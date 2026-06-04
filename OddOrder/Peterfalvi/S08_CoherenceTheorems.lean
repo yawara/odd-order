@@ -3022,6 +3022,100 @@ theorem xPair_stepCoreFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
     (hpair0 i hi) (hpair1 i hi) (hdisj i hi) hi
   exact ⟨hrealχ, hdiffsuppχ, hχχ, hχbarχbar, hχχbar, hχbarχ, hortho.1, hortho.2⟩
 
+/-- **(T8.11c) Accumulator member-family enumeration.**
+
+Every prefix accumulator `pairUnion (xBaseBlock Z) pair i` in the X-chain is a finite family of
+irreducible characters, closed under conjugation.  This packages the `Fin k` enumeration and the
+member facts needed by the member-family half of `XAdjoinStepInput`.  The remaining
+degree-ratio and lattice-generation fields stay separate. -/
+theorem exists_pairUnion_memberFamily_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hi : i < N) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) =
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i ∧
+      (∀ j : Fin k, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ)) ∧
+      (∀ j : Fin k,
+        ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i) ∧
+      (∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ).conj ∈
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i) ∧
+      (∀ j : Fin k, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ).conj = 0) ∧
+      (∀ j l : Fin k,
+        ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+          (χmem l : ClassFunction ↥L ℂ) = if j = l then (1 : ℂ) else 0) := by
+  classical
+  let S₁ : Set (ClassFunction ↥L ℂ) :=
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+  have hS₁X : S₁ ⊆ hyp.Xset Z := by
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact hyp.xBaseBlock_subset Z hbase
+    · exact hpairs j (hji.trans hi) hjpair
+  have hS₁irr : ∀ φ ∈ S₁, IsIrreducibleCharacter φ := fun φ hφ => hX φ (hS₁X hφ)
+  have hS₁fin : S₁.Finite := (hyp.xSet_finite_of_irreducible_X hX).subset hS₁X
+  have hS₀conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+    hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH hX
+  have hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ := by
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (hS₀conj hbase))
+    · have hjN : j < N := hji.trans hi
+      have hpair_conj : φ.conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+          Set.mem_singleton_iff] at hjpair ⊢
+        rcases hjpair with hφ | hφ
+        · right
+          rw [hφ, hpair0 j hjN, hpair1 j hjN]
+        · left
+          rw [hφ, hpair1 j hjN, hpair0 j hjN]
+          simp
+      exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, hpair_conj⟩)
+  obtain ⟨k, χmem, hχinj, hrange⟩ := exists_finEnum_irreducible hS₁fin hS₁irr
+  have hmemS1 : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j
+    rw [← hrange]
+    exact Set.mem_range_self j
+  have hmembarS1 : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ).conj ∈ S₁ :=
+    fun j => hS₁conj (hmemS1 j)
+  have hmemreal : ∀ j : Fin k, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ) := by
+    intro j
+    exact (hyp.xMember_characterFacts_of_irreducible_X hZH hX (hS₁X (hmemS1 j))).1
+  have hmemdiffsupp : ∀ j : Fin k,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    intro j
+    exact hyp.xMember_diffSupport_of_irreducible_X hX (hS₁X (hmemS1 j))
+  have hmemconjortho : ∀ j : Fin k, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0 := by
+    intro j
+    rcases hyp.xMember_characterFacts_of_irreducible_X hZH hX (hS₁X (hmemS1 j)) with
+      ⟨_, _, _, _, hχχbar⟩
+    exact hχχbar
+  have hmemortho : ∀ j l : Fin k,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem l : ClassFunction ↥L ℂ) = if j = l then (1 : ℂ) else 0 := by
+    intro j l
+    by_cases hjl : j = l
+    · subst j
+      simpa using irreducibleCharacter_inner_eq_ite (χmem l) (χmem l)
+    · have hχne : χmem j ≠ χmem l := fun h => hjl (hχinj h)
+      simpa [hjl, hχne] using irreducibleCharacter_inner_eq_ite (χmem j) (χmem l)
+  exact ⟨k, χmem, hχinj, hrange, hmemreal, hmemdiffsupp, hmemS1, hmembarS1,
+    hmemconjortho, hmemortho⟩
+
 /-- **(T8 leaf 10 / T-A4) X-chain assembly from per-pair adjoining data.**
 
 This is the Sibley/Xset wrapper around the abstract `xChainCoherent` fold.  It builds the
