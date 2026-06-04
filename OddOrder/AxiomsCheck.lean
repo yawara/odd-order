@@ -2322,6 +2322,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data
 -- Peterfalvi (7.9) residual cross-term reduction.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero
@@ -2370,6 +2373,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.zetaNuRho_inner_self_re_ge_of_family_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.Bsum_le_of_orthogonal_integer_decomposition

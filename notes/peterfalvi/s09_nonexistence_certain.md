@@ -461,6 +461,19 @@ S09 に `FrobeniusFamily.zetaNuRho_inner_self_re_ge_of_family_source_data`
 組む前段で `1 - e_i/h_i ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接供給する bridge にした。
 
 
+### 2026-06-05 pass: source-data zeta-rho norm formulas
+
+S09 に `Hypothesis78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data`
+と `FrobeniusFamily.zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data`
+を追加した。既存の
+`Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data`
+で source-side の `(β, νζ) = a - 1` を作り、(7.8.c.ii) の
+`(ζ^ν)^ρ` norm formula に接続する bridge。
+
+これで downstream は `u,v,w` formula を作る前段で、local `h/e` 表記と family `h_i/e_i`
+表記の両方から同じ norm identity を直接呼べる。新しい証明書フィールドは追加していない。
+
+
 ### 2026-06-04 pass: residual ZIrr bridges for (7.9)
 
 S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と

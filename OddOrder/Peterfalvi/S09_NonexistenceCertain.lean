@@ -3504,6 +3504,31 @@ theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one
         (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re = r
   exact (congrArg Complex.re hprodCast).trans (Complex.ofReal_re r)
 
+/-- **Peterfalvi (7.8.c.ii).** Source-data bridge for the `(ζ^ν)^ρ` norm
+formula.  The source irreducibility/distinctness data supplies the coefficient
+`(β, ζ^ν) = a - 1`, while irreducibility and orthogonality of the image
+`νζ` remain explicit inputs to the character-ρ norm formula. -/
+theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    H78.zetaNuRhoNormSq =
+      (((H78.kernelOrder : ℝ) - 1) /
+          ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) :=
+  H78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one hBD hnu_irr hnu_orth
+    (H78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+      hBD hirr hdistinct hzeta_degree)
+
 end Hypothesis78
 
 end Section_7_8
@@ -4557,6 +4582,40 @@ lemma zetaNuRho_inner_self_re_ge_of_family_source_data [Fintype G]
         simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
           using hzeta_uv)
       (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+    using hlocal
+
+/-- **Peterfalvi (7.8.c.ii).** Family-notated source-data form of the
+`(ζ^ν)^ρ` norm formula.  This rewrites the local ratio `(h - 1)/(he)` as
+the family quantities `(h_i - 1)/(h_i e_i)`. -/
+lemma zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ r : Fin (H78.hyp76.n + 1), r ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta r)) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (F.e i : ℂ)) :
+    H78.zetaNuRhoNormSq =
+      (((F.h i : ℝ) - 1) / ((F.h i : ℝ) * (F.e i : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) := by
+  have hlocal :
+      H78.zetaNuRhoNormSq =
+        (((H78.kernelOrder : ℝ) - 1) /
+            ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+          (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) :=
+    H78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data
+      hBD hnu_irr hnu_orth hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
   simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
     using hlocal
 
