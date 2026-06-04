@@ -4285,16 +4285,23 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     sorry
   exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
 
-/-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
-`CharacterEstimateData` package used to prove (7.10).
+/-- **Peterfalvi (7.11), displayed-bound form.**  The final contradiction from the
+existential lower bound displayed in (7.10).
 
-This avoids routing through the still-open `card_G0_lower_bound`: once the §9 character theory has
-constructed `F.CharacterEstimateData`, the terminal `G₀ ≠ {1}` contradiction is already closed by
-the completed arithmetic and positivity lemmas. -/
-theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
-    (hodd : Odd (Nat.card G)) (hdata : F.CharacterEstimateData)
+This isolates the terminal arithmetic of (7.11): any proof of the displayed (7.10) bound,
+including the still-open theorem `card_G0_lower_bound` or the conditional §9 assembly lemmas,
+can be consumed without duplicating the `G₀ = {1}` contradiction proof. -/
+theorem not_trivial_G0_of_lowerBoundTerm [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G))
+    (hbound :
+      ∃ i : Fin k,
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          ((F.e i : ℚ) - 1) *
+            (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+                ((F.e i : ℚ) * (F.h i : ℚ)) +
+              2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))))
     (hG0 : F.G0 = {(1 : G)}) : False := by
-  obtain ⟨i, hi⟩ := F.lowerBoundTerm_of_characterEstimateData hodd hdata
+  obtain ⟨i, hi⟩ := hbound
   -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
   have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
   -- The right-hand side of (7.10) is strictly positive.
@@ -4304,6 +4311,18 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
   have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
   rw [hlhs, zero_div] at hi
   linarith [hi, hRHS]
+
+/-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
+`CharacterEstimateData` package used to prove (7.10).
+
+This avoids routing through the still-open `card_G0_lower_bound`: once the §9 character theory has
+constructed `F.CharacterEstimateData`, the terminal `G₀ ≠ {1}` contradiction is already closed by
+the completed arithmetic and positivity lemmas. -/
+theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (hdata : F.CharacterEstimateData)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.lowerBoundTerm_of_characterEstimateData hodd hdata) hG0
 
 /-- **Peterfalvi (7.11), `𝓑`-sum-bound form.**  The terminal contradiction from
 the separately established `𝓑`-sum bound and the real reduced family inequality.
@@ -4371,15 +4390,6 @@ and `e ∣ h - 1` with `h` odd give `(h - 2e - 1)/(eh) ≥ 0`, whence the right 
 of (7.10) is strictly positive — a contradiction. -/
 theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G)) (hG0 : F.G0 = {(1 : G)}) : False := by
-  obtain ⟨i, hi⟩ := card_G0_lower_bound F hodd
-  -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
-  have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
-  -- The right-hand side of (7.10) is strictly positive.
-  have hRHS := F.lowerBoundTerm_pos hodd i
-  -- But (7.10) says it is `≤ 0` — contradiction.
-  rw [hcard] at hi
-  have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
-  rw [hlhs, zero_div] at hi
-  linarith [hi, hRHS]
+  exact not_trivial_G0_of_lowerBoundTerm F hodd (card_G0_lower_bound F hodd) hG0
 
 end OddOrder.Peterfalvi.S09

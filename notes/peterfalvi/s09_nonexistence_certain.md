@@ -354,3 +354,12 @@ S09 に `not_trivial_G0_of_real_Bsum_bound` を追加。これは `CharacterEsti
 
 raw orthogonal decomposition からの入口と named data からの入口の中間に置くことで、(7.8)/(7.9)
 側が先に `Bsum_le` を作った場合にも `card_G0_lower_bound` の sorry を経由せず使える。
+
+
+### 2026-06-04 pass: displayed (7.10) bound to (7.11)
+
+S09 に `not_trivial_G0_of_lowerBoundTerm` を追加し、`card_G0_lower_bound` の結論型そのものから
+`G₀ = {1}` の矛盾へ行く terminal arithmetic を独立化した。既存の
+`not_trivial_G0_of_characterEstimateData` と本 theorem `not_trivial_G0` はこの lemma に委譲する。
+
+これで (7.10) をどの conditional input から作っても、(7.11) 側の証明重複なしに同じ入口へ流せる。
