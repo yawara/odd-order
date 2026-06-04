@@ -398,6 +398,27 @@ theorem s_mem_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
   exact ⟨fieldNormalizerPrimeLineGenerator hyp,
     fieldNormalizerPrimeLineGenerator_mem hyp, rfl⟩
 
+/-- The transported element `s` lies in the transported additive kernel `P`. -/
+theorem s_mem_P {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ∈ hyp.base.P := by
+  rw [← data.sigma_P_eq_P]
+  refine ⟨fieldNormalizerPrimeLineGenerator hyp, ?_, rfl⟩
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [fieldNormalizerPrimeLineGenerator, fieldNormalizerKernel]
+  exact ⟨Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q), rfl⟩
+
+/-- Integer powers of `s` remain in `P`. -/
+theorem s_zpow_mem_P {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℤ) :
+    data.s ^ n ∈ hyp.base.P :=
+  hyp.base.P.zpow_mem data.s_mem_P n
+
+/-- Integer powers of `s` lie in `PU`. -/
+theorem s_zpow_mem_P_sup_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) :
+    data.s ^ n ∈ hyp.base.P ⊔ hyp.base.U :=
+  (le_sup_left : hyp.base.P ≤ hyp.base.P ⊔ hyp.base.U) (data.s_zpow_mem_P n)
+
 /-- The transported element `s` is nontrivial. -/
 theorem s_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.s ≠ 1 := by
@@ -790,6 +811,63 @@ theorem t_pow_normalizes_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℕ) :
     data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
   pow_mem data.t_normalizes_U n
+
+/-- Integer powers of the conjugate generator `t` normalize `U`. -/
+theorem t_zpow_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) :
+    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  (Subgroup.normalizer (hyp.base.U : Set G)).zpow_mem data.t_normalizes_U n
+
+/-- Conjugating a concrete norm-one complement element by any integer power of
+`t` remains in the transported subgroup `U`. -/
+theorem t_zpow_conj_sigma_inr_mem_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ ∈ hyp.base.U := by
+  have huU :
+      data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
+  exact (Subgroup.mem_normalizer_iff.mp (data.t_zpow_normalizes_U n)
+    (data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp))).mp huU
+
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` membership bridge: any expression
+`s^m (u)^{t^n} s^r` with `u ∈ U` lies in `PU`. -/
+theorem s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m n r : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          (data.t ^ n *
+            data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+              (data.t ^ n)⁻¹) *
+        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+  have hmid :
+      data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          (data.t ^ n)⁻¹ ∈ hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U)
+      (data.t_zpow_conj_sigma_inr_mem_U n u)
+  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` decomposition bridge: expressions
+of the form `s^m (u)^{t^n} s^r` admit the Step 1 `u₁ s₁ v₁` normal form. -/
+theorem exists_step4_decomposition_of_zpow_tConj_normOne
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m n r : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s ^ m *
+            (data.t ^ n *
+              data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                (data.t ^ n)⁻¹) *
+          data.s ^ r =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) :=
+  data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    (data.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U m n r u)
 
 /-- BG Appendix C, Lemma C.3 Step 3 intersection dichotomy before the final
 contradiction: if `g` normalizes `U`, then `(PU) ∩ (PU)^g` is either `U` or

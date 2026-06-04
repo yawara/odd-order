@@ -246,6 +246,11 @@ created: 2026-06-04
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の
   “mod P” で `U` 成分だけを取り出す入力。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `(C.5)` decomposition bridge**:
+  `s_mem_P` / `s_zpow_mem_P_sup_U`、`t_zpow_conj_sigma_inr_mem_U`、および
+  `exists_step4_decomposition_of_zpow_tConj_normOne` を公開し、`s^m (u)^{t^n} s^r`
+  型の項が `PU` に入り Step1 の `u₁s₁v₁` normal form を持つことを固定。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。
