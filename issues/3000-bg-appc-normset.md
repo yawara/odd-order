@@ -279,6 +279,13 @@ created: 2026-06-04
   `N(2*φ(u⁻¹)-1)=1` を concrete `P⋊U` と S16 field normalizer data の両方で読める形にした。
   AxiomsCheck 登録済み。残る hard input は、前段 C.4-C.10/Step4 から middle prime-line factor が
   実際に `s⁻¹` になることを materialize し、`appC_twisted_normOne_step` へ接続する部分。
+- [x] **C.3 Step 4 arbitrary middle-coordinate adapter**:
+  `normN_two_mul_sub_one_of_sigma_first_k_three_decomposition` と
+  `appC_normSet_generator_relation_of_first_k_three_coordinate` を公開し、任意の
+  norm-one middle complement `w` について first `k=3` normal form の middle factor が `s⁻¹` なら
+  `N(2*w-1)=1` を読めるようにした。さらに、これを `∀w∈E` で供給すれば
+  `appCNormSetGeneratorRelation` が直ちに出る。AxiomsCheck 登録済み。
+  次の hard target は BG C.4-C.10 の消去から、この universal middle-coordinate step を materialize すること。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。

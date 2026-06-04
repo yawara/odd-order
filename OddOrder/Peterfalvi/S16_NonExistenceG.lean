@@ -1221,16 +1221,14 @@ theorem right_component_of_step4_first_k_three_decomposition
       (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
 
 /-- BG Appendix C, Lemma C.3 Step 4 final paragraph, finite-field reading:
-if the first `k = 3` equation of `(C.5)` has middle prime-line factor `s^{-1}`,
-then its additive coordinate gives `N(2*w-1)=1` for
-`w = (tConjNormOneUnitsAut^3)(u^{-1})`. -/
-theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+if a first `k = 3` normal form has middle prime-line factor `s^{-1}`,
+then its additive coordinate gives `N(2*w-1)=1` for the middle complement
+element `w`. -/
+theorem normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
-    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (w u₁ v₁ : fieldNormalizerNormOneUnits hyp)
     (hdec : data.s *
-          data.sigma
-            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
-              fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
         data.s ^ (-2 : ℤ) =
       data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
         data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
@@ -1238,13 +1236,12 @@ theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
     letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
     OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
       ((2 : GaloisField hyp.base.p hyp.base.q) *
-          ((((data.tConjNormOneUnitsAut ^ 3) u⁻¹ : fieldNormalizerNormOneUnits hyp) :
+          (((w : fieldNormalizerNormOneUnits hyp) :
               (GaloisField hyp.base.p hyp.base.q)ˣ) :
               GaloisField hyp.base.p hyp.base.q) - 1) = 1 := by
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   let F := GaloisField hyp.base.p hyp.base.q
   let H := fieldNormalizerFrobeniusGroup hyp
-  let w : fieldNormalizerNormOneUnits hyp := (data.tConjNormOneUnitsAut ^ 3) u⁻¹
   have hline_neg_one :
       fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p) =
         (SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) : H) := by
@@ -1282,16 +1279,79 @@ theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
       _ = data.sigma (SemidirectProduct.inr u₁ : H) *
             data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
               data.sigma (SemidirectProduct.inr v₁ : H) := by
-        simpa [w] using hdec
+        exact hdec
       _ = data.sigma
           ((SemidirectProduct.inr u₁ : H) *
             SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) *
               SemidirectProduct.inr v₁) := by
         simp [map_mul, hline_neg_one]
   have hH := data.sigma_injective hσ
-  simpa [w, F] using
+  simpa [F] using
     OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
       (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.ne_zero w u₁ v₁ hH
+
+/-- BG Appendix C, Lemma C.3 Step 4 final paragraph, finite-field reading:
+if the first `k = 3` equation of `(C.5)` has middle prime-line factor `s^{-1}`,
+then its additive coordinate gives `N(2*w-1)=1` for
+`w = (tConjNormOneUnitsAut^3)(u^{-1})`. -/
+theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+      ((2 : GaloisField hyp.base.p hyp.base.q) *
+          ((((data.tConjNormOneUnitsAut ^ 3) u⁻¹ : fieldNormalizerNormOneUnits hyp) :
+              (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) - 1) = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simpa using
+    data.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
+      ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) u₁ v₁ hdec
+
+/-- A first `k = 3` coordinate step for every element of `E` implies the
+AppC generator relation.  This is the exact S16-facing target left after the
+BG C.3 Step 4 argument has shown that the middle prime-line factor in the
+relevant normal form is `s^{-1}`. -/
+theorem appC_normSet_generator_relation_of_first_k_three_coordinate
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hstep :
+      letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+      ∀ w : fieldNormalizerNormOneUnits hyp,
+        (((w : fieldNormalizerNormOneUnits hyp) :
+            (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) ∈
+          OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+          ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+            data.s *
+                data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+              data.s ^ (-2 : ℤ) =
+            data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+              data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+                data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    appCNormSetGeneratorRelation hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro a ha
+  let w : fieldNormalizerNormOneUnits hyp :=
+    OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE
+      hyp.base.p hyp.base.q hyp.base.q_prime.pos ha
+  have hwE :
+      (((w : fieldNormalizerNormOneUnits hyp) :
+          (GaloisField hyp.base.p hyp.base.q)ˣ) :
+          GaloisField hyp.base.p hyp.base.q) ∈
+        OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q := by
+    simpa [w] using ha
+  rcases hstep w hwE with ⟨u₁, v₁, hdec⟩
+  have hnorm :=
+    data.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition w u₁ v₁ hdec
+  simpa [w] using hnorm
 
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
