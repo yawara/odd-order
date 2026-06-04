@@ -1398,6 +1398,22 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The coherent source set `S = T \ {Ind 1_H}` from Peterfalvi (7.8),
+presented as a set of class functions on `L`. -/
+def sourceSet (H78 : Hypothesis78 G A L) : Set (ClassFunction L ℂ) :=
+  {φ | ∃ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H ∧ H78.hyp76.zeta i = φ}
+
+/-- Each non-`Ind 1_H` source character belongs to the coherent source set `S`. -/
+theorem zeta_mem_sourceSet (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H) :
+    H78.hyp76.zeta i ∈ H78.sourceSet :=
+  ⟨i, hi, rfl⟩
+
+/-- The distinguished `ζ` belongs to the coherent source set `S`. -/
+theorem zetaDistinct_mem_sourceSet (H78 : Hypothesis78 G A L) :
+    H78.hyp76.zeta H78.zetaDistinct ∈ H78.sourceSet :=
+  H78.zeta_mem_sourceSet H78.zetaDistinct_ne_ind1H
+
 /-- If the abstract `ν` carried by `Hypothesis78` is identified with a concrete
 S07 coherent extension, then `ν` sends the coherent lattice `ℤ[S]` into virtual
 irreducible characters of `G`.
@@ -1426,6 +1442,27 @@ theorem nu_mem_ZIrr_of_isCoherent_of_mem (H78 : Hypothesis78 G A L)
     {φ : ClassFunction L ℂ} (hφ : φ ∈ S) :
     H78.nu φ ∈ ZIrr G :=
   H78.nu_mem_ZIrr_of_isCoherent hcoh hnu (Submodule.subset_span hφ)
+
+/-- If the concrete S07 coherent witness is built over the source set
+`S = T \ {Ind 1_H}`, then every non-`Ind 1_H` indexed source character has
+virtual-irreducible image under `ν`. -/
+theorem nu_zeta_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H) :
+    H78.nu (H78.hyp76.zeta i) ∈ ZIrr G :=
+  H78.nu_mem_ZIrr_of_isCoherent_of_mem hcoh hnu (H78.zeta_mem_sourceSet hi)
+
+/-- Distinguished-`ζ` specialization of `nu_zeta_mem_ZIrr_of_isCoherent`. -/
+theorem nu_zetaDistinct_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension) :
+    H78.nu (H78.hyp76.zeta H78.zetaDistinct) ∈ ZIrr G :=
+  H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu H78.zetaDistinct_ne_ind1H
 
 /-- The Dade image defining `β` is supported on the corresponding Dade support. -/
 theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :

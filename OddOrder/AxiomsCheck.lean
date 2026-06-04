@@ -2117,6 +2117,15 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent_of_mem
+-- Peterfalvi (7.8) indexed source set and `ζᵢ` image consumers for the same S07 witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zeta_mem_sourceSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaDistinct_mem_sourceSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zetaDistinct_mem_ZIrr_of_isCoherent
 -- Peterfalvi (7.8.b) raw norm-bound consumers from `NormEstimates`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates

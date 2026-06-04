@@ -394,3 +394,14 @@ S09 に `Hypothesis78.nu_mem_ZIrr_of_isCoherent` と
 
 これは (7.8.a)/(7.9) で必要になる `νζ ∈ ℤ[Irr G]` 系の入力を、実際の coherence 構成から
 引き出すための入口。抽象 `Hypothesis78.nu` 自体に新しい仮定は追加していない。
+
+### 2026-06-04 pass: indexed source set for S09 coherence
+
+S09 に `Hypothesis78.sourceSet`, `zeta_mem_sourceSet`, `zetaDistinct_mem_sourceSet`,
+`nu_zeta_mem_ZIrr_of_isCoherent`, `nu_zetaDistinct_mem_ZIrr_of_isCoherent` を追加。
+Peterfalvi (7.8) の `S = T \ {Ind 1_H}` を S09 側で名前付けし、具体的な S07
+`IsCoherent τ H78.sourceSet A_prime` witness と `H78.nu = hcoh.extension` から indexed
+`ζ_i` の `νζ_i ∈ ℤ[Irr G]` を直接得られる入口にした。
+
+これで (7.8.a)/(7.9) の downstream proof は、set membership の都度の組み立てではなく
+H78 の indexed API から `νζ_i` の ZIrr-codomain を取り出せる。
