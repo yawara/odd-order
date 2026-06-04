@@ -476,3 +476,15 @@ This removes the uniqueness part of the conjugation-invariance gap. The remainin
 pieces for the Corollary 9.3 replacement step are the elementary/abelian `p`-group data,
 rank lower bounds under conjugation, and the centralizer containment relating the conjugated
 `B*` to the correspondingly conjugated `B`.
+
+### Lean API status (2026-06-04, centralizer simultaneous conjugation)
+
+S09 now has the local helper `conj_smul_le_centralizer_conj_smul`. It transports the
+Corollary 9.3 hypothesis `B* ≤ C_G(B)` after replacing both subgroups by the same conjugate:
+
+`(conj g) • B* ≤ C_G((conj g) • B)`.
+
+This closes the centralizer-containment part of the common-Sylow conjugation step. The
+remaining transport obligations are the `p`-group/noncyclic data for `B`, the elementary
+abelian and `log_p |B*| >= 3` data for `B*`, containment in the chosen Sylow overgroup, and
+moving the resulting uniqueness of the conjugated `B` back to the original `B`.

@@ -484,6 +484,23 @@ private theorem exists_conj_le_sylow_of_isPGroup [Finite G]
     rwa [Sylow.coe_subgroup_smul] at this
   exact hle.trans (le_of_eq hQ'eq)
 
+/-- Centralizer containment is preserved when both sides are conjugated by the same element.
+
+This is the Corollary 9.3 bookkeeping needed after replacing `B*` by a conjugate: the
+subgroup `B` must be conjugated at the same time for `B* ≤ C_G(B)` to remain true. -/
+private theorem conj_smul_le_centralizer_conj_smul {B Bstar : Subgroup G} {g : G}
+    (hBstar_le_CB : Bstar ≤ Subgroup.centralizer (B : Set G)) :
+    ((MulAut.conj g) • Bstar : Subgroup G) ≤
+      Subgroup.centralizer (((MulAut.conj g) • B : Subgroup G) : Set G) := by
+  rintro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  rcases hx with ⟨x0, hx0, rfl⟩
+  rcases hy with ⟨y0, hy0, rfl⟩
+  have hcomm : y0 * x0 = x0 * y0 :=
+    Subgroup.mem_centralizer_iff.mp (hBstar_le_CB hx0) y0 hy0
+  simpa [map_mul] using congrArg (MulAut.conj g) hcomm
+
 /-- BG Corollary 9.3 cascade with the `B*`-side rank drop supplied by a normal
 `E_{p^2}` witness inside an overgroup `P`.
 
