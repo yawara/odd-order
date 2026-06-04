@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.Mathlib.SemidirectProduct
+import OddOrder.Peterfalvi.S08_CoherenceTheorems
 
 /-!
 # BG Appendix C: Frobenius Class-Sum Bridge
@@ -1181,6 +1182,70 @@ def normOneFrobeniusKernelCharacterPred [Fact p.Prime]
   (normOneFrobeniusKernel p q : Set (normOneFrobeniusGroup p q)) ⊆
     OddOrder.Peterfalvi.S03.characterKernel
       (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+
+open scoped Classical in
+/-- A non-kernel irreducible character of the concrete Frobenius group is induced
+from a nontrivial irreducible character of the additive kernel, hence has degree
+`|U|`. -/
+theorem normOneFrobenius_nonKernelCharacter_apply_one_eq_normOneUnits_card
+    [Fact p.Prime] (hq : 1 < q)
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q))
+    (hχnon : ¬ normOneFrobeniusKernelCharacterPred p q χ) :
+    (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q) =
+      (Nat.card (normOneUnits p q) : ℂ) := by
+  let K : Subgroup (normOneFrobeniusGroup p q) := normOneFrobeniusKernel p q
+  haveI : K.Normal := normOneFrobeniusKernel_normal p q
+  obtain ⟨θ, hθinner⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero
+    (H := K) χ
+  have hθ_ne : θ ≠ trivialIrreducibleCharacter K := by
+    intro hθtriv
+    apply hχnon
+    intro g hg
+    have hKind :
+        g ∈ OddOrder.Peterfalvi.S03.characterKernel
+          (ClassFunction.induce K (θ : ClassFunction K ℂ)) := by
+      have hkerθ : (K.subgroupOf K : Set K) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction K ℂ) := by
+        intro n _hn
+        rw [hθtriv]
+        simp [OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction]
+      have hKsubset := OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+        (G := normOneFrobeniusGroup p q) (A := K) (H := K) (le_refl K)
+        (θ : ClassFunction K ℂ) hkerθ
+      exact hKsubset hg
+    exact OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
+      θ.property.isCharacter χ.property hθinner hKind
+  let ψ : IrreducibleCharacter (normOneFrobeniusGroup p q) :=
+    ⟨ClassFunction.induce K (θ : ClassFunction K ℂ),
+      normOneFrobeniusKernel_induce_isIrreducible p q hq θ hθ_ne⟩
+  have hψ_eq : ψ = χ := by
+    have hinner := irreducibleCharacter_inner_eq_ite ψ χ
+    by_cases hψχ : ψ = χ
+    · exact hψχ
+    · rw [if_neg hψχ] at hinner
+      exact absurd hinner hθinner
+  have hcf : ClassFunction.induce K (θ : ClassFunction K ℂ) =
+      (χ : ClassFunction (normOneFrobeniusGroup p q) ℂ) :=
+    congrArg (fun η : IrreducibleCharacter (normOneFrobeniusGroup p q) =>
+      (η : ClassFunction (normOneFrobeniusGroup p q) ℂ)) hψ_eq
+  have hval := congrArg
+    (fun φ : ClassFunction (normOneFrobeniusGroup p q) ℂ =>
+      φ (1 : normOneFrobeniusGroup p q)) hcf
+  exact hval.symm.trans
+    (normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_card p q θ)
+
+/-- Non-kernel irreducible characters in the App C Frobenius group have degree at
+least `|U|`; in fact the previous theorem gives equality. -/
+theorem normOneFrobenius_nonKernelCharacter_normOneUnits_card_le_degree
+    [Fact p.Prime] (hq : 1 < q)
+    (χ : IrreducibleCharacter (normOneFrobeniusGroup p q))
+    (hχnon : ¬ normOneFrobeniusKernelCharacterPred p q χ) :
+    (Nat.card (normOneUnits p q) : ℝ) ≤
+      ‖((χ : ClassFunction (normOneFrobeniusGroup p q) ℂ)
+        (1 : normOneFrobeniusGroup p q))‖ := by
+  rw [normOneFrobenius_nonKernelCharacter_apply_one_eq_normOneUnits_card p q hq χ hχnon]
+  simp
 
 /-- The concrete summand in the `C_1 * C_1 -> C_2` class-sum character formula. -/
 noncomputable def normOneFrobeniusClassSumConcreteTerm [Fact p.Prime]
