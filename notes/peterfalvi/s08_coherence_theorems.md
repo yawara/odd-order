@@ -1771,3 +1771,22 @@ agreement/mixed-inner が `ℤ[X]`/`ℤ[Y]` 上の span-level input だったが
 これで Frobenius/c1 route の `τ₃` 側残 input は、`X` coherence, generator 上の `τ₃` agreement,
 generator 上の mixed-inner preservation, supported-span generation に縮約された。span への持ち上げは
 caller 側で繰り返さない。
+
+
+### 2026-06-04 pass 20: Frobenius c1 capstone from X-chain data
+
+S08 に Frobenius/c1 route の capstone adapter を追加。pass 19 では final glue が generator-level
+`τ₃` data を受けられるようになったが、caller はまだ `hX : IsCoherent τ (Xset H') A` を別途渡す
+形だった。この pass で既存の (6.6) X-chain constructors と final glue を合成した:
+
+- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner`:
+  `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` で `X` coherence を
+  内部構成し、その extension に対する generator-level `τ₃` agreement/mixed-inner/generation から
+  `hyp.CoherenceTarget` を返す。
+- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`:
+  base-anchor step package 版。同じ capstone だが sorted-degree facts は step package からではなく
+  既存 base-anchor adapter が内部導出する。
+
+これで Frobenius/c1 route の caller-facing input は、`Xset H'` nonempty、各 X-chain step の
+common-index p-power data、generator 上の `τ₃` agreement、generator 上の mixed-inner preservation、
+supported-span generation に縮約された。`hX` witness 自体は caller が構成しない。

@@ -2097,6 +2097,12 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
 -- Peterfalvi (7.10) consumer algebra: sum the Ind equations over an integral weighted source.

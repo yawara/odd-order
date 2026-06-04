@@ -5359,6 +5359,98 @@ noncomputable def
     (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
     hXne hstepData
 
+/-- **(6.8.1), Frobenius case:** final glue from common-index p-power X-chain data.
+
+This composes the Frobenius `X = S - S(H')` coherence constructor with the generator-level `τ₃`
+glue adapter.  The caller supplies only the genuine (6.6) X-chain step data and generator-level
+`τ₃` agreement/mixed-inner facts; the `X` coherence witness is built internally. -/
+noncomputable def coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
+      ν x = (hyp.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius
+        hF hXne hstepData).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget :=
+  hyp.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner hF
+    (hyp.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius
+      hF hXne hstepData)
+    ν hagreeX hagreeY hmixed hgen
+
+/-- **(6.8.1), Frobenius case:** final glue from base-anchor common-index p-power X-chain data.
+
+This is the same capstone as
+`coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner`, but using the
+base-anchor step package that derives the sorted-degree inequalities internally. -/
+noncomputable def
+    coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
+      ν x =
+        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+          hF hXne hstepData).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget :=
+  hyp.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner hF
+    (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+      hF hXne hstepData)
+    ν hagreeX hagreeY hmixed hgen
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
