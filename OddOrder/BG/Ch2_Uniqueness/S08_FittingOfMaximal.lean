@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
+import OddOrder.BG.AppB_Thm62
 import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.SCN
@@ -3242,6 +3243,155 @@ theorem sylow_map_mem_range_of_normalizer_le_normalizer [Finite G]
     exact htG_in_PH
   have htG_in_SH : tG ∈ SH := ⟨⟨tG, htG_in_M⟩, htM_in_S, rfl⟩
   exact ht_not htG_in_SH
+
+/-- If `F(M)` is a `p`-group, it lies in every Sylow `p`-subgroup of `M`, viewed in
+`G`. -/
+theorem fittingInG_le_sylow_map_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} (P : Sylow p ↥M)
+    (hFp : IsPGroup p ↥(fittingInG M)) :
+    fittingInG M ≤ (P : Subgroup ↥M).map M.subtype := by
+  rw [fittingInG_eq_opiCoreInG_singleton_of_isPGroup (M := M) hFp, opiCoreInG]
+  rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) p]
+  exact Subgroup.map_mono (OddOrder.Isaacs.Ch01.opCore_le P)
+
+/-- In a nontrivial finite `p`-group, `Z(L(G))` is nontrivial. -/
+theorem zCenterLOdd_top_ne_bot_of_isPGroup
+    {X : Type*} [Group X] [Finite X] {p : ℕ} [Fact p.Prime] [Nontrivial X]
+    (hX : IsPGroup p X) :
+    OddOrder.BG.AppB.zCenterLOdd (⊤ : Subgroup X) ≠ ⊥ := by
+  have hL_ne : OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X) ≠ ⊥ :=
+    OddOrder.BG.AppB.lOddIn_ne_bot hX
+  have hL_pg : IsPGroup p (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)) :=
+    hX.to_subgroup _
+  haveI hL_nontriv : Nontrivial ↥(OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hL_ne
+  have hcenter_ne :
+      Subgroup.center (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X) : Subgroup X) ≠ ⊥ :=
+    (Subgroup.nontrivial_iff_ne_bot _).mp hL_pg.center_nontrivial
+  intro hZ
+  rw [OddOrder.BG.AppB.zCenterLOdd] at hZ
+  exact hcenter_ne ((Subgroup.map_eq_bot_iff_of_injective
+    (Subgroup.center (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X) : Subgroup X))
+    (OddOrder.BG.AppB.lOddIn (⊤ : Subgroup X)).subtype_injective).mp hZ)
+
+/-- If `H` is a nontrivial finite `p`-subgroup, then `Z(L(H))`, realized in the ambient
+group, is nontrivial. -/
+theorem zCenterLOdd_ne_bot_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} (hHp : IsPGroup p H) (hH_ne : H ≠ ⊥) :
+    OddOrder.BG.AppB.zCenterLOdd H ≠ ⊥ := by
+  haveI hH_nontriv : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH_ne
+  have htop_ne : OddOrder.BG.AppB.zCenterLOdd (⊤ : Subgroup ↥H) ≠ ⊥ :=
+    zCenterLOdd_top_ne_bot_of_isPGroup (X := ↥H) hHp
+  have hinj : Function.Injective (H.subtype.comp (⊤ : Subgroup ↥H).subtype) := by
+    intro x y hxy
+    exact Subtype.ext (H.subtype_injective hxy)
+  have hmap := OddOrder.BG.AppB.map_zCenterLOdd_of_injOn
+    (G := ↥H) (G' := G) H.subtype (H := (⊤ : Subgroup ↥H)) hinj
+  have htop_map : ((⊤ : Subgroup ↥H).map H.subtype) = H := by
+    rw [← MonoidHom.range_eq_map, H.range_subtype]
+  rw [htop_map] at hmap
+  intro hbot
+  have hmap_bot : (OddOrder.BG.AppB.zCenterLOdd (⊤ : Subgroup ↥H)).map H.subtype = ⊥ := by
+    rw [hmap, hbot]
+  exact htop_ne ((Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective).mp hmap_bot)
+
+/-- The normalizer of `H` normalizes the characteristic subgroup `Z(L(H))`. -/
+theorem normalizer_le_normalizer_zCenterLOdd (H : Subgroup G) :
+    Subgroup.normalizer (H : Set G) ≤
+      Subgroup.normalizer (OddOrder.BG.AppB.zCenterLOdd H : Set G) := by
+  intro g hg
+  have hHmap : H.map (MulAut.conj g).toMonoidHom = H :=
+    OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mpr hg
+  have hinj : Function.Injective ((MulAut.conj g).toMonoidHom.comp H.subtype) :=
+    (MulAut.conj g).injective.comp H.subtype_injective
+  have hmap : (OddOrder.BG.AppB.zCenterLOdd H).map (MulAut.conj g).toMonoidHom =
+      OddOrder.BG.AppB.zCenterLOdd (H.map (MulAut.conj g).toMonoidHom) :=
+    OddOrder.BG.AppB.map_zCenterLOdd_of_injOn
+      (G := G) (G' := G) (MulAut.conj g).toMonoidHom (H := H) hinj
+  have hZmap : (OddOrder.BG.AppB.zCenterLOdd H).map (MulAut.conj g).toMonoidHom =
+      OddOrder.BG.AppB.zCenterLOdd H := by
+    calc
+      (OddOrder.BG.AppB.zCenterLOdd H).map (MulAut.conj g).toMonoidHom
+          = OddOrder.BG.AppB.zCenterLOdd (H.map (MulAut.conj g).toMonoidHom) := hmap
+      _ = OddOrder.BG.AppB.zCenterLOdd H := by rw [hHmap]
+  exact OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mp hZmap
+
+/-- BG 8.1(b), fifth p-group bridge: Theorem 6.2 applied to `M` gives enough
+normalizer control on `Z(L(P))` to make the image of `P` a Sylow `p`-subgroup of `G`. -/
+theorem sylow_map_mem_range_of_fittingInG_isPGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M)) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+  classical
+  set SH : Subgroup G := (P : Subgroup ↥M).map M.subtype with hSH_def
+  set K : Subgroup G := OddOrder.BG.AppB.zCenterLOdd SH with hK_def
+  have hF_ne_bot : fittingInG M ≠ ⊥ := by
+    intro hbot
+    have hcard : Nat.card ↥(fittingInG M) = 1 := Subgroup.card_eq_one.mpr hbot
+    rw [hcard, Nat.primeFactors_one] at hp
+    exact Finset.notMem_empty p hp
+  have hF_le_SH : fittingInG M ≤ SH := by
+    rw [hSH_def]
+    exact fittingInG_le_sylow_map_of_isPGroup P hFp
+  have hSH_ne_bot : SH ≠ ⊥ := by
+    intro hbot
+    exact hF_ne_bot (le_bot_iff.mp (hF_le_SH.trans (le_of_eq hbot)))
+  have hSH_p : IsPGroup p SH := by
+    rw [hSH_def]
+    exact P.isPGroup'.map M.subtype
+  have hK_ne_bot : K ≠ ⊥ := by
+    rw [hK_def]
+    exact zCenterLOdd_ne_bot_of_isPGroup hSH_p hSH_ne_bot
+  have hK_le_SH : K ≤ SH := by
+    rw [hK_def]
+    exact (OddOrder.BG.AppB.zCenterLOdd_le_lOddIn SH).trans
+      (OddOrder.BG.AppB.lOddIn_le_self SH)
+  have hp_dvd_G : p ∣ Nat.card G :=
+    (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_subgroup_dvd_card (fittingInG M))
+  have hp_odd_prop : Odd p := hG.odd.of_dvd_nat hp_dvd_G
+  have hp_odd : p ≠ 2 := by
+    rintro rfl
+    rw [Nat.odd_iff] at hp_odd_prop
+    omega
+  have hsolvM : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hoddM : Odd (Nat.card ↥M) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hmap_bot : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M).map M.subtype = ⊥ := by
+    simpa [opiCoreInG] using
+      (opiCoreInG_singleton_compl_eq_bot_of_fittingInG_isPGroup (M := M) hp hFp)
+  have hcore_bot_compl : Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M = ⊥ :=
+    (Subgroup.map_eq_bot_iff_of_injective
+      (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥M) M.subtype_injective).mp hmap_bot
+  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥M = ⊥ := by
+    simpa [Set.compl_setOf] using hcore_bot_compl
+  have hZ_norm_M : (OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).Normal := by
+    have h := OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal hp_odd hsolvM hoddM P
+    rwa [hcore_bot, sup_bot_eq] at h
+  have hinjP : Function.Injective (M.subtype.comp (P : Subgroup ↥M).subtype) := by
+    intro x y hxy
+    exact Subtype.ext (M.subtype_injective hxy)
+  have hZmap : (OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map M.subtype = K := by
+    have h := OddOrder.BG.AppB.map_zCenterLOdd_of_injOn
+      (G := ↥M) (G' := G) M.subtype (H := (P : Subgroup ↥M)) hinjP
+    rw [← hSH_def] at h
+    simpa [hK_def] using h
+  have hM_norm_K : M ≤ Subgroup.normalizer (K : Set G) := by
+    have h1 : (Subgroup.normalizer (OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M) : Set ↥M)).map
+        M.subtype ≤ Subgroup.normalizer (((OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map
+          M.subtype) : Set G) :=
+      Subgroup.le_normalizer_map M.subtype
+    rw [Subgroup.normalizer_eq_top_iff.mpr hZ_norm_M] at h1
+    have htop_map : (⊤ : Subgroup ↥M).map M.subtype = M := by
+      rw [← MonoidHom.range_eq_map, M.range_subtype]
+    rw [htop_map, hZmap] at h1
+    exact h1
+  have hN_SH_le_NK : Subgroup.normalizer (SH : Set G) ≤ Subgroup.normalizer (K : Set G) := by
+    rw [hK_def]
+    exact normalizer_le_normalizer_zCenterLOdd SH
+  exact sylow_map_mem_range_of_normalizer_le_normalizer hG hM P hK_ne_bot hK_le_SH
+    hM_norm_K (by simpa [hSH_def] using hN_SH_le_NK)
 
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
