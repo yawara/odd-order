@@ -2734,6 +2734,74 @@ private theorem pRank_opiCoreInG_singleton_le_two_of_rank_le_two
       (f := Subgroup.inclusion (opiCoreInG_le ({q} : Set ℕ) K))
       (Subgroup.inclusion_injective (opiCoreInG_le ({q} : Set ℕ) K))).trans hK_rank)
 
+/-- A finite subgroup that is both a `p`-group and a `q`-group for distinct
+prime numbers is trivial. -/
+private theorem eq_bot_of_isPGroup_of_isPGroup_ne
+    {M : Type*} [Group M] [Finite M] {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hpq : p ≠ q) {H : Subgroup M} (hp : IsPGroup p ↥H) (hq : IsPGroup q ↥H) :
+    H = ⊥ := by
+  have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥H) :=
+    IsPGroup.coprime_card_of_ne p q hpq H H hp hq
+  exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcop dvd_rfl dvd_rfl)
+
+/-- If the image of `P` in `M/V` is trivial, then `P ≤ V`. -/
+private theorem le_of_map_quotient_eq_bot
+    {M : Type*} [Group M] {V P : Subgroup M} [V.Normal]
+    (h : P.map (QuotientGroup.mk' V) = ⊥) : P ≤ V := by
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at h
+  exact h
+
+/-- In a finite nilpotent normal subgroup, a `q`-primary chief-series layer is
+absorbed by `O_q(K)` modulo the next layer. -/
+private theorem chiefSeriesInside_le_opiCoreInG_sup_of_nilpotent
+    {M : Type*} [Group M] [Finite M] {q : ℕ} [Fact q.Prime]
+    {K : Subgroup M} [K.Normal] (hKnilp : Group.IsNilpotent ↥K) (i : ℕ)
+    (hUbar_pgroup :
+      IsPGroup q ↥((chiefSeriesInside K i).map
+        (QuotientGroup.mk' (chiefSeriesInside K (i + 1))))) :
+    chiefSeriesInside K i ≤
+      opiCoreInG ({q} : Set ℕ) K ⊔ chiefSeriesInside K (i + 1) := by
+  classical
+  let U : Subgroup M := chiefSeriesInside K i
+  let V : Subgroup M := chiefSeriesInside K (i + 1)
+  let X : Subgroup M := opiCoreInG ({q} : Set ℕ) K ⊔ V
+  have hU_le_K : U ≤ K := by
+    simpa [U] using chiefSeriesInside_le K i
+  have hU_nilp : Group.IsNilpotent ↥U := by
+    haveI : Group.IsNilpotent ↥K := hKnilp
+    exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hU_le_K)
+  change U ≤ X
+  refine S08.le_of_sylow_le_of_nilpotent hU_nilp ?_
+  intro r
+  haveI hrFact : Fact (Nat.Prime (r : ℕ)) :=
+    ⟨Nat.prime_of_mem_primeFactors r.2⟩
+  let S : Sylow (r : ℕ) ↥U := default
+  let Sm : Subgroup M := (S : Subgroup ↥U).map U.subtype
+  have hSm_le_U : Sm ≤ U := by
+    simpa [Sm] using Subgroup.map_subtype_le (S : Subgroup ↥U)
+  have hSm_le_K : Sm ≤ K := hSm_le_U.trans hU_le_K
+  by_cases hrq : (r : ℕ) = q
+  · have hSm_q : IsPGroup q ↥Sm := by
+      simpa [S, Sm, hrq] using ((S : Sylow (r : ℕ) ↥U).isPGroup'.map U.subtype)
+    have hSm_le_O : Sm ≤ opiCoreInG ({q} : Set ℕ) K :=
+      S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hKnilp hSm_le_K hSm_q
+    have hSm_le_X : Sm ≤ X := hSm_le_O.trans le_sup_left
+    simpa [S, Sm, X] using hSm_le_X
+  · have hSm_r : IsPGroup (r : ℕ) ↥Sm := by
+      simpa [S, Sm] using ((S : Sylow (r : ℕ) ↥U).isPGroup'.map U.subtype)
+    have hSmq_r : IsPGroup (r : ℕ) ↥(Sm.map (QuotientGroup.mk' V)) :=
+      hSm_r.map (QuotientGroup.mk' V)
+    have hSmq_le_Ubar :
+        Sm.map (QuotientGroup.mk' V) ≤ U.map (QuotientGroup.mk' V) :=
+      Subgroup.map_mono hSm_le_U
+    have hSmq_q : IsPGroup q ↥(Sm.map (QuotientGroup.mk' V)) := by
+      simpa [U, V] using hUbar_pgroup.to_le hSmq_le_Ubar
+    have hSmq_bot : Sm.map (QuotientGroup.mk' V) = ⊥ :=
+      eq_bot_of_isPGroup_of_isPGroup_ne hrq hSmq_r hSmq_q
+    have hSm_le_V : Sm ≤ V := le_of_map_quotient_eq_bot hSmq_bot
+    have hSm_le_X : Sm ≤ X := hSm_le_V.trans le_sup_right
+    simpa [S, Sm, X] using hSm_le_X
+
 /-- Package one chief-series layer using the ambient `q`-core of `K` as the
 rank-two normal `q`-subgroup required by BG Corollary 4.19.  The only remaining
 mathematical input is the nilpotent/Hall-style absorption `U ≤ O_q(K) V`, which
@@ -2784,6 +2852,20 @@ private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_
   exact cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG
     hq (odd_prime_of_chiefFactor_quotient_isPGroup hoddM hq hChief hUbar_pgroup)
     hK_rank i hUbar_pgroup (habsorb q hq hUbar_pgroup)
+
+/-- Nilpotent version of the chief-series Corollary 4.19 data package. -/
+private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_nilpotent
+    {M : Type*} [Group M] [Finite M] [IsSolvable M] (hoddM : Odd (Nat.card M))
+    {K : Subgroup M} [K.Normal] (hKnilp : Group.IsNilpotent ↥K)
+    (hK_rank : rank ↥K ≤ 2) :
+    ∀ i, chiefSeriesInside K i ≠ ⊥ →
+      Cor419ChiefFactorData M (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) := by
+  intro i hU_ne
+  exact cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_absorption
+    hoddM hK_rank i hU_ne
+    (fun q hq hUbar => by
+      haveI : Fact q.Prime := ⟨hq⟩
+      exact chiefSeriesInside_le_opiCoreInG_sup_of_nilpotent (q := q) hKnilp i hUbar)
 
 /-- Chief-series layers contained in a normal rank-two `q`-subgroup already have
 the shape required by BG Corollary 4.19.  The later Lemma 9.5 proof uses this
