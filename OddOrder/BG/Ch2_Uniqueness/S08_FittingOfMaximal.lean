@@ -4163,6 +4163,100 @@ theorem not_dvd_subgroupOf_index_of_forall_card_le [Finite G]
     exact hSmap_card_le_K
   exact (not_lt_of_ge hS_card_le_Ksub) hcard_lt
 
+/-- A subgroup properly contained in a finite `p`-group is properly contained in its
+normalizer inside that `p`-group. -/
+theorem lt_inf_normalizer_of_isPGroup_lt [Finite G]
+    {p : ℕ} [Fact p.Prime] {K L : Subgroup G}
+    (hL : IsPGroup p L) (hKL : K < L) :
+    K < L ⊓ Subgroup.normalizer (K : Set G) := by
+  haveI : Group.IsNilpotent ↥L := hL.isNilpotent
+  have hNC : NormalizerCondition ↥L := normalizerCondition_of_isNilpotent (G := ↥L)
+  have hK_le : K ≤ L := le_of_lt hKL
+  have hsub_lt_top : K.subgroupOf L < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact (ne_of_lt hKL) (le_antisymm hK_le htop)
+  have hlt := hNC (K.subgroupOf L) hsub_lt_top
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hK_le, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  refine lt_of_le_of_ne (le_inf hK_le Subgroup.le_normalizer) ?_
+  intro heq
+  apply ht_not
+  have hmem : (t : G) ∈ L ⊓ Subgroup.normalizer (K : Set G) := ⟨t.2, ht_norm⟩
+  rw [← heq] at hmem
+  exact hmem
+
+/-- The ambient image of a Sylow subgroup of `H ⊓ M` dominates every ambient
+`p`-subgroup lying in `H ⊓ M` and containing that image. -/
+theorem card_le_sylow_inf_map_of_le [Finite G]
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (R : Sylow p ↥(H ⊓ M)) {L : Subgroup G}
+    (hLp : IsPGroup p L)
+    (hRL : (R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≤ L)
+    (hLH : L ≤ H) (hLM : L ≤ M) :
+    Nat.card ↥L ≤ Nat.card ↥((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) := by
+  have hL_inf : L ≤ H ⊓ M := le_inf hLH hLM
+  have hLsub_p : IsPGroup p (L.subgroupOf (H ⊓ M)) :=
+    hLp.of_equiv (Subgroup.subgroupOfEquivOfLe hL_inf).symm
+  have hR_le_Lsub : (R : Subgroup ↥(H ⊓ M)) ≤ L.subgroupOf (H ⊓ M) := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    exact hRL ⟨x, hx, rfl⟩
+  have hLsub_eq_R : L.subgroupOf (H ⊓ M) = (R : Subgroup ↥(H ⊓ M)) :=
+    R.is_maximal' hLsub_p hR_le_Lsub
+  have hLsub_card : Nat.card ↥(L.subgroupOf (H ⊓ M)) = Nat.card ↥L :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hL_inf).toEquiv
+  have hRmap_card :
+      Nat.card ↥((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) =
+        Nat.card ↥(R : Subgroup ↥(H ⊓ M)) :=
+    Subgroup.card_map_of_injective (H ⊓ M).subtype_injective
+  rw [← hLsub_card, hLsub_eq_R, hRmap_card]
+
+/-- If the ambient normalizer of the Sylow image in `H ⊓ M` lies in `M`, then that
+image is card-maximal among `p`-subgroups of `H` containing it. -/
+theorem forall_card_le_of_normalizer_sylow_inf_map_le [Finite G]
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (R : Sylow p ↥(H ⊓ M))
+    (hN_le_M : Subgroup.normalizer
+      (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M) :
+    ∀ L : Subgroup G, IsPGroup p L →
+      (R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≤ L → L ≤ H →
+      Nat.card ↥L ≤ Nat.card ↥((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) := by
+  intro L hLp hRL hLH
+  by_cases hL_le_R : L ≤ (R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype
+  · exact Subgroup.card_le_of_le hL_le_R
+  · have hR_lt_L :
+        (R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype < L :=
+      lt_of_le_of_ne hRL (fun hEq => hL_le_R (le_of_eq hEq.symm))
+    have hR_lt_LN := lt_inf_normalizer_of_isPGroup_lt hLp hR_lt_L
+    have hLN_p : IsPGroup p
+        (L ⊓ Subgroup.normalizer
+          (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) : Subgroup G) :=
+      hLp.to_inf_left
+    have hLN_le_H : L ⊓ Subgroup.normalizer
+        (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ H :=
+      inf_le_left.trans hLH
+    have hLN_le_M : L ⊓ Subgroup.normalizer
+        (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M :=
+      inf_le_right.trans hN_le_M
+    have hLN_card_le_R :=
+      card_le_sylow_inf_map_of_le R hLN_p hR_lt_LN.le hLN_le_H hLN_le_M
+    have hcard_lt :
+        Nat.card ↥((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) <
+          Nat.card ↥(L ⊓ Subgroup.normalizer
+            (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) : Subgroup G) := by
+      have hss :
+          (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype : Subgroup G) : Set G) ⊂
+            ((L ⊓ Subgroup.normalizer
+              (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) : Subgroup G) : Set G) :=
+        SetLike.coe_ssubset_coe.mpr hR_lt_LN
+      exact Set.Finite.card_lt_card (Set.toFinite
+        ((L ⊓ Subgroup.normalizer
+          (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) : Subgroup G) : Set G)) hss
+    exact False.elim ((not_lt_of_ge hLN_card_le_R) hcard_lt)
+
 /-- If `Z(L(K))`, realized in the ambient group, is nontrivial and normal in a maximal
 subgroup `H`, then its ambient normalizer is exactly `H`. -/
 theorem normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot [Finite G]
@@ -4376,6 +4470,15 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     exact hRinfH_of_not_dvd
       (not_dvd_subgroupOf_index_of_forall_card_le
         hRinf_amb_p hRinf_amb_le_H hmax)
+  have hRinfH_of_normalizer_le_M :
+      Subgroup.normalizer
+          (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M →
+        ∃ RinfH : Sylow p ↥H,
+          (RinfH : Subgroup ↥H).map H.subtype =
+            (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype := by
+    intro hN_le_M
+    exact hRinfH_of_forall_card_le
+      (forall_card_le_of_normalizer_sylow_inf_map_le Rinf hN_le_M)
   obtain ⟨LRinf, hLRinf, hNRinf_le_LRinf⟩ :=
     exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
       hG hM hRinf_amb_ne_bot hRinf_amb_le_M
@@ -4394,6 +4497,16 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
       simpa [hLRinf_eq_M] using hNRinf_le_LRinf
     · right
       exact hLRinf_bound hLRinf_eq_M
+  have hRinfH_or_bound :
+      (∃ RinfH : Sylow p ↥H,
+          (RinfH : Subgroup ↥H).map H.subtype =
+            (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) ∨
+        sylowInfCard p LRinf M ≤ Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) := by
+    rcases hNRinf_le_M_or_bound with hN_le_M | hbound
+    · left
+      exact hRinfH_of_normalizer_le_M hN_le_M
+    · right
+      exact hbound
   obtain ⟨RH, hA_RH⟩ := exists_sylow_containing_scn3_map_of_le P hAP hAH
   have hRH_ne_bot : (RH : Subgroup ↥H) ≠ ⊥ :=
     sylow_ne_bot_of_scn3_map_le P hAP hA hAH hA_RH
