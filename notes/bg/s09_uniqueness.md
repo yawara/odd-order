@@ -823,11 +823,22 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `B ≤ A` would force the ambient `SCN₃` counterexample `A` into `𝒰`, using
      Corollary 9.2 and `r(A) ≥ 3`.
    - `exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting` packages the
-     cocyclic `Ω₁(A)` witness with `¬ IsUniquelyMaximal B`.
+     cocyclic `Ω₁(A)` witness with both `B.IsElementaryAbelian p` and
+     `¬ IsUniquelyMaximal B`; the elementary-abelian inheritance is isolated in
+     `isElementaryAbelian_of_le_omega1OfAbelian`.
 
-   Remaining for this block: route the resulting noncyclic `B ∉ 𝒰` through
-   Theorem 9.1 to choose `y` and `L`, then apply Corollary 4.19 + Lemma 1.9 to
-   contradict the noncentralization of `D ∩ C_G(B)`.
+   A fifth bridge now records the BG line "By Theorem 9.1, choose `y` and `L`":
+
+   - `exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal` is the direct
+     contrapositive of Theorem 9.1's centralizer alternative.
+   - `exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal` extends the
+     chosen `y ∈ B#` to `L ∈ 𝓜(C_G(y))` with `L ≠ M`.
+   - `exists_nonU_cocyclic_omega1_witness_maximal_ne` combines this with the Lemma
+     9.5 cocyclic `Ω₁(A)`/`O_{p'}(F(M))` witness package.
+
+   Remaining for this block: use the arbitrary-choice hypothesis on `M ∈ 𝓜(C_G(A))`
+   to apply (9.9) with `L` in place of `M`, derive (9.10), then apply Corollary
+   4.19 + Lemma 1.9 to contradict the noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

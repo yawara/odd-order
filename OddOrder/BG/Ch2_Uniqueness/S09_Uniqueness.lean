@@ -112,6 +112,43 @@ theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimal
     IsUniquelyMaximal B := by
   sorry
 
+/-- Contrapositive form of BG Theorem 9.1 used in Lemma 9.5: if the noncyclic
+`p`-elementary subgroup `B ≤ M` is not in `𝒰`, then some nonidentity element of
+`B` has centralizer not contained in `M`. -/
+private theorem exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
+    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
+    ∃ y : G, y ∈ B ∧ y ≠ 1 ∧ ¬ Subgroup.centralizer ({y} : Set G) ≤ M := by
+  by_contra hnone
+  have hcent : ∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
+    intro b hb hb1
+    by_contra hnot_le
+    exact hnone ⟨b, hb, hb1, hnot_le⟩
+  exact hBnot (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM hBea hBM hBnc
+    (Or.inl hcent))
+
+/-- Lemma 9.5 witness selection after BG Theorem 9.1: choose `y ∈ B#` and a
+maximal subgroup `L` over `C_G(y)` with `L ≠ M`. -/
+private theorem exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
+    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
+    ∃ y : G, ∃ L : Subgroup G,
+      y ∈ B ∧ y ≠ 1 ∧
+      ¬ Subgroup.centralizer ({y} : Set G) ≤ M ∧
+      L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) ∧
+      L ≠ M := by
+  obtain ⟨y, hyB, hy1, hCGnotM⟩ :=
+    exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal hG hM hBea hBM hBnc hBnot
+  obtain ⟨L, hLco, hCGleL⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer ({y} : Set G))).resolve_left
+      (centralizer_singleton_lt_top hG hy1).ne
+  have hLneM : L ≠ M := by
+    intro hLM
+    exact hCGnotM (by simpa [hLM] using hCGleL)
+  exact ⟨y, L, hyB, hy1, hCGnotM, ⟨hLco, hCGleL⟩, hLneM⟩
+
 /-- **BG Corollary 9.2** (mmd L2541): `L ∈ 𝒰`, `K ≤ C_G(L)`, `r(K) ≥ 2` ⇒ `K ∈ 𝒰`。 -/
 theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
     {L K : Subgroup G} (hL : IsUniquelyMaximal L) (hKL : K ≤ Subgroup.centralizer (L : Set G))
@@ -2232,6 +2269,20 @@ private theorem exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting
       (G := G) (p := p) (A := A) (D := D) (P0 := P0)
       hAcomm_set h3A hOmegaD hCop (by simpa [D] using hP0D))
 
+/-- Any subgroup of the abelian `Ω₁(A)` is elementary abelian at the same prime. -/
+private theorem isElementaryAbelian_of_le_omega1OfAbelian {p : ℕ} {A B : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hBΩ : B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) :
+    B.IsElementaryAbelian p := by
+  let Ω : Subgroup G := OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set
+  have hΩea : Ω.IsElementaryAbelian p := by
+    simpa [Ω] using
+      (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+        (G := G) (H := A) (p := p) (hH := hAcomm_set))
+  have hB_sub_ea : (B.subgroupOf Ω).IsElementaryAbelian p :=
+    hΩea.to_subgroup (B.subgroupOf Ω)
+  exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hBΩ) hB_sub_ea
+
 /-- BG Lemma 9.5 bridge: the `B` found by the cocyclic `Ω₁(A)` argument is
 also outside the uniqueness class whenever the ambient `SCN₃` subgroup `A` is
 the chosen counterexample. -/
@@ -2243,6 +2294,7 @@ private theorem exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting [Fini
     (hP0D : ¬ P0 ≤ Subgroup.centralizer
       ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G)) :
     ∃ B : Subgroup G,
+      B.IsElementaryAbelian p ∧
       ¬ IsUniquelyMaximal B ∧
       B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ∧
       B ≤ A ∧
@@ -2255,9 +2307,48 @@ private theorem exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting [Fini
             Subgroup.centralizer (B : Set G)) : Set G) := by
   obtain ⟨B, hBΩ, hBA, hBnc, hcyc, hnot_cent⟩ :=
     exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting hAcomm_set hM hA hP0D
-  exact ⟨B,
+  have hBea : B.IsElementaryAbelian p :=
+    isElementaryAbelian_of_le_omega1OfAbelian hAcomm_set hBΩ
+  exact ⟨B, hBea,
     not_isUniquelyMaximal_of_le_scn3_counterexample hG hAcomm_set hA hBA hAnot,
     hBΩ, hBA, hBnc, hcyc, hnot_cent⟩
+
+/-- Lemma 9.5 witness package after Theorem 9.1: from the cocyclic `Ω₁(A)`
+witness one also obtains `y ∈ B#` and a maximal subgroup `L` containing
+`C_G(y)` with `L ≠ M`. -/
+private theorem exists_nonU_cocyclic_omega1_witness_maximal_ne [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A M P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hP0D : ¬ P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G)) :
+    ∃ B : Subgroup G, ∃ y : G, ∃ L : Subgroup G,
+      B.IsElementaryAbelian p ∧
+      ¬ IsUniquelyMaximal B ∧
+      B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ∧
+      B ≤ A ∧
+      ¬ IsCyclic ↥B ∧
+      (∃ a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set,
+        B ⊔ Subgroup.zpowers a =
+          OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) ∧
+      ¬ P0 ≤ Subgroup.centralizer
+        (((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ⊓
+            Subgroup.centralizer (B : Set G)) : Set G) ∧
+      y ∈ B ∧ y ≠ 1 ∧
+      ¬ Subgroup.centralizer ({y} : Set G) ≤ M ∧
+      L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) ∧
+      L ≠ M := by
+  obtain ⟨B, hBea, hBnot, hBΩ, hBA, hBnc, hcyc, hnot_cent⟩ :=
+    exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting hG hAcomm_set hM hA hAnot hP0D
+  haveI hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hA_le_M : A ≤ M := (Subgroup.le_centralizer A).trans hM.2
+  have hBM : B ≤ M := hBA.trans hA_le_M
+  obtain ⟨y, L, hyB, hy1, hCGnotM, hL, hLneM⟩ :=
+    exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal hG hM.1 hBea hBM
+      hBnc hBnot
+  exact ⟨B, y, L, hBea, hBnot, hBΩ, hBA, hBnc, hcyc, hnot_cent,
+    hyB, hy1, hCGnotM, hL, hLneM⟩
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
