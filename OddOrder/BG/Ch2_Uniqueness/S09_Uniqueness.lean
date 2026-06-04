@@ -965,6 +965,36 @@ theorem abelian_rank_three_isUniquelyMaximal_of_fitting [Finite G] (hG : IsMinim
       hAab hAp hArank
   exact isUniquelyMaximal_of_abelian_rank_three hG hUab hUp hAp hAnc hUU hUrank hCA_rank
 
+/-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
+subgroup has `pRank F(M) ≤ 2`.
+
+This is the first reduction in BG Lemma 9.5: otherwise Lemma 9.4 would put the
+rank-three abelian `p`-subgroup `A` itself in `𝒰`. -/
+private theorem pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hA : A ∈ S07.scn3Global p G)
+    (hAnot : ¬ IsUniquelyMaximal A) :
+    pRank ↥(S08.fittingInG M) p ≤ 2 := by
+  classical
+  by_contra hnot
+  have h3F : 3 ≤ pRank ↥(S08.fittingInG M) p := by omega
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  have hAab : IsMulCommutative A :=
+    IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
+      congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp hAscn3.isSCN.isMulCommutative
+        (⟨a, hAP ha⟩ : ↥(P : Subgroup G)) (Subgroup.mem_subgroupOf.mpr ha)
+        ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
+  have hAp : IsPGroup p A := (P.isPGroup').to_le hAP
+  have hArank : 3 ≤ rank ↥A := by
+    have h3A : 3 ≤ pRank ↥A p :=
+      hAscn3.le_pRank.trans
+        (pRank_le_of_injective
+          (f := (Subgroup.subgroupOfEquivOfLe hAP).toMonoidHom)
+          (Subgroup.subgroupOfEquivOfLe hAP).injective)
+    exact h3A.trans (pRank_le_rank (G := ↥A) p)
+  exact hAnot
+    ((abelian_rank_three_isUniquelyMaximal_of_fitting hG hM h3F) A hAab hAp hArank)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses

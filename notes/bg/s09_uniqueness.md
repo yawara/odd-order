@@ -542,8 +542,12 @@ Local bridges added for this proof:
 
 Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
 
-1. `pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal` for BG (9.6), using Lemma 9.4
-   contrapositively after choosing `M ∈ 𝓜(C_G(A))`.
+1. ✅ `pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal` is now implemented
+   sorry-free in S09. It uses Lemma 9.4 contrapositively: if any maximal `M` had
+   `r_p(F(M)) >= 3`, the global `SCN₃(p)` subgroup `A` is a rank-three abelian
+   `p`-subgroup and Lemma 9.4 would force `A ∈ 𝒰`, contradicting the Lemma 9.5
+   counterexample assumption. This proves the BG (9.6) rank cut once `M` has been
+   chosen from `𝓜(C_G(A))`.
 2. `normalizer_le_maximal_of_scn3Global_intermediate` for the BG L2573-L2589 step
    `A ≤ R ≤ P ∩ M → N_G(R) ≤ M`, consuming S07 Theorems 7.6 and 7.4.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
