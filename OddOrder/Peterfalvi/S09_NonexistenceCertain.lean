@@ -4779,6 +4779,70 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_de
       B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
     hred
 
+/-- Source-data constructor form of `CharacterEstimateData` from the real reduced
+family inequality and Peterfalvi's orthogonal integer decomposition.
+
+This is the same assembly as
+`characterEstimateData_of_real_reduced_family_inequality_and_decomposition`, but
+it obtains the required `Γ` norm-bound directly from the local (7.8.b) source
+inputs for an `H78` package.  The only family/local cardinality bridge retained
+as an explicit hypothesis is `H78.complementIndex = F.e i`. -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hindex : H78.complementIndex = F.e i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : H78.smallIndex)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+    hmin B hB_ne v x hBD.Gamma Γ₁ hΓ horth hΓ₁ hx_nonzero
+    (by
+      simpa [hindex] using
+        H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+          hBD hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv hsmall)
+    hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]

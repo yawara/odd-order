@@ -2303,6 +2303,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_characterEstimateData
 set_option linter.style.longLine false in

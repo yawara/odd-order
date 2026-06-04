@@ -536,3 +536,12 @@ S09 に
 を追加した。source inner-product values / source irreducibility-distinctness / degree-sum / `u,v,w` formula / small-index
 をまとめて、(7.10) の `Bsum_le_of_orthogonal_integer_decomposition` が要求する
 `(Γ, Γ).re ≤ e - 1` へ直接渡せる形にする consumer。
+
+
+### 2026-06-04 pass: source-data final assembly constructor
+
+S09 に
+`FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition`
+を追加した。`H78` 側の source-data / `u,v,w` formula / small-index から得た `Γ` bound を、
+`CharacterEstimateData` の real reduced family inequality + orthogonal decomposition constructor に直接接続する。
+局所データと family index の接続は `H78.complementIndex = F.e i` として明示的に残した。
