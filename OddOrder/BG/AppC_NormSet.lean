@@ -976,26 +976,18 @@ lemma exists_mem_normSetE_three [Fact p.Prime] (hpodd : Odd p) :
 
 /-! ## Lemma C.2 -/
 
-/-- **BG Appendix C, Lemma C.2** (mmd L4923): the norm set has at least two
-elements (assuming only that `p`, `q` are odd primes satisfying condition (A)).
-
-Proof (to be formalized, issue 3000): for `q ≥ 5` via the character theory of the
-Frobenius group `H = P ⋊ U` (`|E|` is a structure constant bounded below by
-`p^{q-2} - p^{q/2} > 1` through the orthogonality relations); for `q = 3` via the
-cubic `f_c(x) = x(x-2)(x-c) + (x-1)`, some `c` of which has no root in `𝔽_p`,
-yielding a root `a ∈ 𝔽_{p^3}` with `N(a) = N(2-a) = 1`, so `a, 1 ∈ E`. -/
-theorem lemmaC2 [Fact p.Prime] (hpodd : Odd p) (hq : q.Prime) (hqodd : Odd q)
-    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)) :
-    2 ≤ (normSetE p q).ncard := by
-  rcases eq_or_ne q 3 with rfl | hq3
-  · -- `q = 3`: the cubic argument exhibits an element of `E` distinct from `1`.
-    obtain ⟨a, ha, hane⟩ := exists_mem_normSetE_three p hpodd
-    have hsub : ({1, a} : Set (GaloisField p 3)) ⊆ normSetE p 3 := by
-      rw [Set.insert_subset_iff, Set.singleton_subset_iff]
-      exact ⟨one_mem_normSetE p 3, ha⟩
-    calc (2 : ℕ) = ({1, a} : Set (GaloisField p 3)).ncard := (Set.ncard_pair (Ne.symm hane)).symm
-      _ ≤ (normSetE p 3).ncard := Set.ncard_le_ncard hsub (normSetE p 3).toFinite
-  · -- `q ≥ 5`: the character theory of the Frobenius group `H = P ⋊ U`. TODO (issue 3000).
-    sorry
+/-- **BG Appendix C, Lemma C.2, `q = 3` branch**: the cubic argument
+exhibits an element of `E` distinct from `1`, hence the norm set has at least
+two elements. -/
+theorem normSetE_ncard_ge_two_of_eq_three [Fact p.Prime] (hpodd : Odd p) :
+    2 ≤ (normSetE p 3).ncard := by
+  obtain ⟨a, ha, hane⟩ := exists_mem_normSetE_three p hpodd
+  have hsub : ({1, a} : Set (GaloisField p 3)) ⊆ normSetE p 3 := by
+    rw [Set.insert_subset_iff, Set.singleton_subset_iff]
+    exact ⟨one_mem_normSetE p 3, ha⟩
+  calc
+    (2 : ℕ) = ({1, a} : Set (GaloisField p 3)).ncard :=
+      (Set.ncard_pair (Ne.symm hane)).symm
+    _ ≤ (normSetE p 3).ncard := Set.ncard_le_ncard hsub (normSetE p 3).toFinite
 
 end OddOrder.BG.AppC.NormSet

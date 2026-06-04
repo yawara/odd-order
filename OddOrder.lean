@@ -108,6 +108,7 @@ import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.AppC_FinalContradiction
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
+import OddOrder.BG.AppC_LemmaC2
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.Peterfalvi.Appendices.Suzuki

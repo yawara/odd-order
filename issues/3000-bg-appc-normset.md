@@ -142,8 +142,9 @@ created: 2026-06-04
   `normSetE_ncard_ge_two_of_five_le` を追加し、class-sum 側では q≥5 分岐が
   `2 ≤ |E|` まで到達。`AppC_NormSet.lemmaC2` 本体への直配線は import cycle 回避のため
   後続の placement 整理で扱う。AxiomsCheck 登録済み。
-- [ ] **Lemma C.2 packaging (q≥5)**: `AppC_NormSet.lemmaC2` の q≥5 分岐へ
-  `normSetE_ncard_ge_two_of_five_le` を配線できる placement 整理（循環 import 回避）。
+- [x] **Lemma C.2 packaging (q≥5)**: q=3 helper を `AppC_NormSet` に残し、
+  full `lemmaC2` を class-sum 下流の `AppC_LemmaC2` へ移して
+  `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
 

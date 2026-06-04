@@ -48,6 +48,7 @@ import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
+import OddOrder.BG.AppC_LemmaC2
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -2033,3 +2034,8 @@ set_option linter.style.longLine false in
 -- irreducible, its root `a ∈ 𝔽_{p^3}` has Frobenius orbit `{a, a^p, a^{p²}}` of 3 distinct
 -- roots, so `f_c = ∏(X - a^{p^i})` and reading `f_c(0)=-1`, `f_c(2)=1` gives `N(a)=N(2-a)=1`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_mem_normSetE_three
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_ncard_ge_two_of_eq_three
+
+-- BG App C Lemma C.2: combine the q=3 cubic branch with the q≥5 class-sum
+-- branch to show that the norm set has at least two elements.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC2
