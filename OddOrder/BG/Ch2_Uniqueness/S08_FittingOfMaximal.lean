@@ -45,6 +45,7 @@ namespace OddOrder.BG.Ch2.S08
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -3680,6 +3681,174 @@ theorem exists_unique_hInvariantStar_scn3_map_of_fittingInG_isPGroup
   exact hInvariantStar_scn3_map_eq_of_fittingInG_isPGroup
     hG hM hp P hFp hAP hA hq hQ' hQstar
 
+/-- A local `SCN₃(P)` subgroup is normalized by the image of `P` in the ambient group. -/
+theorem sylow_map_le_normalizer_scn3_map
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (P : Sylow p ↥M)
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    (P : Subgroup ↥M).map M.subtype ≤
+      Subgroup.normalizer (A.map M.subtype : Set G) := by
+  have hA_norm : (P : Subgroup ↥M) ≤ Subgroup.normalizer (A : Set ↥M) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAP).mp hA.1.isNormal
+  exact (Subgroup.map_mono hA_norm).trans (Subgroup.le_normalizer_map M.subtype)
+
+/-- BG (8.12): in the p-group case, `F(M)` normalizes every local `SCN₃(P)` image. -/
+theorem fittingInG_le_normalizer_scn3_map_of_fittingInG_isPGroup
+    [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    fittingInG M ≤ Subgroup.normalizer (A.map M.subtype : Set G) :=
+  (fittingInG_le_sylow_map_of_isPGroup P hFp).trans
+    (sylow_map_le_normalizer_scn3_map P hAP hA)
+
+/-- BG (8.12): the uniqueness of `H_G^*(A;q)` makes `N_G(A)` normalize its member. -/
+theorem normalizer_scn3_map_le_normalizer_hInvariantStar_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q}) :
+    Subgroup.normalizer (A.map M.subtype : Set G) ≤ Subgroup.normalizer (Q : Set G) := by
+  intro x hxA
+  have hxA_eq : MulAut.conj x • (A.map M.subtype) = A.map M.subtype :=
+    conj_smul_eq_self_of_mem_normalizer hxA
+  have hQconj : MulAut.conj x • Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q} :=
+    conj_smul_mem_hInvariantStar_top_of_normalizer hQ hxA_eq
+  have hconj_eq : MulAut.conj x • Q = Q :=
+    hInvariantStar_scn3_map_eq_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hQconj hQ
+  exact mem_normalizer_of_conj_smul_eq_self hconj_eq
+
+/-- BG (8.12): the unique member of `H_G^*(A;q)` is also maximal for `F(M)` invariance. -/
+theorem hInvariantStar_scn3_map_mem_hInvariantStar_fittingInG_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q}) :
+    Q ∈ hInvariantStar ⊤ (fittingInG M) {q} := by
+  have hF_norm_A : fittingInG M ≤ Subgroup.normalizer (A.map M.subtype : Set G) :=
+    fittingInG_le_normalizer_scn3_map_of_fittingInG_isPGroup P hFp hAP hA
+  have hF_norm_Q : fittingInG M ≤ Subgroup.normalizer (Q : Set G) :=
+    hF_norm_A.trans
+      (normalizer_scn3_map_le_normalizer_hInvariantStar_of_fittingInG_isPGroup
+        hG hM hp P hFp hAP hA hq hQ)
+  refine ⟨⟨le_top, hF_norm_Q, hInvariantStar_isPiSubgroup hQ⟩, ?_⟩
+  intro R hR hQR
+  have hA_le_F : A.map M.subtype ≤ fittingInG M :=
+    scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+  have hR_A : R ∈ hInvariant ⊤ (A.map M.subtype) {q} := by
+    rw [mem_hInvariant] at hR ⊢
+    exact ⟨le_top, hA_le_F.trans hR.2.1, hR.2.2⟩
+  exact hQ.2 R hR_A hQR
+
+/-- BG (8.12): `H_G^*(F(M);q)` has the same unique member as `H_G^*(A;q)`. -/
+theorem hInvariantStar_fittingInG_eq_of_scn3_map_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q R : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q})
+    (hR : R ∈ hInvariantStar ⊤ (fittingInG M) {q}) :
+    R = Q := by
+  have hA_le_F : A.map M.subtype ≤ fittingInG M :=
+    scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+  have hR_A : R ∈ hInvariant ⊤ (A.map M.subtype) {q} := by
+    rw [mem_hInvariant]
+    exact ⟨le_top, hA_le_F.trans (hInvariantStar_le_normalizer hR),
+      hInvariantStar_isPiSubgroup hR⟩
+  obtain ⟨S, hSstar, hRS⟩ := exists_le_hInvariantStar hR_A
+  have hS_eq_Q : S = Q :=
+    hInvariantStar_scn3_map_eq_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hSstar hQ
+  have hRQ : R ≤ Q := by
+    rw [← hS_eq_Q]
+    exact hRS
+  have hQF : Q ∈ hInvariantStar ⊤ (fittingInG M) {q} :=
+    hInvariantStar_scn3_map_mem_hInvariantStar_fittingInG_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hQ
+  exact (hInvariantStar_eq_of_le hR (hInvariantStar_mem_hInvariant hQF) hRQ).symm
+
+/-- BG (8.12): `M` normalizes the unique member of `H_G^*(A;q)`. -/
+theorem maximal_le_normalizer_hInvariantStar_scn3_map_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q}) :
+    M ≤ Subgroup.normalizer (Q : Set G) := by
+  have hQF : Q ∈ hInvariantStar ⊤ (fittingInG M) {q} :=
+    hInvariantStar_scn3_map_mem_hInvariantStar_fittingInG_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hQ
+  intro x hxM
+  have hxF : x ∈ Subgroup.normalizer (fittingInG M : Set G) :=
+    mem_normalizer_fittingInG_of_mem hxM
+  have hxF_eq : MulAut.conj x • (fittingInG M) = fittingInG M :=
+    conj_smul_eq_self_of_mem_normalizer hxF
+  have hQconjF : MulAut.conj x • Q ∈ hInvariantStar ⊤ (fittingInG M) {q} :=
+    conj_smul_mem_hInvariantStar_top_of_normalizer hQF hxF_eq
+  have hconj_eq : MulAut.conj x • Q = Q :=
+    hInvariantStar_fittingInG_eq_of_scn3_map_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hQ hQconjF
+  exact mem_normalizer_of_conj_smul_eq_self hconj_eq
+
+/-- BG (8.12): for `q ≠ p`, every member of `H_G^*(A;q)` is trivial in the p-group case. -/
+theorem hInvariantStar_scn3_map_eq_bot_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q}) :
+    Q = ⊥ := by
+  by_cases hQbot : Q = ⊥
+  · exact hQbot
+  have hMQ : M ≤ Subgroup.normalizer (Q : Set G) :=
+    maximal_le_normalizer_hInvariantStar_scn3_map_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hQ
+  have hQM : Q ≤ M :=
+    le_maximal_of_le_normalizer_of_ne_bot_isPiSubgroup_singleton hG hM hMQ hQbot
+      (hInvariantStar_isPiSubgroup hQ)
+  have hQnorm : (Q.subgroupOf M).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hMQ
+  have hQleF : Q ≤ fittingInG M :=
+    le_fittingInG_of_normal_isPiSubgroup_singleton hQM hQnorm
+      (hInvariantStar_isPiSubgroup hQ)
+  have hFpi : Subgroup.IsPiSubgroup ({p} : Set ℕ) (fittingInG M) :=
+    isPiSubgroup_singleton_of_isPGroup hFp
+  have hQpi_compl : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Q := by
+    intro r hr
+    have hrq : r = q := Set.mem_singleton_iff.mp ((hInvariantStar_isPiSubgroup hQ) r hr)
+    rw [hrq]
+    simpa [Set.mem_singleton_iff] using hq
+  exact eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl hQleF hFpi hQpi_compl
+
+/-- BG (8.12), non-star form: for `q ≠ p`, every `A`-invariant q-subgroup is trivial. -/
+theorem hInvariant_scn3_map_eq_bot_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q : Subgroup G} (hQ : Q ∈ hInvariant ⊤ (A.map M.subtype) {q}) :
+    Q = ⊥ := by
+  obtain ⟨R, hRstar, hQR⟩ := exists_le_hInvariantStar hQ
+  have hRbot : R = ⊥ :=
+    hInvariantStar_scn3_map_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hRstar
+  exact le_bot_iff.mp (by simpa [hRbot] using hQR)
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -3705,6 +3874,11 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
       opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) = ⊥ :=
     opiCoreInG_singleton_compl_centralizer_scn3_map_eq_bot_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA
+  have hHqBot : ∀ {q : ℕ} [Fact q.Prime], q ≠ p →
+      ∀ {Y : Subgroup G}, Y ∈ hInvariant ⊤ (A.map M.subtype) {q} → Y = ⊥ := by
+    intro q _ hq Y hY
+    exact hInvariant_scn3_map_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq hY
   refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
