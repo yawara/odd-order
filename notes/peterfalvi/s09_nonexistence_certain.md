@@ -416,3 +416,15 @@ irreducible character として取り出す
 `νζ_i ∈ ZIrr` と `‖νζ_i‖² = 1` からは符号が残るので、正性を hidden assumption にせず
 `ε = ±1` の存在形で公開した。後段で `νζ_i(1) > 0` が得られる場合のために、同じ入力から
 `IsIrreducibleCharacter (νζ_i)` を返す positive-degree bridge も追加した。
+
+
+### 2026-06-04 pass: AxiomsCheck coverage for S09 consumer sockets
+
+Gibbs explorer pass の指摘に従い、既存証明済みの S09 consumer sockets を `AxiomsCheck`
+に追加登録した。対象は `BetaDecomp` algebra (`weightedNuSum_orth_*`, `delta_*`,
+`betaNormSq_eq_*`)、(7.8.b) norm-package consumers、(7.9) の residual cross-term reduction、
+および (7.10) の `FrobeniusFamily.CharacterEstimateData` final-assembly constructors。
+
+これは新しい仮定や wrapper を足す変更ではなく、すでに S09 にある conditional theorem を downstream が
+axiom-clean な入口として参照できるようにする coverage pass。特に `card_G0_lower_bound` の残 sorry を
+迂回するものではなく、(7.8)/(7.9)/(7.10) の witness 構成後に接続すべき socket を明示化した。

@@ -2190,6 +2190,65 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.gamma_inner_self_re_le_of_normEstimates
+-- Peterfalvi (7.8.a)/(7.8.b) `BetaDecomp` algebra and norm consumers.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_orth_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.constOne_orth_weightedNuSum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_orth_gamma
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gamma_orth_weightedNuSum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_eq_weightedNuSum_add_gamma
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_orth_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.constOne_orth_delta
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.betaNormSq_eq_of_weightedNuSum_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_zetaImage_eq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_self_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.betaNormSq_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gammaNormSq_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_source_orthogonal
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_weighted
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one
+-- Peterfalvi (7.9) residual cross-term reduction.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_expand_delta
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_equation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_nonzero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_integral_parity
+-- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.Bsum_le_of_orthogonal_integer_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_characterEstimateData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
 -- Peterfalvi (7.11) terminal contradiction from the displayed (7.10) lower bound.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_lowerBoundTerm
