@@ -97,14 +97,22 @@ theorem lemmaC1_root_count [Finite G]
   exact NormSet.lemmaC1 (p := hyp.base.p) (q := hyp.base.q)
     hyp.base.q_prime hEinv hcard
 
-/-- **BG Lemma C.2**: the norm set has at least two elements. -/
-theorem lemmaC2_card_ge_two [Finite G]
-    (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
+/-- **BG Lemma C.2**: condition (A) alone gives that the norm set has at
+least two elements. -/
+theorem lemmaC2_card_ge_two_of_conditionA [Finite G]
+    (hyp : S16.Hypothesis (G := G)) (hA : conditionA hyp.base.p hyp.base.q) :
     normSetCardGeTwo hyp := by
   haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   have hcard := NormSet.lemmaC2 (p := hyp.base.p) (q := hyp.base.q)
-    hyp.base.p_odd hyp.base.q_prime hyp.base.q_odd data.cyclotomic_coprime
+    hyp.base.p_odd hyp.base.q_prime hyp.base.q_odd hA
   simpa [normSetCardGeTwo] using hcard
+
+/-- **BG Lemma C.2**: the field-normalizer data supplies condition (A), hence
+the norm set has at least two elements. -/
+theorem lemmaC2_card_ge_two [Finite G]
+    (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
+    normSetCardGeTwo hyp :=
+  lemmaC2_card_ge_two_of_conditionA hyp data.cyclotomic_coprime
 
 /-- **BG Lemma C.3**: the norm set is closed under inversion. -/
 theorem lemmaC3_inverse_closed [Finite G]
