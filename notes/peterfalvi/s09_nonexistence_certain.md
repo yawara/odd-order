@@ -428,3 +428,15 @@ Gibbs explorer pass の指摘に従い、既存証明済みの S09 consumer sock
 これは新しい仮定や wrapper を足す変更ではなく、すでに S09 にある conditional theorem を downstream が
 axiom-clean な入口として参照できるようにする coverage pass。特に `card_G0_lower_bound` の残 sorry を
 迂回するものではなく、(7.8)/(7.9)/(7.10) の witness 構成後に接続すべき socket を明示化した。
+
+
+### 2026-06-04 pass: source-data bridges for the (7.8.a) distinguished coefficient
+
+S09 に `sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct`,
+`weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data`,
+`beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data` を追加した。
+
+これにより、source family `S = T \ {Ind 1_H}` が irreducible/distinct で、distinguished `ζ` の degree が
+`e` であるという自然な (7.8) 入力から、(7.8.a) の distinguished column computation
+`⟨Σ, νζ⟩ = 1` と `(β, νζ) = a - 1` を直接取り出せる。新しい証明書フィールドは追加しておらず、既存の
+source orthogonality / weighted-sum consumer を downstream が再構成しなくてよい形にした bridge pass。

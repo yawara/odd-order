@@ -2211,6 +2211,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_zetaImage_eq_one
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_self_eq_of_source_orthogonal
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.betaNormSq_eq_of_source_orthogonal
@@ -2226,6 +2232,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_weighted
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
 -- Peterfalvi (7.9) residual cross-term reduction.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero

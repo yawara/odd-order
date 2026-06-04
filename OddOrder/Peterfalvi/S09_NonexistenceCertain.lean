@@ -2286,6 +2286,34 @@ theorem sourceZeta_orthogonal_of_irreducible_distinct (H78 : Hypothesis78 G A L)
     simpa [χ, ψ, hne] using
       (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ ψ)
 
+/-- Natural distinguished-column form of the source `S` orthogonality matrix. -/
+theorem sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+    (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i)
+        (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0 := by
+  intro i hi
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  have horth := H78.sourceZeta_orthogonal_of_irreducible_distinct hirr hdistinct
+  have hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+    H78.zetaDistinct_inner_self_eq_one_of_irreducible
+      (hirr H78.zetaDistinct hzeta_mem)
+  rw [horth i hi H78.zetaDistinct hzeta_mem]
+  by_cases hiz : i = H78.zetaDistinct
+  · subst i
+    rw [if_pos rfl, if_pos rfl]
+    exact hzeta_norm
+  · simp [hiz]
+
 /-- Irreducibility of the source `S`-family makes every source norm nonzero. -/
 theorem sourceZeta_norm_ne_of_irreducible (H78 : Hypothesis78 G A L)
     (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
@@ -2345,6 +2373,25 @@ theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
     if_pos hzeta_mem, horth H78.zetaDistinct hzeta_mem]
   rw [if_pos rfl]
   field_simp [hzeta_one_ne_zero]
+
+/-- Natural source-data version of `weightedNuSum_inner_zetaImage_eq_one`. -/
+theorem weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.weightedNuSum
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.weightedNuSum_inner_zetaImage_eq_one
+    (H78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+      hirr hdistinct)
+    (by
+      rw [hzeta_degree]
+      exact_mod_cast H78.complementIndex_pos.ne')
 
 /-- Source orthogonality and the Burnside degree sum evaluate the norm of the
 weighted `S^ν`-sum in Peterfalvi (7.8.a).
@@ -2739,6 +2786,26 @@ theorem beta_inner_zetaImage_eq_int_sub_one
   H78.beta_inner_zetaImage_eq_int_sub_one_of_weighted hBD
     (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
     (H78.weightedNuSum_inner_zetaImage_eq_one horth hzeta_one_ne_zero)
+
+/-- Natural source-data version of `(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 :=
+  H78.beta_inner_zetaImage_eq_int_sub_one hBD
+    (H78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+      hirr hdistinct)
+    (by
+      rw [hzeta_degree]
+      exact_mod_cast H78.complementIndex_pos.ne')
+    (hirr H78.zetaDistinct (by simp [H78.zetaDistinct_ne_ind1H]))
 
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
