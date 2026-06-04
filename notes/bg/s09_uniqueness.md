@@ -558,16 +558,21 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
 2. `normalizer_le_maximal_of_scn3Global_intermediate` for the BG L2573-L2589 step
    `A ≤ R ≤ P ∩ M → N_G(R) ≤ M`, consuming S07 Theorems 7.6 and 7.4.
 
-   Partial bridge now implemented in S09:
-   `conjTransitiveOn_hInvariantStar_of_scn3Global_intermediate` packages the line
-   "By Theorems 7.6 and 7.4": from `A ∈ SCN₃(p)`, `A ≤ R`, `R < ⊤`, and
-   `R` a `p`-group, it proves `O_{p'}(C_G(R))` is conjugation-transitive on
-   `ℋ_G^*(R;q)` for every prime `q ≠ p`. Supporting local helpers are
-   `ne_bot_of_mem_scn3Global`, `primesOf_eq_singleton_of_mem_scn3Global`,
-   `prime_dvd_card_of_mem_scn3Global`, and `subgroupOf_isSubnormal_of_isPGroup`.
-   This does not yet prove `N_G(R) ≤ M`; the remaining substep is to turn this
-   transitivity bridge plus the maximal/Fitting hypotheses into the stated normalizer
-   containment.
+   Implemented S09 bridges now split this step into two layers:
+
+   - `conjTransitiveOn_hInvariantStar_of_scn3Global_intermediate` packages the line
+     "By Theorems 7.6 and 7.4": from `A ∈ SCN₃(p)`, `A ≤ R`, `R < ⊤`, and
+     `R` a `p`-group, it proves `O_{p'}(C_G(R))` is conjugation-transitive on
+     `ℋ_G^*(R;q)` for every prime `q ≠ p`. Supporting local helpers are
+     `ne_bot_of_mem_scn3Global`, `primesOf_eq_singleton_of_mem_scn3Global`,
+     `prime_dvd_card_of_mem_scn3Global`, and `subgroupOf_isSubnormal_of_isPGroup`.
+   - `normalizer_le_maximal_of_scn3Global_intermediate` now proves the advertised
+     `N_G(R) ≤ M` conclusion once the BG proof's `Q ∈ ℋ_G^*(R;q)` witness and
+     `(9.8) : N_G(Q) ≤ M` have been supplied. Its generic bookkeeping core is
+     `mem_of_mem_normalizer_of_conjTransitiveOn`.
+
+   Remaining subfrontier for this item: build the `Q` witness and `(9.8)` from the
+   rank/Fitting split around BG L2573-L2584.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final

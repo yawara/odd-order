@@ -1116,6 +1116,63 @@ private theorem conjTransitiveOn_hInvariantStar_of_scn3Global_intermediate [Fini
   have hprop := S07.transitivity_propagates hG hHyp hqA R hRlt hRpi hAR hAsub htransA
   simpa [hπ] using hprop.2.1
 
+/-- A conjugation-transitivity bookkeeping step for BG Lemma 9.5.
+
+If `x` normalizes `R`, transitivity gives `k ∈ K` with `Q^k = Q^x`. Once both `K` and
+`N_G(Q)` lie in `M`, this forces `x ∈ M`. -/
+private theorem mem_of_mem_normalizer_of_conjTransitiveOn
+    {K M R Q : Subgroup G} {q : ℕ} [Fact q.Prime] {x : G}
+    (hxR : x ∈ Subgroup.normalizer (R : Set G))
+    (hQ : Q ∈ hInvariantStar ⊤ R {q})
+    (htrans : S07.ConjTransitiveOn K (hInvariantStar ⊤ R {q}))
+    (hKleM : K ≤ M) (hNQleM : Subgroup.normalizer (Q : Set G) ≤ M) :
+    x ∈ M := by
+  classical
+  have hxR_eq : MulAut.conj x • R = R :=
+    conj_smul_eq_self_of_mem_normalizer hxR
+  have hxQ : MulAut.conj x • Q ∈ hInvariantStar ⊤ R {q} :=
+    conj_smul_mem_hInvariantStar_top_of_normalizer hQ hxR_eq
+  obtain ⟨k, hkK, hkQ⟩ := htrans Q hQ (MulAut.conj x • Q) hxQ
+  have hknorm : k⁻¹ * x ∈ Subgroup.normalizer (Q : Set G) := by
+    apply mem_normalizer_of_conj_smul_eq_self
+    calc MulAut.conj (k⁻¹ * x) • Q
+        = MulAut.conj k⁻¹ • MulAut.conj x • Q := by
+            rw [smul_smul, ← map_mul]
+      _ = MulAut.conj k⁻¹ • MulAut.conj k • Q := by rw [← hkQ]
+      _ = Q := by
+            rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hkM : k ∈ M := hKleM hkK
+  have hknormM : k⁻¹ * x ∈ M := hNQleM hknorm
+  have hprod : k * (k⁻¹ * x) ∈ M := M.mul_mem hkM hknormM
+  simpa [mul_assoc] using hprod
+
+/-- BG Lemma 9.5's normalizer step after the `Q` and `(9.8)` witnesses have been supplied.
+
+This packages the final use of Theorems 7.6 and 7.4: the transitivity bridge puts a
+normalizer element of `R` in the fixed maximal subgroup `M`, provided `Q ∈ ℋ_G^*(R;q)` and
+`N_G(Q) ≤ M` are already known. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R Q : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p)
+    (hQ : Q ∈ hInvariantStar ⊤ R {q})
+    (hNQleM : Subgroup.normalizer (Q : Set G) ≤ M) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  have htrans :
+      S07.ConjTransitiveOn
+        (opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)))
+        (hInvariantStar ⊤ R {q}) :=
+    conjTransitiveOn_hInvariantStar_of_scn3Global_intermediate hG hA hRp hAR hRlt hqp
+  have hKleM :
+      opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)) ≤ M := by
+    exact (opiCoreInG_le ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G))).trans
+      ((Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAR)).trans hM.2)
+  intro x hxR
+  exact mem_of_mem_normalizer_of_conjTransitiveOn hxR hQ htrans hKleM hNQleM
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 
