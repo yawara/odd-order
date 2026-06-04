@@ -3484,6 +3484,40 @@ private theorem normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_pack
   exact normalizer_isUniquelyMaximal_and_le_maximal_of_three_le_rank_opiCoreFitting
     hG hM.1 h3D hP0centD hP0M hP0ne
 
+/-- Low-rank `(9.12)` maximality core: once the low-rank argument has shown
+`M ≤ N_G(P₀)`, the nontriviality of `P₀ ≤ M` makes `N_G(P₀)` proper, so maximality
+of `M` forces `N_G(P₀) = M` and hence `N_G(P₀) ∈ 𝒰`. -/
+private theorem normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normalizer
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥)
+    (hMnormP0 : M ≤ Subgroup.normalizer (P0 : Set G)) :
+    IsUniquelyMaximal (Subgroup.normalizer (P0 : Set G)) ∧
+      Subgroup.normalizer (P0 : Set G) = M := by
+  classical
+  let N0 : Subgroup G := Subgroup.normalizer (P0 : Set G)
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hN0lt : N0 < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hN0top
+    haveI : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    · exact hP0ne hP0bot
+    · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
+        rw [← hP0top]
+        exact hP0M
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  have hN0leM : N0 ≤ M :=
+    (isCoatom_iff_ge_of_le.mp hMco).2 N0 hN0lt.ne hMnormP0
+  have hN0eqM : N0 = M := le_antisymm hN0leM hMnormP0
+  have hN0U : IsUniquelyMaximal N0 := by
+    refine IsUniquelyMaximal.of_unique_maximal hN0lt hM (le_of_eq hN0eqM) ?_
+    intro N hNco hN0N
+    have hMN : M ≤ N := (le_of_eq hN0eqM.symm).trans hN0N
+    have hNleM : N ≤ M :=
+      (isCoatom_iff_ge_of_le.mp hMco).2 N hNco.lt_top.ne hMN
+    exact le_antisymm hNleM hMN
+  exact ⟨by simpa [N0] using hN0U, by simpa [N0] using hN0eqM⟩
+
 /-- Contrapositive form of the `(9.12)` high-rank package.  Once the Lemma 9.5
 normalizer data for `P` and `P₀` is available, failure of `N_G(P₀) ≤ M` forces
 `rank O_{p'}(F(M)) ≤ 2`. -/
