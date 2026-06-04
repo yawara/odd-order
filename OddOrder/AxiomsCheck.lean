@@ -1931,6 +1931,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
 
 -- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
 -- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.

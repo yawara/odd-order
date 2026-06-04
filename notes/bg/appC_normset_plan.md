@@ -287,7 +287,9 @@ Step3 の `U`-既約作用入力も
 非零 `U`-不変 subspace が `U` とともに全体を生成する
 `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` を追加済み。加えて任意の subgroup `X≤P⋊U` について
 `U≤X` かつ `X∩P` が非自明なら `X=⊤` とする Step3 subgroup form
-`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` まで materialize 済み。
+`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl`、および BG 本文に近い
+`U≤X` かつ `X≠U` なら `X=⊤` とする
+`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range` まで materialize 済み。
 Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。さらに BG 最後の
 `(a⁻¹)^{t^3}` を p 回反復する tail は `inv_mem_of_twistedInv_step` /

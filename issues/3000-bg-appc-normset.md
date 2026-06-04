@@ -160,7 +160,9 @@ created: 2026-06-04
   subspace が `U` とともに concrete `P⋊U` 全体を生成することを
   `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` として固定。続いて任意の subgroup
   `X≤P⋊U` について、`U≤X` かつ `X∩P` が非自明なら `X=⊤` とする
-  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` まで materialize。
+  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` を materialize。さらに
+  semidirect product の分解から `U≤X` かつ `X≠U` なら `X=⊤` とする
+  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range` まで固定。
   AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 4 finite-field Frobenius core**: `normN_pow_p` と
   `normSetE_pow_p` により `p`-power Frobenius が `E` を保つことを証明し、

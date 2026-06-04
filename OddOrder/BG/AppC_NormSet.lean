@@ -852,6 +852,53 @@ theorem normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
     hUle ⟨g.right, rfl⟩
   exact X.mul_mem hleft hright
 
+/-- **BG Appendix C, Lemma C.3, Step 3 subgroup dichotomy**: in the concrete
+`P ⋊ U`, any subgroup containing the complement `U` is either exactly `U` or all
+of `P ⋊ U`.  This is the direct semidirect-product form of BG's `X ≠ U ⇒ X=PU`
+step. -/
+theorem normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
+    [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X)
+    (hne : X ≠
+      (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range) :
+    X = ⊤ := by
+  classical
+  let U : Subgroup (normOneFrobeniusGroup p q) :=
+    (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
+  have hnot_le : ¬ X ≤ U := by
+    intro hXle
+    exact hne (le_antisymm hXle hUle)
+  change ¬ ∀ g, g ∈ X → g ∈ U at hnot_le
+  rw [not_forall] at hnot_le
+  obtain ⟨g, hg⟩ := hnot_le
+  obtain ⟨hgX, hgU⟩ := Classical.not_imp.mp hg
+  have hgleft_ne : g.left.toAdd ≠ 0 := by
+    intro hzero
+    apply hgU
+    refine ⟨g.right, ?_⟩
+    rw [← SemidirectProduct.inl_left_mul_inr_right g]
+    rw [← ofAdd_toAdd g.left, hzero]
+    simp
+  have hright : (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q) ∈ X :=
+    hUle ⟨g.right, rfl⟩
+  have hleftX : (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) ∈ X := by
+    have hprod :
+        g * (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q)⁻¹ ∈ X :=
+      X.mul_mem hgX (X.inv_mem hright)
+    have hprod_eq :
+        g * (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q)⁻¹ =
+          SemidirectProduct.inl g.left := by
+      simpa [SemidirectProduct.inl_left_mul_inr_right g] using
+        (mul_inv_cancel_right
+          (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q)
+          (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q))
+    rwa [hprod_eq] at hprod
+  refine normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+    p q hq hA X hUle ?_
+  exact ⟨g.left.toAdd, hgleft_ne, by simpa [ofAdd_toAdd] using hleftX⟩
+
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 
 /-- `N(0) = 0` (the `i = 0` factor `0^{p^0} = 0` makes the product vanish). -/
