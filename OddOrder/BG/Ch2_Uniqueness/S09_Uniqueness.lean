@@ -2390,6 +2390,35 @@ private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
   rw [derivedInG_eq_commutator H, derivedInG_eq_commutator K]
   exact Subgroup.commutator_mono hHK hHK
 
+/-- The ambient derived subgroup is contained in the subgroup it is derived from. -/
+private theorem derivedInG_le_self (H : Subgroup G) : derivedInG H ≤ H := by
+  unfold derivedInG
+  exact Subgroup.map_subtype_le _
+
+/-- Mapping the derived subgroup of the top subgroup of `H` back to `G` recovers
+the ambient derived subgroup `H'`. -/
+private theorem derivedInG_top_map_subtype (H : Subgroup G) :
+    (derivedInG (⊤ : Subgroup ↥H)).map H.subtype = derivedInG H := by
+  have htop : (⊤ : Subgroup ↥H).map H.subtype = H := by
+    ext x
+    constructor
+    · rintro ⟨y, _hy, rfl⟩
+      exact y.property
+    · intro hx
+      exact ⟨⟨x, hx⟩, Subgroup.mem_top _, rfl⟩
+  rw [derivedInG_eq_commutator (⊤ : Subgroup ↥H), derivedInG_eq_commutator H,
+    Subgroup.map_commutator, htop]
+
+/-- If an ambient subgroup `P₀` lies in `H'`, then its restriction to `H` lies
+in the derived subgroup of the top subgroup of `↥H`. -/
+private theorem subgroupOf_le_derivedInG_top_of_le_derivedInG {H P0 : Subgroup G}
+    (hP0D : P0 ≤ derivedInG H) :
+    P0.subgroupOf H ≤ derivedInG (⊤ : Subgroup ↥H) := by
+  have hP0H : P0 ≤ H := hP0D.trans (derivedInG_le_self H)
+  rw [← H.map_subtype_le_map_subtype, Subgroup.map_subgroupOf_eq_of_le hP0H,
+    derivedInG_top_map_subtype H]
+  exact hP0D
+
 /-- The subgroup-theoretic core of BG (9.10): if `P₀ ≤ N_G(P)'` and
 `N_G(P) ≤ L ∩ M`, then `P₀ ≤ (L ∩ M)'`. -/
 private theorem le_derivedInG_inf_of_le_derivedInG_normalizer {P M L P0 : Subgroup G}

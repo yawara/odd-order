@@ -843,6 +843,12 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `L` is available.
    - `derivedInG_eq_commutator` and `derivedInG_mono` isolate the ambient-derived
      subgroup API needed for (9.10).
+   - `derivedInG_le_self` and `derivedInG_top_map_subtype` connect the ambient
+     derived subgroup of `H ≤ G` with the derived subgroup of the top subgroup
+     of the local group `↥H`.
+   - `subgroupOf_le_derivedInG_top_of_le_derivedInG` converts
+     `P₀ ≤ H'` in the ambient group into the local input
+     `P₀.subgroupOf H ≤ (⊤ : Subgroup ↥H)'`.
    - `le_derivedInG_inf_of_le_derivedInG_normalizer` proves the pure group-theory
      step `P₀ ≤ N_G(P)'`, `N_G(P) ≤ M`, `N_G(P) ≤ L` ⇒ `P₀ ≤ (L ∩ M)'`.
    - `p0_le_derivedInG_inf_of_scn3_witness_maximal` combines this with the witness
@@ -866,8 +872,9 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
 
    Remaining for this block: instantiate Corollary 4.19 inside `L ∩ M` with
    `G* = D ∩ L` to obtain the chief-factor centralizer input for `(L ∩ M)'`,
-   and convert the ambient `P₀ ≤ (L ∩ M)'` into the corresponding local subgroup
-   input before discharging the stored noncentralization contradiction.
+   then lift the resulting local `P₀ ≤ C_{L∩M}(D ∩ L)` statement back to the
+   ambient `P₀ ≤ C_G(D ∩ L)` before discharging the stored noncentralization
+   contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 
