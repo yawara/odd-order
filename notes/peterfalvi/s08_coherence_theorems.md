@@ -366,8 +366,14 @@ allowlist):
   **`mem_Yset_iff_exists_linear_source`** を追加。`Yset` witness の source `θ` を
   `Abelianization.of : H → H/H'` で factor し、finite commutative group の irreducible character
   が degree-one/linear であることから、任意の `Yset` member を nontrivial linear source の
-  induced character として表す。残る exact wiring は nontrivial linear characters の finite
-  enumeration と、その explicit family の range 同一視。
+  induced character として表す。
+- **2026-06-04 T6 exact range adapter**:
+  **`range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective`** と
+  **`coherentYset_of_pairwiseNonconj`** を追加。caller が `Fin n` で nontrivial linear
+  characters の induced `Yset` members を覆う orbit representatives を列挙し、その cover と
+  pairwise non-`L`-conjugacy を渡せば、constructed equal-degree family の coherence を
+  `hyp.Yset` へそのまま rewrite できる。残る T6 wiring は concrete representative
+  construction とその cover/pairwise 入力の構成。
 - **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で

@@ -76,6 +76,11 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - 2026-06-04: `exists_linear_source_of_mem_Yset` /
     `mem_Yset_iff_exists_linear_source` で逆向きも証明。残りは nontrivial linear characters の
     finite enumeration と exact range equality。
+  - 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` /
+    `coherentYset_of_pairwiseNonconj` で、非自明 linear characters の induced `Yset` members を
+    覆う orbit-representative `Fin n` family から `Yset` 上の coherence へ直接 rewrite する
+    adapter を追加。残りは concrete representative construction と cover/pairwise nonconjugacy
+    の構成。
 
 ## 完了条件
 
@@ -88,7 +93,10 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - ✅ 2026-06-02: S08 で degree-one induced differences の H^# support を packaging。
 - ✅ 2026-06-04: S08 の c2/case-A inertia bridge、degree-one induced irreducibility、
   `coherentYFamily`、Xset irreducibility consumer を AxiomsCheck 登録。全て 3 axiom allowlist 内。
-- 残: `Y = S(H')` の exact finite family/range construction と `Yset` への接続。
+- ✅ 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` と
+  `coherentYset_of_pairwiseNonconj` を AxiomsCheck 登録。induced `Yset` members を覆う
+  orbit-representative family から `Yset` coherence へ rewrite する adapter まで接続済み。
+- 残: `Y = S(H')` の concrete finite family construction と surjectivity/pairwise nonconjugacy の構成。
 
 ## 参照
 

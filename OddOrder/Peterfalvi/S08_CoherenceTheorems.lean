@@ -2730,6 +2730,52 @@ theorem range_induce_linearIrreducibleCharacter_subset_Yset
   rintro φ ⟨j, rfl⟩
   exact hyp.induce_linearIrreducibleCharacter_mem_Yset (hχ_ne j)
 
+/-- If an index family covers all nontrivial linear sources after induction, its induced range is
+exactly `Y = S(H')`.
+
+This is the orbit-representative form needed for (6.8): the family need only hit each induced
+character in `Y`, not each nontrivial linear source before quotienting by `L`-conjugacy. -/
+theorem range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {ι : Type*}
+    (χ : ι → (↥H →* ℂˣ)) (hχ_ne : ∀ j, χ j ≠ 1)
+    (hχ_cover : ∀ η : ↥H →* ℂˣ, η ≠ 1 → ∃ j,
+      ClassFunction.induce H (linearClassFunction (χ j)) =
+        ClassFunction.induce H (linearClassFunction η)) :
+    Set.range (fun j => ClassFunction.induce H (linearClassFunction (χ j))) = hyp.Yset := by
+  ext φ
+  constructor
+  · rintro ⟨j, rfl⟩
+    simpa [linearIrreducibleCharacter_coe] using
+      hyp.induce_linearIrreducibleCharacter_mem_Yset (hχ_ne j)
+  · intro hφ
+    obtain ⟨η, hη_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+    obtain ⟨j, hηj⟩ := hχ_cover η hη_ne
+    refine ⟨j, ?_⟩
+    rw [hφeq, linearIrreducibleCharacter_coe]
+    exact hηj
+
+/-- `Y = S(H')` coherence from finite orbit representatives of nontrivial linear characters.
+
+The caller supplies representatives whose induced characters cover `Y`, together with the usual
+pairwise non-`L`-conjugacy input that makes the constructed family orthonormal.  The exact range
+equality rewrites `coherentYFamily` from the constructed range to `hyp.Yset`. -/
+noncomputable def coherentYset_of_pairwiseNonconj
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ} [NeZero n]
+    (hn : 2 ≤ n) (χ : Fin n → (↥H →* ℂˣ))
+    (hχ_ne : ∀ j, χ j ≠ 1)
+    (hχ_cover : ∀ η : ↥H →* ℂˣ, η ≠ 1 → ∃ j,
+      ClassFunction.induce H (linearClassFunction (χ j)) =
+        ClassFunction.induce H (linearClassFunction η))
+    (hpairwise : ∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+      IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+        linearIrreducibleCharacter (χ j)) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  have hcoh := hyp.coherentYFamily_of_pairwiseNonconj hn χ hχ_ne hpairwise
+  have hrange :=
+    hyp.range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective χ hχ_ne hχ_cover
+  simpa [hrange] using hcoh
+
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
 nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irreducible. -/
