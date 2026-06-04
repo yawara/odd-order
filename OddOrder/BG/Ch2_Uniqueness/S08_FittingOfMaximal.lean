@@ -3985,6 +3985,68 @@ theorem exists_sylow_inf_containing_scn3_map_of_le
     hAmap_p.of_equiv (Subgroup.subgroupOfEquivOfLe hA_le_inf).symm
   exact hAinf_p.exists_le_sylow
 
+/-- A `SCN₃` subgroup is nontrivial. -/
+theorem isSCN3_ne_bot [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : IsSCN₃ p A) :
+    A ≠ ⊥ := by
+  intro hbot
+  have hprank_le : pRank A p ≤ 0 := by
+    rw [pRank_le_iff]
+    intro B hB
+    haveI : Subsingleton A := by
+      rw [hbot]
+      infer_instance
+    have hBcard : Nat.card B = 1 :=
+      Nat.card_eq_one_iff_unique.mpr ⟨inferInstance, ⟨1⟩⟩
+    rw [hBcard, Nat.log_one_right]
+  have h3 : 3 ≤ pRank A p := hA.le_pRank
+  omega
+
+/-- A local `SCN₃(P)` subgroup has nontrivial image in the ambient group. -/
+theorem scn3_map_ne_bot_of_le_sylow [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M}
+    (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    A.map M.subtype ≠ ⊥ := by
+  have hAsub_ne : A.subgroupOf (P : Subgroup ↥M) ≠ ⊥ :=
+    isSCN3_ne_bot (G := ↥(P : Subgroup ↥M)) hA
+  intro hAmap_bot
+  have hA_bot : A = ⊥ :=
+    (Subgroup.map_eq_bot_iff_of_injective A M.subtype_injective).mp hAmap_bot
+  have hAsub_bot : A.subgroupOf (P : Subgroup ↥M) = ⊥ := by
+    have hmap_bot : (A.subgroupOf (P : Subgroup ↥M)).map
+        (P : Subgroup ↥M).subtype = ⊥ := by
+      rw [Subgroup.map_subgroupOf_eq_of_le hAP, hA_bot]
+    exact (Subgroup.map_eq_bot_iff_of_injective _ (P : Subgroup ↥M).subtype_injective).mp
+      hmap_bot
+  exact hAsub_ne hAsub_bot
+
+/-- BG (8.13), nontriviality setup: the Sylow subgroup of `H ⊓ M` containing the local
+`SCN₃(P)` image is nontrivial. -/
+theorem sylow_inf_ne_bot_of_scn3_map_le [Finite G]
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M}
+    (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    (hAH : A.map M.subtype ≤ H) {R : Sylow p ↥(H ⊓ M)}
+    (hA_R : (A.map M.subtype).subgroupOf (H ⊓ M) ≤
+      (R : Subgroup ↥(H ⊓ M))) :
+    (R : Subgroup ↥(H ⊓ M)) ≠ ⊥ := by
+  have hAmap_ne : A.map M.subtype ≠ ⊥ :=
+    scn3_map_ne_bot_of_le_sylow P hAP hA
+  have hA_le_inf : A.map M.subtype ≤ H ⊓ M :=
+    le_inf hAH (Subgroup.map_subtype_le A)
+  have hAinf_ne : (A.map M.subtype).subgroupOf (H ⊓ M) ≠ ⊥ := by
+    intro hAinf_bot
+    apply hAmap_ne
+    have hmap_bot : ((A.map M.subtype).subgroupOf (H ⊓ M)).map
+        (H ⊓ M).subtype = ⊥ := by
+      rw [hAinf_bot, Subgroup.map_bot]
+    rwa [Subgroup.map_subgroupOf_eq_of_le hA_le_inf] at hmap_bot
+  intro hR_bot
+  exact hAinf_ne (le_bot_iff.mp (hA_R.trans (le_of_eq hR_bot)))
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -4041,6 +4103,16 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     exact zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
       hG hp_dvd_G R hH_solvable hOpComplHBot
   obtain ⟨Rinf, hA_Rinf⟩ := exists_sylow_inf_containing_scn3_map_of_le P hAP hAH
+  have hRinf_ne_bot : (Rinf : Subgroup ↥(H ⊓ M)) ≠ ⊥ :=
+    sylow_inf_ne_bot_of_scn3_map_le P hAP hA hAH hA_Rinf
+  have hZ_Rinf_ne_bot :
+      ((OddOrder.BG.AppB.zCenterLOdd (Rinf : Subgroup ↥(H ⊓ M))).map
+        (H ⊓ M).subtype) ≠ ⊥ := by
+    have hZ_ne : OddOrder.BG.AppB.zCenterLOdd (Rinf : Subgroup ↥(H ⊓ M)) ≠ ⊥ :=
+      zCenterLOdd_ne_bot_of_isPGroup Rinf.isPGroup' hRinf_ne_bot
+    intro hZ_map_bot
+    exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _
+      (H ⊓ M).subtype_injective).mp hZ_map_bot)
   sorry
 
 end OddOrder.BG.Ch2.S08
