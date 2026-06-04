@@ -509,6 +509,30 @@ private theorem isUniquelyMaximal_of_overgroup_rank_three_witness [Finite G]
   exact isUniquelyMaximal_of_overgroup_rank_drop_witness hG hAab hAU hBp hBnc hDP
     hBstarP hDnormP hDea hDcard hBstarea hBstarlog hBstar_le_CB hrCAD
 
+/-- Extract the rank-three elementary abelian subgroup `B* ≤ C_G(B)` used in
+BG Corollary 9.3 from the `pRank` hypothesis. -/
+private theorem exists_elementaryAbelian_le_centralizer_of_three_le_pRank [Finite G]
+    {p : ℕ} [Fact p.Prime] {B : Subgroup G}
+    (hrB : 3 ≤ pRank ↥(Subgroup.centralizer (B : Set G)) p) :
+    ∃ Bstar : Subgroup G,
+      Bstar.IsElementaryAbelian p ∧
+        Bstar ≤ Subgroup.centralizer (B : Set G) ∧
+          3 ≤ Nat.log p (Nat.card Bstar) := by
+  classical
+  let C : Subgroup G := Subgroup.centralizer (B : Set G)
+  obtain ⟨B₀, hB₀ea, hB₀log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥C) (p := p) (n := 3) (by norm_num) hrB
+  let Bstar : Subgroup G := B₀.map C.subtype
+  refine ⟨Bstar, ?_, ?_, ?_⟩
+  · change (B₀.map C.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map C.subtype_injective hB₀ea
+  · change B₀.map C.subtype ≤ C
+    exact Subgroup.map_subtype_le B₀
+  · change 3 ≤ Nat.log p (Nat.card (B₀.map C.subtype))
+    rw [Subgroup.card_map_of_injective C.subtype_injective]
+    exact hB₀log
+
 /-- **BG Corollary 9.3** (mmd L2545): `p` prime, `A` abelian `p`-部分群, `B` noncyclic
 `p`-部分群、`A ∈ 𝒰`, `m(A) ≥ 3`, `r_p(C_G(B)) ≥ 3` ⇒ `B ∈ 𝒰`。 -/
 theorem isUniquelyMaximal_of_abelian_rank_three [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -516,6 +540,11 @@ theorem isUniquelyMaximal_of_abelian_rank_three [Finite G] (hG : IsMinimalSimple
     (hBp : IsPGroup p B) (hBnc : ¬ IsCyclic ↥B) (hAU : IsUniquelyMaximal A)
     (hmA : 3 ≤ rank ↥A) (hrB : 3 ≤ pRank ↥(Subgroup.centralizer (B : Set G)) p) :
     IsUniquelyMaximal B := by
+  classical
+  obtain ⟨Bstar, hBstarea, hBstar_le_CB, hBstarlog⟩ :=
+    exists_elementaryAbelian_le_centralizer_of_three_le_pRank (B := B) hrB
+  -- It remains to conjugate `A`/`Bstar` into a common Sylow `p`-overgroup and
+  -- choose the normal Lemma-4.5 `E_{p^2}` witness `D` inside that overgroup.
   sorry
 
 /-- **BG Lemma 9.4** (mmd L2555): `p` prime, `M ∈ ℳ`, `r_p(F(M)) ≥ 3` ⇒ `𝒰` は rank `≥ 3` の

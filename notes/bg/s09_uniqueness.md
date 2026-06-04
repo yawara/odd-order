@@ -436,3 +436,16 @@ cyclic-quotient rank drops from a single overgroup witness `D ⊴ P`. Corollary 
 therefore reduced to the remaining witness-selection step: extract/conjugate a rank-three
 `B* ≤ C_G(B)`, choose a common Sylow overgroup `P` containing `A`, `B*`, and `D`, and supply
 the normal Lemma-4.5 `E_{p^2}` witness inside `P`.
+
+### Lean API status (2026-06-04, Bstar extraction)
+
+The `r_p(C_G(B)) >= 3` hypothesis in Corollary 9.3 is now consumed by
+`exists_elementaryAbelian_le_centralizer_of_three_le_pRank`. It extracts an ambient subgroup
+`B* ≤ C_G(B)` with `B*` elementary abelian and `log_p |B*| >= 3` by taking a `pRank`
+witness inside `C_G(B)` and mapping it through the centralizer subtype.
+
+The body of `isUniquelyMaximal_of_abelian_rank_three` now performs this extraction before the
+remaining `sorry`. What remains is the genuinely book-specific conjugation/common-Sylow step:
+put `A` and the extracted `B*` into a common Sylow `p`-overgroup (up to conjugacy), then supply
+Lemma 4.5's normal noncyclic `E_{p^2}` witness `D ⊴ P` and feed it to
+`isUniquelyMaximal_of_overgroup_rank_three_witness`.
