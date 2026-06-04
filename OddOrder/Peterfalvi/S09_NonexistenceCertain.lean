@@ -5345,6 +5345,69 @@ theorem not_trivial_G0_of_real_reduced_family_inequality_and_decomposition
       hmin B hB_ne v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hred)
     hG0
 
+/-- **Peterfalvi (7.11), family-source final-assembly form.**  The terminal
+contradiction from the family-notated source data that produces the displayed
+(7.10) lower bound.
+
+This is the terminal consumer paired with
+`FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition`: once the
+character-theoretic work has supplied the chosen local (7.8) source package, the
+real reduced family inequality, and the orthogonal integer decomposition, the
+case `G₀ = {1}` is already impossible without using the still-open
+`card_G0_lower_bound`. -/
+theorem not_trivial_G0_of_family_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    ⟨i, F.lowerBoundTerm_of_family_source_decomposition hodd H78 hBD hL hH hmin B
+      hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hred⟩
+    hG0
+
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 
 There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups

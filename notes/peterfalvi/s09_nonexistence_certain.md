@@ -576,3 +576,12 @@ S09 に `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition` を追�
 `CharacterEstimateData` を明示的に作らずに、選んだ minimal index `i` の Peterfalvi (7.10) 表示下界を直接返す。
 これで downstream は (7.5)/(7.8.b)/(7.9) 由来の family notation 入力を、`card_G0_lower_bound` の sorry を経由せず
 表示下界 consumer へ接続できる。
+
+
+### 2026-06-04 pass: family-source terminal contradiction
+
+S09 に `not_trivial_G0_of_family_source_decomposition` を追加した。
+前回の `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition` を existential (7.10) bound に包み、
+`not_trivial_G0_of_lowerBoundTerm` に渡す terminal consumer。
+これで family-notated source data / real reduced family inequality / orthogonal integer decomposition が揃った時点で、
+`card_G0_lower_bound` の sorry を経由せず `G₀ = {1}` の矛盾まで直接閉じられる。
