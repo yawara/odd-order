@@ -320,7 +320,7 @@ Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`.
 - §9 intentionally introduces no new local definitions: it consumes the shared `IsUniquelyMaximal`/`hInvariant` API, §7 `scn3Global`, and §8 `fittingInG`.
 - Shared uniqueness API landed in `OddOrder/GroupTheory/MaximalSubgroup.lean`: `IsUniquelyMaximal.uniqueMaximalSubgroup`, its membership/coatom/le accessors, equality of maximal overgroups, and `maximalSubgroupsContaining_eq_singleton`.
 - Shared `hInvariant`/`hInvariantStar` destructors landed in `OddOrder/GroupTheory/AInvariantPiSubgroups.lean`, so §9 proofs can project ambient containment, normalizer containment, pi-subgroup status, and star maximality without unfolding definitions by hand.
-- Remaining §9 `sorry`s are exactly Theorem 9.1, Corollary 9.2, Corollary 9.3, Lemma 9.4, Lemma 9.5, Theorem 9.6, and the `E^2 - E*` particular case. They remain hard because they depend on the unlanded §7/§8 chain, BG §6 Theorem 6.2, BG §5 Lemma 5.1, and BG §4 rank/centralizer inputs; no Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
+- Current remaining §9 theorem-body `sorry`s are exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, Lemma 9.5, and Theorem 9.6. Corollary 9.2 and the `E^2 - E*` particular case are now Lean-proved from their upstream stated theorems; the remaining hard proofs still depend on the §7/§8 chain, BG §6 Theorem 6.2, BG §5 Lemma 5.1, and BG §4 rank/centralizer inputs. No Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
 
 
 ## Lean API status (2026-06-04)
@@ -344,6 +344,13 @@ group. With this witness, Corollary 9.2 is now proved in Lean from Theorem 9.1: 
 containing `L`, so Theorem 9.1 gives `A ∈ 𝒰`, and `IsUniquelyMaximal.of_le_of_lt_top` lifts
 from `A` to `K`.
 
+The `E^2 - E*` particular case is now proved in Lean from Theorem 9.6. The local bridge
+`three_le_rank_centralizer_of_mem_e2_not_maximal` extracts a larger elementary abelian
+`p`-subgroup from `¬ IsMaximalElementaryAbelian p A`, puts it inside `C_G(A)`, and converts
+its strict cardinal growth over `|A| = p^2` into `3 ≤ rank C_G(A)`. Thus an `A ∈ E_p^2(G)`
+that is not in `E*` satisfies the second rank alternative of Theorem 9.6.
+
 Remaining §9 `sorry`s are now exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, Lemma 9.5,
-Theorem 9.6, and the `E^2 - E*` particular case. Corollary 9.2 still depends on the stated
-Theorem 9.1 proof being completed, but no longer has its own rank/centralizer API blocker.
+and Theorem 9.6. Corollary 9.2 still depends on the stated Theorem 9.1 proof being completed,
+and the particular case still depends on the stated Theorem 9.6 proof, but neither has its own
+rank/centralizer API blocker.

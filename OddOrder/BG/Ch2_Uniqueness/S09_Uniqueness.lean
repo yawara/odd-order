@@ -184,12 +184,67 @@ theorem uniquenessTheorem [Finite G] (hG : IsMinimalSimpleOdd G)
     IsUniquelyMaximal K := by
   sorry
 
+/-- If an elementary abelian subgroup of order `p^2` is not maximal among elementary abelian
+`p`-subgroups, then its centralizer has rank at least three. This is the rank bridge behind
+BG Theorem 9.6's "in particular" clause. -/
+private theorem three_le_rank_centralizer_of_mem_e2_not_maximal [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA2 : A ∈ elemAbelianOfRank G p 2)
+    (hAns : ¬ IsMaximalElementaryAbelian p A) :
+    3 ≤ rank ↥(Subgroup.centralizer (A : Set G)) := by
+  classical
+  have hAea : A.IsElementaryAbelian p := hA2.1
+  have hAcard : Nat.card A = p ^ 2 := hA2.2
+  have hnot_max :
+      ¬ ∀ F : Subgroup G, F.IsElementaryAbelian p → A ≤ F → F = A := by
+    intro hmax
+    exact hAns ⟨hAea, hmax⟩
+  push Not at hnot_max
+  obtain ⟨F, hFea, hAF, hFne⟩ := hnot_max
+  have hAlt : A < F := lt_of_le_of_ne hAF (fun h => hFne h.symm)
+  have hAcard_lt_Fcard : Nat.card A < Nat.card F :=
+    Set.Finite.card_lt_card (Set.toFinite (F : Set G)) (hAlt : (A : Set G) ⊂ (F : Set G))
+  have hp2_lt_Fcard : p ^ 2 < Nat.card F := by
+    simpa [hAcard] using hAcard_lt_Fcard
+  obtain ⟨k, hFcard_pow⟩ := IsPGroup.iff_card.mp hFea.isPGroup
+  have htwo_lt_k : 2 < k := by
+    have hpow_lt : p ^ 2 < p ^ k := by
+      simpa [hFcard_pow] using hp2_lt_Fcard
+    exact (Nat.pow_lt_pow_iff_right (Fact.out : p.Prime).one_lt).mp hpow_lt
+  have hp3_le_Fcard : p ^ 3 ≤ Nat.card F := by
+    rw [hFcard_pow]
+    exact Nat.pow_le_pow_right (Fact.out : p.Prime).pos (by omega)
+  let C : Subgroup G := Subgroup.centralizer (A : Set G)
+  have hFC : F ≤ C := by
+    intro f hf
+    dsimp [C]
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    exact congrArg Subtype.val (hFea.comm ⟨a, hAF ha⟩ ⟨f, hf⟩)
+  let Fsub : Subgroup C := F.subgroupOf C
+  have hFsub_elem : Fsub.IsElementaryAbelian p :=
+    IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFC).symm hFea
+  have hFsub_card : Nat.card Fsub = Nat.card F :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hFC).toEquiv
+  have hlog_ge : 3 ≤ Nat.log p (Nat.card Fsub) := by
+    rw [hFsub_card]
+    exact Nat.le_log_of_pow_le (Fact.out : p.Prime).one_lt hp3_le_Fcard
+  have h3pRank : 3 ≤ pRank C p := hlog_ge.trans (le_pRank Fsub hFsub_elem)
+  exact h3pRank.trans (pRank_le_rank (G := ↥C) p)
+
 /-- **BG Theorem 9.6 系** (mmd L2627 "In particular"): `A ∈ ℰ²(G) − ℰ*(G)` (位数 `p²` の
 elem-ab で極大でない) なら `A ∈ 𝒰`。 -/
 theorem isUniquelyMaximal_of_mem_e2_not_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA2 : A ∈ elemAbelianOfRank G p 2)
     (hAns : ¬ IsMaximalElementaryAbelian p A) :
     IsUniquelyMaximal A := by
-  sorry
+  have hAea : A.IsElementaryAbelian p := hA2.1
+  have h2pRank : 2 ≤ pRank ↥A p := by
+    have hlog_le : Nat.log p (Nat.card A) ≤ pRank ↥A p := hAea.log_card_le_pRank
+    have hlog : Nat.log p (Nat.card A) = 2 := by
+      rw [hA2.2, Nat.log_pow (Fact.out : p.Prime).one_lt]
+    exact (le_of_eq hlog.symm).trans hlog_le
+  have hr2 : 2 ≤ rank ↥A := h2pRank.trans (pRank_le_rank (G := ↥A) p)
+  exact uniquenessTheorem hG hr2
+    (Or.inr (three_le_rank_centralizer_of_mem_e2_not_maximal hA2 hAns))
 
 end OddOrder.BG.Ch2.S09
