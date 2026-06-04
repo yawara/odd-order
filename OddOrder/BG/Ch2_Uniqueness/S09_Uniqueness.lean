@@ -2681,6 +2681,47 @@ private structure Cor419ChiefFactorData (M : Type*) [Group M] [Finite M]
   Ubar_pgroup : IsPGroup q ↥(U.map (QuotientGroup.mk' V))
   U_le_sup : U ≤ R ⊔ V
 
+/-- A chief factor of a finite solvable group is a `q`-group for some prime `q`.
+This isolates the prime-selection part needed when Lemma 9.5 feeds a local chief
+factor into BG Corollary 4.19. -/
+private theorem exists_prime_isPGroup_chiefFactor_quotient
+    {M : Type*} [Group M] [Finite M] [IsSolvable M]
+    {U V : Subgroup M} (hChief : IsChiefFactor U V) :
+    haveI : V.Normal := hChief.normal_bot
+    ∃ q : ℕ, q.Prime ∧ IsPGroup q ↥(U.map (QuotientGroup.mk' V)) := by
+  haveI : V.Normal := hChief.normal_bot
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
+    hChief.isMinimalNormal_map_quotient
+  obtain ⟨q, hq, hElem⟩ :=
+    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
+  exact ⟨q, hq, hElem.isPGroup⟩
+
+/-- Chief-series layers contained in a normal rank-two `q`-subgroup already have
+the shape required by BG Corollary 4.19.  The later Lemma 9.5 proof uses this
+with the `q`-part extracted from `D ∩ L`. -/
+private def cor419ChiefFactorData_chiefSeriesInside_of_le_normal_pSubgroup
+    {M : Type*} [Group M] [Finite M] {q : ℕ} (hq_prime : q.Prime) (hq_odd : Odd q)
+    {K R : Subgroup M} [K.Normal] [R.Normal]
+    (hK_le_R : K ≤ R) (hR_pgroup : IsPGroup q ↥R) (hR_rank : pRank ↥R q ≤ 2) :
+    ∀ i, chiefSeriesInside K i ≠ ⊥ →
+      Cor419ChiefFactorData M (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) := by
+  intro i _hU_ne
+  have hU_le_R : chiefSeriesInside K i ≤ R :=
+    (chiefSeriesInside_le K i).trans hK_le_R
+  have hU_pgroup : IsPGroup q ↥(chiefSeriesInside K i) := hR_pgroup.to_le hU_le_R
+  refine
+    { q := q
+      q_prime := hq_prime
+      q_odd := hq_odd
+      R := R
+      R_normal := inferInstance
+      R_pgroup := hR_pgroup
+      R_rank := hR_rank
+      Ubar_pgroup := ?_
+      U_le_sup := ?_ }
+  · exact hU_pgroup.map (QuotientGroup.mk' (chiefSeriesInside K (i + 1)))
+  · exact hU_le_R.trans le_sup_left
+
 /-- Turn per-factor BG Corollary 4.19 data into the exact chief-factor
 centralizer chain input consumed by the Lemma 1.9 bridge.  Trivial zero layers
 of `chiefSeriesInside` are handled without Corollary 4.19 data. -/
