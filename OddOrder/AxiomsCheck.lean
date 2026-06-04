@@ -1797,6 +1797,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_scaledDiffSupport_of_charValue_eq
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.scaledDiff_dadeImage_mem_ZIrr
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_closedUnderConjugate_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_hasNoRealCharacters_of_irreducible_X

@@ -2880,6 +2880,20 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **(T8.11e) scaled supported differences map to virtual characters.**
+
+Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
+scaled difference to `ℤ[Irr G]`.  This is exactly the `htau1_memaχ` field of
+`XAdjoinStepInput`, separated from the arithmetic that produces the ratio and support. -/
+theorem scaledDiff_dadeImage_mem_ZIrr (hyp : SibleyDadeHypothesis G L H)
+    {χ χ₁ : IrreducibleCharacter ↥L} {a : ℕ}
+    (hdiffasupp : ((χ : ClassFunction ↥L ℂ) - a • (χ₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    hyp.tau ((χ : ClassFunction ↥L ℂ) - a • (χ₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G := by
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    hyp.dade hyp.hconj hdiffasupp
+    (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem χ₁.mem_ZIrr a))
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
