@@ -133,7 +133,17 @@ created: 2026-06-04
 - [x] **C.2 q≥5 norm-one subgroup lower bound**:
   `|U|=(p^q-1)/(p-1)=1+p+...+p^(q-1)` の最大項から
   `pow_sub_one_le_normOneUnits_card : p^(q-1) ≤ |U|` を追加。q≥5 の純数値評価の入力。
-- [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
+- [x] **C.2 q≥5 numeric separation**:
+  幾何和の最後の二項から `p^q*(1+p^(q-2)) ≤ |U|^2` を証明し、
+  `normOneFrobenius_error_separation_of_five_le` で任意の `c≤|U|` に対する
+  non-kernel error separation を閉じた。AxiomsCheck 登録済み。
+- [x] **C.2 q≥5 class-sum coefficient lower bound**:
+  `normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card` と
+  `normSetE_ncard_ge_two_of_five_le` を追加し、class-sum 側では q≥5 分岐が
+  `2 ≤ |E|` まで到達。`AppC_NormSet.lemmaC2` 本体への直配線は import cycle 回避のため
+  後続の placement 整理で扱う。AxiomsCheck 登録済み。
+- [ ] **Lemma C.2 packaging (q≥5)**: `AppC_NormSet.lemmaC2` の q≥5 分岐へ
+  `normSetE_ncard_ge_two_of_five_le` を配線できる placement 整理（循環 import 回避）。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
 

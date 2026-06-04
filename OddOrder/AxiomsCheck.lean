@@ -1849,6 +1849,12 @@ set_option linter.style.longLine false in
 -- `(p^q - 1)/(p - 1)`, the `|U|` used in the `q ≥ 5` branch of Lemma C.2.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.pow_sub_one_le_normOneUnits_card
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.pow_sub_one_add_pow_sub_two_le_normOneUnits_card
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneUnits_card_sq_ge_pow_mul_one_add_pow_sub_two
 
 -- BG App C Remark (VII): under condition (A), every unit of `𝔽_{p^q}` splits
 -- as a prime-field unit times a norm-one unit.
@@ -1965,6 +1971,13 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card_of_error_separation
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_error_separation_of_five_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_ncard_ge_two_of_five_le
 
 -- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
 -- fixed-product fiber over `inl (2*s)` before passing to the full product class.
