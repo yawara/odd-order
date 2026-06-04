@@ -2696,6 +2696,95 @@ private theorem exists_prime_isPGroup_chiefFactor_quotient
     OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hMin
   exact ⟨q, hq, hElem.isPGroup⟩
 
+/-- In an odd-order ambient group, the prime attached to a nontrivial chief-factor
+`q`-group quotient is odd. -/
+private theorem odd_prime_of_chiefFactor_quotient_isPGroup
+    {M : Type*} [Group M] [Finite M] (hoddM : Odd (Nat.card M))
+    {q : ℕ} (hq : q.Prime) {U V : Subgroup M} (hChief : IsChiefFactor U V)
+    (hUbar_pgroup :
+      haveI : V.Normal := hChief.normal_bot
+      IsPGroup q ↥(U.map (QuotientGroup.mk' V))) :
+    Odd q := by
+  haveI : V.Normal := hChief.normal_bot
+  haveI : Fact q.Prime := ⟨hq⟩
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
+    hChief.isMinimalNormal_map_quotient
+  have hUbar_ne : U.map (QuotientGroup.mk' V) ≠ ⊥ := hMin.2.1
+  have hcard_ne_one : Nat.card ↥(U.map (QuotientGroup.mk' V)) ≠ 1 := by
+    intro hcard
+    exact hUbar_ne (Subgroup.eq_bot_of_card_eq _ hcard)
+  have hq_dvd_Ubar : q ∣ Nat.card ↥(U.map (QuotientGroup.mk' V)) := by
+    rcases hUbar_pgroup.card_eq_or_dvd with hcard | hdvd
+    · exact False.elim (hcard_ne_one hcard)
+    · exact hdvd
+  have hq_dvd_quot : q ∣ Nat.card (M ⧸ V) :=
+    hq_dvd_Ubar.trans (Subgroup.card_subgroup_dvd_card (U.map (QuotientGroup.mk' V)))
+  exact hoddM.of_dvd_nat (hq_dvd_quot.trans (Subgroup.card_quotient_dvd_card V))
+
+/-- The ambient `q`-core of a rank-two normal subgroup has `q`-rank at most two.
+This is the rank input needed when Lemma 9.5 uses `O_q(D ∩ L)` as the Corollary
+4.19 subgroup for a `q`-primary chief factor. -/
+private theorem pRank_opiCoreInG_singleton_le_two_of_rank_le_two
+    {M : Type*} [Group M] [Finite M] {q : ℕ} [Fact q.Prime] {K : Subgroup M}
+    (hK_rank : rank ↥K ≤ 2) :
+    pRank ↥(opiCoreInG ({q} : Set ℕ) K) q ≤ 2 := by
+  exact (pRank_le_rank
+      (G := ↥(opiCoreInG ({q} : Set ℕ) K)) q).trans
+    ((rank_le_of_injective
+      (f := Subgroup.inclusion (opiCoreInG_le ({q} : Set ℕ) K))
+      (Subgroup.inclusion_injective (opiCoreInG_le ({q} : Set ℕ) K))).trans hK_rank)
+
+/-- Package one chief-series layer using the ambient `q`-core of `K` as the
+rank-two normal `q`-subgroup required by BG Corollary 4.19.  The only remaining
+mathematical input is the nilpotent/Hall-style absorption `U ≤ O_q(K) V`, which
+is kept explicit here. -/
+private def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG
+    {M : Type*} [Group M] [Finite M] {q : ℕ} (hq_prime : q.Prime) (hq_odd : Odd q)
+    {K : Subgroup M} [K.Normal] (hK_rank : rank ↥K ≤ 2) (i : ℕ)
+    (hUbar_pgroup :
+      IsPGroup q ↥((chiefSeriesInside K i).map
+        (QuotientGroup.mk' (chiefSeriesInside K (i + 1)))))
+    (hU_le_sup :
+      chiefSeriesInside K i ≤ opiCoreInG ({q} : Set ℕ) K ⊔ chiefSeriesInside K (i + 1)) :
+    Cor419ChiefFactorData M (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) := by
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  refine
+    { q := q
+      q_prime := hq_prime
+      q_odd := hq_odd
+      R := opiCoreInG ({q} : Set ℕ) K
+      R_normal := opiCoreInG_normal ({q} : Set ℕ)
+      R_pgroup := isPGroup_opiCoreInG_singleton K
+      R_rank := pRank_opiCoreInG_singleton_le_two_of_rank_le_two hK_rank
+      Ubar_pgroup := hUbar_pgroup
+      U_le_sup := hU_le_sup }
+
+/-- Choose the chief-factor prime and package Corollary 4.19 data from the
+ambient `q`-core of `K`.  After the rank and oddness bridges, the only remaining
+input is the nilpotent absorption statement `U ≤ O_q(K) V`. -/
+private noncomputable def cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG_absorption
+    {M : Type*} [Group M] [Finite M] [IsSolvable M] (hoddM : Odd (Nat.card M))
+    {K : Subgroup M} [K.Normal] (hK_rank : rank ↥K ≤ 2) (i : ℕ)
+    (hU_ne : chiefSeriesInside K i ≠ ⊥)
+    (habsorb : ∀ q : ℕ, q.Prime →
+      IsPGroup q ↥((chiefSeriesInside K i).map
+        (QuotientGroup.mk' (chiefSeriesInside K (i + 1)))) →
+      chiefSeriesInside K i ≤ opiCoreInG ({q} : Set ℕ) K ⊔ chiefSeriesInside K (i + 1)) :
+    Cor419ChiefFactorData M (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) := by
+  classical
+  have hChief : IsChiefFactor (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
+    isChiefFactor_chiefSeriesInside hU_ne
+  let ex := exists_prime_isPGroup_chiefFactor_quotient hChief
+  let q : ℕ := Classical.choose ex
+  have hq : q.Prime := (Classical.choose_spec ex).1
+  have hUbar_pgroup :
+      IsPGroup q ↥((chiefSeriesInside K i).map
+        (QuotientGroup.mk' (chiefSeriesInside K (i + 1)))) :=
+    (Classical.choose_spec ex).2
+  exact cor419ChiefFactorData_chiefSeriesInside_of_opiCoreInG
+    hq (odd_prime_of_chiefFactor_quotient_isPGroup hoddM hq hChief hUbar_pgroup)
+    hK_rank i hUbar_pgroup (habsorb q hq hUbar_pgroup)
+
 /-- Chief-series layers contained in a normal rank-two `q`-subgroup already have
 the shape required by BG Corollary 4.19.  The later Lemma 9.5 proof uses this
 with the `q`-part extracted from `D ∩ L`. -/
