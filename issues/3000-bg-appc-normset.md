@@ -251,6 +251,11 @@ created: 2026-06-04
   `exists_step4_decomposition_of_zpow_tConj_normOne` を公開し、`s^m (u)^{t^n} s^r`
   型の項が `PU` に入り Step1 の `u₁s₁v₁` normal form を持つことを固定。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 natural-power `t`-action bridge**:
+  `normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe` と
+  `t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow` を公開し、
+  `(u)^{t^n}` を concrete norm-one unit の `tConjNormOneUnitsAut^n` として
+  読めるようにした。AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。

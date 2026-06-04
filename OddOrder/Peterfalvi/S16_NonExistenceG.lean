@@ -969,6 +969,51 @@ theorem normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
     _ = data.t * data.sigma (SemidirectProduct.inr u) * data.t⁻¹ := by
       rw [data.normOneUnitsEquivU_apply_coe]
 
+/-- Iterating the transported `t`-automorphism agrees with conjugation by
+the corresponding natural power of `t` after applying `σ` to the concrete
+complement. -/
+theorem normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ n) u) : G) =
+      data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ := by
+  induction n with
+  | zero =>
+      simp [data.normOneUnitsEquivU_apply_coe]
+  | succ n ih =>
+      calc
+        (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ (n + 1)) u) : G) =
+            data.t *
+                (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ n) u) : G) *
+              data.t⁻¹ := by
+          rw [pow_succ']
+          exact data.normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
+            ((data.tConjNormOneUnitsAut ^ n) u)
+        _ = data.t *
+              (data.t ^ n *
+                data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                  (data.t ^ n)⁻¹) *
+            data.t⁻¹ := by
+          rw [ih]
+        _ = data.t ^ (n + 1) *
+              data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                (data.t ^ (n + 1))⁻¹ := by
+          group
+
+/-- The natural-power conjugate of a concrete complement element is the `σ`
+image of the corresponding power of the transported norm-one automorphism. -/
+theorem t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ =
+      data.sigma
+        (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+          fieldNormalizerFrobeniusGroup hyp) := by
+  rw [← data.normOneUnitsEquivU_apply_coe ((data.tConjNormOneUnitsAut ^ n) u)]
+  exact (data.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe n u).symm
+
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
 theorem normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
