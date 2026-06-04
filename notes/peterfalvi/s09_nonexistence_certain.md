@@ -462,3 +462,12 @@ S09 に `Hypothesis78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr` を追加した。�
 `fullDadeIsometryData.maps_virtualCharacter` を適用する bridge。入力は source-side の
 `Ind 1_H - ζ ∈ ZIrr L` のみに切り出しているので、後段の Peterfalvi (7.8) arithmetic は Dade API と混ぜずに
 独立 obligation として残る。
+
+
+### 2026-06-04 pass: source-difference `ZIrr` from irreducible source terms
+
+S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_irreducible` と
+`Hypothesis78.beta_mem_ZIrr_of_irreducible_sourceDiff` を追加した。前者は
+`ζ_ind1H`, `ζ` がともに irreducible character なら `Submodule.sub_mem` で
+`ζ_ind1H - ζ ∈ ZIrr L` を返す最小 bridge。後者は直前の §4 Dade bridge と合成して
+`β ∈ ZIrr G` を返す consumer で、(7.8)/(7.9) 側は source-side の lattice membership を直接扱わずに済む。

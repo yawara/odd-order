@@ -1416,6 +1416,23 @@ theorem beta_mem_ZIrr_of_sourceDiff_mem_ZIrr (H78 : Hypothesis78 G A L)
         H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) from
       H78.hyp76.hyp71.hyp.dadeIsometryData_toDadeMap H78.hyp76.hyp71.hConjInvariant] at hvirt
 
+/-- The source difference `Ind 1_H - ζ` is virtual when both source terms are
+irreducible characters of `L`. -/
+theorem sourceDiff_mem_ZIrr_of_irreducible (H78 : Hypothesis78 G A L)
+    (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L :=
+  Submodule.sub_mem _ hind_irr.mem_ZIrr hzeta_irr.mem_ZIrr
+
+/-- Irreducibility of the two source terms supplies the virtual-character input
+needed by the Dade bridge for `β`. -/
+theorem beta_mem_ZIrr_of_irreducible_sourceDiff (H78 : Hypothesis78 G A L)
+    (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.beta ∈ ZIrr G :=
+  H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr
+    (H78.sourceDiff_mem_ZIrr_of_irreducible hind_irr hzeta_irr)
+
 /-- The coherent source set `S = T \ {Ind 1_H}` from Peterfalvi (7.8),
 presented as a set of class functions on `L`. -/
 def sourceSet (H78 : Hypothesis78 G A L) : Set (ClassFunction L ℂ) :=
