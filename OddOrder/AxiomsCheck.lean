@@ -2172,6 +2172,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaDistinct_mem_sourceSet
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_mem_ZIrr_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zetaDistinct_mem_ZIrr_of_isCoherent

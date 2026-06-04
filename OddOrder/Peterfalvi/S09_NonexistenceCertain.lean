@@ -1469,6 +1469,38 @@ theorem zetaDistinct_mem_sourceSet (H78 : Hypothesis78 G A L) :
     H78.hyp76.zeta H78.zetaDistinct ∈ H78.sourceSet :=
   H78.zeta_mem_sourceSet H78.zetaDistinct_ne_ind1H
 
+/-- S09-facing constructor for the generic S08 weighted Ind-chain package.
+
+A concrete S07 coherent witness over the source set `S = T \ {Ind 1_H}` gives
+Peterfalvi's Ind-chain data with output family `χ_t = ν ζ_t`, provided the chosen
+source family lies in `S` and the scaled differences lie in the supported
+lattice where the coherent extension agrees with the original map `τ`. -/
+noncomputable def indChainDecomposition_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := L) (G := G) τ ζ d where
+  χ t := H78.nu (ζ t)
+  norm_one t := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem t)), hζ_norm]
+  pairwise_inner_zero t u htu := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem u)), hζ_pairwise htu]
+  d_zero := hd_zero
+  image_eq t := by
+    rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
+
 /-- If the abstract `ν` carried by `Hypothesis78` is identified with a concrete
 S07 coherent extension, then `ν` sends the coherent lattice `ℤ[S]` into virtual
 irreducible characters of `G`.

@@ -585,3 +585,13 @@ S09 に `not_trivial_G0_of_family_source_decomposition` を追加した。
 `not_trivial_G0_of_lowerBoundTerm` に渡す terminal consumer。
 これで family-notated source data / real reduced family inequality / orthogonal integer decomposition が揃った時点で、
 `card_G0_lower_bound` の sorry を経由せず `G₀ = {1}` の矛盾まで直接閉じられる。
+
+### 2026-06-04 pass: S08 Ind-chain bridge from H78 coherence
+
+S09 に `Hypothesis78.indChainDecomposition_of_isCoherent` を追加した。
+具体的な S07 `IsCoherent τ H78.sourceSet A'` witness と `H78.nu = extension` を受け取り、
+任意の source family `ζ_t ∈ H78.sourceSet` と supported scaled differences から、S08 の
+`IndChainDecomposition τ ζ d` を `χ_t = H78.nu ζ_t` として構成する。
+
+これで S08 側に積み上げた weighted Ind-chain Parseval / scalar coefficient API を、S09 の
+`Hypothesis78` 表記から直接起動できる。
