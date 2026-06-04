@@ -2407,7 +2407,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_unit_step
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_twisted_unit_step
+  OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_normOne_step
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 
@@ -2499,6 +2499,10 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_field_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_twisted_normOne_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_normOne_step
 
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.

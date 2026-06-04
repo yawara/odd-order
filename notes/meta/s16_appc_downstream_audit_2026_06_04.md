@@ -66,11 +66,11 @@ BG App C `theoremC : FieldNormalizerData → p ≤ q` の数学核 = `F_{p^q}` �
 ## opaque-Prop placeholder の load-bearing 状態 (監査)
 - **FieldNormalizerData** (S16) = **混在**: concrete carrier (`sigma : H→G`, `P`/`P0`/`U` image identifications,
   `W2_conj_y_normalizes_U`) + genuine (`cyclotomic_coprime`=cond A, `Q_elementaryAbelian`,
-  `W2_normalizes_Q`, `y`, `y_mem_Q`) + **AppC producer obligation** (`appC_twisted_field_step`;
-  `appC_twisted_unit_step` / `appC_normSet_generator_relation` は derived theorems)。
+  `W2_normalizes_Q`, `y`, `y_mem_Q`) + **AppC producer obligation** (`appC_twisted_normOne_step`;
+  `appC_normSet_generator_relation` は derived theorem)。
 - **NormSetData / HypothesisB** (AppC) = downstream theoremC は finite-field C.1/C.2 と S16 の C.3 producer obligation に配線済み。
   `HypothesisB` は concrete `H=P⋊U`, monomorphism `σ:H→G`, `P0`/`U` image identification,
-  normalizer 条件の carrier まで更新済み。残る C.3 本体は S16 `appC_twisted_field_step` の materialization。
+  normalizer 条件の carrier まで更新済み。残る C.3 本体は S16 `appC_twisted_normOne_step` の materialization。
 - vacuous rider 注意 (`scaffold-sorry-free-not-done`): `∃ data, data.caseB_formula ∧ <real>` の `_formula` 連言は
   常時充足可 ⟹ statement は教科書より弱い。実制約 (card 等式/normalizer 包含/D=⊥) は genuine。
 

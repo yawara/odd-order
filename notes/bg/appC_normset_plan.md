@@ -300,10 +300,10 @@ Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normSetE_eq_inv_of_twisted_unit_step` として証明済み。twisted-step / inverse-closure から
 S16 interface の `N(2*a-1)=1` を返す adapter も
 `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
-`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。S16 側にも
-field-element one-step obligation `appCNormSetTwistedFieldStep`、unit-step adapter
-`appCNormSetTwistedUnitStep_of_field_step`、relation adapter
-`appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
+`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。さらに actual `t`-action 用の
+norm-one group 版 `normSetETwistedNormOneStep` /
+`forall_normN_two_mul_sub_one_of_twisted_normOne_step` を追加し、S16 producer obligation も
+`appCNormSetTwistedNormOneStep` に狭めた。AppC 側の `theoremC` は
 finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。さらに
 `S16.FieldNormalizerData` と `AppC_FinalContradiction.HypothesisB` は concrete `H=P⋊U`、
 monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件を持つ carrier に更新済み。
@@ -321,9 +321,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
 `normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
-`appC_twisted_field_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
-generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と
-`appC_normSet_generator_relation` はこの field からの derived theorems。
+`appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
+generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は
+この norm-one step からの derived theorem。
 
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。

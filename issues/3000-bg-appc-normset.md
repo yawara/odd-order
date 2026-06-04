@@ -175,11 +175,11 @@ created: 2026-06-04
   Frobenius propagation / “by (A)” 入力。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 4 twisted-inverse induction tail**: BG 最後の
   `(a⁻¹)^{t^3}` を p 回反復する議論を `inv_mem_of_twistedInv_step` として一般化し、
-  field-element one-step output から unit-step/inverse-closure/generator relation へ落とす
-  `normSetETwistedFieldStep`, `twisted_unit_step_of_twisted_field_step`,
-  `normSetE_eq_inv_of_twisted_field_step`,
-  `forall_normN_two_mul_sub_one_of_twisted_field_step` を追加。S16 側にも
-  `appCNormSetTwistedFieldStep` と derived adapter 群を追加。AxiomsCheck 登録済み。
+  field/full-unit one-step output から inverse-closure/generator relation へ落とす adapter 群を追加。
+  さらに actual `t`-action に合わせた norm-one group 版
+  `normSetETwistedNormOneStep`, `normSetE_eq_inv_of_twisted_normOne_step`,
+  `forall_normN_two_mul_sub_one_of_twisted_normOne_step` を追加し、S16 producer obligation も
+  `appCNormSetTwistedNormOneStep` に狭めた。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
@@ -206,13 +206,13 @@ created: 2026-06-04
   `s_pow_p_eq_one`、`t_pow_p_eq_one`、`tConjUAut_pow_p_eq_one`、
   `tConjNormOneUnitsAut_pow_p_eq_one` を追加し、BG Step4 の `t`-conjugation action が
   p 乗で恒等になることを concrete complement 側にも transport した。
-- [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
+- [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedNormOneStep` を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは `tConjNormOneUnitsAut` による `u ↦ t(u⁻¹)t⁻¹` が `E` を保つという BG C.3 Step3/Step4 本体。`appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。
 
 ## 完了条件
 
 `AppC.theoremC` が sorry-free (Lemmas C.1-C.3 + 配線完成)。`nonexistence_of_G` の BG 側 gap が閉じる。
 2026-06-04 時点で `AppC_FinalContradiction` は direct sorry-free; `theoremC` は AxiomsCheck 登録済み。
-残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_twisted_field_step` の upstream materialization として追跡する。`appC_twisted_unit_step` と `appC_normSet_generator_relation` は derived theorems になった。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
+残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_twisted_normOne_step` の upstream materialization として追跡する。`appC_normSet_generator_relation` は derived theorem になった。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
 段階的に C.1 → C.2(q=3) → C.2(q≥5) → assembly → C.3 materialization。
 
 ## 参照

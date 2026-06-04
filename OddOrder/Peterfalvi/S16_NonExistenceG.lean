@@ -133,6 +133,16 @@ def appCNormSetTwistedUnitStep (hyp : Hypothesis (G := G)) : Prop :=
               GaloisField hyp.base.p hyp.base.q) ∈
             OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q
 
+/-- The same one-step output, narrowed to the concrete norm-one unit group `U`.
+This matches the actual BG Step 4 action by conjugation with `t`; no extension to
+all of `𝔽_{p^q}ˣ` is required. -/
+def appCNormSetTwistedNormOneStep (hyp : Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  ∃ φ : MulAut (OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q),
+    φ ^ hyp.base.p = 1 ∧
+      OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
+        (p := hyp.base.p) (q := hyp.base.q) φ
+
 /-- The field-element Step 4 output implies the unit-group Step 4 output used by
 BG's final odd-iterate argument. -/
 theorem appCNormSetTwistedUnitStep_of_field_step
@@ -156,6 +166,16 @@ theorem appCNormSetGeneratorRelation_of_twisted_unit_step
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   rcases htwist with ⟨φ, hφp, hstep⟩
   exact OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
+    (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos hyp.base.p_odd φ hφp hstep
+
+/-- The norm-one Step 4 output implies the norm relation consumed by AppC. -/
+theorem appCNormSetGeneratorRelation_of_twisted_normOne_step
+    (hyp : Hypothesis (G := G)) :
+    appCNormSetTwistedNormOneStep hyp → appCNormSetGeneratorRelation hyp := by
+  intro htwist
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rcases htwist with ⟨φ, hφp, hstep⟩
+  exact OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_normOne_step
     (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos hyp.base.p_odd φ hφp hstep
 
 /-- The concrete Frobenius group `H = P \rtimes U` from BG Appendix C,
@@ -258,7 +278,7 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U :
     MulAut.conj y • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)
-  appC_twisted_field_step : appCNormSetTwistedFieldStep hyp
+  appC_twisted_normOne_step : appCNormSetTwistedNormOneStep hyp
 
 namespace FieldNormalizerData
 
@@ -495,19 +515,12 @@ theorem t_inv_pow_mul_s_pow_mem_Q {hyp : Hypothesis (G := G)}
     (data.t⁻¹) ^ n * data.s ^ n ∈ hyp.base.Q :=
   inv_pow_mul_pow_mem_of_inv_mul_mem data.t_normalizes_Q data.t_inv_mul_s_mem_Q n
 
-/-- The unit-group C.3 one-step output, derived from the field-element Step 4
-output stored in `FieldNormalizerData`. -/
-theorem appC_twisted_unit_step {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) :
-    appCNormSetTwistedUnitStep hyp :=
-  appCNormSetTwistedUnitStep_of_field_step hyp data.appC_twisted_field_step
-
 /-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
-BG's one-step twisted-inverse output stored in `FieldNormalizerData`. -/
+BG's norm-one twisted-inverse output stored in `FieldNormalizerData`. -/
 theorem appC_normSet_generator_relation {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
     appCNormSetGeneratorRelation hyp :=
-  appCNormSetGeneratorRelation_of_twisted_unit_step hyp data.appC_twisted_unit_step
+  appCNormSetGeneratorRelation_of_twisted_normOne_step hyp data.appC_twisted_normOne_step
 
 end FieldNormalizerData
 
