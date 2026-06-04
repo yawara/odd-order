@@ -876,6 +876,56 @@ theorem hasNormalPComplement_of_oPiCore_quotient_isPGroup {p : ℕ} [Fact p.Prim
     (not_dvd_card_oPiCore (G := ↥H) (p := p) (π := {r : ℕ | r ≠ p}) (by simp))
     hquot
 
+/-- If both quotient layers `H/K` and `G/H` are `p`-groups, then the ambient quotient by
+the image of `K` is a `p`-group. -/
+theorem isPGroup_quotient_map_subtype_of_isPGroup_quotient_of_isPGroup_quotient {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} [H.Normal] {K : Subgroup H}
+    [K.Normal] [(K.map H.subtype).Normal]
+    (hHK : IsPGroup p (↥H ⧸ K)) (hGH : IsPGroup p (G ⧸ H)) :
+    IsPGroup p (G ⧸ K.map H.subtype) := by
+  classical
+  obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hHK
+  obtain ⟨b, hb⟩ := IsPGroup.iff_card.mp hGH
+  refine IsPGroup.of_card (n := a + b) ?_
+  rw [← Subgroup.index_eq_card, Subgroup.index_map_subtype,
+    Subgroup.index_eq_card, Subgroup.index_eq_card, ha, hb, ← pow_add]
+
+/-- Characteristic-subgroup version of the quotient-extension bridge for normal
+`p`-complements. -/
+theorem hasNormalPComplement_of_characteristic_subgroup_quotient_and_outer_quotient_isPGroup
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal] {K : Subgroup H}
+    [K.Normal] (hK_char : K.Characteristic) (hKpPrime : ¬ p ∣ Nat.card ↥K)
+    (hHK : IsPGroup p (↥H ⧸ K)) (hGH : IsPGroup p (G ⧸ H)) :
+    Ch05.HasNormalPComplement p G := by
+  classical
+  haveI : K.Characteristic := hK_char
+  haveI : (K.map H.subtype).Normal := inferInstance
+  exact hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup
+    (H := H) (K := K) hK_char hKpPrime
+    (isPGroup_quotient_map_subtype_of_isPGroup_quotient_of_isPGroup_quotient
+      (p := p) (H := H) (K := K) hHK hGH)
+
+/-- The `O_{r | r != p}` version of the quotient-extension bridge. -/
+theorem hasNormalPComplement_of_oPiCore_quotient_and_outer_quotient_isPGroup {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} [H.Normal]
+    (hlocal : IsPGroup p (↥H ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} ↥H))
+    (houter : IsPGroup p (G ⧸ H)) :
+    Ch05.HasNormalPComplement p G :=
+  hasNormalPComplement_of_characteristic_subgroup_quotient_and_outer_quotient_isPGroup
+    (H := H) (K := Ch03.oPiCore {r : ℕ | r ≠ p} ↥H)
+    (Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} ↥H)
+    (not_dvd_card_oPiCore (G := ↥H) (p := p) (π := {r : ℕ | r ≠ p}) (by simp))
+    hlocal houter
+
+/-- If a normal subgroup has a normal `p`-complement and the outer quotient is a
+`p`-group, then the ambient group has a normal `p`-complement. -/
+theorem hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient_isPGroup
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} [H.Normal]
+    (hH : Ch05.HasNormalPComplement p ↥H) (houter : IsPGroup p (G ⧸ H)) :
+    Ch05.HasNormalPComplement p G :=
+  hasNormalPComplement_of_oPiCore_quotient_and_outer_quotient_isPGroup
+    (H := H) (isPGroup_quotient_oPiCore_of_hasNormalPComplement hH) houter
+
 /-- The canonical normal `p`-complement preserves the Sylow cardinalities for primes
 `q != p`. -/
 theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
