@@ -2881,6 +2881,68 @@ private theorem le_centralizer_of_local_cor419Data_chain
     hP0D hKH hcop hsolv
     (local_derived_le_chiefFactorCentralizer_chain_of_cor419Data hoddH hdata)
 
+/-- Odd order passes from the ambient group to a subgroup. -/
+private theorem odd_card_subgroup_of_odd [Finite G] (hoddG : Odd (Nat.card G))
+    (H : Subgroup G) : Odd (Nat.card ↥H) :=
+  hoddG.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
+
+/-- If `D` is normalized by `M` and contained in `M`, then `D ∩ L` is normal
+inside `L ∩ M`.  This is the local normality needed before applying chief-series
+arguments to `D ∩ L` in BG Lemma 9.5. -/
+private theorem inf_subgroupOf_inf_normal_of_le_normalizer
+    {D L M : Subgroup G} (hDM : D ≤ M)
+    (hMnormD : M ≤ Subgroup.normalizer (D : Set G)) :
+    (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) : Subgroup ↥(L ⊓ M))).Normal := by
+  have hK_le_H : (D ⊓ L : Subgroup G) ≤ L ⊓ M :=
+    le_inf inf_le_right (inf_le_left.trans hDM)
+  refine (Subgroup.normal_subgroupOf_iff_le_normalizer hK_le_H).mpr ?_
+  intro x hxH
+  rw [Subgroup.mem_normalizer_iff]
+  intro k
+  constructor
+  · intro hk
+    rw [Subgroup.mem_inf] at hk ⊢
+    refine ⟨?_, ?_⟩
+    · exact (Subgroup.mem_normalizer_iff.mp (hMnormD hxH.2) k).mp hk.1
+    · exact (Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hxH.1) k).mp hk.2
+  · intro hk
+    rw [Subgroup.mem_inf] at hk ⊢
+    refine ⟨?_, ?_⟩
+    · exact (Subgroup.mem_normalizer_iff.mp (hMnormD hxH.2) k).mpr hk.1
+    · exact (Subgroup.mem_normalizer_iff.mp (Subgroup.le_normalizer hxH.1) k).mpr hk.2
+
+/-- Lemma 9.5's `D ∩ L` Corollary 4.19 consumption step, specialized to the
+local group `L ∩ M`.  Once `(9.10)` gives `P₀ ≤ (L ∩ M).derived` and Corollary
+4.19 data is available for every nonzero chief layer of `D ∩ L`, this proves
+that `P₀` centralizes `D ∩ L`. -/
+private theorem le_centralizer_inf_of_local_cor419Data_chain
+    [Finite G] (hG : IsMinimalSimpleOdd G) {D L M P0 : Subgroup G}
+    (hDM : D ≤ M) (hMnormD : M ≤ Subgroup.normalizer (D : Set G))
+    (hP0_der : P0 ≤ derivedInG (L ⊓ M))
+    (hcop : (Nat.card ↥(P0.subgroupOf (L ⊓ M))).Coprime
+      (Nat.card ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M))))
+    (hsolv :
+      IsSolvable ↥(P0.subgroupOf (L ⊓ M)) ∨
+        IsSolvable ↥((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)))
+    (hdata :
+      letI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
+          Subgroup ↥(L ⊓ M))).Normal :=
+        inf_subgroupOf_inf_normal_of_le_normalizer hDM hMnormD
+      ∀ i,
+      chiefSeriesInside ((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)) i ≠ ⊥ →
+        Cor419ChiefFactorData (↥(L ⊓ M))
+          (chiefSeriesInside ((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)) i)
+          (chiefSeriesInside ((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M)) (i + 1))) :
+    P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
+  have hDL_le_LM : (D ⊓ L : Subgroup G) ≤ L ⊓ M :=
+    le_inf inf_le_right (inf_le_left.trans hDM)
+  haveI : (((D ⊓ L : Subgroup G).subgroupOf (L ⊓ M) :
+      Subgroup ↥(L ⊓ M))).Normal :=
+    inf_subgroupOf_inf_normal_of_le_normalizer hDM hMnormD
+  exact le_centralizer_of_local_cor419Data_chain
+    (H := L ⊓ M) (K := D ⊓ L) (P0 := P0)
+    (odd_card_subgroup_of_odd hG.odd (L ⊓ M)) hP0_der hDL_le_LM hcop hsolv hdata
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
