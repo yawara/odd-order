@@ -366,6 +366,108 @@ theorem primeFieldUnits_mul_normOneUnits_eq_univ [Fact p.Prime] (hq : q.Prime)
   · exact ⟨b, rfl⟩
   · exact u.property
 
+/-! ### Generator-relation finite-field helpers for Lemma C.3 -/
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (intersection core)**: under condition
+(A), a norm-one unit that also comes from the prime field is trivial.  This is
+the finite-field `U ∩ 𝔽_pˣ = 1` input used in the generator-relation argument. -/
+theorem normOneUnits_eq_one_of_mem_primeFieldUnits [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (u : normOneUnits p q) (hu : (u : (GaloisField p q)ˣ) ∈ primeFieldUnits p q) :
+    u = 1 := by
+  have hx : (u : (GaloisField p q)ˣ) ∈ primeFieldUnits p q ⊓ normOneUnits p q := by
+    exact ⟨hu, u.property⟩
+  rw [primeFieldUnits_inf_normOneUnits_eq_bot p q hq hA] at hx
+  exact Subtype.ext hx
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (prime-line core)**: on a nonzero
+prime-field line `𝔽_p s`, if a norm-one unit `u` carries one nonzero prime-field
+multiple into a relation with another, then `u = 1`.  In BG notation this is the
+finite-field calculation behind `s₁ u s₂ ∈ U` forcing `u = 1` in the nonzero
+case. -/
+theorem normOneUnits_eq_one_of_primeLine_relation [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) {c d : ZMod p} (hc : c ≠ 0) (hd : d ≠ 0)
+    (u : normOneUnits p q)
+    (h : (algebraMap (ZMod p) (GaloisField p q) c) * s +
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+          ((algebraMap (ZMod p) (GaloisField p q) d) * s)) = 0) :
+    u = 1 := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  let uval : F := ((u : Fˣ) : F)
+  have hfactor : (emb c + uval * emb d) * s = 0 := by
+    change (emb c) * s + uval * ((emb d) * s) = 0 at h
+    rw [add_mul, mul_assoc]
+    exact h
+  have hcoef : emb c + uval * emb d = 0 := by
+    exact (mul_eq_zero.mp hfactor).resolve_right hs
+  have hdF : emb d ≠ 0 := by
+    exact (map_ne_zero emb).2 hd
+  have hmul : uval * emb d = - emb c := by
+    rw [add_comm] at hcoef
+    exact eq_neg_of_add_eq_zero_left hcoef
+  have huval : uval = - emb c / emb d := by
+    calc
+      uval = (uval * emb d) / emb d := by rw [mul_div_cancel_right₀ _ hdF]
+      _ = - emb c / emb d := by rw [hmul]
+  have hbne : -c / d ≠ 0 := by
+    exact div_ne_zero (neg_ne_zero.mpr hc) hd
+  let b : (ZMod p)ˣ := Units.mk0 (-c / d) hbne
+  have hbmap : Units.map emb.toMonoidHom b = (u : Fˣ) := by
+    apply Units.ext
+    change emb (-c / d) = uval
+    rw [huval]
+    simp [emb]
+  have hu_prime : (u : Fˣ) ∈ primeFieldUnits p q := by
+    exact ⟨b, hbmap⟩
+  exact normOneUnits_eq_one_of_mem_primeFieldUnits p q hq hA u hu_prime
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (prime-line form)**: for a nonzero
+prime-field line `𝔽_p s`, the additive relation corresponding to
+`s₁ u s₂ ∈ U` has only the two BG alternatives: either both prime-field
+coefficients vanish, or `u = 1` and the coefficients sum to zero. -/
+theorem generatorRelation_step2_primeLine [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) (c d : ZMod p) (u : normOneUnits p q)
+    (h : (algebraMap (ZMod p) (GaloisField p q) c) * s +
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+          ((algebraMap (ZMod p) (GaloisField p q) d) * s)) = 0) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  by_cases hc : c = 0
+  · left
+    refine ⟨hc, ?_⟩
+    subst c
+    have hmul : (((u : Fˣ) : F) * (emb d * s)) = 0 := by
+      simpa [emb] using h
+    have huds : emb d * s = 0 := by
+      exact (mul_eq_zero.mp hmul).resolve_left (Units.ne_zero (u : Fˣ))
+    have hdemb : emb d = 0 := by
+      exact (mul_eq_zero.mp huds).resolve_right hs
+    by_contra hd
+    exact (map_ne_zero emb).2 hd hdemb
+  · by_cases hd : d = 0
+    · exfalso
+      subst d
+      have hmul : (emb c) * s = 0 := by
+        simpa [emb] using h
+      have hcemb : emb c = 0 := by
+        exact (mul_eq_zero.mp hmul).resolve_right hs
+      exact (map_ne_zero emb).2 hc hcemb
+    · right
+      have hu1 := normOneUnits_eq_one_of_primeLine_relation p q hq hA hs hc hd u h
+      refine ⟨hu1, ?_⟩
+      subst hu1
+      have hsum_mul : (emb (c + d)) * s = 0 := by
+        change emb c * s + ((1 : Fˣ) : F) * (emb d * s) = 0 at h
+        simpa [emb, map_add, add_mul] using h
+      have hsum_emb : emb (c + d) = 0 := by
+        exact (mul_eq_zero.mp hsum_mul).resolve_right hs
+      by_contra hsum
+      exact (map_ne_zero emb).2 hsum hsum_emb
+
 /-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the

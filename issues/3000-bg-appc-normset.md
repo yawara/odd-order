@@ -147,6 +147,10 @@ created: 2026-06-04
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
 - [x] **Lemma C.3 p=3 branch**: BG C.3 note を `normSetE_eq_inv_of_p_eq_three` として純有限体で証明。characteristic 3 では `2*a-1=2-a` なので generator-relation argument なしで `E=E⁻¹`。AxiomsCheck 登録済み。
 - [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` の C.3 obligation を最終結論 `E=E⁻¹` から generator-relation 出力 `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) に細分化し、`AppC_FinalContradiction.lemmaC3_inverse_closed` は純有限体補題経由で `sorry` なしに維持 (2026-06-04, branch `codex/ft-appc-downstream`)。
+- [x] **Lemma C.3 Step 2 finite-field core**: `U ∩ 𝔽_pˣ = 1` から
+  `normOneUnits_eq_one_of_mem_primeFieldUnits` を公開し、prime-field line 上の relation
+  `c*s + u*(d*s)=0` が BG Step 2 の二択 `(c=d=0) ∨ (u=1 ∧ c+d=0)` を強制する
+  `generatorRelation_step2_primeLine` まで証明。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。

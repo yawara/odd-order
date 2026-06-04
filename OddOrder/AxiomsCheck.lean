@@ -1905,6 +1905,12 @@ set_option linter.style.longLine false in
 -- `𝔽_{p^q}ˣ` under condition (A).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
 
+-- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
+-- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_mem_primeFieldUnits
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_primeLine_relation
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
+
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
