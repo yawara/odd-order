@@ -225,6 +225,11 @@ created: 2026-06-04
   `generatorRelation_step2_primeLine_of_sigma_mem_U` を公開し、`s₁ u s₂∈U` から
   BG Step2 の二択を concrete `P⋊U` と transported `G` の両方で読めるようにした。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 P₀ non-normalization bridge**:
+  `fieldNormalizerNormOneUnits_card_gt_one` / `exists_fieldNormalizerNormOneUnit_ne_one` と
+  `s_not_normalizes_U` / `W2_not_le_normalizer_U` を公開し、非自明 norm-one unit と
+  Step2 generator relation から `P₀` (`W₂`) が `U` を正規化できないことを transport。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 3 irreducibility bridge**:
   `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` を公開し、`U≤X≤PU` かつ
   `X≠U` なら `X=PU` となる BG Step3 の irreducibility 入力を `σ` 経由で transport。

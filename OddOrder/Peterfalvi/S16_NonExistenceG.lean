@@ -242,6 +242,43 @@ abbrev fieldNormalizerNormOneUnits (hyp : Hypothesis (G := G)) : Type _ :=
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q
 
+/-- The concrete norm-one complement has more than one element.  This is the
+lightweight cardinality input needed to turn BG Appendix C, Lemma C.3 Step 2
+into the assertion that the prime line `P₀` cannot normalize `U`, without
+importing the class-sum file. -/
+theorem fieldNormalizerNormOneUnits_card_gt_one (hyp : Hypothesis (G := G)) :
+    1 < Nat.card (fieldNormalizerNormOneUnits hyp) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+  have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
+  have hq2 : 2 ≤ hyp.base.q := by
+    have hq3 : 3 ≤ hyp.base.q := hyp.base.three_le_q
+    omega
+  rw [OddOrder.BG.AppC.NormSet.normOneUnits_card hyp.base.p hyp.base.q hq0,
+    ← Nat.geomSum_eq hp2 hyp.base.q]
+  have hrange : Finset.range 2 ⊆ Finset.range hyp.base.q := by
+    intro k hk
+    exact Finset.mem_range.mpr (by
+      have hk2 : k < 2 := Finset.mem_range.mp hk
+      exact Nat.lt_of_lt_of_le hk2 hq2)
+  have hle :
+      (∑ k ∈ Finset.range 2, hyp.base.p ^ k) ≤
+        ∑ k ∈ Finset.range hyp.base.q, hyp.base.p ^ k :=
+    Finset.sum_le_sum_of_subset_of_nonneg hrange
+      (fun _ _ _ => zero_le _)
+  have htwo : 1 < (∑ k ∈ Finset.range 2, hyp.base.p ^ k) := by
+    simp
+    omega
+  exact htwo.trans_le hle
+
+/-- There is a nonidentity norm-one unit in the concrete complement. -/
+theorem exists_fieldNormalizerNormOneUnit_ne_one (hyp : Hypothesis (G := G)) :
+    ∃ u : fieldNormalizerNormOneUnits hyp, u ≠ 1 := by
+  haveI : Nontrivial (fieldNormalizerNormOneUnits hyp) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (fieldNormalizerNormOneUnits_card_gt_one hyp)
+  exact exists_ne 1
+
 /-- The distinguished nonidentity element of the prime-field line `P₀`,
 corresponding to `1 : F_{p^q}` in BG Appendix C. -/
 noncomputable def fieldNormalizerPrimeLineGenerator (hyp : Hypothesis (G := G)) :
@@ -282,6 +319,14 @@ theorem fieldNormalizerPrimeLineElement_one (hyp : Hypothesis (G := G)) :
     fieldNormalizerPrimeLineElement hyp 1 = fieldNormalizerPrimeLineGenerator hyp := by
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   simp [fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
+
+/-- Prime-line scalar elements invert by negating the scalar. -/
+theorem fieldNormalizerPrimeLineElement_neg (hyp : Hypothesis (G := G))
+    (c : ZMod hyp.base.p) :
+    fieldNormalizerPrimeLineElement hyp (-c) =
+      (fieldNormalizerPrimeLineElement hyp c)⁻¹ := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simp [fieldNormalizerPrimeLineElement]
 
 /-- The distinguished generator lies in the concrete prime-field line `P₀`. -/
 theorem fieldNormalizerPrimeLineGenerator_mem (hyp : Hypothesis (G := G)) :
@@ -599,6 +644,52 @@ theorem generatorRelation_step2_primeLine_of_sigma_mem_U
   have hmemH : prodH ∈ fieldNormalizerComplement hyp := by
     simpa [← hg_eq] using hgU
   exact data.generatorRelation_step2_primeLine u hmemH
+
+/-- The chosen nonidentity element `s ∈ P₀` cannot normalize `U`.  Otherwise a
+nontrivial norm-one unit `u` would give `s u s⁻¹ ∈ U`, and BG Appendix C,
+Lemma C.3 Step 2 forces `u = 1`. -/
+theorem s_not_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    data.s ∉ Subgroup.normalizer (hyp.base.U : Set G) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hsN
+  rcases exists_fieldNormalizerNormOneUnit_ne_one hyp with ⟨u, hu_ne⟩
+  have huU :
+      data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
+  have hconjU :
+      data.s *
+          data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+            data.s⁻¹ ∈ hyp.base.U :=
+    (Subgroup.mem_normalizer_iff.mp hsN
+      (data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp))).mp huU
+  have hsigma_inv :
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-1)) = data.s⁻¹ := by
+    rw [fieldNormalizerPrimeLineElement_neg hyp (1 : ZMod hyp.base.p)]
+    simp [s, fieldNormalizerPrimeLineElement_one]
+  have hmem_step :
+      data.sigma (fieldNormalizerPrimeLineElement hyp 1) *
+          data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-1)) ∈ hyp.base.U := by
+    simpa [s, fieldNormalizerPrimeLineElement_one, hsigma_inv] using hconjU
+  have hstep :=
+    data.generatorRelation_step2_primeLine_of_sigma_mem_U
+      (c := (1 : ZMod hyp.base.p)) (d := (-1 : ZMod hyp.base.p)) u hmem_step
+  rcases hstep with hzero | hone
+  · have h1_ne_zero : (1 : ZMod hyp.base.p) ≠ 0 := one_ne_zero
+    exact h1_ne_zero hzero.1
+  · exact hu_ne hone.1
+
+/-- Consequently the transported prime line `W₂ = P₀` is not contained in
+`N_G(U)`.  This is the Step 3 obstruction BG uses after forcing
+`P₁ = P₀`. -/
+theorem W2_not_le_normalizer_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    ¬ hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
+  intro hW2
+  exact data.s_not_normalizes_U (hW2 data.s_mem_W2)
 
 /-- Applying the norm-one/unit equivalence is just `σ` on the concrete
 semidirect-product complement. -/
