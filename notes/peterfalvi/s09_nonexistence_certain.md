@@ -628,3 +628,14 @@ S08 の生の weighted source-difference 展開、reference coefficient の `1 -
 
 これで downstream は normal form へ集約する前の Ind 方程式も、S09 の `Hypothesis78`
 インターフェイスだけで参照できる。
+
+### 2026-06-05 pass: H78 weighted output coefficient recovery
+
+S09 に `Hypothesis78.indChain_inner_chi_eq_ite_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_weightedOutput_of_isCoherent`,
+`Hypothesis78.indChain_weightedOutput_inner_self_eq_sum_sq_of_isCoherent` を追加した。
+S08 の output family orthonormality、weighted output の係数回収、
+complex Parseval form を H78/S07 witness 入力列から直接返す adapter 形。
+
+前回までの raw/normalized weighted Ind 方程式と合わせて、§9 downstream は
+weighted output の係数・norm・image equation をすべて H78 表記から呼べる。

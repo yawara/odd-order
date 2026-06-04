@@ -2184,6 +2184,11 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_eq_ite_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_weightedOutput_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_weightedDifferenceInput_of_isCoherent
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
@@ -2197,6 +2202,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_weightedOutput_inner_self_eq_sum_sq_of_isCoherent
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent
