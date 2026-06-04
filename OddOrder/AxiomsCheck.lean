@@ -2384,6 +2384,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_integral_parity
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr
+-- Peterfalvi (7.5) reduced family inequality input for the (7.10) assembly.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.reduced_inequality_of_estimates
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h

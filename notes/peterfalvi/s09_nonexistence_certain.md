@@ -692,3 +692,15 @@ H78/S07 witness 入力列から直接返す adapter 形。
 
 これで weighted sum に集約する前の各 source difference 項も、§9 側から `data := ...`
 を手で作らず参照できる。
+
+### 2026-06-05 pass: reduced family inequality from (7.5)
+
+S09 に `reduced_inequality_of_estimates` を追加した。
+これは (7.5) `family_inequality` を、(7.10) の `CharacterEstimateData.base_estimate`
+へ渡す real reduced inequality まで実際に畳む補題。
+入力は `G₀` 上の identity contribution
+`1 ≤ Σ_{g∈G₀}|χ(g)|²`、選択 index `i` の下界 `c ≤ ‖χ^{ρ_i}‖²`、
+および `𝓑` の外側で `‖χ^{ρ_j}‖² ≥ |A_j|/|L_j|` となる非負寄与。
+
+これにより、従来 `hred` として外部仮定にしていた (7.5) 由来の不等式は、
+(7.8)/(7.9) 側の各 `ρ` 下界を揃えれば S09 内で生成できる形になった。
