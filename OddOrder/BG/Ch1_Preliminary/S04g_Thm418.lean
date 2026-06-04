@@ -1180,6 +1180,58 @@ theorem characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
           (default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
           (default : Sylow q G)
 
+/-- One factor of the characteristic Sylow series in BG Theorem 4.20(c).
+
+The data records two characteristic subgroups `lower <= upper` whose quotient has
+exactly the cardinality of a Sylow `q`-subgroup of the ambient group.  Keeping the
+factor as data lets the 4.20(c) induction lift whole layers from the normal
+`p`-complement before assembling the full series. -/
+structure CharacteristicSylowLayer (G : Type*) [Group G] [Finite G]
+    (q : ℕ) [Fact q.Prime] where
+  upper : Subgroup G
+  lower : Subgroup G
+  lower_le_upper : lower ≤ upper
+  upper_char : upper.Characteristic
+  lower_char : lower.Characteristic
+  card_quotient_eq_sylow :
+    Nat.card (upper ⧸ lower.subgroupOf upper) =
+      Nat.card ↥((default : Sylow q G) : Subgroup G)
+
+namespace CharacteristicSylowLayer
+
+/-- A bottom layer in the BG Theorem 4.20(c) characteristic Sylow series supplies
+a normal Sylow subgroup. -/
+theorem exists_normal_sylow_of_lower_eq_bot {q : ℕ} [Fact q.Prime]
+    (L : CharacteristicSylowLayer G q) (hlower : L.lower = ⊥) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  refine exists_normal_sylow_of_characteristic_quotient_bot_card_eq_sylow
+    L.upper_char ?_
+  simpa [hlower] using L.card_quotient_eq_sylow
+
+/-- Lift a characteristic Sylow layer from the canonical normal `p`-complement to
+the ambient group, for `q != p`. -/
+noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (L : CharacteristicSylowLayer
+      ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G) q) :
+    CharacteristicSylowLayer G q := by
+  classical
+  obtain ⟨hupper, hlower, hcard⟩ :=
+    characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
+      (G := G) hpq hG L.lower_le_upper L.upper_char L.lower_char
+      L.card_quotient_eq_sylow
+  exact
+    { upper := L.upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
+      lower := L.lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
+      lower_le_upper := Subgroup.map_mono L.lower_le_upper
+      upper_char := hupper
+      lower_char := hlower
+      card_quotient_eq_sylow := hcard }
+
+end CharacteristicSylowLayer
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04
