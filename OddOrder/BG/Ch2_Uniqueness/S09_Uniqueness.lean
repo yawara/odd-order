@@ -462,6 +462,12 @@ private theorem isUniquelyMaximal_of_rank_drop_witness [Finite G]
   have hrB : 2 ≤ rank ↥B := two_le_rank_of_noncyclic_pSubgroup hG hBp hBnc
   exact isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hBstarU hB_le_CBstar hrB
 
+/-- `MulAut` pointwise action on subgroups is the corresponding subgroup map. -/
+private theorem mulAut_smul_eq_map (φ : MulAut G) (H : Subgroup G) :
+    φ • H = H.map (φ : G →* G) := by
+  rw [Subgroup.pointwise_smul_def]
+  rfl
+
 /-- Any finite `p`-subgroup can be conjugated into a chosen Sylow `p`-subgroup.
 
 This is the Sylow-conjugacy bridge used in BG Corollary 9.3's line "replacing by
@@ -548,6 +554,70 @@ private theorem isUniquelyMaximal_of_overgroup_rank_three_witness [Finite G]
       (P := P) (D := D) (A := A) hAp hAP hDP hDnormP hDea hDcard hmA
   exact isUniquelyMaximal_of_overgroup_rank_drop_witness hG hAab hAU hBp hBnc hDP
     hBstarP hDnormP hDea hDcard hBstarea hBstarlog hBstar_le_CB hrCAD
+
+/-- Conjugate the `B*` side into the chosen overgroup, run the rank-three witness wrapper,
+and transport uniqueness back to the original `B`.
+
+This packages the Corollary 9.3 replacement step where `B*` is conjugated into the Sylow
+overgroup containing `A`; the centralizer hypothesis is kept valid by conjugating `B` by the
+same element. -/
+private theorem isUniquelyMaximal_of_conj_overgroup_rank_three_witness [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A B D Bstar P : Subgroup G}
+    {g : G} (hAab : IsMulCommutative A) (hAp : IsPGroup p A)
+    (hAU : IsUniquelyMaximal A) (hBp : IsPGroup p B) (hBnc : ¬ IsCyclic ↥B)
+    (hAP : A ≤ P) (hDP : D ≤ P)
+    (hBstarP : ((MulAut.conj g) • Bstar : Subgroup G) ≤ P)
+    (hDnormP : (D.subgroupOf P).Normal)
+    (hDea : D.IsElementaryAbelian p) (hDcard : Nat.card D = p ^ 2)
+    (hBstarea : Bstar.IsElementaryAbelian p)
+    (hBstarlog : 3 ≤ Nat.log p (Nat.card Bstar))
+    (hBstar_le_CB : Bstar ≤ Subgroup.centralizer (B : Set G))
+    (hmA : 3 ≤ rank ↥A) :
+    IsUniquelyMaximal B := by
+  classical
+  let φ : MulAut G := MulAut.conj g
+  let Bconj : Subgroup G := φ • B
+  let Bstarconj : Subgroup G := φ • Bstar
+  have hBconj_eq : Bconj = B.map (φ : G →* G) := by
+    change φ • B = B.map (φ : G →* G)
+    exact mulAut_smul_eq_map φ B
+  have hBstarconj_eq : Bstarconj = Bstar.map (φ : G →* G) := by
+    change φ • Bstar = Bstar.map (φ : G →* G)
+    exact mulAut_smul_eq_map φ Bstar
+  have hBconj_p : IsPGroup p Bconj := by
+    rw [hBconj_eq]
+    exact hBp.map (φ : G →* G)
+  have hBconj_nc : ¬ IsCyclic ↥Bconj := by
+    intro hcyc
+    apply hBnc
+    rw [hBconj_eq] at hcyc
+    let e : ↥B ≃* ↥(B.map (φ : G →* G)) :=
+      Subgroup.equivMapOfInjective B (φ : G →* G) φ.injective
+    letI : IsCyclic ↥(B.map (φ : G →* G)) := hcyc
+    exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
+  have hBstarconj_ea : Bstarconj.IsElementaryAbelian p := by
+    rw [hBstarconj_eq]
+    exact Subgroup.IsElementaryAbelian.map φ.injective hBstarea
+  have hBstarconj_log : 3 ≤ Nat.log p (Nat.card Bstarconj) := by
+    rw [hBstarconj_eq, Subgroup.card_map_of_injective φ.injective]
+    exact hBstarlog
+  have hBstarconj_le_CBconj :
+      Bstarconj ≤ Subgroup.centralizer (Bconj : Set G) := by
+    change ((MulAut.conj g) • Bstar : Subgroup G) ≤
+      Subgroup.centralizer (((MulAut.conj g) • B : Subgroup G) : Set G)
+    exact conj_smul_le_centralizer_conj_smul hBstar_le_CB
+  have hBconjU : IsUniquelyMaximal Bconj :=
+    isUniquelyMaximal_of_overgroup_rank_three_witness hG hAab hAp hAU hBconj_p
+      hBconj_nc hAP hDP hBstarP hDnormP hDea hDcard hBstarconj_ea
+      hBstarconj_log hBstarconj_le_CBconj hmA
+  have hBmapU : IsUniquelyMaximal (B.map (φ : G →* G)) := by
+    simpa [hBconj_eq] using hBconjU
+  have hback :
+      IsUniquelyMaximal ((B.map (φ : G →* G)).comap (φ : G →* G)) :=
+    hBmapU.comap_equiv φ
+  have hcomap : (B.map (φ : G →* G)).comap (φ : G →* G) = B :=
+    Subgroup.comap_map_eq_self_of_injective (f := (φ : G →* G)) φ.injective B
+  simpa [hcomap] using hback
 
 /-- Extract the rank-three elementary abelian subgroup `B* ≤ C_G(B)` used in
 BG Corollary 9.3 from the `pRank` hypothesis. -/

@@ -488,3 +488,16 @@ This closes the centralizer-containment part of the common-Sylow conjugation ste
 remaining transport obligations are the `p`-group/noncyclic data for `B`, the elementary
 abelian and `log_p |B*| >= 3` data for `B*`, containment in the chosen Sylow overgroup, and
 moving the resulting uniqueness of the conjugated `B` back to the original `B`.
+
+### Lean API status (2026-06-04, conjugated overgroup wrapper)
+
+S09 now packages those remaining conjugation-transport obligations in
+`isUniquelyMaximal_of_conj_overgroup_rank_three_witness`. Given a Sylow overgroup `P`
+containing `A` and `(conj g) • B*`, plus the normal `E_{p^2}` witness `D ⊴ P`, it applies
+`isUniquelyMaximal_of_overgroup_rank_three_witness` to `(conj g) • B` and then transports
+`IsUniquelyMaximal ((conj g) • B)` back to `IsUniquelyMaximal B` using
+`IsUniquelyMaximal.comap_equiv`.
+
+The Corollary 9.3 gap is therefore narrowed to witness selection: choose a Sylow `P` with
+`A ≤ P`, use Sylow conjugacy to arrange `(conj g) • B* ≤ P`, and supply Lemma 4.5's normal
+`E_{p^2}` subgroup inside that same `P`.
