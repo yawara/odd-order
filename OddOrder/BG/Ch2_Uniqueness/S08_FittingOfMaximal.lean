@@ -3965,6 +3965,26 @@ theorem zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq
     simpa [htop_map] using h1
   exact Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_Z
 
+/-- BG (8.13), Sylow setup: if the local `SCN₃(P)` subgroup image lies in `H`,
+then it lies in a Sylow `p`-subgroup of the intersection `H ⊓ M`. -/
+theorem exists_sylow_inf_containing_scn3_map_of_le
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M}
+    (hAP : A ≤ (P : Subgroup ↥M)) (hAH : A.map M.subtype ≤ H) :
+    ∃ R : Sylow p ↥(H ⊓ M),
+      (A.map M.subtype).subgroupOf (H ⊓ M) ≤ (R : Subgroup ↥(H ⊓ M)) := by
+  have hA_le_inf : A.map M.subtype ≤ H ⊓ M :=
+    le_inf hAH (Subgroup.map_subtype_le A)
+  have hAsub_p : IsPGroup p (A.subgroupOf (P : Subgroup ↥M)) :=
+    P.isPGroup'.to_subgroup _
+  have hA_p : IsPGroup p A :=
+    hAsub_p.of_equiv (Subgroup.subgroupOfEquivOfLe hAP)
+  have hAmap_p : IsPGroup p (A.map M.subtype) :=
+    hA_p.map M.subtype
+  have hAinf_p : IsPGroup p ((A.map M.subtype).subgroupOf (H ⊓ M)) :=
+    hAmap_p.of_equiv (Subgroup.subgroupOfEquivOfLe hA_le_inf).symm
+  exact hAinf_p.exists_le_sylow
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -4020,6 +4040,7 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro R
     exact zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
       hG hp_dvd_G R hH_solvable hOpComplHBot
+  obtain ⟨Rinf, hA_Rinf⟩ := exists_sylow_inf_containing_scn3_map_of_le P hAP hAH
   sorry
 
 end OddOrder.BG.Ch2.S08
