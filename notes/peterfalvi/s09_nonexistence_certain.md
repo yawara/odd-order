@@ -492,3 +492,12 @@ Gibbs explorer の指摘に従い、`Hypothesis78.delta_mem_ZIrr_of_ind_mem_ZIrr
 irreducible である必要がなく、`ζ_ind1H ∈ ZIrr L` から `Δ ∈ ZIrr G` へ接続できる。
 また (7.9) 側では coherence から二つの distinguished `ζ^ν` の `ZIrr` membership をまとめて取り出し、
 `ZIrr` residuals と `(Δ₁,Δ₂)` 偶整数性から parity conclusion に直接入れる。
+
+
+### 2026-06-04 pass: weak two-family residual consumers
+
+S09 に `Hypothesis79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` と
+`Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity` を追加した。
+既存の irreducible-source 版はこれらの特殊化に戻し、二族の (7.9) consumer でも
+`Ind 1_H` source term には irreducibility ではなく `ZIrr` membership だけを要求する形に弱化した。
+これで H78 側の weak residual bridge と H79 側の parity conclusion が同じ入力粒度で接続できる。

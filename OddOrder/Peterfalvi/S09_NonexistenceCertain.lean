@@ -3204,6 +3204,38 @@ theorem delta_cross_integral_of_ZIrr
     ClassFunction.inner_mem_ZIrr_int hζ₁ hδ₂,
     ClassFunction.inner_mem_ZIrr_int hδ₁ hδ₂⟩
 
+/-- Coherence, virtual `Ind 1_H` sources, and irreducible distinguished source
+terms make the three residual cross terms integral. -/
+theorem delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct)) :
+    (∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ)) ∧
+    (∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
+    (∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) := by
+  have hδ₁ : H79.first.delta ∈ ZIrr G :=
+    H79.first.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₁ hnu₁ hind₁Z hzeta₁_irr
+  have hδ₂ : H79.second.delta ∈ ZIrr G :=
+    H79.second.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₂ hnu₂ hind₂Z hzeta₂_irr
+  obtain ⟨hζ₁, hζ₂⟩ := H79.zetaImages_mem_ZIrr_of_isCoherent hcoh₁ hnu₁ hcoh₂ hnu₂
+  exact H79.delta_cross_integral_of_ZIrr hδ₁ hδ₂ hζ₁ hζ₂
+
 /-- Coherence and source irreducibility make the three residual cross terms integral. -/
 theorem delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent
     (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
@@ -3225,20 +3257,10 @@ theorem delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent
     (∃ y : ℤ,
       ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
     (∃ z : ℤ,
-      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) := by
-  have hδ₁ : H79.first.delta ∈ ZIrr G :=
-    H79.first.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
-      hcoh₁ hnu₁ hind₁_irr hzeta₁_irr
-  have hδ₂ : H79.second.delta ∈ ZIrr G :=
-    H79.second.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
-      hcoh₂ hnu₂ hind₂_irr hzeta₂_irr
-  have hζ₁ : H79.firstZetaImage ∈ ZIrr G := by
-    simpa [firstZetaImage] using
-      H79.first.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₁ hnu₁
-  have hζ₂ : H79.secondZetaImage ∈ ZIrr G := by
-    simpa [secondZetaImage] using
-      H79.second.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₂ hnu₂
-  exact H79.delta_cross_integral_of_ZIrr hδ₁ hδ₂ hζ₁ hζ₂
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) :=
+  H79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁_irr.mem_ZIrr hzeta₁_irr
+    hind₂_irr.mem_ZIrr hzeta₂_irr
 
 /-- Integer-parity form of the last step of Peterfalvi (7.9): once the two
 residual cross terms are integers and `(Δ₁,Δ₂)` is an even integer, the displayed
@@ -3294,6 +3316,39 @@ theorem conclusion_of_delta_cross_even_of_ZIrr
   exact H79.conclusion_of_delta_cross_integral_parity hBD₁ hBD₂ hzeta_cross hx hy
     hdelta_even
 
+/-- Coherence, virtual `Ind 1_H` sources, and irreducible distinguished source
+terms supply the integer cross terms needed by the parity form of Peterfalvi
+(7.9). -/
+theorem conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct))
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  have hδ₁ : H79.first.delta ∈ ZIrr G :=
+    H79.first.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₁ hnu₁ hind₁Z hzeta₁_irr
+  have hδ₂ : H79.second.delta ∈ ZIrr G :=
+    H79.second.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₂ hnu₂ hind₂Z hzeta₂_irr
+  obtain ⟨hζ₁, hζ₂⟩ := H79.zetaImages_mem_ZIrr_of_isCoherent hcoh₁ hnu₁ hcoh₂ hnu₂
+  exact H79.conclusion_of_delta_cross_even_of_ZIrr hBD₁ hBD₂ hzeta_cross hδ₁ hδ₂
+    hζ₁ hζ₂ hdelta_even
+
 /-- Coherence and source irreducibility supply the integer cross terms needed by
 the parity form of Peterfalvi (7.9). -/
 theorem conclusion_of_irreducible_sourceDiff_and_isCoherent_parity
@@ -3315,11 +3370,10 @@ theorem conclusion_of_irreducible_sourceDiff_and_isCoherent_parity
     (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
     (hdelta_even : ∃ z : ℤ,
       ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
-    H79.conclusion := by
-  obtain ⟨hx, hy, _hz⟩ :=
-    H79.delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent
-      hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁_irr hzeta₁_irr hind₂_irr hzeta₂_irr
-  exact H79.conclusion_of_delta_cross_integral_parity hBD₁ hBD₂ hzeta_cross hx hy hdelta_even
+    H79.conclusion :=
+  H79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁_irr.mem_ZIrr hzeta₁_irr
+    hind₂_irr.mem_ZIrr hzeta₂_irr hBD₁ hBD₂ hzeta_cross hdelta_even
 
 end Hypothesis79
 
