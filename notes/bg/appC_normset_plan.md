@@ -279,6 +279,15 @@ Step3: `t₁∈P₁^# ⟹ (PU)∩(PU)^{t₁}=U` (U が P に既約作用 + P_0=P
 Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p∈E` を経由して E=E⁻¹。
 **群 G・σ・Q (commutative)・y を本質的に使用** ⟹ FieldNormalizerData materialize 必須 (半上流)。
 
+
+**2026-06-04 現在の形式化 frontier**: Step1/Step2 の純有限体 core は
+`exists_normOne_mul_primeLine_eq` / `generatorRelation_step2_primeLine` として証明済み。
+Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
+`normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。AppC 側の `theoremC` は
+finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
+S16 `FieldNormalizerData` が現在 field として持つ `appC_normSet_generator_relation` を、
+仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
+
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。
 
