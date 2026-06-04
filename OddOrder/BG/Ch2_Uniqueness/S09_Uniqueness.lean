@@ -1726,6 +1726,61 @@ private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_ra
     exact normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
       hG hM hA hRp hAR hRlt hqp hRM h3Fq
 
+/-- BG Lemma 9.5 normalizer step specialized to `R = A`.
+
+After the rank-case normalizer adapter has been supplied with the §4 characteristic
+Sylow series package, the first application gives `N_G(A) ≤ M`. -/
+private theorem normalizer_scn3_self_le_maximal_of_rankCases
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G)
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (A : Set G) ≤ M := by
+  classical
+  have hAab : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hA_le_C : A ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact congrArg Subtype.val (isMulCommutative_iff.mp hAab ⟨y, hy⟩ ⟨x, hx⟩)
+  have hAM : A ≤ M := hA_le_C.trans hM.2
+  have hAlt : A < ⊤ :=
+    lt_of_le_of_lt hA_le_C (centralizer_lt_top_of_mem_scn3Global hG hA)
+  exact normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases
+    hG hM hA (isPGroup_of_mem_scn3Global hA) le_rfl hAlt hAM hFp S hpos
+    hterminal_mem
+
+/-- BG Lemma 9.5 normalizer step specialized to a `p`-subgroup of `N_G(A)`.
+
+The `R = A` instance first puts every chosen `P ≤ N_G(A)` inside `M`; the rank-case
+adapter can then be applied with `R = P` to obtain `N_G(P) ≤ M`. -/
+private theorem normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M P : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hPp : IsPGroup p P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
+  classical
+  have hNAleM : Subgroup.normalizer (A : Set G) ≤ M :=
+    normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp S hpos hterminal_mem
+  have hPM : P ≤ M := hPnormA.trans hNAleM
+  have hMlt : M < ⊤ := (mem_maximalSubgroups.mp hM.1).lt_top
+  have hPlt : P < ⊤ := lt_of_le_of_lt hPM hMlt
+  exact ⟨hPM,
+    normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases
+      hG hM hA hPp hAP hPlt hPM hFp S hpos hterminal_mem⟩
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 

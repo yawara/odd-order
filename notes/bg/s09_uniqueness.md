@@ -651,10 +651,15 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      performs the low/high normalizer case split.  The low branch consumes the §4
      characteristic Sylow series package; the high branch chooses `q` internally
      and invokes the Lemma 9.4 normalizer package.
+   - `S09.normalizer_scn3_self_le_maximal_of_rankCases` specializes this adapter to
+     `R = A`, giving `N_G(A) ≤ M`, and
+     `S09.normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases` specializes the
+     next step to a `p`-subgroup `P ≤ N_G(A)`, returning both `P ≤ M` and
+     `N_G(P) ≤ M`.  This matches the Lemma 9.5 text leading to (9.9).
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank
-   characteristic-series endpoint, then wire the rank-case adapter into the Lemma 9.5
-   `R = A` and `R = P` instantiations.  The largest-prime selection itself is now covered by
+   characteristic-series endpoint and instantiate these packaged normalizer steps in
+   the Lemma 9.5 body.  The largest-prime selection itself is now covered by
    `Ch01.exists_max_primeFactor_card_of_nontrivial` (with the Nat-level helper
    `Ch01.exists_max_primeFactor_of_one_lt`), so the low-rank branch can assume the
    chosen `q ∈ π(M)`, `q` prime, and `∀ r ∈ π(M), r ≤ q` without reopening finite
