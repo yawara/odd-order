@@ -498,6 +498,10 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     actual accumulator `pairUnion (xBaseBlock Z) pair i` の injective finite enumeration から cover /
     non-real / conjugate support / conjugate membership / orthonormality を内部構成し、step caller に残す入力を
     同じ enumeration 上の genuine (6.6) degree・p-power・sum・coprimality data へ絞った。
+  - **2026-06-04 追記 8**: `PairUnionCommonIndexPrimePowerStepData` /
+    `Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X` を追加。per-step caller は
+    `XAdjoinStepInput` record を構成せず、actual pair-cover prefix ごとの common-index/p-power data package を
+    返せば chain fold が internally `pairUnion` adapter を適用して `X` coherence まで進む。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

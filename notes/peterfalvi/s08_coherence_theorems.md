@@ -311,6 +311,11 @@ allowlist):
   cover / non-real / conjugate-support / conjugate-membership / orthonormality を `Xset` facts と pairUnion
   closure から内部構成し、残入力を同じ enumeration 上の genuine (6.6) degree・p-power・sum・coprimality data
   だけにした。
+- **2026-06-04 追記 9**: **`PairUnionCommonIndexPrimePowerStepData`** と
+  **`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X`** を追加。chain-level の
+  `hstep` callback は `XAdjoinStepInput` を直接返さず、actual pair-cover prefix ごとの common-index/p-power
+  degree data package を返せばよくなった。adapter が各 step で `pairUnion` bookkeeping と arithmetic constructor
+  を接続し、`Xset_isCoherent_from_adjoinSteps_of_irreducible_X` に fold する。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
