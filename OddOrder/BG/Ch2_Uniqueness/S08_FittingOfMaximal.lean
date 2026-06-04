@@ -3516,6 +3516,27 @@ theorem normalizer_le_normalizer_zCenterLOdd (H : Subgroup G) :
       _ = OddOrder.BG.AppB.zCenterLOdd H := by rw [hHmap]
   exact OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mp hZmap
 
+/-- The ambient image of `Z(L(K))` is normalized by the normalizer of the ambient image
+of `K`. -/
+theorem normalizer_map_le_normalizer_zCenterLOdd_map {H : Subgroup G} (K : Subgroup ↥H) :
+    Subgroup.normalizer ((K.map H.subtype) : Set G) ≤
+      Subgroup.normalizer (((OddOrder.BG.AppB.zCenterLOdd K).map H.subtype) : Set G) := by
+  have hinj : Function.Injective (H.subtype.comp K.subtype) := by
+    intro x y hxy
+    exact K.subtype_injective (H.subtype_injective hxy)
+  have hZmap :
+      (OddOrder.BG.AppB.zCenterLOdd K).map H.subtype =
+        OddOrder.BG.AppB.zCenterLOdd (K.map H.subtype) :=
+    OddOrder.BG.AppB.map_zCenterLOdd_of_injOn
+      (G := ↥H) (G' := G) H.subtype (H := K) hinj
+  simpa [hZmap] using normalizer_le_normalizer_zCenterLOdd (K.map H.subtype)
+
+/-- The ambient image of `Z(L(K))` lies in the ambient image of `K`. -/
+theorem zCenterLOdd_map_le_map {H : Subgroup G} (K : Subgroup ↥H) :
+    (OddOrder.BG.AppB.zCenterLOdd K).map H.subtype ≤ K.map H.subtype :=
+  Subgroup.map_mono ((OddOrder.BG.AppB.zCenterLOdd_le_lOddIn K).trans
+    (OddOrder.BG.AppB.lOddIn_le_self K))
+
 /-- BG 8.1(b), fifth p-group bridge: Theorem 6.2 applied to `M` gives enough
 normalizer control on `Z(L(P))` to make the image of `P` a Sylow `p`-subgroup of `G`. -/
 theorem sylow_map_mem_range_of_fittingInG_isPGroup [Finite G]
@@ -4226,6 +4247,11 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro hZ_map_bot
     exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _
       (H ⊓ M).subtype_injective).mp hZ_map_bot)
+  have hZ_Rinf_le_Rinf_amb :
+      ((OddOrder.BG.AppB.zCenterLOdd (Rinf : Subgroup ↥(H ⊓ M))).map
+        (H ⊓ M).subtype) ≤
+          (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype :=
+    zCenterLOdd_map_le_map (H := H ⊓ M) (Rinf : Subgroup ↥(H ⊓ M))
   have hSylowInfCard_H :
       sylowInfCard p H M = Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) :=
     sylowInfCard_eq_card p H M Rinf
@@ -4242,6 +4268,19 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
   have hA_le_NRinf : A.map M.subtype ≤
       Subgroup.normalizer (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) :=
     scn3_map_le_normalizer_sylow_inf_map_of_le hAH hA_Rinf
+  have hNRinf_le_NZ_Rinf :
+      Subgroup.normalizer
+          (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤
+        Subgroup.normalizer
+          (((OddOrder.BG.AppB.zCenterLOdd (Rinf : Subgroup ↥(H ⊓ M))).map
+            (H ⊓ M).subtype) : Set G) :=
+    normalizer_map_le_normalizer_zCenterLOdd_map
+      (H := H ⊓ M) (Rinf : Subgroup ↥(H ⊓ M))
+  have hA_le_NZ_Rinf : A.map M.subtype ≤
+      Subgroup.normalizer
+        (((OddOrder.BG.AppB.zCenterLOdd (Rinf : Subgroup ↥(H ⊓ M))).map
+          (H ⊓ M).subtype) : Set G) :=
+    hA_le_NRinf.trans hNRinf_le_NZ_Rinf
   have hRinf_amb_ne_bot :
       (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≠ ⊥ := by
     intro hR_map_bot
