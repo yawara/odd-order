@@ -681,7 +681,16 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    quotient-layer version needed to glue consecutive characteristic factors is
    covered by `S04.characteristic_quotient_layer_lift_of_hasNormalPComplement_ne`;
    its generic subtype/cardinality support is in
-   `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  The
+   `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  The ambient
+   normal-complement lift is now covered by
+   `S04.hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup`,
+   `S04.hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup`, and
+   `S04.hasNormalPComplement_of_oPiCore_quotient_isPGroup`: once a characteristic
+   core from a normal subgroup is known to be p-free and its ambient quotient is a
+   p-group, it is a normal p-complement in the ambient group.  The remaining quotient
+   extension bridge, if the proof phrases the step as separate local and outer p-group
+   quotients, is to combine those into the ambient quotient by the mapped core being a
+   p-group.  The
    Fitting-rank induction line `F(K) <= F(G)` is covered by
    `S04.rank_fitting_le_of_normal_subgroup` and
    `S04.rank_fitting_le_two_of_normal_subgroup`; the full normal-subgroup

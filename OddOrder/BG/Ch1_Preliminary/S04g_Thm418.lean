@@ -810,6 +810,72 @@ theorem card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement {p : ℕ}
   exact Nat.card_congr
     (quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement hG P).toEquiv
 
+/-- A normal `p`-free subgroup whose quotient is a `p`-group is a normal
+`p`-complement.
+
+This is the ambient lift used after applying BG Thm 4.20(c) inside a normal subgroup:
+once the candidate kernel is normal in `G`, the remaining work is only to identify the
+quotient as a `p`-group. -/
+theorem hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup {p : ℕ}
+    [Fact p.Prime] {N : Subgroup G} [N.Normal]
+    (hNpPrime : ¬ p ∣ Nat.card ↥N) (hquot : IsPGroup p (G ⧸ N)) :
+    Ch05.HasNormalPComplement p G := by
+  classical
+  obtain ⟨a, hquot_card⟩ := IsPGroup.iff_card.mp hquot
+  have hquot_index : N.index = p ^ a := by
+    rw [Subgroup.index_eq_card]
+    exact hquot_card
+  refine ⟨N, inferInstance, fun P => ?_⟩
+  have h_fact_a : (Nat.card G).factorization p = a := by
+    have hN_card_mul : Nat.card ↥N * N.index = Nat.card G :=
+      Subgroup.card_mul_index N
+    have h_total : Nat.card G = Nat.card ↥N * p ^ a := by
+      rw [← hN_card_mul, hquot_index]
+    have hN_card_ne : Nat.card ↥N ≠ 0 := ne_of_gt Nat.card_pos
+    have hpa_ne : p ^ a ≠ 0 := ne_of_gt (pow_pos (Fact.out : p.Prime).pos a)
+    rw [h_total, Nat.factorization_mul hN_card_ne hpa_ne, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hNpPrime,
+      Nat.factorization_pow_self (Fact.out : p.Prime), zero_add]
+  have hP_card : Nat.card ↥(P : Subgroup G) = p ^ a := by
+    rw [P.card_eq_multiplicity, h_fact_a]
+  have h_card_mul : Nat.card ↥N * Nat.card ↥(P : Subgroup G) = Nat.card G := by
+    rw [hP_card, ← hquot_index]
+    exact Subgroup.card_mul_index N
+  have h_coprime : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(P : Subgroup G)) := by
+    rw [hP_card]
+    exact (((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hNpPrime).symm).pow_right a
+  exact Subgroup.isComplement'_of_coprime h_card_mul h_coprime
+
+/-- Characteristic subgroup variant of
+`hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup`.
+
+If `K char H` and `H ⊴ G`, then the image of `K` in `G` is normal, so a `p`-group
+quotient by that image gives a normal `p`-complement in `G`. -/
+theorem hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup {p : ℕ}
+    [Fact p.Prime] {H : Subgroup G} [H.Normal] {K : Subgroup H}
+    (hK_char : K.Characteristic) (hKpPrime : ¬ p ∣ Nat.card ↥K)
+    (hquot : IsPGroup p (G ⧸ K.map H.subtype)) :
+    Ch05.HasNormalPComplement p G := by
+  classical
+  haveI : K.Characteristic := hK_char
+  haveI : (K.map H.subtype).Normal := inferInstance
+  refine hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup
+    (N := K.map H.subtype) ?_ hquot
+  rw [Subgroup.card_map_of_injective H.subtype_injective]
+  exact hKpPrime
+
+/-- The canonical `O_{r | r != p}` specialization of the characteristic subgroup lift. -/
+theorem hasNormalPComplement_of_oPiCore_quotient_isPGroup {p : ℕ} [Fact p.Prime]
+    {H : Subgroup G} [H.Normal]
+    (hquot :
+      IsPGroup p (G ⧸ (Ch03.oPiCore {r : ℕ | r ≠ p} ↥H).map H.subtype)) :
+    Ch05.HasNormalPComplement p G :=
+  hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup
+    (H := H) (K := Ch03.oPiCore {r : ℕ | r ≠ p} ↥H)
+    (Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} ↥H)
+    (not_dvd_card_oPiCore (G := ↥H) (p := p) (π := {r : ℕ | r ≠ p}) (by simp))
+    hquot
+
 /-- The canonical normal `p`-complement preserves the Sylow cardinalities for primes
 `q != p`. -/
 theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
