@@ -2974,6 +2974,54 @@ noncomputable def xBaseBlock_isCoherent_caseA (hyp : SibleyDadeHypothesis G L H)
     (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_caseA hZH hZcentral hZnorm hZfpf h)
     hXne
 
+
+/-- **(T8.11b) X-pair step core facts.**
+
+For a pair supplied by `exists_conjugatePairCover`, the first eight fields of
+`XAdjoinStepInput` are forced by membership in `X` and the disjoint-prefix property: the new
+character is non-real, has the required difference support, is orthonormal to its conjugate, and is
+orthogonal to the accumulated prefix. -/
+theorem xPair_stepCoreFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N) :
+    ¬ ClassFunction.IsReal (χs i : ClassFunction ↥L ℂ) ∧
+      (((χs i : ClassFunction ↥L ℂ).conj - (χs i : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      ClassFunction.inner (χs i : ClassFunction ↥L ℂ) (χs i : ClassFunction ↥L ℂ) = 1 ∧
+      ClassFunction.inner (χs i : ClassFunction ↥L ℂ).conj
+        (χs i : ClassFunction ↥L ℂ).conj = 1 ∧
+      ClassFunction.inner (χs i : ClassFunction ↥L ℂ)
+        (χs i : ClassFunction ↥L ℂ).conj = 0 ∧
+      ClassFunction.inner (χs i : ClassFunction ↥L ℂ).conj
+        (χs i : ClassFunction ↥L ℂ) = 0 ∧
+      (∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+        ClassFunction.inner (χs i : ClassFunction ↥L ℂ) x = 0) ∧
+      (∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+        ClassFunction.inner (χs i : ClassFunction ↥L ℂ).conj x = 0) := by
+  classical
+  have hχpair : (χs i : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair0 i hi]
+  have hχX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := hpairs i hi hχpair
+  rcases hyp.xMember_characterFacts_of_irreducible_X hZH hX hχX with
+    ⟨hrealχ, hχχ, hχbarχbar, hχbarχ, hχχbar⟩
+  have hdiffsuppχ := hyp.xMember_diffSupport_of_irreducible_X hX hχX
+  have hortho := pairCover_orthogonal_to_prefix
+    (X := hyp.Xset Z) (S₀ := hyp.xBaseBlock Z) (pair := pair) (N := N)
+    (i := i) (χ := χs i) hX (hyp.xBaseBlock_subset Z) hpairs
+    (hpair0 i hi) (hpair1 i hi) (hdisj i hi) hi
+  exact ⟨hrealχ, hdiffsuppχ, hχχ, hχbarχbar, hχχbar, hχbarχ, hortho.1, hortho.2⟩
+
 /-- **(T8 leaf 10 / T-A4) X-chain assembly from per-pair adjoining data.**
 
 This is the Sibley/Xset wrapper around the abstract `xChainCoherent` fold.  It builds the
