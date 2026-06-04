@@ -1501,6 +1501,90 @@ noncomputable def indChainDecomposition_of_isCoherent
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
+set_option linter.style.longLine false in
+/-- H78-facing normalized weighted Ind equation, with the integer-square coefficient.
+
+This consumes the same concrete S07 coherence witness as
+`indChainDecomposition_of_isCoherent`, then applies the S08 weighted source-difference
+image identity to the resulting Ind-chain package. -/
+theorem indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    τ data.weightedDifferenceInput =
+      data.weightedOutput - (∑ t : Fin n, (d t : ℂ) ^ 2) • data.χ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ data.weightedDifferenceInput =
+    data.weightedOutput - (∑ t : Fin n, (d t : ℂ) ^ 2) • data.χ 0
+  exact data.image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero
+
+set_option linter.style.longLine false in
+/-- H78-facing normalized weighted Ind equation, with the Parseval norm coefficient. -/
+theorem indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    τ data.weightedDifferenceInput =
+      data.weightedOutput -
+        ClassFunction.inner data.weightedOutput data.weightedOutput • data.χ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ data.weightedDifferenceInput =
+    data.weightedOutput -
+      ClassFunction.inner data.weightedOutput data.weightedOutput • data.χ 0
+  exact data.image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero
+
+/-- H78-facing complex scalar-coefficient form for the weighted Ind-chain source
+difference. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+      1 - ClassFunction.inner data.weightedOutput data.weightedOutput := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+    1 - ClassFunction.inner data.weightedOutput data.weightedOutput
+  exact data.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+
 /-- H78-facing real Parseval form for the S08 weighted Ind-chain output.
 
 This consumes the same concrete S07 coherence witness as
