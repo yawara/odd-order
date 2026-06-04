@@ -802,10 +802,16 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `P₀` not centralizing `D ∩ C_G(B)`. This formalizes the BG line choosing
      `B ⊆ Ω₁(A)` from Prop 1.16's cocyclic centralizer generation.
 
-   Remaining for this block: specialize the bridge to `A = Ω₁(A)` and
-   `D = O_{p'}(F(M))`, route the resulting noncyclic `B` through Theorem 9.1 to
-   choose `y` and `L`, then apply Corollary 4.19 + Lemma 1.9 to contradict the
-   noncentralization of `D ∩ C_G(B)`.
+   A second bridge now specializes this to the `Ω₁(A)` setting:
+
+   - `exists_noncyclic_cocyclic_omega1OfAbelian_not_le_centralizer_inf`
+     takes `pRank A p ≥ 3`, `Ω₁(A) ≤ N_G(D)`, coprime action, and
+     `P₀` not centralizing `D`, and returns a cocyclic `B ≤ Ω₁(A)`, `B ≤ A`,
+     `B` noncyclic, with `P₀` still not centralizing `D ∩ C_G(B)`.
+
+   Remaining for this block: specialize `D = O_{p'}(F(M))`, route the resulting
+   noncyclic `B` through Theorem 9.1 to choose `y` and `L`, then apply
+   Corollary 4.19 + Lemma 1.9 to contradict the noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

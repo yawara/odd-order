@@ -221,6 +221,14 @@ theorem pow_eq_one_of_mem_omega1OfAbelian {H : Subgroup G} {p : ℕ}
     (hg : g ∈ omega1OfAbelian G H p hH) : g ^ p = 1 :=
   hg.2
 
+/-- `Ω₁(H)` of an abelian subgroup is elementary abelian. -/
+theorem omega1OfAbelian_isElementaryAbelian {H : Subgroup G} {p : ℕ}
+    {hH : ∀ x ∈ H, ∀ y ∈ H, x * y = y * x} :
+    (omega1OfAbelian G H p hH).IsElementaryAbelian p := by
+  refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
+  · exact hH (x : G) (omega1OfAbelian_le x.2) (y : G) (omega1OfAbelian_le y.2)
+  · exact pow_eq_one_of_mem_omega1OfAbelian x.2
+
 /-- If an abelian subgroup `H` has `p`-rank at least `n > 0`, then
 `p^n` divides the order of its ambient `Ω₁(H)`.
 

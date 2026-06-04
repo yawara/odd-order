@@ -10,6 +10,7 @@ import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.PRank
+import OddOrder.GroupTheory.OmegaSubgroup
 import OddOrder.GroupTheory.ElementaryAbelianFamily
 import OddOrder.GroupTheory.NarrowPGroup
 
@@ -1995,6 +1996,163 @@ private theorem exists_cocyclic_not_le_centralizer_inf_centralizer_of_not_le_cen
     have hdc : d ∈ Subgroup.centralizer ({x} : Set G) := by
       simpa [CxD, Subgroup.mem_subgroupOf] using hdCx
     exact (Subgroup.mem_centralizer_iff.mp hdc x (Set.mem_singleton x)).symm)
+
+/-- A cocyclic subgroup `Y` (`Y ⊔ ⟨b⟩ = B`) of an elementary abelian `p`-group `B`
+of rank at least three is noncyclic. -/
+private theorem not_isCyclic_of_cocyclic_elementary_rank_three [Finite G] {p : ℕ}
+    (hp2 : 2 ≤ p) {B Y : Subgroup G}
+    (hB_ea : B.IsElementaryAbelian p) (hlog : 3 ≤ Nat.log p (Nat.card ↥B))
+    (hYB : Y ≤ B) {b : G} (hb : b ∈ B) (hsup : Y ⊔ Subgroup.zpowers b = B) :
+    ¬ IsCyclic ↥Y := by
+  classical
+  haveI : IsMulCommutative ↥B := IsMulCommutative.of_comm hB_ea.1
+  set Y' : Subgroup ↥B := Y.subgroupOf B with hY'
+  set K : Subgroup ↥B := (Subgroup.zpowers b).subgroupOf B with hK
+  haveI : Y'.Normal := Subgroup.normal_of_isMulCommutative _
+  have hzple : Subgroup.zpowers b ≤ B := Subgroup.zpowers_le.mpr hb
+  have hsup' : Y' ⊔ K = ⊤ := by
+    apply Subgroup.map_injective B.subtype_injective
+    rw [Subgroup.map_sup, hY', hK, Subgroup.map_subgroupOf_eq_of_le hYB,
+      Subgroup.map_subgroupOf_eq_of_le hzple, hsup, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+  have hKle : Nat.card ↥K ≤ p := by
+    rw [hK, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzple).toEquiv, Nat.card_zpowers]
+    refine Nat.le_of_dvd (by omega : 0 < p) (orderOf_dvd_of_pow_eq_one ?_)
+    have hbp := congrArg Subtype.val (hB_ea.2 (⟨b, hb⟩ : ↥B))
+    simpa using hbp
+  have hKmap : K.map (QuotientGroup.mk' Y') = ⊤ := by
+    have h1 : (Y' ⊔ K).map (QuotientGroup.mk' Y') = ⊤ := by
+      rw [hsup', Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective Y')]
+    rwa [Subgroup.map_sup,
+      (Subgroup.map_eq_bot_iff Y').mpr (le_of_eq (QuotientGroup.ker_mk' Y').symm),
+      bot_sup_eq] at h1
+  have hquot_le : Nat.card (↥B ⧸ Y') ≤ Nat.card ↥K :=
+    Nat.card_le_card_of_surjective ((QuotientGroup.mk' Y').comp K.subtype) (by
+      intro x
+      obtain ⟨k, hk, hkx⟩ := hKmap ▸ Subgroup.mem_top x
+      exact ⟨⟨k, hk⟩, hkx⟩)
+  have hcardB : Nat.card ↥B ≤ Nat.card ↥K * Nat.card ↥Y := by
+    have hY'card : Nat.card ↥Y' = Nat.card ↥Y :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hYB).toEquiv
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup Y', hY'card]
+    exact Nat.mul_le_mul_right _ hquot_le
+  intro hcyc
+  have hY_ea : Y.IsElementaryAbelian p := by
+    refine ⟨fun x y => Subtype.ext ?_, fun x => Subtype.ext ?_⟩
+    · change (x : G) * (y : G) = (y : G) * (x : G)
+      exact congrArg (Subtype.val : ↥B → G)
+        (hB_ea.1 ⟨(x : G), hYB x.2⟩ ⟨(y : G), hYB y.2⟩)
+    · change (x : G) ^ p = 1
+      exact congrArg (Subtype.val : ↥B → G)
+        (hB_ea.2 (⟨(x : G), hYB x.2⟩ : ↥B))
+  have hYle : Nat.card ↥Y ≤ p := by
+    have hdvd : Monoid.exponent ↥Y ∣ p := by
+      rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+      exact hY_ea.2
+    rw [← hcyc.exponent_eq_card]
+    exact Nat.le_of_dvd (by omega : 0 < p) hdvd
+  have hp3 : p ^ 3 ≤ Nat.card ↥B :=
+    (Nat.le_log_iff_pow_le (by omega : 1 < p) Nat.card_pos.ne').mp hlog
+  have h1 : Nat.card ↥B ≤ p ^ 2 := by
+    rw [pow_two]
+    exact le_trans hcardB (Nat.mul_le_mul hKle hYle)
+  have h2 : p ^ 2 < p ^ 3 :=
+    Nat.pow_lt_pow_right (by omega : 1 < p) (by norm_num)
+  omega
+
+/-- If `A` has `pRank ≥ 3`, then its abelian `Ω₁(A)` has logarithmic size at least three. -/
+private theorem three_le_log_card_omega1OfAbelian_of_three_le_pRank [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x) (h3A : 3 ≤ pRank A p) :
+    3 ≤ Nat.log p
+      (Nat.card ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set)) := by
+  have hp3_dvd : p ^ 3 ∣
+      Nat.card ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) :=
+    OddOrder.GroupTheory.pow_dvd_card_omega1OfAbelian_of_pos_le_pRank
+      (G := G) (H := A) (p := p) (hH := hAcomm_set) (n := 3) (by norm_num) h3A
+  have hp3_le : p ^ 3 ≤
+      Nat.card ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) :=
+    Nat.le_of_dvd Nat.card_pos hp3_dvd
+  exact (Nat.le_log_iff_pow_le (Fact.out : p.Prime).one_lt Nat.card_pos.ne').mpr hp3_le
+
+/-- `Ω₁(A)` is noncyclic when `A` has `pRank ≥ 3`. -/
+private theorem not_isCyclic_omega1OfAbelian_of_three_le_pRank [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x) (h3A : 3 ≤ pRank A p) :
+    ¬ IsCyclic ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) := by
+  exact not_isCyclic_of_isElementaryAbelian_of_two_le_log_card
+    (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+      (G := G) (H := A) (p := p) (hH := hAcomm_set))
+    (by
+      have hlog := three_le_log_card_omega1OfAbelian_of_three_le_pRank
+        (G := G) (p := p) hAcomm_set h3A
+      omega)
+
+/-- A cocyclic subgroup of `Ω₁(A)` is noncyclic when `pRank A ≥ 3`. -/
+private theorem not_isCyclic_of_cocyclic_omega1OfAbelian_of_three_le_pRank [Finite G]
+    {p : ℕ} [Fact p.Prime] {A B : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x) (h3A : 3 ≤ pRank A p)
+    (hBΩ : B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set)
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set)
+    (hsup : B ⊔ Subgroup.zpowers a =
+      OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) :
+    ¬ IsCyclic ↥B := by
+  exact not_isCyclic_of_cocyclic_elementary_rank_three
+    (G := G) (p := p) (hp2 := (Fact.out : p.Prime).two_le)
+    (B := OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) (Y := B)
+    (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+      (G := G) (H := A) (p := p) (hH := hAcomm_set))
+    (three_le_log_card_omega1OfAbelian_of_three_le_pRank
+      (G := G) (p := p) hAcomm_set h3A)
+    hBΩ ha hsup
+
+/-- BG Lemma 9.5's Prop 1.16 extraction specialized to `Ω₁(A)` under `pRank A ≥ 3`.
+
+The output packages the cocyclic subgroup `B ≤ Ω₁(A)` with the extra facts needed for the
+next step of the Lemma 9.5 contradiction: `B ≤ A`, `B` is noncyclic, and `P0` still does
+not centralize `D ∩ C_G(B)`. -/
+private theorem exists_noncyclic_cocyclic_omega1OfAbelian_not_le_centralizer_inf
+    [Finite G] {p : ℕ} [Fact p.Prime] {A D P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x) (h3A : 3 ≤ pRank A p)
+    (hΩD : OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ≤ Subgroup.normalizer D)
+    (hCop : Nat.Coprime
+      (Nat.card ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set)) (Nat.card ↥D))
+    (hP0D : ¬ P0 ≤ Subgroup.centralizer (D : Set G)) :
+    ∃ B : Subgroup G,
+      B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ∧
+      B ≤ A ∧ ¬ IsCyclic ↥B ∧
+      (∃ a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set,
+        B ⊔ Subgroup.zpowers a = OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) ∧
+      ¬ P0 ≤ Subgroup.centralizer
+        ((D ⊓ Subgroup.centralizer (B : Set G)) : Set G) := by
+  classical
+  let ΩA : Subgroup G := OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set
+  have hΩea : ΩA.IsElementaryAbelian p := by
+    simpa [ΩA] using
+      (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+        (G := G) (H := A) (p := p) (hH := hAcomm_set))
+  haveI : IsMulCommutative ↥ΩA := IsMulCommutative.of_comm hΩea.1
+  have hΩAnc : ¬ IsCyclic ↥ΩA := by
+    simpa [ΩA] using
+      (not_isCyclic_omega1OfAbelian_of_three_le_pRank
+        (G := G) (p := p) (A := A) hAcomm_set h3A)
+  obtain ⟨B, hBΩ, hcycpack, hnot⟩ :=
+    exists_cocyclic_not_le_centralizer_inf_centralizer_of_not_le_centralizer
+      (A := ΩA) (D := D) (P0 := P0) (by simpa [ΩA] using hΩD)
+      (by simpa [ΩA] using hCop) hΩAnc hP0D
+  rcases hcycpack with ⟨a, haΩ, hsup⟩
+  have hBΩ_raw : B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set := by
+    simpa [ΩA] using hBΩ
+  have haΩ_raw : a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set := by
+    simpa [ΩA] using haΩ
+  have hsup_raw : B ⊔ Subgroup.zpowers a =
+      OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set := by
+    simpa [ΩA] using hsup
+  refine ⟨B, hBΩ_raw, ?_, ?_, ⟨a, haΩ_raw, hsup_raw⟩, hnot⟩
+  · exact hBΩ_raw.trans (OddOrder.GroupTheory.omega1OfAbelian_le (G := G) (H := A)
+      (p := p) (hH := hAcomm_set))
+  · exact not_isCyclic_of_cocyclic_omega1OfAbelian_of_three_le_pRank
+      (G := G) (p := p) (A := A) (B := B) hAcomm_set h3A hBΩ_raw haΩ_raw hsup_raw
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
