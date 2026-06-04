@@ -736,6 +736,36 @@ theorem mem_normOnePairSetAt_iff_inl_mul_inl [Fact p.Prime] (s : GaloisField p q
     SemidirectProduct.inl_inj]
   exact Iff.rfl
 
+/-- **BG Appendix C, Lemma C.3, Step 2 semidirect form**: on a nonzero
+prime-field line `𝔽_p s`, if `s₁ u s₂` lies in the complement `U` inside the
+concrete `P ⋊ U`, then either both prime-line factors are trivial or `u=1` and
+the two prime-line factors multiply to the identity. -/
+theorem normOneFrobenius_generatorRelation_step2_primeLine [Fact p.Prime]
+    (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) {c d : ZMod p} (u : normOneUnits p q)
+    (hmem :
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) c) * s)) :
+            normOneFrobeniusGroup p q) *
+        SemidirectProduct.inr u *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) d) * s))) ∈
+      (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  let x : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) c) * s
+  let y : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) d) * s
+  obtain ⟨v, hv⟩ := hmem
+  have hleft : x + (((u : (GaloisField p q)ˣ) : GaloisField p q) * y) = 0 := by
+    have hcongr := congrArg (fun g : normOneFrobeniusGroup p q => g.left.toAdd) hv
+    simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+      SemidirectProduct.left_inl, SemidirectProduct.right_inl, SemidirectProduct.left_inr,
+      SemidirectProduct.right_inr, map_one, one_mul, mul_one, toAdd_mul, toAdd_ofAdd,
+      normOneMulAction_apply] at hcongr
+    simpa [x, y, add_comm] using hcongr.symm
+  exact generatorRelation_step2_primeLine p q hq hA hs (c := c) (d := d) u
+    (by simpa [x, y] using hleft)
+
 /-- The additive subgroup `W ≤ P` inside the concrete Frobenius group `P ⋊ U`. -/
 noncomputable def normOneFrobeniusSubspaceKernel [Fact p.Prime]
     (W : Submodule (ZMod p) (GaloisField p q)) :

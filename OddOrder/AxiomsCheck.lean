@@ -1940,10 +1940,13 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
 
 -- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
--- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.
+-- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives,
+-- both as a finite-field equation and as a concrete `P ⋊ U` membership test.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_mem_primeFieldUnits
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_primeLine_relation
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
 
 -- BG App C Lemma C.3 Step 4: the `p`-power Frobenius preserves the norm-set
 -- relation `a,b ∈ E` and `a+b=2` used in the generator-relation propagation.

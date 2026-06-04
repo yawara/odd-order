@@ -152,10 +152,11 @@ created: 2026-06-04
   `U`-orbit に入る `exists_normOne_mul_primeLine_eq` を証明。さらに concrete `P⋊U` 内の任意の元を
   `u s₁ v` (`u,v∈U`, `s₁∈𝔽_p s`) と書く
   `normOneFrobenius_exists_inr_primeLine_inr` まで materialize。AxiomsCheck 登録済み。
-- [x] **Lemma C.3 Step 2 finite-field core**: `U ∩ 𝔽_pˣ = 1` から
+- [x] **Lemma C.3 Step 2 finite-field/semidirect core**: `U ∩ 𝔽_pˣ = 1` から
   `normOneUnits_eq_one_of_mem_primeFieldUnits` を公開し、prime-field line 上の relation
   `c*s + u*(d*s)=0` が BG Step 2 の二択 `(c=d=0) ∨ (u=1 ∧ c+d=0)` を強制する
-  `generatorRelation_step2_primeLine` まで証明。AxiomsCheck 登録済み。
+  `generatorRelation_step2_primeLine` まで証明。さらに concrete `P⋊U` 内で `s₁ u s₂∈U` から同じ二択を返す
+  `normOneFrobenius_generatorRelation_step2_primeLine` を追加。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 3 finite-field irreducibility input**: condition(A) 下で
   norm-one subgroup `U` が加法群 `𝔽_{p^q}` を `𝔽_p`-既約に作用することを
   `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明。さらに非零 `U`-不変

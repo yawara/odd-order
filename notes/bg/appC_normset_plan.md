@@ -284,6 +284,8 @@ Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p�
 `exists_normOne_mul_primeLine_eq` / `generatorRelation_step2_primeLine` として証明済み。
 Step1 はさらに concrete `P⋊U` 内の `u s₁ v` 分解
 `normOneFrobenius_exists_inr_primeLine_inr` まで semidirect form に持ち上げ済み。
+Step2 も concrete `P⋊U` 内の `s₁ u s₂∈U` membership test
+`normOneFrobenius_generatorRelation_step2_primeLine` として持ち上げ済み。
 Step3 の `U`-既約作用入力も
 `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。さらに concrete `P⋊U` 内で
 非零 `U`-不変 subspace が `U` とともに全体を生成する
