@@ -321,6 +321,12 @@ allowlist):
   **`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`** を追加。chosen anchor `χ₁` が
   minimal-degree base block にいることから prefix member 全体の `d₁≤dmem j` を導出し、current pair が
   prefix と disjoint であることから `χs i∉xBaseBlock Z`、従って `d₁<dχ` を内部化した。
+- **2026-06-04 追記 11**: **`PairUnionBaseAnchorCommonIndexPrimePowerStepData`** と
+  **`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X`** を追加。
+  追記 10 の base-anchor step adapter を chain-level consumer に持ち上げ、per-step data package から
+  `hlt : d₁<dχ` と `hlemem : ∀j, d₁≤dmem j` を削除。caller は actual pair-cover prefix の enumeration,
+  base-block anchor, common-index/p-power/sum/coprimality data を渡せば、chain fold が `X` coherence
+  まで進む。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

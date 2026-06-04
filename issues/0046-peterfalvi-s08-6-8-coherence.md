@@ -507,6 +507,11 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` を追加。base-block anchor から
     `d₁≤dmem j` を、current pair と prefix の disjointness から `χs i∉xBaseBlock Z` および
     `d₁<dχ` を内部導出し、step caller の sorted-degree 入力を 2 つ削った。
+  - **2026-06-04 追記 10**: `PairUnionBaseAnchorCommonIndexPrimePowerStepData` /
+    `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` を追加。
+    base-anchor step adapter を chain fold まで持ち上げ、per-step data package から `hlt`/`hlemem`
+    を削除。caller が渡す sorted-degree 情報は base-block anchor と actual pair-cover disjointness から
+    internally 復元される。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

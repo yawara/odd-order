@@ -4302,6 +4302,69 @@ structure PairUnionCommonIndexPrimePowerStepData
   hidx_D : idx * idx ∣ D
   hcop : Nat.Coprime idx θχ
 
+/-- **(T8.11v1) Base-anchor common-index p-power data for one X-chain step.**
+
+This is the chain-step payload matching
+`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`: the caller supplies the
+chosen anchor in `xBaseBlock Z`, and the adapter derives the sorted-degree facts
+`d₁ < dχ` and `∀ j, d₁ ≤ dmem j` internally. -/
+structure PairUnionBaseAnchorCommonIndexPrimePowerStepData
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L} where
+  κ : Type
+  tailSet : Finset κ
+  k : ℕ
+  χmem : Fin k → IrreducibleCharacter ↥L
+  hχinj : Function.Injective χmem
+  hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+  i₁ : Fin k
+  p : ℕ
+  idx : ℕ
+  d₁ : ℕ
+  dχ : ℕ
+  q : ℕ
+  qtot : ℕ
+  c : ℕ
+  total : ℕ
+  θ₁ : ℕ
+  θχ : ℕ
+  m : ℕ
+  m₁ : ℕ
+  mχ : ℕ
+  mq : ℕ
+  D : ℕ
+  dmem : Fin k → ℕ
+  θmem : Fin k → ℕ
+  mmem : Fin k → ℕ
+  θtail : κ → ℕ
+  mtail : κ → ℕ
+  hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ)
+  hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ)
+  hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z
+  hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ)
+  hDsum : ∑ j : Fin k, dmem j * dmem j = D
+  hp : 3 ≤ p
+  hq : q = p ^ m
+  hdiv : dχ = q * d₁
+  hidxpos : 0 < idx
+  hdχ : dχ = idx * θχ
+  hd₁ : d₁ = idx * θ₁
+  hdmem : ∀ j, dmem j = idx * θmem j
+  hθχ : θχ = p ^ mχ
+  hθ₁ : θ₁ = p ^ m₁
+  hθmem : ∀ j, θmem j = p ^ mmem j
+  hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j
+  htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j
+  hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total
+  hqtot : qtot = p ^ mq
+  hθsq_le_qtot : θχ * θχ ≤ qtot
+  htotal : total = qtot * c
+  hidx_D : idx * idx ∣ D
+  hcop : Nat.Coprime idx θχ
+
 open scoped Classical in
 /-- **(T8.11w) X-chain coherence from per-step common-index p-power data.**
 
@@ -4338,6 +4401,43 @@ noncomputable def Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irr
     data.hp data.hq data.hdiv data.hlt data.hidxpos data.hdχ data.hd₁ data.hdmem
     data.hθχ data.hθ₁ data.hθmem data.hlemem data.hθtail data.htail_le data.hsum
     data.hqtot data.hθsq_le_qtot data.htotal data.hidx_D data.hcop
+
+open scoped Classical in
+/-- **(T8.11w1) X-chain coherence from base-anchor common-index p-power data.**
+
+This is the chain-level consumer of
+`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`.  Compared with
+`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X`, each step package no
+longer includes the sorted-degree fields `d₁ < dχ` and `∀ j, d₁ ≤ dmem j`; the base-block anchor
+and pair-cover disjointness provide them internally. -/
+noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ hyp.Xset Z) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := Z) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  refine hyp.Xset_isCoherent_from_adjoinSteps_of_irreducible_X hZH hX hXne ?_
+  intro pair N χs hpair0 hpair1 hpairs hdisj hmono i hi hcoh
+  let data := hstepData pair N χs hpair0 hpair1 hpairs hdisj hmono i hi
+  exact hyp.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums hZH hX
+    hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
+    data.hχone data.hχ₁one data.hanchor data.hmemone data.hDsum data.hp data.hq data.hdiv
+    data.hidxpos data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
+    data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_D data.hcop
 
 end SibleyDadeHypothesis
 
