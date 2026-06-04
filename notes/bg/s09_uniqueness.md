@@ -853,10 +853,15 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      centralizer antitonicity: `P₀ ≤ C_G(D ∩ L)` implies
      `P₀ ≤ C_G(D ∩ C_G(B))`, exactly the target contradicted by the witness
      package.
+   - `coprime_chiefSeries_stabilizer_le_centralizer` isolates the Lemma 1.9
+     step: a coprime subgroup that stabilizes every `chiefSeriesInside K`
+     factor centralizes `K`. This is the `D ∩ L` centralization engine once
+     Corollary 4.19 supplies the per-factor stabilizer input.
 
-   Remaining for this block: construct `P₀ ≤ C_G(D ∩ L)` from
-   `P₀ ≤ (L ∩ M)'` via the Corollary 4.19 + Lemma 1.9 chain, then discharge
-   the stored noncentralization contradiction.
+   Remaining for this block: from `P₀ ≤ (L ∩ M)'` and Corollary 4.19, produce
+   `⁅chiefSeriesInside (D ∩ L) i, P₀⁆ ≤ chiefSeriesInside (D ∩ L) (i+1)`
+   inside `L ∩ M`; then apply the stored Lemma 1.9 helper and discharge the
+   noncentralization contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

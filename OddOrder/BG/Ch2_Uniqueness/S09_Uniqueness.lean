@@ -2441,6 +2441,63 @@ private theorem le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal
       (inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton
         (D := D) hyB hL)))
 
+open OddOrder.Isaacs.Ch03 in
+open scoped commutatorElement in
+/-- BG Lemma 1.9 applied to a chief series: a coprime subgroup that stabilizes
+every chief factor of `K` centralizes `K`. This isolates the Lemma 1.9 part of
+BG Lemma 9.5 after Corollary 4.19 supplies the per-factor stabilizer input. -/
+private theorem coprime_chiefSeries_stabilizer_le_centralizer
+    {M : Type*} [Group M] [Finite M] {K : Subgroup M} [K.Normal] {D : Subgroup M}
+    (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
+    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hstab : ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1)) :
+    D ≤ Subgroup.centralizer (K : Set M) := by
+  classical
+  obtain ⟨N, hN⟩ := chiefSeriesInside_exists_eq_bot K
+  set ψ : ↥D →* MulAut ↥K := (MulAut.conjNormal (H := K)).comp D.subtype with hψ
+  set s : ℕ → Subgroup ↥K := fun i => (chiefSeriesInside K i).subgroupOf K with hs
+  have hψcoe : ∀ (a : ↥D) (g : ↥K),
+      ((ψ a) g : M) = (a : M) * (g : M) * (a : M)⁻¹ := by
+    intro a g
+    rw [hψ]
+    simp [MulAut.conjNormal_apply]
+  have htrivψ : ∀ a : ↥D, ψ a = 1 := by
+    refine OddOrder.BG.Ch1.S01.coprime_stabilizes_chain_trivial
+      ψ hcop hsolv s ?_ ?_ (n := N) ?_ ?_ ?_ ?_
+    · intro i j hij
+      exact Subgroup.comap_mono (chiefSeriesInside_antitone K hij)
+    · simp [hs, chiefSeriesInside_zero, Subgroup.subgroupOf_self]
+    · simp [hs, hN, Subgroup.bot_subgroupOf]
+    · intro i
+      exact (inferInstance : (chiefSeriesInside K i).Normal).subgroupOf K
+    · intro i
+      rw [isAInvariant_iff_smul_mem]
+      intro a g hg
+      rw [hs, Subgroup.mem_subgroupOf] at hg ⊢
+      rw [hψcoe]
+      exact (chiefSeriesInside_instNormal K i).conj_mem _ hg _
+    · intro i a x hx
+      rw [hs, Subgroup.mem_subgroupOf] at hx
+      refine ⟨x⁻¹ * ψ a x, ?_, by group⟩
+      rw [hs, Subgroup.mem_subgroupOf]
+      have hcoe : ((x⁻¹ * ψ a x : ↥K) : M) = ⁅(x : M)⁻¹, (a : M)⁆ := by
+        rw [Subgroup.coe_mul, Subgroup.coe_inv, hψcoe, commutatorElement_def]
+        group
+      rw [hcoe]
+      exact hstab i (Subgroup.commutator_mem_commutator
+        (Subgroup.inv_mem _ hx) (SetLike.coe_mem a))
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro k hk
+  have h1 := DFunLike.congr_fun (htrivψ ⟨x, hx⟩) ⟨k, hk⟩
+  have h2 : (x : M) * k * x⁻¹ = k := by
+    have := congrArg Subtype.val h1
+    rwa [hψcoe] at this
+  have h3 : x * k = k * x := by
+    have := congrArg (· * x) h2
+    simpa [mul_assoc] using this
+  exact h3.symm
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
