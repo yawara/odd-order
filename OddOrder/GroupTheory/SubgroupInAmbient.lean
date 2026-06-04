@@ -255,4 +255,14 @@ theorem le_normalizer_opiCoreInG_of_le_normalizer (π : Set ℕ) {A H : Subgroup
     rw [hfix] at hyCore
     exact ⟨⟨y, hyH⟩, hyCore, rfl⟩
 
+/-- If `H` is normal in the ambient group, then the ambient realization of `O_π(H)`
+is normal as well. -/
+theorem opiCoreInG_normal (π : Set ℕ) {H : Subgroup G} [H.Normal] :
+    (opiCoreInG π H).Normal := by
+  rw [← Subgroup.normalizer_eq_top_iff]
+  apply eq_top_iff.mpr
+  have htop_le_norm_H : (⊤ : Subgroup G) ≤ Subgroup.normalizer (H : Set G) := by
+    rw [Subgroup.normalizer_eq_top]
+  exact le_normalizer_opiCoreInG_of_le_normalizer π htop_le_norm_H
+
 end OddOrder.GroupTheory
