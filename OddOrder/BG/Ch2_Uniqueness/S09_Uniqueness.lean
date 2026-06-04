@@ -1815,6 +1815,92 @@ private theorem exists_maximal_centralizer_and_pRank_fittingInG_le_two_of_not_sc
   have hM : M ∈ maximalSubgroups G := hMcont.1
   exact ⟨M, hMcont, pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM hA hAnot⟩
 
+/-- Counterexample version of the `R = A` normalizer step in BG Lemma 9.5.
+
+The rank cut `(9.6)` is derived internally from `A ∉ 𝒰`. -/
+private theorem normalizer_scn3_self_le_maximal_of_not_scn3
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (A : Set G) ≤ M := by
+  have hFp : pRank ↥(S08.fittingInG M) p ≤ 2 :=
+    pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM.1 hA hAnot
+  exact normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp S hpos
+    hterminal_mem
+
+/-- Counterexample version of the `R = P` normalizer step in BG Lemma 9.5.
+
+Once `P` is a `p`-subgroup between `A` and `N_G(A)`, the rank cut `(9.6)` and the
+`R = A` instance put `P` inside `M`, and the rank-case adapter gives `N_G(P) ≤ M`. -/
+private theorem normalizer_scn3_pSubgroup_le_maximal_of_not_scn3
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M P : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hPp : IsPGroup p P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
+  have hFp : pRank ↥(S08.fittingInG M) p ≤ 2 :=
+    pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM.1 hA hAnot
+  exact normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases
+    hG hM hA hPp hAP hPnormA hFp S hpos hterminal_mem
+
+/-- Choose an ambient `p`-subgroup between a global `SCN₃(p)` subgroup and its normalizer.
+
+This is the subgroup-level form of the BG choice of a Sylow `p`-subgroup of `N_G(A)`. -/
+private theorem exists_pSubgroup_between_scn3_and_normalizer [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    ∃ P : Subgroup G,
+      IsPGroup p P ∧ A ≤ P ∧ P ≤ Subgroup.normalizer (A : Set G) := by
+  classical
+  let N : Subgroup G := Subgroup.normalizer (A : Set G)
+  have hAN : A ≤ N := Subgroup.le_normalizer
+  let AN : Subgroup ↥N := A.subgroupOf N
+  have hANp : IsPGroup p AN :=
+    (isPGroup_of_mem_scn3Global hA).of_equiv (Subgroup.subgroupOfEquivOfLe hAN).symm
+  obtain ⟨PN, hANPN⟩ := hANp.exists_le_sylow
+  let P : Subgroup G := (PN : Subgroup ↥N).map N.subtype
+  have hPp : IsPGroup p P := PN.isPGroup'.map N.subtype
+  have hAP : A ≤ P := by
+    calc
+      A = AN.map N.subtype := (Subgroup.map_subgroupOf_eq_of_le hAN).symm
+      _ ≤ (PN : Subgroup ↥N).map N.subtype := Subgroup.map_mono hANPN
+  have hPN : P ≤ N := by
+    dsimp [P]
+    exact Subgroup.map_subtype_le (PN : Subgroup ↥N)
+  exact ⟨P, hPp, hAP, hPN⟩
+
+/-- BG Lemma 9.5 opening normalizer package for a chosen maximal subgroup over `C_G(A)`.
+
+Given the §4 characteristic Sylow series package for `M`, a counterexample `A ∉ 𝒰`
+supplies a `p`-subgroup `P` with `A ≤ P ≤ N_G(A)`, `P ≤ M`, and `N_G(P) ≤ M`. -/
+private theorem exists_pSubgroup_normalizer_package_of_not_scn3
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    ∃ P : Subgroup G,
+      IsPGroup p P ∧ A ≤ P ∧ P ≤ Subgroup.normalizer (A : Set G) ∧
+        P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
+  obtain ⟨P, hPp, hAP, hPnormA⟩ := exists_pSubgroup_between_scn3_and_normalizer hA
+  have hpack : P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M :=
+    normalizer_scn3_pSubgroup_le_maximal_of_not_scn3
+      hG hM hA hAnot hPp hAP hPnormA S hpos hterminal_mem
+  exact ⟨P, hPp, hAP, hPnormA, hpack.1, hpack.2⟩
+
 /-- BG Lemma 9.5's Proposition 1.16 extraction step.
 
 If `P0` does not centralize `D`, and a noncyclic abelian subgroup `A` normalizes `D`

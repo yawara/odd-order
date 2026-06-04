@@ -656,14 +656,25 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `S09.normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases` specializes the
      next step to a `p`-subgroup `P ≤ N_G(A)`, returning both `P ≤ M` and
      `N_G(P) ≤ M`.  This matches the Lemma 9.5 text leading to (9.9).
+   - `S09.normalizer_scn3_self_le_maximal_of_not_scn3` and
+     `S09.normalizer_scn3_pSubgroup_le_maximal_of_not_scn3` are the counterexample
+     wrappers: they derive the rank cut `(9.6)` internally from `A ∉ 𝒰`, then call
+     the rank-case normalizer adapters.
+   - `S09.exists_pSubgroup_between_scn3_and_normalizer` supplies the subgroup-level
+     BG opening choice `A ≤ P ≤ N_G(A)` by taking a Sylow subgroup inside `N_G(A)`,
+     and `S09.exists_pSubgroup_normalizer_package_of_not_scn3` bundles this with
+     `P ≤ M` and `N_G(P) ≤ M`.
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank
    characteristic-series endpoint and instantiate these packaged normalizer steps in
-   the Lemma 9.5 body.  The largest-prime selection itself is now covered by
-   `Ch01.exists_max_primeFactor_card_of_nontrivial` (with the Nat-level helper
-   `Ch01.exists_max_primeFactor_of_one_lt`), so the low-rank branch can assume the
-   chosen `q ∈ π(M)`, `q` prime, and `∀ r ∈ π(M), r ≤ q` without reopening finite
-   set bookkeeping.  A scout pass found no existing Thm 4.20(c) endpoint; the
+   the Lemma 9.5 body.  If the later `P₀ = [P, N_G(P)]` construction needs the exact
+   Sylow-of-`N_G(A)` witness rather than only the ambient subgroup inequalities,
+   expose that witness from the current opening choice.  The largest-prime selection
+   itself is now covered by `Ch01.exists_max_primeFactor_card_of_nontrivial` (with
+   the Nat-level helper `Ch01.exists_max_primeFactor_of_one_lt`), so the low-rank
+   branch can assume the chosen `q ∈ π(M)`, `q` prime, and `∀ r ∈ π(M), r ≤ q`
+   without reopening finite set bookkeeping.
+   A scout pass found no existing Thm 4.20(c) endpoint; the
    next missing helper can now be stated in the local §4 vocabulary as: `q` largest
    in `|M|` plus `rank F(M) ≤ 2` gives
    `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The extraction from the final
