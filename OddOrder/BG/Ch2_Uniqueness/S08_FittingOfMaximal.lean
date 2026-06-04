@@ -3407,6 +3407,9 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     (∃ Q : Sylow p G, (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype) ∧
     (∀ A : Subgroup ↥M, A ≤ (P : Subgroup ↥M) → IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)) →
       A.map M.subtype ≤ fittingInG M ∧ IsUniquelyMaximal (A.map M.subtype)) := by
+  refine ⟨sylow_map_mem_range_of_fittingInG_isPGroup hG hM hp P hFp, ?_⟩
+  intro A hAP hA
+  refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
 end OddOrder.BG.Ch2.S08
