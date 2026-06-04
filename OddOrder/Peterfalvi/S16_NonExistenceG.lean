@@ -365,6 +365,37 @@ theorem normOneUnitsEquivU_apply_coe {hyp : Hypothesis (G := G)}
     (data.normOneUnitsEquivU u : G) = data.sigma (SemidirectProduct.inr u) := by
   rfl
 
+/-- Equality of `σ`-images reflects the additive-kernel coordinate in the
+concrete semidirect product. -/
+theorem sigma_eq_left_eq {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {g h : fieldNormalizerFrobeniusGroup hyp} (heq : data.sigma g = data.sigma h) :
+    g.left = h.left :=
+  congrArg (fun x : fieldNormalizerFrobeniusGroup hyp => x.left)
+    (data.sigma_injective heq)
+
+/-- Equality of `σ`-images reflects the norm-one complement coordinate in the
+concrete semidirect product.  This is the precise "mod `P`" reading used in BG
+Appendix C, Lemma C.3 Step 4. -/
+theorem sigma_eq_right_eq {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {g h : fieldNormalizerFrobeniusGroup hyp} (heq : data.sigma g = data.sigma h) :
+    g.right = h.right :=
+  congrArg (fun x : fieldNormalizerFrobeniusGroup hyp => x.right)
+    (data.sigma_injective heq)
+
+/-- Semidirect normal forms remain unique after applying the field-normalizer
+embedding `σ`. -/
+theorem sigma_eq_iff_left_right_eq {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {g h : fieldNormalizerFrobeniusGroup hyp} :
+    data.sigma g = data.sigma h ↔ g.left = h.left ∧ g.right = h.right := by
+  constructor
+  · intro heq
+    exact ⟨data.sigma_eq_left_eq heq, data.sigma_eq_right_eq heq⟩
+  · rintro ⟨hleft, hright⟩
+    apply congrArg data.sigma
+    apply SemidirectProduct.ext
+    · exact hleft
+    · exact hright
+
 /-- The conjugate prime-line subgroup `P₁` used in BG Appendix C, expressed
 with Lean left-conjugation convention. -/
 noncomputable def P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :

@@ -327,6 +327,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 さらに `Q_elementaryAbelian` から `FieldNormalizerData.Q_mul_comm` を導出し、
 `(s⁻¹)^n t^n` / `(t⁻¹)^n s^n` 型の `Q` 内 factor が互いに可換である特殊形も公開した。
 これは BG Step4 の “Since Q is commutative, (C.3) becomes (C.4)” に対応する reorder 入力。
+また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
+`sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
+`left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は
