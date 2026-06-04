@@ -228,6 +228,90 @@ private theorem three_le_pRank_of_isPGroup_of_three_le_rank {H : Type*} [Group H
     3 ≤ pRank H p :=
   hr.trans (rank_le_pRank_of_isPGroup hH)
 
+/-- A positive `pRank` lower bound forces `p` to divide the group order. -/
+private theorem mem_primeFactors_card_of_pos_pRank {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] (hpos : 0 < pRank H p) :
+    p ∈ (Nat.card H).primeFactors := by
+  obtain ⟨E, hEea, hElog⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := H) (p := p) (n := 1) (by norm_num) hpos
+  have hEp : IsPGroup p E := hEea.isPGroup
+  have hp_dvd_E : p ∣ Nat.card E := by
+    obtain ⟨n, hn⟩ := hEp.exists_card_eq
+    have hnpos : 0 < n := by
+      by_contra hn0
+      have hn_zero : n = 0 := by omega
+      rw [hn_zero, pow_zero] at hn
+      rw [hn] at hElog
+      norm_num at hElog
+    rw [hn]
+    exact dvd_pow_self p hnpos.ne'
+  exact Nat.mem_primeFactors.mpr
+    ⟨Fact.out, hp_dvd_E.trans (Subgroup.card_subgroup_dvd_card E), Nat.card_pos.ne'⟩
+
+/-- Extend an elementary abelian subgroup contained in `H` to one maximal inside `H`. -/
+private theorem exists_isMaxElemAbelianIn_ge_of_le [Finite G] {p : ℕ}
+    {E H : Subgroup G} (hE : E.IsElementaryAbelian p) (hEH : E ≤ H) :
+    ∃ A₀ : Subgroup G, E ≤ A₀ ∧ S08.isMaxElemAbelianIn p A₀ H := by
+  obtain ⟨A₀, hEA₀, hA₀max⟩ :=
+    Finite.exists_le_maximal
+      (p := fun A₀ : Subgroup G => A₀.IsElementaryAbelian p ∧ A₀ ≤ H) ⟨hE, hEH⟩
+  refine ⟨A₀, hEA₀, hA₀max.1.1, hA₀max.1.2, ?_⟩
+  intro B hB hBH hA₀B
+  exact le_antisymm (hA₀max.2 ⟨hB, hBH⟩ hA₀B) hA₀B
+
+/-- A `pRank ≥ 3` subgroup has a rank-three maximal elementary abelian subgroup inside it. -/
+private theorem exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank [Finite G]
+    {p : ℕ} [Fact p.Prime] {H : Subgroup G} (h3 : 3 ≤ pRank ↥H p) :
+    ∃ A₀ : Subgroup G, S08.isMaxElemAbelianIn p A₀ H ∧ 3 ≤ rank ↥A₀ := by
+  obtain ⟨E, hEea, hElog⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥H) (p := p) (n := 3) (by norm_num) h3
+  let EG : Subgroup G := E.map H.subtype
+  have hEG_ea : EG.IsElementaryAbelian p := by
+    change (E.map H.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map H.subtype_injective hEea
+  have hEGH : EG ≤ H := by
+    change E.map H.subtype ≤ H
+    exact Subgroup.map_subtype_le E
+  obtain ⟨A₀, hEGA₀, hA₀max⟩ := exists_isMaxElemAbelianIn_ge_of_le hEG_ea hEGH
+  have hEGlog : 3 ≤ Nat.log p (Nat.card EG) := by
+    change 3 ≤ Nat.log p (Nat.card (E.map H.subtype))
+    rw [Subgroup.card_map_of_injective H.subtype_injective]
+    exact hElog
+  have h3EG : 3 ≤ pRank ↥EG p := hEGlog.trans hEG_ea.log_card_le_pRank
+  have h3A₀p : 3 ≤ pRank ↥A₀ p :=
+    h3EG.trans
+      (pRank_le_of_injective (f := Subgroup.inclusion hEGA₀)
+        (Subgroup.inclusion_injective hEGA₀))
+  exact ⟨A₀, hA₀max, h3A₀p.trans (pRank_le_rank (G := ↥A₀) p)⟩
+
+/-- An abelian rank-three `p`-subgroup has centralizer of `pRank` at least three. -/
+private theorem three_le_pRank_centralizer_of_isMulCommutative_of_isPGroup_of_three_le_rank
+    [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hAab : IsMulCommutative A) (hAp : IsPGroup p A) (hr : 3 ≤ rank ↥A) :
+    3 ≤ pRank ↥(Subgroup.centralizer (A : Set G)) p := by
+  have h3A : 3 ≤ pRank ↥A p := three_le_pRank_of_isPGroup_of_three_le_rank hAp hr
+  have hA_le_C : A ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact congrArg Subtype.val (isMulCommutative_iff.mp hAab ⟨y, hy⟩ ⟨x, hx⟩)
+  exact h3A.trans
+    (pRank_le_of_injective (f := Subgroup.inclusion hA_le_C)
+      (Subgroup.inclusion_injective hA_le_C))
+
+/-- Rank at least two rules out cyclicity. -/
+private theorem not_isCyclic_of_two_le_rank [Finite G] {A : Subgroup G}
+    (hr : 2 ≤ rank ↥A) :
+    ¬ IsCyclic ↥A := by
+  obtain ⟨q, hq, E, _hEea, hEA, hEnc⟩ :=
+    exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank A hr
+  intro hAcyc
+  exact hEnc
+    (isCyclic_of_injective (Subgroup.inclusion hEA)
+      (Subgroup.inclusion_injective hEA))
+
 /-- A finite odd `p`-group of `pRank` at least three has a normal elementary abelian
 subgroup of order `p^2`.
 
@@ -789,7 +873,97 @@ theorem abelian_rank_three_isUniquelyMaximal_of_fitting [Finite G] (hG : IsMinim
     {p : ℕ} [Fact p.Prime] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hr : 3 ≤ pRank ↥(S08.fittingInG M) p) :
     ∀ A : Subgroup G, IsMulCommutative A → IsPGroup p A → 3 ≤ rank ↥A → IsUniquelyMaximal A := by
-  sorry
+  classical
+  have hpF : p ∈ (Nat.card ↥(S08.fittingInG M)).primeFactors :=
+    mem_primeFactors_card_of_pos_pRank (H := ↥(S08.fittingInG M))
+      (p := p) (by omega)
+  obtain ⟨A₀, hA₀max, hA₀rank⟩ :=
+    exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank
+      (H := S08.fittingInG M) hr
+  have hWitness :
+      ∃ U : Subgroup G,
+        IsMulCommutative U ∧ IsPGroup p U ∧ IsUniquelyMaximal U ∧ 3 ≤ rank ↥U := by
+    by_cases hFp : IsPGroup p ↥(S08.fittingInG M)
+    · have hFpM : IsPGroup p ((S08.fittingInG M).subgroupOf M) :=
+        hFp.of_equiv (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm
+      obtain ⟨P, hFP⟩ := hFpM.exists_le_sylow
+      have h3Fsub : 3 ≤ pRank ↥((S08.fittingInG M).subgroupOf M) p :=
+        hr.trans
+          (pRank_le_of_injective
+            (f := (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm.toMonoidHom)
+            (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm.injective)
+      have h3P : 3 ≤ pRank ↥(P : Subgroup ↥M) p :=
+        h3Fsub.trans
+          (pRank_le_of_injective (f := Subgroup.inclusion hFP)
+            (Subgroup.inclusion_injective hFP))
+      have hp_dvd_G : p ∣ Nat.card G :=
+        (Nat.mem_primeFactors.mp hpF).2.1.trans
+          (Subgroup.card_subgroup_dvd_card (S08.fittingInG M))
+      have hp_odd : Odd p := hG.odd.of_dvd_nat hp_dvd_G
+      obtain ⟨Asc, hAsc_scn⟩ :=
+        OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank hp_odd P.isPGroup' h3P
+      let A_M : Subgroup ↥M := Asc.map (P : Subgroup ↥M).subtype
+      have hA_MP : A_M ≤ (P : Subgroup ↥M) := by
+        change Asc.map (P : Subgroup ↥M).subtype ≤ (P : Subgroup ↥M)
+        exact Subgroup.map_subtype_le Asc
+      have hA_M_scn : IsSCN₃ p (A_M.subgroupOf (P : Subgroup ↥M)) := by
+        have htarget : A_M.subgroupOf (P : Subgroup ↥M) = Asc := by
+          apply (Subgroup.map_subtype_inj (H := (P : Subgroup ↥M))).mp
+          rw [Subgroup.map_subgroupOf_eq_of_le hA_MP]
+        rwa [htarget]
+      have h8 :=
+        (S08.sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup
+          hG hM hpF hA₀max hA₀rank P hFp).2 A_M hA_MP hA_M_scn
+      let U : Subgroup G := A_M.map M.subtype
+      have hA_Mab : IsMulCommutative A_M := by
+        haveI : IsMulCommutative Asc := hAsc_scn.isSCN.isMulCommutative
+        change IsMulCommutative (Asc.map (P : Subgroup ↥M).subtype)
+        exact Subgroup.map_isMulCommutative Asc (P : Subgroup ↥M).subtype
+      have hUab : IsMulCommutative U := by
+        haveI : IsMulCommutative A_M := hA_Mab
+        change IsMulCommutative (A_M.map M.subtype)
+        exact Subgroup.map_isMulCommutative A_M M.subtype
+      have hA_Mp : IsPGroup p A_M := by
+        change IsPGroup p (Asc.map (P : Subgroup ↥M).subtype)
+        exact (P.isPGroup'.to_subgroup Asc).map (P : Subgroup ↥M).subtype
+      have hUp : IsPGroup p U := by
+        change IsPGroup p (A_M.map M.subtype)
+        exact hA_Mp.map M.subtype
+      have hA_M_rank : 3 ≤ pRank ↥A_M p := by
+        let ePM := Subgroup.equivMapOfInjective Asc (P : Subgroup ↥M).subtype
+          (P : Subgroup ↥M).subtype_injective
+        exact hAsc_scn.le_pRank.trans
+          (pRank_le_of_injective (f := ePM.toMonoidHom) ePM.injective)
+      have hUrank : 3 ≤ rank ↥U := by
+        let eMG := Subgroup.equivMapOfInjective A_M M.subtype M.subtype_injective
+        have hUpRank : 3 ≤ pRank ↥U p :=
+          hA_M_rank.trans
+            (pRank_le_of_injective (f := eMG.toMonoidHom) eMG.injective)
+        exact hUpRank.trans (pRank_le_rank (G := ↥U) p)
+      exact ⟨U, hUab, hUp, h8.2, hUrank⟩
+    · have hCFU : IsUniquelyMaximal (S08.cFittingInG M A₀) :=
+        S08.cFitting_isUniquelyMaximal_of_not_pGroup hG hM hpF hA₀max hA₀rank hFp
+      have hA₀_le_CF : A₀ ≤ Subgroup.centralizer (S08.cFittingInG M A₀ : Set G) := by
+        intro a ha
+        rw [Subgroup.mem_centralizer_iff]
+        intro x hx
+        change x ∈ Subgroup.centralizer (A₀ : Set G) ⊓ S08.fittingInG M at hx
+        exact (Subgroup.mem_centralizer_iff.mp hx.1 a ha).symm
+      have hA₀U : IsUniquelyMaximal A₀ :=
+        isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hCFU hA₀_le_CF
+          (by omega)
+      have hA₀ea : A₀.IsElementaryAbelian p :=
+        S08.isMaxElemAbelianIn_isElementaryAbelian hA₀max
+      have hA₀ab : IsMulCommutative A₀ := IsMulCommutative.of_comm hA₀ea.comm
+      have hA₀p : IsPGroup p A₀ := hA₀ea.isPGroup
+      exact ⟨A₀, hA₀ab, hA₀p, hA₀U, hA₀rank⟩
+  obtain ⟨U, hUab, hUp, hUU, hUrank⟩ := hWitness
+  intro A hAab hAp hArank
+  have hAnc : ¬ IsCyclic ↥A := not_isCyclic_of_two_le_rank (A := A) (by omega)
+  have hCA_rank : 3 ≤ pRank ↥(Subgroup.centralizer (A : Set G)) p :=
+    three_le_pRank_centralizer_of_isMulCommutative_of_isPGroup_of_three_le_rank
+      hAab hAp hArank
+  exact isUniquelyMaximal_of_abelian_rank_three hG hUab hUp hAp hAnc hUU hUrank hCA_rank
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 

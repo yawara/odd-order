@@ -320,7 +320,7 @@ Current Lean spine lives in `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`.
 - §9 intentionally introduces no new local definitions: it consumes the shared `IsUniquelyMaximal`/`hInvariant` API, §7 `scn3Global`, and §8 `fittingInG`.
 - Shared uniqueness API landed in `OddOrder/GroupTheory/MaximalSubgroup.lean`: `IsUniquelyMaximal.uniqueMaximalSubgroup`, its membership/coatom/le accessors, equality of maximal overgroups, and `maximalSubgroupsContaining_eq_singleton`.
 - Shared `hInvariant`/`hInvariantStar` destructors landed in `OddOrder/GroupTheory/AInvariantPiSubgroups.lean`, so §9 proofs can project ambient containment, normalizer containment, pi-subgroup status, and star maximality without unfolding definitions by hand.
-- Current remaining §9 theorem-body `sorry`s are exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5. Corollary 9.2, Corollary 9.3, Theorem 9.6, and the `E^2 - E*` particular case are now Lean-proved from their upstream stated theorems. The remaining hard proofs still depend on the §7/§8 chain, BG §6 Theorem 6.2, BG §4 rank/centralizer inputs, and the Lemma 9.5 SCN₃-to-𝒰 argument. No Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
+- Current remaining §9 theorem-body `sorry`s are exactly Theorem 9.1 and Lemma 9.5. Corollary 9.2, Corollary 9.3, Lemma 9.4, Theorem 9.6, and the `E^2 - E*` particular case are now Lean-proved from their upstream stated theorems. The remaining hard proofs still depend on the §7/§8 chain, BG §6 Theorem 6.2, BG §4 rank/centralizer inputs, and the Lemma 9.5 SCN₃-to-𝒰 argument. No Blackburn/narrow classification or theorem-conclusion hypothesis was hoisted.
 
 
 ## Lean API status (2026-06-04)
@@ -365,10 +365,10 @@ The `E^2 - E*` particular case is now proved in Lean from Theorem 9.6. The local
 its strict cardinal growth over `|A| = p^2` into `3 ≤ rank C_G(A)`. Thus an `A ∈ E_p^2(G)`
 that is not in `E*` satisfies the second rank alternative of Theorem 9.6.
 
-Remaining §9 theorem-body `sorry`s are now exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5.
+Remaining §9 theorem-body `sorry`s are now exactly Theorem 9.1 and Lemma 9.5.
 Corollary 9.2 still depends on the stated Theorem 9.1 proof being completed. Corollary 9.3,
-Theorem 9.6, and the particular case now have no theorem-body `sorry`; Theorem 9.6 still
-passes through the stated Lemma 9.5 gate.
+Lemma 9.4, Theorem 9.6, and the particular case now have no theorem-body `sorry`;
+Theorem 9.6 still passes through the stated Lemma 9.5 gate.
 
 Corollary 9.3 now has a sorry-free internal cascade lemma,
 `isUniquelyMaximal_of_rank_drop_witness`. It formalizes the book's final five successive
@@ -516,4 +516,39 @@ proof adds three local bridges:
 - `exists_normal_isElementaryAbelian_card_prime_sq_in_overgroup_of_pSubgroup_rank_three`:
   maps that normal witness back from the Sylow overgroup to the ambient group.
 
-Current S09 theorem-body `sorry`s are exactly Theorem 9.1, Lemma 9.4, and Lemma 9.5.
+Current S09 theorem-body `sorry`s are exactly Theorem 9.1 and Lemma 9.5.
+
+### Lean API status (2026-06-04, Lemma 9.4 completed)
+
+`abelian_rank_three_isUniquelyMaximal_of_fitting` is now sorry-free. The proof follows BG
+Lemma 9.4's two-case split on `F(M)`:
+
+- if `F(M)` is a `p`-group, it chooses a local `SCN₃(P)` subgroup in a Sylow subgroup of
+  `M`, applies S08 Theorem 8.1(b), and uses Corollary 9.3 to propagate uniqueness to any
+  rank-three abelian `p`-subgroup;
+- if `F(M)` is not a `p`-group, it extends a `pRank >= 3` witness to a maximal elementary
+  abelian `A0 ≤ F(M)`, applies S08 Theorem 8.1(a) to `C_F(A0)`, uses Corollary 9.2 to put
+  `A0 ∈ 𝒰`, and again propagates by Corollary 9.3.
+
+Local bridges added for this proof:
+
+- `mem_primeFactors_card_of_pos_pRank` extracts `p ∈ π(H)` from positive `pRank`.
+- `exists_isMaxElemAbelianIn_ge_of_le` and
+  `exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank` choose the BG `E_p^*(F(M))`
+  witness.
+- `three_le_pRank_centralizer_of_isMulCommutative_of_isPGroup_of_three_le_rank` supplies
+  the Corollary 9.3 centralizer-rank input for an arbitrary abelian rank-three `p`-subgroup.
+- `not_isCyclic_of_two_le_rank` supplies the noncyclic target hypothesis for Corollary 9.3.
+
+Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
+
+1. `pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal` for BG (9.6), using Lemma 9.4
+   contrapositively after choosing `M ∈ 𝓜(C_G(A))`.
+2. `normalizer_le_maximal_of_scn3Global_intermediate` for the BG L2573-L2589 step
+   `A ≤ R ≤ P ∩ M → N_G(R) ≤ M`, consuming S07 Theorems 7.6 and 7.4.
+3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
+   consuming BG Prop 1.16 and Corollary 4.19.
+4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
+   contradiction at L2621-L2625 short.
+
+Current S09 theorem-body `sorry`s are exactly Theorem 9.1 and Lemma 9.5.
