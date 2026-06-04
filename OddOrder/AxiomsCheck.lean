@@ -45,6 +45,7 @@ import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -1786,6 +1787,28 @@ set_option linter.style.longLine false in
 -- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
 -- coherence with no opaque hypotheses — only the genuine equal degree and supports.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade
+--- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
+--- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
+--- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
+--- not add new hard hypotheses or depend on `sibleySetup_is_coherent`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_characterFacts_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_diffSupport_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_closedUnderConjugate_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_hasNoRealCharacters_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xSet_finite_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_caseA
 -- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
 -- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
 -- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
