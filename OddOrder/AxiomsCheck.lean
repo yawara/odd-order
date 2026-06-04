@@ -2112,6 +2112,11 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+-- Peterfalvi (7.8.b) raw norm-bound consumers from `NormEstimates`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gamma_inner_self_re_le_of_normEstimates
 -- Peterfalvi (7.11) terminal contradiction from the displayed (7.10) lower bound.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_lowerBoundTerm

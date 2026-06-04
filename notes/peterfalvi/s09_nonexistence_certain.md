@@ -363,3 +363,14 @@ S09 に `not_trivial_G0_of_lowerBoundTerm` を追加し、`card_G0_lower_bound` 
 `not_trivial_G0_of_characterEstimateData` と本 theorem `not_trivial_G0` はこの lemma に委譲する。
 
 これで (7.10) をどの conditional input から作っても、(7.11) 側の証明重複なしに同じ入口へ流せる。
+
+
+### 2026-06-04 pass: raw consumers for (7.8.b) norm estimates
+
+S09 に `Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates` と
+`Hypothesis78.gamma_inner_self_re_le_of_normEstimates` を追加。`NormEstimates` の named field を
+後段 assembly が使う `ClassFunction.inner _ _ .re` 形へ展開する consumer で、特に後者は
+(7.10) の orthogonal-integer decomposition bridge が要求する `Γ` norm-bound input に直接合う。
+
+`BetaDecomp`/`NormEstimates` の存在そのものは引き続き genuine proof target のままにし、証明書を
+新たに外出しする変更はしていない。

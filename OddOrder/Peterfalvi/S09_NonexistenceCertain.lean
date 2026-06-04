@@ -1851,6 +1851,26 @@ structure NormEstimates (H78 : Hypothesis78 G A L)
   gamma_norm_sq_le :
     H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
 
+/-- Raw class-function form of the `(ζ^ν)^ρ` lower bound supplied by
+`NormEstimates`.  This is the input shape used by the later (7.5)/(7.10)
+assembly, with `zetaNuRhoNormSq` unfolded. -/
+theorem zetaNuRho_inner_self_re_ge_of_normEstimates
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hNE : H78.NormEstimates hBD) (hsmall : H78.smallIndex) :
+    1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+      (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re := by
+  simpa [zetaNuRhoNormSq] using hNE.zetaNuRho_norm_sq_ge hsmall
+
+/-- Raw class-function form of the residual `Γ` upper bound supplied by
+`NormEstimates`.  This is the `Γ` norm-bound shape consumed by the final
+orthogonal-integer decomposition bridge for (7.10). -/
+theorem gamma_inner_self_re_le_of_normEstimates
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hNE : H78.NormEstimates hBD) (hsmall : H78.smallIndex) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+      (H78.complementIndex : ℝ) - 1 := by
+  simpa [gammaNormSq] using hNE.gamma_norm_sq_le hsmall
+
 /-- Under `2e + 1 ≤ h`, Peterfalvi's quadratic correction is nonnegative. -/
 theorem normQuadraticCorrection_nonneg_of_smallIndex
     (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp) :
