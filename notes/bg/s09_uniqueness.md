@@ -657,10 +657,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The extraction from the final
    characteristic layer of the 4.20(c) series is now covered by
    `Ch01.exists_normal_sylow_of_characteristic_card_eq_sylow` (and its cardinal-power
-   variant).  The remaining §4 work is therefore to construct that characteristic
-   layer/series under the `rank F(M) ≤ 2` hypothesis; the `opCore` equality, ambient
-   equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09 once `q ∈ π(M)` is
-   available.
+   variant).  The normal-complement canonicalization needed inside the induction
+   step is now covered by `S04.normalPComplement_eq_oPiCore_compl` and
+   `S04.oPiCore_isComplement_of_hasNormalPComplement`: any normal `p`-complement
+   produced by Thm 4.18(b) can be replaced by the characteristic core
+   `O_{r | r != p}(G)`.  The remaining §4 work is therefore to construct that
+   characteristic layer/series under the `rank F(M) ≤ 2` hypothesis; the `opCore`
+   equality, ambient equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09
+   once `q ∈ π(M)` is available.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 

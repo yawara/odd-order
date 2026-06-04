@@ -672,6 +672,55 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
   obtain ⟨hG'bar, hlargest, hp'quot⟩ := core418 hp_odd hodd_bar hrank_bar hredu_bar
   exact structure_of_quotient_commutator_le_opCore hodd hG'bar hlargest hp'quot
 
+/-- A normal `p`-complement is the canonical `{r | r != p}`-core.
+
+This is the bridge needed in BG Thm 4.20(c): once Thm 4.18(b) produces a normal
+`p`-complement, the complement can be taken to be the characteristic subgroup
+`O_{r | r != p}(G)`. -/
+theorem normalPComplement_eq_oPiCore_compl {p : ℕ} [Fact p.Prime] {K : Subgroup G}
+    [K.Normal] (hK : ∀ P : Sylow p G, Subgroup.IsComplement' K (P : Subgroup G)) :
+    K = Ch03.oPiCore {r : ℕ | r ≠ p} G := by
+  classical
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
+  have hKP := hK P
+  have hK_pi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} K := by
+    intro q hq hq_eq
+    have hq_dvd_K : q ∣ Nat.card ↥K := Nat.dvd_of_mem_primeFactors hq
+    have hp_dvd_index : p ∣ (P : Subgroup G).index := by
+      rw [hKP.index_eq_card, ← hq_eq]
+      exact hq_dvd_K
+    exact P.not_dvd_index hp_dvd_index
+  have hK_le : K ≤ Ch03.oPiCore {r : ℕ | r ≠ p} G :=
+    Ch03.Subgroup.IsPiGroup.le_oPiCore hK_pi
+  have hK_hall : Ch03.IsHallSubgroup {r : ℕ | r ≠ p} K := by
+    refine ⟨hK_pi, ?_⟩
+    intro q hq hq_ne_p
+    have hidx : K.index = Nat.card ↥(P : Subgroup G) := hKP.symm.index_eq_card
+    have hqP : q ∈ (Nat.card ↥(P : Subgroup G)).primeFactors := by
+      simpa [hidx] using hq
+    have hPp : IsPGroup p ↥(P : Subgroup G) := P.isPGroup'
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hPp
+    rw [hk, Nat.mem_primeFactors] at hqP
+    have hq_eq_p : q = p :=
+      (Nat.prime_dvd_prime_iff_eq hqP.1 (Fact.out : p.Prime)).mp
+        (hqP.1.dvd_of_dvd_pow hqP.2.1)
+    exact hq_ne_p hq_eq_p
+  have hO_le : Ch03.oPiCore {r : ℕ | r ≠ p} G ≤ K :=
+    Ch03.Subgroup.IsPiGroup.normal_le_hall
+      (Ch03.oPiCore.isPiGroup {r : ℕ | r ≠ p}) hK_hall
+  exact le_antisymm hK_le hO_le
+
+/-- If `G` has a normal `p`-complement, then the canonical core is such a complement. -/
+theorem oPiCore_isComplement_of_hasNormalPComplement {p : ℕ} [Fact p.Prime]
+    (hG : Ch05.HasNormalPComplement p G) (P : Sylow p G) :
+    Subgroup.IsComplement' (Ch03.oPiCore {r : ℕ | r ≠ p} G) (P : Subgroup G) := by
+  rcases hG with ⟨K, hK_normal, hK_compl⟩
+  haveI : K.Normal := hK_normal
+  have hK_eq : K = Ch03.oPiCore {r : ℕ | r ≠ p} G :=
+    normalPComplement_eq_oPiCore_compl (K := K) hK_compl
+  rw [← hK_eq]
+  exact hK_compl P
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04
