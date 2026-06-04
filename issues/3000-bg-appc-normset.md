@@ -126,6 +126,10 @@ created: 2026-06-04
   非 kernel 既約指標が additive kernel から誘導され degree `|U|` を持つことを使い、既存の
   `hdeg` 仮定付き評価を `normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt` に閉じた。
   これで残る q≥5 branch の Lean core は class-sum 公式から coefficient 下界を抜く実数/自然数評価。
+- [x] **C.2 q≥5 coefficient bridge, numeric separation form**:
+  class-sum 公式 `coeff * p^q = |U|^3 + error` と degree-free error bound から、
+  任意の `c≤|U|` が main term から error bound より遠いという純数値仮定を渡せば
+  `|U| < coeff` を返す `normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card_of_error_separation` を追加。
 - [ ] **Lemma C.2 (q≥5)**: Frobenius 群 H=P⋊U の指標論 (構造定数 e=|E|, 直交関係で下界)。**別 infra・重 (multi-session)**。
 - [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
 - [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。

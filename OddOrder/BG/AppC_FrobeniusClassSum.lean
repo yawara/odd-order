@@ -1603,6 +1603,55 @@ theorem normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt
       normOneFrobenius_nonKernelCharacter_normOneUnits_card_le_degree
         p q hq χ hχnon
 
+open scoped Classical in
+/-- If the main term `|U|^3` is separated from every possible coefficient
+`c <= |U|` by more than the non-kernel error bound, then the concrete class-sum
+coefficient is strictly larger than `|U|`.
+
+This isolates the analytic/numeric part of the `q >= 5` branch from the
+class-sum character calculation. -/
+theorem normOneFrobenius_classSumCoeff_one_gt_normOneUnits_card_of_error_separation
+    [Fact p.Prime] [DecidableEq (ConjClasses (normOneFrobeniusGroup p q))]
+    (hpodd : Odd p) (hq : 1 < q)
+    (hseparation : ∀ c : ℕ, c ≤ Nat.card (normOneUnits p q) →
+      (Nat.card (normOneUnits p q) : ℝ) *
+          (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) <
+        ‖((Nat.card (normOneUnits p q) : ℂ) ^ 3 -
+          (c : ℂ) * ((p ^ q : ℕ) : ℂ))‖) :
+    Nat.card (normOneUnits p q) <
+      classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+        (normOneClassAt p q (1 : GaloisField p q))
+        (normOneClassAt p q (2 : GaloisField p q)) := by
+  let c : ℕ :=
+    classSumCoeff (normOneClassAt p q (1 : GaloisField p q))
+      (normOneClassAt p q (1 : GaloisField p q))
+      (normOneClassAt p q (2 : GaloisField p q))
+  by_contra hnot
+  have hc_le : c ≤ Nat.card (normOneUnits p q) := Nat.le_of_not_gt hnot
+  have hformula :
+      (c : ℂ) * ((p ^ q : ℕ) : ℂ) =
+        (Nat.card (normOneUnits p q) : ℂ) ^ 3 +
+          normOneFrobeniusNonKernelContribution p q := by
+    dsimp [c]
+    simpa using
+      normOneFrobenius_classSumCoeff_one_mul_pow_eq_kernelContribution_add_nonKernelContribution
+        p q hpodd hq
+  have herror := normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt p q hpodd hq
+  have hdev :
+      (Nat.card (normOneUnits p q) : ℂ) ^ 3 -
+          (c : ℂ) * ((p ^ q : ℕ) : ℂ) =
+        -normOneFrobeniusNonKernelContribution p q := by
+    rw [hformula]
+    ring
+  have hdev_le :
+      ‖((Nat.card (normOneUnits p q) : ℂ) ^ 3 -
+          (c : ℂ) * ((p ^ q : ℕ) : ℂ))‖ ≤
+        (Nat.card (normOneUnits p q) : ℝ) *
+          (((p ^ q : ℕ) : ℝ) * √(((p ^ q : ℕ) : ℝ))) := by
+    rw [hdev, norm_neg]
+    exact herror
+  exact not_lt_of_ge hdev_le (hseparation c hc_le)
+
 /-- Once the character-theory lower bound makes the `C_s * C_s -> C_{2s}`
 coefficient larger than `|U|`, the norm set has at least two elements. -/
 theorem normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
