@@ -225,6 +225,10 @@ created: 2026-06-04
   `generatorRelation_step2_primeLine_of_sigma_mem_U` を公開し、`s₁ u s₂∈U` から
   BG Step2 の二択を concrete `P⋊U` と transported `G` の両方で読めるようにした。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 irreducibility bridge**:
+  `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` を公開し、`U≤X≤PU` かつ
+  `X≠U` なら `X=PU` となる BG Step3 の irreducibility 入力を `σ` 経由で transport。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 sigma normal-form bridge**: `sigma_eq_left_eq`、
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の

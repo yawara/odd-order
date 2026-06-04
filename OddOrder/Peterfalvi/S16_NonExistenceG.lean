@@ -459,6 +459,49 @@ theorem P_sup_U_eq_sigma_top {hyp : Hypothesis (G := G)} (data : FieldNormalizer
     _ = (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
       rw [fieldNormalizerKernel_sup_complement_eq_top hyp]
 
+/-- BG Appendix C, Lemma C.3 Step 3 irreducibility bridge: any subgroup of
+`PU` that contains `U` is either `U` or all of `PU`.  This transports the
+concrete irreducibility theorem for `P⋊U` through `σ`. -/
+theorem subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {X : Subgroup G}
+    (hUle : hyp.base.U ≤ X) (hXle : X ≤ hyp.base.P ⊔ hyp.base.U)
+    (hne : X ≠ hyp.base.U) :
+    X = hyp.base.P ⊔ hyp.base.U := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let XH : Subgroup (fieldNormalizerFrobeniusGroup hyp) := X.comap data.sigma
+  have hXrange : X ≤ data.sigma.range := by
+    intro x hx
+    have hxPU : x ∈ hyp.base.P ⊔ hyp.base.U := hXle hx
+    rw [data.P_sup_U_eq_sigma_top] at hxPU
+    simpa using hxPU
+  have hUleH : fieldNormalizerComplement hyp ≤ XH := by
+    intro g hg
+    have hgU : data.sigma g ∈ hyp.base.U := by
+      rw [← data.sigma_U_eq_U]
+      exact ⟨g, hg, rfl⟩
+    exact hUle hgU
+  have hUleH' :
+      (SemidirectProduct.inr : fieldNormalizerNormOneUnits hyp →*
+        fieldNormalizerFrobeniusGroup hyp).range ≤ XH := by
+    simpa [fieldNormalizerComplement] using hUleH
+  have hneH : XH ≠ fieldNormalizerComplement hyp := by
+    intro hXH
+    apply hne
+    have hmapX : XH.map data.sigma = X := Subgroup.map_comap_eq_self hXrange
+    calc
+      X = XH.map data.sigma := hmapX.symm
+      _ = (fieldNormalizerComplement hyp).map data.sigma := by rw [hXH]
+      _ = hyp.base.U := data.sigma_U_eq_U
+  have htopH : XH = ⊤ :=
+    OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime data.cyclotomic_coprime
+      XH hUleH' (by simpa [fieldNormalizerComplement] using hneH)
+  have hmapX : XH.map data.sigma = X := Subgroup.map_comap_eq_self hXrange
+  calc
+    X = XH.map data.sigma := hmapX.symm
+    _ = (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by rw [htopH]
+    _ = hyp.base.P ⊔ hyp.base.U := data.P_sup_U_eq_sigma_top.symm
+
 /-- BG Appendix C, Lemma C.3 Step 1 inside the concrete `P⋊U`: every element is
 `u s₁ v` with `u,v∈U` and `s₁∈P₀`. -/
 theorem exists_normOne_primeLine_normOne {hyp : Hypothesis (G := G)}

@@ -336,6 +336,9 @@ concrete `P⋊U` と transported `PU` の双方で使える形にした。
 さらに `generatorRelation_step2_primeLine` /
 `generatorRelation_step2_primeLine_of_sigma_mem_U` により、BG Step2 の `s₁ u s₂∈U`
 判定を concrete `P⋊U` と transported `G` の両方で使えるようにした。
+さらに `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` により、
+`U≤X≤PU` かつ `X≠U` から `X=PU` を得る Step3 irreducibility 入力を
+concrete `P⋊U` から Peterfalvi 側へ transport した。
 また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
 `sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
 `left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。
