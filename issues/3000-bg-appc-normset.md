@@ -198,6 +198,10 @@ created: 2026-06-04
   `s⁻¹t ∈ Q` から `(s⁻¹)^n t^n ∈ Q` を、逆向きにも `t⁻¹s ∈ Q` から
   `(t⁻¹)^n s^n ∈ Q` を theorem 化。BG Step4 の
   `s^{-i}t^i ∈ Q` 型の冪計算を group-theoretic side に固定。
+- [x] **C.3 Step 4 norm-one transport**: concrete `normOneUnits` を
+  `σ` で Peterfalvi の `U` へ運ぶ `normOneUnitsEquivU` を作成し、
+  `t ∈ N_G(U)` から `tConjUAut` / `tConjNormOneUnitsAut` を theorem 化。
+  `σ(inr u)` に対する ambient conjugation 公式も rewrite 可能にした。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件

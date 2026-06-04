@@ -190,6 +190,12 @@ noncomputable def fieldNormalizerComplement (hyp : Hypothesis (G := G)) :
       OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q →*
         fieldNormalizerFrobeniusGroup hyp).range
 
+/-- The concrete norm-one unit group used as BG's complement before transport
+through the field-normalizer embedding. -/
+abbrev fieldNormalizerNormOneUnits (hyp : Hypothesis (G := G)) : Type _ :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q
+
 /-- The distinguished nonidentity element of the prime-field line `P₀`,
 corresponding to `1 : F_{p^q}` in BG Appendix C. -/
 noncomputable def fieldNormalizerPrimeLineGenerator (hyp : Hypothesis (G := G)) :
@@ -263,6 +269,60 @@ theorem s_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData h
     data.s ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
   data.W2_normalizes_Q data.s_mem_W2
 
+/-- The concrete norm-one complement transported through `σ` onto Peterfalvi's
+subgroup `U`. -/
+noncomputable def normOneUnitsToU {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : fieldNormalizerNormOneUnits hyp →* hyp.base.U :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  { toFun := fun u =>
+      ⟨data.sigma (SemidirectProduct.inr u), by
+        rw [← data.sigma_U_eq_U]
+        exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩⟩
+    map_one' := by
+      ext
+      simp
+    map_mul' := by
+      intro u v
+      ext
+      simp }
+
+/-- The transported norm-one complement map is injective. -/
+theorem normOneUnitsToU_injective {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : Function.Injective data.normOneUnitsToU := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro u v h
+  have hsig : data.sigma (SemidirectProduct.inr u) = data.sigma (SemidirectProduct.inr v) :=
+    congrArg Subtype.val h
+  exact SemidirectProduct.inr_injective (data.sigma_injective hsig)
+
+/-- The transported norm-one complement map is onto Peterfalvi's `U`. -/
+theorem normOneUnitsToU_surjective {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : Function.Surjective data.normOneUnitsToU := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro u
+  have hu : (u : G) ∈ (fieldNormalizerComplement hyp).map data.sigma := by
+    rw [data.sigma_U_eq_U]
+    exact u.property
+  rcases hu with ⟨x, hxU, hx⟩
+  rcases hxU with ⟨u0, rfl⟩
+  refine ⟨u0, ?_⟩
+  ext
+  exact hx
+
+/-- The concrete norm-one unit group is isomorphic to Peterfalvi's subgroup `U`
+through the field-normalizer embedding. -/
+noncomputable def normOneUnitsEquivU {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : fieldNormalizerNormOneUnits hyp ≃* hyp.base.U :=
+  MulEquiv.ofBijective data.normOneUnitsToU
+    ⟨data.normOneUnitsToU_injective, data.normOneUnitsToU_surjective⟩
+
+/-- Applying the norm-one/unit equivalence is just `σ` on the concrete
+semidirect-product complement. -/
+theorem normOneUnitsEquivU_apply_coe {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU u : G) = data.sigma (SemidirectProduct.inr u) := by
+  rfl
+
 /-- The conjugate prime-line subgroup `P₁` used in BG Appendix C, expressed
 with Lean left-conjugation convention. -/
 noncomputable def P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
@@ -297,6 +357,46 @@ theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
 theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
   data.P1_normalizes_U data.t_mem_P1
+
+/-- Conjugation by `t` as an automorphism of Peterfalvi's subgroup `U`. -/
+noncomputable def tConjUAut {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : MulAut hyp.base.U :=
+  hyp.base.U.normalizerMonoidHom ⟨data.t, data.t_normalizes_U⟩
+
+/-- The subgroup automorphism `tConjUAut` is ambient conjugation by `t`. -/
+theorem tConjUAut_apply_coe {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (u : hyp.base.U) :
+    (data.tConjUAut u : G) = data.t * (u : G) * data.t⁻¹ := by
+  rfl
+
+/-- Conjugation by `t`, transported back to the concrete norm-one unit group. -/
+noncomputable def tConjNormOneUnitsAut {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : MulAut (fieldNormalizerNormOneUnits hyp) :=
+  (MulAut.congr data.normOneUnitsEquivU).symm data.tConjUAut
+
+/-- The transported automorphism agrees with conjugation by `t` after applying
+`σ` to the concrete complement. -/
+theorem normOneUnitsEquivU_tConjNormOneUnitsAut {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (u : fieldNormalizerNormOneUnits hyp) :
+    data.normOneUnitsEquivU (data.tConjNormOneUnitsAut u) =
+      data.tConjUAut (data.normOneUnitsEquivU u) := by
+  simp [tConjNormOneUnitsAut]
+
+/-- After transporting back to the concrete complement, the `t`-automorphism is
+ambient conjugation of `σ(inr u)`. -/
+theorem normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU (data.tConjNormOneUnitsAut u) : G) =
+      data.t * data.sigma (SemidirectProduct.inr u) * data.t⁻¹ := by
+  calc
+    (data.normOneUnitsEquivU (data.tConjNormOneUnitsAut u) : G) =
+        (data.tConjUAut (data.normOneUnitsEquivU u) : G) := by
+      rw [data.normOneUnitsEquivU_tConjNormOneUnitsAut]
+    _ = data.t * (data.normOneUnitsEquivU u : G) * data.t⁻¹ :=
+      data.tConjUAut_apply_coe (data.normOneUnitsEquivU u)
+    _ = data.t * data.sigma (SemidirectProduct.inr u) * data.t⁻¹ := by
+      rw [data.normOneUnitsEquivU_apply_coe]
 
 /-- The conjugate generator `t` also normalizes `Q`. -/
 theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
