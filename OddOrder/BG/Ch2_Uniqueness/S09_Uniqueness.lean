@@ -2576,6 +2576,47 @@ private theorem le_centralizer_of_subgroupOf_le_centralizer
     (Subgroup.mem_centralizer_iff.mp (hlocal hxlocal)
       (⟨k, hkH⟩ : ↥H) hklocal)
 
+/-- Data needed to apply BG Corollary 4.19 to one local chief factor `U/V`.
+The prime and the rank-two normal `p`-subgroup are factor-specific; this is the
+shape produced later from the `D ∩ L` rank bound in Lemma 9.5. -/
+private structure Cor419ChiefFactorData (M : Type*) [Group M] [Finite M]
+    (U V : Subgroup M) [V.Normal] where
+  q : ℕ
+  q_prime : q.Prime
+  q_odd : Odd q
+  R : Subgroup M
+  R_normal : R.Normal
+  R_pgroup : IsPGroup q ↥R
+  R_rank : pRank ↥R q ≤ 2
+  Ubar_pgroup : IsPGroup q ↥(U.map (QuotientGroup.mk' V))
+  U_le_sup : U ≤ R ⊔ V
+
+/-- Turn per-factor BG Corollary 4.19 data into the exact chief-factor
+centralizer chain input consumed by the Lemma 1.9 bridge.  Trivial zero layers
+of `chiefSeriesInside` are handled without Corollary 4.19 data. -/
+private theorem local_derived_le_chiefFactorCentralizer_chain_of_cor419Data
+    {M : Type*} [Group M] [Finite M] (hoddM : Odd (Nat.card M))
+    {K : Subgroup M} [K.Normal]
+    (hdata : ∀ i, chiefSeriesInside K i ≠ ⊥ →
+      Cor419ChiefFactorData M (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))) :
+    ∀ i, derivedInG (⊤ : Subgroup M) ≤
+      chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) := by
+  intro i
+  by_cases hU0 : chiefSeriesInside K i = ⊥
+  · rw [chiefFactorCentralizer.le_iff_commutator_le, hU0, Subgroup.commutator_bot_left]
+    exact bot_le
+  · let d := hdata i hU0
+    have hChief : IsChiefFactor (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
+      isChiefFactor_chiefSeriesInside hU0
+    haveI : Fact d.q.Prime := ⟨d.q_prime⟩
+    haveI : d.R.Normal := d.R_normal
+    have hcomm : _root_.commutator M ≤
+        chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
+      OddOrder.BG.Ch1.S04.commutator_le_chiefFactorCentralizer_of_pRank_le_two_of_le_sup
+        (G := M) hoddM d.q_odd hChief d.Ubar_pgroup d.R_pgroup d.R_rank d.U_le_sup
+    rw [derivedInG_eq_commutator (G := M) (⊤ : Subgroup M)]
+    simpa [_root_.commutator] using hcomm
+
 /-- Local Corollary 4.19 output plus the S09 bridge package: if `P₀ ≤ H'`
 and the local derived subgroup of `H` centralizes every chief factor of `K`,
 then `P₀` centralizes `K` back in the ambient group. -/
@@ -2601,6 +2642,24 @@ private theorem le_centralizer_of_local_derived_chiefFactorCentralizer_chain
       (E := derivedInG (⊤ : Subgroup ↥H)) hcop hsolv hP0_local hcent
   exact le_centralizer_of_subgroupOf_le_centralizer
     (hP0D.trans (derivedInG_le_self H)) hKH hlocal
+
+/-- Local BG Corollary 4.19 data plus the S09 bridge package, already composed:
+if `P₀ ≤ H'` and every nonzero chief layer of `K` carries Corollary 4.19 data,
+then `P₀` centralizes `K` in the ambient group. -/
+private theorem le_centralizer_of_local_cor419Data_chain
+    [Finite G] {H K P0 : Subgroup G} [((K.subgroupOf H : Subgroup ↥H)).Normal]
+    (hoddH : Odd (Nat.card ↥H)) (hP0D : P0 ≤ derivedInG H) (hKH : K ≤ H)
+    (hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime
+      (Nat.card ↥(K.subgroupOf H)))
+    (hsolv : IsSolvable ↥(P0.subgroupOf H) ∨ IsSolvable ↥(K.subgroupOf H))
+    (hdata : ∀ i, chiefSeriesInside (K.subgroupOf H) i ≠ ⊥ →
+      Cor419ChiefFactorData (↥H)
+        (chiefSeriesInside (K.subgroupOf H) i)
+        (chiefSeriesInside (K.subgroupOf H) (i + 1))) :
+    P0 ≤ Subgroup.centralizer (K : Set G) :=
+  le_centralizer_of_local_derived_chiefFactorCentralizer_chain
+    hP0D hKH hcop hsolv
+    (local_derived_le_chiefFactorCentralizer_chain_of_cor419Data hoddH hdata)
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
