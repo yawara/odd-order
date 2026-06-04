@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.S16_NonExistenceG
 
 /-!
@@ -17,10 +18,11 @@ appears as Theorem (14.2): a field-normalizer configuration is constructed with
 primes `q < p`.  BG Appendix C proves that any such configuration forces
 `p <= q`.
 
-This file is the BG-side scaffold for that last interface.  The detailed finite
-field proof is split into the named lemmas C.1--C.3 and represented by
-proposition fields until the norm-set and generator-relation calculation is
-formalized.  The final bridge to Peterfalvi Section 16 is already connected.
+This file is the BG-side scaffold for that last interface.  Lemmas C.1 and C.2
+are wired to the concrete finite-field norm-set development in
+`OddOrder.BG.AppC.NormSet`; Lemma C.3 is still the generator-relation argument
+that needs the concrete embedding data from hypothesis (B).  The final bridge to
+Peterfalvi Section 16 is already connected.
 -/
 
 namespace OddOrder.BG.AppC
@@ -39,6 +41,23 @@ variable {G : Type*} [Group G]
 def conditionA (p q : ℕ) : Prop :=
   Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1)
 
+/-- The concrete norm set cardinality conclusion attached to a Peterfalvi
+Section 16 hypothesis.
+
+This adapter keeps the `Fact hyp.base.p.Prime` instance local, because the
+concrete type `GaloisField hyp.base.p hyp.base.q` needs that instance even to be
+formed. -/
+def normSetCardGeTwo (hyp : S16.Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  2 ≤ (NormSet.normSetE hyp.base.p hyp.base.q).ncard
+
+/-- The concrete norm set inversion-closure conclusion attached to a Peterfalvi
+Section 16 hypothesis. -/
+def normSetInverseClosed (hyp : S16.Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  NormSet.normSetE hyp.base.p hyp.base.q =
+    (NormSet.normSetE hyp.base.p hyp.base.q)⁻¹
+
 /-- **BG Appendix C, Hypothesis (B)**, transported to the Peterfalvi Section 16
 field-normalizer data.  The concrete monomorphism `H -> G`, the abelian
 `p'`-subgroup `Q`, and the two normalizer assumptions are already represented
@@ -55,19 +74,11 @@ structure HypothesisB (hyp : S16.Hypothesis (G := G)) where
   P0_conj_y_normalizes_U_formula : Prop
   P0_conj_y_normalizes_U_formula_holds : P0_conj_y_normalizes_U_formula
 
-/-- The norm set `E = {a | N(a) = N(2 - a) = 1}` used in BG Lemmas C.1--C.3.
-The finite field and norm map are not materialized here yet; this carrier records
-the exact proof obligations needed by Theorem C. -/
+/-- The norm-set outputs needed to assemble BG Theorem C from Lemmas C.1--C.3. -/
 structure NormSetData (hyp : S16.Hypothesis (G := G)) where
   conditionA_holds : conditionA hyp.base.p hyp.base.q
-  E_nonempty_formula : Prop
-  E_nonempty_formula_holds : E_nonempty_formula
-  E_card_ge_two : Prop
-  E_card_ge_two_holds : E_card_ge_two
-  E_inverse_closed : Prop
-  E_inverse_closed_holds : E_inverse_closed
-  polynomial_root_bound : Prop
-  polynomial_root_bound_holds : polynomial_root_bound
+  E_card_ge_two : normSetCardGeTwo hyp
+  E_inverse_closed : normSetInverseClosed hyp
 
 /-! ## Lemmas C.1--C.3 -/
 
@@ -76,19 +87,42 @@ elements, the polynomial root count gives `p <= q`. -/
 theorem lemmaC1_root_count [Finite G]
     (hyp : S16.Hypothesis (G := G)) (norms : NormSetData hyp) :
     hyp.base.p ≤ hyp.base.q := by
-  sorry
+  haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hEinv :
+      NormSet.normSetE hyp.base.p hyp.base.q =
+        (NormSet.normSetE hyp.base.p hyp.base.q)⁻¹ := by
+    simpa [normSetInverseClosed] using norms.E_inverse_closed
+  have hcard : 2 ≤ (NormSet.normSetE hyp.base.p hyp.base.q).ncard := by
+    simpa [normSetCardGeTwo] using norms.E_card_ge_two
+  exact NormSet.lemmaC1 (p := hyp.base.p) (q := hyp.base.q)
+    hyp.base.q_prime hEinv hcard
 
-/-- **BG Lemma C.2**: the norm set has at least two elements. -/
+/-- **BG Lemma C.2**: condition (A) alone gives that the norm set has at
+least two elements. -/
+theorem lemmaC2_card_ge_two_of_conditionA [Finite G]
+    (hyp : S16.Hypothesis (G := G)) (hA : conditionA hyp.base.p hyp.base.q) :
+    normSetCardGeTwo hyp := by
+  haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hcard := NormSet.lemmaC2 (p := hyp.base.p) (q := hyp.base.q)
+    hyp.base.p_odd hyp.base.q_prime hyp.base.q_odd hA
+  simpa [normSetCardGeTwo] using hcard
+
+/-- **BG Lemma C.2**: the field-normalizer data supplies condition (A), hence
+the norm set has at least two elements. -/
 theorem lemmaC2_card_ge_two [Finite G]
-    (hyp : S16.Hypothesis (G := G)) (hB : HypothesisB hyp) :
-    ∃ norms : NormSetData hyp, norms.E_card_ge_two := by
-  sorry
+    (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
+    normSetCardGeTwo hyp :=
+  lemmaC2_card_ge_two_of_conditionA hyp data.cyclotomic_coprime
 
 /-- **BG Lemma C.3**: the norm set is closed under inversion. -/
 theorem lemmaC3_inverse_closed [Finite G]
-    (hyp : S16.Hypothesis (G := G)) (hB : HypothesisB hyp) :
-    ∃ norms : NormSetData hyp, norms.E_inverse_closed := by
-  sorry
+    (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
+    normSetInverseClosed hyp := by
+  haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simpa [normSetInverseClosed]
+    using NormSet.normSetE_eq_inv_of_forall_normN_two_mul_sub_one
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos
+      data.appC_normSet_generator_relation
 
 /-! ## Theorem C and the Peterfalvi bridge -/
 
@@ -97,7 +131,10 @@ Peterfalvi (14.2) forces `p <= q`. -/
 theorem theoremC [Finite G] (hyp : S16.Hypothesis (G := G)) :
     S16.FieldNormalizerData hyp → hyp.base.p ≤ hyp.base.q := by
   intro data
-  sorry
+  exact lemmaC1_root_count hyp
+    { conditionA_holds := data.cyclotomic_coprime
+      E_card_ge_two := lemmaC2_card_ge_two hyp data
+      E_inverse_closed := lemmaC3_inverse_closed hyp data }
 
 /-- **BG Appendix C + Peterfalvi Section 16**: once Peterfalvi constructs the
 field-normalizer data, BG Theorem C contradicts the standing hypothesis `q < p`. -/

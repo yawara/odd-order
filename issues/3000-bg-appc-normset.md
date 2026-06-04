@@ -145,13 +145,53 @@ created: 2026-06-04
 - [x] **Lemma C.2 packaging (q≥5)**: q=3 helper を `AppC_NormSet` に残し、
   full `lemmaC2` を class-sum 下流の `AppC_LemmaC2` へ移して
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
-- [ ] **Lemma C.3** (E=E⁻¹): 群論的 generator-relation (Step1-4)。仮説(B)=群G埋め込み必須 ⟹ FieldNormalizerData materialize と共有 (半上流)。
-- [ ] **Theorem C** assembly + 既存 scaffold `AppC.theoremC` への配線 (FieldNormalizerData.field_model materialize)。
+- [x] **Lemma C.3 p=3 branch**: BG C.3 note を `normSetE_eq_inv_of_p_eq_three` として純有限体で証明。characteristic 3 では `2*a-1=2-a` なので generator-relation argument なしで `E=E⁻¹`。AxiomsCheck 登録済み。
+- [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` の C.3 obligation を最終結論 `E=E⁻¹` から generator-relation 出力 `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) に細分化し、`AppC_FinalContradiction.lemmaC3_inverse_closed` は純有限体補題経由で `sorry` なしに維持 (2026-06-04, branch `codex/ft-appc-downstream`)。
+- [x] **Lemma C.3 Step 1 finite-field/semidirect core**: condition(A) 下の直積分解
+  `𝔽_{p^q}ˣ = 𝔽_pˣ · U` から、任意の非零 prime-field line `𝔽_p s` に対して全 field 点が
+  `U`-orbit に入る `exists_normOne_mul_primeLine_eq` を証明。さらに concrete `P⋊U` 内の任意の元を
+  `u s₁ v` (`u,v∈U`, `s₁∈𝔽_p s`) と書く
+  `normOneFrobenius_exists_inr_primeLine_inr` まで materialize。AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 2 finite-field/semidirect core**: `U ∩ 𝔽_pˣ = 1` から
+  `normOneUnits_eq_one_of_mem_primeFieldUnits` を公開し、prime-field line 上の relation
+  `c*s + u*(d*s)=0` が BG Step 2 の二択 `(c=d=0) ∨ (u=1 ∧ c+d=0)` を強制する
+  `generatorRelation_step2_primeLine` まで証明。さらに concrete `P⋊U` 内で `s₁ u s₂∈U` から同じ二択を返す
+  `normOneFrobenius_generatorRelation_step2_primeLine` を追加。AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 3 finite-field irreducibility input**: condition(A) 下で
+  norm-one subgroup `U` が加法群 `𝔽_{p^q}` を `𝔽_p`-既約に作用することを
+  `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明。さらに非零 `U`-不変
+  subspace が `U` とともに concrete `P⋊U` 全体を生成することを
+  `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` として固定。続いて任意の subgroup
+  `X≤P⋊U` について、`U≤X` かつ `X∩P` が非自明なら `X=⊤` とする
+  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl` を materialize。さらに
+  semidirect product の分解から `U≤X` かつ `X≠U` なら `X=⊤` とする
+  `normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range` まで固定。
+  AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 4 finite-field Frobenius core**: `normN_pow_p` と
+  `normSetE_pow_p` により `p`-power Frobenius が `E` を保つことを証明し、
+  `normSetE_frobenius_pair` で `a,b∈E` かつ `a+b=2` なら `a^p,b^p∈E` かつ
+  `a^p+b^p=2` を固定。さらに condition(A) から `u∈U` かつ `u^(p-1)=1` なら
+  `u=1` を返す `normOneUnits_eq_one_of_pow_sub_one_eq_one` を追加。BG Step 4 の
+  Frobenius propagation / “by (A)” 入力。AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 4 twisted-inverse induction tail**: BG 最後の
+  `(a⁻¹)^{t^3}` を p 回反復する議論を `inv_mem_of_twistedInv_step` として一般化し、
+  unit 上の one-step twisted inverse から `E=E⁻¹` を返す
+  `normSetE_eq_inv_of_twisted_unit_step` を証明。さらに inverse-closure/twisted-step から
+  S16 interface の `N(2*a-1)=1` を返す `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
+  `forall_normN_two_mul_sub_one_of_twisted_unit_step` を追加。さらに S16 側にも
+  one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
+  `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加。AxiomsCheck 登録済み。
+- [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
+- [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
+  `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
+- [ ] **C.3 genuine proof/materialization**: `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件
 
 `AppC.theoremC` が sorry-free (Lemmas C.1-C.3 + 配線完成)。`nonexistence_of_G` の BG 側 gap が閉じる。
-段階的に C.1 → C.2(q=3) → C.2(q≥5) → C.3 → assembly。
+2026-06-04 時点で `AppC_FinalContradiction` は direct sorry-free; `theoremC` は AxiomsCheck 登録済み。
+残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_twisted_unit_step` の upstream materialization として追跡する。`appC_normSet_generator_relation` は derived theorem になった。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
+段階的に C.1 → C.2(q=3) → C.2(q≥5) → assembly → C.3 materialization。
 
 ## 参照
 

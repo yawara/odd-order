@@ -2389,6 +2389,15 @@ set_option linter.style.longLine false in
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
+-- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
+-- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
+#assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
+
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd
@@ -2415,6 +2424,64 @@ set_option linter.style.longLine false in
 -- BG App C Remark (VII): the carrier-set product `𝔽_pˣ · U` is all of
 -- `𝔽_{p^q}ˣ` under condition (A).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
+
+-- BG App C Lemma C.3 Step 1: under condition (A), every field element
+-- lies in the `U`-orbit of any fixed nonzero prime-field line; equivalently,
+-- every concrete `P ⋊ U` element has a `u s₁ v` decomposition with
+-- `s₁ ∈ 𝔽_p s`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeFieldUnit_mul_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeLine_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_exists_inr_primeLine_inr
+
+-- BG App C Lemma C.3 Step 3: the norm-one subgroup acts irreducibly on
+-- the additive `𝔽_p`-space `𝔽_{p^q}` under condition (A), and therefore
+-- any nonzero `U`-stable subspace or subgroup-kernel preimage generates all of
+-- `P ⋊ U` together with `U`.
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneUnits_invariant_submodule_eq_top_of_ne_bot
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusKernelPreimageSubmodule
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
+
+-- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
+-- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives,
+-- both as a finite-field equation and as a concrete `P ⋊ U` membership test.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_mem_primeFieldUnits
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_primeLine_relation
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
+
+-- BG App C Lemma C.3 Step 4: the `p`-power Frobenius preserves the norm-set
+-- relation `a,b ∈ E` and `a+b=2` used in the generator-relation propagation.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.pow_p_natCast_two
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normN_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.two_sub_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_frobenius_pair
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_pow_sub_one_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.inv_mem_of_twistedInv_step
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_normSetE_eq_inv
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
 
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.
@@ -2571,6 +2638,10 @@ set_option linter.style.longLine false in
 
 -- BG App C Lemma C.2 bridge in the class-sum form `u*s + v*s = 2*s`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_normSetE_ncard
+
+-- BG App C Lemma C.3 note (`p = 3`): characteristic three makes
+-- `2*a - 1 = 2-a`, so the norm-set inverse closure is purely finite-field.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_p_eq_three
 
 -- BG App C Lemma C.1: if the norm set `E = {a | N(a)=N(2-a)=1}` is inverse-closed and
 -- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,

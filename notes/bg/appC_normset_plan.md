@@ -279,6 +279,35 @@ Step3: `t₁∈P₁^# ⟹ (PU)∩(PU)^{t₁}=U` (U が P に既約作用 + P_0=P
 Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p∈E` を経由して E=E⁻¹。
 **群 G・σ・Q (commutative)・y を本質的に使用** ⟹ FieldNormalizerData materialize 必須 (半上流)。
 
+
+**2026-06-04 現在の形式化 frontier**: Step1/Step2 の純有限体 core は
+`exists_normOne_mul_primeLine_eq` / `generatorRelation_step2_primeLine` として証明済み。
+Step1 はさらに concrete `P⋊U` 内の `u s₁ v` 分解
+`normOneFrobenius_exists_inr_primeLine_inr` まで semidirect form に持ち上げ済み。
+Step2 も concrete `P⋊U` 内の `s₁ u s₂∈U` membership test
+`normOneFrobenius_generatorRelation_step2_primeLine` として持ち上げ済み。
+Step3 の `U`-既約作用入力も
+`normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。さらに concrete `P⋊U` 内で
+非零 `U`-不変 subspace が `U` とともに全体を生成する
+`normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` を追加済み。加えて任意の subgroup `X≤P⋊U` について
+`U≤X` かつ `X∩P` が非自明なら `X=⊤` とする Step3 subgroup form
+`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl`、および BG 本文に近い
+`U≤X` かつ `X≠U` なら `X=⊤` とする
+`normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range` まで materialize 済み。
+Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
+`normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。さらに BG 最後の
+`(a⁻¹)^{t^3}` を p 回反復する tail は `inv_mem_of_twistedInv_step` /
+`normSetE_eq_inv_of_twisted_unit_step` として証明済み。twisted-step / inverse-closure から
+S16 interface の `N(2*a-1)=1` を返す adapter も
+`forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
+`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。S16 側にも
+one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
+`appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
+finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
+S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_unit_step` を、
+仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
+`appC_normSet_generator_relation` はこの field からの derived theorem。
+
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。
 

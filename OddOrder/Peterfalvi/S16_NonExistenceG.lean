@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.AppC_NormSet
 import OddOrder.Peterfalvi.S15_SAndT
 
 /-!
@@ -92,6 +93,47 @@ theorem tSide_cyclotomic_quotient_divisor_modEq_one (hyp : Hypothesis (G := G)) 
 
 end Hypothesis
 
+/-- The concrete norm relation produced by the generator-relation argument in
+**BG Appendix C, Lemma C.3**, expressed at the Peterfalvi Section 16 interface.
+For every `a` in the norm set `E`, the relation should give `N(2 * a - 1) = 1`;
+BG then converts this finite-field statement into `a⁻¹ ∈ E`. -/
+def appCNormSetGeneratorRelation (hyp : Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  ∀ a : GaloisField hyp.base.p hyp.base.q,
+    a ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+      OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+        ((2 : GaloisField hyp.base.p hyp.base.q) * a - 1) = 1
+
+/-- The one-step twisted-inverse output of **BG Appendix C, Lemma C.3, Step 4**,
+expressed at the Peterfalvi Section 16 interface.  This is closer to the group
+calculation in BG: for a field automorphism of `p`-power order, every
+`u ∈ E` is sent to `φ(u⁻¹) ∈ E`. -/
+def appCNormSetTwistedUnitStep (hyp : Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  ∃ φ : MulAut (GaloisField hyp.base.p hyp.base.q)ˣ,
+    φ ^ hyp.base.p = 1 ∧
+      ∀ u : (GaloisField hyp.base.p hyp.base.q)ˣ,
+        ((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) ∈
+          OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+          ((OddOrder.BG.AppC.NormSet.twistedInv φ u :
+              (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) ∈
+            OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q
+
+/-- The BG Step 4 twisted-inverse output implies the norm relation currently
+consumed by `FieldNormalizerData`.  This keeps the S16 producer obligation close
+to the group-theoretic calculation while preserving the downstream AppC
+interface. -/
+theorem appCNormSetGeneratorRelation_of_twisted_unit_step
+    (hyp : Hypothesis (G := G)) :
+    appCNormSetTwistedUnitStep hyp → appCNormSetGeneratorRelation hyp := by
+  intro htwist
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rcases htwist with ⟨φ, hφp, hstep⟩
+  exact OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
+    (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos hyp.base.p_odd φ hφp hstep
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The field model itself is represented propositionally until
 near-field and semidirect-product APIs are fixed for the final integration. -/
@@ -114,6 +156,18 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U : Prop
   W2_conj_y_normalizes_U_holds : W2_conj_y_normalizes_U
+  appC_twisted_unit_step : appCNormSetTwistedUnitStep hyp
+
+namespace FieldNormalizerData
+
+/-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
+BG's one-step twisted-inverse output stored in `FieldNormalizerData`. -/
+theorem appC_normSet_generator_relation {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    appCNormSetGeneratorRelation hyp :=
+  appCNormSetGeneratorRelation_of_twisted_unit_step hyp data.appC_twisted_unit_step
+
+end FieldNormalizerData
 
 /-! ## (14.3)--(14.7): the subgroup `L` over `N_G(U)` -/
 

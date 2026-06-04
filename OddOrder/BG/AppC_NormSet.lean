@@ -12,6 +12,7 @@ import Mathlib.Algebra.Polynomial.Roots
 import Mathlib.Algebra.Polynomial.SpecificDegree
 import Mathlib.Algebra.Ring.GeomSum
 import Mathlib.Data.ZMod.Basic
+import Mathlib.Algebra.Module.ZMod
 
 /-!
 # BG Appendix C: the finite-field norm-set argument
@@ -366,7 +367,286 @@ theorem primeFieldUnits_mul_normOneUnits_eq_univ [Fact p.Prime] (hq : q.Prime)
   · exact ⟨b, rfl⟩
   · exact u.property
 
-/-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
+/-! ### Generator-relation finite-field helpers for Lemma C.3 -/
+
+/-- **BG Appendix C, Lemma C.3, Step 1 (nonzero orbit form)**: under
+condition (A), every nonzero field element lies in the `U`-orbit of a nonzero
+point on any fixed nonzero prime-field line.  This is the finite-field content
+of BG Step 1, using `𝔽_{p^q}ˣ = 𝔽_pˣ · U`. -/
+theorem exists_normOne_mul_primeFieldUnit_mul_eq [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s x : GaloisField p q} (hs : s ≠ 0) (hx : x ≠ 0) :
+    ∃ b : (ZMod p)ˣ, ∃ u : normOneUnits p q,
+      x = (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+        ((algebraMap (ZMod p) (GaloisField p q) (b : ZMod p)) * s)) := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  let xOverS : Fˣ := Units.mk0 (x / s) (div_ne_zero hx hs)
+  obtain ⟨b, u, hxu⟩ := exists_primeFieldUnit_mul_normOne p q hq hA xOverS
+  refine ⟨b, u, ?_⟩
+  let uval : F := ((u : Fˣ) : F)
+  have hval : x / s = emb (b : ZMod p) * uval := by
+    change (xOverS : F) = emb (b : ZMod p) * uval
+    simpa [xOverS, emb, uval] using congrArg (fun z : Fˣ => (z : F)) hxu
+  calc
+    x = (x / s) * s := by rw [div_mul_cancel₀ _ hs]
+    _ = (emb (b : ZMod p) * uval) * s := by rw [hval]
+    _ = uval * (emb (b : ZMod p) * s) := by ring
+
+/-- **BG Appendix C, Lemma C.3, Step 1 (prime-line decomposition)**: under
+condition (A), every field element is a norm-one multiple of a point on any
+fixed nonzero prime-field line.  The zero case supplies the identity element of
+the additive kernel; the nonzero case is the direct-product decomposition of
+`𝔽_{p^q}ˣ`. -/
+theorem exists_normOne_mul_primeLine_eq [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s x : GaloisField p q} (hs : s ≠ 0) :
+    ∃ c : ZMod p, ∃ u : normOneUnits p q,
+      x = (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+        ((algebraMap (ZMod p) (GaloisField p q) c) * s)) := by
+  by_cases hx : x = 0
+  · refine ⟨0, 1, ?_⟩
+    simp [hx]
+  · obtain ⟨b, u, h⟩ :=
+      exists_normOne_mul_primeFieldUnit_mul_eq p q hq hA (s := s) (x := x) hs hx
+    exact ⟨(b : ZMod p), u, h⟩
+
+/-- **BG Appendix C, Lemma C.3, Step 3 input**: under condition (A), the
+norm-one subgroup acts irreducibly on the additive `𝔽_p`-space `𝔽_{p^q}`.
+Any nonzero `U`-invariant subspace is the whole field. -/
+theorem normOneUnits_invariant_submodule_eq_top_of_ne_bot [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (W : Submodule (ZMod p) (GaloisField p q))
+    (hU : ∀ u : normOneUnits p q, ∀ x : GaloisField p q, x ∈ W →
+      (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈ W)
+    (hne : W ≠ ⊥) :
+    W = ⊤ := by
+  classical
+  obtain ⟨s, hsW, hs0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+  apply Submodule.eq_top_iff'.mpr
+  intro x
+  obtain ⟨c, u, hx⟩ := exists_normOne_mul_primeLine_eq p q hq hA (s := s) (x := x) hs0
+  rw [hx]
+  exact hU u ((algebraMap (ZMod p) (GaloisField p q) c) * s) (by
+    simpa [Algebra.smul_def] using W.smul_mem c hsW)
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (intersection core)**: under condition
+(A), a norm-one unit that also comes from the prime field is trivial.  This is
+the finite-field `U ∩ 𝔽_pˣ = 1` input used in the generator-relation argument. -/
+theorem normOneUnits_eq_one_of_mem_primeFieldUnits [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (u : normOneUnits p q) (hu : (u : (GaloisField p q)ˣ) ∈ primeFieldUnits p q) :
+    u = 1 := by
+  have hx : (u : (GaloisField p q)ˣ) ∈ primeFieldUnits p q ⊓ normOneUnits p q := by
+    exact ⟨hu, u.property⟩
+  rw [primeFieldUnits_inf_normOneUnits_eq_bot p q hq hA] at hx
+  exact Subtype.ext hx
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (prime-line core)**: on a nonzero
+prime-field line `𝔽_p s`, if a norm-one unit `u` carries one nonzero prime-field
+multiple into a relation with another, then `u = 1`.  In BG notation this is the
+finite-field calculation behind `s₁ u s₂ ∈ U` forcing `u = 1` in the nonzero
+case. -/
+theorem normOneUnits_eq_one_of_primeLine_relation [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) {c d : ZMod p} (hc : c ≠ 0) (hd : d ≠ 0)
+    (u : normOneUnits p q)
+    (h : (algebraMap (ZMod p) (GaloisField p q) c) * s +
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+          ((algebraMap (ZMod p) (GaloisField p q) d) * s)) = 0) :
+    u = 1 := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  let uval : F := ((u : Fˣ) : F)
+  have hfactor : (emb c + uval * emb d) * s = 0 := by
+    change (emb c) * s + uval * ((emb d) * s) = 0 at h
+    rw [add_mul, mul_assoc]
+    exact h
+  have hcoef : emb c + uval * emb d = 0 := by
+    exact (mul_eq_zero.mp hfactor).resolve_right hs
+  have hdF : emb d ≠ 0 := by
+    exact (map_ne_zero emb).2 hd
+  have hmul : uval * emb d = - emb c := by
+    rw [add_comm] at hcoef
+    exact eq_neg_of_add_eq_zero_left hcoef
+  have huval : uval = - emb c / emb d := by
+    calc
+      uval = (uval * emb d) / emb d := by rw [mul_div_cancel_right₀ _ hdF]
+      _ = - emb c / emb d := by rw [hmul]
+  have hbne : -c / d ≠ 0 := by
+    exact div_ne_zero (neg_ne_zero.mpr hc) hd
+  let b : (ZMod p)ˣ := Units.mk0 (-c / d) hbne
+  have hbmap : Units.map emb.toMonoidHom b = (u : Fˣ) := by
+    apply Units.ext
+    change emb (-c / d) = uval
+    rw [huval]
+    simp [emb]
+  have hu_prime : (u : Fˣ) ∈ primeFieldUnits p q := by
+    exact ⟨b, hbmap⟩
+  exact normOneUnits_eq_one_of_mem_primeFieldUnits p q hq hA u hu_prime
+
+/-- **BG Appendix C, Lemma C.3, Step 2 (prime-line form)**: for a nonzero
+prime-field line `𝔽_p s`, the additive relation corresponding to
+`s₁ u s₂ ∈ U` has only the two BG alternatives: either both prime-field
+coefficients vanish, or `u = 1` and the coefficients sum to zero. -/
+theorem generatorRelation_step2_primeLine [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) (c d : ZMod p) (u : normOneUnits p q)
+    (h : (algebraMap (ZMod p) (GaloisField p q) c) * s +
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) *
+          ((algebraMap (ZMod p) (GaloisField p q) d) * s)) = 0) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  let F := GaloisField p q
+  let emb : ZMod p →+* F := algebraMap (ZMod p) F
+  by_cases hc : c = 0
+  · left
+    refine ⟨hc, ?_⟩
+    subst c
+    have hmul : (((u : Fˣ) : F) * (emb d * s)) = 0 := by
+      simpa [emb] using h
+    have huds : emb d * s = 0 := by
+      exact (mul_eq_zero.mp hmul).resolve_left (Units.ne_zero (u : Fˣ))
+    have hdemb : emb d = 0 := by
+      exact (mul_eq_zero.mp huds).resolve_right hs
+    by_contra hd
+    exact (map_ne_zero emb).2 hd hdemb
+  · by_cases hd : d = 0
+    · exfalso
+      subst d
+      have hmul : (emb c) * s = 0 := by
+        simpa [emb] using h
+      have hcemb : emb c = 0 := by
+        exact (mul_eq_zero.mp hmul).resolve_right hs
+      exact (map_ne_zero emb).2 hc hcemb
+    · right
+      have hu1 := normOneUnits_eq_one_of_primeLine_relation p q hq hA hs hc hd u h
+      refine ⟨hu1, ?_⟩
+      subst hu1
+      have hsum_mul : (emb (c + d)) * s = 0 := by
+        change emb c * s + ((1 : Fˣ) : F) * (emb d * s) = 0 at h
+        simpa [emb, map_add, add_mul] using h
+      have hsum_emb : emb (c + d) = 0 := by
+        exact (mul_eq_zero.mp hsum_mul).resolve_right hs
+      by_contra hsum
+      exact (map_ne_zero emb).2 hsum hsum_emb
+
+
+/-! ### Lemma C.3 Step 4: Frobenius stability of the norm set -/
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: in `𝔽_{p^q}`, the `p`-power
+Frobenius fixes the prime-field element `2`. -/
+lemma pow_p_natCast_two [Fact p.Prime] :
+    (2 : GaloisField p q) ^ p = 2 := by
+  simpa [frobenius_def] using
+    (map_natCast (frobenius (GaloisField p q) p) 2)
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the BG norm is compatible with the
+`p`-power Frobenius. -/
+theorem normN_pow_p [Fact p.Prime] (hq : q ≠ 0) (a : GaloisField p q) :
+    normN p q (a ^ p) = (normN p q a) ^ p := by
+  rw [normN_eq_algebraMap_norm p q hq, normN_eq_algebraMap_norm p q hq]
+  rw [← map_pow]
+  rw [← (Algebra.norm (ZMod p) (S := GaloisField p q)).map_pow a p]
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the `p`-power Frobenius carries
+`2 - a` to `2 - a^p`. -/
+theorem two_sub_pow_p [Fact p.Prime] (a : GaloisField p q) :
+    ((2 : GaloisField p q) - a) ^ p = (2 : GaloisField p q) - a ^ p := by
+  have h := map_sub (frobenius (GaloisField p q) p) (2 : GaloisField p q) a
+  simpa [frobenius_def, pow_p_natCast_two p q] using h
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: in characteristic `p`, Frobenius
+turns a two-term sum into the sum of `p`-th powers. -/
+lemma add_pow_p [Fact p.Prime] (a b : GaloisField p q) :
+    a ^ p + b ^ p = (a + b) ^ p := by
+  have h := map_add (frobenius (GaloisField p q) p) a b
+  simpa [frobenius_def] using h.symm
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the norm set `E` is stable under
+the `p`-power Frobenius. -/
+theorem normSetE_pow_p [Fact p.Prime] (hq : q ≠ 0) {a : GaloisField p q}
+    (ha : a ∈ normSetE p q) :
+    a ^ p ∈ normSetE p q := by
+  constructor
+  · rw [normN_pow_p p q hq, ha.1, one_pow]
+  · rw [← two_sub_pow_p p q a, normN_pow_p p q hq, ha.2, one_pow]
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: if `a,b ∈ E` and `a+b=2`, then
+their Frobenius images again lie in `E` and still sum to `2`. -/
+theorem normSetE_frobenius_pair [Fact p.Prime] (hq : q ≠ 0)
+    {a b : GaloisField p q} (ha : a ∈ normSetE p q) (hb : b ∈ normSetE p q)
+    (hsum : a + b = 2) :
+    a ^ p ∈ normSetE p q ∧ b ^ p ∈ normSetE p q ∧ a ^ p + b ^ p = 2 := by
+  refine ⟨normSetE_pow_p p q hq ha, normSetE_pow_p p q hq hb, ?_⟩
+  rw [add_pow_p p q, hsum, pow_p_natCast_two p q]
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: under condition (A), a norm-one
+unit whose `(p - 1)`-st power is trivial is itself trivial.  This is the
+finite-group form of the line `w_i^{p-1}=1`, hence `w_i=1` by (A). -/
+theorem normOneUnits_eq_one_of_pow_sub_one_eq_one [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (u : normOneUnits p q) (hu : u ^ (p - 1) = 1) :
+    u = 1 := by
+  have hcard : Nat.card (normOneUnits p q) = (p ^ q - 1) / (p - 1) :=
+    normOneUnits_card p q hq.ne_zero
+  have horder_card : orderOf u ∣ (p ^ q - 1) / (p - 1) := by
+    simpa [hcard] using orderOf_dvd_natCard u
+  have horder_p : orderOf u ∣ p - 1 := orderOf_dvd_of_pow_eq_one hu
+  have horder_one : orderOf u = 1 :=
+    Nat.eq_one_of_dvd_coprimes hA horder_card horder_p
+  exact orderOf_eq_one_iff.mp horder_one
+
+/-- The twisted-inverse map attached to an automorphism `φ`: `x ↦ φ(x⁻¹)`.
+This is the abstract form of the last induction in BG Appendix C, Lemma C.3. -/
+def twistedInv {α : Type*} [Group α] (φ : MulAut α) (x : α) : α := φ x⁻¹
+
+@[simp] lemma twistedInv_twistedInv {α : Type*} [Group α] (φ : MulAut α)
+    (x : α) :
+    twistedInv φ (twistedInv φ x) = (φ ^ 2) x := by
+  simp [twistedInv, pow_two]
+
+/-- Odd iterates of the twisted-inverse map are a power of `φ` applied to the
+inverse. -/
+lemma iterate_twistedInv_odd {α : Type*} [Group α] (φ : MulAut α) (n : ℕ)
+    (x : α) :
+    Nat.iterate (twistedInv φ) (2 * n + 1) x = (φ ^ (2 * n + 1)) x⁻¹ := by
+  induction n with
+  | zero =>
+      simp [twistedInv]
+  | succ n ih =>
+      rw [show 2 * (n + 1) + 1 = 2 + (2 * n + 1) by omega]
+      rw [Function.iterate_add_apply]
+      rw [show
+          Nat.iterate (twistedInv φ) 2 (Nat.iterate (twistedInv φ) (2 * n + 1) x) =
+            twistedInv φ (twistedInv φ (Nat.iterate (twistedInv φ) (2 * n + 1) x)) by
+        rfl]
+      rw [twistedInv_twistedInv, ih]
+      simp [pow_add, pow_two]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 tail**: if a set is closed under the
+operation `x ↦ φ(x⁻¹)` and `φ` has odd order dividing `p`, then the set is closed
+under inversion.  This packages the final `n = p` induction in BG. -/
+theorem inv_mem_of_twistedInv_step {α : Type*} [Group α] (φ : MulAut α) (S : Set α)
+    {p : ℕ} (hpodd : Odd p) (hφp : φ ^ p = 1)
+    (hstep : ∀ x : α, x ∈ S → twistedInv φ x ∈ S) :
+    ∀ x : α, x ∈ S → x⁻¹ ∈ S := by
+  intro x hx
+  rcases hpodd with ⟨n, hp⟩
+  have hiter_mem_all :
+      ∀ m (x : α), x ∈ S → Nat.iterate (twistedInv φ) m x ∈ S := by
+    intro m
+    induction m with
+    | zero => intro x hx; simpa using hx
+    | succ m ih =>
+        intro x hx
+        change Nat.iterate (twistedInv φ) m (twistedInv φ x) ∈ S
+        exact ih (twistedInv φ x) (hstep x hx)
+  have hiter_mem : Nat.iterate (twistedInv φ) p x ∈ S := hiter_mem_all p x hx
+  subst p
+  rw [iterate_twistedInv_odd φ n x] at hiter_mem
+  simpa [hφp] using hiter_mem
+
+/-! ### The Frobenius semidirect product `P ⋊ U` for Lemmas C.2 and C.3 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the
 kernel factor in mathlib's `SemidirectProduct`. -/
@@ -405,6 +685,39 @@ theorem normOneFrobenius_conj_inl [Fact p.Prime] (u : normOneUnits p q)
   rw [← SemidirectProduct.inl_aut, SemidirectProduct.inl_inj]
   exact Multiplicative.toAdd.injective (normOneMulAction_apply p q u s)
 
+/-- **BG Appendix C, Lemma C.3, Step 1 semidirect form**: fixing a nonzero
+prime-field line `𝔽_p s`, every element of the concrete `P ⋊ U` can be written
+as `u s₁ v` with `u, v ∈ U` and `s₁ ∈ 𝔽_p s`. -/
+theorem normOneFrobenius_exists_inr_primeLine_inr [Fact p.Prime]
+    (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) (g : normOneFrobeniusGroup p q) :
+    ∃ c : ZMod p, ∃ u v : normOneUnits p q,
+      g = (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) c) * s)) *
+        SemidirectProduct.inr v := by
+  obtain ⟨c, u, hx⟩ :=
+    exists_normOne_mul_primeLine_eq p q hq hA (s := s) (x := g.left.toAdd) hs
+  refine ⟨c, u, u⁻¹ * g.right, ?_⟩
+  let y : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) c) * s
+  have hleft :
+      (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) =
+        (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) * SemidirectProduct.inr u⁻¹ := by
+    rw [normOneFrobenius_conj_inl p q u y]
+    simp [y, ofAdd_toAdd, ← hx]
+  calc
+    g = (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inr g.right := (SemidirectProduct.inl_left_mul_inr_right g).symm
+    _ = ((SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) * SemidirectProduct.inr u⁻¹) *
+          SemidirectProduct.inr g.right := by rw [hleft]
+    _ = (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) *
+          SemidirectProduct.inr (u⁻¹ * g.right) := by
+      simp [mul_assoc]
+
 /-- The BG pair condition `u*s + v*s = 2*s`, already used in
 `normOnePairSetAt`, is exactly the assertion that the corresponding two elements
 of the additive kernel `P ≤ H = P ⋊ U` multiply to `2*s`.  This is the concrete
@@ -422,6 +735,232 @@ theorem mem_normOnePairSetAt_iff_inl_mul_inl [Fact p.Prime] (s : GaloisField p q
   rw [← map_mul (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q),
     SemidirectProduct.inl_inj]
   exact Iff.rfl
+
+/-- **BG Appendix C, Lemma C.3, Step 2 semidirect form**: on a nonzero
+prime-field line `𝔽_p s`, if `s₁ u s₂` lies in the complement `U` inside the
+concrete `P ⋊ U`, then either both prime-line factors are trivial or `u=1` and
+the two prime-line factors multiply to the identity. -/
+theorem normOneFrobenius_generatorRelation_step2_primeLine [Fact p.Prime]
+    (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) {c d : ZMod p} (u : normOneUnits p q)
+    (hmem :
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) c) * s)) :
+            normOneFrobeniusGroup p q) *
+        SemidirectProduct.inr u *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) d) * s))) ∈
+      (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  let x : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) c) * s
+  let y : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) d) * s
+  obtain ⟨v, hv⟩ := hmem
+  have hleft : x + (((u : (GaloisField p q)ˣ) : GaloisField p q) * y) = 0 := by
+    have hcongr := congrArg (fun g : normOneFrobeniusGroup p q => g.left.toAdd) hv
+    simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+      SemidirectProduct.left_inl, SemidirectProduct.right_inl, SemidirectProduct.left_inr,
+      SemidirectProduct.right_inr, map_one, one_mul, mul_one, toAdd_mul, toAdd_ofAdd,
+      normOneMulAction_apply] at hcongr
+    simpa [x, y, add_comm] using hcongr.symm
+  exact generatorRelation_step2_primeLine p q hq hA hs (c := c) (d := d) u
+    (by simpa [x, y] using hleft)
+
+/-- The additive subgroup `W ≤ P` inside the concrete Frobenius group `P ⋊ U`. -/
+noncomputable def normOneFrobeniusSubspaceKernel [Fact p.Prime]
+    (W : Submodule (ZMod p) (GaloisField p q)) :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  W.toAddSubgroup.toSubgroup.map
+    (SemidirectProduct.inl : additiveFieldGroup p q →* normOneFrobeniusGroup p q)
+
+/-- Membership in the embedded additive subspace is exactly membership in `W`. -/
+@[simp] theorem mem_normOneFrobeniusSubspaceKernel_inl [Fact p.Prime]
+    (W : Submodule (ZMod p) (GaloisField p q)) (s : GaloisField p q) :
+    (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈
+      normOneFrobeniusSubspaceKernel p q W ↔ s ∈ W := by
+  unfold normOneFrobeniusSubspaceKernel
+  constructor
+  · intro h
+    rcases h with ⟨x, hxW, hx⟩
+    have hx' : x = Multiplicative.ofAdd s := SemidirectProduct.inl_injective hx
+    simpa [hx'] using hxW
+  · intro hs
+    exact ⟨Multiplicative.ofAdd s, by simpa using hs, rfl⟩
+
+/-- The subgroup generated by an additive subspace `W ≤ P` and the norm-one
+complement `U` inside the concrete Frobenius group `P ⋊ U`. -/
+noncomputable def normOneFrobeniusSubspaceGroup [Fact p.Prime]
+    (W : Submodule (ZMod p) (GaloisField p q)) :
+    Subgroup (normOneFrobeniusGroup p q) :=
+  normOneFrobeniusSubspaceKernel p q W ⊔
+    (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
+
+/-- **BG Appendix C, Lemma C.3, Step 3 semidirect input**: under condition (A),
+if a nonzero additive subspace `W ≤ P` is invariant under `U`, then `W` together
+with `U` generates the whole concrete Frobenius group `P ⋊ U`.  This packages
+the irreducibility step used when `(P ∩ X)U` is larger than `U`. -/
+theorem normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (W : Submodule (ZMod p) (GaloisField p q))
+    (hU : ∀ u : normOneUnits p q, ∀ x : GaloisField p q, x ∈ W →
+      (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈ W)
+    (hne : W ≠ ⊥) :
+    normOneFrobeniusSubspaceGroup p q W = ⊤ := by
+  classical
+  have hW := normOneUnits_invariant_submodule_eq_top_of_ne_bot p q hq hA W hU hne
+  apply le_antisymm le_top
+  intro x _
+  rw [← SemidirectProduct.inl_left_mul_inr_right x]
+  unfold normOneFrobeniusSubspaceGroup
+  refine Subgroup.mul_mem_sup ?_ ?_
+  · unfold normOneFrobeniusSubspaceKernel
+    refine ⟨x.left, ?_, rfl⟩
+    rw [hW]
+    simp
+  · exact ⟨x.right, rfl⟩
+
+/-- Additive-kernel preimage of a subgroup `X ≤ P ⋊ U`. -/
+noncomputable def normOneFrobeniusKernelPreimageAddSubgroup [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) : AddSubgroup (GaloisField p q) where
+  carrier := {s | (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X}
+  zero_mem' := by
+    simp
+  add_mem' := by
+    intro a b ha hb
+    have hmul := X.mul_mem ha hb
+    simpa [← map_mul, ofAdd_add] using hmul
+  neg_mem' := by
+    intro a ha
+    have hinv := X.inv_mem ha
+    simpa using hinv
+
+/-- The additive-kernel preimage of `X ≤ P ⋊ U`, viewed as an `𝔽_p`-subspace. -/
+noncomputable def normOneFrobeniusKernelPreimageSubmodule [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) : Submodule (ZMod p) (GaloisField p q) :=
+  AddSubgroup.toZModSubmodule (n := p) (normOneFrobeniusKernelPreimageAddSubgroup p q X)
+
+/-- Membership in the kernel-preimage subspace is membership of the corresponding
+embedded additive element in `X`. -/
+@[simp] theorem mem_normOneFrobeniusKernelPreimageSubmodule [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q)) (s : GaloisField p q) :
+    s ∈ normOneFrobeniusKernelPreimageSubmodule p q X ↔
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X := by
+  rfl
+
+/-- If `X` contains the norm-one complement `U`, then its additive-kernel preimage
+is stable under the `U` action. -/
+theorem normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X) :
+    ∀ u : normOneUnits p q, ∀ x : GaloisField p q,
+      x ∈ normOneFrobeniusKernelPreimageSubmodule p q X →
+        (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈
+          normOneFrobeniusKernelPreimageSubmodule p q X := by
+  intro u x hx
+  have hu : (SemidirectProduct.inr u : normOneFrobeniusGroup p q) ∈ X := hUle ⟨u, rfl⟩
+  have hxX :
+      (SemidirectProduct.inl (Multiplicative.ofAdd x) : normOneFrobeniusGroup p q) ∈ X := by
+    simpa using hx
+  have huinv : (SemidirectProduct.inr u⁻¹ : normOneFrobeniusGroup p q) ∈ X := by
+    simpa using X.inv_mem hu
+  have hconj :
+      (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd x) * SemidirectProduct.inr u⁻¹ ∈ X := by
+    exact X.mul_mem (X.mul_mem hu hxX) huinv
+  rw [normOneFrobenius_conj_inl p q u x] at hconj
+  simpa using hconj
+
+/-- A subgroup `X ≤ P ⋊ U` with a nontrivial additive-kernel element has nonzero
+additive-kernel preimage. -/
+theorem normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl [Fact p.Prime]
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hker : ∃ s : GaloisField p q, s ≠ 0 ∧
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X) :
+    normOneFrobeniusKernelPreimageSubmodule p q X ≠ ⊥ := by
+  rcases hker with ⟨s, hs0, hsX⟩
+  intro hbot
+  have hsW : s ∈ normOneFrobeniusKernelPreimageSubmodule p q X := hsX
+  rw [hbot] at hsW
+  exact hs0 hsW
+
+/-- **BG Appendix C, Lemma C.3, Step 3 subgroup form**: in the concrete
+`P ⋊ U`, any subgroup containing the complement `U` and one nontrivial
+additive-kernel element is all of `P ⋊ U`.  This is the formal version of the
+irreducibility step `X ≠ U ⇒ X = PU`. -/
+theorem normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+    [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X)
+    (hker : ∃ s : GaloisField p q, s ≠ 0 ∧
+      (SemidirectProduct.inl (Multiplicative.ofAdd s) : normOneFrobeniusGroup p q) ∈ X) :
+    X = ⊤ := by
+  classical
+  let W := normOneFrobeniusKernelPreimageSubmodule p q X
+  have hU : ∀ u : normOneUnits p q, ∀ x : GaloisField p q, x ∈ W →
+      (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈ W := by
+    simpa [W] using normOneFrobeniusKernelPreimageSubmodule_invariant_of_inr_range_le p q X hUle
+  have hne : W ≠ ⊥ := by
+    simpa [W] using normOneFrobeniusKernelPreimageSubmodule_ne_bot_of_exists_inl p q X hker
+  have hWtop := normOneUnits_invariant_submodule_eq_top_of_ne_bot p q hq hA W hU hne
+  apply le_antisymm le_top
+  intro g _
+  rw [← SemidirectProduct.inl_left_mul_inr_right g]
+  have hleft : (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) ∈ X := by
+    have hgW : g.left.toAdd ∈ W := by
+      rw [hWtop]
+      simp
+    simpa [W, ofAdd_toAdd] using hgW
+  have hright : (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q) ∈ X :=
+    hUle ⟨g.right, rfl⟩
+  exact X.mul_mem hleft hright
+
+/-- **BG Appendix C, Lemma C.3, Step 3 subgroup dichotomy**: in the concrete
+`P ⋊ U`, any subgroup containing the complement `U` is either exactly `U` or all
+of `P ⋊ U`.  This is the direct semidirect-product form of BG's `X ≠ U ⇒ X=PU`
+step. -/
+theorem normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
+    [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (X : Subgroup (normOneFrobeniusGroup p q))
+    (hUle : (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range ≤ X)
+    (hne : X ≠
+      (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range) :
+    X = ⊤ := by
+  classical
+  let U : Subgroup (normOneFrobeniusGroup p q) :=
+    (SemidirectProduct.inr : normOneUnits p q →* normOneFrobeniusGroup p q).range
+  have hnot_le : ¬ X ≤ U := by
+    intro hXle
+    exact hne (le_antisymm hXle hUle)
+  change ¬ ∀ g, g ∈ X → g ∈ U at hnot_le
+  rw [not_forall] at hnot_le
+  obtain ⟨g, hg⟩ := hnot_le
+  obtain ⟨hgX, hgU⟩ := Classical.not_imp.mp hg
+  have hgleft_ne : g.left.toAdd ≠ 0 := by
+    intro hzero
+    apply hgU
+    refine ⟨g.right, ?_⟩
+    rw [← SemidirectProduct.inl_left_mul_inr_right g]
+    rw [← ofAdd_toAdd g.left, hzero]
+    simp
+  have hright : (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q) ∈ X :=
+    hUle ⟨g.right, rfl⟩
+  have hleftX : (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) ∈ X := by
+    have hprod :
+        g * (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q)⁻¹ ∈ X :=
+      X.mul_mem hgX (X.inv_mem hright)
+    have hprod_eq :
+        g * (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q)⁻¹ =
+          SemidirectProduct.inl g.left := by
+      simpa [SemidirectProduct.inl_left_mul_inr_right g] using
+        (mul_inv_cancel_right
+          (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q)
+          (SemidirectProduct.inr g.right : normOneFrobeniusGroup p q))
+    rwa [hprod_eq] at hprod
+  refine normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_exists_inl
+    p q hq hA X hUle ?_
+  exact ⟨g.left.toAdd, hgleft_ne, by simpa [ofAdd_toAdd] using hleftX⟩
 
 /-! ## Lemma C.1 machinery: the Möbius iterate and the sequence `d_k` -/
 
@@ -446,6 +985,121 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
   have := ha.2
   rw [h, normN_zero p q hq] at this
   exact zero_ne_one this
+
+/-- The product norm sends inverses to inverses. -/
+lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
+    normN p q a⁻¹ = (normN p q a)⁻¹ := by
+  simp [normN, inv_pow, Finset.prod_inv_distrib]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 tail for the norm set**: if an
+automorphism of the unit group has odd `p`-th power equal to the identity and
+sends every `u ∈ E` to `φ(u⁻¹) ∈ E`, then the norm set is inverse-closed.
+This is the finite-field target of BG's final induction after the generator
+relations have produced the one-step twisted inverse. -/
+theorem normSetE_eq_inv_of_twisted_unit_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : ∀ u : (GaloisField p q)ˣ,
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+        ((twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q) :
+    normSetE p q = (normSetE p q)⁻¹ := by
+  classical
+  let EUnits : Set (GaloisField p q)ˣ :=
+    {u | ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q}
+  have hinv_units : ∀ u : (GaloisField p q)ˣ, u ∈ EUnits → u⁻¹ ∈ EUnits := by
+    exact inv_mem_of_twistedInv_step φ EUnits hpodd hφp hstep
+  ext a
+  constructor
+  · intro ha
+    rw [Set.mem_inv]
+    let u : (GaloisField p q)ˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)
+    have hu : u ∈ EUnits := by simpa [EUnits, u] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u] using hui
+  · intro ha
+    rw [Set.mem_inv] at ha
+    let u : (GaloisField p q)ˣ := Units.mk0 a⁻¹ (ne_zero_of_mem_normSetE p q hq ha)
+    have hu : u ∈ EUnits := by simpa [EUnits, u] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u] using hui
+
+/-- Algebraic tail of **BG Appendix C, Lemma C.3**: once the generator-relation
+calculation has produced `N(2 * a - 1) = 1`, an element `a ∈ E` has inverse in
+`E`.  Indeed `2 - a⁻¹ = a⁻¹ * (2 * a - 1)`. -/
+lemma inv_mem_normSetE_of_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q)
+    (hrel : normN p q ((2 : GaloisField p q) * a - 1) = 1) :
+    a⁻¹ ∈ normSetE p q := by
+  have ha0 : a ≠ 0 := ne_zero_of_mem_normSetE p q hq ha
+  refine ⟨?_, ?_⟩
+  · rw [normN_inv, ha.1, inv_one]
+  · have hcalc :
+        (2 : GaloisField p q) - a⁻¹ = a⁻¹ * ((2 : GaloisField p q) * a - 1) := by
+      field_simp [ha0]
+    rw [hcalc, normN_mul, normN_inv, ha.1, inv_one, one_mul, hrel]
+
+/-- A C.3 generator-relation output in the form `N(2 * a - 1) = 1` for every
+`a ∈ E` implies the usual inversion closure `E = E⁻¹`. -/
+theorem normSetE_eq_inv_of_forall_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 < q)
+    (hrel : ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1) :
+    normSetE p q = (normSetE p q)⁻¹ := by
+  ext a
+  constructor
+  · intro ha
+    rw [Set.mem_inv]
+    exact inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a ha)
+  · intro ha
+    rw [Set.mem_inv] at ha
+    simpa using inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a⁻¹ ha)
+
+/-- Conversely, inverse-closure of `E` gives the generator-relation norm
+identity used by the Peterfalvi Section 16 interface.  This is the algebraic
+tail `2 * a - 1 = a * (2 - a⁻¹)`. -/
+theorem forall_normN_two_mul_sub_one_of_normSetE_eq_inv [Fact p.Prime] (hq : 0 < q)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
+  intro a ha
+  have ha0 : a ≠ 0 := ne_zero_of_mem_normSetE p q hq ha
+  have hainv : a⁻¹ ∈ normSetE p q := by
+    have ha_invset : a ∈ (normSetE p q)⁻¹ := by
+      rw [← hEinv]
+      exact ha
+    rwa [Set.mem_inv] at ha_invset
+  have hcalc :
+      (2 : GaloisField p q) * a - 1 = a * ((2 : GaloisField p q) - a⁻¹) := by
+    field_simp [ha0]
+  rw [hcalc, normN_mul, ha.1, hainv.2, one_mul]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 adapter**: the one-step twisted inverse
+output produced by the generator-relation calculation implies the concrete
+norm identity `N(2 * a - 1) = 1` for every `a ∈ E`. -/
+theorem forall_normN_two_mul_sub_one_of_twisted_unit_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : ∀ u : (GaloisField p q)ˣ,
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+        ((twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
+  exact forall_normN_two_mul_sub_one_of_normSetE_eq_inv p q hq
+    (normSetE_eq_inv_of_twisted_unit_step p q hq hpodd φ hφp hstep)
+
+/-- **BG Appendix C, Lemma C.3, note (`p = 3`)**: in characteristic three the
+generator-relation argument is unnecessary.  Since `2 * a - 1 = 2 - a`, every
+`a ∈ E` already satisfies the relation needed to put `a⁻¹` back in `E`. -/
+theorem normSetE_eq_inv_of_p_eq_three [Fact (Nat.Prime 3)] (hq : 0 < q) :
+    normSetE 3 q = (normSetE 3 q)⁻¹ := by
+  apply normSetE_eq_inv_of_forall_normN_two_mul_sub_one (p := 3) (q := q) hq
+  intro a ha
+  haveI : CharP (GaloisField 3 q) 3 := by
+    rw [← Algebra.charP_iff (ZMod 3) (GaloisField 3 q) 3]
+    exact ZMod.charP 3
+  have hthree : (3 : GaloisField 3 q) = 0 := by
+    change ((3 : ℕ) : GaloisField 3 q) = 0
+    rw [CharP.cast_eq_zero_iff (GaloisField 3 q) 3]
+  have hcalc : ((2 : GaloisField 3 q) * a - 1) = 2 - a := by
+    linear_combination (a - 1) * hthree
+  simpa [hcalc] using ha.2
 
 /-- BG Appendix C, Lemma C.2 structure-constant bridge: the norm set `E` is in
 bijection with pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.  This is the
