@@ -1501,6 +1501,51 @@ noncomputable def indChainDecomposition_of_isCoherent
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
+/-- H78-facing per-term Ind equation in the constructed Ind-chain package. -/
+theorem indChain_image_eq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime)
+    (t : Fin n) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    τ (ζ t - (d t) • ζ 0) = data.χ t - (d t) • data.χ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ (ζ t - (d t) • ζ 0) = data.χ t - (d t) • data.χ 0
+  exact data.image_eq t
+
+/-- H78-facing reference-index vanishing for the per-term Ind equation. -/
+theorem indChain_image_eq_zero_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    τ (ζ 0 - (d 0) • ζ 0) = 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ (ζ 0 - (d 0) • ζ 0) = 0
+  exact data.image_eq_zero
+
 /-- H78-facing orthonormality formula for the Ind-chain output family. -/
 theorem indChain_inner_chi_eq_ite_of_isCoherent
     (H78 : Hypothesis78 G A L)

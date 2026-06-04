@@ -639,3 +639,13 @@ complex Parseval form を H78/S07 witness 入力列から直接返す adapter �
 
 前回までの raw/normalized weighted Ind 方程式と合わせて、§9 downstream は
 weighted output の係数・norm・image equation をすべて H78 表記から呼べる。
+
+### 2026-06-05 pass: H78 per-term Ind-chain image equations
+
+S09 に `Hypothesis78.indChain_image_eq_of_isCoherent` と
+`Hypothesis78.indChain_image_eq_zero_of_isCoherent` を追加した。
+S08 `IndChainDecomposition` の per-term image equation と reference-index vanishing を、
+H78/S07 witness 入力列から直接返す adapter 形。
+
+これで weighted sum に集約する前の各 source difference 項も、§9 側から `data := ...`
+を手で作らず参照できる。

@@ -2184,6 +2184,10 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_eq_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_eq_zero_of_isCoherent
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_eq_ite_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_weightedOutput_of_isCoherent
