@@ -497,6 +497,66 @@ theorem exists_sigma_normOne_primeLine_normOne_of_mem_PU
           data.sigma (SemidirectProduct.inr v : fieldNormalizerFrobeniusGroup hyp) := by
       simp [map_mul]
 
+/-- BG Appendix C, Lemma C.3 Step 2 inside concrete `P⋊U`: if
+`s₁ u s₂` lies in the complement, then either both prime-line factors are
+trivial or the complement factor is trivial and the prime-line factors cancel. -/
+theorem generatorRelation_step2_primeLine {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {c d : ZMod hyp.base.p}
+    (u : fieldNormalizerNormOneUnits hyp)
+    (hmem : (fieldNormalizerPrimeLineElement hyp c *
+        (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          fieldNormalizerPrimeLineElement hyp d) ∈ fieldNormalizerComplement hyp) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hmem_original :
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd
+            ((algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c) *
+              (1 : GaloisField hyp.base.p hyp.base.q))) : fieldNormalizerFrobeniusGroup hyp) *
+        SemidirectProduct.inr u *
+          SemidirectProduct.inl
+            (Multiplicative.ofAdd
+              ((algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) d) *
+                (1 : GaloisField hyp.base.p hyp.base.q)))) ∈
+        (SemidirectProduct.inr : fieldNormalizerNormOneUnits hyp →*
+          fieldNormalizerFrobeniusGroup hyp).range := by
+    simpa [fieldNormalizerPrimeLineElement, fieldNormalizerComplement] using hmem
+  exact
+    OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime data.cyclotomic_coprime
+      (s := (1 : GaloisField hyp.base.p hyp.base.q)) one_ne_zero
+      (c := c) (d := d) u hmem_original
+
+/-- BG Appendix C, Lemma C.3 Step 2 transported to `G`: the same alternative can
+be read from membership of the transported product in `U`. -/
+theorem generatorRelation_step2_primeLine_of_sigma_mem_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {c d : ZMod hyp.base.p} (u : fieldNormalizerNormOneUnits hyp)
+    (hmem : data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) ∈ hyp.base.U) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  have hmem_map : data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) ∈
+      (fieldNormalizerComplement hyp).map data.sigma := by
+    rwa [data.sigma_U_eq_U]
+  rcases hmem_map with ⟨g, hgU, hg⟩
+  let prodH : fieldNormalizerFrobeniusGroup hyp :=
+    fieldNormalizerPrimeLineElement hyp c *
+      (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp d
+  have hprod_sigma : data.sigma prodH =
+      data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) := by
+    simp [prodH, map_mul]
+  have hg_eq : g = prodH := data.sigma_injective (by
+    rw [hg, hprod_sigma])
+  have hmemH : prodH ∈ fieldNormalizerComplement hyp := by
+    simpa [← hg_eq] using hgU
+  exact data.generatorRelation_step2_primeLine u hmemH
+
 /-- Applying the norm-one/unit equivalence is just `σ` on the concrete
 semidirect-product complement. -/
 theorem normOneUnitsEquivU_apply_coe {hyp : Hypothesis (G := G)}

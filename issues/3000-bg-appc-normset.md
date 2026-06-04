@@ -221,6 +221,10 @@ created: 2026-06-04
   `exists_normOne_primeLine_normOne`、`exists_sigma_normOne_primeLine_normOne_of_mem_PU` を公開し、
   concrete `P⋊U` と transported `PU` の任意元を `u s₁ v` に分解できる入口を固定。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 2 generator-relation bridge**: `generatorRelation_step2_primeLine` と
+  `generatorRelation_step2_primeLine_of_sigma_mem_U` を公開し、`s₁ u s₂∈U` から
+  BG Step2 の二択を concrete `P⋊U` と transported `G` の両方で読めるようにした。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 sigma normal-form bridge**: `sigma_eq_left_eq`、
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の

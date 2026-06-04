@@ -333,6 +333,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 さらに `fieldNormalizerPrimeLineElement`、`exists_normOne_primeLine_normOne`、
 `exists_sigma_normOne_primeLine_normOne_of_mem_PU` により、BG Step1 の `u s₁ v` 分解を
 concrete `P⋊U` と transported `PU` の双方で使える形にした。
+さらに `generatorRelation_step2_primeLine` /
+`generatorRelation_step2_primeLine_of_sigma_mem_U` により、BG Step2 の `s₁ u s₂∈U`
+判定を concrete `P⋊U` と transported `G` の両方で使えるようにした。
 また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
 `sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
 `left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。

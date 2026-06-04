@@ -2485,6 +2485,10 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_normOne_primeLine_normOne
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine_of_sigma_mem_U
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
