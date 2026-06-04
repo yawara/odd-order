@@ -716,3 +716,16 @@ S09 に `FrobeniusFamily.base_estimate_of_family71_reduced_estimates` と
 `1 - e_i/h_i ≤ ‖χ^{ρ_i}‖²`、および `𝓑` 外の非負寄与。
 
 従来外部仮定だった `hred` は、この入口では (7.5) family inequality から生成される。
+
+### 2026-06-05 pass: `G₀` identity contribution from signed irreducibility
+
+S09 に `FrobeniusFamily.one_le_G0_norm_sum_of_signed_irreducible` と、
+それを使う `base_estimate_of_family71_reduced_estimates_of_signed_irreducible` /
+`characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible` を追加した。
+
+これは Peterfalvi (7.10) proof の表示
+`(|G₀|-1)/|G| ≥ (|G₀|-χ₁(1)^2)/|G|`
+に対応する Lean 実装。`1 ∈ G₀` と
+`χ₁ = ± ξ` (`ξ ∈ Irr G`) から `1 ≤ |χ₁(1)|²` を証明し、
+前回 constructor の外部入力 `hG0sum : 1 ≤ Σ_{g∈G₀}|χ(g)|²` を
+signed irreducible witness から生成できるようにした。

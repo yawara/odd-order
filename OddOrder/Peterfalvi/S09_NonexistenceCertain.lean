@@ -4199,6 +4199,61 @@ lemma one_mem_G0 (F : FrobeniusFamily G k) : (1 : G) ∈ F.G0 := by
   intro i
   exact F.one_not_mem_kernelSpread i
 
+open scoped Classical in
+/-- The identity contribution in Peterfalvi (7.10): since `1 ∈ G₀`, any class
+function with `1 ≤ |χ(1)|²` contributes at least `1` to the `G₀` norm sum. -/
+lemma one_le_G0_norm_sum_of_one_le_norm_one [Fintype G]
+    (F : FrobeniusFamily G k) (χ : ClassFunction G ℂ)
+    (hone : (1 : ℝ) ≤ ‖(χ : G → ℂ) 1‖ ^ 2) :
+    (1 : ℝ) ≤
+      ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+        ‖(χ : G → ℂ) g‖ ^ 2 := by
+  classical
+  have hmem : (1 : G) ∈ Finset.univ.filter (fun g : G => g ∈ F.G0) := by
+    simp [F.one_mem_G0]
+  exact hone.trans
+    (Finset.single_le_sum (f := fun g : G => ‖(χ : G → ℂ) g‖ ^ 2)
+      (fun g _ => sq_nonneg _) hmem)
+
+/-- A signed irreducible character has `|χ(1)|² ≥ 1`.  This is the numerical
+content behind the `χ₁(1)^2` term in Peterfalvi (7.10). -/
+lemma one_le_norm_sq_apply_one_of_signed_irreducible
+    (χ : ClassFunction G ℂ) (ε : ℤ)
+    (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_one :
+      (χ : G → ℂ) 1 =
+        (ε : ℂ) * ((ξ : ClassFunction G ℂ) : G → ℂ) 1) :
+    (1 : ℝ) ≤ ‖(χ : G → ℂ) 1‖ ^ 2 := by
+  obtain ⟨d, hdpos, hd⟩ :=
+    OddOrder.RepresentationTheory.irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  rw [hχ_one, hd]
+  rcases hε with rfl | rfl
+  · rw [Int.cast_one, one_mul, Complex.norm_natCast]
+    have hd1 : (1 : ℝ) ≤ d := by exact_mod_cast hdpos
+    nlinarith
+  · rw [Int.cast_neg, Int.cast_one, neg_one_mul, norm_neg, Complex.norm_natCast]
+    have hd1 : (1 : ℝ) ≤ d := by exact_mod_cast hdpos
+    nlinarith
+
+open scoped Classical in
+/-- Signed-irreducible form of the `G₀` identity contribution used in (7.10). -/
+lemma one_le_G0_norm_sum_of_signed_irreducible [Fintype G]
+    (F : FrobeniusFamily G k) (χ : ClassFunction G ℂ) (ε : ℤ)
+    (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ : χ = ε • (ξ : ClassFunction G ℂ)) :
+    (1 : ℝ) ≤
+      ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+        ‖(χ : G → ℂ) g‖ ^ 2 := by
+  have hχ_one :
+      (χ : G → ℂ) 1 =
+        (ε : ℂ) * ((ξ : ClassFunction G ℂ) : G → ℂ) 1 := by
+    rw [hχ, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
+      ClassFunction.smul_apply]
+  exact F.one_le_G0_norm_sum_of_one_le_norm_one χ
+    (one_le_norm_sq_apply_one_of_signed_irreducible χ ε ξ hε hχ_one)
+
 /-- Elements of L_i = N_G(H_i) conjugate H_i to itself. -/
 lemma mem_kernel_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
     {g x : G} (hg : g ∈ F.L i) :
@@ -5588,6 +5643,71 @@ noncomputable def characterEstimateData_of_family71_reduced_estimates
   base_estimate :=
     F.base_estimate_of_family71_reduced_estimates P χ hχ B hL hA hG0
       hB_ne hG0sum hi hgood
+
+open scoped Classical in
+/-- Signed-irreducible variant of
+`base_estimate_of_family71_reduced_estimates`.
+
+This packages the exact first inequality in Peterfalvi (7.10):
+`(|G₀|-1)/|G| ≥ (|G₀|-χ₁(1)^2)/|G|`, using that the selected `χ₁` is a signed
+irreducible character and `1 ∈ G₀`. -/
+lemma base_estimate_of_family71_reduced_estimates_of_signed_irreducible
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) :=
+  F.base_estimate_of_family71_reduced_estimates P χ hχ B hL hA hG0 hB_ne
+    (F.one_le_G0_norm_sum_of_signed_irreducible χ ε ξ hε hχ_signed)
+    hi hgood
+
+open scoped Classical in
+/-- Constructor form of the signed-irreducible `(7.5)` base assembly, retaining
+only the `𝓑`-sum bound as a separate final-assembly input. -/
+noncomputable def characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate :=
+    F.base_estimate_of_family71_reduced_estimates_of_signed_irreducible
+      P χ hχ B ε ξ hε hχ_signed hL hA hG0 hB_ne hi hgood
 
 /-- Constructor form of `CharacterEstimateData` from the real reduced family
 inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
