@@ -5615,6 +5615,71 @@ noncomputable def ofIsCoherent
   image_eq t := by
     rw [← hτ.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul]
 
+
 end IndChainDecomposition
+
+namespace SibleyDadeHypothesis
+
+/-- **(6.8.1) → (7.10), Frobenius case:** an `IndChainDecomposition` from the
+base-anchor common-index p-power X-chain data and generator-level `τ₃` glue.
+
+This is the S09-facing consumer form of the Frobenius/c1 capstone: it first builds the full
+`hyp.CoherenceTarget` using the base-anchor X-chain constructor and final generator-level glue, then
+turns that coherence witness into the `IndChainDecomposition` package used by the §9 weighted-sum
+argument. -/
+noncomputable def
+    indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+    {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
+      ν x =
+        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+          hF hXne hstepData).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction ↥L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ hyp.S)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u → ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
+    IndChainDecomposition (L := ↥L) (G := G) hyp.tau ζ d := by
+  exact IndChainDecomposition.ofIsCoherent
+    (hyp.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+      hF hXne hstepData ν hagreeX hagreeY hmixed hgen)
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+
+end SibleyDadeHypothesis
 
 end OddOrder.Peterfalvi.S08

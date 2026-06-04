@@ -4285,6 +4285,26 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     sorry
   exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
 
+/-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
+`CharacterEstimateData` package used to prove (7.10).
+
+This avoids routing through the still-open `card_G0_lower_bound`: once the §9 character theory has
+constructed `F.CharacterEstimateData`, the terminal `G₀ ≠ {1}` contradiction is already closed by
+the completed arithmetic and positivity lemmas. -/
+theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (hdata : F.CharacterEstimateData)
+    (hG0 : F.G0 = {(1 : G)}) : False := by
+  obtain ⟨i, hi⟩ := F.lowerBoundTerm_of_characterEstimateData hodd hdata
+  -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
+  have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
+  -- The right-hand side of (7.10) is strictly positive.
+  have hRHS := F.lowerBoundTerm_pos hodd i
+  -- But the conditional (7.10) lower bound says it is `≤ 0` — contradiction.
+  rw [hcard] at hi
+  have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
+  rw [hlhs, zero_div] at hi
+  linarith [hi, hRHS]
+
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 
 There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups

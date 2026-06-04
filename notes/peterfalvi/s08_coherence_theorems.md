@@ -1790,3 +1790,18 @@ S08 に Frobenius/c1 route の capstone adapter を追加。pass 19 では final
 これで Frobenius/c1 route の caller-facing input は、`Xset H'` nonempty、各 X-chain step の
 common-index p-power data、generator 上の `τ₃` agreement、generator 上の mixed-inner preservation、
 supported-span generation に縮約された。`hX` witness 自体は caller が構成しない。
+
+
+### 2026-06-04 pass 21: Frobenius c1 capstone to S09 Ind-chain data
+
+S08 に S09-facing adapter
+`SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+を追加。base-anchor common-index p-power X-chain data と generator-level `τ₃` glue から
+`hyp.CoherenceTarget` を内部構成し、`IndChainDecomposition.ofIsCoherent` で §9 の weighted-sum
+consumer package へ直接変換する。
+
+これは `hyp.CoherenceTarget` の単なるリネームではなく、§8 の coherence output を §9 の
+`ζ_t`/`d_t` chain interface に変換する caller-facing bridge。既存 capstone と同じく `H.Normal`
+instance は明示引数で受ける。`card_G0_lower_bound` 側はまだ
+`CharacterEstimateData` 構成待ちだが、(6.8) Frobenius/c1 route から (7.10) の Ind-chain consumer への
+接続点が明示化された。

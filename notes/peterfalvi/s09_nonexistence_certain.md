@@ -323,3 +323,14 @@ theorem non_orthogonality_two_families
 *訂正版 作成: 2026-05-27 (原典 `04.9` 162 行 精読 + scaffold 実装に基づく). 旧版 2026-05-22 は App.C 混同のため破棄.*
 *(7.8.a/b)/(7.9) spec + blocker 追記: 2026-05-30 (issue 0044, mmd L63-113 精読 + repo 型検証).*
 *Burnside (1.5.d) `sumIrreducibleDegreeSq` / `sumNontrivialIrreducibleDegreeSq` 実装完了: 2026-05-30 (issue 0044, `ColumnOrthogonality.lean`).*
+
+
+### 2026-06-04 pass: conditional (7.11) from `CharacterEstimateData`
+
+S09 に `not_trivial_G0_of_characterEstimateData` を追加。これは未完の
+`card_G0_lower_bound` を経由せず、既に完成している `lowerBoundTerm_of_characterEstimateData`
+と `lowerBoundTerm_pos` だけから `G₀ = {1}` の矛盾を出す conditional terminal theorem。
+
+これにより §9 の最終矛盾は「`CharacterEstimateData` の構成」へ完全に局所化された。`card_G0_lower_bound`
+本体の sorry はその data 構成部分に残るが、下流は必要なら conditional theorem を使って
+sorryAx を避けられる。AxiomsCheck に登録して axiom-clean にする。

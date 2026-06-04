@@ -46,6 +46,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -2108,6 +2109,12 @@ set_option linter.style.longLine false in
 -- Peterfalvi (7.10) consumer algebra: sum the Ind equations over an integral weighted source.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+-- Peterfalvi (7.11) conditional terminal contradiction from the named (7.10) estimate data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_characterEstimateData
 
 /-! ### Top-level Feit–Thompson reduction (downstream). -/
 
