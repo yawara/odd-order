@@ -3328,6 +3328,131 @@ theorem centralizer_scn3_map_le_maximal_of_fittingInG_isPGroup [Finite G]
     (centerFittingOpCoreInG_le_scn3_map_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA)
 
+/-- Inside `F(M)`, the centralizer of a local `SCN₃(P)` image is contained in that
+image when `F(M)` is a `p`-group. -/
+theorem centralizer_scn3_map_inf_fittingInG_le_scn3_map_of_fittingInG_isPGroup
+    [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    Subgroup.centralizer (A.map M.subtype : Set G) ⊓ fittingInG M ≤ A.map M.subtype := by
+  apply le_scn3_map_of_le_sylow_map_of_le_centralizer_map P hA
+  · exact inf_le_right.trans (fittingInG_le_sylow_map_of_isPGroup P hFp)
+  · exact inf_le_left
+
+/-- If `x` centralizes the image of a local `SCN₃(P)` subgroup, that image lies in
+`C_{F(M)}(<x>)`. -/
+theorem scn3_map_le_centralizer_zpowers_inf_fittingInG_of_mem_centralizer
+    {M : Subgroup G} {A : Subgroup ↥M} {x : G}
+    (hAF : A.map M.subtype ≤ fittingInG M)
+    (hxC : x ∈ Subgroup.centralizer (A.map M.subtype : Set G)) :
+    A.map M.subtype ≤ Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M := by
+  intro a haA
+  refine ⟨?_, hAF haA⟩
+  change a ∈ Subgroup.centralizer (Subgroup.zpowers x : Set G)
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  have hcomm_eq : (a : G) * x = x * (a : G) :=
+    Subgroup.mem_centralizer_iff.mp hxC (a : G) haA
+  have hcomm : Commute (a : G) x := hcomm_eq
+  exact (hcomm.symm.zpow_left n).eq
+
+/-- BG (8.11), Prop 1.10 input for the p-group case: an element of `C_G(A)` satisfies
+the self-centralizer condition on `C_{F(M)}(<x>)`. -/
+theorem centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_scn3_map
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    {x : G} (hxC : x ∈ Subgroup.centralizer (A.map M.subtype : Set G)) :
+    Subgroup.centralizer
+        ((Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
+          (fittingInG M) : Set ↥(fittingInG M))
+      ≤ (Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M).subgroupOf
+          (fittingInG M) := by
+  let Amap : Subgroup G := A.map M.subtype
+  let C : Subgroup G := Subgroup.centralizer (Subgroup.zpowers x : Set G) ⊓ fittingInG M
+  have hAF : Amap ≤ fittingInG M := by
+    dsimp [Amap]
+    exact scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+  have hCFA : Subgroup.centralizer (Amap : Set G) ⊓ fittingInG M ≤ Amap := by
+    dsimp [Amap]
+    exact centralizer_scn3_map_inf_fittingInG_le_scn3_map_of_fittingInG_isPGroup
+      P hFp hA
+  have hA_le_C : Amap ≤ C := by
+    dsimp [Amap, C]
+    exact scn3_map_le_centralizer_zpowers_inf_fittingInG_of_mem_centralizer hAF hxC
+  intro y hy
+  rw [Subgroup.mem_subgroupOf]
+  have hyA : (y : G) ∈ Amap := by
+    apply hCFA
+    rw [Subgroup.mem_inf]
+    refine ⟨?_, y.2⟩
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    let aF : ↥(fittingInG M) := ⟨a, hAF ha⟩
+    have haC : aF ∈ C.subgroupOf (fittingInG M) := by
+      rw [Subgroup.mem_subgroupOf]
+      exact hA_le_C ha
+    exact congrArg Subtype.val (Subgroup.mem_centralizer_iff.mp hy aF haC)
+  exact hA_le_C hyA
+
+/-- BG (8.11), containment form: `O_{p'}(C_G(A))` lies in `F(M)` in the p-group
+case. -/
+theorem opiCoreInG_singleton_compl_centralizer_scn3_map_le_fittingInG_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) ≤
+      fittingInG M := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  let C : Subgroup G := Subgroup.centralizer (A.map M.subtype : Set G)
+  let K : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ C
+  change K ≤ fittingInG M
+  intro x hxK
+  have hxC : x ∈ C := by
+    dsimp [K] at hxK
+    exact opiCoreInG_le ({p} : Set ℕ)ᶜ C hxK
+  have hxM : x ∈ M :=
+    centralizer_scn3_map_le_maximal_of_fittingInG_isPGroup hG hM hp P hFp hAP hA hxC
+  have hxpi_singleton : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (Subgroup.zpowers x) := by
+    intro r hr
+    have hz_le_K : Subgroup.zpowers x ≤ K := Subgroup.zpowers_le.mpr hxK
+    have hrK : r ∈ (Nat.card ↥K).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_dvd_of_le hz_le_K) Nat.card_pos.ne' hr
+    exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ C r hrK
+  have hxpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch2.S07.primesOf (fittingInG M))ᶜ
+      (Subgroup.zpowers x) := by
+    have hπ : OddOrder.BG.Ch2.S07.primesOf (fittingInG M) = ({p} : Set ℕ) :=
+      primesOf_fittingInG_eq_singleton_of_isPGroup hp hFp
+    simpa [hπ] using hxpi_singleton
+  exact mem_fittingInG_of_centralizer_self_zpowers hxM
+    (coprime_card_zpowers_fittingInG_of_isPiSubgroup_primesOf_compl hxpi)
+    (centralizer_zpowers_inf_fittingInG_self_of_mem_centralizer_scn3_map
+      hG hM hp P hFp hAP hA hxC)
+
+/-- BG (8.11): if `F(M)` is a `p`-group, then
+`O_{p'}(C_G(A)) = 1` for every local `SCN₃(P)` image `A`. -/
+theorem opiCoreInG_singleton_compl_centralizer_scn3_map_eq_bot_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) = ⊥ := by
+  exact eq_bot_of_le_of_isPiSubgroup_of_isPiSubgroup_compl
+    (opiCoreInG_singleton_compl_centralizer_scn3_map_le_fittingInG_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA)
+    (isPiSubgroup_singleton_of_isPGroup hFp)
+    (isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ
+      (Subgroup.centralizer (A.map M.subtype : Set G)))
+
 /-- In a nontrivial finite `p`-group, `Z(L(G))` is nontrivial. -/
 theorem zCenterLOdd_top_ne_bot_of_isPGroup
     {X : Type*} [Group X] [Finite X] {p : ℕ} [Fact p.Prime] [Nontrivial X]
@@ -3524,6 +3649,10 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     scn3_map_mem_scn3Global_of_sylow_map P hQ hAP hA
   have hCentM : Subgroup.centralizer (A.map M.subtype : Set G) ≤ M :=
     centralizer_scn3_map_le_maximal_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+  have hOpCentBot :
+      opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) = ⊥ :=
+    opiCoreInG_singleton_compl_centralizer_scn3_map_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA
   refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
