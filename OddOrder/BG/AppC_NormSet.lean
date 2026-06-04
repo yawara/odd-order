@@ -576,6 +576,56 @@ theorem normOneUnits_eq_one_of_pow_sub_one_eq_one [Fact p.Prime] (hq : q.Prime)
     Nat.eq_one_of_dvd_coprimes hA horder_card horder_p
   exact orderOf_eq_one_iff.mp horder_one
 
+/-- The twisted-inverse map attached to an automorphism `φ`: `x ↦ φ(x⁻¹)`.
+This is the abstract form of the last induction in BG Appendix C, Lemma C.3. -/
+def twistedInv {α : Type*} [Group α] (φ : MulAut α) (x : α) : α := φ x⁻¹
+
+@[simp] lemma twistedInv_twistedInv {α : Type*} [Group α] (φ : MulAut α)
+    (x : α) :
+    twistedInv φ (twistedInv φ x) = (φ ^ 2) x := by
+  simp [twistedInv, pow_two]
+
+/-- Odd iterates of the twisted-inverse map are a power of `φ` applied to the
+inverse. -/
+lemma iterate_twistedInv_odd {α : Type*} [Group α] (φ : MulAut α) (n : ℕ)
+    (x : α) :
+    Nat.iterate (twistedInv φ) (2 * n + 1) x = (φ ^ (2 * n + 1)) x⁻¹ := by
+  induction n with
+  | zero =>
+      simp [twistedInv]
+  | succ n ih =>
+      rw [show 2 * (n + 1) + 1 = 2 + (2 * n + 1) by omega]
+      rw [Function.iterate_add_apply]
+      rw [show
+          Nat.iterate (twistedInv φ) 2 (Nat.iterate (twistedInv φ) (2 * n + 1) x) =
+            twistedInv φ (twistedInv φ (Nat.iterate (twistedInv φ) (2 * n + 1) x)) by
+        rfl]
+      rw [twistedInv_twistedInv, ih]
+      simp [pow_add, pow_two]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 tail**: if a set is closed under the
+operation `x ↦ φ(x⁻¹)` and `φ` has odd order dividing `p`, then the set is closed
+under inversion.  This packages the final `n = p` induction in BG. -/
+theorem inv_mem_of_twistedInv_step {α : Type*} [Group α] (φ : MulAut α) (S : Set α)
+    {p : ℕ} (hpodd : Odd p) (hφp : φ ^ p = 1)
+    (hstep : ∀ x : α, x ∈ S → twistedInv φ x ∈ S) :
+    ∀ x : α, x ∈ S → x⁻¹ ∈ S := by
+  intro x hx
+  rcases hpodd with ⟨n, hp⟩
+  have hiter_mem_all :
+      ∀ m (x : α), x ∈ S → Nat.iterate (twistedInv φ) m x ∈ S := by
+    intro m
+    induction m with
+    | zero => intro x hx; simpa using hx
+    | succ m ih =>
+        intro x hx
+        change Nat.iterate (twistedInv φ) m (twistedInv φ x) ∈ S
+        exact ih (twistedInv φ x) (hstep x hx)
+  have hiter_mem : Nat.iterate (twistedInv φ) p x ∈ S := hiter_mem_all p x hx
+  subst p
+  rw [iterate_twistedInv_odd φ n x] at hiter_mem
+  simpa [hφp] using hiter_mem
+
 /-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the
@@ -661,6 +711,37 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
 lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
     normN p q a⁻¹ = (normN p q a)⁻¹ := by
   simp [normN, inv_pow, Finset.prod_inv_distrib]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 tail for the norm set**: if an
+automorphism of the unit group has odd `p`-th power equal to the identity and
+sends every `u ∈ E` to `φ(u⁻¹) ∈ E`, then the norm set is inverse-closed.
+This is the finite-field target of BG's final induction after the generator
+relations have produced the one-step twisted inverse. -/
+theorem normSetE_eq_inv_of_twisted_unit_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : ∀ u : (GaloisField p q)ˣ,
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+        ((twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q) :
+    normSetE p q = (normSetE p q)⁻¹ := by
+  classical
+  let EUnits : Set (GaloisField p q)ˣ :=
+    {u | ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q}
+  have hinv_units : ∀ u : (GaloisField p q)ˣ, u ∈ EUnits → u⁻¹ ∈ EUnits := by
+    exact inv_mem_of_twistedInv_step φ EUnits hpodd hφp hstep
+  ext a
+  constructor
+  · intro ha
+    rw [Set.mem_inv]
+    let u : (GaloisField p q)ˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)
+    have hu : u ∈ EUnits := by simpa [EUnits, u] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u] using hui
+  · intro ha
+    rw [Set.mem_inv] at ha
+    let u : (GaloisField p q)ˣ := Units.mk0 a⁻¹ (ne_zero_of_mem_normSetE p q hq ha)
+    have hu : u ∈ EUnits := by simpa [EUnits, u] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u] using hui
 
 /-- Algebraic tail of **BG Appendix C, Lemma C.3**: once the generator-relation
 calculation has produced `N(2 * a - 1) = 1`, an element `a ∈ E` has inverse in

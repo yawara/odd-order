@@ -160,6 +160,10 @@ created: 2026-06-04
   `a^p+b^p=2` を固定。さらに condition(A) から `u∈U` かつ `u^(p-1)=1` なら
   `u=1` を返す `normOneUnits_eq_one_of_pow_sub_one_eq_one` を追加。BG Step 4 の
   Frobenius propagation / “by (A)” 入力。AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 4 twisted-inverse induction tail**: BG 最後の
+  `(a⁻¹)^{t^3}` を p 回反復する議論を `inv_mem_of_twistedInv_step` として一般化し、
+  unit 上の one-step twisted inverse から `E=E⁻¹` を返す
+  `normSetE_eq_inv_of_twisted_unit_step` を証明。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
