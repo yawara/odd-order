@@ -278,6 +278,9 @@ allowlist):
   ⟹ `θᵢ(1)²∣head`). **additive equation**로 진술해 ℕ subtraction 회피.
 - **`sq_dvd_of_factored_coprime`** (ℕ): `χᵢ(1)=idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`.
   mmd L80 coprimality forcing (`(|L:K|,p)=1` & θ p-power ⟹ `Coprime idx² θ²`; coprime divisors 곱).
+- **2026-06-04 追記**: **`sq_dvd_of_factored_coprime_add_complement`** を追加。`head+tail=total`,
+  `θ²∣tail`, `θ²∣total`, `idx²∣head`, `χᵢ(1)=idx·θ`, `Coprime idx θ` から `χᵢ(1)²∣head` を直接返す
+  consumer-facing 版で、上の additive complement と coprime forcing を S08 `hdvd` 入力の形に合成する。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

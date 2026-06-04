@@ -1943,6 +1943,24 @@ theorem sq_dvd_of_factored_coprime
   calc idx * θ * (idx * θ) = (idx * idx) * (θ * θ) := by ring
     _ ∣ D := h
 
+/-- **Peterfalvi (6.6): full square-divisibility from the additive complement.**
+
+This is the consumer-facing form of mmd L78-80 for the prefix sum `head = ∑_{j<i}χⱼ(1)²`.
+If `θ²` divides the complementary tail and the total degree sum, it divides `head`; combined with
+`idx² ∣ head`, `χᵢ(1) = idx·θ`, and `Coprime idx θ`, the full square `χᵢ(1)²` divides `head`.
+
+It packages the two arithmetic steps above so the (6.6) coherence step can pass the square
+divisibility `hdvd` to `two_mul_degree_lt_sum_ratCast` directly from the character-theoretic
+sum identity and coprimality data. -/
+theorem sq_dvd_of_factored_coprime_add_complement
+    {idx θ chi head tail total : ℕ} (hsum : head + tail = total)
+    (hθtail : θ * θ ∣ tail) (hθtotal : θ * θ ∣ total)
+    (hidx : idx * idx ∣ head) (hchi : chi = idx * θ)
+    (hcop : Nat.Coprime idx θ) :
+    chi * chi ∣ head :=
+  sq_dvd_of_factored_coprime hchi
+    (dvd_of_add_eq_of_dvd_dvd hsum hθtail hθtotal) hidx hcop
+
 namespace CharacterPsiDecomposition
 
 open OddOrder.RepresentationTheory
