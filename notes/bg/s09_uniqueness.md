@@ -672,8 +672,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `S04.quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement`,
    `S04.isPGroup_quotient_oPiCore_of_hasNormalPComplement`, and
    `S04.card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement`.
-   The `q != p` Sylow-cardinality preservation needed to move induction layers
-   back from the complement is covered by
+   The `q != p` prime-factor bookkeeping needed to feed the induction hypothesis
+   on the complement is covered by
+   `S04.factorization_card_oPiCore_eq_factorization_card_of_hasNormalPComplement_ne`,
+   `S04.mem_primeFactors_oPiCore_iff_mem_primeFactors_card_of_hasNormalPComplement_ne`,
+   and `S04.largest_primeFactor_oPiCore_of_hasNormalPComplement_ne`: a largest
+   prime divisor of `G` remains a largest prime divisor of the canonical complement
+   once it is different from the complement prime.  The corresponding Sylow-cardinality
+   preservation needed to move induction layers back from the complement is covered by
    `S04.card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne`.  The
    corresponding characteristic subgroup lift is covered by
    `S04.exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne`,
