@@ -4047,6 +4047,54 @@ theorem sylow_inf_ne_bot_of_scn3_map_le [Finite G]
   intro hR_bot
   exact hAinf_ne (le_bot_iff.mp (hA_R.trans (le_of_eq hR_bot)))
 
+/-- BG (8.13), Sylow setup in `H`: if the local `SCN₃(P)` subgroup image lies in
+`H`, then it lies in a Sylow `p`-subgroup of `H`. -/
+theorem exists_sylow_containing_scn3_map_of_le
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M}
+    (hAP : A ≤ (P : Subgroup ↥M)) (hAH : A.map M.subtype ≤ H) :
+    ∃ R : Sylow p ↥H, (A.map M.subtype).subgroupOf H ≤ (R : Subgroup ↥H) := by
+  have hAsub_p : IsPGroup p (A.subgroupOf (P : Subgroup ↥M)) :=
+    P.isPGroup'.to_subgroup _
+  have hA_p : IsPGroup p A :=
+    hAsub_p.of_equiv (Subgroup.subgroupOfEquivOfLe hAP)
+  have hAmap_p : IsPGroup p (A.map M.subtype) :=
+    hA_p.map M.subtype
+  have hAH_p : IsPGroup p ((A.map M.subtype).subgroupOf H) :=
+    hAmap_p.of_equiv (Subgroup.subgroupOfEquivOfLe hAH).symm
+  exact hAH_p.exists_le_sylow
+
+/-- BG (8.13), nontriviality setup in `H`: a Sylow subgroup of `H` containing the
+local `SCN₃(P)` image is nontrivial. -/
+theorem sylow_ne_bot_of_scn3_map_le [Finite G]
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M}
+    (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    (hAH : A.map M.subtype ≤ H) {R : Sylow p ↥H}
+    (hA_R : (A.map M.subtype).subgroupOf H ≤ (R : Subgroup ↥H)) :
+    (R : Subgroup ↥H) ≠ ⊥ := by
+  have hAmap_ne : A.map M.subtype ≠ ⊥ :=
+    scn3_map_ne_bot_of_le_sylow P hAP hA
+  have hA_H_ne : (A.map M.subtype).subgroupOf H ≠ ⊥ := by
+    intro hA_H_bot
+    apply hAmap_ne
+    have hmap_bot : ((A.map M.subtype).subgroupOf H).map H.subtype = ⊥ := by
+      rw [hA_H_bot, Subgroup.map_bot]
+    rwa [Subgroup.map_subgroupOf_eq_of_le hAH] at hmap_bot
+  intro hR_bot
+  exact hA_H_ne (le_bot_iff.mp (hA_R.trans (le_of_eq hR_bot)))
+
+/-- If `Z(L(K))`, realized in the ambient group, is nontrivial and normal in a maximal
+subgroup `H`, then its ambient normalizer is exactly `H`. -/
+theorem normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {H : Subgroup G} (hH : H ∈ maximalSubgroups G)
+    {K : Subgroup ↥H}
+    (hZnorm : (((OddOrder.BG.AppB.zCenterLOdd K).map H.subtype).subgroupOf H).Normal)
+    (hZne : (OddOrder.BG.AppB.zCenterLOdd K).map H.subtype ≠ ⊥) :
+    Subgroup.normalizer (((OddOrder.BG.AppB.zCenterLOdd K).map H.subtype) : Set G) = H :=
+  normalizer_eq_of_normal_of_mem_maximal hG hH hZnorm hZne (Subgroup.map_subtype_le _)
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -4113,6 +4161,18 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro hZ_map_bot
     exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _
       (H ⊓ M).subtype_injective).mp hZ_map_bot)
+  obtain ⟨RH, hA_RH⟩ := exists_sylow_containing_scn3_map_of_le P hAP hAH
+  have hRH_ne_bot : (RH : Subgroup ↥H) ≠ ⊥ :=
+    sylow_ne_bot_of_scn3_map_le P hAP hA hAH hA_RH
+  have hZ_RH_ne_bot :
+      ((OddOrder.BG.AppB.zCenterLOdd (RH : Subgroup ↥H)).map H.subtype) ≠ ⊥ := by
+    have hZ_ne : OddOrder.BG.AppB.zCenterLOdd (RH : Subgroup ↥H) ≠ ⊥ :=
+      zCenterLOdd_ne_bot_of_isPGroup RH.isPGroup' hRH_ne_bot
+    intro hZ_map_bot
+    exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _ H.subtype_injective).mp hZ_map_bot)
+  have hNZ_RH_eq_H : Subgroup.normalizer
+      (((OddOrder.BG.AppB.zCenterLOdd (RH : Subgroup ↥H)).map H.subtype) : Set G) = H :=
+    normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot hG hH (hZNormH RH) hZ_RH_ne_bot
   sorry
 
 end OddOrder.BG.Ch2.S08
