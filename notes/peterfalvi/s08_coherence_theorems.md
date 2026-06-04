@@ -1699,3 +1699,22 @@ common-index p-power data のみ。これで c1 側は `coherentS_of_Xset_commut
 case-A irreducibility bridge は central/fpf な小さい `Z` 用であり、`H'` へ直接適用する primitive は
 ない。したがって c2 側はこの差分層を coherent に扱う bridge、または教科書どおり (6.8.3) の
 最終 upgrade を別途実装する必要がある。
+
+### 2026-06-04 pass 16: `X/Y` source-side orthogonality bridge
+
+`S08_CoherenceTheorems.lean` に `coherentS_of_Xset_commutator_Yset_glued` の source-side
+orthogonality input を discharge する bridge を追加:
+
+- `SibleyDadeHypothesis.inner_eq_zero_of_mem_span_of_disjoint_irreducible`: disjoint な
+  irreducible character 集合 `X`,`Y` について、`irreducibleCharacter_inner_eq_ite` と
+  span induction により `ℤ[X] ⟂ ℤ[Y]` を証明する一般 helper。
+- `SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_irreducible_X`: (6.8) の
+  `X=S-S(H')`, `Y=S(H')` に特殊化。`Y` 側 irreducibility は
+  `isIrreducibleCharacter_of_mem_Yset`、disjointness は `disjoint_Xset_Yset` から内部供給し、
+  caller は `Xset H' ⊆ Irr L` だけ渡せばよい。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X`: 上の
+  source orthogonality bridge を組み込んだ glue variant。
+
+これにより c1/Frobenius route では既存の `isIrreducibleCharacter_of_mem_Xset_of_frobenius` で
+source-side orthogonality が自動化される。残 input は `X` coherence, `τ₃` agreement,
+image-side orthogonality, supported-span generation。

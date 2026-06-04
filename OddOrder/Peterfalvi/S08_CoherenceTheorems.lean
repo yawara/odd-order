@@ -2923,6 +2923,55 @@ theorem isIrreducibleCharacter_of_mem_Yset
       rw [Ne, linearIrreducibleCharacter_eq_trivial_iff]
       exact hχ_ne)
 
+/-- Disjoint families of irreducible characters are orthogonal after passing to their
+integer spans. -/
+theorem inner_eq_zero_of_mem_span_of_disjoint_irreducible
+    {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
+    {X Y : Set (ClassFunction Γ ℂ)}
+    (hXirr : ∀ χ ∈ X, IsIrreducibleCharacter χ)
+    (hYirr : ∀ η ∈ Y, IsIrreducibleCharacter η)
+    (hdisj : Disjoint X Y) :
+    ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0 := by
+  intro u hu
+  induction hu using Submodule.span_induction with
+  | mem χ hχ =>
+      intro v hv
+      refine OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan ?_ hv
+      intro η hη
+      have hχη : χ ≠ η := by
+        intro h
+        exact (Set.disjoint_left.mp hdisj) hχ (by simpa [← h] using hη)
+      have hχirr : IsIrreducibleCharacter χ := hXirr χ hχ
+      have hηirr : IsIrreducibleCharacter η := hYirr η hη
+      have hneq :
+          (⟨χ, hχirr⟩ : IrreducibleCharacter Γ) ≠ ⟨η, hηirr⟩ := by
+        intro h
+        exact hχη (congrArg Subtype.val h)
+      simpa [hneq] using
+        irreducibleCharacter_inner_eq_ite
+          (⟨χ, hχirr⟩ : IrreducibleCharacter Γ) ⟨η, hηirr⟩
+  | zero =>
+      intro v _hv
+      exact ClassFunction.inner_zero_left v
+  | add x y _hx _hy ihx ihy =>
+      intro v hv
+      rw [ClassFunction.inner_add_left, ihx v hv, ihy v hv, zero_add]
+  | smul a x _hx ih =>
+      intro v hv
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih v hv, mul_zero]
+
+/-- Source-side orthogonality of the (6.8) partition `X = S - S(H')` and `Y = S(H')`,
+assuming the `X` side has already been shown irreducible. -/
+theorem inner_span_Xset_Yset_eq_zero_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    (hXirr : ∀ φ ∈ hyp.Xset ⁅H, H⁆, IsIrreducibleCharacter φ) :
+    ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset, ClassFunction.inner u v = 0 := by
+  letI : H.Normal := hyp.H_normal
+  exact inner_eq_zero_of_mem_span_of_disjoint_irreducible hXirr
+    (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hyp.disjoint_Xset_Yset
+
 /-- Enumerating `Yset` gives nontrivial linear source representatives for its induced members.
 
 The returned family is indexed by `Fin n`, covers `Yset` after induction, and is pairwise
@@ -3166,6 +3215,34 @@ noncomputable def coherentS_of_Xset_commutator_Yset_glued
     OddOrder.Peterfalvi.S07.coherentUnion_of_glued
       (hX := hX) (hY := hY) ν hagreeX hagreeY hsrc_ortho himg_ortho hgen
   simpa [hyp.Xset_union_Yset_eq_S] using hU
+
+/-- Variant of the (6.8) glue step where source-side orthogonality is discharged from
+irreducibility of the `X` side and disjointness of the `X/Y` partition. -/
+noncomputable def coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hXirr : ∀ φ ∈ hyp.Xset ⁅H, H⁆, IsIrreducibleCharacter φ)
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆), ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ hyp.Yset,
+      ν v = hyp.coherentYset.extension v)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset,
+        ClassFunction.inner (hX.extension u) (hyp.coherentYset.extension v) = 0)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget := by
+  letI : H.Normal := hyp.H_normal
+  exact hyp.coherentS_of_Xset_commutator_Yset_glued hX ν hagreeX hagreeY
+    (hyp.inner_span_Xset_Yset_eq_zero_of_irreducible_X hXirr) himg_ortho hgen
 
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
