@@ -301,12 +301,13 @@ Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 S16 interface の `N(2*a-1)=1` を返す adapter も
 `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
 `forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。S16 側にも
-one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
+field-element one-step obligation `appCNormSetTwistedFieldStep`、unit-step adapter
+`appCNormSetTwistedUnitStep_of_field_step`、relation adapter
 `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
 finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
-S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_unit_step` を、
+S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_field_step` を、
 仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
-`appC_normSet_generator_relation` はこの field からの derived theorem。
+`appC_twisted_unit_step` と `appC_normSet_generator_relation` はこの field からの derived theorems。
 
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。
