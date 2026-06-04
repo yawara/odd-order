@@ -464,14 +464,135 @@ instance (~30 field, S07:5399) — を構築。leaf 単位で (/goal 駆動, use
 **leaf 順**: T8.1✅/T8.2✅/T8.3a3b✅ (clean, done) → **pairing 構成 (次)** → base wiring → per-step (Dmem/hdeg_c) → assemble。
 clean leaf は /goal、design-heavy (pairing/Dmem/hdeg_c) は attended 直接。**T8 は feasible・大 (Frobenius case で ~400-600 LOC 見積)**。
 
-### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-7 完了)
+### J.2 backbone 進捗 (2026-06-03, T8 leaf 4-10 完了 — **base coherence + 共役 pair cover 達成**)
 - ✅ **T8.4** `xSet_finite` (31eea58): X⊆Irr L 有限 = `hXfin`。
 - ✅ **T8.5** `xBaseBlock` + subset/degree_re_eq/closedUnderConjugate (79821fb): base S₀=最小次数ブロック。
 - ✅ **T8.6** `sMember_support_subset_H` + `sMember_diffSupport_of_charValue_eq` (eefc87e): 等次数差 χ−χ' ⊆ H^# = base `hsuppdiff`。
 - ✅ **T8.7** `exists_finEnum_irreducible` (41052b8): 有限既約集合→`Fin k` 単射 enum (range=T) = `coherentEqualDegree_fromDade` の Fin n interface bridge。
-- **次 = base coherence assembly**: S₀ を T8.7 で `Fin k` 化 → 等次数 value (re 等しい+irr で実 ⟹ value 等) + T8.6 (hsuppdiff) + `1∉sharpImage H` + n≥2 (T8.3+X.Nonempty) → `coherentEqualDegree_fromDade` → `h0 : IsCoherent τ S₀ A`。**X.Nonempty 要** ((6.5) context or 仮説)。
-- その後: suffix 共役 pairing (combinatorics) → per-step `DadeChainStep` (T8.1/2 + Dmem + hdeg_c 仮説) → `peterfalvi_66_coherence_of_X_from_dade`。
+- ✅ **T8.8** `two_le_xBaseBlock_ncard` (8f6271e): `X.Nonempty` → S₀ に χ と共役 χ̄≠χ → `2 ≤ |S₀|` = base の `2 ≤ n`。
+- ✅ **T8.9** `xBaseBlock_isCoherent` (本コミット, axiom-clean #print 確認済 propext/Classical.choice/Quot.sound): **base block S₀ coherence 完成**。`coherentEqualDegree_fromDade hyp.dade hyp.hconj` を `A = sharpImage H` で適用 → 結論の Dade map = `hyp.tau` (abbrev 同一)・set = `range χ` を `hrange` で `xBaseBlock Z` に rw。入力: enum=T8.7 (`choose` で Type-goal にデータ抽出, `obtain` 不可)・n≥2=T8.8・`hsuppdiff`=T8.6 (H^# = sharpImage H が engine の A と一致)・`hdeg`=`xBaseBlock_degree_re_eq` (re 等) + `irreducibleCharacter_apply_one_eq_pos_natCast` (degree=正整数 ⟹ re 等で value 等)・`h1notA`=`simp [sharpImage]`。**`noncomputable def` (IsCoherent は Type-値=ν 担持)**。`hZH`/`[Z.Normal]`/`hXne` 引数。
+- ✅ **T8.10** `exists_conjugatePairCover` (本コミット, **抽象**=`{Γ}[Group Γ]`, axiom-clean #print 確認済): **共役 pair cover の組合せ核完成**。有限 conj-closed no-real irreducible 集合 `X` + conj-closed base `S₀` から `peterfalvi_66_coherence_of_X_from_dade` の入力一式を ∃-bundle: enum `e`(`exists_monotoneDegreeEnum`)・`pair`/`N`/`hpairχ`・`hsurj`/`hpairs`/`hcoverIdx`/`hpair0`/`hpair1` + **次 leaf 用の 2 事実**=各 pair の `Disjoint (pairSet pair j) (pairUnion S₀ pair j)`(⟹ `χⱼ,χ̄ⱼ⊥S₁`)+ degree-monotone。**構成**: 共役 index involution `cidx`(`e(cidx i)=(e i).conj`, no-real で FPF, `∉S₀` 保存)→ 索引 transversal `T={i|e i∉S₀∧i<cidx i}`(`Finset.orderEmbOfFin` でソート)→ `pair j=(e tⱼ, (e tⱼ).conj)`。cover は `i<cidx i`(i∈T)/`cidx i<i`(cidx i∈T)の 2 分岐、disjoint は 4 index-等式を strict-mono `t`+involution で矛盾。**Prop ∃ bundle ゆえ次 leaf は `choose` で消費**(個別 support 不要)。
+- **次 = per-step `DadeChainStep` instance** (T8.11, 最重・残): `∀ i<N, DadeChainStep hyp hconj (pairUnion S₀ pair i) A' (hpairχ i)` を構成。~30 field: `hreal`/`hχχ`/ortho 系(T8.1 系から)+ `hdiffsupp`(T8.2)+ **Dmem**(各 S₁-member の ψ=0 分解 via `decompositionDaFromDadeOfDiff`, design-heavy)+ **hdeg_c**(5.6 次数不等式 `2a<∑aᵢ²/‖χᵢ‖²`, degree-sum bridge)+ `hχ_S1`/`hχbar_S1`(=T8.10 disjoint から)。
+- その後 (assembly, 軽い): T8.10 cover を `Xset Z`/`S₀=xBaseBlock Z` に特殊化(`xSet_finite`/`Xset_closedUnderConjugate`/`Xset_hasNoRealCharacters`/`isIrreducibleCharacter_of_mem_Xset_of_frobenius`/`xBaseBlock_closedUnderConjugate` を供給)→ `xBaseBlock_isCoherent`(h0)+ T8.11(hstepData)→ `peterfalvi_66_coherence_of_X_from_dade` → `IsCoherent τ X A` → glue X∪Y → capstone。
 - **全 leaf axiom-clean (propext/Classical.choice/Quot.sound), full build 3562 green**。
+
+### J.3 🔴 T8.11 BLOCKER 検証 (2026-06-03 着手→独立監査): DadeChainStep は X で充足不能、engine 手術が真の残務
+
+**結論**: T8.11(per-step `DadeChainStep` instance)は **leaf でなく engine 手術**。`DadeChainStep`/`retarget` が **member 個別 support**(`x.support ⊆ H^#`)を要求するが、X-member `χ=Ind θ` は `χ(1)=|W₁|θ(1)≠0` ⟹ `1∈support`, `1∉H^#` ⟹ 充足不能。これは master-roadmap の 🔴 で、B-surgery round-1 では **未解決**(round-1 は新規 pair の差分 `hdiffsupp`/`hdiffasupp` のみ弱化、member family は手付かず)。§J.1/§I の「engine bug 解消」は member family については **誤り**(訂正)。
+
+**根本原因(コード照合済)**:
+- `zSupportedSpan S A = {φ | φ∈zSpan S ∧ φ.support⊆A}` ⟹ `DadeChainStep.hmemSupp`/`hchi1supp`/`famSupp` は個別 support 要求。
+- `retarget_isCoherent_fromDade_X`(S07:5314)は `hmemSupp`→`hmemTau1 (ν x=τ x)` と `hchi1supp`→`htau1_chi1 (ν chi1=τ chi1)` を `extends_on_supported` 経由で製造。両方 support 必須。
+- **より深い**: core `retarget_isCoherent_of_decompositions`(S07:3309)が `htau1_chi1 : Da.tau1 chi1 = ν chi1` を直接消費。`Da=decompositionDaFromDadeOfDiff` は `ofProjection ... τ ...`(S07:4739)で **`Da.tau1=τ`** ⟹ `htau1_chi1 = (τ chi1 = ν chi1)`、unsupported chi1 で **偽**。adapter だけでなく **core retarget** に届く。
+- 対照: `coherentEqualDegree`(S07:3078, T8.9 を X で構成)は `hsuppdiff` のみ・member support **不要** ⟹ 差分ベース all-at-once は X で動く実証。
+
+**原理的 fix(option A, deep)**: retarget が `ν(χ)` を「`τ chi1=ν chi1` 仮定」でなく **`ν(χ) := τ(χ−a·chi1) + a·ν(chi1)`**(両項 integral: supported 差分の Dade 像 + `ν chi1∈ZIrr`)で **定義** し直す ⟹ `τ chi1=ν chi1` 不要。`hperElem (∀ξ∈ℤ[S₁], ν ξ⊥R(χ))` は ℤ[S₁]=⟨chi1⟩∪{x−aₓchi1 (supported)} 生成で:
+  - (B) `⟨ν chi1,α⟩=0`: `a·ν chi1 = Da.Y`(↑の定義)+ `Da.Y_orthogonal`(struct field: Y⊥R(χ))+ `a≠0`。**solid**。
+  - (A′) `⟨ν(x−aₓchi1),α⟩=⟨τ(x−aₓchi1),α⟩=0`: degree-matched 差分 supported の Dade 像 ⊥ R(χ)(caller 供給、`hmemOrtho` と同形だが supported ⟹ 構成可)。
+  touch = `retarget_isCoherent_of_decompositions`(3309) core + 下流。multi-session 規模。
+**option B(comparable depth)**: `coherentEqualDegree`(差分ベース・running ν 無)を **不等次数に一般化**(generators χⱼ−aⱼχ₁)。τ-vs-ν 整合問題が **構造的に発生しない**(incremental でなく一括)。(6.6) を実質再導出。
+**両者とも (6.6) の真の技術核**(supported-family 用 engine を induced X に拡張)。leaf でなく、どちらも multi-session の新規形式化。
+
+#### J.3.1 option A 完全 reduction (2026-06-03, user 承認後の深掘り — 実装 SPEC)
+
+surgery を 2 系統に分解(`IsCoherent` field 確認済: `extension`=ν, `extension_inner_eq`=ν は ℤ[S₁] 上 isometry, `extends_on_supported`=ν=τ on supported; `CharacterPsiDecomposition.Y_orthogonal`=Y⊥R は struct field S07:1008):
+
+- **member 側(clean fix・教科書通り、support 不要)**: 各 member の per-member 直交 `⟨ν x,α⟩=0`(α∈R(χ))は **member 分解の aux isometry を τ でなく ν にする**だけで解ける。`Dmem x : CharacterPsiDecomposition τ x 0` を **`tau1=ν` で構成**(base は τ だが aux = ν = `hS₁.extension`)。根拠: ν x∈ZIrr(coherence)かつ ‖ν x‖²=⟨x,x⟩=1 ⟹ ν x=±irr ⟹ ν x∈ℤ[R(x)](R(x)=`(x−x̄)^τ=ν(x−x̄)` の構成元={ν x,ν x̄})⟹ ψ=0 分解 Y=0, X=ν x 構成可。`tau1_agrees`(ν(x−x̄)=τ(x−x̄))は supported で ✓。すると `inner_extension_member_orthogonal_imageSet`(3243)の `htau1 : Dmem.tau1 x=ν x` が **rfl**(hmemSupp 不要)。`hmemOrtho`(R(x)⊥R(χ))は `⟨(x−x̄)^τ,(χ−χ̄)^τ⟩=⟨x−x̄,χ−χ̄⟩=0`(supported isometry, χ,χ̄⊥S₁)+ 直交正規(差分和直交⟹構成元集合 disjoint)で証明可。⟹ **adapter `retarget_isCoherent_of_supportedDecomposition_and_memberFamily`(3514)は member 側で既に support-free**(`hmemTau1` を抽象に取る)、`_fromDade_X`(5314)が `hmemSupp` 経由で製造する所だけ ν-aux 構成に差し替え。
+- **chi1/Da 側(真の crux・残)**: `Da`(新 pair, χ∉ℤ[S₁] を含む)は τ ベース必須 ⟹ `Da.tau1 chi1=τ chi1`。core が要求する `htau1_chi1 : Da.tau1 chi1=ν chi1` ⟹ `τ chi1=ν chi1`(=defect δ=ν chi1−τ chi1=0)が unsupported chi1 で偽。**δ は base block 上一定**(ν(chi_j−chi_0)=τ(chi_j−chi_0) ⟹ ν chi_j−τ chi_j=ν chi_0−τ chi_0)。原理的 fix = `ν'(χ):=τ(χ−a·chi1)+a·ν chi1`(両項 integral)で χ の像を定義 ⟹ Da を `tau1 χ=ν'(χ)` で構成すれば `Da.tau1 chi1=ν chi1` 成立。**残 crux = ν'(χ) が norm-1 + ν(S₁) と直交正規であること** ⟺ **`⟨τ(χ−a·chi1), ν chi1⟩=−a`**(norm 条件: ‖ν'(χ)‖²=(1+a²)+a²+2a·Re⟨τ(χ−a·chi1),ν chi1⟩=1)。supported chi1 なら Dade isometry で −a だが、unsupported chi1 では ν chi1 と Dade 像の内積を base coherence(coherentEqualDegree)の構成詳細から導く要 = (5.6) の真の content・multi-session。
+- **実装順(parallel 構成で build-green 維持)**: (1) member ν-aux 分解補題(上記, clean・先行可能)→ (2) crux `⟨τ(χ−a·chi1),ν chi1⟩=−a` を base coherence 構成から導出(hard)→ (3) 補正 Da 構成子(`tau1 χ=ν'(χ)`)→ (4) `retarget_isCoherent_fromDade_X` 差分化(hmemSupp/hchi1supp 除去)→ (5) `DadeChainStep` struct 差分化 + `advance` rewrite。**(2) が律速**。
+
+#### J.3.2 crux 攻略 — surgery を単一恒等式へ還元 (2026-06-03, user「crux 攻略」指示後)
+
+**🟢 base `retarget_isCoherent`(S07:2844)は再利用可・core 再導出不要**: image `X`/`Xbar` を **明示引数**で取り、`hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`(image 直交正規)・`hX_ortho`/`hXbar_ortho`(`⟨ν ξ,X⟩=0`)・`himg : τ(χ−a·chi1)=X−a·ν chi1` を **仮説**として取る(decomposition から X を計算しない)。⟹ **`X := ν'(χ) := τ(χ−a·chi1)+a·ν chi1` を直接渡せる** ⟹ `himg` は **rfl**(`htau1_chi1` を完全 bypass)。`hagree_ratio`(τ₂(χ−a·chi1)=τ(χ−a·chi1))も himg 経由で成立。
+
+**🎯 surgery 全体が単一恒等式 crux1 へ還元**(代数済): X=ν'(χ) で
+- `himg`: 定義より trivial。
+- `hX_ortho ⟨ν ξ,X⟩`: ξ=ξ_supp+m·chi1 分解 + ν-isometry(ℤ[S₁])+ Dade-isometry(supported)で `= m·(a + conj⟨τ(χ−a·chi1),ν chi1⟩)` ⟹ **crux1 ⟺ 0**。
+- `hXX ‖X‖²`: `= ‖τ(χ−a·chi1)‖² + 2a·Re⟨τ(χ−a·chi1),ν chi1⟩ + a²‖ν chi1‖² = (1+a²)+a²+2a·Re(crux1)` ⟹ **=1 ⟺ Re(crux1)=−a**。
+- `crux2 := ⟨τ(χ−χ̄),ν chi1⟩ = 0`: **clean**(`τ(χ−χ̄)∈ℤ[R(χ)]`, `ν chi1∈ℤ[R(chi1)]`(ν-aux 分解), `R(χ)⊥R(chi1)` ← `⟨(χ−χ̄)^τ,(chi1−c̄)^τ⟩=⟨χ−χ̄,chi1−c̄⟩=0`)⟹ `hXXbar`/`hXbar*` 系も crux1 のみに依存。
+
+⟹ **残 = crux1 `⟨τ(χ−a·chi1), ν chi1⟩ = −a` ただ 1 本**。`τ(χ−a·chi1)=Da.X−Da.Y`, `Da.X∈ℤ[R(χ)]⊥ν chi1`(R 直交)⟹ `crux1 = −⟨Da.Y,ν chi1⟩`、両者 ⊥R(χ) の overlap = (5.6) Feit–Sibley の真の content。supported case は `inner_self_chi_eq_sum_coeff`(S07:1220)+`inner_self_chi_add_psi_eq`(1300)+ degree 不等式で `‖Da.X‖²=1`(⟹`‖Da.Y‖²=a²`⟹`‖τ chi1‖²=1`)を導出。crux1 は同 machinery + degree 不等式の適応で出る見込み。
+
+**⚠️ bridge lemma は Dade レベル**: `‖τ(χ−a·chi1)‖²=1+a²` は χ∉ℤ[S₁] ゆえ IsCoherent の `inner_eq_on_supported`(ℤ[S₁] 限定)では出ず、**Dade isometry `dadeIntegralCharacterMap_inner_eq_on_supported_span`** が要る ⟹ bridge は `retarget_isCoherent_fromDade_*` レベルで書く。
+
+**✅ bridge 完成** = `retarget_isCoherent_of_extensionImage`(S08, **axiom-clean** propext/Classical.choice/Quot.sound, full build 3562 green): `τ`+`hτ:τ=dade` でパラメタ化し、crux1`⟨τ(χ−a·chi1),νchi1⟩=−a`+crux2`⟨τ(χ−χ̄),νchi1⟩=0`+`hSgen:ℤ[S₁]≤span(ℤ[S₁,A]∪{chi1})` を仮説に取り、`X:=τ(χ−a·chi1)+a·νchi1` で `hXX`/`hXbarXbar`/`hXXbar`/`hXbarX`/`hX_ortho`/`hXbar_ortho`/`himg`(rfl) を全導出 → base `retarget_isCoherent` 呼ぶ。`hX_ortho` は生成系 induction(supported は Dade+ν isometry, chi1 は crux1)。**これで surgery が crux1+crux2+hSgen に帰着**(crux2/hSgen は clean に discharge 可)。**残 = crux1 を decomposition norm machinery(`inner_self_chi_eq_sum_coeff`/`inner_self_chi_add_psi_eq`)+ degree 不等式で discharge(本丸・(5.6) Feit–Sibley)→ DadeChainStep 代替の per-step glue → capstone**。**重要教訓(set の罠)**: `set τ`/`set ν` は τ/ν が `hS₁` の型に現れる/`hS₁.extension` を含むため `hS₁`→`hS₁✝` dagger を起こし、param `hcrux*` と goal の fold 不一致を招く ⟹ engine 補題は **τ を明示 param + `hτ:τ=dade`** で取るのが安全(`set` 回避)。
+
+#### J.3.3 crux1 深掘り精査 — crux1 = (5.6.1)/(5.6.2) collapse for induced χ (2026-06-03, 「続けてください」)
+
+mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精査し crux1 を厳密 scope:
+
+**crux1 = 真の (5.6.2) collapse `Da.Y = a·νχ₁`(ν=coherent extension)**:
+`τ(χ−a·chi1) = Da.X − Da.Y`(`Da.tau1_image`+`htau1_diff`)。`Da.X∈ℤ[R(χ)]`, `νchi1∈ℤ[R(chi1)]`, `R(χ)⊥R(chi1)`((5.2.e))⟹`⟨Da.X,νchi1⟩=0`。よって `Da.Y=a·νchi1` ⟹ `⟨τ(χ−a·chi1),νchi1⟩=⟨Da.X−a·νchi1,νchi1⟩=0−a·1=−a` = **crux1**。
+↔ (6.8.1) 流に言えば `⟨(χ−a·η₁)^τ,η₁^{τ₁}⟩=b−a`(L176)で **crux1 ⟺ b=0**(case A の b=0 論証=(6.7)+norm bound+a>1; X-chain 経由(6.6)では generic (5.6.2) λ-form)。
+
+**🔴 構造的発見 1(重大)**: `IsCoherent.extension : IntegralCharacterMap = CF L →ₗ[ℤ] CF G`(S07:165 abbrev)で **ZIrr-codomain field 無し**(struct field は `nonzero`/`extension`/`extension_inner_eq`/`extends_on_supported` のみ, S07:1421)⟹ **`ν x ∈ ZIrr` は IsCoherent から導出不能**。member ν-aux 分解(`CharacterPsiDecomposition τ x 0` を `ofProjection` で構成)は `htau1_mem : ν x∈ZIrr` 要求 ⟹ **member R-分解は仮説として注入要**(既存 engine の `Dmem` field と同形;`IsCoherent` を強化するか、caller=実 coherence engine が供給)。
+
+**🔴 構造的発見 2**: 既存 `Y_eq_nsmul_tau1_of_lambdaForm`(S07:1940)は `hvc1 : vc i₁ = D.tau1 chi1` で **member family を `D.tau1` に hardwire**。`Da=decompositionDaFromDadeOfDiff` は `Da.tau1=τ`(Dade)⟹ 結論 `Da.Y=a·D.tau1 chi1=a·τchi1`(≠`a·νchi1`!)。unsupported chi1 で τchi1≠νchi1 ⟹ **直接再利用不可**。代わりに `lambda_eq_zero_and_Z_eq_zero`(S07:1852, **family `vc` 自由**)を `vc i=νχᵢ` で直叩き要。
+
+**crux1 discharge 経路(確定, multi-session)**:
+1. `Da := decompositionDaFromDadeOfDiff hyp hconj χ …`(S07:4708, B-surgery, supported 差分のみ ⟹ **χ unsupported でも構成可**)→ `Da.X∈ℤ[R(χ)]`, `Da.Y`, `Da.tau1_image`, (5.4.a) opening bound。
+2. member ν-aux family(**仮説注入**, 発見1): 各 χᵢ∈S₁ に `νχᵢ∈ℤ[R(χᵢ)]`((5.5))+ orthonormal(ν isometry on ℤ[S₁])。
+3. member R-orthogonality `R(χᵢ)⊥R(χ)`((5.2.e), `⟨(χᵢ−χ̄ᵢ)^τ,(χ−χ̄)^τ⟩=0`)→ 既存 `inner_extension_orthogonal_imageSet_of_members`(S07:3267, **support-free**)で ℤ[S₁] へ lift。
+4. (5.6.1) λ-form `Da.Y=a·νχ₁−λ∑rᵢ·νχᵢ+Z`(**本丸 hard**): 係数を `⟨τ(χ−a·chi1),ν(χⱼ−aⱼchi1)⟩=⟨χ−a·chi1,χⱼ−aⱼchi1⟩`(↓foundational lemma)から計算。
+5. `lambda_eq_zero_and_Z_eq_zero`(degree 不等式(c) `2a<∑aᵢ²/‖χᵢ‖²` = (6.6) prime-power gap, S07:1696 landed)→ λ=0,Z=0 → `Da.Y=a·νχ₁`。
+6. crux1 = `⟨Da.X−a·νχ₁,νchi1⟩=−a`(発見の R-直交 + ‖νchi1‖²=1)。
+
+**✅ foundational lemma landed**(本コミット, S08 `inner_dade_extension_of_supported`, axiom-clean #print 確認): supported `u` + supported `δ∈ℤ[S₁]` で `⟨τ u,ν δ⟩=⟨u,δ⟩`(ν=τ on supported + Dade isometry)= (5.6.1) L79 cross-term の retargeting move(step 4 の基盤)。**注意: δ=chi1 には適用不可**(chi1=Ind θ unsupported)= crux1 が直接系でない理由を体現。
+
+**⚠️ scope 評価**: crux1 = (5.6.1)/(5.6.2) engine を induced(unsupported)member 用に再導出 = (6.6)/(5.6) の真の技術核, **multi-session**。member R-family 注入で `IsCoherent` 拡張 or 新 carrier 要。かつ master-roadmap 上 (6.8) は **orphaned**(FeitThompson 未配線; 実 critical path = BG §7-16 Track B)⟹ crux1 grind 継続は戦略判断要。
+
+#### J.3.4 crux1 進捗 — member 側完全 discharge, 残 = (5.6.2) collapse のみ (2026-06-04, user「最終的に必要 → 続行」)
+
+ユーザー確認: (6.8) は orphaned だが Peterfalvi 指標理論の本物の片翼で **最終的に必須** → crux1 続行。
+**FeitThompson 配線の現状（grep 確認済）**: 最上位 `feitThompson`(`OddOrder/FeitThompson.lean:24`)= 裸 sorry(還元無)、`noMinimalSimpleOdd_of_section16` は `S16.Hypothesis`(未構成 carrier)を仮説に取るのみ、`sibleySetup_is_coherent` は消費者 0、S16 は coherence を import せず。⟹ crux1 完遂しても §10-16 配線が別途必要(全体が未完足場)。
+
+**✅ crux1 の step 1/3/6 + 端部代数を完全 landed**(S08, 全 axiom-clean, build 3320):
+- `crux1_of_collapse`(端部): `himg : w=X−Y` + collapse `Y=a·νχ₁` + `⟨X,νχ₁⟩=0` + `‖νχ₁‖²=1` ⟹ crux1 `⟨w,νχ₁⟩=−a`(純内積代数, abstract over G)。
+- `memberExtensionDecomposition`(step 2, (5.5) member ν-aux): member χ∈S₁ に `D':CharacterPsiDecomposition τ χ 0` を **tau1=ν** で構成(`ofProjection`; `ν χ∈ZIrr` を注入)⟹ `D'.tau1 χ=ν χ`(**rfl, 実 context で検証済**), `ν χ=D'.X∈ℤ[R(χ)]`。
+- `inner_dadeDiff_conjDifference_eq_zero` + `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(step 3, (5.2.e)): 差分 support 版 `R(χ₁)⊥R(χ)`(既存 individual-support 版は induced で不可ゆえ新規)。
+- `inner_decomposition_X_extension_member_eq_zero` + `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`(step 3 assembled): **`⟨Da.X,νχ₁⟩=0` を注入データから完全導出**(member ν-aux + family ⊥ + per-α 和)。
+- `inner_dade_extension_of_supported`(step 4 基盤, 既 landed): `⟨τ u,ν δ⟩=⟨u,δ⟩`(supported)。
+
+⟹ **crux1 残 = (5.6.2) collapse `Da.Y=a·νχ₁` ただ 1 本**(step 4-5)。これを得れば `crux1_of_collapse`(`himg`=`Da.tau1_image`(Da.tau1=τ)+`htau1_diff`, `‖νχ₁‖²=1`=ν-isometry, `⟨Da.X,νχ₁⟩=0`=上記)で crux1 → bridge → coherence。
+
+**残 step 4-5 (本丸・(5.6.1)/(5.6.2) λ-form)**: member family `vc i=νχᵢ`(i over S₁ の有限 enum)を用意し、λ-form `Da.Y=a·νχ₁−λ∑rᵢνχᵢ+Z` を `⟨τ(χ−a·chi1),ν(χⱼ−aⱼchi1)⟩=⟨χ−a·chi1,χⱼ−aⱼchi1⟩`(`inner_dade_extension_of_supported` を δ=χⱼ−aⱼchi1 supported で適用)から係数計算 → 既存 `lambda_eq_zero_and_Z_eq_zero`(S07:1852, vc 自由)+ degree 不等式(c)で λ=0,Z=0 → collapse。**注意**: 既存 `Y_eq_nsmul_tau1_of_lambdaForm`(S07:1940)は vc i₁=D.tau1 chi1=τchi1 に hardwire ⟹ 不使用、`lambda_eq_zero_and_Z_eq_zero` 直叩き。member enum + λ-form 組立が残 work(multi-session)。
+
+#### J.3.5 ✅✅ crux1 完全 discharge — λ-form collapse capstone landed (2026-06-04)
+
+**crux1 → coherence の全 lemma chain が build-green・axiom-clean で landed**(step 4-5 含む全 step 完了):
+1. `inner_dade_extension_of_supported`(foundational cross-term, e1253de)
+2. `crux1_of_collapse`(端部代数, 60cdf56)
+3. `memberExtensionDecomposition`((5.5) member ν-aux, 4f6a19f)
+4. `inner_dadeDiff_conjDifference_eq_zero` + `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(差分 support family ⊥, 992c0c3)
+5. `inner_decomposition_X_extension_member_eq_zero` + `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`(member R-直交 assembled, b2c6a45)
+6. `inner_Y_extension_member_eq`((5.6.1) member coefficient `⟨Da.Y,νχⱼ⟩=a·⟨χ₁,χⱼ⟩−(a+μ)·aⱼ`, 88aaef1)
+7. `exists_indexed_intProjection_of_orthonormal_ZIrr`(indexed 直交射影, 1b368c4)
+8. **`crux1_of_memberFamily`(CAPSTONE: λ-form collapse ⟹ crux1, 8461d5c)** — indexed projection + 係数同定 `cᵢ=a·[i=i₁]−λ·aᵢ`(λ=a+μ, μ=⟨τ(χ−a·χ₁),νχ₁⟩∈ℤ via `inner_mem_ZIrr_int`)+ `lambda_eq_zero_and_Z_eq_zero`(degree 不等式 2a<∑aᵢ²)⟹ λ=0 ⟹ **μ=−a = crux1**。
+9. `retarget_isCoherent_of_extensionImage`(bridge: crux1 ⟹ coherence, e982181)
+
+⟹ **crux1 は X-family enumeration data の関数として完全証明済**。`crux1_of_memberFamily` の仮説 = case-A 用 (X⊆Irr L, ‖χᵢ‖²=1): finite orthonormal member family {χmem i}⊆S₁ + `hcoeffval`(= `inner_Y_extension_member_eq` を per-member 適用)+ a₁=1 + degree 不等式 + `Da`(=`decompositionDaFromDadeOfDiff`)+ Da.Y∈ZIrr + νχᵢ∈ZIrr 注入。
+
+**残 = 最終 assembly のみ(math 完了, glue 残)**: T8 backbone の X-family enum(`Xset Z`/`xBaseBlock`/`exists_conjugatePairCover` の conjugate-pair chain)を上記 lemma に wire:
+- per-step: `inner_Y_extension_member_eq`(member R-直交 + foundational cross-term から hcoeffval)→ `crux1_of_memberFamily`(crux1)→ `retarget_isCoherent_of_extensionImage`(coherence adjoin)。
+- chain: `xBaseBlock_isCoherent`(base)から conjugate-pair cover を induction で adjoin → `IsCoherent τ (Xset) A`。= **DadeChainStep 代替の per-step glue**(notes §J.3.1 step 5)。
+- 必要な X-family 固有 fact: 各 adjoined χ の `decompositionDaFromDadeOfDiff` 構成、degree 不等式(= (6.6) prime-power gap `two_mul_lt_sq_of_primePow_gap` S07:1696)、Da.Y∈ZIrr、νχᵢ∈ZIrr(coherence engine が供給)。
+- その後: glue X∪Y → capstone `sibleySetup_is_coherent`(S08 唯一の sorry)。
+
+**全 math lemma 完了ゆえ残は mechanical-ish wiring(但し T8 enum との接続は非自明・substantial)。**
+
+#### J.3.6 🔶 最終 assembly の blocker = ZIrr-codomain gap (2026-06-04, 着手→診断)
+
+最終 assembly(chain fold で X-coherence 構築)を着手して判明: **`crux1_of_memberFamily` の `hνZ : νχⱼ∈ZIrr` が IsCoherent から取れない**(§J.3.3 構造的発見1 が最終段で blocker 化)。`νχⱼ∈ZIrr` の用途 = (a) indexed projection の integer 係数、(b) μ∈ℤ(`inner_mem_ZIrr_int`)— 両方必須。
+
+**chain fold は再利用可**: `peterfalvi_66_coherence_of_X`(S07, abstract)は per-step `hstep : ∀i<N, IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` を取る ⟹ bridge ベース per-step を供給すれば良い(`DadeChainStep` 不使用)。但し per-step が `crux1_of_memberFamily` を呼ぶ ⟹ running accumulator の member family(orthonormal + ZIrr + degree)が要る。
+
+**ZIrr-codomain は誘導的に維持可(コード診断済)**: `retarget τ₁ χ χ̄ X Xbar = τ₁∘orthoResidualMap + ⟨χ,·⟩•X + ⟨χ̄,·⟩•Xbar`(S07:2348)⟹ `retarget…φ ∈ ZIrr`(φ∈ZIrr L)は **X,Xbar∈ZIrr + 旧 τ₁ が ZIrr→ZIrr + orthoResidual が ZIrr 保存(χ,χ̄∈ZIrr L で integer projection)**で出る。bridge の X=τ(χ−a·chi1)+a·νchi1 は ZIrr(supported Dade 像 + νchi1∈ZIrr)、Xbar=X−τ(χ−χ̄) も ZIrr。⟹ **誘導不変量として thread 可能**。
+
+**2 つの実装路(設計 fork)**:
+- **(A) `IsCoherent` 強化**(正攻法・invasive): field `extension_mem_ZIrr : ∀φ∈ZIrr L, extension φ∈ZIrr G` 追加。影響 = S07 の IsCoherent 構成 ~5 site(`retarget_isCoherent`(2916, 要 X,Xbar∈ZIrr 新仮説 + χ,χ̄∈ZIrr L)/`coherentEqualDegree`(3095)/`coherentEqualDegree_fromDade`(5109)/`galoisTransport`(1471)/他)が新 field を証明。consumer(S08-S16)は不変(struct 強化のみ)。bridge/DadeChainStep に X,Xbar∈ZIrr 伝播。**正しい定義(coherence=ℤ[Irr G] への isometry)だが multi-site refactor、retarget ZIrr 証明は非自明**。
+- **(B) ZIrr companion thread**(localized・S08): `(IsCoherent τ Sᵢ A) × (∀x∈Sᵢ, ν x∈ZIrr)` を per-step で thread、custom chain fold(`peterfalvi_66_coherence_of_X` の induction を companion 付きで再導出)。S07 不変だが chain logic 重複。companion 維持: x∈S₁⟹τ₂ x=τ₁ x∈ZIrr(直交)、χ↦X∈ZIrr、χ̄↦Xbar∈ZIrr。
+
+**現状**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。(6.8) は orphaned ゆえ invasive (A) を打つか localized (B) か checkpoint かは戦略判断。
 
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
