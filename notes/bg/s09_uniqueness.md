@@ -739,7 +739,12 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `S04.CharacteristicSylowSeries.exists_normal_sylow_of_step_term_eq_bot`,
    `S04.CharacteristicSylowSeries.exists_normal_sylow_of_terminal_step`,
    `S04.CharacteristicSylowSeries.exists_terminal_step_of_length_pos`, and
-   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos`.  The §9
+   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos`.
+   The downstream-facing §4.20(c) payload is now named
+   `S04.CharacteristicSylowSeriesPackage`: it bundles the raw series with positive
+   length and terminal-label membership in `π(G)`, and
+   `S04.CharacteristicSylowSeriesPackage.exists_terminal_normal_sylow` extracts the
+   terminal normal Sylow subgroup plus that label membership in one step.  The §9
    consumer side is now split between
    `S09.normalizer_le_maximal_of_scn3Global_intermediate_of_characteristicSylowSeries`,
    which still accepts an explicit terminal-label exclusion, and
@@ -748,7 +753,12 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    extracts the terminal normal local Sylow subgroup.  The low-rank contradiction
    needed to show the terminal label is not the ambient `SCN₃(p)` prime is now
    isolated as
-   `S09.normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two`.
+   `S09.normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two`.  The
+   opening normalizer adapter
+   `S09.exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage`
+   now consumes the §4 package directly, so a future Thm 4.20(c) existence theorem
+   can feed Lemma 9.5 without reopening the `S`, `length_pos`, and terminal-label
+   fields by hand.
    This packages the BG induction pattern: lift the characteristic factors from
    `K = O_{r | r != p1}(G)` and attach the top `G/K` Sylow factor.  The ambient
    normal-complement lift is now covered by

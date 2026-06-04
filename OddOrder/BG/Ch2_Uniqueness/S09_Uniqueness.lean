@@ -1901,6 +1901,20 @@ private theorem exists_pSubgroup_normalizer_package_of_not_scn3
       hG hM hA hAnot hPp hAP hPnormA S hpos hterminal_mem
   exact ⟨P, hPp, hAP, hPnormA, hpack.1, hpack.2⟩
 
+/-- BG Lemma 9.5 opening normalizer package, consuming the §4.20(c) downstream
+characteristic Sylow series package directly. -/
+private theorem exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (SP : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥M) :
+    ∃ P : Subgroup G,
+      IsPGroup p P ∧ A ≤ P ∧ P ≤ Subgroup.normalizer (A : Set G) ∧
+        P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M :=
+  exists_pSubgroup_normalizer_package_of_not_scn3 hG hM hA hAnot
+    SP.series SP.length_pos SP.terminal_mem
+
 /-- BG Lemma 9.5's Proposition 1.16 extraction step.
 
 If `P0` does not centralize `D`, and a noncyclic abelian subgroup `A` normalizes `D`

@@ -1366,6 +1366,19 @@ structure CharacteristicSylowSeries (G : Type*) [Group G] [Finite G] where
   upper_eq : ∀ i : Fin length, (step i).upper = term (Fin.castSucc i)
   lower_eq : ∀ i : Fin length, (step i).lower = term i.succ
 
+/-- The downstream-facing package supplied by BG Theorem 4.20(c).
+
+The raw `CharacteristicSylowSeries` records the characteristic factor data.  Consumers such
+as §9 also need the series to have a terminal step and need that terminal label to be an
+actual prime divisor of the ambient group.  Keeping those as explicit fields avoids baking
+strictness assumptions into the raw series representation. -/
+structure CharacteristicSylowSeriesPackage (G : Type*) [Group G] [Finite G] where
+  series : CharacteristicSylowSeries G
+  length_pos : 0 < series.length
+  terminal_mem :
+    ∀ i : Fin series.length,
+      i.succ = Fin.last series.length → (series.step i).q ∈ (Nat.card G).primeFactors
+
 /-- A finite characteristic Sylow segment with arbitrary endpoints.
 
 This is the ambient image of the induction series inside the canonical normal
@@ -1599,6 +1612,21 @@ noncomputable def lift_oPiCore_series_of_hasNormalPComplement_ne
       S.length + 1 := rfl
 
 end CharacteristicSylowSeries
+
+namespace CharacteristicSylowSeriesPackage
+
+/-- A packaged BG Theorem 4.20(c) characteristic Sylow series supplies the terminal
+normal Sylow subgroup together with the fact that its label lies in `π(G)`. -/
+theorem exists_terminal_normal_sylow (P : CharacteristicSylowSeriesPackage G) :
+    ∃ i : Fin P.series.length,
+      i.succ = Fin.last P.series.length ∧
+        (P.series.step i).q ∈ (Nat.card G).primeFactors ∧
+          ∃ Q : Sylow (P.series.step i).q G, (Q : Subgroup G).Normal := by
+  obtain ⟨i, hi, hQ⟩ :=
+    CharacteristicSylowSeries.exists_normal_sylow_of_length_pos P.series P.length_pos
+  exact ⟨i, hi, P.terminal_mem i hi, hQ⟩
+
+end CharacteristicSylowSeriesPackage
 
 end Thm418
 
