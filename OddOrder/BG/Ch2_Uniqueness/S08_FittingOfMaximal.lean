@@ -4120,6 +4120,49 @@ theorem exists_sylow_subgroupOf_map_eq_of_not_dvd_index [Finite G]
   rw [(hKp.comap_subtype (K := H)).toSylow_coe hidx', Subgroup.comap_subtype,
     Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hKH]
 
+/-- A `p`-subgroup `K ≤ H` has `p`-prime index in `H` if every `p`-subgroup of
+`H` containing `K` has cardinal at most `K`. -/
+theorem not_dvd_subgroupOf_index_of_forall_card_le [Finite G]
+    {p : ℕ} [Fact p.Prime] {H K : Subgroup G}
+    (hKp : IsPGroup p K) (hKH : K ≤ H)
+    (hmax : ∀ L : Subgroup G, IsPGroup p L → K ≤ L → L ≤ H →
+      Nat.card ↥L ≤ Nat.card ↥K) :
+    ¬ p ∣ (K.subgroupOf H).index := by
+  intro hidx
+  have hKsub_p : IsPGroup p (K.subgroupOf H) :=
+    hKp.of_equiv (Subgroup.subgroupOfEquivOfLe hKH).symm
+  obtain ⟨S, hKS⟩ := hKsub_p.exists_le_sylow
+  have hS_ne : (S : Subgroup ↥H) ≠ K.subgroupOf H := by
+    intro hS
+    have hnot : ¬ p ∣ (K.subgroupOf H).index := by
+      simpa [hS] using S.not_dvd_index
+    exact hnot hidx
+  have hKsub_lt_S : K.subgroupOf H < (S : Subgroup ↥H) :=
+    lt_of_le_of_ne hKS (fun h => hS_ne h.symm)
+  have hcard_lt : Nat.card ↥(K.subgroupOf H) < Nat.card ↥(S : Subgroup ↥H) := by
+    have hss : (K.subgroupOf H : Set ↥H) ⊂ ((S : Subgroup ↥H) : Set ↥H) :=
+      SetLike.coe_ssubset_coe.mpr hKsub_lt_S
+    exact Set.Finite.card_lt_card (Set.toFinite ((S : Subgroup ↥H) : Set ↥H)) hss
+  have hK_le_Smap : K ≤ (S : Subgroup ↥H).map H.subtype := by
+    rw [← Subgroup.map_subgroupOf_eq_of_le hKH]
+    exact Subgroup.map_mono hKS
+  have hSmap_p : IsPGroup p ((S : Subgroup ↥H).map H.subtype) :=
+    S.isPGroup'.map H.subtype
+  have hSmap_le_H : (S : Subgroup ↥H).map H.subtype ≤ H :=
+    Subgroup.map_subtype_le _
+  have hSmap_card_le_K :
+      Nat.card ↥((S : Subgroup ↥H).map H.subtype) ≤ Nat.card ↥K :=
+    hmax _ hSmap_p hK_le_Smap hSmap_le_H
+  have hSmap_card :
+      Nat.card ↥((S : Subgroup ↥H).map H.subtype) = Nat.card ↥(S : Subgroup ↥H) :=
+    Subgroup.card_map_of_injective H.subtype_injective
+  have hKsub_card : Nat.card ↥(K.subgroupOf H) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv
+  have hS_card_le_Ksub : Nat.card ↥(S : Subgroup ↥H) ≤ Nat.card ↥(K.subgroupOf H) := by
+    rw [← hSmap_card, hKsub_card]
+    exact hSmap_card_le_K
+  exact (not_lt_of_ge hS_card_le_Ksub) hcard_lt
+
 /-- If `Z(L(K))`, realized in the ambient group, is nontrivial and normal in a maximal
 subgroup `H`, then its ambient normalizer is exactly `H`. -/
 theorem normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot [Finite G]
@@ -4322,6 +4365,17 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro hidx
     exact exists_sylow_subgroupOf_map_eq_of_not_dvd_index
       hRinf_amb_p hRinf_amb_le_H hidx
+  have hRinfH_of_forall_card_le :
+      (∀ L : Subgroup G, IsPGroup p L →
+          (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≤ L → L ≤ H →
+          Nat.card ↥L ≤ Nat.card ↥((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype)) →
+        ∃ RinfH : Sylow p ↥H,
+          (RinfH : Subgroup ↥H).map H.subtype =
+            (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype := by
+    intro hmax
+    exact hRinfH_of_not_dvd
+      (not_dvd_subgroupOf_index_of_forall_card_le
+        hRinf_amb_p hRinf_amb_le_H hmax)
   obtain ⟨LRinf, hLRinf, hNRinf_le_LRinf⟩ :=
     exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
       hG hM hRinf_amb_ne_bot hRinf_amb_le_M
