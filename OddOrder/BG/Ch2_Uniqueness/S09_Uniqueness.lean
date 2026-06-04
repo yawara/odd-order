@@ -1173,6 +1173,49 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate [Finite G]
   intro x hxR
   exact mem_of_mem_normalizer_of_conjTransitiveOn hxR hQ htrans hKleM hNQleM
 
+/-- The `Q`-choice in BG Lemma 9.5.
+
+If `R ≤ M`, then `R` normalizes `O_q(M)`, so `O_q(M)` lies in `ℋ_G(R;q)` and can be
+extended to a maximal member of `ℋ_G^*(R;q)`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_of_le [Finite G]
+    {q : ℕ} [Fact q.Prime] {M R : Subgroup G} (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧ opiCoreInG ({q} : Set ℕ) M ≤ Q := by
+  classical
+  have hcore : opiCoreInG ({q} : Set ℕ) M ∈ hInvariant ⊤ R {q} := by
+    refine ⟨le_top, ?_, isPiSubgroup_opiCoreInG ({q} : Set ℕ) M⟩
+    exact hRM.trans (le_normalizer_opiCoreInG ({q} : Set ℕ) M)
+  exact exists_le_hInvariantStar hcore
+
+/-- A member of `ℋ_G^*(R;q)` containing a Sylow `q`-subgroup is that Sylow subgroup. -/
+private theorem hInvariantStar_eq_sylow_of_sylow_le [Finite G]
+    {q : ℕ} [Fact q.Prime] (P : Sylow q G) {R Q : Subgroup G}
+    (hQ : Q ∈ hInvariantStar ⊤ R {q}) (hPQ : (P : Subgroup G) ≤ Q) :
+    Q = (P : Subgroup G) := by
+  have hQp : IsPGroup q Q :=
+    isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ)
+  exact P.is_maximal' hQp hPQ
+
+/-- The `(9.7)` side of BG Lemma 9.5's `(9.8)` step, abstracted from the source of the
+Sylow fact.
+
+If the core `O_q(M)` is a Sylow `q`-subgroup of `G` and its normalizer lies in `M`, then
+the `Q` chosen above has `N_G(Q) ≤ M`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_sylow
+    [Finite G] {q : ℕ} [Fact q.Prime] {M R : Subgroup G} (P : Sylow q G)
+    (hPcore : (P : Subgroup G) = opiCoreInG ({q} : Set ℕ) M) (hRM : R ≤ M)
+    (hNPM : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  classical
+  obtain ⟨Q, hQ, hcoreQ⟩ := exists_hInvariantStar_containing_opiCoreInG_of_le (q := q) hRM
+  have hPQ : (P : Subgroup G) ≤ Q := (le_of_eq hPcore).trans hcoreQ
+  have hQeq : Q = (P : Subgroup G) := hInvariantStar_eq_sylow_of_sylow_le P hQ hPQ
+  refine ⟨Q, hQ, hcoreQ, ?_⟩
+  rw [hQeq]
+  exact hNPM
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 

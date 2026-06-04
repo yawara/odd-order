@@ -571,8 +571,22 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `(9.8) : N_G(Q) ≤ M` have been supplied. Its generic bookkeeping core is
      `mem_of_mem_normalizer_of_conjTransitiveOn`.
 
-   Remaining subfrontier for this item: build the `Q` witness and `(9.8)` from the
-   rank/Fitting split around BG L2573-L2584.
+   The `Q` witness layer is now implemented:
+
+   - `exists_hInvariantStar_containing_opiCoreInG_of_le` proves the BG choice
+     `O_q(M) ≤ Q ∈ ℋ_G^*(R;q)` from `R ≤ M`, using the fact that `R` normalizes
+     `O_q(M)`.
+   - `hInvariantStar_eq_sylow_of_sylow_le` packages the Sylow maximality step: a
+     member of `ℋ_G^*(R;q)` containing a Sylow `q`-subgroup of `G` is equal to it.
+   - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_sylow`
+     packages the low-rank `(9.7) → (9.8)` side abstractly: if `O_q(M)` is a Sylow
+     `q`-subgroup of `G` and its normalizer lies in `M`, then the chosen `Q` has
+     `N_G(Q) ≤ M`.
+
+   Remaining subfrontier for this item: derive those `(9.7)` hypotheses from
+   Thm 4.20(c) in the `r(F(M)) ≤ 2` branch, and implement the high-rank
+   `r_q(F(M)) ≥ 3` branch using Lemma 9.4. The high-rank branch likely needs a
+   reusable bridge moving rank-three `q`-subgroups from `F(M)` into `O_q(M)`.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
