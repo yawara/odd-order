@@ -259,14 +259,14 @@ theorem isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two
   exact isPGroup_commutator_of_mulAut_odd_of_pRank_le_two hp_odd hR_pg hR_rank
     (QuotientGroup.kerLift_injective ψ) hquot_odd
 
-/-- Corollary 4.19 action-image bridge: if a normal `p`-subgroup `R` has
-`p`-rank at most two and contains the top `U` of a chief factor, then the image
-of `G'` acting on `U/V` is a `p`-group. -/
-theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
+/-- Corollary 4.19 action-image bridge, modulo the lower factor: if a normal
+`p`-subgroup `R` has `p`-rank at most two and the top `U` of a chief factor is
+contained in `R ⊔ V`, then the image of `G'` acting on `U/V` is a `p`-group. -/
+theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two_of_le_sup
     (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
     {R U V : Subgroup G} [R.Normal] [V.Normal]
     [(U.map (QuotientGroup.mk' V)).Normal]
-    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_R : U ≤ R) :
+    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_RV : U ≤ R ⊔ V) :
     IsPGroup p ↥(((_root_.commutator G).map (QuotientGroup.mk' V)).map
       (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V)))) := by
   let q : G →* G ⧸ V := QuotientGroup.mk' V
@@ -278,14 +278,23 @@ theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
     rw [MonoidHom.mem_ker] at hg ⊢
     ext x
     obtain ⟨u, huU, hxu⟩ := x.2
-    have hg_fix_u : g * u * g⁻¹ = u := by
+    obtain ⟨r, hrR, v, hvV, hru⟩ :=
+      (Subgroup.mem_sup_of_normal_right (s := R) (t := V)).mp (hU_le_RV huU)
+    have hg_fix_r : g * r * g⁻¹ = r := by
       have happ := congrArg
-        (fun e : MulAut ↥R => ((e ⟨u, hU_le_R huU⟩ : ↥R) : G)) hg
+        (fun e : MulAut ↥R => ((e ⟨r, hrR⟩ : ↥R) : G)) hg
       simpa only [MulAut.one_apply, MulAut.conjNormal_apply] using happ
+    have hqv : q v = 1 := by
+      change (QuotientGroup.mk' V) v = 1
+      exact (QuotientGroup.eq_one_iff v).mpr hvV
+    have hq_u : q u = q r := by
+      rw [← hru, map_mul, hqv, mul_one]
     change ((MulAut.conjNormal (H := N) (q g)) x : G ⧸ V) = (x : G ⧸ V)
     rw [MulAut.conjNormal_apply, ← hxu]
-    calc q g * q u * (q g)⁻¹ = q (g * u * g⁻¹) := by simp [q, map_mul]
-      _ = q u := by rw [hg_fix_u]
+    calc q g * q u * (q g)⁻¹ = q g * q r * (q g)⁻¹ := by rw [hq_u]
+      _ = q (g * r * g⁻¹) := by simp [q, map_mul]
+      _ = q r := by rw [hg_fix_r]
+      _ = q u := hq_u.symm
   have hQ : IsPGroup p ↥(_root_.commutator (G ⧸ K)) := by
     dsimp [K]
     exact isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two
@@ -297,6 +306,37 @@ theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
     (MulAut.conjNormal (H := N)))
   rw [Subgroup.map_map]
   exact himg
+
+/-- Corollary 4.19 action-image bridge: if a normal `p`-subgroup `R` has
+`p`-rank at most two and contains the top `U` of a chief factor, then the image
+of `G'` acting on `U/V` is a `p`-group. -/
+theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    {R U V : Subgroup G} [R.Normal] [V.Normal]
+    [(U.map (QuotientGroup.mk' V)).Normal]
+    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_R : U ≤ R) :
+    IsPGroup p ↥(((_root_.commutator G).map (QuotientGroup.mk' V)).map
+      (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V)))) :=
+  isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two_of_le_sup
+    hodd hp_odd hR_pg hR_rank (hU_le_R.trans le_sup_left)
+
+/-- Corollary 4.19 centralizer bridge modulo the lower factor: under the
+rank-two normal `p`-subgroup hypothesis, `G'` centralizes every `p`-chief factor
+whose top lies in `R ⊔ V`. -/
+theorem commutator_le_chiefFactorCentralizer_of_pRank_le_two_of_le_sup
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    {R U V : Subgroup G} [R.Normal] [V.Normal]
+    [(U.map (QuotientGroup.mk' V)).Normal]
+    (hChief : IsChiefFactor U V)
+    (hUbar_pg : IsPGroup p ↥(U.map (QuotientGroup.mk' V)))
+    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_RV : U ≤ R ⊔ V) :
+    _root_.commutator G ≤ chiefFactorCentralizer U V := by
+  have hDbar_pg : IsPGroup p ↥(((_root_.commutator G).map (QuotientGroup.mk' V)).map
+      (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V)))) :=
+    isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two_of_le_sup
+      hodd hp_odd hR_pg hR_rank hU_le_RV
+  exact le_chiefFactorCentralizer_of_isPGroup_conjNormal_image_chiefFactor
+    (D := _root_.commutator G) hChief hUbar_pg hDbar_pg
 
 /-- Corollary 4.19 centralizer bridge for a single chief factor: under the
 rank-two normal `p`-subgroup hypothesis, `G'` centralizes every `p`-chief factor
