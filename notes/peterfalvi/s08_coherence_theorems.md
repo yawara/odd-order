@@ -1805,3 +1805,15 @@ consumer package へ直接変換する。
 instance は明示引数で受ける。`card_G0_lower_bound` 側はまだ
 `CharacterEstimateData` 構成待ちだが、(6.8) Frobenius/c1 route から (7.10) の Ind-chain consumer への
 接続点が明示化された。
+
+### 2026-06-04 pass 22: AxiomsCheck coverage for T7/T8 X-layer wrappers
+
+Explorer pass の指摘に従い、既に landed 済みの S08 T7/T8 X-layer を AxiomsCheck に登録した。
+追加した coverage は、`isCharacter_restrict`, kernel-containment support lemmas,
+`Xset_eq_irreducible_not_subset_characterKernel` と、Frobenius-specialized direct wrappers
+`xMember_characterFacts`, `xMember_diffSupport`, `Xset_closedUnderConjugate`,
+`Xset_hasNoRealCharacters`, `xSet_finite`, `xBaseBlock_closedUnderConjugate`,
+`two_le_xBaseBlock_ncard`, `xBaseBlock_isCoherent`。
+
+これで downstream S09/c1 callers は `_of_irreducible_X` 版を毎回手で合成するのではなく、
+Frobenius hypothesis から出る direct API を axiom-clean 登録済みの入口として参照できる。

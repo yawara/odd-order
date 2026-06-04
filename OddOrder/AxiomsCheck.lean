@@ -1831,6 +1831,17 @@ set_option linter.style.longLine false in
 -- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
 -- coherence with no opaque hypotheses — only the genuine equal degree and supports.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade
+-- Peterfalvi S08 T7 X-characterization support layer: restriction preserves characters,
+-- nonzero constituents force kernel containment, induced characters decompose with natural
+-- multiplicities, and the resulting `Xset` is exactly the irreducibles not killing `Z`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isCharacter_restrict
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.induce_exists_natFinsupp_eq_sum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
@@ -1863,6 +1874,23 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_of_irreducible_X
+-- Frobenius-specialized wrappers used by downstream c1/S09 assembly callers.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_characterFacts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_diffSupport
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xSet_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_caseA
 #assert_only_allowed_axioms
