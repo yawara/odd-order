@@ -527,3 +527,12 @@ S09 に `Hypothesis79.zetaImage_cross_eq_zero_of_support_subset` と
 を追加した。これで (7.9) の `⟨ζ₁^ν, ζ₂^ν⟩ = 0` 入力は raw equality だけでなく、
 二つの distinguished coherent image の support が disjoint Dade supports に入ることから生成できる。
 将来の (4.1) `ν`-image support bridge と H79 parity consumer の接続点になる。
+
+
+### 2026-06-04 pass: raw gamma bound from source data
+
+S09 に
+`Hypothesis78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula`
+を追加した。source inner-product values / source irreducibility-distinctness / degree-sum / `u,v,w` formula / small-index
+をまとめて、(7.10) の `Bsum_le_of_orthogonal_integer_decomposition` が要求する
+`(Γ, Γ).re ≤ e - 1` へ直接渡せる形にする consumer。

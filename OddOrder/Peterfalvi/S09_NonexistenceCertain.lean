@@ -2857,6 +2857,43 @@ theorem normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
       hind_norm hzeta_ind (hirr H78.zetaDistinct hzeta_mem))
     hirr hdistinct hzeta_degree hdegree_sum hzeta_uv
 
+/-- Source inner-product values, source irreducibility data, and the textbook
+`u,v,w` formula give the raw `Γ` norm-bound consumed by the (7.10)
+orthogonal-integer decomposition bridge. -/
+theorem gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : H78.smallIndex) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+      (H78.complementIndex : ℝ) - 1 :=
+  H78.gamma_inner_self_re_le_of_normEstimates hBD
+    (H78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula hBD
+      hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv)
+    hsmall
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
