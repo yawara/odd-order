@@ -369,3 +369,19 @@ Remaining §9 `sorry`s are now exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, an
 Corollary 9.2 still depends on the stated Theorem 9.1 proof being completed. Theorem 9.6 and
 the particular case now have no theorem-body `sorry`, but they still depend on the stated
 Corollary 9.3 and Lemma 9.5 gates.
+
+Corollary 9.3 now has a sorry-free internal cascade lemma,
+`isUniquelyMaximal_of_rank_drop_witness`. It formalizes the book's final five successive
+applications of Corollary 9.2:
+
+`A ∈ 𝒰 → C_A(D) ∈ 𝒰 → D ∈ 𝒰 → C_{B*}(D) ∈ 𝒰 → B* ∈ 𝒰 → B ∈ 𝒰`.
+
+The helper assumes the exact two rank-drop inputs produced in the text by Lemma 4.5 and the
+cyclic quotient calculations, namely `2 ≤ rank C_A(D)` and `2 ≤ rank C_{B*}(D)`, plus
+`D ≅ E_{p^2}` and `B* ≤ C_G(B)` with elementary-abelian rank at least three. It also adds the
+local bridge `two_le_rank_of_noncyclic_pSubgroup`, deriving `2 ≤ rank B` for a noncyclic
+`p`-subgroup of the minimal odd simple ambient group via §4 Lemma 4.5(a)'s existing
+non-normal elementary-abelian `E_{p^2}` existence half. The remaining Corollary 9.3 gap is
+therefore isolated to the book's earlier lines: choose a Sylow `P` containing the conjugated
+`A`/`B*`, supply the normal Lemma-4.5 witness `D ⊴ P` of order `p^2`, and prove the two
+cyclic-quotient rank drops for `A/C_A(D)` and `B*/C_{B*}(D)`.

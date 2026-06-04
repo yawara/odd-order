@@ -145,6 +145,101 @@ theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMi
     lt_of_le_of_lt hKleM hL.uniqueMaximalSubgroup_isCoatom.1.lt_top
   exact hAU.of_le_of_lt_top hAK hKlt
 
+/-- A noncyclic `p`-subgroup of a minimal odd simple group has rank at least two.
+
+This is the small rank bridge used at the end of BG Corollary 9.3: once the
+intermediate rank-three elementary abelian subgroup has been put in `𝒰`, Corollary 9.2
+can be applied to the original noncyclic `p`-subgroup. -/
+private theorem two_le_rank_of_noncyclic_pSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {B : Subgroup G} (hBp : IsPGroup p B)
+    (hBnc : ¬ IsCyclic ↥B) :
+    2 ≤ rank ↥B := by
+  classical
+  have hp_dvd_B : p ∣ Nat.card B := by
+    obtain ⟨n, hn⟩ := hBp.exists_card_eq
+    have hnpos : 0 < n := by
+      by_contra hn0
+      have hn_zero : n = 0 := by omega
+      have hBcard_one : Nat.card B = 1 := by simpa [hn_zero] using hn
+      haveI : Subsingleton ↥B := Finite.card_le_one_iff_subsingleton.mp (by omega)
+      exact hBnc isCyclic_of_subsingleton
+    rw [hn]
+    exact dvd_pow_self p hnpos.ne'
+  have hp_odd : Odd p :=
+    hG.odd.of_dvd_nat (hp_dvd_B.trans (Subgroup.card_subgroup_dvd_card B))
+  obtain ⟨E, hEea, hEcard⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+      hBp hp_odd hBnc
+  have hElog : 2 ≤ Nat.log p (Nat.card E) := by
+    rw [hEcard, Nat.log_pow (Fact.out : p.Prime).one_lt]
+  have h2pRank : 2 ≤ pRank ↥B p := hElog.trans (le_pRank E hEea)
+  exact h2pRank.trans (pRank_le_rank (G := ↥B) p)
+
+/-- BG Corollary 9.3's Corollary-9.2 cascade, after the Lemma-4.5 witness `D` and the
+two cyclic-quotient rank drops have been supplied.
+
+In the book proof, `D ⊴ P`, `|D| = p²`, and `B* ≤ C_G(B)` with `m(B*) = 3` are chosen so
+that `m(C_A(D)) ≥ 2` and `m(C_{B*}(D)) ≥ 2`. This lemma formalizes the remaining
+successive applications of Corollary 9.2:
+`A → C_A(D) → D → C_{B*}(D) → B* → B`. -/
+private theorem isUniquelyMaximal_of_rank_drop_witness [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A B D Bstar : Subgroup G}
+    (hAab : IsMulCommutative A) (hAU : IsUniquelyMaximal A)
+    (hBp : IsPGroup p B) (hBnc : ¬ IsCyclic ↥B)
+    (hDea : D.IsElementaryAbelian p) (hDcard : Nat.card D = p ^ 2)
+    (hBstarea : Bstar.IsElementaryAbelian p)
+    (hBstarlog : 3 ≤ Nat.log p (Nat.card Bstar))
+    (hBstar_le_CB : Bstar ≤ Subgroup.centralizer (B : Set G))
+    (hrCAD : 2 ≤ rank ↥(A ⊓ Subgroup.centralizer (D : Set G)))
+    (hrCBD : 2 ≤ rank ↥(Bstar ⊓ Subgroup.centralizer (D : Set G))) :
+    IsUniquelyMaximal B := by
+  classical
+  let CAD : Subgroup G := A ⊓ Subgroup.centralizer (D : Set G)
+  let CBD : Subgroup G := Bstar ⊓ Subgroup.centralizer (D : Set G)
+  have hCAD_le_CA : CAD ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    exact congrArg Subtype.val
+      ((hAab.is_comm.comm (⟨x, hx.1⟩ : A) (⟨a, ha⟩ : A)).symm)
+  have hCADU : IsUniquelyMaximal CAD :=
+    isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hAU hCAD_le_CA hrCAD
+  have hD_le_CCAD : D ≤ Subgroup.centralizer (CAD : Set G) := by
+    intro d hd
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    exact (Subgroup.mem_centralizer_iff.mp hc.2 d hd).symm
+  have hrD : 2 ≤ rank ↥D := by
+    have hlog_le : Nat.log p (Nat.card D) ≤ pRank ↥D p := hDea.log_card_le_pRank
+    have hlog : Nat.log p (Nat.card D) = 2 := by
+      rw [hDcard, Nat.log_pow (Fact.out : p.Prime).one_lt]
+    exact ((le_of_eq hlog.symm).trans hlog_le).trans (pRank_le_rank (G := ↥D) p)
+  have hDU : IsUniquelyMaximal D :=
+    isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hCADU hD_le_CCAD hrD
+  have hCBD_le_CD : CBD ≤ Subgroup.centralizer (D : Set G) := inf_le_right
+  have hCBDU : IsUniquelyMaximal CBD :=
+    isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hDU hCBD_le_CD hrCBD
+  have hBstar_le_CCBD : Bstar ≤ Subgroup.centralizer (CBD : Set G) := by
+    intro b hb
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    exact congrArg Subtype.val
+      ((hBstarea.comm (⟨b, hb⟩ : Bstar) (⟨c, hc.1⟩ : Bstar)).symm)
+  have hrBstar : 2 ≤ rank ↥Bstar := by
+    have hlog_le : Nat.log p (Nat.card Bstar) ≤ pRank ↥Bstar p :=
+      hBstarea.log_card_le_pRank
+    exact ((by omega : 2 ≤ Nat.log p (Nat.card Bstar)).trans hlog_le).trans
+      (pRank_le_rank (G := ↥Bstar) p)
+  have hBstarU : IsUniquelyMaximal Bstar :=
+    isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hCBDU hBstar_le_CCBD hrBstar
+  have hB_le_CBstar : B ≤ Subgroup.centralizer (Bstar : Set G) := by
+    intro b hb
+    rw [Subgroup.mem_centralizer_iff]
+    intro bstar hbstar
+    exact (Subgroup.mem_centralizer_iff.mp (hBstar_le_CB hbstar) b hb).symm
+  have hrB : 2 ≤ rank ↥B := two_le_rank_of_noncyclic_pSubgroup hG hBp hBnc
+  exact isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hBstarU hB_le_CBstar hrB
+
 /-- **BG Corollary 9.3** (mmd L2545): `p` prime, `A` abelian `p`-部分群, `B` noncyclic
 `p`-部分群、`A ∈ 𝒰`, `m(A) ≥ 3`, `r_p(C_G(B)) ≥ 3` ⇒ `B ∈ 𝒰`。 -/
 theorem isUniquelyMaximal_of_abelian_rank_three [Finite G] (hG : IsMinimalSimpleOdd G)
