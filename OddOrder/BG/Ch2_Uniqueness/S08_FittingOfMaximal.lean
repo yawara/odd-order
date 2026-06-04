@@ -3909,6 +3909,26 @@ theorem hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hq_ne_p hOq_mem
   exact hOq_ne hOq_bot
 
+/-- BG (8.13), first p-group input: any subgroup containing the local `SCN₃(P)` image
+has trivial `p'`-core. -/
+theorem opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M H : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    (hAH : A.map M.subtype ≤ H) :
+    opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥ := by
+  have hY : opiCoreInG ({p} : Set ℕ)ᶜ H ∈
+      hInvariant ⊤ (A.map M.subtype) ({p} : Set ℕ)ᶜ := by
+    rw [mem_hInvariant]
+    refine ⟨le_top, ?_, ?_⟩
+    · exact hAH.trans (le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ H)
+    · exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ H
+  exact hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
+    hG hM hp P hFp hAP hA hY
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -3944,7 +3964,19 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro Y hY
     exact hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hY
-  refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
+  have hAF : A.map M.subtype ≤ fittingInG M :=
+    scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+  refine ⟨hAF, ?_⟩
+  have hA_le_M : A.map M.subtype ≤ M := hAF.trans (fittingInG_le M)
+  have hA_proper : A.map M.subtype < ⊤ :=
+    lt_of_le_of_lt hA_le_M (mem_maximalSubgroups.mp hM).lt_top
+  refine IsUniquelyMaximal.of_unique_maximal hA_proper hM hA_le_M ?_
+  intro H hH hAH
+  have hHco : IsCoatom H := mem_maximalSubgroups.mp hH
+  haveI hH_solvable : IsSolvable ↥H := hG.solvable_of_lt_top H hHco.lt_top
+  have hOpComplHBot : opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥ :=
+    opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hAH
   sorry
 
 end OddOrder.BG.Ch2.S08
