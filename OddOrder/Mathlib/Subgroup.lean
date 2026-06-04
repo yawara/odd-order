@@ -262,6 +262,60 @@ theorem nat_card_quotient_subgroupOf_eq_card_map {G : Type*} [Group G] [Finite G
   conv_rhs => rw [show K.map (QuotientGroup.mk' N) = f0.range from hrange.symm]
   exact hEq
 
+/-- Mapping `B ≤ A ≤ H` through `H.subtype` commutes with viewing `B` as a subgroup
+of `A`. -/
+theorem subgroupOf_map_subtype_eq_map_subgroupOf {H : Subgroup G} {A B : Subgroup H}
+    (hBA : B ≤ A) :
+    (B.subgroupOf A).map
+        (Subgroup.equivMapOfInjective A H.subtype H.subtype_injective).toMonoidHom =
+      (B.map H.subtype).subgroupOf (A.map H.subtype) := by
+  ext x
+  constructor
+  · rintro ⟨y, hyB, rfl⟩
+    rw [mem_subgroupOf]
+    exact ⟨(y : H), hyB, rfl⟩
+  · intro hx
+    rw [mem_subgroupOf] at hx
+    rcases hx with ⟨y, hyB, hyx⟩
+    refine ⟨⟨y, hBA hyB⟩, hyB, ?_⟩
+    apply Subtype.ext
+    exact hyx
+
+/-- Normality of `B.subgroupOf A` is preserved when `B ≤ A ≤ H` is mapped through
+`H.subtype`. -/
+theorem normal_subgroupOf_map_subtype {H : Subgroup G} {A B : Subgroup H}
+    (hBA : B ≤ A) [((B.subgroupOf A) : Subgroup A).Normal] :
+    ((B.map H.subtype).subgroupOf (A.map H.subtype)).Normal := by
+  let eA : A ≃* A.map H.subtype :=
+    Subgroup.equivMapOfInjective A H.subtype H.subtype_injective
+  have hmap :
+      (B.subgroupOf A).map eA.toMonoidHom =
+        (B.map H.subtype).subgroupOf (A.map H.subtype) := by
+    simpa [eA] using subgroupOf_map_subtype_eq_map_subgroupOf (H := H) hBA
+  rw [← hmap]
+  exact (inferInstance : ((B.subgroupOf A) : Subgroup A).Normal).map
+    eA.toMonoidHom eA.surjective
+
+/-- Mapping `B ≤ A ≤ H` through `H.subtype` preserves the cardinality of the
+quotient layer `A/B`. -/
+theorem nat_card_quotient_subgroupOf_map_subtype_eq {H : Subgroup G}
+    {A B : Subgroup H} (hBA : B ≤ A)
+    [((B.subgroupOf A) : Subgroup A).Normal] :
+    Nat.card
+        ((A.map H.subtype) ⧸ ((B.map H.subtype).subgroupOf (A.map H.subtype))) =
+      Nat.card (A ⧸ B.subgroupOf A) := by
+  let eA : A ≃* A.map H.subtype :=
+    Subgroup.equivMapOfInjective A H.subtype H.subtype_injective
+  have hmap :
+      (B.subgroupOf A).map eA.toMonoidHom =
+        (B.map H.subtype).subgroupOf (A.map H.subtype) := by
+    simpa [eA] using subgroupOf_map_subtype_eq_map_subgroupOf (H := H) hBA
+  haveI : ((B.map H.subtype).subgroupOf (A.map H.subtype)).Normal :=
+    normal_subgroupOf_map_subtype (H := H) hBA
+  exact (Nat.card_congr
+    (QuotientGroup.congr (B.subgroupOf A)
+      ((B.map H.subtype).subgroupOf (A.map H.subtype)) eA hmap).toEquiv).symm
+
 /-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
 
 This is the induction/minimal-counterexample termination bridge used repeatedly when passing

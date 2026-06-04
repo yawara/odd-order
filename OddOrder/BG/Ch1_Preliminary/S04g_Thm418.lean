@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.GroupTheory.OpResidual
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG §4H: Theorem 4.18 — rank-2 solvable structure
@@ -867,6 +868,52 @@ theorem exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne
       _ =
           Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
             Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) := hL_card
+      _ = Nat.card ↥((default : Sylow q G) : Subgroup G) :=
+        card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne hpq hG
+          (default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+          (default : Sylow q G)
+
+/-- If a quotient layer inside the canonical normal `p`-complement has the
+`q`-Sylow cardinality, then mapping the layer into the ambient group preserves
+characteristic endpoints and the `q`-Sylow cardinality, for `q != p`.
+
+This is the quotient-layer version of the BG Theorem 4.20(c) induction lift. -/
+theorem characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    {A B : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)}
+    (hBA : B ≤ A) (hA_char : A.Characteristic) (hB_char : B.Characteristic)
+    (hcard :
+      Nat.card (A ⧸ B.subgroupOf A) =
+        Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+          Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))) :
+    (A.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype).Characteristic ∧
+      (B.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype).Characteristic ∧
+        Nat.card
+            ((A.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype) ⧸
+              ((B.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype).subgroupOf
+                (A.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype))) =
+          Nat.card ↥((default : Sylow q G) : Subgroup G) := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  haveI : B.Characteristic := hB_char
+  haveI : ((B.subgroupOf A) : Subgroup A).Normal :=
+    (inferInstance : B.Normal).subgroupOf A
+  refine ⟨?_, ?_, ?_⟩
+  · exact OddOrder.GroupTheory.characteristic_map_subtype_of_characteristic
+      (Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} G) hA_char
+  · exact OddOrder.GroupTheory.characteristic_map_subtype_of_characteristic
+      (Ch03.oPiCore.characteristic {r : ℕ | r ≠ p} G) hB_char
+  · calc
+      Nat.card
+          ((A.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype) ⧸
+            ((B.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype).subgroupOf
+              (A.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype))) =
+          Nat.card (A ⧸ B.subgroupOf A) := by
+        simpa [O] using Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq
+          (H := O) hBA
+      _ = Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+          Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) := hcard
       _ = Nat.card ↥((default : Sylow q G) : Subgroup G) :=
         card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne hpq hG
           (default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))

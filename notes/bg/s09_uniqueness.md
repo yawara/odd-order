@@ -671,6 +671,10 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    corresponding characteristic subgroup lift is covered by
    `S04.exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne`,
    which maps the induction-layer subgroup through the characteristic core.  The
+   quotient-layer version needed to glue consecutive characteristic factors is
+   covered by `S04.characteristic_quotient_layer_lift_of_hasNormalPComplement_ne`;
+   its generic subtype/cardinality support is in
+   `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  The
    Fitting-rank induction line `F(K) <= F(G)` is covered by
    `S04.rank_fitting_le_of_normal_subgroup` and
    `S04.rank_fitting_le_two_of_normal_subgroup`; the full normal-subgroup
