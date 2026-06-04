@@ -857,10 +857,13 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      step: a coprime subgroup that stabilizes every `chiefSeriesInside K`
      factor centralizes `K`. This is the `D ∩ L` centralization engine once
      Corollary 4.19 supplies the per-factor stabilizer input.
+   - `chiefSeries_stabilizer_of_le_chiefFactorCentralizer` converts Corollary
+     4.19-style centralization of each chief factor into the exact stabilizer
+     input `⁅chiefSeriesInside K i, P₀⁆ ≤ chiefSeriesInside K (i+1)`.
 
-   Remaining for this block: from `P₀ ≤ (L ∩ M)'` and Corollary 4.19, produce
-   `⁅chiefSeriesInside (D ∩ L) i, P₀⁆ ≤ chiefSeriesInside (D ∩ L) (i+1)`
-   inside `L ∩ M`; then apply the stored Lemma 1.9 helper and discharge the
+   Remaining for this block: instantiate Corollary 4.19 inside `L ∩ M` with
+   `G* = D ∩ L` to obtain the chief-factor centralizer input for `(L ∩ M)'`,
+   then thread `P₀ ≤ (L ∩ M)'` through the two stored helpers and discharge the
    noncentralization contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.

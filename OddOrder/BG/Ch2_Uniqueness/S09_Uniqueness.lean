@@ -2498,6 +2498,18 @@ private theorem coprime_chiefSeries_stabilizer_le_centralizer
     simpa [mul_assoc] using this
   exact h3.symm
 
+/-- If a subgroup centralizes every chief factor in `chiefSeriesInside K`, it
+stabilizes that chief series. This is the exact shape needed to feed the Lemma
+1.9 bridge after Corollary 4.19 gives chief-factor centralization. -/
+private theorem chiefSeries_stabilizer_of_le_chiefFactorCentralizer
+    {M : Type*} [Group M] [Finite M] {K D E : Subgroup M} [K.Normal]
+    (hDE : D ≤ E)
+    (hcent : ∀ i, E ≤ chiefFactorCentralizer
+      (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))) :
+    ∀ i, ⁅chiefSeriesInside K i, D⁆ ≤ chiefSeriesInside K (i + 1) := by
+  intro i
+  exact chiefFactorCentralizer.commutator_le_of_le ((hDE).trans (hcent i))
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
