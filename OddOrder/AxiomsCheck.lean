@@ -2297,6 +2297,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localComplementIndex_eq_e
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localSmallIndex_of_family_cardinalities
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.Bsum_le_of_orthogonal_integer_decomposition
@@ -2306,6 +2313,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_characterEstimateData
 set_option linter.style.longLine false in

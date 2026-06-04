@@ -545,3 +545,17 @@ S09 に
 を追加した。`H78` 側の source-data / `u,v,w` formula / small-index から得た `Γ` bound を、
 `CharacterEstimateData` の real reduced family inequality + orthogonal decomposition constructor に直接接続する。
 局所データと family index の接続は `H78.complementIndex = F.e i` として明示的に残した。
+
+
+### 2026-06-04 pass: family/local cardinality bridges
+
+S09 に `FrobeniusFamily.localKernelOrder_eq_h`,
+`FrobeniusFamily.localComplementIndex_eq_e`,
+`FrobeniusFamily.localSmallIndex_of_family_cardinalities` を追加した。
+`H78` の局所 `h/e/smallIndex` を family 側の `F.h i` / `F.e i` / `2e_i+1≤h_i`
+から供給できる。
+
+さらに
+`FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities`
+を追加し、前回の source-data final assembly constructor が要求していた local `hindex` と
+`H78.smallIndex` を、`L = F.L i`, `H = F.H i`, family-side small-index から内部生成する入口にした。

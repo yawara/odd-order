@@ -4048,6 +4048,41 @@ noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H
 noncomputable def e (F : FrobeniusFamily G k) (i : Fin k) : ℕ :=
   Nat.card (F.L i) / Nat.card (F.H i)
 
+/-- If a local (7.8) package uses the `i`-th family kernel, its local
+kernel order is the family quantity `h_i`. -/
+lemma localKernelOrder_eq_h [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hH : H78.hyp76.H = F.H i) :
+    H78.kernelOrder = F.h i := by
+  simp [Hypothesis78.kernelOrder, FrobeniusFamily.h, hH]
+
+/-- If a local (7.8) package uses the `i`-th family host and kernel, its local
+complement index is the family quantity `e_i`. -/
+lemma localComplementIndex_eq_e [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hL : L = F.L i)
+    (hH : H78.hyp76.H = F.H i) :
+    H78.complementIndex = F.e i := by
+  simp [Hypothesis78.complementIndex, FrobeniusFamily.e, hL, hH]
+
+/-- Family-side small-index data `2e_i + 1 ≤ h_i` supplies the local (7.8.b)
+small-index hypothesis after identifying the local host and kernel. -/
+lemma localSmallIndex_of_family_cardinalities [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hL : L = F.L i)
+    (hH : H78.hyp76.H = F.H i)
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    H78.smallIndex := by
+  rw [Hypothesis78.smallIndex]
+  rw [F.localComplementIndex_eq_e H78 hL hH, F.localKernelOrder_eq_h H78 hH]
+  exact hsmall
+
 /-- `G₀` is nonempty: it contains the identity. -/
 lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :
     1 ≤ Nat.card F.G0 := by
@@ -4842,6 +4877,67 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_so
         H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
           hBD hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv hsmall)
     hred
+
+/-- Source-data constructor with family-side cardinality hypotheses.
+
+Compared with
+`characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition`,
+this wrapper consumes the natural family/local identifications `L = L_i` and
+`H = H_i`, and the family-side small-index hypothesis `2e_i + 1 ≤ h_i`, rather
+than asking the caller to rewrite them into local (7.8.b) notation. -/
+noncomputable def characterEstimateData_of_source_decomposition_of_family_cardinalities
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+    H78 hBD (F.localComplementIndex_eq_e H78 hL hH)
+    hmin B hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+    hzeta_degree hdegree_sum hzeta_uv
+    (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall) hred
 
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
