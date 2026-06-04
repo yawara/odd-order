@@ -69,6 +69,10 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       せず、有限な `Yset` を enumerate して各 member の linear source を選ぶ設計で、exact range
       と pairwise non-`L`-conjugacy を誘導既約文字の injective enumeration から構成。T6/Y-family は
       `2 ≤ hyp.Yset.ncard` まで圧縮済み。
+- [x] (2026-06-04) `induce_conj` / `Yset_nonempty` / `Yset_hasNoRealCharacters` /
+      `Yset_closedUnderConjugate` / `two_le_Yset_ncard` / `coherentYset` を追加。S07 の
+      `two_le_ncard_of_conjugate_closed_of_noReal` に finite/nonempty/closed/no-real を渡し、
+      T6/Y-family coherence の cardinality 仮定を discharge。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

@@ -30,6 +30,45 @@ class-sum-algebra proofs are intentionally not asserted here.
 Reference note: `notes/peterfalvi/s08_coherence_theorems.md`.
 -/
 
+namespace OddOrder.RepresentationTheory
+
+namespace ClassFunction
+
+variable {Γ : Type*} [Group Γ]
+
+/-- The induction summand commutes with complex conjugation. -/
+theorem induceTerm_conjStar (H : Subgroup Γ) (θ : ClassFunction ↥H ℂ) (x g : Γ) :
+    star (induceTerm H θ x g) = induceTerm H θ.conj x g := by
+  classical
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · rw [induceTerm_of_mem θ hx, induceTerm_of_mem θ.conj hx, conj_apply]
+  · rw [induceTerm_of_not_mem θ hx, induceTerm_of_not_mem θ.conj hx, star_zero]
+
+variable [Fintype Γ]
+
+/-- The unnormalized induction sum commutes with complex conjugation. -/
+theorem induceSum_conj (H : Subgroup Γ) (θ : ClassFunction ↥H ℂ) :
+    (induceSum H θ).conj = induceSum H θ.conj := by
+  ext g
+  rw [conj_apply, induceSum_apply, induceSum_apply, star_sum]
+  exact Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g
+
+/-- The normalized induced class function commutes with complex conjugation. -/
+theorem induce_conj (H : Subgroup Γ) [Invertible (Nat.card H : ℂ)]
+    (θ : ClassFunction ↥H ℂ) :
+    (induce H θ).conj = induce H θ.conj := by
+  ext g
+  rw [conj_apply, induce_apply, induce_apply, star_mul', star_sum]
+  have hscale : star (⅟(Nat.card H : ℂ)) = ⅟(Nat.card H : ℂ) := by
+    rw [invOf_eq_inv, star_inv₀, star_natCast]
+  rw [hscale]
+  exact congrArg (fun z => ⅟(Nat.card H : ℂ) * z)
+    (Finset.sum_congr rfl fun x _ => induceTerm_conjStar H θ x g)
+
+end ClassFunction
+
+end OddOrder.RepresentationTheory
+
 namespace OddOrder.Peterfalvi.S08
 
 open OddOrder.RepresentationTheory
@@ -2906,6 +2945,98 @@ noncomputable def coherentYset_of_two_le_ncard
   letI : NeZero n := hnzero
   exact hyp.coherentYset_of_pairwiseNonconj hn2 χ hχ_ne hχ_cover hpairwise
 
+/-- `Y = S(H')` is nonempty.
+
+The nontrivial nilpotent group `H` is solvable, hence has proper commutator subgroup.  The
+abelianization therefore has a nontrivial linear character, whose induced character lies in
+`Yset`. -/
+theorem Yset_nonempty (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    hyp.Yset.Nonempty := by
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have hcomm : _root_.commutator ↥H ≠ ⊤ :=
+    (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H)).ne
+  obtain ⟨χ, hχ_ne⟩ := exists_monoidHom_units_ne_one_of_commutator_ne_top hcomm
+  exact ⟨ClassFunction.induce H (linearClassFunction χ),
+    by simpa [linearIrreducibleCharacter_coe] using
+      hyp.induce_linearIrreducibleCharacter_mem_Yset hχ_ne⟩
+
+/-- `Y = S(H')` contains no real characters.
+
+Each member of `Yset` is an irreducible induced character of degree `|W₁|`; since `W₁` is
+nontrivial this degree is not `1`, so the member is not the trivial irreducible character.  Odd
+order of `L` then gives non-realness by Peterfalvi (1.1). -/
+theorem Yset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Yset := by
+  intro φ hφ hreal
+  let η : IrreducibleCharacter ↥L := ⟨φ, hyp.isIrreducibleCharacter_of_mem_Yset hφ⟩
+  have hη_ne : η ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥L := by
+    intro hη
+    have hφ_one_triv : φ (1 : ↥L) = 1 := by
+      have h := congrArg (fun ψ : IrreducibleCharacter ↥L =>
+        (ψ : ClassFunction ↥L ℂ) (1 : ↥L)) hη
+      simpa [η, trivialClassFunction_apply] using h
+    obtain ⟨χ, _hχ_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+    have hφ_one : φ (1 : ↥L) = (Nat.card hyp.W1 : ℂ) := by
+      rw [hφeq]
+      simpa [linearIrreducibleCharacter_coe] using
+        hyp.induce_apply_one_eq_card_W1_of_degree_one
+          (linearIrreducibleCharacter χ) (linearIrreducibleCharacter_apply_one χ)
+    have hcard_ne : (Nat.card hyp.W1 : ℂ) ≠ 1 := by
+      have hcard_nat : Nat.card hyp.W1 ≠ 1 := by
+        intro hcard
+        exact hyp.W1_nontrivial (Subgroup.card_eq_one.mp hcard)
+      exact_mod_cast hcard_nat
+    exact hcard_ne (hφ_one.symm.trans hφ_one_triv)
+  exact (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+    hyp.card_L_odd hη_ne) hreal
+
+/-- `Y = S(H')` is closed under complex conjugation. -/
+theorem Yset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate hyp.Yset := by
+  intro φ hφ
+  rw [Yset, SsubFiltration] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hφ
+  let θc : IrreducibleCharacter ↥H :=
+    ⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩
+  refine ⟨θc, ?_, ?_, ?_⟩
+  · intro hθc
+    apply hθ_ne
+    apply IrreducibleCharacter.ext
+    have hval : (θ : ClassFunction ↥H ℂ).conj =
+        (OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H :
+          ClassFunction ↥H ℂ) := by
+      simpa [θc] using congrArg
+        (fun η : IrreducibleCharacter ↥H => (η : ClassFunction ↥H ℂ)) hθc
+    calc
+      (θ : ClassFunction ↥H ℂ) = ((θ : ClassFunction ↥H ℂ).conj).conj := by
+        rw [ClassFunction.conj_conj]
+      _ = (OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H :
+          ClassFunction ↥H ℂ).conj := by
+        rw [hval]
+      _ = (OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H :
+          ClassFunction ↥H ℂ) := by
+        ext x
+        simp
+  · simpa [θc, OddOrder.Peterfalvi.S03.characterKernel_conj] using hker
+  · rw [hφeq]
+    simpa [θc] using ClassFunction.induce_conj H (θ : ClassFunction ↥H ℂ)
+
+/-- `Y = S(H')` has at least two members. -/
+theorem two_le_Yset_ncard (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    2 ≤ hyp.Yset.ncard :=
+  OddOrder.Peterfalvi.S07.two_le_ncard_of_conjugate_closed_of_noReal
+    hyp.Yset_finite
+    hyp.Yset_nonempty
+    hyp.Yset_closedUnderConjugate
+    hyp.Yset_hasNoRealCharacters
+
+/-- `Y = S(H')` coherence, with the cardinal lower bound discharged internally. -/
+noncomputable def coherentYset (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.coherentYset_of_two_le_ncard hyp.two_le_Yset_ncard
+
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
 nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irreducible. -/
@@ -4958,5 +5089,4 @@ noncomputable def ofIsCoherent
 end IndChainDecomposition
 
 end OddOrder.Peterfalvi.S08
-
 

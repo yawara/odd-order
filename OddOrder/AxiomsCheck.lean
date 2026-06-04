@@ -701,6 +701,11 @@ set_option linter.style.longLine false in
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (complex conjugation): induction commutes with conjugating values in `ℂ`;
+-- used to show `Y = S(H')` is closed under complex conjugation in Peterfalvi (6.8).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceTerm_conjStar
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_conj
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_conj
 -- RepresentationTheory ([Is] Thm 6.34 degree part): the induced class function at `1` is
 -- `[G : H] · θ(1)`.  All `|G|` conjugates `x⁻¹ · 1 · x = 1` lie in `H`, so every summand is
 -- `θ(1)`; dividing by `|H|` and using `|G| = [G:H]·|H|` (`Subgroup.index_mul_card`) leaves `[G:H]`.
@@ -2017,6 +2022,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_pairwiseNonconj
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_two_le_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_nonempty
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_Yset_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
 #assert_only_allowed_axioms

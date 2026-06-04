@@ -1645,5 +1645,22 @@ wiring-size では放電不能**と確定 (各々 真正に新規数学 + interf
   `coherentYset_of_pairwiseNonconj` に渡し、T6/Y-family coherence の残入力を
   `2 ≤ hyp.Yset.ncard` へ圧縮。
 
-残る T6/Y-family 側の実装境界は、(6.8) case split 内でこの cardinal lower bound を作ることと、
-case c1/c2 の top-level assembly へ `coherentYset_of_two_le_ncard` を差し込むこと。
+### 2026-06-04 pass 13: `Y = S(H')` の cardinal lower bound を discharge
+
+`S08_CoherenceTheorems.lean` に `2 ≤ hyp.Yset.ncard` の入力を closed:
+
+- `ClassFunction.induceTerm_conjStar` / `induceSum_conj` / `induce_conj`: 誘導和が複素共役と
+  可換する一般 helper。
+- `SibleyDadeHypothesis.Yset_nonempty`: `H ≠ 1` かつ nilpotent/solvable から `H/H'` の非自明
+  linear character を取り、誘導して `Yset` の元を得る。
+- `SibleyDadeHypothesis.Yset_hasNoRealCharacters`: `Yset` member は degree `|W₁| > 1` の既約誘導
+  文字なので trivial ではなく、odd order の (1.1) から real でない。
+- `SibleyDadeHypothesis.Yset_closedUnderConjugate`: source `θ` を `θ.conj` に替え、
+  `characterKernel_conj` と `induce_conj` で `Yset` membership を保つ。
+- `SibleyDadeHypothesis.two_le_Yset_ncard`: S07 の
+  `two_le_ncard_of_conjugate_closed_of_noReal` に finite/nonempty/closed/no-real を渡す。
+- `SibleyDadeHypothesis.coherentYset`: `coherentYset_of_two_le_ncard` の cardinality 仮定を
+  内部で `two_le_Yset_ncard` により discharge した T6/Y-family coherence。
+
+残る T6/Y-family 側の実装境界は、case c1/c2 の top-level assembly へ `coherentYset` を
+差し込むこと。

@@ -84,6 +84,9 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
     representative construction を追加。有限な `Yset` を enumerate し、各 member の linear source
     を選ぶことで exact range / cover / pairwise nonconjugacy を構成し、
     `coherentYset_of_two_le_ncard` まで接続。
+  - 2026-06-04: `Yset_nonempty` / `Yset_hasNoRealCharacters` / `Yset_closedUnderConjugate` /
+    `two_le_Yset_ncard` / `coherentYset` を追加。誘導と複素共役の可換性 `induce_conj` を足し、
+    S07 の cardinality lemma で `2 ≤ |Y|` を discharge。
 
 ## 完了条件
 
@@ -101,7 +104,9 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   orbit-representative family から `Yset` coherence へ rewrite する adapter まで接続済み。
 - ✅ 2026-06-04: `Y = S(H')` の concrete finite family construction と
   surjectivity/pairwise nonconjugacy の構成を `exists_Yset_linearRepresentativeFamily` で完了。
-- 残: T6/Y-family を (6.8) 本体へ入れるための `2 ≤ hyp.Yset.ncard` 下限と case c1/c2 top-level assembly。
+- ✅ 2026-06-04: `2 ≤ hyp.Yset.ncard` を `two_le_Yset_ncard` で discharge し、
+  cardinality 仮定なしの `coherentYset` まで接続。
+- 残: T6/Y-family を (6.8) 本体へ入れるための case c1/c2 top-level assembly。
 
 ## 参照
 
