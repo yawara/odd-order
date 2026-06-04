@@ -3436,7 +3436,8 @@ theorem normalizedDegreeGap_of_realDegreeBound
   obtain ⟨d₁, hd₁pos, hχ₁one⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ₁
   have hd₁real_pos : 0 < (d₁ : ℝ) := by exact_mod_cast hd₁pos
   have hχ₁re :
-      (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re = (d₁ : ℝ) := by
+      (OddOrder.Peterfalvi.S03.characterDegree
+          (χ₁ : ClassFunction G ℂ)).re = (d₁ : ℝ) := by
     rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one]
     norm_num
   have hχre :
@@ -3478,6 +3479,95 @@ theorem normalizedDegreeGap_of_realDegreeBound
   rw [hleft, hright] at hAbs
   have hd₁sq_pos : 0 < (d₁ : ℝ) ^ 2 := sq_pos_of_pos hd₁real_pos
   nlinarith
+
+/-- **(T8.11n) real absolute degree bound from natural prime-power data.**
+
+This is the adapter from the pure §6.6 number-theoretic leaf in §7 to the real-valued
+bound used by
+`normalizedDegreeGap_of_realDegreeBound`: if natural degree values identify `χ(1)=dχ`,
+`χ₁(1)=d₁`, and the member-family square sum is `D`, then the prime-power gap plus
+square-divisibility `dχ^2 ∣ D` gives
+`2 * χ(1).re * χ₁(1).re < ∑ χmem(j)(1).re^2`. -/
+theorem realDegreeBound_of_natDegreeSumPrimePowerGap
+    {G : Type*} [Group G]
+    {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {p d₁ dχ q m D : ℕ} {dmem : ι → ℕ}
+    (hχone : (χ : ClassFunction G ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ))
+    (hDsum : ∑ i ∈ s, dmem i * dmem i = D)
+    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    2 * ((OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re *
+        (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re) <
+      ∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2 := by
+  classical
+  have hNat : 2 * (dχ * d₁) < D :=
+    OddOrder.Peterfalvi.S07.two_mul_lt_of_sq_dvd_of_gap
+      (OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_primePow_gap hp hpos₁ hq hdiv hlt)
+      hdvd hDpos
+  have hNatReal : 2 * ((dχ : ℝ) * (d₁ : ℝ)) < (D : ℝ) := by
+    exact_mod_cast hNat
+  have hχre :
+      (OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re = (dχ : ℝ) := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχone]
+    norm_num
+  have hχ₁re :
+      (OddOrder.Peterfalvi.S03.characterDegree
+          (χ₁ : ClassFunction G ℂ)).re = (d₁ : ℝ) := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one]
+    norm_num
+  have hsumCast : (∑ i ∈ s, ((dmem i * dmem i : ℕ) : ℝ)) = (D : ℝ) := by
+    exact_mod_cast hDsum
+  have hright :
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+        (D : ℝ) := by
+    calc
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+          ∑ i ∈ s, ((dmem i : ℝ) ^ 2) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            rw [OddOrder.Peterfalvi.S03.characterDegree_def, hmemone i hi]
+            norm_num
+      _ = ∑ i ∈ s, ((dmem i * dmem i : ℕ) : ℝ) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            norm_num [pow_two]
+      _ = (D : ℝ) := hsumCast
+  rw [hχre, hχ₁re, hright]
+  exact hNatReal
+
+/-- **(T8.11o) normalized degree gap from natural prime-power data.**
+
+Combines `realDegreeBound_of_natDegreeSumPrimePowerGap` with
+`normalizedDegreeGap_of_realDegreeBound`, so a §6.6 caller with natural degree data and ratio data
+can produce the `XAdjoinStepInput.hDeg` field directly. -/
+theorem normalizedDegreeGap_of_natDegreeSumPrimePowerGap
+    {G : Type*} [Group G]
+    {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {deg : ι → ℕ} {a p d₁ dχ q m D : ℕ} {dmem : ι → ℕ}
+    (hχdeg : (χ : ClassFunction G ℂ) 1 =
+      (a : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hmemdeg : ∀ i ∈ s,
+      (χmem i : ClassFunction G ℂ) 1 =
+        (deg i : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hχone : (χ : ClassFunction G ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ))
+    (hDsum : ∑ i ∈ s, dmem i * dmem i = D)
+    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2 :=
+  normalizedDegreeGap_of_realDegreeBound hχdeg hmemdeg
+    (realDegreeBound_of_natDegreeSumPrimePowerGap hχone hχ₁one hmemone hDsum
+      hp hpos₁ hq hdiv hlt hdvd hDpos)
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
 hypotheses `SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is

@@ -217,8 +217,17 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
 
 これで `xAdjoinStepInput_of_memberFamily_degreeRatios` に渡す `hDeg` は、§6.6 側が absolute bound を
 出せば直接変換できる形になった。ratio 生成は `exists_pos_natDegreeRatioFamily_of_dvd` と
-`exists_pos_natDegreeRatio_of_dvd` で用意済み。残る真正 §6.6 入力は、absolute bound 自体を供給する
-square-divisibility / prime-power gap / partial degree-sum identity の chain。
+`exists_pos_natDegreeRatio_of_dvd` で用意済み。
+
+さらに `realDegreeBound_of_natDegreeSumPrimePowerGap` と
+`normalizedDegreeGap_of_natDegreeSumPrimePowerGap` を landing。§7 の純算術 leaf
+`two_mul_lt_sq_of_primePow_gap` + `two_mul_lt_of_sq_dvd_of_gap` を、S08 の real absolute degree bound
+および normalized `hDeg` へ直接接続した。caller が自然数 degree 値、member square-sum identity
+`∑ dmem(j)^2 = D`、prime-power gap data、square-divisibility `dχ^2 ∣ D` を供給すれば、
+`xAdjoinStepInput_of_memberFamily_degreeRatios` の `hDeg` まで一気に得られる。
+
+残る真正 §6.6 入力は、real/normalized 変換ではなく、character theory から自然数 degree 値・
+member square-sum identity・prime-power gap・square-divisibility data を生成する部分。
 
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 
