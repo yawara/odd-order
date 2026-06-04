@@ -4305,6 +4305,29 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
   rw [hlhs, zero_div] at hi
   linarith [hi, hRHS]
 
+/-- **Peterfalvi (7.11), `𝓑`-sum-bound form.**  The terminal contradiction from
+the separately established `𝓑`-sum bound and the real reduced family inequality.
+
+This is the direct consumer for final-assembly work that has already converted the
+orthogonal decomposition into the rational `𝓑`-sum estimate, but has not packaged the result
+as `CharacterEstimateData`. -/
+theorem not_trivial_G0_of_real_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_characterEstimateData F hodd
+    (F.characterEstimateData_of_real_reduced_family_inequality hmin B hB_ne hBsum hred)
+    hG0
+
 /-- **Peterfalvi (7.11), raw final-assembly form.**  The terminal contradiction from the
 real reduced family inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
 

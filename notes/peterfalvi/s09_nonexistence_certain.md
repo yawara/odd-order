@@ -344,3 +344,13 @@ S09 に `not_trivial_G0_of_real_reduced_family_inequality_and_decomposition` を
 
 これで §9 の terminal contradiction は、named `CharacterEstimateData` だけでなく raw final-assembly
 input からも `card_G0_lower_bound` の sorry を通らず axiom-clean に利用できる。
+
+
+### 2026-06-04 pass: Bsum-bound input to conditional (7.11)
+
+S09 に `not_trivial_G0_of_real_Bsum_bound` を追加。これは `CharacterEstimateData` を
+明示的に渡す代わりに、既に得られた `𝓑`-sum bound と real reduced family inequality から
+`G₀ = {1}` の矛盾へ進む入口。
+
+raw orthogonal decomposition からの入口と named data からの入口の中間に置くことで、(7.8)/(7.9)
+側が先に `Bsum_le` を作った場合にも `card_G0_lower_bound` の sorry を経由せず使える。
