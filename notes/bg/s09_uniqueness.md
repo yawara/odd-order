@@ -582,6 +582,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      packages the low-rank `(9.7) → (9.8)` side abstractly: if `O_q(M)` is a Sylow
      `q`-subgroup of `G` and its normalizer lies in `M`, then the chosen `Q` has
      `N_G(Q) ≤ M`.
+   - `normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot` proves the standard
+     maximality localization `N_G(O_q(M)) ≤ M` for nontrivial `O_q(M)`.
+   - `exists_sylow_eq_of_sylow_subgroupOf_and_normalizer_le` is the Sylow-normalizer
+     bridge behind BG (9.7): if `O` is the image of a Sylow `q`-subgroup of `M` and
+     `N_G(O) ≤ M`, then `O` is a Sylow `q`-subgroup of `G`.
+   - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow`
+     packages the low-rank `Q` choice once Thm 4.20(c) supplies the local Sylow
+     equality `(P_M : Subgroup M).map M.subtype = O_q(M)`.
 
    The high-rank bookkeeping layer is also now separated:
 
@@ -602,9 +610,9 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      packages the full high-rank `Q` choice: for `R ≤ M` and `r_q(F(M)) ≥ 3`,
      it returns `Q ∈ ℋ_G^*(R;q)` with `O_q(M) ≤ Q` and `N_G(Q) ≤ M`.
 
-   Remaining subfrontier for this item: derive the low-rank `(9.7)` hypotheses from
-   Thm 4.20(c), then combine the low/high rank `Q` packages into the L2573-L2589
-   `N_G(R) ≤ M` bridge used by Lemma 9.5.
+   Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
+   Sylow equality/nontriviality inputs, then combine the low/high rank `Q` packages
+   into the L2573-L2589 `N_G(R) ≤ M` bridge used by Lemma 9.5.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final

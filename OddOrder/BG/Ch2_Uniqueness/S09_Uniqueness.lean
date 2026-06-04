@@ -1196,6 +1196,71 @@ private theorem hInvariantStar_eq_sylow_of_sylow_le [Finite G]
     isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ)
   exact P.is_maximal' hQp hPQ
 
+/-- A nontrivial singleton core of a maximal subgroup has normalizer contained in that
+maximal subgroup. -/
+private theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
+    Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M := by
+  haveI : IsSimpleGroup G := hG.simple
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hMleN : M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) :=
+    le_normalizer_opiCoreInG ({q} : Set ℕ) M
+  have hNne : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≠ ⊤ := by
+    intro hNtop
+    have hOq_normal : (opiCoreInG ({q} : Set ℕ) M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M)
+        inferInstance with hOqbot | hOqtop
+    · exact hOqne hOqbot
+    · have htop_le_M : ⊤ ≤ M := by
+        rw [← hOqtop]
+        exact opiCoreInG_le ({q} : Set ℕ) M
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  exact (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
+
+/-- If a subgroup is the ambient image of a Sylow `q`-subgroup of `M` and its ambient
+normalizer is contained in `M`, then it is a Sylow `q`-subgroup of `G`.
+
+This is the Sylow-normalizer bookkeeping in BG (9.7). -/
+private theorem exists_sylow_eq_of_sylow_subgroupOf_and_normalizer_le [Finite G]
+    {q : ℕ} [Fact q.Prime] {M O : Subgroup G} (PM : Sylow q ↥M)
+    (hPMO : (PM : Subgroup ↥M).map M.subtype = O)
+    (hNOM : Subgroup.normalizer (O : Set G) ≤ M) :
+    ∃ P : Sylow q G, (P : Subgroup G) = O := by
+  classical
+  have hOp : IsPGroup q O := by
+    rw [← hPMO]
+    exact PM.isPGroup'.map M.subtype
+  obtain ⟨S, hOS⟩ := hOp.exists_le_sylow
+  have hSO : (S : Subgroup G) = O := by
+    by_contra hS_ne_O
+    have hOltS : O < (S : Subgroup G) :=
+      lt_of_le_of_ne hOS (fun h => hS_ne_O h.symm)
+    have hOltSN : O < (S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G) :=
+      S08.lt_inf_normalizer_of_isPGroup_lt S.isPGroup' hOltS
+    have hSN_le_M : (S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G) ≤ M :=
+      inf_le_right.trans hNOM
+    let K : Subgroup ↥M :=
+      ((S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G)).subgroupOf M
+    have hKp : IsPGroup q K := (S.isPGroup'.to_inf_left).comap_subtype
+    have hPM_le_K : (PM : Subgroup ↥M) ≤ K := by
+      intro x hx
+      have hxO : (x : G) ∈ O := by
+        rw [← hPMO]
+        exact ⟨x, hx, rfl⟩
+      change (x : G) ∈ (S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G)
+      exact (le_inf hOS Subgroup.le_normalizer) hxO
+    have hK_eq_PM : K = (PM : Subgroup ↥M) := PM.is_maximal' hKp hPM_le_K
+    have hSN_eq_O : (S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G) = O := by
+      calc
+        (S : Subgroup G) ⊓ Subgroup.normalizer (O : Set G)
+            = K.map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hSN_le_M).symm
+        _ = (PM : Subgroup ↥M).map M.subtype := by rw [hK_eq_PM]
+        _ = O := hPMO
+    exact (ne_of_lt hOltSN) hSN_eq_O.symm
+  exact ⟨S, hSO⟩
+
 /-- The `(9.7)` side of BG Lemma 9.5's `(9.8)` step, abstracted from the source of the
 Sylow fact.
 
@@ -1215,6 +1280,27 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
   refine ⟨Q, hQ, hcoreQ, ?_⟩
   rw [hQeq]
   exact hNPM
+
+/-- Low-rank `(9.7)` package once Theorem 4.20(c) has identified `O_q(M)` as the
+ambient image of a Sylow `q`-subgroup of `M`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  classical
+  have hNcoreM : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M :=
+    normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot hG hM hOqne
+  obtain ⟨P, hPcore⟩ :=
+    exists_sylow_eq_of_sylow_subgroupOf_and_normalizer_le PM hPMcore hNcoreM
+  have hNPM : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤ M := by
+    rw [hPcore]
+    exact hNcoreM
+  exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_sylow
+    P hPcore hRM hNPM
 
 /-- A rank-three `q`-subgroup is nontrivial. -/
 private theorem ne_bot_of_isPGroup_of_three_le_rank [Finite G]
