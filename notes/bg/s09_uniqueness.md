@@ -847,9 +847,16 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      step `P₀ ≤ N_G(P)'`, `N_G(P) ≤ M`, `N_G(P) ≤ L` ⇒ `P₀ ≤ (L ∩ M)'`.
    - `p0_le_derivedInG_inf_of_scn3_witness_maximal` combines this with the witness
      `L` normalizer reapplication.
+   - `inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton`
+     records `D ∩ C_G(B) ≤ D ∩ L` from `y ∈ B` and `C_G(y) ≤ L`.
+   - `le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal` applies
+     centralizer antitonicity: `P₀ ≤ C_G(D ∩ L)` implies
+     `P₀ ≤ C_G(D ∩ C_G(B))`, exactly the target contradicted by the witness
+     package.
 
-   Remaining for this block: feed `P₀ ≤ (L ∩ M)'` into the Corollary 4.19 +
-   Lemma 1.9 chain to contradict the noncentralization of `D ∩ C_G(B)`.
+   Remaining for this block: construct `P₀ ≤ C_G(D ∩ L)` from
+   `P₀ ≤ (L ∩ M)'` via the Corollary 4.19 + Lemma 1.9 chain, then discharge
+   the stored noncentralization contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

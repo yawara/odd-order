@@ -2417,6 +2417,30 @@ private theorem p0_le_derivedInG_inf_of_scn3_witness_maximal
       hG hA hAnot hyA hL hPp hAP hPnormA SP_L).2
   exact le_derivedInG_inf_of_le_derivedInG_normalizer hP0N hNPM hNPL
 
+/-- If `y ∈ B` and `L` contains `C_G(y)`, then `D ∩ C_G(B)` is contained in
+`D ∩ L`. This is the subgroup inclusion used to pass from a centralizer of
+`D ∩ L` to a centralizer of `D ∩ C_G(B)`. -/
+private theorem inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton
+    {B D L : Subgroup G} {y : G} (hyB : y ∈ B)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G))) :
+    D ⊓ Subgroup.centralizer (B : Set G) ≤ D ⊓ L := by
+  refine le_inf inf_le_left ?_
+  exact inf_le_right.trans
+    ((Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hyB)).trans hL.2)
+
+/-- Antitonicity bridge for the final contradiction in BG Lemma 9.5. If `P₀`
+centralizes `D ∩ L`, then it centralizes the smaller subgroup `D ∩ C_G(B)`. -/
+private theorem le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal
+    {B D L P0 : Subgroup G} {y : G} (hyB : y ∈ B)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)))
+    (hcentDL : P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G)) :
+    P0 ≤ Subgroup.centralizer
+      (((D ⊓ Subgroup.centralizer (B : Set G) : Subgroup G)) : Set G) :=
+  hcentDL.trans
+    (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr
+      (inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton
+        (D := D) hyB hL)))
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
