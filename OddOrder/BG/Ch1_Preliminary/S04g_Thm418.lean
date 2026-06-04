@@ -926,14 +926,13 @@ theorem hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient
   hasNormalPComplement_of_oPiCore_quotient_and_outer_quotient_isPGroup
     (H := H) (isPGroup_quotient_oPiCore_of_hasNormalPComplement hH) houter
 
-/-- The canonical normal `p`-complement preserves the Sylow cardinalities for primes
-`q != p`. -/
-theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
-    [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
-    (hG : Ch05.HasNormalPComplement p G)
-    (QK : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) (QG : Sylow q G) :
-    Nat.card ↥(QK : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) =
-      Nat.card ↥(QG : Subgroup G) := by
+/-- The canonical normal `p`-complement preserves the `q`-part of the group order
+for `q != p`. -/
+theorem factorization_card_oPiCore_eq_factorization_card_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G) :
+    (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).factorization q =
+      (Nat.card G).factorization q := by
   classical
   obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
   have hcomp : Subgroup.IsComplement' (Ch03.oPiCore {r : ℕ | r ≠ p} G)
@@ -952,8 +951,64 @@ theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
       (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).factorization q := by
     rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne',
       Finsupp.add_apply, hP_q_zero, add_zero]
+  exact hfact.symm
+
+/-- For primes `q != p`, membership in the prime divisors of the canonical normal
+`p`-complement is equivalent to membership in the prime divisors of the ambient group. -/
+theorem mem_primeFactors_oPiCore_iff_mem_primeFactors_card_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G) :
+    q ∈ (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).primeFactors ↔
+      q ∈ (Nat.card G).primeFactors := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  constructor
+  · intro hqO
+    exact Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card O) Nat.card_pos.ne' hqO
+  · intro hqG
+    have hfact :
+        (Nat.card ↥O).factorization q = (Nat.card G).factorization q := by
+      simpa [O] using
+        factorization_card_oPiCore_eq_factorization_card_of_hasNormalPComplement_ne
+          (G := G) hpq hG
+    rw [← Nat.support_factorization] at hqG ⊢
+    exact Finsupp.mem_support_iff.mpr (by
+      rw [hfact]
+      exact Finsupp.mem_support_iff.mp hqG)
+
+/-- If `q` is a largest prime divisor of `G` and `q != p`, then it is also a
+largest prime divisor of the canonical normal `p`-complement. -/
+theorem largest_primeFactor_oPiCore_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (hqG : q ∈ (Nat.card G).primeFactors)
+    (hlargest : ∀ r ∈ (Nat.card G).primeFactors, r ≤ q) :
+    q ∈ (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).primeFactors ∧
+      ∀ r ∈ (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).primeFactors, r ≤ q := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  refine ⟨?_, ?_⟩
+  · exact
+      (mem_primeFactors_oPiCore_iff_mem_primeFactors_card_of_hasNormalPComplement_ne
+        (G := G) hpq hG).2 hqG
+  · intro r hrO
+    exact hlargest r (Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card O)
+      Nat.card_pos.ne' (by simpa [O] using hrO))
+
+/-- The canonical normal `p`-complement preserves the Sylow cardinalities for primes
+`q != p`. -/
+theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (QK : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) (QG : Sylow q G) :
+    Nat.card ↥(QK : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) =
+      Nat.card ↥(QG : Subgroup G) := by
+  classical
+  have hfact :=
+    factorization_card_oPiCore_eq_factorization_card_of_hasNormalPComplement_ne
+      (G := G) hpq hG
   rw [QK.card_eq_multiplicity, QG.card_eq_multiplicity]
-  exact congrArg (fun n => q ^ n) hfact.symm
+  exact congrArg (fun n => q ^ n) hfact
 
 
 /-- If the canonical normal `p`-complement has a characteristic subgroup with
