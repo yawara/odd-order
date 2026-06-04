@@ -320,6 +320,10 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 追加し、BG 最後の `(a⁻¹)^{t^3}` を concrete complement 側の automorphism として扱う入口を固定した。
 さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
 `normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
+また `a∈E` から concrete norm-one unit および pair `(a,2-a)` を作る
+`normOneUnitOfMemNormSetE` / `normOnePairOfMemNormSetE` を公開し、`normOnePairSet` と
+`normOnePairSetAt` membership を theorem 化した。これで Step4 の `a+b=2` 入力を、群側の
+`U`-pair 計算へ渡す有限体 API が再利用可能になった。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は

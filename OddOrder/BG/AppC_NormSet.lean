@@ -986,6 +986,54 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
   rw [h, normN_zero p q hq] at this
   exact zero_ne_one this
 
+/-- Coerce an element of `E` to the corresponding norm-one unit. -/
+noncomputable def normOneUnitOfMemNormSetE [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) : normOneUnits p q :=
+  let u : (GaloisField p q)ˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)
+  ⟨u, (mem_normOneUnits_iff_normN p q hq.ne' u).mpr ha.1⟩
+
+@[simp] theorem normOneUnitOfMemNormSetE_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    (((normOneUnitOfMemNormSetE p q hq ha : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = a := by
+  rfl
+
+/-- The pair `(a, 2-a)` attached to `a ∈ E`, viewed as a pair of norm-one
+units. -/
+noncomputable def normOnePairOfMemNormSetE [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    normOneUnits p q × normOneUnits p q :=
+  (normOneUnitOfMemNormSetE p q hq ha,
+    normOneUnitOfMemNormSetE p q hq (two_sub_mem_normSetE p q ha))
+
+@[simp] theorem normOnePairOfMemNormSetE_fst_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    ((((normOnePairOfMemNormSetE p q hq ha).1 : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = a := by
+  rfl
+
+@[simp] theorem normOnePairOfMemNormSetE_snd_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    ((((normOnePairOfMemNormSetE p q hq ha).2 : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = (2 : GaloisField p q) - a := by
+  rfl
+
+/-- The pair attached to `a ∈ E` lies in the BG pair set `u + v = 2`. -/
+theorem normOnePairOfMemNormSetE_mem_normOnePairSet [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    normOnePairOfMemNormSetE p q hq ha ∈ normOnePairSet p q := by
+  dsimp [normOnePairOfMemNormSetE, normOnePairSet]
+  change (a + ((2 : GaloisField p q) - a)) = 2
+  ring
+
+/-- The pair attached to `a ∈ E` also lies in the translated BG pair set
+`u*s + v*s = 2*s` for every nonzero `s`. -/
+theorem normOnePairOfMemNormSetE_mem_normOnePairSetAt [Fact p.Prime] (hq : 0 < q)
+    {a s : GaloisField p q} (ha : a ∈ normSetE p q) (hs : s ≠ 0) :
+    normOnePairOfMemNormSetE p q hq ha ∈ normOnePairSetAt p q s := by
+  rw [normOnePairSetAt_eq_normOnePairSet_of_ne_zero p q hs]
+  exact normOnePairOfMemNormSetE_mem_normOnePairSet p q hq ha
+
 /-- The product norm sends inverses to inverses. -/
 lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
     normN p q a⁻¹ = (normN p q a)⁻¹ := by
