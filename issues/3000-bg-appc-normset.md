@@ -190,6 +190,10 @@ created: 2026-06-04
   `P0` 内の非自明元 `fieldNormalizerPrimeLineGenerator` を定義し、
   `FieldNormalizerData.s` として `G` へ transport。`s ∈ W₂`、`s ≠ 1`、
   `s ∈ N_G(Q)` を derived theorem 化。
+- [x] **C.3 Step 4 conjugate line seed**: `FieldNormalizerData.P1` と
+  `FieldNormalizerData.t` を materialize。`t ∈ P1`、`t ≠ 1`、
+  `P1 ≤ N_G(U)`、`t ∈ N_G(U)`、`t ∈ N_G(Q)`、`s⁻¹t ∈ Q` を theorem 化し、
+  BG Step3/Step4 の conjugate-line / Q-commutation 計算の入口を固定。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件

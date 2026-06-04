@@ -309,7 +309,9 @@ finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。�
 monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件を持つ carrier に更新済み。
 また BG Step4 冒頭の `s ∈ P0#` も concrete `fieldNormalizerPrimeLineGenerator` と
 `FieldNormalizerData.s` として materialize し、`s ∈ W₂`、`s ≠ 1`、`s ∈ N_G(Q)` まで
-derived theorem 化済み。
+derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-conjugation convention) も
+`FieldNormalizerData.P1` / `FieldNormalizerData.t` として固定し、`t ∈ P1`、`t ≠ 1`、
+`P1 ≤ N_G(U)`、`t ∈ N_G(U)`、`t ∈ N_G(Q)`、`s⁻¹t ∈ Q` まで derived theorem 化済み。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_field_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と

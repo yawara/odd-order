@@ -263,6 +263,61 @@ theorem s_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData h
     data.s ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
   data.W2_normalizes_Q data.s_mem_W2
 
+/-- The conjugate prime-line subgroup `P₁` used in BG Appendix C, expressed
+with Lean left-conjugation convention. -/
+noncomputable def P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    Subgroup G :=
+  MulAut.conj data.y • hyp.base.W2
+
+/-- The BG element `t`, the `y`-conjugate of `s` in Lean convention. -/
+noncomputable def t {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) : G :=
+  MulAut.conj data.y data.s
+
+/-- The transported conjugate generator lies in `P₁`. -/
+theorem t_mem_P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.t ∈ data.P1 := by
+  dsimp [P1, t]
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  convert data.s_mem_W2 using 1
+  simp
+  group
+
+/-- The conjugate generator `t` is nontrivial. -/
+theorem t_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.t ≠ 1 := by
+  intro ht
+  exact data.s_ne_one ((MulAut.conj data.y).injective (by simpa [t] using ht))
+
+/-- `P₁` normalizes Peterfalvi subgroup `U`, as required in BG C.3 Step 3. -/
+theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.P1 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
+  simpa [P1] using data.W2_conj_y_normalizes_U
+
+/-- The conjugate generator `t` normalizes `U`. -/
+theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  data.P1_normalizes_U data.t_mem_P1
+
+/-- The conjugate generator `t` also normalizes `Q`. -/
+theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.t ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by
+  have hyN : data.y ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
+    Subgroup.le_normalizer data.y_mem_Q
+  dsimp [t]
+  exact mul_mem (mul_mem hyN data.s_normalizes_Q) (inv_mem hyN)
+
+/-- The first BG commutator factor `s⁻¹t` lies in `Q`. -/
+theorem s_inv_mul_t_mem_Q {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    data.s⁻¹ * data.t ∈ hyp.base.Q := by
+  have hsN_inv : data.s⁻¹ ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
+    inv_mem data.s_normalizes_Q
+  have hconj_y : data.s⁻¹ * data.y * data.s ∈ hyp.base.Q := by
+    simpa using (Subgroup.mem_normalizer_iff.mp hsN_inv data.y).mp data.y_mem_Q
+  have hy_inv : data.y⁻¹ ∈ hyp.base.Q := inv_mem data.y_mem_Q
+  dsimp [t]
+  simpa [mul_assoc] using mul_mem hconj_y hy_inv
+
 /-- The unit-group C.3 one-step output, derived from the field-element Step 4
 output stored in `FieldNormalizerData`. -/
 theorem appC_twisted_unit_step {hyp : Hypothesis (G := G)}
