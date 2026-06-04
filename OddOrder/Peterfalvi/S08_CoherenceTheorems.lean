@@ -2867,6 +2867,25 @@ theorem SsubFiltration_nonempty_of_nontrivial_solvable_quotient
     (IsSolvable.commutator_lt_top_of_nontrivial
       (G := ↥H ⧸ A.subgroupOf H)).ne
 
+/-- **Peterfalvi (6.2), proper nilpotent quotient form.**  If `A` is a proper
+normal subgroup of the nilpotent kernel `H`, then the filtration layer `S(A)` is nonempty.
+
+The quotient `H/A` is nontrivial and nilpotent, hence solvable, so the solvable-quotient
+filtration form supplies a nontrivial degree-one source character. -/
+theorem SsubFiltration_nonempty_of_subgroupOf_ne_top
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal] (hA : A.subgroupOf H ≠ ⊤) :
+    (hyp.SsubFiltration A).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Group.IsNilpotent (↥H ⧸ A.subgroupOf H) :=
+    nilpotent_of_surjective (QuotientGroup.mk' (A.subgroupOf H))
+      (QuotientGroup.mk'_surjective (A.subgroupOf H))
+  haveI : IsSolvable (↥H ⧸ A.subgroupOf H) := IsNilpotent.to_isSolvable
+  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) :=
+    Subgroup.nontrivial_quotient_of_ne_top hA
+  exact hyp.SsubFiltration_nonempty_of_nontrivial_solvable_quotient A
+
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
 The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains
