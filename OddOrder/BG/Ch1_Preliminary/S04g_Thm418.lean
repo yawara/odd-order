@@ -188,6 +188,30 @@ theorem le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
     calc n * d = (d * n * d⁻¹) * d := by rw [hfix]
       _ = d * n := by group
 
+/-- Corollary 4.19 fixed-point endpoint for an arbitrary chief factor: if the
+image of `D` acting by conjugation on the quotient chief factor `U/V` is a
+`p`-group, then `D` centralizes `U/V`. -/
+theorem le_chiefFactorCentralizer_of_isPGroup_conjNormal_image_chiefFactor
+    {p : ℕ} [Fact p.Prime] {D U V : Subgroup G} [D.Normal] [V.Normal]
+    [(U.map (QuotientGroup.mk' V)).Normal] (hChief : IsChiefFactor U V)
+    (hUbar_pg : IsPGroup p ↥(U.map (QuotientGroup.mk' V)))
+    (hDbar_pg : IsPGroup p
+      ↥((D.map (QuotientGroup.mk' V)).map
+        (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V))))) :
+    D ≤ chiefFactorCentralizer U V := by
+  haveI hDbar_normal : (D.map (QuotientGroup.mk' V)).Normal :=
+    (inferInstance : D.Normal).map _ (QuotientGroup.mk'_surjective V)
+  have hMin : Ch02.IsMinimalNormal (U.map (QuotientGroup.mk' V)) :=
+    hChief.isMinimalNormal_map_quotient
+  have hcent :
+      D.map (QuotientGroup.mk' V) ≤
+        Subgroup.centralizer
+          ((U.map (QuotientGroup.mk' V) : Subgroup (G ⧸ V)) : Set (G ⧸ V)) :=
+    le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
+      (G := G ⧸ V) (D := D.map (QuotientGroup.mk' V))
+      (N := U.map (QuotientGroup.mk' V)) hMin hUbar_pg hDbar_pg
+  exact chiefFactorCentralizer.le_of_map_le_centralizer hcent
+
 omit [Finite G] in
 /-- If a homomorphism `φ` kills `K`, then a `p`-group derived subgroup in
 `G/K` gives a `p`-group image of `G'` under `φ`. This packages the quotient
@@ -234,6 +258,63 @@ theorem isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two
     · exact ho
   exact isPGroup_commutator_of_mulAut_odd_of_pRank_le_two hp_odd hR_pg hR_rank
     (QuotientGroup.kerLift_injective ψ) hquot_odd
+
+/-- Corollary 4.19 action-image bridge: if a normal `p`-subgroup `R` has
+`p`-rank at most two and contains the top `U` of a chief factor, then the image
+of `G'` acting on `U/V` is a `p`-group. -/
+theorem isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    {R U V : Subgroup G} [R.Normal] [V.Normal]
+    [(U.map (QuotientGroup.mk' V)).Normal]
+    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_R : U ≤ R) :
+    IsPGroup p ↥(((_root_.commutator G).map (QuotientGroup.mk' V)).map
+      (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V)))) := by
+  let q : G →* G ⧸ V := QuotientGroup.mk' V
+  let N : Subgroup (G ⧸ V) := U.map q
+  let φ : G →* MulAut ↥N := (MulAut.conjNormal (H := N)).comp q
+  let K : Subgroup G := (MulAut.conjNormal (H := R)).ker
+  have hK_le : K ≤ φ.ker := by
+    intro g hg
+    rw [MonoidHom.mem_ker] at hg ⊢
+    ext x
+    obtain ⟨u, huU, hxu⟩ := x.2
+    have hg_fix_u : g * u * g⁻¹ = u := by
+      have happ := congrArg
+        (fun e : MulAut ↥R => ((e ⟨u, hU_le_R huU⟩ : ↥R) : G)) hg
+      simpa only [MulAut.one_apply, MulAut.conjNormal_apply] using happ
+    change ((MulAut.conjNormal (H := N) (q g)) x : G ⧸ V) = (x : G ⧸ V)
+    rw [MulAut.conjNormal_apply, ← hxu]
+    calc q g * q u * (q g)⁻¹ = q (g * u * g⁻¹) := by simp [q, map_mul]
+      _ = q u := by rw [hg_fix_u]
+  have hQ : IsPGroup p ↥(_root_.commutator (G ⧸ K)) := by
+    dsimp [K]
+    exact isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two
+      hodd hp_odd hR_pg hR_rank
+  have himg : IsPGroup p ↥((_root_.commutator G).map φ) :=
+    isPGroup_commutator_map_of_quotient_commutator_isPGroup
+      (K := K) φ hK_le hQ
+  change IsPGroup p ↥(((_root_.commutator G).map q).map
+    (MulAut.conjNormal (H := N)))
+  rw [Subgroup.map_map]
+  exact himg
+
+/-- Corollary 4.19 centralizer bridge for a single chief factor: under the
+rank-two normal `p`-subgroup hypothesis, `G'` centralizes every `p`-chief factor
+whose top lies in that subgroup. -/
+theorem commutator_le_chiefFactorCentralizer_of_pRank_le_two
+    (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    {R U V : Subgroup G} [R.Normal] [V.Normal]
+    [(U.map (QuotientGroup.mk' V)).Normal]
+    (hChief : IsChiefFactor U V)
+    (hUbar_pg : IsPGroup p ↥(U.map (QuotientGroup.mk' V)))
+    (hR_pg : IsPGroup p ↥R) (hR_rank : pRank ↥R p ≤ 2) (hU_le_R : U ≤ R) :
+    _root_.commutator G ≤ chiefFactorCentralizer U V := by
+  have hDbar_pg : IsPGroup p ↥(((_root_.commutator G).map (QuotientGroup.mk' V)).map
+      (MulAut.conjNormal (H := U.map (QuotientGroup.mk' V)))) :=
+    isPGroup_commutator_chiefFactor_conjNormal_image_of_pRank_le_two
+      hodd hp_odd hR_pg hR_rank hU_le_R
+  exact le_chiefFactorCentralizer_of_isPGroup_conjNormal_image_chiefFactor
+    (D := _root_.commutator G) hChief hUbar_pg hDbar_pg
 
 /-- **`p'`-核による商で `p`-rank は増えない**: `N ⊴ G` with `p ∤ |N|` のとき
 `r_p(G/N) ≤ r_p(G)`。商の elementary abelian `p`-部分群 `B` は、その逆像の
