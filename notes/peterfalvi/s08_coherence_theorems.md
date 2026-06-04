@@ -290,6 +290,13 @@ allowlist):
   **`sq_dvd_sum_sq_mul_const_of_primePow_mul_le`** を追加。degree-sort の `idx·θ≤idx·θⱼ` から
   固定正 `idx` をキャンセルし、同じ `p` の冪比較で `θ∣θⱼ`、さらに tail 側 `θ²∣∑(idx·θⱼ)²`
   まで直接返す producer。
+- **2026-06-04 追記 5**: **`mul_primePow_dvd_mul_primePow_of_le`** /
+  **`sq_dvd_head_of_commonIndex_primePower_sums`** と S08 adapter
+  **`natDegreeDvd_of_commonIndex_primePowerData`** /
+  **`degreeDivisibilityInputs_of_commonIndex_primePowerData`** /
+  **`xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums`** を追加。common `idx`
+  + p-power 残差 + degree sort から degree-ratio 用 divisibility を作り、さらに tail/total/head
+  算術 chain から `dχ²∣D` を内部構成して `XAdjoinStepInput` へ渡す。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

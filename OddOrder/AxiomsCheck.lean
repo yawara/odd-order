@@ -1566,19 +1566,25 @@ set_option linter.style.longLine false in
 -- `θ²∣∑(idxⱼ·θⱼ)²`, discharging the `Finset.dvd_sum` part of `θ²∣tail`.
 -- `dvd_primePow_of_le`/`dvd_primePow_of_mul_le_mul`: sorted p-power degree factors imply
 -- divisibility, with cancellation of the common positive induction index `idx`.
+-- `mul_primePow_dvd_mul_primePow_of_le`: upgrades that factor divisibility to full induced degrees.
 -- `sq_dvd_sum_sq_mul_const_of_primePow_mul_le`: packages that cancellation with `Finset.dvd_sum`
 -- to produce the tail-side divisibility directly from sorted induced p-power degrees.
 -- `sq_dvd_primePow_of_sq_le`/`sq_dvd_primePow_mul_of_sq_le`: turn the Schur-center bound
 -- `θ²≤p^n` for p-power degrees into total-side divisibility, with an optional product factor.
+-- `sq_dvd_head_of_commonIndex_primePower_sums`: assembles tail/total/head divisibility into
+-- the `χᵢ(1)²∣head` input consumed by the §8 X-adjoin constructors.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime_add_complement
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_sum_sq_mul_of_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_primePow_of_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_primePow_of_mul_le_mul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mul_primePow_dvd_mul_primePow_of_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_sum_sq_mul_const_of_primePow_mul_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_primePow_of_sq_le
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_primePow_mul_of_sq_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
 
 -- Peterfalvi (5.1) Dade-isometry base map (G2.7 type-bridge): the §4 Dade map is `ℂ`-linear on the
 -- supported subspace `CF(L,A)` (`Hypothesis.dadeLinearMap`, the bare `DadeMap` repackaged via the
@@ -1856,8 +1862,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_natDegreeData_for_xAdjoinMemberFamily
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.natDegreeDvd_of_commonIndex_primePowerData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.degreeDivisibilityInputs_of_commonIndex_primePowerData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_realDegreeBound
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap

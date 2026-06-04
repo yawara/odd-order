@@ -2002,6 +2002,22 @@ theorem dvd_primePow_of_mul_le_mul
     θ ∣ θ' :=
   dvd_primePow_of_le hp hθ hθ' (Nat.le_of_mul_le_mul_left hle hidx)
 
+/-- **Peterfalvi (6.6): full induced-degree divisibility from sorted p-power factors (ℕ).**
+
+If `d = idx·θ` and `d' = idx·θ'` share the same positive induction index and the factors
+are powers of the same base `p ≥ 2`, then `d ≤ d'` forces `d ∣ d'`.  This is the full-degree
+version of `dvd_primePow_of_mul_le_mul`, feeding the §8 degree-ratio constructors from the
+(6.6) sorted induced degrees. -/
+theorem mul_primePow_dvd_mul_primePow_of_le
+    {p idx θ θ' d d' m n : ℕ} (hp : 2 ≤ p) (hidx : 0 < idx)
+    (hd : d = idx * θ) (hd' : d' = idx * θ')
+    (hθ : θ = p ^ m) (hθ' : θ' = p ^ n) (hle : d ≤ d') :
+    d ∣ d' := by
+  subst d
+  subst d'
+  exact Nat.mul_dvd_mul_left idx
+    (dvd_primePow_of_mul_le_mul hp hidx hθ hθ' hle)
+
 /-- **Peterfalvi (6.6): tail square-divisibility from sorted p-power degrees (ℕ).**
 
 A consumer-facing form of the tail step: if every tail degree factor `θdeg j` is a p-power
@@ -2041,6 +2057,30 @@ theorem sq_dvd_primePow_mul_of_sq_le
     (hθ : θ = p ^ m) (hq : q = p ^ n) (hle : θ * θ ≤ q) :
     θ * θ ∣ q * c :=
   dvd_mul_of_dvd_left (sq_dvd_primePow_of_sq_le hp hθ hq hle) c
+
+/-- **Peterfalvi (6.6): head square-divisibility from tail and total p-power data (ℕ).**
+
+This packages the full mmd L78-80 arithmetic chain.  The complementary tail divisibility is derived
+from the sorted p-power degrees, the total divisibility from the p-power square bound, and the
+additive identity then moves the `θ²` divisor to the head.  Finally the coprime fixed-index factor
+upgrades `θ² ∣ head` and `idx² ∣ head` to `(idx·θ)² ∣ head`. -/
+theorem sq_dvd_head_of_commonIndex_primePower_sums
+    {ι : Type*} (tailSet : Finset ι)
+    {p idx θ chi q c head total : ℕ} {θdeg : ι → ℕ}
+    {m n : ℕ} {ntail : ι → ℕ} (hp : 2 ≤ p) (hidxpos : 0 < idx)
+    (hθ : θ = p ^ m) (hθdeg : ∀ j ∈ tailSet, θdeg j = p ^ ntail j)
+    (htail_le : ∀ j ∈ tailSet, idx * θ ≤ idx * θdeg j)
+    (hsum : head + (∑ j ∈ tailSet, (idx * θdeg j) * (idx * θdeg j)) = total)
+    (hq : q = p ^ n) (hθsq_le_q : θ * θ ≤ q) (htotal : total = q * c)
+    (hidx_head : idx * idx ∣ head) (hchi : chi = idx * θ) (hcop : Nat.Coprime idx θ) :
+    chi * chi ∣ head := by
+  have hθtail : θ * θ ∣ ∑ j ∈ tailSet, (idx * θdeg j) * (idx * θdeg j) :=
+    sq_dvd_sum_sq_mul_const_of_primePow_mul_le tailSet hp hidxpos hθ hθdeg htail_le
+  have hθtotal : θ * θ ∣ total := by
+    rw [htotal]
+    exact sq_dvd_primePow_mul_of_sq_le hp hθ hq hθsq_le_q
+  exact sq_dvd_of_factored_coprime_add_complement
+    hsum hθtail hθtotal hidx_head hchi hcop
 
 namespace CharacterPsiDecomposition
 
