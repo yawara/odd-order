@@ -1752,3 +1752,22 @@ orthogonality から image-side orthogonality が従う:
 これで c1 route の残 input は `X` coherence, `τ₃` agreement, mixed inner preservation,
 supported-span generation へ整理された。`τ₃` 実構成側は image orthogonality を別途証明する代わりに、
 mixed block の inner preservation を示せばよい。
+
+
+### 2026-06-04 pass 19: generator-level mixed-inner glue interface
+
+S07/S08 に `τ₃` 候補を generator-level data で渡す bridge を追加。pass 18 では
+agreement/mixed-inner が `ℤ[X]`/`ℤ[Y]` 上の span-level input だったが、実際の `τ₃` 構成では
+まず各 character generator 上で値を定めるため、この pass で span induction を内部化した:
+
+- `S07.mixed_inner_eq_on_zSpan_of_eq_on`: `X × Y` の generator 上で
+  `⟨νx,νy⟩=⟨x,y⟩` を確認すれば、`ℤ[X] × ℤ[Y]` 全体の mixed-inner preservation が従う。
+- `S07.coherentUnion_of_glued_of_generator_mixed_inner_eq`: generator-level の
+  `ν = hX.extension` on `X`, `ν = hY.extension` on `Y`, mixed-inner を受け取り、既存の
+  mixed-inner glue に接続する。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner`
+  and `_of_frobenius_generator_mixed_inner`: §8 final adapter の generator-level variants。
+
+これで Frobenius/c1 route の `τ₃` 側残 input は、`X` coherence, generator 上の `τ₃` agreement,
+generator 上の mixed-inner preservation, supported-span generation に縮約された。span への持ち上げは
+caller 側で繰り返さない。

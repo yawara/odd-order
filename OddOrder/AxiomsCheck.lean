@@ -1489,6 +1489,7 @@ set_option linter.style.longLine false in
 -- `IsCoherent.extension_inner_eq` field for the union `X ∪ Y` once the two coherent pieces exist.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_eq_on_zSpan_union_of_orthogonal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.image_orthogonal_of_mixed_inner_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mixed_inner_eq_on_zSpan_of_eq_on
 -- (6.8.1)/(6.8.2) the `τ₃` assembly into an actual `IsCoherent (X∪Y) A` witness: from two coherence
 -- witnesses `hX`, `hY`, a glued map `ν` agreeing with `hX.extension`/`hY.extension` on `ℤ[X]`/`ℤ[Y]`,
 -- and source+image orthogonality, build `IsCoherent τ (X∪Y) A` — `extension_inner_eq` via
@@ -1498,6 +1499,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_mixed_inner_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq
 -- (6.6) "repeated use of (5.6)" iteration engine: from a coherent base `S₀` and a per-index
 -- adjoining step `IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` (each step
 -- one application of (5.6) = `retarget_isCoherent` with the caller's per-step data), the union after
@@ -2075,6 +2078,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
 #assert_only_allowed_axioms
@@ -2088,6 +2094,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
 -- Peterfalvi (7.10) consumer algebra: sum the Ind equations over an integral weighted source.

@@ -4079,6 +4079,45 @@ theorem image_orthogonal_of_mixed_inner_eq
   intro u hu v hv
   rw [← hagreeX u hu, ← hagreeY v hv, hmixed u hu v hv, hsrc_ortho u hu v hv]
 
+/-- A mixed inner-product equality checked on generators extends to their integral spans. -/
+theorem mixed_inner_eq_on_zSpan_of_eq_on
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {ν : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)}
+    (hmixed : ∀ x ∈ X, ∀ y ∈ Y,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y) :
+    ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (ν u) (ν v) = ClassFunction.inner u v := by
+  have hright : ∀ x ∈ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (ν x) (ν v) = ClassFunction.inner x v := by
+    intro x hx v hv
+    induction hv using Submodule.span_induction with
+    | mem y hy => exact hmixed x hx y hy
+    | zero =>
+        rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+    | add y z _ _ ihy ihz =>
+        rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ihy, ihz]
+    | smul a y _ ih =>
+        rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ a (ν y),
+          ← Int.cast_smul_eq_zsmul ℂ a y,
+          OddOrder.RepresentationTheory.inner_smul_right,
+          OddOrder.RepresentationTheory.inner_smul_right, ih]
+  intro u hu
+  induction hu using Submodule.span_induction with
+  | mem x hx =>
+      intro v hv
+      exact hright x hx v hv
+  | zero =>
+      intro v _hv
+      rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
+  | add x y _ _ ihx ihy =>
+      intro v hv
+      rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left, ihx v hv, ihy v hv]
+  | smul a x _ ih =>
+      intro v hv
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ a (ν x),
+        ← Int.cast_smul_eq_zsmul ℂ a x,
+        ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, ih v hv]
+
 /-- **Peterfalvi (6.8.1)/(6.8.2): coherence of the orthogonal union `X ∪ Y`.**
 
 The final gluing step shared by case (A) (6.8.1) and case (B) (6.8.2): given two coherent sets
@@ -4162,6 +4201,32 @@ noncomputable def coherentUnion_of_glued_of_mixed_inner_eq
     IsCoherent τ (X ∪ Y) A :=
   coherentUnion_of_glued hX hY ν hagreeX hagreeY hsrc_ortho
     (image_orthogonal_of_mixed_inner_eq hagreeX hagreeY hmixed hsrc_ortho) hgen
+
+/-- Generator-level variant of `coherentUnion_of_glued_of_mixed_inner_eq`.
+
+This is the form closest to a constructed `τ₃`: the caller checks agreement and mixed inner
+products only on the two generating families, and the span obligations are derived by
+`eq_on_zSpan_of_eq_on` and `mixed_inner_eq_on_zSpan_of_eq_on`. -/
+noncomputable def coherentUnion_of_glued_of_generator_mixed_inner_eq
+    {τ : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hX : IsCoherent τ X A) (hY : IsCoherent τ Y A)
+    (ν : IntegralCharacterMap L G)
+    (hagreeX : ∀ x ∈ X, ν x = hX.extension x)
+    (hagreeY : ∀ y ∈ Y, ν y = hY.extension y)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (hmixed : ∀ x ∈ X, ∀ y ∈ Y,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (hgen : zSupportedSpan (L := L) (X ∪ Y) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A)) :
+    IsCoherent τ (X ∪ Y) A :=
+  coherentUnion_of_glued_of_mixed_inner_eq hX hY ν
+    (fun _ hu => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeX hu)
+    (fun _ hv => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeY hv)
+    hsrc_ortho
+    (mixed_inner_eq_on_zSpan_of_eq_on hmixed)
+    hgen
 
 /-! ### Peterfalvi (6.6): coherence of `X` by repeated adjoining of pairs
 
