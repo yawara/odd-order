@@ -283,6 +283,9 @@ allowlist):
   consumer-facing 版で、上の additive complement と coprime forcing を S08 `hdvd` 入力の形に合成する。
 - **2026-06-04 追記 2**: **`sq_dvd_sum_sq_mul_of_dvd`** を追加。`∀ j∈tail, θ∣θⱼ` から
   `θ²∣∑_{j∈tail}(idxⱼ·θⱼ)²` を返し、`θᵢ(1)²∣∑_{j≥i}` の `Finset.dvd_sum` 部分を独立に閉じる。
+- **2026-06-04 追記 3**: **`sq_dvd_primePow_of_sq_le`** / **`sq_dvd_primePow_mul_of_sq_le`** を追加。
+  `θ=p^m`, `q=p^n`, `θ²≤q` から `θ²∣q`、さらに `θ²∣q*c` を返し、[Is] Cor 2.30 の
+  `θᵢ(1)²≤|K:Z|` を p-power 比較で total 側 divisibility へ落とす算術部分を切り出した。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

@@ -1978,6 +1978,32 @@ theorem sq_dvd_sum_sq_mul_of_dvd
   rw [ha]
   ring
 
+/-- **Peterfalvi (6.6): p-power square divisibility from a square bound (ℕ).**
+
+If `θ` and `q` are powers of the same base `p ≥ 2`, then `θ² ≤ q` forces
+`θ² ∣ q`.  In the (6.6) tail/total divisibility chain, this turns the Schur-center
+bound `θᵢ(1)² ≤ |K:Z|` into the p-power divisibility input needed for the total sum. -/
+theorem sq_dvd_primePow_of_sq_le
+    {p θ q m n : ℕ} (hp : 2 ≤ p)
+    (hθ : θ = p ^ m) (hq : q = p ^ n) (hle : θ * θ ≤ q) :
+    θ * θ ∣ q := by
+  rw [hθ, hq] at hle ⊢
+  have hpow : p ^ (m + m) ≤ p ^ n := by
+    simpa [pow_add] using hle
+  have hexp : m + m ≤ n :=
+    (Nat.pow_le_pow_iff_right (show 1 < p by omega)).mp hpow
+  simpa [pow_add] using Nat.pow_dvd_pow p hexp
+
+/-- **Peterfalvi (6.6): p-power square divisibility through a multiplicative factor (ℕ).**
+
+A factored version of `sq_dvd_primePow_of_sq_le`: once `θ²` divides the p-power factor `q`,
+it divides any product `q * c`. -/
+theorem sq_dvd_primePow_mul_of_sq_le
+    {p θ q c m n : ℕ} (hp : 2 ≤ p)
+    (hθ : θ = p ^ m) (hq : q = p ^ n) (hle : θ * θ ≤ q) :
+    θ * θ ∣ q * c :=
+  dvd_mul_of_dvd_left (sq_dvd_primePow_of_sq_le hp hθ hq hle) c
+
 namespace CharacterPsiDecomposition
 
 open OddOrder.RepresentationTheory
