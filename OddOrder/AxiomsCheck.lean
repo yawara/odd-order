@@ -1959,6 +1959,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.weightedOutput_inner_self_eq_sum_sq
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.weightedOutput_inner_self_re_eq_sum_sq
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.one_le_weightedOutput_inner_self_re
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.ofIsCoherent
 -- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
@@ -2150,6 +2152,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_nonpos

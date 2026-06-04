@@ -1842,3 +1842,14 @@ identity からその実部が非正であることを返す。
 
 これで (7.10) の weighted Ind-chain package から、S09 の scalar coefficient / norm estimate
 consumer が等式を再展開せずに符号情報を参照できる。
+
+### 2026-06-04 pass 25: weighted Ind-chain real Parseval forms
+
+`IndChainDecomposition` の complex-valued Parseval identities を、下流の実数不等式で
+直接使える real-sum 形にした。`weightedOutput_inner_self_re_eq_sum_sq` は
+`⟪weightedOutput, weightedOutput⟫.re = Σ d_t^2` を返し、
+`inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq` は `χ₀` 係数の実部を
+`1 - Σ d_t^2` として返す。
+
+前 pass の符号補題はこの精密形を経由するように整理した。これで §9 側の real scalar
+coefficient / norm bound consumer が complex cast の展開を持たずに済む。
