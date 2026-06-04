@@ -442,6 +442,49 @@ S09 に `sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct`,
 source orthogonality / weighted-sum consumer を downstream が再構成しなくてよい形にした bridge pass。
 
 
+### 2026-06-05 pass: raw zeta-rho bound from source data
+
+S09 に `zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula`
+を追加した。既存の
+`normEstimates_of_inner_values_irreducible_source_data_and_uv_formula` と
+`zetaNuRho_inner_self_re_ge_of_normEstimates` を合成し、自然な source-side 入力、(7.7.b) の
+`u,v,w` formula、`smallIndex` から raw class-function form
+`1 - e/h ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接得る downstream socket にした。
+
+
+### 2026-06-05 pass: family-notated zeta-rho bound
+
+S09 に `FrobeniusFamily.zetaNuRho_inner_self_re_ge_of_family_source_data`
+を追加した。local `H78` 側の
+`zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula`
+を `F.e i` / `F.h i` 表記で使えるようにし、(7.5) の reduced-family inequality を
+組む前段で `1 - e_i/h_i ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接供給する bridge にした。
+
+
+### 2026-06-05 pass: source-data zeta-rho norm formulas
+
+S09 に `Hypothesis78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data`
+と `FrobeniusFamily.zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data`
+を追加した。既存の
+`Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data`
+で source-side の `(β, νζ) = a - 1` を作り、(7.8.c.ii) の
+`(ζ^ν)^ρ` norm formula に接続する bridge。
+
+これで downstream は `u,v,w` formula を作る前段で、local `h/e` 表記と family `h_i/e_i`
+表記の両方から同じ norm identity を直接呼べる。新しい証明書フィールドは追加していない。
+
+
+### 2026-06-05 pass: family-notated Gamma bound
+
+S09 に `FrobeniusFamily.gamma_inner_self_re_le_of_family_source_data` を追加した。
+local `H78` 側の
+`gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula`
+を `F.e i` / `F.h i` 表記で使える standalone bridge。
+
+これで final assembly の orthogonal integer decomposition が必要とする
+`(Γ,Γ).re ≤ e_i - 1` も、`ζ` 下界と同じ family-notated source-data 入力列で直接供給できる。
+
+
 ### 2026-06-04 pass: residual ZIrr bridges for (7.9)
 
 S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と
@@ -617,3 +660,35 @@ weighted source-difference の exact image equation と complex scalar coefficie
 
 前回追加した real Parseval / nonpos consumer と合わせて、§9 側は `data := ...` を手で組み立てず、
 exact identity と実数不等式の両方を H78 表記から呼べる。
+
+### 2026-06-05 pass: H78 raw Ind-chain weighted identities
+
+S09 に `Hypothesis78.indChain_image_weightedDifferenceInput_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_of_isCoherent`,
+`Hypothesis78.indChain_one_le_weightedOutput_inner_self_re_of_isCoherent` を追加した。
+S08 の生の weighted source-difference 展開、reference coefficient の `1 - ∑ d_t²` 形、
+および `d 0 = 1` からの weighted output norm 下界を H78/S07 witness 入力列から直接返す。
+
+これで downstream は normal form へ集約する前の Ind 方程式も、S09 の `Hypothesis78`
+インターフェイスだけで参照できる。
+
+### 2026-06-05 pass: H78 weighted output coefficient recovery
+
+S09 に `Hypothesis78.indChain_inner_chi_eq_ite_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_weightedOutput_of_isCoherent`,
+`Hypothesis78.indChain_weightedOutput_inner_self_eq_sum_sq_of_isCoherent` を追加した。
+S08 の output family orthonormality、weighted output の係数回収、
+complex Parseval form を H78/S07 witness 入力列から直接返す adapter 形。
+
+前回までの raw/normalized weighted Ind 方程式と合わせて、§9 downstream は
+weighted output の係数・norm・image equation をすべて H78 表記から呼べる。
+
+### 2026-06-05 pass: H78 per-term Ind-chain image equations
+
+S09 に `Hypothesis78.indChain_image_eq_of_isCoherent` と
+`Hypothesis78.indChain_image_eq_zero_of_isCoherent` を追加した。
+S08 `IndChainDecomposition` の per-term image equation と reference-index vanishing を、
+H78/S07 witness 入力列から直接返す adapter 形。
+
+これで weighted sum に集約する前の各 source difference 項も、§9 側から `data := ...`
+を手で作らず参照できる。

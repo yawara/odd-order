@@ -1501,6 +1501,125 @@ noncomputable def indChainDecomposition_of_isCoherent
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
+/-- H78-facing per-term Ind equation in the constructed Ind-chain package. -/
+theorem indChain_image_eq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime)
+    (t : Fin n) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    τ (ζ t - (d t) • ζ 0) = data.χ t - (d t) • data.χ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ (ζ t - (d t) • ζ 0) = data.χ t - (d t) • data.χ 0
+  exact data.image_eq t
+
+/-- H78-facing reference-index vanishing for the per-term Ind equation. -/
+theorem indChain_image_eq_zero_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    τ (ζ 0 - (d 0) • ζ 0) = 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ (ζ 0 - (d 0) • ζ 0) = 0
+  exact data.image_eq_zero
+
+/-- H78-facing orthonormality formula for the Ind-chain output family. -/
+theorem indChain_inner_chi_eq_ite_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime)
+    (t u : Fin n) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    ClassFunction.inner (data.χ t) (data.χ u) = if t = u then 1 else 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change ClassFunction.inner (data.χ t) (data.χ u) = if t = u then 1 else 0
+  exact data.inner_chi_eq_ite t u
+
+/-- H78-facing coefficient recovery for the weighted output sum. -/
+theorem indChain_inner_chi_weightedOutput_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime)
+    (t : Fin n) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    ClassFunction.inner (data.χ t) data.weightedOutput = (d t : ℂ) := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change ClassFunction.inner (data.χ t) data.weightedOutput = (d t : ℂ)
+  exact data.inner_chi_weightedOutput t
+
+set_option linter.style.longLine false in
+/-- H78-facing raw weighted Ind equation before collecting the reference term. -/
+theorem indChain_image_weightedDifferenceInput_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    τ data.weightedDifferenceInput =
+      ∑ t : Fin n, (d t) • (data.χ t - (d t) • data.χ 0) := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change τ data.weightedDifferenceInput =
+    ∑ t : Fin n, (d t) • (data.χ t - (d t) • data.χ 0)
+  exact data.image_weightedDifferenceInput
+
 set_option linter.style.longLine false in
 /-- H78-facing normalized weighted Ind equation, with the integer-square coefficient.
 
@@ -1585,6 +1704,57 @@ theorem indChain_inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm_of
     1 - ClassFunction.inner data.weightedOutput data.weightedOutput
   exact data.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
 
+set_option linter.style.longLine false in
+/-- H78-facing reference coefficient of the raw weighted Ind image. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+      1 - ∑ t : Fin n, (d t : ℂ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+    1 - ∑ t : Fin n, (d t : ℂ) ^ 2
+  exact data.inner_chi_zero_image_weightedDifferenceInput
+
+/-- H78-facing complex Parseval form for the weighted output. -/
+theorem indChain_weightedOutput_inner_self_eq_sum_sq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    ClassFunction.inner data.weightedOutput data.weightedOutput =
+      ∑ t : Fin n, (d t : ℂ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change ClassFunction.inner data.weightedOutput data.weightedOutput =
+    ∑ t : Fin n, (d t : ℂ) ^ 2
+  exact data.weightedOutput_inner_self_eq_sum_sq
+
 /-- H78-facing real Parseval form for the S08 weighted Ind-chain output.
 
 This consumes the same concrete S07 coherence witness as
@@ -1613,6 +1783,30 @@ theorem indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent
   change (ClassFunction.inner data.weightedOutput data.weightedOutput).re =
     ∑ t : Fin n, (d t : ℝ) ^ 2
   exact data.weightedOutput_inner_self_re_eq_sum_sq
+
+/-- H78-facing lower bound for the weighted output norm from the normalized
+coefficient `d 0 = 1`. -/
+theorem indChain_one_le_weightedOutput_inner_self_re_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    1 ≤ (ClassFunction.inner data.weightedOutput data.weightedOutput).re := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change 1 ≤ (ClassFunction.inner data.weightedOutput data.weightedOutput).re
+  exact data.one_le_weightedOutput_inner_self_re
 
 /-- H78-facing real scalar-coefficient form for the weighted Ind-chain source
 difference. -/
@@ -3052,6 +3246,42 @@ theorem normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
     hirr hdistinct hzeta_degree hdegree_sum hzeta_uv
 
 /-- Source inner-product values, source irreducibility data, and the textbook
+`u,v,w` formula give the raw `(ζ^ν)^ρ` lower bound used downstream. -/
+theorem zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : H78.smallIndex) :
+    1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+      (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re :=
+  H78.zetaNuRho_inner_self_re_ge_of_normEstimates hBD
+    (H78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula hBD
+      hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv)
+    hsmall
+
+/-- Source inner-product values, source irreducibility data, and the textbook
 `u,v,w` formula give the raw `Γ` norm-bound consumed by the (7.10)
 orthogonal-integer decomposition bridge. -/
 theorem gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
@@ -3273,6 +3503,31 @@ theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one
           ((H78.kernelOrder : ℂ) * (H78.complementIndex : ℂ)) *
         (((hBD.a : ℂ) - 1) * ((hBD.a : ℂ) - 1))).re = r
   exact (congrArg Complex.re hprodCast).trans (Complex.ofReal_re r)
+
+/-- **Peterfalvi (7.8.c.ii).** Source-data bridge for the `(ζ^ν)^ρ` norm
+formula.  The source irreducibility/distinctness data supplies the coefficient
+`(β, ζ^ν) = a - 1`, while irreducibility and orthogonality of the image
+`νζ` remain explicit inputs to the character-ρ norm formula. -/
+theorem zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    H78.zetaNuRhoNormSq =
+      (((H78.kernelOrder : ℝ) - 1) /
+          ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) :=
+  H78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one hBD hnu_irr hnu_orth
+    (H78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+      hBD hirr hdistinct hzeta_degree)
 
 end Hypothesis78
 
@@ -4276,6 +4531,144 @@ lemma localSmallIndex_of_family_cardinalities [Fintype G]
   rw [Hypothesis78.smallIndex]
   rw [F.localComplementIndex_eq_e H78 hL hH, F.localKernelOrder_eq_h H78 hH]
   exact hsmall
+
+/-- Family-notated source-data form of the raw `(ζ^ν)^ρ` lower bound from
+Peterfalvi (7.8.b).  This is the local estimate used before the reduced-family
+inequality in (7.10), with `e` and `h` stated as `F.e i` and `F.h i`. -/
+lemma zetaNuRho_inner_self_re_ge_of_family_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+      (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re := by
+  have hlocal :
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re :=
+    H78.zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula
+      hBD
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+      hzeta_ind hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hdegree_sum)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hzeta_uv)
+      (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+    using hlocal
+
+/-- **Peterfalvi (7.8.b).** Family-notated source-data form of the residual
+`Γ` upper bound.  This is the `Γ` estimate consumed by the orthogonal integer
+decomposition in the final assembly, with the local `e` rewritten as `F.e i`. -/
+lemma gamma_inner_self_re_le_of_family_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤ (F.e i : ℝ) - 1 := by
+  have hlocal :
+      (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+        (H78.complementIndex : ℝ) - 1 :=
+    H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+      hBD
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+      hzeta_ind hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hdegree_sum)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hzeta_uv)
+      (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localComplementIndex_eq_e H78 hL hH] using hlocal
+
+/-- **Peterfalvi (7.8.c.ii).** Family-notated source-data form of the
+`(ζ^ν)^ρ` norm formula.  This rewrites the local ratio `(h - 1)/(he)` as
+the family quantities `(h_i - 1)/(h_i e_i)`. -/
+lemma zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hnu_irr : IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)))
+    (hnu_orth : ∀ r : Fin (H78.hyp76.n + 1), r ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+        (H78.nu (H78.hyp76.zeta r)) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (F.e i : ℂ)) :
+    H78.zetaNuRhoNormSq =
+      (((F.h i : ℝ) - 1) / ((F.h i : ℝ) * (F.e i : ℝ))) *
+        (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) := by
+  have hlocal :
+      H78.zetaNuRhoNormSq =
+        (((H78.kernelOrder : ℝ) - 1) /
+            ((H78.kernelOrder : ℝ) * (H78.complementIndex : ℝ))) *
+          (((hBD.a : ℝ) - 1) * ((hBD.a : ℝ) - 1)) :=
+    H78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreducible_source_data
+      hBD hnu_irr hnu_orth hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+  simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+    using hlocal
 
 /-- `G₀` is nonempty: it contains the identity. -/
 lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :

@@ -2744,6 +2744,129 @@ theorem Xset_union_Yset_eq_S (hyp : SibleyDadeHypothesis G L H) :
     hyp.Xset ⁅H, H⁆ ∪ hyp.Yset = hyp.S := by
   simpa [Yset] using hyp.Xset_union_SsubFiltration_eq_S (Z := ⁅H, H⁆)
 
+/-- A nontrivial irreducible character remains nontrivial after complex conjugation. -/
+theorem irreducibleCharacter_conj_ne_trivial {Γ : Type*} [Group Γ] [Finite Γ]
+    {θ : IrreducibleCharacter Γ}
+    (hθ_ne : θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ) :
+    (⟨(θ : ClassFunction Γ ℂ).conj, θ.isIrreducible.conj⟩ :
+      IrreducibleCharacter Γ) ≠
+        OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ := by
+  intro hθc
+  apply hθ_ne
+  apply IrreducibleCharacter.ext
+  have hval : (θ : ClassFunction Γ ℂ).conj =
+      (OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ :
+        ClassFunction Γ ℂ) := by
+    simpa using congrArg
+      (fun η : IrreducibleCharacter Γ => (η : ClassFunction Γ ℂ)) hθc
+  calc
+    (θ : ClassFunction Γ ℂ) = ((θ : ClassFunction Γ ℂ).conj).conj := by
+      rw [ClassFunction.conj_conj]
+    _ = (OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ :
+        ClassFunction Γ ℂ).conj := by
+      rw [hval]
+    _ = (OddOrder.RepresentationTheory.trivialIrreducibleCharacter Γ :
+        ClassFunction Γ ℂ) := by
+      ext x
+      simp
+
+/-- `S = {Ind_H^L θ | θ ∈ Irr(H), θ ≠ 1}` is finite, directly from the finite source
+irreducible-character set. -/
+theorem S_finite (hyp : SibleyDadeHypothesis G L H) :
+    hyp.S.Finite := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Finite (IrreducibleCharacter ↥H) :=
+    OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥H)
+  refine (Set.finite_range
+    (fun θ : {θ : IrreducibleCharacter ↥H //
+      θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥H} =>
+      ClassFunction.induce H (θ.1 : ClassFunction ↥H ℂ))).subset ?_
+  intro φ hφ
+  rw [hyp.S_eq] at hφ
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  exact ⟨⟨θ, hθ_ne⟩, hφeq.symm⟩
+
+/-- Every filtration layer `S(A)` is finite, because it is a subset of `S`. -/
+theorem SsubFiltration_finite (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L) :
+    (hyp.SsubFiltration A).Finite :=
+  hyp.S_finite.subset hyp.SsubFiltration_subset_S
+
+/-- `X(Z) = S - S(Z)` is finite, because it is a subset of `S`. -/
+theorem Xset_finite (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    (hyp.Xset Z).Finite :=
+  hyp.S_finite.subset hyp.Xset_subset_S
+
+/-- `S` is closed under complex conjugation.  This is a source-side fact:
+`conj (Ind_H^L θ) = Ind_H^L (conj θ)`. -/
+theorem S_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate hyp.S := by
+  intro φ hφ
+  rw [hyp.S_eq] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  let θc : IrreducibleCharacter ↥H :=
+    ⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩
+  refine ⟨θc, irreducibleCharacter_conj_ne_trivial hθ_ne, ?_⟩
+  rw [hφeq]
+  simpa [θc] using ClassFunction.induce_conj H (θ : ClassFunction ↥H ℂ)
+
+/-- Each Peterfalvi filtration layer `S(A)` is closed under complex conjugation.  The
+kernel condition is preserved by conjugating the source character. -/
+theorem SsubFiltration_closedUnderConjugate
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.SsubFiltration A) := by
+  intro φ hφ
+  rw [hyp.mem_SsubFiltration] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hφ
+  let θc : IrreducibleCharacter ↥H :=
+    ⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩
+  refine ⟨θc, irreducibleCharacter_conj_ne_trivial hθ_ne, ?_, ?_⟩
+  · simpa [θc, OddOrder.Peterfalvi.S03.characterKernel_conj] using hker
+  · rw [hφeq]
+    simpa [θc] using ClassFunction.induce_conj H (θ : ClassFunction ↥H ℂ)
+
+/-- `X(Z) = S - S(Z)` is closed under complex conjugation, without first proving
+`X(Z) ⊆ Irr(L)`. -/
+theorem Xset_closedUnderConjugate_unconditional
+    (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) := by
+  intro φ hφ
+  obtain ⟨hφS, hφnotZ⟩ := hyp.mem_Xset.mp hφ
+  refine hyp.mem_Xset.mpr ⟨hyp.S_closedUnderConjugate hφS, ?_⟩
+  intro hφcZ
+  have hφccZ := hyp.SsubFiltration_closedUnderConjugate Z hφcZ
+  exact hφnotZ (by simpa [ClassFunction.conj_conj] using hφccZ)
+
+/-- **Peterfalvi (6.2), filtration form.**  If the quotient `H/A` has nontrivial
+abelianization, then the filtration layer `S(A)` is nonempty.
+
+The source character is the degree-one irreducible obtained on `H/A`, inflated to `H`; inducing it
+to `L` gives an element of the Peterfalvi filtration by construction. -/
+theorem SsubFiltration_nonempty_of_commutator_quotient_ne_top
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal]
+    (hcomm : commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
+    (hyp.SsubFiltration A).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  obtain ⟨θ, hθ_ne, hker, _hdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+      (K := ↥H) (A.subgroupOf H) hcomm
+  refine ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), ?_⟩
+  rw [hyp.mem_SsubFiltration]
+  exact ⟨θ, hθ_ne, hker, rfl⟩
+
+/-- **Peterfalvi (6.2), solvable quotient form.**  A nontrivial finite solvable quotient `H/A`
+has proper commutator subgroup, hence supplies a nontrivial degree-one source character and a
+member of `S(A)`. -/
+theorem SsubFiltration_nonempty_of_nontrivial_solvable_quotient
+    (hyp : SibleyDadeHypothesis G L H) (A : Subgroup ↥L)
+    [(A.subgroupOf H).Normal] [IsSolvable (↥H ⧸ A.subgroupOf H)]
+    [Nontrivial (↥H ⧸ A.subgroupOf H)] :
+    (hyp.SsubFiltration A).Nonempty :=
+  hyp.SsubFiltration_nonempty_of_commutator_quotient_ne_top A
+    (IsSolvable.commutator_lt_top_of_nontrivial
+      (G := ↥H ⧸ A.subgroupOf H)).ne
+
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
 The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains
@@ -3652,15 +3775,10 @@ theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
 `ClosedUnderConjugate` input to the degree-monotone enumeration of `X` into conjugate pairs
 (`S07.two_le_ncard_of_conjugate_closed_of_noReal`, `S07.exists_monotoneDegreeEnum`). -/
 theorem Xset_closedUnderConjugate_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
-    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
-    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) := by
-  have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH hX
-  intro χ hχX
-  rw [hXeq] at hχX ⊢
-  refine ⟨hχX.1.conj, ?_⟩
-  rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
-  exact hχX.2
+    {Z : Subgroup ↥L} (_hZH : Z ≤ H) [Z.Normal]
+    (_hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) :=
+  hyp.Xset_closedUnderConjugate_unconditional Z
 
 /-- **(T8 leaf 3a) `X` is closed under conjugation** (Frobenius case). -/
 theorem Xset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
@@ -3690,14 +3808,9 @@ theorem Xset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
 This is the `hXfin` input to the degree-monotone enumeration
 `S07.exists_monotoneDegreeEnum` and the chain assembly. -/
 theorem xSet_finite_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
-    {Z : Subgroup ↥L} (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
-    (hyp.Xset Z).Finite := by
-  haveI := OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥L)
-  have hIrrFin : (irreducibleCharacters ↥L).Finite :=
-    (Set.finite_range (fun χ : IrreducibleCharacter ↥L => (χ : ClassFunction ↥L ℂ))).subset
-      (fun φ hφ => ⟨⟨φ, mem_irreducibleCharacters.mp hφ⟩, rfl⟩)
-  exact hIrrFin.subset
-    (fun χ hχ => mem_irreducibleCharacters.mpr (hX χ hχ))
+    {Z : Subgroup ↥L} (_hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
+    (hyp.Xset Z).Finite :=
+  hyp.Xset_finite Z
 
 /-- **(T8 leaf 4) `X` is finite** (Frobenius case). -/
 theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
@@ -3720,6 +3833,19 @@ def xBaseBlock (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
 theorem xBaseBlock_subset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
     hyp.xBaseBlock Z ⊆ hyp.Xset Z :=
   fun _ hχ => hχ.1
+
+/-- The minimal-degree base block of `X(Z)` is closed under conjugation.  This uses only the
+direct conjugation-invariance of `X(Z)` and degree preservation under conjugation. -/
+theorem xBaseBlock_closedUnderConjugate_unconditional
+    (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) := by
+  intro χ hχ
+  refine ⟨hyp.Xset_closedUnderConjugate_unconditional Z hχ.1, fun ψ hψ => ?_⟩
+  have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
+      (OddOrder.Peterfalvi.S03.characterDegree χ).re := by
+    simp
+  rw [hre]
+  exact hχ.2 ψ hψ
 
 /-- Any two members of the base block have the same degree (the base is an *equal*-degree family,
 the input shape of `coherentEqualDegree_fromDade`). -/
@@ -3777,16 +3903,10 @@ conjugation preserves the degree (`characterDegree_conj`) and `X`
 (`Xset_closedUnderConjugate_of_irreducible_X`).  With the no-real property this makes `S₀`
 contain a conjugate pair, so `2 ≤ |S₀|`. -/
 theorem xBaseBlock_closedUnderConjugate_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
-    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
-    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) := by
-  intro χ hχ
-  refine ⟨hyp.Xset_closedUnderConjugate_of_irreducible_X hZH hX hχ.1, fun ψ hψ => ?_⟩
-  have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
-      (OddOrder.Peterfalvi.S03.characterDegree χ).re := by
-    simp [OddOrder.Peterfalvi.S03.characterDegree_conj]
-  rw [hre]
-  exact hχ.2 ψ hψ
+    {Z : Subgroup ↥L} (_hZH : Z ≤ H) [Z.Normal]
+    (_hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+  hyp.xBaseBlock_closedUnderConjugate_unconditional Z
 
 /-- The base block is closed under conjugation (Frobenius case). -/
 theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
