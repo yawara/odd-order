@@ -447,6 +447,41 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
   rw [h, normN_zero p q hq] at this
   exact zero_ne_one this
 
+/-- The product norm sends inverses to inverses. -/
+lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
+    normN p q a⁻¹ = (normN p q a)⁻¹ := by
+  simp [normN, inv_pow, Finset.prod_inv_distrib]
+
+/-- Algebraic tail of **BG Appendix C, Lemma C.3**: once the generator-relation
+calculation has produced `N(2 * a - 1) = 1`, an element `a ∈ E` has inverse in
+`E`.  Indeed `2 - a⁻¹ = a⁻¹ * (2 * a - 1)`. -/
+lemma inv_mem_normSetE_of_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q)
+    (hrel : normN p q ((2 : GaloisField p q) * a - 1) = 1) :
+    a⁻¹ ∈ normSetE p q := by
+  have ha0 : a ≠ 0 := ne_zero_of_mem_normSetE p q hq ha
+  refine ⟨?_, ?_⟩
+  · rw [normN_inv, ha.1, inv_one]
+  · have hcalc :
+        (2 : GaloisField p q) - a⁻¹ = a⁻¹ * ((2 : GaloisField p q) * a - 1) := by
+      field_simp [ha0]
+    rw [hcalc, normN_mul, normN_inv, ha.1, inv_one, one_mul, hrel]
+
+/-- A C.3 generator-relation output in the form `N(2 * a - 1) = 1` for every
+`a ∈ E` implies the usual inversion closure `E = E⁻¹`. -/
+theorem normSetE_eq_inv_of_forall_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 < q)
+    (hrel : ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1) :
+    normSetE p q = (normSetE p q)⁻¹ := by
+  ext a
+  constructor
+  · intro ha
+    rw [Set.mem_inv]
+    exact inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a ha)
+  · intro ha
+    rw [Set.mem_inv] at ha
+    simpa using inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a⁻¹ ha)
+
 /-- BG Appendix C, Lemma C.2 structure-constant bridge: the norm set `E` is in
 bijection with pairs `(u, v) ∈ U × U` satisfying `u + v = 2`.  This is the
 finite-field counting identity used before the `q ≥ 5` character calculation. -/

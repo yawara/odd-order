@@ -110,8 +110,11 @@ theorem lemmaC2_card_ge_two [Finite G]
 theorem lemmaC3_inverse_closed [Finite G]
     (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
     normSetInverseClosed hyp := by
-  simpa [normSetInverseClosed, S16.appCNormSetInverseClosed]
-    using data.appC_normSet_inverse_closed
+  haveI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simpa [normSetInverseClosed]
+    using NormSet.normSetE_eq_inv_of_forall_normN_two_mul_sub_one
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos
+      data.appC_normSet_generator_relation
 
 /-! ## Theorem C and the Peterfalvi bridge -/
 

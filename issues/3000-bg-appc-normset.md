@@ -145,15 +145,15 @@ created: 2026-06-04
 - [x] **Lemma C.2 packaging (q≥5)**: q=3 helper を `AppC_NormSet` に残し、
   full `lemmaC2` を class-sum 下流の `AppC_LemmaC2` へ移して
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
-- [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` に実 norm-set conclusion `appCNormSetInverseClosed` を追加し、`AppC_FinalContradiction.lemmaC3_inverse_closed` を `sorry` なしで閉じた (2026-06-04, branch `codex/ft-appc-downstream`)。
+- [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` の C.3 obligation を最終結論 `E=E⁻¹` から generator-relation 出力 `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) に細分化し、`AppC_FinalContradiction.lemmaC3_inverse_closed` は純有限体補題経由で `sorry` なしに維持 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
-- [ ] **C.3 genuine proof/materialization**: `appCNormSetInverseClosed` を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは S16 の `field_normalizer_structure` 側の upstream obligation。
+- [ ] **C.3 genuine proof/materialization**: `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件
 
 `AppC.theoremC` が sorry-free (Lemmas C.1-C.3 + 配線完成)。`nonexistence_of_G` の BG 側 gap が閉じる。
 2026-06-04 時点で `AppC_FinalContradiction` は direct sorry-free; `theoremC` は AxiomsCheck 登録済み。
-残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_normSet_inverse_closed` の upstream materialization として追跡する。
+残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_normSet_generator_relation` の upstream materialization として追跡する。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
 段階的に C.1 → C.2(q=3) → C.2(q≥5) → assembly → C.3 materialization。
 
 ## 参照

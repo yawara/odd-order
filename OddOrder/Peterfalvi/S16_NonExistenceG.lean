@@ -93,17 +93,16 @@ theorem tSide_cyclotomic_quotient_divisor_modEq_one (hyp : Hypothesis (G := G)) 
 
 end Hypothesis
 
-/-- The norm-set inversion closure conclusion of **BG Appendix C, Lemma C.3**,
-expressed at the Peterfalvi Section 16 interface.
-
-The proof of this fact is the generator-relation argument in BG Appendix C and
-uses the concrete hypothesis-(B) embedding data.  Until that embedding is
-materialized, the Section 16 field-normalizer package carries this conclusion as
-part of the upstream data consumed by BG Appendix C. -/
-def appCNormSetInverseClosed (hyp : Hypothesis (G := G)) : Prop :=
+/-- The concrete norm relation produced by the generator-relation argument in
+**BG Appendix C, Lemma C.3**, expressed at the Peterfalvi Section 16 interface.
+For every `a` in the norm set `E`, the relation should give `N(2 * a - 1) = 1`;
+BG then converts this finite-field statement into `a⁻¹ ∈ E`. -/
+def appCNormSetGeneratorRelation (hyp : Hypothesis (G := G)) : Prop :=
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
-  OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q =
-    (OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)⁻¹
+  ∀ a : GaloisField hyp.base.p hyp.base.q,
+    a ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+      OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+        ((2 : GaloisField hyp.base.p hyp.base.q) * a - 1) = 1
 
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The field model itself is represented propositionally until
@@ -127,7 +126,7 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U : Prop
   W2_conj_y_normalizes_U_holds : W2_conj_y_normalizes_U
-  appC_normSet_inverse_closed : appCNormSetInverseClosed hyp
+  appC_normSet_generator_relation : appCNormSetGeneratorRelation hyp
 
 /-! ## (14.3)--(14.7): the subgroup `L` over `N_G(U)` -/
 
