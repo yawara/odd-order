@@ -1034,6 +1034,33 @@ theorem exists_normal_sylow_of_hasNormalPComplement_ne
   exists_normal_sylow_of_exists_characteristic_subgroup_card_sylow
     (exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne hpq hG hK)
 
+/-- If the canonical normal `p`-complement already has a normal Sylow
+`q`-subgroup, then the ambient group has one, for `q != p`.
+
+This is the induction-consumption form used in BG Theorem 4.20(c): the normal
+Sylow in the complement is identified with `O_q` there, hence gives the
+characteristic subgroup required by `exists_normal_sylow_of_hasNormalPComplement_ne`. -/
+theorem exists_normal_sylow_of_hasNormalPComplement_ne_of_complement_normal_sylow
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (hK :
+      ∃ QK : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G),
+        (QK : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).Normal) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  obtain ⟨QK, hQK_norm⟩ := hK
+  have hQK_eq : (QK : Subgroup O) = Ch01.opCore q O :=
+    Ch01.Sylow.eq_opCore_of_normal QK hQK_norm
+  refine exists_normal_sylow_of_hasNormalPComplement_ne hpq hG ?_
+  refine ⟨Ch01.opCore q O, ?_, ?_⟩
+  · exact Ch01.opCore.characteristic q O
+  · calc
+      Nat.card ↥(Ch01.opCore q O) = Nat.card ↥(QK : Subgroup O) := by
+        rw [← hQK_eq]
+      _ = Nat.card ↥((default : Sylow q O) : Subgroup O) := by
+        rw [QK.card_eq_multiplicity, (default : Sylow q O).card_eq_multiplicity]
+
 /-- Bottom-quotient version of `exists_normal_sylow_of_hasNormalPComplement_ne`,
 matching the final layer of the characteristic series in BG Theorem 4.20(c). -/
 theorem exists_normal_sylow_of_hasNormalPComplement_ne_of_characteristic_quotient_bot

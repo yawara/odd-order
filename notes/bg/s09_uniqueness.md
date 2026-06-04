@@ -678,6 +678,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    corresponding characteristic subgroup lift is covered by
    `S04.exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne`,
    which maps the induction-layer subgroup through the characteristic core.  The
+   sibling extraction theorem
+   `S04.exists_normal_sylow_of_hasNormalPComplement_ne_of_complement_normal_sylow`
+   covers the case where the induction result on the canonical complement is already
+   packaged as a normal Sylow subgroup, identifying it with `O_q` in the complement
+   before applying the characteristic-subgroup lift.  The
    quotient-layer version needed to glue consecutive characteristic factors is
    covered by `S04.characteristic_quotient_layer_lift_of_hasNormalPComplement_ne`;
    its generic subtype/cardinality support is in
@@ -704,7 +709,10 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `S04.pRank_sylow_le_two_of_le_fitting` and
    `S04.pRank_le_two_of_sylow_le_fitting`.  The
    remaining §4 work is therefore to construct that
-   characteristic layer/series under the `rank F(M) ≤ 2` hypothesis; the `opCore`
+   characteristic layer/series under the `rank F(M) ≤ 2` hypothesis.  A useful
+   next implementation slice is the series/gluing interface for the BG 4.20(c)
+   induction step (`K = O_{r | r != p1}(G)`, lift the characteristic factors from `K`,
+   then attach the top `G/K` Sylow factor); the `opCore`
    equality, ambient equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09
    once `q ∈ π(M)` is available.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
