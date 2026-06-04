@@ -1714,17 +1714,24 @@ theorem sourceDiffNormEvaluation_of_inner_values (H78 : Hypothesis78 G A L)
     rw [H78.sourceDiffNormSq_expand, hind_norm, hzeta_ind, hind_zeta, hzeta_norm]
     simp
 
+/-- Any indexed source character has norm one once it is known to be irreducible. -/
+theorem zeta_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1 := by
+  simpa using
+    (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨H78.hyp76.zeta i, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L)
+      (⟨H78.hyp76.zeta i, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L))
+
 /-- The chosen non-principal `ζ` has norm one once it is known to be irreducible. -/
 theorem zetaDistinct_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
     (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
     ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
-        (H78.hyp76.zeta H78.zetaDistinct) = 1 := by
-  simpa using
-    (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
-      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
-        OddOrder.RepresentationTheory.IrreducibleCharacter L)
-      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
-        OddOrder.RepresentationTheory.IrreducibleCharacter L))
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+  H78.zeta_inner_self_eq_one_of_irreducible hzeta_irr
 
 /-- Variant of `sourceDiffNormEvaluation_of_inner_values` using irreducibility of
 the chosen `ζ` instead of a raw self-inner-product evaluation. -/
@@ -2151,22 +2158,103 @@ theorem betaNormSq_eq_of_weightedNuSum_norm
   norm_num [Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
   ring
 
+/-- Any indexed coherent image `νζᵢ` has norm one once the source `ζᵢ` does. -/
+theorem nu_zeta_inner_self_eq_one (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+        (H78.nu (H78.hyp76.zeta i)) = 1 := by
+  rw [H78.nu_isometry, hzeta_norm]
+
+/-- Any indexed coherent image `νζᵢ` has norm one once the source `ζᵢ` is irreducible. -/
+theorem nu_zeta_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+        (H78.nu (H78.hyp76.zeta i)) = 1 :=
+  H78.nu_zeta_inner_self_eq_one
+    (H78.zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+
 /-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
 theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
     (hzeta_norm :
       ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
         (H78.hyp76.zeta H78.zetaDistinct) = 1) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
-        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
-  rw [H78.nu_isometry, hzeta_norm]
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.nu_zeta_inner_self_eq_one hzeta_norm
 
 /-- The source irreducibility of the distinguished `ζ` gives `‖νζ‖² = 1`. -/
 theorem zetaImage_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
     (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
         (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
-  H78.zetaImage_inner_self_eq_one
-    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+  H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr
+
+/-- Coherence makes an indexed image `νζᵢ` a signed irreducible character once
+the source `ζᵢ` is irreducible.  This records exactly the sign ambiguity left by
+the virtual-character norm-one criterion. -/
+theorem exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ∃ (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+        H78.nu (H78.hyp76.zeta i) = ε • (ξ : ClassFunction G ℂ) :=
+  OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one
+    (H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu hi)
+    (H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- Distinguished-`ζ` specialization of the signed image criterion. -/
+theorem exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ∃ (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+        H78.nu (H78.hyp76.zeta H78.zetaDistinct) = ε • (ξ : ClassFunction G ℂ) :=
+  H78.exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent hcoh hnu
+    H78.zetaDistinct_ne_ind1H hzeta_irr
+
+/-- If the coherent image `νζᵢ` has positive degree, the signed ambiguity collapses
+and `νζᵢ` is an irreducible character. -/
+theorem nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hpos : ∃ d : ℕ, 0 < d ∧
+      (H78.nu (H78.hyp76.zeta i) : G → ℂ) 1 = (d : ℂ)) :
+    IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta i)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
+    (H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu hi)
+    (H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+    hpos
+
+/-- Distinguished-`ζ` specialization of the positive-degree image criterion. -/
+theorem zetaImage_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hpos : ∃ d : ℕ, 0 < d ∧
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct) : G → ℂ) 1 = (d : ℂ)) :
+    IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) :=
+  H78.nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos hcoh hnu
+    H78.zetaDistinct_ne_ind1H hzeta_irr hpos
 
 /-- Irreducibility and distinctness of the source `S`-family give its
 orthogonality matrix. -/

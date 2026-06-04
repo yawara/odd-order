@@ -405,3 +405,14 @@ Peterfalvi (7.8) の `S = T \ {Ind 1_H}` を S09 側で名前付けし、具体�
 
 これで (7.8.a)/(7.9) の downstream proof は、set membership の都度の組み立てではなく
 H78 の indexed API から `νζ_i` の ZIrr-codomain を取り出せる。
+
+### 2026-06-04 pass: signed irreducible images from S07 coherence
+
+S09 に indexed `zeta_inner_self_eq_one_of_irreducible`, `nu_zeta_inner_self_eq_one`,
+`nu_zeta_inner_self_eq_one_of_irreducible` と、coherence witness から `νζ_i` を signed
+irreducible character として取り出す
+`exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent` / distinguished `ζ` 版を追加。
+
+`νζ_i ∈ ZIrr` と `‖νζ_i‖² = 1` からは符号が残るので、正性を hidden assumption にせず
+`ε = ±1` の存在形で公開した。後段で `νζ_i(1) > 0` が得られる場合のために、同じ入力から
+`IsIrreducibleCharacter (νζ_i)` を返す positive-degree bridge も追加した。

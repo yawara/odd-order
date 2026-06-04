@@ -2126,6 +2126,26 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_mem_ZIrr_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zetaDistinct_mem_ZIrr_of_isCoherent
+-- Peterfalvi (7.8) norm-one and signed-irreducible image bridges for coherent `ζᵢ`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zeta_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_inner_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_inner_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
 -- Peterfalvi (7.8.b) raw norm-bound consumers from `NormEstimates`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates
