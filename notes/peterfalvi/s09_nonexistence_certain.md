@@ -767,3 +767,15 @@ definitional に固定したまま S08 `IndChainDecomposition` を返す。
 これで (6.8.1) Frobenius branch の証明済み assembly を、S09/H78 の weighted-chain consumer に
 `card_G0_lower_bound` の sorry を経由せず接続できる。`hyp.CoherenceTarget` への rewrite は
 extension の definitional equality を隠すため、この socket は union-level 入力を要求する。
+
+### 2026-06-05 pass: family71 source data to displayed bound and contradiction
+
+S09 に `FrobeniusFamily.lowerBoundTerm_of_family71_coherent_zeta_source_data` と
+`not_trivial_G0_of_family71_coherent_zeta_source_data` を追加した。
+
+既存の `characterEstimateData_of_family71_coherent_zeta_source_data` が組み立てる
+concrete (7.5)、coherent image、(7.8.b) source estimates、(7.9) decomposition を、
+中間 package に戻さず Peterfalvi (7.10) の表示下界と (7.11) の `G₀ = {1}` 矛盾へ直接接続する。
+
+これで `card_G0_lower_bound` の残り assembly 義務は、抽象的な `CharacterEstimateData` ではなく、
+教科書の concrete source-data package を存在させる問題として使える形に近づいた。

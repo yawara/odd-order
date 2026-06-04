@@ -2425,6 +2425,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_family71_coherent_zeta_source_data
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
 #assert_only_allowed_axioms
@@ -2476,6 +2479,9 @@ set_option linter.style.longLine false in
 -- Peterfalvi (7.11) conditional terminal contradiction from the named (7.10) estimate data.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_characterEstimateData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_family71_coherent_zeta_source_data
 -- Peterfalvi (7.11) consumer from the `𝓑`-sum bound and real reduced family inequality.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_real_Bsum_bound

@@ -6221,6 +6221,83 @@ lemma lowerBoundTerm_of_characterEstimateData [Finite G]
   rcases hdata with ⟨i, hmin, B, hB_ne, hBsum, hbase⟩
   exact ⟨i, F.lowerBoundTerm_of_Bsum_bound hodd hmin B hB_ne hBsum hbase⟩
 
+
+/-- Concrete (7.5)+(7.8.b)+(7.9) source-data form of the displayed (7.10)
+lower bound.
+
+This is the lower-bound consumer for
+`characterEstimateData_of_family71_coherent_zeta_source_data`: the concrete
+`FamilyHypothesis71` reduced family inequality, the coherent `ζ` image, the
+family-notated (7.8.b) source estimates, and the orthogonal integer
+decomposition are assembled internally into `CharacterEstimateData` and then
+converted to Peterfalvi's displayed rational bound. -/
+lemma lowerBoundTerm_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        ((F.e i : ℚ) - 1) *
+          (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+              ((F.e i : ℚ) * (F.h i : ℚ)) +
+            2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) :=
+  F.lowerBoundTerm_of_characterEstimateData hodd
+    (F.characterEstimateData_of_family71_coherent_zeta_source_data P H78 hBD
+      hcoh hnu hzeta_irr hLocalL hLocalH hmin B hP_L hP_A hP_G0 hB_ne
+      v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hi hgood)
+
 /-- Real-valued form of `lowerBoundTerm_of_Bsum_bound`, matching the reduced
 inequality produced before Peterfalvi's final rational display. -/
 lemma lowerBoundTerm_of_real_Bsum_bound [Finite G]
@@ -6491,6 +6568,77 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
     (hG0 : F.G0 = {(1 : G)}) : False :=
   not_trivial_G0_of_lowerBoundTerm F hodd
     (F.lowerBoundTerm_of_characterEstimateData hodd hdata) hG0
+
+
+/-- **Peterfalvi (7.11), concrete family/source-data form.**  The terminal
+contradiction from the concrete (7.5) family inequality, coherent `ζ` image,
+(7.8.b) source estimates, and the (7.9) orthogonal integer decomposition.
+
+This bypasses the open top-level `card_G0_lower_bound`: once these textbook
+source-data inputs are available, the displayed lower bound and the final
+`G₀ = {1}` contradiction are already closed. -/
+theorem not_trivial_G0_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.lowerBoundTerm_of_family71_coherent_zeta_source_data hodd P H78 hBD
+      hcoh hnu hzeta_irr hLocalL hLocalH hmin B hP_L hP_A hP_G0 hB_ne
+      v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hi hgood)
+    hG0
 
 /-- **Peterfalvi (7.11), `𝓑`-sum-bound form.**  The terminal contradiction from
 the separately established `𝓑`-sum bound and the real reduced family inequality.
