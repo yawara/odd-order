@@ -3135,6 +3135,71 @@ private theorem le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
       (D := D) (L := L) (M := M) (P0 := P0)
       hG hDM hMnormD (by simpa [H] using hP0_der) hcop hK_nilp hK_rank)
 
+/-- Lemma 9.5's final contradiction for a fixed cocyclic witness `B` and
+maximal subgroup `L`: the local `(9.10)` inclusion and Corollary 4.19 force
+`P₀` to centralize the subgroup whose noncentralization selected `B`. -/
+private theorem false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witness
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A B M L P P0 : Subgroup G} {y : G}
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hBA : B ≤ A) (hyB : y ∈ B)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)))
+    (hM : M ∈ maximalSubgroups G) (hLM : L ≠ M)
+    (hPp : IsPGroup p ↥P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hP0p : IsPGroup p ↥P0)
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (SP_L : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L)
+    (hnot_cent : ¬ P0 ≤ Subgroup.centralizer
+      (((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ⊓
+          Subgroup.centralizer (B : Set G)) : Set G)) :
+    False := by
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  have hP0_der : P0 ≤ derivedInG (L ⊓ M) :=
+    p0_le_derivedInG_inf_of_scn3_witness_maximal
+      hG hA hAnot (hBA hyB) hL hPp hAP hPnormA hNPM hP0N SP_L
+  have hcentDL : P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
+    simpa [D] using
+      (le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
+        (G := G) (p := p) hG hM hL.1 hLM hP0p hP0_der)
+  have hcentDB : P0 ≤ Subgroup.centralizer
+      (((D ⊓ Subgroup.centralizer (B : Set G) : Subgroup G)) : Set G) :=
+    le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal
+      (D := D) hyB hL hcentDL
+  exact hnot_cent (by simpa [D] using hcentDB)
+
+/-- Lemma 9.5's `P₀` centralizes `O_{p'}(F(M))` bridge.  Assuming the existing
+normalizer package for `P`, and characteristic Sylow-series packages for the
+witness maximal subgroups produced by Theorem 9.1, the Prop. 1.16 witness
+argument cannot find a noncentralized cocyclic centralizer. -/
+private theorem p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M P P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hPp : IsPGroup p ↥P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hP0p : IsPGroup p ↥P0)
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (hSP :
+      ∀ {y : G} {L : Subgroup G}, y ∈ A →
+        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
+          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G) := by
+  classical
+  by_contra hP0D
+  obtain ⟨B, y, L, _hBea, _hBnot, _hBΩ, hBA, _hBnc, _hcyc,
+      hnot_cent, hyB, _hy1, _hCGnotM, hL, _hLA, hLM⟩ :=
+    exists_nonU_cocyclic_omega1_witness_maximal_ne
+      hG hAcomm_set hM hA hAnot hP0D
+  exact false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witness
+    hG hA hAnot hBA hyB hL hM.1 hLM hPp hAP hPnormA hNPM hP0p hP0N
+    (hSP (hBA hyB) hL) hnot_cent
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
