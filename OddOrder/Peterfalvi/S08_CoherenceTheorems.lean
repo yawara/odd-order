@@ -2894,6 +2894,41 @@ theorem scaledDiff_dadeImage_mem_ZIrr (hyp : SibleyDadeHypothesis G L H)
     hyp.dade hyp.hconj hdiffasupp
     (Submodule.sub_mem _ χ.mem_ZIrr (nsmul_mem χ₁.mem_ZIrr a))
 
+/-- **(T8.11f) X-members with a degree ratio have supported scaled difference.**
+
+This is the `X = S - S(Z)` adapter for `sMember_scaledDiffSupport_of_charValue_eq`: once
+the degree-ratio equation `χ(1)=aχ₁(1)` is available, the scaled difference
+`χ-aχ₁` is supported on `H^#`. -/
+theorem xMember_scaledDiffSupport_of_degreeData (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} {χ χ₁ : IrreducibleCharacter ↥L} {a : ℕ}
+    (hχX : (χ : ClassFunction ↥L ℂ) ∈ hyp.Xset Z)
+    (hχ₁X : (χ₁ : ClassFunction ↥L ℂ) ∈ hyp.Xset Z)
+    (hdeg : (χ : ClassFunction ↥L ℂ) 1 = (a : ℂ) * (χ₁ : ClassFunction ↥L ℂ) 1) :
+    ((χ : ClassFunction ↥L ℂ) - a • (χ₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  exact hyp.sMember_scaledDiffSupport_of_charValue_eq
+    (hyp.mem_Xset.mp hχX).1 (hyp.mem_Xset.mp hχ₁X).1 hdeg
+
+/-- **(T8.11g) member-family scaled supports from degree data.**
+
+Given a finite accumulator family inside `X` and degree ratios against the distinguished member
+`χ₁`, all scaled member differences `χᵢ-degᵢχ₁` are supported on `H^#`.  This is the
+`hmemdegdiffsupp` half of `XAdjoinStepInput`, separated from the arithmetic that constructs the
+ratios. -/
+theorem xMember_scaledDiffSupports_of_degreeData (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} {ι : Type*} {s : Finset ι}
+    {χmem : ι → IrreducibleCharacter ↥L} {deg : ι → ℕ} {i₁ : ι}
+    (hmemX : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z)
+    (hi₁ : i₁ ∈ s)
+    (hdeg : ∀ i ∈ s,
+      (χmem i : ClassFunction ↥L ℂ) 1 =
+        (deg i : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1) :
+    ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  intro i hi
+  exact hyp.xMember_scaledDiffSupport_of_degreeData (hmemX i hi) (hmemX i₁ hi₁) (hdeg i hi)
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
