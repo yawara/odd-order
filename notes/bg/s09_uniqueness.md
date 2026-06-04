@@ -702,7 +702,16 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    group, and `S04.CharacteristicSylowLayer.exists_normal_sylow_of_lower_eq_bot`
    for extracting the final normal Sylow subgroup from a bottom layer.  Its
    generic subtype/cardinality support is in
-   `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  The ambient
+   `Subgroup.nat_card_quotient_subgroupOf_map_subtype_eq`.  Series-level
+   assembly is now covered by `S04.CharacteristicSylowStep.ofLayer`,
+   `S04.CharacteristicSylowSegment`, `S04.CharacteristicSylowSeries.toSegment`,
+   `S04.CharacteristicSylowStep.lift_oPiCore_of_hasNormalPComplement_ne`,
+   `S04.CharacteristicSylowSeries.lift_oPiCore_segment_of_hasNormalPComplement_ne`,
+   the endpoint lemmas `lift_oPiCore_segment_top_eq`/`bot_eq`,
+   `S04.CharacteristicSylowSegment.consTop`, and
+   `S04.CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
+   This packages the BG induction pattern: lift the characteristic factors from
+   `K = O_{r | r != p1}(G)` and attach the top `G/K` Sylow factor.  The ambient
    normal-complement lift is now covered by
    `S04.hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup`,
    `S04.hasNormalPComplement_of_characteristic_subgroup_quotient_isPGroup`, and
@@ -714,8 +723,7 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `S04.hasNormalPComplement_of_characteristic_subgroup_quotient_and_outer_quotient_isPGroup`,
    `S04.hasNormalPComplement_of_oPiCore_quotient_and_outer_quotient_isPGroup`, and
    `S04.hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient_isPGroup`.
-   The
-   Fitting-rank induction line `F(K) <= F(G)` is covered by
+   The Fitting-rank induction line `F(K) <= F(G)` is covered by
    `S04.rank_fitting_le_of_normal_subgroup` and
    `S04.rank_fitting_le_two_of_normal_subgroup`; the full normal-subgroup
    induction input `rank G <= 2 or rank F(G) <= 2` is packaged by
@@ -724,15 +732,12 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `OddOrder.GroupTheory.pRank_le_pRank_sylow` plus
    `S04.pRank_sylow_le_two_of_le_fitting` and
    `S04.pRank_le_two_of_sylow_le_fitting`.  The
-   remaining §4 work is therefore to construct the actual
-   characteristic layer/series under the `rank F(M) ≤ 2` hypothesis, using the
-   packaged BG 4.20(c) induction step (`K = O_{r | r != p1}(G)`, lift the
-   characteristic factors from `K`, then attach the top `G/K` Sylow factor).
-   Reconnaissance favors a small custom `Fin`-indexed series structure over
-   `CompositionSeries` or a public `List` representation, because the BG layers
-   are Sylow-sized characteristic factors rather than maximal factors; the
-   skeleton is `S04.CharacteristicSylowStep` / `S04.CharacteristicSylowSeries`.
-   The remaining BG-specific blockers are constructing `H` with `F ≤ H` and
+   remaining §4 work is therefore to construct the induction input under the
+   `rank F(M) ≤ 2` hypothesis and connect it to the packaged series assembly.
+   The custom `Fin`-indexed representation is now the committed direction;
+   `CompositionSeries` remains the wrong fit because the BG layers are
+   Sylow-sized characteristic factors rather than maximal factors.  The remaining
+   BG-specific blockers are constructing `H` with `F ≤ H` and
    `H/F = O_{p1-prime}(G/F)`, proving `G/H` is a `p1`-group from 4.20(a), and
    showing the relevant Sylow `p1` subgroup of `H` lies in `F(H)`.  The
    `opCore`

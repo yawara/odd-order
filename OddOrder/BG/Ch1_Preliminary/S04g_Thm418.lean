@@ -1297,19 +1297,16 @@ noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
     (hG : Ch05.HasNormalPComplement p G)
     (L : CharacteristicSylowLayer
       ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G) q) :
-    CharacteristicSylowLayer G q := by
-  classical
-  obtain ⟨hupper, hlower, hcard⟩ :=
-    characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
-      (G := G) hpq hG L.lower_le_upper L.upper_char L.lower_char
-      L.card_quotient_eq_sylow
-  exact
-    { upper := L.upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
-      lower := L.lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
-      lower_le_upper := Subgroup.map_mono L.lower_le_upper
-      upper_char := hupper
-      lower_char := hlower
-      card_quotient_eq_sylow := hcard }
+    CharacteristicSylowLayer G q :=
+  let hlift := characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
+    (G := G) hpq hG L.lower_le_upper L.upper_char L.lower_char
+    L.card_quotient_eq_sylow
+  { upper := L.upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
+    lower := L.lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
+    lower_le_upper := Subgroup.map_mono L.lower_le_upper
+    upper_char := hlift.1
+    lower_char := hlift.2.1
+    card_quotient_eq_sylow := hlift.2.2 }
 
 end CharacteristicSylowLayer
 
@@ -1318,6 +1315,33 @@ structure CharacteristicSylowStep (G : Type*) [Group G] [Finite G] where
   q : ℕ
   q_prime : Fact q.Prime
   layer : @CharacteristicSylowLayer G _ _ q q_prime
+
+namespace CharacteristicSylowStep
+
+/-- Upper endpoint of a labelled characteristic Sylow step. -/
+def upper (S : CharacteristicSylowStep G) : Subgroup G :=
+  @CharacteristicSylowLayer.upper G _ _ S.q S.q_prime S.layer
+
+/-- Lower endpoint of a labelled characteristic Sylow step. -/
+def lower (S : CharacteristicSylowStep G) : Subgroup G :=
+  @CharacteristicSylowLayer.lower G _ _ S.q S.q_prime S.layer
+
+/-- Regard an unlabelled characteristic Sylow layer as a labelled step. -/
+def ofLayer {q : ℕ} [Fact q.Prime] (L : CharacteristicSylowLayer G q) :
+    CharacteristicSylowStep G :=
+  { q := q
+    q_prime := inferInstance
+    layer := L }
+
+@[simp] theorem upper_ofLayer {q : ℕ} [Fact q.Prime]
+    (L : CharacteristicSylowLayer G q) :
+    (ofLayer L).upper = L.upper := rfl
+
+@[simp] theorem lower_ofLayer {q : ℕ} [Fact q.Prime]
+    (L : CharacteristicSylowLayer G q) :
+    (ofLayer L).lower = L.lower := rfl
+
+end CharacteristicSylowStep
 
 /-- A finite characteristic Sylow series in the form used by BG Theorem 4.20(c).
 
@@ -1331,12 +1355,200 @@ structure CharacteristicSylowSeries (G : Type*) [Group G] [Finite G] where
   top_eq : term 0 = ⊤
   bot_eq : term (Fin.last length) = ⊥
   step : Fin length → CharacteristicSylowStep G
-  upper_eq : ∀ i : Fin length,
-    @CharacteristicSylowLayer.upper G _ _ (step i).q (step i).q_prime (step i).layer =
-      term (Fin.castSucc i)
-  lower_eq : ∀ i : Fin length,
-    @CharacteristicSylowLayer.lower G _ _ (step i).q (step i).q_prime (step i).layer =
-      term i.succ
+  upper_eq : ∀ i : Fin length, (step i).upper = term (Fin.castSucc i)
+  lower_eq : ∀ i : Fin length, (step i).lower = term i.succ
+
+/-- A finite characteristic Sylow segment with arbitrary endpoints.
+
+This is the ambient image of the induction series inside the canonical normal
+`p`-complement before the top `G/O_{p-prime}` layer is attached. -/
+structure CharacteristicSylowSegment (G : Type*) [Group G] [Finite G] where
+  length : ℕ
+  term : Fin (length + 1) → Subgroup G
+  step : Fin length → CharacteristicSylowStep G
+  upper_eq : ∀ i : Fin length, (step i).upper = term (Fin.castSucc i)
+  lower_eq : ∀ i : Fin length, (step i).lower = term i.succ
+
+namespace CharacteristicSylowStep
+
+/-- Lift a labelled step from the canonical normal `p`-complement to the ambient
+group. -/
+noncomputable def lift_oPiCore_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowStep ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : S.q ≠ p) : CharacteristicSylowStep G :=
+  { q := S.q
+    q_prime := S.q_prime
+    layer := @CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne
+      G _ _ p S.q _ S.q_prime hpq hG S.layer }
+
+@[simp] theorem upper_lift_oPiCore_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowStep ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : S.q ≠ p) :
+    (S.lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG hpq).upper =
+      S.upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+  haveI : Fact S.q.Prime := S.q_prime
+  unfold lift_oPiCore_of_hasNormalPComplement_ne upper
+  unfold CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne
+  rcases characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
+      (G := G) hpq hG S.layer.lower_le_upper S.layer.upper_char
+      S.layer.lower_char S.layer.card_quotient_eq_sylow with
+    ⟨hupper, hlower, hcard⟩
+  rfl
+
+@[simp] theorem lower_lift_oPiCore_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowStep ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : S.q ≠ p) :
+    (S.lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG hpq).lower =
+      S.lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+  haveI : Fact S.q.Prime := S.q_prime
+  unfold lift_oPiCore_of_hasNormalPComplement_ne lower
+  unfold CharacteristicSylowLayer.lift_oPiCore_of_hasNormalPComplement_ne
+  rcases characteristic_quotient_layer_lift_of_hasNormalPComplement_ne
+      (G := G) hpq hG S.layer.lower_le_upper S.layer.upper_char
+      S.layer.lower_char S.layer.card_quotient_eq_sylow with
+    ⟨hupper, hlower, hcard⟩
+  rfl
+
+end CharacteristicSylowStep
+
+namespace CharacteristicSylowSegment
+
+/-- Attach a top characteristic Sylow layer to a segment whose top endpoint is
+that layer's lower endpoint, producing a full characteristic Sylow series. -/
+def consTop (seg : CharacteristicSylowSegment G) {q : ℕ} [Fact q.Prime]
+    (topLayer : CharacteristicSylowLayer G q) (hupper : topLayer.upper = ⊤)
+    (hlink : topLayer.lower = seg.term 0)
+    (hbot : seg.term (Fin.last seg.length) = ⊥) : CharacteristicSylowSeries G :=
+  { length := seg.length + 1
+    term := Fin.cons (⊤ : Subgroup G) seg.term
+    top_eq := by
+      simp [Fin.cons_zero]
+    bot_eq := by
+      simpa [Fin.cons_last] using hbot
+    step := Fin.cons (CharacteristicSylowStep.ofLayer topLayer) seg.step
+    upper_eq := by
+      intro i
+      cases i using Fin.cases
+      · simp [CharacteristicSylowStep.upper_ofLayer, hupper]
+      · rename_i i
+        have hidx : Fin.castSucc i.succ = (Fin.castSucc i).succ := by
+          ext
+          rfl
+        rw [hidx, Fin.cons_succ]
+        exact seg.upper_eq i
+    lower_eq := by
+      intro i
+      cases i using Fin.cases
+      · simp [CharacteristicSylowStep.lower_ofLayer, hlink]
+      · rename_i i
+        simpa [Fin.cons_succ] using seg.lower_eq i }
+
+end CharacteristicSylowSegment
+
+namespace CharacteristicSylowSeries
+
+/-- Forget the endpoint conditions of a full characteristic Sylow series. -/
+def toSegment (S : CharacteristicSylowSeries G) : CharacteristicSylowSegment G :=
+  { length := S.length
+    term := S.term
+    step := S.step
+    upper_eq := S.upper_eq
+    lower_eq := S.lower_eq }
+
+/-- Lift the induction series inside the canonical normal `p`-complement to an
+ambient segment in `G`.  Its top endpoint is `O_{p-prime}(G)`, not `G`; the top
+layer is attached separately by `CharacteristicSylowLayer.top_of_hasNormalPComplement`. -/
+noncomputable def lift_oPiCore_segment_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowSeries ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : ∀ i : Fin S.length, (S.step i).q ≠ p) :
+    CharacteristicSylowSegment G :=
+  { length := S.length
+    term := fun i => (S.term i).map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype
+    step := fun i => (S.step i).lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG (hpq i)
+    upper_eq := by
+      intro i
+      calc
+        ((S.step i).lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG (hpq i)).upper =
+            (S.step i).upper.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+          rw [CharacteristicSylowStep.upper_lift_oPiCore_of_hasNormalPComplement_ne]
+        _ = (S.term (Fin.castSucc i)).map
+              (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+          rw [S.upper_eq i]
+    lower_eq := by
+      intro i
+      calc
+        ((S.step i).lift_oPiCore_of_hasNormalPComplement_ne (G := G) hG (hpq i)).lower =
+            (S.step i).lower.map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+          rw [CharacteristicSylowStep.lower_lift_oPiCore_of_hasNormalPComplement_ne]
+        _ = (S.term i.succ).map (Ch03.oPiCore {r : ℕ | r ≠ p} G).subtype := by
+          rw [S.lower_eq i] }
+
+/-- The lifted complement segment starts at the canonical normal `p`-complement. -/
+theorem lift_oPiCore_segment_top_eq
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowSeries ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : ∀ i : Fin S.length, (S.step i).q ≠ p) :
+    (lift_oPiCore_segment_of_hasNormalPComplement_ne (G := G) hG S hpq).term 0 =
+      Ch03.oPiCore {r : ℕ | r ≠ p} G := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  change (S.term 0).map O.subtype = O
+  rw [S.top_eq]
+  ext x
+  constructor
+  · rintro ⟨y, _hy, rfl⟩
+    exact y.2
+  · intro hx
+    exact ⟨⟨x, hx⟩, trivial, rfl⟩
+
+/-- The lifted complement segment still ends at the ambient bottom subgroup. -/
+theorem lift_oPiCore_segment_bot_eq
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowSeries ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : ∀ i : Fin S.length, (S.step i).q ≠ p) :
+    (lift_oPiCore_segment_of_hasNormalPComplement_ne (G := G) hG S hpq).term
+        (Fin.last S.length) = ⊥ := by
+  classical
+  let O : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G
+  change (S.term (Fin.last S.length)).map O.subtype = ⊥
+  rw [S.bot_eq]
+  ext x
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    simpa [Subgroup.mem_bot] using congrArg O.subtype hy
+  · intro hx
+    rw [Subgroup.mem_bot] at hx
+    subst x
+    exact ⟨1, by simp, rfl⟩
+
+/-- Lift the induction series inside the canonical normal `p`-complement and
+attach the top `G/O_{p-prime}` layer, producing the ambient characteristic Sylow
+series used in BG Theorem 4.20(c). -/
+noncomputable def lift_oPiCore_series_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowSeries ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : ∀ i : Fin S.length, (S.step i).q ≠ p) :
+    CharacteristicSylowSeries G :=
+  (lift_oPiCore_segment_of_hasNormalPComplement_ne (G := G) hG S hpq).consTop
+    (CharacteristicSylowLayer.top_of_hasNormalPComplement (G := G) hG)
+    (by simp)
+    (by
+      rw [CharacteristicSylowLayer.top_of_hasNormalPComplement_lower]
+      exact (lift_oPiCore_segment_top_eq (G := G) hG S hpq).symm)
+    (lift_oPiCore_segment_bot_eq (G := G) hG S hpq)
+
+@[simp] theorem lift_oPiCore_series_length_of_hasNormalPComplement_ne
+    {p : ℕ} [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G)
+    (S : CharacteristicSylowSeries ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
+    (hpq : ∀ i : Fin S.length, (S.step i).q ≠ p) :
+    (lift_oPiCore_series_of_hasNormalPComplement_ne (G := G) hG S hpq).length =
+      S.length + 1 := rfl
+
+end CharacteristicSylowSeries
 
 end Thm418
 
