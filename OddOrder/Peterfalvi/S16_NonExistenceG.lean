@@ -503,6 +503,23 @@ theorem s_inv_pow_mul_t_pow_mem_Q {hyp : Hypothesis (G := G)}
     (data.s⁻¹) ^ n * data.t ^ n ∈ hyp.base.Q :=
   inv_pow_mul_pow_mem_of_inv_mul_mem data.s_normalizes_Q data.s_inv_mul_t_mem_Q n
 
+/-- Elements of the transported `Q` commute.  This is the S16-facing form of
+BG Appendix C Remark (B)/(X) used in Lemma C.3 Step 4 when rewriting (C.3) to
+(C.4). -/
+theorem Q_mul_comm {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x y : G} (hx : x ∈ hyp.base.Q) (hy : y ∈ hyp.base.Q) :
+    x * y = y * x := by
+  simpa using congrArg Subtype.val
+    (data.Q_elementaryAbelian.comm ⟨x, hx⟩ ⟨y, hy⟩)
+
+/-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
+in `Q`. -/
+theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (m n : ℕ) :
+    ((data.s⁻¹) ^ m * data.t ^ m) * ((data.s⁻¹) ^ n * data.t ^ n) =
+      ((data.s⁻¹) ^ n * data.t ^ n) * ((data.s⁻¹) ^ m * data.t ^ m) :=
+  data.Q_mul_comm (data.s_inv_pow_mul_t_pow_mem_Q m) (data.s_inv_pow_mul_t_pow_mem_Q n)
+
 /-- The opposite first commutator factor `t⁻¹s` lies in `Q`. -/
 theorem t_inv_mul_s_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) :
@@ -514,6 +531,21 @@ theorem t_inv_pow_mul_s_pow_mem_Q {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℕ) :
     (data.t⁻¹) ^ n * data.s ^ n ∈ hyp.base.Q :=
   inv_pow_mul_pow_mem_of_inv_mul_mem data.t_normalizes_Q data.t_inv_mul_s_mem_Q n
+
+/-- The opposite BG factors `(t⁻¹)^m s^m` and `(t⁻¹)^n s^n` commute because
+both lie in `Q`. -/
+theorem t_inv_pow_mul_s_pow_mul_comm {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (m n : ℕ) :
+    ((data.t⁻¹) ^ m * data.s ^ m) * ((data.t⁻¹) ^ n * data.s ^ n) =
+      ((data.t⁻¹) ^ n * data.s ^ n) * ((data.t⁻¹) ^ m * data.s ^ m) :=
+  data.Q_mul_comm (data.t_inv_pow_mul_s_pow_mem_Q m) (data.t_inv_pow_mul_s_pow_mem_Q n)
+
+/-- The two BG commutator-factor families commute with each other inside `Q`. -/
+theorem s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) (m n : ℕ) :
+    ((data.s⁻¹) ^ m * data.t ^ m) * ((data.t⁻¹) ^ n * data.s ^ n) =
+      ((data.t⁻¹) ^ n * data.s ^ n) * ((data.s⁻¹) ^ m * data.t ^ m) :=
+  data.Q_mul_comm (data.s_inv_pow_mul_t_pow_mem_Q m) (data.t_inv_pow_mul_s_pow_mem_Q n)
 
 /-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
 BG's norm-one twisted-inverse output stored in `FieldNormalizerData`. -/

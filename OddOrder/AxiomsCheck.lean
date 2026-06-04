@@ -2411,6 +2411,18 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 
+-- BG App C Lemma C.3 Step 4: the transported `Q` is commutative, so the
+-- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
+-- can be reordered.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.t_inv_pow_mul_s_pow_mul_comm
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
+
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd

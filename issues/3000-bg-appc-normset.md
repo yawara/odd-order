@@ -210,6 +210,10 @@ created: 2026-06-04
   `normOneUnitOfMemNormSetE` と、BG の pair `(a,2-a)` を `normOnePairSet` / `normOnePairSetAt`
   に入れる `normOnePairOfMemNormSetE_mem_*` を公開。C.3 group proof で Step4 の
   `a+b=2` を concrete `U`-pair として再利用する入口を固定。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 Q-commutativity bridge**: `Q_elementaryAbelian` から
+  `FieldNormalizerData.Q_mul_comm` を公開し、`s^{-n}t^n` / `t^{-n}s^n` 型の
+  Q 内 commutator factors が互いに可換であることを theorem 化。BG の
+  “Since Q is commutative, (C.3) becomes (C.4)” を使う入口を固定。AxiomsCheck 登録済み。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedNormOneStep` を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは `tConjNormOneUnitsAut` による `u ↦ t(u⁻¹)t⁻¹` が `E` を保つという BG C.3 Step3/Step4 本体。`appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。
 
 ## 完了条件
