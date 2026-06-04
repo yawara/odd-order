@@ -480,43 +480,6 @@ private theorem rank_le_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCycl
   calc Nat.log q (Nat.card ↥A) ≤ Nat.log q q := Nat.log_mono_right hcard_le
     _ = 1 := by simpa using (Nat.log_pow hq.one_lt 1)
 
-/-- The `p`-rank is realised inside any Sylow `p`-subgroup: `pRank G p ≤ pRank ↥P p`.
-Every elementary abelian `p`-subgroup `A ≤ G` is conjugate into `P` (Sylow conjugacy),
-and conjugation preserves elementary-abelianness and order. Used in Prop 10.14(c) to get
-`3 ≤ pRank G p ≤ rank ↥P` from `idealPrime`. -/
-private theorem pRank_le_pRank_sylow [Finite G] [Fact p.Prime] (P : Sylow p G) :
-    pRank G p ≤ pRank ↥(P : Subgroup G) p := by
-  rw [pRank_le_iff]
-  intro A hA
-  -- `A` is a `p`-group, so `A ≤ Q'` for some Sylow `Q'`, and `Q'` is conjugate to `P`.
-  obtain ⟨Q', hAQ'⟩ := hA.isPGroup.exists_le_sylow
-  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q' P
-  have hgcoe : MulAut.conj g • (Q' : Subgroup G) = (P : Subgroup G) := by
-    rw [← Sylow.coe_subgroup_smul]
-    exact congrArg (fun S : Sylow p G => (S : Subgroup G)) hg
-  -- `A' := conj g • A ≤ conj g • Q' = P`, elementary abelian of order `|A|`.
-  set A' : Subgroup G := A.map (MulAut.conj g).toMonoidHom with hA'_def
-  have hA'_le : A' ≤ (P : Subgroup G) := by
-    rw [hA'_def]
-    rintro y ⟨x, hx, rfl⟩
-    rw [← hgcoe]
-    exact Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) Q' (hAQ' hx)
-  have hA'_elem : A'.IsElementaryAbelian p :=
-    hA.map (MulAut.conj g).injective
-  have hA'_card : Nat.card ↥A' = Nat.card ↥A := by
-    rw [hA'_def, Subgroup.card_map_of_injective (MulAut.conj g).injective]
-  -- Transfer `A'` into `↥P` and bound its `log_p`-rank.
-  have hA'P_elem : (A'.subgroupOf (P : Subgroup G)).IsElementaryAbelian p := by
-    apply Subgroup.IsElementaryAbelian.of_map (f := (P : Subgroup G).subtype)
-      (P : Subgroup G).subtype_injective
-    rwa [Subgroup.map_subgroupOf_eq_of_le hA'_le]
-  have hA'P_card : Nat.card ↥(A'.subgroupOf (P : Subgroup G)) = Nat.card ↥A := by
-    rw [← hA'_card, ← Subgroup.card_map_of_injective (P : Subgroup G).subtype_injective,
-      Subgroup.map_subgroupOf_eq_of_le hA'_le]
-  calc Nat.log p (Nat.card ↥A) = Nat.log p (Nat.card ↥(A'.subgroupOf (P : Subgroup G))) := by
-        rw [hA'P_card]
-    _ ≤ pRank ↥(P : Subgroup G) p := le_pRank _ hA'P_elem
-
 /-- **BG Proposition 10.14 (a)(b)(c)** (mmd L2894): `p` ideal (`p ∈ β(G)`), `P ∈ Syl_p(G)`。
 (a) `ℰ_p²(G) ∩ ℰ_p*(G) = ∅`; (b) `p`-部分群 `R` で `r(R) ≥ 2` なら `R ∈ 𝒰`;
 (c) 任意の `X ≤ P` で `N_P(X) ∈ 𝒰`。(原典 (d) は

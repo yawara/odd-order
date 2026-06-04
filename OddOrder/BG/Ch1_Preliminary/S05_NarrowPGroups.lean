@@ -3129,29 +3129,6 @@ section Thm56
 
 variable {G : Type*} [Group G] [Finite G]
 
-/-- **Sylow-rank 橋**: `r_p(G) ≤ r(S)` (`S : Sylow p G`)。任意の elementary abelian
-`p`-部分群はある Sylow `Q` に含まれ (`IsPGroup.exists_le_sylow`)、Sylow 同士は共役
-(`Sylow.equiv`) なので rank は `S` 内で実現される。逆向き `r(S) ≤ r_p(G)` は
-`pRank_le_of_injective` で自明なので実は等号だが、Thm 5.6 では `≤` だけ使う。
-`PRank.lean` への昇格候補。 -/
-theorem pRank_le_pRank_sylow {p : ℕ} [Fact p.Prime] (S : Sylow p G) :
-    pRank G p ≤ pRank ↥(S : Subgroup G) p := by
-  classical
-  rw [pRank_le_iff]
-  intro E hE
-  have hE_pg : IsPGroup p ↥E := fun x => ⟨1, by rw [pow_one]; exact hE.pow_eq_one x⟩
-  obtain ⟨Q, hQle⟩ := hE_pg.exists_le_sylow
-  have h1 : Nat.log p (Nat.card ↥E) ≤ pRank ↥(Q : Subgroup G) p := by
-    have hsub : (E.subgroupOf (Q : Subgroup G)).IsElementaryAbelian p :=
-      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
-        (Subgroup.subgroupOfEquivOfLe hQle).symm hE
-    have hcard : Nat.card ↥(E.subgroupOf (Q : Subgroup G)) = Nat.card ↥E :=
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv
-    rw [← hcard]
-    exact le_pRank _ hsub
-  refine le_trans h1 (pRank_le_of_injective (f := (Sylow.equiv Q S).toMonoidHom) ?_)
-  exact (Sylow.equiv Q S).injective
-
 /-- **Thm 5.6 narrow core** (`O_{p'}(G) = 1`, `r(S) ≥ 3` の場合): `G' ≤ O_p(G)` と
 最大素因子評価。`p`-length one から `p ∤ |G/O_p(G)|` なので `R = O_p(G)` が唯一の
 Sylow `p`-部分群、ゆえに `S = R` で `R` は narrow of rank ≥ 3。Hall–Higman 1.2.3 で

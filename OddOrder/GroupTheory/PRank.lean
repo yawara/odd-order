@@ -40,6 +40,7 @@ mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** (`Mathlib/
   **2 形の橋** — elem-ab `A` で `|A| = p ^ m(A)` かつ `log_p |A| = m(A)`,
   ここで `m(A) = Module.finrank (ZMod p) (Additive A)` (BG の `m(A)`).
 * `pRank_mono_of_le` / `pRank_le_of_injective`: subgroup / 単射像での monotonicity.
+* `pRank_le_pRank_sylow` / `pRank_sylow_eq`: Sylow subgroup realizes ambient `p`-rank.
 * `rank` の `pRank` 単調連動と全素数 sup の性質.
 
 ## Design notes
@@ -540,6 +541,33 @@ theorem pRank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
 theorem pRank_mono_of_le [Finite G] (H : Subgroup G) :
     pRank H p ≤ pRank G p :=
   pRank_le_of_injective H.subtype_injective
+
+/-- The `p`-rank is realised inside any Sylow `p`-subgroup.
+
+Every elementary abelian `p`-subgroup lies in some Sylow subgroup, and Sylow subgroups are
+conjugate, so bounding one Sylow subgroup bounds the ambient `p`-rank. -/
+theorem pRank_le_pRank_sylow [Finite G] [Fact p.Prime] (S : Sylow p G) :
+    pRank G p ≤ pRank ↥(S : Subgroup G) p := by
+  classical
+  rw [pRank_le_iff]
+  intro E hE
+  have hE_pg : IsPGroup p ↥E := fun x => ⟨1, by rw [pow_one]; exact hE.pow_eq_one x⟩
+  obtain ⟨Q, hQle⟩ := hE_pg.exists_le_sylow
+  have h1 : Nat.log p (Nat.card ↥E) ≤ pRank ↥(Q : Subgroup G) p := by
+    have hsub : (E.subgroupOf (Q : Subgroup G)).IsElementaryAbelian p :=
+      IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hQle).symm hE
+    have hcard : Nat.card ↥(E.subgroupOf (Q : Subgroup G)) = Nat.card ↥E :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv
+    rw [← hcard]
+    exact le_pRank _ hsub
+  exact h1.trans
+    (pRank_le_of_injective (f := (Sylow.equiv Q S).toMonoidHom)
+      (Sylow.equiv Q S).injective)
+
+/-- A Sylow `p`-subgroup has the same `p`-rank as the ambient finite group. -/
+theorem pRank_sylow_eq [Finite G] [Fact p.Prime] (S : Sylow p G) :
+    pRank ↥(S : Subgroup G) p = pRank G p :=
+  le_antisymm (pRank_mono_of_le (S : Subgroup G)) (pRank_le_pRank_sylow S)
 
 end Properties
 

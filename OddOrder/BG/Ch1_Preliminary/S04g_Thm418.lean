@@ -672,6 +672,58 @@ theorem solvable_structure_of_pRank_le_two [IsSolvable G]
   obtain ⟨hG'bar, hlargest, hp'quot⟩ := core418 hp_odd hodd_bar hrank_bar hredu_bar
   exact structure_of_quotient_commutator_le_opCore hodd hG'bar hlargest hp'quot
 
+/-- If `K` is normal in `G`, then `F(K)` has rank at most `F(G)`.
+
+This is the rank form of the BG Theorem 4.20(c) induction line `F(K) <= F(G)`. -/
+theorem rank_fitting_le_of_normal_subgroup {K : Subgroup G} [K.Normal] :
+    OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤
+      OddOrder.GroupTheory.rank ↥(Ch01.fitting G) := by
+  classical
+  let f : ↥(Ch01.fitting ↥K) →* ↥(Ch01.fitting G) :=
+    { toFun := fun x =>
+        ⟨(x.1 : G),
+          Ch01.fitting_map_subtype_le_fitting (M := K) ⟨x.1, x.2, rfl⟩⟩
+      map_one' := by
+        apply Subtype.ext
+        rfl
+      map_mul' := by
+        intro _ _
+        apply Subtype.ext
+        rfl }
+  have hf : Function.Injective f := by
+    intro x y hxy
+    apply Subtype.ext
+    apply Subtype.ext
+    exact congrArg (fun z : ↥(Ch01.fitting G) => (z : G)) hxy
+  exact OddOrder.GroupTheory.rank_le_of_injective (G := ↥(Ch01.fitting G)) hf
+
+/-- If `K` is normal in `G` and `F(G)` has rank at most two, then so does `F(K)`. -/
+theorem rank_fitting_le_two_of_normal_subgroup {K : Subgroup G} [K.Normal]
+    (hrF : OddOrder.GroupTheory.rank ↥(Ch01.fitting G) ≤ 2) :
+    OddOrder.GroupTheory.rank ↥(Ch01.fitting ↥K) ≤ 2 :=
+  (rank_fitting_le_of_normal_subgroup (G := G) (K := K)).trans hrF
+
+/-- If a Sylow `p`-subgroup lies in `F(G)`, then its `p`-rank is bounded by the
+rank of `F(G)`. -/
+theorem pRank_sylow_le_two_of_le_fitting {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hPfit : (P : Subgroup G) ≤ Ch01.fitting G)
+    (hrF : OddOrder.GroupTheory.rank ↥(Ch01.fitting G) ≤ 2) :
+    pRank ↥(P : Subgroup G) p ≤ 2 := by
+  have hP_le_F : pRank ↥(P : Subgroup G) p ≤ pRank ↥(Ch01.fitting G) p :=
+    OddOrder.GroupTheory.pRank_le_of_injective
+      (G := ↥(Ch01.fitting G)) (H := ↥(P : Subgroup G))
+      (f := Subgroup.inclusion hPfit) (Subgroup.inclusion_injective hPfit)
+  exact hP_le_F.trans ((OddOrder.GroupTheory.rank_le_iff.mp hrF) p (Fact.out : p.Prime))
+
+/-- If some Sylow `p`-subgroup lies in `F(G)` and `F(G)` has rank at most two, then
+`r_p(G) ≤ 2`. -/
+theorem pRank_le_two_of_sylow_le_fitting {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hPfit : (P : Subgroup G) ≤ Ch01.fitting G)
+    (hrF : OddOrder.GroupTheory.rank ↥(Ch01.fitting G) ≤ 2) :
+    pRank G p ≤ 2 :=
+  (OddOrder.GroupTheory.pRank_le_pRank_sylow P).trans
+    (pRank_sylow_le_two_of_le_fitting P hPfit hrF)
+
 /-- A normal `p`-complement is the canonical `{r | r != p}`-core.
 
 This is the bridge needed in BG Thm 4.20(c): once Thm 4.18(b) produces a normal
