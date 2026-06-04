@@ -1718,3 +1718,19 @@ orthogonality input を discharge する bridge を追加:
 これにより c1/Frobenius route では既存の `isIrreducibleCharacter_of_mem_Xset_of_frobenius` で
 source-side orthogonality が自動化される。残 input は `X` coherence, `τ₃` agreement,
 image-side orthogonality, supported-span generation。
+
+### 2026-06-04 pass 17: Frobenius c1 glue adapter
+
+pass 16 の source orthogonality bridge を (6.8.1) Frobenius alternative に直接接続:
+
+- `SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_frobenius`: `hF : IsFrobeniusGroup L H W₁`
+  から `Xset H' ⊆ Irr L` を内部生成し、`ℤ[Xset H'] ⟂ ℤ[Yset]` を返す。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius`: caller が
+  Frobenius case の `Xset H'` coherence と `τ₃` agreement/image orthogonality/generation を
+  与えれば、source orthogonality は `hF` から放電して `hyp.CoherenceTarget` を返す。
+
+これで c1 route の adapter chain は
+`Xset_commutator_isCoherent_from_pairUnion..._of_frobenius` →
+`coherentS_of_Xset_commutator_Yset_glued_of_frobenius`
+の形に整理された。残りは `τ₃` の実構成・agreement、image-side orthogonality、supported-span
+generation の case-specific 入力。
