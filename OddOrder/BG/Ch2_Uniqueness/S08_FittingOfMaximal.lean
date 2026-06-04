@@ -3929,6 +3929,42 @@ theorem opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
   exact hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
     hG hM hp P hFp hAP hA hY
 
+/-- BG (8.13), second p-group input: if the `p'`-core of `H` is trivial, then
+Theorem 6.2 makes `Z(L(R))` normal in `H` for every Sylow `p`-subgroup `R` of `H`. -/
+theorem zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
+    [Finite G] (hG : IsMinimalSimpleOdd G) {H : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hp_dvd_G : p ∣ Nat.card G) (R : Sylow p ↥H) (hH_solvable : IsSolvable ↥H)
+    (hOpBot : opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥) :
+    (((OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).map H.subtype).subgroupOf H).Normal := by
+  have hp_odd_prop : Odd p := hG.odd.of_dvd_nat hp_dvd_G
+  have hp_odd : p ≠ 2 := by
+    rintro rfl
+    rw [Nat.odd_iff] at hp_odd_prop
+    omega
+  have hoddH : Odd (Nat.card ↥H) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
+  have hmap_bot : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H).map H.subtype = ⊥ := by
+    simpa [opiCoreInG] using hOpBot
+  have hcore_bot_compl : Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H = ⊥ :=
+    (Subgroup.map_eq_bot_iff_of_injective
+      (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H) H.subtype_injective).mp hmap_bot
+  have hcore_bot : Ch03.oPiCore {q | q ≠ p} ↥H = ⊥ := by
+    simpa [Set.compl_setOf] using hcore_bot_compl
+  have hZ_norm_H : (OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).Normal := by
+    have h := OddOrder.BG.AppB.zCenter_lOdd_sup_oPiCore_normal hp_odd hH_solvable hoddH R
+    rwa [hcore_bot, sup_bot_eq] at h
+  have hH_norm_Z : H ≤ Subgroup.normalizer
+      (((OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).map H.subtype) : Set G) := by
+    have h1 : (Subgroup.normalizer (OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H) : Set ↥H)).map
+        H.subtype ≤ Subgroup.normalizer
+          (((OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).map H.subtype) : Set G) :=
+      Subgroup.le_normalizer_map H.subtype
+    rw [Subgroup.normalizer_eq_top_iff.mpr hZ_norm_H] at h1
+    have htop_map : (⊤ : Subgroup ↥H).map H.subtype = H := by
+      rw [← MonoidHom.range_eq_map, H.range_subtype]
+    simpa [htop_map] using h1
+  exact Subgroup.normal_subgroupOf_of_le_normalizer hH_norm_Z
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -3977,6 +4013,13 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
   have hOpComplHBot : opiCoreInG ({p} : Set ℕ)ᶜ H = ⊥ :=
     opiCoreInG_singleton_compl_eq_bot_of_scn3_map_le_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hAH
+  have hp_dvd_G : p ∣ Nat.card G :=
+    (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_subgroup_dvd_card (fittingInG M))
+  have hZNormH : ∀ R : Sylow p ↥H,
+      (((OddOrder.BG.AppB.zCenterLOdd (R : Subgroup ↥H)).map H.subtype).subgroupOf H).Normal := by
+    intro R
+    exact zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
+      hG hp_dvd_G R hH_solvable hOpComplHBot
   sorry
 
 end OddOrder.BG.Ch2.S08
