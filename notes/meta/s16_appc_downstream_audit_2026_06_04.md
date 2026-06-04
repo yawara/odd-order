@@ -64,9 +64,10 @@ BG App C `theoremC : FieldNormalizerData → p ≤ q` の数学核 = `F_{p^q}` �
 - `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (FeitThompson.lean) = BG §7-16 + Pf §10-16 全体。
 
 ## opaque-Prop placeholder の load-bearing 状態 (監査)
-- **FieldNormalizerData** (S16) = **混在**: opaque (`field_model`, `identifies_P/U/W2`, `W2_conj_y_normalizes_U`)
-  + **genuine** (`cyclotomic_coprime`=cond A, `Q_elementaryAbelian`, `W2_normalizes_Q`, `y`, `y_mem_Q`)
-  + **AppC producer obligation** (`appC_twisted_field_step`; `appC_twisted_unit_step` / `appC_normSet_generator_relation` は derived theorems)。
+- **FieldNormalizerData** (S16) = **混在**: concrete carrier (`sigma : H→G`, `P`/`P0`/`U` image identifications,
+  `W2_conj_y_normalizes_U`) + genuine (`cyclotomic_coprime`=cond A, `Q_elementaryAbelian`,
+  `W2_normalizes_Q`, `y`, `y_mem_Q`) + **AppC producer obligation** (`appC_twisted_field_step`;
+  `appC_twisted_unit_step` / `appC_normSet_generator_relation` は derived theorems)。
 - **NormSetData / HypothesisB** (AppC) = downstream theoremC は finite-field C.1/C.2 と S16 の C.3 producer obligation に配線済み。
   `HypothesisB` は concrete `H=P⋊U`, monomorphism `σ:H→G`, `P0`/`U` image identification,
   normalizer 条件の carrier まで更新済み。残る C.3 本体は S16 `appC_twisted_field_step` の materialization。

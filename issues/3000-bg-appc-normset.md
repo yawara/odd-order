@@ -183,8 +183,9 @@ created: 2026-06-04
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
-- [x] **Hypothesis (B) concrete carrier**: `AppC_FinalContradiction.HypothesisB` の opaque formula fields を、
-  concrete `H=P⋊U`、monomorphism `σ:H→G`、`P0`/`U` image identification、normalizer 条件に置換。
+- [x] **S16/AppC Hypothesis (B) concrete carrier**: `S16.FieldNormalizerData` と
+  `AppC_FinalContradiction.HypothesisB` の opaque model/formula fields を、concrete `H=P⋊U`、
+  monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件に置換。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件
