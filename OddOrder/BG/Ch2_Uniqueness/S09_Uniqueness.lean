@@ -175,6 +175,61 @@ private theorem two_le_rank_of_noncyclic_pSubgroup [Finite G] (hG : IsMinimalSim
   have h2pRank : 2 ≤ pRank ↥B p := hElog.trans (le_pRank E hEea)
   exact h2pRank.trans (pRank_le_rank (G := ↥B) p)
 
+/-- A normal elementary abelian subgroup D of order p^2 cuts rank at most one from a
+rank-three elementary abelian subgroup.
+
+This is the cardinal-to-rank bridge used in BG Corollary 9.3 after Lemma 4.5 supplies the
+normal E_{p^2} witness. The proof reuses the §5 conjugation-count estimate
+|B0 ∩ C_G(D)| >= p^2 for an elementary abelian B0 of order p^3, then converts the
+resulting cardinal lower bound back into rank >= 2. -/
+private theorem two_le_rank_inf_centralizer_of_normal_card_prime_sq_of_log_three [Finite G]
+    {p : ℕ} [Fact p.Prime] {D Bstar : Subgroup G} [D.Normal]
+    (hDea : D.IsElementaryAbelian p) (hDcard : Nat.card D = p ^ 2)
+    (hBstarea : Bstar.IsElementaryAbelian p)
+    (hBstarlog : 3 ≤ Nat.log p (Nat.card Bstar)) :
+    2 ≤ rank ↥(Bstar ⊓ Subgroup.centralizer (D : Set G)) := by
+  classical
+  have hBstar_card_ge : p ^ 3 ≤ Nat.card Bstar :=
+    Nat.pow_le_of_le_log Nat.card_pos.ne' hBstarlog
+  obtain ⟨B₀, hB₀card⟩ :=
+    Sylow.exists_subgroup_card_pow_prime_of_le_card (n := 3)
+      (Fact.out : p.Prime) hBstarea.isPGroup hBstar_card_ge
+  let B₀G : Subgroup G := B₀.map Bstar.subtype
+  have hB₀G_ea : B₀G.IsElementaryAbelian p := by
+    change (B₀.map Bstar.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map Bstar.subtype_injective
+      (hBstarea.to_subgroup B₀)
+  have hB₀Gcard : Nat.card B₀G = p ^ 3 := by
+    change Nat.card (B₀.map Bstar.subtype) = p ^ 3
+    rw [Subgroup.card_map_of_injective Bstar.subtype_injective, hB₀card]
+  let H : Subgroup G := B₀G ⊓ Subgroup.centralizer (D : Set G)
+  have hHcard : p ^ 2 ≤ Nat.card H := by
+    change p ^ 2 ≤ Nat.card ↥(B₀G ⊓ Subgroup.centralizer (D : Set G))
+    exact OddOrder.BG.Ch1.S05.card_inf_centralizer_ge_prime_sq_of_card_prime_cube
+      (E := D) (B := B₀G) hDea hDcard hB₀G_ea hB₀Gcard
+  have hH_ea : H.IsElementaryAbelian p := by
+    have hH_le_B₀G : H ≤ B₀G := by
+      dsimp [H]
+      exact inf_le_left
+    have hH_sub_ea : (H.subgroupOf B₀G).IsElementaryAbelian p :=
+      hB₀G_ea.to_subgroup (H.subgroupOf B₀G)
+    exact IsElementaryAbelian.of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hH_le_B₀G) hH_sub_ea
+  have hHlog : 2 ≤ Nat.log p (Nat.card H) :=
+    Nat.le_log_of_pow_le (Fact.out : p.Prime).one_lt hHcard
+  have h2pRankH : 2 ≤ pRank ↥H p := hHlog.trans hH_ea.log_card_le_pRank
+  let K : Subgroup G := Bstar ⊓ Subgroup.centralizer (D : Set G)
+  have hB₀G_le_Bstar : B₀G ≤ Bstar := by
+    change B₀.map Bstar.subtype ≤ Bstar
+    exact Subgroup.map_subtype_le B₀
+  have hHleK : H ≤ K := by
+    intro x hx
+    exact ⟨hB₀G_le_Bstar hx.1, hx.2⟩
+  have hmono : pRank ↥H p ≤ pRank ↥K p :=
+    pRank_le_of_injective (f := Subgroup.inclusion hHleK)
+      (Subgroup.inclusion_injective hHleK)
+  exact (h2pRankH.trans hmono).trans (pRank_le_rank (G := ↥K) p)
+
 /-- BG Corollary 9.3's Corollary-9.2 cascade, after the Lemma-4.5 witness `D` and the
 two cyclic-quotient rank drops have been supplied.
 

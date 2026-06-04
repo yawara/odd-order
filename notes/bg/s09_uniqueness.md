@@ -385,3 +385,21 @@ non-normal elementary-abelian `E_{p^2}` existence half. The remaining Corollary 
 therefore isolated to the book's earlier lines: choose a Sylow `P` containing the conjugated
 `A`/`B*`, supply the normal Lemma-4.5 witness `D ⊴ P` of order `p^2`, and prove the two
 cyclic-quotient rank drops for `A/C_A(D)` and `B*/C_{B*}(D)`.
+
+
+### Lean API status (2026-06-04, rank-drop bridge)
+
+Added the S09 local helper `two_le_rank_inf_centralizer_of_normal_card_prime_sq_of_log_three`.
+It proves the ambient-normal form of the Corollary 9.3 rank-drop calculation: if
+`D ⊴ G` is elementary abelian of order `p^2` and `B*` is elementary abelian with
+`log_p |B*| >= 3`, then `rank (B* ∩ C_G(D)) >= 2`. The proof first extracts an
+order `p^3` elementary abelian subgroup `B0 ≤ B*`, applies the §5 conjugation-count
+estimate `|B0 ∩ C_G(D)| >= p^2`, and then converts that cardinal lower bound back through
+`pRank` to the ambient `rank` of `B* ∩ C_G(D)`.
+
+This verifies one of the two cyclic-quotient rank-drop mechanisms needed by Corollary 9.3
+in the simpler ambient-normal setting. The remaining book-faithful bridge is the local-overgroup
+version used in BG: choose a Sylow `P` containing the relevant conjugates, use Lemma 4.5 to
+produce `D ⊴ P` with `|D| = p^2`, and run the same centralizer-count proof inside `P` before
+transporting the resulting subgroup/rank statement back to `G` for both `A ∩ C_G(D)` and
+`B* ∩ C_G(D)`.
