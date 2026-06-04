@@ -312,6 +312,9 @@ monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件�
 derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-conjugation convention) も
 `FieldNormalizerData.P1` / `FieldNormalizerData.t` として固定し、`t ∈ P1`、`t ≠ 1`、
 `P1 ≤ N_G(U)`、`t ∈ N_G(U)`、`t ∈ N_G(Q)`、`s⁻¹t ∈ Q` まで derived theorem 化済み。
+さらに `s⁻¹t ∈ Q` と normalizer 条件から `(s⁻¹)^n t^n ∈ Q` を、逆向きにも
+`t⁻¹s ∈ Q` と `(t⁻¹)^n s^n ∈ Q` を theorem 化し、BG Step4 の
+`s^{-i}t^i ∈ Q` 型の冪計算を group-theoretic side に固定した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_field_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と

@@ -318,6 +318,39 @@ theorem s_inv_mul_t_mem_Q {hyp : Hypothesis (G := G)}
   dsimp [t]
   simpa [mul_assoc] using mul_mem hconj_y hy_inv
 
+private theorem inv_pow_mul_pow_mem_of_inv_mul_mem {H : Subgroup G} {a b : G}
+    (haN : a ∈ Subgroup.normalizer (H : Set G)) (hrel : a⁻¹ * b ∈ H) :
+    ∀ n : ℕ, (a⁻¹) ^ n * b ^ n ∈ H := by
+  intro n
+  induction n with
+  | zero => simp
+  | succ n ih =>
+      have haN_inv : a⁻¹ ∈ Subgroup.normalizer (H : Set G) := inv_mem haN
+      have hconj : a⁻¹ * ((a⁻¹) ^ n * b ^ n) * a ∈ H := by
+        simpa using (Subgroup.mem_normalizer_iff.mp haN_inv ((a⁻¹) ^ n * b ^ n)).mp ih
+      have hprod : (a⁻¹ * ((a⁻¹) ^ n * b ^ n) * a) * (a⁻¹ * b) ∈ H :=
+        mul_mem hconj hrel
+      convert hprod using 1
+      group
+
+/-- The BG commutator factors `(s⁻¹)^n t^n` lie in `Q`. -/
+theorem s_inv_pow_mul_t_pow_mem_Q {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℕ) :
+    (data.s⁻¹) ^ n * data.t ^ n ∈ hyp.base.Q :=
+  inv_pow_mul_pow_mem_of_inv_mul_mem data.s_normalizes_Q data.s_inv_mul_t_mem_Q n
+
+/-- The opposite first commutator factor `t⁻¹s` lies in `Q`. -/
+theorem t_inv_mul_s_mem_Q {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    data.t⁻¹ * data.s ∈ hyp.base.Q := by
+  simpa using inv_mem data.s_inv_mul_t_mem_Q
+
+/-- The opposite BG commutator factors `(t⁻¹)^n s^n` lie in `Q`. -/
+theorem t_inv_pow_mul_s_pow_mem_Q {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℕ) :
+    (data.t⁻¹) ^ n * data.s ^ n ∈ hyp.base.Q :=
+  inv_pow_mul_pow_mem_of_inv_mul_mem data.t_normalizes_Q data.t_inv_mul_s_mem_Q n
+
 /-- The unit-group C.3 one-step output, derived from the field-element Step 4
 output stored in `FieldNormalizerData`. -/
 theorem appC_twisted_unit_step {hyp : Hypothesis (G := G)}
