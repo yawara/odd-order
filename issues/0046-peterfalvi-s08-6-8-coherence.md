@@ -77,6 +77,15 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       `disjoint_Xset_Yset` / `coherentS_of_Xset_commutator_Yset_glued` を追加。`X=S-S(H')` と
       `Y=S(H')` の set partition を Lean 化し、`coherentYset` を `coherentUnion_of_glued` 経由で
       `hyp.CoherenceTarget` に差し込む adapter まで接続。
+- [x] (2026-06-04) Frobenius case の `Z=H'` 特殊化
+      `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` /
+      `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+      を追加。`H'≤H`, `H'⊴L`, `X⊆Irr L` を内部化し、c1 側の `hX` は
+      `Xset H'` nonempty + per-step common-index p-power data だけで作れる形に圧縮。
+- [x] (2026-06-04) `SsubFiltration_antitone` / `Xset_mono` /
+      `Xset_commutator_eq_Xset_union_filtrationDiff` を追加。c2/case-A は `H'` へ直接
+      `X⊆Irr` を出す既存 primitive がなく、`Z≤H'` から
+      `X(H') = X(Z) ∪ (S(Z) \\ S(H'))` の差分層を扱う必要があることを Lean 側で固定。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

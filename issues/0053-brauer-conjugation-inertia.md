@@ -109,7 +109,14 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - ✅ 2026-06-04: `X=S-S(H')`, `Y=S(H')` の partition lemma と
   `coherentS_of_Xset_commutator_Yset_glued` を追加。`coherentYset` を union glue へ差し込む
   adapter まで接続。
-- 残: T6/Y-family を (6.8) 本体へ入れるための case c1/c2 由来の `X` coherence と
+- ✅ 2026-06-04: Frobenius case の `Xset H'` coherence wrapper
+  `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` /
+  `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius` を追加。
+  c1 側の `X⊆Irr` は `hF` から内部 discharge 済み。
+- ✅ 2026-06-04: `SsubFiltration_antitone` / `Xset_mono` /
+  `Xset_commutator_eq_Xset_union_filtrationDiff` を追加。c2 側は `Z≤H'` の小さい coherent
+  `X(Z)` から `X(H')` へ上げる差分層、または (6.8.3) final upgrade が必要。
+- 残: (6.8) 本体へ入れるための c1 per-step data、c2 由来の `X` coherence route、
   orthogonality/generation 入力の構成。
 
 ## 参照

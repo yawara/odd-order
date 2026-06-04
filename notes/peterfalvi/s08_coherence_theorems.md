@@ -1676,3 +1676,26 @@ wiring-size では放電不能**と確定 (各々 真正に新規数学 + interf
 
 残る T6/Y-family 側の実装境界は、case c1/c2 からこの adapter の `X` coherence と
 orthogonality/generation 入力を構成すること。
+
+### 2026-06-04 pass 15: Frobenius case `X=S-S(H')` coherence wrapper
+
+`S08_CoherenceTheorems.lean` に (6.8.1) Frobenius alternative 用の `Z=H'` 特殊化を追加:
+
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius`
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+
+どちらも既存の generic `Xset_isCoherent_from_*_of_irreducible_X` に対して、`H'≤H`,
+`H'⊴L`, `X⊆Irr L` を内部 discharge する adapter。残る入力は `Xset H'` nonempty と各 step の
+common-index p-power data のみ。これで c1 側は `coherentS_of_Xset_commutator_Yset_glued` の
+`hX` 引数に直接入る形まで圧縮された。
+
+同じ pass で c2/case-A route 用の純集合 bridge も追加:
+
+- `SibleyDadeHypothesis.SsubFiltration_antitone`
+- `SibleyDadeHypothesis.Xset_mono`
+- `SibleyDadeHypothesis.Xset_commutator_eq_Xset_union_filtrationDiff`
+
+`Z≤H'` なら `X(H') = X(Z) ∪ (S(Z) \\ S(H'))` と分解できる。explorer 偵察でも確認された通り、
+case-A irreducibility bridge は central/fpf な小さい `Z` 用であり、`H'` へ直接適用する primitive は
+ない。したがって c2 側はこの差分層を coherent に扱う bridge、または教科書どおり (6.8.3) の
+最終 upgrade を別途実装する必要がある。

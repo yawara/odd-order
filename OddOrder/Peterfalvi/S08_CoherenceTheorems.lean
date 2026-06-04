@@ -2695,6 +2695,45 @@ theorem Xset_union_SsubFiltration_eq_S
     · exact Or.inr hφZ
     · exact Or.inl (hyp.mem_Xset.mpr ⟨hφS, hφZ⟩)
 
+/-- The Peterfalvi filtration is antitone: a larger subgroup imposes a stronger kernel
+condition. -/
+theorem SsubFiltration_antitone
+    (hyp : SibleyDadeHypothesis G L H) {A B : Subgroup ↥L} (hAB : A ≤ B) :
+    hyp.SsubFiltration B ⊆ hyp.SsubFiltration A := by
+  intro φ hφ
+  rw [hyp.mem_SsubFiltration] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hφ
+  refine ⟨θ, hθ_ne, ?_, hφeq⟩
+  intro x hxA
+  exact hker (Subgroup.mem_subgroupOf.mpr (hAB (Subgroup.mem_subgroupOf.mp hxA)))
+
+/-- `X(A) = S - S(A)` grows with the subgroup parameter. -/
+theorem Xset_mono
+    (hyp : SibleyDadeHypothesis G L H) {A B : Subgroup ↥L} (hAB : A ≤ B) :
+    hyp.Xset A ⊆ hyp.Xset B := by
+  intro φ hφ
+  obtain ⟨hφS, hφnotA⟩ := hyp.mem_Xset.mp hφ
+  exact hyp.mem_Xset.mpr ⟨hφS, fun hφB => hφnotA (hyp.SsubFiltration_antitone hAB hφB)⟩
+
+/-- If `Z ≤ H'`, then the larger capstone set `S - S(H')` splits into the smaller
+`X(Z) = S - S(Z)` plus the filtration layer between `Z` and `H'`.  This is the set-theoretic
+bridge needed by the case-A/case-B route, where the textbook first proves coherence for a smaller
+central/fixed-point-free subgroup `Z`. -/
+theorem Xset_commutator_eq_Xset_union_filtrationDiff
+    (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} (hZH' : Z ≤ ⁅H, H⁆) :
+    hyp.Xset ⁅H, H⁆ =
+      hyp.Xset Z ∪ (hyp.SsubFiltration Z \ hyp.SsubFiltration ⁅H, H⁆) := by
+  ext φ
+  constructor
+  · intro hφ
+    obtain ⟨hφS, hφnotH'⟩ := hyp.mem_Xset.mp hφ
+    by_cases hφZ : φ ∈ hyp.SsubFiltration Z
+    · exact Or.inr ⟨hφZ, hφnotH'⟩
+    · exact Or.inl (hyp.mem_Xset.mpr ⟨hφS, hφZ⟩)
+  · rintro (hφZ | ⟨hφFilZ, hφnotH'⟩)
+    · exact hyp.Xset_mono hZH' hφZ
+    · exact hyp.mem_Xset.mpr ⟨hyp.SsubFiltration_subset_S hφFilZ, hφnotH'⟩
+
 /-- The (6.8) sets `X = S - S(H')` and `Y = S(H')` are disjoint. -/
 theorem disjoint_Xset_Yset (hyp : SibleyDadeHypothesis G L H) :
     Disjoint (hyp.Xset ⁅H, H⁆) hyp.Yset := by
@@ -5012,6 +5051,77 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
     data.hχone data.hχ₁one data.hanchor data.hmemone data.hp data.hq data.hdiv
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
+
+/-- **(6.8.1), Frobenius case:** chain-level coherence for
+`X = S - S(H')`, using common-index p-power data.
+
+This is the `Z = H'` specialization of
+`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X` for the Frobenius
+alternative.  The subgroup facts `H' ≤ H`, `H' ⊴ L`, and `X ⊆ Irr L` are discharged internally;
+the remaining inputs are the honest (6.6) nonemptiness and per-step degree data. -/
+noncomputable def Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
+  exact hyp.Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X
+    (Z := ⁅H, H⁆) (Subgroup.commutator_le_left H H)
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    hXne hstepData
+
+/-- **(6.8.1), Frobenius case:** chain-level coherence for
+`X = S - S(H')`, using the base-anchor common-index p-power step packages.
+
+Compared with
+`Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius`, each step data
+package only supplies a base-block anchor; the sorted-degree facts are derived by the existing
+base-anchor adapter. -/
+noncomputable def
+    Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
+  exact hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+    (Z := ⁅H, H⁆) (Subgroup.commutator_le_left H H)
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    hXne hstepData
 
 end SibleyDadeHypothesis
 
