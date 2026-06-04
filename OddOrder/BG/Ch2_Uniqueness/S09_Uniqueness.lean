@@ -1638,6 +1638,37 @@ private theorem normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
         (Subgroup.inclusion_injective hAF))
   omega
 
+/-- Low-rank normalizer step when §4 supplies a positive-length characteristic
+Sylow series and Lemma 9.5 has already established `r_p(F(M)) ≤ 2`. -/
+private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lowRank
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hRM : R ≤ M)
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  have hAab : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hA_le_C : A ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact congrArg Subtype.val (isMulCommutative_iff.mp hAab ⟨y, hy⟩ ⟨x, hx⟩)
+  have hAM : A ≤ M := hA_le_C.trans hM.2
+  refine normalizer_le_maximal_of_scn3Global_intermediate_of_characteristicSylowSeries
+    hG hM hA hRp hAR hRlt hRM S hpos hterminal_mem ?_
+  intro i hi
+  obtain ⟨PM, hPMnorm⟩ :=
+    OddOrder.BG.Ch1.S04.CharacteristicSylowSeries.exists_normal_sylow_of_terminal_step S i hi
+  haveI : Fact (S.step i).q.Prime := (S.step i).q_prime
+  exact normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
+    hA hAM hFp PM hPMnorm
+
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
 rank-three witness inside `O_q(M)`. -/
 private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
