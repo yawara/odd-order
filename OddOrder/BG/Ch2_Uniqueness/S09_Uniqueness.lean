@@ -2470,6 +2470,96 @@ private theorem le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal
       (inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton
         (D := D) hyB hL)))
 
+/-- If a subgroup lies in two distinct maximal subgroups, it cannot be uniquely
+maximal. This is the formal core of the BG Lemma 9.5 line `L ≠ M`, hence no
+subgroup of `M ∩ L` lies in `𝒰`. -/
+private theorem not_isUniquelyMaximal_of_le_inf_distinct_maximals
+    {K M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G)
+    (hKML : K ≤ M ⊓ L) (hLM : L ≠ M) :
+    ¬ IsUniquelyMaximal K := by
+  intro hK
+  have hKM : K ≤ M := hKML.trans inf_le_left
+  have hKL : K ≤ L := hKML.trans inf_le_right
+  exact hLM (hK.eq_of_isCoatom_of_le hL hKL hM hKM)
+
+/-- Lemma 9.4 rank squeeze in the form used inside BG Lemma 9.5: if `K ≤ F(M)`
+and every subgroup of `K` is excluded from `𝒰`, then `K` has rank at most two. -/
+private theorem rank_le_two_of_no_uniqueMaximal_subgroups_le_fitting
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKF : K ≤ S08.fittingInG M)
+    (hno : ∀ B : Subgroup G, B ≤ K → ¬ IsUniquelyMaximal B) :
+    rank ↥K ≤ 2 := by
+  classical
+  by_contra hnot
+  have h3K : 3 ≤ rank ↥K := by omega
+  obtain ⟨q, hq, h3Kq⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 3) (by norm_num) h3K
+  haveI : Fact q.Prime := ⟨hq⟩
+  have h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q :=
+    h3Kq.trans
+      (pRank_le_of_injective (f := Subgroup.inclusion hKF)
+        (Subgroup.inclusion_injective hKF))
+  obtain ⟨B, hBmax, hBrank⟩ :=
+    exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank (H := K) h3Kq
+  have hBea : B.IsElementaryAbelian q :=
+    S08.isMaxElemAbelianIn_isElementaryAbelian hBmax
+  have hBK : B ≤ K := S08.isMaxElemAbelianIn_le hBmax
+  have hBU : IsUniquelyMaximal B :=
+    (abelian_rank_three_isUniquelyMaximal_of_fitting hG hM h3Fq)
+      B (IsMulCommutative.of_comm hBea.comm) hBea.isPGroup hBrank
+  exact (hno B hBK) hBU
+
+/-- In the BG Lemma 9.5 contradiction setup, `D ∩ L` has rank at most two.
+Here `D` is any subgroup of `F(M)` and `L ≠ M` is another maximal subgroup; the
+specialization `D = O_{p'}(F(M))` is used below. -/
+private theorem rank_inf_le_two_of_le_fitting_of_distinct_maximals
+    [Finite G] (hG : IsMinimalSimpleOdd G) {D M L : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G) (hLM : L ≠ M)
+    (hDF : D ≤ S08.fittingInG M) :
+    rank ↥(D ⊓ L : Subgroup G) ≤ 2 := by
+  refine rank_le_two_of_no_uniqueMaximal_subgroups_le_fitting hG hM
+    (K := D ⊓ L) (inf_le_left.trans hDF) ?_
+  intro B hB
+  exact not_isUniquelyMaximal_of_le_inf_distinct_maximals hM hL
+    (hB.trans (le_inf (inf_le_left.trans (hDF.trans (S08.fittingInG_le M))) inf_le_right))
+    hLM
+
+/-- Specialization of the Lemma 9.5 rank squeeze to `D = O_{p'}(F(M))`. -/
+private theorem rank_inf_opiCoreFitting_le_two_of_distinct_maximals
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} {M L : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G) (hLM : L ≠ M) :
+    rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M) ⊓ L : Subgroup G) ≤ 2 :=
+  rank_inf_le_two_of_le_fitting_of_distinct_maximals hG hM hL hLM
+    (opiCoreInG_le ({p} : Set ℕ)ᶜ (S08.fittingInG M))
+
+/-- A `subgroupOf` copy has rank no larger than the ambient subgroup it copies. -/
+private theorem rank_subgroupOf_le_of_le [Finite G] {H K : Subgroup G} (hKH : K ≤ H) :
+    rank ↥(K.subgroupOf H) ≤ rank ↥K :=
+  rank_le_of_injective (G := ↥K) (H := ↥(K.subgroupOf H))
+    (f := (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom)
+    (Subgroup.subgroupOfEquivOfLe hKH).injective
+
+/-- Local `L ∩ M` version of the `O_{p'}(F(M)) ∩ L` rank squeeze. -/
+private theorem pRank_subgroupOf_inf_opiCoreFitting_le_two_of_distinct_maximals
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime]
+    {M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G)
+    (hLM : L ≠ M) :
+    pRank ↥((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M) ⊓ L : Subgroup G).subgroupOf
+      (L ⊓ M)) q ≤ 2 := by
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  let K : Subgroup G := D ⊓ L
+  have hKleH : K ≤ L ⊓ M := by
+    refine le_inf inf_le_right ?_
+    exact inf_le_left.trans ((opiCoreInG_le ({p} : Set ℕ)ᶜ (S08.fittingInG M)).trans
+      (S08.fittingInG_le M))
+  have hrankK : rank ↥K ≤ 2 := by
+    simpa [D, K] using
+      (rank_inf_opiCoreFitting_le_two_of_distinct_maximals
+        (G := G) (p := p) hG hM hL hLM)
+  exact (pRank_le_rank
+      (G := ↥(K.subgroupOf (L ⊓ M))) q).trans
+    ((rank_subgroupOf_le_of_le hKleH).trans hrankK)
+
 open OddOrder.Isaacs.Ch03 in
 open scoped commutatorElement in
 /-- BG Lemma 1.9 applied to a chief series: a coprime subgroup that stabilizes
