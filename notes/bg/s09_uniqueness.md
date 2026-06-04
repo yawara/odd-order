@@ -650,7 +650,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    normalizer packages.  A scout pass found no existing Thm 4.20(c) endpoint; the
    next missing helper can now be stated in the local §4 vocabulary as: `q` largest
    in `|M|` plus `rank F(M) ≤ 2` gives
-   `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The `opCore` equality, ambient
+   `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The extraction from the final
+   characteristic layer of the 4.20(c) series is now covered by
+   `Ch01.exists_normal_sylow_of_characteristic_card_eq_sylow` (and its cardinal-power
+   variant).  The remaining §4 work is therefore to construct that characteristic
+   layer/series under the `rank F(M) ≤ 2` hypothesis; the `opCore` equality, ambient
    equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09 once `q ∈ π(M)` is
    available.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,

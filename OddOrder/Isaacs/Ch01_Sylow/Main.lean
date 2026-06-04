@@ -626,6 +626,30 @@ theorem Sylow.eq_opCore_of_normal {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
   haveI : (P : Subgroup G).Normal := hP
   exact le_antisymm (normal_pgroup_le_opCore P.isPGroup') (opCore_le P)
 
+/-- A characteristic subgroup with the order of a Sylow `p`-subgroup supplies a normal
+Sylow `p`-subgroup. -/
+theorem exists_normal_sylow_of_characteristic_card_eq [Finite G]
+    {p : ℕ} [Fact p.Prime] {K : Subgroup G} (hKchar : K.Characteristic)
+    (hKcard : Nat.card K = p ^ (Nat.card G).factorization p) :
+    ∃ P : Sylow p G, (P : Subgroup G).Normal := by
+  classical
+  haveI : K.Characteristic := hKchar
+  let P : Sylow p G := Sylow.ofCard K hKcard
+  refine ⟨P, ?_⟩
+  have hP : (P : Subgroup G) = K := by
+    simp [P]
+  rw [hP]
+  infer_instance
+
+/-- A characteristic subgroup whose order matches a Sylow `p`-subgroup is itself a normal
+Sylow `p`-subgroup. -/
+theorem exists_normal_sylow_of_characteristic_card_eq_sylow [Finite G]
+    {p : ℕ} [Fact p.Prime] {K : Subgroup G} (hKchar : K.Characteristic)
+    (P₀ : Sylow p G) (hKcard : Nat.card K = Nat.card (P₀ : Subgroup G)) :
+    ∃ P : Sylow p G, (P : Subgroup G).Normal :=
+  exists_normal_sylow_of_characteristic_card_eq hKchar
+    (hKcard.trans P₀.card_eq_multiplicity)
+
 /-! ### Isaacs Thm 1.26 (冪零 ⇔ Sylow 全正規) -/
 
 /-- **Isaacs Thm 1.26 (1) ⇔ (4)**.  有限群 `G` について「`G` が冪零」と
