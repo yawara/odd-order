@@ -474,6 +474,17 @@ S09 に `Hypothesis78.zetaNuRhoNormSq_eq_kernelRatio_mul_int_sub_one_of_irreduci
 表記の両方から同じ norm identity を直接呼べる。新しい証明書フィールドは追加していない。
 
 
+### 2026-06-05 pass: family-notated Gamma bound
+
+S09 に `FrobeniusFamily.gamma_inner_self_re_le_of_family_source_data` を追加した。
+local `H78` 側の
+`gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula`
+を `F.e i` / `F.h i` 表記で使える standalone bridge。
+
+これで final assembly の orthogonal integer decomposition が必要とする
+`(Γ,Γ).re ≤ e_i - 1` も、`ζ` 下界と同じ family-notated source-data 入力列で直接供給できる。
+
+
 ### 2026-06-04 pass: residual ZIrr bridges for (7.9)
 
 S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と

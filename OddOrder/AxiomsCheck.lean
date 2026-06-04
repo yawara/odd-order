@@ -2375,6 +2375,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.FrobeniusFamily.zetaNuRho_inner_self_re_ge_of_family_source_data
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.gamma_inner_self_re_le_of_family_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.zetaNuRhoNormSq_eq_familyRatio_mul_int_sub_one_of_source_data
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms

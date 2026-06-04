@@ -4585,6 +4585,57 @@ lemma zetaNuRho_inner_self_re_ge_of_family_source_data [Fintype G]
   simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
     using hlocal
 
+/-- **Peterfalvi (7.8.b).** Family-notated source-data form of the residual
+`Γ` upper bound.  This is the `Γ` estimate consumed by the orthogonal integer
+decomposition in the final assembly, with the local `e` rewritten as `F.e i`. -/
+lemma gamma_inner_self_re_le_of_family_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤ (F.e i : ℝ) - 1 := by
+  have hlocal :
+      (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+        (H78.complementIndex : ℝ) - 1 :=
+    H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+      hBD
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+      hzeta_ind hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hdegree_sum)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hzeta_uv)
+      (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localComplementIndex_eq_e H78 hL hH] using hlocal
+
 /-- **Peterfalvi (7.8.c.ii).** Family-notated source-data form of the
 `(ζ^ν)^ρ` norm formula.  This rewrites the local ratio `(h - 1)/(he)` as
 the family quantities `(h_i - 1)/(h_i e_i)`. -/
