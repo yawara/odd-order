@@ -543,6 +543,46 @@ theorem Q_mul_comm {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
   simpa using congrArg Subtype.val
     (data.Q_elementaryAbelian.comm ⟨x, hx⟩ ⟨y, hy⟩)
 
+/-- Elements of the transported prime line `W₂ = σ(P₀)` have `p`-th power
+`1`.  This is the ambient `G` form needed when reading BG Appendix C Step 4
+modulo `Q`. -/
+theorem W2_pow_p_eq_one {hyp : Hypothesis (G := G)} (_data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.W2) :
+    x ^ hyp.base.p = 1 := by
+  haveI : Finite hyp.base.W2 := Nat.finite_of_card_ne_zero (by
+    rw [← hyp.base.p_eq_card_W2]
+    exact hyp.base.p_prime.ne_zero)
+  have hxpow := pow_card_eq_one' (G := hyp.base.W2) (x := (⟨x, hx⟩ : hyp.base.W2))
+  have hxpow_coe := congrArg Subtype.val hxpow
+  simpa [← hyp.base.p_eq_card_W2] using hxpow_coe
+
+/-- Elements of the transported elementary abelian subgroup `Q` have `q`-th
+power `1`, in ambient `G` form. -/
+theorem Q_pow_q_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.Q) :
+    x ^ hyp.base.q = 1 := by
+  simpa using congrArg Subtype.val
+    (data.Q_elementaryAbelian.pow_eq_one (⟨x, hx⟩ : hyp.base.Q))
+
+/-- The transported prime line and the transported elementary abelian `Q` meet
+trivially.  This is the BG Appendix C Step 4 `P₀ ∩ Q = 1` input after
+identifying `P₀` with `W₂ = σ(P₀)`. -/
+theorem W2_inf_Q_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.W2 ⊓ hyp.base.Q = ⊥ := by
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  have hxW2 : x ∈ hyp.base.W2 := hx.1
+  have hxQ : x ∈ hyp.base.Q := hx.2
+  have hxp : x ^ hyp.base.p = 1 := data.W2_pow_p_eq_one hxW2
+  have hxq : x ^ hyp.base.q = 1 := data.Q_pow_q_eq_one hxQ
+  have horder_p : orderOf x ∣ hyp.base.p := orderOf_dvd_of_pow_eq_one hxp
+  have horder_q : orderOf x ∣ hyp.base.q := orderOf_dvd_of_pow_eq_one hxq
+  have hpq : Nat.Coprime hyp.base.p hyp.base.q :=
+    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
+  have horder_one : orderOf x = 1 :=
+    Nat.eq_one_of_dvd_coprimes hpq horder_p horder_q
+  simpa [Subgroup.mem_bot] using orderOf_eq_one_iff.mp horder_one
+
 /-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
 in `Q`. -/
 theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}

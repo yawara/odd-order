@@ -2476,6 +2476,9 @@ set_option linter.style.longLine false in
 -- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
 -- can be reordered.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_pow_q_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_inf_Q_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
 #assert_only_allowed_axioms

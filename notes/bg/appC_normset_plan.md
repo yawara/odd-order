@@ -330,6 +330,8 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
 `sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
 `left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。
+さらに `W2_pow_p_eq_one`、`Q_pow_q_eq_one`、`W2_inf_Q_eq_bot` により、BG Step4 の
+“mod Q, since P₀∩Q=1” 入力を Peterfalvi 側の concrete data から導出した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は

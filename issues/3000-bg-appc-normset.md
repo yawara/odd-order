@@ -218,6 +218,10 @@ created: 2026-06-04
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の
   “mod P” で `U` 成分だけを取り出す入力。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 P0-Q intersection bridge**: `W2_pow_p_eq_one`、
+  `Q_pow_q_eq_one`、`W2_inf_Q_eq_bot` を公開し、`W₂=σ(P₀)` と `Q` の交わりが
+  自明であることを concrete data から導出。BG Step4 の “mod Q, since P₀∩Q=1”
+  を使う入力。AxiomsCheck 登録済み。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedNormOneStep` を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは `tConjNormOneUnitsAut` による `u ↦ t(u⁻¹)t⁻¹` が `E` を保つという BG C.3 Step3/Step4 本体。`appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。
 
 ## 完了条件
