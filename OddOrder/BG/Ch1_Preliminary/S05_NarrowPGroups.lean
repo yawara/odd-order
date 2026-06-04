@@ -3509,9 +3509,10 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
     · exact congrArg Subtype.val hx_eq
   -- ## `R` is narrow
   -- generic squeeze: any subgroup of `C_G(E) ⊓ F(G)` has `r`-rank ≤ 2 for every prime `r`
-  have hsq : ∀ (r : ℕ) (X : Subgroup G),
+  have hsq : ∀ (r : ℕ), r.Prime → ∀ X : Subgroup G,
       X ≤ Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G → pRank ↥X r ≤ 2 := by
-    intro r X hX
+    intro r hr X hX
+    haveI : Fact r.Prime := ⟨hr⟩
     calc pRank ↥X r
         ≤ pRank ↥(Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G) r :=
           pRank_le_of_injective (f := Subgroup.inclusion hX) (Subgroup.inclusion_injective hX)
@@ -3554,7 +3555,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
         refine le_trans (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm_bot)
           (Subgroup.centralizer_le ?_)
         exact fun x hx => hE_Op hx
-      have := hsq q R (le_inf hR_le_centE hR_le_F)
+      have := hsq q hq_prime R (le_inf hR_le_centE hR_le_F)
       omega
     subst hq_eq_p
     -- `E ≤ R = O_q(G)` and the interior of `R`: `Z = Ω₁(Z(R))`, `E' = E`-in-`R`
@@ -3604,7 +3605,7 @@ theorem derived_le_fitting_of_centralizer_rank_le_two
         have hcen := omega1Center_le_center (hle (Subgroup.mem_subgroupOf.mpr he :
           (⟨e, hE_R he⟩ : ↥R) ∈ E.subgroupOf R))
         exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp hcen ⟨r, hr⟩)).symm
-      have := hsq q R (le_inf hR_le_centE hR_le_F)
+      have := hsq q hq_prime R (le_inf hR_le_centE hR_le_F)
       omega
     -- `EZ := E' ⊔ Z` is elementary abelian of order exactly `q²` and maximal
     have hE'_elem : (E.subgroupOf R).IsElementaryAbelian q :=

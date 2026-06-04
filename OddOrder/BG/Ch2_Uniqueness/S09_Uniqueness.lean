@@ -114,7 +114,35 @@ theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMi
     {L K : Subgroup G} (hL : IsUniquelyMaximal L) (hKL : K ≤ Subgroup.centralizer (L : Set G))
     (hr : 2 ≤ rank ↥K) :
     IsUniquelyMaximal K := by
-  sorry
+  classical
+  obtain ⟨p, hp, A, hAea, hAK, hAnc⟩ :=
+    exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
+  haveI : Fact p.Prime := ⟨hp⟩
+  let M : Subgroup G := hL.uniqueMaximalSubgroup
+  have hKleM : K ≤ M := by
+    intro k hk
+    by_cases hk1 : k = 1
+    · simp [M, hk1]
+    · have hkL : k ∈ Subgroup.centralizer (L : Set G) := hKL hk
+      have hCGleM : Subgroup.centralizer ({k} : Set G) ≤ M :=
+        centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hkL hk1
+      exact hCGleM (by
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        rw [Set.mem_singleton_iff] at hy
+        subst y
+        rfl)
+  have hAleM : A ≤ M := hAK.trans hKleM
+  have hcent : ∀ b : G, b ∈ A → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
+    intro b hb hb1
+    have hbL : b ∈ Subgroup.centralizer (L : Set G) := hKL (hAK hb)
+    exact centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hbL hb1
+  have hAU : IsUniquelyMaximal A :=
+    noncyclic_isUniquelyMaximal_of_centralizer_le hG
+      (hM := hL.uniqueMaximalSubgroup_isCoatom) hAea hAleM hAnc (Or.inl hcent)
+  have hKlt : K < ⊤ :=
+    lt_of_le_of_lt hKleM hL.uniqueMaximalSubgroup_isCoatom.1.lt_top
+  exact hAU.of_le_of_lt_top hAK hKlt
 
 /-- **BG Corollary 9.3** (mmd L2545): `p` prime, `A` abelian `p`-部分群, `B` noncyclic
 `p`-部分群、`A ∈ 𝒰`, `m(A) ≥ 3`, `r_p(C_G(B)) ≥ 3` ⇒ `B ∈ 𝒰`。 -/

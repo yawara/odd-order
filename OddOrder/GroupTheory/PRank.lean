@@ -30,7 +30,7 @@ mathlib v4.30.0-rc2 の `Group.rank G` は **minimum generators 数** (`Mathlib/
 
 * `OddOrder.GroupTheory.pRank G p`: `G` の `p`-rank, i.e. 最大の `n` で `G` が
   位数 `p^n` の elementary abelian p-subgroup を含む.
-* `OddOrder.GroupTheory.rank G`: `G` の rank `r(G) = ⨆_p pRank G p` (全素数の sup, BG `r(G)`).
+* `OddOrder.GroupTheory.rank G`: `G` の rank `r(G) = ⨆_{p prime} pRank G p` (BG `r(G)`).
 
 ## Main results (本 module で提供)
 
@@ -373,13 +373,13 @@ For `G = ⊥` or no elementary abelian `p`-subgroup besides `⊥`, this is `0`.
 noncomputable def pRank (p : ℕ) : ℕ :=
   ⨆ A : {A : Subgroup G // A.IsElementaryAbelian p}, Nat.log p (Nat.card (A.val : Subgroup G))
 
-/-- **Rank of a group** `r(G) = ⨆_p pRank G p` (BG §4, p.33): the supremum of the `p`-ranks
-over all primes `p`.
+/-- **Rank of a group** `r(G) = ⨆_{p prime} pRank G p` (BG §4, p.33): the
+supremum of the `p`-ranks over all primes `p`.
 
-The supremum ranges over **all** natural numbers `p` (only primes contribute a nonzero
-elementary abelian summand, so non-primes are harmless). -/
+The indexing type records primality explicitly. This matches BG's convention and prevents
+composite exponents from contributing spurious `pRank` summands. -/
 noncomputable def rank : ℕ :=
-  ⨆ p : ℕ, pRank G p
+  ⨆ p : {p : ℕ // p.Prime}, pRank G p.1
 
 variable {G}
 
@@ -561,28 +561,29 @@ theorem pRank_le_log_two [Finite G] (hp : 2 ≤ p) :
       Nat.log_anti_left (by norm_num) hp
     _ ≤ Nat.log 2 (Nat.card G) := Nat.log_mono_right (Subgroup.card_le_card_group A)
 
-/-- `pRank G p = 0` for `p < 2` (i.e. `p = 0` or `p = 1`): no nontrivial elementary abelian
-`p`-subgroup contributes. We bound the whole family `p ↦ pRank G p` by `Nat.log 2 |G|`. -/
+/-- **BddAbove for `rank`** (`[Finite G]`): prime-indexed `pRank` summands are uniformly
+bounded by `log₂ |G|`. -/
 theorem rank_bddAbove [Finite G] :
-    BddAbove (Set.range fun p : ℕ => pRank G p) := by
+    BddAbove (Set.range fun p : {p : ℕ // p.Prime} => pRank G p.1) := by
   refine ⟨Nat.log 2 (Nat.card G), ?_⟩
   rintro _ ⟨p, rfl⟩
-  rcases Nat.lt_or_ge p 2 with hp | hp
-  · -- `p = 0` or `p = 1`: `Nat.log p _ = 0`, so each summand is `0`.
-    interval_cases p
-    · rw [pRank_le_iff]; intro A _; simp
-    · rw [pRank_le_iff]; intro A _; simp
-  · exact pRank_le_log_two hp
+  exact pRank_le_log_two p.2.two_le
 
 /-- The `p`-rank is `≤ rank G` for every prime `p` (`[Finite G]`). -/
-theorem pRank_le_rank [Finite G] (p : ℕ) : pRank G p ≤ rank G :=
-  le_ciSup rank_bddAbove p
+theorem pRank_le_rank [Finite G] (p : ℕ) [Fact p.Prime] : pRank G p ≤ rank G :=
+  le_ciSup rank_bddAbove (⟨p, (Fact.out : p.Prime)⟩ : {p : ℕ // p.Prime})
 
 /-- **Evaluation lemma for `rank`** (`[Finite G]`):
-`rank G ≤ n ⟺ ∀ p, pRank G p ≤ n`. -/
+`rank G ≤ n ⟺ ∀ p` prime, `pRank G p ≤ n`. -/
 theorem rank_le_iff [Finite G] {n : ℕ} :
-    rank G ≤ n ↔ ∀ p : ℕ, pRank G p ≤ n := by
+    rank G ≤ n ↔ ∀ p : ℕ, p.Prime → pRank G p ≤ n := by
+  haveI : Nonempty {p : ℕ // p.Prime} := ⟨⟨2, Nat.prime_two⟩⟩
   rw [rank, ciSup_le_iff rank_bddAbove]
+  constructor
+  · intro h p hp
+    exact h ⟨p, hp⟩
+  · intro h p
+    exact h p.1 p.2
 
 /-- **Monotonicity of `rank` under an injective homomorphism** (`[Finite G]`):
 `rank H ≤ rank G` whenever `f : H →* G` is injective. -/
@@ -590,20 +591,22 @@ theorem rank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
     {f : H →* G} (hf : Function.Injective f) :
     rank H ≤ rank G := by
   rw [rank_le_iff]
-  intro p
-  exact (pRank_le_of_injective hf).trans (pRank_le_rank p)
+  intro p hp
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact (pRank_le_of_injective hf).trans (pRank_le_rank (G := G) p)
 
 /-- **Existence side for a positive `rank` lower bound** (`[Finite G]`).
-If `n ≤ rank G` and `n > 0`, then some `pRank G p` is at least `n`. -/
+If `n ≤ rank G` and `n > 0`, then some prime `p` has `pRank G p ≥ n`. -/
 theorem exists_pRank_ge_of_pos_le_rank [Finite G] {n : ℕ} (hnpos : 0 < n)
     (hn : n ≤ rank G) :
-    ∃ p : ℕ, n ≤ pRank G p := by
+    ∃ p : ℕ, p.Prime ∧ n ≤ pRank G p := by
   by_contra hnone
-  push Not at hnone
   have hrank_le : rank G ≤ n - 1 := by
     rw [rank_le_iff]
-    intro p
-    have hlt : pRank G p < n := hnone p
+    intro p hp
+    have hnot : ¬ n ≤ pRank G p := by
+      intro hpRank
+      exact hnone ⟨p, hp, hpRank⟩
     omega
   omega
 
@@ -615,13 +618,13 @@ theorem rank_mono_of_le [Finite G] (H : Subgroup G) :
 /-- A subgroup of ambient rank at least two contains a noncyclic elementary abelian subgroup,
 viewed back in the ambient group.
 
-The parameter `p` is not asserted prime here; this is the exact extraction supported by the
-current `rank` definition. A later prime-refinement lemma is needed before applying BG
-Theorem 9.1, whose statement requires `[Fact p.Prime]`. -/
+Because `rank` is indexed over primes, the extracted `p` is immediately suitable for
+BG Theorem 9.1 statements requiring `[Fact p.Prime]`. -/
 theorem exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank [Finite G]
     (K : Subgroup G) (hr : 2 ≤ rank ↥K) :
-    ∃ p : ℕ, ∃ A : Subgroup G, A.IsElementaryAbelian p ∧ A ≤ K ∧ ¬ IsCyclic ↥A := by
-  obtain ⟨p, hpRank⟩ :=
+    ∃ p : ℕ, p.Prime ∧
+      ∃ A : Subgroup G, A.IsElementaryAbelian p ∧ A ≤ K ∧ ¬ IsCyclic ↥A := by
+  obtain ⟨p, hp, hpRank⟩ :=
     exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 2) (by norm_num) hr
   obtain ⟨A, hA, hAnc⟩ :=
     exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank (G := ↥K) (p := p) hpRank
@@ -636,7 +639,7 @@ theorem exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank [Finite G]
     intro hBcyc
     exact hAnc
       ((Subgroup.equivMapOfInjective A K.subtype K.subtype_injective).isCyclic.mpr hBcyc)
-  exact ⟨p, B, hBea, hBle, hBnc⟩
+  exact ⟨p, hp, B, hBea, hBle, hBnc⟩
 
 end Rank
 

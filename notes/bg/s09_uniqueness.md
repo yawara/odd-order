@@ -336,9 +336,14 @@ API is now in place:
   maximal subgroup containing `L`. This is the Lean form of the Corollary 9.2 line
   `C_G(b) ⊇ L`, hence `C_G(b) ⊆ H`.
 
-Progress after the next PRank step: `exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank`
-now extracts a noncyclic elementary abelian subgroup of `K` from `2 ≤ rank ↥K` and maps it
-back to the ambient group. Immediate remaining blocker for Corollary 9.2: refine that witness
-to a prime-indexed one. The current `rank` is an `iSup` over all `Nat`, while Theorem 9.1
-requires `[Fact p.Prime]`; the missing reusable lemma should turn the extracted `p` into a
-prime witness suitable for `noncyclic_isUniquelyMaximal_of_centralizer_le`.
+The PRank refinement is now landed: `rank` is indexed over `{p // p.Prime}`, and
+`exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank` extracts a prime-indexed
+noncyclic elementary abelian subgroup of `K` from `2 ≤ rank ↥K`, mapped back to the ambient
+group. With this witness, Corollary 9.2 is now proved in Lean from Theorem 9.1: for
+`A ≤ K ≤ C_G(L)`, every nontrivial `a ∈ A` has `C_G(a)` inside the unique maximal subgroup
+containing `L`, so Theorem 9.1 gives `A ∈ 𝒰`, and `IsUniquelyMaximal.of_le_of_lt_top` lifts
+from `A` to `K`.
+
+Remaining §9 `sorry`s are now exactly Theorem 9.1, Corollary 9.3, Lemma 9.4, Lemma 9.5,
+Theorem 9.6, and the `E^2 - E*` particular case. Corollary 9.2 still depends on the stated
+Theorem 9.1 proof being completed, but no longer has its own rank/centralizer API blocker.

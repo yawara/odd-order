@@ -468,7 +468,7 @@ private theorem isUniquelyMaximal_of_le [Finite G] {A R : Subgroup G}
 private theorem rank_le_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C] :
     rank C ≤ 1 := by
   rw [rank_le_iff]
-  intro q
+  intro q hq
   rw [pRank_le_iff]
   intro A hA
   -- `A` is cyclic, elementary abelian `q`, so `|A| = exponent A ∣ q`, hence `|A| ≤ q`.
@@ -476,17 +476,9 @@ private theorem rank_le_one_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCycl
   have hexp : Monoid.exponent ↥A ∣ q :=
     Monoid.exponent_dvd_of_forall_pow_eq_one (fun g => hA.pow_eq_one g)
   rw [IsCyclic.exponent_eq_card (α := ↥A)] at hexp
-  rcases Nat.eq_zero_or_pos q with hq0 | hqpos
-  · -- `q = 0`: `|A| ∣ 0` is no info, but `Nat.log 0 _ = 0`.
-    subst hq0; rw [Nat.log_zero_left]; exact Nat.zero_le _
-  · have hcard_le : Nat.card ↥A ≤ q := Nat.le_of_dvd hqpos hexp
-    calc Nat.log q (Nat.card ↥A) ≤ Nat.log q q := Nat.log_mono_right hcard_le
-      _ ≤ 1 := by
-        rcases Nat.lt_or_ge q 2 with hq1 | hq2
-        · -- `0 < q < 2` forces `q = 1`, where `Nat.log 1 1 = 0`.
-          interval_cases q
-          simp
-        · rw [Nat.log_eq_one_iff'.mpr ⟨le_refl q, by nlinarith⟩]
+  have hcard_le : Nat.card ↥A ≤ q := Nat.le_of_dvd hq.pos hexp
+  calc Nat.log q (Nat.card ↥A) ≤ Nat.log q q := Nat.log_mono_right hcard_le
+    _ = 1 := by simpa using (Nat.log_pow hq.one_lt 1)
 
 /-- The `p`-rank is realised inside any Sylow `p`-subgroup: `pRank G p ≤ pRank ↥P p`.
 Every elementary abelian `p`-subgroup `A ≤ G` is conjugate into `P` (Sylow conjugacy),
