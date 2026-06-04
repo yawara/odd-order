@@ -1479,10 +1479,11 @@ open scoped Classical in
 
 Bundles the `xAdjoinStep` premises for one adjoining step of the X-family chain — the member family
 `{χmem i}ᵢ∈ₛ ⊆ S₁` (orthonormal, with the ZIrr-codomain injections `ν χmem i ∈ ZIrr`), the new
-character `χ`, the degree data, and the two lattice-generation conditions — into a single structure,
-so the chain fold `xChainCoherent` can take the per-step data as a function of the (inductively
-produced) accumulator coherence `hS₁`.  The index type `ι` is a field (each step has its own
-enumerated family). -/
+character `χ`, the degree data, and the anchor-generation condition `hSgen` — into a single
+structure, so the chain fold `xChainCoherent` can take the per-step data as a function of the
+(inductively produced) accumulator coherence `hS₁`.  The full `hgen` field is derived in `adjoin`
+from `hSgen` and the degree-matched support of `χ - aχ₁`.  The index type `ι` is a field (each step
+has its own enumerated family). -/
 structure XAdjoinStepInput
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
@@ -1532,15 +1533,9 @@ structure XAdjoinStepInput
   hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
     (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)})
-  hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
-      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
-      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
-    Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
-      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
-      {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
-       (χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)})
 
-/-- `xAdjoinStep` applied to a bundled `XAdjoinStepInput`, concluding coherence of `S₁ ∪ {χ, χ̄}`. -/
+/-- `xAdjoinStep` applied to a bundled `XAdjoinStepInput`, concluding coherence of
+`S₁ ∪ {χ, χ̄}`. -/
 noncomputable def XAdjoinStepInput.adjoin
     {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
@@ -1553,11 +1548,47 @@ noncomputable def XAdjoinStepInput.adjoin
     OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
-      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
-  xAdjoinStep hyp hconj hS₁ χ inp.hrealχ inp.hdiffsuppχ inp.hχχ inp.hχbarχbar inp.hχχbar inp.hχbarχ
-    inp.hχ_S1 inp.hχbar_S1 inp.s inp.χmem inp.deg inp.i₁ inp.hi₁ inp.hmemreal inp.hmemdiffsupp
-    inp.hmemdegdiffsupp inp.hmemS1 inp.hmembarS1 inp.hmemconjortho inp.hmemortho
-    inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg inp.hSgen inp.hgen
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L) := by
+  have h1notA : (1 : G) ∉ A := by
+    intro h
+    exact hyp.ne_one h rfl
+  have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+    intro h
+    exact h1notA (by simpa using h)
+  have hdegχ : ((χ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 =
+      (inp.a : ℂ) * ((inp.χmem inp.i₁ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
+    have hzero :
+        (((χ : ClassFunction ↥L ℂ) - inp.a •
+          (inp.χmem inp.i₁ : ClassFunction ↥L ℂ)) : ClassFunction ↥L ℂ) 1 = 0 := by
+      by_contra h
+      exact h1A (inp.hdiffasuppχ (ClassFunction.mem_support.mpr h))
+    rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ inp.a
+      (inp.χmem inp.i₁ : ClassFunction ↥L ℂ), ClassFunction.smul_apply] at hzero
+    exact sub_eq_zero.mp hzero
+  have hchi1_ne : ((inp.χmem inp.i₁ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 ≠ 0 := by
+    obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (inp.χmem inp.i₁)
+    rw [hd1]
+    exact_mod_cast hd.ne'
+  have hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+        {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+         (χ : ClassFunction ↥L ℂ) - inp.a •
+          (inp.χmem inp.i₁ : ClassFunction ↥L ℂ)}) :=
+    OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+      (L := ↥L) (S₁ := S₁)
+      (A := OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+      (χ := (χ : ClassFunction ↥L ℂ)) (chibar := (χ : ClassFunction ↥L ℂ).conj)
+      (chi1 := (inp.χmem inp.i₁ : ClassFunction ↥L ℂ)) (a := inp.a)
+      inp.hSgen hdegχ (OddOrder.Peterfalvi.S07.irreducibleCharacter_conj_apply_one χ)
+      hchi1_ne h1A
+  exact xAdjoinStep hyp hconj hS₁ χ inp.hrealχ inp.hdiffsuppχ inp.hχχ inp.hχbarχbar
+    inp.hχχbar inp.hχbarχ inp.hχ_S1 inp.hχbar_S1 inp.s inp.χmem inp.deg inp.i₁ inp.hi₁
+    inp.hmemreal inp.hmemdiffsupp inp.hmemdegdiffsupp inp.hmemS1 inp.hmembarS1
+    inp.hmemconjortho inp.hmemortho inp.hdiffasuppχ inp.htau1_memaχ inp.ha1 inp.hDeg
+    inp.hSgen hgen
 
 /-- **(T-A2) The X-family coherence chain fold.**
 
