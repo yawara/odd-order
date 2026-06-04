@@ -403,3 +403,20 @@ version used in BG: choose a Sylow `P` containing the relevant conjugates, use L
 produce `D ⊴ P` with `|D| = p^2`, and run the same centralizer-count proof inside `P` before
 transporting the resulting subgroup/rank statement back to `G` for both `A ∩ C_G(D)` and
 `B* ∩ C_G(D)`.
+
+
+### Lean API status (2026-06-04, local-overgroup bridge)
+
+The rank-drop bridge now has the book-oriented local-overgroup form
+`two_le_rank_inf_centralizer_of_normal_in_overgroup_card_prime_sq_of_log_three`. It assumes
+`D ≤ P`, `B* ≤ P`, and `(D.subgroupOf P) ⊴ P`, proves the centralizer estimate inside `P`,
+then maps the resulting subgroup through `P.subtype` and uses injective monotonicity of
+`rank` to conclude `rank (B* ∩ C_G(D)) >= 2` in the ambient group.
+
+The wrapper `isUniquelyMaximal_of_overgroup_rank_drop_witness` connects this directly to the
+Corollary 9.3 cascade. Compared with `isUniquelyMaximal_of_rank_drop_witness`, the `B*`-side
+rank drop is no longer an explicit input once the overgroup witness `D ⊴ P` is available.
+The remaining Corollary 9.3 proof obligation is now concentrated in the witness-selection and
+`A`-side rank-drop step: extract/conjugate the rank-three elementary abelian subgroup from
+`C_G(B)`, choose a common Sylow `P` and normal `D ≤ P` of order `p^2`, and prove
+`rank (A ∩ C_G(D)) >= 2` for the abelian `p`-subgroup `A`.
