@@ -67,6 +67,9 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   normal H の induced support と degree-one equality から (Ind θ_i - Ind θ_0).support ⊆ H^# を直接呼べる。
 - [ ] **Layer D2c — T6 family / engine wiring**: Y=S(Hprime) の family construction、
   coherentEqualDegree_fromDade への接続、および case c2 側の inertia discharge。
+  - 2026-06-04: `coherentYFamily_of_pairwiseNonconj` で nontrivial linear source family から
+    `isIrreducibleCharacter_induce_of_degree_one` を内部適用し、Y-family caller から induced
+    irreducibility family 仮定を削除。残りは `Y=S(H')` の enumeration/range wiring。
 
 ## 完了条件
 

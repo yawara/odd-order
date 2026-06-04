@@ -353,6 +353,11 @@ allowlist):
   `isIrreducibleCharacter_induce_of_degree_one`, `coherentYFamily`, Frobenius/case-A Xset
   irreducibilityがいずれも 3 axiom allowlist 内。これで c2 inertia discharge と Y-family coherence
   engine call は CI guard 下に入り、残る T6 は `Yset = S(H')` との exact family/range wiring。
+- **2026-06-04 T6 adapter**: **`coherentYFamily_of_pairwiseNonconj`** を追加。
+  caller は nontrivial linear source family と pairwise non-`L`-conjugacy だけを渡し、
+  各 `Ind_H^L θ_j` の既約性は T6/c1-c2 brick
+  `isIrreducibleCharacter_induce_of_degree_one` で adapter 内部に discharge する。AxiomsCheck
+  にも登録済みで、残る T6 exact wiring は `Yset = S(H')` の enumeration/range 同一視。
 - **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で

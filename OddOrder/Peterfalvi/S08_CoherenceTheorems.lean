@@ -2547,6 +2547,28 @@ noncomputable def coherentYFamily (hyp : SibleyDadeHypothesis G L H) [H.Normal] 
       hirr j⟩)
     (fun _ => rfl) hηinj (fun j => linearIrreducibleCharacter_apply_one (χ j))
 
+/-- **(6.8) `Y = S(H')` coherence, with induced irreducibility discharged internally.**
+Compared with `coherentYFamily`, the caller supplies only nontrivial linear source characters and
+pairwise non-`L`-conjugacy.  The irreducibility of each induced member is the genuine T6/c1-c2
+brick `isIrreducibleCharacter_induce_of_degree_one`, not an extra hypothesis. -/
+noncomputable def coherentYFamily_of_pairwiseNonconj
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ} [NeZero n]
+    (hn : 2 ≤ n) (χ : Fin n → (↥H →* ℂˣ))
+    (hχ_ne : ∀ j, χ j ≠ 1)
+    (hpairwise : ∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+      IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+        linearIrreducibleCharacter (χ j)) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (Set.range (fun j => ClassFunction.induce H
+        (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)))
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  refine hyp.coherentYFamily hn χ hpairwise ?_
+  intro j
+  exact hyp.isIrreducibleCharacter_induce_of_degree_one
+    (linearIrreducibleCharacter_apply_one (χ j)) (by
+      rw [Ne, linearIrreducibleCharacter_eq_trivial_iff]
+      exact hχ_ne j)
+
 /-! ### Peterfalvi (6.8) `X`-characterization (T7): the sets `S(A)`, `X = S − S(Z)`, `Y = S(H')`
 
 mmd 04.8 L150-164.  The (6.8) proof denotes `H' = [H,H]`, sets `Z = Z(H) ∩ H'` in case (A) and
