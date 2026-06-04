@@ -188,6 +188,53 @@ theorem le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
     calc n * d = (d * n * d⁻¹) * d := by rw [hfix]
       _ = d * n := by group
 
+omit [Finite G] in
+/-- If a homomorphism `φ` kills `K`, then a `p`-group derived subgroup in
+`G/K` gives a `p`-group image of `G'` under `φ`. This packages the quotient
+map calculation used in Corollary 4.19 and the §5 rank/narrow variants. -/
+theorem isPGroup_commutator_map_of_quotient_commutator_isPGroup
+    {A : Type*} [Group A] {p : ℕ} {K : Subgroup G} [K.Normal] (φ : G →* A)
+    (hK : K ≤ φ.ker) (hQ : IsPGroup p ↥(_root_.commutator (G ⧸ K))) :
+    IsPGroup p ↥((_root_.commutator G).map φ) := by
+  let φbar : G ⧸ K →* A :=
+    QuotientGroup.lift K φ (fun k hk => MonoidHom.mem_ker.mp (hK hk))
+  have hcomp : φbar.comp (QuotientGroup.mk' K) = φ := by
+    ext g
+    rfl
+  have hmapK : (_root_.commutator G).map (QuotientGroup.mk' K) =
+      _root_.commutator (G ⧸ K) := by
+    rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective K)]
+  have hmap : (_root_.commutator G).map φ =
+      (_root_.commutator (G ⧸ K)).map φbar := by
+    rw [← hcomp, ← hmapK, Subgroup.map_map]
+  rw [hmap]
+  exact hQ.map φbar
+
+omit [Finite G] in
+/-- Lemma 4.17 in the quotient-action form used by Corollary 4.19: if a
+normal `p`-subgroup has `p`-rank at most two, then the derived subgroup of the
+quotient by its conjugation kernel is a `p`-group. -/
+theorem isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two
+    [Finite G] (hodd : Odd (Nat.card G)) {p : ℕ} [Fact p.Prime] (hp_odd : Odd p)
+    {R : Subgroup G} [R.Normal] (hR_pg : IsPGroup p ↥R)
+    (hR_rank : pRank ↥R p ≤ 2) :
+    IsPGroup p (_root_.commutator (G ⧸ (MulAut.conjNormal (H := R)).ker)) := by
+  let ψ : G →* MulAut ↥R := MulAut.conjNormal
+  change IsPGroup p (_root_.commutator (G ⧸ ψ.ker))
+  have hquot_dvd : Nat.card (G ⧸ ψ.ker) ∣ Nat.card G := by
+    have := Subgroup.index_dvd_card ψ.ker
+    simpa [Subgroup.index] using this
+  have hquot_odd : Odd (Nat.card (G ⧸ ψ.ker)) := by
+    rcases Nat.even_or_odd (Nat.card (G ⧸ ψ.ker)) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := dvd_trans he.two_dvd hquot_dvd
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+  exact isPGroup_commutator_of_mulAut_odd_of_pRank_le_two hp_odd hR_pg hR_rank
+    (QuotientGroup.kerLift_injective ψ) hquot_odd
+
 /-- **`p'`-核による商で `p`-rank は増えない**: `N ⊴ G` with `p ∤ |N|` のとき
 `r_p(G/N) ≤ r_p(G)`。商の elementary abelian `p`-部分群 `B` は、その逆像の
 Sylow `p`-部分群 `P` と同型 (`p`-元は `p'`-核と交わらない) なので `G` 内で実現される。 -/

@@ -70,9 +70,15 @@
   the fixed-point argument used at the end of Corollary 4.19: a normal subgroup
   whose conjugation image on a minimal normal `p`-subgroup is a `p`-group
   centralizes that minimal normal subgroup.
-- Remaining Corollary 4.19 work: build the `p`-group conjugation image of
-  `G'` on each `p`-chief factor from Lemma 4.17/Theorem 4.18 core, then
-  expose the downstream API `G' ≤ C_G(U/V)`.
+- `S04.isPGroup_commutator_map_of_quotient_commutator_isPGroup` packages the
+  quotient-lift calculation: if `K ≤ ker φ` and `(G/K)'` is a `p`-group, then
+  `φ(G')` is a `p`-group.
+- `S04.isPGroup_commutator_quotient_conjNormal_ker_of_pRank_le_two` exposes
+  the Lemma 4.17 call used in Corollary 4.19: the derived subgroup of the
+  conjugation quotient on a normal rank-2 `p`-subgroup is a `p`-group.
+- Remaining Corollary 4.19 work: prove the kernel containment from the rank-2
+  `G*` subgroup to the chief factor action, then expose the downstream API
+  `G' ≤ C_G(U/V)`.
 
 ---
 
