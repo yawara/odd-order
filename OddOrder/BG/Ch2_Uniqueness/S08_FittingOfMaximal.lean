@@ -4135,6 +4135,27 @@ theorem scn3_map_le_normalizer_sylow_inf_map_of_le
       Subgroup.normalizer (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) :=
   (scn3_map_le_sylow_inf_map_of_le hAH hA_R).trans Subgroup.le_normalizer
 
+/-- In a minimal simple group, the normalizer of a nontrivial subgroup lying in a maximal
+subgroup is contained in some maximal subgroup. -/
+theorem exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKne : K ≠ ⊥) (hKM : K ≤ M) :
+    ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ Subgroup.normalizer (K : Set G) ≤ L := by
+  haveI : IsSimpleGroup G := hG.simple
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hN_ne_top : Subgroup.normalizer (K : Set G) ≠ ⊤ := by
+    intro hN_top
+    have hK_normal : K.Normal := Subgroup.normalizer_eq_top_iff.mp hN_top
+    rcases hK_normal.eq_bot_or_eq_top with hK_bot | hK_top
+    · exact hKne hK_bot
+    · have htop_le_M : ⊤ ≤ M := by
+        rw [← hK_top]
+        exact hKM
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  obtain ⟨L, hLco, hN_le_L⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (K : Set G))).resolve_left hN_ne_top
+  exact ⟨L, hLco, hN_le_L⟩
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -4221,6 +4242,35 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
   have hA_le_NRinf : A.map M.subtype ≤
       Subgroup.normalizer (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) :=
     scn3_map_le_normalizer_sylow_inf_map_of_le hAH hA_Rinf
+  have hRinf_amb_ne_bot :
+      (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≠ ⊥ := by
+    intro hR_map_bot
+    exact hRinf_ne_bot
+      ((Subgroup.map_eq_bot_iff_of_injective _
+        (H ⊓ M).subtype_injective).mp hR_map_bot)
+  have hRinf_amb_le_M :
+      (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≤ M := by
+    intro x hx
+    rcases hx with ⟨xinf, -, rfl⟩
+    exact xinf.2.2
+  obtain ⟨LRinf, hLRinf, hNRinf_le_LRinf⟩ :=
+    exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+      hG hM hRinf_amb_ne_bot hRinf_amb_le_M
+  have hA_le_LRinf : A.map M.subtype ≤ LRinf :=
+    hA_le_NRinf.trans hNRinf_le_LRinf
+  have hLRinf_bound : LRinf ≠ M →
+      sylowInfCard p LRinf M ≤ Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) := by
+    intro hLRinf_ne_M
+    exact hHmax_Rinf LRinf hLRinf hA_le_LRinf hLRinf_ne_M
+  have hNRinf_le_M_or_bound :
+      Subgroup.normalizer
+          (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M ∨
+        sylowInfCard p LRinf M ≤ Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) := by
+    by_cases hLRinf_eq_M : LRinf = M
+    · left
+      simpa [hLRinf_eq_M] using hNRinf_le_LRinf
+    · right
+      exact hLRinf_bound hLRinf_eq_M
   obtain ⟨RH, hA_RH⟩ := exists_sylow_containing_scn3_map_of_le P hAP hAH
   have hRH_ne_bot : (RH : Subgroup ↥H) ≠ ⊥ :=
     sylow_ne_bot_of_scn3_map_le P hAP hA hAH hA_RH
