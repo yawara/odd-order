@@ -149,6 +149,16 @@ private theorem exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaxima
     exact hCGnotM (by simpa [hLM] using hCGleL)
   exact ⟨y, L, hyB, hy1, hCGnotM, ⟨hLco, hCGleL⟩, hLneM⟩
 
+/-- If `y ∈ A`, then any maximal subgroup over `C_G(y)` is also a maximal
+subgroup over `C_G(A)`. This is the formal `C_G(A) ≤ C_G(y) ≤ L` bridge used
+when Lemma 9.5 reapplies (9.9) with `L` in place of `M`. -/
+private theorem maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton
+    {A L : Subgroup G} {y : G} (hyA : y ∈ A)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G))) :
+    L ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) := by
+  exact ⟨hL.1,
+    (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hyA)).trans hL.2⟩
+
 /-- **BG Corollary 9.2** (mmd L2541): `L ∈ 𝒰`, `K ≤ C_G(L)`, `r(K) ≥ 2` ⇒ `K ∈ 𝒰`。 -/
 theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
     {L K : Subgroup G} (hL : IsUniquelyMaximal L) (hKL : K ≤ Subgroup.centralizer (L : Set G))
@@ -2338,6 +2348,7 @@ private theorem exists_nonU_cocyclic_omega1_witness_maximal_ne [Finite G]
       y ∈ B ∧ y ≠ 1 ∧
       ¬ Subgroup.centralizer ({y} : Set G) ≤ M ∧
       L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) ∧
+      L ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) ∧
       L ≠ M := by
   obtain ⟨B, hBea, hBnot, hBΩ, hBA, hBnc, hcyc, hnot_cent⟩ :=
     exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting hG hAcomm_set hM hA hAnot hP0D
@@ -2347,8 +2358,26 @@ private theorem exists_nonU_cocyclic_omega1_witness_maximal_ne [Finite G]
   obtain ⟨y, L, hyB, hy1, hCGnotM, hL, hLneM⟩ :=
     exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal hG hM.1 hBea hBM
       hBnc hBnot
+  have hLA : L ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) :=
+    maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton (hBA hyB) hL
   exact ⟨B, y, L, hBea, hBnot, hBΩ, hBA, hBnc, hcyc, hnot_cent,
-    hyB, hy1, hCGnotM, hL, hLneM⟩
+    hyB, hy1, hCGnotM, hL, hLA, hLneM⟩
+
+/-- BG Lemma 9.5: reapply the `(9.9)` normalizer package with a maximal subgroup
+`L ∈ 𝓜(C_G(y))`, where `y ∈ A`.  The conclusion is for the same `p`-subgroup
+`P ≤ N_G(A)`, matching the line `N_G(P) ≤ L` before (9.10). -/
+private theorem normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A L P : Subgroup G} {y : G}
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) (hyA : y ∈ A)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)))
+    (hPp : IsPGroup p P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (SP : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    P ≤ L ∧ Subgroup.normalizer (P : Set G) ≤ L := by
+  exact normalizer_scn3_pSubgroup_le_maximal_of_not_scn3 hG
+    (maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton hyA hL)
+    hA hAnot hPp hAP hPnormA SP.series SP.length_pos SP.terminal_mem
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 

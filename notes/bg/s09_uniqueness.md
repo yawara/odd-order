@@ -833,12 +833,18 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      contrapositive of Theorem 9.1's centralizer alternative.
    - `exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal` extends the
      chosen `y ∈ B#` to `L ∈ 𝓜(C_G(y))` with `L ≠ M`.
+   - `maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton` proves the
+     bridge `C_G(A) ≤ C_G(y) ≤ L`, so this same `L` also lies in `𝓜(C_G(A))`.
    - `exists_nonU_cocyclic_omega1_witness_maximal_ne` combines this with the Lemma
      9.5 cocyclic `Ω₁(A)`/`O_{p'}(F(M))` witness package.
+   - `normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3` reapplies the existing
+     `(9.9)` normalizer package to a witness `L ∈ 𝓜(C_G(y))`, giving the same
+     `P ≤ L` and `N_G(P) ≤ L` once the §4 characteristic Sylow series package for
+     `L` is available.
 
-   Remaining for this block: use the arbitrary-choice hypothesis on `M ∈ 𝓜(C_G(A))`
-   to apply (9.9) with `L` in place of `M`, derive (9.10), then apply Corollary
-   4.19 + Lemma 1.9 to contradict the noncentralization of `D ∩ C_G(B)`.
+   Remaining for this block: derive (9.10), especially the planned `P₀ ≤ (L ∩ M)'`
+   inclusion, then apply Corollary 4.19 + Lemma 1.9 to contradict the
+   noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 
