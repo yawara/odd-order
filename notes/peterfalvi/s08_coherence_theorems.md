@@ -229,6 +229,14 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
 残る真正 §6.6 入力は、real/normalized 変換ではなく、character theory から自然数 degree 値・
 member square-sum identity・prime-power gap・square-divisibility data を生成する部分。
 
+同日追記: `exists_natDegreeData_for_xAdjoinMemberFamily` と
+`SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap` を landing。前者は新規文字・
+anchor・finite member family の自然数 degree witness と member square-sum `D`、および `i₁ ∈ s`
+からの `0 < D` を package する。後者は member-family cover + degree-ratio equations + natural degree
+witnesses + prime-power/square-divisibility gap data から、normalized `hDeg` を別途渡さず直接
+`XAdjoinStepInput` を構成する bridge。これで §6.6 側の frontier は、ratio equation 自体と
+square-divisibility/prime-power data を実際の character theory から生成する部分にさらに絞られた。
+
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 
 `coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <

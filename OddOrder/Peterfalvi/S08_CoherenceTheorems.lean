@@ -1988,6 +1988,41 @@ theorem eq_one_of_fixedPointFree_invariant {Z : Type*} [Group Z] [Finite Z]
     _ = f z₀ * (f z₀)⁻¹ := by rw [hinv]
     _ = 1 := mul_inv_cancel₀ (hne z₀)
 
+/-- **(T8.11p0) natural degree witnesses for one X-adjoin member family.**
+
+This packages the positive natural degree of the new character, the anchor, and every member of a
+finite accumulator family, together with the member square-sum `D`.  The hypothesis `i₁ ∈ s`
+ensures `D` is positive. -/
+theorem exists_natDegreeData_for_xAdjoinMemberFamily
+    {G : Type*} [Group G] {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {i₁ : ι} (hi₁ : i₁ ∈ s) :
+    ∃ dχ d₁ D : ℕ, ∃ dmem : ι → ℕ,
+      (χ : ClassFunction G ℂ) 1 = (dχ : ℂ) ∧
+      (χ₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) ∧
+      (∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ)) ∧
+      (∑ i ∈ s, dmem i * dmem i = D) ∧
+      0 < d₁ ∧ 0 < D := by
+  classical
+  obtain ⟨dχ, _hdχpos, hχone⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  obtain ⟨d₁, hd₁pos, hχ₁one⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ₁
+  let dmem : ι → ℕ := fun i =>
+    (irreducibleCharacter_apply_one_eq_pos_natCast (χmem i)).choose
+  have hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ) := by
+    intro i _hi
+    exact (irreducibleCharacter_apply_one_eq_pos_natCast (χmem i)).choose_spec.2
+  let D : ℕ := ∑ i ∈ s, dmem i * dmem i
+  have hDsum : ∑ i ∈ s, dmem i * dmem i = D := rfl
+  have hDpos : 0 < D := by
+    have hpos_i₁ : 0 < dmem i₁ :=
+      (irreducibleCharacter_apply_one_eq_pos_natCast (χmem i₁)).choose_spec.1
+    have hterm_pos : 0 < dmem i₁ * dmem i₁ := Nat.mul_pos hpos_i₁ hpos_i₁
+    have hsum_pos : 0 < ∑ i ∈ s, dmem i * dmem i := by
+      exact Finset.sum_pos' (fun _ _ => Nat.zero_le _) ⟨i₁, hi₁, hterm_pos⟩
+    simpa [D] using hsum_pos
+  exact ⟨dχ, d₁, D, dmem, hχone, hχ₁one, hmemone, hDsum, hd₁pos, hDpos⟩
+
+
 namespace SibleyDadeHypothesis
 
 variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
@@ -3568,6 +3603,78 @@ theorem normalizedDegreeGap_of_natDegreeSumPrimePowerGap
   normalizedDegreeGap_of_realDegreeBound hχdeg hmemdeg
     (realDegreeBound_of_natDegreeSumPrimePowerGap hχone hχ₁one hmemone hDsum
       hp hpos₁ hq hdiv hlt hdvd hDpos)
+
+
+namespace SibleyDadeHypothesis
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
+
+open scoped Classical in
+/-- **(T8.11p) X-adjoin input from natural degree-gap data.**
+
+This combines `xAdjoinStepInput_of_memberFamily_degreeRatios` with
+`normalizedDegreeGap_of_natDegreeSumPrimePowerGap`.  A §6.6 caller that already has the finite
+member-family data, degree-ratio equations, natural degree witnesses, and the prime-power /
+square-divisibility gap can now produce the full `XAdjoinStepInput` without separately supplying
+the normalized `hDeg` field. -/
+noncomputable def xAdjoinStepInput_of_memberFamily_natDegreeGap
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {ι : Type} {s : Finset ι} {χmem : ι → IrreducibleCharacter ↥L}
+    {deg : ι → ℕ} {i₁ : ι} {a p d₁ dχ q m D : ℕ} {dmem : ι → ℕ}
+    (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+      ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ j ∈ s, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hmemS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmembarS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmemconjortho : ∀ j ∈ s, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        if j = l then (1 : ℂ) else 0)
+    (ha1 : deg i₁ = 1)
+    (hdeg_mem : ∀ j ∈ s,
+      (χmem j : ClassFunction ↥L ℂ) 1 =
+        (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1)
+    (hdegχ : (χs i : ClassFunction ↥L ℂ) 1 =
+      (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1)
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
+    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hdvd : dχ * dχ ∣ D) (hDpos : 0 < D) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) :=
+  hyp.xAdjoinStepInput_of_memberFamily_degreeRatios hZH hX
+    hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
+    hmemS1 hmembarS1 hmemconjortho hmemortho ha1 hdeg_mem hdegχ
+    (normalizedDegreeGap_of_natDegreeSumPrimePowerGap hdegχ hdeg_mem
+      hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hdvd hDpos)
+
+end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
 hypotheses `SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is
