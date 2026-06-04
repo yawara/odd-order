@@ -678,6 +678,55 @@ theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData h
     data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
   data.P1_normalizes_U data.t_mem_P1
 
+/-- Powers of the conjugate generator `t` normalize `U`. -/
+theorem t_pow_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℕ) :
+    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  pow_mem data.t_normalizes_U n
+
+/-- BG Appendix C, Lemma C.3 Step 3 intersection dichotomy before the final
+contradiction: if `g` normalizes `U`, then `(PU) ∩ (PU)^g` is either `U` or
+all of `PU`. -/
+theorem P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {g : G}
+    (hgU : g ∈ Subgroup.normalizer (hyp.base.U : Set G)) :
+    (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.P ⊔ hyp.base.U := by
+  let X : Subgroup G :=
+    (hyp.base.P ⊔ hyp.base.U) ⊓ (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U))
+  have hUle : hyp.base.U ≤ X := by
+    intro u hu
+    refine ⟨(le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu, ?_⟩
+    have hU_image : MulAut.conj g '' (hyp.base.U : Set G) = hyp.base.U :=
+      Subgroup.mem_normalizer_iff_conj_image_eq.mp hgU
+    have hu_image : u ∈ MulAut.conj g '' (hyp.base.U : Set G) := by
+      rw [hU_image]
+      exact hu
+    rcases hu_image with ⟨u0, hu0, hu0_eq⟩
+    have hu0_PU : u0 ∈ hyp.base.P ⊔ hyp.base.U :=
+      (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu0
+    rw [← hu0_eq]
+    exact Set.smul_mem_smul_set hu0_PU
+  by_cases hX : X = hyp.base.U
+  · left
+    exact hX
+  · right
+    exact data.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U hUle inf_le_left hX
+
+/-- The same Step 3 intersection dichotomy for powers of the chosen conjugate
+generator `t`. -/
+theorem P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) (n : ℕ) :
+    (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) =
+          hyp.base.P ⊔ hyp.base.U :=
+  data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+    (data.t_pow_normalizes_U n)
+
 /-- Conjugation by `t` as an automorphism of Peterfalvi's subgroup `U`. -/
 noncomputable def tConjUAut {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) : MulAut hyp.base.U :=

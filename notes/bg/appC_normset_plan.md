@@ -339,6 +339,9 @@ concrete `P⋊U` と transported `PU` の双方で使える形にした。
 さらに `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` により、
 `U≤X≤PU` かつ `X≠U` から `X=PU` を得る Step3 irreducibility 入力を
 concrete `P⋊U` から Peterfalvi 側へ transport した。
+さらに `P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U` と
+`P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` により、`g∈N_G(U)` のとき
+`(PU)∩(PU)^g` が `U` または `PU` であるという Step3 交叉 dichotomy まで固定した。
 また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
 `sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
 `left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。

@@ -229,6 +229,11 @@ created: 2026-06-04
   `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` を公開し、`U≤X≤PU` かつ
   `X≠U` なら `X=PU` となる BG Step3 の irreducibility 入力を `σ` 経由で transport。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 intersection dichotomy bridge**:
+  `P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U` と
+  `P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` を公開し、`g∈N_G(U)` から
+  `(PU)∩(PU)^g = U ∨ (PU)∩(PU)^g = PU` を読めるようにした。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 sigma normal-form bridge**: `sigma_eq_left_eq`、
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の
