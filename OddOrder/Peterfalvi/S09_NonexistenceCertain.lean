@@ -5802,6 +5802,77 @@ noncomputable def characterEstimateData_of_family71_coherent_zeta_decomposition
     hmin B ε ξ hχ_signed.1 hχ_signed.2 hL hA hG0 hB_ne
     v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hi hgood
 
+open scoped Classical in
+/-- Source-data form of the concrete (7.5)+(7.8.b)+(7.9) final-assembly
+constructor.
+
+This refines `characterEstimateData_of_family71_coherent_zeta_decomposition` by
+deriving the residual `Γ` norm bound from the family-notated (7.8.b) source
+data, rather than taking `hΓ_bound` as a separate input.  The selected character
+is still the coherent image `νζ`, so the signed-irreducible witness and the
+`G₀` identity contribution are also generated internally. -/
+noncomputable def characterEstimateData_of_family71_coherent_zeta_source_data
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hLocalL : L = F.L i) (hLocalH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hP_L : ∀ j : Fin k, P.L j = F.L j)
+    (hP_A : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hP_G0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_family71_coherent_zeta_decomposition
+    P H78 hcoh hnu hzeta_irr hmin B hP_L hP_A hP_G0 hB_ne
+    v x hBD.Gamma Γ₁ hΓ horth hΓ₁ hx_nonzero
+    (F.gamma_inner_self_re_le_of_family_source_data H78 hBD hLocalL hLocalH
+      hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv hsmall)
+    hi hgood
+
 /-- Constructor form of `CharacterEstimateData` from the real reduced family
 inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
 

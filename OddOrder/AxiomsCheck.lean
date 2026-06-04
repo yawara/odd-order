@@ -2417,6 +2417,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_source_data
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
 #assert_only_allowed_axioms

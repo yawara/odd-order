@@ -742,3 +742,14 @@ S09 に `characterEstimateData_of_family71_signed_decomposition`
 source form では、`ζ` の irreducibility と S07 coherence witness から `νζ = ±ξ` を内部生成し、
 前回 pass の `G₀` identity contribution に接続する。`hred`、`hBsum`、明示的な
 signed-irreducible witness を同時に外へ出さずに `CharacterEstimateData` まで進められる。
+
+### 2026-06-05 pass: family (7.5) + source-data (7.8.b) coherent assembly
+
+S09 に `characterEstimateData_of_family71_coherent_zeta_source_data` を追加した。
+
+前回の coherent `ζ` constructor は `hΓ_bound : ⟨Γ,Γ⟩.re ≤ e_i - 1` を外部入力にしていた。
+今回の入口では既存の
+`FrobeniusFamily.gamma_inner_self_re_le_of_family_source_data` を内部で使い、family-notated な
+(7.8.b) source data (`hind_norm`, `hzeta_ind`, source irreducibility/distinctness, degree sum,
+`u,v,w` formula, small-index) から `Γ` bound を生成する。これで concrete (7.5)、coherence
+image、(7.8.b)、(7.9) decomposition が `CharacterEstimateData` まで同時に接続される。
