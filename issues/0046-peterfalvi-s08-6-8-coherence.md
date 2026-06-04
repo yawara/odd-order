@@ -526,6 +526,10 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `degreeDivisibility_primePowerSums` 以降の common-index adapters と両 `PairUnion*StepData` から
     caller-supplied `hidxpos : 0 < idx` を削除した。`idx > 0` は `χ(1)>0` と
     `dχ = idx*θχ` から内部導出される。
+  - **2026-06-04 追記 14**: `coprime_commonIndex_primePower` を追加し、
+    `degreeDivisibility_primePowerSums` 以降の common-index adapters と両 `PairUnion*StepData` から
+    caller-supplied `hcop : Nat.Coprime idx θχ` を削除した。caller は (6.4.c) の
+    `hidx_p : Nat.Coprime idx p` を渡し、`θχ = p^mχ` から adapter 内で必要な coprimality を復元する。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

@@ -343,6 +343,10 @@ allowlist):
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で
   局所導出されるため、§6.6 caller は fixed induction index の positivity witness を別途保持しなくてよい。
+- **2026-06-04 追記 15**: **`coprime_commonIndex_primePower`** を追加し、common-index
+  adapters と両 `PairUnion*StepData` から caller-supplied `hcop : Nat.Coprime idx θχ` を削除した。
+  caller は §6.6 / (6.4.c) に対応する `hidx_p : Nat.Coprime idx p` だけを渡し、各 step の
+  residual degree `θχ = p^mχ` から adapter 内で `Nat.Coprime idx θχ` を局所導出する。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
