@@ -860,11 +860,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    - `chiefSeries_stabilizer_of_le_chiefFactorCentralizer` converts Corollary
      4.19-style centralization of each chief factor into the exact stabilizer
      input `⁅chiefSeriesInside K i, P₀⁆ ≤ chiefSeriesInside K (i+1)`.
+   - `le_centralizer_of_le_chiefFactorCentralizer_chain` composes that with the
+     Lemma 1.9 bridge: `D ≤ E`, `E ≤ C(each chief factor of K)`, and coprime
+     imply `D ≤ C(K)`.
 
    Remaining for this block: instantiate Corollary 4.19 inside `L ∩ M` with
    `G* = D ∩ L` to obtain the chief-factor centralizer input for `(L ∩ M)'`,
-   then thread `P₀ ≤ (L ∩ M)'` through the two stored helpers and discharge the
-   noncentralization contradiction.
+   and convert the ambient `P₀ ≤ (L ∩ M)'` into the corresponding local subgroup
+   input before discharging the stored noncentralization contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

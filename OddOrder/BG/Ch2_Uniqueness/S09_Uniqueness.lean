@@ -2510,6 +2510,20 @@ private theorem chiefSeries_stabilizer_of_le_chiefFactorCentralizer
   intro i
   exact chiefFactorCentralizer.commutator_le_of_le ((hDE).trans (hcent i))
 
+/-- Corollary 4.19 output plus Lemma 1.9 input, already composed: if `D` is
+coprime to `K`, lies in a subgroup `E`, and `E` centralizes every chief factor
+of `K`, then `D` centralizes `K`. -/
+private theorem le_centralizer_of_le_chiefFactorCentralizer_chain
+    {M : Type*} [Group M] [Finite M] {K D E : Subgroup M} [K.Normal]
+    (hcop : (Nat.card ↥D).Coprime (Nat.card ↥K))
+    (hsolv : IsSolvable ↥D ∨ IsSolvable ↥K)
+    (hDE : D ≤ E)
+    (hcent : ∀ i, E ≤ chiefFactorCentralizer
+      (chiefSeriesInside K i) (chiefSeriesInside K (i + 1))) :
+    D ≤ Subgroup.centralizer (K : Set M) :=
+  coprime_chiefSeries_stabilizer_le_centralizer hcop hsolv
+    (chiefSeries_stabilizer_of_le_chiefFactorCentralizer hDE hcent)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
