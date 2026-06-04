@@ -266,6 +266,12 @@ created: 2026-06-04
   `right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition` を公開し、
   natural-power `(C.5)` normal form から `tConjNormOneUnitsAut^n u = u₁*v₁` を
   SemidirectProduct の right projection で読めるようにした。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `k=3` first `(C.5)` bridge**:
+  `exists_step4_first_k_three_decomposition` と
+  `right_component_of_step4_first_k_three_decomposition` を公開し、BG final paragraph の
+  `s(a^{-1})^{t^3}s^{-2}=u₁s₁v₁` と “mod P” 読み
+  `(a^{-1})^{t^3}=u₁*v₁` を concrete `tConjNormOneUnitsAut` で消費できる形にした。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。

@@ -1141,6 +1141,55 @@ theorem right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
       fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerNormOneUnits hyp) hH
   simpa [map_mul, hpm_right, hpr_right, hline_right, mul_assoc] using hright
 
+/-- BG Appendix C, Lemma C.3 Step 4 final specialization: the first equation of
+`(C.5)` at `k = 3` has a Step 1 normal form.  This is the entry point for the
+final paragraph, where `u` is instantiated with the norm-one unit represented by
+`a ∈ E`. -/
+theorem exists_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s *
+            data.sigma
+              (SemidirectProduct.inr
+                ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+                fieldNormalizerFrobeniusGroup hyp) *
+          data.s ^ (-2 : ℤ) =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+  simpa using
+    data.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+      (m := (1 : ℤ)) (r := (-2 : ℤ)) (n := 3) (u := u⁻¹)
+
+/-- The `mod P` reading of the `k = 3` first `(C.5)` equation: the middle term
+`u^{-1}` conjugated by `t^3` has complement component `u₁ * v₁`. -/
+theorem right_component_of_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp) (c : ZMod hyp.base.p)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    (data.tConjNormOneUnitsAut ^ 3) u⁻¹ = u₁ * v₁ := by
+  have hdec' : data.s ^ (1 : ℤ) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+    simpa using hdec
+  simpa using
+    data.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+      (m := (1 : ℤ)) (r := (-2 : ℤ)) (n := 3) (u := u⁻¹)
+      (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
+
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
 theorem normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
