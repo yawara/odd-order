@@ -1625,3 +1625,25 @@ wiring-size では放電不能**と確定 (各々 真正に新規数学 + interf
   新規数学)。純益 = existence-half primitive (汎用・再利用可・λ-form の step 1)。
   次 step = (a) `DadeChainStep` に joint-isometry field 追加で coefficient-value + integrality を載せ
   `hY` 放電、(b) (4.7) 形式化で `hgen`、(c) `Dmem` 構成化で `hmemOrtho`。
+
+### (2026-06-04, pass 12) `Y = S(H')` finite representative family and direct coherence bridge
+
+`S08_CoherenceTheorems.lean` に T6/Y-family の representative construction を landing
+(sorry/axiom 無; AxiomsCheck 登録):
+
+- `finite_linearCharacters_of_finite`: finite group の linear characters は有限。
+- `SibleyDadeHypothesis.Yset_finite`: `Y=S(H')` は非自明 linear source characters の induced image
+  に含まれるので有限。
+- `SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Yset`: `Y` member は degree-one source による
+  induced irreducible character。
+- `SibleyDadeHypothesis.exists_Yset_linearRepresentativeFamily`: `Yset` 自体を finite enumerate し、
+  各 `Y` member から `exists_linear_source_of_mem_Yset` で source を選ぶ。これにより exact range、
+  all-nontrivial-linear cover、pairwise non-`L`-conjugacy を同時に得る。重要な設計点: 全 nontrivial
+  linear characters を先に quotient せず、既に有限な `Yset` を enumerate するので orbit representative
+  machinery を追加しない。
+- `SibleyDadeHypothesis.coherentYset_of_two_le_ncard`: 上の family を
+  `coherentYset_of_pairwiseNonconj` に渡し、T6/Y-family coherence の残入力を
+  `2 ≤ hyp.Yset.ncard` へ圧縮。
+
+残る T6/Y-family 側の実装境界は、(6.8) case split 内でこの cardinal lower bound を作ることと、
+case c1/c2 の top-level assembly へ `coherentYset_of_two_le_ncard` を差し込むこと。

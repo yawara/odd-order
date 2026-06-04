@@ -63,7 +63,7 @@ elaboration 時に検査する CI ガード. moore57 プロジェクトの `Moor
 |---|---|---|
 | Ch.1 (Sylow Theory) | `Subgroup.chermakDelgado` | Thm 1.41 (Chermak-Delgado) |
 | Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.matsuyama` | Thm 2.13 (Matsuyama involution) |
-| Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` | Thm 2.12 系 (lean-eval Baer-Suzuki) |
+| Ch.2 (Subnormality) | `baerSuzuki_pCore` | Thm 2.12 系 (Baer-Suzuki) |
 | Ch.2 (Subnormality) | `lucchini_index_normalCore_lt_index` | Thm 2.20 (Lucchini) |
 | Ch.3 (Split Extensions) | `horosevskii_aut_order_lt` | Thm 3.3 (Horosevskii) |
 | Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.hall_E_exists` | Thm 3.13 (Hall E for solvable) |
@@ -2003,9 +2003,20 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.finite_linearCharacters_of_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Yset
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_Yset_linearRepresentativeFamily
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_pairwiseNonconj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_two_le_ncard
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
 #assert_only_allowed_axioms

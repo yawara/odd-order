@@ -62,8 +62,13 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
 - [x] (2026-06-04) `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` /
       `coherentYset_of_pairwiseNonconj` を追加。`Fin n` family が nontrivial linear characters
       の induced `Yset` members を全て覆うという caller-supplied cover から constructed
-      induced range を `Yset` そのものへ rewrite できるようにした。残りは orbit representative
-      family の concrete construction と、その cover/pairwise nonconjugacy 入力の構成。
+      induced range を `Yset` そのものへ rewrite できるようにした。
+- [x] (2026-06-04) `finite_linearCharacters_of_finite` / `Yset_finite` /
+      `isIrreducibleCharacter_of_mem_Yset` / `exists_Yset_linearRepresentativeFamily` /
+      `coherentYset_of_two_le_ncard` を追加。全 nontrivial linear characters を直接 quotient
+      せず、有限な `Yset` を enumerate して各 member の linear source を選ぶ設計で、exact range
+      と pairwise non-`L`-conjugacy を誘導既約文字の injective enumeration から構成。T6/Y-family は
+      `2 ≤ hyp.Yset.ncard` まで圧縮済み。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

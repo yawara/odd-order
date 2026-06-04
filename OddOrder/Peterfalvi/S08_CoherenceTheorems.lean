@@ -2754,6 +2754,123 @@ theorem range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective
     rw [hφeq, linearIrreducibleCharacter_coe]
     exact hηj
 
+/-- There are finitely many linear characters `Γ →* ℂˣ` for a finite group `Γ`.
+
+Local to §8 because the immediate consumer is the finiteness of `Y = S(H')`; a more global API can
+move this later if it gets reused outside the Peterfalvi assembly. -/
+theorem finite_linearCharacters_of_finite {Γ : Type*} [Group Γ] [Finite Γ] :
+    Finite (Γ →* ℂˣ) := by
+  haveI : Finite (IrreducibleCharacter Γ) := finite_irreducibleCharacter (G := Γ)
+  exact Finite.of_injective (linearIrreducibleCharacter (H := Γ))
+    linearIrreducibleCharacter_injective
+
+/-- `Y = S(H')` is finite: it is covered by inducing the finite set of nontrivial
+linear source characters of `H`. -/
+theorem Yset_finite (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    hyp.Yset.Finite := by
+  classical
+  haveI : Finite (↥H →* ℂˣ) := finite_linearCharacters_of_finite (Γ := ↥H)
+  let T : Set (↥H →* ℂˣ) := {χ | χ ≠ 1}
+  refine ((Set.toFinite T).image
+    (fun χ => ClassFunction.induce H (linearClassFunction χ))).subset ?_
+  intro φ hφ
+  obtain ⟨χ, hχ_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+  refine ⟨χ, hχ_ne, ?_⟩
+  rw [hφeq, linearIrreducibleCharacter_coe]
+
+/-- Every member of `Y = S(H')` is irreducible. -/
+theorem isIrreducibleCharacter_of_mem_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Yset) :
+    IsIrreducibleCharacter φ := by
+  obtain ⟨χ, hχ_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+  rw [hφeq]
+  exact hyp.isIrreducibleCharacter_induce_of_degree_one
+    (linearIrreducibleCharacter_apply_one χ) (by
+      rw [Ne, linearIrreducibleCharacter_eq_trivial_iff]
+      exact hχ_ne)
+
+/-- Enumerating `Yset` gives nontrivial linear source representatives for its induced members.
+
+The returned family is indexed by `Fin n`, covers `Yset` after induction, and is pairwise
+non-`L`-conjugate.  The cardinal lower bound is kept as an explicit input because the later
+coherence engine requires `2 ≤ n`. -/
+theorem exists_Yset_linearRepresentativeFamily
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] (hYtwo : 2 ≤ hyp.Yset.ncard) :
+    ∃ (n : ℕ) (_ : NeZero n) (χ : Fin n → ↥H →* ℂˣ),
+      2 ≤ n ∧
+      (∀ j, χ j ≠ 1) ∧
+      (∀ η : ↥H →* ℂˣ, η ≠ 1 → ∃ j,
+        ClassFunction.induce H (linearClassFunction (χ j)) =
+          ClassFunction.induce H (linearClassFunction η)) ∧
+      (∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+        IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+          linearIrreducibleCharacter (χ j)) ∧
+      Set.range (fun j => ClassFunction.induce H (linearClassFunction (χ j))) = hyp.Yset := by
+  classical
+  obtain ⟨n, ζ, hζinj, hζrange⟩ :=
+    exists_finEnum_irreducible (hyp.Yset_finite)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ)
+  have hζmem : ∀ j, (ζ j : ClassFunction ↥L ℂ) ∈ hyp.Yset := by
+    intro j
+    rw [← hζrange]
+    exact Set.mem_range_self j
+  choose χ hχ_ne hχeq using fun j => hyp.exists_linear_source_of_mem_Yset (hζmem j)
+  have hindRange : Set.range (fun j => ClassFunction.induce H (linearClassFunction (χ j))) =
+      hyp.Yset := by
+    ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      have hζeq :
+          (ζ j : ClassFunction ↥L ℂ) =
+            ClassFunction.induce H (linearClassFunction (χ j)) := by
+        simpa [linearIrreducibleCharacter_coe] using hχeq j
+      change ClassFunction.induce H (linearClassFunction (χ j)) ∈ hyp.Yset
+      rw [← hζeq]
+      exact hζmem j
+    · intro hφ
+      rw [← hζrange] at hφ
+      obtain ⟨j, hj⟩ := hφ
+      refine ⟨j, ?_⟩
+      rw [← hj]
+      simpa [linearIrreducibleCharacter_coe] using (hχeq j).symm
+  have hcover : ∀ η : ↥H →* ℂˣ, η ≠ 1 → ∃ j,
+      ClassFunction.induce H (linearClassFunction (χ j)) =
+        ClassFunction.induce H (linearClassFunction η) := by
+    intro η hη_ne
+    have hmem : ClassFunction.induce H (linearClassFunction η) ∈ hyp.Yset := by
+      simpa [linearIrreducibleCharacter_coe] using
+        hyp.induce_linearIrreducibleCharacter_mem_Yset hη_ne
+    rw [← hindRange] at hmem
+    exact hmem
+  have hpairwise : ∀ i j : Fin n, i ≠ j → ∀ g : ↥L,
+      IrreducibleCharacter.conjBy g (linearIrreducibleCharacter (χ i)) ≠
+        linearIrreducibleCharacter (χ j) := by
+    intro i j hij g hconj
+    apply hij
+    apply hζinj
+    apply IrreducibleCharacter.ext
+    have hind :
+        ClassFunction.induce H
+            (linearIrreducibleCharacter (χ i) : ClassFunction ↥H ℂ) =
+          ClassFunction.induce H
+            (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ) :=
+      (induce_eq_induce_iff_conj
+        (G := ↥L) (H := H)
+        (linearIrreducibleCharacter (χ i))
+        (linearIrreducibleCharacter (χ j))).mpr ⟨g, hconj⟩
+    rw [hχeq i, hχeq j]
+    exact hind
+  have hcoeinj : Function.Injective (fun j => (ζ j : ClassFunction ↥L ℂ)) := by
+    intro i j hij
+    exact hζinj (IrreducibleCharacter.ext hij)
+  have hncard : hyp.Yset.ncard = n := by
+    rw [← hζrange, Set.ncard_range_of_injective hcoeinj, Nat.card_eq_fintype_card,
+      Fintype.card_fin]
+  have hn2 : 2 ≤ n := by omega
+  haveI : NeZero n := ⟨by omega⟩
+  exact ⟨n, inferInstance, χ, hn2, hχ_ne, hcover, hpairwise, hindRange⟩
+
 /-- `Y = S(H')` coherence from finite orbit representatives of nontrivial linear characters.
 
 The caller supplies representatives whose induced characters cover `Y`, together with the usual
@@ -2775,6 +2892,19 @@ noncomputable def coherentYset_of_pairwiseNonconj
   have hrange :=
     hyp.range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective χ hχ_ne hχ_cover
   simpa [hrange] using hcoh
+
+/-- `Y = S(H')` coherence from the finite `Yset` representative construction.
+
+This packages `exists_Yset_linearRepresentativeFamily` with the concrete coherence engine; the
+remaining downstream input is the cardinal lower bound `2 ≤ |Y|`. -/
+noncomputable def coherentYset_of_two_le_ncard
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] (hYtwo : 2 ≤ hyp.Yset.ncard) :
+    OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  choose n hnzero χ hn2 hχ_ne hχ_cover hpairwise _hrange using
+    hyp.exists_Yset_linearRepresentativeFamily hYtwo
+  letI : NeZero n := hnzero
+  exact hyp.coherentYset_of_pairwiseNonconj hn2 χ hχ_ne hχ_cover hpairwise
 
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any

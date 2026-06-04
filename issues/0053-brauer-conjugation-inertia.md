@@ -79,8 +79,11 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` /
     `coherentYset_of_pairwiseNonconj` で、非自明 linear characters の induced `Yset` members を
     覆う orbit-representative `Fin n` family から `Yset` 上の coherence へ直接 rewrite する
-    adapter を追加。残りは concrete representative construction と cover/pairwise nonconjugacy
-    の構成。
+    adapter を追加。
+  - 2026-06-04: `Yset_finite` と `exists_Yset_linearRepresentativeFamily` で concrete
+    representative construction を追加。有限な `Yset` を enumerate し、各 member の linear source
+    を選ぶことで exact range / cover / pairwise nonconjugacy を構成し、
+    `coherentYset_of_two_le_ncard` まで接続。
 
 ## 完了条件
 
@@ -96,7 +99,9 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
 - ✅ 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` と
   `coherentYset_of_pairwiseNonconj` を AxiomsCheck 登録。induced `Yset` members を覆う
   orbit-representative family から `Yset` coherence へ rewrite する adapter まで接続済み。
-- 残: `Y = S(H')` の concrete finite family construction と surjectivity/pairwise nonconjugacy の構成。
+- ✅ 2026-06-04: `Y = S(H')` の concrete finite family construction と
+  surjectivity/pairwise nonconjugacy の構成を `exists_Yset_linearRepresentativeFamily` で完了。
+- 残: T6/Y-family を (6.8) 本体へ入れるための `2 ≤ hyp.Yset.ncard` 下限と case c1/c2 top-level assembly。
 
 ## 参照
 
