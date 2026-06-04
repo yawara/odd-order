@@ -965,6 +965,73 @@ theorem abelian_rank_three_isUniquelyMaximal_of_fitting [Finite G] (hG : IsMinim
       hAab hAp hArank
   exact isUniquelyMaximal_of_abelian_rank_three hG hUab hUp hAp hAnc hUU hUrank hCA_rank
 
+/-- A global `SCN₃(p)` subgroup is abelian in the ambient group. -/
+private theorem isMulCommutative_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    IsMulCommutative A := by
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  exact IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
+    congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp hAscn3.isSCN.isMulCommutative
+      (⟨a, hAP ha⟩ : ↥(P : Subgroup G)) (Subgroup.mem_subgroupOf.mpr ha)
+      ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
+
+/-- A global `SCN₃(p)` subgroup is a `p`-subgroup in the ambient group. -/
+private theorem isPGroup_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    IsPGroup p A := by
+  obtain ⟨P, hAP, _hAscn3⟩ := hA
+  exact (P.isPGroup').to_le hAP
+
+/-- A global `SCN₃(p)` subgroup has ambient rank at least three. -/
+private theorem three_le_rank_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    3 ≤ rank ↥A := by
+  obtain ⟨P, hAP, hAscn3⟩ := hA
+  have h3A : 3 ≤ pRank ↥A p :=
+    hAscn3.le_pRank.trans
+      (pRank_le_of_injective
+        (f := (Subgroup.subgroupOfEquivOfLe hAP).toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hAP).injective)
+  exact h3A.trans (pRank_le_rank (G := ↥A) p)
+
+/-- The centralizer of a global `SCN₃(p)` subgroup is proper in a minimal odd simple group. -/
+private theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A ∈ S07.scn3Global p G) :
+    Subgroup.centralizer (A : Set G) < ⊤ := by
+  classical
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  have hArank : 2 ≤ rank ↥A := (by omega : (2 : ℕ) ≤ 3).trans
+    (three_le_rank_of_mem_scn3Global hA)
+  have hAne : A ≠ ⊥ := by
+    obtain ⟨q, hq, E, _hEea, hEA, hEnc⟩ :=
+      exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank A hArank
+    intro hAbot
+    have hEbot : E = ⊥ := le_bot_iff.mp (hEA.trans (le_of_eq hAbot))
+    haveI : Nontrivial ↥E := Nontrivial.of_not_isCyclic hEnc
+    exact ((Subgroup.nontrivial_iff_ne_bot E).mp inferInstance) hEbot
+  rw [lt_top_iff_ne_top]
+  intro hCtop
+  have hAleZ : A ≤ Subgroup.center G :=
+    Subgroup.centralizer_eq_top_iff_subset.mp hCtop
+  exact hAne (le_bot_iff.mp (hAleZ.trans (le_of_eq hZbot)))
+
+/-- A global `SCN₃(p)` subgroup has at least one maximal subgroup over its centralizer. -/
+private theorem exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A ∈ S07.scn3Global p G) :
+    ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) := by
+  classical
+  have hClt : Subgroup.centralizer (A : Set G) < ⊤ :=
+    centralizer_lt_top_of_mem_scn3Global hG hA
+  obtain ⟨M, hM, hCM⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer (A : Set G))).resolve_left hClt.ne
+  exact ⟨M, hM, hCM⟩
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 
@@ -978,22 +1045,26 @@ private theorem pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal [Finite G]
   classical
   by_contra hnot
   have h3F : 3 ≤ pRank ↥(S08.fittingInG M) p := by omega
-  obtain ⟨P, hAP, hAscn3⟩ := hA
-  have hAab : IsMulCommutative A :=
-    IsMulCommutative.of_setLike_mul_comm fun a ha b hb =>
-      congrArg Subtype.val (isMulCommutative_iff_of_setLike.mp hAscn3.isSCN.isMulCommutative
-        (⟨a, hAP ha⟩ : ↥(P : Subgroup G)) (Subgroup.mem_subgroupOf.mpr ha)
-        ⟨b, hAP hb⟩ (Subgroup.mem_subgroupOf.mpr hb))
-  have hAp : IsPGroup p A := (P.isPGroup').to_le hAP
-  have hArank : 3 ≤ rank ↥A := by
-    have h3A : 3 ≤ pRank ↥A p :=
-      hAscn3.le_pRank.trans
-        (pRank_le_of_injective
-          (f := (Subgroup.subgroupOfEquivOfLe hAP).toMonoidHom)
-          (Subgroup.subgroupOfEquivOfLe hAP).injective)
-    exact h3A.trans (pRank_le_rank (G := ↥A) p)
+  have hAab : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hArank : 3 ≤ rank ↥A := three_le_rank_of_mem_scn3Global hA
   exact hAnot
     ((abelian_rank_three_isUniquelyMaximal_of_fitting hG hM h3F) A hAab hAp hArank)
+
+/-- The opening choice in BG Lemma 9.5, bundled with the rank cut (9.6).
+
+For a counterexample `A ∈ SCN₃(p)` with `A ∉ 𝒰`, choose `M ∈ 𝓜(C_G(A))`; then Lemma 9.4
+implies `r_p(F(M)) ≤ 2`. -/
+private theorem exists_maximal_centralizer_and_pRank_fittingInG_le_two_of_not_scn3
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) :
+    ∃ M : Subgroup G,
+      M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) ∧
+        pRank ↥(S08.fittingInG M) p ≤ 2 := by
+  classical
+  obtain ⟨M, hMcont⟩ := exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global hG hA
+  have hM : M ∈ maximalSubgroups G := hMcont.1
+  exact ⟨M, hMcont, pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM hA hAnot⟩
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 

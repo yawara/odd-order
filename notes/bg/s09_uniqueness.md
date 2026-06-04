@@ -548,6 +548,13 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `p`-subgroup and Lemma 9.4 would force `A ∈ 𝒰`, contradicting the Lemma 9.5
    counterexample assumption. This proves the BG (9.6) rank cut once `M` has been
    chosen from `𝓜(C_G(A))`.
+
+   Follow-up S09 helpers are also in place: `isMulCommutative_of_mem_scn3Global`,
+   `isPGroup_of_mem_scn3Global`, `three_le_rank_of_mem_scn3Global`,
+   `centralizer_lt_top_of_mem_scn3Global`,
+   `exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global`, and the bundled
+   `exists_maximal_centralizer_and_pRank_fittingInG_le_two_of_not_scn3`, which realizes
+   the opening choice `M ∈ 𝓜(C_G(A))` together with BG (9.6).
 2. `normalizer_le_maximal_of_scn3Global_intermediate` for the BG L2573-L2589 step
    `A ≤ R ≤ P ∩ M → N_G(R) ≤ M`, consuming S07 Theorems 7.6 and 7.4.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
