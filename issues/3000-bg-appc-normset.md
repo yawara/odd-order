@@ -218,6 +218,10 @@ created: 2026-06-04
   `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
   等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の
   “mod P” で `U` 成分だけを取り出す入力。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
+  `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
+  `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P0-Q intersection bridge**: `W2_pow_p_eq_one`、
   `Q_pow_q_eq_one`、`W2_inf_Q_eq_bot` を公開し、`W₂=σ(P₀)` と `Q` の交わりが
   自明であることを concrete data から導出。BG Step4 の “mod Q, since P₀∩Q=1”

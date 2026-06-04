@@ -2472,6 +2472,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_iff_left_right_eq
 
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
+
 -- BG App C Lemma C.3 Step 4: the transported `Q` is commutative, so the
 -- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
 -- can be reordered.

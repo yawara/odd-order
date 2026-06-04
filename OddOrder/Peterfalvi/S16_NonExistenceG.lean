@@ -210,7 +210,23 @@ noncomputable def fieldNormalizerComplement (hyp : Hypothesis (G := G)) :
       OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q →*
         fieldNormalizerFrobeniusGroup hyp).range
 
-/-- The concrete norm-one unit group used as BG's complement before transport
+/-- In the concrete BG Frobenius group `P ⋊ U`, the additive kernel and the
+norm-one complement meet trivially. -/
+theorem fieldNormalizerKernel_inf_complement_eq_bot (hyp : Hypothesis (G := G)) :
+    fieldNormalizerKernel hyp ⊓ fieldNormalizerComplement hyp = ⊥ := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  rcases hx.1 with ⟨p, rfl⟩
+  rcases hx.2 with ⟨u, hu⟩
+  have hp : p = 1 := by
+    have hleft := congrArg
+      (fun g : fieldNormalizerFrobeniusGroup hyp => g.left) hu
+    simpa using hleft.symm
+  subst p
+  simp
+
+/-- The concrete norm-one unit group used as the BG complement before transport
 through the field-normalizer embedding. -/
 abbrev fieldNormalizerNormOneUnits (hyp : Hypothesis (G := G)) : Type _ :=
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
@@ -357,6 +373,33 @@ noncomputable def normOneUnitsEquivU {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) : fieldNormalizerNormOneUnits hyp ≃* hyp.base.U :=
   MulEquiv.ofBijective data.normOneUnitsToU
     ⟨data.normOneUnitsToU_injective, data.normOneUnitsToU_surjective⟩
+
+/-- The transported additive kernel `P` and complement `U` meet trivially in
+`G`.  This is the S16-facing form of the `U ∩ P = 1` input used when BG
+Appendix C, Lemma C.3 Step 4 reads equations modulo `P`. -/
+theorem P_inf_U_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.P ⊓ hyp.base.U = ⊥ := by
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  have hxP : x ∈ (fieldNormalizerKernel hyp).map data.sigma := by
+    rw [data.sigma_P_eq_P]
+    exact hx.1
+  have hxU : x ∈ (fieldNormalizerComplement hyp).map data.sigma := by
+    rw [data.sigma_U_eq_U]
+    exact hx.2
+  rcases hxP with ⟨p, hpP, hp⟩
+  rcases hxU with ⟨u, huU, hu⟩
+  have hpu : p = u := data.sigma_injective (by
+    rw [hp, hu])
+  have hp_inter : p ∈ fieldNormalizerKernel hyp ⊓ fieldNormalizerComplement hyp := by
+    exact ⟨hpP, by rwa [hpu]⟩
+  have hp_one : p = 1 := by
+    have hp_bot : p ∈ (⊥ : Subgroup (fieldNormalizerFrobeniusGroup hyp)) := by
+      rw [← fieldNormalizerKernel_inf_complement_eq_bot hyp]
+      exact hp_inter
+    simpa [Subgroup.mem_bot] using hp_bot
+  rw [Subgroup.mem_bot]
+  rw [← hp, hp_one, map_one]
 
 /-- Applying the norm-one/unit equivalence is just `σ` on the concrete
 semidirect-product complement. -/
