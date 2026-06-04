@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.GroupTheory.MaximalSubgroup
@@ -171,18 +172,163 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     IsUniquelyMaximal A := by
   sorry
 
-/-- **BG Theorem 9.6 (The Uniqueness Theorem)** (mmd L2627): `K ⊆ G`, `r(K) ≥ 2`、
+/-- A local `SCN₃(P)` subgroup of a Sylow subgroup, viewed in `G`, is a global
+`SCN₃(p)` subgroup. -/
+private theorem scn3Global_of_scn3_sylow [Finite G]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p G) {A : Subgroup ↥(P : Subgroup G)}
+    (hA : IsSCN₃ p A) :
+    A.map (P : Subgroup G).subtype ∈ S07.scn3Global p G := by
+  classical
+  have hAP : A.map (P : Subgroup G).subtype ≤ (P : Subgroup G) :=
+    Subgroup.map_subtype_le A
+  refine ⟨P, hAP, ?_⟩
+  have htarget :
+      (A.map (P : Subgroup G).subtype).subgroupOf (P : Subgroup G) = A := by
+    apply (Subgroup.map_subtype_inj (H := (P : Subgroup G))).mp
+    rw [Subgroup.map_subgroupOf_eq_of_le hAP]
+  rwa [htarget]
+
+/-- If `K` has rank at least two, then `C_G(K)` is proper. -/
+private theorem centralizer_lt_top_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
+    {K : Subgroup G} (hr : 2 ≤ rank ↥K) :
+    Subgroup.centralizer (K : Set G) < ⊤ := by
+  classical
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  have hKne : K ≠ ⊥ := by
+    obtain ⟨p, hp, A, _hAea, hAK, hAnc⟩ :=
+      exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
+    intro hKbot
+    have hA_bot : A = ⊥ := le_bot_iff.mp (hAK.trans (le_of_eq hKbot))
+    haveI : Nontrivial ↥A := Nontrivial.of_not_isCyclic hAnc
+    exact ((Subgroup.nontrivial_iff_ne_bot A).mp inferInstance) hA_bot
+  rw [lt_top_iff_ne_top]
+  intro hCtop
+  have hKleZ : K ≤ Subgroup.center G :=
+    Subgroup.centralizer_eq_top_iff_subset.mp hCtop
+  have hKbot : K = ⊥ := by
+    exact le_bot_iff.mp (hKleZ.trans (le_of_eq hZbot))
+  exact hKne hKbot
+
+/-- Proper form of BG Theorem 9.6 for the branch `r(K) ≥ 3`. -/
+private theorem isUniquelyMaximal_of_three_le_rank_of_lt_top [Finite G]
+    (hG : IsMinimalSimpleOdd G) {K : Subgroup G} (hKlt : K < ⊤)
+    (hr3 : 3 ≤ rank ↥K) :
+    IsUniquelyMaximal K := by
+  classical
+  obtain ⟨p, hp, hpRankK⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 3) (by norm_num) hr3
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨B₀, hB₀ea, hB₀log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥K) (p := p) (n := 3) (by norm_num) hpRankK
+  let B : Subgroup G := B₀.map K.subtype
+  have hBea : B.IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.map K.subtype_injective hB₀ea
+  have hBK : B ≤ K := by
+    intro x hx
+    rcases Subgroup.mem_map.mp hx with ⟨y, _hy, rfl⟩
+    exact y.2
+  have hBlog : 3 ≤ Nat.log p (Nat.card B) := by
+    rw [show B = B₀.map K.subtype from rfl,
+      Subgroup.card_map_of_injective K.subtype_injective]
+    exact hB₀log
+  have hBnc : ¬ IsCyclic ↥B :=
+    not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hBea (by omega)
+  have hBp : IsPGroup p B := hBea.isPGroup
+  have hp_dvd_B : p ∣ Nat.card B := by
+    obtain ⟨n, hn⟩ := hBp.exists_card_eq
+    have hnpos : 0 < n := by
+      by_contra hn0
+      have hn_zero : n = 0 := by omega
+      rw [hn_zero, pow_zero] at hn
+      rw [hn] at hBlog
+      norm_num at hBlog
+    rw [hn]
+    exact dvd_pow_self p hnpos.ne'
+  have hp_odd : Odd p :=
+    hG.odd.of_dvd_nat (hp_dvd_B.trans (Subgroup.card_subgroup_dvd_card B))
+  obtain ⟨P, hBP⟩ := hBp.exists_le_sylow
+  have h3P : 3 ≤ pRank ↥(P : Subgroup G) p := by
+    let Bsub : Subgroup ↥(P : Subgroup G) := B.subgroupOf (P : Subgroup G)
+    have hBsub_ea : Bsub.IsElementaryAbelian p :=
+      IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hBP).symm hBea
+    have hBsub_log : 3 ≤ Nat.log p (Nat.card Bsub) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBP).toEquiv]
+      exact hBlog
+    exact hBsub_log.trans (le_pRank Bsub hBsub_ea)
+  obtain ⟨A₀, hA₀scn⟩ :=
+    OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank
+      (R := ↥(P : Subgroup G)) hp_odd P.isPGroup' h3P
+  let A : Subgroup G := A₀.map (P : Subgroup G).subtype
+  have hAglobal : A ∈ S07.scn3Global p G := by
+    change A₀.map (P : Subgroup G).subtype ∈ S07.scn3Global p G
+    exact scn3Global_of_scn3_sylow P hA₀scn
+  have hAU : IsUniquelyMaximal A :=
+    scn3_isUniquelyMaximal hG hAglobal
+  have hAab : IsMulCommutative A := by
+    haveI : IsMulCommutative A₀ := hA₀scn.isSCN.isMulCommutative
+    change IsMulCommutative (A₀.map (P : Subgroup G).subtype)
+    infer_instance
+  have hAp : IsPGroup p A := by
+    change IsPGroup p (A₀.map (P : Subgroup G).subtype)
+    exact (P.isPGroup'.to_subgroup A₀).map (P : Subgroup G).subtype
+  have hmA : 3 ≤ rank ↥A := by
+    have h3pRankA : 3 ≤ pRank ↥A p := by
+      have hmono :
+          pRank A₀ p ≤ pRank ↥(A₀.map (P : Subgroup G).subtype) p :=
+        pRank_le_of_injective
+          (f := (Subgroup.equivMapOfInjective A₀ (P : Subgroup G).subtype
+            (P : Subgroup G).subtype_injective).toMonoidHom)
+          (Subgroup.equivMapOfInjective A₀ (P : Subgroup G).subtype
+            (P : Subgroup G).subtype_injective).injective
+      exact hA₀scn.le_pRank.trans hmono
+    exact h3pRankA.trans (pRank_le_rank (G := ↥A) p)
+  have hB_le_CB : B ≤ Subgroup.centralizer (B : Set G) := by
+    intro b hb
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    exact (congrArg Subtype.val (hBea.comm ⟨b, hb⟩ ⟨c, hc⟩)).symm
+  have hrB : 3 ≤ pRank ↥(Subgroup.centralizer (B : Set G)) p := by
+    let Bsub : Subgroup ↥(Subgroup.centralizer (B : Set G)) :=
+      B.subgroupOf (Subgroup.centralizer (B : Set G))
+    have hBsub_ea : Bsub.IsElementaryAbelian p :=
+      IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hB_le_CB).symm hBea
+    have hBsub_log : 3 ≤ Nat.log p (Nat.card Bsub) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hB_le_CB).toEquiv]
+      exact hBlog
+    exact hBsub_log.trans (le_pRank Bsub hBsub_ea)
+  have hBU : IsUniquelyMaximal B :=
+    isUniquelyMaximal_of_abelian_rank_three hG hAab hAp hBp hBnc hAU hmA hrB
+  exact hBU.of_le_of_lt_top hBK hKlt
+
+/-- **BG Theorem 9.6 (The Uniqueness Theorem)** (mmd L2627): `K < G`, `r(K) ≥ 2`、
 `r(K) ≥ 3` または `r(C_G(K)) ≥ 3` ⇒ `K ∈ 𝒰`。線形チェーン 9.1→9.5 の終結。
 
 Proof gate: mmd L2629 applies BG Lem 5.1 to obtain an `SCN₃(P)` subgroup inside a
 Sylow `p`-subgroup containing an elementary abelian subgroup of rank 3. This is the
 direct §5 dependency for §9 and should not be replaced by Peterfalvi-style type
-classification hypotheses. -/
+classification hypotheses. Lean carries `K < ⊤` explicitly because `K ∈ 𝒰` includes
+properness by definition. -/
 theorem uniquenessTheorem [Finite G] (hG : IsMinimalSimpleOdd G)
-    {K : Subgroup G} (hr2 : 2 ≤ rank ↥K)
+    {K : Subgroup G} (hKlt : K < ⊤) (hr2 : 2 ≤ rank ↥K)
     (hr3 : 3 ≤ rank ↥K ∨ 3 ≤ rank ↥(Subgroup.centralizer (K : Set G))) :
     IsUniquelyMaximal K := by
-  sorry
+  rcases hr3 with h3K | h3C
+  · exact isUniquelyMaximal_of_three_le_rank_of_lt_top hG hKlt h3K
+  · let C : Subgroup G := Subgroup.centralizer (K : Set G)
+    have hClt : C < ⊤ := centralizer_lt_top_of_two_le_rank hG hr2
+    have hCU : IsUniquelyMaximal C :=
+      isUniquelyMaximal_of_three_le_rank_of_lt_top hG hClt h3C
+    have hKleCC : K ≤ Subgroup.centralizer (C : Set G) := by
+      intro k hk
+      rw [Subgroup.mem_centralizer_iff]
+      intro c hc
+      exact (Subgroup.mem_centralizer_iff.mp hc k hk).symm
+    exact isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hCU hKleCC hr2
 
 /-- If an elementary abelian subgroup of order `p^2` is not maximal among elementary abelian
 `p`-subgroups, then its centralizer has rank at least three. This is the rank bridge behind
@@ -244,7 +390,16 @@ theorem isUniquelyMaximal_of_mem_e2_not_maximal [Finite G] (hG : IsMinimalSimple
       rw [hA2.2, Nat.log_pow (Fact.out : p.Prime).one_lt]
     exact (le_of_eq hlog.symm).trans hlog_le
   have hr2 : 2 ≤ rank ↥A := h2pRank.trans (pRank_le_rank (G := ↥A) p)
-  exact uniquenessTheorem hG hr2
+  have hAlt : A < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hAtop
+    have hcomm : ∀ a b : G, a * b = b * a := by
+      intro a b
+      exact congrArg Subtype.val
+        (hAea.comm (⟨a, hAtop ▸ Subgroup.mem_top a⟩ : A)
+          (⟨b, hAtop ▸ Subgroup.mem_top b⟩ : A))
+    exact hG.notSolvable (isSolvable_of_comm hcomm)
+  exact uniquenessTheorem hG hAlt hr2
     (Or.inr (three_le_rank_centralizer_of_mem_e2_not_maximal hA2 hAns))
 
 end OddOrder.BG.Ch2.S09
