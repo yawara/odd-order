@@ -721,6 +721,30 @@ theorem oPiCore_isComplement_of_hasNormalPComplement {p : ℕ} [Fact p.Prime]
   rw [← hK_eq]
   exact hK_compl P
 
+/-- The quotient by the canonical normal `p`-complement is isomorphic to any Sylow
+`p`-subgroup. -/
+noncomputable def quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement {p : ℕ}
+    [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G) (P : Sylow p G) :
+    G ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} G ≃* (P : Subgroup G) :=
+  (oPiCore_isComplement_of_hasNormalPComplement hG P).symm.QuotientMulEquiv
+
+/-- If `G` has a normal `p`-complement, then quotienting by the canonical complement
+leaves a `p`-group. -/
+theorem isPGroup_quotient_oPiCore_of_hasNormalPComplement {p : ℕ} [Fact p.Prime]
+    (hG : Ch05.HasNormalPComplement p G) :
+    IsPGroup p (G ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} G) := by
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
+  exact P.isPGroup'.of_equiv
+    (quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement hG P).symm
+
+/-- The canonical normal `p`-complement quotient has the same cardinality as a Sylow
+`p`-subgroup. -/
+theorem card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement {p : ℕ}
+    [Fact p.Prime] (hG : Ch05.HasNormalPComplement p G) (P : Sylow p G) :
+    Nat.card (G ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} G) = Nat.card ↥(P : Subgroup G) := by
+  exact Nat.card_congr
+    (quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement hG P).toEquiv
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04
