@@ -147,9 +147,11 @@ created: 2026-06-04
   `normSetE_ncard_ge_two_of_five_le` を配線。循環 import なしで `sorry` を除去。
 - [x] **Lemma C.3 p=3 branch**: BG C.3 note を `normSetE_eq_inv_of_p_eq_three` として純有限体で証明。characteristic 3 では `2*a-1=2-a` なので generator-relation argument なしで `E=E⁻¹`。AxiomsCheck 登録済み。
 - [x] **AppC-facing Lemma C.3 interface**: `S16.FieldNormalizerData` の C.3 obligation を最終結論 `E=E⁻¹` から generator-relation 出力 `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) に細分化し、`AppC_FinalContradiction.lemmaC3_inverse_closed` は純有限体補題経由で `sorry` なしに維持 (2026-06-04, branch `codex/ft-appc-downstream`)。
-- [x] **Lemma C.3 Step 1 finite-field core**: condition(A) 下の直積分解
+- [x] **Lemma C.3 Step 1 finite-field/semidirect core**: condition(A) 下の直積分解
   `𝔽_{p^q}ˣ = 𝔽_pˣ · U` から、任意の非零 prime-field line `𝔽_p s` に対して全 field 点が
-  `U`-orbit に入る `exists_normOne_mul_primeLine_eq` を証明。AxiomsCheck 登録済み。
+  `U`-orbit に入る `exists_normOne_mul_primeLine_eq` を証明。さらに concrete `P⋊U` 内の任意の元を
+  `u s₁ v` (`u,v∈U`, `s₁∈𝔽_p s`) と書く
+  `normOneFrobenius_exists_inr_primeLine_inr` まで materialize。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 2 finite-field core**: `U ∩ 𝔽_pˣ = 1` から
   `normOneUnits_eq_one_of_mem_primeFieldUnits` を公開し、prime-field line 上の relation
   `c*s + u*(d*s)=0` が BG Step 2 の二択 `(c=d=0) ∨ (u=1 ∧ c+d=0)` を強制する

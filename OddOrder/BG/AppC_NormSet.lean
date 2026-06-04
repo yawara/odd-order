@@ -646,7 +646,7 @@ theorem inv_mem_of_twistedInv_step {α : Type*} [Group α] (φ : MulAut α) (S :
   rw [iterate_twistedInv_odd φ n x] at hiter_mem
   simpa [hφp] using hiter_mem
 
-/-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
+/-! ### The Frobenius semidirect product `P ⋊ U` for Lemmas C.2 and C.3 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the
 kernel factor in mathlib's `SemidirectProduct`. -/
@@ -684,6 +684,39 @@ theorem normOneFrobenius_conj_inl [Fact p.Prime] (u : normOneUnits p q)
         (Multiplicative.ofAdd (((u : (GaloisField p q)ˣ) : GaloisField p q) * s)) := by
   rw [← SemidirectProduct.inl_aut, SemidirectProduct.inl_inj]
   exact Multiplicative.toAdd.injective (normOneMulAction_apply p q u s)
+
+/-- **BG Appendix C, Lemma C.3, Step 1 semidirect form**: fixing a nonzero
+prime-field line `𝔽_p s`, every element of the concrete `P ⋊ U` can be written
+as `u s₁ v` with `u, v ∈ U` and `s₁ ∈ 𝔽_p s`. -/
+theorem normOneFrobenius_exists_inr_primeLine_inr [Fact p.Prime]
+    (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    {s : GaloisField p q} (hs : s ≠ 0) (g : normOneFrobeniusGroup p q) :
+    ∃ c : ZMod p, ∃ u v : normOneUnits p q,
+      g = (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd ((algebraMap (ZMod p) (GaloisField p q) c) * s)) *
+        SemidirectProduct.inr v := by
+  obtain ⟨c, u, hx⟩ :=
+    exists_normOne_mul_primeLine_eq p q hq hA (s := s) (x := g.left.toAdd) hs
+  refine ⟨c, u, u⁻¹ * g.right, ?_⟩
+  let y : GaloisField p q := (algebraMap (ZMod p) (GaloisField p q) c) * s
+  have hleft :
+      (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) =
+        (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) * SemidirectProduct.inr u⁻¹ := by
+    rw [normOneFrobenius_conj_inl p q u y]
+    simp [y, ofAdd_toAdd, ← hx]
+  calc
+    g = (SemidirectProduct.inl g.left : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inr g.right := (SemidirectProduct.inl_left_mul_inr_right g).symm
+    _ = ((SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) * SemidirectProduct.inr u⁻¹) *
+          SemidirectProduct.inr g.right := by rw [hleft]
+    _ = (SemidirectProduct.inr u : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inl (Multiplicative.ofAdd y) *
+          SemidirectProduct.inr (u⁻¹ * g.right) := by
+      simp [mul_assoc]
 
 /-- The BG pair condition `u*s + v*s = 2*s`, already used in
 `normOnePairSetAt`, is exactly the assertion that the corresponding two elements

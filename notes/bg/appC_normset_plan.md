@@ -282,6 +282,8 @@ Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p�
 
 **2026-06-04 現在の形式化 frontier**: Step1/Step2 の純有限体 core は
 `exists_normOne_mul_primeLine_eq` / `generatorRelation_step2_primeLine` として証明済み。
+Step1 はさらに concrete `P⋊U` 内の `u s₁ v` 分解
+`normOneFrobenius_exists_inr_primeLine_inr` まで semidirect form に持ち上げ済み。
 Step3 の `U`-既約作用入力も
 `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。さらに concrete `P⋊U` 内で
 非零 `U`-不変 subspace が `U` とともに全体を生成する

@@ -1906,9 +1906,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
 
 -- BG App C Lemma C.3 Step 1: under condition (A), every field element
--- lies in the `U`-orbit of any fixed nonzero prime-field line.
+-- lies in the `U`-orbit of any fixed nonzero prime-field line; equivalently,
+-- every concrete `P ⋊ U` element has a `u s₁ v` decomposition with
+-- `s₁ ∈ 𝔽_p s`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeFieldUnit_mul_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeLine_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_exists_inr_primeLine_inr
 
 -- BG App C Lemma C.3 Step 3: the norm-one subgroup acts irreducibly on
 -- the additive `𝔽_p`-space `𝔽_{p^q}` under condition (A), and therefore
