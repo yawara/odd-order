@@ -1479,6 +1479,26 @@ noncomputable def delta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
   H78.beta - Hypothesis71.constOne G +
     H78.nu (H78.hyp76.zeta H78.zetaDistinct)
 
+/-- If `β` is a virtual character and `ν` is a concrete coherent extension on
+`S = T \ {Ind 1_H}`, then the residual `Δ = β - 1_G + νζ` is virtual. -/
+theorem delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hbeta : H78.beta ∈ ZIrr G) :
+    H78.delta ∈ ZIrr G := by
+  have hconst : Hypothesis71.constOne G ∈ ZIrr G := by
+    have htriv : OddOrder.RepresentationTheory.trivialClassFunction G ∈ ZIrr G :=
+      OddOrder.RepresentationTheory.trivialClassFunction_isIrreducible.mem_ZIrr
+    simpa [Hypothesis71.constOne, OddOrder.RepresentationTheory.trivialClassFunction]
+      using htriv
+  have hzeta : H78.nu (H78.hyp76.zeta H78.zetaDistinct) ∈ ZIrr G :=
+    H78.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh hnu
+  simpa [delta] using Submodule.add_mem (ZIrr G)
+    (Submodule.sub_mem (ZIrr G) hbeta hconst) hzeta
+
 /-- The defining rearrangement `β = 1_G - ζ^ν + Δ`. -/
 theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
     H78.beta =
@@ -3081,6 +3101,23 @@ theorem conclusion_of_delta_cross_nonzero (H79 : Hypothesis79 G A₁ L₁ A₂ L
     apply hleft
     rw [Hypothesis71.ClassFunction.inner_symm H79.second.beta H79.firstZetaImage,
       hzero, star_zero]
+
+/-- Virtual-character residuals make the three residual cross terms integral. -/
+theorem delta_cross_integral_of_ZIrr
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hδ₁ : H79.first.delta ∈ ZIrr G)
+    (hδ₂ : H79.second.delta ∈ ZIrr G)
+    (hζ₁ : H79.firstZetaImage ∈ ZIrr G)
+    (hζ₂ : H79.secondZetaImage ∈ ZIrr G) :
+    (∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ)) ∧
+    (∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
+    (∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) := by
+  exact ⟨ClassFunction.inner_mem_ZIrr_int hδ₁ hζ₂,
+    ClassFunction.inner_mem_ZIrr_int hζ₁ hδ₂,
+    ClassFunction.inner_mem_ZIrr_int hδ₁ hδ₂⟩
 
 /-- Integer-parity form of the last step of Peterfalvi (7.9): once the two
 residual cross terms are integers and `(Δ₁,Δ₂)` is an even integer, the displayed

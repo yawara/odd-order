@@ -440,3 +440,16 @@ S09 に `sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct`,
 `e` であるという自然な (7.8) 入力から、(7.8.a) の distinguished column computation
 `⟨Σ, νζ⟩ = 1` と `(β, νζ) = a - 1` を直接取り出せる。新しい証明書フィールドは追加しておらず、既存の
 source orthogonality / weighted-sum consumer を downstream が再構成しなくてよい形にした bridge pass。
+
+
+### 2026-06-04 pass: residual ZIrr bridges for (7.9)
+
+S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と
+`Hypothesis79.delta_cross_integral_of_ZIrr` を追加した。前者は `β ∈ ZIrr G` と concrete S07
+coherence witness から `Δ = β - 1_G + νζ ∈ ZIrr G` を作る bridge。後者は `Δ₁`, `Δ₂`,
+`ζ₁^ν`, `ζ₂^ν` が virtual character であることから、(7.9) の residual cross terms が整数値になることを
+`ClassFunction.inner_mem_ZIrr_int` へ落とす。
+
+これで (7.9) の parity consumer `conclusion_of_delta_cross_integral_parity` に渡す入力のうち、
+整数性部分は ZIrr membership へ局所化された。残る実数学入力は `β ∈ ZIrr` の構成、`(Δ₁,Δ₂)` の偶性、
+および source/coherence 由来の `ζ` cross-orthogonality。

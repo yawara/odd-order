@@ -2165,6 +2165,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_mem_ZIrr_of_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.nu_zetaDistinct_mem_ZIrr_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
 -- Peterfalvi (7.8) norm-one and signed-irreducible image bridges for coherent `ζᵢ`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.zeta_inner_self_eq_one_of_irreducible
@@ -2242,6 +2245,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_expand_delta
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_equation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_integral_of_ZIrr
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_nonzero
 #assert_only_allowed_axioms
