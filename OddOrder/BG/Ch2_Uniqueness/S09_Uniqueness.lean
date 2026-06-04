@@ -55,6 +55,7 @@ namespace OddOrder.BG.Ch2.S09
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
@@ -460,6 +461,28 @@ private theorem isUniquelyMaximal_of_rank_drop_witness [Finite G]
     exact (Subgroup.mem_centralizer_iff.mp (hBstar_le_CB hbstar) b hb).symm
   have hrB : 2 ≤ rank ↥B := two_le_rank_of_noncyclic_pSubgroup hG hBp hBnc
   exact isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hBstarU hB_le_CBstar hrB
+
+/-- Any finite `p`-subgroup can be conjugated into a chosen Sylow `p`-subgroup.
+
+This is the Sylow-conjugacy bridge used in BG Corollary 9.3's line "replacing by
+conjugates": after extracting a `p`-subgroup witness, choose a Sylow containing it and
+conjugate that Sylow to the fixed one. -/
+private theorem exists_conj_le_sylow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {Q : Subgroup G} (hQ : IsPGroup p Q) (P : Sylow p G) :
+    ∃ g : G, ((MulAut.conj g) • Q : Subgroup G) ≤ (P : Subgroup G) := by
+  classical
+  obtain ⟨Q', hQQ'⟩ := hQ.exists_le_sylow
+  haveI : MulAction.IsPretransitive G (Sylow p G) := Sylow.isPretransitive_of_finite
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q' P
+  refine ⟨g, ?_⟩
+  have hle : ((MulAut.conj g) • Q : Subgroup G) ≤
+      ((MulAut.conj g) • (Q' : Subgroup G) : Subgroup G) :=
+    (Subgroup.pointwise_smul_le_pointwise_smul_iff).mpr hQQ'
+  have hQ'eq : ((MulAut.conj g) • (Q' : Subgroup G) : Subgroup G) =
+      (P : Subgroup G) := by
+    have := congrArg Sylow.toSubgroup hg
+    rwa [Sylow.coe_subgroup_smul] at this
+  exact hle.trans (le_of_eq hQ'eq)
 
 /-- BG Corollary 9.3 cascade with the `B*`-side rank drop supplied by a normal
 `E_{p^2}` witness inside an overgroup `P`.

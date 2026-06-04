@@ -449,3 +449,16 @@ remaining `sorry`. What remains is the genuinely book-specific conjugation/commo
 put `A` and the extracted `B*` into a common Sylow `p`-overgroup (up to conjugacy), then supply
 Lemma 4.5's normal noncyclic `E_{p^2}` witness `D ⊴ P` and feed it to
 `isUniquelyMaximal_of_overgroup_rank_three_witness`.
+
+
+### Lean API status (2026-06-04, Sylow conjugacy bridge)
+
+The Corollary 9.3 common-Sylow step now has the local helper
+`exists_conj_le_sylow_of_isPGroup`: for any finite `p`-subgroup `Q` and fixed Sylow
+`P`, a conjugate of `Q` lies in `P`. It combines `IsPGroup.exists_le_sylow` with
+Sylow conjugacy (`Sylow.isPretransitive_of_finite`) and the pointwise conjugation action.
+
+This is the Lean form of BG's "Replacing by conjugates if necessary" line. The remaining
+Corollary 9.3 gap is to prove the relevant hypotheses are invariant under the chosen
+conjugations, then apply the overgroup witness wrapper after Lemma 4.5 supplies the normal
+`E_{p^2}` subgroup inside the common Sylow.
