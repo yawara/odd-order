@@ -96,6 +96,14 @@ family-free honest sub-lemma 2개를 `S07_Coherence.lean`에 landing (sorry/axio
   `Submodule.subset_span` (ζt∈S⊆zSpan S)로 격자 `extension_inner_eq` 공급. 약화는 consumer
   증명을 **쉽게** 만들 뿐 (전역성 미사용이었음). `sibleySetup_is_coherent` (S08:188, 여전히
   sorry)는 약화된 `CoherenceTarget`에 그대로 typecheck — 향후 증명도 약화로 더 쉬워짐.
+- **2026-06-04 追記**: `IndChainDecomposition` consumer helper 5 件 (`image_eq_zero`,
+  `inner_chi_eq_ite`, `inner_chi_weightedOutput`, `weightedOutput_inner_self_eq_sum_sq`,
+  `ofIsCoherent`) を AxiomsCheck に登録。(7.10) 側がこの interface を使うとき、`sibleySetup_is_coherent`
+  の未完成 proof と独立に consumer packaging が axiom-clean であることを CI で固定した。
+- **2026-06-04 追記 2**: `weightedDifferenceInput` / `image_weightedDifferenceInput` を追加。
+  (7.10) で使う整数係数付き source difference `∑ d_t(ζ_t - d_tζ_0)` へ `image_eq` を合成する
+  ℤ-linear consumer lemma。`IntegralCharacterMap` は ℂ-linear ではないため、source 側は `zsmul`
+  で表現し `map_zsmul` で証明する。AxiomsCheck 登録済み、3 axiom allowlist 内。
 - **의의**: (5.6)은 쌍 인접으로 coherence를 짓는 **귀납 엔진**, §6 (case-A/B coherence) 및
   궁극적으로 S08:188 `sibleySetup_is_coherent`로의 관문. 상세는 issue 0046 pass-5.
 
@@ -187,6 +195,64 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
   `2χᵢ(1)χ₁(1)<∑_{j<i}χⱼ(1)²`) + base prefix coherence ((1.1)/(1.4)). 이들이 `coherentPairChain`의
   `hstep`/`h0`를 채움.
 
+### (2026-06-04) T8.11l `XAdjoinStepInput` assembly from member-family degree ratios
+
+`S08_CoherenceTheorems.lean` に
+`SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeRatios` を landing。これは
+`pairUnion (xBaseBlock Z) pair i` の member-family cover と anchor `χ₁` に対する explicit degree ratios を
+受け取り、per-step `XAdjoinStepInput` を直接構成する bridge。
+
+放電済み field:
+
+- new pair core: `hrealχ`/`hdiffsuppχ`/4 orthogonality/prefix orthogonality は
+  `xPair_stepCoreFacts_of_irreducible_X` から。
+- member scaled supports: `hmemdegdiffsupp` は `xMember_scaledDiffSupports_of_degreeData` から。
+- new scaled support and ZIrr: `hdiffasuppχ` と `htau1_memaχ` は
+  `xMember_scaledDiffSupport_of_degreeData` + `scaledDiff_dadeImage_mem_ZIrr` から。
+- `hSgen`: prefix cover `hcover` と member scaled supports を
+  `S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` に渡して構成。
+
+この bridge の残 input は意図的に純算術側へ押し込めている:
+
+- `ha1 : deg i₁ = 1`
+- `hdeg_mem : χmem j (1) = deg j * χ₁(1)`
+- `hdegχ : χᵢ(1) = a * χ₁(1)`
+- `hDeg : 2 * (a : ℝ) < ∑ j∈s, (deg j : ℝ)^2`
+
+追加で `normalizedDegreeGap_of_realDegreeBound` を landing。絶対次数不等式
+`2 * χᵢ(1) * χ₁(1) < ∑ χmem(j)(1)^2` と同じ anchor に対する ratio data から、anchor の正の
+次数 `χ₁(1)^2` で割って normalized `hDeg` を得る。
+
+これで `xAdjoinStepInput_of_memberFamily_degreeRatios` に渡す `hDeg` は、§6.6 側が absolute bound を
+出せば直接変換できる形になった。ratio 生成は `exists_pos_natDegreeRatioFamily_of_dvd` と
+`exists_pos_natDegreeRatio_of_dvd` で用意済み。
+
+さらに `realDegreeBound_of_natDegreeSumPrimePowerGap` と
+`normalizedDegreeGap_of_natDegreeSumPrimePowerGap` を landing。§7 の純算術 leaf
+`two_mul_lt_sq_of_primePow_gap` + `two_mul_lt_of_sq_dvd_of_gap` を、S08 の real absolute degree bound
+および normalized `hDeg` へ直接接続した。caller が自然数 degree 値、member square-sum identity
+`∑ dmem(j)^2 = D`、prime-power gap data、square-divisibility `dχ^2 ∣ D` を供給すれば、
+`xAdjoinStepInput_of_memberFamily_degreeRatios` の `hDeg` まで一気に得られる。
+
+残る真正 §6.6 入力は、real/normalized 変換ではなく、character theory から自然数 degree 値・
+member square-sum identity・prime-power gap・square-divisibility data を生成する部分。
+
+同日追記: `exists_natDegreeData_for_xAdjoinMemberFamily` と
+`SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap` を landing。前者は新規文字・
+anchor・finite member family の自然数 degree witness と member square-sum `D`、および `i₁ ∈ s`
+からの `0 < D` を package する。後者は member-family cover + degree-ratio equations + natural degree
+witnesses + prime-power/square-divisibility gap data から、normalized `hDeg` を別途渡さず直接
+`XAdjoinStepInput` を構成する bridge。これで §6.6 側の frontier は、ratio equation 自体と
+square-divisibility/prime-power data を実際の character theory から生成する部分にさらに絞られた。
+
+同日追記 2: `SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap`
+を landing。`exists_pos_natDegreeRatioFamily_of_dvd` / `exists_pos_natDegreeRatio_of_dvd` で
+member-family ratio function `deg` と新規 scalar `a` を divisibility hypotheses から非計算的に選び、
+上の nat-gap bridge に接続する。§6.6 caller は ratio equation を直接作らず、degree divisibility +
+natural degree values + prime-power/square-divisibility gap data を出せば `XAdjoinStepInput` まで
+進める形になった。残 frontier はこの divisibility と square-divisibility/prime-power data の
+実 character-theoretic producer。
+
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 
 `coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <
@@ -220,7 +286,103 @@ allowlist):
   ⟹ `θᵢ(1)²∣head`). **additive equation**로 진술해 ℕ subtraction 회피.
 - **`sq_dvd_of_factored_coprime`** (ℕ): `χᵢ(1)=idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`.
   mmd L80 coprimality forcing (`(|L:K|,p)=1` & θ p-power ⟹ `Coprime idx² θ²`; coprime divisors 곱).
-- **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
+- **2026-06-04 追記**: **`sq_dvd_of_factored_coprime_add_complement`** を追加。`head+tail=total`,
+  `θ²∣tail`, `θ²∣total`, `idx²∣head`, `χᵢ(1)=idx·θ`, `Coprime idx θ` から `χᵢ(1)²∣head` を直接返す
+  consumer-facing 版で、上の additive complement と coprime forcing を S08 `hdvd` 入力の形に合成する。
+- **2026-06-04 追記 2**: **`sq_dvd_sum_sq_mul_of_dvd`** を追加。`∀ j∈tail, θ∣θⱼ` から
+  `θ²∣∑_{j∈tail}(idxⱼ·θⱼ)²` を返し、`θᵢ(1)²∣∑_{j≥i}` の `Finset.dvd_sum` 部分を独立に閉じる。
+- **2026-06-04 追記 3**: **`sq_dvd_primePow_of_sq_le`** / **`sq_dvd_primePow_mul_of_sq_le`** を追加。
+  `θ=p^m`, `q=p^n`, `θ²≤q` から `θ²∣q`、さらに `θ²∣q*c` を返し、[Is] Cor 2.30 の
+  `θᵢ(1)²≤|K:Z|` を p-power 比較で total 側 divisibility へ落とす算術部分を切り出した。
+- **2026-06-04 追記 4**: **`dvd_primePow_of_le`** / **`dvd_primePow_of_mul_le_mul`** /
+  **`sq_dvd_sum_sq_mul_const_of_primePow_mul_le`** を追加。degree-sort の `idx·θ≤idx·θⱼ` から
+  固定正 `idx` をキャンセルし、同じ `p` の冪比較で `θ∣θⱼ`、さらに tail 側 `θ²∣∑(idx·θⱼ)²`
+  まで直接返す producer。
+- **2026-06-04 追記 5**: **`mul_primePow_dvd_mul_primePow_of_le`** /
+  **`sq_dvd_head_of_commonIndex_primePower_sums`** と S08 adapter
+  **`natDegreeDvd_of_commonIndex_primePowerData`** /
+  **`degreeDivisibilityInputs_of_commonIndex_primePowerData`** /
+  **`xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums`** を追加。common `idx`
+  + p-power 残差 + degree sort から degree-ratio 用 divisibility を作り、さらに tail/total/head
+  算術 chain から `dχ²∣D` を内部構成して `XAdjoinStepInput` へ渡す。
+- **2026-06-04 追記 6**: **`xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`** を追加。
+  前項の `degreeDivisibilityInputs_of_commonIndex_primePowerData` と `primePowerSums` constructor を接続し、
+  `XAdjoinStepInput` interface から抽象 `hdvd_mem` / `hdvdχ` / `dχ²∣D` 入力をすべて外した。残る入力は
+  member-family の character-theory data、common `idx` + p-power 残差 factorization、degree sort、sum identity、
+  Schur-bound 側の p-power 比較、coprimality などの 6.6 本文由来 data。
+- **2026-06-04 追記 7**: **`natDegree_pos_of_irreducibleCharacter_apply_one_eq`** /
+  **`natDegreeSquareSum_pos_of_memberFamily`** を追加し、`primePowerSums` / `commonIndexPrimePowerSums`
+  constructors から `hpos₁ : 0<d₁` と `hDpos : 0<D` を削除。さらに common-index 版の
+  `hleχ : d₁≤dχ` は既存の strict gap `hlt : d₁<dχ` から内部導出する形にした。
+- **2026-06-04 追記 8**: **`xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`** を追加。
+  caller が actual accumulator `pairUnion (xBaseBlock Z) pair i` の injective finite enumeration を渡せば、
+  cover / non-real / conjugate-support / conjugate-membership / orthonormality を `Xset` facts と pairUnion
+  closure から内部構成し、残入力を同じ enumeration 上の genuine (6.6) degree・p-power・sum・coprimality data
+  だけにした。
+- **2026-06-04 追記 9**: **`PairUnionCommonIndexPrimePowerStepData`** と
+  **`Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X`** を追加。chain-level の
+  `hstep` callback は `XAdjoinStepInput` を直接返さず、actual pair-cover prefix ごとの common-index/p-power
+  degree data package を返せばよくなった。adapter が各 step で `pairUnion` bookkeeping と arithmetic constructor
+  を接続し、`Xset_isCoherent_from_adjoinSteps_of_irreducible_X` に fold する。
+- **2026-06-04 追記 10**: **`natDegree_le_of_xBaseBlock_anchor`** /
+  **`natDegree_lt_of_xBaseBlock_anchor_of_not_mem`** と
+  **`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`** を追加。chosen anchor `χ₁` が
+  minimal-degree base block にいることから prefix member 全体の `d₁≤dmem j` を導出し、current pair が
+  prefix と disjoint であることから `χs i∉xBaseBlock Z`、従って `d₁<dχ` を内部化した。
+- **2026-06-04 追記 11**: **`PairUnionBaseAnchorCommonIndexPrimePowerStepData`** と
+  **`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X`** を追加。
+  追記 10 の base-anchor step adapter を chain-level consumer に持ち上げ、per-step data package から
+  `hlt : d₁<dχ` と `hlemem : ∀j, d₁≤dmem j` を削除。caller は actual pair-cover prefix の enumeration,
+  base-block anchor, common-index/p-power/sum/coprimality data を渡せば、chain fold が `X` coherence
+  まで進む。
+- **2026-06-04 追記 12**: **`sq_dvd_natDegreeSquareSum_of_commonIndex`** を追加し、common-index
+  member factorizations `dmem j = idx·θmem j` と prefix square-sum identity `∑ dmem(j)^2 = D` から
+  `idx²∣D` を内部導出。これにより `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`,
+  `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`, base-anchor 版, および両 `PairUnion*StepData`
+  から caller-supplied `hidx_D` を削除した。低層 `degreeDivisibility_primePowerSums` は `hdmem` を持たないため、
+  common-index adapter 内で局所 witness としてのみ `hidx_D` を作って渡す。
+- **2026-06-04 追記 13**: actual `Fin k` prefix 版の common-index adapters と両 `PairUnion*StepData`
+  から `D` / `hDsum` を削除。prefix square sum は `Dprefix := ∑ j : Fin k, dmem j*dmem j` として
+  adapter 内で定義し、generic member-family adapter へ `hDsum` を局所 `simp` witness として渡す。
+  caller 側の sum data は `D + tail = total` ではなく、直接
+  `(∑ j : Fin k, dmem j*dmem j) + tail = total` を渡す形になり、actual prefix enumeration から
+  自明に決まる `D` witness を保持しなくてよくなった。
+- **2026-06-04 T6 guard**: T6/Y-family 側の S08 landed bricks を AxiomsCheck に登録。
+  `induce_apply_one_eq_card_W1_of_degree_one`, degree-one induced difference support,
+  `coherentInducedDegreeOneFamily`, `inertia_eq_H_of_c2`, `inertia_eq_H_of_c2_caseA`,
+  `isIrreducibleCharacter_induce_of_degree_one`, `coherentYFamily`, Frobenius/case-A Xset
+  irreducibilityがいずれも 3 axiom allowlist 内。これで c2 inertia discharge と Y-family coherence
+  engine call は CI guard 下に入り、残る T6 は `Yset = S(H')` との exact family/range wiring。
+- **2026-06-04 T6 adapter**: **`coherentYFamily_of_pairwiseNonconj`** を追加。
+  caller は nontrivial linear source family と pairwise non-`L`-conjugacy だけを渡し、
+  各 `Ind_H^L θ_j` の既約性は T6/c1-c2 brick
+  `isIrreducibleCharacter_induce_of_degree_one` で adapter 内部に discharge する。AxiomsCheck
+  にも登録済みで、残る T6 exact wiring は `Yset = S(H')` の enumeration/range 同一視。
+- **2026-06-04 T6 Yset bridge**: **`induce_linearIrreducibleCharacter_mem_Yset`** と
+  **`range_induce_linearIrreducibleCharacter_subset_Yset`** を追加。nontrivial linear source
+  `χ : H →* ℂˣ` について `Ind_H^L(linear χ) ∈ Yset = S(H')` を、`linear χ` が commutator
+  subgroup を殺すことから直接証明する。これで constructed Y-family の range は `Yset` に入る。
+- **2026-06-04 T6 Yset reverse bridge**: **`exists_linear_source_of_mem_Yset`** と
+  **`mem_Yset_iff_exists_linear_source`** を追加。`Yset` witness の source `θ` を
+  `Abelianization.of : H → H/H'` で factor し、finite commutative group の irreducible character
+  が degree-one/linear であることから、任意の `Yset` member を nontrivial linear source の
+  induced character として表す。
+- **2026-06-04 T6 exact range adapter**:
+  **`range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective`** と
+  **`coherentYset_of_pairwiseNonconj`** を追加。caller が `Fin n` で nontrivial linear
+  characters の induced `Yset` members を覆う orbit representatives を列挙し、その cover と
+  pairwise non-`L`-conjugacy を渡せば、constructed equal-degree family の coherence を
+  `hyp.Yset` へそのまま rewrite できる。残る T6 wiring は concrete representative
+  construction とその cover/pairwise 入力の構成。
+- **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
+  adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
+  `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で
+  局所導出されるため、§6.6 caller は fixed induction index の positivity witness を別途保持しなくてよい。
+- **2026-06-04 追記 15**: **`coprime_commonIndex_primePower`** を追加し、common-index
+  adapters と両 `PairUnion*StepData` から caller-supplied `hcop : Nat.Coprime idx θχ` を削除した。
+  caller は §6.6 / (6.4.c) に対応する `hidx_p : Nat.Coprime idx p` だけを渡し、各 step の
+  residual degree `θχ = p^mχ` から adapter 内で `Nat.Coprime idx θχ` を局所導出する。
+- **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
   sort + base prefix coherence ((1.1)/(1.4)). 상세는 issue 0046 pass-2 leaf 2.
@@ -286,6 +448,9 @@ landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allow
   経由で `∃ k, characterDegree χ = (p^k:ℂ)`。`characterDegree_def` rewrite で RT 形を
   bundled-character API に橋渡し (既存 `dvd_card` 版と同一の二層パターン = predicate→subtype +
   `φ 1`→`characterDegree` の convention 適応)。これが (6.6) 本文が消費する形。
+- **2026-06-04 追記**: **`exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup`** を追加。
+  `∃ d k, 0<d ∧ characterDegree χ = (d:ℂ) ∧ d=p^k` という同一 witness 版で、S08 の
+  natural-degree witness と prime-power gap data を直接接続する。
 - **依存 verify**: (6.5.b) の "`K` 非可換 `p`-群" は本 leaf では `IsPGroup p K` を**引数**で受ける
   (honest fully-general; `p`-群結論を posit せず、それを供給する (6.5) は別 leaf)。消費 landed lemma
   `exists_finrank_eq_prime_pow_of_isPGroup` は `ClassSumAlgebra.lean:1564` に既存・AxiomsCheck 済 — 確認済。
@@ -1460,3 +1625,231 @@ wiring-size では放電不能**と確定 (各々 真正に新規数学 + interf
   新規数学)。純益 = existence-half primitive (汎用・再利用可・λ-form の step 1)。
   次 step = (a) `DadeChainStep` に joint-isometry field 追加で coefficient-value + integrality を載せ
   `hY` 放電、(b) (4.7) 形式化で `hgen`、(c) `Dmem` 構成化で `hmemOrtho`。
+
+### (2026-06-04, pass 12) `Y = S(H')` finite representative family and direct coherence bridge
+
+`S08_CoherenceTheorems.lean` に T6/Y-family の representative construction を landing
+(sorry/axiom 無; AxiomsCheck 登録):
+
+- `finite_linearCharacters_of_finite`: finite group の linear characters は有限。
+- `SibleyDadeHypothesis.Yset_finite`: `Y=S(H')` は非自明 linear source characters の induced image
+  に含まれるので有限。
+- `SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Yset`: `Y` member は degree-one source による
+  induced irreducible character。
+- `SibleyDadeHypothesis.exists_Yset_linearRepresentativeFamily`: `Yset` 自体を finite enumerate し、
+  各 `Y` member から `exists_linear_source_of_mem_Yset` で source を選ぶ。これにより exact range、
+  all-nontrivial-linear cover、pairwise non-`L`-conjugacy を同時に得る。重要な設計点: 全 nontrivial
+  linear characters を先に quotient せず、既に有限な `Yset` を enumerate するので orbit representative
+  machinery を追加しない。
+- `SibleyDadeHypothesis.coherentYset_of_two_le_ncard`: 上の family を
+  `coherentYset_of_pairwiseNonconj` に渡し、T6/Y-family coherence の残入力を
+  `2 ≤ hyp.Yset.ncard` へ圧縮。
+
+### 2026-06-04 pass 13: `Y = S(H')` の cardinal lower bound を discharge
+
+`S08_CoherenceTheorems.lean` に `2 ≤ hyp.Yset.ncard` の入力を closed:
+
+- `ClassFunction.induceTerm_conjStar` / `induceSum_conj` / `induce_conj`: 誘導和が複素共役と
+  可換する一般 helper。
+- `SibleyDadeHypothesis.Yset_nonempty`: `H ≠ 1` かつ nilpotent/solvable から `H/H'` の非自明
+  linear character を取り、誘導して `Yset` の元を得る。
+- `SibleyDadeHypothesis.Yset_hasNoRealCharacters`: `Yset` member は degree `|W₁| > 1` の既約誘導
+  文字なので trivial ではなく、odd order の (1.1) から real でない。
+- `SibleyDadeHypothesis.Yset_closedUnderConjugate`: source `θ` を `θ.conj` に替え、
+  `characterKernel_conj` と `induce_conj` で `Yset` membership を保つ。
+- `SibleyDadeHypothesis.two_le_Yset_ncard`: S07 の
+  `two_le_ncard_of_conjugate_closed_of_noReal` に finite/nonempty/closed/no-real を渡す。
+- `SibleyDadeHypothesis.coherentYset`: `coherentYset_of_two_le_ncard` の cardinality 仮定を
+  内部で `two_le_Yset_ncard` により discharge した T6/Y-family coherence。
+
+### 2026-06-04 pass 14: `X ∪ Y = S` glue adapter
+
+`S08_CoherenceTheorems.lean` に (6.8) capstone 用の純集合 bridge と union adapter を追加:
+
+- `SsubFiltration_subset_S`, `Xset_subset_S`, `Yset_subset_S`
+- `disjoint_Xset_SsubFiltration`, `Xset_union_SsubFiltration_eq_S`
+- `disjoint_Xset_Yset`, `Xset_union_Yset_eq_S` (`X = S - S(H')`, `Y = S(H')`)
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued`: caller が case-dependent
+  `Xset H'` coherence, agreement, source/image orthogonality, supported-span generation を供給すれば、
+  internally constructed `coherentYset` と `S07.coherentUnion_of_glued` で `hyp.CoherenceTarget`
+  に retarget する。
+
+残る T6/Y-family 側の実装境界は、case c1/c2 からこの adapter の `X` coherence と
+orthogonality/generation 入力を構成すること。
+
+### 2026-06-04 pass 15: Frobenius case `X=S-S(H')` coherence wrapper
+
+`S08_CoherenceTheorems.lean` に (6.8.1) Frobenius alternative 用の `Z=H'` 特殊化を追加:
+
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius`
+- `SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+
+どちらも既存の generic `Xset_isCoherent_from_*_of_irreducible_X` に対して、`H'≤H`,
+`H'⊴L`, `X⊆Irr L` を内部 discharge する adapter。残る入力は `Xset H'` nonempty と各 step の
+common-index p-power data のみ。これで c1 側は `coherentS_of_Xset_commutator_Yset_glued` の
+`hX` 引数に直接入る形まで圧縮された。
+
+同じ pass で c2/case-A route 用の純集合 bridge も追加:
+
+- `SibleyDadeHypothesis.SsubFiltration_antitone`
+- `SibleyDadeHypothesis.Xset_mono`
+- `SibleyDadeHypothesis.Xset_commutator_eq_Xset_union_filtrationDiff`
+
+`Z≤H'` なら `X(H') = X(Z) ∪ (S(Z) \\ S(H'))` と分解できる。explorer 偵察でも確認された通り、
+case-A irreducibility bridge は central/fpf な小さい `Z` 用であり、`H'` へ直接適用する primitive は
+ない。したがって c2 側はこの差分層を coherent に扱う bridge、または教科書どおり (6.8.3) の
+最終 upgrade を別途実装する必要がある。
+
+### 2026-06-04 pass 16: `X/Y` source-side orthogonality bridge
+
+`S08_CoherenceTheorems.lean` に `coherentS_of_Xset_commutator_Yset_glued` の source-side
+orthogonality input を discharge する bridge を追加:
+
+- `SibleyDadeHypothesis.inner_eq_zero_of_mem_span_of_disjoint_irreducible`: disjoint な
+  irreducible character 集合 `X`,`Y` について、`irreducibleCharacter_inner_eq_ite` と
+  span induction により `ℤ[X] ⟂ ℤ[Y]` を証明する一般 helper。
+- `SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_irreducible_X`: (6.8) の
+  `X=S-S(H')`, `Y=S(H')` に特殊化。`Y` 側 irreducibility は
+  `isIrreducibleCharacter_of_mem_Yset`、disjointness は `disjoint_Xset_Yset` から内部供給し、
+  caller は `Xset H' ⊆ Irr L` だけ渡せばよい。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X`: 上の
+  source orthogonality bridge を組み込んだ glue variant。
+
+これにより c1/Frobenius route では既存の `isIrreducibleCharacter_of_mem_Xset_of_frobenius` で
+source-side orthogonality が自動化される。残 input は `X` coherence, `τ₃` agreement,
+image-side orthogonality, supported-span generation。
+
+### 2026-06-04 pass 17: Frobenius c1 glue adapter
+
+pass 16 の source orthogonality bridge を (6.8.1) Frobenius alternative に直接接続:
+
+- `SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_frobenius`: `hF : IsFrobeniusGroup L H W₁`
+  から `Xset H' ⊆ Irr L` を内部生成し、`ℤ[Xset H'] ⟂ ℤ[Yset]` を返す。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius`: caller が
+  Frobenius case の `Xset H'` coherence と `τ₃` agreement/image orthogonality/generation を
+  与えれば、source orthogonality は `hF` から放電して `hyp.CoherenceTarget` を返す。
+
+これで c1 route の adapter chain は
+`Xset_commutator_isCoherent_from_pairUnion..._of_frobenius` →
+`coherentS_of_Xset_commutator_Yset_glued_of_frobenius`
+の形に整理された。残りは `τ₃` の実構成・agreement、image-side orthogonality、supported-span
+generation の case-specific 入力。
+
+### 2026-06-04 pass 18: mixed-inner glue interface
+
+S07/S08 に `himg_ortho` を直接要求しない glue variant を追加。`τ₃` 候補 `ν` が
+`ℤ[X] × ℤ[Y]` の mixed inner を保存し、各 side の extension と agree するなら、source-side
+orthogonality から image-side orthogonality が従う:
+
+- `S07.image_orthogonal_of_mixed_inner_eq`: `ν = νX` on `ℤ[X]`, `ν = νY` on `ℤ[Y]`,
+  `⟨νu,νv⟩=⟨u,v⟩` for `u∈ℤ[X]`, `v∈ℤ[Y]`, and `ℤ[X]⊥ℤ[Y]` から
+  `νX(ℤ[X]) ⟂ νY(ℤ[Y])` を導く。
+- `S07.coherentUnion_of_glued_of_mixed_inner_eq`: `coherentUnion_of_glued` の variant。
+  caller は `himg_ortho` の代わりに mixed inner preservation を渡す。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner`
+  and `_of_frobenius_mixed_inner`: §8 final adapter の corresponding variants。
+
+これで c1 route の残 input は `X` coherence, `τ₃` agreement, mixed inner preservation,
+supported-span generation へ整理された。`τ₃` 実構成側は image orthogonality を別途証明する代わりに、
+mixed block の inner preservation を示せばよい。
+
+
+### 2026-06-04 pass 19: generator-level mixed-inner glue interface
+
+S07/S08 に `τ₃` 候補を generator-level data で渡す bridge を追加。pass 18 では
+agreement/mixed-inner が `ℤ[X]`/`ℤ[Y]` 上の span-level input だったが、実際の `τ₃` 構成では
+まず各 character generator 上で値を定めるため、この pass で span induction を内部化した:
+
+- `S07.mixed_inner_eq_on_zSpan_of_eq_on`: `X × Y` の generator 上で
+  `⟨νx,νy⟩=⟨x,y⟩` を確認すれば、`ℤ[X] × ℤ[Y]` 全体の mixed-inner preservation が従う。
+- `S07.coherentUnion_of_glued_of_generator_mixed_inner_eq`: generator-level の
+  `ν = hX.extension` on `X`, `ν = hY.extension` on `Y`, mixed-inner を受け取り、既存の
+  mixed-inner glue に接続する。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner`
+  and `_of_frobenius_generator_mixed_inner`: §8 final adapter の generator-level variants。
+
+これで Frobenius/c1 route の `τ₃` 側残 input は、`X` coherence, generator 上の `τ₃` agreement,
+generator 上の mixed-inner preservation, supported-span generation に縮約された。span への持ち上げは
+caller 側で繰り返さない。
+
+
+### 2026-06-04 pass 20: Frobenius c1 capstone from X-chain data
+
+S08 に Frobenius/c1 route の capstone adapter を追加。pass 19 では final glue が generator-level
+`τ₃` data を受けられるようになったが、caller はまだ `hX : IsCoherent τ (Xset H') A` を別途渡す
+形だった。この pass で既存の (6.6) X-chain constructors と final glue を合成した:
+
+- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner`:
+  `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` で `X` coherence を
+  内部構成し、その extension に対する generator-level `τ₃` agreement/mixed-inner/generation から
+  `hyp.CoherenceTarget` を返す。
+- `SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`:
+  base-anchor step package 版。同じ capstone だが sorted-degree facts は step package からではなく
+  既存 base-anchor adapter が内部導出する。
+
+これで Frobenius/c1 route の caller-facing input は、`Xset H'` nonempty、各 X-chain step の
+common-index p-power data、generator 上の `τ₃` agreement、generator 上の mixed-inner preservation、
+supported-span generation に縮約された。`hX` witness 自体は caller が構成しない。
+
+
+### 2026-06-04 pass 21: Frobenius c1 capstone to S09 Ind-chain data
+
+S08 に S09-facing adapter
+`SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+を追加。base-anchor common-index p-power X-chain data と generator-level `τ₃` glue から
+`hyp.CoherenceTarget` を内部構成し、`IndChainDecomposition.ofIsCoherent` で §9 の weighted-sum
+consumer package へ直接変換する。
+
+これは `hyp.CoherenceTarget` の単なるリネームではなく、§8 の coherence output を §9 の
+`ζ_t`/`d_t` chain interface に変換する caller-facing bridge。既存 capstone と同じく `H.Normal`
+instance は明示引数で受ける。`card_G0_lower_bound` 側はまだ
+`CharacterEstimateData` 構成待ちだが、(6.8) Frobenius/c1 route から (7.10) の Ind-chain consumer への
+接続点が明示化された。
+
+### 2026-06-04 pass 22: AxiomsCheck coverage for T7/T8 X-layer wrappers
+
+Explorer pass の指摘に従い、既に landed 済みの S08 T7/T8 X-layer を AxiomsCheck に登録した。
+追加した coverage は、`isCharacter_restrict`, kernel-containment support lemmas,
+`Xset_eq_irreducible_not_subset_characterKernel` と、Frobenius-specialized direct wrappers
+`xMember_characterFacts`, `xMember_diffSupport`, `Xset_closedUnderConjugate`,
+`Xset_hasNoRealCharacters`, `xSet_finite`, `xBaseBlock_closedUnderConjugate`,
+`two_le_xBaseBlock_ncard`, `xBaseBlock_isCoherent`。
+
+これで downstream S09/c1 callers は `_of_irreducible_X` 版を毎回手で合成するのではなく、
+Frobenius hypothesis から出る direct API を axiom-clean 登録済みの入口として参照できる。
+
+
+### 2026-06-04 pass 23: weighted Ind-chain image normal form
+
+Gibbs explorer pass の候補に従い、`IndChainDecomposition` の §9-facing weighted consumer
+algebraを正規化した。既存 `image_weightedDifferenceInput` は
+`∑ d_t (χ_t - d_t χ_0)` の展開形だけを返していたが、この pass で
+`weightedOutput - (∑ d_t^2) • χ_0` 形と Parseval 版
+`weightedOutput - ⟪weightedOutput, weightedOutput⟫ • χ_0` を追加した。
+
+同じ正規化式から `χ_0` 係数も抽出し、
+`inner_chi_zero_image_weightedDifferenceInput` と norm 版を登録した。これは S09 の
+`BetaDecomp` / `weightedNuSum` 側で、(7.10) の Ind-chain package から scalar coefficient
+identity を直接消費するための小さな bridge。全 4 件を `AxiomsCheck` に登録済み。
+
+### 2026-06-04 pass 24: weighted Ind-chain real norm bounds
+
+`IndChainDecomposition` の Parseval identity から、§9 側がそのまま消費できる実数部の不等式を
+2 件追加した。`one_le_weightedOutput_inner_self_re` は `d 0 = 1` により
+`⟪weightedOutput, weightedOutput⟫.re ≥ 1` を返し、
+`inner_chi_zero_image_weightedDifferenceInput_re_nonpos` は norm-normalized な `χ₀` 係数
+identity からその実部が非正であることを返す。
+
+これで (7.10) の weighted Ind-chain package から、S09 の scalar coefficient / norm estimate
+consumer が等式を再展開せずに符号情報を参照できる。
+
+### 2026-06-04 pass 25: weighted Ind-chain real Parseval forms
+
+`IndChainDecomposition` の complex-valued Parseval identities を、下流の実数不等式で
+直接使える real-sum 形にした。`weightedOutput_inner_self_re_eq_sum_sq` は
+`⟪weightedOutput, weightedOutput⟫.re = Σ d_t^2` を返し、
+`inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq` は `χ₀` 係数の実部を
+`1 - Σ d_t^2` として返す。
+
+前 pass の符号補題はこの精密形を経由するように整理した。これで §9 側の real scalar
+coefficient / norm bound consumer が complex cast の展開を持たずに済む。

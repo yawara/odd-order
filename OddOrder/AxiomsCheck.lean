@@ -47,6 +47,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
@@ -65,7 +66,7 @@ elaboration 時に検査する CI ガード. moore57 プロジェクトの `Moor
 |---|---|---|
 | Ch.1 (Sylow Theory) | `Subgroup.chermakDelgado` | Thm 1.41 (Chermak-Delgado) |
 | Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.matsuyama` | Thm 2.13 (Matsuyama involution) |
-| Ch.2 (Subnormality) | `OddOrder.Isaacs.Ch02.baerSuzuki_pCore` | Thm 2.12 系 (lean-eval Baer-Suzuki) |
+| Ch.2 (Subnormality) | `baerSuzuki_pCore` | Thm 2.12 系 (Baer-Suzuki) |
 | Ch.2 (Subnormality) | `lucchini_index_normalCore_lt_index` | Thm 2.20 (Lucchini) |
 | Ch.3 (Split Extensions) | `horosevskii_aut_order_lt` | Thm 3.3 (Horosevskii) |
 | Ch.3 (Split Extensions) | `OddOrder.Isaacs.Ch03.hall_E_exists` | Thm 3.13 (Hall E for solvable) |
@@ -703,6 +704,11 @@ set_option linter.style.longLine false in
 -- `induceTerm_of_not_mem`), in unscaled (`induceSum`) and normalized (`induce`) form.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_apply_eq_sum_filter
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_apply_eq_sum_filter
+-- RepresentationTheory (complex conjugation): induction commutes with conjugating values in `ℂ`;
+-- used to show `Y = S(H')` is closed under complex conjugation in Peterfalvi (6.8).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceTerm_conjStar
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induceSum_conj
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.ClassFunction.induce_conj
 -- RepresentationTheory ([Is] Thm 6.34 degree part): the induced class function at `1` is
 -- `[G : H] · θ(1)`.  All `|G|` conjugates `x⁻¹ · 1 · x = 1` lie in `H`, so every summand is
 -- `θ(1)`; dividing by `|H|` and using `|G| = [G:H]·|H|` (`Subgroup.index_mul_card`) leaves `[G:H]`.
@@ -860,6 +866,8 @@ set_option linter.style.longLine false in
 -- This is the honest §5.6 opening step — divisibility (hyp (5.6)(b)) is essential, not scaffolding.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatio_of_dvd
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_pos_natDegreeRatioFamily_of_dvd
 -- Corollary (Isaacs Cor. 3.12): the degree of an irreducible representation of a finite p-group is
 -- a power of p.  Immediate from `finrank_dvd_card` (`dim V ∣ |G| = p^n`) and `Nat.dvd_prime_pow`.
 #assert_only_allowed_axioms
@@ -872,6 +880,10 @@ set_option linter.style.longLine false in
 -- prime-power degree on the `IrreducibleCharacter G` subtype, phrased through `characterDegree`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.exists_characterDegree_eq_prime_pow_of_isPGroup
+-- Same datum with a shared natural witness `d`: `characterDegree χ = d`, `d = p^k`, and `0<d`,
+-- ready for the S08 natural-degree/gap inputs without reopening the representation witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
@@ -1486,6 +1498,8 @@ set_option linter.style.longLine false in
 -- `ℤ[X]` and `νY` on `ℤ[Y]` (`Submodule.span_union` decomposition) — the weakened
 -- `IsCoherent.extension_inner_eq` field for the union `X ∪ Y` once the two coherent pieces exist.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_eq_on_zSpan_union_of_orthogonal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.image_orthogonal_of_mixed_inner_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mixed_inner_eq_on_zSpan_of_eq_on
 -- (6.8.1)/(6.8.2) the `τ₃` assembly into an actual `IsCoherent (X∪Y) A` witness: from two coherence
 -- witnesses `hX`, `hY`, a glued map `ν` agreeing with `hX.extension`/`hY.extension` on `ℤ[X]`/`ℤ[Y]`,
 -- and source+image orthogonality, build `IsCoherent τ (X∪Y) A` — `extension_inner_eq` via
@@ -1493,6 +1507,10 @@ set_option linter.style.longLine false in
 -- generator `Z[X,A] ∪ Z[Y,A]` and a (5.1)-type generation hypothesis.  The two-family analogue of
 -- `retarget_isCoherent`; carries no character theory (its inputs are supplied by (6.6)/(6.7)/Dade).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_mixed_inner_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq
 -- (6.6) "repeated use of (5.6)" iteration engine: from a coherent base `S₀` and a per-index
 -- adjoining step `IsCoherent (pairUnion S₀ pair i) → IsCoherent (pairUnion S₀ pair (i+1))` (each step
 -- one application of (5.6) = `retarget_isCoherent` with the caller's per-step data), the union after
@@ -1563,8 +1581,31 @@ set_option linter.style.longLine false in
 -- `a∣head` (combine `θᵢ(1)² ∣ ∑_{j≥i}` and `θᵢ(1)² ∣ |L|-|L:Z|` through the sum identity).
 -- `sq_dvd_of_factored_coprime`: `χᵢ(1) = idx·θ`, `θ²∣D`, `idx²∣D`, `Coprime idx θ` ⟹ `χᵢ(1)²∣D`
 -- (mmd L80 coprimality forcing, `idx = |L:K|` prime to `p`).
+-- `sq_dvd_of_factored_coprime_add_complement`: combines the additive complement with coprimality
+-- forcing so the consumer can derive `χᵢ(1)²∣head` directly from tail/total divisibility data.
+-- `sq_dvd_sum_sq_mul_of_dvd`: degree-sort divisibility `θ∣θⱼ` over the tail implies
+-- `θ²∣∑(idxⱼ·θⱼ)²`, discharging the `Finset.dvd_sum` part of `θ²∣tail`.
+-- `dvd_primePow_of_le`/`dvd_primePow_of_mul_le_mul`: sorted p-power degree factors imply
+-- divisibility, with cancellation of the common positive induction index `idx`.
+-- `mul_primePow_dvd_mul_primePow_of_le`: upgrades that factor divisibility to full induced degrees.
+-- `sq_dvd_sum_sq_mul_const_of_primePow_mul_le`: packages that cancellation with `Finset.dvd_sum`
+-- to produce the tail-side divisibility directly from sorted induced p-power degrees.
+-- `sq_dvd_primePow_of_sq_le`/`sq_dvd_primePow_mul_of_sq_le`: turn the Schur-center bound
+-- `θ²≤p^n` for p-power degrees into total-side divisibility, with an optional product factor.
+-- `sq_dvd_head_of_commonIndex_primePower_sums`: assembles tail/total/head divisibility into
+-- the `χᵢ(1)²∣head` input consumed by the §8 X-adjoin constructors.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_of_add_eq_of_dvd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_of_factored_coprime_add_complement
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_sum_sq_mul_of_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_primePow_of_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.dvd_primePow_of_mul_le_mul
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.mul_primePow_dvd_mul_primePow_of_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_sum_sq_mul_const_of_primePow_mul_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_primePow_of_sq_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.sq_dvd_primePow_mul_of_sq_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
 
 -- Peterfalvi (5.1) Dade-isometry base map (G2.7 type-bridge): the §4 Dade map is `ℂ`-linear on the
 -- supported subspace `CF(L,A)` (`Hypothesis.dadeLinearMap`, the bare `DadeMap` repackaged via the
@@ -1647,6 +1688,10 @@ set_option linter.style.longLine false in
 -- `χ̄ = χ − (χ − χ̄)`, every `s ∈ S₁` a right-hand generator by supportedness.  This is what makes
 -- `DadeChainStep.advance` discharge the (5.1) generation hypothesis internally rather than positing it.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.advance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.chainStepAdvance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X_from_dade
@@ -1795,6 +1840,17 @@ set_option linter.style.longLine false in
 -- `τ` (its three hypotheses discharged from the Dade isometry), giving `Y = S(H')`/(6.6)-prefix
 -- coherence with no opaque hypotheses — only the genuine equal degree and supports.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade
+-- Peterfalvi S08 T7 X-characterization support layer: restriction preserves characters,
+-- nonzero constituents force kernel containment, induced characters decompose with natural
+-- multiplicities, and the resulting `Xset` is exactly the irreducibles not killing `Z`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isCharacter_restrict
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.induce_exists_natFinsupp_eq_sum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
@@ -1804,19 +1860,118 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_diffSupport_of_irreducible_X
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_scaledDiffSupport_of_charValue_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.scaledDiff_dadeImage_mem_ZIrr
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_scaledDiffSupport_of_degreeData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_scaledDiffSupports_of_degreeData
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_closedUnderConjugate_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_hasNoRealCharacters_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xSet_finite_of_irreducible_X
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.natDegree_le_of_xBaseBlock_anchor
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.natDegree_lt_of_xBaseBlock_anchor_of_not_mem
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_of_irreducible_X
+-- Frobenius-specialized wrappers used by downstream c1/S09 assembly callers.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_characterFacts
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xMember_diffSupport
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xSet_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_isCoherent_caseA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_adjoinSteps_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.pairCover_orthogonal_to_prefix
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xPair_stepCoreFacts_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_pairUnion_memberFamily_of_irreducible_X
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeRatios
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_natDegreeData_for_xAdjoinMemberFamily
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.natDegree_pos_of_irreducibleCharacter_apply_one_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.commonIndex_pos_of_natDegree_factor
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.coprime_commonIndex_primePower
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.natDegreeSquareSum_pos_of_memberFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.sq_dvd_natDegreeSquareSum_of_commonIndex
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.natDegreeDvd_of_commonIndex_primePowerData
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.degreeDivisibilityInputs_of_commonIndex_primePowerData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_realDegreeBound
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.XAdjoinStepInput.adjoin
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_weightedOutput
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.weightedOutput_inner_self_eq_sum_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.weightedOutput_inner_self_re_eq_sum_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.one_le_weightedOutput_inner_self_re
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.ofIsCoherent
 -- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
 -- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
 -- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
@@ -1832,10 +1987,24 @@ set_option linter.style.longLine false in
 -- Linear (degree-one) irreducible character from a hom `H →* ℂˣ`: the source characters of the
 -- (6.8) `Y = S(H')` family are the nontrivial linear characters of `H` (`= Irr(H/H') ∖ {1}`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIrreducibleCharacter
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.compHom_linearIrreducibleCharacter
 -- Degree-one irreducible characters are multiplicative / kill commutators — lets a linear `θ` of `H`
 -- inflate from the abelian quotient `H/⁅H,H⁆` (the (6.8)(c2) inertia bridge).
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.map_mul_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_ne_zero_of_apply_one_eq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_one
 -- (6.8)(c2) inertia bridge infra: inflation–conjugation equivariance + inertia transfer
@@ -1862,6 +2031,353 @@ set_option linter.style.longLine false in
 -- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
+
+-- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
+-- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.induce_apply_one_eq_card_W1_of_degree_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.support_sub_induce_subset_sharpImage_of_apply_one_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.support_sub_induce_subset_sharpImage_of_degree_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentInducedDegreeOneFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inertia_eq_H_of_c2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inertia_eq_H_of_c2_caseA
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_induce_of_degree_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYFamily
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYFamily_of_pairwiseNonconj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.induce_linearIrreducibleCharacter_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_linearIrreducibleCharacter_eq_of_YsetSource
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_linear_source_of_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.mem_Yset_iff_exists_linear_source
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_subset_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_subset_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_subset_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.disjoint_Xset_SsubFiltration
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_union_SsubFiltration_eq_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_antitone
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_mono
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_eq_Xset_union_filtrationDiff
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.disjoint_Xset_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_union_Yset_eq_S
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_subset_Yset
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.finite_linearCharacters_of_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_finite
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inner_eq_zero_of_mem_span_of_disjoint_irreducible
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_irreducible_X
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_Yset_linearRepresentativeFamily
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_pairwiseNonconj
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset_of_two_le_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_nonempty
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Yset_closedUnderConjugate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_Yset_ncard
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_of_frobenius
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inner_span_Xset_Yset_eq_zero_of_frobenius
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_frobenius_generator_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionCommonIndexPrimePowerData_generator_mixed_inner
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
+-- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.indChainDecomposition_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
+-- Peterfalvi (7.8) bridge from the S09 `ν` interface to a concrete S07 coherence witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_mem_ZIrr_of_isCoherent_of_mem
+-- Peterfalvi (7.8) indexed source set and `ζᵢ` image consumers for the same S07 witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zeta_mem_sourceSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaDistinct_mem_sourceSet
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_nonpos_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zetaDistinct_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.sourceDiff_mem_ZIrr_of_irreducible
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_mem_ZIrr_of_irreducible_sourceDiff
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
+-- Peterfalvi (7.8) norm-one and signed-irreducible image bridges for coherent `ζᵢ`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zeta_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_inner_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_inner_self_eq_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_inner_self_eq_one_of_irreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaImage_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+-- Peterfalvi (7.8.b) raw norm-bound consumers from `NormEstimates`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gamma_inner_self_re_le_of_normEstimates
+-- Peterfalvi (7.8.a)/(7.8.b) `BetaDecomp` algebra and norm consumers.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_orth_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.constOne_orth_weightedNuSum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_orth_gamma
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gamma_orth_weightedNuSum
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_eq_weightedNuSum_add_gamma
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_orth_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.constOne_orth_delta
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.betaNormSq_eq_of_weightedNuSum_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_zetaImage_eq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum_inner_self_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.betaNormSq_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gammaNormSq_eq_of_source_orthogonal
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_source_orthogonal
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_weighted
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+-- Peterfalvi (7.9) residual cross-term reduction.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.zetaImage_cross_eq_zero_of_support_subset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.zetaImages_mem_ZIrr_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_expand_delta
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_equation
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_integral_of_ZIrr
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity_of_zeta_support
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_irreducible_sourceDiff_and_isCoherent_parity
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_nonzero
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_integral_parity
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr
+-- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localComplementIndex_eq_e
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.localSmallIndex_of_family_cardinalities
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.Bsum_le_of_orthogonal_integer_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family_source_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_characterEstimateData
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition
+-- Peterfalvi (7.11) terminal contradiction from the displayed (7.10) lower bound.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_lowerBoundTerm
+-- Peterfalvi (7.11) terminal contradictions from existential final-assembly inputs.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_penultimate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_Bsum_bound
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_real_Bsum_bound
+-- Peterfalvi (7.11) conditional terminal contradiction from the named (7.10) estimate data.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_characterEstimateData
+-- Peterfalvi (7.11) consumer from the `𝓑`-sum bound and real reduced family inequality.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_real_Bsum_bound
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_real_reduced_family_inequality_and_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_family_source_decomposition
 
 /-! ### Top-level Feit–Thompson reduction (downstream). -/
 

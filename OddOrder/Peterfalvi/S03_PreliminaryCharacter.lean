@@ -218,6 +218,21 @@ theorem exists_characterDegree_eq_prime_pow_of_isPGroup [Finite G]
   obtain ⟨k, hk⟩ := χ.isIrreducible.exists_charValue_one_eq_prime_pow_of_isPGroup hp
   exact ⟨k, by rw [characterDegree_def]; exact hk⟩
 
+/-- **Natural degree witness for p-group irreducible characters.**
+
+This packages the p-power degree result in the form consumed by the (6.6) degree-gap assembly:
+the same natural witness `d` both evaluates `characterDegree χ = d` and is a prime power `p^k`.
+The positivity is included so downstream ratio and divisibility lemmas can avoid reopening the
+irreducible-character degree witness. -/
+theorem exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : IsPGroup p G) (χ : IrreducibleCharacter G) :
+    ∃ d k : ℕ, 0 < d ∧ characterDegree (χ : ClassFunction G ℂ) = (d : ℂ) ∧ d = p ^ k := by
+  obtain ⟨k, hk⟩ := exists_characterDegree_eq_prime_pow_of_isPGroup hp χ
+  have hk_nat : characterDegree (χ : ClassFunction G ℂ) = ((p ^ k : ℕ) : ℂ) := by
+    simpa [Nat.cast_pow] using hk
+  refine ⟨p ^ k, k, ?_, hk_nat, rfl⟩
+  exact pow_pos (Nat.Prime.pos (Fact.out : p.Prime)) k
+
 /-- **Degree-ratio integrality** (Peterfalvi (5.6), opening step "Set `χ(1) = a·χ₁(1)`").
 
 If `χ₁` is an irreducible character whose natural degree divides that of an irreducible
@@ -247,6 +262,46 @@ theorem exists_pos_natDegreeRatio_of_dvd [Finite G]
     · exact ha
   · rw [characterDegree_def, characterDegree_def, hd_val, hd₁_val, Nat.cast_mul]
     ring
+
+/-- **Degree-ratio family from divisibility data.**
+
+Given a finite family of irreducible characters and a distinguished index `i₁`, if the natural
+degree of `χ i₁` divides the natural degree of every `χ i` in the finite support `s`, then there
+is a positive natural ratio function `deg` with `deg i₁ = 1` and
+`χᵢ(1)=degᵢ χ₁(1)` on `s`.  The definition pins the distinguished ratio to `1` explicitly,
+so downstream finite-family interfaces do not need a uniqueness argument for the quotient
+at `i₁`. -/
+theorem exists_pos_natDegreeRatioFamily_of_dvd [Finite G]
+    {ι : Type*} {s : Finset ι} (χ : ι → IrreducibleCharacter G) {i₁ : ι}
+    (hdvd : ∀ i ∈ s, ∀ d d₁ : ℕ,
+      (χ i : ClassFunction G ℂ) 1 = (d : ℂ) →
+      (χ i₁ : ClassFunction G ℂ) 1 = (d₁ : ℂ) → d₁ ∣ d) :
+    ∃ deg : ι → ℕ, deg i₁ = 1 ∧ (∀ i ∈ s, 0 < deg i) ∧
+      ∀ i ∈ s, (χ i : ClassFunction G ℂ) 1 =
+        (deg i : ℂ) * (χ i₁ : ClassFunction G ℂ) 1 := by
+  classical
+  let ratio : (i : ι) → i ∈ s → ℕ := fun i hi =>
+    (exists_pos_natDegreeRatio_of_dvd (χ i) (χ i₁) (hdvd i hi)).choose
+  have hratio : ∀ i hi, characterDegree (χ i : ClassFunction G ℂ) =
+      (ratio i hi : ℂ) * characterDegree (χ i₁ : ClassFunction G ℂ) := by
+    intro i hi
+    exact (exists_pos_natDegreeRatio_of_dvd (χ i) (χ i₁) (hdvd i hi)).choose_spec.2
+  let deg : ι → ℕ := fun i => if h : i = i₁ then 1 else if hi : i ∈ s then ratio i hi else 1
+  refine ⟨deg, by simp [deg], ?_, ?_⟩
+  · intro i hi
+    by_cases h : i = i₁
+    · subst i
+      simp [deg]
+    · have hpos : 0 < ratio i hi :=
+        (exists_pos_natDegreeRatio_of_dvd (χ i) (χ i₁) (hdvd i hi)).choose_spec.1
+      simpa [deg, h, hi, ratio] using hpos
+  · intro i hi
+    by_cases h : i = i₁
+    · subst i
+      simp [deg]
+    · have hri := hratio i hi
+      rw [characterDegree_def, characterDegree_def] at hri
+      simpa [deg, h, hi, ratio] using hri
 
 /-- A family of class functions has constant degree. -/
 def SameDegreeFamily {ι : Type*} (χ : ι → ClassFunction G ℂ) : Prop :=

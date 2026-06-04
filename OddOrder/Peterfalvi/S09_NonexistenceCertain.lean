@@ -1398,6 +1398,237 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The Dade image defining `β` is a virtual character whenever the source
+difference `Ind 1_H - ζ` is a virtual character on `L`. -/
+theorem beta_mem_ZIrr_of_sourceDiff_mem_ZIrr (H78 : Hypothesis78 G A L)
+    (hdiffZ :
+      H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L) :
+    H78.beta ∈ ZIrr G := by
+  have hτ : H78.hyp76.hyp71.τ = H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.unique H78.hyp76.hyp71.isDadeMap
+      (H78.hyp76.hyp71.hyp.isDadeMap_dadeMap (k := ℂ))
+  have hvirt :=
+    (H78.hyp76.hyp71.hyp.fullDadeIsometryData
+      H78.hyp76.hyp71.hConjInvariant).maps_virtualCharacter H78.indMinusZetaSupp hdiffZ
+  rw [beta, hτ]
+  rwa [show (H78.hyp76.hyp71.hyp.fullDadeIsometryData
+        H78.hyp76.hyp71.hConjInvariant).toDadeMap =
+        H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) from
+      H78.hyp76.hyp71.hyp.dadeIsometryData_toDadeMap H78.hyp76.hyp71.hConjInvariant] at hvirt
+
+/-- The source difference `Ind 1_H - ζ` is virtual when the `Ind 1_H`
+source term is virtual and the distinguished `ζ` is irreducible. -/
+theorem sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hindZ : H78.hyp76.zeta H78.ind1H ∈ ZIrr L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L :=
+  Submodule.sub_mem _ hindZ hzeta_irr.mem_ZIrr
+
+/-- The source difference `Ind 1_H - ζ` is virtual when both source terms are
+irreducible characters of `L`. -/
+theorem sourceDiff_mem_ZIrr_of_irreducible (H78 : Hypothesis78 G A L)
+    (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L :=
+  H78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+    hind_irr.mem_ZIrr hzeta_irr
+
+/-- Virtuality of `Ind 1_H` and irreducibility of `ζ` supply the
+virtual-character input needed by the Dade bridge for `β`. -/
+theorem beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+    (H78 : Hypothesis78 G A L)
+    (hindZ : H78.hyp76.zeta H78.ind1H ∈ ZIrr L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.beta ∈ ZIrr G :=
+  H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr
+    (H78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible hindZ hzeta_irr)
+
+/-- Irreducibility of the two source terms supplies the virtual-character input
+needed by the Dade bridge for `β`. -/
+theorem beta_mem_ZIrr_of_irreducible_sourceDiff (H78 : Hypothesis78 G A L)
+    (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.beta ∈ ZIrr G :=
+  H78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible
+    hind_irr.mem_ZIrr hzeta_irr
+
+/-- The coherent source set `S = T \ {Ind 1_H}` from Peterfalvi (7.8),
+presented as a set of class functions on `L`. -/
+def sourceSet (H78 : Hypothesis78 G A L) : Set (ClassFunction L ℂ) :=
+  {φ | ∃ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H ∧ H78.hyp76.zeta i = φ}
+
+/-- Each non-`Ind 1_H` source character belongs to the coherent source set `S`. -/
+theorem zeta_mem_sourceSet (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H) :
+    H78.hyp76.zeta i ∈ H78.sourceSet :=
+  ⟨i, hi, rfl⟩
+
+/-- The distinguished `ζ` belongs to the coherent source set `S`. -/
+theorem zetaDistinct_mem_sourceSet (H78 : Hypothesis78 G A L) :
+    H78.hyp76.zeta H78.zetaDistinct ∈ H78.sourceSet :=
+  H78.zeta_mem_sourceSet H78.zetaDistinct_ne_ind1H
+
+/-- S09-facing constructor for the generic S08 weighted Ind-chain package.
+
+A concrete S07 coherent witness over the source set `S = T \ {Ind 1_H}` gives
+Peterfalvi's Ind-chain data with output family `χ_t = ν ζ_t`, provided the chosen
+source family lies in `S` and the scaled differences lie in the supported
+lattice where the coherent extension agrees with the original map `τ`. -/
+noncomputable def indChainDecomposition_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := L) (G := G) τ ζ d where
+  χ t := H78.nu (ζ t)
+  norm_one t := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem t)), hζ_norm]
+  pairwise_inner_zero t u htu := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem u)), hζ_pairwise htu]
+  d_zero := hd_zero
+  image_eq t := by
+    rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
+
+/-- H78-facing real Parseval form for the S08 weighted Ind-chain output.
+
+This consumes the same concrete S07 coherence witness as
+`indChainDecomposition_of_isCoherent`, then immediately applies the S08 weighted
+output norm identity to the resulting Ind-chain package. -/
+theorem indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner data.weightedOutput data.weightedOutput).re =
+      ∑ t : Fin n, (d t : ℝ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner data.weightedOutput data.weightedOutput).re =
+    ∑ t : Fin n, (d t : ℝ) ^ 2
+  exact data.weightedOutput_inner_self_re_eq_sum_sq
+
+/-- H78-facing real scalar-coefficient form for the weighted Ind-chain source
+difference. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re =
+      1 - ∑ t : Fin n, (d t : ℝ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re =
+    1 - ∑ t : Fin n, (d t : ℝ) ^ 2
+  exact data.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
+
+/-- H78-facing nonpositivity form for the weighted Ind-chain source difference. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_re_nonpos_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re ≤ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re ≤ 0
+  exact data.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
+
+/-- If the abstract `ν` carried by `Hypothesis78` is identified with a concrete
+S07 coherent extension, then `ν` sends the coherent lattice `ℤ[S]` into virtual
+irreducible characters of `G`.
+
+This is the S09-facing bridge to the real S07 coherence construction: it adds no
+new field to `Hypothesis78`, but lets downstream (7.8)/(7.9) arguments use
+`IsCoherent.extension_mem_ZIrr` whenever the concrete witness is available. -/
+theorem nu_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {φ : ClassFunction L ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan (L := L) S) :
+    H78.nu φ ∈ ZIrr G := by
+  rw [hnu]
+  exact hcoh.extension_mem_ZIrr φ hφ
+
+/-- Generator form of `nu_mem_ZIrr_of_isCoherent`: a member of the coherent set
+itself is automatically in its `ℤ`-span. -/
+theorem nu_mem_ZIrr_of_isCoherent_of_mem (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {φ : ClassFunction L ℂ} (hφ : φ ∈ S) :
+    H78.nu φ ∈ ZIrr G :=
+  H78.nu_mem_ZIrr_of_isCoherent hcoh hnu (Submodule.subset_span hφ)
+
+/-- If the concrete S07 coherent witness is built over the source set
+`S = T \ {Ind 1_H}`, then every non-`Ind 1_H` indexed source character has
+virtual-irreducible image under `ν`. -/
+theorem nu_zeta_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H) :
+    H78.nu (H78.hyp76.zeta i) ∈ ZIrr G :=
+  H78.nu_mem_ZIrr_of_isCoherent_of_mem hcoh hnu (H78.zeta_mem_sourceSet hi)
+
+/-- Distinguished-`ζ` specialization of `nu_zeta_mem_ZIrr_of_isCoherent`. -/
+theorem nu_zetaDistinct_mem_ZIrr_of_isCoherent (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension) :
+    H78.nu (H78.hyp76.zeta H78.zetaDistinct) ∈ ZIrr G :=
+  H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu H78.zetaDistinct_ne_ind1H
+
 /-- The Dade image defining `β` is supported on the corresponding Dade support. -/
 theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :
     H78.beta.support ⊆ H78.hyp76.hyp71.hyp.dadeSupport := by
@@ -1412,6 +1643,54 @@ theorem beta_support_subset_dadeSupport (H78 : Hypothesis78 G A L) :
 noncomputable def delta (H78 : Hypothesis78 G A L) : ClassFunction G ℂ :=
   H78.beta - Hypothesis71.constOne G +
     H78.nu (H78.hyp76.zeta H78.zetaDistinct)
+
+/-- If `β` is a virtual character and `ν` is a concrete coherent extension on
+`S = T \ {Ind 1_H}`, then the residual `Δ = β - 1_G + νζ` is virtual. -/
+theorem delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hbeta : H78.beta ∈ ZIrr G) :
+    H78.delta ∈ ZIrr G := by
+  have hconst : Hypothesis71.constOne G ∈ ZIrr G := by
+    have htriv : OddOrder.RepresentationTheory.trivialClassFunction G ∈ ZIrr G :=
+      OddOrder.RepresentationTheory.trivialClassFunction_isIrreducible.mem_ZIrr
+    simpa [Hypothesis71.constOne, OddOrder.RepresentationTheory.trivialClassFunction]
+      using htriv
+  have hzeta : H78.nu (H78.hyp76.zeta H78.zetaDistinct) ∈ ZIrr G :=
+    H78.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh hnu
+  simpa [delta] using Submodule.add_mem (ZIrr G)
+    (Submodule.sub_mem (ZIrr G) hbeta hconst) hzeta
+
+/-- If the `Ind 1_H` source term is virtual and the distinguished `ζ` is
+irreducible, then coherence supplies the residual virtual character `Δ`. -/
+theorem delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hindZ : H78.hyp76.zeta H78.ind1H ∈ ZIrr L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.delta ∈ ZIrr G :=
+  H78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent hcoh hnu
+    (H78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible hindZ hzeta_irr)
+
+/-- Source irreducibility and coherence supply the full virtual-character
+residual `Δ = β - 1_G + νζ`. -/
+theorem delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.delta ∈ ZIrr G :=
+  H78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    hcoh hnu hind_irr.mem_ZIrr hzeta_irr
 
 /-- The defining rearrangement `β = 1_G - ζ^ν + Δ`. -/
 theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
@@ -1648,17 +1927,24 @@ theorem sourceDiffNormEvaluation_of_inner_values (H78 : Hypothesis78 G A L)
     rw [H78.sourceDiffNormSq_expand, hind_norm, hzeta_ind, hind_zeta, hzeta_norm]
     simp
 
+/-- Any indexed source character has norm one once it is known to be irreducible. -/
+theorem zeta_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1 := by
+  simpa using
+    (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      (⟨H78.hyp76.zeta i, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L)
+      (⟨H78.hyp76.zeta i, hzeta_irr⟩ :
+        OddOrder.RepresentationTheory.IrreducibleCharacter L))
+
 /-- The chosen non-principal `ζ` has norm one once it is known to be irreducible. -/
 theorem zetaDistinct_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
     (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
     ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
-        (H78.hyp76.zeta H78.zetaDistinct) = 1 := by
-  simpa using
-    (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
-      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
-        OddOrder.RepresentationTheory.IrreducibleCharacter L)
-      (⟨H78.hyp76.zeta H78.zetaDistinct, hzeta_irr⟩ :
-        OddOrder.RepresentationTheory.IrreducibleCharacter L))
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+  H78.zeta_inner_self_eq_one_of_irreducible hzeta_irr
 
 /-- Variant of `sourceDiffNormEvaluation_of_inner_values` using irreducibility of
 the chosen `ζ` instead of a raw self-inner-product evaluation. -/
@@ -1850,6 +2136,26 @@ structure NormEstimates (H78 : Hypothesis78 G A L)
   /-- `‖Γ‖² ≤ e - 1`. -/
   gamma_norm_sq_le :
     H78.smallIndex → H78.gammaNormSq hBD ≤ (H78.complementIndex : ℝ) - 1
+
+/-- Raw class-function form of the `(ζ^ν)^ρ` lower bound supplied by
+`NormEstimates`.  This is the input shape used by the later (7.5)/(7.10)
+assembly, with `zetaNuRhoNormSq` unfolded. -/
+theorem zetaNuRho_inner_self_re_ge_of_normEstimates
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hNE : H78.NormEstimates hBD) (hsmall : H78.smallIndex) :
+    1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+      (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re := by
+  simpa [zetaNuRhoNormSq] using hNE.zetaNuRho_norm_sq_ge hsmall
+
+/-- Raw class-function form of the residual `Γ` upper bound supplied by
+`NormEstimates`.  This is the `Γ` norm-bound shape consumed by the final
+orthogonal-integer decomposition bridge for (7.10). -/
+theorem gamma_inner_self_re_le_of_normEstimates
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hNE : H78.NormEstimates hBD) (hsmall : H78.smallIndex) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+      (H78.complementIndex : ℝ) - 1 := by
+  simpa [gammaNormSq] using hNE.gamma_norm_sq_le hsmall
 
 /-- Under `2e + 1 ≤ h`, Peterfalvi's quadratic correction is nonnegative. -/
 theorem normQuadraticCorrection_nonneg_of_smallIndex
@@ -2065,22 +2371,103 @@ theorem betaNormSq_eq_of_weightedNuSum_norm
   norm_num [Complex.ofReal_div, Complex.ofReal_mul, Complex.ofReal_sub]
   ring
 
+/-- Any indexed coherent image `νζᵢ` has norm one once the source `ζᵢ` does. -/
+theorem nu_zeta_inner_self_eq_one (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i) = 1) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+        (H78.nu (H78.hyp76.zeta i)) = 1 := by
+  rw [H78.nu_isometry, hzeta_norm]
+
+/-- Any indexed coherent image `νζᵢ` has norm one once the source `ζᵢ` is irreducible. -/
+theorem nu_zeta_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
+    {i : Fin (H78.hyp76.n + 1)}
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ClassFunction.inner (H78.nu (H78.hyp76.zeta i))
+        (H78.nu (H78.hyp76.zeta i)) = 1 :=
+  H78.nu_zeta_inner_self_eq_one
+    (H78.zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+
 /-- The distinguished image `νζ` has norm one once the source `ζ` has norm one. -/
 theorem zetaImage_inner_self_eq_one (H78 : Hypothesis78 G A L)
     (hzeta_norm :
       ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
         (H78.hyp76.zeta H78.zetaDistinct) = 1) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
-        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 := by
-  rw [H78.nu_isometry, hzeta_norm]
+        (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.nu_zeta_inner_self_eq_one hzeta_norm
 
 /-- The source irreducibility of the distinguished `ζ` gives `‖νζ‖² = 1`. -/
 theorem zetaImage_inner_self_eq_one_of_irreducible (H78 : Hypothesis78 G A L)
     (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
     ClassFunction.inner (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
         (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
-  H78.zetaImage_inner_self_eq_one
-    (H78.zetaDistinct_inner_self_eq_one_of_irreducible hzeta_irr)
+  H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr
+
+/-- Coherence makes an indexed image `νζᵢ` a signed irreducible character once
+the source `ζᵢ` is irreducible.  This records exactly the sign ambiguity left by
+the virtual-character norm-one criterion. -/
+theorem exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i)) :
+    ∃ (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+        H78.nu (H78.hyp76.zeta i) = ε • (ξ : ClassFunction G ℂ) :=
+  OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one
+    (H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu hi)
+    (H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+
+/-- Distinguished-`ζ` specialization of the signed image criterion. -/
+theorem exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    ∃ (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+        H78.nu (H78.hyp76.zeta H78.zetaDistinct) = ε • (ξ : ClassFunction G ℂ) :=
+  H78.exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent hcoh hnu
+    H78.zetaDistinct_ne_ind1H hzeta_irr
+
+/-- If the coherent image `νζᵢ` has positive degree, the signed ambiguity collapses
+and `νζᵢ` is an irreducible character. -/
+theorem nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {i : Fin (H78.hyp76.n + 1)} (hi : i ≠ H78.ind1H)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hpos : ∃ d : ℕ, 0 < d ∧
+      (H78.nu (H78.hyp76.zeta i) : G → ℂ) 1 = (d : ℂ)) :
+    IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta i)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos
+    (H78.nu_zeta_mem_ZIrr_of_isCoherent hcoh hnu hi)
+    (H78.nu_zeta_inner_self_eq_one_of_irreducible hzeta_irr)
+    hpos
+
+/-- Distinguished-`ζ` specialization of the positive-degree image criterion. -/
+theorem zetaImage_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    (hpos : ∃ d : ℕ, 0 < d ∧
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct) : G → ℂ) 1 = (d : ℂ)) :
+    IsIrreducibleCharacter (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) :=
+  H78.nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos hcoh hnu
+    H78.zetaDistinct_ne_ind1H hzeta_irr hpos
 
 /-- Irreducibility and distinctness of the source `S`-family give its
 orthogonality matrix. -/
@@ -2111,6 +2498,34 @@ theorem sourceZeta_orthogonal_of_irreducible_distinct (H78 : Hypothesis78 G A L)
           (θ : ClassFunction L ℂ)) hχψ)
     simpa [χ, ψ, hne] using
       (OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite χ ψ)
+
+/-- Natural distinguished-column form of the source `S` orthogonality matrix. -/
+theorem sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+    (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j) :
+    ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ClassFunction.inner (H78.hyp76.zeta i)
+        (H78.hyp76.zeta H78.zetaDistinct) =
+        if i = H78.zetaDistinct then (1 : ℂ) else 0 := by
+  intro i hi
+  have hzeta_mem : H78.zetaDistinct ∈ (Finset.univ.erase H78.ind1H) := by
+    simp [H78.zetaDistinct_ne_ind1H]
+  have horth := H78.sourceZeta_orthogonal_of_irreducible_distinct hirr hdistinct
+  have hzeta_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.zetaDistinct) = 1 :=
+    H78.zetaDistinct_inner_self_eq_one_of_irreducible
+      (hirr H78.zetaDistinct hzeta_mem)
+  rw [horth i hi H78.zetaDistinct hzeta_mem]
+  by_cases hiz : i = H78.zetaDistinct
+  · subst i
+    rw [if_pos rfl, if_pos rfl]
+    exact hzeta_norm
+  · simp [hiz]
 
 /-- Irreducibility of the source `S`-family makes every source norm nonzero. -/
 theorem sourceZeta_norm_ne_of_irreducible (H78 : Hypothesis78 G A L)
@@ -2171,6 +2586,25 @@ theorem weightedNuSum_inner_zetaImage_eq_one (H78 : Hypothesis78 G A L)
     if_pos hzeta_mem, horth H78.zetaDistinct hzeta_mem]
   rw [if_pos rfl]
   field_simp [hzeta_one_ne_zero]
+
+/-- Natural source-data version of `weightedNuSum_inner_zetaImage_eq_one`. -/
+theorem weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.weightedNuSum
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) = 1 :=
+  H78.weightedNuSum_inner_zetaImage_eq_one
+    (H78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+      hirr hdistinct)
+    (by
+      rw [hzeta_degree]
+      exact_mod_cast H78.complementIndex_pos.ne')
 
 /-- Source orthogonality and the Burnside degree sum evaluate the norm of the
 weighted `S^ν`-sum in Peterfalvi (7.8.a).
@@ -2533,6 +2967,43 @@ theorem normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
       hind_norm hzeta_ind (hirr H78.zetaDistinct hzeta_mem))
     hirr hdistinct hzeta_degree hdegree_sum hzeta_uv
 
+/-- Source inner-product values, source irreducibility data, and the textbook
+`u,v,w` formula give the raw `Γ` norm-bound consumed by the (7.10)
+orthogonal-integer decomposition bridge. -/
+theorem gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ i ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta i (1 : L) * star (H78.hyp76.zeta i (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : H78.smallIndex) :
+    (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+      (H78.complementIndex : ℝ) - 1 :=
+  H78.gamma_inner_self_re_le_of_normEstimates hBD
+    (H78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula hBD
+      hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv)
+    hsmall
+
 /-- With the weighted-sum coefficient normalized, `BetaDecomp` gives
 `(β, ζ^ν) = a - 1`. -/
 theorem beta_inner_zetaImage_eq_int_sub_one_of_weighted
@@ -2565,6 +3036,26 @@ theorem beta_inner_zetaImage_eq_int_sub_one
   H78.beta_inner_zetaImage_eq_int_sub_one_of_weighted hBD
     (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
     (H78.weightedNuSum_inner_zetaImage_eq_one horth hzeta_one_ne_zero)
+
+/-- Natural source-data version of `(β, ζ^ν) = a - 1`. -/
+theorem beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hirr : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta i))
+    (hdistinct : ∀ i ∈ (Finset.univ.erase H78.ind1H),
+      ∀ j ∈ (Finset.univ.erase H78.ind1H), i ≠ j →
+        H78.hyp76.zeta i ≠ H78.hyp76.zeta j)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ)) :
+    ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) =
+      (hBD.a : ℂ) - 1 :=
+  H78.beta_inner_zetaImage_eq_int_sub_one hBD
+    (H78.sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct
+      hirr hdistinct)
+    (by
+      rw [hzeta_degree]
+      exact_mod_cast H78.complementIndex_pos.ne')
+    (hirr H78.zetaDistinct (by simp [H78.zetaDistinct_ne_ind1H]))
 
 /-- **Peterfalvi (7.8.c.i).**  For χ ∈ Irr G orthogonal to `S^ν` and `x ∈ A`,
 `χ^ρ(x) = star (β, χ)_G`. -/
@@ -2750,6 +3241,53 @@ noncomputable def secondZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
     ClassFunction G ℂ :=
   H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)
 
+/-- Coherence supplies virtual-character membership for the two distinguished
+`ζ` images used in (7.9). -/
+theorem zetaImages_mem_ZIrr_of_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension) :
+    H79.firstZetaImage ∈ ZIrr G ∧ H79.secondZetaImage ∈ ZIrr G := by
+  constructor
+  · simpa [firstZetaImage] using
+      H79.first.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₁ hnu₁
+  · simpa [secondZetaImage] using
+      H79.second.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₂ hnu₂
+
+/-- Coherence plus virtual `Ind 1_H` sources package the four virtual-character
+memberships used by the residual cross-term consumers. -/
+theorem delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct)) :
+    H79.first.delta ∈ ZIrr G ∧ H79.second.delta ∈ ZIrr G ∧
+      H79.firstZetaImage ∈ ZIrr G ∧ H79.secondZetaImage ∈ ZIrr G := by
+  have hδ₁ : H79.first.delta ∈ ZIrr G :=
+    H79.first.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₁ hnu₁ hind₁Z hzeta₁_irr
+  have hδ₂ : H79.second.delta ∈ ZIrr G :=
+    H79.second.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₂ hnu₂ hind₂Z hzeta₂_irr
+  obtain ⟨hζ₁, hζ₂⟩ := H79.zetaImages_mem_ZIrr_of_isCoherent hcoh₁ hnu₁ hcoh₂ hnu₂
+  exact ⟨hδ₁, hδ₂, hζ₁, hζ₂⟩
+
 /-- **Peterfalvi (7.9) conclusion.**  The two cross inner products cannot both
 vanish: `(β₁, ζ₂^{ν₂}) ≠ 0` or `(β₂, ζ₁^{ν₁}) ≠ 0`. -/
 def conclusion (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) : Prop :=
@@ -2778,6 +3316,19 @@ theorem beta_inner_beta_eq_zero (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
     exact Set.disjoint_left.mp H79.dadeSupport_disjoint
       (H79.first.beta_support_subset_dadeSupport hg₁)
       (H79.second.beta_support_subset_dadeSupport hg₂)
+  exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
+
+/-- If the two distinguished coherent images are supported in the corresponding
+disjoint Dade supports, their cross inner product vanishes. -/
+theorem zetaImage_cross_eq_zero_of_support_subset
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hζ₁_supp : H79.firstZetaImage.support ⊆ H79.first.hyp76.hyp71.hyp.dadeSupport)
+    (hζ₂_supp : H79.secondZetaImage.support ⊆ H79.second.hyp76.hyp71.hyp.dadeSupport) :
+    ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0 := by
+  have hdisj : Disjoint H79.firstZetaImage.support H79.secondZetaImage.support := by
+    rw [Set.disjoint_left]
+    intro g hg₁ hg₂
+    exact Set.disjoint_left.mp H79.dadeSupport_disjoint (hζ₁_supp hg₁) (hζ₂_supp hg₂)
   exact ClassFunction.inner_eq_zero_of_disjoint_support hdisj
 
 /-- Expanding `β₁ = 1_G - ζ₁^ν + Δ₁` and `β₂ = 1_G - ζ₂^ν + Δ₂`
@@ -2841,6 +3392,77 @@ theorem conclusion_of_delta_cross_nonzero (H79 : Hypothesis79 G A₁ L₁ A₂ L
     rw [Hypothesis71.ClassFunction.inner_symm H79.second.beta H79.firstZetaImage,
       hzero, star_zero]
 
+/-- Virtual-character residuals make the three residual cross terms integral. -/
+theorem delta_cross_integral_of_ZIrr
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hδ₁ : H79.first.delta ∈ ZIrr G)
+    (hδ₂ : H79.second.delta ∈ ZIrr G)
+    (hζ₁ : H79.firstZetaImage ∈ ZIrr G)
+    (hζ₂ : H79.secondZetaImage ∈ ZIrr G) :
+    (∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ)) ∧
+    (∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
+    (∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) := by
+  exact ⟨ClassFunction.inner_mem_ZIrr_int hδ₁ hζ₂,
+    ClassFunction.inner_mem_ZIrr_int hζ₁ hδ₂,
+    ClassFunction.inner_mem_ZIrr_int hδ₁ hδ₂⟩
+
+/-- Coherence, virtual `Ind 1_H` sources, and irreducible distinguished source
+terms make the three residual cross terms integral. -/
+theorem delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct)) :
+    (∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ)) ∧
+    (∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
+    (∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) := by
+  obtain ⟨hδ₁, hδ₂, hζ₁, hζ₂⟩ :=
+    H79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁Z hzeta₁_irr hind₂Z hzeta₂_irr
+  exact H79.delta_cross_integral_of_ZIrr hδ₁ hδ₂ hζ₁ hζ₂
+
+/-- Coherence and source irreducibility make the three residual cross terms integral. -/
+theorem delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.ind1H))
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂_irr : IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.ind1H))
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct)) :
+    (∃ x : ℤ,
+      ClassFunction.inner H79.first.delta H79.secondZetaImage = (x : ℂ)) ∧
+    (∃ y : ℤ,
+      ClassFunction.inner H79.firstZetaImage H79.second.delta = (y : ℂ)) ∧
+    (∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ)) :=
+  H79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁_irr.mem_ZIrr hzeta₁_irr
+    hind₂_irr.mem_ZIrr hzeta₂_irr
+
 /-- Integer-parity form of the last step of Peterfalvi (7.9): once the two
 residual cross terms are integers and `(Δ₁,Δ₂)` is an even integer, the displayed
 `0 = 1 - ... + ...` equation forces one cross term to be nonzero. -/
@@ -2877,6 +3499,105 @@ theorem conclusion_of_delta_cross_integral_parity
   · right
     rw [hy]
     exact_mod_cast hy_ne
+
+/-- Virtual-character inputs supply the two integer cross terms needed by the
+parity form of Peterfalvi (7.9). -/
+theorem conclusion_of_delta_cross_even_of_ZIrr
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hδ₁ : H79.first.delta ∈ ZIrr G)
+    (hδ₂ : H79.second.delta ∈ ZIrr G)
+    (hζ₁ : H79.firstZetaImage ∈ ZIrr G)
+    (hζ₂ : H79.secondZetaImage ∈ ZIrr G)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  obtain ⟨hx, hy, _hz⟩ := H79.delta_cross_integral_of_ZIrr hδ₁ hδ₂ hζ₁ hζ₂
+  exact H79.conclusion_of_delta_cross_integral_parity hBD₁ hBD₂ hzeta_cross hx hy
+    hdelta_even
+
+/-- Coherence, virtual `Ind 1_H` sources, and irreducible distinguished source
+terms supply the integer cross terms needed by the parity form of Peterfalvi
+(7.9). -/
+theorem conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct))
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  obtain ⟨hδ₁, hδ₂, hζ₁, hζ₂⟩ :=
+    H79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+      hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁Z hzeta₁_irr hind₂Z hzeta₂_irr
+  exact H79.conclusion_of_delta_cross_even_of_ZIrr hBD₁ hBD₂ hzeta_cross hδ₁ hδ₂
+    hζ₁ hζ₂ hdelta_even
+
+/-- Support-subset form of the weak parity consumer: the `ζ^ν` cross
+orthogonality is obtained from disjoint Dade supports. -/
+theorem conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity_of_zeta_support
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁Z : H79.first.hyp76.zeta H79.first.ind1H ∈ ZIrr L₁)
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂Z : H79.second.hyp76.zeta H79.second.ind1H ∈ ZIrr L₂)
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct))
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hζ₁_supp : H79.firstZetaImage.support ⊆ H79.first.hyp76.hyp71.hyp.dadeSupport)
+    (hζ₂_supp : H79.secondZetaImage.support ⊆ H79.second.hyp76.hyp71.hyp.dadeSupport)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion :=
+  H79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁Z hzeta₁_irr hind₂Z hzeta₂_irr hBD₁ hBD₂
+    (H79.zetaImage_cross_eq_zero_of_support_subset hζ₁_supp hζ₂_supp) hdelta_even
+
+/-- Coherence and source irreducibility supply the integer cross terms needed by
+the parity form of Peterfalvi (7.9). -/
+theorem conclusion_of_irreducible_sourceDiff_and_isCoherent_parity
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension)
+    (hind₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.ind1H))
+    (hzeta₁_irr : IsIrreducibleCharacter (H79.first.hyp76.zeta H79.first.zetaDistinct))
+    (hind₂_irr : IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.ind1H))
+    (hzeta₂_irr :
+      IsIrreducibleCharacter (H79.second.hyp76.zeta H79.second.zetaDistinct))
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion :=
+  H79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity
+    hcoh₁ hnu₁ hcoh₂ hnu₂ hind₁_irr.mem_ZIrr hzeta₁_irr
+    hind₂_irr.mem_ZIrr hzeta₂_irr hBD₁ hBD₂ hzeta_cross hdelta_even
 
 end Hypothesis79
 
@@ -3436,6 +4157,41 @@ noncomputable def h (F : FrobeniusFamily G k) (i : Fin k) : ℕ := Nat.card (F.H
 /-- Complement index `e_i = |L_i : H_i|` (exact, since `H_i ≤ L_i`). -/
 noncomputable def e (F : FrobeniusFamily G k) (i : Fin k) : ℕ :=
   Nat.card (F.L i) / Nat.card (F.H i)
+
+/-- If a local (7.8) package uses the `i`-th family kernel, its local
+kernel order is the family quantity `h_i`. -/
+lemma localKernelOrder_eq_h [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hH : H78.hyp76.H = F.H i) :
+    H78.kernelOrder = F.h i := by
+  simp [Hypothesis78.kernelOrder, FrobeniusFamily.h, hH]
+
+/-- If a local (7.8) package uses the `i`-th family host and kernel, its local
+complement index is the family quantity `e_i`. -/
+lemma localComplementIndex_eq_e [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hL : L = F.L i)
+    (hH : H78.hyp76.H = F.H i) :
+    H78.complementIndex = F.e i := by
+  simp [Hypothesis78.complementIndex, FrobeniusFamily.e, hL, hH]
+
+/-- Family-side small-index data `2e_i + 1 ≤ h_i` supplies the local (7.8.b)
+small-index hypothesis after identifying the local host and kernel. -/
+lemma localSmallIndex_of_family_cardinalities [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hL : L = F.L i)
+    (hH : H78.hyp76.H = F.H i)
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    H78.smallIndex := by
+  rw [Hypothesis78.smallIndex]
+  rw [F.localComplementIndex_eq_e H78 hL hH, F.localKernelOrder_eq_h H78 hH]
+  exact hsmall
 
 /-- `G₀` is nonempty: it contains the identity. -/
 lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :
@@ -4168,6 +4924,198 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_de
       B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
     hred
 
+/-- Source-data constructor form of `CharacterEstimateData` from the real reduced
+family inequality and Peterfalvi's orthogonal integer decomposition.
+
+This is the same assembly as
+`characterEstimateData_of_real_reduced_family_inequality_and_decomposition`, but
+it obtains the required `Γ` norm-bound directly from the local (7.8.b) source
+inputs for an `H78` package.  The only family/local cardinality bridge retained
+as an explicit hypothesis is `H78.complementIndex = F.e i`. -/
+noncomputable def characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hindex : H78.complementIndex = F.e i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : H78.smallIndex)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+    hmin B hB_ne v x hBD.Gamma Γ₁ hΓ horth hΓ₁ hx_nonzero
+    (by
+      simpa [hindex] using
+        H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+          hBD hind_norm hzeta_ind hirr hdistinct hzeta_degree hdegree_sum hzeta_uv hsmall)
+    hred
+
+/-- Source-data constructor with family-side cardinality hypotheses.
+
+Compared with
+`characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition`,
+this wrapper consumes the natural family/local identifications `L = L_i` and
+`H = H_i`, and the family-side small-index hypothesis `2e_i + 1 ≤ h_i`, rather
+than asking the caller to rewrite them into local (7.8.b) notation. -/
+noncomputable def characterEstimateData_of_source_decomposition_of_family_cardinalities
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (H78.complementIndex : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) =
+      (H78.complementIndex : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((H78.kernelOrder : ℂ) - 1) * (H78.complementIndex : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (H78.complementIndex : ℝ)) *
+            (1 - 1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (H78.kernelOrder : ℝ)) * (hBD.a : ℝ) +
+          (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition
+    H78 hBD (F.localComplementIndex_eq_e H78 hL hH)
+    hmin B hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+    hzeta_degree hdegree_sum hzeta_uv
+    (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall) hred
+
+/-- Source-data constructor with all cardinal source estimates stated in family
+notation.
+
+This is the downstream-facing form of the source-data final assembly: the source
+norm, degree sum, and `u,v,w` formula use the family quantities `e_i` and `h_i`.
+The wrapper rewrites them into the local `H78` notation before applying the
+local/family cardinality constructor. -/
+noncomputable def characterEstimateData_of_family_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_source_decomposition_of_family_cardinalities
+    H78 hBD hL hH hmin B hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero
+    (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+    hzeta_ind hirr hdistinct
+    (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+    (by
+      simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+        using hdegree_sum)
+    (by
+      simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+        using hzeta_uv)
+    hsmall hred
+
 /-- The named character-estimate data implies the displayed lower bound of
 Peterfalvi (7.10). -/
 lemma lowerBoundTerm_of_characterEstimateData [Finite G]
@@ -4240,6 +5188,84 @@ lemma lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
       B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
     hred
 
+/-- Source-data displayed-bound form for the final assembly step of Peterfalvi
+(7.10).
+
+This consumes the same family-notated local source data as
+`characterEstimateData_of_family_source_decomposition`, but returns the displayed
+lower bound for the chosen minimal index directly.  This is useful when the
+caller wants the (7.10) bound without first packaging the intermediate
+`CharacterEstimateData`. -/
+lemma lowerBoundTerm_of_family_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      ((F.e i : ℚ) - 1) *
+        (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+            ((F.e i : ℚ) * (F.h i : ℚ)) +
+          2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))) := by
+  refine F.lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition hodd
+    hmin B hB_ne v x hBD.Gamma Γ₁ hΓ horth hΓ₁ hx_nonzero ?_ hred
+  have hΓ_bound_local :
+      (ClassFunction.inner hBD.Gamma hBD.Gamma).re ≤
+        (H78.complementIndex : ℝ) - 1 :=
+    H78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
+      hBD
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+      hzeta_ind hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hdegree_sum)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hzeta_uv)
+      (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localComplementIndex_eq_e H78 hL hH] using hΓ_bound_local
+
 /-- Existential real-valued wrapper for the final assembly step of Peterfalvi
 (7.10).  The input shape matches the real reduced estimate before converting to
 the rational displayed lower bound. -/
@@ -4285,6 +5311,213 @@ theorem card_G0_lower_bound [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     sorry
   exact F.lowerBoundTerm_of_characterEstimateData hodd hdata
 
+/-- **Peterfalvi (7.11), displayed-bound form.**  The final contradiction from the
+existential lower bound displayed in (7.10).
+
+This isolates the terminal arithmetic of (7.11): any proof of the displayed (7.10) bound,
+including the still-open theorem `card_G0_lower_bound` or the conditional §9 assembly lemmas,
+can be consumed without duplicating the `G₀ = {1}` contradiction proof. -/
+theorem not_trivial_G0_of_lowerBoundTerm [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G))
+    (hbound :
+      ∃ i : Fin k,
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          ((F.e i : ℚ) - 1) *
+            (((F.h i : ℚ) - 2 * (F.e i : ℚ) - 1) /
+                ((F.e i : ℚ) * (F.h i : ℚ)) +
+              2 / ((F.h i : ℚ) * ((F.h i : ℚ) + 2))))
+    (hG0 : F.G0 = {(1 : G)}) : False := by
+  obtain ⟨i, hi⟩ := hbound
+  -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
+  have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
+  -- The right-hand side of (7.10) is strictly positive.
+  have hRHS := F.lowerBoundTerm_pos hodd i
+  -- But the conditional (7.10) lower bound says it is `≤ 0` — contradiction.
+  rw [hcard] at hi
+  have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
+  rw [hlhs, zero_div] at hi
+  linarith [hi, hRHS]
+
+/-- **Peterfalvi (7.11), penultimate existential form.**  The penultimate
+displayed lower bound from (7.10) already contradicts `G₀ = {1}`. -/
+theorem not_trivial_G0_of_exists_penultimate [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hpen : ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)))
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_penultimate hpen) hG0
+
+/-- **Peterfalvi (7.11), existential `𝓑`-sum form.**  If the final assembly
+produces a minimal index, a `𝓑`-set, the unweighted `𝓑`-sum bound, and the
+base estimate, then `G₀ = {1}` is impossible. -/
+theorem not_trivial_G0_of_exists_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          1 - (F.e i : ℚ) / (F.h i : ℚ) -
+            (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+            (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+              ((F.e j : ℚ) * (F.h j : ℚ))))
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_Bsum_bound hodd hdata) hG0
+
+/-- **Peterfalvi (7.11), existential real `𝓑`-sum form.**  This is the terminal
+consumer for the real-valued reduced estimate produced before the rational
+display of (7.10). -/
+theorem not_trivial_G0_of_exists_real_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+            (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+            (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+              ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_real_Bsum_bound hodd hdata) hG0
+
+/-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
+`CharacterEstimateData` package used to prove (7.10).
+
+This avoids routing through the still-open `card_G0_lower_bound`: once the §9 character theory has
+constructed `F.CharacterEstimateData`, the terminal `G₀ ≠ {1}` contradiction is already closed by
+the completed arithmetic and positivity lemmas. -/
+theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) (hdata : F.CharacterEstimateData)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.lowerBoundTerm_of_characterEstimateData hodd hdata) hG0
+
+/-- **Peterfalvi (7.11), `𝓑`-sum-bound form.**  The terminal contradiction from
+the separately established `𝓑`-sum bound and the real reduced family inequality.
+
+This is the direct consumer for final-assembly work that has already converted the
+orthogonal decomposition into the rational `𝓑`-sum estimate, but has not packaged the result
+as `CharacterEstimateData`. -/
+theorem not_trivial_G0_of_real_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum : (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+      (F.e i : ℚ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_characterEstimateData F hodd
+    (F.characterEstimateData_of_real_reduced_family_inequality hmin B hB_ne hBsum hred)
+    hG0
+
+/-- **Peterfalvi (7.11), raw final-assembly form.**  The terminal contradiction from the
+real reduced family inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
+
+This is the form closest to the outputs of (7.5), (7.8), and (7.9): it builds the named
+`CharacterEstimateData` internally, then applies `not_trivial_G0_of_characterEstimateData`. -/
+theorem not_trivial_G0_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_characterEstimateData F hodd
+    (F.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+      hmin B hB_ne v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hred)
+    hG0
+
+/-- **Peterfalvi (7.11), family-source final-assembly form.**  The terminal
+contradiction from the family-notated source data that produces the displayed
+(7.10) lower bound.
+
+This is the terminal consumer paired with
+`FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition`: once the
+character-theoretic work has supplied the chosen local (7.8) source package, the
+real reduced family inequality, and the orthogonal integer decomposition, the
+case `G₀ = {1}` is already impossible without using the still-open
+`card_G0_lower_bound`. -/
+theorem not_trivial_G0_of_family_source_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G)) {i : Fin k}
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ₁ : ClassFunction G ℂ)
+    (hΓ : hBD.Gamma = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    ⟨i, F.lowerBoundTerm_of_family_source_decomposition hodd H78 hBD hL hH hmin B
+      hB_ne v x Γ₁ hΓ horth hΓ₁ hx_nonzero hind_norm hzeta_ind hirr hdistinct
+      hzeta_degree hdegree_sum hzeta_uv hsmall hred⟩
+    hG0
+
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 
 There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups
@@ -4297,15 +5530,6 @@ and `e ∣ h - 1` with `h` odd give `(h - 2e - 1)/(eh) ≥ 0`, whence the right 
 of (7.10) is strictly positive — a contradiction. -/
 theorem not_trivial_G0 [Finite G] {k : ℕ} (F : FrobeniusFamily G k)
     (hodd : Odd (Nat.card G)) (hG0 : F.G0 = {(1 : G)}) : False := by
-  obtain ⟨i, hi⟩ := card_G0_lower_bound F hodd
-  -- `G₀ = {1}` forces `|G₀| = 1`, so the left-hand side of (7.10) is `0`.
-  have hcard : Nat.card F.G0 = 1 := by rw [hG0]; simp
-  -- The right-hand side of (7.10) is strictly positive.
-  have hRHS := F.lowerBoundTerm_pos hodd i
-  -- But (7.10) says it is `≤ 0` — contradiction.
-  rw [hcard] at hi
-  have hlhs : ((1 : ℕ) : ℚ) - 1 = 0 := by norm_num
-  rw [hlhs, zero_div] at hi
-  linarith [hi, hRHS]
+  exact not_trivial_G0_of_lowerBoundTerm F hodd (card_G0_lower_bound F hodd) hG0
 
 end OddOrder.Peterfalvi.S09

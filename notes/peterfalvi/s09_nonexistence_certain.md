@@ -323,3 +323,286 @@ theorem non_orthogonality_two_families
 *訂正版 作成: 2026-05-27 (原典 `04.9` 162 行 精読 + scaffold 実装に基づく). 旧版 2026-05-22 は App.C 混同のため破棄.*
 *(7.8.a/b)/(7.9) spec + blocker 追記: 2026-05-30 (issue 0044, mmd L63-113 精読 + repo 型検証).*
 *Burnside (1.5.d) `sumIrreducibleDegreeSq` / `sumNontrivialIrreducibleDegreeSq` 実装完了: 2026-05-30 (issue 0044, `ColumnOrthogonality.lean`).*
+
+
+### 2026-06-04 pass: conditional (7.11) from `CharacterEstimateData`
+
+S09 に `not_trivial_G0_of_characterEstimateData` を追加。これは未完の
+`card_G0_lower_bound` を経由せず、既に完成している `lowerBoundTerm_of_characterEstimateData`
+と `lowerBoundTerm_pos` だけから `G₀ = {1}` の矛盾を出す conditional terminal theorem。
+
+これにより §9 の最終矛盾は「`CharacterEstimateData` の構成」へ完全に局所化された。`card_G0_lower_bound`
+本体の sorry はその data 構成部分に残るが、下流は必要なら conditional theorem を使って
+sorryAx を避けられる。AxiomsCheck に登録して axiom-clean にする。
+
+
+### 2026-06-04 pass: raw final assembly to conditional (7.11)
+
+S09 に `not_trivial_G0_of_real_reduced_family_inequality_and_decomposition` を追加。これは
+(7.5)/(7.8)/(7.9) が供給する形に近い real reduced family inequality と orthogonal integer
+`𝓑`-sum decomposition から `CharacterEstimateData` を内部構成し、`G₀ = {1}` の矛盾まで進める。
+
+これで §9 の terminal contradiction は、named `CharacterEstimateData` だけでなく raw final-assembly
+input からも `card_G0_lower_bound` の sorry を通らず axiom-clean に利用できる。
+
+
+### 2026-06-04 pass: Bsum-bound input to conditional (7.11)
+
+S09 に `not_trivial_G0_of_real_Bsum_bound` を追加。これは `CharacterEstimateData` を
+明示的に渡す代わりに、既に得られた `𝓑`-sum bound と real reduced family inequality から
+`G₀ = {1}` の矛盾へ進む入口。
+
+raw orthogonal decomposition からの入口と named data からの入口の中間に置くことで、(7.8)/(7.9)
+側が先に `Bsum_le` を作った場合にも `card_G0_lower_bound` の sorry を経由せず使える。
+
+
+### 2026-06-04 pass: displayed (7.10) bound to (7.11)
+
+S09 に `not_trivial_G0_of_lowerBoundTerm` を追加し、`card_G0_lower_bound` の結論型そのものから
+`G₀ = {1}` の矛盾へ行く terminal arithmetic を独立化した。既存の
+`not_trivial_G0_of_characterEstimateData` と本 theorem `not_trivial_G0` はこの lemma に委譲する。
+
+これで (7.10) をどの conditional input から作っても、(7.11) 側の証明重複なしに同じ入口へ流せる。
+
+
+### 2026-06-04 pass: raw consumers for (7.8.b) norm estimates
+
+S09 に `Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates` と
+`Hypothesis78.gamma_inner_self_re_le_of_normEstimates` を追加。`NormEstimates` の named field を
+後段 assembly が使う `ClassFunction.inner _ _ .re` 形へ展開する consumer で、特に後者は
+(7.10) の orthogonal-integer decomposition bridge が要求する `Γ` norm-bound input に直接合う。
+
+`BetaDecomp`/`NormEstimates` の存在そのものは引き続き genuine proof target のままにし、証明書を
+新たに外出しする変更はしていない。
+
+### 2026-06-04 pass: existential final assembly to (7.11)
+
+S09 に `not_trivial_G0_of_exists_penultimate`, `not_trivial_G0_of_exists_Bsum_bound`,
+`not_trivial_G0_of_exists_real_Bsum_bound` を追加。`card_G0_lower_bound` の sorry を経由せず、
+(7.10) assembly が存在形で返す penultimate / rational `𝓑`-sum / real reduced `𝓑`-sum input から
+直接 `G₀ = {1}` の矛盾へ進む terminal consumer。
+
+これにより downstream は fixed-index 形だけでなく、Peterfalvi (7.10) の自然な existential output 形でも
+axiom-clean な (7.11) conditional theorem を使える。
+
+### 2026-06-04 pass: S07 coherence witness to S09 `ν` ZIrr-codomain
+
+S09 に `Hypothesis78.nu_mem_ZIrr_of_isCoherent` と
+`Hypothesis78.nu_mem_ZIrr_of_isCoherent_of_mem` を追加。`Hypothesis78` に `nu_maps_ZIrr`
+のような証明書フィールドを足さず、具体的な S07 `IsCoherent` witness と `H78.nu = hcoh.extension`
+を明示引数にして、`IsCoherent.extension_mem_ZIrr` を S09 側で使える形に変換する。
+
+これは (7.8.a)/(7.9) で必要になる `νζ ∈ ℤ[Irr G]` 系の入力を、実際の coherence 構成から
+引き出すための入口。抽象 `Hypothesis78.nu` 自体に新しい仮定は追加していない。
+
+### 2026-06-04 pass: indexed source set for S09 coherence
+
+S09 に `Hypothesis78.sourceSet`, `zeta_mem_sourceSet`, `zetaDistinct_mem_sourceSet`,
+`nu_zeta_mem_ZIrr_of_isCoherent`, `nu_zetaDistinct_mem_ZIrr_of_isCoherent` を追加。
+Peterfalvi (7.8) の `S = T \ {Ind 1_H}` を S09 側で名前付けし、具体的な S07
+`IsCoherent τ H78.sourceSet A_prime` witness と `H78.nu = hcoh.extension` から indexed
+`ζ_i` の `νζ_i ∈ ℤ[Irr G]` を直接得られる入口にした。
+
+これで (7.8.a)/(7.9) の downstream proof は、set membership の都度の組み立てではなく
+H78 の indexed API から `νζ_i` の ZIrr-codomain を取り出せる。
+
+### 2026-06-04 pass: signed irreducible images from S07 coherence
+
+S09 に indexed `zeta_inner_self_eq_one_of_irreducible`, `nu_zeta_inner_self_eq_one`,
+`nu_zeta_inner_self_eq_one_of_irreducible` と、coherence witness から `νζ_i` を signed
+irreducible character として取り出す
+`exists_zsmul_irreducibleCharacter_nu_zeta_of_isCoherent` / distinguished `ζ` 版を追加。
+
+`νζ_i ∈ ZIrr` と `‖νζ_i‖² = 1` からは符号が残るので、正性を hidden assumption にせず
+`ε = ±1` の存在形で公開した。後段で `νζ_i(1) > 0` が得られる場合のために、同じ入力から
+`IsIrreducibleCharacter (νζ_i)` を返す positive-degree bridge も追加した。
+
+
+### 2026-06-04 pass: AxiomsCheck coverage for S09 consumer sockets
+
+Gibbs explorer pass の指摘に従い、既存証明済みの S09 consumer sockets を `AxiomsCheck`
+に追加登録した。対象は `BetaDecomp` algebra (`weightedNuSum_orth_*`, `delta_*`,
+`betaNormSq_eq_*`)、(7.8.b) norm-package consumers、(7.9) の residual cross-term reduction、
+および (7.10) の `FrobeniusFamily.CharacterEstimateData` final-assembly constructors。
+
+これは新しい仮定や wrapper を足す変更ではなく、すでに S09 にある conditional theorem を downstream が
+axiom-clean な入口として参照できるようにする coverage pass。特に `card_G0_lower_bound` の残 sorry を
+迂回するものではなく、(7.8)/(7.9)/(7.10) の witness 構成後に接続すべき socket を明示化した。
+
+
+### 2026-06-04 pass: source-data bridges for the (7.8.a) distinguished coefficient
+
+S09 に `sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct`,
+`weightedNuSum_inner_zetaImage_eq_one_of_irreducible_source_data`,
+`beta_inner_zetaImage_eq_int_sub_one_of_irreducible_source_data` を追加した。
+
+これにより、source family `S = T \ {Ind 1_H}` が irreducible/distinct で、distinguished `ζ` の degree が
+`e` であるという自然な (7.8) 入力から、(7.8.a) の distinguished column computation
+`⟨Σ, νζ⟩ = 1` と `(β, νζ) = a - 1` を直接取り出せる。新しい証明書フィールドは追加しておらず、既存の
+source orthogonality / weighted-sum consumer を downstream が再構成しなくてよい形にした bridge pass。
+
+
+### 2026-06-04 pass: residual ZIrr bridges for (7.9)
+
+S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と
+`Hypothesis79.delta_cross_integral_of_ZIrr` を追加した。前者は `β ∈ ZIrr G` と concrete S07
+coherence witness から `Δ = β - 1_G + νζ ∈ ZIrr G` を作る bridge。後者は `Δ₁`, `Δ₂`,
+`ζ₁^ν`, `ζ₂^ν` が virtual character であることから、(7.9) の residual cross terms が整数値になることを
+`ClassFunction.inner_mem_ZIrr_int` へ落とす。
+
+これで (7.9) の parity consumer `conclusion_of_delta_cross_integral_parity` に渡す入力のうち、
+整数性部分は ZIrr membership へ局所化された。残る実数学入力は `β ∈ ZIrr` の構成、`(Δ₁,Δ₂)` の偶性、
+および source/coherence 由来の `ζ` cross-orthogonality。
+
+
+### 2026-06-04 pass: `β ∈ ZIrr` bridge from §4 Dade preservation
+
+S09 に `Hypothesis78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr` を追加した。これは S09 の
+`β = τ (Ind 1_H - ζ)` を、§4 の `IsDadeMap.unique` で canonical `hyp.dadeMap` に戻し、構成済みの
+`fullDadeIsometryData.maps_virtualCharacter` を適用する bridge。入力は source-side の
+`Ind 1_H - ζ ∈ ZIrr L` のみに切り出しているので、後段の Peterfalvi (7.8) arithmetic は Dade API と混ぜずに
+独立 obligation として残る。
+
+
+### 2026-06-04 pass: source-difference `ZIrr` from irreducible source terms
+
+S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_irreducible` と
+`Hypothesis78.beta_mem_ZIrr_of_irreducible_sourceDiff` を追加した。前者は
+`ζ_ind1H`, `ζ` がともに irreducible character なら `Submodule.sub_mem` で
+`ζ_ind1H - ζ ∈ ZIrr L` を返す最小 bridge。後者は直前の §4 Dade bridge と合成して
+`β ∈ ZIrr G` を返す consumer で、(7.8)/(7.9) 側は source-side の lattice membership を直接扱わずに済む。
+
+
+### 2026-06-04 pass: composed residual integrality consumers
+
+S09 に `Hypothesis78.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent`、
+`Hypothesis79.delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent`、
+`Hypothesis79.conclusion_of_irreducible_sourceDiff_and_isCoherent_parity` を追加した。
+これらは直前の `β ∈ ZIrr` bridge、coherence 由来の `νζ ∈ ZIrr`、既存の
+`delta_cross_integral_of_ZIrr` / parity consumer を合成するだけの S09-facing socket。
+(7.9) の downstream では、source irreducibility と coherence witness、さらに `(Δ₁,Δ₂)` の偶整数性を渡せば
+`H79.conclusion` まで接続できる。
+
+
+### 2026-06-04 pass: weaker residual and parity consumers
+
+Gibbs explorer の指摘に従い、`Hypothesis78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent`、
+`Hypothesis79.zetaImages_mem_ZIrr_of_isCoherent`、
+`Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr` を追加した。これにより `ind1H` source term は
+irreducible である必要がなく、`ζ_ind1H ∈ ZIrr L` から `Δ ∈ ZIrr G` へ接続できる。
+また (7.9) 側では coherence から二つの distinguished `ζ^ν` の `ZIrr` membership をまとめて取り出し、
+`ZIrr` residuals と `(Δ₁,Δ₂)` 偶整数性から parity conclusion に直接入れる。
+
+
+### 2026-06-04 pass: weak two-family residual consumers
+
+S09 に `Hypothesis79.delta_cross_integral_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` と
+`Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity` を追加した。
+既存の irreducible-source 版はこれらの特殊化に戻し、二族の (7.9) consumer でも
+`Ind 1_H` source term には irreducibility ではなく `ZIrr` membership だけを要求する形に弱化した。
+これで H78 側の weak residual bridge と H79 側の parity conclusion が同じ入力粒度で接続できる。
+
+
+### 2026-06-04 pass: residual membership package
+
+S09 に `Hypothesis79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent`
+を追加した。H79 の weak source input から `Δ₁`, `Δ₂`, `ζ₁^ν`, `ζ₂^ν` の 4 つの
+`ZIrr` membership をまとめて返す package theorem で、直前に追加した residual integrality/parity
+consumer はこの package を使う形へ整理した。downstream は整数性 lemma を使う前に membership だけを取り出せる。
+
+
+### 2026-06-04 pass: weak source-difference beta bridges
+
+S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` と
+`Hypothesis78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` を追加した。
+H78 単体でも `Ind 1_H` source term は irreducible ではなく `ZIrr` membership で十分な形になり、
+既存の irreducible 版と `delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` は
+この weak bridge への特殊化/合成に整理された。
+
+
+### 2026-06-04 pass: support-driven zeta cross socket
+
+S09 に `Hypothesis79.zetaImage_cross_eq_zero_of_support_subset` と
+`Hypothesis79.conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity_of_zeta_support`
+を追加した。これで (7.9) の `⟨ζ₁^ν, ζ₂^ν⟩ = 0` 入力は raw equality だけでなく、
+二つの distinguished coherent image の support が disjoint Dade supports に入ることから生成できる。
+将来の (4.1) `ν`-image support bridge と H79 parity consumer の接続点になる。
+
+
+### 2026-06-04 pass: raw gamma bound from source data
+
+S09 に
+`Hypothesis78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula`
+を追加した。source inner-product values / source irreducibility-distinctness / degree-sum / `u,v,w` formula / small-index
+をまとめて、(7.10) の `Bsum_le_of_orthogonal_integer_decomposition` が要求する
+`(Γ, Γ).re ≤ e - 1` へ直接渡せる形にする consumer。
+
+
+### 2026-06-04 pass: source-data final assembly constructor
+
+S09 に
+`FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_source_decomposition`
+を追加した。`H78` 側の source-data / `u,v,w` formula / small-index から得た `Γ` bound を、
+`CharacterEstimateData` の real reduced family inequality + orthogonal decomposition constructor に直接接続する。
+局所データと family index の接続は `H78.complementIndex = F.e i` として明示的に残した。
+
+
+### 2026-06-04 pass: family/local cardinality bridges
+
+S09 に `FrobeniusFamily.localKernelOrder_eq_h`,
+`FrobeniusFamily.localComplementIndex_eq_e`,
+`FrobeniusFamily.localSmallIndex_of_family_cardinalities` を追加した。
+`H78` の局所 `h/e/smallIndex` を family 側の `F.h i` / `F.e i` / `2e_i+1≤h_i`
+から供給できる。
+
+さらに
+`FrobeniusFamily.characterEstimateData_of_source_decomposition_of_family_cardinalities`
+を追加し、前回の source-data final assembly constructor が要求していた local `hindex` と
+`H78.smallIndex` を、`L = F.L i`, `H = F.H i`, family-side small-index から内部生成する入口にした。
+
+
+### 2026-06-04 pass: family-notated source-data final assembly
+
+S09 に `FrobeniusFamily.characterEstimateData_of_family_source_decomposition` を追加した。
+source norm / distinguished degree / degree-sum / `u,v,w` formula の RHS をすべて family 側の
+`F.e i` と `F.h i` で受け取り、前回追加した cardinality bridge で local `H78` 表記へ変換する。
+これで downstream の (7.8.b) 入力は family notation のまま `CharacterEstimateData` へ接続できる。
+
+
+### 2026-06-04 pass: family-source displayed lower bound
+
+S09 に `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition` を追加した。
+`characterEstimateData_of_family_source_decomposition` と同じ family-notated source inputs から、
+`CharacterEstimateData` を明示的に作らずに、選んだ minimal index `i` の Peterfalvi (7.10) 表示下界を直接返す。
+これで downstream は (7.5)/(7.8.b)/(7.9) 由来の family notation 入力を、`card_G0_lower_bound` の sorry を経由せず
+表示下界 consumer へ接続できる。
+
+
+### 2026-06-04 pass: family-source terminal contradiction
+
+S09 に `not_trivial_G0_of_family_source_decomposition` を追加した。
+前回の `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition` を existential (7.10) bound に包み、
+`not_trivial_G0_of_lowerBoundTerm` に渡す terminal consumer。
+これで family-notated source data / real reduced family inequality / orthogonal integer decomposition が揃った時点で、
+`card_G0_lower_bound` の sorry を経由せず `G₀ = {1}` の矛盾まで直接閉じられる。
+
+### 2026-06-04 pass: S08 Ind-chain bridge from H78 coherence
+
+S09 に `Hypothesis78.indChainDecomposition_of_isCoherent` を追加した。
+具体的な S07 `IsCoherent τ H78.sourceSet A'` witness と `H78.nu = extension` を受け取り、
+任意の source family `ζ_t ∈ H78.sourceSet` と supported scaled differences から、S08 の
+`IndChainDecomposition τ ζ d` を `χ_t = H78.nu ζ_t` として構成する。
+
+これで S08 側に積み上げた weighted Ind-chain Parseval / scalar coefficient API を、S09 の
+`Hypothesis78` 表記から直接起動できる。
+
+### 2026-06-05 pass: H78 Ind-chain weighted consumers
+
+S09 に `Hypothesis78.indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_nonpos_of_isCoherent` を追加した。
+前回の `Hypothesis78.indChainDecomposition_of_isCoherent` で作った S08 `IndChainDecomposition` を、
+S09/H78 の引数列から直接 S08 weighted Parseval / scalar coefficient API に渡す consumer 形。
+
+これで downstream の (7.8)/(7.10) 側は、H78 の `ν` と concrete `IsCoherent` witness だけを持っていれば、
+`data := ...` を毎回組み立てずに weighted output norm と weighted source-difference の非正性を使える。

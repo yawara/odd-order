@@ -67,6 +67,26 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   normal H の induced support と degree-one equality から (Ind θ_i - Ind θ_0).support ⊆ H^# を直接呼べる。
 - [ ] **Layer D2c — T6 family / engine wiring**: Y=S(Hprime) の family construction、
   coherentEqualDegree_fromDade への接続、および case c2 側の inertia discharge。
+  - 2026-06-04: `coherentYFamily_of_pairwiseNonconj` で nontrivial linear source family から
+    `isIrreducibleCharacter_induce_of_degree_one` を内部適用し、Y-family caller から induced
+    irreducibility family 仮定を削除。残りは `Y=S(H')` の enumeration/range wiring。
+  - 2026-06-04: `induce_linearIrreducibleCharacter_mem_Yset` /
+    `range_induce_linearIrreducibleCharacter_subset_Yset` で constructed nontrivial linear family
+    の induced range が `Y=S(H')` に入ることを証明。
+  - 2026-06-04: `exists_linear_source_of_mem_Yset` /
+    `mem_Yset_iff_exists_linear_source` で逆向きも証明。残りは nontrivial linear characters の
+    finite enumeration と exact range equality。
+  - 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` /
+    `coherentYset_of_pairwiseNonconj` で、非自明 linear characters の induced `Yset` members を
+    覆う orbit-representative `Fin n` family から `Yset` 上の coherence へ直接 rewrite する
+    adapter を追加。
+  - 2026-06-04: `Yset_finite` と `exists_Yset_linearRepresentativeFamily` で concrete
+    representative construction を追加。有限な `Yset` を enumerate し、各 member の linear source
+    を選ぶことで exact range / cover / pairwise nonconjugacy を構成し、
+    `coherentYset_of_two_le_ncard` まで接続。
+  - 2026-06-04: `Yset_nonempty` / `Yset_hasNoRealCharacters` / `Yset_closedUnderConjugate` /
+    `two_le_Yset_ncard` / `coherentYset` を追加。誘導と複素共役の可換性 `induce_conj` を足し、
+    S07 の cardinality lemma で `2 ≤ |Y|` を discharge。
 
 ## 完了条件
 
@@ -77,7 +97,27 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   `isIrreducibleCharacter_induce_of_frobeniusGroup` として 6.34 まで packaging。
 - ✅ 2026-06-02: S08 で degree-one source θ の (Ind_H^L θ)(1)=|W₁| を packaging。
 - ✅ 2026-06-02: S08 で degree-one induced differences の H^# support を packaging。
-- 残: Y=S(Hprime) family construction、coherentEqualDegree_fromDade 接続、case c2 側の inertia discharge。
+- ✅ 2026-06-04: S08 の c2/case-A inertia bridge、degree-one induced irreducibility、
+  `coherentYFamily`、Xset irreducibility consumer を AxiomsCheck 登録。全て 3 axiom allowlist 内。
+- ✅ 2026-06-04: `range_induce_linearIrreducibleCharacter_eq_Yset_of_induce_surjective` と
+  `coherentYset_of_pairwiseNonconj` を AxiomsCheck 登録。induced `Yset` members を覆う
+  orbit-representative family から `Yset` coherence へ rewrite する adapter まで接続済み。
+- ✅ 2026-06-04: `Y = S(H')` の concrete finite family construction と
+  surjectivity/pairwise nonconjugacy の構成を `exists_Yset_linearRepresentativeFamily` で完了。
+- ✅ 2026-06-04: `2 ≤ hyp.Yset.ncard` を `two_le_Yset_ncard` で discharge し、
+  cardinality 仮定なしの `coherentYset` まで接続。
+- ✅ 2026-06-04: `X=S-S(H')`, `Y=S(H')` の partition lemma と
+  `coherentS_of_Xset_commutator_Yset_glued` を追加。`coherentYset` を union glue へ差し込む
+  adapter まで接続。
+- ✅ 2026-06-04: Frobenius case の `Xset H'` coherence wrapper
+  `Xset_commutator_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_frobenius` /
+  `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius` を追加。
+  c1 側の `X⊆Irr` は `hF` から内部 discharge 済み。
+- ✅ 2026-06-04: `SsubFiltration_antitone` / `Xset_mono` /
+  `Xset_commutator_eq_Xset_union_filtrationDiff` を追加。c2 側は `Z≤H'` の小さい coherent
+  `X(Z)` から `X(H')` へ上げる差分層、または (6.8.3) final upgrade が必要。
+- 残: (6.8) 本体へ入れるための c1 per-step data、c2 由来の `X` coherence route、
+  orthogonality/generation 入力の構成。
 
 ## 参照
 

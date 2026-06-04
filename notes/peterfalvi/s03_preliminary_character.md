@@ -91,6 +91,12 @@ Peterfalvi §3 は **Isaacs [Is] 1976 Character Theory Ch.1-7 と Peterfalvi 独
   `φ 1`) onto Peterfalvi's `characterDegree`, since `characterDegree χ = χ 1`
   definitionally.  Lets `χ(1) ∣ |G|` flow into §6.7/§7 degree statements phrased
   through `characterDegree`.
+- (2026-06-04) `exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup` —
+  **Isaacs Cor. 3.12 / Peterfalvi (6.6) p-group degree datum** packaged with one
+  natural witness: for `χ : IrreducibleCharacter G` of a finite `p`-group, there
+  are `d k : ℕ` with `0 < d`, `characterDegree χ = (d : ℂ)`, and `d = p^k`.
+  This bridges the existing p-power theorem to S08's natural-degree witnesses and
+  prime-power gap data without reopening the representation witness downstream.
 - `centralizerInSubgroup` and `VanishesOnTrivialSubgroupCentralizers` encode the
   target shape of (1.2) without adding a new proof stub.
 - The shared `ClassFunction` infrastructure now exposes support/restriction
