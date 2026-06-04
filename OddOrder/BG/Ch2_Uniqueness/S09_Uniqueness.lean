@@ -175,6 +175,58 @@ private theorem two_le_rank_of_noncyclic_pSubgroup [Finite G] (hG : IsMinimalSim
   have h2pRank : 2 ≤ pRank ↥B p := hElog.trans (le_pRank E hEea)
   exact h2pRank.trans (pRank_le_rank (G := ↥B) p)
 
+/-- In a finite `p`-group, elementary abelian subgroups for a different prime have
+zero logarithmic size. This is the local arithmetic bridge behind turning BG rank
+of a `p`-group back into the same-prime `pRank`. -/
+private theorem pRank_eq_zero_of_isPGroup_of_ne_prime {H : Type*} [Group H] [Finite H]
+    {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hqp : q ≠ p) (hH : IsPGroup p H) :
+    pRank H q = 0 := by
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  apply le_antisymm ?_ (Nat.zero_le _)
+  rw [pRank_le_iff]
+  intro E hE
+  have hE_p : IsPGroup p E := hH.to_subgroup E
+  have hE_q : IsPGroup q E := hE.isPGroup
+  obtain ⟨a, ha⟩ := hE_p.exists_card_eq
+  obtain ⟨b, hb⟩ := hE_q.exists_card_eq
+  have hcard_one : Nat.card E = 1 := by
+    by_contra hne
+    have hbpos : 0 < b := by
+      by_contra hb0
+      have hb_zero : b = 0 := by omega
+      have hEcard_one : Nat.card E = 1 := by
+        simpa [hb_zero] using hb
+      exact hne hEcard_one
+    have hq_dvd_card : q ∣ Nat.card E := by
+      rw [hb]
+      exact dvd_pow_self q hbpos.ne'
+    have hq_dvd_powa : q ∣ p ^ a := by
+      rwa [ha] at hq_dvd_card
+    have hq_dvd_p : q ∣ p := hq.dvd_of_dvd_pow hq_dvd_powa
+    have hqeqp : q = p :=
+      (Nat.prime_dvd_prime_iff_eq hq (Fact.out : p.Prime)).mp hq_dvd_p
+    exact hqp hqeqp
+  simp [hcard_one]
+
+/-- A finite `p`-group has no rank contribution from primes other than `p`. -/
+private theorem rank_le_pRank_of_isPGroup {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] (hH : IsPGroup p H) :
+    rank H ≤ pRank H p := by
+  rw [rank_le_iff]
+  intro q hq
+  by_cases hqp : q = p
+  · subst q
+    exact le_rfl
+  · rw [pRank_eq_zero_of_isPGroup_of_ne_prime (H := H) (p := p) (q := q) hq hqp hH]
+    exact Nat.zero_le _
+
+/-- In a finite `p`-group, a rank-three lower bound is witnessed at the same prime `p`. -/
+private theorem three_le_pRank_of_isPGroup_of_three_le_rank {H : Type*} [Group H] [Finite H]
+    {p : ℕ} [Fact p.Prime] (hH : IsPGroup p H) (hr : 3 ≤ rank H) :
+    3 ≤ pRank H p :=
+  hr.trans (rank_le_pRank_of_isPGroup hH)
+
 /-- A normal elementary abelian subgroup D of order p^2 cuts rank at most one from a
 rank-three elementary abelian subgroup.
 
@@ -293,6 +345,57 @@ private theorem two_le_rank_inf_centralizer_of_normal_in_overgroup_card_prime_sq
       (Subgroup.inclusion_injective hHleKG)
   exact (hKP_rank.trans hKP_rank_le_H).trans hH_rank_le_KG
 
+/-- `A`-side local rank-drop bridge for BG Corollary 9.3.
+
+If a finite `p`-subgroup `A ≤ P` has BG rank at least three and `D ⊴ P` is elementary
+abelian of order `p^2`, then `A ∩ C_G(D)` has rank at least two. The proof extracts a
+rank-three elementary abelian subgroup of `A` at the same prime `p`, applies the already
+proved elementary abelian rank-drop inside `P`, then includes back into `A ∩ C_G(D)`. -/
+private theorem two_le_rank_inf_centralizer_of_pSubgroup_rank_three [Finite G]
+    {p : ℕ} [Fact p.Prime] {P D A : Subgroup G}
+    (hAp : IsPGroup p A) (hAP : A ≤ P) (hDP : D ≤ P)
+    (hDnormP : (D.subgroupOf P).Normal)
+    (hDea : D.IsElementaryAbelian p) (hDcard : Nat.card D = p ^ 2)
+    (hmA : 3 ≤ rank ↥A) :
+    2 ≤ rank ↥(A ⊓ Subgroup.centralizer (D : Set G)) := by
+  classical
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hmA
+  obtain ⟨A₀, hA₀ea, hA₀log⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥A) (p := p) (n := 3) (by norm_num) h3pRankA
+  let Astar : Subgroup G := A₀.map A.subtype
+  have hAstar_ea : Astar.IsElementaryAbelian p := by
+    change (A₀.map A.subtype).IsElementaryAbelian p
+    exact Subgroup.IsElementaryAbelian.map A.subtype_injective hA₀ea
+  have hAstar_log : 3 ≤ Nat.log p (Nat.card Astar) := by
+    change 3 ≤ Nat.log p (Nat.card (A₀.map A.subtype))
+    rw [Subgroup.card_map_of_injective A.subtype_injective]
+    exact hA₀log
+  have hAstarP : Astar ≤ P := by
+    intro x hx
+    rw [Subgroup.mem_map] at hx
+    obtain ⟨y, _hy, rfl⟩ := hx
+    exact hAP y.2
+  have hAstar_le_A : Astar ≤ A := by
+    intro x hx
+    rw [Subgroup.mem_map] at hx
+    obtain ⟨y, _hy, rfl⟩ := hx
+    exact y.2
+  have hAstar_rank :
+      2 ≤ rank ↥(Astar ⊓ Subgroup.centralizer (D : Set G)) :=
+    two_le_rank_inf_centralizer_of_normal_in_overgroup_card_prime_sq_of_log_three
+      (P := P) (D := D) (Bstar := Astar) hDP hAstarP hDnormP hDea hDcard
+      hAstar_ea hAstar_log
+  have hle :
+      Astar ⊓ Subgroup.centralizer (D : Set G) ≤
+        A ⊓ Subgroup.centralizer (D : Set G) := by
+    intro x hx
+    exact ⟨hAstar_le_A hx.1, hx.2⟩
+  exact hAstar_rank.trans
+    (rank_le_of_injective (f := Subgroup.inclusion hle)
+      (Subgroup.inclusion_injective hle))
+
 /-- BG Corollary 9.3's Corollary-9.2 cascade, after the Lemma-4.5 witness `D` and the
 two cyclic-quotient rank drops have been supplied.
 
@@ -381,6 +484,30 @@ private theorem isUniquelyMaximal_of_overgroup_rank_drop_witness [Finite G]
       hBstarea hBstarlog
   exact isUniquelyMaximal_of_rank_drop_witness hG hAab hAU hBp hBnc hDea hDcard
     hBstarea hBstarlog hBstar_le_CB hrCAD hrCBD
+
+/-- BG Corollary 9.3 cascade with both cyclic-quotient rank drops discharged from a
+single normal `E_{p^2}` witness `D ⊴ P`.
+
+This is the form left after choosing the Lemma-4.5 witness and a rank-three elementary
+abelian subgroup `B* ≤ C_G(B)` inside the same overgroup `P`. -/
+private theorem isUniquelyMaximal_of_overgroup_rank_three_witness [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A B D Bstar P : Subgroup G}
+    (hAab : IsMulCommutative A) (hAp : IsPGroup p A) (hAU : IsUniquelyMaximal A)
+    (hBp : IsPGroup p B) (hBnc : ¬ IsCyclic ↥B)
+    (hAP : A ≤ P) (hDP : D ≤ P) (hBstarP : Bstar ≤ P)
+    (hDnormP : (D.subgroupOf P).Normal)
+    (hDea : D.IsElementaryAbelian p) (hDcard : Nat.card D = p ^ 2)
+    (hBstarea : Bstar.IsElementaryAbelian p)
+    (hBstarlog : 3 ≤ Nat.log p (Nat.card Bstar))
+    (hBstar_le_CB : Bstar ≤ Subgroup.centralizer (B : Set G))
+    (hmA : 3 ≤ rank ↥A) :
+    IsUniquelyMaximal B := by
+  classical
+  have hrCAD : 2 ≤ rank ↥(A ⊓ Subgroup.centralizer (D : Set G)) :=
+    two_le_rank_inf_centralizer_of_pSubgroup_rank_three
+      (P := P) (D := D) (A := A) hAp hAP hDP hDnormP hDea hDcard hmA
+  exact isUniquelyMaximal_of_overgroup_rank_drop_witness hG hAab hAU hBp hBnc hDP
+    hBstarP hDnormP hDea hDcard hBstarea hBstarlog hBstar_le_CB hrCAD
 
 /-- **BG Corollary 9.3** (mmd L2545): `p` prime, `A` abelian `p`-部分群, `B` noncyclic
 `p`-部分群、`A ∈ 𝒰`, `m(A) ≥ 3`, `r_p(C_G(B)) ≥ 3` ⇒ `B ∈ 𝒰`。 -/

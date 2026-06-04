@@ -420,3 +420,19 @@ The remaining Corollary 9.3 proof obligation is now concentrated in the witness-
 `A`-side rank-drop step: extract/conjugate the rank-three elementary abelian subgroup from
 `C_G(B)`, choose a common Sylow `P` and normal `D ≤ P` of order `p^2`, and prove
 `rank (A ∩ C_G(D)) >= 2` for the abelian `p`-subgroup `A`.
+
+### Lean API status (2026-06-04, A-side rank-drop bridge)
+
+The `A`-side Corollary 9.3 rank-drop is now isolated as
+`two_le_rank_inf_centralizer_of_pSubgroup_rank_three`. For a finite `p`-subgroup
+`A ≤ P` with `3 ≤ rank A` and a normal `D ≤ P` of order `p^2`, it first proves that
+`3 ≤ pRank A p`: a finite `p`-group has no `rank` contribution from elementary abelian
+`q`-subgroups with `q ≠ p`. It then extracts a rank-three elementary abelian subgroup
+`A0 ≤ A`, applies the local-overgroup rank-drop bridge to `A0`, and includes the result
+into `A ∩ C_G(D)`.
+
+The wrapper `isUniquelyMaximal_of_overgroup_rank_three_witness` now packages both
+cyclic-quotient rank drops from a single overgroup witness `D ⊴ P`. Corollary 9.3 is
+therefore reduced to the remaining witness-selection step: extract/conjugate a rank-three
+`B* ≤ C_G(B)`, choose a common Sylow overgroup `P` containing `A`, `B*`, and `D`, and supply
+the normal Lemma-4.5 `E_{p^2}` witness inside `P`.
