@@ -334,3 +334,13 @@ S09 に `not_trivial_G0_of_characterEstimateData` を追加。これは未完の
 これにより §9 の最終矛盾は「`CharacterEstimateData` の構成」へ完全に局所化された。`card_G0_lower_bound`
 本体の sorry はその data 構成部分に残るが、下流は必要なら conditional theorem を使って
 sorryAx を避けられる。AxiomsCheck に登録して axiom-clean にする。
+
+
+### 2026-06-04 pass: raw final assembly to conditional (7.11)
+
+S09 に `not_trivial_G0_of_real_reduced_family_inequality_and_decomposition` を追加。これは
+(7.5)/(7.8)/(7.9) が供給する形に近い real reduced family inequality と orthogonal integer
+`𝓑`-sum decomposition から `CharacterEstimateData` を内部構成し、`G₀ = {1}` の矛盾まで進める。
+
+これで §9 の terminal contradiction は、named `CharacterEstimateData` だけでなく raw final-assembly
+input からも `card_G0_lower_bound` の sorry を通らず axiom-clean に利用できる。

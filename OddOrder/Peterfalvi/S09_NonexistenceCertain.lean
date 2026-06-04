@@ -4305,6 +4305,37 @@ theorem not_trivial_G0_of_characterEstimateData [Finite G] {k : ℕ} (F : Froben
   rw [hlhs, zero_div] at hi
   linarith [hi, hRHS]
 
+/-- **Peterfalvi (7.11), raw final-assembly form.**  The terminal contradiction from the
+real reduced family inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
+
+This is the form closest to the outputs of (7.5), (7.8), and (7.9): it builds the named
+`CharacterEstimateData` internally, then applies `not_trivial_G0_of_characterEstimateData`. -/
+theorem not_trivial_G0_of_real_reduced_family_inequality_and_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)] {k : ℕ} (F : FrobeniusFamily G k)
+    (hodd : Odd (Nat.card G)) {i : Fin k}
+    (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hred :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_characterEstimateData F hodd
+    (F.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
+      hmin B hB_ne v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hred)
+    hG0
+
 /-- **Peterfalvi (7.11)** — the §9 main theorem.
 
 There is no odd-order group `G` admitting a family of `k ≥ 2` Frobenius subgroups
