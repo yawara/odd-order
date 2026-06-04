@@ -154,6 +154,10 @@ created: 2026-06-04
   `normOneUnits_eq_one_of_mem_primeFieldUnits` を公開し、prime-field line 上の relation
   `c*s + u*(d*s)=0` が BG Step 2 の二択 `(c=d=0) ∨ (u=1 ∧ c+d=0)` を強制する
   `generatorRelation_step2_primeLine` まで証明。AxiomsCheck 登録済み。
+- [x] **Lemma C.3 Step 4 finite-field Frobenius core**: `normN_pow_p` と
+  `normSetE_pow_p` により `p`-power Frobenius が `E` を保つことを証明し、
+  `normSetE_frobenius_pair` で `a,b∈E` かつ `a+b=2` なら `a^p,b^p∈E` かつ
+  `a^p+b^p=2` を固定。BG Step 4 の Frobenius propagation 入力。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。

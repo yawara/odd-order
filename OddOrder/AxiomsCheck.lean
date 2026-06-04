@@ -1916,6 +1916,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_primeLine_relation
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
 
+-- BG App C Lemma C.3 Step 4: the `p`-power Frobenius preserves the norm-set
+-- relation `a,b ∈ E` and `a+b=2` used in the generator-relation propagation.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.pow_p_natCast_two
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normN_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.two_sub_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_pow_p
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_frobenius_pair
+
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl

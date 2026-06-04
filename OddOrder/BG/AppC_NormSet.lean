@@ -510,6 +510,56 @@ theorem generatorRelation_step2_primeLine [Fact p.Prime] (hq : q.Prime)
       by_contra hsum
       exact (map_ne_zero emb).2 hsum hsum_emb
 
+
+/-! ### Lemma C.3 Step 4: Frobenius stability of the norm set -/
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: in `𝔽_{p^q}`, the `p`-power
+Frobenius fixes the prime-field element `2`. -/
+lemma pow_p_natCast_two [Fact p.Prime] :
+    (2 : GaloisField p q) ^ p = 2 := by
+  simpa [frobenius_def] using
+    (map_natCast (frobenius (GaloisField p q) p) 2)
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the BG norm is compatible with the
+`p`-power Frobenius. -/
+theorem normN_pow_p [Fact p.Prime] (hq : q ≠ 0) (a : GaloisField p q) :
+    normN p q (a ^ p) = (normN p q a) ^ p := by
+  rw [normN_eq_algebraMap_norm p q hq, normN_eq_algebraMap_norm p q hq]
+  rw [← map_pow]
+  rw [← (Algebra.norm (ZMod p) (S := GaloisField p q)).map_pow a p]
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the `p`-power Frobenius carries
+`2 - a` to `2 - a^p`. -/
+theorem two_sub_pow_p [Fact p.Prime] (a : GaloisField p q) :
+    ((2 : GaloisField p q) - a) ^ p = (2 : GaloisField p q) - a ^ p := by
+  have h := map_sub (frobenius (GaloisField p q) p) (2 : GaloisField p q) a
+  simpa [frobenius_def, pow_p_natCast_two p q] using h
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: in characteristic `p`, Frobenius
+turns a two-term sum into the sum of `p`-th powers. -/
+lemma add_pow_p [Fact p.Prime] (a b : GaloisField p q) :
+    a ^ p + b ^ p = (a + b) ^ p := by
+  have h := map_add (frobenius (GaloisField p q) p) a b
+  simpa [frobenius_def] using h.symm
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: the norm set `E` is stable under
+the `p`-power Frobenius. -/
+theorem normSetE_pow_p [Fact p.Prime] (hq : q ≠ 0) {a : GaloisField p q}
+    (ha : a ∈ normSetE p q) :
+    a ^ p ∈ normSetE p q := by
+  constructor
+  · rw [normN_pow_p p q hq, ha.1, one_pow]
+  · rw [← two_sub_pow_p p q a, normN_pow_p p q hq, ha.2, one_pow]
+
+/-- **BG Appendix C, Lemma C.3, Step 4**: if `a,b ∈ E` and `a+b=2`, then
+their Frobenius images again lie in `E` and still sum to `2`. -/
+theorem normSetE_frobenius_pair [Fact p.Prime] (hq : q ≠ 0)
+    {a b : GaloisField p q} (ha : a ∈ normSetE p q) (hb : b ∈ normSetE p q)
+    (hsum : a + b = 2) :
+    a ^ p ∈ normSetE p q ∧ b ^ p ∈ normSetE p q ∧ a ^ p + b ^ p = 2 := by
+  refine ⟨normSetE_pow_p p q hq ha, normSetE_pow_p p q hq hb, ?_⟩
+  rw [add_pow_p p q, hsum, pow_p_natCast_two p q]
+
 /-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the
