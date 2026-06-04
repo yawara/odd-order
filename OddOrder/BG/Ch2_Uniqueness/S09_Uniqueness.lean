@@ -3333,6 +3333,67 @@ private theorem rank_opiCoreFitting_le_two_of_centralizer_of_not_normalizer_le
     (normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralizer
       hG hM h3D hP0centD hP0M hP0ne)
 
+/-- Lemma 9.5 `(9.12)` high-rank package: the previously established
+normalizer package for `P` first makes `P₀` centralize `D = O_{p'}(F(M))`;
+if `rank D ≥ 3`, uniqueness of a rank-three witness in `D` forces `N_G(P₀) ≤ M`. -/
+private theorem normalizer_p0_le_maximal_of_high_rank_opiCoreFitting_package
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M P P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hPp : IsPGroup p ↥P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hP0p : IsPGroup p ↥P0)
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (hP0ne : P0 ≠ ⊥)
+    (h3D : 3 ≤ rank
+      ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
+    (hSP :
+      ∀ {y : G} {L : Subgroup G}, y ∈ A →
+        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
+          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    Subgroup.normalizer (P0 : Set G) ≤ M := by
+  have hP0M : P0 ≤ M :=
+    (hP0N.trans (derivedInG_le_self (Subgroup.normalizer (P : Set G)))).trans hNPM
+  have hP0centD : P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G) :=
+    p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
+      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N hSP
+  exact normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralizer
+    hG hM.1 h3D hP0centD hP0M hP0ne
+
+/-- Contrapositive form of the `(9.12)` high-rank package.  Once the Lemma 9.5
+normalizer data for `P` and `P₀` is available, failure of `N_G(P₀) ≤ M` forces
+`rank O_{p'}(F(M)) ≤ 2`. -/
+private theorem rank_opiCoreFitting_le_two_of_pSubgroup_normalizer_package
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M P P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hPp : IsPGroup p ↥P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hP0p : IsPGroup p ↥P0)
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (hP0ne : P0 ≠ ⊥)
+    (hnot : ¬ Subgroup.normalizer (P0 : Set G) ≤ M)
+    (hSP :
+      ∀ {y : G} {L : Subgroup G}, y ∈ A →
+        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
+          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2 := by
+  by_contra hrank
+  have h3D : 3 ≤ rank
+      ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) := by
+    omega
+  exact hnot
+    (normalizer_p0_le_maximal_of_high_rank_opiCoreFitting_package
+      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N
+      hP0ne h3D hSP)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
