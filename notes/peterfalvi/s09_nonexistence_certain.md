@@ -704,3 +704,15 @@ S09 に `reduced_inequality_of_estimates` を追加した。
 
 これにより、従来 `hred` として外部仮定にしていた (7.5) 由来の不等式は、
 (7.8)/(7.9) 側の各 `ρ` 下界を揃えれば S09 内で生成できる形になった。
+
+### 2026-06-05 pass: concrete (7.5) family package to base estimate
+
+S09 に `FrobeniusFamily.base_estimate_of_family71_reduced_estimates` と
+`FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates` を追加した。
+
+これは前回の `reduced_inequality_of_estimates` を `CharacterEstimateData` 側へ直接接続する入口。
+入力は concrete な `FamilyHypothesis71`、`A_i = H_i^#`、`L_i` と `G₀` の識別、
+`G₀` 上の identity contribution、選択 index の (7.8.b) 下界
+`1 - e_i/h_i ≤ ‖χ^{ρ_i}‖²`、および `𝓑` 外の非負寄与。
+
+従来外部仮定だった `hred` は、この入口では (7.5) family inequality から生成される。

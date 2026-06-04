@@ -2387,6 +2387,14 @@ set_option linter.style.longLine false in
 -- Peterfalvi (7.5) reduced family inequality input for the (7.10) assembly.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.reduced_inequality_of_estimates
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.base_estimate_of_family71_reduced_estimates
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h

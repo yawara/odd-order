@@ -4891,6 +4891,21 @@ lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_h_mul_e [Finite G]
   rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
   norm_num [Nat.cast_sub hh1]
 
+/-- The local sharp-kernel ratio `|H_i^#| / |L_i|` as a real number, in the
+denominator order used by the real reduced-family estimate. -/
+lemma card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real [Finite G]
+    (F : FrobeniusFamily G k) (i : Fin k) :
+    (Nat.card (((F.H i : Set G) \ ({1} : Set G)) : Set G) : ℝ) /
+        (Nat.card (F.L i) : ℝ) =
+      ((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ)) := by
+  have hh1 : 1 ≤ F.h i := by
+    have h2 := F.two_le_h i
+    omega
+  rw [F.card_kernel_sharp_eq_h_sub_one i, ← F.h_mul_e_eq_card_L i]
+  rw [Nat.cast_sub hh1, Nat.cast_mul]
+  rw [mul_comm (F.h i : ℝ) (F.e i : ℝ)]
+  norm_num
+
 /-- The global spread ratio equals the same local ratio `(h_i - 1)/(h_i e_i)`. -/
 lemma card_kernelSpread_div_card_G_eq_h_sub_one_div_h_mul_e [Finite G]
     (F : FrobeniusFamily G k) (i : Fin k) :
@@ -5464,6 +5479,115 @@ noncomputable def characterEstimateData_of_real_reduced_family_inequality [Finit
   B_avoids_min := hB_ne
   Bsum_le := hBsum
   base_estimate := F.base_estimate_of_real_reduced_family_inequality i B hred
+
+open scoped Classical in
+/-- Base-estimate form of Peterfalvi (7.10) obtained directly from the (7.5)
+family inequality package and the per-index lower bounds.
+
+This removes the former standalone `hred` input for the base estimate: the caller
+only supplies the actual (7.5) family package, the identity contribution on
+`G₀`, the selected (7.8.b) lower bound, and the nonnegative outside-`𝓑`
+contributions.  The cardinality hypotheses identify the (7.5) local data with
+the Frobenius-family notation used in (7.10). -/
+lemma base_estimate_of_family71_reduced_estimates
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hG0sum :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+      1 - (F.e i : ℚ) / (F.h i : ℚ) -
+        (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+          ((F.e j : ℚ) * (F.h j : ℚ))) := by
+  classical
+  have hratio : ∀ j : Fin k,
+      (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ) =
+        ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) := by
+    intro j
+    rw [hA j, hL j]
+    exact F.card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h_real j
+  have hgood' : ∀ j : Fin k, i ≠ j → j ∉ B →
+      (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ) ≤
+        P.chiRhoNormSq χ j := by
+    intro j hij hjB
+    rw [hratio j]
+    exact hgood j hij hjB
+  have hG0sumP :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ P.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2 := by
+    rw [hG0]
+    exact hG0sum
+  have hredP :=
+    reduced_inequality_of_estimates P χ hχ i B
+      (1 - (F.e i : ℝ) / (F.h i : ℝ))
+      hB_ne hG0sumP hi hgood'
+  have hredF :
+      ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+        (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+          (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+          (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+            ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0 := by
+    have hredP' :
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+            (Nat.card (P.A i) : ℝ) / (Nat.card (P.L i) : ℝ) -
+            (∑ j ∈ B,
+              (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ))) ≤ 0 := by
+      rw [← hG0]
+      exact hredP
+    have hsum_ratio :
+        (∑ j ∈ B, (Nat.card (P.A j) : ℝ) / (Nat.card (P.L j) : ℝ)) =
+          ∑ j ∈ B, ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) :=
+      Finset.sum_congr rfl (fun j _ => hratio j)
+    rwa [hratio i, hsum_ratio] at hredP'
+  exact F.base_estimate_of_real_reduced_family_inequality i B hredF
+
+open scoped Classical in
+/-- Constructor form of `CharacterEstimateData` from a concrete (7.5) family
+package, per-index lower bounds, and the separately proved `𝓑`-sum bound. -/
+noncomputable def characterEstimateData_of_family71_reduced_estimates
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (hBsum :
+      (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤ (F.e i : ℚ) - 1)
+    (hG0sum :
+      (1 : ℝ) ≤
+        ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ F.G0),
+          ‖(χ : G → ℂ) g‖ ^ 2)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData where
+  i := i
+  hmin := hmin
+  B := B
+  B_avoids_min := hB_ne
+  Bsum_le := hBsum
+  base_estimate :=
+    F.base_estimate_of_family71_reduced_estimates P χ hχ B hL hA hG0
+      hB_ne hG0sum hi hgood
 
 /-- Constructor form of `CharacterEstimateData` from the real reduced family
 inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
