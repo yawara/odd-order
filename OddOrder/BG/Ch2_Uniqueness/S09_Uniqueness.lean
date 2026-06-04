@@ -1032,6 +1032,90 @@ private theorem exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global 
     (eq_top_or_exists_le_coatom (Subgroup.centralizer (A : Set G))).resolve_left hClt.ne
   exact ⟨M, hM, hCM⟩
 
+/-- A global `SCN₃(p)` subgroup is nontrivial. -/
+private theorem ne_bot_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    A ≠ ⊥ := by
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hArank : 3 ≤ rank ↥A := three_le_rank_of_mem_scn3Global hA
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hArank
+  have hpA : p ∣ Nat.card A :=
+    (Nat.mem_primeFactors.mp
+      (mem_primeFactors_card_of_pos_pRank (H := ↥A) (p := p) (by omega))).2.1
+  intro hAbot
+  rw [hAbot, Subgroup.card_bot] at hpA
+  exact (Fact.out : p.Prime).ne_one (Nat.dvd_one.mp hpA)
+
+/-- The prime set of a global `SCN₃(p)` subgroup is exactly `{p}`. -/
+private theorem primesOf_eq_singleton_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    S07.primesOf A = ({p} : Set ℕ) := by
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hAne : A ≠ ⊥ := ne_bot_of_mem_scn3Global hA
+  obtain ⟨n, hn⟩ := hAp.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hn
+    exact hAne (Subgroup.card_eq_one.mp hn)
+  ext q
+  simp only [S07.primesOf, Set.mem_setOf_eq, Set.mem_singleton_iff]
+  rw [hn, Nat.primeFactors_prime_pow hn0 (Fact.out : p.Prime), Finset.mem_singleton]
+
+/-- A global `SCN₃(p)` subgroup forces `p ∣ |G|`. -/
+private theorem prime_dvd_card_of_mem_scn3Global [Finite G]
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
+    p ∣ Nat.card G := by
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hArank : 3 ≤ rank ↥A := three_le_rank_of_mem_scn3Global hA
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hArank
+  have hpA : p ∣ Nat.card A :=
+    (Nat.mem_primeFactors.mp
+      (mem_primeFactors_card_of_pos_pRank (H := ↥A) (p := p) (by omega))).2.1
+  exact hpA.trans (Subgroup.card_subgroup_dvd_card A)
+
+/-- A subgroup of a finite `p`-group is subnormal in that `p`-group. -/
+private theorem subgroupOf_isSubnormal_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] {A R : Subgroup G} (hRp : IsPGroup p R) :
+    (A.subgroupOf R).IsSubnormal := by
+  haveI : Group.IsNilpotent ↥R := hRp.isNilpotent
+  exact OddOrder.Isaacs.Ch02.isSubnormal_of_isNilpotent_finite (A.subgroupOf R)
+
+/-- The Theorem 7.6 → Theorem 7.4 propagation step used in BG Lemma 9.5.
+
+If `A ∈ SCN₃(p)`, `A ≤ R`, and `R` is a proper `p`-subgroup, then for every `q ≠ p`
+`O_{p'}(C_G(R))` acts transitively on `ℋ_G^*(R;q)`. This is the formal version of the
+line "By Theorems 7.6 and 7.4" in the normalizer part of Lemma 9.5. -/
+private theorem conjTransitiveOn_hInvariantStar_of_scn3Global_intermediate [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A R : Subgroup G}
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R) (hRlt : R < ⊤)
+    {q : ℕ} [Fact q.Prime] (hqp : q ≠ p) :
+    S07.ConjTransitiveOn (opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (R : Set G)))
+      (hInvariantStar ⊤ R {q}) := by
+  classical
+  have hA0 := hA
+  obtain ⟨P, hAP, hAscn3⟩ := hA0
+  have hAab : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hAscn2 : IsSCN_n p 2 (A.subgroupOf (P : Subgroup G)) :=
+    IsSCN_n.mono (by norm_num) hAscn3
+  have hHyp : S07.Hypothesis71 A := S07.hypothesis71_of_scn2 hG hAab hAp P hAP hAscn2
+  have hπ : S07.primesOf A = ({p} : Set ℕ) := primesOf_eq_singleton_of_mem_scn3Global hA
+  have hqA : q ∈ (S07.primesOf A)ᶜ := by
+    rw [hπ]
+    simpa [Set.mem_singleton_iff] using hqp
+  have hRpi : Subgroup.IsPiSubgroup (S07.primesOf A) R := by
+    rw [hπ]
+    exact isPiSubgroup_singleton_of_isPGroup hRp
+  have hAsub : Subgroup.IsSubnormal (A.subgroupOf R) :=
+    subgroupOf_isSubnormal_of_isPGroup hRp
+  have htransA : S07.ConjTransitiveOn (S07.kSubgroup A) (hInvariantStar ⊤ A {q}) := by
+    have hT := S07.thompsonTransitivity hG (prime_dvd_card_of_mem_scn3Global hA) hA hqp
+    simpa [S07.kSubgroup, hπ] using hT
+  have hprop := S07.transitivity_propagates hG hHyp hqA R hRlt hRpi hAR hAsub htransA
+  simpa [hπ] using hprop.2.1
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 
