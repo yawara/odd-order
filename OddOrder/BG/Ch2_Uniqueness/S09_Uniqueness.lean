@@ -1357,6 +1357,27 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
     (opiCoreInG_singleton_ne_bot_of_local_sylow_eq_of_mem_primeFactors PM hPMcore hqM)
     hRM
 
+/-- Convert the local `O_q(M)` notation used by the §4 endpoint into the ambient
+`opiCoreInG` notation used in §9. -/
+private theorem local_sylow_map_eq_opiCoreInG_of_eq_opCore
+    [Finite G] {q : ℕ} [Fact q.Prime] {M : Subgroup G} (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M) = Ch01.opCore q ↥M) :
+    (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M := by
+  rw [hPMcore, opiCoreInG, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) q]
+
+/-- Low-rank `(9.7)` package with the natural §4-shaped input
+`(P_M : Subgroup M) = O_q(M)`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_opCore
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M) = Ch01.opCore q ↥M)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq
+    hG hM PM (local_sylow_map_eq_opiCoreInG_of_eq_opCore PM hPMcore) hqM hRM
+
 /-- A rank-three `q`-subgroup is nontrivial. -/
 private theorem ne_bot_of_isPGroup_of_three_le_rank [Finite G]
     {q : ℕ} [Fact q.Prime] {B : Subgroup G} (hBq : IsPGroup q B)
@@ -1508,6 +1529,23 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow_
   exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
     hG hM hA hRp hAR hRlt hqp
     (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq
+      hG hM.1 PM hPMcore hqM hRM)
+
+/-- Low-rank normalizer step with the natural §4-shaped input
+`(P_M : Subgroup M) = O_q(M)`. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_opCore
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p) (hRM : R ≤ M) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M) = Ch01.opCore q ↥M)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    hG hM hA hRp hAR hRlt hqp
+    (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_opCore
       hG hM.1 PM hPMcore hqM hRM)
 
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the

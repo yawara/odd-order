@@ -596,6 +596,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq`
      is the low-rank `Q` package with the weaker Thm 4.20(c)-shaped input
      `(P_M : Subgroup M).map M.subtype = O_q(M)` plus `q ∈ π(M)`.
+   - `local_sylow_map_eq_opiCoreInG_of_eq_opCore` converts the natural §4
+     conclusion `(P_M : Subgroup M) = Ch01.opCore q M` into the ambient equality
+     needed by §9, and
+     `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_opCore`
+     packages the corresponding low-rank `Q` choice.
 
    The high-rank bookkeeping layer is also now separated:
 
@@ -626,15 +631,20 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    - `normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow_eq`
      is the low-rank version with the weaker equality + `q ∈ π(M)` input;
      nontriviality is discharged internally.
+   - `normalizer_le_maximal_of_scn3Global_intermediate_of_local_opCore`
+     is the same low-rank normalizer step with the §4-shaped input
+     `(P_M : Subgroup M) = Ch01.opCore q M`.
    - `normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank`
      is the high-rank version from `r_q(F(M)) ≥ 3`.
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
    Sylow equality and wire the BG choice of `q`/case split into these low/high
    normalizer packages.  A scout pass found no existing Thm 4.20(c) endpoint; the
-   next missing helper should turn `q` largest in `|M|` plus `rank F(M) ≤ 2` into a
-   local Sylow `PM : Sylow q ↥M` whose ambient image is `O_q(M)`.  The separate
-   `O_q(M) ≠ ⊥` input is no longer needed once `q ∈ π(M)` is available.
+   next missing helper can now be stated in the local §4 vocabulary as: `q` largest
+   in `|M|` plus `rank F(M) ≤ 2` gives
+   `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M) = Ch01.opCore q ↥M`.  The separate
+   ambient equality and `O_q(M) ≠ ⊥` inputs are discharged in S09 once `q ∈ π(M)` is
+   available.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 
