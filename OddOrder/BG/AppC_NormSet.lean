@@ -410,6 +410,25 @@ theorem exists_normOne_mul_primeLine_eq [Fact p.Prime] (hq : q.Prime)
       exists_normOne_mul_primeFieldUnit_mul_eq p q hq hA (s := s) (x := x) hs hx
     exact ⟨(b : ZMod p), u, h⟩
 
+/-- **BG Appendix C, Lemma C.3, Step 3 input**: under condition (A), the
+norm-one subgroup acts irreducibly on the additive `𝔽_p`-space `𝔽_{p^q}`.
+Any nonzero `U`-invariant subspace is the whole field. -/
+theorem normOneUnits_invariant_submodule_eq_top_of_ne_bot [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (W : Submodule (ZMod p) (GaloisField p q))
+    (hU : ∀ u : normOneUnits p q, ∀ x : GaloisField p q, x ∈ W →
+      (((u : (GaloisField p q)ˣ) : GaloisField p q) * x) ∈ W)
+    (hne : W ≠ ⊥) :
+    W = ⊤ := by
+  classical
+  obtain ⟨s, hsW, hs0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hne
+  apply Submodule.eq_top_iff'.mpr
+  intro x
+  obtain ⟨c, u, hx⟩ := exists_normOne_mul_primeLine_eq p q hq hA (s := s) (x := x) hs0
+  rw [hx]
+  exact hU u ((algebraMap (ZMod p) (GaloisField p q) c) * s) (by
+    simpa [Algebra.smul_def] using W.smul_mem c hsW)
+
 /-- **BG Appendix C, Lemma C.3, Step 2 (intersection core)**: under condition
 (A), a norm-one unit that also comes from the prime field is trivial.  This is
 the finite-field `U ∩ 𝔽_pˣ = 1` input used in the generator-relation argument. -/

@@ -1910,6 +1910,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeFieldUnit_mul_eq
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_primeLine_eq
 
+-- BG App C Lemma C.3 Step 3: the norm-one subgroup acts irreducibly on
+-- the additive `𝔽_p`-space `𝔽_{p^q}` under condition (A).
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneUnits_invariant_submodule_eq_top_of_ne_bot
+
 -- BG App C Lemma C.3 Step 2: on a prime-field line, the direct-product
 -- intersection `U ∩ 𝔽_pˣ = 1` forces the generator-relation alternatives.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_mem_primeFieldUnits
