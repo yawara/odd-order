@@ -1599,6 +1599,67 @@ noncomputable def xChainCoherent
       rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
       exact (hstep i hi hcoh).adjoin)
 
+/-- A pair disjoint from the accumulated prefix is orthogonal to that prefix.
+
+This is the set-to-inner-product bridge used by the X-chain per-step builder: once the
+conjugate-pair cover has proved `pairSet pair i` is disjoint from `pairUnion S0 pair i`, every
+irreducible member of the prefix is distinct from both `χ_i` and `χ_i.conj`, so row
+orthogonality gives the two `XAdjoinStepInput` fields `hχ_S1` and `hχbar_S1`. -/
+theorem pairCover_orthogonal_to_prefix
+    {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
+    {X S₀ : Set (ClassFunction Γ ℂ)} {pair : ℕ → ClassFunction Γ ℂ × ClassFunction Γ ℂ}
+    {N i : ℕ} {χ : IrreducibleCharacter Γ}
+    (hXirr : ∀ φ ∈ X, IsIrreducibleCharacter φ)
+    (hS₀X : S₀ ⊆ X)
+    (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair j ⊆ X)
+    (hpair0 : (pair i).1 = (χ : ClassFunction Γ ℂ))
+    (hpair1 : (pair i).2 = (χ : ClassFunction Γ ℂ).conj)
+    (hdisj : Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair i)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := Γ) S₀ pair i))
+    (hi : i < N) :
+    (∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := Γ) S₀ pair i,
+        ClassFunction.inner (χ : ClassFunction Γ ℂ) x = 0) ∧
+      (∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := Γ) S₀ pair i,
+        ClassFunction.inner (χ : ClassFunction Γ ℂ).conj x = 0) := by
+  classical
+  have hprefixX : OddOrder.Peterfalvi.S07.pairUnion (L := Γ) S₀ pair i ⊆ X := by
+    intro x hx
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hx with hbase | ⟨j, hji, hjpair⟩
+    · exact hS₀X hbase
+    · exact hpairs j (hji.trans hi) hjpair
+  have hχpair : (χ : ClassFunction Γ ℂ) ∈ OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair0]
+  have hχbarpair : (χ : ClassFunction Γ ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair1]
+  have hχbarIrr : IsIrreducibleCharacter (χ : ClassFunction Γ ℂ).conj :=
+    hXirr _ (hpairs i hi hχbarpair)
+  have hdisj_left := Set.disjoint_left.mp hdisj
+  refine ⟨?_, ?_⟩
+  · intro x hx
+    have hxirr : IsIrreducibleCharacter x := hXirr x (hprefixX hx)
+    let ψ : IrreducibleCharacter Γ := ⟨x, hxirr⟩
+    have hne : χ ≠ ψ := by
+      intro hEq
+      have hx_eq : x = (χ : ClassFunction Γ ℂ) :=
+        (congrArg (fun η : IrreducibleCharacter Γ => (η : ClassFunction Γ ℂ)) hEq).symm
+      have hxpair : x ∈ OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair i := by
+        simpa [hx_eq] using hχpair
+      exact hdisj_left hxpair hx
+    simpa [ψ, hne] using irreducibleCharacter_inner_eq_ite χ ψ
+  · intro x hx
+    have hxirr : IsIrreducibleCharacter x := hXirr x (hprefixX hx)
+    let χbar : IrreducibleCharacter Γ := ⟨(χ : ClassFunction Γ ℂ).conj, hχbarIrr⟩
+    let ψ : IrreducibleCharacter Γ := ⟨x, hxirr⟩
+    have hne : χbar ≠ ψ := by
+      intro hEq
+      have hx_eq : x = (χ : ClassFunction Γ ℂ).conj :=
+        (congrArg (fun η : IrreducibleCharacter Γ => (η : ClassFunction Γ ℂ)) hEq).symm
+      have hxpair : x ∈ OddOrder.Peterfalvi.S07.pairSet (L := Γ) pair i := by
+        simpa [hx_eq] using hχbarpair
+      exact hdisj_left hxpair hx
+    simpa [χbar, ψ, hne] using irreducibleCharacter_inner_eq_ite χbar ψ
+
 /-- **Peterfalvi (6.3) degree-bound arithmetic core.**  The real/integer inequality at the heart of
 Theorem (6.3) (mmd 04.8 L33): from the (6.2) consequence `b·x − 1 ≤ 2·a·b·√x` (with `a = |L:K|`,
 `b = |K:H| ≥ 1`, `x = |H:A| ≥ 1`) one gets `x ≤ 4a² + 1`.
