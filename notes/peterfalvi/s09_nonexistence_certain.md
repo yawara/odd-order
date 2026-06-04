@@ -567,3 +567,12 @@ S09 に `FrobeniusFamily.characterEstimateData_of_family_source_decomposition` �
 source norm / distinguished degree / degree-sum / `u,v,w` formula の RHS をすべて family 側の
 `F.e i` と `F.h i` で受け取り、前回追加した cardinality bridge で local `H78` 表記へ変換する。
 これで downstream の (7.8.b) 入力は family notation のまま `CharacterEstimateData` へ接続できる。
+
+
+### 2026-06-04 pass: family-source displayed lower bound
+
+S09 に `FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition` を追加した。
+`characterEstimateData_of_family_source_decomposition` と同じ family-notated source inputs から、
+`CharacterEstimateData` を明示的に作らずに、選んだ minimal index `i` の Peterfalvi (7.10) 表示下界を直接返す。
+これで downstream は (7.5)/(7.8.b)/(7.9) 由来の family notation 入力を、`card_G0_lower_bound` の sorry を経由せず
+表示下界 consumer へ接続できる。

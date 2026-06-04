@@ -2323,6 +2323,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_real_reduced_family_inequality_and_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_family_source_decomposition
 -- Peterfalvi (7.11) terminal contradiction from the displayed (7.10) lower bound.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_lowerBoundTerm
