@@ -472,6 +472,9 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
     `Coprime idx θ` ⟹ `χᵢ(1)²∣D`. mmd L80 의 coprimality forcing — `(|L:K|,p)=1` & θ p-power ⟹
     `Coprime idx² θ²` (`Nat.Coprime.pow`), coprime divisors 곱 (`mul_dvd_of_dvd_of_dvd`),
     `χᵢ(1)²=idx²·θ²` (`ring`).
+  - **2026-06-04 追記**: `sq_dvd_sum_sq_mul_of_dvd` を追加。`∀ j∈tail, θ∣θⱼ` から
+    `θ²∣∑_{j∈tail}(idxⱼ·θⱼ)²` を返す `Finset.dvd_sum` leaf で、残入力のうち
+    `θᵢ(1)² ∣ ∑_{j≥i}` の summand-divisibility 部分を切り出した。
   - **honest 판정**: 둘 다 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 두 producer 의 *입력* divisibility 생산 (sum identity

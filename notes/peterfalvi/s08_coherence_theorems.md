@@ -281,6 +281,8 @@ allowlist):
 - **2026-06-04 追記**: **`sq_dvd_of_factored_coprime_add_complement`** を追加。`head+tail=total`,
   `θ²∣tail`, `θ²∣total`, `idx²∣head`, `χᵢ(1)=idx·θ`, `Coprime idx θ` から `χᵢ(1)²∣head` を直接返す
   consumer-facing 版で、上の additive complement と coprime forcing を S08 `hdvd` 入力の形に合成する。
+- **2026-06-04 追記 2**: **`sq_dvd_sum_sq_mul_of_dvd`** を追加。`∀ j∈tail, θ∣θⱼ` から
+  `θ²∣∑_{j∈tail}(idxⱼ·θⱼ)²` を返し、`θᵢ(1)²∣∑_{j≥i}` の `Finset.dvd_sum` 部分を独立に閉じる。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

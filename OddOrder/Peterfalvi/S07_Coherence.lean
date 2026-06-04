@@ -1961,6 +1961,23 @@ theorem sq_dvd_of_factored_coprime_add_complement
   sq_dvd_of_factored_coprime hchi
     (dvd_of_add_eq_of_dvd_dvd hsum hθtail hθtotal) hidx hcop
 
+/-- **Peterfalvi (6.6): square-divisibility of the complementary tail sum.**
+
+If the anchor p-power degree `θ` divides every tail p-power degree `θdeg j`, then `θ²` divides
+the tail sum of the induced degrees `(idx j * θdeg j)²`.  This isolates the `Finset.dvd_sum`
+part of mmd L80: once the degree sort gives the divisibility of the p-power factors, every
+summand carries a factor `θ²`. -/
+theorem sq_dvd_sum_sq_mul_of_dvd
+    {ι : Type*} (s : Finset ι) {θ : ℕ} {idx θdeg : ι → ℕ}
+    (hθ : ∀ j ∈ s, θ ∣ θdeg j) :
+    θ * θ ∣ ∑ j ∈ s, (idx j * θdeg j) * (idx j * θdeg j) := by
+  apply Finset.dvd_sum
+  intro j hj
+  obtain ⟨a, ha⟩ := hθ j hj
+  refine ⟨(idx j * a) * (idx j * a), ?_⟩
+  rw [ha]
+  ring
+
 namespace CharacterPsiDecomposition
 
 open OddOrder.RepresentationTheory
