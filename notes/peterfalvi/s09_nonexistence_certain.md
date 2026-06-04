@@ -374,3 +374,13 @@ S09 に `Hypothesis78.zetaNuRho_inner_self_re_ge_of_normEstimates` と
 
 `BetaDecomp`/`NormEstimates` の存在そのものは引き続き genuine proof target のままにし、証明書を
 新たに外出しする変更はしていない。
+
+### 2026-06-04 pass: existential final assembly to (7.11)
+
+S09 に `not_trivial_G0_of_exists_penultimate`, `not_trivial_G0_of_exists_Bsum_bound`,
+`not_trivial_G0_of_exists_real_Bsum_bound` を追加。`card_G0_lower_bound` の sorry を経由せず、
+(7.10) assembly が存在形で返す penultimate / rational `𝓑`-sum / real reduced `𝓑`-sum input から
+直接 `G₀ = {1}` の矛盾へ進む terminal consumer。
+
+これにより downstream は fixed-index 形だけでなく、Peterfalvi (7.10) の自然な existential output 形でも
+axiom-clean な (7.11) conditional theorem を使える。

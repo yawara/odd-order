@@ -2120,6 +2120,13 @@ set_option linter.style.longLine false in
 -- Peterfalvi (7.11) terminal contradiction from the displayed (7.10) lower bound.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_lowerBoundTerm
+-- Peterfalvi (7.11) terminal contradictions from existential final-assembly inputs.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_penultimate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_Bsum_bound
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.not_trivial_G0_of_exists_real_Bsum_bound
 -- Peterfalvi (7.11) conditional terminal contradiction from the named (7.10) estimate data.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.not_trivial_G0_of_characterEstimateData

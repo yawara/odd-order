@@ -4332,6 +4332,57 @@ theorem not_trivial_G0_of_lowerBoundTerm [Finite G] {k : ℕ} (F : FrobeniusFami
   rw [hlhs, zero_div] at hi
   linarith [hi, hRHS]
 
+/-- **Peterfalvi (7.11), penultimate existential form.**  The penultimate
+displayed lower bound from (7.10) already contradicts `G₀ = {1}`. -/
+theorem not_trivial_G0_of_exists_penultimate [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hpen : ∃ i : Fin k,
+      ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+        1 - (F.e i : ℚ) / (F.h i : ℚ) -
+          (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+          (((F.e i : ℚ) - 1) / ((F.h i : ℚ) + 2)))
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_penultimate hpen) hG0
+
+/-- **Peterfalvi (7.11), existential `𝓑`-sum form.**  If the final assembly
+produces a minimal index, a `𝓑`-set, the unweighted `𝓑`-sum bound, and the
+base estimate, then `G₀ = {1}` is impossible. -/
+theorem not_trivial_G0_of_exists_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((Nat.card F.G0 : ℚ) - 1) / (Nat.card G : ℚ) ≥
+          1 - (F.e i : ℚ) / (F.h i : ℚ) -
+            (((F.h i : ℚ) - 1) / ((F.e i : ℚ) * (F.h i : ℚ))) -
+            (∑ j ∈ B, ((F.h j : ℚ) - 1) /
+              ((F.e j : ℚ) * (F.h j : ℚ))))
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_Bsum_bound hodd hdata) hG0
+
+/-- **Peterfalvi (7.11), existential real `𝓑`-sum form.**  This is the terminal
+consumer for the real-valued reduced estimate produced before the rational
+display of (7.10). -/
+theorem not_trivial_G0_of_exists_real_Bsum_bound [Finite G] {k : ℕ}
+    (F : FrobeniusFamily G k) (hodd : Odd (Nat.card G))
+    (hdata : ∃ i : Fin k, (∀ l : Fin k, F.h i ≤ F.h l) ∧
+      ∃ B : Finset (Fin k),
+        (∀ j ∈ B, i ≠ j) ∧
+        (∑ j ∈ B, ((F.h j : ℚ) - 1) / (F.e j : ℚ)) ≤
+          (F.e i : ℚ) - 1 ∧
+        ((1 - (Nat.card F.G0 : ℝ)) / (Nat.card G : ℝ)) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ) -
+            (((F.h i : ℝ) - 1) / ((F.e i : ℝ) * (F.h i : ℝ))) -
+            (∑ j ∈ B, ((F.h j : ℝ) - 1) /
+              ((F.e j : ℝ) * (F.h j : ℝ)))) ≤ 0)
+    (hG0 : F.G0 = {(1 : G)}) : False :=
+  not_trivial_G0_of_lowerBoundTerm F hodd
+    (F.exists_lowerBoundTerm_of_exists_real_Bsum_bound hodd hdata) hG0
+
 /-- **Peterfalvi (7.11), conditional form.**  The final contradiction from the named
 `CharacterEstimateData` package used to prove (7.10).
 
