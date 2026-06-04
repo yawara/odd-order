@@ -1958,6 +1958,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_pow_sub_one_eq_one
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.inv_mem_of_twistedInv_step
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_normSetE_eq_inv
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
 
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.

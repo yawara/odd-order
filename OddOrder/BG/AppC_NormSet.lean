@@ -1052,6 +1052,38 @@ theorem normSetE_eq_inv_of_forall_normN_two_mul_sub_one [Fact p.Prime] (hq : 0 <
     rw [Set.mem_inv] at ha
     simpa using inv_mem_normSetE_of_normN_two_mul_sub_one p q hq ha (hrel a⁻¹ ha)
 
+/-- Conversely, inverse-closure of `E` gives the generator-relation norm
+identity used by the Peterfalvi Section 16 interface.  This is the algebraic
+tail `2 * a - 1 = a * (2 - a⁻¹)`. -/
+theorem forall_normN_two_mul_sub_one_of_normSetE_eq_inv [Fact p.Prime] (hq : 0 < q)
+    (hEinv : normSetE p q = (normSetE p q)⁻¹) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
+  intro a ha
+  have ha0 : a ≠ 0 := ne_zero_of_mem_normSetE p q hq ha
+  have hainv : a⁻¹ ∈ normSetE p q := by
+    have ha_invset : a ∈ (normSetE p q)⁻¹ := by
+      rw [← hEinv]
+      exact ha
+    rwa [Set.mem_inv] at ha_invset
+  have hcalc :
+      (2 : GaloisField p q) * a - 1 = a * ((2 : GaloisField p q) - a⁻¹) := by
+    field_simp [ha0]
+  rw [hcalc, normN_mul, ha.1, hainv.2, one_mul]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 adapter**: the one-step twisted inverse
+output produced by the generator-relation calculation implies the concrete
+norm identity `N(2 * a - 1) = 1` for every `a ∈ E`. -/
+theorem forall_normN_two_mul_sub_one_of_twisted_unit_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : ∀ u : (GaloisField p q)ˣ,
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+        ((twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
+  exact forall_normN_two_mul_sub_one_of_normSetE_eq_inv p q hq
+    (normSetE_eq_inv_of_twisted_unit_step p q hq hpodd φ hφp hstep)
+
 /-- **BG Appendix C, Lemma C.3, note (`p = 3`)**: in characteristic three the
 generator-relation argument is unnecessary.  Since `2 * a - 1 = 2 - a`, every
 `a ∈ E` already satisfies the relation needed to put `a⁻¹` back in `E`. -/

@@ -297,7 +297,10 @@ Step3 の `U`-既約作用入力も
 Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。さらに BG 最後の
 `(a⁻¹)^{t^3}` を p 回反復する tail は `inv_mem_of_twistedInv_step` /
-`normSetE_eq_inv_of_twisted_unit_step` として証明済み。AppC 側の `theoremC` は
+`normSetE_eq_inv_of_twisted_unit_step` として証明済み。twisted-step / inverse-closure から
+S16 interface の `N(2*a-1)=1` を返す adapter も
+`forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
+`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。AppC 側の `theoremC` は
 finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
 S16 `FieldNormalizerData` が現在 field として持つ `appC_normSet_generator_relation` を、
 仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
