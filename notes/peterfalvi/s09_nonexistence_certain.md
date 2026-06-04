@@ -606,3 +606,14 @@ S09/H78 の引数列から直接 S08 weighted Parseval / scalar coefficient API 
 
 これで downstream の (7.8)/(7.10) 側は、H78 の `ν` と concrete `IsCoherent` witness だけを持っていれば、
 `data := ...` を毎回組み立てずに weighted output norm と weighted source-difference の非正性を使える。
+
+### 2026-06-05 pass: H78 Ind-chain exact weighted identities
+
+S09 に `Hypothesis78.indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero_of_isCoherent`,
+`Hypothesis78.indChain_image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm_of_isCoherent` を追加した。
+`Hypothesis78.indChainDecomposition_of_isCoherent` で作る S08 `IndChainDecomposition` から、
+weighted source-difference の exact image equation と complex scalar coefficient identity を H78/S07 witness 入力列で直接返す consumer 形。
+
+前回追加した real Parseval / nonpos consumer と合わせて、§9 側は `data := ...` を手で組み立てず、
+exact identity と実数不等式の両方を H78 表記から呼べる。
