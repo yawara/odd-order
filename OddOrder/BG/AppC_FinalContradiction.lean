@@ -110,7 +110,8 @@ theorem lemmaC2_card_ge_two [Finite G]
 theorem lemmaC3_inverse_closed [Finite G]
     (hyp : S16.Hypothesis (G := G)) (data : S16.FieldNormalizerData hyp) :
     normSetInverseClosed hyp := by
-  sorry
+  simpa [normSetInverseClosed, S16.appCNormSetInverseClosed]
+    using data.appC_normSet_inverse_closed
 
 /-! ## Theorem C and the Peterfalvi bridge -/
 

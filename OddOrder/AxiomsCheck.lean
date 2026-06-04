@@ -1873,6 +1873,10 @@ set_option linter.style.longLine false in
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
+-- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
+-- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
+
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd

@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.AppC_NormSet
 import OddOrder.Peterfalvi.S15_SAndT
 
 /-!
@@ -92,6 +93,18 @@ theorem tSide_cyclotomic_quotient_divisor_modEq_one (hyp : Hypothesis (G := G)) 
 
 end Hypothesis
 
+/-- The norm-set inversion closure conclusion of **BG Appendix C, Lemma C.3**,
+expressed at the Peterfalvi Section 16 interface.
+
+The proof of this fact is the generator-relation argument in BG Appendix C and
+uses the concrete hypothesis-(B) embedding data.  Until that embedding is
+materialized, the Section 16 field-normalizer package carries this conclusion as
+part of the upstream data consumed by BG Appendix C. -/
+def appCNormSetInverseClosed (hyp : Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q =
+    (OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)⁻¹
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The field model itself is represented propositionally until
 near-field and semidirect-product APIs are fixed for the final integration. -/
@@ -114,6 +127,7 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U : Prop
   W2_conj_y_normalizes_U_holds : W2_conj_y_normalizes_U
+  appC_normSet_inverse_closed : appCNormSetInverseClosed hyp
 
 /-! ## (14.3)--(14.7): the subgroup `L` over `N_G(U)` -/
 
