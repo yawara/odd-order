@@ -2852,6 +2852,34 @@ theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **(T8.11d) scaled degree-matched support.**
+
+For two `S`-members whose degrees satisfy `χ(1) = a χ₁(1)`, the scaled difference
+`χ - aχ₁` is supported on `H^# = sharpImage H`.  This is the support bridge used for the
+`hmemdegdiffsupp` and `hdiffasuppχ` fields once the integer degree ratios are available. -/
+theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
+    {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) {a : ℕ}
+    (hdeg : χ 1 = (a : ℂ) * χ' 1) :
+    (χ - a • χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by
+      rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ a χ', ClassFunction.smul_apply,
+        hdeg, sub_self])
+  have hgH : g ∈ H := by
+    rcases eq_or_ne (χ g) 0 with hχg | hχg
+    · have hχ'g : χ' g ≠ 0 := fun h0 =>
+        hg (by
+          rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ a χ',
+            ClassFunction.smul_apply, hχg, h0, mul_zero, sub_self])
+      exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
+    · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
