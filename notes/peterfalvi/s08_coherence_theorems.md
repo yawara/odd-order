@@ -187,6 +187,36 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
   `2χᵢ(1)χ₁(1)<∑_{j<i}χⱼ(1)²`) + base prefix coherence ((1.1)/(1.4)). 이들이 `coherentPairChain`의
   `hstep`/`h0`를 채움.
 
+### (2026-06-04) T8.11l `XAdjoinStepInput` assembly from member-family degree ratios
+
+`S08_CoherenceTheorems.lean` に
+`SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeRatios` を landing。これは
+`pairUnion (xBaseBlock Z) pair i` の member-family cover と anchor `χ₁` に対する explicit degree ratios を
+受け取り、per-step `XAdjoinStepInput` を直接構成する bridge。
+
+放電済み field:
+
+- new pair core: `hrealχ`/`hdiffsuppχ`/4 orthogonality/prefix orthogonality は
+  `xPair_stepCoreFacts_of_irreducible_X` から。
+- member scaled supports: `hmemdegdiffsupp` は `xMember_scaledDiffSupports_of_degreeData` から。
+- new scaled support and ZIrr: `hdiffasuppχ` と `htau1_memaχ` は
+  `xMember_scaledDiffSupport_of_degreeData` + `scaledDiff_dadeImage_mem_ZIrr` から。
+- `hSgen`: prefix cover `hcover` と member scaled supports を
+  `S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` に渡して構成。
+
+この bridge の残 input は意図的に純算術側へ押し込めている:
+
+- `ha1 : deg i₁ = 1`
+- `hdeg_mem : χmem j (1) = deg j * χ₁(1)`
+- `hdegχ : χᵢ(1) = a * χ₁(1)`
+- `hDeg : 2 * (a : ℝ) < ∑ j∈s, (deg j : ℝ)^2`
+
+次の自然な leaf は、絶対次数不等式
+`2 * χᵢ(1) * χ₁(1) < ∑ χmem(j)(1)^2` を anchor の正の次数で割って normalized `hDeg` に
+変換する bridge。その前提となる ratio 生成は `exists_pos_natDegreeRatioFamily_of_dvd` と
+`exists_pos_natDegreeRatio_of_dvd` で既に用意済みだが、§6.6 固有の divisibility/prime-power gap 供給は
+まだ別 leaf。
+
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 
 `coherentPairChain`의 각 `hstep`이 소비하는 **strict degree-ratio bound** `2·χᵢ(1)·χ₁(1) <

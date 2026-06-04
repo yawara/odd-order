@@ -3224,6 +3224,124 @@ theorem exists_pairUnion_memberFamily_of_irreducible_X
   exact ⟨k, χmem, hχinj, hrange, hmemreal, hmemdiffsupp, hmemS1, hmembarS1,
     hmemconjortho, hmemortho⟩
 
+open scoped Classical in
+/-- **(T8.11l) X-adjoin input from member-family degree ratios.**
+
+Given a conjugate-pair cover step, an explicit finite member-family cover of the current prefix
+`S₁ = pairUnion (xBaseBlock Z) pair i`, and degree-ratio data against a chosen anchor `χ₁`, this
+assembles the full `XAdjoinStepInput` for adjoining `χᵢ`.  The theorem deliberately leaves the
+arithmetical (6.6) payload as inputs: the member and new-character degree ratios, `deg i₁ = 1`, and
+the strict inequality `2a < ∑ deg²`.  All non-arithmetical fields are discharged from the X-pair
+cover, support bridges, virtual-character bridge, and the §7 anchor-generation lemma. -/
+noncomputable def xAdjoinStepInput_of_memberFamily_degreeRatios
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {ι : Type} {s : Finset ι} {χmem : ι → IrreducibleCharacter ↥L}
+    {deg : ι → ℕ} {i₁ : ι} {a : ℕ}
+    (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+      ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ j ∈ s, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hmemS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmembarS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmemconjortho : ∀ j ∈ s, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        if j = l then (1 : ℂ) else 0)
+    (ha1 : deg i₁ = 1)
+    (hdeg_mem : ∀ j ∈ s,
+      (χmem j : ClassFunction ↥L ℂ) 1 =
+        (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1)
+    (hdegχ : (χs i : ClassFunction ↥L ℂ) 1 =
+      (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1)
+    (hDeg : 2 * (a : ℝ) < ∑ j ∈ s, ((deg j : ℝ)) ^ 2) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  classical
+  let S₁ : Set (ClassFunction ↥L ℂ) :=
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+  have hχpair : (χs i : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair0 i hi]
+  have hχX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := hpairs i hi hχpair
+  have hmemX : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := by
+    intro j hj
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp (hmemS1 j hj) with hbase | ⟨k, hki, hkpair⟩
+    · exact hyp.xBaseBlock_subset Z hbase
+    · exact hpairs k (hki.trans hi) hkpair
+  rcases hyp.xPair_stepCoreFacts_of_irreducible_X hZH hX hpair0 hpair1 hpairs hdisj hi with
+    ⟨hrealχ, hdiffsuppχ, hχχ, hχbarχbar, hχχbar, hχbarχ, hχ_S1, hχbar_S1⟩
+  have hmemdegdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ) - deg j •
+          (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.xMember_scaledDiffSupports_of_degreeData hmemX hi₁ hdeg_mem
+  have hdiffasuppχ : ((χs i : ClassFunction ↥L ℂ) - a •
+        (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.xMember_scaledDiffSupport_of_degreeData hχX (hmemX i₁ hi₁) hdegχ
+  have htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
+      (hyp.dade.fullDadeIsometryData hyp.hconj)
+      ((χs i : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G := by
+    simpa [SibleyDadeHypothesis.tau] using hyp.scaledDiff_dadeImage_mem_ZIrr hdiffasuppχ
+  have hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          {(χmem i₁ : ClassFunction ↥L ℂ)}) :=
+    OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+      (L := ↥L) (S₁ := S₁)
+      (A := OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+      (χmem := fun j => (χmem j : ClassFunction ↥L ℂ)) (deg := deg) (i₁ := i₁)
+      (by simpa [S₁] using hcover) hi₁ (by simpa [S₁] using hmemS1)
+      (by simpa using hmemdegdiffsupp)
+  exact
+    { hrealχ := hrealχ
+      hdiffsuppχ := hdiffsuppχ
+      hχχ := hχχ
+      hχbarχbar := hχbarχbar
+      hχχbar := hχχbar
+      hχbarχ := hχbarχ
+      hχ_S1 := hχ_S1
+      hχbar_S1 := hχbar_S1
+      ι := ι
+      s := s
+      χmem := χmem
+      deg := deg
+      i₁ := i₁
+      hi₁ := hi₁
+      hmemreal := hmemreal
+      hmemdiffsupp := hmemdiffsupp
+      hmemdegdiffsupp := hmemdegdiffsupp
+      hmemS1 := hmemS1
+      hmembarS1 := hmembarS1
+      hmemconjortho := hmemconjortho
+      hmemortho := hmemortho
+      a := a
+      hdiffasuppχ := hdiffasuppχ
+      htau1_memaχ := htau1_memaχ
+      ha1 := ha1
+      hDeg := hDeg
+      hSgen := hSgen }
+
 /-- **(T8 leaf 10 / T-A4) X-chain assembly from per-pair adjoining data.**
 
 This is the Sibley/Xset wrapper around the abstract `xChainCoherent` fold.  It builds the
