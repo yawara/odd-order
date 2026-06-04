@@ -3849,6 +3849,66 @@ theorem hInvariant_scn3_map_eq_bot_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hq hRstar
   exact le_bot_iff.mp (by simpa [hRbot] using hQR)
 
+/-- BG (8.12), `p'` form: every `A`-invariant `p'`-subgroup is trivial in the
+p-group case. -/
+theorem hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    {Y : Subgroup G} (hY : Y ∈ hInvariant ⊤ (A.map M.subtype) ({p} : Set ℕ)ᶜ) :
+    Y = ⊥ := by
+  by_contra hYne
+  have hp_dvd_G : p ∣ Nat.card G :=
+    (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_subgroup_dvd_card (fittingInG M))
+  have hYpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Y := hInvariant_isPiSubgroup hY
+  have hYlt : Y < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hYtop
+    have hpY : p ∈ (Nat.card ↥Y).primeFactors := by
+      rw [hYtop, Subgroup.card_top]
+      exact Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd_G, Nat.card_pos.ne'⟩
+    have hp_not : p ∈ ({p} : Set ℕ)ᶜ := hYpi p hpY
+    exact hp_not (by simp)
+  haveI hYsolv : IsSolvable ↥Y := hG.solvable_of_lt_top Y hYlt
+  haveI hY_nontriv : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have hFY_ne : fittingInG Y ≠ ⊥ := by
+    have hF_ne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y
+    intro hbot
+    rw [fittingInG] at hbot
+    exact hF_ne ((Subgroup.map_eq_bot_iff_of_injective (Ch01.fitting ↥Y)
+      Y.subtype_injective).mp hbot)
+  have hFY_card_ne_one : Nat.card ↥(fittingInG Y) ≠ 1 := by
+    intro hcard
+    exact hFY_ne (Subgroup.card_eq_one.mp hcard)
+  obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hFY_card_ne_one
+  haveI hqFact : Fact q.Prime := ⟨hq_prime⟩
+  have hqF : q ∈ (Nat.card ↥(fittingInG Y)).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩
+  have hqY : q ∈ (Nat.card ↥Y).primeFactors :=
+    Nat.primeFactors_mono (Subgroup.card_dvd_of_le (fittingInG_le Y)) Nat.card_pos.ne' hqF
+  have hq_compl : q ∈ ({p} : Set ℕ)ᶜ := hYpi q hqY
+  have hq_ne_p : q ≠ p := by
+    simpa [Set.mem_singleton_iff] using hq_compl
+  let Oq : Subgroup G := opiCoreInG ({q} : Set ℕ) Y
+  have hOq_ne : Oq ≠ ⊥ := by
+    dsimp [Oq]
+    exact opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG (H := Y) hqF
+  have hOq_mem : Oq ∈ hInvariant ⊤ (A.map M.subtype) {q} := by
+    rw [mem_hInvariant]
+    refine ⟨le_top, ?_, ?_⟩
+    · dsimp [Oq]
+      exact le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ)
+        (hInvariant_le_normalizer hY)
+    · dsimp [Oq]
+      exact isPiSubgroup_opiCoreInG ({q} : Set ℕ) Y
+  have hOq_bot : Oq = ⊥ :=
+    hInvariant_scn3_map_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hq_ne_p hOq_mem
+  exact hOq_ne hOq_bot
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -3879,6 +3939,11 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro q _ hq Y hY
     exact hInvariant_scn3_map_eq_bot_of_fittingInG_isPGroup
       hG hM hp P hFp hAP hA hq hY
+  have hHpPrimeBot : ∀ {Y : Subgroup G},
+      Y ∈ hInvariant ⊤ (A.map M.subtype) ({p} : Set ℕ)ᶜ → Y = ⊥ := by
+    intro Y hY
+    exact hInvariant_scn3_map_singleton_compl_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA hY
   refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
