@@ -471,3 +471,14 @@ S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_irreducible` と
 `ζ_ind1H`, `ζ` がともに irreducible character なら `Submodule.sub_mem` で
 `ζ_ind1H - ζ ∈ ZIrr L` を返す最小 bridge。後者は直前の §4 Dade bridge と合成して
 `β ∈ ZIrr G` を返す consumer で、(7.8)/(7.9) 側は source-side の lattice membership を直接扱わずに済む。
+
+
+### 2026-06-04 pass: composed residual integrality consumers
+
+S09 に `Hypothesis78.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent`、
+`Hypothesis79.delta_cross_integral_of_irreducible_sourceDiff_and_isCoherent`、
+`Hypothesis79.conclusion_of_irreducible_sourceDiff_and_isCoherent_parity` を追加した。
+これらは直前の `β ∈ ZIrr` bridge、coherence 由来の `νζ ∈ ZIrr`、既存の
+`delta_cross_integral_of_ZIrr` / parity consumer を合成するだけの S09-facing socket。
+(7.9) の downstream では、source irreducibility と coherence witness、さらに `(Δ₁,Δ₂)` の偶整数性を渡せば
+`H79.conclusion` まで接続できる。
