@@ -442,6 +442,16 @@ S09 に `sourceZeta_inner_zetaDistinct_eq_ite_of_irreducible_distinct`,
 source orthogonality / weighted-sum consumer を downstream が再構成しなくてよい形にした bridge pass。
 
 
+### 2026-06-05 pass: raw zeta-rho bound from source data
+
+S09 に `zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula`
+を追加した。既存の
+`normEstimates_of_inner_values_irreducible_source_data_and_uv_formula` と
+`zetaNuRho_inner_self_re_ge_of_normEstimates` を合成し、自然な source-side 入力、(7.7.b) の
+`u,v,w` formula、`smallIndex` から raw class-function form
+`1 - e/h ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接得る downstream socket にした。
+
+
 ### 2026-06-04 pass: residual ZIrr bridges for (7.9)
 
 S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と

@@ -2310,6 +2310,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_inner_values_irreducible_source_data_and_uv_formula
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.gamma_inner_self_re_le_of_inner_values_irreducible_source_data_and_uv_formula
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
