@@ -509,3 +509,12 @@ S09 に `Hypothesis79.delta_and_zetaImages_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irre
 を追加した。H79 の weak source input から `Δ₁`, `Δ₂`, `ζ₁^ν`, `ζ₂^ν` の 4 つの
 `ZIrr` membership をまとめて返す package theorem で、直前に追加した residual integrality/parity
 consumer はこの package を使う形へ整理した。downstream は整数性 lemma を使う前に membership だけを取り出せる。
+
+
+### 2026-06-04 pass: weak source-difference beta bridges
+
+S09 に `Hypothesis78.sourceDiff_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` と
+`Hypothesis78.beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` を追加した。
+H78 単体でも `Ind 1_H` source term は irreducible ではなく `ZIrr` membership で十分な形になり、
+既存の irreducible 版と `delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent` は
+この weak bridge への特殊化/合成に整理された。
