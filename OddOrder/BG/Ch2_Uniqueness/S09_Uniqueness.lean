@@ -2553,6 +2553,29 @@ private theorem le_centralizer_of_le_chiefFactorCentralizer_chain
   coprime_chiefSeries_stabilizer_le_centralizer hcop hsolv
     (chiefSeries_stabilizer_of_le_chiefFactorCentralizer hDE hcent)
 
+/-- A centralizer conclusion proved in the local group `↥H` lifts back to the
+ambient group. This is the final direction needed after applying Corollary 4.19
+inside `L ∩ M`. -/
+private theorem le_centralizer_of_subgroupOf_le_centralizer
+    {H K P0 : Subgroup G} (hP0H : P0 ≤ H) (hKH : K ≤ H)
+    (hlocal : P0.subgroupOf H ≤
+      Subgroup.centralizer ((K.subgroupOf H : Subgroup ↥H) : Set ↥H)) :
+    P0 ≤ Subgroup.centralizer (K : Set G) := by
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro k hk
+  have hxH : x ∈ H := hP0H hx
+  have hkH : k ∈ H := hKH hk
+  have hxlocal : (⟨x, hxH⟩ : ↥H) ∈ P0.subgroupOf H := by
+    rw [Subgroup.mem_subgroupOf]
+    exact hx
+  have hklocal : (⟨k, hkH⟩ : ↥H) ∈ K.subgroupOf H := by
+    rw [Subgroup.mem_subgroupOf]
+    exact hk
+  exact congrArg Subtype.val
+    (Subgroup.mem_centralizer_iff.mp (hlocal hxlocal)
+      (⟨k, hkH⟩ : ↥H) hklocal)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
