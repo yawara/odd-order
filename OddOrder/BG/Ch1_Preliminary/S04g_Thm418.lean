@@ -1489,6 +1489,25 @@ theorem exists_normal_sylow_of_terminal_step
     ∃ Q : Sylow (S.step i).q G, (Q : Subgroup G).Normal :=
   exists_normal_sylow_of_step_term_eq_bot S i (by rw [hi, S.bot_eq])
 
+/-- A positive-length characteristic Sylow series has a terminal step. -/
+theorem exists_terminal_step_of_length_pos (S : CharacteristicSylowSeries G)
+    (hpos : 0 < S.length) :
+    ∃ i : Fin S.length, i.succ = Fin.last S.length := by
+  obtain ⟨n, hlen⟩ := Nat.exists_eq_succ_of_ne_zero (ne_of_gt hpos)
+  refine ⟨Fin.cast hlen.symm (Fin.last n), ?_⟩
+  apply Fin.ext
+  simp [Fin.val_succ, Fin.val_last, hlen]
+
+/-- A positive-length characteristic Sylow series supplies a normal Sylow subgroup
+from its terminal step. -/
+theorem exists_normal_sylow_of_length_pos (S : CharacteristicSylowSeries G)
+    (hpos : 0 < S.length) :
+    ∃ i : Fin S.length,
+      i.succ = Fin.last S.length ∧
+        ∃ Q : Sylow (S.step i).q G, (Q : Subgroup G).Normal := by
+  obtain ⟨i, hi⟩ := exists_terminal_step_of_length_pos S hpos
+  exact ⟨i, hi, exists_normal_sylow_of_terminal_step S i hi⟩
+
 /-- Lift the induction series inside the canonical normal `p`-complement to an
 ambient segment in `G`.  Its top endpoint is `O_{p-prime}(G)`, not `G`; the top
 layer is attached separately by `CharacteristicSylowLayer.top_of_hasNormalPComplement`. -/
