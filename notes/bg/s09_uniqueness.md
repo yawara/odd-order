@@ -668,6 +668,9 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    The `q != p` Sylow-cardinality preservation needed to move induction layers
    back from the complement is covered by
    `S04.card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne`.  The
+   corresponding characteristic subgroup lift is covered by
+   `S04.exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne`,
+   which maps the induction-layer subgroup through the characteristic core.  The
    Fitting-rank induction line `F(K) <= F(G)` is covered by
    `S04.rank_fitting_le_of_normal_subgroup` and
    `S04.rank_fitting_le_two_of_normal_subgroup`; the step where `F` contains a
