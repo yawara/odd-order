@@ -3988,6 +3988,130 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     hχone hχ₁one hmemone hDsum hp hq hdiv hlt
     hidxpos hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
 
+open scoped Classical in
+/-- **(T8.11u) X-adjoin input from a pairUnion enumeration and p-power degree data.**
+
+This specializes `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums` to the actual
+running accumulator `pairUnion (xBaseBlock Z) pair i`.  A caller supplies an injective finite
+enumeration of that accumulator; this adapter turns it into the member-family cover and all routine
+X-member facts (non-real, conjugate support, conjugate membership, and orthonormality).  The
+remaining inputs are the genuine (6.6) degree, p-power, sum, and coprimality data indexed by the
+same enumeration. -/
+noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {κ : Type} {tailSet : Finset κ}
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hχinj : Function.Injective χmem)
+    (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    {i₁ : Fin k} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {dmem θmem mmem : Fin k → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j : Fin k, dmem j * dmem j = D)
+    (hp : 3 ≤ p)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
+    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdmem : ∀ j, dmem j = idx * θmem j)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hθmem : ∀ j, θmem j = p ^ mmem j)
+    (hlemem : ∀ j, d₁ ≤ dmem j)
+    (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
+    (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
+    (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
+    (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
+    (htotal : total = qtot * c) (hidx_D : idx * idx ∣ D)
+    (hcop : Nat.Coprime idx θχ) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  let S₁ : Set (ClassFunction ↥L ℂ) :=
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+  have hS₁X : S₁ ⊆ hyp.Xset Z := by
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact hyp.xBaseBlock_subset Z hbase
+    · exact hpairs j (hji.trans hi) hjpair
+  have hmemS1 : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j
+    change (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+    rw [← hrange]
+    exact Set.mem_range_self j
+  have hS₀conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+    hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH hX
+  have hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ := by
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (hS₀conj hbase))
+    · have hjN : j < N := hji.trans hi
+      have hpair_conj : φ.conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+          Set.mem_singleton_iff] at hjpair ⊢
+        rcases hjpair with hφ | hφ
+        · right
+          rw [hφ, hpair0 j hjN, hpair1 j hjN]
+        · left
+          rw [hφ, hpair1 j hjN, hpair0 j hjN]
+          simp
+      exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, hpair_conj⟩)
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
+      (χmem j : ClassFunction ↥L ℂ) = x := by
+    intro x hx
+    have hxrange : x ∈ Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) := by
+      rw [hrange]
+      exact hx
+    rcases hxrange with ⟨j, rfl⟩
+    exact ⟨j, by simp, rfl⟩
+  have hmemreal : ∀ j ∈ (Finset.univ : Finset (Fin k)),
+      ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ) := by
+    intro j _
+    exact (hyp.xMember_characterFacts_of_irreducible_X hZH hX (hS₁X (hmemS1 j))).1
+  have hmemdiffsupp : ∀ j ∈ (Finset.univ : Finset (Fin k)),
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    intro j _
+    exact hyp.xMember_diffSupport_of_irreducible_X hX (hS₁X (hmemS1 j))
+  have hmemS1' : ∀ j ∈ (Finset.univ : Finset (Fin k)),
+      (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := fun j _ => hmemS1 j
+  have hmembarS1 : ∀ j ∈ (Finset.univ : Finset (Fin k)),
+      (χmem j : ClassFunction ↥L ℂ).conj ∈ S₁ := fun j _ => hS₁conj (hmemS1 j)
+  have hmemconjortho : ∀ j ∈ (Finset.univ : Finset (Fin k)),
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ).conj = 0 := by
+    intro j _
+    exact (hyp.xMember_characterFacts_of_irreducible_X hZH hX (hS₁X (hmemS1 j))).2.2.2.2
+  have hmemortho : ∀ j ∈ (Finset.univ : Finset (Fin k)), ∀ l ∈ (Finset.univ : Finset (Fin k)),
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        @ite ℂ (j = l) (Classical.propDecidable (j = l)) 1 0 := by
+    intro j _ l _
+    by_cases hjl : j = l
+    · subst j
+      simpa using irreducibleCharacter_inner_eq_ite (χmem l) (χmem l)
+    · have hχne : χmem j ≠ χmem l := fun h => hjl (hχinj h)
+      simpa [hjl, hχne] using irreducibleCharacter_inner_eq_ite (χmem j) (χmem l)
+  exact hyp.xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums hZH hX
+    hpair0 hpair1 hpairs hdisj hi hcover (by simp) hmemreal hmemdiffsupp
+    hmemS1' hmembarS1 hmemconjortho hmemortho
+    hχone hχ₁one (fun j _ => hmemone j) (by simpa using hDsum)
+    hp hq hdiv hlt hidxpos hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
+    (fun j _ => hθmem j) (fun j _ => hlemem j)
+    hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

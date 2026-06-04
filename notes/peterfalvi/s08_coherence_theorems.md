@@ -306,6 +306,11 @@ allowlist):
   **`natDegreeSquareSum_pos_of_memberFamily`** を追加し、`primePowerSums` / `commonIndexPrimePowerSums`
   constructors から `hpos₁ : 0<d₁` と `hDpos : 0<D` を削除。さらに common-index 版の
   `hleχ : d₁≤dχ` は既存の strict gap `hlt : d₁<dχ` から内部導出する形にした。
+- **2026-06-04 追記 8**: **`xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`** を追加。
+  caller が actual accumulator `pairUnion (xBaseBlock Z) pair i` の injective finite enumeration を渡せば、
+  cover / non-real / conjugate-support / conjugate-membership / orthonormality を `Xset` facts と pairUnion
+  closure から内部構成し、残入力を同じ enumeration 上の genuine (6.6) degree・p-power・sum・coprimality data
+  だけにした。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
