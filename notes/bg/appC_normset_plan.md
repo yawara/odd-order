@@ -304,10 +304,13 @@ S16 interface の `N(2*a-1)=1` を返す adapter も
 field-element one-step obligation `appCNormSetTwistedFieldStep`、unit-step adapter
 `appCNormSetTwistedUnitStep_of_field_step`、relation adapter
 `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
-finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
+finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。さらに
+`AppC_FinalContradiction.HypothesisB` は concrete `H=P⋊U`、monomorphism `σ:H→G`、
+`P0`/`U` image identification、normalizer 条件を持つ carrier に更新済み。残る genuine gap は、
 S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_field_step` を、
-仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
-`appC_twisted_unit_step` と `appC_normSet_generator_relation` はこの field からの derived theorems。
+この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する generator-relation group proof
+(BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と `appC_normSet_generator_relation` は
+この field からの derived theorems。
 
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。

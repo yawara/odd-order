@@ -175,15 +175,16 @@ created: 2026-06-04
   Frobenius propagation / “by (A)” 入力。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 4 twisted-inverse induction tail**: BG 最後の
   `(a⁻¹)^{t^3}` を p 回反復する議論を `inv_mem_of_twistedInv_step` として一般化し、
-  unit 上の one-step twisted inverse から `E=E⁻¹` を返す
-  `normSetE_eq_inv_of_twisted_unit_step` を証明。さらに inverse-closure/twisted-step から
-  S16 interface の `N(2*a-1)=1` を返す `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
-  `forall_normN_two_mul_sub_one_of_twisted_unit_step` を追加。さらに S16 側にも
-  one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
-  `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加。AxiomsCheck 登録済み。
+  field-element one-step output から unit-step/inverse-closure/generator relation へ落とす
+  `normSetETwistedFieldStep`, `twisted_unit_step_of_twisted_field_step`,
+  `normSetE_eq_inv_of_twisted_field_step`,
+  `forall_normN_two_mul_sub_one_of_twisted_field_step` を追加。S16 側にも
+  `appCNormSetTwistedFieldStep` と derived adapter 群を追加。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
+- [x] **Hypothesis (B) concrete carrier**: `AppC_FinalContradiction.HypothesisB` の opaque formula fields を、
+  concrete `H=P⋊U`、monomorphism `σ:H→G`、`P0`/`U` image identification、normalizer 条件に置換。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedFieldStep` (field element 版の `∀a∈E, φ(a⁻¹)∈E`) を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。`appCNormSetTwistedUnitStep` と `appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。これは S16 の `field_normalizer_structure` 側の upstream obligation。
 
 ## 完了条件
