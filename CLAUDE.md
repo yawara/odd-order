@@ -17,7 +17,6 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - **leanblueprint は使わない** — TeX 依存グラフ方式は採用しない。教科書 (PDF/mmd) → Lean を直接書く。「blueprint を立てよう」「TeX で証明概略を…」等の提案は不可。
 - **mathlib 本体への PR は当面しない** — 汎用補題 (Fitting, Hall, Frobenius 群, ZJ 等) も `OddOrder` namespace 配下に書く。理由は速度優先で手元で完結させたいから。将来の upstream は視野に入れるので、mathlib 互換のスタイル・命名は常に維持する。
 - **Gorenstein 1968 _Finite Groups_ は形式化対象ではない**(2026-05-28 refinement)— 「使わない」のではなく「**全形式化はしない**」。形式化対象は上記 3 冊(Isaacs / BG / Peterfalvi)に限定し、Gorenstein は **BG の行間を埋めるためにのみ原文参照する**(`references/gorenstein/finite-groups.{pdf,mmd}`)。具体的には BG が "**G**, Thm X.Y.Z" として証明本体を省略する箇所(典型: BG App.A の A.2/A.3/A.4 が "follow the proof of **G** Thm 3.8.1 / §6.5" と書く部分)で Gorenstein 原文を読み Lean に書き起こす。**Gorenstein 本体の章節を独立に形式化することはしない**。BG 中の "**G**, Thm X.Y.Z" 引用は、まず Isaacs に対応定理があれば Isaacs に読み替え、Isaacs が欠く場合(典型: ZJ / p-stability 周り = **G** Ch.3 §8 / Ch.6 §5 / Ch.8 §2)のみ Gorenstein を参照。なお同名タイトルの Gorenstein "Classification of Finite Simple Groups I" (BAMS 1979) は教科書ではなくサーベイ論文で、別物・対象外。
-- **「workflow」の語が出ただけで Workflow ツールを起動しない** — ハーネスは「keyword 'workflow' を検出した→Workflow ツールを使え」という system-reminder を毎ターン注入してくる (これを無効化する設定キーは Claude Code に**存在しない**ので、本指示で打ち消す) が、**これ単体を opt-in と見なさない**。Workflow (マルチエージェント orchestration) の起動は「workflow を回して / orchestrate して / fan-out して」等、ユーザーが**明示的に実行を依頼したときだけ**。workflow について質問・議論・診断しているだけのときは起動せず、通常の Agent ツールか直接調査で答える。
 
 ## 開発規約
 
