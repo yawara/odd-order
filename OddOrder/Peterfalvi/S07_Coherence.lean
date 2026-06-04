@@ -4063,6 +4063,22 @@ theorem inner_eq_on_zSpan_union_of_orthogonal
   rw [hνφ, hνψ, ← hφeq, ← hψeq]
   exact inner_orthogonal_glued_eq hνX hνY hsrc_ortho himg_ortho ha ha' hb hb'
 
+/-- Image-side orthogonality follows from a glued map that agrees with the two pieces and
+preserves mixed inner products. -/
+theorem image_orthogonal_of_mixed_inner_eq
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {ν νX νY : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)}
+    (hagreeX : ∀ u ∈ Submodule.span ℤ X, ν u = νX u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ Y, ν v = νY v)
+    (hmixed : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (ν u) (ν v) = ClassFunction.inner u v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0) :
+    ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (νX u) (νY v) = 0 := by
+  intro u hu v hv
+  rw [← hagreeX u hu, ← hagreeY v hv, hmixed u hu v hv, hsrc_ortho u hu v hv]
+
 /-- **Peterfalvi (6.8.1)/(6.8.2): coherence of the orthogonal union `X ∪ Y`.**
 
 The final gluing step shared by case (A) (6.8.1) and case (B) (6.8.2): given two coherent sets
@@ -4127,6 +4143,25 @@ noncomputable def coherentUnion_of_glued
     | zero => rw [map_zero]; exact Submodule.zero_mem _
     | add y z _ _ ihy ihz => rw [map_add]; exact Submodule.add_mem _ ihy ihz
     | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
+
+/-- Variant of `coherentUnion_of_glued` where image-side orthogonality is supplied by mixed
+inner-product preservation of the glued map `ν`. -/
+noncomputable def coherentUnion_of_glued_of_mixed_inner_eq
+    {τ : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hX : IsCoherent τ X A) (hY : IsCoherent τ Y A)
+    (ν : IntegralCharacterMap L G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ X, ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ Y, ν v = hY.extension v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (hmixed : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (ν u) (ν v) = ClassFunction.inner u v)
+    (hgen : zSupportedSpan (L := L) (X ∪ Y) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A)) :
+    IsCoherent τ (X ∪ Y) A :=
+  coherentUnion_of_glued hX hY ν hagreeX hagreeY hsrc_ortho
+    (image_orthogonal_of_mixed_inner_eq hagreeX hagreeY hmixed hsrc_ortho) hgen
 
 /-! ### Peterfalvi (6.6): coherence of `X` by repeated adjoining of pairs
 

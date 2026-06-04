@@ -1734,3 +1734,21 @@ pass 16 の source orthogonality bridge を (6.8.1) Frobenius alternative に直
 `coherentS_of_Xset_commutator_Yset_glued_of_frobenius`
 の形に整理された。残りは `τ₃` の実構成・agreement、image-side orthogonality、supported-span
 generation の case-specific 入力。
+
+### 2026-06-04 pass 18: mixed-inner glue interface
+
+S07/S08 に `himg_ortho` を直接要求しない glue variant を追加。`τ₃` 候補 `ν` が
+`ℤ[X] × ℤ[Y]` の mixed inner を保存し、各 side の extension と agree するなら、source-side
+orthogonality から image-side orthogonality が従う:
+
+- `S07.image_orthogonal_of_mixed_inner_eq`: `ν = νX` on `ℤ[X]`, `ν = νY` on `ℤ[Y]`,
+  `⟨νu,νv⟩=⟨u,v⟩` for `u∈ℤ[X]`, `v∈ℤ[Y]`, and `ℤ[X]⊥ℤ[Y]` から
+  `νX(ℤ[X]) ⟂ νY(ℤ[Y])` を導く。
+- `S07.coherentUnion_of_glued_of_mixed_inner_eq`: `coherentUnion_of_glued` の variant。
+  caller は `himg_ortho` の代わりに mixed inner preservation を渡す。
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner`
+  and `_of_frobenius_mixed_inner`: §8 final adapter の corresponding variants。
+
+これで c1 route の残 input は `X` coherence, `τ₃` agreement, mixed inner preservation,
+supported-span generation へ整理された。`τ₃` 実構成側は image orthogonality を別途証明する代わりに、
+mixed block の inner preservation を示せばよい。

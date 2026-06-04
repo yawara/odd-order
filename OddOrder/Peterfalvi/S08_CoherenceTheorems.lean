@@ -3244,6 +3244,37 @@ noncomputable def coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X
   exact hyp.coherentS_of_Xset_commutator_Yset_glued hX ν hagreeX hagreeY
     (hyp.inner_span_Xset_Yset_eq_zero_of_irreducible_X hXirr) himg_ortho hgen
 
+/-- Variant of the (6.8) glue step where source-side orthogonality is discharged from
+irreducibility of `X`, and image-side orthogonality is discharged from mixed inner preservation
+of the glued map `ν`. -/
+noncomputable def coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hXirr : ∀ φ ∈ hyp.Xset ⁅H, H⁆, IsIrreducibleCharacter φ)
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆), ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ hyp.Yset,
+      ν v = hyp.coherentYset.extension v)
+    (hmixed : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset, ClassFunction.inner (ν u) (ν v) =
+        ClassFunction.inner u v)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget := by
+  let hsrc := hyp.inner_span_Xset_Yset_eq_zero_of_irreducible_X hXirr
+  exact hyp.coherentS_of_Xset_commutator_Yset_glued hX ν hagreeX hagreeY hsrc
+    (OddOrder.Peterfalvi.S07.image_orthogonal_of_mixed_inner_eq
+      hagreeX hagreeY hmixed hsrc)
+    hgen
+
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
 nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irreducible. -/
@@ -3303,6 +3334,35 @@ noncomputable def coherentS_of_Xset_commutator_Yset_glued_of_frobenius
   hyp.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X
     (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
     hX ν hagreeX hagreeY himg_ortho hgen
+
+/-- **(6.8.1), Frobenius case:** glue the Frobenius `X` coherence with the internally
+constructed `Y` coherence, using mixed inner preservation of `ν` to discharge image-side
+orthogonality. -/
+noncomputable def coherentS_of_Xset_commutator_Yset_glued_of_frobenius_mixed_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆), ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ hyp.Yset,
+      ν v = hyp.coherentYset.extension v)
+    (hmixed : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset, ClassFunction.inner (ν u) (ν v) =
+        ClassFunction.inner u v)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget :=
+  hyp.coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_mixed_inner
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    hX ν hagreeX hagreeY hmixed hgen
 
 /-- **(T7-c2 case A) `X ⊆ Irr L`.**  In case A every `χ ∈ X = S − S(Z)` is irreducible.  Writing
 `χ = Ind_H^L θ` (`θ ≠ 1`, from `χ ∈ S`), membership `χ ∉ S(Z)` forces `Z.subgroupOf H ⊄ Ker θ`, so
