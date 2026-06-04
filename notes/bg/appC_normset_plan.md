@@ -304,8 +304,9 @@ S16 interface の `N(2*a-1)=1` を返す adapter も
 one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
 `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
 finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
-S16 `FieldNormalizerData` が現在 field として持つ `appC_normSet_generator_relation` を、
+S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_unit_step` を、
 仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
+`appC_normSet_generator_relation` はこの field からの derived theorem。
 
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。

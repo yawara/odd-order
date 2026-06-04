@@ -190,7 +190,7 @@ created: 2026-06-04
 
 `AppC.theoremC` が sorry-free (Lemmas C.1-C.3 + 配線完成)。`nonexistence_of_G` の BG 側 gap が閉じる。
 2026-06-04 時点で `AppC_FinalContradiction` は direct sorry-free; `theoremC` は AxiomsCheck 登録済み。
-残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_normSet_generator_relation` の upstream materialization として追跡する。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
+残る数学的 C.3 generator-relation は `S16.FieldNormalizerData.appC_twisted_unit_step` の upstream materialization として追跡する。`appC_normSet_generator_relation` は derived theorem になった。AppC 側では `N(2*a-1)=1` から `E=E⁻¹` への有限体代数部分を証明済み。
 段階的に C.1 → C.2(q=3) → C.2(q≥5) → assembly → C.3 materialization。
 
 ## 参照

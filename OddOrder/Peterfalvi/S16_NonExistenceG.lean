@@ -156,7 +156,18 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U : Prop
   W2_conj_y_normalizes_U_holds : W2_conj_y_normalizes_U
-  appC_normSet_generator_relation : appCNormSetGeneratorRelation hyp
+  appC_twisted_unit_step : appCNormSetTwistedUnitStep hyp
+
+namespace FieldNormalizerData
+
+/-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
+BG's one-step twisted-inverse output stored in `FieldNormalizerData`. -/
+theorem appC_normSet_generator_relation {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    appCNormSetGeneratorRelation hyp :=
+  appCNormSetGeneratorRelation_of_twisted_unit_step hyp data.appC_twisted_unit_step
+
+end FieldNormalizerData
 
 /-! ## (14.3)--(14.7): the subgroup `L` over `N_G(U)` -/
 

@@ -1879,6 +1879,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.lemmaC2_card_ge_two_of_conditionA
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
