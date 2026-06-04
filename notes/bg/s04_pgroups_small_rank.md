@@ -64,6 +64,16 @@
 
 **太字**: Blackburn Thm 4.16 (中核), Thm 4.18, 4.20 (下流定理).
 
+### 2026-06-05: Corollary 4.19 implementation split
+
+- `S04.le_centralizer_of_isPGroup_conjNormal_image_minimalNormal` now isolates
+  the fixed-point argument used at the end of Corollary 4.19: a normal subgroup
+  whose conjugation image on a minimal normal `p`-subgroup is a `p`-group
+  centralizes that minimal normal subgroup.
+- Remaining Corollary 4.19 work: build the `p`-group conjugation image of
+  `G'` on each `p`-chief factor from Lemma 4.17/Theorem 4.18 core, then
+  expose the downstream API `G' ≤ C_G(U/V)`.
+
 ---
 
 ## Blackburn Thm 4.16 の詳細

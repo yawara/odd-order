@@ -113,6 +113,81 @@ theorem conjNormal_ker {N : Subgroup G} [N.Normal] :
     calc a * (n : G) * a⁻¹ = ((n : G) * a) * a⁻¹ := by rw [← hcomm]
       _ = (n : G) := by group
 
+/-- If a subgroup has `p`-group conjugation image on a minimal normal `p`-subgroup,
+then it centralizes that subgroup. This is the fixed-point argument used in BG
+Corollary 4.19: a nontrivial fixed-point subgroup is normal, hence all of the
+chief factor. -/
+theorem le_centralizer_of_isPGroup_conjNormal_image_minimalNormal
+    {D N : Subgroup G} [D.Normal] [N.Normal] (hMin : Ch02.IsMinimalNormal N)
+    {p : ℕ} [Fact p.Prime] (hN_pg : IsPGroup p ↥N)
+    (hD_pg : IsPGroup p ↥(D.map (MulAut.conjNormal (H := N)))) :
+    D ≤ Subgroup.centralizer (N : Set G) := by
+  classical
+  set α : G →* MulAut ↥N := MulAut.conjNormal with hα_def
+  have hD_pgPrime : IsPGroup p ↥(D.map α) := by
+    rw [hα_def]
+    exact hD_pg
+  haveI hN_nontriv : Nontrivial ↥N := by
+    rcases Subgroup.bot_or_nontrivial N with h | h
+    · exact absurd h hMin.2.1
+    · exact h
+  have hfix_ne : Subgroup.fixedPointsOfMulAut (D.map α).subtype ≠ ⊥ :=
+    Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup hN_pg hD_pgPrime _
+  set W : Subgroup G :=
+    (Subgroup.fixedPointsOfMulAut (D.map α).subtype).map N.subtype with hW_def
+  have hW_mem : ∀ x : G, x ∈ W ↔ x ∈ N ∧ ∀ d ∈ D, d * x * d⁻¹ = x := by
+    intro x
+    constructor
+    · rintro ⟨⟨n, hn⟩, hfix, rfl⟩
+      refine ⟨hn, fun d hd => ?_⟩
+      have h1 := Subgroup.mem_fixedPointsOfMulAut.mp hfix
+        ⟨α d, Subgroup.mem_map.mpr ⟨d, hd, rfl⟩⟩
+      have h2 := congrArg Subtype.val h1
+      calc d * (N.subtype ⟨n, hn⟩) * d⁻¹
+          = (((α d) ⟨n, hn⟩ : ↥N) : G) :=
+            (MulAut.conjNormal_apply d (⟨n, hn⟩ : ↥N)).symm
+        _ = N.subtype ⟨n, hn⟩ := h2
+    · rintro ⟨hxN, hxfix⟩
+      refine ⟨⟨x, hxN⟩, ?_, rfl⟩
+      rw [SetLike.mem_coe, Subgroup.mem_fixedPointsOfMulAut]
+      intro a
+      obtain ⟨d, hd, ha⟩ := a.2
+      have h3 : a.1 ⟨x, hxN⟩ = (⟨x, hxN⟩ : ↥N) := by
+        rw [← ha]
+        apply Subtype.ext
+        calc (((α d) ⟨x, hxN⟩ : ↥N) : G)
+            = d * x * d⁻¹ := MulAut.conjNormal_apply d (⟨x, hxN⟩ : ↥N)
+          _ = x := hxfix d hd
+      exact h3
+  have hW_le : W ≤ N := by
+    intro x hx
+    exact ((hW_mem x).mp hx).1
+  have hW_ne : W ≠ ⊥ := by
+    intro h
+    apply hfix_ne
+    rw [hW_def, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff] at h
+    exact h
+  haveI hW_norm : W.Normal := by
+    constructor
+    intro n hn g
+    obtain ⟨hnN, hnfix⟩ := (hW_mem n).mp hn
+    refine (hW_mem _).mpr ⟨(inferInstance : N.Normal).conj_mem n hnN g, fun d hd => ?_⟩
+    have hdPrime : g⁻¹ * d * g ∈ D := by
+      simpa using (inferInstance : D.Normal).conj_mem d hd g⁻¹
+    have hfix := hnfix _ hdPrime
+    calc d * (g * n * g⁻¹) * d⁻¹
+        = g * ((g⁻¹ * d * g) * n * (g⁻¹ * d * g)⁻¹) * g⁻¹ := by group
+      _ = g * n * g⁻¹ := by rw [hfix]
+  rcases hMin.2.2 W (inferInstance : W.Normal) hW_le with hW_bot | hW_top
+  · exact absurd hW_bot hW_ne
+  · intro d hd
+    rw [Subgroup.mem_centralizer_iff]
+    intro n hn
+    have hnW : n ∈ W := by rw [hW_top]; exact hn
+    have hfix := ((hW_mem n).mp hnW).2 d hd
+    calc n * d = (d * n * d⁻¹) * d := by rw [hfix]
+      _ = d * n := by group
+
 /-- **`p'`-核による商で `p`-rank は増えない**: `N ⊴ G` with `p ∤ |N|` のとき
 `r_p(G/N) ≤ r_p(G)`。商の elementary abelian `p`-部分群 `B` は、その逆像の
 Sylow `p`-部分群 `P` と同型 (`p`-元は `p'`-核と交わらない) なので `G` 内で実現される。 -/

@@ -875,10 +875,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      the S09 consumption side of Corollary 4.19: `P₀ ≤ H'` plus local
      chief-factor centralization of `H'` yields ambient `P₀ ≤ C_G(K)`.
 
-   Remaining for this block: implement or expose the missing §4 Corollary
-   4.19 API, instantiate it inside `L ∩ M` with `G* = D ∩ L`, and feed its
-   chief-factor centralizer output into the existing S09 bridge to discharge
-   the stored noncentralization contradiction.
+   Remaining for this block: finish/expose the §4 Corollary 4.19 API
+   (the fixed-point centralizer sublemma is now in S04g), instantiate it inside
+   `L ∩ M` with `G* = D ∩ L`, and feed its chief-factor centralizer output into
+   the existing S09 bridge to discharge the stored noncentralization
+   contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 
