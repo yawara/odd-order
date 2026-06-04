@@ -452,6 +452,15 @@ S09 に `zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_
 `1 - e/h ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接得る downstream socket にした。
 
 
+### 2026-06-05 pass: family-notated zeta-rho bound
+
+S09 に `FrobeniusFamily.zetaNuRho_inner_self_re_ge_of_family_source_data`
+を追加した。local `H78` 側の
+`zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula`
+を `F.e i` / `F.h i` 表記で使えるようにし、(7.5) の reduced-family inequality を
+組む前段で `1 - e_i/h_i ≤ ⟨(ζ^ν)^ρ,(ζ^ν)^ρ⟩.re` を直接供給する bridge にした。
+
+
 ### 2026-06-04 pass: residual ZIrr bridges for (7.9)
 
 S09 に `Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent` と

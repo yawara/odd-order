@@ -4507,6 +4507,59 @@ lemma localSmallIndex_of_family_cardinalities [Fintype G]
   rw [F.localComplementIndex_eq_e H78 hL hH, F.localKernelOrder_eq_h H78 hH]
   exact hsmall
 
+/-- Family-notated source-data form of the raw `(ζ^ν)^ρ` lower bound from
+Peterfalvi (7.8.b).  This is the local estimate used before the reduced-family
+inequality in (7.10), with `e` and `h` stated as `F.e i` and `F.h i`. -/
+lemma zetaNuRho_inner_self_re_ge_of_family_source_data [Fintype G]
+    (F : FrobeniusFamily G k) {i : Fin k}
+    {A : Set G} {L : Subgroup G} [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hL : L = F.L i) (hH : H78.hyp76.H = F.H i)
+    (hind_norm :
+      ClassFunction.inner (H78.hyp76.zeta H78.ind1H)
+        (H78.hyp76.zeta H78.ind1H) = (F.e i : ℂ))
+    (hzeta_ind :
+      ClassFunction.inner (H78.hyp76.zeta H78.zetaDistinct)
+        (H78.hyp76.zeta H78.ind1H) = 0)
+    (hirr : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      IsIrreducibleCharacter (H78.hyp76.zeta r))
+    (hdistinct : ∀ r ∈ (Finset.univ.erase H78.ind1H),
+      ∀ s ∈ (Finset.univ.erase H78.ind1H), r ≠ s →
+        H78.hyp76.zeta r ≠ H78.hyp76.zeta s)
+    (hzeta_degree : H78.hyp76.zeta H78.zetaDistinct (1 : L) = (F.e i : ℂ))
+    (hdegree_sum :
+      (∑ r ∈ (Finset.univ.erase H78.ind1H),
+        H78.hyp76.zeta r (1 : L) * star (H78.hyp76.zeta r (1 : L)) /
+          ClassFunction.inner (H78.hyp76.zeta r) (H78.hyp76.zeta r)) =
+        ((F.h i : ℂ) - 1) * (F.e i : ℂ))
+    (hzeta_uv :
+      H78.zetaNuRhoNormSq =
+        (1 / (F.e i : ℝ)) *
+            (1 - 1 / (F.h i : ℝ)) * (hBD.a : ℝ) ^ 2 -
+          2 * (1 / (F.h i : ℝ)) * (hBD.a : ℝ) +
+          (1 - (F.e i : ℝ) / (F.h i : ℝ)))
+    (hsmall : 2 * F.e i + 1 ≤ F.h i) :
+    1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+      (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re := by
+  have hlocal :
+      1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤
+        (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re :=
+    H78.zetaNuRho_inner_self_re_ge_of_inner_values_irreducible_source_data_and_uv_formula
+      hBD
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hind_norm)
+      hzeta_ind hirr hdistinct
+      (by simpa [F.localComplementIndex_eq_e H78 hL hH] using hzeta_degree)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hdegree_sum)
+      (by
+        simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+          using hzeta_uv)
+      (F.localSmallIndex_of_family_cardinalities H78 hL hH hsmall)
+  simpa [F.localKernelOrder_eq_h H78 hH, F.localComplementIndex_eq_e H78 hL hH]
+    using hlocal
+
 /-- `G₀` is nonempty: it contains the identity. -/
 lemma one_le_card_G0 [Finite G] (F : FrobeniusFamily G k) :
     1 ≤ Nat.card F.G0 := by
