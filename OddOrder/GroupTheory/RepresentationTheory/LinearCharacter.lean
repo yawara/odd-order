@@ -64,6 +64,14 @@ noncomputable def linearIrreducibleCharacter (χ : H →* ℂˣ) : IrreducibleCh
     ((linearIrreducibleCharacter χ : ClassFunction H ℂ)) (1 : H) = 1 := by
   rw [linearIrreducibleCharacter_apply, map_one, Units.val_one]
 
+@[simp] theorem ClassFunction.compHom_linearIrreducibleCharacter
+    {K H : Type*} [Group K] [Group H] (f : K →* H) (χ : H →* ℂˣ) :
+    ClassFunction.compHom f
+        (linearIrreducibleCharacter χ : ClassFunction H ℂ) =
+      (linearIrreducibleCharacter (χ.comp f) : ClassFunction K ℂ) := by
+  ext k
+  rfl
+
 theorem linearIrreducibleCharacter_injective :
     Function.Injective (linearIrreducibleCharacter (H := H)) := by
   intro χ₁ χ₂ h
@@ -151,6 +159,47 @@ theorem IsIrreducibleCharacter.apply_ne_zero_of_apply_one_eq_one {φ : ClassFunc
   have hmul := hφ.map_mul_of_apply_one_eq_one h1 g g⁻¹
   rw [mul_inv_cancel, h1, h0, zero_mul] at hmul
   exact one_ne_zero hmul
+
+
+/-- A degree-one irreducible character is induced by a multiplicative linear character
+`G →* ℂˣ`.
+
+This is the converse packaging to `linearIrreducibleCharacter`: multiplicativity of `φ` gives a
+homomorphism into `ℂ`, and `apply_ne_zero_of_apply_one_eq_one` upgrades the values to units. -/
+theorem IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) (h1 : (φ : G → ℂ) 1 = 1) :
+    ∃ χ : G →* ℂˣ, (linearIrreducibleCharacter χ : ClassFunction G ℂ) = φ := by
+  let χ : G →* ℂˣ :=
+    { toFun := fun g => Units.mk0 ((φ : G → ℂ) g)
+        (hφ.apply_ne_zero_of_apply_one_eq_one h1 g)
+      map_one' := by
+        ext
+        exact h1
+      map_mul' := fun g h => by
+        ext
+        exact hφ.map_mul_of_apply_one_eq_one h1 g h }
+  refine ⟨χ, ?_⟩
+  ext g
+  simp [χ]
+
+omit [Finite G] in
+/-- Every irreducible character of a finite commutative group is degree one. -/
+theorem IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative [IsMulCommutative G]
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    (φ : G → ℂ) 1 = 1 := by
+  obtain ⟨V, _, _, _, ρ, hirr, hχ⟩ := hφ
+  haveI : Representation.IsIrreducible ρ := hirr
+  haveI := nontrivial_of_isIrreducible ρ
+  have hdim : Module.finrank ℂ V = 1 :=
+    Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative (ρ := ρ)
+  rw [congrFun hχ 1, ρ.char_one, hdim, Nat.cast_one]
+
+/-- Every irreducible character of a finite commutative group comes from a linear character. -/
+theorem IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+    [IsMulCommutative G] {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ χ : G →* ℂˣ, (linearIrreducibleCharacter χ : ClassFunction G ℂ) = φ :=
+  hφ.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one
+    hφ.apply_one_eq_one_of_isMulCommutative
 
 /-- A degree-one irreducible character **kills commutators**: `θ(⁅a,b⁆) = θ(1) = 1`.
 

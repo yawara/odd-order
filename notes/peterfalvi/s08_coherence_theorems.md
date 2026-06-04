@@ -362,8 +362,12 @@ allowlist):
   **`range_induce_linearIrreducibleCharacter_subset_Yset`** を追加。nontrivial linear source
   `χ : H →* ℂˣ` について `Ind_H^L(linear χ) ∈ Yset = S(H')` を、`linear χ` が commutator
   subgroup を殺すことから直接証明する。これで constructed Y-family の range は `Yset` に入る。
-  残る exact wiring は `Yset` 側の任意 member が nontrivial linear source から来ること
-  (surjectivity/equality) と、その enumeration/range 同一視。
+- **2026-06-04 T6 Yset reverse bridge**: **`exists_linear_source_of_mem_Yset`** と
+  **`mem_Yset_iff_exists_linear_source`** を追加。`Yset` witness の source `θ` を
+  `Abelianization.of : H → H/H'` で factor し、finite commutative group の irreducible character
+  が degree-one/linear であることから、任意の `Yset` member を nontrivial linear source の
+  induced character として表す。残る exact wiring は nontrivial linear characters の finite
+  enumeration と、その explicit family の range 同一視。
 - **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で

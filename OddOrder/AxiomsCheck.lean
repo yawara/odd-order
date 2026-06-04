@@ -1928,10 +1928,24 @@ set_option linter.style.longLine false in
 -- Linear (degree-one) irreducible character from a hom `H →* ℂˣ`: the source characters of the
 -- (6.8) `Y = S(H')` family are the nontrivial linear characters of `H` (`= Irr(H/H') ∖ {1}`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.linearIrreducibleCharacter
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.ClassFunction.compHom_linearIrreducibleCharacter
 -- Degree-one irreducible characters are multiplicative / kill commutators — lets a linear `θ` of `H`
 -- inflate from the abelian quotient `H/⁅H,H⁆` (the (6.8)(c2) inertia bridge).
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.map_mul_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_ne_zero_of_apply_one_eq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_one
 -- (6.8)(c2) inertia bridge infra: inflation–conjugation equivariance + inertia transfer
@@ -1978,6 +1992,12 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYFamily_of_pairwiseNonconj
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.induce_linearIrreducibleCharacter_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_linearIrreducibleCharacter_eq_of_YsetSource
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_linear_source_of_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.mem_Yset_iff_exists_linear_source
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_subset_Yset
 #assert_only_allowed_axioms

@@ -2652,6 +2652,75 @@ theorem induce_linearIrreducibleCharacter_mem_Yset
       rw [mul_inv_cancel, linearIrreducibleCharacter_apply_one χ, ha, one_mul] at hai
       exact hai.symm
 
+
+/-- A source character whose kernel contains `H'` comes from a linear character of `H`.
+
+The proof factors the source through the abelianization `H/H'`; irreducible characters of a finite
+commutative group are degree one, hence are `linearIrreducibleCharacter`s, and pulling that linear
+character back along `Abelianization.of` recovers the original source. -/
+theorem exists_linearIrreducibleCharacter_eq_of_YsetSource
+    (_hyp : SibleyDadeHypothesis G L H) {θ : IrreducibleCharacter ↥H}
+    (hker : (((⁅H, H⁆ : Subgroup ↥L).subgroupOf H : Set ↥H) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))) :
+    ∃ χ : ↥H →* ℂˣ,
+      (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) = (θ : ClassFunction ↥H ℂ) := by
+  classical
+  have hsubgroupOf_eq :
+      ((⁅H, H⁆ : Subgroup ↥L).subgroupOf H) = _root_.commutator ↥H := by
+    rw [← Subgroup.map_subtype_commutator H, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
+  let q : ↥H →* Abelianization ↥H := Abelianization.of
+  have hq_surj : Function.Surjective q := by
+    intro y
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (_root_.commutator ↥H) y
+    exact ⟨x, rfl⟩
+  have hker_q :
+      ((q.ker : Subgroup ↥H) : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
+    intro x hx
+    apply hker
+    have hxcomm : x ∈ _root_.commutator ↥H := by
+      rwa [show q.ker = _root_.commutator ↥H by
+        change Abelianization.of.ker = _root_.commutator ↥H
+        exact Abelianization.ker_of ↥H] at hx
+    rwa [hsubgroupOf_eq]
+  obtain ⟨θbar, hθbar⟩ := exists_compHom_eq_of_subset_characterKernel hq_surj θ hker_q
+  haveI : Finite (Abelianization ↥H) := Finite.of_surjective q hq_surj
+  obtain ⟨χbar, hχbar⟩ :=
+    θbar.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  refine ⟨χbar.comp q, ?_⟩
+  rw [← ClassFunction.compHom_linearIrreducibleCharacter, hχbar, hθbar]
+
+/-- Every member of `Y = S(H')` is induced from a nontrivial linear character of `H`. -/
+theorem exists_linear_source_of_mem_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Yset) :
+    ∃ χ : ↥H →* ℂˣ, χ ≠ 1 ∧
+      φ = ClassFunction.induce H
+        (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) := by
+  rw [Yset, SsubFiltration] at hφ
+  obtain ⟨θ, hθ_ne, hker, hφ⟩ := hφ
+  obtain ⟨χ, hχθ⟩ := hyp.exists_linearIrreducibleCharacter_eq_of_YsetSource hker
+  refine ⟨χ, ?_, ?_⟩
+  · intro hχ
+    apply hθ_ne
+    apply IrreducibleCharacter.ext
+    rw [← hχθ]
+    exact congrArg (fun η : IrreducibleCharacter ↥H => (η : ClassFunction ↥H ℂ))
+      ((linearIrreducibleCharacter_eq_trivial_iff (χ := χ)).mpr hχ)
+  · rw [hφ, ← hχθ]
+
+/-- `Y = S(H')` is exactly the image of the nontrivial linear characters of `H` under induction. -/
+theorem mem_Yset_iff_exists_linear_source
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {φ : ClassFunction ↥L ℂ} :
+    φ ∈ hyp.Yset ↔ ∃ χ : ↥H →* ℂˣ, χ ≠ 1 ∧
+      φ = ClassFunction.induce H
+        (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) := by
+  constructor
+  · exact hyp.exists_linear_source_of_mem_Yset
+  · rintro ⟨χ, hχ_ne, rfl⟩
+    exact hyp.induce_linearIrreducibleCharacter_mem_Yset hχ_ne
+
 /-- Family form of `induce_linearIrreducibleCharacter_mem_Yset`. -/
 theorem range_induce_linearIrreducibleCharacter_subset_Yset
     (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ}

@@ -72,8 +72,10 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
     irreducibility family 仮定を削除。残りは `Y=S(H')` の enumeration/range wiring。
   - 2026-06-04: `induce_linearIrreducibleCharacter_mem_Yset` /
     `range_induce_linearIrreducibleCharacter_subset_Yset` で constructed nontrivial linear family
-    の induced range が `Y=S(H')` に入ることを証明。残りは逆向き
-    (`Yset` member の linear-source representation) と range equality。
+    の induced range が `Y=S(H')` に入ることを証明。
+  - 2026-06-04: `exists_linear_source_of_mem_Yset` /
+    `mem_Yset_iff_exists_linear_source` で逆向きも証明。残りは nontrivial linear characters の
+    finite enumeration と exact range equality。
 
 ## 完了条件
 
