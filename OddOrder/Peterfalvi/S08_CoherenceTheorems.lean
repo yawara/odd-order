@@ -5585,6 +5585,82 @@ theorem image_weightedDifferenceInput
   refine Finset.sum_congr rfl fun t _ => ?_
   rw [map_zsmul, data.image_eq t]
 
+/-- Normalized form of the weighted Ind equation: the weighted source difference maps to
+`∑ d_tχ_t - (∑ d_t²)χ_0`. -/
+theorem image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    τ data.weightedDifferenceInput =
+      data.weightedOutput - (∑ t : Fin n, (d t : ℂ) ^ 2) • data.χ 0 := by
+  classical
+  rw [data.image_weightedDifferenceInput]
+  ext g
+  have hterm : ∀ t : Fin n,
+      (d t • (data.χ t - d t • data.χ 0)) g =
+        (d t : ℂ) * data.χ t g - (d t : ℂ) ^ 2 * data.χ 0 g := by
+    intro t
+    rw [← Int.cast_smul_eq_zsmul ℂ (d t) (data.χ t - (d t) • data.χ 0),
+      ClassFunction.smul_apply, ClassFunction.sub_apply,
+      ← Int.cast_smul_eq_zsmul ℂ (d t) (data.χ 0), ClassFunction.smul_apply]
+    ring
+  rw [ClassFunction.sub_apply, ClassFunction.smul_apply, weightedOutput,
+    ClassFunction.finset_sum_apply]
+  calc
+    ∑ t : Fin n, (d t • (data.χ t - d t • data.χ 0)) g
+        = ∑ t : Fin n, ((d t : ℂ) * data.χ t g - (d t : ℂ) ^ 2 * data.χ 0 g) := by
+          exact Finset.sum_congr rfl fun t _ => hterm t
+    _ = (∑ t : Fin n, (d t : ℂ) * data.χ t g) -
+          ∑ t : Fin n, (d t : ℂ) ^ 2 * data.χ 0 g := by
+          rw [Finset.sum_sub_distrib]
+    _ = (∑ t : Fin n, (d t : ℂ) * data.χ t g) -
+          (∑ t : Fin n, (d t : ℂ) ^ 2) * data.χ 0 g := by
+          rw [← Finset.sum_mul]
+    _ = (∑ t : Fin n, ((d t : ℂ) • data.χ t) g) -
+          (∑ t : Fin n, (d t : ℂ) ^ 2) * data.χ 0 g := by
+          rfl
+    _ = (∑ t : Fin n, (d t : ℂ) • data.χ t) g -
+          (∑ t : Fin n, (d t : ℂ) ^ 2) * data.χ 0 g := by
+          rw [ClassFunction.finset_sum_apply]
+
+/-- The reference character coefficient of the weighted Ind image. -/
+theorem inner_chi_zero_image_weightedDifferenceInput
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+      1 - ∑ t : Fin n, (d t : ℂ) ^ 2 := by
+  classical
+  have hstar_sum : star (∑ t : Fin n, (d t : ℂ) ^ 2) =
+      ∑ t : Fin n, (d t : ℂ) ^ 2 := by
+    rw [show star (∑ t : Fin n, (d t : ℂ) ^ 2) =
+        ∑ t : Fin n, star ((d t : ℂ) ^ 2) from by
+      simp [star_sum]]
+    refine Finset.sum_congr rfl fun t _ => ?_
+    rw [star_pow, star_intCast]
+  rw [data.image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero,
+    ClassFunction.inner_sub_right, data.inner_chi_weightedOutput 0,
+    OddOrder.RepresentationTheory.inner_smul_right, data.norm_one, hstar_sum, mul_one,
+    data.d_zero]
+  norm_num
+
+/-- Parseval-normalized reference coefficient of the weighted Ind image. -/
+theorem inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput) =
+      1 - ClassFunction.inner data.weightedOutput data.weightedOutput := by
+  rw [data.inner_chi_zero_image_weightedDifferenceInput,
+    data.weightedOutput_inner_self_eq_sum_sq]
+
+/-- Parseval-normalized form of the weighted Ind equation. -/
+theorem image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    τ data.weightedDifferenceInput =
+      data.weightedOutput -
+        ClassFunction.inner data.weightedOutput data.weightedOutput • data.χ 0 := by
+  rw [data.image_weightedDifferenceInput_eq_weightedOutput_sub_sum_sq_smul_chi_zero,
+    data.weightedOutput_inner_self_eq_sum_sq]
+
 /-- Construct an `IndChainDecomposition` from a coherence input `hτ : IsCoherent τ S A`
 together with the membership `ζ_t ∈ S`, the orthonormality of the input family `ζ`,
 and the support of each scaled difference `ζ_t - d_t · ζ_0` in `Z[S, A]`.

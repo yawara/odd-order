@@ -1817,3 +1817,17 @@ Explorer pass の指摘に従い、既に landed 済みの S08 T7/T8 X-layer を
 
 これで downstream S09/c1 callers は `_of_irreducible_X` 版を毎回手で合成するのではなく、
 Frobenius hypothesis から出る direct API を axiom-clean 登録済みの入口として参照できる。
+
+
+### 2026-06-04 pass 23: weighted Ind-chain image normal form
+
+Gibbs explorer pass の候補に従い、`IndChainDecomposition` の §9-facing weighted consumer
+algebraを正規化した。既存 `image_weightedDifferenceInput` は
+`∑ d_t (χ_t - d_t χ_0)` の展開形だけを返していたが、この pass で
+`weightedOutput - (∑ d_t^2) • χ_0` 形と Parseval 版
+`weightedOutput - ⟪weightedOutput, weightedOutput⟫ • χ_0` を追加した。
+
+同じ正規化式から `χ_0` 係数も抽出し、
+`inner_chi_zero_image_weightedDifferenceInput` と norm 版を登録した。これは S09 の
+`BetaDecomp` / `weightedNuSum` 側で、(7.10) の Ind-chain package から scalar coefficient
+identity を直接消費するための小さな bridge。全 4 件を `AxiomsCheck` に登録済み。
