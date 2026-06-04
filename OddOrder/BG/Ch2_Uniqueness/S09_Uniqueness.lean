@@ -2576,6 +2576,32 @@ private theorem le_centralizer_of_subgroupOf_le_centralizer
     (Subgroup.mem_centralizer_iff.mp (hlocal hxlocal)
       (⟨k, hkH⟩ : ↥H) hklocal)
 
+/-- Local Corollary 4.19 output plus the S09 bridge package: if `P₀ ≤ H'`
+and the local derived subgroup of `H` centralizes every chief factor of `K`,
+then `P₀` centralizes `K` back in the ambient group. -/
+private theorem le_centralizer_of_local_derived_chiefFactorCentralizer_chain
+    [Finite G] {H K P0 : Subgroup G} [((K.subgroupOf H : Subgroup ↥H)).Normal]
+    (hP0D : P0 ≤ derivedInG H) (hKH : K ≤ H)
+    (hcop : (Nat.card ↥(P0.subgroupOf H)).Coprime
+      (Nat.card ↥(K.subgroupOf H)))
+    (hsolv : IsSolvable ↥(P0.subgroupOf H) ∨ IsSolvable ↥(K.subgroupOf H))
+    (hcent : ∀ i, derivedInG (⊤ : Subgroup ↥H) ≤
+      chiefFactorCentralizer
+        (chiefSeriesInside (K.subgroupOf H) i)
+        (chiefSeriesInside (K.subgroupOf H) (i + 1))) :
+    P0 ≤ Subgroup.centralizer (K : Set G) := by
+  have hP0_local :
+      P0.subgroupOf H ≤ derivedInG (⊤ : Subgroup ↥H) :=
+    subgroupOf_le_derivedInG_top_of_le_derivedInG hP0D
+  have hlocal :
+      P0.subgroupOf H ≤
+        Subgroup.centralizer ((K.subgroupOf H : Subgroup ↥H) : Set ↥H) :=
+    le_centralizer_of_le_chiefFactorCentralizer_chain
+      (K := K.subgroupOf H) (D := P0.subgroupOf H)
+      (E := derivedInG (⊤ : Subgroup ↥H)) hcop hsolv hP0_local hcent
+  exact le_centralizer_of_subgroupOf_le_centralizer
+    (hP0D.trans (derivedInG_le_self H)) hKH hlocal
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses

@@ -871,11 +871,14 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      imply `D ≤ C(K)`.
    - `le_centralizer_of_subgroupOf_le_centralizer` lifts the resulting local
      centralizer conclusion in `↥H` back to the ambient group `G`.
+   - `le_centralizer_of_local_derived_chiefFactorCentralizer_chain` packages
+     the S09 consumption side of Corollary 4.19: `P₀ ≤ H'` plus local
+     chief-factor centralization of `H'` yields ambient `P₀ ≤ C_G(K)`.
 
-   Remaining for this block: instantiate Corollary 4.19 inside `L ∩ M` with
-   `G* = D ∩ L` to obtain the chief-factor centralizer input for `(L ∩ M)'`,
-   then assemble the existing local-derived and local-centralizer bridges to
-   discharge the stored noncentralization contradiction.
+   Remaining for this block: implement or expose the missing §4 Corollary
+   4.19 API, instantiate it inside `L ∩ M` with `G* = D ∩ L`, and feed its
+   chief-factor centralizer output into the existing S09 bridge to discharge
+   the stored noncentralization contradiction.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 
