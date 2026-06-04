@@ -335,6 +335,15 @@ allowlist):
   `hlt : d₁<dχ` と `hlemem : ∀j, d₁≤dmem j` を削除。caller は actual pair-cover prefix の enumeration,
   base-block anchor, common-index/p-power/sum/coprimality data を渡せば、chain fold が `X` coherence
   まで進む。
+- **2026-06-05 追記 13**: **`two_mul_lt_sq_of_commonIndex_primePower_gap`** と
+  S08 側の **`realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap`** /
+  **`normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap`** /
+  **`xAdjoinStepInput_of_memberFamily_degreeDivisibility_commonIndexNatGap`** を追加。common `idx`
+  + p-power residual factorizations + `d₁ < dχ` から直接 degree gap を作るため、common-index
+  constructor/`PairUnion*CommonIndexPrimePowerStepData` から quotient data
+  `q`, `m`, `q = p^m`, `dχ = q*d₁` を削除した。これで §6.6 step data は別途 ratio を命名せず、
+  character degree factorizations・degree sort・sum/coprimality data だけを渡せばよい。
+
 - **2026-06-04 追記 12**: **`sq_dvd_natDegreeSquareSum_of_commonIndex`** を追加し、common-index
   member factorizations `dmem j = idx·θmem j` と prefix square-sum identity `∑ dmem(j)^2 = D` から
   `idx²∣D` を内部導出。これにより `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`,
