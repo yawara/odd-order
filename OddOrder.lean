@@ -25,6 +25,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
@@ -105,6 +106,8 @@ import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.BG.AppC_FinalContradiction
+import OddOrder.BG.AppC_NormSet
+import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppD_CNGroups
 import OddOrder.BG.AppE_FurtherResults
 import OddOrder.Peterfalvi.Appendices.Suzuki

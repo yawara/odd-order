@@ -19,6 +19,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -44,6 +45,9 @@ import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.FeitThompson
+import OddOrder.BG.AppC_NormSet
+import OddOrder.BG.AppC_FrobeniusClassSum
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -594,12 +598,23 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_eq
 -- RepresentationTheory: the irreducible characters span the class functions.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.span_irreducibleCharacter_eq_top
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.irreducibleCharacter_apply_inv
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul
 -- RepresentationTheory (Peterfalvi §3, [Is] Thm 2.18/6.10): second (column) orthogonality is
 -- unconditional — the `CharacterTableIndexing` and weighted-row-orthogonality inputs of the
 -- matrix proof core are discharged for any `[Finite G]` (issue 0027 closed unconditionally).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_diagonal
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_conjugate
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.column_orthogonality_not_conjugate
+-- RepresentationTheory: conjugacy-class representative/cardinality adapters used by
+-- class-sum character formulae.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjClass_mk_out
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.conjClass_carrier_ncard_eq_natCard
+-- RepresentationTheory: class-sum coefficient character formula used in BG App C.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.sum_classSumCoeff_mul_irreducibleCharacter_apply
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.classSumCoeff_mul_centralizer_card_eq_sum_irreducibleCharacter
 -- RepresentationTheory (Peterfalvi (1.5.d), Burnside degree-sum): the diagonal column relation
 -- at `g = 1` gives `∑_{χ ∈ Irr G} χ(1)² = |G|` and, restricted to nontrivial characters,
 -- `∑_{χ ≠ 1} χ(1)² = |G| - 1` (issue 0044 building block for §9 (7.8)).
@@ -1815,3 +1830,186 @@ set_option linter.style.longLine false in
 -- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
+
+/-! ### Top-level Feit–Thompson reduction (downstream). -/
+
+-- Minimal-counterexample reduction: *if* no minimal simple group of odd order exists,
+-- *then* every finite group of odd order is solvable. Pure group theory (strong induction
+-- on `|G|` + `solvable_of_ker_le_range`); the only remaining gap of `feitThompson` itself is
+-- the upstream `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (BG §7–16 + Peterfalvi §10–16).
+#assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
+
+/-! ### BG Appendix C (finite-field norm-set argument). -/
+
+-- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
+-- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd
+
+-- BG App C Remark (VII): the norm-one subgroup `U ≤ 𝔽_{p^q}ˣ` has order
+-- `(p^q - 1)/(p - 1)`, the `|U|` used in the `q ≥ 5` branch of Lemma C.2.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card
+
+-- BG App C Remark (VII): under condition (A), every unit of `𝔽_{p^q}` splits
+-- as a prime-field unit times a norm-one unit.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_primeFieldUnit_mul_normOne
+
+-- BG App C Remark (VII): the prime-field units and `U` meet trivially, giving
+-- the direct-product side of `𝔽_{p^q}ˣ = 𝔽_pˣ × U` under condition (A).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_inf_normOneUnits_eq_bot
+
+-- BG App C Remark (VII): the carrier-set product `𝔽_pˣ · U` is all of
+-- `𝔽_{p^q}ˣ` under condition (A).
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.primeFieldUnits_mul_normOneUnits_eq_univ
+
+-- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
+-- conjugates additive-kernel elements by field multiplication.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
+
+-- BG App C Lemma C.2 q≥5 setup: the concrete semidirect product has a
+-- nontrivial normal additive kernel, a nontrivial norm-one complement, and the
+-- resulting subgroup pair is a Frobenius group.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_normal
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_isComplement_normOneFrobeniusComplement
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_card_gt_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusComplement_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_isFrobeniusGroup
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusGroup_card_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_index_eq_normOneUnits_card
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_mul_comm
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_irreducibleCharacter_apply_one_eq_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_isIrreducible
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_apply_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induced_irreducible_apply_one_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_eq_zero_of_not_mem_kernel
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_support_subset_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_induce_apply_inr_eq_zero
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_inl_ne_one
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_inl_eq_commutator
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_linear_irreducible_apply_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_irreducibleCharacter_apply_inl_of_apply_one_eq_one
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_apply_inl_eq_apply_one_of_kernel_subset
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_kernelCharacter_degree_sq_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_kernelCharacter_column_inl_eq_normOneUnits_card
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_le_centralizer_inl
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_le_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_eq_kernel
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobeniusKernel_card_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_centralizer_inl_card_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_column_sq_sum_inl_eq
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_column_sq_sum_two_mul_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_column_inl_eq
+
+-- BG App C Lemma C.2 q≥5 setup: the pair condition `us+vs=2s` is the
+-- corresponding product equation in the additive kernel of `H = P ⋊ U`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.mem_normOnePairSetAt_iff_inl_mul_inl
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: every `U`-translate `u*s`
+-- lies in the conjugacy class of `s` in `H = P ⋊ U`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneClassAt_mul_eq
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: arbitrary conjugation of an
+-- additive-kernel element is controlled by the `U`-coordinate, and hence the
+-- conjugacy class of `s` is exactly its `U`-orbit.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl_any
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_normOne_mul_of_mem_normOneClass
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_carrier_ncard_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_two_mul_carrier_ncard_eq_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_out_centralizer_card_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_character_sum
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneClassAt_out_apply_eq_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneClassAt_out_inv_irreducibleCharacter_apply_eq_star_inl
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_concrete_character_sum
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_kernelCharacter_concrete_classSumContribution_eq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_classSumCoeff_one_mul_pow_eq_kernelContribution_add_nonKernelContribution
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_normSq_inl_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_sum_nonKernelCharacter_normSq_inl_le
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.sum_normSq_mul_norm_le_sum_normSq_mul_sqrt_sum_normSq
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusClassSumConcreteTerm_norm_le_of_normOneUnits_card_le_degree
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusNonKernelContribution_norm_le_sum_of_degree_ge
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobeniusNonKernelContribution_norm_le_pow_mul_sqrt_of_degree_ge
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: the finite-field pair set is the
+-- fixed-product fiber over `inl (2*s)` before passing to the full product class.
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classPairSet_eq_iUnion_fixedProductClassPairSet
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classPairSet_ncard_eq_finsum_fixedProductClassPairSet_ncard
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.classPairSet_ncard_eq_classSumCoeff
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_eq_finsum_fixedProductClassPairSet_ncard
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneFrobenius_mk_conj_eq
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.fixedProductClassPairSet_ncard_eq_of_isConj
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.finsum_fixedProductClassPairSet_ncard_eq_carrier_ncard_mul
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_eq_carrier_ncard_mul_fixedProductClassPairSet_ncard
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isFixedProductClassPair
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.exists_normOnePairSetAt_of_isFixedProductClassPair
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_fixedProductClassPairSet_ncard
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_pairSetAt_ncard
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.classSumCoeff_normOneClassAt_self_two_mul_eq_normOneUnits_card_mul_normSetE_ncard
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.two_ne_zero_galoisField
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normSetE_ncard_ge_two_of_normOneCoeff_gt_normOneUnits_card
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normSetE_ncard_ge_two_of_normOneCoeff_one_gt_normOneUnits_card
+
+-- BG App C Lemma C.2 q≥5 class-sum bridge: a finite-field pair counted by
+-- `normOnePairSetAt` gives a class pair for the class-sum structure constant.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_isClassPair
+
+-- BG App C Lemma C.2 bridge: `|E|` equals the number of norm-one pairs
+-- `(u, v) ∈ U × U` satisfying `u + v = 2`, the finite-field structure constant.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSet_ncard_eq_normSetE_ncard
+
+-- BG App C Lemma C.2 bridge in the class-sum form `u*s + v*s = 2*s`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_normSetE_ncard
+
+-- BG App C Lemma C.1: if the norm set `E = {a | N(a)=N(2-a)=1}` is inverse-closed and
+-- `|E| ≥ 2`, then `p ≤ q`. The Möbius iterate `aₖ` gives `N((1-a)k+1)=1` for all `k ∈ 𝔽_p`,
+-- and the degree-`q` Frobenius polynomial `∏_{i<q}((1-a)^{p^i}X+1)-1` then has `p` roots.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC1
+
+-- BG App C Lemma C.2 (q=3): a root-free cubic `f_c = X(X-2)(X-c)+(X-1)` (pigeonhole) is
+-- irreducible, its root `a ∈ 𝔽_{p^3}` has Frobenius orbit `{a, a^p, a^{p²}}` of 3 distinct
+-- roots, so `f_c = ∏(X - a^{p^i})` and reading `f_c(0)=-1`, `f_c(2)=1` gives `N(a)=N(2-a)=1`.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.exists_mem_normSetE_three
