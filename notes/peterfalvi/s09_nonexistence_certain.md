@@ -753,3 +753,17 @@ S09 に `characterEstimateData_of_family71_coherent_zeta_source_data` を追加�
 (7.8.b) source data (`hind_norm`, `hzeta_ind`, source irreducibility/distinctness, degree sum,
 `u,v,w` formula, small-index) から `Γ` bound を生成する。これで concrete (7.5)、coherence
 image、(7.8.b)、(7.9) decomposition が `CharacterEstimateData` まで同時に接続される。
+
+### 2026-06-05 pass: S08 Frobenius coherence to H78 Ind-chain socket
+
+S09 に `Hypothesis78.indChainDecomposition_of_coherenceOn` と
+`Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData`
+を追加した。
+
+S08 の Frobenius/base-anchor X-chain、Y coherence、generator-level mixed-inner glue から、
+set rewrite 前の `Xset H' ∪ Yset` coherence を直接作り、extension を `H78.nu` と
+definitional に固定したまま S08 `IndChainDecomposition` を返す。
+
+これで (6.8.1) Frobenius branch の証明済み assembly を、S09/H78 の weighted-chain consumer に
+`card_G0_lower_bound` の sorry を経由せず接続できる。`hyp.CoherenceTarget` への rewrite は
+extension の definitional equality を隠すため、この socket は union-level 入力を要求する。

@@ -2204,6 +2204,11 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.zetaDistinct_mem_sourceSet
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_isCoherent
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_coherenceOn
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.indChain_image_eq_of_isCoherent

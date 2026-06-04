@@ -1597,6 +1597,116 @@ noncomputable def indChainDecomposition_of_isCoherent
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
+open scoped Classical in
+/-- S09-facing `IndChainDecomposition` constructor from an arbitrary coherent
+source family.
+
+This is the set-parametric form of
+`indChainDecomposition_of_isCoherent`: the coherent set need not be
+`H78.sourceSet`.  It is the bridge used when §8 has already identified the
+source family as a Sibley set `hyp.S`, while the §9 notation still wants the
+output family to be exactly `χ_t = H78.nu (ζ_t)`. -/
+noncomputable def indChainDecomposition_of_coherenceOn
+    (H78 : Hypothesis78 G A L)
+    {S : Set (ClassFunction L ℂ)} {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ S)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A_prime) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := L) (G := G) τ ζ d where
+  χ t := H78.nu (ζ t)
+  norm_one t := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem t)), hζ_norm]
+  pairwise_inner_zero t u htu := by
+    rw [hnu, hcoh.extension_inner_eq _ _ (Submodule.subset_span (hζ_mem t))
+      (Submodule.subset_span (hζ_mem u)), hζ_pairwise htu]
+  d_zero := hd_zero
+  image_eq t := by
+    rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
+
+set_option linter.style.longLine false
+open scoped Classical in
+/-- **Peterfalvi (6.8.1) → (7.10), Frobenius/base-anchor form.**
+
+The S08 Frobenius branch constructs the full Sibley coherence target from the
+base-anchor common-index `X`-chain data and generator-level mixed-inner glue.
+This constructor feeds that coherence witness directly into the S09
+`Hypothesis78` Ind-chain package, fixing the output family as
+`χ_t = H78.nu (ζ_t)` rather than leaving it as an anonymous coherence extension.
+
+The remaining inputs are the genuine (6.6)/(6.8) payload: the `X`-chain step
+data, the `ν` agreement/mixed-inner facts for the final glue, and the chosen
+orthonormal source chain in the Xset/H-prime union with supported scaled differences. -/
+noncomputable def
+    indChainDecomposition_of_sibley_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData
+    (H78 : Hypothesis78 G A L)
+    {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)]
+    (hyp : OddOrder.Peterfalvi.S08.SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → OddOrder.RepresentationTheory.IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset ⁅H, H⁆) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock ⁅H, H⁆) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := ⁅H, H⁆) (pair := pair) (i := i) (χs := χs))
+    (hagreeX : ∀ x ∈ hyp.Xset ⁅H, H⁆,
+      H78.nu x =
+        (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+          hF hXne hstepData).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, H78.nu y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset ⁅H, H⁆, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (H78.nu x) (H78.nu y) = ClassFunction.inner x y)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L)))
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction ↥L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L)) :
+    OddOrder.Peterfalvi.S08.IndChainDecomposition (L := ↥L) (G := G) hyp.tau ζ d := by
+  let hX :=
+    hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+      hF hXne hstepData
+  let hcoh : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (OddOrder.Peterfalvi.S08.sharpImage H) L) :=
+    OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq
+      hX hyp.coherentYset H78.nu hagreeX hagreeY
+      (hyp.inner_span_Xset_Yset_eq_zero_of_frobenius hF) hmixed hgen
+  exact H78.indChainDecomposition_of_coherenceOn hcoh (by rfl)
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+
+set_option linter.style.longLine true
+
 /-- H78-facing per-term Ind equation in the constructed Ind-chain package. -/
 theorem indChain_image_eq_of_isCoherent
     (H78 : Hypothesis78 G A L)
