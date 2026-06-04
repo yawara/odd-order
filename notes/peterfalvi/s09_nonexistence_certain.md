@@ -482,3 +482,13 @@ S09 に `Hypothesis78.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent`�
 `delta_cross_integral_of_ZIrr` / parity consumer を合成するだけの S09-facing socket。
 (7.9) の downstream では、source irreducibility と coherence witness、さらに `(Δ₁,Δ₂)` の偶整数性を渡せば
 `H79.conclusion` まで接続できる。
+
+
+### 2026-06-04 pass: weaker residual and parity consumers
+
+Gibbs explorer の指摘に従い、`Hypothesis78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent`、
+`Hypothesis79.zetaImages_mem_ZIrr_of_isCoherent`、
+`Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr` を追加した。これにより `ind1H` source term は
+irreducible である必要がなく、`ζ_ind1H ∈ ZIrr L` から `Δ ∈ ZIrr G` へ接続できる。
+また (7.9) 側では coherence から二つの distinguished `ζ^ν` の `ZIrr` membership をまとめて取り出し、
+`ZIrr` residuals と `(Δ₁,Δ₂)` 偶整数性から parity conclusion に直接入れる。

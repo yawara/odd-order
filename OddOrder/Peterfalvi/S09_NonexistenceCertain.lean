@@ -1534,6 +1534,23 @@ theorem delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
   simpa [delta] using Submodule.add_mem (ZIrr G)
     (Submodule.sub_mem (ZIrr G) hbeta hconst) hzeta
 
+/-- If the `Ind 1_H` source term is virtual and the distinguished `ζ` is
+irreducible, then coherence supplies the residual virtual character `Δ`. -/
+theorem delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hindZ : H78.hyp76.zeta H78.ind1H ∈ ZIrr L)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
+    H78.delta ∈ ZIrr G := by
+  have hdiffZ :
+      H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L :=
+    Submodule.sub_mem _ hindZ hzeta_irr.mem_ZIrr
+  exact H78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent hcoh hnu
+    (H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr hdiffZ)
+
 /-- Source irreducibility and coherence supply the full virtual-character
 residual `Δ = β - 1_G + νζ`. -/
 theorem delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
@@ -1545,8 +1562,8 @@ theorem delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
     (hind_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.ind1H))
     (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct)) :
     H78.delta ∈ ZIrr G :=
-  H78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent hcoh hnu
-    (H78.beta_mem_ZIrr_of_irreducible_sourceDiff hind_irr hzeta_irr)
+  H78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+    hcoh hnu hind_irr.mem_ZIrr hzeta_irr
 
 /-- The defining rearrangement `β = 1_G - ζ^ν + Δ`. -/
 theorem beta_eq_constOne_sub_zetaImage_add_delta (H78 : Hypothesis78 G A L) :
@@ -3060,6 +3077,25 @@ noncomputable def secondZetaImage (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) :
     ClassFunction G ℂ :=
   H79.second.nu (H79.second.hyp76.zeta H79.second.zetaDistinct)
 
+/-- Coherence supplies virtual-character membership for the two distinguished
+`ζ` images used in (7.9). -/
+theorem zetaImages_mem_ZIrr_of_isCoherent
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    {A_prime₁ : Set L₁}
+    {τ₁ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₁ G}
+    {A_prime₂ : Set L₂}
+    {τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L₂ G}
+    (hcoh₁ : OddOrder.Peterfalvi.S07.IsCoherent τ₁ H79.first.sourceSet A_prime₁)
+    (hnu₁ : H79.first.nu = hcoh₁.extension)
+    (hcoh₂ : OddOrder.Peterfalvi.S07.IsCoherent τ₂ H79.second.sourceSet A_prime₂)
+    (hnu₂ : H79.second.nu = hcoh₂.extension) :
+    H79.firstZetaImage ∈ ZIrr G ∧ H79.secondZetaImage ∈ ZIrr G := by
+  constructor
+  · simpa [firstZetaImage] using
+      H79.first.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₁ hnu₁
+  · simpa [secondZetaImage] using
+      H79.second.nu_zetaDistinct_mem_ZIrr_of_isCoherent hcoh₂ hnu₂
+
 /-- **Peterfalvi (7.9) conclusion.**  The two cross inner products cannot both
 vanish: `(β₁, ζ₂^{ν₂}) ≠ 0` or `(β₂, ζ₁^{ν₁}) ≠ 0`. -/
 def conclusion (H79 : Hypothesis79 G A₁ L₁ A₂ L₂) : Prop :=
@@ -3240,6 +3276,23 @@ theorem conclusion_of_delta_cross_integral_parity
   · right
     rw [hy]
     exact_mod_cast hy_ne
+
+/-- Virtual-character inputs supply the two integer cross terms needed by the
+parity form of Peterfalvi (7.9). -/
+theorem conclusion_of_delta_cross_even_of_ZIrr
+    (H79 : Hypothesis79 G A₁ L₁ A₂ L₂)
+    (hBD₁ : H79.first.BetaDecomp) (hBD₂ : H79.second.BetaDecomp)
+    (hzeta_cross : ClassFunction.inner H79.firstZetaImage H79.secondZetaImage = 0)
+    (hδ₁ : H79.first.delta ∈ ZIrr G)
+    (hδ₂ : H79.second.delta ∈ ZIrr G)
+    (hζ₁ : H79.firstZetaImage ∈ ZIrr G)
+    (hζ₂ : H79.secondZetaImage ∈ ZIrr G)
+    (hdelta_even : ∃ z : ℤ,
+      ClassFunction.inner H79.first.delta H79.second.delta = (z : ℂ) ∧ Even z) :
+    H79.conclusion := by
+  obtain ⟨hx, hy, _hz⟩ := H79.delta_cross_integral_of_ZIrr hδ₁ hδ₂ hζ₁ hζ₂
+  exact H79.conclusion_of_delta_cross_integral_parity hBD₁ hBD₂ hzeta_cross hx hy
+    hdelta_even
 
 /-- Coherence and source irreducibility supply the integer cross terms needed by
 the parity form of Peterfalvi (7.9). -/

@@ -2176,6 +2176,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_beta_mem_ZIrr_of_isCoherent
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis78.delta_mem_ZIrr_of_irreducible_sourceDiff_and_isCoherent
 -- Peterfalvi (7.8) norm-one and signed-irreducible image bridges for coherent `ζᵢ`.
 #assert_only_allowed_axioms
@@ -2251,6 +2254,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_eq_zero
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.zetaImages_mem_ZIrr_of_isCoherent
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.beta_inner_beta_expand_delta
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.delta_cross_equation
@@ -2266,6 +2271,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_nonzero
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_integral_parity
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.Hypothesis79.conclusion_of_delta_cross_even_of_ZIrr
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
