@@ -3254,6 +3254,80 @@ theorem fittingInG_le_sylow_map_of_isPGroup [Finite G]
   rw [OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) p]
   exact Subgroup.map_mono (OddOrder.Isaacs.Ch01.opCore_le P)
 
+/-- A subgroup of the image of a Sylow subgroup that centralizes the image of an
+`SCN₃(P)` subgroup already lies in that image. -/
+theorem le_scn3_map_of_le_sylow_map_of_le_centralizer_map
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥M) {A : Subgroup ↥M} {B : Subgroup G}
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M)))
+    (hB_le_P : B ≤ (P : Subgroup ↥M).map M.subtype)
+    (hB_le_cent : B ≤ Subgroup.centralizer (A.map M.subtype : Set G)) :
+    B ≤ A.map M.subtype := by
+  intro b hb
+  obtain ⟨y, hyP, hy_eq⟩ := Subgroup.mem_map.mp (hB_le_P hb)
+  have hy_cent : (⟨y, hyP⟩ : ↥(P : Subgroup ↥M)) ∈
+      Subgroup.centralizer ((A.subgroupOf (P : Subgroup ↥M)) : Set ↥(P : Subgroup ↥M)) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    have hzA : ((z : ↥(P : Subgroup ↥M)) : ↥M) ∈ A :=
+      Subgroup.mem_subgroupOf.mp hz
+    have hz_map : M.subtype ((z : ↥(P : Subgroup ↥M)) : ↥M) ∈ A.map M.subtype :=
+      Subgroup.mem_map.mpr ⟨((z : ↥(P : Subgroup ↥M)) : ↥M), hzA, rfl⟩
+    have hb_cent : b ∈ Subgroup.centralizer (A.map M.subtype : Set G) := hB_le_cent hb
+    have hcommG :=
+      Subgroup.mem_centralizer_iff.mp hb_cent
+        (M.subtype ((z : ↥(P : Subgroup ↥M)) : ↥M)) hz_map
+    have hcommM : ((z : ↥(P : Subgroup ↥M)) : ↥M) * y =
+        y * ((z : ↥(P : Subgroup ↥M)) : ↥M) := by
+      apply M.subtype_injective
+      simpa [map_mul, hy_eq] using hcommG
+    exact Subtype.ext hcommM
+  have hyA_sub : (⟨y, hyP⟩ : ↥(P : Subgroup ↥M)) ∈
+      A.subgroupOf (P : Subgroup ↥M) :=
+    hA.1.centralizer_le hy_cent
+  have hyA : y ∈ A := Subgroup.mem_subgroupOf.mp hyA_sub
+  exact Subgroup.mem_map.mpr ⟨y, hyA, hy_eq⟩
+
+/-- BG (8.10), first p-group form: when `F(M)` is a `p`-group, the nontrivial
+`p`-core of `Z(F(M))` is absorbed by every local `SCN₃(P)` subgroup. -/
+theorem centerFittingOpCoreInG_le_scn3_map_of_fittingInG_isPGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    centerFittingOpCoreInG p M ≤ A.map M.subtype := by
+  apply le_scn3_map_of_le_sylow_map_of_le_centralizer_map P hA
+  · exact ((centerFittingOpCoreInG_le_centerFittingInG p M).trans
+        (centerFittingInG_le_fittingInG M)).trans
+      (fittingInG_le_sylow_map_of_isPGroup P hFp)
+  · intro z hz
+    rw [Subgroup.mem_centralizer_iff]
+    intro a ha
+    have hAF : A.map M.subtype ≤ fittingInG M :=
+      scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
+    have haF : a ∈ fittingInG M := hAF ha
+    have hzZ : z ∈ centerFittingInG M :=
+      centerFittingOpCoreInG_le_centerFittingInG p M hz
+    exact (Subgroup.mem_centralizer_iff.mp
+      (fittingInG_le_centralizer_centerFittingInG M haF) z hzZ).symm
+
+/-- BG (8.10), centralizer form: when `F(M)` is a `p`-group, the ambient centralizer
+of every local `SCN₃(P)` image is contained in `M`. -/
+theorem centralizer_scn3_map_le_maximal_of_fittingInG_isPGroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) :
+    Subgroup.centralizer (A.map M.subtype : Set G) ≤ M :=
+  centralizer_le_maximal_of_centerFittingOpCoreInG_le hG hM
+    (centerFittingOpCoreInG_ne_bot_of_mem_primeFactors_fittingInG hp)
+    (centerFittingOpCoreInG_le_scn3_map_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA)
+
 /-- In a nontrivial finite `p`-group, `Z(L(G))` is nontrivial. -/
 theorem zCenterLOdd_top_ne_bot_of_isPGroup
     {X : Type*} [Group X] [Finite X] {p : ℕ} [Fact p.Prime] [Nontrivial X]
@@ -3448,6 +3522,8 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
   intro A hAP hA
   have hAglobal : A.map M.subtype ∈ OddOrder.BG.Ch2.S07.scn3Global p G :=
     scn3_map_mem_scn3Global_of_sylow_map P hQ hAP hA
+  have hCentM : Subgroup.centralizer (A.map M.subtype : Set G) ≤ M :=
+    centralizer_scn3_map_le_maximal_of_fittingInG_isPGroup hG hM hp P hFp hAP hA
   refine ⟨scn3_map_le_fittingInG_of_fittingInG_isPGroup hG hM hp P hFp hAP hA, ?_⟩
   sorry
 
