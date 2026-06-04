@@ -619,6 +619,13 @@ theorem normal_pgroup_le_opCore {p : ℕ} [Fact p.Prime] {G : Type*} [Group G]
     _ = ↑(g • Q) := Sylow.coe_subgroup_smul.symm
     _ = ↑P := by rw [hgQ]
 
+/-- A normal Sylow `p`-subgroup is the `p`-core. -/
+theorem Sylow.eq_opCore_of_normal {p : ℕ} [Fact p.Prime] [Finite (Sylow p G)]
+    (P : Sylow p G) (hP : (P : Subgroup G).Normal) :
+    (P : Subgroup G) = opCore p G := by
+  haveI : (P : Subgroup G).Normal := hP
+  exact le_antisymm (normal_pgroup_le_opCore P.isPGroup') (opCore_le P)
+
 /-! ### Isaacs Thm 1.26 (冪零 ⇔ Sylow 全正規) -/
 
 /-- **Isaacs Thm 1.26 (1) ⇔ (4)**.  有限群 `G` について「`G` が冪零」と

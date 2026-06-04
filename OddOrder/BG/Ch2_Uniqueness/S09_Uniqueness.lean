@@ -1378,6 +1378,18 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
   exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq
     hG hM PM (local_sylow_map_eq_opiCoreInG_of_eq_opCore PM hPMcore) hqM hRM
 
+/-- Low-rank `(9.7)` package when §4 has supplied a normal local Sylow subgroup. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_normal_local_sylow
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (PM : Sylow q ↥M)
+    (hPMnorm : (PM : Subgroup ↥M).Normal)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_opCore
+    hG hM PM (Ch01.Sylow.eq_opCore_of_normal PM hPMnorm) hqM hRM
+
 /-- A rank-three `q`-subgroup is nontrivial. -/
 private theorem ne_bot_of_isPGroup_of_three_le_rank [Finite G]
     {q : ℕ} [Fact q.Prime] {B : Subgroup G} (hBq : IsPGroup q B)
@@ -1547,6 +1559,22 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_opCore
     hG hM hA hRp hAR hRlt hqp
     (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_opCore
       hG hM.1 PM hPMcore hqM hRM)
+
+/-- Low-rank normalizer step when §4 has supplied a normal local Sylow subgroup. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_normal_local_sylow
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p) (hRM : R ≤ M) (PM : Sylow q ↥M)
+    (hPMnorm : (PM : Subgroup ↥M).Normal)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    hG hM hA hRp hAR hRlt hqp
+    (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_normal_local_sylow
+      hG hM.1 PM hPMnorm hqM hRM)
 
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
 rank-three witness inside `O_q(M)`. -/
