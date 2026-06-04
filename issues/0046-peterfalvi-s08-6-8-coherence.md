@@ -51,6 +51,11 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       pairwise non-`L`-conjugacy から T6/c1-c2 の
       `isIrreducibleCharacter_induce_of_degree_one` を内部適用して `coherentYFamily` へ渡す。
       AxiomsCheck 登録済み。
+- [x] (2026-06-04) `induce_linearIrreducibleCharacter_mem_Yset` と
+      `range_induce_linearIrreducibleCharacter_subset_Yset` を追加。nontrivial linear source family
+      から作った induced range が `Yset = S(H')` に入ることを、commutator kernel containment
+      で証明。AxiomsCheck 登録済み。残りは `Yset` member の linear-source representation と
+      range equality。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

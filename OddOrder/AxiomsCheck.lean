@@ -1977,6 +1977,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYFamily_of_pairwiseNonconj
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.induce_linearIrreducibleCharacter_mem_Yset
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.range_induce_linearIrreducibleCharacter_subset_Yset
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_S_of_frobenius
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_of_frobenius

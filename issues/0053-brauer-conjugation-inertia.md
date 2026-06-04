@@ -70,6 +70,10 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   - 2026-06-04: `coherentYFamily_of_pairwiseNonconj` で nontrivial linear source family から
     `isIrreducibleCharacter_induce_of_degree_one` を内部適用し、Y-family caller から induced
     irreducibility family 仮定を削除。残りは `Y=S(H')` の enumeration/range wiring。
+  - 2026-06-04: `induce_linearIrreducibleCharacter_mem_Yset` /
+    `range_induce_linearIrreducibleCharacter_subset_Yset` で constructed nontrivial linear family
+    の induced range が `Y=S(H')` に入ることを証明。残りは逆向き
+    (`Yset` member の linear-source representation) と range equality。
 
 ## 完了条件
 

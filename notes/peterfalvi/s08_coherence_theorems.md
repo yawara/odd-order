@@ -358,6 +358,12 @@ allowlist):
   各 `Ind_H^L θ_j` の既約性は T6/c1-c2 brick
   `isIrreducibleCharacter_induce_of_degree_one` で adapter 内部に discharge する。AxiomsCheck
   にも登録済みで、残る T6 exact wiring は `Yset = S(H')` の enumeration/range 同一視。
+- **2026-06-04 T6 Yset bridge**: **`induce_linearIrreducibleCharacter_mem_Yset`** と
+  **`range_induce_linearIrreducibleCharacter_subset_Yset`** を追加。nontrivial linear source
+  `χ : H →* ℂˣ` について `Ind_H^L(linear χ) ∈ Yset = S(H')` を、`linear χ` が commutator
+  subgroup を殺すことから直接証明する。これで constructed Y-family の range は `Yset` に入る。
+  残る exact wiring は `Yset` 側の任意 member が nontrivial linear source から来ること
+  (surjectivity/equality) と、その enumeration/range 同一視。
 - **2026-06-04 追記 14**: **`commonIndex_pos_of_natDegree_factor`** を追加し、common-index
   adapters と両 `PairUnion*StepData` から caller-supplied `hidxpos : 0 < idx` を削除した。
   `idx > 0` は current character の自然次数正性と factorization `dχ = idx*θχ` から adapter 内で

@@ -2611,6 +2611,56 @@ theorem mem_Xset (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
     φ ∈ hyp.Xset Z ↔ φ ∈ hyp.S ∧ φ ∉ hyp.SsubFiltration Z :=
   Iff.rfl
 
+/-- A nontrivial linear source character induces to a member of `Y = S(H')`.
+
+The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains
+`H' = [H,H]` because a degree-one character kills commutators. -/
+theorem induce_linearIrreducibleCharacter_mem_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {χ : ↥H →* ℂˣ}
+    (hχ_ne : χ ≠ 1) :
+    ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) ∈
+      hyp.Yset := by
+  rw [Yset]
+  refine ⟨linearIrreducibleCharacter χ, ?_, ?_, rfl⟩
+  · rw [Ne, linearIrreducibleCharacter_eq_trivial_iff]
+    exact hχ_ne
+  · intro x hx
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def, linearIrreducibleCharacter_apply_one]
+    have hsubgroupOf_eq :
+        ((⁅H, H⁆ : Subgroup ↥L).subgroupOf H) = _root_.commutator ↥H := by
+      rw [← Subgroup.map_subtype_commutator H, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
+    have hxcomm : x ∈ _root_.commutator ↥H := by
+      rwa [hsubgroupOf_eq] at hx
+    have hxclosure : x ∈ Subgroup.closure (commutatorSet ↥H) := by
+      rwa [_root_.commutator_eq_closure] at hxcomm
+    refine Subgroup.closure_induction
+      (p := fun y _ => (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) y = 1)
+      ?_ ?_ ?_ ?_ hxclosure
+    · rintro _ ⟨a, b, rfl⟩
+      have hlin := (linearIrreducibleCharacter χ).isIrreducible
+      exact hlin.apply_commutatorElement_eq_one_of_apply_one_eq_one
+        (linearIrreducibleCharacter_apply_one χ) a b
+    · exact linearIrreducibleCharacter_apply_one χ
+    · intro a b _ _ ha hb
+      rw [(linearIrreducibleCharacter χ).isIrreducible.map_mul_of_apply_one_eq_one
+        (linearIrreducibleCharacter_apply_one χ), ha, hb, one_mul]
+    · intro a _ ha
+      have hai := (linearIrreducibleCharacter χ).isIrreducible.map_mul_of_apply_one_eq_one
+        (linearIrreducibleCharacter_apply_one χ) a a⁻¹
+      rw [mul_inv_cancel, linearIrreducibleCharacter_apply_one χ, ha, one_mul] at hai
+      exact hai.symm
+
+/-- Family form of `induce_linearIrreducibleCharacter_mem_Yset`. -/
+theorem range_induce_linearIrreducibleCharacter_subset_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ}
+    (χ : Fin n → (↥H →* ℂˣ)) (hχ_ne : ∀ j, χ j ≠ 1) :
+    Set.range (fun j => ClassFunction.induce H
+      (linearIrreducibleCharacter (χ j) : ClassFunction ↥H ℂ)) ⊆ hyp.Yset := by
+  rintro φ ⟨j, rfl⟩
+  exact hyp.induce_linearIrreducibleCharacter_mem_Yset (hχ_ne j)
+
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
 nontrivial irreducible of the kernel `H` to the Frobenius group `L` gives an irreducible. -/
