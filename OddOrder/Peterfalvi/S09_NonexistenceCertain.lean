@@ -5709,6 +5709,99 @@ noncomputable def characterEstimateData_of_family71_reduced_estimates_of_signed_
     F.base_estimate_of_family71_reduced_estimates_of_signed_irreducible
       P χ hχ B ε ξ hε hχ_signed hL hA hG0 hB_ne hi hgood
 
+open scoped Classical in
+/-- Constructor form of `CharacterEstimateData` from the concrete (7.5) family
+estimates, a signed-irreducible selected character, and Peterfalvi's orthogonal
+integer decomposition for the `𝓑`-sum.
+
+Compared with `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`,
+this no longer asks for the final `𝓑`-sum bound as an external input: it derives
+that bound from the orthogonal decomposition used in (7.9). -/
+noncomputable def characterEstimateData_of_family71_signed_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (χ : ClassFunction G ℂ) (hχ : ClassFunction.inner χ χ = 1)
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (ε : ℤ) (ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G)
+    (hε : ε = 1 ∨ ε = -1)
+    (hχ_signed : χ = ε • (ξ : ClassFunction G ℂ))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤ P.chiRhoNormSq χ i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq χ j) :
+    F.CharacterEstimateData :=
+  F.characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
+    P χ hχ hmin B ε ξ hε hχ_signed hL hA hG0 hB_ne
+    (F.Bsum_le_of_orthogonal_integer_decomposition
+      B v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound)
+    hi hgood
+
+open scoped Classical in
+/-- Coherence-source form of the concrete (7.5)+(7.9) final-assembly
+constructor.
+
+Here the selected character is the coherent image `νζ`.  The source
+irreducibility of `ζ` and the coherence witness produce the signed-irreducible
+witness internally, so the caller supplies neither `hG0sum` nor an explicit
+`νζ = ±ξ` certificate. -/
+noncomputable def characterEstimateData_of_family71_coherent_zeta_decomposition
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {A : Set G} {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (F : FrobeniusFamily G k) (P : FamilyHypothesis71 G k)
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    (hzeta_irr : IsIrreducibleCharacter (H78.hyp76.zeta H78.zetaDistinct))
+    {i : Fin k} (hmin : ∀ l : Fin k, F.h i ≤ F.h l) (B : Finset (Fin k))
+    (hL : ∀ j : Fin k, P.L j = F.L j)
+    (hA : ∀ j : Fin k, P.A j = ((F.H j : Set G) \ ({1} : Set G)))
+    (hG0 : P.G0 = F.G0)
+    (hB_ne : ∀ j ∈ B, i ≠ j)
+    (v : Fin k → ClassFunction G ℂ) (x : Fin k → ℤ)
+    (Γ Γ₁ : ClassFunction G ℂ)
+    (hΓ : Γ = (∑ j ∈ B, (((x j : ℝ) : ℂ) • v j)) + Γ₁)
+    (horth : ∀ j ∈ B, ∀ l ∈ B,
+      ClassFunction.inner (v j) (v l) =
+        if j = l then (F.BsumWeight j : ℂ) else 0)
+    (hΓ₁ : ∀ j ∈ B, ClassFunction.inner Γ₁ (v j) = 0)
+    (hx_nonzero : ∀ j ∈ B, x j ≠ 0)
+    (hΓ_bound : (ClassFunction.inner Γ Γ).re ≤ (F.e i : ℝ) - 1)
+    (hi :
+      1 - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) i)
+    (hgood : ∀ j : Fin k, i ≠ j → j ∉ B →
+      ((F.h j : ℝ) - 1) / ((F.e j : ℝ) * (F.h j : ℝ)) ≤
+        P.chiRhoNormSq (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) j) :
+    F.CharacterEstimateData := by
+  classical
+  let hsig :=
+    H78.exists_zsmul_irreducibleCharacter_zetaImage_of_isCoherent hcoh hnu hzeta_irr
+  let ε : ℤ := Classical.choose hsig
+  let hsigξ := Classical.choose_spec hsig
+  let ξ : OddOrder.RepresentationTheory.IrreducibleCharacter G := Classical.choose hsigξ
+  have hχ_signed := Classical.choose_spec hsigξ
+  exact F.characterEstimateData_of_family71_signed_decomposition
+    P (H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+    (H78.zetaImage_inner_self_eq_one_of_irreducible hzeta_irr)
+    hmin B ε ξ hχ_signed.1 hχ_signed.2 hL hA hG0 hB_ne
+    v x Γ Γ₁ hΓ horth hΓ₁ hx_nonzero hΓ_bound hi hgood
+
 /-- Constructor form of `CharacterEstimateData` from the real reduced family
 inequality and Peterfalvi's orthogonal integer decomposition for the `𝓑`-sum.
 

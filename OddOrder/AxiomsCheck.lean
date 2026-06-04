@@ -2411,6 +2411,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible
 -- Peterfalvi (7.10) final assembly sockets for `CharacterEstimateData`.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_signed_decomposition
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_family71_coherent_zeta_decomposition
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.localKernelOrder_eq_h
 #assert_only_allowed_axioms

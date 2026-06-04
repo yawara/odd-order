@@ -729,3 +729,16 @@ S09 に `FrobeniusFamily.one_le_G0_norm_sum_of_signed_irreducible` と、
 `χ₁ = ± ξ` (`ξ ∈ Irr G`) から `1 ≤ |χ₁(1)|²` を証明し、
 前回 constructor の外部入力 `hG0sum : 1 ≤ Σ_{g∈G₀}|χ(g)|²` を
 signed irreducible witness から生成できるようにした。
+
+### 2026-06-05 pass: family (7.5), coherent image, and `𝓑` decomposition assembly
+
+S09 に `characterEstimateData_of_family71_signed_decomposition`
+と `characterEstimateData_of_family71_coherent_zeta_decomposition`
+を追加した。
+
+これは (7.10) の `CharacterEstimateData` 構成で残っていた外部入力をさらに削る pass。
+(7.5) の concrete `FamilyHypothesis71` と per-index lower bounds から base estimate を作り、
+(7.9) の orthogonal integer decomposition から `𝓑`-sum bound を作る。さらに coherent
+source form では、`ζ` の irreducibility と S07 coherence witness から `νζ = ±ξ` を内部生成し、
+前回 pass の `G₀` identity contribution に接続する。`hred`、`hBsum`、明示的な
+signed-irreducible witness を同時に外へ出さずに `CharacterEstimateData` まで進められる。
