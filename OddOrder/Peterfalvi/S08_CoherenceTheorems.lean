@@ -2022,6 +2022,29 @@ theorem exists_natDegreeData_for_xAdjoinMemberFamily
     simpa [D] using hsum_pos
   exact ⟨dχ, d₁, D, dmem, hχone, hχ₁one, hmemone, hDsum, hd₁pos, hDpos⟩
 
+/-- A natural witness for the degree of an irreducible character is positive. -/
+theorem natDegree_pos_of_irreducibleCharacter_apply_one_eq
+    {G : Type*} [Group G] {χ : IrreducibleCharacter G} {d : ℕ}
+    (hχone : (χ : ClassFunction G ℂ) 1 = (d : ℂ)) : 0 < d := by
+  obtain ⟨e, hepos, heq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  have hde : d = e := Nat.cast_injective (hχone.symm.trans heq)
+  rwa [hde]
+
+/-- A member-family square sum is positive once it contains one irreducible character. -/
+theorem natDegreeSquareSum_pos_of_memberFamily
+    {G : Type*} [Group G] {ι : Type*} {s : Finset ι}
+    {χmem : ι → IrreducibleCharacter G} {i₁ : ι} {D : ℕ} {dmem : ι → ℕ}
+    (hi₁ : i₁ ∈ s)
+    (hmemone : ∀ i ∈ s, (χmem i : ClassFunction G ℂ) 1 = (dmem i : ℂ))
+    (hDsum : ∑ i ∈ s, dmem i * dmem i = D) :
+    0 < D := by
+  have hpos_i₁ : 0 < dmem i₁ :=
+    natDegree_pos_of_irreducibleCharacter_apply_one_eq (hmemone i₁ hi₁)
+  have hterm_pos : 0 < dmem i₁ * dmem i₁ := Nat.mul_pos hpos_i₁ hpos_i₁
+  have hsum_pos : 0 < ∑ i ∈ s, dmem i * dmem i := by
+    exact Finset.sum_pos' (fun _ _ => Nat.zero_le _) ⟨i₁, hi₁, hterm_pos⟩
+  exact hDsum ▸ hsum_pos
+
 
 namespace SibleyDadeHypothesis
 
@@ -3867,8 +3890,8 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
-    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
-    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ) (hDpos : 0 < D)
+    (hp : 3 ≤ p)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
     (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hθχ : θχ = p ^ mχ)
     (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
     (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
@@ -3881,6 +3904,8 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     OddOrder.Peterfalvi.S07.sq_dvd_head_of_commonIndex_primePower_sums
       tailSet (by omega) hidxpos hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal
       hidx_D hdχ hcop
+  have hpos₁ : 0 < d₁ := natDegree_pos_of_irreducibleCharacter_apply_one_eq hχ₁one
+  have hDpos : 0 < D := natDegreeSquareSum_pos_of_memberFamily hi₁ hmemone hDsum
   exact hyp.xAdjoinStepInput_of_memberFamily_degreeDivisibility_natGap hZH hX
     hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
     hmemS1 hmembarS1 hmemconjortho hmemortho hdvd_mem hdvdχ
@@ -3935,13 +3960,13 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
     (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
     (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
     (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
-    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
-    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ) (hDpos : 0 < D)
+    (hp : 3 ≤ p)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ)
     (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
     (hdmem : ∀ j ∈ s, dmem j = idx * θmem j)
     (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
     (hθmem : ∀ j ∈ s, θmem j = p ^ mmem j)
-    (hleχ : d₁ ≤ dχ) (hlemem : ∀ j ∈ s, d₁ ≤ dmem j)
+    (hlemem : ∀ j ∈ s, d₁ ≤ dmem j)
     (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
     (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
     (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
@@ -3956,11 +3981,11 @@ noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
       (θ₁ := θ₁) (θχ := θχ) (m₁ := m₁) (mχ := mχ)
       (dmem := dmem) (θmem := θmem) (mmem := mmem)
       (show 2 ≤ p by omega) hidxpos hχone hχ₁one hmemone hdχ hd₁ hdmem hθχ hθ₁
-      hθmem hleχ hlemem
+      hθmem (Nat.le_of_lt hlt) hlemem
   exact hyp.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums hZH hX
     hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
     hmemS1 hmembarS1 hmemconjortho hmemortho hdvds.1 hdvds.2
-    hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hDpos
+    hχone hχ₁one hmemone hDsum hp hq hdiv hlt
     hidxpos hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
 
 end SibleyDadeHypothesis

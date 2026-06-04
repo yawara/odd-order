@@ -491,6 +491,9 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - **2026-06-04 追記 5**: `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums` を追加。
     前項 producer を `primePowerSums` constructor に接続し、`hdvd_mem` / `hdvdχ` / `dχ²∣D` を
     common `idx` + p-power 残差 + degree sort + tail/head sum data から内部生成する interface にした。
+  - **2026-06-04 追記 6**: `natDegree_pos_of_irreducibleCharacter_apply_one_eq` /
+    `natDegreeSquareSum_pos_of_memberFamily` を追加し、`primePowerSums` / `commonIndexPrimePowerSums`
+    の caller 入力から `hpos₁`/`hDpos` を除去。common-index 版の `hleχ` も `hlt` から内部導出。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

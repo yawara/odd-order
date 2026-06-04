@@ -1860,6 +1860,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeRatios
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_natDegreeData_for_xAdjoinMemberFamily
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.natDegree_pos_of_irreducibleCharacter_apply_one_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.natDegreeSquareSum_pos_of_memberFamily
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap
 set_option linter.style.longLine false in
