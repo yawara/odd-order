@@ -327,6 +327,12 @@ allowlist):
   `hlt : d₁<dχ` と `hlemem : ∀j, d₁≤dmem j` を削除。caller は actual pair-cover prefix の enumeration,
   base-block anchor, common-index/p-power/sum/coprimality data を渡せば、chain fold が `X` coherence
   まで進む。
+- **2026-06-04 追記 12**: **`sq_dvd_natDegreeSquareSum_of_commonIndex`** を追加し、common-index
+  member factorizations `dmem j = idx·θmem j` と prefix square-sum identity `∑ dmem(j)^2 = D` から
+  `idx²∣D` を内部導出。これにより `xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`,
+  `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums`, base-anchor 版, および両 `PairUnion*StepData`
+  から caller-supplied `hidx_D` を削除した。低層 `degreeDivisibility_primePowerSums` は `hdmem` を持たないため、
+  common-index adapter 内で局所 witness としてのみ `hidx_D` を作って渡す。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

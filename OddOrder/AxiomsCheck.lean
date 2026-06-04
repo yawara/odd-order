@@ -1870,6 +1870,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.natDegreeSquareSum_pos_of_memberFamily
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.sq_dvd_natDegreeSquareSum_of_commonIndex
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_natDegreeGap
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
