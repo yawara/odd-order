@@ -453,3 +453,12 @@ coherence witness から `Δ = β - 1_G + νζ ∈ ZIrr G` を作る bridge。�
 これで (7.9) の parity consumer `conclusion_of_delta_cross_integral_parity` に渡す入力のうち、
 整数性部分は ZIrr membership へ局所化された。残る実数学入力は `β ∈ ZIrr` の構成、`(Δ₁,Δ₂)` の偶性、
 および source/coherence 由来の `ζ` cross-orthogonality。
+
+
+### 2026-06-04 pass: `β ∈ ZIrr` bridge from §4 Dade preservation
+
+S09 に `Hypothesis78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr` を追加した。これは S09 の
+`β = τ (Ind 1_H - ζ)` を、§4 の `IsDadeMap.unique` で canonical `hyp.dadeMap` に戻し、構成済みの
+`fullDadeIsometryData.maps_virtualCharacter` を適用する bridge。入力は source-side の
+`Ind 1_H - ζ ∈ ZIrr L` のみに切り出しているので、後段の Peterfalvi (7.8) arithmetic は Dade API と混ぜずに
+独立 obligation として残る。

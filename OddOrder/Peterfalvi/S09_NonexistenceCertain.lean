@@ -1398,6 +1398,24 @@ theorem beta_def (H78 : Hypothesis78 G A L) :
           H78.diff_support⟩ :=
   rfl
 
+/-- The Dade image defining `β` is a virtual character whenever the source
+difference `Ind 1_H - ζ` is a virtual character on `L`. -/
+theorem beta_mem_ZIrr_of_sourceDiff_mem_ZIrr (H78 : Hypothesis78 G A L)
+    (hdiffZ :
+      H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L) :
+    H78.beta ∈ ZIrr G := by
+  have hτ : H78.hyp76.hyp71.τ = H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.unique H78.hyp76.hyp71.isDadeMap
+      (H78.hyp76.hyp71.hyp.isDadeMap_dadeMap (k := ℂ))
+  have hvirt :=
+    (H78.hyp76.hyp71.hyp.fullDadeIsometryData
+      H78.hyp76.hyp71.hConjInvariant).maps_virtualCharacter H78.indMinusZetaSupp hdiffZ
+  rw [beta, hτ]
+  rwa [show (H78.hyp76.hyp71.hyp.fullDadeIsometryData
+        H78.hyp76.hyp71.hConjInvariant).toDadeMap =
+        H78.hyp76.hyp71.hyp.dadeMap (k := ℂ) from
+      H78.hyp76.hyp71.hyp.dadeIsometryData_toDadeMap H78.hyp76.hyp71.hConjInvariant] at hvirt
+
 /-- The coherent source set `S = T \ {Ind 1_H}` from Peterfalvi (7.8),
 presented as a set of class functions on `L`. -/
 def sourceSet (H78 : Hypothesis78 G A L) : Set (ClassFunction L ℂ) :=
