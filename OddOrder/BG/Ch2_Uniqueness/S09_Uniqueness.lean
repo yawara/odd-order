@@ -1598,6 +1598,46 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_characterist
   exact normalizer_le_maximal_of_scn3Global_intermediate_of_normal_local_sylow
     hG hM hA hRp hAR hRlt (hterminal_ne i hi) hRM PM hPMnorm (hterminal_mem i hi)
 
+/-- In the low-rank Lemma 9.5 branch, the terminal normal local Sylow label
+cannot be the ambient `SCN₃` prime. -/
+private theorem normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
+    [Finite G] {p q : ℕ} [Fact p.Prime] [Fact q.Prime] {A M : Subgroup G}
+    (hA : A ∈ S07.scn3Global p G) (hAM : A ≤ M)
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (PM : Sylow q ↥M) (hPMnorm : (PM : Subgroup ↥M).Normal) :
+    q ≠ p := by
+  classical
+  intro hqp
+  subst q
+  have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
+  have hArank : 3 ≤ rank ↥A := three_le_rank_of_mem_scn3Global hA
+  have h3A : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp hArank
+  let AM : Subgroup ↥M := A.subgroupOf M
+  have hAMp : IsPGroup p AM :=
+    hAp.of_equiv (Subgroup.subgroupOfEquivOfLe hAM).symm
+  obtain ⟨P, hAMP⟩ := hAMp.exists_le_sylow
+  haveI : Unique (Sylow p ↥M) := Sylow.unique_of_normal PM hPMnorm
+  have hAM_PM : AM ≤ (PM : Subgroup ↥M) := by
+    have hP_eq : P = PM := Subsingleton.elim P PM
+    rwa [← hP_eq]
+  have hA_PM_map : A ≤ (PM : Subgroup ↥M).map M.subtype := by
+    calc
+      A = AM.map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hAM).symm
+      _ ≤ (PM : Subgroup ↥M).map M.subtype := Subgroup.map_mono hAM_PM
+  have hPMcore : (PM : Subgroup ↥M) = Ch01.opCore p ↥M :=
+    Ch01.Sylow.eq_opCore_of_normal PM hPMnorm
+  have hPMfit : (PM : Subgroup ↥M).map M.subtype ≤ S08.fittingInG M := by
+    rw [hPMcore, ← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) p]
+    change opiCoreInG ({p} : Set ℕ) M ≤ S08.fittingInG M
+    exact S08.opiCoreInG_singleton_le_fittingInG M
+  have hAF : A ≤ S08.fittingInG M := hA_PM_map.trans hPMfit
+  have h3F : 3 ≤ pRank ↥(S08.fittingInG M) p :=
+    h3A.trans
+      (pRank_le_of_injective (f := Subgroup.inclusion hAF)
+        (Subgroup.inclusion_injective hAF))
+  omega
+
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
 rank-three witness inside `O_q(M)`. -/
 private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank

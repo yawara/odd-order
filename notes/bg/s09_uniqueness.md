@@ -720,7 +720,9 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    consumer is
    `S09.normalizer_le_maximal_of_scn3Global_intermediate_of_characteristicSylowSeries`,
    which feeds the extracted terminal normal local Sylow subgroup into the existing
-   low-rank normalizer step.
+   low-rank normalizer step.  The low-rank contradiction needed to show the terminal
+   label is not the ambient `SCN₃(p)` prime is now isolated as
+   `S09.normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two`.
    This packages the BG induction pattern: lift the characteristic factors from
    `K = O_{r | r != p1}(G)` and attach the top `G/K` Sylow factor.  The ambient
    normal-complement lift is now covered by
