@@ -2913,6 +2913,71 @@ noncomputable def xBaseBlock_isCoherent_caseA (hyp : SibleyDadeHypothesis G L H)
     (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_caseA hZH hZcentral hZnorm hZfpf h)
     hXne
 
+/-- **(T8 leaf 10 / T-A4) X-chain assembly from per-pair adjoining data.**
+
+This is the Sibley/Xset wrapper around the abstract `xChainCoherent` fold.  It builds the
+conjugate-pair cover of `X = hyp.Xset Z` over the minimal-degree base block
+`S0 = hyp.xBaseBlock Z` (`exists_conjugatePairCover`), supplies the base coherence
+`xBaseBlock_isCoherent_of_irreducible_X`, and leaves exactly the per-step (5.6)/(6.6) adjoining
+payload as `hstep`.
+
+The extra disjoint-prefix and degree-monotonicity facts exposed to `hstep` are produced by the pair
+cover but are not consumed by `xChainCoherent` itself; they are the data needed to construct each
+`XAdjoinStepInput` without re-enumerating `X`. -/
+noncomputable def Xset_isCoherent_from_adjoinSteps_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
+    (hstep : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ hyp.Xset Z) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+          (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
+        XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  have hXfin : (hyp.Xset Z).Finite := hyp.xSet_finite_of_irreducible_X hX
+  have hXconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) :=
+    hyp.Xset_closedUnderConjugate_of_irreducible_X hZH hX
+  have hXreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
+    hyp.Xset_hasNoRealCharacters_of_irreducible_X hZH hX
+  have hS0conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+    hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH hX
+  choose e pair N hpairχ hsurj hpairs hcoverIdx hpair0Raw hpair1Raw hdisj hmono using
+    exists_conjugatePairCover (X := hyp.Xset Z) (S₀ := hyp.xBaseBlock Z)
+      hXfin hXconj hXreal hX hS0conj
+  let χ0 : IrreducibleCharacter ↥L := ⟨Classical.choose hXne, hX _ (Classical.choose_spec hXne)⟩
+  let χs : ℕ → IrreducibleCharacter ↥L := fun i => if hi : i < N then hpairχ i hi else χ0
+  have hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ) := by
+    intro i hi
+    rw [hpair0Raw i hi]
+    simp [χs, hi]
+  have hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj := by
+    intro i hi
+    rw [hpair1Raw i hi]
+    simp [χs, hi]
+  have hcover : ∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
+      ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+    intro φ hφ
+    obtain ⟨i, hi⟩ := hsurj φ hφ
+    have hci := hcoverIdx i
+    rw [hi] at hci
+    exact hci
+  exact xChainCoherent hyp.dade hyp.hconj pair N χs hpair0 hpair1
+    (hyp.xBaseBlock_subset Z) hpairs hcover
+    (hyp.xBaseBlock_isCoherent_of_irreducible_X hZH hX hXne)
+    (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hdisj hmono i hi hcoh)
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
