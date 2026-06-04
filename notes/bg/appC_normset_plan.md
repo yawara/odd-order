@@ -318,6 +318,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 `normOneUnits` から Peterfalvi `U` への `normOneUnitsEquivU` と、`t∈N_G(U)` 由来の
 `tConjUAut` / `tConjNormOneUnitsAut`、および `σ(inr u)` の ambient conjugation 公式を
 追加し、BG 最後の `(a⁻¹)^{t^3}` を concrete complement 側の automorphism として扱う入口を固定した。
+さらに `normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe` と
+`appC_twisted_normOne_step_of_tConjNormOneUnitsAut` により、S16 producer を concrete `t` 共役が
+`E` を保つことへ縮約した。
 さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
 `normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
 また `a∈E` から concrete norm-one unit および pair `(a,2-a)` を作る
@@ -327,6 +330,25 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 さらに `Q_elementaryAbelian` から `FieldNormalizerData.Q_mul_comm` を導出し、
 `(s⁻¹)^n t^n` / `(t⁻¹)^n s^n` 型の `Q` 内 factor が互いに可換である特殊形も公開した。
 これは BG Step4 の “Since Q is commutative, (C.3) becomes (C.4)” に対応する reorder 入力。
+さらに `fieldNormalizerPrimeLineElement`、`exists_normOne_primeLine_normOne`、
+`exists_sigma_normOne_primeLine_normOne_of_mem_PU` により、BG Step1 の `u s₁ v` 分解を
+concrete `P⋊U` と transported `PU` の双方で使える形にした。
+さらに `generatorRelation_step2_primeLine` /
+`generatorRelation_step2_primeLine_of_sigma_mem_U` により、BG Step2 の `s₁ u s₂∈U`
+判定を concrete `P⋊U` と transported `G` の両方で使えるようにした。
+さらに `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` により、
+`U≤X≤PU` かつ `X≠U` から `X=PU` を得る Step3 irreducibility 入力を
+concrete `P⋊U` から Peterfalvi 側へ transport した。
+さらに `P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U` と
+`P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` により、`g∈N_G(U)` のとき
+`(PU)∩(PU)^g` が `U` または `PU` であるという Step3 交叉 dichotomy まで固定した。
+また `FieldNormalizerData.sigma_eq_left_eq` / `sigma_eq_right_eq` /
+`sigma_eq_iff_left_right_eq` により、`σ : P⋊U → G` の等式から concrete 半直積の
+`left/right` 成分を取り出せるようにし、Step4 の “mod P” 読み替えの Lean API を固定した。
+さらに `fieldNormalizerKernel_inf_complement_eq_bot` と `P_inf_U_eq_bot` により、concrete
+`P⋊U` と Peterfalvi 側 `G` の双方で `P∩U=1` を利用できるようにした。
+さらに `W2_pow_p_eq_one`、`Q_pow_q_eq_one`、`W2_inf_Q_eq_bot` により、BG Step4 の
+“mod Q, since P₀∩Q=1” 入力を Peterfalvi 側の concrete data から導出した。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は

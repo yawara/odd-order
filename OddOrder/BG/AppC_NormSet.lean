@@ -766,6 +766,47 @@ theorem normOneFrobenius_generatorRelation_step2_primeLine [Fact p.Prime]
   exact generatorRelation_step2_primeLine p q hq hA hs (c := c) (d := d) u
     (by simpa [x, y] using hleft)
 
+/-- **BG Appendix C, Lemma C.3, Step 4 final paragraph, concrete form**:
+if the first `k = 3` equation of `(C.5)` has middle prime-line factor `s^{-1}`,
+then reading the additive coordinate in `P ⋊ U` gives the generator relation
+`N(2*w-1)=1` for the middle complement element `w`. -/
+theorem normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
+    [Fact p.Prime] (hq : q ≠ 0) (w u₁ v₁ : normOneUnits p q)
+    (hdec :
+      (SemidirectProduct.inl
+          (Multiplicative.ofAdd (1 : GaloisField p q)) : normOneFrobeniusGroup p q) *
+          SemidirectProduct.inr w *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd (-(2 : GaloisField p q))) =
+      (SemidirectProduct.inr u₁ : normOneFrobeniusGroup p q) *
+        SemidirectProduct.inl
+          (Multiplicative.ofAdd (-(1 : GaloisField p q))) *
+          SemidirectProduct.inr v₁) :
+    normN p q
+      ((2 : GaloisField p q) *
+          (((w : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) - 1) = 1 := by
+  let F := GaloisField p q
+  let H := normOneFrobeniusGroup p q
+  let wF : F := (((w : normOneUnits p q) : (GaloisField p q)ˣ) : F)
+  let u₁F : F := (((u₁ : normOneUnits p q) : (GaloisField p q)ˣ) : F)
+  have hleft := congrArg (fun g : H => g.left.toAdd) hdec
+  simp only [SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+    SemidirectProduct.left_inl, SemidirectProduct.right_inl,
+    SemidirectProduct.left_inr, SemidirectProduct.right_inr, map_one, one_mul, mul_one,
+    toAdd_mul, toAdd_ofAdd, normOneMulAction_apply] at hleft
+  have hleft' : (1 : F) - 2 * wF = -u₁F := by
+    simpa [F, wF, u₁F, sub_eq_add_neg, mul_comm, mul_left_comm, mul_assoc] using hleft
+  have hu₁F : u₁F = (2 : F) * wF - 1 := by
+    calc
+      u₁F = -(-u₁F) := by ring
+      _ = -((1 : F) - 2 * wF) := by rw [← hleft']
+      _ = (2 : F) * wF - 1 := by ring
+  rw [show ((2 : GaloisField p q) *
+        (((w : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) - 1) =
+        (((u₁ : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) by
+      simpa [F, wF, u₁F] using hu₁F.symm]
+  exact (mem_normOneUnits_iff_normN p q hq (u₁ : (GaloisField p q)ˣ)).mp u₁.property
+
 /-- The additive subgroup `W ≤ P` inside the concrete Frobenius group `P ⋊ U`. -/
 noncomputable def normOneFrobeniusSubspaceKernel [Fact p.Prime]
     (W : Submodule (ZMod p) (GaloisField p q)) :

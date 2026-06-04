@@ -2521,10 +2521,88 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
 
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_left_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_right_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.sigma_eq_iff_left_right_eq
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_neg
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerNormOneUnits_card_gt_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_fieldNormalizerNormOneUnit_ne_one
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.fieldNormalizerKernel_sup_complement_eq_top
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_eq_sigma_top
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_normOne_primeLine_normOne
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.generatorRelation_step2_primeLine_of_sigma_mem_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_not_normalizes_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_not_le_normalizer_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_mem_P
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mem_P
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mem_P_sup_U
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_normalizes_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_normalizes_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_zpow_conj_sigma_inr_mem_U
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConj_normOne
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_first_k_three_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_first_k_three_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_neg_two_eq_primeLineElement_neg_two
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation_of_first_k_three_coordinate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_twisted_normOne_step_of_tConjNormOneUnitsAut
+
 -- BG App C Lemma C.3 Step 4: the transported `Q` is commutative, so the
 -- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
 -- can be reordered.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_pow_q_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_inf_Q_eq_bot
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
 #assert_only_allowed_axioms
@@ -2602,6 +2680,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.generatorRelation_step2_primeLine
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
+
+-- BG App C Lemma C.3 Step 4 final paragraph: reading the additive coordinate
+-- of the first `k = 3` equation in concrete `P ⋊ U` gives `N(2*w-1)=1`.
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
 
 -- BG App C Lemma C.3 Step 4: the `p`-power Frobenius preserves the norm-set
 -- relation `a,b ∈ E` and `a+b=2` used in the generator-relation propagation.

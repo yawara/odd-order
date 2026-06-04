@@ -202,6 +202,9 @@ created: 2026-06-04
   `σ` で Peterfalvi の `U` へ運ぶ `normOneUnitsEquivU` を作成し、
   `t ∈ N_G(U)` から `tConjUAut` / `tConjNormOneUnitsAut` を theorem 化。
   `σ(inr u)` に対する ambient conjugation 公式も rewrite 可能にした。
+- [x] **C.3 Step 4 twisted t-action bridge**: `normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe` と
+  `appC_twisted_normOne_step_of_tConjNormOneUnitsAut` を公開し、残りの producer を
+  concrete `t` 共役が `E` を保つことに縮約。AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 p-power action seed**: `fieldNormalizerPrimeLineGenerator_pow_p`、
   `s_pow_p_eq_one`、`t_pow_p_eq_one`、`tConjUAut_pow_p_eq_one`、
   `tConjNormOneUnitsAut_pow_p_eq_one` を追加し、BG Step4 の `t`-conjugation action が
@@ -214,6 +217,83 @@ created: 2026-06-04
   `FieldNormalizerData.Q_mul_comm` を公開し、`s^{-n}t^n` / `t^{-n}s^n` 型の
   Q 内 commutator factors が互いに可換であることを theorem 化。BG の
   “Since Q is commutative, (C.3) becomes (C.4)” を使う入口を固定。AxiomsCheck 登録済み。
+- [x] **C.3 Step 1 decomposition bridge**: `fieldNormalizerPrimeLineElement`、
+  `exists_normOne_primeLine_normOne`、`exists_sigma_normOne_primeLine_normOne_of_mem_PU` を公開し、
+  concrete `P⋊U` と transported `PU` の任意元を `u s₁ v` に分解できる入口を固定。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 2 generator-relation bridge**: `generatorRelation_step2_primeLine` と
+  `generatorRelation_step2_primeLine_of_sigma_mem_U` を公開し、`s₁ u s₂∈U` から
+  BG Step2 の二択を concrete `P⋊U` と transported `G` の両方で読めるようにした。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 P₀ non-normalization bridge**:
+  `fieldNormalizerNormOneUnits_card_gt_one` / `exists_fieldNormalizerNormOneUnit_ne_one` と
+  `s_not_normalizes_U` / `W2_not_le_normalizer_U` を公開し、非自明 norm-one unit と
+  Step2 generator relation から `P₀` (`W₂`) が `U` を正規化できないことを transport。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 `P₁=P₀` contradiction endpoint**:
+  `P1_ne_W2` / `W2_ne_P1` を公開し、`P₁≤N_G(U)` と `W₂⊄N_G(U)` から
+  BG Step3 の `P₁=P₀` 矛盾を直接消費できる形に固定。AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 irreducibility bridge**:
+  `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` を公開し、`U≤X≤PU` かつ
+  `X≠U` なら `X=PU` となる BG Step3 の irreducibility 入力を `σ` 経由で transport。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 intersection dichotomy bridge**:
+  `P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U` と
+  `P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` を公開し、`g∈N_G(U)` から
+  `(PU)∩(PU)^g = U ∨ (PU)∩(PU)^g = PU` を読めるようにした。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 sigma normal-form bridge**: `sigma_eq_left_eq`、
+  `sigma_eq_right_eq`、`sigma_eq_iff_left_right_eq` を公開し、`σ : P⋊U → G` の
+  等式から concrete 半直積の `left/right` 成分を読む API を固定。BG Step4 の
+  “mod P” で `U` 成分だけを取り出す入力。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `(C.5)` decomposition bridge**:
+  `s_mem_P` / `s_zpow_mem_P_sup_U`、`t_zpow_conj_sigma_inr_mem_U`、および
+  `exists_step4_decomposition_of_zpow_tConj_normOne` を公開し、`s^m (u)^{t^n} s^r`
+  型の項が `PU` に入り Step1 の `u₁s₁v₁` normal form を持つことを固定。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 natural-power `t`-action bridge**:
+  `normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe` と
+  `t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow` を公開し、
+  `(u)^{t^n}` を concrete norm-one unit の `tConjNormOneUnitsAut^n` として
+  読めるようにした。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 natural-power `(C.5)` normal-form bridge**:
+  `s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow`、
+  `s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U`、
+  `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` を公開し、
+  `(C.5)` の各中間項を concrete `tConjNormOneUnitsAut^n` で Step1 normal form に渡せるようにした。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `mod P` right-component bridge**:
+  `right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition` を公開し、
+  natural-power `(C.5)` normal form から `tConjNormOneUnitsAut^n u = u₁*v₁` を
+  SemidirectProduct の right projection で読めるようにした。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `k=3` first `(C.5)` bridge**:
+  `exists_step4_first_k_three_decomposition` と
+  `right_component_of_step4_first_k_three_decomposition` を公開し、BG final paragraph の
+  `s(a^{-1})^{t^3}s^{-2}=u₁s₁v₁` と “mod P” 読み
+  `(a^{-1})^{t^3}=u₁*v₁` を concrete `tConjNormOneUnitsAut` で消費できる形にした。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `k=3` generator-relation coordinate bridge**:
+  `normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition` と
+  `normN_two_mul_sub_one_of_step4_first_k_three_decomposition` を公開し、
+  `s φ(u⁻¹) s⁻² = u₁ s⁻¹ v₁` の additive coordinate から
+  `N(2*φ(u⁻¹)-1)=1` を concrete `P⋊U` と S16 field normalizer data の両方で読める形にした。
+  AxiomsCheck 登録済み。残る hard input は、前段 C.4-C.10/Step4 から middle prime-line factor が
+  実際に `s⁻¹` になることを materialize し、`appC_twisted_normOne_step` へ接続する部分。
+- [x] **C.3 Step 4 arbitrary middle-coordinate adapter**:
+  `normN_two_mul_sub_one_of_sigma_first_k_three_decomposition` と
+  `appC_normSet_generator_relation_of_first_k_three_coordinate` を公開し、任意の
+  norm-one middle complement `w` について first `k=3` normal form の middle factor が `s⁻¹` なら
+  `N(2*w-1)=1` を読めるようにした。さらに、これを `∀w∈E` で供給すれば
+  `appCNormSetGeneratorRelation` が直ちに出る。AxiomsCheck 登録済み。
+  次の hard target は BG C.4-C.10 の消去から、この universal middle-coordinate step を materialize すること。
+- [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
+  `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
+  `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。
+  AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 P0-Q intersection bridge**: `W2_pow_p_eq_one`、
+  `Q_pow_q_eq_one`、`W2_inf_Q_eq_bot` を公開し、`W₂=σ(P₀)` と `Q` の交わりが
+  自明であることを concrete data から導出。BG Step4 の “mod Q, since P₀∩Q=1”
+  を使う入力。AxiomsCheck 登録済み。
 - [ ] **C.3 genuine proof/materialization**: `appCNormSetTwistedNormOneStep` を FieldNormalizerData/Hypothesis(B) の具体 embedding data から証明する。これは `tConjNormOneUnitsAut` による `u ↦ t(u⁻¹)t⁻¹` が `E` を保つという BG C.3 Step3/Step4 本体。`appCNormSetGeneratorRelation` (`∀a∈E, N(2*a-1)=1`) は derived theorem で供給済み。
 
 ## 完了条件

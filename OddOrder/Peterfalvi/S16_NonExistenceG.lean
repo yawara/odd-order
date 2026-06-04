@@ -210,11 +210,74 @@ noncomputable def fieldNormalizerComplement (hyp : Hypothesis (G := G)) :
       OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q →*
         fieldNormalizerFrobeniusGroup hyp).range
 
-/-- The concrete norm-one unit group used as BG's complement before transport
+/-- In the concrete BG Frobenius group `P ⋊ U`, the additive kernel and the
+norm-one complement meet trivially. -/
+theorem fieldNormalizerKernel_inf_complement_eq_bot (hyp : Hypothesis (G := G)) :
+    fieldNormalizerKernel hyp ⊓ fieldNormalizerComplement hyp = ⊥ := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  rcases hx.1 with ⟨p, rfl⟩
+  rcases hx.2 with ⟨u, hu⟩
+  have hp : p = 1 := by
+    have hleft := congrArg
+      (fun g : fieldNormalizerFrobeniusGroup hyp => g.left) hu
+    simpa using hleft.symm
+  subst p
+  simp
+
+/-- In the concrete BG Frobenius group `P ⋊ U`, the additive kernel and
+norm-one complement generate the whole group. -/
+theorem fieldNormalizerKernel_sup_complement_eq_top (hyp : Hypothesis (G := G)) :
+    fieldNormalizerKernel hyp ⊔ fieldNormalizerComplement hyp = ⊤ := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  apply le_antisymm le_top
+  intro g _
+  rw [← SemidirectProduct.inl_left_mul_inr_right g]
+  exact Subgroup.mul_mem_sup ⟨g.left, rfl⟩ ⟨g.right, rfl⟩
+
+/-- The concrete norm-one unit group used as the BG complement before transport
 through the field-normalizer embedding. -/
 abbrev fieldNormalizerNormOneUnits (hyp : Hypothesis (G := G)) : Type _ :=
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q
+
+/-- The concrete norm-one complement has more than one element.  This is the
+lightweight cardinality input needed to turn BG Appendix C, Lemma C.3 Step 2
+into the assertion that the prime line `P₀` cannot normalize `U`, without
+importing the class-sum file. -/
+theorem fieldNormalizerNormOneUnits_card_gt_one (hyp : Hypothesis (G := G)) :
+    1 < Nat.card (fieldNormalizerNormOneUnits hyp) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+  have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
+  have hq2 : 2 ≤ hyp.base.q := by
+    have hq3 : 3 ≤ hyp.base.q := hyp.base.three_le_q
+    omega
+  rw [OddOrder.BG.AppC.NormSet.normOneUnits_card hyp.base.p hyp.base.q hq0,
+    ← Nat.geomSum_eq hp2 hyp.base.q]
+  have hrange : Finset.range 2 ⊆ Finset.range hyp.base.q := by
+    intro k hk
+    exact Finset.mem_range.mpr (by
+      have hk2 : k < 2 := Finset.mem_range.mp hk
+      exact Nat.lt_of_lt_of_le hk2 hq2)
+  have hle :
+      (∑ k ∈ Finset.range 2, hyp.base.p ^ k) ≤
+        ∑ k ∈ Finset.range hyp.base.q, hyp.base.p ^ k :=
+    Finset.sum_le_sum_of_subset_of_nonneg hrange
+      (fun _ _ _ => zero_le _)
+  have htwo : 1 < (∑ k ∈ Finset.range 2, hyp.base.p ^ k) := by
+    simp
+    omega
+  exact htwo.trans_le hle
+
+/-- There is a nonidentity norm-one unit in the concrete complement. -/
+theorem exists_fieldNormalizerNormOneUnit_ne_one (hyp : Hypothesis (G := G)) :
+    ∃ u : fieldNormalizerNormOneUnits hyp, u ≠ 1 := by
+  haveI : Nontrivial (fieldNormalizerNormOneUnits hyp) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (fieldNormalizerNormOneUnits_card_gt_one hyp)
+  exact exists_ne 1
 
 /-- The distinguished nonidentity element of the prime-field line `P₀`,
 corresponding to `1 : F_{p^q}` in BG Appendix C. -/
@@ -223,6 +286,47 @@ noncomputable def fieldNormalizerPrimeLineGenerator (hyp : Hypothesis (G := G)) 
   letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
   SemidirectProduct.inl
     (Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q))
+
+/-- The element of the concrete prime-field line corresponding to a scalar
+`c : ZMod p`. -/
+noncomputable def fieldNormalizerPrimeLineElement (hyp : Hypothesis (G := G))
+    (c : ZMod hyp.base.p) : fieldNormalizerFrobeniusGroup hyp :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  SemidirectProduct.inl
+    (Multiplicative.ofAdd
+      (algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c))
+
+/-- Prime-line scalar elements lie in the concrete subgroup `P₀`. -/
+theorem fieldNormalizerPrimeLineElement_mem (hyp : Hypothesis (G := G))
+    (c : ZMod hyp.base.p) :
+    fieldNormalizerPrimeLineElement hyp c ∈ fieldNormalizerPrimeLine hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLine]
+  rw [OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl]
+  have h1 : (1 : GaloisField hyp.base.p hyp.base.q) ∈
+      Submodule.span (ZMod hyp.base.p)
+        ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+          Set (GaloisField hyp.base.p hyp.base.q)) :=
+    Submodule.subset_span (by simp)
+  simpa [Algebra.smul_def] using
+    (Submodule.smul_mem
+      (Submodule.span (ZMod hyp.base.p)
+        ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+          Set (GaloisField hyp.base.p hyp.base.q))) c h1)
+
+/-- The scalar `1` element is the distinguished prime-line generator. -/
+theorem fieldNormalizerPrimeLineElement_one (hyp : Hypothesis (G := G)) :
+    fieldNormalizerPrimeLineElement hyp 1 = fieldNormalizerPrimeLineGenerator hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simp [fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
+
+/-- Prime-line scalar elements invert by negating the scalar. -/
+theorem fieldNormalizerPrimeLineElement_neg (hyp : Hypothesis (G := G))
+    (c : ZMod hyp.base.p) :
+    fieldNormalizerPrimeLineElement hyp (-c) =
+      (fieldNormalizerPrimeLineElement hyp c)⁻¹ := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simp [fieldNormalizerPrimeLineElement]
 
 /-- The distinguished generator lies in the concrete prime-field line `P₀`. -/
 theorem fieldNormalizerPrimeLineGenerator_mem (hyp : Hypothesis (G := G)) :
@@ -294,6 +398,57 @@ theorem s_mem_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
   exact ⟨fieldNormalizerPrimeLineGenerator hyp,
     fieldNormalizerPrimeLineGenerator_mem hyp, rfl⟩
 
+/-- The transported element `s` lies in the transported additive kernel `P`. -/
+theorem s_mem_P {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ∈ hyp.base.P := by
+  rw [← data.sigma_P_eq_P]
+  refine ⟨fieldNormalizerPrimeLineGenerator hyp, ?_, rfl⟩
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [fieldNormalizerPrimeLineGenerator, fieldNormalizerKernel]
+  exact ⟨Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q), rfl⟩
+
+/-- Integer powers of `s` remain in `P`. -/
+theorem s_zpow_mem_P {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℤ) :
+    data.s ^ n ∈ hyp.base.P :=
+  hyp.base.P.zpow_mem data.s_mem_P n
+
+/-- Integer powers of `s` lie in `PU`. -/
+theorem s_zpow_mem_P_sup_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) :
+    data.s ^ n ∈ hyp.base.P ⊔ hyp.base.U :=
+  (le_sup_left : hyp.base.P ≤ hyp.base.P ⊔ hyp.base.U) (data.s_zpow_mem_P n)
+
+/-- The `s^{-2}` factor in BG C.3 Step 4 is the `-2` point of the concrete
+prime-field line after transport by `σ`. -/
+theorem s_zpow_neg_two_eq_primeLineElement_neg_two
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ^ (-2 : ℤ) =
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [s, fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
+  let F := GaloisField hyp.base.p hyp.base.q
+  let H := fieldNormalizerFrobeniusGroup hyp
+  have hpow_two :
+      (SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) ^ 2 =
+        SemidirectProduct.inl (Multiplicative.ofAdd (2 : F)) := by
+    rw [pow_two, ← map_mul (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →* H)]
+    congr
+    apply Multiplicative.toAdd.injective
+    change (1 : F) + 1 = 2
+    ring
+  have hneg_two :
+      (algebraMap (ZMod hyp.base.p) F (-2 : ZMod hyp.base.p)) = -(2 : F) := by
+    simp only [map_neg, map_ofNat]
+  rw [← map_zpow]
+  congr
+  rw [zpow_neg, hneg_two]
+  change ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) ^ 2)⁻¹ =
+    SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))
+  have hpow_two_inv := congrArg Inv.inv hpow_two
+  exact hpow_two_inv.trans (by simp [F])
+
 /-- The transported element `s` is nontrivial. -/
 theorem s_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.s ≠ 1 := by
@@ -358,12 +513,272 @@ noncomputable def normOneUnitsEquivU {hyp : Hypothesis (G := G)}
   MulEquiv.ofBijective data.normOneUnitsToU
     ⟨data.normOneUnitsToU_injective, data.normOneUnitsToU_surjective⟩
 
+/-- The transported additive kernel `P` and complement `U` meet trivially in
+`G`.  This is the S16-facing form of the `U ∩ P = 1` input used when BG
+Appendix C, Lemma C.3 Step 4 reads equations modulo `P`. -/
+theorem P_inf_U_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.P ⊓ hyp.base.U = ⊥ := by
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  have hxP : x ∈ (fieldNormalizerKernel hyp).map data.sigma := by
+    rw [data.sigma_P_eq_P]
+    exact hx.1
+  have hxU : x ∈ (fieldNormalizerComplement hyp).map data.sigma := by
+    rw [data.sigma_U_eq_U]
+    exact hx.2
+  rcases hxP with ⟨p, hpP, hp⟩
+  rcases hxU with ⟨u, huU, hu⟩
+  have hpu : p = u := data.sigma_injective (by
+    rw [hp, hu])
+  have hp_inter : p ∈ fieldNormalizerKernel hyp ⊓ fieldNormalizerComplement hyp := by
+    exact ⟨hpP, by rwa [hpu]⟩
+  have hp_one : p = 1 := by
+    have hp_bot : p ∈ (⊥ : Subgroup (fieldNormalizerFrobeniusGroup hyp)) := by
+      rw [← fieldNormalizerKernel_inf_complement_eq_bot hyp]
+      exact hp_inter
+    simpa [Subgroup.mem_bot] using hp_bot
+  rw [Subgroup.mem_bot]
+  rw [← hp, hp_one, map_one]
+
+/-- The image of the concrete Frobenius group is the subgroup generated by the
+transported additive kernel `P` and complement `U`. -/
+theorem P_sup_U_eq_sigma_top {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.P ⊔ hyp.base.U =
+      (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
+  calc
+    hyp.base.P ⊔ hyp.base.U =
+        (fieldNormalizerKernel hyp).map data.sigma ⊔
+          (fieldNormalizerComplement hyp).map data.sigma := by
+      rw [data.sigma_P_eq_P, data.sigma_U_eq_U]
+    _ = (fieldNormalizerKernel hyp ⊔ fieldNormalizerComplement hyp).map data.sigma := by
+      rw [Subgroup.map_sup]
+    _ = (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
+      rw [fieldNormalizerKernel_sup_complement_eq_top hyp]
+
+/-- BG Appendix C, Lemma C.3 Step 3 irreducibility bridge: any subgroup of
+`PU` that contains `U` is either `U` or all of `PU`.  This transports the
+concrete irreducibility theorem for `P⋊U` through `σ`. -/
+theorem subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {X : Subgroup G}
+    (hUle : hyp.base.U ≤ X) (hXle : X ≤ hyp.base.P ⊔ hyp.base.U)
+    (hne : X ≠ hyp.base.U) :
+    X = hyp.base.P ⊔ hyp.base.U := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let XH : Subgroup (fieldNormalizerFrobeniusGroup hyp) := X.comap data.sigma
+  have hXrange : X ≤ data.sigma.range := by
+    intro x hx
+    have hxPU : x ∈ hyp.base.P ⊔ hyp.base.U := hXle hx
+    rw [data.P_sup_U_eq_sigma_top] at hxPU
+    simpa using hxPU
+  have hUleH : fieldNormalizerComplement hyp ≤ XH := by
+    intro g hg
+    have hgU : data.sigma g ∈ hyp.base.U := by
+      rw [← data.sigma_U_eq_U]
+      exact ⟨g, hg, rfl⟩
+    exact hUle hgU
+  have hUleH' :
+      (SemidirectProduct.inr : fieldNormalizerNormOneUnits hyp →*
+        fieldNormalizerFrobeniusGroup hyp).range ≤ XH := by
+    simpa [fieldNormalizerComplement] using hUleH
+  have hneH : XH ≠ fieldNormalizerComplement hyp := by
+    intro hXH
+    apply hne
+    have hmapX : XH.map data.sigma = X := Subgroup.map_comap_eq_self hXrange
+    calc
+      X = XH.map data.sigma := hmapX.symm
+      _ = (fieldNormalizerComplement hyp).map data.sigma := by rw [hXH]
+      _ = hyp.base.U := data.sigma_U_eq_U
+  have htopH : XH = ⊤ :=
+    OddOrder.BG.AppC.NormSet.normOneFrobeniusSubgroup_eq_top_of_inr_range_le_of_ne_inr_range
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime data.cyclotomic_coprime
+      XH hUleH' (by simpa [fieldNormalizerComplement] using hneH)
+  have hmapX : XH.map data.sigma = X := Subgroup.map_comap_eq_self hXrange
+  calc
+    X = XH.map data.sigma := hmapX.symm
+    _ = (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by rw [htopH]
+    _ = hyp.base.P ⊔ hyp.base.U := data.P_sup_U_eq_sigma_top.symm
+
+/-- BG Appendix C, Lemma C.3 Step 1 inside the concrete `P⋊U`: every element is
+`u s₁ v` with `u,v∈U` and `s₁∈P₀`. -/
+theorem exists_normOne_primeLine_normOne {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (g : fieldNormalizerFrobeniusGroup hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u v : fieldNormalizerNormOneUnits hyp,
+      g = (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simpa [fieldNormalizerPrimeLineElement] using
+    OddOrder.BG.AppC.NormSet.normOneFrobenius_exists_inr_primeLine_inr
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime data.cyclotomic_coprime
+      (s := (1 : GaloisField hyp.base.p hyp.base.q)) one_ne_zero g
+
+/-- BG Appendix C, Lemma C.3 Step 1 transported to `G`: every element of `PU`
+can be written as the `σ`-image of `u s₁ v`. -/
+theorem exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.P ⊔ hyp.base.U) :
+    ∃ c : ZMod hyp.base.p, ∃ u v : fieldNormalizerNormOneUnits hyp,
+      x = data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v : fieldNormalizerFrobeniusGroup hyp) := by
+  have hxmap : x ∈ (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
+    rw [← data.P_sup_U_eq_sigma_top]
+    exact hx
+  rcases hxmap with ⟨g, _hg_top, hg⟩
+  rcases data.exists_normOne_primeLine_normOne g with ⟨c, u, v, hgdec⟩
+  refine ⟨c, u, v, ?_⟩
+  calc
+    x = data.sigma g := hg.symm
+    _ = data.sigma ((SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v) := by
+      rw [hgdec]
+    _ = data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v : fieldNormalizerFrobeniusGroup hyp) := by
+      simp [map_mul]
+
+/-- BG Appendix C, Lemma C.3 Step 2 inside concrete `P⋊U`: if
+`s₁ u s₂` lies in the complement, then either both prime-line factors are
+trivial or the complement factor is trivial and the prime-line factors cancel. -/
+theorem generatorRelation_step2_primeLine {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {c d : ZMod hyp.base.p}
+    (u : fieldNormalizerNormOneUnits hyp)
+    (hmem : (fieldNormalizerPrimeLineElement hyp c *
+        (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          fieldNormalizerPrimeLineElement hyp d) ∈ fieldNormalizerComplement hyp) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hmem_original :
+      ((SemidirectProduct.inl
+          (Multiplicative.ofAdd
+            ((algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c) *
+              (1 : GaloisField hyp.base.p hyp.base.q))) : fieldNormalizerFrobeniusGroup hyp) *
+        SemidirectProduct.inr u *
+          SemidirectProduct.inl
+            (Multiplicative.ofAdd
+              ((algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) d) *
+                (1 : GaloisField hyp.base.p hyp.base.q)))) ∈
+        (SemidirectProduct.inr : fieldNormalizerNormOneUnits hyp →*
+          fieldNormalizerFrobeniusGroup hyp).range := by
+    simpa [fieldNormalizerPrimeLineElement, fieldNormalizerComplement] using hmem
+  exact
+    OddOrder.BG.AppC.NormSet.normOneFrobenius_generatorRelation_step2_primeLine
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime data.cyclotomic_coprime
+      (s := (1 : GaloisField hyp.base.p hyp.base.q)) one_ne_zero
+      (c := c) (d := d) u hmem_original
+
+/-- BG Appendix C, Lemma C.3 Step 2 transported to `G`: the same alternative can
+be read from membership of the transported product in `U`. -/
+theorem generatorRelation_step2_primeLine_of_sigma_mem_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {c d : ZMod hyp.base.p} (u : fieldNormalizerNormOneUnits hyp)
+    (hmem : data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) ∈ hyp.base.U) :
+    (c = 0 ∧ d = 0) ∨ (u = 1 ∧ c + d = 0) := by
+  have hmem_map : data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) ∈
+      (fieldNormalizerComplement hyp).map data.sigma := by
+    rwa [data.sigma_U_eq_U]
+  rcases hmem_map with ⟨g, hgU, hg⟩
+  let prodH : fieldNormalizerFrobeniusGroup hyp :=
+    fieldNormalizerPrimeLineElement hyp c *
+      (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp d
+  have hprod_sigma : data.sigma prodH =
+      data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp d) := by
+    simp [prodH, map_mul]
+  have hg_eq : g = prodH := data.sigma_injective (by
+    rw [hg, hprod_sigma])
+  have hmemH : prodH ∈ fieldNormalizerComplement hyp := by
+    simpa [← hg_eq] using hgU
+  exact data.generatorRelation_step2_primeLine u hmemH
+
+/-- The chosen nonidentity element `s ∈ P₀` cannot normalize `U`.  Otherwise a
+nontrivial norm-one unit `u` would give `s u s⁻¹ ∈ U`, and BG Appendix C,
+Lemma C.3 Step 2 forces `u = 1`. -/
+theorem s_not_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    data.s ∉ Subgroup.normalizer (hyp.base.U : Set G) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hsN
+  rcases exists_fieldNormalizerNormOneUnit_ne_one hyp with ⟨u, hu_ne⟩
+  have huU :
+      data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
+  have hconjU :
+      data.s *
+          data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+            data.s⁻¹ ∈ hyp.base.U :=
+    (Subgroup.mem_normalizer_iff.mp hsN
+      (data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp))).mp huU
+  have hsigma_inv :
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-1)) = data.s⁻¹ := by
+    rw [fieldNormalizerPrimeLineElement_neg hyp (1 : ZMod hyp.base.p)]
+    simp [s, fieldNormalizerPrimeLineElement_one]
+  have hmem_step :
+      data.sigma (fieldNormalizerPrimeLineElement hyp 1) *
+          data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-1)) ∈ hyp.base.U := by
+    simpa [s, fieldNormalizerPrimeLineElement_one, hsigma_inv] using hconjU
+  have hstep :=
+    data.generatorRelation_step2_primeLine_of_sigma_mem_U
+      (c := (1 : ZMod hyp.base.p)) (d := (-1 : ZMod hyp.base.p)) u hmem_step
+  rcases hstep with hzero | hone
+  · have h1_ne_zero : (1 : ZMod hyp.base.p) ≠ 0 := one_ne_zero
+    exact h1_ne_zero hzero.1
+  · exact hu_ne hone.1
+
+/-- Consequently the transported prime line `W₂ = P₀` is not contained in
+`N_G(U)`.  This is the Step 3 obstruction BG uses after forcing
+`P₁ = P₀`. -/
+theorem W2_not_le_normalizer_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    ¬ hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
+  intro hW2
+  exact data.s_not_normalizes_U (hW2 data.s_mem_W2)
+
 /-- Applying the norm-one/unit equivalence is just `σ` on the concrete
 semidirect-product complement. -/
 theorem normOneUnitsEquivU_apply_coe {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (u : fieldNormalizerNormOneUnits hyp) :
     (data.normOneUnitsEquivU u : G) = data.sigma (SemidirectProduct.inr u) := by
   rfl
+
+/-- Equality of `σ`-images reflects the additive-kernel coordinate in the
+concrete semidirect product. -/
+theorem sigma_eq_left_eq {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {g h : fieldNormalizerFrobeniusGroup hyp} (heq : data.sigma g = data.sigma h) :
+    g.left = h.left :=
+  congrArg (fun x : fieldNormalizerFrobeniusGroup hyp => x.left)
+    (data.sigma_injective heq)
+
+/-- Equality of `σ`-images reflects the norm-one complement coordinate in the
+concrete semidirect product.  This is the precise "mod `P`" reading used in BG
+Appendix C, Lemma C.3 Step 4. -/
+theorem sigma_eq_right_eq {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {g h : fieldNormalizerFrobeniusGroup hyp} (heq : data.sigma g = data.sigma h) :
+    g.right = h.right :=
+  congrArg (fun x : fieldNormalizerFrobeniusGroup hyp => x.right)
+    (data.sigma_injective heq)
+
+/-- Semidirect normal forms remain unique after applying the field-normalizer
+embedding `σ`. -/
+theorem sigma_eq_iff_left_right_eq {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {g h : fieldNormalizerFrobeniusGroup hyp} :
+    data.sigma g = data.sigma h ↔ g.left = h.left ∧ g.right = h.right := by
+  constructor
+  · intro heq
+    exact ⟨data.sigma_eq_left_eq heq, data.sigma_eq_right_eq heq⟩
+  · rintro ⟨hleft, hright⟩
+    apply congrArg data.sigma
+    apply SemidirectProduct.ext
+    · exact hleft
+    · exact hright
 
 /-- The conjugate prime-line subgroup `P₁` used in BG Appendix C, expressed
 with Lean left-conjugation convention. -/
@@ -400,10 +815,133 @@ theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
     data.P1 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
   simpa [P1] using data.W2_conj_y_normalizes_U
 
+/-- BG Appendix C, Lemma C.3 Step 3 contradiction endpoint: the conjugate
+prime line `P₁` cannot equal the original prime line `P₀ = W₂`, because `P₁`
+normalizes `U` while `W₂` cannot be contained in `N_G(U)`. -/
+theorem P1_ne_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.P1 ≠ hyp.base.W2 := by
+  intro hP1
+  exact data.W2_not_le_normalizer_U (by
+    intro x hxW2
+    exact data.P1_normalizes_U (by simpa [hP1] using hxW2))
+
+/-- The symmetric form of `P1_ne_W2`, useful when BG has derived `P₀ = P₁`. -/
+theorem W2_ne_P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.W2 ≠ data.P1 := by
+  intro hW2
+  exact data.P1_ne_W2 hW2.symm
+
 /-- The conjugate generator `t` normalizes `U`. -/
 theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
   data.P1_normalizes_U data.t_mem_P1
+
+/-- Powers of the conjugate generator `t` normalize `U`. -/
+theorem t_pow_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℕ) :
+    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  pow_mem data.t_normalizes_U n
+
+/-- Integer powers of the conjugate generator `t` normalize `U`. -/
+theorem t_zpow_normalizes_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) :
+    data.t ^ n ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+  (Subgroup.normalizer (hyp.base.U : Set G)).zpow_mem data.t_normalizes_U n
+
+/-- Conjugating a concrete norm-one complement element by any integer power of
+`t` remains in the transported subgroup `U`. -/
+theorem t_zpow_conj_sigma_inr_mem_U {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ ∈ hyp.base.U := by
+  have huU :
+      data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr u, ⟨u, rfl⟩, rfl⟩
+  exact (Subgroup.mem_normalizer_iff.mp (data.t_zpow_normalizes_U n)
+    (data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp))).mp huU
+
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` membership bridge: any expression
+`s^m (u)^{t^n} s^r` with `u ∈ U` lies in `PU`. -/
+theorem s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m n r : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          (data.t ^ n *
+            data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+              (data.t ^ n)⁻¹) *
+        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+  have hmid :
+      data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          (data.t ^ n)⁻¹ ∈ hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U)
+      (data.t_zpow_conj_sigma_inr_mem_U n u)
+  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` decomposition bridge: expressions
+of the form `s^m (u)^{t^n} s^r` admit the Step 1 `u₁ s₁ v₁` normal form. -/
+theorem exists_step4_decomposition_of_zpow_tConj_normOne
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m n r : ℤ) (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s ^ m *
+            (data.t ^ n *
+              data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                (data.t ^ n)⁻¹) *
+          data.s ^ r =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) :=
+  data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    (data.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U m n r u)
+
+
+/-- BG Appendix C, Lemma C.3 Step 3 intersection dichotomy before the final
+contradiction: if `g` normalizes `U`, then `(PU) ∩ (PU)^g` is either `U` or
+all of `PU`. -/
+theorem P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {g : G}
+    (hgU : g ∈ Subgroup.normalizer (hyp.base.U : Set G)) :
+    (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.P ⊔ hyp.base.U := by
+  let X : Subgroup G :=
+    (hyp.base.P ⊔ hyp.base.U) ⊓ (MulAut.conj g • (hyp.base.P ⊔ hyp.base.U))
+  have hUle : hyp.base.U ≤ X := by
+    intro u hu
+    refine ⟨(le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu, ?_⟩
+    have hU_image : MulAut.conj g '' (hyp.base.U : Set G) = hyp.base.U :=
+      Subgroup.mem_normalizer_iff_conj_image_eq.mp hgU
+    have hu_image : u ∈ MulAut.conj g '' (hyp.base.U : Set G) := by
+      rw [hU_image]
+      exact hu
+    rcases hu_image with ⟨u0, hu0, hu0_eq⟩
+    have hu0_PU : u0 ∈ hyp.base.P ⊔ hyp.base.U :=
+      (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hu0
+    rw [← hu0_eq]
+    exact Set.smul_mem_smul_set hu0_PU
+  by_cases hX : X = hyp.base.U
+  · left
+    exact hX
+  · right
+    exact data.subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U hUle inf_le_left hX
+
+/-- The same Step 3 intersection dichotomy for powers of the chosen conjugate
+generator `t`. -/
+theorem P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) (n : ℕ) :
+    (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U ∨
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj (data.t ^ n) • (hyp.base.P ⊔ hyp.base.U)) =
+          hyp.base.P ⊔ hyp.base.U :=
+  data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+    (data.t_pow_normalizes_U n)
 
 /-- Conjugation by `t` as an automorphism of Peterfalvi's subgroup `U`. -/
 noncomputable def tConjUAut {hyp : Hypothesis (G := G)}
@@ -462,6 +1000,382 @@ theorem normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
     _ = data.t * data.sigma (SemidirectProduct.inr u) * data.t⁻¹ := by
       rw [data.normOneUnitsEquivU_apply_coe]
 
+/-- Iterating the transported `t`-automorphism agrees with conjugation by
+the corresponding natural power of `t` after applying `σ` to the concrete
+complement. -/
+theorem normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ n) u) : G) =
+      data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ := by
+  induction n with
+  | zero =>
+      simp [data.normOneUnitsEquivU_apply_coe]
+  | succ n ih =>
+      calc
+        (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ (n + 1)) u) : G) =
+            data.t *
+                (data.normOneUnitsEquivU ((data.tConjNormOneUnitsAut ^ n) u) : G) *
+              data.t⁻¹ := by
+          rw [pow_succ']
+          exact data.normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
+            ((data.tConjNormOneUnitsAut ^ n) u)
+        _ = data.t *
+              (data.t ^ n *
+                data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                  (data.t ^ n)⁻¹) *
+            data.t⁻¹ := by
+          rw [ih]
+        _ = data.t ^ (n + 1) *
+              data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+                (data.t ^ (n + 1))⁻¹ := by
+          group
+
+/-- The natural-power conjugate of a concrete complement element is the `σ`
+image of the corresponding power of the transported norm-one automorphism. -/
+theorem t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.t ^ n * data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        (data.t ^ n)⁻¹ =
+      data.sigma
+        (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+          fieldNormalizerFrobeniusGroup hyp) := by
+  rw [← data.normOneUnitsEquivU_apply_coe ((data.tConjNormOneUnitsAut ^ n) u)]
+  exact (data.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe n u).symm
+
+/-- Natural-power form of the Step 4 conjugation rewrite: the middle
+`(u)^{t^n}` term can be read as the concrete norm-one unit obtained by iterating
+`tConjNormOneUnitsAut`. -/
+theorem s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          (data.t ^ n *
+            data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+              (data.t ^ n)⁻¹) *
+        data.s ^ r =
+      data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r := by
+  rw [data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow n u]
+
+/-- Natural-power variant of the Step 4 `(C.5)` membership bridge, with the
+middle term already expressed in the concrete norm-one complement. -/
+theorem s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+  have hmidU :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u),
+      ⟨(data.tConjNormOneUnitsAut ^ n) u, rfl⟩, rfl⟩
+  have hmid :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
+  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+
+/-- Natural-power variant of the Step 4 `(C.5)` decomposition bridge: after
+rewriting `(u)^{t^n}` as a concrete iterate of `tConjNormOneUnitsAut`, the term
+still admits Step 1 `u₁ s₁ v₁` normal form. -/
+theorem exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s ^ m *
+            data.sigma
+              (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+                fieldNormalizerFrobeniusGroup hyp) *
+          data.s ^ r =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) :=
+  data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    (data.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U m r n u)
+
+
+/-- BG Appendix C, Lemma C.3 Step 4 "mod `P`" bridge: once a natural-power
+`(C.5)` term is written in Step 1 normal form, applying the right projection of
+the concrete semidirect product reads off the complement equation. -/
+theorem right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (c : ZMod hyp.base.p)
+    (hdec : data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    (data.tConjNormOneUnitsAut ^ n) u = u₁ * v₁ := by
+  have hmP : data.s ^ m ∈ hyp.base.P := data.s_zpow_mem_P m
+  rw [← data.sigma_P_eq_P] at hmP
+  rcases hmP with ⟨pm, hpmP, hpm⟩
+  have hrP : data.s ^ r ∈ hyp.base.P := data.s_zpow_mem_P r
+  rw [← data.sigma_P_eq_P] at hrP
+  rcases hrP with ⟨pr, hprP, hpr⟩
+  have hpm_right : SemidirectProduct.rightHom pm = 1 := by
+    rcases hpmP with ⟨x, rfl⟩
+    simp
+  have hpr_right : SemidirectProduct.rightHom pr = 1 := by
+    rcases hprP with ⟨x, rfl⟩
+    simp
+  have hline_right :
+      SemidirectProduct.rightHom (fieldNormalizerPrimeLineElement hyp c) = 1 := by
+    simp [fieldNormalizerPrimeLineElement]
+  have hσ :
+      data.sigma
+          (pm *
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) * pr) =
+        data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+    calc
+      data.sigma
+          (pm *
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) * pr) =
+          data.s ^ m *
+              data.sigma
+                (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+                  fieldNormalizerFrobeniusGroup hyp) *
+            data.s ^ r := by
+        simp [map_mul, hpm, hpr]
+      _ = data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+              data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := hdec
+      _ = data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+        simp [map_mul]
+  have hH := data.sigma_injective hσ
+  have hright := congrArg (SemidirectProduct.rightHom :
+      fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerNormOneUnits hyp) hH
+  simpa [map_mul, hpm_right, hpr_right, hline_right, mul_assoc] using hright
+
+/-- BG Appendix C, Lemma C.3 Step 4 final specialization: the first equation of
+`(C.5)` at `k = 3` has a Step 1 normal form.  This is the entry point for the
+final paragraph, where `u` is instantiated with the norm-one unit represented by
+`a ∈ E`. -/
+theorem exists_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s *
+            data.sigma
+              (SemidirectProduct.inr
+                ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+                fieldNormalizerFrobeniusGroup hyp) *
+          data.s ^ (-2 : ℤ) =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+  simpa using
+    data.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+      (m := (1 : ℤ)) (r := (-2 : ℤ)) (n := 3) (u := u⁻¹)
+
+/-- The `mod P` reading of the `k = 3` first `(C.5)` equation: the middle term
+`u^{-1}` conjugated by `t^3` has complement component `u₁ * v₁`. -/
+theorem right_component_of_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp) (c : ZMod hyp.base.p)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    (data.tConjNormOneUnitsAut ^ 3) u⁻¹ = u₁ * v₁ := by
+  have hdec' : data.s ^ (1 : ℤ) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+    simpa using hdec
+  simpa using
+    data.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+      (m := (1 : ℤ)) (r := (-2 : ℤ)) (n := 3) (u := u⁻¹)
+      (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
+
+/-- BG Appendix C, Lemma C.3 Step 4 final paragraph, finite-field reading:
+if a first `k = 3` normal form has middle prime-line factor `s^{-1}`,
+then its additive coordinate gives `N(2*w-1)=1` for the middle complement
+element `w`. -/
+theorem normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (w u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (hdec : data.s *
+          data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+      ((2 : GaloisField hyp.base.p hyp.base.q) *
+          (((w : fieldNormalizerNormOneUnits hyp) :
+              (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) - 1) = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let F := GaloisField hyp.base.p hyp.base.q
+  let H := fieldNormalizerFrobeniusGroup hyp
+  have hline_neg_one :
+      fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p) =
+        (SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) : H) := by
+    simp [fieldNormalizerPrimeLineElement, F]
+  have hline_neg_two :
+      fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p) =
+        (SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F))) : H) := by
+    simp [fieldNormalizerPrimeLineElement, F, map_neg, map_ofNat]
+  have hσ :
+      data.sigma
+          ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) *
+              SemidirectProduct.inr w *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))) =
+        data.sigma
+          ((SemidirectProduct.inr u₁ : H) *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) *
+              SemidirectProduct.inr v₁) := by
+    calc
+      data.sigma
+          ((SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) *
+              SemidirectProduct.inr w *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F)))) =
+          data.s * data.sigma (SemidirectProduct.inr w : H) * data.s ^ (-2 : ℤ) := by
+        have hs :
+            data.s =
+              data.sigma
+                (SemidirectProduct.inl (Multiplicative.ofAdd (1 : F)) : H) := by
+          simp [s, fieldNormalizerPrimeLineGenerator, F]
+        have hsneg_two :
+            data.s ^ (-2 : ℤ) =
+              data.sigma
+                (SemidirectProduct.inl (Multiplicative.ofAdd (-(2 : F))) : H) := by
+          simpa [hline_neg_two] using data.s_zpow_neg_two_eq_primeLineElement_neg_two
+        rw [map_mul, map_mul, hsneg_two, hs]
+      _ = data.sigma (SemidirectProduct.inr u₁ : H) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+              data.sigma (SemidirectProduct.inr v₁ : H) := by
+        exact hdec
+      _ = data.sigma
+          ((SemidirectProduct.inr u₁ : H) *
+            SemidirectProduct.inl (Multiplicative.ofAdd (-(1 : F))) *
+              SemidirectProduct.inr v₁) := by
+        simp [map_mul, hline_neg_one]
+  have hH := data.sigma_injective hσ
+  simpa [F] using
+    OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.ne_zero w u₁ v₁ hH
+
+/-- BG Appendix C, Lemma C.3 Step 4 final paragraph, finite-field reading:
+if the first `k = 3` equation of `(C.5)` has middle prime-line factor `s^{-1}`,
+then its additive coordinate gives `N(2*w-1)=1` for
+`w = (tConjNormOneUnitsAut^3)(u^{-1})`. -/
+theorem normN_two_mul_sub_one_of_step4_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+      ((2 : GaloisField hyp.base.p hyp.base.q) *
+          ((((data.tConjNormOneUnitsAut ^ 3) u⁻¹ : fieldNormalizerNormOneUnits hyp) :
+              (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) - 1) = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simpa using
+    data.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition
+      ((data.tConjNormOneUnitsAut ^ 3) u⁻¹) u₁ v₁ hdec
+
+/-- A first `k = 3` coordinate step for every element of `E` implies the
+AppC generator relation.  This is the exact S16-facing target left after the
+BG C.3 Step 4 argument has shown that the middle prime-line factor in the
+relevant normal form is `s^{-1}`. -/
+theorem appC_normSet_generator_relation_of_first_k_three_coordinate
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hstep :
+      letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+      ∀ w : fieldNormalizerNormOneUnits hyp,
+        (((w : fieldNormalizerNormOneUnits hyp) :
+            (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) ∈
+          OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+          ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+            data.s *
+                data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+              data.s ^ (-2 : ℤ) =
+            data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+              data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+                data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    appCNormSetGeneratorRelation hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro a ha
+  let w : fieldNormalizerNormOneUnits hyp :=
+    OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE
+      hyp.base.p hyp.base.q hyp.base.q_prime.pos ha
+  have hwE :
+      (((w : fieldNormalizerNormOneUnits hyp) :
+          (GaloisField hyp.base.p hyp.base.q)ˣ) :
+          GaloisField hyp.base.p hyp.base.q) ∈
+        OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q := by
+    simpa [w] using ha
+  rcases hstep w hwE with ⟨u₁, v₁, hdec⟩
+  have hnorm :=
+    data.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition w u₁ v₁ hdec
+  simpa [w] using hnorm
+
+/-- The `twistedInv` operation in the norm-one C.3 interface is ambient
+conjugation by `t` applied to the inverse complement element. -/
+theorem normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU
+        (OddOrder.BG.AppC.NormSet.twistedInv data.tConjNormOneUnitsAut u) : G) =
+      data.t * data.sigma (SemidirectProduct.inr u⁻¹) * data.t⁻¹ := by
+  simpa [OddOrder.BG.AppC.NormSet.twistedInv] using
+    data.normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe u⁻¹
+
+/-- To produce the S16 AppC C.3 interface it is enough to prove the norm-set
+step for the concrete automorphism induced by conjugation with `t`. -/
+theorem appC_twisted_normOne_step_of_tConjNormOneUnitsAut
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
+        (p := hyp.base.p) (q := hyp.base.q) data.tConjNormOneUnitsAut →
+      appCNormSetTwistedNormOneStep hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hstep
+  exact ⟨data.tConjNormOneUnitsAut, data.tConjNormOneUnitsAut_pow_p_eq_one, hstep⟩
+
 /-- The conjugate generator `t` also normalizes `Q`. -/
 theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.t ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by
@@ -511,6 +1425,46 @@ theorem Q_mul_comm {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     x * y = y * x := by
   simpa using congrArg Subtype.val
     (data.Q_elementaryAbelian.comm ⟨x, hx⟩ ⟨y, hy⟩)
+
+/-- Elements of the transported prime line `W₂ = σ(P₀)` have `p`-th power
+`1`.  This is the ambient `G` form needed when reading BG Appendix C Step 4
+modulo `Q`. -/
+theorem W2_pow_p_eq_one {hyp : Hypothesis (G := G)} (_data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.W2) :
+    x ^ hyp.base.p = 1 := by
+  haveI : Finite hyp.base.W2 := Nat.finite_of_card_ne_zero (by
+    rw [← hyp.base.p_eq_card_W2]
+    exact hyp.base.p_prime.ne_zero)
+  have hxpow := pow_card_eq_one' (G := hyp.base.W2) (x := (⟨x, hx⟩ : hyp.base.W2))
+  have hxpow_coe := congrArg Subtype.val hxpow
+  simpa [← hyp.base.p_eq_card_W2] using hxpow_coe
+
+/-- Elements of the transported elementary abelian subgroup `Q` have `q`-th
+power `1`, in ambient `G` form. -/
+theorem Q_pow_q_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.Q) :
+    x ^ hyp.base.q = 1 := by
+  simpa using congrArg Subtype.val
+    (data.Q_elementaryAbelian.pow_eq_one (⟨x, hx⟩ : hyp.base.Q))
+
+/-- The transported prime line and the transported elementary abelian `Q` meet
+trivially.  This is the BG Appendix C Step 4 `P₀ ∩ Q = 1` input after
+identifying `P₀` with `W₂ = σ(P₀)`. -/
+theorem W2_inf_Q_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.W2 ⊓ hyp.base.Q = ⊥ := by
+  apply le_antisymm ?_ bot_le
+  intro x hx
+  have hxW2 : x ∈ hyp.base.W2 := hx.1
+  have hxQ : x ∈ hyp.base.Q := hx.2
+  have hxp : x ^ hyp.base.p = 1 := data.W2_pow_p_eq_one hxW2
+  have hxq : x ^ hyp.base.q = 1 := data.Q_pow_q_eq_one hxQ
+  have horder_p : orderOf x ∣ hyp.base.p := orderOf_dvd_of_pow_eq_one hxp
+  have horder_q : orderOf x ∣ hyp.base.q := orderOf_dvd_of_pow_eq_one hxq
+  have hpq : Nat.Coprime hyp.base.p hyp.base.q :=
+    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
+  have horder_one : orderOf x = 1 :=
+    Nat.eq_one_of_dvd_coprimes hpq horder_p horder_q
+  simpa [Subgroup.mem_bot] using orderOf_eq_one_iff.mp horder_one
 
 /-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
 in `Q`. -/
