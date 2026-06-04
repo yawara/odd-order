@@ -218,6 +218,21 @@ theorem exists_characterDegree_eq_prime_pow_of_isPGroup [Finite G]
   obtain ⟨k, hk⟩ := χ.isIrreducible.exists_charValue_one_eq_prime_pow_of_isPGroup hp
   exact ⟨k, by rw [characterDegree_def]; exact hk⟩
 
+/-- **Natural degree witness for p-group irreducible characters.**
+
+This packages the p-power degree result in the form consumed by the (6.6) degree-gap assembly:
+the same natural witness `d` both evaluates `characterDegree χ = d` and is a prime power `p^k`.
+The positivity is included so downstream ratio and divisibility lemmas can avoid reopening the
+irreducible-character degree witness. -/
+theorem exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup [Finite G]
+    {p : ℕ} [Fact p.Prime] (hp : IsPGroup p G) (χ : IrreducibleCharacter G) :
+    ∃ d k : ℕ, 0 < d ∧ characterDegree (χ : ClassFunction G ℂ) = (d : ℂ) ∧ d = p ^ k := by
+  obtain ⟨k, hk⟩ := exists_characterDegree_eq_prime_pow_of_isPGroup hp χ
+  have hk_nat : characterDegree (χ : ClassFunction G ℂ) = ((p ^ k : ℕ) : ℂ) := by
+    simpa [Nat.cast_pow] using hk
+  refine ⟨p ^ k, k, ?_, hk_nat, rfl⟩
+  exact pow_pos (Nat.Prime.pos (Fact.out : p.Prime)) k
+
 /-- **Degree-ratio integrality** (Peterfalvi (5.6), opening step "Set `χ(1) = a·χ₁(1)`").
 
 If `χ₁` is an irreducible character whose natural degree divides that of an irreducible

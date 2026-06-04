@@ -347,6 +347,9 @@ landing (sorry/axiom 無 — `#assert_only_allowed_axioms` 各 3 axiom 全 allow
   経由で `∃ k, characterDegree χ = (p^k:ℂ)`。`characterDegree_def` rewrite で RT 形を
   bundled-character API に橋渡し (既存 `dvd_card` 版と同一の二層パターン = predicate→subtype +
   `φ 1`→`characterDegree` の convention 適応)。これが (6.6) 本文が消費する形。
+- **2026-06-04 追記**: **`exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup`** を追加。
+  `∃ d k, 0<d ∧ characterDegree χ = (d:ℂ) ∧ d=p^k` という同一 witness 版で、S08 の
+  natural-degree witness と prime-power gap data を直接接続する。
 - **依存 verify**: (6.5.b) の "`K` 非可換 `p`-群" は本 leaf では `IsPGroup p K` を**引数**で受ける
   (honest fully-general; `p`-群結論を posit せず、それを供給する (6.5) は別 leaf)。消費 landed lemma
   `exists_finrank_eq_prime_pow_of_isPGroup` は `ClassSumAlgebra.lean:1564` に既存・AxiomsCheck 済 — 確認済。

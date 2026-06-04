@@ -872,6 +872,10 @@ set_option linter.style.longLine false in
 -- prime-power degree on the `IrreducibleCharacter G` subtype, phrased through `characterDegree`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.exists_characterDegree_eq_prime_pow_of_isPGroup
+-- Same datum with a shared natural witness `d`: `characterDegree χ = d`, `d = p^k`, and `0<d`,
+-- ready for the S08 natural-degree/gap inputs without reopening the representation witness.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_eq_prime_pow_of_isPGroup
 
 -- Peterfalvi §4 (2.8): the semidirect structure `M(B) = H(B) ⋊ N_L(B)` for a nonempty
 -- `B ⊆ A`, recorded as the order identity `|M(B)| = |H(B)| · |N_L(B)|` (internal-product
