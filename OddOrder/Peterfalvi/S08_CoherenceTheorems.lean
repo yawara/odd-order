@@ -2882,6 +2882,49 @@ theorem xBaseBlock_degree_re_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup
       (OddOrder.Peterfalvi.S03.characterDegree χ').re :=
   le_antisymm (hχ.2 χ' hχ'.1) (hχ'.2 χ hχ.1)
 
+/-- If `χ₁` is a base-block anchor and `χ ∈ X`, then the natural degree of `χ₁` is no larger
+than the natural degree of `χ`. -/
+theorem natDegree_le_of_xBaseBlock_anchor (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {χ₁ χ : IrreducibleCharacter ↥L} {d₁ d : ℕ}
+    (hχ₁base : (χ₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z)
+    (hχX : (χ : ClassFunction ↥L ℂ) ∈ hyp.Xset Z)
+    (hχ₁one : (χ₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hχone : (χ : ClassFunction ↥L ℂ) 1 = (d : ℂ)) :
+    d₁ ≤ d := by
+  have hre := hχ₁base.2 (χ : ClassFunction ↥L ℂ) hχX
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+    OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one, hχone] at hre
+  exact_mod_cast hre
+
+/-- If `χ₁` is a base-block anchor and `χ ∈ X` is not itself in the base block, then the
+natural degree of `χ` is strictly larger. -/
+theorem natDegree_lt_of_xBaseBlock_anchor_of_not_mem
+    (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {χ₁ χ : IrreducibleCharacter ↥L} {d₁ d : ℕ}
+    (hχ₁base : (χ₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z)
+    (hχX : (χ : ClassFunction ↥L ℂ) ∈ hyp.Xset Z)
+    (hχnotbase : (χ : ClassFunction ↥L ℂ) ∉ hyp.xBaseBlock Z)
+    (hχ₁one : (χ₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hχone : (χ : ClassFunction ↥L ℂ) 1 = (d : ℂ)) :
+    d₁ < d := by
+  have hle : d₁ ≤ d :=
+    hyp.natDegree_le_of_xBaseBlock_anchor hχ₁base hχX hχ₁one hχone
+  have hne : d₁ ≠ d := by
+    intro hEq
+    apply hχnotbase
+    refine ⟨hχX, ?_⟩
+    intro ψ hψX
+    have hbase_le := hχ₁base.2 ψ hψX
+    have hχre :
+        (OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction ↥L ℂ)).re =
+          (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction ↥L ℂ)).re := by
+      rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+        OddOrder.Peterfalvi.S03.characterDegree_def, hχone, hχ₁one]
+      exact_mod_cast hEq.symm
+    rw [hχre]
+    exact hbase_le
+  omega
+
 /-- The base block is closed under conjugation, from the abstract input `X ⊆ Irr L`:
 conjugation preserves the degree (`characterDegree_conj`) and `X`
 (`Xset_closedUnderConjugate_of_irreducible_X`).  With the no-real property this makes `S₀`
@@ -4110,6 +4153,88 @@ noncomputable def xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
     hχone hχ₁one (fun j _ => hmemone j) (by simpa using hDsum)
     hp hq hdiv hlt hidxpos hdχ hd₁ (fun j _ => hdmem j) hθχ hθ₁
     (fun j _ => hθmem j) (fun j _ => hlemem j)
+    hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
+
+/-- **(T8.11v0) X-adjoin input from a pairUnion enumeration with a base-block anchor.**
+
+This variant of `xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums` removes two sorted-degree
+inputs.  If the chosen anchor `χ₁` lies in the minimal-degree base block, then every member of the
+running prefix has degree at least `χ₁(1)`.  The current pair is disjoint from the prefix, hence its
+first character is not itself in the base block, so its degree is strictly larger. -/
+noncomputable def xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {κ : Type} {tailSet : Finset κ}
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hχinj : Function.Injective χmem)
+    (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    {i₁ : Fin k} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {dmem θmem mmem : Fin k → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hanchor : (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z)
+    (hmemone : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j : Fin k, dmem j * dmem j = D)
+    (hp : 3 ≤ p)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁)
+    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdmem : ∀ j, dmem j = idx * θmem j)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hθmem : ∀ j, θmem j = p ^ mmem j)
+    (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
+    (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
+    (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
+    (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
+    (htotal : total = qtot * c) (hidx_D : idx * idx ∣ D)
+    (hcop : Nat.Coprime idx θχ) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  let S₁ : Set (ClassFunction ↥L ℂ) :=
+    OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+  have hS₁X : S₁ ⊆ hyp.Xset Z := by
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact hyp.xBaseBlock_subset Z hbase
+    · exact hpairs j (hji.trans hi) hjpair
+  have hmemS1 : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j
+    change (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i
+    rw [← hrange]
+    exact Set.mem_range_self j
+  have hχpair : (χs i : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet, hpair0 i hi]
+  have hχX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset Z := hpairs i hi hχpair
+  have hχnotbase : (χs i : ClassFunction ↥L ℂ) ∉ hyp.xBaseBlock Z := by
+    intro hχbase
+    have hχprefix : (χs i : ClassFunction ↥L ℂ) ∈ S₁ :=
+      OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hχbase)
+    exact (Set.disjoint_left.mp (hdisj i hi)) hχpair hχprefix
+  have hlt : d₁ < dχ :=
+    hyp.natDegree_lt_of_xBaseBlock_anchor_of_not_mem hanchor hχX hχnotbase hχ₁one hχone
+  have hlemem : ∀ j : Fin k, d₁ ≤ dmem j := by
+    intro j
+    exact hyp.natDegree_le_of_xBaseBlock_anchor hanchor (hS₁X (hmemS1 j))
+      hχ₁one (hmemone j)
+  exact hyp.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums hZH hX
+    hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) hχinj hrange
+    hχone hχ₁one hmemone hDsum hp hq hdiv hlt
+    hidxpos hdχ hd₁ hdmem hθχ hθ₁ hθmem hlemem
     hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
 
 /-- **(T8.11v) Common-index p-power data for one X-chain step.**

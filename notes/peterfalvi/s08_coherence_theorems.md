@@ -316,6 +316,11 @@ allowlist):
   `hstep` callback は `XAdjoinStepInput` を直接返さず、actual pair-cover prefix ごとの common-index/p-power
   degree data package を返せばよくなった。adapter が各 step で `pairUnion` bookkeeping と arithmetic constructor
   を接続し、`Xset_isCoherent_from_adjoinSteps_of_irreducible_X` に fold する。
+- **2026-06-04 追記 10**: **`natDegree_le_of_xBaseBlock_anchor`** /
+  **`natDegree_lt_of_xBaseBlock_anchor_of_not_mem`** と
+  **`xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`** を追加。chosen anchor `χ₁` が
+  minimal-degree base block にいることから prefix member 全体の `d₁≤dmem j` を導出し、current pair が
+  prefix と disjoint であることから `χs i∉xBaseBlock Z`、従って `d₁<dχ` を内部化した。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

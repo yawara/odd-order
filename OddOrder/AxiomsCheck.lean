@@ -1842,6 +1842,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xSet_finite_of_irreducible_X
 #assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.natDegree_le_of_xBaseBlock_anchor
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.natDegree_lt_of_xBaseBlock_anchor_of_not_mem
+#assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xBaseBlock_closedUnderConjugate_of_irreducible_X
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_xBaseBlock_ncard_of_irreducible_X
@@ -1882,6 +1886,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_pairUnion_commonIndexPrimePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_isCoherent_from_pairUnionCommonIndexPrimePowerData_of_irreducible_X
