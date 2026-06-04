@@ -1640,6 +1640,8 @@ set_option linter.style.longLine false in
 -- `χ̄ = χ − (χ − χ̄)`, every `s ∈ S₁` a right-hand generator by supportedness.  This is what makes
 -- `DadeChainStep.advance` discharge the (5.1) generation hypothesis internally rather than positing it.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.advance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.DadeChainStep.chainStepAdvance
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.peterfalvi_66_coherence_of_X_from_dade
