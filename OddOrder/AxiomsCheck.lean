@@ -2463,9 +2463,21 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_unit_step
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_twisted_unit_step
+  OddOrder.Peterfalvi.S16.appCNormSetGeneratorRelation_of_twisted_normOne_step
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation
+
+-- BG App C Lemma C.3 Step 4: the transported `Q` is commutative, so the
+-- `s^{-n}t^n` commutator factors used to pass from (C.3) to (C.4)
+-- can be reordered.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.Q_mul_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.t_inv_pow_mul_s_pow_mul_comm
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
 
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
@@ -2555,6 +2567,10 @@ set_option linter.style.longLine false in
   OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_field_step
 #assert_only_allowed_axioms
   OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_unit_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.normSetE_eq_inv_of_twisted_normOne_step
+#assert_only_allowed_axioms
+  OddOrder.BG.AppC.NormSet.forall_normN_two_mul_sub_one_of_twisted_normOne_step
 
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.
@@ -2711,6 +2727,13 @@ set_option linter.style.longLine false in
 
 -- BG App C Lemma C.2 bridge in the class-sum form `u*s + v*s = 2*s`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairSetAt_ncard_eq_normSetE_ncard
+
+-- BG App C Lemma C.3 Step 4 finite-field pair API: an element `a ∈ E` gives
+-- the concrete norm-one pair `(a, 2-a)` in both `u + v = 2` and
+-- `u*s + v*s = 2*s` forms.
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE_coe
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairOfMemNormSetE_mem_normOnePairSet
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOnePairOfMemNormSetE_mem_normOnePairSetAt
 
 -- BG App C Lemma C.3 note (`p = 3`): characteristic three makes
 -- `2*a - 1 = 2-a`, so the norm-set inverse closure is purely finite-field.

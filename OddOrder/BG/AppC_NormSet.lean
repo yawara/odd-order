@@ -986,6 +986,54 @@ lemma two_sub_ne_zero_of_mem_normSetE [Fact p.Prime] (hq : 0 < q) {a : GaloisFie
   rw [h, normN_zero p q hq] at this
   exact zero_ne_one this
 
+/-- Coerce an element of `E` to the corresponding norm-one unit. -/
+noncomputable def normOneUnitOfMemNormSetE [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) : normOneUnits p q :=
+  let u : (GaloisField p q)ˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)
+  ⟨u, (mem_normOneUnits_iff_normN p q hq.ne' u).mpr ha.1⟩
+
+@[simp] theorem normOneUnitOfMemNormSetE_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    (((normOneUnitOfMemNormSetE p q hq ha : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = a := by
+  rfl
+
+/-- The pair `(a, 2-a)` attached to `a ∈ E`, viewed as a pair of norm-one
+units. -/
+noncomputable def normOnePairOfMemNormSetE [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    normOneUnits p q × normOneUnits p q :=
+  (normOneUnitOfMemNormSetE p q hq ha,
+    normOneUnitOfMemNormSetE p q hq (two_sub_mem_normSetE p q ha))
+
+@[simp] theorem normOnePairOfMemNormSetE_fst_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    ((((normOnePairOfMemNormSetE p q hq ha).1 : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = a := by
+  rfl
+
+@[simp] theorem normOnePairOfMemNormSetE_snd_coe [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    ((((normOnePairOfMemNormSetE p q hq ha).2 : normOneUnits p q) :
+        (GaloisField p q)ˣ) : GaloisField p q) = (2 : GaloisField p q) - a := by
+  rfl
+
+/-- The pair attached to `a ∈ E` lies in the BG pair set `u + v = 2`. -/
+theorem normOnePairOfMemNormSetE_mem_normOnePairSet [Fact p.Prime] (hq : 0 < q)
+    {a : GaloisField p q} (ha : a ∈ normSetE p q) :
+    normOnePairOfMemNormSetE p q hq ha ∈ normOnePairSet p q := by
+  dsimp [normOnePairOfMemNormSetE, normOnePairSet]
+  change (a + ((2 : GaloisField p q) - a)) = 2
+  ring
+
+/-- The pair attached to `a ∈ E` also lies in the translated BG pair set
+`u*s + v*s = 2*s` for every nonzero `s`. -/
+theorem normOnePairOfMemNormSetE_mem_normOnePairSetAt [Fact p.Prime] (hq : 0 < q)
+    {a s : GaloisField p q} (ha : a ∈ normSetE p q) (hs : s ≠ 0) :
+    normOnePairOfMemNormSetE p q hq ha ∈ normOnePairSetAt p q s := by
+  rw [normOnePairSetAt_eq_normOnePairSet_of_ne_zero p q hs]
+  exact normOnePairOfMemNormSetE_mem_normOnePairSet p q hq ha
+
 /-- The product norm sends inverses to inverses. -/
 lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
     normN p q a⁻¹ = (normN p q a)⁻¹ := by
@@ -1015,6 +1063,53 @@ theorem twisted_unit_step_of_twisted_field_step [Fact p.Prime] (hq : 0 < q)
     ext
     rfl
   simpa [hmk] using hstep ((u : (GaloisField p q)ˣ) : GaloisField p q) hu
+
+/-- **BG Appendix C, Lemma C.3, Step 4 norm-one form**: the one-step output
+only needs an automorphism of the norm-one unit group, since every element of
+`E` has norm `1`. -/
+def normSetETwistedNormOneStep [Fact p.Prime] (φ : MulAut (normOneUnits p q)) : Prop :=
+  ∀ u : normOneUnits p q,
+    (((u : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+      (((twistedInv φ u : normOneUnits p q) : (GaloisField p q)ˣ) :
+          GaloisField p q) ∈ normSetE p q
+
+/-- **BG Appendix C, Lemma C.3, Step 4 tail for the norm-one group**: the
+odd-iterate argument works inside `U`, avoiding an unnecessary extension of the
+`t`-action to the full unit group. -/
+theorem normSetE_eq_inv_of_twisted_normOne_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (normOneUnits p q)) (hφp : φ ^ p = 1)
+    (hstep : normSetETwistedNormOneStep p q φ) :
+    normSetE p q = (normSetE p q)⁻¹ := by
+  classical
+  let EUnits : Set (normOneUnits p q) :=
+    {u | (((u : normOneUnits p q) : (GaloisField p q)ˣ) : GaloisField p q) ∈
+      normSetE p q}
+  have hinv_units : ∀ u : normOneUnits p q, u ∈ EUnits → u⁻¹ ∈ EUnits := by
+    exact inv_mem_of_twistedInv_step φ EUnits hpodd hφp hstep
+  ext a
+  constructor
+  · intro ha
+    rw [Set.mem_inv]
+    let u0 : (GaloisField p q)ˣ := Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)
+    have hu0 : u0 ∈ normOneUnits p q := by
+      rw [mem_normOneUnits_iff_normN p q hq.ne' u0]
+      simpa [u0] using ha.1
+    let u : normOneUnits p q := ⟨u0, hu0⟩
+    have hu : u ∈ EUnits := by
+      simpa [EUnits, u, u0] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u, u0] using hui
+  · intro ha
+    rw [Set.mem_inv] at ha
+    let u0 : (GaloisField p q)ˣ := Units.mk0 a⁻¹ (ne_zero_of_mem_normSetE p q hq ha)
+    have hu0 : u0 ∈ normOneUnits p q := by
+      rw [mem_normOneUnits_iff_normN p q hq.ne' u0]
+      simpa [u0] using ha.1
+    let u : normOneUnits p q := ⟨u0, hu0⟩
+    have hu : u ∈ EUnits := by
+      simpa [EUnits, u, u0] using ha
+    have hui := hinv_units u hu
+    simpa [EUnits, u, u0] using hui
 
 /-- **BG Appendix C, Lemma C.3, Step 4 tail for the norm set**: if an
 automorphism of the unit group has odd `p`-th power equal to the identity and
@@ -1128,6 +1223,16 @@ theorem forall_normN_two_mul_sub_one_of_twisted_unit_step [Fact p.Prime] (hq : 0
       normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
   exact forall_normN_two_mul_sub_one_of_normSetE_eq_inv p q hq
     (normSetE_eq_inv_of_twisted_unit_step p q hq hpodd φ hφp hstep)
+
+/-- The norm-one one-step output implies the concrete norm relation used by BG's
+final contradiction. -/
+theorem forall_normN_two_mul_sub_one_of_twisted_normOne_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (normOneUnits p q)) (hφp : φ ^ p = 1)
+    (hstep : normSetETwistedNormOneStep p q φ) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 := by
+  exact forall_normN_two_mul_sub_one_of_normSetE_eq_inv p q hq
+    (normSetE_eq_inv_of_twisted_normOne_step p q hq hpodd φ hφp hstep)
 
 /-- **BG Appendix C, Lemma C.3, note (`p = 3`)**: in characteristic three the
 generator-relation argument is unnecessary.  Since `2 * a - 1 = 2 - a`, every

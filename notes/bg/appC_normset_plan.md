@@ -300,14 +300,37 @@ Step4 の純有限体 core も `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normSetE_eq_inv_of_twisted_unit_step` として証明済み。twisted-step / inverse-closure から
 S16 interface の `N(2*a-1)=1` を返す adapter も
 `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
-`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。S16 側にも
-field-element one-step obligation `appCNormSetTwistedFieldStep`、unit-step adapter
-`appCNormSetTwistedUnitStep_of_field_step`、relation adapter
-`appCNormSetGeneratorRelation_of_twisted_unit_step` を追加済み。AppC 側の `theoremC` は
-finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。残る genuine gap は、
-S16 `FieldNormalizerData` が現在 field として持つ `appC_twisted_field_step` を、
-仮説(B) の具体 `σ:H→G`, `Q`, `y` から構成する generator-relation group proof (BG C.3 Step3/Step4 本体)。
-`appC_twisted_unit_step` と `appC_normSet_generator_relation` はこの field からの derived theorems。
+`forall_normN_two_mul_sub_one_of_twisted_unit_step` として追加済み。さらに actual `t`-action 用の
+norm-one group 版 `normSetETwistedNormOneStep` /
+`forall_normN_two_mul_sub_one_of_twisted_normOne_step` を追加し、S16 producer obligation も
+`appCNormSetTwistedNormOneStep` に狭めた。AppC 側の `theoremC` は
+finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。さらに
+`S16.FieldNormalizerData` と `AppC_FinalContradiction.HypothesisB` は concrete `H=P⋊U`、
+monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件を持つ carrier に更新済み。
+また BG Step4 冒頭の `s ∈ P0#` も concrete `fieldNormalizerPrimeLineGenerator` と
+`FieldNormalizerData.s` として materialize し、`s ∈ W₂`、`s ≠ 1`、`s ∈ N_G(Q)` まで
+derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-conjugation convention) も
+`FieldNormalizerData.P1` / `FieldNormalizerData.t` として固定し、`t ∈ P1`、`t ≠ 1`、
+`P1 ≤ N_G(U)`、`t ∈ N_G(U)`、`t ∈ N_G(Q)`、`s⁻¹t ∈ Q` まで derived theorem 化済み。
+さらに `s⁻¹t ∈ Q` と normalizer 条件から `(s⁻¹)^n t^n ∈ Q` を、逆向きにも
+`t⁻¹s ∈ Q` と `(t⁻¹)^n s^n ∈ Q` を theorem 化し、BG Step4 の
+`s^{-i}t^i ∈ Q` 型の冪計算を group-theoretic side に固定した。加えて concrete
+`normOneUnits` から Peterfalvi `U` への `normOneUnitsEquivU` と、`t∈N_G(U)` 由来の
+`tConjUAut` / `tConjNormOneUnitsAut`、および `σ(inr u)` の ambient conjugation 公式を
+追加し、BG 最後の `(a⁻¹)^{t^3}` を concrete complement 側の automorphism として扱う入口を固定した。
+さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
+`normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
+また `a∈E` から concrete norm-one unit および pair `(a,2-a)` を作る
+`normOneUnitOfMemNormSetE` / `normOnePairOfMemNormSetE` を公開し、`normOnePairSet` と
+`normOnePairSetAt` membership を theorem 化した。これで Step4 の `a+b=2` 入力を、群側の
+`U`-pair 計算へ渡す有限体 API が再利用可能になった。
+さらに `Q_elementaryAbelian` から `FieldNormalizerData.Q_mul_comm` を導出し、
+`(s⁻¹)^n t^n` / `(t⁻¹)^n s^n` 型の `Q` 内 factor が互いに可換である特殊形も公開した。
+これは BG Step4 の “Since Q is commutative, (C.3) becomes (C.4)” に対応する reorder 入力。
+残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
+`appC_twisted_normOne_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
+generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_normSet_generator_relation` は
+この norm-one step からの derived theorem。
 
 ### Theorem C — assembly
 C.1 ∧ C.2 ∧ C.3 ⟹ p≤q。既存 scaffold `AppC.theoremC` がこの statement。配線は materialize 後。
