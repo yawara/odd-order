@@ -178,7 +178,9 @@ created: 2026-06-04
   unit 上の one-step twisted inverse から `E=E⁻¹` を返す
   `normSetE_eq_inv_of_twisted_unit_step` を証明。さらに inverse-closure/twisted-step から
   S16 interface の `N(2*a-1)=1` を返す `forall_normN_two_mul_sub_one_of_normSetE_eq_inv` /
-  `forall_normN_two_mul_sub_one_of_twisted_unit_step` を追加。AxiomsCheck 登録済み。
+  `forall_normN_two_mul_sub_one_of_twisted_unit_step` を追加。さらに S16 側にも
+  one-step twisted inverse obligation `appCNormSetTwistedUnitStep` と relation adapter
+  `appCNormSetGeneratorRelation_of_twisted_unit_step` を追加。AxiomsCheck 登録済み。
 - [x] **Theorem C scaffold assembly**: 既存 `AppC_FinalContradiction.theoremC` から直接 `sorry` を除去し、実 finite-field `lemmaC1`/`lemmaC2` + C.3 interface field に配線 (2026-06-04, branch `codex/ft-appc-downstream`)。
 - [x] **AppC-facing Lemma C.2 bridge**: `conditionA` だけから `normSetCardGeTwo` を返す
   `lemmaC2_card_ge_two_of_conditionA` を分離し、`FieldNormalizerData` 依存の wrapper はこの adapter を呼ぶ形に整理。
