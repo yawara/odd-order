@@ -841,10 +841,15 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `(9.9)` normalizer package to a witness `L ∈ 𝓜(C_G(y))`, giving the same
      `P ≤ L` and `N_G(P) ≤ L` once the §4 characteristic Sylow series package for
      `L` is available.
+   - `derivedInG_eq_commutator` and `derivedInG_mono` isolate the ambient-derived
+     subgroup API needed for (9.10).
+   - `le_derivedInG_inf_of_le_derivedInG_normalizer` proves the pure group-theory
+     step `P₀ ≤ N_G(P)'`, `N_G(P) ≤ M`, `N_G(P) ≤ L` ⇒ `P₀ ≤ (L ∩ M)'`.
+   - `p0_le_derivedInG_inf_of_scn3_witness_maximal` combines this with the witness
+     `L` normalizer reapplication.
 
-   Remaining for this block: derive (9.10), especially the planned `P₀ ≤ (L ∩ M)'`
-   inclusion, then apply Corollary 4.19 + Lemma 1.9 to contradict the
-   noncentralization of `D ∩ C_G(B)`.
+   Remaining for this block: feed `P₀ ≤ (L ∩ M)'` into the Corollary 4.19 +
+   Lemma 1.9 chain to contradict the noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

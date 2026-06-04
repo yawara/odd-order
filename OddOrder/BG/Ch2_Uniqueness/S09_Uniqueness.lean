@@ -2379,6 +2379,44 @@ private theorem normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3
     (maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton hyA hL)
     hA hAnot hPp hAP hPnormA SP.series SP.length_pos SP.terminal_mem
 
+/-- Ambient form of the identity `H' = [H,H]`. -/
+private theorem derivedInG_eq_commutator (H : Subgroup G) :
+    derivedInG H = ⁅(H : Subgroup G), H⁆ := by
+  exact Subgroup.map_subtype_commutator H
+
+/-- Monotonicity of the ambient derived subgroup. -/
+private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
+    derivedInG H ≤ derivedInG K := by
+  rw [derivedInG_eq_commutator H, derivedInG_eq_commutator K]
+  exact Subgroup.commutator_mono hHK hHK
+
+/-- The subgroup-theoretic core of BG (9.10): if `P₀ ≤ N_G(P)'` and
+`N_G(P) ≤ L ∩ M`, then `P₀ ≤ (L ∩ M)'`. -/
+private theorem le_derivedInG_inf_of_le_derivedInG_normalizer {P M L P0 : Subgroup G}
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hNPL : Subgroup.normalizer (P : Set G) ≤ L) :
+    P0 ≤ derivedInG (L ⊓ M) :=
+  hP0N.trans (derivedInG_mono (le_inf hNPL hNPM))
+
+/-- BG Lemma 9.5 bridge toward (9.10): after reapplying (9.9) with the witness
+maximal subgroup `L`, any `P₀ ≤ N_G(P)'` lies in `(L ∩ M)'`. -/
+private theorem p0_le_derivedInG_inf_of_scn3_witness_maximal
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M L P P0 : Subgroup G} {y : G}
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) (hyA : y ∈ A)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)))
+    (hPp : IsPGroup p P) (hAP : A ≤ P)
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
+    (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
+    (SP_L : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    P0 ≤ derivedInG (L ⊓ M) := by
+  have hNPL : Subgroup.normalizer (P : Set G) ≤ L :=
+    (normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3
+      hG hA hAnot hyA hL hPp hAP hPnormA SP_L).2
+  exact le_derivedInG_inf_of_le_derivedInG_normalizer hP0N hNPM hNPL
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
