@@ -106,7 +106,7 @@ precursor(2): minimal ψ-inv ⇒ special exp p
 - **G Thm 3.6** — `[P,A,A]=[P,A]`。present infra から assemblable だが未着地。
 - **G Thm 3.7/3.8/3.10** 本体。
 
-## 実装順 (推奨, 下層から; 各 leaf = 別 bg-prove ターゲット可)
+## 実装順 (推奨, 下層から; 各 leaf 独立可)
 
 1. **G Thm 3.6** `actionCommutator_actionCommutator_eq_actionCommutator` (`[P,A,A]=[P,A]`): present `fixedPoints_sup_actionCommutator_eq_top` を P と A-invariant `H=[P,A]` に適用 (H への作用制限が plumbing)。**最も tractable な leaf、独立着手推奨**。
 2. ✅ **G Thm 2.4** (coprime Ω₁-extension) — 着地済 (`CoprimeAbelianPGroup.lean`, commit a2780ec)。
@@ -232,4 +232,4 @@ Gorenstein 原文 = `references/gorenstein/finite-groups.mmd` **L3696-3757** (Ch
 - Gorenstein: `references/gorenstein/finite-groups.mmd` — Thm 3.6 L3826, Thm 3.7 L3812, Thm 3.8 L3870, Lem 3.9 L3898, Thm 3.10 L3920, Thm 2.2/2.4 (§2、要 locate)
 - precursor(1) (完成、隣接技法): commit c1d23e8 `S04d_GorThm415.lean`
 - present coprime infra: `OddOrder/Isaacs/Ch04_Commutators/Main.lean` §4D
-- tracker: issue 0051 / `notes/bg/autonomous_prove_queue.md` (#9 系)
+- tracker: issue 0051 (#9 系)
