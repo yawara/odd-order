@@ -211,11 +211,14 @@ pair 수에 대한 induction으로 fold하는 정직한 핵심:
 - `hdegχ : χᵢ(1) = a * χ₁(1)`
 - `hDeg : 2 * (a : ℝ) < ∑ j∈s, (deg j : ℝ)^2`
 
-次の自然な leaf は、絶対次数不等式
-`2 * χᵢ(1) * χ₁(1) < ∑ χmem(j)(1)^2` を anchor の正の次数で割って normalized `hDeg` に
-変換する bridge。その前提となる ratio 生成は `exists_pos_natDegreeRatioFamily_of_dvd` と
-`exists_pos_natDegreeRatio_of_dvd` で既に用意済みだが、§6.6 固有の divisibility/prime-power gap 供給は
-まだ別 leaf。
+追加で `normalizedDegreeGap_of_realDegreeBound` を landing。絶対次数不等式
+`2 * χᵢ(1) * χ₁(1) < ∑ χmem(j)(1)^2` と同じ anchor に対する ratio data から、anchor の正の
+次数 `χ₁(1)^2` で割って normalized `hDeg` を得る。
+
+これで `xAdjoinStepInput_of_memberFamily_degreeRatios` に渡す `hDeg` は、§6.6 側が absolute bound を
+出せば直接変換できる形になった。ratio 生成は `exists_pos_natDegreeRatioFamily_of_dvd` と
+`exists_pos_natDegreeRatio_of_dvd` で用意済み。残る真正 §6.6 入力は、absolute bound 自体を供給する
+square-divisibility / prime-power gap / partial degree-sum identity の chain。
 
 ### (2026-05-31, pass 2) (6.6) prime-power degree gap (mmd L82) leaf — degree 부등식 방전
 

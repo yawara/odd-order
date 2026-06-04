@@ -3409,6 +3409,76 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_of_irreducible_X
 
 end SibleyDadeHypothesis
 
+/-- **(T8.11m) normalized degree gap from an absolute degree bound.**
+
+If the new character and the prefix member family have natural degree ratios against the same
+anchor `χ₁`, then the absolute §6.6 inequality
+`2 * χ(1) * χ₁(1) < ∑ χmem(j)(1)^2` is equivalent, after dividing by the positive square
+`χ₁(1)^2`, to the normalized `XAdjoinStepInput.hDeg` inequality
+`2 * a < ∑ deg(j)^2`. -/
+theorem normalizedDegreeGap_of_realDegreeBound
+    {G : Type*} [Group G]
+    {ι : Type*} {s : Finset ι}
+    {χ χ₁ : IrreducibleCharacter G} {χmem : ι → IrreducibleCharacter G}
+    {deg : ι → ℕ} {a : ℕ}
+    (hχdeg : (χ : ClassFunction G ℂ) 1 =
+      (a : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hmemdeg : ∀ i ∈ s,
+      (χmem i : ClassFunction G ℂ) 1 =
+        (deg i : ℂ) * (χ₁ : ClassFunction G ℂ) 1)
+    (hAbs : 2 *
+        ((OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re *
+          (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re) <
+      ∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) :
+    2 * (a : ℝ) < ∑ i ∈ s, ((deg i : ℝ)) ^ 2 := by
+  classical
+  obtain ⟨d₁, hd₁pos, hχ₁one⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ₁
+  have hd₁real_pos : 0 < (d₁ : ℝ) := by exact_mod_cast hd₁pos
+  have hχ₁re :
+      (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re = (d₁ : ℝ) := by
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def, hχ₁one]
+    norm_num
+  have hχre :
+      (OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re =
+        (a : ℝ) * (d₁ : ℝ) := by
+    have h := congrArg Complex.re hχdeg
+    rw [hχ₁one] at h
+    simpa [OddOrder.Peterfalvi.S03.characterDegree_def, Complex.ofReal_mul] using h
+  have hmemre : ∀ i ∈ s,
+      (OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re =
+        (deg i : ℝ) * (d₁ : ℝ) := by
+    intro i hi
+    have h := congrArg Complex.re (hmemdeg i hi)
+    rw [hχ₁one] at h
+    simpa [OddOrder.Peterfalvi.S03.characterDegree_def, Complex.ofReal_mul] using h
+  have hleft :
+      2 * ((OddOrder.Peterfalvi.S03.characterDegree (χ : ClassFunction G ℂ)).re *
+          (OddOrder.Peterfalvi.S03.characterDegree (χ₁ : ClassFunction G ℂ)).re) =
+        (2 * (a : ℝ)) * (d₁ : ℝ) ^ 2 := by
+    rw [hχre, hχ₁re]
+    ring
+  have hright :
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+        (∑ i ∈ s, ((deg i : ℝ)) ^ 2) * (d₁ : ℝ) ^ 2 := by
+    calc
+      (∑ i ∈ s,
+        ((OddOrder.Peterfalvi.S03.characterDegree (χmem i : ClassFunction G ℂ)).re) ^ 2) =
+          ∑ i ∈ s, (((deg i : ℝ) * (d₁ : ℝ)) ^ 2) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            rw [hmemre i hi]
+      _ = ∑ i ∈ s, ((deg i : ℝ) ^ 2 * (d₁ : ℝ) ^ 2) := by
+            refine Finset.sum_congr rfl ?_
+            intro i hi
+            ring
+      _ = (∑ i ∈ s, ((deg i : ℝ)) ^ 2) * (d₁ : ℝ) ^ 2 := by
+            rw [← Finset.sum_mul]
+  rw [hleft, hright] at hAbs
+  have hd₁sq_pos : 0 < (d₁ : ℝ) ^ 2 := sq_pos_of_pos hd₁real_pos
+  nlinarith
+
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
 hypotheses `SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is
 coherent: there is an integral isometric extension of the §4 Dade map `τ` from `Z[S, H^#]` to
