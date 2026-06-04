@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Lattice
+import Mathlib.Data.Fintype.Basic
+import Mathlib.Data.Fintype.EquivFin
+import Mathlib.Data.Finset.Max
 import Mathlib.Order.Atoms
 
 /-!
@@ -58,6 +61,31 @@ theorem mem_maximalSubgroups {M : Subgroup G} : M ∈ maximalSubgroups G ↔ IsC
 theorem mem_maximalSubgroupsContaining {H M : Subgroup G} :
     M ∈ maximalSubgroupsContaining H ↔ IsCoatom M ∧ H ≤ M :=
   Iff.rfl
+
+/-- In a finite group, if there is a maximal subgroup over `H` different from `M`, then
+one can choose such a counterexample maximizing any natural-valued measure `w`.
+
+This is the Lean form of the BG phrase "choose `K ∈ ℳ(H)` maximal subject to ...".
+The measure is kept abstract so later arguments can instantiate it with a cardinal, a
+Sylow-order, or a `p`-part without changing the choice API. -/
+theorem exists_maximal_counterexample_image [Finite (Subgroup G)] {H M : Subgroup G}
+    (w : Subgroup G → ℕ)
+    (hne : ∃ K : Subgroup G, K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M) :
+    ∃ K : Subgroup G,
+      K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M ∧
+        ∀ L : Subgroup G, L ∈ maximalSubgroups G → H ≤ L → L ≠ M → w L ≤ w K := by
+  classical
+  letI := Fintype.ofFinite (Subgroup G)
+  let family : Finset (Subgroup G) :=
+    Finset.univ.filter (fun K => K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M)
+  have hfamily_ne : family.Nonempty := by
+    rcases hne with ⟨K, hK, hHK, hKM⟩
+    exact ⟨K, Finset.mem_filter.mpr ⟨Finset.mem_univ K, hK, hHK, hKM⟩⟩
+  obtain ⟨K, hK_mem, hK_max⟩ := family.exists_max_image w hfamily_ne
+  obtain ⟨_, hK, hHK, hKM⟩ := Finset.mem_filter.mp hK_mem
+  refine ⟨K, hK, hHK, hKM, ?_⟩
+  intro L hL hHL hLM
+  exact hK_max L (Finset.mem_filter.mpr ⟨Finset.mem_univ L, hL, hHL, hLM⟩)
 
 namespace IsUniquelyMaximal
 
@@ -136,5 +164,30 @@ theorem maximalSubgroupsContaining_eq_singleton {H : Subgroup G} (h : IsUniquely
   rw [h.mem_maximalSubgroupsContaining_iff_eq_uniqueMaximalSubgroup, Set.mem_singleton_iff]
 
 end IsUniquelyMaximal
+
+/-- If a proper subgroup `H` lies in a known maximal subgroup `M` but is not uniquely maximal,
+then there is another maximal subgroup over `H` different from `M`. -/
+theorem exists_maximal_counterexample_of_not_isUniquelyMaximal {H M : Subgroup G}
+    (hHproper : H < ⊤) (hM : M ∈ maximalSubgroups G) (hHM : H ≤ M)
+    (hnot : ¬ IsUniquelyMaximal H) :
+    ∃ K : Subgroup G, K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M := by
+  by_contra hnone
+  apply hnot
+  refine IsUniquelyMaximal.of_unique_maximal hHproper hM hHM ?_
+  intro K hK hHK
+  by_contra hKM
+  exact hnone ⟨K, hK, hHK, hKM⟩
+
+/-- If a proper subgroup `H` lies in a known maximal subgroup `M` but is not uniquely maximal,
+choose a different maximal subgroup over `H` maximizing a natural-valued measure `w`. -/
+theorem exists_maximal_counterexample_image_of_not_isUniquelyMaximal
+    [Finite (Subgroup G)] {H M : Subgroup G} (w : Subgroup G → ℕ)
+    (hHproper : H < ⊤) (hM : M ∈ maximalSubgroups G) (hHM : H ≤ M)
+    (hnot : ¬ IsUniquelyMaximal H) :
+    ∃ K : Subgroup G,
+      K ∈ maximalSubgroups G ∧ H ≤ K ∧ K ≠ M ∧
+        ∀ L : Subgroup G, L ∈ maximalSubgroups G → H ≤ L → L ≠ M → w L ≤ w K :=
+  exists_maximal_counterexample_image w
+    (exists_maximal_counterexample_of_not_isUniquelyMaximal hHproper hM hHM hnot)
 
 end OddOrder.GroupTheory
