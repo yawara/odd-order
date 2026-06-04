@@ -3628,6 +3628,58 @@ theorem scn3_map_mem_scn3Global_of_sylow_map [Finite G]
     rw [← htarget]
     exact hA.map_equiv e⟩
 
+/-- BG (8.12), uniqueness part: for `q ≠ p`, `H_G^*(A;q)` has at most one member
+for every local `SCN₃(P)` image `A` in the p-group case. -/
+theorem hInvariantStar_scn3_map_eq_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p)
+    {Q₁ Q₂ : Subgroup G}
+    (hQ₁ : Q₁ ∈ hInvariantStar ⊤ (A.map M.subtype) {q})
+    (hQ₂ : Q₂ ∈ hInvariantStar ⊤ (A.map M.subtype) {q}) :
+    Q₁ = Q₂ := by
+  have hp_dvd_G : p ∣ Nat.card G :=
+    (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_subgroup_dvd_card (fittingInG M))
+  obtain ⟨Q, hQ⟩ := sylow_map_mem_range_of_fittingInG_isPGroup hG hM hp P hFp
+  have hAglobal : A.map M.subtype ∈ OddOrder.BG.Ch2.S07.scn3Global p G :=
+    scn3_map_mem_scn3Global_of_sylow_map P hQ hAP hA
+  have hKbot :
+      opiCoreInG ({p} : Set ℕ)ᶜ (Subgroup.centralizer (A.map M.subtype : Set G)) = ⊥ :=
+    opiCoreInG_singleton_compl_centralizer_scn3_map_eq_bot_of_fittingInG_isPGroup
+      hG hM hp P hFp hAP hA
+  exact OddOrder.BG.Ch2.S07.hInvariantStar_eq_of_conjTransitiveOn_bot hKbot
+    (OddOrder.BG.Ch2.S07.thompsonTransitivity hG hp_dvd_G hAglobal hq) hQ₁ hQ₂
+
+/-- BG (8.12), existence-and-uniqueness part: for `q ≠ p`, `H_G^*(A;q)` contains
+a unique member for every local `SCN₃(P)` image `A` in the p-group case. -/
+theorem exists_unique_hInvariantStar_scn3_map_of_fittingInG_isPGroup
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hp : p ∈ (Nat.card ↥(fittingInG M)).primeFactors)
+    (P : Sylow p ↥M) (hFp : IsPGroup p ↥(fittingInG M))
+    {A : Subgroup ↥M} (hAP : A ≤ (P : Subgroup ↥M))
+    (hA : IsSCN₃ p (A.subgroupOf (P : Subgroup ↥M))) (hq : q ≠ p) :
+    ∃ Q, Q ∈ hInvariantStar ⊤ (A.map M.subtype) {q} ∧
+      ∀ Q', Q' ∈ hInvariantStar ⊤ (A.map M.subtype) {q} → Q' = Q := by
+  have hBotInv : (⊥ : Subgroup G) ∈ hInvariant ⊤ (A.map M.subtype) {q} := by
+    rw [mem_hInvariant]
+    refine ⟨bot_le, ?_, ?_⟩
+    · intro x _
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      simp
+    · intro r hr
+      rw [Subgroup.card_bot] at hr
+      simp at hr
+  obtain ⟨Q, hQstar, _hBotQ⟩ := exists_le_hInvariantStar hBotInv
+  refine ⟨Q, hQstar, ?_⟩
+  intro Q' hQ'
+  exact hInvariantStar_scn3_map_eq_of_fittingInG_isPGroup
+    hG hM hp P hFp hAP hA hq hQ' hQstar
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
