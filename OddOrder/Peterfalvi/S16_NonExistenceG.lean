@@ -190,6 +190,31 @@ noncomputable def fieldNormalizerComplement (hyp : Hypothesis (G := G)) :
       OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q →*
         fieldNormalizerFrobeniusGroup hyp).range
 
+/-- The distinguished nonidentity element of the prime-field line `P₀`,
+corresponding to `1 : F_{p^q}` in BG Appendix C. -/
+noncomputable def fieldNormalizerPrimeLineGenerator (hyp : Hypothesis (G := G)) :
+    fieldNormalizerFrobeniusGroup hyp :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  SemidirectProduct.inl
+    (Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q))
+
+/-- The distinguished generator lies in the concrete prime-field line `P₀`. -/
+theorem fieldNormalizerPrimeLineGenerator_mem (hyp : Hypothesis (G := G)) :
+    fieldNormalizerPrimeLineGenerator hyp ∈ fieldNormalizerPrimeLine hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  dsimp [fieldNormalizerPrimeLineGenerator, fieldNormalizerPrimeLine]
+  rw [OddOrder.BG.AppC.NormSet.mem_normOneFrobeniusSubspaceKernel_inl]
+  exact Submodule.subset_span (by simp)
+
+/-- The distinguished generator of `P₀` is nontrivial. -/
+theorem fieldNormalizerPrimeLineGenerator_ne_one (hyp : Hypothesis (G := G)) :
+    fieldNormalizerPrimeLineGenerator hyp ≠ 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro h
+  have hfield : (1 : GaloisField hyp.base.p hyp.base.q) = 0 :=
+    ofAdd_eq_one.mp (SemidirectProduct.inl_inj.mp h)
+  exact one_ne_zero hfield
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The finite-field model is now carried as a concrete
 monomorphism from BG's Frobenius group `H = P \rtimes U` into `G`, together with
@@ -213,6 +238,30 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   appC_twisted_field_step : appCNormSetTwistedFieldStep hyp
 
 namespace FieldNormalizerData
+
+/-- The BG element `s ∈ P₀#`, transported to `G` through the concrete
+field-normalizer monomorphism. -/
+noncomputable def s {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) : G :=
+  data.sigma (fieldNormalizerPrimeLineGenerator hyp)
+
+/-- The transported element `s` lies in Peterfalvi's subgroup `W₂ = σ(P₀)`. -/
+theorem s_mem_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ∈ hyp.base.W2 := by
+  rw [← data.sigma_P0_eq_W2]
+  exact ⟨fieldNormalizerPrimeLineGenerator hyp,
+    fieldNormalizerPrimeLineGenerator_mem hyp, rfl⟩
+
+/-- The transported element `s` is nontrivial. -/
+theorem s_ne_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ≠ 1 := by
+  intro hs
+  exact fieldNormalizerPrimeLineGenerator_ne_one hyp
+    (data.sigma_injective (by simpa [s] using hs))
+
+/-- The transported prime-line generator normalizes `Q`. -/
+theorem s_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ∈ Subgroup.normalizer (hyp.base.Q : Set G) :=
+  data.W2_normalizes_Q data.s_mem_W2
 
 /-- The unit-group C.3 one-step output, derived from the field-element Step 4
 output stored in `FieldNormalizerData`. -/

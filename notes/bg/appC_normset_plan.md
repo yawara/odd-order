@@ -307,6 +307,9 @@ field-element one-step obligation `appCNormSetTwistedFieldStep`、unit-step adap
 finite-field C.1/C.2 と C.3 interface に配線済みで direct sorry-free。さらに
 `S16.FieldNormalizerData` と `AppC_FinalContradiction.HypothesisB` は concrete `H=P⋊U`、
 monomorphism `σ:H→G`、`P`/`P0`/`U` image identification、normalizer 条件を持つ carrier に更新済み。
+また BG Step4 冒頭の `s ∈ P0#` も concrete `fieldNormalizerPrimeLineGenerator` と
+`FieldNormalizerData.s` として materialize し、`s ∈ W₂`、`s ≠ 1`、`s ∈ N_G(Q)` まで
+derived theorem 化済み。
 残る genuine gap は、S16 `FieldNormalizerData` が現在 field として持つ
 `appC_twisted_field_step` を、この concrete Hypothesis (B) data (`σ`, `Q`, `y`) から構成する
 generator-relation group proof (BG C.3 Step3/Step4 本体)。`appC_twisted_unit_step` と
