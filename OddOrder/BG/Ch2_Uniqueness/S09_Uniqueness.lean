@@ -1323,6 +1323,40 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
   exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_sylow
     P hPcore hRM hNPM
 
+/-- If a local Sylow `q`-subgroup maps onto `O_q(M)` and `q ∈ π(M)`, then
+`O_q(M)` is nontrivial. -/
+private theorem opiCoreInG_singleton_ne_bot_of_local_sylow_eq_of_mem_primeFactors
+    [Finite G] {q : ℕ} [Fact q.Prime] {M : Subgroup G} (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) :
+    opiCoreInG ({q} : Set ℕ) M ≠ ⊥ := by
+  classical
+  have hq_dvd_M : q ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hqM).2.1
+  have hPMne : (PM : Subgroup ↥M) ≠ ⊥ :=
+    OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hq_dvd_M PM
+  intro hOqbot
+  have hPMmap_bot : (PM : Subgroup ↥M).map M.subtype = ⊥ := by
+    rw [hPMcore, hOqbot]
+  have hPMbot : (PM : Subgroup ↥M) = ⊥ := by
+    apply (Subgroup.map_subtype_inj (H := M)).mp
+    simpa [Subgroup.map_bot] using hPMmap_bot
+  exact hPMne hPMbot
+
+/-- Low-rank `(9.7)` package when Theorem 4.20(c) has supplied only the local Sylow
+equality; nontriviality follows from `q ∈ π(M)`. -/
+private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (hRM : R ≤ M) :
+    ∃ Q : Subgroup G,
+      Q ∈ hInvariantStar ⊤ R {q} ∧
+        opiCoreInG ({q} : Set ℕ) M ≤ Q ∧ Subgroup.normalizer (Q : Set G) ≤ M := by
+  exact exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow
+    hG hM PM hPMcore
+    (opiCoreInG_singleton_ne_bot_of_local_sylow_eq_of_mem_primeFactors PM hPMcore hqM)
+    hRM
+
 /-- A rank-three `q`-subgroup is nontrivial. -/
 private theorem ne_bot_of_isPGroup_of_three_le_rank [Finite G]
     {q : ℕ} [Fact q.Prime] {B : Subgroup G} (hBq : IsPGroup q B)
@@ -1458,6 +1492,23 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow
     hG hM hA hRp hAR hRlt hqp
     (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow
       hG hM.1 PM hPMcore hOqne hRM)
+
+/-- Low-rank normalizer step when Theorem 4.20(c) has supplied the local Sylow equality;
+nontriviality follows from `q ∈ π(M)`. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow_eq
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hqp : q ≠ p) (hRM : R ≤ M) (PM : Sylow q ↥M)
+    (hPMcore : (PM : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_exists_hInvariantStar
+    hG hM hA hRp hAR hRlt hqp
+    (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq
+      hG hM.1 PM hPMcore hqM hRM)
 
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
 rank-three witness inside `O_q(M)`. -/

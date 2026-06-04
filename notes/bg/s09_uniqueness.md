@@ -589,7 +589,13 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `N_G(O) ≤ M`, then `O` is a Sylow `q`-subgroup of `G`.
    - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow`
      packages the low-rank `Q` choice once Thm 4.20(c) supplies the local Sylow
-     equality `(P_M : Subgroup M).map M.subtype = O_q(M)`.
+     equality `(P_M : Subgroup M).map M.subtype = O_q(M)` and nontriviality.
+   - `opiCoreInG_singleton_ne_bot_of_local_sylow_eq_of_mem_primeFactors` removes
+     that extra nontriviality input: if the local Sylow equality holds and
+     `q ∈ π(M)`, then `O_q(M) ≠ 1`.
+   - `exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_local_sylow_eq`
+     is the low-rank `Q` package with the weaker Thm 4.20(c)-shaped input
+     `(P_M : Subgroup M).map M.subtype = O_q(M)` plus `q ∈ π(M)`.
 
    The high-rank bookkeeping layer is also now separated:
 
@@ -617,15 +623,18 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    - `normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow`
      is the low-rank version after Thm 4.20(c) supplies
      `(P_M : Subgroup M).map M.subtype = O_q(M)` and `O_q(M) ≠ ⊥`.
+   - `normalizer_le_maximal_of_scn3Global_intermediate_of_local_sylow_eq`
+     is the low-rank version with the weaker equality + `q ∈ π(M)` input;
+     nontriviality is discharged internally.
    - `normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank`
      is the high-rank version from `r_q(F(M)) ≥ 3`.
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
-   Sylow equality/nontriviality inputs and wire the BG choice of `q`/case split into
-   these low/high normalizer packages.  A scout pass found no existing Thm 4.20(c)
-   endpoint; the next missing helper should turn `q` largest in `|M|` plus
-   `rank F(M) ≤ 2` into a local Sylow `PM : Sylow q ↥M` whose ambient image is
-   `O_q(M)`, together with `O_q(M) ≠ ⊥`.
+   Sylow equality and wire the BG choice of `q`/case split into these low/high
+   normalizer packages.  A scout pass found no existing Thm 4.20(c) endpoint; the
+   next missing helper should turn `q` largest in `|M|` plus `rank F(M) ≤ 2` into a
+   local Sylow `PM : Sylow q ↥M` whose ambient image is `O_q(M)`.  The separate
+   `O_q(M) ≠ ⊥` input is no longer needed once `q ∈ π(M)` is available.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 
