@@ -104,6 +104,18 @@ def appCNormSetGeneratorRelation (hyp : Hypothesis (G := G)) : Prop :=
       OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
         ((2 : GaloisField hyp.base.p hyp.base.q) * a - 1) = 1
 
+/-- The field-element one-step twisted-inverse output of
+**BG Appendix C, Lemma C.3, Step 4**, expressed at the Peterfalvi Section 16
+interface.  This is closest to the line in BG proving `(a⁻¹)^{t^3} ∈ E` for
+`a ∈ E`; the unit-group formulation used for the final odd iteration is derived
+from this. -/
+def appCNormSetTwistedFieldStep (hyp : Hypothesis (G := G)) : Prop :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  ∃ φ : MulAut (GaloisField hyp.base.p hyp.base.q)ˣ,
+    φ ^ hyp.base.p = 1 ∧
+      OddOrder.BG.AppC.NormSet.normSetETwistedFieldStep
+        (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos φ
+
 /-- The one-step twisted-inverse output of **BG Appendix C, Lemma C.3, Step 4**,
 expressed at the Peterfalvi Section 16 interface.  This is closer to the group
 calculation in BG: for a field automorphism of `p`-power order, every
@@ -120,6 +132,18 @@ def appCNormSetTwistedUnitStep (hyp : Hypothesis (G := G)) : Prop :=
               (GaloisField hyp.base.p hyp.base.q)ˣ) :
               GaloisField hyp.base.p hyp.base.q) ∈
             OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q
+
+/-- The field-element Step 4 output implies the unit-group Step 4 output used by
+BG's final odd-iterate argument. -/
+theorem appCNormSetTwistedUnitStep_of_field_step
+    (hyp : Hypothesis (G := G)) :
+    appCNormSetTwistedFieldStep hyp → appCNormSetTwistedUnitStep hyp := by
+  intro htwist
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rcases htwist with ⟨φ, hφp, hstep⟩
+  exact ⟨φ, hφp,
+    OddOrder.BG.AppC.NormSet.twisted_unit_step_of_twisted_field_step
+      (p := hyp.base.p) (q := hyp.base.q) hyp.base.q_prime.pos φ hstep⟩
 
 /-- The BG Step 4 twisted-inverse output implies the norm relation currently
 consumed by `FieldNormalizerData`.  This keeps the S16 producer obligation close
@@ -156,9 +180,16 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U : Prop
   W2_conj_y_normalizes_U_holds : W2_conj_y_normalizes_U
-  appC_twisted_unit_step : appCNormSetTwistedUnitStep hyp
+  appC_twisted_field_step : appCNormSetTwistedFieldStep hyp
 
 namespace FieldNormalizerData
+
+/-- The unit-group C.3 one-step output, derived from the field-element Step 4
+output stored in `FieldNormalizerData`. -/
+theorem appC_twisted_unit_step {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    appCNormSetTwistedUnitStep hyp :=
+  appCNormSetTwistedUnitStep_of_field_step hyp data.appC_twisted_field_step
 
 /-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
 BG's one-step twisted-inverse output stored in `FieldNormalizerData`. -/

@@ -64,10 +64,11 @@ BG App C `theoremC : FieldNormalizerData → p ≤ q` の数学核 = `F_{p^q}` �
 - `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (FeitThompson.lean) = BG §7-16 + Pf §10-16 全体。
 
 ## opaque-Prop placeholder の load-bearing 状態 (監査)
-- **FieldNormalizerData** (S16:98) = **混在**: opaque (`field_model`, `identifies_P/U/W2`, `W2_conj_y_normalizes_U`)
-  + **genuine** (`cyclotomic_coprime`=cond A, `Q_elementaryAbelian`, `W2_normalizes_Q`, `y`, `y_mem_Q`)。
-- **NormSetData / HypothesisB** (AppC) = 有限体 obligation を opaque (`E_nonempty/card_ge_two/inverse_closed/polynomial_root_bound`)
-  + genuine (`conditionA_holds`)。**C.1-C.3 を実証明する = これら opaque を実 `F_{p^q}` 命題に置換**。
+- **FieldNormalizerData** (S16) = **混在**: opaque (`field_model`, `identifies_P/U/W2`, `W2_conj_y_normalizes_U`)
+  + **genuine** (`cyclotomic_coprime`=cond A, `Q_elementaryAbelian`, `W2_normalizes_Q`, `y`, `y_mem_Q`)
+  + **AppC producer obligation** (`appC_twisted_field_step`; `appC_twisted_unit_step` / `appC_normSet_generator_relation` は derived theorems)。
+- **NormSetData / HypothesisB** (AppC) = downstream theoremC は finite-field C.1/C.2 と S16 の C.3 producer obligation に配線済み。
+  残る C.3 本体は S16 `appC_twisted_field_step` の materialization。
 - vacuous rider 注意 (`scaffold-sorry-free-not-done`): `∃ data, data.caseB_formula ∧ <real>` の `_formula` 連言は
   常時充足可 ⟹ statement は教科書より弱い。実制約 (card 等式/normalizer 包含/D=⊥) は genuine。
 

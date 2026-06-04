@@ -809,9 +809,25 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `P₀` not centralizing `D`, and returns a cocyclic `B ≤ Ω₁(A)`, `B ≤ A`,
      `B` noncyclic, with `P₀` still not centralizing `D ∩ C_G(B)`.
 
-   Remaining for this block: specialize `D = O_{p'}(F(M))`, route the resulting
-   noncyclic `B` through Theorem 9.1 to choose `y` and `L`, then apply
-   Corollary 4.19 + Lemma 1.9 to contradict the noncentralization of `D ∩ C_G(B)`.
+   A third bridge now performs the concrete Lemma 9.5 specialization:
+
+   - `exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting` sets
+     `D = O_{p'}(F(M))` for `M ∈ 𝓜(C_G(A))`.  It derives
+     `Ω₁(A) ≤ N_G(D)` from `A ≤ C_G(A) ≤ M`, the fact that `M` normalizes
+     `F(M)`, and `le_normalizer_opiCoreInG_of_le_normalizer`; coprimality then
+     follows from `Ω₁(A)` being a `p`-group and `D` a `p'`-subgroup.
+
+   A fourth bridge records the BG line "since `A ∉ 𝒰`, `B ∉ 𝒰`":
+
+   - `not_isUniquelyMaximal_of_le_scn3_counterexample` proves any subgroup
+     `B ≤ A` would force the ambient `SCN₃` counterexample `A` into `𝒰`, using
+     Corollary 9.2 and `r(A) ≥ 3`.
+   - `exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting` packages the
+     cocyclic `Ω₁(A)` witness with `¬ IsUniquelyMaximal B`.
+
+   Remaining for this block: route the resulting noncyclic `B ∉ 𝒰` through
+   Theorem 9.1 to choose `y` and `L`, then apply Corollary 4.19 + Lemma 1.9 to
+   contradict the noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

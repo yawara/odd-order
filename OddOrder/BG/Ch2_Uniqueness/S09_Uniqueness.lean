@@ -995,6 +995,26 @@ private theorem three_le_rank_of_mem_scn3Global [Finite G]
         (Subgroup.subgroupOfEquivOfLe hAP).injective)
   exact h3A.trans (pRank_le_rank (G := ↥A) p)
 
+/-- If the ambient `SCN₃` subgroup `A` is not in the uniqueness class, then no
+subgroup of `A` can already be in it.  This is the formal bridge for the step
+"since `A ∉ 𝒰`, the cocyclic subgroup `B ≤ Ω₁(A)` is not in `𝒰`" in BG Lemma
+9.5. -/
+private theorem not_isUniquelyMaximal_of_le_scn3_counterexample [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A B : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hA : A ∈ S07.scn3Global p G) (hBA : B ≤ A)
+    (hAnot : ¬ IsUniquelyMaximal A) :
+    ¬ IsUniquelyMaximal B := by
+  intro hBU
+  have hA_le_CB : A ≤ Subgroup.centralizer (B : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro b hb
+    exact (hAcomm_set a ha b (hBA hb)).symm
+  have h2A : 2 ≤ rank ↥A :=
+    (by omega : (2 : ℕ) ≤ 3).trans (three_le_rank_of_mem_scn3Global hA)
+  exact hAnot (isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hBU hA_le_CB h2A)
+
 /-- The centralizer of a global `SCN₃(p)` subgroup is proper in a minimal odd simple group. -/
 private theorem centralizer_lt_top_of_mem_scn3Global [Finite G]
     (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
@@ -2153,6 +2173,91 @@ private theorem exists_noncyclic_cocyclic_omega1OfAbelian_not_le_centralizer_inf
       (p := p) (hH := hAcomm_set))
   · exact not_isCyclic_of_cocyclic_omega1OfAbelian_of_three_le_pRank
       (G := G) (p := p) (A := A) (B := B) hAcomm_set h3A hBΩ_raw haΩ_raw hsup_raw
+
+
+/-- Lemma 9.5's Prop. 1.16 extraction with `D = O_{p'}(F(M))`.
+
+For `M ∈ ℳ(C_G(A))` and `A ∈ SCN₃(p)`, the subgroup `Ω₁(A)` normalizes
+`O_{p'}(F(M))`: `A ≤ C_G(A) ≤ M`, `M` normalizes `F(M)`, and the ambient
+`p'`-core is characteristic in `F(M)`. Since `Ω₁(A)` is a `p`-group and
+`O_{p'}(F(M))` is a `p'`-subgroup, the action is coprime. This packages the
+exact input needed for the BG L2590--L2613 contradiction block. -/
+private theorem exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting
+    [Finite G] {p : ℕ} [Fact p.Prime] {A M P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G)
+    (hP0D : ¬ P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G)) :
+    ∃ B : Subgroup G,
+      B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ∧
+      B ≤ A ∧ ¬ IsCyclic ↥B ∧
+      (∃ a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set,
+        B ⊔ Subgroup.zpowers a =
+          OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) ∧
+      ¬ P0 ≤ Subgroup.centralizer
+        (((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ⊓
+            Subgroup.centralizer (B : Set G)) : Set G) := by
+  classical
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  have h3A : 3 ≤ pRank A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank
+      (isPGroup_of_mem_scn3Global hA) (three_le_rank_of_mem_scn3Global hA)
+  haveI hAcomm_inst : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
+  have hA_le_M : A ≤ M := by
+    exact (Subgroup.le_centralizer A).trans hM.2
+  have hM_norm_F : M ≤ Subgroup.normalizer (S08.fittingInG M : Set G) := by
+    intro x hxM
+    exact S08.mem_normalizer_fittingInG_of_mem hxM
+  have hA_norm_F : A ≤ Subgroup.normalizer (S08.fittingInG M : Set G) :=
+    hA_le_M.trans hM_norm_F
+  have hOmegaD : OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ≤
+      Subgroup.normalizer D := by
+    exact (OddOrder.GroupTheory.omega1OfAbelian_le (G := G) (H := A)
+      (p := p) (hH := hAcomm_set)).trans
+        (le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ)ᶜ hA_norm_F)
+  have hOmegapi : Subgroup.IsPiSubgroup ({p} : Set ℕ)
+      (OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) :=
+    isPiSubgroup_singleton_of_isPGroup
+      (OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian
+        (G := G) (H := A) (p := p) (hH := hAcomm_set)).isPGroup
+  have hDpic : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ D := by
+    simpa [D] using
+      (isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M))
+  have hCop : Nat.Coprime
+      (Nat.card ↥(OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set)) (Nat.card ↥D) :=
+    coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hOmegapi hDpic
+  simpa [D] using
+    (exists_noncyclic_cocyclic_omega1OfAbelian_not_le_centralizer_inf
+      (G := G) (p := p) (A := A) (D := D) (P0 := P0)
+      hAcomm_set h3A hOmegaD hCop (by simpa [D] using hP0D))
+
+/-- BG Lemma 9.5 bridge: the `B` found by the cocyclic `Ω₁(A)` argument is
+also outside the uniqueness class whenever the ambient `SCN₃` subgroup `A` is
+the chosen counterexample. -/
+private theorem exists_nonU_cocyclic_omega1_not_le_cent_inf_opiCoreFitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A M P0 : Subgroup G}
+    (hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x)
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
+    (hP0D : ¬ P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G)) :
+    ∃ B : Subgroup G,
+      ¬ IsUniquelyMaximal B ∧
+      B ≤ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set ∧
+      B ≤ A ∧
+      ¬ IsCyclic ↥B ∧
+      (∃ a ∈ OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set,
+        B ⊔ Subgroup.zpowers a =
+          OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set) ∧
+      ¬ P0 ≤ Subgroup.centralizer
+        (((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ⊓
+            Subgroup.centralizer (B : Set G)) : Set G) := by
+  obtain ⟨B, hBΩ, hBA, hBnc, hcyc, hnot_cent⟩ :=
+    exists_cocyclic_omega1_not_le_cent_inf_opiCoreFitting hAcomm_set hM hA hP0D
+  exact ⟨B,
+    not_isUniquelyMaximal_of_le_scn3_counterexample hG hAcomm_set hA hBA hAnot,
+    hBΩ, hBA, hBnc, hcyc, hnot_cent⟩
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
