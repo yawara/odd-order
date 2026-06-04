@@ -1216,6 +1216,80 @@ private theorem exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_o
   rw [hQeq]
   exact hNPM
 
+/-- A rank-three `q`-subgroup is nontrivial. -/
+private theorem ne_bot_of_isPGroup_of_three_le_rank [Finite G]
+    {q : ℕ} [Fact q.Prime] {B : Subgroup G} (hBq : IsPGroup q B)
+    (hBrank : 3 ≤ rank ↥B) :
+    B ≠ ⊥ := by
+  have h3pRankB : 3 ≤ pRank ↥B q :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hBq hBrank
+  have hq_dvd_B : q ∣ Nat.card B :=
+    (Nat.mem_primeFactors.mp
+      (mem_primeFactors_card_of_pos_pRank (H := ↥B) (p := q) (by omega))).2.1
+  intro hBbot
+  rw [hBbot, Subgroup.card_bot] at hq_dvd_B
+  exact (Fact.out : q.Prime).ne_one (Nat.dvd_one.mp hq_dvd_B)
+
+/-- If a uniquely maximal subgroup `B` lies in both a fixed maximal subgroup `M` and a
+nontrivial `q`-subgroup `Q`, then the normalizer of `Q` lies in `M`.
+
+This is the uniqueness bookkeeping behind BG Lemma 9.5's high-rank `(9.8)` step. -/
+private theorem normalizer_le_maximal_of_isUniquelyMaximal_le [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M B Q : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hBU : IsUniquelyMaximal B)
+    (hBM : B ≤ M) (hBQ : B ≤ Q) (hQne : Q ≠ ⊥)
+    (hQpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Q) :
+    Subgroup.normalizer (Q : Set G) ≤ M := by
+  classical
+  have hQlt : Q < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hQtop
+    have hQp : IsPGroup q Q := isPGroup_of_isPiSubgroup_singleton hQpi
+    have hGp : IsPGroup q G :=
+      (hQtop ▸ hQp : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
+        (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom
+        Subgroup.topEquiv.surjective
+    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    exact hG.notSolvable inferInstance
+  obtain ⟨N, hNco, hQN⟩ := (eq_top_or_exists_le_coatom Q).resolve_left hQlt.ne
+  have hN_eq_M : N = M :=
+    hBU.eq_of_isCoatom_of_le hNco (hBQ.trans hQN) (mem_maximalSubgroups.mp hM) hBM
+  have hQM : Q ≤ M := hQN.trans (le_of_eq hN_eq_M)
+  obtain ⟨L, hL, hNQleL⟩ :=
+    S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal hG hM hQne hQM
+  have hB_le_L : B ≤ L := hBQ.trans (Subgroup.le_normalizer.trans hNQleL)
+  have hL_eq_M : L = M :=
+    hBU.eq_of_isCoatom_of_le (mem_maximalSubgroups.mp hL) hB_le_L
+      (mem_maximalSubgroups.mp hM) hBM
+  exact hNQleL.trans (le_of_eq hL_eq_M)
+
+/-- High-rank `(9.8)` bookkeeping once a rank-three subgroup inside `O_q(M)` has been
+chosen.
+
+Lemma 9.4 makes the rank-three subgroup uniquely maximal; uniqueness then forces the
+normalizer of the chosen `Q ∈ ℋ_G^*(R;q)` into the fixed maximal subgroup `M`. -/
+private theorem normalizer_hInvariantStar_le_maximal_of_rank_three_opiCoreInG_witness
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M R Q : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q)
+    (hQ : Q ∈ hInvariantStar ⊤ R {q}) (hOqQ : opiCoreInG ({q} : Set ℕ) M ≤ Q)
+    (hwit :
+      ∃ B : Subgroup G,
+        IsMulCommutative B ∧ IsPGroup q B ∧ 3 ≤ rank ↥B ∧
+          B ≤ opiCoreInG ({q} : Set ℕ) M) :
+    Subgroup.normalizer (Q : Set G) ≤ M := by
+  classical
+  obtain ⟨B, hBab, hBq, hBrank, hBcore⟩ := hwit
+  have hBU : IsUniquelyMaximal B :=
+    (abelian_rank_three_isUniquelyMaximal_of_fitting hG hM h3Fq) B hBab hBq hBrank
+  have hBM : B ≤ M := hBcore.trans (opiCoreInG_le ({q} : Set ℕ) M)
+  have hBQ : B ≤ Q := hBcore.trans hOqQ
+  have hBne : B ≠ ⊥ := ne_bot_of_isPGroup_of_three_le_rank hBq hBrank
+  have hQne : Q ≠ ⊥ := by
+    intro hQbot
+    exact hBne (le_bot_iff.mp (hBQ.trans (le_of_eq hQbot)))
+  exact normalizer_le_maximal_of_isUniquelyMaximal_le hG hM hBU hBM hBQ hQne
+    (hInvariantStar_isPiSubgroup hQ)
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 

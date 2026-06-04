@@ -583,10 +583,22 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      `q`-subgroup of `G` and its normalizer lies in `M`, then the chosen `Q` has
      `N_G(Q) ≤ M`.
 
-   Remaining subfrontier for this item: derive those `(9.7)` hypotheses from
-   Thm 4.20(c) in the `r(F(M)) ≤ 2` branch, and implement the high-rank
-   `r_q(F(M)) ≥ 3` branch using Lemma 9.4. The high-rank branch likely needs a
-   reusable bridge moving rank-three `q`-subgroups from `F(M)` into `O_q(M)`.
+   The high-rank bookkeeping layer is also now separated:
+
+   - `ne_bot_of_isPGroup_of_three_le_rank` gives nontriviality for rank-three
+     `q`-subgroups.
+   - `normalizer_le_maximal_of_isUniquelyMaximal_le` is the uniqueness argument:
+     if `B ∈ 𝒰`, `B ≤ M`, `B ≤ Q`, and `Q` is a nontrivial `q`-subgroup, then
+     `N_G(Q) ≤ M`.
+   - `normalizer_hInvariantStar_le_maximal_of_rank_three_opiCoreInG_witness`
+     packages the high-rank `(9.8)` side once a rank-three abelian `q`-subgroup
+     `B ≤ O_q(M)` has been supplied; Lemma 9.4 makes this `B` uniquely maximal,
+     and the previous uniqueness bridge forces `N_G(Q) ≤ M`.
+
+   Remaining subfrontier for this item: derive the low-rank `(9.7)` hypotheses from
+   Thm 4.20(c), and prove the missing high-rank witness bridge that moves
+   `r_q(F(M)) ≥ 3` to an explicit rank-three abelian `q`-subgroup inside `O_q(M)`
+   (likely through `O_q(F(M)) ≤ O_q(M)`, rather than an arbitrary `E_q^*(F(M))`).
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
