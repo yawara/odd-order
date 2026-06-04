@@ -745,6 +745,35 @@ theorem card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement {p : ℕ}
   exact Nat.card_congr
     (quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement hG P).toEquiv
 
+/-- The canonical normal `p`-complement preserves the Sylow cardinalities for primes
+`q != p`. -/
+theorem card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (QK : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) (QG : Sylow q G) :
+    Nat.card ↥(QK : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) =
+      Nat.card ↥(QG : Subgroup G) := by
+  classical
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p G))
+  have hcomp : Subgroup.IsComplement' (Ch03.oPiCore {r : ℕ | r ≠ p} G)
+      (P : Subgroup G) := oPiCore_isComplement_of_hasNormalPComplement hG P
+  have hmul : Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G) *
+      Nat.card ↥(P : Subgroup G) = Nat.card G := hcomp.card_mul
+  have hP_q_zero : (Nat.card ↥(P : Subgroup G)).factorization q = 0 := by
+    rw [P.card_eq_multiplicity]
+    refine Nat.factorization_eq_zero_of_not_dvd ?_
+    intro hq_dvd
+    have hq_eq_p : q = p :=
+      (Nat.prime_dvd_prime_iff_eq (Fact.out : q.Prime) (Fact.out : p.Prime)).mp
+        ((Fact.out : q.Prime).dvd_of_dvd_pow hq_dvd)
+    exact hpq hq_eq_p
+  have hfact : (Nat.card G).factorization q =
+      (Nat.card ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).factorization q := by
+    rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne',
+      Finsupp.add_apply, hP_q_zero, add_zero]
+  rw [QK.card_eq_multiplicity, QG.card_eq_multiplicity]
+  exact congrArg (fun n => q ^ n) hfact.symm
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04

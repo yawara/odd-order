@@ -664,7 +664,10 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `O_{r | r != p}(G)`.  The quotient-layer bridge is also covered by
    `S04.quotient_oPiCore_mulEquiv_sylow_of_hasNormalPComplement`,
    `S04.isPGroup_quotient_oPiCore_of_hasNormalPComplement`, and
-   `S04.card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement`.  The
+   `S04.card_quotient_oPiCore_eq_card_sylow_of_hasNormalPComplement`.
+   The `q != p` Sylow-cardinality preservation needed to move induction layers
+   back from the complement is covered by
+   `S04.card_sylow_oPiCore_eq_card_sylow_of_hasNormalPComplement_ne`.  The
    remaining §4 work is therefore to construct that
    characteristic layer/series under the `rank F(M) ≤ 2` hypothesis; the `opCore`
    equality, ambient equality, and `O_q(M) ≠ ⊥` inputs are discharged in Ch01/S09
