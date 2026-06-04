@@ -4100,6 +4100,41 @@ theorem normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot [Finite G]
 noncomputable def sylowInfCard (p : ℕ) [Fact p.Prime] (K M : Subgroup G) : ℕ :=
   Nat.card ↥((default : Sylow p ↥(K ⊓ M)) : Subgroup ↥(K ⊓ M))
 
+/-- `sylowInfCard` is independent of the chosen Sylow subgroup. -/
+theorem sylowInfCard_eq_card [Finite G]
+    (p : ℕ) [Fact p.Prime] (K M : Subgroup G) (R : Sylow p ↥(K ⊓ M)) :
+    sylowInfCard p K M = Nat.card ↥(R : Subgroup ↥(K ⊓ M)) := by
+  unfold sylowInfCard
+  rw [Sylow.card_eq_multiplicity (default : Sylow p ↥(K ⊓ M)),
+    Sylow.card_eq_multiplicity R]
+
+/-- If the local `A` lies in the chosen Sylow subgroup of `H ⊓ M`, then its ambient image
+lies in the ambient image of that Sylow subgroup. -/
+theorem scn3_map_le_sylow_inf_map_of_le
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime] {A : Subgroup ↥M}
+    (hAH : A.map M.subtype ≤ H) {R : Sylow p ↥(H ⊓ M)}
+    (hA_R : (A.map M.subtype).subgroupOf (H ⊓ M) ≤
+      (R : Subgroup ↥(H ⊓ M))) :
+    A.map M.subtype ≤ (R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype := by
+  intro x hx
+  have hx_inf : x ∈ H ⊓ M := ⟨hAH hx, Subgroup.map_subtype_le A hx⟩
+  let xinf : ↥(H ⊓ M) := ⟨x, hx_inf⟩
+  have hx_sub : xinf ∈ (A.map M.subtype).subgroupOf (H ⊓ M) := by
+    rw [Subgroup.mem_subgroupOf]
+    exact hx
+  exact ⟨xinf, hA_R hx_sub, rfl⟩
+
+/-- If the local `A` lies in the chosen Sylow subgroup of `H ⊓ M`, then its ambient image
+normalizes the ambient image of that Sylow subgroup. -/
+theorem scn3_map_le_normalizer_sylow_inf_map_of_le
+    {M H : Subgroup G} {p : ℕ} [Fact p.Prime] {A : Subgroup ↥M}
+    (hAH : A.map M.subtype ≤ H) {R : Sylow p ↥(H ⊓ M)}
+    (hA_R : (A.map M.subtype).subgroupOf (H ⊓ M) ≤
+      (R : Subgroup ↥(H ⊓ M))) :
+    A.map M.subtype ≤
+      Subgroup.normalizer (((R : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) :=
+  (scn3_map_le_sylow_inf_map_of_le hAH hA_R).trans Subgroup.le_normalizer
+
 /-- **BG Theorem 8.1(b)** (mmd L2319-2322): 同じ仮定で `F(M)` が `p`-群なら、`M` の Sylow
 `p`-部分群 `P` は `G` の Sylow `p`-部分群であり、`SCN₃(P)` の各元は `F(M)` に含まれ `𝒰` に属す。
 
@@ -4170,6 +4205,22 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro hZ_map_bot
     exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _
       (H ⊓ M).subtype_injective).mp hZ_map_bot)
+  have hSylowInfCard_H :
+      sylowInfCard p H M = Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) :=
+    sylowInfCard_eq_card p H M Rinf
+  have hHmax_Rinf : ∀ L : Subgroup G, L ∈ maximalSubgroups G →
+      A.map M.subtype ≤ L → L ≠ M →
+      sylowInfCard p L M ≤ Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) := by
+    intro L hL hAL hLM
+    calc
+      sylowInfCard p L M ≤ sylowInfCard p H M := hHmax L hL hAL hLM
+      _ = Nat.card ↥(Rinf : Subgroup ↥(H ⊓ M)) := hSylowInfCard_H
+  have hA_le_Rinf_amb :
+      A.map M.subtype ≤ (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype :=
+    scn3_map_le_sylow_inf_map_of_le hAH hA_Rinf
+  have hA_le_NRinf : A.map M.subtype ≤
+      Subgroup.normalizer (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) :=
+    scn3_map_le_normalizer_sylow_inf_map_of_le hAH hA_Rinf
   obtain ⟨RH, hA_RH⟩ := exists_sylow_containing_scn3_map_of_le P hAP hAH
   have hRH_ne_bot : (RH : Subgroup ↥H) ≠ ⊥ :=
     sylow_ne_bot_of_scn3_map_le P hAP hA hAH hA_RH
