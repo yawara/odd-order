@@ -4106,6 +4106,20 @@ theorem sylow_ne_bot_of_scn3_map_le [Finite G]
   intro hR_bot
   exact hA_H_ne (le_bot_iff.mp (hA_R.trans (le_of_eq hR_bot)))
 
+/-- A `p`-subgroup `K` of `H` is realized as a Sylow `p`-subgroup of `H` once its
+index in `H` is prime to `p`. -/
+theorem exists_sylow_subgroupOf_map_eq_of_not_dvd_index [Finite G]
+    {p : ℕ} [Fact p.Prime] {H K : Subgroup G}
+    (hKp : IsPGroup p K) (hKH : K ≤ H) (hidx : ¬ p ∣ (K.subgroupOf H).index) :
+    ∃ R : Sylow p ↥H, (R : Subgroup ↥H).map H.subtype = K := by
+  have hidx' : ¬ p ∣ (K.comap H.subtype).index := by
+    rwa [Subgroup.comap_subtype]
+  let R : Sylow p ↥H := (hKp.comap_subtype (K := H)).toSylow hidx'
+  refine ⟨R, ?_⟩
+  change ((hKp.comap_subtype (K := H)).toSylow hidx' : Subgroup ↥H).map H.subtype = K
+  rw [(hKp.comap_subtype (K := H)).toSylow_coe hidx', Subgroup.comap_subtype,
+    Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hKH]
+
 /-- If `Z(L(K))`, realized in the ambient group, is nontrivial and normal in a maximal
 subgroup `H`, then its ambient normalizer is exactly `H`. -/
 theorem normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot [Finite G]
@@ -4292,6 +4306,22 @@ theorem sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup [Finite G] (hG : IsMi
     intro x hx
     rcases hx with ⟨xinf, -, rfl⟩
     exact xinf.2.2
+  have hRinf_amb_le_H :
+      (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype ≤ H := by
+    intro x hx
+    rcases hx with ⟨xinf, -, rfl⟩
+    exact xinf.2.1
+  have hRinf_amb_p :
+      IsPGroup p ((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) :=
+    Rinf.isPGroup'.map (H ⊓ M).subtype
+  have hRinfH_of_not_dvd :
+      (¬ p ∣ (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype).subgroupOf H).index) →
+        ∃ RinfH : Sylow p ↥H,
+          (RinfH : Subgroup ↥H).map H.subtype =
+            (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype := by
+    intro hidx
+    exact exists_sylow_subgroupOf_map_eq_of_not_dvd_index
+      hRinf_amb_p hRinf_amb_le_H hidx
   obtain ⟨LRinf, hLRinf, hNRinf_le_LRinf⟩ :=
     exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
       hG hM hRinf_amb_ne_bot hRinf_amb_le_M
