@@ -2544,15 +2544,20 @@ theorem Xset_eq_irreducible_not_subset_characterKernel (hyp : SibleyDadeHypothes
         exact absurd hite hθinner
     rw [← heq]; exact hIndX
 
-/-- **(T8 leaf 1) `X`-member character facts** (Frobenius case).  Every `χ ∈ X = S − S(Z)` is
-non-real (Peterfalvi (1.1), `L` odd) with `‖χ‖² = ‖χ̄‖² = 1` and `⟨χ̄, χ⟩ = ⟨χ, χ̄⟩ = 0`.  These are
-the `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar'` fields of `S07.DadeChainStep`.  Non-triviality is
-read off the (6.6) characterization (`Z ⊄ Ker χ` via `Xset_eq_irreducible_not_subset_characterKernel`,
-so `χ ≠ 1`), then (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`) gives non-realness and
-`irreducibleCharacter_inner_eq_ite` gives the orthonormality. -/
-theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+/-- **(T8 leaf 1) `X`-member character facts**, from the abstract input `X ⊆ Irr L`.
+
+Every `χ ∈ X = S − S(Z)` is non-real (Peterfalvi (1.1), `L` odd) with
+`‖χ‖² = ‖χ̄‖² = 1` and `⟨χ̄, χ⟩ = ⟨χ, χ̄⟩ = 0`.  These are the
+`hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar'` fields of `S07.DadeChainStep`.
+Non-triviality is read off the (6.6) characterization
+(`Z ⊄ Ker χ` via `Xset_eq_irreducible_not_subset_characterKernel`, so `χ ≠ 1`),
+then (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`) gives non-realness and
+`irreducibleCharacter_inner_eq_ite` gives the orthonormality.
+
+This form is shared by the Frobenius case and the case-A `X ⊆ Irr L` bridge. -/
+theorem xMember_characterFacts_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
     {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
     ¬ ClassFunction.IsReal χ ∧
       ClassFunction.inner χ χ = 1 ∧
@@ -2560,13 +2565,11 @@ theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
       ClassFunction.inner χ.conj χ = 0 ∧
       ClassFunction.inner χ χ.conj = 0 := by
   haveI : Fintype ↥H := Fintype.ofFinite _
-  have hirr : IsIrreducibleCharacter χ :=
-    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hirr : IsIrreducibleCharacter χ := hX χ hχX
   have hconjirr : IsIrreducibleCharacter χ.conj := hirr.conj
   -- `Z ⊄ Ker χ` from the (6.6) characterization, hence `χ ≠ 1`.
   have hZker : ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ) := by
-    have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
-      (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+    have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH hX
     rw [hXeq] at hχX
     exact hχX.2
   have hne_triv : (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ≠
@@ -2590,19 +2593,33 @@ theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
   · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ.conj, hconjirr⟩
     rwa [if_neg (fun h => hbi_ne h.symm)] at h
 
-/-- **(T8 leaf 2) `X`-member difference support** (Frobenius case).  For `χ ∈ X = S − S(Z)` the
-conjugate difference `χ̄ − χ` is supported on `H^# = sharpImage H` (the `hdiffsupp` field of
-`S07.DadeChainStep`).  Since `χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H`
-(`support_induce_subset_of_normal`); `χ̄ − χ` vanishes at `1` (the degree `χ(1)` is the real
-`(n : ℂ)`), so it omits `1` and lands in `H ∖ {1}`. -/
-theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
+/-- **(T8 leaf 1) `X`-member character facts** (Frobenius case). -/
+theorem xMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    {Z : Subgroup ↥L} {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 :=
+  hyp.xMember_characterFacts_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hχX
+
+/-- **(T8 leaf 2) `X`-member difference support**, from the abstract input `X ⊆ Irr L`.
+
+For `χ ∈ X = S − S(Z)` the conjugate difference `χ̄ − χ` is supported on
+`H^# = sharpImage H` (the `hdiffsupp` field of `S07.DadeChainStep`).  Since
+`χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H` (`support_induce_subset_of_normal`);
+`χ̄ − χ` vanishes at `1` (the degree `χ(1)` is the real `(n : ℂ)`), so it omits `1`
+and lands in `H ∖ {1}`. -/
+theorem xMember_diffSupport_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
     (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   letI : H.Normal := hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
-  have hirr : IsIrreducibleCharacter χ :=
-    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hirr : IsIrreducibleCharacter χ := hX χ hχX
   have hχS : χ ∈ hyp.S := (hyp.mem_Xset.mp hχX).1
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, -, hχeq⟩ := hχS
@@ -2623,47 +2640,74 @@ theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
-/-- **(T8 leaf 3a) `X` is closed under conjugation** (Frobenius case).  `Z ⊴ L` gives
-`Ker χ̄ = Ker χ` (`characterKernel_conj`), so the (6.6) characterization `X = {χ ∈ Irr L | Z ⊄ Ker χ}`
-is conjugation-invariant.  This is the `ClosedUnderConjugate` input to the degree-monotone
-enumeration of `X` into conjugate pairs (`S07.two_le_ncard_of_conjugate_closed_of_noReal`,
-`S07.exists_monotoneDegreeEnum`). -/
-theorem Xset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+/-- **(T8 leaf 2) `X`-member difference support** (Frobenius case). -/
+theorem xMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    {Z : Subgroup ↥L} {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) :
+    (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+  hyp.xMember_diffSupport_of_irreducible_X
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hχX
+
+/-- **(T8 leaf 3a) `X` is closed under conjugation**, from the abstract input `X ⊆ Irr L`.
+
+`Z ⊴ L` gives `Ker χ̄ = Ker χ` (`characterKernel_conj`), so the (6.6) characterization
+`X = {χ ∈ Irr L | Z ⊄ Ker χ}` is conjugation-invariant.  This is the
+`ClosedUnderConjugate` input to the degree-monotone enumeration of `X` into conjugate pairs
+(`S07.two_le_ncard_of_conjugate_closed_of_noReal`, `S07.exists_monotoneDegreeEnum`). -/
+theorem Xset_closedUnderConjugate_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
     OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) := by
-  have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
-    (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+  have hXeq := hyp.Xset_eq_irreducible_not_subset_characterKernel hZH hX
   intro χ hχX
   rw [hXeq] at hχX ⊢
   refine ⟨hχX.1.conj, ?_⟩
   rw [OddOrder.Peterfalvi.S03.characterKernel_conj]
   exact hχX.2
 
-/-- **(T8 leaf 3b) `X` has no real characters** (Frobenius case).  Every `χ ∈ X` is non-real
-(`xMember_characterFacts`, Peterfalvi (1.1) for `L` odd).  This is the `HasNoRealCharacters` input
-to the conjugate-pair enumeration (with `Xset_closedUnderConjugate`, it gives `χ̄ ≠ χ`, hence the
-pairs `{χ, χ̄}` are genuine 2-element sets and `2 ≤ |X|`). -/
+/-- **(T8 leaf 3a) `X` is closed under conjugation** (Frobenius case). -/
+theorem Xset_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) :=
+  hyp.Xset_closedUnderConjugate_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+
+/-- **(T8 leaf 3b) `X` has no real characters**, from the abstract input `X ⊆ Irr L`. -/
+theorem Xset_hasNoRealCharacters_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
+  fun _ hχX => (hyp.xMember_characterFacts_of_irreducible_X hZH hX hχX).1
+
+/-- **(T8 leaf 3b) `X` has no real characters** (Frobenius case). -/
 theorem Xset_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
-  fun _ hχX => (hyp.xMember_characterFacts hF hZH hχX).1
+  hyp.Xset_hasNoRealCharacters_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
 
-/-- **(T8 leaf 4) `X` is finite** (Frobenius case).  `X = S − S(Z) ⊆ Irr L`
-(`isIrreducibleCharacter_of_mem_Xset_of_frobenius`) and `Irr L` is finite
-(`finite_irreducibleCharacter`).  This is the `hXfin` input to the degree-monotone enumeration
+/-- **(T8 leaf 4) `X` is finite**, from the abstract input `X ⊆ Irr L`.
+
+This is the `hXfin` input to the degree-monotone enumeration
 `S07.exists_monotoneDegreeEnum` and the chain assembly. -/
-theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} :
+theorem xSet_finite_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
     (hyp.Xset Z).Finite := by
   haveI := OddOrder.RepresentationTheory.finite_irreducibleCharacter (G := ↥L)
   have hIrrFin : (irreducibleCharacters ↥L).Finite :=
     (Set.finite_range (fun χ : IrreducibleCharacter ↥L => (χ : ClassFunction ↥L ℂ))).subset
       (fun φ hφ => ⟨⟨φ, mem_irreducibleCharacters.mp hφ⟩, rfl⟩)
   exact hIrrFin.subset
-    (fun χ hχ => mem_irreducibleCharacters.mpr
-      (hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ))
+    (fun χ hχ => mem_irreducibleCharacters.mpr (hX χ hχ))
+
+/-- **(T8 leaf 4) `X` is finite** (Frobenius case). -/
+theorem xSet_finite (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} :
+    (hyp.Xset Z).Finite :=
+  hyp.xSet_finite_of_irreducible_X
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
 
 /-- **(T8 leaf 5) the base block `S₀`**: the minimal-(real-)degree members of `X`.  This is the
 equal-minimal-degree prefix `{χ₁,…,χₖ}` of (6.6), on which (1.1)+(1.4) supplies the base coherence
@@ -2688,20 +2732,29 @@ theorem xBaseBlock_degree_re_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup
       (OddOrder.Peterfalvi.S03.characterDegree χ').re :=
   le_antisymm (hχ.2 χ' hχ'.1) (hχ'.2 χ hχ.1)
 
-/-- The base block is closed under conjugation (Frobenius case): conjugation preserves the degree
-(`characterDegree_conj`) and `X` (`Xset_closedUnderConjugate`).  With the no-real property this makes
-`S₀` contain a conjugate pair, so `2 ≤ |S₀|`. -/
-theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+/-- The base block is closed under conjugation, from the abstract input `X ⊆ Irr L`:
+conjugation preserves the degree (`characterDegree_conj`) and `X`
+(`Xset_closedUnderConjugate_of_irreducible_X`).  With the no-real property this makes `S₀`
+contain a conjugate pair, so `2 ≤ |S₀|`. -/
+theorem xBaseBlock_closedUnderConjugate_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) :
     OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) := by
   intro χ hχ
-  refine ⟨hyp.Xset_closedUnderConjugate hF hZH hχ.1, fun ψ hψ => ?_⟩
+  refine ⟨hyp.Xset_closedUnderConjugate_of_irreducible_X hZH hX hχ.1, fun ψ hψ => ?_⟩
   have hre : (OddOrder.Peterfalvi.S03.characterDegree χ.conj).re =
       (OddOrder.Peterfalvi.S03.characterDegree χ).re := by
     simp [OddOrder.Peterfalvi.S03.characterDegree_conj]
   rw [hre]
   exact hχ.2 ψ hψ
+
+/-- The base block is closed under conjugation (Frobenius case). -/
+theorem xBaseBlock_closedUnderConjugate (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+  hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
 
 /-- A member `χ = Ind_H^L θ` of `S` is supported on `H` (its induced character vanishes off the
 normal subgroup `H`). -/
@@ -2738,41 +2791,52 @@ theorem sMember_diffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
-/-- **(T8 leaf 8) `2 ≤ |S₀|`.**  If `X` is nonempty, its base block `S₀` (minimal-degree members)
-contains a minimal-degree `χ` together with its conjugate `χ̄ ≠ χ` (`Xset_hasNoRealCharacters`,
-`xBaseBlock_closedUnderConjugate`), so `2 ≤ |S₀|`.  This is the `2 ≤ n` input of
-`coherentEqualDegree_fromDade` for the base coherence.  (`X.Nonempty` comes from the broader (6.5)
-reduction context; here it is a hypothesis.) -/
-theorem two_le_xBaseBlock_ncard (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+/-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
+
+If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
+together with its conjugate `χ̄ ≠ χ` (`Xset_hasNoRealCharacters_of_irreducible_X`,
+`xBaseBlock_closedUnderConjugate_of_irreducible_X`), so `2 ≤ |S₀|`. -/
+theorem two_le_xBaseBlock_ncard_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty) :
     2 ≤ (hyp.xBaseBlock Z).ncard := by
-  have hXfin := hyp.xSet_finite hF (Z := Z)
+  have hXfin := hyp.xSet_finite_of_irreducible_X hX
   obtain ⟨χ, hχX, hχmin⟩ := Set.exists_min_image (hyp.Xset Z)
     (fun ψ => (OddOrder.Peterfalvi.S03.characterDegree ψ).re) hXfin hXne
   have hχS₀ : χ ∈ hyp.xBaseBlock Z := ⟨hχX, hχmin⟩
-  have hconjS₀ : χ.conj ∈ hyp.xBaseBlock Z := hyp.xBaseBlock_closedUnderConjugate hF hZH hχS₀
-  have hne : χ.conj ≠ χ := hyp.Xset_hasNoRealCharacters hF hZH hχX
+  have hconjS₀ : χ.conj ∈ hyp.xBaseBlock Z :=
+    hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH hX hχS₀
+  have hne : χ.conj ≠ χ := hyp.Xset_hasNoRealCharacters_of_irreducible_X hZH hX hχX
   have hS₀fin : (hyp.xBaseBlock Z).Finite := hXfin.subset (hyp.xBaseBlock_subset Z)
   have h1 : 1 < (hyp.xBaseBlock Z).ncard :=
     (Set.one_lt_ncard hS₀fin).mpr ⟨χ.conj, hconjS₀, χ, hχS₀, hne⟩
   omega
 
-/-- **(T8 leaf 9) base coherence `IsCoherent τ S₀`.**  The minimal-degree base block
-`S₀ = xBaseBlock Z` is coherent for the real Dade map `tau`.  It is a finite, equal-degree family
-of `≥ 2` irreducible characters of `L` (`exists_finEnum_irreducible`, `xBaseBlock_degree_re_eq` with
-the integer degrees `irreducibleCharacter_apply_one_eq_pos_natCast`, `two_le_xBaseBlock_ncard`) whose
+/-- **(T8 leaf 8) `2 ≤ |S₀|`** (Frobenius case). -/
+theorem two_le_xBaseBlock_ncard (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+    2 ≤ (hyp.xBaseBlock Z).ncard :=
+  hyp.two_le_xBaseBlock_ncard_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hXne
+
+/-- **(T8 leaf 9) base coherence `IsCoherent τ S₀`**, from the abstract input
+`X ⊆ Irr L`.
+
+The minimal-degree base block `S₀ = xBaseBlock Z` is coherent for the real Dade map `tau`.  It is a
+finite, equal-degree family of `≥ 2` irreducible characters of `L`
+(`exists_finEnum_irreducible`, `xBaseBlock_degree_re_eq` with the integer degrees
+`irreducibleCharacter_apply_one_eq_pos_natCast`, `two_le_xBaseBlock_ncard_of_irreducible_X`) whose
 pairwise differences `χⱼ − χ₀` vanish off `H^# = sharpImage H`
 (`sMember_diffSupport_of_charValue_eq`), so the §7 base engine `coherentEqualDegree_fromDade`
 ((6.6) base case, via (1.1)+(1.4)) applies with `A = H^#` — matching
-`tau = dadeIntegralCharacterMap hyp.dade …`.  `(hyp.Xset Z).Nonempty` (from the broader (6.5)
-reduction context; here a hypothesis) supplies the `2 ≤ |S₀|` input.
+`tau = dadeIntegralCharacterMap hyp.dade …`.
 
 `noncomputable def` (not `theorem`): `IsCoherent` carries the isometric extension map as data
 (it lives in `Type`, not `Prop`), exactly like `sibleySetup_is_coherent`/`CoherenceTarget`. -/
-noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+noncomputable def xBaseBlock_isCoherent_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.xBaseBlock Z)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
@@ -2780,10 +2844,9 @@ noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
   -- `IsCoherent` is `Type`-valued (carries the extension map), so the enumeration data must be
   -- extracted with `choose` (via choice), not `obtain` (which would large-eliminate a `Prop ∃`).
   have hS₀fin : (hyp.xBaseBlock Z).Finite :=
-    (hyp.xSet_finite hF (Z := Z)).subset (hyp.xBaseBlock_subset Z)
+    (hyp.xSet_finite_of_irreducible_X hX).subset (hyp.xBaseBlock_subset Z)
   have hS₀irr : ∀ φ ∈ hyp.xBaseBlock Z, IsIrreducibleCharacter φ :=
-    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF
-      (hyp.xBaseBlock_subset Z hφ)
+    fun φ hφ => hX φ (hyp.xBaseBlock_subset Z hφ)
   choose k χ hχinj hrange using exists_finEnum_irreducible hS₀fin hS₀irr
   have hmemS₀ : ∀ j, (χ j : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z :=
     fun j => hrange ▸ Set.mem_range_self j
@@ -2795,7 +2858,7 @@ noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
     have hcard : (hyp.xBaseBlock Z).ncard = k := by
       rw [← hrange, Set.ncard_range_of_injective hcoeinj, Nat.card_eq_fintype_card,
         Fintype.card_fin]
-    have h2 := hyp.two_le_xBaseBlock_ncard hF hZH hXne
+    have h2 := hyp.two_le_xBaseBlock_ncard_of_irreducible_X hZH hX hXne
     omega
   haveI : NeZero k := ⟨by omega⟩
   -- `S₀ ⊆ S`.
@@ -2824,6 +2887,31 @@ noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
     hk2 χ hχinj hdeg hsuppdiff h1notA
   rw [hrange] at hcoh
   exact hcoh
+
+/-- **(T8 leaf 9) base coherence `IsCoherent τ S₀`** (Frobenius case). -/
+noncomputable def xBaseBlock_isCoherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal] (hXne : (hyp.Xset Z).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.xBaseBlock Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.xBaseBlock_isCoherent_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hXne
+
+/-- **(T8 leaf 9, case A) base coherence `IsCoherent τ S₀`.**
+
+This specializes the abstract `X ⊆ Irr L` base-block engine using the case-A irreducibility bridge
+`isIrreducibleCharacter_of_mem_Xset_caseA`. -/
+noncomputable def xBaseBlock_isCoherent_caseA (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hZcentral : Z.subgroupOf H ≤ Subgroup.center ↥H)
+    (hZnorm : ∀ w ∈ hyp.W1, w ∈ Subgroup.normalizer Z)
+    (hZfpf : ∀ w ∈ hyp.W1, w ≠ 1 → Subgroup.centralizer ({w} : Set ↥L) ⊓ Z = ⊥)
+    (hXne : (hyp.Xset Z).Nonempty) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.xBaseBlock Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.xBaseBlock_isCoherent_of_irreducible_X hZH
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_caseA hZH hZcentral hZnorm hZfpf h)
+    hXne
 
 end SibleyDadeHypothesis
 
