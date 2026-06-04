@@ -316,6 +316,12 @@ theorem nat_card_quotient_subgroupOf_map_subtype_eq {H : Subgroup G}
     (QuotientGroup.congr (B.subgroupOf A)
       ((B.map H.subtype).subgroupOf (A.map H.subtype)) eA hmap).toEquiv).symm
 
+/-- Quotienting a subgroup by the ambient bottom subgroup preserves cardinality. -/
+theorem nat_card_quotient_bot_subgroupOf_eq {H : Subgroup G} :
+    Nat.card (H ⧸ ((⊥ : Subgroup G).subgroupOf H)) = Nat.card H := by
+  rw [bot_subgroupOf]
+  exact Nat.card_congr QuotientGroup.quotientBot.toEquiv
+
 /-- A finite quotient by a nontrivial subgroup has strictly smaller cardinality.
 
 This is the induction/minimal-counterexample termination bridge used repeatedly when passing

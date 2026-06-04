@@ -657,8 +657,15 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `∃ PM : Sylow q ↥M, (PM : Subgroup ↥M).Normal`.  The extraction from the final
    characteristic layer of the 4.20(c) series is now covered by
    `Ch01.exists_normal_sylow_of_characteristic_card_eq_sylow` (and its cardinal-power
-   variant).  The normal-complement canonicalization needed inside the induction
-   step is now covered by `S04.normalPComplement_eq_oPiCore_compl` and
+   variant), with S04 extraction packages
+   `exists_normal_sylow_of_exists_characteristic_subgroup_card_sylow`,
+   `exists_normal_sylow_of_characteristic_quotient_bot_card_eq_sylow`,
+   `exists_normal_sylow_of_hasNormalPComplement_ne`, and
+   `exists_normal_sylow_of_hasNormalPComplement_ne_of_characteristic_quotient_bot`.
+   The bottom-quotient cardinal bridge is
+   `Subgroup.nat_card_quotient_bot_subgroupOf_eq`.  The normal-complement
+   canonicalization needed inside the induction step is now covered by
+   `S04.normalPComplement_eq_oPiCore_compl` and
    `S04.oPiCore_isComplement_of_hasNormalPComplement`: any normal `p`-complement
    produced by Thm 4.18(b) can be replaced by the characteristic core
    `O_{r | r != p}(G)`.  The quotient-layer bridge is also covered by

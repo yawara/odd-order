@@ -873,6 +873,69 @@ theorem exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne
           (default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))
           (default : Sylow q G)
 
+/-- A characteristic subgroup with Sylow `q`-cardinality supplies a normal Sylow
+`q`-subgroup.  This is the packaged extraction form used after BG Theorem 4.20(c)
+has produced the last characteristic layer. -/
+theorem exists_normal_sylow_of_exists_characteristic_subgroup_card_sylow
+    {q : ℕ} [Fact q.Prime]
+    (hK :
+      ∃ L : Subgroup G,
+        L.Characteristic ∧ Nat.card ↥L = Nat.card ↥((default : Sylow q G) : Subgroup G)) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  obtain ⟨L, hL_char, hL_card⟩ := hK
+  exact Ch01.exists_normal_sylow_of_characteristic_card_eq_sylow hL_char
+    (default : Sylow q G) hL_card
+
+/-- If a characteristic subgroup has a bottom quotient with Sylow `q`-cardinality,
+then it supplies a normal Sylow `q`-subgroup. -/
+theorem exists_normal_sylow_of_characteristic_quotient_bot_card_eq_sylow
+    {q : ℕ} [Fact q.Prime] {A : Subgroup G} (hA_char : A.Characteristic)
+    (hcard :
+      Nat.card (A ⧸ ((⊥ : Subgroup G).subgroupOf A)) =
+        Nat.card ↥((default : Sylow q G) : Subgroup G)) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  exact exists_normal_sylow_of_exists_characteristic_subgroup_card_sylow
+    ⟨A, hA_char,
+      (Subgroup.nat_card_quotient_bot_subgroupOf_eq (H := A)).symm.trans hcard⟩
+
+/-- If the canonical normal `p`-complement has a characteristic subgroup with
+the `q`-Sylow cardinality, then the ambient group has a normal Sylow `q`-subgroup,
+for `q != p`.
+
+This is the normal-Sylow extraction form of the BG Theorem 4.20(c) induction lift. -/
+theorem exists_normal_sylow_of_hasNormalPComplement_ne
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    (hK :
+      ∃ L : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G),
+        L.Characteristic ∧
+          Nat.card ↥L =
+            Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+              Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal :=
+  exists_normal_sylow_of_exists_characteristic_subgroup_card_sylow
+    (exists_characteristic_subgroup_card_sylow_of_hasNormalPComplement_ne hpq hG hK)
+
+/-- Bottom-quotient version of `exists_normal_sylow_of_hasNormalPComplement_ne`,
+matching the final layer of the characteristic series in BG Theorem 4.20(c). -/
+theorem exists_normal_sylow_of_hasNormalPComplement_ne_of_characteristic_quotient_bot
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : q ≠ p)
+    (hG : Ch05.HasNormalPComplement p G)
+    {A : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)}
+    (hA_char : A.Characteristic)
+    (hcard :
+      Nat.card (A ⧸
+          ((⊥ : Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)).subgroupOf A)) =
+        Nat.card ↥((default : Sylow q ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G)) :
+          Subgroup ↥(Ch03.oPiCore {r : ℕ | r ≠ p} G))) :
+    ∃ Q : Sylow q G, (Q : Subgroup G).Normal := by
+  classical
+  exact exists_normal_sylow_of_hasNormalPComplement_ne hpq hG
+    ⟨A, hA_char,
+      (Subgroup.nat_card_quotient_bot_subgroupOf_eq (H := A)).symm.trans hcard⟩
+
 /-- If a quotient layer inside the canonical normal `p`-complement has the
 `q`-Sylow cardinality, then mapping the layer into the ambient group preserves
 characteristic endpoints and the `q`-Sylow cardinality, for `q != p`.
