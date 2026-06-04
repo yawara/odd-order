@@ -106,7 +106,11 @@ repo `brauer_permutation_lemma'` (BrauerPermutationUnconditional:196) は **inve
   surjectivity/pairwise nonconjugacy の構成を `exists_Yset_linearRepresentativeFamily` で完了。
 - ✅ 2026-06-04: `2 ≤ hyp.Yset.ncard` を `two_le_Yset_ncard` で discharge し、
   cardinality 仮定なしの `coherentYset` まで接続。
-- 残: T6/Y-family を (6.8) 本体へ入れるための case c1/c2 top-level assembly。
+- ✅ 2026-06-04: `X=S-S(H')`, `Y=S(H')` の partition lemma と
+  `coherentS_of_Xset_commutator_Yset_glued` を追加。`coherentYset` を union glue へ差し込む
+  adapter まで接続。
+- 残: T6/Y-family を (6.8) 本体へ入れるための case c1/c2 由来の `X` coherence と
+  orthogonality/generation 入力の構成。
 
 ## 参照
 

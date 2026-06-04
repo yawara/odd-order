@@ -73,6 +73,10 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
       `Yset_closedUnderConjugate` / `two_le_Yset_ncard` / `coherentYset` を追加。S07 の
       `two_le_ncard_of_conjugate_closed_of_noReal` に finite/nonempty/closed/no-real を渡し、
       T6/Y-family coherence の cardinality 仮定を discharge。
+- [x] (2026-06-04) `SsubFiltration_subset_S` / `Xset_union_Yset_eq_S` /
+      `disjoint_Xset_Yset` / `coherentS_of_Xset_commutator_Yset_glued` を追加。`X=S-S(H')` と
+      `Y=S(H')` の set partition を Lean 化し、`coherentYset` を `coherentUnion_of_glued` 経由で
+      `hyp.CoherenceTarget` に差し込む adapter まで接続。
 - [x] build pass: `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 緑、`lake build OddOrder` 緑。
 - 残: `sibleySetup_is_coherent` の **本体 proof** ((6.1)-(6.7), (5.2), (4.6) 等の積み上げ; 別 issue で長期的に)。
   これ自体は (7.10) を書く時点では sorry のまま invoke して進められる。

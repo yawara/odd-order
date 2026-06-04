@@ -2650,6 +2650,61 @@ theorem mem_Xset (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
     φ ∈ hyp.Xset Z ↔ φ ∈ hyp.S ∧ φ ∉ hyp.SsubFiltration Z :=
   Iff.rfl
 
+/-- Every member of the filtration `S(A)` is a member of the ambient set `S`. -/
+theorem SsubFiltration_subset_S (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L} :
+    hyp.SsubFiltration A ⊆ hyp.S := by
+  intro φ hφ
+  rw [hyp.mem_SsubFiltration] at hφ
+  obtain ⟨θ, hθ_ne, _hker, hφeq⟩ := hφ
+  rw [hyp.S_eq]
+  exact ⟨θ, hθ_ne, hφeq⟩
+
+/-- `X(Z) = S - S(Z)` is contained in `S`. -/
+theorem Xset_subset_S (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} :
+    hyp.Xset Z ⊆ hyp.S := by
+  intro φ hφ
+  exact (hyp.mem_Xset.mp hφ).1
+
+/-- `Y = S(H')` is contained in `S`. -/
+theorem Yset_subset_S (hyp : SibleyDadeHypothesis G L H) :
+    hyp.Yset ⊆ hyp.S := by
+  intro φ hφ
+  rw [Yset] at hφ
+  exact hyp.SsubFiltration_subset_S hφ
+
+/-- `X(Z) = S - S(Z)` is disjoint from `S(Z)`. -/
+theorem disjoint_Xset_SsubFiltration
+    (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    Disjoint (hyp.Xset Z) (hyp.SsubFiltration Z) := by
+  rw [Set.disjoint_left]
+  intro φ hφX hφZ
+  exact (hyp.mem_Xset.mp hφX).2 hφZ
+
+/-- `X(Z)` and `S(Z)` partition `S`. -/
+theorem Xset_union_SsubFiltration_eq_S
+    (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
+    hyp.Xset Z ∪ hyp.SsubFiltration Z = hyp.S := by
+  ext φ
+  constructor
+  · intro hφ
+    rcases hφ with hφX | hφZ
+    · exact hyp.Xset_subset_S hφX
+    · exact hyp.SsubFiltration_subset_S hφZ
+  · intro hφS
+    by_cases hφZ : φ ∈ hyp.SsubFiltration Z
+    · exact Or.inr hφZ
+    · exact Or.inl (hyp.mem_Xset.mpr ⟨hφS, hφZ⟩)
+
+/-- The (6.8) sets `X = S - S(H')` and `Y = S(H')` are disjoint. -/
+theorem disjoint_Xset_Yset (hyp : SibleyDadeHypothesis G L H) :
+    Disjoint (hyp.Xset ⁅H, H⁆) hyp.Yset := by
+  simpa [Yset] using hyp.disjoint_Xset_SsubFiltration (Z := ⁅H, H⁆)
+
+/-- The (6.8) sets `X = S - S(H')` and `Y = S(H')` partition `S`. -/
+theorem Xset_union_Yset_eq_S (hyp : SibleyDadeHypothesis G L H) :
+    hyp.Xset ⁅H, H⁆ ∪ hyp.Yset = hyp.S := by
+  simpa [Yset] using hyp.Xset_union_SsubFiltration_eq_S (Z := ⁅H, H⁆)
+
 /-- A nontrivial linear source character induces to a member of `Y = S(H')`.
 
 The witness in `S(H')` is `linearIrreducibleCharacter χ`.  Its kernel contains
@@ -3036,6 +3091,42 @@ noncomputable def coherentYset (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
     OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
   hyp.coherentYset_of_two_le_ncard hyp.two_le_Yset_ncard
+
+/-- Glue `X = S - S(H')` coherence with the internally constructed `Y = S(H')` coherence.
+
+This is the final algebraic assembly shape needed by Peterfalvi (6.8): callers still provide the
+case-dependent `X` coherence and the two orthogonality/agreement inputs, but the `Y` side and the
+set-theoretic rewrite from `X ∪ Y` to `S` are discharged here. -/
+noncomputable def coherentS_of_Xset_commutator_Yset_glued
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆), ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ hyp.Yset,
+      ν v = hyp.coherentYset.extension v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset, ClassFunction.inner u v = 0)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ (hyp.Xset ⁅H, H⁆),
+      ∀ v ∈ Submodule.span ℤ hyp.Yset,
+        ClassFunction.inner (hX.extension u) (hyp.coherentYset.extension v) = 0)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset ⁅H, H⁆)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    hyp.CoherenceTarget := by
+  let hY := hyp.coherentYset
+  have hU : OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau
+      (hyp.Xset ⁅H, H⁆ ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+    OddOrder.Peterfalvi.S07.coherentUnion_of_glued
+      (hX := hX) (hY := hY) ν hagreeX hagreeY hsrc_ortho himg_ortho hgen
+  simpa [hyp.Xset_union_Yset_eq_S] using hU
 
 /-- **(6.8.1), case (c1):** in the Frobenius case every member of `S` is irreducible (hence
 `X ⊆ Irr L`).  By [Is] Thm 6.34 (`isIrreducibleCharacter_induce_of_frobeniusGroup`), inducing any
@@ -5089,4 +5180,3 @@ noncomputable def ofIsCoherent
 end IndChainDecomposition
 
 end OddOrder.Peterfalvi.S08
-

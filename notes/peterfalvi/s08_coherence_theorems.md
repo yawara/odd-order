@@ -1662,5 +1662,17 @@ wiring-size では放電不能**と確定 (各々 真正に新規数学 + interf
 - `SibleyDadeHypothesis.coherentYset`: `coherentYset_of_two_le_ncard` の cardinality 仮定を
   内部で `two_le_Yset_ncard` により discharge した T6/Y-family coherence。
 
-残る T6/Y-family 側の実装境界は、case c1/c2 の top-level assembly へ `coherentYset` を
-差し込むこと。
+### 2026-06-04 pass 14: `X ∪ Y = S` glue adapter
+
+`S08_CoherenceTheorems.lean` に (6.8) capstone 用の純集合 bridge と union adapter を追加:
+
+- `SsubFiltration_subset_S`, `Xset_subset_S`, `Yset_subset_S`
+- `disjoint_Xset_SsubFiltration`, `Xset_union_SsubFiltration_eq_S`
+- `disjoint_Xset_Yset`, `Xset_union_Yset_eq_S` (`X = S - S(H')`, `Y = S(H')`)
+- `SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued`: caller が case-dependent
+  `Xset H'` coherence, agreement, source/image orthogonality, supported-span generation を供給すれば、
+  internally constructed `coherentYset` と `S07.coherentUnion_of_glued` で `hyp.CoherenceTarget`
+  に retarget する。
+
+残る T6/Y-family 側の実装境界は、case c1/c2 からこの adapter の `X` coherence と
+orthogonality/generation 入力を構成すること。
