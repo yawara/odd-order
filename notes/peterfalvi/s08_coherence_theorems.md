@@ -1831,3 +1831,14 @@ algebraを正規化した。既存 `image_weightedDifferenceInput` は
 `inner_chi_zero_image_weightedDifferenceInput` と norm 版を登録した。これは S09 の
 `BetaDecomp` / `weightedNuSum` 側で、(7.10) の Ind-chain package から scalar coefficient
 identity を直接消費するための小さな bridge。全 4 件を `AxiomsCheck` に登録済み。
+
+### 2026-06-04 pass 24: weighted Ind-chain real norm bounds
+
+`IndChainDecomposition` の Parseval identity から、§9 側がそのまま消費できる実数部の不等式を
+2 件追加した。`one_le_weightedOutput_inner_self_re` は `d 0 = 1` により
+`⟪weightedOutput, weightedOutput⟫.re ≥ 1` を返し、
+`inner_chi_zero_image_weightedDifferenceInput_re_nonpos` は norm-normalized な `χ₀` 係数
+identity からその実部が非正であることを返す。
+
+これで (7.10) の weighted Ind-chain package から、S09 の scalar coefficient / norm estimate
+consumer が等式を再展開せずに符号情報を参照できる。

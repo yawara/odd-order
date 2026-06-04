@@ -5574,6 +5574,28 @@ theorem weightedOutput_inner_self_eq_sum_sq
   rw [hinner]
   ring
 
+/-- The weighted output has norm at least `1`, because the reference coefficient is
+`d 0 = 1`. -/
+theorem one_le_weightedOutput_inner_self_re
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    1 ≤ (ClassFunction.inner data.weightedOutput data.weightedOutput).re := by
+  classical
+  rw [data.weightedOutput_inner_self_eq_sum_sq, Complex.re_sum]
+  have hterm_nonneg : ∀ t : Fin n, 0 ≤ (((d t : ℂ) ^ 2).re) := by
+    intro t
+    rw [show ((d t : ℂ) ^ 2) = (((d t : ℝ) ^ 2 : ℝ) : ℂ) by
+      push_cast
+      ring, Complex.ofReal_re]
+    exact sq_nonneg _
+  have hsingle :
+      (((d 0 : ℂ) ^ 2).re) ≤ ∑ t : Fin n, ((d t : ℂ) ^ 2).re :=
+    Finset.single_le_sum (fun t _ => hterm_nonneg t) (by simp)
+  have hzero : (((d 0 : ℂ) ^ 2).re) = 1 := by
+    rw [data.d_zero]
+    norm_num
+  rwa [hzero] at hsingle
+
 /-- The Ind equations combine linearly on Peterfalvi's weighted source difference. -/
 theorem image_weightedDifferenceInput
     {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
@@ -5650,6 +5672,15 @@ theorem inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
       1 - ClassFunction.inner data.weightedOutput data.weightedOutput := by
   rw [data.inner_chi_zero_image_weightedDifferenceInput,
     data.weightedOutput_inner_self_eq_sum_sq]
+
+/-- The reference coefficient of the weighted Ind image has nonpositive real part. -/
+theorem inner_chi_zero_image_weightedDifferenceInput_re_nonpos
+    {ζ : Fin n → ClassFunction L ℂ} {d : Fin n → ℤ}
+    (data : IndChainDecomposition (L := L) (G := G) τ ζ d) :
+    (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re ≤ 0 := by
+  rw [data.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm,
+    Complex.sub_re, Complex.one_re]
+  linarith [data.one_le_weightedOutput_inner_self_re]
 
 /-- Parseval-normalized form of the weighted Ind equation. -/
 theorem image_weightedDifferenceInput_eq_weightedOutput_sub_norm_smul_chi_zero
