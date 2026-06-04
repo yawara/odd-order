@@ -764,6 +764,22 @@ theorem P1_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
     data.P1 ≤ Subgroup.normalizer (hyp.base.U : Set G) := by
   simpa [P1] using data.W2_conj_y_normalizes_U
 
+/-- BG Appendix C, Lemma C.3 Step 3 contradiction endpoint: the conjugate
+prime line `P₁` cannot equal the original prime line `P₀ = W₂`, because `P₁`
+normalizes `U` while `W₂` cannot be contained in `N_G(U)`. -/
+theorem P1_ne_W2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.P1 ≠ hyp.base.W2 := by
+  intro hP1
+  exact data.W2_not_le_normalizer_U (by
+    intro x hxW2
+    exact data.P1_normalizes_U (by simpa [hP1] using hxW2))
+
+/-- The symmetric form of `P1_ne_W2`, useful when BG has derived `P₀ = P₁`. -/
+theorem W2_ne_P1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    hyp.base.W2 ≠ data.P1 := by
+  intro hW2
+  exact data.P1_ne_W2 hW2.symm
+
 /-- The conjugate generator `t` normalizes `U`. -/
 theorem t_normalizes_U {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.t ∈ Subgroup.normalizer (hyp.base.U : Set G) :=

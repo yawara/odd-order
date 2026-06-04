@@ -230,6 +230,9 @@ created: 2026-06-04
   `s_not_normalizes_U` / `W2_not_le_normalizer_U` を公開し、非自明 norm-one unit と
   Step2 generator relation から `P₀` (`W₂`) が `U` を正規化できないことを transport。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 3 `P₁=P₀` contradiction endpoint**:
+  `P1_ne_W2` / `W2_ne_P1` を公開し、`P₁≤N_G(U)` と `W₂⊄N_G(U)` から
+  BG Step3 の `P₁=P₀` 矛盾を直接消費できる形に固定。AxiomsCheck 登録済み。
 - [x] **C.3 Step 3 irreducibility bridge**:
   `subgroup_eq_P_sup_U_of_U_le_of_le_P_sup_U_of_ne_U` を公開し、`U≤X≤PU` かつ
   `X≠U` なら `X=PU` となる BG Step3 の irreducibility 入力を `σ` 経由で transport。
