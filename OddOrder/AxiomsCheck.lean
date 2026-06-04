@@ -1871,6 +1871,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_realDegreeBound
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap

@@ -297,6 +297,11 @@ allowlist):
   **`xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums`** を追加。common `idx`
   + p-power 残差 + degree sort から degree-ratio 用 divisibility を作り、さらに tail/total/head
   算術 chain から `dχ²∣D` を内部構成して `XAdjoinStepInput` へ渡す。
+- **2026-06-04 追記 6**: **`xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums`** を追加。
+  前項の `degreeDivisibilityInputs_of_commonIndex_primePowerData` と `primePowerSums` constructor を接続し、
+  `XAdjoinStepInput` interface から抽象 `hdvd_mem` / `hdvdχ` / `dχ²∣D` 入力をすべて外した。残る入力は
+  member-family の character-theory data、common `idx` + p-power 残差 factorization、degree sort、sum identity、
+  Schur-bound 側の p-power 比較、coprimality などの 6.6 本文由来 data。
 - **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree

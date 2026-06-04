@@ -3886,6 +3886,83 @@ noncomputable def xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePower
     hmemS1 hmembarS1 hmemconjortho hmemortho hdvd_mem hdvdχ
     hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hdvd hDpos
 
+open scoped Classical in
+/-- **(T8.11t) X-adjoin input from common-index p-power degree data.**
+
+This is the `primePowerSums` constructor with the two degree-divisibility predicate inputs
+also derived internally from the (6.6) common-index p-power degree data.  The caller supplies the
+anchor, new-character, and prefix-member factorizations through the same fixed index `idx`, sorted
+natural-degree inequalities, and the tail square-sum divisibility data; no abstract `hdvd_mem`,
+`hdvdχ`, or `dχ ^ 2 ∣ D` arithmetic black boxes remain at this interface. -/
+noncomputable def xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N i : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ k, k < N → (pair k).1 = (χs k : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ k, k < N → (pair k).2 = (χs k : ClassFunction ↥L ℂ).conj)
+    (hpairs : ∀ k, k < N →
+      OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k ⊆ hyp.Xset Z)
+    (hdisj : ∀ k, k < N → Disjoint
+      (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair k)
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair k))
+    (hi : i < N)
+    {hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)}
+    {ι κ : Type} {s : Finset ι} {tailSet : Finset κ}
+    {χmem : ι → IrreducibleCharacter ↥L}
+    {i₁ : ι} {p idx d₁ dχ q qtot c total θ₁ θχ m₁ mχ mq : ℕ}
+    {dmem θmem mmem : ι → ℕ} {θtail : κ → ℕ} {mtail : κ → ℕ}
+    (hcover : ∀ x ∈ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i,
+      ∃ j, j ∈ s ∧ (χmem j : ClassFunction ↥L ℂ) = x)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ j ∈ s, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ j ∈ s,
+      ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hmemS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmembarS1 : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hmemconjortho : ∀ j ∈ s, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+      (χmem j : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ j ∈ s, ∀ l ∈ s,
+      ClassFunction.inner (χmem j : ClassFunction ↥L ℂ) (χmem l : ClassFunction ↥L ℂ) =
+        if j = l then (1 : ℂ) else 0)
+    (hχone : (χs i : ClassFunction ↥L ℂ) 1 = (dχ : ℂ))
+    (hχ₁one : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (d₁ : ℂ))
+    (hmemone : ∀ j ∈ s, (χmem j : ClassFunction ↥L ℂ) 1 = (dmem j : ℂ))
+    (hDsum : ∑ j ∈ s, dmem j * dmem j = D)
+    (hp : 3 ≤ p) (hpos₁ : 0 < d₁)
+    (hq : q = p ^ m) (hdiv : dχ = q * d₁) (hlt : d₁ < dχ) (hDpos : 0 < D)
+    (hidxpos : 0 < idx) (hdχ : dχ = idx * θχ) (hd₁ : d₁ = idx * θ₁)
+    (hdmem : ∀ j ∈ s, dmem j = idx * θmem j)
+    (hθχ : θχ = p ^ mχ) (hθ₁ : θ₁ = p ^ m₁)
+    (hθmem : ∀ j ∈ s, θmem j = p ^ mmem j)
+    (hleχ : d₁ ≤ dχ) (hlemem : ∀ j ∈ s, d₁ ≤ dmem j)
+    (hθtail : ∀ j ∈ tailSet, θtail j = p ^ mtail j)
+    (htail_le : ∀ j ∈ tailSet, idx * θχ ≤ idx * θtail j)
+    (hsum : D + (∑ j ∈ tailSet, (idx * θtail j) * (idx * θtail j)) = total)
+    (hqtot : qtot = p ^ mq) (hθsq_le_qtot : θχ * θχ ≤ qtot)
+    (htotal : total = qtot * c) (hidx_D : idx * idx ∣ D)
+    (hcop : Nat.Coprime idx θχ) :
+    XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i) := by
+  have hdvds :=
+    OddOrder.Peterfalvi.S08.degreeDivisibilityInputs_of_commonIndex_primePowerData
+      (G := ↥L) (χ := χs i) (χ₁ := χmem i₁) (χmem := χmem) (s := s)
+      (p := p) (idx := idx) (d₁ := d₁) (dχ := dχ)
+      (θ₁ := θ₁) (θχ := θχ) (m₁ := m₁) (mχ := mχ)
+      (dmem := dmem) (θmem := θmem) (mmem := mmem)
+      (show 2 ≤ p by omega) hidxpos hχone hχ₁one hmemone hdχ hd₁ hdmem hθχ hθ₁
+      hθmem hleχ hlemem
+  exact hyp.xAdjoinStepInput_of_memberFamily_degreeDivisibility_primePowerSums hZH hX
+    hpair0 hpair1 hpairs hdisj hi hcover hi₁ hmemreal hmemdiffsupp
+    hmemS1 hmembarS1 hmemconjortho hmemortho hdvds.1 hdvds.2
+    hχone hχ₁one hmemone hDsum hp hpos₁ hq hdiv hlt hDpos
+    hidxpos hdχ hθχ hθtail htail_le hsum hqtot hθsq_le_qtot htotal hidx_D hcop
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
