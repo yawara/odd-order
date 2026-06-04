@@ -1685,6 +1685,47 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
     (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_high_pRank
       hG hM.1 h3Fq hRM)
 
+/-- If the overall rank is at least three but the fixed `p`-rank is at most two,
+then some other prime has rank at least three. -/
+private theorem exists_pRank_ge_three_ne_of_rank_ge_three_of_pRank_le_two
+    {H : Type*} [Group H] [Finite H] {p : ℕ} [Fact p.Prime]
+    (hrank : 3 ≤ rank H) (hp : pRank H p ≤ 2) :
+    ∃ q : ℕ, q.Prime ∧ q ≠ p ∧ 3 ≤ pRank H q := by
+  obtain ⟨q, hq, h3q⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := H) (n := 3) (by norm_num) hrank
+  refine ⟨q, hq, ?_, h3q⟩
+  intro hqp
+  subst q
+  omega
+
+/-- BG Lemma 9.5 rank-case normalizer adapter.
+
+The low-rank branch consumes the §4 characteristic Sylow series package, while the
+high-rank branch chooses a prime `q ≠ p` with `r_q(F(M)) ≥ 3` and applies Lemma 9.4. -/
+private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hRM : R ≤ M)
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  by_cases hrank : rank ↥(S08.fittingInG M) ≤ 2
+  · exact normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lowRank
+      hG hM hA hRp hAR hRlt hRM hFp S hpos hterminal_mem
+  · have h3rank : 3 ≤ rank ↥(S08.fittingInG M) := by omega
+    obtain ⟨q, hq, hqp, h3Fq⟩ :=
+      exists_pRank_ge_three_ne_of_rank_ge_three_of_pRank_le_two
+        (H := ↥(S08.fittingInG M)) (p := p) h3rank hFp
+    haveI : Fact q.Prime := ⟨hq⟩
+    exact normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank
+      hG hM hA hRp hAR hRlt hqp hRM h3Fq
+
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
 

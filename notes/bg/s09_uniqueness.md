@@ -644,10 +644,17 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
      that the local Sylow subgroup is normal.
    - `normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank`
      is the high-rank version from `r_q(F(M)) ≥ 3`.
+   - `S09.exists_pRank_ge_three_ne_of_rank_ge_three_of_pRank_le_two` now extracts
+     the BG high-rank choice of a prime `q ≠ p` from `r(F(M)) ≥ 3` together with
+     the rank cut `(9.6)`, and
+     `S09.normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases`
+     performs the low/high normalizer case split.  The low branch consumes the §4
+     characteristic Sylow series package; the high branch chooses `q` internally
+     and invokes the Lemma 9.4 normalizer package.
 
-   Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
-   Sylow normality and wire the BG choice of `q`/case split into these low/high
-   normalizer packages.  The largest-prime selection itself is now covered by
+   Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank
+   characteristic-series endpoint, then wire the rank-case adapter into the Lemma 9.5
+   `R = A` and `R = P` instantiations.  The largest-prime selection itself is now covered by
    `Ch01.exists_max_primeFactor_card_of_nontrivial` (with the Nat-level helper
    `Ch01.exists_max_primeFactor_of_one_lt`), so the low-rank branch can assume the
    chosen `q ∈ π(M)`, `q` prime, and `∀ r ∈ π(M), r ≤ q` without reopening finite
