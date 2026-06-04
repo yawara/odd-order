@@ -478,6 +478,9 @@ S08 には既に `SibleySetup` structure と `CoherenceTarget` abbrev は揃っ�
   - **2026-06-04 追記 2**: `sq_dvd_primePow_of_sq_le` / `sq_dvd_primePow_mul_of_sq_le` を追加。
     `θ=p^m`, `q=p^n`, `θ²≤q` から `θ²∣q` と `θ²∣q*c` を作り、[Is] Cor 2.30 の
     `θᵢ(1)²≤|K:Z|` を p-power 比較で total 側 divisibility へ落とす算術部分を切り出した。
+  - **2026-06-04 追記 3**: `dvd_primePow_of_le` / `dvd_primePow_of_mul_le_mul` /
+    `sq_dvd_sum_sq_mul_const_of_primePow_mul_le` を追加。degree-sort の `idx·θ≤idx·θⱼ` から
+    固定正 `idx` をキャンセルして `θ∣θⱼ` を作り、tail 側 `θ²∣∑(idx·θⱼ)²` まで直接返す。
   - **honest 판정**: 이 producer들은 순수 산술 — 입력 divisibility 는 character-degree 구조의 정직한 귀결
     (additive sum identity, [Is] Cor 2.30, (6.4.c) coprimality). posited 아님.
   - **(6.6) 잔여 (pass-2 leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 (sum identity

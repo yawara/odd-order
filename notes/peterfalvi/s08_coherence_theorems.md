@@ -286,7 +286,11 @@ allowlist):
 - **2026-06-04 追記 3**: **`sq_dvd_primePow_of_sq_le`** / **`sq_dvd_primePow_mul_of_sq_le`** を追加。
   `θ=p^m`, `q=p^n`, `θ²≤q` から `θ²∣q`、さらに `θ²∣q*c` を返し、[Is] Cor 2.30 の
   `θᵢ(1)²≤|K:Z|` を p-power 比較で total 側 divisibility へ落とす算術部分を切り出した。
-- **(6.6) 잔여 (leaf-2 이후)**: 이 두 producer의 *입력* divisibility 생산 — sum identity
+- **2026-06-04 追記 4**: **`dvd_primePow_of_le`** / **`dvd_primePow_of_mul_le_mul`** /
+  **`sq_dvd_sum_sq_mul_const_of_primePow_mul_le`** を追加。degree-sort の `idx·θ≤idx·θⱼ` から
+  固定正 `idx` をキャンセルし、同じ `p` の冪比較で `θ∣θⱼ`、さらに tail 側 `θ²∣∑(idx·θⱼ)²`
+  まで直接返す producer。
+- **(6.6) 잔여 (leaf-2 이후)**: 이 producer들의 *입력* divisibility 생산 — sum identity
   `∑_{j<i}+∑_{j≥i}=|L|-|L:Z|` (column-orthogonality character theory), `θᵢ(1)²∣∑_{j≥i}`
   (`Finset.dvd_sum`+`pow_dvd_pow`), `θᵢ(1)²≤|K:Z|` ([Is] Cor 2.30), `(|L:K|,p)=1` ((6.4.c)) — + degree
   sort + base prefix coherence ((1.1)/(1.4)). 상세는 issue 0046 pass-2 leaf 2.

@@ -1907,10 +1907,10 @@ The `hdvd` hypothesis of `two_mul_degree_lt_sum_ratCast` (`dᵢ² ∣ D`, i.e.
 * (L80, combine)       hence `θᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²` (the additive complement);
 * (L80, coprime)       `(|L:K|, p) = 1` and `χᵢ(1) = |L:K|·θᵢ(1)` give `χᵢ(1)² ∣ ∑_{j<i}χⱼ(1)²`.
 
-The two purely arithmetic load-bearing steps — the additive complement and the coprimality
-forcing — are isolated below.  They take honest divisibility data (consequences of the
-character-degree structure; the sum identity is an *additive* equation, sidestepping `ℕ`
-truncated subtraction) and are not posited. -/
+The arithmetic load-bearing steps below isolate the additive complement, coprimality forcing,
+tail-sum divisibility, and total-side p-power divisibility.  They take honest divisibility data
+(consequences of the character-degree structure; the sum identity is an *additive* equation,
+sidestepping `ℕ` truncated subtraction) and are not posited. -/
 
 /-- **Peterfalvi (6.6): additive complement of a divisor (ℕ).**
 
@@ -1977,6 +1977,44 @@ theorem sq_dvd_sum_sq_mul_of_dvd
   refine ⟨(idx j * a) * (idx j * a), ?_⟩
   rw [ha]
   ring
+
+/-- **Peterfalvi (6.6): divisibility of p-power degrees from monotonicity (ℕ).**
+
+If two p-power degree factors use the same base `p ≥ 2`, then the weak degree order
+`θ ≤ θ'` implies `θ ∣ θ'`.  This is the arithmetic core behind the tail assertion
+`θᵢ(1) ∣ θⱼ(1)` after the (6.6) degree sort. -/
+theorem dvd_primePow_of_le
+    {p θ θ' m n : ℕ} (hp : 2 ≤ p)
+    (hθ : θ = p ^ m) (hθ' : θ' = p ^ n) (hle : θ ≤ θ') :
+    θ ∣ θ' := by
+  rw [hθ, hθ'] at hle ⊢
+  have hexp : m ≤ n :=
+    (Nat.pow_le_pow_iff_right (show 1 < p by omega)).mp hle
+  exact Nat.pow_dvd_pow p hexp
+
+/-- **Peterfalvi (6.6): cancelling the common induction index in p-power degrees (ℕ).**
+
+The (6.6) sort compares induced degrees `idx·θ`.  Since `idx = |L:K|` is positive and fixed,
+`idx·θ ≤ idx·θ'` reduces to `θ ≤ θ'`, and p-power comparison gives `θ ∣ θ'`. -/
+theorem dvd_primePow_of_mul_le_mul
+    {p idx θ θ' m n : ℕ} (hp : 2 ≤ p) (hidx : 0 < idx)
+    (hθ : θ = p ^ m) (hθ' : θ' = p ^ n) (hle : idx * θ ≤ idx * θ') :
+    θ ∣ θ' :=
+  dvd_primePow_of_le hp hθ hθ' (Nat.le_of_mul_le_mul_left hle hidx)
+
+/-- **Peterfalvi (6.6): tail square-divisibility from sorted p-power degrees (ℕ).**
+
+A consumer-facing form of the tail step: if every tail degree factor `θdeg j` is a p-power
+and the sorted induced degrees satisfy `idx·θ ≤ idx·θdeg j`, then `θ²` divides the tail sum
+`∑ (idx·θdeg j)²`. -/
+theorem sq_dvd_sum_sq_mul_const_of_primePow_mul_le
+    {ι : Type*} (s : Finset ι) {p idx θ : ℕ} {θdeg : ι → ℕ}
+    {m : ℕ} {n : ι → ℕ} (hp : 2 ≤ p) (hidx : 0 < idx)
+    (hθ : θ = p ^ m) (hθdeg : ∀ j ∈ s, θdeg j = p ^ n j)
+    (hle : ∀ j ∈ s, idx * θ ≤ idx * θdeg j) :
+    θ * θ ∣ ∑ j ∈ s, (idx * θdeg j) * (idx * θdeg j) := by
+  exact sq_dvd_sum_sq_mul_of_dvd s (θ := θ) (idx := fun _ ↦ idx) (θdeg := θdeg)
+    (fun j hj ↦ dvd_primePow_of_mul_le_mul hp hidx hθ (hθdeg j hj) (hle j hj))
 
 /-- **Peterfalvi (6.6): p-power square divisibility from a square bound (ℕ).**
 
