@@ -710,6 +710,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    the endpoint lemmas `lift_oPiCore_segment_top_eq`/`bot_eq`,
    `S04.CharacteristicSylowSegment.consTop`, and
    `S04.CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
+   The consumer-side extraction from a completed series is now covered by
+   `S04.CharacteristicSylowStep.exists_normal_sylow_of_lower_eq_bot`,
+   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_step_lower_eq_bot`,
+   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_step_term_eq_bot`, and
+   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_terminal_step`.
    This packages the BG induction pattern: lift the characteristic factors from
    `K = O_{r | r != p1}(G)` and attach the top `G/K` Sylow factor.  The ambient
    normal-complement lift is now covered by

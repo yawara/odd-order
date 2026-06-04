@@ -1341,6 +1341,14 @@ def ofLayer {q : ℕ} [Fact q.Prime] (L : CharacteristicSylowLayer G q) :
     (L : CharacteristicSylowLayer G q) :
     (ofLayer L).lower = L.lower := rfl
 
+/-- A labelled step whose lower endpoint is bottom supplies a normal Sylow
+subgroup for its label. -/
+theorem exists_normal_sylow_of_lower_eq_bot (S : CharacteristicSylowStep G)
+    (hlower : S.lower = ⊥) : ∃ Q : Sylow S.q G, (Q : Subgroup G).Normal := by
+  haveI : Fact S.q.Prime := S.q_prime
+  exact CharacteristicSylowLayer.exists_normal_sylow_of_lower_eq_bot S.layer
+    (by simpa [lower] using hlower)
+
 end CharacteristicSylowStep
 
 /-- A finite characteristic Sylow series in the form used by BG Theorem 4.20(c).
@@ -1457,6 +1465,29 @@ def toSegment (S : CharacteristicSylowSeries G) : CharacteristicSylowSegment G :
     step := S.step
     upper_eq := S.upper_eq
     lower_eq := S.lower_eq }
+
+/-- Any step of a characteristic Sylow series whose lower endpoint is bottom
+supplies a normal Sylow subgroup for that step's label. -/
+theorem exists_normal_sylow_of_step_lower_eq_bot
+    (S : CharacteristicSylowSeries G) (i : Fin S.length)
+    (hlower : (S.step i).lower = ⊥) :
+    ∃ Q : Sylow (S.step i).q G, (Q : Subgroup G).Normal :=
+  CharacteristicSylowStep.exists_normal_sylow_of_lower_eq_bot (S.step i) hlower
+
+/-- A step whose lower series term is bottom supplies a normal Sylow subgroup. -/
+theorem exists_normal_sylow_of_step_term_eq_bot
+    (S : CharacteristicSylowSeries G) (i : Fin S.length)
+    (hterm : S.term i.succ = ⊥) :
+    ∃ Q : Sylow (S.step i).q G, (Q : Subgroup G).Normal :=
+  exists_normal_sylow_of_step_lower_eq_bot S i ((S.lower_eq i).trans hterm)
+
+/-- The terminal step of a characteristic Sylow series supplies a normal Sylow
+subgroup for its label. -/
+theorem exists_normal_sylow_of_terminal_step
+    (S : CharacteristicSylowSeries G) (i : Fin S.length)
+    (hi : i.succ = Fin.last S.length) :
+    ∃ Q : Sylow (S.step i).q G, (Q : Subgroup G).Normal :=
+  exists_normal_sylow_of_step_term_eq_bot S i (by rw [hi, S.bot_eq])
 
 /-- Lift the induction series inside the canonical normal `p`-complement to an
 ambient segment in `G`.  Its top endpoint is `O_{p-prime}(G)`, not `G`; the top
