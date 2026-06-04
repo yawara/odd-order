@@ -536,6 +536,29 @@ theorem normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe
     _ = data.t * data.sigma (SemidirectProduct.inr u) * data.t⁻¹ := by
       rw [data.normOneUnitsEquivU_apply_coe]
 
+/-- The `twistedInv` operation in the norm-one C.3 interface is ambient
+conjugation by `t` applied to the inverse complement element. -/
+theorem normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    (data.normOneUnitsEquivU
+        (OddOrder.BG.AppC.NormSet.twistedInv data.tConjNormOneUnitsAut u) : G) =
+      data.t * data.sigma (SemidirectProduct.inr u⁻¹) * data.t⁻¹ := by
+  simpa [OddOrder.BG.AppC.NormSet.twistedInv] using
+    data.normOneUnitsEquivU_tConjNormOneUnitsAut_apply_coe u⁻¹
+
+/-- To produce the S16 AppC C.3 interface it is enough to prove the norm-set
+step for the concrete automorphism induced by conjugation with `t`. -/
+theorem appC_twisted_normOne_step_of_tConjNormOneUnitsAut
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
+        (p := hyp.base.p) (q := hyp.base.q) data.tConjNormOneUnitsAut →
+      appCNormSetTwistedNormOneStep hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hstep
+  exact ⟨data.tConjNormOneUnitsAut, data.tConjNormOneUnitsAut_pow_p_eq_one, hstep⟩
+
 /-- The conjugate generator `t` also normalizes `Q`. -/
 theorem t_normalizes_Q {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
     data.t ∈ Subgroup.normalizer (hyp.base.Q : Set G) := by

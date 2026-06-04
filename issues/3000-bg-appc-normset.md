@@ -202,6 +202,9 @@ created: 2026-06-04
   `σ` で Peterfalvi の `U` へ運ぶ `normOneUnitsEquivU` を作成し、
   `t ∈ N_G(U)` から `tConjUAut` / `tConjNormOneUnitsAut` を theorem 化。
   `σ(inr u)` に対する ambient conjugation 公式も rewrite 可能にした。
+- [x] **C.3 Step 4 twisted t-action bridge**: `normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe` と
+  `appC_twisted_normOne_step_of_tConjNormOneUnitsAut` を公開し、残りの producer を
+  concrete `t` 共役が `E` を保つことに縮約。AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 p-power action seed**: `fieldNormalizerPrimeLineGenerator_pow_p`、
   `s_pow_p_eq_one`、`t_pow_p_eq_one`、`tConjUAut_pow_p_eq_one`、
   `tConjNormOneUnitsAut_pow_p_eq_one` を追加し、BG Step4 の `t`-conjugation action が

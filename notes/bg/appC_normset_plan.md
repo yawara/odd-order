@@ -318,6 +318,9 @@ derived theorem 化済み。続いて `P1 = W₂^y` と `t = s^y` (Lean left-con
 `normOneUnits` から Peterfalvi `U` への `normOneUnitsEquivU` と、`t∈N_G(U)` 由来の
 `tConjUAut` / `tConjNormOneUnitsAut`、および `σ(inr u)` の ambient conjugation 公式を
 追加し、BG 最後の `(a⁻¹)^{t^3}` を concrete complement 側の automorphism として扱う入口を固定した。
+さらに `normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe` と
+`appC_twisted_normOne_step_of_tConjNormOneUnitsAut` により、S16 producer を concrete `t` 共役が
+`E` を保つことへ縮約した。
 さらに prime-line generator と conjugate `t` の p 乗が 1 であること、そこから `U` と concrete
 `normOneUnits` 上の `t`-conjugation automorphism も p 乗で恒等になることを theorem 化した。
 また `a∈E` から concrete norm-one unit および pair `(a,2-a)` を作る
