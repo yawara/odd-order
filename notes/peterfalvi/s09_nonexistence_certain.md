@@ -617,3 +617,14 @@ weighted source-difference の exact image equation と complex scalar coefficie
 
 前回追加した real Parseval / nonpos consumer と合わせて、§9 側は `data := ...` を手で組み立てず、
 exact identity と実数不等式の両方を H78 表記から呼べる。
+
+### 2026-06-05 pass: H78 raw Ind-chain weighted identities
+
+S09 に `Hypothesis78.indChain_image_weightedDifferenceInput_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_of_isCoherent`,
+`Hypothesis78.indChain_one_le_weightedOutput_inner_self_re_of_isCoherent` を追加した。
+S08 の生の weighted source-difference 展開、reference coefficient の `1 - ∑ d_t²` 形、
+および `d 0 = 1` からの weighted output norm 下界を H78/S07 witness 入力列から直接返す。
+
+これで downstream は normal form へ集約する前の Ind 方程式も、S09 の `Hypothesis78`
+インターフェイスだけで参照できる。
