@@ -3200,6 +3200,72 @@ private theorem p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
     hG hA hAnot hBA hyB hL hM.1 hLM hPp hAP hPnormA hNPM hP0p hP0N
     (hSP (hBA hyB) hL) hnot_cent
 
+/-- If a rank-three abelian subgroup of `F(M)` centralizes a nontrivial `P₀ ≤ M`,
+then uniqueness forces `N_G(P₀) ≤ M`.
+
+This is the high-rank bookkeeping used in BG Lemma 9.5 after `(9.11)`: Lemma 9.4
+puts the rank-three witness in `𝒰`, and every maximal subgroup over `N_G(P₀)`
+also contains that witness. -/
+private theorem normalizer_le_maximal_of_rank_three_fitting_centralizer_witness
+    [Finite G] (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime]
+    {M U P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hUab : IsMulCommutative U) (hUq : IsPGroup q U) (hUrank : 3 ≤ rank ↥U)
+    (hUF : U ≤ S08.fittingInG M)
+    (hUcentP0 : U ≤ Subgroup.centralizer (P0 : Set G))
+    (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥) :
+    Subgroup.normalizer (P0 : Set G) ≤ M := by
+  classical
+  let N0 : Subgroup G := Subgroup.normalizer (P0 : Set G)
+  have h3Uq : 3 ≤ pRank ↥U q :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hUq hUrank
+  have h3Fq : 3 ≤ pRank ↥(S08.fittingInG M) q :=
+    h3Uq.trans
+      (pRank_le_of_injective (f := Subgroup.inclusion hUF)
+        (Subgroup.inclusion_injective hUF))
+  have hUU : IsUniquelyMaximal U :=
+    (abelian_rank_three_isUniquelyMaximal_of_fitting hG hM h3Fq)
+      U hUab hUq hUrank
+  have hUM : U ≤ M := hUF.trans (S08.fittingInG_le M)
+  have hU_le_N0 : U ≤ N0 :=
+    hUcentP0.trans (Subgroup.centralizer_le_normalizer (P0 : Set G))
+  have hN0lt : N0 < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hN0top
+    haveI : P0.Normal := Subgroup.normalizer_eq_top_iff.mp hN0top
+    rcases hG.simple.eq_bot_or_eq_top_of_normal P0 inferInstance with hP0bot | hP0top
+    · exact hP0ne hP0bot
+    · have htop_le_M : (⊤ : Subgroup G) ≤ M := by
+        rw [← hP0top]
+        exact hP0M
+      exact (mem_maximalSubgroups.mp hM).lt_top.ne (eq_top_iff.mpr htop_le_M)
+  obtain ⟨N, hNco, hN0N⟩ :=
+    (eq_top_or_exists_le_coatom N0).resolve_left hN0lt.ne
+  have hUN : U ≤ N := hU_le_N0.trans hN0N
+  have hN_eq_M : N = M :=
+    hUU.eq_of_isCoatom_of_le hNco hUN (mem_maximalSubgroups.mp hM) hUM
+  exact hN0N.trans (le_of_eq hN_eq_M)
+
+/-- The same normalizer-control bridge specialized to
+`D = O_{p'}(F(M))`. -/
+private theorem normalizer_le_maximal_of_rank_three_opiCoreFitting_centralizer_witness
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime]
+    {M U P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hUab : IsMulCommutative U) (hUq : IsPGroup q U) (hUrank : 3 ≤ rank ↥U)
+    (hUD : U ≤ opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M))
+    (hP0centD : P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G))
+    (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥) :
+    Subgroup.normalizer (P0 : Set G) ≤ M := by
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  have hDcentP0 : D ≤ Subgroup.centralizer (P0 : Set G) := by
+    simpa [D] using (Subgroup.le_centralizer_iff.mp hP0centD)
+  exact normalizer_le_maximal_of_rank_three_fitting_centralizer_witness
+    hG hM hUab hUq hUrank
+    (hUD.trans (by simpa [D] using opiCoreInG_le ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
+    (hUD.trans hDcentP0) hP0M hP0ne
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
