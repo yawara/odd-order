@@ -1576,6 +1576,28 @@ private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_normal_local
     (exists_hInvariantStar_containing_opiCoreInG_with_normalizer_le_of_normal_local_sylow
       hG hM.1 PM hPMnorm hqM hRM)
 
+/-- Low-rank normalizer step when §4 supplies a positive-length characteristic
+Sylow series for the local maximal subgroup. -/
+private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_characteristicSylowSeries
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A M R : Subgroup G}
+    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
+    (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
+    (hRlt : R < ⊤) (hRM : R ≤ M)
+    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
+    (hterminal_mem :
+      ∀ i : Fin S.length,
+        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors)
+    (hterminal_ne :
+      ∀ i : Fin S.length, i.succ = Fin.last S.length → (S.step i).q ≠ p) :
+    Subgroup.normalizer (R : Set G) ≤ M := by
+  classical
+  obtain ⟨i, hi, PM, hPMnorm⟩ :=
+    OddOrder.BG.Ch1.S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos S hpos
+  haveI : Fact (S.step i).q.Prime := (S.step i).q_prime
+  exact normalizer_le_maximal_of_scn3Global_intermediate_of_normal_local_sylow
+    hG hM hA hRp hAR hRlt (hterminal_ne i hi) hRM PM hPMnorm (hterminal_mem i hi)
+
 /-- High-rank version of the BG Lemma 9.5 normalizer step, using Lemma 9.4 through the
 rank-three witness inside `O_q(M)`. -/
 private theorem normalizer_le_maximal_of_scn3Global_intermediate_of_high_pRank

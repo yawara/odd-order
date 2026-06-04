@@ -716,7 +716,11 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
    `S04.CharacteristicSylowSeries.exists_normal_sylow_of_step_term_eq_bot`,
    `S04.CharacteristicSylowSeries.exists_normal_sylow_of_terminal_step`,
    `S04.CharacteristicSylowSeries.exists_terminal_step_of_length_pos`, and
-   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos`.
+   `S04.CharacteristicSylowSeries.exists_normal_sylow_of_length_pos`.  The §9
+   consumer is
+   `S09.normalizer_le_maximal_of_scn3Global_intermediate_of_characteristicSylowSeries`,
+   which feeds the extracted terminal normal local Sylow subgroup into the existing
+   low-rank normalizer step.
    This packages the BG induction pattern: lift the characteristic factors from
    `K = O_{r | r != p1}(G)` and attach the top `G/K` Sylow factor.  The ambient
    normal-complement lift is now covered by
