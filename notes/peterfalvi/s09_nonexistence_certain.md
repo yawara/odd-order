@@ -595,3 +595,14 @@ S09 に `Hypothesis78.indChainDecomposition_of_isCoherent` を追加した。
 
 これで S08 側に積み上げた weighted Ind-chain Parseval / scalar coefficient API を、S09 の
 `Hypothesis78` 表記から直接起動できる。
+
+### 2026-06-05 pass: H78 Ind-chain weighted consumers
+
+S09 に `Hypothesis78.indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq_of_isCoherent`,
+`Hypothesis78.indChain_inner_chi_zero_image_weightedDifferenceInput_re_nonpos_of_isCoherent` を追加した。
+前回の `Hypothesis78.indChainDecomposition_of_isCoherent` で作った S08 `IndChainDecomposition` を、
+S09/H78 の引数列から直接 S08 weighted Parseval / scalar coefficient API に渡す consumer 形。
+
+これで downstream の (7.8)/(7.10) 側は、H78 の `ν` と concrete `IsCoherent` witness だけを持っていれば、
+`data := ...` を毎回組み立てずに weighted output norm と weighted source-difference の非正性を使える。

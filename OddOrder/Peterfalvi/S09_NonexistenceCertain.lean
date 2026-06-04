@@ -1501,6 +1501,84 @@ noncomputable def indChainDecomposition_of_isCoherent
   image_eq t := by
     rw [← hcoh.extends_on_supported _ (hsupp t), LinearMap.map_sub, map_zsmul, ← hnu]
 
+/-- H78-facing real Parseval form for the S08 weighted Ind-chain output.
+
+This consumes the same concrete S07 coherence witness as
+`indChainDecomposition_of_isCoherent`, then immediately applies the S08 weighted
+output norm identity to the resulting Ind-chain package. -/
+theorem indChain_weightedOutput_inner_self_re_eq_sum_sq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner data.weightedOutput data.weightedOutput).re =
+      ∑ t : Fin n, (d t : ℝ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner data.weightedOutput data.weightedOutput).re =
+    ∑ t : Fin n, (d t : ℝ) ^ 2
+  exact data.weightedOutput_inner_self_re_eq_sum_sq
+
+/-- H78-facing real scalar-coefficient form for the weighted Ind-chain source
+difference. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re =
+      1 - ∑ t : Fin n, (d t : ℝ) ^ 2 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re =
+    1 - ∑ t : Fin n, (d t : ℝ) ^ 2
+  exact data.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
+
+/-- H78-facing nonpositivity form for the weighted Ind-chain source difference. -/
+theorem indChain_inner_chi_zero_image_weightedDifferenceInput_re_nonpos_of_isCoherent
+    (H78 : Hypothesis78 G A L)
+    {A_prime : Set L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ H78.sourceSet A_prime)
+    (hnu : H78.nu = hcoh.extension)
+    {n : ℕ} [NeZero n] {ζ : Fin n → ClassFunction L ℂ}
+    (hζ_mem : ∀ t, ζ t ∈ H78.sourceSet)
+    (hζ_norm : ∀ t, ClassFunction.inner (ζ t) (ζ t) = 1)
+    (hζ_pairwise : ∀ ⦃t u : Fin n⦄, t ≠ u →
+      ClassFunction.inner (ζ t) (ζ u) = 0)
+    {d : Fin n → ℤ} (hd_zero : d 0 = 1)
+    (hsupp : ∀ t, ζ t - (d t) • ζ 0 ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) H78.sourceSet A_prime) :
+    let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+      hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+    (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re ≤ 0 := by
+  let data := H78.indChainDecomposition_of_isCoherent hcoh hnu
+    hζ_mem hζ_norm hζ_pairwise hd_zero hsupp
+  change (ClassFunction.inner (data.χ 0) (τ data.weightedDifferenceInput)).re ≤ 0
+  exact data.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
+
 /-- If the abstract `ν` carried by `Hypothesis78` is identified with a concrete
 S07 coherent extension, then `ν` sends the coherent lattice `ℤ[S]` into virtual
 irreducible characters of `G`.
