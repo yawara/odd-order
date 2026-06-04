@@ -560,6 +560,22 @@ theorem normSetE_frobenius_pair [Fact p.Prime] (hq : q ≠ 0)
   refine ⟨normSetE_pow_p p q hq ha, normSetE_pow_p p q hq hb, ?_⟩
   rw [add_pow_p p q, hsum, pow_p_natCast_two p q]
 
+/-- **BG Appendix C, Lemma C.3, Step 4**: under condition (A), a norm-one
+unit whose `(p - 1)`-st power is trivial is itself trivial.  This is the
+finite-group form of the line `w_i^{p-1}=1`, hence `w_i=1` by (A). -/
+theorem normOneUnits_eq_one_of_pow_sub_one_eq_one [Fact p.Prime] (hq : q.Prime)
+    (hA : Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1))
+    (u : normOneUnits p q) (hu : u ^ (p - 1) = 1) :
+    u = 1 := by
+  have hcard : Nat.card (normOneUnits p q) = (p ^ q - 1) / (p - 1) :=
+    normOneUnits_card p q hq.ne_zero
+  have horder_card : orderOf u ∣ (p ^ q - 1) / (p - 1) := by
+    simpa [hcard] using orderOf_dvd_natCard u
+  have horder_p : orderOf u ∣ p - 1 := orderOf_dvd_of_pow_eq_one hu
+  have horder_one : orderOf u = 1 :=
+    Nat.eq_one_of_dvd_coprimes hA horder_card horder_p
+  exact orderOf_eq_one_iff.mp horder_one
+
 /-! ### The Frobenius semidirect product `P ⋊ U` for Lemma C.2 -/
 
 /-- The additive group of `𝔽_{p^q}`, written multiplicatively so it can be the

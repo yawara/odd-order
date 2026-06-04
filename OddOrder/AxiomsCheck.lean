@@ -1923,6 +1923,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.two_sub_pow_p
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_pow_p
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normSetE_frobenius_pair
+#assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_pow_sub_one_eq_one
 
 -- BG App C Lemma C.2 q≥5 setup: the concrete Frobenius group `P ⋊ U` action
 -- conjugates additive-kernel elements by field multiplication.
