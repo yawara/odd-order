@@ -3266,6 +3266,73 @@ private theorem normalizer_le_maximal_of_rank_three_opiCoreFitting_centralizer_w
     (hUD.trans (by simpa [D] using opiCoreInG_le ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
     (hUD.trans hDcentP0) hP0M hP0ne
 
+/-- A high `q`-rank inside `D = O_{p'}(F(M))` supplies the rank-three witness
+needed to force `N_G(P₀) ≤ M`.
+
+This packages the high-rank half of BG Lemma 9.5's `(9.12)` after `P₀` has
+been shown to centralize `D`. -/
+private theorem normalizer_le_maximal_of_three_le_pRank_opiCoreFitting_centralizer
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p q : ℕ} [Fact q.Prime]
+    {M P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (h3Dq : 3 ≤ pRank
+      ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) q)
+    (hP0centD : P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G))
+    (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥) :
+    Subgroup.normalizer (P0 : Set G) ≤ M := by
+  classical
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  obtain ⟨U, hUmax, hUrank⟩ :=
+    exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank
+      (H := D) (by simpa [D] using h3Dq)
+  have hUea : U.IsElementaryAbelian q :=
+    S08.isMaxElemAbelianIn_isElementaryAbelian hUmax
+  exact normalizer_le_maximal_of_rank_three_opiCoreFitting_centralizer_witness
+    hG hM (IsMulCommutative.of_comm hUea.comm) hUea.isPGroup hUrank
+    (by simpa [D] using S08.isMaxElemAbelianIn_le hUmax)
+    hP0centD hP0M hP0ne
+
+/-- Rank-three `D = O_{p'}(F(M))` form of the normalizer-control bridge. -/
+private theorem normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralizer
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (h3D : 3 ≤ rank
+      ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
+    (hP0centD : P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G))
+    (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥) :
+    Subgroup.normalizer (P0 : Set G) ≤ M := by
+  classical
+  let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
+  obtain ⟨q, hq, h3Dq⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := ↥D) (n := 3) (by norm_num)
+      (by simpa [D] using h3D)
+  haveI : Fact q.Prime := ⟨hq⟩
+  exact normalizer_le_maximal_of_three_le_pRank_opiCoreFitting_centralizer
+    (G := G) (p := p) (q := q) hG hM (by simpa [D] using h3Dq)
+    hP0centD hP0M hP0ne
+
+/-- Contrapositive rank squeeze for BG Lemma 9.5's `(9.12)`: once `P₀`
+centralizes `D = O_{p'}(F(M))`, failure of `N_G(P₀) ≤ M` forces `rank D ≤ 2`. -/
+private theorem rank_opiCoreFitting_le_two_of_centralizer_of_not_normalizer_le
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {M P0 : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hP0centD : P0 ≤ Subgroup.centralizer
+      ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G))
+    (hP0M : P0 ≤ M) (hP0ne : P0 ≠ ⊥)
+    (hnot : ¬ Subgroup.normalizer (P0 : Set G) ≤ M) :
+    rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2 := by
+  by_contra hrank
+  have h3D : 3 ≤ rank
+      ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) := by
+    omega
+  exact hnot
+    (normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralizer
+      hG hM h3D hP0centD hP0M hP0ne)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
