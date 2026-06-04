@@ -336,7 +336,9 @@ API is now in place:
   maximal subgroup containing `L`. This is the Lean form of the Corollary 9.2 line
   `C_G(b) ⊇ L`, hence `C_G(b) ⊆ H`.
 
-Immediate remaining blocker for Corollary 9.2: extract a prime-indexed noncyclic elementary
-abelian subgroup from `2 ≤ rank ↥K`. The current `rank` is an `iSup` over all `Nat`, while
-Theorem 9.1 requires `[Fact p.Prime]`; the missing reusable lemma should turn a positive rank
-witness into a prime `p` witness suitable for `noncyclic_isUniquelyMaximal_of_centralizer_le`.
+Progress after the next PRank step: `exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank`
+now extracts a noncyclic elementary abelian subgroup of `K` from `2 ≤ rank ↥K` and maps it
+back to the ambient group. Immediate remaining blocker for Corollary 9.2: refine that witness
+to a prime-indexed one. The current `rank` is an `iSup` over all `Nat`, while Theorem 9.1
+requires `[Fact p.Prime]`; the missing reusable lemma should turn the extracted `p` into a
+prime witness suitable for `noncyclic_isUniquelyMaximal_of_centralizer_le`.

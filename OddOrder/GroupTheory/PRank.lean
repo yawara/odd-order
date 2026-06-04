@@ -455,6 +455,46 @@ theorem exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank [Finite G] {n : �
     omega
   omega
 
+/-- An elementary abelian subgroup whose logarithmic `p`-size is at least two is noncyclic.
+
+This is stated without a primality hypothesis on `p`; the logarithmic lower bound rules out
+`p = 0, 1`, and cyclicity would force the cardinality to divide `p`, contradicting
+`p ^ 2 ≤ |A|`. -/
+theorem not_isCyclic_of_isElementaryAbelian_of_two_le_log_card [Finite G] {p : ℕ}
+    {A : Subgroup G} (hA : A.IsElementaryAbelian p)
+    (hlog : 2 ≤ Nat.log p (Nat.card A)) :
+    ¬ IsCyclic ↥A := by
+  intro hcyc
+  have hp_gt_one : 1 < p := by
+    by_contra hpnot
+    have hp_le : p ≤ 1 := by omega
+    interval_cases p
+    · simp at hlog
+    · simp at hlog
+  have hcard_ge : p ^ 2 ≤ Nat.card A :=
+    (Nat.le_log_iff_pow_le hp_gt_one Nat.card_pos.ne').mp hlog
+  haveI : IsCyclic ↥A := hcyc
+  have hExp_eq : Monoid.exponent ↥A = Nat.card ↥A := IsCyclic.exponent_eq_card
+  have hExp_dvd_p : Monoid.exponent ↥A ∣ p := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]
+    exact hA.pow_eq_one
+  have hcard_dvd_p : Nat.card ↥A ∣ p := by
+    simpa [hExp_eq] using hExp_dvd_p
+  have hcard_le_p : Nat.card ↥A ≤ p := Nat.le_of_dvd (by omega : 0 < p) hcard_dvd_p
+  have hp_lt_sq : p < p ^ 2 := by
+    have := pow_lt_pow_right₀ hp_gt_one (by norm_num : (1 : ℕ) < 2)
+    simpa using this
+  exact (not_lt_of_ge (hcard_ge.trans hcard_le_p)) hp_lt_sq
+
+/-- A `pRank` lower bound of two gives a noncyclic elementary abelian subgroup. -/
+theorem exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank [Finite G] {p : ℕ}
+    (hpRank : 2 ≤ pRank G p) :
+    ∃ A : Subgroup G, A.IsElementaryAbelian p ∧ ¬ IsCyclic ↥A := by
+  obtain ⟨A, hA, hlog⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := G) (p := p) (n := 2) (by norm_num) hpRank
+  exact ⟨A, hA, not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hA hlog⟩
+
 /-- **`pRank` lower bound** (`[Finite G]`, `p` prime): an elementary abelian subgroup of
 order `p ^ n` witnesses `n ≤ pRank G p`. This is the existence-side companion to the
 evaluation lemma `pRank_le_iff`. -/
@@ -553,10 +593,50 @@ theorem rank_le_of_injective [Finite G] {H : Type*} [Group H] [Finite H]
   intro p
   exact (pRank_le_of_injective hf).trans (pRank_le_rank p)
 
+/-- **Existence side for a positive `rank` lower bound** (`[Finite G]`).
+If `n ≤ rank G` and `n > 0`, then some `pRank G p` is at least `n`. -/
+theorem exists_pRank_ge_of_pos_le_rank [Finite G] {n : ℕ} (hnpos : 0 < n)
+    (hn : n ≤ rank G) :
+    ∃ p : ℕ, n ≤ pRank G p := by
+  by_contra hnone
+  push Not at hnone
+  have hrank_le : rank G ≤ n - 1 := by
+    rw [rank_le_iff]
+    intro p
+    have hlt : pRank G p < n := hnone p
+    omega
+  omega
+
 /-- **Monotonicity of `rank` under subgroup inclusion** (`[Finite G]`). -/
 theorem rank_mono_of_le [Finite G] (H : Subgroup G) :
     rank H ≤ rank G :=
   rank_le_of_injective H.subtype_injective
+
+/-- A subgroup of ambient rank at least two contains a noncyclic elementary abelian subgroup,
+viewed back in the ambient group.
+
+The parameter `p` is not asserted prime here; this is the exact extraction supported by the
+current `rank` definition. A later prime-refinement lemma is needed before applying BG
+Theorem 9.1, whose statement requires `[Fact p.Prime]`. -/
+theorem exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank [Finite G]
+    (K : Subgroup G) (hr : 2 ≤ rank ↥K) :
+    ∃ p : ℕ, ∃ A : Subgroup G, A.IsElementaryAbelian p ∧ A ≤ K ∧ ¬ IsCyclic ↥A := by
+  obtain ⟨p, hpRank⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := ↥K) (n := 2) (by norm_num) hr
+  obtain ⟨A, hA, hAnc⟩ :=
+    exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank (G := ↥K) (p := p) hpRank
+  let B : Subgroup G := A.map K.subtype
+  have hBea : B.IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.map K.subtype_injective hA
+  have hBle : B ≤ K := by
+    intro x hx
+    rcases Subgroup.mem_map.mp hx with ⟨y, _hy, rfl⟩
+    exact y.2
+  have hBnc : ¬ IsCyclic ↥B := by
+    intro hBcyc
+    exact hAnc
+      ((Subgroup.equivMapOfInjective A K.subtype K.subtype_injective).isCyclic.mpr hBcyc)
+  exact ⟨p, B, hBea, hBle, hBnc⟩
 
 end Rank
 
