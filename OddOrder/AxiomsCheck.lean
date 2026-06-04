@@ -2512,6 +2512,8 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.FieldNormalizerData.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S16.FieldNormalizerData.right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
 #assert_only_allowed_axioms

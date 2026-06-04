@@ -1078,6 +1078,69 @@ theorem exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
   data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
     (data.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U m r n u)
 
+
+/-- BG Appendix C, Lemma C.3 Step 4 "mod `P`" bridge: once a natural-power
+`(C.5)` term is written in Step 1 normal form, applying the right projection of
+the concrete semidirect product reads off the complement equation. -/
+theorem right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (c : ZMod hyp.base.p)
+    (hdec : data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    (data.tConjNormOneUnitsAut ^ n) u = u₁ * v₁ := by
+  have hmP : data.s ^ m ∈ hyp.base.P := data.s_zpow_mem_P m
+  rw [← data.sigma_P_eq_P] at hmP
+  rcases hmP with ⟨pm, hpmP, hpm⟩
+  have hrP : data.s ^ r ∈ hyp.base.P := data.s_zpow_mem_P r
+  rw [← data.sigma_P_eq_P] at hrP
+  rcases hrP with ⟨pr, hprP, hpr⟩
+  have hpm_right : SemidirectProduct.rightHom pm = 1 := by
+    rcases hpmP with ⟨x, rfl⟩
+    simp
+  have hpr_right : SemidirectProduct.rightHom pr = 1 := by
+    rcases hprP with ⟨x, rfl⟩
+    simp
+  have hline_right :
+      SemidirectProduct.rightHom (fieldNormalizerPrimeLineElement hyp c) = 1 := by
+    simp [fieldNormalizerPrimeLineElement]
+  have hσ :
+      data.sigma
+          (pm *
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) * pr) =
+        data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+    calc
+      data.sigma
+          (pm *
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) * pr) =
+          data.s ^ m *
+              data.sigma
+                (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+                  fieldNormalizerFrobeniusGroup hyp) *
+            data.s ^ r := by
+        simp [map_mul, hpm, hpr]
+      _ = data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+              data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := hdec
+      _ = data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+        simp [map_mul]
+  have hH := data.sigma_injective hσ
+  have hright := congrArg (SemidirectProduct.rightHom :
+      fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerNormOneUnits hyp) hH
+  simpa [map_mul, hpm_right, hpr_right, hline_right, mul_assoc] using hright
+
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
 theorem normOneUnitsEquivU_twistedInv_tConjNormOneUnitsAut_apply_coe

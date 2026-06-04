@@ -262,6 +262,10 @@ created: 2026-06-04
   `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` を公開し、
   `(C.5)` の各中間項を concrete `tConjNormOneUnitsAut^n` で Step1 normal form に渡せるようにした。
   AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 `mod P` right-component bridge**:
+  `right_component_of_step4_tConjNormOneUnitsAut_pow_decomposition` を公開し、
+  natural-power `(C.5)` normal form から `tConjNormOneUnitsAut^n u = u₁*v₁` を
+  SemidirectProduct の right projection で読めるようにした。AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。
