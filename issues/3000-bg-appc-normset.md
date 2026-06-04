@@ -256,6 +256,12 @@ created: 2026-06-04
   `t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow` を公開し、
   `(u)^{t^n}` を concrete norm-one unit の `tConjNormOneUnitsAut^n` として
   読めるようにした。AxiomsCheck 登録済み。
+- [x] **C.3 Step 4 natural-power `(C.5)` normal-form bridge**:
+  `s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow`、
+  `s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U`、
+  `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` を公開し、
+  `(C.5)` の各中間項を concrete `tConjNormOneUnitsAut^n` で Step1 normal form に渡せるようにした。
+  AxiomsCheck 登録済み。
 - [x] **C.3 Step 4 P-U intersection bridge**: `fieldNormalizerKernel_inf_complement_eq_bot` と
   `P_inf_U_eq_bot` を公開し、concrete `P⋊U` と Peterfalvi 側 `G` の両方で
   `P∩U=1` を使えるようにした。BG Step4 の “mod P, since U∩P=1” 入力。

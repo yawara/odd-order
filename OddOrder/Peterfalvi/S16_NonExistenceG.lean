@@ -869,6 +869,7 @@ theorem exists_step4_decomposition_of_zpow_tConj_normOne
   data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
     (data.s_zpow_mul_t_zpow_conj_sigma_inr_mul_s_zpow_mem_P_sup_U m n r u)
 
+
 /-- BG Appendix C, Lemma C.3 Step 3 intersection dichotomy before the final
 contradiction: if `g` normalizes `U`, then `(PU) ∩ (PU)^g` is either `U` or
 all of `PU`. -/
@@ -1013,6 +1014,69 @@ theorem t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow
           fieldNormalizerFrobeniusGroup hyp) := by
   rw [← data.normOneUnitsEquivU_apply_coe ((data.tConjNormOneUnitsAut ^ n) u)]
   exact (data.normOneUnitsEquivU_tConjNormOneUnitsAut_pow_apply_coe n u).symm
+
+/-- Natural-power form of the Step 4 conjugation rewrite: the middle
+`(u)^{t^n}` term can be read as the concrete norm-one unit obtained by iterating
+`tConjNormOneUnitsAut`. -/
+theorem s_zpow_mul_t_pow_conj_sigma_inr_mul_s_zpow_eq_sigma_inr_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          (data.t ^ n *
+            data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+              (data.t ^ n)⁻¹) *
+        data.s ^ r =
+      data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r := by
+  rw [data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow n u]
+
+/-- Natural-power variant of the Step 4 `(C.5)` membership bridge, with the
+middle term already expressed in the concrete norm-one complement. -/
+theorem s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+  have hmidU :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u),
+      ⟨(data.tConjNormOneUnitsAut ^ n) u, rfl⟩, rfl⟩
+  have hmid :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
+  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+
+/-- Natural-power variant of the Step 4 `(C.5)` decomposition bridge: after
+rewriting `(u)^{t^n}` as a concrete iterate of `tConjNormOneUnitsAut`, the term
+still admits Step 1 `u₁ s₁ v₁` normal form. -/
+theorem exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s ^ m *
+            data.sigma
+              (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n) u) :
+                fieldNormalizerFrobeniusGroup hyp) *
+          data.s ^ r =
+        data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) :=
+  data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    (data.s_zpow_mul_sigma_inr_tConjNormOneUnitsAut_pow_mul_s_zpow_mem_P_sup_U m r n u)
 
 /-- The `twistedInv` operation in the norm-one C.3 interface is ambient
 conjugation by `t` applied to the inverse complement element. -/
