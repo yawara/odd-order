@@ -1213,6 +1213,10 @@ set_option linter.style.longLine false in
 -- BG Thm 8.1(a) (mmd L2319-L2321): M∈ℳ, p∈π(F(M)), A₀∈ℰ_p^*(F(M)), m(A₀)≥3,
 -- F(M) が p-群でなければ C_{F(M)}(A₀) は一意最大部分群に含まれる。
 #assert_only_allowed_axioms OddOrder.BG.Ch2.S08.cFitting_isUniquelyMaximal_of_not_pGroup
+-- BG Thm 8.1(b) (mmd L2319-L2322): F(M) が p-群なら M の Sylow p-subgroup は G の Sylow,
+-- かつ SCN₃(P) の各元は F(M) に含まれ一意最大部分群に属する。
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch2.S08.sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup
 -- Gorenstein Thm 3.7 (precursor 2, issue 0051): ψ が全 proper A-不変正規部分群上自明 + P 上非自明
 -- ⇒ P′⊆Z(P), P/P′ elem ab + A irreducible + ψ nontrivial, P special. Thm 3.8/3.10 → BG Lem 4.13.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper
