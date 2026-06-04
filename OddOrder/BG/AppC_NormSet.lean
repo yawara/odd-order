@@ -991,6 +991,31 @@ lemma normN_inv [Fact p.Prime] (a : GaloisField p q) :
     normN p q a⁻¹ = (normN p q a)⁻¹ := by
   simp [normN, inv_pow, Finset.prod_inv_distrib]
 
+/-- **BG Appendix C, Lemma C.3, Step 4 field-step form**: the
+one-step output over field elements.  This matches the line in BG that obtains
+`(a⁻¹)^{t^3} ∈ E` for every `a ∈ E`, before coercing nonzero elements of `E` to
+units for the final odd-iterate argument. -/
+def normSetETwistedFieldStep [Fact p.Prime] (hq : 0 < q)
+    (φ : MulAut (GaloisField p q)ˣ) : Prop :=
+  ∀ a : GaloisField p q, ∀ ha : a ∈ normSetE p q,
+    ((twistedInv φ (Units.mk0 a (ne_zero_of_mem_normSetE p q hq ha)) :
+        (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q
+
+/-- The field-element one-step output implies the unit one-step output used by
+`inv_mem_of_twistedInv_step`. -/
+theorem twisted_unit_step_of_twisted_field_step [Fact p.Prime] (hq : 0 < q)
+    (φ : MulAut (GaloisField p q)ˣ)
+    (hstep : normSetETwistedFieldStep p q hq φ) :
+    ∀ u : (GaloisField p q)ˣ,
+      ((u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q →
+        ((twistedInv φ u : (GaloisField p q)ˣ) : GaloisField p q) ∈ normSetE p q := by
+  intro u hu
+  have hmk : Units.mk0 ((u : (GaloisField p q)ˣ) : GaloisField p q)
+      (ne_zero_of_mem_normSetE p q hq hu) = u := by
+    ext
+    rfl
+  simpa [hmk] using hstep ((u : (GaloisField p q)ˣ) : GaloisField p q) hu
+
 /-- **BG Appendix C, Lemma C.3, Step 4 tail for the norm set**: if an
 automorphism of the unit group has odd `p`-th power equal to the identity and
 sends every `u ∈ E` to `φ(u⁻¹) ∈ E`, then the norm set is inverse-closed.
@@ -1021,6 +1046,15 @@ theorem normSetE_eq_inv_of_twisted_unit_step [Fact p.Prime] (hq : 0 < q)
     have hu : u ∈ EUnits := by simpa [EUnits, u] using ha
     have hui := hinv_units u hu
     simpa [EUnits, u] using hui
+
+/-- **BG Appendix C, Lemma C.3, Step 4 field-step adapter**: the
+field-element one-step twisted inverse output implies inverse-closure of `E`. -/
+theorem normSetE_eq_inv_of_twisted_field_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : normSetETwistedFieldStep p q hq φ) :
+    normSetE p q = (normSetE p q)⁻¹ :=
+  normSetE_eq_inv_of_twisted_unit_step p q hq hpodd φ hφp
+    (twisted_unit_step_of_twisted_field_step p q hq φ hstep)
 
 /-- Algebraic tail of **BG Appendix C, Lemma C.3**: once the generator-relation
 calculation has produced `N(2 * a - 1) = 1`, an element `a ∈ E` has inverse in
@@ -1070,6 +1104,17 @@ theorem forall_normN_two_mul_sub_one_of_normSetE_eq_inv [Fact p.Prime] (hq : 0 <
       (2 : GaloisField p q) * a - 1 = a * ((2 : GaloisField p q) - a⁻¹) := by
     field_simp [ha0]
   rw [hcalc, normN_mul, ha.1, hainv.2, one_mul]
+
+/-- **BG Appendix C, Lemma C.3, Step 4 field-step adapter**: the
+field-element one-step twisted inverse output implies the concrete norm identity
+`N(2 * a - 1) = 1` for every `a ∈ E`. -/
+theorem forall_normN_two_mul_sub_one_of_twisted_field_step [Fact p.Prime] (hq : 0 < q)
+    (hpodd : Odd p) (φ : MulAut (GaloisField p q)ˣ) (hφp : φ ^ p = 1)
+    (hstep : normSetETwistedFieldStep p q hq φ) :
+    ∀ a : GaloisField p q, a ∈ normSetE p q →
+      normN p q ((2 : GaloisField p q) * a - 1) = 1 :=
+  forall_normN_two_mul_sub_one_of_normSetE_eq_inv p q hq
+    (normSetE_eq_inv_of_twisted_field_step p q hq hpodd φ hφp hstep)
 
 /-- **BG Appendix C, Lemma C.3, Step 4 adapter**: the one-step twisted inverse
 output produced by the generator-relation calculation implies the concrete
