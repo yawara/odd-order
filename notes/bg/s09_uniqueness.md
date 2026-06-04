@@ -622,9 +622,24 @@ Explorer reconnaissance for Lemma 9.5 isolated the next helper frontier as:
 
    Remaining subfrontier for this item: supply the actual Thm 4.20(c) low-rank local
    Sylow equality/nontriviality inputs and wire the BG choice of `q`/case split into
-   these low/high normalizer packages.
+   these low/high normalizer packages.  A scout pass found no existing Thm 4.20(c)
+   endpoint; the next missing helper should turn `q` largest in `|M|` plus
+   `rank F(M) ≤ 2` into a local Sylow `PM : Sylow q ↥M` whose ambient image is
+   `O_q(M)`, together with `O_q(M) ≠ ⊥`.
 3. `p0_centralizes_opiPrime_fittingInG` for the main L2590-L2613 contradiction block,
    consuming BG Prop 1.16 and Corollary 4.19.
+
+   The first Prop 1.16 extraction bridge is now in S09:
+
+   - `exists_cocyclic_not_le_centralizer_inf_centralizer_of_not_le_centralizer`
+     proves that if `P₀` does not centralize `D`, then some cocyclic `B ≤ A` has
+     `P₀` not centralizing `D ∩ C_G(B)`. This formalizes the BG line choosing
+     `B ⊆ Ω₁(A)` from Prop 1.16's cocyclic centralizer generation.
+
+   Remaining for this block: specialize the bridge to `A = Ω₁(A)` and
+   `D = O_{p'}(F(M))`, route the resulting noncyclic `B` through Theorem 9.1 to
+   choose `y` and `L`, then apply Corollary 4.19 + Lemma 1.9 to contradict the
+   noncentralization of `D ∩ C_G(B)`.
 4. `maximalSubgroupsContaining_normalizer_p0_eq_singleton` for BG (9.12), to make the final
    contradiction at L2621-L2625 short.
 

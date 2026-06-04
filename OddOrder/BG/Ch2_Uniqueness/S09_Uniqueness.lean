@@ -1509,6 +1509,87 @@ private theorem exists_maximal_centralizer_and_pRank_fittingInG_le_two_of_not_sc
   have hM : M ∈ maximalSubgroups G := hMcont.1
   exact ⟨M, hMcont, pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM hA hAnot⟩
 
+/-- BG Lemma 9.5's Proposition 1.16 extraction step.
+
+If `P0` does not centralize `D`, and a noncyclic abelian subgroup `A` normalizes `D`
+coprimely, then among the cocyclic centralizers generating `D` there is one not centralized
+by `P0`. This is the formal version of the line "Take `B ⊆ Ω₁(A)` such that
+`Ω₁(A)/B` is cyclic and `P₀` does not centralize `C_D(B)`." -/
+private theorem exists_cocyclic_not_le_centralizer_inf_centralizer_of_not_le_centralizer
+    [Finite G] {A D P0 : Subgroup G} [IsMulCommutative ↥A]
+    (hAD : A ≤ Subgroup.normalizer D)
+    (hCop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥D))
+    (hAnc : ¬ IsCyclic ↥A)
+    (hP0D : ¬ P0 ≤ Subgroup.centralizer (D : Set G)) :
+    ∃ B : Subgroup G,
+      B ≤ A ∧ (∃ a ∈ A, B ⊔ Subgroup.zpowers a = A) ∧
+        ¬ P0 ≤ Subgroup.centralizer
+          ((D ⊓ Subgroup.centralizer (B : Set G)) : Set G) := by
+  classical
+  by_contra hnone
+  have hAll :
+      ∀ B : Subgroup G,
+        B ≤ A → (∃ a ∈ A, B ⊔ Subgroup.zpowers a = A) →
+          P0 ≤ Subgroup.centralizer
+            ((D ⊓ Subgroup.centralizer (B : Set G)) : Set G) := by
+    intro B hBA hcyc
+    by_contra hnot
+    exact hnone ⟨B, hBA, hcyc, hnot⟩
+  have hDinv : Ch03.IsAInvariant (S07.conjAction A) D :=
+    S07.isAInvariant_conjAction_iff.mpr hAD
+  have htop :=
+    OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic
+      hDinv.restrict hCop hAnc
+  exact hP0D (by
+    intro x hxP0
+    rw [Subgroup.mem_centralizer_iff]
+    intro d hdD
+    let CxD : Subgroup ↥D :=
+      (D ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf D
+    have hclosure_le :
+        OddOrder.BG.Ch1.S01.cocyclicFixedByClosure hDinv.restrict ≤ CxD := by
+      rw [OddOrder.BG.Ch1.S01.cocyclicFixedByClosure, Subgroup.closure_le]
+      rintro z ⟨Yb, ⟨a, hcycYb⟩, hfix⟩
+      change (z : G) ∈ D ⊓ Subgroup.centralizer ({x} : Set G)
+      set Y : Subgroup G := Yb.map A.subtype with hYdef
+      have hYleA : Y ≤ A := by
+        rw [hYdef]
+        exact Subgroup.map_subtype_le Yb
+      have hYcyc : ∃ a' ∈ A, Y ⊔ Subgroup.zpowers a' = A := by
+        refine ⟨(a : G), a.2, ?_⟩
+        have hzp : Subgroup.zpowers (a : G) = (Subgroup.zpowers a).map A.subtype :=
+          (MonoidHom.map_zpowers A.subtype a).symm
+        rw [hYdef, hzp, ← Subgroup.map_sup, hcycYb, ← MonoidHom.range_eq_map,
+          Subgroup.range_subtype]
+      have hzY : (z : G) ∈ D ⊓ Subgroup.centralizer (Y : Set G) := by
+        refine ⟨z.2, ?_⟩
+        change (z : G) ∈ Subgroup.centralizer (Y : Set G)
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hyY
+        rw [hYdef, Subgroup.coe_map, Set.mem_image] at hyY
+        obtain ⟨yb, hyb, rfl⟩ := hyY
+        have hval := congrArg (fun w : ↥D => (w : G)) (hfix yb hyb)
+        change ((hDinv.restrict yb) z : G) = (z : G) at hval
+        rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+        simp only [S07.conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype,
+          MulAut.conj_apply] at hval
+        exact mul_inv_eq_iff_eq_mul.mp hval
+      refine ⟨z.2, ?_⟩
+      change (z : G) ∈ Subgroup.centralizer ({x} : Set G)
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [Set.mem_singleton_iff] at hy
+      subst y
+      have hx_cent := (hAll Y hYleA hYcyc) hxP0
+      exact (Subgroup.mem_centralizer_iff.mp hx_cent (z : G) hzY).symm
+    have hdCx : (⟨d, hdD⟩ : ↥D) ∈ CxD := by
+      apply hclosure_le
+      rw [htop]
+      exact Subgroup.mem_top _
+    have hdc : d ∈ Subgroup.centralizer ({x} : Set G) := by
+      simpa [CxD, Subgroup.mem_subgroupOf] using hdCx
+    exact (Subgroup.mem_centralizer_iff.mp hdc x (Set.mem_singleton x)).symm)
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
