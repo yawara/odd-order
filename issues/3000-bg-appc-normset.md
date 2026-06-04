@@ -156,7 +156,9 @@ created: 2026-06-04
   `generatorRelation_step2_primeLine` まで証明。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 3 finite-field irreducibility input**: condition(A) 下で
   norm-one subgroup `U` が加法群 `𝔽_{p^q}` を `𝔽_p`-既約に作用することを
-  `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明。AxiomsCheck 登録済み。
+  `normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明。さらに非零 `U`-不変
+  subspace が `U` とともに concrete `P⋊U` 全体を生成することを
+  `normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` として固定。AxiomsCheck 登録済み。
 - [x] **Lemma C.3 Step 4 finite-field Frobenius core**: `normN_pow_p` と
   `normSetE_pow_p` により `p`-power Frobenius が `E` を保つことを証明し、
   `normSetE_frobenius_pair` で `a,b∈E` かつ `a+b=2` なら `a^p,b^p∈E` かつ

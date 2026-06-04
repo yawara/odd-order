@@ -283,7 +283,9 @@ Step4: `a∈E^#`, `b=2-a∈E` から `s^a s^b=s^2` ⟹ (C.2) 関係式 → `a^p�
 **2026-06-04 現在の形式化 frontier**: Step1/Step2 の純有限体 core は
 `exists_normOne_mul_primeLine_eq` / `generatorRelation_step2_primeLine` として証明済み。
 Step3 の `U`-既約作用入力も
-`normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。Step4 の純有限体 core も
+`normOneUnits_invariant_submodule_eq_top_of_ne_bot` として証明済み。さらに concrete `P⋊U` 内で
+非零 `U`-不変 subspace が `U` とともに全体を生成する
+`normOneFrobeniusSubspaceGroup_eq_top_of_ne_bot` を追加済み。Step4 の純有限体 core も
 `normSetE_pow_p` / `normSetE_frobenius_pair` /
 `normOneUnits_eq_one_of_pow_sub_one_eq_one` まで証明済み。さらに BG 最後の
 `(a⁻¹)^{t^3}` を p 回反復する tail は `inv_mem_of_twistedInv_step` /
