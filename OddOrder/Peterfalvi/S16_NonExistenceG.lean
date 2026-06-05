@@ -1837,6 +1837,62 @@ theorem unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition
     rw [hcalc, OddOrder.BG.AppC.NormSet.normN_mul,
       OddOrder.BG.AppC.NormSet.normN_inv, hWnorm, inv_one, one_mul, hN]
 
+/-- **Backward conjugation rewrite**: `(t^n)⁻¹ · σ(inr u) · t^n = σ(inr ((tConj^n)⁻¹ u))`.
+This is the inverse-direction companion of
+`t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow` (S16), giving BG's
+right-conjugation `(u)^{t^n} = t⁻ⁿ u tⁿ` directly.  It lets the BG (C.4) connector
+`q`-swap telescoping be carried out on the backward `tConj⁻³` form of `M₁`. -/
+theorem t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (n : ℕ) (u : fieldNormalizerNormOneUnits hyp) :
+    (data.t ^ n)⁻¹ *
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+        data.t ^ n =
+      data.sigma
+        (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ n)⁻¹ u) :
+          fieldNormalizerFrobeniusGroup hyp) := by
+  have hself : (data.tConjNormOneUnitsAut ^ n) ((data.tConjNormOneUnitsAut ^ n)⁻¹ u) = u := by
+    simp
+  have h := data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow n
+    ((data.tConjNormOneUnitsAut ^ n)⁻¹ u)
+  rw [hself] at h
+  rw [← h]; group
+
+/-- **Backward `k = 3` first `(C.5)` decomposition** (the entry point for the
+capstone proof): for any norm-one unit `a`, the backward form
+`s · σ(inr ((tConj³)⁻¹ a⁻¹)) · s⁻²` (BG's `s · (a⁻¹)^{t³} · s⁻²`) admits a Step 1
+normal form `σ(inr u₁) · σ(P₀ c) · σ(inr v₁)`.  BG's Lemma C.3 Step 4 pins `c = -1`;
+that is the content of `Step4Capstone`. -/
+theorem exists_step4_first_k_three_inv_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+      data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹)) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+  apply data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+  have hs : data.s ∈ hyp.base.P ⊔ hyp.base.U := by
+    rw [← zpow_one data.s]; exact data.s_zpow_mem_P_sup_U 1
+  have hmidU :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹),
+      ⟨(data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹, rfl⟩, rfl⟩
+  have hmid :
+      data.sigma
+          (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
+            fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
+  have hr : data.s ^ (-2 : ℤ) ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U (-2)
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hs hmid) hr
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
