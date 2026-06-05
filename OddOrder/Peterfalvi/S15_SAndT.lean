@@ -353,14 +353,46 @@ theorem m_value_gt_four_fifths {q p : ℕ} (hq : 7 ≤ q) (hp : 3 ≤ p) :
     rw [div_le_div_iff₀ (by positivity) (by norm_num)]; nlinarith [hq7]
   linarith [haux, h1, h2]
 
+/-- **Peterfalvi (13.11)** numeric core of the `q = 3` branch: once the
+Section 16 hypothesis gives `p ≥ 5`, the concrete value of `m` is already
+strictly larger than `49/100`. -/
+theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
+    (49 : ℚ) / 100 <
+      1 - 1 / ((3 : ℚ) - 1) - ((3 : ℚ) - 1) / (3 : ℚ) ^ p +
+        1 / (((3 : ℚ) - 1) * (3 : ℚ) ^ p) := by
+  have h4 : 4 ≤ p - 1 := by omega
+  have hpow4 : (3 : ℚ) ^ 4 ≤ (3 : ℚ) ^ (p - 1) :=
+    pow_le_pow_right₀ (by norm_num : (0 : ℚ) ≤ 3) h4
+  norm_num at hpow4
+  have hden_gt : (100 : ℚ) < 2 * (3 : ℚ) ^ (p - 1) := by nlinarith
+  have hden_pos : (0 : ℚ) < 2 * (3 : ℚ) ^ (p - 1) := by nlinarith
+  have hsmall : 1 / (2 * (3 : ℚ) ^ (p - 1)) < (1 : ℚ) / 100 := by
+    rw [div_lt_div_iff₀ hden_pos (by norm_num : (0 : ℚ) < 100)]
+    nlinarith
+  have hpow : (3 : ℚ) ^ p = 3 * (3 : ℚ) ^ (p - 1) := by
+    have hp_eq : p = (p - 1) + 1 := by omega
+    rw [hp_eq, pow_succ]
+    rw [show p - 1 + 1 - 1 = p - 1 by omega]
+    ring
+  have hexpr :
+      1 - 1 / ((3 : ℚ) - 1) - ((3 : ℚ) - 1) / (3 : ℚ) ^ p +
+          1 / (((3 : ℚ) - 1) * (3 : ℚ) ^ p)
+        = (1 : ℚ) / 2 - 1 / (2 * (3 : ℚ) ^ (p - 1)) := by
+    rw [hpow]
+    field_simp [hden_pos.ne']
+    ring
+  rw [hexpr]
+  linarith [hsmall]
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
 `m_value_gt_four_fifths` / `m_value_gt_seven_tenths` applied through the now
 concrete value `m_eq` (they need only `p ≥ 3`, supplied by `three_le_p`).  The
-`q = 3` case is still open: its `m`-bound needs `p ≥ 5` (the `q = 3, p = 3`
-boundary fails `m > 49/100`), and its `u/c` bound is the analytic inequality
-(13.10). -/
+`q = 3` value bound is available as `m_value_q_three_gt_49_hundredths` under
+`p ≥ 5`, which Section 16 supplies from `q < p`; this bundled Section 15
+statement still keeps the branch open because its `u/c` bound is the analytic
+inequality (13.10). -/
 theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧

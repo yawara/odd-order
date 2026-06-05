@@ -59,6 +59,15 @@ theorem five_le_p (hyp : Hypothesis (G := G)) : 5 ≤ hyp.base.p := by
     omega
   omega
 
+/-- **Peterfalvi (13.11), used in Section 16**: in the `q = 3` branch, the
+Section 16 ordering `q < p` gives the missing `p ≥ 5`, so the concrete analytic
+parameter satisfies `m > 49/100`. -/
+theorem m_gt_49_hundredths_of_q_eq_three (hyp : Hypothesis (G := G))
+    (hq3 : hyp.base.q = 3) :
+    hyp.base.m > (49 / 100 : ℚ) := by
+  rw [hyp.base.m_eq, hq3]
+  exact OddOrder.Peterfalvi.S15.m_value_q_three_gt_49_hundredths hyp.five_le_p
+
 /-- The congruence used in **Peterfalvi (14.4)**: from `q < p` and `q` prime,
 `q` cannot be `1 mod p`. -/
 theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
