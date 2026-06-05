@@ -2536,6 +2536,20 @@ private theorem cyclotomic_quotient_sub_one_ge_pow_pred {q p : ℕ}
     omega
   exact_mod_cast hnat
 
+private theorem cyclotomic_quotient_modEq_one_mod_base {p q : ℕ}
+    (hp2 : 2 ≤ p) (hqpos : 0 < q) :
+    (p ^ q - 1) / (p - 1) ≡ 1 [MOD p] := by
+  have hsum_eq : ∑ k ∈ Finset.range q, p ^ k = (p ^ q - 1) / (p - 1) :=
+    Nat.geomSum_eq hp2 q
+  rw [← hsum_eq]
+  rw [show q = (q - 1) + 1 by omega]
+  rw [Finset.sum_range_succ']
+  have hzero : (∑ k ∈ Finset.range (q - 1), p ^ (k + 1)) ≡ 0 [MOD p] := by
+    rw [Nat.modEq_zero_iff_dvd]
+    refine Finset.dvd_sum fun k _hk => ?_
+    exact dvd_pow_self p (Nat.succ_ne_zero k)
+  simpa using hzero.add_right 1
+
 private theorem cyclotomic_quotient_sub_one_lt_div {p q : ℕ} (hp2 : 2 ≤ p) :
     (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) <
       (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
@@ -3166,6 +3180,65 @@ structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
 
 namespace CaseBForSData
 
+/-- **Peterfalvi (14.15)**: the congruence part of the non-full branch.  From
+`h = u * x`, the congruence `h ≡ 1 mod p` supplied by (14.5), and the
+fixed-point-free congruence `x ≡ 1 mod q`, the divided cyclotomic formula gives
+`x ≡ q mod p`; hence `x = q + n p` for some `n`, and then `n ≡ 1 mod q`. -/
+theorem exists_x_decomposition_of_nonfull_card_congruences
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (Sdata : CaseBForSData hyp)
+    (hu_not_full :
+      hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    {x : ℕ} (hh_eq : nc.h = hyp.base.u * x)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hx_mod_q : x ≡ 1 [MOD hyp.base.q]) :
+    ∃ n : ℕ, x = hyp.base.q + n * hyp.base.p ∧ n ≡ 1 [MOD hyp.base.q] := by
+  let C : ℕ := (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)
+  have hmod : hyp.base.p ≡ 1 [MOD hyp.base.q] := by
+    by_contra hnot_mod
+    exact hu_not_full (Sdata.u_eq_of_not_modEq_one hnot_mod)
+  have hC_dvd : hyp.base.q ∣ C := by
+    dsimp [C]
+    exact OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_of_modEq_one
+      hyp.base.p_prime hmod
+  have hu_div : hyp.base.u = C / hyp.base.q := by
+    rw [Sdata.u_eq_of_p_modEq_one hmod]
+    dsimp [C]
+    rw [Nat.div_div_eq_div_mul]
+    rw [Nat.mul_comm (hyp.base.p - 1) hyp.base.q]
+  have hq_u : hyp.base.q * hyp.base.u = C := by
+    rw [hu_div, Nat.mul_comm, Nat.div_mul_cancel hC_dvd]
+  have hq_h : hyp.base.q * nc.h = C * x := by
+    rw [hh_eq, ← mul_assoc, hq_u]
+  have hC_mod_p : C ≡ 1 [MOD hyp.base.p] := by
+    dsimp [C]
+    exact cyclotomic_quotient_modEq_one_mod_base
+      hyp.base.p_prime.two_le hyp.base.q_prime.pos
+  have hqh_mod : hyp.base.q * nc.h ≡ hyp.base.q [MOD hyp.base.p] := by
+    simpa [mul_one] using hh_mod_p.mul_left hyp.base.q
+  rw [hq_h] at hqh_mod
+  have hCx_mod : C * x ≡ x [MOD hyp.base.p] := by
+    simpa [one_mul] using hC_mod_p.mul_right x
+  have hx_mod_p : x ≡ hyp.base.q [MOD hyp.base.p] := hCx_mod.symm.trans hqh_mod
+  have hq_le_x : hyp.base.q ≤ x := by
+    by_contra hnot
+    have hx_lt_q : x < hyp.base.q := Nat.lt_of_not_ge hnot
+    have hx_eq_q : x = hyp.base.q :=
+      Nat.ModEq.eq_of_lt_of_lt hx_mod_p (lt_trans hx_lt_q hyp.q_lt_p) hyp.q_lt_p
+    omega
+  rcases (Nat.modEq_iff_exists_eq_add hq_le_x).mp hx_mod_p.symm with
+    ⟨n, hx_eq_add⟩
+  have hx_eq : x = hyp.base.q + n * hyp.base.p := by
+    simpa [mul_comm] using hx_eq_add
+  have hnp_mod : n * hyp.base.p ≡ n [MOD hyp.base.q] := by
+    simpa [mul_one] using hmod.mul_left n
+  have hq_zero : hyp.base.q ≡ 0 [MOD hyp.base.q] := by
+    rw [Nat.modEq_zero_iff_dvd]
+  have hx_mod_n : x ≡ n [MOD hyp.base.q] := by
+    rw [hx_eq]
+    simpa using hq_zero.add hnp_mod
+  exact ⟨n, hx_eq, hx_mod_n.symm.trans hx_mod_q⟩
+
 /-- **Peterfalvi (14.15)**: in the non-full S-side cyclotomic branch, the
 `h = u * x` decomposition and the fixed-point-free congruence estimate give the
 lower comparison `p^q < h - 1`.  The proof follows the paragraph
@@ -3418,6 +3491,25 @@ theorem caseA_contradiction_of_nonfull_u_data
   exact data.caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
     hcaseA hq3 hp7 hh_ge
 
+/-- **Peterfalvi (14.15)**: consumer form of the non-full case-(a) branch with
+only the cardinal/congruence inputs left from (14.5) and the fixed-point-free
+`W₁` action.  The congruence theorem above derives `x = q + n p` and
+`n ≡ 1 mod q`; the numerical part then closes the case-(a) contradiction. -/
+theorem caseA_contradiction_of_nonfull_card_congruences
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (Sdata : CaseBForSData hyp)
+    (hcaseA : data.caseA)
+    (hu_not_full :
+      hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    {x : ℕ} (hh_eq : nc.h = hyp.base.u * x)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hx_mod_q : x ≡ 1 [MOD hyp.base.q]) (hx_odd : Odd x) :
+    False := by
+  rcases Sdata.exists_x_decomposition_of_nonfull_card_congruences
+      hu_not_full hh_eq hh_mod_p hx_mod_q with ⟨n, hx_eq, hn_mod⟩
+  exact data.caseA_contradiction_of_nonfull_u_data
+    Sdata hcaseA hu_not_full hh_eq hx_eq hn_mod hx_odd
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3442,9 +3534,9 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
   · -- Non-exceptional branch of (14.14): the arithmetic spine is now
-    -- `data.caseA_contradiction_of_nonfull_u_data`.  The remaining work is
-    -- to derive `h = u * x`, `x = q + n * p`, `n ≡ 1 mod q`, and oddness
-    -- of `x` from (14.5), the non-full branch of (14.6), and the
+    -- `data.caseA_contradiction_of_nonfull_card_congruences`.  The remaining
+    -- work is to derive `h = u * x`, `h ≡ 1 mod p`, `x ≡ 1 mod q`, and
+    -- oddness of `x` from (14.5), the non-full branch of (14.6), and the
     -- fixed-point-free action of `W1`.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
