@@ -22,9 +22,14 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 
 ### ファイル粒度
 
-- **Isaacs: 1 章 = 1 ディレクトリ**。入口は `Main.lean` (例: `OddOrder/Isaacs/Ch01_Sylow/Main.lean`)
-- **BG / Peterfalvi: 1 節 (§) = 1 ファイル** (例: `OddOrder/BG/Ch1_Preliminary/S03_FrobeniusActions.lean`)
-- **分割は行数でなく「編集局所性 + 再ビルドレイテンシ」で判断する**。`lake build` はファイル単位で全再 elaboration するので、コストは 1 edit-cycle のレイテンシ (≈ 5s 固定 + ~2ms/行、証明密度で変動)。トリガーは「**今まさに伸ばしている章** かつ **leaf 再ビルドが痛い** (目安 >~4000 行 or rebuild >~12-15s)」。**休眠中の巨大ファイルは行数だけでは割らない** (キャッシュされ無害、今割るのは 先回り分割)。割るときは **active frontier を小さな leaf `Main.lean` に残し、完成・凍結した subsection を上流ファイルへ押し出す** (`Ch01_Sylow/Main.lean` → 凍結部を `A_Existence.lean` 等に出し `Main` が import)。細分化 (<~800-1000 行が乱立) は固定 5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md) と memory `build-perf-bottleneck`。
+**基準は mathlib のファイル粒度** (2026-06-05 方針化)。
+
+- **1 ファイル = 1 つの数学的トピック** (定義+API、または 1 定理とその支持補題群)。行数や「1 節」単位そのものでなく**主題の結束**で分ける。`§` が複数の独立した定理クラスタを含むなら複数ファイルに割ってよい (むしろ割る)。
+- **Isaacs: 1 章 = 1 ディレクトリ** (入口 `Main.lean`、例 `OddOrder/Isaacs/Ch01_Sylow/Main.lean`)。ディレクトリ内は topic 別ファイル。
+- **BG / Peterfalvi**: 小さい節は 1 節 = 1 ファイルでよいが、大きい節は **topic-coherent な複数ファイル + hub** に分ける。例: `S09_Uniqueness.lean` (4440 行) を `S09_Theorem91` / `S09_Corollaries` / `S09_Lemma95` / hub `S09_Uniqueness` に分割 (下流は hub を import するだけで不変)。**active frontier を小さな leaf に残し、凍結クラスタを上流ファイルへ押し出して hub が束ねる**。
+- **最小 import (mathlib の衛生)**: 各ファイルは必要な module だけ import する。一般には import DAG を浅くし full build 並列化 + fan-out 縮小に効く。**ただし FT の spine (§1→§16 が直列依存) のように深い base closure を共有するファイル群では推移閉包が不変ゆえ速度改善はほぼ無い** (2026-06-05 実測: S09 4分割を minimal-import 化しても full build 3580 jobs 不変)。よって本リポジトリでの minimal-import の価値は **DAG 衛生 + 可読性 + upstream 適性**が主で、速度ではない。**注意: `lake exe shake` は本リポジトリで誤判定が多い** (実使用中の import を removable と誤報する) ので鵜呑みにせず必ず build/grep で検証する。
+- **`private` をファイル跨ぎで使わない**: 複数ファイルで使う補題は適切な namespace 付き public にする (mathlib は `private` を真に局所な helper に限定)。
+- **計測事実 (2026-06-05)**: `lake build` はファイル単位で全再 elaboration するが、1 ファイルの再 elaboration は **import closure 読み込み固定費 (~5s) が支配的**で行数差は小さい (S09 4440 行 ≈5.5s、分割後 leaf 2544 行 ≈4.7s)。よって**ファイル分割の主目的は速度でなく minimal-import による DAG 衛生 + 可読性 + upstream 適性**。速度の主レバーは「**開発中は leaf build で回し、full build は commit 直前のみ**」。過度な細分化 (<~300 行が乱立) は固定 ~5s/ファイルが効いて逆効果。詳細は [ROADMAP.md#ファイル粒度とトレーサビリティ](ROADMAP.md)。
 
 ### トレーサビリティ (3 層)
 

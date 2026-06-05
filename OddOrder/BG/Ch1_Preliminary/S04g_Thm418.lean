@@ -1871,6 +1871,49 @@ theorem exists_terminal_normal_sylow (P : CharacteristicSylowSeriesPackage G) :
 
 end CharacteristicSylowSeriesPackage
 
+/-- **BG Theorem 4.20(c) — existence** (mmd L1764/L1771): a finite solvable group of odd
+order with `r(F(G)) ≤ 2` possesses a *characteristic Sylow series* `G = G₀ ⊃ ⋯ ⊃ Gₙ = 1`
+whose factors are isomorphic to Sylow subgroups of `G` — packaged as
+`CharacteristicSylowSeriesPackage G`.
+
+This is the producer the §9 (Lemma 9.5) consumers currently take as a hypothesis
+(`exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage`, etc.); proving it
+lets those `SP : CharacteristicSylowSeriesPackage ↥M` hypotheses be discharged for the
+(solvable, `r(F)≤2`) maximal subgroups `M`.
+
+Construction (strong induction on `Nat.card G`, following BG's own proof of 4.20(c), mmd L1786):
+* `F := F(G)`; by Thm 4.20(a) (`derived_le_fitting_of_centralizer_rank_le_two`) `G' ≤ F`, so `G/F`
+  is abelian;
+* let `p₁` be the *smallest* prime divisor of `|G|`; take `H` with `F ≤ H` and
+  `H/F = O_{p₁'}(G/F)`. Then `F` contains a Sylow `p₁` of `H`, and `G/H` (a quotient of the
+  abelian `G/F`) is a `p₁`-group;
+* by **Thm 4.18(b)** `H` has a normal `p₁`-complement; combined with `G/H` a `p₁`-group,
+  `hasNormalPComplement_of_…_quotient_isPGroup` yields `Ch05.HasNormalPComplement p₁ G`, whose
+  complement is `K = O_{p₁'}(G)` (`normalPComplement_eq_oPiCore_compl`);
+* `F(K) ≤ F(G)` (`fitting_map_subtype_le_fitting`) gives `r(F(K)) ≤ 2`, so recurse on `K`
+  (`Nat.card K < Nat.card G`), then lift the resulting series with
+  `CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
+
+NB: no `pRank G p ≤ 2` is needed — the rank hypothesis flows purely through `G' ≤ F` (Thm 4.20a)
+and `F(K) ≤ F(G)`, both direct inclusions (an earlier pRank/structure-lemma plan was wrong, since
+`pRank G p ≤ r(F(G))` is false in general). All hooks (Thm 4.18, the normal-`p`-complement assembly
+lemmas, the lift machinery) are already in this file / §5. -/
+theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
+    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
+    (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
+    Nonempty (CharacteristicSylowSeriesPackage G) := by
+  classical
+  -- Strong induction on `Nat.card G`, generalizing the group.
+  suffices H : ∀ n : ℕ, ∀ (G : Type _) [Group G] [Finite G] [IsSolvable G] [Nontrivial G],
+      Nat.card G = n → Odd (Nat.card G) → rank ↥(Ch01.fitting G) ≤ 2 →
+      Nonempty (CharacteristicSylowSeriesPackage G) by
+    exact H (Nat.card G) G rfl hodd hrank
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro G _ _ _ _ hcard hodd' hrank'
+    sorry
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04
