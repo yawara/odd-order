@@ -3083,6 +3083,42 @@ theorem m_gt_49_hundredths_of_caseB {hyp : Hypothesis (G := G)}
     hyp.base.m > (49 / 100 : ℚ) := by
   exact hyp.m_gt_49_hundredths_of_q_eq_three (data.caseB_params hcaseB).1
 
+/-- In the exceptional branch of **Peterfalvi (14.14)**, the S-side congruence
+branch `p ≡ 1 mod q` is impossible: the branch has `(q,p) = (3,5)`, and
+`5` is not `1 mod 3`. -/
+theorem not_p_modEq_one_of_caseB {hyp : Hypothesis (G := G)}
+    {nc : NonConjugateHypothesis hyp} (data : OrthogonalitySwitchData nc)
+    (hcaseB : data.caseB) :
+    ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] := by
+  intro hmod
+  have hparams := data.caseB_params hcaseB
+  have hmod' : 5 ≡ 1 [MOD 3] := by
+    simpa [hparams.1, hparams.2] using hmod
+  unfold Nat.ModEq at hmod'
+  norm_num at hmod'
+
+/-- In the exceptional branch of **Peterfalvi (14.14)**, the S-side case-(9.7.b)
+order data is forced into its full cyclotomic branch.  This is the consumer form
+needed for **Peterfalvi (14.15)**. -/
+theorem u_eq_full_cyclotomic_of_caseB {hyp : Hypothesis (G := G)}
+    {nc : NonConjugateHypothesis hyp} (data : OrthogonalitySwitchData nc)
+    (Sdata : CaseBForSData hyp) (hcaseB : data.caseB) :
+    hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+  Sdata.u_eq_of_not_modEq_one (data.not_p_modEq_one_of_caseB hcaseB)
+
+/-- Numerically, the exceptional branch of **Peterfalvi (14.14)** gives
+`u = (5^3 - 1)/(5 - 1) = 31`, once the S-side case-(9.7.b) order data has been
+materialized. -/
+theorem u_eq_thirty_one_of_caseB {hyp : Hypothesis (G := G)}
+    {nc : NonConjugateHypothesis hyp} (data : OrthogonalitySwitchData nc)
+    (Sdata : CaseBForSData hyp) (hcaseB : data.caseB) :
+    hyp.base.u = 31 := by
+  have hparams := data.caseB_params hcaseB
+  have hu := data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
+  rw [hparams.1, hparams.2] at hu
+  norm_num at hu
+  exact hu
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
