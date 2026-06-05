@@ -1894,6 +1894,56 @@ private theorem cyclotomic_quotient_sub_one_lt_div {p q : ℕ} (hp2 : 2 ≤ p) :
     exact div_lt_div_of_pos_right hnum hden_pos
   exact lt_of_le_of_lt hsub_le hquot_lt
 
+private theorem mul_pred_lt_three_pow_pred {p : ℕ} (hp : 5 ≤ p) :
+    p * (p - 1) < 3 ^ (p - 1) := by
+  induction p, hp using Nat.le_induction with
+  | base => norm_num
+  | succ p hp ih =>
+      have hstep : (p + 1) * p < 3 * (p * (p - 1)) := by
+        have hfactor : p + 1 < 3 * (p - 1) := by omega
+        have hmul := Nat.mul_lt_mul_of_pos_right hfactor (by omega : 0 < p)
+        simpa [mul_assoc, mul_left_comm, mul_comm] using hmul
+      calc
+        (p + 1) * ((p + 1) - 1) = (p + 1) * p := by rw [Nat.add_sub_cancel_right]
+        _ < 3 * (p * (p - 1)) := hstep
+        _ < 3 * 3 ^ (p - 1) := Nat.mul_lt_mul_of_pos_left ih (by norm_num)
+        _ = 3 ^ p := by
+          calc
+            3 * 3 ^ (p - 1) = 3 ^ (p - 1) * 3 := by rw [mul_comm]
+            _ = 3 ^ ((p - 1) + 1) := by rw [pow_succ]
+            _ = 3 ^ p := by rw [show (p - 1) + 1 = p by omega]
+
+private theorem p_mul_q_lt_q_pow_pred_of_five_le {p q : ℕ}
+    (hp5 : 5 ≤ p) (hq3 : 3 ≤ q) (hqp : q < p) :
+    p * q < q ^ (p - 1) := by
+  have hq_le_pred : q ≤ p - 1 := by omega
+  have hpq_le : p * q ≤ p * (p - 1) := Nat.mul_le_mul_left p hq_le_pred
+  have hpq_lt_three : p * q < 3 ^ (p - 1) :=
+    lt_of_le_of_lt hpq_le (mul_pred_lt_three_pow_pred hp5)
+  have hthree_le_qpow : 3 ^ (p - 1) ≤ q ^ (p - 1) :=
+    Nat.pow_le_pow_left hq3 (p - 1)
+  exact lt_of_lt_of_le hpq_lt_three hthree_le_qpow
+
+namespace CaseBForTData
+
+/-- The T-side case-(9.7.b) cyclotomic value in **Peterfalvi (14.4)** is already
+larger than `p q`.  This is the cyclotomic lower consequence consumed by the
+norm-cascade contradiction in (14.11.4). -/
+theorem pq_lt_v {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    hyp.base.p * hyp.base.q < hyp.base.v := by
+  have hpow : hyp.base.p * hyp.base.q < hyp.base.q ^ (hyp.base.p - 1) :=
+    p_mul_q_lt_q_pow_pred_of_five_le hyp.five_le_p hyp.base.three_le_q hyp.q_lt_p
+  have hleQ := cyclotomic_quotient_sub_one_ge_pow_pred
+    (q := hyp.base.q) (p := hyp.base.p) hyp.base.q_prime.two_le hyp.base.p_prime.two_le
+  have hle : hyp.base.q ^ (hyp.base.p - 1) ≤
+      (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) - 1 := by
+    exact_mod_cast hleQ
+  rw [data.v_eq]
+  exact lt_of_lt_of_le (lt_of_lt_of_le hpow hle)
+    (Nat.sub_le ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) 1)
+
+end CaseBForTData
+
 /-- Arithmetic bridge for **Peterfalvi (14.8)**: under the Section 16 prime
 ordering `q < p`, the T-side full cyclotomic quotient gives a strictly larger
 `(v - 1) / p` ratio than the S-side full cyclotomic quotient gives for

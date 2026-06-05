@@ -2577,6 +2577,7 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_coprime_q_sub_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.divisor_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.pq_lt_v
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
 set_option linter.style.longLine false in
