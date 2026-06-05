@@ -86,8 +86,13 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `exists_step4_sigma_inr_decomposition`, named BG factors `step4M1/2/3`, `relationC4_step4M`,
   and `Step4C5NormalForms`/`exists_step4C5NormalForms` landed.  This packages the three C.5
   normal forms plus their mod-`P` right-component readings for the already-proved backward C.4.
-  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は C.7 再結合
-  (`relationC4_step4M` に `hM1/hM2/hM3` を代入して U-word と kernel step へ渡す)。
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) C.4+C.5 substitution / C.7 seed done**:
+  `Step4C5NormalForms.factor1/2/3`, `relationC4_step4C5NormalForms`, and `relationC7_seed`
+  landed.  This proves the post-substitution relation
+  `t²·(u₁s₁v₁)·t⁻¹·(u₂s₂v₂)·t⁻¹·(u₃s₃v₃)=1`.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は BG の
+  `w₁=v₂^{t⁻¹}u₃`, `w₂=v₃u₁^{t⁻²}`, `w₃=v₁u₂^t` の def + U-membership + exact C.7.
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 

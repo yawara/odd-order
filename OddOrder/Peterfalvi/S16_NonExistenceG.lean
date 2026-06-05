@@ -2299,6 +2299,63 @@ theorem exists_step4C5NormalForms
         (u₁ := u3) (v₁ := v3) (c := c3) h3
   }⟩
 
+namespace Step4C5NormalForms
+
+/-- The first normal-form factor `u₁ s₁ v₁` from `(C.5)`. -/
+noncomputable def factor1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) *
+    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp)
+
+/-- The second normal-form factor `u₂ s₂ v₂` from `(C.5)`. -/
+noncomputable def factor2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp) *
+    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+      data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp)
+
+/-- The third normal-form factor `u₃ s₃ v₃` from `(C.5)`. -/
+noncomputable def factor3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) : G :=
+  data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) *
+    data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
+      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp)
+
+end Step4C5NormalForms
+
+/-- Relation `(C.4)` after substituting the three `(C.5)` normal forms. -/
+theorem relationC4_step4C5NormalForms
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b) :
+    (data.s⁻¹) ^ 3 * data.t ^ 2 * forms.factor1 *
+      data.t⁻¹ * forms.factor2 * data.t⁻¹ * forms.factor3 * data.s ^ 3 = 1 := by
+  have h := data.relationC4_step4M a b hab
+  rw [forms.hM1, forms.hM2, forms.hM3] at h
+  simpa [Step4C5NormalForms.factor1, Step4C5NormalForms.factor2,
+    Step4C5NormalForms.factor3] using h
+
+/-- The first rearranged relation on the way to BG `(C.7)`: multiply `(C.4)` by
+`s^3` on the left and `s^{-3}` on the right after substituting `(C.5)`. -/
+theorem relationC7_seed
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b) :
+    data.t ^ 2 * forms.factor1 * data.t⁻¹ * forms.factor2 * data.t⁻¹ * forms.factor3 =
+      1 := by
+  have h := data.relationC4_step4C5NormalForms hab forms
+  calc
+    data.t ^ 2 * forms.factor1 * data.t⁻¹ * forms.factor2 * data.t⁻¹ * forms.factor3 =
+        data.s ^ 3 *
+          ((data.s⁻¹) ^ 3 * data.t ^ 2 * forms.factor1 * data.t⁻¹ * forms.factor2 *
+            data.t⁻¹ * forms.factor3 * data.s ^ 3) * (data.s ^ 3)⁻¹ := by
+      group
+    _ = data.s ^ 3 * 1 * (data.s ^ 3)⁻¹ := by rw [h]
+    _ = 1 := by group
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
