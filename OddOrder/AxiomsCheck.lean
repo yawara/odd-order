@@ -2544,6 +2544,36 @@ set_option linter.style.longLine false in
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
+-- Peterfalvi §15/§16 standalone cyclotomic and growth arithmetic feeding the
+-- final Section 16 comparison.  These are independent of the theorem-level
+-- Section 15/16 scaffolds that still carry `sorry`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.q_ne_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.p_ne_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.three_le_q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.three_le_p
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_odd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_of_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_not_dvd_self_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_divisor_facts
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_not_modEq_one_mod_p
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_odd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_coprime
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_divisor_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
+
 -- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
 -- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
