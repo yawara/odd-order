@@ -63,12 +63,23 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 - **`relationC2`**: `s⁻²·(σ(inr a)⁻¹ s σ(inr a))·(σ(inr b)⁻¹ s σ(inr b)) = 1`。
 - **E-extraction** `unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition`:
   decomp(middle s⁻¹) ⟹ `(↑W)⁻¹∈E` (BG final paragraph `v₁=2-W` の repo 版; 既存終端 u₁-route 経由)。
+- **companion 構成** `exists_companion_of_unitVal_inv_mem_normSetE` (🆕 2026-06-05 続2):
+  `↑a⁻¹∈E ⟹ ∃ b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E` (b=bU⁻¹, bU=`normOneUnitOfMemNormSetE (2-↑a⁻¹∈E)`)。
+  `sBGConj_mul_sBGConj`/`relationC2` の仮説 `↑a⁻¹+↑b⁻¹=2` を放電する入口。build-green。
 - **経路B 配線** (commit e1b1991): `Step4Capstone` / `normSetETwistedNormOneStep_tConj_pow_three_of_capstone` /
   `appCNormSetTwistedNormOneStep_of_capstone` / `appC_normSet_generator_relation_of_capstone`。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
 ### 次の 1 手 (最優先): `Step4Capstone` を証明する ((C.3)→(C.10) → kernel → s₁=s⁻¹)
 **全 infra 完備**。capstone を埋めれば即 field 削除可能 (配線済)。PDF pp.150-152 が正確な式 (mmd は (C.3) が garble)。
+
+> 🆕🆕 **2026-06-05 続2 の進捗**: (a) **companion 構成 done** (`exists_companion_of_unitVal_inv_mem_normSetE`,
+> build-green) — `↑a⁻¹∈E ⟹ ∃b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E`、`relationC2` の入口。
+> (b) **🔴 (C.4) に forward-conj の障害を発見**: repo engine の共役が forward なため BG (C.4) は移植不可、
+> かつ **BG の局所 q-swap が機能しない** (connector の Q 元が U 元に刺さって消えない; 下記 step 1)。
+> mod-Q skeleton は OK (stripped (C.4)=`t⁻²M₁tM₂tM₃=1`, connector (-2,+1,+1)) だが **G-level の真偽は未確定**。
+> BG 証明そのものは forward M₁ に適用不可。**次セッションは step 1 の選択肢 (a)大域Q / (b)backward書換 /
+> (c)module抽象 を判断要** — 当初想定 (BG 写経) より重い。
 
 > 💡 **k=3 に固定して導出してよい** (推奨): BG は (C.2)-(C.10) を一般 k∈F_p で進め s₁=s⁻¹ を出すが、
 > 論証は **各 k で独立** (異なる k を混ぜない) で、最終利用は k=3 のみ。`Step4Capstone` 自体が slot
@@ -78,24 +89,42 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 > (BG は right-conj `(u)^{t^j}=t^{-j}u t^j`、repo は left-conj `t^j σ(inr u) t^{-j}=σ(inr(tConjAut^j u))`;
 > repo の `data.t = y·s·y⁻¹` で BG の y と逆規約 — 規約変換は最初に 1 回だけ吸収する)。
 > zpow/一般 k を避けられるので大幅に楽。
-1. **(C.3)→(C.4)** [最も convention-heavy だが構造解明済]: `relationC2` から (C.4)
-   `s⁻³t² M₁ t⁻¹ M₂ t⁻¹ M₃ s³ = 1` (k=3)。M₁=`s(a⁻¹)^{t³}s⁻²` (= `exists_step4_first_k_three_decomposition`
-   の LHS そのもの!), M₂=`s³(ab⁻¹)^{t²}s⁻¹`, M₃=`s²b^t s⁻³` (PDF p.150)。
-   - **✅ 証明構造を完全解明 (BG convention で検算済; repo convention で再現要)**:
-     (C.4-LHS) を展開すると `conn1·C2·conn2·C4·conn3·C6` (C2=(a⁻¹)^{t³}, C4=(ab⁻¹)^{t²}, C6=b^t)。
-     各 connector は **単一の Q-可換スワップ**: `qᵢ⁻¹qⱼ = qⱼqᵢ⁻¹` (qᵢ:=s⁻ⁱtⁱ∈Q):
-     - conn1: `s⁻³t²s = q₃q₁⁻¹ = q₁⁻¹q₃ = t⁻¹s⁻²t³` (q₃=s⁻³t³, q₁⁻¹=t⁻¹s; group→Q-comm→group)。
-     - conn2: `s⁻²t⁻¹s³ = q₂q₃⁻¹ = q₃⁻¹q₂ = t⁻³st²`。
-     - conn3: `s⁻¹t⁻¹s² = q₁q₂⁻¹ = q₂⁻¹q₁ = t⁻²st`。
-     swap 後の `(t⁻¹s⁻²t³)C2(t⁻³st²)C4(t⁻²st)C6` は t冪が telescope して
-     `t⁻¹·(s⁻²A⁻¹sAB⁻¹sB)·t = t⁻¹·(C.2-LHS)·t = t⁻¹·1·t = 1` (relationC2)。
-   - **Q-membership は既存**: q₃=s⁻³t³=`s_inv_pow_mul_t_pow_mem_Q 3` (要 (s⁻¹)³=s⁻³ bridge),
-     q₁⁻¹=t⁻¹s=`t_inv_pow_mul_s_pow_mem_Q 1`, 等。Q-comm=`Q_mul_comm`。
-   - ⚠️ **repo convention 注意**: 上の検算は BG right-conj `(u)^{t^j}=t⁻ʲu tʲ`。repo は
-     `(tConjAut^j)u ↔ tʲσ(inr u)t⁻ʲ` (left-conj, S16:1038) + `t=ysy⁻¹`。M₁ を
-     `exists_step4_first_k_three_decomposition` の LHS (repo) に合わせて定義し、connector/telescope を
-     repo convention で再導出する (構造は同型、冪の符号だけ Lean で確認)。
-   - 既存 engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` (S16:1097) が Mᵢ の正規形を与える。
+1. **(C.3)→(C.4)** [最 convention-heavy。🆕🆕 2026-06-05 続2: forward-conj で repo 冪を確定]:
+   `relationC2` から (C.4)。**⚠️ BG の `s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³` はそのまま移植不可**。理由 = repo
+   engine の共役は **forward** (`σ(inr(tConjAut³ a⁻¹)) = t³σ(inr a⁻¹)t⁻³`、`normOneUnitsEquivU_..._apply_coe`
+   S16:990) で BG の backward `(a⁻¹)^{t³}=t⁻³At³` と逆。素朴な `t→t⁻¹` 置換も**不可** (BG は
+   `qⱼ=s⁻ʲtʲ∈Q` を使うが置換後 `s⁻ʲt⁻ʲ∉Q` — G/Q で `s̄=t̄` (∵`s⁻¹t∈Q`) ゆえ `s⁻ʲt⁻ʲ≡s̄⁻²ʲ≠1`)。
+   - **✅ repo (C.4) の正しい冪を確定 (mod-Q で検算済; G-level Q-juggling は未実装)**:
+     - **M_i (forward, k=3)** = engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` 出力:
+       M₁=`s¹·σ(inr(tConjAut³ a⁻¹))·s⁻²` (= `exists_step4_first_k_three_decomposition` の LHS),
+       M₂=`s³·σ(inr(tConjAut² (a·b⁻¹)))·s⁻¹`, M₃=`s²·σ(inr(tConjAut¹ b))·s⁻³`。
+       (s 冪 (1,-2)/(3,-1)/(2,-3) は **BG と同一**; 共役 tConjAut^{3/2/1} の向きだけ forward。
+       単位対応: relationC2 = `s⁻²·σ(inr a)⁻¹·s·σ(inr(a·b⁻¹))·s·σ(inr b)` の 3 共役単位 = `a⁻¹`,`a·b⁻¹`,`b`。)
+     - **stripped (C.4)** = `t⁻²·M₁·t·M₂·t·M₃ = 1` (connector 冪 **(-2,+1,+1)**; BG は (+2,-1,-1) で**符号反転**)。
+       これが (C.7) に渡る形。**full (C.4)** = `s⁻⁴·t⁻²·M₁·t·M₂·t·M₃·s⁴ = 1` (α=-4,β=-2,γ=δ=+1,ε=4;
+       stripped から `s⁴(·)s⁻⁴`)。
+   - **🔴🔴 重要訂正: forward は BG の局所 q-swap が機能しない (当初「同等」判断は誤り)**:
+     φ-push (`t^β M₁ t^γ M₂ t^δ M₃ = φ^β(M₁)φ^{β+γ}(M₂)φ^{β+γ+δ}(M₃)·t^{β+γ+δ}`, φ(x)=txt⁻¹) で
+     **β+γ+δ=0** (=-2+1+1) + **γ=δ=+1 で U-元 (A,D,E) が一様 φ¹** までは BG と同形。だが残る
+     **s-共役 `φ^j(s)` (j=-2,-1,0) の非一様性**を消す段で差が出る:
+     - BG (backward C_i=`t⁻ᵏAtᵏ`): connector+M₁s+C₁の t = `s⁻³t²s·t⁻³` で **t が局所相殺** → `t⁻¹s⁻²`
+       (clean s-冪)。各 connector が単一 q-swap で綺麗に畳める (full=`t⁻¹·relationC2·t`)。
+     - repo (forward C_i=`tᵏAt⁻ᵏ`): connector+M₁s+C₁の t = `t⁻²s·t³` = `r₂q₁t²` (r₂=t⁻²s²,q₁=s⁻¹t∈Q)
+       — **Q 元 r₂q₁ が残り、leftover t² が U-元 A に刺さる** (`r₂q₁t²·A = r₂q₁·φ²(A)·t²`, Q と U は
+       非可換で消えない)。**局所では畳めない**。
+   - **∴ G-level の真偽は未確定** (mod-Q skeleton `s̄²Ās̄D̄s̄Ēs̄⁻⁴` = `s̄²(Ās̄D̄s̄Ē=s̄²)s̄⁻⁴`=1 は OK だが、
+     Q-part が大域的に消えるかは未検証)。さらに **forward = BG-argument を τ=t⁻¹ で回す版に対応しない**
+     (BG q_j=`s⁻ʲτʲ` を要求するが τ=t⁻¹ では `s⁻ʲt⁻ʲ∉Q`; τ=t⁻¹ は s の y-共役でなく s⁻¹ の共役)。
+     つまり **BG の証明そのものは forward M₁ に直接適用できない**。
+   - **🚩 次セッションの選択肢** (どれか要判断):
+     (a) forward stripped (C.4) を **大域 Q-argument** で証明 (relationC2 を `Ās̄D̄s̄Ē=s̄²` 化 → Q-part を
+         `actionCommutator`/可換性で潰す; 技術新規、難易度高・真偽リスク有)。
+     (b) **engine を backward 版に直す/別 decomposition を立てる** — capstone M₁ が `tConjAut³`(forward)
+         で固定なので、`tConjAut³ a⁻¹ = (tConjAut⁶ a⁻¹)^{t³}_{BG-bwd}` 等の書き換えで BG 形に乗せられるか
+         検討 (ただし unit が tConjAut⁶ a⁻¹ になり E-membership/base relation の再設定が要る)。
+     (c) **module/End 抽象を先に立てて (C.4)-(C.10)+kernel を一括処理** (Q を ℤ[P₀]-加群として扱い、
+         s-共役の非一様性を加群演算で吸収; 最も筋が良いが大工事)。
+   - **Q-membership/comm は既存**: `s_inv_pow_mul_t_pow_mem_Q`/`t_inv_pow_mul_s_pow_mem_Q`/`Q_mul_comm`。
 2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
 3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
 4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,

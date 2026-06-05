@@ -1778,6 +1778,34 @@ theorem relationC2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
   rw [data.sBGConj_mul_sBGConj a b hab, zpow_neg, zpow_two, ← pow_two,
     inv_mul_cancel]
 
+/-- **BG Appendix C, Lemma C.3 Step 4 companion** (mmd L4994): for a norm-one unit
+`a` whose inverse field value lies in `E`, BG's companion element `b ∈ E` with
+`a + b = 2` exists as a norm-one unit.  Concretely, `↑b⁻¹ = 2 - ↑a⁻¹` (so the base
+relation `↑a⁻¹ + ↑b⁻¹ = 2` of `sBGConj_mul_sBGConj` holds), and `↑b⁻¹` again lies in
+`E`. -/
+theorem exists_companion_of_unitVal_inv_mem_normSetE {hyp : Hypothesis (G := G)}
+    (_data : FieldNormalizerData hyp) {a : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q) :
+    ∃ b : fieldNormalizerNormOneUnits hyp,
+      unitVal a⁻¹ + unitVal b⁻¹ = 2 ∧
+        unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hq : 0 < hyp.base.q := hyp.base.q_prime.pos
+  have ha2 : (2 - unitVal a⁻¹) ∈
+      OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q :=
+    OddOrder.BG.AppC.NormSet.two_sub_mem_normSetE hyp.base.p hyp.base.q ha
+  have hval : unitVal
+      ((OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE
+        hyp.base.p hyp.base.q hq ha2)⁻¹)⁻¹ = 2 - unitVal a⁻¹ := by
+    rw [inv_inv]
+    simp only [unitVal]
+    exact OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE_coe
+      hyp.base.p hyp.base.q hq ha2
+  refine ⟨(OddOrder.BG.AppC.NormSet.normOneUnitOfMemNormSetE
+      hyp.base.p hyp.base.q hq ha2)⁻¹, ?_, ?_⟩
+  · rw [hval]; ring
+  · rw [hval]; exact ha2
+
 /-- **BG Appendix C, Lemma C.3 Step 4 E-membership extraction** (mmd L5090–5094):
 if the `k = 3` normal form of `s · σ(inr W) · s⁻²` has central prime-line factor
 `s⁻¹`, then the inverse field value `(↑W)⁻¹` lies in the norm set `E`.  This is BG's
