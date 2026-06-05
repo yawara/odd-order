@@ -1276,6 +1276,21 @@ theorem Msigma_ne_bot_of_rank_fittingInG_le_two [Finite G] (hG : IsMinimalSimple
       hodd hrankF
   exact Msigma_ne_bot_of_characteristicSylowSeriesPackage hG hM pkg
 
+/-- The Fitting subgroup of `M`, viewed inside `G`, has rank no larger than `M`. -/
+theorem rank_fittingInG_le_rank [Finite G] (M : Subgroup G) :
+    rank ↥(Ch2.S08.fittingInG M) ≤ rank ↥M :=
+  OddOrder.GroupTheory.rank_le_of_injective
+    (f := Subgroup.inclusion (Ch2.S08.fittingInG_le M))
+    (Subgroup.inclusion_injective (Ch2.S08.fittingInG_le M))
+
+/-- Low-rank maximal-subgroup input for the hard branch of BG Theorem 10.2(e). -/
+theorem Msigma_ne_bot_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
+    (hrank : rank ↥M ≤ 2) :
+    Msigma M ≠ ⊥ :=
+  Msigma_ne_bot_of_rank_fittingInG_le_two hG hM
+    ((rank_fittingInG_le_rank M).trans hrank)
+
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
 nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
 `M_α = 1` case using the low-rank/Thm 4.20 argument. -/
