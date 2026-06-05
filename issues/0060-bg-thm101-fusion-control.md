@@ -25,13 +25,24 @@ created: 2026-06-05
 - (d) `X∈Syl_p(M), X^g⊆M ⇒ g∈M`.
 - (e) `C_G(X)⊆M, X^g⊆M ⇒ g∈M`.
 
+## 進捗 (2026-06-05)
+
+build-green helper を S10_MalphaMsigma.lean に積み上げ中 (main 直接, commits 7706aba/6201617):
+- ✅ `map_subtype_conj_smul`: `(c•K).map subtype = ↑c • (K.map subtype)` (conj⇄subtype 同変, §10 全般で再利用)。
+- ✅ `normalizer_sylow_map_le_of_mem_sigma` (σ basic, mmd L2655): `p∈σ(M) ⟹ ∀ Sylow-p Q of M, N_G(Q̄)≤M`。
+- ✅ `mem_normalizer_of_conj_smul_eq`: `conj h • H = H → h∈N_G(H)`。
+- ✅ **part (d)** `fusion_d_of_mem_sigma`: `Sylow.ofCard` で `(conj g•X).subgroupOf M` を Sylow 化 →
+  M-共役 c → `↑c⁻¹g∈N_G(X)≤M` → `g∈M`。
+
+**残り** = part (b) (最重・maximal-counterexample 帰納) + (b)⟹(a)(c)(e) 還元 + capstone wiring。
+main 定理 `fusion_control_of_mem_sigma` の bundled sorry は未解消 (part b 完成で一気に閉じる)。
+
 ## やること / 証明構造 (BG 忠実, mmd L2665-2711)
 
-- [ ] **(d)**: X, X^g とも Syl_p(M) ⟹ Sylow 共役で `(X^g)^h=X` (h∈M) ⟹ `gh∈N_G(X)⊆M` ⟹ `g∈M`.
-  `N_G(X)⊆M`: p∈σ(M) で N_G(P)⊆M の Sylow P, X=P^m → N_G(X)=N_G(P)^m⊆M.
+- [x] **(d)**: X, X^g とも Syl_p(M) ⟹ Sylow 共役で `(X^g)^h=X` (h∈M) ⟹ `gh∈N_G(X)⊆M` ⟹ `g∈M`. (`fusion_d_of_mem_sigma`)
 - [ ] **(b)⟹(a)**: X⊆M^{g⁻¹}=M^c (c∈C_G(X)) ⟹ cg∈N_G(M)=M ⟹ g=c⁻¹(cg).
 - [ ] **(a)⟹(c), (b)⟹(e)**: corollary.
-- [ ] **(b) by contradiction (maximal-order counterexample X)**:
+- [ ] **(b) by contradiction (maximal-order counterexample X)** [最重・残りの本体]:
   - L=N_G(X), M₁,M₂∈{M^g|X⊆M^g} with `M₁^c≠M₂ ∀c∈C_G(X)` (10.1).
   - M₂^g=M₁ ⟹ X,X^g⊆M₁. X∉Syl_p(M₁) (else (d)⟹矛盾) ⟹ X⊂X₁∈Syl_p(L∩M₁), X⊂X₂∈Syl_p(L∩M₂).
   - P=Syl_p(L)⊇X₁, t∈L with X₂⊆P^t. p∈σ(M) で M⊇Syl_p(G) → 共役で P⊆M と仮定可.
