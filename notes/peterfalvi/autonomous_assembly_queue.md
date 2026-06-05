@@ -223,16 +223,20 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   - ✅ **a-half assembly** (commit 7a11196, `theta_degree_le_index_mul_constituent`@S08): θ∈Irr K, C≤K ⟹
     ∃ φ∈Irr C, `⟨Ind_C^K φ, θ⟩≠0 ∧ (θ 1).re ≤ |K:C|·(φ 1).re`。`exists_inner_induce_ne_zero`(H:=C で φ 産出)
     + brick 2 + brick 1 + `induce_apply_one`。全 axiom-clean (AxiomsCheck 登録)・warning-clean・full build 3555。
-- 🔴 **θ-bound 残 = 全 θ-bound 結合 + Sibley packaging**:
-  1. **full θ-bound** `θ(1)≤|K:C|·√|C:D|` = a-half(✅) × b-half `degree_sq_le_index_of_central_quotient`(✅,
-     `φ(1)²≤|C:D|`) + `degreeBound_le_of_sqrt_bound` 系の √ 算術。**gap = a-half の φ を b-half 仮説に整合**:
-     b-half は `φ:IrreducibleCharacter C` + `D:Subgroup ↥C` + `N⊆ker φ` + `D/N≤Z(C/N)` を要求。a-half の φ は
-     Ind φ の constituent (= Res θ の constituent) なので、`N⊆ker θ ⟹ N⊆ker φ` (constituent kernel 継承;
-     `characterKernel_subset_of_inner_induce_ne_zero`@S08:243 の Res 版 or restriction 経由) を立てれば整合。
-     D は `Subgroup ↥C` で取れば subgroupOf coercion 不要 (b-half が G:=C で直接適用可)。
-  2. **Sibley packaging** (member-family enum 経由で B1 適用 + B2 接続 ⟹ (6.2) `2|L:C|√|C:D|≥|K:A|−1`)。🔴 最重。
-  → **次着手 = full θ-bound 結合 (φ↔b-half 整合 + √算術) → (6.2) を SibleyDadeHypothesis の実 index に結線**。
-  または (b) T-A4 member-family enum 先行 (Sibley packaging と共有 foundational piece)。
+- ✅✅✅ **full θ-bound 完成** (commit 0826aa7, `theta_degree_le_index_mul_sqrt_index`@S08): θ∈Irr K, C≤K,
+  section N◁C (N≤D≤C, θ trivial on N after Res, D/N≤Z(C/N)) ⟹ `(θ 1).re ≤ |K:C|·√|C:D|`。a-half(✅) ×
+  b-half `degree_sq_le_index_of_central_quotient`(✅) + √算術 `Real.le_sqrt_of_sq_le`。**φ↔b-half 整合 gap 解決**:
+  a-half の φ は Res θ の constituent (reciprocity `inner_induce_eq_inner_restrict` + `inner_conj_symm`) ゆえ
+  `N⊆ker(Res θ) ⟹ N⊆ker φ` を constituent kernel 継承 `characterKernel_subset_of_isCharacter_of_inner_ne_zero`
+  で放電。D を `Subgroup ↥C` に取り subgroupOf coercion 回避。全 axiom-clean (AxiomsCheck 登録)・warning-clean・
+  full build 3555。
+- 🔴 **θ-bound 残 = Sibley packaging のみ** (full θ-bound は完成):
+  **Sibley packaging** = member-family enum 経由で B1 適用 + B2 接続 ⟹ (6.2) `2|L:C|√|C:D|≥|K:A|−1`。🔴 最重 combinatorial。
+  **注意**: (6.3)/(6.5) 算術 shell (`six_three_HH1_le` 等) は数値 `hbound: |K:C|·|C:D|−1 ≤ 2|L:C|·|K:C|·√|C:D|`
+  を coherence family の `∑χ(1)²`(B1/B2 集約) から作る形ゆえ、full θ-bound は **per-θ では 1 スロット差しでなく
+  member-family enum 経由で集約**に効く。
+  → **次着手 = Sibley packaging (member-family enum)** = T-A4 と共有 foundational piece; (6.2) を
+  SibleyDadeHypothesis の実 index に結線。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
