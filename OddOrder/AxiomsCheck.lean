@@ -2571,6 +2571,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_coprime
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_divisor_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_odd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_pos
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_ne_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_coprime_q_sub_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.divisor_modEq_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
 set_option linter.style.longLine false in
@@ -2601,10 +2607,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_mem_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_normalizes_Q
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_neg
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_pow_p
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerNormOneUnits_card_gt_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_fieldNormalizerNormOneUnit_ne_one
 #assert_only_allowed_axioms
@@ -2652,6 +2665,11 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation_of_first_k_three_coordinate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_mem_P1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_normalizes_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_normalizes_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
 #assert_only_allowed_axioms

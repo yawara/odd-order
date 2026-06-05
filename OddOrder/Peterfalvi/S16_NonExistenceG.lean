@@ -1561,6 +1561,18 @@ theorem v_odd {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
   exact hyp.tSide_cyclotomic_quotient_odd
 
 /-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+positive. -/
+theorem v_pos {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    0 < hyp.base.v :=
+  Odd.pos data.v_odd
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+nonzero. -/
+theorem v_ne_zero {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    hyp.base.v ≠ 0 :=
+  ne_of_gt data.v_pos
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
 coprime to `q - 1`. -/
 theorem v_coprime_q_sub_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
     Nat.Coprime hyp.base.v (hyp.base.q - 1) := by
