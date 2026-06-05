@@ -65,25 +65,18 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 - [x] **conditional quotient rank part of (d)**: §4 の既存 lemma
   `Ch1.S04.pRank_quotient_le_of_coprime` を public 化し、`rank_quotient_Malpha_le_two_of_isHall`
   を追加。Hall `α(M)` 連言が得られれば、BG 10.2(d) の `rank(M/M_α)≤2` は完成済み。
-- [x] **Hall `α(M)` transport / existence of `M(α)`**: `not_dvd_index_of_mem_sigma` で
+- [x] **Hall `α(M)` transport / `M(α)=M_α`**: `not_dvd_index_of_mem_sigma` で
   `p∈σ(M) ⇒ p∤[G:M]` を公開し、`hallAlphaSubgroup_isHallInG` /
   `exists_hallAlphaSubgroup_isHallInG` により Hall-E で得た `M` 内の `α(M)`-Hall subgroup を
-  `G` 内の `α(M)`-Hall subgroup として使えるようにした。残る `M(α)=M_α` 同定後、
-  target の G-level Hall `α(M)` 連言へ直結する。
-- [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
-  (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
-  (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。`q∈σ(M) ∧ O_q(M)≠⊥ ⇒ M_σ≠⊥`
-  の最終bridgeは `Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma` として切り出し済み。
-  さらに `P.map = O_q(M)` と `N_G(O_q(M))≤M` から直接 `M_σ≠⊥` を返す
-  `Msigma_ne_bot_of_sylowMap_eq_opiCoreInG_singleton` も追加済み。
-  `Msigma_ne_bot_of_normal_local_sylow` / `Msigma_ne_bot_of_characteristicSylowSeriesPackage` /
-  `Msigma_ne_bot_of_rank_fittingInG_le_two` / `Msigma_ne_bot_of_rank_le_two` により、§4.20(c)
-  package、`rank F(M)≤2`、`rank M≤2` の入力からも `M_σ≠⊥` まで接続済み。
-  `IsMinimalSimpleOdd.ne_bot_of_mem_maximalSubgroups` により `M` の非自明性は最大部分群仮定から
-  自動生成済み。`rank_le_two_of_Malpha_eq_bot_of_isHall` /
-  `Msigma_ne_bot_of_Malpha_eq_bot_of_isHall` により、Hall `α(M)` 連言が得られれば
-  `M_α=⊥` hard branch も `rank M≤2` bridge に接続済み。
-  **残りは Hall `α(M)` / `σ(M)` の2連言を作り、capstoneで `M_α=⊥`/`≠⊥` を場合分けする配線**。
+  `G` 内の `α(M)`-Hall subgroup として使えるようにした。さらに
+  `exists_hallSigmaSubgroup_containing_alphaSubgroup` で Hall-D (BG Prop 1.5(b), trivial operator)
+  により α-subgroup を Hall `σ(M)`-subgroup に入れ、前段の quotient α/α'-triviality から
+  `hallAlphaSubgroup_le_Malpha` を証明。これで `Malpha_isHall` (G-level Hall `α(M)` 連言) 完成。
+- [x] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
+  (M_α≠⊥ ⇒ M_σ≠⊥) と hard branch support (`M_α=⊥ ⇒ rank M≤2 ⇒ §4.20(c) package
+  ⇒ normal local Sylow ⇒ singleton core ⇒ `M_σ≠⊥`) は接続済み。`Malpha_isHall` 完成により
+  `Msigma_ne_bot_of_Malpha_eq_bot_of_isHall` の Hall 仮定が供給できるため、
+  `Msigma_ne_bot` 本体も完成。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重**。
   `rank(M/M_α)≤2` は Hall `α(M)` 仮定の下で `rank_quotient_Malpha_le_two_of_isHall` により
   接続済み。`fitting_quotient_oPiCore_isPiGroup_compl` /
@@ -97,9 +90,8 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl` により任意の Hall `σ(M)`-subgroup
   `S≤M` の像も `F(M/M_α)` 内の α'-group になり、
   `alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup` で `A≤S` なる α-subgroup は
-  すでに `M_α` に入るところまで接続済み。
-  残りは
-  `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
+  すでに `M_α` に入るところまで接続済み。この入力から `Malpha_isHall` も完成。
+  残りは `M(σ)=M_σ` を同定して Hall `σ(M)` 連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。
 
 ## 完了条件

@@ -1588,6 +1588,91 @@ theorem alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup [Finite G]
     Subgroup.mem_subgroupOf.mpr hx
   exact Subgroup.mem_subgroupOf.mp (hA_le_N hxAsub)
 
+/-- **BG Theorem 10.2(d), Hall-`σ` contains `α`-subgroups**:
+every `α(M)`-subgroup of `M` is contained in a Hall `σ(M)`-subgroup of `M`.
+This is Hall-D (BG Prop. 1.5(b)) with the trivial operator group, plus
+`α(M) ⊆ σ(M)`. -/
+theorem exists_hallSigmaSubgroup_containing_alphaSubgroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M A : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hAM : A ≤ M) (hAα : Ch03.Subgroup.IsPiGroup (alpha M) A) :
+    ∃ S : Subgroup G,
+      S ≤ M ∧ Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M) ∧ A ≤ S := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  let φ : Unit →* MulAut ↥M := 1
+  have hA_sub_σ : Ch03.Subgroup.IsPiGroup (sigma M) (A.subgroupOf M) := by
+    intro p hp
+    have hpA : p ∈ (Nat.card ↥A).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAM).toEquiv] at hp
+    exact alpha_subset_sigma hG hM (hAα p hpA)
+  have hA_sub_inv : Ch03.IsAInvariant φ (A.subgroupOf M) := by
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro _ x hx
+    simpa [φ] using hx
+  have hCop : Nat.Coprime (Nat.card Unit) (Nat.card ↥M) := by
+    simp
+  obtain ⟨H, hH_hall, _hH_inv, hA_le_H⟩ :=
+    OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
+      (G := ↥M) (A := Unit) (φ := φ) hCop hA_sub_σ hA_sub_inv
+  let S : Subgroup G := H.map M.subtype
+  have hSM : S ≤ M := by
+    exact Subgroup.map_subtype_le H
+  refine ⟨S, hSM, ?_, ?_⟩
+  · have hS_sub : S.subgroupOf M = H := by
+      rw [show S = H.map M.subtype from rfl, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    rwa [hS_sub]
+  · intro x hx
+    have hxM : x ∈ M := hAM hx
+    have hxA_sub : (⟨x, hxM⟩ : ↥M) ∈ A.subgroupOf M :=
+      Subgroup.mem_subgroupOf.mpr hx
+    rw [show S = H.map M.subtype from rfl, Subgroup.mem_map]
+    exact ⟨⟨x, hxM⟩, hA_le_H hxA_sub, rfl⟩
+
+/-- **BG Theorem 10.2(a), Hall-`α` subgroup collapses to `M_α`**:
+an `α(M)`-Hall subgroup of `M`, viewed in `G`, is contained in `M_α`.
+Choose a Hall `σ(M)`-subgroup containing it and apply the quotient
+`α/α'`-triviality step above. -/
+theorem hallAlphaSubgroup_le_Malpha [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M A : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hAM : A ≤ M)
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (A.subgroupOf M)) :
+    A ≤ Malpha M := by
+  have hAα : Ch03.Subgroup.IsPiGroup (alpha M) A := by
+    intro p hp
+    have hpSub : p ∈ (Nat.card ↥(A.subgroupOf M)).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAM).toEquiv]
+    exact hHallα.1 p hpSub
+  obtain ⟨S, hSM, hHallσ, hAS⟩ :=
+    exists_hallSigmaSubgroup_containing_alphaSubgroup hG hM hAM hAα
+  exact alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup hG hM hSM hHallσ hAS hAα
+
+/-- **BG Theorem 10.2(a)**: `M_α` is an `α(M)`-Hall subgroup of `G`.
+Hall-E gives a local Hall `α(M)`-subgroup `A` of `M`; the previous theorem puts
+`A ≤ M_α`, and the index of `M_α` then divides the index of the `G`-Hall subgroup `A`. -/
+theorem Malpha_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (alpha M) (Malpha M) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (alpha M)
+  set A : Subgroup G := H.map M.subtype with hAdef
+  have hAM : A ≤ M := by
+    rw [hAdef]
+    exact Subgroup.map_subtype_le H
+  have hA_sub : A.subgroupOf M = H := by
+    rw [hAdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  have hHallA_sub : Ch03.IsHallSubgroup (alpha M) (A.subgroupOf M) := by
+    rwa [hA_sub]
+  have hHallA_G : Ch03.IsHallSubgroup (alpha M) A :=
+    hallAlphaSubgroup_isHallInG hG hM hAM hHallA_sub
+  have hA_le_Mα : A ≤ Malpha M :=
+    hallAlphaSubgroup_le_Malpha hG hM hAM hHallA_sub
+  refine ⟨Malpha_isPiGroup M, ?_⟩
+  intro p hpidx hpα
+  apply hHallA_G.2 p ?_ hpα
+  exact Nat.primeFactors_mono (Subgroup.index_dvd_of_le hA_le_Mα)
+    Subgroup.index_ne_zero_of_finite hpidx
+
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
 nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/
@@ -1775,6 +1860,16 @@ theorem Msigma_ne_bot_of_Malpha_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   intro hσ
   exact hα (le_bot_iff.mp (by
     simpa [hσ] using Malpha_le_Msigma hG hM))
+
+/-- **BG Theorem 10.2(e)**: `M_σ` is nontrivial. If `M_α` is nontrivial, this is
+immediate from `M_α ≤ M_σ`; if `M_α = 1`, the Hall-`α` theorem above unlocks the
+low-rank/Thm 4.20 hard branch. -/
+theorem Msigma_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Msigma M ≠ ⊥ := by
+  by_cases hα : Malpha M = ⊥
+  · exact Msigma_ne_bot_of_Malpha_eq_bot_of_isHall hG hM (Malpha_isHall hG hM) hα
+  · exact Msigma_ne_bot_of_Malpha_ne_bot hG hM hα
 
 /-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
 `M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
