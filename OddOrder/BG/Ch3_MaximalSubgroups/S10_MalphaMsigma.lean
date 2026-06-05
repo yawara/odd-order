@@ -1032,6 +1032,93 @@ theorem exists_hallAlphaSubgroup_isHallInG [Finite G] (hG : IsMinimalSimpleOdd G
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   rwa [hA_sub]
 
+/-- Every `p`-subgroup of the Fitting subgroup lies in `O_p(G)`. The point is that
+`F(G)` is nilpotent, hence its Sylow `p`-subgroup is characteristic in `F(G)` and
+therefore normal in `G`. -/
+theorem pSubgroup_le_opCore_of_le_fitting [Finite G] {p : ℕ} [Fact p.Prime]
+    {W : Subgroup G} (hW : IsPGroup p ↥W) (hWF : W ≤ Ch01.fitting G) :
+    W ≤ Ch01.opCore p G := by
+  classical
+  have hW'_pg : IsPGroup p ↥(W.subgroupOf (Ch01.fitting G)) :=
+    hW.of_injective (Subgroup.subgroupOfEquivOfLe hWF).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hWF).injective
+  obtain ⟨P, hWP⟩ := hW'_pg.exists_le_sylow
+  have hPnorm : P.Normal := Ch01.Sylow.normal_of_isNilpotent P
+  haveI : (P : Subgroup ↥(Ch01.fitting G)).Characteristic :=
+    Sylow.characteristic_of_normal P hPnorm
+  haveI : ((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype).Normal :=
+    inferInstance
+  have hPmap_pg :
+      IsPGroup p ↥((P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype) :=
+    P.2.map _
+  calc W = (W.subgroupOf (Ch01.fitting G)).map (Ch01.fitting G).subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hWF).symm
+    _ ≤ (P : Subgroup ↥(Ch01.fitting G)).map (Ch01.fitting G).subtype :=
+        Subgroup.map_mono hWP
+    _ ≤ Ch01.opCore p G := Ch01.normal_pgroup_le_opCore hPmap_pg
+
+/-- Quotienting by `O_π(G)` makes the Fitting subgroup a `π'`-group. If a
+`π`-prime divided `F(G/O_π(G))`, a nontrivial Sylow subgroup of that Fitting subgroup
+would lie in the corresponding `O_p`, hence in the π-core of the quotient, contradicting
+`O_π(G/O_π(G)) = 1`. -/
+theorem fitting_quotient_oPiCore_isPiGroup_compl [Finite G] (π : Set ℕ) :
+    Ch03.Subgroup.IsPiGroup πᶜ (Ch01.fitting (G ⧸ Ch03.oPiCore π G)) := by
+  classical
+  let Q : Type _ := G ⧸ Ch03.oPiCore π G
+  intro p hpF hpπ
+  have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpF).1
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hp_dvd_F : p ∣ Nat.card ↥(Ch01.fitting Q) :=
+    (Nat.mem_primeFactors.mp hpF).2.1
+  obtain ⟨P⟩ : Nonempty (Sylow p ↥(Ch01.fitting Q)) := inferInstance
+  let Pbar : Subgroup Q := (P : Subgroup ↥(Ch01.fitting Q)).map (Ch01.fitting Q).subtype
+  have hPbar_pg : IsPGroup p ↥Pbar := by
+    exact P.2.map _
+  have hPbar_le_F : Pbar ≤ Ch01.fitting Q := Subgroup.map_subtype_le _
+  have hPbar_le_op : Pbar ≤ Ch01.opCore p Q :=
+    pSubgroup_le_opCore_of_le_fitting hPbar_pg hPbar_le_F
+  have hPbar_ne : Pbar ≠ ⊥ := by
+    have hcard_gt : 1 < Nat.card ↥Pbar := by
+      dsimp [Pbar]
+      rw [Subgroup.card_map_of_injective (Ch01.fitting Q).subtype_injective,
+        P.card_eq_multiplicity]
+      exact Nat.one_lt_pow
+        (hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd_F).ne' hp_prime.one_lt
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hcard_gt
+    exact lt_irrefl 1 hcard_gt
+  have hop_pi : Ch03.Subgroup.IsPiGroup π (Ch01.opCore p Q) := by
+    intro r hr
+    have hr_singleton : r ∈ ({p} : Set ℕ) :=
+      Ch1.S04.isPiGroup_singleton_of_isPGroup (Ch01.opCore_isPGroup p Q) r hr
+    rwa [Set.mem_singleton_iff.mp hr_singleton]
+  have hop_le_oPi : Ch01.opCore p Q ≤ Ch03.oPiCore π Q :=
+    Ch03.Subgroup.IsPiGroup.le_oPiCore hop_pi
+  have hoPi_bot : Ch03.oPiCore π Q = ⊥ := by
+    change Ch03.oPiCore π (G ⧸ Ch03.oPiCore π G) = ⊥
+    exact Ch03.oPiCore_quotient_self_eq_bot π
+  have hPbar_bot : Pbar = ⊥ :=
+    le_bot_iff.mp (hPbar_le_op.trans (hop_le_oPi.trans_eq hoPi_bot))
+  exact hPbar_ne hPbar_bot
+
+/-- Variant of `fitting_quotient_oPiCore_isPiGroup_compl` for a quotient whose
+denominator is known to be `O_π(G)`. Keeping the denominator as a variable avoids
+dependent rewriting through the normality instance of `QuotientGroup`. -/
+theorem fitting_quotient_eq_oPiCore_isPiGroup_compl [Finite G] {π : Set ℕ}
+    {N : Subgroup G} [N.Normal] (hN : N = Ch03.oPiCore π G) :
+    Ch03.Subgroup.IsPiGroup πᶜ (Ch01.fitting (G ⧸ N)) := by
+  subst N
+  exact fitting_quotient_oPiCore_isPiGroup_compl (G := G) (π := π)
+
+/-- **BG Theorem 10.2(d), Fitting quotient α′ part**: `F(M/M_α)` is an
+`α(M)'`-group. This is the preceding general π-core quotient theorem with
+`π = α(M)`, using `(M_α).subgroupOf M = O_{α(M)}(M)`. -/
+theorem fitting_quotient_Malpha_isPiGroup_alphaCompl [Finite G] (M : Subgroup G) :
+    Ch03.Subgroup.IsPiGroup (alpha M)ᶜ
+      (Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M)) :=
+  fitting_quotient_eq_oPiCore_isPiGroup_compl
+    (G := ↥M) (π := alpha M) (N := (Malpha M).subgroupOf M) (Malpha_subgroupOf M)
+
 /-- **BG Theorem 10.2(c), inclusion `M_α ⊆ M_σ`**: immediate from `α(M) ⊆ σ(M)`
 (`alpha_subset_sigma`) and monotonicity of the `π`-core. -/
 theorem Malpha_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)

@@ -90,7 +90,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `M'/M_α ≤ F(M/M_α)` も Hall `α(M)` 仮定下で接続済みで、
   `Msigma_quotient_Malpha_le_fitting_of_isHall` により `M_σ` の商像も
   `F(M/M_α)` に入る。さらに `Msigma_quotient_Malpha_isPiGroup_alphaCompl_of_isHall`
-  によりこの商像の α'-性も接続済み。残りは
+  によりこの商像の α'-性も接続済み。`fitting_quotient_oPiCore_isPiGroup_compl` /
+  `fitting_quotient_Malpha_isPiGroup_alphaCompl` により BG の
+  **`F(M/M_α)` is an α'-group** は Hall `α(M)` 仮定なしで完成。
+  残りは
   `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。
 
