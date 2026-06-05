@@ -1969,6 +1969,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coherentDegreeSumBound_of_not_coherent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.XAdjoinStepInput.adjoin
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite

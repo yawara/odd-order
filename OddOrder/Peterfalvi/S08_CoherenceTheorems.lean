@@ -1514,6 +1514,79 @@ noncomputable def xAdjoinStep
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
 open scoped Classical in
+/-- **Peterfalvi (5.6)** — quantitative coherence, contrapositive form ("B1").
+
+The converse of the forward adjoining engine `xAdjoinStep`: under the same Dade /
+member-family hypotheses, if `S₁ ∪ {χ, χ̄}` fails to be coherent then the degree
+sum is bounded by `∑ᵢ (deg i)² ≤ 2 a`.  Writing `a = ψ(1)/χ₁(1)` and
+`deg i = χᵢ(1)/χ₁(1)` this is Peterfalvi's non-coherence bound
+`∑_{χ∈S₁} χ(1)² ≤ 2 ψ(1) χ₁(1)`, the quantitative input consumed by (6.2) on the
+way to the degree bound (6.3)/(6.5).  Proof: contrapose `xAdjoinStep` over its
+degree hypothesis `hDeg : 2 a < ∑ᵢ (deg i)²`. -/
+theorem coherentDegreeSumBound_of_not_coherent
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)] {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 1)
+    (hχbarχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ).conj = 1)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hχbarχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → IrreducibleCharacter ↥L) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemreal : ∀ i ∈ s, ¬ ClassFunction.IsReal (χmem i : ClassFunction ↥L ℂ))
+    (hmemdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ).conj - (χmem i : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemdegdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁)
+    (hmembarS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ).conj ∈ S₁)
+    (hmemconjortho : ∀ i ∈ s, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+      (χmem i : ClassFunction ↥L ℂ).conj = 0)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
+        if i = j then (1 : ℂ) else 0)
+    {a : ℕ}
+    (hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+        {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+         (χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    ∑ i ∈ s, ((deg i : ℝ)) ^ 2 ≤ 2 * (a : ℝ) := by
+  by_contra hlt
+  push_neg at hlt
+  exact hnc ⟨xAdjoinStep hyp hconj hS₁ χ hrealχ hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemreal hmemdiffsupp hmemdegdiffsupp hmemS1 hmembarS1
+    hmemconjortho hmemortho hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
+
+open scoped Classical in
 /-- **(T-A2 input) Per-step `xAdjoinStep` data bundle.**
 
 Bundles the `xAdjoinStep` premises for one adjoining step of the X-family chain — the member family
