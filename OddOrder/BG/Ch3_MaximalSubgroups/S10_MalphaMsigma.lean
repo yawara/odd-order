@@ -296,22 +296,6 @@ private theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
   rw [this]
   exact M.mul_mem (M.mul_mem m.2 hnM) (M.inv_mem m.2)
 
-/-- If conjugation by `h` fixes the subgroup `H` setwise, then `h` normalizes `H`. -/
-private theorem mem_normalizer_of_conj_smul_eq {H : Subgroup G} {h : G}
-    (hstab : MulAut.conj h • H = H) : h ∈ Subgroup.normalizer (H : Set G) := by
-  rw [Subgroup.mem_normalizer_iff]
-  intro n
-  constructor
-  · intro hn
-    have hmem : MulAut.conj h • n ∈ MulAut.conj h • H :=
-      Subgroup.smul_mem_pointwise_smul n (MulAut.conj h) H hn
-    rw [hstab] at hmem
-    simpa [MulAut.conj_apply] using hmem
-  · intro hn
-    have hmem : MulAut.conj h • n ∈ MulAut.conj h • H := by
-      rw [hstab]; simpa [MulAut.conj_apply] using hn
-    exact Subgroup.smul_mem_pointwise_smul_iff.mp hmem
-
 /-- **BG Theorem 10.1(d)** (mmd L2665): for `p ∈ σ(M)` and `X = P̄` a Sylow `p`-subgroup of `M`,
 if a `G`-conjugate `X^g` lies in `M` then `g ∈ M`. Both `X` and `X^g` are Sylow `p`-subgroups of
 `M`, hence `M`-conjugate; the conjugating discrepancy normalizes `X`, and `N_G(X) ≤ M` (σ). -/
@@ -346,10 +330,37 @@ private theorem fusion_d_of_mem_sigma [Finite G]
     rw [map_mul, mul_smul, ← hconj, ← mul_smul, ← map_mul]
     simp
   have hnM : ((c : G)⁻¹ * g) ∈ M :=
-    normalizer_sylow_map_le_of_mem_sigma hp P (mem_normalizer_of_conj_smul_eq hstab)
+    normalizer_sylow_map_le_of_mem_sigma hp P (mem_normalizer_of_conj_smul_eq_self hstab)
   have hg_eq : g = (c : G) * ((c : G)⁻¹ * g) := by group
   rw [hg_eq]
   exact M.mul_mem c.2 hnM
+
+/-- A maximal subgroup of a minimal simple group is self-normalizing: `N_G(M) ≤ M`.
+(`M` is a coatom; if `M < N_G(M)` then `N_G(M) = ⊤`, so `M ⊴ G`, forcing `M ∈ {⊥, ⊤}` by
+simplicity — both impossible: `M = ⊤` contradicts the coatom, and `M = ⊥` makes `G` cyclic of
+prime order, contradicting non-solvability.) -/
+private theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer (M : Set G) ≤ M := by
+  have hco : IsCoatom M := mem_maximalSubgroups.mp hM
+  rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
+  · exact heq.ge
+  · exfalso
+    have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop'
+    · -- `M = ⊥`: every nontrivial subgroup is `⊤`, so `G` is cyclic, hence solvable.
+      have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hbot]; exact hco.2
+      haveI : Nontrivial G := hG.simple.toNontrivial
+      obtain ⟨g, hg1⟩ := exists_ne (1 : G)
+      have hgtop : Subgroup.zpowers g = ⊤ :=
+        hco' _ (bot_lt_iff_ne_bot.mpr (fun h => hg1 (Subgroup.zpowers_eq_bot.mp h)))
+      have hcomm : ∀ a b : G, a * b = b * a := by
+        intro a b
+        obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top a)
+        obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top b)
+        rw [← zpow_add, ← zpow_add, add_comm]
+      exact hG.notSolvable (isSolvable_of_comm hcomm)
+    · exact hco.1 htop'
 
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
 
