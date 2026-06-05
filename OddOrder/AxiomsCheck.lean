@@ -1971,6 +1971,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coherentDegreeSumBound_of_not_coherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_HH1_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_index_contradiction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_chief_factor_contradiction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_c_contradiction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.XAdjoinStepInput.adjoin
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite

@@ -1869,6 +1869,48 @@ theorem two_mul_add_one_le_of_odd_dvd {c a : ℕ} (hc : Odd c) (ha : Odd a) (hdv
   have h2c : 2 * c ≤ c * m := by nlinarith [hm2]
   omega
 
+/-- **Peterfalvi (6.3)** index reduction.  From the degree bound (6.2) applied
+with `C = H, D = A`, in index form `|K:H|·|H:A| − 1 ≤ 2·|L:K|·|K:H|·√|H:A|`,
+together with `|H:H₁| ≤ |H:A|` (from `A ⊆ H₁`), the index `|H:H₁|` is at most
+`4|L:K|² + 1`.  (Peterfalvi states the contrapositive: `|H:H₁| > 4|L:K|² + 1`
+forces `S(M)` coherent.)  The `√`-manipulation is `degreeBound_le_of_sqrt_bound`
+with `a = |L:K|, b = |K:H|, x = |H:A|`. -/
+theorem six_three_HH1_le {LK KH HA HH1 : ℕ} (hKH : 1 ≤ KH) (hHH1le : HH1 ≤ HA)
+    (hbound : (KH : ℝ) * (HA : ℝ) - 1 ≤ 2 * (LK : ℝ) * (KH : ℝ) * Real.sqrt (HA : ℝ)) :
+    HH1 ≤ 4 * LK ^ 2 + 1 := by
+  rcases Nat.eq_zero_or_pos HA with hHA0 | hHA
+  · subst hHA0; omega
+  · have hx := degreeBound_le_of_sqrt_bound hKH hHA hbound
+    omega
+
+/-- Arithmetic core of **Peterfalvi (6.5)(a),(c)**: since
+`(2c+1)² = 4c²+4c+1 > 4c²+1` for `c ≥ 1`, an index `n` cannot satisfy both
+`(2c+1)² ≤ n` and `n ≤ 4c²+1`. -/
+theorem six_five_index_contradiction {LK n : ℕ} (hLK : 1 ≤ LK)
+    (hge : (2 * LK + 1) * (2 * LK + 1) ≤ n) (hle : n ≤ 4 * LK ^ 2 + 1) : False := by
+  nlinarith [hge, hle, hLK]
+
+/-- **Peterfalvi (6.5)(a)** chief-factor step.  If a normal subgroup `H₂` sits
+strictly between `H₁` and `K`, then (6.4.c) + odd order force
+`|K:H₂|, |H₂:H₁| ≥ 2|L:K|+1` (via `two_mul_add_one_le_of_odd_dvd`), so
+`|K:H₁| = |K:H₂|·|H₂:H₁| ≥ (2|L:K|+1)² > 4|L:K|²+1`, contradicting the (6.3)
+bound `|K:H₁| ≤ 4|L:K|²+1`.  Hence `K/H₁` is a chief factor of `L`. -/
+theorem six_five_chief_factor_contradiction {LK KH2 H2H1 KH1 : ℕ} (hLK : 1 ≤ LK)
+    (hKH2 : 2 * LK + 1 ≤ KH2) (hH2H1 : 2 * LK + 1 ≤ H2H1)
+    (hmul : KH1 = KH2 * H2H1) (hKH1le : KH1 ≤ 4 * LK ^ 2 + 1) :
+    False :=
+  six_five_index_contradiction hLK
+    (by rw [hmul]; exact Nat.mul_le_mul hKH2 hH2H1) hKH1le
+
+/-- **Peterfalvi (6.5)(c)** : `|L:K|` does not divide `p − 1`.  If it did then
+`p ≥ 2|L:K|+1` (`two_mul_add_one_le_of_odd_dvd`), and since `K/M` is a
+non-abelian `p`-group `|K:H₁| ≥ p² ≥ (2|L:K|+1)² > 4|L:K|²+1`, contradicting the
+(6.5)(a) bound `|K:H₁| ≤ 4|L:K|²+1`. -/
+theorem six_five_c_contradiction {LK p KH1 : ℕ} (hLK : 1 ≤ LK)
+    (hpge : 2 * LK + 1 ≤ p) (hp2 : p * p ≤ KH1) (hKH1le : KH1 ≤ 4 * LK ^ 2 + 1) :
+    False :=
+  six_five_index_contradiction hLK (le_trans (Nat.mul_le_mul hpge hpge) hp2) hKH1le
+
 /-- **Extension of `p`-groups is a `p`-group.**  If a normal subgroup `N` and the quotient `Γ ⧸ N`
 are both `p`-groups (and `Γ` is finite), then `Γ` is a `p`-group: `|Γ| = |Γ ⧸ N|·|N| = p^b·p^a`
 (Lagrange, `card_eq_card_quotient_mul_card_subgroup`), so `|Γ|` is a `p`-power (`IsPGroup.iff_card`).
