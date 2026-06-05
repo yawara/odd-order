@@ -20,6 +20,16 @@
 **次**: §10 残 = Thm 10.2 (`isHall_Msigma_Malpha`, 10.1 解禁済 + Focal + Thm 4.20) → Thm 10.6 →
 Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
 
+## 🔨 2026-06-05 (続) — Thm 10.2 着手 (issue 0061)
+
+`isHall_Msigma_Malpha` = §10 MAIN・gateway。issue `issues/0061-bg-thm102-hall-structure.md` に証明構造
++ 依存マップ (Focal/Thm4.20/Hall存在 全て ✅、商 F(M/M_α) の機械が (a)/(b) の最重・要調査)。
+**landed (commit 予定, axiom-clean)**: 商を要さない foundational lemma 2 本 —
+- `alpha_subset_sigma` (α(M)⊆σ(M), BG step 1): r_p(M)≥3 ⟹ Sylow P̄ で rank≥3 ⟹ Thm 9.6 で P̄∈𝒰 ⟹
+  N_G(P̄)≤M (10.1 r(P)≥3 分岐と同パターン)。
+- `Malpha_le_Msigma` (M_α⊆M_σ): α⊆σ + `oPiCore_mono`。
+**残**: `Msigma_le_derived` (Focal+10.1) / `Msigma_ne_bot` (Thm4.20) / **商 Hall-ness 2連言 (最重)** / capstone 配線。
+
 ## ✅ 2026-06-05 着手 — 依存 DAG 検証 + Thm 10.1 を first target に確定 (§9 完成で解禁)
 
 **§9 (Uniqueness Thm 9.6) 完成 (commit 12ae441) で §10 解禁**。§10 = 18 scaffold sorry の大型節。

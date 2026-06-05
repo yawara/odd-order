@@ -818,6 +818,59 @@ theorem fusion_control_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## Theorem 10.2 — M_σ/M_α の Hall 構造 (mmd L2713) -/
 
+/-- **BG Theorem 10.2, step 1** (mmd L2721): `α(M) ⊆ σ(M)`. For `p ∈ α(M)` (so `r_p(M) ≥ 3`),
+any Sylow `p`-subgroup `P` of `M` has `r(P̄) ≥ 3`, so by the Uniqueness Theorem (9.6) `P̄ ∈ 𝒰`;
+since `P̄ ≤ M` (a coatom) and `N_G(P̄) < ⊤`, the unique maximal overgroup forces `N_G(P̄) ≤ M`,
+i.e. `p ∈ σ(M)`. (Self-contained; needs no quotient machinery. Yields `Malpha M ≤ Msigma M`.) -/
+theorem alpha_subset_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : alpha M ⊆ sigma M := by
+  intro p hp
+  rw [mem_alpha_iff] at hp
+  obtain ⟨hpf, hpr⟩ := hp
+  obtain ⟨hp_prime, hp_dvd, -⟩ := Nat.mem_primeFactors.mp hpf
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hMc : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr hMc.1
+  obtain ⟨P⟩ : Nonempty (Sylow p ↥M) := inferInstance
+  set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbardef
+  have hPbar_le_M : Pbar ≤ M := Subgroup.map_subtype_le _
+  -- `r(P̄) ≥ 3`.
+  have hPe := Subgroup.equivMapOfInjective (P : Subgroup ↥M) M.subtype M.subtype_injective
+  have hrank3 : 3 ≤ rank ↥Pbar :=
+    le_trans (le_trans (le_trans hpr (pRank_sylow_eq P).ge) (pRank_le_rank p))
+      (rank_le_of_injective (f := hPe.toMonoidHom) hPe.injective)
+  -- `P̄ ≠ ⊥` (its order is divisible by `p`).
+  have hlt1 : 1 < Nat.card ↥Pbar := by
+    rw [hPbardef, Subgroup.card_map_of_injective M.subtype_injective, P.card_eq_multiplicity]
+    exact Nat.one_lt_pow
+      (hp_prime.factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd).ne' hp_prime.one_lt
+  have hPbar_ne : Pbar ≠ ⊥ := by
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hlt1
+    exact lt_irrefl 1 hlt1
+  -- `P̄ ∈ 𝒰` (Uniqueness Theorem), then `N_G(P̄) ≤ M`.
+  have hPbar_lt : Pbar < ⊤ := lt_of_le_of_lt hPbar_le_M hM_lt
+  have hPbarU : IsUniquelyMaximal Pbar :=
+    OddOrder.BG.Ch2.S09.uniquenessTheorem hG hPbar_lt (by omega) (Or.inl hrank3)
+  have hN_lt : Subgroup.normalizer (Pbar : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Pbar
+      (Subgroup.normalizer_eq_top_iff.mp htop) with hbot | htopP
+    · exact hPbar_ne hbot
+    · exact hMc.1 (top_le_iff.mp (htopP ▸ hPbar_le_M))
+  obtain ⟨N, hNc, hNleN⟩ := (IsCoatomic.eq_top_or_exists_le_coatom _).resolve_left hN_lt.ne
+  have hMN : M = N :=
+    hPbarU.eq_of_isCoatom_of_le hMc hPbar_le_M hNc (Subgroup.le_normalizer.trans hNleN)
+  rw [mem_sigma_iff]
+  exact ⟨hpf, P, hNleN.trans hMN.ge⟩
+
+/-- **BG Theorem 10.2(c), inclusion `M_α ⊆ M_σ`**: immediate from `α(M) ⊆ σ(M)`
+(`alpha_subset_sigma`) and monotonicity of the `π`-core. -/
+theorem Malpha_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : Malpha M ≤ Msigma M :=
+  Subgroup.map_mono (Ch03.oPiCore_mono (alpha_subset_sigma hG hM) ↥M)
+
 /-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
 `M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
 quotient 型の `Normal` instance 整備後に追加予定。) -/
