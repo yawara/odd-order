@@ -44,6 +44,69 @@ sub-assembly を新規に書く必要がある** (helper が無い):
 **規模感**: Phase B は ~80-120 行 + sub-assembly 3 つ (P0≠⊥ Burnside / 低rank M≤N_G(P0) / 最終矛盾)。
 helper 合成だけでなく新規 proof を含むため genuine な作業量。foreground 逐次 (leaf build 駆動) 推奨。
 
+## Phase B 実装レシピ (hooks 確定済, 2026-06-05)
+
+**✅ sub-assembly 1 完成** (commit 8aa7cc4): `commutator_normalizer_ne_bot_of_isSylow hG (P:Sylow p G) (hp_dvd : p∣|G|) : ⁅P, N_G(P)⁆ ≠ ⊥`。
+
+**body 骨格** (`scn3_isUniquelyMaximal`, `by_contra hAnot`):
+```
+-- setup
+have hAcomm_set : ∀ x∈A,∀ y∈A, x*y=y*x := fun x hx y hy =>
+  congrArg Subtype.val (isMulCommutative_iff.mp (isMulCommutative_of_mem_scn3Global hA) ⟨x,hx⟩ ⟨y,hy⟩)
+have hAp := isPGroup_of_mem_scn3Global hA;  have hAne := ne_bot_of_mem_scn3Global hA
+have hp_dvd : p ∣ Nat.card G := ... (hAp.exists_card_eq + hAne → p∣|A|; card_subgroup_dvd_card)
+obtain ⟨PG, hAPG, hSCN⟩ := S07.exists_sylow_of_mem_scn3Global hA   -- PG : Sylow p G
+set P : Subgroup G := (PG:Subgroup G)
+have hPp : IsPGroup p P := PG.isPGroup'
+have hPnormA : P ≤ Subgroup.normalizer (A:Set G) :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer hAPG).mp hSCN.1.normal  -- ⚠ normalizer Set/Subgroup coercion 注意
+have hAP : A ≤ P := hAPG
+set P0 : Subgroup G := ⁅P, Subgroup.normalizer (P:Set G)⁆
+have hP0_le_P : P0 ≤ P := ... (⁅P,N_G(P)⁆≤P: P⊴N_G(P); `Subgroup.commutator_le`? or normal)
+have hP0p : IsPGroup p ↥P0 := hPp.to_le hP0_le_P  -- IsPGroup of subgroup
+have hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P:Set G)) := by
+  rw [derivedInG_eq_commutator]; exact Subgroup.commutator_mono Subgroup.le_normalizer le_rfl
+have hP0ne : P0 ≠ ⊥ := commutator_normalizer_ne_bot_of_isSylow hG PG hp_dvd
+-- key (9.6→9.12): ∀ M'∈𝓜(C_G(A)), IsUniquelyMaximal(N_G(P0)) ∧ N_G(P0)≤M'
+have key : ∀ M', M' ∈ maximalSubgroupsContaining (Subgroup.centralizer (A:Set G)) →
+    IsUniquelyMaximal (Subgroup.normalizer (P0:Set G)) ∧ Subgroup.normalizer (P0:Set G)≤M' := by
+  intro M' hM'
+  have hNPM' := (normalizer_scn3_pSubgroup_le_maximal_of_not_scn3 hG hM' hA hAnot hPp hAP hPnormA).2
+  by_cases h3D : 3 ≤ rank ↥(opiCoreInG ({p}:Set ℕ)ᶜ (S08.fittingInG M'))
+  · exact normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_package
+      hG hAcomm_set hM' hA hAnot hPp hAP hPnormA hNPM' hP0p hP0N hP0ne h3D
+  · have hP0M' : P0 ≤ M' := hP0_le_P.trans (hPnormA.trans ... )  -- P≤N_G(A)≤M' via hNPM'? いや P≤M': P≤N_G(P)≤M' (hNPM'); P0≤P
+    have hMN0 : M' ≤ Subgroup.normalizer (P0:Set G) := <SUB-ASSEMBLY 2: Frattini 低rank>
+    exact (fun h => ⟨h.1, le_of_eq h.2⟩)
+      (normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normalizer hG hM'.1 hP0M' hP0ne hMN0)
+obtain ⟨M, hM⟩ := exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global hG hA
+obtain ⟨hUniq, hN0M⟩ := key M hM
+-- 最終矛盾: Ω₁(A)∉𝒰 → Thm 9.1 contrapositive → x∈Ω₁(A)^# with C_G(x)⊄M → M*∈𝓜(C_G(x))⊆𝓜(C_G(A)), M*≠M
+set W := omega1OfAbelian G A p hAcomm_set
+have hWnot : ¬ IsUniquelyMaximal W := not_isUniquelyMaximal_of_le_scn3_counterexample hG hAcomm_set hA (omega1OfAbelian_le ...) hAnot
+have hWea := omega1OfAbelian_isElementaryAbelian (hH := hAcomm_set)
+have hWnc := not_isCyclic_omega1OfAbelian_of_three_le_pRank ...  -- needs 3≤pRank A p
+have hWleM : W ≤ M := (omega1OfAbelian_le).trans (A≤C_G(A)≤M = hM.2 via hA_le_C)
+have hncase := mt (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM.1 hWea hWleM hWnc) hWnot  -- ¬hcase
+-- ¬hcase → ¬first → ∃ x∈W, x≠1, ¬(C_G({x})≤M)
+push_neg at hncase / rcases not_or ... → obtain ⟨x, hxW, hx1, hxnotM⟩
+have hCxlt : Subgroup.centralizer ({x}:Set G) < ⊤ := ...  (x≠1, minimal simple)
+obtain ⟨Mstar, hMstar⟩ := <∃ maximal containing C_G({x})>  -- exists_maximalSubgroupsContaining? or coatom
+have hMstarA : Mstar ∈ 𝓜(C_G(A)) := maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton (x∈A: hxW→W≤A) hMstar
+have hne : Mstar ≠ M := fun h => hxnotM (h ▸ hMstar.2)   -- C_G({x})≤Mstar=M contra
+obtain ⟨_, hN0Mstar⟩ := key Mstar hMstarA
+exact hne (hUniq.eq_of_isCoatom_of_le (mem_maximalSubgroups.mp hMstar.1) hN0Mstar (mem_maximalSubgroups.mp hM.1) hN0M).symm
+   -- ⚠ eq_of_isCoatom_of_le (h)(hM:Coatom)(hHM:H≤M)(hN:Coatom)(hHN:H≤N) : M=N
+```
+
+**要解決 hook 詳細**:
+- `Subgroup.normal_subgroupOf_iff_le_normalizer (h:H≤K) : (H.subgroupOf K).Normal ↔ K≤normalizer H` (mathlib Basic:412)。
+  `Subgroup.normalizer` の Set/Subgroup coercion が §9 の `Subgroup.normalizer (A:Set G)` と合うか要確認 (合わなければ `by simpa`/`Subgroup.le_normalizer` 経由)。
+- `⁅P, N_G(P)⁆ ≤ P` (P⊴N_G(P)): mathlib `Subgroup.commutator_le_...` か normal 経由。
+- `IsPGroup.to_le`/部分群版: `IsPGroup p P → P0≤P → IsPGroup p ↥P0` (`IsPGroup.to_subgroup`/`.of_le` 要確認)。
+- `∃ M*∈𝓜(C_G({x}))`: C_G({x})<⊤ から maximal を取る (`exists_maximalSubgroupsContaining`? なければ coatom 存在 `IsCoatom` via Zorn/Finite)。`omega1OfAbelian_le : W≤A`。`not_isCyclic_omega1OfAbelian_of_three_le_pRank` は `3≤pRank A p` (= `three_le_rank` + `three_le_pRank_of_isPGroup_of_three_le_rank`) 要。
+- **SUB-ASSEMBLY 2 (Frattini 低rank `M'≤N_G(P0)`, BG L2617)**: `M'=O_{p'}(F(M'))·N_{M'}(P)`。Thm 4.20a (`derived_le_fitting_of_rank_fitting_le_two`, 私の新補題; 低rank ⟹ rank F(M')≤2 full) で M''≤F(M'); M'/M'' abelian で FP⊴M'; Frattini (`Sylow.normalizer_sup_eq_top'` 系) で M'=FP·N_{M'}(P); F=O_p(F)·O_{p'}(F), O_p(F)≤P ⟹ M'=O_{p'}(F)·N_{M'}(P); (9.11) で O_{p'}(F)≤C_G(P0)≤N_G(P0), N_{M'}(P)≤N_G(P)≤N_G(P0) (P0⊴N_G(P)) ⟹ M'≤N_G(P0)。**~50-70 行・最重・要 Fitting nilpotent decomposition + Frattini**。これが Phase B の本丸残件。
+
 ---
 
 ## (旧) Phase A propagation 手順 — 記録 (完了済)
