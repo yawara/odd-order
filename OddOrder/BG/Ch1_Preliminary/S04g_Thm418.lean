@@ -1871,6 +1871,31 @@ theorem exists_terminal_normal_sylow (P : CharacteristicSylowSeriesPackage G) :
 
 end CharacteristicSylowSeriesPackage
 
+/-- **BG Theorem 4.20(c) — existence** (mmd L1764/L1771): a finite solvable group of odd
+order with `r(F(G)) ≤ 2` possesses a *characteristic Sylow series* `G = G₀ ⊃ ⋯ ⊃ Gₙ = 1`
+whose factors are isomorphic to Sylow subgroups of `G` — packaged as
+`CharacteristicSylowSeriesPackage G`.
+
+This is the producer the §9 (Lemma 9.5) consumers currently take as a hypothesis
+(`exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage`, etc.); proving it
+lets those `SP : CharacteristicSylowSeriesPackage ↥M` hypotheses be discharged for the
+(solvable, `r(F)≤2`) maximal subgroups `M`.
+
+Construction plan (strong induction on `Nat.card G`):
+* if `O_{p'}(G) = ⊥` (so `G` is a `p`-group), the one-step series `⊤ ⊃ ⊥` with the trivial
+  top Sylow layer (`CharacteristicSylowLayer.top_of_hasNormalPComplement`) works;
+* otherwise let `p` be the largest prime divisor of `|G|`; `solvable_structure_of_pRank_le_two`
+  (largest-prime branch) gives `Ch05.HasNormalPComplement p G`; recurse on `N = O_{p'}(G)`
+  (`Nat.card N < Nat.card G`, still odd/solvable with `r(F(N)) ≤ 2`), and lift the resulting
+  series via `CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
+Hard sub-steps still open: deriving `pRank G p ≤ 2` from `r(F(G)) ≤ 2` for the largest prime,
+preservation of the rank hypothesis under `O_{p'}`, and the `terminal_mem` bookkeeping. -/
+theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
+    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
+    (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
+    Nonempty (CharacteristicSylowSeriesPackage G) := by
+  sorry
+
 end Thm418
 
 end OddOrder.BG.Ch1.S04
