@@ -1872,6 +1872,9 @@ set_option linter.style.longLine false in
 -- the (6.2) degree bound `θ(1) ≤ |K:C|·φ(1)` for an induced-character constituent `φ` of `θ`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isCharacter_induce
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_constituent
+-- full (6.2) θ-bound: a-half × b-half + √ arithmetic ⟹ `θ(1) ≤ |K:C|·√|C:D|` (constituent kernel
+-- inheritance discharges the b-half's `N ⊆ Ker φ` from `N ⊆ Ker(Res θ)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_sqrt_index
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms

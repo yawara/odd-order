@@ -279,6 +279,54 @@ theorem theta_degree_le_index_mul_constituent {K : Type*} [Group K] [Fintype K]
   rwa [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero] at hbound
 
 set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (6.2) `θ`-bound** (full degree bound).  For an irreducible character `θ` of a
+finite group `K`, a subgroup `C ≤ K`, and a section `N ◁ C` with `N ≤ D ≤ C`, `θ` trivial on `N`
+(after restriction to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of `θ` is bounded:
+`θ(1) ≤ |K : C|·√|C : D|`.
+
+Assembled from the two halves: the a-half `theta_degree_le_index_mul_constituent`
+(`θ(1) ≤ |K:C|·φ(1)` for an `Ind`-constituent `φ ∈ Irr C` of `θ`) and the section b-half
+`degree_sq_le_index_of_central_quotient` (`φ(1)² ≤ |C:D|`).  The `φ` produced by the a-half is a
+constituent of `Res^K_C θ` (Frobenius reciprocity `inner_induce_eq_inner_restrict` +
+`inner_conj_symm`), so `N ⊆ Ker(Res^K_C θ)` forces `N ⊆ Ker φ` (constituent kernel inheritance
+`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), discharging the b-half's kernel
+hypothesis.  Then `φ(1) = d` with `d² ≤ |C:D|` gives `φ(1) ≤ √|C:D|` (`Real.le_sqrt_of_sq_le`),
+and multiplying by `|K:C| ≥ 0` closes the bound. -/
+theorem theta_degree_le_index_mul_sqrt_index {K : Type*} [Group K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] (θ : IrreducibleCharacter K) (C : Subgroup K) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict C (θ : ClassFunction K ℂ)))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
+    ((θ : ClassFunction K ℂ) 1).re ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  obtain ⟨φ, hφne, hφbound⟩ := theta_degree_le_index_mul_constituent C θ
+  -- `φ` is a constituent of `Res^K_C θ`: reciprocity turns `⟨Ind φ, θ⟩ ≠ 0` into `⟨φ, Res θ⟩ ≠ 0`,
+  -- and conjugate symmetry flips it to `⟨Res θ, φ⟩ ≠ 0`.
+  have hφRes : ClassFunction.inner (φ : ClassFunction ↥C ℂ)
+      (ClassFunction.restrict C (θ : ClassFunction K ℂ)) ≠ 0 := by
+    rw [← ClassFunction.inner_induce_eq_inner_restrict]; exact hφne
+  have hres_inner : ClassFunction.inner (ClassFunction.restrict C (θ : ClassFunction K ℂ))
+      (φ : ClassFunction ↥C ℂ) ≠ 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm]; exact star_ne_zero.mpr hφRes
+  -- constituent kernel inheritance: `N ⊆ Ker(Res θ) ⟹ N ⊆ Ker φ`.
+  have hkerφ : (↑N : Set ↥C) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥C ℂ) := fun n hn =>
+    characterKernel_subset_of_isCharacter_of_inner_ne_zero
+      (isCharacter_restrict θ.isIrreducible.isCharacter C) φ.isIrreducible hres_inner (hθN hn)
+  -- the b-half: `φ(1) = d` with `d² ≤ |C:D|`.
+  obtain ⟨d, hd1, hd2⟩ :=
+    degree_sq_le_index_of_central_quotient (N := N) φ D hND hkerφ hcentral
+  have hφ1re : ((φ : ClassFunction ↥C ℂ) 1).re = (d : ℝ) := by
+    rw [hd1]; exact Complex.natCast_re d
+  have hd_le : (d : ℝ) ≤ Real.sqrt (D.index : ℝ) :=
+    Real.le_sqrt_of_sq_le (by exact_mod_cast hd2)
+  calc ((θ : ClassFunction K ℂ) 1).re
+      ≤ (C.index : ℝ) * ((φ : ClassFunction ↥C ℂ) 1).re := hφbound
+    _ = (C.index : ℝ) * (d : ℝ) := by rw [hφ1re]
+    _ ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) :=
+        mul_le_mul_of_nonneg_left hd_le (Nat.cast_nonneg _)
+
+set_option linter.unusedFintypeInType false in
 /-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
 (`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
 `induce_exists_natFinsupp_eq_sum` feeds `characterKernel_subset_of_natFinsupp_eq_sum`. -/
