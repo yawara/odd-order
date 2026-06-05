@@ -58,9 +58,19 @@ scaffold `conj g•X≤M` = BG `X^{g⁻¹}⊆M` ⟹ 共役子が逆 ⟹ 積順�
 ### part (b) 帰納の追加メモ
 
 - 反例 X の maximal-order 帰納 = `Nat.card G - Nat.card ↥X` の `Nat.strong_induction_on` (generalizing X);
-  IH は `|X'|>|X|` (= measure 減少) で (b)。X⊂P で (b)-for-P を IH から、(c)-for-P を (a)-of-(b) 経由。
+  IH は `|X'|>|X|` (= measure 減少) で (b)。X⊂P で (b)-for-P を IH から。
 - prerequisite 全確認済: Thm 9.6=`S09.uniquenessTheorem`, Thm 4.18(e)=`S04.solvable_structure_of_pRank_le_two`,
   Frattini=§6 Lem6.6, self-normalizing ✅, L solvable ✅, part(d) ✅, σ basic ✅。
+
+### 🟢 規約解決 (2026-06-05, (b) 実装の最大リスク解消)
+
+**(b) 帰納内では (c) 還元は不要 — IH の (b)-for-P を直接使う**。詳細:
+- 「M と M^t が C_G(X)-共役」⟺ `∃c∈C_G(X), conj c•M = conj t•M` ⟺ `t⁻¹c∈N_G(M)=M` ⟺ **`t∈C_G(X)·M`** (C·M 順)。
+  ゆえに (10.2) の矛盾 = `t = c·m (c∈C_G(X), m∈M)` を示すこと。left-conj `M^t=tMt⁻¹` で `t=c·m ⟹ M^t=conj c•(conj m•M)=conj c•M=M^c` (m∈M=N_G(M) で吸収)。
+- `u∈N_L(P)⊆N_G(P)`: (b)-for-P (IH, |P|>|X|) を `g₁=1, g₂=u` で適用 (`P≤conj u•M` は u∈N_G(P)∧P≤M で `uPu⁻¹=P≤uMu⁻¹`) ⟹ `∃x∈C_G(P), conj x•M=conj u•M` ⟹ `u⁻¹x∈M` ⟹ **`u=x·m' (x∈C_G(P)⊆C_G(X), m'∈M)`** (C·M 順)。
+- Frattini `L=N_L(P)·O_{p'}(L)`: `O_{p'}(L)⊴L` ゆえ `=O_{p'}(L)·N_L(P)` でも書け、**`t=o·n (o∈O_{p'}(L)⊆C_G(X), n∈N_L(P))`** に取る。`n=x·m'` 代入 ⟹ `t=o·x·m'=(ox)·m'`, `ox∈C_G(X)`, `m'∈M` ⟹ **C·M ✓** ⟹ (10.2) 矛盾。
+- ⟹ **(b) 帰納は (b)-for-P (IH) のみで自己完結**。(c) 還元は capstone 用に別途 (order 修正版)。
+- r(P)≥3 分岐: Thm 9.6 で P∈𝒰, `P⊆L∩M ⟹ L⊆M ⟹ t∈M ⟹ M^t=M=M^1 (1∈C_G(X))` で (10.2) 矛盾 ⟹ r(P)≤2。
 
 ## やること / 証明構造 (BG 忠実, mmd L2665-2711)
 
