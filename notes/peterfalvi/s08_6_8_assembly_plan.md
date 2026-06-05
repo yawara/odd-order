@@ -621,6 +621,35 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 - **X-empty branch 完全証明**: `coherenceTarget_of_Xset_empty`(新, axiom-clean): `X=∅ ⟹ S=Y`(`Xset_union_Yset_eq_S` で `S=∅∪Yset=Yset`)⟹ `CoherenceTarget = coherentYset`(Y-coherence, T6 既 landed)。glue 不要。
 - **X-nonempty branch のみ sorry**(真の §8 glue): `hyp.cases`(Frobenius/CertainType)で分岐。`hXne` は `hXe` 否定から放電可。Frobenius case = `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(5925, sorry-free)を invoke、要 `hF`(cases)+ **`hstepData`**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData`@5685 構成 = (6.6) prime-power 次数 gap, **bottleneck = hard content**)+ glue(`ν`/`hagree`/`hmixed`/`hgen`)。**次セッション = hstepData 構成 + glue data 供給**。
 
+#### J.3.9 ✅ (6.5) p-群還元の group-theory core landed (2026-06-05, commit f2aea41)
+
+hstepData の前提「H が p-群 ∴ θ(1)=p-冪」を供給する **(6.5) reduction** の group-theory 半分を実装。
+
+**(6.5) 依存ツリー(status 込み)**:
+```
+(6.5)(b) "H は非可換 p-群"  [reduction target]
+├─ isPGroup_of_isNilpotent_of_isPGroup_abelianization ✅ [H nilp + H/H' p-群 ⟹ H p-群]
+│  └─ H/[H,H] が p-群  ✅NEW = isPGroup_of_card_le_of_isFrobeniusAction (f2aea41)
+│     ├─ p-primary 成分 P: Sylow characteristic ∴ R-invariant ✅(Sylow.characteristic_of_normal)
+│     ├─ |R| | |P|-1: card_modEq_one(restricted via IsFrobeniusAction.subgroup)✅
+│     ├─ |R| | |A:P|-1: 純算術 |A|=|A:P|·|P|, |A|≡|P|≡1 ✅ (quotient-Frobenius 不要!)
+│     ├─ two_mul_add_one_le_of_odd_dvd + six_five_chief_factor_contradiction ✅
+│     └─ bound |A| ≤ 4|R|²+1  🔴 = char theory (6.2)/(6.3) = Sibley packaging
+├─ H 非可換: S 非coherent + S([H,H]) coherent(coherentYset)から ✅可導
+└─ FPF R-作用 on Abelianization H  ⚠️ = Sibley (c1) Frobenius wiring
+```
+
+**新 lemma 2 本**(S08, axiom-clean, AxiomsCheck 登録):
+- `isPGroup_of_card_le_of_isFrobeniusAction`: 抽象 chief-factor core(可換 A + FPF R-作用 + odd + `|A|≤4|R|²+1` ⟹ A は p-群)。
+- `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization`: (6.5)(b) reduction interface(`IsFrobeniusAction R (Abelianization H)` + odd + bound ⟹ `∃p, IsPGroup p H`)。
+
+**残ギャップ**:
+1. **bound(char theory)** = (6.5) の唯一の真ブロッカー。`theta_degree_le_index_mul_sqrt_index`(完成済)を S(A)/S(B) coherence + 実 index に結線 → `six_three_HH1_le` 適用。**Sibley packaging frontier・heavy**。
+2. **FPF 作用 on Abelianization H**(Sibley (c1))= 純群論。`IsFrobeniusGroup ↥L H W1`(`hyp.cases`左)→ `toFrobeniusAction`(`IsFrobeniusAction ↥W1 ↥H`)→ `IsFrobeniusAction.quotient`(commutator ↥H invariant)→ FPF on `↥H ⧸ commutator`。**friction**: `Abelianization H`(semireducible def)vs `↥H ⧸ commutator H` の instance(CommGroup/MulDistribMulAction)が自動転送されない。tractable だが ~30-50 LOC bridge 要。char bound でどのみちブロックされるので **premature**。
+3. odd: `card_L_odd` から H, W1, Abelianization の odd(divisor-of-odd)。容易。
+
+**深 brick は全て既存だった**(再発見): `IsFrobeniusAction.card_modEq_one`/`.subgroup`/`.quotient`/`coprime_card`(FrobeniusActionTI), `coprime_fixedPoints_quotient`(Cor3.28, Ch04), `Sylow.characteristic_of_normal`/`ne_bot_of_dvd_card`(mathlib), p-冪次数(`exists_finrank_eq_prime_pow_of_isPGroup`)。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
