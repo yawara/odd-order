@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Subgroup.Simple
+import Mathlib.GroupTheory.Sylow
+import Mathlib.GroupTheory.Nilpotent
 import Mathlib.SetTheory.Cardinal.Finite
 import OddOrder.GroupTheory.MaximalSubgroup
 
@@ -79,6 +81,34 @@ theorem solvable_of_mem_maximalSubgroups (hG : IsMinimalSimpleOdd G) {M : Subgro
     (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G) :
     IsSolvable M :=
   hG.solvable_of_isCoatom (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM)
+
+/-- A maximal subgroup of a minimal counterexample is nontrivial. If `⊥` were maximal,
+any nontrivial Sylow subgroup would be all of `G`, making `G` a finite `p`-group and hence
+solvable. -/
+theorem ne_bot_of_isCoatom (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : IsCoatom M) :
+    M ≠ ⊥ := by
+  classical
+  intro hMbot
+  haveI : Nontrivial G := hG.nontrivial
+  have hcard_ne : Nat.card G ≠ 1 := ne_of_gt (Finite.one_lt_card (α := G))
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard_ne
+  haveI : Fact p.Prime := ⟨hp⟩
+  let P : Sylow p G := Classical.arbitrary (Sylow p G)
+  have hP_ne : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hpdvd
+  have hbot_co : IsCoatom (⊥ : Subgroup G) := by simpa [hMbot] using hM
+  have hP_top : (P : Subgroup G) = ⊤ := by
+    exact (hbot_co.le_iff.mp bot_le).resolve_right hP_ne
+  have hPp : IsPGroup p G :=
+    (hP_top ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_equiv Subgroup.topEquiv
+  haveI : Group.IsNilpotent G := IsPGroup.isNilpotent hPp
+  exact hG.notSolvable IsNilpotent.to_isSolvable
+
+/-- The `ℳ`-membership form of `ne_bot_of_isCoatom`. -/
+theorem ne_bot_of_mem_maximalSubgroups (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ OddOrder.GroupTheory.maximalSubgroups G) :
+    M ≠ ⊥ :=
+  hG.ne_bot_of_isCoatom (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM)
 
 end IsMinimalSimpleOdd
 

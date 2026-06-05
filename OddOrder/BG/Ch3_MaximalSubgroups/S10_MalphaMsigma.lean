@@ -1285,10 +1285,11 @@ theorem rank_fittingInG_le_rank [Finite G] (M : Subgroup G) :
 
 /-- Low-rank maximal-subgroup input for the hard branch of BG Theorem 10.2(e). -/
 theorem Msigma_ne_bot_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
-    (hrank : rank ↥M ≤ 2) :
-    Msigma M ≠ ⊥ :=
-  Msigma_ne_bot_of_rank_fittingInG_le_two hG hM
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hrank : rank ↥M ≤ 2) :
+    Msigma M ≠ ⊥ := by
+  haveI : Nontrivial ↥M :=
+    (Subgroup.nontrivial_iff_ne_bot M).mpr (hG.ne_bot_of_mem_maximalSubgroups hM)
+  exact Msigma_ne_bot_of_rank_fittingInG_le_two hG hM
     ((rank_fittingInG_le_rank M).trans hrank)
 
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
