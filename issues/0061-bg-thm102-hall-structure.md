@@ -62,6 +62,9 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `piSubgroup_le_opiCoreInG_of_isHall` を一般形として追加し、`Malpha_*` / `Msigma_*`
   specializations を公開。G-level の `IsHallSubgroup π O_π(M)` から `↥M` 内 Hall 性と
   「M 内の π-subgroup は `O_π(M)` に吸収される」を切り出し、§11 の重複 proof を削減。
+- [x] **conditional quotient rank part of (d)**: §4 の既存 lemma
+  `Ch1.S04.pRank_quotient_le_of_coprime` を public 化し、`rank_quotient_Malpha_le_two_of_isHall`
+  を追加。Hall `α(M)` 連言が得られれば、BG 10.2(d) の `rank(M/M_α)≤2` は完成済み。
 - [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
   (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
   (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。`q∈σ(M) ∧ O_q(M)≠⊥ ⇒ M_σ≠⊥`
@@ -76,9 +79,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `Msigma_ne_bot_of_Malpha_eq_bot_of_isHall` により、Hall `α(M)` 連言が得られれば
   `M_α=⊥` hard branch も `rank M≤2` bridge に接続済み。
   **残りは Hall `α(M)` / `σ(M)` の2連言を作り、capstoneで `M_α=⊥`/`≠⊥` を場合分けする配線**。
-- [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
-  - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。
-  - M(σ)=M_σ: M(σ)/M_α normal Hall in F(M/M_α) char ⟹ M(σ)⊴M。
+- [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重**。
+  `rank(M/M_α)≤2` は Hall `α(M)` 仮定の下で `rank_quotient_Malpha_le_two_of_isHall` により
+  接続済み。残りは `M'/M_α ≤ F(M/M_α)` / nilpotent、`M(σ)/M_α` の α'-性、
+  そこから `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。
 
 ## 完了条件

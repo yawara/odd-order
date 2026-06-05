@@ -188,6 +188,11 @@ theorem Fsigma'_le_fitting (M : Subgroup G) : Fsigma' M ≤ Ch2.S08.fittingInG M
     (Malpha M).subgroupOf M = Ch03.oPiCore (alpha M) ↥M := by
   simp [Malpha]
 
+instance Malpha_subgroupOf_normal (M : Subgroup G) :
+    ((Malpha M).subgroupOf M).Normal := by
+  rw [Malpha_subgroupOf]
+  infer_instance
+
 @[simp] theorem Mbeta_subgroupOf (M : Subgroup G) :
     (Mbeta M).subgroupOf M = Ch03.oPiCore (beta M) ↥M := by
   simp [Mbeta]
@@ -1175,6 +1180,52 @@ theorem Msigma_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
       rw [Subgroup.map_subgroupOf_eq_of_le hPbar_le_M]
     _ ≤ (Q : Subgroup ↥M).map M.subtype := Subgroup.map_mono hPQ
     _ ≤ derivedInG M := sylow_le_derived_of_mem_sigma hG hM hr_sigma Q
+
+/-- **BG Theorem 10.2(d), rank part** (mmd L2733-2738): once `M_α` is an
+`α(M)`-Hall subgroup, the quotient `M/M_α` has rank at most two. Primes in `α(M)`
+do not divide the Hall quotient, and primes outside `α(M)` have `p`-rank at most two by
+the definition of `α(M)` plus the `p'`-kernel quotient rank lemma. -/
+theorem rank_quotient_Malpha_le_two_of_isHall [Finite G] {M : Subgroup G}
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+    rank (↥M ⧸ (Malpha M).subgroupOf M) ≤ 2 := by
+  rw [rank_le_iff]
+  intro p hp
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_cases hpα : p ∈ alpha M
+  · by_contra hpRank
+    have hpos : 0 < pRank (↥M ⧸ (Malpha M).subgroupOf M) p := by omega
+    have hpquot : p ∈ (Nat.card (↥M ⧸ (Malpha M).subgroupOf M)).primeFactors :=
+      OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank
+        (H := ↥M ⧸ (Malpha M).subgroupOf M) (p := p) hpos
+    have hpidx_sub : p ∈ ((Malpha M).subgroupOf M).index.primeFactors := by
+      simpa [Subgroup.index] using hpquot
+    have hidx_dvd : ((Malpha M).subgroupOf M).index ∣ (Malpha M).index := by
+      have htower : ((Malpha M).subgroupOf M).index * M.index = (Malpha M).index :=
+        Subgroup.relIndex_mul_index (Malpha_le M)
+      exact ⟨M.index, htower.symm⟩
+    have hpidx : p ∈ (Malpha M).index.primeFactors :=
+      Nat.primeFactors_mono hidx_dvd Subgroup.index_ne_zero_of_finite hpidx_sub
+    exact hHallα.2 p hpidx hpα
+  · have hN_p' : ¬ p ∣ Nat.card ↥((Malpha M).subgroupOf M) := by
+      intro hdiv
+      have hpNsub : p ∈ (Nat.card ↥((Malpha M).subgroupOf M)).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hp, hdiv, Nat.card_pos.ne'⟩
+      have hpN : p ∈ (Nat.card ↥(Malpha M)).primeFactors := by
+        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toEquiv]
+        exact hpNsub
+      exact hpα (Malpha_isPiGroup M p hpN)
+    have hM_rank : pRank ↥M p ≤ 2 := by
+      by_contra hpMRank
+      have h3 : 3 ≤ pRank ↥M p := by omega
+      have hposM : 0 < pRank ↥M p := by omega
+      have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+        OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (H := ↥M) (p := p) hposM
+      have hpα' : p ∈ alpha M := by
+        rw [mem_alpha_iff]
+        exact ⟨hpM, h3⟩
+      exact hpα hpα'
+    exact (Ch1.S04.pRank_quotient_le_of_coprime
+      (G := ↥M) (N := (Malpha M).subgroupOf M) hN_p').trans hM_rank
 
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a

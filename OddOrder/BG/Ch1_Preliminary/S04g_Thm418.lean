@@ -359,7 +359,7 @@ theorem commutator_le_chiefFactorCentralizer_of_pRank_le_two
 /-- **`p'`-核による商で `p`-rank は増えない**: `N ⊴ G` with `p ∤ |N|` のとき
 `r_p(G/N) ≤ r_p(G)`。商の elementary abelian `p`-部分群 `B` は、その逆像の
 Sylow `p`-部分群 `P` と同型 (`p`-元は `p'`-核と交わらない) なので `G` 内で実現される。 -/
-private theorem pRank_quotient_le_of_coprime {p : ℕ} [Fact p.Prime]
+theorem pRank_quotient_le_of_coprime {p : ℕ} [Fact p.Prime]
     {N : Subgroup G} [N.Normal] (hN : ¬ p ∣ Nat.card ↥N) :
     pRank (G ⧸ N) p ≤ pRank G p := by
   classical
