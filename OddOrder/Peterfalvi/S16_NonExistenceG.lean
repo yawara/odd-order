@@ -3131,11 +3131,21 @@ theorem orthogonality_switch [Finite G]
   sorry
 
 /-- **Peterfalvi (14.15)**: `u` has the full cyclotomic value
-`(p^q - 1) / (p - 1)`. -/
+`(p^q - 1) / (p - 1)`.
+
+The exceptional `(q,p) = (3,5)` branch of (14.14) is now discharged by the
+S-side case-(9.7.b) order data.  The remaining local frontier is the
+non-exceptional branch, where (14.14) supplies the bound on `(h - 1) / (p q)`. -/
 theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
-  sorry
+  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
+  rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
+  rcases hcase with hcaseA | hcaseB
+  · -- Non-exceptional branch of (14.14): use `data.caseA_bound hcaseA` to
+    -- compare `h = |H|` with the cyclotomic order data from (14.6).
+    sorry
+  · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
 /-- **Peterfalvi (14.16)**: in the non-conjugate case, the kernel `H` is
 exactly `U`. -/
