@@ -33,22 +33,24 @@ build: `lake build OddOrder.Peterfalvi.S16_NonExistenceG` (leaf) → 完了直�
   BG-a は `(w⁻¹)^{t^{-3}}` で、これが E に入ることは **E=E⁻¹ (証明目標) と同値 → 循環**。
 - ∴ **経路B** (`normSetETwistedNormOneStep φ`, φ=tConjAut³ 系) を採る。終端 `appCNormSetGeneratorRelation_of_twisted_normOne_step` (S16:173) で `appC_normSet_generator_relation` を field 非経由化できる。
 
-### 🟡 未解決の 1 点 (capstone build 時に Lean で確定する): φ-matching / inversion
+### ✅ 解決済 (commit e1b1991): φ-matching + 経路B 配線を Lean で検証
 
-repo convention では decomp(`s·σ(inr W)·s⁻²`, middle s⁻¹) ⟹ **`(↑W)⁻¹∈E`** (W∈E でなく W の逆元)。
-これは u₁-route も v₁-route も同じ (`unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition` で実装済)。
-`exists_step4_first_k_three_decomposition (u)` の slot は `(tConjAut³)(u⁻¹)` 固定。両者合成すると
-`cond(u) ⟹ unitVal((tConjAut³)(u))∈E` の形になり、**素朴には φ=tConjAut³ の twisted step
-`∀u∈E, (tConjAut³)(u⁻¹)∈E` と一致しない** (inversion が 1 個ずれる)。
-- 鍵 = **`cond(u)` (capstone の入力条件) が `unitVal u∈E` か `(unitVal u)⁻¹∈E` か**。これは
-  BG-unit-a と repo-unit-u の field 値が一致するか逆かで決まり (action convention flip;
-  BG の `a⁻¹sa=scalar↑a` vs repo の `σ(inr a)⁻¹sσ(inr a)=scalar↑a⁻¹`)、**机上では詰め切れない**。
-- 対処: capstone を bottom-up で組むと base condition (`unitVal a⁻¹ + unitVal b⁻¹ = 2`,
-  = `unitVal a⁻¹ ∈ E`) が型として伝播し、slot との関係が Lean で forced される。そこで
-  φ を確定 (必要なら slot=`(tConjAut³)(u)` 版 decomposition の variant を `exists_step4_..` に追加、
-  または `exists_step4_first_k_three_decomposition` を u→u⁻¹ で呼ぶ)。
-- 終端 machinery は inversion を 1 つ吸収する形が既にある (`twistedInv φ u = φ(u⁻¹)`); φ と入力の
-  選び方で整合させる。**capstone が出てから 30 分の配線作業**の見込み。
+PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の証明 1 点のみ**:
+- repo の E-extraction (`unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition`) は
+  decomp(`s·σ(inr W)·s⁻²`, middle s⁻¹) ⟹ **`(↑W)⁻¹∈E`** を与える。
+- `exists_step4_first_k_three_decomposition(input)` の slot は `(tConjAut³)(input⁻¹)` 固定。
+- capstone 入力条件は `↑a⁻¹∈E` (base relation `↑a⁻¹+↑b⁻¹=2` 由来; `unitVal a⁻¹+unitVal b⁻¹=2`)。
+- **twisted step は capstone を入力 `a=u⁻¹` で呼ぶ**ことで一致: cond=`↑(u⁻¹)⁻¹=↑u∈E` (手持ち)、
+  slot=`(tConjAut³)((u⁻¹)⁻¹)=(tConjAut³)(u)=W`、E-extraction `(↑W)⁻¹=↑((tConjAut³)(u⁻¹))∈E`
+  が twisted step `∀u∈E, ↑((tConjAut³)(u⁻¹))∈E` に過不足なく合致。**循環なし**。
+- 配線補題 (全 build-green, sorry-free):
+  - `Step4Capstone (data) : Prop` = ∀a, ↑a⁻¹∈E → exists_step4_first_k_three(a) の middle が s⁻¹。
+  - `normSetETwistedNormOneStep_tConj_pow_three_of_capstone` : capstone ⟹ twisted step (φ=tConjAut³)。
+  - `appCNormSetTwistedNormOneStep_of_capstone` / `appC_normSet_generator_relation_of_capstone` :
+    capstone ⟹ generator relation を **field 非経由**で。
+- **capstone 完成後**: `appC_normSet_generator_relation` (S16:1631) を `_of_capstone` 版に差し替え →
+  `FieldNormalizerData.appC_twisted_normOne_step` field を削除 (+ producer `field_normalizer_structure`
+  からも削除) → full build + AxiomsCheck。**30 分の配線作業**。
 
 ### ✅ landed (このセッション, S16 `section Step4`, 全 sorry-free / full build 3580 green / AxiomsCheck OK)
 - **scalar 抽象** `sScalar x := σ(inl(ofAdd x))` (BG の `s^x`) + API: `sScalar_mul`/`sScalar_zero`/
@@ -61,14 +63,30 @@ repo convention では decomp(`s·σ(inr W)·s⁻²`, middle s⁻¹) ⟹ **`(↑
 - **`relationC2`**: `s⁻²·(σ(inr a)⁻¹ s σ(inr a))·(σ(inr b)⁻¹ s σ(inr b)) = 1`。
 - **E-extraction** `unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition`:
   decomp(middle s⁻¹) ⟹ `(↑W)⁻¹∈E` (BG final paragraph `v₁=2-W` の repo 版; 既存終端 u₁-route 経由)。
+- **経路B 配線** (commit e1b1991): `Step4Capstone` / `normSetETwistedNormOneStep_tConj_pow_three_of_capstone` /
+  `appCNormSetTwistedNormOneStep_of_capstone` / `appC_normSet_generator_relation_of_capstone`。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
-### 次の 1 手 (最優先): (C.3)→(C.4) 群関係鎖
-`relationC2` を `t^{±ℓ}` 共役 (ℓ=k-2) → (C.3) → `s^{-i}t^i∈Q` (既存 `s_inv_pow_mul_t_pow_mem_Q`,
-S16:1416) + Q 可換 (`Q_mul_comm`) で整理 → (C.4) `s^{-k}t² M₁ t⁻¹ M₂ t⁻¹ M₃ s^k = 1`
-(Mᵢ = `s^j·(conj)·s^j'` 形, 既存 engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow`
-S16:1097 が正規形を与える)。**最も convention-heavy**。§3 補題分解参照。
-その後 (C.5)-(C.10) → kernel/FPF → `s₁=s⁻¹` capstone → 経路B 配線 → field 削除。
+### 次の 1 手 (最優先): `Step4Capstone` を証明する ((C.3)→(C.10) → kernel → s₁=s⁻¹)
+**全 infra 完備**。capstone を埋めれば即 field 削除可能 (配線済)。PDF pp.150-152 が正確な式 (mmd は (C.3) が garble)。
+1. **(C.3)→(C.4)** [最も convention-heavy]: `relationC2` を `t^{±ℓ}` 共役 (ℓ=k-2) し、`s^{-i}t^i∈Q`
+   (既存 `s_inv_pow_mul_t_pow_mem_Q` S16:1416) + Q 可換 (`Q_mul_comm`) で整理 → (C.4)
+   `s^{-k}t² M₁ t⁻¹ M₂ t⁻¹ M₃ s^k = 1`、Mᵢ = `s^j·(unit)^{t^{j''}}·s^{j'}`。
+   - M₁=`s^{k-2}(a⁻¹)^{t^k}s^{-k+1}`, M₂=`s^k(ab⁻¹)^{t^{k-1}}s^{-k+2}`, M₃=`s^{k-1}b^{t^{k-2}}s^{-k}` (PDF p.150)。
+   - 既存 engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` (S16:1097) が Mᵢ の正規形を与える。
+2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
+3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
+4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,
+   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。⟹ (C.9) `s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`。
+5. **w_i=1**: Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2 (s₁≠1) ⟹ w₃^{p-1}=1 ⟹ (A) で w₃=1。同様 w₁=w₂=1。
+   ⟹ (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1`。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
+6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
+   `y∈ker((s⁻¹+1-s₁⁻¹s⁻¹-s₃)(s⁻¹-1))`。**FPF** (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`,
+   s で固定⟹W₂で固定⟹∈C_Q(W₂)⊓⁅Q,W₂⁆=1, (X)) で `(s⁻¹-1)` 可逆 → `y∈ker(s⁻¹+1-s₁⁻¹s⁻¹-s₃)`。
+   **(XI)** で `y∈⁅Q,W₂⁆` (`exists_yD_mem_actionCommutator_conj_s_eq_t`)。
+7. **s₁=s⁻¹**: tᵢ=y⁻¹sᵢy ⟹ `s₁t₁⁻¹t⁻¹=t⁻¹t₃⁻¹s₃` ⟹ (t₁≠t⁻¹ なら Step3+Step2 で s₁=1 矛盾) ⟹ t₁=t⁻¹ ∧ **s₁=s⁻¹**。
+   ⟹ k=3 第1式の middle が s⁻¹ = `Step4Capstone`。
+⚠️ kernel 段 (6) は `End([Q,P₀])` を ℤ-module 作用として実装する必要 (P₀=⟨s⟩ の作用、`actionCommutator` 上)。最難。
 
 ---
 
