@@ -202,9 +202,20 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   (共有 `(2c+1)²≤n≤4c²+1` 不能) / `six_five_chief_factor_contradiction` ((6.5)(a) chief factor) /
   `six_five_c_contradiction` ((6.5)(c))。**(6.5)(b) p-群 core ✅ + two_mul_add_one ✅ と合わせ (6.5) backbone は (6.2) を除き完成**。
 - **残 (option 1 の (6.2) 本体 + glue)**: (i) **θ-bound section case** `θ(1)≤|K:C|√|C:D|` (D/B⊆Z(C/B), Clifford
-  restriction; 中心 case ✅) 🔴, (ii) **Sibley packaging** (S₁/ψ 構成 + B1 を member-family enum 経由で適用 + B2 接続 ⟹
+  restriction; 中心 case ✅) 🟡 **半分 landed (下記)**, (ii) **Sibley packaging** (S₁/ψ 構成 + B1 を member-family enum 経由で適用 + B2 接続 ⟹
   (6.2) `2|L:C|√|C:D|≥|K:A|−1`; 算術 shell は自明、構成が hard) 🔴, (iii) (6.3)/(6.5) を SibleyDadeHypothesis の
-  実 index に結線。**次着手 = θ-bound section (Clifford) または T-A4 member-family enum**。
+  実 index に結線。
+
+### ✅ 2026-06-05 θ-bound section degree bound (b-half) landed
+- ✅ **`degree_sq_le_index_of_central_quotient`** (commit b61b834, `OddOrder.RepresentationTheory` @InflationCharacter,
+  axiom-clean, full build 3555): φ∈Irr G が N 上自明 + N≤D + `D/N≤Z(G/N)` ⟹ **`φ(1)²≤|G:D|`**。inflation
+  (`exists_inflate_eq_of_subset_characterKernel`+`inflate_apply_one`) で G/N に落とし中心 case `exists_degree_sq_le_index`
+  適用 + quotient index `(D.map mk' N).index=D.index` (`index_comap_of_surjective`+`comap_map_eq`+`ker_mk'`)。
+  = θ-bound の `φ(1)≤√|C:D|` 半分 (中心 case は N=⊥ 特殊化)。InflationCharacter に SchurCenterBound import 追加 (cycle 無)。
+- 🔴 **θ-bound 残 = Clifford restriction (a-half)** `θ(1)≤|K:C|·φ(1)` (φ=Res_C θ の constituent, 乗数 `e²≤|I:C|`):
+  **mathlib/repo に induced/restricted character の multiplicity/inertia 機構が無い** = 真の gap。これが full θ-bound
+  ⟹ (6.2) を塞ぐ。**次着手 = (a) Clifford restriction infra 新規構築 (substantial, mathlib gap) または (b) T-A4
+  member-family enum (Sibley packaging と共有)**。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
