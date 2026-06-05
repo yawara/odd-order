@@ -12,9 +12,43 @@
   `Nonempty (CharacteristicSylowSeriesPackage ↥M)`」。M solvable=`hG.solvable_of_mem_maximalSubgroups`,
   odd=`|M|∣|G|`, `rank F(↥M)=rank(fittingInG M)`(M.subtype iso=`Subgroup.equivMapOfInjective`)経由で L2 を呼ぶ。
 
-## 残作業 = Phase A 残 (propagation) + Phase B (body assembly)
+## ✅ Phase A 完了 (commit 3879b87, leaf build 2480 green)
 
-### Phase A 残: package 仮説の撤去を鎖全体へ伝播
+package 仮説 (`S`/`SP`/`SP_L`/`hSP`) を §9 normalizer 鎖 全 13 helper から撤去済。`rankCases` adapter の
+low-rank 分岐で bridge (L2) により package を内部生成。`ne_bot_of_mem_scn3Global` を un-private 化、
+`_of_sylowSeriesPackage` 変種を削除。**`scn3_isUniquelyMaximal` (S09_Lemma95:2380 の bare sorry) は
+package なしで helper を呼べる状態 = Phase B 解禁**。
+
+## 残作業 = Phase B (`scn3_isUniquelyMaximal` body assembly)
+
+BG mmd L2559-2625 (67 行) を package-free helper で組む。**注意: 単純な helper 合成でなく、3 つの
+sub-assembly を新規に書く必要がある** (helper が無い):
+
+1. **P0 = [P, N_G(P)] の setup + P0 ≠ ⊥**: `exists_pSubgroup_between_scn3_and_normalizer` の P は
+   **N_G(A) の Sylow-p であって G の Sylow-p ではない** (helper は Sylow-of-G を主張しない)。BG (9.9) 後の
+   `P0 ≠ 1` は **Thm 1.18 (Burnside, `Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer`)** を
+   使い「P0=⊥ ⟹ N_G(P)≤C_G(P) ⟹ G に normal p-complement ⟹ G simple nonabelian と矛盾」。
+   ⟹ **P を G の Sylow-p に取り直す** (A ⊴ G の Sylow-p ⊆ N_G(A) ゆえ N_G(A) の Sylow-p = G の Sylow-p)
+   + Burnside + `hG.simple` で no-normal-p-complement。**この sub-assembly が要新規実装**。
+   P0 := ⁅P, N_G(P)⁆ (= `derivedInG (N_G(P))` 以下、`Subgroup.commutator_mono` で hP0N; ⁅P,N_G(P)⁆≤P で hP0p)。
+2. **(9.11)+(9.12) 合成**: `p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package` (package-free 後)
+   で P0 が O_{p'}(F(M)) 中心化 (9.11)。(9.12) は r(F)≤2/≥3 で場合分け:
+   - r(F)≥3: `normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_package` (package-free 後)。
+   - r(F)≤2: `rank_opiCoreFitting_le_two_of_pSubgroup_normalizer_package` の対偶 + 低 rank で M≤N_G(P0)
+     (BG L2615-2619, M=O_{p'}(F)·N_M(P), P0⊴M) → `normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normalizer`。
+     **M≤N_G(P0) の低 rank 議論が要新規実装** (Thm 4.20 M'≤F + Frattini)。
+3. **最終矛盾 (L2621-2625)**: Ω₁(A)∉𝒰 → Thm 9.1 (`noncyclic_isUniquelyMaximal_of_centralizer_le`, 済) で
+   x∈Ω₁(A)^# with C_G(x)⊄M → M*∈𝓜(C_G(x)) → (9.12) を M* に適用し {M*}=𝓜(N_G(P0))={M} → M*=M だが
+   C_G(x)⊄M=M* 矛盾。**この最終 step も要新規実装** (Ω₁(A) の helper `omega1OfAbelian` はあるが最終合成は無)。
+
+**規模感**: Phase B は ~80-120 行 + sub-assembly 3 つ (P0≠⊥ Burnside / 低rank M≤N_G(P0) / 最終矛盾)。
+helper 合成だけでなく新規 proof を含むため genuine な作業量。foreground 逐次 (leaf build 駆動) 推奨。
+
+---
+
+## (旧) Phase A propagation 手順 — 記録 (完了済)
+
+### Phase A: package 仮説の撤去を鎖全体へ伝播
 
 **鍵**: `normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases` は **既に
 `by_cases hrank : rank (fittingInG M) ≤ 2` を持ち、series S は low-rank 分岐 (lowRank helper) でのみ消費**。
