@@ -27,15 +27,40 @@ created: 2026-06-05
 
 ## 進捗 (2026-06-05)
 
-build-green helper を S10_MalphaMsigma.lean に積み上げ中 (main 直接, commits 7706aba/6201617):
+build-green helper を S10_MalphaMsigma.lean に積み上げ済 (main 直接, commits 7706aba/6201617/2c52936):
 - ✅ `map_subtype_conj_smul`: `(c•K).map subtype = ↑c • (K.map subtype)` (conj⇄subtype 同変, §10 全般で再利用)。
 - ✅ `normalizer_sylow_map_le_of_mem_sigma` (σ basic, mmd L2655): `p∈σ(M) ⟹ ∀ Sylow-p Q of M, N_G(Q̄)≤M`。
-- ✅ `mem_normalizer_of_conj_smul_eq`: `conj h • H = H → h∈N_G(H)`。
 - ✅ **part (d)** `fusion_d_of_mem_sigma`: `Sylow.ofCard` で `(conj g•X).subgroupOf M` を Sylow 化 →
   M-共役 c → `↑c⁻¹g∈N_G(X)≤M` → `g∈M`。
+- ✅ `maximal_normalizer_le_self`: `N_G(M)≤M` (maximal=coatom + simple; M=⊥ は cyclic⟹solvable で除外)。
+- ✅ 既存 `mem_normalizer_of_conj_smul_eq_self` (GroupTheory) を再利用 (重複削除)。
 
 **残り** = part (b) (最重・maximal-counterexample 帰納) + (b)⟹(a)(c)(e) 還元 + capstone wiring。
 main 定理 `fusion_control_of_mem_sigma` の bundled sorry は未解消 (part b 完成で一気に閉じる)。
+
+### 🔴 scaffold 規約バグ発見 (要修正): part (a)/(c) の積の順序
+
+scaffold (a) は `∃ c∈C_G(X), ∃ m∈M, g = c*m` (C·M 順) だが、**scaffold の left-conj 規約
+`conj g • X = gXg⁻¹` の下では BG の議論は `g = m*c` (M·C 順) を与える** (BG は `X^g=g⁻¹Xg`、
+scaffold `conj g•X≤M` = BG `X^{g⁻¹}⊆M` ⟹ 共役子が逆 ⟹ 積順反転)。検証: (b) を g₁=1,g₂=g⁻¹ で
+適用 → `cMc⁻¹=g⁻¹Mg` → `gc∈N_G(M)≤M`=:m → `g = m·c⁻¹` (M·C)。両 (b)-instance とも M·C。
+**⟹ 主定理 (a) の `g = c*m` を `∃ m∈M, ∃ c∈C, g = m*c` に修正必要** (capstone wiring 前に)。
+(c) も同様に order 要確認。これは placeholder scaffold の不正確さで、修正は合法。
+
+### (b)⟹(a)⟹(c), (b)⟹(e) 還元 plan (prerequisite 確認済)
+
+- (b)⟹(a): X≤M & conj g•X≤M ⟹ X≤conj 1•M ∧ X≤conj g⁻¹•M ⟹ (b)(g₁=1,g₂=g⁻¹) で `cMc⁻¹=g⁻¹Mg`
+  ⟹ `gc∈N_G(M)` (`mem_normalizer_of_conj_smul_eq_self` + `maximal_normalizer_le_self`) ⟹ `g=m·c⁻¹`。
+- (a)⟹(c): n∈N_G(X) ⟹ conj n⁻¹•X=X≤M ⟹ (a)(g=n⁻¹) で `n⁻¹=...` ⟹ n=a·c (a∈N_G(X)⊓M, c∈C)。
+- (b)⟹(e): `centralizer X≤M` + conj g•X≤M。**X≤M の導出が要** (BG 暗黙; C_G(X)⊆M から?要精査)。
+- L=N_G(X) solvable = `hG.solvable_of_lt_top L (hL:L<⊤)`; L<⊤ は L=⊤⟹X⊴G⟹X∈{⊥,⊤} で除外。
+
+### part (b) 帰納の追加メモ
+
+- 反例 X の maximal-order 帰納 = `Nat.card G - Nat.card ↥X` の `Nat.strong_induction_on` (generalizing X);
+  IH は `|X'|>|X|` (= measure 減少) で (b)。X⊂P で (b)-for-P を IH から、(c)-for-P を (a)-of-(b) 経由。
+- prerequisite 全確認済: Thm 9.6=`S09.uniquenessTheorem`, Thm 4.18(e)=`S04.solvable_structure_of_pRank_le_two`,
+  Frattini=§6 Lem6.6, self-normalizing ✅, L solvable ✅, part(d) ✅, σ basic ✅。
 
 ## やること / 証明構造 (BG 忠実, mmd L2665-2711)
 
