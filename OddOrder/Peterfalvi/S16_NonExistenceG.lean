@@ -2868,6 +2868,123 @@ theorem unitVal_inv_frobenius_pair
     hyp.base.p hyp.base.q hyp.base.q_prime.ne_zero ha hb hab
   simpa [unitVal, map_pow] using hpair
 
+/-- BG Appendix C `(C.9)` for the third word: comparing `(C.7)` for `(a,b)`
+with `(C.7)` for `(a^p,b^p)` shows that
+`S₁ W₃^(p-1) S₁⁻¹` lies in `PU` and its `t²`-conjugate also lies in `PU`. -/
+theorem relationC9_w3_mem_P_sup_U_and_conj
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b) :
+    let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+    let W3pow := data.sigma
+      (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+        fieldNormalizerFrobeniusGroup hyp)
+    S1 * W3pow * S1⁻¹ ∈ hyp.base.P ⊔ hyp.base.U ∧
+      data.t ^ 2 * (S1 * W3pow * S1⁻¹) * (data.t ^ 2)⁻¹ ∈
+        hyp.base.P ⊔ hyp.base.U := by
+  classical
+  dsimp only
+  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+  let S2 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2)
+  let S3 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3)
+  let W1 := data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp)
+  let W2 := data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp)
+  let W3 := data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp)
+  let W1p := data.sigma
+    (SemidirectProduct.inr (forms.w1 ^ hyp.base.p) : fieldNormalizerFrobeniusGroup hyp)
+  let W2p := data.sigma
+    (SemidirectProduct.inr (forms.w2 ^ hyp.base.p) : fieldNormalizerFrobeniusGroup hyp)
+  let W3p := data.sigma
+    (SemidirectProduct.inr (forms.w3 ^ hyp.base.p) : fieldNormalizerFrobeniusGroup hyp)
+  let W3pow := data.sigma
+    (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+      fieldNormalizerFrobeniusGroup hyp)
+  let A := W1 * S3 * W2
+  let Ap := W1p * S3 * W2p
+  let X := S1 * W3pow * S1⁻¹
+  have hpow_pair := unitVal_inv_frobenius_pair ha hb hab
+  have hC7 := data.relationC7 hab forms
+  have hC7p := data.relationC7 hpow_pair.2.2 forms.frobenius
+  have hC7' :
+      data.t⁻¹ * S2 * data.t⁻¹ = (A * data.t ^ 2 * S1 * W3)⁻¹ := by
+    simpa [A, S1, S2, S3, W1, W2, W3, mul_assoc] using hC7
+  have hC7p' :
+      data.t⁻¹ * S2 * data.t⁻¹ = (Ap * data.t ^ 2 * S1 * W3p)⁻¹ := by
+    have hC7p0 := hC7p
+    rw [forms.frobenius_w1, forms.frobenius_w2, forms.frobenius_w3] at hC7p0
+    simpa [Ap, S1, S2, S3, W1p, W2p, W3p,
+      Step4C5NormalForms.frobenius, mul_assoc] using hC7p0
+  have hword : A * data.t ^ 2 * S1 * W3 = Ap * data.t ^ 2 * S1 * W3p := by
+    have hinv : (A * data.t ^ 2 * S1 * W3)⁻¹ =
+        (Ap * data.t ^ 2 * S1 * W3p)⁻¹ := hC7'.symm.trans hC7p'
+    exact inv_inj.mp hinv
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have hp_eq : hyp.base.p = hyp.base.p - 1 + 1 :=
+    (Nat.succ_pred_eq_of_pos hp_pos).symm
+  have hW3_pow_mul_inv : W3 ^ hyp.base.p * W3⁻¹ = W3 ^ (hyp.base.p - 1) := by
+    conv_lhs =>
+      lhs
+      rw [hp_eq]
+    rw [pow_succ]
+    group
+  have hW3p_eq : W3p = W3 ^ hyp.base.p := by
+    simp [W3p, W3, map_pow]
+  have hW3pow_eq : W3pow = W3 ^ (hyp.base.p - 1) := by
+    simp [W3pow, W3, map_pow]
+  have hW3p_mul_inv : W3p * W3⁻¹ = W3pow := by
+    calc
+      W3p * W3⁻¹ = W3 ^ hyp.base.p * W3⁻¹ := by rw [hW3p_eq]
+      _ = W3 ^ (hyp.base.p - 1) := hW3_pow_mul_inv
+      _ = W3pow := hW3pow_eq.symm
+  have hApA : Ap⁻¹ * A = data.t ^ 2 * X * (data.t ^ 2)⁻¹ := by
+    calc
+      Ap⁻¹ * A = Ap⁻¹ * (A * data.t ^ 2 * S1 * W3) * W3⁻¹ * S1⁻¹ *
+          (data.t ^ 2)⁻¹ := by
+        group
+      _ = Ap⁻¹ * (Ap * data.t ^ 2 * S1 * W3p) * W3⁻¹ * S1⁻¹ *
+          (data.t ^ 2)⁻¹ := by
+        rw [hword]
+      _ = data.t ^ 2 * S1 * (W3p * W3⁻¹) * S1⁻¹ *
+          (data.t ^ 2)⁻¹ := by
+        group
+      _ = data.t ^ 2 * S1 * W3pow * S1⁻¹ * (data.t ^ 2)⁻¹ := by
+        rw [hW3p_mul_inv]
+      _ = data.t ^ 2 * X * (data.t ^ 2)⁻¹ := by
+        simp [X]
+        group
+  have hA_mem : A ∈ PU := by
+    change A ∈ hyp.base.P ⊔ hyp.base.U
+    rw [data.P_sup_U_eq_sigma_top]
+    refine ⟨(SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp forms.c3 * SemidirectProduct.inr forms.w2,
+      trivial, ?_⟩
+    simp [A, W1, W2, S3, map_mul]
+  have hAp_mem : Ap ∈ PU := by
+    change Ap ∈ hyp.base.P ⊔ hyp.base.U
+    rw [data.P_sup_U_eq_sigma_top]
+    refine ⟨(SemidirectProduct.inr (forms.w1 ^ hyp.base.p) :
+          fieldNormalizerFrobeniusGroup hyp) *
+        fieldNormalizerPrimeLineElement hyp forms.c3 *
+          SemidirectProduct.inr (forms.w2 ^ hyp.base.p), trivial, ?_⟩
+    simp [Ap, W1p, W2p, S3, map_mul]
+  have hX_mem : X ∈ PU := by
+    change X ∈ hyp.base.P ⊔ hyp.base.U
+    rw [data.P_sup_U_eq_sigma_top]
+    refine ⟨fieldNormalizerPrimeLineElement hyp forms.c1 *
+        (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+          fieldNormalizerFrobeniusGroup hyp) *
+          (fieldNormalizerPrimeLineElement hyp forms.c1)⁻¹, trivial, ?_⟩
+    simp [X, S1, W3pow, map_mul, map_inv]
+  have hconj_mem : data.t ^ 2 * X * (data.t ^ 2)⁻¹ ∈ PU := by
+    have hleft : Ap⁻¹ * A ∈ PU := PU.mul_mem (PU.inv_mem hAp_mem) hA_mem
+    rwa [hApA] at hleft
+  exact ⟨by simpa [PU, X, S1, W3pow] using hX_mem,
+    by simpa [PU, X, S1, W3pow] using hconj_mem⟩
+
 
 /-- BG Appendix C condition `(A)` in S16 form: a norm-one unit with
 `(p - 1)`-st power equal to `1` is trivial. -/

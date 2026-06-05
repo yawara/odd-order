@@ -101,14 +101,14 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `unitVal_inv_frobenius_pair` landed, transporting BG AppC `normSetE_frobenius_pair`
   to S16 Step 4 variables: `unitVal a⁻¹, unitVal b⁻¹ ∈ E` and `unitVal a⁻¹+unitVal b⁻¹=2`
   imply the same facts for `(a^p)⁻¹`, `(b^p)⁻¹`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG`
-  green.  次は powered `(C.5)` normal forms (`uᵢ^p`, `vᵢ^p`) と (C.7) の p-th-power 比較。
+  green.  This is the field-entry used by the later powered `(C.5)`/`(C.7)` comparison.
 - **🆕 (2026-06-06) condition A / C.10 bridge done**:
   `normOneUnit_eq_one_of_pow_sub_one_eq_one` and
   `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` transport BG condition `(A)` to the
   three C.7 words, and `relationC10_of_w_eq_one` collapses exact `(C.7)` to
   `t²s₁t⁻¹s₂t⁻¹s₃=1` once `w₁=w₂=w₃=1`.  `lake build
-  OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は powered `(C.5)`/`(C.7)` comparison
-  から実際に `wᵢ^(p-1)=1` を作る `(C.9)`。
+  OddOrder.Peterfalvi.S16_NonExistenceG` green.  This is the recipient for turning later
+  `(C.9)` memberships plus Step3/condition `(A)` into exact `(C.10)`.
 - **🆕 (2026-06-06) C.8 concrete Frobenius map done**:
   `fieldNormalizerAdditiveFrobeniusHom`, `fieldNormalizerNormOneFrobeniusHom`, and
   `fieldNormalizerFrobeniusHom` landed for the concrete semidirect product `P ⋊ U`, with
@@ -122,9 +122,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `Step4C5NormalForms.hM1_frobenius/hM2_frobenius/hM3_frobenius`, and
   `Step4C5NormalForms.frobenius` landed.  A whole `(C.5)` package for `(a,b)` now gives
   the powered package for `(a^p,b^p)` with the same `cᵢ` and `uᵢ,vᵢ` replaced by
-  `uᵢ^p,vᵢ^p`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は
-  original `forms` と `forms.frobenius` の `(C.7)` を比較して `(C.9)`、すなわち
-  `wᵢ^(p-1)=1` を作る。
+  `uᵢ^p,vᵢ^p`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.
+- **🆕 (2026-06-06) C.9 third-word membership done**:
+  `relationC9_w3_mem_P_sup_U_and_conj` landed.  It compares original `(C.7)` with
+  Frobenius-powered `(C.7)` and proves `S₁ W₃^(p-1) S₁⁻¹ ∈ PU` and its `t²`-conjugate
+  lie in `PU`.  This is the substantive BG `(C.9)` step for `w₃`; remaining frontier is
+  the analogous `w₁/w₂` memberships and the Step3/condition `(A)` collapse to `wᵢ=1`.
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -203,7 +206,8 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 3. **(C.7)**: ✅ landed (`Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7`):
    `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
 4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,
-   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。⟹ (C.9) `s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`。
+   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。✅ `w₃` 版 `(C.9)`
+   (`s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`) landed; `w₁/w₂` 版が残り。
 5. **w_i=1**: Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2 (s₁≠1) ⟹ w₃^{p-1}=1 ⟹ (A) で w₃=1。同様 w₁=w₂=1。
    ⟹ (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1`。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
 6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
@@ -295,7 +299,7 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.6)** | `sᵢ≠1` | **既存** Step2 `generatorRelation_step2_primeLine*` (S16:643/672) + Step3 (下記) |
 | **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
 | **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
-| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | 新規 |
+| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | ✅ `w₃` 版 landed (`relationC9_w3_mem_P_sup_U_and_conj`); `w₁/w₂` 版残り |
 | Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, 同様に `w₁=w₂=1` | bridge landed: `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one`; Step3/Step2 production of powers remains |
 | **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | bridge landed: `relationC10_of_w_eq_one`; actual `wᵢ=1` derivation remains |
 | mod Q | `P₀∩Q=1` ⟹ `s₁s₂s₃=1` | **既存** `W2_inf_Q_eq_bot` (S16:1454) |
@@ -328,9 +332,10 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
      ✅ condition A / C.10 bridge (`w_eq_one_of_pow_sub_one_eq_one`,
      `relationC10_of_w_eq_one`) landed.  ✅ concrete semidirect Frobenius map
      (`fieldNormalizerFrobeniusHom`) landed.  ✅ powered `(C.5)` package transport
-     (`Step4C5NormalForms.frobenius`) landed.  次は powered `(C.7)` comparison → `(C.9)`。
+     (`Step4C5NormalForms.frobenius`) landed.  ✅ powered `(C.7)` comparison gives
+     `relationC9_w3_mem_P_sup_U_and_conj` for the third word.  次は `w₁/w₂` analogues。
    - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
-     条件Aで潰す bridge は landed; `wᵢ^(p-1)=1` を作る比較が残り。
+     条件Aで潰す bridge は landed; `wᵢ^(p-1)=1` への Step3/Step2 production が残り。
    - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1` は `wᵢ=1` 仮定から landed; `s₁s₂s₃_eq_one`
      (mod Q, `W2_inf_Q_eq_bot`) は残り。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):
