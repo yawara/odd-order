@@ -1053,6 +1053,58 @@ theorem IsCharacter.exists_natFinsupp_eq_sum {χ : ClassFunction G ℂ} (hχ : I
       · rw [Finsupp.notMem_support_iff.mp hsupp_mem]
     rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
 
+/-- **Constituent degree bound.**  If `χ` is a genuine character and `θ` is an irreducible
+constituent of `χ` (`⟨χ, θ⟩ ≠ 0`), then the degree of `θ` is at most the degree of `χ`:
+`(θ 1).re ≤ (χ 1).re`.
+
+Decompose `χ = ∑_{a ∈ Irr} m_a · a` (`exists_natFinsupp_eq_sum`) with `m_a = ⟨χ, a⟩ ∈ ℕ` and
+each `a(1)` a positive integer (`irreducibleCharacter_apply_one_eq_pos_natCast`).  Evaluating at
+`1`, every summand `m_a · a(1)` has non-negative real part, and the `θ`-summand alone
+(multiplicity `m_θ ≥ 1`) already dominates `θ(1)`.  This is the degree half of the
+Frobenius-reciprocity route to the Peterfalvi `(6.2)` `θ`-bound (`θ(1) ≤ |K:C|·φ(1)`). -/
+theorem IsCharacter.apply_one_re_le_of_inner_ne_zero {χ : ClassFunction G ℂ}
+    (hχ : IsCharacter χ) {θ : ClassFunction G ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinner : ClassFunction.inner χ θ ≠ 0) :
+    (θ 1).re ≤ (χ 1).re := by
+  classical
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := hχ.exists_natFinsupp_eq_sum
+  -- evaluation of a finite sum of class functions at a point
+  have hsum_apply : ∀ (s : Finset (ClassFunction G ℂ)) (F : ClassFunction G ℂ → ClassFunction G ℂ),
+      (∑ a ∈ s, F a) 1 = ∑ a ∈ s, (F a) 1 := by
+    intro s F
+    induction s using Finset.cons_induction with
+    | empty => simp
+    | cons a s ha ih => rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.add_apply, ih]
+  -- the real-part decomposition of `χ(1)`
+  have hχ1 : (χ 1).re = ∑ a ∈ m.support, (m a : ℝ) * (a 1).re := by
+    have hval : χ 1 = ∑ a ∈ m.support, (m a : ℂ) * (a 1) := by
+      rw [hsum, hsum_apply]
+      exact Finset.sum_congr rfl fun a _ => ClassFunction.smul_apply _ _ _
+    rw [hval, Complex.re_sum]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero]
+  -- each irreducible degree `(a 1).re` is non-negative
+  have hdeg_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (a 1).re := by
+    intro a ha
+    have ha_mem : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    obtain ⟨d, _, hd1⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, ha_mem⟩ : IrreducibleCharacter G)
+    have hd1' : a (1 : G) = (d : ℂ) := hd1
+    rw [hd1', Complex.natCast_re]
+    exact Nat.cast_nonneg d
+  -- hence each summand is non-negative
+  have hterm_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (m a : ℝ) * (a 1).re := fun a ha =>
+    mul_nonneg (Nat.cast_nonneg _) (hdeg_nonneg a ha)
+  -- `θ` lies in the support (its multiplicity is the nonzero Fourier coefficient)
+  have hmθ : m θ ≠ 0 := fun h0 => hinner (by rw [← hcoeff θ hθ, h0, Nat.cast_zero])
+  have hθsupp : θ ∈ m.support := Finsupp.mem_support_iff.mpr hmθ
+  -- the `θ`-summand dominates `θ(1)`, and the whole sum dominates the `θ`-summand
+  have hθterm : (θ 1).re ≤ (m θ : ℝ) * (θ 1).re :=
+    le_mul_of_one_le_left (hdeg_nonneg θ hθsupp)
+      (by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hmθ)
+  rw [hχ1]
+  exact hθterm.trans (Finset.single_le_sum hterm_nonneg hθsupp)
+
 end GenuineDecomposition
 
 end OddOrder.RepresentationTheory
