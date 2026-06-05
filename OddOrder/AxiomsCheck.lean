@@ -1150,6 +1150,14 @@ set_option linter.style.longLine false in
 -- + O_q(G) narrow (q≠p は Fitting 異素数可換で排除; q=p は EZ ∈ ℰ²∩ℰ* + Thm 5.3)
 -- + Thm 5.5(a) で G' の Ū-作用が q-群 + 固定点論法 (Isaacs Lem 4.32) + Ū minimal normal。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two
+-- BG Thm 4.20(a) (rank 版): G solvable odd, rank F(G) ≤ 2 ⇒ G' ≤ F(G)。F(G)≠1 から elem-ab E≤F(G)
+-- を 1 つ作り Thm 5.7 を適用 (C_G(E)⊓F ≤ F ゆえ centralizer-rank 仮説は自動)。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two
+-- BG Thm 4.20(c) 存在 (mmd L1786): G solvable odd, rank F(G) ≤ 2 ⇒ characteristic Sylow series。
+-- |G| 強帰納: G'≤F (4.20a) で G/F abelian → p₁=最小素数, H=(mk' F)⁻¹(O_{p₁'}(G/F)) で G/H が
+-- p₁-群 + F が H の Sylow-p₁ を含む → Thm 4.18(b) で H に normal p₁-complement → G の normal
+-- p₁-complement K=O_{p₁'}(G) → F(K)≤F(G) で K に IH → 上層 (top layer p₁) を付けて lift。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
 -- BG Prop 1.16(2) (mmd L501): noncyclic abelian A が coprime 作用 ⇒ G=⟨C_G(Y)|A/Y cyclic⟩
 -- (第1式 G=⟨C_G(x)|x∈A^#⟩ = Gorenstein 6.2.4 = Isaacs 6.21 既存; 第2式を |A| 帰納で構成)。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic

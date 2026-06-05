@@ -1871,48 +1871,92 @@ theorem exists_terminal_normal_sylow (P : CharacteristicSylowSeriesPackage G) :
 
 end CharacteristicSylowSeriesPackage
 
-/-- **BG Theorem 4.20(c) — existence** (mmd L1764/L1771): a finite solvable group of odd
-order with `r(F(G)) ≤ 2` possesses a *characteristic Sylow series* `G = G₀ ⊃ ⋯ ⊃ Gₙ = 1`
-whose factors are isomorphic to Sylow subgroups of `G` — packaged as
-`CharacteristicSylowSeriesPackage G`.
+/-- For a finite group `B` whose elements pairwise commute (i.e. abelian), the quotient by its
+`p'`-core `O_{p'}(B) = oPiCore {r ≠ p} B` is a `p`-group.
 
-This is the producer the §9 (Lemma 9.5) consumers currently take as a hypothesis
-(`exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage`, etc.); proving it
-lets those `SP : CharacteristicSylowSeriesPackage ↥M` hypotheses be discharged for the
-(solvable, `r(F)≤2`) maximal subgroups `M`.
-
-Construction (strong induction on `Nat.card G`, following BG's own proof of 4.20(c), mmd L1786):
-* `F := F(G)`; by Thm 4.20(a) (`derived_le_fitting_of_centralizer_rank_le_two`) `G' ≤ F`, so `G/F`
-  is abelian;
-* let `p₁` be the *smallest* prime divisor of `|G|`; take `H` with `F ≤ H` and
-  `H/F = O_{p₁'}(G/F)`. Then `F` contains a Sylow `p₁` of `H`, and `G/H` (a quotient of the
-  abelian `G/F`) is a `p₁`-group;
-* by **Thm 4.18(b)** `H` has a normal `p₁`-complement; combined with `G/H` a `p₁`-group,
-  `hasNormalPComplement_of_…_quotient_isPGroup` yields `Ch05.HasNormalPComplement p₁ G`, whose
-  complement is `K = O_{p₁'}(G)` (`normalPComplement_eq_oPiCore_compl`);
-* `F(K) ≤ F(G)` (`fitting_map_subtype_le_fitting`) gives `r(F(K)) ≤ 2`, so recurse on `K`
-  (`Nat.card K < Nat.card G`), then lift the resulting series with
-  `CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
-
-NB: no `pRank G p ≤ 2` is needed — the rank hypothesis flows purely through `G' ≤ F` (Thm 4.20a)
-and `F(K) ≤ F(G)`, both direct inclusions (an earlier pRank/structure-lemma plan was wrong, since
-`pRank G p ≤ r(F(G))` is false in general). All hooks (Thm 4.18, the normal-`p`-complement assembly
-lemmas, the lift machinery) are already in this file / §5. -/
-theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
-    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
-    (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
-    Nonempty (CharacteristicSylowSeriesPackage G) := by
+In an abelian — more generally nilpotent — group `B ≅ Sylow_p(B) × O_{p'}(B)`, so `B/O_{p'}(B)`
+is the Sylow `p`-subgroup.  This is the BG Theorem 4.20(c) step "`G/F` is abelian, hence
+`(G/F)/O_{p₁'}(G/F)` is a `p₁`-group". -/
+theorem isPGroup_quotient_oPiCore_of_comm {B : Type*} [Group B] [Finite B] {p : ℕ}
+    [Fact p.Prime] (hcomm : ∀ x y : B, x * y = y * x) :
+    IsPGroup p (B ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} B) := by
   classical
-  -- Strong induction on `Nat.card G`, generalizing the group.
-  suffices H : ∀ n : ℕ, ∀ (G : Type _) [Group G] [Finite G] [IsSolvable G] [Nontrivial G],
-      Nat.card G = n → Odd (Nat.card G) → rank ↥(Ch01.fitting G) ≤ 2 →
-      Nonempty (CharacteristicSylowSeriesPackage G) by
-    exact H (Nat.card G) G rfl hodd hrank
-  intro n
-  induction n using Nat.strong_induction_on with
-  | _ n IH =>
-    intro G _ _ _ _ hcard hodd' hrank'
-    sorry
+  set O : Subgroup B := Ch03.oPiCore {r : ℕ | r ≠ p} B with hOdef
+  set C := B ⧸ O with hCdef
+  -- the quotient is abelian and has trivial `p'`-core
+  have hcommC : ∀ x y : C, x * y = y * x := by
+    intro x y
+    obtain ⟨a, rfl⟩ := QuotientGroup.mk'_surjective O x
+    obtain ⟨b, rfl⟩ := QuotientGroup.mk'_surjective O y
+    rw [← map_mul, ← map_mul, hcomm a b]
+  have hcoreC : Ch03.oPiCore {r : ℕ | r ≠ p} C = ⊥ :=
+    Ch03.oPiCore_quotient_self_eq_bot _
+  -- every prime dividing `|C|` equals `p`
+  have huniq : ∀ q : ℕ, q.Prime → q ∣ Nat.card C → q = p := by
+    intro q hq hqdvd
+    by_contra hqp
+    haveI : Fact q.Prime := ⟨hq⟩
+    obtain ⟨x, hx⟩ := Ch01.cauchy (G := C) hqdvd
+    -- `⟨x⟩` is a normal `{r ≠ p}`-subgroup, hence trivial — contradicting `|⟨x⟩| = q > 1`.
+    haveI hnorm : (Subgroup.zpowers x).Normal :=
+      { conj_mem := fun n hn g => by
+          have hgn : g * n * g⁻¹ = n := by
+            rw [hcommC g n, mul_assoc, mul_inv_cancel, mul_one]
+          rw [hgn]; exact hn }
+    have hcard : Nat.card (Subgroup.zpowers x) = q := by
+      rw [Nat.card_zpowers, hx]
+    have hpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (Subgroup.zpowers x) := by
+      intro q' hq'
+      rw [hcard, hq.primeFactors, Finset.mem_singleton] at hq'
+      show q' ≠ p
+      rw [hq']; exact hqp
+    have hbot : Subgroup.zpowers x = ⊥ :=
+      Ch03.eq_bot_of_isPiGroup_of_oPiCore_eq_bot {r : ℕ | r ≠ p} hpi hcoreC
+    have hx1 : x = 1 := Subgroup.zpowers_eq_bot.mp hbot
+    rw [hx1, orderOf_one] at hx
+    exact hq.ne_one hx.symm
+  -- a number all of whose prime divisors equal `p` is a power of `p`
+  have hcard_eq : Nat.card C = p ^ (Nat.card C).primeFactorsList.length :=
+    Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
+      (fun {d} hd hdvd => huniq d hd hdvd)
+  exact IsPGroup.iff_card.mpr ⟨_, hcard_eq⟩
+
+/-- If `X` has a nilpotent normal subgroup `M` whose index is coprime to `p` (so `M` contains a
+full Sylow `p`-subgroup of `X`), then some Sylow `p`-subgroup of `X` lies in the Fitting subgroup
+`F(X)`.
+
+BG Theorem 4.20(c) applies this with `X = H`, `M = F(G)` viewed inside `H`: since `H/F` is a
+`p₁'`-group, `p₁ ∤ [H:F]`, and `F ≤ F(H)` is nilpotent and normal. -/
+theorem exists_sylow_le_fitting_of_nilpotent_normal_index_coprime
+    {X : Type*} [Group X] [Finite X] {p : ℕ} [Fact p.Prime]
+    {M : Subgroup X} [M.Normal] [Group.IsNilpotent ↥M] (hidx : ¬ p ∣ M.index) :
+    ∃ P : Sylow p X, (P : Subgroup X) ≤ Ch01.fitting X := by
+  classical
+  have hM_le : M ≤ Ch01.fitting X := Ch01.nilpotent_normal_le_fitting
+  -- `p`-part of `|X|` equals `p`-part of `|M|`, since `p ∤ [X:M]`.
+  have hfactX : (Nat.card X).factorization p = (Nat.card ↥M).factorization p := by
+    have hmul : Nat.card ↥M * M.index = Nat.card X := Subgroup.card_mul_index M
+    rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
+  -- a Sylow `p` of `M`, pushed into `X`, has full `p`-order, hence is Sylow in `X`.
+  obtain ⟨R⟩ := (inferInstance : Nonempty (Sylow p ↥M))
+  set Rmap : Subgroup X := (R : Subgroup ↥M).map M.subtype with hRmap
+  have hRmap_pg : IsPGroup p ↥Rmap := R.isPGroup'.map M.subtype
+  have hRmap_le : Rmap ≤ Ch01.fitting X := (Subgroup.map_subtype_le _).trans hM_le
+  have hRmap_card : Nat.card ↥Rmap = p ^ (Nat.card X).factorization p := by
+    rw [hRmap, Subgroup.card_map_of_injective M.subtype_injective, R.card_eq_multiplicity,
+      ← hfactX]
+  obtain ⟨P, hP_le⟩ := IsPGroup.exists_le_sylow hRmap_pg
+  have hRmap_eq : Rmap = (P : Subgroup X) :=
+    Subgroup.eq_of_le_of_card_ge hP_le
+      (le_of_eq (P.card_eq_multiplicity.trans hRmap_card.symm))
+  exact ⟨P, hRmap_eq ▸ hRmap_le⟩
+
+/-! The BG Theorem 4.20(c) producer
+`exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two` lives in
+`S05_NarrowPGroups` (`section Thm420c`): its strong induction requires `G' ≤ F(G)`
+(BG Theorem 4.20(a)), which the repository derives via Theorem 5.7
+(`derived_le_fitting_of_centralizer_rank_le_two`), and `S05` is downstream of this file. -/
 
 end Thm418
 
