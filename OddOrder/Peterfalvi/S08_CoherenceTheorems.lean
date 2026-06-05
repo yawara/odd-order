@@ -1682,6 +1682,65 @@ theorem coherentDegreeSumBound_of_not_coherent
     hmemconjortho hmemortho hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
 open scoped Classical in
+/-- **Peterfalvi (6.2), step (ii) — the `S(A)` degree-sum (B2 assembled).**
+For `H ⊴ G`, `A ⊴ G`, `A ≤ H`, the induced family
+`S(A) = {Ind_H^G θ | θ ∈ Irr H, A ⊆ Ker θ, θ ≠ 1}` satisfies
+`∑_{χ ∈ S(A)} χ(1)²/‖χ‖² = [G:H]·(|H : A| − 1)`.
+
+This assembles the orbit-counted identity `sum_div_normSq_induce_image_eq`
+(`∑ = [G:H]·∑_{θ∈T}θ(1)²`, fibres of `θ ↦ Ind θ` are `G`-conjugacy orbits) with the inflation
+degree-sum `sumInflatedDegreeSq_ntrivial` (`∑_{θ∈T}θ(1)² = |H ⧸ A| − 1`, Burnside on `H ⧸ A`).
+The index set `T = {θ ∈ Irr H | A ⊆ Ker θ, θ ≠ 1}` is `G`-conjugation-invariant because `A ⊴ G`:
+`Ker(θ^g) = g·(Ker θ)·g⁻¹ ⊇ g·A·g⁻¹ = A`.  This is the (6.2) input "step (ii)" that, with the
+(5.6) bound B1 and the θ-bound, yields `2|L:C|√|C:D| ≥ |K:A| − 1`. -/
+theorem sum_div_normSq_induce_kernelFilter_eq {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {H : Subgroup G} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
+    {A : Subgroup G} [A.Normal] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        χ 1 ^ 2 / ClassFunction.inner χ χ
+      = (H.index : ℂ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℂ) - 1) := by
+  classical
+  have hconj : ∀ θ ∈ Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+      (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H),
+      ∀ g : G, IrreducibleCharacter.conjBy g θ ∈ Finset.univ.filter
+        (fun θ : IrreducibleCharacter ↥H =>
+          (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H) := by
+    intro θ hθ g
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hθ ⊢
+    obtain ⟨hker, hne⟩ := hθ
+    refine ⟨?_, ?_⟩
+    · -- `A ⊆ Ker(θ^g)`: each `a ∈ A` has `g·a·g⁻¹ ∈ A ⊆ Ker θ`.
+      intro a ha
+      have hmemA : (⟨g * (a : G) * g⁻¹, ‹H.Normal›.conj_mem (a : G) a.2 g⟩ : ↥H)
+          ∈ A.subgroupOf H := by
+        rw [Subgroup.mem_subgroupOf]
+        exact ‹A.Normal›.conj_mem (a : G) (Subgroup.mem_subgroupOf.mp ha) g
+      have hk := hker hmemA
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hk
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def, conjBy_apply_one,
+        IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply, hk,
+        OddOrder.Peterfalvi.S03.characterDegree_def]
+    · -- `θ^g ≠ 1`: conjugation is injective and fixes the trivial character.
+      intro hc
+      apply hne
+      have h1 : IrreducibleCharacter.conjBy g⁻¹ (IrreducibleCharacter.conjBy g θ) = θ := by
+        rw [← IrreducibleCharacter.conjBy_mul, mul_inv_cancel, IrreducibleCharacter.conjBy_one]
+      rw [← h1, hc, IrreducibleCharacter.ext_iff]
+      ext h
+      rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply]
+      simp
+  rw [sum_div_normSq_induce_image_eq _ hconj]
+  congr 1
+  exact sumInflatedDegreeSq_ntrivial (N := A.subgroupOf H)
+
+open scoped Classical in
 /-- **(T-A2 input) Per-step `xAdjoinStep` data bundle.**
 
 Bundles the `xAdjoinStep` premises for one adjoining step of the X-family chain — the member family
@@ -2252,6 +2311,40 @@ theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
   have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A (Abelianization ↥N) :=
     hFrobN.quotient (commutator ↥N) hM
   exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hAodd hbound
+
+/-- **Peterfalvi (6.5)(b) reduction in the certain-type case (6.8)(c2): the kernel is a `p`-group.**
+If a finite group `W` acts on a finite nilpotent group `H` with `(|W|, |H|) = 1`, such that for
+every nonidentity `w ∈ W` the `w`-fixed points of `H` lie in `⁅H,H⁆` (the certain-type centralizer
+condition `C_H(x) = W₂ ⊆ ⁅H,H⁆`), and `|Abelianization H|`, `|W|` are odd with
+`|Abelianization H| ≤ 4|W|² + 1`, then `H` is a `p`-group for some prime `p`.
+
+This is the (6.8)(c2) analogue of `isPGroup_of_isFrobeniusGroup_of_card_le`.  Here `W` does *not*
+act fixed-point-freely on `H` (the fixed points `C_H(x) = W₂` are nontrivial), but since
+`W₂ ⊆ ⁅H,H⁆` the action descends fixed-point-freely to `Abelianization H` (`IsFrobeniusAction`'s
+`quotient_of_fixedPoints_le`, via the coprime fixed-point lifting Isaacs Cor 3.28); then the
+(6.5)(b) reduction `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` applies.  In the
+(6.8) capstone the fixed-points hypothesis is discharged from the certain-type fields
+`centralizer_W2` (`C_L(x) ⊓ H = W₂`) and `W₂ ⊆ ⁅H,H⁆`, and the coprimality from the Hall datum
+`gcd(|H|, |W₁|) = 1`. -/
+theorem isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator {H W : Type*}
+    [Group H] [Finite H] [Group.IsNilpotent H] [Group W] [Finite W] [MulDistribMulAction W H]
+    (hCop : Nat.Coprime (Nat.card W) (Nat.card H))
+    (hfix : ∀ w : W, w ≠ 1 → ∀ x : H, w • x = x → x ∈ commutator H)
+    (hHodd : Odd (Nat.card (Abelianization H))) (hWodd : Odd (Nat.card W))
+    (hbound : Nat.card (Abelianization H) ≤ 4 * Nat.card W ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p H := by
+  have hMinv : ∀ a : W, ∀ m ∈ commutator H, a • m ∈ commutator H := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator H).Characteristic) (MulDistribMulAction.toMulAut W H a)
+    have hmem : (MulDistribMulAction.toMulAut W H a).toMonoidHom m ∈ commutator H := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  letI actAb : MulDistribMulAction W (Abelianization H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator H) hMinv
+  have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction W (Abelianization H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le hCop (commutator H) hMinv hfix
+  exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hWodd hbound
 
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
 `Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
