@@ -96,8 +96,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   BG words `Step4C5NormalForms.w1/2/3`, ambient rewrites `sigma_inr_w1/2/3`,
   U-membership `sigma_inr_w_mem_U`, and exact rearrangement `relationC7` landed.
   This proves `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹` in the transported `G` notation.
-  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は (C.8) Frobenius
-  replacement で (C.5)/(C.7) を p-th powers に移し、(C.9) → Step3 → `wᵢ=1` → (C.10)。
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) C.8 Frobenius pair entry done**:
+  `unitVal_inv_frobenius_pair` landed, transporting BG AppC `normSetE_frobenius_pair`
+  to S16 Step 4 variables: `unitVal a⁻¹, unitVal b⁻¹ ∈ E` and `unitVal a⁻¹+unitVal b⁻¹=2`
+  imply the same facts for `(a^p)⁻¹`, `(b^p)⁻¹`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG`
+  green.  次は powered `(C.5)` normal forms (`uᵢ^p`, `vᵢ^p`) と (C.7) の p-th-power 比較。
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -297,7 +301,8 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
 2. **(C.4)–(C.6)** (既存 Q-commutator + Step1/2/3 を chain):
    - `relationC4` (Q 可換で整理), `decompositionC5` (Step1 で uᵢsᵢvᵢ), `sᵢ_ne_one` (Step2/3)。
 3. **(C.7)–(C.10)** (Frobenius 置換 + Step3):
-   - ✅ `relationC7` landed.  次は `frobenius_replacement_C8` : (C.5) が a→aᵖ で不変 (有限体 `add_pow_char`)。
+   - ✅ `relationC7` landed.  ✅ `unitVal_inv_frobenius_pair` landed.  次は
+     `frobenius_replacement_C8` : (C.5) が a→aᵖ で不変 (有限体 `add_pow_char`)。
    - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
    - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1`, `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`)。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):

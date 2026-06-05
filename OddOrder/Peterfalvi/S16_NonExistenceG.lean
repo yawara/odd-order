@@ -2528,6 +2528,22 @@ theorem relationC7
         rw [← hD]
   simpa [S1, S2, S3, W1, W2, W3, mul_assoc] using hmain
 
+
+/-- BG Appendix C `(C.8)` Frobenius entry: if the inverse field values of `a` and
+`b` lie in `E` and satisfy the companion equation, then the inverse field values of
+`a^p` and `b^p` again lie in `E` and satisfy the same companion equation. -/
+theorem unitVal_inv_frobenius_pair
+    {hyp : Hypothesis (G := G)} {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
+    unitVal (a ^ hyp.base.p)⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q ∧
+      unitVal (b ^ hyp.base.p)⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q ∧
+        unitVal (a ^ hyp.base.p)⁻¹ + unitVal (b ^ hyp.base.p)⁻¹ = 2 := by
+  have hpair := OddOrder.BG.AppC.NormSet.normSetE_frobenius_pair
+    hyp.base.p hyp.base.q hyp.base.q_prime.ne_zero ha hb hab
+  simpa [unitVal, map_pow] using hpair
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
