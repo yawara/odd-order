@@ -478,101 +478,6 @@ private theorem le_maximal_of_rank_fitting_le_two_of_sylow [Finite G]
             = opiCoreInG ({p} : Set ℕ)ᶜ H := rfl
         rw [hrfl]; exact hOpM
 
-/-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
-(a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
-
-Proof gate: mmd L2533 invokes BG Thm 8.1 and BG Thm 4.20 after Eq. (9.5). Do not add
-BG Lem 4.13, BG Thm 4.16, or §5 narrow hypotheses to this theorem. -/
-theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
-    {p : ℕ} [Fact p.Prime] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    {B : Subgroup G} (hBea : B.IsElementaryAbelian p) (hBle : B ≤ M) (hBnc : ¬ IsCyclic ↥B)
-    (hcase :
-      (∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer {b} ≤ M) ∨
-      sSup (hInvariant ⊤ B {p}ᶜ) ≤ M) :
-    IsUniquelyMaximal B := by
-  sorry
-
-/-- Contrapositive form of BG Theorem 9.1 used in Lemma 9.5: if the noncyclic
-`p`-elementary subgroup `B ≤ M` is not in `𝒰`, then some nonidentity element of
-`B` has centralizer not contained in `M`. -/
-private theorem exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal [Finite G]
-    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
-    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
-    ∃ y : G, y ∈ B ∧ y ≠ 1 ∧ ¬ Subgroup.centralizer ({y} : Set G) ≤ M := by
-  by_contra hnone
-  have hcent : ∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
-    intro b hb hb1
-    by_contra hnot_le
-    exact hnone ⟨b, hb, hb1, hnot_le⟩
-  exact hBnot (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM hBea hBM hBnc
-    (Or.inl hcent))
-
-/-- Lemma 9.5 witness selection after BG Theorem 9.1: choose `y ∈ B#` and a
-maximal subgroup `L` over `C_G(y)` with `L ≠ M`. -/
-private theorem exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal [Finite G]
-    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
-    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
-    ∃ y : G, ∃ L : Subgroup G,
-      y ∈ B ∧ y ≠ 1 ∧
-      ¬ Subgroup.centralizer ({y} : Set G) ≤ M ∧
-      L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) ∧
-      L ≠ M := by
-  obtain ⟨y, hyB, hy1, hCGnotM⟩ :=
-    exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal hG hM hBea hBM hBnc hBnot
-  obtain ⟨L, hLco, hCGleL⟩ :=
-    (eq_top_or_exists_le_coatom (Subgroup.centralizer ({y} : Set G))).resolve_left
-      (centralizer_singleton_lt_top hG hy1).ne
-  have hLneM : L ≠ M := by
-    intro hLM
-    exact hCGnotM (by simpa [hLM] using hCGleL)
-  exact ⟨y, L, hyB, hy1, hCGnotM, ⟨hLco, hCGleL⟩, hLneM⟩
-
-/-- If `y ∈ A`, then any maximal subgroup over `C_G(y)` is also a maximal
-subgroup over `C_G(A)`. This is the formal `C_G(A) ≤ C_G(y) ≤ L` bridge used
-when Lemma 9.5 reapplies (9.9) with `L` in place of `M`. -/
-private theorem maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton
-    {A L : Subgroup G} {y : G} (hyA : y ∈ A)
-    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G))) :
-    L ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) := by
-  exact ⟨hL.1,
-    (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hyA)).trans hL.2⟩
-
-/-- **BG Corollary 9.2** (mmd L2541): `L ∈ 𝒰`, `K ≤ C_G(L)`, `r(K) ≥ 2` ⇒ `K ∈ 𝒰`。 -/
-theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
-    {L K : Subgroup G} (hL : IsUniquelyMaximal L) (hKL : K ≤ Subgroup.centralizer (L : Set G))
-    (hr : 2 ≤ rank ↥K) :
-    IsUniquelyMaximal K := by
-  classical
-  obtain ⟨p, hp, A, hAea, hAK, hAnc⟩ :=
-    exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
-  haveI : Fact p.Prime := ⟨hp⟩
-  let M : Subgroup G := hL.uniqueMaximalSubgroup
-  have hKleM : K ≤ M := by
-    intro k hk
-    by_cases hk1 : k = 1
-    · simp [M, hk1]
-    · have hkL : k ∈ Subgroup.centralizer (L : Set G) := hKL hk
-      have hCGleM : Subgroup.centralizer ({k} : Set G) ≤ M :=
-        centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hkL hk1
-      exact hCGleM (by
-        rw [Subgroup.mem_centralizer_iff]
-        intro y hy
-        rw [Set.mem_singleton_iff] at hy
-        subst y
-        rfl)
-  have hAleM : A ≤ M := hAK.trans hKleM
-  have hcent : ∀ b : G, b ∈ A → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
-    intro b hb hb1
-    have hbL : b ∈ Subgroup.centralizer (L : Set G) := hKL (hAK hb)
-    exact centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hbL hb1
-  have hAU : IsUniquelyMaximal A :=
-    noncyclic_isUniquelyMaximal_of_centralizer_le hG
-      (hM := hL.uniqueMaximalSubgroup_isCoatom) hAea hAleM hAnc (Or.inl hcent)
-  have hKlt : K < ⊤ :=
-    lt_of_le_of_lt hKleM hL.uniqueMaximalSubgroup_isCoatom.1.lt_top
-  exact hAU.of_le_of_lt_top hAK hKlt
 
 /-- A noncyclic `p`-subgroup of a minimal odd simple group has rank at least two.
 
@@ -713,6 +618,173 @@ private theorem exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank [Finite G
       (pRank_le_of_injective (f := Subgroup.inclusion hEGA₀)
         (Subgroup.inclusion_injective hEGA₀))
   exact ⟨A₀, hA₀max, h3A₀p.trans (pRank_le_rank (G := ↥A₀) p)⟩
+
+/-- **BG Theorem 8.1 witness form** (mmd L2533, the input to BG Eq (9.5)→r(F(H))≤2): if some
+prime `q` has `r_q(F(M)) ≥ 3`, then `F(M)` contains a subgroup in `𝒰`. This is the `9.1`-free
+extraction of `abelian_rank_three_isUniquelyMaximal_of_fitting`'s witness: case `F(M)` not a
+`q`-group uses Theorem 8.1(a) (`cFitting_isUniquelyMaximal_of_not_pGroup`, giving
+`C_{F(M)}(A₀) ∈ 𝒰`), case `F(M)` a `q`-group uses Theorem 8.1(b)
+(`sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup`) with an `SCN₃` subgroup from BG Lem 5.1
+(`scn3_nonempty_of_three_le_pRank`). Both witnesses lie in `F(M)`, so this avoids the
+`Corollary 9.2 ↦ Theorem 9.1` cycle that `abelian_rank_three_isUniquelyMaximal_of_fitting` incurs.
+-/
+private theorem exists_isUniquelyMaximal_le_fittingInG_of_three_le_pRank [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hr : 3 ≤ pRank ↥(S08.fittingInG M) q) :
+    ∃ U : Subgroup G, U ≤ S08.fittingInG M ∧ IsUniquelyMaximal U := by
+  classical
+  have hpF : q ∈ (Nat.card ↥(S08.fittingInG M)).primeFactors :=
+    mem_primeFactors_card_of_pos_pRank (H := ↥(S08.fittingInG M)) (p := q) (by omega)
+  obtain ⟨A₀, hA₀max, hA₀rank⟩ :=
+    exists_isMaxElemAbelianIn_rank_three_of_three_le_pRank (H := S08.fittingInG M) hr
+  by_cases hFp : IsPGroup q ↥(S08.fittingInG M)
+  · -- `F(M)` a `q`-group: Theorem 8.1(b) gives an `SCN₃` witness inside `F(M)`.
+    have hFpM : IsPGroup q ((S08.fittingInG M).subgroupOf M) :=
+      hFp.of_equiv (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm
+    obtain ⟨P, hFP⟩ := hFpM.exists_le_sylow
+    have h3Fsub : 3 ≤ pRank ↥((S08.fittingInG M).subgroupOf M) q :=
+      hr.trans
+        (pRank_le_of_injective
+          (f := (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm.toMonoidHom)
+          (Subgroup.subgroupOfEquivOfLe (S08.fittingInG_le M)).symm.injective)
+    have h3P : 3 ≤ pRank ↥(P : Subgroup ↥M) q :=
+      h3Fsub.trans
+        (pRank_le_of_injective (f := Subgroup.inclusion hFP)
+          (Subgroup.inclusion_injective hFP))
+    have hp_dvd_G : q ∣ Nat.card G :=
+      (Nat.mem_primeFactors.mp hpF).2.1.trans
+        (Subgroup.card_subgroup_dvd_card (S08.fittingInG M))
+    have hp_odd : Odd q := hG.odd.of_dvd_nat hp_dvd_G
+    obtain ⟨Asc, hAsc_scn⟩ :=
+      OddOrder.BG.Ch1.S05.scn3_nonempty_of_three_le_pRank hp_odd P.isPGroup' h3P
+    let A_M : Subgroup ↥M := Asc.map (P : Subgroup ↥M).subtype
+    have hA_MP : A_M ≤ (P : Subgroup ↥M) := Subgroup.map_subtype_le Asc
+    have hA_M_scn : IsSCN₃ q (A_M.subgroupOf (P : Subgroup ↥M)) := by
+      have htarget : A_M.subgroupOf (P : Subgroup ↥M) = Asc := by
+        apply (Subgroup.map_subtype_inj (H := (P : Subgroup ↥M))).mp
+        rw [Subgroup.map_subgroupOf_eq_of_le hA_MP]
+      rwa [htarget]
+    have h8 :=
+      (S08.sylow_isSylow_and_scn3_isUniquelyMaximal_of_pGroup
+        hG hM hpF hA₀max hA₀rank P hFp).2 A_M hA_MP hA_M_scn
+    exact ⟨A_M.map M.subtype, h8.1, h8.2⟩
+  · -- `F(M)` not a `q`-group: Theorem 8.1(a) gives `C_{F(M)}(A₀) ∈ 𝒰`, contained in `F(M)`.
+    refine ⟨S08.cFittingInG M A₀, inf_le_right, ?_⟩
+    exact S08.cFitting_isUniquelyMaximal_of_not_pGroup hG hM hpF hA₀max hA₀rank hFp
+
+/-- **BG Theorem 8.1, rank-squeeze form** (mmd L2533): if `H ∈ ℳ` and no subgroup of `F(H)` lies
+in `𝒰`, then `r(F(H)) ≤ 2`. Contrapositive of
+`exists_isUniquelyMaximal_le_fittingInG_of_three_le_pRank` (which is `9.1`-free, so this is safe to
+use inside the proof of Theorem 9.1). -/
+private theorem rank_fittingInG_le_two_of_no_uniqueMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hno : ∀ U : Subgroup G, U ≤ S08.fittingInG M → ¬ IsUniquelyMaximal U) :
+    rank ↥(S08.fittingInG M) ≤ 2 := by
+  classical
+  by_contra hnot
+  have h3 : 3 ≤ rank ↥(S08.fittingInG M) := by omega
+  obtain ⟨q, hq, h3q⟩ :=
+    exists_pRank_ge_of_pos_le_rank (G := ↥(S08.fittingInG M)) (n := 3) (by norm_num) h3
+  haveI : Fact q.Prime := ⟨hq⟩
+  obtain ⟨U, hUF, hUU⟩ :=
+    exists_isUniquelyMaximal_le_fittingInG_of_three_le_pRank hG hM h3q
+  exact hno U hUF hUU
+
+/-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
+(a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
+
+Proof gate: mmd L2533 invokes BG Thm 8.1 and BG Thm 4.20 after Eq. (9.5). Do not add
+BG Lem 4.13, BG Thm 4.16, or §5 narrow hypotheses to this theorem. -/
+theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {B : Subgroup G} (hBea : B.IsElementaryAbelian p) (hBle : B ≤ M) (hBnc : ¬ IsCyclic ↥B)
+    (hcase :
+      (∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer {b} ≤ M) ∨
+      sSup (hInvariant ⊤ B {p}ᶜ) ≤ M) :
+    IsUniquelyMaximal B := by
+  sorry
+
+/-- Contrapositive form of BG Theorem 9.1 used in Lemma 9.5: if the noncyclic
+`p`-elementary subgroup `B ≤ M` is not in `𝒰`, then some nonidentity element of
+`B` has centralizer not contained in `M`. -/
+private theorem exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
+    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
+    ∃ y : G, y ∈ B ∧ y ≠ 1 ∧ ¬ Subgroup.centralizer ({y} : Set G) ≤ M := by
+  by_contra hnone
+  have hcent : ∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
+    intro b hb hb1
+    by_contra hnot_le
+    exact hnone ⟨b, hb, hb1, hnot_le⟩
+  exact hBnot (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM hBea hBM hBnc
+    (Or.inl hcent))
+
+/-- Lemma 9.5 witness selection after BG Theorem 9.1: choose `y ∈ B#` and a
+maximal subgroup `L` over `C_G(y)` with `L ≠ M`. -/
+private theorem exists_nontrivial_centralizer_maximal_ne_of_not_isUniquelyMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M B : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hBea : B.IsElementaryAbelian p) (hBM : B ≤ M)
+    (hBnc : ¬ IsCyclic ↥B) (hBnot : ¬ IsUniquelyMaximal B) :
+    ∃ y : G, ∃ L : Subgroup G,
+      y ∈ B ∧ y ≠ 1 ∧
+      ¬ Subgroup.centralizer ({y} : Set G) ≤ M ∧
+      L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) ∧
+      L ≠ M := by
+  obtain ⟨y, hyB, hy1, hCGnotM⟩ :=
+    exists_nontrivial_centralizer_not_le_of_not_isUniquelyMaximal hG hM hBea hBM hBnc hBnot
+  obtain ⟨L, hLco, hCGleL⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer ({y} : Set G))).resolve_left
+      (centralizer_singleton_lt_top hG hy1).ne
+  have hLneM : L ≠ M := by
+    intro hLM
+    exact hCGnotM (by simpa [hLM] using hCGleL)
+  exact ⟨y, L, hyB, hy1, hCGnotM, ⟨hLco, hCGleL⟩, hLneM⟩
+
+/-- If `y ∈ A`, then any maximal subgroup over `C_G(y)` is also a maximal
+subgroup over `C_G(A)`. This is the formal `C_G(A) ≤ C_G(y) ≤ L` bridge used
+when Lemma 9.5 reapplies (9.9) with `L` in place of `M`. -/
+private theorem maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton
+    {A L : Subgroup G} {y : G} (hyA : y ∈ A)
+    (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G))) :
+    L ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) := by
+  exact ⟨hL.1,
+    (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hyA)).trans hL.2⟩
+
+/-- **BG Corollary 9.2** (mmd L2541): `L ∈ 𝒰`, `K ≤ C_G(L)`, `r(K) ≥ 2` ⇒ `K ∈ 𝒰`。 -/
+theorem isUniquelyMaximal_of_le_centralizer_of_two_le_rank [Finite G] (hG : IsMinimalSimpleOdd G)
+    {L K : Subgroup G} (hL : IsUniquelyMaximal L) (hKL : K ≤ Subgroup.centralizer (L : Set G))
+    (hr : 2 ≤ rank ↥K) :
+    IsUniquelyMaximal K := by
+  classical
+  obtain ⟨p, hp, A, hAea, hAK, hAnc⟩ :=
+    exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank K hr
+  haveI : Fact p.Prime := ⟨hp⟩
+  let M : Subgroup G := hL.uniqueMaximalSubgroup
+  have hKleM : K ≤ M := by
+    intro k hk
+    by_cases hk1 : k = 1
+    · simp [M, hk1]
+    · have hkL : k ∈ Subgroup.centralizer (L : Set G) := hKL hk
+      have hCGleM : Subgroup.centralizer ({k} : Set G) ≤ M :=
+        centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hkL hk1
+      exact hCGleM (by
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        rw [Set.mem_singleton_iff] at hy
+        subst y
+        rfl)
+  have hAleM : A ≤ M := hAK.trans hKleM
+  have hcent : ∀ b : G, b ∈ A → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M := by
+    intro b hb hb1
+    have hbL : b ∈ Subgroup.centralizer (L : Set G) := hKL (hAK hb)
+    exact centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralizer hG hL hbL hb1
+  have hAU : IsUniquelyMaximal A :=
+    noncyclic_isUniquelyMaximal_of_centralizer_le hG
+      (hM := hL.uniqueMaximalSubgroup_isCoatom) hAea hAleM hAnc (Or.inl hcent)
+  have hKlt : K < ⊤ :=
+    lt_of_le_of_lt hKleM hL.uniqueMaximalSubgroup_isCoatom.1.lt_top
+  exact hAU.of_le_of_lt_top hAK hKlt
 
 /-- An abelian rank-three `p`-subgroup has centralizer of `pRank` at least three. -/
 private theorem three_le_pRank_centralizer_of_isMulCommutative_of_isPGroup_of_three_le_rank
