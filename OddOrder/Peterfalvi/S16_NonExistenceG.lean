@@ -59,6 +59,25 @@ theorem five_le_p (hyp : Hypothesis (G := G)) : 5 ≤ hyp.base.p := by
     omega
   omega
 
+/-- **Peterfalvi (14.15)**: after the case-(a) inequality forces `q = 3`
+and `p < q^2`, the congruence `p ≡ 1 mod q` leaves only `p = 7`. -/
+theorem p_eq_seven_of_q_eq_three_modEq_one_and_lt_q_sq
+    (hyp : Hypothesis (G := G))
+    (hq3 : hyp.base.q = 3) (hmod : hyp.base.p ≡ 1 [MOD hyp.base.q])
+    (hp_lt_q_sq : hyp.base.p < hyp.base.q ^ 2) :
+    hyp.base.p = 7 := by
+  have hp_lt_nine : hyp.base.p < 9 := by
+    simpa [hq3] using hp_lt_q_sq
+  have hp_ge_five : 5 ≤ hyp.base.p := hyp.five_le_p
+  have hmod3 : hyp.base.p % 3 = 1 := by
+    unfold Nat.ModEq at hmod
+    simpa [hq3] using hmod
+  interval_cases hyp.base.p
+  · norm_num at hmod3
+  · norm_num at hmod3
+  · rfl
+  · norm_num at hmod3
+
 /-- **Peterfalvi (13.11), used in Section 16**: in the `q = 3` branch, the
 Section 16 ordering `q < p` gives the missing `p ≥ 5`, so the concrete analytic
 parameter satisfies `m > 49/100`. -/
