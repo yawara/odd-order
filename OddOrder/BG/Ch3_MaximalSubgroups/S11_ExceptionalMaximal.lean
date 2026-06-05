@@ -449,90 +449,13 @@ theorem invariant_sylow_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
       exact (Subgroup.centralizer_eq_top_iff_subset.mp htop)
     exact key (Subgroup.centralizer (X : Set G)) hCXlt hAcX hc1 hc2
 
-/-- `M_σ = O_{σ(M)}(M)` is a `σ(M)`-subgroup: every prime dividing `|M_σ|` lies in `σ(M)`.
-(The order of `(oPiCore σ ↥M).map M.subtype` equals that of `oPiCore σ ↥M`, a `σ`-group.) -/
-private theorem Msigma_isPiGroup [Finite G] (M : Subgroup G) :
-    Ch03.Subgroup.IsPiGroup (S10.sigma M) (S10.Msigma M) := by
-  intro r hr
-  have hcard : Nat.card ↥(S10.Msigma M) = Nat.card ↥(Ch03.oPiCore (S10.sigma M) ↥M) := by
-    rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG,
-      Subgroup.card_map_of_injective M.subtype_injective]
-  rw [hcard] at hr
-  exact Ch03.oPiCore.isPiGroup (S10.sigma M) r hr
-
-/-- **`π`-subgroup inside a normal `π`-Hall is contained in it** (mirror of
-`Ch03.Subgroup.IsPiGroup.normal_le_hall` with the Hall member being the normal one).
-If `K ⊴ G` is a `π`-Hall subgroup and `L` is any `π`-subgroup, then `L ≤ K`. -/
-private theorem pi_subgroup_le_normalHall {H : Type*} [Group H] [Finite H] {π : Set ℕ}
-    {K L : Subgroup H} [K.Normal] (hK : Ch03.IsHallSubgroup π K)
-    (hL : Ch03.Subgroup.IsPiGroup π L) : L ≤ K := by
-  -- `L ⊔ K` is a `π`-group (its order divides `|L|·|K|`, both `π`).
-  have hSup_pi : Ch03.Subgroup.IsPiGroup π (L ⊔ K : Subgroup H) := by
-    intro r hr
-    rw [Nat.mem_primeFactors] at hr
-    obtain ⟨hr_prime, hr_dvd, _⟩ := hr
-    have h_card_eq : Nat.card ↥(L ⊔ K : Subgroup H) * Nat.card ↥(L ⊓ K : Subgroup H)
-        = Nat.card ↥L * Nat.card ↥K := by
-      have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card L K
-      rwa [show (↑L * ↑K : Set H) = ↑(L ⊔ K : Subgroup H) from (Subgroup.mul_normal L K).symm]
-        at h_hk
-    have h_dvd_prod : r ∣ Nat.card ↥L * Nat.card ↥K := by
-      rw [← h_card_eq]; exact hr_dvd.mul_right _
-    rcases hr_prime.dvd_mul.mp h_dvd_prod with hL_dvd | hK_dvd
-    · exact hL r (Nat.mem_primeFactors.mpr ⟨hr_prime, hL_dvd, Nat.card_pos.ne'⟩)
-    · exact hK.1 r (Nat.mem_primeFactors.mpr ⟨hr_prime, hK_dvd, Nat.card_pos.ne'⟩)
-  -- `|L ⊔ K| ∣ |K|` (Hall) and `K ≤ L ⊔ K`, hence `L ⊔ K = K`, so `L ≤ K`.
-  have h_card_dvd : Nat.card ↥(L ⊔ K : Subgroup H) ∣ Nat.card ↥K :=
-    hK.card_dvd_of_isPiGroup hSup_pi
-  have hK_le_sup : K ≤ L ⊔ K := le_sup_right
-  have h_card_ge : Nat.card ↥K ≤ Nat.card ↥(L ⊔ K : Subgroup H) :=
-    Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hK_le_sup)
-  have h_sup_eq : (L ⊔ K : Subgroup H) = K :=
-    (Subgroup.eq_of_le_of_card_ge hK_le_sup
-      (Nat.le_antisymm (Nat.le_of_dvd Nat.card_pos h_card_dvd) h_card_ge).le).symm
-  intro x hx
-  have hx_sup : x ∈ (L ⊔ K : Subgroup H) := Subgroup.mem_sup_left hx
-  rwa [h_sup_eq] at hx_sup
-
 /-- A `σ(M)`-subgroup `L` of the maximal subgroup `M` is contained in `M_σ = O_{σ(M)}(M)`.
 Reason: `M_σ` is a normal `σ(M)`-Hall subgroup of `M` (Thm 10.2), so it absorbs every
-`σ(M)`-subgroup of `M` (`pi_subgroup_le_normalHall`, applied inside `↥M`). -/
+`σ(M)`-subgroup of `M`. -/
 private theorem sigma_subgroup_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {L : Subgroup G} (hLM : L ≤ M)
-    (hLpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) L) : L ≤ S10.Msigma M := by
-  have hMsM : S10.Msigma M ≤ M := le_trans (Subgroup.map_subtype_le _) (le_refl _)
-  -- `(M_σ).subgroupOf M = oPiCore σ ↥M` (roundtrip of `map`/`comap` along the injection).
-  have hsubOf : (S10.Msigma M).subgroupOf M = Ch03.oPiCore (S10.sigma M) ↥M := by
-    rw [Subgroup.subgroupOf, S10.Msigma, OddOrder.GroupTheory.opiCoreInG,
-      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  haveI : ((S10.Msigma M).subgroupOf M).Normal := by rw [hsubOf]; infer_instance
-  -- `(M_σ).subgroupOf M` is `σ(M)`-Hall in `↥M` (transfer card/index from the `G`-level Hall).
-  have hHallG : Ch03.IsHallSubgroup (S10.sigma M) (S10.Msigma M) :=
-    (S10.isHall_Msigma_Malpha hG hM).1
-  have hHallM : Ch03.IsHallSubgroup (S10.sigma M) ((S10.Msigma M).subgroupOf M) := by
-    refine ⟨?_, ?_⟩
-    · intro r hr
-      rw [hsubOf] at hr
-      exact Ch03.oPiCore.isPiGroup (S10.sigma M) r hr
-    · intro r hr
-      -- `[↥M : M_σ.subgroupOf M] = (M_σ).relIndex M ∣ (M_σ).index`, no `σ`-factor.
-      have hidx : ((S10.Msigma M).subgroupOf M).index ∣ (S10.Msigma M).index := by
-        have htower : ((S10.Msigma M).subgroupOf M).index * M.index = (S10.Msigma M).index :=
-          Subgroup.relIndex_mul_index hMsM
-        exact ⟨M.index, htower.symm⟩
-      exact hHallG.2 r (Nat.mem_primeFactors.mpr
-        ⟨(Nat.mem_primeFactors.mp hr).1,
-          dvd_trans (Nat.mem_primeFactors.mp hr).2.1 hidx, Subgroup.index_ne_zero_of_finite⟩)
-  -- `L.subgroupOf M` is a `σ(M)`-subgroup of `↥M`; absorbed by the normal Hall.
-  have hLsubOf : Ch03.Subgroup.IsPiGroup (S10.sigma M) (L.subgroupOf M) :=
-    Ch03.Subgroup.IsPiGroup.subgroupOf hLM hLpi
-  have hle : L.subgroupOf M ≤ (S10.Msigma M).subgroupOf M :=
-    pi_subgroup_le_normalHall hHallM hLsubOf
-  -- Transport `≤` back to `G` (both `L`, `M_σ` lie in `M`).
-  intro x hx
-  have hxM : x ∈ M := hLM hx
-  have : (⟨x, hxM⟩ : ↥M) ∈ (S10.Msigma M).subgroupOf M := hle hx
-  rwa [Subgroup.mem_subgroupOf] at this
+    (hLpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) L) : L ≤ S10.Msigma M :=
+  S10.sigma_subgroup_le_Msigma_of_isHall ((S10.isHall_Msigma_Malpha hG hM).1) hLM hLpi
 
 /-- **`A`-invariant Sylow `q`-subgroup constructor** (Isaacs Cor 3.25 inside `↥H`): if a
 `p`-group `A` normalizes a finite subgroup `H` of coprime order and `P₀ ≤ H` is an
@@ -648,7 +571,8 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   have hApg : IsPGroup p ↥A := h.A_mem.1.isPGroup
   have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
   -- `M_σ` is a `σ(M)`-group, and `p ∉ σ(M)`, so `p ∤ |M_σ|`.
-  have hMsM_pi : Ch03.Subgroup.IsPiGroup (S10.sigma M) (S10.Msigma M) := Msigma_isPiGroup M
+  have hMsM_pi : Ch03.Subgroup.IsPiGroup (S10.sigma M) (S10.Msigma M) :=
+    S10.Msigma_isPiGroup M
   have hp_ndvd_Msigma : ¬ p ∣ Nat.card ↥(S10.Msigma M) := fun hdvd =>
     h.notMem_sigma (hMsM_pi p (Nat.mem_primeFactors.mpr ⟨h.prime, hdvd, Nat.card_pos.ne'⟩))
   -- Cardinality is preserved by any automorphism (used for `conj g` and `(conj g)⁻¹`).

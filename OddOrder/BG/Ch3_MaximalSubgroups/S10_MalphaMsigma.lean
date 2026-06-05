@@ -221,6 +221,72 @@ theorem Msigma_isPiGroup [Finite G] (M : Subgroup G) :
   rw [hcard] at hr
   exact Ch03.oPiCore.isPiGroup (sigma M) r hr
 
+/-- A normal `π`-Hall subgroup absorbs every `π`-subgroup. -/
+private theorem isPiGroup_le_of_normal_isHallSubgroup {H : Type*} [Group H] [Finite H]
+    {π : Set ℕ} {K L : Subgroup H} [K.Normal] (hK : Ch03.IsHallSubgroup π K)
+    (hL : Ch03.Subgroup.IsPiGroup π L) : L ≤ K := by
+  -- `L ⊔ K` is a `π`-group: its order divides `|L| * |K|`, and `K` is normal.
+  have hSup_pi : Ch03.Subgroup.IsPiGroup π (L ⊔ K : Subgroup H) := by
+    intro r hr
+    rw [Nat.mem_primeFactors] at hr
+    obtain ⟨hr_prime, hr_dvd, _⟩ := hr
+    have h_card_eq : Nat.card ↥(L ⊔ K : Subgroup H) * Nat.card ↥(L ⊓ K : Subgroup H)
+        = Nat.card ↥L * Nat.card ↥K := by
+      have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card L K
+      rwa [show (↑L * ↑K : Set H) = ↑(L ⊔ K : Subgroup H) from
+        (Subgroup.mul_normal L K).symm] at h_hk
+    have h_dvd_prod : r ∣ Nat.card ↥L * Nat.card ↥K := by
+      rw [← h_card_eq]
+      exact hr_dvd.mul_right _
+    rcases hr_prime.dvd_mul.mp h_dvd_prod with hL_dvd | hK_dvd
+    · exact hL r (Nat.mem_primeFactors.mpr ⟨hr_prime, hL_dvd, Nat.card_pos.ne'⟩)
+    · exact hK.1 r (Nat.mem_primeFactors.mpr ⟨hr_prime, hK_dvd, Nat.card_pos.ne'⟩)
+  -- Hall divisibility forces `L ⊔ K` to have the same order as `K`.
+  have h_card_dvd : Nat.card ↥(L ⊔ K : Subgroup H) ∣ Nat.card ↥K :=
+    hK.card_dvd_of_isPiGroup hSup_pi
+  have hK_le_sup : K ≤ L ⊔ K := le_sup_right
+  have h_card_ge : Nat.card ↥K ≤ Nat.card ↥(L ⊔ K : Subgroup H) :=
+    Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective hK_le_sup)
+  have h_sup_eq : (L ⊔ K : Subgroup H) = K :=
+    (Subgroup.eq_of_le_of_card_ge hK_le_sup
+      (Nat.le_antisymm (Nat.le_of_dvd Nat.card_pos h_card_dvd) h_card_ge).le).symm
+  intro x hx
+  have hx_sup : x ∈ (L ⊔ K : Subgroup H) := Subgroup.mem_sup_left hx
+  rwa [h_sup_eq] at hx_sup
+
+/-- If `M_σ` is `σ(M)`-Hall in `G`, then its internal copy is `σ(M)`-Hall in `M`. -/
+theorem Msigma_subgroupOf_isHall_of_isHall [Finite G] {M : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (sigma M) (Msigma M)) :
+    Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) := by
+  refine ⟨?_, ?_⟩
+  · intro r hr
+    rw [Msigma_subgroupOf] at hr
+    exact Ch03.oPiCore.isPiGroup (sigma M) r hr
+  · intro r hr
+    have hidx : ((Msigma M).subgroupOf M).index ∣ (Msigma M).index := by
+      have htower : ((Msigma M).subgroupOf M).index * M.index = (Msigma M).index :=
+        Subgroup.relIndex_mul_index (Msigma_le M)
+      exact ⟨M.index, htower.symm⟩
+    exact hHall.2 r (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hr).1,
+        dvd_trans (Nat.mem_primeFactors.mp hr).2.1 hidx, Subgroup.index_ne_zero_of_finite⟩)
+
+/-- A `σ(M)`-subgroup of `M` lies in `M_σ`, provided `M_σ` is `σ(M)`-Hall in `G`. -/
+theorem sigma_subgroup_le_Msigma_of_isHall [Finite G] {M L : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (sigma M) (Msigma M)) (hLM : L ≤ M)
+    (hLpi : Ch03.Subgroup.IsPiGroup (sigma M) L) : L ≤ Msigma M := by
+  haveI : ((Msigma M).subgroupOf M).Normal := by rw [Msigma_subgroupOf]; infer_instance
+  have hHallM : Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) :=
+    Msigma_subgroupOf_isHall_of_isHall hHall
+  have hLsubOf : Ch03.Subgroup.IsPiGroup (sigma M) (L.subgroupOf M) :=
+    Ch03.Subgroup.IsPiGroup.subgroupOf hLM hLpi
+  have hle : L.subgroupOf M ≤ (Msigma M).subgroupOf M :=
+    isPiGroup_le_of_normal_isHallSubgroup hHallM hLsubOf
+  intro x hx
+  have hxM : x ∈ M := hLM hx
+  have : (⟨x, hxM⟩ : ↥M) ∈ (Msigma M).subgroupOf M := hle hx
+  rwa [Subgroup.mem_subgroupOf] at this
+
 @[simp] theorem mem_elemAbelianOfRankIn_iff (p n : ℕ) (H X : Subgroup G) :
     elemAbelianOfRankIn p n H X ↔ X ∈ elemAbelianOfRank G p n ∧ X ≤ H :=
   Iff.rfl
