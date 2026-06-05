@@ -93,6 +93,11 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `derived_quotient_Malpha_le_fitting` / `Msigma_quotient_Malpha_le_fitting` /
   `Msigma_quotient_Malpha_isPiGroup_alphaCompl` により `M'/M_α≤F(M/M_α)`、
   `M_σ/M_α≤F(M/M_α)`、および `M_σ/M_α` の α'-性も Hall 仮定なしで接続済み。
+  さらに `hallSigmaSubgroup_quotient_Malpha_le_fitting` /
+  `hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl` により任意の Hall `σ(M)`-subgroup
+  `S≤M` の像も `F(M/M_α)` 内の α'-group になり、
+  `alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup` で `A≤S` なる α-subgroup は
+  すでに `M_α` に入るところまで接続済み。
   残りは
   `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。

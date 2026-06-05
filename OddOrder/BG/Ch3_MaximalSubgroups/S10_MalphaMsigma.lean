@@ -1494,6 +1494,100 @@ theorem Msigma_quotient_Malpha_isPiGroup_alphaCompl [Finite G]
   Ch03.Subgroup.IsPiGroup.le (Msigma_quotient_Malpha_le_fitting hG hM)
     (fitting_quotient_Malpha_isPiGroup_alphaCompl M)
 
+/-- **BG Theorem 10.2(d), Hall-`σ` quotient Fitting containment**:
+any Hall `σ(M)`-subgroup of `M` has image in `F(M/M_α)`. This is the
+Hall-subgroup version of `Msigma_quotient_Malpha_le_fitting`, using the focal
+subgroup step `hallSigmaSubgroup_le_derived`. -/
+theorem hallSigmaSubgroup_quotient_Malpha_le_fitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    (S.subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M)) ≤
+      Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M) := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  have hS_der : S.subgroupOf M ≤ commutator ↥M := by
+    intro x hx
+    have hxS : (x : G) ∈ S := Subgroup.mem_subgroupOf.mp hx
+    have hxD : (x : G) ∈ derivedInG M :=
+      hallSigmaSubgroup_le_derived hG hM hSM hHallσ hxS
+    rw [derivedInG] at hxD
+    obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hxD
+    have hxy : y = x := M.subtype_injective hyx
+    rwa [← hxy]
+  calc
+    (S.subgroupOf M).map (QuotientGroup.mk' N) ≤
+        (commutator ↥M).map (QuotientGroup.mk' N) := Subgroup.map_mono hS_der
+    _ = commutator (↥M ⧸ N) := by
+      rw [map_commutator_eq, MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective N),
+        _root_.commutator_def]
+    _ ≤ Ch01.fitting (↥M ⧸ N) :=
+      derived_quotient_Malpha_le_fitting hG hM
+
+/-- **BG Theorem 10.2(d), Hall-`σ` quotient is an `α(M)'`-group**:
+the image of any Hall `σ(M)`-subgroup of `M` lies in `F(M/M_α)`, and that
+Fitting subgroup is an `α(M)'`-group. -/
+theorem hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    Ch03.Subgroup.IsPiGroup (alpha M)ᶜ
+      ((S.subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))) :=
+  Ch03.Subgroup.IsPiGroup.le
+    (hallSigmaSubgroup_quotient_Malpha_le_fitting hG hM hSM hHallσ)
+    (fitting_quotient_Malpha_isPiGroup_alphaCompl M)
+
+/-- **BG Theorem 10.2(d), Hall-`σ` kills `α` in the quotient**:
+if an `α(M)`-subgroup of `M` lies in a Hall `σ(M)`-subgroup, then its image in
+`M/M_α` is simultaneously an `α(M)`-group and an `α(M)'`-group, hence trivial.
+Equivalently the subgroup already lies in `M_α`. -/
+theorem alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S A : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M))
+    (hAS : A ≤ S) (hAα : Ch03.Subgroup.IsPiGroup (alpha M) A) :
+    A ≤ Malpha M := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  let q : ↥M →* ↥M ⧸ N := QuotientGroup.mk' N
+  have hAM : A ≤ M := hAS.trans hSM
+  have hAS_sub : A.subgroupOf M ≤ S.subgroupOf M := by
+    intro x hx
+    exact Subgroup.mem_subgroupOf.mpr (hAS (Subgroup.mem_subgroupOf.mp hx))
+  have hAbar_le_Sbar :
+      (A.subgroupOf M).map q ≤ (S.subgroupOf M).map q :=
+    Subgroup.map_mono hAS_sub
+  have hSbarαc : Ch03.Subgroup.IsPiGroup (alpha M)ᶜ ((S.subgroupOf M).map q) :=
+    hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl hG hM hSM hHallσ
+  have hAbarαc : Ch03.Subgroup.IsPiGroup (alpha M)ᶜ ((A.subgroupOf M).map q) :=
+    Ch03.Subgroup.IsPiGroup.le hAbar_le_Sbar hSbarαc
+  have hAbarα : Ch03.Subgroup.IsPiGroup (alpha M) ((A.subgroupOf M).map q) := by
+    intro r hr
+    have hrAsub : r ∈ (Nat.card ↥(A.subgroupOf M)).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_map_dvd (A.subgroupOf M) q)
+        Nat.card_pos.ne' hr
+    have hrA : r ∈ (Nat.card ↥A).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAM).toEquiv] at hrAsub
+    exact hAα r hrA
+  have hAbar_bot : (A.subgroupOf M).map q = ⊥ := by
+    apply Subgroup.card_eq_one.mp
+    have hEmpty : (Nat.card ↥((A.subgroupOf M).map q)).primeFactors = ∅ := by
+      apply Finset.eq_empty_iff_forall_notMem.mpr
+      intro r hr
+      have hr_not_alpha : r ∉ alpha M := by
+        simpa using hAbarαc r hr
+      exact hr_not_alpha (hAbarα r hr)
+    rcases Nat.primeFactors_eq_empty.mp hEmpty with hzero | hone
+    · exact False.elim (Nat.card_pos.ne' hzero)
+    · exact hone
+  have hA_le_N : A.subgroupOf M ≤ N := by
+    have hleKer : A.subgroupOf M ≤ q.ker :=
+      (Subgroup.map_eq_bot_iff (A.subgroupOf M)).mp hAbar_bot
+    simpa [q, QuotientGroup.ker_mk'] using hleKer
+  intro x hx
+  have hxM : x ∈ M := hAM hx
+  have hxAsub : (⟨x, hxM⟩ : ↥M) ∈ A.subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hA_le_N hxAsub)
+
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
 nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/
