@@ -1969,6 +1969,31 @@ theorem key_ratio_inequality_of_caseB_data {hyp : Hypothesis (G := G)}
   rw [Tdata.v_eq]
   exact lt_of_le_of_lt hu_div hratio
 
+/-- **Peterfalvi (14.8)** from materialized case-(9.7.b) data on both sides.
+This is the proven consumer form of `key_inequality`: once Sections (14.4) and
+(14.6) provide the T- and S-side `CaseB` data, the remaining comparison is pure
+arithmetic. -/
+theorem key_inequality_of_caseB_data {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) :
+    hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  exact ⟨hyp.q_pow_gt_p_pow, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
+
+/-- **Peterfalvi (14.8)** consumer form for the exact output shapes of
+`caseB_for_T` and `caseB_for_S`.  This keeps the future proof of
+`key_inequality` focused on constructing the structural `CaseB` data. -/
+theorem key_inequality_of_caseB_outputs {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) :
+    hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact key_inequality_of_caseB_data Tdata Sdata
+
 /-- **Peterfalvi (14.8)**: the strict exponential inequality and its
 character-theoretic corollary comparing `(v - 1) / p` and `(u - 1) / q`. -/
 theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
