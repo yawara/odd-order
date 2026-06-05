@@ -2544,6 +2544,59 @@ theorem unitVal_inv_frobenius_pair
     hyp.base.p hyp.base.q hyp.base.q_prime.ne_zero ha hb hab
   simpa [unitVal, map_pow] using hpair
 
+
+/-- BG Appendix C condition `(A)` in S16 form: a norm-one unit with
+`(p - 1)`-st power equal to `1` is trivial. -/
+theorem normOneUnit_eq_one_of_pow_sub_one_eq_one
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (u : fieldNormalizerNormOneUnits hyp) (hu : u ^ (hyp.base.p - 1) = 1) :
+    u = 1 :=
+  OddOrder.BG.AppC.NormSet.normOneUnits_eq_one_of_pow_sub_one_eq_one
+    hyp.base.p hyp.base.q hyp.base.q_prime data.cyclotomic_coprime u hu
+
+namespace Step4C5NormalForms
+
+/-- The post-`(C.9)` condition `(A)` step for the three BG words. -/
+theorem w_eq_one_of_pow_sub_one_eq_one
+    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b)
+    (hw1 : forms.w1 ^ (hyp.base.p - 1) = 1)
+    (hw2 : forms.w2 ^ (hyp.base.p - 1) = 1)
+    (hw3 : forms.w3 ^ (hyp.base.p - 1) = 1) :
+    forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 :=
+  ⟨data.normOneUnit_eq_one_of_pow_sub_one_eq_one forms.w1 hw1,
+    data.normOneUnit_eq_one_of_pow_sub_one_eq_one forms.w2 hw2,
+    data.normOneUnit_eq_one_of_pow_sub_one_eq_one forms.w3 hw3⟩
+
+end Step4C5NormalForms
+
+
+/-- BG Appendix C `(C.10)`: once `(C.9)` and condition `(A)` have forced
+`w₁ = w₂ = w₃ = 1`, relation `(C.7)` collapses to
+`t² s₁ t⁻¹ s₂ t⁻¹ s₃ = 1`. -/
+theorem relationC10_of_w_eq_one
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b)
+    (hw1 : forms.w1 = 1) (hw2 : forms.w2 = 1) (hw3 : forms.w3 = 1) :
+    data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 := by
+  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+  let S2 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2)
+  let S3 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3)
+  have hC7 := data.relationC7 hab forms
+  rw [hw1, hw2, hw3] at hC7
+  simp only [map_one, one_mul, mul_one] at hC7
+  calc
+    data.t ^ 2 * S1 * data.t⁻¹ * S2 * data.t⁻¹ * S3 =
+        data.t ^ 2 * S1 * (data.t⁻¹ * S2 * data.t⁻¹) * S3 := by
+      group
+    _ = data.t ^ 2 * S1 * (S3 * data.t ^ 2 * S1)⁻¹ * S3 := by
+      rw [hC7]
+    _ = 1 := by group
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
