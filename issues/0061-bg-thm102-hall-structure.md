@@ -63,7 +63,9 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   「M 内の π-subgroup は `O_π(M)` に吸収される」を切り出し、§11 の重複 proof を削減。
 - [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
   (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
-  (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。**(d) と entangle**。
+  (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。`q∈σ(M) ∧ O_q(M)≠⊥ ⇒ M_σ≠⊥`
+  の最終bridgeは `Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma` として切り出し済み。
+  **残りは低rank/Thm 4.20側でその `q` と非自明 `O_q(M)` を作る部分**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
   - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。
   - M(σ)=M_σ: M(σ)/M_α normal Hall in F(M/M_α) char ⟹ M(σ)⊴M。

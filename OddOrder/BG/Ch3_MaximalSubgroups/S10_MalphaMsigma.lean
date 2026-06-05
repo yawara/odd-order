@@ -1146,6 +1146,28 @@ theorem Msigma_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     _ ≤ (Q : Subgroup ↥M).map M.subtype := Subgroup.map_mono hPQ
     _ ≤ derivedInG M := sylow_le_derived_of_mem_sigma hG hM hr_sigma Q
 
+/-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
+the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
+nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/
+theorem opiCoreInG_singleton_le_Msigma_of_mem_sigma {M : Subgroup G} {q : ℕ}
+    (hq : q ∈ sigma M) :
+    opiCoreInG ({q} : Set ℕ) M ≤ Msigma M := by
+  rw [Msigma, opiCoreInG, opiCoreInG]
+  exact Subgroup.map_mono (Ch03.oPiCore_mono (by
+    intro r hr
+    rw [Set.mem_singleton_iff] at hr
+    rwa [hr]) ↥M)
+
+/-- If a singleton core `O_q(M)` is nontrivial for some `q ∈ σ(M)`, then `M_σ` is
+nontrivial. This isolates the final algebraic step needed after the low-rank/Thm 4.20
+argument in the hard branch of BG Theorem 10.2(e). -/
+theorem Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma {M : Subgroup G} {q : ℕ}
+    (hq : q ∈ sigma M) (hOq : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
+    Msigma M ≠ ⊥ := by
+  intro hσ
+  exact hOq (le_bot_iff.mp (by
+    simpa [hσ] using opiCoreInG_singleton_le_Msigma_of_mem_sigma (M := M) hq))
+
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
 nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
 `M_α = 1` case using the low-rank/Thm 4.20 argument. -/
