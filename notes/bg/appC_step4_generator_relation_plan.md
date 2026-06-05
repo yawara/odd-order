@@ -71,6 +71,13 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `normSetETwistedNormOneStep_tConj_pow_three_inv_of_capstone` / `appCNormSetTwistedNormOneStep_of_capstone`
   (φ=(tConjAut³)⁻¹, φ^p=1 は `inv_pow`+pow_p) / `appC_normSet_generator_relation_of_capstone`。
   **capstone M₁ = `s·t⁻³σ(inr a⁻¹)t³·s⁻²` が BG M₁ と完全一致** ⟹ BG (C.4) q-swap 直接移植可。build-green。
+- **🆕🆕 backward 入口補題 done** (commit 71fc608): `t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv`
+  (`(t^n)⁻¹σ(inr u)t^n=σ(inr((tConjAut^n)⁻¹ u))`) + `exists_step4_first_k_three_inv_decomposition`
+  (M₁ の `∃c u₁v₁`, Step1 経由)。
+- **🆕🆕🆕 (C.4) done** (commit be3b427): `connectorC4_one/two/three` (Q-swap: `s⁻³t²s=t⁻¹s⁻²t³` 等,
+  `Q_mul_comm`) + **`relationC4`** = `s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1` (M_i backward 共役形)。証明 = group で
+  `conn1·C2·conn2·C4·conn3·C6` 再結合 → connector rw → group telescope → relationC2。**backward 切替で
+  BG telescoping がそのまま通った (forward 障害完全解消)**。build-green。
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -79,12 +86,14 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 
 > 🆕🆕 **2026-06-05 続2 の進捗**: (a) **companion 構成 done** (`exists_companion_of_unitVal_inv_mem_normSetE`,
 > build-green) — `↑a⁻¹∈E ⟹ ∃b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E`、`relationC2` の入口。
-> (b) **🔴 (C.4) forward-conj 障害を発見 → 🆕 backward 切替で解決 (commit 9be100a, build-green)**:
-> forward `tConjAut³` では BG (C.4) 移植不可 (局所 q-swap で Q 元が U 元に刺さる)。**capstone/配線を
-> backward `(tConjAut³)⁻¹` に restate 済** ⟹ capstone M₁=`s·t⁻³σ(inr a⁻¹)t³·s⁻²` が BG M₁ と完全一致、
-> **BG (C.4) q-swap がそのまま使える**。downstream は φ-agnostic で E=E⁻¹ 不変。
-> **次セッション = (1) backward decomposition engine (`(tConjAut³)⁻¹` 版の `∃c u₁v₁`) → (2) BG (C.4)
-> q-swap 写経で c=-1 → (3) (C.5)-(C.10) → (4) kernel/End**。step 1 参照。
+> (b) **🔴 (C.4) forward-conj 障害を発見 → 🆕 backward 切替で解決**: forward では BG q-swap 不能
+> (Q 元が U 元に刺さる)。**capstone/配線を backward `(tConjAut³)⁻¹` に restate** (commit 9be100a) ⟹
+> capstone M₁ が BG M₁ と完全一致。
+> (c) **🆕🆕🆕 (C.4) `relationC4` 証明完了 (commit be3b427, build-green)**: connector q-swap 3 本
+> (`connectorC4_one/two/three`, `Q_mul_comm`) + telescope + relationC2 で `s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1`。
+> backward 化で BG telescoping がそのまま通った。+ 入口補題 (backward conj + M₁ decomposition) も landed。
+> **次セッション = (C.5)-(C.10) + kernel** (下記 step 2-7; (C.4) より mechanical だが kernel が最難)。
+> 💡 **推奨: M₁/M₂/M₃ を `def` 化** (大きな式の反復を避け (C.5)以降を簡潔に)。
 
 > 💡 **k=3 に固定して導出してよい** (推奨): BG は (C.2)-(C.10) を一般 k∈F_p で進め s₁=s⁻¹ を出すが、
 > 論証は **各 k で独立** (異なる k を混ぜない) で、最終利用は k=3 のみ。`Step4Capstone` 自体が slot
