@@ -2414,7 +2414,117 @@ assumption should be introduced here. -/
 theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
     IsUniquelyMaximal A := by
-  sorry
+  classical
+  by_contra hAnot
+  -- abelian + `p`-group data for `A`
+  have hAcomm_set : ∀ x ∈ A, ∀ y ∈ A, x * y = y * x := fun x hx y hy =>
+    congrArg Subtype.val
+      (isMulCommutative_iff.mp (isMulCommutative_of_mem_scn3Global hA) ⟨x, hx⟩ ⟨y, hy⟩)
+  have hAp : IsPGroup p ↥A := isPGroup_of_mem_scn3Global hA
+  have hAne : A ≠ ⊥ := ne_bot_of_mem_scn3Global hA
+  have h3pRankA : 3 ≤ pRank ↥A p :=
+    three_le_pRank_of_isPGroup_of_three_le_rank hAp (three_le_rank_of_mem_scn3Global hA)
+  have hA_le_C : A ≤ Subgroup.centralizer (A : Set G) := by
+    intro x hx; rw [Subgroup.mem_centralizer_iff]; intro y hy; exact (hAcomm_set y hy x hx)
+  -- `p ∣ |G|`
+  have hp_dvd : p ∣ Nat.card G := by
+    haveI : Nontrivial ↥A := (Subgroup.nontrivial_iff_ne_bot A).mpr hAne
+    obtain ⟨k, hk⟩ := hAp.exists_card_eq
+    have hk1 : k ≠ 0 := by
+      rintro rfl; rw [pow_zero] at hk; exact (Finite.one_lt_card (α := ↥A)).ne' hk
+    exact (hk ▸ dvd_pow_self p hk1 : p ∣ Nat.card ↥A).trans (Subgroup.card_subgroup_dvd_card A)
+  -- the Sylow `p`-subgroup `P` of `G` containing `A` (from `A ∈ SCN₃`), and `P₀ = ⁅P, N_G(P)⁆`
+  obtain ⟨PG, hAPG, hSCN⟩ := S07.exists_sylow_of_mem_scn3Global hA
+  set P : Subgroup G := (PG : Subgroup G) with hPdef
+  have hPp : IsPGroup p ↥P := PG.isPGroup'
+  have hAP : A ≤ P := hAPG
+  have hPnormA : P ≤ Subgroup.normalizer (A : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAPG).mp hSCN.1.isNormal
+  set P0 : Subgroup G := ⁅P, Subgroup.normalizer (P : Set G)⁆ with hP0def
+  have hP0_le_P : P0 ≤ P := by
+    rw [hP0def, Subgroup.commutator_le]
+    intro a ha b hb
+    rw [commutatorElement_def]
+    have hbab : b * a⁻¹ * b⁻¹ ∈ P := ((Subgroup.mem_normalizer_iff.mp hb) a⁻¹).mp (P.inv_mem ha)
+    have heq : a * b * a⁻¹ * b⁻¹ = a * (b * a⁻¹ * b⁻¹) := by group
+    rw [heq]
+    exact P.mul_mem ha hbab
+  have hP0p : IsPGroup p ↥P0 := by
+    obtain ⟨k, hk⟩ := hPp.exists_card_eq
+    obtain ⟨j, _, hj⟩ :=
+      (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp (hk ▸ Subgroup.card_dvd_of_le hP0_le_P)
+    exact IsPGroup.of_card hj
+  have hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)) := by
+    rw [hP0def, derivedInG_eq_commutator]
+    exact Subgroup.commutator_mono Subgroup.le_normalizer le_rfl
+  have hP0ne : P0 ≠ ⊥ := commutator_normalizer_ne_bot_of_isSylow hG PG hp_dvd
+  -- key `(9.6)→(9.12)`: every maximal `M'` over `C_G(A)` is the unique maximal over `N_G(P₀)`
+  have key : ∀ M' : Subgroup G,
+      M' ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) →
+        IsUniquelyMaximal (Subgroup.normalizer (P0 : Set G)) ∧
+          Subgroup.normalizer (P0 : Set G) ≤ M' := by
+    intro M' hM'
+    have hNPM' : Subgroup.normalizer (P : Set G) ≤ M' :=
+      (normalizer_scn3_pSubgroup_le_maximal_of_not_scn3 hG hM' hA hAnot hPp hAP hPnormA).2
+    have hP0M' : P0 ≤ M' := hP0_le_P.trans (Subgroup.le_normalizer.trans hNPM')
+    by_cases h3D : 3 ≤ rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M'))
+    · exact normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_package
+        hG hAcomm_set hM' hA hAnot hPp hAP hPnormA hNPM' hP0p hP0N hP0ne h3D
+    · -- low rank `(9.12)` (BG L2615-2619): `r(F(M')) ≤ 2` ⟹ by Thm 4.20 `M'' ≤ F(M')`, so
+      -- `M' = O_{p'}(F(M'))·N_{M'}(P)`; `(9.11)` puts `O_{p'}(F(M'))` in `C_G(P₀)` and
+      -- `N_{M'}(P) ≤ N_G(P) ≤ N_G(P₀)`, whence `P₀ ⊴ M'`, i.e. `M' ≤ N_G(P₀)`.
+      -- TODO(§9 Phase B sub-assembly 2): the Frattini decomposition. `derived_le_fitting_of_rank_fitting_le_two`
+      -- (Thm 4.20a) applies since `r_p(F)≤2` (here) + `r(O_{p'}(F))≤2` (¬h3D) ⟹ `rank F(M')≤2` (full).
+      have hMN0 : M' ≤ Subgroup.normalizer (P0 : Set G) := by
+        sorry
+      obtain ⟨hU, hEq⟩ :=
+        normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normalizer
+          hG hM'.1 hP0M' hP0ne hMN0
+      exact ⟨hU, le_of_eq hEq⟩
+  obtain ⟨M, hM⟩ := exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global hG hA
+  obtain ⟨hUniq, hN0M⟩ := key M hM
+  -- final contradiction: `Ω₁(A) ∉ 𝒰` ⟹ Theorem 9.1 gives `x` with `C_G(x) ⊄ M`, so a maximal
+  -- `M* ⊇ C_G(x)` lies in `𝓜(C_G(A))` and `M* ≠ M`; but `(9.12)` forces `M = M*`.
+  set W : Subgroup G := OddOrder.GroupTheory.omega1OfAbelian G A p hAcomm_set with hWdef
+  have hWA : W ≤ A := fun x hx => OddOrder.GroupTheory.omega1OfAbelian_le hx
+  have hWnot : ¬ IsUniquelyMaximal W :=
+    not_isUniquelyMaximal_of_le_scn3_counterexample hG hAcomm_set hA hWA hAnot
+  have hWea : W.IsElementaryAbelian p :=
+    OddOrder.GroupTheory.omega1OfAbelian_isElementaryAbelian (hH := hAcomm_set)
+  have hWnc : ¬ IsCyclic ↥W :=
+    not_isCyclic_omega1OfAbelian_of_three_le_pRank hAcomm_set h3pRankA
+  have hWleM : W ≤ M := hWA.trans (hA_le_C.trans hM.2)
+  have hncase := mt (noncyclic_isUniquelyMaximal_of_centralizer_le hG hM.1 hWea hWleM hWnc) hWnot
+  rw [not_or] at hncase
+  have hfirst := hncase.1
+  push_neg at hfirst
+  obtain ⟨x, hxW, hx1, hxnotM⟩ := hfirst
+  -- `Z(G) = ⊥`, hence `C_G(x) < ⊤`
+  have hZbot : Subgroup.center G = ⊥ := by
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with h | h
+    · exact h
+    · exact absurd (isSolvable_of_comm fun a b =>
+        (Subgroup.mem_center_iff.mp (h ▸ Subgroup.mem_top a) b).symm) hG.notSolvable
+  have hCxlt : Subgroup.centralizer ({x} : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hCtop
+    have hxZ : x ∈ Subgroup.center G := by
+      rw [Subgroup.mem_center_iff]
+      intro g
+      have hg : g ∈ Subgroup.centralizer ({x} : Set G) := by
+        rw [hCtop]; exact Subgroup.mem_top g
+      exact (Subgroup.mem_centralizer_iff.mp hg x (Set.mem_singleton x)).symm
+    rw [hZbot, Subgroup.mem_bot] at hxZ
+    exact hx1 hxZ
+  obtain ⟨Mstar, hMstarCo, hCMstar⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer ({x} : Set G))).resolve_left hCxlt.ne
+  have hMstarA : Mstar ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)) :=
+    maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton (hWA hxW)
+      ⟨hMstarCo, hCMstar⟩
+  obtain ⟨_, hN0Mstar⟩ := key Mstar hMstarA
+  have hMM : M = Mstar :=
+    hUniq.eq_of_isCoatom_of_le (mem_maximalSubgroups.mp hM.1) hN0M hMstarCo hN0Mstar
+  exact hxnotM (hMM ▸ hCMstar)
 
 /-- A local `SCN₃(P)` subgroup of a Sylow subgroup, viewed in `G`, is a global
 `SCN₃(p)` subgroup. -/
