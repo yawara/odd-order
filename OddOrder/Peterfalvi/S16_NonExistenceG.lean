@@ -2449,11 +2449,23 @@ theorem contradiction_of_K_ne_V [Finite G]
     (main_size_bounds _hG hyp Mdata hne)
     (normCascadeBound_of_charData _hG hyp Mdata hne)
 
-/-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`. -/
+/-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`.
+
+The `K = V` half is now a genuine consequence of the (14.11.1)--(14.11.4)
+contradiction: assuming `K ≠ V` invokes `contradiction_of_K_ne_V`.  The index
+computation `|M : K| = p q` (here `Mdata.e = p q`) is the remaining genuine
+obligation; note `betaM_expansion`'s `e = p q` is unavailable here because it
+is conditioned on `K ≠ V`, so the equal-index value under `K = V` needs the
+type-I structure of `M` directly. -/
 theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp) :
     Mdata.K = hyp.base.V ∧ Mdata.e = hyp.base.p * hyp.base.q := by
-  sorry
+  refine ⟨?_, ?_⟩
+  · -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
+    by_contra hne
+    exact contradiction_of_K_ne_V _hG hyp Ldata Mdata hne
+  · -- `|M : K| = p q` from the type-I structure of `M` (still to be supplied).
+    sorry
 
 /-! ## (14.12)--(14.16): comparing `L` and `M` -/
 
