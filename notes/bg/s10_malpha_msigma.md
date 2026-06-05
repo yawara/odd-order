@@ -30,7 +30,7 @@ Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
 - `Malpha_le_Msigma` (M_α⊆M_σ): α⊆σ + `oPiCore_mono`。
 - `Msigma_le_derived` (M_σ⊆M′, 2026-06-06): finite Sylow-generation helper + `Msigma_isPiGroup` で
   p∈π(M_σ) ⟹ p∈σ(M)、各 Sylow を M の Sylow に含め、`sylow_le_derived_of_mem_sigma` (Focal+10.1) で M′ に押し込む。
-**残**: `Msigma_ne_bot` (Thm4.20) / **Hall-ness 2連言 (M_σ, M_α; quotient/Fitting machinery が最重)** / capstone 配線。
+**残**: `Msigma_ne_bot` の hard branch (`M_α=⊥`; easy branch `Msigma_ne_bot_of_Malpha_ne_bot` は完成) / **Hall-ness 2連言 (M_σ, M_α; quotient/Fitting machinery が最重)** / capstone 配線。
 
 ## ✅ 2026-06-05 着手 — 依存 DAG 検証 + Thm 10.1 を first target に確定 (§9 完成で解禁)
 

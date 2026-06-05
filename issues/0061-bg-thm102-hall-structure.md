@@ -54,11 +54,11 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `ControlsFusionIn`(=Thm 10.1(a) を X=⟨x⟩ で適用)+ `focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn`
   (Isaacs Cor 5.22) + Focal Thm + `commutator_eq_top`(G'=G)。axiom-clean。helper:
   `commutator_eq_top` / `isSylow_sylowMap_of_mem_sigma`(全 Sylow-p of M は G の Sylow)。✅
-- [ ] **`Msigma_le_derived`** (M_σ⊆M' 全体): per-Sylow core から **generation glue**。mathlib に
-  非nilpotent用 Sylow生成補題が無い ⟹ 各 h∈O_σ(↥M) で ⟨h⟩ (cyclic⟹nilpotent) に
-  `Ch01.iSup_default_sylow_eq_top_of_nilpotent` を使い ⟨h⟩=⨆Sylow⊆commutator ↥M (各 Sylow⊆ via per-Sylow)
-  ⟹ h∈commutator ↥M。per-element ~40行。← 次の landable
-- [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): M_α≠⊥ なら `Malpha_le_Msigma` で済; M_α=⊥ なら r(M)≤2
+- [x] **`Msigma_le_derived`** (M_σ⊆M' 全体): per-Sylow core + finite Sylow-generation helper
+  `le_of_sylow_le` で完成。`Msigma_isPiGroup` から各 Sylow prime が σ(M) に入ることを使い、
+  `sylow_le_derived_of_mem_sigma` に接続。✅ commit 970e458
+- [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
+  (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
   (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。**(d) と entangle**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
   - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。

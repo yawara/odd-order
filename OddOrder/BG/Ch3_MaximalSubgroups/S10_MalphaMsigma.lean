@@ -1047,6 +1047,16 @@ theorem Msigma_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     _ ≤ (Q : Subgroup ↥M).map M.subtype := Subgroup.map_mono hPQ
     _ ≤ derivedInG M := sylow_le_derived_of_mem_sigma hG hM hr_sigma Q
 
+/-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
+nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
+`M_α = 1` case using the low-rank/Thm 4.20 argument. -/
+theorem Msigma_ne_bot_of_Malpha_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hα : Malpha M ≠ ⊥) :
+    Msigma M ≠ ⊥ := by
+  intro hσ
+  exact hα (le_bot_iff.mp (by
+    simpa [hσ] using Malpha_le_Msigma hG hM))
+
 /-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
 `M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
 quotient 型の `Normal` instance 整備後に追加予定。) -/
