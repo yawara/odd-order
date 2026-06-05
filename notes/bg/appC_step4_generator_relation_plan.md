@@ -129,8 +129,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `relationC9_w3_word` also records the exact displayed `(C.9)` word equation, and
   `relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one` proves that once Step3 has killed
   `w₃` (with the `(C.6)` input `c₃≠0`), the same equation forces
-  `w₁^(p-1)=w₂^(p-1)=1`.  Remaining frontier is the Step3/C.6 production of `w₃=1`
-  and the final condition `(A)`/`(C.10)` combination.
+  `w₁^(p-1)=w₂^(p-1)=1`.
+- **🆕 (2026-06-06) Step3-recipient C.10 collapse done**:
+  `relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` landed.  Given the Step3 output
+  `S₁ W₃^(p-1) S₁⁻¹ ∈ U` and the `(C.6)` inputs `c₁,c₃≠0`, it proves
+  `w₁=w₂=w₃=1` and exact `(C.10)`.  Remaining frontier is now the Step3 production of that
+  displayed `U`-membership (plus wiring the global `(C.6)` nonzero facts into this consumer).
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -212,10 +216,10 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
    F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。✅ `w₃` 版 `(C.9)` membership と
    exact word equation landed。さらに `w₃=1` と `(C.6)` の `c₃≠0` から
    `w₁^(p-1)=w₂^(p-1)=1` まで Lean 化済。
-5. **w_i=1**: 残りは Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2/C.6 (s₁≠1) ⟹
-   w₃^{p-1}=1 ⟹ (A) で w₃=1 を作ること。その後は landed theorem で w₁/w₂ の冪条件、
-   `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` で w₁=w₂=1。
-   ⟹ (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1`。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
+5. **w_i=1 / (C.10)**: ✅ Step3 が `s₁w₃^{p-1}s₁⁻¹∈U` を与え、C.6 の
+   `c₁,c₃≠0` が入れば、`relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` が
+   `w₁=w₂=w₃=1` と (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1` まで出す。残りはこの Step3 U-membership
+   生成と global C.6 非零 fact の接続。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
 6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
    `y∈ker((s⁻¹+1-s₁⁻¹s⁻¹-s₃)(s⁻¹-1))`。**FPF** (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`,
    s で固定⟹W₂で固定⟹∈C_Q(W₂)⊓⁅Q,W₂⁆=1, (X)) で `(s⁻¹-1)` 可逆 → `y∈ker(s⁻¹+1-s₁⁻¹s⁻¹-s₃)`。
@@ -306,8 +310,8 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
 | **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
 | **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` and the exact displayed word equation | ✅ `relationC9_w3_mem_P_sup_U_and_conj`, `relationC9_w3_word`; post-`w₃=1` collapse to `w₁^(p-1)=w₂^(p-1)=1` landed with explicit `c₃≠0` input |
-| Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, then `(C.9)` gives the `w₁/w₂` powers | Step3/C.6 production of `w₃=1` remains; condition `(A)` bridge already landed: `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` |
-| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | bridge landed: `relationC10_of_w_eq_one`; needs actual `wᵢ=1` derivation |
+| Step3 適用 | `S₁W₃^(p-1)S₁⁻¹∈U` + C.6 `c₁,c₃≠0` ⟹ `w₁=w₂=w₃=1` | ✅ consumer landed: `relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U`; Step3 production of the `U`-membership remains |
+| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | ✅ included in `relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` once Step3 supplies the `U`-membership |
 | mod Q | `P₀∩Q=1` ⟹ `s₁s₂s₃=1` | **既存** `W2_inf_Q_eq_bot` (S16:1454) |
 | **kernel** | End([Q,P₀]) で `y ∈ ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` | **新規 + (X)/(XI) 要** (§4) |
 | FPF | s⁻¹ が [Q,P₀] 上 fixed-point-free ⟹ `(s⁻¹−1)` 可逆 ⟹ `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)` | **新規 + (X)/(XI) 要** |
@@ -338,12 +342,11 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
      ✅ condition A / C.10 bridge (`w_eq_one_of_pow_sub_one_eq_one`,
      `relationC10_of_w_eq_one`) landed.  ✅ concrete semidirect Frobenius map
      (`fieldNormalizerFrobeniusHom`) landed.  ✅ powered `(C.5)` package transport
-     (`Step4C5NormalForms.frobenius`) landed.  ✅ powered `(C.7)` comparison gives
-     `relationC9_w3_mem_P_sup_U_and_conj` for the third word.  次は `w₁/w₂` analogues。
-   - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
-     条件Aで潰す bridge は landed; `wᵢ^(p-1)=1` への Step3/Step2 production が残り。
-   - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1` は `wᵢ=1` 仮定から landed; `s₁s₂s₃_eq_one`
-     (mod Q, `W2_inf_Q_eq_bot`) は残り。
+     (`Step4C5NormalForms.frobenius`) landed.  ✅ exact `(C.9)` word and the post-`w₃=1`
+     `(C.9)` collapse landed.  ✅ Step3-recipient C.10 theorem landed.
+   - 残る producer は Step3 から `S₁ W₃^(p-1) S₁⁻¹ ∈ U` を出す部分と、global `(C.6)` の
+     `c₁,c₃≠0` 配線。
+   - `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`) は C.10 後の残り。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):
    - `y_mem_ker_of_relationC10` : `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))`。
    - `sInv_fixedPointFree_on_QP0` : s⁻¹ が [Q,P₀] 上 FPF。
@@ -409,14 +412,16 @@ coprime 作用の標準事実**ゆえ:
     `∃ yD ∈ ⁅Q,W2⁆, MulAut.conj yD s = t`。Q = ⁅Q,W2⁆·C_Q(W2) (`fixedPoints_sup_actionCommutator_eq_top`)
     で y=yD·yC、yC∈C_Q(W2) が s と可換 ⟹ t = y·s·y⁻¹ = yD·s·yD⁻¹。kernel 段は yD (∈[Q,W2]) を使える。
 - 🔴 残り (Step 4 の残作業、(X)/(XI) infra は完了):
-  1. **(C.9)→`wᵢ=1` 合成**: landed exact `(C.9)` を使い、Step3/C.6 から `w₃=1` を作る。
-     その後は landed collapse theorem と condition `(A)` bridge で `w₁=w₂=w₃=1` へ進める。
+  1. **Step3 U-membership producer**: exact `(C.9)` の
+     `S₁W₃^(p-1)S₁⁻¹ ∈ (PU)∩(PU)^{t²}` から `S₁W₃^(p-1)S₁⁻¹∈U` を作り、
+     global C.6 の `c₁,c₃≠0` とともに landed consumer へ渡す。consumer 側は既に
+     `w₁=w₂=w₃=1` と `(C.10)` まで閉じる。
   2. **(C.10)→kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を
      ⁅Q,W2⁆ 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`;
      s-only 形は W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化
      → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
   3. **`s₁=s⁻¹` capstone** + 配線 (経路A: `appC_normSet_generator_relation_of_first_k_three_coordinate`)。
-  ⟹ infra (X)/(XI) は全て landed。残りは `wᵢ=1` 合成 (1) → End 計算 (2) → capstone (3)。
+  ⟹ infra (X)/(XI) は全て landed。残りは Step3 producer (1) → End 計算 (2) → capstone (3)。
 
 ---
 

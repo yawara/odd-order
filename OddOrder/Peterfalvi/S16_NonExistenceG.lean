@@ -3291,6 +3291,70 @@ theorem relationC10_of_w_eq_one
       rw [hC7]
     _ = 1 := by group
 
+/-- BG Appendix C Step 4 after Step 3: once Step 3 supplies the membership
+`s₁ w₃^(p-1) s₁⁻¹ ∈ U`, Step 2 and condition `(A)` force
+`w₁ = w₂ = w₃ = 1`, and hence `(C.10)`.
+
+The two nonzero hypotheses are the `(C.6)` inputs for the first and third
+prime-line factors.  The remaining frontier is to produce the displayed
+`U`-membership from the Step 3 intersection theorem. -/
+theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b)
+    (hc1 : forms.c1 ≠ 0) (hc3 : forms.c3 ≠ 0)
+    (hw3U :
+      data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+          data.sigma
+            (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+              fieldNormalizerFrobeniusGroup hyp) *
+            (data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1))⁻¹ ∈ hyp.base.U) :
+    forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
+      data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 := by
+  classical
+  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+  let W3pow := data.sigma
+    (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+      fieldNormalizerFrobeniusGroup hyp)
+  let U3 := forms.w3 ^ (hyp.base.p - 1)
+  have hS1_inv :
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c1)) = S1⁻¹ := by
+    calc
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c1)) =
+          data.sigma ((fieldNormalizerPrimeLineElement hyp forms.c1)⁻¹) := by
+        rw [fieldNormalizerPrimeLineElement_neg]
+      _ = S1⁻¹ := by
+        simp [S1]
+  have hU3_sigma :
+      data.sigma (SemidirectProduct.inr U3 : fieldNormalizerFrobeniusGroup hyp) =
+        W3pow := by
+    simp [U3, W3pow]
+  have hmem_step :
+      data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+          data.sigma (SemidirectProduct.inr U3 : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp (-forms.c1)) ∈ hyp.base.U := by
+    simpa [S1, W3pow, U3, hS1_inv, hU3_sigma, mul_assoc] using hw3U
+  have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
+    (c := forms.c1) (d := -forms.c1) U3 hmem_step
+  have hU3_one : U3 = 1 := by
+    rcases hstep with hzero | hone
+    · exact False.elim (hc1 hzero.1)
+    · exact hone.1
+  have hw3_pow : forms.w3 ^ (hyp.base.p - 1) = 1 := by
+    simpa [U3] using hU3_one
+  have hw3 : forms.w3 = 1 :=
+    data.normOneUnit_eq_one_of_pow_sub_one_eq_one forms.w3 hw3_pow
+  have h12 :=
+    data.relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one ha hb hab forms hc3 hw3
+  have hwords := forms.w_eq_one_of_pow_sub_one_eq_one h12.1 h12.2 hw3_pow
+  have hC10 := data.relationC10_of_w_eq_one hab forms hwords.1 hwords.2.1 hwords.2.2
+  exact ⟨hwords.1, hwords.2.1, hwords.2.2, hC10⟩
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
