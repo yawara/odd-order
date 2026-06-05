@@ -75,11 +75,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 
 > 🆕🆕 **2026-06-05 続2 の進捗**: (a) **companion 構成 done** (`exists_companion_of_unitVal_inv_mem_normSetE`,
 > build-green) — `↑a⁻¹∈E ⟹ ∃b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E`、`relationC2` の入口。
-> (b) **🔴 (C.4) に forward-conj の障害を発見**: repo engine の共役が forward なため BG (C.4) は移植不可、
-> かつ **BG の局所 q-swap が機能しない** (connector の Q 元が U 元に刺さって消えない; 下記 step 1)。
-> mod-Q skeleton は OK (stripped (C.4)=`t⁻²M₁tM₂tM₃=1`, connector (-2,+1,+1)) だが **G-level の真偽は未確定**。
-> BG 証明そのものは forward M₁ に適用不可。**次セッションは step 1 の選択肢 (a)大域Q / (b)backward書換 /
-> (c)module抽象 を判断要** — 当初想定 (BG 写経) より重い。
+> (b) **🔴 (C.4) に forward-conj の障害を発見 → 推奨解も確定**: repo engine の共役が forward なため
+> 現行 `tConjAut³` (forward) では BG (C.4) 移植不可・局所 q-swap 不能 (Q 元が U 元に刺さる)。
+> **🚩 解決 = capstone/配線を backward `tConjAut⁻³` に切替** (= BG が自然に与える向き; capstone M₁ が
+> BG M₁ と完全一致し q-swap が直接移植可)。**feasibility 3 点検証済** (downstream φ-agnostic /
+> φ-matching backward OK / q_j 同一)。詳細 = step 1「🚩🚩 推奨解」。次セッション = この切替 (~75 行) →
+> BG (C.4) q-swap 写経 → (C.5)-(C.10) → kernel。
 
 > 💡 **k=3 に固定して導出してよい** (推奨): BG は (C.2)-(C.10) を一般 k∈F_p で進め s₁=s⁻¹ を出すが、
 > 論証は **各 k で独立** (異なる k を混ぜない) で、最終利用は k=3 のみ。`Step4Capstone` 自体が slot
@@ -116,14 +117,26 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
      Q-part が大域的に消えるかは未検証)。さらに **forward = BG-argument を τ=t⁻¹ で回す版に対応しない**
      (BG q_j=`s⁻ʲτʲ` を要求するが τ=t⁻¹ では `s⁻ʲt⁻ʲ∉Q`; τ=t⁻¹ は s の y-共役でなく s⁻¹ の共役)。
      つまり **BG の証明そのものは forward M₁ に直接適用できない**。
-   - **🚩 次セッションの選択肢** (どれか要判断):
-     (a) forward stripped (C.4) を **大域 Q-argument** で証明 (relationC2 を `Ās̄D̄s̄Ē=s̄²` 化 → Q-part を
-         `actionCommutator`/可換性で潰す; 技術新規、難易度高・真偽リスク有)。
-     (b) **engine を backward 版に直す/別 decomposition を立てる** — capstone M₁ が `tConjAut³`(forward)
-         で固定なので、`tConjAut³ a⁻¹ = (tConjAut⁶ a⁻¹)^{t³}_{BG-bwd}` 等の書き換えで BG 形に乗せられるか
-         検討 (ただし unit が tConjAut⁶ a⁻¹ になり E-membership/base relation の再設定が要る)。
-     (c) **module/End 抽象を先に立てて (C.4)-(C.10)+kernel を一括処理** (Q を ℤ[P₀]-加群として扱い、
-         s-共役の非一様性を加群演算で吸収; 最も筋が良いが大工事)。
+   - **🚩🚩 推奨解 = (b) capstone/配線を backward `tConjAut⁻³` に切替** (このセッションで feasibility 確認済):
+     - **根拠**: BG の結論は `(a⁻¹)^{t³}_{BG-bwd} ∈ E`。repo (forward tConjAut) では
+       `(a⁻¹)^{t³}_{bwd} = t⁻³σ(inr a⁻¹)t³ = σ(inr((tConjAut⁻³)(a⁻¹)))` = **backward = `tConjAut⁻³`**。
+       現行配線は `tConjAut³` (forward) を使うが、**BG が自然に与えるのは `tConjAut⁻³`**。逆向きを使うと
+       capstone M₁ = `s·σ(inr(tConjAut⁻³ a⁻¹))·s⁻² = s·t⁻³A t³·s⁻²` が **BG の M₁ `s(a⁻¹)^{t³}s⁻²` と完全一致**
+       ⟹ BG の (C.4) q-swap (q_j=s⁻ʲtʲ∈Q, repo に既存) が**そのまま移植可能** (forward 障害が消える)。
+     - **✅ 検証済 (3 点)**: ① downstream `normSetE_eq_inv_of_twisted_normOne_step` (AppC_NormSet:1120) は
+       **任意の φ (φ^p=1) で動作** (`(tConjAut⁻³)^p=(tConjAut^p)⁻³=1` OK)。② φ-matching は backward でも成立
+       (capstone を a=u⁻¹ で呼び、E-extraction `(↑W)⁻¹∈E` (W=tConjAut⁻³ u) = `↑(tConjAut⁻³ u⁻¹)∈E` =
+       twisted step に過不足なく合致)。③ backward repo M₁ = BG M₁ なので q-swap が同一 q_j で telescope。
+     - **作業**: (i) backward conj lemma `t⁻ⁿσ(inr u)tⁿ=σ(inr((tConjAut⁻¹)ⁿ u))` (forward S16:1038 を逆に)、
+       (ii) backward engine `exists_step4_first_k_three_decomposition` の `tConjAut⁻³` 版、
+       (iii) `Step4Capstone`/`..._tConj_pow_three_of_capstone`/`appCNormSetTwistedNormOneStep_of_capstone` を
+       `tConjAut⁻³` (=`(tConjAut⁻¹)³`) に restate (全 build-green 保てる、capstone は def のまま)、
+       (iv) その後 BG (C.4) q-swap を写経 (下の旧「✅ 証明構造解明」が **backward なら有効**)。推定 ~75 行 + (C.4)。
+   - 代替: (a) forward を大域 Q-argument で押す (真偽リスク有、非推奨) / (c) module/End 抽象で一括 (大工事)。
+   - **🔁 BG (C.4) q-swap (backward なら有効・写経対象)**: M₁=`s(a⁻¹)^{t³}s⁻²` (=backward capstone LHS),
+     M₂=`s³(ab⁻¹)^{t²}s⁻¹`, M₃=`s²b^t s⁻³`。(C.4)=`s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1`。各 connector が単一 Q-swap
+     `qᵢ⁻¹qⱼ=qⱼqᵢ⁻¹` (qᵢ=s⁻ⁱtⁱ∈Q): conn1 `s⁻³t²s=q₃q₁⁻¹=q₁⁻¹q₃=t⁻¹s⁻²t³`, conn2 `s⁻²t⁻¹s³=q₂q₃⁻¹=t⁻³st²`,
+     conn3 `s⁻¹t⁻¹s²=q₁q₂⁻¹=t⁻²st`。swap 後 telescope で `t⁻¹·(C.2-LHS)·t=t⁻¹·1·t=1`。
    - **Q-membership/comm は既存**: `s_inv_pow_mul_t_pow_mem_Q`/`t_inv_pow_mul_s_pow_mem_Q`/`Q_mul_comm`。
 2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
 3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
