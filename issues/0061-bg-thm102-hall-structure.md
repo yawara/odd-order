@@ -65,6 +65,11 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 - [x] **conditional quotient rank part of (d)**: §4 の既存 lemma
   `Ch1.S04.pRank_quotient_le_of_coprime` を public 化し、`rank_quotient_Malpha_le_two_of_isHall`
   を追加。Hall `α(M)` 連言が得られれば、BG 10.2(d) の `rank(M/M_α)≤2` は完成済み。
+- [x] **Hall `α(M)` transport / existence of `M(α)`**: `not_dvd_index_of_mem_sigma` で
+  `p∈σ(M) ⇒ p∤[G:M]` を公開し、`hallAlphaSubgroup_isHallInG` /
+  `exists_hallAlphaSubgroup_isHallInG` により Hall-E で得た `M` 内の `α(M)`-Hall subgroup を
+  `G` 内の `α(M)`-Hall subgroup として使えるようにした。残る `M(α)=M_α` 同定後、
+  target の G-level Hall `α(M)` 連言へ直結する。
 - [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
   (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
   (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。`q∈σ(M) ∧ O_q(M)≠⊥ ⇒ M_σ≠⊥`

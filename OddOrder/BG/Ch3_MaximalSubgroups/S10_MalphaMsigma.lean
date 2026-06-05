@@ -543,6 +543,15 @@ private theorem exists_sylow_le_of_mem_sigma [Finite G]
     exact absurd this hgrow.ne'
   exact ⟨S, hPeqS ▸ hPbar_le_M⟩
 
+/-- **σ basic fact, index form** (mmd L2655): if `p ∈ σ(M)`, then `M` contains a
+Sylow `p`-subgroup of `G`, so `p` does not divide `[G : M]`. -/
+theorem not_dvd_index_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) :
+    ¬ p ∣ M.index := by
+  obtain ⟨Q, hQM⟩ := exists_sylow_le_of_mem_sigma hp
+  intro hpidx
+  exact Q.not_dvd_index (hpidx.trans (Subgroup.index_dvd_of_le hQM))
+
 /-- Conjugation by `g` as an order isomorphism of the subgroup lattice of `G`. -/
 private def conjOrderIso (g : G) : Subgroup G ≃o Subgroup G where
   toFun H := MulAut.conj g • H
@@ -968,6 +977,60 @@ theorem alpha_subset_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     hPbarU.eq_of_isCoatom_of_le hMc hPbar_le_M hNc (Subgroup.le_normalizer.trans hNleN)
   rw [mem_sigma_iff]
   exact ⟨hpf, P, hNleN.trans hMN.ge⟩
+
+/-- A Hall subgroup of `M`, viewed as a subgroup of `G`, remains Hall in `G` when
+no prime in `π` divides the outer index `[G : M]`. -/
+theorem isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index [Finite G]
+    {π : Set ℕ} {M A : Subgroup G} (hAM : A ≤ M)
+    (hHall : Ch03.IsHallSubgroup π (A.subgroupOf M))
+    (hidx : ∀ p : ℕ, p ∈ π → p.Prime → ¬ p ∣ M.index) :
+    Ch03.IsHallSubgroup π A := by
+  refine ⟨?_, ?_⟩
+  · intro r hr
+    have hrSub : r ∈ (Nat.card ↥(A.subgroupOf M)).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAM).toEquiv]
+    exact hHall.1 r hrSub
+  · intro r hridx hrπ
+    obtain ⟨hr_prime, hr_dvd, -⟩ := Nat.mem_primeFactors.mp hridx
+    have htower : (A.subgroupOf M).index * M.index = A.index :=
+      Subgroup.relIndex_mul_index hAM
+    have hr_dvd_prod : r ∣ (A.subgroupOf M).index * M.index := by
+      rw [htower]
+      exact hr_dvd
+    rcases hr_prime.dvd_mul.mp hr_dvd_prod with hr_dvd_rel | hr_dvd_M
+    · exact hHall.2 r
+        (Nat.mem_primeFactors.mpr ⟨hr_prime, hr_dvd_rel, Subgroup.index_ne_zero_of_finite⟩) hrπ
+    · exact hidx r hrπ hr_prime hr_dvd_M
+
+/-- **BG Theorem 10.2, Hall-`α` transport**: any `α(M)`-Hall subgroup of `M`,
+viewed inside `G`, is already an `α(M)`-Hall subgroup of `G`. The point is that
+`α(M) ⊆ σ(M)`, and σ-primes do not divide `[G : M]`. -/
+theorem hallAlphaSubgroup_isHallInG [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M A : Subgroup G} (hM : M ∈ maximalSubgroups G) (hAM : A ≤ M)
+    (hHall : Ch03.IsHallSubgroup (alpha M) (A.subgroupOf M)) :
+    Ch03.IsHallSubgroup (alpha M) A := by
+  refine isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index hAM hHall ?_
+  intro p hpα hp_prime
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  exact not_dvd_index_of_mem_sigma (alpha_subset_sigma hG hM hpα)
+
+/-- **BG Theorem 10.2, existence of `M(α)`**: for a maximal subgroup `M`, there is
+an `α(M)`-Hall subgroup of `G` contained in `M`. This is Hall existence inside the
+solvable group `M`, transported to `G` using the σ-index fact. -/
+theorem exists_hallAlphaSubgroup_isHallInG [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∃ A : Subgroup G, A ≤ M ∧ Ch03.IsHallSubgroup (alpha M) A := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (alpha M)
+  set A : Subgroup G := H.map M.subtype with hAdef
+  have hAM : A ≤ M := by
+    rw [hAdef]
+    exact Subgroup.map_subtype_le H
+  refine ⟨A, hAM, hallAlphaSubgroup_isHallInG hG hM hAM ?_⟩
+  have hA_sub : A.subgroupOf M = H := by
+    rw [hAdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  rwa [hA_sub]
 
 /-- **BG Theorem 10.2(c), inclusion `M_α ⊆ M_σ`**: immediate from `α(M) ⊆ σ(M)`
 (`alpha_subset_sigma`) and monotonicity of the `π`-core. -/
