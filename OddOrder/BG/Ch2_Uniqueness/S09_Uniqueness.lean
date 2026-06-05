@@ -414,6 +414,51 @@ private theorem normalizer_sylow_map_le_maximal [Finite G] (hG : IsMinimalSimple
           rw [hEq91]
       _ ≤ M := normalizer_opiCoreInG_le_maximal_of_ne_bot hG hM hOp
 
+/-- If a subgroup lies in two distinct maximal subgroups, it cannot be uniquely
+maximal. This is the formal core of the BG Lemma 9.5 line `L ≠ M`, hence no
+subgroup of `M ∩ L` lies in `𝒰`. -/
+private theorem not_isUniquelyMaximal_of_le_inf_distinct_maximals
+    {K M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G)
+    (hKML : K ≤ M ⊓ L) (hLM : L ≠ M) :
+    ¬ IsUniquelyMaximal K := by
+  intro hK
+  have hKM : K ≤ M := hKML.trans inf_le_left
+  have hKL : K ≤ L := hKML.trans inf_le_right
+  exact hLM (hK.eq_of_isCoatom_of_le hL hKL hM hKM)
+
+/-- **BG Theorem 9.1, Eq (9.5) split** (mmd L2527-2529): `F(H) ⊆ R · O_{p'}(H) ⊆ M`. The Fitting
+subgroup of `H` decomposes as `⨆_q O_q(H)`; `O_p(H) ⊆ R` (Sylow) and `O_q(H) ⊆ O_{p'}(H)` for
+`q ≠ p`, so `F(H) ⊆ R ⊔ O_{p'}(H)`. Given the ambient images `R ⊆ M` and `O_{p'}(H) ⊆ M`, this
+yields `F(H) ⊆ M`. -/
+private theorem fittingInG_le_of_sylow_of_opiCore_le [Finite G]
+    {p : ℕ} [Fact p.Prime] {H M : Subgroup G} (R : Sylow p ↥H)
+    (hRM : (R : Subgroup ↥H).map H.subtype ≤ M)
+    (hOpM : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ M) :
+    S08.fittingInG H ≤ M := by
+  classical
+  have hfitN : Ch01.fitting ↥H ≤ (R : Subgroup ↥H) ⊔ Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥H := by
+    rw [Ch01.fitting_eq_iSup_primeFactors]
+    refine iSup_le (fun q => ?_)
+    haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+    by_cases hq : (q : ℕ) = p
+    · subst hq; exact le_sup_of_le_left (Ch01.opCore_le R)
+    · refine le_sup_of_le_right (Ch03.Subgroup.IsPiGroup.le_oPiCore ?_)
+      intro r hr
+      have hrq : r = (q : ℕ) := by
+        obtain ⟨n, hn⟩ := (Ch01.opCore_isPGroup (q : ℕ) ↥H).exists_card_eq
+        rw [hn] at hr
+        have hrp : r.Prime := Nat.prime_of_mem_primeFactors hr
+        exact (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp
+          (hrp.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hr).2.1)
+      simp [hrq, hq]
+  rw [S08.fittingInG]
+  calc (Ch01.fitting ↥H).map H.subtype
+      ≤ ((R : Subgroup ↥H) ⊔ Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥H).map H.subtype :=
+        Subgroup.map_mono hfitN
+    _ = (R : Subgroup ↥H).map H.subtype ⊔ opiCoreInG ({p} : Set ℕ)ᶜ H := by
+        rw [Subgroup.map_sup]; rfl
+    _ ≤ M := sup_le hRM hOpM
+
 /-- **BG Theorem 9.1, Eq (9.5)+STEP5-7** (mmd L2527-2539), abstract form: let `H` be a finite
 solvable group of odd order, `R` a Sylow `p`-subgroup, with `r(F(H)) ≤ 2`. If the ambient images
 satisfy `R ⊆ M`, `O_{p'}(H) ⊆ M` (b), and `N_G(R) ⊆ M` (Eq 9.4), then `H ⊆ M`.
@@ -749,7 +794,146 @@ theorem noncyclic_isUniquelyMaximal_of_centralizer_le [Finite G] (hG : IsMinimal
       (∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer {b} ≤ M) ∨
       sSup (hInvariant ⊤ B {p}ᶜ) ≤ M) :
     IsUniquelyMaximal B := by
-  sorry
+  classical
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hBp : IsPGroup p B := hBea.isPGroup
+  -- STEP 0: reduce (a) to (b): `sSup ℋ_G(B;p') ≤ M`.
+  have hb : sSup (hInvariant ⊤ B ({p} : Set ℕ)ᶜ) ≤ M := by
+    rcases hcase with hcent | hb
+    · exact sSup_hInvariant_le_of_centralizer_le hBea hBnc hcent
+    · exact hb
+  -- `B` is proper (a maximal `M` is proper, `B ≤ M`).
+  have hBproper : B < ⊤ := lt_of_le_of_lt hBle (mem_maximalSubgroups.mp hM).lt_top
+  have hBne : B ≠ ⊥ := by
+    intro hBbot
+    exact hBnc (hBbot ▸ (by infer_instance : IsCyclic ↥(⊥ : Subgroup G)))
+  -- `p ∣ |G|` (since `B ≠ ⊥` is a `p`-group).
+  have hp_dvd_G : p ∣ Nat.card G := by
+    have hBcard : p ∣ Nat.card ↥B := by
+      obtain ⟨k, hk⟩ := hBp.exists_card_eq
+      have hk0 : k ≠ 0 := by
+        rintro rfl; rw [pow_zero] at hk
+        exact hBne (Subgroup.card_eq_one.mp hk)
+      rw [hk]; exact dvd_pow_self p hk0
+    exact hBcard.trans (Subgroup.card_subgroup_dvd_card B)
+  by_contra hBnotU
+  -- STEP 4 selection: choose `H ≠ M` maximal over `B`, maximizing `|H ⊓ M|_p`.
+  obtain ⟨H, hH, hBH, hHM, hHmax⟩ :=
+    exists_maximal_counterexample_image_of_not_isUniquelyMaximal
+      (H := B) (M := M) (w := fun K : Subgroup G => S08.sylowInfCard p K M)
+      hBproper hM hBle hBnotU
+  haveI hHsolv : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hH
+  have hoddH : Odd (Nat.card ↥H) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
+  -- The Eq (9.4) normalizer condition `hNloc` (discharged via Eq (9.3) + maximality).
+  have hNloc : ∀ Rinf : Sylow p ↥(H ⊓ M),
+      (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Subgroup G) ≤ M →
+      B ≤ ((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) →
+      Subgroup.normalizer (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M := by
+    intro Rinf hRamb_le_M hB_Ramb
+    set Ramb : Subgroup G := (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype with hRamb
+    have hRamb_p : IsPGroup p Ramb := Rinf.isPGroup'.map (H ⊓ M).subtype
+    have hRamb_ne : Ramb ≠ ⊥ := fun hbot => hBne (le_bot_iff.mp (hB_Ramb.trans (le_of_eq hbot)))
+    -- choose `P` Sylow of `M` containing `Ramb`.
+    obtain ⟨P, hRamb_P⟩ :=
+      (hRamb_p.comap_subtype (K := M)).exists_le_sylow
+    set Pamb : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPamb
+    have hPamb_le_M : Pamb ≤ M := Subgroup.map_subtype_le _
+    have hRamb_Pamb : Ramb ≤ Pamb := by
+      rw [hPamb]
+      calc Ramb = (Ramb.subgroupOf M).map M.subtype :=
+            (Subgroup.map_subgroupOf_eq_of_le hRamb_le_M).symm
+        _ ≤ (P : Subgroup ↥M).map M.subtype := Subgroup.map_mono hRamb_P
+    have hB_Pamb : B ≤ Pamb := hB_Ramb.trans hRamb_Pamb
+    -- the Eq (9.1)/(9.3) hypothesis: each `Pamb`-invariant `p'`-subgroup `≤ M`.
+    have hPle : ∀ K : Subgroup G,
+        K ∈ hInvariant ⊤ Pamb ({p} : Set ℕ)ᶜ → K ≤ M := by
+      intro K hK
+      refine (le_sSup ?_).trans hb
+      exact ⟨le_top, hB_Pamb.trans (hInvariant_le_normalizer hK), hInvariant_isPiSubgroup hK⟩
+    -- Eq (9.3): `N_G(Pamb) ≤ M`.
+    have hNPamb_le_M : Subgroup.normalizer (Pamb : Set G) ≤ M :=
+      normalizer_sylow_map_le_maximal hG hM P hp_dvd_G
+        (by rw [← hPamb]; intro hbot; exact hRamb_ne (le_bot_iff.mp (hRamb_Pamb.trans (le_of_eq hbot))))
+        (by rw [← hPamb]; exact hPle)
+    -- Case `Ramb = Pamb`: `N_G(Ramb) = N_G(Pamb) ≤ M`.
+    by_cases hRP : Ramb = Pamb
+    · rw [hRP]; exact hNPamb_le_M
+    · -- Case `Ramb < Pamb`: route `N_G(Ramb)` into a maximal `L`; `L = M` by maximality.
+      have hRamb_lt_Pamb : Ramb < Pamb := lt_of_le_of_ne hRamb_Pamb hRP
+      obtain ⟨L, hL, hNG_le_L⟩ :=
+        S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+          hG hM hRamb_ne hRamb_le_M
+      by_cases hLM : L = M
+      · rw [← hLM]; exact hNG_le_L
+      · exfalso
+        -- `N_{Pamb}(Ramb) > Ramb`, lies in `L ⊓ M`, bigger than `sylowInfCard p H M`.
+        have hPamb_p : IsPGroup p Pamb := P.isPGroup'.map M.subtype
+        have hRamb_lt_N : Ramb < Pamb ⊓ Subgroup.normalizer (Ramb : Set G) :=
+          S08.lt_inf_normalizer_of_isPGroup_lt hPamb_p hRamb_lt_Pamb
+        set N : Subgroup G := Pamb ⊓ Subgroup.normalizer (Ramb : Set G) with hNdef
+        have hN_p : IsPGroup p N := hPamb_p.to_inf_left
+        have hN_le_M : N ≤ M := inf_le_left.trans hPamb_le_M
+        have hN_le_L : N ≤ L := inf_le_right.trans hNG_le_L
+        -- `|N| ≤ sylowInfCard p L M ≤ sylowInfCard p H M = |Ramb| < |N|`.
+        have hN_card_le_L : Nat.card ↥N ≤ S08.sylowInfCard p L M :=
+          S08.card_le_sylowInfCard_of_isPGroup_le hN_p hN_le_L hN_le_M
+        -- `B ≤ Ramb ≤ N_G(Ramb) ≤ L`, so the maximality of `H` applies to `L`.
+        have hB_L : B ≤ L := hB_Ramb.trans (Subgroup.le_normalizer.trans hNG_le_L)
+        have hL_le_H : S08.sylowInfCard p L M ≤ S08.sylowInfCard p H M :=
+          hHmax L hL hB_L hLM
+        -- `sylowInfCard p H M = |Ramb|`.
+        have hHcard : S08.sylowInfCard p H M = Nat.card ↥Ramb := by
+          rw [S08.sylowInfCard_eq_card p H M Rinf, hRamb,
+            Subgroup.card_map_of_injective (H ⊓ M).subtype_injective]
+        have hRamb_lt_card : Nat.card ↥Ramb < Nat.card ↥N :=
+          Set.Finite.card_lt_card (Set.toFinite (N : Set G))
+            (SetLike.coe_ssubset_coe.mpr hRamb_lt_N)
+        have : Nat.card ↥N ≤ Nat.card ↥Ramb := by
+          calc Nat.card ↥N ≤ S08.sylowInfCard p L M := hN_card_le_L
+            _ ≤ S08.sylowInfCard p H M := hL_le_H
+            _ = Nat.card ↥Ramb := hHcard
+        exact (not_lt_of_ge this) hRamb_lt_card
+  -- STEP 4 (Eq 9.4): a Sylow `R` of `H` with `R ⊆ M`, `O_{p'}(H) ⊆ M`, `N_G(R) ⊆ M`.
+  obtain ⟨R, hRamb_le_M, hNRamb_le_M⟩ :=
+    exists_sylow_normalizer_le_maximal_of_selection hBp hBH hBle hNloc
+  -- `O_{p'}(H) ⊆ M`: `O_{p'}(H)` is a `B`-invariant `p'`-subgroup (`B ≤ H`, `O_{p'}(H) ⊴ H`).
+  have hOpH_le_M : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ M := by
+    refine (le_sSup ?_).trans hb
+    refine ⟨le_top, ?_, isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ H⟩
+    exact hBH.trans (le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ H)
+  -- Eq (9.5): `F(H) ⊆ M`.
+  have hFHM : S08.fittingInG H ≤ M := fittingInG_le_of_sylow_of_opiCore_le R hRamb_le_M hOpH_le_M
+  -- STEP 6 (Eq 9.5 → Thm 8.1): `r(F(H)) ≤ 2` since no subgroup of `F(H)` is in `𝒰`.
+  have hrankFInG : rank ↥(S08.fittingInG H) ≤ 2 := by
+    refine rank_fittingInG_le_two_of_no_uniqueMaximal hG hH ?_
+    intro U hUF
+    -- `U ≤ F(H) ⊆ M ⊓ H` and `M ≠ H` ⟹ `U ∉ 𝒰`.
+    have hUMH : U ≤ M ⊓ H := le_inf (hUF.trans hFHM) (hUF.trans (S08.fittingInG_le H))
+    exact not_isUniquelyMaximal_of_le_inf_distinct_maximals hM hH hUMH hHM
+  -- `rank (fittingInG H) = rank (Ch01.fitting ↥H)` (image by injective subtype).
+  have hrank : rank ↥(Ch01.fitting ↥H) ≤ 2 := by
+    have heq : rank ↥(Ch01.fitting ↥H) = rank ↥(S08.fittingInG H) := by
+      rw [S08.fittingInG]
+      exact le_antisymm
+        (rank_le_of_injective
+          (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥H) H.subtype
+            H.subtype_injective).toMonoidHom)
+          (Subgroup.equivMapOfInjective (Ch01.fitting ↥H) H.subtype
+            H.subtype_injective).injective)
+        (rank_le_of_injective
+          (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥H) H.subtype
+            H.subtype_injective).symm.toMonoidHom)
+          (Subgroup.equivMapOfInjective (Ch01.fitting ↥H) H.subtype
+            H.subtype_injective).symm.injective)
+    rw [heq]; exact hrankFInG
+  -- STEP 5-7: `H ⊆ M`, contradicting `H ≠ M` (both maximal/coatoms).
+  have hHleM : H ≤ M :=
+    le_maximal_of_rank_fitting_le_two_of_sylow hoddH R hrank hRamb_le_M hOpH_le_M hNRamb_le_M
+  have hHeqM : H = M := by
+    rcases eq_or_lt_of_le hHleM with heq | hlt
+    · exact heq
+    · exact absurd ((mem_maximalSubgroups.mp hH).2 M hlt) (mem_maximalSubgroups.mp hM).1
+  exact hHM hHeqM
 
 /-- Contrapositive form of BG Theorem 9.1 used in Lemma 9.5: if the noncyclic
 `p`-elementary subgroup `B ≤ M` is not in `𝒰`, then some nonidentity element of
@@ -2946,17 +3130,6 @@ private theorem le_centralizer_inf_centralizer_of_le_centralizer_inf_maximal
       (inf_centralizer_le_inf_of_mem_of_maximalContaining_centralizer_singleton
         (D := D) hyB hL)))
 
-/-- If a subgroup lies in two distinct maximal subgroups, it cannot be uniquely
-maximal. This is the formal core of the BG Lemma 9.5 line `L ≠ M`, hence no
-subgroup of `M ∩ L` lies in `𝒰`. -/
-private theorem not_isUniquelyMaximal_of_le_inf_distinct_maximals
-    {K M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hL : L ∈ maximalSubgroups G)
-    (hKML : K ≤ M ⊓ L) (hLM : L ≠ M) :
-    ¬ IsUniquelyMaximal K := by
-  intro hK
-  have hKM : K ≤ M := hKML.trans inf_le_left
-  have hKL : K ≤ L := hKML.trans inf_le_right
-  exact hLM (hK.eq_of_isCoatom_of_le hL hKL hM hKM)
 
 /-- Lemma 9.4 rank squeeze in the form used inside BG Lemma 9.5: if `K ≤ F(M)`
 and every subgroup of `K` is excluded from `𝒰`, then `K` has rank at most two. -/
