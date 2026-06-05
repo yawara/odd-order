@@ -98,6 +98,146 @@ private theorem centralizer_singleton_le_uniqueMaximalSubgroup_of_mem_centralize
     hL.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hNco hLleN
   exact hCGleN.trans (le_of_eq hN_eq)
 
+/-- **BG Theorem 9.1, STEP 0** ((a)⇒(b), mmd L2496-2499): if every nonidentity `b ∈ B`
+has `C_G(b) ≤ M`, then every `B`-invariant `p'`-subgroup `K ≤ ⊤` lies in `M`, hence
+`sSup (ℋ_G(B;p')) ≤ M`. Proof: `B` is a noncyclic abelian `p`-group, so it acts coprimely by
+conjugation on the `p'`-group `K`; BG Prop 1.16(1) / Isaacs 6.21
+(`nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`) gives
+`K = ⟨ C_K(b) ∣ b ∈ B^# ⟩`, and each `C_K(b) ≤ C_G(b) ≤ M`. -/
+private theorem sSup_hInvariant_le_of_centralizer_le [Finite G]
+    {p : ℕ} [Fact p.Prime] {M B : Subgroup G} (hBea : B.IsElementaryAbelian p)
+    (hBnc : ¬ IsCyclic ↥B)
+    (hcent : ∀ b : G, b ∈ B → b ≠ 1 → Subgroup.centralizer ({b} : Set G) ≤ M) :
+    sSup (hInvariant ⊤ B ({p} : Set ℕ)ᶜ) ≤ M := by
+  classical
+  haveI hBcomm : IsMulCommutative ↥B := IsMulCommutative.of_comm hBea.comm
+  have hBpi : Subgroup.IsPiSubgroup ({p} : Set ℕ) B :=
+    isPiSubgroup_singleton_of_isPGroup hBea.isPGroup
+  -- Reduce to: every member `K` of `ℋ_G(B;p')` lies in `M`.
+  rw [sSup_le_iff]
+  intro K hK
+  have hBK : B ≤ Subgroup.normalizer K := hInvariant_le_normalizer hK
+  have hKpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := hInvariant_isPiSubgroup hK
+  -- `B` acts coprimely on the `p'`-group `K`.
+  have hcop : Nat.Coprime (Nat.card ↥B) (Nat.card ↥K) :=
+    coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl hBpi hKpi
+  -- Conjugation action of `B` on `K`.
+  have hK_inv : Ch03.IsAInvariant (S07.conjAction B) K :=
+    S07.isAInvariant_conjAction_iff.mpr hBK
+  -- Prop 1.16(1): the centralizers generate all of `K`.
+  have htop := OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'
+    hK_inv.restrict hcop hBnc
+  -- Each `C_K(b) ≤ M`, so the generated subgroup `K` is contained in `M.subgroupOf K`.
+  have hle : OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure hK_inv.restrict
+      ≤ M.subgroupOf K := by
+    rw [OddOrder.Isaacs.Ch06.nontrivialActionFixedByClosure_le_iff]
+    intro b hb_ne
+    intro z hz
+    rw [Subgroup.mem_subgroupOf]
+    have hb_ne' : (b : G) ≠ 1 := fun h => hb_ne (Subtype.ext h)
+    -- `z` is fixed by `b`, i.e. `z` centralizes `b`.
+    have hzfix : (hK_inv.restrict b) z = z := OddOrder.Isaacs.Ch06.mem_actionFixedBy.mp hz
+    have hval : ((hK_inv.restrict b) z : G) = (z : G) := congrArg Subtype.val hzfix
+    rw [Ch03.IsAInvariant.restrict_apply_val] at hval
+    simp only [S07.conjAction, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      MulAut.conj_apply] at hval
+    have hzC : (z : G) ∈ Subgroup.centralizer ({(b : G)} : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [Set.mem_singleton_iff] at hy; subst hy
+      exact (mul_inv_eq_iff_eq_mul.mp hval)
+    exact hcent (b : G) b.2 hb_ne' hzC
+  rw [htop, top_le_iff, Subgroup.subgroupOf_eq_top] at hle
+  exact hle
+
+/-- **BG Theorem 9.1, Eq (9.1) core** (mmd L2503-2506), abstract form: in a finite solvable
+group `G'`, a `P`-invariant `p'`-subgroup `Y` (where `P` is a Sylow `p`-subgroup) lies in
+`O_{p'}(G')`. Proof (in `X̄ = G'/O_{p'}(G')`): `Ō_p(X̄) = O_p(X̄) ≤ P̄` (image of a Sylow `p` is
+Sylow `p`, and `O_p ≤` every Sylow), and `P̄` normalizes `Ȳ`, so `[Ȳ, O_p(X̄)] ≤ Ȳ ⊓ O_p(X̄) = 1`
+(`p'` ∩ `p`); thus `Ȳ` centralizes `O_p(X̄)`. Since `O_{p'}(X̄) = 1`, Hall–Higman 1.2.3
+(`hall_higman_1_2_3`) gives `C_{X̄}(O_p(X̄)) ≤ O_p(X̄)`, so `Ȳ ≤ O_p(X̄)`; being a `p'`-group it is
+trivial, i.e. `Y ≤ O_{p'}(G')`. -/
+private theorem le_oPiCore_compl_of_sylow_normalizes
+    {p : ℕ} [Fact p.Prime] {G' : Type*} [Group G'] [Finite G'] [IsSolvable G'] (P : Sylow p G')
+    {Y : Subgroup G'} (hPY : (P : Subgroup G') ≤ Subgroup.normalizer Y)
+    (hYpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Y) :
+    Y ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ G' := by
+  classical
+  set N : Subgroup G' := Ch03.oPiCore ({p} : Set ℕ)ᶜ G' with hN
+  set mk := QuotientGroup.mk' N with hmkdef
+  have hsurj : Function.Surjective mk := QuotientGroup.mk'_surjective N
+  have hker : mk.ker = N := QuotientGroup.ker_mk' N
+  set Q : Subgroup (G' ⧸ N) := Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) with hQ
+  haveI hQnorm : Q.Normal := by rw [hQ]; infer_instance
+  set Ybar : Subgroup (G' ⧸ N) := Y.map mk with hYbar
+  -- `Q = O_p(X̄)` is a `p`-group; `Ȳ` is a `p'`-group; hence `Q ⊓ Ȳ = ⊥`.
+  have hQ_pg : IsPGroup p ↥Q := by
+    rw [hQ, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
+    exact OddOrder.Isaacs.Ch01.opCore_isPGroup p _
+  have hYbar_pi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ Ybar := by
+    intro q hq
+    have hdvd : Nat.card ↥Ybar ∣ Nat.card ↥Y := by rw [hYbar]; exact Subgroup.card_map_dvd _ _
+    exact hYpi q (Nat.primeFactors_mono hdvd Nat.card_pos.ne' hq)
+  have hYbar_cop : Nat.Coprime (Nat.card ↥Ybar) p := by
+    refine OddOrder.Isaacs.Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := ({p} : Set ℕ)ᶜ) Nat.card_pos.ne' (Fact.out : p.Prime).pos.ne' ?_ ?_
+    · intro q hq
+      exact hYbar_pi q hq
+    · intro q hq
+      rw [Nat.Prime.primeFactors (Fact.out : p.Prime), Finset.mem_singleton] at hq
+      simp [hq]
+  have hQYbot : Q ⊓ Ybar = ⊥ := OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hQ_pg hYbar_cop
+  -- `O_p(X̄) ⊆ mk(P)`: the image of the Sylow `P` is Sylow, and `O_p ≤` every Sylow.
+  have hQ_le_Pbar : Q ≤ (P : Subgroup G').map mk := by
+    have hle := OddOrder.Isaacs.Ch01.opCore_le (P.mapSurjective hsurj)
+    rw [Sylow.coe_mapSurjective, ← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore] at hle
+    exact hle
+  -- `P̄` normalizes `Ȳ` (since `P` normalizes `Y`); hence so does `O_p(X̄) ≤ P̄`.
+  have hPbar_norm : (P : Subgroup G').map mk ≤ Subgroup.normalizer Ybar := by
+    rw [hYbar]
+    exact (Subgroup.map_mono hPY).trans (Subgroup.le_normalizer_map mk)
+  have hQ_norm_Ybar : Q ≤ Subgroup.normalizer Ybar := hQ_le_Pbar.trans hPbar_norm
+  -- `[Ȳ, O_p(X̄)] ≤ Ȳ ⊓ O_p(X̄) = 1`, so `Ȳ` centralizes `O_p(X̄)`.
+  have hYbar_cent_Q : Ybar ≤ Subgroup.centralizer (Q : Set (G' ⧸ N)) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff]
+    intro c hc
+    -- `[y, c] = y c y⁻¹ c⁻¹`; show it is `1`.
+    have hin_Q : y * c * y⁻¹ * c⁻¹ ∈ Q := by
+      -- `Q` is normal in `X̄`, so `y c y⁻¹ ∈ Q`.
+      have hconj : y * c * y⁻¹ ∈ Q := hQnorm.conj_mem c hc y
+      simpa [mul_assoc] using Q.mul_mem hconj (Q.inv_mem hc)
+    have hin_Y : y * c * y⁻¹ * c⁻¹ ∈ Ybar := by
+      -- `c ∈ Q ≤ N_{X̄}(Ȳ)`, so `c y⁻¹ c⁻¹ ∈ Ȳ`.
+      have hconj : c * y⁻¹ * c⁻¹ ∈ Ybar :=
+        (Subgroup.mem_normalizer_iff.mp (hQ_norm_Ybar hc) y⁻¹).mp (Ybar.inv_mem hy)
+      have heq : y * c * y⁻¹ * c⁻¹ = y * (c * y⁻¹ * c⁻¹) := by group
+      rw [heq]; exact Ybar.mul_mem hy hconj
+    have h1 : y * c * y⁻¹ * c⁻¹ = 1 :=
+      Subgroup.mem_bot.mp (hQYbot ▸ Subgroup.mem_inf.mpr ⟨hin_Q, hin_Y⟩)
+    have h2 : y * c * y⁻¹ = c := mul_inv_eq_one.mp h1
+    have h3 : y * c = c * y := by
+      have h4 := congrArg (· * y) h2
+      simpa [mul_assoc] using h4
+    exact h3.symm
+  -- Hall–Higman 1.2.3 in `X̄` (where `O_{p'}(X̄) = ⊥`): `C_{X̄}(O_p(X̄)) ≤ O_p(X̄)`.
+  have hbot : Ch03.oPiCore ({p} : Set ℕ)ᶜ (G' ⧸ N) = ⊥ := by
+    have := OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot (G := G') ({p} : Set ℕ)ᶜ
+    simpa [hN] using this
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable ({p} : Set ℕ) (G' ⧸ N) := inferInstance
+  have hHH : Subgroup.centralizer (Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) : Set (G' ⧸ N))
+      ≤ Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ N) :=
+    OddOrder.Isaacs.Ch03.hall_higman_1_2_3 (G := G' ⧸ N) ({p} : Set ℕ)
+      (by simpa using hbot)
+  have hYbar_le_Q : Ybar ≤ Q := hYbar_cent_Q.trans hHH
+  -- `Ȳ ≤ O_p(X̄)` is both `p'` and `p`, hence trivial; so `Y ≤ ker mk = O_{p'}(G')`.
+  have hYbar_bot : Ybar = ⊥ := by
+    have : Ybar ⊓ Q = Ybar := inf_eq_left.mpr hYbar_le_Q
+    rw [inf_comm] at this
+    rw [← this, hQYbot]
+  rw [hYbar, Subgroup.map_eq_bot_iff, hker] at hYbar_bot
+  rw [hN]; exact hYbar_bot
+
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
 (a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
 
