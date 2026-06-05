@@ -2462,6 +2462,28 @@ private theorem rank_fitting_subtype_le_two_of_low_rank
         (Subgroup.equivMapOfInjective _ _ (S08.fittingInG M).subtype_injective).injective
     exact (h1.trans h2).trans ((pRank_le_rank q).trans hp')
 
+/-- BG Lemma 9.5 low-rank, the `M'' ≤ F(M')` step (BG L2615 "By Theorem 4.20, M''⊆F"): a maximal
+`M` of the minimal simple odd `G` with `r_p(F(M)) ≤ 2` and `rank O_{p'}(F(M)) ≤ 2` (so
+`rank F(M) ≤ 2`) satisfies `M' ≤ F(M)` in `G`-coordinates. -/
+private theorem derivedInG_le_fittingInG_of_low_rank
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hAM : A ≤ M) (hAne : A ≠ ⊥)
+    (hp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
+    derivedInG M ≤ S08.fittingInG M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : Nontrivial ↥M :=
+    (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 => hAne (le_bot_iff.mp (hM0 ▸ hAM))
+  have hoddM : Odd (Nat.card ↥M) := by
+    rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
+    · exact absurd (he.two_dvd.trans (Subgroup.card_subgroup_dvd_card M))
+        (by have := hG.odd; rw [Nat.odd_iff] at this; omega)
+    · exact ho
+  have hderiv : commutator ↥M ≤ Ch01.fitting ↥M :=
+    OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddM
+      (rank_fitting_subtype_le_two_of_low_rank hp hp')
+  exact Subgroup.map_mono hderiv
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
