@@ -86,13 +86,13 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   **残りは Hall `α(M)` / `σ(M)` の2連言を作り、capstoneで `M_α=⊥`/`≠⊥` を場合分けする配線**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重**。
   `rank(M/M_α)≤2` は Hall `α(M)` 仮定の下で `rank_quotient_Malpha_le_two_of_isHall` により
-  接続済み。さらに `derived_quotient_Malpha_le_fitting_of_isHall` により
-  `M'/M_α ≤ F(M/M_α)` も Hall `α(M)` 仮定下で接続済みで、
-  `Msigma_quotient_Malpha_le_fitting_of_isHall` により `M_σ` の商像も
-  `F(M/M_α)` に入る。さらに `Msigma_quotient_Malpha_isPiGroup_alphaCompl_of_isHall`
-  によりこの商像の α'-性も接続済み。`fitting_quotient_oPiCore_isPiGroup_compl` /
+  接続済み。`fitting_quotient_oPiCore_isPiGroup_compl` /
   `fitting_quotient_Malpha_isPiGroup_alphaCompl` により BG の
-  **`F(M/M_α)` is an α'-group** は Hall `α(M)` 仮定なしで完成。
+  **`F(M/M_α)` is an α'-group** は Hall `α(M)` 仮定なしで完成。さらに
+  `rank_fitting_quotient_Malpha_le_two` により **`rank F(M/M_α)≤2`** も Hall 仮定なしで完成し、
+  `derived_quotient_Malpha_le_fitting` / `Msigma_quotient_Malpha_le_fitting` /
+  `Msigma_quotient_Malpha_isPiGroup_alphaCompl` により `M'/M_α≤F(M/M_α)`、
+  `M_σ/M_α≤F(M/M_α)`、および `M_σ/M_α` の α'-性も Hall 仮定なしで接続済み。
   残りは
   `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。

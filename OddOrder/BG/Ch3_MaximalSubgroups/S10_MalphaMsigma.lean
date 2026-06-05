@@ -1377,20 +1377,60 @@ theorem rank_quotient_Malpha_le_two_of_isHall [Finite G] {M : Subgroup G}
     exact (Ch1.S04.pRank_quotient_le_of_coprime
       (G := ↥M) (N := (Malpha M).subgroupOf M) hN_p').trans hM_rank
 
-/-- **BG Theorem 10.2(d), nilpotence entry point** (mmd L2733-2738): once
-`M_α` is an `α(M)`-Hall subgroup, the derived subgroup of `M/M_α` lies in the
-Fitting subgroup of `M/M_α`. -/
-theorem derived_quotient_Malpha_le_fitting_of_isHall [Finite G]
-    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+/-- **BG Theorem 10.2(d), Fitting rank part** (mmd L2733-2738):
+`F(M/M_α)` has rank at most two. For primes in `α(M)` this follows from
+`F(M/M_α)` being an `α(M)'`-group; for primes outside `α(M)`, the `α(M)`-core
+kernel is a `p'`-group, so quotienting by it does not increase `p`-rank. -/
+theorem rank_fitting_quotient_Malpha_le_two [Finite G] (M : Subgroup G) :
+    rank ↥(Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M)) ≤ 2 := by
+  let Q : Type _ := ↥M ⧸ (Malpha M).subgroupOf M
+  change rank ↥(Ch01.fitting Q) ≤ 2
+  rw [rank_le_iff]
+  intro p hp
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_cases hpα : p ∈ alpha M
+  · by_contra hpRank
+    have h3 : 3 ≤ pRank ↥(Ch01.fitting Q) p := by omega
+    have hpos : 0 < pRank ↥(Ch01.fitting Q) p := by omega
+    have hpF : p ∈ (Nat.card ↥(Ch01.fitting Q)).primeFactors :=
+      OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank
+        (H := ↥(Ch01.fitting Q)) (p := p) hpos
+    exact fitting_quotient_Malpha_isPiGroup_alphaCompl M p hpF hpα
+  · have hN_p' : ¬ p ∣ Nat.card ↥((Malpha M).subgroupOf M) := by
+      intro hdiv
+      have hpNsub : p ∈ (Nat.card ↥((Malpha M).subgroupOf M)).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hp, hdiv, Nat.card_pos.ne'⟩
+      have hpN : p ∈ (Nat.card ↥(Malpha M)).primeFactors := by
+        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toEquiv]
+        exact hpNsub
+      exact hpα (Malpha_isPiGroup M p hpN)
+    have hM_rank : pRank ↥M p ≤ 2 := by
+      by_contra hpMRank
+      have h3 : 3 ≤ pRank ↥M p := by omega
+      have hposM : 0 < pRank ↥M p := by omega
+      have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+        OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (H := ↥M) (p := p) hposM
+      have hpα' : p ∈ alpha M := by
+        rw [mem_alpha_iff]
+        exact ⟨hpM, h3⟩
+      exact hpα hpα'
+    have hFQ_pRank : pRank ↥(Ch01.fitting Q) p ≤ pRank Q p :=
+      pRank_le_of_injective
+        (f := (Ch01.fitting Q).subtype) (Ch01.fitting Q).subtype_injective
+    exact hFQ_pRank.trans
+      ((Ch1.S04.pRank_quotient_le_of_coprime
+        (G := ↥M) (N := (Malpha M).subgroupOf M) hN_p').trans hM_rank)
+
+/-- **BG Theorem 10.2(d), nilpotence entry point** (mmd L2733-2738): the
+derived subgroup of `M/M_α` lies in the Fitting subgroup of `M/M_α`. -/
+theorem derived_quotient_Malpha_le_fitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     commutator (↥M ⧸ (Malpha M).subgroupOf M) ≤
       Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M) := by
   let Q : Type _ := ↥M ⧸ (Malpha M).subgroupOf M
   change commutator Q ≤ Ch01.fitting Q
-  have hQrank : rank Q ≤ 2 := rank_quotient_Malpha_le_two_of_isHall hHallα
   have hFQrank : rank ↥(Ch01.fitting Q) ≤ 2 :=
-    (OddOrder.GroupTheory.rank_le_of_injective
-      (f := (Ch01.fitting Q).subtype) (Ch01.fitting Q).subtype_injective).trans hQrank
+    rank_fitting_quotient_Malpha_le_two M
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
   haveI : IsSolvable Q := inferInstance
   have hoddM : Odd (Nat.card ↥M) := by
@@ -1420,12 +1460,10 @@ theorem derived_quotient_Malpha_le_fitting_of_isHall [Finite G]
     exact OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddQ hFQrank
 
 /-- **BG Theorem 10.2(d), `M_σ/M_α` Fitting containment** (mmd L2733-2738):
-once `M_α` is an `α(M)`-Hall subgroup, the image of `M_σ` in `M/M_α` lies in the
-Fitting subgroup of the quotient. This combines Step 2 (`M_σ ≤ M'`) with the quotient
-derived-subgroup containment above. -/
-theorem Msigma_quotient_Malpha_le_fitting_of_isHall [Finite G]
-    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+the image of `M_σ` in `M/M_α` lies in the Fitting subgroup of the quotient. This
+combines Step 2 (`M_σ ≤ M'`) with the quotient derived-subgroup containment above. -/
+theorem Msigma_quotient_Malpha_le_fitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M)) ≤
       Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M) := by
   let N : Subgroup ↥M := (Malpha M).subgroupOf M
@@ -1444,26 +1482,17 @@ theorem Msigma_quotient_Malpha_le_fitting_of_isHall [Finite G]
       rw [map_commutator_eq, MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective N),
         _root_.commutator_def]
     _ ≤ Ch01.fitting (↥M ⧸ N) :=
-      derived_quotient_Malpha_le_fitting_of_isHall hG hM hHallα
+      derived_quotient_Malpha_le_fitting hG hM
 
 /-- **BG Theorem 10.2(d), `M_σ/M_α` is an `α(M)'`-group** (mmd L2735-2738):
-once `M_α` is an `α(M)`-Hall subgroup, the quotient `M/M_α` has no `α(M)`-prime
-divisors, hence neither does the image of `M_σ`. -/
-theorem Msigma_quotient_Malpha_isPiGroup_alphaCompl_of_isHall [Finite G] {M : Subgroup G}
-    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+the image of `M_σ` lies in `F(M/M_α)`, and that Fitting subgroup is an
+`α(M)'`-group. -/
+theorem Msigma_quotient_Malpha_isPiGroup_alphaCompl [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Ch03.Subgroup.IsPiGroup (alpha M)ᶜ
-      (((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))) := by
-  intro r hr
-  have hHallαM : Ch03.IsHallSubgroup (alpha M) ((Malpha M).subgroupOf M) :=
-    Malpha_subgroupOf_isHall_of_isHall hHallα
-  have hrQ : r ∈ (Nat.card (↥M ⧸ (Malpha M).subgroupOf M)).primeFactors :=
-    Nat.primeFactors_mono
-      (Subgroup.card_subgroup_dvd_card
-        (((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))))
-      Nat.card_pos.ne' hr
-  have hridx : r ∈ ((Malpha M).subgroupOf M).index.primeFactors := by
-    simpa [Subgroup.index] using hrQ
-  exact hHallαM.2 r hridx
+      (((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))) :=
+  Ch03.Subgroup.IsPiGroup.le (Msigma_quotient_Malpha_le_fitting hG hM)
+    (fitting_quotient_Malpha_isPiGroup_alphaCompl M)
 
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
