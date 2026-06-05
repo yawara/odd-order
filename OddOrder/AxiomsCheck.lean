@@ -1769,6 +1769,10 @@ set_option linter.style.longLine false in
 -- for `N ⊴ G`, `N ≤ K ≤ G` (= `sumNonInflatedDegreeSq` + Lagrange index arithmetic).  The mmd
 -- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
+-- Section form of [Is] Cor 2.30 (Peterfalvi (6.2)/(6.6) θ-bound section case): φ trivial on N,
+-- D/N central in G/N ⟹ φ(1)² ≤ |G:D|, via inflation to G/N + the central degree bound.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.degree_sq_le_index_of_central_quotient
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
