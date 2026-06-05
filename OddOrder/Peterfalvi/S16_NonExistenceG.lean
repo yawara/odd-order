@@ -3439,6 +3439,97 @@ theorem relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U
   · right
     exact hPU
 
+/-- BG Appendix C Step 3 bad branch, first concrete consequence: if the relevant
+intersection is all of `PU`, then conjugation by `t²` sends every element of
+`PU` back into `PU`.
+
+The next theorem upgrades this inclusion to normalization using `t ^ p = 1`;
+the remaining bad-branch work is BG's `P char PU`, `P₁` normalizes `P`, and
+`P₀=P₁` contradiction. -/
+theorem step3_badBranch_t_sq_conj_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hbad :
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
+        hyp.base.P ⊔ hyp.base.U) :
+    ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U →
+      data.t ^ 2 * x * (data.t ^ 2)⁻¹ ∈ hyp.base.P ⊔ hyp.base.U := by
+  classical
+  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  intro x hx
+  have hx_inf : x ∈ PU ⊓ (MulAut.conj ((data.t ^ 2)⁻¹) • PU) := by
+    rw [hbad]
+    simpa [PU] using hx
+  have hx_smul : x ∈ MulAut.conj ((data.t ^ 2)⁻¹) • PU := hx_inf.2
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx_smul
+  have hsmul : ((MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ • x) =
+      data.t ^ 2 * x * (data.t ^ 2)⁻¹ := by
+    rw [show ((MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ • x) =
+        (MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ x from rfl,
+      MulAut.conj_inv_apply]
+    group
+  rw [hsmul] at hx_smul
+  simpa [PU] using hx_smul
+
+/-- BG Appendix C Step 3 bad branch: the previous one-sided inclusion upgrades to
+normalization of `PU` because `t²` has finite `p`-power order.  This is the
+formal version of BG's line “hence `t₁` normalizes `PU`” for the current
+`t₁ = t²` branch. -/
+theorem step3_badBranch_t_sq_normalizes_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hbad :
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
+        hyp.base.P ⊔ hyp.base.U) :
+    data.t ^ 2 ∈ Subgroup.normalizer ((hyp.base.P ⊔ hyp.base.U : Subgroup G) : Set G) := by
+  classical
+  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let g : G := data.t ^ 2
+  have hinc : ∀ ⦃x : G⦄, x ∈ PU → g * x * g⁻¹ ∈ PU := by
+    intro x hx
+    simpa [g, PU] using data.step3_badBranch_t_sq_conj_mem_P_sup_U hbad hx
+  have hgpow : g ^ hyp.base.p = 1 := by
+    calc
+      g ^ hyp.base.p = (data.t ^ 2) ^ hyp.base.p := by rfl
+      _ = data.t ^ (2 * hyp.base.p) := by rw [pow_mul]
+      _ = data.t ^ (hyp.base.p * 2) := by rw [Nat.mul_comm]
+      _ = (data.t ^ hyp.base.p) ^ 2 := by rw [pow_mul]
+      _ = 1 := by rw [data.t_pow_p_eq_one, one_pow]
+  have hiter : ∀ (n : ℕ) ⦃x : G⦄, x ∈ PU → g ^ n * x * (g ^ n)⁻¹ ∈ PU := by
+    intro n
+    induction n with
+    | zero =>
+        intro x hx
+        simpa using hx
+    | succ n ih =>
+        intro x hx
+        have hn := ih hx
+        have h := hinc hn
+        simpa [pow_succ', mul_assoc] using h
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have g_inv_eq : g⁻¹ = g ^ (hyp.base.p - 1) := by
+    have hmul : g ^ (hyp.base.p - 1) * g = 1 := by
+      calc
+        g ^ (hyp.base.p - 1) * g = g ^ ((hyp.base.p - 1) + 1) := by
+          rw [pow_succ]
+        _ = g ^ hyp.base.p := by
+          rw [Nat.sub_one_add_one_eq_of_pos hp_pos]
+        _ = 1 := hgpow
+    exact inv_eq_of_mul_eq_one_left hmul
+  have hinv_inc : ∀ ⦃x : G⦄, x ∈ PU → g⁻¹ * x * (g⁻¹)⁻¹ ∈ PU := by
+    intro x hx
+    have h := hiter (hyp.base.p - 1) hx
+    simpa [g_inv_eq] using h
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · intro hx
+    exact hinc hx
+  · intro hx
+    have hpre := hinv_inc (x := g * x * g⁻¹) hx
+    convert hpre using 1
+    group
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form

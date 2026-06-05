@@ -138,8 +138,13 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U` turns the concrete `(C.9)`
   memberships into the displayed `U`-membership when Step3 identifies the Lean-convention
   intersection `PU ∩ (PU)^{t^{-2}}` with `U`.  `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U`
-  then applies the Step3 dichotomy itself: either `(C.10)` is forced, or the only remaining
-  obstruction is the bad branch `PU ∩ (PU)^{t^{-2}} = PU` (plus global `(C.6)` nonzero wiring).
+  then applies the Step3 dichotomy itself: either `(C.10)` is forced, or the remaining
+  branch is `PU ∩ (PU)^{t^{-2}} = PU` (plus global `(C.6)` nonzero wiring).
+- **🆕 (2026-06-06) Step3 bad branch to normalizer done**:
+  `step3_badBranch_t_sq_conj_mem_P_sup_U` extracts the one-sided conjugation inclusion from
+  the bad branch, and `step3_badBranch_t_sq_normalizes_P_sup_U` upgrades it to
+  `t² ∈ N_G(PU)` using `t^p=1`.  The remaining mathematical chunk is the rest of BG Step 3:
+  `P char PU`, then `P₁` normalizes `P`, then the `P₀=P₁` contradiction.
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -225,7 +230,8 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
    `c₁,c₃≠0` が入れば、`relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` が
    `w₁=w₂=w₃=1` と (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1` まで出す。さらに C9 membership +
    Step3 dichotomy は `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U` で
-   Lean 化済。残りは bad branch `PU ∩ (PU)^{t^{-2}} = PU` の排除と global C.6 非零 fact の接続。
+   Lean 化済。bad branch は `step3_badBranch_t_sq_normalizes_P_sup_U` で `t² ∈ N_G(PU)` まで進んだ。
+   残りは BG Step3 後半の `P char PU` → `P₁` normalizes `P` → `P₀=P₁` 矛盾と、global C.6 非零 fact の接続。
    mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
 6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
    `y∈ker((s⁻¹+1-s₁⁻¹s⁻¹-s₃)(s⁻¹-1))`。**FPF** (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`,
@@ -317,8 +323,8 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
 | **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
 | **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` and the exact displayed word equation | ✅ `relationC9_w3_mem_P_sup_U_and_conj`, `relationC9_w3_word`; post-`w₃=1` collapse to `w₁^(p-1)=w₂^(p-1)=1` landed with explicit `c₃≠0` input |
-| Step3 適用 | `S₁W₃^(p-1)S₁⁻¹∈U` + C.6 `c₁,c₃≠0` ⟹ `w₁=w₂=w₃=1` | ✅ consumer landed; ✅ U-branch/dichotomy connected by `relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U` and `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U`; bad branch `PU∩(PU)^{t^{-2}}=PU` remains |
-| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | ✅ included once the Step3 dichotomy is in the `U` branch; otherwise exactly the bad branch above remains |
+| Step3 適用 | `S₁W₃^(p-1)S₁⁻¹∈U` + C.6 `c₁,c₃≠0` ⟹ `w₁=w₂=w₃=1` | ✅ consumer landed; ✅ U-branch/dichotomy connected by `relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U` and `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U`; bad branch pushed to `t²∈N_G(PU)` by `step3_badBranch_t_sq_normalizes_P_sup_U` |
+| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | ✅ included once the Step3 dichotomy is in the `U` branch; otherwise the remaining task is BG Step3's characteristic/Sylow contradiction from `t²∈N_G(PU)` |
 | mod Q | `P₀∩Q=1` ⟹ `s₁s₂s₃=1` | **既存** `W2_inf_Q_eq_bot` (S16:1454) |
 | **kernel** | End([Q,P₀]) で `y ∈ ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` | **新規 + (X)/(XI) 要** (§4) |
 | FPF | s⁻¹ が [Q,P₀] 上 fixed-point-free ⟹ `(s⁻¹−1)` 可逆 ⟹ `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)` | **新規 + (X)/(XI) 要** |
@@ -351,8 +357,8 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
      (`fieldNormalizerFrobeniusHom`) landed.  ✅ powered `(C.5)` package transport
      (`Step4C5NormalForms.frobenius`) landed.  ✅ exact `(C.9)` word and the post-`w₃=1`
      `(C.9)` collapse landed.  ✅ Step3-recipient C.10 theorem landed.
-   - 残る producer は Step3 から `S₁ W₃^(p-1) S₁⁻¹ ∈ U` を出す部分と、global `(C.6)` の
-     `c₁,c₃≠0` 配線。
+   - Step3 の `U`-branch producer は接続済み。bad branch は `t²∈N_G(PU)` まで Lean 化済み。
+     残る producer は BG Step3 後半の characteristic/Sylow 矛盾と、global `(C.6)` の `c₁,c₃≠0` 配線。
    - `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`) は C.10 後の残り。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):
    - `y_mem_ker_of_relationC10` : `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))`。
@@ -420,15 +426,16 @@ coprime 作用の標準事実**ゆえ:
     で y=yD·yC、yC∈C_Q(W2) が s と可換 ⟹ t = y·s·y⁻¹ = yD·s·yD⁻¹。kernel 段は yD (∈[Q,W2]) を使える。
 - 🔴 残り (Step 4 の残作業、(X)/(XI) infra は完了):
   1. **Step3 bad-branch 排除**: exact `(C.9)` の membership と Step3 dichotomy は
-     `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U` まで landed。残る producer は
-     bad branch `PU ∩ (PU)^{t^{-2}} = PU` を BG Step3 の `P₀=P₁` 矛盾へ落とし、global C.6 の
+     `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U` まで landed。bad branch から
+     `t²∈N_G(PU)` までは `step3_badBranch_t_sq_normalizes_P_sup_U` で landed。残る producer は
+     BG Step3 後半の `P char PU` → `P₁` normalizes `P` → `P₀=P₁` 矛盾を形式化し、global C.6 の
      `c₁,c₃≠0` とともに C.10 consumer へ渡すこと。
   2. **(C.10)→kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を
      ⁅Q,W2⁆ 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`;
      s-only 形は W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化
      → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
   3. **`s₁=s⁻¹` capstone** + 配線 (経路A: `appC_normSet_generator_relation_of_first_k_three_coordinate`)。
-  ⟹ infra (X)/(XI) は全て landed。残りは Step3 producer (1) → End 計算 (2) → capstone (3)。
+  ⟹ infra (X)/(XI) は全て landed。残りは Step3 characteristic/Sylow contradiction (1) → End 計算 (2) → capstone (3)。
 
 ---
 
