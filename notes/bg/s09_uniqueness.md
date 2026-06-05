@@ -7,6 +7,35 @@
 
 ---
 
+## 🔴 2026-06-05 BLOCKER UPDATE — §9 keystone 2 sorry は上流2補題待ち (workflow 監査)
+
+`bg-s09-close-uniqueness` workflow (understand→design→implement→verify, adversarial) で
+**Thm 9.1 (`noncyclic_isUniquelyMaximal_of_centralizer_le` L113) / Lemma 9.5
+(`scn3_isUniquelyMaximal` L3559) は今は閉じられない**と判明 (laundering 拒否, tree は元のまま green)。
+「§7/§8/§6 完成 = 解禁」は不正確で、実際は**さらに2つの上流補題**が必要:
+
+- **L1 = 一般 Hall-Higman 1.2.3 (Isaacs 3.21)**: `C_G(O_{π',π}(G)) ≤ O_{π',π}(G)` (O_{π'}=⊥ 仮定なし)。
+  repo の `hall_higman_1_2_3` / `hall_higman_solvable_specialization` は **O_{π'}=⊥ 特殊形のみ**。
+  Thm 9.1 STEP2/3 の Eq(9.1) `⟨ℋ_G(P;p')⟩=O_{p'}(M)` (O_{p'}(M)≠⊥ 分岐) を解禁。
+  → **商 Ḡ=G/O_{π'}(G) で特殊形を適用** (`oPiCore_quotient_self_eq_bot` で O_{π'}(Ḡ)=⊥, `oPiPrimePiCore`
+  定義で O_π(Ḡ)=O_{π',π}(G)/O_{π'}(G)) し pull-back。商 API は揃っており **bounded・landable**。
+  **両 keystone のクリティカルパス** (Lemma 9.5 も Thm 9.1 を2回呼ぶ) ⇒ 最優先。
+- **L2 = BG Thm 4.20(c) 存在** `exists_characteristicSylowSeriesPackage_of_solvable_odd`:
+  `CharacteristicSylowSeriesPackage` (S04g:1618) は **producer ゼロ**, §9 helper ~40 個が仮説として消費。
+  toolkit (`consTop`/`lift_oPiCore_of_hasNormalPComplement_ne`) はあるが帰納構成が未記述。L1 より重い。
+  Lemma 9.5 専用解禁 (Thm 9.1 とは別ゲート)。
+
+**Thm 9.1 内部の他 STEP** (workflow 報告): STEP0 (a)⇒(b) 還元は **証明済・leaf-build 確認** (`sSup_hInvariant_le_of_centralizer_le`,
+Prop1.16/Isaacs6.21 経由) だが dead code 回避で revert。STEP6 rank 限界は **解禁済**
+(`rank_le_two_of_no_uniqueMaximal_subgroups_le_fitting` S09:2487, sorry-free, M:=H で instantiate)。
+STEP3 O_{p'}=⊥ 分岐は S08 infra で doable, STEP4 |H∩M|_p-maximality bookkeeping は intricate だが doable,
+STEP5/7 は mechanical。**真の blocker は L1 (STEP2/3 一般分岐) のみ**。
+
+**推奨攻略順**: (1) L1 一般 Hall-Higman → (2) Thm 9.1 close (STEP0 再land+STEP3一般+STEP4+5/6/7) →
+(3) L2 Thm 4.20(c) 存在 → (4) Lemma 9.5 assembly。各段 build-green+axiom-clean で1 workflow。
+
+---
+
 ## TL;DR — Phase 2a 中盤の山場
 
 §9 は BG のクリティカルパスの**第 3 段階**（§7 Transitivity → §8 Fitting of Max → **§9 Uniqueness**）の最終仕上げ。最小反例 G に対して、**rank ≥ 2 の部分群 K は（一定条件下で）maximal subgroup のいずれかに含まれる** ことを示す（Theorem 9.6）。これは Ch.3 (§10-§13) で maximal subgroup の構造を詳しく分析するための **基礎的な整理定理** として機能する。
