@@ -115,8 +115,16 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `fieldNormalizerFrobeniusHom_inl`, `fieldNormalizerFrobeniusHom_inr`, and
   `fieldNormalizerFrobeniusHom_primeLineElement`.  This is the reusable engine for applying
   Frobenius to a `(C.5)` normal-form equation and keeping the prime-line factor `sᵢ` fixed.
-  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は this hom を
-  `forms.hM1/hM2/hM3` に適用して powered `(C.5)` normal forms を構成する。
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.
+- **🆕 (2026-06-06) C.8 powered `(C.5)` transport done**:
+  `fieldNormalizerFrobeniusHom_primeLineGenerator(_zpow)`,
+  `frobenius_step4_sigma_inr_decomposition`,
+  `Step4C5NormalForms.hM1_frobenius/hM2_frobenius/hM3_frobenius`, and
+  `Step4C5NormalForms.frobenius` landed.  A whole `(C.5)` package for `(a,b)` now gives
+  the powered package for `(a^p,b^p)` with the same `cᵢ` and `uᵢ,vᵢ` replaced by
+  `uᵢ^p,vᵢ^p`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は
+  original `forms` と `forms.frobenius` の `(C.7)` を比較して `(C.9)`、すなわち
+  `wᵢ^(p-1)=1` を作る。
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -286,7 +294,7 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.5)** | Step1 正規形 `uᵢsᵢvᵢ` (i=1,2,3) | **既存** `exists_sigma_normOne_primeLine_normOne_of_mem_PU` (S16:617) |
 | **(C.6)** | `sᵢ≠1` | **既存** Step2 `generatorRelation_step2_primeLine*` (S16:643/672) + Step3 (下記) |
 | **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
-| **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | pair entry + concrete semidirect Frobenius map landed; C.5 equation transport remains |
+| **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
 | **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | 新規 |
 | Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, 同様に `w₁=w₂=1` | bridge landed: `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one`; Step3/Step2 production of powers remains |
 | **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | bridge landed: `relationC10_of_w_eq_one`; actual `wᵢ=1` derivation remains |
@@ -319,8 +327,8 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
    - ✅ `relationC7` landed.  ✅ `unitVal_inv_frobenius_pair` landed.
      ✅ condition A / C.10 bridge (`w_eq_one_of_pow_sub_one_eq_one`,
      `relationC10_of_w_eq_one`) landed.  ✅ concrete semidirect Frobenius map
-     (`fieldNormalizerFrobeniusHom`) landed.  次は `frobenius_replacement_C8` :
-     this hom を `forms.hM1/hM2/hM3` に適用して powered `(C.5)` normal forms を作る。
+     (`fieldNormalizerFrobeniusHom`) landed.  ✅ powered `(C.5)` package transport
+     (`Step4C5NormalForms.frobenius`) landed.  次は powered `(C.7)` comparison → `(C.9)`。
    - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
      条件Aで潰す bridge は landed; `wᵢ^(p-1)=1` を作る比較が残り。
    - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1` は `wᵢ=1` 仮定から landed; `s₁s₂s₃_eq_one`
