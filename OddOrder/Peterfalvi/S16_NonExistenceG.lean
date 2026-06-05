@@ -3234,6 +3234,27 @@ theorem caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
   have hge : 588 ≤ nc.h - 1 := by omega
   omega
 
+/-- **Peterfalvi (14.15)**: arithmetic spine of the non-full cyclotomic
+case-(a) branch. Once the preceding group-theoretic part of the paragraph has
+supplied `p ≡ 1 mod q`, the lower comparison `p^q < h - 1`, and
+`h ≥ 31 * 19`, the case-(a) bound forces `q = 3`, then `p = 7`, and finally
+the numerical contradiction `31 * 19 - 1 ≤ 20 * 21`. -/
+theorem caseA_contradiction_of_p_modEq_one_and_h_bounds
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (hcaseA : data.caseA)
+    (hmod : hyp.base.p ≡ 1 [MOD hyp.base.q])
+    (hpow_lt_h : hyp.base.p ^ hyp.base.q < nc.h - 1)
+    (hh : 31 * 19 ≤ nc.h) :
+    False := by
+  have hpq2 := data.p_pow_q_sub_two_lt_q_sq_of_p_pow_lt_h_sub_one hcaseA hpow_lt_h
+  have hq3 := hyp.q_eq_three_of_p_pow_q_sub_two_lt_q_sq hpq2
+  have hp_lt_q_sq : hyp.base.p < hyp.base.q ^ 2 := by
+    simpa [hq3] using hpq2
+  have hp7 :=
+    hyp.p_eq_seven_of_q_eq_three_modEq_one_and_lt_q_sq hq3 hmod hp_lt_q_sq
+  exact data.caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
+    hcaseA hq3 hp7 hh
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3257,8 +3278,10 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
-  · -- Non-exceptional branch of (14.14): use `data.caseA_bound hcaseA` to
-    -- compare `h = |H|` with the cyclotomic order data from (14.6).
+  · -- Non-exceptional branch of (14.14): the arithmetic spine is now
+    -- `data.caseA_contradiction_of_p_modEq_one_and_h_bounds`.  The remaining
+    -- work is to derive its three group-theoretic inputs from the non-full
+    -- cyclotomic branch of (14.6) and the fixed-point-free action of `W1`.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
