@@ -871,6 +871,103 @@ theorem Malpha_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) : Malpha M ≤ Msigma M :=
   Subgroup.map_mono (Ch03.oPiCore_mono (alpha_subset_sigma hG hM) ↥M)
 
+/-- A minimal simple group is perfect: `G' = G` (`G'` is normal and `≠ ⊥`, else `G` abelian). -/
+private theorem commutator_eq_top [Finite G] (hG : IsMinimalSimpleOdd G) : commutator G = ⊤ := by
+  refine (hG.simple.eq_bot_or_eq_top_of_normal (commutator G) inferInstance).resolve_left ?_
+  intro h
+  exact hG.notSolvable ⟨1, by rw [derivedSeries_one]; exact h⟩
+
+/-- **σ basic fact, every Sylow** (mmd L2655): for `p ∈ σ(M)` and *any* Sylow `p`-subgroup `P` of
+`M`, its image `P̄` is a Sylow `p`-subgroup of `G`. Same argument as `exists_sylow_le_of_mem_sigma`
+but for an arbitrary Sylow `P`, using `normalizer_sylow_map_le_of_mem_sigma`. -/
+private theorem isSylow_sylowMap_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) (P : Sylow p ↥M) :
+    ∃ S : Sylow p G, (S : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+  set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbar
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
+  have hP : Subgroup.normalizer (Pbar : Set G) ≤ M := normalizer_sylow_map_le_of_mem_sigma hp P
+  have hPbar_subOf : Pbar.subgroupOf M = (P : Subgroup ↥M) := by
+    rw [hPbar, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  obtain ⟨S, hPS⟩ := hPbar_pg.exists_le_sylow
+  refine ⟨S, ?_⟩
+  by_contra hne
+  have hlt : Pbar < (S : Subgroup G) := lt_of_le_of_ne hPS (Ne.symm hne)
+  have hgrow : Pbar < Subgroup.normalizer Pbar ⊓ (S : Subgroup G) :=
+    lt_inf_normalizer_of_lt_of_isPGroup hlt S.2
+  set Y : Subgroup G := Subgroup.normalizer Pbar ⊓ (S : Subgroup G) with hY
+  have hYM : Y ≤ M := le_trans inf_le_left hP
+  have hYpg : IsPGroup p ↥Y :=
+    S.2.of_injective (Subgroup.inclusion inf_le_right) (Subgroup.inclusion_injective _)
+  have hPle : (P : Subgroup ↥M) ≤ Y.subgroupOf M :=
+    hPbar_subOf ▸ Subgroup.comap_mono (f := M.subtype) hgrow.le
+  have hYsubM_pg : IsPGroup p ↥(Y.subgroupOf M) :=
+    hYpg.of_equiv (Subgroup.subgroupOfEquivOfLe hYM).symm
+  have hYeq : Y.subgroupOf M = (P : Subgroup ↥M) := P.3 hYsubM_pg hPle
+  have hYP : Y = Pbar := by
+    have := congrArg (Subgroup.map M.subtype) hYeq
+    rwa [Subgroup.map_subgroupOf_eq_of_le hYM, ← hPbar] at this
+  exact absurd hYP hgrow.ne'
+
+/-- **BG Theorem 10.2, step 2 (per-Sylow)** (mmd L2725-2731): for `p ∈ σ(M)` and a Sylow
+`p`-subgroup `P` of `M`, the image `P̄ ≤ M'`. `P̄ ∈ Syl_p(G)` (σ) and `G' = G`, so the Focal
+Subgroup Theorem gives `P̄.focalSubgroup = G' ⊓ P̄ = P̄`; Theorem 10.1(a) (with `X = ⟨x⟩`) shows
+`M` controls `G`-fusion in `P̄`, so the focal subgroup computed inside `M` agrees, yielding
+`M' ⊓ P̄ = P̄`, i.e. `P̄ ≤ M'`. -/
+private theorem sylow_le_derived_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ sigma M) (P : Sylow p ↥M) :
+    (P : Subgroup ↥M).map M.subtype ≤ derivedInG M := by
+  set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbar
+  have hPbar_le_M : Pbar ≤ M := Subgroup.map_subtype_le _
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
+  have hPbar_subOf : Pbar.subgroupOf M = (P : Subgroup ↥M) := by
+    rw [hPbar, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  -- `M` controls `G`-fusion in `P̄` (Theorem 10.1(a) applied to `⟨x⟩`).
+  have hctrl : M.ControlsFusionIn Pbar := by
+    intro x y hxP hyP hxy
+    obtain ⟨g, hg⟩ := hxy
+    by_cases hx1 : x = 1
+    · refine ⟨1, M.one_mem, ?_⟩
+      have hy1 : y = 1 := by rw [hx1, mul_one, mul_inv_cancel] at hg; exact hg.symm
+      rw [hx1, hy1]; group
+    · set X := Subgroup.zpowers x with hXdef
+      have hxX : x ∈ X := Subgroup.mem_zpowers x
+      have hXleP : X ≤ Pbar := Subgroup.zpowers_le.mpr hxP
+      have hXne : X ≠ ⊥ := by rw [hXdef]; exact mt Subgroup.zpowers_eq_bot.mp hx1
+      have hXp : IsPGroup p ↥X :=
+        hPbar_pg.of_injective (Subgroup.inclusion hXleP) (Subgroup.inclusion_injective _)
+      have hXM : X ≤ M := hXleP.trans hPbar_le_M
+      have hconjX : MulAut.conj g • X = Subgroup.zpowers y := by
+        have hgx : (MulAut.conj g : G →* G) x = y := by
+          simpa [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hg
+        rw [hXdef, mulAut_smul_eq_map, MonoidHom.map_zpowers, hgx]
+      have hconjg : MulAut.conj g • X ≤ M := by
+        rw [hconjX]; exact Subgroup.zpowers_le.mpr (hPbar_le_M hyP)
+      obtain ⟨m, hmM, c, hcC, hgmc⟩ :=
+        (fusion_control_of_mem_sigma hG hM hp hXne hXp).1 hXM g hconjg
+      refine ⟨m, hmM, ?_⟩
+      have hxc : x * c = c * x := Subgroup.mem_centralizer_iff.mp hcC x hxX
+      have hcx : c * x * c⁻¹ = x := by rw [← hxc]; group
+      calc m * x * m⁻¹ = m * (c * x * c⁻¹) * m⁻¹ := by rw [hcx]
+        _ = m * c * x * (m * c)⁻¹ := by group
+        _ = g * x * g⁻¹ := by rw [← hgmc]
+        _ = y := hg
+  -- focal subgroups agree (`M`-focal maps to `G`-focal).
+  have hfa := Subgroup.focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn hPbar_le_M hctrl
+  -- `P̄.focalSubgroup = P̄` (Focal Thm for `P̄ ∈ Syl_p(G)` + `G' = G`).
+  obtain ⟨S, hS⟩ := isSylow_sylowMap_of_mem_sigma hp P
+  have hPbar_focal : Pbar.focalSubgroup = Pbar := by
+    have h := Subgroup.commutator_inf_eq_focalSubgroup S
+    rw [hS] at h
+    rw [← h, commutator_eq_top hG, top_inf_eq]
+  -- `(P̄.subgroupOf M).focalSubgroup = M' ⊓ P̄` (Focal Thm inside `↥M`).
+  have hP_focal : (Pbar.subgroupOf M).focalSubgroup = commutator ↥M ⊓ (P : Subgroup ↥M) := by
+    rw [hPbar_subOf, ← Subgroup.commutator_inf_eq_focalSubgroup P]
+  rw [hP_focal, hPbar_focal, Subgroup.map_inf _ _ M.subtype M.subtype_injective] at hfa
+  exact inf_eq_right.mp hfa
+
 /-- **BG Theorem 10.2** (mmd L2713): `M ∈ ℳ` のとき `M_σ`, `M_α` は `M` および `G` の Hall 部分群で、
 `M_α ⊆ M_σ ⊆ M'`、`M_σ ≠ 1`。(原典はさらに `r(M/M_α) ≤ 2` と `M'/M_α` nilpotent を含む —
 quotient 型の `Normal` instance 整備後に追加予定。) -/

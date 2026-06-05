@@ -49,9 +49,17 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 ## やること
 
 - [x] **`alpha_subset_sigma`** (α(M)⊆σ(M)): Step 1 の核。Thm 9.6 + 𝒰⟹N_G(P)⊆M (10.1 の r(P)≥3
-  分岐と同パターン)。商不要・自己完結。**⟹ `Malpha M ≤ Msigma M`** も従う (opiCore monotone)。← まず landable
-- [ ] **`Msigma_le_derived`** (M_σ⊆M', Step 2): Focal `focalSubgroup` 形 ⟷ fusion 接続 + Thm 10.1。商不要。
-- [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): Thm 4.20 package から O_q Sylow 抽出 + r(M)≤2 case。商ほぼ不要。
+  分岐と同パターン)。商不要・自己完結。**⟹ `Malpha M ≤ Msigma M`** も従う (opiCore monotone)。✅ commit 7af327a
+- [x] **`sylow_le_derived_of_mem_sigma`** (per-Sylow, Step 2 の核): p∈σ で Sylow-p P̄⊆M'。
+  `ControlsFusionIn`(=Thm 10.1(a) を X=⟨x⟩ で適用)+ `focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn`
+  (Isaacs Cor 5.22) + Focal Thm + `commutator_eq_top`(G'=G)。axiom-clean。helper:
+  `commutator_eq_top` / `isSylow_sylowMap_of_mem_sigma`(全 Sylow-p of M は G の Sylow)。✅
+- [ ] **`Msigma_le_derived`** (M_σ⊆M' 全体): per-Sylow core から **generation glue**。mathlib に
+  非nilpotent用 Sylow生成補題が無い ⟹ 各 h∈O_σ(↥M) で ⟨h⟩ (cyclic⟹nilpotent) に
+  `Ch01.iSup_default_sylow_eq_top_of_nilpotent` を使い ⟨h⟩=⨆Sylow⊆commutator ↥M (各 Sylow⊆ via per-Sylow)
+  ⟹ h∈commutator ↥M。per-element ~40行。← 次の landable
+- [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): M_α≠⊥ なら `Malpha_le_Msigma` で済; M_α=⊥ なら r(M)≤2
+  (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。**(d) と entangle**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
   - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。
   - M(σ)=M_σ: M(σ)/M_α normal Hall in F(M/M_α) char ⟹ M(σ)⊴M。
