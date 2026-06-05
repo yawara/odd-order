@@ -157,6 +157,50 @@ theorem x_ge_caseA_min_of_decomposition_modEq_and_odd
   rw [hx_eq]
   nlinarith [Nat.mul_le_mul_right hyp.base.p hn_ge]
 
+/-- **Peterfalvi (14.16)**: the parity estimate for the quotient `x = h / u`.
+If `x ≡ 1` modulo both `p` and `q`, then CRT gives `x ≡ 1 mod p q`;
+oddness and `x ≠ 1` force the first nontrivial possibility to be beyond
+`2 p q`. -/
+theorem quotient_gt_two_mul_pq_of_modEq_one_mod_p_and_q
+    (hyp : Hypothesis (G := G)) {x : ℕ}
+    (hx_mod_p : x ≡ 1 [MOD hyp.base.p])
+    (hx_mod_q : x ≡ 1 [MOD hyp.base.q])
+    (hx_odd : Odd x) (hx_ne_one : x ≠ 1) :
+    2 * (hyp.base.p * hyp.base.q) < x := by
+  have hpq_coprime : Nat.Coprime hyp.base.p hyp.base.q :=
+    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
+  have hx_mod_pq : x ≡ 1 [MOD hyp.base.p * hyp.base.q] :=
+    (Nat.modEq_and_modEq_iff_modEq_mul hpq_coprime).mp ⟨hx_mod_p, hx_mod_q⟩
+  have hx_ge_one : 1 ≤ x := by
+    rcases hx_odd with ⟨k, hk⟩
+    omega
+  rcases (Nat.modEq_iff_exists_eq_add hx_ge_one).mp hx_mod_pq.symm with ⟨n, hx_eq⟩
+  have hn_ne_zero : n ≠ 0 := by
+    intro hn0
+    rw [hn0, mul_zero, add_zero] at hx_eq
+    exact hx_ne_one hx_eq
+  have hpq_odd : Odd (hyp.base.p * hyp.base.q) :=
+    hyp.base.p_odd.mul hyp.base.q_odd
+  have hn_even : Even n := by
+    by_contra hn_not_even
+    have hn_odd : Odd n := Nat.not_even_iff_odd.mp hn_not_even
+    have hpqn_odd : Odd ((hyp.base.p * hyp.base.q) * n) :=
+      hpq_odd.mul hn_odd
+    have hx_even : Even x := by
+      rw [hx_eq]
+      exact (by norm_num : Odd 1).add_odd hpqn_odd
+    exact (Nat.not_even_iff_odd.mpr hx_odd) hx_even
+  have hn_ge_two : 2 ≤ n := by
+    rcases hn_even with ⟨k, hk⟩
+    have hk_pos : 0 < k := by
+      by_contra hk_not_pos
+      have hk0 : k = 0 := by omega
+      subst k
+      omega
+    omega
+  rw [hx_eq]
+  nlinarith [Nat.mul_le_mul_left (hyp.base.p * hyp.base.q) hn_ge_two]
+
 /-- The T-side cyclotomic quotient from **Peterfalvi (14.4)** is odd. -/
 theorem tSide_cyclotomic_quotient_odd (hyp : Hypothesis (G := G)) :
     Odd ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) :=
@@ -3651,6 +3695,120 @@ theorem caseA_contradiction_of_nonfull_fpf_card_congruences
         exact hux_mod_q
       exact hh_mod_x.symm.trans hh_mod_q)
 
+/-- **Peterfalvi (14.16)**: the case-(a) branch cannot occur when `H` is
+properly larger than `U`, once (14.15) and the fixed-point-free cardinal
+congruences have been materialized.  The proof follows Peterfalvi's paragraph:
+`x ≡ 1 mod p q` and odd `x ≠ 1` give `x > 2 p q`; the case-(a) bound then
+forces `2 u < p q`, contradicting `u ≡ 1 mod p q` and `u > 2 q`. -/
+theorem caseA_contradiction_of_full_u_card_congruences
+    [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (Sdata : CaseBForSData hyp)
+    (hcaseA : data.caseA)
+    (hu_full : hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (hu_dvd_h : hyp.base.u ∣ nc.h)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hh_mod_q : nc.h ≡ 1 [MOD hyp.base.q])
+    (hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q])
+    (hx_ne_one_of_quotient : ∀ x : ℕ, nc.h = hyp.base.u * x → x ≠ 1) :
+    False := by
+  rcases hu_dvd_h with ⟨x, hh_eq⟩
+  have hu_mod_p : hyp.base.u ≡ 1 [MOD hyp.base.p] := by
+    rw [hu_full]
+    exact cyclotomic_quotient_modEq_one_mod_base
+      hyp.base.p_prime.two_le hyp.base.q_prime.pos
+  have hx_mod_p : x ≡ 1 [MOD hyp.base.p] := by
+    have hux_mod_p : hyp.base.u * x ≡ x [MOD hyp.base.p] := by
+      simpa [one_mul] using hu_mod_p.mul_right x
+    have hh_mod_x : nc.h ≡ x [MOD hyp.base.p] := by
+      rw [hh_eq]
+      exact hux_mod_p
+    exact hh_mod_x.symm.trans hh_mod_p
+  have hx_mod_q : x ≡ 1 [MOD hyp.base.q] := by
+    have hux_mod_q : hyp.base.u * x ≡ x [MOD hyp.base.q] := by
+      simpa [one_mul] using hu_mod_q.mul_right x
+    have hh_mod_x : nc.h ≡ x [MOD hyp.base.q] := by
+      rw [hh_eq]
+      exact hux_mod_q
+    exact hh_mod_x.symm.trans hh_mod_q
+  have hh_odd : Odd nc.h := nc.h_odd _hG
+  have hux_odd : Odd (hyp.base.u * x) := by
+    rw [← hh_eq]
+    exact hh_odd
+  have hx_odd : Odd x := (Nat.odd_mul.mp hux_odd).2
+  have hx_gt : 2 * (hyp.base.p * hyp.base.q) < x :=
+    hyp.quotient_gt_two_mul_pq_of_modEq_one_mod_p_and_q
+      hx_mod_p hx_mod_q hx_odd (hx_ne_one_of_quotient x hh_eq)
+  have hu_pos : 0 < hyp.base.u := by
+    have h2q := Sdata.two_q_lt_u
+    omega
+  have h_lower : 2 * (hyp.base.p * hyp.base.q) * hyp.base.u < nc.h := by
+    have hmul :
+        hyp.base.u * (2 * (hyp.base.p * hyp.base.q)) < hyp.base.u * x :=
+      Nat.mul_lt_mul_of_pos_left hx_gt hu_pos
+    rw [hh_eq]
+    nlinarith
+  have hbound := data.caseA_bound hcaseA
+  have hpq_pos_nat : 0 < hyp.base.p * hyp.base.q :=
+    Nat.mul_pos hyp.base.p_prime.pos hyp.base.q_prime.pos
+  have hpq_posQ : (0 : ℚ) < (hyp.base.p * hyp.base.q : ℚ) := by
+    exact_mod_cast hpq_pos_nat
+  have hmul_bound := mul_le_mul_of_nonneg_right hbound (le_of_lt hpq_posQ)
+  have h_upper_Q : ((nc.h - 1 : ℕ) : ℚ) ≤
+      (hyp.base.p * hyp.base.q : ℚ) *
+        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := by
+    rw [div_mul_cancel₀ _ (ne_of_gt hpq_posQ)] at hmul_bound
+    nlinarith [hmul_bound]
+  have h_upper_sub : nc.h - 1 ≤
+      (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q - 1) := by
+    exact_mod_cast h_upper_Q
+  have h_upper : nc.h ≤
+      (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q - 1) + 1 := by
+    omega
+  have htwo_u_lt_pq : 2 * hyp.base.u < hyp.base.p * hyp.base.q := by
+    by_contra hnot
+    have hpq_le_2u : hyp.base.p * hyp.base.q ≤ 2 * hyp.base.u :=
+      Nat.le_of_not_gt hnot
+    have hpq_sq_le :
+        (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q) ≤
+          (hyp.base.p * hyp.base.q) * (2 * hyp.base.u) :=
+      Nat.mul_le_mul_left (hyp.base.p * hyp.base.q) hpq_le_2u
+    have hupper_lt_sq :
+        (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q - 1) + 1 <
+          (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q) := by
+      have hpq_gt_one : 1 < hyp.base.p * hyp.base.q := by
+        nlinarith [hyp.base.p_prime.one_lt, hyp.base.q_prime.one_lt]
+      have hs :
+          (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q) =
+            (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q - 1) +
+              (hyp.base.p * hyp.base.q) := by
+        rw [← Nat.mul_succ]
+        have : (hyp.base.p * hyp.base.q - 1).succ = hyp.base.p * hyp.base.q := by
+          omega
+        rw [this]
+      rw [hs]
+      omega
+    nlinarith [hpq_sq_le, h_lower, h_upper, hupper_lt_sq]
+  have hpq_coprime : Nat.Coprime hyp.base.p hyp.base.q :=
+    (Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q
+  have hu_mod_pq : hyp.base.u ≡ 1 [MOD hyp.base.p * hyp.base.q] :=
+    (Nat.modEq_and_modEq_iff_modEq_mul hpq_coprime).mp ⟨hu_mod_p, hu_mod_q⟩
+  have hu_gt_one : 1 < hyp.base.u := by
+    have h2q := Sdata.two_q_lt_u
+    nlinarith [hyp.base.q_prime.one_lt]
+  rcases (Nat.modEq_iff_exists_eq_add (le_of_lt hu_gt_one)).mp hu_mod_pq.symm with
+    ⟨t, hu_eq⟩
+  have ht_ne_zero : t ≠ 0 := by
+    intro ht0
+    rw [ht0, mul_zero, add_zero] at hu_eq
+    omega
+  have ht_ge_one : 1 ≤ t := Nat.succ_le_of_lt (Nat.pos_of_ne_zero ht_ne_zero)
+  have hu_ge_pq_add_one : hyp.base.p * hyp.base.q + 1 ≤ hyp.base.u := by
+    rw [hu_eq]
+    have hmul := Nat.mul_le_mul_left (hyp.base.p * hyp.base.q) ht_ge_one
+    nlinarith
+  nlinarith [htwo_u_lt_pq, hu_ge_pq_add_one]
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3702,7 +3860,31 @@ exactly `U`. -/
 theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     nc.Ldata.H = hyp.base.U := by
-  sorry
+  by_contra hHU
+  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
+  rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
+  have hu_full := u_final_value _hG hyp nc
+  rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
+  have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
+    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+  have hU_le_H : hyp.base.U ≤ nc.Ldata.H := by
+    rw [← nc.Ldata.typeI_data_H_eq]
+    exact nc.Ldata.typeI_data.U_le_H
+  have hx_ne_one_of_quotient :
+      ∀ x : ℕ, nc.h = hyp.base.u * x → x ≠ 1 := by
+    intro x hh_eq hx1
+    have hH_card_eq_U_card : Nat.card ↥nc.Ldata.H = Nat.card ↥hyp.base.U := by
+      rw [← nc.h_eq_card_H, hh_eq, hx1, mul_one, hU_card]
+    have hU_eq_H : hyp.base.U = nc.Ldata.H :=
+      Subgroup.eq_of_le_of_card_ge hU_le_H (le_of_eq hH_card_eq_U_card)
+    exact hHU hU_eq_H.symm
+  rcases hcase with hcaseA | hcaseB
+  · exact data.caseA_contradiction_of_full_u_card_congruences
+      _hG Sdata hcaseA hu_full (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
+      (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
+  · -- (14.16) case-(b) still needs the `beta_L` character expansion and
+    -- contradiction with `(beta_L^tau, psi^tau_1) ≠ 0`.
+    sorry
 
 /-- **Peterfalvi (14.2)**: the field-normalizer configuration follows from the
 Section 16 hypotheses. -/
