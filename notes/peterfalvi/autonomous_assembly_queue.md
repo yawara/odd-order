@@ -192,6 +192,46 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   (b) **Pf Thm 5.6 quantitative coherence** (= B1 keystone, (6.2)/(6.3)/(6.6) 共通) → (c) **θ-bound section**。
   framework は IsCoherent (S07) 既存; 残 keystone は **Thm 5.6 の量的不等式**。
 
+### ✅✅ 2026-06-05 (peterfalvi worktree) — B1 + (6.3)/(6.5) 還元 backbone landed
+- ✅ **B1 = Pf (5.6) quantitative** (commit 5a5e0bd, axiom-clean, full build 3555): `coherentDegreeSumBound_of_not_coherent`
+  (S08) = forward engine `xAdjoinStep` の対偶。非 coherent(S₁∪{χ,χ̄}) ⟹ `∑ᵢ(deg i)² ≤ 2a` (= `∑χ(1)² ≤ 2ψ(1)χ₁(1)`)。
+  `by_contra`+`push_neg` で xAdjoinStep の `hDeg : 2a < ∑deg²` を対偶。**member-family 仮説は明示のまま** (forward と同じ;
+  Sibley setup での discharge = T-A4 enum)。⟹ §G 「B1 (5.6) 反転欠落」blocker 解消。step3/5 ✅。
+- ✅ **(6.3)/(6.5) 還元 arith** (commit 810faf5, axiom-clean): `six_three_HH1_le` ((6.3): (6.2) index-bound +
+  `degreeBound_le_of_sqrt_bound` + `|H:H₁|≤|H:A|` ⟹ `|H:H₁|≤4|L:K|²+1`) / `six_five_index_contradiction`
+  (共有 `(2c+1)²≤n≤4c²+1` 不能) / `six_five_chief_factor_contradiction` ((6.5)(a) chief factor) /
+  `six_five_c_contradiction` ((6.5)(c))。**(6.5)(b) p-群 core ✅ + two_mul_add_one ✅ と合わせ (6.5) backbone は (6.2) を除き完成**。
+- **残 (option 1 の (6.2) 本体 + glue)**: (i) **θ-bound section case** `θ(1)≤|K:C|√|C:D|` (D/B⊆Z(C/B), Clifford
+  restriction; 中心 case ✅) 🟡 **半分 landed (下記)**, (ii) **Sibley packaging** (S₁/ψ 構成 + B1 を member-family enum 経由で適用 + B2 接続 ⟹
+  (6.2) `2|L:C|√|C:D|≥|K:A|−1`; 算術 shell は自明、構成が hard) 🔴, (iii) (6.3)/(6.5) を SibleyDadeHypothesis の
+  実 index に結線。
+
+### ✅ 2026-06-05 θ-bound section degree bound (b-half) landed
+- ✅ **`degree_sq_le_index_of_central_quotient`** (commit b61b834, `OddOrder.RepresentationTheory` @InflationCharacter,
+  axiom-clean, full build 3555): φ∈Irr G が N 上自明 + N≤D + `D/N≤Z(G/N)` ⟹ **`φ(1)²≤|G:D|`**。inflation
+  (`exists_inflate_eq_of_subset_characterKernel`+`inflate_apply_one`) で G/N に落とし中心 case `exists_degree_sq_le_index`
+  適用 + quotient index `(D.map mk' N).index=D.index` (`index_comap_of_surjective`+`comap_map_eq`+`ker_mk'`)。
+  = θ-bound の `φ(1)≤√|C:D|` 半分 (中心 case は N=⊥ 特殊化)。InflationCharacter に SchurCenterBound import 追加 (cycle 無)。
+- 🟡 **θ-bound 残 = Clifford restriction (a-half)** `θ(1)≤|K:C|·φ(1)` — **2026-06-05 de-risk 調査: full Clifford
+  ramification (`e²≤|I:C|`) は不要、Frobenius reciprocity route で済む**:
+  φ:=Res_C θ の既約 constituent (∃ via `exists_inner_induce_ne_zero`@S03) ⟹ 相互律 `⟨θ,Ind φ⟩=⟨Res θ,φ⟩≠0`
+  (`inner_induce_eq_inner_restrict`@InducedCharacter:531) ⟹ θ は Ind φ の constituent ⟹ `θ(1)≤(Ind φ)(1)=|K:C|·φ(1)`
+  (`induce_apply_one`@InducedCharacter:289)。section bound `degree_sq_le_index_of_central_quotient`(✅)で
+  `φ(1)²≤|C:D|` ⟹ `θ(1)²≤|K:C|²|C:D|` ⟹ θ-bound。
+  **確認済 infra (全 present)**: Frobenius 相互律 / induce_apply_one / exists_inner_induce_ne_zero /
+  `isCharacter_restrict`@S08:87 / `induce_mem_ZIrr`@InducedCharacter:792 / `IsCharacter.exists_natFinsupp_eq_sum`+
+  `inner_irreducible_nonneg`@Clifford / `character_add_of_isCompl`@CharacterCompleteness:215 /
+  `irreducibleCharacter_apply_one_eq_pos_natCast`@ZIrrFourier:518。
+  **残 brick (2 つ, multi-session だが well-scoped)**:
+  1. **constituent degree bound** `IsCharacter χ ∧ θ∈Irr ∧ ⟨χ,θ⟩≠0 ⟹ (θ 1).re≤(χ 1).re` — `exists_natFinsupp_eq_sum`
+     (χ=∑(m a)•a, nat coeffs) + `single_le_sum` + 各 a(1)>0 + m θ≥1。~40-50 LOC (.re/sum/cast bookkeeping)。
+  2. **`IsCharacter (induce C φ)`** (= reverse char `χ∈ZIrr ∧ ∀ψ∈Irr,⟨χ,ψ⟩≥0 ⟹ IsCharacter χ` の特殊化):
+     induce∈ZIrr(✅`induce_mem_ZIrr`) + 非負係数(相互律+`isCharacter_restrict`+`inner_irreducible_nonneg`) ⟹ IsCharacter。
+     **reverse char 本体 = `character_add_of_isCompl` で ⊕(irreducible reps)^mult を構成** (Finsupp 上 induction)。
+     **代替: mathlib `RepresentationTheory/Induced.lean` の induced rep を repo `induce` 公式に bridge** (別 substantial)。
+  → **次着手 = brick 1 (constituent degree bound, self-contained) → brick 2 (reverse IsCharacter char) → assemble (a-half) → 全 θ-bound → (6.2)**。
+  または (b) T-A4 member-family enum (Sibley packaging と共有)。
+
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
   `isPGroup_of_isNilpotent_of_isPGroup_abelianization` (S08) = finite nilpotent Γ + Abelianization Γ が

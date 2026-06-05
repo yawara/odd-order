@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 
 /-!
 # Inflation of irreducible characters
@@ -305,6 +306,36 @@ theorem exists_inflate_eq_of_subset_characterKernel (χ : IrreducibleCharacter G
   rw [show σ.character (QuotientGroup.mk' N g)
       = Representation.character (σ.comp (QuotientGroup.mk' N)) g from rfl,
     hcomp, ← congrFun hχ g]
+
+/-- **Section form of [Is] Corollary 2.30.**  If an irreducible character `φ` of
+`G` is trivial on the normal subgroup `N`, `N ≤ D`, and the image `D ⧸ N` is
+central in `G ⧸ N`, then `φ(1)² ≤ |G : D|`.
+
+Inflating `φ` from `G ⧸ N` — where `D ⧸ N` is genuinely central, so the central
+degree bound `IsIrreducibleCharacter.exists_degree_sq_le_index` applies — gives
+`φ(1)² ≤ |G ⧸ N : D ⧸ N| = |G : D|`.  This is the section case of the Peterfalvi
+(6.2)/(6.6) degree bound `θ(1) ≤ |K : C|·√|C : D|` (the central case is the
+`N = ⊥` specialization). -/
+theorem degree_sq_le_index_of_central_quotient
+    (φ : IrreducibleCharacter G) (D : Subgroup G) (hND : N ≤ D)
+    (hker : (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction G ℂ))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (G ⧸ N)) :
+    ∃ d : ℕ, (φ : ClassFunction G ℂ) 1 = (d : ℂ) ∧ d ^ 2 ≤ D.index := by
+  classical
+  obtain ⟨φbar, hφbar⟩ := exists_inflate_eq_of_subset_characterKernel (N := N) φ hker
+  haveI : Fintype (G ⧸ N) := Fintype.ofFinite _
+  haveI : Invertible ((Nat.card (G ⧸ N) : ℂ)) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨d, hd1, hd2⟩ := φbar.isIrreducible.exists_degree_sq_le_index
+    (D.map (QuotientGroup.mk' N)) hcentral
+  have hidx : (D.map (QuotientGroup.mk' N)).index = D.index := by
+    have h := Subgroup.index_comap_of_surjective (D.map (QuotientGroup.mk' N))
+      (QuotientGroup.mk'_surjective N)
+    rw [Subgroup.comap_map_eq, QuotientGroup.ker_mk', sup_eq_left.mpr hND] at h
+    exact h.symm
+  refine ⟨d, ?_, hidx ▸ hd2⟩
+  rw [← hφbar, inflate_apply_one]
+  exact hd1
 
 open scoped Classical in
 /-- **Peterfalvi (6.6) degree-sum identity** ([Isaacs] (2.22) corollary).  The sum of the squared

@@ -1777,6 +1777,10 @@ set_option linter.style.longLine false in
 -- for `N ⊴ G`, `N ≤ K ≤ G` (= `sumNonInflatedDegreeSq` + Lagrange index arithmetic).  The mmd
 -- 04.8 L234 identity `|W₁||H:Z|(|Z|−1)` of the (6.8.3) final inequality (`G = L`, `K = H`, `N = Z`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.sumNonInflatedDegreeSq_eq_index_mul
+-- Section form of [Is] Cor 2.30 (Peterfalvi (6.2)/(6.6) θ-bound section case): φ trivial on N,
+-- D/N central in G/N ⟹ φ(1)² ≤ |G:D|, via inflation to G/N + the central degree bound.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.degree_sq_le_index_of_central_quotient
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
@@ -1977,6 +1981,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.xAdjoinStep
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.coherentDegreeSumBound_of_not_coherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_HH1_le
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_index_contradiction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_chief_factor_contradiction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_five_c_contradiction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.XAdjoinStepInput.adjoin
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite
@@ -1989,6 +2000,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.one_le_weightedOutput_inner_self_re
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.ofIsCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
 -- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
 -- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
 -- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
@@ -2464,6 +2486,28 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.Bsum_le_of_orthogonal_integer_decomposition
+-- Peterfalvi (7.10) lower-bound bridge constructors from the penultimate,
+-- rational B-sum, and real reduced-inequality inputs.
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.exists_lowerBoundTerm_of_exists_penultimate
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_Bsum_bound
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.exists_lowerBoundTerm_of_exists_Bsum_bound
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.base_estimate_of_real_reduced_family_inequality
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.lowerBoundTerm_of_real_Bsum_bound
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S09.FrobeniusFamily.exists_lowerBoundTerm_of_exists_real_Bsum_bound
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S09.FrobeniusFamily.characterEstimateData_of_real_reduced_family_inequality_and_decomposition
@@ -2519,6 +2563,74 @@ set_option linter.style.longLine false in
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
+-- Peterfalvi §15/§16 standalone cyclotomic and growth arithmetic feeding the
+-- final Section 16 comparison.  These are independent of the theorem-level
+-- Section 15/16 scaffolds that still carry `sorry`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.q_ne_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.p_ne_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.three_le_q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.Hypothesis.three_le_p
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_odd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_of_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_not_dvd_self_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_prime_dvd_modEq_one_of_not_modEq_one
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_divisor_facts
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_ge_aux
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_gt_seven_tenths
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_gt_four_fifths
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_not_modEq_one_mod_p
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_odd
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_coprime
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_divisor_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_odd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_pos
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_ne_zero
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.v_coprime_q_sub_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.divisor_modEq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.pq_lt_v
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForTData.two_p_lt_v
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.u_le_full_cyclotomic
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.two_q_lt_u
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.cyclotomic_ratio_gt_of_q_lt_p
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.key_ratio_inequality_of_caseB_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.key_inequality_of_caseB_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.key_inequality_of_caseB_outputs
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_error_terms_lt_inv_q
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_T_caseB
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_caseB_data
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_caseB_outputs
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_main_size_bound
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_caseB_data_main_size_bounds
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
+
 -- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
 -- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
 #assert_only_allowed_axioms OddOrder.BG.AppC.theoremC
@@ -2540,10 +2652,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.fieldNormalizerKernel_inf_complement_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P_inf_U_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_mem_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.s_normalizes_Q
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineElement_neg
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerPrimeLineGenerator_pow_p
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerNormOneUnits_card_gt_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.exists_fieldNormalizerNormOneUnit_ne_one
 #assert_only_allowed_axioms
@@ -2591,6 +2710,11 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S16.FieldNormalizerData.normN_two_mul_sub_one_of_step4_first_k_three_decomposition
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.appC_normSet_generator_relation_of_first_k_three_coordinate
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_mem_P1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_pow_p_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_normalizes_U
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.t_normalizes_U
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.P1_ne_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.FieldNormalizerData.W2_ne_P1
 #assert_only_allowed_axioms

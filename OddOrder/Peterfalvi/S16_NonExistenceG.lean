@@ -31,6 +31,7 @@ open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs
 open scoped Pointwise
+open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
@@ -1560,6 +1561,18 @@ theorem v_odd {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
   exact hyp.tSide_cyclotomic_quotient_odd
 
 /-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+positive. -/
+theorem v_pos {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    0 < hyp.base.v :=
+  Odd.pos data.v_odd
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
+nonzero. -/
+theorem v_ne_zero {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    hyp.base.v ≠ 0 :=
+  ne_of_gt data.v_pos
+
+/-- In the T-side case-(9.7.b) conclusion of **Peterfalvi (14.4)**, `v` is
 coprime to `q - 1`. -/
 theorem v_coprime_q_sub_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
     Nat.Coprime hyp.base.v (hyp.base.q - 1) := by
@@ -1619,6 +1632,23 @@ theorem u_eq_of_not_modEq_one {hyp : Hypothesis (G := G)}
     ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] →
       hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
   data.order.u_eq_of_not_modEq_one
+
+/-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, `u` is at
+most the full cyclotomic quotient.  The `p ≡ 1 mod q` branch divides that
+quotient by the additional factor `q`; the other branch is equality. -/
+theorem u_le_full_cyclotomic {hyp : Hypothesis (G := G)}
+    (data : CaseBForSData hyp) :
+    hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+  by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+  · rw [data.u_eq_of_p_modEq_one hmod]
+    have hp1_pos : 0 < hyp.base.p - 1 := by
+      have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+      omega
+    have hden_le : hyp.base.p - 1 ≤ hyp.base.q * (hyp.base.p - 1) := by
+      have hqpos : 1 ≤ hyp.base.q := hyp.base.q_prime.one_le
+      nlinarith [Nat.mul_le_mul_right (hyp.base.p - 1) hqpos]
+    exact Nat.div_le_div_left hden_le hp1_pos
+  · rw [data.u_eq_of_not_modEq_one hmod]
 
 end CaseBForSData
 
@@ -1813,6 +1843,315 @@ theorem q_pow_gt_p_pow (hyp : Hypothesis (G := G)) :
 
 end Hypothesis
 
+private theorem cyclotomic_quotient_sub_one_ge_pow_pred {q p : ℕ}
+    (hq2 : 2 ≤ q) (hp2 : 2 ≤ p) :
+    ((q ^ (p - 1) : ℕ) : ℚ) ≤ (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) := by
+  have hsum_eq : ∑ k ∈ Finset.range p, q ^ k = (q ^ p - 1) / (q - 1) :=
+    Nat.geomSum_eq hq2 p
+  have hle_rest : q ^ (p - 1) ≤ ∑ k ∈ Finset.range (p - 1), q ^ (k + 1) := by
+    have hlast_mem : p - 2 ∈ Finset.range (p - 1) := by
+      simp
+      omega
+    have hnonneg : ∀ k ∈ Finset.range (p - 1), 0 ≤ q ^ (k + 1) := by
+      intro k _hk
+      exact Nat.zero_le _
+    have hsingle := Finset.single_le_sum hnonneg hlast_mem
+    simpa [show p - 2 + 1 = p - 1 by omega] using hsingle
+  have hsum_succ : ∑ k ∈ Finset.range p, q ^ k =
+      (∑ k ∈ Finset.range (p - 1), q ^ (k + 1)) + 1 := by
+    rw [show p = (p - 1) + 1 by omega]
+    rw [Finset.sum_range_succ']
+    simp
+  have hle_sum : q ^ (p - 1) + 1 ≤ ∑ k ∈ Finset.range p, q ^ k := by
+    rw [hsum_succ]
+    omega
+  have hnat : q ^ (p - 1) ≤ (q ^ p - 1) / (q - 1) - 1 := by
+    rw [← hsum_eq]
+    omega
+  exact_mod_cast hnat
+
+private theorem cyclotomic_quotient_sub_one_lt_div {p q : ℕ} (hp2 : 2 ≤ p) :
+    (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) <
+      (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+  have hp_pos : 0 < p := lt_of_lt_of_le (by norm_num : 0 < 2) hp2
+  have hp1_pos_nat : 0 < p - 1 := by omega
+  have hden_pos : (0 : ℚ) < (((p - 1 : ℕ) : ℚ)) := by exact_mod_cast hp1_pos_nat
+  have hdiv : p - 1 ∣ p ^ q - 1 := by
+    simpa only [one_pow] using Nat.sub_dvd_pow_sub_pow p 1 q
+  have hcast_div : (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) =
+      ((p ^ q - 1 : ℕ) : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+    exact Nat.cast_div hdiv (ne_of_gt hden_pos)
+  have hsub_le : (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) ≤
+      (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le ((p ^ q - 1) / (p - 1)) 1
+  have hnum_nat : p ^ q - 1 < p ^ q := by
+    have hpq_pos : 0 < p ^ q := pow_pos hp_pos q
+    omega
+  have hnum : ((p ^ q - 1 : ℕ) : ℚ) < (p ^ q : ℚ) := by exact_mod_cast hnum_nat
+  have hquot_lt : (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) <
+      (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+    rw [hcast_div]
+    exact div_lt_div_of_pos_right hnum hden_pos
+  exact lt_of_le_of_lt hsub_le hquot_lt
+
+private theorem mul_pred_lt_three_pow_pred {p : ℕ} (hp : 5 ≤ p) :
+    p * (p - 1) < 3 ^ (p - 1) := by
+  induction p, hp using Nat.le_induction with
+  | base => norm_num
+  | succ p hp ih =>
+      have hstep : (p + 1) * p < 3 * (p * (p - 1)) := by
+        have hfactor : p + 1 < 3 * (p - 1) := by omega
+        have hmul := Nat.mul_lt_mul_of_pos_right hfactor (by omega : 0 < p)
+        simpa [mul_assoc, mul_left_comm, mul_comm] using hmul
+      calc
+        (p + 1) * ((p + 1) - 1) = (p + 1) * p := by rw [Nat.add_sub_cancel_right]
+        _ < 3 * (p * (p - 1)) := hstep
+        _ < 3 * 3 ^ (p - 1) := Nat.mul_lt_mul_of_pos_left ih (by norm_num)
+        _ = 3 ^ p := by
+          calc
+            3 * 3 ^ (p - 1) = 3 ^ (p - 1) * 3 := by rw [mul_comm]
+            _ = 3 ^ ((p - 1) + 1) := by rw [pow_succ]
+            _ = 3 ^ p := by rw [show (p - 1) + 1 = p by omega]
+
+private theorem p_mul_q_lt_q_pow_pred_of_five_le {p q : ℕ}
+    (hp5 : 5 ≤ p) (hq3 : 3 ≤ q) (hqp : q < p) :
+    p * q < q ^ (p - 1) := by
+  have hq_le_pred : q ≤ p - 1 := by omega
+  have hpq_le : p * q ≤ p * (p - 1) := Nat.mul_le_mul_left p hq_le_pred
+  have hpq_lt_three : p * q < 3 ^ (p - 1) :=
+    lt_of_le_of_lt hpq_le (mul_pred_lt_three_pow_pred hp5)
+  have hthree_le_qpow : 3 ^ (p - 1) ≤ q ^ (p - 1) :=
+    Nat.pow_le_pow_left hq3 (p - 1)
+  exact lt_of_lt_of_le hpq_lt_three hthree_le_qpow
+
+private theorem two_mul_sq_lt_pow_pred_of_odd_lt {p q : ℕ}
+    (hpodd : Odd p) (hqodd : Odd q) (hq3 : 3 ≤ q) (hqp : q < p) :
+    2 * q * q < p ^ (q - 1) := by
+  by_cases hq_three : q = 3
+  · subst q
+    have hp_gt_three : 3 < p := by simpa using hqp
+    have hp5 : 5 ≤ p := by
+      have hp_ne_four : p ≠ 4 := by
+        intro hp4
+        have hodd : Odd 4 := by simpa [hp4] using hpodd
+        rcases hodd with ⟨k, hk⟩
+        omega
+      omega
+    have hpow2 : 2 * 3 * 3 < p ^ 2 := by
+      nlinarith
+    simpa using hpow2
+  · have hq5 : 5 ≤ q := by
+      have hq_ne_four : q ≠ 4 := by
+        intro hq4
+        have hodd : Odd 4 := by simpa [hq4] using hqodd
+        rcases hodd with ⟨k, hk⟩
+        omega
+      omega
+    have hq_pos : 0 < q := by omega
+    have hq_sq_pos : 0 < q * q := Nat.mul_pos hq_pos hq_pos
+    have htwo_lt_qsq : 2 < q * q := by nlinarith
+    have hlt_q4 : 2 * (q * q) < (q * q) * (q * q) :=
+      Nat.mul_lt_mul_of_pos_right htwo_lt_qsq hq_sq_pos
+    have hq4_le_p4 : q ^ 4 ≤ p ^ 4 :=
+      Nat.pow_le_pow_left (Nat.le_of_lt hqp) 4
+    have hp_pos : 0 < p := by omega
+    have hp4_le : p ^ 4 ≤ p ^ (q - 1) :=
+      Nat.pow_le_pow_right hp_pos (by omega : 4 ≤ q - 1)
+    calc
+      2 * q * q = 2 * (q * q) := by ring
+      _ < (q * q) * (q * q) := hlt_q4
+      _ = q ^ 4 := by ring
+      _ ≤ p ^ 4 := hq4_le_p4
+      _ ≤ p ^ (q - 1) := hp4_le
+
+namespace CaseBForTData
+
+/-- The T-side case-(9.7.b) cyclotomic value in **Peterfalvi (14.4)** is already
+larger than `p q`.  This is the cyclotomic lower consequence consumed by the
+norm-cascade contradiction in (14.11.4). -/
+theorem pq_lt_v {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    hyp.base.p * hyp.base.q < hyp.base.v := by
+  have hpow : hyp.base.p * hyp.base.q < hyp.base.q ^ (hyp.base.p - 1) :=
+    p_mul_q_lt_q_pow_pred_of_five_le hyp.five_le_p hyp.base.three_le_q hyp.q_lt_p
+  have hleQ := cyclotomic_quotient_sub_one_ge_pow_pred
+    (q := hyp.base.q) (p := hyp.base.p) hyp.base.q_prime.two_le hyp.base.p_prime.two_le
+  have hle : hyp.base.q ^ (hyp.base.p - 1) ≤
+      (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) - 1 := by
+    exact_mod_cast hleQ
+  rw [data.v_eq]
+  exact lt_of_lt_of_le (lt_of_lt_of_le hpow hle)
+    (Nat.sub_le ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) 1)
+
+/-- The T-side case-(9.7.b) lower bound also gives the size hypothesis
+`v > 2 p` needed in the (14.11.4) norm cascade. -/
+theorem two_p_lt_v {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    2 * hyp.base.p < hyp.base.v := by
+  have hq_gt_two : 2 < hyp.base.q := by
+    have hq3 : 3 ≤ hyp.base.q := hyp.base.three_le_q
+    omega
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have hmul : hyp.base.p * 2 < hyp.base.p * hyp.base.q :=
+    Nat.mul_lt_mul_of_pos_left hq_gt_two hp_pos
+  have h2p_lt_pq : 2 * hyp.base.p < hyp.base.p * hyp.base.q := by
+    simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+  exact lt_trans h2p_lt_pq data.pq_lt_v
+
+end CaseBForTData
+
+namespace CaseBForSData
+
+/-- The S-side case-(9.7.b) cyclotomic value in **Peterfalvi (14.6)** is larger
+than `2 q`.  This is the S-side size input consumed by the norm-cascade
+contradiction in (14.11.4), including the additional division by `q` in the
+`p ≡ 1 mod q` branch. -/
+theorem two_q_lt_u {hyp : Hypothesis (G := G)} (data : CaseBForSData hyp) :
+    2 * hyp.base.q < hyp.base.u := by
+  have hpow_sq :
+      2 * hyp.base.q * hyp.base.q < hyp.base.p ^ (hyp.base.q - 1) :=
+    two_mul_sq_lt_pow_pred_of_odd_lt hyp.base.p_odd hyp.base.q_odd
+      hyp.base.three_le_q hyp.q_lt_p
+  have hq_gt_one : 1 < hyp.base.q := hyp.base.q_prime.one_lt
+  have htwoq_pos : 0 < 2 * hyp.base.q :=
+    Nat.mul_pos (by norm_num) hyp.base.q_prime.pos
+  have htwoq_lt_twoqq : 2 * hyp.base.q < 2 * hyp.base.q * hyp.base.q := by
+    have hmul := Nat.mul_lt_mul_of_pos_left hq_gt_one htwoq_pos
+    simpa [mul_assoc] using hmul
+  have hpow : 2 * hyp.base.q < hyp.base.p ^ (hyp.base.q - 1) :=
+    lt_trans htwoq_lt_twoqq hpow_sq
+  have hleQ := cyclotomic_quotient_sub_one_ge_pow_pred
+    (q := hyp.base.p) (p := hyp.base.q) hyp.base.p_prime.two_le hyp.base.q_prime.two_le
+  have hle : hyp.base.p ^ (hyp.base.q - 1) ≤
+      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 := by
+    exact_mod_cast hleQ
+  have hfull_gt_twoq :
+      2 * hyp.base.q < (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+    lt_of_lt_of_le (lt_of_lt_of_le hpow hle)
+      (Nat.sub_le ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) 1)
+  have hfull_gt_twoqq :
+      2 * hyp.base.q * hyp.base.q <
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+    lt_of_lt_of_le (lt_of_lt_of_le hpow_sq hle)
+      (Nat.sub_le ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) 1)
+  by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+  · rw [data.u_eq_of_p_modEq_one hmod]
+    have hdvd : hyp.base.q ∣ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+      OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_of_modEq_one
+        hyp.base.p_prime hmod
+    have hlt_div :
+        2 * hyp.base.q <
+          (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) / hyp.base.q := by
+      rw [Nat.lt_div_iff_mul_lt' hdvd]
+      simpa [mul_assoc, mul_comm, mul_left_comm] using hfull_gt_twoqq
+    rw [show (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.q * (hyp.base.p - 1)) =
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) / hyp.base.q by
+      rw [Nat.div_div_eq_div_mul]
+      rw [Nat.mul_comm]]
+    exact hlt_div
+  · rw [data.u_eq_of_not_modEq_one hmod]
+    exact hfull_gt_twoq
+
+end CaseBForSData
+
+/-- Arithmetic bridge for **Peterfalvi (14.8)**: under the Section 16 prime
+ordering `q < p`, the T-side full cyclotomic quotient gives a strictly larger
+`(v - 1) / p` ratio than the S-side full cyclotomic quotient gives for
+`(u - 1) / q`. -/
+theorem cyclotomic_ratio_gt_of_q_lt_p {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpodd : Odd p) (hqodd : Odd q) (hqp : q < p) :
+    (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) / (p : ℚ) >
+      (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) / (q : ℚ) := by
+  have hpow : q ^ (p + 1) > p ^ (q + 1) :=
+    OddOrder.Peterfalvi.S16.q_pow_gt_p_pow hq hpodd hqodd hqp
+  have hq2 : 2 ≤ q := hq.two_le
+  have hp2 : 2 ≤ p := hp.two_le
+  have hqpos_nat : 0 < q := hq.pos
+  have hppos_nat : 0 < p := hp.pos
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hp1_pos_nat : 0 < p - 1 := by omega
+  have hp1pos : (0 : ℚ) < (((p - 1 : ℕ) : ℚ)) := by exact_mod_cast hp1_pos_nat
+  have hp_pred_ge_q : q ≤ p - 1 := by omega
+  have hmain_nat : p ^ (q + 1) < (p - 1) * q ^ p := by
+    have hmul : q ^ (p + 1) ≤ (p - 1) * q ^ p := by
+      rw [pow_succ, mul_comm (q ^ p) q]
+      exact Nat.mul_le_mul_right (q ^ p) hp_pred_ge_q
+    exact lt_of_lt_of_le hpow hmul
+  have hmain : (p : ℚ) ^ (q + 1) < (((p - 1 : ℕ) : ℚ)) * (q : ℚ) ^ p := by
+    exact_mod_cast hmain_nat
+  have hmain' : (p ^ q : ℚ) * (p : ℚ) <
+      (q ^ (p - 1) : ℚ) * ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) := by
+    have hp_pow : (p : ℚ) ^ (q + 1) = (p : ℚ) ^ q * (p : ℚ) := by
+      rw [pow_succ]
+    have hq_pow : (q : ℚ) ^ p = (q : ℚ) ^ (p - 1) * (q : ℚ) := by
+      calc
+        (q : ℚ) ^ p = (q : ℚ) ^ ((p - 1) + 1) := by
+          exact congrArg (fun n : ℕ => (q : ℚ) ^ n) (by omega : p = (p - 1) + 1)
+        _ = (q : ℚ) ^ (p - 1) * (q : ℚ) := by rw [pow_succ]
+    norm_num [Nat.cast_pow] at hmain ⊢
+    nlinarith
+  have hleft_lower := cyclotomic_quotient_sub_one_ge_pow_pred (q := q) (p := p) hq2 hp2
+  have hright_upper := cyclotomic_quotient_sub_one_lt_div (p := p) (q := q) hp2
+  have hcompare_core : (p ^ q : ℚ) / ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) <
+      (q ^ (p - 1) : ℚ) / (p : ℚ) := by
+    rw [div_lt_div_iff₀]
+    · simpa [Nat.cast_pow, mul_assoc, mul_left_comm, mul_comm] using hmain'
+    · positivity
+    · exact hppos
+  calc
+    (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) / (q : ℚ)
+        < ((p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ))) / (q : ℚ) :=
+          div_lt_div_of_pos_right hright_upper hqpos
+    _ = (p ^ q : ℚ) / ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) := by
+          field_simp [hqpos.ne', hp1pos.ne']
+    _ < (q ^ (p - 1) : ℚ) / (p : ℚ) := hcompare_core
+    _ ≤ (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) / (p : ℚ) := by
+          exact div_le_div_of_nonneg_right (by simpa [Nat.cast_pow] using hleft_lower)
+            (le_of_lt hppos)
+
+/-- The ratio comparison in **Peterfalvi (14.8)** from the two case-(9.7.b)
+cyclotomic order conclusions. -/
+theorem key_ratio_inequality_of_caseB_data {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) :
+    (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  have hratio := cyclotomic_ratio_gt_of_q_lt_p
+    hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
+  have hqpos : (0 : ℚ) < hyp.base.q := by exact_mod_cast hyp.base.q_prime.pos
+  have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le_sub_right Sdata.u_le_full_cyclotomic 1
+  have hu_div : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) /
+        (hyp.base.q : ℚ) :=
+    div_le_div_of_nonneg_right hu_sub (le_of_lt hqpos)
+  rw [Tdata.v_eq]
+  exact lt_of_le_of_lt hu_div hratio
+
+/-- **Peterfalvi (14.8)** from materialized case-(9.7.b) data on both sides.
+This is the proven consumer form of `key_inequality`: once Sections (14.4) and
+(14.6) provide the T- and S-side `CaseB` data, the remaining comparison is pure
+arithmetic. -/
+theorem key_inequality_of_caseB_data {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) :
+    hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  exact ⟨hyp.q_pow_gt_p_pow, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
+
+/-- **Peterfalvi (14.8)** consumer form for the exact output shapes of
+`caseB_for_T` and `caseB_for_S`.  This keeps the future proof of
+`key_inequality` focused on constructing the structural `CaseB` data. -/
+theorem key_inequality_of_caseB_outputs {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) :
+    hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact key_inequality_of_caseB_data Tdata Sdata
+
 /-- **Peterfalvi (14.8)**: the strict exponential inequality and its
 character-theoretic corollary comparing `(v - 1) / p` and `(u - 1) / q`. -/
 theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1857,6 +2196,195 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_expansion_formula : Prop
   final_norm_contradiction : Prop
 
+/-- The displayed rational inequality produced by the norm calculation in
+**Peterfalvi (14.11.4)**, after substituting `e = p q`.  It is kept concrete so
+future character-theoretic producers can target the exact arithmetic consumer
+without adding another opaque proposition. -/
+def normCascadeBound (hyp : Hypothesis (G := G)) (k : ℕ) : Prop :=
+  (1 : ℚ) / (hyp.base.p : ℚ) + 1 / (hyp.base.q : ℚ) ≤
+    ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (k : ℚ) +
+      2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) +
+      1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ) +
+      1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)
+
+/-- Pure arithmetic estimate used in **Peterfalvi (14.11.4)**.  Once the
+norm calculation reduces the error terms to `2 / (p q) + 1 / (u q) + 1 / (v p)`,
+the Section 16 size assumptions `u > 2q`, `v > 2p`, and `q < p` bound that error
+strictly by `1 / q`. -/
+theorem norm_error_terms_lt_inv_q {p q u v : ℕ}
+    (hq3 : 3 ≤ q) (hqp : q < p) (hu : 2 * q < u) (hv : 2 * p < v) :
+    (2 : ℚ) / ((p * q : ℕ) : ℚ) + 1 / ((u * q : ℕ) : ℚ) +
+        1 / ((v * p : ℕ) : ℚ) < 1 / (q : ℚ) := by
+  have hqpos_nat : 0 < q := by omega
+  have hppos_nat : 0 < p := by omega
+  have hupos_nat : 0 < u := by omega
+  have hvpos_nat : 0 < v := by omega
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hupos : (0 : ℚ) < u := by exact_mod_cast hupos_nat
+  have hvpos : (0 : ℚ) < v := by exact_mod_cast hvpos_nat
+  have hq3q : (3 : ℚ) ≤ q := by exact_mod_cast hq3
+  have hqpq : (q : ℚ) < p := by exact_mod_cast hqp
+  have huq : (2 : ℚ) * q < u := by exact_mod_cast hu
+  have hvp : (2 : ℚ) * p < v := by exact_mod_cast hv
+  have hterm1 : (2 : ℚ) / ((p * q : ℕ) : ℚ) < 2 / ((q * q : ℕ) : ℚ) := by
+    norm_num [Nat.cast_mul]
+    exact div_lt_div_of_pos_left (by norm_num) (mul_pos hqpos hqpos)
+      (mul_lt_mul_of_pos_right hqpq hqpos)
+  have hterm2 : (1 : ℚ) / ((u * q : ℕ) : ℚ) < 1 / ((2 * q * q : ℕ) : ℚ) := by
+    have hden : (2 : ℚ) * q * q < u * q := by nlinarith [huq, hqpos]
+    have hcore : (1 : ℚ) / (u * q) < 1 / (2 * q * q) :=
+      one_div_lt_one_div_of_lt (by positivity : (0 : ℚ) < 2 * q * q) hden
+    simpa [Nat.cast_mul, mul_assoc, mul_left_comm, mul_comm] using hcore
+  have hterm3 : (1 : ℚ) / ((v * p : ℕ) : ℚ) < 1 / ((2 * q * q : ℕ) : ℚ) := by
+    have hsq : (q : ℚ) * q < p * p := by nlinarith [hqpq, hqpos, hppos]
+    have hden : (2 : ℚ) * q * q < v * p := by nlinarith [hsq, hvp, hppos]
+    have hcore : (1 : ℚ) / (v * p) < 1 / (2 * q * q) :=
+      one_div_lt_one_div_of_lt (by positivity : (0 : ℚ) < 2 * q * q) hden
+    simpa [Nat.cast_mul, mul_assoc, mul_left_comm, mul_comm] using hcore
+  have hsum :
+      (2 : ℚ) / ((p * q : ℕ) : ℚ) + 1 / ((u * q : ℕ) : ℚ) +
+          1 / ((v * p : ℕ) : ℚ) <
+        2 / ((q * q : ℕ) : ℚ) + 1 / ((2 * q * q : ℕ) : ℚ) +
+          1 / ((2 * q * q : ℕ) : ℚ) := by
+    nlinarith [hterm1, hterm2, hterm3]
+  have hsum_eq :
+      2 / ((q * q : ℕ) : ℚ) + 1 / ((2 * q * q : ℕ) : ℚ) +
+          1 / ((2 * q * q : ℕ) : ℚ) = 3 / ((q * q : ℕ) : ℚ) := by
+    norm_num [Nat.cast_mul]
+    field_simp [hqpos.ne']
+    ring
+  have hthree_le : (3 : ℚ) / ((q * q : ℕ) : ℚ) ≤ 1 / (q : ℚ) := by
+    norm_num [Nat.cast_mul]
+    have hmul_nonneg : 0 ≤ (q : ℚ) * ((q : ℚ) - 3) :=
+      mul_nonneg (le_of_lt hqpos) (sub_nonneg.mpr hq3q)
+    field_simp [hqpos.ne']
+    nlinarith [hmul_nonneg]
+  nlinarith [hsum, hsum_eq, hthree_le]
+
+/-- Arithmetic endpoint for **Peterfalvi (14.11.4)**.  If the norm calculation
+has already yielded the displayed bound from the text, then the lower bound
+`k > 2 p v` and the cyclotomic lower consequence `p q < v` are contradictory. -/
+theorem norm_cascade_contradiction {p q u v k : ℕ}
+    (hq3 : 3 ≤ q) (hqp : q < p) (hu : 2 * q < u) (hv : 2 * p < v)
+    (hk : 2 * p * v < k) (hvlarge : p * q < v)
+    (hbound :
+      (1 : ℚ) / (p : ℚ) + 1 / (q : ℚ) ≤
+        ((p * q : ℕ) : ℚ) / (k : ℚ) +
+          2 / ((p * q : ℕ) : ℚ) +
+          1 / ((u * q : ℕ) : ℚ) +
+          1 / ((v * p : ℕ) : ℚ)) :
+    False := by
+  have hqpos_nat : 0 < q := by omega
+  have hppos_nat : 0 < p := by omega
+  have hvpos_nat : 0 < v := by omega
+  have hkpos_nat : 0 < k := by omega
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hkpos : (0 : ℚ) < k := by exact_mod_cast hkpos_nat
+  have hsmall := norm_error_terms_lt_inv_q (p := p) (q := q) (u := u) (v := v)
+    hq3 hqp hu hv
+  have hpinv_lt : (1 : ℚ) / (p : ℚ) < ((p * q : ℕ) : ℚ) / (k : ℚ) := by
+    nlinarith [hbound, hsmall]
+  have hk_lt : (k : ℚ) < (p : ℚ) * (p : ℚ) * (q : ℚ) := by
+    field_simp [Nat.cast_mul, hppos.ne', hqpos.ne', hkpos.ne'] at hpinv_lt
+    norm_num [Nat.cast_mul] at hpinv_lt
+    nlinarith [hpinv_lt]
+  have hk_gt : ((2 * p * v : ℕ) : ℚ) < k := by exact_mod_cast hk
+  have hvlargeq : ((p * q : ℕ) : ℚ) < v := by exact_mod_cast hvlarge
+  norm_num [Nat.cast_mul] at hk_gt hvlargeq
+  nlinarith [hk_lt, hk_gt, hvlargeq, hppos]
+
+/-- **Peterfalvi (14.11.4)** arithmetic consumer with the T-side case-(9.7.b)
+data already materialized.  The T-side data supplies both `p q < v` and
+`2 p < v`, so the remaining inputs are exactly the S-side lower bound on `u`,
+the `k > 2 p v` lower bound, and the displayed norm inequality. -/
+theorem norm_cascade_contradiction_of_T_caseB {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (hu : 2 * hyp.base.q < hyp.base.u) {k : ℕ}
+    (hk : 2 * hyp.base.p * hyp.base.v < k)
+    (hbound :
+      (1 : ℚ) / (hyp.base.p : ℚ) + 1 / (hyp.base.q : ℚ) ≤
+        ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (k : ℚ) +
+          2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)) :
+    False := by
+  exact norm_cascade_contradiction hyp.base.three_le_q hyp.q_lt_p hu
+    Tdata.two_p_lt_v hk Tdata.pq_lt_v hbound
+
+/-- **Peterfalvi (14.11.4)** arithmetic consumer with both case-(9.7.b) data
+packages materialized.  The S-side data supplies `2 q < u`; the T-side data
+supplies `2 p < v` and `p q < v`. -/
+theorem norm_cascade_contradiction_of_caseB_data {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) {k : ℕ}
+    (hk : 2 * hyp.base.p * hyp.base.v < k)
+    (hbound :
+      (1 : ℚ) / (hyp.base.p : ℚ) + 1 / (hyp.base.q : ℚ) ≤
+        ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (k : ℚ) +
+          2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)) :
+    False := by
+  exact norm_cascade_contradiction_of_T_caseB Tdata Sdata.two_q_lt_u hk hbound
+
+/-- **Peterfalvi (14.11.4)** consumer for the exact output shapes of
+`caseB_for_T` and `caseB_for_S`.  It leaves only the lower bound on `k` and the
+concrete displayed norm inequality as inputs. -/
+theorem norm_cascade_contradiction_of_caseB_outputs {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) {k : ℕ}
+    (hk : 2 * hyp.base.p * hyp.base.v < k) (hbound : normCascadeBound hyp k) :
+    False := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact norm_cascade_contradiction_of_caseB_data Tdata Sdata hk hbound
+
+/-- **Peterfalvi (14.11.4)** consumer after the first numerical output of
+`main_size_bounds` has supplied `k > 2 p v`.  The remaining non-arithmetic work
+is precisely to produce the displayed norm inequality. -/
+theorem norm_cascade_contradiction_of_main_size_bound {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v)
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  exact norm_cascade_contradiction_of_caseB_data Tdata Sdata hsize hbound
+
+/-- **Peterfalvi (14.11.4)** consumer for the exact three-part numerical output
+of **Peterfalvi (14.11.1)**.  Only the first component, `k > 2 p v`, is needed
+by the norm-cascade contradiction; the remaining components stay available to
+match the theorem output without weakening its shape. -/
+theorem norm_cascade_contradiction_of_caseB_data_main_size_bounds
+    {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  exact norm_cascade_contradiction_of_main_size_bound Tdata Sdata Mdata hsize.1 hbound
+
+/-- **Peterfalvi (14.11.4)** consumer for the exact output shapes of
+`caseB_for_T`, `caseB_for_S`, and `main_size_bounds`. -/
+theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
+    {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact norm_cascade_contradiction_of_caseB_data_main_size_bounds Tdata Sdata Mdata
+    hsize hbound
+
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`. -/
 theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1885,19 +2413,59 @@ theorem generic_character_bound [Finite G]
     ∀ g : G, g ∈ Mdata.G0 → Mdata.generic_bound_formula g := by
   sorry
 
-/-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts
-`K != V`. -/
-theorem contradiction_of_K_ne_V [Finite G]
+/-- **Peterfalvi (14.11.2)+(14.11.3) ⇒ (14.11.4)**: the character-theoretic norm
+calculation.  Combining the `beta_M^tau` expansion (14.11.2) with the generic
+lower bound `|psi^tau_1| ≥ 1` (14.11.3) and the Frobenius inner-product formula
+(7.5) yields the displayed rational inequality `normCascadeBound hyp k`.  This is
+the *sole* genuinely character-theoretic input to the (14.11.4) contradiction;
+everything downstream of it is the arithmetic cascade already discharged in
+`norm_cascade_contradiction`. -/
+theorem normCascadeBound_of_charData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
-    False := by
+    normCascadeBound hyp Mdata.k := by
+  -- (14.11.2): `e = p q` together with the signed `eta_ij` expansion of `beta_M^tau`.
+  have _hbeta := betaM_expansion _hG hyp Mdata hne
+  -- (14.11.3): the generic lower bound `|psi^tau_1(g)| ≥ 1` on `G_0`.
+  have _hgen := generic_character_bound _hG hyp Mdata
   sorry
 
-/-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`. -/
+/-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts `K != V`.
+
+This is now a transparent composition rather than an opaque obligation: the
+case-(9.7.b) outputs of `caseB_for_T` (14.4) and `caseB_for_S` (14.6) supply the
+T-side/S-side cyclotomic size data, `main_size_bounds` (14.11.1) supplies
+`k > 2 p v`, and `normCascadeBound_of_charData` (14.11.2)--(14.11.3) supplies the
+displayed norm inequality.  The arithmetic consumer
+`norm_cascade_contradiction_of_caseB_outputs_main_size_bounds` then closes the
+cascade.  The only remaining genuine `sorry`s are the named producers above. -/
+theorem contradiction_of_K_ne_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
+    (hne : Mdata.K ≠ hyp.base.V) :
+    False :=
+  norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
+    (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata) Mdata
+    (main_size_bounds _hG hyp Mdata hne)
+    (normCascadeBound_of_charData _hG hyp Mdata hne)
+
+/-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`.
+
+The `K = V` half is now a genuine consequence of the (14.11.1)--(14.11.4)
+contradiction: assuming `K ≠ V` invokes `contradiction_of_K_ne_V`.  The index
+computation `|M : K| = p q` (here `Mdata.e = p q`) is the remaining genuine
+obligation; note `betaM_expansion`'s `e = p q` is unavailable here because it
+is conditioned on `K ≠ V`, so the equal-index value under `K = V` needs the
+type-I structure of `M` directly. -/
 theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp) :
     Mdata.K = hyp.base.V ∧ Mdata.e = hyp.base.p * hyp.base.q := by
-  sorry
+  refine ⟨?_, ?_⟩
+  · -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
+    by_contra hne
+    exact contradiction_of_K_ne_V _hG hyp Ldata Mdata hne
+  · -- `|M : K| = p q` from the type-I structure of `M` (still to be supplied).
+    sorry
 
 /-! ## (14.12)--(14.16): comparing `L` and `M` -/
 

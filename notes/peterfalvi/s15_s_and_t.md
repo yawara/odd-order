@@ -8,6 +8,25 @@
 
 ---
 
+## 実装状況 (2026-06-05 更新, peterfalvi worktree)
+
+**注意**: 以下の大計画は 2026-05-22 の初版 (stale)。実体は `S15_SAndT.lean` の scaffold (18 sorry)。`Hypothesis` は **opaque-Prop convention** (m/u/c 等の値は usable な等式で pin されていない field 群) で、多くの数値結果は値の不透明性ゆえブロックされる。`Hypothesis` は **どこからも構成されない** (S16 が `base : S15.Hypothesis` で参照するのみ) ので field 改変は安全。
+
+### ✅ 実証済 (real, axiom-clean)
+- **(13.14) cyclotomic number theory 一式** — `cyclotomic_divisor_facts` + 7 helper (odd / dvd_of_modEq_one / coprime / not_dvd_self / prime_dvd_modEq_one / dvd_modEq_one / modEq_one_of_forall_primeFactors)。純数論、完全証明済。
+- **(13.11) m-bounds 部分** (2026-06-05, commit 987392d): opaque `m_formula : Prop` を `m_eq : m = 1 - 1/(q-1) - (q-1)/q^p + 1/((q-1)q^p)` (= (13.10) の値) に置換して **m を pin**。新 arithmetic lemma `m_value_ge_aux` (m ≥ 1-1/(q-1)-1/q², p≥3 で可) / `m_value_gt_seven_tenths` (5≤q⇒m>7/10) / `m_value_gt_four_fifths` (7≤q⇒m>8/10)。`numeric_bounds` の **q≥7, q≥5 conjunct は real** (m_eq + three_le_p 経由)。
+
+### 🔴 残ブロッカー
+- **`numeric_bounds` の q=3 conjunct** (narrow sorry): m-bound (m>49/100) は **p≥5 が要** (q=p=3 で m=4/9<49/100 と破綻)。§15 は q<p も p≠q も field に持たず (§16 は (14.1) の `q_lt_p` から p_ne_q/five_le_p を導くが §15 には無い)。p≠q は (13.1) mmd に明示されず §10-§12 由来。u/c bound (u/c>(p²-1)/6) は **analytic_inequality (13.10) 待ち** (character theory)。→ **p≠q (or q<p) を Hypothesis に追加すれば q=3 m-bound は landable** (u/c は別途)。
+- **character-theoretic norm 系 (13.5)-(13.10)**: lambda/eta norm lower bounds, global_character_bound, analytic_inequality — §3-§8 (Dade/coherence/TI) の深い指標論依存。`m` は pin 済だが norm cascade 本体は未。
+- **c_eq_one (13.12)**: numeric_bounds + analytic + caseA に依存、blocked。
+- **caseB_order_u (13.15)**: §16 の `caseB_for_S` が `CaseBOrderUData` 経由で消費。u の値確定は (13.14) facts + character-theoretic な u 下界が要 (blocked)。
+- **normalizer_W1 (13.16) / typeII_overNormalizer (13.17) / 18,19**: group/character theory, blocked。
+
+**次の tractable 候補**: p≠q を (13.1) field 追加 (mmd 由来要確認だが FT 設定で valid) → q=3 m-bound 完成 + 他 §15 proof も恩恵。それ以外の実前進は §3-§8 character theory のスキャフォールド解消が必要。
+
+---
+
 ## TL;DR — Peterfalvi 本文最大規模, §16 直前の最終仕込み
 
 §15 は Peterfalvi 著作の中で **最も計算が過密** な節. §14 で確立した Type I 最大部分群 (13 個の補題) に続き、§15 は **Type II/III の 2 つの最大部分群 S, T** に焦点を絞る. 両者の位数・正規化群・Dade 等距写像を組合せ、最終的に「S, T の存在は矛盾を導く」という結論に到達させる. これが §16 の 11 個の結果による「G 非存在」の直接的な前提となる.

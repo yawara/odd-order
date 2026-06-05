@@ -112,7 +112,8 @@ structure Hypothesis where
   mu_definition_formula : Prop
   nu_definition_formula : Prop
   m : ℚ
-  m_formula : Prop
+  m_eq : m = 1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
+    1 / (((q : ℚ) - 1) * (q : ℚ) ^ p)
 
 namespace Hypothesis
 
@@ -303,7 +304,63 @@ theorem analytic_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (13.11)--(13.15): order and divisor determination -/
 
-/-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`. -/
+/-- Lower estimate for the analytic parameter `m` of **Peterfalvi (13.10)**.
+Dropping the (positive) last summand and bounding `(q-1)/q^p ≤ 1/q^2` (valid once
+`p ≥ 3`) gives `m ≥ 1 - 1/(q-1) - 1/q^2`. -/
+theorem m_value_ge_aux {q p : ℕ} (hq : 5 ≤ q) (hp : 3 ≤ p) :
+    (1 : ℚ) - 1 / ((q : ℚ) - 1) - 1 / (q : ℚ) ^ 2 ≤
+      1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
+        1 / (((q : ℚ) - 1) * (q : ℚ) ^ p) := by
+  have hq5 : (5 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq
+  have hqpos : (0 : ℚ) < (q : ℚ) := by linarith
+  have hq1pos : (0 : ℚ) < (q : ℚ) - 1 := by linarith
+  have hXpos : (0 : ℚ) < (q : ℚ) ^ p := by positivity
+  have hX3 : (q : ℚ) ^ 3 ≤ (q : ℚ) ^ p := pow_le_pow_right₀ (by linarith) hp
+  have hfrac : ((q : ℚ) - 1) / (q : ℚ) ^ p ≤ 1 / (q : ℚ) ^ 2 := by
+    rw [div_le_div_iff₀ hXpos (by positivity)]
+    have e : (q : ℚ) ^ 3 = ((q : ℚ) - 1) * (q : ℚ) ^ 2 + (q : ℚ) ^ 2 := by ring
+    have hsq : (0 : ℚ) ≤ (q : ℚ) ^ 2 := sq_nonneg _
+    linarith [hX3, e, hsq]
+  have hpos : (0 : ℚ) ≤ 1 / (((q : ℚ) - 1) * (q : ℚ) ^ p) := by positivity
+  linarith [hfrac, hpos]
+
+/-- **Peterfalvi (13.11.b)** numeric bound: `q ≥ 5 ⇒ m > 7/10`. -/
+theorem m_value_gt_seven_tenths {q p : ℕ} (hq : 5 ≤ q) (hp : 3 ≤ p) :
+    (7 : ℚ) / 10 <
+      1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
+        1 / (((q : ℚ) - 1) * (q : ℚ) ^ p) := by
+  have haux := m_value_ge_aux hq hp
+  have hq5 : (5 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq
+  have hq1pos : (0 : ℚ) < (q : ℚ) - 1 := by linarith
+  have h1 : 1 / ((q : ℚ) - 1) ≤ 1 / 4 := by
+    rw [div_le_div_iff₀ hq1pos (by norm_num)]; linarith
+  have h2 : 1 / (q : ℚ) ^ 2 ≤ 1 / 25 := by
+    rw [div_le_div_iff₀ (by positivity) (by norm_num)]; nlinarith [hq5]
+  linarith [haux, h1, h2]
+
+/-- **Peterfalvi (13.11.a)** numeric bound: `q ≥ 7 ⇒ m > 8/10`. -/
+theorem m_value_gt_four_fifths {q p : ℕ} (hq : 7 ≤ q) (hp : 3 ≤ p) :
+    (8 : ℚ) / 10 <
+      1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
+        1 / (((q : ℚ) - 1) * (q : ℚ) ^ p) := by
+  have hq5 : 5 ≤ q := by omega
+  have haux := m_value_ge_aux hq5 hp
+  have hq7 : (7 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq
+  have hq1pos : (0 : ℚ) < (q : ℚ) - 1 := by linarith
+  have h1 : 1 / ((q : ℚ) - 1) ≤ 1 / 6 := by
+    rw [div_le_div_iff₀ hq1pos (by norm_num)]; linarith
+  have h2 : 1 / (q : ℚ) ^ 2 ≤ 1 / 49 := by
+    rw [div_le_div_iff₀ (by positivity) (by norm_num)]; nlinarith [hq7]
+  linarith [haux, h1, h2]
+
+/-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
+
+The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
+`m_value_gt_four_fifths` / `m_value_gt_seven_tenths` applied through the now
+concrete value `m_eq` (they need only `p ≥ 3`, supplied by `three_le_p`).  The
+`q = 3` case is still open: its `m`-bound needs `p ≥ 5` (the `q = 3, p = 3`
+boundary fails `m > 49/100`), and its `u/c` bound is the analytic inequality
+(13.10). -/
 theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
@@ -311,7 +368,12 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.q = 3 →
         hyp.m > (49 / 100 : ℚ) ∧
           (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
-  sorry
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  refine ⟨fun hq7 => ?_, fun hq5 => ?_, fun hq3 => ?_⟩
+  · rw [hyp.m_eq]; exact m_value_gt_four_fifths hq7 hp3
+  · rw [hyp.m_eq]; exact m_value_gt_seven_tenths hq5 hp3
+  · -- `q = 3`: `m`-bound needs `p ≥ 5`; `u/c` bound needs analytic ineq (13.10).
+    sorry
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
 theorem c_eq_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
