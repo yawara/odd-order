@@ -2208,6 +2208,8 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   L_semidirect_formula : G → Prop
   U_characteristic_in_H : Prop
   typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base
+  typeI_data_L_eq : typeI_data.L = L
+  typeI_data_H_eq : typeI_data.H = H
 
 /-- Carrier for the case-(9.7.b) conclusion applied to `T` in Peterfalvi
 (14.4). -/
@@ -3177,7 +3179,50 @@ theorem h_odd [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [nc.h_eq_card_H]
   exact _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card nc.Ldata.H)
 
+/-- **Peterfalvi (14.5)** cardinal consequence: `u` divides `h = |H|`.
+The subgroup `U` lies in the Fitting kernel `H` of the type-I subgroup over
+`N_G(U)`, while (13.12) gives `c = 1`; hence `|U| = u` and `u ∣ |H|`. -/
+theorem u_dvd_h [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp) :
+    hyp.base.u ∣ nc.h := by
+  rw [nc.h_eq_card_H]
+  have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
+    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+  have hU_le_H : hyp.base.U ≤ nc.Ldata.H := by
+    rw [← nc.Ldata.typeI_data_H_eq]
+    exact nc.Ldata.typeI_data.U_le_H
+  have hdvd : Nat.card ↥hyp.base.U ∣ Nat.card ↥nc.Ldata.H :=
+    Subgroup.card_dvd_of_le hU_le_H
+  simpa [hU_card] using hdvd
+
 end NonConjugateHypothesis
+
+namespace Hypothesis
+
+/-- **Peterfalvi (14.5)** fixed-point-free cardinal consequence for `U`:
+`u ≡ 1 mod q`.  The Frobenius action of `W₁` on `U` gives
+`|U| ≡ 1 mod |W₁|`; using (13.12), `|U| = u`, and the definition
+`q = |W₁|` gives the stated congruence. -/
+theorem u_modEq_one_mod_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.u ≡ 1 [MOD hyp.base.q] := by
+  rcases OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base with ⟨data, _hdata⟩
+  have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
+    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one _hG hyp.base, mul_one]
+  have hU_sub_card :
+      Nat.card ↥(hyp.base.U.subgroupOf (hyp.base.U ⊔ hyp.base.W1)) =
+        Nat.card ↥hyp.base.U :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (le_sup_left : hyp.base.U ≤ hyp.base.U ⊔ hyp.base.W1)).toEquiv
+  have hW1_sub_card :
+      Nat.card ↥(hyp.base.W1.subgroupOf (hyp.base.U ⊔ hyp.base.W1)) =
+        Nat.card ↥hyp.base.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (le_sup_right : hyp.base.W1 ≤ hyp.base.U ⊔ hyp.base.W1)).toEquiv
+  have hmod := data.UW1_frobenius.card_kernel_modEq_one
+  rwa [hU_sub_card, hW1_sub_card, hU_card, ← hyp.base.q_eq_card_W1] at hmod
+
+end Hypothesis
 
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
@@ -3611,18 +3656,22 @@ theorem u_final_value_of_fpf_card_congruences
 `(p^q - 1) / (p - 1)`.
 
 The theorem `u_final_value_of_fpf_card_congruences` now contains the full
-(14.14) case split and the non-full case-(a) contradiction.  The remaining work
-is to derive the four cardinal inputs `u ∣ h`, `h ≡ 1 mod p`, `h ≡ 1 mod q`,
-and `u ≡ 1 mod q` from (14.5) and the fixed-point-free `W₁` action. -/
+(14.14) case split and the non-full case-(a) contradiction.  The divisibility
+input `u ∣ h` is supplied by `NonConjugateHypothesis.u_dvd_h`, and
+`u ≡ 1 mod q` is supplied by `Hypothesis.u_modEq_one_mod_q`; the remaining
+work is to derive the two congruences `h ≡ 1 mod p` and `h ≡ 1 mod q` from
+(14.5) and the fixed-point-free `W₁` action. -/
 theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
   rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
-  · -- Non-exceptional branch of (14.14): use
-    -- `u_final_value_of_fpf_card_congruences` once the four cardinal inputs
-    -- from (14.5) have been produced.
+  · have hu_dvd_h : hyp.base.u ∣ nc.h := nc.u_dvd_h _hG
+    have hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q] := hyp.u_modEq_one_mod_q _hG
+    -- Non-exceptional branch of (14.14): use
+    -- `u_final_value_of_fpf_card_congruences` once the two congruence inputs
+    -- for `h` have been produced.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
