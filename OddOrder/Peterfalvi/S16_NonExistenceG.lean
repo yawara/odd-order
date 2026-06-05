@@ -1633,6 +1633,184 @@ theorem appC_normSet_generator_relation {hyp : Hypothesis (G := G)}
     appCNormSetGeneratorRelation hyp :=
   appCNormSetGeneratorRelation_of_twisted_normOne_step hyp data.appC_twisted_normOne_step
 
+/-! ### BG Appendix C, Lemma C.3 Step 4: the generator relation `s₁ = s⁻¹`
+
+The remaining mathematical gap of BG Appendix C (mmd L4994–5095): the central
+prime-line factor of the relevant `k = 3` normal form is `s⁻¹`.  The argument is
+the group-relation chain (C.2)–(C.10), a kernel/fixed-point-free step inside
+`End ⁅Q, P₀⁆`, and a final contradiction via Steps 2–3.
+
+We work throughout with the prime-field-line scalar `s^x := σ(inl(ofAdd x))` for a
+field scalar `x ∈ 𝔽_{p^q}`; conjugating by `σ(inr a)` (`a ∈ U`) scales by `↑a⁻¹`. -/
+
+section Step4
+
+/-- Local `Fact` instance for the Step 4 development, so that
+`GaloisField hyp.base.p hyp.base.q` elaborates in signatures with a field scalar
+argument.  Scoped to the section; downstream callers supply their own. -/
+local instance factPPrimeStep4 {hyp : Hypothesis (G := G)} : Fact hyp.base.p.Prime :=
+  ⟨hyp.base.p_prime⟩
+
+/-- BG Appendix C prime-field-line scalar `s^x`: the additive-line element
+`σ(inl(ofAdd x))` for a field scalar `x ∈ 𝔽_{p^q}`.  The distinguished generator is
+`s = s^1`, and `s^x · s^y = s^{x+y}`. -/
+noncomputable def sScalar {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (x : GaloisField hyp.base.p hyp.base.q) : G :=
+  data.sigma (SemidirectProduct.inl (Multiplicative.ofAdd x))
+
+/-- The prime-field-line scalars are additive in the exponent: `s^x · s^y = s^{x+y}`. -/
+theorem sScalar_mul {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (x y : GaloisField hyp.base.p hyp.base.q) :
+    data.sScalar x * data.sScalar y = data.sScalar (x + y) := by
+  rw [sScalar, sScalar, sScalar, ← map_mul data.sigma,
+    ← map_mul (SemidirectProduct.inl :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
+        fieldNormalizerFrobeniusGroup hyp),
+    ← ofAdd_add]
+
+/-- The trivial scalar `s^0 = 1`. -/
+theorem sScalar_zero {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.sScalar 0 = 1 := by
+  rw [sScalar, ofAdd_zero, map_one, map_one]
+
+/-- The distinguished generator is the scalar `s = s^1`. -/
+theorem s_eq_sScalar_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s = data.sScalar 1 := by
+  rw [sScalar, s, fieldNormalizerPrimeLineGenerator]
+
+/-- The field value `↑a ∈ 𝔽_{p^q}` of a norm-one unit `a ∈ U`. -/
+def unitVal {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits hyp) :
+    GaloisField hyp.base.p hyp.base.q :=
+  ((a : (GaloisField hyp.base.p hyp.base.q)ˣ) : GaloisField hyp.base.p hyp.base.q)
+
+/-- The field value of an inverse unit is the inverse field value. -/
+theorem unitVal_inv {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits hyp) :
+    unitVal a⁻¹ = (unitVal a)⁻¹ := by
+  simp [unitVal]
+
+/-- The field value of a norm-one unit is nonzero. -/
+theorem unitVal_ne_zero {hyp : Hypothesis (G := G)} (a : fieldNormalizerNormOneUnits hyp) :
+    unitVal a ≠ 0 := by
+  simpa [unitVal] using (a : (GaloisField hyp.base.p hyp.base.q)ˣ).ne_zero
+
+/-- Conjugating the prime-line scalar `s^x` by `σ(inr a)` scales the exponent by
+`↑a⁻¹`: `σ(inr a)⁻¹ · s^x · σ(inr a) = s^{(↑a⁻¹)·x}`.  This is BG's `s^a` notation. -/
+theorem sScalar_conj {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a : fieldNormalizerNormOneUnits hyp) (x : GaloisField hyp.base.p hyp.base.q) :
+    (data.sigma (SemidirectProduct.inr a))⁻¹ * data.sScalar x *
+        data.sigma (SemidirectProduct.inr a) =
+      data.sScalar (unitVal a⁻¹ * x) := by
+  rw [sScalar, sScalar, ← map_inv, ← map_mul, ← map_mul]
+  congr 1
+  rw [← map_inv]
+  have h := OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
+    (p := hyp.base.p) (q := hyp.base.q) a⁻¹ x
+  rw [inv_inv] at h
+  exact h
+
+/-- Inversion of a prime-line scalar negates the exponent: `(s^x)⁻¹ = s^{-x}`. -/
+theorem sScalar_inv {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (x : GaloisField hyp.base.p hyp.base.q) :
+    (data.sScalar x)⁻¹ = data.sScalar (-x) := by
+  rw [sScalar, sScalar, ← map_inv, ← map_inv, ← ofAdd_neg]
+
+/-- `s⁻¹ = s^{-1}` as a prime-line scalar. -/
+theorem s_inv_eq_sScalar_neg_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s⁻¹ = data.sScalar (-1) := by
+  rw [s_eq_sScalar_one, sScalar_inv]
+
+/-- `s² = s^2` as a prime-line scalar. -/
+theorem s_sq_eq_sScalar_two {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s ^ 2 = data.sScalar 2 := by
+  rw [s_eq_sScalar_one, pow_two, sScalar_mul]
+  congr 1
+  norm_num
+
+/-- The transported prime-line element `σ(P₀ c)` is the scalar `s^{algebraMap c}`. -/
+theorem sigma_primeLineElement_eq_sScalar {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (c : ZMod hyp.base.p) :
+    data.sigma (fieldNormalizerPrimeLineElement hyp c) =
+      data.sScalar
+        (algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c) := by
+  rw [sScalar, fieldNormalizerPrimeLineElement]
+
+/-- The central prime-line scalar `s^{-1}` equals `σ(P₀ (-1))`, the middle factor
+of the target normal form. -/
+theorem sScalar_neg_one_eq_sigma_primeLineElement {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    data.sScalar (-1) =
+      data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) := by
+  rw [sigma_primeLineElement_eq_sScalar]
+  congr 1
+  push_cast
+  ring
+
+/-- **BG Appendix C, Lemma C.3 Step 4 base relation** (mmd L4994): for norm-one
+units `a, b` with `↑a⁻¹ + ↑b⁻¹ = 2`, BG's identity `s^a · s^b = s²`, where the BG
+conjugate `s^a = σ(inr a)⁻¹ · s · σ(inr a) = s^{↑a⁻¹}`. -/
+theorem sBGConj_mul_sBGConj {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
+    ((data.sigma (SemidirectProduct.inr a))⁻¹ * data.s *
+          data.sigma (SemidirectProduct.inr a)) *
+        ((data.sigma (SemidirectProduct.inr b))⁻¹ * data.s *
+          data.sigma (SemidirectProduct.inr b)) =
+      data.s ^ 2 := by
+  have ha : (data.sigma (SemidirectProduct.inr a))⁻¹ * data.s *
+      data.sigma (SemidirectProduct.inr a) = data.sScalar (unitVal a⁻¹) := by
+    rw [s_eq_sScalar_one, sScalar_conj, mul_one]
+  have hb : (data.sigma (SemidirectProduct.inr b))⁻¹ * data.s *
+      data.sigma (SemidirectProduct.inr b) = data.sScalar (unitVal b⁻¹) := by
+    rw [s_eq_sScalar_one, sScalar_conj, mul_one]
+  rw [ha, hb, sScalar_mul, hab, s_sq_eq_sScalar_two]
+
+/-- **BG Appendix C, Lemma C.3 Step 4 relation (C.2)** (mmd L4994): for norm-one
+units `a, b` with `↑a⁻¹ + ↑b⁻¹ = 2`,
+`s⁻² · (σ(inr a)⁻¹ s σ(inr a)) · (σ(inr b)⁻¹ s σ(inr b)) = 1`. -/
+theorem relationC2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
+    data.s ^ (-2 : ℤ) *
+        (((data.sigma (SemidirectProduct.inr a))⁻¹ * data.s *
+            data.sigma (SemidirectProduct.inr a)) *
+          ((data.sigma (SemidirectProduct.inr b))⁻¹ * data.s *
+            data.sigma (SemidirectProduct.inr b))) = 1 := by
+  rw [data.sBGConj_mul_sBGConj a b hab, zpow_neg, zpow_two, ← pow_two,
+    inv_mul_cancel]
+
+/-- **BG Appendix C, Lemma C.3 Step 4 E-membership extraction** (mmd L5090–5094):
+if the `k = 3` normal form of `s · σ(inr W) · s⁻²` has central prime-line factor
+`s⁻¹`, then the inverse field value `(↑W)⁻¹` lies in the norm set `E`.  This is BG's
+final paragraph `v₁ = 2 - W ⟹ N(2 - W) = N(v₁) = 1 ⟹ W ∈ E`, read in the repo's
+(inverse) convention so that it is `(↑W)⁻¹` that enters `E`. -/
+theorem unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (W u₁ v₁ : fieldNormalizerNormOneUnits hyp)
+    (hdec : data.s * data.sigma (SemidirectProduct.inr W) * data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+          data.sigma (SemidirectProduct.inr v₁)) :
+    (unitVal W)⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q := by
+  have hN :
+      OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q
+        ((2 : GaloisField hyp.base.p hyp.base.q) * unitVal W - 1) = 1 :=
+    data.normN_two_mul_sub_one_of_sigma_first_k_three_decomposition W u₁ v₁ hdec
+  have hWnorm :
+      OddOrder.BG.AppC.NormSet.normN hyp.base.p hyp.base.q (unitVal W) = 1 :=
+    (OddOrder.BG.AppC.NormSet.mem_normOneUnits_iff_normN hyp.base.p hyp.base.q
+      hyp.base.q_prime.ne_zero (W : (GaloisField hyp.base.p hyp.base.q)ˣ)).mp W.property
+  have hW0 : unitVal W ≠ 0 := unitVal_ne_zero W
+  refine ⟨?_, ?_⟩
+  · rw [OddOrder.BG.AppC.NormSet.normN_inv, hWnorm, inv_one]
+  · have hcalc :
+        (2 : GaloisField hyp.base.p hyp.base.q) - (unitVal W)⁻¹ =
+          (unitVal W)⁻¹ * ((2 : GaloisField hyp.base.p hyp.base.q) * unitVal W - 1) := by
+      field_simp
+    rw [hcalc, OddOrder.BG.AppC.NormSet.normN_mul,
+      OddOrder.BG.AppC.NormSet.normN_inv, hWnorm, inv_one, one_mul, hN]
+
+end Step4
+
 end FieldNormalizerData
 
 /-! ## (14.3)--(14.7): the subgroup `L` over `N_G(U)` -/
