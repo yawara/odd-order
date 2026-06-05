@@ -45,7 +45,7 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   が twisted step `∀u∈E, ↑((tConjAut³)(u⁻¹))∈E` に過不足なく合致。**循環なし**。
 - 配線補題 (全 build-green, sorry-free):
   - `Step4Capstone (data) : Prop` = ∀a, ↑a⁻¹∈E → exists_step4_first_k_three(a) の middle が s⁻¹。
-  - `normSetETwistedNormOneStep_tConj_pow_three_of_capstone` : capstone ⟹ twisted step (φ=tConjAut³)。
+  - `normSetETwistedNormOneStep_tConj_pow_three_inv_of_capstone` : capstone ⟹ twisted step (現 φ=(tConjAut³)⁻¹)。
   - `appCNormSetTwistedNormOneStep_of_capstone` / `appC_normSet_generator_relation_of_capstone` :
     capstone ⟹ generator relation を **field 非経由**で。
 - **capstone 完成後**: `appC_normSet_generator_relation` (S16:1631) を `_of_capstone` 版に差し替え →
@@ -66,8 +66,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 - **companion 構成** `exists_companion_of_unitVal_inv_mem_normSetE` (🆕 2026-06-05 続2):
   `↑a⁻¹∈E ⟹ ∃ b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E` (b=bU⁻¹, bU=`normOneUnitOfMemNormSetE (2-↑a⁻¹∈E)`)。
   `sBGConj_mul_sBGConj`/`relationC2` の仮説 `↑a⁻¹+↑b⁻¹=2` を放電する入口。build-green。
-- **経路B 配線** (commit e1b1991): `Step4Capstone` / `normSetETwistedNormOneStep_tConj_pow_three_of_capstone` /
-  `appCNormSetTwistedNormOneStep_of_capstone` / `appC_normSet_generator_relation_of_capstone`。
+- **🆕🆕 backward restate done** (commit 9be100a): `Step4Capstone` + 配線を forward `tConjAut³` から
+  **backward `(tConjNormOneUnitsAut^3)⁻¹`** に切替 (BG-provable 形)。配線名 →
+  `normSetETwistedNormOneStep_tConj_pow_three_inv_of_capstone` / `appCNormSetTwistedNormOneStep_of_capstone`
+  (φ=(tConjAut³)⁻¹, φ^p=1 は `inv_pow`+pow_p) / `appC_normSet_generator_relation_of_capstone`。
+  **capstone M₁ = `s·t⁻³σ(inr a⁻¹)t³·s⁻²` が BG M₁ と完全一致** ⟹ BG (C.4) q-swap 直接移植可。build-green。
+- 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
 ### 次の 1 手 (最優先): `Step4Capstone` を証明する ((C.3)→(C.10) → kernel → s₁=s⁻¹)
@@ -75,12 +79,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 
 > 🆕🆕 **2026-06-05 続2 の進捗**: (a) **companion 構成 done** (`exists_companion_of_unitVal_inv_mem_normSetE`,
 > build-green) — `↑a⁻¹∈E ⟹ ∃b, ↑a⁻¹+↑b⁻¹=2 ∧ ↑b⁻¹∈E`、`relationC2` の入口。
-> (b) **🔴 (C.4) に forward-conj の障害を発見 → 推奨解も確定**: repo engine の共役が forward なため
-> 現行 `tConjAut³` (forward) では BG (C.4) 移植不可・局所 q-swap 不能 (Q 元が U 元に刺さる)。
-> **🚩 解決 = capstone/配線を backward `tConjAut⁻³` に切替** (= BG が自然に与える向き; capstone M₁ が
-> BG M₁ と完全一致し q-swap が直接移植可)。**feasibility 3 点検証済** (downstream φ-agnostic /
-> φ-matching backward OK / q_j 同一)。詳細 = step 1「🚩🚩 推奨解」。次セッション = この切替 (~75 行) →
-> BG (C.4) q-swap 写経 → (C.5)-(C.10) → kernel。
+> (b) **🔴 (C.4) forward-conj 障害を発見 → 🆕 backward 切替で解決 (commit 9be100a, build-green)**:
+> forward `tConjAut³` では BG (C.4) 移植不可 (局所 q-swap で Q 元が U 元に刺さる)。**capstone/配線を
+> backward `(tConjAut³)⁻¹` に restate 済** ⟹ capstone M₁=`s·t⁻³σ(inr a⁻¹)t³·s⁻²` が BG M₁ と完全一致、
+> **BG (C.4) q-swap がそのまま使える**。downstream は φ-agnostic で E=E⁻¹ 不変。
+> **次セッション = (1) backward decomposition engine (`(tConjAut³)⁻¹` 版の `∃c u₁v₁`) → (2) BG (C.4)
+> q-swap 写経で c=-1 → (3) (C.5)-(C.10) → (4) kernel/End**。step 1 参照。
 
 > 💡 **k=3 に固定して導出してよい** (推奨): BG は (C.2)-(C.10) を一般 k∈F_p で進め s₁=s⁻¹ を出すが、
 > 論証は **各 k で独立** (異なる k を混ぜない) で、最終利用は k=3 のみ。`Step4Capstone` 自体が slot
@@ -127,11 +131,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
        **任意の φ (φ^p=1) で動作** (`(tConjAut⁻³)^p=(tConjAut^p)⁻³=1` OK)。② φ-matching は backward でも成立
        (capstone を a=u⁻¹ で呼び、E-extraction `(↑W)⁻¹∈E` (W=tConjAut⁻³ u) = `↑(tConjAut⁻³ u⁻¹)∈E` =
        twisted step に過不足なく合致)。③ backward repo M₁ = BG M₁ なので q-swap が同一 q_j で telescope。
-     - **作業**: (i) backward conj lemma `t⁻ⁿσ(inr u)tⁿ=σ(inr((tConjAut⁻¹)ⁿ u))` (forward S16:1038 を逆に)、
-       (ii) backward engine `exists_step4_first_k_three_decomposition` の `tConjAut⁻³` 版、
-       (iii) `Step4Capstone`/`..._tConj_pow_three_of_capstone`/`appCNormSetTwistedNormOneStep_of_capstone` を
-       `tConjAut⁻³` (=`(tConjAut⁻¹)³`) に restate (全 build-green 保てる、capstone は def のまま)、
-       (iv) その後 BG (C.4) q-swap を写経 (下の旧「✅ 証明構造解明」が **backward なら有効**)。推定 ~75 行 + (C.4)。
+     - **作業**: ✅ (iii) `Step4Capstone`/配線の `(tConjAut³)⁻¹` restate は **done** (commit 9be100a, build-green)。
+       残り: (i) backward conj lemma `(t^n)⁻¹σ(inr u)t^n=σ(inr((tConjAut^n)⁻¹ u))` (forward S16:1038 を逆に;
+       `← map_inv` 系で ~5 行)、(ii) **backward decomposition** = capstone の `∃c u₁v₁` を与える lemma
+       (`s·σ(inr((tConjAut³)⁻¹ a⁻¹))·s⁻² ∈ P⊔U` を Step1 `exists_sigma_normOne_primeLine_normOne_of_mem_PU`
+       に通す; forward `exists_step4_first_k_three_decomposition` (S16:1179) の逆向き版、(i) を使い ~15 行)、
+       (iv) BG (C.4) q-swap を写経 (下の「🔁 BG (C.4) q-swap」が backward で**そのまま有効**) → c=-1。
    - 代替: (a) forward を大域 Q-argument で押す (真偽リスク有、非推奨) / (c) module/End 抽象で一括 (大工事)。
    - **🔁 BG (C.4) q-swap (backward なら有効・写経対象)**: M₁=`s(a⁻¹)^{t³}s⁻²` (=backward capstone LHS),
      M₂=`s³(ab⁻¹)^{t²}s⁻¹`, M₃=`s²b^t s⁻³`。(C.4)=`s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1`。各 connector が単一 Q-swap
