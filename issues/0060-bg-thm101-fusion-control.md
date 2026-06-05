@@ -7,6 +7,75 @@ created: 2026-06-05
 
 # BG Thm 10.1 fusion control (§10 keystone)
 
+## ▶▶▶ START HERE (fresh session, 2026-06-05 引き継ぎ)
+
+**状態**: §9 完全 close 済 (commit 12ae441)。Thm 10.1 の **5 prerequisite が全て build-green の private
+helper として完成・コミット済** (`OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean`)。
+S10 は 0 errors。残るは **part (b) 帰納本体の orchestration + (a)/(c) order 修正 + capstone wiring** のみ。
+
+**まず読む**: 本 issue の「規約解決」節 (← part(b) 実装の最重要設計) + 「進捗」節 + s10 notes。
+
+### 使える green helper (S10_MalphaMsigma.lean、全て `OddOrder.BG.Ch3.S10` namespace)
+
+```
+-- L255: 共役⇄subtype 同変
+map_subtype_conj_smul {M} (c : ↥M) (K : Subgroup ↥M) :
+  (MulAut.conj c • K).map M.subtype = MulAut.conj (c:G) • (K.map M.subtype)
+-- L270: σ basic (mmd L2655) — ∀ Sylow-p Q of M, N_G(Q̄)≤M
+normalizer_sylow_map_le_of_mem_sigma [Finite G] {M p} [Fact p.Prime] (hp : p ∈ sigma M) (Q : Sylow p ↥M) :
+  Subgroup.normalizer (((Q:Subgroup ↥M).map M.subtype : Subgroup G):Set G) ≤ M
+-- L302: part (d) — X=P̄ Sylow of M, conj g•X≤M ⟹ g∈M
+fusion_d_of_mem_sigma [Finite G] {M p} [Fact p.Prime] (hp : p ∈ sigma M)
+  (P : Sylow p ↥M) {g} (hg : MulAut.conj g • ((P:Subgroup ↥M).map M.subtype) ≤ M) : g ∈ M
+-- L342: M self-normalizing
+maximal_normalizer_le_self [Finite G] (hG) {M} (hM : M ∈ maximalSubgroups G) :
+  Subgroup.normalizer (M:Set G) ≤ M
+-- L369: Frattini分解 (r(P)≤2 case) — L=O_{p'}(L)·N_L(P)
+frattini_decomp_of_rank_le_two [Finite G] (hG) {L} (hL : L<⊤) {p} [Fact p.Prime]
+  (P : Sylow p ↥L) (hp_dvd : p ∣ Nat.card ↥L) (hrank : rank ↥(P:Subgroup ↥L) ≤ 2) :
+  (⊤:Subgroup ↥L) = Ch03.oPiCore {q | q ∉ ({p}:Set ℕ)} ↥L ⊔ Subgroup.normalizer (P:Subgroup ↥L)
+-- 既存 (GroupTheory): conj h•H=H ⟹ h∈N_G(H)
+mem_normalizer_of_conj_smul_eq_self {Q a} (h : MulAut.conj a • Q = Q) : a ∈ Subgroup.normalizer Q
+```
+
+外部: **Thm 9.6** = `OddOrder.BG.Ch2.S09.uniquenessTheorem [Finite G] (hG) {K} (hKlt : K<⊤)
+(hr2 : 2≤rank ↥K) (hr3 : 3≤rank ↥K ∨ 3≤rank ↥(centralizer K)) : IsUniquelyMaximal K`。
+L solvable = `hG.solvable_of_lt_top L (hL:L<⊤)`。`hG.odd : Odd (Nat.card G)`。
+
+### やる順 (推奨)
+
+1. **(a)/(c) scaffold order 修正**: main 定理 `fusion_control_of_mem_sigma` (L392) の (a) を
+   `∃ m ∈ M, ∃ c ∈ centralizer X, g = m * c`、(c) も C·N→ order を実証可能形に (← 「規約解決」参照)。
+   ※ placeholder 修正なので合法。下流消費者 (10.2/10.7) は未実装なので order 自由。
+2. **`fusion_b`** (帰納本体) を private theorem として書く。skeleton:
+   ```
+   private theorem fusion_b [Finite G] (hG) {M} (hM : M ∈ maximalSubgroups G) {p} [Fact p.Prime]
+       (hp : p ∈ sigma M) : ∀ X : Subgroup G, X ≠ ⊥ → IsPGroup p X →
+       ∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
+         ∃ c ∈ Subgroup.centralizer (X:Set G),
+           MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M := by
+     -- 強帰納 on `Nat.card G - Nat.card ↥X`:
+     suffices key : ∀ n, ∀ X, Nat.card G - Nat.card ↥X = n → X≠⊥ → IsPGroup p X → <stmt X> by
+       intro X hXne hXp; exact key _ X rfl hXne hXp
+     intro n; induction n using Nat.strong_induction_on with | _ n IH => intro X hmeas hXne hXp g₁ g₂ h1 h2
+     by_contra hcon; push_neg at hcon  -- hcon : ∀c∈C_G(X), conj c•(conj g₁•M) ≠ conj g₂•M
+     <diagram + 2 cases>
+   ```
+   IH は `|X'|>|X|` (measure 減少) で (b)。本体 = mmd L2679-2711 (「やること」節の (b) step)。
+3. **(b)⟹(a), (a)⟹(c), (b)⟹(e)** 還元 (「還元 plan」節、order は実証形に合わせる)。
+4. **capstone** `fusion_control_of_mem_sigma`: `refine ⟨?a, ?b, ?c, ?d, ?e⟩`、
+   (b)=`fusion_b ...`、(d)=`fun ⟨P,rfl⟩ g hg => fusion_d_of_mem_sigma hp P hg`、(a)(c)(e)=還元。
+
+### ⚠️ 最大の formalization 注意点 (WLOG "replace M by conjugate", mmd L2693)
+
+BG「M は Sylow-p of G を含む。M を共役で取り替えて P⊆M と仮定」。**M を literal に取り替えない**:
+P (Sylow-p of L) は p-subgroup of G ⟹ ある Sylow-p of G ⊆ ある共役 M^s (p∈σ(M) ⟹ M ⊇ Sylow-p Q of G
+⟹ 全 Sylow-p of G = Q^h ⊆ M^h)。**P⊆M^s なる s を取り、M^s を base に使う**。M₁,M₂ は M-軌道=M^s-軌道、
+C_G(X)-非共役 (10.1) は代表元非依存。結論「M₁,M₂ が C_G(X)-共役」も軌道のみに依存 ⟹ M^s 経由で矛盾を出せる。
+σ helper は `p∈σ(M^s)` で呼ぶ (σ equivariant: `p∈σ(M) ⟹ p∈σ(MulAut.conj s•M)` の補題が要、要新規 ~10行)。
+
+---
+
 ## 背景
 
 §9 (Uniqueness Thm 9.6) 完成 (commit 12ae441) で §10 解禁。§10 = 18 scaffold sorry の大型節で、
