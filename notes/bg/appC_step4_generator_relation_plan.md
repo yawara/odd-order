@@ -12,6 +12,40 @@ BG App.C 経路 (`theoremC` → `final_contradiction`) が carrier だけで閉�
 
 ---
 
+## 🚩 次セッション START HERE (2026-06-05 handoff)
+
+**worktree セットアップ** (この worktree は `.lake`/`references` symlink が無い場合がある):
+```bash
+cd <worktree>
+mkdir -p .lake && ln -sfn /home/ywr/odd-order/.lake/packages .lake/packages
+ln -sfn /home/ywr/odd-order/references references
+[ -d .lake/build ] || cp -a /home/ywr/odd-order/.lake/build .lake/build
+```
+build: `lake build OddOrder.Peterfalvi.S16_NonExistenceG` (leaf) → 完了直前に `lake build OddOrder` (full 3580)。
+作業対象ファイル = **`OddOrder/Peterfalvi/S16_NonExistenceG.lean` の `namespace FieldNormalizerData`**。
+
+**✅ landed (このセッション, S16 `FieldNormalizerData` 内, 全 build-green/axiom-clean)**:
+- (X)/(XI) infra: `W2_card_coprime_Q_card` / `w2ConjQAut` / `w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot`
+  (= `C_Q(W₂)⊓⁅Q,W₂⁆=⊥`) / `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` (FPF) /
+  `w2ConjQAut_apply_coe` / `exists_yD_mem_actionCommutator_conj_s_eq_t` ((XI): `∃yD∈⁅Q,W₂⁆, yD·s·yD⁻¹=t`)。
+- (C.2) 足場: `sigma_inr_inv_mul_s_mul_sigma_inr` (= `σ(inr a)⁻¹·s·σ(inr a)=σ(inl(a⁻¹·1))`)。
+
+**次の 1 手 (最優先)**: §6.1 の **a↔a⁻¹ sign を 1 回で固定**する。手順:
+  終端補題 `OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition`
+  (NormSet.lean:773) が要求する H-関係 `inl(1)·inr(w)·inl(-2) = inr(u₁)·inl(-1)·inr(v₁)` の `w` と、
+  (C.5) 第1式の `(a⁻¹)^{t³}` (= `exists_step4_first_k_three_decomposition`, S16:1179 の `tConjAut³ u⁻¹`)
+  の coe を突き合わせ、`sigma_inr_inv_mul_s_mul_sigma_inr` のスカラー `a⁻¹` 側で base relation
+  `s^a s^b = s²` を sign 整合させる。**これが済めば (C.2)-(C.10) は §3 の補題分解どおり既存 API chain**。
+
+**最終目標**: `s₁=s⁻¹` ⟹ `appC_normSet_generator_relation_of_first_k_three_coordinate` (S16:1324) の hstep を満たし
+  `FieldNormalizerData.appC_twisted_normOne_step` を **field から削除** (producer の義務減)。
+  kernel 段で `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` (FPF) を使い `(s⁻¹-1)` 可逆化、
+  `exists_yD_mem_actionCommutator_conj_s_eq_t` で y を ⁅Q,W₂⁆ に載せる。
+
+**残ステップ**: §3 補題分解参照 ((C.2)-(C.10) 群関係鎖 → kernel→End 翻訳 → `s₁=s⁻¹` capstone → 配線)。
+
+---
+
 ## 0. 現状サマリ (2026-06-05 監査)
 
 App.C の有限体核は **全完成** (sorry-free・axiom-clean, build 3487 green):
