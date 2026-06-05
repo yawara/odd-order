@@ -1893,6 +1893,121 @@ theorem exists_step4_first_k_three_inv_decomposition
   exact (hyp.base.P ⊔ hyp.base.U).mul_mem
     ((hyp.base.P ⊔ hyp.base.U).mul_mem hs hmid) hr
 
+/-! ### BG Appendix C (C.4) connector `q`-swaps
+
+The three connector words appearing between the conjugated factors in the BG (C.4)
+relation are single `Q`-commutator swaps `qᵢ qⱼ = qⱼ qᵢ` (`qᵢ = (s⁻¹)ⁱ tⁱ ∈ Q`,
+`Q` abelian).  Each rewrites a connector to a form whose `t`-powers telescope with
+the neighbouring conjugates. -/
+
+/-- BG (C.4) connector 1: `s⁻³ t² s = t⁻¹ s⁻² t³`, by commuting `(s⁻¹)³t³` and
+`t⁻¹s` inside the abelian `Q`. -/
+theorem connectorC4_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    (data.s⁻¹) ^ 3 * data.t ^ 2 * data.s =
+      data.t⁻¹ * (data.s⁻¹) ^ 2 * data.t ^ 3 :=
+  calc
+    (data.s⁻¹) ^ 3 * data.t ^ 2 * data.s
+        = ((data.s⁻¹) ^ 3 * data.t ^ 3) * (data.t⁻¹ * data.s) := by group
+    _ = (data.t⁻¹ * data.s) * ((data.s⁻¹) ^ 3 * data.t ^ 3) :=
+          data.Q_mul_comm (data.s_inv_pow_mul_t_pow_mem_Q 3) data.t_inv_mul_s_mem_Q
+    _ = data.t⁻¹ * (data.s⁻¹) ^ 2 * data.t ^ 3 := by group
+
+/-- BG (C.4) connector 2: `s⁻² t⁻¹ s³ = t⁻³ s t²`, by commuting `(s⁻¹)²t²` and
+`(t⁻¹)³s³` inside the abelian `Q`. -/
+theorem connectorC4_two {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    (data.s⁻¹) ^ 2 * data.t⁻¹ * data.s ^ 3 =
+      (data.t⁻¹) ^ 3 * data.s * data.t ^ 2 :=
+  calc
+    (data.s⁻¹) ^ 2 * data.t⁻¹ * data.s ^ 3
+        = ((data.s⁻¹) ^ 2 * data.t ^ 2) * ((data.t⁻¹) ^ 3 * data.s ^ 3) := by group
+    _ = ((data.t⁻¹) ^ 3 * data.s ^ 3) * ((data.s⁻¹) ^ 2 * data.t ^ 2) :=
+          data.Q_mul_comm (data.s_inv_pow_mul_t_pow_mem_Q 2)
+            (data.t_inv_pow_mul_s_pow_mem_Q 3)
+    _ = (data.t⁻¹) ^ 3 * data.s * data.t ^ 2 := by group
+
+/-- BG (C.4) connector 3: `s⁻¹ t⁻¹ s² = t⁻² s t`, by commuting `s⁻¹t` and
+`(t⁻¹)²s²` inside the abelian `Q`. -/
+theorem connectorC4_three {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    data.s⁻¹ * data.t⁻¹ * data.s ^ 2 =
+      (data.t⁻¹) ^ 2 * data.s * data.t :=
+  calc
+    data.s⁻¹ * data.t⁻¹ * data.s ^ 2
+        = (data.s⁻¹ * data.t) * ((data.t⁻¹) ^ 2 * data.s ^ 2) := by group
+    _ = ((data.t⁻¹) ^ 2 * data.s ^ 2) * (data.s⁻¹ * data.t) :=
+          data.Q_mul_comm data.s_inv_mul_t_mem_Q (data.t_inv_pow_mul_s_pow_mem_Q 2)
+    _ = (data.t⁻¹) ^ 2 * data.s * data.t := by group
+
+/-- **BG Appendix C, Lemma C.3 relation (C.4)** (mmd L4994, PDF p.150): the
+backward conjugated `k = 3` relation
+`s⁻³ t² M₁ t⁻¹ M₂ t⁻¹ M₃ s³ = 1`, where
+`M₁ = s · (t⁻³ σ(inr a)⁻¹ t³) · s⁻²`, `M₂ = s³ · (t⁻² σ(inr (a b⁻¹)) t²) · s⁻¹`,
+`M₃ = s² · (t⁻¹ σ(inr b) t) · s⁻³` are BG's `s^{k-2}(a⁻¹)^{t^k}s^{-k+1}` etc.  The
+connector words between the conjugated factors `q`-swap (Connectors 1–3) and the
+`t`-powers then telescope to `t⁻¹ · (C.2) · t = 1`. -/
+theorem relationC4 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
+    (data.s⁻¹) ^ 3 * data.t ^ 2 *
+        (data.s *
+            ((data.t⁻¹) ^ 3 * (data.sigma (SemidirectProduct.inr a))⁻¹ * data.t ^ 3) *
+          (data.s⁻¹) ^ 2) *
+      data.t⁻¹ *
+        (data.s ^ 3 *
+            ((data.t⁻¹) ^ 2 *
+              (data.sigma (SemidirectProduct.inr a) *
+                (data.sigma (SemidirectProduct.inr b))⁻¹) * data.t ^ 2) *
+          data.s⁻¹) *
+      data.t⁻¹ *
+        (data.s ^ 2 *
+            (data.t⁻¹ * data.sigma (SemidirectProduct.inr b) * data.t) *
+          (data.s⁻¹) ^ 3) *
+      data.s ^ 3 = 1 := by
+  have hC2 := data.relationC2 a b hab
+  calc
+    (data.s⁻¹) ^ 3 * data.t ^ 2 *
+          (data.s *
+              ((data.t⁻¹) ^ 3 * (data.sigma (SemidirectProduct.inr a))⁻¹ * data.t ^ 3) *
+            (data.s⁻¹) ^ 2) *
+        data.t⁻¹ *
+          (data.s ^ 3 *
+              ((data.t⁻¹) ^ 2 *
+                (data.sigma (SemidirectProduct.inr a) *
+                  (data.sigma (SemidirectProduct.inr b))⁻¹) * data.t ^ 2) *
+            data.s⁻¹) *
+        data.t⁻¹ *
+          (data.s ^ 2 *
+              (data.t⁻¹ * data.sigma (SemidirectProduct.inr b) * data.t) *
+            (data.s⁻¹) ^ 3) *
+        data.s ^ 3
+        = ((data.s⁻¹) ^ 3 * data.t ^ 2 * data.s) *
+              ((data.t⁻¹) ^ 3 * (data.sigma (SemidirectProduct.inr a))⁻¹ * data.t ^ 3) *
+              ((data.s⁻¹) ^ 2 * data.t⁻¹ * data.s ^ 3) *
+              ((data.t⁻¹) ^ 2 *
+                (data.sigma (SemidirectProduct.inr a) *
+                  (data.sigma (SemidirectProduct.inr b))⁻¹) * data.t ^ 2) *
+              (data.s⁻¹ * data.t⁻¹ * data.s ^ 2) *
+              (data.t⁻¹ * data.sigma (SemidirectProduct.inr b) * data.t) := by
+        group
+    _ = (data.t⁻¹ * (data.s⁻¹) ^ 2 * data.t ^ 3) *
+              ((data.t⁻¹) ^ 3 * (data.sigma (SemidirectProduct.inr a))⁻¹ * data.t ^ 3) *
+              ((data.t⁻¹) ^ 3 * data.s * data.t ^ 2) *
+              ((data.t⁻¹) ^ 2 *
+                (data.sigma (SemidirectProduct.inr a) *
+                  (data.sigma (SemidirectProduct.inr b))⁻¹) * data.t ^ 2) *
+              ((data.t⁻¹) ^ 2 * data.s * data.t) *
+              (data.t⁻¹ * data.sigma (SemidirectProduct.inr b) * data.t) := by
+        rw [data.connectorC4_one, data.connectorC4_two, data.connectorC4_three]
+    _ = data.t⁻¹ *
+          (data.s ^ (-2 : ℤ) *
+            (((data.sigma (SemidirectProduct.inr a))⁻¹ * data.s *
+                data.sigma (SemidirectProduct.inr a)) *
+              ((data.sigma (SemidirectProduct.inr b))⁻¹ * data.s *
+                data.sigma (SemidirectProduct.inr b)))) *
+          data.t := by
+        group
+    _ = data.t⁻¹ * 1 * data.t := by rw [hC2]
+    _ = 1 := by group
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
