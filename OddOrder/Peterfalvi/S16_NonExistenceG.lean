@@ -2413,13 +2413,41 @@ theorem generic_character_bound [Finite G]
     ∀ g : G, g ∈ Mdata.G0 → Mdata.generic_bound_formula g := by
   sorry
 
-/-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts
-`K != V`. -/
-theorem contradiction_of_K_ne_V [Finite G]
+/-- **Peterfalvi (14.11.2)+(14.11.3) ⇒ (14.11.4)**: the character-theoretic norm
+calculation.  Combining the `beta_M^tau` expansion (14.11.2) with the generic
+lower bound `|psi^tau_1| ≥ 1` (14.11.3) and the Frobenius inner-product formula
+(7.5) yields the displayed rational inequality `normCascadeBound hyp k`.  This is
+the *sole* genuinely character-theoretic input to the (14.11.4) contradiction;
+everything downstream of it is the arithmetic cascade already discharged in
+`norm_cascade_contradiction`. -/
+theorem normCascadeBound_of_charData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
-    False := by
+    normCascadeBound hyp Mdata.k := by
+  -- (14.11.2): `e = p q` together with the signed `eta_ij` expansion of `beta_M^tau`.
+  have _hbeta := betaM_expansion _hG hyp Mdata hne
+  -- (14.11.3): the generic lower bound `|psi^tau_1(g)| ≥ 1` on `G_0`.
+  have _hgen := generic_character_bound _hG hyp Mdata
   sorry
+
+/-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts `K != V`.
+
+This is now a transparent composition rather than an opaque obligation: the
+case-(9.7.b) outputs of `caseB_for_T` (14.4) and `caseB_for_S` (14.6) supply the
+T-side/S-side cyclotomic size data, `main_size_bounds` (14.11.1) supplies
+`k > 2 p v`, and `normCascadeBound_of_charData` (14.11.2)--(14.11.3) supplies the
+displayed norm inequality.  The arithmetic consumer
+`norm_cascade_contradiction_of_caseB_outputs_main_size_bounds` then closes the
+cascade.  The only remaining genuine `sorry`s are the named producers above. -/
+theorem contradiction_of_K_ne_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
+    (hne : Mdata.K ≠ hyp.base.V) :
+    False :=
+  norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
+    (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata) Mdata
+    (main_size_bounds _hG hyp Mdata hne)
+    (normCascadeBound_of_charData _hG hyp Mdata hne)
 
 /-- **Peterfalvi (14.11)**: `K = V` and `|M : K| = p q`. -/
 theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
