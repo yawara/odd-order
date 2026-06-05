@@ -54,9 +54,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `ControlsFusionIn`(=Thm 10.1(a) を X=⟨x⟩ で適用)+ `focalSubgroup_subgroupOf_map_eq_of_controlsFusionIn`
   (Isaacs Cor 5.22) + Focal Thm + `commutator_eq_top`(G'=G)。axiom-clean。helper:
   `commutator_eq_top` / `isSylow_sylowMap_of_mem_sigma`(全 Sylow-p of M は G の Sylow)。✅
-- [x] **`Msigma_le_derived`** (M_σ⊆M' 全体): per-Sylow core + finite Sylow-generation helper
-  `le_of_sylow_le` で完成。`Msigma_isPiGroup` から各 Sylow prime が σ(M) に入ることを使い、
-  `sylow_le_derived_of_mem_sigma` に接続。✅ commit 970e458
+- [x] **`Msigma_le_derived` / `hallSigmaSubgroup_le_derived`** (Step 2: Hall σ-subgroup ⊆ M'):
+  Focal + Thm 10.1 の per-Sylow proof `sylow_le_derived_of_mem_sigma` から、finite Sylow-generation
+  で `M_σ⊆M'` を完成 (commit 970e458)。さらに任意の Hall `σ(M)`-subgroup `S≤M` について
+  `S≤M'` へ一般化済み。これは後続の `M(σ)/M_α ≤ M'/M_α` に直接使う。
 - [x] **conditional Hall transport support**: `opiCoreInG_subgroupOf_isHall_of_isHall` /
   `piSubgroup_le_opiCoreInG_of_isHall` を一般形として追加し、`Malpha_*` / `Msigma_*`
   specializations を公開。G-level の `IsHallSubgroup π O_π(M)` から `↥M` 内 Hall 性と
@@ -71,8 +72,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   `Msigma_ne_bot_of_rank_fittingInG_le_two` / `Msigma_ne_bot_of_rank_le_two` により、§4.20(c)
   package、`rank F(M)≤2`、`rank M≤2` の入力からも `M_σ≠⊥` まで接続済み。
   `IsMinimalSimpleOdd.ne_bot_of_mem_maximalSubgroups` により `M` の非自明性は最大部分群仮定から
-  自動生成済み。
-  **残りは `M_α=⊥` から `rank M≤2` を取り出してこの補題へ渡す部分**。
+  自動生成済み。`rank_le_two_of_Malpha_eq_bot_of_isHall` /
+  `Msigma_ne_bot_of_Malpha_eq_bot_of_isHall` により、Hall `α(M)` 連言が得られれば
+  `M_α=⊥` hard branch も `rank M≤2` bridge に接続済み。
+  **残りは Hall `α(M)` / `σ(M)` の2連言を作り、capstoneで `M_α=⊥`/`≠⊥` を場合分けする配線**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
   - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。
   - M(σ)=M_σ: M(σ)/M_α normal Hall in F(M/M_α) char ⟹ M(σ)⊴M。

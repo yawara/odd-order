@@ -1119,6 +1119,36 @@ private theorem sylow_le_derived_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOd
   rw [hP_focal, hPbar_focal, Subgroup.map_inf _ _ M.subtype M.subtype_injective] at hfa
   exact inf_eq_right.mp hfa
 
+/-- **BG Theorem 10.2, step 2** (mmd L2725-2731): any Hall `σ(M)`-subgroup
+of `M`, viewed in `G`, lies in `M'`. This is the Hall-subgroup version of the per-Sylow
+focal-subgroup argument. -/
+theorem hallSigmaSubgroup_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {S : Subgroup G}
+    (hSM : S ≤ M) (hHall : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    S ≤ derivedInG M := by
+  refine le_of_sylow_le ?_
+  intro r P
+  haveI : Fact (r : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors r.property⟩
+  set Pbar : Subgroup G := (P : Subgroup ↥S).map S.subtype with hPbar
+  have hPbar_le_S : Pbar ≤ S := Subgroup.map_subtype_le _
+  have hPbar_le_M : Pbar ≤ M := hPbar_le_S.trans hSM
+  have hPbar_pg : IsPGroup (r : ℕ) ↥Pbar := by
+    rw [hPbar]
+    exact P.2.of_equiv (Subgroup.equivMapOfInjective _ _ S.subtype_injective)
+  have hPsub_pg : IsPGroup (r : ℕ) ↥(Pbar.subgroupOf M) :=
+    hPbar_pg.of_equiv (Subgroup.subgroupOfEquivOfLe hPbar_le_M).symm
+  obtain ⟨Q, hPQ⟩ := hPsub_pg.exists_le_sylow
+  have hr_sub : (r : ℕ) ∈ (Nat.card ↥(S.subgroupOf M)).primeFactors := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSM).toEquiv]
+    exact r.property
+  have hr_sigma : (r : ℕ) ∈ sigma M := hHall.1 (r : ℕ) hr_sub
+  calc
+    ((P : Subgroup ↥S).map S.subtype : Subgroup G) = Pbar := hPbar.symm
+    _ = (Pbar.subgroupOf M).map M.subtype := by
+      rw [Subgroup.map_subgroupOf_eq_of_le hPbar_le_M]
+    _ ≤ (Q : Subgroup ↥M).map M.subtype := Subgroup.map_mono hPQ
+    _ ≤ derivedInG M := sylow_le_derived_of_mem_sigma hG hM hr_sigma Q
+
 /-- **BG Theorem 10.2(c), inclusion `M_σ ⊆ M'`**: each Sylow subgroup of `M_σ`
 has prime in `σ(M)`, hence lies in a Sylow subgroup of `M`; `sylow_le_derived_of_mem_sigma`
 puts that Sylow subgroup inside `M'`, and the finite Sylow-generation helper assembles the
@@ -1291,6 +1321,38 @@ theorem Msigma_ne_bot_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
     (Subgroup.nontrivial_iff_ne_bot M).mpr (hG.ne_bot_of_mem_maximalSubgroups hM)
   exact Msigma_ne_bot_of_rank_fittingInG_le_two hG hM
     ((rank_fittingInG_le_rank M).trans hrank)
+
+/-- If `M_α` is an `α(M)`-Hall subgroup and is trivial, then no prime has
+`p`-rank at least three in `M`; hence `rank M ≤ 2`. -/
+theorem rank_le_two_of_Malpha_eq_bot_of_isHall [Finite G] {M : Subgroup G}
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) (hαbot : Malpha M = ⊥) :
+    rank ↥M ≤ 2 := by
+  rw [rank_le_iff]
+  intro p hp
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_contra hpRank
+  have h3 : 3 ≤ pRank ↥M p := by omega
+  have hpos : 0 < pRank ↥M p := by omega
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (H := ↥M) (p := p) hpos
+  have hpG : p ∈ (Nat.card G).primeFactors :=
+    Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card M) Nat.card_pos.ne' hpM
+  have hHallBot : Ch03.IsHallSubgroup (alpha M) (⊥ : Subgroup G) := by
+    simpa [hαbot] using hHallα
+  have hnotα : ∀ q ∈ (Nat.card G).primeFactors, q ∉ alpha M :=
+    (Ch03.IsHallSubgroup.bot_iff (G := G) (alpha M)).mp hHallBot
+  have hpα : p ∈ alpha M := by
+    rw [mem_alpha_iff]
+    exact ⟨hpM, h3⟩
+  exact hnotα p hpG hpα
+
+/-- Hard branch of BG Theorem 10.2(e), conditional on the Hall `M_α` conjunct. -/
+theorem Msigma_ne_bot_of_Malpha_eq_bot_of_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) (hαbot : Malpha M = ⊥) :
+    Msigma M ≠ ⊥ :=
+  Msigma_ne_bot_of_rank_le_two hG hM
+    (rank_le_two_of_Malpha_eq_bot_of_isHall hHallα hαbot)
 
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
 nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
