@@ -65,8 +65,7 @@ parameter satisfies `m > 49/100`. -/
 theorem m_gt_49_hundredths_of_q_eq_three (hyp : Hypothesis (G := G))
     (hq3 : hyp.base.q = 3) :
     hyp.base.m > (49 / 100 : ℚ) := by
-  rw [hyp.base.m_eq, hq3]
-  exact OddOrder.Peterfalvi.S15.m_value_q_three_gt_49_hundredths hyp.five_le_p
+  exact hyp.base.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq3 hyp.five_le_p
 
 /-- The congruence used in **Peterfalvi (14.4)**: from `q < p` and `q` prime,
 `q` cannot be `1 mod p`. -/
@@ -3072,6 +3071,19 @@ structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
         ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ))
   caseB : Prop
   caseB_params : caseB → hyp.base.q = 3 ∧ hyp.base.p = 5
+
+namespace OrthogonalitySwitchData
+
+/-- The exceptional branch in **Peterfalvi (14.14)** is already in the
+`q = 3` situation, so the Section 16 `m > 49/100` bound is available for later
+use in the final comparison. -/
+theorem m_gt_49_hundredths_of_caseB {hyp : Hypothesis (G := G)}
+    {nc : NonConjugateHypothesis hyp} (data : OrthogonalitySwitchData nc)
+    (hcaseB : data.caseB) :
+    hyp.base.m > (49 / 100 : ℚ) := by
+  exact hyp.m_gt_49_hundredths_of_q_eq_three (data.caseB_params hcaseB).1
+
+end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
 `(h - 1) / p q <= p q - 1`, or the `beta_L`--`psi` pairing is nonzero and

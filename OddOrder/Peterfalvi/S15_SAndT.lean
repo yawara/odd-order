@@ -384,6 +384,46 @@ theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
   rw [hexpr]
   linarith [hsmall]
 
+namespace Hypothesis
+
+/-- **Peterfalvi (13.11.a)** at the Section 15 hypothesis level: if `q ≥ 7`,
+then the concrete analytic parameter satisfies `m > 8/10`. -/
+theorem m_gt_four_fifths_of_seven_le_q (hyp : Hypothesis (G := G))
+    (hq7 : 7 ≤ hyp.q) :
+    hyp.m > (8 / 10 : ℚ) := by
+  rw [hyp.m_eq]
+  exact m_value_gt_four_fifths hq7 hyp.three_le_p
+
+/-- **Peterfalvi (13.11.b)** at the Section 15 hypothesis level: if `q ≥ 5`,
+then the concrete analytic parameter satisfies `m > 7/10`. -/
+theorem m_gt_seven_tenths_of_five_le_q (hyp : Hypothesis (G := G))
+    (hq5 : 5 ≤ hyp.q) :
+    hyp.m > (7 / 10 : ℚ) := by
+  rw [hyp.m_eq]
+  exact m_value_gt_seven_tenths hq5 hyp.three_le_p
+
+/-- **Peterfalvi (13.11)** at the Section 15 hypothesis level: in the `q = 3`
+branch, the `m > 49/100` part follows once an external argument supplies
+`p ≥ 5`.  Section 16 supplies this from `q < p`. -/
+theorem m_gt_49_hundredths_of_q_eq_three_of_five_le_p
+    (hyp : Hypothesis (G := G)) (hq3 : hyp.q = 3) (hp5 : 5 ≤ hyp.p) :
+    hyp.m > (49 / 100 : ℚ) := by
+  rw [hyp.m_eq, hq3]
+  exact m_value_q_three_gt_49_hundredths hp5
+
+/-- The `m`-only part of **Peterfalvi (13.11)**.  The full `numeric_bounds`
+theorem below also packages the `u/c` inequality in the `q = 3` branch, so it
+still waits for the analytic estimate (13.10). -/
+theorem numeric_m_bounds (hyp : Hypothesis (G := G)) :
+    (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
+      (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
+      (hyp.q = 3 → 5 ≤ hyp.p → hyp.m > (49 / 100 : ℚ)) := by
+  exact ⟨hyp.m_gt_four_fifths_of_seven_le_q,
+    hyp.m_gt_seven_tenths_of_five_le_q,
+    fun hq3 hp5 => hyp.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq3 hp5⟩
+
+end Hypothesis
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
@@ -400,11 +440,10 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.q = 3 →
         hyp.m > (49 / 100 : ℚ) ∧
           (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
-  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
-  refine ⟨fun hq7 => ?_, fun hq5 => ?_, fun hq3 => ?_⟩
-  · rw [hyp.m_eq]; exact m_value_gt_four_fifths hq7 hp3
-  · rw [hyp.m_eq]; exact m_value_gt_seven_tenths hq5 hp3
-  · -- `q = 3`: `m`-bound needs `p ≥ 5`; `u/c` bound needs analytic ineq (13.10).
+  refine ⟨hyp.m_gt_four_fifths_of_seven_le_q,
+    hyp.m_gt_seven_tenths_of_five_le_q, fun hq3 => ?_⟩
+  · -- `q = 3`: the `m`-only API needs `p ≥ 5`, and the bundled `u/c` bound
+    -- still needs the analytic inequality (13.10).
     sorry
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
