@@ -192,6 +192,20 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   (b) **Pf Thm 5.6 quantitative coherence** (= B1 keystone, (6.2)/(6.3)/(6.6) 共通) → (c) **θ-bound section**。
   framework は IsCoherent (S07) 既存; 残 keystone は **Thm 5.6 の量的不等式**。
 
+### ✅✅ 2026-06-05 (peterfalvi worktree) — B1 + (6.3)/(6.5) 還元 backbone landed
+- ✅ **B1 = Pf (5.6) quantitative** (commit 5a5e0bd, axiom-clean, full build 3555): `coherentDegreeSumBound_of_not_coherent`
+  (S08) = forward engine `xAdjoinStep` の対偶。非 coherent(S₁∪{χ,χ̄}) ⟹ `∑ᵢ(deg i)² ≤ 2a` (= `∑χ(1)² ≤ 2ψ(1)χ₁(1)`)。
+  `by_contra`+`push_neg` で xAdjoinStep の `hDeg : 2a < ∑deg²` を対偶。**member-family 仮説は明示のまま** (forward と同じ;
+  Sibley setup での discharge = T-A4 enum)。⟹ §G 「B1 (5.6) 反転欠落」blocker 解消。step3/5 ✅。
+- ✅ **(6.3)/(6.5) 還元 arith** (commit 810faf5, axiom-clean): `six_three_HH1_le` ((6.3): (6.2) index-bound +
+  `degreeBound_le_of_sqrt_bound` + `|H:H₁|≤|H:A|` ⟹ `|H:H₁|≤4|L:K|²+1`) / `six_five_index_contradiction`
+  (共有 `(2c+1)²≤n≤4c²+1` 不能) / `six_five_chief_factor_contradiction` ((6.5)(a) chief factor) /
+  `six_five_c_contradiction` ((6.5)(c))。**(6.5)(b) p-群 core ✅ + two_mul_add_one ✅ と合わせ (6.5) backbone は (6.2) を除き完成**。
+- **残 (option 1 の (6.2) 本体 + glue)**: (i) **θ-bound section case** `θ(1)≤|K:C|√|C:D|` (D/B⊆Z(C/B), Clifford
+  restriction; 中心 case ✅) 🔴, (ii) **Sibley packaging** (S₁/ψ 構成 + B1 を member-family enum 経由で適用 + B2 接続 ⟹
+  (6.2) `2|L:C|√|C:D|≥|K:A|−1`; 算術 shell は自明、構成が hard) 🔴, (iii) (6.3)/(6.5) を SibleyDadeHypothesis の
+  実 index に結線。**次着手 = θ-bound section (Clifford) または T-A4 member-family enum**。
+
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
   `isPGroup_of_isNilpotent_of_isPGroup_abelianization` (S08) = finite nilpotent Γ + Abelianization Γ が
