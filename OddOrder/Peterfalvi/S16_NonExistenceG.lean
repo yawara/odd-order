@@ -1521,6 +1521,52 @@ theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed [Finite G]
   rw [data.w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot] at hmem
   simpa using hmem
 
+/-- The `W₂`-conjugation action on `Q`, read in the ambient group `G`: it is
+genuine conjugation `w x w⁻¹`. -/
+theorem w2ConjQAut_apply_coe {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (w : ↥hyp.base.W2) (x : ↥hyp.base.Q) :
+    ((data.w2ConjQAut w x : ↥hyp.base.Q) : G) = (w : G) * (x : G) * (w : G)⁻¹ := rfl
+
+/-- **BG Appendix C, Remark (XI)**: we may assume `y ∈ ⁅Q, P₀⁆`.  Writing the
+coprime decomposition `Q = ⁅Q,W₂⁆ · C_Q(W₂)`, the centralizer component `yC` of
+`y` commutes with `s ∈ W₂`, so the conjugate generator `t = y s y⁻¹` is already
+produced by the action-commutator component `yD ∈ ⁅Q, W₂⁆`: `t = yD s yD⁻¹`. -/
+theorem exists_yD_mem_actionCommutator_conj_s_eq_t [Finite G]
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    ∃ yD : ↥hyp.base.Q,
+      yD ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ∧
+        MulAut.conj (yD : G) data.s = data.t := by
+  letI : CommGroup ↥hyp.base.Q :=
+    { (inferInstance : Group ↥hyp.base.Q) with
+      mul_comm := data.Q_elementaryAbelian.comm }
+  have hsup : OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ⊔
+      Subgroup.fixedPointsOfMulAut data.w2ConjQAut = ⊤ := by
+    rw [sup_comm]
+    exact OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top
+      data.W2_card_coprime_Q_card (Or.inr inferInstance)
+  have hmem : (⟨data.y, data.y_mem_Q⟩ : ↥hyp.base.Q) ∈
+      OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut ⊔
+        Subgroup.fixedPointsOfMulAut data.w2ConjQAut := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hmem
+  obtain ⟨yD, hyD, yC, hyC, hyDyC⟩ := hmem
+  refine ⟨yD, hyD, ?_⟩
+  have hyC_s : (yC : G) * data.s = data.s * (yC : G) := by
+    have hfix := Subgroup.mem_fixedPointsOfMulAut.mp hyC ⟨data.s, data.s_mem_W2⟩
+    have hcoe := congrArg (Subtype.val) hfix
+    rw [data.w2ConjQAut_apply_coe] at hcoe
+    exact (mul_inv_eq_iff_eq_mul.mp hcoe).symm
+  have hconj_raw : (yC : G) * data.s * (yC : G)⁻¹ = data.s := by
+    rw [hyC_s]; group
+  have hy_coe : (data.y : G) = (yD : G) * (yC : G) := by
+    have h := congrArg (Subtype.val) hyDyC
+    simpa using h.symm
+  show MulAut.conj (yD : G) data.s = MulAut.conj data.y data.s
+  rw [MulAut.conj_apply, MulAut.conj_apply, hy_coe, mul_inv_rev,
+    show (yD : G) * (yC : G) * data.s * ((yC : G)⁻¹ * (yD : G)⁻¹)
+        = (yD : G) * ((yC : G) * data.s * (yC : G)⁻¹) * (yD : G)⁻¹ by group,
+    hconj_raw]
+
 /-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
 in `Q`. -/
 theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}
