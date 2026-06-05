@@ -138,6 +138,22 @@ X∪Y glue → `sibleySetup_is_coherent` (S08 唯一の sorry) を埋める.
 
 route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が foundation) + enum 構成 (ZIrr 非依存)。
 
+### 🆕🆕 2026-06-05 (続) char-bound frontier 再照合 (下記 2026-06-04 セクションの stale 項目を訂正)
+
+下の 2026-06-04 セクションは B1/θ-bound を 🔴 と記すが **両方 landed 済**。現在の正確な char-bound (= (6.5) の唯一の残) フロンティア:
+
+- ✅ **B1 (5.6 量的形)** = `coherentDegreeSumBound_of_not_coherent` (S08:1621)。`xAdjoinStep` の対偶、`∑deg²≤2a` を産出。**member-family enum を仮説として取る** (s/χmem/deg + ~15 orthogonality/support/gen 仮説)。
+- ✅ **θ-bound** = `theta_degree_le_index_mul_sqrt_index` (S08:295, commit 0826aa7)。`θ(1)≤|K:C|√|C:D|` full 完成。
+- ✅ **B2 ingredient 1** = `sumInflatedDegreeSq_ntrivial` (∑_{θ∈T}θ(1)²=|K:A|−1)。
+- ✅ **(6.3)/(6.5) 算術 shell 群** = `degreeBound_le_of_sqrt_bound`/`six_three_HH1_le`/`six_five_*`/`two_mul_add_one_le_of_odd_dvd`。
+- ✅✅ **(6.5) group-theory 完全 landed (両 case, 2026-06-05)**: `isPGroup_of_card_le_of_isFrobeniusAction` (chief-factor core) + `isPGroup_of_isFrobeniusGroup_of_card_le` (c1) + `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` (c2) + `IsFrobeniusAction.quotient_of_fixedPoints_le` (新 Frobenius brick)。(6.5) は **bound + odd のみ要**。
+
+**genuinely 残る char-bound gap (2 件、いずれも substantial・multi-session)**:
+1. 🔴 **B2 orbit-counting** `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|·∑_{θ∈T}θ(1)²` — S(A)={Ind θ} の W₁-inertia/orbit counting (χ=Ind θ, χ(1)=|L:K|θ(1), ‖Ind θ‖² = orbit size)。induced-char inertia 機構要。**concrete char-identity だが intricate** (inertia=K 非自明・norm 構造)。
+2. 🔴 **member-family enum 構成** — B1 が消費する S(A) 列挙 (S₁/S₂ from (C.b) + member family)。**heavy combinatorial・capstone glue/hstepData と共有の核**。X-chain 側の enum 機構 (`xAdjoinStepInput_of_memberFamily_*` 等) は別物 (Irr-L X-side)、(6.2) は S(A)-side で新規。
+
+**(6.2)→(6.3)→char-bound の残**: B1 (enum 仮説) + B2 (orbit-counting 要) + θ-bound を組む (6.2) assembly + minimal-A 帰納 ((6.3))。**B1 が enum を仮説に取るので、(6.2) assembly も enum 構成にブロックされる**。⟹ char-bound の律速 = 上記 gap 1/2。clean single-session leaf 無し (scaffold 量産は doneness を進めない)。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
