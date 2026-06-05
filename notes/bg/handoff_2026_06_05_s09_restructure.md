@@ -1,5 +1,32 @@
 # 引き継ぎ — BG §9 Lemma 9.5 closure (package-interface 再構成) — 2026-06-05
 
+## ✅✅✅ 完了 (2026-06-05 続) — §9 完全 sorry-free 達成
+
+**SUB-ASSEMBLY 2 (Frattini 低rank `M'≤N_G(P0)`) 完成 → `scn3_isUniquelyMaximal` sorry-free・axiom-clean
+([propext,Classical.choice,Quot.sound]、#print 確認)。BG §9 (Uniqueness Theorem) は実 sorry 0**。
+実装 = `S09_Lemma95.lean` の `key` low-rank 分岐 (旧 sorry @ 2557) を Frattini 議論で充足 + 新 private helper 4 本:
+- `map_conj_eq_self_of_mem_normalizer` (L2488): `g∈N_G(K) ⟹ K.map(conj g)=K`。
+- `normalizer_le_normalizer_commutator_normalizer` (L2501): `N_G(H) ≤ N_G(⁅H,N_G(H)⁆)` (conj が ⁅H,N_G(H)⁆ を保つ; `map_commutator`+前 helper)。
+- `top_le_oPiCore_singleton_sup_compl_of_isNilpotent` (L2529): 有限 nilpotent K で `⊤ ≤ O_p(K)⊔O_{p'}(K)`
+  (`fitting=⊤` via `Group.isNilpotent_top`+`nilpotent_normal_le_fitting`, `fitting_eq_iSup_primeFactors` を q=p/q≠p で分割)。
+- `fittingInG_le_opiCoreInG_sup_compl` (L2553): ambient 版 `F(M) ≤ O_p(F(M))⊔O_{p'}(F(M))` (上を `.map subtype`)。
+
+**証明骨格** (BG L2615-2619 忠実): P を ↥M' の Sylow-p に取り (`Sylow.subtype`)、`FP=F(M')⊔P ⊴ M'` (`commutator ↥M'≤F` ⟹
+`Normal.of_commutator_le`)、Frattini `Sylow.normalizer_sup_eq_top'` で `M'=N_{M'}(P)⊔FP` を ↥M' で得、
+`.map M'.subtype` で G に降ろす。各片を `N_G(P0)` で抑える: ① `N_{M'}(P).map subtype ≤ N_G(P) ≤ N_G(P0)`
+(`le_normalizer_map`+`subgroupOf_map_subtype`); ② `F(M') = O_p⊔O_{p'} ≤ N_G(P0)`: `O_p(F)≤P` (M' が
+F を, ゆえに O_p(F) を正規化 ⟹ `O_p(F).subgroupOf M'` 正規 p-群 ⟹ `normal_pgroup_le_opCore`+`opCore_le PM'`),
+`O_{p'}(F)≤C_G(P0)≤N_G(P0)` ((9.11)`p0_le_centralizer_opiCoreFitting_*`+`le_centralizer_iff`+`centralizer_le_normalizer`);
+③ `P≤N_G(P0)`。これで `M'≤N_G(P0)` ⟹ (9.12) 低rank分岐充足。**handoff の 8-step recipe 通り実装**。
+
+**Lean 罠**: `Normal.of_commutator_le` は `{H}` 暗黙推論が positional に落ちる → `(G:=↥M')(H:=FP)` 明示で解決;
+`Subgroup.map_top` 不在 → `← MonoidHom.range_eq_map`+`range_subtype`; nilpotent ⊤ instance = `Group.isNilpotent_top.mpr`;
+`set FP` は `le_sup_left` に対し unfold されない → `rw [hFPdef]` 経由で `commutator ≤ FP` を構成。
+
+**次の BG spine frontier** = §10 (M_α/M_σ; Uniqueness Thm 9.6 を引用、§9 完成で解禁)。下記は (旧) 引き継ぎ記録。
+
+---
+
 ## 状況
 
 - **✅ L2 = BG Thm 4.20(c) 存在 完成** (commit 4475477, `S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two`, axiom-clean, full build 3580)。
