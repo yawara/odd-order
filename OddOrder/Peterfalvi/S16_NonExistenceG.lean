@@ -3586,23 +3586,43 @@ theorem orthogonality_switch [Finite G]
     ∃ data : OrthogonalitySwitchData nc, data.caseA ∨ data.caseB := by
   sorry
 
+/-- **Peterfalvi (14.14)--(14.15)**: the full `u` value once the
+cardinality consequences of (14.5) have been materialized.  The case-(b)
+alternative of (14.14) is already full by the S-side order data; in case (a),
+assuming the non-full value contradicts the fixed-point-free cardinal
+congruences for `H` and `U`. -/
+theorem u_final_value_of_fpf_card_congruences
+    [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp)
+    (hu_dvd_h : hyp.base.u ∣ nc.h)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hh_mod_q : nc.h ≡ 1 [MOD hyp.base.q])
+    (hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q]) :
+    hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
+  rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
+  rcases hcase with hcaseA | hcaseB
+  · by_contra hu_not_full
+    exact data.caseA_contradiction_of_nonfull_fpf_card_congruences
+      _hG Sdata hcaseA hu_not_full hu_dvd_h hh_mod_p hh_mod_q hu_mod_q
+  · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
+
 /-- **Peterfalvi (14.15)**: `u` has the full cyclotomic value
 `(p^q - 1) / (p - 1)`.
 
-The exceptional `(q,p) = (3,5)` branch of (14.14) is now discharged by the
-S-side case-(9.7.b) order data.  The remaining local frontier is the
-non-exceptional branch, where (14.14) supplies the bound on `(h - 1) / (p q)`. -/
+The theorem `u_final_value_of_fpf_card_congruences` now contains the full
+(14.14) case split and the non-full case-(a) contradiction.  The remaining work
+is to derive the four cardinal inputs `u ∣ h`, `h ≡ 1 mod p`, `h ≡ 1 mod q`,
+and `u ≡ 1 mod q` from (14.5) and the fixed-point-free `W₁` action. -/
 theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
   rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
-  · -- Non-exceptional branch of (14.14): the arithmetic spine is now
-    -- `data.caseA_contradiction_of_nonfull_fpf_card_congruences`.  The
-    -- remaining work is to derive `u ∣ h`, `h ≡ 1 mod p`, and the two
-    -- fixed-point-free cardinal congruences `h ≡ 1 mod q` and `u ≡ 1 mod q`
-    -- from (14.5) and the non-full branch of (14.6).
+  · -- Non-exceptional branch of (14.14): use
+    -- `u_final_value_of_fpf_card_congruences` once the four cardinal inputs
+    -- from (14.5) have been produced.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
