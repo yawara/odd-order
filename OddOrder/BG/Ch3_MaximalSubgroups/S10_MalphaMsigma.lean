@@ -1536,6 +1536,72 @@ theorem hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl [Finite G]
     (hallSigmaSubgroup_quotient_Malpha_le_fitting hG hM hSM hHallσ)
     (fitting_quotient_Malpha_isPiGroup_alphaCompl M)
 
+/-- **BG Theorem 10.2(b), `M_α` lies in every Hall-`σ` subgroup**:
+since `α(M) ⊆ σ(M)` and `M_α` is normal in `M`, the normal `σ(M)`-subgroup
+`M_α` of `M` is contained in every Hall `σ(M)`-subgroup of `M`. -/
+theorem Malpha_le_hallSigmaSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    Malpha M ≤ S := by
+  have hMα_sub_σ : Ch03.Subgroup.IsPiGroup (sigma M) ((Malpha M).subgroupOf M) := by
+    intro p hp
+    have hpMα : p ∈ (Nat.card ↥(Malpha M)).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toEquiv] at hp
+    exact alpha_subset_sigma hG hM (Malpha_isPiGroup M p hpMα)
+  have hle : (Malpha M).subgroupOf M ≤ S.subgroupOf M :=
+    Ch03.Subgroup.IsPiGroup.normal_le_hall hMα_sub_σ hHallσ
+  intro x hx
+  have hxM : x ∈ M := Malpha_le M hx
+  have hxSub : (⟨x, hxM⟩ : ↥M) ∈ (Malpha M).subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hle hxSub)
+
+/-- **BG Theorem 10.2(b), Hall-`σ` quotient**:
+the image of a Hall `σ(M)`-subgroup of `M` in `M/M_α` is again Hall
+`σ(M)`. -/
+theorem hallSigmaSubgroup_quotient_Malpha_isHall [Finite G] {M S : Subgroup G}
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    Ch03.IsHallSubgroup (sigma M)
+      ((S.subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))) :=
+  Ch03.IsHallSubgroup.map_quotient (N := (Malpha M).subgroupOf M) hHallσ
+
+/-- **BG Theorem 10.2(b), Hall-`σ` inside the quotient Fitting subgroup**:
+if `S` is a Hall `σ(M)`-subgroup of `M`, then its image is not only contained
+in `F(M/M_α)`, but remains Hall `σ(M)` after viewing it as a subgroup of that
+Fitting subgroup. This packages the quotient Hall step with the BG
+`M'/M_α ≤ F(M/M_α)` argument. -/
+theorem hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    Ch03.IsHallSubgroup (sigma M)
+      (((S.subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))).subgroupOf
+        (Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M))) := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  let Q : Type _ := ↥M ⧸ N
+  let q : ↥M →* Q := QuotientGroup.mk' N
+  let Hbar : Subgroup Q := (S.subgroupOf M).map q
+  let F : Subgroup Q := Ch01.fitting Q
+  have hHbarF : Hbar ≤ F := by
+    exact hallSigmaSubgroup_quotient_Malpha_le_fitting hG hM hSM hHallσ
+  have hHbarHall : Ch03.IsHallSubgroup (sigma M) Hbar := by
+    exact hallSigmaSubgroup_quotient_Malpha_isHall hHallσ
+  refine ⟨?_, ?_⟩
+  · intro p hp
+    have hpHbar : p ∈ (Nat.card ↥Hbar).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHbarF).toEquiv] at hp
+    exact hHbarHall.1 p hpHbar
+  · intro p hpidx hpσ
+    have hidx : (Hbar.subgroupOf F).index ∣ Hbar.index := by
+      have htower : (Hbar.subgroupOf F).index * F.index = Hbar.index :=
+        Subgroup.relIndex_mul_index hHbarF
+      exact ⟨F.index, htower.symm⟩
+    exact hHbarHall.2 p
+      (Nat.mem_primeFactors.mpr
+        ⟨(Nat.mem_primeFactors.mp hpidx).1,
+          dvd_trans (Nat.mem_primeFactors.mp hpidx).2.1 hidx,
+          Subgroup.index_ne_zero_of_finite⟩) hpσ
+
 /-- **BG Theorem 10.2(d), Hall-`σ` kills `α` in the quotient**:
 if an `α(M)`-subgroup of `M` lies in a Hall `σ(M)`-subgroup, then its image in
 `M/M_α` is simultaneously an `α(M)`-group and an `α(M)'`-group, hence trivial.

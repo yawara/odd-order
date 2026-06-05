@@ -89,8 +89,11 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   さらに `hallSigmaSubgroup_quotient_Malpha_le_fitting` /
   `hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl` により任意の Hall `σ(M)`-subgroup
   `S≤M` の像も `F(M/M_α)` 内の α'-group になり、
-  `alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup` で `A≤S` なる α-subgroup は
-  すでに `M_α` に入るところまで接続済み。この入力から `Malpha_isHall` も完成。
+  `Malpha_le_hallSigmaSubgroup` で `M_α≤S`、
+  `hallSigmaSubgroup_quotient_Malpha_isHall` で `S/M_α` が `M/M_α` の Hall `σ(M)`、
+  `hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting` で `F(M/M_α)` 内でも Hall `σ(M)` として
+  残るところまで接続済み。`alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup` で `A≤S` なる
+  α-subgroup はすでに `M_α` に入る。この入力から `Malpha_isHall` も完成。
   残りは `M(σ)=M_σ` を同定して Hall `σ(M)` 連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。
 
