@@ -1269,6 +1269,33 @@ theorem derived_quotient_Malpha_le_fitting_of_isHall [Finite G]
   · haveI : Nontrivial Q := hnontriv
     exact OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddQ hFQrank
 
+/-- **BG Theorem 10.2(d), `M_σ/M_α` Fitting containment** (mmd L2733-2738):
+once `M_α` is an `α(M)`-Hall subgroup, the image of `M_σ` in `M/M_α` lies in the
+Fitting subgroup of the quotient. This combines Step 2 (`M_σ ≤ M'`) with the quotient
+derived-subgroup containment above. -/
+theorem Msigma_quotient_Malpha_le_fitting_of_isHall [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+    ((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M)) ≤
+      Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M) := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  have hMsigma_der : (Msigma M).subgroupOf M ≤ commutator ↥M := by
+    intro x hx
+    have hxσ : (x : G) ∈ Msigma M := Subgroup.mem_subgroupOf.mp hx
+    have hxD : (x : G) ∈ derivedInG M := Msigma_le_derived hG hM hxσ
+    rw [derivedInG] at hxD
+    obtain ⟨y, hy, hyx⟩ := Subgroup.mem_map.mp hxD
+    have hxy : y = x := M.subtype_injective hyx
+    rwa [← hxy]
+  calc
+    ((Msigma M).subgroupOf M).map (QuotientGroup.mk' N) ≤
+        (commutator ↥M).map (QuotientGroup.mk' N) := Subgroup.map_mono hMsigma_der
+    _ = commutator (↥M ⧸ N) := by
+      rw [map_commutator_eq, MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective N),
+        _root_.commutator_def]
+    _ ≤ Ch01.fitting (↥M ⧸ N) :=
+      derived_quotient_Malpha_le_fitting_of_isHall hG hM hHallα
+
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
 nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/

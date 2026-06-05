@@ -82,9 +82,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重**。
   `rank(M/M_α)≤2` は Hall `α(M)` 仮定の下で `rank_quotient_Malpha_le_two_of_isHall` により
   接続済み。さらに `derived_quotient_Malpha_le_fitting_of_isHall` により
-  `M'/M_α ≤ F(M/M_α)` も Hall `α(M)` 仮定下で接続済み。残りは
-  `M(σ)/M_α` の α'-性、そこから `M(α)=M_α`・`M(σ)=M_σ` を同定して
-  Hall 2連言を作る部分。
+  `M'/M_α ≤ F(M/M_α)` も Hall `α(M)` 仮定下で接続済みで、
+  `Msigma_quotient_Malpha_le_fitting_of_isHall` により `M_σ` の商像も
+  `F(M/M_α)` に入る。残りはこの Fitting 内部分群の α'-性、そこから
+  `M(α)=M_α`・`M(σ)=M_σ` を同定して Hall 2連言を作る部分。
 - [ ] capstone `isHall_Msigma_Malpha` 配線。
 
 ## 完了条件
