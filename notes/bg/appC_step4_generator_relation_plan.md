@@ -123,11 +123,14 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `Step4C5NormalForms.frobenius` landed.  A whole `(C.5)` package for `(a,b)` now gives
   the powered package for `(a^p,b^p)` with the same `cᵢ` and `uᵢ,vᵢ` replaced by
   `uᵢ^p,vᵢ^p`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.
-- **🆕 (2026-06-06) C.9 third-word membership done**:
-  `relationC9_w3_mem_P_sup_U_and_conj` landed.  It compares original `(C.7)` with
-  Frobenius-powered `(C.7)` and proves `S₁ W₃^(p-1) S₁⁻¹ ∈ PU` and its `t²`-conjugate
-  lie in `PU`.  This is the substantive BG `(C.9)` step for `w₃`; remaining frontier is
-  the analogous `w₁/w₂` memberships and the Step3/condition `(A)` collapse to `wᵢ=1`.
+- **🆕 (2026-06-06) C.9 word/collapse done**:
+  `relationC9_w3_mem_P_sup_U_and_conj` compares original `(C.7)` with Frobenius-powered
+  `(C.7)` and proves `S₁ W₃^(p-1) S₁⁻¹ ∈ PU` and its `t²`-conjugate lie in `PU`.
+  `relationC9_w3_word` also records the exact displayed `(C.9)` word equation, and
+  `relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one` proves that once Step3 has killed
+  `w₃` (with the `(C.6)` input `c₃≠0`), the same equation forces
+  `w₁^(p-1)=w₂^(p-1)=1`.  Remaining frontier is the Step3/C.6 production of `w₃=1`
+  and the final condition `(A)`/`(C.10)` combination.
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -206,9 +209,12 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 3. **(C.7)**: ✅ landed (`Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7`):
    `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
 4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,
-   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。✅ `w₃` 版 `(C.9)`
-   (`s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`) landed; `w₁/w₂` 版が残り。
-5. **w_i=1**: Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2 (s₁≠1) ⟹ w₃^{p-1}=1 ⟹ (A) で w₃=1。同様 w₁=w₂=1。
+   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。✅ `w₃` 版 `(C.9)` membership と
+   exact word equation landed。さらに `w₃=1` と `(C.6)` の `c₃≠0` から
+   `w₁^(p-1)=w₂^(p-1)=1` まで Lean 化済。
+5. **w_i=1**: 残りは Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2/C.6 (s₁≠1) ⟹
+   w₃^{p-1}=1 ⟹ (A) で w₃=1 を作ること。その後は landed theorem で w₁/w₂ の冪条件、
+   `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` で w₁=w₂=1。
    ⟹ (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1`。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
 6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
    `y∈ker((s⁻¹+1-s₁⁻¹s⁻¹-s₃)(s⁻¹-1))`。**FPF** (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`,
@@ -299,9 +305,9 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.6)** | `sᵢ≠1` | **既存** Step2 `generatorRelation_step2_primeLine*` (S16:643/672) + Step3 (下記) |
 | **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
 | **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
-| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | ✅ `w₃` 版 landed (`relationC9_w3_mem_P_sup_U_and_conj`); `w₁/w₂` 版残り |
-| Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, 同様に `w₁=w₂=1` | bridge landed: `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one`; Step3/Step2 production of powers remains |
-| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | bridge landed: `relationC10_of_w_eq_one`; actual `wᵢ=1` derivation remains |
+| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` and the exact displayed word equation | ✅ `relationC9_w3_mem_P_sup_U_and_conj`, `relationC9_w3_word`; post-`w₃=1` collapse to `w₁^(p-1)=w₂^(p-1)=1` landed with explicit `c₃≠0` input |
+| Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, then `(C.9)` gives the `w₁/w₂` powers | Step3/C.6 production of `w₃=1` remains; condition `(A)` bridge already landed: `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` |
+| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | bridge landed: `relationC10_of_w_eq_one`; needs actual `wᵢ=1` derivation |
 | mod Q | `P₀∩Q=1` ⟹ `s₁s₂s₃=1` | **既存** `W2_inf_Q_eq_bot` (S16:1454) |
 | **kernel** | End([Q,P₀]) で `y ∈ ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` | **新規 + (X)/(XI) 要** (§4) |
 | FPF | s⁻¹ が [Q,P₀] 上 fixed-point-free ⟹ `(s⁻¹−1)` 可逆 ⟹ `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)` | **新規 + (X)/(XI) 要** |
@@ -403,13 +409,14 @@ coprime 作用の標準事実**ゆえ:
     `∃ yD ∈ ⁅Q,W2⁆, MulAut.conj yD s = t`。Q = ⁅Q,W2⁆·C_Q(W2) (`fixedPoints_sup_actionCommutator_eq_top`)
     で y=yD·yC、yC∈C_Q(W2) が s と可換 ⟹ t = y·s·y⁻¹ = yD·s·yD⁻¹。kernel 段は yD (∈[Q,W2]) を使える。
 - 🔴 残り (Step 4 の残作業、(X)/(XI) infra は完了):
-  1. **(C.2)–(C.10) 群関係鎖** (convention-heavy, 既存 API chain): `s^a s^b=s²` → … → `s₁s₂s₃=1` /
-     `t²s₁t⁻¹s₂t⁻¹s₃=1`。§3 補題分解参照。`s^a` 二義性 (§6) を最初に固定。
-  2. **kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を ⁅Q,W2⁆ 上の
-     ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`; s-only 形は
-     W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化 → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
+  1. **(C.9)→`wᵢ=1` 合成**: landed exact `(C.9)` を使い、Step3/C.6 から `w₃=1` を作る。
+     その後は landed collapse theorem と condition `(A)` bridge で `w₁=w₂=w₃=1` へ進める。
+  2. **(C.10)→kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を
+     ⁅Q,W2⁆ 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`;
+     s-only 形は W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化
+     → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
   3. **`s₁=s⁻¹` capstone** + 配線 (経路A: `appC_normSet_generator_relation_of_first_k_three_coordinate`)。
-  ⟹ infra (X)/(XI) は全て landed。残りは群関係鎖 (1) → End 計算 (2) → capstone (3)。
+  ⟹ infra (X)/(XI) は全て landed。残りは `wᵢ=1` 合成 (1) → End 計算 (2) → capstone (3)。
 
 ---
 
