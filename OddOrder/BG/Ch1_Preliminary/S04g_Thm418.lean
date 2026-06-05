@@ -1881,20 +1881,38 @@ This is the producer the §9 (Lemma 9.5) consumers currently take as a hypothesi
 lets those `SP : CharacteristicSylowSeriesPackage ↥M` hypotheses be discharged for the
 (solvable, `r(F)≤2`) maximal subgroups `M`.
 
-Construction plan (strong induction on `Nat.card G`):
-* if `O_{p'}(G) = ⊥` (so `G` is a `p`-group), the one-step series `⊤ ⊃ ⊥` with the trivial
-  top Sylow layer (`CharacteristicSylowLayer.top_of_hasNormalPComplement`) works;
-* otherwise let `p` be the largest prime divisor of `|G|`; `solvable_structure_of_pRank_le_two`
-  (largest-prime branch) gives `Ch05.HasNormalPComplement p G`; recurse on `N = O_{p'}(G)`
-  (`Nat.card N < Nat.card G`, still odd/solvable with `r(F(N)) ≤ 2`), and lift the resulting
-  series via `CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
-Hard sub-steps still open: deriving `pRank G p ≤ 2` from `r(F(G)) ≤ 2` for the largest prime,
-preservation of the rank hypothesis under `O_{p'}`, and the `terminal_mem` bookkeeping. -/
+Construction (strong induction on `Nat.card G`, following BG's own proof of 4.20(c), mmd L1786):
+* `F := F(G)`; by Thm 4.20(a) (`derived_le_fitting_of_centralizer_rank_le_two`) `G' ≤ F`, so `G/F`
+  is abelian;
+* let `p₁` be the *smallest* prime divisor of `|G|`; take `H` with `F ≤ H` and
+  `H/F = O_{p₁'}(G/F)`. Then `F` contains a Sylow `p₁` of `H`, and `G/H` (a quotient of the
+  abelian `G/F`) is a `p₁`-group;
+* by **Thm 4.18(b)** `H` has a normal `p₁`-complement; combined with `G/H` a `p₁`-group,
+  `hasNormalPComplement_of_…_quotient_isPGroup` yields `Ch05.HasNormalPComplement p₁ G`, whose
+  complement is `K = O_{p₁'}(G)` (`normalPComplement_eq_oPiCore_compl`);
+* `F(K) ≤ F(G)` (`fitting_map_subtype_le_fitting`) gives `r(F(K)) ≤ 2`, so recurse on `K`
+  (`Nat.card K < Nat.card G`), then lift the resulting series with
+  `CharacteristicSylowSeries.lift_oPiCore_series_of_hasNormalPComplement_ne`.
+
+NB: no `pRank G p ≤ 2` is needed — the rank hypothesis flows purely through `G' ≤ F` (Thm 4.20a)
+and `F(K) ≤ F(G)`, both direct inclusions (an earlier pRank/structure-lemma plan was wrong, since
+`pRank G p ≤ r(F(G))` is false in general). All hooks (Thm 4.18, the normal-`p`-complement assembly
+lemmas, the lift machinery) are already in this file / §5. -/
 theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
     [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
     (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
     Nonempty (CharacteristicSylowSeriesPackage G) := by
-  sorry
+  classical
+  -- Strong induction on `Nat.card G`, generalizing the group.
+  suffices H : ∀ n : ℕ, ∀ (G : Type _) [Group G] [Finite G] [IsSolvable G] [Nontrivial G],
+      Nat.card G = n → Odd (Nat.card G) → rank ↥(Ch01.fitting G) ≤ 2 →
+      Nonempty (CharacteristicSylowSeriesPackage G) by
+    exact H (Nat.card G) G rfl hodd hrank
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro G _ _ _ _ hcard hodd' hrank'
+    sorry
 
 end Thm418
 
