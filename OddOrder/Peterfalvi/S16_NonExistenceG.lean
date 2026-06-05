@@ -2210,6 +2210,8 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base
   typeI_data_L_eq : typeI_data.L = L
   typeI_data_H_eq : typeI_data.H = H
+  typeI_complement_card_eq_pq :
+    Nat.card ↥typeI_data.frobenius.complement = hyp.base.p * hyp.base.q
 
 /-- Carrier for the case-(9.7.b) conclusion applied to `T` in Peterfalvi
 (14.4). -/
@@ -3195,6 +3197,35 @@ theorem u_dvd_h [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Subgroup.card_dvd_of_le hU_le_H
   simpa [hU_card] using hdvd
 
+/-- **Peterfalvi (14.5)** cardinal congruences for `h = |H|`.  The type-I
+Frobenius structure has kernel `M_F = H`; by (14.5) its complement has order
+`p q`.  Isaacs Lemma 6.1 gives `|H| ≡ 1 mod |C|`, hence both congruences
+modulo `p` and modulo `q`. -/
+theorem h_modEq_one_mod_p_and_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp) :
+    nc.h ≡ 1 [MOD hyp.base.p] ∧ nc.h ≡ 1 [MOD hyp.base.q] := by
+  let H0 : Subgroup G := nc.Ldata.typeI_data.frobenius.typeI.typeF.H
+  have hH0_eq_typeI_H : H0 = nc.Ldata.typeI_data.H := by
+    dsimp [H0]
+    rw [nc.Ldata.typeI_data.frobenius.typeI.typeF.H_eq,
+      nc.Ldata.typeI_data.H_eq_LF]
+  have hH0_eq_H : H0 = nc.Ldata.H :=
+    hH0_eq_typeI_H.trans nc.Ldata.typeI_data_H_eq
+  have hkernel_card :
+      Nat.card ↥(H0.subgroupOf nc.Ldata.typeI_data.L) = Nat.card ↥nc.Ldata.H := by
+    have hH0_card :
+        Nat.card ↥(H0.subgroupOf nc.Ldata.typeI_data.L) = Nat.card ↥H0 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (by
+        dsimp [H0]
+        exact nc.Ldata.typeI_data.frobenius.typeI.typeF.H_le)).toEquiv
+    rw [hH0_card, hH0_eq_H]
+  have hmod_pq : nc.h ≡ 1 [MOD hyp.base.p * hyp.base.q] := by
+    have hmod := nc.Ldata.typeI_data.frobenius.frobenius.card_kernel_modEq_one
+    rw [hkernel_card, nc.Ldata.typeI_complement_card_eq_pq] at hmod
+    rwa [nc.h_eq_card_H]
+  exact ⟨hmod_pq.of_dvd (dvd_mul_right hyp.base.p hyp.base.q),
+    hmod_pq.of_dvd (dvd_mul_left hyp.base.q hyp.base.p)⟩
+
 end NonConjugateHypothesis
 
 namespace Hypothesis
@@ -3655,25 +3686,16 @@ theorem u_final_value_of_fpf_card_congruences
 /-- **Peterfalvi (14.15)**: `u` has the full cyclotomic value
 `(p^q - 1) / (p - 1)`.
 
-The theorem `u_final_value_of_fpf_card_congruences` now contains the full
-(14.14) case split and the non-full case-(a) contradiction.  The divisibility
-input `u ∣ h` is supplied by `NonConjugateHypothesis.u_dvd_h`, and
-`u ≡ 1 mod q` is supplied by `Hypothesis.u_modEq_one_mod_q`; the remaining
-work is to derive the two congruences `h ≡ 1 mod p` and `h ≡ 1 mod q` from
-(14.5) and the fixed-point-free `W₁` action. -/
+The proof consumes the cardinal consequences of (14.5): `u ∣ h`, the two
+Frobenius-kernel congruences for `h`, and the fixed-point-free cardinal
+congruence for `U`.  The arithmetic contradiction is packaged in
+`u_final_value_of_fpf_card_congruences`. -/
 theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (nc : NonConjugateHypothesis hyp) :
     hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
-  rcases orthogonality_switch _hG hyp nc with ⟨data, hcase⟩
-  rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
-  rcases hcase with hcaseA | hcaseB
-  · have hu_dvd_h : hyp.base.u ∣ nc.h := nc.u_dvd_h _hG
-    have hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q] := hyp.u_modEq_one_mod_q _hG
-    -- Non-exceptional branch of (14.14): use
-    -- `u_final_value_of_fpf_card_congruences` once the two congruence inputs
-    -- for `h` have been produced.
-    sorry
-  · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
+  rcases nc.h_modEq_one_mod_p_and_q _hG with ⟨hh_mod_p, hh_mod_q⟩
+  exact u_final_value_of_fpf_card_congruences _hG hyp nc (nc.u_dvd_h _hG)
+    hh_mod_p hh_mod_q (hyp.u_modEq_one_mod_q _hG)
 
 /-- **Peterfalvi (14.16)**: in the non-conjugate case, the kernel `H` is
 exactly `U`. -/
