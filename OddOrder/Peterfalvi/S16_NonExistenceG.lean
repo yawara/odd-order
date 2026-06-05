@@ -1942,6 +1942,20 @@ theorem pq_lt_v {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
   exact lt_of_lt_of_le (lt_of_lt_of_le hpow hle)
     (Nat.sub_le ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) 1)
 
+/-- The T-side case-(9.7.b) lower bound also gives the size hypothesis
+`v > 2 p` needed in the (14.11.4) norm cascade. -/
+theorem two_p_lt_v {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp) :
+    2 * hyp.base.p < hyp.base.v := by
+  have hq_gt_two : 2 < hyp.base.q := by
+    have hq3 : 3 ≤ hyp.base.q := hyp.base.three_le_q
+    omega
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have hmul : hyp.base.p * 2 < hyp.base.p * hyp.base.q :=
+    Nat.mul_lt_mul_of_pos_left hq_gt_two hp_pos
+  have h2p_lt_pq : 2 * hyp.base.p < hyp.base.p * hyp.base.q := by
+    simpa [mul_comm, mul_left_comm, mul_assoc] using hmul
+  exact lt_trans h2p_lt_pq data.pq_lt_v
+
 end CaseBForTData
 
 /-- Arithmetic bridge for **Peterfalvi (14.8)**: under the Section 16 prime
@@ -2175,6 +2189,23 @@ theorem norm_cascade_contradiction {p q u v k : ℕ}
   have hvlargeq : ((p * q : ℕ) : ℚ) < v := by exact_mod_cast hvlarge
   norm_num [Nat.cast_mul] at hk_gt hvlargeq
   nlinarith [hk_lt, hk_gt, hvlargeq, hppos]
+
+/-- **Peterfalvi (14.11.4)** arithmetic consumer with the T-side case-(9.7.b)
+data already materialized.  The T-side data supplies both `p q < v` and
+`2 p < v`, so the remaining inputs are exactly the S-side lower bound on `u`,
+the `k > 2 p v` lower bound, and the displayed norm inequality. -/
+theorem norm_cascade_contradiction_of_T_caseB {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (hu : 2 * hyp.base.q < hyp.base.u) {k : ℕ}
+    (hk : 2 * hyp.base.p * hyp.base.v < k)
+    (hbound :
+      (1 : ℚ) / (hyp.base.p : ℚ) + 1 / (hyp.base.q : ℚ) ≤
+        ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (k : ℚ) +
+          2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ) +
+          1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)) :
+    False := by
+  exact norm_cascade_contradiction hyp.base.three_le_q hyp.q_lt_p hu
+    Tdata.two_p_lt_v hk Tdata.pq_lt_v hbound
 
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`. -/
