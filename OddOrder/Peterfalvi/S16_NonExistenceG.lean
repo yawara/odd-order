@@ -2196,6 +2196,17 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_expansion_formula : Prop
   final_norm_contradiction : Prop
 
+/-- The displayed rational inequality produced by the norm calculation in
+**Peterfalvi (14.11.4)**, after substituting `e = p q`.  It is kept concrete so
+future character-theoretic producers can target the exact arithmetic consumer
+without adding another opaque proposition. -/
+def normCascadeBound (hyp : Hypothesis (G := G)) (k : ℕ) : Prop :=
+  (1 : ℚ) / (hyp.base.p : ℚ) + 1 / (hyp.base.q : ℚ) ≤
+    ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (k : ℚ) +
+      2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) +
+      1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ) +
+      1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)
+
 /-- Pure arithmetic estimate used in **Peterfalvi (14.11.4)**.  Once the
 norm calculation reduces the error terms to `2 / (p q) + 1 / (u q) + 1 / (v p)`,
 the Section 16 size assumptions `u > 2q`, `v > 2p`, and `q < p` bound that error
@@ -2315,6 +2326,29 @@ theorem norm_cascade_contradiction_of_caseB_data {hyp : Hypothesis (G := G)}
           1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)) :
     False := by
   exact norm_cascade_contradiction_of_T_caseB Tdata Sdata.two_q_lt_u hk hbound
+
+/-- **Peterfalvi (14.11.4)** consumer for the exact output shapes of
+`caseB_for_T` and `caseB_for_S`.  It leaves only the lower bound on `k` and the
+concrete displayed norm inequality as inputs. -/
+theorem norm_cascade_contradiction_of_caseB_outputs {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) {k : ℕ}
+    (hk : 2 * hyp.base.p * hyp.base.v < k) (hbound : normCascadeBound hyp k) :
+    False := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact norm_cascade_contradiction_of_caseB_data Tdata Sdata hk hbound
+
+/-- **Peterfalvi (14.11.4)** consumer after the first numerical output of
+`main_size_bounds` has supplied `k > 2 p v`.  The remaining non-arithmetic work
+is precisely to produce the displayed norm inequality. -/
+theorem norm_cascade_contradiction_of_main_size_bound {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v)
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  exact norm_cascade_contradiction_of_caseB_data Tdata Sdata hsize hbound
 
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`. -/
