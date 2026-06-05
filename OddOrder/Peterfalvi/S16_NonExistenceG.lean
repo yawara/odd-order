@@ -3549,6 +3549,32 @@ theorem caseA_contradiction_of_nonfull_card_divisibility
   exact data.caseA_contradiction_of_nonfull_card_congruences
     Sdata hcaseA hu_not_full hh_eq hh_mod_p hx_mod_q hx_odd
 
+/-- **Peterfalvi (14.15)**: fixed-point-free cardinal-congruence form of the
+non-full case-(a) branch.  If the `W₁` action gives both `h ≡ 1 mod q` and
+`u ≡ 1 mod q`, then for any quotient decomposition `h = u * x` the quotient
+itself satisfies `x ≡ 1 mod q`, which is the congruence used in the displayed
+`x = q + n p` calculation. -/
+theorem caseA_contradiction_of_nonfull_fpf_card_congruences
+    [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (Sdata : CaseBForSData hyp)
+    (hcaseA : data.caseA)
+    (hu_not_full :
+      hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (hu_dvd_h : hyp.base.u ∣ nc.h)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hh_mod_q : nc.h ≡ 1 [MOD hyp.base.q])
+    (hu_mod_q : hyp.base.u ≡ 1 [MOD hyp.base.q]) :
+    False := by
+  exact data.caseA_contradiction_of_nonfull_card_divisibility
+    _hG Sdata hcaseA hu_not_full hu_dvd_h hh_mod_p (fun x hh_eq => by
+      have hux_mod_q : hyp.base.u * x ≡ x [MOD hyp.base.q] := by
+        simpa [one_mul] using hu_mod_q.mul_right x
+      have hh_mod_x : nc.h ≡ x [MOD hyp.base.q] := by
+        rw [hh_eq]
+        exact hux_mod_q
+      exact hh_mod_x.symm.trans hh_mod_q)
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3573,10 +3599,10 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
   · -- Non-exceptional branch of (14.14): the arithmetic spine is now
-    -- `data.caseA_contradiction_of_nonfull_card_divisibility`.  The remaining
-    -- work is to derive `u ∣ h`, `h ≡ 1 mod p`, and the fixed-point-free
-    -- quotient congruence `x ≡ 1 mod q` from (14.5) and the non-full branch
-    -- of (14.6).
+    -- `data.caseA_contradiction_of_nonfull_fpf_card_congruences`.  The
+    -- remaining work is to derive `u ∣ h`, `h ≡ 1 mod p`, and the two
+    -- fixed-point-free cardinal congruences `h ≡ 1 mod q` and `u ≡ 1 mod q`
+    -- from (14.5) and the non-full branch of (14.6).
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
