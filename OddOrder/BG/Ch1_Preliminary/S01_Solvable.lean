@@ -2442,6 +2442,50 @@ theorem hall_higman_solvable_specialization
       OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) G :=
   OddOrder.Isaacs.Ch03.hall_higman_1_2_3 ({p} : Set ℕ) hp'
 
+/-- **Isaacs Thm 3.21 / Hall-Higman 1.2.3 (general form)**: for a finite π-separable
+group `G`, the centralizer of `O_{π',π}(G)` is contained in `O_{π',π}(G)`:
+`C_G(O_{π',π}(G)) ≤ O_{π',π}(G)`.
+
+There is **no** hypothesis that `O_{π'}(G) = 1`; this is the genuine general statement.
+The literal numbered Isaacs Thm 3.21 carries the `O_{π'}(G) = 1` hypothesis and is exactly
+the special case `OddOrder.Isaacs.Ch03.hall_higman_1_2_3`. This general form is obtained by
+transporting that special case to `Ḡ = G/O_{π'}(G)` (where `O_{π'}(Ḡ) = 1` automatically) and
+recognizing `O_π(Ḡ)` pulled back as `O_{π',π}(G)` — exactly Isaacs' own reduction in the proof
+of Thm 3.22. This is the form BG §9 Thm 9.1 needs.
+
+`IsSolvable` callers obtain `[IsPiSeparable π G]` for free via the instance
+`OddOrder.Isaacs.Ch03.isPiSeparable_of_solvable`. -/
+theorem centralizer_oPiPrimePiCore_le
+    {G : Type*} [Group G] [Finite G] (π : Set ℕ) [OddOrder.Isaacs.Ch03.IsPiSeparable π G] :
+    Subgroup.centralizer (OddOrder.Isaacs.Ch03.oPiPrimePiCore π G : Set G) ≤
+      OddOrder.Isaacs.Ch03.oPiPrimePiCore π G := by
+  -- `Ḡ = G ⧸ O_{π'}(G)`, written inline to keep all occurrences syntactically identical.
+  -- `mk : G →* Ḡ` is the quotient map.
+  let mk : G →* G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G :=
+    QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)
+  -- `Ḡ` is π-separable and `O_{π'}(Ḡ) = ⊥` (self-quotient identity at the complement set).
+  haveI : OddOrder.Isaacs.Ch03.IsPiSeparable π
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) := inferInstance
+  have hbot : OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π}
+      (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) = ⊥ :=
+    OddOrder.Isaacs.Ch03.oPiCore_quotient_self_eq_bot {p | p ∉ π}
+  -- Special-case Hall-Higman on `Ḡ`: `C_Ḡ(O_π(Ḡ)) ≤ O_π(Ḡ)`.
+  have hHH := OddOrder.Isaacs.Ch03.hall_higman_1_2_3
+    (G := G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G) π hbot
+  -- `O_{π',π}(G) = comap mk (O_π(Ḡ))`, with `mk` written to match the `let`-binding.
+  have hcomap : OddOrder.Isaacs.Ch03.oPiPrimePiCore π G
+      = Subgroup.comap mk
+        (OddOrder.Isaacs.Ch03.oPiCore π (G ⧸ OddOrder.Isaacs.Ch03.oPiCore {p | p ∉ π} G)) := by
+    rw [OddOrder.Isaacs.Ch03.oPiPrimePiCore]
+  -- Push the centralizer through `mk` and conclude via the Galois connection.
+  -- After `map_le_iff_le_comap` the goal is `map mk (centralizer ↑(comap mk Oπ)) ≤ Oπ`.
+  rw [hcomap, ← Subgroup.map_le_iff_le_comap]
+  refine le_trans (Subgroup.map_centralizer_le_centralizer_image _ mk) ?_
+  -- `mk '' ↑(comap mk Oπ) = ↑Oπ` since `mk` is surjective.
+  rw [← Subgroup.coe_map,
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _]
+  exact hHH
+
 /-- **Prop 1.15(b) core** (`O_{p'}(G) = ⊥` case, per element): every `u ∈ M := O_{p'}(C_G(R))`
 centralizes `T := O_p(G)`. Proof mirrors `BG.AppA.thmA5_part2`: `⟨u⟩` acts by conjugation on the
 `p`-group `RT := R ⊔ T`, and `C_{RT}(C_{RT}(u)) ⊆ C_{RT}(R) ⊆ C_{RT}(u)` — the second inclusion

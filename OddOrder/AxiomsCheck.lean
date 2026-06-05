@@ -1167,6 +1167,9 @@ set_option linter.style.longLine false in
 -- BG Cor 1.12 (mmd L457): p 奇, G p-群, E elem ab, A p'-operators が C_G(E) の order-p 元を全固定
 -- ⇒ A は G 上自明。Thm 1.11 (=Isaacs 4.36) を C_G(C_G(A)) に + Prop 1.10 (G nilpotent)。Thm 6.7 で使用。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S01.corollary_1_12
+-- Isaacs Thm 3.21 / Hall-Higman 1.2.3 (general form, no O_{π'}=1 hyp): π-separable G で
+-- C_G(O_{π',π}(G)) ≤ O_{π',π}(G)。Ḡ=G/O_{π'}(G) へ特殊形を転送する Isaacs Thm 3.22 還元。BG §9 Thm 9.1 で使用。
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S01.centralizer_oPiPrimePiCore_le
 -- BG §6/§7 共有 engine: ↥V 可解 + π-Hall 共役 (Isaacs hall_C を subtype 像で G レベルへ);
 -- §7 Thm 7.4(d) と §6 Lem 6.5(c) の両方で使用。
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf
