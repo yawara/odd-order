@@ -1227,6 +1227,48 @@ theorem rank_quotient_Malpha_le_two_of_isHall [Finite G] {M : Subgroup G}
     exact (Ch1.S04.pRank_quotient_le_of_coprime
       (G := ↥M) (N := (Malpha M).subgroupOf M) hN_p').trans hM_rank
 
+/-- **BG Theorem 10.2(d), nilpotence entry point** (mmd L2733-2738): once
+`M_α` is an `α(M)`-Hall subgroup, the derived subgroup of `M/M_α` lies in the
+Fitting subgroup of `M/M_α`. -/
+theorem derived_quotient_Malpha_le_fitting_of_isHall [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+    commutator (↥M ⧸ (Malpha M).subgroupOf M) ≤
+      Ch01.fitting (↥M ⧸ (Malpha M).subgroupOf M) := by
+  let Q : Type _ := ↥M ⧸ (Malpha M).subgroupOf M
+  change commutator Q ≤ Ch01.fitting Q
+  have hQrank : rank Q ≤ 2 := rank_quotient_Malpha_le_two_of_isHall hHallα
+  have hFQrank : rank ↥(Ch01.fitting Q) ≤ 2 :=
+    (OddOrder.GroupTheory.rank_le_of_injective
+      (f := (Ch01.fitting Q).subtype) (Ch01.fitting Q).subtype_injective).trans hQrank
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable Q := inferInstance
+  have hoddM : Odd (Nat.card ↥M) := by
+    rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := he.two_dvd.trans (Subgroup.card_subgroup_dvd_card M)
+      have := hG.odd
+      rw [Nat.odd_iff] at this
+      omega
+    · exact ho
+  have hQ_dvd_M : Nat.card Q ∣ Nat.card ↥M := by
+    change ((Malpha M).subgroupOf M).index ∣ Nat.card ↥M
+    exact Subgroup.index_dvd_card ((Malpha M).subgroupOf M)
+  have hoddQ : Odd (Nat.card Q) := by
+    rcases Nat.even_or_odd (Nat.card Q) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card ↥M := he.two_dvd.trans hQ_dvd_M
+      rw [Nat.odd_iff] at hoddM
+      omega
+    · exact ho
+  rcases subsingleton_or_nontrivial Q with hsub | hnontriv
+  · intro x _hx
+    have hx1 : x = 1 := hsub.elim x 1
+    rw [hx1]
+    exact (Ch01.fitting Q).one_mem
+  · haveI : Nontrivial Q := hnontriv
+    exact OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddQ hFQrank
+
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
 nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/
