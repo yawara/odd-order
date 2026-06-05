@@ -414,6 +414,70 @@ private theorem normalizer_sylow_map_le_maximal [Finite G] (hG : IsMinimalSimple
           rw [hEq91]
       _ ≤ M := normalizer_opiCoreInG_le_maximal_of_ne_bot hG hM hOp
 
+/-- **BG Theorem 9.1, Eq (9.5)+STEP5-7** (mmd L2527-2539), abstract form: let `H` be a finite
+solvable group of odd order, `R` a Sylow `p`-subgroup, with `r(F(H)) ≤ 2`. If the ambient images
+satisfy `R ⊆ M`, `O_{p'}(H) ⊆ M` (b), and `N_G(R) ⊆ M` (Eq 9.4), then `H ⊆ M`.
+
+Proof: by Theorem 5.7 (`derived_le_fitting_of_centralizer_rank_le_two` with `E = ⊥`, using
+`r(F(H)) ≤ 2`), `H' ⊆ F(H)`. The nilpotent `F(H)` splits as `⨆_q O_q(H) ⊆ R ⊔ O_{p'}(H) =: N`
+(`fitting_eq_iSup_primeFactors`; `O_p ⊆ R`, `O_q ⊆ O_{p'}` for `q ≠ p`). Hence `H' ⊆ N`, so
+`N ⊴ H`, and Frattini (`Sylow.normalizer_sup_eq_top'`) gives `H = N_H(R)·N`. Mapping back to `G`,
+`N_H(R) ⊆ N_G(R) ⊆ M`, `R ⊆ M`, `O_{p'}(H) ⊆ M`, so `H ⊆ M`. -/
+private theorem le_maximal_of_rank_fitting_le_two_of_sylow [Finite G]
+    {p : ℕ} [Fact p.Prime] {H M : Subgroup G} [IsSolvable ↥H]
+    (hoddH : Odd (Nat.card ↥H)) (R : Sylow p ↥H)
+    (hrank : rank ↥(Ch01.fitting ↥H) ≤ 2)
+    (hRM : (R : Subgroup ↥H).map H.subtype ≤ M)
+    (hOpM : opiCoreInG ({p} : Set ℕ)ᶜ H ≤ M)
+    (hNRM : Subgroup.normalizer (((R : Subgroup ↥H).map H.subtype) : Set G) ≤ M) :
+    H ≤ M := by
+  classical
+  set N : Subgroup ↥H := (R : Subgroup ↥H) ⊔ Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥H with hN
+  -- Theorem 5.7: `H' ⊆ F(H)` (via `E = ⊥`, `C(⊥) ⊓ F = F`, `r(F) ≤ 2`).
+  have hderiv : commutator ↥H ≤ Ch01.fitting ↥H := by
+    have hcentbot : Subgroup.centralizer ((⊥ : Subgroup ↥H) : Set ↥H) = ⊤ := by
+      rw [Subgroup.coe_bot]; ext x; simp [Subgroup.mem_centralizer_iff]
+    have hrank' : rank
+        ↥(Subgroup.centralizer ((⊥ : Subgroup ↥H) : Set ↥H) ⊓ Ch01.fitting ↥H) ≤ 2 := by
+      rw [hcentbot, top_inf_eq]; exact hrank
+    exact OddOrder.BG.Ch1.S05.derived_le_fitting_of_centralizer_rank_le_two hoddH
+      (⊥ : Subgroup ↥H) (bot_isElementaryAbelian (p := p)) bot_le hrank'
+  -- `F(H) ⊆ R ⊔ O_{p'}(H)` via the nilpotent decomposition.
+  have hfitN : Ch01.fitting ↥H ≤ N := by
+    rw [Ch01.fitting_eq_iSup_primeFactors]
+    refine iSup_le (fun q => ?_)
+    haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+    by_cases hq : (q : ℕ) = p
+    · subst hq; exact le_sup_of_le_left (Ch01.opCore_le R)
+    · refine le_sup_of_le_right (Ch03.Subgroup.IsPiGroup.le_oPiCore ?_)
+      intro r hr
+      have hrq : r = (q : ℕ) := by
+        obtain ⟨n, hn⟩ := (Ch01.opCore_isPGroup (q : ℕ) ↥H).exists_card_eq
+        rw [hn] at hr
+        have hrp : r.Prime := Nat.prime_of_mem_primeFactors hr
+        exact (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp
+          (hrp.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hr).2.1)
+      simp [hrq, hq]
+  -- `N ⊴ H` (it contains `H'`), then Frattini's argument.
+  have hNnorm : N.Normal := Subgroup.Normal.of_commutator_le _ (hderiv.trans hfitN)
+  haveI := hNnorm
+  have hRN : (R : Subgroup ↥H) ≤ N := le_sup_left
+  have hfrattini : Subgroup.normalizer (R : Subgroup ↥H) ⊔ N = ⊤ :=
+    Sylow.normalizer_sup_eq_top' R hRN
+  -- map `⊤ = N_H(R) ⊔ N` back to `G`.
+  have hmaptop : (⊤ : Subgroup ↥H).map H.subtype = H := by
+    rw [← MonoidHom.range_eq_map, H.range_subtype]
+  calc H = (⊤ : Subgroup ↥H).map H.subtype := hmaptop.symm
+    _ = (Subgroup.normalizer (R : Subgroup ↥H) ⊔ N).map H.subtype := by rw [hfrattini]
+    _ ≤ M := by
+        rw [Subgroup.map_sup]
+        refine sup_le (le_trans (Subgroup.le_normalizer_map H.subtype) hNRM) ?_
+        rw [hN, Subgroup.map_sup]
+        refine sup_le hRM ?_
+        have hrfl : (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥H).map H.subtype
+            = opiCoreInG ({p} : Set ℕ)ᶜ H := rfl
+        rw [hrfl]; exact hOpM
+
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
 (a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
 
