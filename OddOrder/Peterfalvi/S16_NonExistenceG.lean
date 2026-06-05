@@ -363,6 +363,84 @@ theorem fieldNormalizerPrimeLineGenerator_pow_p (hyp : Hypothesis (G := G)) :
   congr
   simp
 
+/-- The additive kernel of the concrete BG Frobenius group, with the local
+`Fact p.Prime` bundled into the abbreviation. -/
+abbrev fieldNormalizerAdditiveGroup (hyp : Hypothesis (G := G)) : Type _ :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q
+
+/-- The concrete `p`-power Frobenius on the additive kernel of BG's model
+`P ⋊ U`, written multiplicatively via `Multiplicative`. -/
+noncomputable def fieldNormalizerAdditiveFrobeniusHom (hyp : Hypothesis (G := G)) :
+    fieldNormalizerAdditiveGroup hyp →* fieldNormalizerAdditiveGroup hyp where
+  toFun x := Multiplicative.ofAdd (x.toAdd ^ hyp.base.p)
+  map_one' := by
+    apply Multiplicative.toAdd.injective
+    simp [hyp.base.p_prime.ne_zero]
+  map_mul' x y := by
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    apply Multiplicative.toAdd.injective
+    exact (OddOrder.BG.AppC.NormSet.add_pow_p
+      hyp.base.p hyp.base.q x.toAdd y.toAdd).symm
+
+/-- The concrete `p`-power Frobenius on the norm-one complement. -/
+noncomputable def fieldNormalizerNormOneFrobeniusHom (hyp : Hypothesis (G := G)) :
+    fieldNormalizerNormOneUnits hyp →* fieldNormalizerNormOneUnits hyp where
+  toFun u := u ^ hyp.base.p
+  map_one' := by simp
+  map_mul' u v := by
+    rw [mul_pow]
+
+/-- The concrete `p`-power Frobenius of BG's semidirect product
+`P ⋊ U`: it sends `(x,u)` to `(x^p,u^p)`. -/
+noncomputable def fieldNormalizerFrobeniusHom (hyp : Hypothesis (G := G)) :
+    fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerFrobeniusGroup hyp :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  SemidirectProduct.map
+    (fieldNormalizerAdditiveFrobeniusHom (G := G) hyp)
+    (fieldNormalizerNormOneFrobeniusHom (G := G) hyp)
+    (by
+      intro u
+      ext x
+      apply Multiplicative.toAdd.injective
+      change (((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) * x) ^ hyp.base.p =
+            (((u ^ hyp.base.p : fieldNormalizerNormOneUnits hyp) :
+                  (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                GaloisField hyp.base.p hyp.base.q) * x ^ hyp.base.p
+      simpa [map_pow] using
+        (mul_pow (((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+          GaloisField hyp.base.p hyp.base.q)) x hyp.base.p))
+
+@[simp]
+theorem fieldNormalizerFrobeniusHom_inl (hyp : Hypothesis (G := G))
+    (x : fieldNormalizerAdditiveGroup hyp) :
+    fieldNormalizerFrobeniusHom hyp (SemidirectProduct.inl x) =
+      SemidirectProduct.inl (Multiplicative.ofAdd (x.toAdd ^ hyp.base.p)) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simp [fieldNormalizerFrobeniusHom, fieldNormalizerAdditiveFrobeniusHom]
+
+@[simp]
+theorem fieldNormalizerFrobeniusHom_inr (hyp : Hypothesis (G := G))
+    (u : fieldNormalizerNormOneUnits hyp) :
+    fieldNormalizerFrobeniusHom hyp
+        (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) =
+      SemidirectProduct.inr (u ^ hyp.base.p) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  simp [fieldNormalizerFrobeniusHom, fieldNormalizerNormOneFrobeniusHom]
+
+/-- The concrete Frobenius fixes the prime-field line pointwise. -/
+theorem fieldNormalizerFrobeniusHom_primeLineElement (hyp : Hypothesis (G := G))
+    (c : ZMod hyp.base.p) :
+    fieldNormalizerFrobeniusHom hyp (fieldNormalizerPrimeLineElement hyp c) =
+      fieldNormalizerPrimeLineElement hyp c := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rw [fieldNormalizerPrimeLineElement, fieldNormalizerFrobeniusHom_inl,
+    SemidirectProduct.inl_inj]
+  change (algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c) ^
+      hyp.base.p = algebraMap (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q) c
+  rw [← map_pow, ZMod.pow_card]
+
 /-- The two conclusions of **Peterfalvi (14.2)**, packaged in the form consumed
 by BG Appendix C.  The finite-field model is now carried as a concrete
 monomorphism from BG's Frobenius group `H = P \rtimes U` into `G`, together with
