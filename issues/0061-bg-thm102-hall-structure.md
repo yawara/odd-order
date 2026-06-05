@@ -57,9 +57,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 - [x] **`Msigma_le_derived`** (M_σ⊆M' 全体): per-Sylow core + finite Sylow-generation helper
   `le_of_sylow_le` で完成。`Msigma_isPiGroup` から各 Sylow prime が σ(M) に入ることを使い、
   `sylow_le_derived_of_mem_sigma` に接続。✅ commit 970e458
-- [x] **conditional Hall transport support**: `Msigma_subgroupOf_isHall_of_isHall` と
-  `sigma_subgroup_le_Msigma_of_isHall` を追加。G-level の `IsHallSubgroup (σ M) M_σ` から
-  `↥M` 内 Hall 性と「M 内の σ-subgroup は M_σ に吸収される」を切り出し、§11 の重複 proof を削減。
+- [x] **conditional Hall transport support**: `opiCoreInG_subgroupOf_isHall_of_isHall` /
+  `piSubgroup_le_opiCoreInG_of_isHall` を一般形として追加し、`Malpha_*` / `Msigma_*`
+  specializations を公開。G-level の `IsHallSubgroup π O_π(M)` から `↥M` 内 Hall 性と
+  「M 内の π-subgroup は `O_π(M)` に吸収される」を切り出し、§11 の重複 proof を削減。
 - [ ] **`Msigma_ne_bot`** (M_σ≠1, (e)): easy branch `Msigma_ne_bot_of_Malpha_ne_bot`
   (M_α≠⊥ ⇒ M_σ≠⊥) は完成。残りは M_α=⊥ なら r(M)≤2
   (Thm 4.20/(d) 要) + O_q Sylow + N_G(O_q)=M。**(d) と entangle**。

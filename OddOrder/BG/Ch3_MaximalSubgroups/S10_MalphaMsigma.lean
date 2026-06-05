@@ -179,20 +179,22 @@ theorem Fsigma_le_fitting (M : Subgroup G) : Fsigma M ≤ Ch2.S08.fittingInG M :
 theorem Fsigma'_le_fitting (M : Subgroup G) : Fsigma' M ≤ Ch2.S08.fittingInG M :=
   Subgroup.map_subtype_le _
 
+@[simp] theorem opiCoreInG_subgroupOf (π : Set ℕ) (M : Subgroup G) :
+    (opiCoreInG π M).subgroupOf M = Ch03.oPiCore π ↥M := by
+  rw [Subgroup.subgroupOf, OddOrder.GroupTheory.opiCoreInG,
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+
 @[simp] theorem Malpha_subgroupOf (M : Subgroup G) :
     (Malpha M).subgroupOf M = Ch03.oPiCore (alpha M) ↥M := by
-  rw [Subgroup.subgroupOf, Malpha, OddOrder.GroupTheory.opiCoreInG,
-    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  simp [Malpha]
 
 @[simp] theorem Mbeta_subgroupOf (M : Subgroup G) :
     (Mbeta M).subgroupOf M = Ch03.oPiCore (beta M) ↥M := by
-  rw [Subgroup.subgroupOf, Mbeta, OddOrder.GroupTheory.opiCoreInG,
-    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  simp [Mbeta]
 
 @[simp] theorem Msigma_subgroupOf (M : Subgroup G) :
     (Msigma M).subgroupOf M = Ch03.oPiCore (sigma M) ↥M := by
-  rw [Subgroup.subgroupOf, Msigma, OddOrder.GroupTheory.opiCoreInG,
-    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  simp [Msigma]
 
 theorem Malpha_isPiGroup [Finite G] (M : Subgroup G) :
     Ch03.Subgroup.IsPiGroup (alpha M) (Malpha M) := by
@@ -254,38 +256,69 @@ private theorem isPiGroup_le_of_normal_isHallSubgroup {H : Type*} [Group H] [Fin
   have hx_sup : x ∈ (L ⊔ K : Subgroup H) := Subgroup.mem_sup_left hx
   rwa [h_sup_eq] at hx_sup
 
-/-- If `M_σ` is `σ(M)`-Hall in `G`, then its internal copy is `σ(M)`-Hall in `M`. -/
-theorem Msigma_subgroupOf_isHall_of_isHall [Finite G] {M : Subgroup G}
-    (hHall : Ch03.IsHallSubgroup (sigma M) (Msigma M)) :
-    Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) := by
+/-- If `O_π(M)` is `π`-Hall in `G`, then its internal copy is `π`-Hall in `M`. -/
+theorem opiCoreInG_subgroupOf_isHall_of_isHall [Finite G] {π : Set ℕ} {M : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup π (opiCoreInG π M)) :
+    Ch03.IsHallSubgroup π ((opiCoreInG π M).subgroupOf M) := by
   refine ⟨?_, ?_⟩
   · intro r hr
-    rw [Msigma_subgroupOf] at hr
-    exact Ch03.oPiCore.isPiGroup (sigma M) r hr
+    rw [opiCoreInG_subgroupOf] at hr
+    exact Ch03.oPiCore.isPiGroup π r hr
   · intro r hr
-    have hidx : ((Msigma M).subgroupOf M).index ∣ (Msigma M).index := by
-      have htower : ((Msigma M).subgroupOf M).index * M.index = (Msigma M).index :=
-        Subgroup.relIndex_mul_index (Msigma_le M)
+    have hidx : ((opiCoreInG π M).subgroupOf M).index ∣ (opiCoreInG π M).index := by
+      have htower : ((opiCoreInG π M).subgroupOf M).index * M.index =
+          (opiCoreInG π M).index :=
+        Subgroup.relIndex_mul_index (opiCoreInG_le π M)
       exact ⟨M.index, htower.symm⟩
     exact hHall.2 r (Nat.mem_primeFactors.mpr
       ⟨(Nat.mem_primeFactors.mp hr).1,
         dvd_trans (Nat.mem_primeFactors.mp hr).2.1 hidx, Subgroup.index_ne_zero_of_finite⟩)
 
+/-- A `π`-subgroup of `M` lies in `O_π(M)`, provided `O_π(M)` is `π`-Hall in `G`. -/
+theorem piSubgroup_le_opiCoreInG_of_isHall [Finite G] {π : Set ℕ} {M L : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup π (opiCoreInG π M)) (hLM : L ≤ M)
+    (hLpi : Ch03.Subgroup.IsPiGroup π L) : L ≤ opiCoreInG π M := by
+  haveI : ((opiCoreInG π M).subgroupOf M).Normal := by
+    rw [opiCoreInG_subgroupOf]
+    infer_instance
+  have hHallM : Ch03.IsHallSubgroup π ((opiCoreInG π M).subgroupOf M) :=
+    opiCoreInG_subgroupOf_isHall_of_isHall hHall
+  have hLsubOf : Ch03.Subgroup.IsPiGroup π (L.subgroupOf M) :=
+    Ch03.Subgroup.IsPiGroup.subgroupOf hLM hLpi
+  have hle : L.subgroupOf M ≤ (opiCoreInG π M).subgroupOf M :=
+    isPiGroup_le_of_normal_isHallSubgroup hHallM hLsubOf
+  intro x hx
+  have hxM : x ∈ M := hLM hx
+  have : (⟨x, hxM⟩ : ↥M) ∈ (opiCoreInG π M).subgroupOf M := hle hx
+  rwa [Subgroup.mem_subgroupOf] at this
+
+/-- If `M_α` is `α(M)`-Hall in `G`, then its internal copy is `α(M)`-Hall in `M`. -/
+theorem Malpha_subgroupOf_isHall_of_isHall [Finite G] {M : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+    Ch03.IsHallSubgroup (alpha M) ((Malpha M).subgroupOf M) := by
+  simpa [Malpha] using
+    opiCoreInG_subgroupOf_isHall_of_isHall (π := alpha M) (M := M) hHall
+
+/-- If `M_σ` is `σ(M)`-Hall in `G`, then its internal copy is `σ(M)`-Hall in `M`. -/
+theorem Msigma_subgroupOf_isHall_of_isHall [Finite G] {M : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (sigma M) (Msigma M)) :
+    Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) := by
+  simpa [Msigma] using
+    opiCoreInG_subgroupOf_isHall_of_isHall (π := sigma M) (M := M) hHall
+
+/-- An `α(M)`-subgroup of `M` lies in `M_α`, provided `M_α` is `α(M)`-Hall in `G`. -/
+theorem alpha_subgroup_le_Malpha_of_isHall [Finite G] {M L : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (alpha M) (Malpha M)) (hLM : L ≤ M)
+    (hLpi : Ch03.Subgroup.IsPiGroup (alpha M) L) : L ≤ Malpha M := by
+  simpa [Malpha] using
+    piSubgroup_le_opiCoreInG_of_isHall (π := alpha M) (M := M) hHall hLM hLpi
+
 /-- A `σ(M)`-subgroup of `M` lies in `M_σ`, provided `M_σ` is `σ(M)`-Hall in `G`. -/
 theorem sigma_subgroup_le_Msigma_of_isHall [Finite G] {M L : Subgroup G}
     (hHall : Ch03.IsHallSubgroup (sigma M) (Msigma M)) (hLM : L ≤ M)
     (hLpi : Ch03.Subgroup.IsPiGroup (sigma M) L) : L ≤ Msigma M := by
-  haveI : ((Msigma M).subgroupOf M).Normal := by rw [Msigma_subgroupOf]; infer_instance
-  have hHallM : Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) :=
-    Msigma_subgroupOf_isHall_of_isHall hHall
-  have hLsubOf : Ch03.Subgroup.IsPiGroup (sigma M) (L.subgroupOf M) :=
-    Ch03.Subgroup.IsPiGroup.subgroupOf hLM hLpi
-  have hle : L.subgroupOf M ≤ (Msigma M).subgroupOf M :=
-    isPiGroup_le_of_normal_isHallSubgroup hHallM hLsubOf
-  intro x hx
-  have hxM : x ∈ M := hLM hx
-  have : (⟨x, hxM⟩ : ↥M) ∈ (Msigma M).subgroupOf M := hle hx
-  rwa [Subgroup.mem_subgroupOf] at this
+  simpa [Msigma] using
+    piSubgroup_le_opiCoreInG_of_isHall (π := sigma M) (M := M) hHall hLM hLpi
 
 @[simp] theorem mem_elemAbelianOfRankIn_iff (p n : ℕ) (H X : Subgroup G) :
     elemAbelianOfRankIn p n H X ↔ X ∈ elemAbelianOfRank G p n ∧ X ≤ H :=
