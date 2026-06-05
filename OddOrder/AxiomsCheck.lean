@@ -2185,6 +2185,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_Yset_ncard
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset
+-- (6.8) capstone X-empty (abelian) branch: `S = Y` ⟹ CoherenceTarget = coherentYset.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherenceTarget_of_Xset_empty
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued

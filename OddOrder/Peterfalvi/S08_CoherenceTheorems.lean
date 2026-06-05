@@ -3532,6 +3532,19 @@ noncomputable def coherentYset (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
   hyp.coherentYset_of_two_le_ncard hyp.two_le_Yset_ncard
 
+/-- **(6.8) coherence, `X`-empty case** (`H` abelian / no non-linear constituents).  When
+`X = S − S([H,H])` is empty, the partition `S = X ∪ Y` (`Xset_union_Yset_eq_S`) collapses to
+`S = Y = S([H,H])`, so the full target `IsCoherent τ S H^#` is exactly the already-built
+`Y`-coherence `coherentYset` (T6: equal-degree `|W₁|` family).  This discharges the abelian branch
+of the (6.8) capstone with no gluing required. -/
+noncomputable def coherenceTarget_of_Xset_empty (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hXe : hyp.Xset ⁅H, H⁆ = ∅) : hyp.CoherenceTarget := by
+  have hSY : hyp.Yset = hyp.S := by
+    rw [← hyp.Xset_union_Yset_eq_S, hXe, Set.empty_union]
+  have h : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := hSY ▸ hyp.coherentYset
+  exact h
+
 /-- Glue `X = S - S(H')` coherence with the internally constructed `Y = S(H')` coherence.
 
 This is the final algebraic assembly shape needed by Peterfalvi (6.8): callers still provide the
@@ -5990,7 +6003,16 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
     {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
     (hyp : SibleyDadeHypothesis G L H) : hyp.CoherenceTarget := by
-  sorry
+  haveI := hyp.H_normal
+  by_cases hXe : hyp.Xset ⁅H, H⁆ = ∅
+  · -- `X`-empty (abelian) branch: `S = Y`, discharged by the `Y`-coherence `coherentYset`.
+    exact hyp.coherenceTarget_of_Xset_empty hXe
+  · -- `X`-nonempty branch: the genuine §8 content — glue the `X = S − S(Z)`-coherence
+    -- (`Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`,
+    -- per-step (6.6) prime-power degree data) with `Y`-coherence via the §7 engine.  Requires
+    -- the case split `hyp.cases` (Frobenius / CertainType) and the per-step `hstepData` +
+    -- combined extension `ν` glue data, which remain to be constructed.
+    sorry
 
 /-- **Peterfalvi (6.8) → (7.10) consumer interface.**
 A degree-scaled `Z`-chain decomposition: given a coherence input `τ` on `(S, A)`
