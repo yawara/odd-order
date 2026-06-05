@@ -2038,6 +2038,94 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_expansion_formula : Prop
   final_norm_contradiction : Prop
 
+/-- Pure arithmetic estimate used in **Peterfalvi (14.11.4)**.  Once the
+norm calculation reduces the error terms to `2 / (p q) + 1 / (u q) + 1 / (v p)`,
+the Section 16 size assumptions `u > 2q`, `v > 2p`, and `q < p` bound that error
+strictly by `1 / q`. -/
+theorem norm_error_terms_lt_inv_q {p q u v : ℕ}
+    (hq3 : 3 ≤ q) (hqp : q < p) (hu : 2 * q < u) (hv : 2 * p < v) :
+    (2 : ℚ) / ((p * q : ℕ) : ℚ) + 1 / ((u * q : ℕ) : ℚ) +
+        1 / ((v * p : ℕ) : ℚ) < 1 / (q : ℚ) := by
+  have hqpos_nat : 0 < q := by omega
+  have hppos_nat : 0 < p := by omega
+  have hupos_nat : 0 < u := by omega
+  have hvpos_nat : 0 < v := by omega
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hupos : (0 : ℚ) < u := by exact_mod_cast hupos_nat
+  have hvpos : (0 : ℚ) < v := by exact_mod_cast hvpos_nat
+  have hq3q : (3 : ℚ) ≤ q := by exact_mod_cast hq3
+  have hqpq : (q : ℚ) < p := by exact_mod_cast hqp
+  have huq : (2 : ℚ) * q < u := by exact_mod_cast hu
+  have hvp : (2 : ℚ) * p < v := by exact_mod_cast hv
+  have hterm1 : (2 : ℚ) / ((p * q : ℕ) : ℚ) < 2 / ((q * q : ℕ) : ℚ) := by
+    norm_num [Nat.cast_mul]
+    exact div_lt_div_of_pos_left (by norm_num) (mul_pos hqpos hqpos)
+      (mul_lt_mul_of_pos_right hqpq hqpos)
+  have hterm2 : (1 : ℚ) / ((u * q : ℕ) : ℚ) < 1 / ((2 * q * q : ℕ) : ℚ) := by
+    have hden : (2 : ℚ) * q * q < u * q := by nlinarith [huq, hqpos]
+    have hcore : (1 : ℚ) / (u * q) < 1 / (2 * q * q) :=
+      one_div_lt_one_div_of_lt (by positivity : (0 : ℚ) < 2 * q * q) hden
+    simpa [Nat.cast_mul, mul_assoc, mul_left_comm, mul_comm] using hcore
+  have hterm3 : (1 : ℚ) / ((v * p : ℕ) : ℚ) < 1 / ((2 * q * q : ℕ) : ℚ) := by
+    have hsq : (q : ℚ) * q < p * p := by nlinarith [hqpq, hqpos, hppos]
+    have hden : (2 : ℚ) * q * q < v * p := by nlinarith [hsq, hvp, hppos]
+    have hcore : (1 : ℚ) / (v * p) < 1 / (2 * q * q) :=
+      one_div_lt_one_div_of_lt (by positivity : (0 : ℚ) < 2 * q * q) hden
+    simpa [Nat.cast_mul, mul_assoc, mul_left_comm, mul_comm] using hcore
+  have hsum :
+      (2 : ℚ) / ((p * q : ℕ) : ℚ) + 1 / ((u * q : ℕ) : ℚ) +
+          1 / ((v * p : ℕ) : ℚ) <
+        2 / ((q * q : ℕ) : ℚ) + 1 / ((2 * q * q : ℕ) : ℚ) +
+          1 / ((2 * q * q : ℕ) : ℚ) := by
+    nlinarith [hterm1, hterm2, hterm3]
+  have hsum_eq :
+      2 / ((q * q : ℕ) : ℚ) + 1 / ((2 * q * q : ℕ) : ℚ) +
+          1 / ((2 * q * q : ℕ) : ℚ) = 3 / ((q * q : ℕ) : ℚ) := by
+    norm_num [Nat.cast_mul]
+    field_simp [hqpos.ne']
+    ring
+  have hthree_le : (3 : ℚ) / ((q * q : ℕ) : ℚ) ≤ 1 / (q : ℚ) := by
+    norm_num [Nat.cast_mul]
+    have hmul_nonneg : 0 ≤ (q : ℚ) * ((q : ℚ) - 3) :=
+      mul_nonneg (le_of_lt hqpos) (sub_nonneg.mpr hq3q)
+    field_simp [hqpos.ne']
+    nlinarith [hmul_nonneg]
+  nlinarith [hsum, hsum_eq, hthree_le]
+
+/-- Arithmetic endpoint for **Peterfalvi (14.11.4)**.  If the norm calculation
+has already yielded the displayed bound from the text, then the lower bound
+`k > 2 p v` and the cyclotomic lower consequence `p q < v` are contradictory. -/
+theorem norm_cascade_contradiction {p q u v k : ℕ}
+    (hq3 : 3 ≤ q) (hqp : q < p) (hu : 2 * q < u) (hv : 2 * p < v)
+    (hk : 2 * p * v < k) (hvlarge : p * q < v)
+    (hbound :
+      (1 : ℚ) / (p : ℚ) + 1 / (q : ℚ) ≤
+        ((p * q : ℕ) : ℚ) / (k : ℚ) +
+          2 / ((p * q : ℕ) : ℚ) +
+          1 / ((u * q : ℕ) : ℚ) +
+          1 / ((v * p : ℕ) : ℚ)) :
+    False := by
+  have hqpos_nat : 0 < q := by omega
+  have hppos_nat : 0 < p := by omega
+  have hvpos_nat : 0 < v := by omega
+  have hkpos_nat : 0 < k := by omega
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hkpos : (0 : ℚ) < k := by exact_mod_cast hkpos_nat
+  have hsmall := norm_error_terms_lt_inv_q (p := p) (q := q) (u := u) (v := v)
+    hq3 hqp hu hv
+  have hpinv_lt : (1 : ℚ) / (p : ℚ) < ((p * q : ℕ) : ℚ) / (k : ℚ) := by
+    nlinarith [hbound, hsmall]
+  have hk_lt : (k : ℚ) < (p : ℚ) * (p : ℚ) * (q : ℚ) := by
+    field_simp [Nat.cast_mul, hppos.ne', hqpos.ne', hkpos.ne'] at hpinv_lt
+    norm_num [Nat.cast_mul] at hpinv_lt
+    nlinarith [hpinv_lt]
+  have hk_gt : ((2 * p * v : ℕ) : ℚ) < k := by exact_mod_cast hk
+  have hvlargeq : ((p * q : ℕ) : ℚ) < v := by exact_mod_cast hvlarge
+  norm_num [Nat.cast_mul] at hk_gt hvlargeq
+  nlinarith [hk_lt, hk_gt, hvlargeq, hppos]
+
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`. -/
 theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
