@@ -565,6 +565,33 @@ private theorem normal_sylow_label_ne_of_scn3Global_of_pRank_fittingInG_le_two
         (Subgroup.inclusion_injective hAF))
   omega
 
+/-- **BG Theorem 4.20(c) package bridge for §9.** A maximal subgroup `M` of the minimal simple
+odd group `G` with `r(F(M)) ≤ 2` carries a characteristic Sylow series package: `M` is solvable
+(`hG.solvable_of_mem_maximalSubgroups`), of odd order (`|M| ∣ |G|`), nontrivial, and
+`rank F(↥M) = rank (fittingInG M) ≤ 2` (the two Fitting subgroups are isomorphic via
+`M.subtype`).  This is how the low-rank branch of the Lemma 9.5 normalizer step obtains its
+`(9.7)` Sylow data internally — replacing the (unfulfillable, since `r(F(M))` may be `≥ 3`)
+external package hypothesis. -/
+private theorem exists_characteristicSylowSeriesPackage_of_maximal_of_rank_fittingInG_le_two
+    [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
+    (hrank : rank ↥(S08.fittingInG M) ≤ 2) :
+    Nonempty (OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥M) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hodd : Odd (Nat.card ↥M) := by
+    rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := he.two_dvd.trans (Subgroup.card_subgroup_dvd_card M)
+      have := hG.odd; rw [Nat.odd_iff] at this; omega
+    · exact ho
+  have hrankF : rank ↥(Ch01.fitting ↥M) ≤ 2 := by
+    refine le_trans (OddOrder.GroupTheory.rank_le_of_injective
+      (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype
+        M.subtype_injective).toMonoidHom) ?_) hrank
+    exact (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype M.subtype_injective).injective
+  exact ⟨(OddOrder.BG.Ch1.S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
+    hodd hrankF).some⟩
+
 /-- Low-rank normalizer step when §4 supplies a positive-length characteristic
 Sylow series and Lemma 9.5 has already established `r_p(F(M)) ≤ 2`. -/
 private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lowRank
