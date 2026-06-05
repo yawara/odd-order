@@ -3167,6 +3167,18 @@ structure NonConjugateHypothesis (hyp : Hypothesis (G := G)) where
   h : ℕ
   h_eq_card_H : h = Nat.card ↥Ldata.H
 
+namespace NonConjugateHypothesis
+
+/-- **Peterfalvi (14.13)**: since `h = |H|` and `H` is a subgroup of the
+minimal odd-order group, `h` is odd. -/
+theorem h_odd [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (nc : NonConjugateHypothesis hyp) :
+    Odd nc.h := by
+  rw [nc.h_eq_card_H]
+  exact _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card nc.Ldata.H)
+
+end NonConjugateHypothesis
+
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
     (nc : NonConjugateHypothesis hyp) where
@@ -3510,6 +3522,33 @@ theorem caseA_contradiction_of_nonfull_card_congruences
   exact data.caseA_contradiction_of_nonfull_u_data
     Sdata hcaseA hu_not_full hh_eq hx_eq hn_mod hx_odd
 
+/-- **Peterfalvi (14.15)**: quotient form of the non-full case-(a) branch.
+Once the group-theoretic part of (14.5) has supplied `u ∣ h`, `h ≡ 1 mod p`,
+and the fixed-point-free congruence for the quotient `x = h / u`, the oddness
+of `x` is no longer an input: it follows from `h = |H|` in the ambient
+odd-order group. -/
+theorem caseA_contradiction_of_nonfull_card_divisibility
+    [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (Sdata : CaseBForSData hyp)
+    (hcaseA : data.caseA)
+    (hu_not_full :
+      hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (hu_dvd_h : hyp.base.u ∣ nc.h)
+    (hh_mod_p : nc.h ≡ 1 [MOD hyp.base.p])
+    (hx_mod_q_of_quotient :
+      ∀ x : ℕ, nc.h = hyp.base.u * x → x ≡ 1 [MOD hyp.base.q]) :
+    False := by
+  rcases hu_dvd_h with ⟨x, hh_eq⟩
+  have hx_mod_q : x ≡ 1 [MOD hyp.base.q] := hx_mod_q_of_quotient x hh_eq
+  have hh_odd : Odd nc.h := nc.h_odd _hG
+  have hux_odd : Odd (hyp.base.u * x) := by
+    rw [← hh_eq]
+    exact hh_odd
+  have hx_odd : Odd x := (Nat.odd_mul.mp hux_odd).2
+  exact data.caseA_contradiction_of_nonfull_card_congruences
+    Sdata hcaseA hu_not_full hh_eq hh_mod_p hx_mod_q hx_odd
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3534,10 +3573,10 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
   · -- Non-exceptional branch of (14.14): the arithmetic spine is now
-    -- `data.caseA_contradiction_of_nonfull_card_congruences`.  The remaining
-    -- work is to derive `h = u * x`, `h ≡ 1 mod p`, `x ≡ 1 mod q`, and
-    -- oddness of `x` from (14.5), the non-full branch of (14.6), and the
-    -- fixed-point-free action of `W1`.
+    -- `data.caseA_contradiction_of_nonfull_card_divisibility`.  The remaining
+    -- work is to derive `u ∣ h`, `h ≡ 1 mod p`, and the fixed-point-free
+    -- quotient congruence `x ≡ 1 mod q` from (14.5) and the non-full branch
+    -- of (14.6).
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
