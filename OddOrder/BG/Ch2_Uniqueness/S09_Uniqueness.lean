@@ -690,6 +690,53 @@ private theorem rank_fittingInG_le_two_of_no_uniqueMaximal [Finite G] (hG : IsMi
     exists_isUniquelyMaximal_le_fittingInG_of_three_le_pRank hG hM h3q
   exact hno U hUF hUU
 
+/-- **BG Theorem 9.1, Eq (9.4)** (mmd L2520-2526), the Sylow-promotion step: pick a Sylow
+`p`-subgroup `Rinf` of `H ⊓ M` containing the `p`-group `B`. Once the Eq (9.3)/(9.4) normalizer
+condition `N_G(R) ≤ M` is supplied (`hNloc`, discharged in the body from `|H ⊓ M|_p` maximality
+and Eq (9.3)), `R := Rinf` is automatically a Sylow `p`-subgroup of `H` (anything strictly above
+`R` inside `H` would, via its `R`-normalizer, exceed the Sylow `Rinf` of `H ⊓ M`,
+`forall_card_le_of_normalizer_sylow_inf_map_le`). Mirrors the BG Theorem 8.1(b) endgame in `S08`. -/
+private theorem exists_sylow_normalizer_le_maximal_of_selection [Finite G]
+    {p : ℕ} [Fact p.Prime] {M H : Subgroup G}
+    {B : Subgroup G} (hBp : IsPGroup p B) (hBH : B ≤ H) (hBM : B ≤ M)
+    (hNloc : ∀ Rinf : Sylow p ↥(H ⊓ M),
+      (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Subgroup G) ≤ M →
+      B ≤ ((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) →
+      Subgroup.normalizer (((Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype) : Set G) ≤ M) :
+    ∃ R : Sylow p ↥H,
+      ((R : Subgroup ↥H).map H.subtype ≤ M) ∧
+      Subgroup.normalizer (((R : Subgroup ↥H).map H.subtype) : Set G) ≤ M := by
+  classical
+  -- `Rinf` : Sylow `p` of `H ⊓ M` containing `B`.
+  have hBinf : B ≤ H ⊓ M := le_inf hBH hBM
+  obtain ⟨Rinf, hB_Rinf⟩ := (hBp.comap_subtype (K := H ⊓ M)).exists_le_sylow
+  set Ramb : Subgroup G := (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype with hRamb
+  have hRamb_le_H : Ramb ≤ H := by
+    rw [hRamb]; rintro x ⟨xi, -, rfl⟩; exact xi.2.1
+  have hRamb_le_M : Ramb ≤ M := by
+    rw [hRamb]; rintro x ⟨xi, -, rfl⟩; exact xi.2.2
+  have hRamb_p : IsPGroup p Ramb := Rinf.isPGroup'.map (H ⊓ M).subtype
+  have hB_Ramb : B ≤ Ramb := by
+    rw [hRamb]
+    calc B = (B.subgroupOf (H ⊓ M)).map (H ⊓ M).subtype :=
+          (Subgroup.map_subgroupOf_eq_of_le hBinf).symm
+      _ ≤ (Rinf : Subgroup ↥(H ⊓ M)).map (H ⊓ M).subtype := Subgroup.map_mono hB_Rinf
+  -- `N_G(Ramb) ≤ M` from the Eq (9.3) hypothesis.
+  have hNRamb_le_M : Subgroup.normalizer (Ramb : Set G) ≤ M :=
+    hNloc Rinf hRamb_le_M hB_Ramb
+  -- card-maximality of `Ramb` among `p`-subgroups of `H` (since `N_G(Ramb) ≤ M`).
+  have hforall :
+      ∀ L : Subgroup G, IsPGroup p L → Ramb ≤ L → L ≤ H → Nat.card ↥L ≤ Nat.card ↥Ramb := by
+    have := S08.forall_card_le_of_normalizer_sylow_inf_map_le Rinf hNRamb_le_M
+    simpa [hRamb] using this
+  -- promote `Ramb` to a Sylow `p`-subgroup of `H`.
+  obtain ⟨R, hR_map⟩ :=
+    S08.exists_sylow_subgroupOf_map_eq_of_not_dvd_index hRamb_p hRamb_le_H
+      (S08.not_dvd_subgroupOf_index_of_forall_card_le hRamb_p hRamb_le_H hforall)
+  refine ⟨R, ?_, ?_⟩
+  · rw [hR_map]; exact hRamb_le_M
+  · rw [hR_map]; exact hNRamb_le_M
+
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
 (a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
 
