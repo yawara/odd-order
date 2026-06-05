@@ -362,6 +362,27 @@ private theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G
       exact hG.notSolvable (isSolvable_of_comm hcomm)
     · exact hco.1 htop'
 
+/-- **BG Theorem 10.1 part-(b) input** (mmd L2697-2699): for a proper subgroup `L < ⊤` and a
+Sylow `p`-subgroup `P` of `L` with `rank P ≤ 2`, the Frattini decomposition
+`L = O_{p'}(L) · N_L(P)` holds. `L` is solvable (proper subgroup of a minimal simple group),
+so Theorem 4.18(e) gives `L` `p`-length one, and the §6 Frattini lemma applies. -/
+private theorem frattini_decomp_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hL : L < ⊤) {p : ℕ} [Fact p.Prime] (P : Sylow p ↥L)
+    (hp_dvd : p ∣ Nat.card ↥L) (hrank : rank ↥(P : Subgroup ↥L) ≤ 2) :
+    (⊤ : Subgroup ↥L)
+      = Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L ⊔ Subgroup.normalizer (P : Subgroup ↥L) := by
+  haveI : IsSolvable ↥L := hG.solvable_of_lt_top L hL
+  have hodd : Odd (Nat.card ↥L) := by
+    rcases Nat.even_or_odd (Nat.card ↥L) with he | ho
+    · exact absurd (he.two_dvd.trans (Subgroup.card_subgroup_dvd_card L))
+        (by have := hG.odd; rw [Nat.odd_iff] at this; omega)
+    · exact ho
+  have hpr : pRank ↥L p ≤ 2 := by
+    rw [← pRank_sylow_eq P]; exact (pRank_le_rank p).trans hrank
+  have hpl1 : Ch1.hasPLengthOne p ↥L :=
+    (Ch1.S04.solvable_structure_of_pRank_le_two hodd hp_dvd hpr).2.2.2.2.2
+  exact Ch1.S06.top_eq_oPiPrimeCore_sup_normalizer_sylow P hpl1
+
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
 
 /-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。
