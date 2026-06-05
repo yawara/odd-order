@@ -238,6 +238,182 @@ private theorem le_oPiCore_compl_of_sylow_normalizes
   rw [hYbar, Subgroup.map_eq_bot_iff, hker] at hYbar_bot
   rw [hN]; exact hYbar_bot
 
+/-- A nontrivial singleton core of a maximal subgroup has normalizer contained in that
+maximal subgroup. -/
+private theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
+    Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M := by
+  haveI : IsSimpleGroup G := hG.simple
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hMleN : M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) :=
+    le_normalizer_opiCoreInG ({q} : Set ℕ) M
+  have hNne : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≠ ⊤ := by
+    intro hNtop
+    have hOq_normal : (opiCoreInG ({q} : Set ℕ) M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M)
+        inferInstance with hOqbot | hOqtop
+    · exact hOqne hOqbot
+    · have htop_le_M : ⊤ ≤ M := by
+        rw [← hOqtop]
+        exact opiCoreInG_le ({q} : Set ℕ) M
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  exact (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
+
+/-- A nontrivial `π`-core of a maximal subgroup has normalizer contained in that maximal
+subgroup. General `π` version of `normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot`,
+used for `π = {p}ᶜ` in BG Eq (9.3). -/
+private theorem normalizer_opiCoreInG_le_maximal_of_ne_bot [Finite G]
+    (hG : IsMinimalSimpleOdd G) {π : Set ℕ} {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hOne : opiCoreInG π M ≠ ⊥) :
+    Subgroup.normalizer (opiCoreInG π M : Set G) ≤ M := by
+  haveI : IsSimpleGroup G := hG.simple
+  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hMleN : M ≤ Subgroup.normalizer (opiCoreInG π M : Set G) :=
+    le_normalizer_opiCoreInG π M
+  have hNne : Subgroup.normalizer (opiCoreInG π M : Set G) ≠ ⊤ := by
+    intro hNtop
+    have hO_normal : (opiCoreInG π M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG π M)
+        inferInstance with hObot | hOtop
+    · exact hOne hObot
+    · have htop_le_M : ⊤ ≤ M := by
+        rw [← hOtop]
+        exact opiCoreInG_le π M
+      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
+  exact (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
+
+/-- **BG Theorem 9.1, Eq (9.1)** (mmd L2503-2506): for a Sylow `p`-subgroup `P` of a solvable
+maximal `M` (here `P` a Sylow of `↥M`, `Pamb` its ambient image), if every `Pamb`-invariant
+`p'`-subgroup lies in `M`, then `⟨ℋ_G(Pamb;p')⟩ = O_{p'}(M)`.
+
+`≤`: each `K ∈ ℋ_G(Pamb;p')` lies in `M` (hypothesis) and is `Pamb`-invariant, so
+`le_oPiCore_compl_of_sylow_normalizes` (in `↥M`, with the Sylow `P`) puts `K ≤ O_{p'}(M)`.
+`≥`: `O_{p'}(M)` is itself a `Pamb`-invariant `p'`-subgroup (normal in `M`, `Pamb ≤ M`). -/
+private theorem sSup_hInvariant_eq_opiCoreInG_singleton_compl [Finite G]
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} [IsSolvable ↥M] (P : Sylow p ↥M)
+    (hPle : ∀ K : Subgroup G, K ∈ hInvariant ⊤ ((P : Subgroup ↥M).map M.subtype) ({p} : Set ℕ)ᶜ →
+      K ≤ M) :
+    sSup (hInvariant ⊤ ((P : Subgroup ↥M).map M.subtype) ({p} : Set ℕ)ᶜ)
+      = opiCoreInG ({p} : Set ℕ)ᶜ M := by
+  classical
+  set Pamb : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPamb
+  have hPamb_le_M : Pamb ≤ M := Subgroup.map_subtype_le _
+  refine le_antisymm ?_ ?_
+  · -- `≤`: each member lies in `O_{p'}(M)`.
+    rw [sSup_le_iff]
+    intro K hK
+    have hKM : K ≤ M := hPle K hK
+    have hKnorm : Pamb ≤ Subgroup.normalizer K := hInvariant_le_normalizer hK
+    have hKpi : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ K := hInvariant_isPiSubgroup hK
+    -- transport to `↥M` and apply the Sylow-normalizer core lemma.
+    have hPsub : (P : Subgroup ↥M) ≤ Subgroup.normalizer (K.subgroupOf M) := by
+      intro x hx
+      have hxamb : (x : G) ∈ Pamb := ⟨x, hx, rfl⟩
+      have hxn : (x : G) ∈ Subgroup.normalizer K := hKnorm hxamb
+      rw [Subgroup.mem_normalizer_iff]
+      intro z
+      simp only [Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+      exact Subgroup.mem_normalizer_iff.mp hxn (z : G)
+    have hKpi_sub : Subgroup.IsPiSubgroup ({p} : Set ℕ)ᶜ (K.subgroupOf M) := by
+      intro r hr
+      refine hKpi r ?_
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hr
+    have hcore : K.subgroupOf M ≤ Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥M :=
+      le_oPiCore_compl_of_sylow_normalizes P hPsub hKpi_sub
+    calc K = (K.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hKM).symm
+      _ ≤ (Ch03.oPiCore ({p} : Set ℕ)ᶜ ↥M).map M.subtype := Subgroup.map_mono hcore
+      _ = opiCoreInG ({p} : Set ℕ)ᶜ M := rfl
+  · -- `≥`: `O_{p'}(M)` is itself a `Pamb`-invariant `p'`-subgroup.
+    refine le_sSup ?_
+    refine ⟨le_top, ?_, ?_⟩
+    · -- `Pamb` normalizes `O_{p'}(M)` (normal in `M`, `Pamb ≤ M`).
+      refine hPamb_le_M.trans ?_
+      exact le_normalizer_opiCoreInG ({p} : Set ℕ)ᶜ M
+    · exact isPiSubgroup_opiCoreInG ({p} : Set ℕ)ᶜ M
+
+/-- The normalizer of `A` normalizes `sSup ℋ_G(A;π)`: conjugation by `g ∈ N_G(A)` permutes the
+family `ℋ_⊤(A;π)` (`conj_smul_mem_hInvariant_top_of_normalizer`), hence fixes its supremum.
+Used in BG Eq (9.3): `N_G(P) ≤ N_G(⟨ℋ_G(P;p')⟩) = N_G(O_{p'}(M))`. -/
+private theorem normalizer_le_normalizer_sSup_hInvariant_top {A : Subgroup G} {π : Set ℕ} :
+    Subgroup.normalizer (A : Set G)
+      ≤ Subgroup.normalizer ((sSup (hInvariant ⊤ A π) : Subgroup G) : Set G) := by
+  intro g hg
+  have hgA : MulAut.conj g • A = A := conj_smul_eq_self_of_mem_normalizer hg
+  have hgA' : MulAut.conj g⁻¹ • A = A := by
+    have hg' : g⁻¹ ∈ Subgroup.normalizer (A : Set G) :=
+      (Subgroup.normalizer (A : Set G)).inv_mem hg
+    exact conj_smul_eq_self_of_mem_normalizer hg'
+  apply mem_normalizer_of_conj_smul_eq_self
+  have key : ∀ {h : G}, MulAut.conj h • A = A →
+      MulAut.conj h • (sSup (hInvariant ⊤ A π) : Subgroup G) ≤ sSup (hInvariant ⊤ A π) := by
+    intro h hhA
+    rw [Subgroup.pointwise_smul_subset_iff]
+    refine sSup_le ?_
+    intro Q hQ
+    have hmem : MulAut.conj h • Q ∈ hInvariant ⊤ A π :=
+      conj_smul_mem_hInvariant_top_of_normalizer hQ hhA
+    have hle : MulAut.conj h • Q ≤ sSup (hInvariant ⊤ A π) := le_sSup hmem
+    rwa [Subgroup.pointwise_smul_subset_iff] at hle
+  refine le_antisymm (key hgA) ?_
+  have h2 := key hgA'
+  rw [Subgroup.pointwise_smul_subset_iff, ← map_inv, inv_inv] at h2
+  exact h2
+
+/-- **BG Theorem 9.1, Eq (9.3)** (mmd L2510-2514): `N_G(P) ≤ M` for a Sylow `p`-subgroup `P` of
+`M` (`P` a Sylow of `↥M`, `Pamb` its ambient image), where each `Pamb`-invariant `p'`-subgroup
+lies in `M`. Two cases on `O_{p'}(M)`:
+
+* `O_{p'}(M) = ⊥`: by Theorem 6.2, `Z(L(P)) ⊴ M`, so
+  `N_G(Pamb) ≤ N_G(Z(L(P))) = M` (`normalizer_le_normalizer_zCenterLOdd_map`,
+  `normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot`).
+* `O_{p'}(M) ≠ ⊥`: by Eq (9.1), `N_G(Pamb)` normalizes `⟨ℋ_G(Pamb;p')⟩ = O_{p'}(M)`, so
+  `N_G(Pamb) ≤ N_G(O_{p'}(M)) = M` (`normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot`). -/
+private theorem normalizer_sylow_map_le_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (P : Sylow p ↥M) (hp_dvd_G : p ∣ Nat.card G)
+    (hPamb_ne_bot : (P : Subgroup ↥M).map M.subtype ≠ ⊥)
+    (hPle : ∀ K : Subgroup G, K ∈ hInvariant ⊤ ((P : Subgroup ↥M).map M.subtype) ({p} : Set ℕ)ᶜ →
+      K ≤ M) :
+    Subgroup.normalizer (((P : Subgroup ↥M).map M.subtype) : Set G) ≤ M := by
+  classical
+  set Pamb : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPamb
+  haveI hM_solvable : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  by_cases hOp : opiCoreInG ({p} : Set ℕ)ᶜ M = ⊥
+  · -- `O_{p'}(M) = ⊥`: route through `Z(L(P))`.
+    have hZnorm :
+        (((OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map M.subtype).subgroupOf M).Normal :=
+      S08.zCenterLOdd_sylow_map_subgroupOf_normal_of_opiCoreInG_singleton_compl_eq_bot
+        hG hp_dvd_G P hM_solvable hOp
+    have hZne : (OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map M.subtype ≠ ⊥ := by
+      have hZ_ne : OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M) ≠ ⊥ :=
+        S08.zCenterLOdd_ne_bot_of_isPGroup P.isPGroup'
+          (by
+            intro hPbot
+            exact hPamb_ne_bot (by rw [hPamb, hPbot, Subgroup.map_bot]))
+      intro hmap
+      exact hZ_ne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp hmap)
+    have hNZ_eq_M : Subgroup.normalizer
+        (((OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map M.subtype) : Set G) = M :=
+      S08.normalizer_zCenterLOdd_map_eq_of_normal_of_ne_bot hG hM hZnorm hZne
+    calc Subgroup.normalizer (Pamb : Set G)
+        ≤ Subgroup.normalizer
+            (((OddOrder.BG.AppB.zCenterLOdd (P : Subgroup ↥M)).map M.subtype) : Set G) :=
+          S08.normalizer_map_le_normalizer_zCenterLOdd_map (P : Subgroup ↥M)
+      _ = M := hNZ_eq_M
+  · -- `O_{p'}(M) ≠ ⊥`: route through `O_{p'}(M)` via Eq (9.1).
+    have hEq91 : sSup (hInvariant ⊤ Pamb ({p} : Set ℕ)ᶜ) = opiCoreInG ({p} : Set ℕ)ᶜ M :=
+      sSup_hInvariant_eq_opiCoreInG_singleton_compl P hPle
+    calc Subgroup.normalizer (Pamb : Set G)
+        ≤ Subgroup.normalizer
+            ((sSup (hInvariant ⊤ Pamb ({p} : Set ℕ)ᶜ) : Subgroup G) : Set G) :=
+          normalizer_le_normalizer_sSup_hInvariant_top
+      _ = Subgroup.normalizer ((opiCoreInG ({p} : Set ℕ)ᶜ M : Subgroup G) : Set G) := by
+          rw [hEq91]
+      _ ≤ M := normalizer_opiCoreInG_le_maximal_of_ne_bot hG hM hOp
+
 /-- **BG Theorem 9.1** (mmd L2492): `p` prime, `M ∈ ℳ`, `B ∈ ℰ_p(M)` noncyclic で、
 (a) 任意の `b ∈ B^#` で `C_G(b) ⊆ M`、または (b) `⟨ℋ_G(B;p')⟩ ⊆ M`、のいずれかなら `B ∈ 𝒰`。
 
@@ -1424,29 +1600,6 @@ private theorem hInvariantStar_eq_sylow_of_sylow_le [Finite G]
   have hQp : IsPGroup q Q :=
     isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ)
   exact P.is_maximal' hQp hPQ
-
-/-- A nontrivial singleton core of a maximal subgroup has normalizer contained in that
-maximal subgroup. -/
-private theorem normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot [Finite G]
-    (hG : IsMinimalSimpleOdd G) {q : ℕ} [Fact q.Prime] {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hOqne : opiCoreInG ({q} : Set ℕ) M ≠ ⊥) :
-    Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M := by
-  haveI : IsSimpleGroup G := hG.simple
-  have hMco : IsCoatom M := mem_maximalSubgroups.mp hM
-  have hMleN : M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) :=
-    le_normalizer_opiCoreInG ({q} : Set ℕ) M
-  have hNne : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≠ ⊤ := by
-    intro hNtop
-    have hOq_normal : (opiCoreInG ({q} : Set ℕ) M).Normal :=
-      Subgroup.normalizer_eq_top_iff.mp hNtop
-    rcases hG.simple.eq_bot_or_eq_top_of_normal (opiCoreInG ({q} : Set ℕ) M)
-        inferInstance with hOqbot | hOqtop
-    · exact hOqne hOqbot
-    · have htop_le_M : ⊤ ≤ M := by
-        rw [← hOqtop]
-        exact opiCoreInG_le ({q} : Set ℕ) M
-      exact hMco.lt_top.ne (eq_top_iff.mpr htop_le_M)
-  exact (isCoatom_iff_ge_of_le.mp hMco).2 _ hNne hMleN
 
 /-- If a subgroup is the ambient image of a Sylow `q`-subgroup of `M` and its ambient
 normalizer is contained in `M`, then it is a Sylow `q`-subgroup of `G`.
