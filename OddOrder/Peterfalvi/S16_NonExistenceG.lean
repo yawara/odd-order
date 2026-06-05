@@ -2680,6 +2680,27 @@ noncomputable def w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp
     fieldNormalizerNormOneUnits hyp :=
   forms.v1 * (data.tConjNormOneUnitsAut ^ 1)⁻¹ forms.u2
 
+/-- Under `(C.8)`, the first `(C.7)` word is raised to its `p`-th power. -/
+theorem frobenius_w1
+    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w1 = forms.w1 ^ hyp.base.p := by
+  simp [frobenius, w1, map_pow, mul_pow]
+
+/-- Under `(C.8)`, the second `(C.7)` word is raised to its `p`-th power. -/
+theorem frobenius_w2
+    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w2 = forms.w2 ^ hyp.base.p := by
+  simp [frobenius, w2, map_pow, mul_pow]
+
+/-- Under `(C.8)`, the third `(C.7)` word is raised to its `p`-th power. -/
+theorem frobenius_w3
+    {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    forms.frobenius.w3 = forms.w3 ^ hyp.base.p := by
+  simp [frobenius, w3, map_pow, mul_pow]
+
 /-- The ambient reading of `w₁`: `σ(w₁) = t σ(v₂) t⁻¹ σ(u₃)`. -/
 theorem sigma_inr_w1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
     {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
