@@ -3255,6 +3255,48 @@ theorem caseA_contradiction_of_p_modEq_one_and_h_bounds
   exact data.caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
     hcaseA hq3 hp7 hh
 
+/-- **Peterfalvi (14.15)**: the non-full cyclotomic branch of the case-(a)
+comparison.  If `u` is not the full cyclotomic quotient, then the S-side
+case-(9.7.b) order formula puts us in the `p ≡ 1 mod q` branch and gives the
+divided cyclotomic value of `u`.  Together with the `h = u * x` decomposition,
+the fixed-point-free lower bound on `x`, and `p^q < h - 1`, the case-(a) bound
+forces `q = 3`, `p = 7`, `u = 19`, `x ≥ 31`, and hence the final numerical
+contradiction. -/
+theorem caseA_contradiction_of_nonfull_u_data
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (Sdata : CaseBForSData hyp)
+    (hcaseA : data.caseA)
+    (hu_not_full :
+      hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    {x : ℕ} (hh_eq : nc.h = hyp.base.u * x)
+    (hx_min : hyp.base.q + (1 + hyp.base.q) * hyp.base.p ≤ x)
+    (hpow_lt_h : hyp.base.p ^ hyp.base.q < nc.h - 1) :
+    False := by
+  have hmod : hyp.base.p ≡ 1 [MOD hyp.base.q] := by
+    by_contra hnot_mod
+    exact hu_not_full (Sdata.u_eq_of_not_modEq_one hnot_mod)
+  have hpq2 := data.p_pow_q_sub_two_lt_q_sq_of_p_pow_lt_h_sub_one hcaseA hpow_lt_h
+  have hq3 := hyp.q_eq_three_of_p_pow_q_sub_two_lt_q_sq hpq2
+  have hp_lt_q_sq : hyp.base.p < hyp.base.q ^ 2 := by
+    simpa [hq3] using hpq2
+  have hp7 :=
+    hyp.p_eq_seven_of_q_eq_three_modEq_one_and_lt_q_sq hq3 hmod hp_lt_q_sq
+  have hu19 : hyp.base.u = 19 := by
+    have hu := Sdata.u_eq_of_p_modEq_one hmod
+    rw [hq3, hp7] at hu
+    norm_num at hu
+    exact hu
+  have hx31 : 31 ≤ x := by
+    have hx := hx_min
+    rw [hq3, hp7] at hx
+    norm_num at hx
+    exact hx
+  have hh_ge : 31 * 19 ≤ nc.h := by
+    rw [hh_eq, hu19]
+    nlinarith [hx31]
+  exact data.caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
+    hcaseA hq3 hp7 hh_ge
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
@@ -3279,9 +3321,10 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases caseB_for_S _hG hyp nc.Ldata with ⟨Sdata, _hS_caseB⟩
   rcases hcase with hcaseA | hcaseB
   · -- Non-exceptional branch of (14.14): the arithmetic spine is now
-    -- `data.caseA_contradiction_of_p_modEq_one_and_h_bounds`.  The remaining
-    -- work is to derive its three group-theoretic inputs from the non-full
-    -- cyclotomic branch of (14.6) and the fixed-point-free action of `W1`.
+    -- `data.caseA_contradiction_of_nonfull_u_data`.  The remaining work is
+    -- to derive `h = u * x`, the lower bound on `x`, and `p^q < h - 1` from
+    -- (14.5), the non-full branch of (14.6), and the fixed-point-free action
+    -- of `W1`.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
