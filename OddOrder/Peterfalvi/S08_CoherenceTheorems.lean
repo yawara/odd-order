@@ -745,8 +745,10 @@ This is the member family input that discharges the `D'`/`htau1` hypotheses of
 * `htau1_inner_eq` — `ν` is a `ℤ[χ−χ̄, χ]`-isometry: both generators lie in `ℤ[S₁]` (since
   `χ, χ̄ ∈ S₁`), where `hS₁.extension_inner_eq` applies;
 * `htau1_agrees` — `ν(χ−χ̄) = τ(χ−χ̄)` since `χ−χ̄` is supported (`extends_on_supported`);
-* `htau1_mem` — `ν χ ∈ ZIrr G` is the **injected** hypothesis `hνZ` (not derivable from `IsCoherent`,
-  whose `extension` is a bare `→ₗ[ℤ]` with no ZIrr-codomain field).
+* `htau1_mem` — `ν χ ∈ ZIrr G` is the hypothesis `hνZ`.  Since `IsCoherent` gained the
+  `extension_mem_ZIrr` field (route A), this is now derivable from `χ ∈ S₁ ⊆ ℤ[S₁]` via
+  `hS₁.extension_mem_ZIrr`; callers discharge it from the field (it is kept as an explicit argument
+  here only because this `def` predates the field).
 
 The remaining (5.4) orthogonality scalars `⟨χ, 0⟩ = ⟨χ̄, 0⟩ = 0` are trivial and `⟨χ, χ̄⟩ = 0` is
 `hχχbar`. -/
@@ -1068,7 +1070,6 @@ theorem crux1_of_memberFamily
     (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ
       (χ : ClassFunction ↥L ℂ) (a • χmem i₁))
     (hDaY_ZIrr : Da.Y ∈ ZIrr G)
-    (hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G)
     (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
@@ -1082,6 +1083,10 @@ theorem crux1_of_memberFamily
     ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
       (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
   classical
+  -- `hνZ` is derived (route A): `χmem i ∈ S₁ ⊆ ℤ[S₁]`, so `ν (χmem i) ∈ ℤ[Irr G]` by the
+  -- `IsCoherent.extension_mem_ZIrr` field — it need not be injected as a hypothesis.
+  have hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
+    fun i hi => hS₁.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1 i hi))
   obtain ⟨μ, hμeq⟩ := ClassFunction.inner_mem_ZIrr_int hμZ (hνZ i₁ hi₁)
   -- Orthonormality of the family `vc i = ν χᵢ` (ν isometry on `ℤ[S₁]` + member orthonormality).
   have horth : ∀ i ∈ s, ∀ j ∈ s,
@@ -1579,7 +1584,7 @@ noncomputable def xAdjoinStep
       (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -(a : ℂ) :=
     crux1_of_memberFamily hyp hconj
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
-      hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemνZ hmemS1
+      hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemS1
       hmemortho hcoeffval htau1_memaχ ha1 hDeg
   -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) ⊥ R(χ₁)`.
   have hcrux2 : ClassFunction.inner
