@@ -649,6 +649,161 @@ theorem P_sup_U_eq_sigma_top {hyp : Hypothesis (G := G)} (data : FieldNormalizer
     _ = (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
       rw [fieldNormalizerKernel_sup_complement_eq_top hyp]
 
+
+/-- The norm-one complement has order prime to `p`.  In BG Appendix C terms,
+`|U| = 1 + p + ... + p^{q-1}`, so the `U`-coordinate of any `p`-element in
+`P ⋊ U` must be trivial. -/
+theorem fieldNormalizerNormOneUnits_card_coprime_p (hyp : Hypothesis (G := G)) :
+    Nat.Coprime hyp.base.p (Nat.card (fieldNormalizerNormOneUnits hyp)) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+  have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
+  rw [OddOrder.BG.AppC.NormSet.normOneUnits_card hyp.base.p hyp.base.q hq0,
+    ← Nat.geomSum_eq hp2 hyp.base.q]
+  have hq_pos : 0 < hyp.base.q := hyp.base.q_prime.pos
+  have hsum :
+      (∑ k ∈ Finset.range hyp.base.q, hyp.base.p ^ k) =
+        (∑ k ∈ Finset.range (hyp.base.q - 1), hyp.base.p ^ (k + 1)) + 1 := by
+    rw [show hyp.base.q = (hyp.base.q - 1) + 1 by omega]
+    rw [Finset.sum_range_succ']
+    simp
+  rw [hsum, add_comm]
+  have hdiv :
+      hyp.base.p ∣
+        ∑ k ∈ Finset.range (hyp.base.q - 1), hyp.base.p ^ (k + 1) := by
+    exact Finset.dvd_sum fun k _ => dvd_pow_self hyp.base.p (Nat.succ_ne_zero k)
+  rw [Nat.coprime_add_iff_left hdiv]
+  exact Nat.coprime_one_right hyp.base.p
+
+/-- Every element of the concrete additive kernel `P ≤ P⋊U` has `p`-th power
+`1`. -/
+theorem fieldNormalizerKernel_pow_p_eq_one {hyp : Hypothesis (G := G)}
+    {x : fieldNormalizerFrobeniusGroup hyp} (hx : x ∈ fieldNormalizerKernel hyp) :
+    x ^ hyp.base.p = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  haveI : CharP (GaloisField hyp.base.p hyp.base.q) hyp.base.p := by
+    rw [← Algebra.charP_iff (ZMod hyp.base.p) (GaloisField hyp.base.p hyp.base.q)
+      hyp.base.p]
+    exact ZMod.charP hyp.base.p
+  rcases hx with ⟨a, rfl⟩
+  let inlHom :
+      OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
+        fieldNormalizerFrobeniusGroup hyp := SemidirectProduct.inl
+  rw [← map_pow inlHom, ← map_one inlHom, SemidirectProduct.inl_inj]
+  rw [← ofAdd_toAdd a, ← ofAdd_nsmul]
+  congr
+  simp
+
+/-- In the concrete Frobenius group `P⋊U`, a `p`-element has trivial
+`U`-coordinate. -/
+theorem fieldNormalizerFrobeniusGroup_right_eq_one_of_pow_p_eq_one
+    {hyp : Hypothesis (G := G)} (x : fieldNormalizerFrobeniusGroup hyp)
+    (hx : x ^ hyp.base.p = 1) :
+    (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp) = 1 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hright_pow :
+      (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp) ^ hyp.base.p = 1 := by
+    have h := congrArg
+      (SemidirectProduct.rightHom :
+        fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerNormOneUnits hyp) hx
+    rw [map_pow] at h
+    simpa using h
+  have horder_p : orderOf (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp) ∣
+      hyp.base.p := orderOf_dvd_of_pow_eq_one hright_pow
+  have horder_card :
+      orderOf (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp) ∣
+        Nat.card (fieldNormalizerNormOneUnits hyp) :=
+    orderOf_dvd_natCard (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp)
+  have horder_one : orderOf (SemidirectProduct.rightHom x : fieldNormalizerNormOneUnits hyp) = 1 :=
+    Nat.eq_one_of_dvd_coprimes (fieldNormalizerNormOneUnits_card_coprime_p hyp)
+      horder_p horder_card
+  exact orderOf_eq_one_iff.mp horder_one
+
+/-- The concrete `p`-torsion in `P⋊U` is contained in the additive kernel `P`.
+This is the semidirect-product core of BG's assertion `P char PU`. -/
+theorem fieldNormalizerFrobeniusGroup_mem_kernel_of_pow_p_eq_one
+    {hyp : Hypothesis (G := G)} (x : fieldNormalizerFrobeniusGroup hyp)
+    (hx : x ^ hyp.base.p = 1) :
+    x ∈ fieldNormalizerKernel hyp := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  have hright := fieldNormalizerFrobeniusGroup_right_eq_one_of_pow_p_eq_one
+    (G := G) (hyp := hyp) x hx
+  have hright' : x.right = 1 := by
+    simpa [SemidirectProduct.rightHom_eq_right] using hright
+  refine ⟨x.left, ?_⟩
+  calc
+    SemidirectProduct.inl x.left =
+        (SemidirectProduct.inl x.left : fieldNormalizerFrobeniusGroup hyp) * 1 := by simp
+    _ = (SemidirectProduct.inl x.left : fieldNormalizerFrobeniusGroup hyp) *
+        SemidirectProduct.inr x.right := by rw [hright']; simp
+    _ = x := SemidirectProduct.inl_left_mul_inr_right x
+
+/-- Transported form: every element of Peterfalvi's `P` has `p`-th power `1`. -/
+theorem P_pow_p_eq_one {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hx : x ∈ hyp.base.P) :
+    x ^ hyp.base.p = 1 := by
+  rw [← data.sigma_P_eq_P] at hx
+  rcases hx with ⟨h, hhK, hh⟩
+  have hhpow := fieldNormalizerKernel_pow_p_eq_one (G := G) (hyp := hyp) hhK
+  calc
+    x ^ hyp.base.p = (data.sigma h) ^ hyp.base.p := by rw [hh]
+    _ = data.sigma (h ^ hyp.base.p) := by rw [map_pow]
+    _ = 1 := by rw [hhpow, map_one]
+
+/-- Transported form of `P char PU`: the `p`-torsion in `PU` lies in `P`. -/
+theorem mem_P_of_mem_P_sup_U_of_pow_p_eq_one
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {x : G} (hxPU : x ∈ hyp.base.P ⊔ hyp.base.U) (hxp : x ^ hyp.base.p = 1) :
+    x ∈ hyp.base.P := by
+  have hxrange : x ∈ (⊤ : Subgroup (fieldNormalizerFrobeniusGroup hyp)).map data.sigma := by
+    rwa [← data.P_sup_U_eq_sigma_top]
+  rcases hxrange with ⟨h, _hhtop, hh⟩
+  have hhp : h ^ hyp.base.p = 1 := data.sigma_injective (by
+    calc
+      data.sigma (h ^ hyp.base.p) = (data.sigma h) ^ hyp.base.p := by rw [map_pow]
+      _ = x ^ hyp.base.p := by rw [hh]
+      _ = 1 := hxp
+      _ = data.sigma 1 := by rw [map_one])
+  have hhK := fieldNormalizerFrobeniusGroup_mem_kernel_of_pow_p_eq_one
+    (G := G) (hyp := hyp) h hhp
+  rw [← data.sigma_P_eq_P]
+  exact ⟨h, hhK, hh⟩
+
+/-- BG Appendix C Step 3, `P char PU` in normalizer form: anything normalizing
+`PU` also normalizes its additive kernel `P`. -/
+theorem normalizer_P_sup_U_le_normalizer_P
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) :
+    Subgroup.normalizer ((hyp.base.P ⊔ hyp.base.U : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (hyp.base.P : Set G) := by
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff] at hg ⊢
+  intro x
+  constructor
+  · intro hxP
+    have hxPU : x ∈ hyp.base.P ⊔ hyp.base.U := (le_sup_left : hyp.base.P ≤
+      hyp.base.P ⊔ hyp.base.U) hxP
+    have hconjPU : g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U := (hg x).mp hxPU
+    have hxpow : x ^ hyp.base.p = 1 := data.P_pow_p_eq_one hxP
+    have hconjpow : (g * x * g⁻¹) ^ hyp.base.p = 1 := by
+      have h := congrArg (MulAut.conj g) hxpow
+      rw [map_pow] at h
+      simpa [MulAut.conj_apply] using h
+    exact data.mem_P_of_mem_P_sup_U_of_pow_p_eq_one hconjPU hconjpow
+  · intro hxconjP
+    have hconjPU : g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U :=
+      (le_sup_left : hyp.base.P ≤ hyp.base.P ⊔ hyp.base.U) hxconjP
+    have hxPU : x ∈ hyp.base.P ⊔ hyp.base.U := (hg x).mpr hconjPU
+    have hconjpow : (g * x * g⁻¹) ^ hyp.base.p = 1 := data.P_pow_p_eq_one hxconjP
+    have hxpow : x ^ hyp.base.p = 1 := by
+      have h := congrArg (MulAut.conj g⁻¹) hconjpow
+      rw [map_pow] at h
+      have hback : MulAut.conj g⁻¹ (g * x * g⁻¹) = x := by
+        simp
+        group
+      rw [hback] at h
+      simpa [MulAut.conj_apply] using h
+    exact data.mem_P_of_mem_P_sup_U_of_pow_p_eq_one hxPU hxpow
+
 /-- BG Appendix C, Lemma C.3 Step 3 irreducibility bridge: any subgroup of
 `PU` that contains `U` is either `U` or all of `PU`.  This transports the
 concrete irreducibility theorem for `P⋊U` through `σ`. -/
@@ -3443,9 +3598,9 @@ theorem relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U
 intersection is all of `PU`, then conjugation by `t²` sends every element of
 `PU` back into `PU`.
 
-The next theorem upgrades this inclusion to normalization using `t ^ p = 1`;
-the remaining bad-branch work is BG's `P char PU`, `P₁` normalizes `P`, and
-`P₀=P₁` contradiction. -/
+The following bad-branch lemmas upgrade this inclusion first to `t² ∈ N_G(PU)`
+and then, via `P char PU`, to `t² ∈ N_G(P)`.  The remaining Step 3 work is to
+pass from `t²` to `P₁ ≤ N_G(P)` and then derive the `P₀=P₁` contradiction. -/
 theorem step3_badBranch_t_sq_conj_mem_P_sup_U
     {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
     (hbad :
@@ -3529,6 +3684,18 @@ theorem step3_badBranch_t_sq_normalizes_P_sup_U
     have hpre := hinv_inc (x := g * x * g⁻¹) hx
     convert hpre using 1
     group
+
+/-- BG Appendix C Step 3 bad branch after `P char PU`: the forced normalization of
+`PU` already forces `t²` to normalize the additive kernel `P`. -/
+theorem step3_badBranch_t_sq_normalizes_P
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hbad :
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
+        hyp.base.P ⊔ hyp.base.U) :
+    data.t ^ 2 ∈ Subgroup.normalizer (hyp.base.P : Set G) :=
+  data.normalizer_P_sup_U_le_normalizer_P
+    (data.step3_badBranch_t_sq_normalizes_P_sup_U hbad)
 
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
