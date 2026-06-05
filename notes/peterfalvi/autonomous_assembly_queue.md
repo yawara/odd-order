@@ -212,10 +212,25 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   (`exists_inflate_eq_of_subset_characterKernel`+`inflate_apply_one`) で G/N に落とし中心 case `exists_degree_sq_le_index`
   適用 + quotient index `(D.map mk' N).index=D.index` (`index_comap_of_surjective`+`comap_map_eq`+`ker_mk'`)。
   = θ-bound の `φ(1)≤√|C:D|` 半分 (中心 case は N=⊥ 特殊化)。InflationCharacter に SchurCenterBound import 追加 (cycle 無)。
-- 🔴 **θ-bound 残 = Clifford restriction (a-half)** `θ(1)≤|K:C|·φ(1)` (φ=Res_C θ の constituent, 乗数 `e²≤|I:C|`):
-  **mathlib/repo に induced/restricted character の multiplicity/inertia 機構が無い** = 真の gap。これが full θ-bound
-  ⟹ (6.2) を塞ぐ。**次着手 = (a) Clifford restriction infra 新規構築 (substantial, mathlib gap) または (b) T-A4
-  member-family enum (Sibley packaging と共有)**。
+- 🟡 **θ-bound 残 = Clifford restriction (a-half)** `θ(1)≤|K:C|·φ(1)` — **2026-06-05 de-risk 調査: full Clifford
+  ramification (`e²≤|I:C|`) は不要、Frobenius reciprocity route で済む**:
+  φ:=Res_C θ の既約 constituent (∃ via `exists_inner_induce_ne_zero`@S03) ⟹ 相互律 `⟨θ,Ind φ⟩=⟨Res θ,φ⟩≠0`
+  (`inner_induce_eq_inner_restrict`@InducedCharacter:531) ⟹ θ は Ind φ の constituent ⟹ `θ(1)≤(Ind φ)(1)=|K:C|·φ(1)`
+  (`induce_apply_one`@InducedCharacter:289)。section bound `degree_sq_le_index_of_central_quotient`(✅)で
+  `φ(1)²≤|C:D|` ⟹ `θ(1)²≤|K:C|²|C:D|` ⟹ θ-bound。
+  **確認済 infra (全 present)**: Frobenius 相互律 / induce_apply_one / exists_inner_induce_ne_zero /
+  `isCharacter_restrict`@S08:87 / `induce_mem_ZIrr`@InducedCharacter:792 / `IsCharacter.exists_natFinsupp_eq_sum`+
+  `inner_irreducible_nonneg`@Clifford / `character_add_of_isCompl`@CharacterCompleteness:215 /
+  `irreducibleCharacter_apply_one_eq_pos_natCast`@ZIrrFourier:518。
+  **残 brick (2 つ, multi-session だが well-scoped)**:
+  1. **constituent degree bound** `IsCharacter χ ∧ θ∈Irr ∧ ⟨χ,θ⟩≠0 ⟹ (θ 1).re≤(χ 1).re` — `exists_natFinsupp_eq_sum`
+     (χ=∑(m a)•a, nat coeffs) + `single_le_sum` + 各 a(1)>0 + m θ≥1。~40-50 LOC (.re/sum/cast bookkeeping)。
+  2. **`IsCharacter (induce C φ)`** (= reverse char `χ∈ZIrr ∧ ∀ψ∈Irr,⟨χ,ψ⟩≥0 ⟹ IsCharacter χ` の特殊化):
+     induce∈ZIrr(✅`induce_mem_ZIrr`) + 非負係数(相互律+`isCharacter_restrict`+`inner_irreducible_nonneg`) ⟹ IsCharacter。
+     **reverse char 本体 = `character_add_of_isCompl` で ⊕(irreducible reps)^mult を構成** (Finsupp 上 induction)。
+     **代替: mathlib `RepresentationTheory/Induced.lean` の induced rep を repo `induce` 公式に bridge** (別 substantial)。
+  → **次着手 = brick 1 (constituent degree bound, self-contained) → brick 2 (reverse IsCharacter char) → assemble (a-half) → 全 θ-bound → (6.2)**。
+  または (b) T-A4 member-family enum (Sibley packaging と共有)。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 
