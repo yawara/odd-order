@@ -1882,6 +1882,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_card_le_of_isFrobeniusAction
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
+-- (6.5)(b) in the (6.8)(c1) Frobenius case: `IsFrobeniusGroup G N A` + nilpotent kernel + the
+-- `≤ 4|A|²+1` bound ⟹ `N` is a `p`-group.  The FPF `A`-action on `Abelianization N` is supplied
+-- from the Frobenius group (`toFrobeniusAction` + `IsFrobeniusAction.quotient` through `⁅N,N⁆`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_isFrobeniusGroup_of_card_le
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms

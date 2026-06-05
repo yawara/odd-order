@@ -2217,6 +2217,42 @@ theorem isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
   haveI : Fact p.Prime := ⟨hp⟩
   exact ⟨p, hp, isPGroup_of_isNilpotent_of_isPGroup_abelianization hPab⟩
 
+/-- **Peterfalvi (6.5)(b) reduction in the Frobenius case (6.8)(c1): the kernel is a `p`-group.**
+If `G = N ⋊ A` is a Frobenius group with nilpotent kernel `N`, `|Abelianization N|` and `|A|` are
+odd, and `|Abelianization N| ≤ 4|A|² + 1`, then `N` is a `p`-group for some prime `p`.
+
+This is `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` with the fixed-point-free
+`A`-action on `Abelianization N` supplied directly from the Frobenius group: `A` acts
+fixed-point-freely on `N` by conjugation (`toFrobeniusAction`), and since `⁅N,N⁆` is characteristic
+in `N` (hence `A`-invariant), the action descends fixed-point-freely to the abelianization
+`N / ⁅N,N⁆` (`IsFrobeniusAction.quotient`).  In the (6.8) capstone this is the Frobenius alternative
+`hyp.cases.inl : IsFrobeniusGroup ↥L H W₁` (with `N = H`, `A = W₁`); the only remaining input is the
+`≤ 4|W₁|² + 1` bound from the character theory ((6.2)/(6.3)). -/
+theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
+    {N A : Subgroup G} [Group.IsNilpotent ↥N]
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G N A)
+    (hHodd : Odd (Nat.card (Abelianization ↥N))) (hAodd : Odd (Nat.card ↥A))
+    (hbound : Nat.card (Abelianization ↥N) ≤ 4 * Nat.card ↥A ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p ↥N := by
+  letI : N.Normal := h.isNormal
+  letI actN : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  have hFrobN : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A ↥N := h.toFrobeniusAction
+  -- `⁅N,N⁆` is characteristic in `N`, hence preserved by the automorphism `A`-action.
+  have hM : ∀ a : ↥A, ∀ m ∈ commutator ↥N, a • m ∈ commutator ↥N := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator ↥N).Characteristic) (MulDistribMulAction.toMulAut ↥A ↥N a)
+    have hmem : (MulDistribMulAction.toMulAut ↥A ↥N a).toMonoidHom m ∈ commutator ↥N := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- The fixed-point-free action descends to the abelianization quotient.
+  letI actAb : MulDistribMulAction ↥A (Abelianization ↥N) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator ↥N) hM
+  have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A (Abelianization ↥N) :=
+    hFrobN.quotient (commutator ↥N) hM
+  exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hAodd hbound
+
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
 `Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
 finite solvable group has one.
