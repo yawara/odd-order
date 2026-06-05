@@ -3119,6 +3119,22 @@ theorem u_eq_thirty_one_of_caseB {hyp : Hypothesis (G := G)}
   norm_num at hu
   exact hu
 
+/-- **Peterfalvi (14.15)**: the final numerical contradiction for the
+case-(a) branch of (14.14). Once the bound is specialized to `(q,p) = (3,7)`,
+it is incompatible with `h ≥ 31 * 19`. -/
+theorem caseA_bound_contradiction_of_h_ge_thirty_one_mul_nineteen
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (hcaseA : data.caseA)
+    (hq3 : hyp.base.q = 3) (hp7 : hyp.base.p = 7) (hh : 31 * 19 ≤ nc.h) :
+    False := by
+  have hbound := data.caseA_bound hcaseA
+  rw [hq3, hp7] at hbound
+  norm_num at hbound
+  have hleQ : ((nc.h - 1 : ℕ) : ℚ) ≤ 420 := by nlinarith [hbound]
+  have hle : nc.h - 1 ≤ 420 := by exact_mod_cast hleQ
+  have hge : 588 ≤ nc.h - 1 := by omega
+  omega
+
 end OrthogonalitySwitchData
 
 /-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
