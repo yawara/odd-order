@@ -237,6 +237,48 @@ theorem induce_exists_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Fintype Γ]
     rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
 
 set_option linter.unusedFintypeInType false in
+/-- **(H2, character form)** the induced character `Ind_H^Γ θ` of a genuine character `θ` is
+itself a genuine character.  Combines the non-negative-integer decomposition
+`induce_exists_natFinsupp_eq_sum` (`Ind θ = ∑ mₐ·a` with `mₐ ∈ ℕ`, `a ∈ Irr Γ`) with its
+converse `isCharacter_of_natFinsupp_eq_sum` (a `ℕ`-combination of irreducible characters is a
+genuine character).  This is **brick 2** of the Frobenius-reciprocity route to the Peterfalvi
+`(6.2)` `θ`-bound a-half. -/
+theorem isCharacter_induce {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ) :
+    IsCharacter (ClassFunction.induce H θ) := by
+  obtain ⟨m, hsupp, hsum, _⟩ := induce_exists_natFinsupp_eq_sum hθ
+  exact isCharacter_of_natFinsupp_eq_sum m hsupp hsum
+
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (6.2) `θ`-bound, a-half** (the Clifford/induction half).  For an irreducible
+character `θ` of a finite group `K` and a subgroup `C ≤ K`, there is an irreducible character
+`φ` of `C` of which `θ` is a constituent of `Ind_C^K φ` (`⟨Ind_C^K φ, θ⟩ ≠ 0`), and whose
+degree controls `θ`'s: `θ(1) ≤ |K : C|·φ(1)`.
+
+By Frobenius reciprocity `θ` is a constituent of `Ind_C^K φ` for some `φ ∈ Irr C`
+(`exists_inner_induce_ne_zero`, equivalently `φ` is a constituent of `Res^K_C θ`).  Since `φ` is
+a genuine character, so is `Ind_C^K φ` (`isCharacter_induce`, brick 2), so the
+constituent-degree bound `IsCharacter.apply_one_re_le_of_inner_ne_zero` (brick 1) gives
+`θ(1) ≤ (Ind_C^K φ)(1) = |K : C|·φ(1)` (`induce_apply_one`).  Combined with the section degree
+bound `degree_sq_le_index_of_central_quotient` (`φ(1)² ≤ |C : D|`, the b-half) this yields the
+full `(6.2)` degree bound `θ(1) ≤ |K : C|·√|C : D|`. -/
+theorem theta_degree_le_index_mul_constituent {K : Type*} [Group K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] (C : Subgroup K) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] (θ : IrreducibleCharacter K) :
+    ∃ φ : IrreducibleCharacter C,
+      ClassFunction.inner (ClassFunction.induce C (φ : ClassFunction ↥C ℂ))
+          (θ : ClassFunction K ℂ) ≠ 0 ∧
+      ((θ : ClassFunction K ℂ) 1).re ≤ (C.index : ℝ) * ((φ : ClassFunction ↥C ℂ) 1).re := by
+  obtain ⟨φ, hφ⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero (H := C) θ
+  refine ⟨φ, hφ, ?_⟩
+  have hind : IsCharacter (ClassFunction.induce C (φ : ClassFunction ↥C ℂ)) :=
+    isCharacter_induce φ.isIrreducible.isCharacter
+  have hbound := hind.apply_one_re_le_of_inner_ne_zero θ.isIrreducible hφ
+  rw [ClassFunction.induce_apply_one] at hbound
+  rwa [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero] at hbound
+
+set_option linter.unusedFintypeInType false in
 /-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
 (`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
 `induce_exists_natFinsupp_eq_sum` feeds `characterKernel_subset_of_natFinsupp_eq_sum`. -/

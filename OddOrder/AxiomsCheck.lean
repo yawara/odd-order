@@ -1271,6 +1271,12 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.IsCharacter.exists_natCast_inner_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.inner_irreducible_nonneg
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.exists_natFinsupp_eq_sum
+-- θ-bound bricks: constituent degree bound `(θ 1).re ≤ (χ 1).re` for `θ` an irreducible
+-- constituent of a genuine `χ` (brick 1), and the converse decomposition
+-- `ℕ-combination of irreducibles ⇒ genuine character` (brick 2 infra).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsCharacter.apply_one_re_le_of_inner_ne_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isCharacter_of_natFinsupp_eq_sum
 
 -- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
 -- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
@@ -1862,6 +1868,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.induce_exists_natFinsupp_eq_sum
+-- θ-bound a-half: `Ind_C^K φ` of a genuine `φ` is genuine (brick 2), assembled with brick 1 into
+-- the (6.2) degree bound `θ(1) ≤ |K:C|·φ(1)` for an induced-character constituent `φ` of `θ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isCharacter_induce
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_constituent
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms
