@@ -1809,6 +1809,62 @@ theorem unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition
     rw [hcalc, OddOrder.BG.AppC.NormSet.normN_mul,
       OddOrder.BG.AppC.NormSet.normN_inv, hWnorm, inv_one, one_mul, hN]
 
+/-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
+every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
+companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
+of `s · σ(inr ((tConj³)(a⁻¹))) · s⁻²` has central prime-line factor `s⁻¹`.  This is
+the remaining mathematical content; it follows from the (C.2)–(C.10) chain and the
+kernel/fixed-point-free argument inside `End ⁅Q, P₀⁆`. -/
+def Step4Capstone {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) : Prop :=
+  ∀ a : fieldNormalizerNormOneUnits hyp,
+    unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q →
+      ∃ u₁ v₁ : fieldNormalizerNormOneUnits hyp,
+        data.s *
+            data.sigma (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3) a⁻¹)) *
+          data.s ^ (-2 : ℤ) =
+        data.sigma (SemidirectProduct.inr u₁) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp (-1 : ZMod hyp.base.p)) *
+            data.sigma (SemidirectProduct.inr v₁)
+
+/-- The Step 4 capstone yields BG's one-step twisted-inverse output for the
+conjugation automorphism `tConj³`: `a ∈ E ⟹ (a⁻¹)^{t³} ∈ E`.  We apply the
+capstone at `a = u⁻¹` so that its hypothesis `↑(u⁻¹)⁻¹ = ↑u ∈ E` is exactly the
+input, and the E-extraction `(↑W)⁻¹ ∈ E` (with `W = (tConj³)(u)`) reads as
+`↑((tConj³)(u⁻¹)) ∈ E`. -/
+theorem normSetETwistedNormOneStep_tConj_pow_three_of_capstone
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (hcap : data.Step4Capstone) :
+    OddOrder.BG.AppC.NormSet.normSetETwistedNormOneStep
+      (p := hyp.base.p) (q := hyp.base.q) (data.tConjNormOneUnitsAut ^ 3) := by
+  intro u hu
+  have hcond : unitVal (u⁻¹)⁻¹ ∈
+      OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q := by
+    rw [inv_inv]; exact hu
+  obtain ⟨u₁, v₁, hdec⟩ := hcap u⁻¹ hcond
+  have hext := data.unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition
+    ((data.tConjNormOneUnitsAut ^ 3) (u⁻¹)⁻¹) u₁ v₁ hdec
+  rw [inv_inv, ← unitVal_inv, ← map_inv] at hext
+  rw [OddOrder.BG.AppC.NormSet.twistedInv]
+  exact hext
+
+/-- The Step 4 capstone supplies the AppC norm-one twisted-inverse output. -/
+theorem appCNormSetTwistedNormOneStep_of_capstone {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (hcap : data.Step4Capstone) :
+    appCNormSetTwistedNormOneStep hyp := by
+  refine ⟨data.tConjNormOneUnitsAut ^ 3, ?_,
+    data.normSetETwistedNormOneStep_tConj_pow_three_of_capstone hcap⟩
+  rw [← pow_mul, mul_comm, pow_mul, data.tConjNormOneUnitsAut_pow_p_eq_one, one_pow]
+
+/-- The Step 4 capstone supplies the AppC generator relation `∀ a ∈ E, N(2a-1)=1`,
+**without** the `FieldNormalizerData.appC_twisted_normOne_step` field.  Once the
+capstone is proved, this replaces the field-based
+`appC_normSet_generator_relation`. -/
+theorem appC_normSet_generator_relation_of_capstone {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (hcap : data.Step4Capstone) :
+    appCNormSetGeneratorRelation hyp :=
+  appCNormSetGeneratorRelation_of_twisted_normOne_step hyp
+    (data.appCNormSetTwistedNormOneStep_of_capstone hcap)
+
 end Step4
 
 end FieldNormalizerData
