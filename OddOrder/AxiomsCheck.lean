@@ -1981,6 +1981,17 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.one_le_weightedOutput_inner_self_re
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.ofIsCoherent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_eq_ite
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_eq_one_sub_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_eq_one_sub_sum_sq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.IndChainDecomposition.inner_chi_zero_image_weightedDifferenceInput_re_nonpos
 -- [Is] Thm 6.34 (Mackey restriction, normal-subgroup case): `|H| • Res_H (Ind_H^G θ) = ∑_{x∈G} θ^{x⁻¹}`.
 -- The unnormalized Frobenius/Mackey restriction formula; the heaviest analytic brick of [Is] 6.34,
 -- feeding Peterfalvi (6.8)'s `Y = S(H')` (induced irreducibles of common degree `|W₁|`).
