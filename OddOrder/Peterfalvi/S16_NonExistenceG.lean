@@ -3355,6 +3355,90 @@ theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
   have hC10 := data.relationC10_of_w_eq_one hab forms hwords.1 hwords.2.1 hwords.2.2
   exact ⟨hwords.1, hwords.2.1, hwords.2.2, hC10⟩
 
+/-- BG Appendix C Step 4, Step 3 producer in the `U` branch: the concrete `(C.9)`
+membership places `S₁ W₃^(p-1) S₁⁻¹` in `PU` and, after applying the inverse Lean
+conjugation convention, in `(PU)^{t^{-2}}`.  If Step 3 identifies that
+intersection with `U`, the already-landed `(C.9)` collapse gives `w₁=w₂=w₃=1`
+and hence `(C.10)`.
+
+This theorem isolates the remaining Step 3 obstruction: after this point the only
+missing part of the producer is ruling out the alternative intersection `PU`. -/
+theorem relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b)
+    (hc1 : forms.c1 ≠ 0) (hc3 : forms.c3 ≠ 0)
+    (hstep3 :
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.U) :
+    forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
+      data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 := by
+  classical
+  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+  let W3pow := data.sigma
+    (SemidirectProduct.inr (forms.w3 ^ (hyp.base.p - 1)) :
+      fieldNormalizerFrobeniusGroup hyp)
+  let X := S1 * W3pow * S1⁻¹
+  have hC9 := data.relationC9_w3_mem_P_sup_U_and_conj ha hb hab forms
+  have hX_PU : X ∈ PU := by
+    simpa [PU, X, S1, W3pow] using hC9.1
+  have hX_conj_PU : data.t ^ 2 * X * (data.t ^ 2)⁻¹ ∈ PU := by
+    simpa [PU, X, S1, W3pow] using hC9.2
+  have hX_smul : X ∈ MulAut.conj ((data.t ^ 2)⁻¹) • PU := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hsmul : ((MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ • X) =
+        data.t ^ 2 * X * (data.t ^ 2)⁻¹ := by
+      rw [show ((MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ • X) =
+          (MulAut.conj ((data.t ^ 2)⁻¹))⁻¹ X from rfl,
+        MulAut.conj_inv_apply]
+      group
+    rwa [hsmul]
+  have hX_inf : X ∈ PU ⊓ (MulAut.conj ((data.t ^ 2)⁻¹) • PU) := ⟨hX_PU, hX_smul⟩
+  have hX_U : X ∈ hyp.base.U := by
+    have hX_inf' : X ∈ (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) := by
+      simpa [PU] using hX_inf
+    rwa [hstep3] at hX_inf'
+  exact data.relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U
+    ha hb hab forms hc1 hc3 (by simpa [X, S1, W3pow] using hX_U)
+
+/-- BG Appendix C Step 4 after applying Step 3 to the `(C.9)` element: either
+`(C.10)` has already been forced, or the only remaining Step 3 obstruction is
+the bad branch where the relevant intersection is all of `PU`. -/
+theorem relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b)
+    (hc1 : forms.c1 ≠ 0) (hc3 : forms.c3 ≠ 0) :
+    (forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
+      data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1) ∨
+      (hyp.base.P ⊔ hyp.base.U) ⊓
+          (MulAut.conj ((data.t ^ 2)⁻¹) • (hyp.base.P ⊔ hyp.base.U)) =
+        hyp.base.P ⊔ hyp.base.U := by
+  classical
+  have ht2_norm : data.t ^ 2 ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+    data.t_pow_normalizes_U 2
+  have ht2_inv_norm : (data.t ^ 2)⁻¹ ∈ Subgroup.normalizer (hyp.base.U : Set G) :=
+    (Subgroup.normalizer (hyp.base.U : Set G)).inv_mem ht2_norm
+  have hstep3 := data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U ht2_inv_norm
+  rcases hstep3 with hU | hPU
+  · left
+    exact data.relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U
+      ha hb hab forms hc1 hc3 hU
+  · right
+    exact hPU
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form
