@@ -123,6 +123,40 @@ theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
     Nat.ModEq.eq_of_lt_of_lt hmod hyp.q_lt_p hp_gt_one
   exact hyp.base.q_prime.ne_one hq_eq_one
 
+/-- **Peterfalvi (14.15)**: the parity and congruence estimate for the
+integer `x` in the non-full branch.  If `x = q + n p`, the fixed-point-free
+congruence gives `n ≡ 1 mod q`; since `p` and `q` are odd, oddness of `x`
+forces `n` even.  Thus `n` cannot be `0` or `1`, and the congruence then gives
+`n ≥ q + 1`, hence `x ≥ q + (1 + q) p`. -/
+theorem x_ge_caseA_min_of_decomposition_modEq_and_odd
+    (hyp : Hypothesis (G := G)) {x n : ℕ}
+    (hx_eq : x = hyp.base.q + n * hyp.base.p)
+    (hn_mod : n ≡ 1 [MOD hyp.base.q]) (hx_odd : Odd x) :
+    hyp.base.q + (1 + hyp.base.q) * hyp.base.p ≤ x := by
+  have hn_even : Even n := by
+    by_contra hn_not_even
+    have hn_odd : Odd n := Nat.not_even_iff_odd.mp hn_not_even
+    have hnp_odd : Odd (n * hyp.base.p) := hn_odd.mul hyp.base.p_odd
+    have hx_even : Even x := by
+      rw [hx_eq]
+      exact hyp.base.q_odd.add_odd hnp_odd
+    exact (Nat.not_even_iff_odd.mpr hx_odd) hx_even
+  have hn_ne_zero : n ≠ 0 := by
+    intro hn0
+    have hmod0 : 0 ≡ 1 [MOD hyp.base.q] := by
+      simpa [hn0] using hn_mod
+    have hzero_eq_one : 0 = 1 :=
+      Nat.ModEq.eq_of_lt_of_lt hmod0 hyp.base.q_prime.pos hyp.base.q_prime.one_lt
+    omega
+  have hn_ne_one : n ≠ 1 := by
+    intro hn1
+    rw [hn1] at hn_even
+    norm_num at hn_even
+  have hn_gt_one : 1 < n := by omega
+  have hn_ge : 1 + hyp.base.q ≤ n := hn_mod.symm.add_le_of_lt hn_gt_one
+  rw [hx_eq]
+  nlinarith [Nat.mul_le_mul_right hyp.base.p hn_ge]
+
 /-- The T-side cyclotomic quotient from **Peterfalvi (14.4)** is odd. -/
 theorem tSide_cyclotomic_quotient_odd (hyp : Hypothesis (G := G)) :
     Odd ((hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1)) :=
@@ -3268,8 +3302,9 @@ theorem caseA_contradiction_of_nonfull_u_data
     (hcaseA : data.caseA)
     (hu_not_full :
       hyp.base.u ≠ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
-    {x : ℕ} (hh_eq : nc.h = hyp.base.u * x)
-    (hx_min : hyp.base.q + (1 + hyp.base.q) * hyp.base.p ≤ x)
+    {x n : ℕ} (hh_eq : nc.h = hyp.base.u * x)
+    (hx_eq : x = hyp.base.q + n * hyp.base.p)
+    (hn_mod : n ≡ 1 [MOD hyp.base.q]) (hx_odd : Odd x)
     (hpow_lt_h : hyp.base.p ^ hyp.base.q < nc.h - 1) :
     False := by
   have hmod : hyp.base.p ≡ 1 [MOD hyp.base.q] := by
@@ -3286,6 +3321,8 @@ theorem caseA_contradiction_of_nonfull_u_data
     rw [hq3, hp7] at hu
     norm_num at hu
     exact hu
+  have hx_min : hyp.base.q + (1 + hyp.base.q) * hyp.base.p ≤ x :=
+    hyp.x_ge_caseA_min_of_decomposition_modEq_and_odd hx_eq hn_mod hx_odd
   have hx31 : 31 ≤ x := by
     have hx := hx_min
     rw [hq3, hp7] at hx
@@ -3322,9 +3359,9 @@ theorem u_final_value [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases hcase with hcaseA | hcaseB
   · -- Non-exceptional branch of (14.14): the arithmetic spine is now
     -- `data.caseA_contradiction_of_nonfull_u_data`.  The remaining work is
-    -- to derive `h = u * x`, the lower bound on `x`, and `p^q < h - 1` from
-    -- (14.5), the non-full branch of (14.6), and the fixed-point-free action
-    -- of `W1`.
+    -- to derive `h = u * x`, `x = q + n * p`, `n ≡ 1 mod q`, oddness of `x`,
+    -- and `p^q < h - 1` from (14.5), the non-full branch of (14.6), and the
+    -- fixed-point-free action of `W1`.
     sorry
   · exact data.u_eq_full_cyclotomic_of_caseB Sdata hcaseB
 
