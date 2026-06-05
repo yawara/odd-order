@@ -212,25 +212,31 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
   (`exists_inflate_eq_of_subset_characterKernel`+`inflate_apply_one`) で G/N に落とし中心 case `exists_degree_sq_le_index`
   適用 + quotient index `(D.map mk' N).index=D.index` (`index_comap_of_surjective`+`comap_map_eq`+`ker_mk'`)。
   = θ-bound の `φ(1)≤√|C:D|` 半分 (中心 case は N=⊥ 特殊化)。InflationCharacter に SchurCenterBound import 追加 (cycle 無)。
-- 🟡 **θ-bound 残 = Clifford restriction (a-half)** `θ(1)≤|K:C|·φ(1)` — **2026-06-05 de-risk 調査: full Clifford
-  ramification (`e²≤|I:C|`) は不要、Frobenius reciprocity route で済む**:
-  φ:=Res_C θ の既約 constituent (∃ via `exists_inner_induce_ne_zero`@S03) ⟹ 相互律 `⟨θ,Ind φ⟩=⟨Res θ,φ⟩≠0`
-  (`inner_induce_eq_inner_restrict`@InducedCharacter:531) ⟹ θ は Ind φ の constituent ⟹ `θ(1)≤(Ind φ)(1)=|K:C|·φ(1)`
-  (`induce_apply_one`@InducedCharacter:289)。section bound `degree_sq_le_index_of_central_quotient`(✅)で
-  `φ(1)²≤|C:D|` ⟹ `θ(1)²≤|K:C|²|C:D|` ⟹ θ-bound。
-  **確認済 infra (全 present)**: Frobenius 相互律 / induce_apply_one / exists_inner_induce_ne_zero /
-  `isCharacter_restrict`@S08:87 / `induce_mem_ZIrr`@InducedCharacter:792 / `IsCharacter.exists_natFinsupp_eq_sum`+
-  `inner_irreducible_nonneg`@Clifford / `character_add_of_isCompl`@CharacterCompleteness:215 /
-  `irreducibleCharacter_apply_one_eq_pos_natCast`@ZIrrFourier:518。
-  **残 brick (2 つ, multi-session だが well-scoped)**:
-  1. **constituent degree bound** `IsCharacter χ ∧ θ∈Irr ∧ ⟨χ,θ⟩≠0 ⟹ (θ 1).re≤(χ 1).re` — `exists_natFinsupp_eq_sum`
-     (χ=∑(m a)•a, nat coeffs) + `single_le_sum` + 各 a(1)>0 + m θ≥1。~40-50 LOC (.re/sum/cast bookkeeping)。
-  2. **`IsCharacter (induce C φ)`** (= reverse char `χ∈ZIrr ∧ ∀ψ∈Irr,⟨χ,ψ⟩≥0 ⟹ IsCharacter χ` の特殊化):
-     induce∈ZIrr(✅`induce_mem_ZIrr`) + 非負係数(相互律+`isCharacter_restrict`+`inner_irreducible_nonneg`) ⟹ IsCharacter。
-     **reverse char 本体 = `character_add_of_isCompl` で ⊕(irreducible reps)^mult を構成** (Finsupp 上 induction)。
-     **代替: mathlib `RepresentationTheory/Induced.lean` の induced rep を repo `induce` 公式に bridge** (別 substantial)。
-  → **次着手 = brick 1 (constituent degree bound, self-contained) → brick 2 (reverse IsCharacter char) → assemble (a-half) → 全 θ-bound → (6.2)**。
-  または (b) T-A4 member-family enum (Sibley packaging と共有)。
+- ✅✅✅ **2026-06-05 θ-bound a-half (Clifford restriction) 完成** `θ(1)≤|K:C|·φ(1)` — Frobenius reciprocity
+  route で de-risk 通り landed (full Clifford ramification `e²≤|I:C|` 不要):
+  - ✅ **brick 1** (commit bf0f34f, `IsCharacter.apply_one_re_le_of_inner_ne_zero`@Clifford): genuine χ の
+    既約 constituent θ (⟨χ,θ⟩≠0) ⟹ `(θ 1).re≤(χ 1).re`。`exists_natFinsupp_eq_sum`+`single_le_sum`+各 a(1)>0。
+  - ✅ **brick 2** (commit 7a11196, `isCharacter_induce`@S08): `Ind_H^Γ θ` (θ genuine) は genuine。
+    **想定より簡単だった**: `character_add_of_isCompl` 再構成は不要 — nat 分解 `induce_exists_natFinsupp_eq_sum`
+    (@S08:192, **既存だった**) を新 reverse 補題 `isCharacter_of_natFinsupp_eq_sum`@Clifford (nat 結合⟹genuine,
+    closure `IsCharacter.zero/add/nsmul/sum` 経由) に流すだけ。
+  - ✅ **a-half assembly** (commit 7a11196, `theta_degree_le_index_mul_constituent`@S08): θ∈Irr K, C≤K ⟹
+    ∃ φ∈Irr C, `⟨Ind_C^K φ, θ⟩≠0 ∧ (θ 1).re ≤ |K:C|·(φ 1).re`。`exists_inner_induce_ne_zero`(H:=C で φ 産出)
+    + brick 2 + brick 1 + `induce_apply_one`。全 axiom-clean (AxiomsCheck 登録)・warning-clean・full build 3555。
+- ✅✅✅ **full θ-bound 完成** (commit 0826aa7, `theta_degree_le_index_mul_sqrt_index`@S08): θ∈Irr K, C≤K,
+  section N◁C (N≤D≤C, θ trivial on N after Res, D/N≤Z(C/N)) ⟹ `(θ 1).re ≤ |K:C|·√|C:D|`。a-half(✅) ×
+  b-half `degree_sq_le_index_of_central_quotient`(✅) + √算術 `Real.le_sqrt_of_sq_le`。**φ↔b-half 整合 gap 解決**:
+  a-half の φ は Res θ の constituent (reciprocity `inner_induce_eq_inner_restrict` + `inner_conj_symm`) ゆえ
+  `N⊆ker(Res θ) ⟹ N⊆ker φ` を constituent kernel 継承 `characterKernel_subset_of_isCharacter_of_inner_ne_zero`
+  で放電。D を `Subgroup ↥C` に取り subgroupOf coercion 回避。全 axiom-clean (AxiomsCheck 登録)・warning-clean・
+  full build 3555。
+- 🔴 **θ-bound 残 = Sibley packaging のみ** (full θ-bound は完成):
+  **Sibley packaging** = member-family enum 経由で B1 適用 + B2 接続 ⟹ (6.2) `2|L:C|√|C:D|≥|K:A|−1`。🔴 最重 combinatorial。
+  **注意**: (6.3)/(6.5) 算術 shell (`six_three_HH1_le` 等) は数値 `hbound: |K:C|·|C:D|−1 ≤ 2|L:C|·|K:C|·√|C:D|`
+  を coherence family の `∑χ(1)²`(B1/B2 集約) から作る形ゆえ、full θ-bound は **per-θ では 1 スロット差しでなく
+  member-family enum 経由で集約**に効く。
+  → **次着手 = Sibley packaging (member-family enum)** = T-A4 と共有 foundational piece; (6.2) を
+  SibleyDadeHypothesis の実 index に結線。
 
 ### mathlib API 知見 (substantial ピースの調査削減, 2026-06-04 確認済)
 - ✅✅ **(6.5)(b) reduction core 完成** (commit bf4fcf2, axiom-clean, full build 3562): 

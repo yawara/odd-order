@@ -1053,6 +1053,120 @@ theorem IsCharacter.exists_natFinsupp_eq_sum {χ : ClassFunction G ℂ} (hχ : I
       · rw [Finsupp.notMem_support_iff.mp hsupp_mem]
     rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
 
+/-- **Constituent degree bound.**  If `χ` is a genuine character and `θ` is an irreducible
+constituent of `χ` (`⟨χ, θ⟩ ≠ 0`), then the degree of `θ` is at most the degree of `χ`:
+`(θ 1).re ≤ (χ 1).re`.
+
+Decompose `χ = ∑_{a ∈ Irr} m_a · a` (`exists_natFinsupp_eq_sum`) with `m_a = ⟨χ, a⟩ ∈ ℕ` and
+each `a(1)` a positive integer (`irreducibleCharacter_apply_one_eq_pos_natCast`).  Evaluating at
+`1`, every summand `m_a · a(1)` has non-negative real part, and the `θ`-summand alone
+(multiplicity `m_θ ≥ 1`) already dominates `θ(1)`.  This is the degree half of the
+Frobenius-reciprocity route to the Peterfalvi `(6.2)` `θ`-bound (`θ(1) ≤ |K:C|·φ(1)`). -/
+theorem IsCharacter.apply_one_re_le_of_inner_ne_zero {χ : ClassFunction G ℂ}
+    (hχ : IsCharacter χ) {θ : ClassFunction G ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinner : ClassFunction.inner χ θ ≠ 0) :
+    (θ 1).re ≤ (χ 1).re := by
+  classical
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := hχ.exists_natFinsupp_eq_sum
+  -- evaluation of a finite sum of class functions at a point
+  have hsum_apply : ∀ (s : Finset (ClassFunction G ℂ)) (F : ClassFunction G ℂ → ClassFunction G ℂ),
+      (∑ a ∈ s, F a) 1 = ∑ a ∈ s, (F a) 1 := by
+    intro s F
+    induction s using Finset.cons_induction with
+    | empty => simp
+    | cons a s ha ih => rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.add_apply, ih]
+  -- the real-part decomposition of `χ(1)`
+  have hχ1 : (χ 1).re = ∑ a ∈ m.support, (m a : ℝ) * (a 1).re := by
+    have hval : χ 1 = ∑ a ∈ m.support, (m a : ℂ) * (a 1) := by
+      rw [hsum, hsum_apply]
+      exact Finset.sum_congr rfl fun a _ => ClassFunction.smul_apply _ _ _
+    rw [hval, Complex.re_sum]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero]
+  -- each irreducible degree `(a 1).re` is non-negative
+  have hdeg_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (a 1).re := by
+    intro a ha
+    have ha_mem : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    obtain ⟨d, _, hd1⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, ha_mem⟩ : IrreducibleCharacter G)
+    have hd1' : a (1 : G) = (d : ℂ) := hd1
+    rw [hd1', Complex.natCast_re]
+    exact Nat.cast_nonneg d
+  -- hence each summand is non-negative
+  have hterm_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (m a : ℝ) * (a 1).re := fun a ha =>
+    mul_nonneg (Nat.cast_nonneg _) (hdeg_nonneg a ha)
+  -- `θ` lies in the support (its multiplicity is the nonzero Fourier coefficient)
+  have hmθ : m θ ≠ 0 := fun h0 => hinner (by rw [← hcoeff θ hθ, h0, Nat.cast_zero])
+  have hθsupp : θ ∈ m.support := Finsupp.mem_support_iff.mpr hmθ
+  -- the `θ`-summand dominates `θ(1)`, and the whole sum dominates the `θ`-summand
+  have hθterm : (θ 1).re ≤ (m θ : ℝ) * (θ 1).re :=
+    le_mul_of_one_le_left (hdeg_nonneg θ hθsupp)
+      (by exact_mod_cast Nat.one_le_iff_ne_zero.mpr hmθ)
+  rw [hχ1]
+  exact hθterm.trans (Finset.single_le_sum hterm_nonneg hθsupp)
+
+/-! ### Closure of genuine characters under `0`, `+`, `ℕ•`, and finite sums
+
+These give the *reverse* direction `IsCharacter.of_natFinsupp_eq_sum`: a non-negative-integer
+combination of irreducible characters is a genuine character.  Combined with
+`induce_exists_natFinsupp_eq_sum` this yields `IsCharacter (Ind θ)` (brick 2 of the
+Peterfalvi `(6.2)` `θ`-bound a-half). -/
+
+omit [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- The zero class function is a genuine character (the character of the `0`-dimensional
+representation on `PUnit`). -/
+theorem IsCharacter.zero : IsCharacter (0 : ClassFunction G ℂ) := by
+  refine ⟨PUnit, inferInstance, inferInstance, inferInstance, 1, ?_⟩
+  funext g
+  show (0 : ℂ) = LinearMap.trace ℂ PUnit ((1 : Representation ℂ G PUnit) g)
+  rw [Subsingleton.elim ((1 : Representation ℂ G PUnit) g) 0, map_zero]
+
+/-- Genuine characters are closed under addition: the direct sum (`Representation.prod`) of the
+witnessing representations has character `χ + ψ`. -/
+theorem IsCharacter.add {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (hψ : IsCharacter ψ) :
+    IsCharacter (χ + ψ) := by
+  obtain ⟨V, _, _, _, ρ, hρ⟩ := hχ
+  obtain ⟨W, _, _, _, σ, hσ⟩ := hψ
+  refine ⟨V × W, inferInstance, inferInstance, inferInstance, ρ.prod σ, ?_⟩
+  funext g
+  have hprod : (ρ.prod σ).character g = ρ.character g + σ.character g := by
+    show LinearMap.trace ℂ (V × W) ((ρ g).prodMap (σ g))
+        = LinearMap.trace ℂ V (ρ g) + LinearMap.trace ℂ W (σ g)
+    exact LinearMap.trace_prodMap' (ρ g) (σ g)
+  rw [hprod, ClassFunction.add_apply, congrFun hρ g, congrFun hσ g]
+
+/-- Genuine characters are closed under `ℕ`-scalar multiples. -/
+theorem IsCharacter.nsmul {χ : ClassFunction G ℂ} (hχ : IsCharacter χ) (n : ℕ) :
+    IsCharacter (n • χ) := by
+  induction n with
+  | zero => simpa using IsCharacter.zero
+  | succ k ih => rw [succ_nsmul]; exact ih.add hχ
+
+/-- Genuine characters are closed under finite sums. -/
+theorem IsCharacter.sum {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G ℂ}
+    (h : ∀ i ∈ s, IsCharacter (f i)) : IsCharacter (∑ i ∈ s, f i) := by
+  classical
+  induction s using Finset.cons_induction with
+  | empty => simpa using IsCharacter.zero
+  | cons a s ha ih =>
+      rw [Finset.sum_cons]
+      exact (h a (Finset.mem_cons_self a s)).add (ih fun i hi => h i (Finset.mem_cons_of_mem hi))
+
+set_option linter.unusedFintypeInType false in
+/-- **Reverse decomposition.**  A non-negative-integer combination of irreducible characters is a
+genuine character.  This is the converse of `exists_natFinsupp_eq_sum` and the engine behind
+`IsCharacter (Ind θ)`. -/
+theorem isCharacter_of_natFinsupp_eq_sum {χ : ClassFunction G ℂ}
+    (m : ClassFunction G ℂ →₀ ℕ) (hsupp : (↑m.support : Set (ClassFunction G ℂ)) ⊆
+      irreducibleCharacters G) (hsum : χ = ∑ a ∈ m.support, (m a : ℂ) • a) :
+    IsCharacter χ := by
+  rw [hsum]
+  refine IsCharacter.sum fun a ha => ?_
+  have ha_irr : IsIrreducibleCharacter a :=
+    mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha))
+  rw [Nat.cast_smul_eq_nsmul]
+  exact ha_irr.isCharacter.nsmul (m a)
+
 end GenuineDecomposition
 
 end OddOrder.RepresentationTheory

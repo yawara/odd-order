@@ -604,7 +604,51 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 - **(A) `IsCoherent` 強化**(正攻法・invasive): field `extension_mem_ZIrr : ∀φ∈ZIrr L, extension φ∈ZIrr G` 追加。影響 = S07 の IsCoherent 構成 ~5 site(`retarget_isCoherent`(2916, 要 X,Xbar∈ZIrr 新仮説 + χ,χ̄∈ZIrr L)/`coherentEqualDegree`(3095)/`coherentEqualDegree_fromDade`(5109)/`galoisTransport`(1471)/他)が新 field を証明。consumer(S08-S16)は不変(struct 強化のみ)。bridge/DadeChainStep に X,Xbar∈ZIrr 伝播。**正しい定義(coherence=ℤ[Irr G] への isometry)だが multi-site refactor、retarget ZIrr 証明は非自明**。
 - **(B) ZIrr companion thread**(localized・S08): `(IsCoherent τ Sᵢ A) × (∀x∈Sᵢ, ν x∈ZIrr)` を per-step で thread、custom chain fold(`peterfalvi_66_coherence_of_X` の induction を companion 付きで再導出)。S07 不変だが chain logic 重複。companion 維持: x∈S₁⟹τ₂ x=τ₁ x∈ZIrr(直交)、χ↦X∈ZIrr、χ̄↦Xbar∈ZIrr。
 
-**現状**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。(6.8) は orphaned ゆえ invasive (A) を打つか localized (B) か checkpoint かは戦略判断。
+**現状(2026-06-04 時点)**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。
+
+#### J.3.7 ✅✅ ZIrr-codomain gap **解消済**(2026-06-05 確認 + cleanup) — 上記 J.3.6 fork は STALE
+
+**重要訂正**: 上の「(A)/(B) fork が gate」は **STALE**。**path (A) は既に実装済**:
+- **`IsCoherent` に `extension_mem_ZIrr` field が追加済**(commit a054bc8 "route A: IsCoherent gains ZIrr-codomain field on ℤ[S]", S07:1577): `∀φ∈zSpan S, extension φ∈ZIrr G`。**zSpan S 相対**(全 ZIrr L ではない — base Dade map は global ℤ[Irr] endo でないため、zSpan-S-relative が正しい定義)。全 IsCoherent 構成 site で証明済(`galoisTransport`@1619 / retarget@3284 span-induction 等)、build green。
+- **`xAdjoinStep`(S08:1427, per-step X-adjoin bridge)は既に route A で `hmemνZ` を field から導出**(S08:1487-1488, コメント "route A")。
+- **2026-06-05 cleanup(commit 0482531)**: `crux1_of_memberFamily` の injected `hνZ` を除去し `hmemS1`+field で内部導出。stale docstring("ν χ∈ZIrr not derivable from IsCoherent")訂正。
+- **`retarget_mem_ZIrr`(全 ZIrr L 版)は不要・revert 済**(1f478dc→reset): base map が全 ZIrr L を保存しないので過剰仮説。zSpan-S-relative field(span-induction 証明)が正しい道具。
+
+**⟹ ZIrr gap は gate でない。残 = capstone の最終 assembly のみ**(`sibleySetup_is_coherent` の sorry, S08): X-chain fold(`xAdjoinStep` を conjugate-pair enumeration で fold → `IsCoherent τ (Xset Z) A`)+ X∪Y glue(`coherentS_of_frobenius_pairUnion...` 系は **sorry-free で landed 済**, S08:5920-5965)+ Frobenius/p-群還元 wiring。X-chain machinery は全 sorry-free。**真の残務 = capstone def 本体の組立**(substantial; T8 enum fold + glue data 供給)。次セッションは J.3.6 の (A)/(B) を再検討せず capstone assembly に直行すべし。
+
+#### J.3.8 ✅ capstone X-empty (abelian) case closed (2026-06-05, commit 166d3b5)
+`sibleySetup_is_coherent` の bare sorry を `by_cases hXe : Xset ⁅H,H⁆ = ∅` に分割:
+- **X-empty branch 完全証明**: `coherenceTarget_of_Xset_empty`(新, axiom-clean): `X=∅ ⟹ S=Y`(`Xset_union_Yset_eq_S` で `S=∅∪Yset=Yset`)⟹ `CoherenceTarget = coherentYset`(Y-coherence, T6 既 landed)。glue 不要。
+- **X-nonempty branch のみ sorry**(真の §8 glue): `hyp.cases`(Frobenius/CertainType)で分岐。`hXne` は `hXe` 否定から放電可。Frobenius case = `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(5925, sorry-free)を invoke、要 `hF`(cases)+ **`hstepData`**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData`@5685 構成 = (6.6) prime-power 次数 gap, **bottleneck = hard content**)+ glue(`ν`/`hagree`/`hmixed`/`hgen`)。**次セッション = hstepData 構成 + glue data 供給**。
+
+#### J.3.9 ✅ (6.5) p-群還元の group-theory core landed (2026-06-05, commit f2aea41)
+
+hstepData の前提「H が p-群 ∴ θ(1)=p-冪」を供給する **(6.5) reduction** の group-theory 半分を実装。
+
+**(6.5) 依存ツリー(status 込み)**:
+```
+(6.5)(b) "H は非可換 p-群"  [reduction target]
+├─ isPGroup_of_isNilpotent_of_isPGroup_abelianization ✅ [H nilp + H/H' p-群 ⟹ H p-群]
+│  └─ H/[H,H] が p-群  ✅NEW = isPGroup_of_card_le_of_isFrobeniusAction (f2aea41)
+│     ├─ p-primary 成分 P: Sylow characteristic ∴ R-invariant ✅(Sylow.characteristic_of_normal)
+│     ├─ |R| | |P|-1: card_modEq_one(restricted via IsFrobeniusAction.subgroup)✅
+│     ├─ |R| | |A:P|-1: 純算術 |A|=|A:P|·|P|, |A|≡|P|≡1 ✅ (quotient-Frobenius 不要!)
+│     ├─ two_mul_add_one_le_of_odd_dvd + six_five_chief_factor_contradiction ✅
+│     └─ bound |A| ≤ 4|R|²+1  🔴 = char theory (6.2)/(6.3) = Sibley packaging
+├─ H 非可換: S 非coherent + S([H,H]) coherent(coherentYset)から ✅可導
+└─ FPF R-作用 on Abelianization H  ⚠️ = Sibley (c1) Frobenius wiring
+```
+
+**新 lemma 2 本**(S08, axiom-clean, AxiomsCheck 登録):
+- `isPGroup_of_card_le_of_isFrobeniusAction`: 抽象 chief-factor core(可換 A + FPF R-作用 + odd + `|A|≤4|R|²+1` ⟹ A は p-群)。
+- `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization`: (6.5)(b) reduction interface(`IsFrobeniusAction R (Abelianization H)` + odd + bound ⟹ `∃p, IsPGroup p H`)。
+
+**残ギャップ**:
+1. **bound(char theory)** = (6.5) の唯一の真ブロッカー。`theta_degree_le_index_mul_sqrt_index`(完成済)を S(A)/S(B) coherence + 実 index に結線 → `six_three_HH1_le` 適用。**Sibley packaging frontier・heavy**。
+2. **FPF 作用 on Abelianization H**(Sibley (c1))= 純群論。`IsFrobeniusGroup ↥L H W1`(`hyp.cases`左)→ `toFrobeniusAction`(`IsFrobeniusAction ↥W1 ↥H`)→ `IsFrobeniusAction.quotient`(commutator ↥H invariant)→ FPF on `↥H ⧸ commutator`。**friction**: `Abelianization H`(semireducible def)vs `↥H ⧸ commutator H` の instance(CommGroup/MulDistribMulAction)が自動転送されない。tractable だが ~30-50 LOC bridge 要。char bound でどのみちブロックされるので **premature**。
+3. odd: `card_L_odd` から H, W1, Abelianization の odd(divisor-of-odd)。容易。
+
+**深 brick は全て既存だった**(再発見): `IsFrobeniusAction.card_modEq_one`/`.subgroup`/`.quotient`/`coprime_card`(FrobeniusActionTI), `coprime_fixedPoints_quotient`(Cor3.28, Ch04), `Sylow.characteristic_of_normal`/`ne_bot_of_dvd_card`(mathlib), p-冪次数(`exists_finrank_eq_prime_pow_of_isPGroup`)。
 
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 

@@ -237,6 +237,96 @@ theorem induce_exists_natFinsupp_eq_sum {Γ : Type*} [Group Γ] [Fintype Γ]
     rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
 
 set_option linter.unusedFintypeInType false in
+/-- **(H2, character form)** the induced character `Ind_H^Γ θ` of a genuine character `θ` is
+itself a genuine character.  Combines the non-negative-integer decomposition
+`induce_exists_natFinsupp_eq_sum` (`Ind θ = ∑ mₐ·a` with `mₐ ∈ ℕ`, `a ∈ Irr Γ`) with its
+converse `isCharacter_of_natFinsupp_eq_sum` (a `ℕ`-combination of irreducible characters is a
+genuine character).  This is **brick 2** of the Frobenius-reciprocity route to the Peterfalvi
+`(6.2)` `θ`-bound a-half. -/
+theorem isCharacter_induce {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ) :
+    IsCharacter (ClassFunction.induce H θ) := by
+  obtain ⟨m, hsupp, hsum, _⟩ := induce_exists_natFinsupp_eq_sum hθ
+  exact isCharacter_of_natFinsupp_eq_sum m hsupp hsum
+
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (6.2) `θ`-bound, a-half** (the Clifford/induction half).  For an irreducible
+character `θ` of a finite group `K` and a subgroup `C ≤ K`, there is an irreducible character
+`φ` of `C` of which `θ` is a constituent of `Ind_C^K φ` (`⟨Ind_C^K φ, θ⟩ ≠ 0`), and whose
+degree controls `θ`'s: `θ(1) ≤ |K : C|·φ(1)`.
+
+By Frobenius reciprocity `θ` is a constituent of `Ind_C^K φ` for some `φ ∈ Irr C`
+(`exists_inner_induce_ne_zero`, equivalently `φ` is a constituent of `Res^K_C θ`).  Since `φ` is
+a genuine character, so is `Ind_C^K φ` (`isCharacter_induce`, brick 2), so the
+constituent-degree bound `IsCharacter.apply_one_re_le_of_inner_ne_zero` (brick 1) gives
+`θ(1) ≤ (Ind_C^K φ)(1) = |K : C|·φ(1)` (`induce_apply_one`).  Combined with the section degree
+bound `degree_sq_le_index_of_central_quotient` (`φ(1)² ≤ |C : D|`, the b-half) this yields the
+full `(6.2)` degree bound `θ(1) ≤ |K : C|·√|C : D|`. -/
+theorem theta_degree_le_index_mul_constituent {K : Type*} [Group K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] (C : Subgroup K) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] (θ : IrreducibleCharacter K) :
+    ∃ φ : IrreducibleCharacter C,
+      ClassFunction.inner (ClassFunction.induce C (φ : ClassFunction ↥C ℂ))
+          (θ : ClassFunction K ℂ) ≠ 0 ∧
+      ((θ : ClassFunction K ℂ) 1).re ≤ (C.index : ℝ) * ((φ : ClassFunction ↥C ℂ) 1).re := by
+  obtain ⟨φ, hφ⟩ := OddOrder.Peterfalvi.S03.exists_inner_induce_ne_zero (H := C) θ
+  refine ⟨φ, hφ, ?_⟩
+  have hind : IsCharacter (ClassFunction.induce C (φ : ClassFunction ↥C ℂ)) :=
+    isCharacter_induce φ.isIrreducible.isCharacter
+  have hbound := hind.apply_one_re_le_of_inner_ne_zero θ.isIrreducible hφ
+  rw [ClassFunction.induce_apply_one] at hbound
+  rwa [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero] at hbound
+
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (6.2) `θ`-bound** (full degree bound).  For an irreducible character `θ` of a
+finite group `K`, a subgroup `C ≤ K`, and a section `N ◁ C` with `N ≤ D ≤ C`, `θ` trivial on `N`
+(after restriction to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of `θ` is bounded:
+`θ(1) ≤ |K : C|·√|C : D|`.
+
+Assembled from the two halves: the a-half `theta_degree_le_index_mul_constituent`
+(`θ(1) ≤ |K:C|·φ(1)` for an `Ind`-constituent `φ ∈ Irr C` of `θ`) and the section b-half
+`degree_sq_le_index_of_central_quotient` (`φ(1)² ≤ |C:D|`).  The `φ` produced by the a-half is a
+constituent of `Res^K_C θ` (Frobenius reciprocity `inner_induce_eq_inner_restrict` +
+`inner_conj_symm`), so `N ⊆ Ker(Res^K_C θ)` forces `N ⊆ Ker φ` (constituent kernel inheritance
+`characterKernel_subset_of_isCharacter_of_inner_ne_zero`), discharging the b-half's kernel
+hypothesis.  Then `φ(1) = d` with `d² ≤ |C:D|` gives `φ(1) ≤ √|C:D|` (`Real.le_sqrt_of_sq_le`),
+and multiplying by `|K:C| ≥ 0` closes the bound. -/
+theorem theta_degree_le_index_mul_sqrt_index {K : Type*} [Group K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] (θ : IrreducibleCharacter K) (C : Subgroup K) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict C (θ : ClassFunction K ℂ)))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
+    ((θ : ClassFunction K ℂ) 1).re ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  obtain ⟨φ, hφne, hφbound⟩ := theta_degree_le_index_mul_constituent C θ
+  -- `φ` is a constituent of `Res^K_C θ`: reciprocity turns `⟨Ind φ, θ⟩ ≠ 0` into `⟨φ, Res θ⟩ ≠ 0`,
+  -- and conjugate symmetry flips it to `⟨Res θ, φ⟩ ≠ 0`.
+  have hφRes : ClassFunction.inner (φ : ClassFunction ↥C ℂ)
+      (ClassFunction.restrict C (θ : ClassFunction K ℂ)) ≠ 0 := by
+    rw [← ClassFunction.inner_induce_eq_inner_restrict]; exact hφne
+  have hres_inner : ClassFunction.inner (ClassFunction.restrict C (θ : ClassFunction K ℂ))
+      (φ : ClassFunction ↥C ℂ) ≠ 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm]; exact star_ne_zero.mpr hφRes
+  -- constituent kernel inheritance: `N ⊆ Ker(Res θ) ⟹ N ⊆ Ker φ`.
+  have hkerφ : (↑N : Set ↥C) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥C ℂ) := fun n hn =>
+    characterKernel_subset_of_isCharacter_of_inner_ne_zero
+      (isCharacter_restrict θ.isIrreducible.isCharacter C) φ.isIrreducible hres_inner (hθN hn)
+  -- the b-half: `φ(1) = d` with `d² ≤ |C:D|`.
+  obtain ⟨d, hd1, hd2⟩ :=
+    degree_sq_le_index_of_central_quotient (N := N) φ D hND hkerφ hcentral
+  have hφ1re : ((φ : ClassFunction ↥C ℂ) 1).re = (d : ℝ) := by
+    rw [hd1]; exact Complex.natCast_re d
+  have hd_le : (d : ℝ) ≤ Real.sqrt (D.index : ℝ) :=
+    Real.le_sqrt_of_sq_le (by exact_mod_cast hd2)
+  calc ((θ : ClassFunction K ℂ) 1).re
+      ≤ (C.index : ℝ) * ((φ : ClassFunction ↥C ℂ) 1).re := hφbound
+    _ = (C.index : ℝ) * (d : ℝ) := by rw [hφ1re]
+    _ ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) :=
+        mul_le_mul_of_nonneg_left hd_le (Nat.cast_nonneg _)
+
+set_option linter.unusedFintypeInType false in
 /-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
 (`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
 `induce_exists_natFinsupp_eq_sum` feeds `characterKernel_subset_of_natFinsupp_eq_sum`. -/
@@ -655,8 +745,10 @@ This is the member family input that discharges the `D'`/`htau1` hypotheses of
 * `htau1_inner_eq` — `ν` is a `ℤ[χ−χ̄, χ]`-isometry: both generators lie in `ℤ[S₁]` (since
   `χ, χ̄ ∈ S₁`), where `hS₁.extension_inner_eq` applies;
 * `htau1_agrees` — `ν(χ−χ̄) = τ(χ−χ̄)` since `χ−χ̄` is supported (`extends_on_supported`);
-* `htau1_mem` — `ν χ ∈ ZIrr G` is the **injected** hypothesis `hνZ` (not derivable from `IsCoherent`,
-  whose `extension` is a bare `→ₗ[ℤ]` with no ZIrr-codomain field).
+* `htau1_mem` — `ν χ ∈ ZIrr G` is the hypothesis `hνZ`.  Since `IsCoherent` gained the
+  `extension_mem_ZIrr` field (route A), this is now derivable from `χ ∈ S₁ ⊆ ℤ[S₁]` via
+  `hS₁.extension_mem_ZIrr`; callers discharge it from the field (it is kept as an explicit argument
+  here only because this `def` predates the field).
 
 The remaining (5.4) orthogonality scalars `⟨χ, 0⟩ = ⟨χ̄, 0⟩ = 0` are trivial and `⟨χ, χ̄⟩ = 0` is
 `hχχbar`. -/
@@ -978,7 +1070,6 @@ theorem crux1_of_memberFamily
     (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G) τ
       (χ : ClassFunction ↥L ℂ) (a • χmem i₁))
     (hDaY_ZIrr : Da.Y ∈ ZIrr G)
-    (hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G)
     (hmemS1 : ∀ i ∈ s, χmem i ∈ S₁)
     (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
       ClassFunction.inner (χmem i) (χmem j) = if i = j then (1 : ℂ) else 0)
@@ -992,6 +1083,10 @@ theorem crux1_of_memberFamily
     ClassFunction.inner (τ ((χ : ClassFunction ↥L ℂ) - a • χmem i₁))
       (hS₁.extension (χmem i₁)) = -(a : ℂ) := by
   classical
+  -- `hνZ` is derived (route A): `χmem i ∈ S₁ ⊆ ℤ[S₁]`, so `ν (χmem i) ∈ ℤ[Irr G]` by the
+  -- `IsCoherent.extension_mem_ZIrr` field — it need not be injected as a hypothesis.
+  have hνZ : ∀ i ∈ s, hS₁.extension (χmem i) ∈ ZIrr G :=
+    fun i hi => hS₁.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1 i hi))
   obtain ⟨μ, hμeq⟩ := ClassFunction.inner_mem_ZIrr_int hμZ (hνZ i₁ hi₁)
   -- Orthonormality of the family `vc i = ν χᵢ` (ν isometry on `ℤ[S₁]` + member orthonormality).
   have horth : ∀ i ∈ s, ∀ j ∈ s,
@@ -1489,7 +1584,7 @@ noncomputable def xAdjoinStep
       (hS₁.extension (χmem i₁ : ClassFunction ↥L ℂ)) = -(a : ℂ) :=
     crux1_of_memberFamily hyp hconj
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) rfl
-      hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemνZ hmemS1
+      hS₁ χ s (fun i => (χmem i : ClassFunction ↥L ℂ)) deg i₁ hi₁ Da hDaY_ZIrr hmemS1
       hmemortho hcoeffval htau1_memaχ ha1 hDeg
   -- crux2 clean: `⟨τ(χ − χ̄), ν χ₁⟩ = 0` from `R(χ) ⊥ R(χ₁)`.
   have hcrux2 : ClassFunction.inner
@@ -1989,6 +2084,174 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   refine isPGroup_of_quotient_of_subgroup P.isPGroup' ?_
   rw [IsPGroup.iff_card]
   exact ⟨0, by rw [pow_zero]; exact @Nat.card_of_subsingleton (Γ ⧸ (↑P : Subgroup Γ)) 1 hQ_triv⟩
+
+/-- **Group-theory core of Peterfalvi (6.5)(a),(b): a Frobenius-acted abelian section obeying the
+(6.3) index bound is a `p`-group.**
+
+Let a finite group `R` act on a finite abelian group `A` by automorphisms, *fixed-point-freely*
+(`IsFrobeniusAction R A`: no nonidentity `r ∈ R` fixes a nonidentity `a ∈ A`).  If `|A|` and `|R|`
+are odd and `|A| ≤ 4|R|² + 1`, then `A` is a `p`-group for some prime `p`.
+
+This is the abstract content of Peterfalvi (6.5).  In the Sibley setting `A = K/H₁` is the
+abelianization section and `R = L/K` is the Frobenius complement; (6.5)(a) says `K/H₁` is a chief
+factor.  Here the chief-factor argument is run through the `p`-primary component: if `A` had a prime
+divisor `p` whose Sylow subgroup `P` were proper (i.e. `A` were not a `p`-group), then `P`
+(characteristic in the abelian `A`, hence `R`-invariant) and the quotient index `|A : P|` would both
+be nontrivial, odd, and `≡ 1 (mod |R|)` — the first two by Frobenius `card_modEq_one` applied to the
+whole action and the restricted action on `P` (`IsFrobeniusAction.subgroup`), the index by the
+arithmetic `|A| = |A:P|·|P|`, `|A| ≡ |P| ≡ 1`.  Oddness then forces `|P|, |A:P| ≥ 2|R| + 1`
+(`two_mul_add_one_le_of_odd_dvd`), so `|A| = |A:P|·|P| ≥ (2|R|+1)² > 4|R|² + 1`, contradicting the
+bound (`six_five_chief_factor_contradiction`).
+
+The `|A| ≤ 4|R|² + 1` bound is the single character-theoretic input ((6.2)/(6.3); in the Sibley
+setup supplied by `theta_degree_le_index_mul_sqrt_index`).  Everything else is discharged here. -/
+theorem isPGroup_of_card_le_of_isFrobeniusAction {A R : Type*} [CommGroup A] [Finite A]
+    [Group R] [Finite R] [MulDistribMulAction R A]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction R A)
+    (hAodd : Odd (Nat.card A)) (hRodd : Odd (Nat.card R))
+    (hbound : Nat.card A ≤ 4 * Nat.card R ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p A := by
+  classical
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype R := Fintype.ofFinite R
+  by_contra hcon
+  -- `A` is nontrivial: a trivial group is a `p`-group for every prime.
+  rcases eq_or_ne (Nat.card A) 1 with hA1 | hA1
+  · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    exact hcon ⟨2, Nat.prime_two, IsPGroup.iff_card.mpr ⟨0, by rw [pow_zero, hA1]⟩⟩
+  -- Otherwise take a prime divisor `p` of `|A|` and its Sylow `p`-subgroup `P`.
+  obtain ⟨p, hp, hpdvd⟩ := (Nat.card A).exists_prime_and_dvd hA1
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨P⟩ : Nonempty (Sylow p A) := inferInstance
+  -- `|P| > 1` because `p ∣ |P|`.
+  have hpP : p ∣ Nat.card (P : Subgroup A) := P.dvd_card_of_dvd_card hpdvd
+  have hcardP : 1 < Nat.card (P : Subgroup A) :=
+    lt_of_lt_of_le hp.one_lt (Nat.le_of_dvd Nat.card_pos hpP)
+  -- `P` is normal (abelian ambient), hence characteristic.
+  have hPnormal : (P : Subgroup A).Normal :=
+    ⟨fun n hn g => by
+      have heq : g * n * g⁻¹ = n := by rw [mul_comm g n, mul_assoc, mul_inv_cancel, mul_one]
+      rw [heq]; exact hn⟩
+  have hPchar : (P : Subgroup A).Characteristic := P.characteristic_of_normal hPnormal
+  -- `R` acts by automorphisms, which fix the characteristic `P` setwise: `P` is `R`-invariant.
+  have hinv : ∀ r : R, ∀ m ∈ (P : Subgroup A), r • m ∈ (P : Subgroup A) := by
+    intro r m hm
+    have hmap : (P : Subgroup A).map (MulDistribMulAction.toMulAut R A r).toMonoidHom
+        = (P : Subgroup A) :=
+      Subgroup.characteristic_iff_map_eq.mp hPchar (MulDistribMulAction.toMulAut R A r)
+    have hmem : (MulDistribMulAction.toMulAut R A r).toMonoidHom m ∈ (P : Subgroup A) := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- `A` not a `p`-group ⟹ `P ≠ ⊤` ⟹ `|A : P| > 1`.
+  have hindex : 1 < (P : Subgroup A).index := by
+    by_contra hle
+    have h : (P : Subgroup A).index ≤ 1 := Nat.not_lt.mp hle
+    have hidxpos : 0 < (P : Subgroup A).index := by
+      have hmc := Subgroup.index_mul_card (P : Subgroup A)
+      rcases Nat.eq_zero_or_pos (P : Subgroup A).index with h0 | h0
+      · rw [h0, zero_mul] at hmc; exact absurd hmc.symm Nat.card_pos.ne'
+      · exact h0
+    have hidx1 : (P : Subgroup A).index = 1 := by omega
+    have hPtop : (P : Subgroup A) = ⊤ := Subgroup.index_eq_one.mp hidx1
+    have hcardeq : Nat.card (P : Subgroup A) = Nat.card A := by
+      rw [hPtop]; exact Nat.card_congr (Subgroup.topEquiv).toEquiv
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    exact hcon ⟨p, hp, IsPGroup.iff_card.mpr ⟨n, by rw [← hcardeq, hn]⟩⟩
+  -- Frobenius `card ≡ 1 (mod |R|)` for the whole action and the restricted action on `P`.
+  haveI : Fintype (P : Subgroup A) := Fintype.ofFinite _
+  have hAmod : Nat.card A ≡ 1 [MOD Nat.card R] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrob.card_modEq_one
+  letI instP : MulDistribMulAction R (P : Subgroup A) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction
+      (P : Subgroup A) hinv
+  have hFrobP : @OddOrder.Isaacs.Ch06.IsFrobeniusAction R (P : Subgroup A) _ _ instP :=
+    hFrob.subgroup (P : Subgroup A) hinv
+  have hPmod : Nat.card (P : Subgroup A) ≡ 1 [MOD Nat.card R] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrobP.card_modEq_one
+  -- `|R| ∣ |P| - 1` and (via `|A| = |A:P|·|P|`) `|R| ∣ |A:P| - 1`.
+  have hRdvdP : Nat.card R ∣ Nat.card (P : Subgroup A) - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hPmod.symm
+  have hmul : (P : Subgroup A).index * Nat.card (P : Subgroup A) = Nat.card A :=
+    Subgroup.index_mul_card _
+  have hidxmod : (P : Subgroup A).index ≡ 1 [MOD Nat.card R] := by
+    have h1 : (P : Subgroup A).index * Nat.card (P : Subgroup A)
+        ≡ (P : Subgroup A).index * 1 [MOD Nat.card R] := Nat.ModEq.mul_left _ hPmod
+    rw [mul_one, hmul] at h1
+    exact h1.symm.trans hAmod
+  have hRdvdidx : Nat.card R ∣ (P : Subgroup A).index - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hidxmod.symm
+  -- Oddness of both factors (they multiply to the odd `|A|`).
+  have hAodd' : Odd ((P : Subgroup A).index * Nat.card (P : Subgroup A)) := by
+    rw [hmul]; exact hAodd
+  obtain ⟨hidxodd, hcardPodd⟩ := Nat.odd_mul.mp hAodd'
+  -- Each factor is `≥ 2|R| + 1`; their product exceeds the bound — contradiction.
+  have hbP : 2 * Nat.card R + 1 ≤ Nat.card (P : Subgroup A) :=
+    two_mul_add_one_le_of_odd_dvd hRodd hcardPodd hRdvdP hcardP
+  have hbidx : 2 * Nat.card R + 1 ≤ (P : Subgroup A).index :=
+    two_mul_add_one_le_of_odd_dvd hRodd hidxodd hRdvdidx hindex
+  exact six_five_chief_factor_contradiction Nat.card_pos hbidx hbP hmul.symm hbound
+
+/-- **Peterfalvi (6.5)(b) reduction: `H` is a `p`-group.**  Assemble the chief-factor core
+`isPGroup_of_card_le_of_isFrobeniusAction` (the abelianization `Abelianization H` is a `p`-group)
+with `isPGroup_of_isNilpotent_of_isPGroup_abelianization` (a nilpotent group with `p`-group
+abelianization is a `p`-group).
+
+Let `H` be a finite nilpotent group whose abelianization `Abelianization H` carries a
+fixed-point-free action of a finite group `R` (in the Sibley setting `R = L/H` is the Frobenius
+complement acting on `H/H'` by conjugation), with `|Abelianization H|` and `|R|` odd and
+`|Abelianization H| ≤ 4|R|² + 1`.  Then `H` is a `p`-group for some prime `p`.
+
+This is the group-theory conclusion of Peterfalvi (6.5) ("we may assume `H` is a non-abelian
+`p`-group") in the form the (6.8) capstone consumes; the `≤ 4|R|² + 1` bound is the single
+character-theoretic input ((6.2)/(6.3)), and the fixed-point-free `R`-action on `Abelianization H`
+is supplied from the Frobenius alternative (6.8)(c1) / (6.4.c). -/
+theorem isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
+    {H : Type*} [Group H] [Finite H] [Group.IsNilpotent H]
+    {R : Type*} [Group R] [Finite R] [MulDistribMulAction R (Abelianization H)]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction R (Abelianization H))
+    (hHodd : Odd (Nat.card (Abelianization H))) (hRodd : Odd (Nat.card R))
+    (hbound : Nat.card (Abelianization H) ≤ 4 * Nat.card R ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p H := by
+  obtain ⟨p, hp, hPab⟩ :=
+    isPGroup_of_card_le_of_isFrobeniusAction hFrob hHodd hRodd hbound
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact ⟨p, hp, isPGroup_of_isNilpotent_of_isPGroup_abelianization hPab⟩
+
+/-- **Peterfalvi (6.5)(b) reduction in the Frobenius case (6.8)(c1): the kernel is a `p`-group.**
+If `G = N ⋊ A` is a Frobenius group with nilpotent kernel `N`, `|Abelianization N|` and `|A|` are
+odd, and `|Abelianization N| ≤ 4|A|² + 1`, then `N` is a `p`-group for some prime `p`.
+
+This is `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` with the fixed-point-free
+`A`-action on `Abelianization N` supplied directly from the Frobenius group: `A` acts
+fixed-point-freely on `N` by conjugation (`toFrobeniusAction`), and since `⁅N,N⁆` is characteristic
+in `N` (hence `A`-invariant), the action descends fixed-point-freely to the abelianization
+`N / ⁅N,N⁆` (`IsFrobeniusAction.quotient`).  In the (6.8) capstone this is the Frobenius alternative
+`hyp.cases.inl : IsFrobeniusGroup ↥L H W₁` (with `N = H`, `A = W₁`); the only remaining input is the
+`≤ 4|W₁|² + 1` bound from the character theory ((6.2)/(6.3)). -/
+theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
+    {N A : Subgroup G} [Group.IsNilpotent ↥N]
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G N A)
+    (hHodd : Odd (Nat.card (Abelianization ↥N))) (hAodd : Odd (Nat.card ↥A))
+    (hbound : Nat.card (Abelianization ↥N) ≤ 4 * Nat.card ↥A ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p ↥N := by
+  letI : N.Normal := h.isNormal
+  letI actN : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  have hFrobN : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A ↥N := h.toFrobeniusAction
+  -- `⁅N,N⁆` is characteristic in `N`, hence preserved by the automorphism `A`-action.
+  have hM : ∀ a : ↥A, ∀ m ∈ commutator ↥N, a • m ∈ commutator ↥N := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator ↥N).Characteristic) (MulDistribMulAction.toMulAut ↥A ↥N a)
+    have hmem : (MulDistribMulAction.toMulAut ↥A ↥N a).toMonoidHom m ∈ commutator ↥N := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- The fixed-point-free action descends to the abelianization quotient.
+  letI actAb : MulDistribMulAction ↥A (Abelianization ↥N) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator ↥N) hM
+  have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥A (Abelianization ↥N) :=
+    hFrobN.quotient (commutator ↥N) hM
+  exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hAodd hbound
 
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
 `Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
@@ -3436,6 +3699,19 @@ noncomputable def coherentYset (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
     OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.Yset
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
   hyp.coherentYset_of_two_le_ncard hyp.two_le_Yset_ncard
+
+/-- **(6.8) coherence, `X`-empty case** (`H` abelian / no non-linear constituents).  When
+`X = S − S([H,H])` is empty, the partition `S = X ∪ Y` (`Xset_union_Yset_eq_S`) collapses to
+`S = Y = S([H,H])`, so the full target `IsCoherent τ S H^#` is exactly the already-built
+`Y`-coherence `coherentYset` (T6: equal-degree `|W₁|` family).  This discharges the abelian branch
+of the (6.8) capstone with no gluing required. -/
+noncomputable def coherenceTarget_of_Xset_empty (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hXe : hyp.Xset ⁅H, H⁆ = ∅) : hyp.CoherenceTarget := by
+  have hSY : hyp.Yset = hyp.S := by
+    rw [← hyp.Xset_union_Yset_eq_S, hXe, Set.empty_union]
+  have h : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := hSY ▸ hyp.coherentYset
+  exact h
 
 /-- Glue `X = S - S(H')` coherence with the internally constructed `Y = S(H')` coherence.
 
@@ -5895,7 +6171,16 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
     {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
     (hyp : SibleyDadeHypothesis G L H) : hyp.CoherenceTarget := by
-  sorry
+  haveI := hyp.H_normal
+  by_cases hXe : hyp.Xset ⁅H, H⁆ = ∅
+  · -- `X`-empty (abelian) branch: `S = Y`, discharged by the `Y`-coherence `coherentYset`.
+    exact hyp.coherenceTarget_of_Xset_empty hXe
+  · -- `X`-nonempty branch: the genuine §8 content — glue the `X = S − S(Z)`-coherence
+    -- (`Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`,
+    -- per-step (6.6) prime-power degree data) with `Y`-coherence via the §7 engine.  Requires
+    -- the case split `hyp.cases` (Frobenius / CertainType) and the per-step `hstepData` +
+    -- combined extension `ν` glue data, which remain to be constructed.
+    sorry
 
 /-- **Peterfalvi (6.8) → (7.10) consumer interface.**
 A degree-scaled `Z`-chain decomposition: given a coherence input `τ` on `(S, A)`

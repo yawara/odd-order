@@ -1271,6 +1271,12 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.IsCharacter.exists_natCast_inner_irreducible
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.inner_irreducible_nonneg
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.IsCharacter.exists_natFinsupp_eq_sum
+-- θ-bound bricks: constituent degree bound `(θ 1).re ≤ (χ 1).re` for `θ` an irreducible
+-- constituent of a genuine `χ` (brick 1), and the converse decomposition
+-- `ℕ-combination of irreducibles ⇒ genuine character` (brick 2 infra).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.IsCharacter.apply_one_re_le_of_inner_ne_zero
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isCharacter_of_natFinsupp_eq_sum
 
 -- Peterfalvi (2.1) (issue 0040, Dade-isometry spine): g normalizing H, (|H|,orderOf g)=1
 -- ⇒ Hg = ⋃_{x∈H} (C_H(g)g)^x (set form) / every hg ∈ Hg is H-conjugate to C_H(g)g (existence).
@@ -1862,6 +1868,24 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_isCharacter_of_inner_ne_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.induce_exists_natFinsupp_eq_sum
+-- θ-bound a-half: `Ind_C^K φ` of a genuine `φ` is genuine (brick 2), assembled with brick 1 into
+-- the (6.2) degree bound `θ(1) ≤ |K:C|·φ(1)` for an induced-character constituent `φ` of `θ`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isCharacter_induce
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_constituent
+-- full (6.2) θ-bound: a-half × b-half + √ arithmetic ⟹ `θ(1) ≤ |K:C|·√|C:D|` (constituent kernel
+-- inheritance discharges the b-half's `N ⊆ Ker φ` from `N ⊆ Ker(Res θ)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_sqrt_index
+-- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
+-- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
+-- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
+-- abelianization lemma this yields "`H` is a `p`-group" for the (6.8) capstone.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_card_le_of_isFrobeniusAction
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
+-- (6.5)(b) in the (6.8)(c1) Frobenius case: `IsFrobeniusGroup G N A` + nilpotent kernel + the
+-- `≤ 4|A|²+1` bound ⟹ `N` is a `p`-group.  The FPF `A`-action on `Abelianization N` is supplied
+-- from the Frobenius group (`toFrobeniusAction` + `IsFrobeniusAction.quotient` through `⁅N,N⁆`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_isFrobeniusGroup_of_card_le
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms
@@ -2172,6 +2196,9 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.two_le_Yset_ncard
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentYset
+-- (6.8) capstone X-empty (abelian) branch: `S = Y` ⟹ CoherenceTarget = coherentYset.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherenceTarget_of_Xset_empty
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_Xset_commutator_Yset_glued
