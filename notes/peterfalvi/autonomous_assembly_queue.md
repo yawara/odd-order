@@ -150,6 +150,8 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 
 - ✅✅ **B2 orbit-counting も landed (訂正)**: `sum_div_normSq_induce_image_eq` (InducedIrreducible.lean:274) = `∑_{χ∈Ind''T}χ(1)²/⟨χ,χ⟩ = [G:H]·∑_{θ∈T}θ(1)²` (H⊴G, T conj-invariant)。inertia/orbit 機構 (`card_mul_inner_self_induce_eq_card_inertia`=norm/`induce_eq_induce_iff_conj`=fibre=orbit/`card_filter_induce_eq_index_inertia`=fibre card) も全 landed (InducedIrreducible.lean、(6.2) step-4a 用に構築済)。**B2 完全 landed** (ingredient-1 `sumInflatedDegreeSq_ntrivial` × orbit-counting で `∑_{S(A)}=|L:K|(|K:A|-1)`)。
 
+- ✅✅ **B2 for S(A) 組立済 (2026-06-06)**: `sum_div_normSq_induce_kernelFilter_eq` (S08, axiom-clean) = `∑_{χ∈S(A)} χ(1)²/‖χ‖² = [G:H]·(|H:A|−1)`(`H ⊴ G`, `A ⊴ G`)。orbit-counting × inflation degree-sum を kernel-filter `T={θ∈Irr H | A⊆Ker θ, θ≠1}`(`A⊴G` ゆえ conj-invariant)上で合成。(6.2) step (ii) を Sibley 適用形で landed。⟹ (6.2) は **B1(enum 仮説)+ θ-bound + これ** で組める(残 = enum 構成のみ)。
+
 **genuinely 残る char-bound gap = 1 件のみ (member-family enum)**:
 🔴 **member-family enum 構成 + (6.2)/(6.3) assembly** — B1 が消費する S(A)/S₁ 列挙 (s/χmem/deg + ~15 orthogonality/support/gen/S₁-membership 仮説; S₁/S₂ from (C.b))。これを構成して B1+B2+θ-bound を組めば (6.2) `2|L:C|√|C:D|≥|K:A|−1`、minimal-A 帰納で (6.3) char-bound。**B1/B2/θ-bound/算術は全 landed**ゆえ、char-bound (= (6.5) の唯一の残) は **member-family enum 構成だけにブロックされる**。enum は **capstone glue/hstepData と共有の核** (Frobenius case では全 Ind θ 既約ゆえ S(A)={distinct Ind θ}、enum はその列挙)。X-chain 側 enum (`xAdjoinStepInput_of_memberFamily_*`) は Irr-L X-side で別物だが構造類似。**= 全 (6.8) capstone 残務の単一 bottleneck**。
 

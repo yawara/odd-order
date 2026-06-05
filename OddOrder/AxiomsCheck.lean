@@ -1875,6 +1875,10 @@ set_option linter.style.longLine false in
 -- full (6.2) θ-bound: a-half × b-half + √ arithmetic ⟹ `θ(1) ≤ |K:C|·√|C:D|` (constituent kernel
 -- inheritance discharges the b-half's `N ⊆ Ker φ` from `N ⊆ Ker(Res θ)`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_sqrt_index
+-- (6.2) step (ii), B2 assembled: the `S(A)` degree-sum `∑_{χ∈S(A)} χ(1)²/‖χ‖² = [G:H]·(|H:A|−1)`,
+-- combining the orbit-counted `sum_div_normSq_induce_image_eq` with the inflation degree-sum
+-- `sumInflatedDegreeSq_ntrivial` over the (conjugation-invariant, as `A ⊴ G`) kernel-filter `T`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent

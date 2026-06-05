@@ -1682,6 +1682,65 @@ theorem coherentDegreeSumBound_of_not_coherent
     hmemconjortho hmemortho hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
 open scoped Classical in
+/-- **Peterfalvi (6.2), step (ii) — the `S(A)` degree-sum (B2 assembled).**
+For `H ⊴ G`, `A ⊴ G`, `A ≤ H`, the induced family
+`S(A) = {Ind_H^G θ | θ ∈ Irr H, A ⊆ Ker θ, θ ≠ 1}` satisfies
+`∑_{χ ∈ S(A)} χ(1)²/‖χ‖² = [G:H]·(|H : A| − 1)`.
+
+This assembles the orbit-counted identity `sum_div_normSq_induce_image_eq`
+(`∑ = [G:H]·∑_{θ∈T}θ(1)²`, fibres of `θ ↦ Ind θ` are `G`-conjugacy orbits) with the inflation
+degree-sum `sumInflatedDegreeSq_ntrivial` (`∑_{θ∈T}θ(1)² = |H ⧸ A| − 1`, Burnside on `H ⧸ A`).
+The index set `T = {θ ∈ Irr H | A ⊆ Ker θ, θ ≠ 1}` is `G`-conjugation-invariant because `A ⊴ G`:
+`Ker(θ^g) = g·(Ker θ)·g⁻¹ ⊇ g·A·g⁻¹ = A`.  This is the (6.2) input "step (ii)" that, with the
+(5.6) bound B1 and the θ-bound, yields `2|L:C|√|C:D| ≥ |K:A| − 1`. -/
+theorem sum_div_normSq_induce_kernelFilter_eq {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {H : Subgroup G} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
+    {A : Subgroup G} [A.Normal] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        χ 1 ^ 2 / ClassFunction.inner χ χ
+      = (H.index : ℂ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℂ) - 1) := by
+  classical
+  have hconj : ∀ θ ∈ Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+      (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H),
+      ∀ g : G, IrreducibleCharacter.conjBy g θ ∈ Finset.univ.filter
+        (fun θ : IrreducibleCharacter ↥H =>
+          (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H) := by
+    intro θ hθ g
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hθ ⊢
+    obtain ⟨hker, hne⟩ := hθ
+    refine ⟨?_, ?_⟩
+    · -- `A ⊆ Ker(θ^g)`: each `a ∈ A` has `g·a·g⁻¹ ∈ A ⊆ Ker θ`.
+      intro a ha
+      have hmemA : (⟨g * (a : G) * g⁻¹, ‹H.Normal›.conj_mem (a : G) a.2 g⟩ : ↥H)
+          ∈ A.subgroupOf H := by
+        rw [Subgroup.mem_subgroupOf]
+        exact ‹A.Normal›.conj_mem (a : G) (Subgroup.mem_subgroupOf.mp ha) g
+      have hk := hker hmemA
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hk
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def, conjBy_apply_one,
+        IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply, hk,
+        OddOrder.Peterfalvi.S03.characterDegree_def]
+    · -- `θ^g ≠ 1`: conjugation is injective and fixes the trivial character.
+      intro hc
+      apply hne
+      have h1 : IrreducibleCharacter.conjBy g⁻¹ (IrreducibleCharacter.conjBy g θ) = θ := by
+        rw [← IrreducibleCharacter.conjBy_mul, mul_inv_cancel, IrreducibleCharacter.conjBy_one]
+      rw [← h1, hc, IrreducibleCharacter.ext_iff]
+      ext h
+      rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply]
+      simp
+  rw [sum_div_normSq_induce_image_eq _ hconj]
+  congr 1
+  exact sumInflatedDegreeSq_ntrivial (N := A.subgroupOf H)
+
+open scoped Classical in
 /-- **(T-A2 input) Per-step `xAdjoinStep` data bundle.**
 
 Bundles the `xAdjoinStep` premises for one adjoining step of the X-family chain — the member family
