@@ -2583,6 +2583,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.u_le_full_cyclotomic
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.two_q_lt_u
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.cyclotomic_ratio_gt_of_q_lt_p
 set_option linter.style.longLine false in
@@ -2597,6 +2598,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_T_caseB
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.norm_cascade_contradiction_of_caseB_data
 
 -- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
 -- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
