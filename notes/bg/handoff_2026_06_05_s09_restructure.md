@@ -105,7 +105,17 @@ exact hne (hUniq.eq_of_isCoatom_of_le (mem_maximalSubgroups.mp hMstar.1) hN0Msta
 - `⁅P, N_G(P)⁆ ≤ P` (P⊴N_G(P)): mathlib `Subgroup.commutator_le_...` か normal 経由。
 - `IsPGroup.to_le`/部分群版: `IsPGroup p P → P0≤P → IsPGroup p ↥P0` (`IsPGroup.to_subgroup`/`.of_le` 要確認)。
 - `∃ M*∈𝓜(C_G({x}))`: C_G({x})<⊤ から maximal を取る (`exists_maximalSubgroupsContaining`? なければ coatom 存在 `IsCoatom` via Zorn/Finite)。`omega1OfAbelian_le : W≤A`。`not_isCyclic_omega1OfAbelian_of_three_le_pRank` は `3≤pRank A p` (= `three_le_rank` + `three_le_pRank_of_isPGroup_of_three_le_rank`) 要。
-- **SUB-ASSEMBLY 2 (Frattini 低rank `M'≤N_G(P0)`, BG L2617)**: `M'=O_{p'}(F(M'))·N_{M'}(P)`。Thm 4.20a (`derived_le_fitting_of_rank_fitting_le_two`, 私の新補題; 低rank ⟹ rank F(M')≤2 full) で M''≤F(M'); M'/M'' abelian で FP⊴M'; Frattini (`Sylow.normalizer_sup_eq_top'` 系) で M'=FP·N_{M'}(P); F=O_p(F)·O_{p'}(F), O_p(F)≤P ⟹ M'=O_{p'}(F)·N_{M'}(P); (9.11) で O_{p'}(F)≤C_G(P0)≤N_G(P0), N_{M'}(P)≤N_G(P)≤N_G(P0) (P0⊴N_G(P)) ⟹ M'≤N_G(P0)。**~50-70 行・最重・要 Fitting nilpotent decomposition + Frattini**。これが Phase B の本丸残件。
+- **SUB-ASSEMBLY 2 (Frattini 低rank `M'≤N_G(P0)`, BG L2615-2619) = 唯一の残 sorry (S09_Lemma95:2479)**:
+  ✅✅ **body は組み上がり (commit 615aec6), Lemma 9.5 は構造的に完成、残るは此の 1 step のみ**。証明手順:
+  1. `r_p(F(M'))≤2` = `pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM'.1 hA hAnot`。
+  2. `rank(O_{p'}(F(M')))≤2` (¬h3D, branch 仮説)。1+2 ⟹ **rank F(M')≤2 (全素数)** (r_q(F)=r_q(O_{p'}(F))≤2 for q≠p)。
+  3. Thm 4.20a `derived_le_fitting_of_rank_fitting_le_two` を **↥M'** に適用 (M' solvable=`hG.solvable_of_mem_maximalSubgroups hM'.1`, odd, `rank F(↥M')≤2` は fittingInG↔fitting bridge で 2 から; package bridge と同パターン) ⟹ `commutator ↥M' ≤ fitting ↥M'` (= M''≤F)。
+  4. M'/M'' abelian; F⊇M'' ⟹ `F⊔P ⊴ M'` (abelian quotient で全部分群 normal)。P≤M' (hNPM'+le_normalizer)。
+  5. P は F⊔P の Sylow-p (P=G の Sylow-p, P≤F⊔P ⟹ |P|=|F⊔P|_p)。
+  6. Frattini (`Sylow.normalizer_sup_eq_top'` 系) で `M' = (F⊔P)·N_{M'}(P)`。
+  7. F nilpotent = `O_p(F)·O_{p'}(F)`, `O_p(F)≤P` ⟹ `M' = O_{p'}(F)·N_{M'}(P)`。
+  8. (9.11) `p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package` で `O_{p'}(F)=opiCoreInG{p}ᶜ(fittingInG M') ≤ C_G(P0) ≤ N_G(P0)`; `N_{M'}(P)≤N_G(P)≤N_G(P0)` (P0=⁅P,N_G(P)⁆⊴N_G(P))。⟹ `M'≤N_G(P0)`。
+  **~80-100 行・最重・要 Thm 4.20a(↥M')+Fitting nilpotent 分解(O_p×O_{p'})+Frattini+部分群積**。subtype ↥M' の subgroupOf 操作が intricate。これが §9 完全 close の唯一残件。
 
 ---
 
