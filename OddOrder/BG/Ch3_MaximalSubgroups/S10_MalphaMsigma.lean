@@ -247,6 +247,142 @@ theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [F
     Ch1.hasPLengthOne p ↥H := by
   sorry
 
+/-! ### Theorem 10.1 用の補助補題 -/
+
+/-- Conjugation by `c ∈ M` commutes with the inclusion `M.subtype`: `(c • K)` mapped into `G`
+equals `↑c`-conjugation of `K` mapped into `G`. The basic equivariance used throughout §10
+to move between conjugation inside `↥M` and conjugation in `G`. -/
+private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M) (K : Subgroup ↥M) :
+    (MulAut.conj c • K).map M.subtype = MulAut.conj (c : G) • (K.map M.subtype) := by
+  have hcomp : (MulAut.conj (c : G)).toMonoidHom.comp M.subtype
+      = M.subtype.comp (MulAut.conj c).toMonoidHom := by
+    ext x
+    simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+      Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
+  show (K.map (MulAut.conj c).toMonoidHom).map M.subtype
+      = (K.map M.subtype).map (MulAut.conj (c : G)).toMonoidHom
+  rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+
+/-- **σ basic fact** (mmd L2655): if `p ∈ σ(M)`, then for *every* Sylow `p`-subgroup `Q` of `M`
+the `G`-normalizer of its image lies in `M`. The definition of `σ(M)` provides one such Sylow `P`;
+every other `Q` is `M`-conjugate to it (`Q = m • P`, `m ∈ M`), and `N_G(·)` is
+conjugation-equivariant. -/
+private theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) (Q : Sylow p ↥M) :
+    Subgroup.normalizer (((Q : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) ≤ M := by
+  classical
+  obtain ⟨-, P, hP⟩ := hp
+  obtain ⟨m, hm⟩ := MulAction.exists_smul_eq (↥M) P Q
+  -- `Q̄ = conj ↑m • P̄ = P̄.map (conj ↑m)`: conjugation commutes with `M.subtype`.
+  have hQeq : ((Q : Subgroup ↥M).map M.subtype : Subgroup G)
+      = ((P : Subgroup ↥M).map M.subtype).map (MulAut.conj (m : G)).toMonoidHom := by
+    have hQ : (Q : Subgroup ↥M) = MulAut.conj m • (P : Subgroup ↥M) := by
+      rw [← hm]; exact Sylow.coe_subgroup_smul
+    rw [hQ, map_subtype_conj_smul]; rfl
+  -- `N_G(Q̄) = N_G(P̄).map (conj ↑m) ≤ M.map (conj ↑m) = M`.
+  have hbij : Function.Bijective (MulAut.conj (m : G)).toMonoidHom :=
+    (MulAut.conj (m : G)).bijective
+  have hnorm : Subgroup.normalizer (((Q : Subgroup ↥M).map M.subtype : Subgroup G) : Set G)
+      = (Subgroup.normalizer (((P : Subgroup ↥M).map M.subtype : Subgroup G) : Set G)).map
+          (MulAut.conj (m : G)).toMonoidHom := by
+    rw [hQeq, ← Subgroup.map_normalizer_eq_of_bijective _ hbij]
+  rw [hnorm]
+  intro g hg
+  obtain ⟨n, hn, rfl⟩ := Subgroup.mem_map.mp hg
+  have hnM : n ∈ M := hP hn
+  -- `(conj ↑m).toMonoidHom n = ↑m * n * ↑m⁻¹ ∈ M`
+  have : (MulAut.conj (m : G)).toMonoidHom n = (m : G) * n * (m : G)⁻¹ := by
+    simp [MulAut.conj_apply]
+  rw [this]
+  exact M.mul_mem (M.mul_mem m.2 hnM) (M.inv_mem m.2)
+
+/-- **BG Theorem 10.1(d)** (mmd L2665): for `p ∈ σ(M)` and `X = P̄` a Sylow `p`-subgroup of `M`,
+if a `G`-conjugate `X^g` lies in `M` then `g ∈ M`. Both `X` and `X^g` are Sylow `p`-subgroups of
+`M`, hence `M`-conjugate; the conjugating discrepancy normalizes `X`, and `N_G(X) ≤ M` (σ). -/
+private theorem fusion_d_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M)
+    (P : Sylow p ↥M) {g : G}
+    (hg : MulAut.conj g • ((P : Subgroup ↥M).map M.subtype) ≤ M) : g ∈ M := by
+  classical
+  set X : Subgroup G := (P : Subgroup ↥M).map M.subtype with hXdef
+  have hcardX : Nat.card ↥X = p ^ (Nat.card ↥M).factorization p := by
+    rw [hXdef, Subgroup.card_map_of_injective M.subtype_injective]
+    exact P.card_eq_multiplicity
+  -- `Ȳ = (conj g • X).subgroupOf M` is a Sylow-`p` of `↥M`.
+  have hcardConj : Nat.card ↥(MulAut.conj g • X) = Nat.card ↥X :=
+    Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have hcardY : Nat.card ↥((MulAut.conj g • X).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hg).toEquiv, hcardConj, hcardX]
+  let PY : Sylow p ↥M := Sylow.ofCard ((MulAut.conj g • X).subgroupOf M) hcardY
+  -- Sylow conjugacy in `↥M`: `c • P = PY` for some `c ∈ M`.
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq (↥M) P PY
+  have hPY : ((PY : Subgroup ↥M).map M.subtype : Subgroup G) = MulAut.conj g • X := by
+    show (((MulAut.conj g • X).subgroupOf M : Subgroup ↥M).map M.subtype) = MulAut.conj g • X
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hg]
+  -- transport to `G`: `conj ↑c • X = conj g • X`.
+  have hconj : MulAut.conj (c : G) • X = MulAut.conj g • X := by
+    have h1 : (PY : Subgroup ↥M) = MulAut.conj c • (P : Subgroup ↥M) := by
+      rw [← hc]; exact Sylow.coe_subgroup_smul
+    rw [← hPY, h1, map_subtype_conj_smul, ← hXdef]
+  -- `↑c⁻¹ * g` normalizes `X`, so lies in `N_G(X) ≤ M`; and `↑c ∈ M`.
+  have hstab : MulAut.conj ((c : G)⁻¹ * g) • X = X := by
+    rw [map_mul, mul_smul, ← hconj, ← mul_smul, ← map_mul]
+    simp
+  have hnM : ((c : G)⁻¹ * g) ∈ M :=
+    normalizer_sylow_map_le_of_mem_sigma hp P (mem_normalizer_of_conj_smul_eq_self hstab)
+  have hg_eq : g = (c : G) * ((c : G)⁻¹ * g) := by group
+  rw [hg_eq]
+  exact M.mul_mem c.2 hnM
+
+/-- A maximal subgroup of a minimal simple group is self-normalizing: `N_G(M) ≤ M`.
+(`M` is a coatom; if `M < N_G(M)` then `N_G(M) = ⊤`, so `M ⊴ G`, forcing `M ∈ {⊥, ⊤}` by
+simplicity — both impossible: `M = ⊤` contradicts the coatom, and `M = ⊥` makes `G` cyclic of
+prime order, contradicting non-solvability.) -/
+private theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer (M : Set G) ≤ M := by
+  have hco : IsCoatom M := mem_maximalSubgroups.mp hM
+  rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
+  · exact heq.ge
+  · exfalso
+    have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop'
+    · -- `M = ⊥`: every nontrivial subgroup is `⊤`, so `G` is cyclic, hence solvable.
+      have hco' : ∀ b : Subgroup G, ⊥ < b → b = ⊤ := by rw [← hbot]; exact hco.2
+      haveI : Nontrivial G := hG.simple.toNontrivial
+      obtain ⟨g, hg1⟩ := exists_ne (1 : G)
+      have hgtop : Subgroup.zpowers g = ⊤ :=
+        hco' _ (bot_lt_iff_ne_bot.mpr (fun h => hg1 (Subgroup.zpowers_eq_bot.mp h)))
+      have hcomm : ∀ a b : G, a * b = b * a := by
+        intro a b
+        obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top a)
+        obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hgtop ▸ Subgroup.mem_top b)
+        rw [← zpow_add, ← zpow_add, add_comm]
+      exact hG.notSolvable (isSolvable_of_comm hcomm)
+    · exact hco.1 htop'
+
+/-- **BG Theorem 10.1 part-(b) input** (mmd L2697-2699): for a proper subgroup `L < ⊤` and a
+Sylow `p`-subgroup `P` of `L` with `rank P ≤ 2`, the Frattini decomposition
+`L = O_{p'}(L) · N_L(P)` holds. `L` is solvable (proper subgroup of a minimal simple group),
+so Theorem 4.18(e) gives `L` `p`-length one, and the §6 Frattini lemma applies. -/
+private theorem frattini_decomp_of_rank_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hL : L < ⊤) {p : ℕ} [Fact p.Prime] (P : Sylow p ↥L)
+    (hp_dvd : p ∣ Nat.card ↥L) (hrank : rank ↥(P : Subgroup ↥L) ≤ 2) :
+    (⊤ : Subgroup ↥L)
+      = Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L ⊔ Subgroup.normalizer (P : Subgroup ↥L) := by
+  haveI : IsSolvable ↥L := hG.solvable_of_lt_top L hL
+  have hodd : Odd (Nat.card ↥L) := by
+    rcases Nat.even_or_odd (Nat.card ↥L) with he | ho
+    · exact absurd (he.two_dvd.trans (Subgroup.card_subgroup_dvd_card L))
+        (by have := hG.odd; rw [Nat.odd_iff] at this; omega)
+    · exact ho
+  have hpr : pRank ↥L p ≤ 2 := by
+    rw [← pRank_sylow_eq P]; exact (pRank_le_rank p).trans hrank
+  have hpl1 : Ch1.hasPLengthOne p ↥L :=
+    (Ch1.S04.solvable_structure_of_pRank_le_two hodd hp_dvd hpr).2.2.2.2.2
+  exact Ch1.S06.top_eq_oPiPrimeCore_sup_normalizer_sylow P hpl1
+
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
 
 /-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。

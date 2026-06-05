@@ -1,5 +1,30 @@
 # BG §10: The Subgroups M_α and M_σ — mini-roadmap
 
+## ✅ 2026-06-05 着手 — 依存 DAG 検証 + Thm 10.1 を first target に確定 (§9 完成で解禁)
+
+**§9 (Uniqueness Thm 9.6) 完成 (commit 12ae441) で §10 解禁**。§10 = 18 scaffold sorry の大型節。
+mmd L2657-2743 精読で **依存順序を検証** (本ノートの旧「Thm 10.1 が p-length-1 を要し Thm 10.6 で自動 →
+循環?」は **誤り = red herring**):
+
+- **Thm 10.1 (`fusion_control_of_mem_sigma`) = §10 keystone・first target・今 unblocked**。proof (mmd L2665-2711):
+  (d) 先 (Sylow 共役 + `N_G(X)⊆M`) → (b)⟹(a)(c)(e) → (b) は **maximal-order counterexample X の帰納**。
+  使う上流 = **Thm 9.6 (✅)** [r(P)≥3 分岐で P∈𝒰⟹L⊆M で矛盾] + **Thm 4.18(e)** [r(P)≤2 分岐] + Frattini。
+  **Thm 10.6 (p-length-1) は使わない** (10.1→10.6 の循環は無い; 逆に 10.6 が 10.2→10.1 に依存)。
+- **prerequisite 検証済 (repo 内 全存在)**:
+  - Thm 9.6 = `Ch2.S09.uniquenessTheorem` / `scn3_isUniquelyMaximal` (✅ 2026-06-05)。
+  - **Thm 4.18(e)** = `S04.solvable_structure_of_pRank_le_two` (S04g:878) の第5連言 `hasPLengthOne p L`
+    (+ `G/O_{p',p}` abelian)。L=N_G(X) は proper⊆min-simple ⟹ solvable+odd, P 非自明で p∣|L|, r_p(L)=r(P)≤2。
+  - **L=N_L(P)·O_{p'}(L) (Frattini step, mmd L2699)**: `hasPLengthOne p L` + **§6 Lemma 6.6 foundation**
+    `S06.oPiPrimePiCore_eq_oPiPrimeCore_sup_sylow` (O_{p',p}=O_{p'}⊔S) + Frattini で導く
+    (P=Sylow-p of O_{p',p}(L), O_{p'}(L)∩X=1 ⟹ O_{p'}(L)⊆C_G(X))。
+  - **Focal Subgroup Thm (Thm 1.17 BG)** = `Ch05.focalSubgroupTheorem` (Thm 10.2 用、10.1 では未使用)。
+  - **σ 基本** (mmd L2655): p∈σ(M)⟹∀ Sylow-p P of M, N_G(P)⊆M ∧ P=Sylow-p of G。`mem_sigma_iff` (S10:149)
+    は「∃ Sylow」形 ⟹ 共役で「∀ Sylow」へ拡張する小補題が要 (N_G 共役同変)。
+- **攻略順 (BG-faithful)**: Thm 10.1 → Thm 10.2 (10.1 + Focal + Thm 4.20) → Thm 10.6 (10.2 + 4.18 + 3.6)
+  → Cor 10.7 (10.1 + 10.6 + Lem 6.6) → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
+- **規模**: Thm 10.1 単独で BG ~50 行 = Lean 推定 250-400 行 (maximal-counterexample 帰納 + Sylow/conj
+  bookkeeping + 5-part 連言)。dedicated 着手単位。issue 化推奨。
+
 ## 2026-06-02 B7 foundation checkpoint
 
 Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean`.

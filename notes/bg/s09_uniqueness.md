@@ -1,5 +1,16 @@
 # BG §9: The Uniqueness Theorem — mini-roadmap (FT critical)
 
+## ✅✅✅ 2026-06-05 (続) — BG §9 完全 sorry-free 達成
+
+**`scn3_isUniquelyMaximal` (Lemma 9.5) 完成 = §9 全 6 結果 (9.1-9.6) 実 sorry 0**。axiom-clean
+([propext,Classical.choice,Quot.sound]、#print 確認)、full build 3580 green。最後の gap だった SUB-ASSEMBLY 2
+(Frattini 低rank `M'≤N_G(P0)`, BG L2615-2619) を実装。詳細・proof 骨格・Lean 罠 = `handoff_2026_06_05_s09_restructure.md`
+冒頭「✅✅✅ 完了」節。新 private helper 4 本 (`map_conj_eq_self_of_mem_normalizer` / `normalizer_le_normalizer_commutator_normalizer`
+/ `top_le_oPiCore_singleton_sup_compl_of_isNilpotent` / `fittingInG_le_opiCoreInG_sup_compl`、S09_Lemma95:2488-2566)。
+**§9 解禁 → 次 BG spine = §10 (M_α/M_σ; Thm 9.6 引用)**。以下は (旧) 経緯記録。
+
+---
+
 **スコープ**: BG §9 (pp.64-68 in PDF), mmd L2486-2630. 6 結果を扱う.
 **形式化先 (予定)**: `OddOrder/BG/Ch2_Uniqueness/S09_Uniqueness.lean`
 **ROADMAP 上の位置**: Phase 2a 第 3 波（§8 完成必須）

@@ -2406,6 +2406,160 @@ private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
       (Nat.pow_eq_one.mp hcard.symm).resolve_left (Fact.out : p.Prime).ne_one
     exact ((Fact.out : p.Prime).factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd).ne' hfact0
 
+/-- In a finite nilpotent group `N`, the `q`-rank for `q ≠ p` is realized inside the `p'`-core
+`O_{p'}(N)` (the `q`-Sylow is normal, a `{r ≠ p}`-group, hence lies in `O_{p'}(N)`). -/
+private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
+    {N : Type*} [Group N] [Finite N] [Group.IsNilpotent N] {p q : ℕ} [Fact q.Prime] (hqp : q ≠ p) :
+    pRank N q ≤ pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} N) q := by
+  classical
+  obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
+  have hiff : Group.IsNilpotent N ↔
+      ∀ (p' : ℕ) (_hp : Fact p'.Prime) (P : Sylow p' N), (↑P : Subgroup N).Normal :=
+    (isNilpotent_of_finite_tfae (G := N)).out 0 3
+  haveI hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
+  have hSpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (S : Subgroup N) := by
+    intro r hr
+    obtain ⟨k, hk⟩ := S.isPGroup'.exists_card_eq
+    rw [hk, Nat.mem_primeFactors] at hr
+    have hrq : r = q :=
+      (Nat.prime_dvd_prime_iff_eq hr.1 (Fact.out : q.Prime)).mp (hr.1.dvd_of_dvd_pow hr.2.1)
+    show r ≠ p
+    rw [hrq]; exact hqp
+  have hScore : (S : Subgroup N) ≤ Ch03.oPiCore {r : ℕ | r ≠ p} N := hSpi.le_oPiCore
+  calc pRank N q = pRank ↥(S : Subgroup N) q := (pRank_sylow_eq S).symm
+    _ ≤ pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} N) q :=
+        pRank_le_of_injective (Subgroup.inclusion_injective hScore)
+
+/-- If `r_p(F(M)) ≤ 2` and the `p'`-core `O_{p'}(F(M))` has rank ≤ 2, then `F(M)` itself has
+rank ≤ 2 (for `q ≠ p`, `F(M)`'s `q`-rank lives in `O_{p'}(F(M))` since `F(M)` is nilpotent). -/
+private theorem rank_fitting_subtype_le_two_of_low_rank
+    [Finite G] {p : ℕ} [Fact p.Prime] {M : Subgroup G}
+    (hp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
+    rank ↥(Ch01.fitting ↥M) ≤ 2 := by
+  classical
+  haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+  have hcompl : (({p} : Set ℕ)ᶜ) = {r : ℕ | r ≠ p} := by
+    ext r; simp [Set.mem_compl_iff, Set.mem_singleton_iff]
+  refine (rank_le_of_injective
+    (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype
+      M.subtype_injective).toMonoidHom)
+    (Subgroup.equivMapOfInjective _ _ M.subtype_injective).injective).trans ?_
+  rw [rank_le_iff]
+  intro q hq
+  haveI : Fact q.Prime := ⟨hq⟩
+  by_cases hqp : q = p
+  · subst hqp; exact hp
+  · have h1 : pRank ↥(S08.fittingInG M) q ≤
+        pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} ↥(S08.fittingInG M)) q :=
+      pRank_le_pRank_oPiCore_compl_of_nilpotent hqp
+    have h2 : pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} ↥(S08.fittingInG M)) q ≤
+        pRank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) q := by
+      rw [← hcompl]
+      exact pRank_le_of_injective
+        (f := (Subgroup.equivMapOfInjective (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(S08.fittingInG M))
+          (S08.fittingInG M).subtype (S08.fittingInG M).subtype_injective).toMonoidHom)
+        (Subgroup.equivMapOfInjective _ _ (S08.fittingInG M).subtype_injective).injective
+    exact (h1.trans h2).trans ((pRank_le_rank q).trans hp')
+
+/-- BG Lemma 9.5 low-rank, the `M'' ≤ F(M')` step (BG L2615 "By Theorem 4.20, M''⊆F"): a maximal
+`M` of the minimal simple odd `G` with `r_p(F(M)) ≤ 2` and `rank O_{p'}(F(M)) ≤ 2` (so
+`rank F(M) ≤ 2`) satisfies `M' ≤ F(M)` in `G`-coordinates. -/
+private theorem derivedInG_le_fittingInG_of_low_rank
+    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {A M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hAM : A ≤ M) (hAne : A ≠ ⊥)
+    (hp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
+    derivedInG M ≤ S08.fittingInG M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : Nontrivial ↥M :=
+    (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 => hAne (le_bot_iff.mp (hM0 ▸ hAM))
+  have hoddM : Odd (Nat.card ↥M) := by
+    rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
+    · exact absurd (he.two_dvd.trans (Subgroup.card_subgroup_dvd_card M))
+        (by have := hG.odd; rw [Nat.odd_iff] at this; omega)
+    · exact ho
+  have hderiv : commutator ↥M ≤ Ch01.fitting ↥M :=
+    OddOrder.BG.Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hoddM
+      (rank_fitting_subtype_le_two_of_low_rank hp hp')
+  exact Subgroup.map_mono hderiv
+
+/-- If `g` normalizes `K`, then conjugation by `g` fixes `K` setwise. -/
+private theorem map_conj_eq_self_of_mem_normalizer {g : G} {K : Subgroup G}
+    (hg : g ∈ Subgroup.normalizer (K : Set G)) :
+    K.map (MulAut.conj g).toMonoidHom = K := by
+  ext y
+  simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+  constructor
+  · rintro ⟨z, hz, rfl⟩
+    exact (Subgroup.mem_normalizer_iff.mp hg z).mp hz
+  · intro hy
+    exact ⟨g⁻¹ * y * g, (Subgroup.mem_normalizer_iff''.mp hg y).mp hy, by group⟩
+
+/-- `N_G(H)` normalizes the commutator `⁅H, N_G(H)⁆`: conjugation by an element of
+`N_G(H)` fixes both `H` and `N_G(H)`, hence fixes their commutator. -/
+private theorem normalizer_le_normalizer_commutator_normalizer (H : Subgroup G) :
+    Subgroup.normalizer (H : Set G) ≤
+      Subgroup.normalizer
+        ((⁅H, Subgroup.normalizer (H : Set G)⁆ : Subgroup G) : Set G) := by
+  intro g hg
+  have key : (⁅H, Subgroup.normalizer (H : Set G)⁆).map (MulAut.conj g).toMonoidHom
+      = ⁅H, Subgroup.normalizer (H : Set G)⁆ := by
+    rw [Subgroup.map_commutator, map_conj_eq_self_of_mem_normalizer hg,
+      map_conj_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)]
+  rw [Subgroup.mem_normalizer_iff]
+  intro h
+  constructor
+  · intro hh
+    have hmem : (MulAut.conj g) h ∈
+        (⁅H, Subgroup.normalizer (H : Set G)⁆).map (MulAut.conj g).toMonoidHom :=
+      Subgroup.mem_map.mpr ⟨h, hh, rfl⟩
+    rw [key] at hmem
+    simpa [MulAut.conj_apply] using hmem
+  · intro hh
+    have hmem : (MulAut.conj g) h ∈ ⁅H, Subgroup.normalizer (H : Set G)⁆ := by
+      simpa [MulAut.conj_apply] using hh
+    rw [← key, Subgroup.mem_map] at hmem
+    obtain ⟨z, hz, hzeq⟩ := hmem
+    have hzh : z = h := (MulAut.conj g).injective (by
+      simpa [MulEquiv.coe_toMonoidHom] using hzeq)
+    rwa [hzh] at hz
+
+/-- A finite nilpotent group is generated by its `p`-core and its `p'`-core. -/
+private theorem top_le_oPiCore_singleton_sup_compl_of_isNilpotent
+    {K : Type*} [Group K] [Finite K] [Group.IsNilpotent K] (p : ℕ) :
+    (⊤ : Subgroup K) ≤
+      Ch03.oPiCore ({p} : Set ℕ) K ⊔ Ch03.oPiCore (({p} : Set ℕ)ᶜ) K := by
+  classical
+  have hfit : Ch01.fitting K = ⊤ := by
+    refine top_le_iff.mp ?_
+    haveI : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
+    exact Ch01.nilpotent_normal_le_fitting
+  rw [← hfit, Ch01.fitting_eq_iSup_primeFactors]
+  refine iSup_le fun q => ?_
+  obtain ⟨qval, hq_mem⟩ := q
+  haveI : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
+  rw [show (Ch01.opCore qval K) = Ch03.oPiCore ({qval} : Set ℕ) K from
+      (Ch04.oPiCore_singleton_eq_opCore qval).symm]
+  by_cases hqeq : qval = p
+  · exact le_sup_of_le_left
+      (Ch03.oPiCore_mono (Set.singleton_subset_iff.mpr (Set.mem_singleton_iff.mpr hqeq)) K)
+  · exact le_sup_of_le_right
+      (Ch03.oPiCore_mono
+        (Set.singleton_subset_iff.mpr (Set.mem_compl_singleton_iff.mpr hqeq)) K)
+
+/-- `F(M) ≤ O_p(F(M)) ⊔ O_{p'}(F(M))` in the ambient group: `F(M)` is nilpotent, so it
+is generated by its `p`-core and `p'`-core. -/
+private theorem fittingInG_le_opiCoreInG_sup_compl [Finite G] (p : ℕ) (M : Subgroup G) :
+    S08.fittingInG M ≤ opiCoreInG ({p} : Set ℕ) (S08.fittingInG M)
+      ⊔ opiCoreInG (({p} : Set ℕ)ᶜ) (S08.fittingInG M) := by
+  classical
+  haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+  have hmap := Subgroup.map_mono (f := (S08.fittingInG M).subtype)
+    (top_le_oPiCore_singleton_sup_compl_of_isNilpotent (K := ↥(S08.fittingInG M)) p)
+  rw [Subgroup.map_sup, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  exact hmap
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
@@ -2476,7 +2630,81 @@ theorem scn3_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
       -- TODO(§9 Phase B sub-assembly 2): the Frattini decomposition. `derived_le_fitting_of_rank_fitting_le_two`
       -- (Thm 4.20a) applies since `r_p(F)≤2` (here) + `r(O_{p'}(F))≤2` (¬h3D) ⟹ `rank F(M')≤2` (full).
       have hMN0 : M' ≤ Subgroup.normalizer (P0 : Set G) := by
-        sorry
+        -- `(9.6)`: `r_p(F(M')) ≤ 2`, and `¬ h3D` gives `rank O_{p'}(F(M')) ≤ 2`.
+        have hpr : pRank ↥(S08.fittingInG M') p ≤ 2 :=
+          pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM'.1 hA hAnot
+        have hpr' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M')) ≤ 2 := by omega
+        have hAM' : A ≤ M' := hA_le_C.trans hM'.2
+        have hPM' : (P : Subgroup G) ≤ M' := Subgroup.le_normalizer.trans hNPM'
+        -- Theorem 4.20(a) inside `↥M'`: `M'' ≤ F(M')`, i.e. `commutator ↥M' ≤ fitting ↥M'`.
+        have hderiv : derivedInG M' ≤ S08.fittingInG M' :=
+          derivedInG_le_fittingInG_of_low_rank hG hM'.1 hAM' hAne hpr hpr'
+        have hcomm_le : commutator ↥M' ≤ Ch01.fitting ↥M' :=
+          (Subgroup.map_le_map_iff_of_injective M'.subtype_injective).mp hderiv
+        -- `P` as a Sylow `p`-subgroup of `↥M'`, and `FP = F(M') ⊔ P ⊴ M'`.
+        let PM' : Sylow p ↥M' := PG.subtype hPM'
+        have hPM'coe : (PM' : Subgroup ↥M') = (P : Subgroup G).subgroupOf M' :=
+          PG.coe_subtype hPM'
+        set FP : Subgroup ↥M' := Ch01.fitting ↥M' ⊔ (P : Subgroup G).subgroupOf M' with hFPdef
+        have hcomm_FP : commutator ↥M' ≤ FP := by
+          rw [hFPdef]; exact hcomm_le.trans le_sup_left
+        haveI hFPnorm : FP.Normal :=
+          Subgroup.Normal.of_commutator_le (G := ↥M') (H := FP) hcomm_FP
+        have hPM'_le_FP : (PM' : Subgroup ↥M') ≤ FP := by rw [hPM'coe]; exact le_sup_right
+        -- Frattini argument in `↥M'`: `N_{M'}(P) ⊔ FP = ⊤`.
+        have hFrat : Subgroup.normalizer ((PM' : Subgroup ↥M') : Set ↥M') ⊔ FP = ⊤ :=
+          Sylow.normalizer_sup_eq_top' PM' hPM'_le_FP
+        -- `N_G(P) ≤ N_G(P₀)` (conjugation preserves `P₀ = ⁅P, N_G(P)⁆`), hence `P ≤ N_G(P₀)`.
+        have hNP_NP0 : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤
+            Subgroup.normalizer (P0 : Set G) :=
+          normalizer_le_normalizer_commutator_normalizer (P : Subgroup G)
+        have hP_NP0 : (P : Subgroup G) ≤ Subgroup.normalizer (P0 : Set G) :=
+          Subgroup.le_normalizer.trans hNP_NP0
+        -- `O_p(F(M')) ≤ P`: a normal `p`-subgroup of `↥M'` lies in the Sylow `P`.
+        have hOp_le_P : opiCoreInG ({p} : Set ℕ) (S08.fittingInG M') ≤ (P : Subgroup G) := by
+          set Op : Subgroup G := opiCoreInG ({p} : Set ℕ) (S08.fittingInG M') with hOpdef
+          have hOp_le_M' : Op ≤ M' := (opiCoreInG_le _ _).trans (S08.fittingInG_le M')
+          have hM'_norm_F : M' ≤ Subgroup.normalizer ((S08.fittingInG M') : Set G) :=
+            fun x hx => S08.mem_normalizer_fittingInG_of_mem hx
+          have hM'_norm_Op : M' ≤ Subgroup.normalizer (Op : Set G) :=
+            le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ) hM'_norm_F
+          haveI hOpnorm : (Op.subgroupOf M').Normal :=
+            (Subgroup.normal_subgroupOf_iff_le_normalizer hOp_le_M').mpr hM'_norm_Op
+          have hOpp : IsPGroup p ↥(Op.subgroupOf M') :=
+            (isPGroup_opiCoreInG_singleton (S08.fittingInG M')).comap_of_injective
+              M'.subtype M'.subtype_injective
+          have hsub : Op.subgroupOf M' ≤ (P : Subgroup G).subgroupOf M' := by
+            rw [← hPM'coe]
+            exact (Ch01.normal_pgroup_le_opCore hOpp).trans (Ch01.opCore_le PM')
+          intro x hx
+          have hxM' : x ∈ M' := hOp_le_M' hx
+          have hmem : (⟨x, hxM'⟩ : ↥M') ∈ (P : Subgroup G).subgroupOf M' :=
+            hsub (Subgroup.mem_subgroupOf.mpr hx)
+          exact Subgroup.mem_subgroupOf.mp hmem
+        -- `F(M') ≤ N_G(P₀)`: `O_p(F) ≤ P ≤ N_G(P₀)` and `O_{p'}(F) ≤ C_G(P₀) ≤ N_G(P₀)`.
+        have hFle : S08.fittingInG M' ≤ Subgroup.normalizer (P0 : Set G) := by
+          refine (fittingInG_le_opiCoreInG_sup_compl p M').trans (sup_le ?_ ?_)
+          · exact hOp_le_P.trans hP_NP0
+          · have h911 := p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
+              hG hAcomm_set hM' hA hAnot hPp hAP hPnormA hNPM' hP0p hP0N
+            exact (Subgroup.le_centralizer_iff.mp h911).trans
+              (Subgroup.centralizer_le_normalizer _)
+        -- transport the Frattini decomposition back to `G` and bound by `N_G(P₀)`.
+        calc M' = (⊤ : Subgroup ↥M').map M'.subtype := by
+                rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+          _ ≤ (Subgroup.normalizer ((PM' : Subgroup ↥M') : Set ↥M') ⊔ FP).map M'.subtype :=
+                Subgroup.map_mono hFrat.ge
+          _ = (Subgroup.normalizer ((PM' : Subgroup ↥M') : Set ↥M')).map M'.subtype
+                ⊔ FP.map M'.subtype := Subgroup.map_sup _ _ _
+          _ ≤ Subgroup.normalizer (P0 : Set G) := by
+                refine sup_le ?_ ?_
+                · rw [hPM'coe]
+                  refine (Subgroup.le_normalizer_map M'.subtype).trans ?_
+                  rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPM']
+                  exact hNP_NP0
+                · rw [hFPdef, Subgroup.map_sup, Subgroup.subgroupOf_map_subtype,
+                    inf_eq_left.mpr hPM']
+                  exact sup_le hFle hP_NP0
       obtain ⟨hU, hEq⟩ :=
         normalizer_isUniquelyMaximal_and_eq_maximal_of_maximal_le_normalizer
           hG hM'.1 hP0M' hP0ne hMN0
