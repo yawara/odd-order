@@ -78,6 +78,10 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `Q_mul_comm`) + **`relationC4`** = `s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1` (M_i backward 共役形)。証明 = group で
   `conn1·C2·conn2·C4·conn3·C6` 再結合 → connector rw → group telescope → relationC2。**backward 切替で
   BG telescoping がそのまま通った (forward 障害完全解消)**。build-green。
+- **🆕 (2026-06-06) C.5 mod-P right-component bridge done**: `right_component_of_step4_sigma_inr_decomposition`
+  (neutral `s^m·σ(inr w)·s^r = σ(inr u₁)·σ(P₀ c)·σ(inr v₁) ⟹ w=u₁v₁`) と
+  `right_component_of_step4_first_k_three_inv_decomposition` (backward `k=3` M₁ の `((tConjAut^3)⁻¹ a⁻¹)=u₁v₁`) を追加。
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。次は C.5 の M₁/M₂/M₃ normal-form bundle と C.7 再結合。
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 

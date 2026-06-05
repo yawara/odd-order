@@ -1893,6 +1893,86 @@ theorem exists_step4_first_k_three_inv_decomposition
   exact (hyp.base.P ⊔ hyp.base.U).mul_mem
     ((hyp.base.P ⊔ hyp.base.U).mul_mem hs hmid) hr
 
+/-- BG Appendix C, Lemma C.3 Step 4 "mod `P`" bridge in a neutral form: if a
+word `s^m · σ(inr w) · s^r` is written in Step 1 normal form `u₁ s₁ v₁`, then the
+right component is `w = u₁ v₁`.  This is the reusable right-projection step behind
+both the forward and backward `k = 3` `(C.5)` equations. -/
+theorem right_component_of_step4_sigma_inr_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (w u₁ v₁ : fieldNormalizerNormOneUnits hyp) (c : ZMod hyp.base.p)
+    (hdec : data.s ^ m *
+          data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    w = u₁ * v₁ := by
+  have hmP : data.s ^ m ∈ hyp.base.P := data.s_zpow_mem_P m
+  rw [← data.sigma_P_eq_P] at hmP
+  rcases hmP with ⟨pm, hpmP, hpm⟩
+  have hrP : data.s ^ r ∈ hyp.base.P := data.s_zpow_mem_P r
+  rw [← data.sigma_P_eq_P] at hrP
+  rcases hrP with ⟨pr, hprP, hpr⟩
+  have hpm_right : SemidirectProduct.rightHom pm = 1 := by
+    rcases hpmP with ⟨x, rfl⟩
+    simp
+  have hpr_right : SemidirectProduct.rightHom pr = 1 := by
+    rcases hprP with ⟨x, rfl⟩
+    simp
+  have hline_right :
+      SemidirectProduct.rightHom (fieldNormalizerPrimeLineElement hyp c) = 1 := by
+    simp [fieldNormalizerPrimeLineElement]
+  have hσ :
+      data.sigma (pm * (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) * pr) =
+        data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+    calc
+      data.sigma (pm * (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) * pr) =
+          data.s ^ m *
+              data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+            data.s ^ r := by
+        simp [map_mul, hpm, hpr]
+      _ = data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+              data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := hdec
+      _ = data.sigma
+          ((SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+            fieldNormalizerPrimeLineElement hyp c * SemidirectProduct.inr v₁) := by
+        simp [map_mul]
+  have hH := data.sigma_injective hσ
+  have hright := congrArg (SemidirectProduct.rightHom :
+      fieldNormalizerFrobeniusGroup hyp →* fieldNormalizerNormOneUnits hyp) hH
+  simpa [map_mul, hpm_right, hpr_right, hline_right, mul_assoc] using hright
+
+/-- The `mod P` reading of the backward `k = 3` first `(C.5)` equation: BG's
+middle term `(a⁻¹)^{t^3}` has complement component `u₁ * v₁`. -/
+theorem right_component_of_step4_first_k_three_inv_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a u₁ v₁ : fieldNormalizerNormOneUnits hyp) (c : ZMod hyp.base.p)
+    (hdec : data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹)) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp)) :
+    (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹ = u₁ * v₁ := by
+  have hdec' : data.s ^ (1 : ℤ) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) =
+      data.sigma (SemidirectProduct.inr u₁ : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+          data.sigma (SemidirectProduct.inr v₁ : fieldNormalizerFrobeniusGroup hyp) := by
+    simpa using hdec
+  simpa using
+    data.right_component_of_step4_sigma_inr_decomposition
+      (m := (1 : ℤ)) (r := (-2 : ℤ))
+      (w := (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹)
+      (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
+
 /-! ### BG Appendix C (C.4) connector `q`-swaps
 
 The three connector words appearing between the conjugated factors in the BG (C.4)
