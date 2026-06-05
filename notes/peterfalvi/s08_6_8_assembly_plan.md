@@ -604,7 +604,17 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 - **(A) `IsCoherent` 強化**(正攻法・invasive): field `extension_mem_ZIrr : ∀φ∈ZIrr L, extension φ∈ZIrr G` 追加。影響 = S07 の IsCoherent 構成 ~5 site(`retarget_isCoherent`(2916, 要 X,Xbar∈ZIrr 新仮説 + χ,χ̄∈ZIrr L)/`coherentEqualDegree`(3095)/`coherentEqualDegree_fromDade`(5109)/`galoisTransport`(1471)/他)が新 field を証明。consumer(S08-S16)は不変(struct 強化のみ)。bridge/DadeChainStep に X,Xbar∈ZIrr 伝播。**正しい定義(coherence=ℤ[Irr G] への isometry)だが multi-site refactor、retarget ZIrr 証明は非自明**。
 - **(B) ZIrr companion thread**(localized・S08): `(IsCoherent τ Sᵢ A) × (∀x∈Sᵢ, ν x∈ZIrr)` を per-step で thread、custom chain fold(`peterfalvi_66_coherence_of_X` の induction を companion 付きで再導出)。S07 不変だが chain logic 重複。companion 維持: x∈S₁⟹τ₂ x=τ₁ x∈ZIrr(直交)、χ↦X∈ZIrr、χ̄↦Xbar∈ZIrr。
 
-**現状**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。(6.8) は orphaned ゆえ invasive (A) を打つか localized (B) か checkpoint かは戦略判断。
+**現状(2026-06-04 時点)**: crux1 hard core(9 lemma chain)完全完了・axiom-clean。最終 assembly は (A)/(B) いずれかの ZIrr-codomain 解決が gate。
+
+#### J.3.7 ✅✅ ZIrr-codomain gap **解消済**(2026-06-05 確認 + cleanup) — 上記 J.3.6 fork は STALE
+
+**重要訂正**: 上の「(A)/(B) fork が gate」は **STALE**。**path (A) は既に実装済**:
+- **`IsCoherent` に `extension_mem_ZIrr` field が追加済**(commit a054bc8 "route A: IsCoherent gains ZIrr-codomain field on ℤ[S]", S07:1577): `∀φ∈zSpan S, extension φ∈ZIrr G`。**zSpan S 相対**(全 ZIrr L ではない — base Dade map は global ℤ[Irr] endo でないため、zSpan-S-relative が正しい定義)。全 IsCoherent 構成 site で証明済(`galoisTransport`@1619 / retarget@3284 span-induction 等)、build green。
+- **`xAdjoinStep`(S08:1427, per-step X-adjoin bridge)は既に route A で `hmemνZ` を field から導出**(S08:1487-1488, コメント "route A")。
+- **2026-06-05 cleanup(commit 0482531)**: `crux1_of_memberFamily` の injected `hνZ` を除去し `hmemS1`+field で内部導出。stale docstring("ν χ∈ZIrr not derivable from IsCoherent")訂正。
+- **`retarget_mem_ZIrr`(全 ZIrr L 版)は不要・revert 済**(1f478dc→reset): base map が全 ZIrr L を保存しないので過剰仮説。zSpan-S-relative field(span-induction 証明)が正しい道具。
+
+**⟹ ZIrr gap は gate でない。残 = capstone の最終 assembly のみ**(`sibleySetup_is_coherent` の sorry, S08): X-chain fold(`xAdjoinStep` を conjugate-pair enumeration で fold → `IsCoherent τ (Xset Z) A`)+ X∪Y glue(`coherentS_of_frobenius_pairUnion...` 系は **sorry-free で landed 済**, S08:5920-5965)+ Frobenius/p-群還元 wiring。X-chain machinery は全 sorry-free。**真の残務 = capstone def 本体の組立**(substantial; T8 enum fold + glue data 供給)。次セッションは J.3.6 の (A)/(B) を再検討せず capstone assembly に直行すべし。
 
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
