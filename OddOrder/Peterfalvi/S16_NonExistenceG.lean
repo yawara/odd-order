@@ -2350,6 +2350,41 @@ theorem norm_cascade_contradiction_of_main_size_bound {hyp : Hypothesis (G := G)
     False := by
   exact norm_cascade_contradiction_of_caseB_data Tdata Sdata hsize hbound
 
+/-- **Peterfalvi (14.11.4)** consumer for the exact three-part numerical output
+of **Peterfalvi (14.11.1)**.  Only the first component, `k > 2 p v`, is needed
+by the norm-cascade contradiction; the remaining components stay available to
+match the theorem output without weakening its shape. -/
+theorem norm_cascade_contradiction_of_caseB_data_main_size_bounds
+    {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  exact norm_cascade_contradiction_of_main_size_bound Tdata Sdata Mdata hsize.1 hbound
+
+/-- **Peterfalvi (14.11.4)** consumer for the exact output shapes of
+`caseB_for_T`, `caseB_for_S`, and `main_size_bounds`. -/
+theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
+    {hyp : Hypothesis (G := G)}
+    (hT : ∃ data : CaseBForTData hyp,
+      data.caseB_formula ∧ hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hS : ∃ data : CaseBForSData hyp, data.caseB_formula) (Mdata : MHypothesis hyp)
+    (hsize : Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
+      (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)))
+    (hbound : normCascadeBound hyp Mdata.k) :
+    False := by
+  rcases hT with ⟨Tdata, _hTcase, _hv⟩
+  rcases hS with ⟨Sdata, _hScase⟩
+  exact norm_cascade_contradiction_of_caseB_data_main_size_bounds Tdata Sdata Mdata
+    hsize hbound
+
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`. -/
 theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
