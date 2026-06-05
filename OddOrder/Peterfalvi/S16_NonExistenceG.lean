@@ -2356,6 +2356,178 @@ theorem relationC7_seed
     _ = data.s ^ 3 * 1 * (data.s ^ 3)⁻¹ := by rw [h]
     _ = 1 := by group
 
+
+namespace Step4C5NormalForms
+
+/-- BG `w₁ = v₂^{t⁻¹} u₃` from the rearrangement leading to `(C.7)`. -/
+noncomputable def w1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    fieldNormalizerNormOneUnits hyp :=
+  data.tConjNormOneUnitsAut forms.v2 * forms.u3
+
+/-- BG `w₂ = v₃ u₁^{t⁻²}` from the rearrangement leading to `(C.7)`. -/
+noncomputable def w2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    fieldNormalizerNormOneUnits hyp :=
+  forms.v3 * (data.tConjNormOneUnitsAut ^ 2) forms.u1
+
+/-- BG `w₃ = v₁ u₂^t` from the rearrangement leading to `(C.7)`. -/
+noncomputable def w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    fieldNormalizerNormOneUnits hyp :=
+  forms.v1 * (data.tConjNormOneUnitsAut ^ 1)⁻¹ forms.u2
+
+/-- The ambient reading of `w₁`: `σ(w₁) = t σ(v₂) t⁻¹ σ(u₃)`. -/
+theorem sigma_inr_w1 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) =
+      data.t * data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp) *
+        data.t⁻¹ *
+          data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) := by
+  unfold Step4C5NormalForms.w1
+  simp only [map_mul]
+  have hφ :
+      data.sigma
+          (SemidirectProduct.inr (data.tConjNormOneUnitsAut forms.v2) :
+            fieldNormalizerFrobeniusGroup hyp) =
+        data.t * data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp) *
+          data.t⁻¹ := by
+    simpa using
+      (data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow 1 forms.v2).symm
+  rw [hφ]
+
+/-- The ambient reading of `w₂`: `σ(w₂) = σ(v₃) t² σ(u₁) t⁻²`. -/
+theorem sigma_inr_w2 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) =
+      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) *
+        data.t ^ 2 *
+          data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) *
+            (data.t ^ 2)⁻¹ := by
+  unfold Step4C5NormalForms.w2
+  simp only [map_mul]
+  rw [← data.t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow 2 forms.u1]
+  group
+
+/-- The ambient reading of `w₃`: `σ(w₃) = σ(v₁) t⁻¹ σ(u₂) t`. -/
+theorem sigma_inr_w3 {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp) =
+      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) *
+        data.t⁻¹ * data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp) *
+          data.t := by
+  unfold Step4C5NormalForms.w3
+  simp only [map_mul]
+  rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv 1 forms.u2]
+  group
+
+/-- The three BG `(C.7)` words are elements of `U`, expressed after applying `σ`. -/
+theorem sigma_inr_w_mem_U {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U ∧
+      data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) ∈ hyp.base.U ∧
+        data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp) ∈
+          hyp.base.U := by
+  constructor
+  · rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.w1, ⟨forms.w1, rfl⟩, rfl⟩
+  constructor
+  · rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.w2, ⟨forms.w2, rfl⟩, rfl⟩
+  · rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.w3, ⟨forms.w3, rfl⟩, rfl⟩
+
+end Step4C5NormalForms
+
+/-- BG Appendix C `(C.7)`, obtained by rearranging the `(C.5)` substitution relation and
+absorbing the conjugated complement terms into `w₁`, `w₂`, and `w₃`. -/
+theorem relationC7
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b) :
+    data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) * data.t⁻¹ =
+      (data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) *
+          data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp) *
+            data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+              data.sigma
+                (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp))⁻¹ := by
+  let U1 := data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp)
+  let V1 := data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp)
+  let U2 := data.sigma (SemidirectProduct.inr forms.u2 : fieldNormalizerFrobeniusGroup hyp)
+  let V2 := data.sigma (SemidirectProduct.inr forms.v2 : fieldNormalizerFrobeniusGroup hyp)
+  let U3 := data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp)
+  let V3 := data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp)
+  let S1 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1)
+  let S2 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2)
+  let S3 := data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3)
+  let W1 := data.sigma (SemidirectProduct.inr forms.w1 : fieldNormalizerFrobeniusGroup hyp)
+  let W2 := data.sigma (SemidirectProduct.inr forms.w2 : fieldNormalizerFrobeniusGroup hyp)
+  let W3 := data.sigma (SemidirectProduct.inr forms.w3 : fieldNormalizerFrobeniusGroup hyp)
+  have hseed :
+      data.t ^ 2 * U1 * S1 * V1 * data.t⁻¹ * U2 * S2 * V2 * data.t⁻¹ * U3 * S3 * V3 =
+        1 := by
+    have h := data.relationC7_seed hab forms
+    simpa [Step4C5NormalForms.factor1, Step4C5NormalForms.factor2,
+      Step4C5NormalForms.factor3, U1, V1, U2, V2, U3, V3, S1, S2, S3, mul_assoc]
+      using h
+  have hw1_t : data.t⁻¹ * W1 = V2 * data.t⁻¹ * U3 := by
+    dsimp [W1, V2, U3]
+    rw [forms.sigma_inr_w1]
+    group
+  have hw2_t : W2 * data.t ^ 2 = V3 * data.t ^ 2 * U1 := by
+    dsimp [W2, V3, U1]
+    rw [forms.sigma_inr_w2]
+    group
+  have hw3_t : W3 * data.t⁻¹ = V1 * data.t⁻¹ * U2 := by
+    dsimp [W3, V1, U2]
+    rw [forms.sigma_inr_w3]
+    group
+  have hword :
+      data.t ^ 2 * U1 * S1 * W3 * (data.t⁻¹ * S2 * data.t⁻¹) * W1 * S3 * V3 =
+        1 := by
+    calc
+      data.t ^ 2 * U1 * S1 * W3 * (data.t⁻¹ * S2 * data.t⁻¹) * W1 * S3 * V3 =
+          data.t ^ 2 * U1 * S1 * (W3 * data.t⁻¹) * S2 *
+            (data.t⁻¹ * W1) * S3 * V3 := by
+        group
+      _ = data.t ^ 2 * U1 * S1 * (V1 * data.t⁻¹ * U2) * S2 *
+            (V2 * data.t⁻¹ * U3) * S3 * V3 := by
+        rw [hw3_t, hw1_t]
+      _ = data.t ^ 2 * U1 * S1 * V1 * data.t⁻¹ * U2 * S2 * V2 * data.t⁻¹ * U3 * S3 * V3 := by
+        group
+      _ = 1 := hseed
+  have hwordPrime :
+      (data.t ^ 2 * U1 * S1 * W3) * (data.t⁻¹ * S2 * data.t⁻¹) *
+          (W1 * S3 * V3) = 1 := by
+    simpa [mul_assoc] using hword
+  have hmain : data.t⁻¹ * S2 * data.t⁻¹ =
+      (W1 * S3 * W2 * data.t ^ 2 * S1 * W3)⁻¹ := by
+    calc
+      data.t⁻¹ * S2 * data.t⁻¹ =
+          (data.t ^ 2 * U1 * S1 * W3)⁻¹ *
+            ((data.t ^ 2 * U1 * S1 * W3) * (data.t⁻¹ * S2 * data.t⁻¹) *
+              (W1 * S3 * V3)) * (W1 * S3 * V3)⁻¹ := by
+        group
+      _ = (data.t ^ 2 * U1 * S1 * W3)⁻¹ * 1 * (W1 * S3 * V3)⁻¹ := by
+        rw [hwordPrime]
+      _ = ((W1 * S3 * V3) * (data.t ^ 2 * U1 * S1 * W3))⁻¹ := by
+        group
+      _ = (W1 * S3 * W2 * data.t ^ 2 * S1 * W3)⁻¹ := by
+        have hD : W1 * S3 * W2 * data.t ^ 2 * S1 * W3 =
+            (W1 * S3 * V3) * (data.t ^ 2 * U1 * S1 * W3) := by
+          calc
+            W1 * S3 * W2 * data.t ^ 2 * S1 * W3 =
+                W1 * S3 * (W2 * data.t ^ 2) * S1 * W3 := by
+              group
+            _ = W1 * S3 * (V3 * data.t ^ 2 * U1) * S1 * W3 := by
+              rw [hw2_t]
+            _ = (W1 * S3 * V3) * (data.t ^ 2 * U1 * S1 * W3) := by
+              group
+        rw [← hD]
+  simpa [S1, S2, S3, W1, W2, W3, mul_assoc] using hmain
+
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
 companion `b = 2 - ↑a⁻¹` is again a norm-one value), the `k = 3` first normal form

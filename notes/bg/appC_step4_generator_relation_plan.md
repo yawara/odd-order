@@ -91,8 +91,13 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `Step4C5NormalForms.factor1/2/3`, `relationC4_step4C5NormalForms`, and `relationC7_seed`
   landed.  This proves the post-substitution relation
   `t²·(u₁s₁v₁)·t⁻¹·(u₂s₂v₂)·t⁻¹·(u₃s₃v₃)=1`.
-  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は BG の
-  `w₁=v₂^{t⁻¹}u₃`, `w₂=v₃u₁^{t⁻²}`, `w₃=v₁u₂^t` の def + U-membership + exact C.7.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) exact C.7 done**:
+  BG words `Step4C5NormalForms.w1/2/3`, ambient rewrites `sigma_inr_w1/2/3`,
+  U-membership `sigma_inr_w_mem_U`, and exact rearrangement `relationC7` landed.
+  This proves `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹` in the transported `G` notation.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.  次は (C.8) Frobenius
+  replacement で (C.5)/(C.7) を p-th powers に移し、(C.9) → Step3 → `wᵢ=1` → (C.10)。
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -168,7 +173,8 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
      conn3 `s⁻¹t⁻¹s²=q₁q₂⁻¹=t⁻²st`。swap 後 telescope で `t⁻¹·(C.2-LHS)·t=t⁻¹·1·t=1`。
    - **Q-membership/comm は既存**: `s_inv_pow_mul_t_pow_mem_Q`/`t_inv_pow_mul_s_pow_mem_Q`/`Q_mul_comm`。
 2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
-3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
+3. **(C.7)**: ✅ landed (`Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7`):
+   `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
 4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,
    F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。⟹ (C.9) `s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`。
 5. **w_i=1**: Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2 (s₁≠1) ⟹ w₃^{p-1}=1 ⟹ (A) で w₃=1。同様 w₁=w₂=1。
@@ -260,7 +266,7 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.4)** | `s⁻ⁱtⁱ = [sⁱ,y] ∈ Q`, Q 可換 ⟹ 整理 | **既存** `s_inv_pow_mul_t_pow_mem_Q` (S16:1416) + `Q_mul_comm` (S16:1424) + `s_inv_pow_mul_t_pow_mul_comm` 系 |
 | **(C.5)** | Step1 正規形 `uᵢsᵢvᵢ` (i=1,2,3) | **既存** `exists_sigma_normOne_primeLine_normOne_of_mem_PU` (S16:617) |
 | **(C.6)** | `sᵢ≠1` | **既存** Step2 `generatorRelation_step2_primeLine*` (S16:643/672) + Step3 (下記) |
-| **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | 新規 (再結合) |
+| **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
 | **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | 新規 (有限体 Frobenius; `add_pow_char` 系) |
 | **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | 新規 |
 | Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, 同様に `w₁=w₂=1` | **既存** Step3 `P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` (S16:937) + Step2 |
@@ -291,7 +297,7 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
 2. **(C.4)–(C.6)** (既存 Q-commutator + Step1/2/3 を chain):
    - `relationC4` (Q 可換で整理), `decompositionC5` (Step1 で uᵢsᵢvᵢ), `sᵢ_ne_one` (Step2/3)。
 3. **(C.7)–(C.10)** (Frobenius 置換 + Step3):
-   - `frobenius_replacement_C8` : (C.5) が a→aᵖ で不変 (有限体 `add_pow_char`)。
+   - ✅ `relationC7` landed.  次は `frobenius_replacement_C8` : (C.5) が a→aᵖ で不変 (有限体 `add_pow_char`)。
    - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
    - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1`, `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`)。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):
