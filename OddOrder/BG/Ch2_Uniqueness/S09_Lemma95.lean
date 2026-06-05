@@ -2406,6 +2406,62 @@ private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
       (Nat.pow_eq_one.mp hcard.symm).resolve_left (Fact.out : p.Prime).ne_one
     exact ((Fact.out : p.Prime).factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd).ne' hfact0
 
+/-- In a finite nilpotent group `N`, the `q`-rank for `q ≠ p` is realized inside the `p'`-core
+`O_{p'}(N)` (the `q`-Sylow is normal, a `{r ≠ p}`-group, hence lies in `O_{p'}(N)`). -/
+private theorem pRank_le_pRank_oPiCore_compl_of_nilpotent
+    {N : Type*} [Group N] [Finite N] [Group.IsNilpotent N] {p q : ℕ} [Fact q.Prime] (hqp : q ≠ p) :
+    pRank N q ≤ pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} N) q := by
+  classical
+  obtain ⟨S⟩ := (inferInstance : Nonempty (Sylow q N))
+  have hiff : Group.IsNilpotent N ↔
+      ∀ (p' : ℕ) (_hp : Fact p'.Prime) (P : Sylow p' N), (↑P : Subgroup N).Normal :=
+    (isNilpotent_of_finite_tfae (G := N)).out 0 3
+  haveI hSnorm : (S : Subgroup N).Normal := hiff.mp inferInstance q inferInstance S
+  have hSpi : Ch03.Subgroup.IsPiGroup {r : ℕ | r ≠ p} (S : Subgroup N) := by
+    intro r hr
+    obtain ⟨k, hk⟩ := S.isPGroup'.exists_card_eq
+    rw [hk, Nat.mem_primeFactors] at hr
+    have hrq : r = q :=
+      (Nat.prime_dvd_prime_iff_eq hr.1 (Fact.out : q.Prime)).mp (hr.1.dvd_of_dvd_pow hr.2.1)
+    show r ≠ p
+    rw [hrq]; exact hqp
+  have hScore : (S : Subgroup N) ≤ Ch03.oPiCore {r : ℕ | r ≠ p} N := hSpi.le_oPiCore
+  calc pRank N q = pRank ↥(S : Subgroup N) q := (pRank_sylow_eq S).symm
+    _ ≤ pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} N) q :=
+        pRank_le_of_injective (Subgroup.inclusion_injective hScore)
+
+/-- If `r_p(F(M)) ≤ 2` and the `p'`-core `O_{p'}(F(M))` has rank ≤ 2, then `F(M)` itself has
+rank ≤ 2 (for `q ≠ p`, `F(M)`'s `q`-rank lives in `O_{p'}(F(M))` since `F(M)` is nilpotent). -/
+private theorem rank_fitting_subtype_le_two_of_low_rank
+    [Finite G] {p : ℕ} [Fact p.Prime] {M : Subgroup G}
+    (hp : pRank ↥(S08.fittingInG M) p ≤ 2)
+    (hp' : rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2) :
+    rank ↥(Ch01.fitting ↥M) ≤ 2 := by
+  classical
+  haveI : Group.IsNilpotent ↥(S08.fittingInG M) := S08.fittingInG_isNilpotent M
+  have hcompl : (({p} : Set ℕ)ᶜ) = {r : ℕ | r ≠ p} := by
+    ext r; simp [Set.mem_compl_iff, Set.mem_singleton_iff]
+  refine (rank_le_of_injective
+    (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype
+      M.subtype_injective).toMonoidHom)
+    (Subgroup.equivMapOfInjective _ _ M.subtype_injective).injective).trans ?_
+  rw [rank_le_iff]
+  intro q hq
+  haveI : Fact q.Prime := ⟨hq⟩
+  by_cases hqp : q = p
+  · subst hqp; exact hp
+  · have h1 : pRank ↥(S08.fittingInG M) q ≤
+        pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} ↥(S08.fittingInG M)) q :=
+      pRank_le_pRank_oPiCore_compl_of_nilpotent hqp
+    have h2 : pRank ↥(Ch03.oPiCore {r : ℕ | r ≠ p} ↥(S08.fittingInG M)) q ≤
+        pRank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) q := by
+      rw [← hcompl]
+      exact pRank_le_of_injective
+        (f := (Subgroup.equivMapOfInjective (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥(S08.fittingInG M))
+          (S08.fittingInG M).subtype (S08.fittingInG M).subtype_injective).toMonoidHom)
+        (Subgroup.equivMapOfInjective _ _ (S08.fittingInG M).subtype_injective).injective
+    exact (h1.trans h2).trans ((pRank_le_rank q).trans hp')
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
