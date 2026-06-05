@@ -1886,6 +1886,14 @@ set_option linter.style.longLine false in
 -- `≤ 4|A|²+1` bound ⟹ `N` is a `p`-group.  The FPF `A`-action on `Abelianization N` is supplied
 -- from the Frobenius group (`toFrobeniusAction` + `IsFrobeniusAction.quotient` through `⁅N,N⁆`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_isFrobeniusGroup_of_card_le
+-- (6.5)(b) in the (6.8)(c2) certain-type case: a coprime `W`-action on nilpotent `H` whose
+-- nonidentity-element fixed points lie in `⁅H,H⁆` (`C_H(x) = W₂ ⊆ ⁅H,H⁆`) + the bound ⟹ `H` is a
+-- `p`-group.  Underlying Frobenius brick: `IsFrobeniusAction.quotient_of_fixedPoints_le` (FPF on
+-- `N ⧸ M` from the coprime fixed-point lifting Isaacs Cor 3.28, without FPF on `N`).
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms

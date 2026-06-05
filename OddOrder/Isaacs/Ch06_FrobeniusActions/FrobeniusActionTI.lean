@@ -284,6 +284,100 @@ theorem quotient [Finite A] [Finite N] (h : IsFrobeniusAction A N) (M : Subgroup
     simpa [φC, φ] using this
   exact h a ha x hx_ne hax
 
+/-- **Fixed-point-free action on a quotient from a "fixed points lie in `M`" condition.**
+A variant of `IsFrobeniusAction.quotient` that does *not* require the action on `N` to be Frobenius:
+if a finite group `A` acts on a finite group `N` with `(|A|, |N|) = 1`, and for every nonidentity
+`a ∈ A` the `a`-fixed points of `N` lie in the `A`-invariant normal subgroup `M`, then the induced
+action of `A` on `N ⧸ M` is Frobenius (fixed-point-free).
+
+This is Peterfalvi's (6.5)/(6.8)(c2) mechanism: in the certain-type case `A = W₁` does *not* act
+fixed-point-freely on the kernel `N = H` (the fixed points are `C_H(x) = W₂ ≠ 1`), but since
+`W₂ ⊆ ⁅H,H⁆ = M`, it acts fixed-point-freely on the abelianization `H / ⁅H,H⁆`.  The proof is the
+coprime fixed-point lifting (Isaacs Cor 3.28): an `a`-fixed coset of `N / M` lifts to an `a`-fixed
+`c ∈ N` (cyclic `⟨a⟩` acting coprimely), and `c` lies in `M` by hypothesis, so the coset is
+trivial. -/
+theorem quotient_of_fixedPoints_le [Finite A] [Finite N]
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card N))
+    (M : Subgroup N) [M.Normal] (hM : ∀ a : A, ∀ m ∈ M, a • m ∈ M)
+    (hfixle : ∀ a : A, a ≠ 1 → ∀ x : N, a • x = x → x ∈ M) :
+    @IsFrobeniusAction A (N ⧸ M) _ _ (invariantQuotientMulDistribMulAction M hM) := by
+  classical
+  letI : MulDistribMulAction A (N ⧸ M) := invariantQuotientMulDistribMulAction M hM
+  intro a ha q hq_ne hfix_q
+  revert hq_ne hfix_q
+  refine QuotientGroup.induction_on q ?_
+  intro n hq_ne hfix_q
+  let φ : A →* MulAut N := MulDistribMulAction.toMulAut A N
+  let P : Subgroup A :=
+    { carrier := {b | ∃ m ∈ M, φ b n = n * m}
+      one_mem' := by
+        refine ⟨1, M.one_mem, ?_⟩
+        simp [φ]
+      mul_mem' := by
+        intro b c hb hc
+        rcases hb with ⟨mb, hmb, hb⟩
+        rcases hc with ⟨mc, hmc, hc⟩
+        refine ⟨mb * (φ b) mc, M.mul_mem hmb (hM b mc hmc), ?_⟩
+        calc
+          φ (b * c) n = φ b (φ c n) := by
+            change (b * c) • n = b • c • n
+            rw [mul_smul]
+          _ = φ b (n * mc) := by rw [hc]
+          _ = φ b n * φ b mc := by simp
+          _ = n * (mb * φ b mc) := by rw [hb]; group
+      inv_mem' := by
+        intro b hb
+        rcases hb with ⟨m, hm, hb⟩
+        refine ⟨((φ b⁻¹) m)⁻¹, M.inv_mem (hM b⁻¹ m hm), ?_⟩
+        have hb' : n = φ b⁻¹ n * φ b⁻¹ m := by
+          calc
+            n = φ b⁻¹ (φ b n) := by simp [φ]
+            _ = φ b⁻¹ (n * m) := by rw [hb]
+            _ = φ b⁻¹ n * φ b⁻¹ m := by simp
+        calc
+          φ b⁻¹ n = (φ b⁻¹ n * φ b⁻¹ m) * (φ b⁻¹ m)⁻¹ := by group
+          _ = n * (φ b⁻¹ m)⁻¹ := by rw [← hb'] }
+  have haP : a ∈ P := by
+    have hfix' : ((a • n : N) : N ⧸ M) = (n : N ⧸ M) := by
+      simpa [invariantQuotientMulDistribMulAction, invariantQuotientMulAutHom,
+        invariantQuotientMulAut] using hfix_q
+    have hdiv : (a • n) / n ∈ M := (QuotientGroup.eq_iff_div_mem (N := M)).mp hfix'
+    have hMN : M.Normal := inferInstance
+    have hm : n⁻¹ * (a • n) ∈ M := by
+      rw [← hMN.mem_comm_iff]
+      simpa [div_eq_mul_inv] using hdiv
+    refine ⟨n⁻¹ * (a • n), hm, ?_⟩
+    simp [φ]
+  let C : Subgroup A := Subgroup.zpowers a
+  let φC : C →* MulAut N := φ.comp C.subtype
+  have hC_le_P : C ≤ P := Subgroup.zpowers_le.mpr haP
+  have hM_inv_C : OddOrder.Isaacs.Ch03.IsAInvariant φC M := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro c m hm
+    exact hM (c : A) m hm
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype N := Fintype.ofFinite N
+  have hCopCN : Nat.Coprime (Nat.card C) (Nat.card N) :=
+    hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card C)
+  haveI : IsCyclic C := Subgroup.isCyclic_zpowers a
+  letI : CommGroup C := IsCyclic.commGroup
+  have hSolvC : IsSolvable C ∨ IsSolvable N := Or.inl inferInstance
+  have hg_fix_C : ∀ c : C, ∃ m ∈ M, φC c n = n * m := by
+    intro c
+    simpa [φC] using hC_le_P c.2
+  obtain ⟨x, hx_fixed, hx_coset⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
+      (A := C) (G := N) (φ := φC) hCopCN hSolvC hM_inv_C hg_fix_C
+  have hax : a • x = x := by
+    have := hx_fixed ⟨a, Subgroup.mem_zpowers a⟩
+    simpa [φC, φ] using this
+  have hxM : x ∈ M := hfixle a ha x hax
+  rcases hx_coset with ⟨m, hm, hx_eq⟩
+  have hnM : n ∈ M := by
+    have hne : n = x * m⁻¹ := by rw [hx_eq]; group
+    rw [hne]; exact M.mul_mem hxM (M.inv_mem hm)
+  exact hq_ne ((QuotientGroup.eq_one_iff n).mpr hnM)
+
 /-! ### Theorem 6.3: even-order Frobenius complements
 
 If `|A|` is even and `N` is nontrivial under a Frobenius action, then `A` contains a *unique*

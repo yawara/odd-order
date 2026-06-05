@@ -2253,6 +2253,40 @@ theorem isPGroup_of_isFrobeniusGroup_of_card_le {G : Type*} [Group G] [Finite G]
     hFrobN.quotient (commutator ↥N) hM
   exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hAodd hbound
 
+/-- **Peterfalvi (6.5)(b) reduction in the certain-type case (6.8)(c2): the kernel is a `p`-group.**
+If a finite group `W` acts on a finite nilpotent group `H` with `(|W|, |H|) = 1`, such that for
+every nonidentity `w ∈ W` the `w`-fixed points of `H` lie in `⁅H,H⁆` (the certain-type centralizer
+condition `C_H(x) = W₂ ⊆ ⁅H,H⁆`), and `|Abelianization H|`, `|W|` are odd with
+`|Abelianization H| ≤ 4|W|² + 1`, then `H` is a `p`-group for some prime `p`.
+
+This is the (6.8)(c2) analogue of `isPGroup_of_isFrobeniusGroup_of_card_le`.  Here `W` does *not*
+act fixed-point-freely on `H` (the fixed points `C_H(x) = W₂` are nontrivial), but since
+`W₂ ⊆ ⁅H,H⁆` the action descends fixed-point-freely to `Abelianization H` (`IsFrobeniusAction`'s
+`quotient_of_fixedPoints_le`, via the coprime fixed-point lifting Isaacs Cor 3.28); then the
+(6.5)(b) reduction `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` applies.  In the
+(6.8) capstone the fixed-points hypothesis is discharged from the certain-type fields
+`centralizer_W2` (`C_L(x) ⊓ H = W₂`) and `W₂ ⊆ ⁅H,H⁆`, and the coprimality from the Hall datum
+`gcd(|H|, |W₁|) = 1`. -/
+theorem isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator {H W : Type*}
+    [Group H] [Finite H] [Group.IsNilpotent H] [Group W] [Finite W] [MulDistribMulAction W H]
+    (hCop : Nat.Coprime (Nat.card W) (Nat.card H))
+    (hfix : ∀ w : W, w ≠ 1 → ∀ x : H, w • x = x → x ∈ commutator H)
+    (hHodd : Odd (Nat.card (Abelianization H))) (hWodd : Odd (Nat.card W))
+    (hbound : Nat.card (Abelianization H) ≤ 4 * Nat.card W ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p H := by
+  have hMinv : ∀ a : W, ∀ m ∈ commutator H, a • m ∈ commutator H := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator H).Characteristic) (MulDistribMulAction.toMulAut W H a)
+    have hmem : (MulDistribMulAction.toMulAut W H a).toMonoidHom m ∈ commutator H := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  letI actAb : MulDistribMulAction W (Abelianization H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction (commutator H) hMinv
+  have hFrobAb : OddOrder.Isaacs.Ch06.IsFrobeniusAction W (Abelianization H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le hCop (commutator H) hMinv hfix
+  exact isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization hFrobAb hHodd hWodd hbound
+
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
 `Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
 finite solvable group has one.
