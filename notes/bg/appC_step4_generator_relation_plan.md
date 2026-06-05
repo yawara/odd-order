@@ -207,8 +207,17 @@ coprime 作用の標準事実**ゆえ:
 
 ## 6. 🔴 実装で最初に固定すべき曖昧点
 
-1. **`s^a` の二義性**: BG の `s^a` は文脈で「スカラー inl(a)」と「共役 a⁻¹sa」の両方に使われる。
-   Lean では別名で完全に分離 (例: `sScalar a := σ(inl(ofAdd a))`, 共役は `σ(inr a)⁻¹ · s · σ(inr a)`)。
+1. **`s^a` の二義性 — ✅ 確定済 (2026-06-05, commit e5ba700)**: `sigma_inr_inv_mul_s_mul_sigma_inr` で
+   **右共役 `σ(inr a)⁻¹ · s · σ(inr a) = σ(inl(ofAdd((a:F)⁻¹·1)))`** と確定 (= scalar `a⁻¹`)。
+   🔴 **重要 sign 注意**: repo convention では右共役 by σ(inr a) は scalar **a⁻¹** (a でない;
+   `normOneFrobenius_conj_inl : inr(u)·inl(s)·inr(u)⁻¹ = inl(u·s)` の向きゆえ)。よって BG の base
+   `a+b=2 ⟹ s^a s^b=s²` を素直に取ると `s^a=σ(inl a⁻¹)` で `a⁻¹+b⁻¹=2` を要し a+b=2 と非整合。
+   **解決方針**: BG の exponent ラベル a は終端補題
+   `normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition` の encoding
+   (中央 `inl(-1)`, w の coe) に合わせて downstream で a↔a⁻¹ を吸収する。(C.2) を組むときは
+   この bridge をスカラー側で使い、BG の a を「σ(inr a⁻¹) で共役した scalar a」と読むのが安全
+   (= `σ(inr a⁻¹)⁻¹·s·σ(inr a⁻¹) = σ(inl a)`)。次セッションは終端補題の w と (C.5) 第1式の
+   `(a⁻¹)^{t³}` の coe を突き合わせて sign を 1 回で固定すること。
 2. **t vs t³**: BG one-step は t³。field 充足は φ=tConjAut³ で直接 (§1.1 経路B) か、経路A で w-全称。
 3. **inversion (terminal `N(2w−1)` vs BG `N(2−w)`)**: `N(2w−1)=N(2−w⁻¹)` を使い w⁻¹/w を実装時に整合。
 4. **経路A vs B の最終決定**: 推奨 A (field 削除可)。実装の最初に型検査で確定。
