@@ -12,7 +12,7 @@ BG App.C 経路 (`theoremC` → `final_contradiction`) が carrier だけで閉�
 
 ---
 
-## 🚩 次セッション START HERE (2026-06-05 handoff)
+## 🚩 次セッション START HERE (2026-06-05 handoff 続き)
 
 **worktree セットアップ** (この worktree は `.lake`/`references` symlink が無い場合がある):
 ```bash
@@ -22,27 +22,53 @@ ln -sfn /home/ywr/odd-order/references references
 [ -d .lake/build ] || cp -a /home/ywr/odd-order/.lake/build .lake/build
 ```
 build: `lake build OddOrder.Peterfalvi.S16_NonExistenceG` (leaf) → 完了直前に `lake build OddOrder` (full 3580)。
-作業対象ファイル = **`OddOrder/Peterfalvi/S16_NonExistenceG.lean` の `namespace FieldNormalizerData`**。
+作業対象 = **`OddOrder/Peterfalvi/S16_NonExistenceG.lean` の `namespace FieldNormalizerData` 末尾の `section Step4`**。
 
-**✅ landed (このセッション, S16 `FieldNormalizerData` 内, 全 build-green/axiom-clean)**:
-- (X)/(XI) infra: `W2_card_coprime_Q_card` / `w2ConjQAut` / `w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot`
-  (= `C_Q(W₂)⊓⁅Q,W₂⁆=⊥`) / `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` (FPF) /
-  `w2ConjQAut_apply_coe` / `exists_yD_mem_actionCommutator_conj_s_eq_t` ((XI): `∃yD∈⁅Q,W₂⁆, yD·s·yD⁻¹=t`)。
-- (C.2) 足場: `sigma_inr_inv_mul_s_mul_sigma_inr` (= `σ(inr a)⁻¹·s·σ(inr a)=σ(inl(a⁻¹·1))`)。
+### 🔴🔴 最重要の戦略確定 (このセッション, commit 730eaae): 経路B が唯一の faithful path
 
-**次の 1 手 (最優先)**: §6.1 の **a↔a⁻¹ sign を 1 回で固定**する。手順:
-  終端補題 `OddOrder.BG.AppC.NormSet.normOneFrobenius_normN_two_mul_sub_one_of_first_k_three_decomposition`
-  (NormSet.lean:773) が要求する H-関係 `inl(1)·inr(w)·inl(-2) = inr(u₁)·inl(-1)·inr(v₁)` の `w` と、
-  (C.5) 第1式の `(a⁻¹)^{t³}` (= `exists_step4_first_k_three_decomposition`, S16:1179 の `tConjAut³ u⁻¹`)
-  の coe を突き合わせ、`sigma_inr_inv_mul_s_mul_sigma_inr` のスカラー `a⁻¹` 側で base relation
-  `s^a s^b = s²` を sign 整合させる。**これが済めば (C.2)-(C.10) は §3 の補題分解どおり既存 API chain**。
+旧 plan §1.1 は「**経路A 推奨**」だったが、これは**循環するので不可**と確定:
+- c=-1 (`s₁=s⁻¹`) 論証は **base relation で `a∈E` を必須**とする。理由: (C.2) は `b=2-a∈U`
+  (= `σ(inr b)` を作るため) を要し、`a∈U ∧ 2-a∈U ⟺ a∈E` (E の定義そのもの)。
+- 経路A の hstep は `∀ w∈E` で decomp(`s·σ(inr w)·s⁻²`) の middle が s⁻¹ を要求。この w に対応する
+  BG-a は `(w⁻¹)^{t^{-3}}` で、これが E に入ることは **E=E⁻¹ (証明目標) と同値 → 循環**。
+- ∴ **経路B** (`normSetETwistedNormOneStep φ`, φ=tConjAut³ 系) を採る。終端 `appCNormSetGeneratorRelation_of_twisted_normOne_step` (S16:173) で `appC_normSet_generator_relation` を field 非経由化できる。
 
-**最終目標**: `s₁=s⁻¹` ⟹ `appC_normSet_generator_relation_of_first_k_three_coordinate` (S16:1324) の hstep を満たし
-  `FieldNormalizerData.appC_twisted_normOne_step` を **field から削除** (producer の義務減)。
-  kernel 段で `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` (FPF) を使い `(s⁻¹-1)` 可逆化、
-  `exists_yD_mem_actionCommutator_conj_s_eq_t` で y を ⁅Q,W₂⁆ に載せる。
+### 🟡 未解決の 1 点 (capstone build 時に Lean で確定する): φ-matching / inversion
 
-**残ステップ**: §3 補題分解参照 ((C.2)-(C.10) 群関係鎖 → kernel→End 翻訳 → `s₁=s⁻¹` capstone → 配線)。
+repo convention では decomp(`s·σ(inr W)·s⁻²`, middle s⁻¹) ⟹ **`(↑W)⁻¹∈E`** (W∈E でなく W の逆元)。
+これは u₁-route も v₁-route も同じ (`unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition` で実装済)。
+`exists_step4_first_k_three_decomposition (u)` の slot は `(tConjAut³)(u⁻¹)` 固定。両者合成すると
+`cond(u) ⟹ unitVal((tConjAut³)(u))∈E` の形になり、**素朴には φ=tConjAut³ の twisted step
+`∀u∈E, (tConjAut³)(u⁻¹)∈E` と一致しない** (inversion が 1 個ずれる)。
+- 鍵 = **`cond(u)` (capstone の入力条件) が `unitVal u∈E` か `(unitVal u)⁻¹∈E` か**。これは
+  BG-unit-a と repo-unit-u の field 値が一致するか逆かで決まり (action convention flip;
+  BG の `a⁻¹sa=scalar↑a` vs repo の `σ(inr a)⁻¹sσ(inr a)=scalar↑a⁻¹`)、**机上では詰め切れない**。
+- 対処: capstone を bottom-up で組むと base condition (`unitVal a⁻¹ + unitVal b⁻¹ = 2`,
+  = `unitVal a⁻¹ ∈ E`) が型として伝播し、slot との関係が Lean で forced される。そこで
+  φ を確定 (必要なら slot=`(tConjAut³)(u)` 版 decomposition の variant を `exists_step4_..` に追加、
+  または `exists_step4_first_k_three_decomposition` を u→u⁻¹ で呼ぶ)。
+- 終端 machinery は inversion を 1 つ吸収する形が既にある (`twistedInv φ u = φ(u⁻¹)`); φ と入力の
+  選び方で整合させる。**capstone が出てから 30 分の配線作業**の見込み。
+
+### ✅ landed (このセッション, S16 `section Step4`, 全 sorry-free / full build 3580 green / AxiomsCheck OK)
+- **scalar 抽象** `sScalar x := σ(inl(ofAdd x))` (BG の `s^x`) + API: `sScalar_mul`/`sScalar_zero`/
+  `sScalar_inv`/`s_eq_sScalar_one`/`s_inv_eq_sScalar_neg_one`/`s_sq_eq_sScalar_two`/
+  `sigma_primeLineElement_eq_sScalar`/`sScalar_neg_one_eq_sigma_primeLineElement`。
+- **`sScalar_conj`**: `σ(inr a)⁻¹·s^x·σ(inr a) = s^{(↑a⁻¹)·x}` (= BG の s^a 共役 = scalar `↑a⁻¹`)。
+- `unitVal a := ↑↑a` (norm-one unit の field 値) + `unitVal_inv`/`unitVal_ne_zero`。
+- **base relation** `sBGConj_mul_sBGConj`: `(σ(inr a)⁻¹ s σ(inr a))·(σ(inr b)⁻¹ s σ(inr b)) = s²`
+  (条件 `unitVal a⁻¹ + unitVal b⁻¹ = 2`)。
+- **`relationC2`**: `s⁻²·(σ(inr a)⁻¹ s σ(inr a))·(σ(inr b)⁻¹ s σ(inr b)) = 1`。
+- **E-extraction** `unitVal_inv_mem_normSetE_of_sigma_first_k_three_decomposition`:
+  decomp(middle s⁻¹) ⟹ `(↑W)⁻¹∈E` (BG final paragraph `v₁=2-W` の repo 版; 既存終端 u₁-route 経由)。
+- 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
+
+### 次の 1 手 (最優先): (C.3)→(C.4) 群関係鎖
+`relationC2` を `t^{±ℓ}` 共役 (ℓ=k-2) → (C.3) → `s^{-i}t^i∈Q` (既存 `s_inv_pow_mul_t_pow_mem_Q`,
+S16:1416) + Q 可換 (`Q_mul_comm`) で整理 → (C.4) `s^{-k}t² M₁ t⁻¹ M₂ t⁻¹ M₃ s^k = 1`
+(Mᵢ = `s^j·(conj)·s^j'` 形, 既存 engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow`
+S16:1097 が正規形を与える)。**最も convention-heavy**。§3 補題分解参照。
+その後 (C.5)-(C.10) → kernel/FPF → `s₁=s⁻¹` capstone → 経路B 配線 → field 削除。
 
 ---
 
@@ -83,7 +109,11 @@ appC_twisted_normOne_step : appCNormSetTwistedNormOneStep hyp
 
 ⟹ **既存機構は「ある c の分解」までを与える。残ギャップ = その `c = −1`**。
 
-### 1.1 二つの配線経路 (実装時にどちらを取るか確定する)
+### 1.1 二つの配線経路 (✅ 2026-06-05 確定: **経路B**。経路A は循環で不可 — START HERE 参照)
+
+> **訂正 (commit 730eaae)**: 下記の「推奨=経路A」は **撤回**。経路A の hstep `∀w∈E` は循環する
+> (c=-1 論証が `a∈E` 必須 ⟹ 経路A の w に対する BG-a=`(w⁻¹)^{t^{-3}}` が E に入る必要 = E=E⁻¹ と同値)。
+> **経路B が唯一の faithful path**。以下は経緯として残す。
 
 - **経路A (first-k-three / generator-relation)**: `appC_normSet_generator_relation_of_first_k_three_coordinate`
   の hstep を証明。hstep = 「∀w∈E (unit), `s·σ(inr w)·s⁻²` が中央 `-1` の分解を持つ」。
