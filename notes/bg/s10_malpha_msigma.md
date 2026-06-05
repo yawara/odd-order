@@ -1,5 +1,25 @@
 # BG §10: The Subgroups M_α and M_σ — mini-roadmap
 
+## ✅✅ 2026-06-05 完了 — Thm 10.1 (keystone) sorry-free + axiom-clean
+
+`fusion_control_of_mem_sigma` (BG Thm 10.1, 5-part a–e) 完成。`#print axioms` =
+`[propext, Classical.choice, Quot.sound]`、full build 3580 jobs green。詳細・実装メモは
+`issues/closed/0060-bg-thm101-fusion-control.md`「✅ DONE」節。
+
+**要点**:
+- part (b) = `fusion_b` (private): `Nat.card G - Nat.card X` の強帰納 (maximal-order counterexample)。
+  WLOG「M を共役で取り替え P⊆M」は M^s=`conj s•M` を「M の共役 maximal」として扱い、`sigma_conj`
+  (σ equivariance) で一般 `fusion_d_of_mem_sigma` を M₁ に直接適用して処理 (M を literal に取り替えない)。
+  r(P)≥3 = Thm 9.6 (`uniquenessTheorem`) で P∈𝒰⟹L⊆M^s⟹矛盾; r(P)≤2 = Thm 4.18(e)
+  (`solvable_structure_of_pRank_le_two`) + §6 Frattini (`frattini_decomp_of_rank_le_two`) + IH-for-P。
+- (a) = `g=m*c` (M·C 順); (c)/(d)/(e) は (a)/(b) の系。**(e) は `X≤M` を明示追加**
+  (`C_G(X)⊆M` だけからは X⊆M が一般に従わない: X 非可換だと X⊄C_G(X); BG の暗黙前提を明示)。
+- 新 private helper 群: normalizer 成長 / σ⟹Sylow-of-G / conjOrderIso+coatom保存+随伴 /
+  card・normalizer の共役同変 / σ_conj / card_lt_card_of_lt。AxiomsCheck は §9 同様未登録 (S10 未 import)。
+
+**次**: §10 残 = Thm 10.2 (`isHall_Msigma_Malpha`, 10.1 解禁済 + Focal + Thm 4.20) → Thm 10.6 →
+Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
+
 ## ✅ 2026-06-05 着手 — 依存 DAG 検証 + Thm 10.1 を first target に確定 (§9 完成で解禁)
 
 **§9 (Uniqueness Thm 9.6) 完成 (commit 12ae441) で §10 解禁**。§10 = 18 scaffold sorry の大型節。
