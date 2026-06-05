@@ -2372,6 +2372,40 @@ private theorem rank_opiCoreFitting_le_two_of_pSubgroup_normalizer_package
       hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N
       hP0ne h3D)
 
+/-- BG Lemma 9.5 (9.9)→`P₀ ≠ 1`: for a Sylow `p`-subgroup `P` of the minimal simple odd group `G`
+(with `p ∣ |G|`), `P₀ = ⁅P, N_G(P)⁆ ≠ 1`.  If `P₀ = 1` then `N_G(P) ≤ C_G(P)`, so Burnside
+(Theorem 1.18) gives a normal `p`-complement `N`; simplicity forces `N = ⊥` (⇒ `G` a `p`-group,
+hence solvable — impossible) or `N = ⊤` (⇒ `P = ⊥`, so `p ∤ |G|`). -/
+private theorem commutator_normalizer_ne_bot_of_isSylow [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] (P : Sylow p G)
+    (hp_dvd : p ∣ Nat.card G) :
+    ⁅(P : Subgroup G), Subgroup.normalizer ((P : Subgroup G) : Set G)⁆ ≠ ⊥ := by
+  classical
+  intro h
+  have hNC : Subgroup.normalizer ((P : Subgroup G) : Set G) ≤
+      Subgroup.centralizer ((P : Subgroup G) : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm]
+    exact h
+  obtain ⟨N, hNnorm, hNcompl⟩ :=
+    OddOrder.Isaacs.Ch05.hasNormalPComplement_of_sylow_normalizer_le_centralizer P hNC
+  rcases hG.simple.eq_bot_or_eq_top_of_normal N hNnorm with hNbot | hNtop
+  · -- `N = ⊥` ⇒ `P = ⊤` ⇒ `G` is a `p`-group ⇒ solvable, contradicting `hG`.
+    have hPtop : (P : Subgroup G) = ⊤ :=
+      Subgroup.isComplement'_bot_left.mp (hNbot ▸ hNcompl P)
+    have hGp : IsPGroup p G :=
+      (hPtop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_equiv Subgroup.topEquiv
+    haveI := hGp.isNilpotent
+    exact hG.notSolvable inferInstance
+  · -- `N = ⊤` ⇒ `P = ⊥` ⇒ `p ∤ |G|`, contradicting `hp_dvd`.
+    have hPbot : (P : Subgroup G) = ⊥ :=
+      Subgroup.isComplement'_top_left.mp (hNtop ▸ hNcompl P)
+    have hcard : Nat.card ↥(P : Subgroup G) = p ^ (Nat.card G).factorization p :=
+      P.card_eq_multiplicity
+    rw [hPbot, Subgroup.card_bot] at hcard
+    have hfact0 : (Nat.card G).factorization p = 0 :=
+      (Nat.pow_eq_one.mp hcard.symm).resolve_left (Fact.out : p.Prime).ne_one
+    exact ((Fact.out : p.Prime).factorization_pos_of_dvd Nat.card_pos.ne' hp_dvd).ne' hfact0
+
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 
 Proof gate: mmd L2579 uses Thm 7.6 and Thm 7.4; L2605 uses Cor 4.19; L2615 uses
