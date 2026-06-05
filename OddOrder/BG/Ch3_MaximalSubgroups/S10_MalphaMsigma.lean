@@ -1168,6 +1168,46 @@ theorem Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma {M : Subgroup 
   exact hOq (le_bot_iff.mp (by
     simpa [hσ] using opiCoreInG_singleton_le_Msigma_of_mem_sigma (M := M) hq))
 
+/-- If a Sylow `q`-subgroup of `M` maps onto the singleton core `O_q(M)` and the
+ambient normalizer of that core lies in `M`, then `q ∈ σ(M)`. This packages the exact
+output expected from the low-rank/Thm 4.20 branch of BG Theorem 10.2(e). -/
+theorem mem_sigma_of_sylowMap_eq_opiCoreInG_singleton {M : Subgroup G} {q : ℕ}
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (P : Sylow q ↥M)
+    (hP : (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hN : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M) :
+    q ∈ sigma M := by
+  rw [mem_sigma_iff]
+  refine ⟨hqM, P, ?_⟩
+  simpa [hP] using hN
+
+/-- A singleton core that is the ambient image of a Sylow subgroup for a prime divisor of
+`|M|` is nontrivial. -/
+theorem opiCoreInG_singleton_ne_bot_of_sylowMap_eq [Finite G] {M : Subgroup G} {q : ℕ}
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (P : Sylow q ↥M)
+    (hP : (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M) :
+    opiCoreInG ({q} : Set ℕ) M ≠ ⊥ := by
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqM⟩
+  have hP_ne : (P : Subgroup ↥M) ≠ ⊥ :=
+    OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card (Nat.dvd_of_mem_primeFactors hqM) P
+  intro hOq
+  have hPmap_bot : (P : Subgroup ↥M).map M.subtype = ⊥ := by
+    rw [hP, hOq]
+  exact hP_ne ((Subgroup.map_eq_bot_iff_of_injective _ M.subtype_injective).mp hPmap_bot)
+
+/-- Hard-branch support for BG Theorem 10.2(e): once the low-rank argument shows that
+`O_q(M)` is the image of a Sylow `q`-subgroup of `M` and has normalizer inside `M`, the
+nontriviality of `M_σ` follows. -/
+theorem Msigma_ne_bot_of_sylowMap_eq_opiCoreInG_singleton [Finite G] {M : Subgroup G} {q : ℕ}
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) (P : Sylow q ↥M)
+    (hP : (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M)
+    (hN : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M) :
+    Msigma M ≠ ⊥ := by
+  have hqσ : q ∈ sigma M :=
+    mem_sigma_of_sylowMap_eq_opiCoreInG_singleton hqM P hP hN
+  have hOq : opiCoreInG ({q} : Set ℕ) M ≠ ⊥ :=
+    opiCoreInG_singleton_ne_bot_of_sylowMap_eq hqM P hP
+  exact Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma hqσ hOq
+
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
 nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
 `M_α = 1` case using the low-rank/Thm 4.20 argument. -/
