@@ -67,7 +67,10 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   の最終bridgeは `Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma` として切り出し済み。
   さらに `P.map = O_q(M)` と `N_G(O_q(M))≤M` から直接 `M_σ≠⊥` を返す
   `Msigma_ne_bot_of_sylowMap_eq_opiCoreInG_singleton` も追加済み。
-  **残りは低rank/Thm 4.20側でその `q` と `P.map = O_q(M)` / normalizer 包含を作る部分**。
+  `Msigma_ne_bot_of_normal_local_sylow` / `Msigma_ne_bot_of_characteristicSylowSeriesPackage` /
+  `Msigma_ne_bot_of_rank_fittingInG_le_two` により、§4.20(c) package や `rank F(M)≤2`
+  の入力からも `M_σ≠⊥` まで接続済み。
+  **残りは `M_α=⊥` から `Nontrivial M` と `rank F(M)≤2` を取り出してこの補題へ渡す部分**。
 - [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重・要 quotient infra 調査**。
   - M(α)=M_α: M(σ)/M_α が α'-group + M(α) Hall。
   - M(σ)=M_σ: M(σ)/M_α normal Hall in F(M/M_α) char ⟹ M(σ)⊴M。

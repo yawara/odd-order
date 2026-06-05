@@ -1208,6 +1208,74 @@ theorem Msigma_ne_bot_of_sylowMap_eq_opiCoreInG_singleton [Finite G] {M : Subgro
     opiCoreInG_singleton_ne_bot_of_sylowMap_eq hqM P hP
   exact Msigma_ne_bot_of_opiCoreInG_singleton_ne_bot_of_mem_sigma hqσ hOq
 
+/-- Convert the local `O_q(M)` notation from §4/Thm 4.20 into the ambient `O_q(M)`
+notation used in §10. -/
+theorem sylowMap_eq_opiCoreInG_singleton_of_eq_opCore [Finite G] {M : Subgroup G} {q : ℕ}
+    [Fact q.Prime] (P : Sylow q ↥M)
+    (hP : (P : Subgroup ↥M) = Ch01.opCore q ↥M) :
+    (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M := by
+  rw [hP, opiCoreInG, OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := ↥M) q]
+
+/-- A normal local Sylow subgroup is the local core, hence maps to the ambient singleton
+core. -/
+theorem sylowMap_eq_opiCoreInG_singleton_of_normal [Finite G] {M : Subgroup G} {q : ℕ}
+    [Fact q.Prime] (P : Sylow q ↥M) (hP : (P : Subgroup ↥M).Normal) :
+    (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M :=
+  sylowMap_eq_opiCoreInG_singleton_of_eq_opCore P (Ch01.Sylow.eq_opCore_of_normal P hP)
+
+/-- Hard-branch support for BG Theorem 10.2(e) in the natural Thm 4.20(c) form: a
+normal Sylow `q`-subgroup of `M` supplies `M_σ ≠ 1`. -/
+theorem Msigma_ne_bot_of_normal_local_sylow [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (P : Sylow q ↥M) (hP : (P : Subgroup ↥M).Normal)
+    (hqM : q ∈ (Nat.card ↥M).primeFactors) :
+    Msigma M ≠ ⊥ := by
+  have hPcore : (P : Subgroup ↥M).map M.subtype = opiCoreInG ({q} : Set ℕ) M :=
+    sylowMap_eq_opiCoreInG_singleton_of_normal P hP
+  have hOq : opiCoreInG ({q} : Set ℕ) M ≠ ⊥ :=
+    opiCoreInG_singleton_ne_bot_of_sylowMap_eq hqM P hPcore
+  have hN : Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M : Set G) ≤ M :=
+    OddOrder.BG.Ch2.S09.normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot hG hM hOq
+  exact Msigma_ne_bot_of_sylowMap_eq_opiCoreInG_singleton hqM P hPcore hN
+
+/-- A BG Theorem 4.20(c) characteristic Sylow-series package for `M` supplies the hard
+branch nontriviality `M_σ ≠ 1`. -/
+theorem Msigma_ne_bot_of_characteristicSylowSeriesPackage [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (pkg : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥M) :
+    Msigma M ≠ ⊥ := by
+  obtain ⟨i, _hi, hqM, P, hP⟩ :=
+    OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage.exists_terminal_normal_sylow pkg
+  haveI : Fact (pkg.series.step i).q.Prime := (pkg.series.step i).q_prime
+  exact Msigma_ne_bot_of_normal_local_sylow hG hM P hP hqM
+
+/-- Rank-`≤ 2` Fitting input for the hard branch of BG Theorem 10.2(e): applying BG
+Theorem 4.20(c) inside the maximal subgroup `M` gives a characteristic Sylow series, hence
+`M_σ ≠ 1`. -/
+theorem Msigma_ne_bot_of_rank_fittingInG_le_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) [Nontrivial ↥M]
+    (hrank : rank ↥(Ch2.S08.fittingInG M) ≤ 2) :
+    Msigma M ≠ ⊥ := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hodd : Odd (Nat.card ↥M) := by
+    rcases Nat.even_or_odd (Nat.card ↥M) with he | ho
+    · exfalso
+      have h2 : (2 : ℕ) ∣ Nat.card G := he.two_dvd.trans (Subgroup.card_subgroup_dvd_card M)
+      have := hG.odd
+      rw [Nat.odd_iff] at this
+      omega
+    · exact ho
+  have hrankF : rank ↥(Ch01.fitting ↥M) ≤ 2 := by
+    refine le_trans (OddOrder.GroupTheory.rank_le_of_injective
+      (f := (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype
+        M.subtype_injective).toMonoidHom) ?_) hrank
+    exact (Subgroup.equivMapOfInjective (Ch01.fitting ↥M) M.subtype
+      M.subtype_injective).injective
+  obtain ⟨pkg⟩ :=
+    OddOrder.BG.Ch1.S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
+      hodd hrankF
+  exact Msigma_ne_bot_of_characteristicSylowSeriesPackage hG hM pkg
+
 /-- **BG Theorem 10.2(e), easy branch**: if `M_α` is nontrivial, then `M_σ` is
 nontrivial because `M_α ≤ M_σ`. The remaining branch of (e) is the hard
 `M_α = 1` case using the low-rank/Thm 4.20 argument. -/
