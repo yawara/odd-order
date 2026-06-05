@@ -1467,6 +1467,20 @@ theorem W2_inf_Q_eq_bot {hyp : Hypothesis (G := G)} (data : FieldNormalizerData 
     Nat.eq_one_of_dvd_coprimes hpq horder_p horder_q
   simpa [Subgroup.mem_bot] using orderOf_eq_one_iff.mp horder_one
 
+/-- The orders of `W₂ = σ(P₀)` and `Q` are coprime: `|W₂| = p` is prime, `|Q|`
+is a power of `q`, and `p ≠ q`.  This is the coprimality input to BG Appendix C
+Remark (X)'s coprime decomposition `Q = C_Q(P₀) × ⁅Q, P₀⁆` (Isaacs Thm 4.34 /
+BG Prop 1.6(d)), used in the Lemma C.3 Step 4 kernel argument. -/
+theorem W2_card_coprime_Q_card [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    Nat.Coprime (Nat.card ↥hyp.base.W2) (Nat.card ↥hyp.base.Q) := by
+  haveI : Fact hyp.base.q.Prime := ⟨hyp.base.q_prime⟩
+  have hW2 : Nat.card ↥hyp.base.W2 = hyp.base.p := hyp.base.p_eq_card_W2.symm
+  obtain ⟨k, hQ⟩ : ∃ k, Nat.card ↥hyp.base.Q = hyp.base.q ^ k :=
+    ⟨_, data.Q_elementaryAbelian.card_eq_pow_finrank⟩
+  rw [hW2, hQ]
+  exact ((Nat.coprime_primes hyp.base.p_prime hyp.base.q_prime).mpr hyp.p_ne_q).pow_right k
+
 /-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
 in `Q`. -/
 theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}
