@@ -170,11 +170,21 @@ coprime 作用の標準事実**ゆえ:
   y_C が P₀ と可換ゆえ関係式から落ちることに対応。**実装案**: carrier に field 追加せず、`t=s^y` を
   `s^{y_[Q,P₀]}` で置換しても (C.2)-(C.10) が不変であることを示す reduction、または最小限 `y∈[Q,P₀]` を
   carrier field 追加 (producer は 4.34 分解で供給)。**まず reduction を試行、無理なら field 追加**。
-- **作用 φ の setup (要実装)**: `W2 ≤ N_G(Q)` (`W2_normalizes_Q`) から `φ : W2 →* MulAut Q` を構成
-  (`MulAut.conj` の Q への制限)。repo に共役作用→MulAut helper があるか確認 (BG Prop 1.6 / S01 の 4.34
-  使用箇所のパターンを流用)。Q の `CommGroup` instance は `Q_elementaryAbelian` から。
-- 🔴 残る「新規数学」は **§3 の kernel/FPF 段の (s⁻¹−1) 可逆性を [Q,P₀] 上で End 計算に落とす**部分のみ。
-  (X) 自体は既存。先に φ setup + (X) 分解 instance を `FieldNormalizerData` 補題化するのが安全な第一歩。
+- **✅ LANDED (2026-06-05, commits 9fae5e2 / 6bea62c)**: (X) 分解 core を `FieldNormalizerData` に実装済:
+  - `W2_card_coprime_Q_card` : `Coprime |W2| |Q|` (|W2|=p, |Q|=q^k via `card_eq_pow_finrank`, p≠q)。
+  - `w2ConjQAut : ↥W2 →* MulAut ↥Q` = mathlib `Subgroup.normalizerMonoidHom (H:=Q)` ∘
+    `Subgroup.inclusion W2_normalizes_Q` (BG Ch2 S07 conjAction 不要・新規 import 無)。
+  - `w2ConjQAut_fixedPoints_inf_actionCommutator_eq_bot` : **`C_Q(W2) ⊓ ⁅Q,W2⁆ = ⊥`**
+    (`Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian` + 上記 coprimality;
+    CommGroup ↥Q は `{ (inferInstance:Group ↥Q) with mul_comm := Q_elementaryAbelian.comm }` で diamond 回避)。
+  - `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` : **FPF** — `x∈⁅Q,W2⁆` かつ W2-固定 ⟹ x=1。
+- 🔴 残る「新規数学」:
+  1. **(XI) `y∈[Q,P₀]`**: 実 `y` (∈Q, `y_mem_Q`) を `actionCommutator w2ConjQAut` (= ↥Q 内 [Q,W2]) の
+     元として扱う reduction (or carrier field 追加)。`⟨y,y_mem_Q⟩ : ↥Q` の [Q,W2]-成分を取る。
+  2. **kernel→End 翻訳**: BG の `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を `actionCommutator w2ConjQAut`
+     (abelian, ↥Q 部分群) 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`)
+     で `(s⁻¹−1)` 可逆化。`w2ConjQAut ⟨s,·⟩` (s = W2 生成元) の作用が「s 共役」。
+  ⟹ (X) infra core は landed、残りは (XI) bridge + kernel 段の End 計算。
 
 ---
 
