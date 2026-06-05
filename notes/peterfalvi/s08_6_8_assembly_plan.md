@@ -616,6 +616,11 @@ mmd (5.6)(04.7 L59-105) + (6.8.1)(04.8 L166-177) + 既存 S07 machinery を精�
 
 **⟹ ZIrr gap は gate でない。残 = capstone の最終 assembly のみ**(`sibleySetup_is_coherent` の sorry, S08): X-chain fold(`xAdjoinStep` を conjugate-pair enumeration で fold → `IsCoherent τ (Xset Z) A`)+ X∪Y glue(`coherentS_of_frobenius_pairUnion...` 系は **sorry-free で landed 済**, S08:5920-5965)+ Frobenius/p-群還元 wiring。X-chain machinery は全 sorry-free。**真の残務 = capstone def 本体の組立**(substantial; T8 enum fold + glue data 供給)。次セッションは J.3.6 の (A)/(B) を再検討せず capstone assembly に直行すべし。
 
+#### J.3.8 ✅ capstone X-empty (abelian) case closed (2026-06-05, commit 166d3b5)
+`sibleySetup_is_coherent` の bare sorry を `by_cases hXe : Xset ⁅H,H⁆ = ∅` に分割:
+- **X-empty branch 完全証明**: `coherenceTarget_of_Xset_empty`(新, axiom-clean): `X=∅ ⟹ S=Y`(`Xset_union_Yset_eq_S` で `S=∅∪Yset=Yset`)⟹ `CoherenceTarget = coherentYset`(Y-coherence, T6 既 landed)。glue 不要。
+- **X-nonempty branch のみ sorry**(真の §8 glue): `hyp.cases`(Frobenius/CertainType)で分岐。`hXne` は `hXe` 否定から放電可。Frobenius case = `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(5925, sorry-free)を invoke、要 `hF`(cases)+ **`hstepData`**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData`@5685 構成 = (6.6) prime-power 次数 gap, **bottleneck = hard content**)+ glue(`ν`/`hagree`/`hmixed`/`hgen`)。**次セッション = hstepData 構成 + glue data 供給**。
+
 ## H. T7 実装状況 + 特徴付け設計確定 (2026-06-03, Plan agent + atom 照合済)
 
 **landed (S08, build-green)**: def 層 `SsubFiltration`(=(6.1)S(A))/`Xset`(=S−S(Z))/`Yset`(=S(H'))
