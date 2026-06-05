@@ -383,17 +383,394 @@ private theorem frattini_decomp_of_rank_le_two [Finite G] (hG : IsMinimalSimpleO
     (Ch1.S04.solvable_structure_of_pRank_le_two hodd hp_dvd hpr).2.2.2.2.2
   exact Ch1.S06.top_eq_oPiPrimeCore_sup_normalizer_sylow P hpl1
 
+/-- **Normalizer growth in a `p`-group**: if `X < S` with `S` a `p`-group, then `X` is properly
+contained in `N_G(X) ⊓ S` (some element of `S` normalizes `X` without lying in `X`). This is the
+nilpotent normalizer condition applied inside `↥S`, transported back to `G` via
+`subgroupOf_normalizer_eq`. Used to show a non-Sylow `p`-subgroup grows inside its normalizer. -/
+private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
+    X < Subgroup.normalizer X ⊓ S := by
+  haveI : Group.IsNilpotent ↥S := hS.isNilpotent
+  have hNC : NormalizerCondition ↥S := normalizerCondition_of_isNilpotent (G := ↥S)
+  have hsub_lt : X.subgroupOf S < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hXS.ne (le_antisymm hXS.le htop)
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)
+  exact heq ▸ Subgroup.mem_inf.mpr ⟨ht_norm, t.2⟩
+
+/-- **σ basic fact, Sylow side** (mmd L2655): if `p ∈ σ(M)`, then `M` contains a Sylow
+`p`-subgroup of `G`. The defining Sylow `P` of `M` has `N_G(P̄) ≤ M`; if `P̄` were a proper
+`p`-subgroup of a Sylow `S` of `G`, then `N_G(P̄) ⊓ S` (a `p`-subgroup of `M`) would strictly
+contain `P̄`, contradicting that `P̄` is a Sylow `p`-subgroup of `M`. Hence `P̄ = S ≤ M`. -/
+private theorem exists_sylow_le_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) ≤ M := by
+  obtain ⟨-, P, hP⟩ := hp
+  set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbar
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
+  have hPbar_le_M : Pbar ≤ M := Subgroup.map_subtype_le _
+  have hPbar_subOf : Pbar.subgroupOf M = (P : Subgroup ↥M) := by
+    rw [hPbar, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  obtain ⟨S, hPS⟩ := hPbar_pg.exists_le_sylow
+  have hPeqS : (S : Subgroup G) = Pbar := by
+    by_contra hne
+    have hlt : Pbar < (S : Subgroup G) := lt_of_le_of_ne hPS (Ne.symm hne)
+    have hgrow : Pbar < Subgroup.normalizer Pbar ⊓ (S : Subgroup G) :=
+      lt_inf_normalizer_of_lt_of_isPGroup hlt S.2
+    set Y : Subgroup G := Subgroup.normalizer Pbar ⊓ (S : Subgroup G) with hY
+    have hYM : Y ≤ M := le_trans inf_le_left hP
+    have hYpg : IsPGroup p ↥Y :=
+      S.2.of_injective (Subgroup.inclusion (inf_le_right)) (Subgroup.inclusion_injective _)
+    -- `Y.subgroupOf M` is a `p`-group `⊇ P`, hence `= P` by Sylow maximality; mapping back, `Y = P̄`.
+    have hPle : (P : Subgroup ↥M) ≤ Y.subgroupOf M :=
+      hPbar_subOf ▸ Subgroup.comap_mono (f := M.subtype) hgrow.le
+    have hYsubM_pg : IsPGroup p ↥(Y.subgroupOf M) :=
+      hYpg.of_equiv (Subgroup.subgroupOfEquivOfLe hYM).symm
+    have hYeq : Y.subgroupOf M = (P : Subgroup ↥M) := P.3 hYsubM_pg hPle
+    have : Y = Pbar := by
+      have := congrArg (Subgroup.map M.subtype) hYeq
+      rwa [Subgroup.map_subgroupOf_eq_of_le hYM, ← hPbar] at this
+    exact absurd this hgrow.ne'
+  exact ⟨S, hPeqS ▸ hPbar_le_M⟩
+
+/-- Conjugation by `g` as an order isomorphism of the subgroup lattice of `G`. -/
+private def conjOrderIso (g : G) : Subgroup G ≃o Subgroup G where
+  toFun H := MulAut.conj g • H
+  invFun H := MulAut.conj g⁻¹ • H
+  left_inv H := by
+    show MulAut.conj g⁻¹ • (MulAut.conj g • H) = H
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  right_inv H := by
+    show MulAut.conj g • (MulAut.conj g⁻¹ • H) = H
+    rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  map_rel_iff' := Subgroup.pointwise_smul_le_pointwise_smul_iff
+
+/-- A conjugate of a maximal subgroup is maximal. -/
+private theorem isCoatom_conj_smul {g : G} {M : Subgroup G} (h : IsCoatom M) :
+    IsCoatom (MulAut.conj g • M) :=
+  (OrderIso.isCoatom_iff (conjOrderIso g) M).mpr h
+
+/-- The conjugation/inclusion adjunction: `gXg⁻¹ ≤ M ↔ X ≤ g⁻¹Mg`. -/
+private theorem conj_smul_le_iff {g : G} {X M : Subgroup G} :
+    MulAut.conj g • X ≤ M ↔ X ≤ MulAut.conj g⁻¹ • M :=
+  (OrderIso.le_symm_apply (conjOrderIso g)).symm
+
+/-- Conjugation commutes with `map`: `g • H = H.map (conj g)`. -/
+private theorem mulAut_smul_eq_map (φ : MulAut G) (H : Subgroup G) :
+    φ • H = H.map (φ : G →* G) := rfl
+
+/-- Conjugation preserves cardinality. -/
+private theorem card_conj_smul (g : G) (H : Subgroup G) :
+    Nat.card ↥(MulAut.conj g • H) = Nat.card ↥H :=
+  Subgroup.card_map_of_injective (MulAut.conj g).injective
+
+/-- Conjugation commutes with the normalizer. -/
+private theorem normalizer_conj_smul (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.normalizer (H : Set G)
+      = Subgroup.normalizer ((MulAut.conj g • H : Subgroup G) : Set G) := by
+  rw [mulAut_smul_eq_map, mulAut_smul_eq_map]
+  exact Subgroup.map_normalizer_eq_of_bijective H (MulAut.conj g).bijective
+
+/-- **σ is conjugation-equivariant**: `p ∈ σ(M) ⟹ p ∈ σ(M^g)`. The Sylow `P` witnessing
+`σ(M)` conjugates to a Sylow of `M^g`, and `N_G(P̄) ≤ M` conjugates to `N_G(P̄^g) ≤ M^g`. -/
+private theorem sigma_conj [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (g : G) (hp : p ∈ sigma M) : p ∈ sigma (MulAut.conj g • M) := by
+  rw [mem_sigma_iff] at hp ⊢
+  obtain ⟨hpf, P, hP⟩ := hp
+  refine ⟨by rw [card_conj_smul]; exact hpf, ?_⟩
+  set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbar
+  have hle : MulAut.conj g • Pbar ≤ MulAut.conj g • M :=
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (Subgroup.map_subtype_le _)
+  have hcard : Nat.card ↥((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M))
+      = p ^ (Nat.card ↥(MulAut.conj g • M)).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv, card_conj_smul, card_conj_smul,
+      hPbar, Subgroup.card_map_of_injective M.subtype_injective]
+    exact P.card_eq_multiplicity
+  refine ⟨Sylow.ofCard ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)) hcard, ?_⟩
+  have hP'bar : (((Sylow.ofCard ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)) hcard :
+        Sylow p ↥(MulAut.conj g • M)) : Subgroup ↥(MulAut.conj g • M)).map
+          (MulAut.conj g • M).subtype : Subgroup G) = MulAut.conj g • Pbar := by
+    show ((MulAut.conj g • Pbar).subgroupOf (MulAut.conj g • M)).map (MulAut.conj g • M).subtype = _
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hle]
+  rw [hP'bar, ← normalizer_conj_smul]
+  exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hP
+
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
+
+/-- A proper subgroup has strictly smaller cardinality (finite group). -/
+private theorem card_lt_card_of_lt [Finite G] {H K : Subgroup G} (h : H < K) :
+    Nat.card ↥H < Nat.card ↥K := by
+  refine lt_of_le_of_ne (Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective h.le)) ?_
+  intro hcard
+  exact h.ne (Subgroup.eq_of_le_of_card_ge h.le hcard.ge)
+
+/-- **BG Theorem 10.1 part (b)** (mmd L2679-2711): `C_G(X)` acts transitively by conjugation on
+`{M^g | X ≤ M^g}`. Proved by contradiction, taking `X` a counterexample of maximal order
+(strong induction on `Nat.card G - Nat.card X`). The maximal choice promotes `X` to strictly
+larger `p`-subgroups `X₁ ≤ M₁ ∩ L`, `X₂ ≤ M₂ ∩ L` (where `L = N_G(X)`), for which the inductive
+hypothesis applies, reducing the non-conjugacy `(10.1)` to `(10.2)`: a conjugate `M^s ⊇ P`
+(`P ∈ Syl_p(L)`) and `(M^s)^t` are not `C_G(X)`-conjugate. The rank of `P` then yields a
+contradiction: `r(P) ≥ 3` via the Uniqueness Theorem (9.6), `r(P) ≤ 2` via Theorem 4.18(e) and
+a Frattini decomposition of `L`. -/
+private theorem fusion_b [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) :
+    ∀ X : Subgroup G, X ≠ ⊥ → IsPGroup p X →
+    ∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
+      ∃ c ∈ Subgroup.centralizer (X : Set G),
+        MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M := by
+  classical
+  have hMc : IsCoatom M := mem_maximalSubgroups.mp hM
+  suffices key : ∀ n : ℕ, ∀ X : Subgroup G, Nat.card G - Nat.card ↥X = n →
+      X ≠ ⊥ → IsPGroup p X → ∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
+        ∃ c ∈ Subgroup.centralizer (X : Set G),
+          MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M by
+    intro X hXne hXp g₁ g₂ h1 h2
+    exact key _ X rfl hXne hXp g₁ g₂ h1 h2
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro X hmeas hXne hXp g₁ g₂ h1 h2
+    by_contra hcon
+    push_neg at hcon
+    set M₁ := MulAut.conj g₁ • M with hM₁def
+    set M₂ := MulAut.conj g₂ • M with hM₂def
+    set L := Subgroup.normalizer (X : Set G) with hLdef
+    set C := Subgroup.centralizer (X : Set G) with hCdef
+    have hM1c : IsCoatom M₁ := isCoatom_conj_smul hMc
+    have hM2c : IsCoatom M₂ := isCoatom_conj_smul hMc
+    -- `L = N_G(X) < ⊤`: else `X ⊴ G`, forcing `X ∈ {⊥,⊤}`, both impossible.
+    have hL_lt : L < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro htop
+      rw [hLdef] at htop
+      have hXnorm : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal X hXnorm with hbot | htopX
+      · exact hXne hbot
+      · have hGpg : IsPGroup p G := hXp.of_equiv (htopX ▸ Subgroup.topEquiv)
+        haveI : Group.IsNilpotent G := hGpg.isNilpotent
+        exact hG.notSolvable inferInstance
+    have hXcardG : Nat.card ↥X ≤ Nat.card G :=
+      Nat.le_of_dvd Nat.card_pos X.card_subgroup_dvd_card
+    -- Promote `X` to a strictly larger `p`-subgroup inside `(conj a•M) ∩ L`, given that
+    -- `conj a•M` and `conj b•M` are not `C_G(X)`-conjugate (so `X` is not Sylow in `conj a•M`).
+    have promote : ∀ a b : G, X ≤ MulAut.conj a • M → X ≤ MulAut.conj b • M →
+        (∀ c ∈ C, MulAut.conj c • (MulAut.conj a • M) ≠ MulAut.conj b • M) →
+        ∃ Y : Subgroup G, X < Y ∧ Y ≤ MulAut.conj a • M ∧ Y ≤ L ∧ IsPGroup p ↥Y := by
+      intro a b ha hb hne
+      have hXpa : IsPGroup p ↥(X.subgroupOf (MulAut.conj a • M)) :=
+        hXp.of_equiv (Subgroup.subgroupOfEquivOfLe ha).symm
+      obtain ⟨Q, hQ⟩ := hXpa.exists_le_sylow
+      set S₁ := (Q : Subgroup ↥(MulAut.conj a • M)).map (MulAut.conj a • M).subtype with hS₁def
+      have hXS₁ : X ≤ S₁ := by
+        rw [hS₁def, ← Subgroup.map_subgroupOf_eq_of_le ha]; exact Subgroup.map_mono hQ
+      have hS₁M : S₁ ≤ MulAut.conj a • M := Subgroup.map_subtype_le _
+      have hS₁p : IsPGroup p ↥S₁ :=
+        Q.2.of_equiv (Subgroup.equivMapOfInjective _ _ (MulAut.conj a • M).subtype_injective)
+      have hXS₁lt : X < S₁ := by
+        rcases lt_or_eq_of_le hXS₁ with hlt | heq
+        · exact hlt
+        · exfalso
+          have hgbg : MulAut.conj (a * b⁻¹) • (MulAut.conj b • M) = MulAut.conj a • M := by
+            rw [← mul_smul, ← map_mul, inv_mul_cancel_right]
+          have hdle : MulAut.conj (a * b⁻¹) • S₁ ≤ MulAut.conj a • M := by
+            rw [← heq]
+            calc MulAut.conj (a * b⁻¹) • X
+                  ≤ MulAut.conj (a * b⁻¹) • (MulAut.conj b • M) :=
+                    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hb
+              _ = MulAut.conj a • M := hgbg
+          have hd : (a * b⁻¹) ∈ MulAut.conj a • M :=
+            fusion_d_of_mem_sigma (M := MulAut.conj a • M) (sigma_conj a hp) Q (hS₁def ▸ hdle)
+          have hself : MulAut.conj (a * b⁻¹) • (MulAut.conj a • M) = MulAut.conj a • M :=
+            conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hd)
+          have key : MulAut.conj (a * b⁻¹) • (MulAut.conj a • M)
+              = MulAut.conj (a * b⁻¹) • (MulAut.conj b • M) := hself.trans hgbg.symm
+          have hab : MulAut.conj a • M = MulAut.conj b • M :=
+            le_antisymm (Subgroup.pointwise_smul_le_pointwise_smul_iff.mp key.le)
+              (Subgroup.pointwise_smul_le_pointwise_smul_iff.mp key.ge)
+          exact hne 1 (Subgroup.one_mem C) (by rw [map_one, one_smul]; exact hab)
+      refine ⟨Subgroup.normalizer X ⊓ S₁, lt_inf_normalizer_of_lt_of_isPGroup hXS₁lt hS₁p,
+        le_trans inf_le_right hS₁M, inf_le_left,
+        hS₁p.of_injective (Subgroup.inclusion inf_le_right) (Subgroup.inclusion_injective _)⟩
+    obtain ⟨X₁, hXX₁, hX₁M₁, hX₁L, hX₁p⟩ := promote g₁ g₂ h1 h2 hcon
+    obtain ⟨X₂, hXX₂, hX₂M₂, hX₂L, hX₂p⟩ := promote g₂ g₁ h2 h1 (by
+      intro c hc heq
+      refine hcon c⁻¹ (Subgroup.inv_mem C hc) ?_
+      rw [hM₁def, hM₂def, ← heq, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul])
+    -- `P ∈ Syl_p(L)` containing `X₁`; its image `P̄ ≤ L`.
+    obtain ⟨P, hX₁P⟩ : ∃ P : Sylow p ↥L, X₁ ≤ (P : Subgroup ↥L).map L.subtype := by
+      obtain ⟨P, hP⟩ := (hX₁p.of_equiv (Subgroup.subgroupOfEquivOfLe hX₁L).symm).exists_le_sylow
+      exact ⟨P, by rw [← Subgroup.map_subgroupOf_eq_of_le hX₁L]; exact Subgroup.map_mono hP⟩
+    set Pbar := ((P : Subgroup ↥L).map L.subtype) with hPbardef
+    have hPbarL : Pbar ≤ L := Subgroup.map_subtype_le _
+    have hPbarp : IsPGroup p ↥Pbar :=
+      P.2.of_equiv (Subgroup.equivMapOfInjective _ _ L.subtype_injective)
+    -- WLOG choose `s` with `P̄ ≤ M^s := conj s • M` (uses `σ ⟹ M ⊇ Sylow of G`).
+    obtain ⟨s, hPs⟩ : ∃ s : G, Pbar ≤ MulAut.conj s • M := by
+      obtain ⟨Q, hQM⟩ := exists_sylow_le_of_mem_sigma hp
+      obtain ⟨S', hPbarS'⟩ := hPbarp.exists_le_sylow
+      obtain ⟨a, ha⟩ := MulAction.exists_smul_eq G Q S'
+      refine ⟨a, hPbarS'.trans ?_⟩
+      calc (S' : Subgroup G) = MulAut.conj a • (Q : Subgroup G) := by
+              rw [← ha, Sylow.coe_subgroup_smul]
+        _ ≤ MulAut.conj a • M := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hQM
+    set Ms := MulAut.conj s • M with hMsdef
+    have hMsc : IsCoatom Ms := isCoatom_conj_smul hMc
+    -- `t ∈ L` with `X₂ ≤ P̄^t`.
+    obtain ⟨t, htL, hX₂t⟩ : ∃ t : G, t ∈ L ∧ X₂ ≤ MulAut.conj t • Pbar := by
+      obtain ⟨S'', hX₂S''⟩ := (hX₂p.of_equiv (Subgroup.subgroupOfEquivOfLe hX₂L).symm).exists_le_sylow
+      obtain ⟨t', ht'⟩ := MulAction.exists_smul_eq (↥L) P S''
+      refine ⟨(t' : G), t'.2, ?_⟩
+      calc X₂ = (X₂.subgroupOf L).map L.subtype := (Subgroup.map_subgroupOf_eq_of_le hX₂L).symm
+        _ ≤ (S'' : Subgroup ↥L).map L.subtype := Subgroup.map_mono hX₂S''
+        _ = (MulAut.conj t' • (P : Subgroup ↥L)).map L.subtype := by
+              rw [← ht', Sylow.coe_subgroup_smul]
+        _ = MulAut.conj (t' : G) • Pbar := by rw [map_subtype_conj_smul, ← hPbardef]
+    -- (10.2): `M^s` and `(M^s)^t` are not `C_G(X)`-conjugate.
+    have h102 : ∀ c ∈ C, MulAut.conj c • Ms ≠ MulAut.conj t • Ms := by
+      -- rel1: `M₁` and `M^s` are `C_G(X₁)`-conjugate (IH at `X₁`), hence `C_G(X)`-conjugate.
+      obtain ⟨c₁, hc₁C, hc₁⟩ : ∃ c₁ ∈ C, MulAut.conj c₁ • M₁ = Ms := by
+        have hmeas₁ : Nat.card G - Nat.card ↥X₁ < n := by
+          have h1 : Nat.card ↥X < Nat.card ↥X₁ := card_lt_card_of_lt hXX₁
+          have h2 : Nat.card ↥X₁ ≤ Nat.card G :=
+            Nat.le_of_dvd Nat.card_pos X₁.card_subgroup_dvd_card
+          omega
+        obtain ⟨c, hcC₁, hc⟩ :=
+          IH _ hmeas₁ X₁ rfl (bot_le.trans_lt hXX₁).ne' hX₁p g₁ s hX₁M₁ (hX₁P.trans hPs)
+        exact ⟨c, Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXX₁.le) hcC₁, hc⟩
+      -- rel2: `M₂` and `(M^s)^t` are `C_G(X₂)`-conjugate (IH at `X₂`), hence `C_G(X)`-conjugate.
+      obtain ⟨c₂, hc₂C, hc₂⟩ : ∃ c₂ ∈ C, MulAut.conj c₂ • M₂ = MulAut.conj t • Ms := by
+        have hmeas₂ : Nat.card G - Nat.card ↥X₂ < n := by
+          have h1 : Nat.card ↥X < Nat.card ↥X₂ := card_lt_card_of_lt hXX₂
+          have h2 : Nat.card ↥X₂ ≤ Nat.card G :=
+            Nat.le_of_dvd Nat.card_pos X₂.card_subgroup_dvd_card
+          omega
+        have hX₂ts : X₂ ≤ MulAut.conj (t * s) • M := by
+          rw [map_mul, mul_smul]
+          exact hX₂t.trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPs)
+        obtain ⟨c, hcC₂, hc⟩ :=
+          IH _ hmeas₂ X₂ rfl (bot_le.trans_lt hXX₂).ne' hX₂p g₂ (t * s) hX₂M₂ hX₂ts
+        refine ⟨c, Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXX₂.le) hcC₂, ?_⟩
+        have hbridge : MulAut.conj (t * s) • M = MulAut.conj t • Ms := by
+          rw [hMsdef, map_mul, mul_smul]
+        rw [hM₂def]; exact hc.trans hbridge
+      intro c hcC heqcc
+      refine hcon (c₂⁻¹ * c * c₁) (C.mul_mem (C.mul_mem (C.inv_mem hc₂C) hcC) hc₁C) ?_
+      rw [map_mul, map_mul, mul_smul, mul_smul, hc₁, heqcc, ← hc₂, ← mul_smul, ← map_mul,
+        inv_mul_cancel, map_one, one_smul]
+    -- Case on `r(P̄)`.
+    by_cases hrank : 3 ≤ rank ↥Pbar
+    · -- `r(P) ≥ 3`: `P̄ ∈ 𝒰` (Thm 9.6); `P̄ ≤ L ∩ M^s ⟹ L ≤ M^s ⟹ t ∈ M^s`, contra (10.2).
+      have hPbar_lt : Pbar < ⊤ := lt_of_le_of_lt hPbarL hL_lt
+      have hPbarU : IsUniquelyMaximal Pbar :=
+        OddOrder.BG.Ch2.S09.uniquenessTheorem hG hPbar_lt (by omega) (Or.inl hrank)
+      obtain ⟨N, hNc, hLN⟩ := (IsCoatomic.eq_top_or_exists_le_coatom L).resolve_left hL_lt.ne
+      have hMsN : Ms = N := hPbarU.eq_of_isCoatom_of_le hMsc hPs hNc (hPbarL.trans hLN)
+      have hLMs : L ≤ Ms := hLN.trans hMsN.ge
+      have hconjt : MulAut.conj t • Ms = Ms :=
+        conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hLMs htL))
+      exact h102 1 (Subgroup.one_mem C) (by rw [map_one, one_smul, hconjt])
+    · -- `r(P) ≤ 2`: Thm 4.18(e) + Frattini ⟹ `t = c·m`, contra (10.2).
+      have hrankP : rank ↥(P : Subgroup ↥L) ≤ 2 := by
+        have hle : rank ↥(P : Subgroup ↥L) ≤ rank ↥Pbar :=
+          rank_le_of_injective (f := (Subgroup.equivMapOfInjective (P : Subgroup ↥L) L.subtype
+            L.subtype_injective).toMonoidHom)
+            (Subgroup.equivMapOfInjective _ L.subtype L.subtype_injective).injective
+        omega
+      have hp_dvd_L : p ∣ Nat.card ↥L := by
+        obtain ⟨k, hk⟩ := hX₁p.exists_card_eq
+        have hcard1 : Nat.card ↥X < Nat.card ↥X₁ := card_lt_card_of_lt hXX₁
+        have hk0 : k ≠ 0 := by
+          rintro rfl; rw [pow_zero] at hk; have := Nat.card_pos (α := ↥X); omega
+        refine (hk ▸ dvd_pow_self p hk0).trans ?_
+        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX₁L).toEquiv]
+        exact (X₁.subgroupOf L).card_subgroup_dvd_card
+      have hfd := frattini_decomp_of_rank_le_two hG hL_lt P hp_dvd_L hrankP
+      haveI : (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L).Normal := Ch03.oPiCore.normal _ _
+      obtain ⟨o, ho, w, hw, how⟩ :=
+        Subgroup.mem_sup_of_normal_left.mp (hfd ▸ Subgroup.mem_top (⟨t, htL⟩ : ↥L))
+      have hXL : X ≤ L := Subgroup.le_normalizer
+      have hXsubL_normal : (X.subgroupOf L).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hXL).mpr le_rfl
+      have hdisj : Disjoint (Ch03.oPiCore {q | q ∉ ({p} : Set ℕ)} ↥L) (X.subgroupOf L) := by
+        rw [disjoint_iff, inf_comm]
+        exact inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+          (isPiSubgroup_singleton_of_isPGroup
+            (hXp.of_equiv (Subgroup.subgroupOfEquivOfLe hXL).symm))
+          (Ch03.oPiCore.isPiGroup _)
+      -- `↑o ∈ C_G(X)`: the `p'`-core centralizes the normal `p`-subgroup `X`.
+      have ho_cent : (o : G) ∈ C := by
+        rw [hCdef, Subgroup.mem_centralizer_iff]
+        intro x hx
+        have hxL : x ∈ L := hXL hx
+        have hcomm : Commute o (⟨x, hxL⟩ : ↥L) :=
+          Subgroup.commute_of_normal_of_disjoint _ _ (Ch03.oPiCore.normal _ _) hXsubL_normal hdisj
+            o ⟨x, hxL⟩ ho (Subgroup.mem_subgroupOf.mpr hx)
+        have hval := congrArg (Subgroup.subtype L) hcomm.eq
+        simpa using hval.symm
+      -- `↑n ∈ N_G(P̄)`.
+      have hn_norm : MulAut.conj (w : G) • Pbar = Pbar := by
+        have h1 : MulAut.conj w • (P : Subgroup ↥L) = (P : Subgroup ↥L) :=
+          conj_smul_eq_self_of_mem_normalizer hw
+        have h2 := congrArg (Subgroup.map L.subtype) h1
+        rwa [map_subtype_conj_smul, ← hPbardef] at h2
+      -- IH applied to `P̄` (strictly larger than `X`): `M^s` and `(M^s)^n` are `C_G(P̄)`-conjugate.
+      have hXPbar : X < Pbar := lt_of_lt_of_le hXX₁ hX₁P
+      have hmeasP : Nat.card G - Nat.card ↥Pbar < n := by
+        have h1 : Nat.card ↥X < Nat.card ↥Pbar := card_lt_card_of_lt hXPbar
+        have h2 : Nat.card ↥Pbar ≤ Nat.card G :=
+          Nat.le_of_dvd Nat.card_pos Pbar.card_subgroup_dvd_card
+        omega
+      have hPbarns : Pbar ≤ MulAut.conj ((w : G) * s) • M := by
+        rw [map_mul, mul_smul]
+        exact hn_norm.symm.le.trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPs)
+      obtain ⟨x, hxC, hx⟩ :=
+        IH _ hmeasP Pbar rfl (bot_le.trans_lt hXPbar).ne' hPbarp s ((w : G) * s) hPs hPbarns
+      have hx' : MulAut.conj x • Ms = MulAut.conj (w : G) • Ms :=
+        hx.trans (by rw [hMsdef, map_mul, mul_smul])
+      -- `↑n = x · m` with `x ∈ C_G(P̄) ⊆ C_G(X)` and `m ∈ M^s`.
+      have hMs_selfnorm : Subgroup.normalizer (Ms : Set G) ≤ Ms :=
+        maximal_normalizer_le_self hG (mem_maximalSubgroups.mpr hMsc)
+      have hnm : MulAut.conj ((w : G)⁻¹ * x) • Ms = Ms := by
+        rw [map_mul, mul_smul, hx', ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      have hnx_mem : (w : G)⁻¹ * x ∈ Ms :=
+        hMs_selfnorm (mem_normalizer_of_conj_smul_eq_self hnm)
+      -- assemble `t = c · m`, `c = ↑o · x ∈ C`, `m ∈ M^s`.
+      have ht_eq : t = (o : G) * (w : G) := by
+        have := congrArg (Subgroup.subtype L) how
+        simpa using this.symm
+      set c := (o : G) * x with hcdef
+      have hxX_cent : x ∈ C := Subgroup.centralizer_le
+        (SetLike.coe_subset_coe.mpr (hXPbar.le)) hxC
+      have hc_mem : c ∈ C := C.mul_mem ho_cent hxX_cent
+      have hct : c⁻¹ * t ∈ Ms := by
+        have hval : c⁻¹ * t = ((w : G)⁻¹ * x)⁻¹ := by rw [hcdef, ht_eq]; group
+        rw [hval]; exact Ms.inv_mem hnx_mem
+      refine h102 c hc_mem ?_
+      have hfix : MulAut.conj (c⁻¹ * t) • Ms = Ms :=
+        conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hct)
+      calc MulAut.conj c • Ms
+          = MulAut.conj c • (MulAut.conj (c⁻¹ * t) • Ms) := by rw [hfix]
+        _ = MulAut.conj (c * (c⁻¹ * t)) • Ms := by rw [← mul_smul, ← map_mul]
+        _ = MulAut.conj t • Ms := by rw [mul_inv_cancel_left]
 
 /-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。
 (a) `X, X^g ⊆ M ⇒ g = cm` (`c∈C_G(X)`, `m∈M`); (b) `C_G(X)` は `{M^g | X⊆M^g}` 上推移的;
-(c) `X⊆M ⇒ N_G(X)=N_M(X)C_G(X)`; (d) `X∈Syl_p(M), X^g⊆M ⇒ g∈M`; (e) `C_G(X)⊆M, X^g⊆M ⇒ g∈M`。
-共役 `X^g` は `MulAut.conj g • X`、(c) の積分解は要素形で述べる。 -/
+(c) `X⊆M ⇒ N_G(X)=N_M(X)C_G(X)`; (d) `X∈Syl_p(M), X^g⊆M ⇒ g∈M`; (e) `X⊆M, C_G(X)⊆M, X^g⊆M ⇒ g∈M`。
+共役 `X^g` は `MulAut.conj g • X`、(c) の積分解は要素形で述べる。BG は (a) を `g = cm` と書くが、
+left-conj 規約 `conj g • X = gXg⁻¹` の下では `g = mc` (`m∈M`, `c∈C_G(X)`) が導かれるので、その形で述べる。
+(e) は BG では `C_G(X)⊆M` のみだが、本質的に `X⊆M` を暗黙前提とする (a) の系なので `X⊆M` を明示する
+(`C_G(X)⊆M` だけからは `X⊆M` が一般には従わない: `X` 非可換だと `X⊄C_G(X)`)。 -/
 theorem fusion_control_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M)
     {X : Subgroup G} (hXne : X ≠ ⊥) (hXp : IsPGroup p X) :
     (X ≤ M → ∀ g : G, MulAut.conj g • X ≤ M →
-      ∃ c ∈ Subgroup.centralizer (X : Set G), ∃ m ∈ M, g = c * m) ∧
+      ∃ m ∈ M, ∃ c ∈ Subgroup.centralizer (X : Set G), g = m * c) ∧
     (∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
       ∃ c ∈ Subgroup.centralizer (X : Set G),
         MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M) ∧
@@ -401,8 +778,43 @@ theorem fusion_control_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
       ∃ a ∈ Subgroup.normalizer X ⊓ M, ∃ c ∈ Subgroup.centralizer (X : Set G), n = a * c) ∧
     ((∃ P : Sylow p ↥M, X = (P : Subgroup ↥M).map M.subtype) →
       ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) ∧
-    (Subgroup.centralizer (X : Set G) ≤ M → ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) := by
-  sorry
+    (X ≤ M → Subgroup.centralizer (X : Set G) ≤ M →
+      ∀ g : G, MulAut.conj g • X ≤ M → g ∈ M) := by
+  have hb : ∀ g₁ g₂ : G, X ≤ MulAut.conj g₁ • M → X ≤ MulAut.conj g₂ • M →
+      ∃ c ∈ Subgroup.centralizer (X : Set G),
+        MulAut.conj c • (MulAut.conj g₁ • M) = MulAut.conj g₂ • M :=
+    fusion_b hG hM hp X hXne hXp
+  have ha : X ≤ M → ∀ g : G, MulAut.conj g • X ≤ M →
+      ∃ m ∈ M, ∃ c ∈ Subgroup.centralizer (X : Set G), g = m * c := by
+    intro hXM g hgM
+    obtain ⟨c, hcC, hc⟩ :=
+      hb 1 g⁻¹ (by rw [map_one, one_smul]; exact hXM) (conj_smul_le_iff.mp hgM)
+    rw [map_one, one_smul] at hc
+    have hgc : MulAut.conj (g * c) • M = M := by
+      rw [map_mul, mul_smul, hc, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    exact ⟨g * c, maximal_normalizer_le_self hG hM (mem_normalizer_of_conj_smul_eq_self hgc),
+      c⁻¹, Subgroup.inv_mem _ hcC, by group⟩
+  refine ⟨ha, hb, ?_, ?_, ?_⟩
+  · -- (c): `N_G(X) = N_M(X)·C_G(X)`, from (a) applied to `n ∈ N_G(X)`.
+    intro hXM n hn
+    have hnXM : MulAut.conj n • X ≤ M := by
+      rw [conj_smul_eq_self_of_mem_normalizer hn]; exact hXM
+    obtain ⟨m, hmM, c, hcC, hnmc⟩ := ha hXM n hnXM
+    refine ⟨m, ?_, c, hcC, hnmc⟩
+    rw [Subgroup.mem_inf]
+    refine ⟨?_, hmM⟩
+    have hmeq : m = n * c⁻¹ := by rw [hnmc]; group
+    rw [hmeq]
+    exact Subgroup.mul_mem _ hn
+      (Subgroup.centralizer_le_normalizer _ (Subgroup.inv_mem _ hcC))
+  · -- (d): `X` Sylow of `M`, `X^g ⊆ M ⟹ g ∈ M`.
+    rintro ⟨P, hPX⟩ g hg
+    exact fusion_d_of_mem_sigma hp P (hPX ▸ hg)
+  · -- (e): `X ⊆ M` (BG の暗黙前提), `C_G(X) ⊆ M`, `X^g ⊆ M ⟹ g ∈ M`, from (a).
+    intro hXM hCM g hgM
+    obtain ⟨m, hmM, c, hcC, hgmc⟩ := ha hXM g hgM
+    rw [hgmc]
+    exact M.mul_mem hmM (hCM hcC)
 
 /-! ## Theorem 10.2 — M_σ/M_α の Hall 構造 (mmd L2713) -/
 

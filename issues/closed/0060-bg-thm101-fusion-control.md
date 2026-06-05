@@ -7,7 +7,30 @@ created: 2026-06-05
 
 # BG Thm 10.1 fusion control (§10 keystone)
 
-## ▶▶▶ START HERE (fresh session, 2026-06-05 引き継ぎ)
+## ✅ DONE (2026-06-05)
+
+`fusion_control_of_mem_sigma` (BG Thm 10.1, 5 parts a–e) は **sorry-free + axiom-clean**
+(`#print axioms` = `[propext, Classical.choice, Quot.sound]`) 完成。full build 3580 jobs green。
+
+**実装** (`S10_MalphaMsigma.lean`, 全て `OddOrder.BG.Ch3.S10` 内 private helper + 本体):
+- 新 helper: `lt_inf_normalizer_of_lt_of_isPGroup` (p群内 normalizer 成長) /
+  `exists_sylow_le_of_mem_sigma` (σ⟹M⊇Sylow of G) / `conjOrderIso` + `isCoatom_conj_smul` +
+  `conj_smul_le_iff` (共役随伴・coatom保存) / `mulAut_smul_eq_map` / `card_conj_smul` /
+  `normalizer_conj_smul` / `sigma_conj` (σ equivariance) / `card_lt_card_of_lt`。
+- `fusion_b` = part (b)、`Nat.card G - Nat.card X` の強帰納 (maximal-order counterexample)。
+  内部 `promote` で X を strict に拡大 (Step A の strictness を (d) で内包)、`h102` で (10.1)⟹(10.2)、
+  r(P)≥3 (Thm 9.6) / r(P)≤2 (Thm 4.18(e)+Frattini+IH) の2分岐で矛盾。WLOG は M^s=conj s•M を
+  「M の共役 maximal」として扱い σ_conj で `fusion_d_of_mem_sigma` を M₁ に直接適用 (M literal 取替え無し)。
+- 規約解決: (a) は `g = m*c` (M·C 順、commit 済 scaffold 修正)。
+- **(e) は `X ≤ M` を hypothesis に追加** (BG は `C_G(X)⊆M` のみだが (a) の系で X⊆M 暗黙前提;
+  `C_G(X)⊆M` だけからは X⊆M が一般に従わない — X 非可換だと X⊄C_G(X))。scaffold 修正 ((a) order と同質、合法)。
+
+**解禁**: Thm 10.2 (`isHall_Msigma_Malpha`) が (10.1) 消費可能に。次は §10 残 sorry
+(10.2 → 10.6 → Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-14)。
+
+---
+
+## ▶▶▶ START HERE (fresh session, 2026-06-05 引き継ぎ) — 【完了済、履歴として保存】
 
 **状態**: §9 完全 close 済 (commit 12ae441)。Thm 10.1 の **5 prerequisite が全て build-green の private
 helper として完成・コミット済** (`OddOrder/BG/Ch3_MaximalSubgroups/S10_MalphaMsigma.lean`)。
