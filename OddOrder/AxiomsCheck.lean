@@ -1875,6 +1875,13 @@ set_option linter.style.longLine false in
 -- full (6.2) θ-bound: a-half × b-half + √ arithmetic ⟹ `θ(1) ≤ |K:C|·√|C:D|` (constituent kernel
 -- inheritance discharges the b-half's `N ⊆ Ker φ` from `N ⊆ Ker(Res θ)`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.theta_degree_le_index_mul_sqrt_index
+-- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
+-- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
+-- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
+-- abelianization lemma this yields "`H` is a `p`-group" for the (6.8) capstone.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isPGroup_of_card_le_of_isFrobeniusAction
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms

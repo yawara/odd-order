@@ -2085,6 +2085,138 @@ theorem isPGroup_of_isNilpotent_of_isPGroup_abelianization {p : ℕ} [Fact p.Pri
   rw [IsPGroup.iff_card]
   exact ⟨0, by rw [pow_zero]; exact @Nat.card_of_subsingleton (Γ ⧸ (↑P : Subgroup Γ)) 1 hQ_triv⟩
 
+/-- **Group-theory core of Peterfalvi (6.5)(a),(b): a Frobenius-acted abelian section obeying the
+(6.3) index bound is a `p`-group.**
+
+Let a finite group `R` act on a finite abelian group `A` by automorphisms, *fixed-point-freely*
+(`IsFrobeniusAction R A`: no nonidentity `r ∈ R` fixes a nonidentity `a ∈ A`).  If `|A|` and `|R|`
+are odd and `|A| ≤ 4|R|² + 1`, then `A` is a `p`-group for some prime `p`.
+
+This is the abstract content of Peterfalvi (6.5).  In the Sibley setting `A = K/H₁` is the
+abelianization section and `R = L/K` is the Frobenius complement; (6.5)(a) says `K/H₁` is a chief
+factor.  Here the chief-factor argument is run through the `p`-primary component: if `A` had a prime
+divisor `p` whose Sylow subgroup `P` were proper (i.e. `A` were not a `p`-group), then `P`
+(characteristic in the abelian `A`, hence `R`-invariant) and the quotient index `|A : P|` would both
+be nontrivial, odd, and `≡ 1 (mod |R|)` — the first two by Frobenius `card_modEq_one` applied to the
+whole action and the restricted action on `P` (`IsFrobeniusAction.subgroup`), the index by the
+arithmetic `|A| = |A:P|·|P|`, `|A| ≡ |P| ≡ 1`.  Oddness then forces `|P|, |A:P| ≥ 2|R| + 1`
+(`two_mul_add_one_le_of_odd_dvd`), so `|A| = |A:P|·|P| ≥ (2|R|+1)² > 4|R|² + 1`, contradicting the
+bound (`six_five_chief_factor_contradiction`).
+
+The `|A| ≤ 4|R|² + 1` bound is the single character-theoretic input ((6.2)/(6.3); in the Sibley
+setup supplied by `theta_degree_le_index_mul_sqrt_index`).  Everything else is discharged here. -/
+theorem isPGroup_of_card_le_of_isFrobeniusAction {A R : Type*} [CommGroup A] [Finite A]
+    [Group R] [Finite R] [MulDistribMulAction R A]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction R A)
+    (hAodd : Odd (Nat.card A)) (hRodd : Odd (Nat.card R))
+    (hbound : Nat.card A ≤ 4 * Nat.card R ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p A := by
+  classical
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype R := Fintype.ofFinite R
+  by_contra hcon
+  -- `A` is nontrivial: a trivial group is a `p`-group for every prime.
+  rcases eq_or_ne (Nat.card A) 1 with hA1 | hA1
+  · haveI : Fact (Nat.Prime 2) := ⟨Nat.prime_two⟩
+    exact hcon ⟨2, Nat.prime_two, IsPGroup.iff_card.mpr ⟨0, by rw [pow_zero, hA1]⟩⟩
+  -- Otherwise take a prime divisor `p` of `|A|` and its Sylow `p`-subgroup `P`.
+  obtain ⟨p, hp, hpdvd⟩ := (Nat.card A).exists_prime_and_dvd hA1
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨P⟩ : Nonempty (Sylow p A) := inferInstance
+  -- `|P| > 1` because `p ∣ |P|`.
+  have hpP : p ∣ Nat.card (P : Subgroup A) := P.dvd_card_of_dvd_card hpdvd
+  have hcardP : 1 < Nat.card (P : Subgroup A) :=
+    lt_of_lt_of_le hp.one_lt (Nat.le_of_dvd Nat.card_pos hpP)
+  -- `P` is normal (abelian ambient), hence characteristic.
+  have hPnormal : (P : Subgroup A).Normal :=
+    ⟨fun n hn g => by
+      have heq : g * n * g⁻¹ = n := by rw [mul_comm g n, mul_assoc, mul_inv_cancel, mul_one]
+      rw [heq]; exact hn⟩
+  have hPchar : (P : Subgroup A).Characteristic := P.characteristic_of_normal hPnormal
+  -- `R` acts by automorphisms, which fix the characteristic `P` setwise: `P` is `R`-invariant.
+  have hinv : ∀ r : R, ∀ m ∈ (P : Subgroup A), r • m ∈ (P : Subgroup A) := by
+    intro r m hm
+    have hmap : (P : Subgroup A).map (MulDistribMulAction.toMulAut R A r).toMonoidHom
+        = (P : Subgroup A) :=
+      Subgroup.characteristic_iff_map_eq.mp hPchar (MulDistribMulAction.toMulAut R A r)
+    have hmem : (MulDistribMulAction.toMulAut R A r).toMonoidHom m ∈ (P : Subgroup A) := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- `A` not a `p`-group ⟹ `P ≠ ⊤` ⟹ `|A : P| > 1`.
+  have hindex : 1 < (P : Subgroup A).index := by
+    by_contra hle
+    have h : (P : Subgroup A).index ≤ 1 := Nat.not_lt.mp hle
+    have hidxpos : 0 < (P : Subgroup A).index := by
+      have hmc := Subgroup.index_mul_card (P : Subgroup A)
+      rcases Nat.eq_zero_or_pos (P : Subgroup A).index with h0 | h0
+      · rw [h0, zero_mul] at hmc; exact absurd hmc.symm Nat.card_pos.ne'
+      · exact h0
+    have hidx1 : (P : Subgroup A).index = 1 := by omega
+    have hPtop : (P : Subgroup A) = ⊤ := Subgroup.index_eq_one.mp hidx1
+    have hcardeq : Nat.card (P : Subgroup A) = Nat.card A := by
+      rw [hPtop]; exact Nat.card_congr (Subgroup.topEquiv).toEquiv
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+    exact hcon ⟨p, hp, IsPGroup.iff_card.mpr ⟨n, by rw [← hcardeq, hn]⟩⟩
+  -- Frobenius `card ≡ 1 (mod |R|)` for the whole action and the restricted action on `P`.
+  haveI : Fintype (P : Subgroup A) := Fintype.ofFinite _
+  have hAmod : Nat.card A ≡ 1 [MOD Nat.card R] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrob.card_modEq_one
+  letI instP : MulDistribMulAction R (P : Subgroup A) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction
+      (P : Subgroup A) hinv
+  have hFrobP : @OddOrder.Isaacs.Ch06.IsFrobeniusAction R (P : Subgroup A) _ _ instP :=
+    hFrob.subgroup (P : Subgroup A) hinv
+  have hPmod : Nat.card (P : Subgroup A) ≡ 1 [MOD Nat.card R] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrobP.card_modEq_one
+  -- `|R| ∣ |P| - 1` and (via `|A| = |A:P|·|P|`) `|R| ∣ |A:P| - 1`.
+  have hRdvdP : Nat.card R ∣ Nat.card (P : Subgroup A) - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hPmod.symm
+  have hmul : (P : Subgroup A).index * Nat.card (P : Subgroup A) = Nat.card A :=
+    Subgroup.index_mul_card _
+  have hidxmod : (P : Subgroup A).index ≡ 1 [MOD Nat.card R] := by
+    have h1 : (P : Subgroup A).index * Nat.card (P : Subgroup A)
+        ≡ (P : Subgroup A).index * 1 [MOD Nat.card R] := Nat.ModEq.mul_left _ hPmod
+    rw [mul_one, hmul] at h1
+    exact h1.symm.trans hAmod
+  have hRdvdidx : Nat.card R ∣ (P : Subgroup A).index - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hidxmod.symm
+  -- Oddness of both factors (they multiply to the odd `|A|`).
+  have hAodd' : Odd ((P : Subgroup A).index * Nat.card (P : Subgroup A)) := by
+    rw [hmul]; exact hAodd
+  obtain ⟨hidxodd, hcardPodd⟩ := Nat.odd_mul.mp hAodd'
+  -- Each factor is `≥ 2|R| + 1`; their product exceeds the bound — contradiction.
+  have hbP : 2 * Nat.card R + 1 ≤ Nat.card (P : Subgroup A) :=
+    two_mul_add_one_le_of_odd_dvd hRodd hcardPodd hRdvdP hcardP
+  have hbidx : 2 * Nat.card R + 1 ≤ (P : Subgroup A).index :=
+    two_mul_add_one_le_of_odd_dvd hRodd hidxodd hRdvdidx hindex
+  exact six_five_chief_factor_contradiction Nat.card_pos hbidx hbP hmul.symm hbound
+
+/-- **Peterfalvi (6.5)(b) reduction: `H` is a `p`-group.**  Assemble the chief-factor core
+`isPGroup_of_card_le_of_isFrobeniusAction` (the abelianization `Abelianization H` is a `p`-group)
+with `isPGroup_of_isNilpotent_of_isPGroup_abelianization` (a nilpotent group with `p`-group
+abelianization is a `p`-group).
+
+Let `H` be a finite nilpotent group whose abelianization `Abelianization H` carries a
+fixed-point-free action of a finite group `R` (in the Sibley setting `R = L/H` is the Frobenius
+complement acting on `H/H'` by conjugation), with `|Abelianization H|` and `|R|` odd and
+`|Abelianization H| ≤ 4|R|² + 1`.  Then `H` is a `p`-group for some prime `p`.
+
+This is the group-theory conclusion of Peterfalvi (6.5) ("we may assume `H` is a non-abelian
+`p`-group") in the form the (6.8) capstone consumes; the `≤ 4|R|² + 1` bound is the single
+character-theoretic input ((6.2)/(6.3)), and the fixed-point-free `R`-action on `Abelianization H`
+is supplied from the Frobenius alternative (6.8)(c1) / (6.4.c). -/
+theorem isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization
+    {H : Type*} [Group H] [Finite H] [Group.IsNilpotent H]
+    {R : Type*} [Group R] [Finite R] [MulDistribMulAction R (Abelianization H)]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction R (Abelianization H))
+    (hHodd : Odd (Nat.card (Abelianization H))) (hRodd : Odd (Nat.card R))
+    (hbound : Nat.card (Abelianization H) ≤ 4 * Nat.card R ^ 2 + 1) :
+    ∃ p : ℕ, Nat.Prime p ∧ IsPGroup p H := by
+  obtain ⟨p, hp, hPab⟩ :=
+    isPGroup_of_card_le_of_isFrobeniusAction hFrob hHodd hRodd hbound
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact ⟨p, hp, isPGroup_of_isNilpotent_of_isPGroup_abelianization hPab⟩
+
 /-- A finite group with non-trivial abelianization carries a non-trivial linear character
 `Γ →* ℂˣ`. Equivalently (via `IsSolvable.commutator_lt_top_of_nontrivial`) every non-trivial
 finite solvable group has one.
