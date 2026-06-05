@@ -1296,6 +1296,25 @@ theorem Msigma_quotient_Malpha_le_fitting_of_isHall [Finite G]
     _ ≤ Ch01.fitting (↥M ⧸ N) :=
       derived_quotient_Malpha_le_fitting_of_isHall hG hM hHallα
 
+/-- **BG Theorem 10.2(d), `M_σ/M_α` is an `α(M)'`-group** (mmd L2735-2738):
+once `M_α` is an `α(M)`-Hall subgroup, the quotient `M/M_α` has no `α(M)`-prime
+divisors, hence neither does the image of `M_σ`. -/
+theorem Msigma_quotient_Malpha_isPiGroup_alphaCompl_of_isHall [Finite G] {M : Subgroup G}
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) :
+    Ch03.Subgroup.IsPiGroup (alpha M)ᶜ
+      (((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))) := by
+  intro r hr
+  have hHallαM : Ch03.IsHallSubgroup (alpha M) ((Malpha M).subgroupOf M) :=
+    Malpha_subgroupOf_isHall_of_isHall hHallα
+  have hrQ : r ∈ (Nat.card (↥M ⧸ (Malpha M).subgroupOf M)).primeFactors :=
+    Nat.primeFactors_mono
+      (Subgroup.card_subgroup_dvd_card
+        (((Msigma M).subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M))))
+      Nat.card_pos.ne' hr
+  have hridx : r ∈ ((Malpha M).subgroupOf M).index.primeFactors := by
+    simpa [Subgroup.index] using hrQ
+  exact hHallαM.2 r hridx
+
 /-- Singleton cores for primes in `σ(M)` lie in `M_σ`. This is the local bridge used in
 the hard `M_α = 1` branch of BG Theorem 10.2(e): once the low-rank argument produces a
 nontrivial `O_q(M)` with `q ∈ σ(M)`, this inclusion turns it into `M_σ ≠ 1`. -/
