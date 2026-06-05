@@ -178,13 +178,19 @@ coprime 作用の標準事実**ゆえ:
     (`Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian` + 上記 coprimality;
     CommGroup ↥Q は `{ (inferInstance:Group ↥Q) with mul_comm := Q_elementaryAbelian.comm }` で diamond 回避)。
   - `w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed` : **FPF** — `x∈⁅Q,W2⁆` かつ W2-固定 ⟹ x=1。
-- 🔴 残る「新規数学」:
-  1. **(XI) `y∈[Q,P₀]`**: 実 `y` (∈Q, `y_mem_Q`) を `actionCommutator w2ConjQAut` (= ↥Q 内 [Q,W2]) の
-     元として扱う reduction (or carrier field 追加)。`⟨y,y_mem_Q⟩ : ↥Q` の [Q,W2]-成分を取る。
-  2. **kernel→End 翻訳**: BG の `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を `actionCommutator w2ConjQAut`
-     (abelian, ↥Q 部分群) 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`)
-     で `(s⁻¹−1)` 可逆化。`w2ConjQAut ⟨s,·⟩` (s = W2 生成元) の作用が「s 共役」。
-  ⟹ (X) infra core は landed、残りは (XI) bridge + kernel 段の End 計算。
+- **✅ (XI) bridge LANDED (2026-06-05, commit 5b1288b)**:
+  - `w2ConjQAut_apply_coe` : `(w2ConjQAut w x : G) = w·x·w⁻¹` (rfl)。
+  - `exists_yD_mem_actionCommutator_conj_s_eq_t` : **BG Remark (XI)** —
+    `∃ yD ∈ ⁅Q,W2⁆, MulAut.conj yD s = t`。Q = ⁅Q,W2⁆·C_Q(W2) (`fixedPoints_sup_actionCommutator_eq_top`)
+    で y=yD·yC、yC∈C_Q(W2) が s と可換 ⟹ t = y·s·y⁻¹ = yD·s·yD⁻¹。kernel 段は yD (∈[Q,W2]) を使える。
+- 🔴 残り (Step 4 の残作業、(X)/(XI) infra は完了):
+  1. **(C.2)–(C.10) 群関係鎖** (convention-heavy, 既存 API chain): `s^a s^b=s²` → … → `s₁s₂s₃=1` /
+     `t²s₁t⁻¹s₂t⁻¹s₃=1`。§3 補題分解参照。`s^a` 二義性 (§6) を最初に固定。
+  2. **kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を ⁅Q,W2⁆ 上の
+     ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`; s-only 形は
+     W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化 → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
+  3. **`s₁=s⁻¹` capstone** + 配線 (経路A: `appC_normSet_generator_relation_of_first_k_three_coordinate`)。
+  ⟹ infra (X)/(XI) は全て landed。残りは群関係鎖 (1) → End 計算 (2) → capstone (3)。
 
 ---
 
