@@ -148,6 +148,18 @@ theorem tSide_cyclotomic_quotient_divisor_modEq_one (hyp : Hypothesis (G := G)) 
 
 end Hypothesis
 
+private theorem p_pow_sub_two_lt_q_sq_of_pow_lt_mul_sq {p q : ℕ}
+    (hq2 : 2 ≤ q) (hlt : p ^ q < (p * q) ^ 2) :
+    p ^ (q - 2) < q ^ 2 := by
+  have hpow_eq : p ^ q = p ^ (q - 2) * p ^ 2 := by
+    calc
+      p ^ q = p ^ ((q - 2) + 2) := by rw [show (q - 2) + 2 = q by omega]
+      _ = p ^ (q - 2) * p ^ 2 := by rw [pow_add]
+  have hmul_eq : (p * q) ^ 2 = p ^ 2 * q ^ 2 := by ring
+  rw [hpow_eq, hmul_eq] at hlt
+  rw [mul_comm (p ^ (q - 2)) (p ^ 2)] at hlt
+  exact Nat.lt_of_mul_lt_mul_left hlt
+
 /-- The concrete norm relation produced by the generator-relation argument in
 **BG Appendix C, Lemma C.3**, expressed at the Peterfalvi Section 16 interface.
 For every `a` in the norm set `E`, the relation should give `N(2 * a - 1) = 1`;
@@ -3164,6 +3176,47 @@ theorem u_eq_thirty_one_of_caseB {hyp : Hypothesis (G := G)}
   rw [hparams.1, hparams.2] at hu
   norm_num at hu
   exact hu
+
+/-- **Peterfalvi (14.15)**: the case-(a) bound of (14.14) turns a lower
+bound `p^q < h - 1` into the key inequality `p^(q - 2) < q^2`. -/
+theorem p_pow_q_sub_two_lt_q_sq_of_p_pow_lt_h_sub_one
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (hcaseA : data.caseA)
+    (hpow_lt_h : hyp.base.p ^ hyp.base.q < nc.h - 1) :
+    hyp.base.p ^ (hyp.base.q - 2) < hyp.base.q ^ 2 := by
+  have hbound := data.caseA_bound hcaseA
+  have hpq_pos_nat : 0 < hyp.base.p * hyp.base.q :=
+    Nat.mul_pos hyp.base.p_prime.pos hyp.base.q_prime.pos
+  have hpq_posQ : (0 : ℚ) < (hyp.base.p * hyp.base.q : ℚ) := by
+    exact_mod_cast hpq_pos_nat
+  have hmul := mul_le_mul_of_nonneg_right hbound (le_of_lt hpq_posQ)
+  have hleQ : ((nc.h - 1 : ℕ) : ℚ) ≤
+      (hyp.base.p * hyp.base.q : ℚ) * ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := by
+    rw [div_mul_cancel₀ _ (ne_of_gt hpq_posQ)] at hmul
+    nlinarith [hmul]
+  have hsub_ltQ : ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) <
+      (hyp.base.p * hyp.base.q : ℚ) := by
+    have hsub_lt : hyp.base.p * hyp.base.q - 1 < hyp.base.p * hyp.base.q := by omega
+    exact_mod_cast hsub_lt
+  have hpow_ltQ : ((hyp.base.p ^ hyp.base.q : ℕ) : ℚ) < ((nc.h - 1 : ℕ) : ℚ) := by
+    exact_mod_cast hpow_lt_h
+  have hright_lt_sq :
+      (hyp.base.p * hyp.base.q : ℚ) * ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) <
+        (hyp.base.p * hyp.base.q : ℚ) * (hyp.base.p * hyp.base.q : ℚ) :=
+    mul_lt_mul_of_pos_left hsub_ltQ hpq_posQ
+  have hpq_sqQ : ((hyp.base.p ^ hyp.base.q : ℕ) : ℚ) <
+      ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ^ 2 := by
+    calc
+      ((hyp.base.p ^ hyp.base.q : ℕ) : ℚ) < ((nc.h - 1 : ℕ) : ℚ) := hpow_ltQ
+      _ ≤ (hyp.base.p * hyp.base.q : ℚ) *
+          ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ) := hleQ
+      _ < (hyp.base.p * hyp.base.q : ℚ) * (hyp.base.p * hyp.base.q : ℚ) :=
+        hright_lt_sq
+      _ = ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ^ 2 := by
+        norm_num [Nat.cast_mul, pow_two]
+  have hpq_sq_nat : hyp.base.p ^ hyp.base.q < (hyp.base.p * hyp.base.q) ^ 2 := by
+    exact_mod_cast hpq_sqQ
+  exact p_pow_sub_two_lt_q_sq_of_pow_lt_mul_sq hyp.base.q_prime.two_le hpq_sq_nat
 
 /-- **Peterfalvi (14.15)**: the final numerical contradiction for the
 case-(a) branch of (14.14). Once the bound is specialized to `(q,p) = (3,7)`,
