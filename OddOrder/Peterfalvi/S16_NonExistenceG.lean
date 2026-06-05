@@ -31,6 +31,7 @@ open OddOrder.GroupTheory
 open OddOrder.RepresentationTheory
 open OddOrder.Isaacs
 open scoped Pointwise
+open scoped BigOperators
 
 variable {G : Type*} [Group G]
 
@@ -1620,6 +1621,23 @@ theorem u_eq_of_not_modEq_one {hyp : Hypothesis (G := G)}
       hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
   data.order.u_eq_of_not_modEq_one
 
+/-- In the S-side case-(9.7.b) conclusion of **Peterfalvi (14.6)**, `u` is at
+most the full cyclotomic quotient.  The `p ≡ 1 mod q` branch divides that
+quotient by the additional factor `q`; the other branch is equality. -/
+theorem u_le_full_cyclotomic {hyp : Hypothesis (G := G)}
+    (data : CaseBForSData hyp) :
+    hyp.base.u ≤ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+  by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+  · rw [data.u_eq_of_p_modEq_one hmod]
+    have hp1_pos : 0 < hyp.base.p - 1 := by
+      have hp2 : 2 ≤ hyp.base.p := hyp.base.p_prime.two_le
+      omega
+    have hden_le : hyp.base.p - 1 ≤ hyp.base.q * (hyp.base.p - 1) := by
+      have hqpos : 1 ≤ hyp.base.q := hyp.base.q_prime.one_le
+      nlinarith [Nat.mul_le_mul_right (hyp.base.p - 1) hqpos]
+    exact Nat.div_le_div_left hden_le hp1_pos
+  · rw [data.u_eq_of_not_modEq_one hmod]
+
 end CaseBForSData
 
 /-- **Peterfalvi (14.6)**: case (9.7.b) holds for `S`. -/
@@ -1812,6 +1830,132 @@ theorem q_pow_gt_p_pow (hyp : Hypothesis (G := G)) :
   OddOrder.Peterfalvi.S16.q_pow_gt_p_pow hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
 
 end Hypothesis
+
+private theorem cyclotomic_quotient_sub_one_ge_pow_pred {q p : ℕ}
+    (hq2 : 2 ≤ q) (hp2 : 2 ≤ p) :
+    ((q ^ (p - 1) : ℕ) : ℚ) ≤ (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) := by
+  have hsum_eq : ∑ k ∈ Finset.range p, q ^ k = (q ^ p - 1) / (q - 1) :=
+    Nat.geomSum_eq hq2 p
+  have hle_rest : q ^ (p - 1) ≤ ∑ k ∈ Finset.range (p - 1), q ^ (k + 1) := by
+    have hlast_mem : p - 2 ∈ Finset.range (p - 1) := by
+      simp
+      omega
+    have hnonneg : ∀ k ∈ Finset.range (p - 1), 0 ≤ q ^ (k + 1) := by
+      intro k _hk
+      exact Nat.zero_le _
+    have hsingle := Finset.single_le_sum hnonneg hlast_mem
+    simpa [show p - 2 + 1 = p - 1 by omega] using hsingle
+  have hsum_succ : ∑ k ∈ Finset.range p, q ^ k =
+      (∑ k ∈ Finset.range (p - 1), q ^ (k + 1)) + 1 := by
+    rw [show p = (p - 1) + 1 by omega]
+    rw [Finset.sum_range_succ']
+    simp
+  have hle_sum : q ^ (p - 1) + 1 ≤ ∑ k ∈ Finset.range p, q ^ k := by
+    rw [hsum_succ]
+    omega
+  have hnat : q ^ (p - 1) ≤ (q ^ p - 1) / (q - 1) - 1 := by
+    rw [← hsum_eq]
+    omega
+  exact_mod_cast hnat
+
+private theorem cyclotomic_quotient_sub_one_lt_div {p q : ℕ} (hp2 : 2 ≤ p) :
+    (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) <
+      (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+  have hp_pos : 0 < p := lt_of_lt_of_le (by norm_num : 0 < 2) hp2
+  have hp1_pos_nat : 0 < p - 1 := by omega
+  have hden_pos : (0 : ℚ) < (((p - 1 : ℕ) : ℚ)) := by exact_mod_cast hp1_pos_nat
+  have hdiv : p - 1 ∣ p ^ q - 1 := by
+    simpa only [one_pow] using Nat.sub_dvd_pow_sub_pow p 1 q
+  have hcast_div : (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) =
+      ((p ^ q - 1 : ℕ) : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+    exact Nat.cast_div hdiv (ne_of_gt hden_pos)
+  have hsub_le : (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) ≤
+      (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le ((p ^ q - 1) / (p - 1)) 1
+  have hnum_nat : p ^ q - 1 < p ^ q := by
+    have hpq_pos : 0 < p ^ q := pow_pos hp_pos q
+    omega
+  have hnum : ((p ^ q - 1 : ℕ) : ℚ) < (p ^ q : ℚ) := by exact_mod_cast hnum_nat
+  have hquot_lt : (((p ^ q - 1) / (p - 1) : ℕ) : ℚ) <
+      (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
+    rw [hcast_div]
+    exact div_lt_div_of_pos_right hnum hden_pos
+  exact lt_of_le_of_lt hsub_le hquot_lt
+
+/-- Arithmetic bridge for **Peterfalvi (14.8)**: under the Section 16 prime
+ordering `q < p`, the T-side full cyclotomic quotient gives a strictly larger
+`(v - 1) / p` ratio than the S-side full cyclotomic quotient gives for
+`(u - 1) / q`. -/
+theorem cyclotomic_ratio_gt_of_q_lt_p {p q : ℕ}
+    (hp : p.Prime) (hq : q.Prime) (hpodd : Odd p) (hqodd : Odd q) (hqp : q < p) :
+    (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) / (p : ℚ) >
+      (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) / (q : ℚ) := by
+  have hpow : q ^ (p + 1) > p ^ (q + 1) :=
+    OddOrder.Peterfalvi.S16.q_pow_gt_p_pow hq hpodd hqodd hqp
+  have hq2 : 2 ≤ q := hq.two_le
+  have hp2 : 2 ≤ p := hp.two_le
+  have hqpos_nat : 0 < q := hq.pos
+  have hppos_nat : 0 < p := hp.pos
+  have hqpos : (0 : ℚ) < q := by exact_mod_cast hqpos_nat
+  have hppos : (0 : ℚ) < p := by exact_mod_cast hppos_nat
+  have hp1_pos_nat : 0 < p - 1 := by omega
+  have hp1pos : (0 : ℚ) < (((p - 1 : ℕ) : ℚ)) := by exact_mod_cast hp1_pos_nat
+  have hp_pred_ge_q : q ≤ p - 1 := by omega
+  have hmain_nat : p ^ (q + 1) < (p - 1) * q ^ p := by
+    have hmul : q ^ (p + 1) ≤ (p - 1) * q ^ p := by
+      rw [pow_succ, mul_comm (q ^ p) q]
+      exact Nat.mul_le_mul_right (q ^ p) hp_pred_ge_q
+    exact lt_of_lt_of_le hpow hmul
+  have hmain : (p : ℚ) ^ (q + 1) < (((p - 1 : ℕ) : ℚ)) * (q : ℚ) ^ p := by
+    exact_mod_cast hmain_nat
+  have hmain' : (p ^ q : ℚ) * (p : ℚ) <
+      (q ^ (p - 1) : ℚ) * ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) := by
+    have hp_pow : (p : ℚ) ^ (q + 1) = (p : ℚ) ^ q * (p : ℚ) := by
+      rw [pow_succ]
+    have hq_pow : (q : ℚ) ^ p = (q : ℚ) ^ (p - 1) * (q : ℚ) := by
+      calc
+        (q : ℚ) ^ p = (q : ℚ) ^ ((p - 1) + 1) := by
+          exact congrArg (fun n : ℕ => (q : ℚ) ^ n) (by omega : p = (p - 1) + 1)
+        _ = (q : ℚ) ^ (p - 1) * (q : ℚ) := by rw [pow_succ]
+    norm_num [Nat.cast_pow] at hmain ⊢
+    nlinarith
+  have hleft_lower := cyclotomic_quotient_sub_one_ge_pow_pred (q := q) (p := p) hq2 hp2
+  have hright_upper := cyclotomic_quotient_sub_one_lt_div (p := p) (q := q) hp2
+  have hcompare_core : (p ^ q : ℚ) / ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) <
+      (q ^ (p - 1) : ℚ) / (p : ℚ) := by
+    rw [div_lt_div_iff₀]
+    · simpa [Nat.cast_pow, mul_assoc, mul_left_comm, mul_comm] using hmain'
+    · positivity
+    · exact hppos
+  calc
+    (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) / (q : ℚ)
+        < ((p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ))) / (q : ℚ) :=
+          div_lt_div_of_pos_right hright_upper hqpos
+    _ = (p ^ q : ℚ) / ((q : ℚ) * (((p - 1 : ℕ) : ℚ))) := by
+          field_simp [hqpos.ne', hp1pos.ne']
+    _ < (q ^ (p - 1) : ℚ) / (p : ℚ) := hcompare_core
+    _ ≤ (((q ^ p - 1) / (q - 1) - 1 : ℕ) : ℚ) / (p : ℚ) := by
+          exact div_le_div_of_nonneg_right (by simpa [Nat.cast_pow] using hleft_lower)
+            (le_of_lt hppos)
+
+/-- The ratio comparison in **Peterfalvi (14.8)** from the two case-(9.7.b)
+cyclotomic order conclusions. -/
+theorem key_ratio_inequality_of_caseB_data {hyp : Hypothesis (G := G)}
+    (Tdata : CaseBForTData hyp) (Sdata : CaseBForSData hyp) :
+    (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+      ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
+  have hratio := cyclotomic_ratio_gt_of_q_lt_p
+    hyp.base.p_prime hyp.base.q_prime hyp.base.p_odd hyp.base.q_odd hyp.q_lt_p
+  have hqpos : (0 : ℚ) < hyp.base.q := by exact_mod_cast hyp.base.q_prime.pos
+  have hu_sub : ((hyp.base.u - 1 : ℕ) : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) := by
+    exact_mod_cast Nat.sub_le_sub_right Sdata.u_le_full_cyclotomic 1
+  have hu_div : ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ) ≤
+      (((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) - 1 : ℕ) : ℚ) /
+        (hyp.base.q : ℚ) :=
+    div_le_div_of_nonneg_right hu_sub (le_of_lt hqpos)
+  rw [Tdata.v_eq]
+  exact lt_of_le_of_lt hu_div hratio
 
 /-- **Peterfalvi (14.8)**: the strict exponential inequality and its
 character-theoretic corollary comparing `(v - 1) / p` and `(u - 1) / q`. -/

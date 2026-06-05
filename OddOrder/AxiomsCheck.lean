@@ -2573,6 +2573,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.tSide_cyclotomic_quotient_divisor_modEq_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.q_pow_gt_p_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_pow_gt_p_pow
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.CaseBForSData.u_le_full_cyclotomic
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.cyclotomic_ratio_gt_of_q_lt_p
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.key_ratio_inequality_of_caseB_data
 
 -- BG App C Theorem C bridge: once Section 16 supplies the field-normalizer data,
 -- C.1/C.2 plus the carried C.3 generator-relation conclusion force `p ≤ q`.
