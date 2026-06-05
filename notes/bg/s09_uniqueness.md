@@ -34,6 +34,35 @@ STEP5/7 は mechanical。**真の blocker は L1 (STEP2/3 一般分岐) のみ**
 **推奨攻略順**: (1) L1 一般 Hall-Higman → (2) Thm 9.1 close (STEP0 再land+STEP3一般+STEP4+5/6/7) →
 (3) L2 Thm 4.20(c) 存在 → (4) Lemma 9.5 assembly。各段 build-green+axiom-clean で1 workflow。
 
+## ✅🔴 2026-06-05 (続) — L1/Thm9.1/L2 完成、ただし Lemma 9.5 は「単純 wiring」では閉じない
+
+**L2 = BG Thm 4.20(c) 存在 完成** (commit 4475477, `S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two`,
+axiom-clean, full build 3580 green)。場所は **S04g でなく S05** (帰納が `G'≤F` = Thm 4.20(a) を要し、
+repo はそれを Thm 5.7 経由で出すが S05 が S04g を import するため循環回避)。補助:
+`S05.derived_le_fitting_of_rank_fitting_le_two` (4.20a), `S04.isPGroup_quotient_oPiCore_of_comm`
+(abelian B ⇒ B/O_{p'}(B) は p-群), `S04.exists_sylow_le_fitting_of_nilpotent_normal_index_coprime`。
+
+**🔴 重要訂正 — handoff の「L2 完成後: `.some` で SP を供給」は誤り**。`scn3_isUniquelyMaximal`
+(S09_Lemma95:2407) を閉じるには L2 だけでは不足、**§9 scaffold の package-interface 再構成**が要る:
+
+- §9 helper 群は `SP : CharacteristicSylowSeriesPackage ↥M` / `hSP : ∀{y L}, …→ package ↥L` を
+  **無条件外部仮説**として thread (例 `exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage`
+  L833, `false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witness` L1989 が `SP_L` 消費)。
+- だが **package (4.20c=L2) は `rank F(L) ≤ 2` (全素数 rank) を要求**。repo で得られるのは
+  `pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal` = **`r_p(F(L)) ≤ 2` (素数 p のみ)** で、
+  `r(F(L))` は **p≠q なる素数 q で ≥3 になり得る** (Lemma 9.4 は r_p のみ縛る; BG 原文も
+  (9.6)-(9.8)(9.12) で `r(F)≥3` 分岐を明示的に扱う)。⇒ **witness L (および M) の package は無条件には存在しない**。
+- ⟹ `hSP`/`SP` を `.some` で供給する道は塞がれている (scaffold が hard content を未充足仮説に hoist =
+  memory `scaffold-sorry-free-not-done` の典型)。
+
+**正しい閉じ方 (L2 が解禁する r(F)≤2 分岐)**: (9.9)-for-M / (9.9)-for-L の q-Sylow 構成を
+**`r(F)≤2` で場合分け**し、`r(F)≤2` 分岐でのみ L2 で package を内部生成 (分岐仮説 `r(F)≤2` が
+in scope なので合法; M/L solvable は `hG.solvable_of_mem_maximalSubgroups` (Setup:78), odd は |·|∣|G|,
+nontrivial は proper maximal)、`r(F)≥3` 分岐は **Lemma 9.4 で 𝓗*_G(R;q)⊆N_G(Q)⊆M** (package 不要, BG 原文の道)。
+つまり §9 helper の `SP`/`hSP` 外部仮説を撤去し内部で case-split して L2/Lemma 9.4 を呼ぶ再構成。
+package を消費する鎖 (`p0_le_derivedInG_inf_of_scn3_witness_maximal` 系 + `exists_pSubgroup_normalizer_package_*`)
+が対象。**規模は dedicated workflow 1 本相当** (handoff の「wiring」想定より重い)。
+
 ---
 
 ## TL;DR — Phase 2a 中盤の山場
