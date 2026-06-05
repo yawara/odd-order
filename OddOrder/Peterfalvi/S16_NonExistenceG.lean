@@ -1567,6 +1567,30 @@ theorem exists_yD_mem_actionCommutator_conj_s_eq_t [Finite G]
         = (yD : G) * ((yC : G) * data.s * (yC : G)⁻¹) * (yD : G)⁻¹ by group,
     hconj_raw]
 
+/-- **BG Appendix C, Lemma C.3 Step 4, the `s^a` notation**: conjugating the
+prime-line generator `s` by `σ(inr a)` (`a ∈ U`) acts as scalar multiplication by
+`a⁻¹` on the additive line, i.e. `σ(inr a)⁻¹ s σ(inr a) = σ(inl (a⁻¹ · 1))`.  This
+is the concrete reading of BG's relation `as + bs = 2s ⟹ s^a s^b = s²`. -/
+theorem sigma_inr_inv_mul_s_mul_sigma_inr {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (a : fieldNormalizerNormOneUnits hyp) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    (data.sigma (SemidirectProduct.inr a))⁻¹ * data.s *
+        data.sigma (SemidirectProduct.inr a) =
+      data.sigma (SemidirectProduct.inl (Multiplicative.ofAdd
+        (((((a⁻¹ : fieldNormalizerNormOneUnits hyp) :
+            (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q)) *
+          (1 : GaloisField hyp.base.p hyp.base.q)))) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  rw [s, fieldNormalizerPrimeLineGenerator, ← map_inv, ← map_mul, ← map_mul]
+  congr 1
+  rw [← map_inv]
+  have h := OddOrder.BG.AppC.NormSet.normOneFrobenius_conj_inl
+    (p := hyp.base.p) (q := hyp.base.q) a⁻¹
+    (1 : GaloisField hyp.base.p hyp.base.q)
+  rw [inv_inv] at h
+  exact h
+
 /-- The BG factors `(s⁻¹)^m t^m` and `(s⁻¹)^n t^n` commute because both lie
 in `Q`. -/
 theorem s_inv_pow_mul_t_pow_mul_comm {hyp : Hypothesis (G := G)}
