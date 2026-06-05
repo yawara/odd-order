@@ -2563,6 +2563,9 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_modEq_one_of_not_modEq_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S15.cyclotomic_divisor_facts
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_ge_aux
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_gt_seven_tenths
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S15.m_value_gt_four_fifths
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.Hypothesis.q_not_modEq_one_mod_p
 set_option linter.style.longLine false in
