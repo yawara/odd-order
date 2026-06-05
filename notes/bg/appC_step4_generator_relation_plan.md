@@ -69,10 +69,32 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
 
 ### 次の 1 手 (最優先): `Step4Capstone` を証明する ((C.3)→(C.10) → kernel → s₁=s⁻¹)
 **全 infra 完備**。capstone を埋めれば即 field 削除可能 (配線済)。PDF pp.150-152 が正確な式 (mmd は (C.3) が garble)。
-1. **(C.3)→(C.4)** [最も convention-heavy]: `relationC2` を `t^{±ℓ}` 共役 (ℓ=k-2) し、`s^{-i}t^i∈Q`
-   (既存 `s_inv_pow_mul_t_pow_mem_Q` S16:1416) + Q 可換 (`Q_mul_comm`) で整理 → (C.4)
-   `s^{-k}t² M₁ t⁻¹ M₂ t⁻¹ M₃ s^k = 1`、Mᵢ = `s^j·(unit)^{t^{j''}}·s^{j'}`。
-   - M₁=`s^{k-2}(a⁻¹)^{t^k}s^{-k+1}`, M₂=`s^k(ab⁻¹)^{t^{k-1}}s^{-k+2}`, M₃=`s^{k-1}b^{t^{k-2}}s^{-k}` (PDF p.150)。
+
+> 💡 **k=3 に固定して導出してよい** (推奨): BG は (C.2)-(C.10) を一般 k∈F_p で進め s₁=s⁻¹ を出すが、
+> 論証は **各 k で独立** (異なる k を混ぜない) で、最終利用は k=3 のみ。`Step4Capstone` 自体が slot
+> `(tConjAut³)(a⁻¹)` で k=3。∴ ℓ=k-2=1 で固定すると冪が具体的自然数 (M₁=`s¹(a⁻¹)^{t³}s⁻²`,
+> M₂=`s³(ab⁻¹)^{t²}s⁻¹`, M₃=`s²b^t s⁻³`; 共役は t³/t²/t¹) になり、**既存 ℕ-共役補題
+> `t_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow` (S16:1038, left-conj 規約) が直接使える**
+> (BG は right-conj `(u)^{t^j}=t^{-j}u t^j`、repo は left-conj `t^j σ(inr u) t^{-j}=σ(inr(tConjAut^j u))`;
+> repo の `data.t = y·s·y⁻¹` で BG の y と逆規約 — 規約変換は最初に 1 回だけ吸収する)。
+> zpow/一般 k を避けられるので大幅に楽。
+1. **(C.3)→(C.4)** [最も convention-heavy だが構造解明済]: `relationC2` から (C.4)
+   `s⁻³t² M₁ t⁻¹ M₂ t⁻¹ M₃ s³ = 1` (k=3)。M₁=`s(a⁻¹)^{t³}s⁻²` (= `exists_step4_first_k_three_decomposition`
+   の LHS そのもの!), M₂=`s³(ab⁻¹)^{t²}s⁻¹`, M₃=`s²b^t s⁻³` (PDF p.150)。
+   - **✅ 証明構造を完全解明 (BG convention で検算済; repo convention で再現要)**:
+     (C.4-LHS) を展開すると `conn1·C2·conn2·C4·conn3·C6` (C2=(a⁻¹)^{t³}, C4=(ab⁻¹)^{t²}, C6=b^t)。
+     各 connector は **単一の Q-可換スワップ**: `qᵢ⁻¹qⱼ = qⱼqᵢ⁻¹` (qᵢ:=s⁻ⁱtⁱ∈Q):
+     - conn1: `s⁻³t²s = q₃q₁⁻¹ = q₁⁻¹q₃ = t⁻¹s⁻²t³` (q₃=s⁻³t³, q₁⁻¹=t⁻¹s; group→Q-comm→group)。
+     - conn2: `s⁻²t⁻¹s³ = q₂q₃⁻¹ = q₃⁻¹q₂ = t⁻³st²`。
+     - conn3: `s⁻¹t⁻¹s² = q₁q₂⁻¹ = q₂⁻¹q₁ = t⁻²st`。
+     swap 後の `(t⁻¹s⁻²t³)C2(t⁻³st²)C4(t⁻²st)C6` は t冪が telescope して
+     `t⁻¹·(s⁻²A⁻¹sAB⁻¹sB)·t = t⁻¹·(C.2-LHS)·t = t⁻¹·1·t = 1` (relationC2)。
+   - **Q-membership は既存**: q₃=s⁻³t³=`s_inv_pow_mul_t_pow_mem_Q 3` (要 (s⁻¹)³=s⁻³ bridge),
+     q₁⁻¹=t⁻¹s=`t_inv_pow_mul_s_pow_mem_Q 1`, 等。Q-comm=`Q_mul_comm`。
+   - ⚠️ **repo convention 注意**: 上の検算は BG right-conj `(u)^{t^j}=t⁻ʲu tʲ`。repo は
+     `(tConjAut^j)u ↔ tʲσ(inr u)t⁻ʲ` (left-conj, S16:1038) + `t=ysy⁻¹`。M₁ を
+     `exists_step4_first_k_three_decomposition` の LHS (repo) に合わせて定義し、connector/telescope を
+     repo convention で再導出する (構造は同型、冪の符号だけ Lean で確認)。
    - 既存 engine `exists_step4_decomposition_of_zpow_tConjNormOneUnitsAut_pow` (S16:1097) が Mᵢ の正規形を与える。
 2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
 3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
