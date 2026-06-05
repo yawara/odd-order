@@ -1893,6 +1893,45 @@ theorem exists_step4_first_k_three_inv_decomposition
   exact (hyp.base.P ⊔ hyp.base.U).mul_mem
     ((hyp.base.P ⊔ hyp.base.U).mul_mem hs hmid) hr
 
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` membership bridge in a neutral form:
+any word `s^m · σ(inr w) · s^r`, with the middle term already a concrete
+norm-one complement element, lies in `PU`. -/
+theorem s_zpow_mul_sigma_inr_mul_s_zpow_mem_P_sup_U
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (w : fieldNormalizerNormOneUnits hyp) :
+    data.s ^ m *
+          data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := by
+  have hm : data.s ^ m ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U m
+  have hmidU :
+      data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr w, ⟨w, rfl⟩, rfl⟩
+  have hmid :
+      data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.P ⊔ hyp.base.U :=
+    (le_sup_right : hyp.base.U ≤ hyp.base.P ⊔ hyp.base.U) hmidU
+  have hr : data.s ^ r ∈ hyp.base.P ⊔ hyp.base.U := data.s_zpow_mem_P_sup_U r
+  exact (hyp.base.P ⊔ hyp.base.U).mul_mem
+    ((hyp.base.P ⊔ hyp.base.U).mul_mem hm hmid) hr
+
+/-- Neutral Step 4 `(C.5)` decomposition bridge: every word
+`s^m · σ(inr w) · s^r` admits Step 1 normal form
+`σ(inr u) · σ(P₀ c) · σ(inr v)`. -/
+theorem exists_step4_sigma_inr_decomposition
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (m r : ℤ) (w : fieldNormalizerNormOneUnits hyp) :
+    ∃ c : ZMod hyp.base.p, ∃ u v : fieldNormalizerNormOneUnits hyp,
+      data.s ^ m *
+            data.sigma (SemidirectProduct.inr w : fieldNormalizerFrobeniusGroup hyp) *
+          data.s ^ r =
+        data.sigma (SemidirectProduct.inr u : fieldNormalizerFrobeniusGroup hyp) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c) *
+            data.sigma (SemidirectProduct.inr v : fieldNormalizerFrobeniusGroup hyp) :=
+  data.exists_sigma_normOne_primeLine_normOne_of_mem_PU
+    (data.s_zpow_mul_sigma_inr_mul_s_zpow_mem_P_sup_U m r w)
+
 /-- BG Appendix C, Lemma C.3 Step 4 "mod `P`" bridge in a neutral form: if a
 word `s^m · σ(inr w) · s^r` is written in Step 1 normal form `u₁ s₁ v₁`, then the
 right component is `w = u₁ v₁`.  This is the reusable right-projection step behind
@@ -1972,6 +2011,32 @@ theorem right_component_of_step4_first_k_three_inv_decomposition
       (m := (1 : ℤ)) (r := (-2 : ℤ))
       (w := (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹)
       (u₁ := u₁) (v₁ := v₁) (c := c) hdec'
+
+/-- BG Appendix C, Lemma C.3 Step 4 first `(C.5)` factor
+`M₁ = s · (a⁻¹)^{t^3} · s⁻²`, in BG's backward conjugation convention. -/
+noncomputable def step4M1 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a : fieldNormalizerNormOneUnits hyp) : G :=
+  data.s *
+      ((data.t⁻¹) ^ 3 * (data.sigma (SemidirectProduct.inr a))⁻¹ * data.t ^ 3) *
+    (data.s⁻¹) ^ 2
+
+/-- BG Appendix C, Lemma C.3 Step 4 second `(C.5)` factor
+`M₂ = s³ · (ab⁻¹)^{t^2} · s⁻¹`. -/
+noncomputable def step4M2 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp) : G :=
+  data.s ^ 3 *
+      ((data.t⁻¹) ^ 2 *
+        (data.sigma (SemidirectProduct.inr a) *
+          (data.sigma (SemidirectProduct.inr b))⁻¹) * data.t ^ 2) *
+    data.s⁻¹
+
+/-- BG Appendix C, Lemma C.3 Step 4 third `(C.5)` factor
+`M₃ = s² · b^t · s⁻³`. -/
+noncomputable def step4M3 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (b : fieldNormalizerNormOneUnits hyp) : G :=
+  data.s ^ 2 *
+      (data.t⁻¹ * data.sigma (SemidirectProduct.inr b) * data.t) *
+    (data.s⁻¹) ^ 3
 
 /-! ### BG Appendix C (C.4) connector `q`-swaps
 
@@ -2087,6 +2152,152 @@ theorem relationC4 {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
         group
     _ = data.t⁻¹ * 1 * data.t := by rw [hC2]
     _ = 1 := by group
+
+/-- The first BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
+`w = (tConj^3)⁻¹ a⁻¹`. -/
+theorem step4M1_eq_sigma_inr
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a : fieldNormalizerNormOneUnits hyp) :
+    data.step4M1 a =
+      data.s *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-2 : ℤ) := by
+  unfold step4M1
+  rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
+    3 a⁻¹]
+  simp [map_inv]
+  group
+
+/-- The second BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
+`w = (tConj^2)⁻¹ (a b⁻¹)`. -/
+theorem step4M2_eq_sigma_inr
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp) :
+    data.step4M2 a b =
+      data.s ^ (3 : ℤ) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹)) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-1 : ℤ) := by
+  unfold step4M2
+  rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv
+    2 (a * b⁻¹)]
+  simp [map_mul, map_inv]
+  group
+
+/-- The third BG `(C.5)` factor is the neutral `s^m σ(inr w) s^r` word with
+`w = tConj⁻¹ b`. -/
+theorem step4M3_eq_sigma_inr
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (b : fieldNormalizerNormOneUnits hyp) :
+    data.step4M3 b =
+      data.s ^ (2 : ℤ) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.s ^ (-3 : ℤ) := by
+  unfold step4M3
+  rw [← data.t_inv_pow_conj_sigma_inr_eq_sigma_inr_tConjNormOneUnitsAut_pow_inv 1 b]
+  group
+
+/-- Relation `(C.4)` restated using the named BG `(C.5)` factors. -/
+theorem relationC4_step4M {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2) :
+    (data.s⁻¹) ^ 3 * data.t ^ 2 * data.step4M1 a *
+      data.t⁻¹ * data.step4M2 a b * data.t⁻¹ * data.step4M3 b *
+        data.s ^ 3 = 1 := by
+  simpa [step4M1, step4M2, step4M3] using data.relationC4 a b hab
+
+/-- BG Appendix C, Lemma C.3 Step 4 `(C.5)` normal-form package for the three
+terms appearing in the already-proved relation `(C.4)`.  The `hM*` fields state
+the Step 1 normal forms of BG's named factors, and the `right*` fields record the
+corresponding mod-`P` complement readings. -/
+structure Step4C5NormalForms {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (a b : fieldNormalizerNormOneUnits hyp) where
+  c1 : ZMod hyp.base.p
+  c2 : ZMod hyp.base.p
+  c3 : ZMod hyp.base.p
+  u1 : fieldNormalizerNormOneUnits hyp
+  v1 : fieldNormalizerNormOneUnits hyp
+  u2 : fieldNormalizerNormOneUnits hyp
+  v2 : fieldNormalizerNormOneUnits hyp
+  u3 : fieldNormalizerNormOneUnits hyp
+  v3 : fieldNormalizerNormOneUnits hyp
+  hM1 :
+    data.step4M1 a =
+      data.sigma (SemidirectProduct.inr u1 : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+          data.sigma (SemidirectProduct.inr v1 : fieldNormalizerFrobeniusGroup hyp)
+  hM2 :
+    data.step4M2 a b =
+      data.sigma (SemidirectProduct.inr u2 : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
+          data.sigma (SemidirectProduct.inr v2 : fieldNormalizerFrobeniusGroup hyp)
+  hM3 :
+    data.step4M3 b =
+      data.sigma (SemidirectProduct.inr u3 : fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c3) *
+          data.sigma (SemidirectProduct.inr v3 : fieldNormalizerFrobeniusGroup hyp)
+  right1 : (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹ = u1 * v1
+  right2 : (data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹) = u2 * v2
+  right3 : (data.tConjNormOneUnitsAut ^ 1)⁻¹ b = u3 * v3
+
+/-- The three BG `(C.5)` factors in relation `(C.4)` admit compatible Step 1
+normal forms and mod-`P` complement readings. -/
+theorem exists_step4C5NormalForms
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    (a b : fieldNormalizerNormOneUnits hyp) :
+    Nonempty (Step4C5NormalForms data a b) := by
+  rcases data.exists_step4_sigma_inr_decomposition
+      (m := (1 : ℤ)) (r := (-2 : ℤ))
+      (w := (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) with
+    ⟨c1, u1, v1, h1⟩
+  rcases data.exists_step4_sigma_inr_decomposition
+      (m := (3 : ℤ)) (r := (-1 : ℤ))
+      (w := (data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹)) with
+    ⟨c2, u2, v2, h2⟩
+  rcases data.exists_step4_sigma_inr_decomposition
+      (m := (2 : ℤ)) (r := (-3 : ℤ))
+      (w := (data.tConjNormOneUnitsAut ^ 1)⁻¹ b) with
+    ⟨c3, u3, v3, h3⟩
+  exact ⟨{
+    c1 := c1
+    c2 := c2
+    c3 := c3
+    u1 := u1
+    v1 := v1
+    u2 := u2
+    v2 := v2
+    u3 := u3
+    v3 := v3
+    hM1 := by
+      rw [data.step4M1_eq_sigma_inr]
+      simpa using h1
+    hM2 := by
+      rw [data.step4M2_eq_sigma_inr]
+      simpa using h2
+    hM3 := by
+      rw [data.step4M3_eq_sigma_inr]
+      simpa using h3
+    right1 :=
+      data.right_component_of_step4_sigma_inr_decomposition
+        (m := (1 : ℤ)) (r := (-2 : ℤ))
+        (w := (data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹)
+        (u₁ := u1) (v₁ := v1) (c := c1) h1
+    right2 :=
+      data.right_component_of_step4_sigma_inr_decomposition
+        (m := (3 : ℤ)) (r := (-1 : ℤ))
+        (w := (data.tConjNormOneUnitsAut ^ 2)⁻¹ (a * b⁻¹))
+        (u₁ := u2) (v₁ := v2) (c := c2) h2
+    right3 :=
+      data.right_component_of_step4_sigma_inr_decomposition
+        (m := (2 : ℤ)) (r := (-3 : ℤ))
+        (w := (data.tConjNormOneUnitsAut ^ 1)⁻¹ b)
+        (u₁ := u3) (v₁ := v3) (c := c3) h3
+  }⟩
 
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
 every norm-one unit `a` whose inverse field value `↑a⁻¹` lies in `E` (so that BG's
