@@ -296,6 +296,61 @@ private theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
   rw [this]
   exact M.mul_mem (M.mul_mem m.2 hnM) (M.inv_mem m.2)
 
+/-- If conjugation by `h` fixes the subgroup `H` setwise, then `h` normalizes `H`. -/
+private theorem mem_normalizer_of_conj_smul_eq {H : Subgroup G} {h : G}
+    (hstab : MulAut.conj h • H = H) : h ∈ Subgroup.normalizer (H : Set G) := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro n
+  constructor
+  · intro hn
+    have hmem : MulAut.conj h • n ∈ MulAut.conj h • H :=
+      Subgroup.smul_mem_pointwise_smul n (MulAut.conj h) H hn
+    rw [hstab] at hmem
+    simpa [MulAut.conj_apply] using hmem
+  · intro hn
+    have hmem : MulAut.conj h • n ∈ MulAut.conj h • H := by
+      rw [hstab]; simpa [MulAut.conj_apply] using hn
+    exact Subgroup.smul_mem_pointwise_smul_iff.mp hmem
+
+/-- **BG Theorem 10.1(d)** (mmd L2665): for `p ∈ σ(M)` and `X = P̄` a Sylow `p`-subgroup of `M`,
+if a `G`-conjugate `X^g` lies in `M` then `g ∈ M`. Both `X` and `X^g` are Sylow `p`-subgroups of
+`M`, hence `M`-conjugate; the conjugating discrepancy normalizes `X`, and `N_G(X) ≤ M` (σ). -/
+private theorem fusion_d_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M)
+    (P : Sylow p ↥M) {g : G}
+    (hg : MulAut.conj g • ((P : Subgroup ↥M).map M.subtype) ≤ M) : g ∈ M := by
+  classical
+  set X : Subgroup G := (P : Subgroup ↥M).map M.subtype with hXdef
+  have hcardX : Nat.card ↥X = p ^ (Nat.card ↥M).factorization p := by
+    rw [hXdef, Subgroup.card_map_of_injective M.subtype_injective]
+    exact P.card_eq_multiplicity
+  -- `Ȳ = (conj g • X).subgroupOf M` is a Sylow-`p` of `↥M`.
+  have hcardConj : Nat.card ↥(MulAut.conj g • X) = Nat.card ↥X :=
+    Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have hcardY : Nat.card ↥((MulAut.conj g • X).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hg).toEquiv, hcardConj, hcardX]
+  let PY : Sylow p ↥M := Sylow.ofCard ((MulAut.conj g • X).subgroupOf M) hcardY
+  -- Sylow conjugacy in `↥M`: `c • P = PY` for some `c ∈ M`.
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq (↥M) P PY
+  have hPY : ((PY : Subgroup ↥M).map M.subtype : Subgroup G) = MulAut.conj g • X := by
+    show (((MulAut.conj g • X).subgroupOf M : Subgroup ↥M).map M.subtype) = MulAut.conj g • X
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hg]
+  -- transport to `G`: `conj ↑c • X = conj g • X`.
+  have hconj : MulAut.conj (c : G) • X = MulAut.conj g • X := by
+    have h1 : (PY : Subgroup ↥M) = MulAut.conj c • (P : Subgroup ↥M) := by
+      rw [← hc]; exact Sylow.coe_subgroup_smul
+    rw [← hPY, h1, map_subtype_conj_smul, ← hXdef]
+  -- `↑c⁻¹ * g` normalizes `X`, so lies in `N_G(X) ≤ M`; and `↑c ∈ M`.
+  have hstab : MulAut.conj ((c : G)⁻¹ * g) • X = X := by
+    rw [map_mul, mul_smul, ← hconj, ← mul_smul, ← map_mul]
+    simp
+  have hnM : ((c : G)⁻¹ * g) ∈ M :=
+    normalizer_sylow_map_le_of_mem_sigma hp P (mem_normalizer_of_conj_smul_eq hstab)
+  have hg_eq : g = (c : G) * ((c : G)⁻¹ * g) := by group
+  rw [hg_eq]
+  exact M.mul_mem c.2 hnM
+
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
 
 /-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。
