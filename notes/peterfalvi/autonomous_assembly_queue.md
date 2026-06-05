@@ -148,11 +148,10 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 - ✅ **(6.3)/(6.5) 算術 shell 群** = `degreeBound_le_of_sqrt_bound`/`six_three_HH1_le`/`six_five_*`/`two_mul_add_one_le_of_odd_dvd`。
 - ✅✅ **(6.5) group-theory 完全 landed (両 case, 2026-06-05)**: `isPGroup_of_card_le_of_isFrobeniusAction` (chief-factor core) + `isPGroup_of_isFrobeniusGroup_of_card_le` (c1) + `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` (c2) + `IsFrobeniusAction.quotient_of_fixedPoints_le` (新 Frobenius brick)。(6.5) は **bound + odd のみ要**。
 
-**genuinely 残る char-bound gap (2 件、いずれも substantial・multi-session)**:
-1. 🔴 **B2 orbit-counting** `∑_{S(A)}χ(1)²/‖χ‖²=|L:K|·∑_{θ∈T}θ(1)²` — S(A)={Ind θ} の W₁-inertia/orbit counting (χ=Ind θ, χ(1)=|L:K|θ(1), ‖Ind θ‖² = orbit size)。induced-char inertia 機構要。**concrete char-identity だが intricate** (inertia=K 非自明・norm 構造)。
-2. 🔴 **member-family enum 構成** — B1 が消費する S(A) 列挙 (S₁/S₂ from (C.b) + member family)。**heavy combinatorial・capstone glue/hstepData と共有の核**。X-chain 側の enum 機構 (`xAdjoinStepInput_of_memberFamily_*` 等) は別物 (Irr-L X-side)、(6.2) は S(A)-side で新規。
+- ✅✅ **B2 orbit-counting も landed (訂正)**: `sum_div_normSq_induce_image_eq` (InducedIrreducible.lean:274) = `∑_{χ∈Ind''T}χ(1)²/⟨χ,χ⟩ = [G:H]·∑_{θ∈T}θ(1)²` (H⊴G, T conj-invariant)。inertia/orbit 機構 (`card_mul_inner_self_induce_eq_card_inertia`=norm/`induce_eq_induce_iff_conj`=fibre=orbit/`card_filter_induce_eq_index_inertia`=fibre card) も全 landed (InducedIrreducible.lean、(6.2) step-4a 用に構築済)。**B2 完全 landed** (ingredient-1 `sumInflatedDegreeSq_ntrivial` × orbit-counting で `∑_{S(A)}=|L:K|(|K:A|-1)`)。
 
-**(6.2)→(6.3)→char-bound の残**: B1 (enum 仮説) + B2 (orbit-counting 要) + θ-bound を組む (6.2) assembly + minimal-A 帰納 ((6.3))。**B1 が enum を仮説に取るので、(6.2) assembly も enum 構成にブロックされる**。⟹ char-bound の律速 = 上記 gap 1/2。clean single-session leaf 無し (scaffold 量産は doneness を進めない)。
+**genuinely 残る char-bound gap = 1 件のみ (member-family enum)**:
+🔴 **member-family enum 構成 + (6.2)/(6.3) assembly** — B1 が消費する S(A)/S₁ 列挙 (s/χmem/deg + ~15 orthogonality/support/gen/S₁-membership 仮説; S₁/S₂ from (C.b))。これを構成して B1+B2+θ-bound を組めば (6.2) `2|L:C|√|C:D|≥|K:A|−1`、minimal-A 帰納で (6.3) char-bound。**B1/B2/θ-bound/算術は全 landed**ゆえ、char-bound (= (6.5) の唯一の残) は **member-family enum 構成だけにブロックされる**。enum は **capstone glue/hstepData と共有の核** (Frobenius case では全 Ind θ 既約ゆえ S(A)={distinct Ind θ}、enum はその列挙)。X-chain 側 enum (`xAdjoinStepInput_of_memberFamily_*`) は Irr-L X-side で別物だが構造類似。**= 全 (6.8) capstone 残務の単一 bottleneck**。
 
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
