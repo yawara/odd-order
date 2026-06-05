@@ -59,6 +59,33 @@ theorem five_le_p (hyp : Hypothesis (G := G)) : 5 ≤ hyp.base.p := by
     omega
   omega
 
+/-- **Peterfalvi (14.15)**: the inequality `p^(q - 2) < q^2` is
+impossible in the Section 16 ordering unless `q = 3`. -/
+theorem q_eq_three_of_p_pow_q_sub_two_lt_q_sq
+    (hyp : Hypothesis (G := G))
+    (hlt : hyp.base.p ^ (hyp.base.q - 2) < hyp.base.q ^ 2) :
+    hyp.base.q = 3 := by
+  by_contra hq_ne_three
+  have hq5 : 5 ≤ hyp.base.q := by
+    have hq3le : 3 ≤ hyp.base.q := hyp.base.three_le_q
+    have hq_ne_four : hyp.base.q ≠ 4 := by
+      intro hq4
+      have hodd : Odd 4 := by simpa [hq4] using hyp.base.q_odd
+      rcases hodd with ⟨k, hk⟩
+      omega
+    omega
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have hpow3_le : hyp.base.p ^ 3 ≤ hyp.base.p ^ (hyp.base.q - 2) :=
+    Nat.pow_le_pow_right hp_pos (by omega : 3 ≤ hyp.base.q - 2)
+  have hq2_lt_p3 : hyp.base.q ^ 2 < hyp.base.p ^ 3 := by
+    have hq2_lt_p2 : hyp.base.q ^ 2 < hyp.base.p ^ 2 :=
+      Nat.pow_lt_pow_left hyp.q_lt_p (by norm_num : 2 ≠ 0)
+    have hp2_lt_p3 : hyp.base.p ^ 2 < hyp.base.p ^ 3 := by
+      nlinarith [hyp.base.p_prime.one_lt]
+    exact lt_trans hq2_lt_p2 hp2_lt_p3
+  exact (lt_irrefl (hyp.base.q ^ 2))
+    (lt_of_lt_of_le hq2_lt_p3 (le_trans hpow3_le (le_of_lt hlt)))
+
 /-- **Peterfalvi (14.15)**: after the case-(a) inequality forces `q = 3`
 and `p < q^2`, the congruence `p ≡ 1 mod q` leaves only `p = 7`. -/
 theorem p_eq_seven_of_q_eq_three_modEq_one_and_lt_q_sq
