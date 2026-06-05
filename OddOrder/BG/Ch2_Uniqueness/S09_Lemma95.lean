@@ -662,16 +662,18 @@ private theorem normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_ra
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
     (hA : A ∈ S07.scn3Global p G) (hRp : IsPGroup p R) (hAR : A ≤ R)
     (hRlt : R < ⊤) (hRM : R ≤ M)
-    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2) :
     Subgroup.normalizer (R : Set G) ≤ M := by
   classical
   by_cases hrank : rank ↥(S08.fittingInG M) ≤ 2
-  · exact normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lowRank
-      hG hM hA hRp hAR hRlt hRM hFp S hpos hterminal_mem
+  · -- low rank: build the §4.20(c) characteristic Sylow series of `M` internally via L2
+    have hAM : A ≤ M := hAR.trans hRM
+    haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM0 =>
+      ne_bot_of_mem_scn3Global hA (le_bot_iff.mp (hM0 ▸ hAM))
+    obtain ⟨pkg⟩ :=
+      exists_characteristicSylowSeriesPackage_of_maximal_of_rank_fittingInG_le_two hG hM.1 hrank
+    exact normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_lowRank
+      hG hM hA hRp hAR hRlt hRM hFp pkg.series pkg.length_pos pkg.terminal_mem
   · have h3rank : 3 ≤ rank ↥(S08.fittingInG M) := by omega
     obtain ⟨q, hq, hqp, h3Fq⟩ :=
       exists_pRank_ge_three_ne_of_rank_ge_three_of_pRank_le_two
@@ -689,11 +691,7 @@ private theorem normalizer_scn3_self_le_maximal_of_rankCases
     {A M : Subgroup G}
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
     (hA : A ∈ S07.scn3Global p G)
-    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2) :
     Subgroup.normalizer (A : Set G) ≤ M := by
   classical
   have hAab : IsMulCommutative A := isMulCommutative_of_mem_scn3Global hA
@@ -706,8 +704,7 @@ private theorem normalizer_scn3_self_le_maximal_of_rankCases
   have hAlt : A < ⊤ :=
     lt_of_le_of_lt hA_le_C (centralizer_lt_top_of_mem_scn3Global hG hA)
   exact normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases
-    hG hM hA (isPGroup_of_mem_scn3Global hA) le_rfl hAlt hAM hFp S hpos
-    hterminal_mem
+    hG hM hA (isPGroup_of_mem_scn3Global hA) le_rfl hAlt hAM hFp
 
 /-- BG Lemma 9.5 normalizer step specialized to a `p`-subgroup of `N_G(A)`.
 
@@ -719,21 +716,17 @@ private theorem normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
     (hA : A ∈ S07.scn3Global p G) (hPp : IsPGroup p P) (hAP : A ≤ P)
     (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
-    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2)
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hFp : pRank ↥(S08.fittingInG M) p ≤ 2) :
     P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
   classical
   have hNAleM : Subgroup.normalizer (A : Set G) ≤ M :=
-    normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp S hpos hterminal_mem
+    normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp
   have hPM : P ≤ M := hPnormA.trans hNAleM
   have hMlt : M < ⊤ := (mem_maximalSubgroups.mp hM.1).lt_top
   have hPlt : P < ⊤ := lt_of_le_of_lt hPM hMlt
   exact ⟨hPM,
     normalizer_le_maximal_of_scn3Global_characteristicSylowSeries_rankCases
-      hG hM hA hPp hAP hPlt hPM hFp S hpos hterminal_mem⟩
+      hG hM hA hPp hAP hPlt hPM hFp⟩
 
 /-- If an `SCN₃(p)` subgroup is a counterexample to uniqueness, then every maximal
 subgroup has `pRank F(M) ≤ 2`.
@@ -776,16 +769,11 @@ private theorem normalizer_scn3_self_le_maximal_of_not_scn3
     [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     {A M : Subgroup G}
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
-    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) :
     Subgroup.normalizer (A : Set G) ≤ M := by
   have hFp : pRank ↥(S08.fittingInG M) p ≤ 2 :=
     pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM.1 hA hAnot
-  exact normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp S hpos
-    hterminal_mem
+  exact normalizer_scn3_self_le_maximal_of_rankCases hG hM hA hFp
 
 /-- Counterexample version of the `R = P` normalizer step in BG Lemma 9.5.
 
@@ -797,16 +785,12 @@ private theorem normalizer_scn3_pSubgroup_le_maximal_of_not_scn3
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
     (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
     (hPp : IsPGroup p P) (hAP : A ≤ P)
-    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G)) :
     P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
   have hFp : pRank ↥(S08.fittingInG M) p ≤ 2 :=
     pRank_fittingInG_le_two_of_not_scn3_isUniquelyMaximal hG hM.1 hA hAnot
   exact normalizer_scn3_sylowNormalizer_le_maximal_of_rankCases
-    hG hM hA hPp hAP hPnormA hFp S hpos hterminal_mem
+    hG hM hA hPp hAP hPnormA hFp
 
 /-- Choose an ambient `p`-subgroup between a global `SCN₃(p)` subgroup and its normalizer.
 
@@ -841,33 +825,15 @@ private theorem exists_pSubgroup_normalizer_package_of_not_scn3
     [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     {A M : Subgroup G}
     (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
-    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
-    (S : OddOrder.BG.Ch1.S04.CharacteristicSylowSeries ↥M) (hpos : 0 < S.length)
-    (hterminal_mem :
-      ∀ i : Fin S.length,
-        i.succ = Fin.last S.length → (S.step i).q ∈ (Nat.card ↥M).primeFactors) :
+    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) :
     ∃ P : Subgroup G,
       IsPGroup p P ∧ A ≤ P ∧ P ≤ Subgroup.normalizer (A : Set G) ∧
         P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M := by
   obtain ⟨P, hPp, hAP, hPnormA⟩ := exists_pSubgroup_between_scn3_and_normalizer hA
   have hpack : P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M :=
     normalizer_scn3_pSubgroup_le_maximal_of_not_scn3
-      hG hM hA hAnot hPp hAP hPnormA S hpos hterminal_mem
+      hG hM hA hAnot hPp hAP hPnormA
   exact ⟨P, hPp, hAP, hPnormA, hpack.1, hpack.2⟩
-
-/-- BG Lemma 9.5 opening normalizer package, consuming the §4.20(c) downstream
-characteristic Sylow series package directly. -/
-private theorem exists_pSubgroup_normalizer_package_of_not_scn3_of_sylowSeriesPackage
-    [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
-    {A M : Subgroup G}
-    (hM : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (A : Set G)))
-    (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A)
-    (SP : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥M) :
-    ∃ P : Subgroup G,
-      IsPGroup p P ∧ A ≤ P ∧ P ≤ Subgroup.normalizer (A : Set G) ∧
-        P ≤ M ∧ Subgroup.normalizer (P : Set G) ≤ M :=
-  exists_pSubgroup_normalizer_package_of_not_scn3 hG hM hA hAnot
-    SP.series SP.length_pos SP.terminal_mem
 
 /-- BG Lemma 9.5's Proposition 1.16 extraction step.
 
@@ -1258,12 +1224,11 @@ private theorem normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3
     (hA : A ∈ S07.scn3Global p G) (hAnot : ¬ IsUniquelyMaximal A) (hyA : y ∈ A)
     (hL : L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)))
     (hPp : IsPGroup p P) (hAP : A ≤ P)
-    (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
-    (SP : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    (hPnormA : P ≤ Subgroup.normalizer (A : Set G)) :
     P ≤ L ∧ Subgroup.normalizer (P : Set G) ≤ L := by
   exact normalizer_scn3_pSubgroup_le_maximal_of_not_scn3 hG
     (maximalSubgroupsContaining_centralizer_of_mem_centralizer_singleton hyA hL)
-    hA hAnot hPp hAP hPnormA SP.series SP.length_pos SP.terminal_mem
+    hA hAnot hPp hAP hPnormA
 
 /-- Ambient form of the identity `H' = [H,H]`. -/
 private theorem derivedInG_eq_commutator (H : Subgroup G) :
@@ -1324,12 +1289,11 @@ private theorem p0_le_derivedInG_inf_of_scn3_witness_maximal
     (hPp : IsPGroup p P) (hAP : A ≤ P)
     (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
     (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
-    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
-    (SP_L : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G))) :
     P0 ≤ derivedInG (L ⊓ M) := by
   have hNPL : Subgroup.normalizer (P : Set G) ≤ L :=
     (normalizer_scn3_pSubgroup_le_witness_maximal_of_not_scn3
-      hG hA hAnot hyA hL hPp hAP hPnormA SP_L).2
+      hG hA hAnot hyA hL hPp hAP hPnormA).2
   exact le_derivedInG_inf_of_le_derivedInG_normalizer hP0N hNPM hNPL
 
 /-- If `y ∈ B` and `L` contains `C_G(y)`, then `D ∩ C_G(B)` is contained in
@@ -2025,7 +1989,6 @@ private theorem false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witne
     (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
     (hP0p : IsPGroup p ↥P0)
     (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
-    (SP_L : OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L)
     (hnot_cent : ¬ P0 ≤ Subgroup.centralizer
       (((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ⊓
           Subgroup.centralizer (B : Set G)) : Set G)) :
@@ -2033,7 +1996,7 @@ private theorem false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witne
   let D : Subgroup G := opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)
   have hP0_der : P0 ≤ derivedInG (L ⊓ M) :=
     p0_le_derivedInG_inf_of_scn3_witness_maximal
-      hG hA hAnot (hBA hyB) hL hPp hAP hPnormA hNPM hP0N SP_L
+      hG hA hAnot (hBA hyB) hL hPp hAP hPnormA hNPM hP0N
   have hcentDL : P0 ≤ Subgroup.centralizer ((D ⊓ L : Subgroup G) : Set G) := by
     simpa [D] using
       (le_centralizer_inf_opiCoreFitting_of_pSubgroup_local_derived
@@ -2058,11 +2021,7 @@ private theorem p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
     (hPnormA : P ≤ Subgroup.normalizer (A : Set G))
     (hNPM : Subgroup.normalizer (P : Set G) ≤ M)
     (hP0p : IsPGroup p ↥P0)
-    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
-    (hSP :
-      ∀ {y : G} {L : Subgroup G}, y ∈ A →
-        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
-          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G))) :
     P0 ≤ Subgroup.centralizer
       ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G) := by
   classical
@@ -2072,8 +2031,7 @@ private theorem p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
     exists_nonU_cocyclic_omega1_witness_maximal_ne
       hG hAcomm_set hM hA hAnot hP0D
   exact false_of_not_le_centralizer_inf_centralizer_opiCoreFitting_witness
-    hG hA hAnot hBA hyB hL hM.1 hLM hPp hAP hPnormA hNPM hP0p hP0N
-    (hSP (hBA hyB) hL) hnot_cent
+    hG hA hAnot hBA hyB hL hM.1 hLM hPp hAP hPnormA hNPM hP0p hP0N hnot_cent
 
 /-- If a rank-three abelian subgroup of `F(M)` centralizes a nontrivial `P₀ ≤ M`,
 then `N_G(P₀)` is uniquely maximal, with unique maximal subgroup `M`.
@@ -2313,17 +2271,14 @@ private theorem normalizer_p0_le_maximal_of_high_rank_opiCoreFitting_package
     (hP0ne : P0 ≠ ⊥)
     (h3D : 3 ≤ rank
       ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
-    (hSP :
-      ∀ {y : G} {L : Subgroup G}, y ∈ A →
-        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
-          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    :
     Subgroup.normalizer (P0 : Set G) ≤ M := by
   have hP0M : P0 ≤ M :=
     (hP0N.trans (derivedInG_le_self (Subgroup.normalizer (P : Set G)))).trans hNPM
   have hP0centD : P0 ≤ Subgroup.centralizer
       ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G) :=
     p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
-      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N hSP
+      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N
   exact normalizer_le_maximal_of_three_le_rank_opiCoreFitting_centralizer
     hG hM.1 h3D hP0centD hP0M hP0ne
 
@@ -2344,10 +2299,7 @@ private theorem normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_pack
     (hP0ne : P0 ≠ ⊥)
     (h3D : 3 ≤ rank
       ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)))
-    (hSP :
-      ∀ {y : G} {L : Subgroup G}, y ∈ A →
-        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
-          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    :
     IsUniquelyMaximal (Subgroup.normalizer (P0 : Set G)) ∧
       Subgroup.normalizer (P0 : Set G) ≤ M := by
   have hP0M : P0 ≤ M :=
@@ -2355,7 +2307,7 @@ private theorem normalizer_p0_isUniquelyMaximal_and_le_maximal_of_high_rank_pack
   have hP0centD : P0 ≤ Subgroup.centralizer
       ((opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) : Set G) :=
     p0_le_centralizer_opiCoreFitting_of_pSubgroup_normalizer_package
-      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N hSP
+      hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N
   exact normalizer_isUniquelyMaximal_and_le_maximal_of_three_le_rank_opiCoreFitting
     hG hM.1 h3D hP0centD hP0M hP0ne
 
@@ -2409,10 +2361,7 @@ private theorem rank_opiCoreFitting_le_two_of_pSubgroup_normalizer_package
     (hP0N : P0 ≤ derivedInG (Subgroup.normalizer (P : Set G)))
     (hP0ne : P0 ≠ ⊥)
     (hnot : ¬ Subgroup.normalizer (P0 : Set G) ≤ M)
-    (hSP :
-      ∀ {y : G} {L : Subgroup G}, y ∈ A →
-        L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({y} : Set G)) →
-          OddOrder.BG.Ch1.S04.CharacteristicSylowSeriesPackage ↥L) :
+    :
     rank ↥(opiCoreInG ({p} : Set ℕ)ᶜ (S08.fittingInG M)) ≤ 2 := by
   by_contra hrank
   have h3D : 3 ≤ rank
@@ -2421,7 +2370,7 @@ private theorem rank_opiCoreFitting_le_two_of_pSubgroup_normalizer_package
   exact hnot
     (normalizer_p0_le_maximal_of_high_rank_opiCoreFitting_package
       hG hAcomm_set hM hA hAnot hPp hAP hPnormA hNPM hP0p hP0N
-      hP0ne h3D hSP)
+      hP0ne h3D)
 
 /-- **BG Lemma 9.5** (mmd L2559): `p` prime, `A ∈ SCN₃(p)` ⇒ `A ∈ 𝒰`。
 

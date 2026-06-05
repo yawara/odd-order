@@ -833,7 +833,7 @@ theorem exists_maximalSubgroupsContaining_centralizer_of_mem_scn3Global [Finite 
   exact ⟨M, hM, hCM⟩
 
 /-- A global `SCN₃(p)` subgroup is nontrivial. -/
-private theorem ne_bot_of_mem_scn3Global [Finite G]
+theorem ne_bot_of_mem_scn3Global [Finite G]
     {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ S07.scn3Global p G) :
     A ≠ ⊥ := by
   have hAp : IsPGroup p A := isPGroup_of_mem_scn3Global hA
