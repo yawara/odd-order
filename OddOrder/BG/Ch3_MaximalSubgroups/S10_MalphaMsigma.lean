@@ -247,6 +247,55 @@ theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [F
     Ch1.hasPLengthOne p ↥H := by
   sorry
 
+/-! ### Theorem 10.1 用の補助補題 -/
+
+/-- Conjugation by `c ∈ M` commutes with the inclusion `M.subtype`: `(c • K)` mapped into `G`
+equals `↑c`-conjugation of `K` mapped into `G`. The basic equivariance used throughout §10
+to move between conjugation inside `↥M` and conjugation in `G`. -/
+private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M) (K : Subgroup ↥M) :
+    (MulAut.conj c • K).map M.subtype = MulAut.conj (c : G) • (K.map M.subtype) := by
+  have hcomp : (MulAut.conj (c : G)).toMonoidHom.comp M.subtype
+      = M.subtype.comp (MulAut.conj c).toMonoidHom := by
+    ext x
+    simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+      Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
+  show (K.map (MulAut.conj c).toMonoidHom).map M.subtype
+      = (K.map M.subtype).map (MulAut.conj (c : G)).toMonoidHom
+  rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+
+/-- **σ basic fact** (mmd L2655): if `p ∈ σ(M)`, then for *every* Sylow `p`-subgroup `Q` of `M`
+the `G`-normalizer of its image lies in `M`. The definition of `σ(M)` provides one such Sylow `P`;
+every other `Q` is `M`-conjugate to it (`Q = m • P`, `m ∈ M`), and `N_G(·)` is
+conjugation-equivariant. -/
+private theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) (Q : Sylow p ↥M) :
+    Subgroup.normalizer (((Q : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) ≤ M := by
+  classical
+  obtain ⟨-, P, hP⟩ := hp
+  obtain ⟨m, hm⟩ := MulAction.exists_smul_eq (↥M) P Q
+  -- `Q̄ = conj ↑m • P̄ = P̄.map (conj ↑m)`: conjugation commutes with `M.subtype`.
+  have hQeq : ((Q : Subgroup ↥M).map M.subtype : Subgroup G)
+      = ((P : Subgroup ↥M).map M.subtype).map (MulAut.conj (m : G)).toMonoidHom := by
+    have hQ : (Q : Subgroup ↥M) = MulAut.conj m • (P : Subgroup ↥M) := by
+      rw [← hm]; exact Sylow.coe_subgroup_smul
+    rw [hQ, map_subtype_conj_smul]; rfl
+  -- `N_G(Q̄) = N_G(P̄).map (conj ↑m) ≤ M.map (conj ↑m) = M`.
+  have hbij : Function.Bijective (MulAut.conj (m : G)).toMonoidHom :=
+    (MulAut.conj (m : G)).bijective
+  have hnorm : Subgroup.normalizer (((Q : Subgroup ↥M).map M.subtype : Subgroup G) : Set G)
+      = (Subgroup.normalizer (((P : Subgroup ↥M).map M.subtype : Subgroup G) : Set G)).map
+          (MulAut.conj (m : G)).toMonoidHom := by
+    rw [hQeq, ← Subgroup.map_normalizer_eq_of_bijective _ hbij]
+  rw [hnorm]
+  intro g hg
+  obtain ⟨n, hn, rfl⟩ := Subgroup.mem_map.mp hg
+  have hnM : n ∈ M := hP hn
+  -- `(conj ↑m).toMonoidHom n = ↑m * n * ↑m⁻¹ ∈ M`
+  have : (MulAut.conj (m : G)).toMonoidHom n = (m : G) * n * (m : G)⁻¹ := by
+    simp [MulAut.conj_apply]
+  rw [this]
+  exact M.mul_mem (M.mul_mem m.2 hnM) (M.inv_mem m.2)
+
 /-! ## Theorem 10.1 — σ(M)-prime の fusion control (mmd L2657) -/
 
 /-- **BG Theorem 10.1** (mmd L2657): `M ∈ ℳ`, `p ∈ σ(M)`, `X` を `G` の非自明 `p`-部分群とする。
