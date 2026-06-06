@@ -72,6 +72,15 @@ noncomputable def mulDistribMulActionQuotientOfTrivial {G M : Type*} [Group G] [
     (QuotientGroup.lift L (MulDistribMulAction.toMulAut G M)
       (fun l hl => MulEquiv.ext (fun m => by simpa using hL l hl m)))
 
+/-- The descended action of `G ⧸ L` on `M` agrees with the original `G`-action on representatives:
+`⟦g⟧ • m = g • m`. -/
+theorem mulDistribMulActionQuotientOfTrivial_smul_mk {G M : Type*} [Group G] [Monoid M]
+    [MulDistribMulAction G M] {L : Subgroup G} [L.Normal]
+    (hL : ∀ l : G, l ∈ L → ∀ m : M, l • m = m) (g : G) (m : M) :
+    letI := mulDistribMulActionQuotientOfTrivial L hL
+    (QuotientGroup.mk g : G ⧸ L) • m = g • m :=
+  rfl
+
 /-- Sanity check that the coprime-bridge representation now elaborates: an elementary abelian
 `p`-group `M` with a `MulDistribMulAction` of `G` becomes a `ZMod p`-linear `G`-representation on
 `Additive M` through `Representation.ofDistribMulAction`. -/
