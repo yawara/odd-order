@@ -448,4 +448,60 @@ theorem normal_pgroup_acts_trivially_of_irreducible {s : ℕ} [Fact s.Prime]
       have hm := (Subgroup.mem_fixedPointsOfMulAut.mp hmem) k
       rw [hsmul] at hm; exact hm
 
+open OddOrder.GroupTheory in
+/-- **A chief factor is irreducible** (same-prime plumbing for BG Thm 3.7): for a `G`-chief factor
+`X/Y`, the only `chiefFactorConjAction`-invariant subgroups of `↥X ⧸ Y.subgroupOf X` are `⊥` and
+`⊤`. An invariant subgroup `N` pulls back (correspondence theorem) to a `G`-normal subgroup
+`W = (N.comap mk).map X.subtype` with `Y ≤ W ≤ X`, which by `IsChiefFactor` equals `Y` or `X`,
+giving `N = ⊥` or `N = ⊤`. -/
+theorem chiefFactor_invariant_eq_bot_or_top {G : Type*} [Group G] {X Y : Subgroup G}
+    [X.Normal] [Y.Normal] (hChief : IsChiefFactor X Y) :
+    letI := chiefFactorConjAction X Y
+    ∀ N : Subgroup (↥X ⧸ Y.subgroupOf X),
+      (∀ g : G, ∀ n : ↥X ⧸ Y.subgroupOf X, n ∈ N → g • n ∈ N) → N = ⊥ ∨ N = ⊤ := by
+  letI := chiefFactorConjAction X Y
+  intro N hNinv
+  have hYleX : Y ≤ X := hChief.lt.le
+  set q : ↥X →* (↥X ⧸ Y.subgroupOf X) := QuotientGroup.mk' (Y.subgroupOf X) with hq
+  have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective _
+  set W : Subgroup G := (N.comap q).map X.subtype with hW
+  have hWX : W ≤ X := by rw [hW]; exact Subgroup.map_subtype_le _
+  have hNcomapW : N.comap q = W.subgroupOf X := by
+    rw [hW]
+    exact (Subgroup.comap_map_eq_self (by rw [Subgroup.ker_subtype]; exact bot_le)).symm
+  have hNeq : (N.comap q).map q = N := Subgroup.map_comap_eq_self_of_surjective hqsurj N
+  have hWnorm : W.Normal := by
+    refine ⟨fun w hw g => ?_⟩
+    rw [hW, Subgroup.mem_map] at hw ⊢
+    obtain ⟨x', hx', hx'eq⟩ := hw
+    have hgxX : g * w * g⁻¹ ∈ X := by
+      rw [← hx'eq]; exact (inferInstance : X.Normal).conj_mem _ x'.2 g
+    refine ⟨⟨g * w * g⁻¹, hgxX⟩, ?_, rfl⟩
+    rw [Subgroup.mem_comap] at hx' ⊢
+    have hmkeq : q ⟨g * w * g⁻¹, hgxX⟩ = g • q x' := by
+      rw [hq, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, chiefFactorConjAction_smul_mk]
+      congr 1
+      apply Subtype.ext
+      show g * w * g⁻¹ = (↑(ConjAct.toConjAct g • x') : G)
+      rw [← hx'eq]; rfl
+    rw [hmkeq]; exact hNinv g (q x') hx'
+  have hYW : Y ≤ W := by
+    intro y hy
+    rw [hW, Subgroup.mem_map]
+    have hk : q ⟨y, hYleX hy⟩ = 1 := by
+      rw [hq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact Subgroup.mem_subgroupOf.mpr hy
+    exact ⟨⟨y, hYleX hy⟩, by rw [Subgroup.mem_comap, hk]; exact N.one_mem, rfl⟩
+  rcases hChief.eq_bot_or_eq_top_of_normal W hWnorm hYW hWX with hWeq | hWeq
+  · left
+    rw [← hNeq, hNcomapW, hWeq, eq_bot_iff]
+    intro z hz
+    rw [Subgroup.mem_map] at hz
+    obtain ⟨a, ha, haz⟩ := hz
+    rw [Subgroup.mem_bot, ← haz, hq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact ha
+  · right
+    rw [← hNeq, hNcomapW, hWeq, Subgroup.subgroupOf_self,
+      Subgroup.map_top_of_surjective q hqsurj]
+
 end OddOrder.BG.Ch1.S03c
