@@ -204,7 +204,12 @@ glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model
    - **coprime** (|K̄|,|V| coprime): (3.39) で |V| coprime to |Ḡ|。`C_V(R̄)=C_V(R)=C_X(R)Y/Y=1` ((ii-b) `chiefFactor_fixedPointFree`) + Lemma 3.3 → `K̄` trivial on V。← (coprime conclusion) `coprime_kernel_le_chiefFactorCentralizer` (hVelem + L≤chiefFactorCentralizer(step7) + G/L Frobenius(step5) + s∤|K̄| + FPF(ii-b))。
 10. → `K ≤ chiefFactorCentralizer X Y` → `chiefFactorCentralizer.commutator_le_of_le` → ⁅K,V_i⁆≤V_{i+1} → Prop1.2 → done。
 
-**残課題 (大きい順)**: (a) 🔴 **強帰納 setup** (group-order induction, IH を LR subgroup に適用) + **LR Frobenius restriction 補題** (未形式化, subgroup typing); (b) **same-prime case の Ḡ-model bridge** (K̄/V̄ as q-groups in Ḡ, commutator_eq_bot → K centralizes V); (c) **coprime case 組立** (prerequisites 全在庫, prime 比較 s∤|K̄| の場合分け)。**sub-piece 分割推奨**: まず coprime-only の per-factor dichotomy lemma (prerequisites 在庫) → same-prime → LR restriction → induction 本体。
+**残課題 (2026-06-06 更新, ✅ LR restriction 完了)**:
+- ✅ **LR Frobenius restriction** = `isFrobeniusGroup_sup_of_normal_le_kernel`(bdbe79b) **build-green**。
+- 🔴 **(b) same-prime case bridge = genuine gap (要新規補題)**: K は q-群でない (K/L のみ q-群)。`commutator_eq_bot_of_normal_pgroup_minimalNormal` は単一商の subgroup 版で, 「K/L (q-群) が q-chief-factor X/Y に自明作用 → K ≤ chiefFactorCentralizer X Y」へ直結しない。**確認済: repo に O_q-centralizes-q-chief-factor / same-prime chiefFactorCentralizer ヘルパは無い**。必要 = 2 商 (L で割って K̄ を q-群化, さらに Y で chief factor 実現) を跨ぐ bridge, or chiefFactorConjAction 枠での「正規 q-部分群が既約 q-加群に自明作用」補題 (p-群 fixed-point + Clifford)。**ここが (v) の最難所・未解決**。
+- 🟡 **(a) 強帰納 scaffolding**: group-order strong induction (`Nat.strong_induction` を `∀ Type, card ↥K = n` motive で), IH を ↥(L⊔R) に適用 (LR restriction 在庫), nilpotency transfer `Subgroup.subgroupOfEquivOfLe le_sup_left : ↥(L.subgroupOf(L⊔R)) ≃* ↥L`。非自明だが定型 (verbose)。
+- 🟢 **(c) coprime case + 結線**: prerequisites 全在庫 (`coprime_kernel_le_chiefFactorCentralizer` + (ii-b) `chiefFactor_fixedPointFree`); `nilpotent_normal_le_fitting` + glue A `fitting_le_chiefFactorCentralizer` で L⊆F(G) centralize; Prop1.2 `isNilpotent_of_chief_factor_centralization`。
+- **build 順案**: (a) scaffolding + (c) coprime 結線 を先 (在庫), (b) same-prime bridge を最後に集中。(b) が genuine 数学的ギャップなので, ここで loop checkpoint (2026-06-06)。
 
 ## §11 適用 (Thm 11.3)
 `M_σ ⋊ ⟨a₀^g⟩` (a₀^g prime order p, C_{M_σ}(a₀^g)=1, M_σ solvable=M の部分群)。
