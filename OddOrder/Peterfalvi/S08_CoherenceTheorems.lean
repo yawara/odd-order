@@ -3480,6 +3480,128 @@ def Xset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
 def Yset (hyp : SibleyDadeHypothesis G L H) : Set (ClassFunction ↥L ℂ) :=
   hyp.SsubFiltration ⁅H, H⁆
 
+/-- **(6.8) case (A) central subgroup `Z = Z(H) ∩ H′`** (Peterfalvi (6.8), p.34: *"Set
+`Z = Z(H) ∩ H′` in case (A)"*).  This is the **correct** `(6.6)` `Z` for the `X = S − S(Z)`
+coherence step: it is **central in `H`** (so [Is] Cor 2.30 `exists_degree_sq_le_index` bounds
+`θ(1)² ≤ |H:Z|`, making the per-step degree field fillable) and contained in `H′ = ⁅H,H⁆`.
+
+The earlier capstone route mis-instantiated the `(6.6)` producer at `Z = ⁅H,H⁆`, which is **not**
+central for class `≥ 3` `p`-groups (e.g. `UT(4,p)`), so its degree field `θχ² ≤ qtot ≤ |H:⁅H,H⁆|`
+was unsatisfiable.  See `notes/peterfalvi/s08_6_8_blocker_central_Z.md`. -/
+def centralCommutator (hyp : SibleyDadeHypothesis G L H) : Subgroup ↥L :=
+  (Subgroup.center ↥H).map H.subtype ⊓ ⁅H, H⁆
+
+theorem centralCommutator_le_commutator (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator ≤ ⁅H, H⁆ := by
+  simp only [centralCommutator]; exact inf_le_right
+
+theorem centralCommutator_le (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator ≤ H := by
+  haveI := hyp.H_normal
+  exact le_trans hyp.centralCommutator_le_commutator (Subgroup.commutator_le_left H H)
+
+/-- `Z = Z(H) ∩ H′` is central in `H`: its trace `Z.subgroupOf H` lies in `Z(↥H)`.  This is the
+hypothesis [Is] Cor 2.30 / `IsIrreducibleCharacter.exists_degree_sq_le_index` needs to bound
+`θ(1)² ≤ |H : Z|` for the `(6.6)` per-step degree field. -/
+theorem centralCommutator_subgroupOf_le_center (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.subgroupOf H ≤ Subgroup.center ↥H := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  simp only [centralCommutator] at hx
+  have hx2 : (x : ↥L) ∈ (Subgroup.center ↥H).map H.subtype := (Subgroup.mem_inf.mp hx).1
+  rw [Subgroup.mem_map] at hx2
+  obtain ⟨z, hz, hzx⟩ := hx2
+  have hzx' : z = x := Subtype.ext (by simpa using hzx)
+  rwa [← hzx']
+
+/-- `Z = Z(H) ∩ H′` is normal in `L`: `(center ↥H).map H.subtype` is normal (characteristic in the
+normal `H`, via `normal_of_characteristic_of_normal`) and `⁅H,H⁆` is normal, so their inf is. -/
+instance centralCommutator_normal (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.Normal := by
+  haveI := hyp.H_normal
+  haveI : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
+  simp only [centralCommutator]
+  infer_instance
+
+/-- `Z = Z(H) ∩ H′` traced into `H` is `Z(↥H) ⊓ commutator ↥H`. -/
+theorem centralCommutator_subgroupOf_eq (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.subgroupOf H
+      = Subgroup.center ↥H ⊓ _root_.commutator ↥H := by
+  have h1 : hyp.centralCommutator.subgroupOf H
+      = ((Subgroup.center ↥H).map H.subtype).subgroupOf H
+        ⊓ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H := by
+    rw [centralCommutator]; exact Subgroup.comap_inf _ _ _
+  rw [h1, commutator_subgroupOf_self]
+  congr 1
+  exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+
+/-- `Z = Z(H) ∩ H′ ≠ 1` when `H` is non-abelian: a non-trivial nilpotent group has
+`Z(H) ∩ H′ ≠ 1` (`isNilpotent_normal_inf_center_ne_bot` with `N = H′`). -/
+theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) : hyp.centralCommutator ≠ ⊥ := by
+  haveI := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have hkey : Subgroup.center ↥H ⊓ _root_.commutator ↥H ≠ ⊥ := by
+    rw [inf_comm]
+    exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
+  intro hbot
+  apply hkey
+  rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
+
+/-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
+`W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
+characteristic, so the action restricts fixed-point-freely to it (`IsFrobeniusAction.subgroup`);
+`card_modEq_one` gives `|Z| ≡ 1 (mod |W₁|)`, and as `|Z|, |W₁|` are odd and `|Z| > 1`
+(`H` non-abelian), `two_mul_add_one_le_of_odd_dvd` yields `2|W₁| + 1 ≤ |Z|`. -/
+theorem centralCommutator_card_subgroupOf_lower (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) :
+    2 * Nat.card hyp.W1 + 1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+    MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
+  have hFrobH : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1 ↥H := hF.toFrobeniusAction
+  have hMeq : hyp.centralCommutator.subgroupOf H = Subgroup.center ↥H ⊓ _root_.commutator ↥H :=
+    hyp.centralCommutator_subgroupOf_eq
+  have hcprod : ∀ (K : Subgroup ↥H) [K.Characteristic] (a : ↥hyp.W1) (m : ↥H),
+      m ∈ K → a • m ∈ K := by
+    intro K _ a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp ‹K.Characteristic›
+      (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a)
+    have hmem : (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a).toMonoidHom m ∈ K := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  have hinv : ∀ a : ↥hyp.W1, ∀ m ∈ hyp.centralCommutator.subgroupOf H,
+      a • m ∈ hyp.centralCommutator.subgroupOf H := by
+    intro a m hm
+    rw [hMeq, Subgroup.mem_inf] at hm ⊢
+    exact ⟨hcprod (Subgroup.center ↥H) a m hm.1, hcprod (_root_.commutator ↥H) a m hm.2⟩
+  letI instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hinv
+  have hFrobM : @OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1
+      ↥(hyp.centralCommutator.subgroupOf H) _ _ instM := hFrobH.subgroup _ hinv
+  haveI : Fintype ↥hyp.W1 := Fintype.ofFinite _
+  haveI : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
+  have hMmod : Nat.card ↥(hyp.centralCommutator.subgroupOf H) ≡ 1 [MOD Nat.card hyp.W1] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrobM.card_modEq_one
+  have hMne : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
+    rw [hMeq, inf_comm]
+    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
+  have hMgt1 : 1 < Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+    haveI : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hMne
+    exact Finite.one_lt_card
+  have hRdvd : Nat.card hyp.W1 ∣ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hMmod.symm
+  have hW1odd : Odd (Nat.card hyp.W1) :=
+    Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hModd : Odd (Nat.card ↥(hyp.centralCommutator.subgroupOf H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card H))
+      (Subgroup.card_subgroup_dvd_card (hyp.centralCommutator.subgroupOf H))
+  exact two_mul_add_one_le_of_odd_dvd hW1odd hModd hRdvd hMgt1
+
 /-- Membership in `S(A)`, unfolded. -/
 theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
@@ -5447,6 +5569,28 @@ theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
   simp only [Nat.mul_add, Nat.mul_one, Nat.add_sub_cancel]
   ring
 
+/-- **(6.8.3) arithmetic core.**  The numeric contradiction closing the (6.8.3) extension in case
+(A).  From the break-pair (5.6) bound `∑_{χ∈X} χ(1)² < 2ψ(1)η₁(1)` — i.e.
+`|W₁|·|H:Z|·(|Z|−1) < 2·|W₁|²·d` with `ψ(1) = |W₁|d`, `η₁(1) = |W₁|` — together with [Is] Cor 2.30
+`d² ≤ |H:Z|` (valid since `Z` is central) and the fixed-point-free bound `|Z|−1 ≥ 2|W₁|`
+(`W₁` acts FPF on the odd-order `Z`), one derives `|H:Z| < d ≤ d² ≤ |H:Z|`, a contradiction.
+
+Here `w1 = |W₁|`, `d = θ(1)` (the degree of the `H`-source of `ψ`), `hZ = |H:Z|`, `cZ = |Z|`.
+The hypothesis `2 ≤ hZ` holds because `Z ⊆ H′ ⊊ H` (`H` non-abelian), so `|H:Z| ≥ |H:H′| ≥ 2`. -/
+theorem false_of_centralCommutator_break_arith {w1 d hZ cZ : ℕ}
+    (hw1 : 1 ≤ w1) (hd : 1 ≤ d) (hdsq : d ^ 2 ≤ hZ) (hZ2 : 2 ≤ hZ)
+    (hfpf : 2 * w1 ≤ cZ - 1)
+    (hbreak : w1 * hZ * (cZ - 1) ≤ 2 * w1 ^ 2 * d) : False := by
+  set m := cZ - 1 with hm
+  have hge : 2 * w1 ^ 2 * hZ ≤ w1 * hZ * m := by
+    calc 2 * w1 ^ 2 * hZ = w1 * hZ * (2 * w1) := by ring
+      _ ≤ w1 * hZ * m := mul_le_mul_left' hfpf (w1 * hZ)
+  have hle : 2 * w1 ^ 2 * hZ ≤ 2 * w1 ^ 2 * d := le_trans hge hbreak
+  have hZd : hZ ≤ d := Nat.le_of_mul_le_mul_left hle (by positivity)
+  have h2d : 2 ≤ d := le_trans hZ2 hZd
+  have hdd : 2 * d ≤ d ^ 2 := by nlinarith [h2d]
+  omega
+
 /-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
 `χ(1) = |L:H| · θ(1)`; when `H` is a `p`-group `θ(1) = p^k`, so `χ(1) = |L:H| · p^k`.  This is the
 common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
@@ -5535,6 +5679,65 @@ theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
         ≤ 2 * (ψ 1).re * (H.index : ℝ) := hchain
       _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
   exact le_of_mul_le_mul_left key hidx_pos
+
+open scoped Classical in
+/-- **(6.8.3) X-sum break bound.**  The (5.6)/B1 bound applied to the breaking coherent set `S₁ ⊇ X`:
+`∑_{χ∈X} χ(1)² ≤ 2ψ(1)·χ₁(1)`.  Since `X ⊆ S₁` and `S₁` enumerates as a member family bounded by
+`sMember_degreeSqReBound_of_not_coherent`, the `X`-sum `(H.index)·(|H| − |H:Z|)`
+(`sum_re_sq_Xset_eq`) is dominated by the full family sum, which the (5.6) break bounds by
+`2ψ(1)χ₁(1)`.  This is the `(6.8.3)` inequality with `χ₁ = η₁ ∈ Y` of degree `|W₁|`. -/
+theorem xSum_le_two_psi (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} [Z.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite) (hXS1 : hyp.Xset Z ⊆ S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ))
+      ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  obtain ⟨k, χmem, hχinj, hrange, hmemS1, hfambound⟩ :=
+    hyp.sMember_degreeSqReBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hcfinj : Function.Injective (fun j => (χmem j : ClassFunction ↥L ℂ)) :=
+    fun a b h => hχinj (Subtype.ext h)
+  have hXsum := hyp.sum_re_sq_Xset_eq hF (Z := Z)
+  set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hXdiffdef
+  have hsub : Xdiff ⊆ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hXdiffdef, Finset.mem_sdiff] at hχ
+    obtain ⟨hχbot, hχnotZ⟩ := hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχbot
+    obtain ⟨-, -, hne⟩ := Finset.mem_filter.mp hθ
+    have hχS : ClassFunction.induce H θ.toClassFunction ∈ hyp.S := by
+      rw [hyp.S_eq]; exact ⟨θ, hne, rfl⟩
+    have hχnotSZ : ClassFunction.induce H θ.toClassFunction ∉ hyp.SsubFiltration Z := by
+      intro hmem
+      rw [hyp.mem_SsubFiltration] at hmem
+      obtain ⟨θ', hne', hker', heq'⟩ := hmem
+      exact hχnotZ (Finset.mem_image.mpr
+        ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+    exact hXS1 ⟨hχS, hχnotSZ⟩
+  rw [← hXsum]
+  calc ∑ χ ∈ Xdiff, ((χ 1).re) ^ 2
+      ≤ ∑ χ ∈ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset, ((χ 1).re) ^ 2 :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub (fun _ _ _ => sq_nonneg _)
+    _ = ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 :=
+        sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
+    _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
 
 /-- **(6.2) θ-bound for an induced member `ψ = Ind_H^L θ`.**
 
