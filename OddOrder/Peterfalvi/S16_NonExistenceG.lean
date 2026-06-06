@@ -4706,6 +4706,85 @@ theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
         (s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc)) from by group,
     hW, mul_one, inv_mul_cancel]
 
+/-- BG Appendix C, Lemma C.3 Step 3 bad-branch inclusion for a general conjugator
+`g`: if `(PU) ∩ (PU)^g = PU`, then conjugation by `g` preserves `PU`. -/
+theorem conj_mem_P_sup_U_of_inf_conj_eq {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {g : G}
+    (hbad : (hyp.base.P ⊔ hyp.base.U) ⊓
+        (MulAut.conj g⁻¹ • (hyp.base.P ⊔ hyp.base.U)) = hyp.base.P ⊔ hyp.base.U) :
+    ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U → g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U := by
+  intro x hx
+  have hx_inf : x ∈ (hyp.base.P ⊔ hyp.base.U) ⊓
+      (MulAut.conj g⁻¹ • (hyp.base.P ⊔ hyp.base.U)) := by rw [hbad]; exact hx
+  have hx_smul : x ∈ MulAut.conj g⁻¹ • (hyp.base.P ⊔ hyp.base.U) := hx_inf.2
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx_smul
+  have hsmul : ((MulAut.conj g⁻¹)⁻¹ • x) = g * x * g⁻¹ := by
+    rw [show ((MulAut.conj g⁻¹)⁻¹ • x) = (MulAut.conj g⁻¹)⁻¹ x from rfl,
+      MulAut.conj_inv_apply]; group
+  rwa [hsmul] at hx_smul
+
+/-- BG Appendix C, Lemma C.3 Step 3 bad-branch normalization for a general
+conjugator `g` of `p`-power order: a one-sided conjugation inclusion of `PU`
+upgrades to `g ∈ N_G(PU)`. -/
+theorem mem_normalizer_P_sup_U_of_conj_of_pow {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {g : G}
+    (hconj : ∀ ⦃x : G⦄, x ∈ hyp.base.P ⊔ hyp.base.U → g * x * g⁻¹ ∈ hyp.base.P ⊔ hyp.base.U)
+    (hgp : g ^ hyp.base.p = 1) :
+    g ∈ Subgroup.normalizer ((hyp.base.P ⊔ hyp.base.U : Subgroup G) : Set G) := by
+  classical
+  let PU : Subgroup G := hyp.base.P ⊔ hyp.base.U
+  have hiter : ∀ (n : ℕ) ⦃x : G⦄, x ∈ PU → g ^ n * x * (g ^ n)⁻¹ ∈ PU := by
+    intro n
+    induction n with
+    | zero => intro x hx; simpa using hx
+    | succ n ih => intro x hx; simpa [pow_succ', mul_assoc] using hconj (ih hx)
+  have hp_pos : 0 < hyp.base.p := hyp.base.p_prime.pos
+  have g_inv_eq : g⁻¹ = g ^ (hyp.base.p - 1) := by
+    have hmul : g ^ (hyp.base.p - 1) * g = 1 := by
+      rw [← pow_succ, Nat.sub_one_add_one_eq_of_pos hp_pos, hgp]
+    exact inv_eq_of_mul_eq_one_left hmul
+  have hinv_inc : ∀ ⦃x : G⦄, x ∈ PU → g⁻¹ * x * (g⁻¹)⁻¹ ∈ PU := by
+    intro x hx
+    simpa [g_inv_eq] using hiter (hyp.base.p - 1) hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  refine ⟨fun hx => hconj hx, fun hx => ?_⟩
+  have hpre := hinv_inc (x := g * x * g⁻¹) hx
+  convert hpre using 1; group
+
+/-- **BG Appendix C, Lemma C.3 Step 3** (mmd L4988–4992): for `g ∈ P₁^#`,
+`(PU) ∩ (PU)^g = U`.  We use the dichotomy `= U ∨ = PU`; the `= PU` branch forces
+`g ∈ N_G(PU) ⊆ N_G(P)`, hence (since `g` generates `P₁`) `P₁ ≤ N_G(P)`, giving the
+`P₀ = P₁` contradiction `P1_ne_W2`. -/
+theorem step3_inf_conj_eq_U_of_mem_P1 [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {g : G} (hg : g ∈ data.P1) (hg1 : g ≠ 1) :
+    (hyp.base.P ⊔ hyp.base.U) ⊓ (MulAut.conj g⁻¹ • (hyp.base.P ⊔ hyp.base.U)) =
+      hyp.base.U := by
+  rcases data.P_sup_U_inf_conj_eq_U_or_eq_P_sup_U_of_normalizes_U
+      (inv_mem (data.P1_normalizes_U hg)) with hU | hPU
+  · exact hU
+  · exfalso
+    have hgp : g ^ hyp.base.p = 1 := by
+      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp (data.P1_eq_zpowers_t ▸ hg)
+      rw [← hn, ← zpow_natCast, ← zpow_mul, mul_comm, zpow_mul, zpow_natCast,
+        data.t_pow_p_eq_one, one_zpow]
+    have hgP : g ∈ Subgroup.normalizer (hyp.base.P : Set G) :=
+      data.normalizer_P_sup_U_le_normalizer_P
+        (data.mem_normalizer_P_sup_U_of_conj_of_pow
+          (data.conj_mem_P_sup_U_of_inf_conj_eq hPU) hgp)
+    have horder : orderOf g = hyp.base.p := by
+      rcases (hyp.base.p_prime.eq_one_or_self_of_dvd _ (orderOf_dvd_of_pow_eq_one hgp))
+        with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hg1
+      · exact h
+    have hP1g : data.P1 = Subgroup.zpowers g := by
+      refine (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hg) ?_).symm
+      rw [Nat.card_zpowers, horder, data.P1_eq_zpowers_t, Nat.card_zpowers,
+        data.t_orderOf_eq_p]
+    exact data.P1_ne_W2 (data.P1_eq_W2_of_le_normalizer_W2
+      (data.P1_le_normalizer_W2_of_le_normalizer_P
+        (hP1g ▸ Subgroup.zpowers_le.mpr hgP)))
+
 /-- **BG Appendix C, Lemma C.3 Step 4 conclusion** (mmd L5078–5082): the `(5076)`
 relation `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` (`tᵢ = yc⁻¹ sᵢ yc`) forces `t₁ = t⁻¹`, hence
 `s₁ = s⁻¹`.  Otherwise `g = t₁⁻¹ t⁻¹ ∈ P₁^#`, and for `u ∈ U^#` the common value
