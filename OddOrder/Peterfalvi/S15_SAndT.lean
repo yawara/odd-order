@@ -26,9 +26,12 @@ The scaffold follows the four blocks of the text:
 * (13.11)--(13.15): the numerical contradiction giving `c = 1` and `u`;
 * (13.16)--(13.19): normalizers, Frobenius structure, and type-I interaction.
 
-The character-grid identities are stored as named proposition fields.  This
-keeps the Section 16 interface stable without forcing a premature concrete
-model of all induced-character sums in the `omega_ij`/`eta_ij` grid.
+The character-grid identities (13.1.d,e) are materialized as genuine equalities
+`η_{ij} = τ(ω_{ij})` and `Ind_W^{S/T}(ω_{ij} − ω) = ±(μ/ν - μ/ν)` over carried
+`ℂ`-linear transfer maps `tau3`/`indWS`/`indWT`.  This forces the `η`/`μ`/`ν`
+grids to be linear images of the `ω`-grid (a genuine, non-vacuous constraint);
+pinning those maps to the concrete (3.2)/(4.3) constructions is the remaining
+§3/§4 layer.
 -/
 
 namespace OddOrder.Peterfalvi.S15
@@ -108,9 +111,28 @@ structure Hypothesis where
   nu : Fin q → Fin p → ClassFunction ↥T ℂ
   delta : Fin p → ℤ
   deltaPrime : Fin q → ℤ
-  eta_eq_tau_omega_formula : Prop
-  mu_definition_formula : Prop
-  nu_definition_formula : Prop
+  /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, carried as a `ℂ`-linear map
+  sending the cyclic `W`-grid to virtual characters of `G` (the Dade-isometry
+  datum of (13.1.c)).  Pinning `tau3` to the concrete (3.2) construction is the
+  remaining §3 layer; the equality `eta_eq_tau_omega` already forces the `η`-grid
+  to be the linear image of the `ω`-grid. -/
+  tau3 : ClassFunction ↥W ℂ →ₗ[ℂ] ClassFunction G ℂ
+  /-- The induction `Ind_W^S` of (13.1.e)/(4.3), carried as a `ℂ`-linear map. -/
+  indWS : ClassFunction ↥W ℂ →ₗ[ℂ] ClassFunction ↥S ℂ
+  /-- The induction `Ind_W^T` of (13.1.e)/(4.3), carried as a `ℂ`-linear map. -/
+  indWT : ClassFunction ↥W ℂ →ₗ[ℂ] ClassFunction ↥T ℂ
+  /-- **Peterfalvi (13.1.d)**: `η_{ij} = ω_{ij}^τ`. -/
+  eta_eq_tau_omega : ∀ (i : Fin q) (j : Fin p), eta i j = tau3 (omega i j)
+  /-- **Peterfalvi (13.1.e)**: `Ind_W^S (ω_{ij} − ω_{0j}) = δ_j (μ_{ij} − μ_{0j})`,
+  where `δ_j = ±1` is recorded by `delta`. -/
+  mu_definition : ∀ (i : Fin q) (j : Fin p),
+    indWS (omega i j - omega ⟨0, q_prime.pos⟩ j)
+      = (delta j : ℂ) • (mu i j - mu ⟨0, q_prime.pos⟩ j)
+  /-- **Peterfalvi (13.1.e)**: `Ind_W^T (ω_{ij} − ω_{i0}) = δ'_i (ν_{ij} − ν_{i0})`,
+  where `δ'_i = ±1` is recorded by `deltaPrime`. -/
+  nu_definition : ∀ (i : Fin q) (j : Fin p),
+    indWT (omega i j - omega i ⟨0, p_prime.pos⟩)
+      = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, p_prime.pos⟩)
   m : ℚ
   m_eq : m = 1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
     1 / (((q : ℚ) - 1) * (q : ℚ) ^ p)
