@@ -5148,6 +5148,34 @@ theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
       _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
   exact le_of_mul_le_mul_left key hidx_pos
 
+/-- **(6.2) θ-bound for an induced member `ψ = Ind_H^L θ`.**
+
+For `θ ∈ Irr H` and a section `N ◁ C` with `N ≤ D ≤ C ≤ H`, `θ` trivial on `N` (after restriction
+to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of the induced character `ψ = Ind_H^L θ` is
+bounded by `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`, combining `induce_apply_one`
+(`ψ(1) = |L:H|·θ(1)`) with the §6 `θ`-bound `theta_degree_le_index_mul_sqrt_index`
+(`θ(1) ≤ |H:C|·√|C:D|`).  This is the (6.2) step `ψ(1) ≤ |L:C|·√|C:D|`. -/
+theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
+    (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict C (θ : ClassFunction ↥H ℂ)))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
+      (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
+      = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hind]
+  have hθbound := theta_degree_le_index_mul_sqrt_index (K := ↥H) θ C D hND hθN hcentral
+  calc (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re
+      ≤ (H.index : ℝ) * ((C.index : ℝ) * Real.sqrt (D.index : ℝ)) :=
+        mul_le_mul_of_nonneg_left hθbound (Nat.cast_nonneg _)
+    _ = (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`

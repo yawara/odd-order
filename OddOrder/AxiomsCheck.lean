@@ -1958,6 +1958,10 @@ set_option linter.style.longLine false in
 -- combined (via `S(A) ⊆ S₁`) with the real B2 identity `∑_{S(A)} = |L:H|(|H:A|−1)`, cancelling |L:H|.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_index_le_two_psi
+-- (6.2) θ-bound for an induced member `ψ = Ind_H^L θ`: `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`
+-- (`induce_apply_one` + `theta_degree_le_index_mul_sqrt_index`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.psi_degree_le_of_source
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
