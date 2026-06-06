@@ -4393,9 +4393,8 @@ theorem appCNormSetTwistedNormOneStep_of_capstone {hyp : Hypothesis (G := G)}
     one_pow, inv_one]
 
 /-- The Step 4 capstone supplies the AppC generator relation `∀ a ∈ E, N(2a-1)=1`,
-**without** the `FieldNormalizerData.appC_twisted_normOne_step` field.  Once the
-capstone is proved, this replaces the field-based
-`appC_normSet_generator_relation`. -/
+without any carrier field.  This is what `appC_normSet_generator_relation` (proved
+once `step4Capstone` is available) calls. -/
 theorem appC_normSet_generator_relation_of_capstone {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (hcap : data.Step4Capstone) :
     appCNormSetGeneratorRelation hyp :=
