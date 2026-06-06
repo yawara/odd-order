@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
 import OddOrder.GroupTheory.MaximalSubgroup
@@ -687,11 +688,89 @@ theorem Msigma_meet_conjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hQ₀ne (le_bot_iff.mp (hdisj ▸ le_inf hQ₀Q₁ hQ₀Q₂))
   exact ⟨hpartA, le_bot_iff.mp (le_trans (inf_le_inf_left _ hCAconj) hpartA.le)⟩
 
-/-- **BG Theorem 11.3** (mmd L2955): `M_σ` は nilpotent。 -/
+/-- **BG Theorem 11.3** (mmd L2955): `M_σ` は nilpotent。
+
+証明 (BG): `g ∈ N_G(P) − N_M(P)` をとると `A₀^g ⊆ P ⊆ M` で、`A₀^g` は Corollary 11.2(b) により
+`M_σ` 上に不動点自由に作用する。`A₀^g` は素数位数 `p` なので、`M_σ ⋊ A₀^g` は Frobenius 群であり、
+Theorem 3.7 (`frobeniusKernelIsNilpotent`) から kernel `M_σ` は nilpotent。 -/
 theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
     Group.IsNilpotent ↥(S10.Msigma M) := by
-  sorry
+  haveI : Fact p.Prime := ⟨h.prime⟩
+  -- If `M_σ` is trivial it is nilpotent; otherwise build the Frobenius structure.
+  by_cases hMsbot : S10.Msigma M = ⊥
+  · rw [hMsbot]; infer_instance
+  -- BG: take `g ∈ N_G(P) − N_M(P)` (here it suffices that `g ∈ N_G(P)` and `g ∉ M`).
+  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hgN
+  -- `A₀^g`, contained in `P ⊆ M` since `g` normalizes `P`.
+  set Ag : Subgroup G := MulAut.conj g • A₀ with hAg_def
+  have hAgP : Ag ≤ P := by
+    rw [hAg_def, ← hgP]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.A0_le_P
+  have hAgM : Ag ≤ M := hAgP.trans h.P_le
+  -- `A ⊆ M^g` (as `A ⊆ P = P^g ⊆ M^g`), so Corollary 11.2 applies to this `g`.
+  have hAMg : A ≤ MulAut.conj g • M := by
+    have hAP : A ≤ MulAut.conj g • P := by rw [hgP]; exact h.A_le_P
+    exact hAP.trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.P_le)
+  -- `|A₀^g| = |A₀| = p`.
+  have hcard_conj : ∀ (φ : MulAut G) (K : Subgroup G), Nat.card ↥(φ • K) = Nat.card ↥K :=
+    fun φ K => by
+      rw [mulAut_smul_eq_map]
+      exact (Nat.card_congr (Subgroup.equivMapOfInjective K _ φ.injective).toEquiv).symm
+  have hAgcard : Nat.card ↥Ag = p := by rw [hAg_def, hcard_conj, h.A₀_mem.2, pow_one]
+  have hAgne : Ag ≠ ⊥ := by
+    intro hbot; rw [hbot, Subgroup.card_bot] at hAgcard
+    exact h.prime.one_lt.ne' hAgcard.symm
+  -- Corollary 11.2(b): `M_σ ∩ C_G(A₀^g) = 1` (the fixed-point-free condition).
+  have hFPFcard := (Msigma_meet_conjugate hG h hgM hAMg).2
+  rw [← hAg_def] at hFPFcard
+  -- `p ∤ |M_σ|` (as `p ∉ σ(M)`), so `M_σ` and `A₀^g` are disjoint of coprime order.
+  have hp_ndvd : ¬ p ∣ Nat.card ↥(S10.Msigma M) := fun hdvd =>
+    h.notMem_sigma ((S10.Msigma_isPiGroup M) p
+      (Nat.mem_primeFactors.mpr ⟨h.prime, hdvd, Nat.card_pos.ne'⟩))
+  have hcop : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥Ag) := by
+    rw [hAgcard]; exact ((Nat.Prime.coprime_iff_not_dvd h.prime).mpr hp_ndvd).symm
+  have hdisj : Disjoint (S10.Msigma M) Ag :=
+    disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop)
+  -- `A₀^g ⊆ M ⊆ N_G(M_σ)` (since `M_σ ⊴ M`).
+  have hMnormMsM : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
+    rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]
+    have hle := Subgroup.le_normalizer_map (H := Ch03.oPiCore (S10.sigma M) ↥M) M.subtype
+    rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hle
+  have hAgnorm : Ag ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := hAgM.trans hMnormMsM
+  -- `M_σ ⊔ A₀^g ⊆ M` is solvable (proper subgroup of a minimal simple group).
+  haveI hMsol : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have hsupleM : S10.Msigma M ⊔ Ag ≤ M := sup_le (S10.Msigma_le M) hAgM
+  haveI : IsSolvable ↥(S10.Msigma M ⊔ Ag) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hsupleM).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hsupleM).surjective
+  -- Fixed-point-freeness as `r * n * r⁻¹ ≠ n` (using `|A₀^g| = p` prime and Cor 11.2(b)):
+  -- if `n ∈ M_σ` commutes with `r ∈ A₀^g − 1`, it commutes with `⟨r⟩ = A₀^g`, so `n ∈ C_G(A₀^g)`.
+  have hFPF : ∀ r ∈ Ag, r ≠ 1 → ∀ n ∈ S10.Msigma M, n ≠ 1 → r * n * r⁻¹ ≠ n := by
+    intro r hrAg hr1 n hnM hn1 hcontra
+    have hcomm : Commute r n := mul_inv_eq_iff_eq_mul.mp hcontra
+    have hzple : Subgroup.zpowers r ≤ Ag := Subgroup.zpowers_le.mpr hrAg
+    have hdvd : Nat.card ↥(Subgroup.zpowers r) ∣ p := by
+      rw [← hAgcard]; exact Subgroup.card_dvd_of_le hzple
+    have hne1 : Nat.card ↥(Subgroup.zpowers r) ≠ 1 := fun hh =>
+      hr1 (Subgroup.zpowers_eq_bot.mp (Subgroup.eq_bot_of_card_eq _ hh))
+    have hcardzp : Nat.card ↥(Subgroup.zpowers r) = p :=
+      (h.prime.eq_one_or_self_of_dvd _ hdvd).resolve_left hne1
+    have hzp : Subgroup.zpowers r = Ag :=
+      Subgroup.eq_of_le_of_card_ge hzple (hAgcard.trans hcardzp.symm).le
+    have hnC : n ∈ Subgroup.centralizer (↑Ag : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro b hb
+      rw [← hzp] at hb
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hb
+      exact Commute.zpow_left hcomm k
+    have hmem : n ∈ S10.Msigma M ⊓ Subgroup.centralizer (↑Ag : Set G) := ⟨hnM, hnC⟩
+    rw [hFPFcard] at hmem
+    exact hn1 (by simpa using hmem)
+  -- Apply the subgroup form of BG Theorem 3.7.
+  exact OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+    hAgnorm hdisj hMsbot hAgne ⟨p, h.prime, hAgcard⟩ hFPF
 
 /-- **BG Corollary 11.4** (mmd L2959): `H ∈ ℳ(A)` で `M_σ ⊓ H_σ ≠ 1` なら `M = H`。 -/
 theorem eq_of_Msigma_meet_Hsigma [Finite G] (hG : IsMinimalSimpleOdd G)

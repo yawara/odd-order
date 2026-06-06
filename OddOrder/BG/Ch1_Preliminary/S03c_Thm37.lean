@@ -666,4 +666,65 @@ theorem frobeniusKernelIsNilpotent {G : Type*} [Group G] [Finite G] [IsSolvable 
     (hR : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) : Group.IsNilpotent ↥K :=
   frobeniusKernelIsNilpotent_aux (Nat.card ↥K) K R h hR rfl
 
+/-- **BG Theorem 3.7, subgroup-pair form** (used for BG Thm 11.3). If a subgroup `N` of a finite
+group `G` is normalized by a prime-order subgroup `R` that meets it trivially and acts on it in a
+fixed-point-free manner (`r * n * r⁻¹ ≠ n` whenever `1 ≠ r ∈ R` and `1 ≠ n ∈ N`), and the subgroup
+`N ⊔ R` is solvable, then `N` is nilpotent. This realizes `N ⋊ R` as the Frobenius group `↥(N ⊔ R)`
+with kernel `N.subgroupOf (N ⊔ R)` and complement `R.subgroupOf (N ⊔ R)`, then applies
+`frobeniusKernelIsNilpotent`. (In BG Thm 11.3, `N = M_σ` and `R = A₀^g` for
+`g ∈ N_G(P) − N_M(P)`; the fixed-point-freeness comes from Corollary 11.2(b).) -/
+theorem isNilpotent_of_normalizing_primeOrder_fixedPointFree {G : Type*} [Group G] [Finite G]
+    {N R : Subgroup G} [IsSolvable ↥(N ⊔ R)]
+    (hRnorm : R ≤ Subgroup.normalizer N) (hdisj : Disjoint N R)
+    (hNne : N ≠ ⊥) (hRne : R ≠ ⊥) (hRprime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
+    (hFPF : ∀ r ∈ R, r ≠ 1 → ∀ n ∈ N, n ≠ 1 → r * n * r⁻¹ ≠ n) :
+    Group.IsNilpotent ↥N := by
+  have hNleH : N ≤ N ⊔ R := le_sup_left
+  have hRleH : R ≤ N ⊔ R := le_sup_right
+  have hKnormal : (N.subgroupOf (N ⊔ R)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hRnorm)
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(N ⊔ R)
+      (N.subgroupOf (N ⊔ R)) (R.subgroupOf (N ⊔ R)) := by
+    refine
+      { isNormal := hKnormal
+        isComplement := ?_
+        ne_bot_kernel := ?_
+        ne_bot_complement := ?_
+        conj_frobenius := ?_ }
+    · -- complement: disjoint + the product covers `↥(N ⊔ R)`
+      refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+      · refine disjoint_iff.mpr (eq_bot_iff.mpr (fun x hx => ?_))
+        rw [Subgroup.mem_inf] at hx
+        simp only [Subgroup.mem_subgroupOf] at hx
+        have hmem : (x : G) ∈ N ⊓ R := ⟨hx.1, hx.2⟩
+        rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
+        rw [Subgroup.mem_bot]; exact Subtype.ext (by simpa using hmem)
+      · haveI := hKnormal
+        have hKRtop : (N.subgroupOf (N ⊔ R)) ⊔ (R.subgroupOf (N ⊔ R)) = ⊤ := by
+          rw [← Subgroup.subgroupOf_sup hNleH hRleH, Subgroup.subgroupOf_self]
+        have hmul := Subgroup.normal_mul (N.subgroupOf (N ⊔ R)) (R.subgroupOf (N ⊔ R))
+        rw [hKRtop, Subgroup.coe_top] at hmul
+        exact hmul.symm
+    · rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      exact fun hd => hNne (hd.eq_bot_of_le hNleH)
+    · rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      exact fun hd => hRne (hd.eq_bot_of_le hRleH)
+    · -- conjugation Frobenius condition from the fixed-point-free hypothesis `hFPF`
+      intro a ha hane n hn hnne
+      simp only [Subgroup.mem_subgroupOf] at ha hn
+      have hane' : (a : G) ≠ 1 := fun hc => hane (Subtype.ext (by simpa using hc))
+      have hnne' : (n : G) ≠ 1 := fun hc => hnne (Subtype.ext (by simpa using hc))
+      intro hcontra
+      apply hFPF (a : G) ha hane' (n : G) hn hnne'
+      have hval := congrArg (Subtype.val) hcontra
+      push_cast at hval
+      exact hval
+  have hRprime' : ∃ p : ℕ, p.Prime ∧ Nat.card ↥(R.subgroupOf (N ⊔ R)) = p := by
+    obtain ⟨p, hp, hpc⟩ := hRprime
+    exact ⟨p, hp, by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRleH).toEquiv]; exact hpc⟩
+  haveI : Group.IsNilpotent ↥(N.subgroupOf (N ⊔ R)) := frobeniusKernelIsNilpotent hfrob hRprime'
+  exact nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hNleH).toMonoidHom
+    (Subgroup.subgroupOfEquivOfLe hNleH).surjective
+
 end OddOrder.BG.Ch1.S03c
