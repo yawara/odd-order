@@ -1,10 +1,16 @@
 # BG Thm 3.7 形式化プラン (Frobenius kernel nilpotency, prime complement)
 
-## ✅✅ 2026-06-06 COMPLETE: `frobeniusKernelIsNilpotent` (06f9b92), sorry-free, full build 3580 緑
+## ✅✅✅ 2026-06-07 COMPLETE: Thm 3.7 + Thm 11.3 両方 sorry-free, full build 3583 緑 + AxiomsCheck OK
 
-**Thm 3.7 完全形式化 (S03c_Thm37.lean)**: `frobeniusKernelIsNilpotent {G}[Group][Finite][IsSolvable]{K R}(h : IsFrobeniusGroup G K R)(hR : ∃p,p.Prime∧Nat.card ↥R=p) : Group.IsNilpotent ↥K`。
+**Thm 3.7 完全形式化 (S03c_Thm37.lean)**: `frobeniusKernelIsNilpotent {G}[Group][Finite][IsSolvable]{K R}(h : IsFrobeniusGroup G K R)(hR : ∃p,p.Prime∧Nat.card ↥R=p) : Group.IsNilpotent ↥K` (06f9b92)。
 証明経路: chief-factor prerequisites (coprime conclusion / same-prime branch=SP-1+(A)+SP-2 / G-L Frobenius (iii) / elem-abelian (iv) / FPF (ii-b) / LR restriction / K/L q-群 helper) → per-factor dichotomy `kernel_le_chiefFactorCentralizer_dichotomy` → group-order 強帰納 `frobeniusKernelIsNilpotent_aux` (Nat.strong_induction_on, L=maxProperNormalOrBot K, IH on LR, L⊆F(G), Prop 1.2)。
-**残り = (vi) BG Thm 11.3 `Msigma_isNilpotent` で §11 解除 (frobeniusKernelIsNilpotent を適用)**。
+
+**Thm 11.3 完全形式化 (S11:696, a8eee6d)**: `Msigma_isNilpotent` = `M_σ` nilpotent。
+- enabling helper `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (S03c): subgroup-pair 形 Thm 3.7。`N` が prime-order `R` に正規化され disjoint + FPF (`∀r∈R≠1,∀n∈N≠1, rnr⁻¹≠n`) + `N⊔R` solvable ⇒ `N` nilpotent。`↥(N⊔R)` 上に Frobenius 群 (kernel `N.subgroupOf(N⊔R)`, complement `R.subgroupOf(N⊔R)`) を `normal_subgroupOf_of_le_normalizer`+`isComplement'_of_disjoint_and_mul_eq_univ`(`subgroupOf_sup`+`subgroupOf_self`+`normal_mul`) で構築 → `frobeniusKernelIsNilpotent` → `subgroupOfEquivOfLe`+`nilpotent_of_surjective` で `↥N` に転送。
+- 本体: `g∈N_G(P)−M` (`SetLike.not_le_iff_exists` + `normalizer_P_not_le`); `A₀^g≤P≤M` (`conj_smul_eq_self_of_mem_normalizer` + `pointwise_smul_le_pointwise_smul_iff`); `A⊆M^g` → Cor 11.2(b) `Msigma_meet_conjugate` で `M_σ⊓C_G(A₀^g)=⊥`; `|A₀^g|=p` prime なので `⟨r⟩=A₀^g` (`eq_of_le_of_card_ge`) で単元可換 `Commute.zpow_left` → `n∈C_G(A₀^g)`; `M_σ⊔A₀^g≤M` solvable (`solvable_of_mem_maximalSubgroups`)。S11 が S03c_Thm37 import 追加。
+
+**残 §11 (Cor11.4/Thm11.5/Cor11.6/Thm11.7) は §10 sorry 待ちでブロック** (詳細 = memory `bg-s11-blocked-on-thm37`):
+Cor 11.4 → Lemma 10.12(b) `disjoint_of_not_conj`(S10:2419)=sorry; Thm 11.5 → Lemma 10.13(c)=sorry; Cor 11.6 → Thm 11.5; Thm 11.7 → Thm 4.20 + Lem 10.4(c) + Prop 10.10(c)/10.11(d)。§10 は §7-9 (sorry) 依存 = 深い spine。本ループ (Thm3.7→§11解除 via Thm11.3) のスコープ完了。
 
 ---
 
