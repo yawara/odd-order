@@ -144,6 +144,20 @@ Lemma 3.3 が要求するのは s∤|K̄|=|K/L|)。よって既存 `kernel_acts_
 - **(B) chief-factor MulDistribMulAction plumbing** = Ḡ (or ConjAct) を V=X/Y に `invariantQuotientMulDistribMulAction` で載せ、`hM.zmodModule` で `[Module (ZMod s) (Additive V)]` を供給 → coprime case 適用可能に。
 - **(C) induction skeleton** = `Nat.card K` 上の強帰納 (L=maxProperNormalOrBot K, LR への restriction で C_L(R)=1+Frobenius, IH→L nilpotent→L⊆F(G)); 各 chief factor で same-prime/coprime dichotomy (G solvable から elem-abelian 抽出 + 素数比較) → Prop 1.2。
 
+## 🔴 2026-06-06 BLOCKER: coprime-branch conclusion = CommGroup-on-quotient instance diamond
+
+glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model-bridge `chiefFactorConjAction_smul_eq_self_iff_mem` 7dd0166 が最後)。次の **coprime-branch conclusion** (`coprime_kernel_le_chiefFactorCentralizer`) を組もうとして **instance 設計の壁**:
+
+- coprime case `kernel_acts_trivially_of_coprime_fixedPointFree` は `[CommGroup M]` を要求。
+- chief factor `↥X ⧸ Y.subgroupOf X` は標準では **`Group` のみ** (可換性は `hVelem.comm` = Prop)。`letI : CommGroup := inferInstance` は **synthesize 失敗** + 仮に入れても標準 `Group` instance との **One/DivisionMonoid diamond** (`Group.toDivisionMonoid` vs `CommGroup.toDivisionCommMonoid.toDivisionMonoid`) で `1`・action が型不一致 (実測 3 error: 208 synth fail, 218/222 One mismatch)。
+- PRank `IsElementaryAbelian.zmodModule` は abstract `{G}[Group G]` で `letI:CommGroup:=inferInstance` が通るが、**具体 quotient 型では通らない** (再現済)。
+
+**解決オプション (次セッションが選ぶ)**:
+- **(a) 推奨**: coprime case `kernel_acts_trivially_of_coprime_fixedPointFree` (S03c) + bridge instances (`Additive.instDistribMulActionOfMulDistribMulAction`, `instSMulCommClassZModOfDistribMulAction`, ElementaryAbelianRepresentation.lean) を **`[CommGroup M]` → `[Group M] [IsMulCommutative M]`** に refactor。`AddCommGroup (Additive M)` を IsMulCommutative から導く必要 (`Additive.addCommGroup` は CommGroup 要 → IsMulCommutative 経由の導出 or 別 instance)。committed lemma を触るので慎重に。
+- **(b)** 標準 `Group` と defeq な CommGroup instance を明示構成 (canonical Group を再利用する `{ ‹Group› with mul_comm }` 形)。`IsMulCommutative → CommGroup` の正しい instance 名を特定し quotient で通るか検証。
+
+**この壁の先の残り (C)** (未着手, 大きい): (i) coprime conclusion (上記解決後), (ii) **FPF 導出 `C_V(R̄)=1`** (C_K(R)=1 + coprime-action の固定点-in-quotient; CoprimeAction.lean 要確認), (iii) **G/L Frobenius 構成** (`quotient_isFrobeniusGroup_of_le_kernel_of_*` に正しい入力), (iv) **elem-abelian 抽出** (chief factor が elem-abelian: G solvable + `IsChiefFactor.commutator_le_of_isSolvable`), (v) **|K|-強帰納 + LR restriction + dichotomy + Prop1.2 組立**, (vi) **Thm 11.3** `Msigma_isNilpotent`。
+
 ## §11 適用 (Thm 11.3)
 `M_σ ⋊ ⟨a₀^g⟩` (a₀^g prime order p, C_{M_σ}(a₀^g)=1, M_σ solvable=M の部分群)。
 `IsFrobeniusGroup` を構成 (`of_centralizer_kernel_le` 等) → Thm 3.7 → `M_σ` nilpotent。
