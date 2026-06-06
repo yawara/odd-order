@@ -326,6 +326,24 @@ theorem theta_degree_le_index_mul_sqrt_index {K : Type*} [Group K] [Fintype K]
     _ ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) :=
         mul_le_mul_of_nonneg_left hd_le (Nat.cast_nonneg _)
 
+/-- **Restriction kernel inheritance.**  If `θ` is trivial on a subgroup `M ≤ K` (i.e.
+`M ⊆ characterKernel θ`), then its restriction `Res_C θ` to a subgroup `C ≤ K` is trivial on
+`M.subgroupOf C = M ∩ C` (viewed in `C`).  Used by (6.2): a member `ψ = Ind_H^L θ ∈ S(B)` has
+source `θ` trivial on `B`, so `Res_C θ` is trivial on `B.subgroupOf C`, discharging the `θ`-bound's
+kernel hypothesis. -/
+theorem characterKernel_restrict_subgroupOf {K : Type*} [Group K] {θ : ClassFunction K ℂ}
+    (C : Subgroup K) {M : Subgroup K}
+    (hM : (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel θ) :
+    ((M.subgroupOf C : Subgroup ↥C) : Set ↥C) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.restrict C θ) := by
+  intro c hc
+  have hker : (θ : ClassFunction K ℂ) (↑c : K) = (θ : ClassFunction K ℂ) 1 :=
+    hM (Subgroup.mem_subgroupOf.mp hc)
+  simp only [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def, ClassFunction.restrict_apply,
+    OneMemClass.coe_one]
+  exact hker
+
 set_option linter.unusedFintypeInType false in
 /-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
 (`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
@@ -366,6 +384,14 @@ theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFuncti
       exact (e.symm j).2
     · intro hφ
       exact ⟨e ⟨φ, hφ⟩, by simp⟩
+
+/-- Reindex a sum over the `Finset` of a range by the indexing family: for an injective `f` over a
+finite domain, `∑_{x ∈ (Set.range f).toFinset} g x = ∑ j, g (f j)`.  Used to turn the `S₁`-set
+degree-square sum of the (6.2) bound into the `Fin k` member-family sum produced by B1. -/
+theorem sum_toFinset_range_eq {α β M : Type*} [Fintype α] [DecidableEq β] [AddCommMonoid M]
+    {f : α → β} (hinj : Function.Injective f) (g : β → M) :
+    ∑ x ∈ (Set.range f).toFinset, g x = ∑ j, g (f j) := by
+  rw [Set.toFinset_range, Finset.sum_image (fun a _ b _ h => hinj h)]
 
 /-- **(T8 leaf 10, combinatorial core) the conjugate-pair cover of `X` over a base `S₀`.**
 
@@ -516,6 +542,306 @@ theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
     have hj : j < T.card := by omega
     rw [hfst j hj, hfst (j + 1) hj1]
     exact he_mono (htmono.monotone (Fin.mk_le_mk.mpr (by omega)))
+
+/-- A predicate true at `0` and false at `N` must flip somewhere: there is an index `i < N` with
+`P i` true and `P (i + 1)` false.  (Discrete first-failure / boundary extraction, by induction on
+`N`.) -/
+theorem exists_index_predicate_break {P : ℕ → Prop} (h0 : P 0) :
+    ∀ N, ¬ P N → ∃ i, i < N ∧ P i ∧ ¬ P (i + 1)
+  | 0, hN => absurd h0 hN
+  | N + 1, hN => by
+    by_cases hPN : P N
+    · exact ⟨N, Nat.lt_succ_self N, hPN, hN⟩
+    · obtain ⟨i, hiN, hPi, hnPi⟩ := exists_index_predicate_break h0 N hPN
+      exact ⟨i, hiN.trans (Nat.lt_succ_self N), hPi, hnPi⟩
+
+open scoped Classical in
+/-- **First obstruction to coherence — the Peterfalvi (6.2) `S₁`/`S₂` decomposition.**
+
+Given conjugation-closed sets `Sa ⊆ Sb` of irreducible characters of `↥L`, with `Sb` finite and
+real-free, if `Sa` is coherent for an integral character map `τ` (on the support set `A`) but `Sb`
+is not, then there is an intermediate conjugation-closed set `S₁` (`Sa ⊆ S₁ ⊆ Sb`) and a character
+`ψ ∈ Sb` such that `S₁` is coherent but adjoining the conjugate pair `{ψ, ψ̄}` destroys coherence:
+`S₁ ∪ {ψ, ψ̄}` is not coherent.
+
+This is the decomposition cited at the start of the (6.2) proof ("By (b), there are sets `S₁` and
+`S₂ = {ψ, ψ̄}` … such that `S₁` is coherent but `S₁ ∪ S₂` is not coherent").  Construction:
+enumerate `Sb ∖ Sa` as conjugate pairs (`exists_conjugatePairCover`), so the running union
+`pairUnion Sa pair i` rises from `Sa` (coherent) to `Sb` (not), and take the first pair whose
+adjunction breaks coherence (`exists_index_predicate_break`). -/
+theorem exists_coherentBreakPair
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G) {A : Set ↥L}
+    {Sa Sb : Set (ClassFunction ↥L ℂ)}
+    (hsub : Sa ⊆ Sb) (hSbfin : Sb.Finite)
+    (hSbconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Sb)
+    (hSbreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Sb)
+    (hSbirr : ∀ χ ∈ Sb, IsIrreducibleCharacter χ)
+    (hSaconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Sa)
+    (hSacoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ Sa A))
+    (hSbncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ Sb A)) :
+    ∃ (S₁ : Set (ClassFunction ↥L ℂ)) (ψ : ClassFunction ↥L ℂ),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ ∧ Sa ⊆ S₁ ∧ S₁ ⊆ Sb ∧ ψ ∈ Sb ∧
+      ψ ∉ S₁ ∧ ψ.conj ∉ S₁ ∧
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A) ∧
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A) := by
+  classical
+  obtain ⟨e, pair, N, hpairχ, hsurj, hpairs, hcoverIdx, hpair0, hpair1, hdisj, _hmono⟩ :=
+    exists_conjugatePairCover hSbfin hSbconj hSbreal hSbirr hSaconj
+  -- the running union reaches `Sb` after `N` steps
+  have hUN : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair N = Sb :=
+    OddOrder.Peterfalvi.S07.pairUnion_eq_of_enumCover hsurj hsub hpairs hcoverIdx
+  -- the coherence predicate along the chain rises from `Sa` (true) to `Sb` (false)
+  have hP0 : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair 0) A) := by
+    rw [OddOrder.Peterfalvi.S07.pairUnion_zero]; exact hSacoh
+  have hPN : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair N) A) := by
+    rw [hUN]; exact hSbncoh
+  obtain ⟨i, hiN, hPi, hnPi⟩ := exists_index_predicate_break
+    (P := fun i => Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i) A)) hP0 N hPN
+  -- the breaking pair `{ψ, ψ̄}` lies in `Sb` and is disjoint from the prefix `S₁`
+  have hψpair : (pair i).1 ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet]
+  have hconj2 : (pair i).2 = ((pair i).1).conj := by rw [hpair1 i hiN, hpair0 i hiN]
+  have hψcpair : ((pair i).1).conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    rw [← hconj2]; simp [OddOrder.Peterfalvi.S07.pairSet]
+  refine ⟨OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i, (pair i).1,
+    ?_, ?_, ?_, hpairs i hiN hψpair,
+    Set.disjoint_left.mp (hdisj i hiN) hψpair,
+    Set.disjoint_left.mp (hdisj i hiN) hψcpair, hPi, ?_⟩
+  · -- `S₁` is closed under conjugation (base `Sa` is, each adjoined pair is)
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (hSaconj hbase))
+    · have hjN : j < N := hji.trans hiN
+      have hpair_conj : φ.conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+          Set.mem_singleton_iff] at hjpair ⊢
+        rcases hjpair with hφ' | hφ'
+        · right; rw [hφ', hpair0 j hjN, hpair1 j hjN]
+        · left; rw [hφ', hpair1 j hjN, hpair0 j hjN]; simp
+      exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, hpair_conj⟩)
+  · -- `Sa ⊆ S₁`
+    exact fun φ hφ => OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
+  · -- `S₁ ⊆ Sb`
+    rw [← hUN]; exact OddOrder.Peterfalvi.S07.pairUnion_mono Sa pair hiN.le
+  · -- `S₁ ∪ {ψ, ψ̄}` is not coherent (it is the next accumulator, where coherence fails)
+    have hsplit : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair (i + 1) =
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i ∪ {(pair i).1, ((pair i).1).conj} :=
+      OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair rfl hconj2
+    rw [← hsplit]; exact hnPi
+
+/-- **In a finite nilpotent group, a nontrivial normal subgroup meets the centre.**
+If `N ◁ G` is nontrivial and `G` is finite nilpotent, then `N ⊓ Z(G) ≠ ⊥`.  Proof: take the least
+`m` with `N ⊓ ζₘ ≠ ⊥` (the upper central series reaches `⊤`, so `m` exists; `m = k+1 > 0`); a
+nontrivial `x ∈ N ⊓ ζ_{k+1}` has `x·y·x⁻¹·y⁻¹ ∈ ζₖ` (definition of `ζ_{k+1}`) and `∈ N` (`N`
+normal), so `∈ N ⊓ ζₖ = ⊥` by minimality; hence `x` is central, `x ∈ N ⊓ Z(G)`.
+
+This is the nilpotency central step of Peterfalvi (6.3): `H/M` nilpotent and `A/B` a nontrivial
+normal subgroup give `(A/B) ⊓ Z(H/B) ≠ 1`, which (with maximality of `B`) forces `A/B ⊆ Z(H/B)`. -/
+theorem isNilpotent_normal_inf_center_ne_bot {Γ : Type*} [Group Γ] [Finite Γ]
+    [Group.IsNilpotent Γ] {N : Subgroup Γ} (hN : N.Normal) (hNne : N ≠ ⊥) :
+    N ⊓ Subgroup.center Γ ≠ ⊥ := by
+  classical
+  have hexists : ∃ i, N ⊓ upperCentralSeries Γ i ≠ ⊥ := by
+    refine ⟨Group.nilpotencyClass Γ, ?_⟩
+    rw [upperCentralSeries_eq_top_iff_nilpotencyClass_le.mpr (le_refl _), inf_top_eq]
+    exact hNne
+  have hm := Nat.find_spec hexists
+  have hm0 : Nat.find hexists ≠ 0 := by
+    intro h0
+    rw [h0, upperCentralSeries_zero, inf_bot_eq] at hm
+    exact hm rfl
+  obtain ⟨k, hk_eq⟩ := Nat.exists_eq_succ_of_ne_zero hm0
+  have hkbot : N ⊓ upperCentralSeries Γ k = ⊥ := by
+    by_contra h
+    exact Nat.find_min hexists (m := k) (by rw [hk_eq]; exact Nat.lt_succ_self k) h
+  rw [hk_eq] at hm
+  obtain ⟨⟨x, hxmem⟩, hxne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hm
+  have hx1 : x ≠ 1 := fun h => hxne (Subtype.ext h)
+  rw [Subgroup.mem_inf] at hxmem
+  obtain ⟨hxN, hxU⟩ := hxmem
+  have hxcenter : x ∈ Subgroup.center Γ := by
+    rw [Subgroup.mem_center_iff]
+    intro y
+    have hcomm_U : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries Γ k :=
+      mem_upperCentralSeries_succ_iff.mp hxU y
+    have hcomm_N : x * y * x⁻¹ * y⁻¹ ∈ N := by
+      have hconj : y * x⁻¹ * y⁻¹ ∈ N := hN.conj_mem x⁻¹ (N.inv_mem hxN) y
+      have := N.mul_mem hxN hconj
+      rwa [← mul_assoc, ← mul_assoc] at this
+    have hbot : x * y * x⁻¹ * y⁻¹ = 1 := by
+      have hin : x * y * x⁻¹ * y⁻¹ ∈ N ⊓ upperCentralSeries Γ k :=
+        Subgroup.mem_inf.mpr ⟨hcomm_N, hcomm_U⟩
+      rw [hkbot, Subgroup.mem_bot] at hin
+      exact hin
+    have h2 : x * y * x⁻¹ = y := mul_inv_eq_one.mp hbot
+    conv_lhs => rw [← h2]
+    group
+  intro hbot
+  have : x ∈ N ⊓ Subgroup.center Γ := Subgroup.mem_inf.mpr ⟨hxN, hxcenter⟩
+  rw [hbot, Subgroup.mem_bot] at this
+  exact hx1 this
+
+/-- **A maximal normal subgroup strictly between `M` and `A`.**
+For a finite group, if `M < A` (with `M` normal) there is a normal `B` with `M ≤ B < A` that is
+maximal with this property: any normal `C` with `B ≤ C < A` equals `B`.  This is the maximal-`B`
+step of the Peterfalvi (6.3) minimal-`A` induction (find a maximal proper normal subgroup below the
+minimal coherent `A`). -/
+theorem exists_maximal_normal_between {Γ : Type*} [Group Γ] [Finite Γ] {M A : Subgroup Γ}
+    [M.Normal] (hMA : M < A) :
+    ∃ B : Subgroup Γ, B.Normal ∧ M ≤ B ∧ B < A ∧
+      ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B := by
+  classical
+  haveI : Finite (Subgroup Γ) := Finite.of_injective (fun H : Subgroup Γ => (H : Set Γ))
+    (fun _ _ h => SetLike.coe_injective h)
+  obtain ⟨B, hBmem, hBmax⟩ :=
+    Set.Finite.exists_maximalFor (id : Subgroup Γ → Subgroup Γ)
+      {N | N.Normal ∧ M ≤ N ∧ N < A} (Set.toFinite _) ⟨M, ‹M.Normal›, le_refl M, hMA⟩
+  obtain ⟨hBnorm, hMB, hBA⟩ := hBmem
+  refine ⟨B, hBnorm, hMB, hBA, fun C hCnorm hBC hCA => ?_⟩
+  exact le_antisymm (hBmax ⟨hCnorm, hMB.trans hBC, hCA⟩ hBC) hBC
+
+/-- **Maximality forces centrality** — the central step of Peterfalvi (6.3).
+
+If `H ◁ Γ` is nilpotent and `A`, `B` are normal subgroups of `Γ` with `B < A ≤ H`, where `B` is
+maximal among normal subgroups of `Γ` strictly below `A`, then `A/B ⊆ Z(H/B)`.
+
+Indeed `A/B` is a nontrivial normal subgroup of the nilpotent group `H/B`, so `(A/B) ⊓ Z(H/B) ≠ 1`
+(`isNilpotent_normal_inf_center_ne_bot`).  Its full preimage `C` in `Γ` is a normal subgroup with
+`B < C ≤ A` (`C` is normal because conjugation by `Γ` preserves both `A/B` and the centre of `H/B`);
+by maximality of `B`, `C = A`, i.e. `A/B ⊆ Z(H/B)`.
+
+This discharges the `hcentral` hypothesis of `six_three_index_bound` in the minimal-`A`/maximal-`B`
+induction of Peterfalvi (6.3). -/
+theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite Γ]
+    {H A B : Subgroup Γ} (hH : H.Normal) [Group.IsNilpotent ↥H]
+    [A.Normal] [B.Normal] (hAH : A ≤ H) (hBA : B < A)
+    (hmax : ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B) :
+    (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H) := by
+  classical
+  haveI hNnorm : (B.subgroupOf H).Normal := (‹B.Normal›).subgroupOf H
+  haveI hANnorm : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  have hBH : B ≤ H := hBA.le.trans hAH
+  -- `mk' (B.subgroupOf H) a = 1 ↔ a ∈ B.subgroupOf H`
+  have mk_eq_one : ∀ a : ↥H,
+      QuotientGroup.mk' (B.subgroupOf H) a = 1 ↔ a ∈ B.subgroupOf H := by
+    intro a; rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']
+  -- centrality of `mk' x` ⟺ all commutators `h x h⁻¹ x⁻¹` land in `B.subgroupOf H`
+  have center_iff : ∀ x : ↥H,
+      QuotientGroup.mk' (B.subgroupOf H) x ∈ Subgroup.center (↥H ⧸ B.subgroupOf H) ↔
+        ∀ h : ↥H, h * x * h⁻¹ * x⁻¹ ∈ B.subgroupOf H := by
+    intro x
+    rw [Subgroup.mem_center_iff]
+    refine ⟨fun hx h => ?_, fun hx q => ?_⟩
+    · have h2 := hx (QuotientGroup.mk' (B.subgroupOf H) h)
+      rw [← mk_eq_one]
+      simp only [map_mul, map_inv]
+      rw [h2]; group
+    · obtain ⟨h, rfl⟩ := QuotientGroup.mk'_surjective (B.subgroupOf H) q
+      have hcomm := (mk_eq_one (h * x * h⁻¹ * x⁻¹)).2 (hx h)
+      simp only [map_mul, map_inv] at hcomm
+      calc QuotientGroup.mk' (B.subgroupOf H) h * QuotientGroup.mk' (B.subgroupOf H) x
+          = (QuotientGroup.mk' (B.subgroupOf H) h * QuotientGroup.mk' (B.subgroupOf H) x *
+              (QuotientGroup.mk' (B.subgroupOf H) h)⁻¹ *
+              (QuotientGroup.mk' (B.subgroupOf H) x)⁻¹) *
+              (QuotientGroup.mk' (B.subgroupOf H) x * QuotientGroup.mk' (B.subgroupOf H) h) := by
+            group
+        _ = QuotientGroup.mk' (B.subgroupOf H) x * QuotientGroup.mk' (B.subgroupOf H) h := by
+            rw [hcomm, one_mul]
+  -- `A/B` is nontrivial in `H/B`
+  have hAbar_ne : (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≠ ⊥ := by
+    intro hbot
+    rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+    have hAB : A ≤ B := by
+      intro y hy
+      have hy' : (⟨y, hAH hy⟩ : ↥H) ∈ A.subgroupOf H := Subgroup.mem_subgroupOf.mpr hy
+      exact Subgroup.mem_subgroupOf.mp (hbot hy')
+    exact lt_irrefl _ (hBA.trans_le hAB)
+  -- nilpotency: `(A/B) ⊓ Z(H/B) ≠ 1`
+  have hinf := isNilpotent_normal_inf_center_ne_bot
+    (Subgroup.Normal.map hANnorm (QuotientGroup.mk' (B.subgroupOf H))
+      (QuotientGroup.mk'_surjective _)) hAbar_ne
+  -- the pullback subgroup of `Γ`
+  set Zc := (Subgroup.center (↥H ⧸ B.subgroupOf H)).comap (QuotientGroup.mk' (B.subgroupOf H))
+    with hZc
+  set CH := A.subgroupOf H ⊓ Zc with hCH
+  set C := CH.map H.subtype with hC
+  -- `B ≤ C`
+  have hBC : B ≤ C := by
+    rw [hC, ← Subgroup.map_subgroupOf_eq_of_le hBH]
+    apply Subgroup.map_mono
+    rw [hCH]
+    refine le_inf (Subgroup.subgroupOf_mono H hBA.le) (fun x hx => ?_)
+    rw [hZc, Subgroup.mem_comap, (mk_eq_one x).2 hx]
+    exact Subgroup.one_mem _
+  -- `C ≤ A`
+  have hCA : C ≤ A := by
+    rw [hC, ← Subgroup.map_subgroupOf_eq_of_le hAH]
+    exact Subgroup.map_mono (by rw [hCH]; exact inf_le_left)
+  -- `C` is normal in `Γ`
+  have hCnorm : C.Normal := by
+    rw [hC]
+    refine ⟨fun n hn g => ?_⟩
+    rw [Subgroup.mem_map] at hn
+    obtain ⟨c, hcCH, rfl⟩ := hn
+    rw [hCH, Subgroup.mem_inf] at hcCH
+    obtain ⟨hcA, hcZ⟩ := hcCH
+    have hc_center : ∀ k : ↥H, k * c * k⁻¹ * c⁻¹ ∈ B.subgroupOf H := by
+      apply (center_iff c).mp
+      rw [hZc] at hcZ; exact Subgroup.mem_comap.mp hcZ
+    have hc'H : g * (c : Γ) * g⁻¹ ∈ H := hH.conj_mem _ c.2 g
+    rw [Subgroup.mem_map]
+    refine ⟨⟨g * (c : Γ) * g⁻¹, hc'H⟩, ?_, rfl⟩
+    rw [hCH, Subgroup.mem_inf]
+    refine ⟨Subgroup.mem_subgroupOf.mpr ?_, ?_⟩
+    · exact (‹A.Normal›).conj_mem _ (Subgroup.mem_subgroupOf.mp hcA) g
+    · rw [hZc, Subgroup.mem_comap, center_iff]
+      intro h
+      have hkH : g⁻¹ * (h : Γ) * g ∈ H := by
+        have := hH.conj_mem (h : Γ) h.2 g⁻¹; rwa [inv_inv] at this
+      have hk := hc_center ⟨g⁻¹ * (h : Γ) * g, hkH⟩
+      rw [Subgroup.mem_subgroupOf] at hk ⊢
+      have hrel : (((h * ⟨g * (c : Γ) * g⁻¹, hc'H⟩ * h⁻¹ *
+            (⟨g * (c : Γ) * g⁻¹, hc'H⟩ : ↥H)⁻¹ : ↥H) : Γ))
+          = g * (((⟨g⁻¹ * (h : Γ) * g, hkH⟩ * c *
+              (⟨g⁻¹ * (h : Γ) * g, hkH⟩ : ↥H)⁻¹ * c⁻¹ : ↥H) : Γ)) * g⁻¹ := by
+        push_cast
+        group
+      rw [hrel]
+      exact (‹B.Normal›).conj_mem _ hk g
+  -- a nontrivial element of `(A/B) ⊓ Z(H/B)` gives `B ≠ C`
+  obtain ⟨⟨q, hqmem⟩, hqne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hinf
+  rw [Subgroup.mem_inf] at hqmem
+  obtain ⟨hqA, hqZ⟩ := hqmem
+  rw [Subgroup.mem_map] at hqA
+  obtain ⟨c₀, hc₀A, hc₀q⟩ := hqA
+  have hq1 : q ≠ 1 := fun hq => hqne (Subtype.ext hq)
+  have hc₀CH : c₀ ∈ CH := by
+    rw [hCH, Subgroup.mem_inf]
+    exact ⟨hc₀A, by rw [hZc, Subgroup.mem_comap, hc₀q]; exact hqZ⟩
+  have hc₀C : (c₀ : Γ) ∈ C := by
+    rw [hC]; exact Subgroup.mem_map_of_mem H.subtype hc₀CH
+  have hc₀notB : (c₀ : Γ) ∉ B := by
+    intro hb
+    exact hq1 (by rw [← hc₀q]; exact (mk_eq_one c₀).2 (Subgroup.mem_subgroupOf.mpr hb))
+  have hBneC : B ≠ C := fun heq => hc₀notB (heq.symm ▸ hc₀C)
+  have hBC_lt : B < C := lt_of_le_of_ne hBC hBneC
+  have hCeqA : C = A := by
+    rcases eq_or_lt_of_le hCA with h | h
+    · exact h
+    · exact absurd (hmax C hCnorm hBC h) (Ne.symm (ne_of_lt hBC_lt))
+  have hCHmap : CH.map H.subtype = A := by rw [← hC, hCeqA]
+  have hCHeq : CH = A.subgroupOf H := by
+    rw [← Subgroup.map_subtype_inj, hCHmap, Subgroup.map_subgroupOf_eq_of_le hAH]
+  have hle : A.subgroupOf H ≤ Zc := by
+    rw [← hCHeq, hCH]; exact inf_le_right
+  rw [Subgroup.map_le_iff_le_comap, ← hZc]
+  exact hle
 
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
@@ -3959,6 +4285,106 @@ theorem isIrreducibleCharacter_of_mem_Xset_of_frobenius (hyp : SibleyDadeHypothe
     IsIrreducibleCharacter φ :=
   hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hyp.mem_Xset.mp hφ).1
 
+/-- **`S` contains no real characters** (Frobenius case).
+
+Each member of `S` is an irreducible induced character `Ind_H^L θ` (`θ ≠ 1_H`,
+`isIrreducibleCharacter_of_mem_S_of_frobenius`) of degree `|L:H|·θ(1) = |W₁|·θ(1) ≥ |W₁| > 1`, so
+it is not the trivial irreducible character; odd order of `L` then gives non-realness by Peterfalvi
+(1.1) (`not_isReal_of_ne_trivial_of_odd_card'`).  This `HasNoRealCharacters` fact and its
+`SsubFiltration` corollary supply the no-real input to the conjugate-pair enumeration of any
+`S(A) ⊆ S` consumed on the way to the (6.2)/(6.3) degree bound. -/
+theorem S_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.S := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  intro φ hφ hreal
+  have hirr : IsIrreducibleCharacter φ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hφ
+  let η : IrreducibleCharacter ↥L := ⟨φ, hirr⟩
+  have hη_ne : η ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥L := by
+    intro hη
+    have hφ_one_triv : φ (1 : ↥L) = 1 := by
+      have h := congrArg (fun ψ : IrreducibleCharacter ↥L =>
+        (ψ : ClassFunction ↥L ℂ) (1 : ↥L)) hη
+      simpa [η, trivialClassFunction_apply] using h
+    rw [hyp.S_eq] at hφ
+    obtain ⟨θ, -, hφeq⟩ := hφ
+    obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hφ_one : φ (1 : ↥L) = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+      rw [hφeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hd,
+        hyp.index_H_eq_card_W1]
+    refine absurd (hφ_one.symm.trans hφ_one_triv) ?_
+    rw [← Nat.cast_mul]
+    intro hcast
+    have hnat : Nat.card hyp.W1 * d = 1 := by exact_mod_cast hcast
+    exact hyp.W1_nontrivial (Subgroup.card_eq_one.mp (Nat.dvd_one.mp ⟨d, hnat.symm⟩))
+  exact (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+    hyp.card_L_odd hη_ne) hreal
+
+/-- **`S(A)` contains no real characters** (Frobenius case), as `S(A) ⊆ S`. -/
+theorem SsubFiltration_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) (A : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.SsubFiltration A) :=
+  (hyp.S_hasNoRealCharacters hF).mono hyp.SsubFiltration_subset_S
+
+/-- **`S`-member character facts** (Frobenius case): for `χ ∈ S` (irreducible by
+`isIrreducibleCharacter_of_mem_S_of_frobenius`, non-real by `S_hasNoRealCharacters`) the conjugate
+pair `{χ, χ̄}` is orthonormal (`‖χ‖² = ‖χ̄‖² = 1`, `⟨χ̄, χ⟩ = ⟨χ, χ̄⟩ = 0`).  These are the
+per-member `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar` facts that the (6.2) member-family
+enumeration feeds to B1 (`coherentDegreeSumBound_of_not_coherent`) for each member of `S₁ ⊆ S`. -/
+theorem sMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 := by
+  have hirr : IsIrreducibleCharacter χ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hχS
+  have hconjirr : IsIrreducibleCharacter χ.conj := hirr.conj
+  have hreal : ¬ ClassFunction.IsReal χ := hyp.S_hasNoRealCharacters hF hχS
+  have hbi_ne : (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ, hirr⟩ :=
+    fun h => hreal (congrArg Subtype.val h)
+  refine ⟨hreal, ?_, ?_, ?_, ?_⟩
+  · simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
+  · simpa using
+      irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ.conj, hconjirr⟩
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ, hirr⟩
+    rwa [if_neg hbi_ne] at h
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ.conj, hconjirr⟩
+    rwa [if_neg (fun h => hbi_ne h.symm)] at h
+
+/-- **`S`-member conjugate-difference support** (any irreducible `χ ∈ S`): `χ̄ − χ` is supported on
+`H^# = sharpImage H`.  Since `χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H`, and `χ̄ − χ` vanishes at
+`1` (the degree `χ(1)` is a real natural number), so it omits `1`.  This is the per-member
+`hdiffsupp` fact for the (6.2)/B1 member-family over `S₁ ⊆ S`. -/
+theorem sMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hirr : IsIrreducibleCharacter χ) :
+    (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast, sub_self])
+  have hχg : χ g ≠ 0 := fun h0 =>
+    hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_zero])
+  have hgH : g ∈ H := by
+    have hsupp : χ.support ⊆ (H : Set ↥L) := by
+      rw [hχeq]
+      exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
+    exact hsupp (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 /-- **(6.8.1), Frobenius case:** source-side orthogonality for the final
 `X = S - S(H')`, `Y = S(H')` partition. -/
 theorem inner_span_Xset_Yset_eq_zero_of_frobenius
@@ -4488,6 +4914,161 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **`S`-member degree ratio against a degree-`|W₁|` anchor.**
+
+For `χ = Ind_H^L θ ∈ S` and an anchor `χ₁` of the minimal degree `χ₁(1) = |W₁|` (induced from a
+degree-`1` source of `H`), the degree ratio `χ(1)/χ₁(1)` is the source degree `θ(1)`, a positive
+natural number: `χ(1) = θ(1)·χ₁(1)` (`χ(1) = |L:H|·θ(1) = |W₁|·θ(1)`, `induce_apply_one`).  This
+produces the integer degree `a = deg i` and the equation `χ(1) = a·χ₁(1)` that
+`sMember_scaledDiffSupport_of_charValue_eq` (and `scaledDiff_dadeImage_mem_ZIrr`) consume for the
+`hmemdegdiffsupp`/`hdiffasuppχ`/`htau1_memaχ` fields of the (6.2)/B1 member-family.  Applied with
+`χ = χ₁` it gives the anchor ratio `a = 1` (`ha1`). -/
+theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
+    {χ χ₁ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ)) :
+    ∃ a : ℕ, 0 < a ∧ χ 1 = (a : ℂ) * χ₁ 1 := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  refine ⟨a, ha_pos, ?_⟩
+  rw [hχeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha,
+    hyp.index_H_eq_card_W1, hχ₁deg]
+  ring
+
+/-- **(6.2) member-family core for `S₁ ⊆ S`** (Frobenius case): the flat enumeration of `S₁` with
+its per-member orthonormality, non-realness, conjugate-difference support, and `S₁`-membership
+facts.
+
+For a finite conjugation-closed `S₁ ⊆ S`, `exists_finEnum_irreducible` gives an injective family
+`χmem : Fin k → Irr L` with range `S₁`; the per-member helpers (`sMember_characterFacts`,
+`sMember_diffSupport`) and conjugation-closure of `S₁` discharge the `hmemreal`/`hmemconjortho`/
+`hmemortho`/`hmemdiffsupp`/`hmemS1`/`hmembarS1` fields that B1
+(`coherentDegreeSumBound_of_not_coherent`) consumes.  The degree data
+(`deg`/`hmemdegdiffsupp`, from `sMember_charValue_one_eq_mul_anchor`) is layered on separately. -/
+theorem exists_sMemberOrthonormalFamily (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ)) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ).conj ∈ S₁) ∧
+      (∀ j, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ).conj = 0) ∧
+      (∀ i j, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ) = if i = j then (1 : ℂ) else 0) := by
+  have hS₁irr : ∀ φ ∈ S₁, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hφ)
+  obtain ⟨k, χmem, hχinj, hrange⟩ := exists_finEnum_irreducible hS₁fin hS₁irr
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact Set.mem_range_self j
+  refine ⟨k, χmem, hχinj, hrange, ?_, ?_, hmemS1, ?_, ?_, ?_⟩
+  · intro j
+    exact (hyp.sMember_characterFacts hF (hS₁sub (hmemS1 j))).1
+  · intro j
+    exact hyp.sMember_diffSupport (hS₁sub (hmemS1 j)) (χmem j).2
+  · intro j
+    exact hS₁conj (hmemS1 j)
+  · intro j
+    exact (hyp.sMember_characterFacts hF (hS₁sub (hmemS1 j))).2.2.2.2
+  · intro i j
+    rw [irreducibleCharacter_inner_eq_ite (χmem i) (χmem j)]
+    rcases eq_or_ne i j with h | h
+    · subst h; simp
+    · rw [if_neg (fun he => h (hχinj he)), if_neg h]
+
+/-- **(6.2) member-family degree data** (Frobenius case): integer degree ratios against a
+degree-`|W₁|` anchor.
+
+Given a family `χmem` of `S`-members and a distinguished index `i₁` whose member has the minimal
+degree `χmem i₁ (1) = |W₁|`, every member has a positive integer degree ratio
+`χmem j (1) = (deg j)·χmem i₁ (1)` (the source degree, `sMember_charValue_one_eq_mul_anchor`), the
+anchor ratio is `deg i₁ = 1` (cancel the nonzero `|W₁|`), and each scaled difference
+`χmem j − deg j·χmem i₁` is supported on `H^#` (`sMember_scaledDiffSupport_of_charValue_eq`).  This
+is the `deg`/`ha1`/`hmemdegdiffsupp` data that layers on `exists_sMemberOrthonormalFamily` to
+complete the (6.2)/B1 member-family. -/
+theorem exists_sMemberDegreeData (hyp : SibleyDadeHypothesis G L H)
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L} {i₁ : Fin k}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S)
+    (hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ)) :
+    ∃ deg : Fin k → ℕ, deg i₁ = 1 ∧ (∀ j, 0 < deg j) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 =
+        (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ) - deg j • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  choose deg hdeg_pos hdeg_eq using fun j =>
+    hyp.sMember_charValue_one_eq_mul_anchor (hmemS j) hanchordeg
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  refine ⟨deg, ?_, hdeg_pos, hdeg_eq, fun j =>
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hmemS j) (hmemS i₁) (hdeg_eq j)⟩
+  have h := hdeg_eq i₁
+  rw [hanchordeg] at h
+  have hdeg1 : (deg i₁ : ℂ) = 1 :=
+    mul_right_cancel₀ hW1ne (by rw [one_mul]; exact h.symm)
+  exact_mod_cast hdeg1
+
+/-- **(6.2) anchor existence: `S(A)` contains a member of the minimal degree `|W₁|`.**
+
+When the section `H/(A.subgroupOf H)` has a proper commutator subgroup (e.g. `A ⊊ H` with `H`
+solvable, so `H/A` is a nontrivial solvable group), it carries a nontrivial degree-`1` character
+trivial on `A` (`exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top`); its
+induction `Ind_H^L θ ∈ S(A)` has degree `|L:H|·1 = |W₁|`
+(`induce_apply_one_eq_card_W1_of_degree_one`).  This furnishes the degree-`|W₁|` anchor `χ₁`
+consumed by `exists_sMemberDegreeData` (its `hanchordeg`). -/
+theorem exists_mem_SsubFiltration_degree_W1 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {A : Subgroup ↥L} [A.Normal]
+    (h : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
+    ∃ φ, φ ∈ hyp.SsubFiltration A ∧ (φ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ) := by
+  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top (A.subgroupOf H) h
+  refine ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), ?_, ?_⟩
+  · rw [hyp.mem_SsubFiltration]; exact ⟨θ, hθne, hθker, rfl⟩
+  · exact hyp.induce_apply_one_eq_card_W1_of_degree_one θ hθdeg
+
+/-- **(6.2) adjoined-pair fields for the breaking pair `{ψ, ψ̄}`** (Frobenius case).
+
+For `ψ ∈ S` whose conjugate pair `{ψ, ψ̄}` is disjoint from `S₁ ⊆ S`, this packages the per-`ψ`
+fields B1 (`coherentDegreeSumBound_of_not_coherent`) consumes: non-realness and orthonormality of
+`{ψ, ψ̄}` (`sMember_characterFacts`), the conjugate-difference support on `H^#`
+(`sMember_diffSupport`), and the orthogonality of `ψ` and `ψ̄` to every member of `S₁` (distinct
+irreducibles, since `ψ, ψ̄ ∉ S₁` but the members lie in `S₁`).  Together with
+`exists_coherentBreakPair` (which supplies `ψ ∉ S₁`, `ψ̄ ∉ S₁`) this is the adjoined-pair side of
+the (6.2) member-family. -/
+theorem sBreakPair_fields (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {ψ : ClassFunction ↥L ℂ} {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hψS : ψ ∈ hyp.S) (hS₁sub : S₁ ⊆ hyp.S) (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
+    ¬ ClassFunction.IsReal ψ ∧
+      ClassFunction.inner ψ ψ = 1 ∧ ClassFunction.inner ψ.conj ψ.conj = 1 ∧
+      ClassFunction.inner ψ.conj ψ = 0 ∧ ClassFunction.inner ψ ψ.conj = 0 ∧
+      ((ψ.conj - ψ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ χ = 0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
+  have hψirr : IsIrreducibleCharacter ψ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS
+  obtain ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar⟩ := hyp.sMember_characterFacts hF hψS
+  refine ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar,
+    hyp.sMember_diffSupport hψS hψirr, ?_, ?_⟩
+  · intro χ hχS1
+    have hχirr : IsIrreducibleCharacter χ :=
+      hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
+    have hne : ψ ≠ χ := fun h => hψnotS1 (by rw [h]; exact hχS1)
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hχirr⟩
+    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+  · intro χ hχS1
+    have hχirr : IsIrreducibleCharacter χ :=
+      hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
+    have hne : ψ.conj ≠ χ := fun h => hψcnotS1 (by rw [h]; exact hχS1)
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ.conj, hψirr.conj⟩ : IrreducibleCharacter ↥L)
+      ⟨χ, hχirr⟩
+    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
 Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
@@ -4536,6 +5117,519 @@ theorem xMember_scaledDiffSupports_of_degreeData (hyp : SibleyDadeHypothesis G L
         OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
   intro i hi
   exact hyp.xMember_scaledDiffSupport_of_degreeData (hmemX i hi) (hmemX i₁ hi₁) (hdeg i hi)
+
+open scoped Classical in
+/-- **(6.2) member-family → B1 degree-sum bound.**
+
+Assembles the (6.2) member-family for a coherent `S₁` and the breaking pair `{ψ, ψ̄}`, feeding it to
+B1 (`coherentDegreeSumBound_of_not_coherent`).  When `S₁` (conjugation-closed, coherent, `⊆ S`)
+contains the degree-`|W₁|` anchor `χ₁`, `ψ ∈ S` with `{ψ, ψ̄}` disjoint from `S₁`, and `S₁ ∪ {ψ, ψ̄}`
+is not coherent, the degree-ratio sum is bounded by `∑ⱼ (degⱼ)² ≤ 2·a`, where `degⱼ = χⱼ(1)/χ₁(1)`
+and `a = ψ(1)/χ₁(1)`.
+
+All member-family fields are discharged from the landed pieces: the per-member core
+(`exists_sMemberOrthonormalFamily`), the degree data (`exists_sMemberDegreeData`), the adjoined-pair
+fields (`sBreakPair_fields`), the scaled-difference support + Dade image
+(`sMember_scaledDiffSupport_of_charValue_eq`, `scaledDiff_dadeImage_mem_ZIrr`), and the abstract
+S07 generation bridges (`…_scaledDiffs`, `…_anchorGeneration`).  This is the (6.2) step
+"`2ψ(1)|L:K| ≥ ∑_{χ∈S₁} χ(1)²/‖χ‖²`" in normalized integer form. -/
+theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L) (deg : Fin k → ℕ) (a : ℕ),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * χ₁ 1) ∧
+      ψ 1 = (a : ℂ) * χ₁ 1 ∧
+      ∑ j : Fin k, ((deg j : ℝ)) ^ 2 ≤ 2 * (a : ℝ) := by
+  classical
+  -- (1) enumerate `S₁` with the per-member fields
+  obtain ⟨k, χmem, hχinj, hrange, hmemreal, hmemdiffsupp, hmemS1, hmembarS1,
+    hmemconjortho, hmemortho⟩ := hyp.exists_sMemberOrthonormalFamily hF hS₁sub hS₁conj hS₁fin
+  -- (2) locate the anchor index `i₁` (the anchor lies in `S₁ = range χmem`)
+  have hχ₁range : χ₁ ∈ Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) := by
+    rw [hrange]; exact hχ₁S₁
+  obtain ⟨i₁, hi₁eq0⟩ := hχ₁range
+  have hi₁eq : (χmem i₁ : ClassFunction ↥L ℂ) = χ₁ := hi₁eq0
+  have hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S := fun j => hS₁sub (hmemS1 j)
+  have hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ) := by
+    rw [hi₁eq]; exact hχ₁deg
+  -- (3) degree data
+  obtain ⟨deg, hdeg_i₁, _hdeg_pos, hdeg_eq, hmemdegdiffsupp⟩ :=
+    hyp.exists_sMemberDegreeData hmemS hanchordeg
+  -- (4) breaking-pair fields
+  obtain ⟨hrealψ, hψψ, hψbarψbar, hψbarψ, hψψbar, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    hyp.sBreakPair_fields hF hψS hS₁sub hψnotS1 hψcnotS1
+  -- (5) the `ψ` degree ratio `a`
+  obtain ⟨a, _ha_pos, hψratio⟩ := hyp.sMember_charValue_one_eq_mul_anchor hψS hanchordeg
+  -- (6) `ψ` scaled-difference support + Dade image (the `ψ`-side `hdiffasuppχ`/`htau1_memaχ`)
+  have hdiffasuppψ : (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq hψS (hmemS i₁) hψratio
+  have htau1ψ : hyp.tau (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G :=
+    hyp.scaledDiff_dadeImage_mem_ZIrr (χ := ⟨ψ, hψirr⟩) (χ₁ := χmem i₁) hdiffasuppψ
+  -- (7) generation fields via the abstract S07 bridges (`hSgen`, `hgen`)
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
+      (χmem j : ClassFunction ↥L ℂ) = x := by
+    intro x hx
+    rw [← hrange] at hx
+    obtain ⟨j, hj⟩ := hx
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := fun j => (χmem j : ClassFunction ↥L ℂ))
+    (deg := deg) (i₁ := i₁) hcover (Finset.mem_univ i₁) (fun j _ => hmemS1 j)
+    (fun j _ => hmemdegdiffsupp j)
+  have hbar1 : ψ.conj 1 = ψ 1 := by
+    rw [ClassFunction.conj_apply]
+    obtain ⟨n, -, hn1, -⟩ := hψirr.exists_natDegree_charValue_one_dvd_card
+    rw [hn1, star_natCast]
+  have hchi1_ne : (χmem i₁ : ClassFunction ↥L ℂ) 1 ≠ 0 := by
+    rw [hanchordeg]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    intro hmem
+    exact hmem.2 (by simp)
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := ψ) (chibar := ψ.conj) (chi1 := (χmem i₁ : ClassFunction ↥L ℂ)) (a := a)
+    hSgen hψratio hbar1 hchi1_ne h1A
+  -- (8) feed everything to B1
+  refine ⟨k, χmem, deg, a, hχinj, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
+    by rw [hψratio, hi₁eq], ?_⟩
+  have hbound := coherentDegreeSumBound_of_not_coherent hyp.dade hyp.hconj hS₁coh
+    ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    (fun j _ => hmemreal j) (fun j _ => hmemdiffsupp j) (fun j _ => hmemdegdiffsupp j)
+    (fun j _ => hmemS1 j) (fun j _ => hmembarS1 j) (fun j _ => hmemconjortho j)
+    (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
+    hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
+  simpa using hbound
+
+/-- **(6.2) member-family degree-square bound** (real form).
+
+The degree-sum bound `sMember_degreeSumBound_of_not_coherent` (`∑ⱼ (degⱼ)² ≤ 2a`), rescaled by the
+anchor degree `χ₁(1) = |W₁|`, gives the character-degree-square sum over the enumerated `S₁`-family:
+`∑ⱼ (χⱼ(1))² ≤ 2·ψ(1)·χ₁(1)` (real parts), since `χⱼ(1) = degⱼ·χ₁(1)` and `ψ(1) = a·χ₁(1)`.  This is
+the (6.2) bound `∑_{χ∈S₁} χ(1)² ≤ 2ψ(1)χ₁(1)` in the form ready to be compared, via `S(A) ⊆ S₁`,
+with the `S(A)` degree-sum identity B2. -/
+theorem sMember_degreeSqReBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 ≤
+        2 * (ψ 1).re * (χ₁ 1).re := by
+  obtain ⟨k, χmem, deg, a, hχinj, hrange, hdeg_eq, hψ_eq, hbound⟩ :=
+    hyp.sMember_degreeSumBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact ⟨j, rfl⟩
+  refine ⟨k, χmem, hχinj, hrange, hmemS1, ?_⟩
+  -- real parts of the degree relations
+  have hdegre : ∀ j, ((χmem j : ClassFunction ↥L ℂ) 1).re = (deg j : ℝ) * (χ₁ 1).re := by
+    intro j
+    rw [hdeg_eq j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (ψ 1).re = (a : ℝ) * (χ₁ 1).re := by
+    rw [hψ_eq, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hre_nonneg : (0 : ℝ) ≤ (χ₁ 1).re ^ 2 := sq_nonneg _
+  calc ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2
+      = ∑ j : Fin k, ((deg j : ℝ) * (χ₁ 1).re) ^ 2 := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (χ₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (χ₁ 1).re ^ 2 * (2 * (a : ℝ)) := by
+        exact mul_le_mul_of_nonneg_left hbound hre_nonneg
+    _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
+    _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
+
+open scoped Classical in
+/-- **(6.2) B2 in real / Frobenius form.**
+
+In the Frobenius case every member of `S(A)` is an irreducible induced character
+(`isIrreducibleCharacter_of_mem_S_of_frobenius`), so `χ(1)²/‖χ‖² = (χ(1).re)²` (`‖χ‖² = 1`, `χ(1)`
+a real natural number), and B2 (`sum_div_normSq_induce_kernelFilter_eq`) becomes the real
+degree-square identity `∑_{χ∈S(A)} (χ(1).re)² = |L:H|·(|H:A| − 1)`. -/
+theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {A : Subgroup ↥L} [A.Normal] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        ((χ 1).re) ^ 2
+      = (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hB2 := sum_div_normSq_induce_kernelFilter_eq (G := ↥L) (H := H) (A := A)
+  have hsummand : ∀ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+      (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥H ℂ) ∧
+        θ ≠ trivialIrreducibleCharacter ↥H)).image
+      (fun θ => ClassFunction.induce H θ.toClassFunction),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = ((((χ 1).re) ^ 2 : ℝ) : ℂ) := by
+    intro χ hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    have hθne : θ ≠ trivialIrreducibleCharacter ↥H := (Finset.mem_filter.mp hθ).2.2
+    have hχS : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∈ hyp.S := by
+      rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩
+    have hirr := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hχS
+    have hinner : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite (⟨_, hirr⟩ : IrreducibleCharacter ↥L) ⟨_, hirr⟩
+    obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+    rw [hinner, div_one, hn1, Complex.natCast_re]; push_cast; ring
+  have key : ((∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        ((χ 1).re) ^ 2 : ℝ) : ℂ)
+      = (((H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)) : ℝ) := by
+    rw [Complex.ofReal_sum, Finset.sum_congr rfl (fun χ hχ => (hsummand χ hχ).symm), hB2]
+    push_cast; ring
+  exact Complex.ofReal_inj.mp key
+
+open scoped Classical in
+/-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
+
+Combines the member-family degree-square bound `sMember_degreeSqReBound_of_not_coherent`
+(`∑_{χ∈S₁} χ(1).re² ≤ 2ψ(1).re·χ₁(1).re`) with the real B2 identity `sum_re_sq_induce_kernelFilter_eq`
+(`∑_{χ∈S(A)} χ(1).re² = |L:H|·(|H:A| − 1)`).  Since `S(A) ⊆ S₁`, the `S(A)`-sum is bounded by the
+`S₁`-sum, and with `χ₁(1) = |W₁| = |L:H|` (cancelling the positive index `|L:H|`) this gives
+`|H:A| − 1 ≤ 2ψ(1)`.  This is the (6.2) bound `2ψ(1) ≥ |K:A| − 1` (with `K = H`); composing with the
+θ-bound `ψ(1) ≤ |L:C|√|C:D|` yields the full (6.2) `2|L:C|√|C:D| ≥ |K:A| − 1`. -/
+theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {A : Subgroup ↥L} [A.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite) (hSA_S1 : hyp.SsubFiltration A ⊆ S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  obtain ⟨k, χmem, hχinj, hrange, hmemS1, hfambound⟩ :=
+    hyp.sMember_degreeSqReBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hcfinj : Function.Injective (fun j => (χmem j : ClassFunction ↥L ℂ)) :=
+    fun a b h => hχinj (Subtype.ext h)
+  have hB2 := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := A)
+  set SA := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) with hSAdef
+  -- the `S(A)` Finset is contained in the enumerated `S₁`-range Finset
+  have hsub : SA ⊆ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    exact hSA_S1 (by rw [hyp.mem_SsubFiltration]; exact ⟨θ, hne, hker, rfl⟩)
+  have hchain : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) ≤
+      2 * (ψ 1).re * (χ₁ 1).re := by
+    rw [← hB2]
+    calc ∑ χ ∈ SA, ((χ 1).re) ^ 2
+        ≤ ∑ χ ∈ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset, ((χ 1).re) ^ 2 :=
+          Finset.sum_le_sum_of_subset_of_nonneg hsub (fun _ _ _ => sq_nonneg _)
+      _ = ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 :=
+          sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
+      _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
+  have hχ₁re : (χ₁ 1).re = (H.index : ℝ) := by
+    rw [hχ₁deg, Complex.natCast_re, hyp.index_H_eq_card_W1]
+  rw [hχ₁re] at hchain
+  have hidx_pos : (0 : ℝ) < (H.index : ℝ) := by
+    rw [hyp.index_H_eq_card_W1]; exact_mod_cast Nat.card_pos
+  have key : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) ≤
+      (H.index : ℝ) * (2 * (ψ 1).re) := by
+    calc (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+        ≤ 2 * (ψ 1).re * (H.index : ℝ) := hchain
+      _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
+  exact le_of_mul_le_mul_left key hidx_pos
+
+/-- **(6.2) θ-bound for an induced member `ψ = Ind_H^L θ`.**
+
+For `θ ∈ Irr H` and a section `N ◁ C` with `N ≤ D ≤ C ≤ H`, `θ` trivial on `N` (after restriction
+to `C`) and `D ⧸ N` central in `C ⧸ N`, the degree of the induced character `ψ = Ind_H^L θ` is
+bounded by `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`, combining `induce_apply_one`
+(`ψ(1) = |L:H|·θ(1)`) with the §6 `θ`-bound `theta_degree_le_index_mul_sqrt_index`
+(`θ(1) ≤ |H:C|·√|C:D|`).  This is the (6.2) step `ψ(1) ≤ |L:C|·√|C:D|`. -/
+theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
+    (θ : IrreducibleCharacter ↥H) (C : Subgroup ↥H) [Fintype ↥C]
+    [Invertible (Nat.card ↥C : ℂ)] {N : Subgroup ↥C} [N.Normal] (D : Subgroup ↥C) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥C) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        (ClassFunction.restrict C (θ : ClassFunction ↥H ℂ)))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥C ⧸ N)) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
+      (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
+      = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hind]
+  have hθbound := theta_degree_le_index_mul_sqrt_index (K := ↥H) θ C D hND hθN hcentral
+  calc (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re
+      ≤ (H.index : ℝ) * ((C.index : ℝ) * Real.sqrt (D.index : ℝ)) :=
+        mul_le_mul_of_nonneg_left hθbound (Nat.cast_nonneg _)
+    _ = (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
+open scoped Classical in
+/-- **(6.2) first-obstruction + core wiring** `|K:A| − 1 ≤ 2ψ(1)`.
+
+From `S(A)` coherent and `S(B)` not coherent (with `S(A) ⊆ S(B)`), the first-obstruction
+`exists_coherentBreakPair` produces a breaking pair `{ψ, ψ̄}` with `ψ ∈ S(B)` (`ψ, ψ̄ ∉ S₁`), and the
+(6.2) core `sMember_index_le_two_psi` — with the degree-`|W₁|` anchor `χ₁ ∈ S(A) ⊆ S₁`
+(`exists_mem_SsubFiltration_degree_W1`, valid since `H/(A.subgroupOf H)` has a proper commutator
+subgroup) — gives `|H:A| − 1 ≤ 2ψ(1)`.  The structural inputs (`S(B)` finite / conjugation-closed /
+real-free / irreducible, `S(A)` conjugation-closed) come from the landed `SsubFiltration_*`
+helpers. -/
+theorem six_two_index_bound (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ ψ, ψ ∈ hyp.SsubFiltration B ∧
+      (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨S₁, ψ, hS₁conj, hAS₁, hS₁B, hψB, hψnotS1, hψcnotS1, hS₁coh, hncoh⟩ :=
+    exists_coherentBreakPair hyp.tau hAB (hyp.SsubFiltration_finite B)
+      (hyp.SsubFiltration_closedUnderConjugate B) (hyp.SsubFiltration_hasNoRealCharacters hF B)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF
+        (hyp.SsubFiltration_subset_S hφ))
+      (hyp.SsubFiltration_closedUnderConjugate A) hSAcoh hSBncoh
+  obtain ⟨χ₁, hχ₁SA, hχ₁deg⟩ := hyp.exists_mem_SsubFiltration_degree_W1 hAcomm
+  have hψS : ψ ∈ hyp.S := hyp.SsubFiltration_subset_S hψB
+  exact ⟨ψ, hψB, hyp.sMember_index_le_two_psi hF
+    (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
+    ((hyp.SsubFiltration_finite B).subset hS₁B) hAS₁ hS₁coh.some
+    (hAS₁ hχ₁SA) hχ₁deg hψS (hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS)
+    hψnotS1 hψcnotS1 hncoh⟩
+
+/-- **Peterfalvi (6.2)** (Frobenius case, `K = H`).
+
+Under the (6.2) section hypotheses — `B ⊆ D ⊆ C ⊆ H` with `D ⧸ B` central in `C ⧸ B` (here `B`
+appears as `N = (B.subgroupOf H).subgroupOf C`), `S(A)` coherent, `S(B)` not — the index bound
+`2|L:C|·√|C:D| ≥ |K:A| − 1` holds (with `K = H`, so `|L:C| = |L:H|·|H:C|` and `|C:D| = D.index`).
+
+Proof: `six_two_index_bound` gives a breaking pair `ψ ∈ S(B)` with `|H:A| − 1 ≤ 2ψ(1)`; writing
+`ψ = Ind_H^L θ` with `θ` trivial on `B` (`ψ ∈ S(B)`), `characterKernel_restrict_subgroupOf`
+discharges the θ-bound's kernel hypothesis, and `psi_degree_le_of_source` gives
+`ψ(1) ≤ |L:H|·|H:C|·√|C:D|`. -/
+theorem six_two (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal] [B.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (C : Subgroup ↥H) [Fintype ↥C] [Invertible (Nat.card ↥C : ℂ)] (D : Subgroup ↥C)
+    (hND : ((B.subgroupOf H).subgroupOf C) ≤ D)
+    (hcentral : D.map (QuotientGroup.mk' ((B.subgroupOf H).subgroupOf C)) ≤
+      Subgroup.center (↥C ⧸ (B.subgroupOf H).subgroupOf C))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤
+      2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
+  rw [hyp.mem_SsubFiltration] at hψB
+  obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
+  have hθN := characterKernel_restrict_subgroupOf C hθkerB
+  have hψdeg := hyp.psi_degree_le_of_source θ C D hND hθN hcentral
+  rw [hψeq] at hψbound
+  calc (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re := hψbound
+    _ ≤ 2 * ((H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
+    _ = 2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
+/-- **(6.2) θ-bound for an induced member, central (`C = H`) case.**
+
+When the section is `N ◁ D ≤ H` with `θ` trivial on `N` and `D ⧸ N` central in `H ⧸ N`, the b-half
+`degree_sq_le_index_of_central_quotient` gives `θ(1)² ≤ |H:D|` directly (no Clifford restriction),
+so `ψ = Ind_H^L θ` has `ψ(1) = |L:H|·θ(1) ≤ |L:H|·√|H:D|`.  This is the form (6.3) consumes (it
+applies (6.2) with `C = H`). -/
+theorem psi_degree_le_of_source_central (hyp : SibleyDadeHypothesis G L H)
+    (θ : IrreducibleCharacter ↥H) {N : Subgroup ↥H} [N.Normal] (D : Subgroup ↥H) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥H ⧸ N)) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
+      (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  obtain ⟨d, hd1, hd2⟩ :=
+    degree_sq_le_index_of_central_quotient N θ D hND hθN hcentral
+  have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
+      = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hind, hd1, Complex.natCast_re]
+  exact mul_le_mul_of_nonneg_left (Real.le_sqrt_of_sq_le (by exact_mod_cast hd2))
+    (Nat.cast_nonneg _)
+
+/-- **Peterfalvi (6.2), central case `C = H`** (the form consumed by (6.3)).
+
+With the section `B ⊆ D ≤ H` (`B` as `N = B.subgroupOf H`), `D/B` central in `H/B`, `S(A)`
+coherent, `S(B)` not: `|K:A| − 1 ≤ 2|L:H|·√|H:D|`.  Specializes `six_two` to `C = H`, where the
+θ-bound is the direct b-half (`psi_degree_le_of_source_central`), so the source `θ` of the breaking
+pair `ψ ∈ S(B)` is trivial on `N = B.subgroupOf H` (no restriction step needed). -/
+theorem six_two_central (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal] [B.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (D : Subgroup ↥H) (hND : B.subgroupOf H ≤ D)
+    (hcentral : D.map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
+  rw [hyp.mem_SsubFiltration] at hψB
+  obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
+  have hψdeg := hyp.psi_degree_le_of_source_central θ D hND hθkerB hcentral
+  rw [hψeq] at hψbound
+  calc (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re := hψbound
+    _ ≤ 2 * ((H.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
+    _ = 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
+/-- **(6.3) per-step index bound.**
+
+The per-step of Peterfalvi (6.3): for a section `B ⊆ A ⊆ H₁` with `A/B` central in `H/B`, `S(A)`
+coherent and `S(B)` not, the (6.2) central bound `six_two_central` (`|H:A| − 1 ≤ 2|L:H|√|H:A|`)
+combines with the arithmetic core `six_three_HH1_le` to give `|H:H₁| ≤ 4|L:K|² + 1` (`K = H`).
+The minimal-`A` / maximal-`B` induction of (6.3) repeatedly applies this step. -/
+theorem six_three_index_bound (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B H₁ : Subgroup ↥L} [A.Normal] [B.Normal] (hBA : B ≤ A) (hAH₁ : A ≤ H₁)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (hcentral : (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
+  letI : H.Normal := hyp.H_normal
+  have hsixtwo := hyp.six_two_central hF (hyp.SsubFiltration_antitone hBA) hAcomm
+    (A.subgroupOf H) (Subgroup.subgroupOf_mono H hBA) hcentral hSAcoh hSBncoh
+  have hHH1le : Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ Nat.card (↥H ⧸ A.subgroupOf H) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
+  refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))
+    (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
+  simpa using hsixtwo
+
+/-- **`hAcomm` from nilpotency of `H`.**
+
+In the Sibley setup `H` is nilpotent, so for a normal `A ⊊ H` the quotient `H/A` is a nontrivial
+nilpotent (hence solvable) group, whence its commutator subgroup is proper: `[H/A, H/A] ≠ ⊤`.  This
+supplies the `hAcomm` hypothesis of `six_two_index_bound` / `six_three_index_bound` (which need a
+degree-`|W₁|` anchor in `S(A)`). -/
+theorem commutator_subgroupOf_quotient_ne_top (hyp : SibleyDadeHypothesis G L H)
+    {A : Subgroup ↥L} [A.Normal] (hAH : A < H) :
+    _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤ := by
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) := by
+    rw [QuotientGroup.nontrivial_iff]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hAH.ne (le_antisymm hAH.le htop)
+  exact (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H ⧸ A.subgroupOf H)).ne
+
+/-- **Peterfalvi (6.3)** (Frobenius case `K = H`).
+
+With `M ≤ H₁ ⊊ H` normal subgroups of `L`, `S(H₁)` coherent and `|H:H₁| > 4|L:H|² + 1`, the set
+`S(M)` is coherent.
+
+Minimal-`A` induction (Peterfalvi's argument): pick a normal `A ∈ [M, H₁]` with `S(A)` coherent that
+is minimal for `⊆` (exists since `H₁` qualifies).  If `A ≠ M` then `M < A`; take a maximal normal
+`B` with `M ≤ B ⊊ A` (`exists_maximal_normal_between`).  Then `A/B ⊆ Z(H/B)`
+(`normal_central_of_maximal_normal_below`, using `H` nilpotent), and `S(B)` is *not* coherent (else
+`B ∈ [M, H₁]` would beat the minimality of `A`).  So `six_three_index_bound` gives
+`|H:H₁| ≤ 4|L:H|² + 1`, contradicting the hypothesis.  Hence `A = M` and `S(M) = S(A)` is
+coherent. -/
+theorem six_three (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal] (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration H₁)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hbound : 4 * H.index ^ 2 + 1 < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration M)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
+    (fun _ _ h => SetLike.coe_injective h)
+  set s : Set (Subgroup ↥L) := {A | A.Normal ∧ M ≤ A ∧ A ≤ H₁ ∧
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))} with hs_def
+  have hH₁s : H₁ ∈ s := by
+    simp only [hs_def, Set.mem_setOf_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
+  obtain ⟨A, hAmem, hAmin⟩ :=
+    Set.Finite.exists_minimalFor (id : Subgroup ↥L → Subgroup ↥L) s (Set.toFinite _) ⟨H₁, hH₁s⟩
+  simp only [hs_def, Set.mem_setOf_eq] at hAmem
+  obtain ⟨hAnorm, hMA, hAH₁, hAcoh⟩ := hAmem
+  haveI : A.Normal := hAnorm
+  have hAeqM : A = M := by
+    by_contra hne
+    have hMltA : M < A := lt_of_le_of_ne hMA (Ne.symm hne)
+    obtain ⟨B, hBnorm, hMB, hBltA, hBmaxl⟩ := exists_maximal_normal_between hMltA
+    haveI : B.Normal := hBnorm
+    have hAltH : A < H := lt_of_le_of_lt hAH₁ hH₁H
+    have hAcomm := hyp.commutator_subgroupOf_quotient_ne_top hAltH
+    have hcentral := normal_central_of_maximal_normal_below (H := H) (A := A) (B := B)
+      ‹H.Normal› hAltH.le hBltA hBmaxl
+    have hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+      intro hBcoh
+      have hBs : B ∈ s := by
+        simp only [hs_def, Set.mem_setOf_eq]
+        exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
+      exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
+    have hbnd := hyp.six_three_index_bound hF hBltA.le hAH₁ hAcomm hcentral hAcoh hSBncoh
+    omega
+  rw [← hAeqM]
+  exact hAcoh
 
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 

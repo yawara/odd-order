@@ -14,8 +14,12 @@
    し、本ファイル下部「blocked ログ」に「欠落 primitive / 理由」を記録して次 task へ。
 4. **commit 単位**: 完成した lemma 1 つ (+ その helper) ごとに build-green+axiom-clean で commit
    (descriptive message + `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`)。
-5. **worktree のみ・main 不可侵**: commit 前に `git branch --show-current` =
-   `claude/determined-hypatia-e67fd5` を確認。main への操作一切不可。
+5. **worktree のみ・main 不可侵**: 作業は worktree `/home/ywr/odd-order-peterfalvi`
+   (branch `peterfalvi`) で行う。commit 前に `git branch --show-current` = `peterfalvi` を確認。
+   main (`/home/ywr/odd-order`, 現在 BG Thm 3.7) への操作一切不可。
+   (旧 branch `claude/determined-hypatia-e67fd5` は merge 済・消滅。2026-06-06 訂正。)
+   注: Bash の cwd は毎回 main にリセットされるので各コマンド冒頭で
+   `cd /home/ywr/odd-order-peterfalvi` する。lake/references は symlink 共有済。
 6. **逐次** (impl は 1 本ずつ; parallel build 不可)。詰まったら revert→次 task、全 task blocked で停止。
 
 ## 既存 landed lemma (S08, 全 axiom-clean — 再実装不要, 呼ぶだけ)
@@ -154,6 +158,65 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 
 **genuinely 残る char-bound gap = 1 件のみ (member-family enum)**:
 🔴 **member-family enum 構成 + (6.2)/(6.3) assembly** — B1 が消費する S(A)/S₁ 列挙 (s/χmem/deg + ~15 orthogonality/support/gen/S₁-membership 仮説; S₁/S₂ from (C.b))。これを構成して B1+B2+θ-bound を組めば (6.2) `2|L:C|√|C:D|≥|K:A|−1`、minimal-A 帰納で (6.3) char-bound。**B1/B2/θ-bound/算術は全 landed**ゆえ、char-bound (= (6.5) の唯一の残) は **member-family enum 構成だけにブロックされる**。enum は **capstone glue/hstepData と共有の核** (Frobenius case では全 Ind θ 既約ゆえ S(A)={distinct Ind θ}、enum はその列挙)。X-chain 側 enum (`xAdjoinStepInput_of_memberFamily_*`) は Irr-L X-side で別物だが構造類似。**= 全 (6.8) capstone 残務の単一 bottleneck**。
+
+### ✅ 2026-06-06: (C.b) S₁/S₂ first-obstruction 分解 landed (commit 5f8be45, axiom-clean)
+上の (6.2) gap の前半「S₁/S₂ from (C.b)」を **honest に構成**(仮説 hoist でなく実証明):
+- **`exists_coherentBreakPair`** (S08, abstract over τ/A): `Sa ⊆ Sb` (conj-closed irreducible, Sb finite real-free), Sa coherent ∧ Sb 非coherent ⟹ ∃ S₁ (conj-closed, Sa⊆S₁⊆Sb) + ψ∈Sb で S₁ coherent ∧ `S₁∪{ψ,ψ̄}` 非coherent。= (6.2) 冒頭「By (b), there are sets S₁ and S₂={ψ,ψ̄}...S₁ coherent but S₁∪S₂ not」そのもの。**構成**: `exists_conjugatePairCover` で Sb∖Sa を共役 pair 列挙 → 走行 union `pairUnion Sa pair i` が Sa(coherent)→Sb(非)へ上昇 → 離散 first-failure `exists_index_predicate_break` (新 generic Nat lemma) で最初に coherence を壊す pair を抽出。`pairUnion` の conj-closure/cover (`pairUnion_eq_of_enumCover`/`pairUnion_succ_eq_union_pair`) は S07 既存。
+- **`S_hasNoRealCharacters`/`SsubFiltration_hasNoRealCharacters`** (Frobenius case): S(A)⊆S の各 χ=Ind θ は degree `|W₁|·θ(1)≥|W₁|>1` ∴ ≠trivial、odd order で非実 (1.1)。`exists_coherentBreakPair` の Sb real-free 入力 (Sibley S(A) 適用形) を供給。
+- **⟹ (6.2) の残 gap = member-family enum のみ**(S₁ を B1 に渡す flat family + degree-ratio/support/gen 諸 field 構成)。first-obstruction は **enum 非依存**で先行 landable だった。B1 適用には依然 enum (s/χmem/deg + ~15 field) が必要で、これが (6.5) bound の単一 bottleneck のまま。次手 = **S₁ の member-family enum** (`exists_finEnum_irreducible` + 諸 property 放電; degree-ratio `deg`/`hmemdegdiffsupp`/`hSgen`/`hgen`/`htau1_memaχ` が subtle 部)。
+
+### ✅ 2026-06-06 (続): member-family enum の per-member + anchor + adjoined-pair 側 landed (loop 自走, commits 61831a3/0838812/c4f1ad3/c3d6c7d/50239f5/eeeb06a, 全 axiom-clean)
+B1 が消費する member-family の **enum 非依存部を体系的に構築**(全 Frobenius case, S08, AxiomsCheck 登録):
+- **per-member facts**: `sMember_characterFacts`(non-real + 共役対 orthonormal)/`sMember_diffSupport`(`(χ̄−χ).support⊆H^#`)/`sMember_charValue_one_eq_mul_anchor`(degree-ratio `χ(1)=θ(1)·χ₁(1)`、anchor degree |W₁| 与で integer ratio + 既存 `sMember_scaledDiffSupport_of_charValue_eq`/`scaledDiff_dadeImage_mem_ZIrr` を発火)。
+- **core bundle** `exists_sMemberOrthonormalFamily`: 有限 conj-closed `S₁⊆S` → `exists_finEnum_irreducible` で flat `Fin k` 列挙 + hmemreal/hmemconjortho/hmemortho/hmemdiffsupp/hmemS1/hmembarS1 一括放電。
+- **degree-data layer** `exists_sMemberDegreeData`: anchor index `i₁`(degree |W₁|)与で `deg`/`ha1`(=1)/hmemdegdiffsupp を産出。
+- **anchor 存在** `exists_mem_SsubFiltration_degree_W1`: `commutator(H/A.subgroupOf H)≠⊤`(A⊊H solvable)⟹ S(A) に degree-|W₁| member(degree-1 source inflation+induce)。`hanchordeg` を discharge。
+- **adjoined-pair** `sBreakPair_fields` + `exists_coherentBreakPair` 強化(ψ∉S₁/ψ̄∉S₁ を cover disjointness から出力追加): ψ の per-field + `⟨ψ,χ⟩=⟨ψ̄,χ⟩=0 (χ∈S₁)`(distinct irreducible)。
+- **残 = ① generation field `hSgen`/`hgen`**(X-side `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(T8.11i)/`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`(T8.11j) が abstract module lemma で流用見込み)**② ψ の `hdiffasuppχ`/`htau1_memaχ`**(ψ の degree-ratio + 既存 scaled-diff/ZIrr helper)**③ 最終 assembly**(全 field を B1 に結線 → (6.2) `2|L:C|√|C:D|≥|K:A|−1`)。enum の hard combinatorial 部はほぼ機械化済、残は generation の module 議論と assembly。
+
+### ✅✅ 2026-06-06 (続2): member-family enum **突破** + (6.2) core 到達 (loop 自走, commits 6eab816/ecc773c/953af71/d39e6f4, 全 axiom-clean)
+**member-family enum(前任 deferral の単一 bottleneck)を完全突破** → (6.2) `|K:A|−1≤2ψ(1)` まで結線:
+- **`sMember_degreeSumBound_of_not_coherent`**(6eab816): member-family の全 ~15 field を B1 `coherentDegreeSumBound_of_not_coherent` に結線 → `∑ⱼ(degⱼ)²≤2a`。generation field は T8.11i/T8.11j を直接適用、ψ scaled-diff は既存 helper、anchor index は range から取得。**enum 完全機械化**。
+- **`sMember_degreeSqReBound_of_not_coherent`**(ecc773c): B1 bound を anchor degree |W₁| で rescale → `∑ⱼ χⱼ(1).re² ≤ 2ψ(1).re·χ₁(1).re`(family sum、ℝ)。+ 汎用 reindex `sum_toFinset_range_eq`。
+- **`sum_re_sq_induce_kernelFilter_eq`**(953af71): B2 を Frobenius .re 形に → `∑_{S(A)} χ(1).re² = |L:H|(|H:A|−1)`(各 S(A) member 既約 ⟹ ⟨χ,χ⟩=1、χ(1) 実、`Complex.ofReal_inj`)。
+- **`sMember_index_le_two_psi`**(d39e6f4, **(6.2) core**): 上記を結線。`S(A)⊆S₁` で sub-sum(`Finset.sum_le_sum_of_subset_of_nonneg` + reindex)→ `|L:H|(|H:A|−1) = ∑_{S(A)} ≤ ∑_{S₁} ≤ 2ψ(1).re·|L:H|` → |L:H| 約分 → **`|K:A|−1 ≤ 2ψ(1)`**。
+- **残 = θ-bound 合成のみ**: `theta_degree_le_index_mul_sqrt_index`(landed)で `ψ(1)=|L:K|θ(1) ≤ |L:C|√|C:D|` → (6.2) `2|L:C|√|C:D|≥|K:A|−1`。その後 (6.3) minimal-A 帰納(`six_three_HH1_le` landed)→ (6.5) bound → 「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed)。**(6.2) は θ-bound 合成 1 ステップで完成見込み**。
+
+### ✅✅✅ 2026-06-06 (続3): **Peterfalvi (6.2) 完全組立達成** (loop 自走, commits b93bb98/0cd57f1/704c24f/12408ea, 全 axiom-clean)
+(6.2) `2|L:C|√|C:D| ≥ |K:A|−1` を **honest に完成**(Frobenius case, K=H):
+- **`psi_degree_le_of_source`**(b93bb98): θ-bound 合成。ψ=Ind θ ⟹ `ψ(1)=|L:H|θ(1) ≤ |L:H|·|H:C|·√|C:D|`(`induce_apply_one` + `theta_degree_le_index_mul_sqrt_index`)。
+- **`six_two_index_bound`**(0cd57f1): first-obstruction + core 結線。S(A) coherent ∧ S(B) 非 ⟹ ∃ψ∈S(B), `|K:A|−1≤2ψ(1)`。`exists_coherentBreakPair` + `sMember_index_le_two_psi`、anchor = `exists_mem_SsubFiltration_degree_W1`、構造的事実 = landed `SsubFiltration_*`、Nonempty coherence は `.some`。
+- **`characterKernel_restrict_subgroupOf`**(704c24f): 汎用 restriction-kernel inheritance。θ trivial on M ⟹ Res_C θ trivial on M.subgroupOf C。θ-bound の kernel 条件を ψ∈S(B)(θ trivial on B)から discharge。
+- **`six_two`**(12408ea, **(6.2) 完成**): 上記を section 仮説(B⊆D⊆C⊆H, D/B⊆Z(C/B))下で合成。six_two_index_bound の ψ=Ind θ + kernel lemma + psi_degree_le_of_source → **`|K:A|−1 ≤ 2|L:C|√|C:D|`**。
+- **⟹ §6 残路** = (6.3) minimal-A 帰納((6.2) を section 上で帰納適用、`six_three_HH1_le` の arith core landed)→ (6.5) chief-factor で「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed、要 bound)。(6.3) の minimal-A 帰納(subgroup lattice 上の well-founded)が次の主要 assembly。
+
+### ✅✅ 2026-06-06 (続4): (6.3) building blocks landed (loop 自走, commits eb4c7fb/9c8d3e8/9906836/fcc4f15, 全 axiom-clean)
+(6.3) minimal-A 帰納の構成要素を体系的に landed(残 = maximality-central 導出 + 帰納 wrapping のみ):
+- **`six_two_central`/`psi_degree_le_of_source_central`**(eb4c7fb): (6.2) の C=H 特殊形 `|K:A|−1 ≤ 2|L:H|√|H:D|`。C=H は θ-bound の b-half `degree_sq_le_index_of_central_quotient`(θ(1)²≤|H:D|)で直接、⊤-subgroup friction 回避。(6.3) が消費する形。
+- **`six_three_index_bound`**(9c8d3e8): (6.3) per-step。section(B⊆A⊆H₁, A/B central, S(A) coh, S(B) 非)⟹ `|H:H₁|≤4|L:K|²+1`。six_two_central + `six_three_HH1_le` + index 補題(`SsubFiltration_antitone`/`subgroupOf_mono`/`index_dvd_of_le`)。
+- **`isNilpotent_normal_inf_center_ne_bot`**(9906836): **汎用** nilpotent 中心 fact(mathlib/repo 欠落、新規構築)。finite nilpotent + N◁ nontrivial ⟹ `N⊓Z(G)≠⊥`。upper central series の least-index 論法(`mem_upperCentralSeries_succ_iff` + 最小性)。
+- **`exists_maximal_normal_between`**(fcc4f15): **汎用** finite-lattice fact。`M<A`(M normal)⟹ maximal normal B(`M≤B<A`, normal C で `B≤C<A`⟹C=B)。`Set.Finite.exists_maximalFor`。
+- **残 (6.3) = ① maximality-central 導出**(nilpotency fact + maximal-B で `A/B ⊆ Z(H/B)`): A/B⊓Z(H/B)≠⊥(nilpotency)→ 対応する C は normal in L/B(Z(H/B) は H/B の center で characteristic、H/B◁L/B ゆえ normal)、B⊊C⊆A → maximality で C=A → A/B⊆Z。**quotient/subgroupOf/correspondence bookkeeping が重い**(~60-100行)。**② 強帰納 wrapping**(`Nat.card A` 上、A=H₁ から S(M) coherent。A=M base / A≠M で maximal-B → S(B) coh なら IH / S(B) 非なら central+per-step で `|H:H₁|≤bound` 矛盾)。両者で (6.3) 完成 → (6.5)(a) bound(M=⊥, H₁=⁅H,H⁆)で `|Abelianization H|≤4|W₁|²+1` → `isPGroup_of_isFrobeniusGroup_of_card_le` で H は p-群 → (6.8) capstone hstepData。
+
+### ✅✅✅ 2026-06-06 (続6): **Peterfalvi (6.3) 完全証明達成** (loop 自走, commit c57e205, axiom-clean, S08 leaf 3465 + full AxiomsCheck 3555)
+- **`six_three`**(S08, Frobenius K=H): `M ≤ H₁ ⊊ H` normal + `S(H₁)` coherent + `|H:H₁| > 4|L:H|²+1` ⟹ `S(M)` coherent。minimal-A 帰納: `Set.Finite.exists_minimalFor (id)` で ⊆-minimal な normal A∈[M,H₁](S(A) coh)を取得(H₁ が witness)→ A≠M なら `exists_maximal_normal_between` で maximal-B(M≤B⊊A)→ `normal_central_of_maximal_normal_below`(item ①)で A/B⊆Z(H/B)→ S(B) 非coherent(coh なら B が minimality 破る)→ `six_three_index_bound` で `|H:H₁|≤4|L:H|²+1` 矛盾 → A=M → S(M)=S(A) coherent。
+- **helper `commutator_subgroupOf_quotient_ne_top`**(item ② の hAcomm provider): H nilpotent ⟹ normal A⊊H で H/A nontrivial nilpotent ⟹ not perfect ⟹ `[H/A,H/A]≠⊤`。`QuotientGroup.nontrivial_iff` + `subgroupOf_eq_top` + `IsSolvable.commutator_lt_top_of_nontrivial`。six_two/six_three の degree-|W₁| anchor 仮説を放電。
+- **⟹ (6.3) 完全 landed**(item ①+②)。**次 = (6.5) wiring「H は p-群」**(下記)。
+
+### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象
+**目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
+- **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
+- **bound の出どころ** = `six_three` の対偶(M=⊥, H₁=⁅H,H⁆): `S(⊥)=S` 非coherent ∧ `S(⁅H,H⁆)=Yset` coherent(`coherentYFamily` 既 landed, S08:3347/`Yset` def:3431)∧ `⁅H,H⁆⊊H`(H 非可換)⟹ `¬(|H:⁅H,H⁆|>4|L:H|²+1)` ⟹ `|H:⁅H,H⁆|≤4|L:H|²+1`。
+- **要 bridge 補題群**(次 iteration で landing):
+  - **(i)** `⁅H,H⁆.subgroupOf H = commutator ↥H`(L-commutator subgroup of H ↔ ↥H の commutator)。`Nat.card (↥H ⧸ ⁅H,H⁆.subgroupOf H) = Nat.card (Abelianization ↥H)` に必要。mathlib: `Subgroup.commutator_subgroupOf`?要調査(無ければ `commutator_le`/`map_commutator` 経由)。
+  - **(ii)** `H.index = Nat.card ↥W₁`(Frobenius)= 既 landed(`hyp.index_eq_card_W1` 類, S08:2805 付近 `H.index = Nat.card hyp.W1`)。`4*H.index²+1 = 4*Nat.card W₁²+1` 整合。
+  - **(iii)** oddness: `Odd (Nat.card (Abelianization ↥H))`(|Ab H| ∣ |H| ∣ |L| odd)+ `Odd (Nat.card ↥W₁)`(|W₁| ∣ |L| odd)。`hyp.card_L_odd` + `Nat.Odd.of_dvd`/`card_dvd`。
+  - **(iv)** `S(⊥)=hyp.S`(SsubFiltration ⊥: `⊥⊆ker` 自明 ⟹ 全 S)、`⁅H,H⁆⊊H`(H 非可換; capstone では non-abelian case)。
+- **注意**: abelian H case(⁅H,H⁆=⊥=M)は別処理(X-empty case, 既 closed)。(6.5) p-群 path は non-abelian case 用。capstone 構造(by_contra ¬S coherent → H p-群 → (6.6) で coherence 構築 → 矛盾)を S08 capstone `sibleySetup_is_coherent`(sorry@7288 付近)で確認してから wiring。
+
+### ✅ 2026-06-06 (続5): (6.3) item ① **maximality-central 導出 landed** (loop 自走, commit c0cb810, axiom-clean, S08 leaf 3465 + full AxiomsCheck 3555)
+- **`normal_central_of_maximal_normal_below`**(S08, **汎用** group theory): finite Γ + H◁Γ nilpotent + A,B◁Γ + B<A≤H + B maximal-normal-below-A ⟹ `(A.subgroupOf H).map (mk' (B.subgroupOf H)) ≤ center (↥H ⧸ B.subgroupOf H)`(= A/B ⊆ Z(H/B))。`isNilpotent_normal_inf_center_ne_bot`(Ā⊓Z(Q)≠⊥, Q=H/B nilpotent quotient)→ pullback `C := (A.subgroupOf H ⊓ (center Q).comap (mk')).map H.subtype` が Γ-normal(**element-level commutator 証明**: 各 g∈Γ で `↑(h c' h⁻¹ c'⁻¹) = g·↑(k c k⁻¹ c⁻¹)·g⁻¹`, k=g⁻¹•h•g; `push_cast; group` + B normal conj)→ B<C≤A → maximality で C=A → A/B⊆Z。**`six_three_index_bound` の `hcentral` 仮説を放電する key piece**。
+- **残 (6.3) = ② 強帰納 wrapping のみ**(item ① 完了)。`Nat.card A`(or subgroup lattice well-founded)上の minimal-A 帰納で (6.3) 本体 `S(H₁) coherent + |H:H₁|>4|L:K|²+1 ⟹ S(M) coherent`。要: (b) minimal-coherent-A の存在(S(A) coherent な normal A の `Nat.card` 最小元)+ A=M base / A≠M で `exists_maximal_normal_between`→`normal_central_of_maximal_normal_below`(item ①)→`six_three_index_bound` で `|H:H₁|≤4|L:K|²+1` 矛盾。次 loop iteration の主対象。
 
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`

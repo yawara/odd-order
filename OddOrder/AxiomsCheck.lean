@@ -1902,6 +1902,102 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
+-- Peterfalvi S08 (6.2) `S₁`/`S₂` first-obstruction decomposition + its `S` no-real input.
+-- `exists_coherentBreakPair`: for `Sa ⊆ Sb` (conj-closed irreducible, `Sb` finite real-free) with
+-- `Sa` coherent and `Sb` not, the conjugate-pair cover `exists_conjugatePairCover` + the discrete
+-- first-failure extraction `exists_index_predicate_break` produce the intermediate coherent `S₁`
+-- and the breaking pair `{ψ, ψ̄}` cited at the start of the (6.2) proof.  `S_hasNoRealCharacters`
+-- (Frobenius case) supplies the real-free input for any `S(A) ⊆ S`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.S_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_hasNoRealCharacters
+-- (6.2) member-family per-member facts over `S₁ ⊆ S` (Frobenius case): orthonormal conjugate pair
+-- (`sMember_characterFacts`) and conjugate-difference support on `H^#` (`sMember_diffSupport`).
+-- These are the per-member `hreal`/`hχχ`/…/`hdiffsupp` fields B1 consumes for each `S`-member.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_characterFacts
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_diffSupport
+-- (6.2) member-family degree ratio: an `S`-member `χ = Ind θ` against a degree-`|W₁|` anchor `χ₁`
+-- has integer ratio `χ(1) = θ(1)·χ₁(1)` (the `deg`/`ha1` data feeding the scaled-diff support and
+-- `htau1_memaχ` fields).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_charValue_one_eq_mul_anchor
+-- (6.2) member-family core: flat enumeration of a finite conj-closed `S₁ ⊆ S` with the per-member
+-- orthonormality/non-real/diff-support/membership fields B1 consumes (degree data layered on).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_sMemberOrthonormalFamily
+-- (6.2) member-family degree data: integer ratios `deg`/`ha1`/`hmemdegdiffsupp` against a
+-- degree-`|W₁|` anchor, layering on the member-family core.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_sMemberDegreeData
+-- (6.2) anchor existence: `S(A)` has a degree-`|W₁|` member (degree-1 source of `H/A` inflated and
+-- induced), discharging the `hanchordeg` of `exists_sMemberDegreeData`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_mem_SsubFiltration_degree_W1
+-- (6.2) adjoined-pair fields for the breaking pair `{ψ, ψ̄}`: non-realness, orthonormality,
+-- conjugate-difference support, and orthogonality to all of `S₁` (the `ψ ∉ S₁` from the
+-- strengthened `exists_coherentBreakPair`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sBreakPair_fields
+-- (6.2) member-family → B1 degree-sum bound: the full assembly threading the member-family core,
+-- degree data, adjoined-pair fields, scaled-diff support/Dade image, and the abstract generation
+-- bridges into B1 (`coherentDegreeSumBound_of_not_coherent`), yielding `∑ⱼ (degⱼ)² ≤ 2a`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSumBound_of_not_coherent
+-- (6.2) range-sum reindex + the degree-square real bound `∑ⱼ χⱼ(1)² ≤ 2ψ(1)χ₁(1)` (B1 rescaled by
+-- the anchor degree), the form ready to compare with B2 via `S(A) ⊆ S₁`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_toFinset_range_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSqReBound_of_not_coherent
+-- (6.2) B2 in real/Frobenius form: `∑_{χ∈S(A)} (χ(1).re)² = |L:H|·(|H:A|−1)` (each S(A) member is
+-- irreducible so `χ(1)²/‖χ‖² = (χ(1).re)²`), the real-degree-square identity to compare with the
+-- member-family bound.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sum_re_sq_induce_kernelFilter_eq
+-- (6.2) core inequality `|K:A|−1 ≤ 2ψ(1)`: the member-family degree-square bound `∑_{S₁} ≤ 2ψ(1)χ₁(1)`
+-- combined (via `S(A) ⊆ S₁`) with the real B2 identity `∑_{S(A)} = |L:H|(|H:A|−1)`, cancelling |L:H|.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_index_le_two_psi
+-- (6.2) θ-bound for an induced member `ψ = Ind_H^L θ`: `ψ(1) = |L:H|·θ(1) ≤ |L:H|·|H:C|·√|C:D|`
+-- (`induce_apply_one` + `theta_degree_le_index_mul_sqrt_index`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.psi_degree_le_of_source
+-- (6.2) first-obstruction + core wiring: `S(A)` coherent ∧ `S(B)` not ⟹ ∃ ψ∈S(B), `|K:A|−1 ≤ 2ψ(1)`
+-- (the breaking pair from `exists_coherentBreakPair` fed to the (6.2) core `sMember_index_le_two_psi`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two_index_bound
+-- (6.2) restriction kernel inheritance: `θ` trivial on `M` ⟹ `Res_C θ` trivial on `M.subgroupOf C`
+-- (discharges the θ-bound's kernel hypothesis from `ψ = Ind θ ∈ S(B)`, `θ` trivial on `B`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.characterKernel_restrict_subgroupOf
+-- Peterfalvi (6.2) fully assembled (Frobenius case): under the section hypotheses (S(A) coherent,
+-- S(B) not, B ⊆ D ⊆ C ⊆ H with D/B central in C/B), `|K:A|−1 ≤ 2|L:C|·√|C:D|`.  Threads the
+-- first-obstruction + core (`six_two_index_bound`) with the θ-bound (`psi_degree_le_of_source`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two
+-- Peterfalvi (6.2) central case `C = H` (the form (6.3) consumes): θ-bound via the direct b-half
+-- `degree_sq_le_index_of_central_quotient` (no Clifford restriction), giving `|K:A|−1 ≤ 2|L:H|√|H:D|`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.psi_degree_le_of_source_central
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two_central
+-- (6.3) per-step index bound: a section `B ⊆ A ⊆ H₁` (A/B central, S(A) coherent, S(B) not) gives
+-- `|H:H₁| ≤ 4|L:K|²+1` (six_two_central + the arithmetic core six_three_HH1_le).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three_index_bound
+-- (6.3) `hAcomm` provider: `H` nilpotent ⟹ for normal `A ⊊ H`, `[H/A, H/A] ≠ ⊤` (nontrivial
+-- nilpotent ⟹ not perfect).  Supplies the degree-`|W₁|` anchor hypothesis of six_two/six_three.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.commutator_subgroupOf_quotient_ne_top
+-- (6.3) THEOREM (Frobenius K=H): `M ≤ H₁ ⊊ H`, `S(H₁)` coherent, `|H:H₁| > 4|L:H|²+1` ⟹ `S(M)`
+-- coherent.  Minimal-A induction: maximal-B + maximality-central + per-step index bound contradiction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three
+-- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
+-- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
+-- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isNilpotent_normal_inf_center_ne_bot
+-- (6.3) maximal-B step: in a finite group, `M < A` (M normal) has a maximal normal `B` with
+-- `M ≤ B < A` (any normal `C` with `B ≤ C < A` is `B`).  The maximal-B of the (6.3) induction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_maximal_normal_between
+-- (6.3) maximality forces centrality: with `H ◁ Γ` nilpotent, `B < A ≤ H` and `B` maximal normal
+-- below `A`, the nilpotency central step + maximality give `A/B ⊆ Z(H/B)`.  Discharges the
+-- `hcentral` hypothesis of `six_three_index_bound` in the (6.3) minimal-A / maximal-B induction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normal_central_of_maximal_normal_below
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
