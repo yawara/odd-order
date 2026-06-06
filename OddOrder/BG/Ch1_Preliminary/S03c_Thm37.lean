@@ -125,4 +125,13 @@ noncomputable def chiefFactorConjAction {G : Type*} [Group G] (X Y : Subgroup G)
         exact (‹Y.Normal›).conj_mem _ hm _)
   MulDistribMulAction.compHom _ (ConjAct.toConjAct (G := G)).toMonoidHom
 
+/-- Reduction of the chief-factor conjugation smul on a coset: `g` sends the class of `x ∈ X` to
+the class of its `G`-conjugate. -/
+theorem chiefFactorConjAction_smul_mk {G : Type*} [Group G] {X Y : Subgroup G}
+    [X.Normal] [Y.Normal] (g : G) (x : ↥X) :
+    letI := chiefFactorConjAction X Y
+    (g • (QuotientGroup.mk x : ↥X ⧸ Y.subgroupOf X)) =
+      QuotientGroup.mk (ConjAct.toConjAct g • x) :=
+  rfl
+
 end OddOrder.BG.Ch1.S03c
