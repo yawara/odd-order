@@ -5739,6 +5739,114 @@ theorem xSum_le_two_psi (hyp : SibleyDadeHypothesis G L H)
         sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
     _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
 
+/-- **(6.8.3) extension, case (A): non-coherence of `S` is impossible.**
+If `X ∪ Y` (with `X = S − S(Z)`, `Z = Z(H)∩H′` central) is coherent but `S` is not, the
+break-pair `{ψ, ψ̄}` (`exists_coherentBreakPair`) gives a coherent `S₁ ⊇ X∪Y` whose extension by
+`{ψ,ψ̄}` fails; the (5.6)/B1 bound (`xSum_le_two_psi`) then forces
+`|W₁|·|H:Z|·(|Z|−1) = ∑_X χ(1)² ≤ 2ψ(1)·η₁(1) = 2|W₁|²d` with `d = θ(1)`, `ψ = Ind θ`.  Combined
+with Cor 2.30 `d² ≤ |H:Z|` (central `Z`) and the FPF bound `|Z|−1 ≥ 2|W₁|`
+(`centralCommutator_card_subgroupOf_lower`), the arithmetic core
+`false_of_centralCommutator_break_arith` yields a contradiction.  This is the heart of
+Peterfalvi (6.8.3) — the step the old `Xset ⁅H,H⁆ ∪ Yset = S` shortcut elided. -/
+theorem false_of_coherentXunionYset_of_not_coherentS (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    (hXYcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) : False := by
+  classical
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
+    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    rw [← commutator_subgroupOf_self] at h1
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
+    rw [heq, Subgroup.subgroupOf_self] at h1
+    exact lt_irrefl _ h1
+  -- break pair on `Sa = X ∪ Y`, `Sb = S`
+  have hSaSb : hyp.Xset hyp.centralCommutator ∪ hyp.Yset ⊆ hyp.S := by
+    rintro φ (hX | hY)
+    · exact hyp.Xset_subset_S hX
+    · exact hyp.Yset_subset_S hY
+  have hSaconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset) := by
+    intro φ hφ
+    rcases hφ with hX | hY
+    · exact Or.inl (hyp.Xset_closedUnderConjugate_unconditional hyp.centralCommutator hX)
+    · exact Or.inr (hyp.SsubFiltration_closedUnderConjugate ⁅H, H⁆ hY)
+  obtain ⟨S₁, ψ, hS₁conj, hSaS₁, hS₁Sb, hψSb, hψnS₁, hψcnS₁, hS₁cohN, hncN⟩ :=
+    exists_coherentBreakPair hyp.tau hSaSb hyp.S_finite hyp.S_closedUnderConjugate
+      (hyp.S_hasNoRealCharacters hF)
+      (fun χ hχ => hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hχ)
+      hSaconj hXYcoh hncoh
+  -- anchor `η ∈ Y` of degree `|W₁|`
+  obtain ⟨η, hηY⟩ := hyp.Yset_nonempty
+  have hηS₁ : η ∈ S₁ := hSaS₁ (Or.inr hηY)
+  have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := by
+    obtain ⟨χ, -, rfl⟩ := hyp.exists_linear_source_of_mem_Yset hηY
+    exact hyp.induce_apply_one_eq_card_W1_of_degree_one _
+      (OddOrder.RepresentationTheory.linearIrreducibleCharacter_apply_one χ)
+  -- `ψ ∈ S` irreducible, `ψ = Ind θ`
+  have hψS : ψ ∈ hyp.S := hψSb
+  have hψirr : IsIrreducibleCharacter ψ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hψS
+  obtain ⟨θ, hθne, hψeq⟩ := hψS
+  obtain ⟨d, hdpos, hθd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have hdsq : d ^ 2 ≤ Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) := by
+    obtain ⟨d', hθd', hd'sq⟩ := θ.isIrreducible.exists_degree_sq_le_index
+      (hyp.centralCommutator.subgroupOf H) hyp.centralCommutator_subgroupOf_le_center
+    have hdd' : d = d' := by
+      have hcast : (d : ℂ) = (d' : ℂ) := by rw [← hθd, hθd']
+      exact_mod_cast hcast
+    rw [hdd', ← Subgroup.index_eq_card]; exact hd'sq
+  -- the (5.6) X-sum bound
+  have hxb := hyp.xSum_le_two_psi hF (Z := hyp.centralCommutator) hS₁Sb hS₁conj
+    (hyp.S_finite.subset hS₁Sb) (fun φ hφ => hSaS₁ (Or.inl hφ)) hS₁cohN.some
+    hηS₁ hηdeg hψSb hψirr hψnS₁ hψcnS₁ hncN
+  have hψre : (ψ 1).re = (H.index : ℝ) * (d : ℝ) := by
+    rw [hψeq, ClassFunction.induce_apply_one, hθd]
+    simp only [Complex.mul_re, Complex.natCast_re, Complex.natCast_im]; ring
+  have hηre : (η 1).re = (Nat.card hyp.W1 : ℝ) := by rw [hηdeg, Complex.natCast_re]
+  rw [hψre, hηre] at hxb
+  -- cast the real inequality to ℕ
+  have hZle : Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) ≤ Nat.card ↥H :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_quotient_dvd_card _)
+  have hxbN : H.index * (Nat.card ↥H - Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
+      ≤ 2 * (H.index * d) * Nat.card hyp.W1 := by
+    rw [← Nat.cast_le (α := ℝ)]
+    push_cast [Nat.cast_sub hZle]
+    nlinarith [hxb]
+  rw [hyp.index_mul_card_sub_factor (Z := hyp.centralCommutator), hyp.index_H_eq_card_W1] at hxbN
+  -- discharge the arithmetic core
+  refine false_of_centralCommutator_break_arith (w1 := Nat.card hyp.W1) (d := d)
+    (hZ := Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H))
+    (cZ := Nat.card ↥(hyp.centralCommutator.subgroupOf H))
+    Nat.card_pos hdpos hdsq ?_ ?_ ?_
+  · -- `2 ≤ |H:Z|`
+    have hZcnotle : ¬ H ≤ hyp.centralCommutator := by
+      intro h
+      exact (ne_of_lt hcommlt)
+        (le_antisymm (Subgroup.commutator_le_left H H)
+          (le_trans h hyp.centralCommutator_le_commutator))
+    have hne : hyp.centralCommutator.subgroupOf H ≠ ⊤ := fun heq =>
+      hZcnotle (Subgroup.subgroupOf_eq_top.mp heq)
+    have hcard1 : Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) ≠ 1 := by
+      rw [← Subgroup.index_eq_card]; exact mt Subgroup.index_eq_one.mp hne
+    have hcardpos : 0 < Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) := Nat.card_pos
+    omega
+  · -- `2|W₁| ≤ |Z| − 1`
+    have he := hyp.centralCommutator_card_subgroupOf_lower hF hHnonab
+    omega
+  · -- the break inequality, reassociated
+    calc Nat.card hyp.W1 * Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H)
+            * (Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1)
+        = Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H)
+            * (Nat.card hyp.W1 * (Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1)) := by ring
+      _ ≤ 2 * (Nat.card hyp.W1 * d) * Nat.card hyp.W1 := hxbN
+      _ = 2 * Nat.card hyp.W1 ^ 2 * d := by ring
+
 /-- **(6.2) θ-bound for an induced member `ψ = Ind_H^L θ`.**
 
 For `θ ∈ Irr H` and a section `N ◁ C` with `N ≤ D ≤ C ≤ H`, `θ` trivial on `N` (after restriction
