@@ -1939,6 +1939,11 @@ set_option linter.style.longLine false in
 -- strengthened `exists_coherentBreakPair`).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sBreakPair_fields
+-- (6.2) member-family → B1 degree-sum bound: the full assembly threading the member-family core,
+-- degree data, adjoined-pair fields, scaled-diff support/Dade image, and the abstract generation
+-- bridges into B1 (`coherentDegreeSumBound_of_not_coherent`), yielding `∑ⱼ (degⱼ)² ≤ 2a`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSumBound_of_not_coherent
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

@@ -4883,6 +4883,101 @@ theorem xMember_scaledDiffSupports_of_degreeData (hyp : SibleyDadeHypothesis G L
   intro i hi
   exact hyp.xMember_scaledDiffSupport_of_degreeData (hmemX i hi) (hmemX i₁ hi₁) (hdeg i hi)
 
+open scoped Classical in
+/-- **(6.2) member-family → B1 degree-sum bound.**
+
+Assembles the (6.2) member-family for a coherent `S₁` and the breaking pair `{ψ, ψ̄}`, feeding it to
+B1 (`coherentDegreeSumBound_of_not_coherent`).  When `S₁` (conjugation-closed, coherent, `⊆ S`)
+contains the degree-`|W₁|` anchor `χ₁`, `ψ ∈ S` with `{ψ, ψ̄}` disjoint from `S₁`, and `S₁ ∪ {ψ, ψ̄}`
+is not coherent, the degree-ratio sum is bounded by `∑ⱼ (degⱼ)² ≤ 2·a`, where `degⱼ = χⱼ(1)/χ₁(1)`
+and `a = ψ(1)/χ₁(1)`.
+
+All member-family fields are discharged from the landed pieces: the per-member core
+(`exists_sMemberOrthonormalFamily`), the degree data (`exists_sMemberDegreeData`), the adjoined-pair
+fields (`sBreakPair_fields`), the scaled-difference support + Dade image
+(`sMember_scaledDiffSupport_of_charValue_eq`, `scaledDiff_dadeImage_mem_ZIrr`), and the abstract
+S07 generation bridges (`…_scaledDiffs`, `…_anchorGeneration`).  This is the (6.2) step
+"`2ψ(1)|L:K| ≥ ∑_{χ∈S₁} χ(1)²/‖χ‖²`" in normalized integer form. -/
+theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L) (deg : Fin k → ℕ) (a : ℕ),
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * χ₁ 1) ∧
+      ψ 1 = (a : ℂ) * χ₁ 1 ∧
+      ∑ j : Fin k, ((deg j : ℝ)) ^ 2 ≤ 2 * (a : ℝ) := by
+  classical
+  -- (1) enumerate `S₁` with the per-member fields
+  obtain ⟨k, χmem, hχinj, hrange, hmemreal, hmemdiffsupp, hmemS1, hmembarS1,
+    hmemconjortho, hmemortho⟩ := hyp.exists_sMemberOrthonormalFamily hF hS₁sub hS₁conj hS₁fin
+  -- (2) locate the anchor index `i₁` (the anchor lies in `S₁ = range χmem`)
+  have hχ₁range : χ₁ ∈ Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) := by
+    rw [hrange]; exact hχ₁S₁
+  obtain ⟨i₁, hi₁eq0⟩ := hχ₁range
+  have hi₁eq : (χmem i₁ : ClassFunction ↥L ℂ) = χ₁ := hi₁eq0
+  have hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S := fun j => hS₁sub (hmemS1 j)
+  have hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ) := by
+    rw [hi₁eq]; exact hχ₁deg
+  -- (3) degree data
+  obtain ⟨deg, hdeg_i₁, _hdeg_pos, hdeg_eq, hmemdegdiffsupp⟩ :=
+    hyp.exists_sMemberDegreeData hmemS hanchordeg
+  -- (4) breaking-pair fields
+  obtain ⟨hrealψ, hψψ, hψbarψbar, hψbarψ, hψψbar, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    hyp.sBreakPair_fields hF hψS hS₁sub hψnotS1 hψcnotS1
+  -- (5) the `ψ` degree ratio `a`
+  obtain ⟨a, _ha_pos, hψratio⟩ := hyp.sMember_charValue_one_eq_mul_anchor hψS hanchordeg
+  -- (6) `ψ` scaled-difference support + Dade image (the `ψ`-side `hdiffasuppχ`/`htau1_memaχ`)
+  have hdiffasuppψ : (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq hψS (hmemS i₁) hψratio
+  have htau1ψ : hyp.tau (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G :=
+    hyp.scaledDiff_dadeImage_mem_ZIrr (χ := ⟨ψ, hψirr⟩) (χ₁ := χmem i₁) hdiffasuppψ
+  -- (7) generation fields via the abstract S07 bridges (`hSgen`, `hgen`)
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
+      (χmem j : ClassFunction ↥L ℂ) = x := by
+    intro x hx
+    rw [← hrange] at hx
+    obtain ⟨j, hj⟩ := hx
+    exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := fun j => (χmem j : ClassFunction ↥L ℂ))
+    (deg := deg) (i₁ := i₁) hcover (Finset.mem_univ i₁) (fun j _ => hmemS1 j)
+    (fun j _ => hmemdegdiffsupp j)
+  have hbar1 : ψ.conj 1 = ψ 1 := by
+    rw [ClassFunction.conj_apply]
+    obtain ⟨n, -, hn1, -⟩ := hψirr.exists_natDegree_charValue_one_dvd_card
+    rw [hn1, star_natCast]
+  have hchi1_ne : (χmem i₁ : ClassFunction ↥L ℂ) 1 ≠ 0 := by
+    rw [hanchordeg]; exact Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    intro hmem
+    exact hmem.2 (by simp)
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := ψ) (chibar := ψ.conj) (chi1 := (χmem i₁ : ClassFunction ↥L ℂ)) (a := a)
+    hSgen hψratio hbar1 hchi1_ne h1A
+  -- (8) feed everything to B1
+  refine ⟨k, χmem, deg, a, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
+    by rw [hψratio, hi₁eq], ?_⟩
+  have hbound := coherentDegreeSumBound_of_not_coherent hyp.dade hyp.hconj hS₁coh
+    ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    (fun j _ => hmemreal j) (fun j _ => hmemdiffsupp j) (fun j _ => hmemdegdiffsupp j)
+    (fun j _ => hmemS1 j) (fun j _ => hmembarS1 j) (fun j _ => hmemconjortho j)
+    (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
+    hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
+  simpa using hbound
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
