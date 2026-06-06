@@ -123,6 +123,27 @@
 ⇒ G,Ḡ irreducible on V; G solvable ⇒ K̄,V elementary abelian; 同素数 q ⇒ (2); coprime ⇒ `C_V(R̄)=1`+Lem 3.3。
 最後に Prop 1.2 (`isNilpotent_of_chief_factor_centralization`) で `K` nilpotent。
 
+## 🆕 2026-06-06 (続): Thm 3.7 本体 induction — 精密 roadmap (BG mmd L1199-1219 再読、全 leaf dep 確認済)
+
+BG 原文を再読し proof 構造を確定。**重要訂正: Lemma 3.3 の "kernel" は K̄=K/L (K でない)**。coprime case は
+|K̄| と |V| が互いに素な場合で、そこで `s ∤ |K̄|` が成立 (chief factor V が K に s-部分群で入る ⟹ s∣|K| とは無矛盾;
+Lemma 3.3 が要求するのは s∤|K̄|=|K/L|)。よって既存 `kernel_acts_trivially_of_coprime_fixedPointFree` は正しく、
+適用時の kernel を K̄ にすればよい。
+
+**leaf dep 全確認済 (build 済・命名確定)**:
+- (3.39) `(|K|,|R|)=1` = **`OddOrder.Isaacs.Ch06.coprime_card_kernel_complement hFrob`** (Frobenius なら自動、Sylow 論証不要)。
+- Lemmas 3.1/3.2 (Ḡ=G/L Frobenius) = **`S03.quotient_isFrobeniusGroup_of_le_kernel_of_{centralizer,fixedPoint_lift,coprime_zpowers}`**。
+- Prop 1.2 = **`ChiefFactor.isNilpotent_of_chief_factor_centralization`** (`∀i ⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i+1)` ⟹ K nilpotent; chiefSeriesInside は **G-chief-factor** の系列、確認済)。
+- same-prime = **`S03c.commutator_eq_bot_of_normal_pgroup_minimalNormal`** (G/Y で X/Y minimal normal に適用)。
+- coprime = **`S03c.kernel_acts_trivially_of_coprime_fixedPointFree`** (kernel=K̄)。
+- chief factor abelian = **`IsChiefFactor.commutator_le_of_isSolvable`**; "K centralizes V" ⟹ ⁅K,X⁆≤Y = **`chiefFactorCentralizer.commutator_le_of_le`** (K ≤ `chiefFactorCentralizer X Y`)。
+- chief factor 商作用 infra = **`Ch06.invariantQuotientMulDistribMulAction (M) (hM : ∀a m∈M, a•m∈M) : MulDistribMulAction A (N⧸M)`**。
+
+**残 GLUE sub-lemma (次イテレーションで1つずつ)**:
+- **(A) normal-nilpotent-centralizes-G-chief-factor** = 「L⊴G nilpotent (⊆F(G)) は G の chief factor を centralize」。BG の "By (3.40) and Prop 1.2, L centralizes V"。solvable 群の標準事実 (F(G)=∩ chief factor centralizer) だが **repo に無さそう → 要実装** (最重 glue)。
+- **(B) chief-factor MulDistribMulAction plumbing** = Ḡ (or ConjAct) を V=X/Y に `invariantQuotientMulDistribMulAction` で載せ、`hM.zmodModule` で `[Module (ZMod s) (Additive V)]` を供給 → coprime case 適用可能に。
+- **(C) induction skeleton** = `Nat.card K` 上の強帰納 (L=maxProperNormalOrBot K, LR への restriction で C_L(R)=1+Frobenius, IH→L nilpotent→L⊆F(G)); 各 chief factor で same-prime/coprime dichotomy (G solvable から elem-abelian 抽出 + 素数比較) → Prop 1.2。
+
 ## §11 適用 (Thm 11.3)
 `M_σ ⋊ ⟨a₀^g⟩` (a₀^g prime order p, C_{M_σ}(a₀^g)=1, M_σ solvable=M の部分群)。
 `IsFrobeniusGroup` を構成 (`of_centralizer_kernel_le` 等) → Thm 3.7 → `M_σ` nilpotent。
