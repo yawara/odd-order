@@ -843,6 +843,55 @@ theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite �
   rw [Subgroup.map_le_iff_le_comap, ← hZc]
   exact hle
 
+/-- For `H ≤ G`, the commutator subgroup of the subtype group `↥H` is the `subgroupOf` of the
+ambient commutator `⁅H, H⁆`.  In particular `Abelianization ↥H = ↥H ⧸ ⁅H, H⁆.subgroupOf H`, so the
+index `|H : ⁅H,H⁆|` equals `|Abelianization ↥H|`. -/
+theorem commutator_subgroupOf_self {G : Type*} [Group G] (H : Subgroup G) :
+    (⁅H, H⁆ : Subgroup G).subgroupOf H = _root_.commutator ↥H := by
+  have htop : (⊤ : Subgroup ↥H).map H.subtype = H := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have h1 : (_root_.commutator ↥H).map H.subtype = ⁅H, H⁆ := by
+    show (⁅(⊤ : Subgroup ↥H), (⊤ : Subgroup ↥H)⁆).map H.subtype = ⁅H, H⁆
+    rw [Subgroup.map_commutator, htop]
+  rw [← h1]
+  exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+
+/-- For a finite `p`-group `K`, every irreducible character has degree a power of `p`
+(its degree divides `|K| = pⁿ`).  This supplies the `θ = p^m` source-degree fields of the X-chain
+step data once `H` is known to be a `p`-group (Peterfalvi (6.5)/(6.6)). -/
+theorem exists_primePow_natDegree_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
+    (hp : p.Prime) (hK : IsPGroup p K) (θ : IrreducibleCharacter K) :
+    ∃ k : ℕ, (θ : ClassFunction K ℂ) 1 = ((p ^ k : ℕ) : ℂ) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, _hpos, hval, hdvd⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨N, hN⟩ := hK.exists_card_eq
+  rw [hN] at hdvd
+  obtain ⟨k, _hk_le, hk⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  exact ⟨k, by rw [hval, hk]⟩
+
+/-- A nontrivial finite `p`-group of odd order has `p ≥ 3` (its order `pⁿ` is odd, so `p` is odd).
+Supplies the `3 ≤ p` field of the X-chain step data (in the (6.8) setup `|L|`, hence `|H|`, is
+odd). -/
+theorem three_le_prime_of_isPGroup_of_odd {K : Type*} [Group K] [Finite K] [Nontrivial K]
+    {p : ℕ} (hp : p.Prime) (hK : IsPGroup p K) (hodd : Odd (Nat.card K)) : 3 ≤ p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hK.exists_card_eq
+  have hcard : Nat.card K ≠ 1 := by
+    simpa using (Finite.one_lt_card (α := K)).ne'
+  have hn0 : n ≠ 0 := by rintro rfl; rw [pow_zero] at hn; exact hcard hn
+  have hpdvd : p ∣ Nat.card K := hn ▸ dvd_pow_self p hn0
+  obtain ⟨m, hm⟩ := Odd.of_dvd_nat hodd hpdvd
+  have := hp.two_le
+  omega
+
+/-- A quotient of a finite `p`-group is a `p`-group, so its order is a power of `p`.  In the (6.6)
+setup this gives `|H:Z| = p^k` (`H` a `p`-group), the key to `θχ(1)² ∣ |H:Z|` (both `p`-powers). -/
+theorem exists_primePow_card_quotient_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
+    (hp : p.Prime) (hK : IsPGroup p K) (N : Subgroup K) [N.Normal] :
+    ∃ k : ℕ, Nat.card (K ⧸ N) = p ^ k := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact (hK.of_surjective (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)).exists_card_eq
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
@@ -3441,6 +3490,23 @@ theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L
       φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
   Iff.rfl
 
+/-- `S(⊥) = S`: the kernel condition `⊥ ⊆ Ker θ` is vacuous, so the bottom filtration is all of
+`S`.  (Peterfalvi writes `S(1) = S`.) -/
+theorem SsubFiltration_bot (hyp : SibleyDadeHypothesis G L H) :
+    hyp.SsubFiltration ⊥ = hyp.S := by
+  ext φ
+  rw [hyp.mem_SsubFiltration, hyp.S_eq, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨θ, hθ, -, hφ⟩
+    exact ⟨θ, hθ, hφ⟩
+  · rintro ⟨θ, hθ, hφ⟩
+    refine ⟨θ, hθ, ?_, hφ⟩
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot]
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+
 /-- Membership in `X = S − S(Z)`, unfolded. -/
 theorem mem_Xset (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
@@ -5313,6 +5379,101 @@ theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
   exact Complex.ofReal_inj.mp key
 
 open scoped Classical in
+/-- **(6.6) X degree-sum identity (Frobenius case).**
+
+The degree-square sum over `X = S − S(Z)` is `|L:H| · (|H| − |H:Z|)`.  Since `S = S(⊥)` and
+`S(Z) ⊆ S`, this is the difference of two instances of the `S(A)` degree-sum identity
+`sum_re_sq_induce_kernelFilter_eq` (at `A = ⊥`, using `|H ⧸ ⊥| = |H|`, and at `A = Z`).  This is
+the `total` of the X-chain step data: the (6.6) divisibility argument shows the source degree
+`θχ(1)²` divides it. -/
+theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} [Z.Normal] :
+    ∑ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        ((χ 1).re) ^ 2
+      = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+  letI : H.Normal := hyp.H_normal
+  have hbotker : ∀ θ : IrreducibleCharacter ↥H,
+      (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
+    intro θ x hx
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  have hsub : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) ⊆
+      (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) := by
+    apply Finset.image_subset_image
+    intro θ hθ
+    rw [Finset.mem_filter] at hθ ⊢
+    exact ⟨hθ.1, hbotker θ, hθ.2.2⟩
+  have hsd := Finset.sum_sdiff (f := fun χ : ClassFunction ↥L ℂ => ((χ 1).re) ^ 2) hsub
+  have h0 := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := (⊥ : Subgroup ↥L))
+  have hZ := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := Z)
+  have hbotcard : Nat.card (↥H ⧸ (⊥ : Subgroup ↥L).subgroupOf H) = Nat.card ↥H := by
+    rw [Subgroup.bot_subgroupOf]
+    exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥H)).toEquiv
+  rw [hbotcard] at h0
+  rw [eq_sub_of_add_eq hsd, h0, hZ]
+  ring
+
+/-- **(6.6) `htotal` factorization.**  `|L:H|·(|H| − |H:Z|) = |H:Z| · (|L:H|·(|Z| − 1))` (Lagrange
+`|H| = |H:Z|·|Z|`).  With the X degree-sum `total = |L:H|·(|H| − |H:Z|)` (`sum_re_sq_Xset_eq`), this
+is the `total = qtot · c` of the X-chain step data with `qtot = |H:Z|`, `c = |L:H|·(|Z| − 1)`. -/
+theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} [Z.Normal] :
+    H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H))
+      = Nat.card (↥H ⧸ Z.subgroupOf H) * (H.index * (Nat.card ↥(Z.subgroupOf H) - 1)) := by
+  have hlag : Nat.card ↥H
+      = Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (Z.subgroupOf H)
+  have hz : 1 ≤ Nat.card ↥(Z.subgroupOf H) := Nat.card_pos
+  obtain ⟨w, hw⟩ : ∃ w, Nat.card ↥(Z.subgroupOf H) = w + 1 := ⟨_, (Nat.sub_add_cancel hz).symm⟩
+  rw [hlag, hw]
+  simp only [Nat.mul_add, Nat.mul_one, Nat.add_sub_cancel]
+  ring
+
+/-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
+`χ(1) = |L:H| · θ(1)`; when `H` is a `p`-group `θ(1) = p^k`, so `χ(1) = |L:H| · p^k`.  This is the
+common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
+theorem exists_index_primePow_degree_of_mem_S (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.S) :
+    ∃ k : ℕ, χ 1 = ((H.index * p ^ k : ℕ) : ℂ) := by
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, _hθ, rfl⟩ := hχ
+  obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hHp θ
+  refine ⟨k, ?_⟩
+  rw [ClassFunction.induce_apply_one, hk]
+  push_cast; ring
+
+/-- **(6.6) per-member degree data for an X-member family.**  Vectorizes
+`exists_index_primePow_degree_of_mem_S` over a finite family `χmem : Fin k → Irr L` of `S`-members:
+there are exponents `mmem j` with `χmem j (1) = |L:H| · p^(mmem j)`.  Supplies the `dmem`/`θmem`/`mmem`
+fields of the X-chain step data (`dmem j = |L:H|·θmem j`, `θmem j = p^(mmem j)`). -/
+theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S) :
+    ∃ mmem : Fin k → ℕ,
+      ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = ((H.index * p ^ mmem j : ℕ) : ℂ) := by
+  choose mmem hmmem using fun j => hyp.exists_index_primePow_degree_of_mem_S hp hHp (hmemS j)
+  exact ⟨mmem, hmmem⟩
+
+open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 
 Combines the member-family degree-square bound `sMember_degreeSqReBound_of_not_coherent`
@@ -5630,6 +5791,51 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
     omega
   rw [← hAeqM]
   exact hAcoh
+
+/-- **Peterfalvi (6.5) consequence (Frobenius case): `H` is a `p`-group.**
+
+If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply `six_three`
+with `M = ⊥`, `H₁ = ⁅H,H⁆`: `S(⁅H,H⁆) = Y` is coherent (`coherentYset`), `⊥ ≤ ⁅H,H⁆` and `⁅H,H⁆ ⊊ H`
+(`H` nilpotent nontrivial ⟹ not perfect), so if `|H:⁅H,H⁆| > 4|L:H|²+1` then `S(⊥) = S` would be
+coherent — contradiction.  Hence `|Abelianization H| = |H:⁅H,H⁆| ≤ 4|W₁|²+1`
+(`commutator_subgroupOf_self`, `index_H_eq_card_W1`), and as everything has odd order
+`isPGroup_of_isFrobeniusGroup_of_card_le` produces the prime.  This is the (6.5)/(6.6) reduction
+"`H` is a `p`-group" that feeds the (6.8) capstone. -/
+theorem isPGroup_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hSncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥H := by
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  -- `⁅H,H⁆ ⊊ H` from nilpotency (nontrivial nilpotent is not perfect)
+  have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
+    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    rw [← commutator_subgroupOf_self] at h1
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
+    rw [heq, Subgroup.subgroupOf_self] at h1
+    exact lt_irrefl _ h1
+  -- the index bound, by the contrapositive of `six_three`
+  have hidx : Nat.card (↥H ⧸ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
+    by_contra hgt
+    rw [not_le] at hgt
+    have hYcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration ⁅H, H⁆)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := ⟨hyp.coherentYset⟩
+    have hMcoh := hyp.six_three hF (M := ⊥) (H₁ := ⁅H, H⁆) bot_le hcommlt hYcoh hgt
+    rw [hyp.SsubFiltration_bot] at hMcoh
+    exact hSncoh hMcoh
+  -- convert the index bound to the abelianization-card bound
+  have hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card hyp.W1 ^ 2 + 1 := by
+    rw [commutator_subgroupOf_self, hyp.index_H_eq_card_W1] at hidx
+    exact hidx
+  -- odd orders
+  have hLodd : Odd (Nat.card ↥L) := hyp.card_L_odd
+  have hHodd : Odd (Nat.card (Abelianization ↥H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hLodd H.card_subgroup_dvd_card)
+      (Subgroup.card_quotient_dvd_card (_root_.commutator ↥H))
+  have hW1odd : Odd (Nat.card hyp.W1) := Odd.of_dvd_nat hLodd hyp.W1.card_subgroup_dvd_card
+  exact isPGroup_of_isFrobeniusGroup_of_card_le hF hHodd hW1odd hbound
 
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 

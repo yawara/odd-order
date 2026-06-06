@@ -203,7 +203,55 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **helper `commutator_subgroupOf_quotient_ne_top`**(item ② の hAcomm provider): H nilpotent ⟹ normal A⊊H で H/A nontrivial nilpotent ⟹ not perfect ⟹ `[H/A,H/A]≠⊤`。`QuotientGroup.nontrivial_iff` + `subgroupOf_eq_top` + `IsSolvable.commutator_lt_top_of_nontrivial`。six_two/six_three の degree-|W₁| anchor 仮説を放電。
 - **⟹ (6.3) 完全 landed**(item ①+②)。**次 = (6.5) wiring「H は p-群」**(下記)。
 
-### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象
+### ✅✅✅ 2026-06-06 (続7): **(6.5)「H は p-群」wiring landed** (loop 自走, commit 34b464c, axiom-clean, S08 leaf 3465 + full AxiomsCheck 3555)
+- **`isPGroup_of_not_coherent`**(S08, Frobenius): `¬ Nonempty(IsCoherent τ hyp.S A)` ⟹ `∃ p prime, IsPGroup p ↥H`。`six_three` 対偶(M=⊥, H₁=⁅H,H⁆): `S(⁅H,H⁆)=Yset` coherent(`⟨hyp.coherentYset⟩`)∧ `⊥≤⁅H,H⁆⊊H`(nilpotent nontrivial ⟹ not perfect)⟹ `|H:⁅H,H⁆|>4|L:H|²+1` なら `S(⊥)=S` coherent で矛盾 ⟹ `|Ab H|=|H:⁅H,H⁆|≤4|W₁|²+1` ⟹ `isPGroup_of_isFrobeniusGroup_of_card_le`(既 landed)。
+- **bridge helpers**(両 axiom-clean): `commutator_subgroupOf_self`(汎用: `⁅H,H⁆.subgroupOf H = commutator ↥H` ⟹ `|H:⁅H,H⁆|=|Ab ↥H|`)/ `SsubFiltration_bot`(`S(⊥)=S`)。
+- **⟹ (6.2)/(6.3)/(6.5) 全 landed**。残 = (6.8) capstone X-nonempty branch (sorry@S08:7451)。
+
+### 🔴 (6.8) capstone X-nonempty branch = 次 frontier (最終ボス)
+**現状**: `sibleySetup_is_coherent`(S08:7438)の X-empty branch は closed、**残 sorry = X-nonempty branch (7451)**。
+- **既存 assembler**: `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(S08:7379)が `hyp.CoherenceTarget` を産出。要供給:
+  - `hstepData`: per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData`(各 step の (6.6) prime-power degree gap; **(6.5) H p-群で unblock** — θ(1) が p-power)。
+  - `ν` + `hagreeX`/`hagreeY`/`hmixed`/`hgen`: X∪Y glue data(combined extension)。
+- **次着手**: `PairUnionBaseAnchorCommonIndexPrimePowerStepData` の構造を読み、(6.5) の `isPGroup_of_not_coherent` を使って per-step prime-power degree data を構成。`two_mul_lt_sq_of_primePow_gap`(S07, 既 landed)が degree gap 核。**X-chain enum (pairUnion accumulator から member family)** が最重 combinatorial(queue 全体で繰り返し flagged)。
+
+### ✅ 2026-06-06 (続8): (6.6) ingredient `exists_primePow_natDegree_of_isPGroup` landed (commit 955859b, axiom-clean)
+- **`exists_primePow_natDegree_of_isPGroup`**(S08 general): finite p-群 K + θ∈Irr K ⟹ `∃ k, θ(1)=p^k`。`exists_natDegree_charValue_one_dvd_card`(θ(1)∣|K|)+`IsPGroup.exists_card_eq`(|K|=pⁿ)+`Nat.dvd_prime_pow`。StepData の `θ=p^m` source-degree fields の leaf ingredient(X-member ψ=Ind θ で θ(1) p-power, ψ(1)=|W₁|·θ(1))。
+
+### 🔴 capstone X-nonempty 残務 = hstepData 構成 + ν glue（X-chain enum 本体, multi-session）
+**hstep.. → capstone の全 chain は配線済**(`coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner` S08:7379)。残 = **(A)** `hstepData` 構成 + **(B)** ν glue data。
+- **(A) hstepData**(各 step i で `PairUnionBaseAnchorCommonIndexPrimePowerStepData` を産出):
+  - **enum**: conjugate-pair cover (`exists_conjugatePairCover`) で pair/χs/N を定義 → 各 step の `pairUnion (xBaseBlock ⁅H,H⁆) pair i` accumulator を `χmem : Fin k → IrreducibleCharacter ↥L` として列挙(hrange 一致)。anchor i₁∈xBaseBlock。**= (6.2) の `sMember_*` enum と構造類似**(template 流用可、但し X-side Irr-L)。
+  - **degree fields**: 各 χmem j = Ind_H^L θ_j、`exists_primePow_natDegree_of_isPGroup`(✅ 続8)で θ_j(1)=p^(mmem j)、idx=|W₁| (`index_H_eq_card_W1`)、`coprimeIndexPrimePow`(S08:2893 付近 idx coprime p)で hidx_p。p prime ≥3 は |L| odd ⟹ p odd ⟹ p≥3。
+  - **gap/sum fields**(hsum/hqtot/hθsq_le_qtot/htotal): (6.6) prime-power degree-sum 論証(mmd 04.8 L76-82, θᵢ(1)²∣∑, [Is]Cor2.30 θ(1)²≤|K:Z|)。`two_mul_lt_sq_of_primePow_gap`(S07)が核。
+- **(B) ν glue**: hagreeX/hagreeY/hmixed/hgen — X-coherence と Y-coherence の combined extension(`coherentUnion_of_glued` が要求)。
+- **scope**: (A) enum が最重(~200+行見込み, (6.2) enum 並)。multi-session。**p prime≥3 / idx coprime / θ p-power は leaf 揃った**ので、enum 骨格 + gap-sum が主残務。
+
+### ✅ 2026-06-06 (続9): StepData leaf ingredients 2 件 landed + **enum core 既存を確認**
+- ✅ `exists_primePow_natDegree_of_isPGroup`(955859b): θ∈Irr(p-群) ⟹ θ(1)=p^k。
+- ✅ `three_le_prime_of_isPGroup_of_odd`(a1696cc): 非自明 odd p-群 ⟹ 3≤p。
+- ✅✅ **enum core は既存だった**: `exists_pairUnion_memberFamily_of_irreducible_X`(S08:5898)が accumulator `pairUnion (xBaseBlock Z) pair i` を `(k, χmem:Fin k→IrreducibleCharacter ↥L, hχinj, hrange一致, non-real, conj-support⊆A, conj-orthogonality, orthonormality)` として完全列挙。**⟹ StepData の enum fields (k/χmem/hrange) は揃っている**。idx coprime = `coprimeIndexPrimePow`(S08:2893 付近)。
+- **⟹ capstone 残務の正確な姿**:
+  - **(A) StepData degree-data producer** = (6.6) の本体。enum member family(上記)+ leaf(θ p-power/3≤p/idx)から StepData の **degree/gap/sum fields**(dχ/d₁/dmem, θ=p^m, hsum/hqtot/hθsq_le_qtot/htotal)を構成。mmd 04.8 L76-82(θᵢ(1)²∣∑χⱼ(1)², [Is]Cor2.30 θ(1)²≤|K:Z|, idx coprime p)。consumer = `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(S08:7009)。**次 loop の主対象**。
+  - **(B) ν glue**(hagreeX/hagreeY/hmixed/hgen): X∪Y combined extension。
+- **次着手**: `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(7009)と StepData consumer の正確な必要 fields を読み、enum member family の各 χmem=Ind θ から degree-data を組む producer を構成(per-member Ind 分解 + θ p-power で θmem、idx=|W₁| で dmem=idx·θmem、(6.6) 数論で gap/sum)。
+
+### 🔬 2026-06-06 (続10): (6.6) degree-data producer の正確な解剖（consumer 7024 精読済）
+**consumer `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(S08:7024)は StepData の全 field を explicit 仮説として取り、`XAdjoinStepInput` を産出**(StepData structure 7134 は同じ field の bundle)。⟹ **producer の仕事 = degree-data field 群の構成のみ**(coherence 本体は consumer が処理)。
+**field の意味（解読済）**:
+- enum: k/χmem/hrange/i₁ = `exists_pairUnion_memberFamily_of_irreducible_X`(✅既存)+ anchor は xBaseBlock の最小次数元。
+- degree: dχ=χs i の次数, dmem j=χmem j の次数, idx=|W₁|, θ=dχ/idx 等の source 次数(=Ind の source θ の次数), 全 θ=p^m(✅ `exists_primePow_natDegree_of_isPGroup`)。
+- **核 = `total = qtot·c`, `qtot=p^mq`, `θχ²≤qtot`** ⟺ **`θχ(1)² | total`**(total=full X degree-sum)。これが (6.6) の divisibility(mmd L76-82)。
+**producer 構成 plan(残 substantial pieces)**:
+1. ✅ **X degree-sum 恒等式 landed**(続11, commit b5dd055, axiom-clean): `sum_re_sq_Xset_eq`(S08, Frobenius)= `∑_{χ∈X=S−S(Z)} (χ 1).re² = |L:H|·(|H|−|H:Z|)`。S=S(⊥), S(Z)⊆S ゆえ B2 `sum_re_sq_induce_kernelFilter_eq`(A=⊥, `|H⧸⊥|=|H|` via `QuotientGroup.quotientBot`)−(A=Z)を `Finset.sum_sdiff` で。LHS Finset = kernelFilter(⊥) image \ kernelFilter(Z) image。**罠**: 統計 statement に `open scoped Classical in`(DecidablePred filter)要(sum_re_sq と同様)。
+2. 🟡 **divisibility 組立**: `θχ²|tail-sum`(p-power: θχ≤θⱼ ⟹ θχ|θⱼ ⟹ θχ²|θⱼ², `pow_dvd_pow`)+`θχ²|full-sum`(`degree_sq_le_index_of_central_quotient`=Is Cor2.30 ✅ + 恒等式1 + idx coprime p)⟹ `θχ²|total` ⟹ qtot:=θχ², c:=total/θχ²。
+   - ✅✅ **piece-2 leaf 群 全 landed**(続11-12): `exists_primePow_natDegree_of_isPGroup`(θ(1)=p^k)/`three_le_prime_of_isPGroup_of_odd`(p≥3)/`exists_primePow_card_quotient_of_isPGroup`(|H:Z|=p^k, 569c8dd)/`degree_sq_le_index_of_central_quotient`(Is Cor2.30, 既)/`sum_re_sq_Xset_eq`(piece1 total, b5dd055)。
+   - 🟡 **残 divisibility 本体**: `θχ²|total` を上記から組む。core arith = 「p-power a≤b ⟹ a|b」(`Nat.pow_dvd_pow` + exponent 抽出)。`θχ²≤|H:Z|`(Is Cor2.30, Z⊆Z(H) central 要)+ |H:Z| p-power + θχ² p-power ⟹ θχ²||H:Z|; |H:Z| | total=idx·|H:Z|·(|Z|−1) ⟹ θχ²|total。**Z⊆Z(H) は (6.6) 仮説**(capstone で hyp.cases から)。
+3. 🟡 **StepData packaging**: 1+2 と enum/leaf を `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` の形に束ねる。tailSet κ の取り方(degree>χ の members)に注意。
+4. 🔴 **ν glue**(hagreeX/hagreeY/hmixed/hgen): X-coherence ∪ Y-coherence の combined extension(`coherentUnion_of_glued`)。
+**scope 判定**: §6 reduction chain ((6.2)/(6.3)/(6.5)) は完成・main 反映済(一部)。capstone 残 = この (6.6) producer(piece 1-3)+ glue(piece 4)。各 piece は独立に landable(特に piece 1 の X degree-sum 恒等式)。multi-session だが blocked ではない(欠落 primitive 無し、全 ingredient 在)。
+
+### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象 (✅ 続7 で landed)
 **目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
 - **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
 - **bound の出どころ** = `six_three` の対偶(M=⊥, H₁=⁅H,H⁆): `S(⊥)=S` 非coherent ∧ `S(⁅H,H⁆)=Yset` coherent(`coherentYFamily` 既 landed, S08:3347/`Yset` def:3431)∧ `⁅H,H⁆⊊H`(H 非可換)⟹ `¬(|H:⁅H,H⁆|>4|L:H|²+1)` ⟹ `|H:⁅H,H⁆|≤4|L:H|²+1`。
@@ -363,6 +411,65 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **B1/θ-bound**: B1=Sibley-setup packaging (xAdjoinStep aux 仮説の always-true 化 + 対偶); θ-bound=Clifford
   中心 section (基本 Schur `exists_degree_sq_le_index`@SchurCenterBound では不足)。両者 framework/Clifford 要・最重。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
+
+## 🔑 2026-06-07 capstone 構造 + consumer semantics 解明（build 着手前の確定事項）
+
+- **`CoherenceTarget = IsCoherent τ S A` は Type(data, ν を運ぶ)** (S08:2983 abbrev)。capstone は **data を構成**する(by_contra 不可)。⟹ 構造:
+  ```
+  by_cases hNe : Nonempty hyp.CoherenceTarget
+  · exact hNe.some                                   -- Classical.choice で data 抽出
+  · obtain ⟨p,hp,hHp⟩ := hyp.isPGroup_of_not_coherent hF hNe   -- ¬Nonempty ⟹ H p-群
+    -- hHp : IsPGroup p ↥H 下で (6.6) coherence data D を構成
+    exact absurd ⟨D⟩ hNe                             -- ⟨D⟩:Nonempty が hNe と矛盾 → goal(data)
+  ```
+  **⟹ 「H p-群」は ¬Nonempty branch で入手可**(isPGroup_of_not_coherent は `¬Nonempty CoherenceTarget` を取る)。
+- **consumer semantics**(`xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums` 6903 精読): `D=∑_{s}dmem²`=**accumulator(prefix=pairUnion i) sum**, `tailSet`=**X∖accumulator(j≥i tail)**, `total=D+tail-sum`=**full ∑_X**。`sq_dvd_head_of_commonIndex_primePower_sums`(S07)が `total=qtot·c`(qtot=p^mq≥θχ²)+tail(θtail≥θχ)から **dχ²|D**(adjoin 条件)を導く。⟹ producer は total=∑_X=|L|−|L:Z|=|H:Z|·(idx·(|Z|−1)) を hsum partition で作る(qtot=|H:Z|)。
+- **cover**(`exists_conjugatePairCover` 411): e/pair/N/hpairχ + pairUnion 被覆 + degree-monotone。tail = pairs[i,N)。
+- **build 着手**: `xStepData` per-step producer(enum=exists_pairUnion_memberFamily, tail=pairs[i,N), degrees=helpers, hsum=accumulator⊔tail=X partition sum)。最難 = hsum partition + htotal(piece1+Lagrange)。
+
+### ✅ 2026-06-07 building blocks 完備（10 commits this session, 残=monolith のみ）
+全 clean-decomposable building block landed: piece1(`sum_re_sq_Xset_eq`)/member-degree(`exists_index_primePow_degree_of_mem_S`)/vectorized(`exists_memberDegreeData`)/**htotal factorization(`index_mul_card_sub_factor`, 94e371b: idx·(|H|−|H:Z|)=|H:Z|·(idx·(|Z|−1)))**/leaves(θ=p^k, p≥3, |H:Z|=p^k)。+ 既存: enum(`exists_pairUnion_memberFamily_of_irreducible_X`)/Is Cor2.30(`exists_degree_sq_le_index`)/Lagrange/`sq_dvd_head_of_commonIndex_primePower_sums`(arith core)。
+**残 = monolith のみ(clean 分割不能)**:
+- **`xStepData` per-step**(~42 field の StepData term): hθsq_le_qtot=`exists_degree_sq_le_index (Z.subgroupOf H) hZcentral`(θχ²≤|H:Z|=qtot)/hqtot=`exists_primePow_card_quotient_of_isPGroup`/htotal=piece1(ℕ化)+`index_mul_card_sub_factor`/hsum=**accumulator⊔tail=X の partition sum**(最難, tail=pairs[i,N) を Finset κ で列挙, ∑member+∑tail を piece1 の ∑_X に一致, ~100行)/dmem,θmem,mmem=`exists_memberDegreeData`/enum=`exists_pairUnion_memberFamily`/i₁=xBaseBlock 最小次数 anchor。
+- **ν glue**(hagreeX/hagreeY/hmixed/hgen, assembler 7379 用): combined extension(別 ~100行)。
+- **capstone wiring**: by_cases Nonempty CoherenceTarget(上記構造)。
+**→ 全 ingredient 在、欠落 primitive 無し。残は sustained ~300行 assembly(per-commit 分割不能)で、focused session 向き。**
+
+## 🔑 2026-06-06 (続) producer 簡約 + building blocks 完了（qtot:=|H:Z| 簡約が鍵）
+
+**重要簡約**: StepData の `qtot` は **θχ² でなく `qtot := |H:Z| = Nat.card(↥H⧸Z.subgroupOf H)`**（total の p-part 全体）を取ると激減:
+- `total = ∑_X χ(1)² = idx·(|H|−|H:Z|) = idx·|H:Z|·(|Z|−1) = |H:Z|·(idx·(|Z|−1))`(Lagrange `|H|=|H:Z|·|Z|`)⟹ `htotal: total = qtot·c`, c:=idx·(|Z|−1)。**θχ²|total の square-divisibility 不要**。
+- `hqtot: qtot=p^mq` = `exists_primePow_card_quotient_of_isPGroup`(✅)。
+- `hθsq_le_qtot: θχ²≤|H:Z|` = **`IsIrreducibleCharacter.exists_degree_sq_le_index (Z.subgroupOf H) (hcentral: Z.subgroupOf H ≤ center ↥H)`**（中心 case 直接, N=⊥ quotient transport 不要; degree_sq_le_index_of_central_quotient より簡単）。Z⊆Z(H)=(6.6)仮説。
+
+**building blocks 全 landed (続8-13, 全 axiom-clean)**:
+- `exists_primePow_natDegree_of_isPGroup`(θ(1)=p^k) / `three_le_prime_of_isPGroup_of_odd`(p≥3) / `exists_primePow_card_quotient_of_isPGroup`(|H:Z|=p^k) / `sum_re_sq_Xset_eq`(piece1 total ℝ) / `exists_index_primePow_degree_of_mem_S`(χ(1)=idx·p^k) / `exists_memberDegreeData`(vectorized mmem)。+ 既存: `exists_pairUnion_memberFamily_of_irreducible_X`(enum, 5898) / `exists_degree_sq_le_index`(中心bound) / `index_H_eq_card_W1`(idx) / `coprimeIndexPrimePow`(idx coprime p) / `Subgroup.card_eq_card_quotient_mul_card_subgroup`(Lagrange)。
+
+**残 = monolithic producer def + glue（clean 増分なし, focused build 要）**:
+- **(A) hstepData per-step**: enum(✅)→ tailSet=X∖accumulator 列挙(intricate)→ 各 member degree(✅ data)→ θχ(χs i の source)→ **sum reindex**(∑_{Fin k}dmem²+∑tail = piece-1 の ∑_X; accumulator⊔tail=X 分割が核, ~100行)→ qtot=|H:Z|/c=idx·(|Z|−1)/htotal(Lagrange)→ θχ²≤|H:Z|(exists_degree_sq_le_index)→ StepData ⟨⟩ packaging。
+- **(B) ν glue**(hagreeX/hagreeY/hmixed/hgen): combined extension(別 ~100行)。
+- **(C) case split** hyp.cases(Frobenius branch 機構揃う; CertainType 別)。
+- **見積**: (A)~200行 + (B)~100行、intricate(特に sum reindex / tailSet)。**per-commit clean 単位に分割困難**ゆえ focused session 推奨(green まで commit 保留の連続 build)。
+
+## 🛑 2026-06-06 LOOP PAUSE / handoff（leaf 相 完了, producer 相 へ）
+
+**到達点**: §6 reduction chain ((6.2)/(6.3)/(6.5)) 完成 + (6.6) piece 1 (X degree-sum 恒等式) + **piece-2 leaf 全landed**。capstone sorry (S08:7451) 解消に残るのは **(6.6) producer の組立 1 本 + ν glue** のみ（全 ingredient/enum/arith は揃っている、欠落 primitive 無し）。
+
+**なぜ pause**: ここから先は clean な単一補題（leaf）ではなく、**(6.6) hypotheses (Z⊆Z(H)) を thread して consumer 署名に合わせる大きめの `def` 構築**。auto-loop の「1 iteration=1 clean lemma」に合わず、focused session 向き。leaf 相は出尽くした。
+
+**producer の正確な construction recipe（次の focused session 用、即着手可）**:
+1. **divisibility `θχ(1)² ∣ total` (ℕ)** — piece-2 の本体:
+   - `θχ(1)² ≤ |H:Z|`: `degree_sq_le_index_of_central_quotient`(InflationCharacter, 既landed)を **N:=⊥, D:=Z.subgroupOf H, φ:=θχ** で適用。要 `Z.subgroupOf H ≤ Subgroup.center ↥H`(= (6.6) の Z⊆Z(K)=Z(H); capstone で hyp.cases から)。N=⊥ ゆえ θ trivial-on-N は自明、`D/⊥ ≤ Z(H/⊥)=Z(H)`。結論 `θχ(1)² ≤ |↥H:Z.subgroupOf H| = |H:Z|`。
+   - `θχ(1)²` p-power(`exists_primePow_natDegree_of_isPGroup` ✅）, `|H:Z|` p-power(`exists_primePow_card_quotient_of_isPGroup` ✅, K=↥H N=Z.subgroupOf H）⟹ `θχ(1)² ∣ |H:Z|`(p-powers a≤b⟹a∣b: 指数抽出 `Nat.pow_le_pow_iff_right`+`Nat.pow_dvd_pow`, inline）。
+   - `|H:Z| ∣ total`: total(ℕ) = `idx·(|H|−|H:Z|) = idx·|H:Z|·(|Z|−1)`(piece1 の ℝ 値を ℕ 化: 各 χ(1)=n_χ∈ℕ ゆえ ∑(χ1).re²=(∑n²:ℝ), piece1 と `Nat.cast_injective` で ℕ 等式)。⟹ `θχ(1)² ∣ total`。
+2. **StepData packaging**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData` 7134 / consumer `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` 7024):
+   - enum = `exists_pairUnion_memberFamily_of_irreducible_X`(5898, ✅）→ k/χmem/hrange/i₁(anchor=xBaseBlock 最小次数）。
+   - 各 member χmem j=Ind θ_j: θmem j:=θ_j(1)(p-power), dmem j:=idx·θmem j(=`induce_apply_one`), idx:=|W₁|(`index_H_eq_card_W1`)。p≥3=`three_le_prime_of_isPGroup_of_odd`。hidx_p=`coprimeIndexPrimePow`(2893付近)。
+   - qtot:=θχ², mq:=2mχ, c:=total/θχ²(divisibility 1 で割り切れる), θχ²≤qtot は equality。tailSet=degree>χ の members(htail_le)。
+3. **`hstepData` 関数化** → `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`(7301)に供給 → Xset coherence。
+4. **ν glue**(hagreeX/hagreeY/hmixed/hgen, consumer 7379)→ `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(7379)→ capstone。**case split** hyp.cases (Frobenius/CertainType) も capstone で要(現状 Frobenius branch 機構が揃う; CertainType は別途)。
+
+**本セッション landed (peterfalvi, a94f1ef 以降, 全 axiom-clean)**: 34b464c (6.5) / 955859b θ=p^k / a1696cc p≥3 / b5dd055 piece1 X-sum / 569c8dd |H:Z|=p^k。(6.3 は a94f1ef で main 済)。
 
 ## Blocked ログ (revert した task と欠落 primitive を追記)
 

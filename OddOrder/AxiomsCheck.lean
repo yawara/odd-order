@@ -1987,6 +1987,33 @@ set_option linter.style.longLine false in
 -- (6.3) THEOREM (Frobenius K=H): `M ≤ H₁ ⊊ H`, `S(H₁)` coherent, `|H:H₁| > 4|L:H|²+1` ⟹ `S(M)`
 -- coherent.  Minimal-A induction: maximal-B + maximality-central + per-step index bound contradiction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three
+-- (6.5) bridge: `⁅H,H⁆.subgroupOf H = commutator ↥H` (so `|H:⁅H,H⁆| = |Abelianization ↥H|`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.commutator_subgroupOf_self
+-- (6.5) bridge: `S(⊥) = S` (the bottom filtration is everything; kernel condition is vacuous).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_bot
+-- (6.5) THEOREM (Frobenius): if `S` is not coherent then `H` is a `p`-group.  `six_three`
+-- contrapositive (M=⊥, H₁=⁅H,H⁆) gives `|Abelianization H| ≤ 4|W₁|²+1`, then the Frobenius/odd
+-- p-group reduction `isPGroup_of_isFrobeniusGroup_of_card_le`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isPGroup_of_not_coherent
+-- (6.6) ingredient: for a finite p-group, every irreducible character degree is a power of p
+-- (degree ∣ |K| = pⁿ).  Feeds the `θ = p^m` source-degree fields of the X-chain step data.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_primePow_natDegree_of_isPGroup
+-- (6.6) ingredient: a nontrivial odd-order p-group has p ≥ 3 (its order pⁿ is odd).  The `3 ≤ p`
+-- field of the X-chain step data.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.three_le_prime_of_isPGroup_of_odd
+-- (6.6) X degree-sum identity (Frobenius): ∑_{χ∈X=S−S(Z)} (χ 1).re² = |L:H|·(|H| − |H:Z|),
+-- the difference of the S(A) degree-sum identity at A=⊥ and A=Z.  The `total` of the X-chain step.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sum_re_sq_Xset_eq
+-- (6.6) ingredient: a quotient of a finite p-group has p-power order (so |H:Z| = p^k), the key to
+-- θχ(1)² ∣ |H:Z| (both p-powers) in the (6.6) divisibility.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_primePow_card_quotient_of_isPGroup
+-- (6.6) per-member degree shape: every S-member χ = Ind θ has χ(1) = |L:H|·θ(1) = |L:H|·p^k
+-- (H a p-group).  The common-index p-power degree of each X-chain member.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_index_primePow_degree_of_mem_S
+-- (6.6) vectorized per-member degree data (χmem j (1) = |L:H|·p^(mmem j)) for an X-member family.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_memberDegreeData
+-- (6.6) htotal factorization: |L:H|·(|H|−|H:Z|) = |H:Z|·(|L:H|·(|Z|−1)) (Lagrange); total=qtot·c.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.index_mul_card_sub_factor
 -- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).
