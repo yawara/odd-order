@@ -1917,6 +1917,11 @@ set_option linter.style.longLine false in
 -- These are the per-member `hreal`/`hχχ`/…/`hdiffsupp` fields B1 consumes for each `S`-member.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_characterFacts
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_diffSupport
+-- (6.2) member-family degree ratio: an `S`-member `χ = Ind θ` against a degree-`|W₁|` anchor `χ₁`
+-- has integer ratio `χ(1) = θ(1)·χ₁(1)` (the `deg`/`ha1` data feeding the scaled-diff support and
+-- `htau1_memaχ` fields).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_charValue_one_eq_mul_anchor
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

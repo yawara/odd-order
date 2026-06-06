@@ -4675,6 +4675,29 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **`S`-member degree ratio against a degree-`|W₁|` anchor.**
+
+For `χ = Ind_H^L θ ∈ S` and an anchor `χ₁` of the minimal degree `χ₁(1) = |W₁|` (induced from a
+degree-`1` source of `H`), the degree ratio `χ(1)/χ₁(1)` is the source degree `θ(1)`, a positive
+natural number: `χ(1) = θ(1)·χ₁(1)` (`χ(1) = |L:H|·θ(1) = |W₁|·θ(1)`, `induce_apply_one`).  This
+produces the integer degree `a = deg i` and the equation `χ(1) = a·χ₁(1)` that
+`sMember_scaledDiffSupport_of_charValue_eq` (and `scaledDiff_dadeImage_mem_ZIrr`) consume for the
+`hmemdegdiffsupp`/`hdiffasuppχ`/`htau1_memaχ` fields of the (6.2)/B1 member-family.  Applied with
+`χ = χ₁` it gives the anchor ratio `a = 1` (`ha1`). -/
+theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
+    {χ χ₁ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ)) :
+    ∃ a : ℕ, 0 < a ∧ χ 1 = (a : ℂ) * χ₁ 1 := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  refine ⟨a, ha_pos, ?_⟩
+  rw [hχeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha,
+    hyp.index_H_eq_card_W1, hχ₁deg]
+  ring
+
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
 Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
