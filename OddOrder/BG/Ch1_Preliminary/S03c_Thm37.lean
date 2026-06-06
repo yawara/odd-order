@@ -8,6 +8,7 @@ import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import OddOrder.GroupTheory.ChiefFactor
 import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
@@ -133,5 +134,56 @@ theorem chiefFactorConjAction_smul_mk {G : Type*} [Group G] {X Y : Subgroup G}
     (g • (QuotientGroup.mk x : ↥X ⧸ Y.subgroupOf X)) =
       QuotientGroup.mk (ConjAct.toConjAct g • x) :=
   rfl
+
+open OddOrder.GroupTheory in
+/-- **Model bridge**: `g` acts trivially on the chief factor `↥X ⧸ Y.subgroupOf X` via
+`chiefFactorConjAction` iff `g ∈ chiefFactorCentralizer X Y`. Both sides reduce to
+`∀ x ∈ X, g x g⁻¹ x⁻¹ ∈ Y` (the action side via `x ↦ x⁻¹` reindexing). -/
+theorem chiefFactorConjAction_smul_eq_self_iff_mem {G : Type*} [Group G] {X Y : Subgroup G}
+    [X.Normal] [Y.Normal] (g : G) :
+    letI := chiefFactorConjAction X Y
+    (∀ v : ↥X ⧸ Y.subgroupOf X, g • v = v) ↔ g ∈ chiefFactorCentralizer X Y := by
+  letI := chiefFactorConjAction X Y
+  have hcoe : ∀ x : ↥X, (↑(ConjAct.toConjAct g • x) : G) = g * ↑x * g⁻¹ := fun _ => rfl
+  have hL : (∀ v : ↥X ⧸ Y.subgroupOf X, g • v = v)
+      ↔ ∀ x : ↥X, (g * (↑x)⁻¹ * g⁻¹ * ↑x : G) ∈ Y := by
+    constructor
+    · intro h x
+      have hv := h (QuotientGroup.mk x)
+      rw [chiefFactorConjAction_smul_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf,
+        Subgroup.coe_mul, Subgroup.coe_inv, hcoe] at hv
+      have heq : ((g * ↑x * g⁻¹)⁻¹ * ↑x : G) = g * (↑x)⁻¹ * g⁻¹ * ↑x := by group
+      rwa [heq] at hv
+    · intro h v
+      induction v using QuotientGroup.induction_on with
+      | _ x =>
+        rw [chiefFactorConjAction_smul_mk, QuotientGroup.eq, Subgroup.mem_subgroupOf,
+          Subgroup.coe_mul, Subgroup.coe_inv, hcoe]
+        have heq : ((g * ↑x * g⁻¹)⁻¹ * ↑x : G) = g * (↑x)⁻¹ * g⁻¹ * ↑x := by group
+        rw [heq]; exact h x
+  have hR : g ∈ chiefFactorCentralizer X Y
+      ↔ ∀ x : ↥X, (g * ↑x * g⁻¹ * (↑x)⁻¹ : G) ∈ Y := by
+    rw [chiefFactorCentralizer.mem_iff, Subgroup.mem_centralizer_iff]
+    constructor
+    · intro h x
+      have hcomm := h ((QuotientGroup.mk' Y) (↑x : G)) ⟨↑x, x.2, rfl⟩
+      have hgoal : (QuotientGroup.mk' Y) (g * ↑x * g⁻¹ * (↑x)⁻¹) = 1 := by
+        simp only [map_mul, map_inv]
+        rw [← hcomm]
+        group
+      exact (QuotientGroup.eq_one_iff _).mp hgoal
+    · intro h q hq
+      obtain ⟨x, hx, rfl⟩ := hq
+      have hy : (QuotientGroup.mk' Y) (g * ↑x * g⁻¹ * (↑x)⁻¹) = 1 := by
+        rw [QuotientGroup.mk'_apply]
+        exact (QuotientGroup.eq_one_iff _).mpr (h ⟨x, hx⟩)
+      simp only [map_mul, map_inv] at hy
+      rw [mul_inv_eq_one] at hy
+      rw [mul_inv_eq_iff_eq_mul] at hy
+      exact hy.symm
+  rw [hL, hR]
+  constructor
+  · intro h x; have := h x⁻¹; simpa using this
+  · intro h x; have := h x⁻¹; simpa using this
 
 end OddOrder.BG.Ch1.S03c
