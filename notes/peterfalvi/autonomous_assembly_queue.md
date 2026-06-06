@@ -186,6 +186,14 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **`six_two`**(12408ea, **(6.2) 完成**): 上記を section 仮説(B⊆D⊆C⊆H, D/B⊆Z(C/B))下で合成。six_two_index_bound の ψ=Ind θ + kernel lemma + psi_degree_le_of_source → **`|K:A|−1 ≤ 2|L:C|√|C:D|`**。
 - **⟹ §6 残路** = (6.3) minimal-A 帰納((6.2) を section 上で帰納適用、`six_three_HH1_le` の arith core landed)→ (6.5) chief-factor で「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed、要 bound)。(6.3) の minimal-A 帰納(subgroup lattice 上の well-founded)が次の主要 assembly。
 
+### ✅✅ 2026-06-06 (続4): (6.3) building blocks landed (loop 自走, commits eb4c7fb/9c8d3e8/9906836/fcc4f15, 全 axiom-clean)
+(6.3) minimal-A 帰納の構成要素を体系的に landed(残 = maximality-central 導出 + 帰納 wrapping のみ):
+- **`six_two_central`/`psi_degree_le_of_source_central`**(eb4c7fb): (6.2) の C=H 特殊形 `|K:A|−1 ≤ 2|L:H|√|H:D|`。C=H は θ-bound の b-half `degree_sq_le_index_of_central_quotient`(θ(1)²≤|H:D|)で直接、⊤-subgroup friction 回避。(6.3) が消費する形。
+- **`six_three_index_bound`**(9c8d3e8): (6.3) per-step。section(B⊆A⊆H₁, A/B central, S(A) coh, S(B) 非)⟹ `|H:H₁|≤4|L:K|²+1`。six_two_central + `six_three_HH1_le` + index 補題(`SsubFiltration_antitone`/`subgroupOf_mono`/`index_dvd_of_le`)。
+- **`isNilpotent_normal_inf_center_ne_bot`**(9906836): **汎用** nilpotent 中心 fact(mathlib/repo 欠落、新規構築)。finite nilpotent + N◁ nontrivial ⟹ `N⊓Z(G)≠⊥`。upper central series の least-index 論法(`mem_upperCentralSeries_succ_iff` + 最小性)。
+- **`exists_maximal_normal_between`**(fcc4f15): **汎用** finite-lattice fact。`M<A`(M normal)⟹ maximal normal B(`M≤B<A`, normal C で `B≤C<A`⟹C=B)。`Set.Finite.exists_maximalFor`。
+- **残 (6.3) = ① maximality-central 導出**(nilpotency fact + maximal-B で `A/B ⊆ Z(H/B)`): A/B⊓Z(H/B)≠⊥(nilpotency)→ 対応する C は normal in L/B(Z(H/B) は H/B の center で characteristic、H/B◁L/B ゆえ normal)、B⊊C⊆A → maximality で C=A → A/B⊆Z。**quotient/subgroupOf/correspondence bookkeeping が重い**(~60-100行)。**② 強帰納 wrapping**(`Nat.card A` 上、A=H₁ から S(M) coherent。A=M base / A≠M で maximal-B → S(B) coh なら IH / S(B) 非なら central+per-step で `|H:H₁|≤bound` 矛盾)。両者で (6.3) 完成 → (6.5)(a) bound(M=⊥, H₁=⁅H,H⁆)で `|Abelianization H|≤4|W₁|²+1` → `isPGroup_of_isFrobeniusGroup_of_card_le` で H は p-群 → (6.8) capstone hstepData。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
