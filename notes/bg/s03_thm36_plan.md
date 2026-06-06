@@ -60,3 +60,30 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 - Thm 3.6 は 10.6 の r_p≥3 ケースのエンジン。10.6 はさらに Lem 10.4(b) (lane A1) も要 ([[s10_spine_blockers]])。
 - Lem 1.21(a) を landing すれば 10.6 の reduction (H≤M⇒) が解け、10.6 は「easy case 完成 + hard case=Thm3.6+10.4b」に縮む。
 - このセッションの成果: 10.14(d) landing (f21eb12) + スパイン/§3 ブロッカー精査。
+
+## Lemma 1.21 着手状況 (2026-06-07)
+
+ファイル `OddOrder/BG/Ch1_Preliminary/PLengthTransfer.lean` (新規)。
+
+**✅ Landed (commit `4a9bf08`, sorry-free):**
+- `card_quotient_oPiPrimePiCore_eq` : `|G/O_{p',p}(G)| = |(G/O_{p'}(G))/O_p(G/O_{p'}(G))|`
+  (第3同型 `quotientQuotientEquivQuotient` + `O_{p',p}(G) = comap mk' (O_p(G/O_{p'}(G)))`
+  + `map_comap_eq_self_of_surjective` + `oPiCore_compl_le_oPiPrimePiCore`)。
+- `hasPLengthOne_iff_card_quotient` : 上を `hasPLengthOne` に rw した reformulation。
+これが (a)–(e) 共通の出発点。
+
+**作業中 (b) `hasPLengthOne_of_isPiPrime_normal_quotient` — 証明法確定済・機械的詰めのみ残:**
+- 補題 `oPiCore_compl_quotient_eq` : `H ⊴ G` normal `p'` ⇒ `O_{p'}(G/H) = O_{p'}(G).map mk'`。
+  - `≥`: `Ch03.oPiCore.map_le_of_surjective`。
+  - `≤`: `N := (O_{p'}(G/H)).comap mk'` は normal、`p∤|N|` (∵ `|N|=|H|·|Kbar|`、`Kbar=O_{p'}(G/H)` は
+    `p'`、両者 `p∤`)、ゆえ `N ≤ O_{p'}(G)` (`Ch03.Subgroup.IsPiGroup.le_oPiCore`)、`Kbar=N.map mk'`。
+- (b) 本体: `φ : (G/H)/O_{p'}(G/H) ≃* G/O_{p'}(G)`
+  `:= (QuotientGroup.quotientMulEquivOfEq hcorr).trans (quotientQuotientEquivQuotient H _ hHle)`。
+  `O_p` を `Ch03.oPiCore.map_eq_of_mulEquiv` で φ 越しに移送、index を `Subgroup.index_map_equiv`
+  (`Nat.card (A⧸M) = M.index` defeq) で一致させ、`hasPLengthOne_iff_card_quotient` に rw。
+- **残る機械的論点** (次セッション fresh budget で即詰め): `Subgroup.card_mul_index` は `(H)` explicit /
+  `Subgroup.index_comap_of_surjective` の引数順 / `Subgroup.Normal.map (h)(f)(hf)` の 3 引数 /
+  `set Kbar/N` の opacity (`rw [hKbar]/[hN]` で unfold するか set を避ける)。
+- **(a) 部分群単調性** (10.6 で必要) は (b) と異なり部分群-core 対応が要る: `O_{p',p}(G).subgroupOf H ≤
+  O_{p',p}(↥H)` (normal p-nilpotent ≤ O_{p',p}) + index 整除鎖。(b) より重い。
+- (c)(d)(e): (d)=`⟨p-elts⟩=O^{p'}` の normal p-complement 特徴づけ、(e) は (d) 経由、(c) は (b) 類似。
