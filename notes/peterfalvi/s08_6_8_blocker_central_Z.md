@@ -180,7 +180,13 @@ larger remaining lift.**
     (S08:~7460). **✅ linchpin landed** (`exists_source_primePow_centralBound_of_mem_Xset`, commit
     `a119d9c`): for `χ∈X(Z)`, `χ(1)=|L:H|·p^k ∧ (p^k)²≤|H:Z|` — the `hθχ`/`hθsq_le_qtot` data, now
     fillable at central `Zc`. `isIrreducibleCharacter_of_mem_Xset_of_frobenius` confirmed Z-generic.
-    **Remaining = the producer `hstepData` monolith** (single atomic `noncomputable def`, ~250 lines,
+    **✅ hXne landed (2026-06-07, commit `264966a`)**: `Xset_centralCommutator_nonempty` (via Z-generic
+    `Xset_nonempty_of_subgroupOf_ne_bot`, degree-sum positivity — no Clifford theory). **✅ outer shell
+    landed (commit `a9054c4`)**: `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+    — the Zc instantiation of the consumer, all prereqs discharged, `hstepData` confirmed to TYPECHECK
+    at `Z := Zc` (so the producer goal is well-formed and satisfiable).
+    **Sole remaining L2 hole = constructing the producer `hstepData` monolith** (single atomic
+    `noncomputable def`, ~250 lines,
     not splittable — the StepData is consumed atomically). For each chain step `i`:
     1. enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k`, `χmem`, `hχinj`, `hrange`; anchor
        `i₁` = min-degree of `xBaseBlock Zc` (`Set.exists_min_image`, cf. `two_le_xBaseBlock_ncard`).
