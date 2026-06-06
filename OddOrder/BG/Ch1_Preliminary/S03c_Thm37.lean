@@ -568,4 +568,26 @@ theorem kernel_le_chiefFactorCentralizer_dichotomy
     exact hsq ((Nat.prime_dvd_prime_iff_eq (Fact.out : s.Prime) (Fact.out : q.Prime)).mp
       ((Fact.out : s.Prime).prime.dvd_of_dvd_pow hdvd))
 
+open OddOrder.GroupTheory in
+/-- The image `K/L = K.map (mk' L)` of `K` in `G/L` is a `q`-group whenever the chief factor
+`↥K ⧸ L.subgroupOf K` is elementary abelian of prime `q` (every element of the image has order
+dividing `q`). Supplies `hKbar` to the per-factor dichotomy in the main induction. -/
+theorem isPGroup_map_mk'_of_isElementaryAbelian {G : Type*} [Group G] {K L : Subgroup G}
+    [L.Normal] {q : ℕ} (hKLelem : IsElementaryAbelian q (↥K ⧸ L.subgroupOf K)) :
+    IsPGroup q (K.map (QuotientGroup.mk' L)) := by
+  intro x
+  obtain ⟨g, hgK, hgx⟩ := x.2
+  refine ⟨1, ?_⟩
+  have hgLpow : (g : G) ^ q ∈ L := by
+    have hgpow : (⟨g, hgK⟩ : ↥K) ^ q ∈ L.subgroupOf K := by
+      rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply, map_pow]
+      exact hKLelem.pow_eq_one _
+    have h2 := Subgroup.mem_subgroupOf.mp hgpow
+    simpa using h2
+  rw [pow_one]
+  apply Subtype.ext
+  show ((x : G ⧸ L)) ^ q = (1 : G ⧸ L)
+  rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  exact hgLpow
+
 end OddOrder.BG.Ch1.S03c
