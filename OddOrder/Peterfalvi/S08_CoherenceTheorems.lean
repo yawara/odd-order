@@ -6702,6 +6702,70 @@ noncomputable def Xset_isCoherent_from_adjoinSteps_of_irreducible_X
     (hyp.xBaseBlock_isCoherent_of_irreducible_X hZH hX hXne)
     (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hdisj hmono i hi hcoh)
 
+/-- **(T8.10w) X-chain coherence engine, completeness-exposing variant.**  Identical to
+`Xset_isCoherent_from_adjoinSteps_of_irreducible_X` but the per-step callback `hstep` additionally
+receives the **Xset-cover completeness** witness
+`hcover : ∀ φ ∈ X, φ ∈ xBaseBlock Z ∨ ∃ j < N, φ ∈ pairSet pair j`.  The base engine derives this
+internally (from `exists_conjugatePairCover`) but does not expose it; the StepData producer needs it
+to build the per-step `tailSet = X ∖ accumulator` and discharge `htail_le`/`hsum` (only well-behaved
+when the conjugate-pair cover is complete — see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`
+finding #6).  Additive: no existing signature changes. -/
+noncomputable def Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
+    (hstep : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ hyp.Xset Z) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      (∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
+        ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
+      ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+          (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
+        XAdjoinStepInput hyp.dade hyp.hconj hcoh (χs i)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  have hXfin : (hyp.Xset Z).Finite := hyp.xSet_finite_of_irreducible_X hX
+  have hXconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset Z) :=
+    hyp.Xset_closedUnderConjugate_of_irreducible_X hZH hX
+  have hXreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.Xset Z) :=
+    hyp.Xset_hasNoRealCharacters_of_irreducible_X hZH hX
+  have hS0conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.xBaseBlock Z) :=
+    hyp.xBaseBlock_closedUnderConjugate_of_irreducible_X hZH hX
+  choose e pair N hpairχ hsurj hpairs hcoverIdx hpair0Raw hpair1Raw hdisj hmono using
+    exists_conjugatePairCover (X := hyp.Xset Z) (S₀ := hyp.xBaseBlock Z)
+      hXfin hXconj hXreal hX hS0conj
+  let χ0 : IrreducibleCharacter ↥L := ⟨Classical.choose hXne, hX _ (Classical.choose_spec hXne)⟩
+  let χs : ℕ → IrreducibleCharacter ↥L := fun i => if hi : i < N then hpairχ i hi else χ0
+  have hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ) := by
+    intro i hi
+    rw [hpair0Raw i hi]
+    simp [χs, hi]
+  have hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj := by
+    intro i hi
+    rw [hpair1Raw i hi]
+    simp [χs, hi]
+  have hcover : ∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
+      ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+    intro φ hφ
+    obtain ⟨i, hi⟩ := hsurj φ hφ
+    have hci := hcoverIdx i
+    rw [hi] at hci
+    exact hci
+  exact xChainCoherent hyp.dade hyp.hconj pair N χs hpair0 hpair1
+    (hyp.xBaseBlock_subset Z) hpairs hcover
+    (hyp.xBaseBlock_isCoherent_of_irreducible_X hZH hX hXne)
+    (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh)
+
 end SibleyDadeHypothesis
 
 /-- **(T8.11m) normalized degree gap from an absolute degree bound.**
@@ -7803,6 +7867,79 @@ noncomputable def Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerD
     data.hχone data.hχ₁one data.hanchor data.hmemone data.hp
     data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
     data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
+
+/-- **(T8.11w1c) base-anchor X-chain coherence, completeness-exposing variant.**  Like
+`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X` but the per-step
+producer `hstepData` additionally receives the Xset-cover completeness witness `hcover` (finding #6)
+— required to build the per-step `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…`
+engine.  Additive (no existing signature changes). -/
+noncomputable def
+    Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ) (hXne : (hyp.Xset Z).Nonempty)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ hyp.Xset Z) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      (∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
+        ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := Z) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset Z)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  refine hyp.Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X hZH hX hXne ?_
+  intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi hcoh
+  let data := hstepData pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi
+  exact hyp.xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums hZH hX
+    hpair0 hpair1 hpairs hdisj hi (hcoh := hcoh) data.hχinj data.hrange
+    data.hχone data.hχ₁one data.hanchor data.hmemone data.hp
+    data.hdχ data.hd₁ data.hdmem data.hθχ data.hθ₁ data.hθmem data.hθtail
+    data.htail_le data.hsum data.hqtot data.hθsq_le_qtot data.htotal data.hidx_p
+
+/-- **(6.6)/(6.8.1), central-`Zc`, completeness-exposing form (redesign L2 outer shell, withCover).**
+Same as `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+but the `hstepData` producer receives the Xset-cover completeness witness `hcover` (finding #6), which
+the monolith needs to build `tailSet`/`htail_le`/`hsum`.  Routes through the `…withCover…` consumer. -/
+noncomputable def
+    Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset hyp.centralCommutator) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L)
+          (hyp.xBaseBlock hyp.centralCommutator) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      (∀ φ ∈ hyp.Xset hyp.centralCommutator, φ ∈ hyp.xBaseBlock hyp.centralCommutator ∨
+        ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := hyp.centralCommutator) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI := hyp.centralCommutator_normal
+  exact hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    (Z := hyp.centralCommutator) hyp.centralCommutator_le
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
 
 /-- **(6.8.1), Frobenius case:** chain-level coherence for
 `X = S - S(H')`, using common-index p-power data.
