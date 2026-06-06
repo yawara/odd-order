@@ -1981,6 +1981,12 @@ set_option linter.style.longLine false in
 -- (6.3) per-step index bound: a section `B ⊆ A ⊆ H₁` (A/B central, S(A) coherent, S(B) not) gives
 -- `|H:H₁| ≤ 4|L:K|²+1` (six_two_central + the arithmetic core six_three_HH1_le).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three_index_bound
+-- (6.3) `hAcomm` provider: `H` nilpotent ⟹ for normal `A ⊊ H`, `[H/A, H/A] ≠ ⊤` (nontrivial
+-- nilpotent ⟹ not perfect).  Supplies the degree-`|W₁|` anchor hypothesis of six_two/six_three.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.commutator_subgroupOf_quotient_ne_top
+-- (6.3) THEOREM (Frobenius K=H): `M ≤ H₁ ⊊ H`, `S(H₁)` coherent, `|H:H₁| > 4|L:H|²+1` ⟹ `S(M)`
+-- coherent.  Minimal-A induction: maximal-B + maximality-central + per-step index bound contradiction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three
 -- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).

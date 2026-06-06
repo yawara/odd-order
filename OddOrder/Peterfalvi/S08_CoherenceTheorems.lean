@@ -5556,6 +5556,81 @@ theorem six_three_index_bound (hyp : SibleyDadeHypothesis G L H)
     (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
   simpa using hsixtwo
 
+/-- **`hAcomm` from nilpotency of `H`.**
+
+In the Sibley setup `H` is nilpotent, so for a normal `A ⊊ H` the quotient `H/A` is a nontrivial
+nilpotent (hence solvable) group, whence its commutator subgroup is proper: `[H/A, H/A] ≠ ⊤`.  This
+supplies the `hAcomm` hypothesis of `six_two_index_bound` / `six_three_index_bound` (which need a
+degree-`|W₁|` anchor in `S(A)`). -/
+theorem commutator_subgroupOf_quotient_ne_top (hyp : SibleyDadeHypothesis G L H)
+    {A : Subgroup ↥L} [A.Normal] (hAH : A < H) :
+    _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤ := by
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  haveI : Nontrivial (↥H ⧸ A.subgroupOf H) := by
+    rw [QuotientGroup.nontrivial_iff]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hAH.ne (le_antisymm hAH.le htop)
+  exact (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥H ⧸ A.subgroupOf H)).ne
+
+/-- **Peterfalvi (6.3)** (Frobenius case `K = H`).
+
+With `M ≤ H₁ ⊊ H` normal subgroups of `L`, `S(H₁)` coherent and `|H:H₁| > 4|L:H|² + 1`, the set
+`S(M)` is coherent.
+
+Minimal-`A` induction (Peterfalvi's argument): pick a normal `A ∈ [M, H₁]` with `S(A)` coherent that
+is minimal for `⊆` (exists since `H₁` qualifies).  If `A ≠ M` then `M < A`; take a maximal normal
+`B` with `M ≤ B ⊊ A` (`exists_maximal_normal_between`).  Then `A/B ⊆ Z(H/B)`
+(`normal_central_of_maximal_normal_below`, using `H` nilpotent), and `S(B)` is *not* coherent (else
+`B ∈ [M, H₁]` would beat the minimality of `A`).  So `six_three_index_bound` gives
+`|H:H₁| ≤ 4|L:H|² + 1`, contradicting the hypothesis.  Hence `A = M` and `S(M) = S(A)` is
+coherent. -/
+theorem six_three (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal] (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration H₁)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hbound : 4 * H.index ^ 2 + 1 < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration M)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
+    (fun _ _ h => SetLike.coe_injective h)
+  set s : Set (Subgroup ↥L) := {A | A.Normal ∧ M ≤ A ∧ A ≤ H₁ ∧
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))} with hs_def
+  have hH₁s : H₁ ∈ s := by
+    simp only [hs_def, Set.mem_setOf_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
+  obtain ⟨A, hAmem, hAmin⟩ :=
+    Set.Finite.exists_minimalFor (id : Subgroup ↥L → Subgroup ↥L) s (Set.toFinite _) ⟨H₁, hH₁s⟩
+  simp only [hs_def, Set.mem_setOf_eq] at hAmem
+  obtain ⟨hAnorm, hMA, hAH₁, hAcoh⟩ := hAmem
+  haveI : A.Normal := hAnorm
+  have hAeqM : A = M := by
+    by_contra hne
+    have hMltA : M < A := lt_of_le_of_ne hMA (Ne.symm hne)
+    obtain ⟨B, hBnorm, hMB, hBltA, hBmaxl⟩ := exists_maximal_normal_between hMltA
+    haveI : B.Normal := hBnorm
+    have hAltH : A < H := lt_of_le_of_lt hAH₁ hH₁H
+    have hAcomm := hyp.commutator_subgroupOf_quotient_ne_top hAltH
+    have hcentral := normal_central_of_maximal_normal_below (H := H) (A := A) (B := B)
+      ‹H.Normal› hAltH.le hBltA hBmaxl
+    have hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+      intro hBcoh
+      have hBs : B ∈ s := by
+        simp only [hs_def, Set.mem_setOf_eq]
+        exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
+      exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
+    have hbnd := hyp.six_three_index_bound hF hBltA.le hAH₁ hAcomm hcentral hAcoh hSBncoh
+    omega
+  rw [← hAeqM]
+  exact hAcoh
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
