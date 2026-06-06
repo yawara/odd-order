@@ -590,4 +590,80 @@ theorem isPGroup_map_mk'_of_isElementaryAbelian {G : Type*} [Group G] {K L : Sub
   rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact hgLpow
 
+open OddOrder.GroupTheory in
+/-- Group-order strong-induction core of BG Theorem 3.7. -/
+private theorem frobeniusKernelIsNilpotent_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G]
+    [IsSolvable G] (K R : Subgroup G), OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R →
+    (∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) → Nat.card ↥K = n → Group.IsNilpotent ↥K := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro G _ _ _ K R h hR hn
+    by_cases hK : K = ⊥
+    · subst hK; infer_instance
+    · haveI hKnorm : K.Normal := h.isNormal
+      haveI hLnorm : (maxProperNormalOrBot K).Normal := maxProperNormalOrBot_normal K
+      set L := maxProperNormalOrBot K with hLdef
+      have hLK : L ≤ K := maxProperNormalOrBot_le K
+      have hLltK : L < K := maxProperNormalOrBot_lt_of_ne_bot hK
+      have hKL_notle : ¬ K ≤ L := fun hle => (ne_of_lt hLltK) (le_antisymm hLK hle)
+      have hcardL : Nat.card ↥L < Nat.card ↥K := by
+        have hdvd := Subgroup.card_dvd_of_le hLK
+        refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos hdvd) (fun heq => ?_)
+        exact (ne_of_lt hLltK) (Subgroup.eq_of_le_of_card_ge hLK heq.ge)
+      have hLnil : Group.IsNilpotent ↥L := by
+        by_cases hLbot : L = ⊥
+        · rw [hLbot]; infer_instance
+        · have hLR := isFrobeniusGroup_sup_of_normal_le_kernel h hLK hLbot
+          have hcardlt : Nat.card ↥(L.subgroupOf (L ⊔ R)) < n := by
+            rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv, ← hn]
+            exact hcardL
+          have hRprime' : ∃ p : ℕ, p.Prime ∧ Nat.card ↥(R.subgroupOf (L ⊔ R)) = p := by
+            obtain ⟨p, hp, hpc⟩ := hR
+            exact ⟨p, hp, by
+              rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]; exact hpc⟩
+          haveI : Group.IsNilpotent ↥(L.subgroupOf (L ⊔ R)) :=
+            IH _ hcardlt (L.subgroupOf (L ⊔ R)) (R.subgroupOf (L ⊔ R)) hLR hRprime' rfl
+          exact nilpotent_of_surjective
+            (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).toMonoidHom
+            (Subgroup.subgroupOfEquivOfLe (le_sup_left : L ≤ L ⊔ R)).surjective
+      have hLfit : L ≤ OddOrder.Isaacs.Ch01.fitting G := by
+        haveI : Group.IsNilpotent ↥L := hLnil
+        exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+      have hChiefKL : IsChiefFactor K L := by
+        have h0 := isChiefFactor_chiefSeriesInside (K := K) (n := 0)
+          (by rw [chiefSeriesInside_zero]; exact hK)
+        rw [chiefSeriesInside_zero, chiefSeriesInside_succ, chiefSeriesInside_zero, ← hLdef] at h0
+        exact h0
+      obtain ⟨q, hq, hKLelem⟩ := chiefFactor_isElementaryAbelian hChiefKL
+      haveI : Fact q.Prime := ⟨hq⟩
+      have hKbar : IsPGroup q (K.map (QuotientGroup.mk' L)) :=
+        isPGroup_map_mk'_of_isElementaryAbelian hKLelem
+      refine isNilpotent_of_chief_factor_centralization (fun i => ?_)
+      by_cases hVibot : chiefSeriesInside K i = ⊥
+      · rw [hVibot]; simp
+      · have hChiefVi := isChiefFactor_chiefSeriesInside hVibot
+        have hViK : chiefSeriesInside K i ≤ K := chiefSeriesInside_le K i
+        obtain ⟨s, hs, hVelem⟩ := chiefFactor_isElementaryAbelian hChiefVi
+        haveI : Fact s.Prime := ⟨hs⟩
+        haveI := hChiefVi.normal_top
+        haveI := hChiefVi.normal_bot
+        have hLcent :
+            L ≤ chiefFactorCentralizer (chiefSeriesInside K i) (chiefSeriesInside K (i + 1)) :=
+          hLfit.trans (OddOrder.BG.Ch1.S01.fitting_le_chiefFactorCentralizer hChiefVi)
+        have hFrobL := frobenius_quotient_of_normal_lt_kernel h hLK hKL_notle inferInstance
+        have hKcent := kernel_le_chiefFactorCentralizer_dichotomy h hChiefVi hViK hVelem hLcent
+          hFrobL hKbar
+        rw [Subgroup.commutator_comm]
+        exact chiefFactorCentralizer.commutator_le_of_le hKcent
+
+open OddOrder.GroupTheory in
+/-- **BG Theorem 3.7** (Thompson/Higman, solvable odd case): if `G = KR` is a solvable group with
+`K ⊴ G` and complement `R` of prime order, and `C_K(R) = 1` (so `G` is a Frobenius group with kernel
+`K`), then `K` is nilpotent. -/
+theorem frobeniusKernelIsNilpotent {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {K R : Subgroup G} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
+    (hR : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p) : Group.IsNilpotent ↥K :=
+  frobeniusKernelIsNilpotent_aux (Nat.card ↥K) K R h hR rfl
+
 end OddOrder.BG.Ch1.S03c
