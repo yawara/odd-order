@@ -28,18 +28,29 @@ worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE
 
 ### 10.12 `disjoint_of_not_conj` 証明 (book p.79 冒頭, PDF 92 で回収)
 
+(Nougat 単独ページ再OCR `-p 92 --no-skipping` で確実に回収。私の最初の手読みは誤りだった —
+"not abelian"→**"not normal in `M`"**、`N_G(S)⊆M`→**`N_G(S)⊆H^g`**、末尾は「`p∉α(M)` **かつ
+`M_σ` は nilpotent でない**」が**結論**。訂正後は行間ゼロの完結した3文証明。)
+
 > Proof. Suppose `p ∈ σ(M) ∩ σ(H)`. Then some Sylow `p`-subgroup `S` of `G` lies in `M`
 > and in some conjugate `H^g` of `H`. By the **Uniqueness Theorem**, `r(S) ≤ 2` because
-> `H^g ≠ M`. Furthermore `S` is not abelian because `N_G(S) ⊆ M` and `M_σ` is not nilpotent.
-> Now we are done because `π(M_α ∩ H_σ) ⊆ α(M) ∩ σ(H) ⊆ σ(M) ∩ σ(H)` and
-> `π(M_σ ∩ H_σ) ⊆ σ(M) ∩ σ(H)`.
+> `H^g ≠ M`. Furthermore, `S` is not normal in `M` because `N_G(S) ⊆ H^g`. This shows that
+> `p ∉ α(M)` and that `M_σ` is not nilpotent. Now we are done because
+> `π(M_α ∩ H_σ) ⊆ α(M) ∩ σ(H) ⊆ σ(M) ∩ σ(H)` and `π(M_σ ∩ H_σ) ⊆ σ(M) ∩ σ(H)`.
 
-- 構造: (a)(b) とも「素数集合の disjoint」を背理法 (∃ p∈σ(M)∩σ(H) → S を共通 Sylow に取り
-  Uniqueness で矛盾) で示し、subgroup の disjoint (`M_α∩H_σ=1` 等) は `π(A∩B) ⊆ …` の包含から導く。
-- **依存**: §9 Uniqueness Thm の「非共役 2 極大に共通する `S` の rank ≤ 2」形 (repo に
-  `S09_*` で証明済か要確認), `sigma`/`alpha` 定義の `N_G(Sylow)⊆M` 性, `π(A⊓B)⊆π(A)∩π(B)`,
-  「`p∈σ` ⇔ ある Sylow `p` で `N_G⊆M`」のAPI。**中規模だが原文が terse で行間多い**;
-  次セッションは上記回収文 + `S09_Uniqueness` の API を突き合わせて形式化する。
+- **核心 (任意の `p ∈ σ(M)∩σ(H)`)**: 共通 Sylow `S ≤ M ∩ H^g` を取る (∵ `p∈σ(M)` で
+  `N_G(P)⊆M` な Sylow-of-`M` `P` は Sylow-of-`G`; 同様に `p∈σ(H)`; 2 つの Sylow-of-`G` は共役)。
+  - `r(S) ≤ 2` (Uniqueness, `S ≤ M ∩ H^g`, `M ≠ H^g`) ⟹ `r_p(M) ≤ 2` ⟹ **`p ∉ α(M)`**。
+  - `N_G(S) ⊆ H^g ≠ M` ⟹ `S` は `M` で非正規 (正規なら `M ⊆ N_G(S) ⊆ H^g`, 極大性で `M=H^g` 矛盾)。
+    `p∈σ(M)` で `S ≤ M_σ` (Hall σ)。`M_σ` nilpotent なら Sylow `S` が `M_σ` で characteristic、
+    `M_σ ⊴ M` ゆえ `S ⊴ M` で矛盾 ⟹ **`M_σ` not nilpotent**。
+- **(a)** `α(M)∩σ(H)=∅` (∵ `p∈α(M)∩σ(H)⊆σ(M)∩σ(H)` → `p∉α(M)` 矛盾); `M_α∩H_σ=1` は
+  `π(M_α∩H_σ)⊆α(M)∩σ(H)=∅`。**(b)** `M_σ` nilpotent ⟹ `σ(M)∩σ(H)=∅` (∵ さもなくば
+  `M_σ` not nilpotent 矛盾); `M_σ∩H_σ=1` 同様。
+- **依存**: §9 Uniqueness (`S ≤ 2 distinct maximals ⇒ r(S)≤2`, repo `S09_*` 要確認),
+  `p∈σ(M)` で Sylow-of-`M` が Sylow-of-`G` (N_G⊆M argument), Sylow 共役 (mathlib),
+  `M_σ`=Hall σ + nilpotent⇒Sylow char⇒正規, `π(A⊓B)⊆π(A)∩π(B)` + `π(M_α)⊆α(M)` 等。
+  **行間は無い**; ブロッカーは無し。形式化は中規模 (10.11(d) 同等)。
 
 ## ⚠ 依存の実態 (BG 原文を読んで判明 — 当初の docstring ベース map は楽観的すぎた)
 
