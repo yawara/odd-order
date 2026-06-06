@@ -161,6 +161,15 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 - **`S_hasNoRealCharacters`/`SsubFiltration_hasNoRealCharacters`** (Frobenius case): S(A)⊆S の各 χ=Ind θ は degree `|W₁|·θ(1)≥|W₁|>1` ∴ ≠trivial、odd order で非実 (1.1)。`exists_coherentBreakPair` の Sb real-free 入力 (Sibley S(A) 適用形) を供給。
 - **⟹ (6.2) の残 gap = member-family enum のみ**(S₁ を B1 に渡す flat family + degree-ratio/support/gen 諸 field 構成)。first-obstruction は **enum 非依存**で先行 landable だった。B1 適用には依然 enum (s/χmem/deg + ~15 field) が必要で、これが (6.5) bound の単一 bottleneck のまま。次手 = **S₁ の member-family enum** (`exists_finEnum_irreducible` + 諸 property 放電; degree-ratio `deg`/`hmemdegdiffsupp`/`hSgen`/`hgen`/`htau1_memaχ` が subtle 部)。
 
+### ✅ 2026-06-06 (続): member-family enum の per-member + anchor + adjoined-pair 側 landed (loop 自走, commits 61831a3/0838812/c4f1ad3/c3d6c7d/50239f5/eeeb06a, 全 axiom-clean)
+B1 が消費する member-family の **enum 非依存部を体系的に構築**(全 Frobenius case, S08, AxiomsCheck 登録):
+- **per-member facts**: `sMember_characterFacts`(non-real + 共役対 orthonormal)/`sMember_diffSupport`(`(χ̄−χ).support⊆H^#`)/`sMember_charValue_one_eq_mul_anchor`(degree-ratio `χ(1)=θ(1)·χ₁(1)`、anchor degree |W₁| 与で integer ratio + 既存 `sMember_scaledDiffSupport_of_charValue_eq`/`scaledDiff_dadeImage_mem_ZIrr` を発火)。
+- **core bundle** `exists_sMemberOrthonormalFamily`: 有限 conj-closed `S₁⊆S` → `exists_finEnum_irreducible` で flat `Fin k` 列挙 + hmemreal/hmemconjortho/hmemortho/hmemdiffsupp/hmemS1/hmembarS1 一括放電。
+- **degree-data layer** `exists_sMemberDegreeData`: anchor index `i₁`(degree |W₁|)与で `deg`/`ha1`(=1)/hmemdegdiffsupp を産出。
+- **anchor 存在** `exists_mem_SsubFiltration_degree_W1`: `commutator(H/A.subgroupOf H)≠⊤`(A⊊H solvable)⟹ S(A) に degree-|W₁| member(degree-1 source inflation+induce)。`hanchordeg` を discharge。
+- **adjoined-pair** `sBreakPair_fields` + `exists_coherentBreakPair` 強化(ψ∉S₁/ψ̄∉S₁ を cover disjointness から出力追加): ψ の per-field + `⟨ψ,χ⟩=⟨ψ̄,χ⟩=0 (χ∈S₁)`(distinct irreducible)。
+- **残 = ① generation field `hSgen`/`hgen`**(X-side `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(T8.11i)/`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`(T8.11j) が abstract module lemma で流用見込み)**② ψ の `hdiffasuppχ`/`htau1_memaχ`**(ψ の degree-ratio + 既存 scaled-diff/ZIrr helper)**③ 最終 assembly**(全 field を B1 に結線 → (6.2) `2|L:C|√|C:D|≥|K:A|−1`)。enum の hard combinatorial 部はほぼ機械化済、残は generation の module 議論と assembly。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
