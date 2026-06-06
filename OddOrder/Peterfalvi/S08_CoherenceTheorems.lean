@@ -686,6 +686,25 @@ theorem isNilpotent_normal_inf_center_ne_bot {Γ : Type*} [Group Γ] [Finite Γ]
   rw [hbot, Subgroup.mem_bot] at this
   exact hx1 this
 
+/-- **A maximal normal subgroup strictly between `M` and `A`.**
+For a finite group, if `M < A` (with `M` normal) there is a normal `B` with `M ≤ B < A` that is
+maximal with this property: any normal `C` with `B ≤ C < A` equals `B`.  This is the maximal-`B`
+step of the Peterfalvi (6.3) minimal-`A` induction (find a maximal proper normal subgroup below the
+minimal coherent `A`). -/
+theorem exists_maximal_normal_between {Γ : Type*} [Group Γ] [Finite Γ] {M A : Subgroup Γ}
+    [M.Normal] (hMA : M < A) :
+    ∃ B : Subgroup Γ, B.Normal ∧ M ≤ B ∧ B < A ∧
+      ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B := by
+  classical
+  haveI : Finite (Subgroup Γ) := Finite.of_injective (fun H : Subgroup Γ => (H : Set Γ))
+    (fun _ _ h => SetLike.coe_injective h)
+  obtain ⟨B, hBmem, hBmax⟩ :=
+    Set.Finite.exists_maximalFor (id : Subgroup Γ → Subgroup Γ)
+      {N | N.Normal ∧ M ≤ N ∧ N < A} (Set.toFinite _) ⟨M, ‹M.Normal›, le_refl M, hMA⟩
+  obtain ⟨hBnorm, hMB, hBA⟩ := hBmem
+  refine ⟨B, hBnorm, hMB, hBA, fun C hCnorm hBC hCA => ?_⟩
+  exact le_antisymm (hBmax ⟨hCnorm, hMB.trans hBC, hCA⟩ hBC) hBC
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/

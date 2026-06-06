@@ -1985,6 +1985,9 @@ set_option linter.style.longLine false in
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.isNilpotent_normal_inf_center_ne_bot
+-- (6.3) maximal-B step: in a finite group, `M < A` (M normal) has a maximal normal `B` with
+-- `M ≤ B < A` (any normal `C` with `B ≤ C < A` is `B`).  The maximal-B of the (6.3) induction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_maximal_normal_between
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
