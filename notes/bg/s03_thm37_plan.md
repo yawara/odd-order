@@ -58,6 +58,24 @@
 
 **注意**: 探索 agent の signature は近似 (要 build 検証)。`Representation.ofModule` の `[Module k[G] M]` 構築が gate#2 の核。
 
+### 🆕 2026-06-06: bridge は大幅に簡素化 (gate#3 irreducibility 不要)
+
+旧ロードマップの「gate#3 = irreducible (最難 ~50-70行)」は **coprime case には不要**。Lemma 3.3
+(`centralizer_ne_bot_of_nontrivial_kernel`) は `V` の既約性を要求せず、任意の `Representation F G V`
+で動く。さらに **`Representation.ofDistribMulAction` は mathlib に存在する** (旧注記「無い」は誤り、
+`RepresentationTheory/Basic.lean:429`)。よって bridge は ~2 instance に縮小:
+- `OddOrder/GroupTheory/RepresentationTheory/ElementaryAbelianRepresentation.lean` (新規, build-green):
+  - `Additive.instDistribMulActionOfMulDistribMulAction`: `MulDistribMulAction G M` (CommGroup M) ⟹
+    `DistribMulAction G (Additive M)` (mathlib は acting-side Additive のみ transport するので acted-on
+    側を補う)。
+  - `instSMulCommClassZModOfDistribMulAction`: 任意の `ZMod n`-module + `DistribMulAction G` で
+    `SMulCommClass G (ZMod n) A` (additive 写像は `ZMod.map_smul` で自動 ZMod-線形)。
+  - これで `Representation.ofDistribMulAction (ZMod p) G (Additive M)` が elem-abelian chief factor で
+    elaborate する (example で検証済)。
+- **残 coprime case** = (a) Lemma 3.3 の対偶 (`C_V(R)=0 ⟹ K acts trivially`, S03b に追加), (b) chief factor
+  X/Y に `MulDistribMulAction G` を `invariantQuotientMulDistribMulAction` 等で載せる, (c) `C_V(R̄)=1`
+  (coprime FPF, `C_K(R)=1` から) を供給して結線。→ その後 |K|-induction。
+
 ### 進捗 (2026-06-01, `S03c_Thm37.lean`)
 - ✅✅ **same-prime case 完成・sorry-free** (commit b0acb75): `commutator_eq_bot_of_normal_pgroup_minimalNormal`
   (正規 q-部分群 K が minimal-normal q-部分群 V を中心化)。`K⊔V` の中心と V の交わり
