@@ -884,6 +884,14 @@ theorem three_le_prime_of_isPGroup_of_odd {K : Type*} [Group K] [Finite K] [Nont
   have := hp.two_le
   omega
 
+/-- A quotient of a finite `p`-group is a `p`-group, so its order is a power of `p`.  In the (6.6)
+setup this gives `|H:Z| = p^k` (`H` a `p`-group), the key to `θχ(1)² ∣ |H:Z|` (both `p`-powers). -/
+theorem exists_primePow_card_quotient_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
+    (hp : p.Prime) (hK : IsPGroup p K) (N : Subgroup K) [N.Normal] :
+    ∃ k : ℕ, Nat.card (K ⧸ N) = p ^ k := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  exact (hK.of_surjective (QuotientGroup.mk' N) (QuotientGroup.mk'_surjective N)).exists_card_eq
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
