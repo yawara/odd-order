@@ -517,6 +517,93 @@ theorem exists_conjugatePairCover {Γ : Type*} [Group Γ]
     rw [hfst j hj, hfst (j + 1) hj1]
     exact he_mono (htmono.monotone (Fin.mk_le_mk.mpr (by omega)))
 
+/-- A predicate true at `0` and false at `N` must flip somewhere: there is an index `i < N` with
+`P i` true and `P (i + 1)` false.  (Discrete first-failure / boundary extraction, by induction on
+`N`.) -/
+theorem exists_index_predicate_break {P : ℕ → Prop} (h0 : P 0) :
+    ∀ N, ¬ P N → ∃ i, i < N ∧ P i ∧ ¬ P (i + 1)
+  | 0, hN => absurd h0 hN
+  | N + 1, hN => by
+    by_cases hPN : P N
+    · exact ⟨N, Nat.lt_succ_self N, hPN, hN⟩
+    · obtain ⟨i, hiN, hPi, hnPi⟩ := exists_index_predicate_break h0 N hPN
+      exact ⟨i, hiN.trans (Nat.lt_succ_self N), hPi, hnPi⟩
+
+open scoped Classical in
+/-- **First obstruction to coherence — the Peterfalvi (6.2) `S₁`/`S₂` decomposition.**
+
+Given conjugation-closed sets `Sa ⊆ Sb` of irreducible characters of `↥L`, with `Sb` finite and
+real-free, if `Sa` is coherent for an integral character map `τ` (on the support set `A`) but `Sb`
+is not, then there is an intermediate conjugation-closed set `S₁` (`Sa ⊆ S₁ ⊆ Sb`) and a character
+`ψ ∈ Sb` such that `S₁` is coherent but adjoining the conjugate pair `{ψ, ψ̄}` destroys coherence:
+`S₁ ∪ {ψ, ψ̄}` is not coherent.
+
+This is the decomposition cited at the start of the (6.2) proof ("By (b), there are sets `S₁` and
+`S₂ = {ψ, ψ̄}` … such that `S₁` is coherent but `S₁ ∪ S₂` is not coherent").  Construction:
+enumerate `Sb ∖ Sa` as conjugate pairs (`exists_conjugatePairCover`), so the running union
+`pairUnion Sa pair i` rises from `Sa` (coherent) to `Sb` (not), and take the first pair whose
+adjunction breaks coherence (`exists_index_predicate_break`). -/
+theorem exists_coherentBreakPair
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card L : ℂ)]
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G) {A : Set ↥L}
+    {Sa Sb : Set (ClassFunction ↥L ℂ)}
+    (hsub : Sa ⊆ Sb) (hSbfin : Sb.Finite)
+    (hSbconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Sb)
+    (hSbreal : OddOrder.Peterfalvi.S03.HasNoRealCharacters Sb)
+    (hSbirr : ∀ χ ∈ Sb, IsIrreducibleCharacter χ)
+    (hSaconj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate Sa)
+    (hSacoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ Sa A))
+    (hSbncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ Sb A)) :
+    ∃ (S₁ : Set (ClassFunction ↥L ℂ)) (ψ : ClassFunction ↥L ℂ),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ ∧ Sa ⊆ S₁ ∧ S₁ ⊆ Sb ∧ ψ ∈ Sb ∧
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A) ∧
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A) := by
+  classical
+  obtain ⟨e, pair, N, hpairχ, hsurj, hpairs, hcoverIdx, hpair0, hpair1, _hdisj, _hmono⟩ :=
+    exists_conjugatePairCover hSbfin hSbconj hSbreal hSbirr hSaconj
+  -- the running union reaches `Sb` after `N` steps
+  have hUN : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair N = Sb :=
+    OddOrder.Peterfalvi.S07.pairUnion_eq_of_enumCover hsurj hsub hpairs hcoverIdx
+  -- the coherence predicate along the chain rises from `Sa` (true) to `Sb` (false)
+  have hP0 : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair 0) A) := by
+    rw [OddOrder.Peterfalvi.S07.pairUnion_zero]; exact hSacoh
+  have hPN : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair N) A) := by
+    rw [hUN]; exact hSbncoh
+  obtain ⟨i, hiN, hPi, hnPi⟩ := exists_index_predicate_break
+    (P := fun i => Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
+      (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i) A)) hP0 N hPN
+  refine ⟨OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i, (pair i).1,
+    ?_, ?_, ?_, ?_, hPi, ?_⟩
+  · -- `S₁` is closed under conjugation (base `Sa` is, each adjoined pair is)
+    intro φ hφ
+    rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
+    · exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl (hSaconj hbase))
+    · have hjN : j < N := hji.trans hiN
+      have hpair_conj : φ.conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j := by
+        simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+          Set.mem_singleton_iff] at hjpair ⊢
+        rcases hjpair with hφ' | hφ'
+        · right; rw [hφ', hpair0 j hjN, hpair1 j hjN]
+        · left; rw [hφ', hpair1 j hjN, hpair0 j hjN]; simp
+      exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hji, hpair_conj⟩)
+  · -- `Sa ⊆ S₁`
+    exact fun φ hφ => OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
+  · -- `S₁ ⊆ Sb`
+    rw [← hUN]; exact OddOrder.Peterfalvi.S07.pairUnion_mono Sa pair hiN.le
+  · -- `ψ ∈ Sb`
+    refine hpairs i hiN ?_
+    simp [OddOrder.Peterfalvi.S07.pairSet]
+  · -- `S₁ ∪ {ψ, ψ̄}` is not coherent (it is the next accumulator, where coherence fails)
+    have hconj2 : (pair i).2 = ((pair i).1).conj := by
+      rw [hpair1 i hiN, hpair0 i hiN]
+    have hsplit : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair (i + 1) =
+        OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i ∪ {(pair i).1, ((pair i).1).conj} :=
+      OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair rfl hconj2
+    rw [← hsplit]; exact hnPi
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
@@ -3958,6 +4045,48 @@ theorem isIrreducibleCharacter_of_mem_Xset_of_frobenius (hyp : SibleyDadeHypothe
     {Z : Subgroup ↥L} {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Xset Z) :
     IsIrreducibleCharacter φ :=
   hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hyp.mem_Xset.mp hφ).1
+
+/-- **`S` contains no real characters** (Frobenius case).
+
+Each member of `S` is an irreducible induced character `Ind_H^L θ` (`θ ≠ 1_H`,
+`isIrreducibleCharacter_of_mem_S_of_frobenius`) of degree `|L:H|·θ(1) = |W₁|·θ(1) ≥ |W₁| > 1`, so
+it is not the trivial irreducible character; odd order of `L` then gives non-realness by Peterfalvi
+(1.1) (`not_isReal_of_ne_trivial_of_odd_card'`).  This `HasNoRealCharacters` fact and its
+`SsubFiltration` corollary supply the no-real input to the conjugate-pair enumeration of any
+`S(A) ⊆ S` consumed on the way to the (6.2)/(6.3) degree bound. -/
+theorem S_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.S := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  intro φ hφ hreal
+  have hirr : IsIrreducibleCharacter φ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hφ
+  let η : IrreducibleCharacter ↥L := ⟨φ, hirr⟩
+  have hη_ne : η ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥L := by
+    intro hη
+    have hφ_one_triv : φ (1 : ↥L) = 1 := by
+      have h := congrArg (fun ψ : IrreducibleCharacter ↥L =>
+        (ψ : ClassFunction ↥L ℂ) (1 : ↥L)) hη
+      simpa [η, trivialClassFunction_apply] using h
+    rw [hyp.S_eq] at hφ
+    obtain ⟨θ, -, hφeq⟩ := hφ
+    obtain ⟨d, -, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hφ_one : φ (1 : ↥L) = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+      rw [hφeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hd,
+        hyp.index_H_eq_card_W1]
+    refine absurd (hφ_one.symm.trans hφ_one_triv) ?_
+    rw [← Nat.cast_mul]
+    intro hcast
+    have hnat : Nat.card hyp.W1 * d = 1 := by exact_mod_cast hcast
+    exact hyp.W1_nontrivial (Subgroup.card_eq_one.mp (Nat.dvd_one.mp ⟨d, hnat.symm⟩))
+  exact (OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+    hyp.card_L_odd hη_ne) hreal
+
+/-- **`S(A)` contains no real characters** (Frobenius case), as `S(A) ⊆ S`. -/
+theorem SsubFiltration_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) (A : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.SsubFiltration A) :=
+  (hyp.S_hasNoRealCharacters hF).mono hyp.SsubFiltration_subset_S
 
 /-- **(6.8.1), Frobenius case:** source-side orthogonality for the final
 `X = S - S(H')`, `Y = S(H')` partition. -/

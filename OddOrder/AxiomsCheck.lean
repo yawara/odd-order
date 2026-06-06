@@ -1902,6 +1902,16 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.characterKernel_subset_of_inner_induce_ne_zero
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_eq_irreducible_not_subset_characterKernel
+-- Peterfalvi S08 (6.2) `S₁`/`S₂` first-obstruction decomposition + its `S` no-real input.
+-- `exists_coherentBreakPair`: for `Sa ⊆ Sb` (conj-closed irreducible, `Sb` finite real-free) with
+-- `Sa` coherent and `Sb` not, the conjugate-pair cover `exists_conjugatePairCover` + the discrete
+-- first-failure extraction `exists_index_predicate_break` produce the intermediate coherent `S₁`
+-- and the breaking pair `{ψ, ψ̄}` cited at the start of the (6.2) proof.  `S_hasNoRealCharacters`
+-- (Frobenius case) supplies the real-free input for any `S(A) ⊆ S`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.S_hasNoRealCharacters
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_hasNoRealCharacters
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
