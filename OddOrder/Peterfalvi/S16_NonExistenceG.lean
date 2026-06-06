@@ -4706,6 +4706,38 @@ theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
         (s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc)) from by group,
     hW, mul_one, inv_mul_cancel]
 
+/-- **BG Appendix C, Lemma C.3 Step 4 conclusion** (mmd L5078–5082): the `(5076)`
+relation `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃` (`tᵢ = yc⁻¹ sᵢ yc`) forces `t₁ = t⁻¹`, hence
+`s₁ = s⁻¹`.  Otherwise `g = t₁⁻¹ t⁻¹ ∈ P₁^#`, and for `u ∈ U^#` the common value
+`u^{s₁ t₁⁻¹ t⁻¹} = u^{t⁻¹ t₃⁻¹ s₃}` lies in `(PU) ∩ (PU)^g`, which is `U` by Step 3;
+then `u^{s₁} ∈ U^{t t₁} = U`, so Step 2 gives `s₁ = 1`, contradicting `(C.6)`. -/
+theorem step4_sigma_primeLine_eq_s_inv [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {c1 c3 : ZMod hyp.base.p}
+    (hc1 : c1 ≠ 0) (hc3 : c3 ≠ 0) (yc : G) (hty : data.t = yc⁻¹ * data.s * yc)
+    (hrel : data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+        (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c1))⁻¹ * yc) * data.t⁻¹ =
+      data.t⁻¹ * (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c3))⁻¹ * yc) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c3)) :
+    data.sigma (fieldNormalizerPrimeLineElement hyp c1) = data.s⁻¹ := by
+  sorry
+
+/-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**: the central prime-line
+factor of the `k = 3` first normal form is `s⁻¹`.  This is the last gap of BG
+Appendix C; combined with the existing finite-field core it discharges
+`appC_normSet_generator_relation` without the carrier field. -/
+theorem step4Capstone [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) : data.Step4Capstone := by
+  intro a ha
+  obtain ⟨b, hab, hb⟩ := data.exists_companion_of_unitVal_inv_mem_normSetE ha
+  obtain ⟨forms⟩ := data.exists_step4C5NormalForms a b
+  have hC10 := (data.relationC9_w_eq_one_and_relationC10 ha hb hab forms).2.2.2
+  obtain ⟨yc, hty, h5076⟩ := data.step4_relation_5076 hC10
+  have hs1 : data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) = data.s⁻¹ :=
+    data.step4_sigma_primeLine_eq_s_inv forms.c1_ne_zero forms.c3_ne_zero yc hty h5076
+  refine ⟨forms.u1, forms.v1, ?_⟩
+  rw [← data.step4M1_eq_sigma_inr, forms.hM1, hs1,
+    ← data.sScalar_neg_one_eq_sigma_primeLineElement, ← data.s_inv_eq_sScalar_neg_one]
+
 end Step4
 
 end FieldNormalizerData
