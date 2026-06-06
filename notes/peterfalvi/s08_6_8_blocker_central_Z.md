@@ -233,23 +233,57 @@ green, 1 sorry @ capstone S08:7919). New facts beyond the progress log above:
    `hcoh.some`; ¬coherent → `exfalso`; `rcases hyp.cases`; Frobenius → L2+L3+L4
    (`false_of_coherentXunionYset_of_not_coherentS`, with `hHnonab` from X-nonempty); CertainType →
    case-(B) analogue (needs its own central-Z facts + (6.8.2) + a case-(B) L4).
+6. **🛑 SECOND BLOCKER — the StepData producer contract is undischargeable as-is (the real reason
+   #3's StepData was never built).** The per-step fields `htail_le`/`hsum`/`htotal` flow into
+   `S07.sq_dvd_head_of_commonIndex_primePower_sums` (called @ S08:7402) to prove `dχ² ∣ D`
+   (`D = ∑members²`). To supply them honestly the producer must take `tailSet = Xset Z ∖ members`
+   with `total =` the full X degree-square sum `= |H:Z|·(|L:H|·(|Z|−1)) = qtot·c` (`qtot = |H:Z|`),
+   and `htail_le` = "every non-member has degree ≥ dχ". **Both require Xset-cover completeness**
+   (`∀ φ ∈ Xset Z, φ ∈ xBaseBlock Z ∨ ∃ j<N, φ ∈ pairSet pair j`). The chain engine
+   `Xset_isCoherent_from_adjoinSteps_of_irreducible_X` (S08:6651) HAS this (`hcover` @ 6693, from
+   `exists_conjugatePairCover`) but passes **only the 5 hypotheses** (hpair0/1, hpairs, hdisj, hmono)
+   to its `hstep` callback (6703) — completeness is NOT exposed to the StepData producer. Verified no
+   cooked-`tailSet` escape: setting `qtot = θχ²` (or padding with `dχ²` copies) makes `htotal` reduce
+   to `θχ² ∣ D`, the very conclusion — circular. An incomplete-but-5-hyp-valid `pair` (covering half
+   of `Xset Z`, sorted/disjoint) is a genuine counterexample to the producer goal.
+   **Fix = thread `hcover` through the callback contract**: add it to `adjoinSteps`' `hstep` type +
+   pass it (6703); thread into the base-anchor consumer's `hstepData`
+   (`…BaseAnchorCommonIndexPrimePowerData_of_irreducible_X` @ S08:7697) and its callers (the ⁅H,H⁆
+   wrapper @ 7850, the Zc shell `a9054c4`, the capstone glue `coherentS_of_frobenius_…BaseAnchor…`
+   @ ~7951/7966, and **S09:1648** `indChainDecomposition_of_sibley_…`). The common-index consumer
+   (@ 7660) + its wrapper can accept-and-ignore the new `hcover` (their path isn't being built).
+   ~7 defs across S08+S09, mechanical (everyone threads one extra hypothesis; only the eventual
+   monolith *uses* it). **Alternative**: a new completeness-aware consumer that re-runs
+   `exists_conjugatePairCover` internally and absorbs the monolith, leaving existing signatures
+   untouched (no S09 churn, but ~50 lines of engine duplication). Do the threading fix **before** the
+   monolith; it is the true L2 unblock.
 
 ### L2 field map (for the eventual monolith — `xAdjoinStepInput_of_pairUnion_baseAnchor_…` @ S08:7464)
+**⚠️ Requires the finding-#6 completeness fix first** (`htail_le`/`hsum` below are unprovable until
+`hcover` is threaded to the producer).
 - enum (`κ,tailSet,k,χmem,hχinj,hrange,i₁`): `exists_pairUnion_memberFamily_of_irreducible_X`
   (S08:6353, gives `k/χmem/hχinj/hrange`) + base-block min-degree anchor `i₁`.
 - numerics: `p`(`3≤p`),`idx=H.index`(`hidx_p` coprime),`qtot=|H:Z|=p^mq`,`c=|L:H|·(|Z|−1)`,
   `total=|H:Z|·c`(`index_mul_card_sub_factor` @5560); `dχ/θχ/mχ`,`d₁/θ₁/m₁`,`dmem/θmem/mmem` via
   `exists_source_primePow_centralBound_of_mem_Xset` (5627, gives `hθsq_le_qtot`) /
-  `exists_memberDegreeData` (5611). `htail_le` from `natDegree_le_of_xBaseBlock_anchor` (~4998).
-- **crux `hsum`**: `tailSet := Xfin ∖ members`, `θtail` = source p-degree (choose via linchpin over
-  `Xfin`); `∑members² + ∑tail² = total` is `Finset.sum_sdiff` + per-char deg identification, with the
-  ℝ-value pinned by `sum_re_sq_Xset_eq` (5511) cast to ℕ. ~80 lines of casts/plumbing.
+  `exists_memberDegreeData` (5611).
+- **crux `hsum`/`htail_le`/`htotal`** (needs finding-#6 `hcover`): `tailSet := Xfin ∖ members`,
+  `θtail` = source p-degree (choose via linchpin over `Xfin`); `∑members² + ∑tail² = total` is
+  `Finset.sum_sdiff` + per-char deg identification, ℝ-value pinned by `sum_re_sq_Xset_eq` (5511)
+  cast to ℕ, with `htotal` from `index_mul_card_sub_factor`. `htail_le` (non-members have degree
+  ≥ `dχ`) is the part that genuinely consumes `hcover` + `hmono`. ~80 lines of casts/plumbing
+  **on top of** the threading fix.
 
 ## Recommendation
 
 Multi-session redesign of the §8 capstone assembly (Frobenius L2/L3 **and** the unplanned
 CertainType case (B)), not an autonomous "fill the sorry" loop. The earlier
 `autonomous_assembly_queue.md` recipe (build the `Z=⁅H,H⁆` producer) is **invalid**. With (6.7)
-confirmed present, no prerequisite *theorem* is missing — it is all assembly. The next real Lean work
-is the central-`Zc` redesign above (start: `hXne` sub-lemma, then the L2 `hstepData` monolith), best
-done attended in focused sessions.
+confirmed present, no prerequisite *theorem* is missing — it is all assembly.
+
+**Precise next-step ordering for L2** (2026-06-07): ✅ `hXne` (`264966a`) + ✅ Zc shell (`a9054c4`)
+done. **(1) finding-#6 contract fix** — thread `hcover` (Xset-completeness) through `adjoinSteps` →
+base-anchor consumer → wrappers/glue → S09 (~7 defs, mechanical, build-green checkpoint). **(2) the
+L2 `hstepData` monolith** using the now-available `hcover` (the field map above). Then L3, then
+CertainType case (B), then capstone wiring. The contract fix is a clean committable unit that should
+land first; the monolith is unbuildable until it does. Best done attended in focused sessions.
