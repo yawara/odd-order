@@ -267,4 +267,54 @@ theorem isPGroup_inf_map_oPiPrimePiCore [Fact p.Prime] {G : Type*} [Group G] [Fi
   exact isPGroup_map_oPiPrimePiCore.of_injective
     (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
 
+/-- **Crux of Lemma 1.21(a)**: `O_{p',p}(G) ∩ H ≤ O_{p',p}(↥H)` (as a subgroup of `↥H`).
+Both the `G/O_{p'}(G)`-image and the `↥H/O_{p'}(↥H)`-image of `A := O_{p',p}(G) ⊓ H` are
+quotients of `↥A`; the former is a `p`-group and has the smaller kernel
+(`O_{p'}(G)∩H ≤ O_{p'}(↥H)`), so the latter — which is `K.map mk'` — has order dividing it,
+hence is a `p`-group; `le_oPiPrimePiCore_of_quotient_isPGroup` finishes. -/
+theorem oPiPrimePiCore_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} :
+    (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H
+      ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥H := by
+  classical
+  haveI hKnorm : ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).Normal :=
+    Subgroup.Normal.comap inferInstance H.subtype
+  apply le_oPiPrimePiCore_of_quotient_isPGroup
+  set A : Subgroup G := Ch03.oPiPrimePiCore ({p} : Set ℕ) G ⊓ H with hAdef
+  have hAH : A ≤ H := inf_le_right
+  set gA : ↥A →* G ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G :=
+    (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)).comp A.subtype with hgA
+  set fA : ↥A →* ↥H ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H :=
+    (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H)).comp (Subgroup.inclusion hAH) with hfA
+  -- `range gA = A.map mk'` is a `p`-group.
+  have hgA_range : gA.range = A.map (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)) := by
+    rw [hgA, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hgA_pg : IsPGroup p ↥gA.range := by rw [hgA_range]; exact isPGroup_inf_map_oPiPrimePiCore
+  -- `range fA = K.map mk'` (the goal's subject).
+  have hfA_range : fA.range
+      = ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).map
+          (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H)) := by
+    rw [hfA, MonoidHom.range_comp, Subgroup.inclusion_range, hAdef,
+      Subgroup.inf_subgroupOf_right]
+  -- `ker gA ≤ ker fA`.
+  have hker_le : gA.ker ≤ fA.ker := by
+    intro a ha
+    rw [hgA, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff] at ha
+    rw [hfA, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff]
+    apply oPiCore_compl_subgroupOf_le
+    rw [Subgroup.mem_subgroupOf, Subgroup.coe_inclusion]
+    exact ha
+  -- `|range fA| ∣ |range gA|` (= p-power), so `range fA` is a `p`-group.
+  rw [← hfA_range]
+  have hcard_dvd : Nat.card ↥fA.range ∣ Nat.card ↥gA.range := by
+    rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange fA).toEquiv,
+      ← Nat.card_congr (QuotientGroup.quotientKerEquivRange gA).toEquiv]
+    exact Subgroup.index_dvd_of_le hker_le
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hgA_pg
+  rw [hn] at hcard_dvd
+  obtain ⟨m, _, hm⟩ := (Nat.dvd_prime_pow Fact.out).mp hcard_dvd
+  exact IsPGroup.of_card hm
+
 end OddOrder.BG.Ch1
