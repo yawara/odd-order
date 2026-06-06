@@ -200,4 +200,18 @@ theorem centralizer_ne_bot_of_nontrivial_kernel [Finite G] {K R : Subgroup G}
   obtain ⟨k, hk⟩ := hKnt
   exact hk (hKtriv k)
 
+/-- **Contrapositive of BG Lemma 3.3**, the form used in the coprime chief-factor case of
+Theorem 3.7: if `G = KR` is a Frobenius group and the complement `R` has no nonzero fixed vector
+on a representation `V` over a field `F` with `char F ∤ |K|` (i.e. `C_V(R) = 0`), then the kernel
+`K` acts trivially on `V`. -/
+theorem kernel_acts_trivially_of_centralizer_eq_bot [Finite G] {K R : Subgroup G}
+    (hFrob : IsFrobeniusGroup G K R) (ρ : Representation F G V)
+    (hchar : (Nat.card K : F) ≠ 0)
+    (hCR : ∀ v : V, (∀ r : R, ρ (r : G) v = v) → v = 0) :
+    ∀ k : K, ρ (k : G) = 1 := by
+  by_contra h
+  push_neg at h
+  obtain ⟨v, hv0, hvfix⟩ := centralizer_ne_bot_of_nontrivial_kernel hFrob ρ hchar h
+  exact hv0 (hCR v hvfix)
+
 end OddOrder.BG.Ch1.S03b
