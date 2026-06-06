@@ -353,14 +353,86 @@ theorem m_value_gt_four_fifths {q p : ℕ} (hq : 7 ≤ q) (hp : 3 ≤ p) :
     rw [div_le_div_iff₀ (by positivity) (by norm_num)]; nlinarith [hq7]
   linarith [haux, h1, h2]
 
+/-- **Peterfalvi (13.11)** numeric core of the `q = 3` branch: once the
+Section 16 hypothesis gives `p ≥ 5`, the concrete value of `m` is already
+strictly larger than `49/100`. -/
+theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
+    (49 : ℚ) / 100 <
+      1 - 1 / ((3 : ℚ) - 1) - ((3 : ℚ) - 1) / (3 : ℚ) ^ p +
+        1 / (((3 : ℚ) - 1) * (3 : ℚ) ^ p) := by
+  have h4 : 4 ≤ p - 1 := by omega
+  have hpow4 : (3 : ℚ) ^ 4 ≤ (3 : ℚ) ^ (p - 1) :=
+    pow_le_pow_right₀ (by norm_num : (0 : ℚ) ≤ 3) h4
+  norm_num at hpow4
+  have hden_gt : (100 : ℚ) < 2 * (3 : ℚ) ^ (p - 1) := by nlinarith
+  have hden_pos : (0 : ℚ) < 2 * (3 : ℚ) ^ (p - 1) := by nlinarith
+  have hsmall : 1 / (2 * (3 : ℚ) ^ (p - 1)) < (1 : ℚ) / 100 := by
+    rw [div_lt_div_iff₀ hden_pos (by norm_num : (0 : ℚ) < 100)]
+    nlinarith
+  have hpow : (3 : ℚ) ^ p = 3 * (3 : ℚ) ^ (p - 1) := by
+    have hp_eq : p = (p - 1) + 1 := by omega
+    rw [hp_eq, pow_succ]
+    rw [show p - 1 + 1 - 1 = p - 1 by omega]
+    ring
+  have hexpr :
+      1 - 1 / ((3 : ℚ) - 1) - ((3 : ℚ) - 1) / (3 : ℚ) ^ p +
+          1 / (((3 : ℚ) - 1) * (3 : ℚ) ^ p)
+        = (1 : ℚ) / 2 - 1 / (2 * (3 : ℚ) ^ (p - 1)) := by
+    rw [hpow]
+    field_simp [hden_pos.ne']
+    ring
+  rw [hexpr]
+  linarith [hsmall]
+
+namespace Hypothesis
+
+/-- **Peterfalvi (13.11.a)** at the Section 15 hypothesis level: if `q ≥ 7`,
+then the concrete analytic parameter satisfies `m > 8/10`. -/
+theorem m_gt_four_fifths_of_seven_le_q (hyp : Hypothesis (G := G))
+    (hq7 : 7 ≤ hyp.q) :
+    hyp.m > (8 / 10 : ℚ) := by
+  rw [hyp.m_eq]
+  exact m_value_gt_four_fifths hq7 hyp.three_le_p
+
+/-- **Peterfalvi (13.11.b)** at the Section 15 hypothesis level: if `q ≥ 5`,
+then the concrete analytic parameter satisfies `m > 7/10`. -/
+theorem m_gt_seven_tenths_of_five_le_q (hyp : Hypothesis (G := G))
+    (hq5 : 5 ≤ hyp.q) :
+    hyp.m > (7 / 10 : ℚ) := by
+  rw [hyp.m_eq]
+  exact m_value_gt_seven_tenths hq5 hyp.three_le_p
+
+/-- **Peterfalvi (13.11)** at the Section 15 hypothesis level: in the `q = 3`
+branch, the `m > 49/100` part follows once an external argument supplies
+`p ≥ 5`.  Section 16 supplies this from `q < p`. -/
+theorem m_gt_49_hundredths_of_q_eq_three_of_five_le_p
+    (hyp : Hypothesis (G := G)) (hq3 : hyp.q = 3) (hp5 : 5 ≤ hyp.p) :
+    hyp.m > (49 / 100 : ℚ) := by
+  rw [hyp.m_eq, hq3]
+  exact m_value_q_three_gt_49_hundredths hp5
+
+/-- The `m`-only part of **Peterfalvi (13.11)**.  The full `numeric_bounds`
+theorem below also packages the `u/c` inequality in the `q = 3` branch, so it
+still waits for the analytic estimate (13.10). -/
+theorem numeric_m_bounds (hyp : Hypothesis (G := G)) :
+    (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
+      (5 ≤ hyp.q → hyp.m > (7 / 10 : ℚ)) ∧
+      (hyp.q = 3 → 5 ≤ hyp.p → hyp.m > (49 / 100 : ℚ)) := by
+  exact ⟨hyp.m_gt_four_fifths_of_seven_le_q,
+    hyp.m_gt_seven_tenths_of_five_le_q,
+    fun hq3 hp5 => hyp.m_gt_49_hundredths_of_q_eq_three_of_five_le_p hq3 hp5⟩
+
+end Hypothesis
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
 `m_value_gt_four_fifths` / `m_value_gt_seven_tenths` applied through the now
 concrete value `m_eq` (they need only `p ≥ 3`, supplied by `three_le_p`).  The
-`q = 3` case is still open: its `m`-bound needs `p ≥ 5` (the `q = 3, p = 3`
-boundary fails `m > 49/100`), and its `u/c` bound is the analytic inequality
-(13.10). -/
+`q = 3` value bound is available as `m_value_q_three_gt_49_hundredths` under
+`p ≥ 5`, which Section 16 supplies from `q < p`; this bundled Section 15
+statement still keeps the branch open because its `u/c` bound is the analytic
+inequality (13.10). -/
 theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (7 ≤ hyp.q → hyp.m > (8 / 10 : ℚ)) ∧
@@ -368,11 +440,10 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hyp.q = 3 →
         hyp.m > (49 / 100 : ℚ) ∧
           (hyp.u : ℚ) / (hyp.c : ℚ) > (((hyp.p ^ 2 - 1 : ℕ) : ℚ) / 6)) := by
-  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
-  refine ⟨fun hq7 => ?_, fun hq5 => ?_, fun hq3 => ?_⟩
-  · rw [hyp.m_eq]; exact m_value_gt_four_fifths hq7 hp3
-  · rw [hyp.m_eq]; exact m_value_gt_seven_tenths hq5 hp3
-  · -- `q = 3`: `m`-bound needs `p ≥ 5`; `u/c` bound needs analytic ineq (13.10).
+  refine ⟨hyp.m_gt_four_fifths_of_seven_le_q,
+    hyp.m_gt_seven_tenths_of_five_le_q, fun hq3 => ?_⟩
+  · -- `q = 3`: the `m`-only API needs `p ≥ 5`, and the bundled `u/c` bound
+    -- still needs the analytic inequality (13.10).
     sorry
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
@@ -628,6 +699,12 @@ theorem beta_support_norm_and_remainder [Finite G]
         data.Gamma_orthogonal_one ∧ data.Gamma_real ∧ data.Y_norm_bound := by
   sorry
 
+/-- The parity conclusion in Peterfalvi (13.19.c2): the character inner
+product is an odd integer, recorded inside `ℂ`. -/
+def OddIntegerInner (χ ψ : ClassFunction G ℂ) : Prop :=
+  ∃ n : ℤ, Odd n ∧
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)], ClassFunction.inner χ ψ = (n : ℂ)
+
 /-- Carrier for the type-I comparison in Peterfalvi (13.19). -/
 structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) where
   typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L
@@ -645,15 +722,78 @@ structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) wh
   betaL_eta_independent : Prop
   caseC1 : Prop
   caseC2 : Prop
+  caseC2_eta0j_odd :
+    caseC2 →
+      ∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
+  caseC1_bound :
+    caseC1 →
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
+  caseC1_dual : Prop
+  caseC2_dual : Prop
+  caseC2_dual_etai0_odd :
+    caseC2_dual →
+      ∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
+  caseC1_dual_bound :
+    caseC1_dual →
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
+
+namespace TypeIOrthogonalityData
+
+/-- **Peterfalvi (13.19.c)**, consumer form: any strict gap beyond the
+case-(c1) bound forces the parity alternative (c2). -/
+theorem caseC2_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L)
+    (hcases : data.caseC1 ∨ data.caseC2)
+    (hgap :
+      ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ) <
+        ((Nat.card ↥data.typeISetup.H - 1 : ℕ) : ℚ) / (data.e : ℚ)) :
+    data.caseC2 := by
+  rcases hcases with hcaseC1 | hcaseC2
+  · exact False.elim ((not_lt_of_ge (data.caseC1_bound hcaseC1)) hgap)
+  · exact hcaseC2
+
+/-- **Peterfalvi (13.19.c)** after swapping `S` and `T`: any strict gap beyond
+`(v - 1) / p` excludes the dual case-(c1) bound and forces the dual parity
+alternative (c2), the source of the `eta_i0` congruences. -/
+theorem caseC2_dual_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L)
+    (hcases : data.caseC1_dual ∨ data.caseC2_dual)
+    (hgap :
+      ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ) <
+        ((Nat.card ↥data.typeISetup.H - 1 : ℕ) : ℚ) / (data.e : ℚ)) :
+    data.caseC2_dual := by
+  rcases hcases with hcaseC1 | hcaseC2
+  · exact False.elim ((not_lt_of_ge (data.caseC1_dual_bound hcaseC1)) hgap)
+  · exact hcaseC2
+
+/-- **Peterfalvi (13.19.c2)**: once both S- and T-side parity alternatives
+hold, the two zero-axis families of `eta` have odd integer inner product with
+`beta_L`. -/
+theorem eta_axes_odd_of_caseC2_pair {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L) (hcases : data.caseC2 ∧ data.caseC2_dual) :
+    (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner data.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧
+      (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner data.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) := by
+  exact ⟨data.caseC2_eta0j_odd hcases.1, data.caseC2_dual_etai0_odd hcases.2⟩
+
+end TypeIOrthogonalityData
 
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has Dade images
-orthogonal to the `eta_ij`, and one of the two final parity cases holds. -/
+orthogonal to the `eta_ij`; on each zero axis, one of the two final parity
+cases holds. -/
 theorem typeI_orthogonality_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L) :
     ∃ data : TypeIOrthogonalityData hyp L,
       data.disjoint_support ∧ data.Ltau_orthogonal_eta ∧
-        data.betaL_eta_independent ∧ (data.caseC1 ∨ data.caseC2) := by
+        data.betaL_eta_independent ∧
+          (data.caseC1 ∨ data.caseC2) ∧
+            (data.caseC1_dual ∨ data.caseC2_dual) := by
   sorry
 
 end OddOrder.Peterfalvi.S15

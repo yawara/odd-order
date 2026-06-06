@@ -3793,6 +3793,12 @@ noncomputable def coherentYset (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
   hyp.coherentYset_of_two_le_ncard hyp.two_le_Yset_ncard
 
+/-- Convert the `X(Z) ≠ ∅` branch condition used in the (6.8) capstone into
+the `Set.Nonempty` input consumed by the X-chain coherence constructors. -/
+theorem Xset_nonempty_of_ne_empty (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    (hX : hyp.Xset Z ≠ ∅) : (hyp.Xset Z).Nonempty :=
+  Set.nonempty_iff_ne_empty.mpr hX
+
 /-- **(6.8) coherence, `X`-empty case** (`H` abelian / no non-linear constituents).  When
 `X = S − S([H,H])` is empty, the partition `S = X ∪ Y` (`Xset_union_Yset_eq_S`) collapses to
 `S = Y = S([H,H])`, so the full target `IsCoherent τ S H^#` is exactly the already-built
