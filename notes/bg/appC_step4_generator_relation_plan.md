@@ -78,6 +78,83 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
   `Q_mul_comm`) + **`relationC4`** = `s⁻³t²M₁t⁻¹M₂t⁻¹M₃s³=1` (M_i backward 共役形)。証明 = group で
   `conn1·C2·conn2·C4·conn3·C6` 再結合 → connector rw → group telescope → relationC2。**backward 切替で
   BG telescoping がそのまま通った (forward 障害完全解消)**。build-green。
+- **🆕 (2026-06-06) C.5 mod-P right-component bridge done**: `right_component_of_step4_sigma_inr_decomposition`
+  (neutral `s^m·σ(inr w)·s^r = σ(inr u₁)·σ(P₀ c)·σ(inr v₁) ⟹ w=u₁v₁`) と
+  `right_component_of_step4_first_k_three_inv_decomposition` (backward `k=3` M₁ の `((tConjAut^3)⁻¹ a⁻¹)=u₁v₁`) を追加。
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) FT-critical C.5 normal-form bundle done**: neutral decomposition
+  `exists_step4_sigma_inr_decomposition`, named BG factors `step4M1/2/3`, `relationC4_step4M`,
+  and `Step4C5NormalForms`/`exists_step4C5NormalForms` landed.  This packages the three C.5
+  normal forms plus their mod-`P` right-component readings for the already-proved backward C.4.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) C.4+C.5 substitution / C.7 seed done**:
+  `Step4C5NormalForms.factor1/2/3`, `relationC4_step4C5NormalForms`, and `relationC7_seed`
+  landed.  This proves the post-substitution relation
+  `t²·(u₁s₁v₁)·t⁻¹·(u₂s₂v₂)·t⁻¹·(u₃s₃v₃)=1`.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) exact C.7 done**:
+  BG words `Step4C5NormalForms.w1/2/3`, ambient rewrites `sigma_inr_w1/2/3`,
+  U-membership `sigma_inr_w_mem_U`, and exact rearrangement `relationC7` landed.
+  This proves `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹` in the transported `G` notation.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green。
+- **🆕 (2026-06-06) C.8 Frobenius pair entry done**:
+  `unitVal_inv_frobenius_pair` landed, transporting BG AppC `normSetE_frobenius_pair`
+  to S16 Step 4 variables: `unitVal a⁻¹, unitVal b⁻¹ ∈ E` and `unitVal a⁻¹+unitVal b⁻¹=2`
+  imply the same facts for `(a^p)⁻¹`, `(b^p)⁻¹`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG`
+  green.  This is the field-entry used by the later powered `(C.5)`/`(C.7)` comparison.
+- **🆕 (2026-06-06) condition A / C.10 bridge done**:
+  `normOneUnit_eq_one_of_pow_sub_one_eq_one` and
+  `Step4C5NormalForms.w_eq_one_of_pow_sub_one_eq_one` transport BG condition `(A)` to the
+  three C.7 words, and `relationC10_of_w_eq_one` collapses exact `(C.7)` to
+  `t²s₁t⁻¹s₂t⁻¹s₃=1` once `w₁=w₂=w₃=1`.  `lake build
+  OddOrder.Peterfalvi.S16_NonExistenceG` green.  This is the recipient for turning later
+  `(C.9)` memberships plus Step3/condition `(A)` into exact `(C.10)`.
+- **🆕 (2026-06-06) C.8 concrete Frobenius map done**:
+  `fieldNormalizerAdditiveFrobeniusHom`, `fieldNormalizerNormOneFrobeniusHom`, and
+  `fieldNormalizerFrobeniusHom` landed for the concrete semidirect product `P ⋊ U`, with
+  `fieldNormalizerFrobeniusHom_inl`, `fieldNormalizerFrobeniusHom_inr`, and
+  `fieldNormalizerFrobeniusHom_primeLineElement`.  This is the reusable engine for applying
+  Frobenius to a `(C.5)` normal-form equation and keeping the prime-line factor `sᵢ` fixed.
+  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.
+- **🆕 (2026-06-06) C.8 powered `(C.5)` transport done**:
+  `fieldNormalizerFrobeniusHom_primeLineGenerator(_zpow)`,
+  `frobenius_step4_sigma_inr_decomposition`,
+  `Step4C5NormalForms.hM1_frobenius/hM2_frobenius/hM3_frobenius`, and
+  `Step4C5NormalForms.frobenius` landed.  A whole `(C.5)` package for `(a,b)` now gives
+  the powered package for `(a^p,b^p)` with the same `cᵢ` and `uᵢ,vᵢ` replaced by
+  `uᵢ^p,vᵢ^p`.  `lake build OddOrder.Peterfalvi.S16_NonExistenceG` green.
+- **🆕 (2026-06-06) C.9 word/collapse done**:
+  `relationC9_w3_mem_P_sup_U_and_conj` compares original `(C.7)` with Frobenius-powered
+  `(C.7)` and proves `S₁ W₃^(p-1) S₁⁻¹ ∈ PU` and its `t²`-conjugate lie in `PU`.
+  `relationC9_w3_word` also records the exact displayed `(C.9)` word equation, and
+  `relationC9_w1_w2_pow_sub_one_eq_one_of_w3_eq_one` proves that once Step3 has killed
+  `w₃` (with the `(C.6)` input `c₃≠0`), the same equation forces
+  `w₁^(p-1)=w₂^(p-1)=1`.
+- **🆕 (2026-06-06) Step3-recipient C.10 collapse done**:
+  `relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` landed.  Given the Step3 output
+  `S₁ W₃^(p-1) S₁⁻¹ ∈ U` and the `(C.6)` inputs `c₁,c₃≠0`, it proves
+  `w₁=w₂=w₃=1` and exact `(C.10)`.
+- **🆕 (2026-06-06) Step3 U-branch/dichotomy connected**:
+  `relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U` turns the concrete `(C.9)`
+  memberships into the displayed `U`-membership when Step3 identifies the Lean-convention
+  intersection `PU ∩ (PU)^{t^{-2}}` with `U`.  `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U`
+  then applies the Step3 dichotomy itself: either `(C.10)` is forced, or the remaining
+  branch is `PU ∩ (PU)^{t^{-2}} = PU` (plus global `(C.6)` nonzero wiring).
+- **🆕 (2026-06-06) Step3 bad branch eliminated**:
+  `step3_badBranch_t_sq_conj_mem_P_sup_U` extracts the one-sided conjugation inclusion from
+  the bad branch, `step3_badBranch_t_sq_normalizes_P_sup_U` upgrades it to `t² ∈ N_G(PU)`
+  using `t^p=1`, and `normalizer_P_sup_U_le_normalizer_P` supplies BG's `P char PU` step,
+  giving `step3_badBranch_t_sq_normalizes_P : t² ∈ N_G(P)`.  The chunk then uses
+  `W2_eq_zpowers_s`, `P1_eq_zpowers_t`, and odd `p` to show that `t²` generates the same
+  cyclic subgroup as `t`, hence `step3_badBranch_P1_le_normalizer_P : P₁ ≤ N_G(P)`.
+  The product/intersection half is now also landed: `P1_le_W2_sup_Q`,
+  `W2_sup_Q_le_normalizer_Q`, `P_inf_W2_sup_Q_eq_W2`, and
+  `P1_le_normalizer_W2_of_le_normalizer_P` put the branch inside `W₂⊔Q` and force
+  `P₁ ≤ N_G(W₂)`.  Finally `P1_eq_W2_of_le_normalizer_W2 [Finite G]` gives
+  `P₁=W₂` by the p-subgroup/cardinality argument in `W₂⊔Q`; combined with `P1_ne_W2`,
+  `step3_badBranch_false [Finite G]` closes the non-`U` branch.  Thus Step3 no longer
+  leaves a `QW₂`/Sylow contradiction as frontier; the remaining Step4 producer is global
+  `(C.6)` nonzero wiring into the existing C.10 consumer, followed by the kernel/End path.
 - 経路B 配線 (元 commit e1b1991, 現在は backward に restate 済): 上記 + `Step4Capstone` (def)。
 - 先行 landed (前セッション): (X)/(XI) infra (`w2ConjQAut`/FPF/`exists_yD_..` 等) + `sigma_inr_inv_mul_s_mul_sigma_inr`。
 
@@ -153,11 +230,21 @@ PDF pp.150-152 精読 + Lean 検証で確定。**残るは `Step4Capstone` の�
      conn3 `s⁻¹t⁻¹s²=q₁q₂⁻¹=t⁻²st`。swap 後 telescope で `t⁻¹·(C.2-LHS)·t=t⁻¹·1·t=1`。
    - **Q-membership/comm は既存**: `s_inv_pow_mul_t_pow_mem_Q`/`t_inv_pow_mul_s_pow_mem_Q`/`Q_mul_comm`。
 2. **(C.5)-(C.6)**: Step1 で uᵢsᵢvᵢ、Step2/3 で sᵢ≠1。
-3. **(C.7)**: `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
+3. **(C.7)**: ✅ landed (`Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7`):
+   `s^k·(C.4)·s^{-k}` + (C.5) 代入 → `t⁻¹s₂t⁻¹=(w₁s₃w₂t²s₁w₃)⁻¹`、wᵢ∈U (PDF p.150-151)。
 4. **(C.8)-(C.9) Frobenius**: (C.5) は a,b,uᵢ,vᵢ→aᵖ,bᵖ,uᵢᵖ,vᵢᵖ で不変 (s₁=`(s^{k-2})^{u₁}(s^{-k+1})^{v₁⁻¹}`,
-   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。⟹ (C.9) `s₁w₃^{p-1}s₁⁻¹∈(PU)∩(PU)^{t²}`。
-5. **w_i=1**: Step3 ⟹ s₁w₃^{p-1}s₁⁻¹∈U、Step2 (s₁≠1) ⟹ w₃^{p-1}=1 ⟹ (A) で w₃=1。同様 w₁=w₂=1。
-   ⟹ (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1`。mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
+   F で `s₁=(k-2)su₁+(-k+1)s/v₁`、p乗 Frobenius)。✅ `w₃` 版 `(C.9)` membership と
+   exact word equation landed。さらに `w₃=1` と `(C.6)` の `c₃≠0` から
+   `w₁^(p-1)=w₂^(p-1)=1` まで Lean 化済。
+5. **w_i=1 / (C.10)**: ✅ Step3 が `s₁w₃^{p-1}s₁⁻¹∈U` を与え、C.6 の
+   `c₁,c₃≠0` が入れば、`relationC9_w_eq_one_and_relationC10_of_w3_step3_mem_U` が
+   `w₁=w₂=w₃=1` と (C.10) `t²s₁t⁻¹s₂t⁻¹s₃=1` まで出す。さらに C9 membership +
+   Step3 dichotomy は `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U` で
+   Lean 化済。bad branch は `step3_badBranch_false [Finite G]` で排除済み:
+   `P₁≤W₂⊔Q`, `P∩(W₂⊔Q)=W₂`, `P₁≤N_G(W₂)`, `P₁=W₂` 矛盾まで landed。
+   残りは global C.6 非零 fact (`c₁,c₃≠0`) を Step3 consumer に接続して
+   unconditional な `(C.10)` を閉じること。
+   mod Q (`W2_inf_Q_eq_bot` S16:1454) ⟹ s₁s₂s₃=1。
 6. **kernel/End** (PDF p.151-152): (C.10) を `t=y⁻¹sy` で展開 + `P₀` を `End([Q,P₀])` 像と同一視 →
    `y∈ker((s⁻¹+1-s₁⁻¹s⁻¹-s₃)(s⁻¹-1))`。**FPF** (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`,
    s で固定⟹W₂で固定⟹∈C_Q(W₂)⊓⁅Q,W₂⁆=1, (X)) で `(s⁻¹-1)` 可逆 → `y∈ker(s⁻¹+1-s₁⁻¹s⁻¹-s₃)`。
@@ -245,11 +332,11 @@ hstep は w∈E 全称だが、§3 の核 `s₁=s⁻¹` は w に依らず carri
 | **(C.4)** | `s⁻ⁱtⁱ = [sⁱ,y] ∈ Q`, Q 可換 ⟹ 整理 | **既存** `s_inv_pow_mul_t_pow_mem_Q` (S16:1416) + `Q_mul_comm` (S16:1424) + `s_inv_pow_mul_t_pow_mul_comm` 系 |
 | **(C.5)** | Step1 正規形 `uᵢsᵢvᵢ` (i=1,2,3) | **既存** `exists_sigma_normOne_primeLine_normOne_of_mem_PU` (S16:617) |
 | **(C.6)** | `sᵢ≠1` | **既存** Step2 `generatorRelation_step2_primeLine*` (S16:643/672) + Step3 (下記) |
-| **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | 新規 (再結合) |
-| **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | 新規 (有限体 Frobenius; `add_pow_char` 系) |
-| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` | 新規 |
-| Step3 適用 | `w₃^{p-1}=1` ⟹ (A) で `w₃=1`, 同様に `w₁=w₂=1` | **既存** Step3 `P_sup_U_inf_conj_t_pow_eq_U_or_eq_P_sup_U` (S16:937) + Step2 |
-| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | 新規 |
+| **(C.7)** | `t⁻¹s₂t⁻¹ = (w₁s₃w₂t²s₁w₃)⁻¹` (wᵢ∈U) | ✅ landed: `Step4C5NormalForms.w1/2/3`, `sigma_inr_w_mem_U`, `relationC7` |
+| **(C.8)** | a→aᵖ 置換不変 (Frobenius `aᵖ+bᵖ=2`) | ✅ landed: pair entry, concrete semidirect Frobenius map, neutral `(C.5)` equation transport, and `Step4C5NormalForms.frobenius` |
+| **(C.9)** | `s₁w₃^{p-1}s₁⁻¹ ∈ (PU)∩(PU)^{t²}` and the exact displayed word equation | ✅ `relationC9_w3_mem_P_sup_U_and_conj`, `relationC9_w3_word`; post-`w₃=1` collapse to `w₁^(p-1)=w₂^(p-1)=1` landed with explicit `c₃≠0` input |
+| Step3 適用 | `S₁W₃^(p-1)S₁⁻¹∈U` + C.6 `c₁,c₃≠0` ⟹ `w₁=w₂=w₃=1` | ✅ consumer landed; ✅ U-branch/dichotomy connected by `relationC9_w_eq_one_and_relationC10_of_w3_step3_inf_eq_U` and `relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U`; ✅ bad branch eliminated by `step3_badBranch_false [Finite G]` |
+| **(C.10)** | `t²s₁t⁻¹s₂t⁻¹s₃=1` | ✅ included once the Step3 dichotomy is in the `U` branch; with the bad branch now contradictory, the remaining bridge is global C.6 nonzero wiring and composition into unconditional C.10 |
 | mod Q | `P₀∩Q=1` ⟹ `s₁s₂s₃=1` | **既存** `W2_inf_Q_eq_bot` (S16:1454) |
 | **kernel** | End([Q,P₀]) で `y ∈ ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` | **新規 + (X)/(XI) 要** (§4) |
 | FPF | s⁻¹ が [Q,P₀] 上 fixed-point-free ⟹ `(s⁻¹−1)` 可逆 ⟹ `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)` | **新規 + (X)/(XI) 要** |
@@ -276,9 +363,17 @@ k=3 第1式 + `s₁=s⁻¹`: `s·(a⁻¹)^{t³}·s⁻² = u₁s⁻¹v₁` ⟹ `v
 2. **(C.4)–(C.6)** (既存 Q-commutator + Step1/2/3 を chain):
    - `relationC4` (Q 可換で整理), `decompositionC5` (Step1 で uᵢsᵢvᵢ), `sᵢ_ne_one` (Step2/3)。
 3. **(C.7)–(C.10)** (Frobenius 置換 + Step3):
-   - `frobenius_replacement_C8` : (C.5) が a→aᵖ で不変 (有限体 `add_pow_char`)。
-   - `w_eq_one` : `w₁=w₂=w₃=1` (Step3 `..._inf_conj_t_pow_..` + Step2 + 条件A `w₃^{p-1}=1→w₃=1`)。
-   - `relationC10` : `t²s₁t⁻¹s₂t⁻¹s₃=1`, `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`)。
+   - ✅ `relationC7` landed.  ✅ `unitVal_inv_frobenius_pair` landed.
+     ✅ condition A / C.10 bridge (`w_eq_one_of_pow_sub_one_eq_one`,
+     `relationC10_of_w_eq_one`) landed.  ✅ concrete semidirect Frobenius map
+     (`fieldNormalizerFrobeniusHom`) landed.  ✅ powered `(C.5)` package transport
+     (`Step4C5NormalForms.frobenius`) landed.  ✅ exact `(C.9)` word and the post-`w₃=1`
+     `(C.9)` collapse landed.  ✅ Step3-recipient C.10 theorem landed.
+   - Step3 の `U`-branch producer は接続済み。bad branch も `step3_badBranch_false [Finite G]`
+     で排除済み (`P₁≤W₂⊔Q`, `P∩(W₂⊔Q)=W₂`, `P₁≤N_G(W₂)`, `P₁=W₂` 矛盾)。
+     残る producer は global `(C.6)` の `c₁,c₃≠0` 配線と、dichotomy + bad-branch false を
+     unconditional C.10 へ束ねる theorem。
+   - `s₁s₂s₃_eq_one` (mod Q, `W2_inf_Q_eq_bot`) は C.10 後の残り。
 4. **kernel/FPF** (🔴 (X)/(XI) 依存, §4):
    - `y_mem_ker_of_relationC10` : `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))`。
    - `sInv_fixedPointFree_on_QP0` : s⁻¹ が [Q,P₀] 上 FPF。
@@ -343,14 +438,18 @@ coprime 作用の標準事実**ゆえ:
   - `exists_yD_mem_actionCommutator_conj_s_eq_t` : **BG Remark (XI)** —
     `∃ yD ∈ ⁅Q,W2⁆, MulAut.conj yD s = t`。Q = ⁅Q,W2⁆·C_Q(W2) (`fixedPoints_sup_actionCommutator_eq_top`)
     で y=yD·yC、yC∈C_Q(W2) が s と可換 ⟹ t = y·s·y⁻¹ = yD·s·yD⁻¹。kernel 段は yD (∈[Q,W2]) を使える。
-- 🔴 残り (Step 4 の残作業、(X)/(XI) infra は完了):
-  1. **(C.2)–(C.10) 群関係鎖** (convention-heavy, 既存 API chain): `s^a s^b=s²` → … → `s₁s₂s₃=1` /
-     `t²s₁t⁻¹s₂t⁻¹s₃=1`。§3 補題分解参照。`s^a` 二義性 (§6) を最初に固定。
-  2. **kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を ⁅Q,W2⁆ 上の
-     ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`; s-only 形は
-     W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化 → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
+- 🔴 残り (Step 4 の残作業、(X)/(XI) infra と Step3 bad branch は完了):
+  1. **global `(C.6)` 非零 wiring → unconditional `(C.10)`**: exact `(C.9)` の membership、
+     Step3 dichotomy、C.10 consumer は landed。bad branch も `step3_badBranch_false [Finite G]` で
+     `P₁≤W₂⊔Q` / `P∩(W₂⊔Q)=W₂` / `P₁≤N_G(W₂)` / `P₁=W₂` 矛盾まで閉じた。
+     残る producer は global C.6 の `c₁,c₃≠0` を渡し、dichotomy + bad-branch false を
+     unconditional C.10 に束ねること。
+  2. **(C.10)→kernel→End 翻訳**: (C.10) から得る `y∈ker((s⁻¹+1−s₁⁻¹s⁻¹−s₃)(s⁻¹−1))` を
+     ⁅Q,W2⁆ 上の ℤ-module 作用に落とし、FPF (`w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed`;
+     s-only 形は W2=⟨s⟩ で s-固定⟹W2-固定 を経由) で `(s⁻¹−1)` 可逆化
+     → `y∈ker(s⁻¹+1−s₁⁻¹s⁻¹−s₃)`。
   3. **`s₁=s⁻¹` capstone** + 配線 (経路A: `appC_normSet_generator_relation_of_first_k_three_coordinate`)。
-  ⟹ infra (X)/(XI) は全て landed。残りは群関係鎖 (1) → End 計算 (2) → capstone (3)。
+  ⟹ infra (X)/(XI) と Step3 bad branch は landed。残りは C.6 wiring/C.10 composition (1) → End 計算 (2) → capstone (3)。
 
 ---
 
