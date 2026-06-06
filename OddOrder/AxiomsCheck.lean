@@ -1934,6 +1934,11 @@ set_option linter.style.longLine false in
 -- induced), discharging the `hanchordeg` of `exists_sMemberDegreeData`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_mem_SsubFiltration_degree_W1
+-- (6.2) adjoined-pair fields for the breaking pair `{ψ, ψ̄}`: non-realness, orthonormality,
+-- conjugate-difference support, and orthogonality to all of `S₁` (the `ψ ∉ S₁` from the
+-- strengthened `exists_coherentBreakPair`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sBreakPair_fields
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

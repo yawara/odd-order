@@ -557,10 +557,11 @@ theorem exists_coherentBreakPair
     (hSbncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ Sb A)) :
     ∃ (S₁ : Set (ClassFunction ↥L ℂ)) (ψ : ClassFunction ↥L ℂ),
       OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ ∧ Sa ⊆ S₁ ∧ S₁ ⊆ Sb ∧ ψ ∈ Sb ∧
+      ψ ∉ S₁ ∧ ψ.conj ∉ S₁ ∧
       Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A) ∧
       ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {ψ, ψ.conj}) A) := by
   classical
-  obtain ⟨e, pair, N, hpairχ, hsurj, hpairs, hcoverIdx, hpair0, hpair1, _hdisj, _hmono⟩ :=
+  obtain ⟨e, pair, N, hpairχ, hsurj, hpairs, hcoverIdx, hpair0, hpair1, hdisj, _hmono⟩ :=
     exists_conjugatePairCover hSbfin hSbconj hSbreal hSbirr hSaconj
   -- the running union reaches `Sb` after `N` steps
   have hUN : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair N = Sb :=
@@ -575,8 +576,16 @@ theorem exists_coherentBreakPair
   obtain ⟨i, hiN, hPi, hnPi⟩ := exists_index_predicate_break
     (P := fun i => Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ
       (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i) A)) hP0 N hPN
+  -- the breaking pair `{ψ, ψ̄}` lies in `Sb` and is disjoint from the prefix `S₁`
+  have hψpair : (pair i).1 ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    simp [OddOrder.Peterfalvi.S07.pairSet]
+  have hconj2 : (pair i).2 = ((pair i).1).conj := by rw [hpair1 i hiN, hpair0 i hiN]
+  have hψcpair : ((pair i).1).conj ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair i := by
+    rw [← hconj2]; simp [OddOrder.Peterfalvi.S07.pairSet]
   refine ⟨OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i, (pair i).1,
-    ?_, ?_, ?_, ?_, hPi, ?_⟩
+    ?_, ?_, ?_, hpairs i hiN hψpair,
+    Set.disjoint_left.mp (hdisj i hiN) hψpair,
+    Set.disjoint_left.mp (hdisj i hiN) hψcpair, hPi, ?_⟩
   · -- `S₁` is closed under conjugation (base `Sa` is, each adjoined pair is)
     intro φ hφ
     rcases OddOrder.Peterfalvi.S07.mem_pairUnion.mp hφ with hbase | ⟨j, hji, hjpair⟩
@@ -593,12 +602,7 @@ theorem exists_coherentBreakPair
     exact fun φ hφ => OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
   · -- `S₁ ⊆ Sb`
     rw [← hUN]; exact OddOrder.Peterfalvi.S07.pairUnion_mono Sa pair hiN.le
-  · -- `ψ ∈ Sb`
-    refine hpairs i hiN ?_
-    simp [OddOrder.Peterfalvi.S07.pairSet]
   · -- `S₁ ∪ {ψ, ψ̄}` is not coherent (it is the next accumulator, where coherence fails)
-    have hconj2 : (pair i).2 = ((pair i).1).conj := by
-      rw [hpair1 i hiN, hpair0 i hiN]
     have hsplit : OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair (i + 1) =
         OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) Sa pair i ∪ {(pair i).1, ((pair i).1).conj} :=
       OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair rfl hconj2
@@ -4792,6 +4796,43 @@ theorem exists_mem_SsubFiltration_degree_W1 (hyp : SibleyDadeHypothesis G L H) [
   refine ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), ?_, ?_⟩
   · rw [hyp.mem_SsubFiltration]; exact ⟨θ, hθne, hθker, rfl⟩
   · exact hyp.induce_apply_one_eq_card_W1_of_degree_one θ hθdeg
+
+/-- **(6.2) adjoined-pair fields for the breaking pair `{ψ, ψ̄}`** (Frobenius case).
+
+For `ψ ∈ S` whose conjugate pair `{ψ, ψ̄}` is disjoint from `S₁ ⊆ S`, this packages the per-`ψ`
+fields B1 (`coherentDegreeSumBound_of_not_coherent`) consumes: non-realness and orthonormality of
+`{ψ, ψ̄}` (`sMember_characterFacts`), the conjugate-difference support on `H^#`
+(`sMember_diffSupport`), and the orthogonality of `ψ` and `ψ̄` to every member of `S₁` (distinct
+irreducibles, since `ψ, ψ̄ ∉ S₁` but the members lie in `S₁`).  Together with
+`exists_coherentBreakPair` (which supplies `ψ ∉ S₁`, `ψ̄ ∉ S₁`) this is the adjoined-pair side of
+the (6.2) member-family. -/
+theorem sBreakPair_fields (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {ψ : ClassFunction ↥L ℂ} {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hψS : ψ ∈ hyp.S) (hS₁sub : S₁ ⊆ hyp.S) (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
+    ¬ ClassFunction.IsReal ψ ∧
+      ClassFunction.inner ψ ψ = 1 ∧ ClassFunction.inner ψ.conj ψ.conj = 1 ∧
+      ClassFunction.inner ψ.conj ψ = 0 ∧ ClassFunction.inner ψ ψ.conj = 0 ∧
+      ((ψ.conj - ψ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ χ = 0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
+  have hψirr : IsIrreducibleCharacter ψ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS
+  obtain ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar⟩ := hyp.sMember_characterFacts hF hψS
+  refine ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar,
+    hyp.sMember_diffSupport hψS hψirr, ?_, ?_⟩
+  · intro χ hχS1
+    have hχirr : IsIrreducibleCharacter χ :=
+      hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
+    have hne : ψ ≠ χ := fun h => hψnotS1 (by rw [h]; exact hχS1)
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hχirr⟩
+    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+  · intro χ hχS1
+    have hχirr : IsIrreducibleCharacter χ :=
+      hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hχS1)
+    have hne : ψ.conj ≠ χ := fun h => hψcnotS1 (by rw [h]; exact hχS1)
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ.conj, hψirr.conj⟩ : IrreducibleCharacter ↥L)
+      ⟨χ, hχirr⟩
+    rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
 
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
