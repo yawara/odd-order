@@ -215,6 +215,18 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
   - `ν` + `hagreeX`/`hagreeY`/`hmixed`/`hgen`: X∪Y glue data(combined extension)。
 - **次着手**: `PairUnionBaseAnchorCommonIndexPrimePowerStepData` の構造を読み、(6.5) の `isPGroup_of_not_coherent` を使って per-step prime-power degree data を構成。`two_mul_lt_sq_of_primePow_gap`(S07, 既 landed)が degree gap 核。**X-chain enum (pairUnion accumulator から member family)** が最重 combinatorial(queue 全体で繰り返し flagged)。
 
+### ✅ 2026-06-06 (続8): (6.6) ingredient `exists_primePow_natDegree_of_isPGroup` landed (commit 955859b, axiom-clean)
+- **`exists_primePow_natDegree_of_isPGroup`**(S08 general): finite p-群 K + θ∈Irr K ⟹ `∃ k, θ(1)=p^k`。`exists_natDegree_charValue_one_dvd_card`(θ(1)∣|K|)+`IsPGroup.exists_card_eq`(|K|=pⁿ)+`Nat.dvd_prime_pow`。StepData の `θ=p^m` source-degree fields の leaf ingredient(X-member ψ=Ind θ で θ(1) p-power, ψ(1)=|W₁|·θ(1))。
+
+### 🔴 capstone X-nonempty 残務 = hstepData 構成 + ν glue（X-chain enum 本体, multi-session）
+**hstep.. → capstone の全 chain は配線済**(`coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner` S08:7379)。残 = **(A)** `hstepData` 構成 + **(B)** ν glue data。
+- **(A) hstepData**(各 step i で `PairUnionBaseAnchorCommonIndexPrimePowerStepData` を産出):
+  - **enum**: conjugate-pair cover (`exists_conjugatePairCover`) で pair/χs/N を定義 → 各 step の `pairUnion (xBaseBlock ⁅H,H⁆) pair i` accumulator を `χmem : Fin k → IrreducibleCharacter ↥L` として列挙(hrange 一致)。anchor i₁∈xBaseBlock。**= (6.2) の `sMember_*` enum と構造類似**(template 流用可、但し X-side Irr-L)。
+  - **degree fields**: 各 χmem j = Ind_H^L θ_j、`exists_primePow_natDegree_of_isPGroup`(✅ 続8)で θ_j(1)=p^(mmem j)、idx=|W₁| (`index_H_eq_card_W1`)、`coprimeIndexPrimePow`(S08:2893 付近 idx coprime p)で hidx_p。p prime ≥3 は |L| odd ⟹ p odd ⟹ p≥3。
+  - **gap/sum fields**(hsum/hqtot/hθsq_le_qtot/htotal): (6.6) prime-power degree-sum 論証(mmd 04.8 L76-82, θᵢ(1)²∣∑, [Is]Cor2.30 θ(1)²≤|K:Z|)。`two_mul_lt_sq_of_primePow_gap`(S07)が核。
+- **(B) ν glue**: hagreeX/hagreeY/hmixed/hgen — X-coherence と Y-coherence の combined extension(`coherentUnion_of_glued` が要求)。
+- **scope**: (A) enum が最重(~200+行見込み, (6.2) enum 並)。multi-session。**p prime≥3 / idx coprime / θ p-power は leaf 揃った**ので、enum 骨格 + gap-sum が主残務。
+
 ### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象 (✅ 続7 で landed)
 **目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
 - **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
