@@ -144,7 +144,20 @@ Lemma 3.3 が要求するのは s∤|K̄|=|K/L|)。よって既存 `kernel_acts_
 - **(B) chief-factor MulDistribMulAction plumbing** = Ḡ (or ConjAct) を V=X/Y に `invariantQuotientMulDistribMulAction` で載せ、`hM.zmodModule` で `[Module (ZMod s) (Additive V)]` を供給 → coprime case 適用可能に。
 - **(C) induction skeleton** = `Nat.card K` 上の強帰納 (L=maxProperNormalOrBot K, LR への restriction で C_L(R)=1+Frobenius, IH→L nilpotent→L⊆F(G)); 各 chief factor で same-prime/coprime dichotomy (G solvable から elem-abelian 抽出 + 素数比較) → Prop 1.2。
 
-## 🔴 2026-06-06 BLOCKER: coprime-branch conclusion = CommGroup-on-quotient instance diamond
+## ✅ 2026-06-06 RESOLVED → coprime-branch conclusion landed (778c464)
+
+**解決**: CommGroup-on-quotient diamond は **小修正**で解消 — 適用側で標準 `Group` を再利用して
+`letI : CommGroup (↥X ⧸ Y.subgroupOf X) := { (inferInstance : Group _) with mul_comm := hVelem.comm }`
+と注入(defeq-clean、diamond 無し)。`inferInstance` 単体合成が失敗していたのが原因で、refactor は不要だった。
+descent smul の rw は subtype 強制で構文不一致 → goal 側を `rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL g v]`
+で書き換えて defeq close。結果 **`coprime_kernel_le_chiefFactorCentralizer` (S03c, 778c464) build-green**。
+
+**残り = (C) induction のみ**: (i) ~~coprime conclusion~~ ✅DONE, (ii) **FPF 導出 `C_V(R̄)=1`**(C_K(R)=1+coprime-action),
+(iii) **G/L Frobenius 構成**(`quotient_isFrobeniusGroup_of_le_kernel_of_*`), (iv) **elem-abelian 抽出**(chief factor),
+(v) **|K|-強帰納 + LR restriction + same-prime/coprime dichotomy + Prop1.2 組立**, (vi) **Thm 11.3** `Msigma_isNilpotent`。
+same-prime 分岐も (C) 内で `commutator_eq_bot_of_normal_pgroup_minimalNormal` を同様 model 経由で結線要。
+
+### (旧 BLOCKER 記録, 参考)
 
 glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model-bridge `chiefFactorConjAction_smul_eq_self_iff_mem` 7dd0166 が最後)。次の **coprime-branch conclusion** (`coprime_kernel_le_chiefFactorCentralizer`) を組もうとして **instance 設計の壁**:
 
