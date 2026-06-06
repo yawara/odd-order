@@ -86,8 +86,9 @@ is purely the §8 capstone-level choice `Z := ⁅H,H⁆` and the `X ⊔ Y = S` s
 - New prerequisites: `Zc` normal/central/nontrivial facts; (6.8.3) `coherentUnion`→`coherentAllS`
   extension (a new §7-engine application: `S₁` coherent, `S₁∪{ψ,ψ̄}` not ⟹ degree/`(5.6)` bound,
   contradiction). (6.8.1)/(6.8.2) case-A/B `τ₃`/`τ₂` glue (genuine character theory, uses (6.7)).
-- The `(6.7)` congruence `ψ(z) ≡ ψ(1) (mod |P|)` (mmd L86-134) is itself **not yet formalized** and
-  is a prerequisite of (6.8.1)/(6.8.2). Check whether it exists in S08/S07 before redesign.
+- The `(6.7)` congruence `ψ(z) ≡ ψ(1) (mod |P|)` (mmd L86-134) **IS formalized** (2026-06-07 finding)
+  as `peterfalvi_67_of_odd` (`SylowTICongruence.lean:140`); it is a prerequisite of (6.8.1)/(6.8.2)
+  and is available for wiring.
 
 ## Layered redesign plan (dependency-audited 2026-06-07) — Frobenius / case (A)
 
@@ -118,11 +119,15 @@ Also needs `X(Zc) ⊆ Irr L` — at central `Zc`, `Ind θ` irreducible for `Zc �
 `simpa [Xset_union_Yset_eq_S]` (false at `Zc`); stop at the union coherence. The hypotheses
 `hagreeX/hagreeY/himg_ortho/hgen` are the genuine **(6.8.1)** case-A `τ₃` content (mmd L160-176):
 construct `ν` agreeing with `τ₁` on `Y` and `τ₂` on `X`, mutually orthogonal images. **This uses
-(6.7)** (`η₁^{τ₁}` constant on `Z^#` ⟹ congruence ⟹ `b ≡ 0 mod a`). **(6.7) is NOT formalized as a
-named theorem** (broad grep 2026-06-07). CANDIDATE: `OddOrder/GroupTheory/RepresentationTheory/
-SylowTICongruence.lean` — (6.7) is a Sylow-TI congruence (`P^#` TI, ψ constant on `Z^# ⊆ P` ⟹
-`ψ(z) ≡ ψ(1) mod |P|`). **First action of L3 = read SylowTICongruence.lean; if it is (6.7), wire it;
-else formalize (6.7) (mmd L86-134, the class-algebra `ω`/`a_{ijs}` argument).**
+(6.7)** (`η₁^{τ₁}` constant on `Z^#` ⟹ congruence ⟹ `b ≡ 0 mod a`). **CORRECTION (2026-06-07): (6.7)
+IS already formalized** as `peterfalvi_67_of_odd`
+(`OddOrder/GroupTheory/RepresentationTheory/SylowTICongruence.lean:140`) — the earlier "NOT
+formalized" claim was a grep miss (searched the string `6.7`, not the identifier). Its statement:
+for `P` Sylow-`p`, `L = N_G(P)` odd, `P^#` TI, `Z ⊴ L`, `1 ≠ Z ≤ Z(P)`, `|C_L(·)|` const on `Z^#`,
+and `ψ = χ_ρ ∈ Irr G` const on `Z^#`, then `ψ(z) ≡ ψ(1) [ALGMOD |P|]`. So **L3's gating prerequisite
+exists**; L3 reduces to the (6.8.1) `τ₃` ν-construction *wiring* `peterfalvi_67_of_odd`, not a
+from-scratch formalization of the class-algebra `ω`/`a_{ijs}` argument (that is already done inside
+`ClassSumAlgebra.lean` / `SylowTICongruence.lean`).
 
 **L4 — (6.8.3): `IsCoherent (Xset Zc ∪ Yset)` → `CoherenceTarget` (all of `S`).** mmd L226-: if
 `S ⊋ X∪Y` (i.e. `Zc ⊊ H′`), suppose `S` not coherent; `exists_coherentBreakPair` (S08:572) gives
@@ -142,8 +147,11 @@ tools EXIST. Substantial but unblocked.
   L4 (6.8.3) extension.
 
 ### Order of attack
-L1 → (read SylowTICongruence for 6.7) → L4 (unblocked, exercises the (5.6) tools) → L2 (monolith) →
-L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is the gating risk.
+L1 → L4 (unblocked, exercises the (5.6) tools) → L2 (monolith) → L3 (wires the already-formalized
+(6.7) `peterfalvi_67_of_odd` into the (6.8.1) `τ₃` ν-construction). L1 and L4 are the cleanest
+committable starts. **With (6.7) confirmed present, L3's residual risk is the `τ₃` ν-construction
+itself, not a missing congruence theorem; L2 (the never-before-built StepData monolith) is now the
+larger remaining lift.**
 
 ### Progress
 - **✅ L1 DONE (2026-06-07, commits `b501838` + `b70b430`, leaf-green, axiom-clean).** In namespace
@@ -172,7 +180,13 @@ L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is th
     (S08:~7460). **✅ linchpin landed** (`exists_source_primePow_centralBound_of_mem_Xset`, commit
     `a119d9c`): for `χ∈X(Z)`, `χ(1)=|L:H|·p^k ∧ (p^k)²≤|H:Z|` — the `hθχ`/`hθsq_le_qtot` data, now
     fillable at central `Zc`. `isIrreducibleCharacter_of_mem_Xset_of_frobenius` confirmed Z-generic.
-    **Remaining = the producer `hstepData` monolith** (single atomic `noncomputable def`, ~250 lines,
+    **✅ hXne landed (2026-06-07, commit `264966a`)**: `Xset_centralCommutator_nonempty` (via Z-generic
+    `Xset_nonempty_of_subgroupOf_ne_bot`, degree-sum positivity — no Clifford theory). **✅ outer shell
+    landed (commit `a9054c4`)**: `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+    — the Zc instantiation of the consumer, all prereqs discharged, `hstepData` confirmed to TYPECHECK
+    at `Z := Zc` (so the producer goal is well-formed and satisfiable).
+    **Sole remaining L2 hole = constructing the producer `hstepData` monolith** (single atomic
+    `noncomputable def`, ~250 lines,
     not splittable — the StepData is consumed atomically). For each chain step `i`:
     1. enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k`, `χmem`, `hχinj`, `hrange`; anchor
        `i₁` = min-degree of `xBaseBlock Zc` (`Set.exists_min_image`, cf. `two_le_xBaseBlock_ncard`).
@@ -188,13 +202,54 @@ L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is th
     Also needs `H` a `p`-group (from `isPGroup_of_not_coherent`, capstone ¬-coherent branch) and
     `(Xset Zc).Nonempty`.
   - **L3**: ν glue → `Nonempty (IsCoherent (Xset Zc ∪ Yset))` via `coherentUnion_of_glued`; needs
-    (6.8.1) case-A `τ₃` + (6.7) (`SylowTICongruence.lean`?). Hardest; gating.
+    (6.8.1) case-A `τ₃`, which wires the **already-formalized** (6.7) `peterfalvi_67_of_odd`
+    (`SylowTICongruence.lean:140`). The `τ₃` ν-construction is the residual content (no missing
+    prerequisite theorem).
   - **capstone** `sibleySetup_is_coherent` (S08 X-nonempty sorry): `by_cases Nonempty CoherenceTarget`;
     `¬` branch → `isPGroup_of_not_coherent` (H p-group) → L2 → L3 → `false_of_coherentXunionYset_of_not_coherentS` (L4).
 
+## 2026-06-07 deep-dive findings (reconnaissance, no Lean delta yet)
+
+Re-verified the whole frontier against the live branch (`peterfalvi` @ `144c9c9`, baseline build
+green, 1 sorry @ capstone S08:7919). New facts beyond the progress log above:
+
+1. **(6.7) `peterfalvi_67_of_odd` is already formalized** (`SylowTICongruence.lean:140`,
+   complete + clean). The note's L3 gating-risk analysis was wrong; corrected throughout above.
+   L3 ⇒ "wire (6.7) into the (6.8.1) `τ₃` ν-construction", no missing prerequisite theorem.
+2. **The `Z=⁅H,H⁆` blocker is independently re-confirmed.** Cor 2.30 needs centrality; `UT(4,p)`
+   (class 3) is the counterexample; the redesign is genuinely necessary, not a detour.
+3. **No `…StepData` value has ever been constructed anywhere** (grep: every occurrence is the
+   `hstepData` *hypothesis*, incl. S09:1668). L2 builds the **first-ever** such term — the
+   per-step machinery has never been exercised with concrete data. This is the larger remaining lift.
+4. **`hXne` (`(Xset Zc).Nonempty`) is NOT a quick win.** `Xset Zc ⊆ Xset ⁅H,H⁆` (antitone,
+   `Xset_mono`), so the X-nonempty branch hypothesis does NOT give it. It needs the
+   separation argument: `Zc ≠ ⊥` (`centralCommutator_ne_bot`, needs `commutator ↥H ≠ ⊥`) ⟹
+   ∃ `θ≠1`, `Zc ⊄ ker θ`, AND `Ind θ ∉ S(Zc)` — the latter needs `Zc` W₁-invariant (char in H) +
+   `Ind` injective-up-to-W₁-conjugacy. Genuine character theory; budget a sub-lemma.
+5. **The capstone needs BOTH branches of `hyp.cases`** (`IsFrobeniusGroup ∨ ∃ cert,
+   CertainTypeHypothesis`). L1–L4 + L2/L3 close only the **Frobenius / case (A)** branch. The
+   **CertainType / case (B)** branch (`Z = W₂`, (6.8.2) `τ₂` glue, mmd L178-224) is **unplanned**.
+   Capstone skeleton: `by_cases hcoh : Nonempty CoherenceTarget` (`= IsCoherent … S …`); coherent →
+   `hcoh.some`; ¬coherent → `exfalso`; `rcases hyp.cases`; Frobenius → L2+L3+L4
+   (`false_of_coherentXunionYset_of_not_coherentS`, with `hHnonab` from X-nonempty); CertainType →
+   case-(B) analogue (needs its own central-Z facts + (6.8.2) + a case-(B) L4).
+
+### L2 field map (for the eventual monolith — `xAdjoinStepInput_of_pairUnion_baseAnchor_…` @ S08:7464)
+- enum (`κ,tailSet,k,χmem,hχinj,hrange,i₁`): `exists_pairUnion_memberFamily_of_irreducible_X`
+  (S08:6353, gives `k/χmem/hχinj/hrange`) + base-block min-degree anchor `i₁`.
+- numerics: `p`(`3≤p`),`idx=H.index`(`hidx_p` coprime),`qtot=|H:Z|=p^mq`,`c=|L:H|·(|Z|−1)`,
+  `total=|H:Z|·c`(`index_mul_card_sub_factor` @5560); `dχ/θχ/mχ`,`d₁/θ₁/m₁`,`dmem/θmem/mmem` via
+  `exists_source_primePow_centralBound_of_mem_Xset` (5627, gives `hθsq_le_qtot`) /
+  `exists_memberDegreeData` (5611). `htail_le` from `natDegree_le_of_xBaseBlock_anchor` (~4998).
+- **crux `hsum`**: `tailSet := Xfin ∖ members`, `θtail` = source p-degree (choose via linchpin over
+  `Xfin`); `∑members² + ∑tail² = total` is `Finset.sum_sdiff` + per-char deg identification, with the
+  ℝ-value pinned by `sum_re_sq_Xset_eq` (5511) cast to ℕ. ~80 lines of casts/plumbing.
+
 ## Recommendation
 
-This is a multi-session redesign of the §8 capstone assembly (and possibly (6.7)), not an
-autonomous "fill the sorry" loop. The earlier `autonomous_assembly_queue.md` recipe (build the
-`Z=⁅H,H⁆` producer) is **invalid** and should not be executed. Pause the (6.8) capstone; the next
-real work is the central-`Zc` redesign above, best done attended.
+Multi-session redesign of the §8 capstone assembly (Frobenius L2/L3 **and** the unplanned
+CertainType case (B)), not an autonomous "fill the sorry" loop. The earlier
+`autonomous_assembly_queue.md` recipe (build the `Z=⁅H,H⁆` producer) is **invalid**. With (6.7)
+confirmed present, no prerequisite *theorem* is missing — it is all assembly. The next real Lean work
+is the central-`Zc` redesign above (start: `hXne` sub-lemma, then the L2 `hstepData` monolith), best
+done attended in focused sessions.
