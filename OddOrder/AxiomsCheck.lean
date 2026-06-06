@@ -1966,6 +1966,9 @@ set_option linter.style.longLine false in
 -- (the breaking pair from `exists_coherentBreakPair` fed to the (6.2) core `sMember_index_le_two_psi`).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two_index_bound
+-- (6.2) restriction kernel inheritance: `θ` trivial on `M` ⟹ `Res_C θ` trivial on `M.subgroupOf C`
+-- (discharges the θ-bound's kernel hypothesis from `ψ = Ind θ ∈ S(B)`, `θ` trivial on `B`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.characterKernel_restrict_subgroupOf
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

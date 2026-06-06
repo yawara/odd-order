@@ -326,6 +326,24 @@ theorem theta_degree_le_index_mul_sqrt_index {K : Type*} [Group K] [Fintype K]
     _ ≤ (C.index : ℝ) * Real.sqrt (D.index : ℝ) :=
         mul_le_mul_of_nonneg_left hd_le (Nat.cast_nonneg _)
 
+/-- **Restriction kernel inheritance.**  If `θ` is trivial on a subgroup `M ≤ K` (i.e.
+`M ⊆ characterKernel θ`), then its restriction `Res_C θ` to a subgroup `C ≤ K` is trivial on
+`M.subgroupOf C = M ∩ C` (viewed in `C`).  Used by (6.2): a member `ψ = Ind_H^L θ ∈ S(B)` has
+source `θ` trivial on `B`, so `Res_C θ` is trivial on `B.subgroupOf C`, discharging the `θ`-bound's
+kernel hypothesis. -/
+theorem characterKernel_restrict_subgroupOf {K : Type*} [Group K] {θ : ClassFunction K ℂ}
+    (C : Subgroup K) {M : Subgroup K}
+    (hM : (M : Set K) ⊆ OddOrder.Peterfalvi.S03.characterKernel θ) :
+    ((M.subgroupOf C : Subgroup ↥C) : Set ↥C) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.restrict C θ) := by
+  intro c hc
+  have hker : (θ : ClassFunction K ℂ) (↑c : K) = (θ : ClassFunction K ℂ) 1 :=
+    hM (Subgroup.mem_subgroupOf.mp hc)
+  simp only [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def, ClassFunction.restrict_apply,
+    OneMemClass.coe_one]
+  exact hker
+
 set_option linter.unusedFintypeInType false in
 /-- **(H2, kernel form)** an irreducible constituent `χ` of an induced character `Ind_H^Γ θ`
 (`θ` genuine, `⟨Ind θ, χ⟩ ≠ 0`) inherits a kernel containment of `Ind θ`.  The `ℕ`-decomposition
