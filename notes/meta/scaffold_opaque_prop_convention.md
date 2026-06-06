@@ -45,11 +45,17 @@ S15 の群構造 field — すべて実構造体 (`IsComplement'`/`IsFrobeniusGr
 3. 結論の vacuous rider を実条件に締める。
 4. faithful 性監査: opaque が消えるまで「scaffold doneness ≠ build-green」を [[scaffold-sorry-free-not-done]] で判定。
 
-**進捗 (2026-06-06)**: S15 `Hypothesis` の (13.1.d,e) 恒等式 3 個を step 2 相当で materialize 済
-(opaque `: Prop` → carried ℂ-linear map `tau3`/`indWS`/`indWT` + genuine 等式、commit c724456)。
-**残 = step 1**: `tau3` を (3.2) Dade σ に、`indWS`/`indWT` を canonical `ClassFunction.induce` に pin
-する。後者は ambient (↥S/↥T) の finiteness を要し、`induce` が `[Invertible (Nat.card H : ℂ)]` +
-`∑ x : G` (Fintype) を要求するため **`S15.Hypothesis` への `[Finite G]` 追加** (S16 まで ripple) が前提。
-前者は (3.2) σ : CF(W)→CF(G) の S03 材料化 (gate #3) が前提。両方そろうと carried map を等式で canonical に締められる。
+**進捗 (2026-06-06→07)**:
+- step 2 (materialize): S15 `Hypothesis` の (13.1.d,e) 恒等式 3 個を opaque `: Prop` → genuine 等式化 (c724456)。
+- **μ/ν を canonical induction に pin 完了** (92a99b9): carried `indWS`/`indWT` を撤去し
+  `ClassFunction.induce (W.subgroupOf S/T)` (W-grid を W≤S/T で transport) に置換。**ripple 回避の鍵** =
+  `[finiteG : Finite G]` を **instance field** で構造体に内包 (消費者は `[Finite G]` 再仮定不要) +
+  `noncomputable scoped instance` (`Fintype ↥H` from Finite / `Invertible (Nat.card H : ℂ)`) を
+  `scoped namespace FiniteInduce` に置き structure 限定で `open scoped`。これで `induce` が field 型内で
+  elaborate し、noncomputable Fintype/Invertible が大域に漏れない。(scratch probe で先に検証)。
+- `tau3` を `IntegralCharacterMap ↥W G` (ℤ-linear, tauS/tauT と統一) に retype (0081a9d)。
+- **残 = `tau3` の完全 σ-pin** (大): `tau3` を**具体的 (3.2) Dade isometry** にする = W の
+  `S05.TICyclicHypothesis` (W1/W2/V TI-subset 〜13 field) を確立 → `S04.dadeIntegralCharacterMap` で σ 構成 →
+  ω を (3.3) grid として材料化 → `tau3 = σ`。これは §3/§5 本体の dedicated 形式化 (gate #3 proper)。
 
 grep 手掛かり: `_formula : Prop` / `_formula : G → Prop` / `_holds :` / `: Prop$`。
