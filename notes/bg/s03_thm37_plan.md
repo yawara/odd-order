@@ -186,7 +186,25 @@ glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model
 - c R-fixed (∀a:↥R, φ a c=c) ⟹ ∀r∈R, r·(c:G)·r⁻¹=(c:G) ⟹ (ii-a) `frobenius_kernel_conj_fixed_eq_one h (hXK c.2) _` で (c:G)=1 ⟹ c=1 ⟹ x=n⁻¹∈N ⟹ ⟦x⟧=1。
 - **friction**: framework bridge (φ:A→MulAut vs chiefFactorConjAction MulDistribMulAction), 要素順序 (QuotientGroup.eq の a⁻¹b)、IsAInvariant.subgroupOf の引数。~9 step、複数 build cycle 見込み。
 
-**(v) induction skeleton**: Nat.card K 強帰納 (WellFoundedLT or Nat.strong_induction), L=maxProperNormalOrBot K; L=⊥ なら K=⊥ or K自身が chief factor; L≠⊥ なら LR への restriction で C_L(R)=1 + Frobenius → IH(|L|<|K|)で L nilpotent → `nilpotent_normal_le_fitting`(L⊴G)→ L⊆F(G); Prop1.2 のため `∀i, ⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i+1)`: chiefSeriesInside K i ≠⊥ なら chief factor V_i/V_{i+1}, elem-abelian(iv), |K̄|=|K/L| vs |V_i/V_{i+1}| 素数で same-prime[`commutator_eq_bot_of_normal_pgroup_minimalNormal`, model 経由]/coprime[`coprime_kernel_le_chiefFactorCentralizer` + (ii-b) FPF] dichotomy → `chiefFactorCentralizer.commutator_le_of_le` → ⁅K,V_i⁆≤V_{i+1} → Prop1.2 `isNilpotent_of_chief_factor_centralization`。**注: dichotomy の prime 比較 + same-prime の model 経由結線 が残課題**。
+### (v) main induction — **BG 原文 (local-analysis.mmd L1199-1219) の精密手順**
+
+**Statement (BG Thm 3.7)**: `G=KR` solvable odd, `K⊴G`, `R` complement of prime order `p`, `C_K(R)=1` ⟹ `K` nilpotent。Lean では `IsFrobeniusGroup G K R`(C_K(R)=1+R prime order から従う; conj_frobenius は C_K(a)=C_K(R)=1 ∀a≠1∈R で成立)+ `[IsSolvable G]` + `R` prime order を仮定し `Group.IsNilpotent ↥K` を結論。
+
+**Proof 構造**:
+1. **(3.39) `(|K|,|R|)=1`**: 既に `coprime_card_kernel_complement`(Frobenius から)で取得可。BG は Sylow 論法だが Frobenius 経由で free。
+2. `K=1` なら trivial。`L := maxProperNormalOrBot K`(`K≠1` で `L<K`, `L⊴G`)。
+3. **`C_L(R) ⊆ C_K(R)=1`** → **IH を `LR` に適用** → `L` nilpotent。← **強帰納 (on `Nat.card ↥G` or `↥K`)。IH は LR(=↥(L⊔R), kernel L, complement R)の Frobenius 構造が必要 = 🔴 LR Frobenius **restriction** 補題が未形式化 (S03 は quotient 方向のみ)。subgroup 制限の typing がネック。**
+4. `L⊴G` nilpotent → `L ⊆ F(G)` (`nilpotent_normal_le_fitting`, Isaacs Ch01:904)。BG は F(K) だが F(G) で十分(下記 glue A が G-chief factor 用)。
+5. `Ḡ=G/L, K̄=K/L, R̄=RL/L`。Lemma 3.1/3.2: `G` と `Ḡ` 両方 Frobenius (kernels K,K̄; complements R,R̄) ((3.41))。Ḡ 側 = (iii) `frobenius_quotient_of_normal_lt_kernel`。
+6. **Prop 1.2** で `K` nilpotent ⟺ `K` が `X⊆K` なる G-chief factor `X/Y` を全て centralize。`isNilpotent_of_chief_factor_centralization` の `∀i, ⁅K, chiefSeriesInside K i⁆ ≤ chiefSeriesInside K (i+1)` がこれ。
+7. 各 chief factor `V=X/Y` (X⊆K) で: **`L` centralizes V** ← `L⊆F(G)` + glue A `fitting_le_chiefFactorCentralizer` (S01: F(G) ≤ chiefFactorCentralizer)。→ G と Ḡ の作用が V 上 irreducible。**`K̄` centralizes V を示せば十分**(L が centralize するので `K` centralize ⟺ `K̄` centralize)。
+8. G solvable → `K̄`, `V` elem-abelian ((iv) `chiefFactor_isElementaryAbelian`)。
+9. **dichotomy** (V の素数 s vs |K̄|):
+   - **same-prime** (K̄, V とも q-group, 同 q): `K̄ ⊆ O_q(Ḡ)` + Ḡ irreducible → `K̄` centralizes V。← `commutator_eq_bot_of_normal_pgroup_minimalNormal` (Ḡ model: K̄=K.map(mk' L), V̄ minimal normal in Ḡ; **model bridge 要**)。
+   - **coprime** (|K̄|,|V| coprime): (3.39) で |V| coprime to |Ḡ|。`C_V(R̄)=C_V(R)=C_X(R)Y/Y=1` ((ii-b) `chiefFactor_fixedPointFree`) + Lemma 3.3 → `K̄` trivial on V。← (coprime conclusion) `coprime_kernel_le_chiefFactorCentralizer` (hVelem + L≤chiefFactorCentralizer(step7) + G/L Frobenius(step5) + s∤|K̄| + FPF(ii-b))。
+10. → `K ≤ chiefFactorCentralizer X Y` → `chiefFactorCentralizer.commutator_le_of_le` → ⁅K,V_i⁆≤V_{i+1} → Prop1.2 → done。
+
+**残課題 (大きい順)**: (a) 🔴 **強帰納 setup** (group-order induction, IH を LR subgroup に適用) + **LR Frobenius restriction 補題** (未形式化, subgroup typing); (b) **same-prime case の Ḡ-model bridge** (K̄/V̄ as q-groups in Ḡ, commutator_eq_bot → K centralizes V); (c) **coprime case 組立** (prerequisites 全在庫, prime 比較 s∤|K̄| の場合分け)。**sub-piece 分割推奨**: まず coprime-only の per-factor dichotomy lemma (prerequisites 在庫) → same-prime → LR restriction → induction 本体。
 
 ## §11 適用 (Thm 11.3)
 `M_σ ⋊ ⟨a₀^g⟩` (a₀^g prime order p, C_{M_σ}(a₀^g)=1, M_σ solvable=M の部分群)。
