@@ -220,4 +220,19 @@ theorem le_oPiPrimePiCore_of_quotient_isPGroup [Fact p.Prime] {G : Type*} [Group
     Ch03.Subgroup.IsPiGroup.le_oPiCore (isPiGroup_singleton_of_isPGroup hK)
   exact Subgroup.map_le_iff_le_comap.mp hle
 
+/-- The image of `O_{p',p}(G)` in `G/O_{p'}(G)` is a `p`-group — it is exactly `O_p(G/O_{p'}(G))`.
+(Building block for Lemma 1.21(a): `O_{p',p}(G)/O_{p'}(G)` is a `p`-group.) -/
+theorem isPGroup_map_oPiPrimePiCore [Fact p.Prime] {G : Type*} [Group G] [Finite G] :
+    IsPGroup p ↥((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).map
+      (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G))) := by
+  have heq : (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).map
+        (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G))
+      = Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G) :=
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
+  rw [heq]
+  exact IsPGroup.of_card (Nat.eq_prime_pow_of_unique_prime_dvd Nat.card_pos.ne'
+    (fun {d} hd hdvd => Set.mem_singleton_iff.mp
+      (Ch03.oPiCore.isPiGroup ({p} : Set ℕ) d
+        (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))))
+
 end OddOrder.BG.Ch1
