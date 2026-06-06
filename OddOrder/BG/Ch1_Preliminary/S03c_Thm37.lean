@@ -407,4 +407,45 @@ theorem isFrobeniusGroup_sup_of_normal_le_kernel
     push_cast at hval
     exact hval
 
+/-- **A normal `s`-subgroup acts trivially on an irreducible `s`-module** (same-prime core of BG
+Thm 3.7's chief-factor analysis). If `K̄ ⊴ Ḡ` is an `s`-group acting (`MulDistribMulAction`) on a
+finite `s`-group `M` whose only `Ḡ`-invariant subgroups are `⊥` and `⊤`, then `K̄` fixes every point
+of `M`. Proof: the `K̄`-fixed points `C_M(K̄)` form a `Ḡ`-invariant subgroup
+(`K̄ ⊴ Ḡ`), nonzero by the `p`-group fixed-point theorem
+(`fixedPoints_ne_bot_of_pgroup_action_pgroup`), hence `= ⊤` by irreducibility. -/
+theorem normal_pgroup_acts_trivially_of_irreducible {s : ℕ} [Fact s.Prime]
+    {Gbar M : Type*} [Group Gbar] [Finite Gbar] [Group M] [Finite M]
+    [MulDistribMulAction Gbar M] {Kbar : Subgroup Gbar} [Kbar.Normal]
+    (hKbar : IsPGroup s Kbar) (hMs : IsPGroup s M)
+    (hirr : ∀ N : Subgroup M, (∀ g : Gbar, ∀ n : M, n ∈ N → g • n ∈ N) → N = ⊥ ∨ N = ⊤) :
+    ∀ (k : Kbar) (m : M), (k : Gbar) • m = m := by
+  rcases subsingleton_or_nontrivial M with _ | _
+  · intro k m; exact Subsingleton.elim _ _
+  · set φ : Kbar →* MulAut M := (MulDistribMulAction.toMulAut Gbar M).comp Kbar.subtype with hφ
+    have hsmul : ∀ (a : Kbar) (m : M), (φ a) m = (a : Gbar) • m := fun _ _ => rfl
+    have hCne : Subgroup.fixedPointsOfMulAut φ ≠ ⊥ :=
+      OddOrder.Isaacs.Ch04.fixedPoints_ne_bot_of_pgroup_action_pgroup hMs hKbar φ
+    have hCinv : ∀ g : Gbar, ∀ n : M, n ∈ Subgroup.fixedPointsOfMulAut φ →
+        g • n ∈ Subgroup.fixedPointsOfMulAut φ := by
+      intro g n hn
+      rw [Subgroup.mem_fixedPointsOfMulAut]
+      intro a
+      rw [hsmul]
+      have hk' : g⁻¹ * (a : Gbar) * g ∈ Kbar := by
+        have hc := (inferInstance : Kbar.Normal).conj_mem (a : Gbar) a.2 g⁻¹
+        simpa using hc
+      have hfix : ((⟨g⁻¹ * (a : Gbar) * g, hk'⟩ : Kbar) : Gbar) • n = n := by
+        have hm := (Subgroup.mem_fixedPointsOfMulAut.mp hn) ⟨g⁻¹ * (a : Gbar) * g, hk'⟩
+        rw [hsmul] at hm; exact hm
+      calc (a : Gbar) • (g • n) = ((a : Gbar) * g) • n := by rw [mul_smul]
+        _ = (g * (g⁻¹ * (a : Gbar) * g)) • n := by group
+        _ = g • ((g⁻¹ * (a : Gbar) * g) • n) := by rw [mul_smul]
+        _ = g • n := by rw [hfix]
+    rcases hirr _ hCinv with hbot | htop
+    · exact absurd hbot hCne
+    · intro k m
+      have hmem : m ∈ Subgroup.fixedPointsOfMulAut φ := by rw [htop]; exact Subgroup.mem_top m
+      have hm := (Subgroup.mem_fixedPointsOfMulAut.mp hmem) k
+      rw [hsmul] at hm; exact hm
+
 end OddOrder.BG.Ch1.S03c
