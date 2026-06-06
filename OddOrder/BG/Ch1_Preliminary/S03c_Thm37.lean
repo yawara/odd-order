@@ -7,6 +7,8 @@ import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
+import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
+import Mathlib.GroupTheory.GroupAction.ConjAct
 
 /-!
 # BG §3D: toward Theorem 3.7 (Frobenius kernel nilpotency)
@@ -105,5 +107,22 @@ theorem kernel_acts_trivially_of_coprime_fixedPointFree {s : ℕ} [Fact s.Prime]
     rw [hKtriv k]; rfl
   rw [hρ_apply] at happ
   exact congrArg Additive.toMul happ
+
+/-- The conjugation action of `G` on a chief factor `X/Y` (with `X`, `Y` normal in `G`), presented
+as `MulDistribMulAction G (↥X ⧸ Y.subgroupOf X)`: `G` conjugates the normal subgroup `↥X`, the
+invariant subgroup `Y.subgroupOf X` is preserved (`Y` normal), and the action descends to the
+quotient, then is pulled back from `ConjAct G` to `G`. This is the chief-factor action fed (after
+descending through `G/L` via `mulDistribMulActionQuotientOfTrivial`) to the coprime case. -/
+noncomputable def chiefFactorConjAction {G : Type*} [Group G] (X Y : Subgroup G)
+    [X.Normal] [Y.Normal] :
+    MulDistribMulAction G (↥X ⧸ Y.subgroupOf X) :=
+  letI : MulDistribMulAction (ConjAct G) (↥X ⧸ Y.subgroupOf X) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction
+      (Y.subgroupOf X) (by
+        intro a m hm
+        rw [Subgroup.mem_subgroupOf] at hm ⊢
+        show ConjAct.ofConjAct a * (↑m : G) * (ConjAct.ofConjAct a)⁻¹ ∈ Y
+        exact (‹Y.Normal›).conj_mem _ hm _)
+  MulDistribMulAction.compHom _ (ConjAct.toConjAct (G := G)).toMonoidHom
 
 end OddOrder.BG.Ch1.S03c
