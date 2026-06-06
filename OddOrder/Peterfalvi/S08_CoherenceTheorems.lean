@@ -3480,6 +3480,40 @@ def Xset (hyp : SibleyDadeHypothesis G L H) (Z : Subgroup ↥L) :
 def Yset (hyp : SibleyDadeHypothesis G L H) : Set (ClassFunction ↥L ℂ) :=
   hyp.SsubFiltration ⁅H, H⁆
 
+/-- **(6.8) case (A) central subgroup `Z = Z(H) ∩ H′`** (Peterfalvi (6.8), p.34: *"Set
+`Z = Z(H) ∩ H′` in case (A)"*).  This is the **correct** `(6.6)` `Z` for the `X = S − S(Z)`
+coherence step: it is **central in `H`** (so [Is] Cor 2.30 `exists_degree_sq_le_index` bounds
+`θ(1)² ≤ |H:Z|`, making the per-step degree field fillable) and contained in `H′ = ⁅H,H⁆`.
+
+The earlier capstone route mis-instantiated the `(6.6)` producer at `Z = ⁅H,H⁆`, which is **not**
+central for class `≥ 3` `p`-groups (e.g. `UT(4,p)`), so its degree field `θχ² ≤ qtot ≤ |H:⁅H,H⁆|`
+was unsatisfiable.  See `notes/peterfalvi/s08_6_8_blocker_central_Z.md`. -/
+def centralCommutator (hyp : SibleyDadeHypothesis G L H) : Subgroup ↥L :=
+  (Subgroup.center ↥H).map H.subtype ⊓ ⁅H, H⁆
+
+theorem centralCommutator_le_commutator (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator ≤ ⁅H, H⁆ := by
+  simp only [centralCommutator]; exact inf_le_right
+
+theorem centralCommutator_le (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator ≤ H := by
+  haveI := hyp.H_normal
+  exact le_trans hyp.centralCommutator_le_commutator (Subgroup.commutator_le_left H H)
+
+/-- `Z = Z(H) ∩ H′` is central in `H`: its trace `Z.subgroupOf H` lies in `Z(↥H)`.  This is the
+hypothesis [Is] Cor 2.30 / `IsIrreducibleCharacter.exists_degree_sq_le_index` needs to bound
+`θ(1)² ≤ |H : Z|` for the `(6.6)` per-step degree field. -/
+theorem centralCommutator_subgroupOf_le_center (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.subgroupOf H ≤ Subgroup.center ↥H := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  simp only [centralCommutator] at hx
+  have hx2 : (x : ↥L) ∈ (Subgroup.center ↥H).map H.subtype := (Subgroup.mem_inf.mp hx).1
+  rw [Subgroup.mem_map] at hx2
+  obtain ⟨z, hz, hzx⟩ := hx2
+  have hzx' : z = x := Subtype.ext (by simpa using hzx)
+  rwa [← hzx']
+
 /-- Membership in `S(A)`, unfolded. -/
 theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
