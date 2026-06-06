@@ -634,6 +634,58 @@ theorem exists_coherentBreakPair
       OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair rfl hconj2
     rw [← hsplit]; exact hnPi
 
+/-- **In a finite nilpotent group, a nontrivial normal subgroup meets the centre.**
+If `N ◁ G` is nontrivial and `G` is finite nilpotent, then `N ⊓ Z(G) ≠ ⊥`.  Proof: take the least
+`m` with `N ⊓ ζₘ ≠ ⊥` (the upper central series reaches `⊤`, so `m` exists; `m = k+1 > 0`); a
+nontrivial `x ∈ N ⊓ ζ_{k+1}` has `x·y·x⁻¹·y⁻¹ ∈ ζₖ` (definition of `ζ_{k+1}`) and `∈ N` (`N`
+normal), so `∈ N ⊓ ζₖ = ⊥` by minimality; hence `x` is central, `x ∈ N ⊓ Z(G)`.
+
+This is the nilpotency central step of Peterfalvi (6.3): `H/M` nilpotent and `A/B` a nontrivial
+normal subgroup give `(A/B) ⊓ Z(H/B) ≠ 1`, which (with maximality of `B`) forces `A/B ⊆ Z(H/B)`. -/
+theorem isNilpotent_normal_inf_center_ne_bot {Γ : Type*} [Group Γ] [Finite Γ]
+    [Group.IsNilpotent Γ] {N : Subgroup Γ} (hN : N.Normal) (hNne : N ≠ ⊥) :
+    N ⊓ Subgroup.center Γ ≠ ⊥ := by
+  classical
+  have hexists : ∃ i, N ⊓ upperCentralSeries Γ i ≠ ⊥ := by
+    refine ⟨Group.nilpotencyClass Γ, ?_⟩
+    rw [upperCentralSeries_eq_top_iff_nilpotencyClass_le.mpr (le_refl _), inf_top_eq]
+    exact hNne
+  have hm := Nat.find_spec hexists
+  have hm0 : Nat.find hexists ≠ 0 := by
+    intro h0
+    rw [h0, upperCentralSeries_zero, inf_bot_eq] at hm
+    exact hm rfl
+  obtain ⟨k, hk_eq⟩ := Nat.exists_eq_succ_of_ne_zero hm0
+  have hkbot : N ⊓ upperCentralSeries Γ k = ⊥ := by
+    by_contra h
+    exact Nat.find_min hexists (m := k) (by rw [hk_eq]; exact Nat.lt_succ_self k) h
+  rw [hk_eq] at hm
+  obtain ⟨⟨x, hxmem⟩, hxne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hm
+  have hx1 : x ≠ 1 := fun h => hxne (Subtype.ext h)
+  rw [Subgroup.mem_inf] at hxmem
+  obtain ⟨hxN, hxU⟩ := hxmem
+  have hxcenter : x ∈ Subgroup.center Γ := by
+    rw [Subgroup.mem_center_iff]
+    intro y
+    have hcomm_U : x * y * x⁻¹ * y⁻¹ ∈ upperCentralSeries Γ k :=
+      mem_upperCentralSeries_succ_iff.mp hxU y
+    have hcomm_N : x * y * x⁻¹ * y⁻¹ ∈ N := by
+      have hconj : y * x⁻¹ * y⁻¹ ∈ N := hN.conj_mem x⁻¹ (N.inv_mem hxN) y
+      have := N.mul_mem hxN hconj
+      rwa [← mul_assoc, ← mul_assoc] at this
+    have hbot : x * y * x⁻¹ * y⁻¹ = 1 := by
+      have hin : x * y * x⁻¹ * y⁻¹ ∈ N ⊓ upperCentralSeries Γ k :=
+        Subgroup.mem_inf.mpr ⟨hcomm_N, hcomm_U⟩
+      rw [hkbot, Subgroup.mem_bot] at hin
+      exact hin
+    have h2 : x * y * x⁻¹ = y := mul_inv_eq_one.mp hbot
+    conv_lhs => rw [← h2]
+    group
+  intro hbot
+  have : x ∈ N ⊓ Subgroup.center Γ := Subgroup.mem_inf.mpr ⟨hxN, hxcenter⟩
+  rw [hbot, Subgroup.mem_bot] at this
+  exact hx1 this
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
