@@ -59,6 +59,17 @@ theorem five_le_p (hyp : Hypothesis (G := G)) : 5 ≤ hyp.base.p := by
     omega
   omega
 
+/-- In the prime field `ZMod p`, the scalar `2` is nonzero because the standing
+prime `p` is odd. -/
+theorem zmod_two_ne_zero (hyp : Hypothesis (G := G)) :
+    (2 : ZMod hyp.base.p) ≠ 0 := by
+  intro hzero
+  have hp_dvd_two : hyp.base.p ∣ 2 :=
+    (ZMod.natCast_eq_zero_iff 2 hyp.base.p).mp hzero
+  rcases (Nat.dvd_prime Nat.prime_two).mp hp_dvd_two with hp_eq_one | hp_eq_two
+  · exact hyp.base.p_prime.ne_one hp_eq_one
+  · exact hyp.base.p_ne_two hp_eq_two
+
 /-- The congruence used in **Peterfalvi (14.4)**: from `q < p` and `q` prime,
 `q` cannot be `1 mod p`. -/
 theorem q_not_modEq_one_mod_p (hyp : Hypothesis (G := G)) :
@@ -512,6 +523,27 @@ theorem s_zpow_mem_P_sup_U {hyp : Hypothesis (G := G)}
     (data : FieldNormalizerData hyp) (n : ℤ) :
     data.s ^ n ∈ hyp.base.P ⊔ hyp.base.U :=
   (le_sup_left : hyp.base.P ≤ hyp.base.P ⊔ hyp.base.U) (data.s_zpow_mem_P n)
+
+/-- Integer powers of the transported generator `s` are exactly the corresponding
+points of the concrete prime-field line. -/
+theorem s_zpow_eq_primeLineElement {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (n : ℤ) :
+    data.s ^ n =
+      data.sigma (fieldNormalizerPrimeLineElement hyp (n : ZMod hyp.base.p)) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  calc
+    data.s ^ n = data.sigma ((fieldNormalizerPrimeLineGenerator hyp) ^ n) := by
+      rw [s, map_zpow]
+    _ = data.sigma (fieldNormalizerPrimeLineElement hyp (n : ZMod hyp.base.p)) := by
+      congr 1
+      dsimp [fieldNormalizerPrimeLineElement, fieldNormalizerPrimeLineGenerator]
+      rw [← map_zpow (SemidirectProduct.inl :
+        OddOrder.BG.AppC.NormSet.additiveFieldGroup hyp.base.p hyp.base.q →*
+          fieldNormalizerFrobeniusGroup hyp)]
+      rw [SemidirectProduct.inl_inj]
+      rw [← ofAdd_zsmul]
+      congr 1
+      simp [zsmul_eq_mul]
 
 /-- The `s^{-2}` factor in BG C.3 Step 4 is the `-2` point of the concrete
 prime-field line after transport by `σ`. -/
@@ -3198,6 +3230,110 @@ theorem sigma_inr_w_mem_U {hyp : Hypothesis (G := G)} {data : FieldNormalizerDat
   · rw [← data.sigma_U_eq_U]
     exact ⟨SemidirectProduct.inr forms.w3, ⟨forms.w3, rfl⟩, rfl⟩
 
+/-- BG Appendix C `(C.6)` for the first `(C.5)` factor: its prime-line
+coordinate cannot be zero.  If `c₁=0`, then the first normal form lies in `U`;
+reading the same element as `s · U · s⁻²` and applying Step 2 with prime-line
+coordinates `(1,-2)` gives either `1=0` or `-1=0` in `ZMod p`, both impossible. -/
+theorem c1_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    forms.c1 ≠ 0 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hc1
+  have hu1 :
+      data.sigma (SemidirectProduct.inr forms.u1 : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.u1, ⟨forms.u1, rfl⟩, rfl⟩
+  have hv1 :
+      data.sigma (SemidirectProduct.inr forms.v1 : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.v1, ⟨forms.v1, rfl⟩, rfl⟩
+  have hM1U : data.step4M1 a ∈ hyp.base.U := by
+    rw [forms.hM1, hc1]
+    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using hyp.base.U.mul_mem hu1 hv1
+  have hM1_step :
+      data.sigma (fieldNormalizerPrimeLineElement hyp (1 : ZMod hyp.base.p)) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) ∈
+          hyp.base.U := by
+    have h := hM1U
+    rw [data.step4M1_eq_sigma_inr] at h
+    have hs_one :
+        data.s = data.sigma (fieldNormalizerPrimeLineElement hyp (1 : ZMod hyp.base.p)) := by
+      simp [s, fieldNormalizerPrimeLineElement_one]
+    have hs_neg_two :
+        data.s ^ (-2 : ℤ) =
+          data.sigma (fieldNormalizerPrimeLineElement hyp (-2 : ZMod hyp.base.p)) := by
+      simpa using data.s_zpow_eq_primeLineElement (-2 : ℤ)
+    rw [hs_neg_two] at h
+    rw [hs_one] at h
+    simpa [mul_assoc] using h
+  have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
+    (c := (1 : ZMod hyp.base.p)) (d := (-2 : ZMod hyp.base.p))
+    ((data.tConjNormOneUnitsAut ^ 3)⁻¹ a⁻¹) hM1_step
+  rcases hstep with hzero | hone
+  · exact one_ne_zero hzero.1
+  · have hsum : (1 : ZMod hyp.base.p) + -2 = (-1 : ZMod hyp.base.p) := by
+      ring
+    have hneg : (-1 : ZMod hyp.base.p) = 0 := by
+      simpa [hsum] using hone.2
+    exact one_ne_zero (neg_eq_zero.mp hneg)
+
+/-- BG Appendix C `(C.6)` for the third `(C.5)` factor: its prime-line
+coordinate cannot be zero.  If `c₃=0`, then the third normal form lies in `U`;
+reading the same element as `s² · U · s⁻³` and applying Step 2 with prime-line
+coordinates `(2,-3)` gives either `2=0` or `-1=0` in `ZMod p`, both impossible. -/
+theorem c3_ne_zero {hyp : Hypothesis (G := G)} {data : FieldNormalizerData hyp}
+    {a b : fieldNormalizerNormOneUnits hyp} (forms : Step4C5NormalForms data a b) :
+    forms.c3 ≠ 0 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro hc3
+  have hu3 :
+      data.sigma (SemidirectProduct.inr forms.u3 : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.u3, ⟨forms.u3, rfl⟩, rfl⟩
+  have hv3 :
+      data.sigma (SemidirectProduct.inr forms.v3 : fieldNormalizerFrobeniusGroup hyp) ∈
+        hyp.base.U := by
+    rw [← data.sigma_U_eq_U]
+    exact ⟨SemidirectProduct.inr forms.v3, ⟨forms.v3, rfl⟩, rfl⟩
+  have hM3U : data.step4M3 b ∈ hyp.base.U := by
+    rw [forms.hM3, hc3]
+    simpa [fieldNormalizerPrimeLineElement, mul_assoc] using hyp.base.U.mul_mem hu3 hv3
+  have hM3_step :
+      data.sigma (fieldNormalizerPrimeLineElement hyp (2 : ZMod hyp.base.p)) *
+          data.sigma
+            (SemidirectProduct.inr ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) :
+              fieldNormalizerFrobeniusGroup hyp) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp (-3 : ZMod hyp.base.p)) ∈
+          hyp.base.U := by
+    have h := hM3U
+    rw [data.step4M3_eq_sigma_inr] at h
+    have hs_two :
+        data.s ^ (2 : ℤ) =
+          data.sigma (fieldNormalizerPrimeLineElement hyp (2 : ZMod hyp.base.p)) := by
+      simpa using data.s_zpow_eq_primeLineElement (2 : ℤ)
+    have hs_neg_three :
+        data.s ^ (-3 : ℤ) =
+          data.sigma (fieldNormalizerPrimeLineElement hyp (-3 : ZMod hyp.base.p)) := by
+      simpa using data.s_zpow_eq_primeLineElement (-3 : ℤ)
+    rw [hs_two, hs_neg_three] at h
+    simpa [mul_assoc] using h
+  have hstep := data.generatorRelation_step2_primeLine_of_sigma_mem_U
+    (c := (2 : ZMod hyp.base.p)) (d := (-3 : ZMod hyp.base.p))
+    ((data.tConjNormOneUnitsAut ^ 1)⁻¹ b) hM3_step
+  rcases hstep with hzero | hone
+  · exact hyp.zmod_two_ne_zero hzero.1
+  · have hsum : (2 : ZMod hyp.base.p) + -3 = (-1 : ZMod hyp.base.p) := by
+      ring
+    have hneg : (-1 : ZMod hyp.base.p) = 0 := by
+      simpa [hsum] using hone.2
+    exact one_ne_zero (neg_eq_zero.mp hneg)
+
 end Step4C5NormalForms
 
 /-- BG Appendix C `(C.7)`, obtained by rearranging the `(C.5)` substitution relation and
@@ -4017,6 +4153,48 @@ theorem step3_badBranch_false [Finite G]
   data.P1_ne_W2
     (data.P1_eq_W2_of_le_normalizer_W2
       (data.step3_badBranch_P1_le_normalizer_W2 hbad))
+
+/-- BG Appendix C Step 4 after Step 3 and the bad-branch contradiction: with the
+two `(C.6)` nonzero inputs for the first and third prime-line factors, exact
+`(C.9)` no longer leaves a Step 3 alternative.  The dichotomy either gives the
+`U` branch, where the existing `(C.9)` collapse forces `w₁=w₂=w₃=1` and `(C.10)`,
+or gives the bad branch, now contradictory by `step3_badBranch_false`.
+
+This is the branch-free Step 3/C.10 producer still waiting only for the global
+`(C.6)` wiring that supplies `forms.c1 ≠ 0` and `forms.c3 ≠ 0`. -/
+theorem relationC9_w_eq_one_and_relationC10_of_c6 [Finite G]
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b)
+    (hc1 : forms.c1 ≠ 0) (hc3 : forms.c3 ≠ 0) :
+    forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
+      data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 := by
+  rcases data.relationC9_w_eq_one_and_relationC10_or_step3_inf_eq_P_sup_U
+      ha hb hab forms hc1 hc3 with hC10 | hbad
+  · exact hC10
+  · exact False.elim (data.step3_badBranch_false hbad)
+
+/-- BG Appendix C Step 4 branch-free `(C.10)` producer: exact `(C.9)`, Step 3,
+the bad-branch contradiction, and the `(C.6)` nonzero facts for `c₁` and `c₃`
+together force `w₁=w₂=w₃=1` and the displayed `(C.10)` relation. -/
+theorem relationC9_w_eq_one_and_relationC10 [Finite G]
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp)
+    {a b : fieldNormalizerNormOneUnits hyp}
+    (ha : unitVal a⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hb : unitVal b⁻¹ ∈ OddOrder.BG.AppC.NormSet.normSetE hyp.base.p hyp.base.q)
+    (hab : unitVal a⁻¹ + unitVal b⁻¹ = 2)
+    (forms : Step4C5NormalForms data a b) :
+    forms.w1 = 1 ∧ forms.w2 = 1 ∧ forms.w3 = 1 ∧
+      data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp forms.c3) = 1 :=
+  data.relationC9_w_eq_one_and_relationC10_of_c6
+    ha hb hab forms forms.c1_ne_zero forms.c3_ne_zero
 
 
 /-- **BG Appendix C, Lemma C.3 Step 4 capstone `s₁ = s⁻¹`**, as a statement: for
