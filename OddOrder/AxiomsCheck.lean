@@ -1922,6 +1922,10 @@ set_option linter.style.longLine false in
 -- `htau1_memaχ` fields).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_charValue_one_eq_mul_anchor
+-- (6.2) member-family core: flat enumeration of a finite conj-closed `S₁ ⊆ S` with the per-member
+-- orthonormality/non-real/diff-support/membership fields B1 consumes (degree data layered on).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_sMemberOrthonormalFamily
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

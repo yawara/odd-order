@@ -4698,6 +4698,52 @@ theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
     hyp.index_H_eq_card_W1, hχ₁deg]
   ring
 
+/-- **(6.2) member-family core for `S₁ ⊆ S`** (Frobenius case): the flat enumeration of `S₁` with
+its per-member orthonormality, non-realness, conjugate-difference support, and `S₁`-membership
+facts.
+
+For a finite conjugation-closed `S₁ ⊆ S`, `exists_finEnum_irreducible` gives an injective family
+`χmem : Fin k → Irr L` with range `S₁`; the per-member helpers (`sMember_characterFacts`,
+`sMember_diffSupport`) and conjugation-closure of `S₁` discharge the `hmemreal`/`hmemconjortho`/
+`hmemortho`/`hmemdiffsupp`/`hmemS1`/`hmembarS1` fields that B1
+(`coherentDegreeSumBound_of_not_coherent`) consumes.  The degree data
+(`deg`/`hmemdegdiffsupp`, from `sMember_charValue_one_eq_mul_anchor`) is layered on separately. -/
+theorem exists_sMemberOrthonormalFamily (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ)) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ).conj ∈ S₁) ∧
+      (∀ j, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ).conj = 0) ∧
+      (∀ i j, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ) = if i = j then (1 : ℂ) else 0) := by
+  have hS₁irr : ∀ φ ∈ S₁, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF (hS₁sub hφ)
+  obtain ⟨k, χmem, hχinj, hrange⟩ := exists_finEnum_irreducible hS₁fin hS₁irr
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact Set.mem_range_self j
+  refine ⟨k, χmem, hχinj, hrange, ?_, ?_, hmemS1, ?_, ?_, ?_⟩
+  · intro j
+    exact (hyp.sMember_characterFacts hF (hS₁sub (hmemS1 j))).1
+  · intro j
+    exact hyp.sMember_diffSupport (hS₁sub (hmemS1 j)) (χmem j).2
+  · intro j
+    exact hS₁conj (hmemS1 j)
+  · intro j
+    exact (hyp.sMember_characterFacts hF (hS₁sub (hmemS1 j))).2.2.2.2
+  · intro i j
+    rw [irreducibleCharacter_inner_eq_ite (χmem i) (χmem j)]
+    rcases eq_or_ne i j with h | h
+    · subst h; simp
+    · rw [if_neg (fun he => h (hχinj he)), if_neg h]
+
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
 Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
