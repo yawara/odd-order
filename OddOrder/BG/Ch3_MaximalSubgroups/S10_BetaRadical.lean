@@ -359,7 +359,89 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
     (hYne : Y ≠ ⊥) (hYβ : Subgroup.IsPiSubgroup (beta M) Y) :
     Subgroup.normalizer (Y : Set G) ≤ M := by
-  sorry
+  classical
+  have hM_co : IsCoatom M := mem_maximalSubgroups.mp hM
+  -- `↥Y` is finite, solvable and nontrivial, so `F(↥Y) ≠ 1` and `q ∣ |F(↥Y)|` for some prime `q`.
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hYsolv : IsSolvable ↥Y :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hYM)
+  haveI hYnt : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have hFne : Ch01.fitting ↥Y ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y
+  haveI hFnt : Nontrivial ↥(Ch01.fitting ↥Y) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
+  obtain ⟨q, hq_prime, hq_dvdF⟩ :=
+    (Nat.card ↥(Ch01.fitting ↥Y)).exists_prime_and_dvd
+      (by have := Finite.one_lt_card_iff_nontrivial.mpr hFnt; omega)
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  -- `q ∈ π(F(↥Y)) ⊆ π(Y)`, hence `q ∈ β(M)`: `idealPrime q G` and `q ∈ α(M) ⊆ σ(M)`.
+  have hq_piY : q ∈ (Nat.card ↥Y).primeFactors := by
+    refine Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvdF.trans ?_, Nat.card_pos.ne'⟩
+    exact Subgroup.card_subgroup_dvd_card _
+  have hqβ : q ∈ beta M := hYβ q hq_piY
+  rw [mem_beta_iff] at hqβ
+  obtain ⟨hqα, hq_ideal⟩ := hqβ
+  have hqσ : q ∈ sigma M := alpha_subset_sigma hG hM hqα
+  -- `X := O_q(↥Y)` realised in `G`: a `q`-subgroup, `≤ Y ≤ M`, and characteristic in `Y`.
+  set X : Subgroup G := opiCoreInG ({q} : Set ℕ) Y with hXdef
+  have hX_pg : IsPGroup q ↥X := isPGroup_opiCoreInG_singleton Y
+  have hXY : X ≤ Y := opiCoreInG_le _ _
+  have hXM : X ≤ M := hXY.trans hYM
+  -- `X ≠ ⊥`: a `q`-element of `F(↥Y)` lies in `O_q(↥Y)` (`mem_opCore_of_le_fitting`).
+  have hXne : X ≠ ⊥ := by
+    obtain ⟨x, hx_ord⟩ := exists_prime_orderOf_dvd_card' q hq_dvdF
+    set K : Subgroup ↥Y := (Subgroup.zpowers x).map (Ch01.fitting ↥Y).subtype with hKdef
+    have hKcard : Nat.card ↥K = q := by
+      rw [hKdef, Subgroup.card_map_of_injective (Ch01.fitting ↥Y).subtype_injective,
+        Nat.card_zpowers, hx_ord]
+    have hK_pg : IsPGroup q ↥K := by
+      rw [IsPGroup.iff_card]; exact ⟨1, by rw [hKcard, pow_one]⟩
+    have hK_fit : K ≤ Ch01.fitting ↥Y := Subgroup.map_subtype_le _
+    have hK_op : K ≤ Ch01.opCore q ↥Y :=
+      Ch02.mem_opCore_of_le_fitting_of_isPGroup hK_pg hK_fit
+    have hop_ne : Ch01.opCore q ↥Y ≠ ⊥ := by
+      intro hbot
+      rw [hbot, le_bot_iff] at hK_op
+      have h1 : Nat.card ↥K = 1 := by simp [hK_op]
+      have := hq_prime.two_le
+      omega
+    have hbridge : X = (Ch01.opCore q ↥Y).map Y.subtype := by
+      rw [hXdef, OddOrder.GroupTheory.opiCoreInG, Ch04.oPiCore_singleton_eq_opCore]
+    rw [hbridge, Ne, Subgroup.map_eq_bot_iff, Subgroup.ker_subtype, le_bot_iff]
+    exact hop_ne
+  -- Land `X` in a Sylow `q`-subgroup `S` of `G` that lies in `M` (using `q ∈ σ(M)`).
+  have hXMsub_pg : IsPGroup q ↥(X.subgroupOf M) :=
+    hX_pg.of_equiv (Subgroup.subgroupOfEquivOfLe hXM).symm
+  obtain ⟨P, hXP⟩ := hXMsub_pg.exists_le_sylow
+  obtain ⟨S, hS_eq⟩ := isSylow_sylowMap_of_mem_sigma hqσ P
+  have hS_le_M : (S : Subgroup G) ≤ M := by rw [hS_eq]; exact Subgroup.map_subtype_le _
+  have hXS : X ≤ (S : Subgroup G) := by
+    rw [hS_eq, ← Subgroup.map_subgroupOf_eq_of_le hXM]
+    exact Subgroup.map_mono hXP
+  -- Proposition 10.14(c): `N_G(X) ⊓ S` is uniquely maximal, with unique coatom `M`.
+  obtain ⟨_, M', ⟨hM'co, _⟩, hM'uniq⟩ := (beta_global_structure hG hq_ideal S).2.2 X hXS
+  have hcap_le_M : Subgroup.normalizer (X : Set G) ⊓ (S : Subgroup G) ≤ M :=
+    le_trans inf_le_right hS_le_M
+  have hM_eq : M = M' := hM'uniq M ⟨hM_co, hcap_le_M⟩
+  -- `N_G(X)` is proper (else `X ⊴ G`, contradicting `G` simple with `⊥ ≠ X ≠ ⊤`).
+  have hNX_lt : Subgroup.normalizer (X : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    have hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases (hG.simple).eq_bot_or_eq_top_of_normal X hXnormal with hb | ht
+    · exact hXne hb
+    · exact hM_co.1 (top_le_iff.mp (ht ▸ hXM))
+  -- A coatom `C ⊇ N_G(X)` exists; it contains `N_G(X) ⊓ S`, so `C = M' = M`.
+  obtain ⟨C, hCco, hNXC⟩ :=
+    (IsCoatomic.eq_top_or_exists_le_coatom (Subgroup.normalizer (X : Set G))).resolve_left
+      hNX_lt.ne
+  have hCeq : C = M' := hM'uniq C ⟨hCco, le_trans inf_le_left hNXC⟩
+  -- `N_G(Y) ≤ N_G(X) ≤ C = M` (characteristic core normalizer).
+  have hNYNX : Subgroup.normalizer (Y : Set G) ≤ Subgroup.normalizer (X : Set G) := by
+    rw [hXdef]
+    exact le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ) (le_refl _)
+  calc Subgroup.normalizer (Y : Set G)
+      ≤ Subgroup.normalizer (X : Set G) := hNYNX
+    _ ≤ C := hNXC
+    _ = M := by rw [hCeq, ← hM_eq]
 
 /-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
 

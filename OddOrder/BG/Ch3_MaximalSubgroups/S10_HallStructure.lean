@@ -1203,7 +1203,7 @@ private theorem commutator_eq_top [Finite G] (hG : IsMinimalSimpleOdd G) : commu
 /-- **σ basic fact, every Sylow** (mmd L2655): for `p ∈ σ(M)` and *any* Sylow `p`-subgroup `P` of
 `M`, its image `P̄` is a Sylow `p`-subgroup of `G`. Same argument as `exists_sylow_le_of_mem_sigma`
 but for an arbitrary Sylow `P`, using `normalizer_sylow_map_le_of_mem_sigma`. -/
-private theorem isSylow_sylowMap_of_mem_sigma [Finite G]
+theorem isSylow_sylowMap_of_mem_sigma [Finite G]
     {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) (P : Sylow p ↥M) :
     ∃ S : Sylow p G, (S : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
   set Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype with hPbar
