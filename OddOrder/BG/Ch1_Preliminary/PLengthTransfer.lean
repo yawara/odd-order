@@ -235,4 +235,22 @@ theorem isPGroup_map_oPiPrimePiCore [Fact p.Prime] {G : Type*} [Group G] [Finite
       (Ch03.oPiCore.isPiGroup ({p} : Set ℕ) d
         (Nat.mem_primeFactors.mpr ⟨hd, hdvd, Nat.card_pos.ne'⟩))))
 
+/-- `O_{p'}(G) ∩ H` lands in `O_{p'}(↥H)` — it is a normal `{p}ᶜ`-subgroup of `↥H`.
+(Building block for Lemma 1.21(a).) -/
+theorem oPiCore_compl_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} :
+    (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H
+      ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H := by
+  haveI : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H).Normal :=
+    Subgroup.Normal.comap inferInstance H.subtype
+  refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
+  intro r hr
+  have hcard : Nat.card ↥((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).subgroupOf H)
+      ∣ Nat.card ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) G) := by
+    rw [← Subgroup.card_map_of_injective H.subtype_injective,
+      Subgroup.subgroupOf_map_subtype]
+    exact Subgroup.card_dvd_of_le inf_le_left
+  exact Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) r
+    (Nat.primeFactors_mono hcard Nat.card_pos.ne' hr)
+
 end OddOrder.BG.Ch1
