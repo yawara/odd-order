@@ -295,4 +295,13 @@ theorem frobenius_kernel_conj_fixed_eq_one
     Subgroup.mem_bot] at hmem
   exact hc1 hmem
 
+/-- In a Frobenius group `G = KR`, the complement order `|R|` is coprime to the order of any
+subgroup `X ≤ K` (since `|X| ∣ |K|` and `(|K|,|R|)=1`). The coprimality hypothesis for the
+coprime fixed-point lift in BG Thm 3.7's FPF derivation. -/
+theorem frobenius_coprime_complement_subgroup
+    {G : Type*} [Group G] [Finite G] {K R X : Subgroup G}
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hXK : X ≤ K) :
+    Nat.Coprime (Nat.card ↥R) (Nat.card ↥X) :=
+  h.coprime_card_kernel_complement.symm.coprime_dvd_right (Subgroup.card_dvd_of_le hXK)
+
 end OddOrder.BG.Ch1.S03c
