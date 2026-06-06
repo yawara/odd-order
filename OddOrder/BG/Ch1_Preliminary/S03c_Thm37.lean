@@ -504,4 +504,40 @@ theorem chiefFactor_invariant_eq_bot_or_top {G : Type*} [Group G] {X Y : Subgrou
     rw [← hNeq, hNcomapW, hWeq, Subgroup.subgroupOf_self,
       Subgroup.map_top_of_surjective q hqsurj]
 
+open OddOrder.GroupTheory in
+/-- **Same-prime branch of BG Thm 3.7's chief-factor analysis**: for a `G`-chief factor `X/Y`
+elementary abelian of prime `s`, with `L ⊴ G` centralizing `X/Y` and the quotient kernel
+`K/L` an `s`-group (same prime as `X/Y`), the kernel `K` centralizes `X/Y`
+(`K ≤ chiefFactorCentralizer X Y`). Descends the action to `G/L`, then applies
+`normal_pgroup_acts_trivially_of_irreducible` with irreducibility from
+`chiefFactor_invariant_eq_bot_or_top`. -/
+theorem samePrime_kernel_le_chiefFactorCentralizer
+    {G : Type*} [Group G] [Finite G] {K X Y : Subgroup G} [K.Normal]
+    [X.Normal] [Y.Normal] {s : ℕ} [Fact s.Prime]
+    (hChief : IsChiefFactor X Y)
+    (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
+    {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
+    (hKbar : IsPGroup s (K.map (QuotientGroup.mk' L))) :
+    K ≤ chiefFactorCentralizer X Y := by
+  letI := chiefFactorConjAction X Y
+  have hVs : IsPGroup s (↥X ⧸ Y.subgroupOf X) :=
+    fun v => ⟨1, by rw [pow_one]; exact hVelem.pow_eq_one v⟩
+  have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
+    intro l hl v
+    exact (chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
+  letI := mulDistribMulActionQuotientOfTrivial L hL
+  haveI : (K.map (QuotientGroup.mk' L)).Normal :=
+    (inferInstance : K.Normal).map (QuotientGroup.mk' L) (QuotientGroup.mk'_surjective L)
+  have hirr : ∀ N : Subgroup (↥X ⧸ Y.subgroupOf X),
+      (∀ gq : G ⧸ L, ∀ n : ↥X ⧸ Y.subgroupOf X, n ∈ N → gq • n ∈ N) → N = ⊥ ∨ N = ⊤ := by
+    intro N hNinv
+    refine chiefFactor_invariant_eq_bot_or_top hChief N (fun g n hn => ?_)
+    rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL g n]
+    exact hNinv (QuotientGroup.mk g) n hn
+  have hKtriv := normal_pgroup_acts_trivially_of_irreducible hKbar hVs hirr
+  intro k hk
+  refine (chiefFactorConjAction_smul_eq_self_iff_mem k).mp (fun v => ?_)
+  rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (k : G) v]
+  exact hKtriv ⟨QuotientGroup.mk' L (k : G), ⟨k, hk, rfl⟩⟩ v
+
 end OddOrder.BG.Ch1.S03c
