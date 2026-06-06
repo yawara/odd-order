@@ -17,7 +17,7 @@ cleanup path をまとめる。**この note が canonical 参照** (各ファ�
 
 | ファイル | opaque 数 | 備考 |
 |---|---|---|
-| Peterfalvi S15_SAndT | 44 | 最大。ただし ω/η/μ/ν 自体は実型 `Fin q→Fin p→ClassFunction _ ℂ` field で materialize 済; opaque はそれらの**恒等式** |
+| Peterfalvi S15_SAndT | 41 | ω/η/μ/ν 自体は実型 `Fin q→Fin p→ClassFunction _ ℂ` field。**2026-06-06: `Hypothesis` 本体の (13.1.d,e) 恒等式 3 個 (`eta_eq_tau_omega`/`mu_definition`/`nu_definition`) を materialize** (carried ℂ-linear `tau3`/`indWS`/`indWT` + genuine 等式; commit c724456)。残 opaque は §13 `…Data` carrier 構造 (BasicStructureData/CharacterDegreeData/NormCascadeData/BetaData/TypeIOrthogonalityData) のみ; `Hypothesis` 本体は opaque 0 |
 | Peterfalvi S16_NonExistenceG | 37 | FieldNormalizerData/LHypothesis/MHypothesis の恒等式 field。最終矛盾の配線は honest (下記) |
 | Peterfalvi S14_MaximalI | 26 | |
 | Peterfalvi S12/S13/S11 | 21/14/19 | |
@@ -44,5 +44,12 @@ S15 の群構造 field — すべて実構造体 (`IsComplement'`/`IsFrobeniusGr
 2. 各 `_formula : Prop` を**実 `ClassFunction` 恒等式**に置換、`_holds` を実証明 (or sorry)。
 3. 結論の vacuous rider を実条件に締める。
 4. faithful 性監査: opaque が消えるまで「scaffold doneness ≠ build-green」を [[scaffold-sorry-free-not-done]] で判定。
+
+**進捗 (2026-06-06)**: S15 `Hypothesis` の (13.1.d,e) 恒等式 3 個を step 2 相当で materialize 済
+(opaque `: Prop` → carried ℂ-linear map `tau3`/`indWS`/`indWT` + genuine 等式、commit c724456)。
+**残 = step 1**: `tau3` を (3.2) Dade σ に、`indWS`/`indWT` を canonical `ClassFunction.induce` に pin
+する。後者は ambient (↥S/↥T) の finiteness を要し、`induce` が `[Invertible (Nat.card H : ℂ)]` +
+`∑ x : G` (Fintype) を要求するため **`S15.Hypothesis` への `[Finite G]` 追加** (S16 まで ripple) が前提。
+前者は (3.2) σ : CF(W)→CF(G) の S03 材料化 (gate #3) が前提。両方そろうと carried map を等式で canonical に締められる。
 
 grep 手掛かり: `_formula : Prop` / `_formula : G → Prop` / `_holds :` / `: Prop$`。
