@@ -4641,7 +4641,35 @@ theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
   -- (B) `⋆ = (C.10)`-LHS `= 1` (the `(5060)` regrouping, using `s₂ = s₁⁻¹ s₃⁻¹`).
   have hstarQ_coe : (starQ : G) =
       data.t ^ 2 * s1 * data.t⁻¹ * s2 * data.t⁻¹ * s3 := by
-    sorry
+    have hc1 : Commute data.s s1 := data.s_commute_sigma_primeLineElement c1
+    have hc3 : Commute data.s s3 := data.s_commute_sigma_primeLineElement c3
+    have ht2 : data.t ^ 2 = yc⁻¹ * (data.s * data.s) * yc := by rw [hty, pow_two]; group
+    have hti : data.t⁻¹ = yc⁻¹ * data.s⁻¹ * yc := by rw [hty]; group
+    -- BG's `(5060)` over-product (the six brackets, before regrouping).
+    have hSC : (starQ : G) =
+        (yc⁻¹ * (data.s * data.s) * yc) *
+          (data.s⁻¹ * data.s⁻¹ * data.s * data.s * s1) *
+          (yc⁻¹ * s1⁻¹ * data.s⁻¹ * data.s⁻¹ * data.s * s1 * yc) *
+          (s1⁻¹ * data.s⁻¹ * data.s * s3⁻¹) *
+          (yc⁻¹ * s3 * data.s⁻¹ * s3⁻¹ * yc) * s3 := by
+      rw [hstarQdef]
+      simp only [Subgroup.coe_mul, InvMemClass.coe_inv, data.w2ConjQAut_apply_coe,
+        hsW_coe, hs1W_coe, hs3W_coe, hycdef]
+      group
+    -- the two `(C.10)` `t⁻¹`-brackets collapse using `[s, sᵢ] = 1`.
+    have e3 : s1⁻¹ * data.s⁻¹ * data.s⁻¹ * data.s * s1 = data.s⁻¹ := by
+      rw [show s1⁻¹ * data.s⁻¹ * data.s⁻¹ * data.s * s1 = s1⁻¹ * data.s⁻¹ * s1 from by group,
+        mul_assoc, (hc1.inv_left).eq]; group
+    have e5 : s3 * data.s⁻¹ * s3⁻¹ = data.s⁻¹ := by
+      rw [(hc3.inv_left.eq).symm]; group
+    rw [hSC, ht2, hti, hs2eq,
+      show data.s⁻¹ * data.s⁻¹ * data.s * data.s * s1 = s1 from by group,
+      show yc⁻¹ * s1⁻¹ * data.s⁻¹ * data.s⁻¹ * data.s * s1 * yc =
+          yc⁻¹ * (s1⁻¹ * data.s⁻¹ * data.s⁻¹ * data.s * s1) * yc from by group,
+      e3,
+      show s1⁻¹ * data.s⁻¹ * data.s * s3⁻¹ = s1⁻¹ * s3⁻¹ from by group,
+      show yc⁻¹ * s3 * data.s⁻¹ * s3⁻¹ * yc = yc⁻¹ * (s3 * data.s⁻¹ * s3⁻¹) * yc from by group,
+      e5]
   have hstarQ1 : starQ = 1 := by
     apply Subtype.ext
     rw [hstarQ_coe, hC10, OneMemClass.coe_one]
