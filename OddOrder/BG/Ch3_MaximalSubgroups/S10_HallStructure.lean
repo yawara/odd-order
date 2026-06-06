@@ -1232,6 +1232,20 @@ theorem isSylow_sylowMap_of_mem_sigma [Finite G]
     rwa [Subgroup.map_subgroupOf_eq_of_le hYM, ← hPbar] at this
   exact absurd hYP hgrow.ne'
 
+/-- **Public packaging (for the §10 leaves)**: for `p ∈ σ(M)` there is a Sylow `p`-subgroup
+`S` of `G` lying in `M` whose `G`-normalizer also lies in `M`. Combines the per-Sylow
+`isSylow_sylowMap_of_mem_sigma` and `normalizer_sylow_map_le_of_mem_sigma`; exposed so the
+local-lemma leaf `S10_LocalLemmas` can build the common Sylow used in BG Lemma 10.12. -/
+theorem exists_sylow_le_normalizer_le_of_mem_sigma [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) :
+    ∃ S : Sylow p G,
+      (S : Subgroup G) ≤ M ∧ Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M := by
+  obtain ⟨P, -⟩ := hp.2
+  obtain ⟨S, hS⟩ := isSylow_sylowMap_of_mem_sigma hp P
+  refine ⟨S, ?_, ?_⟩
+  · rw [hS]; exact Subgroup.map_subtype_le _
+  · rw [hS]; exact normalizer_sylow_map_le_of_mem_sigma hp P
+
 /-- **BG Theorem 10.2, step 2 (per-Sylow)** (mmd L2725-2731): for `p ∈ σ(M)` and a Sylow
 `p`-subgroup `P` of `M`, the image `P̄ ≤ M'`. `P̄ ∈ Syl_p(G)` (σ) and `G' = G`, so the Focal
 Subgroup Theorem gives `P̄.focalSubgroup = G' ⊓ P̄ = P̄`; Theorem 10.1(a) (with `X = ⟨x⟩`) shows
