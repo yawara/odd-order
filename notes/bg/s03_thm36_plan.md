@@ -74,12 +74,27 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 - `oPiPrimePiCore_eq_oPiCore_of_compl_bot` (`6a7a705`, S06 private を §1 layering 維持で再証明)。
 - **(c)** `hasPLengthOne_of_isPGroup_normal_quotient` (`6a7a705`): normal `p` 商 + `O_{p'}(G/H)=1`。
 
-**残 (a)(d)(e) — より重い別チャンク (次セッション):**
-- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩ が normal p-complement を持つ`。`⟨p-elements⟩ = O^{p'}(G)` の
-  形式化が要 (mathlib/repo に `pResidual`/closure-of-p-elements は**見当たらず**、新規実装)。
-  `HasNormalPComplement` の**部分群継承は既存** (`Ch05_Transfer/Main.lean:1985`
-  `(hG : HasNormalPComplement p G)(H) : HasNormalPComplement p ↥H`) → (d) があれば (a)(e) は即。
-- **(a)** 部分群単調性 (10.6 reduction 用)。(d) 経由が最短 (⟨p-elts H⟩ ≤ ⟨p-elts G⟩ + 1985 継承)。
-  直接路は `O_{p',p}(G).subgroupOf H ≤ O_{p',p}(↥H)` (normal p-nilpotent ≤ O_{p',p}; O_{p',p}(G) は
-  normal p-complement O_{p'}(G) を持つ ⇒ 1985 で ∩H も) + index 整除鎖、~80 行・subgroupOf 多用。
-- **(e)** `H,N ⊴ G, H∩N=1, G/H・G/N plen1 ⇒ G plen1`: (d) 経由。Thm 3.6 (3.11) が cite。
+**(a) 用 building block 4つ landed (sorry-free, overnight loop 2026-06-07):**
+- `le_oPiPrimePiCore_of_quotient_isPGroup` (`2ffd94a`): `K⊴G`, `K.map(mk' O_{p'}(G))` p-群 ⇒ `K ≤ O_{p',p}(G)`。
+- `isPGroup_map_oPiPrimePiCore` (`aa64421`): `O_{p',p}(G).map(mk' O_{p'}(G))` は p-群 (=`O_p(G/O_{p'}(G))`)。
+- `oPiCore_compl_subgroupOf_le` (`885f8ca`): `(O_{p'}(G)).subgroupOf H ≤ O_{p'}(↥H)`。
+- `isPGroup_inf_map_oPiPrimePiCore` (`3b841e9`): `(O_{p',p}(G)⊓H).map(mk' O_{p'}(G))` は p-群。
+
+**(a) 完成の残 crux (設計確定・Lean grind のみ、~40 行 fiddly で wind-down):**
+中間補題 `(oPiPrimePiCore {p} G).subgroupOf H ≤ oPiPrimePiCore {p} ↥H` を `le_oPiPrimePiCore_of_quotient_isPGroup` (↥H で) に帰着。要 `IsPGroup p ↥(K.map (mk' (oPiCore {p}ᶜ ↥H)))`, `K=(oPiPrimePiCore{p}G).subgroupOf H`。
+- `A := oPiPrimePiCore{p}G ⊓ H` (≤ H), 2 つの hom from `↥A`:
+  `gA := (mk' (oPiCore{p}ᶜ G)).comp A.subtype` (range `= A.map(mk' O_{p'}G) =` isPGroup_inf_map の p-群),
+  `fA := (mk' (oPiCore{p}ᶜ ↥H)).comp (Subgroup.inclusion (A≤H))` (range `= (A.subgroupOf H).map(mk' O_{p'}↥H) = K.map f`)。
+- `ker gA ≤ ker fA`: `a∈↥A, ↑a∈O_{p'}(G) ⇒ (a:↥H)∈(O_{p'}G).subgroupOf H ≤ O_{p'}(↥H)` (`oPiCore_compl_subgroupOf_le`)。
+- card: `|range fA| = (ker fA).index`, `|range gA| = (ker gA).index` (`quotientKerEquivRange` + index 定義); `index_dvd_of_le (ker gA ≤ ker fA)` ⇒ `(ker fA).index ∣ (ker gA).index` ⇒ `|range fA| ∣ |range gA|` (=p冪) ⇒ `IsPGroup.of_card`+`Nat.dvd_prime_pow`。
+  (別路: `IsPGroup.of_surjective` (PGroup.lean:74) で `↥A/ker gA ↠ ↥A/ker fA` (`QuotientGroup.map`) 経由。)
+- 続く index 鎖: `Subgroup.index_dvd_of_le 中間補題` で `(oPiPrimePiCore{p}↥H).index ∣ ((oPiPrimePiCore{p}G).subgroupOf H).index ∣ (oPiPrimePiCore{p}G).index = |G/O_{p',p}G|` ⇒ p∤ ⇒ `hasPLengthOne p ↥H`。最終 `hasPLengthOne_of_le`。
+
+**残 (d)(e) — さらに別チャンク:**
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}(G) が normal p-complement`。`⟨p-elements⟩` の新規形式化要
+  (`pResidual` 等 mathlib/repo に無し)。`HasNormalPComplement` 部分群継承 (`Ch05:1985`) 既存 → (d) で (a)(e) も即。
+- **(e)** `H,N⊴G, H∩N=1, G/H・G/N plen1 ⇒ G plen1`: (d) 経由。Thm 3.6 (3.11) cite。
+
+**overnight loop 総括 (2026-06-07)**: foundation + (b) + (c) + (a) building block 4つ を sorry-free landing
+(7 commits, `4a9bf08`..`3b841e9`)。(a) crux (~40行 fiddly, 設計上記) と (d)(e)/Thm 3.4/3.5/Gorenstein 5.3.7/Thm 3.6
+は heavy なため、無人 grind を避け clean handoff で loop 終了。再開は上記 crux から (building block 全部揃い)。
