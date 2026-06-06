@@ -170,6 +170,14 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **adjoined-pair** `sBreakPair_fields` + `exists_coherentBreakPair` 強化(ψ∉S₁/ψ̄∉S₁ を cover disjointness から出力追加): ψ の per-field + `⟨ψ,χ⟩=⟨ψ̄,χ⟩=0 (χ∈S₁)`(distinct irreducible)。
 - **残 = ① generation field `hSgen`/`hgen`**(X-side `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(T8.11i)/`zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`(T8.11j) が abstract module lemma で流用見込み)**② ψ の `hdiffasuppχ`/`htau1_memaχ`**(ψ の degree-ratio + 既存 scaled-diff/ZIrr helper)**③ 最終 assembly**(全 field を B1 に結線 → (6.2) `2|L:C|√|C:D|≥|K:A|−1`)。enum の hard combinatorial 部はほぼ機械化済、残は generation の module 議論と assembly。
 
+### ✅✅ 2026-06-06 (続2): member-family enum **突破** + (6.2) core 到達 (loop 自走, commits 6eab816/ecc773c/953af71/d39e6f4, 全 axiom-clean)
+**member-family enum(前任 deferral の単一 bottleneck)を完全突破** → (6.2) `|K:A|−1≤2ψ(1)` まで結線:
+- **`sMember_degreeSumBound_of_not_coherent`**(6eab816): member-family の全 ~15 field を B1 `coherentDegreeSumBound_of_not_coherent` に結線 → `∑ⱼ(degⱼ)²≤2a`。generation field は T8.11i/T8.11j を直接適用、ψ scaled-diff は既存 helper、anchor index は range から取得。**enum 完全機械化**。
+- **`sMember_degreeSqReBound_of_not_coherent`**(ecc773c): B1 bound を anchor degree |W₁| で rescale → `∑ⱼ χⱼ(1).re² ≤ 2ψ(1).re·χ₁(1).re`(family sum、ℝ)。+ 汎用 reindex `sum_toFinset_range_eq`。
+- **`sum_re_sq_induce_kernelFilter_eq`**(953af71): B2 を Frobenius .re 形に → `∑_{S(A)} χ(1).re² = |L:H|(|H:A|−1)`(各 S(A) member 既約 ⟹ ⟨χ,χ⟩=1、χ(1) 実、`Complex.ofReal_inj`)。
+- **`sMember_index_le_two_psi`**(d39e6f4, **(6.2) core**): 上記を結線。`S(A)⊆S₁` で sub-sum(`Finset.sum_le_sum_of_subset_of_nonneg` + reindex)→ `|L:H|(|H:A|−1) = ∑_{S(A)} ≤ ∑_{S₁} ≤ 2ψ(1).re·|L:H|` → |L:H| 約分 → **`|K:A|−1 ≤ 2ψ(1)`**。
+- **残 = θ-bound 合成のみ**: `theta_degree_le_index_mul_sqrt_index`(landed)で `ψ(1)=|L:K|θ(1) ≤ |L:C|√|C:D|` → (6.2) `2|L:C|√|C:D|≥|K:A|−1`。その後 (6.3) minimal-A 帰納(`six_three_HH1_le` landed)→ (6.5) bound → 「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed)。**(6.2) は θ-bound 合成 1 ステップで完成見込み**。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
