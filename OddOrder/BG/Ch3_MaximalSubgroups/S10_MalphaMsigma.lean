@@ -341,6 +341,32 @@ theorem omega1CenterInG_le (P : Subgroup G) (p : ℕ) :
     omega1CenterInG P p ≤ P :=
   Subgroup.map_subtype_le _
 
+/-- **BG Theorem 10.6, low-rank branch for maximal subgroups**:
+if `p ∉ α(M)`, then the maximal subgroup `M` has `p`-length one.  When
+`p ∈ π(M)`, this is the rank-`≤ 2` case of BG Theorem 4.18(e); when
+`p ∉ π(M)`, the quotient by `O_{p',p}(M)` has order dividing `|M|`, so no
+`p` can divide it. -/
+theorem maximal_hasPLengthOne_of_not_mem_alpha [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] (hpα : p ∉ alpha M) :
+    Ch1.hasPLengthOne p ↥M := by
+  classical
+  by_cases hpM : p ∈ (Nat.card ↥M).primeFactors
+  · haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have hoddM : Odd (Nat.card ↥M) :=
+      hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+    have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpM).2.1
+    have hnot_rank : ¬ 3 ≤ pRank ↥M p := by
+      intro h3
+      exact hpα ⟨hpM, h3⟩
+    have hrank : pRank ↥M p ≤ 2 := by omega
+    exact (Ch1.S04.solvable_structure_of_pRank_le_two hoddM hp_dvd hrank).2.2.2.2.2
+  · rw [Ch1.hasPLengthOne]
+    intro hpquot
+    exact hpM (Nat.mem_primeFactors.mpr
+      ⟨Fact.out, hpquot.trans (Subgroup.card_quotient_dvd_card
+        (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥M)), Nat.card_pos.ne'⟩)
+
 /-! ## Theorem 10.6 — proper subgroup は p-length one (mmd L2779) -/
 
 /-- **BG Theorem 10.6** (mmd L2779): `p` prime、`H` を `G` の真部分群とすると、`H` は `p`-length

@@ -260,6 +260,14 @@ H = proper subgroup of G に対して，H は すべての素数 p に対して 
 
 **Step 5**: Lemma 10.4 より，∃x ∈ Q, order q, C_{M_α}(x) = Z-group. Theorem 3.6 により，[M_α, K] has p-length 1. Since M_α = [M_α, K], done.
 
+### Lean progress (2026-06-06)
+
+`maximal_hasPLengthOne_of_not_mem_alpha` を追加し、Thm 10.6 の maximal subgroup base branch を完成。
+`p∈π(M)` なら `p∉α(M)` から `pRank M p≤2` として Thm 4.18(e) を適用し、`p∉π(M)` なら
+`|M/O_{p',p}(M)| ∣ |M|` から直接 `hasPLengthOne`。S10 leaf build green、axioms は標準3公理のみ。
+残り frontier は issue `0062-bg-thm106-p-length-one.md`: maximal reduction/subgroup-closure と、
+`p∈α(M)` hard branch (Lemma 6.3(a) + Lemma 10.4 fragment + BG Thm 3.6)。
+
 ### 役割
 
 **Theorem 10.6 は本セクション唯一の「フリースタンディング」structural result であり，同時に全 §11-§13 へ汎用的に使われる**. 特に:
