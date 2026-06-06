@@ -359,6 +359,36 @@ theorem fitting_map_subtype_le_chiefFactorCentralizer
   exact OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer
     hFstarGq_le_cent_Ubar
 
+/-- **BG Proposition 1.2, whole-group form**: `F(G)` centralizes every chief factor `U/V` of a
+finite solvable group `G`. (The `G* = G` specialization of
+`fitting_map_subtype_le_chiefFactorCentralizer`, in the form used by BG Theorem 3.7's chief-factor
+induction: a normal nilpotent subgroup `L ≤ F(G)` then centralizes every chief factor via
+`nilpotent_normal_le_fitting`.) -/
+theorem fitting_le_chiefFactorCentralizer
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {U V : Subgroup G} [V.Normal]
+    (hChief : OddOrder.GroupTheory.IsChiefFactor U V) :
+    OddOrder.Isaacs.Ch01.fitting G ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V := by
+  haveI hV_normal : V.Normal := hChief.normal_bot
+  let q : G →* G ⧸ V := QuotientGroup.mk' V
+  let Ubar : Subgroup (G ⧸ V) := U.map q
+  have hMin : OddOrder.Isaacs.Ch02.IsMinimalNormal Ubar :=
+    isMinimalNormal_map_quotient_of_isChiefFactor hChief
+  have hFquot_le_cent_Ubar :
+      OddOrder.Isaacs.Ch01.fitting (G ⧸ V) ≤ Subgroup.centralizer (Ubar : Set (G ⧸ V)) :=
+    Subgroup.le_centralizer_iff.mp
+      (isMinimalNormal_le_fitting_and_isElementaryAbelian (G := G ⧸ V) hMin).2.1
+  haveI hFG_normal : (OddOrder.Isaacs.Ch01.fitting G).Normal := inferInstance
+  haveI : ((OddOrder.Isaacs.Ch01.fitting G).map q).Normal :=
+    hFG_normal.map q QuotientGroup.mk_surjective
+  haveI : Group.IsNilpotent ((OddOrder.Isaacs.Ch01.fitting G).map q) :=
+    isNilpotent_subgroup_map (OddOrder.Isaacs.Ch01.fitting G) q
+  have hFGq_le_fitting :
+      (OddOrder.Isaacs.Ch01.fitting G).map q ≤ OddOrder.Isaacs.Ch01.fitting (G ⧸ V) :=
+    nilpotent_normal_le_fitting
+  exact OddOrder.GroupTheory.chiefFactorCentralizer.le_of_map_le_centralizer
+    (hFGq_le_fitting.trans hFquot_le_cent_Ubar)
+
 /-- **BG Proposition 1.2, reverse inclusion** (P. Hall): every `G`-normal subgroup `H ≤ G*`
 that centralizes every chief factor `U/V` of `G` with `U ⊆ F(G*)` is contained in `F(G*)`.
 
