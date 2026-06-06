@@ -133,12 +133,15 @@ structure Hypothesis where
   nu : Fin q → Fin p → ClassFunction ↥T ℂ
   delta : Fin p → ℤ
   deltaPrime : Fin q → ℤ
-  /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, carried as a `ℂ`-linear map
-  sending the cyclic `W`-grid to virtual characters of `G` (the Dade-isometry
-  datum of (13.1.c)).  Pinning `tau3` to the concrete (3.2) construction is the
-  remaining §3 layer; the equality `eta_eq_tau_omega` already forces the `η`-grid
-  to be the linear image of the `ω`-grid. -/
-  tau3 : ClassFunction ↥W ℂ →ₗ[ℂ] ClassFunction G ℂ
+  /-- The Peterfalvi (3.2)/(3.3) transfer map `τ`, typed as an integral
+  (virtual-character) map via the same `IntegralCharacterMap` convention as
+  `tauS`/`tauT` — faithful to `τ` being defined on the `ℤ`-lattice of virtual
+  characters.  Pinning `tau3` to the *concrete* (3.2) Dade isometry (built from a
+  `S05.TICyclicHypothesis` for `W` through `S04.dadeIntegralCharacterMap`, with the
+  `ω`-grid materialized as the (3.3) characters) is a dedicated §3/§5 construction;
+  `eta_eq_tau_omega` already forces the `η`-grid to be the integral-linear image of
+  the `ω`-grid. -/
+  tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥W G
   /-- **Peterfalvi (13.1.d)**: `η_{ij} = ω_{ij}^τ`. -/
   eta_eq_tau_omega : ∀ (i : Fin q) (j : Fin p), eta i j = tau3 (omega i j)
   /-- **Peterfalvi (13.1.e)**: `Ind_W^S (ω_{ij} − ω_{0j}) = δ_j (μ_{ij} − μ_{0j})`,
