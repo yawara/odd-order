@@ -171,9 +171,11 @@ glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model
 
 **この壁の先の残り (C)** (未着手, 大きい): (i) coprime conclusion (上記解決後), (ii) **FPF 導出 `C_V(R̄)=1`** (C_K(R)=1 + coprime-action の固定点-in-quotient; CoprimeAction.lean 要確認), (iii) **G/L Frobenius 構成** (`quotient_isFrobeniusGroup_of_le_kernel_of_*` に正しい入力), (iv) **elem-abelian 抽出** (chief factor が elem-abelian: G solvable + `IsChiefFactor.commutator_le_of_isSolvable`), (v) **|K|-強帰納 + LR restriction + dichotomy + Prop1.2 組立**, (vi) **Thm 11.3** `Msigma_isNilpotent`。
 
-## 🟡 2026-06-06 進捗: (C) prerequisites 3/4 landed、残 = (ii-b) FPF + (v) induction + (vi) Thm 11.3
+## 🟢 2026-06-06 進捗: (C) prerequisites 4/4 landed、残 = (v) induction + (vi) Thm 11.3 のみ
 
-**landed (build-green)**: coprime conclusion `coprime_kernel_le_chiefFactorCentralizer`(778c464); (iii) `frobenius_quotient_of_normal_lt_kernel`(b463229); (iv) `chiefFactor_isElementaryAbelian`(3045cca); (ii-a) `frobenius_kernel_conj_fixed_eq_one`(98dc377)。
+**(ii-b) FPF 完了**: `chiefFactor_fixedPointFree`(643f2b5) build-green。framework bridge (ψ=`MulAut.conj.comp R.subtype` + `Normal.conj_smul_eq_self` + `IsAInvariant.subgroupOf` + `coprime_fixedPoints_quotient_of_coprime_normal` + (ii-a)) 成功。**4 prerequisites (FPF/G-L Frobenius/elem-abelian/coprime conclusion) 全 landed**。
+
+**landed (build-green)**: coprime conclusion `coprime_kernel_le_chiefFactorCentralizer`(778c464); (iii) `frobenius_quotient_of_normal_lt_kernel`(b463229); (iv) `chiefFactor_isElementaryAbelian`(3045cca); (ii-a) `frobenius_kernel_conj_fixed_eq_one`(98dc377); coprimality `frobenius_coprime_complement_subgroup`(8295832); **(ii-b) FPF `chiefFactor_fixedPointFree`(643f2b5)**。
 
 **(ii-b) full FPF — 精密手順 (全 API 確認済、未実装)**: lemma `chiefFactor_fixedPointFree` (h:Frobenius G K R, hXK:X≤K, coprime|R||X|, solvable) ⟹ `letI := chiefFactorConjAction X Y; ∀ v, (∀r:R,(r:G)•v=v)→v=1`。
 - φ := `MulAut.conjNormal.comp R.subtype : ↥R →* MulAut ↥X` (X.Normal); `(φ a) x = conj (a:G) on ↥X` (`MulAut.conjNormal_apply`: ↑= (a:G)·(x:G)·(a:G)⁻¹)。
