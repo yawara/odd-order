@@ -63,27 +63,23 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 
 ## Lemma 1.21 着手状況 (2026-06-07)
 
-ファイル `OddOrder/BG/Ch1_Preliminary/PLengthTransfer.lean` (新規)。
+ファイル `OddOrder/BG/Ch1_Preliminary/PLengthTransfer.lean` (新規)。**(b)(c) + 全 infra 完了 (sorry-free)**。
 
-**✅ Landed (commit `4a9bf08`, sorry-free):**
-- `card_quotient_oPiPrimePiCore_eq` : `|G/O_{p',p}(G)| = |(G/O_{p'}(G))/O_p(G/O_{p'}(G))|`
-  (第3同型 `quotientQuotientEquivQuotient` + `O_{p',p}(G) = comap mk' (O_p(G/O_{p'}(G)))`
-  + `map_comap_eq_self_of_surjective` + `oPiCore_compl_le_oPiPrimePiCore`)。
-- `hasPLengthOne_iff_card_quotient` : 上を `hasPLengthOne` に rw した reformulation。
-これが (a)–(e) 共通の出発点。
+**✅ Landed (sorry-free):**
+- `card_quotient_oPiPrimePiCore_eq` / `hasPLengthOne_iff_card_quotient` (`4a9bf08`): 第3同型 bridge
+  `|G/O_{p',p}(G)| = |(G/O_{p'}(G))/O_p(…)|`。(a)–(e) 共通の出発点。
+- `oPiCore_quotient_eq_of_isPiGroup` (`db0a10d`): **汎用 engine** — `H ⊴ G` が π-群 ⇒
+  `O_π(G/H) = O_π(G).map mk'` (`|N|=|H|·|Kbar|` + `primeFactors_mul` + `IsPiGroup.le_oPiCore`)。(b)=π{p}ᶜ, (c)=π{p}。
+- **(b)** `hasPLengthOne_of_isPiPrime_normal_quotient` (`1179617`): normal `p'` 商。
+- `oPiPrimePiCore_eq_oPiCore_of_compl_bot` (`6a7a705`, S06 private を §1 layering 維持で再証明)。
+- **(c)** `hasPLengthOne_of_isPGroup_normal_quotient` (`6a7a705`): normal `p` 商 + `O_{p'}(G/H)=1`。
 
-**作業中 (b) `hasPLengthOne_of_isPiPrime_normal_quotient` — 証明法確定済・機械的詰めのみ残:**
-- 補題 `oPiCore_compl_quotient_eq` : `H ⊴ G` normal `p'` ⇒ `O_{p'}(G/H) = O_{p'}(G).map mk'`。
-  - `≥`: `Ch03.oPiCore.map_le_of_surjective`。
-  - `≤`: `N := (O_{p'}(G/H)).comap mk'` は normal、`p∤|N|` (∵ `|N|=|H|·|Kbar|`、`Kbar=O_{p'}(G/H)` は
-    `p'`、両者 `p∤`)、ゆえ `N ≤ O_{p'}(G)` (`Ch03.Subgroup.IsPiGroup.le_oPiCore`)、`Kbar=N.map mk'`。
-- (b) 本体: `φ : (G/H)/O_{p'}(G/H) ≃* G/O_{p'}(G)`
-  `:= (QuotientGroup.quotientMulEquivOfEq hcorr).trans (quotientQuotientEquivQuotient H _ hHle)`。
-  `O_p` を `Ch03.oPiCore.map_eq_of_mulEquiv` で φ 越しに移送、index を `Subgroup.index_map_equiv`
-  (`Nat.card (A⧸M) = M.index` defeq) で一致させ、`hasPLengthOne_iff_card_quotient` に rw。
-- **残る機械的論点** (次セッション fresh budget で即詰め): `Subgroup.card_mul_index` は `(H)` explicit /
-  `Subgroup.index_comap_of_surjective` の引数順 / `Subgroup.Normal.map (h)(f)(hf)` の 3 引数 /
-  `set Kbar/N` の opacity (`rw [hKbar]/[hN]` で unfold するか set を避ける)。
-- **(a) 部分群単調性** (10.6 で必要) は (b) と異なり部分群-core 対応が要る: `O_{p',p}(G).subgroupOf H ≤
-  O_{p',p}(↥H)` (normal p-nilpotent ≤ O_{p',p}) + index 整除鎖。(b) より重い。
-- (c)(d)(e): (d)=`⟨p-elts⟩=O^{p'}` の normal p-complement 特徴づけ、(e) は (d) 経由、(c) は (b) 類似。
+**残 (a)(d)(e) — より重い別チャンク (次セッション):**
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩ が normal p-complement を持つ`。`⟨p-elements⟩ = O^{p'}(G)` の
+  形式化が要 (mathlib/repo に `pResidual`/closure-of-p-elements は**見当たらず**、新規実装)。
+  `HasNormalPComplement` の**部分群継承は既存** (`Ch05_Transfer/Main.lean:1985`
+  `(hG : HasNormalPComplement p G)(H) : HasNormalPComplement p ↥H`) → (d) があれば (a)(e) は即。
+- **(a)** 部分群単調性 (10.6 reduction 用)。(d) 経由が最短 (⟨p-elts H⟩ ≤ ⟨p-elts G⟩ + 1985 継承)。
+  直接路は `O_{p',p}(G).subgroupOf H ≤ O_{p',p}(↥H)` (normal p-nilpotent ≤ O_{p',p}; O_{p',p}(G) は
+  normal p-complement O_{p'}(G) を持つ ⇒ 1985 で ∩H も) + index 整除鎖、~80 行・subgroupOf 多用。
+- **(e)** `H,N ⊴ G, H∩N=1, G/H・G/N plen1 ⇒ G plen1`: (d) 経由。Thm 3.6 (3.11) が cite。
