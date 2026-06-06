@@ -869,6 +869,21 @@ theorem exists_primePow_natDegree_of_isPGroup {K : Type*} [Group K] [Finite K] {
   obtain ⟨k, _hk_le, hk⟩ := (Nat.dvd_prime_pow hp).mp hdvd
   exact ⟨k, by rw [hval, hk]⟩
 
+/-- A nontrivial finite `p`-group of odd order has `p ≥ 3` (its order `pⁿ` is odd, so `p` is odd).
+Supplies the `3 ≤ p` field of the X-chain step data (in the (6.8) setup `|L|`, hence `|H|`, is
+odd). -/
+theorem three_le_prime_of_isPGroup_of_odd {K : Type*} [Group K] [Finite K] [Nontrivial K]
+    {p : ℕ} (hp : p.Prime) (hK : IsPGroup p K) (hodd : Odd (Nat.card K)) : 3 ≤ p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hK.exists_card_eq
+  have hcard : Nat.card K ≠ 1 := by
+    simpa using (Finite.one_lt_card (α := K)).ne'
+  have hn0 : n ≠ 0 := by rintro rfl; rw [pow_zero] at hn; exact hcard hn
+  have hpdvd : p ∣ Nat.card K := hn ▸ dvd_pow_self p hn0
+  obtain ⟨m, hm⟩ := Odd.of_dvd_nat hodd hpdvd
+  have := hp.two_le
+  omega
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/

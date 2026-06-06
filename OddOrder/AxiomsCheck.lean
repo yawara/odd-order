@@ -1998,6 +1998,9 @@ set_option linter.style.longLine false in
 -- (6.6) ingredient: for a finite p-group, every irreducible character degree is a power of p
 -- (degree ∣ |K| = pⁿ).  Feeds the `θ = p^m` source-degree fields of the X-chain step data.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_primePow_natDegree_of_isPGroup
+-- (6.6) ingredient: a nontrivial odd-order p-group has p ≥ 3 (its order pⁿ is odd).  The `3 ≤ p`
+-- field of the X-chain step data.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.three_le_prime_of_isPGroup_of_odd
 -- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).
