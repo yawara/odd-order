@@ -5432,6 +5432,21 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
   rw [eq_sub_of_add_eq hsd, h0, hZ]
   ring
 
+/-- **(6.6) `htotal` factorization.**  `|L:H|·(|H| − |H:Z|) = |H:Z| · (|L:H|·(|Z| − 1))` (Lagrange
+`|H| = |H:Z|·|Z|`).  With the X degree-sum `total = |L:H|·(|H| − |H:Z|)` (`sum_re_sq_Xset_eq`), this
+is the `total = qtot · c` of the X-chain step data with `qtot = |H:Z|`, `c = |L:H|·(|Z| − 1)`. -/
+theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L} [Z.Normal] :
+    H.index * (Nat.card ↥H - Nat.card (↥H ⧸ Z.subgroupOf H))
+      = Nat.card (↥H ⧸ Z.subgroupOf H) * (H.index * (Nat.card ↥(Z.subgroupOf H) - 1)) := by
+  have hlag : Nat.card ↥H
+      = Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+    Subgroup.card_eq_card_quotient_mul_card_subgroup (Z.subgroupOf H)
+  have hz : 1 ≤ Nat.card ↥(Z.subgroupOf H) := Nat.card_pos
+  obtain ⟨w, hw⟩ : ∃ w, Nat.card ↥(Z.subgroupOf H) = w + 1 := ⟨_, (Nat.sub_add_cancel hz).symm⟩
+  rw [hlag, hw]
+  simp only [Nat.mul_add, Nat.mul_one, Nat.add_sub_cancel]
+  ring
+
 /-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
 `χ(1) = |L:H| · θ(1)`; when `H` is a `p`-group `θ(1) = p^k`, so `χ(1) = |L:H| · p^k`.  This is the
 common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
