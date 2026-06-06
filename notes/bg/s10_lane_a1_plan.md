@@ -3,19 +3,58 @@
 worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE_BASE=2000`。
 対象 = `OddOrder/BG/Ch3_MaximalSubgroups/S10_LocalLemmas.lean` の 7 sorry。
 
+## 進捗 (2026-06-07)
+
+- ✅ **10.11(d) `sigma_complement_commutator_cyclic_normal` DONE** (commit `eb6cc10`)。
+  sorry-free・full build green (3586 jobs)。axiom 依存 = `propext/Classical.choice/Quot.sound` +
+  `sorryAx`(後者は **10.11(c) `sigma_complement_rank_le_one` の transitive 依存のみ**;
+  (d) は (c)+Thm 3.7 への正当な還元で、(c) が landing すれば自動 discharge)。
+  - レシピ全 6 step を原文 (book p.78, mmd L2856) どおり: ①Isaacs Ch05 `fitting_coprime_abelian_decomp`
+    で `K=C_K(P)×[K,P]` ②③積分解 (`coe_mul_of_left_le_normalizer_right` + `K₀⊓Mσ=⊥` の一意性) で
+    `P` の FPF ④BG Thm 3.7 (`S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree`) で
+    `K₀⊔Mσ` nilpotent ⑤新ヘルパ `commute_of_coprime_orderOf_of_isNilpotent`
+    (`Sylow.directProductOfNormal` で成分分解) で `K₀≤C(Mσ)` ⑥(c) cite + cyclic 一意性。
+  - 追加した private ヘルパ 3 個: `commute_of_coprime_orderOf_of_isNilpotent`,
+    `cyclic_subgroup_eq_of_card_eq` (S10_BetaRadical の private 複製 → lane 合流時に
+    S10_HallStructure へ hoist 推奨), `conjSmul_eq_map`。
+
+- ⚠ **PDF offset 校正完了: `book page = PDF page − 13`** (PDF 102–105 = book 89–92 で確認)。
+  当初プランの「10.12 = book p.92」「10.3/10.4/10.5 = p.87」は **誤り** (book p.85–92 は §12
+  "The Subgroup E"; 10.3/10.4/10.5 は §10 内なのでもっと前)。正しい §10 範囲:
+  - §10 = **book 76–79 = PDF 89–92**, §11 = book 80–84, §12 = book 85–92。
+  - **Lemma 10.12: 文 = book p.78 (PDF 91 末), 証明 = book p.79 (PDF 92 冒頭)。**
+  - **Lemma 10.13: book p.79–80 (PDF 92–93), 証明あり (mmd で欠落していた本体)。**
+  - 10.3/10.4/10.5 は §10 前半 (book p.76 以前 = PDF 88 以前) を要再読込で位置確定。
+
+### 10.12 `disjoint_of_not_conj` 証明 (book p.79 冒頭, PDF 92 で回収)
+
+> Proof. Suppose `p ∈ σ(M) ∩ σ(H)`. Then some Sylow `p`-subgroup `S` of `G` lies in `M`
+> and in some conjugate `H^g` of `H`. By the **Uniqueness Theorem**, `r(S) ≤ 2` because
+> `H^g ≠ M`. Furthermore `S` is not abelian because `N_G(S) ⊆ M` and `M_σ` is not nilpotent.
+> Now we are done because `π(M_α ∩ H_σ) ⊆ α(M) ∩ σ(H) ⊆ σ(M) ∩ σ(H)` and
+> `π(M_σ ∩ H_σ) ⊆ σ(M) ∩ σ(H)`.
+
+- 構造: (a)(b) とも「素数集合の disjoint」を背理法 (∃ p∈σ(M)∩σ(H) → S を共通 Sylow に取り
+  Uniqueness で矛盾) で示し、subgroup の disjoint (`M_α∩H_σ=1` 等) は `π(A∩B) ⊆ …` の包含から導く。
+- **依存**: §9 Uniqueness Thm の「非共役 2 極大に共通する `S` の rank ≤ 2」形 (repo に
+  `S09_*` で証明済か要確認), `sigma`/`alpha` 定義の `N_G(Sylow)⊆M` 性, `π(A⊓B)⊆π(A)∩π(B)`,
+  「`p∈σ` ⇔ ある Sylow `p` で `N_G⊆M`」のAPI。**中規模だが原文が terse で行間多い**;
+  次セッションは上記回収文 + `S09_Uniqueness` の API を突き合わせて形式化する。
+
 ## ⚠ 依存の実態 (BG 原文を読んで判明 — 当初の docstring ベース map は楽観的すぎた)
 
 | leaf | BG# | 実依存 | A1 で独立に可? |
 |---|---|---|---|
 | `sigma_complement_rank_le_one` | 10.11(a)(b)(c) | (a) Thm 4.20+base; **(b) Prop 10.10 (spine!)**; (c)←(b) | ✗ (b)(c) が spine 待ち |
-| `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | △ (c) 経由で spine、ただし下記参照 |
-| `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | ○ だが **MISSING_PAGE (PDF p.92)** 要読込 |
-| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Uniqueness | **MISSING_PAGE (p.87)** |
-| `pRank_eq_two_of_normalizer_le` | 10.5 | §7 Prop 7.5 等 | **MISSING_PAGE (p.87)** |
-| `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | **MISSING_PAGE (p.87)** |
-| `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | 10.13 | p-群構造 | **MISSING_PAGE (p.79)**, 末尾のみ mmd L2890 |
+| `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | ✅ **DONE** (eb6cc10, (c) 還元) |
+| `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | 証明回収済 (book p.79=PDF 92, 上記参照) |
+| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Uniqueness | 要 PDF 再読込 (§10 前半, ≈book p.76 以前=PDF≤88) |
+| `pRank_eq_two_of_normalizer_le` | 10.5 | §7 Prop 7.5 等 | 要 PDF 再読込 (§10 前半) |
+| `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | 要 PDF 再読込 (§10 前半) |
+| `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | 10.13 | p-群構造 | 証明回収済 (book p.79–80=PDF 92–93) |
 
-**教訓**: §10 leaf は spine (Prop 10.10/Cor 10.7) と絡む or MISSING_PAGE。当初の「6-7 完全独立」は誤り。
+**教訓**: §10 leaf は spine (Prop 10.10/Cor 10.7) と絡む or 旧 MISSING_PAGE (PDF 回収で解決)。
+当初の「6-7 完全独立」+「page 番号」推定は誤り。正しい offset = `book = PDF − 13`。
 
 ## 最良ターゲット: 10.11(d) `sigma_complement_commutator_cyclic_normal` (Thm 3.7 シナジー)
 
