@@ -5230,6 +5230,43 @@ theorem six_two_index_bound (hyp : SibleyDadeHypothesis G L H)
     (hAS₁ hχ₁SA) hχ₁deg hψS (hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS)
     hψnotS1 hψcnotS1 hncoh⟩
 
+/-- **Peterfalvi (6.2)** (Frobenius case, `K = H`).
+
+Under the (6.2) section hypotheses — `B ⊆ D ⊆ C ⊆ H` with `D ⧸ B` central in `C ⧸ B` (here `B`
+appears as `N = (B.subgroupOf H).subgroupOf C`), `S(A)` coherent, `S(B)` not — the index bound
+`2|L:C|·√|C:D| ≥ |K:A| − 1` holds (with `K = H`, so `|L:C| = |L:H|·|H:C|` and `|C:D| = D.index`).
+
+Proof: `six_two_index_bound` gives a breaking pair `ψ ∈ S(B)` with `|H:A| − 1 ≤ 2ψ(1)`; writing
+`ψ = Ind_H^L θ` with `θ` trivial on `B` (`ψ ∈ S(B)`), `characterKernel_restrict_subgroupOf`
+discharges the θ-bound's kernel hypothesis, and `psi_degree_le_of_source` gives
+`ψ(1) ≤ |L:H|·|H:C|·√|C:D|`. -/
+theorem six_two (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal] [B.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (C : Subgroup ↥H) [Fintype ↥C] [Invertible (Nat.card ↥C : ℂ)] (D : Subgroup ↥C)
+    (hND : ((B.subgroupOf H).subgroupOf C) ≤ D)
+    (hcentral : D.map (QuotientGroup.mk' ((B.subgroupOf H).subgroupOf C)) ≤
+      Subgroup.center (↥C ⧸ (B.subgroupOf H).subgroupOf C))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤
+      2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
+  rw [hyp.mem_SsubFiltration] at hψB
+  obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
+  have hθN := characterKernel_restrict_subgroupOf C hθkerB
+  have hψdeg := hyp.psi_degree_le_of_source θ C D hND hθN hcentral
+  rw [hψeq] at hψbound
+  calc (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re := hψbound
+    _ ≤ 2 * ((H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
+    _ = 2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
