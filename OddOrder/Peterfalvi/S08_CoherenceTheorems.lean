@@ -5445,6 +5445,19 @@ theorem exists_index_primePow_degree_of_mem_S (hyp : SibleyDadeHypothesis G L H)
   rw [ClassFunction.induce_apply_one, hk]
   push_cast; ring
 
+/-- **(6.6) per-member degree data for an X-member family.**  Vectorizes
+`exists_index_primePow_degree_of_mem_S` over a finite family `χmem : Fin k → Irr L` of `S`-members:
+there are exponents `mmem j` with `χmem j (1) = |L:H| · p^(mmem j)`.  Supplies the `dmem`/`θmem`/`mmem`
+fields of the X-chain step data (`dmem j = |L:H|·θmem j`, `θmem j = p^(mmem j)`). -/
+theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S) :
+    ∃ mmem : Fin k → ℕ,
+      ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = ((H.index * p ^ mmem j : ℕ) : ℂ) := by
+  choose mmem hmmem using fun j => hyp.exists_index_primePow_degree_of_mem_S hp hHp (hmemS j)
+  exact ⟨mmem, hmmem⟩
+
 open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 
