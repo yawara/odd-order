@@ -699,6 +699,12 @@ theorem beta_support_norm_and_remainder [Finite G]
         data.Gamma_orthogonal_one ∧ data.Gamma_real ∧ data.Y_norm_bound := by
   sorry
 
+/-- The parity conclusion in Peterfalvi (13.19.c2): the character inner
+product is an odd integer, recorded inside `ℂ`. -/
+def OddIntegerInner (χ ψ : ClassFunction G ℂ) : Prop :=
+  ∃ n : ℤ, Odd n ∧
+    ∀ [Fintype G] [Invertible (Nat.card G : ℂ)], ClassFunction.inner χ ψ = (n : ℂ)
+
 /-- Carrier for the type-I comparison in Peterfalvi (13.19). -/
 structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) where
   typeISetup : OddOrder.Peterfalvi.S14.Hypothesis L
@@ -716,12 +722,20 @@ structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) wh
   betaL_eta_independent : Prop
   caseC1 : Prop
   caseC2 : Prop
+  caseC2_eta0j_odd :
+    caseC2 →
+      ∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)
   caseC1_bound :
     caseC1 →
       (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
         ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
   caseC1_dual : Prop
   caseC2_dual : Prop
+  caseC2_dual_etai0_odd :
+    caseC2_dual →
+      ∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)
   caseC1_dual_bound :
     caseC1_dual →
       (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
@@ -756,16 +770,30 @@ theorem caseC2_dual_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
   · exact False.elim ((not_lt_of_ge (data.caseC1_dual_bound hcaseC1)) hgap)
   · exact hcaseC2
 
+/-- **Peterfalvi (13.19.c2)**: once both S- and T-side parity alternatives
+hold, the two zero-axis families of `eta` have odd integer inner product with
+`beta_L`. -/
+theorem eta_axes_odd_of_caseC2_pair {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L) (hcases : data.caseC2 ∧ data.caseC2_dual) :
+    (∀ j : Fin hyp.p, (j : ℕ) ≠ 0 →
+        OddIntegerInner data.betaL (hyp.eta ⟨0, hyp.q_prime.pos⟩ j)) ∧
+      (∀ i : Fin hyp.q, (i : ℕ) ≠ 0 →
+        OddIntegerInner data.betaL (hyp.eta i ⟨0, hyp.p_prime.pos⟩)) := by
+  exact ⟨data.caseC2_eta0j_odd hcases.1, data.caseC2_dual_etai0_odd hcases.2⟩
+
 end TypeIOrthogonalityData
 
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has Dade images
-orthogonal to the `eta_ij`, and one of the two final parity cases holds. -/
+orthogonal to the `eta_ij`; on each zero axis, one of the two final parity
+cases holds. -/
 theorem typeI_orthogonality_dichotomy [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L) :
     ∃ data : TypeIOrthogonalityData hyp L,
       data.disjoint_support ∧ data.Ltau_orthogonal_eta ∧
-        data.betaL_eta_independent ∧ (data.caseC1 ∨ data.caseC2) := by
+        data.betaL_eta_independent ∧
+          (data.caseC1 ∨ data.caseC2) ∧
+            (data.caseC1_dual ∨ data.caseC2_dual) := by
   sorry
 
 end OddOrder.Peterfalvi.S15

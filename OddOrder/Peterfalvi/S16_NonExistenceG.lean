@@ -2257,6 +2257,17 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   typeI_complement_card_eq_pq :
     Nat.card ↥typeI_data.frobenius.complement = hyp.base.p * hyp.base.q
 
+namespace LHypothesis
+
+/-- The subgroup `L` supplied in **Peterfalvi (14.3)** is type I, as witnessed
+by the Frobenius data inherited from (13.17). -/
+theorem isTypeI {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp) :
+    IsTypeI Ldata.L := by
+  rw [← Ldata.typeI_data_L_eq]
+  exact ⟨Ldata.typeI_data.frobenius.typeI⟩
+
+end LHypothesis
+
 /-- Carrier for the case-(9.7.b) conclusion applied to `T` in Peterfalvi
 (14.4). -/
 structure CaseBForTData (hyp : Hypothesis (G := G)) where
@@ -3959,6 +3970,64 @@ theorem typeI_caseC2_pair_of_caseB_gap
     orth.caseC2 ∧ orth.caseC2_dual := by
   exact ⟨typeI_caseC2_of_caseB_sSide_gap orth hcases hH he hhv hvu,
     typeI_caseC2_of_caseB_tSide_gap orth hcases_dual hH he hhv⟩
+
+/-- **Peterfalvi (14.16)**: after the case-(b) gaps force both alternatives
+(13.19.c2), the usable character output is odd integer pairing on the two
+zero-axis families `eta_0j` and `eta_i0`. -/
+theorem typeI_eta_axes_odd_of_caseB_gap
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L)
+    (hcases : orth.caseC1 ∨ orth.caseC2)
+    (hcases_dual : orth.caseC1_dual ∨ orth.caseC2_dual)
+    (hH : Nat.card ↥orth.typeISetup.H = nc.h)
+    (he : orth.e = hyp.base.p * hyp.base.q)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    (∀ j : Fin hyp.base.p, (j : ℕ) ≠ 0 →
+        OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
+          (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)) ∧
+      (∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
+        OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
+          (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
+  exact orth.eta_axes_odd_of_caseC2_pair
+    (typeI_caseC2_pair_of_caseB_gap orth hcases hcases_dual hH he hhv hvu)
+
+/-- **Peterfalvi (14.16)**: combining the actual (13.19) Type-I
+orthogonality output for `L` with the case-(b) numerical gaps gives the two
+zero-axis odd pairings needed for the final `eta_ij` expansion.  The remaining
+inputs identify the abstract kernel and complement index in the (13.19) data
+with the `H` and `p q` already fixed in Section 16. -/
+theorem exists_typeI_eta_axes_odd_of_caseB_gap
+    [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (hH_of_orth :
+      ∀ orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L,
+        Nat.card ↥orth.typeISetup.H = nc.h)
+    (he_of_orth :
+      ∀ orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L,
+        orth.e = hyp.base.p * hyp.base.q)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    ∃ orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L,
+      (∀ j : Fin hyp.base.p, (j : ℕ) ≠ 0 →
+          OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
+            (hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ j)) ∧
+        (∀ i : Fin hyp.base.q, (i : ℕ) ≠ 0 →
+          OddOrder.Peterfalvi.S15.OddIntegerInner orth.betaL
+            (hyp.base.eta i ⟨0, hyp.base.p_prime.pos⟩)) := by
+  rcases OddOrder.Peterfalvi.S15.typeI_orthogonality_dichotomy
+      _hG hyp.base nc.Ldata.L_maximal nc.Ldata.isTypeI with
+    ⟨orth, horth⟩
+  exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2
+    (hH_of_orth orth) (he_of_orth orth) hhv hvu⟩
 
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
