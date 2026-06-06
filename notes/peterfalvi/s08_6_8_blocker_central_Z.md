@@ -89,6 +89,75 @@ is purely the §8 capstone-level choice `Z := ⁅H,H⁆` and the `X ⊔ Y = S` s
 - The `(6.7)` congruence `ψ(z) ≡ ψ(1) (mod |P|)` (mmd L86-134) is itself **not yet formalized** and
   is a prerequisite of (6.8.1)/(6.8.2). Check whether it exists in S08/S07 before redesign.
 
+## Layered redesign plan (dependency-audited 2026-06-07) — Frobenius / case (A)
+
+Frobenius (c1) ⟹ `W₂ = 1 ⊆ Z(H)` ⟹ Peterfalvi **case (A)**, `Z = Z(H) ∩ H′` (central). The
+(A)/(B) split (mmd L150) is orthogonal to c1/c2; the Frobenius producer machinery targets case A.
+
+**L1 — central `Zc` facts** (clean, committable, independent of everything below).
+`Zc := ((Subgroup.center ↥H).map H.subtype) ⊓ ⁅H,H⁆ : Subgroup ↥L`. Need:
+`Zc ≤ ⁅H,H⁆` (inf_le_right); `Zc ≤ H`; `Zc.Normal` (center char in `H◁L` ⟹ its map ◁L; `⁅H,H⁆◁L`;
+inf of normals); `Zc.subgroupOf H ≤ Subgroup.center ↥H` (via `map`/`subgroupOf` of `center ↥H` along
+injective `H.subtype`); `Zc ≠ ⊥` when `H` nonabelian (use `isNilpotent_normal_inf_center_ne_bot`
+@S08:645 with `N = ⁅H,H⁆ ≠ ⊥`, giving `⁅H,H⁆ ⊓ center ≠ ⊥`).
+
+**L2 — `X = Xset Zc` coherence at central `Zc`.** REUSE the general consumer
+`Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X (Z := Zc)`
+(S08:7360) — it is SOUND for any Z; the producer `hstepData` is now HONESTLY fillable because
+`hθsq_le_qtot : θχ² ≤ qtot` = `exists_degree_sq_le_index (Zc.subgroupOf H) (L1 centrality)`. The
+building blocks `sum_re_sq_Xset_eq` / `index_mul_card_sub_factor` are already stated for general Z, so
+they apply verbatim at `Zc`. **This is still the ~300-line `hstepData` monolith** (member/tail
+degree data + the `hsum` partition `∑members² + ∑tail² = total = ∑_{X(Zc)} deg²`), but now
+mathematically valid. The hardest sub-piece is `hsum` (degree-sorted partition of `X(Zc)`).
+Also needs `X(Zc) ⊆ Irr L` — at central `Zc`, `Ind θ` irreducible for `Zc ⊄ ker θ`: reuse/adapt
+`isIrreducibleCharacter_of_mem_Xset_of_frobenius` (currently proven; check it is Z-generic or only
+⁅H,H⁆).
+
+**L3 — ν glue → `IsCoherent (Xset Zc ∪ Yset)`.** REUSE `coherentUnion_of_glued` (S07) — exactly what
+`coherentS_of_Xset_commutator_Yset_glued` (S08:4212) wraps, EXCEPT do NOT apply the final
+`simpa [Xset_union_Yset_eq_S]` (false at `Zc`); stop at the union coherence. The hypotheses
+`hagreeX/hagreeY/himg_ortho/hgen` are the genuine **(6.8.1)** case-A `τ₃` content (mmd L160-176):
+construct `ν` agreeing with `τ₁` on `Y` and `τ₂` on `X`, mutually orthogonal images. **This uses
+(6.7)** (`η₁^{τ₁}` constant on `Z^#` ⟹ congruence ⟹ `b ≡ 0 mod a`). **(6.7) is NOT formalized as a
+named theorem** (broad grep 2026-06-07). CANDIDATE: `OddOrder/GroupTheory/RepresentationTheory/
+SylowTICongruence.lean` — (6.7) is a Sylow-TI congruence (`P^#` TI, ψ constant on `Z^# ⊆ P` ⟹
+`ψ(z) ≡ ψ(1) mod |P|`). **First action of L3 = read SylowTICongruence.lean; if it is (6.7), wire it;
+else formalize (6.7) (mmd L86-134, the class-algebra `ω`/`a_{ijs}` argument).**
+
+**L4 — (6.8.3): `IsCoherent (Xset Zc ∪ Yset)` → `CoherenceTarget` (all of `S`).** mmd L226-: if
+`S ⊋ X∪Y` (i.e. `Zc ⊊ H′`), suppose `S` not coherent; `exists_coherentBreakPair` (S08:572) gives
+`S₁ ⊇ X∪Y` coherent with breaking pair `{ψ,ψ̄}`; `coherentDegreeSumBound_of_not_coherent` (S08:1996)
++ the (5.6) degree bound force a contradiction (`|L:H| ∣ ψ(1)`, the `Z⊄ker` degree argument). Both
+tools EXIST. Substantial but unblocked.
+
+### Reuse / rework map
+- **Keep (Z-generic, sound):** `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X`,
+  `sum_re_sq_Xset_eq`, `index_mul_card_sub_factor`, `exists_degree_sq_le_index`, `coherentYset`,
+  `coherentUnion_of_glued`, `exists_coherentBreakPair`, `coherentDegreeSumBound_of_not_coherent`,
+  `exists_pairUnion_memberFamily_of_irreducible_X`, all the per-member degree blocks.
+- **Rework / replace (hardwired to ⁅H,H⁆):** the capstone `sibleySetup_is_coherent` X-nonempty branch;
+  `coherentS_of_Xset_commutator_Yset_glued` (drop final `simpa`); `coherentS_of_frobenius_…` capstone;
+  `coherenceTarget_of_Xset_empty` / `Xset_union_Yset_eq_S` (no longer the partition).
+- **New:** L1 Zc facts; L2 producer at Zc; L3 (6.8.1) ν construction (+ (6.7) wiring/formalization);
+  L4 (6.8.3) extension.
+
+### Order of attack
+L1 → (read SylowTICongruence for 6.7) → L4 (unblocked, exercises the (5.6) tools) → L2 (monolith) →
+L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is the gating risk.
+
+### Progress
+- **✅ L1 DONE (2026-06-07, commits `b501838` + `b70b430`, leaf-green, axiom-clean).** In namespace
+  `SibleyDadeHypothesis`: `centralCommutator := (center ↥H).map H.subtype ⊓ ⁅H,H⁆`;
+  `centralCommutator_le_commutator` / `centralCommutator_le` (≤ ⁅H,H⁆, ≤ H);
+  `centralCommutator_subgroupOf_le_center` (**centrality** — the (6.6) bound enabler);
+  `centralCommutator_normal` (instance, via `normal_of_characteristic_of_normal`);
+  `centralCommutator_subgroupOf_eq` (`= center ↥H ⊓ commutator ↥H`);
+  `centralCommutator_ne_bot` (H non-abelian ⟹ ≠ ⊥). Not yet registered in `AxiomsCheck.lean`
+  (deferred until consumed; verified axiom-clean via temp `#print axioms`).
+- **Next: L4 or L2.** Before L2, confirm `isIrreducibleCharacter_of_mem_Xset_of_frobenius`
+  (S08:4348) is `Z`-generic (works at `centralCommutator`) or generalize it. Before L3, read
+  `OddOrder/GroupTheory/RepresentationTheory/SylowTICongruence.lean` for (6.7).
+
 ## Recommendation
 
 This is a multi-session redesign of the §8 capstone assembly (and possibly (6.7)), not an
