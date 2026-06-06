@@ -178,6 +178,14 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **`sMember_index_le_two_psi`**(d39e6f4, **(6.2) core**): 上記を結線。`S(A)⊆S₁` で sub-sum(`Finset.sum_le_sum_of_subset_of_nonneg` + reindex)→ `|L:H|(|H:A|−1) = ∑_{S(A)} ≤ ∑_{S₁} ≤ 2ψ(1).re·|L:H|` → |L:H| 約分 → **`|K:A|−1 ≤ 2ψ(1)`**。
 - **残 = θ-bound 合成のみ**: `theta_degree_le_index_mul_sqrt_index`(landed)で `ψ(1)=|L:K|θ(1) ≤ |L:C|√|C:D|` → (6.2) `2|L:C|√|C:D|≥|K:A|−1`。その後 (6.3) minimal-A 帰納(`six_three_HH1_le` landed)→ (6.5) bound → 「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed)。**(6.2) は θ-bound 合成 1 ステップで完成見込み**。
 
+### ✅✅✅ 2026-06-06 (続3): **Peterfalvi (6.2) 完全組立達成** (loop 自走, commits b93bb98/0cd57f1/704c24f/12408ea, 全 axiom-clean)
+(6.2) `2|L:C|√|C:D| ≥ |K:A|−1` を **honest に完成**(Frobenius case, K=H):
+- **`psi_degree_le_of_source`**(b93bb98): θ-bound 合成。ψ=Ind θ ⟹ `ψ(1)=|L:H|θ(1) ≤ |L:H|·|H:C|·√|C:D|`(`induce_apply_one` + `theta_degree_le_index_mul_sqrt_index`)。
+- **`six_two_index_bound`**(0cd57f1): first-obstruction + core 結線。S(A) coherent ∧ S(B) 非 ⟹ ∃ψ∈S(B), `|K:A|−1≤2ψ(1)`。`exists_coherentBreakPair` + `sMember_index_le_two_psi`、anchor = `exists_mem_SsubFiltration_degree_W1`、構造的事実 = landed `SsubFiltration_*`、Nonempty coherence は `.some`。
+- **`characterKernel_restrict_subgroupOf`**(704c24f): 汎用 restriction-kernel inheritance。θ trivial on M ⟹ Res_C θ trivial on M.subgroupOf C。θ-bound の kernel 条件を ψ∈S(B)(θ trivial on B)から discharge。
+- **`six_two`**(12408ea, **(6.2) 完成**): 上記を section 仮説(B⊆D⊆C⊆H, D/B⊆Z(C/B))下で合成。six_two_index_bound の ψ=Ind θ + kernel lemma + psi_degree_le_of_source → **`|K:A|−1 ≤ 2|L:C|√|C:D|`**。
+- **⟹ §6 残路** = (6.3) minimal-A 帰納((6.2) を section 上で帰納適用、`six_three_HH1_le` の arith core landed)→ (6.5) chief-factor で「H は p-群」(`isPGroup_of_isFrobeniusGroup_of_card_le` landed、要 bound)。(6.3) の minimal-A 帰納(subgroup lattice 上の well-founded)が次の主要 assembly。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
