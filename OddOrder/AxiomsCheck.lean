@@ -1973,6 +1973,11 @@ set_option linter.style.longLine false in
 -- S(B) not, B ⊆ D ⊆ C ⊆ H with D/B central in C/B), `|K:A|−1 ≤ 2|L:C|·√|C:D|`.  Threads the
 -- first-obstruction + core (`six_two_index_bound`) with the θ-bound (`psi_degree_le_of_source`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two
+-- Peterfalvi (6.2) central case `C = H` (the form (6.3) consumes): θ-bound via the direct b-half
+-- `degree_sq_le_index_of_central_quotient` (no Clifford restriction), giving `|K:A|−1 ≤ 2|L:H|√|H:D|`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.psi_degree_le_of_source_central
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two_central
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

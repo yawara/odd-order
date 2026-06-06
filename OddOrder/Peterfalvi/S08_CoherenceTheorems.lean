@@ -5267,6 +5267,60 @@ theorem six_two (hyp : SibleyDadeHypothesis G L H)
     _ ≤ 2 * ((H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
     _ = 2 * (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
 
+/-- **(6.2) θ-bound for an induced member, central (`C = H`) case.**
+
+When the section is `N ◁ D ≤ H` with `θ` trivial on `N` and `D ⧸ N` central in `H ⧸ N`, the b-half
+`degree_sq_le_index_of_central_quotient` gives `θ(1)² ≤ |H:D|` directly (no Clifford restriction),
+so `ψ = Ind_H^L θ` has `ψ(1) = |L:H|·θ(1) ≤ |L:H|·√|H:D|`.  This is the form (6.3) consumes (it
+applies (6.2) with `C = H`). -/
+theorem psi_degree_le_of_source_central (hyp : SibleyDadeHypothesis G L H)
+    (θ : IrreducibleCharacter ↥H) {N : Subgroup ↥H} [N.Normal] (D : Subgroup ↥H) (hND : N ≤ D)
+    (hθN : (↑N : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))
+    (hcentral : D.map (QuotientGroup.mk' N) ≤ Subgroup.center (↥H ⧸ N)) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re ≤
+      (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  obtain ⟨d, hd1, hd2⟩ :=
+    degree_sq_le_index_of_central_quotient N θ D hND hθN hcentral
+  have hind : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re
+      = (H.index : ℝ) * ((θ : ClassFunction ↥H ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hind, hd1, Complex.natCast_re]
+  exact mul_le_mul_of_nonneg_left (Real.le_sqrt_of_sq_le (by exact_mod_cast hd2))
+    (Nat.cast_nonneg _)
+
+/-- **Peterfalvi (6.2), central case `C = H`** (the form consumed by (6.3)).
+
+With the section `B ⊆ D ≤ H` (`B` as `N = B.subgroupOf H`), `D/B` central in `H/B`, `S(A)`
+coherent, `S(B)` not: `|K:A| − 1 ≤ 2|L:H|·√|H:D|`.  Specializes `six_two` to `C = H`, where the
+θ-bound is the direct b-half (`psi_degree_le_of_source_central`), so the source `θ` of the breaking
+pair `ψ ∈ S(B)` is trivial on `N = B.subgroupOf H` (no restriction step needed). -/
+theorem six_two_central (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal] [B.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (D : Subgroup ↥H) (hND : B.subgroupOf H ≤ D)
+    (hcentral : D.map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨ψ, hψB, hψbound⟩ := hyp.six_two_index_bound hF hAB hAcomm hSAcoh hSBncoh
+  rw [hyp.mem_SsubFiltration] at hψB
+  obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
+  have hψdeg := hyp.psi_degree_le_of_source_central θ D hND hθkerB hcentral
+  rw [hψeq] at hψbound
+  calc (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re := hψbound
+    _ ≤ 2 * ((H.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
+    _ = 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
