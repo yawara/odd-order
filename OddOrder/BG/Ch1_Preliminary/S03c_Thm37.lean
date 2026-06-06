@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 
 /-!
 # BG §3D: toward Theorem 3.7 (Frobenius kernel nilpotency)
@@ -62,5 +64,46 @@ theorem commutator_eq_bot_of_normal_pgroup_minimalNormal {q : ℕ} [Fact q.Prime
   rcases hVmin.2.2 (V ⊓ Subgroup.centralizer (K : Set H)) hCnorm inf_le_left with h | h
   · exact absurd h hCne
   · rw [← h]; exact inf_le_right
+
+/-- **Coprime case** of BG Thm 3.7's chief-factor analysis (via BG Lemma 3.3): let `G = KR` be a
+Frobenius group whose kernel order `|K|` is coprime to a prime `s` (`s ∤ |K|`), and let `M` be a
+commutative group with a `MulDistribMulAction` of `G` whose additive form `Additive M` is a
+`ZMod s`-module (the intended case is an elementary abelian `s`-group via
+`IsElementaryAbelian.zmodModule`). If `R` acts fixed-point-freely on `M` (`C_M(R) = 1`), then `K`
+acts trivially on `M`.
+
+View `M` additively as the `ZMod s`-representation `Representation.ofDistribMulAction` (the bridge
+instances supply `DistribMulAction G (Additive M)` and `SMulCommClass`), and apply the
+contrapositive of Lemma 3.3 (`S03b.kernel_acts_trivially_of_centralizer_eq_bot`). -/
+theorem kernel_acts_trivially_of_coprime_fixedPointFree {s : ℕ} [Fact s.Prime]
+    {G M : Type*} [Finite G] [Group G] [CommGroup M] [MulDistribMulAction G M]
+    [Module (ZMod s) (Additive M)]
+    {K R : Subgroup G} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
+    (hchar : ¬ s ∣ Nat.card K)
+    (hFPF : ∀ m : M, (∀ r : R, (r : G) • m = m) → m = 1) :
+    ∀ (k : K) (m : M), (k : G) • m = m := by
+  set ρ : Representation (ZMod s) G (Additive M) :=
+    Representation.ofDistribMulAction (ZMod s) G (Additive M) with hρ
+  have hρ_apply : ∀ (g : G) (a : Additive M), ρ g a = g • a := by
+    intro g a; rw [hρ]; rfl
+  have hchar' : (Nat.card K : ZMod s) ≠ 0 :=
+    fun h => hchar ((ZMod.natCast_eq_zero_iff _ _).1 h)
+  have hCR : ∀ v : Additive M, (∀ r : R, ρ (r : G) v = v) → v = 0 := by
+    intro v hv
+    have hfix : ∀ r : R, (r : G) • Additive.toMul v = Additive.toMul v := by
+      intro r
+      have h := hv r
+      rw [hρ_apply] at h
+      exact congrArg Additive.toMul h
+    have h0 : Additive.ofMul (Additive.toMul v) = Additive.ofMul (1 : M) :=
+      congrArg Additive.ofMul (hFPF _ hfix)
+    simpa using h0
+  have hKtriv := OddOrder.BG.Ch1.S03b.kernel_acts_trivially_of_centralizer_eq_bot
+    hFrob ρ hchar' hCR
+  intro k m
+  have happ : ρ (k : G) (Additive.ofMul m) = Additive.ofMul m := by
+    rw [hKtriv k]; rfl
+  rw [hρ_apply] at happ
+  exact congrArg Additive.toMul happ
 
 end OddOrder.BG.Ch1.S03c
