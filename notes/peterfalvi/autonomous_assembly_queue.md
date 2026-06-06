@@ -203,7 +203,19 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **helper `commutator_subgroupOf_quotient_ne_top`**(item ② の hAcomm provider): H nilpotent ⟹ normal A⊊H で H/A nontrivial nilpotent ⟹ not perfect ⟹ `[H/A,H/A]≠⊤`。`QuotientGroup.nontrivial_iff` + `subgroupOf_eq_top` + `IsSolvable.commutator_lt_top_of_nontrivial`。six_two/six_three の degree-|W₁| anchor 仮説を放電。
 - **⟹ (6.3) 完全 landed**(item ①+②)。**次 = (6.5) wiring「H は p-群」**(下記)。
 
-### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象
+### ✅✅✅ 2026-06-06 (続7): **(6.5)「H は p-群」wiring landed** (loop 自走, commit 34b464c, axiom-clean, S08 leaf 3465 + full AxiomsCheck 3555)
+- **`isPGroup_of_not_coherent`**(S08, Frobenius): `¬ Nonempty(IsCoherent τ hyp.S A)` ⟹ `∃ p prime, IsPGroup p ↥H`。`six_three` 対偶(M=⊥, H₁=⁅H,H⁆): `S(⁅H,H⁆)=Yset` coherent(`⟨hyp.coherentYset⟩`)∧ `⊥≤⁅H,H⁆⊊H`(nilpotent nontrivial ⟹ not perfect)⟹ `|H:⁅H,H⁆|>4|L:H|²+1` なら `S(⊥)=S` coherent で矛盾 ⟹ `|Ab H|=|H:⁅H,H⁆|≤4|W₁|²+1` ⟹ `isPGroup_of_isFrobeniusGroup_of_card_le`(既 landed)。
+- **bridge helpers**(両 axiom-clean): `commutator_subgroupOf_self`(汎用: `⁅H,H⁆.subgroupOf H = commutator ↥H` ⟹ `|H:⁅H,H⁆|=|Ab ↥H|`)/ `SsubFiltration_bot`(`S(⊥)=S`)。
+- **⟹ (6.2)/(6.3)/(6.5) 全 landed**。残 = (6.8) capstone X-nonempty branch (sorry@S08:7451)。
+
+### 🔴 (6.8) capstone X-nonempty branch = 次 frontier (最終ボス)
+**現状**: `sibleySetup_is_coherent`(S08:7438)の X-empty branch は closed、**残 sorry = X-nonempty branch (7451)**。
+- **既存 assembler**: `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(S08:7379)が `hyp.CoherenceTarget` を産出。要供給:
+  - `hstepData`: per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData`(各 step の (6.6) prime-power degree gap; **(6.5) H p-群で unblock** — θ(1) が p-power)。
+  - `ν` + `hagreeX`/`hagreeY`/`hmixed`/`hgen`: X∪Y glue data(combined extension)。
+- **次着手**: `PairUnionBaseAnchorCommonIndexPrimePowerStepData` の構造を読み、(6.5) の `isPGroup_of_not_coherent` を使って per-step prime-power degree data を構成。`two_mul_lt_sq_of_primePow_gap`(S07, 既 landed)が degree gap 核。**X-chain enum (pairUnion accumulator から member family)** が最重 combinatorial(queue 全体で繰り返し flagged)。
+
+### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象 (✅ 続7 で landed)
 **目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
 - **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
 - **bound の出どころ** = `six_three` の対偶(M=⊥, H₁=⁅H,H⁆): `S(⊥)=S` 非coherent ∧ `S(⁅H,H⁆)=Yset` coherent(`coherentYFamily` 既 landed, S08:3347/`Yset` def:3431)∧ `⁅H,H⁆⊊H`(H 非可換)⟹ `¬(|H:⁅H,H⁆|>4|L:H|²+1)` ⟹ `|H:⁅H,H⁆|≤4|L:H|²+1`。
