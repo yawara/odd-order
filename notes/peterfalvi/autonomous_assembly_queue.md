@@ -236,6 +236,19 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
   - **(B) ν glue**(hagreeX/hagreeY/hmixed/hgen): X∪Y combined extension。
 - **次着手**: `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(7009)と StepData consumer の正確な必要 fields を読み、enum member family の各 χmem=Ind θ から degree-data を組む producer を構成(per-member Ind 分解 + θ p-power で θmem、idx=|W₁| で dmem=idx·θmem、(6.6) 数論で gap/sum)。
 
+### 🔬 2026-06-06 (続10): (6.6) degree-data producer の正確な解剖（consumer 7024 精読済）
+**consumer `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(S08:7024)は StepData の全 field を explicit 仮説として取り、`XAdjoinStepInput` を産出**(StepData structure 7134 は同じ field の bundle)。⟹ **producer の仕事 = degree-data field 群の構成のみ**(coherence 本体は consumer が処理)。
+**field の意味（解読済）**:
+- enum: k/χmem/hrange/i₁ = `exists_pairUnion_memberFamily_of_irreducible_X`(✅既存)+ anchor は xBaseBlock の最小次数元。
+- degree: dχ=χs i の次数, dmem j=χmem j の次数, idx=|W₁|, θ=dχ/idx 等の source 次数(=Ind の source θ の次数), 全 θ=p^m(✅ `exists_primePow_natDegree_of_isPGroup`)。
+- **核 = `total = qtot·c`, `qtot=p^mq`, `θχ²≤qtot`** ⟺ **`θχ(1)² | total`**(total=full X degree-sum)。これが (6.6) の divisibility(mmd L76-82)。
+**producer 構成 plan(残 substantial pieces)**:
+1. 🔴 **X degree-sum 恒等式**(NEW, 未在; grep 確認): `∑_{χ∈Xset Z} χ(1)² = |L|−|L:Z|`(or 精密形)。X=S−S(Z), χ=Ind θ。**B2 系(`sum_re_sq_induce_kernelFilter_eq` 等 S(A)-side)と類似の Burnside-type**。**= 次 loop の第一目標**(clean substantial lemma)。
+2. 🟡 **divisibility 組立**: `θχ²|tail-sum`(p-power: θχ≤θⱼ ⟹ θχ|θⱼ ⟹ θχ²|θⱼ², `pow_dvd_pow`)+`θχ²|full-sum`(`degree_sq_le_index_of_central_quotient`=Is Cor2.30 ✅ + 恒等式1 + idx coprime p)⟹ `θχ²|total` ⟹ qtot:=θχ², c:=total/θχ²。
+3. 🟡 **StepData packaging**: 1+2 と enum/leaf を `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` の形に束ねる。tailSet κ の取り方(degree>χ の members)に注意。
+4. 🔴 **ν glue**(hagreeX/hagreeY/hmixed/hgen): X-coherence ∪ Y-coherence の combined extension(`coherentUnion_of_glued`)。
+**scope 判定**: §6 reduction chain ((6.2)/(6.3)/(6.5)) は完成・main 反映済(一部)。capstone 残 = この (6.6) producer(piece 1-3)+ glue(piece 4)。各 piece は独立に landable(特に piece 1 の X degree-sum 恒等式)。multi-session だが blocked ではない(欠落 primitive 無し、全 ingredient 在)。
+
 ### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象 (✅ 続7 で landed)
 **目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
 - **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
