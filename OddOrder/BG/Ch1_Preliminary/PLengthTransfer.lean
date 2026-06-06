@@ -253,4 +253,18 @@ theorem oPiCore_compl_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finite
   exact Ch03.oPiCore.isPiGroup (({p} : Set ℕ)ᶜ) r
     (Nat.primeFactors_mono hcard Nat.card_pos.ne' hr)
 
+/-- The image of `O_{p',p}(G) ⊓ H` in `G/O_{p'}(G)` is a `p`-group (it sits inside the
+`p`-group `O_{p',p}(G).map mk'`). Building block for Lemma 1.21(a). -/
+theorem isPGroup_inf_map_oPiPrimePiCore [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} :
+    IsPGroup p ↥((Ch03.oPiPrimePiCore ({p} : Set ℕ) G ⊓ H).map
+      (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G))) := by
+  have hle : (Ch03.oPiPrimePiCore ({p} : Set ℕ) G ⊓ H).map
+        (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G))
+      ≤ (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).map
+        (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)) :=
+    Subgroup.map_mono inf_le_left
+  exact isPGroup_map_oPiPrimePiCore.of_injective
+    (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
+
 end OddOrder.BG.Ch1
