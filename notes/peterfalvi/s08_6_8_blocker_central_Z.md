@@ -169,13 +169,24 @@ L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is th
 - **🔜 NEXT: L2 (the producer monolith), then L3, then capstone wiring.**
   - **L2**: `X = Xset Zc` coherence at central `Zc`. REUSE the general consumer
     `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X (Z := Zc)`
-    (S08:~7460); the producer `hstepData` is now HONESTLY fillable (`hθsq_le_qtot` =
-    `exists_degree_sq_le_index (Zc.subgroupOf H) centralCommutator_subgroupOf_le_center`). Still the
-    ~300-line monolith (member/tail degree data + the `hsum` degree-sorted partition of `X(Zc)`).
-    Building blocks: `sum_re_sq_Xset_eq`, `index_mul_card_sub_factor`, `exists_memberDegreeData`,
-    `exists_pairUnion_memberFamily_of_irreducible_X`, `exists_primePow_card_quotient_of_isPGroup`.
-    Need `Xset Zc ⊆ Irr L`: check `isIrreducibleCharacter_of_mem_Xset_of_frobenius` is Z-generic. Also
-    need `H` is a `p`-group (from `isPGroup_of_not_coherent` in the capstone's ¬-coherent branch).
+    (S08:~7460). **✅ linchpin landed** (`exists_source_primePow_centralBound_of_mem_Xset`, commit
+    `a119d9c`): for `χ∈X(Z)`, `χ(1)=|L:H|·p^k ∧ (p^k)²≤|H:Z|` — the `hθχ`/`hθsq_le_qtot` data, now
+    fillable at central `Zc`. `isIrreducibleCharacter_of_mem_Xset_of_frobenius` confirmed Z-generic.
+    **Remaining = the producer `hstepData` monolith** (single atomic `noncomputable def`, ~250 lines,
+    not splittable — the StepData is consumed atomically). For each chain step `i`:
+    1. enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k`, `χmem`, `hχinj`, `hrange`; anchor
+       `i₁` = min-degree of `xBaseBlock Zc` (`Set.exists_min_image`, cf. `two_le_xBaseBlock_ncard`).
+    2. numerics: `p`/`hp`(`three_le_prime_of_isPGroup_of_odd`)/`idx=H.index`(`hidx_p`=`coprimeIndexPrimePow`)/
+       per-member `dmem,θmem,mmem` (`exists_memberDegreeData`); `χs i` degree via the linchpin
+       (`θχ=p^mχ`, `θχ²≤|H:Z|=qtot`); `qtot=|H:Z|=p^mq` (`exists_primePow_card_quotient_of_isPGroup`);
+       `c`/`total`/`htotal` via `index_mul_card_sub_factor`.
+    3. **`hsum` (crux, ~80 lines)**: `tailSet := X(Zc)-Finset ∖ (accumulator image)`,
+       `θtail j` = source p-degree of `j`; `∑_{Fin k} dmem² + ∑_{tailSet}(idx·θtail)² = ∑_{X(Zc)} = total`
+       via `Finset.sum_sdiff` (accumulator ⊆ X) + `sum_re_sq_Xset_eq` (ℕ-cast); `htail_le` from the
+       degree-sorted chain (`hmono`): tail degrees ≥ `dχ`.
+    4. package `PairUnionBaseAnchorCommonIndexPrimePowerStepData ⟨…⟩`; feed the consumer.
+    Also needs `H` a `p`-group (from `isPGroup_of_not_coherent`, capstone ¬-coherent branch) and
+    `(Xset Zc).Nonempty`.
   - **L3**: ν glue → `Nonempty (IsCoherent (Xset Zc ∪ Yset))` via `coherentUnion_of_glued`; needs
     (6.8.1) case-A `τ₃` + (6.7) (`SylowTICongruence.lean`?). Hardest; gating.
   - **capstone** `sibleySetup_is_coherent` (S08 X-nonempty sorry): `by_cases Nonempty CoherenceTarget`;
