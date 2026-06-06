@@ -275,4 +275,24 @@ theorem chiefFactor_isElementaryAbelian
       ((QuotientGroup.quotientKerEquivRange φ).trans (MulEquiv.subgroupCongr hrange))
   exact IsElementaryAbelian.of_mulEquiv e.symm hs_ea
 
+/-- **Frobenius FPF on the kernel** (conjugation form): in a Frobenius group `G = KR`, the only
+element of the kernel `K` fixed by conjugation by *all* of `R` is the identity (`C_K(R) = 1`). Used
+to collapse the lifted fixed point in BG Thm 3.7's coprime case. -/
+theorem frobenius_kernel_conj_fixed_eq_one
+    {G : Type*} [Group G] {K R : Subgroup G} (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
+    {c : G} (hcK : c ∈ K) (hfix : ∀ r ∈ R, r * c * r⁻¹ = c) : c = 1 := by
+  by_contra hc1
+  haveI : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr h.ne_bot_complement
+  obtain ⟨r, hr⟩ := exists_ne (1 : ↥R)
+  have hrR : (r : G) ∈ R := r.2
+  have hr1 : (r : G) ≠ 1 := by simpa using hr
+  have hcomm : (r : G) * c = c * (r : G) := by
+    have hf : (r : G) * c * (r : G)⁻¹ * (r : G) = c * (r : G) := by rw [hfix (r : G) hrR]
+    simpa [mul_assoc] using hf
+  have hmem : c ∈ Subgroup.centralizer ({(r : G)} : Set G) ⊓ K :=
+    ⟨Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm, hcK⟩
+  rw [OddOrder.BG.Ch1.S03.centralizer_complement_inf_kernel_eq_bot h (r : G) hrR hr1,
+    Subgroup.mem_bot] at hmem
+  exact hc1 hmem
+
 end OddOrder.BG.Ch1.S03c
