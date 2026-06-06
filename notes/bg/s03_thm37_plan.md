@@ -1,8 +1,16 @@
 # BG Thm 3.7 形式化プラン (Frobenius kernel nilpotency, prime complement)
 
+## ✅✅ 2026-06-06 COMPLETE: `frobeniusKernelIsNilpotent` (06f9b92), sorry-free, full build 3580 緑
+
+**Thm 3.7 完全形式化 (S03c_Thm37.lean)**: `frobeniusKernelIsNilpotent {G}[Group][Finite][IsSolvable]{K R}(h : IsFrobeniusGroup G K R)(hR : ∃p,p.Prime∧Nat.card ↥R=p) : Group.IsNilpotent ↥K`。
+証明経路: chief-factor prerequisites (coprime conclusion / same-prime branch=SP-1+(A)+SP-2 / G-L Frobenius (iii) / elem-abelian (iv) / FPF (ii-b) / LR restriction / K/L q-群 helper) → per-factor dichotomy `kernel_le_chiefFactorCentralizer_dichotomy` → group-order 強帰納 `frobeniusKernelIsNilpotent_aux` (Nat.strong_induction_on, L=maxProperNormalOrBot K, IH on LR, L⊆F(G), Prop 1.2)。
+**残り = (vi) BG Thm 11.3 `Msigma_isNilpotent` で §11 解除 (frobeniusKernelIsNilpotent を適用)**。
+
+---
+
 **目的**: BG Thm 11.3 (`Msigma_isNilpotent`) を unblock する。Thm 3.7 = 「solvable odd `G=KR`,
 `K⊲G`, `R` = prime order `p` complement, `C_K(R)=1` ⇒ `K` nilpotent」(mmd L1199)。
-配置 = `OddOrder/BG/Ch1_Preliminary/S03_FrobeniusActions.lean` (§3, 既存 429 行に追記)。
+配置 = `OddOrder/BG/Ch1_Preliminary/S03c_Thm37.lean` (S03 から分割)。
 
 ## 既存インフラ (調査済 2026-06-01)
 
