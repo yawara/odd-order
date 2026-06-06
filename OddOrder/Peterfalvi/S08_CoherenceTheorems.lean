@@ -367,6 +367,14 @@ theorem exists_finEnum_irreducible {Γ : Type*} [Group Γ] {T : Set (ClassFuncti
     · intro hφ
       exact ⟨e ⟨φ, hφ⟩, by simp⟩
 
+/-- Reindex a sum over the `Finset` of a range by the indexing family: for an injective `f` over a
+finite domain, `∑_{x ∈ (Set.range f).toFinset} g x = ∑ j, g (f j)`.  Used to turn the `S₁`-set
+degree-square sum of the (6.2) bound into the `Fin k` member-family sum produced by B1. -/
+theorem sum_toFinset_range_eq {α β M : Type*} [Fintype α] [DecidableEq β] [AddCommMonoid M]
+    {f : α → β} (hinj : Function.Injective f) (g : β → M) :
+    ∑ x ∈ (Set.range f).toFinset, g x = ∑ j, g (f j) := by
+  rw [Set.toFinset_range, Finset.sum_image (fun a _ b _ h => hinj h)]
+
 /-- **(T8 leaf 10, combinatorial core) the conjugate-pair cover of `X` over a base `S₀`.**
 
 Given a finite set `X` of irreducible characters of `Γ`, closed under conjugation and with no real
@@ -4977,6 +4985,56 @@ theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H
     (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
     hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
   simpa using hbound
+
+/-- **(6.2) member-family degree-square bound** (real form).
+
+The degree-sum bound `sMember_degreeSumBound_of_not_coherent` (`∑ⱼ (degⱼ)² ≤ 2a`), rescaled by the
+anchor degree `χ₁(1) = |W₁|`, gives the character-degree-square sum over the enumerated `S₁`-family:
+`∑ⱼ (χⱼ(1))² ≤ 2·ψ(1)·χ₁(1)` (real parts), since `χⱼ(1) = degⱼ·χ₁(1)` and `ψ(1) = a·χ₁(1)`.  This is
+the (6.2) bound `∑_{χ∈S₁} χ(1)² ≤ 2ψ(1)χ₁(1)` in the form ready to be compared, via `S(A) ⊆ S₁`,
+with the `S(A)` degree-sum identity B2. -/
+theorem sMember_degreeSqReBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 ≤
+        2 * (ψ 1).re * (χ₁ 1).re := by
+  obtain ⟨k, χmem, deg, a, hrange, hdeg_eq, hψ_eq, hbound⟩ :=
+    hyp.sMember_degreeSumBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact ⟨j, rfl⟩
+  refine ⟨k, χmem, hrange, hmemS1, ?_⟩
+  -- real parts of the degree relations
+  have hdegre : ∀ j, ((χmem j : ClassFunction ↥L ℂ) 1).re = (deg j : ℝ) * (χ₁ 1).re := by
+    intro j
+    rw [hdeg_eq j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (ψ 1).re = (a : ℝ) * (χ₁ 1).re := by
+    rw [hψ_eq, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hre_nonneg : (0 : ℝ) ≤ (χ₁ 1).re ^ 2 := sq_nonneg _
+  calc ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2
+      = ∑ j : Fin k, ((deg j : ℝ) * (χ₁ 1).re) ^ 2 := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (χ₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (χ₁ 1).re ^ 2 * (2 * (a : ℝ)) := by
+        exact mul_le_mul_of_nonneg_left hbound hre_nonneg
+    _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
+    _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
 
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 

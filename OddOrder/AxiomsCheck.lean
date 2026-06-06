@@ -1944,6 +1944,11 @@ set_option linter.style.longLine false in
 -- bridges into B1 (`coherentDegreeSumBound_of_not_coherent`), yielding `∑ⱼ (degⱼ)² ≤ 2a`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSumBound_of_not_coherent
+-- (6.2) range-sum reindex + the degree-square real bound `∑ⱼ χⱼ(1)² ≤ 2ψ(1)χ₁(1)` (B1 rescaled by
+-- the anchor degree), the form ready to compare with B2 via `S(A) ⊆ S₁`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_toFinset_range_eq
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSqReBound_of_not_coherent
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
