@@ -5515,6 +5515,27 @@ theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
   simp only [Nat.mul_add, Nat.mul_one, Nat.add_sub_cancel]
   ring
 
+/-- **(6.8.3) arithmetic core.**  The numeric contradiction closing the (6.8.3) extension in case
+(A).  From the break-pair (5.6) bound `∑_{χ∈X} χ(1)² < 2ψ(1)η₁(1)` — i.e.
+`|W₁|·|H:Z|·(|Z|−1) < 2·|W₁|²·d` with `ψ(1) = |W₁|d`, `η₁(1) = |W₁|` — together with [Is] Cor 2.30
+`d² ≤ |H:Z|` (valid since `Z` is central) and the fixed-point-free bound `|Z|−1 ≥ 2|W₁|`
+(`W₁` acts FPF on the odd-order `Z`), one derives `|H:Z| < d ≤ d² ≤ |H:Z|`, a contradiction.
+
+Here `w1 = |W₁|`, `d = θ(1)` (the degree of the `H`-source of `ψ`), `hZ = |H:Z|`, `cZ = |Z|`. -/
+theorem false_of_centralCommutator_break_arith {w1 d hZ cZ : ℕ}
+    (hw1 : 1 ≤ w1) (hd : 1 ≤ d) (hdsq : d ^ 2 ≤ hZ)
+    (hfpf : 2 * w1 ≤ cZ - 1)
+    (hbreak : w1 * hZ * (cZ - 1) < 2 * w1 ^ 2 * d) : False := by
+  set m := cZ - 1 with hm
+  have hge : 2 * w1 ^ 2 * hZ ≤ w1 * hZ * m := by
+    calc 2 * w1 ^ 2 * hZ = w1 * hZ * (2 * w1) := by ring
+      _ ≤ w1 * hZ * m := mul_le_mul_left' hfpf (w1 * hZ)
+  have hlt : 2 * w1 ^ 2 * hZ < 2 * w1 ^ 2 * d := lt_of_le_of_lt hge hbreak
+  have hZd : hZ < d := Nat.lt_of_mul_lt_mul_left hlt
+  have hd2 : d ^ 2 < d := lt_of_le_of_lt hdsq hZd
+  have hdd : d ≤ d ^ 2 := Nat.le_self_pow two_ne_zero d
+  omega
+
 /-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
 `χ(1) = |L:H| · θ(1)`; when `H` is a `p`-group `θ(1) = p^k`, so `χ(1) = |L:H| · p^k`.  This is the
 common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
