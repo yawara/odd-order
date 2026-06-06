@@ -14,8 +14,12 @@
    し、本ファイル下部「blocked ログ」に「欠落 primitive / 理由」を記録して次 task へ。
 4. **commit 単位**: 完成した lemma 1 つ (+ その helper) ごとに build-green+axiom-clean で commit
    (descriptive message + `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`)。
-5. **worktree のみ・main 不可侵**: commit 前に `git branch --show-current` =
-   `claude/determined-hypatia-e67fd5` を確認。main への操作一切不可。
+5. **worktree のみ・main 不可侵**: 作業は worktree `/home/ywr/odd-order-peterfalvi`
+   (branch `peterfalvi`) で行う。commit 前に `git branch --show-current` = `peterfalvi` を確認。
+   main (`/home/ywr/odd-order`, 現在 BG Thm 3.7) への操作一切不可。
+   (旧 branch `claude/determined-hypatia-e67fd5` は merge 済・消滅。2026-06-06 訂正。)
+   注: Bash の cwd は毎回 main にリセットされるので各コマンド冒頭で
+   `cd /home/ywr/odd-order-peterfalvi` する。lake/references は symlink 共有済。
 6. **逐次** (impl は 1 本ずつ; parallel build 不可)。詰まったら revert→次 task、全 task blocked で停止。
 
 ## 既存 landed lemma (S08, 全 axiom-clean — 再実装不要, 呼ぶだけ)
@@ -193,6 +197,10 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **`isNilpotent_normal_inf_center_ne_bot`**(9906836): **汎用** nilpotent 中心 fact(mathlib/repo 欠落、新規構築)。finite nilpotent + N◁ nontrivial ⟹ `N⊓Z(G)≠⊥`。upper central series の least-index 論法(`mem_upperCentralSeries_succ_iff` + 最小性)。
 - **`exists_maximal_normal_between`**(fcc4f15): **汎用** finite-lattice fact。`M<A`(M normal)⟹ maximal normal B(`M≤B<A`, normal C で `B≤C<A`⟹C=B)。`Set.Finite.exists_maximalFor`。
 - **残 (6.3) = ① maximality-central 導出**(nilpotency fact + maximal-B で `A/B ⊆ Z(H/B)`): A/B⊓Z(H/B)≠⊥(nilpotency)→ 対応する C は normal in L/B(Z(H/B) は H/B の center で characteristic、H/B◁L/B ゆえ normal)、B⊊C⊆A → maximality で C=A → A/B⊆Z。**quotient/subgroupOf/correspondence bookkeeping が重い**(~60-100行)。**② 強帰納 wrapping**(`Nat.card A` 上、A=H₁ から S(M) coherent。A=M base / A≠M で maximal-B → S(B) coh なら IH / S(B) 非なら central+per-step で `|H:H₁|≤bound` 矛盾)。両者で (6.3) 完成 → (6.5)(a) bound(M=⊥, H₁=⁅H,H⁆)で `|Abelianization H|≤4|W₁|²+1` → `isPGroup_of_isFrobeniusGroup_of_card_le` で H は p-群 → (6.8) capstone hstepData。
+
+### ✅ 2026-06-06 (続5): (6.3) item ① **maximality-central 導出 landed** (loop 自走, commit c0cb810, axiom-clean, S08 leaf 3465 + full AxiomsCheck 3555)
+- **`normal_central_of_maximal_normal_below`**(S08, **汎用** group theory): finite Γ + H◁Γ nilpotent + A,B◁Γ + B<A≤H + B maximal-normal-below-A ⟹ `(A.subgroupOf H).map (mk' (B.subgroupOf H)) ≤ center (↥H ⧸ B.subgroupOf H)`(= A/B ⊆ Z(H/B))。`isNilpotent_normal_inf_center_ne_bot`(Ā⊓Z(Q)≠⊥, Q=H/B nilpotent quotient)→ pullback `C := (A.subgroupOf H ⊓ (center Q).comap (mk')).map H.subtype` が Γ-normal(**element-level commutator 証明**: 各 g∈Γ で `↑(h c' h⁻¹ c'⁻¹) = g·↑(k c k⁻¹ c⁻¹)·g⁻¹`, k=g⁻¹•h•g; `push_cast; group` + B normal conj)→ B<C≤A → maximality で C=A → A/B⊆Z。**`six_three_index_bound` の `hcentral` 仮説を放電する key piece**。
+- **残 (6.3) = ② 強帰納 wrapping のみ**(item ① 完了)。`Nat.card A`(or subgroup lattice well-founded)上の minimal-A 帰納で (6.3) 本体 `S(H₁) coherent + |H:H₁|>4|L:K|²+1 ⟹ S(M) coherent`。要: (b) minimal-coherent-A の存在(S(A) coherent な normal A の `Nat.card` 最小元)+ A=M base / A≠M で `exists_maximal_normal_between`→`normal_central_of_maximal_normal_below`(item ①)→`six_three_index_bound` で `|H:H₁|≤4|L:K|²+1` 矛盾。次 loop iteration の主対象。
 
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
