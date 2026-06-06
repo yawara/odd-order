@@ -3514,6 +3514,40 @@ theorem centralCommutator_subgroupOf_le_center (hyp : SibleyDadeHypothesis G L H
   have hzx' : z = x := Subtype.ext (by simpa using hzx)
   rwa [← hzx']
 
+/-- `Z = Z(H) ∩ H′` is normal in `L`: `(center ↥H).map H.subtype` is normal (characteristic in the
+normal `H`, via `normal_of_characteristic_of_normal`) and `⁅H,H⁆` is normal, so their inf is. -/
+instance centralCommutator_normal (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.Normal := by
+  haveI := hyp.H_normal
+  haveI : (⁅H, H⁆ : Subgroup ↥L).Normal := Subgroup.commutator_normal H H
+  simp only [centralCommutator]
+  infer_instance
+
+/-- `Z = Z(H) ∩ H′` traced into `H` is `Z(↥H) ⊓ commutator ↥H`. -/
+theorem centralCommutator_subgroupOf_eq (hyp : SibleyDadeHypothesis G L H) :
+    hyp.centralCommutator.subgroupOf H
+      = Subgroup.center ↥H ⊓ _root_.commutator ↥H := by
+  have h1 : hyp.centralCommutator.subgroupOf H
+      = ((Subgroup.center ↥H).map H.subtype).subgroupOf H
+        ⊓ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H := by
+    rw [centralCommutator]; exact Subgroup.comap_inf _ _ _
+  rw [h1, commutator_subgroupOf_self]
+  congr 1
+  exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+
+/-- `Z = Z(H) ∩ H′ ≠ 1` when `H` is non-abelian: a non-trivial nilpotent group has
+`Z(H) ∩ H′ ≠ 1` (`isNilpotent_normal_inf_center_ne_bot` with `N = H′`). -/
+theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) : hyp.centralCommutator ≠ ⊥ := by
+  haveI := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  have hkey : Subgroup.center ↥H ⊓ _root_.commutator ↥H ≠ ⊥ := by
+    rw [inf_comm]
+    exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
+  intro hbot
+  apply hkey
+  rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
+
 /-- Membership in `S(A)`, unfolded. -/
 theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
