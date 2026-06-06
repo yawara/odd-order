@@ -7,6 +7,7 @@ import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
+import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 import OddOrder.GroupTheory.ChiefFactor
@@ -243,5 +244,35 @@ theorem frobenius_quotient_of_normal_lt_kernel
   have hdvd : Nat.card ↥(Subgroup.zpowers x) ∣ Nat.card ↥R :=
     Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hxR)
   exact (hcop.coprime_dvd_right hdvd).symm
+
+open OddOrder.GroupTheory in
+/-- **A chief factor of a finite solvable group is elementary abelian** (in the quotient-type model
+`↥X ⧸ Y.subgroupOf X` used by `chiefFactorConjAction`): transports the standard
+`X.map(mk' Y)`-form (`isMinimalNormal_le_fitting_and_isElementaryAbelian`) across the first
+isomorphism `↥X ⧸ Y.subgroupOf X ≃* ↥(X.map (mk' Y))`. -/
+theorem chiefFactor_isElementaryAbelian
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {X Y : Subgroup G} [Y.Normal]
+    (hChief : IsChiefFactor X Y) :
+    ∃ s : ℕ, s.Prime ∧ IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X) := by
+  have hMin := hChief.isMinimalNormal_map_quotient
+  obtain ⟨s, hs_prime, hs_ea⟩ :=
+    (OddOrder.BG.Ch1.S01.isMinimalNormal_le_fitting_and_isElementaryAbelian hMin).2.2
+  refine ⟨s, hs_prime, ?_⟩
+  let φ : ↥X →* G ⧸ Y := (QuotientGroup.mk' Y).comp X.subtype
+  have hker : φ.ker = Y.subgroupOf X := by
+    ext x
+    simp only [φ, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+  have hrange : φ.range = X.map (QuotientGroup.mk' Y) := by
+    ext z
+    simp only [φ, MonoidHom.mem_range, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      Subgroup.mem_map]
+    constructor
+    · rintro ⟨x, rfl⟩; exact ⟨x, x.2, rfl⟩
+    · rintro ⟨g, hg, rfl⟩; exact ⟨⟨g, hg⟩, rfl⟩
+  let e : ↥X ⧸ Y.subgroupOf X ≃* ↥(X.map (QuotientGroup.mk' Y)) :=
+    (QuotientGroup.quotientMulEquivOfEq hker.symm).trans
+      ((QuotientGroup.quotientKerEquivRange φ).trans (MulEquiv.subgroupCongr hrange))
+  exact IsElementaryAbelian.of_mulEquiv e.symm hs_ea
 
 end OddOrder.BG.Ch1.S03c
