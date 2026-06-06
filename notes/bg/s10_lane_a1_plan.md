@@ -50,7 +50,24 @@ worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE
 - **依存**: §9 Uniqueness (`S ≤ 2 distinct maximals ⇒ r(S)≤2`, repo `S09_*` 要確認),
   `p∈σ(M)` で Sylow-of-`M` が Sylow-of-`G` (N_G⊆M argument), Sylow 共役 (mathlib),
   `M_σ`=Hall σ + nilpotent⇒Sylow char⇒正規, `π(A⊓B)⊆π(A)∩π(B)` + `π(M_α)⊆α(M)` 等。
-  **行間は無い**; ブロッカーは無し。形式化は中規模 (10.11(d) 同等)。
+  **行間は無い**; ブロッカーは無し。
+
+- ✅ **10.12 DONE** (commit `95a313c`)。core lemma `mem_sigma_inter_sigma_imp` 経由で上記証明を
+  そのまま形式化、**axiom-clean** (sorryAx 無; §9 Uniqueness が axiom-clean なので)。
+  使った主要部品: 新 public base lemma `exists_sylow_le_normalizer_le_of_mem_sigma`
+  (S10_HallStructure; 既存 private `isSylow_sylowMap_of_mem_sigma` +
+  `normalizer_sylow_map_le_of_mem_sigma` の packaging), replicate `sylow_subgroupOf_of_le`
+  (S07 private の複製), `S09.isUniquelyMaximal_of_three_le_rank_of_lt_top`,
+  `pRank_sylow_eq`+`pRank_le_rank`, `Msigma_isHall`, `Sylow.coe_subgroup_smul`+
+  `map_normalizer_eq_of_bijective`, `AppB.normalizer_le_normalizer_map_of_characteristic`,
+  `inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl`。
+
+### 残り §10 leaves (要 PDF 再読込, offset `book = PDF − 13`)
+
+10.3 (`centralizer_isUniquelyMaximal_of_two_le_rank`), 10.5 (`pRank_eq_two_of_normalizer_le`),
+10.4 (`alpha_criterion`), 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) が残 sorry。
+いずれも旧 MISSING_PAGE で §10 前半 (≈book p.76 以前 = PDF ≤88) or p.79–80 (10.13) を要読込。
+10.3/10.5 は Uniqueness 系で 10.12 と部品共通、10.13 は §5 narrow p-群構造。
 
 ## ⚠ 依存の実態 (BG 原文を読んで判明 — 当初の docstring ベース map は楽観的すぎた)
 
@@ -58,7 +75,7 @@ worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE
 |---|---|---|---|
 | `sigma_complement_rank_le_one` | 10.11(a)(b)(c) | (a) Thm 4.20+base; **(b) Prop 10.10 (spine!)**; (c)←(b) | ✗ (b)(c) が spine 待ち |
 | `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | ✅ **DONE** (eb6cc10, (c) 還元) |
-| `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | 証明回収済 (book p.79=PDF 92, 上記参照) |
+| `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | ✅ **DONE** (95a313c, **axiom-clean** sorryAx 無) |
 | `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Uniqueness | 要 PDF 再読込 (§10 前半, ≈book p.76 以前=PDF≤88) |
 | `pRank_eq_two_of_normalizer_le` | 10.5 | §7 Prop 7.5 等 | 要 PDF 再読込 (§10 前半) |
 | `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | 要 PDF 再読込 (§10 前半) |
