@@ -1357,6 +1357,46 @@ theorem Msigma_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
     _ ≤ (Q : Subgroup ↥M).map M.subtype := Subgroup.map_mono hPQ
     _ ≤ derivedInG M := sylow_le_derived_of_mem_sigma hG hM hr_sigma Q
 
+/-- **BG Theorem 10.6 support, α-Sylow absorption**:
+if `M_α` is an `α(M)`-Hall subgroup, then every Sylow `p`-subgroup of `M` with
+`p ∈ α(M)` lies in `M_α` when mapped back to `G`. -/
+theorem sylow_le_Malpha_of_mem_alpha_of_isHall [Finite G] {M : Subgroup G}
+    (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M)) {p : ℕ} [Fact p.Prime]
+    (hpα : p ∈ alpha M) (P : Sylow p ↥M) :
+    ((P : Subgroup ↥M).map M.subtype : Subgroup G) ≤ Malpha M := by
+  let Pbar : Subgroup G := (P : Subgroup ↥M).map M.subtype
+  have hPbarM : Pbar ≤ M := Subgroup.map_subtype_le _
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ M.subtype_injective)
+  have hPbarα : Ch03.Subgroup.IsPiGroup (alpha M) Pbar := by
+    intro r hr
+    obtain ⟨n, hn⟩ := hPbar_pg.exists_card_eq
+    rw [hn, Nat.mem_primeFactors] at hr
+    have hrp : r = p :=
+      (Nat.prime_dvd_prime_iff_eq hr.1 Fact.out).mp (hr.1.dvd_of_dvd_pow hr.2.1)
+    exact hrp ▸ hpα
+  exact alpha_subgroup_le_Malpha_of_isHall hHallα hPbarM hPbarα
+
+/-- **BG Theorem 10.6 support, α primes disappear modulo `M_α`**:
+if `M_α` is an `α(M)`-Hall subgroup and `p ∈ α(M)`, then `p` does not divide
+`|M/M_α|`. -/
+theorem not_dvd_card_quotient_Malpha_of_mem_alpha_of_isHall [Finite G]
+    {M : Subgroup G} (hHallα : Ch03.IsHallSubgroup (alpha M) (Malpha M))
+    {p : ℕ} [Fact p.Prime] (hpα : p ∈ alpha M) :
+    ¬ p ∣ Nat.card (↥M ⧸ (Malpha M).subgroupOf M) := by
+  intro hpquot_dvd
+  have hpquot : p ∈ (Nat.card (↥M ⧸ (Malpha M).subgroupOf M)).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpquot_dvd, Nat.card_pos.ne'⟩
+  have hpidx_sub : p ∈ ((Malpha M).subgroupOf M).index.primeFactors := by
+    simpa [Subgroup.index] using hpquot
+  have hidx_dvd : ((Malpha M).subgroupOf M).index ∣ (Malpha M).index := by
+    have htower : ((Malpha M).subgroupOf M).index * M.index = (Malpha M).index :=
+      Subgroup.relIndex_mul_index (Malpha_le M)
+    exact ⟨M.index, htower.symm⟩
+  have hpidx : p ∈ (Malpha M).index.primeFactors :=
+    Nat.primeFactors_mono hidx_dvd Subgroup.index_ne_zero_of_finite hpidx_sub
+  exact hHallα.2 p hpidx hpα
+
 /-- **BG Theorem 10.2(d), rank part** (mmd L2733-2738): once `M_α` is an
 `α(M)`-Hall subgroup, the quotient `M/M_α` has rank at most two. Primes in `α(M)`
 do not divide the Hall quotient, and primes outside `α(M)` have `p`-rank at most two by
@@ -1373,15 +1413,8 @@ theorem rank_quotient_Malpha_le_two_of_isHall [Finite G] {M : Subgroup G}
     have hpquot : p ∈ (Nat.card (↥M ⧸ (Malpha M).subgroupOf M)).primeFactors :=
       OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank
         (H := ↥M ⧸ (Malpha M).subgroupOf M) (p := p) hpos
-    have hpidx_sub : p ∈ ((Malpha M).subgroupOf M).index.primeFactors := by
-      simpa [Subgroup.index] using hpquot
-    have hidx_dvd : ((Malpha M).subgroupOf M).index ∣ (Malpha M).index := by
-      have htower : ((Malpha M).subgroupOf M).index * M.index = (Malpha M).index :=
-        Subgroup.relIndex_mul_index (Malpha_le M)
-      exact ⟨M.index, htower.symm⟩
-    have hpidx : p ∈ (Malpha M).index.primeFactors :=
-      Nat.primeFactors_mono hidx_dvd Subgroup.index_ne_zero_of_finite hpidx_sub
-    exact hHallα.2 p hpidx hpα
+    exact not_dvd_card_quotient_Malpha_of_mem_alpha_of_isHall hHallα hpα
+      (Nat.mem_primeFactors.mp hpquot).2.1
   · have hN_p' : ¬ p ∣ Nat.card ↥((Malpha M).subgroupOf M) := by
       intro hdiv
       have hpNsub : p ∈ (Nat.card ↥((Malpha M).subgroupOf M)).primeFactors :=

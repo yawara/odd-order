@@ -26,6 +26,12 @@ BG 本体 critical path の gateway。
   `p∉π(M)` なら `|M/O_{p',p}(M)| ∣ |M|` から直接 `hasPLengthOne`。
   `lake build OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma` green、axioms =
   `[propext, Classical.choice, Quot.sound]`。
+- [x] **`p∈α(M)` hard branch の Hall-α support 完成**:
+  `sylow_le_Malpha_of_mem_alpha_of_isHall` により `p∈α(M)` の Sylow-p subgroup of `M` は
+  `M_α` に吸収される。
+  `not_dvd_card_quotient_Malpha_of_mem_alpha_of_isHall` により `p∈α(M)` なら
+  `p∤|M/M_α|`。既存 `rank_quotient_Malpha_le_two_of_isHall` もこの public lemma を使う形に整理。
+  S10 leaf build green、axioms = `[propext, Classical.choice, Quot.sound]`。
 
 ## やること
 
