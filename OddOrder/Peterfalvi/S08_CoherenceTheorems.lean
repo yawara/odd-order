@@ -4744,6 +4744,37 @@ theorem exists_sMemberOrthonormalFamily (hyp : SibleyDadeHypothesis G L H)
     · subst h; simp
     · rw [if_neg (fun he => h (hχinj he)), if_neg h]
 
+/-- **(6.2) member-family degree data** (Frobenius case): integer degree ratios against a
+degree-`|W₁|` anchor.
+
+Given a family `χmem` of `S`-members and a distinguished index `i₁` whose member has the minimal
+degree `χmem i₁ (1) = |W₁|`, every member has a positive integer degree ratio
+`χmem j (1) = (deg j)·χmem i₁ (1)` (the source degree, `sMember_charValue_one_eq_mul_anchor`), the
+anchor ratio is `deg i₁ = 1` (cancel the nonzero `|W₁|`), and each scaled difference
+`χmem j − deg j·χmem i₁` is supported on `H^#` (`sMember_scaledDiffSupport_of_charValue_eq`).  This
+is the `deg`/`ha1`/`hmemdegdiffsupp` data that layers on `exists_sMemberOrthonormalFamily` to
+complete the (6.2)/B1 member-family. -/
+theorem exists_sMemberDegreeData (hyp : SibleyDadeHypothesis G L H)
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L} {i₁ : Fin k}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.S)
+    (hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ)) :
+    ∃ deg : Fin k → ℕ, deg i₁ = 1 ∧ (∀ j, 0 < deg j) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 =
+        (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ) - deg j • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  choose deg hdeg_pos hdeg_eq using fun j =>
+    hyp.sMember_charValue_one_eq_mul_anchor (hmemS j) hanchordeg
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  refine ⟨deg, ?_, hdeg_pos, hdeg_eq, fun j =>
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hmemS j) (hmemS i₁) (hdeg_eq j)⟩
+  have h := hdeg_eq i₁
+  rw [hanchordeg] at h
+  have hdeg1 : (deg i₁ : ℂ) = 1 :=
+    mul_right_cancel₀ hW1ne (by rw [one_mul]; exact h.symm)
+  exact_mod_cast hdeg1
+
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
 Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
