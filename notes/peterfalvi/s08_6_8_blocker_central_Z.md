@@ -154,7 +154,23 @@ L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is th
   `centralCommutator_subgroupOf_eq` (`= center ↥H ⊓ commutator ↥H`);
   `centralCommutator_ne_bot` (H non-abelian ⟹ ≠ ⊥). Not yet registered in `AxiomsCheck.lean`
   (deferred until consumed; verified axiom-clean via temp `#print axioms`).
-- **Next: L4 or L2.** Before L2, confirm `isIrreducibleCharacter_of_mem_Xset_of_frobenius`
+- **🔜 L4 IN PROGRESS (order chosen: L4 → L2 → L3).** Decomposition of the (6.8.3) case-(A) extension
+  `IsCoherent (Xset Zc ∪ Yset) → ¬Nonempty CoherenceTarget → False`:
+  - **✅ (a) arithmetic core** `false_of_centralCommutator_break_arith` (commit `0af1041`, axiom-clean):
+    `w1,d,hZ,cZ`, `d²≤hZ`, `2w1≤cZ−1`, `w1·hZ·(cZ−1) < 2w1²d` ⟹ False.
+  - (b) **break-pair**: `exists_coherentBreakPair` (S08:572) on `Sa = Xset Zc ∪ Yset`, `Sb = S` ⟹
+    `S₁` (conj-closed, X∪Y ⊆ S₁ ⊆ S) coherent + `ψ` with `S₁∪{ψ,ψ̄}` not coherent. Needs `S` real-free
+    (`S_hasNoRealCharacters`), `Xset Zc ∪ Yset ⊆ S`, and `Xset Zc ∪ Yset` coherent (= L3 output).
+  - (c) **xSum bound** `∑_{χ∈X} χ(1)² < 2ψ(1)·|W₁|`: analogue of `sMember_index_le_two_psi` (S08:5485)
+    but bounding the X-sum (`sum_re_sq_Xset_eq`, applies at central Zc) instead of `S(A)`; reuse
+    `sMember_degreeSqReBound_of_not_coherent` over `S₁ ⊇ X`, anchor `χ₁ = η₁ ∈ Y` of degree `|W₁|`.
+  - (d) **Cor 2.30** `d² ≤ |H:Z|`: `exists_degree_sq_le_index (Zc.subgroupOf H) centralCommutator_subgroupOf_le_center` (L1). Easy.
+  - (e) **FPF bound** `|Z|−1 ≥ 2|W₁|`: W₁ acts FPF on the W₁-invariant `Z ≤ H` (Z char in H);
+    `card_modEq_one` (`FrobeniusActionTI:146`) + `Z,W₁` odd + `two_mul_add_one_le_of_odd_dvd` (S08:2383)
+    — mirrors `isPGroup_of_isFrobeniusGroup_of_card_le` (S08:2534) done for all of H. Sub-task: derive
+    `IsFrobeniusAction W₁ Z` from `IsFrobeniusGroup L H W₁` + Z W₁-invariant.
+  - (f) assemble (b)–(e)+(a). `∑_X = |W₁|·|H:Z|·(|Z|−1)` via `sum_re_sq_Xset_eq` + `index_mul_card_sub_factor`.
+- **Then L2, L3.** Before L2, confirm `isIrreducibleCharacter_of_mem_Xset_of_frobenius`
   (S08:4348) is `Z`-generic (works at `centralCommutator`) or generalize it. Before L3, read
   `OddOrder/GroupTheory/RepresentationTheory/SylowTICongruence.lean` for (6.7).
 
