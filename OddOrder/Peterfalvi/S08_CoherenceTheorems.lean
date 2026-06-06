@@ -7875,6 +7875,46 @@ noncomputable def
     (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
     hXne hstepData
 
+/-- **(6.6)/(6.8.1), central-`Zc` form (redesign L2 outer shell):** chain-level coherence for
+`X = S − S(Zc)` with the **central** `Zc = Z(H) ∩ H′`, from base-anchor common-index p-power step
+packages.  This replaces `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`
+(which instantiated the general (6.6) consumer at `Z = ⁅H,H⁆`, where the per-step degree field
+`hθsq_le_qtot : θχ² ≤ qtot ≤ |H:⁅H,H⁆|` is *unsatisfiable* for class ≥ 3 `p`-groups — see
+`notes/peterfalvi/s08_6_8_blocker_central_Z.md`).  At the central `Zc` that field is honestly fillable
+by [Is] Cor 2.30 (`exists_source_primePow_centralBound_of_mem_Xset`), so the `hstepData` hypothesis
+is satisfiable here — the remaining work is to *construct* it (the producer monolith).  `hX` is
+discharged Z-generically (`isIrreducibleCharacter_of_mem_Xset_of_frobenius`) and `hXne` from `H`
+non-abelian (`Xset_centralCommutator_nonempty`). -/
+noncomputable def
+    Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    (hstepData : ∀
+      (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+      (χs : ℕ → IrreducibleCharacter ↥L),
+      (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+      (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+      (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆
+        hyp.Xset hyp.centralCommutator) →
+      (∀ j, j < N → Disjoint (OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L)
+          (hyp.xBaseBlock hyp.centralCommutator) pair j)) →
+      (∀ j, j + 1 < N →
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+          (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re) →
+      ∀ i, i < N →
+        PairUnionBaseAnchorCommonIndexPrimePowerStepData hyp
+          (Z := hyp.centralCommutator) (pair := pair) (i := i) (χs := χs)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI := hyp.centralCommutator_normal
+  exact hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X
+    (Z := hyp.centralCommutator) hyp.centralCommutator_le
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
+
 /-- **(6.8.1), Frobenius case:** final glue from common-index p-power X-chain data.
 
 This composes the Frobenius `X = S - S(H')` coherence constructor with the generator-level `τ₃`
