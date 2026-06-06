@@ -3548,6 +3548,60 @@ theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
   apply hkey
   rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
 
+/-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
+`W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
+characteristic, so the action restricts fixed-point-freely to it (`IsFrobeniusAction.subgroup`);
+`card_modEq_one` gives `|Z| ≡ 1 (mod |W₁|)`, and as `|Z|, |W₁|` are odd and `|Z| > 1`
+(`H` non-abelian), `two_mul_add_one_le_of_odd_dvd` yields `2|W₁| + 1 ≤ |Z|`. -/
+theorem centralCommutator_card_subgroupOf_lower (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) :
+    2 * Nat.card hyp.W1 + 1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+    MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
+  have hFrobH : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1 ↥H := hF.toFrobeniusAction
+  have hMeq : hyp.centralCommutator.subgroupOf H = Subgroup.center ↥H ⊓ _root_.commutator ↥H :=
+    hyp.centralCommutator_subgroupOf_eq
+  have hcprod : ∀ (K : Subgroup ↥H) [K.Characteristic] (a : ↥hyp.W1) (m : ↥H),
+      m ∈ K → a • m ∈ K := by
+    intro K _ a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp ‹K.Characteristic›
+      (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a)
+    have hmem : (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a).toMonoidHom m ∈ K := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  have hinv : ∀ a : ↥hyp.W1, ∀ m ∈ hyp.centralCommutator.subgroupOf H,
+      a • m ∈ hyp.centralCommutator.subgroupOf H := by
+    intro a m hm
+    rw [hMeq, Subgroup.mem_inf] at hm ⊢
+    exact ⟨hcprod (Subgroup.center ↥H) a m hm.1, hcprod (_root_.commutator ↥H) a m hm.2⟩
+  letI instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hinv
+  have hFrobM : @OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1
+      ↥(hyp.centralCommutator.subgroupOf H) _ _ instM := hFrobH.subgroup _ hinv
+  haveI : Fintype ↥hyp.W1 := Fintype.ofFinite _
+  haveI : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
+  have hMmod : Nat.card ↥(hyp.centralCommutator.subgroupOf H) ≡ 1 [MOD Nat.card hyp.W1] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrobM.card_modEq_one
+  have hMne : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
+    rw [hMeq, inf_comm]
+    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
+  have hMgt1 : 1 < Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+    haveI : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hMne
+    exact Finite.one_lt_card
+  have hRdvd : Nat.card hyp.W1 ∣ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hMmod.symm
+  have hW1odd : Odd (Nat.card hyp.W1) :=
+    Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hModd : Odd (Nat.card ↥(hyp.centralCommutator.subgroupOf H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card H))
+      (Subgroup.card_subgroup_dvd_card (hyp.centralCommutator.subgroupOf H))
+  exact two_mul_add_one_le_of_odd_dvd hW1odd hModd hRdvd hMgt1
+
 /-- Membership in `S(A)`, unfolded. -/
 theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
