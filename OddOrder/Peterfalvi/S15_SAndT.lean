@@ -720,6 +720,12 @@ structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) wh
     caseC1 →
       (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
         ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
+  caseC1_dual : Prop
+  caseC2_dual : Prop
+  caseC1_dual_bound :
+    caseC1_dual →
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ))
 
 namespace TypeIOrthogonalityData
 
@@ -734,6 +740,20 @@ theorem caseC2_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
     data.caseC2 := by
   rcases hcases with hcaseC1 | hcaseC2
   · exact False.elim ((not_lt_of_ge (data.caseC1_bound hcaseC1)) hgap)
+  · exact hcaseC2
+
+/-- **Peterfalvi (13.19.c)** after swapping `S` and `T`: any strict gap beyond
+`(v - 1) / p` excludes the dual case-(c1) bound and forces the dual parity
+alternative (c2), the source of the `eta_i0` congruences. -/
+theorem caseC2_dual_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L)
+    (hcases : data.caseC1_dual ∨ data.caseC2_dual)
+    (hgap :
+      ((hyp.v - 1 : ℕ) : ℚ) / (hyp.p : ℚ) <
+        ((Nat.card ↥data.typeISetup.H - 1 : ℕ) : ℚ) / (data.e : ℚ)) :
+    data.caseC2_dual := by
+  rcases hcases with hcaseC1 | hcaseC2
+  · exact False.elim ((not_lt_of_ge (data.caseC1_dual_bound hcaseC1)) hgap)
   · exact hcaseC2
 
 end TypeIOrthogonalityData

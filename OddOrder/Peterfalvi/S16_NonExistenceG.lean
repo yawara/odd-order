@@ -3923,6 +3923,43 @@ theorem typeI_caseC2_of_caseB_sSide_gap
   rw [hH, he]
   exact hvu.trans hhv
 
+/-- **Peterfalvi (14.16)**: the T-side gap in the exceptional branch excludes
+the dual case-(c1) of (13.19.c).  This is the symmetric input producing the
+`eta_i0` parity congruences. -/
+theorem typeI_caseC2_of_caseB_tSide_gap
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L)
+    (hcases : orth.caseC1_dual ∨ orth.caseC2_dual)
+    (hH : Nat.card ↥orth.typeISetup.H = nc.h)
+    (he : orth.e = hyp.base.p * hyp.base.q)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) :
+    orth.caseC2_dual := by
+  apply orth.caseC2_dual_of_gap hcases
+  rw [hH, he]
+  exact hhv
+
+/-- **Peterfalvi (14.16)**: the two numerical gaps in case-(b) force both
+(13.19.c2) parity alternatives, the S-side one for the `eta_0j` row and the
+T-side swapped one for the `eta_i0` column. -/
+theorem typeI_caseC2_pair_of_caseB_gap
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L)
+    (hcases : orth.caseC1 ∨ orth.caseC2)
+    (hcases_dual : orth.caseC1_dual ∨ orth.caseC2_dual)
+    (hH : Nat.card ↥orth.typeISetup.H = nc.h)
+    (he : orth.e = hyp.base.p * hyp.base.q)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    orth.caseC2 ∧ orth.caseC2_dual := by
+  exact ⟨typeI_caseC2_of_caseB_sSide_gap orth hcases hH he hhv hvu,
+    typeI_caseC2_of_caseB_tSide_gap orth hcases_dual hH he hhv⟩
+
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
 S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
