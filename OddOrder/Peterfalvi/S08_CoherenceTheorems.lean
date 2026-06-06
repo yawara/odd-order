@@ -856,6 +856,19 @@ theorem commutator_subgroupOf_self {G : Type*} [Group G] (H : Subgroup G) :
   rw [← h1]
   exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
 
+/-- For a finite `p`-group `K`, every irreducible character has degree a power of `p`
+(its degree divides `|K| = pⁿ`).  This supplies the `θ = p^m` source-degree fields of the X-chain
+step data once `H` is known to be a `p`-group (Peterfalvi (6.5)/(6.6)). -/
+theorem exists_primePow_natDegree_of_isPGroup {K : Type*} [Group K] [Finite K] {p : ℕ}
+    (hp : p.Prime) (hK : IsPGroup p K) (θ : IrreducibleCharacter K) :
+    ∃ k : ℕ, (θ : ClassFunction K ℂ) 1 = ((p ^ k : ℕ) : ℂ) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, _hpos, hval, hdvd⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  obtain ⟨N, hN⟩ := hK.exists_card_eq
+  rw [hN] at hdvd
+  obtain ⟨k, _hk_le, hk⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+  exact ⟨k, by rw [hval, hk]⟩
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
