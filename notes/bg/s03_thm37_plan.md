@@ -206,7 +206,10 @@ glue(A)+(B) は全 landed・build-green (commits a39c26f..ee9afa4, 10 本; model
 
 **残課題 (2026-06-06 更新, ✅ LR restriction 完了)**:
 - ✅ **LR Frobenius restriction** = `isFrobeniusGroup_sup_of_normal_le_kernel`(bdbe79b) **build-green**。
-- 🔴 **(b) same-prime case bridge = genuine gap (要新規補題)**: K は q-群でない (K/L のみ q-群)。`commutator_eq_bot_of_normal_pgroup_minimalNormal` は単一商の subgroup 版で, 「K/L (q-群) が q-chief-factor X/Y に自明作用 → K ≤ chiefFactorCentralizer X Y」へ直結しない。**確認済: repo に O_q-centralizes-q-chief-factor / same-prime chiefFactorCentralizer ヘルパは無い**。必要 = 2 商 (L で割って K̄ を q-群化, さらに Y で chief factor 実現) を跨ぐ bridge, or chiefFactorConjAction 枠での「正規 q-部分群が既約 q-加群に自明作用」補題 (p-群 fixed-point + Clifford)。**ここが (v) の最難所・未解決**。
+- ✅ **(b) same-prime case bridge = 解消 (2026-06-06)**: chiefFactorConjAction 枠で 3 補題に分解・全 build-green:
+  - SP-1 `normal_pgroup_acts_trivially_of_irreducible`(9db492a): 正規 s-部分群 K̄⊴Ḡ が既約 s-module M に自明作用(`fixedPoints_ne_bot_of_pgroup_action_pgroup`=Isaacs 4.32 + Ḡ-invariance + irreducibility)。
+  - (A) `chiefFactor_invariant_eq_bot_or_top`(5a7c708): IsChiefFactor → V の chiefFactorConjAction-invariant 部分群は ⊥/⊤(商の対応定理 comap mk'/map subtype)。
+  - SP-2 `samePrime_kernel_le_chiefFactorCentralizer`(714786c): L centralize + K/L が s-群 ⟹ K≤chiefFactorCentralizer X Y(G/L へ descend → SP-1 適用)。**coprime conclusion と対の per-factor dichotomy 両分岐そろった**。
 - 🟡 **(a) 強帰納 scaffolding**: group-order strong induction (`Nat.strong_induction` を `∀ Type, card ↥K = n` motive で), IH を ↥(L⊔R) に適用 (LR restriction 在庫), nilpotency transfer `Subgroup.subgroupOfEquivOfLe le_sup_left : ↥(L.subgroupOf(L⊔R)) ≃* ↥L`。非自明だが定型 (verbose)。
 - 🟢 **(c) coprime case + 結線**: prerequisites 全在庫 (`coprime_kernel_le_chiefFactorCentralizer` + (ii-b) `chiefFactor_fixedPointFree`); `nilpotent_normal_le_fitting` + glue A `fitting_le_chiefFactorCentralizer` で L⊆F(G) centralize; Prop1.2 `isNilpotent_of_chief_factor_centralization`。
 - **build 順案**: (a) scaffolding + (c) coprime 結線 を先 (在庫), (b) same-prime bridge を最後に集中。(b) が genuine 数学的ギャップなので, ここで loop checkpoint (2026-06-06)。
