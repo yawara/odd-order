@@ -8017,6 +8017,34 @@ theorem characterDegree_re_le_of_not_mem_pairUnion (hyp : SibleyDadeHypothesis G
       · rw [h, hpair1 j hjN, hpair0 j hjN]; simp
     rw [hφdeg]; exact hdeg_ij
 
+/-- **Degree-square partition (finding #6 `hsum` core).**  For a finite character set `Xfin` whose
+real degree-square sum is a natural number `totalN`, and an injective member subfamily `memb`
+contained in `Xfin`, the natural degree-square sum splits as members `+` tail (`Xfin ∖ members`)
+`= totalN`.  Pure `Finset.sum_image` + `Finset.sum_sdiff` + an ℝ→ℕ cast; no character theory.  The
+producer supplies `deg φ = |L:H|·p^(eφ)` and `totalN = |L:H|·(|H|−|H:Z|)` (via `sum_re_sq_Xset_eq`). -/
+theorem natSum_partition_of_realSum {α : Type*} [DecidableEq α]
+    (Xfin : Finset α) (deg : α → ℕ) (totalN : ℕ)
+    (hXsum : (∑ φ ∈ Xfin, ((deg φ : ℝ)) ^ 2) = (totalN : ℝ))
+    {k : ℕ} {memb : Fin k → α} (hinj : Function.Injective memb)
+    (hsub : ∀ j, memb j ∈ Xfin) :
+    (∑ j : Fin k, deg (memb j) * deg (memb j))
+      + (∑ φ ∈ Xfin \ Finset.univ.image memb, deg φ * deg φ) = totalN := by
+  classical
+  have hmembers : Finset.univ.image memb ⊆ Xfin := by
+    intro φ hφ
+    obtain ⟨j, -, rfl⟩ := Finset.mem_image.mp hφ
+    exact hsub j
+  have hreindex : ∑ φ ∈ Finset.univ.image memb, deg φ * deg φ
+      = ∑ j : Fin k, deg (memb j) * deg (memb j) :=
+    Finset.sum_image (fun a _ b _ h => hinj h)
+  have hXsumN : ∑ φ ∈ Xfin, deg φ * deg φ = totalN := by
+    have h : ((∑ φ ∈ Xfin, deg φ * deg φ : ℕ) : ℝ) = (totalN : ℝ) := by
+      rw [← hXsum, Nat.cast_sum]
+      exact Finset.sum_congr rfl (fun φ _ => by push_cast; ring)
+    exact_mod_cast h
+  rw [← hreindex, add_comm, Finset.sum_sdiff hmembers]
+  exact hXsumN
+
 /-- **(6.8.1), Frobenius case:** chain-level coherence for
 `X = S - S(H')`, using common-index p-power data.
 
