@@ -281,9 +281,11 @@ CertainType case (B)), not an autonomous "fill the sorry" loop. The earlier
 `autonomous_assembly_queue.md` recipe (build the `Z=⁅H,H⁆` producer) is **invalid**. With (6.7)
 confirmed present, no prerequisite *theorem* is missing — it is all assembly.
 
-**Precise next-step ordering for L2** (2026-06-07): ✅ `hXne` (`264966a`) + ✅ Zc shell (`a9054c4`)
-done. **(1) finding-#6 contract fix** — thread `hcover` (Xset-completeness) through `adjoinSteps` →
-base-anchor consumer → wrappers/glue → S09 (~7 defs, mechanical, build-green checkpoint). **(2) the
-L2 `hstepData` monolith** using the now-available `hcover` (the field map above). Then L3, then
-CertainType case (B), then capstone wiring. The contract fix is a clean committable unit that should
-land first; the monolith is unbuildable until it does. Best done attended in focused sessions.
+**Precise next-step ordering for L2** (2026-06-07): ✅ `hXne` (`264966a`) + ✅ Zc shell (`a9054c4`).
+**✅ (1) finding-#6 contract fix DONE (`2e46520`, additive)**: three `…withCover…` defs expose
+`hcover` to the StepData producer (engine `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X`,
+consumer `…BaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X`, Zc shell
+`Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius`).
+No existing signatures touched → S09 untouched, full build green. **🔜 (2) the L2 `hstepData`
+monolith** at Z=Zc, fed to the `…withCover…` Zc shell, using `hcover` for `tailSet`/`htail_le`/`hsum`
+(field map above). Then L3, CertainType case (B), capstone wiring.
