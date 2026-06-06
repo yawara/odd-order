@@ -304,4 +304,53 @@ theorem frobenius_coprime_complement_subgroup
     Nat.Coprime (Nat.card ↥R) (Nat.card ↥X) :=
   h.coprime_card_kernel_complement.symm.coprime_dvd_right (Subgroup.card_dvd_of_le hXK)
 
+open OddOrder.GroupTheory in
+/-- **(ii) FPF for the coprime chief-factor case**: in a finite solvable Frobenius group `G = KR`,
+for a chief factor `X/Y` with `X ⊆ K`, the complement `R` acts fixed-point-freely on `X/Y` via
+`chiefFactorConjAction` (`C_{X/Y}(R) = 1`). Proof: an `R`-fixed coset lifts (coprime action,
+`coprime_fixedPoints_quotient_of_coprime_normal`) to an `R`-fixed element of `X ≤ K`, which is `1`
+by `frobenius_kernel_conj_fixed_eq_one`. -/
+theorem chiefFactor_fixedPointFree
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    [X.Normal] [Y.Normal]
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hXK : X ≤ K) :
+    letI := chiefFactorConjAction X Y
+    ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1 := by
+  letI := chiefFactorConjAction X Y
+  set ψ : ↥R →* MulAut G := MulAut.conj.comp R.subtype with hψ
+  have hXinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ X :=
+    fun a => Subgroup.Normal.conj_smul_eq_self (a : G) X
+  have hYinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ Y :=
+    fun a => Subgroup.Normal.conj_smul_eq_self (a : G) Y
+  have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant hXinv.restrict (Y.subgroupOf X) :=
+    hXinv.subgroupOf hYinv
+  have hCop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥(Y.subgroupOf X)) :=
+    (frobenius_coprime_complement_subgroup h hXK).coprime_dvd_right
+      (Subgroup.card_subgroup_dvd_card (Y.subgroupOf X))
+  have hSolv : IsSolvable ↥R ∨ IsSolvable ↥(Y.subgroupOf X) := Or.inr inferInstance
+  have hrestrict : ∀ (a : ↥R) (x : ↥X),
+      (hXinv.restrict a) x = ConjAct.toConjAct (a : G) • x := fun _ _ => rfl
+  intro v hv
+  induction v using QuotientGroup.induction_on with
+  | _ x =>
+    have hgfix : ∀ a : ↥R, ∃ n ∈ Y.subgroupOf X, (hXinv.restrict a) x = x * n := by
+      intro a
+      have hva := hv a
+      rw [chiefFactorConjAction_smul_mk, QuotientGroup.eq] at hva
+      refine ⟨x⁻¹ * (hXinv.restrict a) x, ?_, by group⟩
+      rw [hrestrict]
+      simpa using (Y.subgroupOf X).inv_mem hva
+    obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
+      OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal hCop hSolv hN_inv hgfix
+    have hc_one : (c : G) = 1 := by
+      refine frobenius_kernel_conj_fixed_eq_one h (hXK c.2) (fun r hrR => ?_)
+      have hcr : ConjAct.toConjAct r • c = c := by
+        rw [← hrestrict ⟨r, hrR⟩ c]; exact hc_fix ⟨r, hrR⟩
+      exact congrArg Subtype.val hcr
+    have hc1 : c = 1 := Subtype.ext (by simpa using hc_one)
+    have hx_eq : x = n⁻¹ := by
+      rw [hc1] at hcn; rw [eq_comm, mul_eq_one_iff_eq_inv] at hcn; exact hcn
+    rw [QuotientGroup.eq_one_iff, hx_eq]
+    exact (Y.subgroupOf X).inv_mem hn
+
 end OddOrder.BG.Ch1.S03c
