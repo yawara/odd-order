@@ -705,6 +705,144 @@ theorem exists_maximal_normal_between {Γ : Type*} [Group Γ] [Finite Γ] {M A :
   refine ⟨B, hBnorm, hMB, hBA, fun C hCnorm hBC hCA => ?_⟩
   exact le_antisymm (hBmax ⟨hCnorm, hMB.trans hBC, hCA⟩ hBC) hBC
 
+/-- **Maximality forces centrality** — the central step of Peterfalvi (6.3).
+
+If `H ◁ Γ` is nilpotent and `A`, `B` are normal subgroups of `Γ` with `B < A ≤ H`, where `B` is
+maximal among normal subgroups of `Γ` strictly below `A`, then `A/B ⊆ Z(H/B)`.
+
+Indeed `A/B` is a nontrivial normal subgroup of the nilpotent group `H/B`, so `(A/B) ⊓ Z(H/B) ≠ 1`
+(`isNilpotent_normal_inf_center_ne_bot`).  Its full preimage `C` in `Γ` is a normal subgroup with
+`B < C ≤ A` (`C` is normal because conjugation by `Γ` preserves both `A/B` and the centre of `H/B`);
+by maximality of `B`, `C = A`, i.e. `A/B ⊆ Z(H/B)`.
+
+This discharges the `hcentral` hypothesis of `six_three_index_bound` in the minimal-`A`/maximal-`B`
+induction of Peterfalvi (6.3). -/
+theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite Γ]
+    {H A B : Subgroup Γ} (hH : H.Normal) [Group.IsNilpotent ↥H]
+    [A.Normal] [B.Normal] (hAH : A ≤ H) (hBA : B < A)
+    (hmax : ∀ C : Subgroup Γ, C.Normal → B ≤ C → C < A → C = B) :
+    (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H) := by
+  classical
+  haveI hNnorm : (B.subgroupOf H).Normal := (‹B.Normal›).subgroupOf H
+  haveI hANnorm : (A.subgroupOf H).Normal := (‹A.Normal›).subgroupOf H
+  have hBH : B ≤ H := hBA.le.trans hAH
+  -- `mk' (B.subgroupOf H) a = 1 ↔ a ∈ B.subgroupOf H`
+  have mk_eq_one : ∀ a : ↥H,
+      QuotientGroup.mk' (B.subgroupOf H) a = 1 ↔ a ∈ B.subgroupOf H := by
+    intro a; rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']
+  -- centrality of `mk' x` ⟺ all commutators `h x h⁻¹ x⁻¹` land in `B.subgroupOf H`
+  have center_iff : ∀ x : ↥H,
+      QuotientGroup.mk' (B.subgroupOf H) x ∈ Subgroup.center (↥H ⧸ B.subgroupOf H) ↔
+        ∀ h : ↥H, h * x * h⁻¹ * x⁻¹ ∈ B.subgroupOf H := by
+    intro x
+    rw [Subgroup.mem_center_iff]
+    refine ⟨fun hx h => ?_, fun hx q => ?_⟩
+    · have h2 := hx (QuotientGroup.mk' (B.subgroupOf H) h)
+      rw [← mk_eq_one]
+      simp only [map_mul, map_inv]
+      rw [h2]; group
+    · obtain ⟨h, rfl⟩ := QuotientGroup.mk'_surjective (B.subgroupOf H) q
+      have hcomm := (mk_eq_one (h * x * h⁻¹ * x⁻¹)).2 (hx h)
+      simp only [map_mul, map_inv] at hcomm
+      calc QuotientGroup.mk' (B.subgroupOf H) h * QuotientGroup.mk' (B.subgroupOf H) x
+          = (QuotientGroup.mk' (B.subgroupOf H) h * QuotientGroup.mk' (B.subgroupOf H) x *
+              (QuotientGroup.mk' (B.subgroupOf H) h)⁻¹ *
+              (QuotientGroup.mk' (B.subgroupOf H) x)⁻¹) *
+              (QuotientGroup.mk' (B.subgroupOf H) x * QuotientGroup.mk' (B.subgroupOf H) h) := by
+            group
+        _ = QuotientGroup.mk' (B.subgroupOf H) x * QuotientGroup.mk' (B.subgroupOf H) h := by
+            rw [hcomm, one_mul]
+  -- `A/B` is nontrivial in `H/B`
+  have hAbar_ne : (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≠ ⊥ := by
+    intro hbot
+    rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+    have hAB : A ≤ B := by
+      intro y hy
+      have hy' : (⟨y, hAH hy⟩ : ↥H) ∈ A.subgroupOf H := Subgroup.mem_subgroupOf.mpr hy
+      exact Subgroup.mem_subgroupOf.mp (hbot hy')
+    exact lt_irrefl _ (hBA.trans_le hAB)
+  -- nilpotency: `(A/B) ⊓ Z(H/B) ≠ 1`
+  have hinf := isNilpotent_normal_inf_center_ne_bot
+    (Subgroup.Normal.map hANnorm (QuotientGroup.mk' (B.subgroupOf H))
+      (QuotientGroup.mk'_surjective _)) hAbar_ne
+  -- the pullback subgroup of `Γ`
+  set Zc := (Subgroup.center (↥H ⧸ B.subgroupOf H)).comap (QuotientGroup.mk' (B.subgroupOf H))
+    with hZc
+  set CH := A.subgroupOf H ⊓ Zc with hCH
+  set C := CH.map H.subtype with hC
+  -- `B ≤ C`
+  have hBC : B ≤ C := by
+    rw [hC, ← Subgroup.map_subgroupOf_eq_of_le hBH]
+    apply Subgroup.map_mono
+    rw [hCH]
+    refine le_inf (Subgroup.subgroupOf_mono H hBA.le) (fun x hx => ?_)
+    rw [hZc, Subgroup.mem_comap, (mk_eq_one x).2 hx]
+    exact Subgroup.one_mem _
+  -- `C ≤ A`
+  have hCA : C ≤ A := by
+    rw [hC, ← Subgroup.map_subgroupOf_eq_of_le hAH]
+    exact Subgroup.map_mono (by rw [hCH]; exact inf_le_left)
+  -- `C` is normal in `Γ`
+  have hCnorm : C.Normal := by
+    rw [hC]
+    refine ⟨fun n hn g => ?_⟩
+    rw [Subgroup.mem_map] at hn
+    obtain ⟨c, hcCH, rfl⟩ := hn
+    rw [hCH, Subgroup.mem_inf] at hcCH
+    obtain ⟨hcA, hcZ⟩ := hcCH
+    have hc_center : ∀ k : ↥H, k * c * k⁻¹ * c⁻¹ ∈ B.subgroupOf H := by
+      apply (center_iff c).mp
+      rw [hZc] at hcZ; exact Subgroup.mem_comap.mp hcZ
+    have hc'H : g * (c : Γ) * g⁻¹ ∈ H := hH.conj_mem _ c.2 g
+    rw [Subgroup.mem_map]
+    refine ⟨⟨g * (c : Γ) * g⁻¹, hc'H⟩, ?_, rfl⟩
+    rw [hCH, Subgroup.mem_inf]
+    refine ⟨Subgroup.mem_subgroupOf.mpr ?_, ?_⟩
+    · exact (‹A.Normal›).conj_mem _ (Subgroup.mem_subgroupOf.mp hcA) g
+    · rw [hZc, Subgroup.mem_comap, center_iff]
+      intro h
+      have hkH : g⁻¹ * (h : Γ) * g ∈ H := by
+        have := hH.conj_mem (h : Γ) h.2 g⁻¹; rwa [inv_inv] at this
+      have hk := hc_center ⟨g⁻¹ * (h : Γ) * g, hkH⟩
+      rw [Subgroup.mem_subgroupOf] at hk ⊢
+      have hrel : (((h * ⟨g * (c : Γ) * g⁻¹, hc'H⟩ * h⁻¹ *
+            (⟨g * (c : Γ) * g⁻¹, hc'H⟩ : ↥H)⁻¹ : ↥H) : Γ))
+          = g * (((⟨g⁻¹ * (h : Γ) * g, hkH⟩ * c *
+              (⟨g⁻¹ * (h : Γ) * g, hkH⟩ : ↥H)⁻¹ * c⁻¹ : ↥H) : Γ)) * g⁻¹ := by
+        push_cast
+        group
+      rw [hrel]
+      exact (‹B.Normal›).conj_mem _ hk g
+  -- a nontrivial element of `(A/B) ⊓ Z(H/B)` gives `B ≠ C`
+  obtain ⟨⟨q, hqmem⟩, hqne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hinf
+  rw [Subgroup.mem_inf] at hqmem
+  obtain ⟨hqA, hqZ⟩ := hqmem
+  rw [Subgroup.mem_map] at hqA
+  obtain ⟨c₀, hc₀A, hc₀q⟩ := hqA
+  have hq1 : q ≠ 1 := fun hq => hqne (Subtype.ext hq)
+  have hc₀CH : c₀ ∈ CH := by
+    rw [hCH, Subgroup.mem_inf]
+    exact ⟨hc₀A, by rw [hZc, Subgroup.mem_comap, hc₀q]; exact hqZ⟩
+  have hc₀C : (c₀ : Γ) ∈ C := by
+    rw [hC]; exact Subgroup.mem_map_of_mem H.subtype hc₀CH
+  have hc₀notB : (c₀ : Γ) ∉ B := by
+    intro hb
+    exact hq1 (by rw [← hc₀q]; exact (mk_eq_one c₀).2 (Subgroup.mem_subgroupOf.mpr hb))
+  have hBneC : B ≠ C := fun heq => hc₀notB (heq.symm ▸ hc₀C)
+  have hBC_lt : B < C := lt_of_le_of_ne hBC hBneC
+  have hCeqA : C = A := by
+    rcases eq_or_lt_of_le hCA with h | h
+    · exact h
+    · exact absurd (hmax C hCnorm hBC h) (Ne.symm (ne_of_lt hBC_lt))
+  have hCHmap : CH.map H.subtype = A := by rw [← hC, hCeqA]
+  have hCHeq : CH = A.subgroupOf H := by
+    rw [← Subgroup.map_subtype_inj, hCHmap, Subgroup.map_subgroupOf_eq_of_le hAH]
+  have hle : A.subgroupOf H ≤ Zc := by
+    rw [← hCHeq, hCH]; exact inf_le_right
+  rw [Subgroup.map_le_iff_le_comap, ← hZc]
+  exact hle
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/

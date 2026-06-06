@@ -1988,6 +1988,10 @@ set_option linter.style.longLine false in
 -- (6.3) maximal-B step: in a finite group, `M < A` (M normal) has a maximal normal `B` with
 -- `M ≤ B < A` (any normal `C` with `B ≤ C < A` is `B`).  The maximal-B of the (6.3) induction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_maximal_normal_between
+-- (6.3) maximality forces centrality: with `H ◁ Γ` nilpotent, `B < A ≤ H` and `B` maximal normal
+-- below `A`, the nilpotency central step + maximality give `A/B ⊆ Z(H/B)`.  Discharges the
+-- `hcentral` hypothesis of `six_three_index_bound` in the (6.3) minimal-A / maximal-B induction.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normal_central_of_maximal_normal_below
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
