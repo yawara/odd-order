@@ -5617,6 +5617,32 @@ theorem exists_memberDegreeData (hyp : SibleyDadeHypothesis G L H)
   choose mmem hmmem using fun j => hyp.exists_index_primePow_degree_of_mem_S hp hHp (hmemS j)
   exact ⟨mmem, hmmem⟩
 
+/-- **(6.6)/(6.8) central degree bound for an X-member (the redesign linchpin).**  For
+`χ = Ind_H^L θ ∈ X(Z) = S − S(Z)` with `H` a `p`-group and `Z` **central in `H`**
+(`Z.subgroupOf H ≤ Z(↥H)`), the source `θ` has `θ(1) = p^k` and — crucially — by [Is] Cor 2.30
+(`exists_degree_sq_le_index`, which needs `Z` central) `θ(1)² = (p^k)² ≤ |H:Z|`, while
+`χ(1) = |L:H|·p^k`.  This is exactly the `θχ`/`hθχ`/`hθsq_le_qtot` data the per-step X-chain producer
+needs (with `qtot = |H:Z|`); it is fillable at the central `Z = Z(H)∩H′` but **not** at `Z = ⁅H,H⁆`
+(see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`). -/
+theorem exists_source_primePow_centralBound_of_mem_Xset (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {Z : Subgroup ↥L} (hZcentral : Z.subgroupOf H ≤ Subgroup.center ↥H)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset Z) :
+    ∃ k : ℕ, χ 1 = ((H.index * p ^ k : ℕ) : ℂ)
+      ∧ (p ^ k) ^ 2 ≤ Nat.card (↥H ⧸ Z.subgroupOf H) := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχ
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  obtain ⟨θ, _hθne, rfl⟩ := hχS
+  obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hHp θ
+  refine ⟨k, ?_, ?_⟩
+  · rw [ClassFunction.induce_apply_one, hk]; push_cast; ring
+  · obtain ⟨d, hd, hdsq⟩ := θ.isIrreducible.exists_degree_sq_le_index (Z.subgroupOf H) hZcentral
+    have hdpk : d = p ^ k := by
+      have hcast : (d : ℂ) = ((p ^ k : ℕ) : ℂ) := by rw [← hd, hk]
+      exact_mod_cast hcast
+    rw [← hdpk, ← Subgroup.index_eq_card]; exact hdsq
+
 open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 
