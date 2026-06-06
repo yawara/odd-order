@@ -1602,6 +1602,277 @@ theorem hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting [Finite G]
           dvd_trans (Nat.mem_primeFactors.mp hpidx).2.1 hidx,
           Subgroup.index_ne_zero_of_finite⟩) hpσ
 
+/-- **Nilpotent `π`/`π'` core decomposition**:
+in a finite nilpotent group, `O_π(K)` together with `O_{π'}(K)` generates all
+of `K`. This is the arbitrary-`π` version of the singleton decomposition used
+in BG Lemma 9.5. -/
+theorem top_le_oPiCore_sup_compl_of_isNilpotent
+    {K : Type*} [Group K] [Finite K] [Group.IsNilpotent K] (π : Set ℕ) :
+    (⊤ : Subgroup K) ≤ Ch03.oPiCore π K ⊔ Ch03.oPiCore {p | p ∉ π} K := by
+  classical
+  have hfit : Ch01.fitting K = ⊤ := by
+    refine top_le_iff.mp ?_
+    haveI : Group.IsNilpotent ↥(⊤ : Subgroup K) := Group.isNilpotent_top.mpr inferInstance
+    exact Ch01.nilpotent_normal_le_fitting
+  rw [← hfit, Ch01.fitting_eq_iSup_primeFactors]
+  refine iSup_le fun q => ?_
+  obtain ⟨qval, hq_mem⟩ := q
+  haveI : Fact qval.Prime := ⟨(Nat.mem_primeFactors.mp hq_mem).1⟩
+  rw [show Ch01.opCore qval K = Ch03.oPiCore ({qval} : Set ℕ) K from
+    (OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore (G := K) qval).symm]
+  by_cases hqπ : qval ∈ π
+  · exact le_sup_of_le_left
+      (Ch03.oPiCore_mono (Set.singleton_subset_iff.mpr hqπ) K)
+  · exact le_sup_of_le_right
+      (Ch03.oPiCore_mono (Set.singleton_subset_iff.mpr hqπ) K)
+
+/-- **Nilpotent Hall core**:
+in a finite nilpotent group, `O_π(K)` is a `π`-Hall subgroup. -/
+theorem oPiCore_isHall_of_isNilpotent
+    {K : Type*} [Group K] [Finite K] [Group.IsNilpotent K] (π : Set ℕ) :
+    Ch03.IsHallSubgroup π (Ch03.oPiCore π K) := by
+  let Oπ : Subgroup K := Ch03.oPiCore π K
+  let Oπc : Subgroup K := Ch03.oPiCore {p | p ∉ π} K
+  refine ⟨Ch03.oPiCore.isPiGroup π, ?_⟩
+  intro p hpidx hpπ
+  have hsup : Oπ ⊔ Oπc = ⊤ := by
+    exact top_le_iff.mp (top_le_oPiCore_sup_compl_of_isNilpotent (K := K) π)
+  have hdisj : Oπ ⊓ Oπc = ⊥ := by
+    exact Ch03.oPiCore.coprime_inf π
+  have hcard_sup : Nat.card ↥(Oπ ⊔ Oπc : Subgroup K) =
+      Nat.card ↥Oπ * Nat.card ↥Oπc :=
+    OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal
+      (T := Oπ) (M := Oπc) hdisj
+  have hcardK : Nat.card K = Nat.card ↥(Oπ ⊔ Oπc : Subgroup K) := by
+    rw [hsup, Subgroup.card_top]
+  have hidx_eq : Oπ.index = Nat.card ↥Oπc := by
+    have hmul : Nat.card ↥Oπ * Oπ.index = Nat.card ↥Oπ * Nat.card ↥Oπc := by
+      calc
+        Nat.card ↥Oπ * Oπ.index = Nat.card K := Subgroup.card_mul_index Oπ
+        _ = Nat.card ↥(Oπ ⊔ Oπc : Subgroup K) := hcardK
+        _ = Nat.card ↥Oπ * Nat.card ↥Oπc := hcard_sup
+    exact Nat.mul_left_cancel Nat.card_pos hmul
+  have hpOπc : p ∈ (Nat.card ↥Oπc).primeFactors := by
+    rwa [hidx_eq] at hpidx
+  exact (Ch03.oPiCore.isPiGroup {q | q ∉ π} p hpOπc) hpπ
+
+/-- **BG Theorem 10.2(b), Hall-`σ` quotient as the Fitting `σ`-core**:
+inside the nilpotent group `F(M/M_α)`, the image of any Hall `σ(M)`-subgroup
+is exactly `O_{σ(M)}(F(M/M_α))`. -/
+theorem hallSigmaSubgroup_quotient_Malpha_eq_oPiCore_in_fitting [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    let N : Subgroup ↥M := (Malpha M).subgroupOf M
+    let q : ↥M →* ↥M ⧸ N := QuotientGroup.mk' N
+    let Hbar : Subgroup (↥M ⧸ N) := (S.subgroupOf M).map q
+    let F : Subgroup (↥M ⧸ N) := Ch01.fitting (↥M ⧸ N)
+    Hbar.subgroupOf F = Ch03.oPiCore (sigma M) ↥F := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  let q : ↥M →* ↥M ⧸ N := QuotientGroup.mk' N
+  let Hbar : Subgroup (↥M ⧸ N) := (S.subgroupOf M).map q
+  let F : Subgroup (↥M ⧸ N) := Ch01.fitting (↥M ⧸ N)
+  have hHallF : Ch03.IsHallSubgroup (sigma M) (Hbar.subgroupOf F) :=
+    hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting hG hM hSM hHallσ
+  have hCoreHall : Ch03.IsHallSubgroup (sigma M) (Ch03.oPiCore (sigma M) ↥F) :=
+    oPiCore_isHall_of_isNilpotent (K := ↥F) (sigma M)
+  have hCore_le_H : Ch03.oPiCore (sigma M) ↥F ≤ Hbar.subgroupOf F :=
+    Ch03.Subgroup.IsPiGroup.normal_le_hall (Ch03.oPiCore.isPiGroup (sigma M)) hHallF
+  have hH_le_Core : Hbar.subgroupOf F ≤ Ch03.oPiCore (sigma M) ↥F :=
+    isPiGroup_le_of_normal_isHallSubgroup hCoreHall hHallF.1
+  exact le_antisymm hH_le_Core hCore_le_H
+
+/-- **BG Theorem 10.2(b), Hall-`σ` quotient lies in the quotient `σ`-core**:
+the image of any Hall `σ(M)`-subgroup of `M` in `M/M_α` is contained in
+`O_{σ(M)}(M/M_α)`. The key point is that the image is the `σ`-core of the
+nilpotent Fitting subgroup, and that core is characteristic in the normal
+Fitting subgroup. -/
+theorem hallSigmaSubgroup_quotient_Malpha_le_oPiCore_quotient [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    (S.subgroupOf M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M)) ≤
+      Ch03.oPiCore (sigma M) (↥M ⧸ (Malpha M).subgroupOf M) := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  let Q : Type _ := ↥M ⧸ N
+  let q : ↥M →* Q := QuotientGroup.mk' N
+  let Hbar : Subgroup Q := (S.subgroupOf M).map q
+  let F : Subgroup Q := Ch01.fitting Q
+  have hHbarF : Hbar ≤ F := by
+    exact hallSigmaSubgroup_quotient_Malpha_le_fitting hG hM hSM hHallσ
+  have hEq : Hbar.subgroupOf F = Ch03.oPiCore (sigma M) ↥F := by
+    simpa [N, Q, q, Hbar, F] using
+      hallSigmaSubgroup_quotient_Malpha_eq_oPiCore_in_fitting hG hM hSM hHallσ
+  have hCoreMap_le : (Ch03.oPiCore (sigma M) ↥F).map F.subtype ≤
+      Ch03.oPiCore (sigma M) Q := by
+    have hCoreMapPi : Ch03.Subgroup.IsPiGroup (sigma M)
+        ((Ch03.oPiCore (sigma M) ↥F).map F.subtype) := by
+      intro p hp
+      exact (Ch03.oPiCore.isPiGroup (sigma M)) p
+        (Nat.primeFactors_mono
+          (Subgroup.card_map_dvd (Ch03.oPiCore (sigma M) ↥F) F.subtype)
+          Nat.card_pos.ne' hp)
+    exact Ch03.Subgroup.IsPiGroup.le_oPiCore hCoreMapPi
+  intro x hx
+  have hxF : x ∈ F := hHbarF hx
+  have hxSub : (⟨x, hxF⟩ : ↥F) ∈ Hbar.subgroupOf F :=
+    Subgroup.mem_subgroupOf.mpr hx
+  have hxCoreF : (⟨x, hxF⟩ : ↥F) ∈ Ch03.oPiCore (sigma M) ↥F := by
+    rwa [hEq] at hxSub
+  have hxMap : x ∈ (Ch03.oPiCore (sigma M) ↥F).map F.subtype := by
+    exact ⟨⟨x, hxF⟩, hxCoreF, rfl⟩
+  exact hCoreMap_le hxMap
+
+/-- **Quotient `π`-core preimage**:
+if `N ≤ O_π(K)`, then the preimage of `O_π(K/N)` is still contained in
+`O_π(K)`. The proof is the standard extension argument: the preimage has
+π-group quotient over `N`, and `N` itself is a π-group. -/
+theorem oPiCore_quotient_comap_le_oPiCore_of_le
+    {K : Type*} [Group K] [Finite K] {π : Set ℕ} {N : Subgroup K} [N.Normal]
+    (hNle : N ≤ Ch03.oPiCore π K) :
+    (Ch03.oPiCore π (K ⧸ N)).comap (QuotientGroup.mk' N) ≤ Ch03.oPiCore π K := by
+  let q : K →* K ⧸ N := QuotientGroup.mk' N
+  let Kbar : Subgroup (K ⧸ N) := Ch03.oPiCore π (K ⧸ N)
+  let L : Subgroup K := Kbar.comap q
+  have hN_le_L : N ≤ L := by
+    intro x hx
+    change q x ∈ Kbar
+    rw [show q x = 1 from (QuotientGroup.eq_one_iff x).mpr hx]
+    exact Kbar.one_mem
+  have hL_map : L.map q = Kbar := by
+    dsimp [L, q, Kbar]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N) Kbar
+  have hLmap_pi : Ch03.Subgroup.IsPiGroup π (L.map q) := by
+    rw [hL_map]
+    exact Ch03.oPiCore.isPiGroup π
+  have hN_pi : Ch03.Subgroup.IsPiGroup π N :=
+    Ch03.Subgroup.IsPiGroup.le hNle (Ch03.oPiCore.isPiGroup π)
+  have hNsub_pi : Ch03.Subgroup.IsPiGroup π (N.subgroupOf L) :=
+    Ch03.Subgroup.IsPiGroup.subgroupOf hN_le_L hN_pi
+  have hLquot_pi : ∀ p ∈ (Nat.card (↥L ⧸ N.subgroupOf L)).primeFactors, p ∈ π :=
+    Ch03.Subgroup.IsPiGroup.primeFactors_quotient_subgroupOf hLmap_pi
+  have hL_pi : Ch03.Subgroup.IsPiGroup π L :=
+    Ch03.IsPiGroup.of_normal_quotient (N.subgroupOf L) hNsub_pi hLquot_pi
+  exact hL_pi.le_oPiCore
+
+/-- **BG Theorem 10.2(b), Hall-`σ` subgroup absorbed by `M_σ`, internal form**:
+any Hall `σ(M)`-subgroup of `M`, viewed internally in `M`, lies in the local
+`σ`-core `M_σ`. -/
+theorem hallSigmaSubgroup_subgroupOf_le_Msigma_subgroupOf [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    S.subgroupOf M ≤ (Msigma M).subgroupOf M := by
+  let N : Subgroup ↥M := (Malpha M).subgroupOf M
+  let q : ↥M →* ↥M ⧸ N := QuotientGroup.mk' N
+  have hSbar : (S.subgroupOf M).map q ≤ Ch03.oPiCore (sigma M) (↥M ⧸ N) := by
+    exact hallSigmaSubgroup_quotient_Malpha_le_oPiCore_quotient hG hM hSM hHallσ
+  have hNle : N ≤ Ch03.oPiCore (sigma M) ↥M := by
+    rw [← Msigma_subgroupOf M]
+    intro x hx
+    exact Subgroup.mem_subgroupOf.mpr
+      (Malpha_le_Msigma hG hM (Subgroup.mem_subgroupOf.mp hx))
+  have hpre : (Ch03.oPiCore (sigma M) (↥M ⧸ N)).comap q ≤
+      Ch03.oPiCore (sigma M) ↥M :=
+    oPiCore_quotient_comap_le_oPiCore_of_le (π := sigma M) (N := N) hNle
+  intro x hx
+  rw [Msigma_subgroupOf M]
+  apply hpre
+  change q x ∈ Ch03.oPiCore (sigma M) (↥M ⧸ N)
+  exact hSbar ⟨x, hx, rfl⟩
+
+/-- **BG Theorem 10.2(b), Hall-`σ` subgroup absorbed by `M_σ`, ambient form**:
+any Hall `σ(M)`-subgroup of `M`, viewed as a subgroup of `G`, lies in `M_σ`. -/
+theorem hallSigmaSubgroup_le_Msigma [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    S ≤ Msigma M := by
+  have hsub : S.subgroupOf M ≤ (Msigma M).subgroupOf M :=
+    hallSigmaSubgroup_subgroupOf_le_Msigma_subgroupOf hG hM hSM hHallσ
+  intro x hx
+  have hxM : x ∈ M := hSM hx
+  have hxSub : (⟨x, hxM⟩ : ↥M) ∈ S.subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hsub hxSub)
+
+/-- **BG Theorem 10.2(b), `M_σ` lies in every Hall-`σ` subgroup, internal form**:
+the normal local `σ(M)`-core is contained in any Hall `σ(M)`-subgroup of `M`. -/
+theorem Msigma_subgroupOf_le_hallSigmaSubgroup [Finite G] {M S : Subgroup G}
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    (Msigma M).subgroupOf M ≤ S.subgroupOf M := by
+  haveI : ((Msigma M).subgroupOf M).Normal := by
+    rw [Msigma_subgroupOf]
+    infer_instance
+  have hMsigmaσ : Ch03.Subgroup.IsPiGroup (sigma M) ((Msigma M).subgroupOf M) := by
+    rw [Msigma_subgroupOf]
+    exact Ch03.oPiCore.isPiGroup (sigma M)
+  exact Ch03.Subgroup.IsPiGroup.normal_le_hall hMsigmaσ hHallσ
+
+/-- **BG Theorem 10.2(b), `M_σ` lies in every Hall-`σ` subgroup, ambient form**. -/
+theorem Msigma_le_hallSigmaSubgroup [Finite G] {M S : Subgroup G}
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    Msigma M ≤ S := by
+  have hsub : (Msigma M).subgroupOf M ≤ S.subgroupOf M :=
+    Msigma_subgroupOf_le_hallSigmaSubgroup hHallσ
+  intro x hx
+  have hxM : x ∈ M := Msigma_le M hx
+  have hxSub : (⟨x, hxM⟩ : ↥M) ∈ (Msigma M).subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hsub hxSub)
+
+/-- **BG Theorem 10.2(b), Hall-`σ` subgroup identification**:
+any Hall `σ(M)`-subgroup of `M`, viewed in `G`, is exactly `M_σ`. -/
+theorem hallSigmaSubgroup_eq_Msigma [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M S : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hSM : S ≤ M)
+    (hHallσ : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M)) :
+    S = Msigma M :=
+  le_antisymm (hallSigmaSubgroup_le_Msigma hG hM hSM hHallσ)
+    (Msigma_le_hallSigmaSubgroup hHallσ)
+
+/-- **BG Theorem 10.2(b), local Hall property of `M_σ`**:
+inside `M`, the local `σ`-core `M_σ` is a Hall `σ(M)`-subgroup. -/
+theorem Msigma_subgroupOf_isHall [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨H, hH⟩ := Ch03.hall_E_exists (G := ↥M) (sigma M)
+  set S : Subgroup G := H.map M.subtype with hSdef
+  have hSM : S ≤ M := by
+    rw [hSdef]
+    exact Subgroup.map_subtype_le H
+  have hS_sub : S.subgroupOf M = H := by
+    rw [hSdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  have hHallS : Ch03.IsHallSubgroup (sigma M) (S.subgroupOf M) := by
+    rwa [hS_sub]
+  have hEq : S = Msigma M := hallSigmaSubgroup_eq_Msigma hG hM hSM hHallS
+  rwa [← hEq]
+
+/-- **BG Theorem 10.2(b), ambient Hall property of `M_σ`**:
+`M_σ` is a Hall `σ(M)`-subgroup of `G`. The internal Hall property supplies the
+`M`-index part, and `σ(M)` itself rules out primes in `[G:M]`. -/
+theorem Msigma_isHall [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (sigma M) (Msigma M) := by
+  refine ⟨Msigma_isPiGroup M, ?_⟩
+  intro p hpidx hpσ
+  have hp_prime : p.Prime := (Nat.mem_primeFactors.mp hpidx).1
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hrel : ((Msigma M).subgroupOf M).index * M.index = (Msigma M).index :=
+    Subgroup.relIndex_mul_index (Msigma_le M)
+  have hp_dvd_prod : p ∣ ((Msigma M).subgroupOf M).index * M.index := by
+    rw [hrel]
+    exact (Nat.mem_primeFactors.mp hpidx).2.1
+  rcases hp_prime.dvd_mul.mp hp_dvd_prod with hp_internal | hp_M
+  · have hHallLocal : Ch03.IsHallSubgroup (sigma M) ((Msigma M).subgroupOf M) :=
+      Msigma_subgroupOf_isHall hG hM
+    exact hHallLocal.2 p
+      (Nat.mem_primeFactors.mpr
+        ⟨hp_prime, hp_internal, Subgroup.index_ne_zero_of_finite⟩) hpσ
+  · exact not_dvd_index_of_mem_sigma hpσ hp_M
+
 /-- **BG Theorem 10.2(d), Hall-`σ` kills `α` in the quotient**:
 if an `α(M)`-subgroup of `M` lies in a Hall `σ(M)`-subgroup, then its image in
 `M/M_α` is simultaneously an `α(M)`-group and an `α(M)'`-group, hence trivial.
@@ -1946,7 +2217,8 @@ theorem isHall_Msigma_Malpha [Finite G] (hG : IsMinimalSimpleOdd G)
     Ch03.IsHallSubgroup (alpha M) (Malpha M) ∧
     Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧
     Msigma M ≠ ⊥ := by
-  sorry
+  exact ⟨Msigma_isHall hG hM, Malpha_isHall hG hM, Malpha_le_Msigma hG hM,
+    Msigma_le_derived hG hM, Msigma_ne_bot hG hM⟩
 
 /-! ## Corollary 10.7 — Sylow `p`-部分群の構造 (mmd L2787) -/
 

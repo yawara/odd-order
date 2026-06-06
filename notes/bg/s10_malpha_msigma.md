@@ -17,8 +17,24 @@
 - 新 private helper 群: normalizer 成長 / σ⟹Sylow-of-G / conjOrderIso+coatom保存+随伴 /
   card・normalizer の共役同変 / σ_conj / card_lt_card_of_lt。AxiomsCheck は §9 同様未登録 (S10 未 import)。
 
-**次**: §10 残 = Thm 10.2 (`isHall_Msigma_Malpha`, 10.1 解禁済 + Focal + Thm 4.20) → Thm 10.6 →
+**次**: Thm 10.2 は reduced capstone 完成。§10 残 frontier は Thm 10.6 →
 Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
+
+
+## ✅ 2026-06-06 完了 — Thm 10.2 reduced capstone (`isHall_Msigma_Malpha`)
+
+`isHall_Msigma_Malpha` の `sorry` を削除し、reduced 版 Thm 10.2 を axiom-clean で完成。BG Step 4 は
+小さな bridge ではなく、以下の quotient/Fitting 証明ブロックとして実装済み:
+
+- finite nilpotent 群の `π`/`π'` core decomposition: `O_π(K) ⊔ O_{π'}(K)=⊤`、よって `O_π(K)` は Hall。
+- Hall `σ(M)` subgroup `S≤M` の像 `S/M_α` を `F(M/M_α)` 内の Hall subgroup として扱い、nilpotent core uniqueness から
+  `S/M_α = O_{σ(M)}(F(M/M_α))`。
+- characteristic-in-normal と quotient core preimage により `S≤M_σ`、normal Hall 吸収により逆包含、従って `S=M_σ`。
+- Hall-E の局所 Hall subgroup を `M_σ` と同定して `Msigma_subgroupOf_isHall`、さらに
+  `[M:M_σ]·[G:M]` と `p∈σ(M)⇒p∤[G:M]` で ambient `Msigma_isHall`。
+
+検証: `lake build OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma` green、主要 theorem の
+`#print axioms` は全て `[propext, Classical.choice, Quot.sound]`。issue 0061 closed。
 
 ## 🔨 2026-06-05 (続) — Thm 10.2 着手 (issue 0061)
 
@@ -30,7 +46,7 @@ Cor 10.7 → Lem 10.8 / Cor 10.9 / Prop 10.10-10.14。
 - `Malpha_le_Msigma` (M_α⊆M_σ): α⊆σ + `oPiCore_mono`。
 - `Msigma_le_derived` (M_σ⊆M′, 2026-06-06): finite Sylow-generation helper + `Msigma_isPiGroup` で
   p∈π(M_σ) ⟹ p∈σ(M)、各 Sylow を M の Sylow に含め、`sylow_le_derived_of_mem_sigma` (Focal+10.1) で M′ に押し込む。
-**残**: `Msigma_ne_bot` の hard branch (`M_α=⊥`; easy branch `Msigma_ne_bot_of_Malpha_ne_bot` は完成) / **Hall-ness 2連言 (M_σ, M_α; quotient/Fitting machinery が最重)** / capstone 配線。
+**完了後の状態**: `Msigma_ne_bot`、Hall `α(M)`、Hall `σ(M)`、capstone は全て完成。次 frontier は Thm 10.6。
 
 ## ✅ 2026-06-05 着手 — 依存 DAG 検証 + Thm 10.1 を first target に確定 (§9 完成で解禁)
 

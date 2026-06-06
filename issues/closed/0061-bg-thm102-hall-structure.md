@@ -21,6 +21,30 @@ IsHallSubgroup (sigma M) (Msigma M) ∧ IsHallSubgroup (alpha M) (Malpha M) ∧
 Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
 ```
 
+## ✅ DONE (2026-06-06)
+
+`isHall_Msigma_Malpha` の `sorry` を削除し、reduced Thm 10.2 capstone を完成。
+核心は BG Step 4 の Hall-σ 同定を、以下の数学的ブロックとして実装したこと:
+
+1. finite nilpotent 群で `O_π(K) ⊔ O_{π'}(K)=⊤`、従って `O_π(K)` は `π`-Hall。
+2. 任意の Hall `σ(M)`-subgroup `S≤M` について、`S/M_α` を `F(M/M_α)` 内の Hall subgroup と見なし、nilpotent core uniqueness から
+   `S/M_α = O_{σ(M)}(F(M/M_α))` と同定。
+3. この像が quotient の `O_{σ(M)}(M/M_α)` に入り、`M_α≤O_{σ(M)}(M)` のもとで quotient core の preimage を戻して `S≤M_σ`。
+4. 逆包含 `M_σ≤S` は normal `σ`-subgroup の Hall 吸収で得て、`S=M_σ`。
+5. Hall-E で存在する局所 Hall `σ(M)`-subgroup を選び、`M_σ` と同定して local Hall、さらに `[M:M_σ]·[G:M]` と
+   `p∈σ(M)⇒p∤[G:M]` から ambient Hall を得る。
+
+追加された主要 theorem:
+`top_le_oPiCore_sup_compl_of_isNilpotent`, `oPiCore_isHall_of_isNilpotent`,
+`hallSigmaSubgroup_quotient_Malpha_eq_oPiCore_in_fitting`,
+`hallSigmaSubgroup_quotient_Malpha_le_oPiCore_quotient`,
+`oPiCore_quotient_comap_le_oPiCore_of_le`, `hallSigmaSubgroup_eq_Msigma`,
+`Msigma_subgroupOf_isHall`, `Msigma_isHall`。
+
+検証: `lake build OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma` green。
+`#print axioms` は全て `[propext, Classical.choice, Quot.sound]`。
+
+
 ## 依存状況 (2026-06-05 検証済)
 
 | 依存 | 状態 | repo 名 |
@@ -77,25 +101,12 @@ Malpha M ≤ Msigma M ∧ Msigma M ≤ derivedInG M ∧ Msigma M ≠ ⊥
   ⇒ normal local Sylow ⇒ singleton core ⇒ `M_σ≠⊥`) は接続済み。`Malpha_isHall` 完成により
   `Msigma_ne_bot_of_Malpha_eq_bot_of_isHall` の Hall 仮定が供給できるため、
   `Msigma_ne_bot` 本体も完成。
-- [ ] **商 F(M/M_α) の機械** (a)/(b) の Hall-ness: `IsHallSubgroup` 2 連言。**最重**。
-  `rank(M/M_α)≤2` は Hall `α(M)` 仮定の下で `rank_quotient_Malpha_le_two_of_isHall` により
-  接続済み。`fitting_quotient_oPiCore_isPiGroup_compl` /
-  `fitting_quotient_Malpha_isPiGroup_alphaCompl` により BG の
-  **`F(M/M_α)` is an α'-group** は Hall `α(M)` 仮定なしで完成。さらに
-  `rank_fitting_quotient_Malpha_le_two` により **`rank F(M/M_α)≤2`** も Hall 仮定なしで完成し、
-  `derived_quotient_Malpha_le_fitting` / `Msigma_quotient_Malpha_le_fitting` /
-  `Msigma_quotient_Malpha_isPiGroup_alphaCompl` により `M'/M_α≤F(M/M_α)`、
-  `M_σ/M_α≤F(M/M_α)`、および `M_σ/M_α` の α'-性も Hall 仮定なしで接続済み。
-  さらに `hallSigmaSubgroup_quotient_Malpha_le_fitting` /
-  `hallSigmaSubgroup_quotient_Malpha_isPiGroup_alphaCompl` により任意の Hall `σ(M)`-subgroup
-  `S≤M` の像も `F(M/M_α)` 内の α'-group になり、
-  `Malpha_le_hallSigmaSubgroup` で `M_α≤S`、
-  `hallSigmaSubgroup_quotient_Malpha_isHall` で `S/M_α` が `M/M_α` の Hall `σ(M)`、
-  `hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting` で `F(M/M_α)` 内でも Hall `σ(M)` として
-  残るところまで接続済み。`alphaSubgroup_le_Malpha_of_le_hallSigmaSubgroup` で `A≤S` なる
-  α-subgroup はすでに `M_α` に入る。この入力から `Malpha_isHall` も完成。
-  残りは `M(σ)=M_σ` を同定して Hall `σ(M)` 連言を作る部分。
-- [ ] capstone `isHall_Msigma_Malpha` 配線。
+- [x] **商 F(M/M_α) の機械 / `M(σ)=M_σ` / Hall `σ(M)` 連言**:
+  `hallSigmaSubgroup_quotient_Malpha_isHall_in_fitting` までの quotient/Fitting 入力から、nilpotent `π`-core decomposition
+  と quotient `O_π` preimage を追加し、任意の Hall `σ(M)`-subgroup `S≤M` について `S=M_σ` を証明。
+  これにより `Msigma_subgroupOf_isHall` と ambient `Msigma_isHall` が完成。
+- [x] capstone `isHall_Msigma_Malpha` 配線。`Msigma_isHall`, `Malpha_isHall`, `Malpha_le_Msigma`,
+  `Msigma_le_derived`, `Msigma_ne_bot` をまとめて reduced Thm 10.2 を閉じた。
 
 ## 完了条件
 
