@@ -7941,6 +7941,25 @@ noncomputable def
     (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
     (hyp.Xset_centralCommutator_nonempty hF hHnonab) hstepData
 
+/-- **Base-anchor index existence** (the StepData `i₁`/`hanchor` data).  If `χmem` enumerates the
+running prefix `pairUnion (xBaseBlock Z) pair i` and the minimal-degree base block `xBaseBlock Z`
+is nonempty, then some index `i₁` has `χmem i₁ ∈ xBaseBlock Z` (the base block is contained in the
+prefix `pairUnion`). -/
+theorem exists_xBaseBlock_anchor_index (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {i k : ℕ}
+    {χmem : Fin k → IrreducibleCharacter ↥L}
+    (hrange : Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) =
+      OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i)
+    (hne : (hyp.xBaseBlock Z).Nonempty) :
+    ∃ i₁ : Fin k, (χmem i₁ : ClassFunction ↥L ℂ) ∈ hyp.xBaseBlock Z := by
+  obtain ⟨φ, hφ⟩ := hne
+  have hφpair : φ ∈ Set.range (fun j : Fin k => (χmem j : ClassFunction ↥L ℂ)) := by
+    rw [hrange]
+    exact OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hφ)
+  obtain ⟨i₁, hi₁⟩ := hφpair
+  have hi₁' : (χmem i₁ : ClassFunction ↥L ℂ) = φ := hi₁
+  exact ⟨i₁, by rw [hi₁']; exact hφ⟩
+
 /-- **(6.8.1), Frobenius case:** chain-level coherence for
 `X = S - S(H')`, using common-index p-power data.
 
