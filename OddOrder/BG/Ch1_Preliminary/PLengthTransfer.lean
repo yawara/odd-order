@@ -138,4 +138,71 @@ theorem hasPLengthOne_of_isPiPrime_normal_quotient [Fact p.Prime] {G : Type*} [G
     exact Subgroup.index_map_equiv _ φ
   rw [hcard_quot]; exact hquot
 
+/-- When `O_{p'}(G) = ⊥`, the `p`-length-one core simplifies: `O_{p',p}(G) = O_p(G)`. -/
+theorem oPiPrimePiCore_eq_oPiCore_of_compl_bot {G : Type*} [Group G] [Finite G]
+    (h : Ch03.oPiCore (({p} : Set ℕ)ᶜ) G = ⊥) :
+    Ch03.oPiPrimePiCore ({p} : Set ℕ) G = Ch03.oPiCore ({p} : Set ℕ) G := by
+  have key : ∀ (M : Subgroup G) [M.Normal], M = ⊥ →
+      Subgroup.comap (QuotientGroup.mk' M) (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ M))
+        = Ch03.oPiCore ({p} : Set ℕ) G := by
+    intro M _ hM
+    subst hM
+    rw [show (QuotientGroup.mk' (⊥ : Subgroup G))
+        = (QuotientGroup.quotientBot (G := G)).symm.toMonoidHom from rfl]
+    rw [Subgroup.comap_equiv_eq_map_symm']
+    simp only [MulEquiv.symm_symm]
+    exact Ch03.oPiCore.map_eq_of_mulEquiv ({p} : Set ℕ) (QuotientGroup.quotientBot (G := G))
+  exact key _ h
+
+/-- A normal `p`-subgroup is a `{p}`-group. -/
+private theorem isPiGroup_singleton_of_isPGroup [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} (hHp : IsPGroup p ↥H) : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H := by
+  intro r hr
+  have hrp : r.Prime := Nat.prime_of_mem_primeFactors hr
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hHp
+  have hrdvd : r ∣ p ^ k := hk ▸ Nat.dvd_of_mem_primeFactors hr
+  exact (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp (hrp.prime.dvd_of_dvd_pow hrdvd)
+
+/-- **BG Lemma 1.21(c)** (mmd L568): if `H ⊴ G` is a normal `p`-subgroup with `O_{p'}(G/H) = 1`
+and `G/H` has `p`-length one, then `G` has `p`-length one. -/
+theorem hasPLengthOne_of_isPGroup_normal_quotient [Fact p.Prime] {G : Type*} [Group G]
+    [Finite G] {H : Subgroup G} [H.Normal] (hHp : IsPGroup p ↥H)
+    (hOp' : Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H) = ⊥)
+    (hquot : hasPLengthOne p (G ⧸ H)) : hasPLengthOne p G := by
+  classical
+  -- `O_{p'}(G) ≤ H` (it maps into `O_{p'}(G/H) = ⊥`), and being `≤ H` it is a `p`-group; also
+  -- a `{p}ᶜ`-group, hence trivial.
+  have hOp'G : Ch03.oPiCore (({p} : Set ℕ)ᶜ) G = ⊥ := by
+    have hle : Ch03.oPiCore (({p} : Set ℕ)ᶜ) G ≤ H := by
+      have h1 : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H)
+          ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H) :=
+        Ch03.oPiCore.map_le_of_surjective _ _ (QuotientGroup.mk'_surjective H)
+      rw [hOp', le_bot_iff, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at h1
+      exact h1
+    have hpgroup : IsPGroup p ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) G) :=
+      hHp.of_injective (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
+    have hp_ndvd : ¬ p ∣ Nat.card ↥(Ch03.oPiCore (({p} : Set ℕ)ᶜ) G) := fun hd =>
+      (Ch03.oPiCore.isPiGroup _ p (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩))
+        (Set.mem_singleton p)
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hpgroup
+    have hk0 : k = 0 := by by_contra hk0; exact hp_ndvd (hk ▸ dvd_pow_self p hk0)
+    exact Subgroup.card_eq_one.mp (by rw [hk, hk0, pow_zero])
+  -- Reduce both sides to `O_p`-quotients via `O_{p',p} = O_p` (since `O_{p'} = ⊥`).
+  rw [hasPLengthOne, oPiPrimePiCore_eq_oPiCore_of_compl_bot hOp'G]
+  rw [hasPLengthOne, oPiPrimePiCore_eq_oPiCore_of_compl_bot hOp'] at hquot
+  -- `H ≤ O_p(G)` and `O_p(G/H) = O_p(G).map mk'`, so `(G/H)/O_p(G/H) ≃* G/O_p(G)`.
+  have hHpi : Ch03.Subgroup.IsPiGroup ({p} : Set ℕ) H := isPiGroup_singleton_of_isPGroup hHp
+  have hHleOp : H ≤ Ch03.oPiCore ({p} : Set ℕ) G := Ch03.Subgroup.IsPiGroup.le_oPiCore hHpi
+  have hcorr : Ch03.oPiCore ({p} : Set ℕ) (G ⧸ H)
+      = (Ch03.oPiCore ({p} : Set ℕ) G).map (QuotientGroup.mk' H) :=
+    oPiCore_quotient_eq_of_isPiGroup _ hHpi
+  haveI hmapN : ((Ch03.oPiCore ({p} : Set ℕ) G).map (QuotientGroup.mk' H)).Normal :=
+    Subgroup.Normal.map inferInstance (QuotientGroup.mk' H) (QuotientGroup.mk'_surjective H)
+  have φ : ((G ⧸ H) ⧸ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ H)) ≃*
+      (G ⧸ Ch03.oPiCore ({p} : Set ℕ) G) :=
+    (QuotientGroup.quotientMulEquivOfEq hcorr).trans
+      (QuotientGroup.quotientQuotientEquivQuotient H _ hHleOp)
+  rw [(Nat.card_congr φ.toEquiv).symm]
+  exact hquot
+
 end OddOrder.BG.Ch1
