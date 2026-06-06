@@ -154,25 +154,43 @@ L3 (hardest, needs 6.7). L1 and L4 are the cleanest committable starts; L3 is th
   `centralCommutator_subgroupOf_eq` (`= center ↥H ⊓ commutator ↥H`);
   `centralCommutator_ne_bot` (H non-abelian ⟹ ≠ ⊥). Not yet registered in `AxiomsCheck.lean`
   (deferred until consumed; verified axiom-clean via temp `#print axioms`).
-- **🔜 L4 IN PROGRESS (order chosen: L4 → L2 → L3).** Decomposition of the (6.8.3) case-(A) extension
-  `IsCoherent (Xset Zc ∪ Yset) → ¬Nonempty CoherenceTarget → False`:
-  - **✅ (a) arithmetic core** `false_of_centralCommutator_break_arith` (commit `0af1041`, axiom-clean):
-    `w1,d,hZ,cZ`, `d²≤hZ`, `2w1≤cZ−1`, `w1·hZ·(cZ−1) < 2w1²d` ⟹ False.
-  - (b) **break-pair**: `exists_coherentBreakPair` (S08:572) on `Sa = Xset Zc ∪ Yset`, `Sb = S` ⟹
-    `S₁` (conj-closed, X∪Y ⊆ S₁ ⊆ S) coherent + `ψ` with `S₁∪{ψ,ψ̄}` not coherent. Needs `S` real-free
-    (`S_hasNoRealCharacters`), `Xset Zc ∪ Yset ⊆ S`, and `Xset Zc ∪ Yset` coherent (= L3 output).
-  - (c) **xSum bound** `∑_{χ∈X} χ(1)² < 2ψ(1)·|W₁|`: analogue of `sMember_index_le_two_psi` (S08:5485)
-    but bounding the X-sum (`sum_re_sq_Xset_eq`, applies at central Zc) instead of `S(A)`; reuse
-    `sMember_degreeSqReBound_of_not_coherent` over `S₁ ⊇ X`, anchor `χ₁ = η₁ ∈ Y` of degree `|W₁|`.
-  - (d) **Cor 2.30** `d² ≤ |H:Z|`: `exists_degree_sq_le_index (Zc.subgroupOf H) centralCommutator_subgroupOf_le_center` (L1). Easy.
-  - (e) **FPF bound** `|Z|−1 ≥ 2|W₁|`: W₁ acts FPF on the W₁-invariant `Z ≤ H` (Z char in H);
-    `card_modEq_one` (`FrobeniusActionTI:146`) + `Z,W₁` odd + `two_mul_add_one_le_of_odd_dvd` (S08:2383)
-    — mirrors `isPGroup_of_isFrobeniusGroup_of_card_le` (S08:2534) done for all of H. Sub-task: derive
-    `IsFrobeniusAction W₁ Z` from `IsFrobeniusGroup L H W₁` + Z W₁-invariant.
-  - (f) assemble (b)–(e)+(a). `∑_X = |W₁|·|H:Z|·(|Z|−1)` via `sum_re_sq_Xset_eq` + `index_mul_card_sub_factor`.
-- **Then L2, L3.** Before L2, confirm `isIrreducibleCharacter_of_mem_Xset_of_frobenius`
-  (S08:4348) is `Z`-generic (works at `centralCommutator`) or generalize it. Before L3, read
-  `OddOrder/GroupTheory/RepresentationTheory/SylowTICongruence.lean` for (6.7).
+- **✅ L4 COMPLETE (order L4 → L2 → L3).** The (6.8.3) case-(A) extension
+  `false_of_coherentXunionYset_of_not_coherentS` (commit `c49ab3f`, axiom-clean): given
+  `Nonempty (IsCoherent (Xset Zc ∪ Yset))` and `¬ Nonempty (IsCoherent S)`, derives `False`.
+  Sub-pieces (all committed, leaf-green, axiom-clean):
+  - **✅ (a) arithmetic core** `false_of_centralCommutator_break_arith` (commit `0af1041`; relaxed to
+    non-strict `≤` + `2 ≤ hZ` in `c9ba639`): `d²≤hZ`, `2≤hZ`, `2w1≤cZ−1`, `w1·hZ·(cZ−1) ≤ 2w1²d` ⟹ False.
+  - **✅ (e) FPF bound** `centralCommutator_card_subgroupOf_lower` (commit `395ceb2`): `2|W₁|+1 ≤ |Z|`.
+  - **✅ (c) X-sum bound** `xSum_le_two_psi` (commit `c9ba639`): `∑_X χ(1)² ≤ 2ψ(1)χ₁(1)`.
+  - **✅ (d)** inline in (f): Cor 2.30 `d²≤|H:Z|` via `exists_degree_sq_le_index` + L1 centrality.
+  - **✅ (b)+(f)** the assembly (commit `c49ab3f`): break-pair + (c)+(d)+(e)+(a), with the
+    `isIrreducibleCharacter_of_mem_S_of_frobenius` / `Yset_nonempty` / `induce_apply_one_eq_card_W1_of_degree_one`
+    helpers (all pre-existing) and ℝ→ℕ casting via `index_mul_card_sub_factor`.
+- **🔜 NEXT: L2 (the producer monolith), then L3, then capstone wiring.**
+  - **L2**: `X = Xset Zc` coherence at central `Zc`. REUSE the general consumer
+    `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_irreducible_X (Z := Zc)`
+    (S08:~7460). **✅ linchpin landed** (`exists_source_primePow_centralBound_of_mem_Xset`, commit
+    `a119d9c`): for `χ∈X(Z)`, `χ(1)=|L:H|·p^k ∧ (p^k)²≤|H:Z|` — the `hθχ`/`hθsq_le_qtot` data, now
+    fillable at central `Zc`. `isIrreducibleCharacter_of_mem_Xset_of_frobenius` confirmed Z-generic.
+    **Remaining = the producer `hstepData` monolith** (single atomic `noncomputable def`, ~250 lines,
+    not splittable — the StepData is consumed atomically). For each chain step `i`:
+    1. enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k`, `χmem`, `hχinj`, `hrange`; anchor
+       `i₁` = min-degree of `xBaseBlock Zc` (`Set.exists_min_image`, cf. `two_le_xBaseBlock_ncard`).
+    2. numerics: `p`/`hp`(`three_le_prime_of_isPGroup_of_odd`)/`idx=H.index`(`hidx_p`=`coprimeIndexPrimePow`)/
+       per-member `dmem,θmem,mmem` (`exists_memberDegreeData`); `χs i` degree via the linchpin
+       (`θχ=p^mχ`, `θχ²≤|H:Z|=qtot`); `qtot=|H:Z|=p^mq` (`exists_primePow_card_quotient_of_isPGroup`);
+       `c`/`total`/`htotal` via `index_mul_card_sub_factor`.
+    3. **`hsum` (crux, ~80 lines)**: `tailSet := X(Zc)-Finset ∖ (accumulator image)`,
+       `θtail j` = source p-degree of `j`; `∑_{Fin k} dmem² + ∑_{tailSet}(idx·θtail)² = ∑_{X(Zc)} = total`
+       via `Finset.sum_sdiff` (accumulator ⊆ X) + `sum_re_sq_Xset_eq` (ℕ-cast); `htail_le` from the
+       degree-sorted chain (`hmono`): tail degrees ≥ `dχ`.
+    4. package `PairUnionBaseAnchorCommonIndexPrimePowerStepData ⟨…⟩`; feed the consumer.
+    Also needs `H` a `p`-group (from `isPGroup_of_not_coherent`, capstone ¬-coherent branch) and
+    `(Xset Zc).Nonempty`.
+  - **L3**: ν glue → `Nonempty (IsCoherent (Xset Zc ∪ Yset))` via `coherentUnion_of_glued`; needs
+    (6.8.1) case-A `τ₃` + (6.7) (`SylowTICongruence.lean`?). Hardest; gating.
+  - **capstone** `sibleySetup_is_coherent` (S08 X-nonempty sorry): `by_cases Nonempty CoherenceTarget`;
+    `¬` branch → `isPGroup_of_not_coherent` (H p-group) → L2 → L3 → `false_of_coherentXunionYset_of_not_coherentS` (L4).
 
 ## Recommendation
 
