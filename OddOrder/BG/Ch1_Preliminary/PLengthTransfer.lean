@@ -317,4 +317,17 @@ theorem oPiPrimePiCore_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finit
   obtain ⟨m, _, hm⟩ := (Nat.dvd_prime_pow Fact.out).mp hcard_dvd
   exact IsPGroup.of_card hm
 
+/-- **BG Lemma 1.21(a)** (mmd L566): `p`-length one passes to subgroups — if `G` has
+`p`-length one and `H ≤ G`, then `H` has `p`-length one. Index chain:
+`[↥H : O_{p',p}(↥H)] ∣ [↥H : (O_{p',p}(G)).subgroupOf H] = (O_{p',p}(G)).relIndex H ∣
+[G : O_{p',p}(G)]` (the last step uses `O_{p',p}(G) ◁ G`). -/
+theorem hasPLengthOne_subgroup [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hpl : hasPLengthOne p G) (H : Subgroup G) : hasPLengthOne p ↥H := by
+  rw [hasPLengthOne] at hpl ⊢
+  have hchain : (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥H).index
+      ∣ (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).index :=
+    dvd_trans (Subgroup.index_dvd_of_le oPiPrimePiCore_subgroupOf_le)
+      (Subgroup.relIndex_dvd_index_of_normal (Ch03.oPiPrimePiCore ({p} : Set ℕ) G) H)
+  exact fun hdvd => hpl (dvd_trans hdvd hchain)
+
 end OddOrder.BG.Ch1
