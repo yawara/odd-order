@@ -4406,6 +4406,143 @@ theorem appC_normSet_generator_relation_of_capstone {hyp : Hypothesis (G := G)}
   appCNormSetGeneratorRelation_of_twisted_normOne_step hyp
     (data.appCNormSetTwistedNormOneStep_of_capstone hcap)
 
+/-! #### BG Appendix C, Lemma C.3 Step 4: the kernel/fixed-point-free argument
+
+This proves the capstone `s₁ = s⁻¹` from the displayed relation `(C.10)`.  Setting
+`t = y⁻¹ s y` with `y ∈ ⁅Q, W₂⁆` (Remark (XI)), BG rewrites `(C.10)` modulo the
+abelian group `⁅Q, P₀⁆` (= `⁅Q, W₂⁆`) as `y` lying in the kernel of
+`(s⁻¹ + 1 - s₁⁻¹s⁻¹ - s₃)(s⁻¹ - 1)`.  Because `s⁻¹` operates fixed-point-freely on
+`⁅Q, P₀⁆` (Remark (X)), the factor `(s⁻¹ - 1)` is injective, so `y` lies in the
+kernel of `(s⁻¹ + 1 - s₁⁻¹s⁻¹ - s₃)`; unwinding gives `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃`
+(`tᵢ = y⁻¹ sᵢ y`).  Steps 2–3 then force `t₁ = t⁻¹`, i.e. `s₁ = s⁻¹`.
+
+We avoid building the endomorphism ring `End ⁅Q, P₀⁆`: BG's "`y ∈ ker(BC)`, `C`
+injective ⟹ `y ∈ ker B`" is realised concretely as "`β(Y_B)·Y_B⁻¹ = ⋆` and `⋆ = 1`
+⟹ `β(Y_B) = Y_B` ⟹ (fixed-point-free) `Y_B = 1`", where `β` is conjugation by `s`
+on the abelian `⁅Q, W₂⁆` and `Y_B` the four-fold `y`-conjugate of BG's `(5074)`. -/
+
+/-- The transported prime-line element `σ(P₀ c)` lies in `W₂`. -/
+theorem sigma_primeLineElement_mem_W2 {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (c : ZMod hyp.base.p) :
+    data.sigma (fieldNormalizerPrimeLineElement hyp c) ∈ hyp.base.W2 := by
+  rw [← data.sigma_P0_eq_W2]
+  exact Subgroup.mem_map_of_mem _ (fieldNormalizerPrimeLineElement_mem hyp c)
+
+/-- Any two transported prime-line elements commute (the prime line `P₀` is
+abelian). -/
+theorem sigma_primeLineElement_commute {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (c d : ZMod hyp.base.p) :
+    Commute (data.sigma (fieldNormalizerPrimeLineElement hyp c))
+      (data.sigma (fieldNormalizerPrimeLineElement hyp d)) := by
+  rw [Commute, SemiconjBy, sigma_primeLineElement_eq_sScalar,
+    sigma_primeLineElement_eq_sScalar, sScalar_mul, sScalar_mul, add_comm]
+
+/-- The distinguished generator `s` commutes with every transported prime-line
+element. -/
+theorem s_commute_sigma_primeLineElement {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) (c : ZMod hyp.base.p) :
+    Commute data.s (data.sigma (fieldNormalizerPrimeLineElement hyp c)) := by
+  have h := data.sigma_primeLineElement_commute 1 c
+  rwa [show data.sigma (fieldNormalizerPrimeLineElement hyp 1) = data.s by
+    rw [fieldNormalizerPrimeLineElement_one, s, fieldNormalizerPrimeLineGenerator]] at h
+
+/-- **BG Appendix C, Lemma C.3 Step 4: `(C.10)` modulo `Q`** (mmd L5058).  Since
+`P₀ ∩ Q = 1` (`W2_inf_Q_eq_bot`) and `t ≡ s` modulo `Q`, the displayed relation
+`(C.10)` collapses to `s₁ s₂ s₃ = 1`.  We conjugate `(C.10)` by `y⁻¹` (so each `t`
+becomes `s`), telescope the resulting `Q`-cosets to the left, and use that
+`P₀`-conjugation normalizes `Q`. -/
+theorem step4_sigma_primeLine_prod_eq_one {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {c1 c2 c3 : ZMod hyp.base.p}
+    (hC10 : data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1) :
+    data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+        data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1 := by
+  set s1 := data.sigma (fieldNormalizerPrimeLineElement hyp c1) with hs1def
+  set s2 := data.sigma (fieldNormalizerPrimeLineElement hyp c2) with hs2def
+  set s3 := data.sigma (fieldNormalizerPrimeLineElement hyp c3) with hs3def
+  -- The three prime-line factors lie in `W₂`.
+  have hs1W : s1 ∈ hyp.base.W2 := data.sigma_primeLineElement_mem_W2 c1
+  have hs2W : s2 ∈ hyp.base.W2 := data.sigma_primeLineElement_mem_W2 c2
+  have hs3W : s3 ∈ hyp.base.W2 := data.sigma_primeLineElement_mem_W2 c3
+  have hprodW : s1 * s2 * s3 ∈ hyp.base.W2 := mul_mem (mul_mem hs1W hs2W) hs3W
+  -- `y⁻¹`-conjugates `σᵢ = y⁻¹ sᵢ y`, congruent to `sᵢ` modulo `Q`.
+  set σ1 := data.y⁻¹ * s1 * data.y with hσ1def
+  set σ2 := data.y⁻¹ * s2 * data.y with hσ2def
+  set σ3 := data.y⁻¹ * s3 * data.y with hσ3def
+  -- conjugating `(C.10)` by `y⁻¹` turns each `t` into `s` (since `t = y s y⁻¹`).
+  have hyt2 : data.y⁻¹ * data.t ^ 2 * data.y = data.s ^ 2 := by
+    rw [t, MulAut.conj_apply, pow_two, pow_two]; group
+  have hyti : data.y⁻¹ * data.t⁻¹ * data.y = data.s⁻¹ := by
+    rw [t, MulAut.conj_apply]; group
+  have hconj : data.s ^ 2 * σ1 * data.s⁻¹ * σ2 * data.s⁻¹ * σ3 = 1 := by
+    rw [← hyt2, ← hyti, hσ1def, hσ2def, hσ3def,
+      show data.y⁻¹ * data.t ^ 2 * data.y * (data.y⁻¹ * s1 * data.y) *
+            (data.y⁻¹ * data.t⁻¹ * data.y) * (data.y⁻¹ * s2 * data.y) *
+            (data.y⁻¹ * data.t⁻¹ * data.y) * (data.y⁻¹ * s3 * data.y) =
+          data.y⁻¹ * (data.t ^ 2 * s1 * data.t⁻¹ * s2 * data.t⁻¹ * s3) * data.y from by group,
+      hC10, mul_one, inv_mul_cancel]
+  -- each `σᵢ sᵢ⁻¹` lies in `Q`.
+  have hQconj : ∀ g ∈ hyp.base.W2, ∀ x ∈ hyp.base.Q, g * x * g⁻¹ ∈ hyp.base.Q :=
+    fun g hg x hx => (Subgroup.mem_normalizer_iff.mp (data.W2_normalizes_Q hg) x).mp hx
+  set q1 := σ1 * s1⁻¹ with hq1def
+  set q2 := σ2 * s2⁻¹ with hq2def
+  set q3 := σ3 * s3⁻¹ with hq3def
+  have hq1Q : q1 ∈ hyp.base.Q := by
+    rw [show q1 = data.y⁻¹ * (s1 * data.y * s1⁻¹) from by rw [hq1def, hσ1def]; group]
+    exact mul_mem (inv_mem data.y_mem_Q) (hQconj s1 hs1W data.y data.y_mem_Q)
+  have hq2Q : q2 ∈ hyp.base.Q := by
+    rw [show q2 = data.y⁻¹ * (s2 * data.y * s2⁻¹) from by rw [hq2def, hσ2def]; group]
+    exact mul_mem (inv_mem data.y_mem_Q) (hQconj s2 hs2W data.y data.y_mem_Q)
+  have hq3Q : q3 ∈ hyp.base.Q := by
+    rw [show q3 = data.y⁻¹ * (s3 * data.y * s3⁻¹) from by rw [hq3def, hσ3def]; group]
+    exact mul_mem (inv_mem data.y_mem_Q) (hQconj s3 hs3W data.y data.y_mem_Q)
+  -- `s`-power and `sᵢ` normalize `Q`.
+  have hsN : data.s ∈ Subgroup.normalizer (hyp.base.Q : Set G) := data.s_normalizes_Q
+  have hs1N : s1 ∈ Subgroup.normalizer (hyp.base.Q : Set G) := data.W2_normalizes_Q hs1W
+  have hs2N : s2 ∈ Subgroup.normalizer (hyp.base.Q : Set G) := data.W2_normalizes_Q hs2W
+  -- the telescoped `Q`-element.
+  set Q1 := data.s ^ 2 * q1 * (data.s ^ 2)⁻¹ with hQ1def
+  set Q2 := data.s ^ 2 * s1 * data.s⁻¹ * q2 * (data.s ^ 2 * s1 * data.s⁻¹)⁻¹ with hQ2def
+  set Q3 := data.s ^ 2 * s1 * data.s⁻¹ * s2 * data.s⁻¹ * q3 *
+    (data.s ^ 2 * s1 * data.s⁻¹ * s2 * data.s⁻¹)⁻¹ with hQ3def
+  have hQ1Q : Q1 ∈ hyp.base.Q :=
+    (Subgroup.mem_normalizer_iff.mp (pow_mem hsN 2) q1).mp hq1Q
+  have hQ2Q : Q2 ∈ hyp.base.Q :=
+    (Subgroup.mem_normalizer_iff.mp
+      (mul_mem (mul_mem (pow_mem hsN 2) hs1N) (inv_mem hsN)) q2).mp hq2Q
+  have hQ3Q : Q3 ∈ hyp.base.Q :=
+    (Subgroup.mem_normalizer_iff.mp
+      (mul_mem (mul_mem (mul_mem (mul_mem (pow_mem hsN 2) hs1N) (inv_mem hsN)) hs2N)
+        (inv_mem hsN)) q3).mp hq3Q
+  -- free-group telescoping identity.
+  have hfactor : data.s ^ 2 * σ1 * data.s⁻¹ * σ2 * data.s⁻¹ * σ3 =
+      Q1 * Q2 * Q3 * (data.s ^ 2 * s1 * data.s⁻¹ * s2 * data.s⁻¹ * s3) := by
+    rw [hQ1def, hQ2def, hQ3def,
+      show σ1 = q1 * s1 by rw [hq1def]; group,
+      show σ2 = q2 * s2 by rw [hq2def]; group,
+      show σ3 = q3 * s3 by rw [hq3def]; group]
+    group
+  -- collapse the bare `s`-word to `s₁ s₂ s₃` using commutativity of `W₂`.
+  have hcollapse : data.s ^ 2 * s1 * data.s⁻¹ * s2 * data.s⁻¹ * s3 = s1 * s2 * s3 := by
+    have h1 : Commute (data.s ^ 2) s1 := (data.s_commute_sigma_primeLineElement c1).pow_left 2
+    have h2 : Commute data.s s2 := data.s_commute_sigma_primeLineElement c2
+    rw [h1.eq]
+    rw [show s1 * data.s ^ 2 * data.s⁻¹ = s1 * data.s by group,
+      show s1 * data.s * s2 = s1 * (data.s * s2) by group, h2.eq,
+      show s1 * (s2 * data.s) * data.s⁻¹ = s1 * s2 by group]
+  rw [hcollapse] at hfactor
+  -- conclude `s₁ s₂ s₃ ∈ Q`, hence `∈ W₂ ⊓ Q = ⊥`.
+  have hprodQ : s1 * s2 * s3 ∈ hyp.base.Q := by
+    have hQ0 : Q1 * Q2 * Q3 ∈ hyp.base.Q := mul_mem (mul_mem hQ1Q hQ2Q) hQ3Q
+    have hone : Q1 * Q2 * Q3 * (s1 * s2 * s3) = 1 := by rw [← hfactor, hconj]
+    have hmem : (Q1 * Q2 * Q3)⁻¹ ∈ hyp.base.Q := inv_mem hQ0
+    rwa [inv_eq_of_mul_eq_one_right hone] at hmem
+  have : s1 * s2 * s3 ∈ hyp.base.W2 ⊓ hyp.base.Q := ⟨hprodW, hprodQ⟩
+  rw [data.W2_inf_Q_eq_bot] at this
+  simpa using this
+
 end Step4
 
 end FieldNormalizerData
