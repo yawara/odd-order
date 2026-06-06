@@ -412,6 +412,21 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
   中心 section (基本 Schur `exists_degree_sq_le_index`@SchurCenterBound では不足)。両者 framework/Clifford 要・最重。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
+## 🔑 2026-06-07 capstone 構造 + consumer semantics 解明（build 着手前の確定事項）
+
+- **`CoherenceTarget = IsCoherent τ S A` は Type(data, ν を運ぶ)** (S08:2983 abbrev)。capstone は **data を構成**する(by_contra 不可)。⟹ 構造:
+  ```
+  by_cases hNe : Nonempty hyp.CoherenceTarget
+  · exact hNe.some                                   -- Classical.choice で data 抽出
+  · obtain ⟨p,hp,hHp⟩ := hyp.isPGroup_of_not_coherent hF hNe   -- ¬Nonempty ⟹ H p-群
+    -- hHp : IsPGroup p ↥H 下で (6.6) coherence data D を構成
+    exact absurd ⟨D⟩ hNe                             -- ⟨D⟩:Nonempty が hNe と矛盾 → goal(data)
+  ```
+  **⟹ 「H p-群」は ¬Nonempty branch で入手可**(isPGroup_of_not_coherent は `¬Nonempty CoherenceTarget` を取る)。
+- **consumer semantics**(`xAdjoinStepInput_of_memberFamily_commonIndexPrimePowerSums` 6903 精読): `D=∑_{s}dmem²`=**accumulator(prefix=pairUnion i) sum**, `tailSet`=**X∖accumulator(j≥i tail)**, `total=D+tail-sum`=**full ∑_X**。`sq_dvd_head_of_commonIndex_primePower_sums`(S07)が `total=qtot·c`(qtot=p^mq≥θχ²)+tail(θtail≥θχ)から **dχ²|D**(adjoin 条件)を導く。⟹ producer は total=∑_X=|L|−|L:Z|=|H:Z|·(idx·(|Z|−1)) を hsum partition で作る(qtot=|H:Z|)。
+- **cover**(`exists_conjugatePairCover` 411): e/pair/N/hpairχ + pairUnion 被覆 + degree-monotone。tail = pairs[i,N)。
+- **build 着手**: `xStepData` per-step producer(enum=exists_pairUnion_memberFamily, tail=pairs[i,N), degrees=helpers, hsum=accumulator⊔tail=X partition sum)。最難 = hsum partition + htotal(piece1+Lagrange)。
+
 ## 🔑 2026-06-06 (続) producer 簡約 + building blocks 完了（qtot:=|H:Z| 簡約が鍵）
 
 **重要簡約**: StepData の `qtot` は **θχ² でなく `qtot := |H:Z| = Nat.card(↥H⧸Z.subgroupOf H)`**（total の p-part 全体）を取ると激減:
