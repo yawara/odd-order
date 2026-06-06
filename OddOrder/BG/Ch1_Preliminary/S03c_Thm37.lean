@@ -353,4 +353,58 @@ theorem chiefFactor_fixedPointFree
     rw [QuotientGroup.eq_one_iff, hx_eq]
     exact (Y.subgroupOf X).inv_mem hn
 
+/-- **Frobenius restriction to `LR`** (inductive step of BG Thm 3.7): if `G = KR` is a Frobenius
+group and `L ⊴ G` is a nontrivial normal subgroup of the kernel `K`, then the subgroup `L ⊔ R = LR`
+is a Frobenius group with kernel `L` and complement `R` (as subgroups of `↥(L ⊔ R)` via
+`subgroupOf`). The conjugation/complement structure restricts from `G`. -/
+theorem isFrobeniusGroup_sup_of_normal_le_kernel
+    {G : Type*} [Group G] [Finite G] {K R : Subgroup G}
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) {L : Subgroup G} [L.Normal]
+    (hLK : L ≤ K) (hL_ne : L ≠ ⊥) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(L ⊔ R)
+      (L.subgroupOf (L ⊔ R)) (R.subgroupOf (L ⊔ R)) := by
+  have hdisjLR : Disjoint L R := Disjoint.mono_left hLK h.isComplement.disjoint
+  have hLR_bot : L ⊓ R = ⊥ := hdisjLR.eq_bot
+  refine
+    { isNormal := Subgroup.normal_subgroupOf
+      isComplement := ?_
+      ne_bot_kernel := ?_
+      ne_bot_complement := ?_
+      conj_frobenius := ?_ }
+  · -- complement: disjoint + the product covers `L ⊔ R`
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · refine disjoint_iff.mpr (eq_bot_iff.mpr (fun x hx => ?_))
+      rw [Subgroup.mem_inf] at hx
+      simp only [Subgroup.mem_subgroupOf] at hx
+      have hmem : (x : G) ∈ L ⊓ R := ⟨hx.1, hx.2⟩
+      rw [hLR_bot, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      exact Subtype.ext (by simpa using hmem)
+    · ext g
+      simp only [Set.mem_mul, Set.mem_univ, iff_true]
+      have hgset : (g : G) ∈ (↑L : Set G) * (↑R : Set G) := by
+        rw [← Subgroup.normal_mul L R]; exact g.2
+      obtain ⟨l, hl, r, hr, hlr⟩ := hgset
+      have hlL : l ∈ L := hl
+      have hrR : r ∈ R := hr
+      exact ⟨⟨l, (le_sup_left : L ≤ L ⊔ R) hlL⟩, Subgroup.mem_subgroupOf.mpr hlL,
+        ⟨r, (le_sup_right : R ≤ L ⊔ R) hrR⟩, Subgroup.mem_subgroupOf.mpr hrR,
+        Subtype.ext (by simpa using hlr)⟩
+  · -- ne_bot_kernel
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hL_ne (hd.eq_bot_of_le le_sup_left)
+  · -- ne_bot_complement
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => h.ne_bot_complement (hd.eq_bot_of_le le_sup_right)
+  · -- conj_frobenius inherited from `h` (via `L ≤ K`)
+    intro a ha hane n hn hnne
+    simp only [Subgroup.mem_subgroupOf] at ha hn
+    have hane' : (a : G) ≠ 1 := fun hc => hane (Subtype.ext (by simpa using hc))
+    have hnne' : (n : G) ≠ 1 := fun hc => hnne (Subtype.ext (by simpa using hc))
+    intro hcontra
+    apply h.conj_frobenius (a : G) ha hane' (n : G) (hLK hn) hnne'
+    have hval := congrArg (Subtype.val) hcontra
+    push_cast at hval
+    exact hval
+
 end OddOrder.BG.Ch1.S03c
