@@ -243,7 +243,7 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - degree: dχ=χs i の次数, dmem j=χmem j の次数, idx=|W₁|, θ=dχ/idx 等の source 次数(=Ind の source θ の次数), 全 θ=p^m(✅ `exists_primePow_natDegree_of_isPGroup`)。
 - **核 = `total = qtot·c`, `qtot=p^mq`, `θχ²≤qtot`** ⟺ **`θχ(1)² | total`**(total=full X degree-sum)。これが (6.6) の divisibility(mmd L76-82)。
 **producer 構成 plan(残 substantial pieces)**:
-1. 🔴 **X degree-sum 恒等式**(NEW, 未在; grep 確認): `∑_{χ∈Xset Z} χ(1)² = |L|−|L:Z|`(or 精密形)。X=S−S(Z), χ=Ind θ。**B2 系(`sum_re_sq_induce_kernelFilter_eq` 等 S(A)-side)と類似の Burnside-type**。**= 次 loop の第一目標**(clean substantial lemma)。
+1. ✅ **X degree-sum 恒等式 landed**(続11, commit b5dd055, axiom-clean): `sum_re_sq_Xset_eq`(S08, Frobenius)= `∑_{χ∈X=S−S(Z)} (χ 1).re² = |L:H|·(|H|−|H:Z|)`。S=S(⊥), S(Z)⊆S ゆえ B2 `sum_re_sq_induce_kernelFilter_eq`(A=⊥, `|H⧸⊥|=|H|` via `QuotientGroup.quotientBot`)−(A=Z)を `Finset.sum_sdiff` で。LHS Finset = kernelFilter(⊥) image \ kernelFilter(Z) image。**罠**: 統計 statement に `open scoped Classical in`(DecidablePred filter)要(sum_re_sq と同様)。
 2. 🟡 **divisibility 組立**: `θχ²|tail-sum`(p-power: θχ≤θⱼ ⟹ θχ|θⱼ ⟹ θχ²|θⱼ², `pow_dvd_pow`)+`θχ²|full-sum`(`degree_sq_le_index_of_central_quotient`=Is Cor2.30 ✅ + 恒等式1 + idx coprime p)⟹ `θχ²|total` ⟹ qtot:=θχ², c:=total/θχ²。
 3. 🟡 **StepData packaging**: 1+2 と enum/leaf を `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` の形に束ねる。tailSet κ の取り方(degree>χ の members)に注意。
 4. 🔴 **ν glue**(hagreeX/hagreeY/hmixed/hgen): X-coherence ∪ Y-coherence の combined extension(`coherentUnion_of_glued`)。
