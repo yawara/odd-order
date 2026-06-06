@@ -261,8 +261,9 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
-  delta_eq_one : Prop
-  delta_eq_one_holds : delta_eq_one
+  /-- **Peterfalvi (13.3.c)**: the signs `δ_j`, `δ'_i` of (13.1.e) are all equal
+  to `1` (materialized as a concrete statement about `delta`/`deltaPrime`). -/
+  delta_eq_one : (∀ j : Fin hyp.p, hyp.delta j = 1) ∧ (∀ i : Fin hyp.q, hyp.deltaPrime i = 1)
   mu_tau1_formula : Prop
   mu_tau1_formula_holds : mu_tau1_formula
   sign_flip_exception : Prop
@@ -273,7 +274,7 @@ theorem character_degree_analysis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∃ data : CharacterDegreeData hyp,
       data.mu_j_linear_induced ∧ data.no_lambda_forces_caseB_S ∧
-        data.delta_eq_one ∧ data.mu_tau1_formula := by
+        data.mu_tau1_formula := by
   sorry
 
 /-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
