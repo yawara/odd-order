@@ -631,7 +631,6 @@ structure FieldNormalizerData (hyp : Hypothesis (G := G)) where
   y_mem_Q : y ∈ hyp.base.Q
   W2_conj_y_normalizes_U :
     MulAut.conj y • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)
-  appC_twisted_normOne_step : appCNormSetTwistedNormOneStep hyp
 
 namespace FieldNormalizerData
 
@@ -2332,12 +2331,9 @@ theorem s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
       ((data.t⁻¹) ^ n * data.s ^ n) * ((data.s⁻¹) ^ m * data.t ^ m) :=
   data.Q_mul_comm (data.s_inv_pow_mul_t_pow_mem_Q m) (data.t_inv_pow_mul_s_pow_mem_Q n)
 
-/-- The C.3 generator-relation interface consumed by BG Appendix C, derived from
-BG's norm-one twisted-inverse output stored in `FieldNormalizerData`. -/
-theorem appC_normSet_generator_relation {hyp : Hypothesis (G := G)}
-    (data : FieldNormalizerData hyp) :
-    appCNormSetGeneratorRelation hyp :=
-  appCNormSetGeneratorRelation_of_twisted_normOne_step hyp data.appC_twisted_normOne_step
+-- The C.3 generator-relation interface `appC_normSet_generator_relation` is now
+-- *derived* from the Step 4 capstone (`s₁ = s⁻¹`) rather than carried as a field;
+-- see its definition after `step4Capstone` below.
 
 /-! ### BG Appendix C, Lemma C.3 Step 4: the generator relation `s₁ = s⁻¹`
 
@@ -4906,6 +4902,14 @@ theorem step4Capstone [Finite G] {hyp : Hypothesis (G := G)}
   refine ⟨forms.u1, forms.v1, ?_⟩
   rw [← data.step4M1_eq_sigma_inr, forms.hM1, hs1,
     ← data.sScalar_neg_one_eq_sigma_primeLineElement, ← data.s_inv_eq_sScalar_neg_one]
+
+/-- The C.3 generator-relation interface consumed by BG Appendix C
+(`∀ a ∈ E, N(2a-1) = 1`), now **derived** from the Step 4 capstone `s₁ = s⁻¹`
+rather than carried as the former `appC_twisted_normOne_step` field. -/
+theorem appC_normSet_generator_relation [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) :
+    appCNormSetGeneratorRelation hyp :=
+  data.appC_normSet_generator_relation_of_capstone data.step4Capstone
 
 end Step4
 
