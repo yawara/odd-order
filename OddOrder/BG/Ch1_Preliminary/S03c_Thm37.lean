@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
+import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.GroupTheory.RepresentationTheory.ElementaryAbelianRepresentation
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusActionTI
 import OddOrder.GroupTheory.ChiefFactor
@@ -223,5 +224,24 @@ theorem coprime_kernel_le_chiefFactorCentralizer
   refine (chiefFactorConjAction_smul_eq_self_iff_mem k).mp (fun v => ?_)
   rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (k : G) v]
   exact hKtriv ⟨QuotientGroup.mk' L (k : G), ⟨k, hk, rfl⟩⟩ v
+
+/-- **G/L is Frobenius** (BG Lemmas 3.1/3.2 applied in Thm 3.7): if `G = KR` is a Frobenius group
+with solvable kernel `K`, and `N ⊴ G` is a proper subgroup of `K`, then `G/N` is a Frobenius group
+with kernel `K/N` and complement `RN/N`. The coprimality of `⟨x⟩` with `K` (for `x ∈ R`) comes from
+`coprime_card_kernel_complement`. -/
+theorem frobenius_quotient_of_normal_lt_kernel
+    {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [N.Normal]
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hNK : N ≤ K) (hKN : ¬ K ≤ N)
+    (hSolvK : IsSolvable ↥K) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup (G ⧸ N)
+      (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  refine OddOrder.BG.Ch1.S03.quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers
+    h hNK hKN ?_ hSolvK
+  intro x hxR _
+  have hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R) :=
+    h.coprime_card_kernel_complement
+  have hdvd : Nat.card ↥(Subgroup.zpowers x) ∣ Nat.card ↥R :=
+    Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hxR)
+  exact (hcop.coprime_dvd_right hdvd).symm
 
 end OddOrder.BG.Ch1.S03c
