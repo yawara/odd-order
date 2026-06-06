@@ -5371,6 +5371,60 @@ theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
   exact Complex.ofReal_inj.mp key
 
 open scoped Classical in
+/-- **(6.6) X degree-sum identity (Frobenius case).**
+
+The degree-square sum over `X = S − S(Z)` is `|L:H| · (|H| − |H:Z|)`.  Since `S = S(⊥)` and
+`S(Z) ⊆ S`, this is the difference of two instances of the `S(A)` degree-sum identity
+`sum_re_sq_induce_kernelFilter_eq` (at `A = ⊥`, using `|H ⧸ ⊥| = |H|`, and at `A = Z`).  This is
+the `total` of the X-chain step data: the (6.6) divisibility argument shows the source degree
+`θχ(1)²` divides it. -/
+theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} [Z.Normal] :
+    ∑ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        ((χ 1).re) ^ 2
+      = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+  letI : H.Normal := hyp.H_normal
+  have hbotker : ∀ θ : IrreducibleCharacter ↥H,
+      (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
+    intro θ x hx
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  have hsub : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) ⊆
+      (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) := by
+    apply Finset.image_subset_image
+    intro θ hθ
+    rw [Finset.mem_filter] at hθ ⊢
+    exact ⟨hθ.1, hbotker θ, hθ.2.2⟩
+  have hsd := Finset.sum_sdiff (f := fun χ : ClassFunction ↥L ℂ => ((χ 1).re) ^ 2) hsub
+  have h0 := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := (⊥ : Subgroup ↥L))
+  have hZ := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := Z)
+  have hbotcard : Nat.card (↥H ⧸ (⊥ : Subgroup ↥L).subgroupOf H) = Nat.card ↥H := by
+    rw [Subgroup.bot_subgroupOf]
+    exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥H)).toEquiv
+  rw [hbotcard] at h0
+  rw [eq_sub_of_add_eq hsd, h0, hZ]
+  ring
+
+open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 
 Combines the member-family degree-square bound `sMember_degreeSqReBound_of_not_coherent`
