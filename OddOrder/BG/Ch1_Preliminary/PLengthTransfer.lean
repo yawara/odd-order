@@ -57,25 +57,21 @@ theorem hasPLengthOne_iff_card_quotient (G : Type*) [Group G] [Finite G] :
         Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)) := by
   rw [hasPLengthOne, card_quotient_oPiPrimePiCore_eq G]
 
-/-- The `p'`-core commutes with quotient by a normal `p'`-subgroup:
-`O_{p'}(G/H) = O_{p'}(G) / H` when `H ⊴ G` is a `p'`-subgroup. -/
-theorem oPiCore_compl_quotient_eq [Fact p.Prime] {G : Type*} [Group G] [Finite G]
-    {H : Subgroup G} [H.Normal] (hHp' : ¬ p ∣ Nat.card H) :
-    Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H)
-      = (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H) := by
+/-- The `π`-core commutes with quotient by a normal `π`-subgroup:
+`O_π(G/H) = O_π(G) / H` when `H ⊴ G` is a `π`-subgroup. (The reusable engine for the
+Lemma 1.21 transfer lemmas: (b) uses `π = {p}ᶜ`, (c) uses `π = {p}`.) -/
+theorem oPiCore_quotient_eq_of_isPiGroup {G : Type*} [Group G] [Finite G] (π : Set ℕ)
+    {H : Subgroup G} [H.Normal] (hπH : Ch03.Subgroup.IsPiGroup π H) :
+    Ch03.oPiCore π (G ⧸ H) = (Ch03.oPiCore π G).map (QuotientGroup.mk' H) := by
   classical
   set q : G →* G ⧸ H := QuotientGroup.mk' H with hq
   have hsurj : Function.Surjective q := QuotientGroup.mk'_surjective H
   refine le_antisymm ?_ (Ch03.oPiCore.map_le_of_surjective _ q hsurj)
-  set Kbar : Subgroup (G ⧸ H) := Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H) with hKbar
+  set Kbar : Subgroup (G ⧸ H) := Ch03.oPiCore π (G ⧸ H) with hKbar
   haveI hKbarN : Kbar.Normal := by rw [hKbar]; infer_instance
   set N : Subgroup G := Kbar.comap q with hN
   haveI hNnormal : N.Normal := by rw [hN]; infer_instance
-  -- `Kbar` is a `p'`-group, so `p ∤ |Kbar|`.
-  have hKbar_pi : Ch03.Subgroup.IsPiGroup (({p} : Set ℕ)ᶜ) Kbar := by
-    rw [hKbar]; exact Ch03.oPiCore.isPiGroup _
-  have hKbar_p' : ¬ p ∣ Nat.card Kbar := fun hd =>
-    (hKbar_pi p (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩)) (Set.mem_singleton p)
+  have hKbar_pi : Ch03.Subgroup.IsPiGroup π Kbar := by rw [hKbar]; exact Ch03.oPiCore.isPiGroup _
   -- `|N| = |H| · |Kbar|` (the restriction `q : N → Kbar` is onto with kernel `H`).
   have hidx : N.index = Kbar.index := by rw [hN]; exact Subgroup.index_comap_of_surjective Kbar hsurj
   have hKpos : 0 < Kbar.index := Nat.card_pos
@@ -88,19 +84,23 @@ theorem oPiCore_compl_quotient_eq [Fact p.Prime] {G : Type*} [Group G] [Finite G
               rw [← Subgroup.card_mul_index Kbar]
         _ = (Nat.card H * Nat.card Kbar) * Kbar.index := by ring
     exact Nat.eq_of_mul_eq_mul_right hKpos key
-  have hNp' : ¬ p ∣ Nat.card N := by
-    rw [hcardN]
-    intro hdvd
-    rcases (Nat.Prime.dvd_mul Fact.out).mp hdvd with h | h
-    · exact hHp' h
-    · exact hKbar_p' h
-  have hNpi : Ch03.Subgroup.IsPiGroup (({p} : Set ℕ)ᶜ) N := by
+  -- `N` is a `π`-group: `π(|N|) = π(|H|) ∪ π(|Kbar|) ⊆ π`.
+  have hNpi : Ch03.Subgroup.IsPiGroup π N := by
     intro r hr
-    have hrp : r ≠ p := fun h => hNp' (h ▸ Nat.dvd_of_mem_primeFactors hr)
-    simpa using hrp
-  have hNle : N ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G := Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi
+    rw [hcardN, Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hr
+    rcases Finset.mem_union.mp hr with h | h
+    · exact hπH r h
+    · exact hKbar_pi r h
+  have hNle : N ≤ Ch03.oPiCore π G := Ch03.Subgroup.IsPiGroup.le_oPiCore hNpi
   have hKN : Kbar = N.map q := (Subgroup.map_comap_eq_self_of_surjective hsurj Kbar).symm
   rw [hKN]; exact Subgroup.map_mono hNle
+
+/-- A normal subgroup with order prime to `p` is a `{p}ᶜ`-group. -/
+private theorem isPiGroup_compl_of_not_dvd {G : Type*} [Group G] {H : Subgroup G}
+    (hHp' : ¬ p ∣ Nat.card H) : Ch03.Subgroup.IsPiGroup (({p} : Set ℕ)ᶜ) H := by
+  intro r hr
+  have hrp : r ≠ p := fun h => hHp' (h ▸ Nat.dvd_of_mem_primeFactors hr)
+  simpa using hrp
 
 /-- **BG Lemma 1.21(b)** (mmd L567): if `H ⊴ G` is a normal `p'`-subgroup and `G/H` has
 `p`-length one, then `G` has `p`-length one. -/
@@ -109,14 +109,11 @@ theorem hasPLengthOne_of_isPiPrime_normal_quotient [Fact p.Prime] {G : Type*} [G
     (hquot : hasPLengthOne p (G ⧸ H)) : hasPLengthOne p G := by
   classical
   rw [hasPLengthOne_iff_card_quotient] at hquot ⊢
-  have hHle : H ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G := by
-    refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
-    intro r hr
-    have hrp : r ≠ p := fun h => hHp' (h ▸ Nat.dvd_of_mem_primeFactors hr)
-    simpa using hrp
+  have hHle : H ≤ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G :=
+    Ch03.Subgroup.IsPiGroup.le_oPiCore (isPiGroup_compl_of_not_dvd hHp')
   have hcorr : Ch03.oPiCore (({p} : Set ℕ)ᶜ) (G ⧸ H)
       = (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H) :=
-    oPiCore_compl_quotient_eq hHp'
+    oPiCore_quotient_eq_of_isPiGroup _ (isPiGroup_compl_of_not_dvd hHp')
   haveI hmapN : ((Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map (QuotientGroup.mk' H)).Normal :=
     Subgroup.Normal.map inferInstance (QuotientGroup.mk' H) (QuotientGroup.mk'_surjective H)
   -- `φ : (G/H)/O_{p'}(G/H) ≃* G/O_{p'}(G)`.
