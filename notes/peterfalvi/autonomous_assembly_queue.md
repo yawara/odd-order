@@ -427,6 +427,14 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **cover**(`exists_conjugatePairCover` 411): e/pair/N/hpairχ + pairUnion 被覆 + degree-monotone。tail = pairs[i,N)。
 - **build 着手**: `xStepData` per-step producer(enum=exists_pairUnion_memberFamily, tail=pairs[i,N), degrees=helpers, hsum=accumulator⊔tail=X partition sum)。最難 = hsum partition + htotal(piece1+Lagrange)。
 
+### ✅ 2026-06-07 building blocks 完備（10 commits this session, 残=monolith のみ）
+全 clean-decomposable building block landed: piece1(`sum_re_sq_Xset_eq`)/member-degree(`exists_index_primePow_degree_of_mem_S`)/vectorized(`exists_memberDegreeData`)/**htotal factorization(`index_mul_card_sub_factor`, 94e371b: idx·(|H|−|H:Z|)=|H:Z|·(idx·(|Z|−1)))**/leaves(θ=p^k, p≥3, |H:Z|=p^k)。+ 既存: enum(`exists_pairUnion_memberFamily_of_irreducible_X`)/Is Cor2.30(`exists_degree_sq_le_index`)/Lagrange/`sq_dvd_head_of_commonIndex_primePower_sums`(arith core)。
+**残 = monolith のみ(clean 分割不能)**:
+- **`xStepData` per-step**(~42 field の StepData term): hθsq_le_qtot=`exists_degree_sq_le_index (Z.subgroupOf H) hZcentral`(θχ²≤|H:Z|=qtot)/hqtot=`exists_primePow_card_quotient_of_isPGroup`/htotal=piece1(ℕ化)+`index_mul_card_sub_factor`/hsum=**accumulator⊔tail=X の partition sum**(最難, tail=pairs[i,N) を Finset κ で列挙, ∑member+∑tail を piece1 の ∑_X に一致, ~100行)/dmem,θmem,mmem=`exists_memberDegreeData`/enum=`exists_pairUnion_memberFamily`/i₁=xBaseBlock 最小次数 anchor。
+- **ν glue**(hagreeX/hagreeY/hmixed/hgen, assembler 7379 用): combined extension(別 ~100行)。
+- **capstone wiring**: by_cases Nonempty CoherenceTarget(上記構造)。
+**→ 全 ingredient 在、欠落 primitive 無し。残は sustained ~300行 assembly(per-commit 分割不能)で、focused session 向き。**
+
 ## 🔑 2026-06-06 (続) producer 簡約 + building blocks 完了（qtot:=|H:Z| 簡約が鍵）
 
 **重要簡約**: StepData の `qtot` は **θχ² でなく `qtot := |H:Z| = Nat.card(↥H⧸Z.subgroupOf H)`**（total の p-part 全体）を取ると激減:
