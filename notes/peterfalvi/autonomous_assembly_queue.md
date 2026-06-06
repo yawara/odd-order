@@ -412,6 +412,22 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
   中心 section (基本 Schur `exists_degree_sq_le_index`@SchurCenterBound では不足)。両者 framework/Clifford 要・最重。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
+## 🔑 2026-06-06 (続) producer 簡約 + building blocks 完了（qtot:=|H:Z| 簡約が鍵）
+
+**重要簡約**: StepData の `qtot` は **θχ² でなく `qtot := |H:Z| = Nat.card(↥H⧸Z.subgroupOf H)`**（total の p-part 全体）を取ると激減:
+- `total = ∑_X χ(1)² = idx·(|H|−|H:Z|) = idx·|H:Z|·(|Z|−1) = |H:Z|·(idx·(|Z|−1))`(Lagrange `|H|=|H:Z|·|Z|`)⟹ `htotal: total = qtot·c`, c:=idx·(|Z|−1)。**θχ²|total の square-divisibility 不要**。
+- `hqtot: qtot=p^mq` = `exists_primePow_card_quotient_of_isPGroup`(✅)。
+- `hθsq_le_qtot: θχ²≤|H:Z|` = **`IsIrreducibleCharacter.exists_degree_sq_le_index (Z.subgroupOf H) (hcentral: Z.subgroupOf H ≤ center ↥H)`**（中心 case 直接, N=⊥ quotient transport 不要; degree_sq_le_index_of_central_quotient より簡単）。Z⊆Z(H)=(6.6)仮説。
+
+**building blocks 全 landed (続8-13, 全 axiom-clean)**:
+- `exists_primePow_natDegree_of_isPGroup`(θ(1)=p^k) / `three_le_prime_of_isPGroup_of_odd`(p≥3) / `exists_primePow_card_quotient_of_isPGroup`(|H:Z|=p^k) / `sum_re_sq_Xset_eq`(piece1 total ℝ) / `exists_index_primePow_degree_of_mem_S`(χ(1)=idx·p^k) / `exists_memberDegreeData`(vectorized mmem)。+ 既存: `exists_pairUnion_memberFamily_of_irreducible_X`(enum, 5898) / `exists_degree_sq_le_index`(中心bound) / `index_H_eq_card_W1`(idx) / `coprimeIndexPrimePow`(idx coprime p) / `Subgroup.card_eq_card_quotient_mul_card_subgroup`(Lagrange)。
+
+**残 = monolithic producer def + glue（clean 増分なし, focused build 要）**:
+- **(A) hstepData per-step**: enum(✅)→ tailSet=X∖accumulator 列挙(intricate)→ 各 member degree(✅ data)→ θχ(χs i の source)→ **sum reindex**(∑_{Fin k}dmem²+∑tail = piece-1 の ∑_X; accumulator⊔tail=X 分割が核, ~100行)→ qtot=|H:Z|/c=idx·(|Z|−1)/htotal(Lagrange)→ θχ²≤|H:Z|(exists_degree_sq_le_index)→ StepData ⟨⟩ packaging。
+- **(B) ν glue**(hagreeX/hagreeY/hmixed/hgen): combined extension(別 ~100行)。
+- **(C) case split** hyp.cases(Frobenius branch 機構揃う; CertainType 別)。
+- **見積**: (A)~200行 + (B)~100行、intricate(特に sum reindex / tailSet)。**per-commit clean 単位に分割困難**ゆえ focused session 推奨(green まで commit 保留の連続 build)。
+
 ## 🛑 2026-06-06 LOOP PAUSE / handoff（leaf 相 完了, producer 相 へ）
 
 **到達点**: §6 reduction chain ((6.2)/(6.3)/(6.5)) 完成 + (6.6) piece 1 (X degree-sum 恒等式) + **piece-2 leaf 全landed**。capstone sorry (S08:7451) 解消に残るのは **(6.6) producer の組立 1 本 + ν glue** のみ（全 ingredient/enum/arith は揃っている、欠落 primitive 無し）。
