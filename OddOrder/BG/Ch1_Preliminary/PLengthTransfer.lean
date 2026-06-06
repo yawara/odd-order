@@ -205,4 +205,19 @@ theorem hasPLengthOne_of_isPGroup_normal_quotient [Fact p.Prime] {G : Type*} [Gr
   rw [(Nat.card_congr φ.toEquiv).symm]
   exact hquot
 
+/-- If `K ⊴ G` has `p`-group image in `G/O_{p'}(G)`, then `K ≤ O_{p',p}(G)`. (The `≤ O_{p',p}`
+half used for subgroup monotonicity Lemma 1.21(a): the image is a normal `p`-subgroup of
+`G/O_{p'}(G)`, hence lies in `O_p(G/O_{p'}(G))`, whose preimage is `O_{p',p}(G)`.) -/
+theorem le_oPiPrimePiCore_of_quotient_isPGroup [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {K : Subgroup G} [K.Normal]
+    (hK : IsPGroup p ↥(K.map (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)))) :
+    K ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) G := by
+  classical
+  set Op' : Subgroup G := Ch03.oPiCore (({p} : Set ℕ)ᶜ) G with hOp'
+  haveI : (K.map (QuotientGroup.mk' Op')).Normal :=
+    Subgroup.Normal.map inferInstance (QuotientGroup.mk' Op') (QuotientGroup.mk'_surjective Op')
+  have hle : K.map (QuotientGroup.mk' Op') ≤ Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Op') :=
+    Ch03.Subgroup.IsPiGroup.le_oPiCore (isPiGroup_singleton_of_isPGroup hK)
+  exact Subgroup.map_le_iff_le_comap.mp hle
+
 end OddOrder.BG.Ch1
