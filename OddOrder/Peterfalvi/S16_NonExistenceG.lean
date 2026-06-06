@@ -4543,6 +4543,141 @@ theorem step4_sigma_primeLine_prod_eq_one {hyp : Hypothesis (G := G)}
   rw [data.W2_inf_Q_eq_bot] at this
   simpa using this
 
+/-- A fixed point of an automorphism is fixed by every integer power of it. -/
+theorem zpow_apply_fixed {M : Type*} [Group M] (f : MulAut M) {z : M} (hf : f z = z)
+    (m : ℤ) : (f ^ m) z = z := by
+  have hfinv : (f⁻¹) z = z := by
+    have h1 : (f⁻¹ * f) z = z := by rw [inv_mul_cancel]; rfl
+    rwa [MulAut.mul_apply, hf] at h1
+  induction m using Int.induction_on with
+  | zero => simp
+  | succ k ih => rw [zpow_add_one, MulAut.mul_apply, hf, ih]
+  | pred k ih => rw [zpow_sub_one, MulAut.mul_apply, hfinv, ih]
+
+/-- **BG Appendix C, Remark (X), `s`-only form**: if `x ∈ ⁅Q, W₂⁆` is fixed by
+conjugation by the single generator `s`, then `x = 1`.  Since `W₂ = ⟨s⟩`, being
+`s`-fixed is being `W₂`-fixed, and `(X)` (`C_Q(W₂) ∩ ⁅Q,W₂⁆ = 1`) applies. -/
+theorem w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed [Finite G]
+    {hyp : Hypothesis (G := G)} (data : FieldNormalizerData hyp) {x : ↥hyp.base.Q}
+    (hx : x ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut)
+    (hsfix : data.w2ConjQAut ⟨data.s, data.s_mem_W2⟩ x = x) :
+    x = 1 := by
+  apply data.w2ConjQAut_eq_one_of_mem_actionCommutator_of_fixed hx
+  intro w
+  obtain ⟨n, hn⟩ : ∃ n : ℤ, (⟨data.s, data.s_mem_W2⟩ : ↥hyp.base.W2) ^ n = w := by
+    have hwz : (w : G) ∈ Subgroup.zpowers data.s := by
+      rw [← data.W2_eq_zpowers_s]; exact w.2
+    obtain ⟨n, hn⟩ := hwz
+    exact ⟨n, Subtype.ext (by rw [SubgroupClass.coe_zpow]; exact hn)⟩
+  rw [← hn, map_zpow]
+  exact zpow_apply_fixed _ hsfix n
+
+/-- **BG Appendix C, Lemma C.3 Step 4 kernel identity** (mmd L5060–5076): from the
+displayed relation `(C.10)`, BG's `y ∈ ⁅Q, W₂⁆` lies in the kernel of
+`(s⁻¹ + 1 - s₁⁻¹s⁻¹ - s₃)(s⁻¹ - 1)`; the fixed-point-free action of `s` (Remark (X))
+removes the factor `(s⁻¹ - 1)`, leaving `Y_B = 1`, i.e. `s₁ t₁⁻¹ t⁻¹ = t⁻¹ t₃⁻¹ s₃`
+where `tᵢ = y⁻¹ sᵢ y`.  We produce this relation with the explicit conjugator `yc`. -/
+theorem step4_relation_5076 [Finite G] {hyp : Hypothesis (G := G)}
+    (data : FieldNormalizerData hyp) {c1 c2 c3 : ZMod hyp.base.p}
+    (hC10 : data.t ^ 2 * data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+        data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c2) *
+          data.t⁻¹ * data.sigma (fieldNormalizerPrimeLineElement hyp c3) = 1) :
+    ∃ yc : G, data.t = yc⁻¹ * data.s * yc ∧
+      data.sigma (fieldNormalizerPrimeLineElement hyp c1) *
+          (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c1))⁻¹ * yc) * data.t⁻¹ =
+        data.t⁻¹ * (yc⁻¹ * (data.sigma (fieldNormalizerPrimeLineElement hyp c3))⁻¹ * yc) *
+          data.sigma (fieldNormalizerPrimeLineElement hyp c3) := by
+  classical
+  letI : CommGroup ↥hyp.base.Q :=
+    { (inferInstance : Group ↥hyp.base.Q) with
+      mul_comm := data.Q_elementaryAbelian.comm }
+  set s1 := data.sigma (fieldNormalizerPrimeLineElement hyp c1) with hs1def
+  set s2 := data.sigma (fieldNormalizerPrimeLineElement hyp c2) with hs2def
+  set s3 := data.sigma (fieldNormalizerPrimeLineElement hyp c3) with hs3def
+  have hs1W : s1 ∈ hyp.base.W2 := data.sigma_primeLineElement_mem_W2 c1
+  have hs3W : s3 ∈ hyp.base.W2 := data.sigma_primeLineElement_mem_W2 c3
+  -- `s₁ s₂ s₃ = 1` (mod-Q collapse), hence `s₂ = s₁⁻¹ s₃⁻¹`.
+  have hs123 : s1 * s2 * s3 = 1 := data.step4_sigma_primeLine_prod_eq_one hC10
+  have h12 : s1 * s2 = s3⁻¹ := eq_inv_of_mul_eq_one_left hs123
+  have hs2eq : s2 = s1⁻¹ * s3⁻¹ := by rw [← h12]; group
+  -- Remark (XI): a conjugator `yc = yD⁻¹ ∈ ⁅Q, W₂⁆` with `t = yc⁻¹ s yc`.
+  obtain ⟨yD, hyD_mem, hyD_conj⟩ := data.exists_yD_mem_actionCommutator_conj_s_eq_t
+  set Yq : ↥hyp.base.Q := yD⁻¹ with hYqdef
+  have hYq_mem : Yq ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut := inv_mem hyD_mem
+  set yc : G := (Yq : G) with hycdef
+  have hyc_eq : yc = (yD : G)⁻¹ := by rw [hycdef, hYqdef, InvMemClass.coe_inv]
+  have hty : data.t = yc⁻¹ * data.s * yc := by
+    rw [hyc_eq, inv_inv, ← hyD_conj, MulAut.conj_apply]
+  refine ⟨yc, hty, ?_⟩
+  -- `W₂` elements used as conjugators.
+  set sW : ↥hyp.base.W2 := ⟨data.s, data.s_mem_W2⟩ with hsWdef
+  set s1W : ↥hyp.base.W2 := ⟨s1, hs1W⟩ with hs1Wdef
+  set s3W : ↥hyp.base.W2 := ⟨s3, hs3W⟩ with hs3Wdef
+  have hsW_coe : (sW : G) = data.s := rfl
+  have hs1W_coe : (s1W : G) = s1 := rfl
+  have hs3W_coe : (s3W : G) = s3 := rfl
+  -- BG's `Y_B` (the four-fold conjugate, `(5074)`), as an element of `⁅Q, W₂⁆`.
+  set YB : ↥hyp.base.Q :=
+    (data.w2ConjQAut s3W⁻¹ Yq)⁻¹ * data.w2ConjQAut sW Yq *
+      (data.w2ConjQAut (sW * s1W) Yq)⁻¹ * Yq with hYBdef
+  have hinv := OddOrder.Isaacs.Ch03.IsAInvariant.actionCommutator data.w2ConjQAut
+  have hYB_mem : YB ∈ OddOrder.Isaacs.Ch04.actionCommutator data.w2ConjQAut := by
+    rw [hYBdef]
+    exact mul_mem (mul_mem (mul_mem (inv_mem (hinv.smul_mem _ hYq_mem))
+      (hinv.smul_mem _ hYq_mem)) (inv_mem (hinv.smul_mem _ hYq_mem))) hYq_mem
+  -- `(Y_B : G)` is BG's `s₃⁻¹ t₃ t s₁ t₁⁻¹ t⁻¹` (mmd `(5074)`).
+  have hYB_coe : (YB : G) =
+      (s3⁻¹ * yc * s3)⁻¹ * (data.s * yc * data.s⁻¹) *
+        (data.s * s1 * yc * s1⁻¹ * data.s⁻¹)⁻¹ * yc := by
+    rw [hYBdef]
+    simp only [Subgroup.coe_mul, InvMemClass.coe_inv, data.w2ConjQAut_apply_coe,
+      hsW_coe, hs1W_coe, hs3W_coe, hycdef]
+    group
+  -- BG's `(5060)` element `⋆`, the six-fold conjugate product.
+  set starQ : ↥hyp.base.Q :=
+    Yq⁻¹ * data.w2ConjQAut (sW * sW) Yq * (data.w2ConjQAut (sW * (sW * s1W)) Yq)⁻¹ *
+      data.w2ConjQAut (sW * s1W) Yq * (data.w2ConjQAut (sW * s3W⁻¹) Yq)⁻¹ *
+        data.w2ConjQAut s3W⁻¹ Yq with hstarQdef
+  -- (B) `⋆ = (C.10)`-LHS `= 1` (the `(5060)` regrouping, using `s₂ = s₁⁻¹ s₃⁻¹`).
+  have hstarQ_coe : (starQ : G) =
+      data.t ^ 2 * s1 * data.t⁻¹ * s2 * data.t⁻¹ * s3 := by
+    sorry
+  have hstarQ1 : starQ = 1 := by
+    apply Subtype.ext
+    rw [hstarQ_coe, hC10, OneMemClass.coe_one]
+  -- (A) `(s • Y_B) · Y_B⁻¹ = ⋆` (abelian regrouping inside `⁅Q, W₂⁆`).
+  have hA : data.w2ConjQAut sW YB * YB⁻¹ = starQ := by
+    have hadd : (Additive.ofMul (data.w2ConjQAut sW YB * YB⁻¹) :
+        Additive ↥hyp.base.Q) = Additive.ofMul starQ := by
+      rw [hYBdef, hstarQdef]
+      simp only [map_mul, map_inv, MulAut.mul_apply, mul_inv_rev, inv_inv, ofMul_mul,
+        ofMul_inv]
+      abel
+    exact Additive.ofMul.injective hadd
+  have hβfix : data.w2ConjQAut sW YB = YB :=
+    mul_inv_eq_one.mp (by rw [hA]; exact hstarQ1)
+  have hYB1 : YB = 1 :=
+    data.w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed hYB_mem hβfix
+  -- unwind `Y_B = 1` to `(5074)`, hence the `(5076)` relation.
+  have hR1 : (s3⁻¹ * yc * s3)⁻¹ * (data.s * yc * data.s⁻¹) *
+      (data.s * s1 * yc * s1⁻¹ * data.s⁻¹)⁻¹ * yc = 1 := by
+    rw [← hYB_coe, hYB1, OneMemClass.coe_one]
+  have hW : s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc) * s1 *
+      (yc⁻¹ * s1⁻¹ * yc) * (yc⁻¹ * data.s⁻¹ * yc) = 1 := by
+    rw [show s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc) * s1 *
+          (yc⁻¹ * s1⁻¹ * yc) * (yc⁻¹ * data.s⁻¹ * yc) =
+        (s3⁻¹ * yc * s3)⁻¹ * (data.s * yc * data.s⁻¹) *
+          (data.s * s1 * yc * s1⁻¹ * data.s⁻¹)⁻¹ * yc from by group]
+    exact hR1
+  rw [hty, ← mul_inv_eq_one,
+    show s1 * (yc⁻¹ * s1⁻¹ * yc) * (yc⁻¹ * data.s * yc)⁻¹ *
+        ((yc⁻¹ * data.s * yc)⁻¹ * (yc⁻¹ * s3⁻¹ * yc) * s3)⁻¹ =
+      (s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc))⁻¹ *
+        (s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc) * s1 *
+          (yc⁻¹ * s1⁻¹ * yc) * (yc⁻¹ * data.s⁻¹ * yc)) *
+        (s3⁻¹ * (yc⁻¹ * s3 * yc) * (yc⁻¹ * data.s * yc)) from by group,
+    hW, mul_one, inv_mul_cancel]
+
 end Step4
 
 end FieldNormalizerData
