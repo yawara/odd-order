@@ -155,6 +155,12 @@ route A で ZIrr は解決済。残は §6 degree-bound machinery (B1/B2 が fou
 **genuinely 残る char-bound gap = 1 件のみ (member-family enum)**:
 🔴 **member-family enum 構成 + (6.2)/(6.3) assembly** — B1 が消費する S(A)/S₁ 列挙 (s/χmem/deg + ~15 orthogonality/support/gen/S₁-membership 仮説; S₁/S₂ from (C.b))。これを構成して B1+B2+θ-bound を組めば (6.2) `2|L:C|√|C:D|≥|K:A|−1`、minimal-A 帰納で (6.3) char-bound。**B1/B2/θ-bound/算術は全 landed**ゆえ、char-bound (= (6.5) の唯一の残) は **member-family enum 構成だけにブロックされる**。enum は **capstone glue/hstepData と共有の核** (Frobenius case では全 Ind θ 既約ゆえ S(A)={distinct Ind θ}、enum はその列挙)。X-chain 側 enum (`xAdjoinStepInput_of_memberFamily_*`) は Irr-L X-side で別物だが構造類似。**= 全 (6.8) capstone 残務の単一 bottleneck**。
 
+### ✅ 2026-06-06: (C.b) S₁/S₂ first-obstruction 分解 landed (commit 5f8be45, axiom-clean)
+上の (6.2) gap の前半「S₁/S₂ from (C.b)」を **honest に構成**(仮説 hoist でなく実証明):
+- **`exists_coherentBreakPair`** (S08, abstract over τ/A): `Sa ⊆ Sb` (conj-closed irreducible, Sb finite real-free), Sa coherent ∧ Sb 非coherent ⟹ ∃ S₁ (conj-closed, Sa⊆S₁⊆Sb) + ψ∈Sb で S₁ coherent ∧ `S₁∪{ψ,ψ̄}` 非coherent。= (6.2) 冒頭「By (b), there are sets S₁ and S₂={ψ,ψ̄}...S₁ coherent but S₁∪S₂ not」そのもの。**構成**: `exists_conjugatePairCover` で Sb∖Sa を共役 pair 列挙 → 走行 union `pairUnion Sa pair i` が Sa(coherent)→Sb(非)へ上昇 → 離散 first-failure `exists_index_predicate_break` (新 generic Nat lemma) で最初に coherence を壊す pair を抽出。`pairUnion` の conj-closure/cover (`pairUnion_eq_of_enumCover`/`pairUnion_succ_eq_union_pair`) は S07 既存。
+- **`S_hasNoRealCharacters`/`SsubFiltration_hasNoRealCharacters`** (Frobenius case): S(A)⊆S の各 χ=Ind θ は degree `|W₁|·θ(1)≥|W₁|>1` ∴ ≠trivial、odd order で非実 (1.1)。`exists_coherentBreakPair` の Sb real-free 入力 (Sibley S(A) 適用形) を供給。
+- **⟹ (6.2) の残 gap = member-family enum のみ**(S₁ を B1 に渡す flat family + degree-ratio/support/gen 諸 field 構成)。first-obstruction は **enum 非依存**で先行 landable だった。B1 適用には依然 enum (s/χmem/deg + ~15 field) が必要で、これが (6.5) bound の単一 bottleneck のまま。次手 = **S₁ の member-family enum** (`exists_finEnum_irreducible` + 諸 property 放電; degree-ratio `deg`/`hmemdegdiffsupp`/`hSgen`/`hgen`/`htau1_memaχ` が subtle 部)。
+
 ### §6 degree-bound machinery 進捗 (2026-06-04, route A 後の継続)
 - ✅ **B2 ingredient 1** (commit 90d67af, axiom-clean, full build 3562): `sumInflatedDegreeSq_ntrivial`
   (`OddOrder.RepresentationTheory`, InflationCharacter.lean:332) = `∑_{χ∈Irr G, N⊆ker χ, χ≠1}χ(1)²=|G⧸N|−1`
