@@ -1954,6 +1954,10 @@ set_option linter.style.longLine false in
 -- member-family bound.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sum_re_sq_induce_kernelFilter_eq
+-- (6.2) core inequality `|K:A|−1 ≤ 2ψ(1)`: the member-family degree-square bound `∑_{S₁} ≤ 2ψ(1)χ₁(1)`
+-- combined (via `S(A) ⊆ S₁`) with the real B2 identity `∑_{S(A)} = |L:H|(|H:A|−1)`, cancelling |L:H|.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_index_le_two_psi
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

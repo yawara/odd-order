@@ -4920,6 +4920,7 @@ theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L) (deg : Fin k → ℕ) (a : ℕ),
+      Function.Injective χmem ∧
       Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
       (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * χ₁ 1) ∧
       ψ 1 = (a : ℂ) * χ₁ 1 ∧
@@ -4975,7 +4976,7 @@ theorem sMember_degreeSumBound_of_not_coherent (hyp : SibleyDadeHypothesis G L H
     (χ := ψ) (chibar := ψ.conj) (chi1 := (χmem i₁ : ClassFunction ↥L ℂ)) (a := a)
     hSgen hψratio hbar1 hchi1_ne h1A
   -- (8) feed everything to B1
-  refine ⟨k, χmem, deg, a, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
+  refine ⟨k, χmem, deg, a, hχinj, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
     by rw [hψratio, hi₁eq], ?_⟩
   have hbound := coherentDegreeSumBound_of_not_coherent hyp.dade hyp.hconj hS₁coh
     ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ hψ_S1 hψbar_S1
@@ -5007,16 +5008,17 @@ theorem sMember_degreeSqReBound_of_not_coherent (hyp : SibleyDadeHypothesis G L 
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
       Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
       (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
       ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 ≤
         2 * (ψ 1).re * (χ₁ 1).re := by
-  obtain ⟨k, χmem, deg, a, hrange, hdeg_eq, hψ_eq, hbound⟩ :=
+  obtain ⟨k, χmem, deg, a, hχinj, hrange, hdeg_eq, hψ_eq, hbound⟩ :=
     hyp.sMember_degreeSumBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
       hψS hψirr hψnotS1 hψcnotS1 hnc
   have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
     intro j; rw [← hrange]; exact ⟨j, rfl⟩
-  refine ⟨k, χmem, hrange, hmemS1, ?_⟩
+  refine ⟨k, χmem, hχinj, hrange, hmemS1, ?_⟩
   -- real parts of the degree relations
   have hdegre : ∀ j, ((χmem j : ClassFunction ↥L ℂ) 1).re = (deg j : ℝ) * (χ₁ 1).re := by
     intro j
@@ -5082,6 +5084,69 @@ theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
     rw [Complex.ofReal_sum, Finset.sum_congr rfl (fun χ hχ => (hsummand χ hχ).symm), hB2]
     push_cast; ring
   exact Complex.ofReal_inj.mp key
+
+open scoped Classical in
+/-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
+
+Combines the member-family degree-square bound `sMember_degreeSqReBound_of_not_coherent`
+(`∑_{χ∈S₁} χ(1).re² ≤ 2ψ(1).re·χ₁(1).re`) with the real B2 identity `sum_re_sq_induce_kernelFilter_eq`
+(`∑_{χ∈S(A)} χ(1).re² = |L:H|·(|H:A| − 1)`).  Since `S(A) ⊆ S₁`, the `S(A)`-sum is bounded by the
+`S₁`-sum, and with `χ₁(1) = |W₁| = |L:H|` (cancelling the positive index `|L:H|`) this gives
+`|H:A| − 1 ≤ 2ψ(1)`.  This is the (6.2) bound `2ψ(1) ≥ |K:A| − 1` (with `K = H`); composing with the
+θ-bound `ψ(1) ≤ |L:C|√|C:D|` yields the full (6.2) `2|L:C|√|C:D| ≥ |K:A| − 1`. -/
+theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {A : Subgroup ↥L} [A.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite) (hSA_S1 : hyp.SsubFiltration A ⊆ S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  obtain ⟨k, χmem, hχinj, hrange, hmemS1, hfambound⟩ :=
+    hyp.sMember_degreeSqReBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hcfinj : Function.Injective (fun j => (χmem j : ClassFunction ↥L ℂ)) :=
+    fun a b h => hχinj (Subtype.ext h)
+  have hB2 := hyp.sum_re_sq_induce_kernelFilter_eq hF (A := A)
+  set SA := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) with hSAdef
+  -- the `S(A)` Finset is contained in the enumerated `S₁`-range Finset
+  have hsub : SA ⊆ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    exact hSA_S1 (by rw [hyp.mem_SsubFiltration]; exact ⟨θ, hne, hker, rfl⟩)
+  have hchain : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) ≤
+      2 * (ψ 1).re * (χ₁ 1).re := by
+    rw [← hB2]
+    calc ∑ χ ∈ SA, ((χ 1).re) ^ 2
+        ≤ ∑ χ ∈ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset, ((χ 1).re) ^ 2 :=
+          Finset.sum_le_sum_of_subset_of_nonneg hsub (fun _ _ _ => sq_nonneg _)
+      _ = ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 :=
+          sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
+      _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
+  have hχ₁re : (χ₁ 1).re = (H.index : ℝ) := by
+    rw [hχ₁deg, Complex.natCast_re, hyp.index_H_eq_card_W1]
+  rw [hχ₁re] at hchain
+  have hidx_pos : (0 : ℝ) < (H.index : ℝ) := by
+    rw [hyp.index_H_eq_card_W1]; exact_mod_cast Nat.card_pos
+  have key : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) ≤
+      (H.index : ℝ) * (2 * (ψ 1).re) := by
+    calc (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+        ≤ 2 * (ψ 1).re * (H.index : ℝ) := hchain
+      _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
+  exact le_of_mul_le_mul_left key hidx_pos
 
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
