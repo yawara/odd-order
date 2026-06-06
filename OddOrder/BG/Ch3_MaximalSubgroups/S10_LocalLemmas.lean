@@ -374,6 +374,107 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
   have h2 := congrArg (Subgroup.map Z.subtype) h1
   rwa [Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_subgroupOf_eq_of_le hK₀_le_Z] at h2
 
+/-! ## Helpers for Lemma 10.12 -/
+
+/-- A Sylow `p`-subgroup `P` of `G` contained in `K ≤ G` restricts to a Sylow `p`-subgroup of
+`↥K` with carrier `P.subgroupOf K` (replicates the private `S07.sylow_subgroupOf_of_le`). -/
+private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : Sylow p G)
+    {K : Subgroup G} (hPK : (P : Subgroup G) ≤ K) :
+    ∃ Q : Sylow p ↥K, (Q : Subgroup ↥K) = (P : Subgroup G).subgroupOf K := by
+  have hpg : IsPGroup p ↥((P : Subgroup G).subgroupOf K) := by
+    obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]; exact hn)
+  have hidx : ¬ p ∣ ((P : Subgroup G).subgroupOf K).index := fun h =>
+    P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
+  exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
+
+/-- **Core of BG Lemma 10.12** (book p.79): if `p ∈ σ(M) ∩ σ(H)` with `M`, `H` non-conjugate
+maximal subgroups, then `p ∉ α(M)` and `M_σ` is not nilpotent. The argument takes a common
+Sylow `p`-subgroup `S` of `G` lying in `M` and in a conjugate `H^g` (`M ≠ H^g`); the Uniqueness
+Theorem forces `r(S) ≤ 2` (whence `p ∉ α(M)`), and `N_G(S) ⊆ H^g ≠ M` makes `S` non-normal in
+`M`, ruling out `M_σ` nilpotent (else its Sylow `S` would be characteristic in `M_σ ⊴ M`). -/
+private theorem mem_sigma_inter_sigma_imp [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = H) {p : ℕ} [Fact p.Prime]
+    (hpM : p ∈ sigma M) (hpH : p ∈ sigma H) :
+    p ∉ alpha M ∧ ¬ Group.IsNilpotent ↥(Msigma M) := by
+  classical
+  obtain ⟨SM, hSM_le, _hSM_norm⟩ := exists_sylow_le_normalizer_le_of_mem_sigma hpM
+  obtain ⟨SH, hSH_le, hSH_norm⟩ := exists_sylow_le_normalizer_le_of_mem_sigma hpH
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G SH SM
+  set Hg : Subgroup G := MulAut.conj g • H with hHg
+  have hSMeq : (SM : Subgroup G) = MulAut.conj g • (SH : Subgroup G) := by
+    rw [← hg, Sylow.coe_subgroup_smul]
+  have hS_le_Hg : (SM : Subgroup G) ≤ Hg := by
+    rw [hSMeq, hHg]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hSH_le
+  have hSnorm_Hg : Subgroup.normalizer ((SM : Subgroup G) : Set G) ≤ Hg := by
+    have h1 : (SM : Subgroup G) = (SH : Subgroup G).map (MulAut.conj g : G →* G) :=
+      hSMeq.trans (conjSmul_eq_map _ _)
+    rw [h1, ← Subgroup.map_normalizer_eq_of_bijective _ (MulAut.conj g).bijective, hHg,
+      show (MulAut.conj g • H) = H.map (MulAut.conj g : G →* G) from conjSmul_eq_map _ _]
+    exact Subgroup.map_mono hSH_norm
+  -- `M ≠ H^g` and both are maximal.
+  have hHg_max : IsCoatom Hg := by
+    rw [hHg, conjSmul_eq_map]
+    exact (OrderIso.isCoatom_iff ((MulAut.conj g).mapSubgroup) H).mpr (mem_maximalSubgroups.mp hH)
+  have hMne : M ≠ Hg := by
+    intro heq
+    exact hnc ⟨g⁻¹, by rw [heq, hHg, map_inv]; exact inv_smul_smul _ _⟩
+  have hMlt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1
+  refine ⟨?_, ?_⟩
+  · -- `p ∉ α(M)`: otherwise `r(S) ≥ 3` makes `S` uniquely maximal, forcing `M = H^g`.
+    rw [mem_alpha_iff]
+    rintro ⟨-, hr3⟩
+    have hrank3 : 3 ≤ rank ↥(SM : Subgroup G) := by
+      obtain ⟨SM', hSM'⟩ := sylow_subgroupOf_of_le SM hSM_le
+      have e2 : pRank ↥(SM' : Subgroup ↥M) p ≤ pRank ↥(SM : Subgroup G) p := by
+        rw [hSM']
+        exact pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hSM_le).toMonoidHom)
+          (Subgroup.subgroupOfEquivOfLe hSM_le).injective
+      calc (3 : ℕ) ≤ pRank ↥M p := hr3
+        _ = pRank ↥(SM' : Subgroup ↥M) p := (pRank_sylow_eq SM').symm
+        _ ≤ pRank ↥(SM : Subgroup G) p := e2
+        _ ≤ rank ↥(SM : Subgroup G) := pRank_le_rank p
+    have hSlt : (SM : Subgroup G) < ⊤ := lt_of_le_of_lt hSM_le hMlt
+    have hSU : IsUniquelyMaximal (SM : Subgroup G) :=
+      OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_three_le_rank_of_lt_top hG hSlt hrank3
+    exact hMne (hSU.eq_of_isCoatom_of_le (mem_maximalSubgroups.mp hM) hSM_le hHg_max hS_le_Hg)
+  · -- `M_σ` not nilpotent: otherwise `S` (Sylow of `M_σ`) is characteristic, so `M ≤ N_G(S) ⊆ H^g`.
+    intro hnil
+    have hM_norm_Mσ : M ≤ Subgroup.normalizer ((Msigma M) : Set G) := by
+      rw [Msigma, OddOrder.GroupTheory.opiCoreInG]
+      have hle := Subgroup.le_normalizer_map (H := Ch03.oPiCore (sigma M) ↥M) M.subtype
+      rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hle
+    have hSM_pi : Ch03.Subgroup.IsPiGroup (sigma M) (SM : Subgroup G) := by
+      intro q hq
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp SM.isPGroup'
+      have hq_prime := (Nat.mem_primeFactors.mp hq).1
+      have hqdvd : q ∣ p ^ k := hk ▸ (Nat.mem_primeFactors.mp hq).2.1
+      have hqp : q = p :=
+        (Nat.prime_dvd_prime_iff_eq hq_prime (Fact.out : p.Prime)).mp
+          (hq_prime.dvd_of_dvd_pow hqdvd)
+      rw [hqp]; exact hpM
+    have hS_le_Msigma : (SM : Subgroup G) ≤ Msigma M :=
+      sigma_subgroup_le_Msigma_of_isHall (Msigma_isHall hG hM) hSM_le hSM_pi
+    obtain ⟨SMσ, hSMσ⟩ := sylow_subgroupOf_of_le SM hS_le_Msigma
+    haveI := hnil
+    haveI hSMσ_normal : (SMσ : Subgroup ↥(Msigma M)).Normal := Ch01.Sylow.normal_of_isNilpotent SMσ
+    haveI hSMσ_char : (SMσ : Subgroup ↥(Msigma M)).Characteristic :=
+      Sylow.characteristic_of_normal SMσ hSMσ_normal
+    have hSM_eq_map : (SMσ : Subgroup ↥(Msigma M)).map (Msigma M).subtype = (SM : Subgroup G) := by
+      rw [hSMσ, Subgroup.map_subgroupOf_eq_of_le hS_le_Msigma]
+    have hM_le_NS : M ≤ Subgroup.normalizer ((SM : Subgroup G) : Set G) := by
+      calc M ≤ Subgroup.normalizer ((Msigma M) : Set G) := hM_norm_Mσ
+        _ ≤ Subgroup.normalizer
+              (((SMσ : Subgroup ↥(Msigma M)).map (Msigma M).subtype : Subgroup G) : Set G) :=
+            OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+        _ = Subgroup.normalizer ((SM : Subgroup G) : Set G) := by rw [hSM_eq_map]
+    have hMHg : M ≤ Hg := le_trans hM_le_NS hSnorm_Hg
+    rcases eq_or_lt_of_le hMHg with heq | hlt
+    · exact hMne heq
+    · exact (mem_maximalSubgroups.mp hHg_max).1 ((mem_maximalSubgroups.mp hM).2 Hg hlt)
+
 /-! ## Lemma 10.12 — 非共役 maximal の σ-disjointness (mmd L2885) -/
 
 /-- **BG Lemma 10.12** (mmd L2885): `M, H ∈ ℳ` が `G` で非共役なら、
@@ -385,7 +486,33 @@ theorem disjoint_of_not_conj [Finite G] (hG : IsMinimalSimpleOdd G)
     (Malpha M ⊓ Msigma H = ⊥ ∧ alpha M ∩ sigma H = ∅) ∧
     (Group.IsNilpotent ↥(Msigma M) →
       Msigma M ⊓ Msigma H = ⊥ ∧ sigma M ∩ sigma H = ∅) := by
-  sorry
+  classical
+  -- (a) prime-set disjointness from the core lemma.
+  have hα_disj : alpha M ∩ sigma H = ∅ := by
+    rw [Set.eq_empty_iff_forall_notMem]
+    rintro p ⟨hpα, hpσH⟩
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpα.1⟩
+    exact (mem_sigma_inter_sigma_imp hG hM hH hnc (alpha_subset_sigma hG hM hpα) hpσH).1 hpα
+  refine ⟨⟨?_, hα_disj⟩, ?_⟩
+  · -- `M_α ⊓ H_σ = ⊥`: `π(M_α ⊓ H_σ) ⊆ α(M) ∩ σ(H) = ∅`.
+    refine inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl (π := alpha M)
+      (fun q hq => Malpha_isPiGroup M q hq) (fun q hq hqα => ?_)
+    have hmem : q ∈ alpha M ∩ sigma H := ⟨hqα, Msigma_isPiGroup H q hq⟩
+    rw [hα_disj] at hmem
+    exact absurd hmem (Set.notMem_empty q)
+  · -- (b) under `M_σ` nilpotent.
+    intro hMσnil
+    have hσ_disj : sigma M ∩ sigma H = ∅ := by
+      rw [Set.eq_empty_iff_forall_notMem]
+      rintro p ⟨hpσM, hpσH⟩
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hpσM.1⟩
+      exact (mem_sigma_inter_sigma_imp hG hM hH hnc hpσM hpσH).2 hMσnil
+    refine ⟨?_, hσ_disj⟩
+    refine inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl (π := sigma M)
+      (fun q hq => Msigma_isPiGroup M q hq) (fun q hq hqσM => ?_)
+    have hmem : q ∈ sigma M ∩ sigma H := ⟨hqσM, Msigma_isPiGroup H q hq⟩
+    rw [hσ_disj] at hmem
+    exact absurd hmem (Set.notMem_empty q)
 
 /-! ## Lemma 10.13 — `Ω₁(Z(P))` と rank-two elementary abelian subgroup (PDF p.79) -/
 
