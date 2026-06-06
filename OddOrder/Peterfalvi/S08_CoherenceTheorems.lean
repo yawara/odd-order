@@ -7960,6 +7960,63 @@ theorem exists_xBaseBlock_anchor_index (hyp : SibleyDadeHypothesis G L H) {Z : S
   have hi₁' : (χmem i₁ : ClassFunction ↥L ℂ) = φ := hi₁
   exact ⟨i₁, by rw [hi₁']; exact hφ⟩
 
+/-- **Tail-degree lower bound (finding #6 `htail_le` core).**  An `X`-member `φ` outside the running
+prefix `pairUnion (xBaseBlock Z) pair i` has degree at least that of the current pair head
+`(pair i).1`.  Proof: by `hcover`, `φ` is in the base block or some pair `j < N`; it is not in the
+base (`⊆` prefix), so `φ ∈ pairSet pair j`; and `φ ∉ prefix` forces `j ≥ i` (pairs `< i` lie in the
+prefix), so by degree-monotonicity (`hmono`) `(pair i).1(1) ≤ (pair j).1(1) = φ(1)`.  This is the
+step where Xset-cover completeness (`hcover`) is genuinely used. -/
+theorem characterDegree_re_le_of_not_mem_pairUnion (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L}
+    {pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ} {N : ℕ}
+    {χs : ℕ → IrreducibleCharacter ↥L}
+    (hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
+    (hmono : ∀ j, j + 1 < N →
+      (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair (j + 1)).1).re)
+    (hcover : ∀ φ ∈ hyp.Xset Z, φ ∈ hyp.xBaseBlock Z ∨
+      ∃ j, j < N ∧ φ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+    {i : ℕ} (hi : i < N)
+    {φ : ClassFunction ↥L ℂ} (hφX : φ ∈ hyp.Xset Z)
+    (hφnot : φ ∉ OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) (hyp.xBaseBlock Z) pair i) :
+    (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤
+      (OddOrder.Peterfalvi.S03.characterDegree φ).re := by
+  -- degree-monotone chaining: `a ≤ b < N ⟹ deg (pair a).1 ≤ deg (pair b).1`
+  have hchain : ∀ d a : ℕ, a + d < N →
+      (OddOrder.Peterfalvi.S03.characterDegree (pair a).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair (a + d)).1).re := by
+    intro d
+    induction d with
+    | zero => intro a _; simp
+    | succ d ih =>
+      intro a haN
+      have h1 := ih a (by omega)
+      have h2 := hmono (a + d) (by omega)
+      have : a + (d + 1) = (a + d) + 1 := by omega
+      rw [this]
+      exact le_trans h1 h2
+  -- `φ` is in some pair `j`, and `j ≥ i`
+  rcases hcover φ hφX with hbase | ⟨j, hjN, hjpair⟩
+  · exact absurd (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inl hbase)) hφnot
+  · have hij : i ≤ j := by
+      by_contra hlt
+      push_neg at hlt  -- j < i
+      exact hφnot (OddOrder.Peterfalvi.S07.mem_pairUnion.mpr (Or.inr ⟨j, hlt, hjpair⟩))
+    have hdeg_ij : (OddOrder.Peterfalvi.S03.characterDegree (pair i).1).re ≤
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re := by
+      have := hchain (j - i) i (by omega)
+      rwa [Nat.add_sub_cancel' hij] at this
+    -- `φ` equals `(pair j).1` or `(pair j).2`, both of degree `(pair j).1(1)`
+    have hφdeg : (OddOrder.Peterfalvi.S03.characterDegree φ).re =
+        (OddOrder.Peterfalvi.S03.characterDegree (pair j).1).re := by
+      simp only [OddOrder.Peterfalvi.S07.pairSet, Set.mem_insert_iff,
+        Set.mem_singleton_iff] at hjpair
+      rcases hjpair with h | h
+      · rw [h]
+      · rw [h, hpair1 j hjN, hpair0 j hjN]; simp
+    rw [hφdeg]; exact hdeg_ij
+
 /-- **(6.8.1), Frobenius case:** chain-level coherence for
 `X = S - S(H')`, using common-index p-power data.
 
