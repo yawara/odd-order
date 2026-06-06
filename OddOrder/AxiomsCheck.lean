@@ -1930,6 +1930,10 @@ set_option linter.style.longLine false in
 -- degree-`|W₁|` anchor, layering on the member-family core.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_sMemberDegreeData
+-- (6.2) anchor existence: `S(A)` has a degree-`|W₁|` member (degree-1 source of `H/A` inflated and
+-- induced), discharging the `hanchordeg` of `exists_sMemberDegreeData`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_mem_SsubFiltration_degree_W1
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

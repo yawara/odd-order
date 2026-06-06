@@ -4775,6 +4775,24 @@ theorem exists_sMemberDegreeData (hyp : SibleyDadeHypothesis G L H)
     mul_right_cancel₀ hW1ne (by rw [one_mul]; exact h.symm)
   exact_mod_cast hdeg1
 
+/-- **(6.2) anchor existence: `S(A)` contains a member of the minimal degree `|W₁|`.**
+
+When the section `H/(A.subgroupOf H)` has a proper commutator subgroup (e.g. `A ⊊ H` with `H`
+solvable, so `H/A` is a nontrivial solvable group), it carries a nontrivial degree-`1` character
+trivial on `A` (`exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top`); its
+induction `Ind_H^L θ ∈ S(A)` has degree `|L:H|·1 = |W₁|`
+(`induce_apply_one_eq_card_W1_of_degree_one`).  This furnishes the degree-`|W₁|` anchor `χ₁`
+consumed by `exists_sMemberDegreeData` (its `hanchordeg`). -/
+theorem exists_mem_SsubFiltration_degree_W1 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {A : Subgroup ↥L} [A.Normal]
+    (h : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
+    ∃ φ, φ ∈ hyp.SsubFiltration A ∧ (φ : ClassFunction ↥L ℂ) 1 = (Nat.card hyp.W1 : ℂ) := by
+  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top (A.subgroupOf H) h
+  refine ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), ?_, ?_⟩
+  · rw [hyp.mem_SsubFiltration]; exact ⟨θ, hθne, hθker, rfl⟩
+  · exact hyp.induce_apply_one_eq_card_W1_of_degree_one θ hθdeg
+
 /-- **(T8.11e) scaled supported differences map to virtual characters.**
 
 Once the degree-ratio support field for `χ - aχ₁` is known, the real Dade map sends that
