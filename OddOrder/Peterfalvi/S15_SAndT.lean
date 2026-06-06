@@ -716,6 +716,27 @@ structure TypeIOrthogonalityData (hyp : Hypothesis (G := G)) (L : Subgroup G) wh
   betaL_eta_independent : Prop
   caseC1 : Prop
   caseC2 : Prop
+  caseC1_bound :
+    caseC1 →
+      (((Nat.card ↥typeISetup.H - 1 : ℕ) : ℚ) / (e : ℚ) ≤
+        ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ))
+
+namespace TypeIOrthogonalityData
+
+/-- **Peterfalvi (13.19.c)**, consumer form: any strict gap beyond the
+case-(c1) bound forces the parity alternative (c2). -/
+theorem caseC2_of_gap {hyp : Hypothesis (G := G)} {L : Subgroup G}
+    (data : TypeIOrthogonalityData hyp L)
+    (hcases : data.caseC1 ∨ data.caseC2)
+    (hgap :
+      ((hyp.u - 1 : ℕ) : ℚ) / (hyp.q : ℚ) <
+        ((Nat.card ↥data.typeISetup.H - 1 : ℕ) : ℚ) / (data.e : ℚ)) :
+    data.caseC2 := by
+  rcases hcases with hcaseC1 | hcaseC2
+  · exact False.elim ((not_lt_of_ge (data.caseC1_bound hcaseC1)) hgap)
+  · exact hcaseC2
+
+end TypeIOrthogonalityData
 
 /-- **Peterfalvi (13.19)**: a type-I maximal subgroup has Dade images
 orthogonal to the `eta_ij`, and one of the two final parity cases holds. -/

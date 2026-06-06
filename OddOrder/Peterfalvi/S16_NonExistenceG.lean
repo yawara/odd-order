@@ -3901,6 +3901,28 @@ theorem caseB_gap_inequalities_of_h_gt_two_mul_pq_mul_u
   · rw [hparams.1, hparams.2, hu31, hv121]
     norm_num
 
+/-- **Peterfalvi (14.16)**: the S-side gap in the exceptional branch
+excludes case-(c1) of (13.19.c).  After identifying the Type-I kernel with the
+current `H` and the complement index with `p q`, the inequality
+`(h - 1)/(p q) > (v - 1)/p > (u - 1)/q` is exactly the strict negation of the
+case-(c1) bound, so the parity alternative (c2) must hold. -/
+theorem typeI_caseC2_of_caseB_sSide_gap
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (orth : OddOrder.Peterfalvi.S15.TypeIOrthogonalityData hyp.base nc.Ldata.L)
+    (hcases : orth.caseC1 ∨ orth.caseC2)
+    (hH : Nat.card ↥orth.typeISetup.H = nc.h)
+    (he : orth.e = hyp.base.p * hyp.base.q)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    orth.caseC2 := by
+  apply orth.caseC2_of_gap hcases
+  rw [hH, he]
+  exact hvu.trans hhv
+
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
 S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
