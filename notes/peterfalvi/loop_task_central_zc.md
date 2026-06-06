@@ -68,6 +68,10 @@ wiring. Per the note. Focus 1→2 first.
 8. **If genuinely blocked** (needs a design decision, or a missing theorem you cannot derive in a few
    attempts): document it precisely in the note, commit the note, and **stop the loop** — do not
    thrash. Likewise stop once Steps 1–2 are done and committed (leave 3+ for an attended session).
+   **To stop the loop, output the exact text** `<promise>RALPHDONE</promise>` — but ONLY when either
+   (a) Steps 1 and 2 are committed and `lake build OddOrder` is green, or (b) you are genuinely
+   blocked and the blocker is documented + committed to the note. Never emit it just to escape; the
+   loop also hard-stops on its own after 25 iterations.
 
 ## Each iteration
 Read the note, identify the smallest build-green committable increment toward the next unfinished
