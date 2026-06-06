@@ -1,5 +1,22 @@
 # BG App.C Lemma C.3 Step 4 — generator-relation `s₁ = s⁻¹` 形式化 plan (2026-06-05)
 
+> ## ✅ 完了 (2026-06-06, worktree head `339c713`)
+> `Step4Capstone` (`s₁=s⁻¹`) を **sorry-free + axiom-clean** で証明し、carrier の
+> `appC_twisted_normOne_step` field を削除。**BG App.C 完全形式化** (full build 3580 +
+> AxiomsCheck green; `step4Capstone` / `lemmaC3_inverse_closed` axioms =
+> propext/Classical.choice/Quot.sound)。**main 未マージ**。実装 (`S16_NonExistenceG.lean`
+> `section Step4`):
+> - `step4_sigma_primeLine_prod_eq_one` — (C.10) mod Q ⟹ s₁s₂s₃=1。
+> - `step4_relation_5076` — kernel argument (End 環非構築: β(Y_B)·Y_B⁻¹=⋆=1 ⟹ FPF ⟹
+>   Y_B=1)。abelian regroup = `Additive`+`abel` (⁅Q,W₂⁆ に CommGroup `letI`)。FPF =
+>   `w2ConjQAut_eq_one_of_mem_actionCommutator_of_s_fixed` + `zpow_apply_fixed`。
+>   (5060) bridge = over-product + bracket commute。
+> - `step3_inf_conj_eq_U_of_mem_P1` — Step 3 を g∈P₁^# に一般化 (generic badBranch)。
+> - `step4_sigma_primeLine_eq_s_inv` — part (f) (BG 5078-5082, Step3+Step2)。
+> - `step4Capstone` / `appC_normSet_generator_relation` (field 非経由) で結線。
+> 残り = App.C 外の carrier producer `field_normalizer_structure` (§14 指標論)。
+> 以下は作業時の計画 (歴史的)。
+
 **スコープ**: BG Appendix C, Lemma C.3 **Step 4** (mmd L4994–5095) の核 = 正規形の中央
 prime-line 因子が `c = -1` (= `s₁ = s⁻¹`) であることの確定。これが App.C に残る**唯一の数学的
 ギャップ**であり、`S16.FieldNormalizerData.appC_twisted_normOne_step` という producer obligation
