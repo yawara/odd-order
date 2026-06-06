@@ -4088,6 +4088,64 @@ theorem SsubFiltration_hasNoRealCharacters (hyp : SibleyDadeHypothesis G L H)
     OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.SsubFiltration A) :=
   (hyp.S_hasNoRealCharacters hF).mono hyp.SsubFiltration_subset_S
 
+/-- **`S`-member character facts** (Frobenius case): for `χ ∈ S` (irreducible by
+`isIrreducibleCharacter_of_mem_S_of_frobenius`, non-real by `S_hasNoRealCharacters`) the conjugate
+pair `{χ, χ̄}` is orthonormal (`‖χ‖² = ‖χ̄‖² = 1`, `⟨χ̄, χ⟩ = ⟨χ, χ̄⟩ = 0`).  These are the
+per-member `hreal`/`hχχ`/`hχbarχbar`/`hχbarχ`/`hχχbar` facts that the (6.2) member-family
+enumeration feeds to B1 (`coherentDegreeSumBound_of_not_coherent`) for each member of `S₁ ⊆ S`. -/
+theorem sMember_characterFacts (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) :
+    ¬ ClassFunction.IsReal χ ∧
+      ClassFunction.inner χ χ = 1 ∧
+      ClassFunction.inner χ.conj χ.conj = 1 ∧
+      ClassFunction.inner χ.conj χ = 0 ∧
+      ClassFunction.inner χ χ.conj = 0 := by
+  have hirr : IsIrreducibleCharacter χ := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hχS
+  have hconjirr : IsIrreducibleCharacter χ.conj := hirr.conj
+  have hreal : ¬ ClassFunction.IsReal χ := hyp.S_hasNoRealCharacters hF hχS
+  have hbi_ne : (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ, hirr⟩ :=
+    fun h => hreal (congrArg Subtype.val h)
+  refine ⟨hreal, ?_, ?_, ?_, ?_⟩
+  · simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L) ⟨χ, hirr⟩
+  · simpa using
+      irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ.conj, hconjirr⟩
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hconjirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ, hirr⟩
+    rwa [if_neg hbi_ne] at h
+  · have h := irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
+      ⟨χ.conj, hconjirr⟩
+    rwa [if_neg (fun h => hbi_ne h.symm)] at h
+
+/-- **`S`-member conjugate-difference support** (any irreducible `χ ∈ S`): `χ̄ − χ` is supported on
+`H^# = sharpImage H`.  Since `χ = Ind_H^L θ` with `H ⊴ L`, `support χ ⊆ H`, and `χ̄ − χ` vanishes at
+`1` (the degree `χ(1)` is a real natural number), so it omits `1`.  This is the per-member
+`hdiffsupp` fact for the (6.2)/B1 member-family over `S₁ ⊆ S`. -/
+theorem sMember_diffSupport (hyp : SibleyDadeHypothesis G L H)
+    {χ : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hirr : IsIrreducibleCharacter χ) :
+    (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hn1, star_natCast, sub_self])
+  have hχg : χ g ≠ 0 := fun h0 =>
+    hg (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, h0, star_zero, sub_zero])
+  have hgH : g ∈ H := by
+    have hsupp : χ.support ⊆ (H : Set ↥L) := by
+      rw [hχeq]
+      exact ClassFunction.support_induce_subset_of_normal H (θ : ClassFunction ↥H ℂ)
+    exact hsupp (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 /-- **(6.8.1), Frobenius case:** source-side orthogonality for the final
 `X = S - S(H')`, `Y = S(H')` partition. -/
 theorem inner_span_Xset_Yset_eq_zero_of_frobenius

@@ -1912,6 +1912,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.S_hasNoRealCharacters
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_hasNoRealCharacters
+-- (6.2) member-family per-member facts over `S₁ ⊆ S` (Frobenius case): orthonormal conjugate pair
+-- (`sMember_characterFacts`) and conjugate-difference support on `H^#` (`sMember_diffSupport`).
+-- These are the per-member `hreal`/`hχχ`/…/`hdiffsupp` fields B1 consumes for each `S`-member.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_characterFacts
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_diffSupport
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
