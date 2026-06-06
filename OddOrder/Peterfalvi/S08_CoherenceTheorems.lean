@@ -5575,19 +5575,20 @@ theorem index_mul_card_sub_factor (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
 `d² ≤ |H:Z|` (valid since `Z` is central) and the fixed-point-free bound `|Z|−1 ≥ 2|W₁|`
 (`W₁` acts FPF on the odd-order `Z`), one derives `|H:Z| < d ≤ d² ≤ |H:Z|`, a contradiction.
 
-Here `w1 = |W₁|`, `d = θ(1)` (the degree of the `H`-source of `ψ`), `hZ = |H:Z|`, `cZ = |Z|`. -/
+Here `w1 = |W₁|`, `d = θ(1)` (the degree of the `H`-source of `ψ`), `hZ = |H:Z|`, `cZ = |Z|`.
+The hypothesis `2 ≤ hZ` holds because `Z ⊆ H′ ⊊ H` (`H` non-abelian), so `|H:Z| ≥ |H:H′| ≥ 2`. -/
 theorem false_of_centralCommutator_break_arith {w1 d hZ cZ : ℕ}
-    (hw1 : 1 ≤ w1) (hd : 1 ≤ d) (hdsq : d ^ 2 ≤ hZ)
+    (hw1 : 1 ≤ w1) (hd : 1 ≤ d) (hdsq : d ^ 2 ≤ hZ) (hZ2 : 2 ≤ hZ)
     (hfpf : 2 * w1 ≤ cZ - 1)
-    (hbreak : w1 * hZ * (cZ - 1) < 2 * w1 ^ 2 * d) : False := by
+    (hbreak : w1 * hZ * (cZ - 1) ≤ 2 * w1 ^ 2 * d) : False := by
   set m := cZ - 1 with hm
   have hge : 2 * w1 ^ 2 * hZ ≤ w1 * hZ * m := by
     calc 2 * w1 ^ 2 * hZ = w1 * hZ * (2 * w1) := by ring
       _ ≤ w1 * hZ * m := mul_le_mul_left' hfpf (w1 * hZ)
-  have hlt : 2 * w1 ^ 2 * hZ < 2 * w1 ^ 2 * d := lt_of_le_of_lt hge hbreak
-  have hZd : hZ < d := Nat.lt_of_mul_lt_mul_left hlt
-  have hd2 : d ^ 2 < d := lt_of_le_of_lt hdsq hZd
-  have hdd : d ≤ d ^ 2 := Nat.le_self_pow two_ne_zero d
+  have hle : 2 * w1 ^ 2 * hZ ≤ 2 * w1 ^ 2 * d := le_trans hge hbreak
+  have hZd : hZ ≤ d := Nat.le_of_mul_le_mul_left hle (by positivity)
+  have h2d : 2 ≤ d := le_trans hZ2 hZd
+  have hdd : 2 * d ≤ d ^ 2 := by nlinarith [h2d]
   omega
 
 /-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
@@ -5678,6 +5679,65 @@ theorem sMember_index_le_two_psi (hyp : SibleyDadeHypothesis G L H)
         ≤ 2 * (ψ 1).re * (H.index : ℝ) := hchain
       _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
   exact le_of_mul_le_mul_left key hidx_pos
+
+open scoped Classical in
+/-- **(6.8.3) X-sum break bound.**  The (5.6)/B1 bound applied to the breaking coherent set `S₁ ⊇ X`:
+`∑_{χ∈X} χ(1)² ≤ 2ψ(1)·χ₁(1)`.  Since `X ⊆ S₁` and `S₁` enumerates as a member family bounded by
+`sMember_degreeSqReBound_of_not_coherent`, the `X`-sum `(H.index)·(|H| − |H:Z|)`
+(`sum_re_sq_Xset_eq`) is dominated by the full family sum, which the (5.6) break bounds by
+`2ψ(1)χ₁(1)`.  This is the `(6.8.3)` inequality with `χ₁ = η₁ ∈ Y` of degree `|W₁|`. -/
+theorem xSum_le_two_psi (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {Z : Subgroup ↥L} [Z.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁sub : S₁ ⊆ hyp.S) (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁fin : S₁.Finite) (hXS1 : hyp.Xset Z ⊆ S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (Nat.card hyp.W1 : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ))
+      ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  obtain ⟨k, χmem, hχinj, hrange, hmemS1, hfambound⟩ :=
+    hyp.sMember_degreeSqReBound_of_not_coherent hF hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁ hχ₁deg
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hcfinj : Function.Injective (fun j => (χmem j : ClassFunction ↥L ℂ)) :=
+    fun a b h => hχinj (Subtype.ext h)
+  have hXsum := hyp.sum_re_sq_Xset_eq hF (Z := Z)
+  set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hXdiffdef
+  have hsub : Xdiff ⊆ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hXdiffdef, Finset.mem_sdiff] at hχ
+    obtain ⟨hχbot, hχnotZ⟩ := hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχbot
+    obtain ⟨-, -, hne⟩ := Finset.mem_filter.mp hθ
+    have hχS : ClassFunction.induce H θ.toClassFunction ∈ hyp.S := by
+      rw [hyp.S_eq]; exact ⟨θ, hne, rfl⟩
+    have hχnotSZ : ClassFunction.induce H θ.toClassFunction ∉ hyp.SsubFiltration Z := by
+      intro hmem
+      rw [hyp.mem_SsubFiltration] at hmem
+      obtain ⟨θ', hne', hker', heq'⟩ := hmem
+      exact hχnotZ (Finset.mem_image.mpr
+        ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+    exact hXS1 ⟨hχS, hχnotSZ⟩
+  rw [← hXsum]
+  calc ∑ χ ∈ Xdiff, ((χ 1).re) ^ 2
+      ≤ ∑ χ ∈ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset, ((χ 1).re) ^ 2 :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub (fun _ _ _ => sq_nonneg _)
+    _ = ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 :=
+        sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
+    _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
 
 /-- **(6.2) θ-bound for an induced member `ψ = Ind_H^L θ`.**
 
