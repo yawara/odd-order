@@ -1949,6 +1949,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_toFinset_range_eq
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sMember_degreeSqReBound_of_not_coherent
+-- (6.2) B2 in real/Frobenius form: `∑_{χ∈S(A)} (χ(1).re)² = |L:H|·(|H:A|−1)` (each S(A) member is
+-- irreducible so `χ(1)²/‖χ‖² = (χ(1).re)²`), the real-degree-square identity to compare with the
+-- member-family bound.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.sum_re_sq_induce_kernelFilter_eq
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do

@@ -5036,6 +5036,53 @@ theorem sMember_degreeSqReBound_of_not_coherent (hyp : SibleyDadeHypothesis G L 
     _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
     _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
 
+open scoped Classical in
+/-- **(6.2) B2 in real / Frobenius form.**
+
+In the Frobenius case every member of `S(A)` is an irreducible induced character
+(`isIrreducibleCharacter_of_mem_S_of_frobenius`), so `χ(1)²/‖χ‖² = (χ(1).re)²` (`‖χ‖² = 1`, `χ(1)`
+a real natural number), and B2 (`sum_div_normSq_induce_kernelFilter_eq`) becomes the real
+degree-square identity `∑_{χ∈S(A)} (χ(1).re)² = |L:H|·(|H:A| − 1)`. -/
+theorem sum_re_sq_induce_kernelFilter_eq (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1) {A : Subgroup ↥L} [A.Normal] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        ((χ 1).re) ^ 2
+      = (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hB2 := sum_div_normSq_induce_kernelFilter_eq (G := ↥L) (H := H) (A := A)
+  have hsummand : ∀ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+      (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥H ℂ) ∧
+        θ ≠ trivialIrreducibleCharacter ↥H)).image
+      (fun θ => ClassFunction.induce H θ.toClassFunction),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = ((((χ 1).re) ^ 2 : ℝ) : ℂ) := by
+    intro χ hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    have hθne : θ ≠ trivialIrreducibleCharacter ↥H := (Finset.mem_filter.mp hθ).2.2
+    have hχS : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∈ hyp.S := by
+      rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩
+    have hirr := hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hχS
+    have hinner : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite (⟨_, hirr⟩ : IrreducibleCharacter ↥L) ⟨_, hirr⟩
+    obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+    rw [hinner, div_one, hn1, Complex.natCast_re]; push_cast; ring
+  have key : ((∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction),
+        ((χ 1).re) ^ 2 : ℝ) : ℂ)
+      = (((H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)) : ℝ) := by
+    rw [Complex.ofReal_sum, Finset.sum_congr rfl (fun χ hχ => (hsummand χ hχ).symm), hB2]
+    push_cast; ring
+  exact Complex.ofReal_inj.mp key
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`
