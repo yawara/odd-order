@@ -540,4 +540,32 @@ theorem samePrime_kernel_le_chiefFactorCentralizer
   rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (k : G) v]
   exact hKtriv ⟨QuotientGroup.mk' L (k : G), ⟨k, hk, rfl⟩⟩ v
 
+open OddOrder.GroupTheory in
+/-- **Per-factor dichotomy of BG Thm 3.7**: for a `G`-chief factor `X/Y` (`X ⊆ K`) elementary
+abelian of prime `s`, with `L ⊴ G` centralizing `X/Y`, `G/L` Frobenius, and `K/L` a `q`-group,
+the kernel `K` centralizes `X/Y`. Case `s = q` is the same-prime branch
+(`samePrime_kernel_le_chiefFactorCentralizer`); case `s ≠ q` gives `s ∤ |K/L|` (a `q`-power), the
+coprime branch (`coprime_kernel_le_chiefFactorCentralizer` + the Frobenius FPF). -/
+theorem kernel_le_chiefFactorCentralizer_dichotomy
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    [K.Normal] [X.Normal] [Y.Normal] {s q : ℕ} [Fact s.Prime] [Fact q.Prime]
+    (h : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R)
+    (hChief : IsChiefFactor X Y) (hXK : X ≤ K)
+    (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
+    {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
+    (hFrobL : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (G ⧸ L)
+      (K.map (QuotientGroup.mk' L)) (R.map (QuotientGroup.mk' L)))
+    (hKbar : IsPGroup q (K.map (QuotientGroup.mk' L))) :
+    K ≤ chiefFactorCentralizer X Y := by
+  by_cases hsq : s = q
+  · subst hsq
+    exact samePrime_kernel_le_chiefFactorCentralizer hChief hVelem hLcent hKbar
+  · refine coprime_kernel_le_chiefFactorCentralizer hVelem hLcent hFrobL ?_
+      (chiefFactor_fixedPointFree h hXK)
+    intro hdvd
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hKbar
+    rw [hn] at hdvd
+    exact hsq ((Nat.prime_dvd_prime_iff_eq (Fact.out : s.Prime) (Fact.out : q.Prime)).mp
+      ((Fact.out : s.Prime).prime.dvd_of_dvd_pow hdvd))
+
 end OddOrder.BG.Ch1.S03c
