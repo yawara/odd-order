@@ -412,6 +412,26 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
   中心 section (基本 Schur `exists_degree_sq_le_index`@SchurCenterBound では不足)。両者 framework/Clifford 要・最重。
 - 🟢 **T-A5 = T-A4 後** (coherentUnion_of_glued で X∪Y glue, Y=coherentYFamily; field 追加で hνZ 不要に)。
 
+## 🛑 2026-06-06 LOOP PAUSE / handoff（leaf 相 完了, producer 相 へ）
+
+**到達点**: §6 reduction chain ((6.2)/(6.3)/(6.5)) 完成 + (6.6) piece 1 (X degree-sum 恒等式) + **piece-2 leaf 全landed**。capstone sorry (S08:7451) 解消に残るのは **(6.6) producer の組立 1 本 + ν glue** のみ（全 ingredient/enum/arith は揃っている、欠落 primitive 無し）。
+
+**なぜ pause**: ここから先は clean な単一補題（leaf）ではなく、**(6.6) hypotheses (Z⊆Z(H)) を thread して consumer 署名に合わせる大きめの `def` 構築**。auto-loop の「1 iteration=1 clean lemma」に合わず、focused session 向き。leaf 相は出尽くした。
+
+**producer の正確な construction recipe（次の focused session 用、即着手可）**:
+1. **divisibility `θχ(1)² ∣ total` (ℕ)** — piece-2 の本体:
+   - `θχ(1)² ≤ |H:Z|`: `degree_sq_le_index_of_central_quotient`(InflationCharacter, 既landed)を **N:=⊥, D:=Z.subgroupOf H, φ:=θχ** で適用。要 `Z.subgroupOf H ≤ Subgroup.center ↥H`(= (6.6) の Z⊆Z(K)=Z(H); capstone で hyp.cases から)。N=⊥ ゆえ θ trivial-on-N は自明、`D/⊥ ≤ Z(H/⊥)=Z(H)`。結論 `θχ(1)² ≤ |↥H:Z.subgroupOf H| = |H:Z|`。
+   - `θχ(1)²` p-power(`exists_primePow_natDegree_of_isPGroup` ✅）, `|H:Z|` p-power(`exists_primePow_card_quotient_of_isPGroup` ✅, K=↥H N=Z.subgroupOf H）⟹ `θχ(1)² ∣ |H:Z|`(p-powers a≤b⟹a∣b: 指数抽出 `Nat.pow_le_pow_iff_right`+`Nat.pow_dvd_pow`, inline）。
+   - `|H:Z| ∣ total`: total(ℕ) = `idx·(|H|−|H:Z|) = idx·|H:Z|·(|Z|−1)`(piece1 の ℝ 値を ℕ 化: 各 χ(1)=n_χ∈ℕ ゆえ ∑(χ1).re²=(∑n²:ℝ), piece1 と `Nat.cast_injective` で ℕ 等式)。⟹ `θχ(1)² ∣ total`。
+2. **StepData packaging**(`PairUnionBaseAnchorCommonIndexPrimePowerStepData` 7134 / consumer `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums` 7024):
+   - enum = `exists_pairUnion_memberFamily_of_irreducible_X`(5898, ✅）→ k/χmem/hrange/i₁(anchor=xBaseBlock 最小次数）。
+   - 各 member χmem j=Ind θ_j: θmem j:=θ_j(1)(p-power), dmem j:=idx·θmem j(=`induce_apply_one`), idx:=|W₁|(`index_H_eq_card_W1`)。p≥3=`three_le_prime_of_isPGroup_of_odd`。hidx_p=`coprimeIndexPrimePow`(2893付近)。
+   - qtot:=θχ², mq:=2mχ, c:=total/θχ²(divisibility 1 で割り切れる), θχ²≤qtot は equality。tailSet=degree>χ の members(htail_le)。
+3. **`hstepData` 関数化** → `Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`(7301)に供給 → Xset coherence。
+4. **ν glue**(hagreeX/hagreeY/hmixed/hgen, consumer 7379)→ `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`(7379)→ capstone。**case split** hyp.cases (Frobenius/CertainType) も capstone で要(現状 Frobenius branch 機構が揃う; CertainType は別途)。
+
+**本セッション landed (peterfalvi, a94f1ef 以降, 全 axiom-clean)**: 34b464c (6.5) / 955859b θ=p^k / a1696cc p≥3 / b5dd055 piece1 X-sum / 569c8dd |H:Z|=p^k。(6.3 は a94f1ef で main 済)。
+
 ## Blocked ログ (revert した task と欠落 primitive を追記)
 
 > ⚠️ **更新 (2026-06-04 後続セッション)**: 下記 T-A3 blocked は **解決済** (route A 完遂, commit a054bc8 +
