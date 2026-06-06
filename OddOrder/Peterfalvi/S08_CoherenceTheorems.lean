@@ -5176,6 +5176,42 @@ theorem psi_degree_le_of_source (hyp : SibleyDadeHypothesis G L H)
         mul_le_mul_of_nonneg_left hθbound (Nat.cast_nonneg _)
     _ = (H.index : ℝ) * (C.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
 
+open scoped Classical in
+/-- **(6.2) first-obstruction + core wiring** `|K:A| − 1 ≤ 2ψ(1)`.
+
+From `S(A)` coherent and `S(B)` not coherent (with `S(A) ⊆ S(B)`), the first-obstruction
+`exists_coherentBreakPair` produces a breaking pair `{ψ, ψ̄}` with `ψ ∈ S(B)` (`ψ, ψ̄ ∉ S₁`), and the
+(6.2) core `sMember_index_le_two_psi` — with the degree-`|W₁|` anchor `χ₁ ∈ S(A) ⊆ S₁`
+(`exists_mem_SsubFiltration_degree_W1`, valid since `H/(A.subgroupOf H)` has a proper commutator
+subgroup) — gives `|H:A| − 1 ≤ 2ψ(1)`.  The structural inputs (`S(B)` finite / conjugation-closed /
+real-free / irreducible, `S(A)` conjugation-closed) come from the landed `SsubFiltration_*`
+helpers. -/
+theorem six_two_index_bound (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {A B : Subgroup ↥L} [A.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm : _root_.commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤)
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ ψ, ψ ∈ hyp.SsubFiltration B ∧
+      (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  letI : H.Normal := hyp.H_normal
+  obtain ⟨S₁, ψ, hS₁conj, hAS₁, hS₁B, hψB, hψnotS1, hψcnotS1, hS₁coh, hncoh⟩ :=
+    exists_coherentBreakPair hyp.tau hAB (hyp.SsubFiltration_finite B)
+      (hyp.SsubFiltration_closedUnderConjugate B) (hyp.SsubFiltration_hasNoRealCharacters hF B)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF
+        (hyp.SsubFiltration_subset_S hφ))
+      (hyp.SsubFiltration_closedUnderConjugate A) hSAcoh hSBncoh
+  obtain ⟨χ₁, hχ₁SA, hχ₁deg⟩ := hyp.exists_mem_SsubFiltration_degree_W1 hAcomm
+  have hψS : ψ ∈ hyp.S := hyp.SsubFiltration_subset_S hψB
+  exact ⟨ψ, hψB, hyp.sMember_index_le_two_psi hF
+    (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
+    ((hyp.SsubFiltration_finite B).subset hS₁B) hAS₁ hS₁coh.some
+    (hAS₁ hχ₁SA) hχ₁deg hψS (hyp.isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS)
+    hψnotS1 hψcnotS1 hncoh⟩
+
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
 If `X` is nonempty, its base block `S₀` (minimal-degree members) contains a minimal-degree `χ`

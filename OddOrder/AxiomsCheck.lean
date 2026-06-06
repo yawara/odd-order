@@ -1962,6 +1962,10 @@ set_option linter.style.longLine false in
 -- (`induce_apply_one` + `theta_degree_le_index_mul_sqrt_index`).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.psi_degree_le_of_source
+-- (6.2) first-obstruction + core wiring: `S(A)` coherent ∧ `S(B)` not ⟹ ∃ ψ∈S(B), `|K:A|−1 ≤ 2ψ(1)`
+-- (the breaking pair from `exists_coherentBreakPair` fed to the (6.2) core `sMember_index_le_two_psi`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_two_index_bound
 --- Peterfalvi S08 T8 base-block bridges: the Frobenius-specific X-base coherence helpers
 --- are factored through the honest abstract hypothesis `X ⊆ Irr L`, and the case-A specialization
 --- consumes `isIrreducibleCharacter_of_mem_Xset_caseA`.  These are assembly bridges only; they do
