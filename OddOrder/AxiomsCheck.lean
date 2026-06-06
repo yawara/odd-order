@@ -1987,6 +1987,14 @@ set_option linter.style.longLine false in
 -- (6.3) THEOREM (Frobenius K=H): `M ≤ H₁ ⊊ H`, `S(H₁)` coherent, `|H:H₁| > 4|L:H|²+1` ⟹ `S(M)`
 -- coherent.  Minimal-A induction: maximal-B + maximality-central + per-step index bound contradiction.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.six_three
+-- (6.5) bridge: `⁅H,H⁆.subgroupOf H = commutator ↥H` (so `|H:⁅H,H⁆| = |Abelianization ↥H|`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.commutator_subgroupOf_self
+-- (6.5) bridge: `S(⊥) = S` (the bottom filtration is everything; kernel condition is vacuous).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_bot
+-- (6.5) THEOREM (Frobenius): if `S` is not coherent then `H` is a `p`-group.  `six_three`
+-- contrapositive (M=⊥, H₁=⁅H,H⁆) gives `|Abelianization H| ≤ 4|W₁|²+1`, then the Frobenius/odd
+-- p-group reduction `isPGroup_of_isFrobeniusGroup_of_card_le`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isPGroup_of_not_coherent
 -- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).

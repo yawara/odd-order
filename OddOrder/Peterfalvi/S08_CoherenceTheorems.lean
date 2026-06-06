@@ -843,6 +843,19 @@ theorem normal_central_of_maximal_normal_below {Γ : Type*} [Group Γ] [Finite �
   rw [Subgroup.map_le_iff_le_comap, ← hZc]
   exact hle
 
+/-- For `H ≤ G`, the commutator subgroup of the subtype group `↥H` is the `subgroupOf` of the
+ambient commutator `⁅H, H⁆`.  In particular `Abelianization ↥H = ↥H ⧸ ⁅H, H⁆.subgroupOf H`, so the
+index `|H : ⁅H,H⁆|` equals `|Abelianization ↥H|`. -/
+theorem commutator_subgroupOf_self {G : Type*} [Group G] (H : Subgroup G) :
+    (⁅H, H⁆ : Subgroup G).subgroupOf H = _root_.commutator ↥H := by
+  have htop : (⊤ : Subgroup ↥H).map H.subtype = H := by
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have h1 : (_root_.commutator ↥H).map H.subtype = ⁅H, H⁆ := by
+    show (⁅(⊤ : Subgroup ↥H), (⊤ : Subgroup ↥H)⁆).map H.subtype = ⁅H, H⁆
+    rw [Subgroup.map_commutator, htop]
+  rw [← h1]
+  exact Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+
 /-- Peterfalvi (6.1): the filtration `S(A)` attached to the base character set
 `S`.  In the text, larger kernel conditions give smaller subsets:
 if `A ≤ B`, then `S(B) ⊆ S(A)`. -/
@@ -3441,6 +3454,23 @@ theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L
       φ = OddOrder.RepresentationTheory.ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
   Iff.rfl
 
+/-- `S(⊥) = S`: the kernel condition `⊥ ⊆ Ker θ` is vacuous, so the bottom filtration is all of
+`S`.  (Peterfalvi writes `S(1) = S`.) -/
+theorem SsubFiltration_bot (hyp : SibleyDadeHypothesis G L H) :
+    hyp.SsubFiltration ⊥ = hyp.S := by
+  ext φ
+  rw [hyp.mem_SsubFiltration, hyp.S_eq, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨θ, hθ, -, hφ⟩
+    exact ⟨θ, hθ, hφ⟩
+  · rintro ⟨θ, hθ, hφ⟩
+    refine ⟨θ, hθ, ?_, hφ⟩
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot]
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+
 /-- Membership in `X = S − S(Z)`, unfolded. -/
 theorem mem_Xset (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :
@@ -5630,6 +5660,51 @@ theorem six_three (hyp : SibleyDadeHypothesis G L H)
     omega
   rw [← hAeqM]
   exact hAcoh
+
+/-- **Peterfalvi (6.5) consequence (Frobenius case): `H` is a `p`-group.**
+
+If the full set `S` is *not* coherent, then `H` is a `p`-group for some prime `p`.  Apply `six_three`
+with `M = ⊥`, `H₁ = ⁅H,H⁆`: `S(⁅H,H⁆) = Y` is coherent (`coherentYset`), `⊥ ≤ ⁅H,H⁆` and `⁅H,H⁆ ⊊ H`
+(`H` nilpotent nontrivial ⟹ not perfect), so if `|H:⁅H,H⁆| > 4|L:H|²+1` then `S(⊥) = S` would be
+coherent — contradiction.  Hence `|Abelianization H| = |H:⁅H,H⁆| ≤ 4|W₁|²+1`
+(`commutator_subgroupOf_self`, `index_H_eq_card_W1`), and as everything has odd order
+`isPGroup_of_isFrobeniusGroup_of_card_le` produces the prime.  This is the (6.5)/(6.6) reduction
+"`H` is a `p`-group" that feeds the (6.8) capstone. -/
+theorem isPGroup_of_not_coherent (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hSncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ p : ℕ, p.Prime ∧ IsPGroup p ↥H := by
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  -- `⁅H,H⁆ ⊊ H` from nilpotency (nontrivial nilpotent is not perfect)
+  have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
+    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    rw [← commutator_subgroupOf_self] at h1
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
+    rw [heq, Subgroup.subgroupOf_self] at h1
+    exact lt_irrefl _ h1
+  -- the index bound, by the contrapositive of `six_three`
+  have hidx : Nat.card (↥H ⧸ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
+    by_contra hgt
+    rw [not_le] at hgt
+    have hYcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration ⁅H, H⁆)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := ⟨hyp.coherentYset⟩
+    have hMcoh := hyp.six_three hF (M := ⊥) (H₁ := ⁅H, H⁆) bot_le hcommlt hYcoh hgt
+    rw [hyp.SsubFiltration_bot] at hMcoh
+    exact hSncoh hMcoh
+  -- convert the index bound to the abelianization-card bound
+  have hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card hyp.W1 ^ 2 + 1 := by
+    rw [commutator_subgroupOf_self, hyp.index_H_eq_card_W1] at hidx
+    exact hidx
+  -- odd orders
+  have hLodd : Odd (Nat.card ↥L) := hyp.card_L_odd
+  have hHodd : Odd (Nat.card (Abelianization ↥H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hLodd H.card_subgroup_dvd_card)
+      (Subgroup.card_quotient_dvd_card (_root_.commutator ↥H))
+  have hW1odd : Odd (Nat.card hyp.W1) := Odd.of_dvd_nat hLodd hyp.W1.card_subgroup_dvd_card
+  exact isPGroup_of_isFrobeniusGroup_of_card_le hF hHodd hW1odd hbound
 
 /-- **(T8 leaf 8) `2 ≤ |S₀|`**, from the abstract input `X ⊆ Irr L`.
 
