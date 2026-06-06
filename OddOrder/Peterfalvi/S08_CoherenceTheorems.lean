@@ -5432,6 +5432,19 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
   rw [eq_sub_of_add_eq hsd, h0, hZ]
   ring
 
+/-- **(6.6) per-member degree shape.**  Every member `χ = Ind_H^L θ` of `S` (`θ ∈ Irr H`) has degree
+`χ(1) = |L:H| · θ(1)`; when `H` is a `p`-group `θ(1) = p^k`, so `χ(1) = |L:H| · p^k`.  This is the
+common-index `p`-power degree shape (`idx = |L:H|`) of every X-chain member. -/
+theorem exists_index_primePow_degree_of_mem_S (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.S) :
+    ∃ k : ℕ, χ 1 = ((H.index * p ^ k : ℕ) : ℂ) := by
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, _hθ, rfl⟩ := hχ
+  obtain ⟨k, hk⟩ := exists_primePow_natDegree_of_isPGroup hp hHp θ
+  refine ⟨k, ?_⟩
+  rw [ClassFunction.induce_apply_one, hk]
+  push_cast; ring
+
 open scoped Classical in
 /-- **(6.2) core inequality** `|K:A| − 1 ≤ 2ψ(1)` (Frobenius case).
 

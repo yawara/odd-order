@@ -2007,6 +2007,9 @@ set_option linter.style.longLine false in
 -- (6.6) ingredient: a quotient of a finite p-group has p-power order (so |H:Z| = p^k), the key to
 -- θχ(1)² ∣ |H:Z| (both p-powers) in the (6.6) divisibility.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_primePow_card_quotient_of_isPGroup
+-- (6.6) per-member degree shape: every S-member χ = Ind θ has χ(1) = |L:H|·θ(1) = |L:H|·p^k
+-- (H a p-group).  The common-index p-power degree of each X-chain member.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.exists_index_primePow_degree_of_mem_S
 -- (6.3) nilpotency central step: in a finite nilpotent group, a nontrivial normal subgroup meets
 -- the centre (`N ⊓ Z(G) ≠ ⊥`), via the upper central series least-index argument.  Discharges the
 -- `A/B ⊆ Z(H/B)` central condition of the (6.3) minimal-A induction (with maximality of B).
