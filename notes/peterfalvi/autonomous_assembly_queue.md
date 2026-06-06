@@ -227,6 +227,15 @@ B1 が消費する member-family の **enum 非依存部を体系的に構築**(
 - **(B) ν glue**: hagreeX/hagreeY/hmixed/hgen — X-coherence と Y-coherence の combined extension(`coherentUnion_of_glued` が要求)。
 - **scope**: (A) enum が最重(~200+行見込み, (6.2) enum 並)。multi-session。**p prime≥3 / idx coprime / θ p-power は leaf 揃った**ので、enum 骨格 + gap-sum が主残務。
 
+### ✅ 2026-06-06 (続9): StepData leaf ingredients 2 件 landed + **enum core 既存を確認**
+- ✅ `exists_primePow_natDegree_of_isPGroup`(955859b): θ∈Irr(p-群) ⟹ θ(1)=p^k。
+- ✅ `three_le_prime_of_isPGroup_of_odd`(a1696cc): 非自明 odd p-群 ⟹ 3≤p。
+- ✅✅ **enum core は既存だった**: `exists_pairUnion_memberFamily_of_irreducible_X`(S08:5898)が accumulator `pairUnion (xBaseBlock Z) pair i` を `(k, χmem:Fin k→IrreducibleCharacter ↥L, hχinj, hrange一致, non-real, conj-support⊆A, conj-orthogonality, orthonormality)` として完全列挙。**⟹ StepData の enum fields (k/χmem/hrange) は揃っている**。idx coprime = `coprimeIndexPrimePow`(S08:2893 付近)。
+- **⟹ capstone 残務の正確な姿**:
+  - **(A) StepData degree-data producer** = (6.6) の本体。enum member family(上記)+ leaf(θ p-power/3≤p/idx)から StepData の **degree/gap/sum fields**(dχ/d₁/dmem, θ=p^m, hsum/hqtot/hθsq_le_qtot/htotal)を構成。mmd 04.8 L76-82(θᵢ(1)²∣∑χⱼ(1)², [Is]Cor2.30 θ(1)²≤|K:Z|, idx coprime p)。consumer = `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(S08:7009)。**次 loop の主対象**。
+  - **(B) ν glue**(hagreeX/hagreeY/hmixed/hgen): X∪Y combined extension。
+- **次着手**: `xAdjoinStepInput_of_pairUnion_baseAnchor_commonIndexPrimePowerSums`(7009)と StepData consumer の正確な必要 fields を読み、enum member family の各 χmem=Ind θ から degree-data を組む producer を構成(per-member Ind 分解 + θ p-power で θmem、idx=|W₁| で dmem=idx·θmem、(6.6) 数論で gap/sum)。
+
 ### 🔴→🟢 (6.5) 「H は p-群」wiring = 次 loop iteration の主対象 (✅ 続7 で landed)
 **目標**: Frobenius case で `∃ p prime, IsPGroup p ↥H` を `six_three` 逆用 + 既 landed `isPGroup_of_isFrobeniusGroup_of_card_le`(S08:2616)で得る。
 - **`isPGroup_of_isFrobeniusGroup_of_card_le`** signature(確認済): `{N A:Subgroup G}[IsNilpotent ↥N] (h:IsFrobeniusGroup G N A)(hHodd:Odd (Nat.card (Abelianization ↥N)))(hAodd:Odd (Nat.card ↥A))(hbound:Nat.card (Abelianization ↥N) ≤ 4*Nat.card ↥A^2+1) ⟹ ∃ p, p.Prime ∧ IsPGroup p ↥N`。N=H, A=W₁, h=hF。
