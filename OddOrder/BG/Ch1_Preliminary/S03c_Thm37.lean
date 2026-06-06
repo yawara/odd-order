@@ -186,4 +186,42 @@ theorem chiefFactorConjAction_smul_eq_self_iff_mem {G : Type*} [Group G] {X Y : 
   · intro h x; have := h x⁻¹; simpa using this
   · intro h x; have := h x⁻¹; simpa using this
 
+open OddOrder.GroupTheory in
+/-- **Coprime branch of BG Thm 3.7's chief-factor analysis**: for a `G`-chief factor `X/Y` with
+`X ⊆ K`, elementary abelian of prime `s` coprime to `|K/L|`, with `L ⊴ G` (the nilpotent layer from
+the induction) centralizing `X/Y` and `R` acting fixed-point-freely on `X/Y`, the kernel `K`
+centralizes `X/Y` (i.e. `K ≤ chiefFactorCentralizer X Y`). Assembles glue (A) + the model-bridge +
+the descent helper + the coprime case (`kernel_acts_trivially_of_coprime_fixedPointFree`). -/
+theorem coprime_kernel_le_chiefFactorCentralizer
+    {G : Type*} [Group G] [Finite G] {K R X Y : Subgroup G}
+    [X.Normal] [Y.Normal] {s : ℕ} [Fact s.Prime]
+    (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
+    {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
+    (hFrobL : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (G ⧸ L)
+      (K.map (QuotientGroup.mk' L)) (R.map (QuotientGroup.mk' L)))
+    (hchar : ¬ s ∣ Nat.card (K.map (QuotientGroup.mk' L)))
+    (hFPF : letI := chiefFactorConjAction X Y
+            ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1) :
+    K ≤ chiefFactorCentralizer X Y := by
+  haveI : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
+  letI : CommGroup (↥X ⧸ Y.subgroupOf X) :=
+    { (inferInstance : Group (↥X ⧸ Y.subgroupOf X)) with mul_comm := hVelem.comm }
+  letI := hVelem.zmodModule
+  letI := chiefFactorConjAction X Y
+  have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
+    intro l hl v
+    exact (chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
+  letI := mulDistribMulActionQuotientOfTrivial L hL
+  have hFPF' : ∀ v : ↥X ⧸ Y.subgroupOf X,
+      (∀ r : R.map (QuotientGroup.mk' L), (r : G ⧸ L) • v = v) → v = 1 := by
+    intro v hv
+    refine hFPF v (fun r => ?_)
+    rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (r : G) v]
+    exact hv ⟨QuotientGroup.mk' L (r : G), ⟨r, r.2, rfl⟩⟩
+  have hKtriv := kernel_acts_trivially_of_coprime_fixedPointFree hFrobL hchar hFPF'
+  intro k hk
+  refine (chiefFactorConjAction_smul_eq_self_iff_mem k).mp (fun v => ?_)
+  rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (k : G) v]
+  exact hKtriv ⟨QuotientGroup.mk' L (k : G), ⟨k, hk, rfl⟩⟩ v
+
 end OddOrder.BG.Ch1.S03c
