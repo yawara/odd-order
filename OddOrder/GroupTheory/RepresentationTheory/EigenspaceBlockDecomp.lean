@@ -184,6 +184,30 @@ theorem trace_eq_sum_finrank_smul_of_isInternal {ι : Type*} [Fintype ι] [Decid
   simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
 
 open Module in
+/-- **Keystone (P1).** `tr(c_{xᵏ}) = ∑_m εᵐᵏ · dim E_m` where `c_x = cyclicEndConj g` is the
+conjugation operator: instantiate the block-scalar trace lemma at `End V = ⊕_m E_m`, on which
+`(cyclicEndConj g)^k` acts as the scalar `(εᵐ)ᵏ = ε^{m·k}` (eigenvector power). -/
+theorem trace_pow_cyclicEndConj_eq {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} [NeZero h] [FiniteDimensional F V]
+    (hprim : IsPrimitiveRoot epsilon h)
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h))
+    (k : ℕ) :
+    LinearMap.trace F (Module.End F V) ((cyclicEndConj g) ^ k)
+      = ∑ m : Fin h,
+          (finrank F (cyclicEndConjEigenspaceFin epsilon g m) : F) * epsilon ^ ((m : ℕ) * k) := by
+  refine trace_eq_sum_finrank_smul_of_isInternal
+    (isInternal_cyclicEndConjEigenspaceFin hprim hV) ?_
+  intro m v hv
+  have hev : (cyclicEndConj g) v = epsilon ^ (m : ℕ) • v := mem_cyclicEigenspace_iff.mp hv
+  have hpow : ∀ j : ℕ, ((cyclicEndConj g) ^ j) v = (epsilon ^ (m : ℕ)) ^ j • v := by
+    intro j
+    induction j with
+    | zero => simp
+    | succ j ih =>
+      rw [pow_succ, Module.End.mul_apply, hev, map_smul, ih, smul_smul, ← pow_succ']
+  rw [hpow k, ← pow_mul]
+
+open Module in
 /-- **BG Proposition 2.4(g).** For the conjugation `εᵐ`-eigenspace `E_m` on `End V`,
 `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ` where `nᵢ = dim Vᵢ`. Sandwich: each diagonal `⨆ᵢ E_{i,i+m} ≤ E_m` gives
 `∑ᵢ nᵢnᵢ₊ₘ ≤ dim E_m`; the `E_m` are independent (distinct eigenvalues) so `∑ₘ dim E_m ≤ dim End`;
