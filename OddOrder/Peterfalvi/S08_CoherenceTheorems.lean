@@ -9232,6 +9232,38 @@ theorem restrict_extension_Yset_degree_value_eq_of_frobenius
     (N := hyp.centralCommutator) hz hz1]
   ring
 
+/-- **(6.8.1) `η^{τ₁}` is constant on `Zc^#`** (mmd 04.8 L168 conclusion).  For `η ∈ Y`, the
+restriction `Res^G_L(η^{τ₁})` takes the same value at any two points of `Zc^#`.  Immediate from the
+value identity `restrict_extension_Yset_degree_value_eq_of_frobenius` (whose right side `-⟨R,χ₁⟩·|L|`
+is independent of the point) and `χ₁(1) ≠ 0` (any anchor `χ₁ ∈ X(Zc)`, nonempty).  This is the exact
+"character constant on `Z^#`" hypothesis of the (6.7) adapter `peterfalvi_67_centralCommutator`. -/
+theorem restrict_extension_Yset_const_on_centralCommutator_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z z' : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1)
+    (hz' : z' ∈ hyp.centralCommutator) (hz'1 : z' ≠ 1) :
+    (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      = (ClassFunction.restrict L (hyp.coherentYset.extension η)) z' := by
+  obtain ⟨χ₁, hχ₁⟩ := hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hd : χ₁ 1 ≠ 0 := by
+    obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ₁, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hd_eq
+    rw [hd_eq]; exact_mod_cast hd_pos.ne'
+  have hv := hyp.restrict_extension_Yset_degree_value_eq_of_frobenius
+    hF hHnonab hp hp3 hHp hη hχ₁ hz hz1
+  have hv' := hyp.restrict_extension_Yset_degree_value_eq_of_frobenius
+    hF hHnonab hp hp3 hHp hη hχ₁ hz' hz'1
+  have hcancel : (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      - (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+      = (ClassFunction.restrict L (hyp.coherentYset.extension η)) z'
+        - (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1 :=
+    mul_left_cancel₀ hd (hv.trans hv'.symm)
+  linear_combination hcancel
+
 /-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
 `himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
 (`exists_integralCharacterMap_glue_of_orthonormal` with `νX = τ₂`, `νY = τ₁`); its agreement
