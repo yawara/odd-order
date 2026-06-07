@@ -1,0 +1,134 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.GroupTheory.RepresentationTheory.EigenspaceBlockDecomp
+
+/-!
+# Eigenspaces of a cyclic shift (single-cycle core of BG (2.11))
+
+`OddOrder.GroupTheory.RepresentationTheory` shared module: the linear-algebra core behind the
+`F[H]`-module structure of `E(P)` in Bender–Glauberman (2.11).  A **cyclic shift** is the
+permutation operator of a single `h`-cycle: a finite-dimensional space `W` with a basis
+`b : ZMod h → W` and an operator `T` with `T (b j) = b (j + 1)`.  Over a field containing a
+primitive `h`-th root of unity `ε`, every eigenvalue `εᵐ` of `T` has a **one-dimensional**
+eigenspace (the shift is the regular representation of the cyclic group, which splits into the `h`
+distinct characters, each with multiplicity one).
+
+The proof avoids a full diagonalization: the `h` eigenspaces are independent
+(`cyclicEigenspaceFin_iSupIndep`, distinct eigenvalues), each is nonzero (explicit eigenvector
+`v_i = ∑_j (ε^{i})⁻¹^{j.val} • b j`), and their dimensions sum to at most `dim W = h`, forcing each
+to be exactly `1`.
+
+This is the per-orbit input to the pure-permutation eigenspace count yielding the keystone
+`dim E₀ = dim E_m + 1`.
+-/
+
+namespace OddOrder.RepresentationTheory
+
+open Finset EigenspaceUnderCyclicAction Module
+
+variable {F : Type*} [Field F]
+variable {W : Type*} [AddCommGroup W] [Module F W]
+
+/-- A power of a root of unity is periodic in its exponent modulo `hh`: if `ζ^hh = 1` and
+`a ≡ c [MOD hh]` then `ζ^a = ζ^c`. -/
+theorem pow_eq_pow_of_modEq {ζ : F} {hh : ℕ} (hζ : ζ ^ hh = 1) {a c : ℕ}
+    (hac : a ≡ c [MOD hh]) : ζ ^ a = ζ ^ c := by
+  wlog hle : c ≤ a generalizing a c
+  · exact (this hac.symm (not_le.mp hle).le).symm
+  obtain ⟨t, ht⟩ := (Nat.modEq_iff_dvd' hle).mp hac.symm
+  rw [show a = c + hh * t by omega, pow_add, pow_mul, hζ, one_pow, mul_one]
+
+section CyclicShift
+
+variable {h : ℕ} [NeZero h] (b : Basis (ZMod h) F W) (T : Module.End F W)
+
+/-- `↑(x.val) = x` for the self-cast `ZMod h → ZMod h`. -/
+private theorem natCast_val_zmod (x : ZMod h) : ((x.val : ℕ) : ZMod h) = x :=
+  ZMod.natCast_rightInverse x
+
+/-- The explicit eigenvector identity for a cyclic shift: `v = ∑_j (ε^i)⁻¹^{j.val} • b j` is an
+`ε^i`-eigenvector of `T` (where `T (b j) = b (j+1)`), provided `ε^h = 1`. -/
+theorem cyclicShift_hasEigenvector {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
+    (hb : ∀ j, T (b j) = b (j + 1)) (i : ℕ) :
+    T (∑ j : ZMod h, ((ε ^ i)⁻¹ ^ j.val) • b j)
+      = (ε ^ i) • ∑ j : ZMod h, ((ε ^ i)⁻¹ ^ j.val) • b j := by
+  set ζ : F := (ε ^ i)⁻¹ with hζdef
+  have hζne : ζ ≠ 0 := inv_ne_zero (pow_ne_zero i hε)
+  have hζpow : ζ ^ h = 1 := by
+    rw [hζdef, inv_pow, ← pow_mul, mul_comm, pow_mul, hεpow, one_pow, inv_one]
+  -- key index identity: `ζ^{(k-1).val} = ε^i · ζ^{k.val}`
+  have hgeom : ∀ k : ZMod h, ζ ^ (k - 1).val = ε ^ i * ζ ^ k.val := by
+    intro k
+    have hmod : (k - 1).val + 1 ≡ k.val [MOD h] := by
+      apply (ZMod.natCast_eq_natCast_iff _ _ _).mp
+      push_cast
+      rw [natCast_val_zmod (k - 1), natCast_val_zmod k]
+      ring
+    have hstepmul : ζ ^ (k - 1).val * ζ = ζ ^ k.val := by
+      rw [← pow_succ]; exact pow_eq_pow_of_modEq hζpow hmod
+    have hεi : ζ⁻¹ = ε ^ i := by rw [hζdef, inv_inv]
+    have hstep : ζ ^ (k - 1).val = ζ ^ k.val * ζ⁻¹ := by
+      rw [← hstepmul, mul_assoc, mul_inv_cancel₀ hζne, mul_one]
+    rw [hstep, hεi, mul_comm]
+  -- expand `T v`, reindex by `+1`, apply the geometric identity
+  rw [map_sum]
+  simp only [map_smul, hb]
+  rw [Finset.smul_sum]
+  have hLHS : (∑ j : ZMod h, ζ ^ j.val • b (j + 1))
+      = ∑ k : ZMod h, ζ ^ (k - 1).val • b k := by
+    rw [← Equiv.sum_comp (Equiv.addRight (1 : ZMod h)) (fun k => ζ ^ (k - 1).val • b k)]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    simp only [Equiv.coe_addRight, add_sub_cancel_right]
+  rw [hLHS]
+  refine Finset.sum_congr rfl fun k _ => ?_
+  rw [hgeom k, mul_smul]
+
+/-- **Each eigenspace of a cyclic shift is one-dimensional.** For `b : Basis (ZMod h) F W` and the
+shift `T (b j) = b (j+1)`, and `ε` a primitive `h`-th root of unity,
+`finrank (T.eigenspace (ε^{i})) = 1` for every `i : Fin h`. (The regular representation of `ZMod h`
+splits into the `h` distinct characters, each with multiplicity one.) -/
+theorem finrank_cyclicEigenspaceFin_cyclicShift {ε : F} (hε : IsPrimitiveRoot ε h)
+    (hb : ∀ j, T (b j) = b (j + 1)) (i : Fin h) :
+    finrank F (cyclicEigenspaceFin ε T i) = 1 := by
+  haveI : FiniteDimensional F W := Module.Finite.of_basis b
+  have hε0 : ε ≠ 0 := hε.ne_zero (NeZero.ne h)
+  have hεpow : ε ^ h = 1 := hε.pow_eq_one
+  -- explicit eigenvector for `ε^{j.1}`, for each `j`
+  have hev : ∀ j : Fin h, cyclicEigenspaceFin ε T j ≠ ⊥ := by
+    intro j
+    rw [Submodule.ne_bot_iff]
+    refine ⟨∑ l : ZMod h, ((ε ^ j.1)⁻¹ ^ l.val) • b l, ?_, ?_⟩
+    · rw [mem_cyclicEigenspaceFin_iff]
+      exact cyclicShift_hasEigenvector b T hε0 hεpow hb j.1
+    · -- nonzero: its `0`-coordinate is `(ε^{j.1})⁻¹^0 = 1`
+      intro hzero
+      have hcoord : (b.repr (∑ l : ZMod h, ((ε ^ j.1)⁻¹ ^ l.val) • b l)) 0 = 1 := by
+        rw [map_sum]
+        simp only [map_smul, Basis.repr_self, Finsupp.coe_finset_sum, Finset.sum_apply,
+          Finsupp.smul_single, smul_eq_mul, mul_one, Finsupp.single_apply]
+        rw [Finset.sum_eq_single (0 : ZMod h)]
+        · simp
+        · intro l _ hl; rw [if_neg hl]
+        · intro h0; exact absurd (Finset.mem_univ _) h0
+      rw [hzero] at hcoord
+      simp at hcoord
+  -- the `h` eigenspaces are independent, with dimensions summing to `≤ dim W = h`
+  have hindep := cyclicEigenspaceFin_iSupIndep (g := T) hε
+  have hge : ∀ j : Fin h, 1 ≤ finrank F (cyclicEigenspaceFin ε T j) := fun j =>
+    Submodule.one_le_finrank_iff.mpr (hev j)
+  have hsumle : (∑ j : Fin h, finrank F (cyclicEigenspaceFin ε T j)) ≤ finrank F W := by
+    rw [← finrank_iSup_of_iSupIndep (fun j : Fin h => cyclicEigenspaceFin ε T j) hindep]
+    exact Submodule.finrank_le _
+  have hWcard : finrank F W = h := by rw [finrank_eq_card_basis b, ZMod.card]
+  have hcardeq : (∑ _j : Fin h, (1 : ℕ)) = h := by simp
+  have hsumeq : (∑ _j : Fin h, (1 : ℕ)) = ∑ j : Fin h, finrank F (cyclicEigenspaceFin ε T j) := by
+    refine le_antisymm (Finset.sum_le_sum fun j _ => hge j) ?_
+    rw [hcardeq]; exact hsumle.trans_eq hWcard
+  exact ((Finset.sum_eq_sum_iff_of_le fun k _ => hge k).mp hsumeq i (Finset.mem_univ i)).symm
+
+end CyclicShift
+
+end OddOrder.RepresentationTheory

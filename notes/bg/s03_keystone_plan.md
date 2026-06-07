@@ -117,18 +117,33 @@ partial products), and `{v_m}_{m}` is a basis of `W_O` (distinct eigenvalues) �
 for every `m`. Fixed point `s₀` (identity coset): `b s₀ = ρ(1) = id`, `c_x(id)=id` ⟹ contributes to
 `E₀` only. So `dim E_m = N + [m=0]`.
 
-**Remaining Leaf 3 sub-leaves (recommended order):**
-1. Generalize the basis to a section: `burnsideBasisOfSection (t : P/Z → P) (ht : ∀ c, ⟦t c⟧ = c) :
-   Basis (P/Z) F (End V)` (refactor Leaf 1; `Quotient.out` is the special case).
-2. Construct the φ-equivariant section `t` (orbit-rep choice + `φ^j` propagation; uses `σ`-orbit
-   structure of `P/Z`, free for `c ≠ ⟦1⟧` from `C_{P/Z}(xᵏ)=1`). Prove `φ(t c) = t(σ c)` ⟹
-   `c_x (b c) = b (σ c)` (pure permutation) via `cyclicEndConj_representation`.
-3. Pure-permutation eigenspace count: `dim(εᵐ-eigenspace of the σ-permutation operator) = #{orbits O
-   : ε^{m·|O|}=1}` (orbit `DirectSum.IsInternal` + single-cycle pure-shift eigenvector
-   `∑_j ε^{-mj} b_{σʲc₀}`, dim-1 per cycle for each `m`). Reusable as its own file.
-4. Instantiate: orbits of `σ` on `P/Z` are `{⟦1⟧}` (size 1) + free (size `h`) ⟹ `dim E_m = N+[m=0]`
-   ⟹ `dim E₀ = dim E_m + 1`. Discharge `hEdim` of
-   `sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace` (`ExtraspecialThm25.lean`).
+**✅ Leaf 3 technical core DONE** (`CyclicShiftEigenspace.lean`, sorry-free, axiom-clean, commit
+`7b2663b`): `finrank_cyclicEigenspaceFin_cyclicShift` — for the pure shift `T (b j) = b (j+1)` on
+`b : Basis (ZMod h) F W`, each `T.eigenspace (εⁱ)` is **1-dimensional** (`ε` primitive `h`-th root).
+Helpers: `pow_eq_pow_of_modEq` (general), `cyclicShift_hasEigenvector` (explicit eigenvector
+`∑_j (εⁱ)⁻¹^{j.val} • b j`). Proof = dimension squeeze (h independent nonzero eigenspaces in an
+h-dim space) reusing `cyclicEigenspaceFin_iSupIndep` + `finrank_iSup_of_iSupIndep` — NO full
+diagonalization. **Route-independent** (works for any orbit once it's reduced to a pure cycle).
+
+**▶ Remaining Leaf 3 = the ORBIT ASSEMBLY (the bulk that's left).** Refined plan — a **GLOBAL SQUEEZE**
+that AVOIDS the orbit `DirectSum.IsInternal` and the "block-eigenspace = ∑" lemma:
+1. Generalize the basis to a section: `burnsideBasisOfSection (t : P/Z → P) (ht : ∀ c, ⟦t c⟧ = c)`
+   (refactor Leaf 1; independence/spanning work for any section, not just `Quotient.out`).
+2. Construct the **φ-equivariant section** `t` (orbit-rep choice + `φ^j` propagation; `σ`-orbits of
+   `P/Z` are free for `c ≠ ⟦1⟧` from `C_{P/Z}(xᵏ)=1`, fixed only at `⟦1⟧`). Get `φ(t c) = t(σ c)`
+   ⟹ via `cyclicEndConj_representation`, `c_x (b c) = b (σ c)` — a **PURE permutation** (twist gone).
+3. **Per free orbit**, the orbit submodule `W_O = span{b_s : s∈O}` has `Basis (ZMod h) F W_O`
+   (torsor `j ↦ σʲc_O`) and `c_x|_{W_O}` = pure shift ⟹ apply `finrank_cyclicEigenspaceFin_cyclicShift`
+   to get an explicit `εᵐ`-eigenvector `v_{O,m} ∈ E_m` (it lies in the global `E_m` since `W_O` is
+   `c_x`-invariant). Fixed point `⟦1⟧`: `b_{⟦1⟧} = ρ(1) = id ∈ E₀`.
+4. **Squeeze (global, no DirectSum):** `{v_{O,m} : O free} ∪ ({b_{⟦1⟧}} if m=0) ⊆ E_m` are independent
+   (disjoint orbit support) ⟹ `dim E_m ≥ N + [m=0]` (`N` = #free orbits). And `∑_m dim E_m = q²`
+   (`isInternal_cyclicEndConjEigenspaceFin`) `= N·h + 1 = ∑_m (N+[m=0])`. Each `≥` + equal totals ⟹
+   `dim E_m = N + [m=0]` ⟹ `dim E₀ = dim E_m + 1`. (Same squeeze pattern as the single-cycle proof.)
+   Needs: σ-orbit count `|P/Z| = N·h + 1` (orbit sizes from `C_{P/Z}(xᵏ)=1`; `MulAction`/`Equiv.Perm`
+   orbit tools), and cross-orbit independence (disjoint basis support).
+5. Discharge `hEdim` of `sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace`
+   (`ExtraspecialThm25.lean`). Leaf 4.
 
 Then **Leaf 5 = Thm 2.5/3.4 assembly** (Prop 2.2(a) alg-closed Clifford `V_P=M`, base-change (2.9),
 produce `(P,φ,T)` from the `G=P⋊⟨x⟩` rep, Maschke→faithful irred, Gor 5.3.7 → contradiction).
