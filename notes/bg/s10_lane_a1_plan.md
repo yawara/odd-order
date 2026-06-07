@@ -93,8 +93,24 @@ B∉𝒰 と仮定 → Uniqueness で r(C_P(B))≤2 → |B|=p² ∧ Ω₁(C_P(B)
 coprime + Ω₁ 固定 ⇒ 全固定の剛性) で C_P(X)=P → r(C_M(X))≥r(P)≥3 (p∈α) → Uniqueness で 𝒰。
 依存: `exists_aInvariant_sylow`, **Cor 1.12 (未特定)**, uniquenessTheorem, α-rank, max-order B。中規模。
 
-#### 10.5 `pRank_eq_two_of_normalizer_le` (statement OK; **§11 Hyp 11.1 を解除する高価値**)
+#### ✅ 10.5 `pRank_eq_two_of_normalizer_le` DONE (axiom-clean; **§11 Hyp 11.1 を解除**)
 
+2026-06-07 完成・sorry-free・`#print axioms` = 標準3つ (sorryAx 無)。本文 (mmd L2767-2774) を直訳。
+新規 leaf-private helper 2 個:
+- `isCyclic_of_pRank_le_one` (= **Lemma 4.5 の逆**): odd p-群 pRank≤1 ⇒ cyclic。既存
+  `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` の対偶 + `le_pRank`。
+- `normalizer_le_normalizer_omega1CenterInG`: `N_G(P) ≤ N_G(Ω₁(Z(P)))`。inner `omega1OfAbelian ↥P (center) p`
+  の characteristic を `CriticalSubgroup.omega1Center.characteristic` の複製で示し
+  `AppB.normalizer_le_normalizer_map_of_characteristic` 適用。
+
+実装メモ: `PM : Sylow p ↥M`, `P := (PM:Subgroup↥M).map M.subtype` で `pRank ↥P = pRank ↥M`
+(`pRank_le_of_injective` 双方向 + `pRank_sylow_eq`)。σ-introduction は σ-def の witness `⟨hpπ, PM, _⟩` を
+直接供給 (**Uniqueness 不使用**)。(iii) は `A = X ⊔ Ω₁(Z(P))` を `↥P` 内で構成 (`sup_of_le_centralizer`,
+`omega1OfAbelian_isElementaryAbelian`, `Z'≠⊥` は `exists_mem_omega1_center_of_normal_ne_bot` N=⊤)、
+`|A|=p²` を `pRank ↥P=2` 上限 ∧ `X'⊊A'` 下限で挟み `P.subtype` で `G` へ push。leaf 内で
+`alpha_criterion`/`cyclic_subgroup_eq_of_card_eq` の後ろへ移動 (forward-ref 回避)。
+
+(以下は着手前の回収メモ。)
 本 proof (mmd L2767-2774, 既存): α⊆σ ⇒ p∉α ⇒ r_p(M)≤2。P=Sylow p of M ⊇X。r_p=1 なら
 **Lemma 4.5** で P cyclic → X=Ω₁(P), N_G(P)⊆N_G(X)⊆M ⇒ p∈σ 矛盾 → r_p(M)=2。X≠Ω₁(Z(P)) ⇒
 A:=XΩ₁(Z(P))∈ℰ²(P)⊆ℰ_p²(G) ∋X。p not ideal = **本 10.4(c)**。
@@ -108,9 +124,9 @@ r(S)=2 / r(S)≥3 の場合分け、**Thm 5.3** (narrow) + Cor 10.7(b) を使い
 (c): x∈N_P(A)−C_P(A) が位数 p の自己同型を誘導、Z₀ 中心化 → A の p-部分群を transitive 置換。
 依存: §5 narrow p-群構造 (Thm 5.3, Cor 10.7(b)), Ω₁(Z(·)), ℰ¹/ℰ² API。§5 重め。
 
-**総括**: 4 leaf とも原文回収済・依存マップ済だが、各 100-200 行規模の本格証明 (+ 10.4 は statement 修正要)。
-着手順推奨: 10.4 (statement 修正 + 短い proof) → 10.5 (10.4(c) 利用, §11 解除) → 10.3 (Cor 1.12 特定後) →
-10.13 (§5 重)。Cor 1.12 と Lemma 4.5 (cyclic) の repo 内特定が次の前提作業。
+**総括 (2026-06-07 更新)**: A1 lane で着手可能だったのは 10.11(d)/10.12/10.4/10.5 の 4 つ → **全て DONE・axiom-clean**。
+残りは 10.3 (Cor 1.12 未特定)、10.13 (§5 narrow 重)、10.11(a)(b)(c) (spine `Prop 10.10` 待ち=A1 不可)。
+着手順推奨 (残り): 10.3 (Cor 1.12 = coprime+Ω₁ 固定 ⇒ 全固定 の repo 内特定が前提) → 10.13 (Thm 5.3/Cor 10.7(b))。
 
 ## ⚠ 依存の実態 (BG 原文を読んで判明 — 当初の docstring ベース map は楽観的すぎた)
 
@@ -120,7 +136,7 @@ r(S)=2 / r(S)≥3 の場合分け、**Thm 5.3** (narrow) + Cor 10.7(b) を使い
 | `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | ✅ **DONE** (eb6cc10, (c) 還元) |
 | `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | ✅ **DONE** (95a313c, **axiom-clean** sorryAx 無) |
 | `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Uniqueness | 要 PDF 再読込 (§10 前半, ≈book p.76 以前=PDF≤88) |
-| `pRank_eq_two_of_normalizer_le` | 10.5 | §7 Prop 7.5 等 | 要 PDF 再読込 (§10 前半) |
+| `pRank_eq_two_of_normalizer_le` | 10.5 | σ-def + Lemma 4.5逆 + Ω₁(Z) + 10.4(c) | ✅ **DONE** (axiom-clean; §11 解除) |
 | `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | 要 PDF 再読込 (§10 前半) |
 | `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | 10.13 | p-群構造 | 証明回収済 (book p.79–80=PDF 92–93) |
 
