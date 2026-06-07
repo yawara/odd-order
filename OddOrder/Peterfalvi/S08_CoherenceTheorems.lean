@@ -9817,6 +9817,56 @@ theorem dvd_inner_restrict_extension_Yset_of_frobenius
   have : (cc : ℂ) = ((a : ℤ) * n : ℤ) := by rw [hn]; push_cast; ring
   exact_mod_cast this
 
+/-- **(6.8.1) `a ∣ b`** (mmd 04.8 L176, the `b ≡ 0 (mod a)` half of "`b ≡ c ≡ 0 (mod a)`").  For
+`η = η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|` (`a > 0`), the `η₁^{τ₁}`-coefficient
+of the cross-diagonal image `(χ₁−aη₁)^τ` — namely `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩`, which is `b − a` in the
+Peterfalvi decomposition (168) `(χ₁−aη₁)^τ = X − aη₁^{τ₁} + b∑η_j^{τ₁}` — is an **integer divisible
+by `a`**.  Since `a ∣ (b − a) ⟺ a ∣ b`, this is exactly Peterfalvi's `b ≡ 0 (mod a)`.
+
+Direct route via Dade reciprocity (no need for the full (168) decomposition): `χ₁−aη₁` is supported
+on `H^#` (`sMember_scaledDiffSupport_of_charValue_eq`, `χ₁(1) = a·η₁(1)` from `Yset_apply_one`), so
+`⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = ⟨χ₁−aη₁, Res^G_L(η₁^{τ₁})⟩` (`inner_tau_eq_inner_restrict`)
+`= ⟨χ₁, R⟩ − a·⟨η₁, R⟩ = c − a·e` (`R = Res^G_L(η₁^{τ₁})`; conjugate symmetry `inner_conj_symm` +
+reality of the integers `c = ⟨R,χ₁⟩`, `e = ⟨R,η₁⟩`, `mem_ZIrr_inner_int`).  Since `a ∣ c`
+(`dvd_inner_restrict_extension_Yset_of_frobenius`, step 2) and `a ∣ a·e`, `a ∣ (c − a·e)`. -/
+theorem dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha_pos : 0 < a) (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ∃ bb : ℤ,
+      ClassFunction.inner (hyp.tau (χ₁ - a • η)) (hyp.coherentYset.extension η) = (bb : ℂ)
+        ∧ (a : ℤ) ∣ bb := by
+  classical
+  -- step 2: `c = ⟨R, χ₁⟩` is an integer with `a ∣ c`.
+  obtain ⟨cc, hcc, hacc⟩ :=
+    hyp.dvd_inner_restrict_extension_Yset_of_frobenius hF hHnonab hp hp3 hHp hη hχ₁ ha_pos ha
+  -- `R ∈ ZIrr L`, `η₁` irreducible ⟹ `e := ⟨R, η₁⟩ ∈ ℤ`.
+  have hηtZ : hyp.coherentYset.extension η ∈ ZIrr G :=
+    hyp.coherentYset.extension_mem_ZIrr η (Submodule.subset_span hη)
+  have hRZ : ClassFunction.restrict L (hyp.coherentYset.extension η) ∈ ZIrr (↥L) :=
+    OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr L hηtZ
+  have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  obtain ⟨e, he⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int
+    (⟨η, hηirr⟩ : IrreducibleCharacter ↥L) hRZ
+  rw [show ((⟨η, hηirr⟩ : IrreducibleCharacter ↥L) : ClassFunction ↥L ℂ) = η from rfl] at he
+  -- `χ₁ − a•η₁` is supported on `H^#`.
+  have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
+  have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+  -- reciprocity: `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = ⟨χ₁−aη₁, R⟩`.
+  have hrec := hyp.inner_tau_eq_inner_restrict hsupp (hyp.coherentYset.extension η)
+  refine ⟨cc - a * e, ?_, ?_⟩
+  · rw [hrec, ClassFunction.inner_sub_left, ← Nat.cast_smul_eq_nsmul ℂ a η,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_conj_symm _ χ₁, hcc,
+      OddOrder.RepresentationTheory.inner_conj_symm _ η, he]
+    simp only [star_intCast]
+    push_cast; ring
+  · exact dvd_sub hacc (dvd_mul_right _ _)
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
