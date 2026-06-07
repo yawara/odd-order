@@ -32,7 +32,16 @@ Each new def must build leaf-green. Commit as one unit.
 defs + S09 — ~7 defs, mechanical — but only if you can keep every intermediate build green.)
 
 ### Step 2 — the L2 `hstepData` monolith at `Z = centralCommutator`
-Use the note's "L2 field map". Sketch:
+
+**✅ DONE (2026-06-07, `d21d788`, sorry-free + axiom-clean).**
+`Xset_centralCommutator_isCoherent_of_frobenius` builds the StepData for every chain step and feeds
+the `…withCover…` Zc shell → `IsCoherent (Xset Zc)`. The `κ : Type` (Type 0) constraint was met by
+`Fin tailF.card`-indexing the tail (`Finset.equivFin` + `Equiv.sum_comp` + `Finset.sum_coe_sort`);
+∃→data via the `choose` tactic. Sub-lemmas: `exists_xBaseBlock_anchor_index` (1f2148a),
+`characterDegree_re_le_of_not_mem_pairUnion` (c8ddb62), `natSum_partition_of_realSum` (ab01c92).
+**⟹ L2 is complete. Next: Step 3 (L3 ν-glue, then CertainType case B, then capstone wiring).**
+
+Original field-map sketch (for reference):
 - p-group: `H` is a `p`-group via `isPGroup_of_not_coherent` (or take `{p} (hp) (hHp)` as inputs).
 - enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k, χmem, hχinj, hrange`; anchor `i₁` =
   a base-block element (use `two_le_xBaseBlock_ncard` for nonemptiness + membership in the pairUnion).

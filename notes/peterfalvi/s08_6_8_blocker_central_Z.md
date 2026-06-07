@@ -286,6 +286,12 @@ confirmed present, no prerequisite *theorem* is missing — it is all assembly.
 `hcover` to the StepData producer (engine `Xset_isCoherent_from_adjoinSteps_withCover_of_irreducible_X`,
 consumer `…BaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X`, Zc shell
 `Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius`).
-No existing signatures touched → S09 untouched, full build green. **🔜 (2) the L2 `hstepData`
-monolith** at Z=Zc, fed to the `…withCover…` Zc shell, using `hcover` for `tailSet`/`htail_le`/`hsum`
-(field map above). Then L3, CertainType case (B), capstone wiring.
+No existing signatures touched → S09 untouched, full build green. **✅ (2) the L2 producer monolith
+DONE (`d21d788`, sorry-free + axiom-clean)**: `Xset_centralCommutator_isCoherent_of_frobenius` builds
+the first-ever `…StepData` term for every chain step and feeds the `…withCover…` Zc shell →
+`IsCoherent (Xset Zc)`. Sub-lemmas: anchor (`1f2148a`), htail_le core (`c8ddb62`), hsum-partition
+(`natSum_partition_of_realSum`, `ab01c92`). The `StepData.κ : Type` (Type 0) constraint was met by
+indexing the tail `XF∖members` via `Fin tailF.card` (`Finset.equivFin` + `Equiv.sum_comp` +
+`Finset.sum_coe_sort`); ∃→data witnesses via the `choose` tactic (Type-valued goal).
+**⟹ L2 (the X(Zc)-coherence) is complete.** Remaining for the (6.8) capstone: **L3** (ν-glue, wires
+`peterfalvi_67_of_odd`), **CertainType case (B)**, **capstone wiring**.
