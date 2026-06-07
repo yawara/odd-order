@@ -465,10 +465,20 @@ this). **Verify before committing to "himg_ortho is the last step":** re-derive 
 meant to supply `hgen`; if the degree-counting above is right, plan a diagonal-aware union lemma.
 
 ### Recommended next steps (updated)
-1. **difference-orthogonality leaf** (clean): `⟨τ₂ x, τ₁ y⟩ = ⟨x,y⟩` for supported `x∈ℤ[X,A]`,
-   `y∈ℤ[Y,A]` (both = τ, Dade isometry). Foundation for both `himg_ortho` and the diagonal handling.
-2. **`himg_ortho` via (4.1)**: wire `pairwise_inner_eq_zero_of_orthogonal_signedDifference` + #1 +
-   `dadeIntegralCharacterMap_apply_one_eq_zero` + `n,m ≥ 2`.
+1. ✅ **DONE** (2026-06-07 session 3, same commit cluster): **difference-orthogonality leaf** —
+   `inner_extension_eq_inner_of_supported` (S08 `OddOrder.Peterfalvi.S08`, axiom-clean, AxiomsCheck-
+   registered): for two coherences `hX, hY` off the **same** Dade base map and supported
+   `x∈ℤ[X,A]`, `y∈ℤ[Y,A]`, `⟨hX.extension x, hY.extension y⟩ = ⟨x,y⟩` (`extends_on_supported` to τ +
+   `dadeIntegralCharacterMap_inner_eq_on_supported_span` on the pair `{x,y}`). Companion
+   `extension_apply_one_eq_zero_of_supported` (`(hX.extension x)(1)=0` for supported `x`) supplies
+   the (4.1) degree-`0` hypotheses. Both are the (4.1) `hdiff`/degree-`0` inputs — hgen-independent,
+   reusable for the diagonal handling too.
+2. **`himg_ortho` via (4.1)**: wire `pairwise_inner_eq_zero_of_orthogonal_signedDifference` + #1
+   (`inner_extension_eq_inner_of_supported` for `hdiff`, `extension_apply_one_eq_zero_of_supported`
+   for degree-`0`) + `n,m ≥ 2` (the B4 issue — needs a reference distinct from each member; the
+   degree ratio is just `dᵢ = χᵢ(1)/χ₁(1) ∈ ℝ`, no p-group structure needed). **Blocked only on
+   `n ≥ 2`/`m ≥ 2`** (existence of distinct references per member), itself a caller-supplied /
+   §6.5-context fact.
 3. **Resolve `hgen`**: confirm the counterexample, then build a diagonal-aware union variant (or fix
    the shell) and discharge the cross-diagonal via the b≡0 / (6.7) argument. **This is the real deep
    piece**, best attended.

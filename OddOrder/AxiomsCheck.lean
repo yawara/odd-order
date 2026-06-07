@@ -2382,6 +2382,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.eq_inner_smul_of_inner_ne_zero
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one
+-- (4.1) inputs for `himg_ortho`: two coherences off the same Dade base map have cross
+-- inner products (`inner_extension_eq_inner_of_supported`, the difference-orthogonality) and
+-- degree-`0` values (`extension_apply_one_eq_zero_of_supported`) governed by the Dade isometry on
+-- supported lattice elements (`extends_on_supported` + the §4 Dade isometry / vanish-at-`1`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inner_extension_eq_inner_of_supported
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.extension_apply_one_eq_zero_of_supported
 -- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
