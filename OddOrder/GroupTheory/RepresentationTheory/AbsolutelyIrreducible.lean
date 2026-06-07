@@ -131,4 +131,33 @@ theorem asAlgebraHom_surjective_of_isAlgClosed (ρ : Representation F G V)
 
 end Representation
 
+section CentralCharacter
+
+variable {F : Type*} [Field F] [IsAlgClosed F]
+variable {G : Type*} [Group G] {V : Type*} [AddCommGroup V] [Module F V]
+
+/-- **Central scalar action** (Schur, central character): for a finite-dimensional irreducible
+representation `ρ` over an algebraically closed field `F`, every central element `z ∈ Z(G)` acts
+on `V` by a scalar `c • id`. (This is the existence half of the central character used in the
+representation theory of extraspecial groups, BG Thm 2.5 / Gor 5.5.5.) -/
+theorem center_isScalar (ρ : Representation F G V) [ρ.IsIrreducible] [FiniteDimensional F V]
+    {z : G} (hz : z ∈ Subgroup.center G) :
+    ∃ c : F, ρ z = c • LinearMap.id := by
+  -- `ρ z` commutes with every `ρ g` (`z` is central), so it is an intertwiner `ρ → ρ`.
+  have hcomm : ∀ (g : G) (v : V), (ρ z) ((ρ g) v) = (ρ g) ((ρ z) v) := fun g v => by
+    rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul,
+      Subgroup.mem_center_iff.mp hz g]
+  -- Over an algebraically closed field every self-intertwiner of an irreducible is a scalar.
+  have hbij :=
+    (Representation.IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed (ρ := ρ)).2
+  obtain ⟨c, hc⟩ := hbij ((ρ z).intertwiningMap_of_isIntertwiningMap ρ ρ hcomm)
+  refine ⟨c, ?_⟩
+  ext v
+  -- `algebraMap F (IntertwiningMap ρ ρ) c` is `c • 1` and its coercion at `v` is `c • v`; the
+  -- built intertwiner's coercion at `v` is `ρ z v`.  All these are `rfl`, so this typechecks.
+  have hv : c • v = (ρ z) v := DFunLike.congr_fun hc v
+  simpa using hv.symm
+
+end CentralCharacter
+
 end OddOrder.RepresentationTheory
