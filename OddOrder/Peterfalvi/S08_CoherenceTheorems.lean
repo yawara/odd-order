@@ -298,6 +298,44 @@ theorem sum_filter_degree_mul_charValue_sub_eq (N : Subgroup Γ) [N.Normal]
     exact sumNonInflatedDegreeSq (N := N)
   rw [hsplit, sumNonInflatedDegreeMulChar_of_mem (N := N) hz hz1, h2]; ring
 
+open scoped Classical in
+/-- **Bessel's inequality (integer-coefficient form).**  For an orthonormal family `s` of class
+functions (`⟨a,b⟩ = δ_{a,b}` on `s`) and any `v` whose Fourier coefficients on `s` are integers
+(`⟨v,a⟩ = β a`), the sum of squared coefficients is bounded by the squared norm:
+`∑_{a∈s} (β a)² ≤ (⟨v,v⟩).re`.
+
+Pythagoras on `v = (v − p) + p` with `p = ∑_{a∈s} (β a)•a` the orthogonal projection:
+`⟨v,p⟩ = ⟨p,v⟩ = ⟨p,p⟩ = ∑(β a)²` (Parseval `inner_self_orthonormalSum_eq_sum_sq` + conjugate
+symmetry), so `⟨v−p,v−p⟩ = ⟨v,v⟩ − ∑(β a)²`; non-negativity of `‖v−p‖²`
+(`inner_self_re_nonneg`) gives the bound. -/
+theorem sum_sq_le_inner_self_re {s : Finset (ClassFunction Γ ℂ)}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (v : ClassFunction Γ ℂ) {β : ClassFunction Γ ℂ → ℤ}
+    (hβ : ∀ a ∈ s, ClassFunction.inner v a = (β a : ℂ)) :
+    ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℝ) ≤ (ClassFunction.inner v v).re := by
+  classical
+  set p : ClassFunction Γ ℂ := ∑ a ∈ s, (β a : ℂ) • a with hp
+  have hsumcast : ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) = ∑ a ∈ s, ((β a : ℂ)) ^ 2 := by
+    push_cast; ring
+  have hvp : ClassFunction.inner v p = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [hp, inner_sum_right, hsumcast]
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [inner_smul_right, hβ a ha, star_intCast]; ring
+  have hpp : ClassFunction.inner p p = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [hp, inner_self_orthonormalSum_eq_sum_sq horth, hsumcast]
+  have hpv : ClassFunction.inner p v = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [inner_conj_symm v p, hvp, star_intCast]
+  have hkey : ClassFunction.inner (v - p) (v - p)
+      = ClassFunction.inner v v - ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hvp, hpv, hpp]; ring
+  have hnn := inner_self_re_nonneg (v - p)
+  rw [hkey, Complex.sub_re] at hnn
+  have hcast : (((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ)).re = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℝ) :=
+    Complex.intCast_re _
+  rw [hcast] at hnn
+  linarith
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08
