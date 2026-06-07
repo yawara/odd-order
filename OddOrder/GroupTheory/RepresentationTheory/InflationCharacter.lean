@@ -474,6 +474,61 @@ theorem sumNonInflatedDegreeSq_eq_index_mul (K : Subgroup G) (hNK : N ≤ K) :
     exact_mod_cast Subgroup.relIndex_mul_index hNK
   linear_combination (-1 : ℂ) * h1 + (1 - (Nat.card N : ℂ)) * h2
 
+open scoped Classical in
+/-- **Peterfalvi (6.8.1) regular-character decomposition, off-identity value.**  For `z ∈ N^#`
+(`z ∈ N`, `z ≠ 1`), the `N ⊄ ker χ` part of the regular character of `G` evaluated at `z` is
+`-|G ⧸ N|`:
+`∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)·χ(z) = -|G ⧸ N|` in `ℂ`.
+
+This is the off-identity companion of `sumNonInflatedDegreeSq` (the `z = 1` value
+`∑_{N ⊄ ker χ} χ(1)² = |G| − |G ⧸ N|`): the class function `ψ_N := ∑_{N ⊄ ker χ} χ(1)·χ`
+(`= ρ_G − ρ_{G ⧸ N}`, the difference of regular characters) is constant on `N^#` with value
+`-|G ⧸ N|`, so `ψ_N(z) − ψ_N(1) = -|G|` for `z ∈ N^#`.
+
+Two ingredients: the **full** regular character vanishes off `1`
+(`∑_{χ ∈ Irr G} χ(1)·χ(z) = 0`, second/column orthogonality `column_orthogonality_not_conjugate`
+at the non-conjugate pair `z ≁ 1`); and the **`N ⊆ ker χ`** part is the regular character of
+`G ⧸ N` at `mk z = 1`: each such `χ` is constant on `N`, so `χ(z) = χ(1)`, whence
+`∑_{N ⊆ ker χ} χ(1)·χ(z) = ∑_{N ⊆ ker χ} χ(1)² = |G ⧸ N|` (`sumInflatedDegreeSq`).  Subtracting,
+the `N ⊄ ker χ` part is `0 − |G ⧸ N|`.
+
+With `G = L`, `N = Z`, this is the mmd 04.8 L168 identity
+`∑ d_iχ_i(z) = (1/(a|W₁|))(ρ_L − ρ_{L/Z})(z) = -|L:Z|/(a|W₁|)`, the step showing `η₁^{τ₁}` is
+constant on `Z^#` in Peterfalvi (6.8.1). -/
+theorem sumNonInflatedDegreeMulChar_of_mem {z : G} (hz : z ∈ N) (hz1 : z ≠ 1) :
+    ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        ¬ (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) * ((χ : ClassFunction G ℂ) z)
+      = -(Nat.card (G ⧸ N) : ℂ) := by
+  classical
+  -- (i) the full regular character vanishes off `1` (column orthogonality at `z ≁ 1`).
+  have htot : ∑ χ : IrreducibleCharacter G,
+      ((χ : ClassFunction G ℂ) 1) * ((χ : ClassFunction G ℂ) z) = 0 := by
+    have hnc : ¬ IsConj z (1 : G) := fun h => hz1 (isConj_one_left.mp h)
+    have hcol := column_orthogonality_not_conjugate (G := G) (g := z) (h := 1) hnc
+    rw [← hcol]
+    refine Finset.sum_congr rfl (fun χ _ => ?_)
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+    rw [hd, star_natCast]; ring
+  -- (ii) the `N ⊆ ker χ` part is the regular character of `G ⧸ N` at `mk z = 1`, i.e. `|G ⧸ N|`.
+  have hker : ∑ χ ∈ Finset.univ.filter (fun χ : IrreducibleCharacter G =>
+        (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ)),
+        ((χ : ClassFunction G ℂ) 1) * ((χ : ClassFunction G ℂ) z)
+      = (Nat.card (G ⧸ N) : ℂ) := by
+    rw [← sumInflatedDegreeSq (N := N)]
+    refine Finset.sum_congr rfl (fun χ hχ => ?_)
+    rw [Finset.mem_filter] at hχ
+    have hzk : z ∈ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ) := hχ.2 hz
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hzk
+    rw [hzk, OddOrder.Peterfalvi.S03.characterDegree_def]; ring
+  -- (iii) `N ⊄ ker χ` part = (full) − (`N ⊆ ker χ` part) = 0 − |G ⧸ N|.
+  have hsplit := Finset.sum_filter_add_sum_filter_not
+    (Finset.univ : Finset (IrreducibleCharacter G))
+    (fun χ => (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))
+    (fun χ => ((χ : ClassFunction G ℂ) 1) * ((χ : ClassFunction G ℂ) z))
+  rw [hker] at hsplit
+  linear_combination hsplit + htot
+
 end Inflation
 
 /-- **Inflation along an arbitrary surjective homomorphism.**  If `f : H →* G` is surjective and
