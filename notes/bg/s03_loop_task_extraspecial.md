@@ -15,14 +15,25 @@ representation theory** (BG §2 Thm 2.5 core), bottom-up, in **build-green + axi
 - **Axiom-clean**: append a temporary `#print axioms <name>` for each new top-level result, confirm `[propext, Classical.choice, Quot.sound]` only, then remove it.
 - **One coherent unit per commit** (`Pf (RepresentationTheory): …` or `Pf (BG 3.4 …): …`). Update `notes/bg/s03_thm36_plan.md` when the frontier changes.
 
-## State at loop start (worktree `bg-reptower` from main `c0b6eb6`, build-green)
+## State (worktree `bg-reptower`, build-green)
 
-**▶ CURRENT ENTRY POINT = Step 1, Schur half via the FDRep route** (Step 0 design is DONE; see
-`notes/bg/s03_prop21_design.md` + `notes/bg/s03_extraspecial_blocker.md`). The raw
-`Module.End (MonoidAlgebra F G) ρ.asModule` route fights `asModule` synonym instances — use
-`FDRep.finrank_hom_simple_simple [IsAlgClosed F]` instead (work in the `FDRep F G` category; bridge
-`Representation ⇝ FDRep`). Then Burnside (Wedderburn route in the design note), Gor 5.5.5, Prop 2.2
-alg-closed, Thm 2.5, Thm 3.4.
+**▶ CURRENT ENTRY POINT = Step 2, Gor 5.5.5a (the character computation).** See the refreshed
+`notes/bg/s03_extraspecial_blocker.md` for the exact lemma chain — it is now the authoritative handoff.
+
+**✅ Step 1 (Prop 2.1 / Burnside) DONE** (`AbsolutelyIrreducible.lean`, sorry-free, axiom-clean,
+commits `f6497da`/`f05e707`): `toModuleEnd_surjective_of_isAlgClosed` (module form) +
+`asAlgebraHom_surjective_of_isAlgClosed` (rep form). The feared ~150-line Wedderburn gap was a
+non-issue: Burnside = mathlib Jacobson density (`Module.Finite.toModuleEnd_moduleEnd_surjective`) +
+alg-closed Schur (`IsSimpleModule.algebraMap_end_bijective_of_isAlgClosed`). asModule synonym trap
+solved via `set_option backward.isDefEq.respectTransparency false`.
+
+**✅ Step 2 foundation `center_isScalar` DONE** (commit `ab4da25`): center acts by scalar on
+irreducible (the central character λ).
+
+**KEY: mathlib has field-valued character orthogonality over general alg-closed `k`**
+(`FDRep.char_orthonormal`, `Character.lean:129`) — the repo's ℂ-pinned orthogonality is NOT needed.
+This makes Gor 5.5.5a tractable. Remaining queue: Gor 5.5.5 (5.5.5a rep-theory + 5.5.5b group theory),
+Prop 2.2 alg-closed, Thm 2.5, Thm 3.4.
 
 
 **✅ Already done (do NOT redo):**
@@ -41,10 +52,13 @@ alg-closed, Thm 2.5, Thm 3.4.
 ### Step 0 — design (iteration 1)
 Read `RingTheory/SimpleModule/IsAlgClosed.lean` + `WedderburnArtin.lean` + `RepresentationTheory/FDRep.lean` (Schur) + `RepresentationTheory/Irreducible.lean`. Figure out the bridge `Representation.IsIrreducible ρ` (faithful, alg-closed, fin-dim) → `IsSimpleModule (MonoidAlgebra F G) ρ.asModule` → Wedderburn-Artin → image of `F[G]` in `End_F V` is **all of `End_F V`** (Burnside / Prop 2.1). Write the proof sketch (exact lemma chain) into `notes/bg/s03_prop21_design.md`. Commit the note.
 
-### Step 1 — Prop 2.1 (Burnside / `E(P) = End_F(V)`)
-Fill `AbsolutelyIrreducible.lean` (currently an empty skeleton): for `V` a faithful absolutely-irreducible `FG`-module over an alg-closed field, the `F`-span of the image of `G` is `End_F(V)`; equivalently `End_{FG}(V) = F` (Schur) and the image generates. State the version Thm 2.5 needs (E(P) = Hom_F(V,V)). Build-green, axiom-clean, commit.
+### Step 1 — Prop 2.1 (Burnside / `E(P) = End_F(V)`) ✅ DONE (f6497da/f05e707)
+`AbsolutelyIrreducible.lean`: `toModuleEnd_surjective_of_isAlgClosed` (module) +
+`asAlgebraHom_surjective_of_isAlgClosed` (rep). Jacobson density + Schur, ~30 lines, axiom-clean.
 
-### Step 2 — Gor 5.5.5 (extraspecial faithful irreducible has dim `qⁿ`)
+### Step 2 — Gor 5.5.5 (extraspecial faithful irreducible has dim `qⁿ`) — ▶ IN PROGRESS
+Foundation `center_isScalar` ✅ (ab4da25). Crux = 5.5.5a via mathlib `FDRep.char_orthonormal`
+(field-valued, general alg-closed). Exact lemma chain in `s03_extraspecial_blocker.md`.
 Fill `ExtraspecialFaithful.lean` (empty skeleton, issue #34): for an extraspecial `q`-group `P` of order `q^{1+2n}` over alg-closed `F` (`char ∤ q`), a faithful irreducible module has dimension `qⁿ` (the non-linear irreducibles; from the irreducible-degree sum of squares `q^{2n}·1 + (q-1)(qⁿ)² = |P|`, or via Wedderburn + the central character). Use `IsExtraspecial` (`GroupTheory/IsExtraspecial.lean`). Commit.
 
 ### Step 3 — Prop 2.2(a) over alg-closed (Clifford `V_P = M`)
