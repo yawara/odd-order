@@ -8347,6 +8347,67 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_of_frobenius
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed hgen
 
+/-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
+`himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
+(`exists_integralCharacterMap_glue_of_orthonormal` with `νX = τ₂`, `νY = τ₁`); its agreement
+`hagreeX`/`hagreeY` is automatic, and `hmixed` reduces to `himg_ortho` (both `⟨νx,νy⟩` and `⟨x,y⟩`
+vanish — the latter by `X ⊥ Y`).  Orthonormality of `X`, `Y` and `X ⊥ Y` are read off irreducibility
+(`irreducibleCharacter_inner`) + disjointness.  **The sole remaining (6.8.1) obligation is
+`himg_ortho`** — the `b ≡ c ≡ 0 mod a` argument (L3 (3b), via `peterfalvi_67_centralCommutator`). -/
+noncomputable def coherentXunionYset_centralCommutator_of_himg_ortho
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (himg_ortho : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner
+        ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+        (hyp.coherentYset.extension y) = 0)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  have hinner : ∀ (φ ψ : ClassFunction ↥L ℂ), IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  have hXY : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner x y = 0 := fun x hx y hy => by
+    rw [hinner x y (hXirr x hx) (hYirr y hy),
+      if_neg (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
+  have hglue :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
+      (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite
+      (fun x hx x' hx' => hinner x x' (hXirr x hx) (hXirr x' hx'))
+      (fun y hy y' hy' => hinner y y' (hYirr y hy) (hYirr y' hy')) hXY
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension)
+      hyp.coherentYset.extension
+  refine hyp.coherentXunionYset_centralCommutator_of_glued_of_frobenius hF hHnonab hp hp3 hHp
+    hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_) hgen
+  rw [hglue.choose_spec.1 x hx, hglue.choose_spec.2 y hy, himg_ortho x hx y hy, hXY x hx y hy]
+
 /-- **(6.8.1), Frobenius case:** chain-level coherence for
 `X = S - S(H')`, using common-index p-power data.
 
