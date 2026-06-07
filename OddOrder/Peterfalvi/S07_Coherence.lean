@@ -4355,6 +4355,116 @@ noncomputable def coherentUnion_of_glued_of_generator_mixed_inner_eq
     (mixed_inner_eq_on_zSpan_of_eq_on hmixed)
     hgen
 
+/-- **Peterfalvi (6.8.1) diagonal-aware coherence of the union `X ∪ Y`.**
+
+The plain `coherentUnion_of_glued` requires the generation hypothesis
+
+`zSupportedSpan (X ∪ Y) A ⊆ ℤ[ zSupportedSpan X A ∪ zSupportedSpan Y A ]`,
+
+which is **false** in the (6.8.1) situation.  With `χ₁ ∈ X` the minimal-degree anchor
+(`χ₁(1) = a·|W₁|`, `a > 1`) and `η₁ ∈ Y` (`η₁(1) = |W₁|`), the *cross-diagonal* `χ₁ − a·η₁` is
+supported (vanishes at `1`) and lies in `ℤ[X ∪ Y]`, yet **not** in the right-hand `ℤ`-span: a
+supported `X`-combination `∑cᵢχᵢ` has degree `0` (so `∑cᵢdᵢ = 0`), a supported `Y`-combination
+`∑eⱼηⱼ` has degree `0` (so `∑eⱼ = 0`), and by linear independence of the disjoint irreducibles
+`χ₁ − a·η₁` would force its `X`-part `χ₁` to be supported — but `χ₁(1) ≠ 0`.  (Degree count: a
+supported `∑cᵢχᵢ + ∑eⱼηⱼ` has `∑eⱼ = −a∑cᵢdᵢ`, and splits as `X`-supported `+` `Y`-supported only
+when `∑cᵢdᵢ = 0`; `χ₁ − a·η₁` has `∑cᵢdᵢ = d₁ = 1`.)  See
+`notes/peterfalvi/s08_6_8_blocker_central_Z.md` (framing correction #2).
+
+The fix threads a set `D` of supported cross-diagonals on which the glued map `ν` is **already
+known** to agree with the base map `τ` (`hDτ` — the (6.8.1) `b ≡ 0` conclusion, i.e.
+`(χ₁ − a·η₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`), and enlarges the generating set with `D`.  With the single
+cross-diagonal `χ₁ − a·η₁` adjoined, the generation hypothesis `hgen` *is* satisfiable:
+`zSupportedSpan (X ∪ Y) A = ℤ[ {χᵢ − dᵢχ₁} ∪ {ηⱼ − η₁} ∪ {χ₁ − a·η₁} ]`, the degree-`0` sublattice
+of `ℤ[X ∪ Y]` (rank `|X| + |Y| − 1`).
+
+The `extension_inner_eq` (isometry) and `extension_mem_ZIrr` obligations are **unchanged** from
+`coherentUnion_of_glued`: they live on `ℤ[X ∪ Y]` and never see `D`.  Only `extends_on_supported`
+gains the `D`-generators, discharged directly by `hDτ`.  Taking `D = ∅` recovers
+`coherentUnion_of_glued`. -/
+noncomputable def coherentUnion_of_glued_withDiagonal
+    {τ : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hX : IsCoherent τ X A) (hY : IsCoherent τ Y A)
+    (ν : IntegralCharacterMap L G)
+    (hagreeX : ∀ u ∈ Submodule.span ℤ X, ν u = hX.extension u)
+    (hagreeY : ∀ v ∈ Submodule.span ℤ Y, ν v = hY.extension v)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (himg_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner (hX.extension u) (hY.extension v) = 0)
+    (D : Set (ClassFunction L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = τ d)
+    (hgen : zSupportedSpan (L := L) (X ∪ Y) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A ∪ D)) :
+    IsCoherent τ (X ∪ Y) A := by
+  classical
+  refine ⟨?_, ν, ?_, ?_, ?_⟩
+  · -- nonzero: inherited from `X ⊆ X ∪ Y`.
+    obtain ⟨φ, hφmem, hφne⟩ := hX.nonzero
+    exact ⟨φ, zSupportedSpan_mono_left Set.subset_union_left hφmem, hφne⟩
+  · -- `extension_inner_eq` on `ℤ[X ∪ Y]` via the two-lattice gluing identity (`D`-independent).
+    intro φ ψ hφ hψ
+    exact inner_eq_on_zSpan_union_of_orthogonal hagreeX hagreeY
+      hX.extension_inner_eq hY.extension_inner_eq hsrc_ortho himg_ortho hφ hψ
+  · -- `extends_on_supported`: `ν = τ` on the generator `Z[X,A] ∪ Z[Y,A] ∪ D`, then `span_induction`.
+    intro φ hφ
+    have hagree_T : ∀ y ∈ zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A ∪ D,
+        ν y = τ y := by
+      intro y hy
+      rcases hy with (hyX | hyY) | hyD
+      · rw [hagreeX y hyX.1, hX.extends_on_supported y hyX]
+      · rw [hagreeY y hyY.1, hY.extends_on_supported y hyY]
+      · exact hDτ y hyD
+    exact IntegralCharacterMap.eq_on_zSpan_of_eq_on hagree_T (hgen hφ)
+  · -- extension_mem_ZIrr: each generator of `ℤ[X ∪ Y]` maps via `νX`/`νY` into `ℤ[Irr G]`
+    -- (`D`-independent).
+    intro φ hφ
+    induction hφ using Submodule.span_induction with
+    | mem y hy =>
+        rcases hy with hyX | hyY
+        · rw [hagreeX y (Submodule.subset_span hyX)]
+          exact hX.extension_mem_ZIrr y (Submodule.subset_span hyX)
+        · rw [hagreeY y (Submodule.subset_span hyY)]
+          exact hY.extension_mem_ZIrr y (Submodule.subset_span hyY)
+    | zero => rw [map_zero]; exact Submodule.zero_mem _
+    | add y z _ _ ihy ihz => rw [map_add]; exact Submodule.add_mem _ ihy ihz
+    | smul c y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ c ih
+
+/-- Generator-level form of `coherentUnion_of_glued_withDiagonal` (the diagonal-aware analogue of
+`coherentUnion_of_glued_of_generator_mixed_inner_eq`).
+
+The caller checks agreement (`hagreeX`/`hagreeY`) and mixed inner products (`hmixed`) only on the
+two generating families `X`, `Y`; the span obligations and `himg_ortho` are derived
+(`eq_on_zSpan_of_eq_on`, `mixed_inner_eq_on_zSpan_of_eq_on`, `image_orthogonal_of_mixed_inner_eq`).
+The extra `D`/`hDτ` thread the supported cross-diagonals on which `ν = τ` is already known (the
+(6.8.1) `b ≡ 0` conclusion), enlarging the generation hypothesis `hgen` to the satisfiable form. -/
+noncomputable def coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    {τ : IntegralCharacterMap L G} {X Y : Set (ClassFunction L ℂ)} {A : Set L}
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hX : IsCoherent τ X A) (hY : IsCoherent τ Y A)
+    (ν : IntegralCharacterMap L G)
+    (hagreeX : ∀ x ∈ X, ν x = hX.extension x)
+    (hagreeY : ∀ y ∈ Y, ν y = hY.extension y)
+    (hsrc_ortho : ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0)
+    (hmixed : ∀ x ∈ X, ∀ y ∈ Y,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = τ d)
+    (hgen : zSupportedSpan (L := L) (X ∪ Y) A ⊆
+      Submodule.span ℤ (zSupportedSpan (L := L) X A ∪ zSupportedSpan (L := L) Y A ∪ D)) :
+    IsCoherent τ (X ∪ Y) A :=
+  coherentUnion_of_glued_withDiagonal hX hY ν
+    (fun _ hu => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeX hu)
+    (fun _ hv => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeY hv)
+    hsrc_ortho
+    (image_orthogonal_of_mixed_inner_eq
+      (fun _ hu => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeX hu)
+      (fun _ hv => IntegralCharacterMap.eq_on_zSpan_of_eq_on hagreeY hv)
+      (mixed_inner_eq_on_zSpan_of_eq_on hmixed) hsrc_ortho)
+    D hDτ hgen
+
 /-! ### Peterfalvi (6.6): coherence of `X` by repeated adjoining of pairs
 
 The (6.6) proof concludes "**Repeated use of Theorem (5.6)** then shows that `X` is coherent":

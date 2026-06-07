@@ -8689,6 +8689,51 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_of_frobenius
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed hgen
 
+/-- **(6.8.1)/(6.8), L3 outer shell — diagonal-aware form.**  Same as
+`coherentXunionYset_centralCommutator_of_glued_of_frobenius`, but routing through the corrected
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`: the plain shell's generation
+hypothesis `hgen` (without the cross-diagonals `D`) is **false** in the (6.8.1) situation — the
+supported cross-diagonal `χ₁ − a·η₁ ∈ ℤ[X(Zc) ∪ Y]` is not a sum of a supported `X`-combination and
+a supported `Y`-combination (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`, framing correction
+#2, and the `coherentUnion_of_glued_withDiagonal` docstring).  Here `D` carries those cross-diagonals
+with `hDτ : ∀ d ∈ D, ν d = τ d` (the (6.8.1) `b ≡ 0` conclusion
+`(χ₁ − a·η₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`), and `hgen` is the satisfiable generation including `D`. -/
+noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset hyp.centralCommutator,
+      ν x = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset ν hagreeX hagreeY
+    (inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
+    hmixed D hDτ hgen
+
 /-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
 `himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
 (`exists_integralCharacterMap_glue_of_orthonormal` with `νX = τ₂`, `νY = τ₁`); its agreement
