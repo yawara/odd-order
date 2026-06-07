@@ -499,16 +499,20 @@ its `hD : 2a < ∑(rcᵢ)²mcᵢ` is the wrong forcing).  Spine + status:
   `sumNonInflatedDegreeMulChar_of_mem` gives `∑_{Z⊄ker χ}χ(1)χ(z) = −|L:Z|`, constant on `Z^#`).
 - **norm-bound forcing** `b = 0 ∨ (b=a ∧ m=2)`: ✅ **LANDED** `eq_zero_or_edge_of_dvd_of_normBound`
   (S08, axiom-clean, registered).  The (6.8.1) L176 step.
-- 🔴 **the gateway = Dade reciprocity** `⟨τα, ψ⟩_G = ⟨α, Res_L ψ⟩_L` for supported `α` — the one
-  un-built structural piece, gating the Res-decomposition. **FEASIBLE (key finding):** the (6.8)
-  Dade situation is the **TI case** (`H^#` TI, normalizer `L`), where `hyp.H a = ⊥` (S04:308
-  `of_isTISubset … .H a = ⊥`); then `adjointAverageFun ψ a = |H(a)|⁻¹∑_{x∈H(a)}ψ(ax) = ψ(a) =
-  (Res_L ψ)(a)`, so the **(2.7) `adjoint_formula`** (S04:3894, `⟨τα, χ⟩ = ⟨α, adjointAverageFun χ⟩`)
-  collapses to the clean reciprocity.  Build = `adjointAverageFun`-collapse-at-`H=⊥` (sum over `↥⊥`
-  = single term) + `adjoint_formula` + `dadeIntegralCharacterMap_apply_of_support` bridge.  Needs
-  `∀ a, hyp.dade.H a = ⊥` at the Sibley call site (holds since `H_sharp_ti`; may need a derived
-  bridge or a field, as `dade` is currently a free `S04.Hypothesis` field — minor faithfulness check).
+- ✅ **the gateway = Dade reciprocity** `⟨τα, ψ⟩_G = ⟨α, Res_L ψ⟩_L` for supported `α` — **LANDED**
+  (S08, axiom-clean, registered): `inner_dadeIntegralCharacterMap_eq_inner_restrict` (under
+  `∀ a, hyp.H a = ⊥`, the TI condition) + the collapse `adjointAverageFun_eq_of_H_eq_bot`
+  (`adjointAverageFun χ a = χ a` when `H(a) = ⊥`, the `H(a)=⊥` ⟹ `aH(a)={a}` single-term average,
+  modelled on `adjointAverageFun_dadeMap_eq`).  Built from the (2.7) `adjoint_formula` (S04:3894) +
+  `dadeIntegralCharacterMap_apply_of_support`.  **Sibley call-site obligation:** `∀ a, hyp.dade.H a = ⊥`
+  — holds since `H_sharp_ti` makes `dade` the TI Dade (`S04:308 of_isTISubset … .H a = ⊥`); `dade`
+  is currently a free `S04.Hypothesis` field, so this needs either a derived bridge from `H_sharp_ti`
+  or a new field `dade_H_eq_bot` (minor faithfulness wiring, honest since (6.8)'s Dade IS the TI one).
 
-So 4 of the ~6 b≡0 ingredient-classes are landed/tractable ((4.1), diff-ortho, degree-0, norm-bound,
-reg-char + (6.7) adapter); the **Res-decomposition via Dade reciprocity** is the remaining structural
-core, now de-risked (TI ⟹ `H a = ⊥` ⟹ `adjoint_formula` collapse).
+So **5 of the ~6 b≡0 ingredient-classes are landed** ((4.1), diff-ortho, degree-0, norm-bound,
+**Dade reciprocity**, + reg-char & (6.7) adapter).  Remaining = the **Res-decomposition assembly**:
+use reciprocity `⟨η₁^{τ₁}, τ(χᵢ−dᵢχ₁)⟩ = ⟨Res_L(η₁^{τ₁}), χᵢ−dᵢχ₁⟩` + the himg-difference-orthogonality
+(`=0`, giving `Res_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′`) → reg-char `∑dᵢχᵢ` const on `Z^#` → (6.7) `a∣c` →
+norm-bound `b=0` → crux `⟨τ(χ₁−aη₁), τ₁η₁⟩ = −a` → cross-diagonal `ν=τ` → diagonal-aware union →
+capstone.  All ingredients are now in hand; the assembly + the `dade_H_eq_bot` wiring + the m=2
+relabel are the remaining (attended) work.
