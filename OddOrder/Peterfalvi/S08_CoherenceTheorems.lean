@@ -298,6 +298,44 @@ theorem sum_filter_degree_mul_charValue_sub_eq (N : Subgroup Γ) [N.Normal]
     exact sumNonInflatedDegreeSq (N := N)
   rw [hsplit, sumNonInflatedDegreeMulChar_of_mem (N := N) hz hz1, h2]; ring
 
+open scoped Classical in
+/-- **Bessel's inequality (integer-coefficient form).**  For an orthonormal family `s` of class
+functions (`⟨a,b⟩ = δ_{a,b}` on `s`) and any `v` whose Fourier coefficients on `s` are integers
+(`⟨v,a⟩ = β a`), the sum of squared coefficients is bounded by the squared norm:
+`∑_{a∈s} (β a)² ≤ (⟨v,v⟩).re`.
+
+Pythagoras on `v = (v − p) + p` with `p = ∑_{a∈s} (β a)•a` the orthogonal projection:
+`⟨v,p⟩ = ⟨p,v⟩ = ⟨p,p⟩ = ∑(β a)²` (Parseval `inner_self_orthonormalSum_eq_sum_sq` + conjugate
+symmetry), so `⟨v−p,v−p⟩ = ⟨v,v⟩ − ∑(β a)²`; non-negativity of `‖v−p‖²`
+(`inner_self_re_nonneg`) gives the bound. -/
+theorem sum_sq_le_inner_self_re {s : Finset (ClassFunction Γ ℂ)}
+    (horth : ∀ a ∈ s, ∀ b ∈ s, ClassFunction.inner a b = if a = b then (1 : ℂ) else 0)
+    (v : ClassFunction Γ ℂ) {β : ClassFunction Γ ℂ → ℤ}
+    (hβ : ∀ a ∈ s, ClassFunction.inner v a = (β a : ℂ)) :
+    ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℝ) ≤ (ClassFunction.inner v v).re := by
+  classical
+  set p : ClassFunction Γ ℂ := ∑ a ∈ s, (β a : ℂ) • a with hp
+  have hsumcast : ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) = ∑ a ∈ s, ((β a : ℂ)) ^ 2 := by
+    push_cast; ring
+  have hvp : ClassFunction.inner v p = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [hp, inner_sum_right, hsumcast]
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [inner_smul_right, hβ a ha, star_intCast]; ring
+  have hpp : ClassFunction.inner p p = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [hp, inner_self_orthonormalSum_eq_sum_sq horth, hsumcast]
+  have hpv : ClassFunction.inner p v = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [inner_conj_symm v p, hvp, star_intCast]
+  have hkey : ClassFunction.inner (v - p) (v - p)
+      = ClassFunction.inner v v - ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ) := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hvp, hpv, hpp]; ring
+  have hnn := inner_self_re_nonneg (v - p)
+  rw [hkey, Complex.sub_re] at hnn
+  have hcast : (((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℂ)).re = ((∑ a ∈ s, (β a) ^ 2 : ℤ) : ℝ) :=
+    Complex.intCast_re _
+  rw [hcast] at hnn
+  linarith
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08
@@ -9931,6 +9969,115 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
     ← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
     hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
   ring
+
+/-- **(6.8.1) norm of the cross-diagonal image** (mmd 04.8 L176: `‖χ₁−aη₁‖² = 1+a²`).  For `η = η₁ ∈ Y`
+and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`:
+`⟨(χ₁−aη₁)^τ, (χ₁−aη₁)^τ⟩ = 1 + a²`.
+
+By the Dade isometry on the supported singleton `{χ₁−aη₁}`
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`) this equals the source norm
+`⟨χ₁−aη₁, χ₁−aη₁⟩`, which expands by `χ₁`/`η₁`-orthonormality (`⟨χ₁,χ₁⟩ = ⟨η₁,η₁⟩ = 1`) and `X ⊥ Y`
+(`⟨χ₁,η₁⟩ = ⟨η₁,χ₁⟩ = 0`) to `1 + a²`.  This is the LHS of Peterfalvi's norm identity
+`1+a² = ‖X‖² + (b−a)² + (m−1)b²` for the `b = 0` step. -/
+theorem inner_self_tau_scaledDiff_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η)) (hyp.tau (χ₁ - a • η)) = 1 + (a : ℂ) ^ 2 := by
+  classical
+  have hχ₁irr : IsIrreducibleCharacter χ₁ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
+  have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  -- orthonormality / orthogonality scalars.
+  have hχ₁n : ClassFunction.inner χ₁ χ₁ = (1 : ℂ) := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L)
+      (⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hηn : ClassFunction.inner η η = (1 : ℂ) := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hXY : ClassFunction.inner χ₁ η = (0 : ℂ) :=
+    inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj χ₁ (Submodule.subset_span hχ₁)
+      η (Submodule.subset_span hη)
+  have hYX : ClassFunction.inner η χ₁ = (0 : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm χ₁ η, hXY, star_zero]
+  -- supported singleton ⟹ Dade isometry.
+  have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
+  have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+  have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
+    (Submodule.subset_span rfl) (Submodule.subset_span rfl)
+  rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hχ₁n, hηn,
+    hXY, hYX, star_natCast]
+  ring
+
+/-- **(6.8.1) the degree ratio `a` satisfies `a ≥ 2`** (mmd 04.8 L176: "Since `X ∩ Y = ∅`, `a > 1`").
+For an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the ratio `a ≥ 2`.
+
+If `a ≤ 1` then (as `χ₁` is a positive-degree irreducible, `a ≥ 1`, so) `a = 1`, hence the source
+`θ` (with `χ₁ = Ind_H^L θ`, `θ ≠ 1`, `χ₁(1) = |W₁|·θ(1)`) has degree `θ(1) = a = 1`, so `θ` is a
+nontrivial **linear** character (`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`); then
+`χ₁ = Ind_H^L θ ∈ Y = S(H')` (`mem_Yset_iff_exists_linear_source`), contradicting `χ₁ ∈ X` and the
+disjointness `X(Zc) ∩ Y = ∅`.  This is the `2 ≤ a` input of `eq_zero_or_edge_of_dvd_of_normBound`. -/
+theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) : 2 ≤ a := by
+  classical
+  -- extract the source `θ` of `χ₁ ∈ S`.
+  have hχ₁S : χ₁ ∈ hyp.S := hyp.Xset_subset_S hχ₁
+  rw [hyp.S_eq] at hχ₁S
+  obtain ⟨θ, hθne, hχ₁eq⟩ := hχ₁S
+  -- `χ₁(1) = |W₁|·θ(1)`.
+  have hdeg : χ₁ 1 = (Nat.card hyp.W1 : ℂ) * (θ : ClassFunction ↥H ℂ) 1 := by
+    rw [hχ₁eq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+      hyp.index_H_eq_card_W1]
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  -- `(a : ℂ) = θ(1)`.
+  have haθ : (a : ℂ) = (θ : ClassFunction ↥H ℂ) 1 := by
+    have h : (a : ℂ) * (Nat.card hyp.W1 : ℂ)
+        = (θ : ClassFunction ↥H ℂ) 1 * (Nat.card hyp.W1 : ℂ) := by rw [← ha, hdeg]; ring
+    exact mul_right_cancel₀ hW1ne h
+  -- `θ(1) = d > 0`, so `a = d ≥ 1`.
+  obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have had : a = d := by have := haθ.trans hd_eq; exact_mod_cast this
+  by_contra hlt
+  push_neg at hlt
+  -- `a ≤ 1` with `a = d ≥ 1` ⟹ `a = 1` ⟹ `θ(1) = 1`.
+  have ha1 : a = 1 := by omega
+  have hθ1 : (θ : ClassFunction ↥H ℂ) 1 = 1 := by rw [← haθ, ha1]; norm_num
+  -- `θ` is a nontrivial linear character ⟹ `χ₁ ∈ Y`, contradicting `χ₁ ∈ X`.
+  obtain ⟨ψ, hψeq⟩ := θ.2.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one hθ1
+  have hlinθ : OddOrder.RepresentationTheory.linearIrreducibleCharacter ψ = θ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.ext hψeq
+  have hψne : ψ ≠ 1 := by
+    intro hψ1
+    apply hθne
+    rw [← hlinθ, hψ1]
+    exact OddOrder.RepresentationTheory.linearIrreducibleCharacter_eq_trivial_iff.mpr rfl
+  have hχ₁Y : χ₁ ∈ hyp.Yset := by
+    rw [hyp.mem_Yset_iff_exists_linear_source]
+    exact ⟨ψ, hψne, by rw [hχ₁eq, hψeq]⟩
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact absurd hχ₁Y (Set.disjoint_left.mp hdisj hχ₁)
 
 end SibleyDadeHypothesis
 
