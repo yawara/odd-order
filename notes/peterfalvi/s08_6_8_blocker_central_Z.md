@@ -659,6 +659,48 @@ divisibility spine (the deep `b≡c≡0 mod a` argument, mmd 04.8 L176) is now m
   `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` + L4
   `false_of_coherentXunionYset_of_not_coherentS`.  CertainType case (B) still unplanned.
 
+## 2026-06-08 (session 5 cont.): step-4 ingredient set COMPLETE (3 more commits, axiom-clean)
+
+All leaf-green (3467) + axiom-clean.  The **complete ingredient set for the step-4 dichotomy
+`b = 0 ∨ (b = a ∧ m = 2)`** is now landed:
+- ✅ **norm `‖(χ₁−aη₁)^τ‖² = 1+a²`** `b97d2f9a`: `inner_self_tau_scaledDiff_of_frobenius` (Dade
+  isometry on the supported singleton `{χ₁−aη₁}` + `χ₁/η₁`-orthonormality + `X⊥Y`).  Peterfalvi's
+  norm-identity LHS.
+- ✅ **Bessel's inequality (general, reusable)** `b2fe3bd7`:
+  `OddOrder.RepresentationTheory.sum_sq_le_inner_self_re` — for an orthonormal Finset family `s`
+  (`⟨a,b⟩=δ`) and `v` with integer coefficients `⟨v,a⟩=β a` on `s`,
+  `(∑_{a∈s} (β a)² : ℝ) ≤ (⟨v,v⟩).re`.  Pythagoras on `v=(v−p)+p`, `p=∑β_a•a`
+  (`inner_self_orthonormalSum_eq_sum_sq` + `inner_conj_symm` + `inner_self_re_nonneg`).
+- ✅ **`a ≥ 2`** `066da126`: `two_le_degreeRatio_of_mem_Xset_of_frobenius` — `χ₁∈X(Zc)`,
+  `χ₁(1)=a|W₁|` ⟹ `2≤a` (`a=1` ⟹ source `θ` linear nontrivial ⟹ `χ₁∈Y`, contra `X∩Y=∅`; uses
+  `exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one` + `linearIrreducibleCharacter_eq_trivial_iff`
+  + `mem_Yset_iff_exists_linear_source` + `IrreducibleCharacter.ext`).
+
+### 🔴 Remaining for step 4 (the dichotomy ASSEMBLY — all ingredients in hand)
+The next unit is purely **assembly** (lengthy Finset bookkeeping, no new math):
+1. Build the **Y^{τ₁}-image Finset** `s := Yset.toFinset.image (coherentYset.extension)` with
+   orthonormality `⟨ext η, ext η'⟩ = ⟨η,η'⟩ = δ` (`extension_inner_eq` + Y orthonormal; injectivity of
+   `extension` on Y from orthonormality) — OR reuse the S07 `OrthonormalCharacterImageFamily` of the
+   `coherentYset` if it exposes one.
+2. Coefficient function `β ψ := ⟨v, ψ⟩` (`v = (χ₁−aη₁)^τ`), integer-valued (`v∈ZIrr G`,
+   `mem_ZIrr_inner_int` — though here β is real/int via the constancy values).  Values:
+   `β (ext η₁) = bb` (step 3 `dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius`),
+   `β (ext η) = bb + a` for `η≠η₁` (constancy `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius`:
+   `⟨v,(η−η₁)^τ⟩ = a` and `(η−η₁)^τ = ext η − ext η₁` ⟹ `β(ext η) − β(ext η₁) = a`).
+3. `∑_{ψ∈s} (β ψ)² = bb² + (m−1)(bb+a)²` (`m = |Y| = s.card`; one element `ext η₁` gets `bb`, the
+   other `m−1` get `bb+a`) — `Finset.sum` with the `if`-coefficient.
+4. **Bessel** (`sum_sq_le_inner_self_re`) + **norm** (`(⟨v,v⟩).re = 1+a²`, `.re` of `b97d2f9a`) ⟹
+   `bb² + (m−1)(bb+a)² ≤ 1+a²`.
+5. **`eq_zero_or_edge_of_dvd_of_normBound`** (already landed) with Peterfalvi `b := bb+a`, `a∣b`
+   (⟺ `a∣bb`, step 3), `2≤a` (`066da126`), `2≤m` (`two_le_Yset_ncard`), hnorm = step 4 ⟹
+   `b=0 ∨ (b=a∧m=2)`, i.e. **`bb=−a ∨ (bb=0 ∧ m=2)`**.
+6. GOOD case `bb=−a`: the Y-projection of `v` is `−a·η₁^{τ₁}` (`β(ext η₁)=−a`, `β(ext η)=0` for
+   η≠η₁), so `v = X − aη₁^{τ₁}` with `X ⊥ Y^{τ₁}`, `‖X‖²=1`.  EDGE case `m=2`: relabel
+   `η₁^{τ₁},η₂^{τ₁} ↦ −η₂^{τ₁},−η₁^{τ₁}` (re-choose the `Y`-coherence isometry — structurally the
+   hardest remaining piece) reduces to `bb=−a`.
+- **then step 5 (`X=χ₁^{τ₂}`)** ⟹ crux `(χ₁−aη₁)^τ = χ₁^{τ₂}−aη₁^{τ₁}` = `hDτ`, then `hgen'` +
+  ν-free diagonal shell + capstone wiring.  CertainType (B) still unplanned.
+
 ### Key API discovered this session (don't re-derive)
 - **Rational alg-int ⟹ integer:** `OddOrder.RepresentationTheory.isIntegral_rat_imp_int {q:ℚ}
   (IsIntegral ℤ (q:ℂ)) : ∃ n:ℤ, (q:ℂ)=n` (ClassSumAlgebra.lean:1434).
@@ -681,3 +723,14 @@ divisibility spine (the deep `b≡c≡0 mod a` argument, mmd 04.8 L176) is now m
   ratio `a`); `Yset_apply_one (hη) : η 1 = |W₁|`; `index_H_eq_card_W1 : H.index = |W₁|`;
   `Subgroup.index_mul_card H : H.index * |H| = |L|`.  `Xset_subset_S`, `Yset_subset_S`,
   `centralCommutator_ne_bot (hHnonab)` (+ `Subgroup.ne_bot_iff_exists_ne_one` for a `z∈Zc^#`).
+- **(session 5 cont.):** `inner_self_re_nonneg (φ) : 0 ≤ (⟨φ,φ⟩).re` (ZIrrFourier:177);
+  `inner_self_orthonormalSum_eq_sum_sq (horth) : ⟨∑c_a•a, ∑c_a•a⟩ = ∑(c_a)²` (Parseval,
+  ZIrrFourier:352); `Complex.intCast_re`.  Degree-1↔linear:
+  `IsIrreducibleCharacter.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one (hφ)(φ 1=1) :
+  ∃ χ:G→*ℂˣ, (linearIrreducibleCharacter χ : CF)=φ` (LinearCharacter:169);
+  `linearIrreducibleCharacter_eq_trivial_iff : linear χ = trivial ↔ χ=1` (LinearCharacter:84);
+  `IrreducibleCharacter.ext (↑χ=↑ψ) : χ=ψ`; `S_eq : S = {φ | ∃θ:Irr H, θ≠trivial ∧ φ=induce H ↑θ}`;
+  `ClassFunction.induce_apply_one : (induce H ψ) 1 = H.index * ψ 1`; `mem_Yset_iff_exists_linear_source`.
+  ⚠ inner: linear in 1st arg (`ClassFunction.inner_smul_left`/`inner_sub_left`/`inner_sub_right`),
+  conj-linear in 2nd (`OddOrder.RepresentationTheory.inner_smul_right : ⟨φ,c•ψ⟩=star c·⟨φ,ψ⟩` — NOT in
+  `ClassFunction` namespace).
