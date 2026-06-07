@@ -11,6 +11,7 @@ import Mathlib.LinearAlgebra.Matrix.ToLin
 import Mathlib.LinearAlgebra.FreeModule.Finite.Matrix
 import Mathlib.LinearAlgebra.FiniteDimensional.Basic
 import Mathlib.LinearAlgebra.Dimension.StrongRankCondition
+import Mathlib.LinearAlgebra.Eigenspace.Triangularizable
 
 /-!
 # Skolem–Noether for the endomorphism algebra of a finite-dimensional vector space
@@ -62,6 +63,36 @@ theorem nonempty_linearEquiv_of_isSimpleModule
   exact ⟨eA.trans (eIJ.symm.trans eB.symm)⟩
 
 end SimpleArtinian
+
+section Schur
+
+/-- **Schur's Lemma over an algebraically closed field (module form).**  Every `R`-linear
+endomorphism of a finite-dimensional simple `R`-module `M` (over a `k`-algebra `R`, `k`
+algebraically closed) is a scalar: `algebraMap k (End R M)` is bijective.
+
+Surjectivity is the eigenvalue argument: `f` (as a `k`-linear map on the finite-dimensional `M`)
+has an eigenvalue `c ∈ k`; then `ker (f - c • id)` is a nonzero `R`-submodule of the simple `M`,
+hence all of `M`, so `f = c • id`.  This sidesteps the endomorphism-division-ring instance and its
+semiring diamond. -/
+theorem algebraMap_end_bijective_of_isSimpleModule
+    {k : Type*} [Field k] [IsAlgClosed k] {R : Type*} [Ring R] [Algebra k R]
+    {M : Type*} [AddCommGroup M] [Module R M] [Module k M] [IsScalarTower k R M]
+    [IsSimpleModule R M] [Module.Finite k M] :
+    Function.Bijective (algebraMap k (Module.End R M)) := by
+  haveI : Nontrivial M := IsSimpleModule.nontrivial R M
+  refine ⟨(algebraMap k (Module.End R M)).injective, fun f => ?_⟩
+  obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue (f.restrictScalars k)
+  obtain ⟨v, hv⟩ := hc.exists_hasEigenvector
+  have hv_ne : v ≠ 0 := (Module.End.hasEigenvector_iff.mp hv).2
+  refine ⟨c, ?_⟩
+  have hfv : f v = c • v := hv.apply_eq_smul
+  have hmem : v ∈ LinearMap.ker (f - algebraMap k (Module.End R M) c) := by
+    simp only [LinearMap.mem_ker, LinearMap.sub_apply, Module.algebraMap_end_apply, hfv, sub_self]
+  rcases eq_bot_or_eq_top (LinearMap.ker (f - algebraMap k (Module.End R M) c)) with hbot | htop
+  · rw [hbot, Submodule.mem_bot] at hmem; exact absurd hmem hv_ne
+  · exact (sub_eq_zero.mp (LinearMap.ker_eq_top.mp htop)).symm
+
+end Schur
 
 section Twist
 
