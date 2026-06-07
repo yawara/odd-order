@@ -279,4 +279,30 @@ theorem prop24k {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ) (hpos :
     rw [hsum, hv0, mul_zero, zero_add] at hq
     rcases hδ with hd | hd <;> rw [hd] at hq <;> omega
 
+/-- **`Fin h`-indexed form of `prop24j`** — transported through `ZMod.finEquiv : Fin h ≃+* ZMod h`.
+This is the form consumed by the Thm 2.5 assembly, where the eigenspace dimensions are indexed by
+`Fin h`. -/
+theorem prop24j_fin {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : Fin h → ℤ)
+    (H : ∀ m : Fin h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    ∃ (i₁ : Fin h) (v₀ δ : ℤ), (δ = 1 ∨ δ = -1) ∧ (∀ i, i ≠ i₁ → n i = v₀) ∧
+      n i₁ = v₀ + δ ∧ (∑ i, n i) = (h : ℤ) * v₀ + δ := by
+  classical
+  let e : Fin h ≃+* ZMod h := ZMod.finEquiv h
+  set n' : ZMod h → ℤ := fun z => n (e.symm z) with hn'
+  have hcomp : ∀ i : Fin h, n' (e i) = n i := fun i => by simp [hn']
+  have H' : ∀ m' : ZMod h, m' ≠ 0 → ∑ i', (n' i' - n' (i' + m')) ^ 2 = 2 := by
+    intro m' hm'
+    have hm : e.symm m' ≠ 0 := fun hc => hm' (by rw [← e.apply_symm_apply m', hc, map_zero])
+    rw [← H (e.symm m') hm]
+    refine (Fintype.sum_equiv e.toEquiv _ _ fun i => ?_).symm
+    simp [hn', map_add]
+  obtain ⟨i₁', v₀, δ, hδ, hconst, hi₁, hsum⟩ := prop24j hh n' H'
+  refine ⟨e.symm i₁', v₀, δ, hδ, ?_, ?_, ?_⟩
+  · intro i hi
+    rw [← hcomp i]
+    exact hconst (e i) fun hc => hi (by rw [← e.symm_apply_apply i, hc])
+  · rw [← hi₁, ← hcomp (e.symm i₁'), e.apply_symm_apply]
+  · rw [← hsum]
+    exact Fintype.sum_equiv e.toEquiv _ _ fun i => by simp [hn']
+
 end OddOrder.RepresentationTheory
