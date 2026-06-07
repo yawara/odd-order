@@ -258,4 +258,25 @@ theorem prop24j {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ)
   have hmul : (n i₁ - v₀) * (n i₁ - v₀) = 1 := by rw [← pow_two]; exact hsq1
   exact mul_self_eq_one_iff.mp hmul
 
+/-- **BG Proposition 2.4(k).** If additionally all `nᵢ ≥ 0` (eigenspace dimensions),
+`q := ∑ nᵢ ≥ 2`, and the fixed value `n 0 = 0`, then `q = h − 1`, i.e. `h = q + 1`.
+(The `C_V(H) = 0 ⟹ h = qⁿ + 1` half of BG Thm 2.5.) -/
+theorem prop24k {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ) (hpos : ∀ i, 0 ≤ n i)
+    (hq : 2 ≤ ∑ i, n i) (H : ∀ m : ZMod h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2)
+    (h0 : n 0 = 0) : (∑ i, n i) = (h : ℤ) - 1 := by
+  haveI : Fact (1 < h) := ⟨by omega⟩
+  obtain ⟨i₁, v₀, δ, hδ, hconst, hi₁, hsum⟩ := prop24j hh n H
+  by_cases hi0 : i₁ = 0
+  · subst hi0
+    have hv : v₀ + δ = 0 := hi₁.symm.trans h0
+    have hv0 : (0 : ℤ) ≤ v₀ := by rw [← hconst 1 one_ne_zero]; exact hpos 1
+    rcases hδ with hd | hd
+    · exfalso; rw [hd] at hv; omega
+    · have : v₀ = 1 := by rw [hd] at hv; omega
+      rw [hsum, hd, this]; ring
+  · exfalso
+    have hv0 : v₀ = 0 := by rw [← hconst 0 (fun hc => hi0 hc.symm), h0]
+    rw [hsum, hv0, mul_zero, zero_add] at hq
+    rcases hδ with hd | hd <;> rw [hd] at hq <;> omega
+
 end OddOrder.RepresentationTheory
