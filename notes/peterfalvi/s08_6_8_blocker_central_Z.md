@@ -410,3 +410,65 @@ prerequisite it needs is now in place: the reg-char decomposition (`abbe578`) an
 Order note: the adapter (step 5) and task #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
 prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with
 `coherentYset.extension` internals).
+
+## 2026-06-07 (session 3): Peterfalvi (4.1) landed + two framing corrections (read carefully)
+
+**✅ Peterfalvi (4.1) (mmd 04.6 L5) LANDED — general form, build-green + axiom-clean + AxiomsCheck-registered.**
+In `S08_CoherenceTheorems.lean`, namespace `OddOrder.RepresentationTheory` (general `{Γ}`, reusable;
+inserted just after the early `ClassFunction` section):
+- `apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one` — a `±Irr` element has nonzero degree.
+- `eq_inner_smul_of_inner_ne_zero` — two `±Irr` with `⟨φ,ψ⟩ ≠ 0` satisfy `ψ = ⟨φ,ψ⟩ • φ`.
+- `inner_eq_zero_of_orthogonal_signedDifference` — (4.1) cross core: `(α,γ) = 0`.
+- `pairwise_inner_eq_zero_of_orthogonal_signedDifference` — full (4.1): all four cross products
+  `(α,γ),(α,δ),(β,γ),(β,δ)` vanish (core + 3 sign-flipped/swapped applications).
+
+"±Irr Γ" = norm-`1` element of `ZIrr Γ` (`exists_zsmul_irreducibleCharacter_of_inner_self_one`).
+All four `#print axioms` = `[propext, Classical.choice, Quot.sound]`. Issue `1002`.
+
+### 🔶 Framing correction #1: `himg_ortho` IS the (4.1) step, NOT the deep `b≡0` argument.
+The mmd (6.8.1) proof (04.8 **L166**) establishes `X^{τ₂} ⊥ Y^{τ₁}` (= the formalization's
+`himg_ortho`, `⟨τ₂ χᵢ, τ₁ ηⱼ⟩ = 0`) **"by (4.1)"**, *before* and independent of the `b≡c≡0 mod a`
+argument (L168-176). So `himg_ortho` reduces to **(4.1) + difference-orthogonality + degree setup +
+`n ≥ 2`, `m ≥ 2`**, not the `(6.7)`/regular-character machinery. Concretely, apply
+`pairwise_inner_eq_zero_of_orthogonal_signedDifference` with `α=τ₁ηⱼ, β=τ₁η₁, γ=τ₂χᵢ, δ=τ₂χ₁,
+u=1, v=dᵢ` (`dᵢ` = degree ratio `χᵢ(1)/χ₁(1)`); the four conclusions cover all index combinations
+(incl. boundaries `i=1`/`j=1`). Hypotheses discharge as:
+- `(α,β)=(γ,δ)=0`: τ₁/τ₂ isometry on `ℤ[Y]`/`ℤ[X]` + distinct irreducibles (`extension_inner_eq`).
+- difference-orthogonality `⟨τ₁(ηⱼ−η₁), τ₂(χᵢ−dᵢχ₁)⟩=0`: both diffs supported (vanish at 1) ⟹
+  `τ₁=τ₂=τ` there (`extends_on_supported`) ⟹ `=⟨ηⱼ−η₁, χᵢ−dᵢχ₁⟩=0` by the Dade isometry +
+  `X ⊥ Y` (disjoint irreducibles). **This is the next leaf to build** (needs the Dade
+  supported-isometry lemma `dadeIntegralCharacterMap_inner_eq_on_supported_span` wired to τ₁/τ₂).
+- degree-`0` conditions `(τ₁(ηⱼ−η₁))(1)=(τ₂(χᵢ−dᵢχ₁))(1)=0`: **`dadeIntegralCharacterMap_apply_one_eq_zero`**
+  (S07:5107, "Dade base map sends supported class functions to functions vanishing at `1`"), since τ
+  scales degree by `[G:L]`.
+
+### ⚠️ Framing correction #2 (NEEDS VERIFICATION): `hgen` looks **false** for `X ∪ Y` — it, not
+### `himg_ortho`, is where the deep `b≡0` argument lives.
+The L3 shell hands `hgen : zSupportedSpan (X∪Y) A ⊆ span ℤ (zSupportedSpan X A ∪ zSupportedSpan Y A)`
+to the capstone (`coherentUnion_of_glued`, S07). With `zSupportedSpan S A = {φ ∈ ℤ[S] | supp φ ⊆ A}`
+(S07:44), this appears **FALSE**: `χ₁ − aη₁` (`a = χ₁(1)/|W₁| > 1`, so `χ₁(1) = aη₁(1)`) lies in
+`zSupportedSpan (X∪Y) A` (it is in `ℤ[X∪Y]` and vanishes at `1`, supported on `H^#`), but **not** in
+the RHS: any RHS element is `p + q` with `p` a *supported* `X`-combo (degree `0`, i.e.
+`∑ pᵢdᵢ = 0`) and `q` a supported `Y`-combo; coefficient-matching forces `p`'s `X`-part `= χ₁`, which
+has degree `a|W₁| ≠ 0` — contradiction. (Degree-counting: a supported `∑cᵢχᵢ + ∑eⱼηⱼ` has
+`∑eⱼ = −a∑cᵢdᵢ`, and splits only when `∑cᵢdᵢ = 0`; `χ₁−aη₁` has `∑cᵢdᵢ = 1`.)
+**Structural confirmation:** the *single-family* `XAdjoinStepInput.adjoin` derives its `hgen` "from
+`hSgen` and the degree-matched support of `χ − aχ₁`" (S08:2296) — i.e. it explicitly **generates the
+supported lattice with the diagonal difference `χ − aχ₁`**, which the union shell's `hgen` omits.
+**⟹ Hypothesis:** the deep `b≡c≡0 mod a` / (6.7) argument (mmd L168-176, showing
+`(χ₁−aη₁)^τ = χ₁^{τ₂} − aη₁^{τ₁}`) is what discharges the **cross-diagonal** generation, i.e. it
+targets `extends_on_supported`/`hgen`, **not** `himg_ortho`. So `himg_ortho` alone is likely **not**
+the sole remaining obligation — the union needs a `coherentUnion_of_glued` *variant* whose supported
+generation includes the cross-diagonals `{χᵢ − aᵢη₁}`, discharged by the b≡0 argument (the already-
+landed `peterfalvi_67_centralCommutator` + reg-char `sumNonInflatedDegreeMulChar_of_mem` feed exactly
+this). **Verify before committing to "himg_ortho is the last step":** re-derive how the capstone is
+meant to supply `hgen`; if the degree-counting above is right, plan a diagonal-aware union lemma.
+
+### Recommended next steps (updated)
+1. **difference-orthogonality leaf** (clean): `⟨τ₂ x, τ₁ y⟩ = ⟨x,y⟩` for supported `x∈ℤ[X,A]`,
+   `y∈ℤ[Y,A]` (both = τ, Dade isometry). Foundation for both `himg_ortho` and the diagonal handling.
+2. **`himg_ortho` via (4.1)**: wire `pairwise_inner_eq_zero_of_orthogonal_signedDifference` + #1 +
+   `dadeIntegralCharacterMap_apply_one_eq_zero` + `n,m ≥ 2`.
+3. **Resolve `hgen`**: confirm the counterexample, then build a diagonal-aware union variant (or fix
+   the shell) and discharge the cross-diagonal via the b≡0 / (6.7) argument. **This is the real deep
+   piece**, best attended.

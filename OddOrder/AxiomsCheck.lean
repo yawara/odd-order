@@ -2370,6 +2370,18 @@ set_option linter.style.longLine false in
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.isIrreducibleCharacter_of_mem_Xset_caseA
+-- Peterfalvi (4.1) (mmd 04.6 L5): signed irreducibles with orthogonal, degree-`0` signed
+-- differences are pairwise orthogonal — the lemma promoting difference-orthogonality to full
+-- image-orthogonality (`X^{τ₂} ⊥ Y^{τ₁}`), the (6.8.1) `himg_ortho` ingredient.  Sub-lemmas:
+-- `eq_inner_smul_of_inner_ne_zero` (`±Irr` equal up to sign) and
+-- `apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one` (`±Irr` has nonzero degree).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.pairwise_inner_eq_zero_of_orthogonal_signedDifference
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.inner_eq_zero_of_orthogonal_signedDifference
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.eq_inner_smul_of_inner_ne_zero
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one
 -- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput

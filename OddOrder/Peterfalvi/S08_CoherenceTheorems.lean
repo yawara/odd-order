@@ -69,6 +69,175 @@ theorem induce_conj (H : Subgroup Γ) [Invertible (Nat.card H : ℂ)]
 
 end ClassFunction
 
+/-! ### Peterfalvi (4.1): pairwise orthogonality of signed irreducibles (mmd 04.6 L5)
+
+Peterfalvi **(4.1)** is the elementary character-theoretic lemma that lets one glue two coherent
+families into a single isometry: it promotes orthogonality of *signed differences* to orthogonality
+of the underlying signed irreducibles.  A "signed irreducible" (Peterfalvi's `±Irr X`) is a norm-`1`
+element of `ZIrr Γ`, i.e. `±` an irreducible character (`exists_zsmul_irreducibleCharacter_of_inner_self_one`).
+The lemma is used in §4.3, §6.8.1, §9.5, §10.3 and §14.1. -/
+
+variable {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
+
+/-- A norm-`1` virtual character has nonzero degree: if `φ = ε • ξ` with `ε = ±1` and `ξ`
+irreducible, then `φ(1) = ε · ξ(1) ≠ 0` (irreducible degrees are positive). -/
+theorem apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one
+    {φ : ClassFunction Γ ℂ} (hφ : φ ∈ ZIrr Γ)
+    (hφn : ClassFunction.inner φ φ = 1) : φ (1 : Γ) ≠ 0 := by
+  obtain ⟨ε, ξ, hε, rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hφ hφn
+  obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction Γ ℂ), ClassFunction.smul_apply, hd1]
+  refine mul_ne_zero ?_ ?_
+  · rcases hε with h | h <;> subst h <;> norm_num
+  · exact_mod_cast hd.ne'
+
+/-- Two signed irreducibles with nonzero inner product are equal up to that inner product:
+`ψ = ⟨φ, ψ⟩ • φ`.  (Writing `φ = ε•a`, `ψ = ε'•b`, the inner product `εε'·(a = b)` is nonzero only
+if `a = b`, in which case `⟨φ,ψ⟩ = εε'` and `εε'·ε = ε'` since `ε² = 1`.) -/
+theorem eq_inner_smul_of_inner_ne_zero
+    {φ ψ : ClassFunction Γ ℂ} (hφ : φ ∈ ZIrr Γ) (hψ : ψ ∈ ZIrr Γ)
+    (hφn : ClassFunction.inner φ φ = 1) (hψn : ClassFunction.inner ψ ψ = 1)
+    (hne : ClassFunction.inner φ ψ ≠ 0) :
+    ψ = ClassFunction.inner φ ψ • φ := by
+  classical
+  obtain ⟨ε, a, hε, rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hφ hφn
+  obtain ⟨ε', b, hε', rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hψ hψn
+  have key : ClassFunction.inner (ε • (a : ClassFunction Γ ℂ)) (ε' • (b : ClassFunction Γ ℂ)) =
+      (ε : ℂ) * (ε' : ℂ) *
+        ClassFunction.inner (a : ClassFunction Γ ℂ) (b : ClassFunction Γ ℂ) := by
+    rw [← Int.cast_smul_eq_zsmul ℂ ε (a : ClassFunction Γ ℂ),
+      ← Int.cast_smul_eq_zsmul ℂ ε' (b : ClassFunction Γ ℂ),
+      ClassFunction.inner_smul_left, inner_smul_right, star_intCast]
+    ring
+  have hab : a = b := by
+    by_contra hab
+    exact hne (by rw [key, irreducibleCharacter_inner, if_neg hab, mul_zero])
+  subst hab
+  rw [key, irreducibleCharacter_inner, if_pos rfl, mul_one,
+    ← Int.cast_smul_eq_zsmul ℂ ε' (a : ClassFunction Γ ℂ),
+    ← Int.cast_smul_eq_zsmul ℂ ε (a : ClassFunction Γ ℂ), smul_smul]
+  congr 1
+  rcases hε with h | h <;> subst h <;> push_cast <;> ring
+
+/-- **Peterfalvi (4.1)** (mmd 04.6 L5), cross-orthogonality core.
+
+For signed irreducibles `α, β, γ, δ ∈ ±Irr Γ` (norm-`1` elements of `ZIrr Γ`) and nonzero reals
+`u, v`, if `(α,β) = (γ,δ) = 0`, the signed difference `(α − β, u•γ − v•δ) = 0`, and both signed
+differences vanish at `1`, then `(α, γ) = 0`.
+
+Proof (mmd): if `(α,γ) ≠ 0`, then `γ = εα` (`ε = ±1`); orthogonality of `γ,δ` forces `(α,δ) = 0`,
+and `(α,β) = 0` forces `(β,γ) = 0`.  Expanding `(α−β, u•γ−v•δ) = 0` gives `uε + v(β,δ) = 0`, so
+`(β,δ) ≠ 0` and `v•δ = −uε•β`.  Then `u•γ − v•δ = uε•(α+β)`, and evaluating at `1` (using
+`(α−β)(1) = 0`, i.e. `α(1) = β(1)`) gives `0 = 2uεα(1)`, contradicting `u ≠ 0`, `ε ≠ 0`,
+`α(1) ≠ 0`. -/
+theorem inner_eq_zero_of_orthogonal_signedDifference
+    {α β γ δ : ClassFunction Γ ℂ} {u v : ℝ} (hu : u ≠ 0) (hv : v ≠ 0)
+    (hα : α ∈ ZIrr Γ) (hαn : ClassFunction.inner α α = 1)
+    (hβ : β ∈ ZIrr Γ) (hβn : ClassFunction.inner β β = 1)
+    (hγ : γ ∈ ZIrr Γ) (hγn : ClassFunction.inner γ γ = 1)
+    (hδ : δ ∈ ZIrr Γ) (hδn : ClassFunction.inner δ δ = 1)
+    (hαβ : ClassFunction.inner α β = 0) (hγδ : ClassFunction.inner γ δ = 0)
+    (hdiff : ClassFunction.inner (α - β) ((u : ℂ) • γ - (v : ℂ) • δ) = 0)
+    (hα1 : (α - β) (1 : Γ) = 0)
+    (hγδ1 : ((u : ℂ) • γ - (v : ℂ) • δ) (1 : Γ) = 0) :
+    ClassFunction.inner α γ = 0 := by
+  by_contra hαγ
+  -- (1) `γ = ⟨α,γ⟩ • α`.
+  have hγeq : γ = ClassFunction.inner α γ • α :=
+    eq_inner_smul_of_inner_ne_zero hα hγ hαn hγn hαγ
+  -- (2) `⟨α,δ⟩ = 0` (else `δ = ±α = ±γ`, contradicting `γ ⊥ δ`).
+  have hαδ : ClassFunction.inner α δ = 0 := by
+    by_contra hαδ
+    have hδeq : δ = ClassFunction.inner α δ • α :=
+      eq_inner_smul_of_inner_ne_zero hα hδ hαn hδn hαδ
+    have hcontra : ClassFunction.inner γ δ =
+        ClassFunction.inner α γ * star (ClassFunction.inner α δ) := by
+      conv_lhs => rw [hγeq, hδeq]
+      rw [ClassFunction.inner_smul_left, inner_smul_right, hαn, mul_one]
+    exact (mul_ne_zero hαγ (star_ne_zero.mpr hαδ)) (hγδ ▸ hcontra).symm
+  -- (3) `⟨β,γ⟩ = 0`.
+  have hβγ : ClassFunction.inner β γ = 0 := by
+    rw [hγeq, inner_smul_right, inner_conj_symm α β, hαβ, star_zero, mul_zero]
+  -- (4) Expand the signed-difference orthogonality to `u⟨α,γ⟩ + v⟨β,δ⟩ = 0`.
+  have hexpand : (u : ℂ) * ClassFunction.inner α γ + (v : ℂ) * ClassFunction.inner β δ = 0 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      inner_smul_right, inner_smul_right, inner_smul_right, inner_smul_right] at hdiff
+    simp only [show star ((u : ℝ) : ℂ) = ((u : ℝ) : ℂ) from by simp,
+      show star ((v : ℝ) : ℂ) = ((v : ℝ) : ℂ) from by simp, hαδ, hβγ, mul_zero] at hdiff
+    linear_combination hdiff
+  -- (5) `⟨β,δ⟩ ≠ 0`, so `δ = ⟨β,δ⟩ • β`.
+  have hβδ : ClassFunction.inner β δ ≠ 0 := by
+    intro h0
+    rw [h0, mul_zero, add_zero] at hexpand
+    exact (mul_ne_zero (Complex.ofReal_ne_zero.mpr hu) hαγ) hexpand
+  have hδeq : δ = ClassFunction.inner β δ • β :=
+    eq_inner_smul_of_inner_ne_zero hβ hδ hβn hδn hβδ
+  -- (6) Evaluate at `1`.  `α(1) = β(1)` from `(α−β)(1) = 0`.
+  have hαβ1 : α (1 : Γ) = β (1 : Γ) := by
+    have h := hα1; rw [ClassFunction.sub_apply, sub_eq_zero] at h; exact h
+  have hγ1 : γ (1 : Γ) = ClassFunction.inner α γ * α (1 : Γ) := by
+    conv_lhs => rw [hγeq]
+    rw [ClassFunction.smul_apply]
+  have hδ1 : δ (1 : Γ) = ClassFunction.inner β δ * β (1 : Γ) := by
+    conv_lhs => rw [hδeq]
+    rw [ClassFunction.smul_apply]
+  rw [ClassFunction.sub_apply, ClassFunction.smul_apply, ClassFunction.smul_apply, hγ1, hδ1,
+    ← hαβ1] at hγδ1
+  -- `hγδ1 : u·(⟨α,γ⟩·α(1)) − v·(⟨β,δ⟩·α(1)) = 0`.
+  have hfinal : 2 * (u : ℂ) * ClassFunction.inner α γ * α (1 : Γ) = 0 := by
+    linear_combination hγδ1 + α (1 : Γ) * hexpand
+  -- (7) Contradiction: every factor is nonzero.
+  refine (mul_ne_zero (mul_ne_zero (mul_ne_zero ?_ ?_) hαγ)
+    (apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one hα hαn)) hfinal
+  · norm_num
+  · exact Complex.ofReal_ne_zero.mpr hu
+
+/-- **Peterfalvi (4.1)** (mmd 04.6 L5).  Signed irreducibles `α, β, γ, δ ∈ ±Irr Γ` with
+`(α,β) = (γ,δ) = 0`, orthogonal signed difference `(α − β, u•γ − v•δ) = 0` (`u, v` nonzero reals)
+and both signed differences vanishing at `1` are **pairwise orthogonal**: all four cross inner
+products `(α,γ), (α,δ), (β,γ), (β,δ)` vanish.
+
+Each follows from the cross-orthogonality core
+`inner_eq_zero_of_orthogonal_signedDifference` applied to a sign-flipped / swapped instance
+(`α ↔ β`, `γ ↔ δ` with `u ↔ v`); the permuted hypotheses are produced by conjugate symmetry
+(`inner_conj_symm`) and `neg_sub`. -/
+theorem pairwise_inner_eq_zero_of_orthogonal_signedDifference
+    {α β γ δ : ClassFunction Γ ℂ} {u v : ℝ} (hu : u ≠ 0) (hv : v ≠ 0)
+    (hα : α ∈ ZIrr Γ) (hαn : ClassFunction.inner α α = 1)
+    (hβ : β ∈ ZIrr Γ) (hβn : ClassFunction.inner β β = 1)
+    (hγ : γ ∈ ZIrr Γ) (hγn : ClassFunction.inner γ γ = 1)
+    (hδ : δ ∈ ZIrr Γ) (hδn : ClassFunction.inner δ δ = 1)
+    (hαβ : ClassFunction.inner α β = 0) (hγδ : ClassFunction.inner γ δ = 0)
+    (hdiff : ClassFunction.inner (α - β) ((u : ℂ) • γ - (v : ℂ) • δ) = 0)
+    (hα1 : (α - β) (1 : Γ) = 0)
+    (hγδ1 : ((u : ℂ) • γ - (v : ℂ) • δ) (1 : Γ) = 0) :
+    ClassFunction.inner α γ = 0 ∧ ClassFunction.inner α δ = 0 ∧
+      ClassFunction.inner β γ = 0 ∧ ClassFunction.inner β δ = 0 := by
+  -- Conjugate-symmetric companions of the orthogonality hypotheses.
+  have hδγ : ClassFunction.inner δ γ = 0 := by rw [inner_conj_symm γ δ, hγδ, star_zero]
+  have hβα : ClassFunction.inner β α = 0 := by rw [inner_conj_symm α β, hαβ, star_zero]
+  -- The `β ↔ α` and `γ,u ↔ δ,v` sign-flipped signed differences (orthogonal + vanishing at `1`).
+  have hdiffYX : ClassFunction.inner (α - β) ((v : ℂ) • δ - (u : ℂ) • γ) = 0 := by
+    rw [← neg_sub ((u : ℂ) • γ) ((v : ℂ) • δ), ClassFunction.inner_neg_right, hdiff, neg_zero]
+  have hdiffBA : ClassFunction.inner (β - α) ((u : ℂ) • γ - (v : ℂ) • δ) = 0 := by
+    rw [← neg_sub α β, ClassFunction.inner_neg_left, hdiff, neg_zero]
+  have hdiffBAYX : ClassFunction.inner (β - α) ((v : ℂ) • δ - (u : ℂ) • γ) = 0 := by
+    rw [← neg_sub α β, ← neg_sub ((u : ℂ) • γ) ((v : ℂ) • δ),
+      ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg, hdiff]
+  have h1BA : (β - α) (1 : Γ) = 0 := by
+    rw [← neg_sub α β, ClassFunction.neg_apply, hα1, neg_zero]
+  have h1YX : ((v : ℂ) • δ - (u : ℂ) • γ) (1 : Γ) = 0 := by
+    rw [← neg_sub ((u : ℂ) • γ) ((v : ℂ) • δ), ClassFunction.neg_apply, hγδ1, neg_zero]
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · exact inner_eq_zero_of_orthogonal_signedDifference hu hv hα hαn hβ hβn hγ hγn hδ hδn
+      hαβ hγδ hdiff hα1 hγδ1
+  · exact inner_eq_zero_of_orthogonal_signedDifference hv hu hα hαn hβ hβn hδ hδn hγ hγn
+      hαβ hδγ hdiffYX hα1 h1YX
+  · exact inner_eq_zero_of_orthogonal_signedDifference hu hv hβ hβn hα hαn hγ hγn hδ hδn
+      hβα hγδ hdiffBA h1BA hγδ1
+  · exact inner_eq_zero_of_orthogonal_signedDifference hv hu hβ hβn hα hαn hδ hδn hγ hγn
+      hβα hδγ hdiffBAYX h1BA h1YX
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08
