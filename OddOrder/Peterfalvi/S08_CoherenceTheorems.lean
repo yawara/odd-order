@@ -9932,6 +9932,61 @@ theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
     hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
   ring
 
+/-- **(6.8.1) norm of the cross-diagonal image** (mmd 04.8 L176: `‖χ₁−aη₁‖² = 1+a²`).  For `η = η₁ ∈ Y`
+and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`:
+`⟨(χ₁−aη₁)^τ, (χ₁−aη₁)^τ⟩ = 1 + a²`.
+
+By the Dade isometry on the supported singleton `{χ₁−aη₁}`
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`) this equals the source norm
+`⟨χ₁−aη₁, χ₁−aη₁⟩`, which expands by `χ₁`/`η₁`-orthonormality (`⟨χ₁,χ₁⟩ = ⟨η₁,η₁⟩ = 1`) and `X ⊥ Y`
+(`⟨χ₁,η₁⟩ = ⟨η₁,χ₁⟩ = 0`) to `1 + a²`.  This is the LHS of Peterfalvi's norm identity
+`1+a² = ‖X‖² + (b−a)² + (m−1)b²` for the `b = 0` step. -/
+theorem inner_self_tau_scaledDiff_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η)) (hyp.tau (χ₁ - a • η)) = 1 + (a : ℂ) ^ 2 := by
+  classical
+  have hχ₁irr : IsIrreducibleCharacter χ₁ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
+  have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  -- orthonormality / orthogonality scalars.
+  have hχ₁n : ClassFunction.inner χ₁ χ₁ = (1 : ℂ) := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L)
+      (⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hηn : ClassFunction.inner η η = (1 : ℂ) := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hXY : ClassFunction.inner χ₁ η = (0 : ℂ) :=
+    inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj χ₁ (Submodule.subset_span hχ₁)
+      η (Submodule.subset_span hη)
+  have hYX : ClassFunction.inner η χ₁ = (0 : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm χ₁ η, hXY, star_zero]
+  -- supported singleton ⟹ Dade isometry.
+  have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
+  have hsupp : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+  have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj (S := ({χ₁ - a • η} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
+    (Submodule.subset_span rfl) (Submodule.subset_span rfl)
+  rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hχ₁n, hηn,
+    hXY, hYX, star_natCast]
+  ring
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
