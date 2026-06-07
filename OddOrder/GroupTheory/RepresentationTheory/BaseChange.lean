@@ -148,4 +148,17 @@ theorem invariants_baseChangeRepresentation_eq_bot
     exact (TensorProduct.piRight F K K (fun _ : G => V)).injective.comp hlt
   rw [← ker_invariantsObstruction ρ', LinearMap.ker_eq_bot.mpr hinj']
 
+/-- Base change commutes with restriction along a group hom `φ : H →* G`.
+
+Lets the whole-group transfer lemmas apply to a subgroup: with `φ = H.subtype` and `ρ.comp φ`
+the restricted representation, `C_V(H) = ⊥` over `F` transfers to `C_{K⊗V}(H) = ⊥` over `K`
+(this is the form of BG (2.9), used at `H = Z(P)`). -/
+@[simp]
+theorem baseChangeRepresentation_comp
+    {F : Type*} [Field F] {G H : Type*} [Group G] [Group H]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (K : Type*) [Field K] [Algebra F K]
+    (ρ : Representation F G V) (φ : H →* G) :
+    baseChangeRepresentation K (ρ.comp φ) = (baseChangeRepresentation K ρ).comp φ := rfl
+
 end OddOrder.RepresentationTheory
