@@ -5633,6 +5633,41 @@ theorem sMember_smulDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L 
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **General `S`-combination support from degree 0.**  Any integer combination of `S`-members
+(`φ ∈ ℤ[S]`) that vanishes at `1` is supported on `H^# = sharpImage H`.  Each `S`-member is
+supported on `H` (`sMember_support_subset_H`), so `φ.support ⊆ H` (span induction); and `φ(1) = 0`
+removes `1`.  This is the multi-term generalisation of `sMember_diffSupport_of_charValue_eq` /
+`sMember_scaledDiffSupport_of_charValue_eq` — the supported↔degree-0 direction for the `S`-lattice,
+the support side of the (6.8.1) `hgen'` decomposition. -/
+theorem zSpan_S_support_subset_of_apply_one_eq_zero (hyp : SibleyDadeHypothesis G L H)
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.S) (h1 : φ 1 = 0) :
+    φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  -- `ℤ[S] ⊆ {ψ | ψ.support ⊆ H}` by span induction (decoupled from `h1`).
+  have hsuppH : ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.S, ψ.support ⊆ (H : Set ↥L) := by
+    intro ψ hψ
+    induction hψ using Submodule.span_induction with
+    | mem x hx => exact hyp.sMember_support_subset_H hx
+    | zero => intro g hg; rw [ClassFunction.mem_support] at hg; exact absurd rfl hg
+    | add x y _ _ hx hy =>
+        intro g hg
+        rcases ClassFunction.support_add_subset x y hg with h | h
+        · exact hx h
+        · exact hy h
+    | smul c x _ hx =>
+        intro g hg
+        refine hx ?_
+        rw [ClassFunction.mem_support] at hg ⊢
+        intro hxg
+        apply hg
+        rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hxg, mul_zero]
+  intro g hg
+  have hgH : g ∈ H := hsuppH φ hφ hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl; exact (ClassFunction.mem_support.mp hg) h1
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h => hg1 (OneMemClass.coe_eq_one.mp h)⟩
+
 /-- **`S`-member degree ratio against a degree-`|W₁|` anchor.**
 
 For `χ = Ind_H^L θ ∈ S` and an anchor `χ₁` of the minimal degree `χ₁(1) = |W₁|` (induced from a
