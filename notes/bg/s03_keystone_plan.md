@@ -247,9 +247,33 @@ contradiction. This opens BG §10–§16.
    `center_isScalar` + `sq_finrank_eq_card_quotient_center`; 5.5.4 = "two faithful irreds with equal
    central char are isomorphic" is a separate sub-piece.
 
-After both: `finrank_modEq_of_faithful_irreducible` is a genuine grounded Thm 2.5 (divisibility). Then:
-3. **C_V(H)=0 half** of Thm 2.5 (`h ≠ pⁿ+1 ⟹ C_V(H) ≠ 0`) — near-copy of `finrank_modEq…` using
-   `sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace` (✅ in ExtraspecialThm25) +
-   `dim V₀ = 0` hypothesis ⟹ `dim V = h − 1`. Low-risk wiring (extract shared setup to a private lemma).
+After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H)). Then:
+3. **✅ C_V(H) half DONE** (commit `e7db278`, 2026-06-08, sorry-free + axiom-clean, full build 3608):
+   `finrank_eq_sub_one_of_faithful_irreducible` (`ExtraspecialThm25Group.lean`) — same setup as
+   `finrank_modEq…` + `dim V ≥ 2` + `C_V(x)=0` (`cyclicEigenspaceFinDim ε (ρ x) 0 = 0`) ⟹ `dim V = h-1`
+   (= `h = dim V + 1`); contrapositive = BG's `h ≠ pⁿ+1 ⟹ C_V(H) ≠ 0`. Calls
+   `sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace` (Prop 2.4(k), ✅). Shared setup
+   (φ,T,hint,hV,hEdim,∑=dim V) factored into private `cyclicEndConj_keystoneData_of_faithful_irreducible`
+   (both divisibility + C_V(H) consume it; divisibility rewritten to use it, sig unchanged). centralizer
+   corollary `finrank_eq_sub_one_of_faithful_irreducible_of_centralizer` parallels the divisibility one.
+   **⟹ group-level Thm 2.5 は両結論とも wired, 残仮説 = hVP 単独。**
 4. **Thm 3.4** (`S03d_Thm34.lean`, new): Maschke → faithful irred → Gor 5.3.7 → special case = Thm 2.5
    → parity contradiction (`h = pⁿ+1` even vs `|G|` odd). Then Thm 3.5 → Thm 3.6 → §10.6 → §10/§11.
+
+### ▶▶▶ hVP (Prop 2.2(a)) の精密プラン (mmd L614-653 精読, 2026-06-08)
+
+**Prop 2.2(a)**: `G` group, `H ⊴ G`, `G/H` cyclic, `F` alg-closed, `M` irred `F[H]`-module with
+`M ≅ M^x ∀x∈G`. IF `L` irred `F[G]`-module & `M ≅` submodule of `L_H`, THEN `L_H ≅ M` (= `L_H` irred).
+**hVP 適用**: `H=P`, `L=V` (faithful irred `F[G]`), `M`=irred `F[P]`-submodule of `V_P` ⟹ `V_P=M` irred。
+証明 (mmd L619-651):
+1. Clifford (Gor 3.4.1): `L_H = M_1⊕…⊕M_k`, `M≅M_i`。`G` faithful on `L` ⟹ `H` faithful on `M`。
+2. `F` alg-closed ⟹ `Hom_{FH}(M,M)=F` ⟹ (Prop 2.1✅) `E(H)=Hom_F(M,M)` (Burnside, M 上全行列環)。
+3. `M≅M^{x⁻¹}` (hyp) ⟹ ∃ F-iso `τ∈E(H)` with `(mh)τ=(mτ)(xhx⁻¹)` (2.2)。`L` に lift (2.1+2.2 経由)、
+   linear 拡張 ⟹ `(ℓθ)τ=(ℓτ)(xθx⁻¹) ∀θ∈E(H)⊆E(G)` (2.3 `(ℓθ)τx=(ℓτx)θ`)。
+4. `τ⁻¹∈E(H)` ⟹ `ℓx=ℓτxτ⁻¹` ⟹ `(ℓx)τx=(ℓτx)x` (2.4)。(2.3)+(2.4)+`⟨H,x⟩=G` ⟹ `τx∈Hom_{FG}(L,L)`。
+5. `F` alg-closed + `L` irred ⟹ (Prop 2.1✅) `Hom_{FG}(L,L)=F` ⟹ `τx` scalar。`τ∈E(H)` ⟹ `M_1τ=M_1`
+   ⟹ `M_1=M_1τx=M_1x` ⟹ `M_1` は `G`-submodule ⟹ `L=M_1` (L irred)。∎
+**要件**: (i) Clifford 分解 (mathlib に有? 要調査; repo `Clifford.lean` は ℂ-pin)。(ii) Prop 2.1✅
+(`asAlgebraHom_surjective_of_isAlgClosed` 系)。(iii) Gor 5.5.4 (= `M≅M^g`, faithful irred extraspecial
+は central char で決まる; `ExtraspecialFaithful.lean` の `center_isScalar`+`sq_finrank…` 部分被覆、
+"等 central char ⟹ iso" は別 sub-piece)。新 `CliffordAlgClosed.lean` (ℂ-pin Clifford.lean は破壊禁止)。複数セッション。
