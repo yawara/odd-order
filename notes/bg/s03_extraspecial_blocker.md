@@ -99,7 +99,18 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
   `iSup_cyclicHomBlockFin_eq_top` → `isInternal_cyclicHomBlockFin` (`DirectSum.IsInternal`, via
   coeLinearMap surjective + `∑ dim E_{i,t}=(dim V)²=dim End` ⟹ bijective by
   `injective_iff_surjective_of_finrank_eq_finrank`).
-- **(g)(h) bridge — IN PROGRESS** (next concrete leaf):
+- **(g) — ✅ DONE** (`finrank_cyclicEndConjEigenspaceFin`, EigenspaceBlockDecomp.lean, axiom-clean):
+  `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ`. Built bottom-up: `finrank_iSup_of_iSupIndep` (general
+  `dim(⨆ indep)=∑dim`) → `finrank_iSup_cyclicHomBlockFin_diagonal` (`dim(⨆ᵢ E_{i,i+m})=∑nᵢnᵢ₊ₘ`,
+  m-diagonal sub-family of (c)) → `iSup_cyclicHomBlockFin_diagonal_le` (`⨆ᵢ E_{i,i+m} ≤ E_m`) →
+  the dimension sandwich (E_m independent via `cyclicEigenspaceFin_iSupIndep` for the conj operator
+  + ∑ₘ∑ᵢ = (dim V)² = dim End ⟹ termwise). Key hyps: `IsPrimitiveRoot epsilon h`, hV.
+- **(h) — NEXT** (pure arithmetic from (g)): `2 dim E_0 − 2 dim E_m = ∑ᵢ(nᵢ−nᵢ₊ₘ)²`. Over ℤ
+  (prop24j is ℤ-valued): `∑((nᵢ:ℤ)−nᵢ₊ₘ)² = 2(dim E_0 − dim E_m)` via (g) at m and m=0 +
+  `∑ nᵢ₊ₘ² = ∑ nᵢ²` (reindex). Then `dim E_0 = dim E_m+1 ∀m≢0` (Thm 2.5 H-module hyp) ⟹ `∑=2`.
+- **Indexing bridge for prop24j**: `prop24j`/`prop24k` are over `ZMod h → ℤ`; eigenspace dims are
+  `Fin h → ℕ`. `ZMod h ≃+ Fin h` (NeZero h) needed to transport the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis.
+- **(g)(h) bridge — leftover detail**:
     - **(g)** `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ`. **Route fixed (iter 18)** — AVOID the eigenvalue-uniqueness
       refinement (`E_m = ⊕_{t−i≡m} E_{i,t}` ⊆-direction). Instead: (i) sub-family finrank
       `dim(⨆_{t−i≡m} E_{i,t}) = ∑_{t−i≡m} dim E_{i,t}` [sub-family of `isInternal_cyclicHomBlockFin`
