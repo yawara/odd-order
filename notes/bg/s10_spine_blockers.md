@@ -33,6 +33,24 @@ landable な grounded prerequisite / helper を 2 件**着地 (full build 3609, 
 2=Lem 6.3(a) ✅, 3=p-length 単調性 ✅, 4=p'-quotient lift ✅)。両者とも Lane A keystone 系・
 forward-axiom 待ち (ユーザ判断で forward-axiom 配線は保留中)。
 
+### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
+
+`exists_pow_map_line_eq` (抽象 𝔽_p 形, 着地済) を 10.13(c) が consume する **group 形**
+`mulAut_pow_map_orderP_subgroup` (E elem ab rank-2, σ:MulAut E 位数 p が Z₀ を pointwise 固定 ⟹
+order-p 部分群 X,Y≠Z₀ が σ^k で結ばれる) に持ち上げる。infra は揃っている:
+- `IsElementaryAbelian.zmodModule` (`Additive E` = ZMod p-module), `card_eq_pow_finrank` (⟹ dim=2),
+- σ↔φ: `(AddAutAdditive (G:=E)).symm.trans AddAut.toZModLinearEquiv` (PRank `mulAutEquivGeneralLinearGroup`
+  と同型、map_pow で `φ^k = β(σ^k)`),
+- 部分群↔部分加群 (carrier 保存 ≃o): `Subgroup.toAddSubgroup` ∘ `ZMod.toZModSubmodule`; card p ↔ finrank 1。
+- 結論翻訳: `Φ(X.map σ^k) = (Φ X).map φ^k` を **carrier 集合等式**で (`φ a = σ a` synonym).
+**⚠ GOTCHA (2026-06-08 で判明、未解決)**: `letI := hE.zmodModule` 後の `Additive E` の
+`AddCommGroup`/`CommGroup`/`Module` インスタンスが diamond で `set β` の elaboration が詰まる
+(`@AddAut (Additive E) Additive.add` vs `AddCommGroup.toAdd` 不一致, `Module (ZMod p) (Additive E)`
+synth 失敗)。PRank が `mulAutEquivGeneralLinearGroup` を WORKING で持つので解決可 — 推定 fix =
+`AddAut.toZModLinearEquiv (p := p)` で p 明示 + β に型注釈を付けない (PRank 同様 codomain 自由) +
+`CommGroup E` letI は不要。PRank の動く setup を逐語的にミラーすること。**focused session 推奨**
+(diamond 慣れ + carrier synonym の bookkeeping)。これが済めば 10.13(c) は Cor 10.7(b) のみ待ち。
+
 ## 直列スパインは Theorem 10.6 に全面ブロックされている
 
 ユーザ指定の直列順 `proper_hasPLengthOne (10.6) → isHall_Mbeta (10.8) → 10.14/10.9/10.10` は、
