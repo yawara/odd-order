@@ -325,3 +325,46 @@ IntegralCharacterMap agreeing with τ₂/τ₁ — extensions are built via `ret
 (6.7) ⟹ `c≡0 mod a`; norm bound ⟹ done). Both (a),(b) are genuinely deep / multi-session; (b) is the
 gating character theory. The (6.7) wiring needs the SibleyDade TI/Sylow/odd setup matched to
 `peterfalvi_67_of_odd`'s hypotheses (`P`, `L=N_G(P)`, `Z≤Z(P)`, `|C_L(·)|` const on `Z^#`).
+
+## 2026-06-07 (session 2): regular-char ingredient landed + (6.7)-wiring feasibility resolved
+
+**✅ (1) Regular-character decomposition off-identity value — DONE, committed `abbe578`.**
+`sumNonInflatedDegreeMulChar_of_mem` (`InflationCharacter.lean`, sorry-free + axiom-clean): for
+finite `G`, `N ⊴ G`, `z ∈ N^#`,
+`∑_{χ ∈ Irr G, N ⊄ ker χ} χ(1)·χ(z) = -|G ⧸ N|`. The off-identity companion of the pre-existing
+`sumNonInflatedDegreeSq` (z=1 value `|G|−|G⧸N|`); together they give `ρ_G − ρ_{G⧸N}` constant on
+`N^#` (value `-|G⧸N|`) with `ψ_N(z)−ψ_N(1) = -|G|`. Proof = `column_orthogonality_not_conjugate`
+(`∑_{Irr G} χ(1)χ(z)=0` at `z≁1`) minus the `N⊆ker` part (`χ(z)=χ(1)` on the kernel,
+`sumInflatedDegreeSq`). This is the mmd 04.8 L168 `∑ dᵢχᵢ(z) = -|L:Z|/(a|W₁|)` ingredient of
+"`η₁^{τ₁}` constant on `Z^#`". **NOT yet consumed** (the `Res η₁^{τ₁} = c∑dᵢχᵢ+χ′` decomposition that
+feeds it is still to be built — task #3); committed as a standalone reusable rep-theory lemma.
+
+**🟢 (2) The (6.7) wiring is FEASIBLE — the "structural risk" (is `H` Sylow-`p` of `G`?) is resolved.**
+(6.7) `peterfalvi_67_of_odd` requires `P : Sylow p G` with `L = N_G(P)`; the (6.8.1) application
+uses modulus `|H|`, so it needs **`H` = Sylow-`p` of `G`, `L = N_G(H)`**. Peterfalvi (6.8)(a)
+(mmd L138) does **not** state this (only `H^#` TI with normalizer `L`, `H` nilpotent) — and it is
+**not** implied by TI alone (counterexample `H=C_p ◁ G=C_p×C_p`, non-Frobenius). **But in the
+Frobenius case (A) it IS provable**, hence no missing hypothesis field:
+- `H ◁ L` (kernel, `H_normal`), `H` a `p`-group (post-(6.5), `hHp`), and Frobenius ⟹
+  `gcd(|H|,|W₁|)=1` (`OddOrder.Isaacs.Ch06.coprime_card_kernel_complement hF`, FrobeniusGroup.lean:287)
+  ⟹ `H` is the **unique normal** Sylow-`p` of `↥L` (`Sylow.unique_of_normal`) ⟹ every `p`-element
+  of `↥L` lies in `H`.
+- `Ĥ := H.map L.subtype : Subgroup G` (`sharpImage H = (Ĥ : Set G) \ {1}`, S08:1004),
+  `N_G(Ĥ) = L` from `H_sharp_ti` (TI normalizer). If `Ĥ ⊊ P ∈ Syl_p(G)`: normalizer-growth gives
+  `x ∈ N_P(Ĥ)∖Ĥ`; `x` normalizes `Ĥ` ⟹ `x ∈ N_G(Ĥ) = L`; `x` a `p`-element of `L` ⟹ `x ∈ Ĥ`,
+  contradiction. ∴ `Ĥ ∈ Syl_p(G)`. (Even if one only had `H ⊆ P`, `mod |P| ⟹ mod |H|` since
+  `|H| ∣ |P|` makes `-c|H|/(a|P|) ∈ ℤ ⟹ a ∣ c` anyway — but the `L=N_G(P)` hypothesis still forces
+  `Ĥ=P`, so the Sylow lemma is the honest route.)
+
+**(6.7)-wiring plan (task #2), de-risked, ~focused-session build:**
+1. `Ĥ := H.map L.subtype : Subgroup G`; `card Ĥ = card H`, `IsPGroup p Ĥ`.
+2. **`Ĥ ∈ Syl_p(G)`** structural lemma (the proof above). Needs mathlib: p-group normalizer-growth
+   (`H<P ⟹ H<N_P(H)`), p-element-in-unique-normal-Sylow, TI ⟹ `N_G(Ĥ)=L`. ~50–100 lines, the bulk.
+3. `L = N_G(Ĥ)` as a `Sylow.normalizer`-style equality (peterfalvi_67 takes `L = normalizer ↑P`).
+4. matchings: `Zc.map L.subtype ≤ Z(Ĥ)` (from `centralCommutator_subgroupOf_le_center`),
+   `|C_L(·)|` const on `Zc^#` (the (6.6)/(4.5) input — check availability), `Zc ⊴ L`.
+5. apply `peterfalvi_67_of_odd` to `ψ = η₁^{τ₁}` (const on `Zc^#`, from task #3) ⟹ congruence mod `|H|`.
+
+Order note: tasks #2 (this wiring) and #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
+prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with
+`coherentYset.extension` internals); #2 is structural group theory (de-risked, mechanical-ish).
