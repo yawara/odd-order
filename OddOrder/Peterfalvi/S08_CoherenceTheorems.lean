@@ -336,6 +336,73 @@ theorem characterKernel_subset_of_isCharacter_of_inner_ne_zero {Γ : Type*} [Gro
   have hmχ : m χ ≠ 0 := fun h0 => hχψ (by rw [← hcoeff χ hχ, h0, Nat.cast_zero])
   exact characterKernel_subset_of_natFinsupp_eq_sum hsupp hsum hχ hmχ hg
 
+/-! ### Cross-family inner products of two coherent Dade extensions
+
+Two coherence extensions `τ₁, τ₂` built from the **same** §4 Dade base map agree with it on their
+supported lattices (`extends_on_supported`), so on *supported* virtual characters their cross inner
+products and degree-`0` values are governed by the Dade isometry alone — independent of which set
+each comes from.  These are the (4.1) inputs for the (6.8.1) `himg_ortho`: with `x = χᵢ − dᵢχ₁`,
+`y = ηⱼ − η₁` (degree-matched differences, supported on `H^#`),
+`inner_extension_eq_inner_of_supported` gives `⟨τ₂ x, τ₁ y⟩ = ⟨x, y⟩` (`= 0` by `X ⊥ Y`), the
+difference-orthogonality, and `extension_apply_one_eq_zero_of_supported` gives the
+`(α − β)(1) = 0` / `(u•γ − v•δ)(1) = 0` hypotheses of
+`pairwise_inner_eq_zero_of_orthogonal_signedDifference`. -/
+
+section DadeCoherenceUnion
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+  {A : Set G} {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+
+/-- **Difference-orthogonality (Peterfalvi (4.1) input).**  For two coherences `hX`, `hY` w.r.t. the
+**same** §4 Dade base map and supported lattice elements `x ∈ ℤ[X, A]`, `y ∈ ℤ[Y, A]`, the cross
+inner product of the extensions equals the source inner product:
+`⟨hX.extension x, hY.extension y⟩ = ⟨x, y⟩`.  Both extensions agree with the Dade map on the
+supported lattice (`extends_on_supported`), reducing to the Dade isometry
+`dadeIntegralCharacterMap_inner_eq_on_supported_span` (applied on the pair `{x, y}`). -/
+theorem inner_extension_eq_inner_of_supported
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {X Y : Set (ClassFunction ↥L ℂ)}
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (hY : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) Y
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    {x y : ClassFunction ↥L ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan X
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (hy : y ∈ OddOrder.Peterfalvi.S07.zSupportedSpan Y
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
+    ClassFunction.inner (hX.extension x) (hY.extension y) = ClassFunction.inner x y := by
+  rw [hX.extends_on_supported x hx, hY.extends_on_supported y hy]
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj
+    (S := ({x, y} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+        rcases hs with rfl | rfl
+        · exact hx.2
+        · exact hy.2)
+    (Submodule.subset_span (Set.mem_insert x _))
+    (Submodule.subset_span (Set.mem_insert_of_mem x rfl))
+
+/-- A coherent Dade extension sends a supported lattice element to a function vanishing at `1`:
+`(hX.extension x)(1) = 0` for `x ∈ ℤ[X, A]`.  (`extends_on_supported` to the Dade map, then
+`dadeIntegralCharacterMap_apply_one_eq_zero`.)  Supplies the degree-`0` hypotheses of (4.1). -/
+theorem extension_apply_one_eq_zero_of_supported
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {X : Set (ClassFunction ↥L ℂ)}
+    (hX : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj)) X
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    {x : ClassFunction ↥L ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan X
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L)) :
+    (hX.extension x) (1 : G) = 0 := by
+  rw [hX.extends_on_supported x hx]
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero hyp hconj hx.2
+
+end DadeCoherenceUnion
+
 open scoped ComplexOrder in
 /-- The inner product of two genuine characters is `≥ 0`.  Decompose the right argument into a
 non-negative integer combination of irreducibles (`exists_natFinsupp_eq_sum`); each summand
