@@ -293,5 +293,19 @@ the first-ever `…StepData` term for every chain step and feeds the `…withCov
 (`natSum_partition_of_realSum`, `ab01c92`). The `StepData.κ : Type` (Type 0) constraint was met by
 indexing the tail `XF∖members` via `Fin tailF.card` (`Finset.equivFin` + `Equiv.sum_comp` +
 `Finset.sum_coe_sort`); ∃→data witnesses via the `choose` tactic (Type-valued goal).
-**⟹ L2 (the X(Zc)-coherence) is complete.** Remaining for the (6.8) capstone: **L3** (ν-glue, wires
-`peterfalvi_67_of_odd`), **CertainType case (B)**, **capstone wiring**.
+**⟹ L2 (the X(Zc)-coherence) is complete.**
+**✅ (3a) L3 outer shell DONE (`13836f7`)**: `coherentXunionYset_centralCommutator_of_glued_of_frobenius`
+— given the (6.8.1) `τ₃` glue data (`ν`, `hagreeX`/`hagreeY`/`hmixed`/`hgen`), produces
+`IsCoherent (Xset Zc ∪ Yset)` (what L4 consumes), via `coherentUnion_of_glued` at `Zc`,
+source-orthogonality discharged. **🔴 (3b) the genuine L3 content = CONSTRUCT `ν` (the (6.8.1) `τ₃`
+argument)** — DEEP character theory, never before built (like the StepData, `ν` was always a
+hypothesis). The mmd (6.8.1) proof (04.8 L160-176): set `τ₁`= Y-isometry (`coherentYset.extension`),
+`τ₂`= X-isometry (L2 `.extension`); write `(χ₁−aη₁)^τ = X − a η₁^{τ₁} + b∑η_j^{τ₁}`; show
+`η₁^{τ₁}` constant on `Z^#` (via the `Res η₁^{τ₁} = c∑d_iχ_i + χ′` decomposition =
+`(c/a)(ρ_L − ρ_{L/Z})`), then **(6.7) `peterfalvi_67_of_odd`** ⟹ `−c|H|/a ≡ 0 mod |H|` ⟹ `b ≡ c ≡ 0
+mod a`; norm bound `(x−1)²+(m−1)x² ≤ 1+1/a²` with `a>1` ⟹ `b=0`; then `X = χ₁^{τ₁}`, so `τ₃` (=`τ₁`
+on Y, `τ₂` on X) is an isometry. Formalizing this faithfully is a multi-session piece (several
+sub-lemmas: the regular-character decomposition, the (6.7) wiring to the SibleyDade TI/Sylow/odd
+setup, the norm/inner computations). After `ν`: **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, the
+`τ₂`/`(6.8.2.1-3)` argument — separate, also deep), then **capstone wiring** (`by_cases Nonempty
+CoherenceTarget`; `¬` → `rcases hyp.cases`; Frobenius → L2+L3+L4; CertainType → case-(B) analogue).
