@@ -61,3 +61,20 @@ Thm 4.18 `solvable_structure_of_pRank_le_two` / Thm 5.5 narrow core + Thm 5.6 `n
 Lem 6.5(a) `inf_commutator_eq_of_coprime`, 6.5(c) `exists_conj_eq_of_isHall_subgroupOf`, Lem 6.6
 `exists_mem_centralizer_inf_conj_le_sylow` / §7 (sorry-free) / 10.14(a)(b)(c) `beta_global_structure` /
 Uniqueness `isUniquelyMaximal_of_mem_e2_not_maximal` / `isSylow_sylowMap_of_mem_sigma` (今 public 化)。
+
+## Lemma 10.13 / §11 も rep-theory keystone に推移ブロック (2026-06-07 検証)
+
+§11.5/11.6/11.7 の単一ゲート **Lemma 10.13** (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`,
+`S10_LocalLemmas.lean:1063`, 全 (a)(b)(c) が 1 sorry) は **独立に landing できない**:
+- 証明 (BG p.79-80) の r(S)=2 ケースが **Cor 10.7(b)** (`r(S)=2 ⇒ Z(S) cyclic`) を使う。
+- **Cor 10.7** (`sylow_structure`, `S10_BetaRadical.lean:43`, **sorry**) の (a) は "P ⊆ O_{p',p}(M)"
+  = **Theorem 10.6** (`proper_hasPLengthOne`, sorry) を使い、(b)=(a)+Thm 4.16。
+- Theorem 10.6 → **Theorem 3.6** → **Theorem 3.4** → 代数閉体 extraspecial 表現論 (= rep-theory keystone, `bg-reptower` レーン)。
+
+⟹ **§11.5-7 → 10.13 → Cor 10.7(b) → 10.6 → 3.6 → rep-theory keystone** で推移ブロック。
+§10 spine と同じく、§11 の残りも **keystone (Thm 3.4/3.6) がクリティカルパス**。
+
+**ただし self-contained で unblocked な部分**: Lemma 10.13(c) のコア = 「(ℤ/p)² の位数 p の自己同型が
+1 本の line を固定すると残り p 本の line を transitive に置換する」(GL(2,p) transvection 事実、純線型代数、
+FT のブロックと無関係)。これは独立補題として今でも構築可能で、10.13(c) に最終的に必要 (非無駄)。
+GL(2,p) 既存 infra = `Isaacs/Ch07_ThompsonSubgroup/S7A1_JpGL2p.lean`。
