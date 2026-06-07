@@ -10079,6 +10079,152 @@ theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
       (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
   exact absurd hχ₁Y (Set.disjoint_left.mp hdisj hχ₁)
 
+open scoped Classical in
+/-- **(6.8.1) step-4 dichotomy** (mmd 04.8 L176, "`b ≡ c ≡ 0 (mod a)` ⟹ `b = 0` or the `m=2`
+edge").  For `η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the `η₁^{τ₁}`-coefficient
+`⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩` (Peterfalvi's `b − a`) is either `−a` (the `b = 0` case) or `0` with
+`|Y| = 2` (the `b = a ∧ m = 2` edge case).
+
+Bessel's inequality (`sum_sq_le_inner_self_re`) over the orthonormal `Y^{τ₁}`-family with
+`v = (χ₁−aη₁)^τ`: the coefficient is `bb = ⟨v,η₁^{τ₁}⟩` (`= b−a`, `a ∣ bb`, step 3) on `η₁^{τ₁}`
+and `bb + a` on the other `m−1` members (the constancy
+`inner_tau_scaledDiff_tau_Yset_diff_of_frobenius`); their squares sum to
+`bb² + (m−1)(bb+a)² ≤ ‖v‖² = 1 + a²` (norm `inner_self_tau_scaledDiff_of_frobenius`).  With
+`a ∣ (bb+a)`, `2 ≤ a` (`two_le_degreeRatio_of_mem_Xset_of_frobenius`), `2 ≤ m`
+(`two_le_Yset_ncard`), `eq_zero_or_edge_of_dvd_of_normBound` gives `bb+a = 0 ∨ (bb+a = a ∧ m = 2)`. -/
+theorem coeff_eq_neg_or_edge_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha_pos : 0 < a) (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁) = -(a : ℂ)
+      ∨ (hyp.Yset.ncard = 2 ∧
+        ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁) = 0) := by
+  classical
+  -- step 3: `bb = ⟨v, η₁^{τ₁}⟩ ∈ ℤ`, `a ∣ bb`.
+  obtain ⟨bb, hbb, habb⟩ :=
+    hyp.dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos ha
+  -- `Y`-orthonormality and injectivity of the extension on `Y`.
+  have hYon : ∀ ψ ψ' : ClassFunction ↥L ℂ, ψ ∈ hyp.Yset → ψ' ∈ hyp.Yset →
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Yset hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Yset hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hEinj : ∀ η ∈ hyp.Yset, ∀ η' ∈ hyp.Yset,
+      hyp.coherentYset.extension η = hyp.coherentYset.extension η' → η = η' := by
+    intro η hη η' hη' heq
+    by_contra hne
+    have h0 : ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η') = 0 := by
+      rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
+        (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
+    have h1 : ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η') = 1 := by
+      rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
+        (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
+    rw [h1] at h0; exact one_ne_zero h0
+  -- coefficient values `⟨v, η^{τ₁}⟩`.
+  have hcoeff : ∀ η ∈ hyp.Yset,
+      ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η)
+        = ((if η = η₁ then bb else bb + a : ℤ) : ℂ) := by
+    intro η hη
+    by_cases hee : η = η₁
+    · subst hee; rw [if_pos rfl]; exact hbb
+    · rw [if_neg hee]
+      have hsuppd : (η - η₁).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+        hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη₁)
+          ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη₁).symm)
+      have htaud : hyp.tau (η - η₁)
+          = hyp.coherentYset.extension η - hyp.coherentYset.extension η₁ := by
+        rw [← hyp.coherentYset.extends_on_supported (η - η₁)
+          ⟨Submodule.sub_mem _ (Submodule.subset_span hη) (Submodule.subset_span hη₁), hsuppd⟩,
+          map_sub]
+      have hconst := hyp.inner_tau_scaledDiff_tau_Yset_diff_of_frobenius hF hη₁ hη hee hχ₁ ha
+      rw [htaud, ClassFunction.inner_sub_right, hbb] at hconst
+      push_cast
+      linear_combination hconst
+  -- the orthonormal `Y^{τ₁}`-image Finset.
+  have hmemt : ∀ {η}, η ∈ hyp.Yset_finite.toFinset ↔ η ∈ hyp.Yset :=
+    fun {η} => hyp.Yset_finite.mem_toFinset
+  have hEinj_t : ∀ η ∈ hyp.Yset_finite.toFinset, ∀ η' ∈ hyp.Yset_finite.toFinset,
+      hyp.coherentYset.extension η = hyp.coherentYset.extension η' → η = η' :=
+    fun η hη η' hη' => hEinj η (hmemt.mp hη) η' (hmemt.mp hη')
+  have horth : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ∀ ψ' ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ hψ ψ' hψ'
+    rw [Finset.mem_image] at hψ hψ'
+    obtain ⟨η, hη, rfl⟩ := hψ
+    obtain ⟨η', hη', rfl⟩ := hψ'
+    rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span (hmemt.mp hη))
+      (Submodule.subset_span (hmemt.mp hη')), hYon η η' (hmemt.mp hη) (hmemt.mp hη')]
+    by_cases hee : η = η'
+    · subst hee; simp
+    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η' hη' h))]
+  have hη₁t : η₁ ∈ hyp.Yset_finite.toFinset := hmemt.mpr hη₁
+  have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) ψ
+        = ((if ψ = hyp.coherentYset.extension η₁ then bb else bb + a : ℤ) : ℂ) := by
+    intro ψ hψ
+    rw [Finset.mem_image] at hψ
+    obtain ⟨η, hη, rfl⟩ := hψ
+    rw [hcoeff η (hmemt.mp hη)]
+    by_cases hee : η = η₁
+    · subst hee; simp
+    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
+  -- Bessel + norm ⟹ the integer norm inequality.
+  have hbessel := OddOrder.RepresentationTheory.sum_sq_le_inner_self_re horth
+    (hyp.tau (χ₁ - a • η₁)) hβval
+  have hnorm_re : (ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.tau (χ₁ - a • η₁))).re
+      = ((1 + a ^ 2 : ℕ) : ℝ) := by
+    rw [hyp.inner_self_tau_scaledDiff_of_frobenius hF hη₁ hχ₁ ha,
+      show (1 : ℂ) + (a : ℂ) ^ 2 = ((1 + a ^ 2 : ℕ) : ℂ) by push_cast; ring, Complex.natCast_re]
+  rw [hnorm_re] at hbessel
+  have hsum : ∑ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      (if ψ = hyp.coherentYset.extension η₁ then bb else bb + a) ^ 2
+      = bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + a) ^ 2 := by
+    rw [Finset.sum_image hEinj_t]
+    have hsplit : ∀ η ∈ hyp.Yset_finite.toFinset,
+        (if hyp.coherentYset.extension η = hyp.coherentYset.extension η₁ then bb else bb + a) ^ 2
+        = if η = η₁ then bb ^ 2 else (bb + a) ^ 2 := by
+      intro η hη
+      by_cases hee : η = η₁
+      · subst hee; simp
+      · rw [if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h)), if_neg hee]
+    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, if_pos rfl]
+    have hc : (hyp.Yset_finite.toFinset.erase η₁).card = hyp.Yset.ncard - 1 := by
+      rw [Finset.card_erase_of_mem hη₁t, ← Set.ncard_eq_toFinset_card _ hyp.Yset_finite]
+    have h1le : 1 ≤ hyp.Yset.ncard := by
+      rw [Set.ncard_eq_toFinset_card _ hyp.Yset_finite]; exact Finset.one_le_card.mpr ⟨η₁, hη₁t⟩
+    rw [Finset.sum_congr rfl (fun η hη => if_neg (Finset.ne_of_mem_erase hη)),
+      Finset.sum_const, nsmul_eq_mul, hc, Nat.cast_sub h1le, Nat.cast_one]
+  rw [hsum] at hbessel
+  -- the integer inequality and `eq_zero_or_edge`.
+  have hnorm_ineq : bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + a) ^ 2 ≤ 1 + (a : ℤ) ^ 2 := by
+    exact_mod_cast hbessel
+  have ha2 : (2 : ℤ) ≤ (a : ℤ) := by
+    exact_mod_cast hyp.two_le_degreeRatio_of_mem_Xset_of_frobenius hχ₁ ha
+  have hm2 : (2 : ℤ) ≤ (hyp.Yset.ncard : ℤ) := by exact_mod_cast hyp.two_le_Yset_ncard
+  have hnorm_lemma : ((bb + a) - (a : ℤ)) ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + a) ^ 2
+      ≤ 1 + (a : ℤ) ^ 2 := by
+    rw [show (bb + (a : ℤ)) - (a : ℤ) = bb by ring]; exact hnorm_ineq
+  have hdich := eq_zero_or_edge_of_dvd_of_normBound ha2 hm2 (dvd_add habb (dvd_refl _)) hnorm_lemma
+  -- translate `bb+a = 0 ∨ (bb+a = a ∧ m = 2)` to the coefficient dichotomy.
+  rcases hdich with h | ⟨h1, h2⟩
+  · left
+    rw [hbb]
+    have : bb = -(a : ℤ) := by omega
+    rw [this]; push_cast; ring
+  · right
+    refine ⟨by exact_mod_cast h2, ?_⟩
+    rw [hbb]
+    have : bb = 0 := by omega
+    rw [this]; norm_num
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
