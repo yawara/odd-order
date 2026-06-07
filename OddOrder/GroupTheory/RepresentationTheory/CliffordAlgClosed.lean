@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.Algebra.MonoidAlgebra.MapDomain
 import Mathlib.RingTheory.SimpleModule.Basic
+import Mathlib.RingTheory.SimpleModule.Isotypic
 import Mathlib.Algebra.Group.Subgroup.Pointwise
 import Mathlib.Algebra.Module.Submodule.RestrictScalars
 
@@ -198,6 +199,72 @@ theorem eq_top_of_forall_map_conjSemilinearEnd_le
     refine eq_top_iff.mpr fun v _ => ?_
     have hv' : v ∈ W.restrictScalars k := h1 ▸ Submodule.mem_top
     exact hv'
+
+/-- `ρ 1 = id` translates the `g = 1` conjugate to `W` itself. -/
+theorem map_conjSemilinearEnd_one (W : Submodule k[↥H] (resRep ρ H).asModule) :
+    W.map (conjSemilinearEnd (H := H) ρ 1) = W := by
+  ext v
+  rw [mem_map_conjSemilinearEnd]
+  refine ⟨?_, fun hv => ⟨v, hv, ?_⟩⟩
+  · rintro ⟨w, hw, rfl⟩
+    have : (show (resRep ρ H).asModule from ρ (1 : G) w) = w := by rw [map_one]; rfl
+    rwa [this]
+  · show (show (resRep ρ H).asModule from ρ (1 : G) v) = v
+    rw [map_one]; rfl
+
+/-- Conjugating by `g₂` then `g₁` is conjugating by `g₁ * g₂` (carrier-level, from
+`ρ (g₁ g₂) = ρ g₁ ∘ ρ g₂`).  This avoids the heterogeneous semilinear composition law. -/
+theorem map_map_conjSemilinearEnd (W : Submodule k[↥H] (resRep ρ H).asModule) (g₁ g₂ : G) :
+    (W.map (conjSemilinearEnd (H := H) ρ g₂)).map (conjSemilinearEnd (H := H) ρ g₁)
+      = W.map (conjSemilinearEnd (H := H) ρ (g₁ * g₂)) := by
+  ext v
+  simp only [mem_map_conjSemilinearEnd]
+  constructor
+  · rintro ⟨u, ⟨w, hw, rfl⟩, rfl⟩
+    exact ⟨w, hw, by rw [map_mul]; rfl⟩
+  · rintro ⟨w, hw, rfl⟩
+    exact ⟨(show (resRep ρ H).asModule from ρ g₂ w), ⟨w, hw, rfl⟩, by rw [map_mul]; rfl⟩
+
+/-- **Clifford: the restriction is spanned by the `G`-conjugates of any nonzero `k[H]`-submodule.**
+For `ρ` irreducible, the supremum of the conjugates `(ρ g)(W)` over all `g ∈ G` is `⊤`. -/
+theorem iSup_map_conjSemilinearEnd_eq_top [ρ.IsIrreducible]
+    (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) :
+    ⨆ g : G, W.map (conjSemilinearEnd (H := H) ρ g) = ⊤ := by
+  refine eq_top_of_forall_map_conjSemilinearEnd_le ρ _ ?_ ?_
+  · -- the supremum contains `W` (the `g = 1` term), hence is nonzero
+    intro h
+    refine hW (le_bot_iff.mp ?_)
+    calc W = W.map (conjSemilinearEnd (H := H) ρ 1) := (map_conjSemilinearEnd_one ρ W).symm
+      _ ≤ ⨆ g : G, W.map (conjSemilinearEnd (H := H) ρ g) :=
+          le_iSup (fun g : G => W.map (conjSemilinearEnd (H := H) ρ g)) 1
+      _ = ⊥ := h
+  · -- the supremum is `G`-invariant: `(ρ g')` maps `(ρ g)(W)` to `(ρ (g' g))(W)`
+    intro g'
+    rw [Submodule.map_iSup]
+    refine iSup_le fun g => ?_
+    rw [map_map_conjSemilinearEnd]
+    exact le_iSup (fun g => W.map (conjSemilinearEnd (H := H) ρ g)) (g' * g)
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **The restriction is `W`-isotypic** (the Clifford structure of BG Prop 2.2(a)).  If `ρ` is
+irreducible, `W` is a nonzero simple `k[H]`-submodule of the restriction, and every `G`-conjugate
+of `W` is isomorphic to `W` (the hypothesis `M ≅ M^g`), then *every* simple `k[H]`-submodule of the
+restriction is isomorphic to `W`.  Proof: a simple submodule is isomorphic to one of the conjugates
+(which span `⊤`, `iSup_map_conjSemilinearEnd_eq_top`), and each conjugate is `≅ W`. -/
+theorem isIsotypicOfType_of_conjugates [ρ.IsIrreducible]
+    (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
+    (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
+    IsIsotypicOfType k[↥H] (resRep ρ H).asModule W := by
+  intro m _
+  haveI : ∀ S : (Set.range fun g : G => W.map (conjSemilinearEnd (H := H) ρ g)),
+      IsSimpleModule k[↥H] (S : Submodule k[↥H] (resRep ρ H).asModule) := by
+    rintro ⟨_, g, rfl⟩
+    exact isSimpleModule_map_conjSemilinearEnd ρ g W
+  obtain ⟨S, hS, ⟨e⟩⟩ := Submodule.linearEquiv_of_sSup_eq_top m
+    (Set.range fun g : G => W.map (conjSemilinearEnd (H := H) ρ g))
+    (by rw [sSup_range]; exact iSup_map_conjSemilinearEnd_eq_top ρ W hW)
+  obtain ⟨g, rfl⟩ := hS
+  exact ⟨e.trans (hconj g).some.symm⟩
 
 end ConjBySimple
 
