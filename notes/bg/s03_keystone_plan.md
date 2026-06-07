@@ -374,10 +374,25 @@ centralizer-dimension 補題が **不要**になった。
     (iv) θ が u 自身を固定 ⟹ u scalar (c•id, c≠0) ⟹ θ=id ⟹ 全 f scalar ⟹ `finrank(End)=n²≤1` (surj algebraMap)
     ⟹ n≤1。**alg-closed も Jacobson density も centralizer-dim も不要** (W₀=End_k(W₀) なので u∈E 自動)。
   - ⚠ diamond `set_option` は **不要**だった (compHom instance + `change` で defeq 解決)。`show`→`change` lint のみ。
-- **Leaf wire-E** (CliffordAlgClosed.lean に追記 or 新 section): `E:=End_{k[H]}((resRep ρ H).asModule)`,
-  W-isotypic (既 `isIsotypicOfType_of_conjugates`) + Maschke ⟹ `E ≅ M_m(k) ≅ End_k(Fin m→k)`;
-  θ:=Ad(ρx) を E の AlgEquiv に (`LinearEquiv.conjAlgEquiv (ρ.asLinearEquiv x)` を subalgebra へ);
-  `E^θ = End_{k[G]}(V) = scalars` (Schur, ρ 既約); SN-core 適用 ⟹ finrank E=1 ⟹ m=1 ⟹ V_H simple ⟹ `W=⊤`。
+  - **✅ 抽象ラッパー `finrank_eq_one_of_aut_fixedScalar` も追加** (alg-closed `k` の f.d. simple algebra `E`,
+    `θ : E ≃ₐ[k] E` 固定環 ⊆ scalars ⟹ `finrank_k E = 1`): Wedderburn `exists_algEquiv_matrix_of_isAlgClosed`
+    で `E ≅ₐ M_n(k) ≅ₐ End_k(Fin n→k)` (`algEquivMatrix'.symm`)、θ を transport、matrix 版適用 ⟹ n≤1、`NeZero n`
+    ⟹ n=1 ⟹ `finrank E=n²=1`。**wire-E はこれを直接消費** (M_m transport を application で再実装不要)。両定理 commit `b4a88f9f`/次。
+- **▶ Leaf wire-E** (次セッション, CliffordAlgClosed.lean に追記 or 新 section) — **SN-core 完成済なので残る山はこれ**:
+  `E:=Module.End k[↥H] (resRep ρ H).asModule`。手順:
+  1. **`IsSimpleRing E`**: V は W-isotypic (既 `isIsotypicOfType_of_conjugates`) + Maschke 半単純 ⟹
+     `E ≅ₐ Matrix m m (End_{k[H]} W)` (`endVecAlgEquivMatrixEnd` + `linearEquiv_fun`), `End_{k[H]} W = k`
+     (Schur, alg-closed + W simple — 補題名要確認: `finrank_endomorphism_simple_eq_one` 系) ⟹ `E ≅ₐ M_m(k)` simple。
+     `[FiniteDimensional k E]` も (V f.d.)。
+  2. **θ:=Ad(ρx) を `E ≃ₐ[k] E` に**: ρx ∈ GL(V) (k-線形) が E を共役で保つ (x が H 正規化 ⟹ k[H]-線形性保存)。
+     mathlib 直球は無いかも (conjAlgEquiv は End_R の R-共役用; ここは End_{k[H]} を k-線形 ρx で共役 = subalgebra 共役)。
+     `MulSemiringAction`/`Subalgebra` 共役 or 手構築 (`AlgEquiv` の toFun=f↦ρx∘f∘ρx⁻¹, well-def 証明)。
+  3. **`E^θ = scalars`**: `θ f = f ⟺ ρx と可換 ⟺ f ∈ End_{k[G]}(V)` (G=⟨H,x⟩); `End_{k[G]}(V)=k` (Schur,
+     V 既約 k[G]-加群, alg-closed) ⟹ 固定環 ⊆ scalars。⚠ `G=⟨H,x⟩` (= ⟨H, x⟩ 生成 = ⊤) を仮説に要する
+     (§2 setup の `G = P ⋊ ⟨x⟩` が供給) — hVP/Prop2.2(a) の hypothesis に `Subgroup.closure (H ∪ {x}) = ⊤` 相当。
+  4. **`finrank_eq_one_of_aut_fixedScalar` 適用** ⟹ `finrank_k E = 1` ⟹ m=1 (E≅M_m, m²=1) ⟹ `V_H` simple
+     ⟹ W (simple 部分加群) `= ⊤` (finrank 一致 or simple ≤ ⊤)。これで Prop 2.2(a) = hVP discharge。
+  + Gor 5.5.4 (hconj `W≅W^g`) は依然別 sub-piece (未着手, hVP の最終 hypothesis)。
 - **Leaf hVP-assemble**: `eq_top_of_forall_map_conjSemilinearEnd_le` は m=1 finish で **不要** (W=⊤ を finrank
   経由で直接); hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
 - これで `Representation.IsIrreducible (ρ.comp P.subtype)` (= group-level Thm 2.5 の唯一残仮説) が discharge。

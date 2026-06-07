@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.RingTheory.SimpleModule.WedderburnArtin
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.SimpleRing.Matrix
 import Mathlib.RingTheory.SimpleRing.Congr
 import Mathlib.LinearAlgebra.Matrix.ToLin
@@ -32,6 +33,10 @@ so `End k W₀` is the scalars, so `(finrank k W₀)² ≤ 1`.
 
 * `nonempty_linearEquiv_of_isSimpleModule` — any two simple modules over a simple Artinian ring are
   isomorphic.
+* `finrank_le_one_of_aut_fixedScalar` — a `k`-algebra automorphism of `End k W₀` (over any field)
+  fixing only the scalars forces `finrank k W₀ ≤ 1`.
+* `finrank_eq_one_of_aut_fixedScalar` — the same for an abstract finite-dimensional simple algebra
+  over an algebraically closed field: it must be the scalars (`finrank k E = 1`).
 -/
 
 namespace OddOrder.RepresentationTheory
@@ -188,6 +193,37 @@ theorem finrank_le_one_of_aut_fixedScalar
       simpa using this
     rw [Module.finrank_linearMap] at hle
     nlinarith [Module.finrank_pos (R := k) (M := W₀), hle]
+
+/-- **Skolem–Noether, scalar-fixed form, for an abstract simple algebra.**  If `E` is a
+finite-dimensional simple algebra over an algebraically closed field `k` and a `k`-algebra
+automorphism `θ` of `E` fixes only the scalars, then `E` *is* the scalars (`finrank k E = 1`).
+
+Wedderburn–Artin (`exists_algEquiv_matrix_of_isAlgClosed`) identifies `E` with a matrix algebra
+`Matrix (Fin n) (Fin n) k ≃ₐ End k (Fin n → k)`; transporting `θ` and applying
+`finrank_le_one_of_aut_fixedScalar` gives `n ≤ 1`, and `NeZero n` gives `n = 1`. -/
+theorem finrank_eq_one_of_aut_fixedScalar
+    {k E : Type*} [Field k] [IsAlgClosed k] [Ring E] [Algebra k E]
+    [IsSimpleRing E] [FiniteDimensional k E]
+    (θ : E ≃ₐ[k] E)
+    (hfix : ∀ f : E, θ f = f → ∃ c : k, algebraMap k E c = f) :
+    Module.finrank k E = 1 := by
+  obtain ⟨n, hn, ⟨Φ⟩⟩ := IsSimpleRing.exists_algEquiv_matrix_of_isAlgClosed k E
+  -- `Ψ : E ≃ₐ[k] End k (Fin n → k)`, via the matrix algebra.
+  let Ψ : E ≃ₐ[k] Module.End k (Fin n → k) := Φ.trans algEquivMatrix'.symm
+  let θ' : Module.End k (Fin n → k) ≃ₐ[k] Module.End k (Fin n → k) := Ψ.symm.trans (θ.trans Ψ)
+  -- `θ'` also fixes only the scalars (transport along `Ψ`).
+  have hfix' : ∀ g : Module.End k (Fin n → k), θ' g = g →
+      ∃ c : k, algebraMap k (Module.End k (Fin n → k)) c = g := by
+    intro g hg
+    have hg' : Ψ (θ (Ψ.symm g)) = g := hg
+    have h1 : θ (Ψ.symm g) = Ψ.symm g := Ψ.injective (by rw [hg', Ψ.apply_symm_apply])
+    obtain ⟨c, hc⟩ := hfix (Ψ.symm g) h1
+    exact ⟨c, by rw [← Ψ.commutes c, hc, Ψ.apply_symm_apply]⟩
+  have hle := finrank_le_one_of_aut_fixedScalar θ' hfix'
+  have hW₀ : Module.finrank k (Fin n → k) = n := by
+    rw [Module.finrank_fintype_fun_eq_card, Fintype.card_fin]
+  have hn1 : n = 1 := le_antisymm (hW₀ ▸ hle) (Nat.one_le_iff_ne_zero.mpr hn.out)
+  rw [Ψ.toLinearEquiv.finrank_eq, Module.finrank_linearMap, hW₀, hn1, mul_one]
 
 end SkolemNoether
 
