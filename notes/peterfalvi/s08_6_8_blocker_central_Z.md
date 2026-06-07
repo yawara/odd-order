@@ -387,20 +387,25 @@ green. The handoff's flagged structural risk is fully resolved and formalized. T
 of task #3 supplies).
 
 **🔴 REMAINING for the (6.8) capstone:**
-- **L3 (3a) construct `ν` — CORE DONE (commit `9977399`, axiom-clean).** `IntegralCharacterMap.coherentImageMapGlue`
-  (S07) = `coherentImageMap χX (τ₂∘χX) + coherentImageMap χY (τ₁∘χY)`, sending `χXₖ↦τ₂(χXₖ)`,
-  `χYₖ↦τ₁(χYₖ)` (`coherentImageMapGlue_apply_left/right`; cross terms vanish by X⊥Y). No new
-  constructor needed — built on the existing single-family Fourier map. **Remaining (3a)
-  shell-wiring (bookkeeping):** enumerate `X=Xset Zc`/`Y=Yset` as Fin-indexed orthonormal families
-  (`Finset.equivFin` + `irreducibleCharacter_inner`; `X⊥Y` from disjointness), set
-  `ν := coherentImageMapGlue`, discharge the L3 shell's `hagreeX`/`hagreeY` via apply_left/right.
-- **L3 (3b) prove `himg_ortho` — the deep `b≡c≡0 mod a` argument** (`Res η₁^{τ₁}` decomposition ⟹
+- **✅ L3 (3a) construct `ν` — DONE (commits `9977399` + `1b72d39` + `015441a`, axiom-clean).**
+  `IntegralCharacterMap.coherentImageMapGlue` (S07) = `coherentImageMap χX (τ₂∘χX) + coherentImageMap χY (τ₁∘χY)`
+  (`coherentImageMapGlue_apply_left/right`); set form `exists_integralCharacterMap_glue_of_orthonormal`
+  (enumerates X/Y via `Finset.equivFin`, set-orthonormality as hyps); S08 `ν`-free shell
+  `coherentXunionYset_centralCommutator_of_himg_ortho` (derives orthonormality from
+  `irreducibleCharacter_inner` + disjointness, `ν` via `Classical.choose`). **⟹ the (6.8.1)
+  `X(Zc)∪Y`-coherence now has a SINGLE remaining obligation: `himg_ortho`.**
+- **🔴 L3 (3b) prove `himg_ortho` — the deep `b≡c≡0 mod a` argument** (`Res η₁^{τ₁}` decomposition ⟹
   const on `Zc^#` ⟹ **adapter `peterfalvi_67_centralCommutator`** ⟹ `a∣c`, then norm bound ⟹ `b=0`).
-  **The gating character theory, attended.** Tasks #3/#4.
-- capstone Frobenius-branch wiring (mechanical once L3 done); CertainType case (B) (unplanned).
+  `himg_ortho : ∀ x ∈ X(Zc), ∀ y ∈ Y, ⟨τ₂ x, τ₁ y⟩ = 0` (`τ₂ = Xset_centralCommutator_isCoherent_of_frobenius.extension`,
+  `τ₁ = coherentYset.extension`). **The gating character theory, attended.** Tasks #3/#4.
+- capstone Frobenius-branch wiring (mechanical: `by_cases Nonempty CoherenceTarget`; `¬` →
+  `isPGroup_of_not_coherent` → `coherentXunionYset_centralCommutator_of_himg_ortho` (needs 3b) wrapped
+  `Nonempty` → L4 `false_of_coherentXunionYset_of_not_coherentS`); CertainType case (B) (unplanned).
 
-The autonomous structural runway (6.7 wiring + the 3a glue core) is done; the gating remainder is
-the subtle §13-style character theory (3b) to do attended.
+**The entire autonomous-friendly runway is done** (6.7 wiring + L3 (3a) ν-construction). The sole
+gating remainder is `himg_ortho` (3b), the subtle §13-style character theory — best attended. Every
+prerequisite it needs is now in place: the reg-char decomposition (`abbe578`) and the (6.7) adapter
+(`9498451`).
 
 Order note: the adapter (step 5) and task #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
 prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with
