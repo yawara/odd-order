@@ -166,4 +166,17 @@ theorem sq_finrank_mul_card_center [FiniteDimensional F V] [Finite P]
   rw [mul_comm, ← hsplit]
   exact hsum
 
+/-- **`(dim V : F) ≠ 0`** (Gor 5.5.5a-iii). Bootstrapped from the mass formula: if `(dim V : F) = 0`
+then `(dim V)² · |Z| = 0 ≠ |P|`, contradicting `char ∤ |P|`. This is what makes the trace-form Gram
+matrix nonsingular in the integer step. -/
+theorem finrank_cast_ne_zero [FiniteDimensional F V] [Finite P]
+    [Invertible (Nat.card P : F)] (ρ : Representation F P V) [ρ.IsIrreducible]
+    (hf : Function.Injective ρ) (hcl : commutator P ≤ Subgroup.center P) :
+    (Module.finrank F V : F) ≠ 0 := by
+  intro h
+  apply (isUnit_of_invertible (Nat.card P : F)).ne_zero
+  have hmass := sq_finrank_mul_card_center ρ hf hcl
+  rw [h] at hmass
+  rw [← hmass]; ring
+
 end OddOrder.RepresentationTheory
