@@ -772,13 +772,41 @@ theorem Msigma_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
   exact OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
     hAgnorm hdisj hMsbot hAgne ⟨p, h.prime, hAgcard⟩ hFPF
 
-/-- **BG Corollary 11.4** (mmd L2959): `H ∈ ℳ(A)` で `M_σ ⊓ H_σ ≠ 1` なら `M = H`。 -/
+/-- **BG Corollary 11.4** (mmd L2959): `H ∈ ℳ(A)` で `M_σ ⊓ H_σ ≠ 1` なら `M = H`。
+
+証明 (BG): Theorem 11.3 で `M_σ` は nilpotent。`M_σ ⊓ H_σ ≠ 1` なので Lemma 10.12(b) の対偶により
+`M`, `H` は共役 (`∃ g, M^g = H`)。`H ∈ ℳ(A)` から `A ⊆ H = M^g` で、さらに `M_σ ⊓ M^g ⊇ M_σ ⊓ H_σ ≠ 1`
+なので Corollary 11.2(a) の対偶から `g ∈ M`。よって `M^g = M = H`。 -/
 theorem eq_of_Msigma_meet_Hsigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P)
     {H : Subgroup G} (hH : H ∈ maximalSubgroupsContaining A)
     (hne : S10.Msigma M ⊓ S10.Msigma H ≠ ⊥) :
     M = H := by
-  sorry
+  -- Theorem 11.3: `M_σ` is nilpotent.
+  have hMσnil : Group.IsNilpotent ↥(S10.Msigma M) := Msigma_isNilpotent hG h
+  -- Lemma 10.12(b) contrapositive: `M_σ` nilpotent and `M_σ ⊓ H_σ ≠ ⊥` force `M`, `H` conjugate.
+  obtain ⟨g, hgMH⟩ : ∃ g : G, MulAut.conj g • M = H := by
+    by_contra hnc
+    exact hne ((S10.disjoint_of_not_conj hG h.mem_maximal hH.1 hnc).2 hMσnil).1
+  -- `A ≤ H = M^g`, so Corollary 11.2(a) applies to this `g`.
+  have hAg : A ≤ MulAut.conj g • M := by rw [hgMH]; exact hH.2
+  -- `M_σ ⊓ M^g ≠ ⊥`: it dominates the nonbot `M_σ ⊓ H_σ` (`H_σ ≤ H = M^g`).
+  have hmeet_ne : S10.Msigma M ⊓ MulAut.conj g • M ≠ ⊥ := by
+    rw [hgMH]
+    intro hbot
+    apply hne
+    have hle : S10.Msigma M ⊓ S10.Msigma H ≤ S10.Msigma M ⊓ H :=
+      inf_le_inf_left (S10.Msigma M) (S10.Msigma_le H)
+    rw [hbot] at hle
+    exact le_bot_iff.mp hle
+  -- Corollary 11.2(a) contrapositive: `g ∈ M`.
+  have hgM : g ∈ M := by
+    by_contra hgM
+    exact hmeet_ne (Msigma_meet_conjugate hG h hgM hAg).1
+  -- `g ∈ M ⊆ N_G(M)`, so `M^g = M`; hence `M = M^g = H`.
+  calc M = MulAut.conj g • M :=
+        (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hgM)).symm
+    _ = H := hgMH
 
 /-- **BG Theorem 11.5** (mmd L2963): `M` の Sylow `p`-部分群は abelian。 -/
 theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
