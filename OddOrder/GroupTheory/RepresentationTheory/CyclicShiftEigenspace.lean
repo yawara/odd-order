@@ -42,6 +42,27 @@ theorem pow_eq_pow_of_modEq {M : Type*} [Monoid M] {ζ : M} {hh : ℕ} (hζ : ζ
   obtain ⟨t, ht⟩ := (Nat.modEq_iff_dvd' hle).mp hac.symm
   rw [show a = c + hh * t by omega, pow_add, pow_mul, hζ, one_pow, mul_one]
 
+/-- **Triangular linear independence** (disjoint-support criterion). If each `g a` has a basis
+coordinate `coord a` at which it is nonzero, while every *other* `g a'` vanishes there (`a ≠ a'`),
+then `g` is linearly independent. (Used for vectors supported on disjoint `σ`-orbits: `g ω =
+proj (b (rep ω))` is nonzero at coordinate `rep ω` and zero at `rep ω'` for `ω' ≠ ω`.) -/
+theorem linearIndependent_of_triangular {ι κ : Type*} [Finite κ] (b : Basis ι F W) (g : κ → W)
+    (coord : κ → ι) (hdiag : ∀ a, b.repr (g a) (coord a) ≠ 0)
+    (hoff : ∀ a a', a ≠ a' → b.repr (g a) (coord a') = 0) :
+    LinearIndependent F g := by
+  classical
+  haveI := Fintype.ofFinite κ
+  rw [Fintype.linearIndependent_iff]
+  intro c hc a₀
+  have hb : (b.repr (∑ a, c a • g a)) (coord a₀) = 0 := by rw [hc]; simp
+  rw [map_sum] at hb
+  simp only [map_smul, Finsupp.coe_finset_sum, Finset.sum_apply, Finsupp.coe_smul,
+    Pi.smul_apply, smul_eq_mul] at hb
+  rw [Finset.sum_eq_single a₀] at hb
+  · exact (mul_eq_zero.mp hb).resolve_right (hdiag a₀)
+  · intro a _ ha; rw [hoff a a₀ ha, mul_zero]
+  · intro h; exact absurd (Finset.mem_univ _) h
+
 section CyclicShift
 
 variable {h : ℕ} [NeZero h]

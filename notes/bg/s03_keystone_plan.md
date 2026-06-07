@@ -148,3 +148,55 @@ that AVOIDS the orbit `DirectSum.IsInternal` and the "block-eigenspace = ∑" le
 
 Then **Leaf 5 = Thm 2.5/3.4 assembly** (Prop 2.2(a) alg-closed Clifford `V_P=M`, base-change (2.9),
 produce `(P,φ,T)` from the `G=P⋊⟨x⟩` rep, Maschke→faithful irred, Gor 5.3.7 → contradiction).
+
+## ✅✅ KEYSTONE COMPLETE (2026-06-07, Lane A `a-keystone`) — Leaf 3 + Leaf 4 done, sorry-free + axiom-clean
+
+The keystone `dim E₀ = dim E_m + 1` (BG (2.11)) is **fully discharged** in terms of the BG Thm 2.5
+setup data. Full build green (3599 jobs), AxiomsCheck OK. Three commits:
+`2b6617c` (orbit infra) → `f2af3c8` (abstract keystone) → `6cfa8d8` (extraspecial discharge).
+
+**Two new leaf files** (nothing imports them yet — they are the producers for Leaf 5):
+- `CyclicPermEigenCount.lean` — the **abstract** orbit-count keystone, pure linear algebra +
+  finite combinatorics over a bare basis index `κ`:
+  `CyclicPermEigen.finrank_eigenspace_fixed_succ` — for a monomial permutation operator
+  `T` on `b : Basis κ F W` (`T^k (b c) = a • b (σ^k c)`, `σ : Equiv.Perm κ`) with `σ^h = T^h = 1`,
+  `ε` primitive `h`-th root, `char ∤ h`, a `σ`-fixed `c₀` with `T (b c₀) = b c₀` whose orbit is the
+  **only** non-free one, gives `dim (T.eigenspace ε^0) = dim (T.eigenspace ε^m) + 1` for `ε^m ≠ 1`.
+- `ExtraspecialKeystone.lean` — the **bridge** `finrank_cyclicEndConjEigenspaceFin_succ`:
+  instantiates the abstract keystone at `b = burnsideBasis`, `T_op = cyclicEndConj T`,
+  `σ = quotientCenterCongr φ`, producing the exact `hEdim` of
+  `sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace`. **Verified end-to-end**: composing
+  the two yields BG Thm 2.5's `q = h·v₀ ± 1` from `(ρ, φ, T, hint, φ^h=1, ε primitive, char∤h,
+  C_{P/Z}(xᵏ)=1)`.
+
+### ⚠ The realised plan DEVIATED from "Remaining Leaf 3" above (both deviations are improvements — do not revert)
+
+1. **No φ-equivariant section** (Step 2 above was AVOIDED). The recent commits `range_sum_pow_eq_eigenspace`
+   (range of the Fourier projection `proj_m = ∑_k (ε^m)⁻¹^{k} T^k` = the eigenspace `E_m`) and
+   `sum_pow_smul_pow_comm` (proportionality `proj_m (T^n w) = (ε^m)^n proj_m w`) make the *monomial*
+   (twisted) action suffice — no need to kill the twist. Reason: independence (`hoff`/`hdiag`) only
+   needs the **support** of `proj_m (b c)` (⊆ the orbit of `c`) plus the `k=0` diagonal term `= 1`;
+   the twist scalars `μ_k` are always killed by the Kronecker `[σ^k c = c']`. So the **done** Leaf 2
+   `cyclicEndConj_pow_burnsideBasisOfSection` is reused directly. The fixed point `⟦1⟧` lands in `E₀`
+   for **any** section because `b ⟦1⟧ = ρ(out ⟦1⟧)` is central ⟹ scalar ⟹ `c_x`-fixed (conjugation
+   fixes scalars) — no need for `t ⟦1⟧ = 1`.
+2. **No GLOBAL SQUEEZE / no `|P/Z| = N·h+1`** (Step 4 above was REPLACED). Because `range proj_m = E_m`
+   gives **spanning** of `E_m` by `{proj_m (b c) : c}` for free, and proportionality collapses the span
+   onto orbit reps, `dim E_m = #{contributing orbits}` is an **exact per-`m` basis count** (via
+   `finrank_span_eq_card`), not a squeeze. The total orbit count `N` cancels between `E₀` (all orbits)
+   and `E_m` (all but the `c₀`-orbit, which projects to 0 for `ε^m ≠ 1`), so the keystone needs neither
+   `∑_m dim E_m` nor `(dim V)² = |P/Z|`. Orbit reps come from a hand-built `orbitSetoid` (`Quotient`,
+   reps via `Quotient.out`), counted by a `Finset` filter; no `MulAction`/`DirectSum.IsInternal`.
+
+### ▶ Remaining = Leaf 5 (Thm 2.5/3.4 assembly) — the keystone is no longer the blocker
+
+The keystone now consumes three inputs that the **BG Thm 2.5 setup** must supply (assembled separately,
+from the `G = P ⋊ ⟨x⟩` representation):
+- `hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily ε (T:End) h)` (eigenspace decomposition of `End V`);
+- `hcent : C_{P/Z}(xᵏ) = 1` for `xᵏ ≠ 1` (stated as: only the identity coset is fixed by a nontrivial
+  `σ`-power) — this is the BG hypothesis that `x` acts fixed-point-freely on `P/Z`;
+- the `(ρ, φ, T, hint)` data itself: a faithful irreducible `F[P⋊⟨x⟩]`-module restricting to `(P,φ,T)`.
+
+So **Leaf 5** = Prop 2.2(a) alg-closed Clifford (`V_P = M`), base-change (2.9), produce `(P,φ,T)` +
+`hV` + `hcent` from the `G`-rep (Maschke → faithful irred), then Gor 5.3.7 (=`S04e_GorThm37`) →
+contradiction. This opens BG §10–§16.
