@@ -188,4 +188,39 @@ theorem finrank_cyclicEndConjEigenspaceFin {epsilon : F}
     le_antisymm (Finset.sum_le_sum fun m' _ => hge m') (hle.trans_eq htotal.symm)
   exact ((Finset.sum_eq_sum_iff_of_le fun m' _ => hge m').mp hsum_ab m (mem_univ m)).symm
 
+/-- Elementary sum-of-squares identity: if `∑ bᵢ² = ∑ aᵢ²` then
+`∑ (aᵢ − bᵢ)² = 2 ∑ aᵢ² − 2 ∑ aᵢbᵢ`. -/
+theorem sum_sub_sq_of_sum_sq_eq {ι : Type*} [Fintype ι] (a b : ι → ℤ)
+    (hab : ∑ i, b i ^ 2 = ∑ i, a i ^ 2) :
+    ∑ i, (a i - b i) ^ 2 = 2 * ∑ i, a i ^ 2 - 2 * ∑ i, a i * b i := by
+  have hexp : ∑ i, (a i - b i) ^ 2
+      = ∑ i, a i ^ 2 - 2 * ∑ i, a i * b i + ∑ i, b i ^ 2 := by
+    rw [Finset.mul_sum, ← Finset.sum_sub_distrib, ← Finset.sum_add_distrib]
+    exact Finset.sum_congr rfl fun i _ => by ring
+  rw [hexp, hab]; ring
+
+open Module in
+/-- **BG Proposition 2.4(h).** `∑ᵢ (nᵢ − nᵢ₊ₘ)² = 2 (dim E₀ − dim E_m)` (worked over `ℤ`; here
+`nᵢ = dim Vᵢ` and `E_m` is the conjugation `εᵐ`-eigenspace). Combined with the Theorem 2.5
+hypothesis `dim E₀ = dim E_m + 1` (`m ≠ 0`), this gives `∑ᵢ(nᵢ−nᵢ₊ₘ)² = 2`, feeding `prop24j`. -/
+theorem sum_sq_sub_finrank_cyclicEndConjEigenspaceFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} [NeZero h] [FiniteDimensional F V]
+    (hprim : IsPrimitiveRoot epsilon h)
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h))
+    (m : Fin h) :
+    (∑ i, ((cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ)
+        - (cyclicEigenspaceFinDim epsilon (g : Module.End F V) (i + m) : ℤ)) ^ 2)
+      = 2 * ((finrank F (cyclicEndConjEigenspaceFin epsilon g (0 : Fin h)) : ℤ)
+        - (finrank F (cyclicEndConjEigenspaceFin epsilon g m) : ℤ)) := by
+  set a : Fin h → ℤ := fun i => (cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ) with ha
+  have hreindex : ∑ i, a (i + m) ^ 2 = ∑ i, a i ^ 2 :=
+    Equiv.sum_comp (Equiv.addRight m) (fun j => a j ^ 2)
+  rw [sum_sub_sq_of_sum_sq_eq a (fun i => a (i + m)) hreindex,
+    finrank_cyclicEndConjEigenspaceFin hprim hV (0 : Fin h),
+    finrank_cyclicEndConjEigenspaceFin hprim hV m]
+  push_cast
+  simp_rw [add_zero]
+  simp only [ha]
+  ring
+
 end OddOrder.RepresentationTheory
