@@ -3549,6 +3549,25 @@ theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
   apply hkey
   rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
 
+/-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
+`z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`
+(`centralizer_kernel_le`).  Hence `|C_L(z)| = |H|` is **constant on `Z^#`** — the `|C_L(·)|`-constancy
+input of Peterfalvi (6.7). -/
+theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    Subgroup.centralizer ({z} : Set ↥L) = H := by
+  apply le_antisymm
+  · exact hF.centralizer_kernel_le z (hyp.centralCommutator_le hz) hz1
+  · intro h hh
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hzH : (z : ↥L) ∈ H := hyp.centralCommutator_le hz
+    have hzc : (⟨z, hzH⟩ : ↥H) ∈ Subgroup.center ↥H :=
+      hyp.centralCommutator_subgroupOf_le_center (Subgroup.mem_subgroupOf.mpr hz)
+    have hcomm := (Subgroup.mem_center_iff.mp hzc) ⟨h, hh⟩
+    have hcoe := congrArg (H.subtype) hcomm
+    simpa using hcoe
+
 /-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
 `W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
 characteristic, so the action restricts fixed-point-freely to it (`IsFrobeniusAction.subgroup`);
