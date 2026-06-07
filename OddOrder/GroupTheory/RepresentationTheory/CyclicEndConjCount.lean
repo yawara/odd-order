@@ -305,4 +305,25 @@ theorem prop24j_fin {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : Fin h → ℤ)
   · rw [← hsum]
     exact Fintype.sum_equiv e.toEquiv _ _ fun i => by simp [hn']
 
+/-- **`Fin h`-indexed form of `prop24k`** — transported through `ZMod.finEquiv`. The
+`C_V(H) = 0 ⟹ q = h − 1` half of Thm 2.5, for `Fin h`-indexed eigenspace dimensions. -/
+theorem prop24k_fin {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : Fin h → ℤ) (hpos : ∀ i, 0 ≤ n i)
+    (hq : 2 ≤ ∑ i, n i) (H : ∀ m : Fin h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2)
+    (h0 : n 0 = 0) : (∑ i, n i) = (h : ℤ) - 1 := by
+  classical
+  let e : Fin h ≃+* ZMod h := ZMod.finEquiv h
+  set n' : ZMod h → ℤ := fun z => n (e.symm z) with hn'
+  have hsumeq : ∑ i, n i = ∑ i', n' i' :=
+    Fintype.sum_equiv e.toEquiv _ _ fun i => by simp [hn']
+  have H' : ∀ m' : ZMod h, m' ≠ 0 → ∑ i', (n' i' - n' (i' + m')) ^ 2 = 2 := by
+    intro m' hm'
+    have hm : e.symm m' ≠ 0 := fun hc => hm' (by rw [← e.apply_symm_apply m', hc, map_zero])
+    rw [← H (e.symm m') hm]
+    refine (Fintype.sum_equiv e.toEquiv _ _ fun i => ?_).symm
+    simp [hn', map_add]
+  have hpos' : ∀ i', 0 ≤ n' i' := fun i' => by rw [hn']; exact hpos _
+  have h0' : n' 0 = 0 := by change n (e.symm (0 : ZMod h)) = 0; rw [map_zero]; exact h0
+  rw [hsumeq]
+  exact prop24k hh n' hpos' (hsumeq ▸ hq) H' h0'
+
 end OddOrder.RepresentationTheory
