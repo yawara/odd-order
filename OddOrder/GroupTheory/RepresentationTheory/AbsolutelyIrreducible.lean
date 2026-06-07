@@ -129,6 +129,20 @@ theorem asAlgebraHom_surjective_of_isAlgClosed (ρ : Representation F G V)
   obtain ⟨r, hr⟩ := hsurj h
   exact ⟨r, hr⟩
 
+/-- **Burnside, span form** (BG Prop 2.1): for a finite-dimensional irreducible representation `ρ`
+over an algebraically closed field, the images `{ρ g : g ∈ G}` span `End_F V`. (Equivalent to
+`asAlgebraHom_surjective_of_isAlgClosed`; the convenient form for building the Burnside basis.) -/
+theorem span_range_representation_eq_top (ρ : Representation F G V)
+    [ρ.IsIrreducible] [FiniteDimensional F V] :
+    Submodule.span F (Set.range fun g : G => ρ g) = ⊤ := by
+  rw [eq_top_iff]
+  rintro e -
+  obtain ⟨r, rfl⟩ := asAlgebraHom_surjective_of_isAlgClosed ρ e
+  induction r using MonoidAlgebra.induction_on with
+  | hM g => rw [Representation.asAlgebraHom_of]; exact Submodule.subset_span ⟨g, rfl⟩
+  | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+  | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ c hx
+
 end Representation
 
 section CentralCharacter
