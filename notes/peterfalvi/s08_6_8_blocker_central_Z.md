@@ -566,14 +566,35 @@ build 3599; NOT yet AxiomsCheck-registered — deferred until the capstone consu
   `Yset_apply_one` (every `Y`-member has degree `|W₁|`).
 
 ### Remaining for the capstone Frobenius branch (`himg_ortho` ✅ landed)
-1. **`hDτ`** (the crux / `b ≡ 0`): `ν d = τ d` for `d = χ₁−aη₁`, i.e. `τ₂χ₁ − a·τ₁η₁ = (χ₁−aη₁)^τ`.
-   The deep b≡0 spine (Res-decomposition → reg-char const on `Zc^#` → (6.7)
-   `peterfalvi_67_centralCommutator` → norm-bound).  **Now unblocked**: the spine's step-2
-   "himg-difference-orthogonality" `⟨τ₁η₁, τ₂(χᵢ−dᵢχ₁)⟩ = 0` is exactly `himg_ortho` (the τ₁/τ₂ being
-   `coherentYset.extension` / `Xset_centralCommutator_isCoherent_of_frobenius.extension`, the same as
-   in the new theorem).  Spine: `inner_tau_eq_inner_restrict` (reciprocity) + `himg_ortho` ⟹
-   `Res_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′` → `sumNonInflatedDegreeMulChar_of_mem` (const on `Zc^#`) →
-   `peterfalvi_67_centralCommutator` (`a∣c`) → `eq_zero_or_edge_of_dvd_of_normBound` (`b=0`).
+
+**crux `hDτ` progress (2026-06-07 session 4 cont., commits `badd906` + `31b3b28`, axiom-clean):**
+the deep b≡0 spine's first steps are now LANDED:
+- **✅ spine steps 1–2 (Res-decomposition orthogonality)** `badd906`:
+  `inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius` (span `himg_ortho`) +
+  `inner_restrict_extension_Yset_mem_span_Xset_eq_zero_of_frobenius`
+  (`⟨Res^G_L(η^{τ₁}), x⟩_L = 0` for supported `x ∈ ℤ[X(Zc)]`, via reciprocity + span-himg_ortho).
+  ⟹ the X-components of `Res^G_L(η₁^{τ₁})` are all `∝ dᵢ`.
+- **✅ spine step 5 (reg-char values over `X(Zc)`)** `31b3b28`: reindexing
+  `sum_Xset_eq_sum_filter_irreducible_of_frobenius` (X(Z)↔Irr-filter via the (6.6) characterization
+  `Xset_eq_irreducible_not_subset_characterKernel` + `sum_bij'`) ⟹ `∑_{χ∈X(Z)}χ(1)χ(z) = -|L⧸Z|`
+  (`sum_degree_mul_charValue_Xset_eq_of_frobenius`), `∑χ(1)² = |L|-|L⧸Z|`
+  (`sum_degree_sq_Xset_eq_of_frobenius`), combined `∑χ(1)(χ(z)-χ(1)) = -|L|`
+  (`sum_degree_mul_charValue_sub_Xset_eq_of_frobenius`).
+
+**🔴 remaining for `hDτ`** (the precise next steps):
+1. **`η₁^{τ₁}` const on `Zc^#`** (the (6.7) input): Fourier-expand `Res^G_L(η₁^{τ₁}) ∈ ZIrr L`
+   (`mem_ZIrr_repr` / `inner_eq_coeff_of_repr`); on `X(Zc)` the coefficients are `c·ψ(1)/χ₁(1)`
+   (Res-orthogonality, with `c = ⟨Res,χ₁⟩`); the `Z⊆ker` part is const on `Z` (factors through
+   `L/Z`).  Then `Res(z)−Res(1) = (c/χ₁(1))·(∑χ(1)(χ(z)−χ(1))) = (c/χ₁(1))(−|L|) = −c|H|/a` (reg-char
+   combined value, `χ₁(1)=a|W₁|`), constant on `Zc^#`.  **The harder remaining sub-piece** (Fourier
+   assembly + X/non-X split + non-X const-on-Z).
+2. **`a ∣ c`**: `η₁^{τ₁}` const on `Zc^#` + `peterfalvi_67_centralCommutator` (η₁^{τ₁} = ±irreducible
+   ⟹ `≡ mod |H|`) ⟹ `−c|H|/a ≡ 0 mod |H|` ⟹ `a ∣ c`.
+3. **the Y-decomposition + `c ≡ b mod a`**: `(χ₁−aη₁)^τ = X − aη₁^{τ₁} + b∑η_j^{τ₁}` (X ⊥ Y^{τ₁};
+   the `j>1` coefficients equal via `⟨(χ₁−aη₁)^τ,(η_j−η₁)^τ⟩ = a`); then `⟨Res(η₁^{τ₁}),χ₁−aη₁⟩ = b−a`
+   (Dade reciprocity) gives `c ≡ b mod a` ⟹ with step 2, `b ≡ 0 mod a`.
+4. **`b = 0`** via `eq_zero_or_edge_of_dvd_of_normBound` (`‖(χ₁−aη₁)^τ‖²=1+a²`, `a,m≥2`; m=2 relabel).
+5. **`X = χ₁^{τ₂}`** (index argument, `⟨(χ₁−aη₁)^τ,(χ₂−χ₁)^τ⟩`, n≥3 / n=2 relabel) ⟹ the crux.
 2. **`hgen'`** (the satisfiable generation): provable lattice fact — anchors `χ₁∈X(Zc)`, `η₁∈Yset`
    with `χ₁(1)=a|W₁|`, `η₁(1)=|W₁|`; the degree-`0` decomposition
    `φ = (∑cᵢχᵢ − s·χ₁) + (∑eⱼηⱼ + sa·η₁) + s·(χ₁−aη₁)` with `s = ∑cᵢdᵢ ∈ ℤ` (needs `dᵢ ∈ ℤ`, the
