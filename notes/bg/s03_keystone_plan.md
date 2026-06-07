@@ -219,22 +219,25 @@ So **Leaf 5** = Prop 2.2(a) alg-closed Clifford (`V_P = M`), base-change (2.9), 
 `hV` + `hcent` from the `G`-rep (Maschke → faithful irred), then Gor 5.3.7 (=`S04e_GorThm37`) →
 contradiction. This opens BG §10–§16.
 
-### ▶▶ Precise next steps (2026-06-08) — `finrank_modEq_of_faithful_irreducible` reduces Thm 2.5
-### divisibility to exactly TWO open hypotheses; discharge them:
+### ▶▶ Precise next steps (2026-06-08) — `finrank_modEq_of_faithful_irreducible` reduced Thm 2.5
+### divisibility to TWO open hypotheses; **`hcent` now DISCHARGED**, so the frontier = `hVP` alone:
 
-1. **`hcent` (Prop 1.5, the smaller piece, tool IDENTIFIED)** — from the BG hypothesis `C_P(xᵏ) = Z(P)`
-   (`xᵏ ≠ 1`) derive `∀ k≠0, ∀ c, (quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c = c → c = 1`.
-   Use **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`** (ForwardFromCh03.lean:794):
-   `{φ : A →* MulAut G} {N ⊴ G} (hCop : Coprime |A| |N|) (hSolv : Solvable A ∨ Solvable N)`
-   `(hN_inv : IsAInvariant φ N) {g} (hg_fix : ∀ a, ∃ n∈N, φ a g = g*n) : ∃ c, (∀ a, φ a c = c) ∧ ∃ n∈N, c = g*n`.
-   Setup: `A = Subgroup.zpowers (conjAutOfNormal P x ^ k.val)` ≤ `MulAut P`, `φ = A.subtype`, `G = P`,
-   `N = center P` (abelian ⟹ `hSolv` right; characteristic ⟹ `hN_inv`); `Coprime |A| |Z|` from `|A| ∣ h`
-   (`(conjAutOfNormal P x)^h = 1`) + `|Z| ∣ |P|` p-power + `gcd(h,p)=1`. `g = Quotient.out c`, `hg_fix`
-   from `σ^{k·j} c = c` (iterate `σ^k c = c`). Lift gives `c'` conj(xᵏ)-fixed ⟹ `c' ∈ C_P(xᵏ) = Z = N`
-   ⟹ `g = c'·n⁻¹ ∈ Z` ⟹ `⟦g⟧ = c = 1`. ~80-120 lines (A-action plumbing + coprimality + the bridges).
-   `C_P(xᵏ)` (centralizer in P) = `{p : P | conj(xᵏ) p = p}` (fixed points of the conj aut) — same set.
+1. **✅ `hcent` (Prop 1.5) DONE** (commit `0af0f90`, sorry-free + axiom-clean, full build 3608 green):
+   `quotientCenter_fixedFree_of_centralizer_le_center` (`ExtraspecialThm25Group.lean`) derives
+   `∀ k≠0, ∀ c, (quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c = c → c = 1` from `(h, |P|) = 1`
+   + the BG-faithful `hCP : ∀ k≠0, ∀ p, (conjAutOfNormal P x ^ k.val) p = p → p ∈ center P` (= `C_P(xᵏ) ⊆ Z`).
+   Proof exactly as planned: `A = Subgroup.zpowers (φ₀^k.val) ≤ MulAut P`, `coprime_fixedPoints_quotient_of_coprime_normal`
+   (Isaacs Cor 3.28) lifts the fixed coset `⟦g⟧` to a genuine fixed point `w` of `φ₀^k`, `hCP` puts
+   `w ∈ Z`, coset rep `g = w·n⁻¹ ∈ Z` ⟹ `⟦g⟧ = c = 1`. Coprimality `|A|=orderOf(φ₀^k.val) ∣ h`
+   (`(φ₀^k.val)^h=(φ₀^h)^k.val=1`) + `|Z| ∣ |P|` + `(h,|P|)=1`. `hg_fix` (coset A-invariance) via
+   nat-power reduction `mem_powers_iff_mem_zpowers` + `quotientCenterCongr_pow_mk` + fixed-point iterate.
+   Center `IsSolvable` via `isSolvable_of_comm` + `mem_center_iff`. **Convenience corollary**
+   `finrank_modEq_of_faithful_irreducible_of_centralizer` = Thm 2.5 divisibility with `hcent` swapped
+   for `(h,|P|)=1` + `hCP` (calls the producer internally). **`hcop`/`hCP` will be supplied by the
+   §2 setup** (`h` rel. prime `p` is a hypothesis of BG Thm 2.5, mmd L716; `C_P(x)=Z` likewise).
 
-2. **`hVP` (Prop 2.2(a) alg-closed Clifford, the BIG piece)** — `Representation.IsIrreducible (ρ.comp P.subtype)`
+2. **▶ `hVP` (Prop 2.2(a) alg-closed Clifford, the BIG piece) — NOW THE SOLE FRONTIER for divisibility** —
+   `Representation.IsIrreducible (ρ.comp P.subtype)`
    from: `ρ` faithful irreducible `F[G]`-module, `P ⊴ G`, `G/P` cyclic, `F` alg-closed, and `M ≅ M^g`
    ∀g (all `P`-conjugates of an irred submodule `M` isomorphic — from "faithful irred of extraspecial
    determined by center", Gor 5.5.4). BG mmd L614-647: build `L` extending `M`, `τ`-cocycle, `τx`
