@@ -10562,6 +10562,58 @@ theorem extension_eq_or_eq_neg_of_frobenius
     refine heq X (hXc.extension χ₁) hXnorm hX1norm ?_
     rw [hc₁]; norm_num
 
+open scoped Classical in
+/-- **(6.8.1) crux `hDτ` (`n ≥ 3` case)** (mmd 04.8 L176).  Given a third equal-degree `X`-anchor
+`χ₃` (distinct from `χ₁, χ₂`), the good-case crux holds:
+`(χ₁−aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`.
+
+The step-5 dichotomy gives `X := (χ₁−aη₁)^τ + a·η₁^{τ₁} = χ₁^{τ₂} ∨ X = −χ₂^{τ₂}`; the second
+disjunct is excluded by the step-5 relation for `χ₃` (`⟨X,χ₃^{τ₂}⟩ − ⟨X,χ₁^{τ₂}⟩ = −1`,
+`inner_extension_Xset_sub_eq_neg_one`): under `X = −χ₂^{τ₂}` both `⟨χ₂^{τ₂},χ₃^{τ₂}⟩` and
+`⟨χ₂^{τ₂},χ₁^{τ₂}⟩` vanish (distinct `X`-images), giving `0 = −1`.  Hence `X = χ₁^{τ₂}`, i.e. the
+crux.  (The `n = 2` case — no third anchor — needs the relabel of `χ₁^{τ₂}, χ₂^{τ₂}`, deferred.) -/
+theorem crux_of_third_anchor_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1)
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+      = -(a : ℂ)) :
+    hyp.tau (χ₁ - a • η₁)
+      = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
+        - (a : ℂ) • hyp.coherentYset.extension η₁ := by
+  classical
+  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
+  -- `X`-image orthonormality.
+  have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
+      ψ' ∈ hyp.Xset hyp.centralCommutator →
+      ClassFunction.inner (hXc.extension ψ) (hXc.extension ψ') = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    rw [hXc.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  rcases hyp.extension_eq_or_eq_neg_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ hχ₂ hne₂ ha hdeg2
+    hgood with h | h
+  · -- left disjunct `X = χ₁^{τ₂}` ⟹ the crux by `eq_sub_of_add_eq`.
+    rw [← hXc_def] at h
+    exact eq_sub_of_add_eq h
+  · -- right disjunct `X = −χ₂^{τ₂}` is excluded by the `χ₃` relation.
+    exfalso
+    rw [← hXc_def] at h
+    have hrel3 := hyp.inner_extension_Xset_sub_eq_neg_one_of_frobenius hF hHnonab hp hp3 hHp
+      hη₁ hχ₁ hχ₃ hne₃₁ ha hdeg3
+    rw [← hXc_def, h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
+      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
+    norm_num at hrel3
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
