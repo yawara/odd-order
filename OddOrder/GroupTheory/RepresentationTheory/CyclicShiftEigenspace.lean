@@ -118,7 +118,7 @@ private theorem pow_apply_of_eigenvector {T : Module.End F W} {ε : F} {i : ℕ}
 /-- **The eigenspace-projection's range is the whole eigenspace.** The "Fourier projection"
 `proj := ∑_{k} (ε^i)⁻¹^{k.val} • T^{k.val}` (`= h · π_{ε^i}`) has `range proj = T.eigenspace (ε^i)`
 (`ε^h = 1`, `T^h = 1`, `h ≠ 0`): `range ⊆ eigenspace` since each `proj w` is an eigenvector
-(`sum_pow_smul_mem_eigenspace`); `eigenspace ⊆ range` since `proj` acts as `h · id` on the eigenspace
+(`sum_pow_smul_mem_eigenspace`); `eigenspace ⊆ range` since `proj` acts as `h · id` on it
 (so `v = proj ((h:F)⁻¹ • v)`). Hence `dim (T.eigenspace (ε^i)) = rank proj`. -/
 theorem range_sum_pow_eq_eigenspace (T : Module.End F W) {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
     (hTh : T ^ h = 1) (hh : (h : F) ≠ 0) (i : ℕ) :
@@ -141,6 +141,27 @@ theorem range_sum_pow_eq_eigenspace (T : Module.End F W) {ε : F} (hε : ε ≠ 
         one_pow, one_smul]
     rw [Finset.sum_congr rfl (fun k _ => hterm k), Finset.sum_const, Finset.card_univ, ZMod.card,
       ← Nat.cast_smul_eq_nsmul F, smul_smul, inv_mul_cancel₀ hh, one_smul]
+
+/-- **The Fourier projection scales by `(ε^i)^n` along the `T`-action** (proportionality engine).
+`proj (T^n w) = (ε^i)^n • proj w`, since `proj` commutes with `T^n` (it is a polynomial in `T`) and
+`proj w` is an `ε^i`-eigenvector. This makes `proj (b s)` constant-up-to-scalar along each
+`σ`-orbit (via the monomial action `b (σ s) ∝ T (b s)`). -/
+theorem sum_pow_smul_pow_comm (T : Module.End F W) {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
+    (hTh : T ^ h = 1) (w : W) (i n : ℕ) :
+    (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) ((T ^ n) w))
+      = (ε ^ i) ^ n • ∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) w := by
+  have hsum : (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) w)
+      ∈ Module.End.eigenspace T (ε ^ i) :=
+    sum_pow_smul_mem_eigenspace T hε hεpow hTh w i
+  rw [Module.End.mem_eigenspace_iff] at hsum
+  have hcomm : (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) ((T ^ n) w))
+      = (T ^ n) (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) w) := by
+    rw [map_sum]
+    refine Finset.sum_congr rfl fun k _ => ?_
+    rw [map_smul]
+    congr 1
+    rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← pow_add, ← pow_add, add_comm]
+  rw [hcomm, pow_apply_of_eigenvector hsum]
 
 /-- **Each eigenspace of a cyclic shift is one-dimensional.** For `b : Basis (ZMod h) F W` and the
 shift `T (b j) = b (j+1)`, and `ε` a primitive `h`-th root of unity,
