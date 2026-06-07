@@ -67,6 +67,22 @@ Peterfalvi 用に構築された `OddOrder/GroupTheory/RepresentationTheory/*` �
 (BG Thm 2.5 証明自身が代数閉体へ base-change するので、その橋 or ℂ-module の代数閉体一般化が要)。
 Prop 2.4 (eigenspace) のみ一般体で即再利用可。**Thm 3.4 着手時の設計判断 = §2 を「ℂ/代数閉体で組んで base-change」か「一般体で再構築」か**。
 
+## base-change レイヤ確立 + Thm 3.4 の真の bottleneck (2026-06-07, main)
+
+**✅ base-change インフラ完了** (`OddOrder/GroupTheory/RepresentationTheory/BaseChange.lean`, 共有レイヤ, sorry-free):
+- `baseChangeRepresentation` (+ `_apply_tmul`, `_faithful`) — S02 から移設 (scalar 拡張 `F→K`)
+- `invariants_baseChangeRepresentation_eq_bot` — **BG (2.9)** `C_V(R)=0 ⇒ C_{K⊗V}(R)=0` (flat + `piRight`)
+- `baseChangeRepresentation_comp` — restriction 互換 (部分群 `H=Z(P)` へ (2.9) 適用)
+- **BG (2.8) (dim 不変) は意図的に省略**: Thm 2.5 の "C_V(H)≠0" 方向専用で、Thm 3.4 は "C_V(H)=0 ⇒ h=pⁿ+1" 方向 (= (2.9) 経由) しか使わない。demand-driven。
+
+**Thm 3.4 の残り = Thm 2.5 本体 = 代数閉体上の extraspecial 表現論** (repo・mathlib に**無い**が **mathlib の Wedderburn–Artin (`RingTheory/SimpleModule/IsAlgClosed.lean`) + Schur で構築可能**, from-scratch ではない)。bottom-up:
+1. **Prop 2.1** (faithful absolutely irreducible ⇒ `E(P)=Hom_F(V,V)`; Burnside) — Wedderburn-Artin/alg-closed から。`AbsolutelyIrreducible.lean` は空 skeleton。
+2. **Gor 5.5.4-5** (extraspecial faithful irreducible: 中心指標で決まり dim=pⁿ; 二乗和 `p^{2n}·1+(p-1)(pⁿ)²=|P|` から) — `ExtraspecialFaithful.lean` 空 skeleton (issue #34)。
+3. **Prop 2.2(a)** (Clifford `V_P=M`) — `Clifford.lean` は ℂ 限定ゆえ代数閉体版 or base-change。
+4. **Prop 2.4(j)(k)** (eigenspace counting) — ✅ `EigenspaceUnderCyclicAction` (一般体)。
+5. **Thm 2.5 assembly** → Thm 3.4 special case (K extraspecial) → 矛盾 (h=qⁿ+1 even vs odd)。
+これは複数セッションの表現論サブプロジェクト。char-p (有限体) のため ℂ-Clifford は不可、代数閉体 F̄ 版が要る。
+
 ## 推奨着手順序 (bottom-up)
 
 1. **Lem 1.21** (新ファイル `OddOrder/BG/Ch1_Preliminary/PLength.lean` 拡張 or `S01d_Lemma121.lean`)。
