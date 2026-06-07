@@ -331,3 +331,53 @@ After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H))
   ※ m=1 finish なら finrank 経由で直接 `W=⊤`, bootstrap 不要かも。
 - **▶ + Gor 5.5.4** (`W≅W^g` 供給 = hconj 仮説, 別 sub-piece, 未着手)。
 - **hVP 進捗 = 3/4** (foundation✅ + conclusion✅ + W-isotypic✅; 残 m=1 finish)。CliffordAlgClosed.lean 全 sorry-free。
+
+### ✅ m=1 finish: REFINED ROUTE A (2026-06-08, mathlib 偵察完了 — Explore agent; 再調査不要)
+
+**ルート A (Skolem-Noether) に確定。ルート B (BG-τ) は破棄** (τ cocycle が fiddly・非再利用)。偵察で
+**A の hard piece は「行列 Skolem-Noether 自前構築」1 個のみ**と判明し、しかも **finish が劇的に簡単化** —
+centralizer-dimension 補題が **不要**になった。
+
+**mathlib 在庫 (PRESENT / ABSENT 確定)**:
+- ✅ Wedderburn-Artin 一式 (`RingTheory/SimpleModule/WedderburnArtin.lean`): `isSimpleRing_isArtinianRing_iff`
+  (L66, `IsSimpleRing R ∧ IsArtinianRing R ↔ IsSemisimpleRing R ∧ IsIsotypic R R ∧ Nontrivial R`),
+  `IsSimpleRing.exists_algEquiv_matrix_of_isAlgClosed` (`SimpleModule/IsAlgClosed.lean:22`, `R≃ₐ[F]M_n(F)`)。
+- ✅ **unique simple module** = `IsIsotypic.of_self [IsSemisimpleRing R] (h : IsIsotypic R R) : IsIsotypic R M`
+  (`Isotypic.lean:80`)。`IsIsotypic R M` の def (L59) = 「M の任意 simple 部分加群が互いに ≅」。
+- ✅ `Matrix.isSimpleRing [IsSimpleRing A] : IsSimpleRing (Matrix ι ι A)` (`SimpleRing/Matrix.lean:21`);
+  field は IsSimpleRing。transport = `IsSimpleRing.of_ringEquiv` / `of_surjective` (`SimpleRing/Congr.lean:23-28`)。
+- ✅ twist module = `compHom.toLinearEquiv {R S} (g : R ≃+* S)` (`Module/Equiv/Basic.lean:175`) — θ:E≃ₐE を
+  RingEquiv とみて `Module.compHom` で別 E-module 構造 (instance diamond 注意, 型シノニム or letI)。
+- ✅ `IsIsotypicOfType.linearEquiv_fun [Module.Finite R M] : ∃ n, Nonempty (M ≃ₗ[R] Fin n → S)` (mult 抽出),
+  `IsSemisimpleModule.endAlgEquiv`, `endVecAlgEquivMatrixEnd : End_A(ι→M)≃ₐMatrix ι ι (End_A M)` (`Matrix/ToLin.lean:1165`)。
+- ✅ Schur: `finrank_endomorphism_simple_eq_one` (alg-closed, 既約 ⟹ `finrank End=1`),
+  `isSimpleModule_iff_finrank_eq_one` (`SimpleModule/Rank.lean:17`), `Module.End.instDivisionRing`,
+  `isField_center (A) [IsSimpleRing A]` (`SimpleRing/Field.lean:27`)。
+- ✅ Maschke instance `IsSemisimpleModule k[G] V` for `[Finite G][NeZero (Nat.card G:k)]` (`Maschke.lean:168`)。
+- ❌ **ABSENT**: Skolem-Noether 本体 / 「M_n aut は inner」/ centralizer finrank bound ≥ n。← A の唯一の自前構築。
+
+**REFINED finish (centralizer-dim 不要・エレガント)**: SN で θ=Ad(u) (u∈E) を得たら、`u∈E` かつ
+`u∈C_E(u)=E^θ=k` (u は自分と可換) ⟹ **u は scalar** ⟹ θ=Ad(scalar)=**id** ⟹ `E=E^θ=k` ⟹
+`finrank_k E=1` ⟹ m=1。← 「centralizer(u)=k ⟹ m=1」(旧プラン, dim≥m 補題要) を回避。
+
+**Leaf 分解 (bottom-up, 各 build-green)**:
+- **✅ Leaf SN-core DONE** (2026-06-08, `SkolemNoether.lean` 新規, sorry-free + axiom-clean, full build
+  3610 green): **`finrank_le_one_of_aut_fixedScalar`** — `W₀` f.d. over **任意体 `k`** (alg-closed 不要!),
+  `θ : End_k(W₀) ≃ₐ[k] End_k(W₀)` の固定環 ⊆ scalars ⟹ `finrank_k W₀ ≤ 1`。+ foundation
+  **`nonempty_linearEquiv_of_isSimpleModule`** (任意 simple artinian ring の simple module は同型, ~6 行,
+  `IsSimpleRing.isIsotypic` + `exists_linearEquiv_ideal_of_isSimpleModule`)。
+  - 実装ルート (計画どおり, deviation 小): (i) `EndTwist θ` 型シノニム + `Module.compHom θ.toRingEquiv.toRingHom`
+    で twist module; simplicity 移送は **`LinearMap.isSimpleModule_iff_of_bijective`** (mathlib 既存! θ-semilinear
+    恒等で) — orderIso 手構築不要。(ii) `IsSimpleRing (End k W₀)` は `algEquivMatrix` で `Matrix` へ transport
+    (`Module.finBasis`, `Nonempty (Fin n)` from `finrank_pos`), `IsArtinianRing` は `IsArtinianRing.of_finite`。
+    (iii) `nonempty_linearEquiv_of_isSimpleModule` で `W₀ ≃ₗ[End] EndTwist θ` → u∈GL(W₀)=End_k(W₀), `θ=u.conjAlgEquiv k`。
+    (iv) θ が u 自身を固定 ⟹ u scalar (c•id, c≠0) ⟹ θ=id ⟹ 全 f scalar ⟹ `finrank(End)=n²≤1` (surj algebraMap)
+    ⟹ n≤1。**alg-closed も Jacobson density も centralizer-dim も不要** (W₀=End_k(W₀) なので u∈E 自動)。
+  - ⚠ diamond `set_option` は **不要**だった (compHom instance + `change` で defeq 解決)。`show`→`change` lint のみ。
+- **Leaf wire-E** (CliffordAlgClosed.lean に追記 or 新 section): `E:=End_{k[H]}((resRep ρ H).asModule)`,
+  W-isotypic (既 `isIsotypicOfType_of_conjugates`) + Maschke ⟹ `E ≅ M_m(k) ≅ End_k(Fin m→k)`;
+  θ:=Ad(ρx) を E の AlgEquiv に (`LinearEquiv.conjAlgEquiv (ρ.asLinearEquiv x)` を subalgebra へ);
+  `E^θ = End_{k[G]}(V) = scalars` (Schur, ρ 既約); SN-core 適用 ⟹ finrank E=1 ⟹ m=1 ⟹ V_H simple ⟹ `W=⊤`。
+- **Leaf hVP-assemble**: `eq_top_of_forall_map_conjSemilinearEnd_le` は m=1 finish で **不要** (W=⊤ を finrank
+  経由で直接); hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
+- これで `Representation.IsIrreducible (ρ.comp P.subtype)` (= group-level Thm 2.5 の唯一残仮説) が discharge。
