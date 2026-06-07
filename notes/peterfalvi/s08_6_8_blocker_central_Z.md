@@ -482,3 +482,33 @@ meant to supply `hgen`; if the degree-counting above is right, plan a diagonal-a
 3. **Resolve `hgen`**: confirm the counterexample, then build a diagonal-aware union variant (or fix
    the shell) and discharge the cross-diagonal via the b≡0 / (6.7) argument. **This is the real deep
    piece**, best attended.
+
+### The b≡0 / cross-diagonal argument — spine mapped + 4 ingredients landed (2026-06-07 session 3 cont.)
+
+The `hgen` fix (diagonal-aware union) reduces to the **cross-diagonal agreement**
+`ν(χᵢ − aᵢη₁) = τ(χᵢ − aᵢη₁)`, i.e. `τ₂χᵢ − aᵢτ₁η₁ = τ(χᵢ − aᵢη₁)`, i.e. the **crux**
+`t₁ := ⟨τ(χ₁ − aη₁), τ₁η₁⟩ = −a` (the b≡0 conclusion; parallels the X-chain `crux1` but forced by
+(6.7)+norm-bound, **not** the (6.6) degree gap — so `lambda_eq_zero_and_Z_eq_zero` does NOT apply,
+its `hD : 2a < ∑(rcᵢ)²mcᵢ` is the wrong forcing).  Spine + status:
+- **cross-term** `⟨τ(χ₁−aη₁), τ(η_j−η₁)⟩ = ⟨χ₁−aη₁, η_j−η₁⟩ = a` (j>1): Dade isometry on supported
+  (`dadeIntegralCharacterMap_inner_eq_on_supported_span` / `inner_extension_eq_inner_of_supported`) +
+  `X⊥Y`.  Tractable.
+- **(6.7) divisibility `a ∣ c ≡ b`**: needs "η₁^{τ₁} const on `Z^#`" ⟹ `peterfalvi_67_centralCommutator`
+  (LANDED adapter).  The "const on `Z^#`" comes from the **Res-decomposition** `Res_L(η₁^{τ₁}) =
+  c∑dᵢχᵢ + χ′` + the **reg-char identity** `∑dᵢχᵢ = (ρ_L − ρ_{L/Z})/(a|W₁|)` (LANDED:
+  `sumNonInflatedDegreeMulChar_of_mem` gives `∑_{Z⊄ker χ}χ(1)χ(z) = −|L:Z|`, constant on `Z^#`).
+- **norm-bound forcing** `b = 0 ∨ (b=a ∧ m=2)`: ✅ **LANDED** `eq_zero_or_edge_of_dvd_of_normBound`
+  (S08, axiom-clean, registered).  The (6.8.1) L176 step.
+- 🔴 **the gateway = Dade reciprocity** `⟨τα, ψ⟩_G = ⟨α, Res_L ψ⟩_L` for supported `α` — the one
+  un-built structural piece, gating the Res-decomposition. **FEASIBLE (key finding):** the (6.8)
+  Dade situation is the **TI case** (`H^#` TI, normalizer `L`), where `hyp.H a = ⊥` (S04:308
+  `of_isTISubset … .H a = ⊥`); then `adjointAverageFun ψ a = |H(a)|⁻¹∑_{x∈H(a)}ψ(ax) = ψ(a) =
+  (Res_L ψ)(a)`, so the **(2.7) `adjoint_formula`** (S04:3894, `⟨τα, χ⟩ = ⟨α, adjointAverageFun χ⟩`)
+  collapses to the clean reciprocity.  Build = `adjointAverageFun`-collapse-at-`H=⊥` (sum over `↥⊥`
+  = single term) + `adjoint_formula` + `dadeIntegralCharacterMap_apply_of_support` bridge.  Needs
+  `∀ a, hyp.dade.H a = ⊥` at the Sibley call site (holds since `H_sharp_ti`; may need a derived
+  bridge or a field, as `dade` is currently a free `S04.Hypothesis` field — minor faithfulness check).
+
+So 4 of the ~6 b≡0 ingredient-classes are landed/tractable ((4.1), diff-ortho, degree-0, norm-bound,
+reg-char + (6.7) adapter); the **Res-decomposition via Dade reciprocity** is the remaining structural
+core, now de-risked (TI ⟹ `H a = ⊥` ⟹ `adjoint_formula` collapse).

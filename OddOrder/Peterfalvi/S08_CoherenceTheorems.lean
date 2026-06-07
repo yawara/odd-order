@@ -403,6 +403,39 @@ theorem extension_apply_one_eq_zero_of_supported
 
 end DadeCoherenceUnion
 
+/-- **Peterfalvi (6.8.1) norm-bound forcing** (mmd 04.8 L176).  In the (6.8.1) `b ≡ c ≡ 0 mod a`
+argument, after `(6.7)` gives `a ∣ b` (write `b = a·x`), the norm identity
+`1 + a² = ‖(χ₁ − aη₁)^τ‖² = ‖X‖² + (b − a)² + (m − 1)·b²` with `‖X‖² ≥ 0` gives the bound
+`(b − a)² + (m − 1)·b² ≤ 1 + a²`; with `a ≥ 2` and `m ≥ 2` (`m = |Y|`) this forces `b = 0` — or the
+edge case `b = a`, `m = 2`, which the textbook reduces to `b = 0` by relabelling
+`η₁^{τ₁} ↔ −η₂^{τ₁}`.  (`b = ±2a` and `b = −a` are excluded since `4a² > 1 + a²` for `a ≥ 2`.) -/
+theorem eq_zero_or_edge_of_dvd_of_normBound {a b m : ℤ}
+    (ha : 2 ≤ a) (hm : 2 ≤ m) (hdvd : a ∣ b)
+    (hnorm : (b - a) ^ 2 + (m - 1) * b ^ 2 ≤ 1 + a ^ 2) :
+    b = 0 ∨ (b = a ∧ m = 2) := by
+  obtain ⟨x, rfl⟩ := hdvd
+  have ha0 : (0 : ℤ) < a := by linarith
+  -- `b² = (a·x)² ≤ 1 + a²` (drop `(b−a)² ≥ 0` and the `(m−2)·b² ≥ 0` slack).
+  have hb2 : (a * x) ^ 2 ≤ 1 + a ^ 2 := by
+    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
+  -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting `a ≥ 2`.
+  have hx2 : x ^ 2 ≤ 1 := by
+    by_contra h
+    push_neg at h
+    have hx2' : 2 ≤ x ^ 2 := h
+    nlinarith [hb2, mul_pos ha0 ha0, mul_le_mul_of_nonneg_left hx2' (le_of_lt (mul_pos ha0 ha0))]
+  have hxlo : -1 ≤ x := by nlinarith [hx2, sq_nonneg (x + 1)]
+  have hxhi : x ≤ 1 := by nlinarith [hx2, sq_nonneg (x - 1)]
+  interval_cases x
+  · -- `x = -1` (`b = -a`): `4a² + (m−1)a² ≤ 1 + a²` is impossible.
+    exfalso; nlinarith [hnorm, ha, hm]
+  · -- `x = 0`: `b = 0`.
+    left; ring
+  · -- `x = 1` (`b = a`): `(m−1)a² ≤ 1 + a²` forces `m = 2`.
+    right
+    refine ⟨by ring, ?_⟩
+    nlinarith [hnorm, ha, hm]
+
 open scoped ComplexOrder in
 /-- The inner product of two genuine characters is `≥ 0`.  Decompose the right argument into a
 non-negative integer combination of irreducibles (`exists_natFinsupp_eq_sum`); each summand

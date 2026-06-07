@@ -2388,6 +2388,9 @@ set_option linter.style.longLine false in
 -- supported lattice elements (`extends_on_supported` + the §4 Dade isometry / vanish-at-`1`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inner_extension_eq_inner_of_supported
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.extension_apply_one_eq_zero_of_supported
+-- (6.8.1) norm-bound forcing (mmd L176): `a ∣ b` (from (6.7)) + the `Y`-part norm bound
+-- `(b−a)² + (m−1)b² ≤ 1 + a²` (`a,m ≥ 2`) ⟹ `b = 0` (or the relabel-reducible edge `b=a, m=2`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.eq_zero_or_edge_of_dvd_of_normBound
 -- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
