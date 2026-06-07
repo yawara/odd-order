@@ -96,4 +96,19 @@ theorem isInternal_cyclicHomBlockFin {epsilon : F} {g : Module.End F V} {h : ℕ
       (fun p => cyclicHomBlockFin epsilon g p.1 p.2)).symm
   exact ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hfin).mpr hsurj, hsurj⟩
 
+open Module in
+open Module in
+/-- For an **independent** finite family of submodules of a finite-dimensional space, the dimension
+of the supremum is the sum of the dimensions. (mathlib has the `IsInternal` finrank facts but not
+this `iSupIndep`-only form; here `⨆ p k` need not be all of `M`.) -/
+theorem finrank_iSup_of_iSupIndep {M : Type*} [AddCommGroup M] [Module F M]
+    [FiniteDimensional F M] {κ : Type*} [Fintype κ]
+    (p : κ → Submodule F M) (hp : iSupIndep p) :
+    finrank F ((⨆ k, p k : Submodule F M)) = ∑ k, finrank F (p k) := by
+  classical
+  have hinj : Function.Injective (DirectSum.coeLinearMap p) := hp.dfinsupp_lsum_injective
+  have e := (LinearEquiv.ofInjective (DirectSum.coeLinearMap p) hinj).trans
+      (LinearEquiv.ofEq _ _ (DirectSum.range_coeLinearMap (A := p)))
+  rw [← e.finrank_eq, finrank_directSum]
+
 end OddOrder.RepresentationTheory
