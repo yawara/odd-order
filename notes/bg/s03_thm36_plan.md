@@ -86,12 +86,21 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 +`index_dvd_of_le` で `|range fA| ∣ |range gA|`=p冪 ⇒ IsPGroup ⇒ `le_oPiPrimePiCore_of_quotient_isPGroup`。
 最終 index 鎖は `index_dvd_of_le` + `relIndex_dvd_index_of_normal` (O_{p',p}G normal)。**(a) は Thm 10.6 の H≤M reduction を解く**。
 
-**Lemma 1.21: (a)(b)(c) 完了 (sorry-free)。残 (d)(e):**
-- **(e)** `H,N⊴G, H∩N=1, G/H・G/N plen1 ⇒ G plen1`。**(d) 不要の近道**: `G ↪ (G/H)×(G/N)` (ker=H∩N=⊥) +
-  「product の p-length one」+ **(a)** (部分群単調性) + hasPLengthOne の iso 不変性。**gate = product-core**
-  `oPiCore π (A×B) = oPiCore π A ×' oPiCore π B` (mathlib/repo に**無し**、projection 論法で ~40 行新規) +
-  iso 不変 `hasPLengthOne_of_mulEquiv` (~20 行, bridge + `oPiCore.map_eq_of_mulEquiv`)。計 ~80 行。Thm 3.6 (3.11) cite。
-- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}(G) が normal p-complement`。`⟨p-elements⟩` 新規形式化要 (重)。(e) は上記近道で (d) 回避可。
+**Lemma 1.21: (a)(b)(c) 完了 (sorry-free)。(e) は product-core 経由で進行中:**
+- ✅ `oPiCore_prod` (`ee73dac`): `O_π(A×B) = O_π A ×' O_π B`。(e) の product 段の土台。
+- **(e) 残り (~80 行, 設計確定, 全て PLengthTransfer.lean 内に積む):**
+  1. **iso 不変** `hasPLengthOne_of_mulEquiv (φ : G ≃* G')`: `(oPiPrimePiCore π G).map φ = oPiPrimePiCore π G'`
+     (`oPiPrimePiCore = comap (mk' O_{p'}) (O_p(·/O_{p'}))` を `oPiCore.map_eq_of_mulEquiv` で 2 段 transport;
+     descending iso `ψ : G/N ≃* G'/(N.map φ)` は `quotientKerEquivOfSurjective ((mk' (N.map φ)).comp φ)` で構成,
+     ker = comap φ (N.map φ) = N) ⇒ `Nat.card` 等しく iso 不変。~25 行。
+  2. **quotient-of-product iso** `(A×B)/(H ×' K) ≃* (A/H)×(B/K)`: `quotientKerEquivOfSurjective (MonoidHom.prodMap (mk' H)(mk' K))`
+     (ker = H ×' K) + `quotientMulEquivOfEq`。~15 行。
+  3. **`hasPLengthOne_prod`** A,B plen1 ⇒ A×B plen1: bridge + `oPiCore_prod` (O_{p'} と O_p の 2 段) + (2) の iso
+     + `Nat.card_prod` で `|((A×B)/O_{p'})/O_p| = |(A/O_{p'})/O_p|·|(B/O_{p'})/O_p|`, p 素数で ¬p∣ ⟺ 両方。~30 行。
+  4. **(e) 本体**: `φ : G →* (G/H)×(G/N)` (`(mk' H).prod (mk' N)`), `ker = H ⊓ N = ⊥` ⇒ injective ⇒
+     `G ≃* range φ` (`quotientKerEquivOfSurjective`/`ofInjective`); `hasPLengthOne_prod` で product plen1,
+     `hasPLengthOne_subgroup` (=1.21a) で `↥(range φ)` plen1, (1) の iso 不変で `G` plen1。~25 行。
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}` は (e) 近道で回避済 (不要)。Thm 3.6 (3.11) は (e) を cite。
 
 **Thm 3.6 残ブロッカー (1.21 完成後)**: **Thm 3.4** (L863) + **Thm 3.5** (L903) = 表現論 (Clifford/Maschke/Wedderburn, 最重量) + **Gorenstein 5.3.7** (special q-群)。これらが本丸の山。
 
