@@ -6,7 +6,9 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Invariants
 import Mathlib.LinearAlgebra.TensorProduct.Tower
+import Mathlib.LinearAlgebra.TensorProduct.Pi
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
+import Mathlib.RingTheory.Flat.Basic
 
 /-!
 # Scalar extension (base change) of group representations
@@ -83,5 +85,67 @@ theorem baseChangeRepresentation_faithful
   have hmap := congrArg
     (fun f : TensorProduct F K V →ₗ[K] TensorProduct F K V => f (1 ⊗ₜ[F] v)) hgh
   simpa [baseChangeRepresentation] using hmap
+
+/-- The obstruction map `v ↦ (g ↦ ρ g v - v)`; its kernel is the space of invariants. -/
+private noncomputable def invariantsObstruction
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] (ρ : Representation F G V) :
+    V →ₗ[F] (G → V) :=
+  LinearMap.pi (fun g => ρ g - LinearMap.id)
+
+private theorem ker_invariantsObstruction
+    {F : Type*} [Field F] {G : Type*} [Group G]
+    {V : Type*} [AddCommGroup V] [Module F V] (ρ : Representation F G V) :
+    LinearMap.ker (invariantsObstruction ρ) = Representation.invariants ρ := by
+  ext v
+  rw [LinearMap.mem_ker, Representation.mem_invariants, funext_iff]
+  refine forall_congr' (fun g => ?_)
+  simp [invariantsObstruction, LinearMap.pi_apply, LinearMap.sub_apply, sub_eq_zero]
+
+/-- **Base change preserves vanishing of invariants**: if a representation `ρ` over a field `F`
+has no nonzero invariants, then neither does its scalar extension to any field extension `K/F`.
+
+This is the field-agnostic bridge that transfers a hypothesis `C_V(R) = 0` to the algebraic
+closure (BG §2/§3): apply it to the restricted representation `ρ.comp R.subtype`.  The proof
+factors the invariants as `ker` of the obstruction map `v ↦ (g ↦ ρ g v - v)`; flatness of `K`
+over `F` preserves the injectivity of that map, and `TensorProduct.piRight` identifies its scalar
+extension with the obstruction map of the base-changed representation. -/
+theorem invariants_baseChangeRepresentation_eq_bot
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V]
+    (K : Type*) [Field K] [Algebra F K]
+    (ρ : Representation F G V) (h : Representation.invariants ρ = ⊥) :
+    Representation.invariants (baseChangeRepresentation K ρ) = ⊥ := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set ρ' := baseChangeRepresentation K ρ with hρ'
+  -- `ρ`'s obstruction map is injective (its kernel is the invariants, which vanish).
+  have hinj : Function.Injective (invariantsObstruction ρ) := by
+    rw [← LinearMap.ker_eq_bot, ker_invariantsObstruction, h]
+  -- flatness of `K/F` preserves injectivity under `lTensor`.
+  have hlt : Function.Injective (LinearMap.lTensor K (invariantsObstruction ρ)) :=
+    Module.Flat.lTensor_preserves_injective_linearMap _ hinj
+  -- `piRight ∘ lTensor` agrees with `ρ'`'s obstruction map on the nose.
+  have hcompat : ∀ x : TensorProduct F K V,
+      invariantsObstruction ρ' x
+        = TensorProduct.piRight F K K (fun _ : G => V)
+            (LinearMap.lTensor K (invariantsObstruction ρ) x) := by
+    intro x
+    induction x using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a v =>
+        funext g
+        simp [invariantsObstruction, hρ', LinearMap.pi_apply, LinearMap.sub_apply,
+          baseChangeRepresentation_apply_tmul, LinearMap.lTensor_tmul,
+          TensorProduct.piRight_apply, TensorProduct.piRightHom_tmul, TensorProduct.tmul_sub]
+    | add x y hx hy => simp [map_add, hx, hy]
+  -- hence `ρ'`'s obstruction map is injective, so its invariants vanish.
+  have hinj' : Function.Injective (invariantsObstruction ρ') := by
+    have hfun : (invariantsObstruction ρ' : TensorProduct F K V → (G → TensorProduct F K V))
+        = (TensorProduct.piRight F K K (fun _ : G => V)) ∘
+            (LinearMap.lTensor K (invariantsObstruction ρ)) := funext hcompat
+    rw [show ⇑(invariantsObstruction ρ') = _ from hfun]
+    exact (TensorProduct.piRight F K K (fun _ : G => V)).injective.comp hlt
+  rw [← ker_invariantsObstruction ρ', LinearMap.ker_eq_bot.mpr hinj']
 
 end OddOrder.RepresentationTheory
