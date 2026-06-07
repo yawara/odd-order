@@ -100,4 +100,35 @@ theorem toModuleEnd_surjective_of_isAlgClosed :
 
 end Burnside
 
+section Representation
+
+open scoped MonoidAlgebra
+
+variable {F : Type*} [Field F] [IsAlgClosed F]
+variable {G : Type*} [Monoid G] {V : Type*} [AddCommGroup V] [Module F V]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Burnside's theorem** (BG Prop 2.1, representation form): for a
+finite-dimensional irreducible representation `ρ` of `G` over an algebraically
+closed field `F`, the algebra hom `ρ.asAlgebraHom : F[G] →ₐ[F] End_F V` is
+surjective. Equivalently, the *enveloping algebra* `E(G)` (the `F`-span of the
+image of `G` in `End_F V`) is all of `End_F V = Hom_F(V, V)`.
+
+This is the form `BG Thm 2.5` uses (as `E(P) = Hom_F(V, V)`). -/
+theorem asAlgebraHom_surjective_of_isAlgClosed (ρ : Representation F G V)
+    [ρ.IsIrreducible] [FiniteDimensional F V] :
+    Function.Surjective ρ.asAlgebraHom := by
+  -- Module-form Burnside applied with `A := F[G]`, `M := ρ.asModule`.  `ρ.asModule` is
+  -- definitionally `V` and the `F[G]`-action `r • x` is `ρ.asAlgebraHom r x`, so
+  -- `Module.toModuleEnd F ρ.asModule` and `ρ.asAlgebraHom` are the *same* map.  The
+  -- relaxed-transparency option lets instance search see through the `asModule` synonym
+  -- (the idiom mathlib uses for the `IsScalarTower k k[G] ρ.asModule` instance).
+  have hsurj := toModuleEnd_surjective_of_isAlgClosed (F := F) (A := MonoidAlgebra F G)
+    (M := ρ.asModule)
+  intro h
+  obtain ⟨r, hr⟩ := hsurj h
+  exact ⟨r, hr⟩
+
+end Representation
+
 end OddOrder.RepresentationTheory
