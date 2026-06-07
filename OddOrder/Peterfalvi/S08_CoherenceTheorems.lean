@@ -10081,8 +10081,9 @@ theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
 
 open scoped Classical in
 /-- **(6.8.1) step-4 dichotomy** (mmd 04.8 L176, "`b ≡ c ≡ 0 (mod a)` ⟹ `b = 0` or the `m=2`
-edge").  For `η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the `η₁^{τ₁}`-coefficient
-`⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩` (Peterfalvi's `b − a`) is either `−a` (the `b = 0` case) or `0` with
+edge").  For `η₁ ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the
+`η₁^{τ₁}`-coefficient `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩` (Peterfalvi's `b − a`) is either `−a` (the `b = 0`
+case) or `0` with
 `|Y| = 2` (the `b = a ∧ m = 2` edge case).
 
 Bessel's inequality (`sum_sq_le_inner_self_re`) over the orthonormal `Y^{τ₁}`-family with
@@ -10091,7 +10092,8 @@ and `bb + a` on the other `m−1` members (the constancy
 `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius`); their squares sum to
 `bb² + (m−1)(bb+a)² ≤ ‖v‖² = 1 + a²` (norm `inner_self_tau_scaledDiff_of_frobenius`).  With
 `a ∣ (bb+a)`, `2 ≤ a` (`two_le_degreeRatio_of_mem_Xset_of_frobenius`), `2 ≤ m`
-(`two_le_Yset_ncard`), `eq_zero_or_edge_of_dvd_of_normBound` gives `bb+a = 0 ∨ (bb+a = a ∧ m = 2)`. -/
+(`two_le_Yset_ncard`), `eq_zero_or_edge_of_dvd_of_normBound` gives
+`bb+a = 0 ∨ (bb+a = a ∧ m = 2)`. -/
 theorem coeff_eq_neg_or_edge_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
@@ -10119,10 +10121,12 @@ theorem coeff_eq_neg_or_edge_of_frobenius
       hyp.coherentYset.extension η = hyp.coherentYset.extension η' → η = η' := by
     intro η hη η' hη' heq
     by_contra hne
-    have h0 : ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η') = 0 := by
+    have h0 : ClassFunction.inner (hyp.coherentYset.extension η)
+        (hyp.coherentYset.extension η') = 0 := by
       rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
         (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
-    have h1 : ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η') = 1 := by
+    have h1 : ClassFunction.inner (hyp.coherentYset.extension η)
+        (hyp.coherentYset.extension η') = 1 := by
       rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
         (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
     rw [h1] at h0; exact one_ne_zero h0
@@ -10224,6 +10228,99 @@ theorem coeff_eq_neg_or_edge_of_frobenius
     rw [hbb]
     have : bb = 0 := by omega
     rw [this]; norm_num
+
+open scoped Classical in
+/-- **(6.8.1) step-4 good-case `X`-structure** (mmd 04.8 L176: "`b = 0` ⟹
+`(χ₁ − aη₁)^τ = X − aη₁^{τ₁}`, `‖X‖² = ‖χ₁‖² = 1`").  In the good case
+`⟨(χ₁ − aη₁)^τ, η₁^{τ₁}⟩ = −a` (the `b = 0` branch of `coeff_eq_neg_or_edge_of_frobenius`), the
+element `X := (χ₁ − aη₁)^τ + a·η₁^{τ₁}` is orthogonal to the whole coherent `Y`-image family
+`Y^{τ₁}`, has norm `1`, and lies in `ℤ[Irr G]`.  Step 5 then identifies `X = χ₁^{τ₂}`, giving the
+crux `(χ₁ − aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`.
+
+The orthogonality uses the constancy `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius`
+(`⟨v, (η − η₁)^τ⟩ = a`, so `⟨v, η^{τ₁}⟩ = ⟨v, η₁^{τ₁}⟩ + a = 0` for `η ≠ η₁`) and the norm
+`‖v‖² = 1 + a²` (`inner_self_tau_scaledDiff_of_frobenius`); the norm of `X` is
+`(1 + a²) − a² − a² + a² = 1`. -/
+theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+      = -(a : ℂ)) :
+    (∀ η ∈ hyp.Yset,
+        ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+          (hyp.coherentYset.extension η) = 0)
+      ∧ ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+          (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁) = 1
+      ∧ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+  classical
+  set v := hyp.tau (χ₁ - a • η₁) with hv
+  -- Y-image orthonormality: `⟨η^{τ₁}, η'^{τ₁}⟩ = ⟨η, η'⟩ = δ`.
+  have hYon : ∀ η η', η ∈ hyp.Yset → η' ∈ hyp.Yset →
+      ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η')
+        = if η = η' then (1 : ℂ) else 0 := by
+    intro η η' hη hη'
+    rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
+      (Submodule.subset_span hη')]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+      (⟨η', hyp.isIrreducibleCharacter_of_mem_Yset hη'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  -- `⟨v, η^{τ₁}⟩ = 0` for `η ≠ η₁` (constancy `⟨v, (η−η₁)^τ⟩ = a` plus `⟨v, η₁^{τ₁}⟩ = −a`).
+  have hcoeff0 : ∀ η ∈ hyp.Yset, η ≠ η₁ →
+      ClassFunction.inner v (hyp.coherentYset.extension η) = 0 := by
+    intro η hη hne
+    have hconst := hyp.inner_tau_scaledDiff_tau_Yset_diff_of_frobenius hF hη₁ hη hne hχ₁ ha
+    have hsuppd : (η - η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη₁)
+        ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη₁).symm)
+    have htaud : hyp.tau (η - η₁)
+        = hyp.coherentYset.extension η - hyp.coherentYset.extension η₁ := by
+      rw [← hyp.coherentYset.extends_on_supported (η - η₁)
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hη) (Submodule.subset_span hη₁), hsuppd⟩,
+        map_sub]
+    rw [htaud, ClassFunction.inner_sub_right, hgood] at hconst
+    linear_combination hconst
+  -- norm and the conjugate of the good-case coefficient.
+  have hvv : ClassFunction.inner v v = 1 + (a : ℂ) ^ 2 :=
+    hyp.inner_self_tau_scaledDiff_of_frobenius hF hη₁ hχ₁ ha
+  have he₁e₁ : ClassFunction.inner (hyp.coherentYset.extension η₁)
+      (hyp.coherentYset.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+  have he₁v : ClassFunction.inner (hyp.coherentYset.extension η₁) v = -(a : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm v (hyp.coherentYset.extension η₁), hgood]
+    simp
+  refine ⟨?_, ?_, ?_⟩
+  · -- orthogonality `⟨X, η^{τ₁}⟩ = 0`.
+    intro η hη
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left]
+    by_cases hee : η = η₁
+    · subst hee
+      rw [hgood, he₁e₁]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (fun h => hee h.symm)]; ring
+  · -- norm `⟨X, X⟩ = 1`.
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+    rw [hvv, hgood, he₁v, he₁e₁, star_natCast]; ring
+  · -- `X ∈ ℤ[Irr G]`.
+    have hdeg : χ₁ 1 = (a : ℂ) * η₁ 1 := by rw [ha, hyp.Yset_apply_one hη₁]
+    have hsuppX : (χ₁ - a • η₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁)
+        (hyp.Yset_subset_S hη₁) hdeg
+    have hsrcZ : χ₁ - a • η₁ ∈ ZIrr (↥L) :=
+      sub_mem (hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁).mem_ZIrr
+        (nsmul_mem (hyp.isIrreducibleCharacter_of_mem_Yset hη₁).mem_ZIrr a)
+    have hvZ : v ∈ ZIrr G := by
+      rw [hv]
+      exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        hyp.dade hyp.hconj hsuppX hsrcZ
+    have he₁Z : hyp.coherentYset.extension η₁ ∈ ZIrr G :=
+      hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)
+    have haZ : (a : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+      rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem he₁Z a
+    exact add_mem hvZ haZ
 
 end SibleyDadeHypothesis
 
