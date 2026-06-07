@@ -548,25 +548,43 @@ build 3599; NOT yet AxiomsCheck-registered — deferred until the capstone consu
 **⟹ The false-`hgen` shell `coherentXunionYset_centralCommutator_of_himg_ortho` (8699) is superseded**
 (it is an unconsumed dead `def` with an unsatisfiable hypothesis; left in place, documented here).
 
-### Remaining for the capstone Frobenius branch (all hypotheses of the new shell now satisfiable)
-1. **`hmixed`** (= `himg_ortho` on the glue `ν`): the (4.1) argument
-   (`pairwise_inner_eq_zero_of_orthogonal_signedDifference`) + diff-ortho/degree-0 (landed) +
-   `n,m ≥ 2` (distinct references per member — §6.5-context fact, still the gating availability Q).
-2. **`hDτ`** (the crux / `b ≡ 0`): `ν d = τ d` for `d = χ₁−aη₁`, i.e. `τ₂χ₁ − a·τ₁η₁ = (χ₁−aη₁)^τ`.
-   This is the deep b≡0 spine (Res-decomposition → reg-char const on `Zc^#` → (6.7)
-   `peterfalvi_67_centralCommutator` → norm-bound).  **Needs `himg_ortho` first** (the spine's step-2
-   "himg-difference-orthogonality" is `⟨τ₁η₁, τ₂(χᵢ−dᵢχ₁)⟩ = 0`, an *individual* `X^τ₂⊥Y^τ₁`
-   orthogonality — exactly `himg_ortho`, NOT the supported difference-ortho leaf, since `η₁` does not
-   vanish at `1`).  So **`himg_ortho` is the shared bottleneck** for both 1 and 2.
-3. **`hgen'`** (the satisfiable generation): provable lattice fact — needs the anchors `χ₁∈X(Zc)`,
-   `η₁∈Yset` with `χ₁(1)=a|W₁|`, `η₁(1)=|W₁|`, linear independence of `X(Zc)∪Yset` irreducibles, and
-   `supp ⊆ A ⟺ degree 0` for the induced-character lattice (TI ⟹ `ℤ[X∪Y]`-combos vanish off `A` only
-   at `1`).  `D := {χ₁−aη₁}`.  No deep character theory; budget a focused lattice sub-lemma.
-4. **construct `ν`** (`exists_integralCharacterMap_glue_of_orthonormal`, L3 3a — landed) + wire the
-   capstone Frobenius branch through the new diagonal shell + L4
-   `false_of_coherentXunionYset_of_not_coherentS`.  (The ν-free diagonal shell — analogue of the
-   8699 shell constructing `ν` internally — can be added once `hDτ`/`hgen'` are in hand; with the
-   internally-glued `ν`, `hDτ(χ₁−aη₁)` reads `τ₂χ₁ − a·τ₁η₁ = (χ₁−aη₁)^τ`, i.e. the crux.)
+### ✅ `himg_ortho` DONE (2026-06-07 session 4, commit `3f486cb`) — the shared bottleneck is resolved
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius` (S08, axiom-clean): for
+`χ ∈ X(Zc)`, `η ∈ Y`, `⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  **Two findings correcting the prior pessimism:**
+- **`n,m ≥ 2` ARE available** — NOT a missing §6.5 fact.  `2 ≤ |Y|` = `two_le_Yset_ncard`;
+  `2 ≤ |X(Zc)|` from `two_le_xBaseBlock_ncard hF centralCommutator_le hXne` + `xBaseBlock_subset` +
+  `Set.ncard_le_ncard`.  So distinct references `χ'≠χ`, `η'≠η` always exist
+  (`Set.exists_ne_of_one_lt_ncard`).
+- **The degree-coefficient trick kills the divisibility/minimality/4-case subtleties.**  Take the
+  (4.1) coefficients to be the degrees themselves: `u = χ'(1)`, `v = χ(1)`.  Then
+  `u•χ − v•χ' = χ'(1)•χ − χ(1)•χ'` is an *integer* `X`-combination that is degree-`0` **for free**
+  (`χ'(1)·χ(1) − χ(1)·χ'(1) = 0`, `mul_comm`), hence supported
+  (`sMember_smulDiffSupport_of_charValue_eq`, the new two-coefficient support helper — no `χ'(1) ∣ χ(1)`
+  needed).  No need for `χ₁`-minimality or a 4-case reference split: *any* distinct `χ'`, `η'` work.
+  `pairwise_inner_eq_zero_of_orthogonal_signedDifference` then yields `⟨α,γ⟩ = 0`, conjugate symmetry
+  gives the claim.  Supporting helpers landed: `sMember_smulDiffSupport_of_charValue_eq`,
+  `Yset_apply_one` (every `Y`-member has degree `|W₁|`).
 
-**Order:** `himg_ortho` (gating both) → `hDτ` (crux spine) ‖ `hgen'` (independent lattice fact) →
+### Remaining for the capstone Frobenius branch (`himg_ortho` ✅ landed)
+1. **`hDτ`** (the crux / `b ≡ 0`): `ν d = τ d` for `d = χ₁−aη₁`, i.e. `τ₂χ₁ − a·τ₁η₁ = (χ₁−aη₁)^τ`.
+   The deep b≡0 spine (Res-decomposition → reg-char const on `Zc^#` → (6.7)
+   `peterfalvi_67_centralCommutator` → norm-bound).  **Now unblocked**: the spine's step-2
+   "himg-difference-orthogonality" `⟨τ₁η₁, τ₂(χᵢ−dᵢχ₁)⟩ = 0` is exactly `himg_ortho` (the τ₁/τ₂ being
+   `coherentYset.extension` / `Xset_centralCommutator_isCoherent_of_frobenius.extension`, the same as
+   in the new theorem).  Spine: `inner_tau_eq_inner_restrict` (reciprocity) + `himg_ortho` ⟹
+   `Res_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′` → `sumNonInflatedDegreeMulChar_of_mem` (const on `Zc^#`) →
+   `peterfalvi_67_centralCommutator` (`a∣c`) → `eq_zero_or_edge_of_dvd_of_normBound` (`b=0`).
+2. **`hgen'`** (the satisfiable generation): provable lattice fact — anchors `χ₁∈X(Zc)`, `η₁∈Yset`
+   with `χ₁(1)=a|W₁|`, `η₁(1)=|W₁|`; the degree-`0` decomposition
+   `φ = (∑cᵢχᵢ − s·χ₁) + (∑eⱼηⱼ + sa·η₁) + s·(χ₁−aη₁)` with `s = ∑cᵢdᵢ ∈ ℤ` (needs `dᵢ ∈ ℤ`, the
+   p-power degree ratio, χ₁ minimal); `supp ⊆ A ⟺ degree 0` for the induced lattice (TI).
+   `D := {χ₁−aη₁}`.  No deep character theory; focused lattice sub-lemma.
+3. **construct `ν`** (`exists_integralCharacterMap_glue_of_orthonormal`, L3 3a — landed; `hmixed`
+   reduces to the now-proven `himg_ortho`) + wire the capstone Frobenius branch through
+   `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` + L4
+   `false_of_coherentXunionYset_of_not_coherentS`.  (A ν-free diagonal shell — analogue of the old
+   8699 shell constructing `ν` internally — packages this; with the internally-glued `ν`,
+   `hDτ(χ₁−aη₁)` reads `τ₂χ₁ − a·τ₁η₁ = (χ₁−aη₁)^τ` = the crux.)
+
+**Order:** `hDτ` (crux spine, now unblocked by `himg_ortho`) ‖ `hgen'` (independent lattice fact) →
 ν-free diagonal shell + capstone wiring.  CertainType case (B) still unplanned.
