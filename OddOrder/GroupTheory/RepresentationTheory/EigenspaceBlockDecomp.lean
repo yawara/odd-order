@@ -141,6 +141,27 @@ theorem iSup_cyclicHomBlockFin_diagonal_le {epsilon : F} (hε : epsilon ≠ 0)
   rw [Fin.val_add]
   exact (Nat.mod_modEq _ _).symm
 
+/-- **`End V = ⊕_m E_m`**: the conjugation `εᵐ`-eigenspaces decompose `End V` (BG Prop 2.4(a) for
+the conjugation operator). Independence is `cyclicEigenspaceFin_iSupIndep` for `cyclicEndConj g`;
+spanning is `⨆_{i,t} E_{i,t} = ⊤` (block decomposition) since each `E_{i,t} ⊆ E_{t−i}`. -/
+theorem isInternal_cyclicEndConjEigenspaceFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} [NeZero h] [FiniteDimensional F V]
+    (hprim : IsPrimitiveRoot epsilon h)
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h)) :
+    DirectSum.IsInternal (fun m : Fin h => cyclicEndConjEigenspaceFin epsilon g m) := by
+  have hε : epsilon ≠ 0 := hprim.ne_zero (NeZero.ne h)
+  have hperiod : epsilon ^ h = 1 := hprim.pow_eq_one
+  have hspan := span_cyclicEigenspaceFinUnion_eq_top_of_isInternal hV
+  rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top]
+  refine ⟨cyclicEigenspaceFin_iSupIndep (g := cyclicEndConj g) hprim, ?_⟩
+  rw [eq_top_iff, ← iSup_cyclicHomBlockFin_eq_top hV]
+  refine iSup_le fun p => le_trans ?_ (le_iSup _ (p.2 - p.1))
+  refine cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq hε hspan hperiod ?_
+  have hp : ((p.1 + (p.2 - p.1) : Fin h) : ℕ) = (p.2 : ℕ) := by
+    rw [show p.1 + (p.2 - p.1) = p.2 by abel]
+  rw [← hp, Fin.val_add]
+  exact (Nat.mod_modEq _ _).symm
+
 open Module in
 /-- **BG Proposition 2.4(g).** For the conjugation `εᵐ`-eigenspace `E_m` on `End V`,
 `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ` where `nᵢ = dim Vᵢ`. Sandwich: each diagonal `⨆ᵢ E_{i,i+m} ≤ E_m` gives
