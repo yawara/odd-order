@@ -111,4 +111,20 @@ theorem finrank_iSup_of_iSupIndep {M : Type*} [AddCommGroup M] [Module F M]
       (LinearEquiv.ofEq _ _ (DirectSum.range_coeLinearMap (A := p)))
   rw [← e.finrank_eq, finrank_directSum]
 
+open Module in
+/-- **The `m`-diagonal of blocks** `⨆ᵢ E_{i, i+m}` has dimension `∑ᵢ nᵢ·nᵢ₊ₘ` (the right-hand side
+of BG Prop 2.4(g)). The diagonal blocks form an independent sub-family of the full block
+decomposition `isInternal_cyclicHomBlockFin`, so the finrank is additive over `i`. -/
+theorem finrank_iSup_cyclicHomBlockFin_diagonal {epsilon : F} {g : Module.End F V} {h : ℕ}
+    [FiniteDimensional F V] (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (m : Fin h) :
+    finrank F ((⨆ i, cyclicHomBlockFin epsilon g i (i + m) : Submodule F (Module.End F V)))
+      = ∑ i : Fin h,
+          cyclicEigenspaceFinDim epsilon g i * cyclicEigenspaceFinDim epsilon g (i + m) := by
+  have hindep : iSupIndep (fun i : Fin h => cyclicHomBlockFin epsilon g i (i + m)) :=
+    (isInternal_cyclicHomBlockFin hV).submodule_iSupIndep.comp
+      (f := fun i : Fin h => (i, i + m)) (fun _ _ hab => congrArg Prod.fst hab)
+  rw [finrank_iSup_of_iSupIndep _ hindep]
+  exact Finset.sum_congr rfl fun i _ => finrank_cyclicHomBlockFin hV i (i + m)
+
 end OddOrder.RepresentationTheory
