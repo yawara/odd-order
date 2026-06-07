@@ -37,7 +37,55 @@ private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : 
     P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
   exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
 
-/-! ## Lemma 10.3 / 10.5 — centralizer と normalizer (mmd gap, PDF p.87 回収) -/
+/-- **Converse of BG Lemma 4.5**: a finite `p`-group (`p` odd) of `p`-rank `≤ 1` is cyclic.
+Contrapositive of `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (a noncyclic odd
+`p`-group has a rank-`2` elementary abelian subgroup, forcing `pRank ≥ 2`). Used in Lemma 10.5. -/
+private theorem isCyclic_of_pRank_le_one {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
+    [Fact p.Prime] (hQ : IsPGroup p Q) (hodd : Odd p) (hr : pRank Q p ≤ 1) : IsCyclic Q := by
+  by_contra hnc
+  obtain ⟨E, hEea, hEcard⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hQ hodd hnc
+  have hle : Nat.log p (Nat.card ↥E) ≤ pRank Q p := le_pRank E hEea
+  rw [hEcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+  omega
+
+/-- `N_G(P) ≤ N_G(Ω₁(Z(P)))` (`Z₀ = omega1CenterInG P p`): the inner `Ω₁(Z(↥P))` is
+characteristic in `↥P` (the center is characteristic and `g ^ p = 1` is automorphism-stable),
+so `AppB.normalizer_le_normalizer_map_of_characteristic` applies. Replicates the private
+`CriticalSubgroup.omega1Center.characteristic`. Used in Lemma 10.5. -/
+private theorem normalizer_le_normalizer_omega1CenterInG (P : Subgroup G) (p : ℕ) :
+    Subgroup.normalizer (P : Set G) ≤
+      Subgroup.normalizer ((omega1CenterInG P p : Subgroup G) : Set G) := by
+  haveI hchar : (omega1OfAbelian ↥P (Subgroup.center ↥P) p
+      (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)).Characteristic := by
+    rw [Subgroup.characteristic_iff_comap_eq]
+    intro φ
+    have hcZ : ∀ g : ↥P, φ g ∈ Subgroup.center ↥P ↔ g ∈ Subgroup.center ↥P := by
+      intro g
+      rw [Subgroup.mem_center_iff, Subgroup.mem_center_iff]
+      constructor
+      · intro h h'
+        have := h (φ h')
+        rwa [← map_mul, ← map_mul, φ.injective.eq_iff] at this
+      · intro h h'
+        obtain ⟨h'', rfl⟩ := φ.surjective h'
+        rw [← map_mul, ← map_mul, φ.injective.eq_iff]
+        exact h h''
+    ext g
+    simp only [Subgroup.mem_comap, mem_omega1OfAbelian, MulEquiv.coe_toMonoidHom]
+    rw [hcZ g]
+    refine and_congr_right fun _ => ?_
+    constructor
+    · intro hpow
+      have := congrArg φ.symm hpow
+      rwa [map_pow, φ.symm_apply_apply, map_one] at this
+    · intro hpow
+      rw [← map_pow, hpow, map_one]
+  exact OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic (K := P)
+    (W := omega1OfAbelian ↥P (Subgroup.center ↥P) p
+      (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm))
+
+/-! ## Lemma 10.3 — centralizer of a 2-rank subgroup (mmd gap, PDF p.87 回収) -/
 
 /-- **BG Lemma 10.3** (mmd MISSING_PAGE, PDF p.87): `M ∈ ℳ`, `X` を `M` の `α(M)'`-部分群とし
 `r(C_{M_α}(X)) ≥ 2` なら `C_M(X) ∈ 𝒰`。 -/
@@ -46,15 +94,6 @@ theorem centralizer_isUniquelyMaximal_of_two_le_rank [Finite G] (hG : IsMinimalS
     (hXpi : Subgroup.IsPiSubgroup (alpha M)ᶜ X)
     (hr : 2 ≤ rank ↥(Subgroup.centralizer (X : Set G) ⊓ Malpha M)) :
     IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M) := by
-  sorry
-
-/-- **BG Lemma 10.5** (mmd MISSING_PAGE, PDF p.87): `p ∈ σ(M)'`, `X ∈ ℰ_p¹(G)`,
-`N_G(X) ⊆ M` なら `r_p(M) = 2`、`p` は ideal でなく、`X ⊆ A` となる `A ∈ ℰ_p²(G)` が存在する。 -/
-theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∉ sigma M)
-    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1)
-    (hN : Subgroup.normalizer (X : Set G) ≤ M) :
-    pRank ↥M p = 2 ∧ ¬ idealPrime p G ∧ ∃ A ∈ elemAbelianOfRank G p 2, X ≤ A := by
   sorry
 
 /-! ## Lemma 10.4 — α(M) の判定 (mmd MISSING_PAGE, PDF p.87) -/
@@ -260,6 +299,168 @@ private theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [
 `mulAut_smul_eq_map` of the BG `Ch1`/`Ch2` files). -/
 private theorem conjSmul_eq_map (φ : MulAut G) (H : Subgroup G) :
     φ • H = H.map (φ : G →* G) := by rw [Subgroup.pointwise_smul_def]; rfl
+
+/-- **BG Lemma 10.5** (mmd MISSING_PAGE, PDF p.87): `p ∈ σ(M)'`, `X ∈ ℰ_p¹(G)`,
+`N_G(X) ⊆ M` なら `r_p(M) = 2`、`p` は ideal でなく、`X ⊆ A` となる `A ∈ ℰ_p²(G)` が存在する。 -/
+theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∉ sigma M)
+    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1)
+    (hN : Subgroup.normalizer (X : Set G) ≤ M) :
+    pRank ↥M p = 2 ∧ ¬ idealPrime p G ∧ ∃ A ∈ elemAbelianOfRank G p 2, X ≤ A := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hXea : X.IsElementaryAbelian p := hX.1
+  have hXcard : Nat.card ↥X = p := by simpa using hX.2
+  have hXM : X ≤ M := le_trans Subgroup.le_normalizer hN
+  have hpdvdM : p ∣ Nat.card ↥M := by rw [← hXcard]; exact Subgroup.card_dvd_of_le hXM
+  have hpπ : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdM, Nat.card_pos.ne'⟩
+  have hodd : Odd p := hG.odd.of_dvd_nat (dvd_trans hpdvdM (Subgroup.card_subgroup_dvd_card M))
+  have hpα : p ∉ alpha M := fun h => hp (alpha_subset_sigma hG hM h)
+  have hr_le : pRank ↥M p ≤ 2 := by
+    by_contra h
+    exact hpα ⟨hpπ, by omega⟩
+  -- Lift `X` into `↥M` and extend to a Sylow `PM` of `↥M`; `P` = its image in `G`.
+  have hXMpg : IsPGroup p ↥(X.subgroupOf M) :=
+    IsPGroup.of_card (n := 1) (by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXM).toEquiv, hXcard, pow_one])
+  obtain ⟨PM, hXPM⟩ := hXMpg.exists_le_sylow
+  set P : Subgroup G := (PM : Subgroup ↥M).map M.subtype with hPdef
+  have hXP : X ≤ P := by
+    rw [hPdef, ← Subgroup.map_subgroupOf_eq_of_le hXM]
+    exact Subgroup.map_mono hXPM
+  have hPpg : IsPGroup p ↥P := by
+    obtain ⟨k, hk⟩ := PM.isPGroup'.exists_card_eq
+    refine IsPGroup.of_card (n := k) ?_
+    rw [hPdef, ← Nat.card_congr (Subgroup.equivMapOfInjective (PM : Subgroup ↥M) M.subtype
+      M.subtype_injective).toEquiv]
+    exact hk
+  have hPrank : pRank ↥P p = pRank ↥M p := by
+    have e : ↥(PM : Subgroup ↥M) ≃* ↥P := by
+      rw [hPdef]
+      exact Subgroup.equivMapOfInjective (PM : Subgroup ↥M) M.subtype M.subtype_injective
+    have h1 : pRank ↥P p ≤ pRank ↥(PM : Subgroup ↥M) p :=
+      pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective
+    have h2 : pRank ↥(PM : Subgroup ↥M) p ≤ pRank ↥P p :=
+      pRank_le_of_injective (f := e.toMonoidHom) e.injective
+    have h3 : pRank ↥(PM : Subgroup ↥M) p = pRank ↥M p := pRank_sylow_eq PM
+    omega
+  -- (i) `pRank = 2`: `≤ 2` from `p ∉ α`; `≥ 2` because rank `1` forces a cyclic Sylow whose
+  -- `Ω₁` is `X`, giving `N_G(P) ≤ N_G(X) ≤ M`, i.e. `p ∈ σ(M)`, contrary to `p ∉ σ(M)`.
+  have hr2 : pRank ↥M p = 2 := by
+    rcases Nat.lt_or_ge (pRank ↥M p) 2 with hlt | hge
+    · exfalso
+      have hr1 : pRank ↥P p ≤ 1 := by rw [hPrank]; omega
+      haveI : IsCyclic ↥P := isCyclic_of_pRank_le_one hPpg hodd hr1
+      haveI : Nontrivial ↥P := by
+        rw [← Finite.one_lt_card_iff_nontrivial]
+        calc 1 < p := (Fact.out : p.Prime).one_lt
+          _ = Nat.card ↥X := hXcard.symm
+          _ ≤ Nat.card ↥P := Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hXP)
+      have hWcard : Nat.card ↥(Omega (↥P) p 1) = p :=
+        OddOrder.BG.Ch1.S04.card_omega1_eq_prime_of_isCyclic hPpg
+      have hXsub : Nat.card ↥(X.subgroupOf P) = p := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXP).toEquiv, hXcard]
+      have heq : X.subgroupOf P = Omega (↥P) p 1 :=
+        cyclic_subgroup_eq_of_card_eq (by rw [hXsub, hWcard])
+      have hXeq : X = (Omega (↥P) p 1).map P.subtype := by
+        rw [← heq, Subgroup.map_subgroupOf_eq_of_le hXP]
+      have hNPX : Subgroup.normalizer (P : Set G) ≤ Subgroup.normalizer (X : Set G) := by
+        rw [hXeq]
+        exact OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+          (K := P) (W := Omega (↥P) p 1)
+      apply hp
+      rw [mem_sigma_iff]
+      exact ⟨hpπ, PM, le_trans hNPX hN⟩
+    · omega
+  have hnotideal : ¬ idealPrime p G := ((alpha_criterion hG hM).2 p Fact.out hp hr2).1
+  refine ⟨hr2, hnotideal, ?_⟩
+  -- (iii) `X ≤ A` for some `A ∈ ℰ_p²(G)`: take `A = X·Ω₁(Z(P))`.  Work inside `↥P` with
+  -- `X' = X.subgroupOf P` and `Z' = Ω₁(Z(↥P))`; then push the join `A' = X' ⊔ Z'` to `G`.
+  haveI : Nontrivial ↥P := by
+    rw [← Finite.one_lt_card_iff_nontrivial]
+    calc 1 < p := (Fact.out : p.Prime).one_lt
+      _ = Nat.card ↥X := hXcard.symm
+      _ ≤ Nat.card ↥P := Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hXP)
+  have hPrank2 : pRank ↥P p = 2 := hPrank.trans hr2
+  -- `X ≠ Ω₁(Z(P))` (else `N_G(P) ≤ N_G(X) ≤ M`, i.e. `p ∈ σ(M)`, contrary to `p ∉ σ(M)`).
+  have hXZ₀ : X ≠ omega1CenterInG P p := by
+    intro hXeqZ
+    apply hp
+    rw [mem_sigma_iff]
+    refine ⟨hpπ, PM, ?_⟩
+    have h1 := normalizer_le_normalizer_omega1CenterInG P p
+    rw [← hXeqZ] at h1
+    exact le_trans h1 hN
+  set Z' : Subgroup ↥P := omega1OfAbelian ↥P (Subgroup.center ↥P) p
+    (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm) with hZ'def
+  set X' : Subgroup ↥P := X.subgroupOf P with hX'def
+  have hX'card : Nat.card ↥X' = p := by
+    rw [hX'def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXP).toEquiv, hXcard]
+  have hX'ea : X'.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hX'card
+  have hZ'ea : Z'.IsElementaryAbelian p := omega1OfAbelian_isElementaryAbelian
+  have hX'centZ' : X' ≤ Subgroup.centralizer (Z' : Set ↥P) := by
+    intro x _
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    exact (Subgroup.mem_center_iff.mp (omega1OfAbelian_le hz) x).symm
+  have hA'ea : (X' ⊔ Z').IsElementaryAbelian p :=
+    hX'ea.sup_of_le_centralizer hZ'ea hX'centZ'
+  -- `Z' ≠ ⊥` (center of the nontrivial `p`-group `↥P` has an element of order `p`).
+  have hZ'nbot : Z' ≠ ⊥ := by
+    obtain ⟨x, -, hxc, hx1, hxp⟩ :=
+      exists_mem_omega1_center_of_normal_ne_bot (P := ↥P) hPpg (N := ⊤) top_ne_bot
+    intro hbot
+    have hxZ' : x ∈ Z' := by rw [hZ'def, mem_omega1OfAbelian]; exact ⟨hxc, hxp⟩
+    rw [hbot, Subgroup.mem_bot] at hxZ'
+    exact hx1 hxZ'
+  -- `Z' ≰ X'` (else `Ω₁(Z(P)) ≤ X`, forcing equality since both are order `p`, contra `X ≠ Z₀`).
+  have hZ'X' : ¬ Z' ≤ X' := by
+    intro hle
+    apply hXZ₀
+    have hmap : Z'.map P.subtype ≤ X := by
+      have h := Subgroup.map_mono (f := P.subtype) hle
+      rwa [hX'def, Subgroup.map_subgroupOf_eq_of_le hXP] at h
+    have hZ₀card : Nat.card ↥(Z'.map P.subtype) = p := by
+      have hdvd : Nat.card ↥(Z'.map P.subtype) ∣ p := by
+        rw [← hXcard]; exact Subgroup.card_dvd_of_le hmap
+      rcases (Nat.dvd_prime Fact.out).mp hdvd with h1 | hpp
+      · exfalso
+        apply hZ'nbot
+        refine Subgroup.card_eq_one.mp ?_
+        rwa [Subgroup.card_map_of_injective P.subtype_injective] at h1
+      · exact hpp
+    show X = omega1CenterInG P p
+    have hOmEq : omega1CenterInG P p = Z'.map P.subtype := rfl
+    rw [hOmEq]
+    exact (Subgroup.eq_of_le_of_card_ge hmap (le_of_eq (by rw [hXcard, hZ₀card]))).symm
+  have hX'lt : X' < X' ⊔ Z' := by
+    refine lt_of_le_of_ne le_sup_left (fun h => hZ'X' ?_)
+    rw [h]; exact le_sup_right
+  -- `|A'| = p²`: it is a `p`-power `≤ p²` (`pRank ↥P = 2`) and `> p` (`X' ⊊ A'`).
+  obtain ⟨k, hk⟩ := hA'ea.isPGroup.exists_card_eq
+  have hub : k ≤ 2 := by
+    have hle := le_pRank (X' ⊔ Z') hA'ea
+    rwa [hk, Nat.log_pow (Fact.out : p.Prime).one_lt, hPrank2] at hle
+  have hlb : 2 ≤ k := by
+    rcases Nat.lt_or_ge k 2 with h | h
+    · exfalso
+      interval_cases k
+      · rw [pow_zero] at hk
+        have hA'bot : (X' ⊔ Z') = ⊥ := Subgroup.card_eq_one.mp hk
+        have hX'bot : X' = ⊥ := le_bot_iff.mp (hA'bot ▸ (le_sup_left : X' ≤ X' ⊔ Z'))
+        rw [hX'bot, Subgroup.card_bot] at hX'card
+        exact (Fact.out : p.Prime).ne_one hX'card.symm
+      · rw [pow_one] at hk
+        exact absurd (Subgroup.eq_of_le_of_card_ge le_sup_left (le_of_eq (by rw [hk, hX'card])))
+          (ne_of_lt hX'lt)
+    · exact h
+  have hA'card : Nat.card ↥(X' ⊔ Z') = p ^ 2 := by rw [hk]; congr 1; omega
+  -- Push `A' = X' ⊔ Z'` to `G`.
+  refine ⟨(X' ⊔ Z').map P.subtype, ⟨hA'ea.map P.subtype_injective, ?_⟩, ?_⟩
+  · rw [Subgroup.card_map_of_injective P.subtype_injective, hA'card]
+  · calc X = X'.map P.subtype := by rw [hX'def, Subgroup.map_subgroupOf_eq_of_le hXP]
+      _ ≤ (X' ⊔ Z').map P.subtype := Subgroup.map_mono le_sup_left
 
 /-! ## Proposition 10.11(d) — commutators with `σ(M)'`-subgroups (mmd L2856) -/
 
