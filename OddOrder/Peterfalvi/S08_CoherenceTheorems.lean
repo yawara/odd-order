@@ -9680,6 +9680,67 @@ theorem peterfalvi_67_centralCommutator (hyp : SibleyDadeHypothesis G L H) [H.No
     hz hz1 hPz hconst
   rwa [hcard] at key
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.1) (6.7)-congruence for `η^{τ₁}`** (mmd 04.8 L168 → L176).  For `η ∈ Y` and `z ∈ Zc^#`,
+`Res^G_L(η^{τ₁})(z) ≡ Res^G_L(η^{τ₁})(1) (mod |H|)`.  Wires the (6.7) adapter
+`peterfalvi_67_centralCommutator` to `η^{τ₁}`: write `η^{τ₁} = ε•ξ` (`ε = ±1`, `ξ` irreducible, from
+norm `1`); unpack `ξ = ρ.character` (`ρ` irreducible).  The const-on-`Zc^#`
+(`restrict_extension_Yset_const_on_centralCommutator_of_frobenius`, transferred to `Zc.map`) is the
+adapter's hypothesis, giving `ξ(z) ≡ ξ(1) (mod |H|)`; scale by `ε` (`Cong.smul_left`) to get
+`η^{τ₁}(z) ≡ η^{τ₁}(1)`. -/
+theorem restrict_extension_Yset_charValue_cong_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      ≡ (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+        [ALGMOD (Nat.card ↥H : ℤ)] := by
+  classical
+  have hηtZ : hyp.coherentYset.extension η ∈ ZIrr G :=
+    hyp.coherentYset.extension_mem_ZIrr η (Submodule.subset_span hη)
+  have hηtnorm : ClassFunction.inner (hyp.coherentYset.extension η)
+      (hyp.coherentYset.extension η) = 1 := by
+    rw [hyp.coherentYset.extension_inner_eq η η (Submodule.subset_span hη)
+      (Submodule.subset_span hη)]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  obtain ⟨ε, ξ, hε, hηtε⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hηtZ hηtnorm
+  have hεne : (ε : ℂ) ≠ 0 := by rcases hε with rfl | rfl <;> norm_num
+  have hεint : IsIntegral ℤ (ε : ℂ) := by
+    simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
+  -- the eval identity `η^{τ₁}(g) = ε · ξ(g)`.
+  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+    intro g
+    rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
+  obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
+  haveI : ρ.IsIrreducible := hρ
+  have hzGmem : (L.subtype z) ∈ hyp.centralCommutator.map L.subtype :=
+    Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
+  have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))
+  have hψconst : ∀ w ∈ hyp.centralCommutator.map L.subtype, w ≠ 1 →
+      ρ.character w = ρ.character (L.subtype z) := by
+    intro w hw hw1
+    obtain ⟨w₀, hw₀, rfl⟩ := Subgroup.mem_map.mp hw
+    have hw₀1 : w₀ ≠ 1 := fun h => hw1 (by rw [h]; simp)
+    have hRw : (hyp.coherentYset.extension η) (L.subtype w₀)
+        = (hyp.coherentYset.extension η) (L.subtype z) :=
+      hyp.restrict_extension_Yset_const_on_centralCommutator_of_frobenius
+        hF hHnonab hp hp3 hHp hη hw₀ hw₀1 hz hz1
+    rw [← congrFun hξρ (L.subtype w₀), ← congrFun hξρ (L.subtype z)]
+    apply mul_left_cancel₀ hεne
+    rw [← hsmul (L.subtype w₀), ← hsmul (L.subtype z)]
+    exact hRw
+  have hcong := hyp.peterfalvi_67_centralCommutator hF hp hHp ρ hzGmem hzG1 hψconst
+  rw [← congrFun hξρ (L.subtype z), ← congrFun hξρ 1] at hcong
+  have hcong2 := hcong.smul_left hεint
+  simp only [← hsmul] at hcong2
+  exact hcong2
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
