@@ -428,4 +428,62 @@ theorem hasPLengthOne_of_inf_eq_bot [Fact p.Prime] {G : Type*} [Group G] [Finite
     hasPLengthOne_subgroup (hasPLengthOne_prod hH hN) _
   exact hasPLengthOne_of_mulEquiv (MonoidHom.ofInjective hinj).symm hrange
 
+/-- **`p`-length one lifts along `p'`-quotients** (the dual of BG Lemma 1.21(b); equivalently a
+consequence of Lemma 1.21(d), since `Γ/N` a `p'`-group forces all `p`-elements of `Γ` into `N`):
+if `N ⊴ Γ` with `Γ/N` a `p'`-group and `↥N` has `p`-length one, then `Γ` has `p`-length one.
+BG uses this in the `r_p ≥ 3` branch of Theorem 10.6: `M_α ⊴ M` is a Hall `α(M)`-subgroup with
+`p ∈ α(M)`, so `M/M_α` is a `p'`-group, and once `M_α` is shown to have `p`-length one, so does
+`M`.
+
+`W = O_{p',p}(↥N)` is characteristic in `↥N` (`oPiPrimePiCore` is a `comap` of characteristic
+cores), so `K = W.map N.subtype ⊴ Γ`. The image of `K` in `Γ/O_{p'}(Γ)` is the image of the
+`p`-group `W/O_{p'}(↥N)` under the quotient map induced by `N.subtype`, hence a `p`-group; by
+`le_oPiPrimePiCore_of_quotient_isPGroup`, `K ≤ O_{p',p}(Γ)`. Finally
+`[Γ : O_{p',p}(Γ)] ∣ [Γ : K]` and `[Γ : K] = [↥N : W] · [Γ : N]`, with `p` dividing neither
+factor. -/
+theorem hasPLengthOne_of_normal_pPrime_quotient [Fact p.Prime] {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Normal] (hquot : ¬ p ∣ Nat.card (Γ ⧸ N))
+    (hpl : hasPLengthOne p ↥N) : hasPLengthOne p Γ := by
+  classical
+  set Op'N : Subgroup ↥N := Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥N with hOp'N
+  set Op'Γ : Subgroup Γ := Ch03.oPiCore (({p} : Set ℕ)ᶜ) Γ with hOp'Γ
+  set W : Subgroup ↥N := Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥N with hW
+  -- `W` is characteristic in `↥N`, so `K = W.map N.subtype ⊴ Γ`.
+  haveI hWchar : W.Characteristic :=
+    Subgroup.Characteristic.comap_quotient_mk (Ch03.oPiCore.characteristic _ _)
+  set K : Subgroup Γ := W.map N.subtype with hK
+  -- Induced quotient map `ρ : ↥N/O_{p'}(↥N) → Γ/O_{p'}(Γ)`.
+  have hOp'_le : Op'N ≤ Op'Γ.comap N.subtype := by
+    rw [← Subgroup.map_le_iff_le_comap]
+    haveI : (Op'N.map N.subtype).Normal := by rw [hOp'N]; infer_instance
+    refine Ch03.Subgroup.IsPiGroup.le_oPiCore ?_
+    intro r hr
+    have hcard : Nat.card ↥(Op'N.map N.subtype) = Nat.card ↥Op'N :=
+      Subgroup.card_map_of_injective N.subtype_injective
+    rw [hcard] at hr
+    exact Ch03.oPiCore.isPiGroup _ r hr
+  set ρ : (↥N ⧸ Op'N) →* (Γ ⧸ Op'Γ) := QuotientGroup.map Op'N Op'Γ N.subtype hOp'_le with hρ
+  -- `K.map (mk' Op'Γ) = A.map ρ` where `A = W.map (mk' Op'N)` is a `p`-group.
+  have hAp : IsPGroup p ↥(W.map (QuotientGroup.mk' Op'N)) := isPGroup_map_oPiPrimePiCore
+  have himg_eq : K.map (QuotientGroup.mk' Op'Γ)
+      = (W.map (QuotientGroup.mk' Op'N)).map ρ := by
+    rw [hK, Subgroup.map_map, Subgroup.map_map]
+    congr 1
+  have himg_pg : IsPGroup p ↥(K.map (QuotientGroup.mk' Op'Γ)) := by
+    rw [himg_eq]; exact hAp.map ρ
+  have hKle : K ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) Γ :=
+    le_oPiPrimePiCore_of_quotient_isPGroup himg_pg
+  -- Index bookkeeping: `[Γ : O_{p',p}(Γ)] ∣ [Γ : K] = [↥N : W] · [Γ : N]`.
+  have hKN : K ≤ N := hK ▸ Subgroup.map_subtype_le W
+  have hsub : K.subgroupOf N = W := by
+    rw [hK, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective N.subtype_injective]
+  have hrelW : K.relIndex N = W.index := by rw [Subgroup.relIndex, hsub]
+  have hKidx : K.index = W.index * N.index := by
+    rw [← hrelW, Subgroup.relIndex_mul_index hKN]
+  have hpW : ¬ p ∣ W.index := by rw [hasPLengthOne] at hpl; exact hpl
+  have hpN : ¬ p ∣ N.index := hquot
+  have hpK : ¬ p ∣ K.index := by
+    rw [hKidx]; exact fun hd => (Nat.Prime.dvd_mul Fact.out).mp hd |>.elim hpW hpN
+  exact fun hd => hpK (dvd_trans hd (Subgroup.index_dvd_of_le hKle))
+
 end OddOrder.BG.Ch1
