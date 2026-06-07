@@ -122,7 +122,13 @@ private) 即時; 本 (c) proof = 「A∈ℰ_p²(M), A∉ℰ_p*(G) ⇒ Uniqueness
 依存総括: Prop 1.5 ✅, Cor 1.12 ✅(S01c), 最終 Uniqueness ✅, of_le_of_lt_top ✅; **未=step1 helper +
 step5 の Uniqueness corollary 特定 + max-order B**。最重・~150 行。Cor 1.12 が解決したので残るは本体組立。
 
-**🚧 進捗 (2026-06-07, uncommitted WIP in worktree)**: 10.3 の **math core 完成・compiling**。
+**✅ 10.3 DONE (2026-06-07, sorry-free + axiom-clean)**: 全 10 step 完成。`#print axioms` = 標準3つ。
+step3/7 = X の M_α/P 上共役作用 (`MulDistribMulAction.compHom`+`toMulAut`, S11 template) +
+`aInvariant_pSubgroup_le_aInvariant_sylow` / S01c `actsTrivially_of_fixes_omega1_centralizer`、
+step9 = `sylow_le_Malpha_of_mem_alpha_of_isHall`+`pRank_sylow_eq`+`pRank_le_rank`。leaf に
+`import S01c_Omega1Rigidity` 追加。以下は着手時メモ:
+
+(旧) 🚧 進捗: 10.3 の **math core 完成・compiling**。
 DONE (sorry-free): 設定 (CMX<⊤) + step1 (`exists_pRank_ge_of_pos_le_rank`) + step2 (B: log≥2,
 `exists_isElementaryAbelian_log_card_ge` を map up) + step4 (`hBU.of_le_of_lt_top`) + **step5 (難所:
 `isUniquelyMaximal_of_three_le_rank_of_lt_top` + `isUniquelyMaximal_of_le_centralizer_of_two_le_rank`)**
@@ -198,7 +204,7 @@ r(S)=2 / r(S)≥3 の場合分け、**Thm 5.3** (narrow) + Cor 10.7(b) を使い
 | `sigma_complement_rank_le_one` | 10.11(a)(b)(c) | (a) Thm 4.20+base; **(b) Prop 10.10 (spine!)**; (c)←(b) | ✗ (b)(c) が spine 待ち |
 | `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | ✅ **DONE** (eb6cc10, (c) 還元) |
 | `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | ✅ **DONE** (95a313c, **axiom-clean** sorryAx 無) |
-| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Cor 1.12 ✅(S01c)+ Prop 1.5 + Uniqueness | ⏳ 本体のみ残(PDF 87 回収+組立) |
+| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Cor 1.12(S01c)+ Prop 1.5 + Uniqueness | ✅ **DONE** (axiom-clean) |
 | `pRank_eq_two_of_normalizer_le` | 10.5 | σ-def + Lemma 4.5逆 + Ω₁(Z) + 10.4(c) | ✅ **DONE** (axiom-clean; §11 解除) |
 | `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | 要 PDF 再読込 (§10 前半) |
 | `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | 10.13 | p-群構造 | 証明回収済 (book p.79–80=PDF 92–93) |
