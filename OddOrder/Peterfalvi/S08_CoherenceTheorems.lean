@@ -10,6 +10,7 @@ import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.FixedPointFree
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
 import OddOrder.GroupTheory.SubgroupInAmbient
+import OddOrder.GroupTheory.RepresentationTheory.SylowTICongruence
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -3567,6 +3568,32 @@ theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.N
     have hcomm := (Subgroup.mem_center_iff.mp hzc) ⟨h, hh⟩
     have hcoe := congrArg (H.subtype) hcomm
     simpa using hcoe
+
+/-- **(6.7)-wiring step (c′): the ambient-`G` form `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**
+Realizes `centralizer_centralCommutator_eq` (`C_↥L(w) = H`) in `G`: an element `g ∈ L` centralizes
+`↑w` iff (as an element of `↥L`) it centralizes `w`, iff it lies in `H = C_↥L(w)`.  Hence
+`|N_G(Ĥ) ⊓ C_G(w)| = |C_L(w)| = |Ĥ|` is **constant on `Z^#`** (`N_G(Ĥ) = L`), the centralizer-card
+clause of Peterfalvi (6.7)'s `hconst`. -/
+theorem inf_centralizer_centralCommutator_map (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {w : ↥L} (hw : w ∈ hyp.centralCommutator) (hw1 : w ≠ 1) :
+    (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = H.map L.subtype := by
+  have hCH := hyp.centralizer_centralCommutator_eq hF hw hw1
+  ext g
+  rw [Subgroup.mem_inf]
+  constructor
+  · rintro ⟨hgL, hgc⟩
+    rw [Subgroup.mem_centralizer_singleton_iff] at hgc
+    refine Subgroup.mem_map.mpr ⟨⟨g, hgL⟩, ?_, rfl⟩
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff]
+    exact Subtype.ext (by simpa using hgc)
+  · intro hg
+    obtain ⟨c, hcH, rfl⟩ := Subgroup.mem_map.mp hg
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff] at hcH
+    refine ⟨c.2, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have := congrArg (L.subtype) hcH
+    simpa using this
 
 /-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
 `W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
@@ -8601,6 +8628,79 @@ theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Nor
   have hx'H : (⟨x, hxL⟩ : ↥L) ∈ H :=
     hpsub _ hQLp (Subgroup.mem_comap.mpr (by exact hx.2))
   exact Subgroup.mem_map.mpr ⟨⟨x, hxL⟩, hx'H, rfl⟩
+
+open scoped OddOrder.AlgInt in
+/-- **(6.7)-wiring capstone: Peterfalvi (6.7) specialized to the Sibley Frobenius setup.**
+
+For an irreducible `ρ` whose character is **constant on `Z^# = (Z(H) ∩ H′)^#`** (the only
+character-theoretic input, deferred to the caller — in (6.8.1) it is `η₁^{τ₁}`), the congruence
+
+`ρ.character z ≡ ρ.character 1  (mod |H|)`
+
+holds for `z ∈ Z^#`.  This discharges every structural hypothesis of `peterfalvi_67_of_odd` at
+`P := Ĥ = H.map L.subtype` (Sylow in `G` by `sylow_map_subtype_of_frobenius`, with `N_G(Ĥ) = L` by
+`normalizer_map_subtype_eq`) and `Z := centralCommutator.map L.subtype`: `hZP`, `hZnormal`
+(`Z.subgroupOf L = centralCommutator ◁ ↥L`), `hti`/`hodd` (`H^#` TI / `|L|` odd), `hPz`
+(`Ĥ ≤ C_G(z)`), and the `|C_L(·)|`-constancy clause of `hconst` (both sides `= |Ĥ|` by
+`inf_centralizer_centralCommutator_map`).  The modulus `|Ĥ| = |H|` via `card_map_of_injective`. -/
+theorem peterfalvi_67_centralCommutator (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V) [ρ.IsIrreducible]
+    {z : G} (hz : z ∈ hyp.centralCommutator.map L.subtype) (hz1 : z ≠ 1)
+    (hψconst : ∀ w ∈ hyp.centralCommutator.map L.subtype, w ≠ 1 →
+        ρ.character w = ρ.character z) :
+    ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥H : ℤ)] := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  classical
+  obtain ⟨Q, hQeq⟩ := hyp.sylow_map_subtype_of_frobenius hF hp hHp
+  have hNorm : Subgroup.normalizer ((Q : Subgroup G) : Set G) = L := by
+    rw [hQeq]; exact hyp.normalizer_map_subtype_eq
+  have hcard : Nat.card (Q : Subgroup G) = Nat.card ↥H := by
+    rw [hQeq]; exact Subgroup.card_map_of_injective L.subtype_injective
+  -- structural hypotheses of `peterfalvi_67_of_odd`
+  have hZP : hyp.centralCommutator.map L.subtype ≤ (Q : Subgroup G) := by
+    rw [hQeq]; exact Subgroup.map_mono hyp.centralCommutator_le
+  have hZnormal : ((hyp.centralCommutator.map L.subtype).subgroupOf
+      (Subgroup.normalizer ((Q : Subgroup G) : Set G))).Normal := by
+    rw [hNorm,
+      show (hyp.centralCommutator.map L.subtype).subgroupOf L = hyp.centralCommutator from
+        Subgroup.comap_map_eq_self_of_injective L.subtype_injective _]
+    exact hyp.centralCommutator_normal
+  have hti : OddOrder.GroupTheory.IsTISubset (((Q : Subgroup G) : Set G) \ {1})
+      (Subgroup.normalizer ((Q : Subgroup G) : Set G)) := by
+    rw [hNorm, show ((Q : Subgroup G) : Set G) \ {1} = sharpImage H by rw [hQeq]; rfl]
+    exact hyp.H_sharp_ti
+  have hodd : Odd (Nat.card (Subgroup.normalizer ((Q : Subgroup G) : Set G))) := by
+    rw [hNorm]; exact hyp.card_L_odd
+  have hPz : (Q : Subgroup G) ≤ Subgroup.centralizer ({z} : Set G) := by
+    rw [hQeq]
+    obtain ⟨w', hw', hw'z⟩ := Subgroup.mem_map.mp hz
+    have hw'zc : (w' : G) = z := hw'z
+    have hw'1 : w' ≠ 1 := fun h => hz1 (hw'zc ▸ OneMemClass.coe_eq_one.mpr h)
+    have hbr := hyp.inf_centralizer_centralCommutator_map hF hw' hw'1
+    rw [hw'zc] at hbr
+    rw [← hbr]; exact inf_le_right
+  have hconst : ∀ ⦃w : G⦄, w ∈ hyp.centralCommutator.map L.subtype → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({z} : Set G)) := by
+    intro w hw hw1
+    refine ⟨hψconst w hw hw1, ?_⟩
+    obtain ⟨w', hw'cc, hw'w⟩ := Subgroup.mem_map.mp hw
+    have hw'wc : (w' : G) = w := hw'w
+    have hw'1 : w' ≠ 1 := fun h => hw1 (hw'wc ▸ OneMemClass.coe_eq_one.mpr h)
+    obtain ⟨z', hz'cc, hz'z⟩ := Subgroup.mem_map.mp hz
+    have hz'zc : (z' : G) = z := hz'z
+    have hz'1 : z' ≠ 1 := fun h => hz1 (hz'zc ▸ OneMemClass.coe_eq_one.mpr h)
+    rw [hNorm, ← hw'wc, ← hz'zc, hyp.inf_centralizer_centralCommutator_map hF hw'cc hw'1,
+      hyp.inf_centralizer_centralCommutator_map hF hz'cc hz'1]
+  have key := OddOrder.RepresentationTheory.peterfalvi_67_of_odd ρ Q hZP hZnormal hti hodd
+    hz hz1 hPz hconst
+  rwa [hcard] at key
 
 end SibleyDadeHypothesis
 
