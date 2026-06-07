@@ -1,0 +1,112 @@
+# BG Theorem 3.6 形式化プラン (§3 p-length-one サブプログラム, 2026-06-07)
+
+worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由) として着手。
+**Thm 3.6 は単独定理でなく §3 サブツリーの頂点**である。下から積む。
+
+## Thm 3.6 (mmd L955)
+
+「`G` 可解奇数位数, `H ⊴ G` normal Hall, `R` を `H` の補群, `R₀ ≤ R` prime order `r` で
+`C_H(R₀)` が Z-群。任意素数 `p` で `[H,R]` は p-length one」。
+証明 = 最小反例法、~4 ページ、equation (3.6)–(3.38)。
+
+### 証明フェーズ (equation 番号)
+- **Phase A 還元** (3.6)–(3.11): `H=[H,R]` (3.6); 商帰納 (3.7); `O_{p'}(H)=1` (3.8, **Lem 1.21(b)**);
+  `V=F(H)=O_p(H)` elementary abelian (3.9, **Lem 1.21(c)** + Lem 1.7/Thm 1.8/Prop 1.3); `C_H(V)=V`
+  (3.10, Prop 1.3); `V` に唯一の minimal normal (3.11, **Lem 1.21(e)**)。
+- **Phase B 補群 K の構造** (3.12)–(3.16): `U=preimage F(H/V)`, `K`= R-不変補群 (Prop 1.5a + S-Z);
+  Frattini で `H=VN_H(K)` (3.12); `[K,P]≠1` (3.13); `[V,K]=V, C_V(K)=1` (3.14, Prop 1.6d + 3.11);
+  `K=F(N_H(K))` (3.15); `C_H(K)⊆K` (3.16, Prop 1.3)。
+- **Phase C R₀ の作用** (3.17)–(3.21): `[K,R₀]≠1` (3.17, Prop 1.4); `C_{KR₀}(V)=1` (3.18);
+  `C_V(R₀)≠1` ⟸ **Thm 3.4** (3.18→faithful→[K,R₀]=1 矛盾); `|C_V(R₀)|=p` (3.19, Z-群); `C_P(R₀)=1`
+  (3.20, Z-群); `P=[P,R₀]` (3.21, Prop 1.6a)。
+- **Phase D G の構造確定** (3.22)–(3.31): 最小性帰納で `[X,P]=1 (X=X^{PR}⊂K)` (3.22); `G=VKPR₀`,
+  `H=VKP, R=R₀` (3.23); `K=[K,P]` (3.24, Prop 1.6b); `K` は special q-群 (**Gorenstein 5.3.7**)
+  + `C_{K/K'}(P)=1` (3.25); `K` exp q (3.26, Thm 1.13); `C_{PR}(K)=1` (3.28); `C_{PR}(K/K')=1`
+  (3.29, Thm 1.8); `C_{K/K'}(R)≠1` (3.30, **Thm 3.4**); `|C_K(R)|=q, C_K(R)∩K'=1` (3.31, Z-群 + 3.26)。
+- **Phase E K elementary abelian** (3.32)–(3.37): `K≠[K,R]` (3.32); `C_{[K,R]}(R)=1` (3.33);
+  `[K,R]R` Frobenius (Lem 3.1); **Thm 3.5** で `[K,R]` abelian (3.34); `[K,R]` not P-invariant
+  (3.35); `|K:Z(K)|≤q` ⟸ **Thm 2.6(a)** (✅) ⟹ `K` elem abelian (3.36); `|K|>q²` (3.37, Thm 2.6)。
+- **Phase F 最終矛盾** (3.38–): `V=⊕V_i` (V_i=C_V(K_i)≠1, index-q K_i; **Prop 1.16** ✅);
+  `RP` transitive on {V_i} (3.11); orbit 長さ解析 + `|V_1|=p` (3.19) + parity (n odd vs even) で矛盾。
+
+## 依存サブツリーと状態
+
+| 依存 | mmd | 状態 | 備考 |
+|---|---|---|---|
+| **Lem 1.21(a)** | L566 | ✅ | `hasPLengthOne_subgroup` (= p-length 部分群単調性, **10.6 でも必要**) |
+| **Lem 1.21(b)** | L567 | ✅ | `hasPLengthOne_of_isPiPrime_normal_quotient`。(3.8) で使用 |
+| **Lem 1.21(c)** | L568 | ✅ | `hasPLengthOne_of_isPGroup_normal_quotient`。(3.9) |
+| **Lem 1.21(d)** | L569 | — bypass | `⟨p-elements⟩` 特徴づけ。(e) を product-core 経由にしたので不要 |
+| **Lem 1.21(e)** | L570 | ✅ | `hasPLengthOne_of_inf_eq_bot`。(3.11)。product 埋め込み + (a) |
+| **Thm 3.4** | L863 | ❌ 未 (本体) | 可解奇 G, normal Hall K + prime-order 補群 R, V 上 (char∤\|G\|), `C_V(R)=0 ⇒ [R,K]⊆C_K(V)`。reduction は Maschke/Prop1.5/Lem3.1/Lem3.3 で組める。**真の残り = BG §2 (Thm 2.5)**、Gorenstein 系は下記の通り被覆済 |
+| **Thm 3.5** | L903 | ❌ 未 | Frobenius G=KR (K 可解, R cyclic prime), V 上, `C_V(R) 1-dim ⇒ K'⊆C_K(V)`。Clifford/Maschke/Wedderburn/Prop2.2/Lem3.3 |
+| **Lem 3.3** | L845 | ✅ | S03b_Lemma33 `kernel_acts_trivially_of_centralizer_eq_bot` 等 |
+| **Lem 3.1** | — | ✅ | S03 `isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot` |
+| **Gorenstein 5.3.7** (BG 番号; = 当 ed. **Gor 3.7/3.8/3.10**) | — | ✅ **被覆済** | coprime minimal 作用 ⇒ special + irred on K/K' + trivial K'。`S04e_GorThm37.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality` (sorry-free, AxiomsCheck:1250)。BG 3.4 では K に適用 (existence-of-minimal → K=Q bridge は §3.4 内部) |
+| **Gorenstein 3.2.2** (Z(G) cyclic) | — | △ ほぼ被覆 | faithful irreducible ⇒ Z(G) cyclic。ℂ 版 machinery = Isaacs CTFG Cor 2.30 `SchurCenterBound.lean` (`exists_central_scalar` 他, sorry-free)。一般体 F 版 capstone = Schur→`Module.End` division ring + mathlib `isCyclic_of_subgroup_isDomain` で短い追加 |
+| **BG Thm 2.5** (+ Prop 2.1/2.2/2.4, Gor 5.5.4-5) | L716 | ❌ 未 (真の frontier) | extraspecial+cyclic faithful irred の最終矛盾。**Isaacs FGT 不在 = BG 自前 §2 表現論**(cross_refs §5 L134)。S02 は docstring stub (2.6 のみ ✅)。**Thm 3.4 完成の本丸はここ**(Gorenstein でなく BG §2) |
+| §1 Prop1.3/1.4/1.5/1.6/1.7/1.8/1.13/1.16, Thm2.6 | — | ✅ (要再確認) | S01_Solvable / S01b_Prop116 / S02_Representations (使用時に各個検証) |
+| special q-group def `IsSpecial` | — | ✅ def | GroupTheory/IsExtraspecial.lean:84 |
+
+## 推奨着手順序 (bottom-up)
+
+1. **Lem 1.21** (新ファイル `OddOrder/BG/Ch1_Preliminary/PLength.lean` 拡張 or `S01d_Lemma121.lean`)。
+   自己完結 (oPiPrimePiCore/oPiCore 商対応 API は S06 に precedent: 第3同型 + `oPiCore_compl_le_oPiPrimePiCore` +
+   `oPiPrimePiCore_eq_oPiCore_of_compl_bot`)。**(a)=10.6 でも再利用**。順序 (a)(b)(c) → (d) → (e)。
+2. **Thm 3.4** (S03 新ファイル)。表現論。Lem 3.3 (✅) を使う。
+3. **Thm 3.5** (S03 新ファイル)。Clifford/Maschke/Wedderburn が要 (mathlib `Representation`/`Module` + 既存 S02)。最重量。
+4. **Gorenstein 5.3.7** (special q-群)。`references/gorenstein/finite-groups.{pdf,mmd}` 参照。
+5. **Thm 3.6 本体** (S03 新ファイル `S03d_Thm36.lean`)。Phase A–F を組む。
+
+## メモ
+- Thm 3.6 は 10.6 の r_p≥3 ケースのエンジン。10.6 はさらに Lem 10.4(b) (lane A1) も要 ([[s10_spine_blockers]])。
+- Lem 1.21(a) を landing すれば 10.6 の reduction (H≤M⇒) が解け、10.6 は「easy case 完成 + hard case=Thm3.6+10.4b」に縮む。
+- このセッションの成果: 10.14(d) landing (f21eb12) + スパイン/§3 ブロッカー精査。
+
+## Lemma 1.21 着手状況 (2026-06-07)
+
+ファイル `OddOrder/BG/Ch1_Preliminary/PLengthTransfer.lean` (新規)。**(b)(c) + 全 infra 完了 (sorry-free)**。
+
+**✅ Landed (sorry-free):**
+- `card_quotient_oPiPrimePiCore_eq` / `hasPLengthOne_iff_card_quotient` (`4a9bf08`): 第3同型 bridge
+  `|G/O_{p',p}(G)| = |(G/O_{p'}(G))/O_p(…)|`。(a)–(e) 共通の出発点。
+- `oPiCore_quotient_eq_of_isPiGroup` (`db0a10d`): **汎用 engine** — `H ⊴ G` が π-群 ⇒
+  `O_π(G/H) = O_π(G).map mk'` (`|N|=|H|·|Kbar|` + `primeFactors_mul` + `IsPiGroup.le_oPiCore`)。(b)=π{p}ᶜ, (c)=π{p}。
+- **(b)** `hasPLengthOne_of_isPiPrime_normal_quotient` (`1179617`): normal `p'` 商。
+- `oPiPrimePiCore_eq_oPiCore_of_compl_bot` (`6a7a705`, S06 private を §1 layering 維持で再証明)。
+- **(c)** `hasPLengthOne_of_isPGroup_normal_quotient` (`6a7a705`): normal `p` 商 + `O_{p'}(G/H)=1`。
+
+**(a) 用 building block 4つ landed (sorry-free, overnight loop 2026-06-07):**
+- `le_oPiPrimePiCore_of_quotient_isPGroup` (`2ffd94a`): `K⊴G`, `K.map(mk' O_{p'}(G))` p-群 ⇒ `K ≤ O_{p',p}(G)`。
+- `isPGroup_map_oPiPrimePiCore` (`aa64421`): `O_{p',p}(G).map(mk' O_{p'}(G))` は p-群 (=`O_p(G/O_{p'}(G))`)。
+- `oPiCore_compl_subgroupOf_le` (`885f8ca`): `(O_{p'}(G)).subgroupOf H ≤ O_{p'}(↥H)`。
+- `isPGroup_inf_map_oPiPrimePiCore` (`3b841e9`): `(O_{p',p}(G)⊓H).map(mk' O_{p'}(G))` は p-群。
+
+**✅ (a) DONE** `hasPLengthOne_subgroup` (`2271b55`, crux `oPiPrimePiCore_subgroupOf_le` = `5aeb6f0`):
+`hasPLengthOne p G ⇒ hasPLengthOne p ↥H`。crux は `A=O_{p',p}G⊓H` からの 2 hom `gA`(→G/O_{p'}G, range=p群)
+/`fA`(→↥H/O_{p'}↥H, range=K.map mk') で `ker gA ≤ ker fA` (`oPiCore_compl_subgroupOf_le`) ⇒ `quotientKerEquivRange`
++`index_dvd_of_le` で `|range fA| ∣ |range gA|`=p冪 ⇒ IsPGroup ⇒ `le_oPiPrimePiCore_of_quotient_isPGroup`。
+最終 index 鎖は `index_dvd_of_le` + `relIndex_dvd_index_of_normal` (O_{p',p}G normal)。**(a) は Thm 10.6 の H≤M reduction を解く**。
+
+**✅ Lemma 1.21 完了: (a)(b)(c)(e) すべて sorry-free + axiom-clean。(d) は bypass (不要)。**
+PLengthTransfer.lean を `OddOrder.lean` root に配線済 (full build 3587 + AxiomsCheck allowlist OK)。
+
+(e) は product 埋め込み経由で landing (2026-06-07, この章の最終チャンク):
+- ✅ `oPiCore_prod` (`ee73dac`): `O_π(A×B) = O_π A ×' O_π B`。product 段の土台。
+- ✅ **(e)-1 iso 不変** `hasPLengthOne_of_mulEquiv (e : G ≃* G')`: bridge の double quotient を
+  `QuotientGroup.congr` + `oPiCore.map_eq_of_mulEquiv` で O_{p'}/O_p の 2 段 transport ⇒ `Nat.card` 不変。
+- ✅ **(e)-2 product 商 iso** `quotientProd_mulEquiv : (A×B)/(H ×' K) ≃* (A/H)×(B/K)`:
+  `quotientKerEquivOfSurjective (prodMap (mk' H)(mk' K))` (`ker_prodMap`+`ker_mk'`) + `quotientMulEquivOfEq`。
+- ✅ **(e)-3 `hasPLengthOne_prod`** A,B plen1 ⇒ A×B plen1: double quotient を (e)-1/(e)-2/`oPiCore_prod` で
+  `DQ(A×B) ≃* DQ(A)×DQ(B)` に分解 ⇒ `Nat.card_prod` + `Nat.Prime.dvd_mul`。
+- ✅ **(e) 本体** `hasPLengthOne_of_inf_eq_bot`: `(mk' H).prod (mk' N) : G →* (G/H)×(G/N)`,
+  `ker = H⊓N = ⊥` (`ker_prod`) ⇒ injective ⇒ `MonoidHom.ofInjective` で `G ≃* range`;
+  `hasPLengthOne_prod` + `hasPLengthOne_subgroup` (=1.21a) + (e)-1 iso 不変。
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}` は (e) 近道で回避 (不要)。Thm 3.6 (3.11) は (e) を cite。
+
+**Thm 3.6 残ブロッカー (1.21 完成済, ここから本丸)**: **Thm 3.4** (L863) + **Thm 3.5** (L903)
+= 表現論 (Clifford/Maschke/Wedderburn, 最重量) + **Gorenstein 5.3.7** (special q-群)。
+
+**進捗ログ**: overnight loop (`4a9bf08`..`3b841e9`, 7 commits: foundation+(b)+(c)+(a) building block 4つ)、
+朝 attended (`5aeb6f0` crux + `2271b55` (a) 完成)、(e) landing (このセッション: (e)-1〜本体 4 補題 +
+root 配線)。**Lemma 1.21 全完。次 = Thm 3.4 着手** (S03 表現論新ファイル, Lem 3.3 ✅ を使う)。

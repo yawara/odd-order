@@ -149,6 +149,9 @@ BG §1-§16 で書かれた "Theorem X.Y" の Gorenstein 引用を、Isaacs に�
 | BG 出現箇所 | Gorenstein | repo 定理 (確認済み, file:line) | 内容 |
 |---|---|---|---|
 | §7 Prop 7.5 proof (mmd L2272) | **G 2.6.4** (p.31) | `Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial` (`OddOrder/Isaacs/Ch01_Sylow/Main.lean:355`) | 有限 p-群の非自明正規部分群は中心と非自明に交わる (`1≠N⊴P ⟹ N⊓Z(P)≠1`) |
+| §3 Thm 3.4 proof (mmd L893) | **G 5.3.7** (p.181; = 当 ed. Gor 3.7/3.8/3.10, finite-groups.mmd L3850/3866/4228) | `BG.Ch1.S04.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality` (`OddOrder/BG/Ch1_Preliminary/S04e_GorThm37.lean:626`, sorry-free, AxiomsCheck:1250) | coprime minimal 作用 ⇒ special exp-p + A irred on Q/Q' + ψ trivial on Q'。**版で番号違い (BG=1st ed 5.3.7, repo=Gor 3.7)** ゆえ「5.3.7 未形式化」と即断しないこと |
+| §3 Thm 3.4 proof (mmd L884) | **G 3.2.2** (p.64) | ℂ版: `RepresentationTheory.SchurCenterBound` (`OddOrder/GroupTheory/RepresentationTheory/SchurCenterBound.lean`, = Isaacs CTFG Cor 2.30, sorry-free)。一般体 F の `IsCyclic (center G)` capstone は未 (Schur→`Module.End` division ring + mathlib `isCyclic_of_subgroup_isDomain` で短い) | faithful irreducible ⇒ Z(G) cyclic |
+| §2 Thm 2.5 proof (mmd L756) | **G 5.5.4-5.5.5** (extraspecial faithful irred は center で決定, dim=p^n) | ❌ 未 — Isaacs FGT 不在の **BG 自前 §2 表現論** (§5 L134)。新規 module 要 (Thm 2.5 本体と一体) | extraspecial 既約表現の構造 |
 
 **運用ルール**: 後続節の proof を Lean 化中に "**G** X.Y.Z" を見たら — (1) §5 + 本 §5b を引く、(2) 無ければ `OddOrder/Isaacs` `OddOrder/GroupTheory` + mathlib を grep (新規形式化と即断しない)、(3) `references/gorenstein/finite-groups.mmd` を読むのは Isaacs が真に欠く場合のみ (ZJ / p-stability / critical subgroup — いずれも形式化済)、(4) 解決した対応は本表に追記して次回の引きどころにする。詳細は memory `bg-gorenstein-reread-as-isaacs`。
 

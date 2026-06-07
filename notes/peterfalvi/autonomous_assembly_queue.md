@@ -1,7 +1,16 @@
 # Peterfalvi (6.8) X-family coherence — 自走 assembly queue
 
+> 🛑🛑 **2026-06-07 BLOCKER — このキューの producer recipe は無効。自走するな。**
+> (6.8) capstone の X-coherence producer (`hstepData`) は、現状の `Z = ⁅H,H⁆` 指定では
+> **正直に構築不能** (step-data の `hθsq_le_qtot : θχ² ≤ qtot` が充足不能)。Peterfalvi (6.6) は
+> **`Z ⊆ Z(K)` 中心**を要求 (Cor 2.30)、(6.8) は **`Z = Z(H)∩H′` 中心**を使う。`⁅H,H⁆` は
+> 中心でない (class≥3 p-群、反例 `UT(4,p)`: 次数 `p²` の既約, `|H:H′|=p³`, `p⁴>p³`)。
+> 詳細・正しい再設計 (中心 `Zc` + (6.8.3) 拡張) は **[s08_6_8_blocker_central_Z.md](s08_6_8_blocker_central_Z.md)**。
+> 下の「producer recipe」「building blocks 完備」節は **この欠陥を見落とした楽観記録**。実行しないこと。
+
 **正本** (context 圧縮されても自走ターンはこのファイルを読んで従う). 2026-06-04 設定.
 状況: crux1 hard core 完了 (notes/peterfalvi/s08_6_8_assembly_plan.md §J.3.5). 残 = 最終 assembly (§J.3.6).
+~~状況~~ **訂正 (2026-06-07)**: 「残=最終 assembly」は誤り。残は §8 capstone の**再設計** (上記 BLOCKER)。
 
 ## 不変則 (毎ターン厳守)
 
