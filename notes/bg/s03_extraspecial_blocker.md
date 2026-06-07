@@ -83,10 +83,26 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
   `commutator_eq_center`; the even-rank fact may itself be a sub-leaf — check mathlib
   `GroupTheory`/symplectic for `extraspecial card`.)
 
-## Then Steps 3-5 (unchanged shape, see `s03_loop_task_extraspecial.md`)
-- Step 3 Prop 2.2(a) alg-closed (Clifford `V_K = M`) — `Clifford.lean` is ℂ; build alg-closed facts new.
-- Step 4 Thm 2.5 (`h | qⁿ ± 1`, `C_V(H)=0 ⟹ h = qⁿ+1`) via Prop 2.4(j)(k) + base-change (2.9).
-- Step 5 Thm 3.4 body (`S03d_Thm34.lean`).
+## Then Steps 3-5 — the assembly phase (LARGER than "routine"; ~4 substantial leaves)
+**Recon (2026-06-07, iter 6): Thm 2.5 needs TWO unbuilt pieces beyond the done core, plus assembly.**
+- **Prop 2.4(g)(h)(j)(k) — NOT built** (`EigenspaceUnderCyclicAction.lean` has only (a)(c)(d)(e)!).
+  Thm 2.5's divisibility output `h | qⁿ ± 1` is exactly Prop 2.4(j). Need to add, building on the
+  existing `cyclicEndConjEigenspace` (= `E_m`), `cyclicHomBlockFin` (= `E_{i,t}`),
+  `finrank_cyclicHomBlockFin` (= (d) `dim E_{i,t} = n_i n_t`), internal-direct-sum (= (c)):
+    - (f) `E_m = ⊕_{t-i≡m} E_{i,t}`  [from (c)+(e), the `..._of_modEq` inclusion is there];
+    - (g) `dim E_m = ∑_i n_i n_{i+m}`  [from (d)+(f)];
+    - (h) `2 dim E_0 − 2 dim E_m = ∑_i (n_i − n_{i+m})²`  [(g) + periodicity `n_i = n_{i+h}`];
+    - (j) hyp `dim E_0 = dim E_m + 1 ∀ m≢0` ⟹ `∃ n δ=±1, q = hn+δ`  [elementary: `∑(n_i−n_{i+m})²=2`
+      analysis, BG mmd L696-712]; (k) the `C_V(H)=0 ⟹ h=q+1` corollary. General field; ~150-250 LOC.
+- **Prop 2.2(a) alg-closed (Clifford `V_K = M`) — NOT built**; `Clifford.lean` is ℂ. Real Clifford
+  theory over alg-closed F (M irred H-module, H◁G, M≅M^x, G/H cyclic ⟹ V_H irreducible = M).
+- **Thm 2.5 assembly**: base-change (2.9 ✅) → reduce to alg-closed faithful irred → Prop 2.2(a) `V_P=M`
+  → Gor 5.5.5a `(dim V)²=|P/Z|` (✅) + Burnside `E(P)=End` (✅) ⟹ coset reps are a basis (BG (2.11))
+  → H-conjugation on `E(P)` is principal + `(q²−1)/h` regular (uses Prop 1.5 `C_{P/Z}(x)=1`) → Prop 2.4(j)(k)
+  ⟹ `h | qⁿ±1` (with `q := dim V`). Big interconnected proof.
+- **Thm 3.4** (`S03d_Thm34.lean`): Maschke → faithful irred → Gor 5.3.7 (✅ `S04e`) → elem-abelian case
+  (Frobenius/Lem 3.1/3.3 ✅) / special case (Thm 2.5) → contradiction `h` even vs odd.
+- Prop 1.5 (`C_{P/Z}(x)=1`): check `S01_Solvable` / Isaacs; small if present.
 
 ## Bottom line
 The rep-theory tower is **NOT** the multi-session mathlib-gap build the AM blocker feared. Both hard
