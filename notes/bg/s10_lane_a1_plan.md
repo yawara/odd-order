@@ -62,12 +62,55 @@ worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE
   `map_normalizer_eq_of_bijective`, `AppB.normalizer_le_normalizer_map_of_characteristic`,
   `inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl`。
 
-### 残り §10 leaves (要 PDF 再読込, offset `book = PDF − 13`)
+### 残り §10 leaves: 証明回収済 + 依存マップ (2026-06-07, Nougat `-p N --no-skipping` 再OCR)
 
-10.3 (`centralizer_isUniquelyMaximal_of_two_le_rank`), 10.5 (`pRank_eq_two_of_normalizer_le`),
-10.4 (`alpha_criterion`), 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) が残 sorry。
-いずれも旧 MISSING_PAGE で §10 前半 (≈book p.76 以前 = PDF ≤88) or p.79–80 (10.13) を要読込。
-10.3/10.5 は Uniqueness 系で 10.12 と部品共通、10.13 は §5 narrow p-群構造。
+旧 MISSING_PAGE を全回収。10.3/10.4 = **PDF 87 (book p.74)**, 10.5 proof = mmd L2767-2774 (既存),
+10.13 = **PDF 92-93 (book p.79-80)**。以下、原文証明と Lean 形式化の依存。
+
+#### ✅ 10.4 `alpha_criterion` DONE (commit `cd5e10b`, axiom-clean) — scaffold バグ修正済
+
+statement を本 10.4(a)(c) (`p∉σ(M)` 版) に修正 + 証明。`#print axioms` = 標準3つ (sorryAx 無)。
+`sylow_le_derived_of_mem_sigma` を public 化、`sylow_subgroupOf_of_le` を leaf 先頭へ移動 (10.5/10.12 共有)。
+以下は修正前の経緯記録:
+
+#### ⚠⚠ (経緯) `alpha_criterion` (10.4) の旧 Lean statement は **原文と不一致 (scaffold バグ)**
+
+回収した **本 Lemma 10.4**: (a) `p ∣ |M/M'| ⇒ p∉σ(M)`; (b) `p∉σ(M), M_α≠1 ⇒ ∃x∈Ω₁(Z(P))#:
+ℳ(C_G(x))≠{M} ∧ C_{M_α}(x) Z-group` (Lean は省略); (c) `p∉σ(M), r_p(M)=2 ⇒ p not ideal ∧
+ℰ_p²(M)⊆ℰ_p*(G)`。**Lean `alpha_criterion` は (a) を `p∉α(M)` (弱い; α⊆σ で従う) に、(c) の仮定を
+`p∈α(M)` に誤記**。`p∈α(M)` は `3≤pRank` を含むので `pRank=2` と矛盾 → **Lean (c) は vacuous**
+(p∈α ∧ pRank=2 から False を出せば sorry-free に「証明」できてしまうが中身ゼロ)。
+`alpha_criterion` は **downstream 未使用** (grep 確認済) なので、**statement を本 10.4(a)(c) に修正
+(`p∉σ(M)` 版) してから証明するのが正しい**。修正せず vacuous proof で埋めるのは scaffold-sorry-free
+≠ proved の典型的な罠なので避ける。本 (a) proof = Thm 10.2(c) (`sylow_le_derived_of_mem_sigma`,
+private) 即時; 本 (c) proof = 「A∈ℰ_p²(M), A∉ℰ_p*(G) ⇒ Uniqueness で A∈𝒰 ⇒ N_G(P)⊆M ⇒ p∈σ 矛盾」。
+
+#### 10.3 `centralizer_isUniquelyMaximal_of_two_le_rank` (statement OK, 本と一致)
+
+本 proof (PDF 87): r_p(C_{M_α}(X))≥2 な p, B∈ℰ_p(C_{M_α}(X)) max order。X は M_α を coprime に
+正規化 → **Prop 1.5** (`Ch04.exists_aInvariant_sylow`) で X が B⊇ な M_α の Sylow p `P` を正規化。
+B∉𝒰 と仮定 → Uniqueness で r(C_P(B))≤2 → |B|=p² ∧ Ω₁(C_P(B))=B⊆C_P(X) → **Cor 1.12** (要特定:
+coprime + Ω₁ 固定 ⇒ 全固定の剛性) で C_P(X)=P → r(C_M(X))≥r(P)≥3 (p∈α) → Uniqueness で 𝒰。
+依存: `exists_aInvariant_sylow`, **Cor 1.12 (未特定)**, uniquenessTheorem, α-rank, max-order B。中規模。
+
+#### 10.5 `pRank_eq_two_of_normalizer_le` (statement OK; **§11 Hyp 11.1 を解除する高価値**)
+
+本 proof (mmd L2767-2774, 既存): α⊆σ ⇒ p∉α ⇒ r_p(M)≤2。P=Sylow p of M ⊇X。r_p=1 なら
+**Lemma 4.5** で P cyclic → X=Ω₁(P), N_G(P)⊆N_G(X)⊆M ⇒ p∈σ 矛盾 → r_p(M)=2。X≠Ω₁(Z(P)) ⇒
+A:=XΩ₁(Z(P))∈ℰ²(P)⊆ℰ_p²(G) ∋X。p not ideal = **本 10.4(c)**。
+依存: `alpha_subset_sigma`, Lemma 4.5 (r_p=1⇒cyclic, **未特定** — 逆向き `exists_..._not_isCyclic_of_two_le_pRank`
+は有), σ-intro (N_G(Sylow)⊆M ⇒ p∈σ; `mem_sigma_iff` 逆), Ω₁(Z(P)) of cyclic, **10.4(c)**, idealPrime def。
+
+#### 10.13 `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` (statement OK)
+
+本 proof (PDF 92-93): S⊇P Sylow p of G, Z₁=Ω₁(Z(S))。(10.4)(10.5)(10.6) 経由で
+r(S)=2 / r(S)≥3 の場合分け、**Thm 5.3** (narrow) + Cor 10.7(b) を使い C_S(A)=A₀×Y (Y cyclic)。
+(c): x∈N_P(A)−C_P(A) が位数 p の自己同型を誘導、Z₀ 中心化 → A の p-部分群を transitive 置換。
+依存: §5 narrow p-群構造 (Thm 5.3, Cor 10.7(b)), Ω₁(Z(·)), ℰ¹/ℰ² API。§5 重め。
+
+**総括**: 4 leaf とも原文回収済・依存マップ済だが、各 100-200 行規模の本格証明 (+ 10.4 は statement 修正要)。
+着手順推奨: 10.4 (statement 修正 + 短い proof) → 10.5 (10.4(c) 利用, §11 解除) → 10.3 (Cor 1.12 特定後) →
+10.13 (§5 重)。Cor 1.12 と Lemma 4.5 (cyclic) の repo 内特定が次の前提作業。
 
 ## ⚠ 依存の実態 (BG 原文を読んで判明 — 当初の docstring ベース map は楽観的すぎた)
 
