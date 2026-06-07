@@ -105,9 +105,16 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
   m-diagonal sub-family of (c)) → `iSup_cyclicHomBlockFin_diagonal_le` (`⨆ᵢ E_{i,i+m} ≤ E_m`) →
   the dimension sandwich (E_m independent via `cyclicEigenspaceFin_iSupIndep` for the conj operator
   + ∑ₘ∑ᵢ = (dim V)² = dim End ⟹ termwise). Key hyps: `IsPrimitiveRoot epsilon h`, hV.
-- **(h) — NEXT** (pure arithmetic from (g)): `2 dim E_0 − 2 dim E_m = ∑ᵢ(nᵢ−nᵢ₊ₘ)²`. Over ℤ
-  (prop24j is ℤ-valued): `∑((nᵢ:ℤ)−nᵢ₊ₘ)² = 2(dim E_0 − dim E_m)` via (g) at m and m=0 +
-  `∑ nᵢ₊ₘ² = ∑ nᵢ²` (reindex). Then `dim E_0 = dim E_m+1 ∀m≢0` (Thm 2.5 H-module hyp) ⟹ `∑=2`.
+- **(h) — ✅ DONE** (`sum_sq_sub_finrank_cyclicEndConjEigenspaceFin`, axiom-clean):
+  `∑ᵢ((nᵢ:ℤ)−nᵢ₊ₘ)² = 2(dim E_0 − dim E_m)`. Via (g) at m and 0 + `sum_sub_sq_of_sum_sq_eq`
+  (elementary) + reindex `∑nᵢ₊ₘ²=∑nᵢ²`. **⟹ full BG Prop 2.4 chain (a)(c)(d)(g)(h)(j)(k) COMPLETE.**
+  With the Thm 2.5 hyp `dim E_0 = dim E_m+1 ∀m≢0` this gives `∑(nᵢ−nᵢ₊ₘ)²=2` = the prop24j hypothesis.
+- **NEXT — Thm 2.5 core** (the real remaining work): assemble `h | qⁿ±1` and `C_V(H)=0 ⟹ h=qⁿ+1`.
+  Needs: (1) **E(P) = principal ⊕ (q²−1)/h · regular** as an `H = ⟨x⟩`-module under conjugation
+  (from the Burnside basis E(P)=End_F V (Prop 2.1, done) + `C_{P/Z}(x)=1` ⟹ x acts freely off
+  scalars), giving `dim E_0 = dim E_m + 1 ∀ m≢0` — substantial group-rep-theory; (2) the
+  **Fin h ↔ ZMod h** transport to feed prop24j; (3) Prop 2.2(a) alg-closed Clifford (`V_P = M`);
+  (4) base-change wiring (2.9, done) for `C_V(H)=0 ⟹ C_V̄(H)=0`. Then Thm 3.4 assembly.
 - **Indexing bridge for prop24j**: `prop24j`/`prop24k` are over `ZMod h → ℤ`; eigenspace dims are
   `Fin h → ℕ`. `ZMod h ≃+ Fin h` (NeZero h) needed to transport the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis.
 - **(g)(h) bridge — leftover detail**:
