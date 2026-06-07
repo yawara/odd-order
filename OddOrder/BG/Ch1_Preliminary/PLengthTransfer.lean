@@ -267,4 +267,165 @@ theorem isPGroup_inf_map_oPiPrimePiCore [Fact p.Prime] {G : Type*} [Group G] [Fi
   exact isPGroup_map_oPiPrimePiCore.of_injective
     (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
 
+/-- **Crux of Lemma 1.21(a)**: `O_{p',p}(G) ∩ H ≤ O_{p',p}(↥H)` (as a subgroup of `↥H`).
+Both the `G/O_{p'}(G)`-image and the `↥H/O_{p'}(↥H)`-image of `A := O_{p',p}(G) ⊓ H` are
+quotients of `↥A`; the former is a `p`-group and has the smaller kernel
+(`O_{p'}(G)∩H ≤ O_{p'}(↥H)`), so the latter — which is `K.map mk'` — has order dividing it,
+hence is a `p`-group; `le_oPiPrimePiCore_of_quotient_isPGroup` finishes. -/
+theorem oPiPrimePiCore_subgroupOf_le [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H : Subgroup G} :
+    (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H
+      ≤ Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥H := by
+  classical
+  haveI hKnorm : ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).Normal :=
+    Subgroup.Normal.comap inferInstance H.subtype
+  apply le_oPiPrimePiCore_of_quotient_isPGroup
+  set A : Subgroup G := Ch03.oPiPrimePiCore ({p} : Set ℕ) G ⊓ H with hAdef
+  have hAH : A ≤ H := inf_le_right
+  set gA : ↥A →* G ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G :=
+    (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)).comp A.subtype with hgA
+  set fA : ↥A →* ↥H ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H :=
+    (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H)).comp (Subgroup.inclusion hAH) with hfA
+  -- `range gA = A.map mk'` is a `p`-group.
+  have hgA_range : gA.range = A.map (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)) := by
+    rw [hgA, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hgA_pg : IsPGroup p ↥gA.range := by rw [hgA_range]; exact isPGroup_inf_map_oPiPrimePiCore
+  -- `range fA = K.map mk'` (the goal's subject).
+  have hfA_range : fA.range
+      = ((Ch03.oPiPrimePiCore ({p} : Set ℕ) G).subgroupOf H).map
+          (QuotientGroup.mk' (Ch03.oPiCore (({p} : Set ℕ)ᶜ) ↥H)) := by
+    rw [hfA, MonoidHom.range_comp, Subgroup.inclusion_range, hAdef,
+      Subgroup.inf_subgroupOf_right]
+  -- `ker gA ≤ ker fA`.
+  have hker_le : gA.ker ≤ fA.ker := by
+    intro a ha
+    rw [hgA, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff] at ha
+    rw [hfA, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff]
+    apply oPiCore_compl_subgroupOf_le
+    rw [Subgroup.mem_subgroupOf, Subgroup.coe_inclusion]
+    exact ha
+  -- `|range fA| ∣ |range gA|` (= p-power), so `range fA` is a `p`-group.
+  rw [← hfA_range]
+  have hcard_dvd : Nat.card ↥fA.range ∣ Nat.card ↥gA.range := by
+    rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange fA).toEquiv,
+      ← Nat.card_congr (QuotientGroup.quotientKerEquivRange gA).toEquiv]
+    exact Subgroup.index_dvd_of_le hker_le
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp hgA_pg
+  rw [hn] at hcard_dvd
+  obtain ⟨m, _, hm⟩ := (Nat.dvd_prime_pow Fact.out).mp hcard_dvd
+  exact IsPGroup.of_card hm
+
+/-- **BG Lemma 1.21(a)** (mmd L566): `p`-length one passes to subgroups — if `G` has
+`p`-length one and `H ≤ G`, then `H` has `p`-length one. Index chain:
+`[↥H : O_{p',p}(↥H)] ∣ [↥H : (O_{p',p}(G)).subgroupOf H] = (O_{p',p}(G)).relIndex H ∣
+[G : O_{p',p}(G)]` (the last step uses `O_{p',p}(G) ◁ G`). -/
+theorem hasPLengthOne_subgroup [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    (hpl : hasPLengthOne p G) (H : Subgroup G) : hasPLengthOne p ↥H := by
+  rw [hasPLengthOne] at hpl ⊢
+  have hchain : (Ch03.oPiPrimePiCore ({p} : Set ℕ) ↥H).index
+      ∣ (Ch03.oPiPrimePiCore ({p} : Set ℕ) G).index :=
+    dvd_trans (Subgroup.index_dvd_of_le oPiPrimePiCore_subgroupOf_le)
+      (Subgroup.relIndex_dvd_index_of_normal (Ch03.oPiPrimePiCore ({p} : Set ℕ) G) H)
+  exact fun hdvd => hpl (dvd_trans hdvd hchain)
+
+/-! ### Lemma 1.21(e): `p`-length one of products and the `H ∩ N = 1` transfer -/
+
+/-- The `π`-core of a product is the product of the `π`-cores. -/
+theorem oPiCore_prod {A B : Type*} [Group A] [Group B] [Finite A] [Finite B] (π : Set ℕ) :
+    Ch03.oPiCore π (A × B) = (Ch03.oPiCore π A).prod (Ch03.oPiCore π B) := by
+  classical
+  have hfst : Function.Surjective (MonoidHom.fst A B) := fun a => ⟨(a, 1), rfl⟩
+  have hsnd : Function.Surjective (MonoidHom.snd A B) := fun b => ⟨(1, b), rfl⟩
+  refine le_antisymm ?_ ?_
+  · rw [Subgroup.le_prod_iff]
+    refine ⟨?_, ?_⟩
+    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.fst A B)).Normal :=
+        Subgroup.Normal.map inferInstance (MonoidHom.fst A B) hfst
+      refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+      exact Ch03.oPiCore.isPiGroup π r
+        (Nat.primeFactors_mono (Subgroup.card_map_dvd _ _) Nat.card_pos.ne' hr)
+    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.snd A B)).Normal :=
+        Subgroup.Normal.map inferInstance (MonoidHom.snd A B) hsnd
+      refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+      exact Ch03.oPiCore.isPiGroup π r
+        (Nat.primeFactors_mono (Subgroup.card_map_dvd _ _) Nat.card_pos.ne' hr)
+  · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+    rw [Nat.card_congr (Subgroup.prodEquiv _ _).toEquiv, Nat.card_prod,
+      Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hr
+    rcases Finset.mem_union.mp hr with h | h
+    · exact Ch03.oPiCore.isPiGroup π r h
+    · exact Ch03.oPiCore.isPiGroup π r h
+
+/-- `hasPLengthOne` is invariant under group isomorphism. Transport the double quotient
+`(G/O_{p'}(G)) / O_p(G/O_{p'}(G))` of the bridge `hasPLengthOne_iff_card_quotient` across `e`
+in two stages: `O_{p'}` and then `O_p`, each via `QuotientGroup.congr` +
+`oPiCore.map_eq_of_mulEquiv`. -/
+theorem hasPLengthOne_of_mulEquiv [Fact p.Prime] {G G' : Type*} [Group G] [Finite G]
+    [Group G'] [Finite G'] (e : G ≃* G') (h : hasPLengthOne p G) : hasPLengthOne p G' := by
+  rw [hasPLengthOne_iff_card_quotient] at h ⊢
+  have hmapN : (Ch03.oPiCore (({p} : Set ℕ)ᶜ) G).map e = Ch03.oPiCore (({p} : Set ℕ)ᶜ) G' :=
+    Ch03.oPiCore.map_eq_of_mulEquiv _ e
+  -- descending iso on the `O_{p'}`-quotient
+  let ē := QuotientGroup.congr _ _ e hmapN
+  have hmapO : (Ch03.oPiCore ({p} : Set ℕ) (G ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G)).map ē
+      = Ch03.oPiCore ({p} : Set ℕ) (G' ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) G') :=
+    Ch03.oPiCore.map_eq_of_mulEquiv _ ē
+  -- descending iso on the `O_p`-quotient gives the double-quotient iso
+  rw [← Nat.card_congr (QuotientGroup.congr _ _ ē hmapO).toEquiv]
+  exact h
+
+/-- Quotient of a product by a product subgroup splits: `(A × B) / (H ×' K) ≃* (A/H) × (B/K)`.
+(`prodMap (mk' H) (mk' K)` is surjective with kernel `H ×' K`.) -/
+noncomputable def quotientProd_mulEquiv {A B : Type*} [Group A] [Group B]
+    (H : Subgroup A) [H.Normal] (K : Subgroup B) [K.Normal] :
+    (A × B) ⧸ H.prod K ≃* (A ⧸ H) × (B ⧸ K) := by
+  have hker : ((QuotientGroup.mk' H).prodMap (QuotientGroup.mk' K)).ker = H.prod K := by
+    rw [MonoidHom.ker_prodMap, QuotientGroup.ker_mk', QuotientGroup.ker_mk']
+  have hsurj : Function.Surjective ⇑((QuotientGroup.mk' H).prodMap (QuotientGroup.mk' K)) := by
+    rw [MonoidHom.coe_prodMap]
+    exact (QuotientGroup.mk'_surjective H).prodMap (QuotientGroup.mk'_surjective K)
+  exact (QuotientGroup.quotientMulEquivOfEq hker.symm).trans
+    (QuotientGroup.quotientKerEquivOfSurjective _ hsurj)
+
+/-- **Lemma 1.21(e) product step**: `p`-length one is closed under direct products.
+The double quotient `((A×B)/O_{p'}) / O_p` splits as a product (via `oPiCore_prod` at both
+`O_{p'}` and `O_p` levels, plus `quotientProd_mulEquiv`), so its order is the product of the
+two factors' double-quotient orders; `p` prime divides neither. -/
+theorem hasPLengthOne_prod [Fact p.Prime] {A B : Type*} [Group A] [Finite A] [Group B] [Finite B]
+    (hA : hasPLengthOne p A) (hB : hasPLengthOne p B) : hasPLengthOne p (A × B) := by
+  rw [hasPLengthOne_iff_card_quotient] at hA hB ⊢
+  -- `(A×B)/O_{p'}(A×B) ≃* (A/O_{p'}A) × (B/O_{p'}B)`
+  have e1 : (A × B) ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) (A × B) ≃*
+      (A ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) A) × (B ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) B) :=
+    (QuotientGroup.quotientMulEquivOfEq (oPiCore_prod _)).trans (quotientProd_mulEquiv _ _)
+  -- transport `O_p` across `e1`
+  have hmapO : (Ch03.oPiCore ({p} : Set ℕ) ((A × B) ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) (A × B))).map e1
+      = Ch03.oPiCore ({p} : Set ℕ)
+          ((A ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) A) × (B ⧸ Ch03.oPiCore (({p} : Set ℕ)ᶜ) B)) :=
+    Ch03.oPiCore.map_eq_of_mulEquiv _ e1
+  -- the double-quotient splits: `DQ(A×B) ≃* DQ(A) × DQ(B)`
+  let Φ := (QuotientGroup.congr _ _ e1 hmapO).trans
+    ((QuotientGroup.quotientMulEquivOfEq (oPiCore_prod ({p} : Set ℕ))).trans
+      (quotientProd_mulEquiv _ _))
+  rw [Nat.card_congr Φ.toEquiv, Nat.card_prod]
+  exact fun hd => ((Nat.Prime.dvd_mul Fact.out).mp hd).elim hA hB
+
+/-- **BG Lemma 1.21(e)** (mmd L570): if `H, N ⊴ G` with `H ∩ N = 1` and both `G/H` and `G/N`
+have `p`-length one, then `G` has `p`-length one. Since `H ∩ N = 1`, the map
+`G → (G/H) × (G/N)` is injective, embedding `G` as a subgroup of the product; the product is
+`p`-length one (`hasPLengthOne_prod`), the subgroup inherits it (Lemma 1.21(a)), and the
+embedding transfers it back to `G` (`hasPLengthOne_of_mulEquiv`). -/
+theorem hasPLengthOne_of_inf_eq_bot [Fact p.Prime] {G : Type*} [Group G] [Finite G]
+    {H N : Subgroup G} [H.Normal] [N.Normal] (hHN : H ⊓ N = ⊥)
+    (hH : hasPLengthOne p (G ⧸ H)) (hN : hasPLengthOne p (G ⧸ N)) : hasPLengthOne p G := by
+  have hker : ((QuotientGroup.mk' H).prod (QuotientGroup.mk' N)).ker = ⊥ := by
+    rw [MonoidHom.ker_prod, QuotientGroup.ker_mk', QuotientGroup.ker_mk']; exact hHN
+  have hinj : Function.Injective ⇑((QuotientGroup.mk' H).prod (QuotientGroup.mk' N)) :=
+    (MonoidHom.ker_eq_bot_iff _).mp hker
+  have hrange : hasPLengthOne p ↥((QuotientGroup.mk' H).prod (QuotientGroup.mk' N)).range :=
+    hasPLengthOne_subgroup (hasPLengthOne_prod hH hN) _
+  exact hasPLengthOne_of_mulEquiv (MonoidHom.ofInjective hinj).symm hrange
+
 end OddOrder.BG.Ch1

@@ -33,11 +33,11 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 
 | 依存 | mmd | 状態 | 備考 |
 |---|---|---|---|
-| **Lem 1.21(a)** | L566 | ❌ 未 | `H≤G, plen1 G ⇒ plen1 H` (= p-length 部分群単調性, **10.6 でも必要**) |
-| **Lem 1.21(b)** | L567 | ❌ 未 | `H ⊴ G normal p'-sub, plen1(G/H) ⇒ plen1 G`。(3.8) で使用 |
-| **Lem 1.21(c)** | L568 | ❌ 未 | `H ⊴ G normal p-sub, O_{p'}(G/H)=1, plen1(G/H) ⇒ plen1 G`。(3.9) |
-| **Lem 1.21(d)** | L569 | ❌ 未 | `plen1 G ⟺ ⟨p-elements⟩ が normal p-complement を持つ`。(e) の engine |
-| **Lem 1.21(e)** | L570 | ❌ 未 | `H,N ⊴ G, H∩N=1, plen1(G/H), plen1(G/N) ⇒ plen1 G`。(3.11) |
+| **Lem 1.21(a)** | L566 | ✅ | `hasPLengthOne_subgroup` (= p-length 部分群単調性, **10.6 でも必要**) |
+| **Lem 1.21(b)** | L567 | ✅ | `hasPLengthOne_of_isPiPrime_normal_quotient`。(3.8) で使用 |
+| **Lem 1.21(c)** | L568 | ✅ | `hasPLengthOne_of_isPGroup_normal_quotient`。(3.9) |
+| **Lem 1.21(d)** | L569 | — bypass | `⟨p-elements⟩` 特徴づけ。(e) を product-core 経由にしたので不要 |
+| **Lem 1.21(e)** | L570 | ✅ | `hasPLengthOne_of_inf_eq_bot`。(3.11)。product 埋め込み + (a) |
 | **Thm 3.4** | L863 | ❌ 未 | 可解奇 G, normal Hall K + prime-order 補群 R, V 上 (char∤\|G\|), `C_V(R)=0 ⇒ [R,K]⊆C_K(V)`。表現論 (Clifford/Maschke/special) |
 | **Thm 3.5** | L903 | ❌ 未 | Frobenius G=KR (K 可解, R cyclic prime), V 上, `C_V(R) 1-dim ⇒ K'⊆C_K(V)`。Clifford/Maschke/Wedderburn/Prop2.2/Lem3.3 |
 | **Lem 3.3** | L845 | ✅ | S03b_Lemma33 `kernel_acts_trivially_of_centralizer_eq_bot` 等 |
@@ -80,21 +80,31 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 - `oPiCore_compl_subgroupOf_le` (`885f8ca`): `(O_{p'}(G)).subgroupOf H ≤ O_{p'}(↥H)`。
 - `isPGroup_inf_map_oPiPrimePiCore` (`3b841e9`): `(O_{p',p}(G)⊓H).map(mk' O_{p'}(G))` は p-群。
 
-**(a) 完成の残 crux (設計確定・Lean grind のみ、~40 行 fiddly で wind-down):**
-中間補題 `(oPiPrimePiCore {p} G).subgroupOf H ≤ oPiPrimePiCore {p} ↥H` を `le_oPiPrimePiCore_of_quotient_isPGroup` (↥H で) に帰着。要 `IsPGroup p ↥(K.map (mk' (oPiCore {p}ᶜ ↥H)))`, `K=(oPiPrimePiCore{p}G).subgroupOf H`。
-- `A := oPiPrimePiCore{p}G ⊓ H` (≤ H), 2 つの hom from `↥A`:
-  `gA := (mk' (oPiCore{p}ᶜ G)).comp A.subtype` (range `= A.map(mk' O_{p'}G) =` isPGroup_inf_map の p-群),
-  `fA := (mk' (oPiCore{p}ᶜ ↥H)).comp (Subgroup.inclusion (A≤H))` (range `= (A.subgroupOf H).map(mk' O_{p'}↥H) = K.map f`)。
-- `ker gA ≤ ker fA`: `a∈↥A, ↑a∈O_{p'}(G) ⇒ (a:↥H)∈(O_{p'}G).subgroupOf H ≤ O_{p'}(↥H)` (`oPiCore_compl_subgroupOf_le`)。
-- card: `|range fA| = (ker fA).index`, `|range gA| = (ker gA).index` (`quotientKerEquivRange` + index 定義); `index_dvd_of_le (ker gA ≤ ker fA)` ⇒ `(ker fA).index ∣ (ker gA).index` ⇒ `|range fA| ∣ |range gA|` (=p冪) ⇒ `IsPGroup.of_card`+`Nat.dvd_prime_pow`。
-  (別路: `IsPGroup.of_surjective` (PGroup.lean:74) で `↥A/ker gA ↠ ↥A/ker fA` (`QuotientGroup.map`) 経由。)
-- 続く index 鎖: `Subgroup.index_dvd_of_le 中間補題` で `(oPiPrimePiCore{p}↥H).index ∣ ((oPiPrimePiCore{p}G).subgroupOf H).index ∣ (oPiPrimePiCore{p}G).index = |G/O_{p',p}G|` ⇒ p∤ ⇒ `hasPLengthOne p ↥H`。最終 `hasPLengthOne_of_le`。
+**✅ (a) DONE** `hasPLengthOne_subgroup` (`2271b55`, crux `oPiPrimePiCore_subgroupOf_le` = `5aeb6f0`):
+`hasPLengthOne p G ⇒ hasPLengthOne p ↥H`。crux は `A=O_{p',p}G⊓H` からの 2 hom `gA`(→G/O_{p'}G, range=p群)
+/`fA`(→↥H/O_{p'}↥H, range=K.map mk') で `ker gA ≤ ker fA` (`oPiCore_compl_subgroupOf_le`) ⇒ `quotientKerEquivRange`
++`index_dvd_of_le` で `|range fA| ∣ |range gA|`=p冪 ⇒ IsPGroup ⇒ `le_oPiPrimePiCore_of_quotient_isPGroup`。
+最終 index 鎖は `index_dvd_of_le` + `relIndex_dvd_index_of_normal` (O_{p',p}G normal)。**(a) は Thm 10.6 の H≤M reduction を解く**。
 
-**残 (d)(e) — さらに別チャンク:**
-- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}(G) が normal p-complement`。`⟨p-elements⟩` の新規形式化要
-  (`pResidual` 等 mathlib/repo に無し)。`HasNormalPComplement` 部分群継承 (`Ch05:1985`) 既存 → (d) で (a)(e) も即。
-- **(e)** `H,N⊴G, H∩N=1, G/H・G/N plen1 ⇒ G plen1`: (d) 経由。Thm 3.6 (3.11) cite。
+**✅ Lemma 1.21 完了: (a)(b)(c)(e) すべて sorry-free + axiom-clean。(d) は bypass (不要)。**
+PLengthTransfer.lean を `OddOrder.lean` root に配線済 (full build 3587 + AxiomsCheck allowlist OK)。
 
-**overnight loop 総括 (2026-06-07)**: foundation + (b) + (c) + (a) building block 4つ を sorry-free landing
-(7 commits, `4a9bf08`..`3b841e9`)。(a) crux (~40行 fiddly, 設計上記) と (d)(e)/Thm 3.4/3.5/Gorenstein 5.3.7/Thm 3.6
-は heavy なため、無人 grind を避け clean handoff で loop 終了。再開は上記 crux から (building block 全部揃い)。
+(e) は product 埋め込み経由で landing (2026-06-07, この章の最終チャンク):
+- ✅ `oPiCore_prod` (`ee73dac`): `O_π(A×B) = O_π A ×' O_π B`。product 段の土台。
+- ✅ **(e)-1 iso 不変** `hasPLengthOne_of_mulEquiv (e : G ≃* G')`: bridge の double quotient を
+  `QuotientGroup.congr` + `oPiCore.map_eq_of_mulEquiv` で O_{p'}/O_p の 2 段 transport ⇒ `Nat.card` 不変。
+- ✅ **(e)-2 product 商 iso** `quotientProd_mulEquiv : (A×B)/(H ×' K) ≃* (A/H)×(B/K)`:
+  `quotientKerEquivOfSurjective (prodMap (mk' H)(mk' K))` (`ker_prodMap`+`ker_mk'`) + `quotientMulEquivOfEq`。
+- ✅ **(e)-3 `hasPLengthOne_prod`** A,B plen1 ⇒ A×B plen1: double quotient を (e)-1/(e)-2/`oPiCore_prod` で
+  `DQ(A×B) ≃* DQ(A)×DQ(B)` に分解 ⇒ `Nat.card_prod` + `Nat.Prime.dvd_mul`。
+- ✅ **(e) 本体** `hasPLengthOne_of_inf_eq_bot`: `(mk' H).prod (mk' N) : G →* (G/H)×(G/N)`,
+  `ker = H⊓N = ⊥` (`ker_prod`) ⇒ injective ⇒ `MonoidHom.ofInjective` で `G ≃* range`;
+  `hasPLengthOne_prod` + `hasPLengthOne_subgroup` (=1.21a) + (e)-1 iso 不変。
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}` は (e) 近道で回避 (不要)。Thm 3.6 (3.11) は (e) を cite。
+
+**Thm 3.6 残ブロッカー (1.21 完成済, ここから本丸)**: **Thm 3.4** (L863) + **Thm 3.5** (L903)
+= 表現論 (Clifford/Maschke/Wedderburn, 最重量) + **Gorenstein 5.3.7** (special q-群)。
+
+**進捗ログ**: overnight loop (`4a9bf08`..`3b841e9`, 7 commits: foundation+(b)+(c)+(a) building block 4つ)、
+朝 attended (`5aeb6f0` crux + `2271b55` (a) 完成)、(e) landing (このセッション: (e)-1〜本体 4 補題 +
+root 配線)。**Lemma 1.21 全完。次 = Thm 3.4 着手** (S03 表現論新ファイル, Lem 3.3 ✅ を使う)。
