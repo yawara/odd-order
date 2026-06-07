@@ -330,4 +330,32 @@ theorem hasPLengthOne_subgroup [Fact p.Prime] {G : Type*} [Group G] [Finite G]
       (Subgroup.relIndex_dvd_index_of_normal (Ch03.oPiPrimePiCore ({p} : Set ℕ) G) H)
   exact fun hdvd => hpl (dvd_trans hdvd hchain)
 
+/-! ### Lemma 1.21(e): `p`-length one of products and the `H ∩ N = 1` transfer -/
+
+/-- The `π`-core of a product is the product of the `π`-cores. -/
+theorem oPiCore_prod {A B : Type*} [Group A] [Group B] [Finite A] [Finite B] (π : Set ℕ) :
+    Ch03.oPiCore π (A × B) = (Ch03.oPiCore π A).prod (Ch03.oPiCore π B) := by
+  classical
+  have hfst : Function.Surjective (MonoidHom.fst A B) := fun a => ⟨(a, 1), rfl⟩
+  have hsnd : Function.Surjective (MonoidHom.snd A B) := fun b => ⟨(1, b), rfl⟩
+  refine le_antisymm ?_ ?_
+  · rw [Subgroup.le_prod_iff]
+    refine ⟨?_, ?_⟩
+    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.fst A B)).Normal :=
+        Subgroup.Normal.map inferInstance (MonoidHom.fst A B) hfst
+      refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+      exact Ch03.oPiCore.isPiGroup π r
+        (Nat.primeFactors_mono (Subgroup.card_map_dvd _ _) Nat.card_pos.ne' hr)
+    · haveI : ((Ch03.oPiCore π (A × B)).map (MonoidHom.snd A B)).Normal :=
+        Subgroup.Normal.map inferInstance (MonoidHom.snd A B) hsnd
+      refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+      exact Ch03.oPiCore.isPiGroup π r
+        (Nat.primeFactors_mono (Subgroup.card_map_dvd _ _) Nat.card_pos.ne' hr)
+  · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun r hr => ?_)
+    rw [Nat.card_congr (Subgroup.prodEquiv _ _).toEquiv, Nat.card_prod,
+      Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hr
+    rcases Finset.mem_union.mp hr with h | h
+    · exact Ch03.oPiCore.isPiGroup π r h
+    · exact Ch03.oPiCore.isPiGroup π r h
+
 end OddOrder.BG.Ch1
