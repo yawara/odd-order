@@ -309,3 +309,19 @@ sub-lemmas: the regular-character decomposition, the (6.7) wiring to the SibleyD
 setup, the norm/inner computations). After `ν`: **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, the
 `τ₂`/`(6.8.2.1-3)` argument — separate, also deep), then **capstone wiring** (`by_cases Nonempty
 CoherenceTarget`; `¬` → `rcases hyp.cases`; Frobenius → L2+L3+L4; CertainType → case-(B) analogue).
+
+### L3 ν-construction analysis (2026-06-07, post-L3-shell)
+`IntegralCharacterMap (↥L) G = ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ` (S07:301). `IsCoherent`
+(S07:1557) carries `extension : IntegralCharacterMap` isometric **only on its lattice** `ℤ[S]`.
+τ₁ := `coherentYset.extension`, τ₂ := `(Xset_centralCommutator_isCoherent_of_frobenius …).extension`.
+**Key reduction:** the L3 shell wants `ν` with `hagreeX`(=τ₂ on X), `hagreeY`(=τ₁ on Y), `hmixed`
+(`⟨νx,νy⟩=⟨x,y⟩` on X×Y). Take `ν` agreeing with τ₂ on X-irr and τ₁ on Y-irr (then hagreeX/hagreeY
+hold by ℤ-linearity on `ℤ[X]`/`ℤ[Y]`); since `⟨x,y⟩=0` (source-ortho, X⊥Y disjoint irreducibles),
+**`hmixed ⟺ himg_ortho : ⟨τ₂ x, τ₁ y⟩ = 0` = the image orthogonality `X^τ₂ ⊥ Y^τ₁`** — which IS the
+deep (6.8.1) content (the `b≡c≡0 mod a` computation via (6.7)). So L3 = (a) *construct* `ν` (an
+IntegralCharacterMap agreeing with τ₂/τ₁ — extensions are built via `retarget` @S07:2680, NOT
+`Basis.constr`; a glue/combination constructor likely must be added) + (b) prove `himg_ortho` (the
+(6.8.1) `b≡0` argument: `Res η₁^{τ₁} = c∑dᵢχᵢ+χ′ = (c/a)(ρ_L−ρ_{L/Z})` ⟹ `η₁^{τ₁}` const on `Z^#` ⟹
+(6.7) ⟹ `c≡0 mod a`; norm bound ⟹ done). Both (a),(b) are genuinely deep / multi-session; (b) is the
+gating character theory. The (6.7) wiring needs the SibleyDade TI/Sylow/odd setup matched to
+`peterfalvi_67_of_odd`'s hypotheses (`P`, `L=N_G(P)`, `Z≤Z(P)`, `|C_L(·)|` const on `Z^#`).
