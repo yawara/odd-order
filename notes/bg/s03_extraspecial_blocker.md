@@ -109,12 +109,25 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
   `∑ᵢ((nᵢ:ℤ)−nᵢ₊ₘ)² = 2(dim E_0 − dim E_m)`. Via (g) at m and 0 + `sum_sub_sq_of_sum_sq_eq`
   (elementary) + reindex `∑nᵢ₊ₘ²=∑nᵢ²`. **⟹ full BG Prop 2.4 chain (a)(c)(d)(g)(h)(j)(k) COMPLETE.**
   With the Thm 2.5 hyp `dim E_0 = dim E_m+1 ∀m≢0` this gives `∑(nᵢ−nᵢ₊ₘ)²=2` = the prop24j hypothesis.
-- **NEXT — Thm 2.5 core** (the real remaining work): assemble `h | qⁿ±1` and `C_V(H)=0 ⟹ h=qⁿ+1`.
-  Needs: (1) **E(P) = principal ⊕ (q²−1)/h · regular** as an `H = ⟨x⟩`-module under conjugation
-  (from the Burnside basis E(P)=End_F V (Prop 2.1, done) + `C_{P/Z}(x)=1` ⟹ x acts freely off
-  scalars), giving `dim E_0 = dim E_m + 1 ∀ m≢0` — substantial group-rep-theory; (2) the
-  **Fin h ↔ ZMod h** transport to feed prop24j; (3) Prop 2.2(a) alg-closed Clifford (`V_P = M`);
-  (4) base-change wiring (2.9, done) for `C_V(H)=0 ⟹ C_V̄(H)=0`. Then Thm 3.4 assembly.
+- **Thm 2.5 divisibility step — ✅ DONE conditional on the keystone**
+  (`sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace`, `ExtraspecialThm25.lean`, axiom-clean):
+  given `dim E_0 = dim E_m+1 ∀m≢0`, `q = ∑ dim Vᵢ = h·v₀+δ` (δ=±1), i.e. `q ≡ ±1 mod h`. Wires
+  Prop 2.4(h) + `prop24j_fin`. **Fin h↔ZMod h transport also done** (`prop24j_fin`).
+- **THE SOLE REMAINING DEEP INPUT = the keystone `dim E_0 = dim E_m + 1`** (BG (2.11), the
+  `E(P) = principal ⊕ (q²−1)/h·regular` H-module structure). **Route (worked out, accessible — builds
+  on Prop 2.1 + center_isScalar, both done):**
+    - (A) **tensor-trace** `tr(c_g on End V) = χ_V(g)·χ_V(g⁻¹) = |χ_V(g)|²` (general rep theory;
+      End V ≅ V⊗V*, c_g = mulLeft g ∘ mulRight g⁻¹) — clean next leaf.
+    - (B) **Burnside basis** `{ρ(t) : t ∈ transversal of Z in P}` is a basis of End V: spans by
+      Prop 2.1 (`asAlgebraHom_surjective`) + `ρ(gz)=scalar·ρ(g)` (`center_isScalar`); #=|P/Z|=dim End
+      ⟹ basis. Then `c_x` is **monomial** on it (`c_x ρ(t) = scalar·ρ(t')`, t'=rep of xtx⁻¹Z), so
+      `tr(c_{xᵏ}) = ∑_{t : xᵏ-fixed} scalar`; `C_{P/Z}(xᵏ)=1` (from `C_P(xᵏ)=Z`) ⟹ only t=1 fixed,
+      scalar=1 ⟹ `tr(c_{xᵏ}) = 1` for `xᵏ≠1`. **(B) is the deep extraspecial part.**
+    - (C) **char-orthogonality** (`FDRep.char_orthonormal`, in mathlib): `dim E_m = (1/h)∑ₖ ε^{−mk} tr(c_{xᵏ})`,
+      then (A)+(B) give `dim E_0 = (q²+h−1)/h`, `dim E_m = (q²−1)/h` ⟹ diff = 1.
+  ALT: Prop 2.4(g) already gives `dim E_m = ∑nᵢnᵢ₊ₘ`; combined with `|χ_V(xᵏ)|²=1`, same conclusion.
+- **Also still needed**: `prop24k_fin` + its conditional (`C_V(H)=0 ⟹ q=h−1`); Prop 2.2(a)
+  alg-closed Clifford (`V_P = M`); base-change (2.9, done); then Thm 3.4 assembly.
 - **Indexing bridge for prop24j**: `prop24j`/`prop24k` are over `ZMod h → ℤ`; eigenspace dims are
   `Fin h → ℕ`. `ZMod h ≃+ Fin h` (NeZero h) needed to transport the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis.
 - **(g)(h) bridge — leftover detail**:
