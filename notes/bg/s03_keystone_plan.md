@@ -277,3 +277,22 @@ After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H))
 (`asAlgebraHom_surjective_of_isAlgClosed` 系)。(iii) Gor 5.5.4 (= `M≅M^g`, faithful irred extraspecial
 は central char で決まる; `ExtraspecialFaithful.lean` の `center_isScalar`+`sq_finrank…` 部分被覆、
 "等 central char ⟹ iso" は別 sub-piece)。新 `CliffordAlgClosed.lean` (ℂ-pin Clifford.lean は破壊禁止)。複数セッション。
+
+**資産インベントリ (2026-06-08 精査, Explore agent; 再調査不要)**:
+- ✅ **Prop 2.1 = `AbsolutelyIrreducible.lean` (一般 alg-closed F, NOT ℂ-pin)**: `asAlgebraHom_surjective_of_isAlgClosed`
+  (L118, `F[G]→End_F V` 全射), `span_range_representation_eq_top` (L135, `{ρ g}` spans End), `center_isScalar`
+  (L157, `z∈center ⟹ ρ z = c•id`), `toModuleEnd_surjective_of_isAlgClosed` (L67, module 版 Burnside)。
+- ✅ **`Representation.IsIrreducible`** (mathlib `RepresentationTheory/Irreducible.lean:28`) `:= IsSimpleOrder (Subrepresentation ρ)`;
+  `irreducible_iff_isSimpleModule_asModule` (L34) で `IsSimpleModule k[G] ρ.asModule` と往復。`restrictRep ρ H := ρ.comp H.subtype`
+  (Clifford.lean:147)。`IsSimpleModule` API (mathlib `RingTheory/SimpleModule/Basic.lean`) 充実。
+- ⚠️ **重大 ℂ-pin 障壁**: Clifford.lean の **module-level** 機構は全部 ℂ 固定 — `conjBySimpleRingHom g` (L156, `ℂ[H]` 環自己同型 `h↦ghg⁻¹`),
+  `conjBySimpleSemilinear g` (L182, ρ g を H-intertwiner として実現する semilinear), **`isSimpleModule_map_conjBySimpleSemilinear`
+  (L244, 証明済: N が `Res ρ` の simple `ℂ[H]`-部分加群 ⟹ `ρ g(N)` も simple — これが Clifford 分解の核ブロック)**。
+  **⟹ 一般 F へ移植が hVP の最初の具体 sub-task** (これら 3 つを CliffordAlgClosed.lean で F 版に)。
+- ❌ **mathlib に完全 module-level Clifford 分解は無い** (`L_H=⊕ conjugate simples`)。有るのは `IsSimpleModule`,
+  `Rep.res` (`Rep/Res.lean`), `Representation.ind` (`Induced.lean`), Maschke `sumOfConjugates` (intertwiner レベルのみ)。
+- ❌ **Gor 5.5.4 ("等 central char の faithful irred ⟹ iso" ⟹ `M≅M^g`) は未形式化** (ExtraspecialFaithful は mass formula
+  止まり、iso 部分なし)。別 sub-piece。
+- **着手順序案**: (1) `conjBySimpleSemilinear`+`isSimpleModule_map_conjBySimpleSemilinear` を一般 F に移植
+  (CliffordAlgClosed.lean) → (2) Clifford 分解 `L_H=⊕M_i` (M≅M_i, M_1 が submodule) → (3) τ-intertwiner +
+  `τx∈Hom_{FG}(L,L)=F` scalar → `L=M_1` (Prop 2.2(a) 本体) → (4) Gor 5.5.4 で `M≅M^g` 供給 → hVP discharge。
