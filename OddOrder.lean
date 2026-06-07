@@ -31,6 +31,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
