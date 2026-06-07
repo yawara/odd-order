@@ -10025,6 +10025,60 @@ theorem inner_self_tau_scaledDiff_of_frobenius
     hXY, hYX, star_natCast]
   ring
 
+/-- **(6.8.1) the degree ratio `a` satisfies `a ≥ 2`** (mmd 04.8 L176: "Since `X ∩ Y = ∅`, `a > 1`").
+For an `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, the ratio `a ≥ 2`.
+
+If `a ≤ 1` then (as `χ₁` is a positive-degree irreducible, `a ≥ 1`, so) `a = 1`, hence the source
+`θ` (with `χ₁ = Ind_H^L θ`, `θ ≠ 1`, `χ₁(1) = |W₁|·θ(1)`) has degree `θ(1) = a = 1`, so `θ` is a
+nontrivial **linear** character (`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`); then
+`χ₁ = Ind_H^L θ ∈ Y = S(H')` (`mem_Yset_iff_exists_linear_source`), contradicting `χ₁ ∈ X` and the
+disjointness `X(Zc) ∩ Y = ∅`.  This is the `2 ≤ a` input of `eq_zero_or_edge_of_dvd_of_normBound`. -/
+theorem two_le_degreeRatio_of_mem_Xset_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) : 2 ≤ a := by
+  classical
+  -- extract the source `θ` of `χ₁ ∈ S`.
+  have hχ₁S : χ₁ ∈ hyp.S := hyp.Xset_subset_S hχ₁
+  rw [hyp.S_eq] at hχ₁S
+  obtain ⟨θ, hθne, hχ₁eq⟩ := hχ₁S
+  -- `χ₁(1) = |W₁|·θ(1)`.
+  have hdeg : χ₁ 1 = (Nat.card hyp.W1 : ℂ) * (θ : ClassFunction ↥H ℂ) 1 := by
+    rw [hχ₁eq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one,
+      hyp.index_H_eq_card_W1]
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  -- `(a : ℂ) = θ(1)`.
+  have haθ : (a : ℂ) = (θ : ClassFunction ↥H ℂ) 1 := by
+    have h : (a : ℂ) * (Nat.card hyp.W1 : ℂ)
+        = (θ : ClassFunction ↥H ℂ) 1 * (Nat.card hyp.W1 : ℂ) := by rw [← ha, hdeg]; ring
+    exact mul_right_cancel₀ hW1ne h
+  -- `θ(1) = d > 0`, so `a = d ≥ 1`.
+  obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have had : a = d := by have := haθ.trans hd_eq; exact_mod_cast this
+  by_contra hlt
+  push_neg at hlt
+  -- `a ≤ 1` with `a = d ≥ 1` ⟹ `a = 1` ⟹ `θ(1) = 1`.
+  have ha1 : a = 1 := by omega
+  have hθ1 : (θ : ClassFunction ↥H ℂ) 1 = 1 := by rw [← haθ, ha1]; norm_num
+  -- `θ` is a nontrivial linear character ⟹ `χ₁ ∈ Y`, contradicting `χ₁ ∈ X`.
+  obtain ⟨ψ, hψeq⟩ := θ.2.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one hθ1
+  have hlinθ : OddOrder.RepresentationTheory.linearIrreducibleCharacter ψ = θ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.ext hψeq
+  have hψne : ψ ≠ 1 := by
+    intro hψ1
+    apply hθne
+    rw [← hlinθ, hψ1]
+    exact OddOrder.RepresentationTheory.linearIrreducibleCharacter_eq_trivial_iff.mpr rfl
+  have hχ₁Y : χ₁ ∈ hyp.Yset := by
+    rw [hyp.mem_Yset_iff_exists_linear_source]
+    exact ⟨ψ, hψne, by rw [hχ₁eq, hψeq]⟩
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact absurd hχ₁Y (Set.disjoint_left.mp hdisj hχ₁)
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
