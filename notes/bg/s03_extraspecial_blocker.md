@@ -91,22 +91,32 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
   sub-lemma 1 (`∑d=0,∑d²=2 ⟹ one +1/−1`) → per-shift count = 2 → total moved-pairs `2(h−1)` →
   `∑mult = (h−1)²+1` → max-multiplicity index has mult `h−1` (one outlier) → `(n_{i₁}−v₀)²=1`.
   Takes the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis abstractly (`n : ZMod h → ℤ`); general, field-free.
-- **STILL NEEDED** to apply (j) in Thm 2.5:
-    - **(k)** `C_V(H)=0 ⟹ h=q+1`: short follow-up to `prop24j` given `∀i, 0≤nᵢ` and `q≥2` (n₀=0 forces
-      i₁=0, δ=−1, v₀=1, q=h−1). ~15 LOC.
-    - **(g)(h) bridge** — connect `prop24j`'s abstract `n` to the eigenspace dims: `nᵢ := dim Vᵢ`
-      (`cyclicEigenspaceFinDim`), `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ` (g, from (d) `finrank_cyclicHomBlockFin` +
-      the block decomposition (c)/(f)), `2 dim E_0 − 2 dim E_m = ∑ᵢ(nᵢ−nᵢ₊ₘ)²` (h). Then
-      `dim E_0 = dim E_m + 1 ∀m≢0` (the Thm 2.5 multiplicity hyp) gives `∑(nᵢ−nᵢ₊ₘ)²=2`, feeding (j).
-      This needs the `E = ⊕ E_{i,t}` internal direct sum (part c), which is NOT yet in
-      `EigenspaceUnderCyclicAction` — the remaining real work for the Prop 2.4 ↔ Thm 2.5 interface.
-      **NB (checked iter 14): mathlib has NO ready-made `End V ≃ ⊕_{i,t} Hom(Vᵢ,Vₜ)` block
-      decomposition for an internal direct sum — must build `E = ⊕ E_{i,t}` from scratch** via the
-      existing `cyclicHomBlockFin` / `cyclicHomBlockFinLinearEquiv` / `cyclicHomBlockFinProjection`
-      machinery (independence + spanning of the blocks, then sum finranks via `finrank_cyclicHomBlockFin`).
-      This is the next concrete leaf and is substantial (~100-150 LOC). The larger Thm 2.5 assembly
-      after it (E(P) = principal + (q²−1)/h regular H-module from the Burnside basis (2.11) +
-      `C_{P/Z}(x)=1`; Prop 2.2(a) alg-closed Clifford; base-change wiring) is itself several leaves.
+- **(k) — ✅ DONE** (`prop24k`, CyclicEndConjCount.lean): `C_V(H)=0 ⟹ q=h−1`.
+- **(c) — ✅ DONE** (`EigenspaceBlockDecomp.lean`, all axiom-clean): the `End V = ⊕_{i,t} E_{i,t}`
+  block internal direct sum is built from scratch (no mathlib shortcut):
+  `sum_cyclicEigenspaceFinDecomposition_eq` (reconstruction ∑ᵢ compᵢ v = v) →
+  `sum_cyclicHomBlockFinProjection_eq` (every e = ∑ block-projections, via `Submodule.iSup_induction'`) →
+  `iSup_cyclicHomBlockFin_eq_top` → `isInternal_cyclicHomBlockFin` (`DirectSum.IsInternal`, via
+  coeLinearMap surjective + `∑ dim E_{i,t}=(dim V)²=dim End` ⟹ bijective by
+  `injective_iff_surjective_of_finrank_eq_finrank`).
+- **(g)(h) bridge — IN PROGRESS** (next concrete leaf):
+    - **(g)** `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ`. **Route fixed (iter 18)** — AVOID the eigenvalue-uniqueness
+      refinement (`E_m = ⊕_{t−i≡m} E_{i,t}` ⊆-direction). Instead: (i) sub-family finrank
+      `dim(⨆_{t−i≡m} E_{i,t}) = ∑_{t−i≡m} dim E_{i,t}` [sub-family of `isInternal_cyclicHomBlockFin`
+      is `iSupIndep` via `iSupIndep.comp`; **mathlib lacks `finrank(⨆ independent)=∑finrank`** — build
+      via sub-family coeLinearMap injective → equiv → `finrank_directSum`]; (ii) `⨆_{t−i≡m} E_{i,t} ≤ E_m`
+      [inclusion `cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq`, already in file] ⟹
+      `dim E_m ≥ ∑_{t−i≡m} dim E_{i,t}`; (iii) `∑_m dim E_m = dim End` [need `End = ⊕_m E_m`, i.e.
+      Prop 2.4(a) for the conj operator `cyclicEndConj g`]; (iv) `∑_m ∑_{t−i≡m} dim E_{i,t} = ∑_all = dim End`
+      [(c) + partition]; (v) `dim E_m ≥ Σ_m` termwise with equal total sums ⟹ each `=`. **GOTCHA**:
+      `E_m = cyclicEndConjEigenspace` needs `g : GeneralLinearGroup F V` (invertible), but the blocks/(c)
+      use `g : Module.End F V` — instantiate (c) at `(g : End)` and carry the GL `g` + `hspan`/`hperiod`/
+      ε-primitive hyps from the inclusion lemma's signature.
+    - **(h)** `2 dim E_0 − 2 dim E_m = ∑ᵢ(nᵢ−nᵢ₊ₘ)²` from (g) + periodicity `∑ nᵢ² = ∑ nᵢ₊ₘ²`
+      (`Equiv.addRight m` reindex on `Fin h`). Then `dim E_0 = dim E_m+1 ∀m≢0` (Thm 2.5 H-module hyp) ⟹
+      `∑(nᵢ−nᵢ₊ₘ)²=2`, feeding `prop24j`.
+- Larger Thm 2.5 assembly after (g)(h): E(P) = principal + (q²−1)/h regular H-module (Burnside basis
+  (2.11) + `C_{P/Z}(x)=1`); Prop 2.2(a) alg-closed Clifford; base-change wiring — several leaves each.
 - **Prop 2.2(a) alg-closed (Clifford `V_K = M`) — NOT built**; `Clifford.lean` is ℂ. Real Clifford
   theory over alg-closed F (M irred H-module, H◁G, M≅M^x, G/H cyclic ⟹ V_H irreducible = M).
 - **Thm 2.5 assembly**: base-change (2.9 ✅) → reduce to alg-closed faithful irred → Prop 2.2(a) `V_P=M`
