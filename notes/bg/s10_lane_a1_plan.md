@@ -85,13 +85,42 @@ statement を本 10.4(a)(c) (`p∉σ(M)` 版) に修正 + 証明。`#print axiom
 ≠ proved の典型的な罠なので避ける。本 (a) proof = Thm 10.2(c) (`sylow_le_derived_of_mem_sigma`,
 private) 即時; 本 (c) proof = 「A∈ℰ_p²(M), A∉ℰ_p*(G) ⇒ Uniqueness で A∈𝒰 ⇒ N_G(P)⊆M ⇒ p∈σ 矛盾」。
 
-#### 10.3 `centralizer_isUniquelyMaximal_of_two_le_rank` (statement OK, 本と一致)
+#### 10.3 `centralizer_isUniquelyMaximal_of_two_le_rank` (statement OK; **残=本体のみ, Cor 1.12 解決済**)
 
-本 proof (PDF 87): r_p(C_{M_α}(X))≥2 な p, B∈ℰ_p(C_{M_α}(X)) max order。X は M_α を coprime に
-正規化 → **Prop 1.5** (`Ch04.exists_aInvariant_sylow`) で X が B⊇ な M_α の Sylow p `P` を正規化。
-B∉𝒰 と仮定 → Uniqueness で r(C_P(B))≤2 → |B|=p² ∧ Ω₁(C_P(B))=B⊆C_P(X) → **Cor 1.12** (要特定:
-coprime + Ω₁ 固定 ⇒ 全固定の剛性) で C_P(X)=P → r(C_M(X))≥r(P)≥3 (p∈α) → Uniqueness で 𝒰。
-依存: `exists_aInvariant_sylow`, **Cor 1.12**, uniquenessTheorem, α-rank, max-order B。中規模。
+**PDF 87 (book p.74) 逐語回収 (2026-06-07)**:
+> Take a prime `p` for which `r_p(C_{M_α}(X)) ≥ 2` and choose a group `B ∈ ℰ_p(C_{M_α}(X))` of
+> maximal order. Now `X` normalizes `M_α` and has order relatively prime to `|M_α|`. By
+> Proposition 1.5, `X` normalizes some Sylow `p`-subgroup `P` of `M_α` that contains `B`.
+> Clearly we can assume that `B ∉ 𝒰`. By the Uniqueness Theorem, `r(C_P(B)) ≤ 2`. Hence
+> `|B| = p²` and `Ω₁(C_P(B)) = B ⊆ C_P(X)`. By Corollary 1.12, `C_P(X) = P`. Therefore
+> `r(C_M(X)) ≥ r(P) ≥ 3` because `p ∈ α(M)`. By the Uniqueness Theorem, `C_M(X) ∈ 𝒰`. □
+
+**Lean 組み立てプラン + API 対応**:
+1. `2 ≤ rank C_{M_α}(X)` ⇒ `∃ p prime, 2 ≤ pRank C_{M_α}(X) p`。← **要 helper**(rank=⨆_p pRank の
+   sup≥2 ⇒ ある項≥2; `le_ciSup` + 有限性で構成、~10 行)。
+2. max-order `B ∈ ℰ_p(C_{M_α}(X))`: `Finite` ゆえ最大位数 elem-ab を選べる(`exists_maximalElementaryAbelian_ge`
+   = `NarrowPGroup:151`、または card-argmax)。`|B| ≥ p²`。
+3. X が M_α を coprime 正規化 + B を含む A-不変 Sylow P: **Prop 1.5** = `Ch04.aInvariant_pSubgroup_le_aInvariant_sylow`
+   (`ForwardFromCh03:554`、A-不変 p-部分群 ⊆ A-不変 Sylow) ✅。
+4. **case B∈𝒰**: `IsUniquelyMaximal.of_le_of_lt_top`(`B ≤ C_M(X) < ⊤`)で即 `C_M(X)∈𝒰`(line 67 で使用例)。
+   ⇒ 以降 B∉𝒰 と仮定。
+5. **✅ 核心ステップ解決 (2026-06-07)**: `B∉𝒰 ⇒ r(C_P(B)) ≤ 2`。対偶: `r(C_P(B))≥3` を仮定。
+   `C_P(B)<⊤` ゆえ `isUniquelyMaximal_of_three_le_rank_of_lt_top` で **`C_P(B)∈𝒰`**。さらに
+   `B ≤ C_G(C_P(B))`(C_P(B) は B を中心化 ⇒ 対称に B も C_P(B) を中心化)かつ `rank B ≥ 2`
+   ゆえ `isUniquelyMaximal_of_le_centralizer_of_two_le_rank`(L=C_P(B), K=B)で **`B∈𝒰`** ⇒ 矛盾。
+   ∴ `r(C_P(B))≤2`。**両 Uniqueness 補題は既存・難所解消**。
+6. `|B|=p²`: `r(B)=log_p|B|≤r(C_P(B))≤2` かつ `|B|≥p²` ⇒ `=p²`(易)。`Ω₁(C_P(B))=B`: `B≤Z(C_P(B))`
+   (B abelian, C_P(B) が B 中心化)で `r(Z(C_P(B)))=2`; rank-2 p-群が非可換なら中心 cyclic(**BG Thm 4.16
+   = §4 `S04f_Blackburn`, spine ではない**)ゆえ `C_P(B)` 可換 ⇒ `Ω₁(C_P(B))` = rank-2 elem-ab = B。
+   **step 6 は §4 Thm 4.16 で A1 内完結(Cor 10.7(b) spine 経由不要)**。
+7. `Ω₁(C_P(B))=B ⊆ C_P(X)`: B≤C_{M_α}(X)⊆C_G(X) so B⊆C_P(X); X が C_P(B) の Ω₁=B を全固定。
+8. **Cor 1.12** = `S01c.actsTrivially_of_fixes_omega1_centralizer` ✅ (今回実装) で `C_P(X)=P`
+   (E=B, group=P, A=X; X が C_P(B)⊇C_P(?) の order-p を固定 ⇒ X trivial on P)。
+9. `r(C_M(X)) ≥ r(P) ≥ 3` (p∈α(M) ⇒ r_p(M)=r_p(M_α)=r(P)≥3, P=Sylow p of M_α; P≤C_M(X))。
+10. **最終**: `isUniquelyMaximal_of_three_le_rank_of_lt_top`(`S09_Lemma95:2799`)+ `C_M(X)<⊤`。
+
+依存総括: Prop 1.5 ✅, Cor 1.12 ✅(S01c), 最終 Uniqueness ✅, of_le_of_lt_top ✅; **未=step1 helper +
+step5 の Uniqueness corollary 特定 + max-order B**。最重・~150 行。Cor 1.12 が解決したので残るは本体組立。
 
 **✅ Cor 1.12 チェーン DONE (2026-06-07, `S01c_Omega1Rigidity.lean`, axiom-clean)**: BG **Cor 1.12**
 (mmd L457) = 「p odd, G p-群, E elem-ab ≤G, A は p'-operator 群で `C_G(E)` の位数 p の元を全固定
