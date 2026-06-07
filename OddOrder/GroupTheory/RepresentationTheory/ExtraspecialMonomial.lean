@@ -58,6 +58,14 @@ theorem quotientCenterCongr_mk (φ : P ≃* P) (g : P) :
     quotientCenterCongr φ (g : P ⧸ Subgroup.center P) = (φ g : P ⧸ Subgroup.center P) :=
   rfl
 
+/-- Iterating the induced quotient automorphism: `σ^k ⟦g⟧ = ⟦φ^k g⟧`. -/
+theorem quotientCenterCongr_pow_mk (φ : P ≃* P) (k : ℕ) (g : P) :
+    ((quotientCenterCongr φ) ^ k) (g : P ⧸ Subgroup.center P)
+      = ((φ ^ k) g : P ⧸ Subgroup.center P) := by
+  induction k generalizing g with
+  | zero => simp
+  | succ k ih => rw [pow_succ, MulAut.mul_apply, quotientCenterCongr_mk, ih, pow_succ]; rfl
+
 omit [IsAlgClosed F] in
 /-- For a `GL` element `T`, conjugation `cyclicEndConj T` followed by `T⁻¹` collapses: as
 endomorphisms, `(T : End) * (T⁻¹) = 1`. -/
@@ -77,6 +85,57 @@ theorem cyclicEndConj_representation (ρ : Representation F P V) (φ : P ≃* P)
     cyclicEndConj T (ρ p) = ρ (φ p) := by
   change (T : Module.End F V) * ρ p * (T.toLinearEquiv.symm : Module.End F V) = ρ (φ p)
   rw [hint p, mul_assoc, gl_mul_invEnd_eq_one, mul_one]
+
+omit [IsAlgClosed F] in
+/-- **Iterated conjugation**: `(c_x)^k (ρ p) = ρ (φ^k p)`. -/
+theorem cyclicEndConj_pow_representation (ρ : Representation F P V) (φ : P ≃* P)
+    (T : LinearMap.GeneralLinearGroup F V)
+    (hint : ∀ p : P, (T : Module.End F V) * ρ p = ρ (φ p) * (T : Module.End F V)) :
+    ∀ (k : ℕ) (p : P), ((cyclicEndConj T) ^ k) (ρ p) = ρ ((φ ^ k) p) := by
+  intro k
+  induction k with
+  | zero => intro p; simp
+  | succ k ih =>
+    intro p
+    rw [pow_succ, Module.End.mul_apply, cyclicEndConj_representation ρ φ T hint p, ih (φ p)]
+    congr 1
+
+/-- **`(c_x)^h = 1`** when `φ^h = 1`: the iterate agrees with `id` on the Burnside spanning set
+`{ρ p}` (`(c_x)^h (ρ p) = ρ (φ^h p) = ρ p`), and `{ρ p}` spans `End_F V`. -/
+theorem cyclicEndConj_pow_eq_one [FiniteDimensional F V] (ρ : Representation F P V)
+    [ρ.IsIrreducible] (φ : P ≃* P) (T : LinearMap.GeneralLinearGroup F V)
+    (hint : ∀ p : P, (T : Module.End F V) * ρ p = ρ (φ p) * (T : Module.End F V))
+    {h : ℕ} (hφh : φ ^ h = 1) :
+    (cyclicEndConj T) ^ h = 1 := by
+  refine LinearMap.ext_on (span_range_representation_eq_top ρ) ?_
+  rintro _ ⟨g, rfl⟩
+  rw [cyclicEndConj_pow_representation ρ φ T hint h g, hφh]
+  simp
+
+/-- **The monomial action of `(c_x)^k` on the Burnside basis** (BG (2.11)): `(c_x)^k (b c)` is a
+scalar multiple of `b (σ^k c)`, where `σ = quotientCenterCongr φ`. (`(c_x)^k (ρ(t c)) = ρ(φ^k(t c))`
+by `cyclicEndConj_pow_representation`, and `φ^k(t c)`, `t(σ^k c)` lie in the same central coset.)
+This is the monomial action of the cyclic group `⟨c_x⟩` on the basis — input to the orbit count. -/
+theorem cyclicEndConj_pow_burnsideBasisOfSection [Finite P] [Invertible (Nat.card P : F)]
+    [FiniteDimensional F V] (ρ : Representation F P V) [ρ.IsIrreducible] (hf : Function.Injective ρ)
+    (hcl : commutator P ≤ Subgroup.center P) (φ : P ≃* P) (T : LinearMap.GeneralLinearGroup F V)
+    (hint : ∀ p : P, (T : Module.End F V) * ρ p = ρ (φ p) * (T : Module.End F V))
+    (t : P ⧸ Subgroup.center P → P) (ht : ∀ c, (↑(t c) : P ⧸ Subgroup.center P) = c)
+    (k : ℕ) (c : P ⧸ Subgroup.center P) :
+    ∃ a : F, ((cyclicEndConj T) ^ k) (burnsideBasisOfSection ρ hf hcl t ht c)
+      = a • burnsideBasisOfSection ρ hf hcl t ht (((quotientCenterCongr φ) ^ k) c) := by
+  have hcoset : (φ ^ k) (t c) * (t (((quotientCenterCongr φ) ^ k) c))⁻¹ ∈ Subgroup.center P := by
+    rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, QuotientGroup.mk_inv, ht,
+      ← quotientCenterCongr_pow_mk, ht]
+    exact mul_inv_cancel _
+  obtain ⟨a, ha⟩ := center_isScalar ρ hcoset
+  refine ⟨a, ?_⟩
+  rw [burnsideBasisOfSection_apply, burnsideBasisOfSection_apply,
+    cyclicEndConj_pow_representation ρ φ T hint k (t c)]
+  have hsplit : (φ ^ k) (t c)
+      = ((φ ^ k) (t c) * (t (((quotientCenterCongr φ) ^ k) c))⁻¹)
+        * t (((quotientCenterCongr φ) ^ k) c) := by group
+  rw [hsplit, map_mul, ha, ← Module.End.one_eq_id, smul_mul_assoc, one_mul]
 
 /-- **The monomial action on the Burnside basis** (BG (2.11)). With `ρ` faithful irreducible over an
 algebraically closed field (`char ∤ |P|`, nilpotency class `≤ 2`), an intertwiner `T` for an
