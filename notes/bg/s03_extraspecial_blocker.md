@@ -100,6 +100,13 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
       `dim E_0 = dim E_m + 1 ∀m≢0` (the Thm 2.5 multiplicity hyp) gives `∑(nᵢ−nᵢ₊ₘ)²=2`, feeding (j).
       This needs the `E = ⊕ E_{i,t}` internal direct sum (part c), which is NOT yet in
       `EigenspaceUnderCyclicAction` — the remaining real work for the Prop 2.4 ↔ Thm 2.5 interface.
+      **NB (checked iter 14): mathlib has NO ready-made `End V ≃ ⊕_{i,t} Hom(Vᵢ,Vₜ)` block
+      decomposition for an internal direct sum — must build `E = ⊕ E_{i,t}` from scratch** via the
+      existing `cyclicHomBlockFin` / `cyclicHomBlockFinLinearEquiv` / `cyclicHomBlockFinProjection`
+      machinery (independence + spanning of the blocks, then sum finranks via `finrank_cyclicHomBlockFin`).
+      This is the next concrete leaf and is substantial (~100-150 LOC). The larger Thm 2.5 assembly
+      after it (E(P) = principal + (q²−1)/h regular H-module from the Burnside basis (2.11) +
+      `C_{P/Z}(x)=1`; Prop 2.2(a) alg-closed Clifford; base-change wiring) is itself several leaves.
 - **Prop 2.2(a) alg-closed (Clifford `V_K = M`) — NOT built**; `Clifford.lean` is ℂ. Real Clifford
   theory over alg-closed F (M irred H-module, H◁G, M≅M^x, G/H cyclic ⟹ V_H irreducible = M).
 - **Thm 2.5 assembly**: base-change (2.9 ✅) → reduce to alg-closed faithful irred → Prop 2.2(a) `V_P=M`
