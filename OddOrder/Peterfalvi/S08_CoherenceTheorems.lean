@@ -10614,6 +10614,51 @@ theorem crux_of_third_anchor_of_frobenius
       hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
     norm_num at hrel3
 
+open scoped Classical in
+/-- For `m = |Y| ≥ 3` the step-4 edge case (`m = 2`) is impossible, so the good case
+`⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = −a` of `coeff_eq_neg_or_edge_of_frobenius` holds (no relabel needed). -/
+theorem inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hm3 : 3 ≤ hyp.Yset.ncard) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁) = -(a : ℂ) := by
+  have ha_pos : 0 < a := by
+    have := hyp.two_le_degreeRatio_of_mem_Xset_of_frobenius hχ₁ ha; omega
+  rcases hyp.coeff_eq_neg_or_edge_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos ha with
+    h | ⟨hm2, _⟩
+  · exact h
+  · exfalso; omega
+
+open scoped Classical in
+/-- **(6.8.1) crux `hDτ` (generic `m, n ≥ 3` case)** (mmd 04.8 L176).  When `|Y| ≥ 3` (so the step-4
+edge `m = 2` is impossible, discharging the good case) and a third equal-degree `X`-anchor `χ₃`
+exists (the `n ≥ 3` pinning), the crux `(χ₁−aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}` holds **unconditionally**
+(no relabel).  This is the diagonal-shell hypothesis `hDτ` in the generic case. -/
+theorem crux_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1)
+    (hm3 : 3 ≤ hyp.Yset.ncard) :
+    hyp.tau (χ₁ - a • η₁)
+      = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
+        - (a : ℂ) • hyp.coherentYset.extension η₁ :=
+  hyp.crux_of_third_anchor_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
+    ha hdeg2 hdeg3
+    (hyp.inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha
+      hm3)
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
