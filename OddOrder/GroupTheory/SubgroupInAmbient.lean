@@ -265,4 +265,34 @@ theorem opiCoreInG_normal (π : Set ℕ) {H : Subgroup G} [H.Normal] :
     rw [Subgroup.normalizer_eq_top]
   exact le_normalizer_opiCoreInG_of_le_normalizer π htop_le_norm_H
 
+/-- **A self-normalizing `p`-subgroup of a Sylow overgroup is the whole Sylow.**
+If a subgroup `P ≤ Q` of a Sylow `p`-subgroup `Q` of `G` has the property that every element of `Q`
+normalizing `P` already lies in `P` (`P.normalizer ⊓ Q ≤ P`), then `P = Q`.
+
+This is the normalizer-growth half of Sylow theory: `Q` is a `p`-group, hence nilpotent, hence
+satisfies the normalizer condition; the hypothesis says `P.subgroupOf Q` is self-normalizing in
+`↥Q` (via `subgroupOf_normalizer_eq`), and a self-normalizing subgroup of a group with the
+normalizer condition is the whole group, so `P.subgroupOf Q = ⊤`, i.e. `Q ≤ P`.
+
+The intended use: a `p`-subgroup `P` with `N_G(P) = L` such that every `p`-element of `L` lies in
+`P` (e.g. `P` the unique normal Sylow `p`-subgroup of `L`) is itself Sylow in `G` — take a Sylow
+overgroup `Q ⊇ P`, and `N_G(P) ⊓ Q = L ⊓ Q ≤ P` because `Q`-elements are `p`-elements. -/
+theorem sylow_coe_eq_of_normalizer_inf_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q : Sylow p G} {P : Subgroup G} (hPQ : P ≤ (Q : Subgroup G))
+    (hle : Subgroup.normalizer P ⊓ (Q : Subgroup G) ≤ P) :
+    (Q : Subgroup G) = P := by
+  haveI : Group.IsNilpotent ↥(Q : Subgroup G) := Q.isPGroup'.isNilpotent
+  have hnc : NormalizerCondition ↥(Q : Subgroup G) := normalizerCondition_of_isNilpotent
+  -- `P.subgroupOf Q` is self-normalizing in `↥Q`.
+  have hself : Subgroup.normalizer (P.subgroupOf (Q : Subgroup G)) =
+      P.subgroupOf (Q : Subgroup G) := by
+    rw [← Subgroup.subgroupOf_normalizer_eq hPQ]
+    refine le_antisymm (fun x hx => ?_) (fun x hx => ?_) <;>
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+    · exact hle ⟨hx, x.2⟩
+    · exact P.le_normalizer hx
+  have htop : P.subgroupOf (Q : Subgroup G) = ⊤ :=
+    (normalizerCondition_iff_only_full_group_self_normalizing.mp hnc) _ hself
+  exact le_antisymm (Subgroup.subgroupOf_eq_top.mp htop) hPQ
+
 end OddOrder.GroupTheory

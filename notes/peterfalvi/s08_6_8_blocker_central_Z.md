@@ -357,13 +357,26 @@ Frobenius case (A) it IS provable**, hence no missing hypothesis field:
   `Ĥ=P`, so the Sylow lemma is the honest route.)
 
 **(6.7)-wiring plan (task #2), de-risked, ~focused-session build:**
-1. `Ĥ := H.map L.subtype : Subgroup G`; `card Ĥ = card H`, `IsPGroup p Ĥ`.
-2. **`Ĥ ∈ Syl_p(G)`** structural lemma (the proof above). Needs mathlib: p-group normalizer-growth
-   (`H<P ⟹ H<N_P(H)`), p-element-in-unique-normal-Sylow, TI ⟹ `N_G(Ĥ)=L`. ~50–100 lines, the bulk.
-3. `L = N_G(Ĥ)` as a `Sylow.normalizer`-style equality (peterfalvi_67 takes `L = normalizer ↑P`).
-4. matchings: `Zc.map L.subtype ≤ Z(Ĥ)` (from `centralCommutator_subgroupOf_le_center`),
-   `|C_L(·)|` const on `Zc^#` (the (6.6)/(4.5) input — check availability), `Zc ⊴ L`.
-5. apply `peterfalvi_67_of_odd` to `ψ = η₁^{τ₁}` (const on `Zc^#`, from task #3) ⟹ congruence mod `|H|`.
+1. ✅ `Ĥ := H.map L.subtype : Subgroup G`; `IsPGroup p Ĥ` (`hHp.map L.subtype`).
+2. **✅ DONE (commit `941e85e`, sorry-free + axiom-clean): `Ĥ ∈ Syl_p(G)`.** Realized as
+   `SibleyDadeHypothesis.sylow_map_subtype_of_frobenius` (S08) + the reusable general lemma
+   `OddOrder.GroupTheory.sylow_coe_eq_of_normalizer_inf_le` (SubgroupInAmbient.lean). The
+   normalizer-growth was packaged via `NormalizerCondition` (`Q` nilpotent) + `subgroupOf_normalizer_eq`
+   (self-normalizing ⟹ ⊤), avoiding the explicit `N_P(H)` argument. The "p-element of L in H" went
+   through `Q.comap L.subtype ≤ H` (`comap_of_injective` + unique normal Sylow), and `N_G(Ĥ) ≤ L`
+   from `H_sharp_ti`. **The handoff's structural risk is now not just resolved on paper but formalized.**
+3. **🔜 `L = N_G(Ĥ)` (exact equality).** Have `≤` (inline `hNle` in the lemma); `≥` from `H ◁ ↥L`
+   (`l ∈ L` conjugates `Ĥ` to `Ĥ`). peterfalvi_67 uses `Subgroup.normalizer ((↑Q):Set G)` directly
+   (no abstract `L` param), so this bridges `H_sharp_ti`/`card_L_odd` to its TI/odd hypotheses.
+   Consider extracting `normalizer_map_subtype_eq : normalizer (H.map L.subtype) = L` standalone
+   (reused by step 2's `hNle` and by the application).
+4. **🔜 matchings:** `Zc.map L.subtype ≤ Z(Ĥ)` (from `centralCommutator_subgroupOf_le_center`);
+   `Zc ⊴ L` (`centralCommutator_normal`); **`|C_L(z)| = |H|` const on `Zc^#`** — in the Frobenius
+   case this is clean: `z ∈ Z(H) ⟹ C_H(z) = H`, and `W₁` FPF on `H` ⟹ `C_{W₁}(z) = 1` ⟹
+   `C_L(z) = C_H(z) = H` (needs the `C_L(z) = C_H(z)` decomposition via the `L = H ⋊ W₁` split + FPF).
+5. **🔜 apply `peterfalvi_67_of_odd`** to `ψ = η₁^{τ₁}` (const on `Zc^#`, from task #3) ⟹ congruence
+   mod `|H|`. Best stated as an adapter deferring `ψ`/`ψ-const` to the caller (tasks #3/#4):
+   `(ψ : Irr G) const on Zc^# ⟹ ψ(z) ≡ ψ(1) [ALGMOD |H|]`.
 
 Order note: tasks #2 (this wiring) and #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
 prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with

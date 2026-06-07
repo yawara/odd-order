@@ -9,6 +9,7 @@ import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
 import Mathlib.GroupTheory.FixedPointFree
 import OddOrder.Isaacs.Ch06_FrobeniusActions.FrobeniusGroup
+import OddOrder.GroupTheory.SubgroupInAmbient
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
@@ -3547,6 +3548,25 @@ theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
   intro hbot
   apply hkey
   rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
+
+/-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
+`z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`
+(`centralizer_kernel_le`).  Hence `|C_L(z)| = |H|` is **constant on `Z^#`** — the `|C_L(·)|`-constancy
+input of Peterfalvi (6.7). -/
+theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    Subgroup.centralizer ({z} : Set ↥L) = H := by
+  apply le_antisymm
+  · exact hF.centralizer_kernel_le z (hyp.centralCommutator_le hz) hz1
+  · intro h hh
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hzH : (z : ↥L) ∈ H := hyp.centralCommutator_le hz
+    have hzc : (⟨z, hzH⟩ : ↥H) ∈ Subgroup.center ↥H :=
+      hyp.centralCommutator_subgroupOf_le_center (Subgroup.mem_subgroupOf.mpr hz)
+    have hcomm := (Subgroup.mem_center_iff.mp hzc) ⟨h, hh⟩
+    have hcoe := congrArg (H.subtype) hcomm
+    simpa using hcoe
 
 /-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
 `W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
@@ -8502,6 +8522,85 @@ noncomputable def
     (hyp.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
       hF hXne hstepData)
     ν hagreeX hagreeY hmixed hgen
+
+/-- **(6.7)-wiring step (b): `N_G(H.map L.subtype) = L`.**  The normalizer (in `G`) of the kernel
+realized in the ambient group is exactly `L`: `≤` is the `H^#` TI condition (`H_sharp_ti`; a
+nontrivial `a ∈ Ĥ` and its conjugate witness the TI hypothesis), and `≥` holds because `H ◁ L`
+(`L = range L.subtype` normalizes the image of the normal `H`, via `le_normalizer_map`). -/
+theorem normalizer_map_subtype_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    Subgroup.normalizer (H.map L.subtype) = L := by
+  apply le_antisymm
+  · haveI : Nontrivial ↥H := H.nontrivial_iff_ne_bot.mpr hyp.H_ne_bot
+    obtain ⟨x, hx1⟩ := exists_ne (1 : ↥H)
+    set a : G := ((x : ↥L) : G) with ha_def
+    have haĤ : a ∈ H.map L.subtype := Subgroup.mem_map.mpr ⟨(x : ↥L), x.2, rfl⟩
+    have ha1 : a ≠ 1 := by rw [ha_def]; simp only [ne_eq, OneMemClass.coe_eq_one]; exact hx1
+    intro g hg
+    refine hyp.H_sharp_ti g ⟨a, ⟨haĤ, ha1⟩, ?_, ?_⟩
+    · exact (Subgroup.mem_normalizer_iff.mp hg a).mp haĤ
+    · intro hc
+      rw [Set.mem_singleton_iff, mul_inv_eq_one, mul_eq_left] at hc
+      exact ha1 hc
+  · calc L = L.subtype.range := (Subgroup.range_subtype L).symm
+      _ = (⊤ : Subgroup ↥L).map L.subtype := MonoidHom.range_eq_map L.subtype
+      _ = (Subgroup.normalizer H).map L.subtype := by
+          rw [Subgroup.normalizer_eq_top_iff.mpr ‹H.Normal›]
+      _ ≤ Subgroup.normalizer (H.map L.subtype) := H.le_normalizer_map L.subtype
+
+/-- **(6.7)-wiring step (a): the kernel `H`, mapped into `G`, is a Sylow `p`-subgroup of `G`.**
+
+Peterfalvi (6.7) is stated for a Sylow `p`-subgroup `P` of `G` with `L = N_G(P)`; the (6.8.1)
+application uses it at `P = H` (modulus `|H|`).  Peterfalvi (6.8)(a) only assumes `H^#` TI with
+normalizer `L`, which alone does *not* force `H` Sylow — but in the **Frobenius case** it does:
+`H ◁ L` with complement `W₁` of coprime order makes `H` the unique (normal) Sylow `p`-subgroup of
+`↥L`, so every `p`-subgroup of `↥L` (in particular `Q ⊓ L` for any Sylow `Q ⊇ Ĥ`) lies in `H`;
+combined with `N_G(Ĥ) ≤ L` (from `H^#` TI, `Ĥ := H.map L.subtype`) and the self-normalizing-Sylow
+criterion `sylow_coe_eq_of_normalizer_inf_le`, this forces `Ĥ ∈ Syl_p(G)`. -/
+theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) = H.map L.subtype := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  set Ĥ : Subgroup G := H.map L.subtype with hĤ_def
+  -- `Ĥ` is a `p`-group (image of the `p`-group `H` under the injective `L.subtype`).
+  have hĤp : IsPGroup p ↥Ĥ := hHp.map L.subtype
+  -- `p ∣ |H|` (nontrivial `p`-group) and `gcd(|H|, |W₁|) = 1`, so `p ∤ [L : H] = |W₁|`.
+  have hpH : p ∣ Nat.card ↥H := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hHp
+    have h1 : 1 < Nat.card ↥H := (Subgroup.one_lt_card_iff_ne_bot (H := H)).mpr hyp.H_ne_bot
+    rw [hn] at h1 ⊢
+    rcases n with _ | n
+    · simp at h1
+    · exact dvd_pow_self p (Nat.succ_ne_zero n)
+  have hpidx : ¬ p ∣ H.index := by
+    rw [hyp.index_H_eq_card_W1]
+    have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1) :=
+      hF.coprime_card_kernel_complement
+    exact (hp.coprime_iff_not_dvd).mp (Nat.Coprime.coprime_dvd_left hpH hcop)
+  -- `H` is the unique (normal) Sylow `p`-subgroup of `↥L`.
+  set HSyl : Sylow p ↥L := hHp.toSylow hpidx with hHSyl_def
+  have hHSyl : (HSyl : Subgroup ↥L) = H := IsPGroup.toSylow_coe hHp hpidx
+  haveI hHSylNormal : (HSyl : Subgroup ↥L).Normal := by rw [hHSyl]; exact ‹H.Normal›
+  haveI : Unique (Sylow p ↥L) := Sylow.unique_of_normal HSyl hHSylNormal
+  have hpsub : ∀ K : Subgroup ↥L, IsPGroup p K → K ≤ H := by
+    intro K hK
+    obtain ⟨R, hR⟩ := hK.exists_le_sylow
+    calc K ≤ (R : Subgroup ↥L) := hR
+      _ = (HSyl : Subgroup ↥L) := by rw [Subsingleton.elim R HSyl]
+      _ = H := hHSyl
+  -- `N_G(Ĥ) ≤ L` from `H^#` TI (the `normalizer_map_subtype_eq` equality).
+  have hNle : Subgroup.normalizer Ĥ ≤ L := hyp.normalizer_map_subtype_eq.le
+  -- a Sylow overgroup `Q ⊇ Ĥ`; then `N_G(Ĥ) ⊓ Q ≤ Ĥ` via the `p`-subgroup `Q.comap L.subtype ≤ H`.
+  obtain ⟨Q, hĤQ⟩ := hĤp.exists_le_sylow
+  refine ⟨Q, ?_⟩
+  apply OddOrder.GroupTheory.sylow_coe_eq_of_normalizer_inf_le hĤQ
+  intro x hx
+  have hxL : x ∈ L := hNle hx.1
+  have hQLp : IsPGroup p ((Q : Subgroup G).comap L.subtype : Subgroup ↥L) :=
+    Q.isPGroup'.comap_of_injective L.subtype L.subtype_injective
+  have hx'H : (⟨x, hxL⟩ : ↥L) ∈ H :=
+    hpsub _ hQLp (Subgroup.mem_comap.mpr (by exact hx.2))
+  exact Subgroup.mem_map.mpr ⟨⟨x, hxL⟩, hx'H, rfl⟩
 
 end SibleyDadeHypothesis
 
