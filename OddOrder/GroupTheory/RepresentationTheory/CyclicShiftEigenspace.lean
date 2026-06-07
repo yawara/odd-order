@@ -107,6 +107,41 @@ theorem sum_pow_smul_mem_eigenspace (T : Module.End F W) {ε : F} (hε : ε ≠ 
     rw [← Module.End.mul_apply, ← pow_succ', hpow]
   exact cyclicShift_hasEigenvector T (fun j => (T ^ j.val) w) hε hεpow hb i
 
+/-- `T^n` acts on an `ε^i`-eigenvector by the scalar `(ε^i)^n`. -/
+private theorem pow_apply_of_eigenvector {T : Module.End F W} {ε : F} {i : ℕ} {v : W}
+    (hv : T v = (ε ^ i) • v) (n : ℕ) : (T ^ n) v = ((ε ^ i) ^ n) • v := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [pow_succ, Module.End.mul_apply, hv, map_smul, ih, smul_smul, ← pow_succ']
+
+/-- **The eigenspace-projection's range is the whole eigenspace.** The "Fourier projection"
+`proj := ∑_{k} (ε^i)⁻¹^{k.val} • T^{k.val}` (`= h · π_{ε^i}`) has `range proj = T.eigenspace (ε^i)`
+(`ε^h = 1`, `T^h = 1`, `h ≠ 0`): `range ⊆ eigenspace` since each `proj w` is an eigenvector
+(`sum_pow_smul_mem_eigenspace`); `eigenspace ⊆ range` since `proj` acts as `h · id` on the eigenspace
+(so `v = proj ((h:F)⁻¹ • v)`). Hence `dim (T.eigenspace (ε^i)) = rank proj`. -/
+theorem range_sum_pow_eq_eigenspace (T : Module.End F W) {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
+    (hTh : T ^ h = 1) (hh : (h : F) ≠ 0) (i : ℕ) :
+    LinearMap.range (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • T ^ k.val)
+      = Module.End.eigenspace T (ε ^ i) := by
+  have happly : ∀ w : W, (∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • T ^ k.val) w
+      = ∑ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) w := by
+    intro w; simp only [LinearMap.sum_apply, LinearMap.smul_apply]
+  refine le_antisymm ?_ ?_
+  · rintro _ ⟨w, rfl⟩
+    rw [happly]
+    exact sum_pow_smul_mem_eigenspace T hε hεpow hTh w i
+  · intro v hv
+    rw [Module.End.mem_eigenspace_iff] at hv
+    refine ⟨(h : F)⁻¹ • v, ?_⟩
+    rw [map_smul, happly]
+    have hterm : ∀ k : ZMod h, ((ε ^ i)⁻¹ ^ k.val) • (T ^ k.val) v = v := by
+      intro k
+      rw [pow_apply_of_eigenvector hv, smul_smul, ← mul_pow, inv_mul_cancel₀ (pow_ne_zero i hε),
+        one_pow, one_smul]
+    rw [Finset.sum_congr rfl (fun k _ => hterm k), Finset.sum_const, Finset.card_univ, ZMod.card,
+      ← Nat.cast_smul_eq_nsmul F, smul_smul, inv_mul_cancel₀ hh, one_smul]
+
 /-- **Each eigenspace of a cyclic shift is one-dimensional.** For `b : Basis (ZMod h) F W` and the
 shift `T (b j) = b (j+1)`, and `ε` a primitive `h`-th root of unity,
 `finrank (T.eigenspace (ε^{i})) = 1` for every `i : Fin h`. (The regular representation of `ZMod h`
