@@ -8504,6 +8504,30 @@ noncomputable def
       hF hXne hstepData)
     ν hagreeX hagreeY hmixed hgen
 
+/-- **(6.7)-wiring step (b): `N_G(H.map L.subtype) = L`.**  The normalizer (in `G`) of the kernel
+realized in the ambient group is exactly `L`: `≤` is the `H^#` TI condition (`H_sharp_ti`; a
+nontrivial `a ∈ Ĥ` and its conjugate witness the TI hypothesis), and `≥` holds because `H ◁ L`
+(`L = range L.subtype` normalizes the image of the normal `H`, via `le_normalizer_map`). -/
+theorem normalizer_map_subtype_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal] :
+    Subgroup.normalizer (H.map L.subtype) = L := by
+  apply le_antisymm
+  · haveI : Nontrivial ↥H := H.nontrivial_iff_ne_bot.mpr hyp.H_ne_bot
+    obtain ⟨x, hx1⟩ := exists_ne (1 : ↥H)
+    set a : G := ((x : ↥L) : G) with ha_def
+    have haĤ : a ∈ H.map L.subtype := Subgroup.mem_map.mpr ⟨(x : ↥L), x.2, rfl⟩
+    have ha1 : a ≠ 1 := by rw [ha_def]; simp only [ne_eq, OneMemClass.coe_eq_one]; exact hx1
+    intro g hg
+    refine hyp.H_sharp_ti g ⟨a, ⟨haĤ, ha1⟩, ?_, ?_⟩
+    · exact (Subgroup.mem_normalizer_iff.mp hg a).mp haĤ
+    · intro hc
+      rw [Set.mem_singleton_iff, mul_inv_eq_one, mul_eq_left] at hc
+      exact ha1 hc
+  · calc L = L.subtype.range := (Subgroup.range_subtype L).symm
+      _ = (⊤ : Subgroup ↥L).map L.subtype := MonoidHom.range_eq_map L.subtype
+      _ = (Subgroup.normalizer H).map L.subtype := by
+          rw [Subgroup.normalizer_eq_top_iff.mpr ‹H.Normal›]
+      _ ≤ Subgroup.normalizer (H.map L.subtype) := H.le_normalizer_map L.subtype
+
 /-- **(6.7)-wiring step (a): the kernel `H`, mapped into `G`, is a Sylow `p`-subgroup of `G`.**
 
 Peterfalvi (6.7) is stated for a Sylow `p`-subgroup `P` of `G` with `L = N_G(P)`; the (6.8.1)
@@ -8545,22 +8569,8 @@ theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Nor
     calc K ≤ (R : Subgroup ↥L) := hR
       _ = (HSyl : Subgroup ↥L) := by rw [Subsingleton.elim R HSyl]
       _ = H := hHSyl
-  -- `N_G(Ĥ) ≤ L` from `H^#` TI: a nontrivial `a ∈ Ĥ` and its conjugate witness the TI condition.
-  have hNle : Subgroup.normalizer Ĥ ≤ L := by
-    haveI : Nontrivial ↥H := H.nontrivial_iff_ne_bot.mpr hyp.H_ne_bot
-    obtain ⟨x, hx1⟩ := exists_ne (1 : ↥H)
-    set a : G := ((x : ↥L) : G) with ha_def
-    have haĤ : a ∈ Ĥ := Subgroup.mem_map.mpr ⟨(x : ↥L), x.2, rfl⟩
-    have ha1 : a ≠ 1 := by
-      rw [ha_def]
-      simp only [ne_eq, OneMemClass.coe_eq_one]
-      exact hx1
-    intro g hg
-    refine hyp.H_sharp_ti g ⟨a, ⟨haĤ, ha1⟩, ?_, ?_⟩
-    · exact (Subgroup.mem_normalizer_iff.mp hg a).mp haĤ
-    · intro hc
-      rw [Set.mem_singleton_iff, mul_inv_eq_one, mul_eq_left] at hc
-      exact ha1 hc
+  -- `N_G(Ĥ) ≤ L` from `H^#` TI (the `normalizer_map_subtype_eq` equality).
+  have hNle : Subgroup.normalizer Ĥ ≤ L := hyp.normalizer_map_subtype_eq.le
   -- a Sylow overgroup `Q ⊇ Ĥ`; then `N_G(Ĥ) ⊓ Q ≤ Ĥ` via the `p`-subgroup `Q.comap L.subtype ≤ H`.
   obtain ⟨Q, hĤQ⟩ := hĤp.exists_le_sylow
   refine ⟨Q, ?_⟩
