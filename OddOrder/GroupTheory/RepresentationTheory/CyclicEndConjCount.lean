@@ -85,4 +85,27 @@ theorem exists_pos_neg_of_sum_sq_eq_two {α : Type*} [Fintype α]
   · exact ⟨i, j, hij, h, by omega, hisupp⟩
   · exact ⟨j, i, hij.symm, by omega, h, fun k hk => (hisupp k hk).symm⟩
 
+/-- **For each nonzero shift, exactly two indices move** (BG Prop 2.4(j), `m`-step shape). If the
+"squared shift difference" sum is `2`, then `n i ≠ n (i + m)` for exactly two `i`. -/
+theorem card_filter_ne_shift_eq_two {h : ℕ} [NeZero h] (n : ZMod h → ℤ) {m : ZMod h}
+    (hsq : ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    (univ.filter (fun i => n i ≠ n (i + m))).card = 2 := by
+  classical
+  have hshift : ∑ x, n (x + m) = ∑ x, n x :=
+    Fintype.sum_equiv (Equiv.addRight m) (fun x => n (x + m)) n (fun _ => rfl)
+  have hsum : ∑ i, (n i - n (i + m)) = 0 := by
+    rw [Finset.sum_sub_distrib, hshift, sub_self]
+  obtain ⟨a, b, hab, ha, hb, hsupp⟩ :=
+    exists_pos_neg_of_sum_sq_eq_two (fun i => n i - n (i + m)) hsum hsq
+  have hfilter : (univ.filter (fun i => n i ≠ n (i + m))) = {a, b} := by
+    ext i
+    simp only [mem_filter, mem_univ, true_and, mem_insert, mem_singleton]
+    rw [← sub_ne_zero]
+    constructor
+    · exact hsupp i
+    · rintro (rfl | rfl)
+      · rw [ha]; norm_num
+      · rw [hb]; norm_num
+  rw [hfilter, Finset.card_pair hab]
+
 end OddOrder.RepresentationTheory
