@@ -3150,6 +3150,13 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   /-- The §4 Dade datum on `A = H^#`; its Dade isometry *is* `tau`. -/
   dade : OddOrder.Peterfalvi.S04.Hypothesis G (sharpImage H) L
   hconj : dade.HConjInvariant
+  /-- In the TI situation ((6.8.a): `H^#` is a TI-subset of `G` with normalizer `L`), the §4 Dade
+  datum's local subgroups are trivial, `dade.H a = ⊥` — i.e. `dade` is the Dade map of the
+  TI-subset construction (`S04.of_isTISubset`, whose `H a = ⊥`, S04:308).  This faithful (6.8.a)
+  fact makes the Dade map agree with `Ind_L^G` on the supported lattice, yielding the (2.7)
+  reciprocity `⟨α^τ, ψ⟩_G = ⟨α, Res_L^G ψ⟩_L` (`inner_tau_eq_inner_restrict`), the gateway to the
+  (6.8.1) `Res_L(η₁^{τ₁})` decomposition. -/
+  dade_H_eq_bot : ∀ a : {a : G // a ∈ sharpImage H}, dade.H a = ⊥
   /-- The base character set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` (Peterfalvi (6.8.b)). -/
   S : Set (ClassFunction ↥L ℂ)
   /-- `S` is exactly the set of characters induced from nontrivial irreducibles of `H`. -/
@@ -3308,6 +3315,18 @@ the conclusion shape produced by the §7 engine, hence honestly dischargeable �
 abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L H) :=
   OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S
     (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+
+/-- **(6.8.1) Dade reciprocity for the Sibley carrier.**  Since `H^#` is TI (`dade_H_eq_bot`), the
+real Dade map `tau` satisfies `⟨α^τ, ψ⟩_G = ⟨α, Res_L^G ψ⟩_L` for supported `α ∈ CF(L, H^#)` and any
+`ψ ∈ CF(G)` (`inner_dadeIntegralCharacterMap_eq_inner_restrict`).  This is the move the (6.8.1)
+proof (mmd L176) uses to rewrite `⟨η₁^{τ₁}, (χᵢ − dᵢχ₁)^τ⟩ = ⟨Res_L(η₁^{τ₁}), χᵢ − dᵢχ₁⟩`, feeding
+the `Res_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′` decomposition. -/
+theorem inner_tau_eq_inner_restrict (hyp : SibleyDadeHypothesis G L H)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner (hyp.tau α) ψ = ClassFunction.inner α (ClassFunction.restrict L ψ) :=
+  inner_dadeIntegralCharacterMap_eq_inner_restrict hyp.dade hyp.hconj hyp.dade_H_eq_bot hαsupp ψ
 
 /-- (6.8)(a) consequence: `[L : H] = |W₁|`.  From the complement `L = H ⋊ W₁` (`hyp.split`).
 This is the common degree of the members of `Y = S(H')`: by [Is] Thm 6.34
