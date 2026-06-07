@@ -58,4 +58,42 @@ theorem sum_cyclicHomBlockFinProjection_eq {epsilon : F} {g : Module.End F V} {h
   | zero => simp
   | add x y _ _ ihx ihy => rw [map_add, map_add, ihx, ihy]
 
+/-- The `(i,t)`-blocks span all of `End V` (BG Prop 2.4(c), supremum form). -/
+theorem iSup_cyclicHomBlockFin_eq_top {epsilon : F} {g : Module.End F V} {h : ℕ}
+    [FiniteDimensional F V] (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h)) :
+    ⨆ p : Fin h × Fin h, cyclicHomBlockFin epsilon g p.1 p.2 = ⊤ := by
+  rw [eq_top_iff]
+  intro e _
+  rw [← sum_cyclicHomBlockFinProjection_eq hV e]
+  exact Submodule.sum_mem _ fun p _ =>
+    Submodule.mem_iSup_of_mem p (Submodule.coe_mem _)
+
+open Module in
+/-- **The `(i,t)`-blocks form an internal direct sum** `End V = ⊕_{i,t} E_{i,t}` (BG Prop 2.4(c)).
+The blocks span (`iSup_cyclicHomBlockFin_eq_top`) and
+`∑ dim E_{i,t} = (∑ nᵢ)² = (dim V)² = dim End`, so the coercion `⊕ E_{i,t} → End` is a surjection
+between equal-dimensional spaces, hence bijective. -/
+theorem isInternal_cyclicHomBlockFin {epsilon : F} {g : Module.End F V} {h : ℕ}
+    [FiniteDimensional F V] (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h)) :
+    DirectSum.IsInternal (fun p : Fin h × Fin h => cyclicHomBlockFin epsilon g p.1 p.2) := by
+  have hsurj : Function.Surjective (DirectSum.coeLinearMap
+      (fun p : Fin h × Fin h => cyclicHomBlockFin epsilon g p.1 p.2)) := by
+    rw [← LinearMap.range_eq_top, DirectSum.range_coeLinearMap, iSup_cyclicHomBlockFin_eq_top hV]
+  have hsumV : ∑ i, cyclicEigenspaceFinDim epsilon g (i : Fin h) = finrank F V := by
+    rw [← (LinearEquiv.ofBijective
+      (DirectSum.coeLinearMap (cyclicEigenspaceFinFamily epsilon g h)) hV).finrank_eq,
+      finrank_directSum]
+  have hfin : finrank F (DirectSum (Fin h × Fin h)
+      (fun p => cyclicHomBlockFin epsilon g p.1 p.2)) = finrank F (Module.End F V) := by
+    rw [finrank_directSum]
+    simp_rw [finrank_cyclicHomBlockFin hV]
+    rw [Fintype.sum_prod_type, ← Finset.sum_mul_sum, hsumV, Module.finrank_linearMap]
+  haveI : ∀ p : Fin h × Fin h, FiniteDimensional F (cyclicHomBlockFin epsilon g p.1 p.2) :=
+    fun _ => inferInstance
+  haveI : FiniteDimensional F (DirectSum (Fin h × Fin h)
+      (fun p => cyclicHomBlockFin epsilon g p.1 p.2)) :=
+    Module.Finite.equiv (DirectSum.linearEquivFunOnFintype F (Fin h × Fin h)
+      (fun p => cyclicHomBlockFin epsilon g p.1 p.2)).symm
+  exact ⟨(LinearMap.injective_iff_surjective_of_finrank_eq_finrank hfin).mpr hsurj, hsurj⟩
+
 end OddOrder.RepresentationTheory
