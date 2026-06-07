@@ -32,7 +32,34 @@ Each new def must build leaf-green. Commit as one unit.
 defs + S09 — ~7 defs, mechanical — but only if you can keep every intermediate build green.)
 
 ### Step 2 — the L2 `hstepData` monolith at `Z = centralCommutator`
-Use the note's "L2 field map". Sketch:
+
+**STATUS (2026-06-07): Step 1 done (2e46520). Sub-lemmas done + committed:**
+`exists_xBaseBlock_anchor_index` (1f2148a, the i₁/hanchor data),
+`characterDegree_re_le_of_not_mem_pairUnion` (c8ddb62, the htail_le core via hcover),
+`natSum_partition_of_realSum` (ab01c92, the hsum core). The final producer
+`Xset_centralCommutator_isCoherent_of_frobenius` (feeds the `…withCover…` Zc shell) is **90% written
+and STASHED** (`git stash list` → "Pf 6.8 L2 monolith assembly WIP"). To finish: `git stash pop`
+then fix these (all surfaced by `lake build`):
+1. **κ universe** (the main one): `StepData.κ : Type` is Type 0, but the WIP used
+   `κ := ClassFunction ↥L ℂ` (Type u_3). Re-index the tail by `Fin tailF.card` where
+   `tailF := XF \ univ.image (fun j => (χmem j : CF))`. Use `tailF.equivFin : ↥tailF ≃ Fin tailF.card`;
+   `tElt i := (tailF.equivFin.symm i).val`; `θtail i := p^(e (tElt i))`; `tailSet := univ`. For `hsum`,
+   re-index `∑ i : Fin card, g (tElt i) = ∑ x ∈ tailF, g x` via `Finset.sum_image` (tElt injective via
+   Subtype.ext + equiv inj; `univ.image tElt = tailF`) OR `Equiv.sum_comp tailF.equivFin.symm` +
+   `Finset.sum_coe_sort`, then apply `natSum_partition_of_realSum`. For `htail_le`, run the degree
+   bound on `tElt i` (∈ tailF ⟹ ∈ XF⟹Xset Zc, ∉ members⟹∉ pairUnion).
+2. **hχinj** field wants `Injective χmem` (Irr) — the WIP's hsub/hinj need the CF-version:
+   `fun a b h => hχinj (Subtype.ext h)` (cf. xSum_le_two_psi @ ~5733). hχinj (from the enum) IS Irr.
+3. **hθsq_le_qtot**: goal `p^mχ * p^mχ ≤ qtot`, have `hχsq : (p^mχ)^2 ≤ qtot` → `by rw [← pow_two]; exact hχsq`.
+4. **htail_le h1/h2 `simp`** (the `(characterDegree _).re = (idx*p^k : ℕ)` steps) may need
+   `Complex.natCast_re`/`push_cast` instead of bare `simp`; and the final `exact_mod_cast hdeg`.
+5. **hbbne** (xBaseBlock Zc nonempty): the `Set.ncard_pos` form may need tuning; alternatively derive
+   `Nonempty` from `two_le_xBaseBlock_ncard` ≥ 2 > 0 + `Set.nonempty_of_ncard_ne_zero`.
+The producer takes `{p} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)`; the capstone supplies
+these via `isPGroup_of_not_coherent` + `three_le_prime_of_isPGroup_of_odd`. After it builds: full
+build + commit as "L2 producer monolith DONE", then Step 3.
+
+Original field-map sketch:
 - p-group: `H` is a `p`-group via `isPGroup_of_not_coherent` (or take `{p} (hp) (hHp)` as inputs).
 - enum: `exists_pairUnion_memberFamily_of_irreducible_X` → `k, χmem, hχinj, hrange`; anchor `i₁` =
   a base-block element (use `two_le_xBaseBlock_ncard` for nonemptiness + membership in the pairUnion).
