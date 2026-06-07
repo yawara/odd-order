@@ -4370,6 +4370,18 @@ theorem mem_Yset_iff_exists_linear_source
   · rintro ⟨χ, hχ_ne, rfl⟩
     exact hyp.induce_linearIrreducibleCharacter_mem_Yset hχ_ne
 
+/-- Every `Y = S(H')` member has degree `|W₁|` (`Ind_H^L` of a degree-`1` source of `H`).  The
+common degree of the equal-degree `Y`-family; used for the equal-degree difference support
+(`sMember_diffSupport_of_charValue_eq`) in the (6.8.1) `himg_ortho`. -/
+theorem Yset_apply_one (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Yset) :
+    φ (1 : ↥L) = (Nat.card hyp.W1 : ℂ) := by
+  obtain ⟨χ, _hχ_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+  rw [hφeq]
+  simpa [linearIrreducibleCharacter_coe] using
+    hyp.induce_apply_one_eq_card_W1_of_degree_one
+      (linearIrreducibleCharacter χ) (linearIrreducibleCharacter_apply_one χ)
+
 /-- Family form of `induce_linearIrreducibleCharacter_mem_Yset`. -/
 theorem range_induce_linearIrreducibleCharacter_subset_Yset
     (hyp : SibleyDadeHypothesis G L H) [H.Normal] {n : ℕ}
@@ -5487,6 +5499,38 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
             ClassFunction.smul_apply, hχg, h0, mul_zero, sub_self])
       exact hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr hχ'g)
     · exact hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr hχg)
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
+/-- **Two-coefficient degree-matched difference support.**  For two `S`-members `χ, χ'` and naturals
+`m, n` with `m·χ(1) = n·χ'(1)`, the combination `m·χ − n·χ'` is supported on `H^# = sharpImage H`.
+Both are supported on `H` (`sMember_support_subset_H`) and the combination vanishes at `1`.  Unlike
+`sMember_scaledDiffSupport_of_charValue_eq` (`χ − a·χ'`, requiring `χ'(1) ∣ χ(1)`), the symmetric
+coefficients `m = χ'(1)`, `n = χ(1)` make `m·χ − n·χ'` supported **without** any divisibility — the
+(4.1) supported-difference input `χ'(1)·χ − χ(1)·χ'` used in the (6.8.1) `himg_ortho`. -/
+theorem sMember_smulDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
+    {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) {m n : ℕ}
+    (hdeg : (m : ℂ) * χ 1 = (n : ℂ) * χ' 1) :
+    (m • χ - n • χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  have hval : ∀ x : ↥L, (m • χ - n • χ') x = (m : ℂ) * χ x - (n : ℂ) * χ' x := by
+    intro x
+    rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ m χ, ← Nat.cast_smul_eq_nsmul ℂ n χ',
+      ClassFunction.smul_apply, ClassFunction.smul_apply]
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [hval, hdeg, sub_self])
+  have hgH : g ∈ H := by
+    by_contra hgnH
+    have hχg : χ g = 0 := by
+      by_contra h
+      exact hgnH (hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr h))
+    have hχ'g : χ' g = 0 := by
+      by_contra h
+      exact hgnH (hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr h))
+    exact hg (by rw [hval, hχg, hχ'g, mul_zero, mul_zero, sub_zero])
   rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
@@ -8733,6 +8777,138 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed D hDτ hgen
+
+/-- **Peterfalvi (6.8.1) image orthogonality `himg_ortho` via (4.1)** (Frobenius case, mmd 04.8 L166).
+`X(Zc)^{τ₂} ⊥ Y^{τ₁}`: for `χ ∈ X(Zc)`, `η ∈ Y`, the coherent images are orthogonal,
+`⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  This is the "by (4.1)" step, **independent** of the deep `b ≡ 0` argument.
+
+Pick distinct references `χ' ≠ χ` in `X(Zc)` (`2 ≤ |X(Zc)|`, from `two_le_xBaseBlock_ncard` +
+`xBaseBlock_subset`) and `η' ≠ η` in `Y` (`2 ≤ |Y|`, `two_le_Yset_ncard`), and apply
+`pairwise_inner_eq_zero_of_orthogonal_signedDifference` with `α = η^{τ₁}, β = η'^{τ₁}, γ = χ^{τ₂},
+δ = χ'^{τ₂}` and **degree coefficients** `u = χ'(1), v = χ(1)`.  Then `u•γ − v•δ =
+(χ'(1)•χ − χ(1)•χ')^{τ₂}` is the τ₂-image of a *supported* (degree-`0`,
+`sMember_smulDiffSupport_of_charValue_eq` — no divisibility needed) integer `X`-combination, and
+`α − β = (η − η')^{τ₁}` the τ₁-image of a supported (equal-degree, `Yset_apply_one`) `Y`-difference;
+the difference-orthogonality `inner_extension_eq_inner_of_supported` (`= 0` by `X ⊥ Y`) and degree-`0`
+`extension_apply_one_eq_zero_of_supported` discharge `hdiff`/`hα1`/`hγδ1`.  The conclusion `⟨α,γ⟩ = 0`
+gives the claim by conjugate symmetry. -/
+theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ)
+      (hyp.coherentYset.extension η) = 0 := by
+  classical
+  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
+  set hYc := hyp.coherentYset with hYc_def
+  -- irreducibility of members
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  -- `if`-formula for inner products of irreducibles (orthonormality)
+  have hinner : ∀ (φ ψ : ClassFunction ↥L ℂ), IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  -- distinct references (n, m ≥ 2)
+  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty :=
+    hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.xSet_finite_of_irreducible_X hXirr
+  have hX2 : 2 ≤ (hyp.Xset hyp.centralCommutator).ncard :=
+    le_trans (hyp.two_le_xBaseBlock_ncard hF hyp.centralCommutator_le hXne)
+      (Set.ncard_le_ncard (hyp.xBaseBlock_subset _) hXfin)
+  obtain ⟨χ', hχ'X, hχ'ne⟩ :=
+    Set.exists_ne_of_one_lt_ncard (by omega : 1 < (hyp.Xset hyp.centralCommutator).ncard) χ
+  obtain ⟨η', hη'Y, hη'ne⟩ :=
+    Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega : 1 < hyp.Yset.ncard) η
+  -- positive natural degrees of `χ`, `χ'`
+  obtain ⟨d, hd_pos, hd_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ, hXirr χ hχ⟩ : IrreducibleCharacter ↥L)
+  obtain ⟨d', hd'_pos, hd'_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ', hXirr χ' hχ'X⟩ : IrreducibleCharacter ↥L)
+  simp only [IrreducibleCharacter.coe_mk] at hd_eq hd'_eq
+  -- membership in the integral spans (`subset_span`)
+  have hχs : χ ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator) := Submodule.subset_span hχ
+  have hχ's : χ' ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator) := Submodule.subset_span hχ'X
+  have hηs : η ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη
+  have hη's : η' ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη'Y
+  -- the two supported difference inputs of (4.1)
+  set xdiff : ClassFunction ↥L ℂ := d' • χ - d • χ' with hxdiff_def
+  set ydiff : ClassFunction ↥L ℂ := η - η' with hydiff_def
+  have hx_supp : xdiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨?_, ?_⟩
+    · refine Submodule.sub_mem _ ?_ ?_
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d' χ]; exact Submodule.smul_mem _ _ hχs
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d χ']; exact Submodule.smul_mem _ _ hχ's
+    · exact hyp.sMember_smulDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ)
+        (hyp.Xset_subset_S hχ'X) (by rw [hd_eq, hd'_eq]; ring)
+  have hy_supp : ydiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨Submodule.sub_mem _ hηs hη's, ?_⟩
+    exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη'Y)
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη'Y).symm)
+  -- the image of `xdiff` is exactly the degree-weighted `u•γ − v•δ`
+  have hXeq : ((d' : ℝ) : ℂ) • hXc.extension χ - ((d : ℝ) : ℂ) • hXc.extension χ'
+      = hXc.extension xdiff := by
+    rw [hxdiff_def, map_sub, map_nsmul, map_nsmul,
+      ← Nat.cast_smul_eq_nsmul ℂ d' (hXc.extension χ),
+      ← Nat.cast_smul_eq_nsmul ℂ d (hXc.extension χ')]
+    push_cast
+    ring
+  have hYeq : hYc.extension η - hYc.extension η' = hYc.extension ydiff := by
+    rw [hydiff_def, map_sub]
+  -- disjointness `X(Zc) ⊥ Y` and the source orthogonality `⟨xdiff, ydiff⟩ = 0`
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  have hsrc0 : ClassFunction.inner xdiff ydiff = 0 :=
+    inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj xdiff hx_supp.1 ydiff hy_supp.1
+  -- discharge the (4.1) hypotheses and read off `⟨α,γ⟩ = 0`
+  have hconcl := OddOrder.RepresentationTheory.pairwise_inner_eq_zero_of_orthogonal_signedDifference
+    (Γ := G) (α := hYc.extension η) (β := hYc.extension η')
+    (γ := hXc.extension χ) (δ := hXc.extension χ')
+    (u := (d' : ℝ)) (v := (d : ℝ))
+    (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
+    (hYc.extension_mem_ZIrr η hηs)
+    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (hYc.extension_mem_ZIrr η' hη's)
+    (by rw [hYc.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
+        if_pos rfl])
+    (hXc.extension_mem_ZIrr χ hχs)
+    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ), if_pos rfl])
+    (hXc.extension_mem_ZIrr χ' hχ's)
+    (by rw [hXc.extension_inner_eq χ' χ' hχ's hχ's, hinner χ' χ' (hXirr χ' hχ'X) (hXirr χ' hχ'X),
+        if_pos rfl])
+    (by rw [hYc.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
+        if_neg (fun h => hη'ne h.symm)])
+    (by rw [hXc.extension_inner_eq χ χ' hχs hχ's, hinner χ χ' (hXirr χ hχ) (hXirr χ' hχ'X),
+        if_neg (fun h => hχ'ne h.symm)])
+    (by -- hdiff
+      rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
+        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj hXc hYc hx_supp hy_supp,
+        hsrc0, star_zero])
+    (by -- hα1
+      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hYc hy_supp)
+    (by -- hγδ1
+      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
+  rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
 
 /-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
 `himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
