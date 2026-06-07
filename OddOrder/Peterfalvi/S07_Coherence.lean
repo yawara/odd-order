@@ -3082,6 +3082,39 @@ theorem coherentImageMap_apply_eq {n : ℕ} {χ : Fin n → ClassFunction L ℂ}
   · intro j _ hjk; rw [horthχ k j, if_neg (fun h => hjk h.symm), zero_smul]
   · intro h; exact absurd (Finset.mem_univ k) h
 
+/-- **The two-family Fourier glue** `ν = νX-image on `range χX` ⊕ νY-image on `range χY``.
+For orthonormal families `χX`, `χY` with mutually orthogonal ranges, `ν φ =
+∑ᵢ ⟨φ,χXᵢ⟩•νX(χXᵢ) + ∑ⱼ ⟨φ,χYⱼ⟩•νY(χYⱼ)` sends `χXₖ ↦ νX(χXₖ)` and `χYₖ ↦ νY(χYₖ)` — the cross
+terms vanish by `⟨χXₖ,χYⱼ⟩ = 0`.  This is the `τ₃` glue of Peterfalvi (6.8.1): with `νX = τ₂`
+(the `X`-coherence extension) and `νY = τ₁` (the `Y`-coherence extension), it is the combined map
+agreeing with `τ₂` on `X` and `τ₁` on `Y`, ready for `coherentUnion_of_glued` (the only remaining
+input being `himg_ortho`). -/
+noncomputable def coherentImageMapGlue {n m : ℕ} (χX : Fin n → ClassFunction L ℂ)
+    (χY : Fin m → ClassFunction L ℂ) (νX νY : IntegralCharacterMap L G) :
+    IntegralCharacterMap L G :=
+  coherentImageMap (L := L) (G := G) χX (fun i => νX (χX i))
+    + coherentImageMap (L := L) (G := G) χY (fun j => νY (χY j))
+
+/-- The glue sends `χXₖ ↦ νX(χXₖ)`: the `νX`-image term is Parseval-exact (`χX` orthonormal), the
+`νY`-image term vanishes (`χXₖ ⊥ χYⱼ`). -/
+theorem coherentImageMapGlue_apply_left {n m : ℕ} {χX : Fin n → ClassFunction L ℂ}
+    {χY : Fin m → ClassFunction L ℂ} {νX νY : IntegralCharacterMap L G}
+    (horthX : ∀ i j, ClassFunction.inner (χX i) (χX j) = if i = j then (1 : ℂ) else 0)
+    (hXY : ∀ (k : Fin n) (j : Fin m), ClassFunction.inner (χX k) (χY j) = 0) (k : Fin n) :
+    coherentImageMapGlue (L := L) (G := G) χX χY νX νY (χX k) = νX (χX k) := by
+  rw [coherentImageMapGlue, LinearMap.add_apply, coherentImageMap_apply_eq horthX k,
+    coherentImageMap_apply, Finset.sum_eq_zero (fun j _ => by rw [hXY k j, zero_smul]), add_zero]
+
+/-- The glue sends `χYₖ ↦ νY(χYₖ)` (symmetric to `coherentImageMapGlue_apply_left`). -/
+theorem coherentImageMapGlue_apply_right {n m : ℕ} {χX : Fin n → ClassFunction L ℂ}
+    {χY : Fin m → ClassFunction L ℂ} {νX νY : IntegralCharacterMap L G}
+    (horthY : ∀ i j, ClassFunction.inner (χY i) (χY j) = if i = j then (1 : ℂ) else 0)
+    (hXY : ∀ (i : Fin n) (k : Fin m), ClassFunction.inner (χY k) (χX i) = 0) (k : Fin m) :
+    coherentImageMapGlue (L := L) (G := G) χX χY νX νY (χY k) = νY (χY k) := by
+  rw [coherentImageMapGlue, LinearMap.add_apply, coherentImageMap_apply,
+    Finset.sum_eq_zero (fun i _ => by rw [hXY i k, zero_smul]), zero_add,
+    coherentImageMap_apply_eq horthY k]
+
 /-- **Fourier expansion on the integral span of an orthonormal family.**
 Every `φ ∈ ℤ[range χ]` equals `∑ⱼ ⟨φ, χⱼ⟩ • χⱼ`. -/
 theorem eq_sum_inner_smul_of_mem_span {n : ℕ} {χ : Fin n → ClassFunction L ℂ}

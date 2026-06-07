@@ -386,13 +386,21 @@ green. The handoff's flagged structural risk is fully resolved and formalized. T
 `η₁^{τ₁}`; the "character const on `Zc^#`" hypothesis is exactly what the `Res η₁^{τ₁}` decomposition
 of task #3 supplies).
 
-**🔴 REMAINING for the (6.8) capstone — ALL deep character theory (handoff: attended, not
-autonomous):** L3 (3a) construct `ν` (the IntegralCharacterMap glue agreeing with τ₂/τ₁ — needs a
-new S07 combination constructor); L3 (3b) prove `himg_ortho` (the `b≡c≡0 mod a` argument: `Res η₁^{τ₁}`
-decomposition ⟹ const on `Zc^#` ⟹ **adapter** ⟹ `a∣c`, then norm bound ⟹ `b=0`); capstone
-Frobenius-branch wiring (mechanical once L3 done); CertainType case (B) (unplanned, separate). The
-autonomous structural runway ended with the (6.7) wiring; the rest is the subtle §13-style character
-theory to do attended.
+**🔴 REMAINING for the (6.8) capstone:**
+- **L3 (3a) construct `ν` — CORE DONE (commit `9977399`, axiom-clean).** `IntegralCharacterMap.coherentImageMapGlue`
+  (S07) = `coherentImageMap χX (τ₂∘χX) + coherentImageMap χY (τ₁∘χY)`, sending `χXₖ↦τ₂(χXₖ)`,
+  `χYₖ↦τ₁(χYₖ)` (`coherentImageMapGlue_apply_left/right`; cross terms vanish by X⊥Y). No new
+  constructor needed — built on the existing single-family Fourier map. **Remaining (3a)
+  shell-wiring (bookkeeping):** enumerate `X=Xset Zc`/`Y=Yset` as Fin-indexed orthonormal families
+  (`Finset.equivFin` + `irreducibleCharacter_inner`; `X⊥Y` from disjointness), set
+  `ν := coherentImageMapGlue`, discharge the L3 shell's `hagreeX`/`hagreeY` via apply_left/right.
+- **L3 (3b) prove `himg_ortho` — the deep `b≡c≡0 mod a` argument** (`Res η₁^{τ₁}` decomposition ⟹
+  const on `Zc^#` ⟹ **adapter `peterfalvi_67_centralCommutator`** ⟹ `a∣c`, then norm bound ⟹ `b=0`).
+  **The gating character theory, attended.** Tasks #3/#4.
+- capstone Frobenius-branch wiring (mechanical once L3 done); CertainType case (B) (unplanned).
+
+The autonomous structural runway (6.7 wiring + the 3a glue core) is done; the gating remainder is
+the subtle §13-style character theory (3b) to do attended.
 
 Order note: the adapter (step 5) and task #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
 prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with
