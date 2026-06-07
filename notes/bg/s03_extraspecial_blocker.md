@@ -126,8 +126,16 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
     - (C) **char-orthogonality** (`FDRep.char_orthonormal`, in mathlib): `dim E_m = (1/h)∑ₖ ε^{−mk} tr(c_{xᵏ})`,
       then (A)+(B) give `dim E_0 = (q²+h−1)/h`, `dim E_m = (q²−1)/h` ⟹ diff = 1.
   ALT: Prop 2.4(g) already gives `dim E_m = ∑nᵢnᵢ₊ₘ`; combined with `|χ_V(xᵏ)|²=1`, same conclusion.
-- **Also still needed**: `prop24k_fin` + its conditional (`C_V(H)=0 ⟹ q=h−1`); Prop 2.2(a)
-  alg-closed Clifford (`V_P = M`); base-change (2.9, done); then Thm 3.4 assembly.
+- **✅ Both Thm 2.5 conclusions now done conditional on the keystone** (`ExtraspecialThm25.lean`,
+  axiom-clean): `sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace` (q ≡ ±1) and
+  `…_eq_sub_one_…` (C_V(H)=0 ⟹ q=h−1), via `prop24j_fin`/`prop24k_fin` + Prop 2.4(h). **The keystone
+  `dim E₀ = dim E_m+1` is the SOLE remaining input for all of Thm 2.5.**
+- **Still needed after the keystone**: Prop 2.2(a) alg-closed Clifford (`V_P = M`); base-change
+  (2.9, done); then Thm 3.4 assembly (Maschke → faithful irred → Gor 5.3.7 → Thm 2.5 contradiction).
+- **NB the keystone needs a new framework**: the generic machinery above is stated for an abstract
+  `g : GL(V)`; the keystone instantiates it for `G = P ⋊ ⟨x⟩` with `P` extraspecial, `ρ : G → GL(V)`
+  faithful, `C_P(xᵏ)=Z`. The Burnside basis `{ρ(t)}` and the monomial `c_x`-action require building
+  this `P⋊H` representation setup (interfacing `IsExtraspecial` + the action) — the large remaining lift.
 - **Indexing bridge for prop24j**: `prop24j`/`prop24k` are over `ZMod h → ℤ`; eigenspace dims are
   `Fin h → ℕ`. `ZMod h ≃+ Fin h` (NeZero h) needed to transport the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis.
 - **(g)(h) bridge — leftover detail**:
