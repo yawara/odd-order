@@ -227,4 +227,57 @@ theorem card_quotient_center_le_sq_finrank [FiniteDimensional F V] [Finite P]
   have h1 := hindep.fintype_card_le_finrank
   rwa [Module.finrank_linearMap, ← pow_two, ← Nat.card_eq_fintype_card] at h1
 
+/-- **Gorenstein 5.5.5a (integer form): `(dim V)² = |P/Z|`.** For a faithful irreducible
+representation of a finite group `P` of nilpotency class `≤ 2` over an algebraically closed field
+with `char ∤ |P|`, `(dim V)² = Nat.card (P ⧸ Z(P))`.
+
+The `≥` direction is `card_quotient_center_le_sq_finrank` (trace-form independence). The `≤`
+direction is spanning: by Burnside `End_F V` is spanned by `{ρ g}`, and each `ρ g` is a multiple of
+`ρ(out ⟦g⟧)`, so the `|P/Z|` coset-rep images span `End_F V`, giving
+`(dim V)² = finrank (End_F V) ≤ |P/Z|`. (This is the basis of BG (2.11).) -/
+theorem sq_finrank_eq_card_quotient_center [FiniteDimensional F V] [Finite P]
+    [Invertible (Nat.card P : F)] (ρ : Representation F P V) [ρ.IsIrreducible]
+    (hf : Function.Injective ρ) (hcl : commutator P ≤ Subgroup.center P) :
+    Module.finrank F V ^ 2 = Nat.card (P ⧸ Subgroup.center P) := by
+  classical
+  haveI : Fintype P := Fintype.ofFinite P
+  haveI : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
+  set v : (P ⧸ Subgroup.center P) → Module.End F V := fun c => ρ (Quotient.out c) with hv
+  have hco : ∀ c : P ⧸ Subgroup.center P, (↑(Quotient.out c) : P ⧸ Subgroup.center P) = c :=
+    fun c => Quotient.out_eq' c
+  -- each `ρ g` is a scalar multiple of `v ⟦g⟧`, hence in `span (range v)`
+  have hmem_span : ∀ g : P, ρ g ∈ Submodule.span F (Set.range v) := by
+    intro g
+    have hz : g * (Quotient.out (↑g : P ⧸ Subgroup.center P))⁻¹ ∈ Subgroup.center P := by
+      rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, QuotientGroup.mk_inv, hco]
+      exact mul_inv_cancel _
+    obtain ⟨s, hs⟩ := center_isScalar ρ hz
+    have hgeq : g = g * (Quotient.out (↑g : P ⧸ Subgroup.center P))⁻¹
+        * Quotient.out (↑g : P ⧸ Subgroup.center P) := by group
+    rw [hgeq, map_mul, hs, ← Module.End.one_eq_id, smul_mul_assoc, one_mul]
+    exact Submodule.smul_mem _ s (Submodule.subset_span (Set.mem_range_self _))
+  -- the family spans `End_F V` (Burnside)
+  have hsub : ∀ r : MonoidAlgebra F P, ρ.asAlgebraHom r ∈ Submodule.span F (Set.range v) := by
+    intro r
+    induction r using MonoidAlgebra.induction_on with
+    | hM g => rw [asAlgebraHom_of]; exact hmem_span g
+    | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+    | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ _ hx
+  have hspan : Submodule.span F (Set.range v) = ⊤ := by
+    rw [eq_top_iff]
+    intro A _
+    obtain ⟨r, rfl⟩ := asAlgebraHom_surjective_of_isAlgClosed ρ A
+    exact hsub r
+  -- spanning ⟹ `(dim V)² ≤ |P/Z|`
+  have hle : Module.finrank F V ^ 2 ≤ Nat.card (P ⧸ Subgroup.center P) := by
+    have hfr : Module.finrank F (Module.End F V) ≤ Nat.card (P ⧸ Subgroup.center P) :=
+      calc Module.finrank F (Module.End F V)
+          = Module.finrank F ↥(Submodule.span F (Set.range v)) := by rw [hspan, finrank_top]
+        _ ≤ (Set.range v).toFinset.card := finrank_span_le_card _
+        _ ≤ Fintype.card (P ⧸ Subgroup.center P) := by
+            rw [Set.toFinset_range]; exact Finset.card_image_le.trans_eq Finset.card_univ
+        _ = Nat.card (P ⧸ Subgroup.center P) := Nat.card_eq_fintype_card.symm
+    rwa [Module.finrank_linearMap, ← pow_two] at hfr
+  exact le_antisymm hle (card_quotient_center_le_sq_finrank ρ hf hcl)
+
 end OddOrder.RepresentationTheory
