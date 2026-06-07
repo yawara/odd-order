@@ -96,13 +96,14 @@ real subtlety — that the `F`-valued character sum doesn't descend to the neede
 mass formula), avoiding Stone–von-Neumann and degree-divides-order entirely. Remaining work is real but
 routine assembly.
 
-**5.5.5a status:** i ✅ (`b3017ac` char-vanishing), ii ✅ (`e3cc34c` mass formula
-`sq_finrank_mul_card_center` + per-`Z` `char_mul_char_inv_of_mem_center`), iii ✅ (`40ef1d2`
-`finrank_cast_ne_zero`), **v ✅ (`ef6b560` `card_quotient_center_le_sq_finrank` = the independence
-`|P/Z| ≤ (dim V)²`, indexed by `P ⧸ Z` via `Quotient.out`, Gram diagonal via the trace-form
-functional + `Fintype.linearIndependent_iff`)**. **Resume at 5.5.5a-iv (spanning `(dim V)² ≤ |P/Z|`)**:
-`span F (range (fun c => ρ (Quotient.out c))) = ⊤` from Burnside (`asAlgebraHom_surjective_of_isAlgClosed`
-⟹ every `A = asAlgebraHom ρ r = r.sum (g c ↦ c • ρ g)` by `MonoidAlgebra.lift_apply`; each `ρ g` is a
-scalar multiple of `ρ(out ⟦g⟧)` since `g·(out⟦g⟧)⁻¹ ∈ Z`) ⟹ `finrank (End) ≤ card(P⧸Z)`
-(`finrank_span_le_card` + `Set.toFinset_range`/`card_image_le`); then vi `(dim V)² = |P/Z|` by
-`le_antisymm` with v (or do both at once via `finrank_span_eq_card` reusing the independence).
+**✅ 5.5.5a DONE** (`a6473bc` `sq_finrank_eq_card_quotient_center`: `(dim V)² = Nat.card (P ⧸ Z(P))`
+for faithful irreducible, `commutator P ≤ Z(P)`, alg-closed, `char ∤ |P|`). All of i–vi landed
+(`b3017ac` char-vanish, `e3cc34c` mass formula, `40ef1d2` `(dim V:F)≠0`, `ef6b560` independence ≥,
+`a6473bc` spanning ≤ + assembly). The whole tower is sorry-free + axiom-clean.
+
+**Important observation for Step 4 (Thm 2.5):** the deliverable `(dim V)² = |P/Z|` is exactly what BG
+(2.11) uses (the `|P/Z|` coset-rep images are a *basis* of `E(P)`, since `|P/Z| = dim E(P)`). BG calls
+`dim V = pⁿ` and `|P/Z| = p^{2n}`, but those equalities are just *naming* `q := dim V`; the divisibility
+conclusion `h | pⁿ ± 1` is `h | dim V ± 1`. So **5.5.5b (extraspecial `|P| = q^{1+2n}`, the even-rank
+symplectic group theory) is likely NOT needed for Thm 2.5** — use `dim V` directly as `q`. Confirm when
+wiring Thm 2.5; only prove 5.5.5b if the final Thm 3.4 arithmetic genuinely needs `dim V = qⁿ` literally.
