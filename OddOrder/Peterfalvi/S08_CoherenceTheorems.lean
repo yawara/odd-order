@@ -9867,6 +9867,71 @@ theorem dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius
     push_cast; ring
   · exact dvd_sub hacc (dvd_mul_right _ _)
 
+/-- **(6.8.1) cross-diagonal/`Y`-difference isometry** (mmd 04.8 L166, the constancy ingredient of
+decomposition (168)).  For `η = η₁`, `η' = η_j ∈ Y` with `η' ≠ η`, and an `X`-anchor `χ₁ ∈ X(Zc)`
+with `χ₁(1) = a·|W₁|` (`a > 0`):
+`⟨(χ₁−aη₁)^τ, (η_j−η₁)^τ⟩ = a`.
+
+By the Dade isometry on the supported pair `{χ₁−aη₁, η_j−η₁}`
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`; `χ₁−aη₁` supported by
+`sMember_scaledDiffSupport_of_charValue_eq`, `η_j−η₁` by `sMember_diffSupport_of_charValue_eq` at the
+common degree `|W₁|`), the inner product equals the source `⟨χ₁−aη₁, η_j−η₁⟩`, which expands by
+`X ⊥ Y` (`⟨χ₁,η_j⟩ = ⟨χ₁,η₁⟩ = 0`) and `Y`-orthonormality (`⟨η₁,η_j⟩ = 0`, `⟨η₁,η₁⟩ = 1`) to
+`a·⟨η₁,η₁⟩ = a`.  This gives the constancy `β_j − β₁ = a` (j>1) of the `η_j^{τ₁}`-coefficients
+`β_j = ⟨(χ₁−aη₁)^τ, η_j^{τ₁}⟩` of decomposition (168). -/
+theorem inner_tau_scaledDiff_tau_Yset_diff_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) (hne : η' ≠ η)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η)) (hyp.tau (η' - η)) = (a : ℂ) := by
+  classical
+  -- irreducibility + disjointness `X(Zc) ⊥ Y`.
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  -- supported difference inputs.
+  have hdeg : χ₁ 1 = (a : ℂ) * η 1 := by rw [ha, hyp.Yset_apply_one hη]
+  have hsuppX : (χ₁ - a • η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη) hdeg
+  have hsuppY : (η' - η).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη)
+      ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη).symm)
+  -- Dade isometry on the supported pair.
+  have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj (S := ({χ₁ - a • η, η' - η} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+        rcases hs with rfl | rfl
+        · exact hsuppX
+        · exact hsuppY)
+    (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  rw [hiso]
+  -- the source orthogonality computation `⟨χ₁ − a•η, η' − η⟩ = a`.
+  have hXY : ∀ ψ ∈ hyp.Yset, ClassFunction.inner χ₁ ψ = 0 := by
+    intro ψ hψ
+    exact inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hXirr φ hφ) (fun φ hφ => hYirr φ hφ) hdisj χ₁ (Submodule.subset_span hχ₁)
+      ψ (Submodule.subset_span hψ)
+  have hYon : ∀ ψ ψ' : ClassFunction ↥L ℂ, ψ ∈ hyp.Yset → ψ' ∈ hyp.Yset →
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hYirr ψ hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hYirr ψ' hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  rw [ClassFunction.inner_sub_right, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+    ← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+    hXY η' hη', hXY η hη, hYon η η' hη hη', hYon η η hη hη, if_neg (Ne.symm hne), if_pos rfl]
+  ring
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
