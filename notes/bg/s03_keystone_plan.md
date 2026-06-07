@@ -393,6 +393,15 @@ centralizer-dimension 補題が **不要**になった。
   4. **`finrank_eq_one_of_aut_fixedScalar` 適用** ⟹ `finrank_k E = 1` ⟹ m=1 (E≅M_m, m²=1) ⟹ `V_H` simple
      ⟹ W (simple 部分加群) `= ⊤` (finrank 一致 or simple ≤ ⊤)。これで Prop 2.2(a) = hVP discharge。
   + Gor 5.5.4 (hconj `W≅W^g`) は依然別 sub-piece (未着手, hVP の最終 hypothesis)。
+  - **wire-E recon (2026-06-08, 再調査不要)**: (a) module-level Schur 「`End_{k[G]} V = scalars`」は
+    **要組立** — mathlib の `finrank_endomorphism_simple_eq_one` は **category 版** (`CategoryTheory/Preadditive/Schur.lean:126`,
+    `FDRep` 経由); module 直は `AlgebraRepresentation/Basic.lean` の alg-closed Schur か、`End` が division ring
+    (`Module.End.instDivisionRing`, simple module) + f.d. division alg over alg-closed = k (`isSimpleModule_iff_finrank_eq_one`)
+    で組む。`irreducible_iff_isSimpleModule_asModule` (`Irreducible.lean:34`) で `ρ.IsIrreducible ↔ IsSimpleModule k[G] ρ.asModule`。
+    (b) `IsSimpleRing E` の直 instance **無し** → `V ≅ W^m` (`linearEquiv_fun`) ⟹ `E ≅ₐ Matrix m m (End_{k[H]}W)`
+    (`endVecAlgEquivMatrixEnd`), `End_{k[H]}W` は division ring (Schur) ⟹ `Matrix.isSimpleRing` + transport (`Nonempty (Fin m)`, m≥1)。
+    (c) θ=Ad(ρx) on E: `LinearEquiv.conjAlgEquiv (ρx)` は `End_k V` 全体の自己同型 → E (=`End_{k[H]}V`) を保つこと
+    を示して手で `E ≃ₐ E` 構築 (`Subalgebra.equivOfEq`/`AlgEquiv.ofInjective` は部分的; 直球 restrict は無く手構築濃厚)。
 - **Leaf hVP-assemble**: `eq_top_of_forall_map_conjSemilinearEnd_le` は m=1 finish で **不要** (W=⊤ を finrank
   経由で直接); hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
 - これで `Representation.IsIrreducible (ρ.comp P.subtype)` (= group-level Thm 2.5 の唯一残仮説) が discharge。
