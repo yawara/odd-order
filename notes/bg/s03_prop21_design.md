@@ -48,3 +48,28 @@ alg-closed `F`. Faithfulness is not needed for surjectivity — irreducibility s
 Fallback: prove Burnside via the **double-centralizer count** directly — `End_{F[G]} V = F`
 (Schur over alg-closed: `IsSimpleModule` ⇒ `DivisionRing (End)` `Basic.lean:530`, then alg-closed
 ⇒ `= F` via `algebraMap_bijective_of_isIntegral` `IsAlgClosed/Basic.lean:232`), then `dim_F A · dim_F (End_{F[G]}V) = (dim_F V)²` is NOT directly a mathlib lemma; the cleanest remains Wedderburn (steps 5–6). If both stall after a few attempts → blocker note + stop.
+
+## Iteration 2 status (2026-06-07) — Schur leaf: raw-End route hit instance plumbing
+
+Attempted the Schur half (`bijective_algebraMap_end_asModule`: over alg-closed,
+`algebraMap F (Module.End (MonoidAlgebra F G) ρ.asModule)` bijective) via division-ring + integral.
+**Build failed on instance synthesis** for the raw `End` over `F[G]`:
+- `Module (MonoidAlgebra F G) ρ.asModule` (in a `haveI := inferInstance` — odd, the instance exists at
+  `RepresentationTheory/Basic.lean:162`; likely an elaboration-order / `AddCommGroup ρ.asModule`
+  unfolding issue since `asModule` is a `def`),
+- `IsNoetherian F (ρ.asModule →ₗ[F] ρ.asModule)` (for `Module.Finite F (End_F asModule)`),
+- `Ring (Module.End (MonoidAlgebra F G) ρ.asModule)`.
+The raw `Module.End (F[G]) ρ.asModule` finiteness/algebra plumbing is fiddly.
+
+**Pivot for next iteration (cleaner Schur):** use **FDRep** where Schur is packaged —
+`FDRep.finrank_hom_simple_simple [IsAlgClosed F] (W W) [Simple W] : finrank F (W ⟶ W) = 1`
+(`RepresentationTheory/FDRep.lean:160`). Bridge `Representation F G V` ⇝ `FDRep F G` (`FDRep.of`,
+check constructor) and `IsIrreducible ρ` ⇝ `Simple (FDRep.of ρ)`, then read off `End = F`. Or fix the
+raw-End instances by providing `AddCommGroup`/`Module F`/`Module.Finite` on `ρ.asModule` explicitly
+(`ρ.asModuleEquiv`).
+
+**Reality check (for a human decision):** even with Schur done, **Burnside** (`E(P) = End_F V`) is the
+genuine **~150-line** Wedderburn-structural gap (semisimple image → faithful-simple ⟹ single matrix
+factor → dim count; the "faithful simple ⟹ simple ring" step is NOT in mathlib). And Thm 2.5 further
+needs Gor 5.5.5 (extraspecial dim) + Prop 2.2 alg-closed, then Thm 3.4. The whole tower is a **large,
+expert, multi-session representation-theory build**. Worth weighing vs reprioritizing the FT spine.
