@@ -33,11 +33,11 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 
 | 依存 | mmd | 状態 | 備考 |
 |---|---|---|---|
-| **Lem 1.21(a)** | L566 | ❌ 未 | `H≤G, plen1 G ⇒ plen1 H` (= p-length 部分群単調性, **10.6 でも必要**) |
-| **Lem 1.21(b)** | L567 | ❌ 未 | `H ⊴ G normal p'-sub, plen1(G/H) ⇒ plen1 G`。(3.8) で使用 |
-| **Lem 1.21(c)** | L568 | ❌ 未 | `H ⊴ G normal p-sub, O_{p'}(G/H)=1, plen1(G/H) ⇒ plen1 G`。(3.9) |
-| **Lem 1.21(d)** | L569 | ❌ 未 | `plen1 G ⟺ ⟨p-elements⟩ が normal p-complement を持つ`。(e) の engine |
-| **Lem 1.21(e)** | L570 | ❌ 未 | `H,N ⊴ G, H∩N=1, plen1(G/H), plen1(G/N) ⇒ plen1 G`。(3.11) |
+| **Lem 1.21(a)** | L566 | ✅ | `hasPLengthOne_subgroup` (= p-length 部分群単調性, **10.6 でも必要**) |
+| **Lem 1.21(b)** | L567 | ✅ | `hasPLengthOne_of_isPiPrime_normal_quotient`。(3.8) で使用 |
+| **Lem 1.21(c)** | L568 | ✅ | `hasPLengthOne_of_isPGroup_normal_quotient`。(3.9) |
+| **Lem 1.21(d)** | L569 | — bypass | `⟨p-elements⟩` 特徴づけ。(e) を product-core 経由にしたので不要 |
+| **Lem 1.21(e)** | L570 | ✅ | `hasPLengthOne_of_inf_eq_bot`。(3.11)。product 埋め込み + (a) |
 | **Thm 3.4** | L863 | ❌ 未 | 可解奇 G, normal Hall K + prime-order 補群 R, V 上 (char∤\|G\|), `C_V(R)=0 ⇒ [R,K]⊆C_K(V)`。表現論 (Clifford/Maschke/special) |
 | **Thm 3.5** | L903 | ❌ 未 | Frobenius G=KR (K 可解, R cyclic prime), V 上, `C_V(R) 1-dim ⇒ K'⊆C_K(V)`。Clifford/Maschke/Wedderburn/Prop2.2/Lem3.3 |
 | **Lem 3.3** | L845 | ✅ | S03b_Lemma33 `kernel_acts_trivially_of_centralizer_eq_bot` 等 |
@@ -86,23 +86,25 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 +`index_dvd_of_le` で `|range fA| ∣ |range gA|`=p冪 ⇒ IsPGroup ⇒ `le_oPiPrimePiCore_of_quotient_isPGroup`。
 最終 index 鎖は `index_dvd_of_le` + `relIndex_dvd_index_of_normal` (O_{p',p}G normal)。**(a) は Thm 10.6 の H≤M reduction を解く**。
 
-**Lemma 1.21: (a)(b)(c) 完了 (sorry-free)。(e) は product-core 経由で進行中:**
-- ✅ `oPiCore_prod` (`ee73dac`): `O_π(A×B) = O_π A ×' O_π B`。(e) の product 段の土台。
-- **(e) 残り (~80 行, 設計確定, 全て PLengthTransfer.lean 内に積む):**
-  1. **iso 不変** `hasPLengthOne_of_mulEquiv (φ : G ≃* G')`: `(oPiPrimePiCore π G).map φ = oPiPrimePiCore π G'`
-     (`oPiPrimePiCore = comap (mk' O_{p'}) (O_p(·/O_{p'}))` を `oPiCore.map_eq_of_mulEquiv` で 2 段 transport;
-     descending iso `ψ : G/N ≃* G'/(N.map φ)` は `quotientKerEquivOfSurjective ((mk' (N.map φ)).comp φ)` で構成,
-     ker = comap φ (N.map φ) = N) ⇒ `Nat.card` 等しく iso 不変。~25 行。
-  2. **quotient-of-product iso** `(A×B)/(H ×' K) ≃* (A/H)×(B/K)`: `quotientKerEquivOfSurjective (MonoidHom.prodMap (mk' H)(mk' K))`
-     (ker = H ×' K) + `quotientMulEquivOfEq`。~15 行。
-  3. **`hasPLengthOne_prod`** A,B plen1 ⇒ A×B plen1: bridge + `oPiCore_prod` (O_{p'} と O_p の 2 段) + (2) の iso
-     + `Nat.card_prod` で `|((A×B)/O_{p'})/O_p| = |(A/O_{p'})/O_p|·|(B/O_{p'})/O_p|`, p 素数で ¬p∣ ⟺ 両方。~30 行。
-  4. **(e) 本体**: `φ : G →* (G/H)×(G/N)` (`(mk' H).prod (mk' N)`), `ker = H ⊓ N = ⊥` ⇒ injective ⇒
-     `G ≃* range φ` (`quotientKerEquivOfSurjective`/`ofInjective`); `hasPLengthOne_prod` で product plen1,
-     `hasPLengthOne_subgroup` (=1.21a) で `↥(range φ)` plen1, (1) の iso 不変で `G` plen1。~25 行。
-- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}` は (e) 近道で回避済 (不要)。Thm 3.6 (3.11) は (e) を cite。
+**✅ Lemma 1.21 完了: (a)(b)(c)(e) すべて sorry-free + axiom-clean。(d) は bypass (不要)。**
+PLengthTransfer.lean を `OddOrder.lean` root に配線済 (full build 3587 + AxiomsCheck allowlist OK)。
 
-**Thm 3.6 残ブロッカー (1.21 完成後)**: **Thm 3.4** (L863) + **Thm 3.5** (L903) = 表現論 (Clifford/Maschke/Wedderburn, 最重量) + **Gorenstein 5.3.7** (special q-群)。これらが本丸の山。
+(e) は product 埋め込み経由で landing (2026-06-07, この章の最終チャンク):
+- ✅ `oPiCore_prod` (`ee73dac`): `O_π(A×B) = O_π A ×' O_π B`。product 段の土台。
+- ✅ **(e)-1 iso 不変** `hasPLengthOne_of_mulEquiv (e : G ≃* G')`: bridge の double quotient を
+  `QuotientGroup.congr` + `oPiCore.map_eq_of_mulEquiv` で O_{p'}/O_p の 2 段 transport ⇒ `Nat.card` 不変。
+- ✅ **(e)-2 product 商 iso** `quotientProd_mulEquiv : (A×B)/(H ×' K) ≃* (A/H)×(B/K)`:
+  `quotientKerEquivOfSurjective (prodMap (mk' H)(mk' K))` (`ker_prodMap`+`ker_mk'`) + `quotientMulEquivOfEq`。
+- ✅ **(e)-3 `hasPLengthOne_prod`** A,B plen1 ⇒ A×B plen1: double quotient を (e)-1/(e)-2/`oPiCore_prod` で
+  `DQ(A×B) ≃* DQ(A)×DQ(B)` に分解 ⇒ `Nat.card_prod` + `Nat.Prime.dvd_mul`。
+- ✅ **(e) 本体** `hasPLengthOne_of_inf_eq_bot`: `(mk' H).prod (mk' N) : G →* (G/H)×(G/N)`,
+  `ker = H⊓N = ⊥` (`ker_prod`) ⇒ injective ⇒ `MonoidHom.ofInjective` で `G ≃* range`;
+  `hasPLengthOne_prod` + `hasPLengthOne_subgroup` (=1.21a) + (e)-1 iso 不変。
+- **(d)** `hasPLengthOne ⟺ ⟨p-elements⟩=O^{p'}` は (e) 近道で回避 (不要)。Thm 3.6 (3.11) は (e) を cite。
+
+**Thm 3.6 残ブロッカー (1.21 完成済, ここから本丸)**: **Thm 3.4** (L863) + **Thm 3.5** (L903)
+= 表現論 (Clifford/Maschke/Wedderburn, 最重量) + **Gorenstein 5.3.7** (special q-群)。
 
 **進捗ログ**: overnight loop (`4a9bf08`..`3b841e9`, 7 commits: foundation+(b)+(c)+(a) building block 4つ)、
-朝 attended (`5aeb6f0` crux + `2271b55` (a) 完成)。次 = (e) product-core 開発 か Thm 3.4/3.5 着手。
+朝 attended (`5aeb6f0` crux + `2271b55` (a) 完成)、(e) landing (このセッション: (e)-1〜本体 4 補題 +
+root 配線)。**Lemma 1.21 全完。次 = Thm 3.4 着手** (S03 表現論新ファイル, Lem 3.3 ✅ を使う)。
