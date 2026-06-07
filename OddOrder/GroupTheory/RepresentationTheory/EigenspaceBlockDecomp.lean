@@ -127,4 +127,65 @@ theorem finrank_iSup_cyclicHomBlockFin_diagonal {epsilon : F} {g : Module.End F 
   rw [finrank_iSup_of_iSupIndep _ hindep]
   exact Finset.sum_congr rfl fun i _ => finrank_cyclicHomBlockFin hV i (i + m)
 
+/-- The `m`-diagonal of blocks lies in the conjugation `εᵐ`-eigenspace: `⨆ᵢ E_{i,i+m} ≤ E_m`
+(BG Prop 2.4(e)/(f), supremum form). -/
+theorem iSup_cyclicHomBlockFin_diagonal_le {epsilon : F} (hε : epsilon ≠ 0)
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ}
+    (hspan : Submodule.span F (cyclicEigenspaceFinUnion epsilon (g : Module.End F V) h) = ⊤)
+    (hperiod : epsilon ^ h = 1) (m : Fin h) :
+    (⨆ i, cyclicHomBlockFin epsilon (g : Module.End F V) i (i + m))
+      ≤ cyclicEndConjEigenspaceFin epsilon g m := by
+  refine iSup_le fun i =>
+    cyclicHomBlockFin_le_cyclicEndConjEigenspace_of_modEq hε hspan hperiod ?_
+  show i.1 + m.1 ≡ ((i + m : Fin h) : ℕ) [MOD h]
+  rw [Fin.val_add]
+  exact (Nat.mod_modEq _ _).symm
+
+open Module in
+/-- **BG Proposition 2.4(g).** For the conjugation `εᵐ`-eigenspace `E_m` on `End V`,
+`dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ` where `nᵢ = dim Vᵢ`. Sandwich: each diagonal `⨆ᵢ E_{i,i+m} ≤ E_m` gives
+`∑ᵢ nᵢnᵢ₊ₘ ≤ dim E_m`; the `E_m` are independent (distinct eigenvalues) so `∑ₘ dim E_m ≤ dim End`;
+and `∑ₘ ∑ᵢ nᵢnᵢ₊ₘ = (∑ nᵢ)² = (dim V)² = dim End`, forcing termwise equality. -/
+theorem finrank_cyclicEndConjEigenspaceFin {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} [NeZero h] [FiniteDimensional F V]
+    (hprim : IsPrimitiveRoot epsilon h)
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h))
+    (m : Fin h) :
+    finrank F (cyclicEndConjEigenspaceFin epsilon g m)
+      = ∑ i, cyclicEigenspaceFinDim epsilon (g : Module.End F V) i
+          * cyclicEigenspaceFinDim epsilon (g : Module.End F V) (i + m) := by
+  set n : Fin h → ℕ := fun i => cyclicEigenspaceFinDim epsilon (g : Module.End F V) i with hn
+  have hε : epsilon ≠ 0 := hprim.ne_zero (NeZero.ne h)
+  have hperiod : epsilon ^ h = 1 := hprim.pow_eq_one
+  have hspan := span_cyclicEigenspaceFinUnion_eq_top_of_isInternal hV
+  -- `∑ᵢ nᵢnᵢ₊ₘ' ≤ dim E_{m'}` for every `m'`
+  have hge : ∀ m' : Fin h, (∑ i, n i * n (i + m'))
+      ≤ finrank F (cyclicEndConjEigenspaceFin epsilon g m') := fun m' => by
+    rw [← finrank_iSup_cyclicHomBlockFin_diagonal hV m']
+    exact Submodule.finrank_mono (iSup_cyclicHomBlockFin_diagonal_le hε hspan hperiod m')
+  -- the conjugation eigenspaces are independent (distinct eigenvalues)
+  have hindep : iSupIndep (fun m' : Fin h => cyclicEndConjEigenspaceFin epsilon g m') :=
+    cyclicEigenspaceFin_iSupIndep (g := cyclicEndConj g) hprim
+  have hle : (∑ m' : Fin h, finrank F (cyclicEndConjEigenspaceFin epsilon g m'))
+      ≤ finrank F (Module.End F V) := by
+    rw [← finrank_iSup_of_iSupIndep _ hindep]
+    exact Submodule.finrank_le _
+  have hsumV : ∑ i, n i = finrank F V := by
+    rw [← (LinearEquiv.ofBijective
+      (DirectSum.coeLinearMap (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h))
+      hV).finrank_eq, finrank_directSum]
+  -- `∑ₘ ∑ᵢ nᵢnᵢ₊ₘ = (dim V)² = dim End`
+  have htotal : (∑ m' : Fin h, ∑ i, n i * n (i + m')) = finrank F (Module.End F V) := by
+    rw [Finset.sum_comm]
+    simp_rw [← Finset.mul_sum]
+    have hreindex : ∀ i : Fin h, (∑ m', n (i + m')) = ∑ j, n j := fun i =>
+      Equiv.sum_comp (Equiv.addLeft i) n
+    simp_rw [hreindex]
+    rw [← Finset.sum_mul, hsumV, Module.finrank_linearMap]
+  -- termwise equality from the sandwich
+  have hsum_ab : (∑ m' : Fin h, ∑ i, n i * n (i + m'))
+      = ∑ m' : Fin h, finrank F (cyclicEndConjEigenspaceFin epsilon g m') :=
+    le_antisymm (Finset.sum_le_sum fun m' _ => hge m') (hle.trans_eq htotal.symm)
+  exact ((Finset.sum_eq_sum_iff_of_le fun m' _ => hge m').mp hsum_ab m (mem_univ m)).symm
+
 end OddOrder.RepresentationTheory
