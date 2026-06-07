@@ -36,4 +36,26 @@ theorem sum_cyclicEigenspaceFinDecomposition_eq {epsilon : F} {g : Module.End F 
   rw [DFinsupp.sum_eq_sum_fintype _ (fun _ => rfl)]
   simp
 
+/-- **Every endomorphism is the sum of its `(i,t)`-blocks** (BG Prop 2.4(c), spanning half). -/
+theorem sum_cyclicHomBlockFinProjection_eq {epsilon : F} {g : Module.End F V} {h : ℕ}
+    [FiniteDimensional F V] (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon g h))
+    (e : Module.End F V) :
+    ∑ p : Fin h × Fin h, ((cyclicHomBlockFinProjection hV p.1 p.2 e : Module.End F V)) = e := by
+  classical
+  ext v
+  have hv : v ∈ ⨆ j, cyclicEigenspaceFinFamily epsilon g h j := by
+    rw [hV.submodule_iSup_eq_top]; trivial
+  induction hv using Submodule.iSup_induction' with
+  | mem j w hw =>
+    rw [LinearMap.sum_apply, Fintype.sum_prod_type, Finset.sum_eq_single j]
+    · rw [Finset.sum_congr rfl
+        (fun t _ => cyclicHomBlockFinProjection_apply_of_mem_same hV e hw)]
+      exact sum_cyclicEigenspaceFinDecomposition_eq hV (e w)
+    · intro i _ hi
+      exact Finset.sum_eq_zero
+        (fun t _ => cyclicHomBlockFinProjection_apply_of_mem_ne hV (Ne.symm hi) e hw)
+    · intro hj; exact absurd (mem_univ j) hj
+  | zero => simp
+  | add x y _ _ ihx ihy => rw [map_add, map_add, ihx, ihy]
+
 end OddOrder.RepresentationTheory
