@@ -32,9 +32,10 @@ open Finset EigenspaceUnderCyclicAction Module
 variable {F : Type*} [Field F]
 variable {W : Type*} [AddCommGroup W] [Module F W]
 
-/-- A power of a root of unity is periodic in its exponent modulo `hh`: if `ζ^hh = 1` and
-`a ≡ c [MOD hh]` then `ζ^a = ζ^c`. -/
-theorem pow_eq_pow_of_modEq {ζ : F} {hh : ℕ} (hζ : ζ ^ hh = 1) {a c : ℕ}
+/-- A power of a finite-order element is periodic in its exponent modulo `hh`: if `ζ^hh = 1` and
+`a ≡ c [MOD hh]` then `ζ^a = ζ^c`. (Stated for any monoid, so it applies both to roots of unity in
+`F` and to finite-order endomorphisms `T : End W`.) -/
+theorem pow_eq_pow_of_modEq {M : Type*} [Monoid M] {ζ : M} {hh : ℕ} (hζ : ζ ^ hh = 1) {a c : ℕ}
     (hac : a ≡ c [MOD hh]) : ζ ^ a = ζ ^ c := by
   wlog hle : c ≤ a generalizing a c
   · exact (this hac.symm (not_le.mp hle).le).symm
@@ -43,16 +44,17 @@ theorem pow_eq_pow_of_modEq {ζ : F} {hh : ℕ} (hζ : ζ ^ hh = 1) {a c : ℕ}
 
 section CyclicShift
 
-variable {h : ℕ} [NeZero h] (b : Basis (ZMod h) F W) (T : Module.End F W)
+variable {h : ℕ} [NeZero h]
 
 /-- `↑(x.val) = x` for the self-cast `ZMod h → ZMod h`. -/
 private theorem natCast_val_zmod (x : ZMod h) : ((x.val : ℕ) : ZMod h) = x :=
   ZMod.natCast_rightInverse x
 
-/-- The explicit eigenvector identity for a cyclic shift: `v = ∑_j (ε^i)⁻¹^{j.val} • b j` is an
-`ε^i`-eigenvector of `T` (where `T (b j) = b (j+1)`), provided `ε^h = 1`. -/
-theorem cyclicShift_hasEigenvector {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
-    (hb : ∀ j, T (b j) = b (j + 1)) (i : ℕ) :
+/-- The explicit eigenvector identity for a cyclic shift on **any family** `b : ZMod h → W` (no
+basis needed): `v = ∑_j (ε^i)⁻¹^{j.val} • b j` is an `ε^i`-eigenvector of `T` whenever
+`T (b j) = b (j+1)` and `ε^h = 1`. -/
+theorem cyclicShift_hasEigenvector (T : Module.End F W) (b : ZMod h → W) {ε : F} (hε : ε ≠ 0)
+    (hεpow : ε ^ h = 1) (hb : ∀ j, T (b j) = b (j + 1)) (i : ℕ) :
     T (∑ j : ZMod h, ((ε ^ i)⁻¹ ^ j.val) • b j)
       = (ε ^ i) • ∑ j : ZMod h, ((ε ^ i)⁻¹ ^ j.val) • b j := by
   set ζ : F := (ε ^ i)⁻¹ with hζdef
@@ -86,11 +88,31 @@ theorem cyclicShift_hasEigenvector {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [hgeom k, mul_smul]
 
+/-- **Projection onto an `ε^i`-eigenspace** (the BG (2.11) `F[H]`-module count input). For a
+finite-order endomorphism `T` (`T^h = 1`) and any vector `w`, the "Fourier mode"
+`∑_j (ε^i)⁻¹^{j.val} • T^{j.val} w` lies in `T.eigenspace (ε^i)` (`ε^h = 1`). This is
+`cyclicShift_hasEigenvector` applied to the cyclic family `j ↦ T^{j.val} w`, on which `T` acts as
+the shift (`T (Tʲw) = Tʲ⁺¹w`, periodic since `T^h = 1`). -/
+theorem sum_pow_smul_mem_eigenspace (T : Module.End F W) {ε : F} (hε : ε ≠ 0) (hεpow : ε ^ h = 1)
+    (hTh : T ^ h = 1) (w : W) (i : ℕ) :
+    (∑ j : ZMod h, ((ε ^ i)⁻¹ ^ j.val) • (T ^ j.val) w) ∈ Module.End.eigenspace T (ε ^ i) := by
+  rw [Module.End.mem_eigenspace_iff]
+  have hb : ∀ j : ZMod h, T ((T ^ j.val) w) = (T ^ (j + 1).val) w := by
+    intro j
+    have hmod : j.val + 1 ≡ (j + 1).val [MOD h] := by
+      apply (ZMod.natCast_eq_natCast_iff _ _ _).mp
+      push_cast
+      rw [natCast_val_zmod j, natCast_val_zmod (j + 1)]
+    have hpow : T ^ (j.val + 1) = T ^ (j + 1).val := pow_eq_pow_of_modEq hTh hmod
+    rw [← Module.End.mul_apply, ← pow_succ', hpow]
+  exact cyclicShift_hasEigenvector T (fun j => (T ^ j.val) w) hε hεpow hb i
+
 /-- **Each eigenspace of a cyclic shift is one-dimensional.** For `b : Basis (ZMod h) F W` and the
 shift `T (b j) = b (j+1)`, and `ε` a primitive `h`-th root of unity,
 `finrank (T.eigenspace (ε^{i})) = 1` for every `i : Fin h`. (The regular representation of `ZMod h`
 splits into the `h` distinct characters, each with multiplicity one.) -/
-theorem finrank_cyclicEigenspaceFin_cyclicShift {ε : F} (hε : IsPrimitiveRoot ε h)
+theorem finrank_cyclicEigenspaceFin_cyclicShift (T : Module.End F W) (b : Basis (ZMod h) F W)
+    {ε : F} (hε : IsPrimitiveRoot ε h)
     (hb : ∀ j, T (b j) = b (j + 1)) (i : Fin h) :
     finrank F (cyclicEigenspaceFin ε T i) = 1 := by
   haveI : FiniteDimensional F W := Module.Finite.of_basis b
@@ -102,7 +124,7 @@ theorem finrank_cyclicEigenspaceFin_cyclicShift {ε : F} (hε : IsPrimitiveRoot 
     rw [Submodule.ne_bot_iff]
     refine ⟨∑ l : ZMod h, ((ε ^ j.1)⁻¹ ^ l.val) • b l, ?_, ?_⟩
     · rw [mem_cyclicEigenspaceFin_iff]
-      exact cyclicShift_hasEigenvector b T hε0 hεpow hb j.1
+      exact cyclicShift_hasEigenvector T b hε0 hεpow hb j.1
     · -- nonzero: its `0`-coordinate is `(ε^{j.1})⁻¹^0 = 1`
       intro hzero
       have hcoord : (b.repr (∑ l : ZMod h, ((ε ^ j.1)⁻¹ ^ l.val) • b l)) 0 = 1 := by
