@@ -402,6 +402,23 @@ centralizer-dimension 補題が **不要**になった。
     (`endVecAlgEquivMatrixEnd`), `End_{k[H]}W` は division ring (Schur) ⟹ `Matrix.isSimpleRing` + transport (`Nonempty (Fin m)`, m≥1)。
     (c) θ=Ad(ρx) on E: `LinearEquiv.conjAlgEquiv (ρx)` は `End_k V` 全体の自己同型 → E (=`End_{k[H]}V`) を保つこと
     を示して手で `E ≃ₐ E` 構築 (`Subalgebra.equivOfEq`/`AlgEquiv.ofInjective` は部分的; 直球 restrict は無く手構築濃厚)。
-- **Leaf hVP-assemble**: `eq_top_of_forall_map_conjSemilinearEnd_le` は m=1 finish で **不要** (W=⊤ を finrank
-  経由で直接); hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
-- これで `Representation.IsIrreducible (ρ.comp P.subtype)` (= group-level Thm 2.5 の唯一残仮説) が discharge。
+- **✅ module-Schur LANDED** (2026-06-08, commit `1e4c9314`): `algebraMap_end_bijective_of_isSimpleModule`
+  (`SkolemNoether.lean`) — `[Field k][IsAlgClosed k][Algebra k R]`, M simple R-加群 f.d. over k ⟹
+  `algebraMap k (End R M)` bijective (= 全 endo が scalar)。**eigenvalue 論法で diamond 回避**: f は固有値 c∈k を持ち
+  (`Module.End.exists_eigenvalue`, alg-closed+f.d.), `ker(f−c•id)` は simple M の非零 R-部分加群 ⟹ ⊤ ⟹ f=c•id。
+  `Module.End.instDivisionRing` の **semiring diamond を完全回避** (note 旧推奨の FDRep ルートも不要だった)。
+  ⟹ wire-E step 3 (`E^θ⊆scalars` for `End_{k[G]}V`) + step 1 (`End_{k[H]}W≅k` for IsSimpleRing E) の両方を供給。
+- **🔑 θ construction の KEY INSIGHT (2026-06-08, 次セッション用)**: by-hand map_smul' を避ける道 —
+  既存 `conjSemilinearEnd ρ x` (CliffordAlgClosed, σ_x:=conjMonoidAlgRingHom x-semilinear) を使い
+  `θ(f) := conjSL(x) ∘ f ∘ conjSL(x⁻¹)`。**semilinear twist が相殺**: σ_x ∘ σ_{x⁻¹} = id (∵ conj_x∘conj_{x⁻¹}=id on H)
+  ⟹ θ(f) は **k[H]-linear 自動** (RingHomCompTriple σ_{x⁻¹} σ_x id 要)。あるいは by-hand map_smul' (single h c で
+  reduce, ρ の hom 性で計算; 既に worked out — `θ(f)(single h c•v)=single h c•θ(f)(v)` は ρ(hx)=ρ(h)ρ(x) 等で展開)。
+  `asModule := V` は **defeq** (`Representation.asModule` は型シノニム, `asModuleEquiv` で橋) — ρx を asModule 上で使える。
+  θ の AlgEquiv packaging (map_mul/map_add/commutes/bijective, θ⁻¹=conj by x⁻¹) が残工数の主 (~60-100 行)。
+- **bridge finrank E=1 ⟹ V_H simple**: projection idempotent (W 補元 p∈E, finrank E=1 ⟹ E=k•id ⟹ p=c•id,
+  idempotent ⟹ c∈{0,1}, range p=W ⟹ W=⊥/⊤) ‖ 「End=scalar ⟹ 非自明 idempotent 無 ⟹ indecomposable + semisimple ⟹ simple」。
+- **Leaf hVP-assemble**: 最終結論は `Representation.IsIrreducible (resRep ρ H)` (= `IsSimpleModule k[↥H] (resRep ρ H).asModule`,
+  `irreducible_iff_isSimpleModule_asModule`) — group-level Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) が直消費。
+  hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
+- **wire-E 残工数見積**: θ packaging (~60-100) + IsSimpleRing E (~30, module-Schur 利用) + bridge (~25) + assembly (~30)
+  ≈ 1 セッション。SN core/wrapper/module-Schur (本セッション 3 commit) で **材料は出揃った**; 残は asModule 越しの組立。
