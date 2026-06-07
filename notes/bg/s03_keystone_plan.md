@@ -127,9 +127,10 @@ diagonalization. **Route-independent** (works for any orbit once it's reduced to
 
 **▶ Remaining Leaf 3 = the ORBIT ASSEMBLY (the bulk that's left).** Refined plan — a **GLOBAL SQUEEZE**
 that AVOIDS the orbit `DirectSum.IsInternal` and the "block-eigenspace = ∑" lemma:
-1. Generalize the basis to a section: `burnsideBasisOfSection (t : P/Z → P) (ht : ∀ c, ⟦t c⟧ = c)`
-   (refactor Leaf 1; independence/spanning work for any section, not just `Quotient.out`).
-2. Construct the **φ-equivariant section** `t` (orbit-rep choice + `φ^j` propagation; `σ`-orbits of
+1. ✅ DONE (`BurnsideBasis.lean`, commit `22384c0`): `burnsideBasisOfSection ρ hf hcl t ht`
+   for any section `t` (+ `linearIndependent_representation_section`, `span_range_section_eq_top`,
+   `burnsideBasisOfSection_apply`). `Quotient.out` versions now delegate to these (DRY).
+2. ▶ Construct the **φ-equivariant section** `t` (orbit-rep choice + `φ^j` propagation; `σ`-orbits of
    `P/Z` are free for `c ≠ ⟦1⟧` from `C_{P/Z}(xᵏ)=1`, fixed only at `⟦1⟧`). Get `φ(t c) = t(σ c)`
    ⟹ via `cyclicEndConj_representation`, `c_x (b c) = b (σ c)` — a **PURE permutation** (twist gone).
 3. **Per free orbit**, the orbit submodule `W_O = span{b_s : s∈O}` has `Basis (ZMod h) F W_O`
