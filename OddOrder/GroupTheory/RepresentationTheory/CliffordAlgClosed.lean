@@ -7,6 +7,7 @@ import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.Algebra.MonoidAlgebra.MapDomain
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Algebra.Module.Submodule.RestrictScalars
 
 /-!
 # Conjugation permutes the simple constituents of a restriction (general field)
@@ -166,6 +167,37 @@ theorem isSimpleModule_map_conjSemilinearEnd
       N.map (conjSemilinearEnd (H := H) ρ g) := rfl
   rw [isSimpleModule_iff_isAtom, ← hmap]
   exact (OrderIso.isAtom_iff _ N).mpr hatomN
+
+/-- **The final step of BG Prop 2.2(a).** If `ρ` is irreducible and `W` is a nonzero
+`k[H]`-submodule of the restriction `(resRep ρ H).asModule` that is `G`-invariant (stable under
+every `ρ g`, expressed via `conjSemilinearEnd`), then `W = ⊤`.  A `G`-invariant `k[H]`-submodule is
+the carrier of a
+`Subrepresentation ρ`, so irreducibility (`IsSimpleOrder (Subrepresentation ρ)`) forces it to be `⊥`
+or `⊤`; nonzero rules out `⊥`. -/
+theorem eq_top_of_forall_map_conjSemilinearEnd_le
+    [ρ.IsIrreducible] (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥)
+    (hinv : ∀ g : G, W.map (conjSemilinearEnd (H := H) ρ g) ≤ W) :
+    W = ⊤ := by
+  -- `W`, being `G`-invariant, is the carrier of a `Subrepresentation ρ`
+  let Wρ : Subrepresentation ρ :=
+    { toSubmodule := W.restrictScalars k
+      apply_mem_toSubmodule := fun g v hv => by
+        have hv' : v ∈ W := hv
+        have : (show (resRep ρ H).asModule from ρ g v) ∈ W :=
+          hinv g (Submodule.mem_map_of_mem hv')
+        exact this }
+  rcases IsSimpleOrder.eq_bot_or_eq_top Wρ with hbot | htop
+  · -- `Wρ = ⊥` forces `W = ⊥`, contradicting `hW`
+    have h0 : W.restrictScalars k = ⊥ := congrArg Subrepresentation.toSubmodule hbot
+    refine absurd (eq_bot_iff.mpr fun v hv => ?_) hW
+    have hv' : v ∈ W.restrictScalars k := hv
+    rw [h0] at hv'
+    simpa using hv'
+  · -- `Wρ = ⊤` gives `W = ⊤`
+    have h1 : W.restrictScalars k = ⊤ := congrArg Subrepresentation.toSubmodule htop
+    refine eq_top_iff.mpr fun v _ => ?_
+    have hv' : v ∈ W.restrictScalars k := h1 ▸ Submodule.mem_top
+    exact hv'
 
 end ConjBySimple
 
