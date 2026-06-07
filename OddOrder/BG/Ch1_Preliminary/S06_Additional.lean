@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.NarrowPGroup
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import Mathlib.Algebra.Group.Subgroup.Pointwise
+import Mathlib.Algebra.Group.Commutator
 
 /-!
 # BG §6: Additional Results — the normal-J hub (FT critical)
@@ -31,7 +32,8 @@ CLAUDE.md no-wrapper policy 準拠: 完成済 Isaacs Ch.7 を直接呼ぶ。教�
 |---|---|---|---|
 | **Thm 6.1** | G solvable odd, S∈Syl_p ⇒ `O_{p',p}(G)` が S の全 abelian normal 部分群を含む | Thm 3.21 (Hall-Higman 1.2.3) `hall_higman_1_2_3` の系 / `normal_J` 中間補題 | core 完成 (本ファイル), 一般形 TODO |
 | **Thm 6.2** | (normal-J) G solvable odd, S∈Syl_p ⇒ `Z(J(S))·O_{p'}(G) ⊴ G` | **Thm 7.6** `OddOrder.Isaacs.Ch07.normal_J` (odd-order 等価) | core 完成 (本ファイル, reduced case), 一般形 (O_{p'} 簡約) TODO |
-| 6.3-6.7, 6.5-6.6 | solvable + p-length 1 + Frobenius factorization | Isaacs Ch.5/Ch.7 | TODO |
+| **Lem 6.3(a)** | G solvable, H ⊴ G normal Hall 補群 K, H⊆G' ⇒ `⁅H,K⁆ = H` (∧ C_H(K)⊆H') | `commutator_eq_self_of_isComplement'_le_commutator` (§6.3, 本ファイル) | 第 1 結論 ✅ (Thm 10.6/Cor 10.7(a)/§15 が引用); C_H(K)⊆H' は §10 critical path 外で TODO |
+| 6.3(b)-6.4, 6.7 | solvable + p-length 1 + Frobenius factorization | Isaacs Ch.5/Ch.7 | TODO |
 
 ## このコミット (core results)
 
@@ -50,6 +52,7 @@ case** で `J(P) ⊴ G` を与える。本ファイルでは、その awkward �
 namespace OddOrder.BG.Ch1.S06
 
 open OddOrder.Isaacs
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -158,6 +161,161 @@ theorem thompsonJ_le_oPiPrimePiCore_of_odd [Finite G]
   (thompsonJ_le_opCore_of_odd hodd P hp2 h_oPiPrime_trivial h_centralizer_center).trans
     (opCore_le_oPiPrimePiCore p)
 
+/-- `G = KU` (`K ⊴ G`) のとき `G' ≤ K · U'`: 商 `G/K` は `U` の像で生成され,
+その像は可換 (`U'` が消える) なので `G/K` の commutator は像の commutator に一致。
+(§6.3 と §6.5(a) の共有 helper。) -/
+private theorem commutator_le_sup_commutator {K U : Subgroup G} [K.Normal]
+    (hKU : K ⊔ U = ⊤) : commutator G ≤ K ⊔ ⁅U, U⁆ := by
+  set q := QuotientGroup.mk' K with hq
+  have hsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
+  have hkerq : q.ker = K := by rw [hq, QuotientGroup.ker_mk']
+  have hmapK : K.map q = ⊥ := (Subgroup.map_eq_bot_iff K).mpr hkerq.ge
+  have hmapU : U.map q = ⊤ := by
+    have h := congrArg (Subgroup.map q) hKU
+    rwa [Subgroup.map_sup, hmapK, bot_sup_eq, Subgroup.map_top_of_surjective _ hsurj] at h
+  -- 両辺の `q`-像が `⁅⊤,⊤⁆` で一致
+  have hmapeq : (commutator G).map q = (K ⊔ ⁅U, U⁆).map q := by
+    rw [map_commutator_eq, MonoidHom.range_eq_top_of_surjective _ hsurj, Subgroup.map_sup, hmapK,
+      bot_sup_eq, Subgroup.map_commutator, hmapU]
+  -- `K = ker q ≤ K ⊔ ⁅U,U⁆` ゆえ comap-map で復元
+  calc commutator G ≤ Subgroup.comap q ((commutator G).map q) := Subgroup.le_comap_map _ _
+    _ = Subgroup.comap q ((K ⊔ ⁅U, U⁆).map q) := by rw [hmapeq]
+    _ = K ⊔ ⁅U, U⁆ := Subgroup.comap_map_eq_self (by rw [hkerq]; exact le_sup_left)
+
+/-! ## 6.3: 可解群の normal Hall 補群と commutator (pp. 63-64, mmd L1981)
+
+**Lemma 6.3(a)**: `G` 可解, `H ⊴ G` が補群 `K` を持ち (`H.IsComplement' K`), `H ⊆ G'` のとき
+`H = ⁅H, K⁆` (かつ `C_H(K) ⊆ H'`)。Thm 10.6 Step 4 (`M_α = ⁅M_α, K⁆`), Cor 10.7(a)
+(`⁅P, V⁆ = P`), §15 (`⁅M_σ, K⁆ = M_σ`) で第 1 結論を引用。第 2 結論 `C_H(K) ⊆ H'` は §10
+critical path 外 (coprime action 分解を要する) ゆえ後続。第 1 結論には coprime 性は不要。 -/
+
+section /- 6.3 -/
+
+/-- 共役 `x ↦ gxg⁻¹` (`g ∈ H ∪ K`, `H ⊴ G`) は `⁅H, K⁆` を保つ。`⁅H,K⁆` の `comap` への引き戻しは
+全生成子 `⁅h,k⁆` を含む部分群: `g ∈ H` では `g⁅h,k⁆g⁻¹ = ⁅gh,k⁆·⁅g,k⁆⁻¹`, `g ∈ K` では
+`conjugate_commutatorElement` (`H ⊴ G` で `ghg⁻¹ ∈ H`)。 -/
+private theorem conj_mem_commutator_of_mem_sup {H K : Subgroup G} [hHN : H.Normal]
+    {g : G} (hg : g ∈ H ∨ g ∈ K) {n : G} (hn : n ∈ ⁅H, K⁆) :
+    g * n * g⁻¹ ∈ ⁅H, K⁆ := by
+  have hsub : (⁅H, K⁆ : Subgroup G) ≤ (⁅H, K⁆).comap (MulAut.conj g).toMonoidHom := by
+    rw [Subgroup.commutator_le]
+    intro h hh k hk
+    rw [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+    rcases hg with hgH | hgK
+    · have hid : g * ⁅h, k⁆ * g⁻¹ = ⁅g * h, k⁆ * ⁅g, k⁆⁻¹ := by group
+      rw [hid]
+      exact Subgroup.mul_mem _
+        (Subgroup.commutator_mem_commutator (H.mul_mem hgH hh) hk)
+        (Subgroup.inv_mem _ (Subgroup.commutator_mem_commutator hgH hk))
+    · rw [conjugate_commutatorElement]
+      exact Subgroup.commutator_mem_commutator (hHN.conj_mem h hh g)
+        (K.mul_mem (K.mul_mem hgK hk) (K.inv_mem hgK))
+  have hmem := hsub hn
+  rwa [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hmem
+
+/-- `⁅H, K⁆ ⊴ G`, when `H ⊴ G` と `H ⊔ K = ⊤`: `H` と `K` の両方が `⁅H,K⁆` を正規化し
+(`conj_mem_commutator_of_mem_sup`), 両者で `G` を生成する。 -/
+private theorem commutator_normal_of_normal_sup_eq_top {H K : Subgroup G} [H.Normal]
+    (hsup : H ⊔ K = ⊤) : (⁅H, K⁆ : Subgroup G).Normal := by
+  rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hsup, sup_le_iff]
+  have key : ∀ g : G, (g ∈ H ∨ g ∈ K) → g ∈ Subgroup.normalizer (⁅H, K⁆ : Subgroup G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    refine ⟨fun hn => conj_mem_commutator_of_mem_sup hg hn, fun hn => ?_⟩
+    have hg' : g⁻¹ ∈ H ∨ g⁻¹ ∈ K := hg.imp H.inv_mem K.inv_mem
+    have h2 := conj_mem_commutator_of_mem_sup (g := g⁻¹) hg' hn
+    have heq : g⁻¹ * (g * n * g⁻¹) * (g⁻¹)⁻¹ = n := by group
+    rwa [heq] at h2
+  exact ⟨fun g hg => key g (Or.inl hg), fun g hg => key g (Or.inr hg)⟩
+
+/-- **BG Lemma 6.3(a)** (first conclusion, mmd L1981): `G` solvable, `H ⊴ G` with complement
+`K` (`H.IsComplement' K`), and `H ⊆ G'`. Then `⁅H, K⁆ = H`.
+
+Proof (BG): `N = ⁅H,K⁆ ⊴ G` (`N ≤ H`). In `Ḡ = G/N` the images `H̄, K̄` centralise each other
+(`⁅H̄,K̄⁆ = 1`) and complement each other, so `K̄ ⊴ Ḡ`. From `H ⊆ G'` we get `H̄ ⊆ Ḡ'`, and
+`Ḡ' ≤ K̄ ⊔ ⁅H̄,H̄⁆` (`commutator_le_sup_commutator`); the modular law plus `H̄ ⊓ K̄ = 1` gives
+`H̄ ≤ ⁅H̄,H̄⁆`, i.e. `H̄` is perfect, hence trivial (`G/N` solvable). Thus `H ≤ N = ⁅H,K⁆`. -/
+theorem commutator_eq_self_of_isComplement'_le_commutator [IsSolvable G]
+    {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G) :
+    ⁅H, K⁆ = H := by
+  have hsup : H ⊔ K = ⊤ := hHK.isCompl.sup_eq_top
+  have hdisj : Disjoint H K := hHK.isCompl.disjoint
+  haveI hN : (⁅H, K⁆ : Subgroup G).Normal := commutator_normal_of_normal_sup_eq_top hsup
+  refine le_antisymm (Subgroup.commutator_le_left H K) ?_
+  set q : G →* G ⧸ ⁅H, K⁆ := QuotientGroup.mk' ⁅H, K⁆ with hq
+  have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective _
+  haveI hGsolv : IsSolvable (G ⧸ ⁅H, K⁆) := solvable_of_surjective hqsurj
+  set Hbar : Subgroup (G ⧸ ⁅H, K⁆) := H.map q with hHbar
+  set Kbar : Subgroup (G ⧸ ⁅H, K⁆) := K.map q with hKbar
+  -- `⁅H̄,K̄⁆ = ⊥` (`⁅H,K⁆ = ker q`)
+  have hcomm_bot : ⁅Hbar, Kbar⁆ = ⊥ := by
+    rw [hHbar, hKbar, ← Subgroup.map_commutator, Subgroup.map_eq_bot_iff, hq,
+      QuotientGroup.ker_mk']
+  -- `Ḡ = H̄ ⊔ K̄`
+  have hsupbar : Hbar ⊔ Kbar = ⊤ := by
+    rw [hHbar, hKbar, ← Subgroup.map_sup, hsup, Subgroup.map_top_of_surjective q hqsurj]
+  -- `K̄ ⊴ Ḡ` (正規化群 `⊇ H̄ ⊔ K̄ = ⊤`; `H̄` は中心化ゆえ正規化)
+  haveI hKbarN : Kbar.Normal := by
+    rw [← Subgroup.normalizer_eq_top_iff, eq_top_iff, ← hsupbar, sup_le_iff]
+    refine ⟨le_trans ?_ (Subgroup.centralizer_le_normalizer _), Subgroup.le_normalizer⟩
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer]; exact hcomm_bot
+  -- `H̄ ⊓ K̄ = ⊥`
+  have hdisjbar : Hbar ⊓ Kbar = ⊥ := by
+    rw [eq_bot_iff]
+    intro ybar hy
+    rw [Subgroup.mem_inf] at hy
+    obtain ⟨h, hhH, hhy⟩ := Subgroup.mem_map.mp (hHbar ▸ hy.1)
+    obtain ⟨k, hkK, hky⟩ := Subgroup.mem_map.mp (hKbar ▸ hy.2)
+    have hqeq : q h = q k := hhy.trans hky.symm
+    have hmem : h * k⁻¹ ∈ (⁅H, K⁆ : Subgroup G) := by
+      have h2 : q (h * k⁻¹) = 1 := by rw [map_mul, map_inv, hqeq, mul_inv_cancel]
+      rwa [hq, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h2
+    have hkH : k ∈ H := by
+      have hhk : h * k⁻¹ ∈ H := Subgroup.commutator_le_left H K hmem
+      have hkinv : k⁻¹ ∈ H := by
+        have := H.mul_mem (H.inv_mem hhH) hhk
+        rwa [← mul_assoc, inv_mul_cancel, one_mul] at this
+      simpa using H.inv_mem hkinv
+    have hk1 : k = 1 := by
+      have : k ∈ (⊥ : Subgroup G) := hdisj.le_bot (Subgroup.mem_inf.mpr ⟨hkH, hkK⟩)
+      simpa using this
+    rw [Subgroup.mem_bot, ← hky, hk1, map_one]
+  -- `H̄ ≤ commutator Ḡ`
+  have hHbarle : Hbar ≤ commutator (G ⧸ ⁅H, K⁆) := by
+    have hmap : (commutator G).map q = commutator (G ⧸ ⁅H, K⁆) := by
+      rw [map_commutator_eq, MonoidHom.range_eq_top_of_surjective _ hqsurj, ← commutator_def]
+    calc Hbar = H.map q := hHbar
+      _ ≤ (commutator G).map q := Subgroup.map_mono hH
+      _ = commutator (G ⧸ ⁅H, K⁆) := hmap
+  -- `commutator Ḡ ≤ K̄ ⊔ ⁅H̄,H̄⁆`
+  have hcomm_le : commutator (G ⧸ ⁅H, K⁆) ≤ Kbar ⊔ ⁅Hbar, Hbar⁆ :=
+    commutator_le_sup_commutator (by rw [sup_comm]; exact hsupbar)
+  -- `H̄ ≤ ⁅H̄,H̄⁆`: 任意 `x ∈ H̄ ≤ K̄·⁅H̄,H̄⁆` を `x = k·c` (`k ∈ K̄`, `c ∈ ⁅H̄,H̄⁆ ≤ H̄`) と分解;
+  -- `k = x·c⁻¹ ∈ H̄` ゆえ `k ∈ H̄ ⊓ K̄ = ⊥`, よって `x = c ∈ ⁅H̄,H̄⁆`。
+  have hHbar_perfect : Hbar ≤ ⁅Hbar, Hbar⁆ := by
+    intro x hx
+    have hx2 : x ∈ Kbar ⊔ ⁅Hbar, Hbar⁆ := hcomm_le (hHbarle hx)
+    rw [← SetLike.mem_coe, Subgroup.normal_mul] at hx2
+    obtain ⟨k, hk, c, hc, hkc⟩ := hx2
+    have hcH : c ∈ Hbar := Subgroup.commutator_le_left Hbar Hbar hc
+    have hkH : k ∈ Hbar := by
+      have hkeq : k = x * c⁻¹ := by rw [← hkc]; group
+      rw [hkeq]; exact Hbar.mul_mem hx (Hbar.inv_mem hcH)
+    have hk1 : k = 1 := by
+      have hmem : k ∈ Hbar ⊓ Kbar := Subgroup.mem_inf.mpr ⟨hkH, hk⟩
+      rw [hdisjbar] at hmem; simpa using hmem
+    rw [← hkc, hk1]; simpa using hc
+  -- 可解 ⟹ `H̄ = ⊥` ⟹ `H ≤ ⁅H,K⁆`
+  have hHbar_bot : Hbar = ⊥ := by
+    by_contra hne
+    exact absurd (lt_of_le_of_lt hHbar_perfect (IsSolvable.commutator_lt_of_ne_bot hne))
+      (lt_irrefl _)
+  have hmap_bot : H.map q = ⊥ := hHbar ▸ hHbar_bot
+  rwa [Subgroup.map_eq_bot_iff, hq, QuotientGroup.ker_mk'] at hmap_bot
+
+end /- 6.3 -/
+
 /-! ## 6.5: 可解群の N/C 分解 (pp. 64-65, mmd L2048-2088)
 
 **Lemma 6.5**: `K, U, H ≤ G` 可解, `K ⊴ G`, `G = KU`, `H ⊆ U`, `(|H|, |K|) = 1` のとき
@@ -181,26 +339,6 @@ private theorem inf_eq_bot_of_coprime_card {H K : Subgroup G}
     Nat.dvd_one.mp (hcop.gcd_eq_one ▸ Nat.dvd_gcd h1 h2)
   exact Subgroup.card_eq_one.mp hone
 
-omit [Finite G] in
-/-- `G = KU` (`K ⊴ G`) のとき `G' ≤ K · U'`: 商 `G/K` は `U` の像で生成され,
-その像は可換 (`U'` が消える) なので `G/K` の commutator は像の commutator に一致。 -/
-private theorem commutator_le_sup_commutator {K U : Subgroup G} [K.Normal]
-    (hKU : K ⊔ U = ⊤) : commutator G ≤ K ⊔ ⁅U, U⁆ := by
-  set q := QuotientGroup.mk' K with hq
-  have hsurj : Function.Surjective q := QuotientGroup.mk'_surjective K
-  have hkerq : q.ker = K := by rw [hq, QuotientGroup.ker_mk']
-  have hmapK : K.map q = ⊥ := (Subgroup.map_eq_bot_iff K).mpr hkerq.ge
-  have hmapU : U.map q = ⊤ := by
-    have h := congrArg (Subgroup.map q) hKU
-    rwa [Subgroup.map_sup, hmapK, bot_sup_eq, Subgroup.map_top_of_surjective _ hsurj] at h
-  -- 両辺の `q`-像が `⁅⊤,⊤⁆` で一致
-  have hmapeq : (commutator G).map q = (K ⊔ ⁅U, U⁆).map q := by
-    rw [map_commutator_eq, MonoidHom.range_eq_top_of_surjective _ hsurj, Subgroup.map_sup, hmapK,
-      bot_sup_eq, Subgroup.map_commutator, hmapU]
-  -- `K = ker q ≤ K ⊔ ⁅U,U⁆` ゆえ comap-map で復元
-  calc commutator G ≤ Subgroup.comap q ((commutator G).map q) := Subgroup.le_comap_map _ _
-    _ = Subgroup.comap q ((K ⊔ ⁅U, U⁆).map q) := by rw [hmapeq]
-    _ = K ⊔ ⁅U, U⁆ := Subgroup.comap_map_eq_self (by rw [hkerq]; exact le_sup_left)
 
 /-- **BG Lemma 6.5(a)** (mmd L2054): `G` 可解, `K ⊴ G`, `G = KU`, `H ≤ U`,
 `(|H|, |K|) = 1` のとき `H ∩ G' = H ∩ U'`。 -/

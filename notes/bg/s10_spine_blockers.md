@@ -10,6 +10,47 @@ worktree `bg-s10-spine` (branch `bg-s10-spine`, `ODD_ISSUE_BASE=4000`)。
   10.14(a)(b)(c) (`beta_global_structure`, 既証) のみに依存する唯一の grounded ターゲットだった。
   併せて base `isSylow_sylowMap_of_mem_sigma` を private→public 化 (σ Sylow-lifting、複数ファイル使用)。
 
+### grounded leaves landed — Lane C session (2026-06-08, branch `c-bg-s10`)
+
+§10 spine 全体が Thm 3.6 (Lane A keystone) に推移ブロックされている中、**axiom 債務ゼロを維持して
+landable な grounded prerequisite / helper を 2 件**着地 (full build 3609, axiom-clean):
+
+- **p-length one が p'-quotient に沿って lift** `hasPLengthOne_of_normal_pPrime_quotient`
+  (`PLengthTransfer.lean`, commit `7e55283a`): `N ⊴ Γ`, `Γ/N` が p'-group, `↥N` p-length one
+  ⟹ `Γ` p-length one。Thm 10.6 r_p≥3 branch の最終 lift (`M_α ⊴ M` Hall α, `M/M_α` p'-group)。
+  併せて Lem 1.21(a) `hasPLengthOne_subgroup` も既に landed (下記 Thm 10.6 ゲート 4 を解消)。
+- **Lem 6.3(a) 第 1 結論** `commutator_eq_self_of_isComplement'_le_commutator`
+  (`S06_Additional.lean` §6.3, commit `5e0e7066`): `G` 可解, `H ⊴ G` 補群 `K`, `H ⊆ G'`
+  ⟹ `⁅H,K⁆ = H`。**Thm 10.6 ゲート 3 を解消** (下記)。Thm 10.6 Step 4 (`M_α=⁅M_α,K⁆`) /
+  Cor 10.7(a) (`⁅P,V⁆=P`) / §15 (`⁅M_σ,K⁆=M_σ`) が引用。coprime 性は第 1 結論には不要。
+  第 2 結論 `C_H(K) ⊆ H'` は §10 critical path 外 (どこからも未引用) ゆえ未着手。
+- **GL(2,p) transvection** `exists_pow_map_line_eq` (`S10_Transvection.lean`, commit `0e191635`):
+  2 次元 𝔽_p 空間で `φ^p=1, φ≠1`, line `L` を pointwise 固定 ⟹ `⟨φ⟩` が `L` 以外の p 本の line に
+  transitive。**Lemma 10.13(c) の FT-block 非依存コア** (下記)。10.13(c) 完成には更に group-level
+  wiring (`A` rank-2 elem ab ↔ `Additive A` = 2-dim 𝔽_p, `MulAut.conj x` ↔ φ) + Cor 10.7(b) が要る。
+
+⟹ **Thm 10.6 r_p≥3 branch の残ゲートは Lem 10.4(b) + Thm 3.6 の 2 件のみ** (ゲート 1=Thm 10.2 ✅,
+2=Lem 6.3(a) ✅, 3=p-length 単調性 ✅, 4=p'-quotient lift ✅)。両者とも Lane A keystone 系・
+forward-axiom 待ち (ユーザ判断で forward-axiom 配線は保留中)。
+
+### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
+
+`exists_pow_map_line_eq` (抽象 𝔽_p 形, 着地済) を 10.13(c) が consume する **group 形**
+`mulAut_pow_map_orderP_subgroup` (E elem ab rank-2, σ:MulAut E 位数 p が Z₀ を pointwise 固定 ⟹
+order-p 部分群 X,Y≠Z₀ が σ^k で結ばれる) に持ち上げる。infra は揃っている:
+- `IsElementaryAbelian.zmodModule` (`Additive E` = ZMod p-module), `card_eq_pow_finrank` (⟹ dim=2),
+- σ↔φ: `(AddAutAdditive (G:=E)).symm.trans AddAut.toZModLinearEquiv` (PRank `mulAutEquivGeneralLinearGroup`
+  と同型、map_pow で `φ^k = β(σ^k)`),
+- 部分群↔部分加群 (carrier 保存 ≃o): `Subgroup.toAddSubgroup` ∘ `ZMod.toZModSubmodule`; card p ↔ finrank 1。
+- 結論翻訳: `Φ(X.map σ^k) = (Φ X).map φ^k` を **carrier 集合等式**で (`φ a = σ a` synonym).
+**⚠ GOTCHA (2026-06-08 で判明、未解決)**: `letI := hE.zmodModule` 後の `Additive E` の
+`AddCommGroup`/`CommGroup`/`Module` インスタンスが diamond で `set β` の elaboration が詰まる
+(`@AddAut (Additive E) Additive.add` vs `AddCommGroup.toAdd` 不一致, `Module (ZMod p) (Additive E)`
+synth 失敗)。PRank が `mulAutEquivGeneralLinearGroup` を WORKING で持つので解決可 — 推定 fix =
+`AddAut.toZModLinearEquiv (p := p)` で p 明示 + β に型注釈を付けない (PRank 同様 codomain 自由) +
+`CommGroup E` letI は不要。PRank の動く setup を逐語的にミラーすること。**focused session 推奨**
+(diamond 慣れ + carrier synonym の bookkeeping)。これが済めば 10.13(c) は Cor 10.7(b) のみ待ち。
+
 ## 直列スパインは Theorem 10.6 に全面ブロックされている
 
 ユーザ指定の直列順 `proper_hasPLengthOne (10.6) → isHall_Mbeta (10.8) → 10.14/10.9/10.10` は、
