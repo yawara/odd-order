@@ -51,4 +51,28 @@ theorem sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace {epsilon : F}
     prop24j_fin hh (fun i => (cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ)) Hsum
   exact ⟨v₀, δ, hδ, hsum⟩
 
+/-- **BG Theorem 2.5, `C_V(H) = 0` step (conditional on the H-module multiplicities).** With the
+same keystone `dim E₀ = dim E_m + 1`, if the fixed space `C_V(x) = V₀` is trivial (`dim V₀ = 0`) and
+`q ≥ 2`, then `q = h − 1`, i.e. `h = q + 1`. (This is the half Thm 3.4 uses for the even/odd
+contradiction.) -/
+theorem sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace {epsilon : F}
+    {g : LinearMap.GeneralLinearGroup F V} {h : ℕ} [NeZero h] [FiniteDimensional F V]
+    (hprim : IsPrimitiveRoot epsilon h)
+    (hV : DirectSum.IsInternal (cyclicEigenspaceFinFamily epsilon (g : Module.End F V) h))
+    (hh : 2 ≤ h)
+    (hEdim : ∀ m : Fin h, m ≠ 0 →
+      finrank F (cyclicEndConjEigenspaceFin epsilon g (0 : Fin h))
+        = finrank F (cyclicEndConjEigenspaceFin epsilon g m) + 1)
+    (hq : 2 ≤ ∑ i : Fin h, (cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ))
+    (h0 : cyclicEigenspaceFinDim epsilon (g : Module.End F V) (0 : Fin h) = 0) :
+    (∑ i : Fin h, (cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ)) = (h : ℤ) - 1 := by
+  have Hsum : ∀ m : Fin h, m ≠ 0 →
+      ∑ i : Fin h, ((cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ)
+        - (cyclicEigenspaceFinDim epsilon (g : Module.End F V) (i + m) : ℤ)) ^ 2 = 2 := by
+    intro m hm
+    rw [sum_sq_sub_finrank_cyclicEndConjEigenspaceFin hprim hV m, hEdim m hm]
+    push_cast; ring
+  exact prop24k_fin hh (fun i => (cyclicEigenspaceFinDim epsilon (g : Module.End F V) i : ℤ))
+    (fun i => Int.natCast_nonneg _) hq Hsum (by simpa using h0)
+
 end OddOrder.RepresentationTheory
