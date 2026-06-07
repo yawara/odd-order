@@ -8910,6 +8910,64 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
       rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
   rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
 
+/-- **Span form of `himg_ortho`:** `⟨x^{τ₂}, η^{τ₁}⟩ = 0` for any `x ∈ ℤ[X(Zc)]` and `η ∈ Y`
+(by `ℤ`-linearity from the per-member
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`). -/
+theorem inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {x : ClassFunction ↥L ℂ} (hx : x ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator))
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+      (hyp.coherentYset.extension η) = 0 := by
+  classical
+  induction hx using Submodule.span_induction with
+  | mem χ hχ =>
+      exact hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+        hF hHnonab hp hp3 hHp hχ hη
+  | zero => rw [map_zero, ClassFunction.inner_zero_left]
+  | add a b _ _ iha ihb => rw [map_add, ClassFunction.inner_add_left, iha, ihb, add_zero]
+  | smul c a _ ih =>
+      rw [map_zsmul,
+        ← Int.cast_smul_eq_zsmul ℂ c
+          ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension a),
+        ClassFunction.inner_smul_left, ih, mul_zero]
+
+/-- **(6.8.1) Res-decomposition orthogonality** (spine steps 1–2): `Res^G_L(η^{τ₁})` is orthogonal
+to every *supported* `X(Zc)`-combination.  For `η ∈ Y` and `x ∈ ℤ[X(Zc), H^#]` (supported),
+`⟨Res^G_L(η^{τ₁}), x⟩_L = 0`.  By Dade reciprocity (`inner_tau_eq_inner_restrict`,
+`⟨x^τ, η^{τ₁}⟩_G = ⟨x, Res_L(η^{τ₁})⟩_L`) and `x^τ = x^{τ₂}` (supported), this reduces to the span
+form of `himg_ortho` (`⟨x^{τ₂}, η^{τ₁}⟩_G = 0`).  Hence the `X`-components of `Res^G_L(η^{τ₁})` are
+all proportional to `dᵢ`, i.e. `Res^G_L(η^{τ₁}) = c·∑dᵢχᵢ + χ′` with `χ′ ⊥ X(Zc)` (mmd 04.8 L170). -/
+theorem inner_restrict_extension_Yset_mem_span_Xset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {x : ClassFunction ↥L ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
+    ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) x = 0 := by
+  classical
+  have hrec := hyp.inner_tau_eq_inner_restrict hx.2 (hyp.coherentYset.extension η)
+  have hτ : hyp.tau x =
+      (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x :=
+    ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extends_on_supported
+      x hx).symm
+  have h0 : ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+      (hyp.coherentYset.extension η) = 0 :=
+    hyp.inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+      hF hHnonab hp hp3 hHp hx.1 hη
+  have hxr : ClassFunction.inner x
+      (ClassFunction.restrict L (hyp.coherentYset.extension η)) = 0 := by
+    rw [← hrec, hτ, h0]
+  rw [inner_conj_symm x (ClassFunction.restrict L (hyp.coherentYset.extension η)), hxr, star_zero]
+
 /-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
 `himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
 (`exists_integralCharacterMap_glue_of_orthonormal` with `νX = τ₂`, `νY = τ₁`); its agreement
