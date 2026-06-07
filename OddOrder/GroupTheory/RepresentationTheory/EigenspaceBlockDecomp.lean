@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
+import Mathlib.LinearAlgebra.Trace
 
 /-!
 # Block decomposition of `End V` (BG Prop 2.4(c)/(g))
@@ -161,6 +162,26 @@ theorem isInternal_cyclicEndConjEigenspaceFin {epsilon : F}
     rw [show p.1 + (p.2 - p.1) = p.2 by abel]
   rw [← hp, Fin.val_add]
   exact (Nat.mod_modEq _ _).symm
+
+open Module in
+/-- **Trace of a block-scalar operator.** If `M = ⊕ᵢ Eᵢ` internally and `f` acts as the scalar `cᵢ`
+on each `Eᵢ`, then `tr f = ∑ᵢ (dim Eᵢ)·cᵢ`. (mathlib has no trace-over-`IsInternal` lemma; proved
+via the collected basis, in which `f` is diagonal with entry `cᵢ` on the `Eᵢ`-block.) -/
+theorem trace_eq_sum_finrank_smul_of_isInternal {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : Type*} [AddCommGroup M] [Module F M] [FiniteDimensional F M]
+    {E : ι → Submodule F M} (hE : DirectSum.IsInternal E) {f : M →ₗ[F] M} {c : ι → F}
+    (hf : ∀ i, ∀ v ∈ E i, f v = c i • v) :
+    LinearMap.trace F M f = ∑ i, (finrank F (E i) : F) * c i := by
+  classical
+  set b := hE.collectedBasis (fun i => Module.finBasis F (E i)) with hb
+  have hdiag : ∀ j : Σ i, Fin (finrank F (E i)), LinearMap.toMatrix b b f j j = c j.1 := by
+    intro j
+    rw [LinearMap.toMatrix_apply, hf j.1 (b j) (by rw [hb]; exact hE.collectedBasis_mem _ j),
+      map_smul, Finsupp.smul_apply, b.repr_self_apply, if_pos rfl, smul_eq_mul, mul_one]
+  rw [LinearMap.trace_eq_matrix_trace F b f, Matrix.trace]
+  simp_rw [Matrix.diag_apply, hdiag]
+  rw [Fintype.sum_sigma]
+  simp only [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
 
 open Module in
 /-- **BG Proposition 2.4(g).** For the conjugation `εᵐ`-eigenspace `E_m` on `End V`,
