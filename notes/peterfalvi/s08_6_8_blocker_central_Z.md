@@ -609,3 +609,75 @@ the deep b≡0 spine's first steps are now LANDED:
 
 **Order:** `hDτ` (crux spine, now unblocked by `himg_ortho`) ‖ `hgen'` (independent lattice fact) →
 ν-free diagonal shell + capstone wiring.  CertainType case (B) still unplanned.
+
+## 2026-06-08 (session 5): crux `hDτ` spine steps 1–3 + step-4 foundation LANDED (5 commits, axiom-clean)
+
+**All leaf-green (3467) + axiom-clean `[propext, Classical.choice, Quot.sound]`.**  The crux `hDτ`
+divisibility spine (the deep `b≡c≡0 mod a` argument, mmd 04.8 L176) is now mostly assembled:
+
+- **step 1 (`η₁^{τ₁}` const on `Zc^#`)** — already landed pre-session (`14ea0ae`/`d1c18ea`):
+  `restrict_extension_Yset_degree_value_eq_of_frobenius` (`χ₁(1)·(R(z)−R(1)) = −c·|L|`,
+  `R = Res^G_L(η^{τ₁})`, `c = ⟨R,χ₁⟩`) + `restrict_extension_Yset_const_on_centralCommutator_of_frobenius`.
+- ✅ **step-2 input (the (6.7)-congruence)** `bb81ca1`:
+  `restrict_extension_Yset_charValue_cong_of_frobenius` — `R(z) ≡ R(1) [ALGMOD |H|]` (write
+  `η^{τ₁} = ε•ξ`, `ξ` irreducible from norm 1; const-on-`Zc^#` is the
+  `peterfalvi_67_centralCommutator` hypothesis; scale by `ε` via `Cong.smul_left`).
+- ✅ **step 2 (`a ∣ c`)** `f92617c`: `dvd_inner_restrict_extension_Yset_of_frobenius` — for
+  `χ₁(1) = a·|W₁|` (`a>0`), `c = ⟨R,χ₁⟩ ∈ ℤ` and `a ∣ c`.  Value identity (with `χ₁(1)=a|W₁|`,
+  `|L|=|H||W₁|` via `index_H_eq_card_W1` + `Subgroup.index_mul_card`) gives `(R(z)−R(1))/|H| = −c/a`;
+  the congruence makes it an algebraic integer; rational alg-int ⟹ integer
+  (`RepresentationTheory.isIntegral_rat_imp_int`).  `c∈ℤ` via `restrict_mem_ZIrr` + `mem_ZIrr_inner_int`.
+- ✅ **step 3 (`a ∣ b`)** `cdb2ca8`: `dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius` — the
+  `η₁^{τ₁}`-coefficient `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩` (= `b−a`) is an integer divisible by `a` (⟺ `a∣b`).
+  **Direct route — bypasses the full (168) decomposition:** reciprocity `inner_tau_eq_inner_restrict`
+  (`χ₁−aη₁` supported via `sMember_scaledDiffSupport_of_charValue_eq`) gives
+  `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = ⟨χ₁−aη₁, R⟩ = c − a·e` (`inner_conj_symm` + reality of `c=⟨R,χ₁⟩`,
+  `e=⟨R,η₁⟩`); `a∣c` (step 2) + `a∣a·e` ⟹ done.
+- ✅ **step-4 foundation (the constancy isometry)** `4ceb421`:
+  `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius` — `⟨(χ₁−aη₁)^τ, (η_j−η₁)^τ⟩ = a` (η_j≠η₁), via
+  Dade isometry on the supported pair (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) +
+  `X⊥Y` + `Y`-orthonormality.  This is the `β_j − β₁ = a` (j>1) constancy of the `η_j^{τ₁}`-coefficients.
+
+### 🔴 Remaining for `hDτ` (refined plan, session 5)
+- **step 4 (`b = 0`)** — the next big unit, needs the **full (168) decomposition**
+  `(χ₁−aη₁)^τ = X − aη₁^{τ₁} + b∑_j η_j^{τ₁}`, `X ⊥ Y^{τ₁}`: project `(χ₁−aη₁)^τ` (∈ ZIrr G) onto the
+  orthonormal `{η_j^{τ₁}}_{j∈Y}` (coefficients `β_j = ⟨(χ₁−aη₁)^τ, η_j^{τ₁}⟩ ∈ ℤ`), define
+  `X := (χ₁−aη₁)^τ − ∑_j β_j η_j^{τ₁}` (⊥ all η_j^{τ₁}); the constancy `4ceb421` gives `β_j = β_{j'}`
+  (j,j'>1, since `⟨(χ₁−aη₁)^τ,(η_j−η_{j'})^τ⟩ = ⟨χ₁−aη₁, η_j−η_{j'}⟩ = 0`) and `β_j − β₁ = a` (j>1),
+  so all-but-η₁ coefficients equal `b := β₁ + a` and η₁ coefficient is `b−a`.  Parseval +
+  `‖(χ₁−aη₁)^τ‖² = ‖χ₁−aη₁‖² = ‖χ₁‖²+a²‖η₁‖² = 1+a²` (Dade isometry on the supported `χ₁−aη₁` +
+  X⊥Y orthonormality) gives `1+a² = ‖X‖² + (b−a)² + (m−1)b²`, i.e. (with `b=ax`)
+  `(x−1)²+(m−1)x² ≤ 1+1/a²`.  `eq_zero_or_edge_of_dvd_of_normBound` (**already landed**, takes `2≤a`,
+  `2≤m`, `a∣b`, the norm ineq) ⟹ `b=0 ∨ (b=a ∧ m=2)`.  Need `2≤a` (from `X∩Y=∅`: `a=1` ⟹ χ₁ has
+  degree `|W₁|` ⟹ χ₁∈Y, contra `disjoint_Xset…`), `2≤m` (`two_le_Yset_ncard`); the `b=a∧m=2` edge
+  case reduces to `b=0` by relabelling `η₁^{τ₁},η₂^{τ₁} ↦ −η₂^{τ₁},−η₁^{τ₁}`.  **This is a sizable
+  new development** (the Y-family projection + Parseval bookkeeping); best a fresh focused session.
+- **step 5 (`X = χ₁^{τ₂}`)** ⟹ the crux `(χ₁−aη₁)^τ = χ₁^{τ₂} − aη₁^{τ₁}` = `hDτ`: with `b=0`,
+  `(χ₁−aη₁)^τ = X − aη₁^{τ₁}`, `‖X‖²=1`; consider `⟨(χ₁−aη₁)^τ,(χ₂−χ₁)^τ⟩` (= `⟨χ₁−aη₁,χ₂−χ₁⟩` by
+  isometry) ⟹ `X=χ₁^{τ₂} ∨ X=−χ₂^{τ₂}`; for `n≥3` pin via `⟨(χ₁−aη₁)^τ,(χ₃−d₃χ₁)^τ⟩`, `n=2` relabel.
+- **then wiring:** `hgen'` (lattice fact, unchanged plan above) + ν-free diagonal shell through
+  `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` + L4
+  `false_of_coherentXunionYset_of_not_coherentS`.  CertainType case (B) still unplanned.
+
+### Key API discovered this session (don't re-derive)
+- **Rational alg-int ⟹ integer:** `OddOrder.RepresentationTheory.isIntegral_rat_imp_int {q:ℚ}
+  (IsIntegral ℤ (q:ℂ)) : ∃ n:ℤ, (q:ℂ)=n` (ClassSumAlgebra.lean:1434).
+- **ZIrr inner integrality:** `OddOrder.RepresentationTheory.mem_ZIrr_inner_int (χ:IrreducibleChar G)
+  (hφ:φ∈ZIrr G) : ∃ m:ℤ, inner φ χ = m` (ZIrrFourier.lean:52) — **ZIrr first arg**, use
+  `inner_conj_symm` to flip.  **Restriction preserves ZIrr:**
+  `OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr (H:Subgroup G) (hφ:φ∈ZIrr G) :
+  restrict H φ ∈ ZIrr ↥H` (InducedCharacter.lean:644, namespace `…ClassFunction`).
+- **Inner conj symmetry:** `OddOrder.RepresentationTheory.inner_conj_symm (φ ψ) : inner ψ φ =
+  star (inner φ ψ)` (ZIrrFourier.lean:147); `star_intCast` for `star (n:ℂ)=n`.  Inner is **linear in
+  1st arg** (`ClassFunction.inner_smul_left c φ ψ : inner (c•φ) ψ = c*inner φ ψ`, `inner_sub_left`).
+- **ALGMOD:** `OddOrder.AlgInt.Cong n α β := IsIntegral ℤ ((α−β)/n)`; `cong_def` unfolds it.
+- **`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`** (abbrev);
+  Dade isometry on supported: `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade
+  hyp.hconj (hS : ∀s∈S, supported) (hφ:φ∈zSpan S)(hζ:ζ∈zSpan S) : ⟨τφ,τζ⟩ = ⟨φ,ζ⟩`.  Reciprocity:
+  `hyp.inner_tau_eq_inner_restrict (hαsupp) ψ : ⟨hyp.tau α, ψ⟩ = ⟨α, restrict L ψ⟩`.
+- **Supports/degrees:** `sMember_scaledDiffSupport_of_charValue_eq (hχS)(hχ'S)(χ 1 = a*χ' 1) :
+  (χ − a•χ').support ⊆ H^#`; `sMember_diffSupport_of_charValue_eq` (equal degree);
+  `sMember_charValue_one_eq_mul_anchor (hχ∈S)(χ₁ 1=|W₁|) : ∃a:ℕ, 0<a ∧ χ 1=a*χ₁ 1` (the degree
+  ratio `a`); `Yset_apply_one (hη) : η 1 = |W₁|`; `index_H_eq_card_W1 : H.index = |W₁|`;
+  `Subgroup.index_mul_card H : H.index * |H| = |L|`.  `Xset_subset_S`, `Yset_subset_S`,
+  `centralCommutator_ne_bot (hHnonab)` (+ `Subgroup.ne_bot_iff_exists_ne_one` for a `z∈Zc^#`).
