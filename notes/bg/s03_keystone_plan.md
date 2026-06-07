@@ -296,3 +296,24 @@ After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H))
 - **着手順序案**: (1) `conjBySimpleSemilinear`+`isSimpleModule_map_conjBySimpleSemilinear` を一般 F に移植
   (CliffordAlgClosed.lean) → (2) Clifford 分解 `L_H=⊕M_i` (M≅M_i, M_1 が submodule) → (3) τ-intertwiner +
   `τx∈Hom_{FG}(L,L)=F` scalar → `L=M_1` (Prop 2.2(a) 本体) → (4) Gor 5.5.4 で `M≅M^g` 供給 → hVP discharge。
+
+### ✅✅ hVP 進捗 (2026-06-08, `a-keystone`): CliffordAlgClosed.lean の両「端」着地 — 残 = τ-scalar crux
+
+`CliffordAlgClosed.lean` (新規, **一般体 `k`**, sorry-free + axiom-clean, OddOrder root 配線済, full 3609):
+- **✅ Step 1 (foundation) DONE** (commit `3aa611c`): ℂ-pin Clifford.lean の module-core を一般 `k` に移植:
+  `conjNormalMulAut H g : H≃*H` (h↦ghg⁻¹), `conjMonoidAlgRingHom g : k[H]→+*k[H]` (誘導環自己同型, surj),
+  `conjSemilinearEnd ρ g` (ρ g を `conjMonoidAlgRingHom g`-semilinear endo として; module-level normality
+  `h•(ρg v)=ρg(ρ(g⁻¹hg)v)`), **`isSimpleModule_map_conjSemilinearEnd`** (simple `k[H]`-部分加群 N の像 `ρg(N)`
+  も simple — conjugation が simple constituents を置換; 既約性/alg-closed 不要, ρg は常に bijection)。
+  ℂ-pin Clifford.lean は無改変 (名前を別にして共存)。
+- **✅ Step 末尾 (conclusion) DONE** (commit `1b24c0a`): **`eq_top_of_forall_map_conjSemilinearEnd_le`** —
+  ρ 既約 + W (≠⊥) が `G`-不変 (∀g, `W.map (conjSemilinearEnd ρ g) ≤ W`) ⟹ `W=⊤`。証明: G-不変 `k[H]`-部分加群
+  は `Subrepresentation ρ` の carrier (`toSubmodule := W.restrictScalars k`) ⟹ `IsSimpleOrder (Subrepresentation ρ)`
+  (=既約) で ⊥/⊤、≠⊥ で ⊤。これが BG の「M_1 G-不変 ⟹ L=M_1」(mmd L651)。
+- **▶ 残 = 中間の τ-scalar crux (mmd L619-650, ハード, 単独 multi-session)**: `W` が **x-不変** (`(ρx)(W)≤W`) を出す。
+  必要: (a) `L_H` semisimple (Maschke, char∤|H|) + **W-isotypic** (全 simple constituent ≅ W ← Clifford "L=Σ_g (ρg)W" +
+  hyp `W≅W^g`); (b) Burnside `E(H)=End_F(W)` (Prop2.1✅); (c) τ-intertwiner (`L_H≅(L_H)^x`) → `τ·ρx` が
+  `Hom_{FG}(L,L)=F` の scalar (Schur) → `(ρx)(W)=W`。**代替: Skolem-Noether (Ad(ρx) on `End_{k[H]}(L_H)≅M_k`
+  は inner)** も同じハードさ。mathlib に完全 Clifford 分解/isotypic API 無 → これも自前。
+  **+ bootstrap**: x-不変 + W は `k[H]`-部分加群 (H-不変) + `G/H=⟨xH⟩` ⟹ ∀g G-不変 (`eq_top` の前提) — 小補題。
+- **▶ + Gor 5.5.4** (`W≅W^g` 供給, 別 sub-piece, 未着手)。これら 2 つ (τ-crux + Gor5.5.4) が hVP の残り全部。
