@@ -85,15 +85,21 @@ Stone–von-Neumann, no "deg ∣ |G|" needed):
 
 ## Then Steps 3-5 — the assembly phase (LARGER than "routine"; ~4 substantial leaves)
 **Recon (2026-06-07, iter 6): Thm 2.5 needs TWO unbuilt pieces beyond the done core, plus assembly.**
-- **Prop 2.4(g)(h)(j)(k) — NOT built** (`EigenspaceUnderCyclicAction.lean` has only (a)(c)(d)(e)!).
-  Thm 2.5's divisibility output `h | qⁿ ± 1` is exactly Prop 2.4(j). Need to add, building on the
-  existing `cyclicEndConjEigenspace` (= `E_m`), `cyclicHomBlockFin` (= `E_{i,t}`),
-  `finrank_cyclicHomBlockFin` (= (d) `dim E_{i,t} = n_i n_t`), internal-direct-sum (= (c)):
-    - (f) `E_m = ⊕_{t-i≡m} E_{i,t}`  [from (c)+(e), the `..._of_modEq` inclusion is there];
-    - (g) `dim E_m = ∑_i n_i n_{i+m}`  [from (d)+(f)];
-    - (h) `2 dim E_0 − 2 dim E_m = ∑_i (n_i − n_{i+m})²`  [(g) + periodicity `n_i = n_{i+h}`];
-    - (j) hyp `dim E_0 = dim E_m + 1 ∀ m≢0` ⟹ `∃ n δ=±1, q = hn+δ`  [elementary: `∑(n_i−n_{i+m})²=2`
-      analysis, BG mmd L696-712]; (k) the `C_V(H)=0 ⟹ h=q+1` corollary. General field; ~150-250 LOC.
+- **Prop 2.4(j) — ✅ DONE** in new file `CyclicEndConjCount.lean` (`prop24j`, axiom-clean): under
+  `∀ m≠0, ∑ᵢ(nᵢ−nᵢ₊ₘ)²=2` with `h≥2`, `∃ i₁ v₀ δ=±1, (∀ i≠i₁, nᵢ=v₀) ∧ n_{i₁}=v₀+δ ∧ ∑nᵢ=h·v₀+δ`
+  (so `∑nᵢ ≡ ±1 mod h`). Proved by a **counting route** (NOT the textbook cyclic-arc geometry):
+  sub-lemma 1 (`∑d=0,∑d²=2 ⟹ one +1/−1`) → per-shift count = 2 → total moved-pairs `2(h−1)` →
+  `∑mult = (h−1)²+1` → max-multiplicity index has mult `h−1` (one outlier) → `(n_{i₁}−v₀)²=1`.
+  Takes the `∑(nᵢ−nᵢ₊ₘ)²=2` hypothesis abstractly (`n : ZMod h → ℤ`); general, field-free.
+- **STILL NEEDED** to apply (j) in Thm 2.5:
+    - **(k)** `C_V(H)=0 ⟹ h=q+1`: short follow-up to `prop24j` given `∀i, 0≤nᵢ` and `q≥2` (n₀=0 forces
+      i₁=0, δ=−1, v₀=1, q=h−1). ~15 LOC.
+    - **(g)(h) bridge** — connect `prop24j`'s abstract `n` to the eigenspace dims: `nᵢ := dim Vᵢ`
+      (`cyclicEigenspaceFinDim`), `dim E_m = ∑ᵢ nᵢ·nᵢ₊ₘ` (g, from (d) `finrank_cyclicHomBlockFin` +
+      the block decomposition (c)/(f)), `2 dim E_0 − 2 dim E_m = ∑ᵢ(nᵢ−nᵢ₊ₘ)²` (h). Then
+      `dim E_0 = dim E_m + 1 ∀m≢0` (the Thm 2.5 multiplicity hyp) gives `∑(nᵢ−nᵢ₊ₘ)²=2`, feeding (j).
+      This needs the `E = ⊕ E_{i,t}` internal direct sum (part c), which is NOT yet in
+      `EigenspaceUnderCyclicAction` — the remaining real work for the Prop 2.4 ↔ Thm 2.5 interface.
 - **Prop 2.2(a) alg-closed (Clifford `V_K = M`) — NOT built**; `Clifford.lean` is ℂ. Real Clifford
   theory over alg-closed F (M irred H-module, H◁G, M≅M^x, G/H cyclic ⟹ V_H irreducible = M).
 - **Thm 2.5 assembly**: base-change (2.9 ✅) → reduce to alg-closed faithful irred → Prop 2.2(a) `V_P=M`
