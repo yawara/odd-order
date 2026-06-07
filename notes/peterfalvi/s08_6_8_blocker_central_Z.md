@@ -365,19 +365,35 @@ Frobenius case (A) it IS provable**, hence no missing hypothesis field:
    (self-normalizing ⟹ ⊤), avoiding the explicit `N_P(H)` argument. The "p-element of L in H" went
    through `Q.comap L.subtype ≤ H` (`comap_of_injective` + unique normal Sylow), and `N_G(Ĥ) ≤ L`
    from `H_sharp_ti`. **The handoff's structural risk is now not just resolved on paper but formalized.**
-3. **🔜 `L = N_G(Ĥ)` (exact equality).** Have `≤` (inline `hNle` in the lemma); `≥` from `H ◁ ↥L`
-   (`l ∈ L` conjugates `Ĥ` to `Ĥ`). peterfalvi_67 uses `Subgroup.normalizer ((↑Q):Set G)` directly
-   (no abstract `L` param), so this bridges `H_sharp_ti`/`card_L_odd` to its TI/odd hypotheses.
-   Consider extracting `normalizer_map_subtype_eq : normalizer (H.map L.subtype) = L` standalone
-   (reused by step 2's `hNle` and by the application).
-4. **🔜 matchings:** `Zc.map L.subtype ≤ Z(Ĥ)` (from `centralCommutator_subgroupOf_le_center`);
-   `Zc ⊴ L` (`centralCommutator_normal`); **`|C_L(z)| = |H|` const on `Zc^#`** — in the Frobenius
-   case this is clean: `z ∈ Z(H) ⟹ C_H(z) = H`, and `W₁` FPF on `H` ⟹ `C_{W₁}(z) = 1` ⟹
-   `C_L(z) = C_H(z) = H` (needs the `C_L(z) = C_H(z)` decomposition via the `L = H ⋊ W₁` split + FPF).
-5. **🔜 apply `peterfalvi_67_of_odd`** to `ψ = η₁^{τ₁}` (const on `Zc^#`, from task #3) ⟹ congruence
-   mod `|H|`. Best stated as an adapter deferring `ψ`/`ψ-const` to the caller (tasks #3/#4):
-   `(ψ : Irr G) const on Zc^# ⟹ ψ(z) ≡ ψ(1) [ALGMOD |H|]`.
+3. **✅ DONE (commit `2a10d44`): `normalizer_map_subtype_eq : normalizer (H.map L.subtype) = L`.**
+   `≤` from `H_sharp_ti` (TI), `≥` from `H ◁ ↥L` (`H.normalizer = ⊤` mapped to `range L.subtype = L`,
+   `le_normalizer_map`). Refactored step 2's `hNle` to reuse `.le`.
+4. **✅ DONE (commits `023fbfb` + `abf9c05`): the centralizer constancy.**
+   `centralizer_centralCommutator_eq : Subgroup.centralizer {z} = H` for `z ∈ Zc^#` (in `↥L`):
+   `H ≤ C_L(z)` (`z ∈ Z(H)`, `centralCommutator_subgroupOf_le_center`) + `C_L(z) ≤ H`
+   (`z ∈ H^#`, Frobenius `centralizer_kernel_le`). Its ambient-`G` form
+   `inf_centralizer_centralCommutator_map : (L:Subgroup G) ⊓ C_G(↑z) = H.map L.subtype` gives the
+   `|N_G(Ĥ) ⊓ C_G(·)| = |Ĥ|` constancy on `Zc^#`.
+5. **✅ DONE (commit `9498451`): the adapter `peterfalvi_67_centralCommutator`.** For `ρ` irreducible
+   with character const on `Zc^#`: `ρ.character z ≡ ρ.character 1 [ALGMOD |H|]` for `z ∈ Zc^#`.
+   Discharges all of `peterfalvi_67_of_odd`'s hyps at `P:=Ĥ`, `Z:=Zc.map L.subtype` (hZP, hZnormal
+   via `comap_map_eq_self`, hti/hodd via step 3, hPz + hconst-centralizer via step 4); modulus
+   `|Ĥ|=|H|` via `card_map_of_injective`. S08 imports `SylowTICongruence`, opens `OddOrder.AlgInt`.
 
-Order note: tasks #2 (this wiring) and #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
+**⟹ (6.7) WIRING COMPLETE (task #2 closed).** All five steps sorry-free + axiom-clean, full build
+green. The handoff's flagged structural risk is fully resolved and formalized. The adapter
+`peterfalvi_67_centralCommutator` is ready for L3 (3b) to consume (`ρ` = the irreducible underlying
+`η₁^{τ₁}`; the "character const on `Zc^#`" hypothesis is exactly what the `Res η₁^{τ₁}` decomposition
+of task #3 supplies).
+
+**🔴 REMAINING for the (6.8) capstone — ALL deep character theory (handoff: attended, not
+autonomous):** L3 (3a) construct `ν` (the IntegralCharacterMap glue agreeing with τ₂/τ₁ — needs a
+new S07 combination constructor); L3 (3b) prove `himg_ortho` (the `b≡c≡0 mod a` argument: `Res η₁^{τ₁}`
+decomposition ⟹ const on `Zc^#` ⟹ **adapter** ⟹ `a∣c`, then norm bound ⟹ `b=0`); capstone
+Frobenius-branch wiring (mechanical once L3 done); CertainType case (B) (unplanned, separate). The
+autonomous structural runway ended with the (6.7) wiring; the rest is the subtle §13-style character
+theory to do attended.
+
+Order note: the adapter (step 5) and task #3 (`Res η₁^{τ₁}` decomposition ⟹ const on `Zc^#`) are both
 prerequisites of #4 (`b≡0`). #3 is the genuinely deep character theory (entangled with
-`coherentYset.extension` internals); #2 is structural group theory (de-risked, mechanical-ish).
+`coherentYset.extension` internals).
