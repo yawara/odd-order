@@ -122,6 +122,26 @@ private) 即時; 本 (c) proof = 「A∈ℰ_p²(M), A∉ℰ_p*(G) ⇒ Uniqueness
 依存総括: Prop 1.5 ✅, Cor 1.12 ✅(S01c), 最終 Uniqueness ✅, of_le_of_lt_top ✅; **未=step1 helper +
 step5 の Uniqueness corollary 特定 + max-order B**。最重・~150 行。Cor 1.12 が解決したので残るは本体組立。
 
+**🚧 進捗 (2026-06-07, uncommitted WIP in worktree)**: 10.3 の **math core 完成・compiling**。
+DONE (sorry-free): 設定 (CMX<⊤) + step1 (`exists_pRank_ge_of_pos_le_rank`) + step2 (B: log≥2,
+`exists_isElementaryAbelian_log_card_ge` を map up) + step4 (`hBU.of_le_of_lt_top`) + **step5 (難所:
+`isUniquelyMaximal_of_three_le_rank_of_lt_top` + `isUniquelyMaximal_of_le_centralizer_of_two_le_rank`)**
++ `|B|=p²` 導出 (`rank_le_of_injective` + `log_card_le_pRank`) + **step6 (rank-3 矛盾: g∉B order p ⇒
+`B⊔⟨g⟩` elem-ab order>p², `sup_of_le_centralizer`+`Commute.zpow_left`)** + step10。
+- **max-order B は不要だった** (rank-2 B で step6 の rank 引数が回る)。step6 は Thm 4.16 不要。
+
+残 3 sorry (= plumbing のみ、math 不確定ゼロ):
+- **step3** `∃ P ≤ M_α, IsPGroup, X≤N(P), B≤P, pRank↥M p ≤ pRank↥P p`: X の M_α 上共役作用 →
+  X-不変 Sylow。template = **S11:480-510** (`MulDistribMulAction.compHom`+`toMulAut`) +
+  coprime = **10.11d:649-654** idiom (`Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl`,
+  hXpi + `Malpha_isPiGroup`) + `le_normalizer_opiCoreInG (alpha M) M` (X≤N(M_α)) +
+  `aInvariant_pSubgroup_le_aInvariant_sylow (G:=↥M_α)`。B は X-fixed (B≤C_G(X)) ゆえ A-inv。
+  pRank↥P p=pRank↥M p は **`sylow_le_Malpha_of_mem_alpha_of_isHall`** + `pRank_sylow_eq` + `Malpha_isHall`。
+- **step7** `P ≤ C_G(X)`: X の P 上共役作用 + **S01c `actsTrivially_of_fixes_omega1_centralizer`**
+  (E=B.subgroupOf P, X が `C_P(B)` の order-p 元=Ω₁(C_P(B))=B (step6 hOmega) を固定 (B≤C_G(X)))。
+- **step9** `3 ≤ rank↥(C_G(X)⊓M)`: P≤C_G(X)(step7)∧P≤M ⇒ rank ≥ rank↥P ≥ pRank↥P p ≥ pRank↥M p ≥3
+  (`hpα` = p∈α via p∣|M_α| + `Malpha_isPiGroup`; `mem_alpha_iff`)。`rank_le_of_injective` で rank mono。
+
 **✅ Cor 1.12 チェーン DONE (2026-06-07, `S01c_Omega1Rigidity.lean`, axiom-clean)**: BG **Cor 1.12**
 (mmd L457) = 「p odd, G p-群, E elem-ab ≤G, A は p'-operator 群で `C_G(E)` の位数 p の元を全固定
 ⇒ A は G に trivial に作用」。実装した §1 結果:
