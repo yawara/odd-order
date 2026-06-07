@@ -218,4 +218,44 @@ theorem exists_outlier {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ)
   · have : i₁ ∈ univ.filter (fun j => n j ≠ n i₀) := by rw [hi₁]; exact mem_singleton_self i₁
     simpa using this
 
+/-- **BG Proposition 2.4(j) (number-theoretic core).** Under the shift hypothesis with `h ≥ 2`,
+there is an index `i₁`, a base value `v₀`, and `δ = ±1` such that `n` equals `v₀` off `i₁`,
+`n i₁ = v₀ + δ`, and `∑ᵢ nᵢ = h·v₀ + δ`. In particular `∑ nᵢ ≡ ±1 (mod h)`.
+
+This packages the eigenvalue-multiplicity structure that BG Thm 2.5 feeds into the `h ∣ qⁿ ± 1`
+conclusion (with `q := ∑ nᵢ = dim V`). -/
+theorem prop24j {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ)
+    (H : ∀ m : ZMod h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    ∃ (i₁ : ZMod h) (v₀ δ : ℤ), (δ = 1 ∨ δ = -1) ∧ (∀ i, i ≠ i₁ → n i = v₀) ∧
+      n i₁ = v₀ + δ ∧ (∑ i, n i) = (h : ℤ) * v₀ + δ := by
+  classical
+  haveI : Fact (1 < h) := ⟨by omega⟩
+  have hcu : (univ : Finset (ZMod h)).card = h := by rw [Finset.card_univ, ZMod.card]
+  obtain ⟨i₁, v₀, hconst, _hne⟩ := exists_outlier hh n H
+  have hm : (1 : ZMod h) ≠ 0 := one_ne_zero
+  have hi₁m : i₁ - 1 ≠ i₁ := fun hc => hm (sub_eq_self.mp hc)
+  -- the `m = 1` shift sum is supported on `{i₁, i₁ - 1}` and equals `2 (n i₁ - v₀)²`
+  have hf0 : ∀ x ∈ (univ : Finset (ZMod h)), x ∉ ({i₁, i₁ - 1} : Finset (ZMod h)) →
+      (n x - n (x + 1)) ^ 2 = 0 := by
+    intro x _ hx
+    simp only [mem_insert, mem_singleton, not_or] at hx
+    rw [hconst x hx.1, hconst (x + 1) (fun hc => hx.2 (eq_sub_of_add_eq hc)), sub_self]; ring
+  have hsq1 : (n i₁ - v₀) ^ 2 = 1 := by
+    have h2 := H 1 hm
+    rw [← Finset.sum_subset (Finset.subset_univ ({i₁, i₁ - 1} : Finset (ZMod h))) hf0,
+      Finset.sum_pair hi₁m.symm,
+      hconst (i₁ + 1) (fun hc => hm (by simpa using sub_eq_zero.mpr hc)),
+      hconst (i₁ - 1) hi₁m, sub_add_cancel] at h2
+    nlinarith [h2]
+  -- the value sum
+  have hsumn : (∑ i, n i) = (h : ℤ) * v₀ + (n i₁ - v₀) := by
+    rw [← Finset.add_sum_erase univ n (mem_univ i₁),
+      Finset.sum_congr rfl (fun i hi => hconst i (Finset.ne_of_mem_erase hi)),
+      Finset.sum_const, Finset.card_erase_of_mem (mem_univ i₁), hcu, nsmul_eq_mul]
+    push_cast [Nat.cast_sub (show 1 ≤ h by omega)]
+    ring
+  refine ⟨i₁, v₀, n i₁ - v₀, ?_, hconst, by ring, hsumn⟩
+  have hmul : (n i₁ - v₀) * (n i₁ - v₀) = 1 := by rw [← pow_two]; exact hsq1
+  exact mul_self_eq_one_iff.mp hmul
+
 end OddOrder.RepresentationTheory
