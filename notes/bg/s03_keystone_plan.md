@@ -188,6 +188,24 @@ setup data. Full build green (3599 jobs), AxiomsCheck OK. Three commits:
    `∑_m dim E_m` nor `(dim V)² = |P/Z|`. Orbit reps come from a hand-built `orbitSetoid` (`Quotient`,
    reps via `Quotient.out`), counted by a `Finset` filter; no `MulAction`/`DirectSum.IsInternal`.
 
+## ✅ Leaf 5 progress (2026-06-08, `a-keystone`): group-level Thm 2.5 divisibility wired
+
+`ExtraspecialThm25Group.lean` (commit `788b670`, sorry-free + axiom-clean, full build green):
+**`finrank_modEq_of_faithful_irreducible`** — for finite `G`, `P ⊴ G` of class `≤ 2`
+(`commutator P ≤ Z(P)`), faithful `ρ` over alg-closed `F` (`char ∤ |P|`), `x ∈ G` with `x^h = 1`,
+`h ≥ 2`, `char ∤ h`, `ε` primitive `h`-th root, **IF** `Representation.IsIrreducible (ρ.comp P.subtype)`
+(= Prop 2.2(a), `V_P` irreducible) **and** `hcent` (`x` fixed-point-free on `P/Z`, = Prop 1.5),
+**THEN** `(dim V : ℤ) = h·v₀ + δ` with `δ = ±1` (i.e. `dim V ≡ ±1 mod h`).
+
+Group-theoretic setup wiring built (all grounded): `conjAutOfNormal P x : P ≃* P` (conj aut of normal
+`P`, via `MulEquiv.subgroupMap` + `Subgroup.Normal.conj_smul_eq_self`) + `_pow_apply_coe`/`_pow_eq_one`;
+`T = ρ.asGroupHom x : GL(V)` with `(T:End) = ρ x` (`MonoidHom.coe_toHomUnits`); `hint`; `φ^h=1`,
+`T^h=1`; `hV` (`cyclicEigenspaceFin_isInternal_of_pow_eq_one`); then composes
+`finrank_cyclicEndConjEigenspaceFin_succ` (keystone) + `sum_eigenspaceFinDim_eq_…` (Prop 2.4) +
+`∑ dim Vᵢ = dim V`. **GOTCHA**: `(ρ.comp P.subtype).IsIrreducible` dot-notation resolves to
+`MonoidHom.IsIrreducible` (fails) — use explicit `Representation.IsIrreducible (ρ.comp P.subtype)`
+(both are `abbrev`; Clifford.lean does the same at L101).
+
 ### ▶ Remaining = Leaf 5 (Thm 2.5/3.4 assembly) — the keystone is no longer the blocker
 
 The keystone now consumes three inputs that the **BG Thm 2.5 setup** must supply (assembled separately,
@@ -200,3 +218,35 @@ from the `G = P ⋊ ⟨x⟩` representation):
 So **Leaf 5** = Prop 2.2(a) alg-closed Clifford (`V_P = M`), base-change (2.9), produce `(P,φ,T)` +
 `hV` + `hcent` from the `G`-rep (Maschke → faithful irred), then Gor 5.3.7 (=`S04e_GorThm37`) →
 contradiction. This opens BG §10–§16.
+
+### ▶▶ Precise next steps (2026-06-08) — `finrank_modEq_of_faithful_irreducible` reduces Thm 2.5
+### divisibility to exactly TWO open hypotheses; discharge them:
+
+1. **`hcent` (Prop 1.5, the smaller piece, tool IDENTIFIED)** — from the BG hypothesis `C_P(xᵏ) = Z(P)`
+   (`xᵏ ≠ 1`) derive `∀ k≠0, ∀ c, (quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c = c → c = 1`.
+   Use **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`** (ForwardFromCh03.lean:794):
+   `{φ : A →* MulAut G} {N ⊴ G} (hCop : Coprime |A| |N|) (hSolv : Solvable A ∨ Solvable N)`
+   `(hN_inv : IsAInvariant φ N) {g} (hg_fix : ∀ a, ∃ n∈N, φ a g = g*n) : ∃ c, (∀ a, φ a c = c) ∧ ∃ n∈N, c = g*n`.
+   Setup: `A = Subgroup.zpowers (conjAutOfNormal P x ^ k.val)` ≤ `MulAut P`, `φ = A.subtype`, `G = P`,
+   `N = center P` (abelian ⟹ `hSolv` right; characteristic ⟹ `hN_inv`); `Coprime |A| |Z|` from `|A| ∣ h`
+   (`(conjAutOfNormal P x)^h = 1`) + `|Z| ∣ |P|` p-power + `gcd(h,p)=1`. `g = Quotient.out c`, `hg_fix`
+   from `σ^{k·j} c = c` (iterate `σ^k c = c`). Lift gives `c'` conj(xᵏ)-fixed ⟹ `c' ∈ C_P(xᵏ) = Z = N`
+   ⟹ `g = c'·n⁻¹ ∈ Z` ⟹ `⟦g⟧ = c = 1`. ~80-120 lines (A-action plumbing + coprimality + the bridges).
+   `C_P(xᵏ)` (centralizer in P) = `{p : P | conj(xᵏ) p = p}` (fixed points of the conj aut) — same set.
+
+2. **`hVP` (Prop 2.2(a) alg-closed Clifford, the BIG piece)** — `Representation.IsIrreducible (ρ.comp P.subtype)`
+   from: `ρ` faithful irreducible `F[G]`-module, `P ⊴ G`, `G/P` cyclic, `F` alg-closed, and `M ≅ M^g`
+   ∀g (all `P`-conjugates of an irred submodule `M` isomorphic — from "faithful irred of extraspecial
+   determined by center", Gor 5.5.4). BG mmd L614-647: build `L` extending `M`, `τ`-cocycle, `τx`
+   generates `Hom_FG(L,L) = F` (Prop 2.1 ✅), so `V_P` irreducible. `Clifford.lean` is **ℂ-pinned**
+   (no destructive edit) ⟹ NEW file `CliffordAlgClosed.lean` (or alg-closed section). Multi-session.
+   Needs Gor 5.5.4 ("faithful irred determined by central char") too — `ExtraspecialFaithful.lean` has
+   `center_isScalar` + `sq_finrank_eq_card_quotient_center`; 5.5.4 = "two faithful irreds with equal
+   central char are isomorphic" is a separate sub-piece.
+
+After both: `finrank_modEq_of_faithful_irreducible` is a genuine grounded Thm 2.5 (divisibility). Then:
+3. **C_V(H)=0 half** of Thm 2.5 (`h ≠ pⁿ+1 ⟹ C_V(H) ≠ 0`) — near-copy of `finrank_modEq…` using
+   `sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace` (✅ in ExtraspecialThm25) +
+   `dim V₀ = 0` hypothesis ⟹ `dim V = h − 1`. Low-risk wiring (extract shared setup to a private lemma).
+4. **Thm 3.4** (`S03d_Thm34.lean`, new): Maschke → faithful irred → Gor 5.3.7 → special case = Thm 2.5
+   → parity contradiction (`h = pⁿ+1` even vs `|G|` odd). Then Thm 3.5 → Thm 3.6 → §10.6 → §10/§11.
