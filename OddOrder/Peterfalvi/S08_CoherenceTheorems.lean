@@ -3568,6 +3568,32 @@ theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.N
     have hcoe := congrArg (H.subtype) hcomm
     simpa using hcoe
 
+/-- **(6.7)-wiring step (c′): the ambient-`G` form `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**
+Realizes `centralizer_centralCommutator_eq` (`C_↥L(w) = H`) in `G`: an element `g ∈ L` centralizes
+`↑w` iff (as an element of `↥L`) it centralizes `w`, iff it lies in `H = C_↥L(w)`.  Hence
+`|N_G(Ĥ) ⊓ C_G(w)| = |C_L(w)| = |Ĥ|` is **constant on `Z^#`** (`N_G(Ĥ) = L`), the centralizer-card
+clause of Peterfalvi (6.7)'s `hconst`. -/
+theorem inf_centralizer_centralCommutator_map (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {w : ↥L} (hw : w ∈ hyp.centralCommutator) (hw1 : w ≠ 1) :
+    (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = H.map L.subtype := by
+  have hCH := hyp.centralizer_centralCommutator_eq hF hw hw1
+  ext g
+  rw [Subgroup.mem_inf]
+  constructor
+  · rintro ⟨hgL, hgc⟩
+    rw [Subgroup.mem_centralizer_singleton_iff] at hgc
+    refine Subgroup.mem_map.mpr ⟨⟨g, hgL⟩, ?_, rfl⟩
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff]
+    exact Subtype.ext (by simpa using hgc)
+  · intro hg
+    obtain ⟨c, hcH, rfl⟩ := Subgroup.mem_map.mp hg
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff] at hcH
+    refine ⟨c.2, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have := congrArg (L.subtype) hcH
+    simpa using this
+
 /-- **(6.8.3) case-(A) fixed-point-free bound** `|Z| ≥ 2|W₁| + 1` (hence `|Z| − 1 ≥ 2|W₁|`).
 `W₁` acts fixed-point-freely on `H` (`hF.toFrobeniusAction`), and `Z.subgroupOf H = Z(↥H) ⊓ H′` is
 characteristic, so the action restricts fixed-point-freely to it (`IsFrobeniusAction.subgroup`);
