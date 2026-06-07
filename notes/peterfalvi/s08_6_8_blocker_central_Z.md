@@ -819,3 +819,57 @@ The crux is `(χ₁−aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}` for the *
   hyp.dade hyp.hconj (hsupp)(hZIrr:φ∈ZIrr L) : tau φ ∈ ZIrr G` (S07:5196 — ⚠ needs the **ZIrr-L** arg).
 - `xBaseBlock Z = {χ∈Xset Z | minimal re-degree}`; `xBaseBlock_subset`, `xBaseBlock_degree_re_eq`
   (S08:5449–5478).  himg_ortho landed = `inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`.
+
+## 2026-06-08 (session 6 cont.): crux `hDτ` COMPLETE in the generic `m,n ≥ 3` case (5 more Lean commits, axiom-clean)
+
+The entire step-5 + crux spine landed.  All leaf-green (3467) + axiom-clean.  **The crux `hDτ`
+`(χ₁−aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}` now holds UNCONDITIONALLY when `|Y| ≥ 3` and a third equal-degree
+`X`-anchor exists** (`crux_of_frobenius`, `17b79c5a`).  Commits:
+
+- ✅ **step-5 relation** `a453969e`: `inner_extension_Xset_sub_eq_neg_one_of_frobenius` —
+  `⟨X, χ₂^{τ₂}⟩ − ⟨X, χ₁^{τ₂}⟩ = −1` for `X := (χ₁−aη₁)^τ + a·η₁^{τ₁}`.  Via himg_ortho
+  (`η₁^{τ₁} ⊥ X^{τ₂}`, so `⟨X,χ_j^{τ₂}⟩ = ⟨(χ₁−aη₁)^τ,χ_j^{τ₂}⟩`) + X-coherence
+  `(χ₂−χ₁)^τ = χ₂^{τ₂}−χ₁^{τ₂}` + the isometry value `a5df2a3a`.
+- ✅ **step-5 dichotomy** `a6d88cf3`: `extension_eq_or_eq_neg_of_frobenius` —
+  `X = χ₁^{τ₂} ∨ X = −χ₂^{τ₂}`.  Bessel `c₁²+c₂² ≤ ‖X‖²=1` via positive-definiteness
+  (`inner_self_re_nonneg` of the residual `X − c₁·χ₁^{τ₂} − c₂·χ₂^{τ₂}`, integer coeffs
+  `inner_mem_ZIrr_int` — **NO `±Irr` lemma**) + relation `c₂−c₁=−1` ⟹ `(c₁,c₂) ∈ {(1,0),(0,−1)}`;
+  `⟨X,·⟩=1` + both norm 1 ⟹ equal by `eq_zero_of_inner_self_re_eq_zero`.
+- ✅ **crux (n≥3 case)** `1c1f37cb`: `crux_of_third_anchor_of_frobenius` — a third equal-degree anchor
+  `χ₃` excludes the right disjunct (`X=−χ₂^{τ₂}` ⟹ the χ₃ relation gives `0=−1`), so `X=χ₁^{τ₂}`,
+  and `eq_sub_of_add_eq` gives the crux.
+- ✅ **good-case discharge (m≥3)** + **generic crux** `17b79c5a`:
+  `inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius` (`|Y|≥3` ⟹ step-4 edge `m=2` impossible
+  ⟹ good case `⟨v,η₁^{τ₁}⟩=−a`) feeds `crux_of_frobenius` (`|Y|≥3` + third anchor ⟹ crux, no hgood).
+
+### 🔴 Remaining for the capstone (refined, session 6 cont.)
+1. **Relabels (m=2 / n=2 edge cases)** — still the structural bottleneck.  The generic crux needs
+   `3 ≤ |xBaseBlock Zc|` (for the third anchor `χ₃`) AND `3 ≤ |Y|` (for hgood).  When either is 2,
+   relabel.  Plan unchanged: build a 2-element sign-swap `IsCoherent` constructor (template = `retarget`
+   S07:2987–3360), OR restructure the capstone to choose relabeled witnesses.  **Could also defer**:
+   land the capstone Frobenius branch under the explicit `3 ≤ |xBaseBlock Zc| ∧ 3 ≤ |Y|` hypotheses
+   first, isolate the relabel as the sole gap.
+2. **`hgen'`** (the diagonal-aware generation, relabel-free): `zSupportedSpan (X∪Y) A ⊆ span(zSupp X ∪ zSupp Y ∪ {χ₁−aη₁})`.
+   Degree-0 decomp `φ = (∑cᵢχᵢ − s·χ₁) + (∑eⱼηⱼ + sa·η₁) + s·(χ₁−aη₁)`, `s = ∑cᵢdᵢ ∈ ℤ` (needs
+   `dᵢ ∈ ℤ` = p-power degree ratio, χ₁ minimal); supp↔deg-0 for the induced lattice (TI).  Focused
+   lattice sub-lemma, no deep character theory.
+3. **ν construction + ν-free diagonal shell**: build `ν = coherentImageMapGlue` (X^{τ₂} ⊕ Y^{τ₁}),
+   discharge `hagreeX`/`hagreeY` (defn), `hmixed` (= himg_ortho), `hDτ` (= `crux_of_frobenius`), `hgen`
+   (= hgen'); route through `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius`
+   (S08:8928) + L4 `false_of_coherentXunionYset_of_not_coherentS`.
+4. **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, separate (6.8.2.1)/(6.8.2.2)/(6.8.2.3)) — unplanned.
+
+**Recommended next session:** `hgen'` (relabel-free, focused) → ν-shell wiring under `3≤|xBaseBlock|, 3≤|Y|`
+⟹ generic-case capstone Frobenius branch done; THEN relabels; THEN CertainType (B).
+
+### Key API (session 6 cont.)
+- **generic crux** `crux_of_frobenius (hyp)(hF)(hHnonab)(hp)(hp3)(hHp)(hη₁)(hχ₁)(hχ₂)(hne₂:χ₂≠χ₁)
+  (hχ₃)(hne₃₁:χ₃≠χ₁)(hne₃₂:χ₃≠χ₂)(ha:χ₁ 1=a·|W₁|)(hdeg2:χ₂ 1=χ₁ 1)(hdeg3:χ₃ 1=χ₁ 1)(hm3:3≤|Y|)`
+  : `tau(χ₁−a•η₁) = χ₁^{τ₂} − a·η₁^{τ₁}` (the equality form of `hDτ`).
+- `extension_eq_or_eq_neg_of_frobenius (… hgood:⟨tau(χ₁−a•η₁),ext η₁⟩=−a)` : `X=χ₁^{τ₂} ∨ X=−χ₂^{τ₂}`
+  (`X := tau(χ₁−a•η₁)+a•ext η₁`).
+- `inner_extension_Xset_sub_eq_neg_one_of_frobenius (…)` : `⟨X,χ₂^{τ₂}⟩−⟨X,χ₁^{τ₂}⟩=−1`.
+- `inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius (…)(hm3:3≤|Y|)` : `⟨tau(χ₁−a•η₁),ext η₁⟩=−a`.
+- `OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int (hφ:φ∈ZIrr)(hψ:ψ∈ZIrr) : ∃m:ℤ, ⟨φ,ψ⟩=m`
+  (InducedCharacter:716 — ⚠ full path `…ClassFunction.inner_mem_ZIrr_int`); `eq_zero_of_inner_self_re_eq_zero
+  (h:(⟨φ,φ⟩).re=0) : φ=0` (ZIrrFourier:189); `Complex.intCast_re`, `star_intCast`, `Finset.sum_pair`.
