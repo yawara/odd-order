@@ -129,6 +129,20 @@ theorem asAlgebraHom_surjective_of_isAlgClosed (ρ : Representation F G V)
   obtain ⟨r, hr⟩ := hsurj h
   exact ⟨r, hr⟩
 
+/-- **Burnside, span form** (BG Prop 2.1): for a finite-dimensional irreducible representation `ρ`
+over an algebraically closed field, the images `{ρ g : g ∈ G}` span `End_F V`. (Equivalent to
+`asAlgebraHom_surjective_of_isAlgClosed`; the convenient form for building the Burnside basis.) -/
+theorem span_range_representation_eq_top (ρ : Representation F G V)
+    [ρ.IsIrreducible] [FiniteDimensional F V] :
+    Submodule.span F (Set.range fun g : G => ρ g) = ⊤ := by
+  rw [eq_top_iff]
+  rintro e -
+  obtain ⟨r, rfl⟩ := asAlgebraHom_surjective_of_isAlgClosed ρ e
+  induction r using MonoidAlgebra.induction_on with
+  | hM g => rw [Representation.asAlgebraHom_of]; exact Submodule.subset_span ⟨g, rfl⟩
+  | hadd x y hx hy => rw [map_add]; exact Submodule.add_mem _ hx hy
+  | hsmul c x hx => rw [map_smul]; exact Submodule.smul_mem _ c hx
+
 end Representation
 
 section CentralCharacter
@@ -157,6 +171,28 @@ theorem center_isScalar (ρ : Representation F G V) [ρ.IsIrreducible] [FiniteDi
   -- built intertwiner's coercion at `v` is `ρ z v`.  All these are `rfl`, so this typechecks.
   have hv : c • v = (ρ z) v := DFunLike.congr_fun hc v
   simpa using hv.symm
+
+/-- **Burnside basis, spanning step.** A transversal `{ρ(out c) : c ∈ G/Z}` of the central cosets
+still spans `End_F V`: every `ρ g` is a scalar multiple of `ρ(out (gZ))` (central character), so the
+span is unchanged from `span_range_representation_eq_top`. -/
+theorem span_range_quotient_out_eq_top (ρ : Representation F G V)
+    [ρ.IsIrreducible] [FiniteDimensional F V] :
+    Submodule.span F
+      (Set.range fun c : G ⧸ Subgroup.center G => ρ (Quotient.out c)) = ⊤ := by
+  rw [eq_top_iff, ← span_range_representation_eq_top ρ, Submodule.span_le]
+  rintro _ ⟨g, rfl⟩
+  set c₀ : G ⧸ Subgroup.center G := (g : G ⧸ Subgroup.center G) with hc₀
+  have hz : (Quotient.out c₀)⁻¹ * g ∈ Subgroup.center G :=
+    QuotientGroup.eq.mp (Quotient.out_eq c₀)
+  obtain ⟨c, hc⟩ := center_isScalar ρ hz
+  have hg : ρ g = c • ρ (Quotient.out c₀) := by
+    have hsplit : g = Quotient.out c₀ * ((Quotient.out c₀)⁻¹ * g) := by group
+    rw [hsplit, map_mul, hc]
+    ext v
+    simp [Module.End.mul_apply]
+  change ρ g ∈ Submodule.span F (Set.range fun c : G ⧸ Subgroup.center G => ρ (Quotient.out c))
+  rw [hg]
+  exact Submodule.smul_mem _ c (Submodule.subset_span ⟨c₀, rfl⟩)
 
 end CentralCharacter
 
