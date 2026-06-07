@@ -179,4 +179,52 @@ theorem finrank_cast_ne_zero [FiniteDimensional F V] [Finite P]
   rw [h] at hmass
   rw [← hmass]; ring
 
+/-- **`|P/Z| ≤ (dim V)²`** (Gor 5.5.5a-v, the trace-form independence half). The `|P/Z|` images
+`ρ(out c)` of `Z`-coset representatives are `F`-linearly independent in `End_F V`: pairing with the
+functional `A ↦ trace(A · ρ(out c')⁻¹)` gives the Gram matrix `χ(out c · (out c')⁻¹) = δ · (dim V)`,
+nonsingular because `(dim V : F) ≠ 0`. Hence `card (P ⧸ Z) ≤ finrank (End_F V) = (dim V)²`. -/
+theorem card_quotient_center_le_sq_finrank [FiniteDimensional F V] [Finite P]
+    [Invertible (Nat.card P : F)] (ρ : Representation F P V) [ρ.IsIrreducible]
+    (hf : Function.Injective ρ) (hcl : commutator P ≤ Subgroup.center P) :
+    Nat.card (P ⧸ Subgroup.center P) ≤ Module.finrank F V ^ 2 := by
+  classical
+  haveI : Fintype P := Fintype.ofFinite P
+  haveI : Fintype (P ⧸ Subgroup.center P) := Fintype.ofFinite _
+  -- coset membership of `out c · (out c')⁻¹` ↔ `c = c'`
+  have hco : ∀ c : P ⧸ Subgroup.center P, (↑(Quotient.out c) : P ⧸ Subgroup.center P) = c :=
+    fun c => Quotient.out_eq' c
+  have hmem : ∀ c c' : P ⧸ Subgroup.center P,
+      Quotient.out c * (Quotient.out c')⁻¹ ∈ Subgroup.center P ↔ c = c' := by
+    intro c c'
+    rw [← QuotientGroup.eq_one_iff, QuotientGroup.mk_mul, QuotientGroup.mk_inv, hco, hco]
+    exact mul_inv_eq_one
+  -- trace-form Gram entries
+  have hTval : ∀ c c' : P ⧸ Subgroup.center P,
+      LinearMap.trace F V (ρ (Quotient.out c) * ρ ((Quotient.out c')⁻¹))
+        = if c = c' then (Module.finrank F V : F) else 0 := by
+    intro c c'
+    rw [← map_mul]
+    change ρ.character _ = _
+    by_cases h : c = c'
+    · subst h; rw [if_pos rfl, mul_inv_cancel, char_one]
+    · rw [if_neg h]
+      exact character_eq_zero_of_notMem_center ρ hf hcl ((hmem c c').not.mpr h)
+  -- the family of coset-rep images is linearly independent
+  have hindep : LinearIndependent F (fun c : P ⧸ Subgroup.center P => ρ (Quotient.out c)) := by
+    rw [Fintype.linearIndependent_iff]
+    intro coef hcoef j
+    have happ : LinearMap.trace F V
+          ((∑ i, coef i • ρ (Quotient.out i)) * ρ ((Quotient.out j)⁻¹))
+        = ∑ i, coef i • LinearMap.trace F V (ρ (Quotient.out i) * ρ ((Quotient.out j)⁻¹)) := by
+      rw [Finset.sum_mul, map_sum]
+      simp only [smul_mul_assoc, map_smul]
+    rw [hcoef, zero_mul, map_zero] at happ
+    simp only [hTval, smul_ite, smul_zero] at happ
+    rw [Finset.sum_ite_eq' Finset.univ j] at happ
+    simp only [Finset.mem_univ, if_true, smul_eq_mul] at happ
+    exact (mul_eq_zero.mp happ.symm).resolve_right (finrank_cast_ne_zero ρ hf hcl)
+  -- independence ⟹ card ≤ finrank End = (dim V)²
+  have h1 := hindep.fintype_card_le_finrank
+  rwa [Module.finrank_linearMap, ← pow_two, ← Nat.card_eq_fintype_card] at h1
+
 end OddOrder.RepresentationTheory
