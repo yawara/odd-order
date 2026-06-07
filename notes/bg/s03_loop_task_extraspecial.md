@@ -1,13 +1,13 @@
-# Autonomous loop task — A2 lane: BG §3 Thm 3.4 via alg-closed extraspecial rep theory (2026-06-07)
+# Autonomous loop task — rep-theory lane: BG §3 Thm 3.4 via alg-closed extraspecial rep theory (2026-06-07)
 
-You are an autonomous **Ralph loop** on the **A2 lane**. Goal: drive BG **Theorem 3.4** to
-completion by building the missing **algebraically-closed extraspecial representation theory**
-(BG §2 Thm 2.5 core), bottom-up, in **build-green + axiom-clean** commits.
+You are an autonomous loop on the **representation-theory lane** (`bg-reptower`). Goal: drive BG
+**Theorem 3.4** to completion by building the missing **algebraically-closed extraspecial
+representation theory** (BG §2 Thm 2.5 core), bottom-up, in **build-green + axiom-clean** commits.
 
 ## Hard rules (read every iteration)
 
-- **Worktree**: work **ONLY** in `/home/ywr/odd-order-bg-s10-spine` (branch `bg-s10-spine`).
-  The shell cwd **resets to `/home/ywr/odd-order` (main) every command** — so **`cd /home/ywr/odd-order-bg-s10-spine && <cmd>`** every time. Commit to `bg-s10-spine`. **Do NOT merge to main** (the integrator does that; main gets concurrent background merges).
+- **Worktree**: work **ONLY** in `/home/ywr/odd-order-bg-reptower` (branch `bg-reptower`).
+  The shell cwd **resets to `/home/ywr/odd-order` (main) every command** — so **`cd /home/ywr/odd-order-bg-reptower && <cmd>`** every time. Commit to `bg-reptower`. **Do NOT merge to main** (the integrator does that; main gets concurrent background merges). Issue numbering base for this lane = **3000** (`export ODD_ISSUE_BASE=3000` or `bin/new-issue --base 3000`).
 - **Do NOT `lake update`**. Do NOT touch other lanes' files.
 - **Build discipline**: develop with leaf builds `cd … && lake build OddOrder.GroupTheory.RepresentationTheory.X`; **before every commit run a leaf build of the changed file (and a full `lake build OddOrder` before a commit that is imported widely)**. **Commit only when green. NEVER commit a `sorry`.** If a leaf needs an unproven sub-fact, prove it or defer the whole leaf.
 - **Don't break Peterfalvi**: `Clifford.lean`, `SchurCenterBound.lean` are **ℂ-pinned and shared with the Peterfalvi lane**. Do **not** edit them destructively. Add algebraically-closed / general-field results as **new defs/sections or new files**.
@@ -15,7 +15,15 @@ completion by building the missing **algebraically-closed extraspecial represent
 - **Axiom-clean**: append a temporary `#print axioms <name>` for each new top-level result, confirm `[propext, Classical.choice, Quot.sound]` only, then remove it.
 - **One coherent unit per commit** (`Pf (RepresentationTheory): …` or `Pf (BG 3.4 …): …`). Update `notes/bg/s03_thm36_plan.md` when the frontier changes.
 
-## State at loop start (worktree synced to main `dfcbfac`, build-green)
+## State at loop start (worktree `bg-reptower` from main `c0b6eb6`, build-green)
+
+**▶ CURRENT ENTRY POINT = Step 1, Schur half via the FDRep route** (Step 0 design is DONE; see
+`notes/bg/s03_prop21_design.md` + `notes/bg/s03_extraspecial_blocker.md`). The raw
+`Module.End (MonoidAlgebra F G) ρ.asModule` route fights `asModule` synonym instances — use
+`FDRep.finrank_hom_simple_simple [IsAlgClosed F]` instead (work in the `FDRep F G` category; bridge
+`Representation ⇝ FDRep`). Then Burnside (Wedderburn route in the design note), Gor 5.5.5, Prop 2.2
+alg-closed, Thm 2.5, Thm 3.4.
+
 
 **✅ Already done (do NOT redo):**
 - base-change infra `OddOrder/GroupTheory/RepresentationTheory/BaseChange.lean`:
