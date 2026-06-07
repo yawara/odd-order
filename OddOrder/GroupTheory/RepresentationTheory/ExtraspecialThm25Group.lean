@@ -132,23 +132,29 @@ theorem quotientCenter_fixedFree_of_centralizer_le_center
   rw [← hgc, QuotientGroup.eq_one_iff]
   exact hg_center
 
-/-- **BG Theorem 2.5, divisibility part (group level).** Let `P ⊴ G` be a finite group of
-nilpotency class `≤ 2` (`commutator P ≤ Z(P)`) with a faithful representation `ρ` over an
-algebraically closed field (`char ∤ |P|`), `x ∈ G` of order `h ≥ 2` with `char ∤ h`, `ε` a
-primitive `h`-th root of unity.  If the restriction `V_P` is irreducible (BG Prop 2.2(a)) and `x`
-acts fixed-point-freely on `P/Z(P)` (`hcent`, BG Prop 1.5), then `dim V ≡ ±1 (mod h)`. -/
-theorem finrank_modEq_of_faithful_irreducible
+/-- **Shared keystone data for BG Theorem 2.5 (group level).** From the Theorem 2.5 setup
+(`P ⊴ G` of class `≤ 2`, faithful `ρ` over alg-closed `F`, `char ∤ |P|`, `x^h = 1`, `ε` primitive
+`h`-th root, `char ∤ h`, `V_P` irreducible, `x` fixed-point-free on `P/Z`), the conjugation
+operator `T = ρ x` on `End_F V` has: the eigenspace decomposition `hV`, the keystone multiplicities
+`dim E₀ = dim E_m + 1` (BG (2.11) via `finrank_cyclicEndConjEigenspaceFin_succ`), and
+`∑ dim Vᵢ = dim V`.  Both conclusions of Theorem 2.5 (divisibility and `C_V(H)`) consume this. -/
+private theorem cyclicEndConj_keystoneData_of_faithful_irreducible
     {F : Type*} [Field F] [IsAlgClosed F]
     {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Finite G]
     (P : Subgroup G) [P.Normal] [Invertible (Nat.card P : F)]
     (ρ : Representation F G V) (hf : Function.Injective ρ)
     (hcl : commutator P ≤ Subgroup.center P)
-    (x : G) {h : ℕ} [NeZero h] (hxh : x ^ h = 1) (hh2 : 2 ≤ h)
+    (x : G) {h : ℕ} [NeZero h] (hxh : x ^ h = 1)
     {ε : F} (hprim : IsPrimitiveRoot ε h) (hh : (h : F) ≠ 0)
     (hVP : Representation.IsIrreducible (ρ.comp P.subtype))
     (hcent : ∀ k : ZMod h, k ≠ 0 → ∀ c : P ⧸ Subgroup.center P,
         ((quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c) = c → c = 1) :
-    ∃ (v₀ δ : ℤ), (δ = 1 ∨ δ = -1) ∧ (Module.finrank F V : ℤ) = (h : ℤ) * v₀ + δ := by
+    DirectSum.IsInternal (cyclicEigenspaceFinFamily ε (ρ.asGroupHom x : Module.End F V) h) ∧
+    (∀ m : Fin h, m ≠ 0 →
+      Module.finrank F (cyclicEndConjEigenspaceFin ε (ρ.asGroupHom x) (0 : Fin h))
+        = Module.finrank F (cyclicEndConjEigenspaceFin ε (ρ.asGroupHom x) m) + 1) ∧
+    (∑ i : Fin h, cyclicEigenspaceFinDim ε (ρ.asGroupHom x : Module.End F V) i
+        = Module.finrank F V) := by
   classical
   set ρP : Representation F P V := ρ.comp P.subtype with hρP
   haveI : Representation.IsIrreducible ρP := hVP
@@ -175,17 +181,36 @@ theorem finrank_modEq_of_faithful_irreducible
     cyclicEigenspaceFin_isInternal_of_pow_eq_one hprim hTEnd_h
   -- the keystone supplies `hEdim`
   have hEdim := finrank_cyclicEndConjEigenspaceFin_succ ρP hfP hcl φ T hint hφh hprim hh hcent
-  -- the Prop 2.4 counting gives `∑ dim Vᵢ ≡ ±1`
-  obtain ⟨v₀, δ, hδ, hsum⟩ :=
-    sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace hprim hV hh2 hEdim
   -- `∑ dim Vᵢ = dim V`
   have hsumV : ∑ i : Fin h, cyclicEigenspaceFinDim ε (T : Module.End F V) i
       = Module.finrank F V := by
     rw [← (LinearEquiv.ofBijective
       (DirectSum.coeLinearMap (cyclicEigenspaceFinFamily ε (T : Module.End F V) h)) hV).finrank_eq,
       Module.finrank_directSum]
-  refine ⟨v₀, δ, hδ, ?_⟩
-  rw [← hsum, ← Nat.cast_sum, hsumV]
+  exact ⟨hV, hEdim, hsumV⟩
+
+/-- **BG Theorem 2.5, divisibility part (group level).** Let `P ⊴ G` be a finite group of
+nilpotency class `≤ 2` (`commutator P ≤ Z(P)`) with a faithful representation `ρ` over an
+algebraically closed field (`char ∤ |P|`), `x ∈ G` of order `h ≥ 2` with `char ∤ h`, `ε` a
+primitive `h`-th root of unity.  If the restriction `V_P` is irreducible (BG Prop 2.2(a)) and `x`
+acts fixed-point-freely on `P/Z(P)` (`hcent`, BG Prop 1.5), then `dim V ≡ ±1 (mod h)`. -/
+theorem finrank_modEq_of_faithful_irreducible
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Finite G]
+    (P : Subgroup G) [P.Normal] [Invertible (Nat.card P : F)]
+    (ρ : Representation F G V) (hf : Function.Injective ρ)
+    (hcl : commutator P ≤ Subgroup.center P)
+    (x : G) {h : ℕ} [NeZero h] (hxh : x ^ h = 1) (hh2 : 2 ≤ h)
+    {ε : F} (hprim : IsPrimitiveRoot ε h) (hh : (h : F) ≠ 0)
+    (hVP : Representation.IsIrreducible (ρ.comp P.subtype))
+    (hcent : ∀ k : ZMod h, k ≠ 0 → ∀ c : P ⧸ Subgroup.center P,
+        ((quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c) = c → c = 1) :
+    ∃ (v₀ δ : ℤ), (δ = 1 ∨ δ = -1) ∧ (Module.finrank F V : ℤ) = (h : ℤ) * v₀ + δ := by
+  obtain ⟨hV, hEdim, hsumV⟩ :=
+    cyclicEndConj_keystoneData_of_faithful_irreducible P ρ hf hcl x hxh hprim hh hVP hcent
+  obtain ⟨v₀, δ, hδ, hsum⟩ :=
+    sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace hprim hV hh2 hEdim
+  exact ⟨v₀, δ, hδ, by rw [← hsum, ← Nat.cast_sum, hsumV]⟩
 
 /-- **BG Theorem 2.5, divisibility part**, with the abstract fixed-point-free hypothesis `hcent`
 replaced by the BG-faithful centralizer condition.  Let `P ⊴ G` (finite, class `≤ 2`) carry a
@@ -209,5 +234,55 @@ theorem finrank_modEq_of_faithful_irreducible_of_centralizer
     ∃ (v₀ δ : ℤ), (δ = 1 ∨ δ = -1) ∧ (Module.finrank F V : ℤ) = (h : ℤ) * v₀ + δ :=
   finrank_modEq_of_faithful_irreducible P ρ hf hcl x hxh hh2 hprim hh hVP
     (quotientCenter_fixedFree_of_centralizer_le_center P x hxh hcop hCP)
+
+/-- **BG Theorem 2.5, `C_V(H)` part (group level).** Same setup as the divisibility theorem
+`finrank_modEq_of_faithful_irreducible`;
+in addition assume `dim V ≥ 2` and that `x` has no nonzero fixed vector, i.e. the fixed space
+`C_V(H) = C_V(x) = V₀` is trivial (`cyclicEigenspaceFinDim ε (ρ x) 0 = 0`).  Then `dim V = h - 1`,
+i.e. `h = dim V + 1`.  Equivalently (contrapositive), if `h ≠ dim V + 1` then `C_V(H) ≠ 0` — the
+half of Theorem 2.5 used in the even/odd contradiction of Theorem 3.4. -/
+theorem finrank_eq_sub_one_of_faithful_irreducible
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Finite G]
+    (P : Subgroup G) [P.Normal] [Invertible (Nat.card P : F)]
+    (ρ : Representation F G V) (hf : Function.Injective ρ)
+    (hcl : commutator P ≤ Subgroup.center P)
+    (x : G) {h : ℕ} [NeZero h] (hxh : x ^ h = 1) (hh2 : 2 ≤ h)
+    {ε : F} (hprim : IsPrimitiveRoot ε h) (hh : (h : F) ≠ 0)
+    (hVP : Representation.IsIrreducible (ρ.comp P.subtype))
+    (hcent : ∀ k : ZMod h, k ≠ 0 → ∀ c : P ⧸ Subgroup.center P,
+        ((quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c) = c → c = 1)
+    (hV2 : 2 ≤ Module.finrank F V)
+    (hCV : cyclicEigenspaceFinDim ε (ρ.asGroupHom x : Module.End F V) (0 : Fin h) = 0) :
+    (Module.finrank F V : ℤ) = (h : ℤ) - 1 := by
+  obtain ⟨hV, hEdim, hsumV⟩ :=
+    cyclicEndConj_keystoneData_of_faithful_irreducible P ρ hf hcl x hxh hprim hh hVP hcent
+  have hq : 2 ≤ ∑ i : Fin h,
+      (cyclicEigenspaceFinDim ε (ρ.asGroupHom x : Module.End F V) i : ℤ) := by
+    rw [← Nat.cast_sum, hsumV]; exact_mod_cast hV2
+  have hsub := sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace
+    hprim hV hh2 hEdim hq hCV
+  rw [← hsub, ← Nat.cast_sum, hsumV]
+
+/-- **BG Theorem 2.5, `C_V(H)` part**, with the abstract `hcent` replaced by the BG-faithful
+centralizer condition `(h, |P|) = 1` + `C_P(xᵏ) ⊆ Z(P)` (cf.
+`finrank_modEq_of_faithful_irreducible_of_centralizer`). -/
+theorem finrank_eq_sub_one_of_faithful_irreducible_of_centralizer
+    {F : Type*} [Field F] [IsAlgClosed F]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Finite G]
+    (P : Subgroup G) [P.Normal] [Invertible (Nat.card P : F)]
+    (ρ : Representation F G V) (hf : Function.Injective ρ)
+    (hcl : commutator P ≤ Subgroup.center P)
+    (x : G) {h : ℕ} [NeZero h] (hxh : x ^ h = 1) (hh2 : 2 ≤ h)
+    {ε : F} (hprim : IsPrimitiveRoot ε h) (hh : (h : F) ≠ 0)
+    (hcop : Nat.Coprime h (Nat.card P))
+    (hVP : Representation.IsIrreducible (ρ.comp P.subtype))
+    (hCP : ∀ k : ZMod h, k ≠ 0 → ∀ p : P,
+        (conjAutOfNormal P x ^ k.val) p = p → p ∈ Subgroup.center P)
+    (hV2 : 2 ≤ Module.finrank F V)
+    (hCV : cyclicEigenspaceFinDim ε (ρ.asGroupHom x : Module.End F V) (0 : Fin h) = 0) :
+    (Module.finrank F V : ℤ) = (h : ℤ) - 1 :=
+  finrank_eq_sub_one_of_faithful_irreducible P ρ hf hcl x hxh hh2 hprim hh hVP
+    (quotientCenter_fixedFree_of_centralizer_le_center P x hxh hcop hCP) hV2 hCV
 
 end OddOrder.RepresentationTheory
