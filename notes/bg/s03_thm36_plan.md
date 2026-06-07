@@ -44,9 +44,28 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 | **Lem 3.1** | — | ✅ | S03 `isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot` |
 | **Gorenstein 5.3.7** (BG 番号; = 当 ed. **Gor 3.7/3.8/3.10**) | — | ✅ **被覆済** | coprime minimal 作用 ⇒ special + irred on K/K' + trivial K'。`S04e_GorThm37.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality` (sorry-free, AxiomsCheck:1250)。BG 3.4 では K に適用 (existence-of-minimal → K=Q bridge は §3.4 内部) |
 | **Gorenstein 3.2.2** (Z(G) cyclic) | — | △ ほぼ被覆 | faithful irreducible ⇒ Z(G) cyclic。ℂ 版 machinery = Isaacs CTFG Cor 2.30 `SchurCenterBound.lean` (`exists_central_scalar` 他, sorry-free)。一般体 F 版 capstone = Schur→`Module.End` division ring + mathlib `isCyclic_of_subgroup_isDomain` で短い追加 |
-| **BG Thm 2.5** (+ Prop 2.1/2.2/2.4, Gor 5.5.4-5) | L716 | ❌ 未 (真の frontier) | extraspecial+cyclic faithful irred の最終矛盾。**Isaacs FGT 不在 = BG 自前 §2 表現論**(cross_refs §5 L134)。S02 は docstring stub (2.6 のみ ✅)。**Thm 3.4 完成の本丸はここ**(Gorenstein でなく BG §2) |
+| **BG Thm 2.5** (+ Prop 2.1/2.2/2.4, Gor 5.5.4-5) | L716 | ❌ 未 (真の frontier) | extraspecial+cyclic faithful irred の最終矛盾。**Gorenstein でなく BG 自前 §2 表現論**。Thm 3.4 完成の本丸。下記 §2 ↔ Peterfalvi 棚卸し参照 |
 | §1 Prop1.3/1.4/1.5/1.6/1.7/1.8/1.13/1.16, Thm2.6 | — | ✅ (要再確認) | S01_Solvable / S01b_Prop116 / S02_Representations (使用時に各個検証) |
 | special q-group def `IsSpecial` | — | ✅ def | GroupTheory/IsExtraspecial.lean:84 |
+
+## BG §2 ↔ Peterfalvi `RepresentationTheory` 棚卸し (2026-06-07 検証, main `ae2eccc`)
+
+Peterfalvi 用に構築された `OddOrder/GroupTheory/RepresentationTheory/*` 共有 module が BG §2 をどこまで
+被覆するか、実測 (decls / LOC / 体)。**「sorry-free だが空 skeleton」の罠に注意**([[scaffold-sorry-free-not-done]])。
+
+| BG §2 | RepresentationTheory module | 実体 | 体 | BG (一般体 F, char∤\|G\|) で使えるか |
+|---|---|---|---|---|
+| **Prop 2.1** (Schur/abs irred) | `AbsolutelyIrreducible.lean` | **空 skeleton** (0 decls, issue #) | — | ❌ 未。S02 に signature 案のみ |
+| **Prop 2.2** (Clifford) | `Clifford.lean` | ✅ 実体 (65 decls, 1172 LOC, sorry-free) | **ℂ 限定** (`Representation ℂ G V`) | △ ℂ専用 ⇒ BG 一般体は **base-change か一般体版**要 |
+| **Prop 2.4** (eigenspace under cyclic) | `EigenspaceUnderCyclicAction.lean` | ✅ 実体 (48 decls, 918 LOC, sorry-free) | **一般体** (`[Field F]`) | ◯ 直接再利用可 |
+| **Thm 2.5** (extraspecial faithful) / Gor 5.5.4-5 | `ExtraspecialFaithful.lean` | **空 skeleton** (0 decls, issue #34) | — | ❌ 未。Thm 3.4 本丸 |
+| **Thm 2.6** (奇数 2-dim) | `PGroupFixedVector.lean` + S02 | ✅ sorry-free (`odd_two_dim_abelian` 他) | 一般体 | ◯ 完了 |
+| **Gor 3.2.2** (Z cyclic) | `SchurCenterBound.lean` | ✅ 実体 (= Isaacs CTFG Cor 2.30) | **ℂ 限定** | △ 一般体 capstone 短い追加要 |
+
+**結論**: Peterfalvi 進捗は **大量の再利用可能な ℂ 表現論 + 一部一般体 module** を提供するが、BG §2 を**完全代替はしない**。
+(1) Thm 2.5 / Prop 2.1 は空 skeleton で未着手、(2) Clifford/Schur は **ℂ 限定**で BG の一般体 F 設定に直接は乗らない
+(BG Thm 2.5 証明自身が代数閉体へ base-change するので、その橋 or ℂ-module の代数閉体一般化が要)。
+Prop 2.4 (eigenspace) のみ一般体で即再利用可。**Thm 3.4 着手時の設計判断 = §2 を「ℂ/代数閉体で組んで base-change」か「一般体で再構築」か**。
 
 ## 推奨着手順序 (bottom-up)
 
