@@ -49,20 +49,33 @@ For `ρ = σ`: `∑ g, χ(g) χ(g⁻¹) = |G|` (`Equiv ρ ρ` nonempty via `refl
 
 **Recommended split** (the "2n even" structure is isolated to a pure group-theory leaf):
 
-- **5.5.5a (representation theory, the meat):** `P` finite, `Z := Z(P)`, `[P,P] = Z` (= extraspecial's
-  `commutator_eq_center`), `|Z| = q` prime, `F` alg-closed with `char ∤ |P|`, `V` a faithful simple
-  `FDRep F P`. Then **`(dim V)² · q = |P|`** (equivalently `(dim V)² = |P| / |Z|`). Lemma chain:
-  1. `λ : Z → F` central character from `center_isScalar` (✅). Faithful ⟹ `λ z = 1 ↔ z = 1`
-     (if `ρ z = id` then `z = 1`), so `z ≠ 1 ⟹ λ z ≠ 1`.
-  2. `χ(g z) = λ(z) · χ(g)` for `z ∈ Z` (trace of `ρ g ∘ (λ z • id)`).
-  3. **χ vanishes off Z:** `g ∉ Z ⟹ χ g = 0`. Group fact: `g ∉ Z(P) ⟹ ∃ x, [g,x] ≠ 1`; then
-     `gˣ = g·[g,x]` with `z₀ := [g,x] ∈ [P,P] = Z` (extraspecial!), `z₀ ≠ 1`. So `g ~ g z₀`, giving
-     `χ g = χ(g z₀) = λ(z₀) χ g` with `λ(z₀) ≠ 1` ⟹ `χ g = 0`.
-  4. `char_orthonormal V V`: `∑_{g} χ(g)χ(g⁻¹) = |P|`. Split off Z (vanishing): `= ∑_{z∈Z} χ(z)χ(z⁻¹)`.
-  5. `χ(z) = λ(z)·d`, `χ(z⁻¹) = λ(z)⁻¹·d` (d = dim V), product `= d²`. Sum over `z∈Z`: `= |Z|·d² = q d²`.
-  6. `q d² = |P|`. ∎
-  Risk: bridging "BG faithful irreducible" ⇝ `Simple (FDRep.of ...)`; the conjugacy-class sum split
-  (`Finset` over `G \ Z`); `char` of `FDRep` vs `Representation` (use `FDRep.character`).
+**What Thm 2.5 actually needs (re-read of BG proof, mmd L756/L766):** the *integer* equation
+**`(dim V)² = |P/Z|`** — it is used to say the `|P/Z|` images of `Z`-coset reps form a *basis* of
+`E(P)` (BG (2.11)), needing `dim E(P) = (dim V)² = |P/Z|` exactly. So the deliverable is this **ℕ
+equation**, not just an `F`-equation.
+
+**⚠ char-p descent subtlety (the real point):** `Representation.char_orthonormal` lives in `F`. Over
+`char r > 0` the cast `ℕ → F` is NOT injective, so the `F`-equation `(d:F)²·(|Z|:F) = (|P|:F)` does
+**not** by itself give the ℕ equation. The clean fix is a **trace-form Gram-matrix** argument (no
+Stone–von-Neumann, no "deg ∣ |G|" needed):
+
+- **5.5.5a-i ✅ DONE** (`character_eq_zero_of_notMem_center`, commit `b3017ac`): faithful irreducible,
+  `commutator P ≤ Z(P)` ⟹ `χ g = 0` for `g ∉ Z(P)`. (Uses `center_isScalar` + `char_conj` + the
+  `x g x⁻¹ = ⁅x,g⁆ g` identity + faithfulness `c ≠ 1`.)
+- **5.5.5a-ii (mass formula in F):** `char_orthonormal ρ ρ` ⟹ `∑_g χ(g)χ(g⁻¹) = (|P|:F)`; split off `Z`
+  by (i); for `z ∈ Z`, `χ(z)χ(z⁻¹) = (d:F)²` (`ρ z = c•id`, `ρ z⁻¹ = c⁻¹•id`, `χ z = c·d`,
+  `χ z⁻¹ = c⁻¹·d`, product `= d²`). Sum ⟹ `(|Z|:F)·(d:F)² = (|P|:F)`, i.e. `(d:F)² = (|P/Z|:F)`.
+- **5.5.5a-iii `(d:F) ≠ 0`** — the KEY enabler: from `(d:F)² = (|P/Z|:F)` and `(|P/Z|:F) ≠ 0`
+  (`|P/Z| ∣ |P|`, `char ∤ |P|`). So `char ∤ dim V` *without* needing degree-divides-order.
+- **5.5.5a-iv spanning** `(dim V)² ≤ |P/Z|`: Burnside `E(P) = End_F V` (✅ `asAlgebraHom_surjective…`)
+  + `Z` acts by scalars (`center_isScalar`) ⟹ `E(P) = ∑_{g∈R} F·g` (`R` = `Z`-coset reps), so
+  `dim E ≤ |R| = |P/Z|`.
+- **5.5.5a-v independence** `(dim V)² ≥ |P/Z|`: the Gram matrix `[trace(ρ gᵢ · ρ gⱼ⁻¹)]_{R×R}
+  = [χ(gᵢ gⱼ⁻¹)]` is `(d:F)·I` (off-diag: `gᵢgⱼ⁻¹ ∉ Z` ⟹ `0` by (i); diag: `χ 1 = (d:F)`),
+  nonsingular by (iii) ⟹ the `|P/Z|` images are `F`-independent in `E(P)`.
+- **5.5.5a-vi assembly:** iv + v ⟹ **`(dim V)² = |P/Z|`** (ℕ). ∎
+  Work at the `Representation` level (`Representation.char_orthonormal`, no FDRep bridge). The sum
+  split is `Finset.sum_subset`/filter over `g ∈ center` (`DecidablePred`, classical).
 
 - **5.5.5b (pure group theory):** extraspecial `P` of order `q^{1+2n}` ⟹ `|P| = q · q^{2n}` with the
   exponent `2n` even (nondegenerate symplectic form on `P/Z` from the commutator). Combined with
@@ -77,5 +90,8 @@ For `ρ = σ`: `∑ g, χ(g) χ(g⁻¹) = |G|` (`Equiv ρ ρ` nonempty via `refl
 
 ## Bottom line
 The rep-theory tower is **NOT** the multi-session mathlib-gap build the AM blocker feared. Both hard
-keystones (Burnside, character orthogonality over general alg-closed fields) are in mathlib. Remaining
-work is real but routine assembly. Resume at **Gor 5.5.5a** (the character computation).
+keystones (Burnside, character orthogonality over general alg-closed fields) are in mathlib. The one
+real subtlety — that the `F`-valued character sum doesn't descend to the needed ℕ equation over
+`char r` — is resolved by the trace-form Gram-matrix argument above (`(d:F) ≠ 0` bootstrapped from the
+mass formula), avoiding Stone–von-Neumann and degree-divides-order entirely. Remaining work is real but
+routine assembly. **Resume at 5.5.5a-ii** (mass formula; 5.5.5a-i char-vanishing is ✅ `b3017ac`).
