@@ -131,4 +131,27 @@ theorem sum_ne_pairs_eq {h : ℕ} [NeZero h] (n : ZMod h → ℤ)
     Finset.card_univ, ZMod.card]
   ring
 
+/-- **Sum of value-multiplicities** (BG Prop 2.4(j), step P3): `∑ᵢ #{j | nⱼ = nᵢ} = h² − 2(h−1)`,
+the complement of the moved-pair count. -/
+theorem sum_mult_add_eq {h : ℕ} [NeZero h] (n : ZMod h → ℤ)
+    (H : ∀ m : ZMod h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    (∑ i, (univ.filter (fun j => n j = n i)).card) + 2 * (h - 1) = h ^ 2 := by
+  classical
+  have hP2 : ∑ i, (univ.filter (fun j => n i ≠ n j)).card = 2 * (h - 1) := by
+    rw [← sum_ne_pairs_eq n H]
+    exact Finset.sum_congr rfl fun i _ => (Finset.sum_boole _ _).symm
+  have hcompl : ∀ i, (univ.filter (fun j => n j = n i)).card
+      + (univ.filter (fun j => n i ≠ n j)).card = h := by
+    intro i
+    have h1 : (univ.filter (fun j => n i ≠ n j)) = (univ.filter (fun j => ¬ n j = n i)) :=
+      Finset.filter_congr fun j _ => ne_comm
+    rw [h1, Finset.card_filter_add_card_filter_not, Finset.card_univ, ZMod.card]
+  calc (∑ i, (univ.filter (fun j => n j = n i)).card) + 2 * (h - 1)
+      = (∑ i, (univ.filter (fun j => n j = n i)).card)
+        + ∑ i, (univ.filter (fun j => n i ≠ n j)).card := by rw [hP2]
+    _ = ∑ i, ((univ.filter (fun j => n j = n i)).card
+        + (univ.filter (fun j => n i ≠ n j)).card) := by rw [← Finset.sum_add_distrib]
+    _ = ∑ _i : ZMod h, h := Finset.sum_congr rfl fun i _ => hcompl i
+    _ = h ^ 2 := by rw [Finset.sum_const, Finset.card_univ, ZMod.card, smul_eq_mul]; ring
+
 end OddOrder.RepresentationTheory
