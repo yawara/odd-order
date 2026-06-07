@@ -734,3 +734,88 @@ The next unit is purely **assembly** (lengthy Finset bookkeeping, no new math):
   ⚠ inner: linear in 1st arg (`ClassFunction.inner_smul_left`/`inner_sub_left`/`inner_sub_right`),
   conj-linear in 2nd (`OddOrder.RepresentationTheory.inner_smul_right : ⟨φ,c•ψ⟩=star c·⟨φ,ψ⟩` — NOT in
   `ClassFunction` namespace).
+
+## 2026-06-08 (session 6): step 4 COMPLETE (dichotomy + good-case `X`-structure) + step-5 isometry value (3 commits, axiom-clean)
+
+All leaf-green (3467) + axiom-clean `[propext, Classical.choice, Quot.sound]`.  The step-4
+dichotomy ASSEMBLY (the lengthy Finset bookkeeping recipe of "session 5 cont.") was sitting
+**uncommitted** in the worktree from a prior session; this session committed it and pushed the
+crux spine forward two more units:
+
+- ✅ **step-4 dichotomy** `eea00823`: `coeff_eq_neg_or_edge_of_frobenius` —
+  `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = −a ∨ (|Y|=2 ∧ = 0)` (Peterfalvi's `b=0 ∨ (b=a∧m=2)`).  Builds the
+  `Y^{τ₁}`-image Finset, coefficient values `bb`/`bb+a`, `∑β²=bb²+(m−1)(bb+a)²`, feeds `sum_sq_le_inner_self_re`
+  (Bessel) + the `b97d2f9a` norm + `eq_zero_or_edge_of_dvd_of_normBound`.  (Exactly the recipe; no new math.)
+- ✅ **step-4 good-case `X`-structure** `8709ee15`:
+  `orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius` — in the good case
+  `⟨v, η₁^{τ₁}⟩ = −a` (`v = (χ₁−aη₁)^τ`), the element **`X := v + a·η₁^{τ₁}`** is ⊥ the whole
+  `Y^{τ₁}` family, has `‖X‖² = 1`, and lies in `ℤ[Irr G]`.  (Peterfalvi's `(χ₁−aη₁)^τ = X − aη₁^{τ₁}`,
+  `‖X‖²=‖χ₁‖²=1`.)  Orthogonality from the constancy `4ceb421` + `⟨v,η₁^{τ₁}⟩=−a`; norm
+  `(1+a²)−a²−a²+a²=1`; ZIrr from `dadeIntegralCharacterMap_mem_ZIrr_of_supported` + `extension_mem_ZIrr`.
+- ✅ **step-5 `X`-difference isometry value** `a5df2a3a`:
+  `inner_tau_scaledDiff_tau_Xset_diff_of_frobenius` — `⟨(χ₁−aη₁)^τ, (χ₂−χ₁)^τ⟩ = −1` for a second
+  **equal-degree** `X`-member `χ₂ ∈ X(Zc)`, `χ₂≠χ₁`, `χ₂(1)=χ₁(1)`.  Dade isometry on the supported
+  pair ⟹ source `⟨χ₁−aη₁,χ₂−χ₁⟩ = (0−a·0)−(1−a·0) = −1` (X-orthonormality + X⊥Y).  Mirror of the
+  Yset-diff constancy lemma.
+
+### 🔴 Remaining for the crux `hDτ` (refined, session 6)
+The crux is `(χ₁−aη₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}` for the **fixed** `τ₁ = coherentYset`,
+`τ₂ = Xset_centralCommutator_isCoherent`.  With `X := v + a·η₁^{τ₁}` (good case), the crux ⟺ `X = χ₁^{τ₂}`.
+
+- **step 5 (`X = χ₁^{τ₂}`)** — the next focused unit.  **A `±Irr` lemma is NOT needed** (worked out
+  this session): use `⟨X, χ₁^{τ₂}⟩ = 1` ⟹ `‖X − χ₁^{τ₂}‖² = ‖X‖² − 2·Re⟨X,χ₁^{τ₂}⟩ + ‖χ₁^{τ₂}‖² = 1−2+1 = 0`
+  ⟹ `X = χ₁^{τ₂}`.  To get `⟨X,χ₁^{τ₂}⟩=1`:
+  1. **translation** (relabel-free, ~60–80 lines): `⟨X, χ₂^{τ₂}⟩ − ⟨X, χ₁^{τ₂}⟩ = −1`.  From the
+     isometry value `a5df2a3a`: `⟨v,(χ₂−χ₁)^τ⟩=−1`; `(χ₂−χ₁)^τ = χ₂^{τ₂}−χ₁^{τ₂}` (X-coherence
+     `extends_on_supported` on the supported equal-degree diff χ₂−χ₁); `v = X − a·η₁^{τ₁}` and
+     `η₁^{τ₁} ⊥ X^{τ₂}` (himg_ortho `inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`,
+     conj-flip) ⟹ `⟨v,χ_j^{τ₂}⟩ = ⟨X,χ_j^{τ₂}⟩`.
+  2. **Bessel pinning** (relabel-free for the generic case): `⟨X,χ_j^{τ₂}⟩ ∈ ℤ` (X, χ_j^{τ₂} ∈ ZIrr,
+     `mem_ZIrr_inner_int`); `∑_{χ∈X(Zc)} ⟨X,χ^{τ₂}⟩² ≤ ‖X‖² = 1` (`sum_sq_le_inner_self_re` over the
+     orthonormal `X^{τ₂}` family).  With the relation `⟨X,χ₁^{τ₂}⟩−⟨X,χ₂^{τ₂}⟩=1`, integer coeffs +
+     ∑²≤1 force `(⟨X,χ₁^{τ₂}⟩,⟨X,χ₂^{τ₂}⟩) ∈ {(1,0),(0,−1)}`, i.e. `X=χ₁^{τ₂} ∨ X=−χ₂^{τ₂}`.  For
+     `n=|xBaseBlock|≥3` a third anchor χ₃ pins `(1,0)`; for `n=2`, **relabel** (see below).
+  - **inputs needed**: a second equal-degree anchor `χ₂` and `χ₁ ∈ xBaseBlock Zc` (the minimal-degree
+    block; `xBaseBlock_degree_re_eq` = equal degree, `xBaseBlock_subset`).  `2 ≤ |xBaseBlock Zc|`
+    (note's `two_le_xBaseBlock_ncard` — VERIFY it exists / is for Zc).  ⚠ the good-case χ₁ must be a
+    **base-block** anchor (minimal degree) for `χ₂−χ₁` equal-degree-supported — re-derive the good
+    case with `χ₁ ∈ xBaseBlock`, not a general X-anchor.
+
+- **🛑 the relabels = the structural bottleneck** (both `m=2` step-4 edge and `n=2` step-5 edge).
+  Worked out this session: the relabel `η₁^{τ₁},η₂^{τ₁} ↦ −η₂^{τ₁},−η₁^{τ₁}` (or the X-analogue) is a
+  **different `IsCoherent` witness** with flipped signs.  It IS valid (preserves `extends_on_supported`:
+  the difference `η₁−η₂ ↦ τ(η₁−η₂)` is unchanged under swap+negate — verified), but the FIXED
+  `coherentYset`/`Xset_centralCommutator_isCoherent` are not it.  **The crux for the fixed maps is
+  FALSE in the edge cases**, so the "ν-free diagonal shell over the fixed extensions" plan only works
+  in the **generic `n,m ≥ 3` case**.  Two ways forward:
+  (a) **land the generic case first** — prove the capstone Frobenius branch assuming `3 ≤ |xBaseBlock Zc|`
+      and `3 ≤ |Y|` (no relabel), defer edge cases.  Lets `hDτ`+`hgen'`+ν-shell+wiring complete for
+      generic, isolating the relabel as the sole remaining gap.
+  (b) **build relabel infrastructure** — a constructor producing an `IsCoherent` witness for a 2-element
+      sign-swap of an equal-degree coherent family (new `IntegralCharacterMap` with flipped values; prove
+      the 4 `IsCoherent` fields).  Reusable for both edges.  Structurally hardest; the `retarget`
+      machinery (S07:2987–3360, builds τ₂ from target pairs `{X,X̄}`) is the closest existing template.
+  **Recommend (a) first** (concrete generic-case progress) then (b).
+
+- **then**: `hgen'` (lattice fact — degree-0 decomp + supp↔deg-0 for the induced lattice, `D := {χ₁−aη₁}`,
+  unchanged plan) + ν-free diagonal shell through
+  `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` (S08:8928; needs
+  `ν`/`hagreeX`/`hagreeY`/`hmixed`(=himg_ortho)/`D`/`hDτ`(=crux)/`hgen`) + L4
+  `false_of_coherentXunionYset_of_not_coherentS`.  **CertainType case (B)** (mmd (6.8.2), `Z=W₂`,
+  τ₂-glue, separate (6.8.2.1)/(6.8.2.2)/(6.8.2.3) lemmas) still **unplanned** — capstone needs BOTH
+  `hyp.cases` branches.
+
+### Key API (session 6, don't re-derive)
+- **Step-4 dichotomy** `coeff_eq_neg_or_edge_of_frobenius (hyp)(hF)(hHnonab)(hp)(hp3)(hHp)(hη₁:η₁∈Yset)
+  (hχ₁:χ₁∈Xset Zc)(ha_pos:0<a)(ha:χ₁ 1=a·|W₁|) : ⟨tau(χ₁−a•η₁), coherentYset.extension η₁⟩ = −a ∨
+  (Yset.ncard=2 ∧ … = 0)`.
+- **Good-case `X`** `orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius (hyp)(hF)(hη₁)(hχ₁)
+  (ha:χ₁ 1=a·|W₁|)(hgood:⟨tau(χ₁−a•η₁),ext η₁⟩=−a)` : `(∀η∈Yset, ⟨v+a•ext η₁, ext η⟩=0) ∧
+  ⟨v+a•ext η₁, v+a•ext η₁⟩=1 ∧ v+a•ext η₁ ∈ ZIrr G` (`v=tau(χ₁−a•η₁)`, `a•` = `(a:ℂ)•`).
+- **Step-5 isometry value** `inner_tau_scaledDiff_tau_Xset_diff_of_frobenius (hyp)(hF)(hη₁)(hχ₁)
+  (hχ₂)(hne:χ₂≠χ₁)(ha:χ₁ 1=a·|W₁|)(hdeg2:χ₂ 1=χ₁ 1) : ⟨tau(χ₁−a•η₁), tau(χ₂−χ₁)⟩ = −1`.
+- `IsIrreducibleCharacter.mem_ZIrr (hφ) : φ ∈ ZIrr G` (ZIrr.lean:160).  `nsmul_mem (h:x∈S)(n) : n•x∈S`
+  (submodule).  `Nat.cast_smul_eq_nsmul ℂ a x : (↑a)•x = a•x`.  `dadeIntegralCharacterMap_mem_ZIrr_of_supported
+  hyp.dade hyp.hconj (hsupp)(hZIrr:φ∈ZIrr L) : tau φ ∈ ZIrr G` (S07:5196 — ⚠ needs the **ZIrr-L** arg).
+- `xBaseBlock Z = {χ∈Xset Z | minimal re-degree}`; `xBaseBlock_subset`, `xBaseBlock_degree_re_eq`
+  (S08:5449–5478).  himg_ortho landed = `inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`.
