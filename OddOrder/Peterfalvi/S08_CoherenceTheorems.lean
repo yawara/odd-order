@@ -5987,6 +5987,91 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
   rw [eq_sub_of_add_eq hsd, h0, hZ]
   ring
 
+open scoped Classical in
+/-- **Reindexing `X(Z)` to the `Irr L`-filter** (Frobenius case).  Any Finset `T` member-wise equal
+to the central `(6.6)` set `X(Z) = {χ ∈ Irr L | Z ⊄ ker χ}`
+(`Xset_eq_irreducible_not_subset_characterKernel`) sums the same as the `IrreducibleCharacter ↥L`
+filter `{ψ | Z ⊄ ker ψ}` for any `ℂ`-valued function: the injective coercion
+`IrreducibleCharacter ↥L ↪ ClassFunction ↥L ℂ` (`IrreducibleCharacter.ext`) is a bijection between
+them.  This bridges the regular-character sums (`sumNonInflatedDegreeMulChar_of_mem`,
+`sumNonInflatedDegreeSq`), stated over the `Irr`-filter, to the Sibley `X(Z)` index set. -/
+theorem sum_Xset_eq_sum_filter_irreducible_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    (f : ClassFunction ↥L ℂ → ℂ) :
+    ∑ φ ∈ T, f φ = ∑ ψ ∈ Finset.univ.filter (fun ψ : IrreducibleCharacter ↥L =>
+        ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥L ℂ))),
+        f (ψ : ClassFunction ↥L ℂ) := by
+  classical
+  have hXc : hyp.Xset Z = {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} :=
+    hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
+      (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+  have hirrT : ∀ φ, φ ∈ T → IsIrreducibleCharacter φ := by
+    intro φ hφ; have := (hT φ).mp hφ; rw [hXc] at this; exact this.1
+  have hkerT : ∀ φ, φ ∈ T →
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel φ) := by
+    intro φ hφ; have := (hT φ).mp hφ; rw [hXc] at this; exact this.2
+  have hmemT : ∀ ψ : IrreducibleCharacter ↥L,
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥L ℂ)) →
+      (ψ : ClassFunction ↥L ℂ) ∈ T := by
+    intro ψ hψ; rw [hT, hXc]; exact ⟨ψ.2, hψ⟩
+  refine Finset.sum_bij'
+    (fun φ hφ => (⟨φ, hirrT φ hφ⟩ : IrreducibleCharacter ↥L))
+    (fun ψ _ => (ψ : ClassFunction ↥L ℂ))
+    (fun φ hφ => ?_) (fun ψ hψ => ?_) (fun φ hφ => rfl) (fun ψ hψ => ?_) (fun φ hφ => rfl)
+  · rw [Finset.mem_filter]; exact ⟨Finset.mem_univ _, hkerT φ hφ⟩
+  · rw [Finset.mem_filter] at hψ; exact hmemT ψ hψ.2
+  · apply IrreducibleCharacter.ext; rfl
+
+open scoped Classical in
+/-- **(6.8.1) regular-character value over `X(Z)`** (mmd 04.8 L168).  For the central `(6.6)` set
+`X(Z)` and `z ∈ Z^#`, `∑_{χ ∈ X(Z)} χ(1)·χ(z) = -|L ⧸ Z|` — the off-identity value of
+`∑ χ(1)·χ = ρ_L − ρ_{L/Z}` (the step showing `η₁^{τ₁}` is constant on `Z^#`).  Reindex
+(`sum_Xset_eq_sum_filter_irreducible_of_frobenius`) + `sumNonInflatedDegreeMulChar_of_mem`. -/
+theorem sum_degree_mul_charValue_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    {z : ↥L} (hz : z ∈ Z) (hz1 : z ≠ 1) :
+    ∑ φ ∈ T, (φ 1) * (φ z) = -(Nat.card (↥L ⧸ Z) : ℂ) := by
+  rw [hyp.sum_Xset_eq_sum_filter_irreducible_of_frobenius hF hZH hT (fun φ => φ 1 * φ z)]
+  exact OddOrder.RepresentationTheory.sumNonInflatedDegreeMulChar_of_mem (N := Z) hz hz1
+
+open scoped Classical in
+/-- **(6.8.1) degree-square value over `X(Z)`** (mmd 04.8, the `z = 1` companion).  For the central
+`(6.6)` set `X(Z)`, `∑_{χ ∈ X(Z)} χ(1)·χ(1) = |L| − |L ⧸ Z|`.  Reindex
+(`sum_Xset_eq_sum_filter_irreducible_of_frobenius`) + `sumNonInflatedDegreeSq`. -/
+theorem sum_degree_sq_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z) :
+    ∑ φ ∈ T, (φ 1) * (φ 1) = (Nat.card ↥L : ℂ) - (Nat.card (↥L ⧸ Z) : ℂ) := by
+  rw [hyp.sum_Xset_eq_sum_filter_irreducible_of_frobenius hF hZH hT (fun φ => φ 1 * φ 1)]
+  rw [← OddOrder.RepresentationTheory.sumNonInflatedDegreeSq (N := Z)]
+  refine Finset.sum_congr rfl (fun ψ _ => ?_)
+  rw [pow_two]
+
+open scoped Classical in
+/-- **(6.8.1) regular-character difference value over `X(Z)`** (mmd 04.8 L168, combined form).  For
+the central `(6.6)` set `X(Z)` and `z ∈ Z^#`, `∑_{χ ∈ X(Z)} χ(1)·(χ(z) − χ(1)) = -|L|`.  This is
+`(ρ_L − ρ_{L/Z})(z) − (ρ_L − ρ_{L/Z})(1) = -|L:Z| − (|L| − |L:Z|) = -|L|` (the off-identity minus the
+degree value), which divided by `a|W₁| = χ₁(1)` gives `∑dᵢχᵢ(z) − ∑dᵢχᵢ(1) = -|H|/a` — the key
+constant in showing `η₁^{τ₁}` is constant on `Z^#`. -/
+theorem sum_degree_mul_charValue_sub_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    {z : ↥L} (hz : z ∈ Z) (hz1 : z ≠ 1) :
+    ∑ φ ∈ T, (φ 1) * (φ z - φ 1) = -(Nat.card ↥L : ℂ) := by
+  have hexpand : ∑ φ ∈ T, (φ 1) * (φ z - φ 1)
+      = (∑ φ ∈ T, (φ 1) * φ z) - (∑ φ ∈ T, (φ 1) * φ 1) := by
+    rw [← Finset.sum_sub_distrib]; refine Finset.sum_congr rfl (fun φ _ => ?_); ring
+  rw [hexpand, hyp.sum_degree_mul_charValue_Xset_eq_of_frobenius hF hZH hT hz hz1,
+    hyp.sum_degree_sq_Xset_eq_of_frobenius hF hZH hT]
+  ring
+
 /-- **(6.6) `htotal` factorization.**  `|L:H|·(|H| − |H:Z|) = |H:Z| · (|L:H|·(|Z| − 1))` (Lagrange
 `|H| = |H:Z|·|Z|`).  With the X degree-sum `total = |L:H|·(|H| − |H:Z|)` (`sum_re_sq_Xset_eq`), this
 is the `total = qtot · c` of the X-chain step data with `qtot = |H:Z|`, `c = |L:H|·(|Z| − 1)`. -/
