@@ -91,7 +91,18 @@ private) 即時; 本 (c) proof = 「A∈ℰ_p²(M), A∉ℰ_p*(G) ⇒ Uniqueness
 正規化 → **Prop 1.5** (`Ch04.exists_aInvariant_sylow`) で X が B⊇ な M_α の Sylow p `P` を正規化。
 B∉𝒰 と仮定 → Uniqueness で r(C_P(B))≤2 → |B|=p² ∧ Ω₁(C_P(B))=B⊆C_P(X) → **Cor 1.12** (要特定:
 coprime + Ω₁ 固定 ⇒ 全固定の剛性) で C_P(X)=P → r(C_M(X))≥r(P)≥3 (p∈α) → Uniqueness で 𝒰。
-依存: `exists_aInvariant_sylow`, **Cor 1.12 (未特定)**, uniquenessTheorem, α-rank, max-order B。中規模。
+依存: `exists_aInvariant_sylow`, **Cor 1.12**, uniquenessTheorem, α-rank, max-order B。中規模。
+
+**⚠ Cor 1.12 の正体 (2026-06-07 調査)**: BG **Cor 1.12** (mmd L457) = 「p odd, G p-群, E elem-ab ≤G,
+A は p'-operator 群で `C_G(E)` の位数 p の元を全固定 ⇒ A は G に trivial に作用」。証明 (mmd L459) は
+2 つの §1 結果に依存し、**どちらも repo 未形式化**:
+- **BG Thm 1.11** (mmd L453): p odd p-群 G, A が `Ω₁(G)` に trivial ⇒ A trivial on G (**非可換版**)。
+  repo にあるのは**可換版のみ** (`CoprimeAbelianPGroup.actionCommutator_eq_bot_of_omega1_le_fixedPoints`
+  = Gorenstein 2.4)。非可換版は Thompson critical subgroup 経由 (= BG Thm 1.13 / `G` 5.3.13) で要追加。
+- **BG Prop 1.10** (mmd L445): A coprime on nilpotent G, `C=C_G(A)`, `C_G(C)⊆C` ⇒ A trivial。repo に
+  `le_centralizer_centralizer` 等の部品はあるが Prop 1.10 そのものは未パッケージ。
+⇒ **10.3 は単独 leaf でなく §1 ミニプログラム (Prop 1.10 + Thm 1.11 + Cor 1.12) + PDF 87 の正確な
+proof 回収が前提**。A1 lane の独立 leaf としては不可; §1 worktree 案件。
 
 #### ✅ 10.5 `pRank_eq_two_of_normalizer_le` DONE (axiom-clean; **§11 Hyp 11.1 を解除**)
 
@@ -135,7 +146,7 @@ r(S)=2 / r(S)≥3 の場合分け、**Thm 5.3** (narrow) + Cor 10.7(b) を使い
 | `sigma_complement_rank_le_one` | 10.11(a)(b)(c) | (a) Thm 4.20+base; **(b) Prop 10.10 (spine!)**; (c)←(b) | ✗ (b)(c) が spine 待ち |
 | `sigma_complement_commutator_cyclic_normal` | 10.11(d) | **Thm 3.7** + (c) + coprime 分解 | ✅ **DONE** (eb6cc10, (c) 還元) |
 | `disjoint_of_not_conj` | 10.12 | Uniqueness Thm (§9, 証明済) | ✅ **DONE** (95a313c, **axiom-clean** sorryAx 無) |
-| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | Uniqueness | 要 PDF 再読込 (§10 前半, ≈book p.76 以前=PDF≤88) |
+| `centralizer_isUniquelyMaximal_of_two_le_rank` | 10.3 | **Cor 1.12 (←Thm 1.11 非可換 + Prop 1.10, 両者未形式化)** | ✗ §1 ミニプログラム要 (A1 leaf 不可) |
 | `pRank_eq_two_of_normalizer_le` | 10.5 | σ-def + Lemma 4.5逆 + Ω₁(Z) + 10.4(c) | ✅ **DONE** (axiom-clean; §11 解除) |
 | `alpha_criterion` | 10.4(a)(c) | (a) def+§4; (c) Thm 5.3/ideal | 要 PDF 再読込 (§10 前半) |
 | `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` | 10.13 | p-群構造 | 証明回収済 (book p.79–80=PDF 92–93) |
