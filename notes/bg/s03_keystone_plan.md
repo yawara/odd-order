@@ -219,22 +219,25 @@ So **Leaf 5** = Prop 2.2(a) alg-closed Clifford (`V_P = M`), base-change (2.9), 
 `hV` + `hcent` from the `G`-rep (Maschke → faithful irred), then Gor 5.3.7 (=`S04e_GorThm37`) →
 contradiction. This opens BG §10–§16.
 
-### ▶▶ Precise next steps (2026-06-08) — `finrank_modEq_of_faithful_irreducible` reduces Thm 2.5
-### divisibility to exactly TWO open hypotheses; discharge them:
+### ▶▶ Precise next steps (2026-06-08) — `finrank_modEq_of_faithful_irreducible` reduced Thm 2.5
+### divisibility to TWO open hypotheses; **`hcent` now DISCHARGED**, so the frontier = `hVP` alone:
 
-1. **`hcent` (Prop 1.5, the smaller piece, tool IDENTIFIED)** — from the BG hypothesis `C_P(xᵏ) = Z(P)`
-   (`xᵏ ≠ 1`) derive `∀ k≠0, ∀ c, (quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c = c → c = 1`.
-   Use **`OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`** (ForwardFromCh03.lean:794):
-   `{φ : A →* MulAut G} {N ⊴ G} (hCop : Coprime |A| |N|) (hSolv : Solvable A ∨ Solvable N)`
-   `(hN_inv : IsAInvariant φ N) {g} (hg_fix : ∀ a, ∃ n∈N, φ a g = g*n) : ∃ c, (∀ a, φ a c = c) ∧ ∃ n∈N, c = g*n`.
-   Setup: `A = Subgroup.zpowers (conjAutOfNormal P x ^ k.val)` ≤ `MulAut P`, `φ = A.subtype`, `G = P`,
-   `N = center P` (abelian ⟹ `hSolv` right; characteristic ⟹ `hN_inv`); `Coprime |A| |Z|` from `|A| ∣ h`
-   (`(conjAutOfNormal P x)^h = 1`) + `|Z| ∣ |P|` p-power + `gcd(h,p)=1`. `g = Quotient.out c`, `hg_fix`
-   from `σ^{k·j} c = c` (iterate `σ^k c = c`). Lift gives `c'` conj(xᵏ)-fixed ⟹ `c' ∈ C_P(xᵏ) = Z = N`
-   ⟹ `g = c'·n⁻¹ ∈ Z` ⟹ `⟦g⟧ = c = 1`. ~80-120 lines (A-action plumbing + coprimality + the bridges).
-   `C_P(xᵏ)` (centralizer in P) = `{p : P | conj(xᵏ) p = p}` (fixed points of the conj aut) — same set.
+1. **✅ `hcent` (Prop 1.5) DONE** (commit `0af0f90`, sorry-free + axiom-clean, full build 3608 green):
+   `quotientCenter_fixedFree_of_centralizer_le_center` (`ExtraspecialThm25Group.lean`) derives
+   `∀ k≠0, ∀ c, (quotientCenterCongr (conjAutOfNormal P x) ^ k.val) c = c → c = 1` from `(h, |P|) = 1`
+   + the BG-faithful `hCP : ∀ k≠0, ∀ p, (conjAutOfNormal P x ^ k.val) p = p → p ∈ center P` (= `C_P(xᵏ) ⊆ Z`).
+   Proof exactly as planned: `A = Subgroup.zpowers (φ₀^k.val) ≤ MulAut P`, `coprime_fixedPoints_quotient_of_coprime_normal`
+   (Isaacs Cor 3.28) lifts the fixed coset `⟦g⟧` to a genuine fixed point `w` of `φ₀^k`, `hCP` puts
+   `w ∈ Z`, coset rep `g = w·n⁻¹ ∈ Z` ⟹ `⟦g⟧ = c = 1`. Coprimality `|A|=orderOf(φ₀^k.val) ∣ h`
+   (`(φ₀^k.val)^h=(φ₀^h)^k.val=1`) + `|Z| ∣ |P|` + `(h,|P|)=1`. `hg_fix` (coset A-invariance) via
+   nat-power reduction `mem_powers_iff_mem_zpowers` + `quotientCenterCongr_pow_mk` + fixed-point iterate.
+   Center `IsSolvable` via `isSolvable_of_comm` + `mem_center_iff`. **Convenience corollary**
+   `finrank_modEq_of_faithful_irreducible_of_centralizer` = Thm 2.5 divisibility with `hcent` swapped
+   for `(h,|P|)=1` + `hCP` (calls the producer internally). **`hcop`/`hCP` will be supplied by the
+   §2 setup** (`h` rel. prime `p` is a hypothesis of BG Thm 2.5, mmd L716; `C_P(x)=Z` likewise).
 
-2. **`hVP` (Prop 2.2(a) alg-closed Clifford, the BIG piece)** — `Representation.IsIrreducible (ρ.comp P.subtype)`
+2. **▶ `hVP` (Prop 2.2(a) alg-closed Clifford, the BIG piece) — NOW THE SOLE FRONTIER for divisibility** —
+   `Representation.IsIrreducible (ρ.comp P.subtype)`
    from: `ρ` faithful irreducible `F[G]`-module, `P ⊴ G`, `G/P` cyclic, `F` alg-closed, and `M ≅ M^g`
    ∀g (all `P`-conjugates of an irred submodule `M` isomorphic — from "faithful irred of extraspecial
    determined by center", Gor 5.5.4). BG mmd L614-647: build `L` extending `M`, `τ`-cocycle, `τx`
@@ -244,9 +247,52 @@ contradiction. This opens BG §10–§16.
    `center_isScalar` + `sq_finrank_eq_card_quotient_center`; 5.5.4 = "two faithful irreds with equal
    central char are isomorphic" is a separate sub-piece.
 
-After both: `finrank_modEq_of_faithful_irreducible` is a genuine grounded Thm 2.5 (divisibility). Then:
-3. **C_V(H)=0 half** of Thm 2.5 (`h ≠ pⁿ+1 ⟹ C_V(H) ≠ 0`) — near-copy of `finrank_modEq…` using
-   `sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace` (✅ in ExtraspecialThm25) +
-   `dim V₀ = 0` hypothesis ⟹ `dim V = h − 1`. Low-risk wiring (extract shared setup to a private lemma).
+After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H)). Then:
+3. **✅ C_V(H) half DONE** (commit `e7db278`, 2026-06-08, sorry-free + axiom-clean, full build 3608):
+   `finrank_eq_sub_one_of_faithful_irreducible` (`ExtraspecialThm25Group.lean`) — same setup as
+   `finrank_modEq…` + `dim V ≥ 2` + `C_V(x)=0` (`cyclicEigenspaceFinDim ε (ρ x) 0 = 0`) ⟹ `dim V = h-1`
+   (= `h = dim V + 1`); contrapositive = BG's `h ≠ pⁿ+1 ⟹ C_V(H) ≠ 0`. Calls
+   `sum_eigenspaceFinDim_eq_sub_one_of_finrank_cyclicEndConjEigenspace` (Prop 2.4(k), ✅). Shared setup
+   (φ,T,hint,hV,hEdim,∑=dim V) factored into private `cyclicEndConj_keystoneData_of_faithful_irreducible`
+   (both divisibility + C_V(H) consume it; divisibility rewritten to use it, sig unchanged). centralizer
+   corollary `finrank_eq_sub_one_of_faithful_irreducible_of_centralizer` parallels the divisibility one.
+   **⟹ group-level Thm 2.5 は両結論とも wired, 残仮説 = hVP 単独。**
 4. **Thm 3.4** (`S03d_Thm34.lean`, new): Maschke → faithful irred → Gor 5.3.7 → special case = Thm 2.5
    → parity contradiction (`h = pⁿ+1` even vs `|G|` odd). Then Thm 3.5 → Thm 3.6 → §10.6 → §10/§11.
+
+### ▶▶▶ hVP (Prop 2.2(a)) の精密プラン (mmd L614-653 精読, 2026-06-08)
+
+**Prop 2.2(a)**: `G` group, `H ⊴ G`, `G/H` cyclic, `F` alg-closed, `M` irred `F[H]`-module with
+`M ≅ M^x ∀x∈G`. IF `L` irred `F[G]`-module & `M ≅` submodule of `L_H`, THEN `L_H ≅ M` (= `L_H` irred).
+**hVP 適用**: `H=P`, `L=V` (faithful irred `F[G]`), `M`=irred `F[P]`-submodule of `V_P` ⟹ `V_P=M` irred。
+証明 (mmd L619-651):
+1. Clifford (Gor 3.4.1): `L_H = M_1⊕…⊕M_k`, `M≅M_i`。`G` faithful on `L` ⟹ `H` faithful on `M`。
+2. `F` alg-closed ⟹ `Hom_{FH}(M,M)=F` ⟹ (Prop 2.1✅) `E(H)=Hom_F(M,M)` (Burnside, M 上全行列環)。
+3. `M≅M^{x⁻¹}` (hyp) ⟹ ∃ F-iso `τ∈E(H)` with `(mh)τ=(mτ)(xhx⁻¹)` (2.2)。`L` に lift (2.1+2.2 経由)、
+   linear 拡張 ⟹ `(ℓθ)τ=(ℓτ)(xθx⁻¹) ∀θ∈E(H)⊆E(G)` (2.3 `(ℓθ)τx=(ℓτx)θ`)。
+4. `τ⁻¹∈E(H)` ⟹ `ℓx=ℓτxτ⁻¹` ⟹ `(ℓx)τx=(ℓτx)x` (2.4)。(2.3)+(2.4)+`⟨H,x⟩=G` ⟹ `τx∈Hom_{FG}(L,L)`。
+5. `F` alg-closed + `L` irred ⟹ (Prop 2.1✅) `Hom_{FG}(L,L)=F` ⟹ `τx` scalar。`τ∈E(H)` ⟹ `M_1τ=M_1`
+   ⟹ `M_1=M_1τx=M_1x` ⟹ `M_1` は `G`-submodule ⟹ `L=M_1` (L irred)。∎
+**要件**: (i) Clifford 分解 (mathlib に有? 要調査; repo `Clifford.lean` は ℂ-pin)。(ii) Prop 2.1✅
+(`asAlgebraHom_surjective_of_isAlgClosed` 系)。(iii) Gor 5.5.4 (= `M≅M^g`, faithful irred extraspecial
+は central char で決まる; `ExtraspecialFaithful.lean` の `center_isScalar`+`sq_finrank…` 部分被覆、
+"等 central char ⟹ iso" は別 sub-piece)。新 `CliffordAlgClosed.lean` (ℂ-pin Clifford.lean は破壊禁止)。複数セッション。
+
+**資産インベントリ (2026-06-08 精査, Explore agent; 再調査不要)**:
+- ✅ **Prop 2.1 = `AbsolutelyIrreducible.lean` (一般 alg-closed F, NOT ℂ-pin)**: `asAlgebraHom_surjective_of_isAlgClosed`
+  (L118, `F[G]→End_F V` 全射), `span_range_representation_eq_top` (L135, `{ρ g}` spans End), `center_isScalar`
+  (L157, `z∈center ⟹ ρ z = c•id`), `toModuleEnd_surjective_of_isAlgClosed` (L67, module 版 Burnside)。
+- ✅ **`Representation.IsIrreducible`** (mathlib `RepresentationTheory/Irreducible.lean:28`) `:= IsSimpleOrder (Subrepresentation ρ)`;
+  `irreducible_iff_isSimpleModule_asModule` (L34) で `IsSimpleModule k[G] ρ.asModule` と往復。`restrictRep ρ H := ρ.comp H.subtype`
+  (Clifford.lean:147)。`IsSimpleModule` API (mathlib `RingTheory/SimpleModule/Basic.lean`) 充実。
+- ⚠️ **重大 ℂ-pin 障壁**: Clifford.lean の **module-level** 機構は全部 ℂ 固定 — `conjBySimpleRingHom g` (L156, `ℂ[H]` 環自己同型 `h↦ghg⁻¹`),
+  `conjBySimpleSemilinear g` (L182, ρ g を H-intertwiner として実現する semilinear), **`isSimpleModule_map_conjBySimpleSemilinear`
+  (L244, 証明済: N が `Res ρ` の simple `ℂ[H]`-部分加群 ⟹ `ρ g(N)` も simple — これが Clifford 分解の核ブロック)**。
+  **⟹ 一般 F へ移植が hVP の最初の具体 sub-task** (これら 3 つを CliffordAlgClosed.lean で F 版に)。
+- ❌ **mathlib に完全 module-level Clifford 分解は無い** (`L_H=⊕ conjugate simples`)。有るのは `IsSimpleModule`,
+  `Rep.res` (`Rep/Res.lean`), `Representation.ind` (`Induced.lean`), Maschke `sumOfConjugates` (intertwiner レベルのみ)。
+- ❌ **Gor 5.5.4 ("等 central char の faithful irred ⟹ iso" ⟹ `M≅M^g`) は未形式化** (ExtraspecialFaithful は mass formula
+  止まり、iso 部分なし)。別 sub-piece。
+- **着手順序案**: (1) `conjBySimpleSemilinear`+`isSimpleModule_map_conjBySimpleSemilinear` を一般 F に移植
+  (CliffordAlgClosed.lean) → (2) Clifford 分解 `L_H=⊕M_i` (M≅M_i, M_1 が submodule) → (3) τ-intertwiner +
+  `τx∈Hom_{FG}(L,L)=F` scalar → `L=M_1` (Prop 2.2(a) 本体) → (4) Gor 5.5.4 で `M≅M^g` 供給 → hVP discharge。
