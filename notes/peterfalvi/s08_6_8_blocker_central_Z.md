@@ -873,3 +873,28 @@ The entire step-5 + crux spine landed.  All leaf-green (3467) + axiom-clean.  **
 - `OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int (hφ:φ∈ZIrr)(hψ:ψ∈ZIrr) : ∃m:ℤ, ⟨φ,ψ⟩=m`
   (InducedCharacter:716 — ⚠ full path `…ClassFunction.inner_mem_ZIrr_int`); `eq_zero_of_inner_self_re_eq_zero
   (h:(⟨φ,φ⟩).re=0) : φ=0` (ZIrrFourier:189); `Complex.intCast_re`, `star_intCast`, `Finset.sum_pair`.
+
+## 2026-06-08 (session 6 cont.²): `hgen'` support side landed (`zSpan_S_support_subset_of_apply_one_eq_zero`)
+
+✅ **support side of `hgen'`** (`aa6476a0`, axiom-clean): `zSpan_S_support_subset_of_apply_one_eq_zero`
+— any `φ ∈ ℤ[S]` with `φ(1) = 0` is supported on `H^# = sharpImage H`.  `φ.support ⊆ H` by span
+induction (each S-member is, `sMember_support_subset_H`; `+`/`zsmul`-closed — the `zsmul` case needs
+`← Int.cast_smul_eq_zsmul ℂ` then `smul_apply`+`mul_zero`); `φ(1)=0` removes `1`.  The multi-term
+generalisation of the 2-term `sMember_(scaled)diffSupport_of_charValue_eq` — usable for **both** the
+`X`-part `∑cᵢχᵢ−sχ₁` and the `Y`-part `∑eⱼηⱼ+saη₁` of the `hgen'` decomposition (both degree-0).
+
+### 🔴 Remaining for `hgen'` (degree side + decomposition)
+- **degree-ratio integrality `dᵢ = χᵢ(1)/χ₁(1) ∈ ℕ`** (for `χ₁ ∈ xBaseBlock Zc` minimal): sources
+  `θ,θ₁ ∈ Irr H` have p-power degrees (`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`,
+  ZIrr.lean:254 — **available**); `χ₁` minimal (`natDegree_le_of_xBaseBlock_anchor` S08:5482) ⟹
+  `θ₁(1) ≤ θ(1)` ⟹ `p^{k₁} | p^k` ⟹ `χ₁(1) | χᵢ(1)`.  ~50–80 lines (source extraction via `S_eq` +
+  `induce_apply_one` + p-power comparison).
+- **the decomposition itself**: `φ ∈ zSupportedSpan (X∪Y) A`, write `φ = ∑_{X} cᵢχᵢ + ∑_{Y} eⱼηⱼ`
+  (Finsupp over X∪Y), `s := ∑cᵢdᵢ ∈ ℤ`; then `∑cᵢχᵢ−sχ₁ ∈ zSupportedSpan X A` (degree 0 via the new
+  support lemma + `s·χ₁(1)=∑cᵢχᵢ(1)`) and `∑eⱼηⱼ+saη₁ ∈ zSupportedSpan Y A` (degree 0: `φ(1)=0` ⟹
+  `∑eⱼ=−sa`), and `s·(χ₁−aη₁) ∈ span{χ₁−aη₁}`.  Finsupp split of `zSpan(X∪Y)` into `zSpan X ⊕ zSpan Y`
+  (X,Y disjoint) is the bookkeeping.  Substantial (~150–250 lines).
+
+**Then** ν-shell wiring (under `3≤|xBaseBlock Zc|, 3≤|Y|` ⟹ crux + hgen' both available) ⟹ generic
+capstone Frobenius branch.  Then relabels; then CertainType (B).  **Next session: degree-ratio
+integrality (small, p-power lemma available) → the Finsupp decomposition → ν-shell.**
