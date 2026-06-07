@@ -172,6 +172,28 @@ theorem center_isScalar (ρ : Representation F G V) [ρ.IsIrreducible] [FiniteDi
   have hv : c • v = (ρ z) v := DFunLike.congr_fun hc v
   simpa using hv.symm
 
+/-- **Burnside basis, spanning step.** A transversal `{ρ(out c) : c ∈ G/Z}` of the central cosets
+still spans `End_F V`: every `ρ g` is a scalar multiple of `ρ(out (gZ))` (central character), so the
+span is unchanged from `span_range_representation_eq_top`. -/
+theorem span_range_quotient_out_eq_top (ρ : Representation F G V)
+    [ρ.IsIrreducible] [FiniteDimensional F V] :
+    Submodule.span F
+      (Set.range fun c : G ⧸ Subgroup.center G => ρ (Quotient.out c)) = ⊤ := by
+  rw [eq_top_iff, ← span_range_representation_eq_top ρ, Submodule.span_le]
+  rintro _ ⟨g, rfl⟩
+  set c₀ : G ⧸ Subgroup.center G := (g : G ⧸ Subgroup.center G) with hc₀
+  have hz : (Quotient.out c₀)⁻¹ * g ∈ Subgroup.center G :=
+    QuotientGroup.eq.mp (Quotient.out_eq c₀)
+  obtain ⟨c, hc⟩ := center_isScalar ρ hz
+  have hg : ρ g = c • ρ (Quotient.out c₀) := by
+    have hsplit : g = Quotient.out c₀ * ((Quotient.out c₀)⁻¹ * g) := by group
+    rw [hsplit, map_mul, hc]
+    ext v
+    simp [Module.End.mul_apply]
+  change ρ g ∈ Submodule.span F (Set.range fun c : G ⧸ Subgroup.center G => ρ (Quotient.out c))
+  rw [hg]
+  exact Submodule.smul_mem _ c (Submodule.subset_span ⟨c₀, rfl⟩)
+
 end CentralCharacter
 
 end OddOrder.RepresentationTheory
