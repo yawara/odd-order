@@ -403,6 +403,93 @@ theorem extension_apply_one_eq_zero_of_supported
 
 end DadeCoherenceUnion
 
+/-- **Peterfalvi (6.8.1) norm-bound forcing** (mmd 04.8 L176).  In the (6.8.1) `b ≡ c ≡ 0 mod a`
+argument, after `(6.7)` gives `a ∣ b` (write `b = a·x`), the norm identity
+`1 + a² = ‖(χ₁ − aη₁)^τ‖² = ‖X‖² + (b − a)² + (m − 1)·b²` with `‖X‖² ≥ 0` gives the bound
+`(b − a)² + (m − 1)·b² ≤ 1 + a²`; with `a ≥ 2` and `m ≥ 2` (`m = |Y|`) this forces `b = 0` — or the
+edge case `b = a`, `m = 2`, which the textbook reduces to `b = 0` by relabelling
+`η₁^{τ₁} ↔ −η₂^{τ₁}`.  (`b = ±2a` and `b = −a` are excluded since `4a² > 1 + a²` for `a ≥ 2`.) -/
+theorem eq_zero_or_edge_of_dvd_of_normBound {a b m : ℤ}
+    (ha : 2 ≤ a) (hm : 2 ≤ m) (hdvd : a ∣ b)
+    (hnorm : (b - a) ^ 2 + (m - 1) * b ^ 2 ≤ 1 + a ^ 2) :
+    b = 0 ∨ (b = a ∧ m = 2) := by
+  obtain ⟨x, rfl⟩ := hdvd
+  have ha0 : (0 : ℤ) < a := by linarith
+  -- `b² = (a·x)² ≤ 1 + a²` (drop `(b−a)² ≥ 0` and the `(m−2)·b² ≥ 0` slack).
+  have hb2 : (a * x) ^ 2 ≤ 1 + a ^ 2 := by
+    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
+  -- Hence `x² ≤ 1`: otherwise `x² ≥ 2` gives `2a² ≤ a²x² ≤ 1 + a²`, i.e. `a² ≤ 1`, contradicting `a ≥ 2`.
+  have hx2 : x ^ 2 ≤ 1 := by
+    by_contra h
+    push_neg at h
+    have hx2' : 2 ≤ x ^ 2 := h
+    nlinarith [hb2, mul_pos ha0 ha0, mul_le_mul_of_nonneg_left hx2' (le_of_lt (mul_pos ha0 ha0))]
+  have hxlo : -1 ≤ x := by nlinarith [hx2, sq_nonneg (x + 1)]
+  have hxhi : x ≤ 1 := by nlinarith [hx2, sq_nonneg (x - 1)]
+  interval_cases x
+  · -- `x = -1` (`b = -a`): `4a² + (m−1)a² ≤ 1 + a²` is impossible.
+    exfalso; nlinarith [hnorm, ha, hm]
+  · -- `x = 0`: `b = 0`.
+    left; ring
+  · -- `x = 1` (`b = a`): `(m−1)a² ≤ 1 + a²` forces `m = 2`.
+    right
+    refine ⟨by ring, ?_⟩
+    nlinarith [hnorm, ha, hm]
+
+section DadeReciprocity
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+  {A : Set G} {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+
+/-- In the **TI Dade situation** (`hyp.H a = ⊥`, e.g. `H^#` a TI-subset with normalizer `L`), the
+(2.7) adjoint averaging map collapses to plain evaluation: `adjointAverageFun hyp χ a = χ(a)`.  The
+average `|H(a)|⁻¹ ∑_{x ∈ H(a)} χ(ax)` over the trivial group `H(a) = ⊥` is the single term
+`χ(a·1) = χ(a)`. -/
+theorem adjointAverageFun_eq_of_H_eq_bot
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (χ : ClassFunction G ℂ)
+    (a : {a : G // a ∈ A}) (hH : hyp.H a = ⊥) :
+    OddOrder.Peterfalvi.S04.adjointAverageFun hyp χ ⟨a.1, hyp.subset_L a.2⟩ = χ a.1 := by
+  classical
+  simp only [OddOrder.Peterfalvi.S04.adjointAverageFun]
+  rw [dif_pos a.2]
+  have hHa : hyp.H ⟨a.1, a.2⟩ = ⊥ := hH
+  have hconst : ∀ x : ↥(hyp.H ⟨a.1, a.2⟩), χ (a.1 * (x : G)) = χ a.1 := by
+    intro x
+    have hx1 : (x : G) ∈ (⊥ : Subgroup G) := by rw [← hHa]; exact x.2
+    rw [Subgroup.mem_bot.mp hx1, mul_one]
+  have hHne : (Nat.card (hyp.H ⟨a.1, a.2⟩) : ℂ) ≠ 0 := by
+    have : 0 < Nat.card (hyp.H ⟨a.1, a.2⟩) := Nat.card_pos
+    exact_mod_cast this.ne'
+  rw [Finset.sum_congr rfl (fun x _ => hconst x), Finset.sum_const, Finset.card_univ,
+    ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hHne, one_mul]
+
+/-- **Dade reciprocity (TI case).**  For the §4 Dade base map of a TI Hypothesis (`hyp.H a = ⊥`),
+a *supported* `α ∈ CF(L, A)` and any `ψ ∈ CF(G)`:
+
+`⟨α^τ, ψ⟩_G = ⟨α, Res_L^G ψ⟩_L`.
+
+This is the (2.7) `adjoint_formula` specialized to the TI situation, where the adjoint average of
+`ψ` is `Res_L^G ψ` (`adjointAverageFun_eq_of_H_eq_bot`).  It is the gateway to the (6.8.1)
+`Res_L(η₁^{τ₁})` decomposition: it converts the `G`-side pairing of a Dade image with `ψ` into the
+`L`-side pairing of the supported source with `Res_L ψ`. -/
+theorem inner_dadeIntegralCharacterMap_eq_inner_restrict
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (hH : ∀ a : {a : G // a ∈ A}, hyp.H a = ⊥)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj) α) ψ
+      = ClassFunction.inner α (ClassFunction.restrict L ψ) := by
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp _ hαsupp]
+  refine OddOrder.Peterfalvi.S04.adjoint_formula hyp (hyp.dadeMap (k := ℂ))
+    (hyp.isDadeMap_dadeMap (k := ℂ)) hconj
+    ⟨α, (ClassFunction.mem_supportedSubmodule).mpr hαsupp⟩ ψ (ClassFunction.restrict L ψ)
+    (fun a => ?_)
+  rw [adjointAverageFun_eq_of_H_eq_bot hyp ψ a (hH a), ClassFunction.restrict_apply]
+
+end DadeReciprocity
+
 open scoped ComplexOrder in
 /-- The inner product of two genuine characters is `≥ 0`.  Decompose the right argument into a
 non-negative integer combination of irreducibles (`exists_natFinsupp_eq_sum`); each summand
