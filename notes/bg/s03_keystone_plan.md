@@ -80,3 +80,55 @@ The iso comes from the **Burnside basis being a monomial `F[H]`-module**: `H` pe
 all other orbits free of size `h`; each free monomial orbit ≅ `F[H]` (regular) since char `∤ h` and
 the orbit-product scalar is a root of unity. **This is the deep P2 + module theory — the large lift.**
 Net: build P2 as the module iso (not the trace/DFT). P1/`trace_pow…` support the multiplicity bookkeeping.
+
+## Lane A progress (2026-06-07, branch `a-keystone`) + refined Lean plan
+
+**✅ Leaf 1 — Burnside basis** (`BurnsideBasis.lean`, sorry-free, axiom-clean, commit `97412db`):
+`burnsideBasis ρ hf hcl : Basis (P ⧸ Z(P)) F (End F V)`, `b c = ρ(out c)`, via `Basis.mk`
+(`linearIndependent_representation_quotientOut` [lifted from the Gram-matrix `hindep` previously
+buried in `card_quotient_center_le_sq_finrank`] + the already-public spanning
+`span_range_quotient_out_eq_top`). `burnsideBasis_apply` simp lemma.
+
+**✅ Leaf 2 — monomial action** (`ExtraspecialMonomial.lean`, sorry-free, axiom-clean, commit `5053a7e`):
+abstract data = automorphism `φ : P ≃* P` + intertwiner `T : GL(V)` with `T·ρ p = ρ(φ p)·T`.
+- `center_map_eq_of_mulEquiv` (φ maps Z(P) onto Z(P));
+- `quotientCenterCongr φ : (P/Z) ≃* (P/Z)` = the induced `σ`, `quotientCenterCongr_mk` simp;
+- `cyclicEndConj_representation : c_x (ρ p) = ρ(φ p)` (conjugation by the intertwiner = ρ∘φ);
+- `cyclicEndConj_burnsideBasis : ∃ a, c_x (b c) = a • b (σ c)` — the **monomial identity**.
+
+**▶ Leaf 3 (the deep core, NOT yet done) — abstract monomial-operator eigenspace count.**
+Goal: `finrank (cyclicEndConjEigenspaceFin ε T m) = N + (if m=0 then 1 else 0)` (N = #free orbits),
+hence the keystone `dim E₀ = dim E_m + 1`. Confirmed NO mathlib shortcut: free-action→free-module,
+regular-rep eigenspace dims, cyclic group-algebra split are all ABSENT; every trace/rank/charpoly
+route is `F`-valued ⟹ circular for the ℕ count (re-verified this session). The integer count
+genuinely needs the orbit/basis combinatorics. mathlib tools available: `MulAction.selfEquivSigmaOrbits`,
+`orbitRel.Quotient`, `DirectSum.IsInternal` (style as in `EigenspaceBlockDecomp.lean`),
+`finrank_eigenspace_le … charpoly.rootMultiplicity` + semisimple equality.
+
+**KEY SIMPLIFICATION found this session (de-risks Leaf 3): use a φ-EQUIVARIANT transversal ⟹ the
+twist `μ` vanishes ⟹ `T` is a PURE permutation of the basis.** Because `φ^h = conj(x^h) = id`, one
+can choose the transversal `t : P/Z → P` orbit-by-orbit via `t(σ^j c₀) := φ^j(t c₀)`; then
+`φ(t c) = t(σ c)` EXACTLY (the wrap `φ^h(t c₀)=t c₀` closes since `σ^h=id`), so `c_x (b c) = b (σ c)`
+with NO scalar. (Any section gives a Burnside basis — spanning+Gram independence work for any `t`,
+not just `Quotient.out`; generalize `burnsideBasis`/`linearIndependent_representation_quotientOut`
+to an arbitrary section `t` with `⟦t c⟧ = c`.) Then per **pure** cycle the eigenvectors are clean:
+for a free orbit `{c₀,σc₀,…,σ^{h-1}c₀}`, `v_m = ∑_j ε^{-mj} b_{σʲc₀}` is an `εᵐ`-eigenvector (no
+partial products), and `{v_m}_{m}` is a basis of `W_O` (distinct eigenvalues) ⟹ `dim(E_m ∩ W_O)=1`
+for every `m`. Fixed point `s₀` (identity coset): `b s₀ = ρ(1) = id`, `c_x(id)=id` ⟹ contributes to
+`E₀` only. So `dim E_m = N + [m=0]`.
+
+**Remaining Leaf 3 sub-leaves (recommended order):**
+1. Generalize the basis to a section: `burnsideBasisOfSection (t : P/Z → P) (ht : ∀ c, ⟦t c⟧ = c) :
+   Basis (P/Z) F (End V)` (refactor Leaf 1; `Quotient.out` is the special case).
+2. Construct the φ-equivariant section `t` (orbit-rep choice + `φ^j` propagation; uses `σ`-orbit
+   structure of `P/Z`, free for `c ≠ ⟦1⟧` from `C_{P/Z}(xᵏ)=1`). Prove `φ(t c) = t(σ c)` ⟹
+   `c_x (b c) = b (σ c)` (pure permutation) via `cyclicEndConj_representation`.
+3. Pure-permutation eigenspace count: `dim(εᵐ-eigenspace of the σ-permutation operator) = #{orbits O
+   : ε^{m·|O|}=1}` (orbit `DirectSum.IsInternal` + single-cycle pure-shift eigenvector
+   `∑_j ε^{-mj} b_{σʲc₀}`, dim-1 per cycle for each `m`). Reusable as its own file.
+4. Instantiate: orbits of `σ` on `P/Z` are `{⟦1⟧}` (size 1) + free (size `h`) ⟹ `dim E_m = N+[m=0]`
+   ⟹ `dim E₀ = dim E_m + 1`. Discharge `hEdim` of
+   `sum_eigenspaceFinDim_eq_of_finrank_cyclicEndConjEigenspace` (`ExtraspecialThm25.lean`).
+
+Then **Leaf 5 = Thm 2.5/3.4 assembly** (Prop 2.2(a) alg-closed Clifford `V_P=M`, base-change (2.9),
+produce `(P,φ,T)` from the `G=P⋊⟨x⟩` rep, Maschke→faithful irred, Gor 5.3.7 → contradiction).
