@@ -310,10 +310,24 @@ After hVP: both Thm 2.5 conclusions are genuine grounded (divisibility + C_V(H))
   ρ 既約 + W (≠⊥) が `G`-不変 (∀g, `W.map (conjSemilinearEnd ρ g) ≤ W`) ⟹ `W=⊤`。証明: G-不変 `k[H]`-部分加群
   は `Subrepresentation ρ` の carrier (`toSubmodule := W.restrictScalars k`) ⟹ `IsSimpleOrder (Subrepresentation ρ)`
   (=既約) で ⊥/⊤、≠⊥ で ⊤。これが BG の「M_1 G-不変 ⟹ L=M_1」(mmd L651)。
-- **▶ 残 = 中間の τ-scalar crux (mmd L619-650, ハード, 単独 multi-session)**: `W` が **x-不変** (`(ρx)(W)≤W`) を出す。
-  必要: (a) `L_H` semisimple (Maschke, char∤|H|) + **W-isotypic** (全 simple constituent ≅ W ← Clifford "L=Σ_g (ρg)W" +
-  hyp `W≅W^g`); (b) Burnside `E(H)=End_F(W)` (Prop2.1✅); (c) τ-intertwiner (`L_H≅(L_H)^x`) → `τ·ρx` が
-  `Hom_{FG}(L,L)=F` の scalar (Schur) → `(ρx)(W)=W`。**代替: Skolem-Noether (Ad(ρx) on `End_{k[H]}(L_H)≅M_k`
-  は inner)** も同じハードさ。mathlib に完全 Clifford 分解/isotypic API 無 → これも自前。
-  **+ bootstrap**: x-不変 + W は `k[H]`-部分加群 (H-不変) + `G/H=⟨xH⟩` ⟹ ∀g G-不変 (`eq_top` の前提) — 小補題。
-- **▶ + Gor 5.5.4** (`W≅W^g` 供給, 別 sub-piece, 未着手)。これら 2 つ (τ-crux + Gor5.5.4) が hVP の残り全部。
+- **✅ Clifford 構造 (W-isotypic) DONE** (commit `497fb1e`, 2026-06-08): mathlib `IsIsotypicOfType`
+  (`RingTheory/SimpleModule/Isotypic.lean`) を使用。`map_conjSemilinearEnd_one`/`map_map_conjSemilinearEnd`
+  (carrier 等式 `ρ(g₁g₂)=ρg₁∘ρg₂`, semilinear-comp 回避) → `iSup_map_conjSemilinearEnd_eq_top` (ρ 既約 ⟹
+  `⨆_g (ρg)W = ⊤`, Clifford) → **`isIsotypicOfType_of_conjugates`** (∀ conjugate `(ρg)W ≅ W` ⟹
+  `IsIsotypicOfType k[H] L_H W`)。`Submodule.linearEquiv_of_sSup_eq_top` 使用。**GOTCHA**: asModule の
+  Module-instance diamond で `set_option backward.isDefEq.respectTransparency false in` 必須 (Clifford.lean 同様)。
+- **▶ 残 = m=1 finish のみ** (`finrank V = finrank W` ⟹ `W=⊤`): `IsIsotypicOfType L_H W` + Maschke
+  (mathlib instance `IsSemisimpleModule k[G] V` for `NeZero(card G:k)`) ⟹ `V ≅ Wᵐ` (`linearEquiv_fun`).
+  **m=1 が唯一の残り。クリーン還元**: m=1 ⟺ `finrank V = finrank W` ⟹ `W` simple ≤ ⊤ で finrank 一致 ⟹ `W=⊤`
+  (`eq_top` も使える)。m=1 の 2 ルート (どちらもハード, 単独 multi-session):
+  - **(A) Skolem-Noether 経路**: `E:=End_{k[H]}(V)≅M_m(k)` (isotypic + `endVecAlgEquivMatrixEnd` + Schur
+    `finrank_endomorphism_simple_eq_one`✅mathlib); θ:=Ad(ρx) auto, `End_{k[G]}(V)=E^θ=k` (Schur 既約 V); SN
+    (θ=Ad u) + centralizer(u)=k ⟹ u scalar ⟹ θ=id ⟹ E=k ⟹ m=1。**⚠ SN は mathlib ABSENT** → M_m(k) 版を自前
+    (θ-twist simple module ≅ standard ⟹ intertwiner u, ~50-100 行)。Wedderburn (`WedderburnArtin.lean`) 有。
+  - **(B) BG-τ 経路** (mmd L619-650): Burnside (Prop2.1✅) で conjugate-iso を `τ=ρ(a)∈E(H)` 化, `ann(V)=ann(W)`
+    (isotypic) で `L` へ extend, σ:=ρx∘τ⁻¹ が `End_{k[G]}=k` scalar ⟹ `(ρx)W=W`。⚠ τ の commutation/convention
+    が微妙 (σ が ρx と可換になる cocycle 条件 = BG (2.4))。
+- **▶ + bootstrap**: x-不変 + W は `k[H]`-部分加群 (H-不変) + `G/H=⟨xH⟩` ⟹ ∀g G-不変 — 小補題 (eq_top 前提)。
+  ※ m=1 finish なら finrank 経由で直接 `W=⊤`, bootstrap 不要かも。
+- **▶ + Gor 5.5.4** (`W≅W^g` 供給 = hconj 仮説, 別 sub-piece, 未着手)。
+- **hVP 進捗 = 3/4** (foundation✅ + conclusion✅ + W-isotypic✅; 残 m=1 finish)。CliffordAlgClosed.lean 全 sorry-free。
