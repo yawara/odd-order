@@ -67,7 +67,13 @@ worktree `/home/ywr/odd-order-bg-s10-leaves`, branch `bg-s10-leaves`, `ODD_ISSUE
 旧 MISSING_PAGE を全回収。10.3/10.4 = **PDF 87 (book p.74)**, 10.5 proof = mmd L2767-2774 (既存),
 10.13 = **PDF 92-93 (book p.79-80)**。以下、原文証明と Lean 形式化の依存。
 
-#### ⚠⚠ 重大: `alpha_criterion` (10.4) の Lean statement は **原文と不一致 (scaffold バグ)**
+#### ✅ 10.4 `alpha_criterion` DONE (commit `cd5e10b`, axiom-clean) — scaffold バグ修正済
+
+statement を本 10.4(a)(c) (`p∉σ(M)` 版) に修正 + 証明。`#print axioms` = 標準3つ (sorryAx 無)。
+`sylow_le_derived_of_mem_sigma` を public 化、`sylow_subgroupOf_of_le` を leaf 先頭へ移動 (10.5/10.12 共有)。
+以下は修正前の経緯記録:
+
+#### ⚠⚠ (経緯) `alpha_criterion` (10.4) の旧 Lean statement は **原文と不一致 (scaffold バグ)**
 
 回収した **本 Lemma 10.4**: (a) `p ∣ |M/M'| ⇒ p∉σ(M)`; (b) `p∉σ(M), M_α≠1 ⇒ ∃x∈Ω₁(Z(P))#:
 ℳ(C_G(x))≠{M} ∧ C_{M_α}(x) Z-group` (Lean は省略); (c) `p∉σ(M), r_p(M)=2 ⇒ p not ideal ∧
