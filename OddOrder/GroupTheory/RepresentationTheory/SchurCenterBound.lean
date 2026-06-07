@@ -70,7 +70,7 @@ theorem exists_central_scalar (ρ : Representation ℂ G V) [IsIrreducible ρ]
 
 `ρ z = c • id` and `ρ z⁻¹ = c' • id` with `c·c' = 1` (since `ρ z · ρ z⁻¹ = id`), so
 `χ(z)·χ(z⁻¹) = (n·c)(n·c') = n²`. -/
-theorem char_mul_char_inv_of_mem_center [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ]
+theorem char_mul_char_inv_of_mem_center_complex [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ]
     {z : G} (hz : z ∈ Subgroup.center G) :
     ρ.character z * ρ.character z⁻¹ = (finrank ℂ V : ℂ) ^ 2 := by
   obtain ⟨c, hc⟩ := exists_central_scalar ρ hz
@@ -109,7 +109,7 @@ theorem char_mul_char_inv_eq_normSq [Finite G] (ρ : Representation ℂ G V) (g 
 theorem normSq_char_of_mem_center [Finite G] (ρ : Representation ℂ G V) [IsIrreducible ρ]
     {z : G} (hz : z ∈ Subgroup.center G) :
     Complex.normSq (ρ.character z) = (finrank ℂ V : ℝ) ^ 2 := by
-  have h := char_mul_char_inv_of_mem_center ρ hz
+  have h := char_mul_char_inv_of_mem_center_complex ρ hz
   rw [char_mul_char_inv_eq_normSq] at h
   have : (Complex.normSq (ρ.character z) : ℂ) = (((finrank ℂ V : ℝ) ^ 2 : ℝ) : ℂ) := by
     rw [h]; push_cast; ring
