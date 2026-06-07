@@ -238,6 +238,66 @@ theorem pairwise_inner_eq_zero_of_orthogonal_signedDifference
   · exact inner_eq_zero_of_orthogonal_signedDifference hv hu hβ hβn hα hαn hδ hδn hγ hγn
       hβα hδγ hdiffBAYX h1BA h1YX
 
+open scoped Classical in
+/-- **Fourier expansion of a class function** in the orthonormal basis of irreducible characters:
+`φ = ∑_{χ ∈ Irr Γ} ⟨φ, χ⟩ • χ`.  From completeness (`classFunction_eq_zero_of_orthogonal`): the
+difference `φ − ∑ ⟨φ,χ⟩•χ` is orthogonal to every irreducible (orthonormality
+`irreducibleCharacter_inner_eq_ite`), hence `0`.  Used in (6.8.1) to expand `Res^G_L(η₁^{τ₁})` and
+split its `X`-part (whose coefficients `⟨·,χᵢ⟩` are governed by Res-orthogonality) from the
+`Z ⊆ ker` part (constant on `Z`). -/
+theorem classFunction_eq_sum_inner_smul (φ : ClassFunction Γ ℂ) :
+    φ = ∑ a : IrreducibleCharacter Γ,
+      ClassFunction.inner φ (a : ClassFunction Γ ℂ) • (a : ClassFunction Γ ℂ) := by
+  refine eq_of_sub_eq_zero (classFunction_eq_zero_of_orthogonal _ (fun b => ?_))
+  rw [ClassFunction.inner_sub_left, inner_sum_left]
+  have hstep : (∑ a : IrreducibleCharacter Γ,
+      ClassFunction.inner
+        (ClassFunction.inner φ (a : ClassFunction Γ ℂ) • (a : ClassFunction Γ ℂ))
+        (b : ClassFunction Γ ℂ)) = ClassFunction.inner φ (b : ClassFunction Γ ℂ) := by
+    rw [Finset.sum_eq_single b]
+    · rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite b b, if_pos rfl, mul_one]
+    · intro a _ hab
+      rw [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite a b, if_neg hab, mul_zero]
+    · intro hb; exact absurd (Finset.mem_univ b) hb
+  rw [hstep, sub_self]
+
+open scoped Classical in
+/-- **Regular-character difference value over the non-inflated irreducibles** (mmd 04.8 L168,
+combined `(ρ_Γ − ρ_{Γ/N})(z) − (…)(1)` value).  For `N ⊴ Γ` and `z ∈ N^#`,
+`∑_{χ ∈ Irr Γ, N ⊄ ker χ} χ(1)·(χ(z) − χ(1)) = -|Γ|`.  This is
+`(-|Γ⧸N|) − (|Γ| − |Γ⧸N|) = -|Γ|`, from `sumNonInflatedDegreeMulChar_of_mem` (the `χ(z)` part) and
+`sumNonInflatedDegreeSq` (the `χ(1)` part). -/
+theorem sum_filter_degree_mul_charValue_sub_eq (N : Subgroup Γ) [N.Normal]
+    {z : Γ} (hz : z ∈ N) (hz1 : z ≠ 1) :
+    ∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+        ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+        (a : ClassFunction Γ ℂ) 1 * ((a : ClassFunction Γ ℂ) z - (a : ClassFunction Γ ℂ) 1)
+      = -(Nat.card Γ : ℂ) := by
+  haveI : Finite Γ := Finite.of_fintype Γ
+  have hsplit : (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+        ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+        (a : ClassFunction Γ ℂ) 1 * ((a : ClassFunction Γ ℂ) z - (a : ClassFunction Γ ℂ) 1))
+      = (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+          ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+          (a : ClassFunction Γ ℂ) 1 * (a : ClassFunction Γ ℂ) z)
+        - (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+            ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+            (a : ClassFunction Γ ℂ) 1 * (a : ClassFunction Γ ℂ) 1) := by
+    rw [← Finset.sum_sub_distrib]; exact Finset.sum_congr rfl (fun a _ => by ring)
+  have h2 : (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+        ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+        (a : ClassFunction Γ ℂ) 1 * (a : ClassFunction Γ ℂ) 1)
+      = (Nat.card Γ : ℂ) - (Nat.card (Γ ⧸ N) : ℂ) := by
+    rw [show (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+          ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+          (a : ClassFunction Γ ℂ) 1 * (a : ClassFunction Γ ℂ) 1)
+        = ∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter Γ =>
+          ¬ ((N : Set Γ) ⊆ OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction Γ ℂ))),
+          ((a : ClassFunction Γ ℂ) 1) ^ 2 from
+        Finset.sum_congr rfl (fun a _ => by rw [pow_two])]
+    exact sumNonInflatedDegreeSq (N := N)
+  rw [hsplit, sumNonInflatedDegreeMulChar_of_mem (N := N) hz hz1, h2]; ring
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08
@@ -3150,6 +3210,13 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   /-- The §4 Dade datum on `A = H^#`; its Dade isometry *is* `tau`. -/
   dade : OddOrder.Peterfalvi.S04.Hypothesis G (sharpImage H) L
   hconj : dade.HConjInvariant
+  /-- In the TI situation ((6.8.a): `H^#` is a TI-subset of `G` with normalizer `L`), the §4 Dade
+  datum's local subgroups are trivial, `dade.H a = ⊥` — i.e. `dade` is the Dade map of the
+  TI-subset construction (`S04.of_isTISubset`, whose `H a = ⊥`, S04:308).  This faithful (6.8.a)
+  fact makes the Dade map agree with `Ind_L^G` on the supported lattice, yielding the (2.7)
+  reciprocity `⟨α^τ, ψ⟩_G = ⟨α, Res_L^G ψ⟩_L` (`inner_tau_eq_inner_restrict`), the gateway to the
+  (6.8.1) `Res_L(η₁^{τ₁})` decomposition. -/
+  dade_H_eq_bot : ∀ a : {a : G // a ∈ sharpImage H}, dade.H a = ⊥
   /-- The base character set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` (Peterfalvi (6.8.b)). -/
   S : Set (ClassFunction ↥L ℂ)
   /-- `S` is exactly the set of characters induced from nontrivial irreducibles of `H`. -/
@@ -3308,6 +3375,18 @@ the conclusion shape produced by the §7 engine, hence honestly dischargeable �
 abbrev CoherenceTarget (hyp : SibleyDadeHypothesis G L H) :=
   OddOrder.Peterfalvi.S07.IsCoherent (L := ↥L) (G := G) hyp.tau hyp.S
     (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+
+/-- **(6.8.1) Dade reciprocity for the Sibley carrier.**  Since `H^#` is TI (`dade_H_eq_bot`), the
+real Dade map `tau` satisfies `⟨α^τ, ψ⟩_G = ⟨α, Res_L^G ψ⟩_L` for supported `α ∈ CF(L, H^#)` and any
+`ψ ∈ CF(G)` (`inner_dadeIntegralCharacterMap_eq_inner_restrict`).  This is the move the (6.8.1)
+proof (mmd L176) uses to rewrite `⟨η₁^{τ₁}, (χᵢ − dᵢχ₁)^τ⟩ = ⟨Res_L(η₁^{τ₁}), χᵢ − dᵢχ₁⟩`, feeding
+the `Res_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′` decomposition. -/
+theorem inner_tau_eq_inner_restrict (hyp : SibleyDadeHypothesis G L H)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner (hyp.tau α) ψ = ClassFunction.inner α (ClassFunction.restrict L ψ) :=
+  inner_dadeIntegralCharacterMap_eq_inner_restrict hyp.dade hyp.hconj hyp.dade_H_eq_bot hαsupp ψ
 
 /-- (6.8)(a) consequence: `[L : H] = |W₁|`.  From the complement `L = H ⋊ W₁` (`hyp.split`).
 This is the common degree of the members of `Y = S(H')`: by [Is] Thm 6.34
@@ -4350,6 +4429,18 @@ theorem mem_Yset_iff_exists_linear_source
   · exact hyp.exists_linear_source_of_mem_Yset
   · rintro ⟨χ, hχ_ne, rfl⟩
     exact hyp.induce_linearIrreducibleCharacter_mem_Yset hχ_ne
+
+/-- Every `Y = S(H')` member has degree `|W₁|` (`Ind_H^L` of a degree-`1` source of `H`).  The
+common degree of the equal-degree `Y`-family; used for the equal-degree difference support
+(`sMember_diffSupport_of_charValue_eq`) in the (6.8.1) `himg_ortho`. -/
+theorem Yset_apply_one (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Yset) :
+    φ (1 : ↥L) = (Nat.card hyp.W1 : ℂ) := by
+  obtain ⟨χ, _hχ_ne, hφeq⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+  rw [hφeq]
+  simpa [linearIrreducibleCharacter_coe] using
+    hyp.induce_apply_one_eq_card_W1_of_degree_one
+      (linearIrreducibleCharacter χ) (linearIrreducibleCharacter_apply_one χ)
 
 /-- Family form of `induce_linearIrreducibleCharacter_mem_Yset`. -/
 theorem range_induce_linearIrreducibleCharacter_subset_Yset
@@ -5472,6 +5563,38 @@ theorem sMember_scaledDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G 
   simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
   exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
 
+/-- **Two-coefficient degree-matched difference support.**  For two `S`-members `χ, χ'` and naturals
+`m, n` with `m·χ(1) = n·χ'(1)`, the combination `m·χ − n·χ'` is supported on `H^# = sharpImage H`.
+Both are supported on `H` (`sMember_support_subset_H`) and the combination vanishes at `1`.  Unlike
+`sMember_scaledDiffSupport_of_charValue_eq` (`χ − a·χ'`, requiring `χ'(1) ∣ χ(1)`), the symmetric
+coefficients `m = χ'(1)`, `n = χ(1)` make `m·χ − n·χ'` supported **without** any divisibility — the
+(4.1) supported-difference input `χ'(1)·χ − χ(1)·χ'` used in the (6.8.1) `himg_ortho`. -/
+theorem sMember_smulDiffSupport_of_charValue_eq (hyp : SibleyDadeHypothesis G L H)
+    {χ χ' : ClassFunction ↥L ℂ} (hχS : χ ∈ hyp.S) (hχ'S : χ' ∈ hyp.S) {m n : ℕ}
+    (hdeg : (m : ℂ) * χ 1 = (n : ℂ) * χ' 1) :
+    (m • χ - n • χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  have hval : ∀ x : ↥L, (m • χ - n • χ') x = (m : ℂ) * χ x - (n : ℂ) * χ' x := by
+    intro x
+    rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ m χ, ← Nat.cast_smul_eq_nsmul ℂ n χ',
+      ClassFunction.smul_apply, ClassFunction.smul_apply]
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  have hg1 : g ≠ 1 := by
+    rintro rfl
+    exact hg (by rw [hval, hdeg, sub_self])
+  have hgH : g ∈ H := by
+    by_contra hgnH
+    have hχg : χ g = 0 := by
+      by_contra h
+      exact hgnH (hyp.sMember_support_subset_H hχS (ClassFunction.mem_support.mpr h))
+    have hχ'g : χ' g = 0 := by
+      by_contra h
+      exact hgnH (hyp.sMember_support_subset_H hχ'S (ClassFunction.mem_support.mpr h))
+    exact hg (by rw [hval, hχg, hχ'g, mul_zero, mul_zero, sub_zero])
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  simp only [sharpImage, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  exact ⟨Subgroup.mem_map.mpr ⟨g, hgH, rfl⟩, fun h1 => hg1 (OneMemClass.coe_eq_one.mp h1)⟩
+
 /-- **`S`-member degree ratio against a degree-`|W₁|` anchor.**
 
 For `χ = Ind_H^L θ ∈ S` and an anchor `χ₁` of the minimal degree `χ₁(1) = |W₁|` (induced from a
@@ -5922,6 +6045,91 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
     exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥H)).toEquiv
   rw [hbotcard] at h0
   rw [eq_sub_of_add_eq hsd, h0, hZ]
+  ring
+
+open scoped Classical in
+/-- **Reindexing `X(Z)` to the `Irr L`-filter** (Frobenius case).  Any Finset `T` member-wise equal
+to the central `(6.6)` set `X(Z) = {χ ∈ Irr L | Z ⊄ ker χ}`
+(`Xset_eq_irreducible_not_subset_characterKernel`) sums the same as the `IrreducibleCharacter ↥L`
+filter `{ψ | Z ⊄ ker ψ}` for any `ℂ`-valued function: the injective coercion
+`IrreducibleCharacter ↥L ↪ ClassFunction ↥L ℂ` (`IrreducibleCharacter.ext`) is a bijection between
+them.  This bridges the regular-character sums (`sumNonInflatedDegreeMulChar_of_mem`,
+`sumNonInflatedDegreeSq`), stated over the `Irr`-filter, to the Sibley `X(Z)` index set. -/
+theorem sum_Xset_eq_sum_filter_irreducible_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    (f : ClassFunction ↥L ℂ → ℂ) :
+    ∑ φ ∈ T, f φ = ∑ ψ ∈ Finset.univ.filter (fun ψ : IrreducibleCharacter ↥L =>
+        ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥L ℂ))),
+        f (ψ : ClassFunction ↥L ℂ) := by
+  classical
+  have hXc : hyp.Xset Z = {χ : ClassFunction ↥L ℂ | IsIrreducibleCharacter χ ∧
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel χ)} :=
+    hyp.Xset_eq_irreducible_not_subset_characterKernel hZH
+      (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)
+  have hirrT : ∀ φ, φ ∈ T → IsIrreducibleCharacter φ := by
+    intro φ hφ; have := (hT φ).mp hφ; rw [hXc] at this; exact this.1
+  have hkerT : ∀ φ, φ ∈ T →
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel φ) := by
+    intro φ hφ; have := (hT φ).mp hφ; rw [hXc] at this; exact this.2
+  have hmemT : ∀ ψ : IrreducibleCharacter ↥L,
+      ¬ ((Z : Set ↥L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥L ℂ)) →
+      (ψ : ClassFunction ↥L ℂ) ∈ T := by
+    intro ψ hψ; rw [hT, hXc]; exact ⟨ψ.2, hψ⟩
+  refine Finset.sum_bij'
+    (fun φ hφ => (⟨φ, hirrT φ hφ⟩ : IrreducibleCharacter ↥L))
+    (fun ψ _ => (ψ : ClassFunction ↥L ℂ))
+    (fun φ hφ => ?_) (fun ψ hψ => ?_) (fun φ hφ => rfl) (fun ψ hψ => ?_) (fun φ hφ => rfl)
+  · rw [Finset.mem_filter]; exact ⟨Finset.mem_univ _, hkerT φ hφ⟩
+  · rw [Finset.mem_filter] at hψ; exact hmemT ψ hψ.2
+  · apply IrreducibleCharacter.ext; rfl
+
+open scoped Classical in
+/-- **(6.8.1) regular-character value over `X(Z)`** (mmd 04.8 L168).  For the central `(6.6)` set
+`X(Z)` and `z ∈ Z^#`, `∑_{χ ∈ X(Z)} χ(1)·χ(z) = -|L ⧸ Z|` — the off-identity value of
+`∑ χ(1)·χ = ρ_L − ρ_{L/Z}` (the step showing `η₁^{τ₁}` is constant on `Z^#`).  Reindex
+(`sum_Xset_eq_sum_filter_irreducible_of_frobenius`) + `sumNonInflatedDegreeMulChar_of_mem`. -/
+theorem sum_degree_mul_charValue_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    {z : ↥L} (hz : z ∈ Z) (hz1 : z ≠ 1) :
+    ∑ φ ∈ T, (φ 1) * (φ z) = -(Nat.card (↥L ⧸ Z) : ℂ) := by
+  rw [hyp.sum_Xset_eq_sum_filter_irreducible_of_frobenius hF hZH hT (fun φ => φ 1 * φ z)]
+  exact OddOrder.RepresentationTheory.sumNonInflatedDegreeMulChar_of_mem (N := Z) hz hz1
+
+open scoped Classical in
+/-- **(6.8.1) degree-square value over `X(Z)`** (mmd 04.8, the `z = 1` companion).  For the central
+`(6.6)` set `X(Z)`, `∑_{χ ∈ X(Z)} χ(1)·χ(1) = |L| − |L ⧸ Z|`.  Reindex
+(`sum_Xset_eq_sum_filter_irreducible_of_frobenius`) + `sumNonInflatedDegreeSq`. -/
+theorem sum_degree_sq_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z) :
+    ∑ φ ∈ T, (φ 1) * (φ 1) = (Nat.card ↥L : ℂ) - (Nat.card (↥L ⧸ Z) : ℂ) := by
+  rw [hyp.sum_Xset_eq_sum_filter_irreducible_of_frobenius hF hZH hT (fun φ => φ 1 * φ 1)]
+  rw [← OddOrder.RepresentationTheory.sumNonInflatedDegreeSq (N := Z)]
+  refine Finset.sum_congr rfl (fun ψ _ => ?_)
+  rw [pow_two]
+
+open scoped Classical in
+/-- **(6.8.1) regular-character difference value over `X(Z)`** (mmd 04.8 L168, combined form).  For
+the central `(6.6)` set `X(Z)` and `z ∈ Z^#`, `∑_{χ ∈ X(Z)} χ(1)·(χ(z) − χ(1)) = -|L|`.  This is
+`(ρ_L − ρ_{L/Z})(z) − (ρ_L − ρ_{L/Z})(1) = -|L:Z| − (|L| − |L:Z|) = -|L|` (the off-identity minus the
+degree value), which divided by `a|W₁| = χ₁(1)` gives `∑dᵢχᵢ(z) − ∑dᵢχᵢ(1) = -|H|/a` — the key
+constant in showing `η₁^{τ₁}` is constant on `Z^#`. -/
+theorem sum_degree_mul_charValue_sub_Xset_eq_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) [Z.Normal]
+    {T : Finset (ClassFunction ↥L ℂ)} (hT : ∀ φ, φ ∈ T ↔ φ ∈ hyp.Xset Z)
+    {z : ↥L} (hz : z ∈ Z) (hz1 : z ≠ 1) :
+    ∑ φ ∈ T, (φ 1) * (φ z - φ 1) = -(Nat.card ↥L : ℂ) := by
+  have hexpand : ∑ φ ∈ T, (φ 1) * (φ z - φ 1)
+      = (∑ φ ∈ T, (φ 1) * φ z) - (∑ φ ∈ T, (φ 1) * φ 1) := by
+    rw [← Finset.sum_sub_distrib]; refine Finset.sum_congr rfl (fun φ _ => ?_); ring
+  rw [hexpand, hyp.sum_degree_mul_charValue_Xset_eq_of_frobenius hF hZH hT hz hz1,
+    hyp.sum_degree_sq_Xset_eq_of_frobenius hF hZH hT]
   ring
 
 /-- **(6.6) `htotal` factorization.**  `|L:H|·(|H| − |H:Z|) = |H:Z| · (|L:H|·(|Z| − 1))` (Lagrange
@@ -8670,6 +8878,392 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_of_frobenius
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed hgen
 
+/-- **(6.8.1)/(6.8), L3 outer shell — diagonal-aware form.**  Same as
+`coherentXunionYset_centralCommutator_of_glued_of_frobenius`, but routing through the corrected
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`: the plain shell's generation
+hypothesis `hgen` (without the cross-diagonals `D`) is **false** in the (6.8.1) situation — the
+supported cross-diagonal `χ₁ − a·η₁ ∈ ℤ[X(Zc) ∪ Y]` is not a sum of a supported `X`-combination and
+a supported `Y`-combination (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`, framing correction
+#2, and the `coherentUnion_of_glued_withDiagonal` docstring).  Here `D` carries those cross-diagonals
+with `hDτ : ∀ d ∈ D, ν d = τ d` (the (6.8.1) `b ≡ 0` conclusion
+`(χ₁ − a·η₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`), and `hgen` is the satisfiable generation including `D`. -/
+noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset hyp.centralCommutator,
+      ν x = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset ν hagreeX hagreeY
+    (inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
+    hmixed D hDτ hgen
+
+/-- **Peterfalvi (6.8.1) image orthogonality `himg_ortho` via (4.1)** (Frobenius case, mmd 04.8 L166).
+`X(Zc)^{τ₂} ⊥ Y^{τ₁}`: for `χ ∈ X(Zc)`, `η ∈ Y`, the coherent images are orthogonal,
+`⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  This is the "by (4.1)" step, **independent** of the deep `b ≡ 0` argument.
+
+Pick distinct references `χ' ≠ χ` in `X(Zc)` (`2 ≤ |X(Zc)|`, from `two_le_xBaseBlock_ncard` +
+`xBaseBlock_subset`) and `η' ≠ η` in `Y` (`2 ≤ |Y|`, `two_le_Yset_ncard`), and apply
+`pairwise_inner_eq_zero_of_orthogonal_signedDifference` with `α = η^{τ₁}, β = η'^{τ₁}, γ = χ^{τ₂},
+δ = χ'^{τ₂}` and **degree coefficients** `u = χ'(1), v = χ(1)`.  Then `u•γ − v•δ =
+(χ'(1)•χ − χ(1)•χ')^{τ₂}` is the τ₂-image of a *supported* (degree-`0`,
+`sMember_smulDiffSupport_of_charValue_eq` — no divisibility needed) integer `X`-combination, and
+`α − β = (η − η')^{τ₁}` the τ₁-image of a supported (equal-degree, `Yset_apply_one`) `Y`-difference;
+the difference-orthogonality `inner_extension_eq_inner_of_supported` (`= 0` by `X ⊥ Y`) and degree-`0`
+`extension_apply_one_eq_zero_of_supported` discharge `hdiff`/`hα1`/`hγδ1`.  The conclusion `⟨α,γ⟩ = 0`
+gives the claim by conjugate symmetry. -/
+theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ)
+      (hyp.coherentYset.extension η) = 0 := by
+  classical
+  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
+  set hYc := hyp.coherentYset with hYc_def
+  -- irreducibility of members
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  -- `if`-formula for inner products of irreducibles (orthonormality)
+  have hinner : ∀ (φ ψ : ClassFunction ↥L ℂ), IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  -- distinct references (n, m ≥ 2)
+  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty :=
+    hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.xSet_finite_of_irreducible_X hXirr
+  have hX2 : 2 ≤ (hyp.Xset hyp.centralCommutator).ncard :=
+    le_trans (hyp.two_le_xBaseBlock_ncard hF hyp.centralCommutator_le hXne)
+      (Set.ncard_le_ncard (hyp.xBaseBlock_subset _) hXfin)
+  obtain ⟨χ', hχ'X, hχ'ne⟩ :=
+    Set.exists_ne_of_one_lt_ncard (by omega : 1 < (hyp.Xset hyp.centralCommutator).ncard) χ
+  obtain ⟨η', hη'Y, hη'ne⟩ :=
+    Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega : 1 < hyp.Yset.ncard) η
+  -- positive natural degrees of `χ`, `χ'`
+  obtain ⟨d, hd_pos, hd_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ, hXirr χ hχ⟩ : IrreducibleCharacter ↥L)
+  obtain ⟨d', hd'_pos, hd'_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ', hXirr χ' hχ'X⟩ : IrreducibleCharacter ↥L)
+  simp only [IrreducibleCharacter.coe_mk] at hd_eq hd'_eq
+  -- membership in the integral spans (`subset_span`)
+  have hχs : χ ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator) := Submodule.subset_span hχ
+  have hχ's : χ' ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator) := Submodule.subset_span hχ'X
+  have hηs : η ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη
+  have hη's : η' ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη'Y
+  -- the two supported difference inputs of (4.1)
+  set xdiff : ClassFunction ↥L ℂ := d' • χ - d • χ' with hxdiff_def
+  set ydiff : ClassFunction ↥L ℂ := η - η' with hydiff_def
+  have hx_supp : xdiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨?_, ?_⟩
+    · refine Submodule.sub_mem _ ?_ ?_
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d' χ]; exact Submodule.smul_mem _ _ hχs
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d χ']; exact Submodule.smul_mem _ _ hχ's
+    · exact hyp.sMember_smulDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ)
+        (hyp.Xset_subset_S hχ'X) (by rw [hd_eq, hd'_eq]; ring)
+  have hy_supp : ydiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨Submodule.sub_mem _ hηs hη's, ?_⟩
+    exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη'Y)
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη'Y).symm)
+  -- the image of `xdiff` is exactly the degree-weighted `u•γ − v•δ`
+  have hXeq : ((d' : ℝ) : ℂ) • hXc.extension χ - ((d : ℝ) : ℂ) • hXc.extension χ'
+      = hXc.extension xdiff := by
+    rw [hxdiff_def, map_sub, map_nsmul, map_nsmul,
+      ← Nat.cast_smul_eq_nsmul ℂ d' (hXc.extension χ),
+      ← Nat.cast_smul_eq_nsmul ℂ d (hXc.extension χ')]
+    push_cast
+    ring
+  have hYeq : hYc.extension η - hYc.extension η' = hYc.extension ydiff := by
+    rw [hydiff_def, map_sub]
+  -- disjointness `X(Zc) ⊥ Y` and the source orthogonality `⟨xdiff, ydiff⟩ = 0`
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  have hsrc0 : ClassFunction.inner xdiff ydiff = 0 :=
+    inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj xdiff hx_supp.1 ydiff hy_supp.1
+  -- discharge the (4.1) hypotheses and read off `⟨α,γ⟩ = 0`
+  have hconcl := OddOrder.RepresentationTheory.pairwise_inner_eq_zero_of_orthogonal_signedDifference
+    (Γ := G) (α := hYc.extension η) (β := hYc.extension η')
+    (γ := hXc.extension χ) (δ := hXc.extension χ')
+    (u := (d' : ℝ)) (v := (d : ℝ))
+    (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
+    (hYc.extension_mem_ZIrr η hηs)
+    (by rw [hYc.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (hYc.extension_mem_ZIrr η' hη's)
+    (by rw [hYc.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
+        if_pos rfl])
+    (hXc.extension_mem_ZIrr χ hχs)
+    (by rw [hXc.extension_inner_eq χ χ hχs hχs, hinner χ χ (hXirr χ hχ) (hXirr χ hχ), if_pos rfl])
+    (hXc.extension_mem_ZIrr χ' hχ's)
+    (by rw [hXc.extension_inner_eq χ' χ' hχ's hχ's, hinner χ' χ' (hXirr χ' hχ'X) (hXirr χ' hχ'X),
+        if_pos rfl])
+    (by rw [hYc.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
+        if_neg (fun h => hη'ne h.symm)])
+    (by rw [hXc.extension_inner_eq χ χ' hχs hχ's, hinner χ χ' (hXirr χ hχ) (hXirr χ' hχ'X),
+        if_neg (fun h => hχ'ne h.symm)])
+    (by -- hdiff
+      rw [hXeq, hYeq, inner_conj_symm (hXc.extension xdiff) (hYc.extension ydiff),
+        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj hXc hYc hx_supp hy_supp,
+        hsrc0, star_zero])
+    (by -- hα1
+      rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hYc hy_supp)
+    (by -- hγδ1
+      rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
+  rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
+
+/-- **Span form of `himg_ortho`:** `⟨x^{τ₂}, η^{τ₁}⟩ = 0` for any `x ∈ ℤ[X(Zc)]` and `η ∈ Y`
+(by `ℤ`-linearity from the per-member
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`). -/
+theorem inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {x : ClassFunction ↥L ℂ} (hx : x ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator))
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+      (hyp.coherentYset.extension η) = 0 := by
+  classical
+  induction hx using Submodule.span_induction with
+  | mem χ hχ =>
+      exact hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+        hF hHnonab hp hp3 hHp hχ hη
+  | zero => rw [map_zero, ClassFunction.inner_zero_left]
+  | add a b _ _ iha ihb => rw [map_add, ClassFunction.inner_add_left, iha, ihb, add_zero]
+  | smul c a _ ih =>
+      rw [map_zsmul,
+        ← Int.cast_smul_eq_zsmul ℂ c
+          ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension a),
+        ClassFunction.inner_smul_left, ih, mul_zero]
+
+/-- **(6.8.1) Res-decomposition orthogonality** (spine steps 1–2): `Res^G_L(η^{τ₁})` is orthogonal
+to every *supported* `X(Zc)`-combination.  For `η ∈ Y` and `x ∈ ℤ[X(Zc), H^#]` (supported),
+`⟨Res^G_L(η^{τ₁}), x⟩_L = 0`.  By Dade reciprocity (`inner_tau_eq_inner_restrict`,
+`⟨x^τ, η^{τ₁}⟩_G = ⟨x, Res_L(η^{τ₁})⟩_L`) and `x^τ = x^{τ₂}` (supported), this reduces to the span
+form of `himg_ortho` (`⟨x^{τ₂}, η^{τ₁}⟩_G = 0`).  Hence the `X`-components of `Res^G_L(η^{τ₁})` are
+all proportional to `dᵢ`, i.e. `Res^G_L(η^{τ₁}) = c·∑dᵢχᵢ + χ′` with `χ′ ⊥ X(Zc)` (mmd 04.8 L170). -/
+theorem inner_restrict_extension_Yset_mem_span_Xset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {x : ClassFunction ↥L ℂ}
+    (hx : x ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
+    ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) x = 0 := by
+  classical
+  have hrec := hyp.inner_tau_eq_inner_restrict hx.2 (hyp.coherentYset.extension η)
+  have hτ : hyp.tau x =
+      (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x :=
+    ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extends_on_supported
+      x hx).symm
+  have h0 : ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension x)
+      (hyp.coherentYset.extension η) = 0 :=
+    hyp.inner_extension_span_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+      hF hHnonab hp hp3 hHp hx.1 hη
+  have hxr : ClassFunction.inner x
+      (ClassFunction.restrict L (hyp.coherentYset.extension η)) = 0 := by
+    rw [← hrec, hτ, h0]
+  rw [inner_conj_symm x (ClassFunction.restrict L (hyp.coherentYset.extension η)), hxr, star_zero]
+
+/-- **(6.8.1) Res `X`-coefficient proportionality** (mmd 04.8 L170).  For `χ, χ' ∈ X(Zc)` and
+`R = Res^G_L(η^{τ₁})` (`η ∈ Y`), `χ'(1)·⟨R, χ⟩ = χ(1)·⟨R, χ'⟩` — the `X`-Fourier coefficients of `R`
+are proportional to the degrees (`⟨R,χᵢ⟩ ∝ dᵢ`, the `Res^G_L(η₁^{τ₁}) = c∑dᵢχᵢ + χ′` decomposition).
+Apply Res-orthogonality (`inner_restrict_extension_Yset_mem_span_Xset_eq_zero`) to the supported
+integer combination `χ'(1)•χ − χ(1)•χ'` (degree-`0`, `sMember_smulDiffSupport_of_charValue_eq`). -/
+theorem inner_restrict_extension_Yset_mul_degree_eq_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ' : χ' ∈ hyp.Xset hyp.centralCommutator) :
+    (χ' 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ
+      = (χ 1) * ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ' := by
+  classical
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
+  obtain ⟨d, _hd_pos, hd_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ, hXirr χ hχ⟩ : IrreducibleCharacter ↥L)
+  obtain ⟨d', _hd'_pos, hd'_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ', hXirr χ' hχ'⟩ : IrreducibleCharacter ↥L)
+  simp only [IrreducibleCharacter.coe_mk] at hd_eq hd'_eq
+  have hx_supp : (d' • χ - d • χ') ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨?_, ?_⟩
+    · refine Submodule.sub_mem _ ?_ ?_
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d' χ]
+        exact Submodule.smul_mem _ _ (Submodule.subset_span hχ)
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d χ']
+        exact Submodule.smul_mem _ _ (Submodule.subset_span hχ')
+    · exact hyp.sMember_smulDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ)
+        (hyp.Xset_subset_S hχ') (by rw [hd_eq, hd'_eq]; ring)
+  have hortho := hyp.inner_restrict_extension_Yset_mem_span_Xset_eq_zero_of_frobenius
+    hF hHnonab hp hp3 hHp hη hx_supp
+  rw [ClassFunction.inner_sub_right,
+    ← Nat.cast_smul_eq_nsmul ℂ d' χ, ← Nat.cast_smul_eq_nsmul ℂ d χ',
+    OddOrder.RepresentationTheory.inner_smul_right, OddOrder.RepresentationTheory.inner_smul_right,
+    star_natCast, star_natCast, ← hd'_eq, ← hd_eq] at hortho
+  exact sub_eq_zero.mp hortho
+
+/-- **(6.8.1) `η^{τ₁}` constancy value on `Zc^#`** (mmd 04.8 L168, the key constant).  For `η ∈ Y`,
+`χ₁ ∈ X(Zc)` and `z ∈ Zc^#`, with `R = Res^G_L(η^{τ₁})`,
+`χ₁(1)·(R(z) − R(1)) = -⟨R, χ₁⟩·|L|`.  Since the right side is independent of `z`, this shows `R`
+(hence `η^{τ₁}`) is **constant on `Zc^#`** (and gives the value `R(z) − R(1) = -c|H|/a` with
+`c = ⟨R,χ₁⟩`, `χ₁(1) = a|W₁|`, after clearing the denominator).
+
+Proof: Fourier-expand `R = ∑_{a∈Irr L} ⟨R,a⟩•a` (`classFunction_eq_sum_inner_smul`); split the sum
+by `Zc ⊄ ker`.  On `Zc ⊆ ker` (the non-`X` part) `a(z) = a(1)`, so those terms vanish.  On `X(Zc)`
+the coefficient relation `χ₁(1)⟨R,a⟩ = a(1)⟨R,χ₁⟩` (`inner_restrict_extension_Yset_mul_degree_eq`)
+factors out `⟨R,χ₁⟩`, leaving `⟨R,χ₁⟩·∑_{a∈X} a(1)(a(z)−a(1)) = ⟨R,χ₁⟩·(-|L|)`
+(`sum_filter_degree_mul_charValue_sub_eq`). -/
+theorem restrict_extension_Yset_degree_value_eq_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    (χ₁ 1) * ((ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+        - (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1)
+      = -(ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ₁)
+          * (Nat.card ↥L : ℂ) := by
+  classical
+  haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
+  set R := ClassFunction.restrict L (hyp.coherentYset.extension η) with hRdef
+  have hval : R z - R 1 = ∑ a : IrreducibleCharacter ↥L,
+      ClassFunction.inner R (a : ClassFunction ↥L ℂ) *
+        ((a : ClassFunction ↥L ℂ) z - (a : ClassFunction ↥L ℂ) 1) := by
+    conv_lhs => rw [OddOrder.RepresentationTheory.classFunction_eq_sum_inner_smul R]
+    rw [ClassFunction.finset_sum_apply, ClassFunction.finset_sum_apply, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl (fun a _ => ?_)
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply]; ring
+  rw [hval, Finset.mul_sum,
+    ← Finset.sum_filter_add_sum_filter_not Finset.univ
+      (fun a : IrreducibleCharacter ↥L => ¬ ((hyp.centralCommutator : Set ↥L) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction ↥L ℂ)))]
+  have hnot : (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter ↥L =>
+        ¬ ¬ ((hyp.centralCommutator : Set ↥L) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction ↥L ℂ))),
+        (χ₁ 1) * (ClassFunction.inner R (a : ClassFunction ↥L ℂ) *
+          ((a : ClassFunction ↥L ℂ) z - (a : ClassFunction ↥L ℂ) 1))) = 0 := by
+    refine Finset.sum_eq_zero (fun a ha => ?_)
+    rw [Finset.mem_filter, not_not] at ha
+    have haz : (a : ClassFunction ↥L ℂ) z = (a : ClassFunction ↥L ℂ) 1 := by
+      have hmem := ha.2 hz
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def] at hmem
+      exact hmem
+    rw [haz, sub_self, mul_zero, mul_zero]
+  rw [hnot, add_zero]
+  have hfilter : (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter ↥L =>
+        ¬ ((hyp.centralCommutator : Set ↥L) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction ↥L ℂ))),
+        (χ₁ 1) * (ClassFunction.inner R (a : ClassFunction ↥L ℂ) *
+          ((a : ClassFunction ↥L ℂ) z - (a : ClassFunction ↥L ℂ) 1)))
+      = (ClassFunction.inner R χ₁) *
+        (∑ a ∈ Finset.univ.filter (fun a : IrreducibleCharacter ↥L =>
+          ¬ ((hyp.centralCommutator : Set ↥L) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel (a : ClassFunction ↥L ℂ))),
+          (a : ClassFunction ↥L ℂ) 1 *
+            ((a : ClassFunction ↥L ℂ) z - (a : ClassFunction ↥L ℂ) 1)) := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl (fun a ha => ?_)
+    rw [Finset.mem_filter] at ha
+    have haX : (a : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
+      rw [hyp.Xset_eq_irreducible_not_subset_characterKernel hyp.centralCommutator_le
+        (fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h)]
+      exact ⟨a.isIrreducible, ha.2⟩
+    have hrel := hyp.inner_restrict_extension_Yset_mul_degree_eq_of_frobenius
+      hF hHnonab hp hp3 hHp hη haX hχ₁
+    rw [← hRdef] at hrel
+    linear_combination ((a : ClassFunction ↥L ℂ) z - (a : ClassFunction ↥L ℂ) 1) * hrel
+  rw [hfilter, OddOrder.RepresentationTheory.sum_filter_degree_mul_charValue_sub_eq
+    (N := hyp.centralCommutator) hz hz1]
+  ring
+
+/-- **(6.8.1) `η^{τ₁}` is constant on `Zc^#`** (mmd 04.8 L168 conclusion).  For `η ∈ Y`, the
+restriction `Res^G_L(η^{τ₁})` takes the same value at any two points of `Zc^#`.  Immediate from the
+value identity `restrict_extension_Yset_degree_value_eq_of_frobenius` (whose right side `-⟨R,χ₁⟩·|L|`
+is independent of the point) and `χ₁(1) ≠ 0` (any anchor `χ₁ ∈ X(Zc)`, nonempty).  This is the exact
+"character constant on `Z^#`" hypothesis of the (6.7) adapter `peterfalvi_67_centralCommutator`. -/
+theorem restrict_extension_Yset_const_on_centralCommutator_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z z' : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1)
+    (hz' : z' ∈ hyp.centralCommutator) (hz'1 : z' ≠ 1) :
+    (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      = (ClassFunction.restrict L (hyp.coherentYset.extension η)) z' := by
+  obtain ⟨χ₁, hχ₁⟩ := hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hd : χ₁ 1 ≠ 0 := by
+    obtain ⟨d, hd_pos, hd_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ₁, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hd_eq
+    rw [hd_eq]; exact_mod_cast hd_pos.ne'
+  have hv := hyp.restrict_extension_Yset_degree_value_eq_of_frobenius
+    hF hHnonab hp hp3 hHp hη hχ₁ hz hz1
+  have hv' := hyp.restrict_extension_Yset_degree_value_eq_of_frobenius
+    hF hHnonab hp hp3 hHp hη hχ₁ hz' hz'1
+  have hcancel : (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      - (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+      = (ClassFunction.restrict L (hyp.coherentYset.extension η)) z'
+        - (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1 :=
+    mul_left_cancel₀ hd (hv.trans hv'.symm)
+  linear_combination hcancel
+
 /-- **L3 (3a) shell, ν-free form:** `X(Zc) ∪ Y` is coherent given only the genuine (6.8.1) input
 `himg_ortho : ⟨χ^{τ₂}, η^{τ₁}⟩ = 0`.  The `τ₃` glue `ν` is constructed internally
 (`exists_integralCharacterMap_glue_of_orthonormal` with `νX = τ₂`, `νY = τ₁`); its agreement
@@ -9085,6 +9679,67 @@ theorem peterfalvi_67_centralCommutator (hyp : SibleyDadeHypothesis G L H) [H.No
   have key := OddOrder.RepresentationTheory.peterfalvi_67_of_odd ρ Q hZP hZnormal hti hodd
     hz hz1 hPz hconst
   rwa [hcard] at key
+
+open scoped OddOrder.AlgInt in
+/-- **(6.8.1) (6.7)-congruence for `η^{τ₁}`** (mmd 04.8 L168 → L176).  For `η ∈ Y` and `z ∈ Zc^#`,
+`Res^G_L(η^{τ₁})(z) ≡ Res^G_L(η^{τ₁})(1) (mod |H|)`.  Wires the (6.7) adapter
+`peterfalvi_67_centralCommutator` to `η^{τ₁}`: write `η^{τ₁} = ε•ξ` (`ε = ±1`, `ξ` irreducible, from
+norm `1`); unpack `ξ = ρ.character` (`ρ` irreducible).  The const-on-`Zc^#`
+(`restrict_extension_Yset_const_on_centralCommutator_of_frobenius`, transferred to `Zc.map`) is the
+adapter's hypothesis, giving `ξ(z) ≡ ξ(1) (mod |H|)`; scale by `ε` (`Cong.smul_left`) to get
+`η^{τ₁}(z) ≡ η^{τ₁}(1)`. -/
+theorem restrict_extension_Yset_charValue_cong_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      ≡ (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+        [ALGMOD (Nat.card ↥H : ℤ)] := by
+  classical
+  have hηtZ : hyp.coherentYset.extension η ∈ ZIrr G :=
+    hyp.coherentYset.extension_mem_ZIrr η (Submodule.subset_span hη)
+  have hηtnorm : ClassFunction.inner (hyp.coherentYset.extension η)
+      (hyp.coherentYset.extension η) = 1 := by
+    rw [hyp.coherentYset.extension_inner_eq η η (Submodule.subset_span hη)
+      (Submodule.subset_span hη)]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  obtain ⟨ε, ξ, hε, hηtε⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hηtZ hηtnorm
+  have hεne : (ε : ℂ) ≠ 0 := by rcases hε with rfl | rfl <;> norm_num
+  have hεint : IsIntegral ℤ (ε : ℂ) := by
+    simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
+  -- the eval identity `η^{τ₁}(g) = ε · ξ(g)`.
+  have hsmul : ∀ g : G, (hyp.coherentYset.extension η) g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+    intro g
+    rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
+  obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
+  haveI : ρ.IsIrreducible := hρ
+  have hzGmem : (L.subtype z) ∈ hyp.centralCommutator.map L.subtype :=
+    Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
+  have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))
+  have hψconst : ∀ w ∈ hyp.centralCommutator.map L.subtype, w ≠ 1 →
+      ρ.character w = ρ.character (L.subtype z) := by
+    intro w hw hw1
+    obtain ⟨w₀, hw₀, rfl⟩ := Subgroup.mem_map.mp hw
+    have hw₀1 : w₀ ≠ 1 := fun h => hw1 (by rw [h]; simp)
+    have hRw : (hyp.coherentYset.extension η) (L.subtype w₀)
+        = (hyp.coherentYset.extension η) (L.subtype z) :=
+      hyp.restrict_extension_Yset_const_on_centralCommutator_of_frobenius
+        hF hHnonab hp hp3 hHp hη hw₀ hw₀1 hz hz1
+    rw [← congrFun hξρ (L.subtype w₀), ← congrFun hξρ (L.subtype z)]
+    apply mul_left_cancel₀ hεne
+    rw [← hsmul (L.subtype w₀), ← hsmul (L.subtype z)]
+    exact hRw
+  have hcong := hyp.peterfalvi_67_centralCommutator hF hp hHp ρ hzGmem hzG1 hψconst
+  rw [← congrFun hξρ (L.subtype z), ← congrFun hξρ 1] at hcong
+  have hcong2 := hcong.smul_left hεint
+  simp only [← hsmul] at hcong2
+  exact hcong2
 
 end SibleyDadeHypothesis
 

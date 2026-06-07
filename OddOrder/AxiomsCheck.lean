@@ -2396,6 +2396,9 @@ set_option linter.style.longLine false in
 -- structural input for the `Res_L(η₁^{τ₁})` decomposition.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.adjointAverageFun_eq_of_H_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inner_dadeIntegralCharacterMap_eq_inner_restrict
+-- Sibley-carrier reciprocity wrapper (uses the new `dade_H_eq_bot` TI field).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.inner_tau_eq_inner_restrict
 -- Peterfalvi (7.10) consumer algebra: sum and normalize the weighted Ind equations.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.IndChainDecomposition.image_weightedDifferenceInput
