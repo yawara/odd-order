@@ -38,12 +38,14 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 | **Lem 1.21(c)** | L568 | ✅ | `hasPLengthOne_of_isPGroup_normal_quotient`。(3.9) |
 | **Lem 1.21(d)** | L569 | — bypass | `⟨p-elements⟩` 特徴づけ。(e) を product-core 経由にしたので不要 |
 | **Lem 1.21(e)** | L570 | ✅ | `hasPLengthOne_of_inf_eq_bot`。(3.11)。product 埋め込み + (a) |
-| **Thm 3.4** | L863 | ❌ 未 | 可解奇 G, normal Hall K + prime-order 補群 R, V 上 (char∤\|G\|), `C_V(R)=0 ⇒ [R,K]⊆C_K(V)`。表現論 (Clifford/Maschke/special) |
+| **Thm 3.4** | L863 | ❌ 未 (本体) | 可解奇 G, normal Hall K + prime-order 補群 R, V 上 (char∤\|G\|), `C_V(R)=0 ⇒ [R,K]⊆C_K(V)`。reduction は Maschke/Prop1.5/Lem3.1/Lem3.3 で組める。**真の残り = BG §2 (Thm 2.5)**、Gorenstein 系は下記の通り被覆済 |
 | **Thm 3.5** | L903 | ❌ 未 | Frobenius G=KR (K 可解, R cyclic prime), V 上, `C_V(R) 1-dim ⇒ K'⊆C_K(V)`。Clifford/Maschke/Wedderburn/Prop2.2/Lem3.3 |
 | **Lem 3.3** | L845 | ✅ | S03b_Lemma33 `kernel_acts_trivially_of_centralizer_eq_bot` 等 |
 | **Lem 3.1** | — | ✅ | S03 `isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot` |
-| **Gorenstein 5.3.7** | — | ❌ 未 | special q-群の coprime 作用 (3.25)。CLAUDE.md 方針: Gorenstein 原文を読み Lean 化 |
-| §1 Prop1.3/1.4/1.5/1.6/1.7/1.8/1.13/1.16, Thm2.6 | — | ✅ (要再確認) | S01_Solvable / S01b_Prop116 / S02_Representations (Explore 2026-06-07 報告、楽観気味なので使用時に各個検証) |
+| **Gorenstein 5.3.7** (BG 番号; = 当 ed. **Gor 3.7/3.8/3.10**) | — | ✅ **被覆済** | coprime minimal 作用 ⇒ special + irred on K/K' + trivial K'。`S04e_GorThm37.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality` (sorry-free, AxiomsCheck:1250)。BG 3.4 では K に適用 (existence-of-minimal → K=Q bridge は §3.4 内部) |
+| **Gorenstein 3.2.2** (Z(G) cyclic) | — | △ ほぼ被覆 | faithful irreducible ⇒ Z(G) cyclic。ℂ 版 machinery = Isaacs CTFG Cor 2.30 `SchurCenterBound.lean` (`exists_central_scalar` 他, sorry-free)。一般体 F 版 capstone = Schur→`Module.End` division ring + mathlib `isCyclic_of_subgroup_isDomain` で短い追加 |
+| **BG Thm 2.5** (+ Prop 2.1/2.2/2.4, Gor 5.5.4-5) | L716 | ❌ 未 (真の frontier) | extraspecial+cyclic faithful irred の最終矛盾。**Isaacs FGT 不在 = BG 自前 §2 表現論**(cross_refs §5 L134)。S02 は docstring stub (2.6 のみ ✅)。**Thm 3.4 完成の本丸はここ**(Gorenstein でなく BG §2) |
+| §1 Prop1.3/1.4/1.5/1.6/1.7/1.8/1.13/1.16, Thm2.6 | — | ✅ (要再確認) | S01_Solvable / S01b_Prop116 / S02_Representations (使用時に各個検証) |
 | special q-group def `IsSpecial` | — | ✅ def | GroupTheory/IsExtraspecial.lean:84 |
 
 ## 推奨着手順序 (bottom-up)
