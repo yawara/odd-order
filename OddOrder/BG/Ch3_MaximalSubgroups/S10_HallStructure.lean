@@ -1251,7 +1251,7 @@ theorem exists_sylow_le_normalizer_le_of_mem_sigma [Finite G]
 Subgroup Theorem gives `P̄.focalSubgroup = G' ⊓ P̄ = P̄`; Theorem 10.1(a) (with `X = ⟨x⟩`) shows
 `M` controls `G`-fusion in `P̄`, so the focal subgroup computed inside `M` agrees, yielding
 `M' ⊓ P̄ = P̄`, i.e. `P̄ ≤ M'`. -/
-private theorem sylow_le_derived_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+theorem sylow_le_derived_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
     (hp : p ∈ sigma M) (P : Sylow p ↥M) :
     (P : Subgroup ↥M).map M.subtype ≤ derivedInG M := by

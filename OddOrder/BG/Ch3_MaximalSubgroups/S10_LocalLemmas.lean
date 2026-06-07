@@ -23,6 +23,20 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-- A Sylow `p`-subgroup `P` of `G` contained in `K ≤ G` restricts to a Sylow `p`-subgroup of
+`↥K` with carrier `P.subgroupOf K` (replicates the private `S07.sylow_subgroupOf_of_le`). Shared
+by Lemmas 10.4 and 10.12. -/
+private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : Sylow p G)
+    {K : Subgroup G} (hPK : (P : Subgroup G) ≤ K) :
+    ∃ Q : Sylow p ↥K, (Q : Subgroup ↥K) = (P : Subgroup G).subgroupOf K := by
+  have hpg : IsPGroup p ↥((P : Subgroup G).subgroupOf K) := by
+    obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]; exact hn)
+  have hidx : ¬ p ∣ ((P : Subgroup G).subgroupOf K).index := fun h =>
+    P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
+  exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
+
 /-! ## Lemma 10.3 / 10.5 — centralizer と normalizer (mmd gap, PDF p.87 回収) -/
 
 /-- **BG Lemma 10.3** (mmd MISSING_PAGE, PDF p.87): `M ∈ ℳ`, `X` を `M` の `α(M)'`-部分群とし
@@ -45,19 +59,107 @@ theorem pRank_eq_two_of_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## Lemma 10.4 — α(M) の判定 (mmd MISSING_PAGE, PDF p.87) -/
 
-/-- **BG Lemma 10.4 (a)(c)** (mmd MISSING_PAGE, PDF p.87): `M ∈ ℳ`。
-(a) `p ∣ |M/M'|` ⇒ `p ∉ α(M)`; (c) `p ∈ α(M)`, `r_p(M) = 2` ⇒ `p` は ideal でなく、`M` の位数 `p²`
-elem-ab はすべて `G` の極大 elem-ab。
-(原典 (b): `p∈α(M), M_α≠1` ⇒ `∃ x∈Ω₁(Z(P))#: ℳ(C_G(x))={M} ∧ C_{M_α}(x) Z-group` —
-`Ω₁(Z(P))` の入れ子 encoding は後続。`IsZGroup`/`maximalSubgroupsContaining` は整備済。) -/
+/-- **BG Lemma 10.4 (a)(c)** (mmd MISSING_PAGE, PDF p.74 = PDF page 87; recovered 2026-06-07):
+`M ∈ ℳ`。(a) `p ∣ |M/M'|` ⇒ `p ∉ σ(M)`; (c) `p ∉ σ(M)`, `r_p(M) = 2` ⇒ `p` は ideal でなく、
+`M` の位数 `p²` elem-ab はすべて `G` の極大 elem-ab (`ℰ_p²(M) ⊆ ℰ_p*(G)`)。
+
+**注意**: 旧 scaffold は (a) を `p ∉ α(M)` (弱い) に、(c) の仮定を `p ∈ α(M)` (⇒ `pRank ≥ 3`
+で `pRank = 2` と矛盾 = vacuous) に誤記していた。原典 Lemma 10.4 に合わせ `σ(M)` 版へ修正
+(downstream 未使用を確認済)。原典 (b) (`Ω₁(Z(P))` 入れ子 encoding) は後続。 -/
 theorem alpha_criterion [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
-    (∀ p : ℕ, p.Prime → p ∣ (commutator ↥M).index → p ∉ alpha M) ∧
-    (∀ p : ℕ, p.Prime → p ∈ alpha M → pRank ↥M p = 2 →
+    (∀ p : ℕ, p.Prime → p ∣ (commutator ↥M).index → p ∉ sigma M) ∧
+    (∀ p : ℕ, p.Prime → p ∉ sigma M → pRank ↥M p = 2 →
       ¬ idealPrime p G ∧
       ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
         IsMaximalElementaryAbelian p A) := by
-  sorry
+  refine ⟨fun p hp hdvd hpσ => ?_, fun p hp hpσ hr2 => ?_⟩
+  · -- (a) `p ∣ |M/M'|` and `p ∈ σ(M)` are contradictory: a Sylow `p` of `M` lies in `M'`.
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨P, -⟩ := hpσ.2
+    have hPder : (P : Subgroup ↥M) ≤ commutator ↥M := by
+      have h := sylow_le_derived_of_mem_sigma hG hM hpσ P
+      rwa [derivedInG, Subgroup.map_le_map_iff_of_injective M.subtype_injective] at h
+    exact P.not_dvd_index (dvd_trans hdvd (Subgroup.index_dvd_of_le hPder))
+  · -- (c)
+    haveI : Fact p.Prime := ⟨hp⟩
+    -- ∀-part: a rank-`2` elementary abelian `A ≤ M` is `G`-maximal
+    -- (else `A ∈ 𝒰` forces `p ∈ σ(M)`).
+    have hmax : ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
+        IsMaximalElementaryAbelian p A := by
+      intro A hAM hA2
+      by_contra hAns
+      have hAU := OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_mem_e2_not_maximal hG hA2 hAns
+      obtain ⟨PG, hAPG⟩ := hA2.1.isPGroup.exists_le_sylow
+      have hAne : A ≠ ⊥ := by
+        intro hb
+        have h1 : Nat.card ↥A = 1 := by rw [hb]; exact Subgroup.card_bot
+        rw [hA2.2] at h1
+        exact hp.ne_one ((Nat.pow_eq_one.mp h1).resolve_right two_ne_zero)
+      have hPGne : (PG : Subgroup G) ≠ ⊥ := fun hb => hAne (le_bot_iff.mp (hAPG.trans_eq hb))
+      have hNlt : Subgroup.normalizer ((PG : Subgroup G) : Set G) < ⊤ := by
+        rw [lt_top_iff_ne_top]
+        intro htop
+        have hPGnormal : (PG : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp htop
+        rcases hG.simple.eq_bot_or_eq_top_of_normal _ hPGnormal with hbot | htop'
+        · exact hPGne hbot
+        · have hsolv : IsSolvable ↥(PG : Subgroup G) := by
+            haveI := (PG.isPGroup').isNilpotent; infer_instance
+          rw [htop'] at hsolv
+          haveI := hsolv
+          exact hG.notSolvable (solvable_of_surjective
+            (f := (Subgroup.topEquiv (G := G)).toMonoidHom) (Subgroup.topEquiv (G := G)).surjective)
+      have hAN : A ≤ Subgroup.normalizer ((PG : Subgroup G) : Set G) :=
+        hAPG.trans Subgroup.le_normalizer
+      obtain ⟨K, hKco, hNK⟩ :=
+        (eq_top_or_exists_le_coatom (Subgroup.normalizer ((PG : Subgroup G) : Set G))).resolve_left
+          hNlt.ne
+      have hNM : Subgroup.normalizer ((PG : Subgroup G) : Set G) ≤ M := by
+        have hKeqM : K = M :=
+          (hAU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hKco (hAN.trans hNK)).trans
+            (hAU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le (mem_maximalSubgroups.mp hM) hAM).symm
+        exact hKeqM ▸ hNK
+      have hPGM : (PG : Subgroup G) ≤ M := Subgroup.le_normalizer.trans hNM
+      apply hpσ
+      rw [mem_sigma_iff]
+      refine ⟨Nat.mem_primeFactors.mpr ⟨hp, ?_, Nat.card_pos.ne'⟩, ?_⟩
+      · exact dvd_trans (by rw [hA2.2]; exact dvd_pow_self p two_ne_zero)
+          ((Subgroup.card_dvd_of_le hAM))
+      · obtain ⟨Q, hQ⟩ := sylow_subgroupOf_of_le PG hPGM
+        exact ⟨Q, by rw [hQ, Subgroup.map_subgroupOf_eq_of_le hPGM]; exact hNM⟩
+    refine ⟨?_, hmax⟩
+    -- `¬ idealPrime`: `r_p(M) = 2` gives `A ∈ ℰ_p²(M)`, maximal by `hmax` — a non-ideality witness.
+    intro hideal
+    obtain ⟨A0, hA0ea, hA0log⟩ :=
+      exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := ↥M) (p := p) (n := 2)
+        (by norm_num) (le_of_eq hr2.symm)
+    have hA0card : Nat.card ↥A0 = p ^ 2 := by
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hA0ea.isPGroup
+      have hlog : Nat.log p (Nat.card ↥A0) = k := by
+        rw [hk, Nat.log_pow (Fact.out : p.Prime).one_lt]
+      have hle : Nat.log p (Nat.card ↥A0) ≤ pRank ↥M p := le_pRank A0 hA0ea
+      rw [hr2, hlog] at hle
+      rw [hlog] at hA0log
+      rw [hk, le_antisymm hle hA0log]
+    set A : Subgroup G := A0.map M.subtype with hAdef
+    have hAea : A.IsElementaryAbelian p := hA0ea.map M.subtype_injective
+    have hAcard : Nat.card ↥A = p ^ 2 := by
+      rw [hAdef, Subgroup.card_map_of_injective M.subtype_injective]; exact hA0card
+    have hAM : A ≤ M := Subgroup.map_subtype_le _
+    have hAmax : IsMaximalElementaryAbelian p A := hmax A hAM ⟨hAea, hAcard⟩
+    obtain ⟨PG, hAPG⟩ := hAea.isPGroup.exists_le_sylow
+    refine hideal.2 PG ⟨A.subgroupOf PG, ?_, ?_, ?_⟩
+    · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAPG).toEquiv]; exact hAcard
+    · exact IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAPG).symm hAea
+    · intro F hFea hFle
+      have hmapF : F.map (PG : Subgroup G).subtype = A := by
+        refine hAmax.2 _ (hFea.map (PG : Subgroup G).subtype_injective) ?_
+        rw [← Subgroup.map_subgroupOf_eq_of_le hAPG]
+        exact Subgroup.map_mono hFle
+      have hF_eq : F = (F.map (PG : Subgroup G).subtype).subgroupOf (PG : Subgroup G) := by
+        rw [Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective (PG : Subgroup G).subtype_injective]
+      rw [hF_eq, hmapF]
 
 /-! ## Proposition 10.11 — σ(M)'-部分群の rank (mmd L2856) -/
 
@@ -211,7 +313,8 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
   have hsmul_K₀ : ∀ g ∈ P, MulAut.conj g • K₀ = K₀ := by
     intro g hg
     have hconjK : MulAut.conj g • K = K := conj_smul_eq_self_of_mem_normalizer (hPnorm_K hg)
-    have hconjP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
+    have hconjP : MulAut.conj g • P = P :=
+      conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
     rw [hK₀def, conjSmul_eq_map, Subgroup.map_commutator, ← conjSmul_eq_map, ← conjSmul_eq_map,
       hconjK, hconjP]
   have hP_norm_K₀ : P ≤ Subgroup.normalizer (K₀ : Set G) :=
@@ -366,7 +469,8 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
     rw [← hgZ]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hK₀_le_Z
   have hcard : Nat.card ↥(MulAut.conj g • K₀) = Nat.card ↥K₀ := by
     rw [conjSmul_eq_map]
-    exact (Nat.card_congr (Subgroup.equivMapOfInjective K₀ _ (MulAut.conj g).injective).toEquiv).symm
+    exact (Nat.card_congr
+      (Subgroup.equivMapOfInjective K₀ _ (MulAut.conj g).injective).toEquiv).symm
   have h1 : (MulAut.conj g • K₀).subgroupOf Z = K₀.subgroupOf Z := by
     apply cyclic_subgroup_eq_of_card_eq (C := ↥Z)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
@@ -375,19 +479,6 @@ theorem sigma_complement_commutator_cyclic_normal [Finite G] (hG : IsMinimalSimp
   rwa [Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_subgroupOf_eq_of_le hK₀_le_Z] at h2
 
 /-! ## Helpers for Lemma 10.12 -/
-
-/-- A Sylow `p`-subgroup `P` of `G` contained in `K ≤ G` restricts to a Sylow `p`-subgroup of
-`↥K` with carrier `P.subgroupOf K` (replicates the private `S07.sylow_subgroupOf_of_le`). -/
-private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : Sylow p G)
-    {K : Subgroup G} (hPK : (P : Subgroup G) ≤ K) :
-    ∃ Q : Sylow p ↥K, (Q : Subgroup ↥K) = (P : Subgroup G).subgroupOf K := by
-  have hpg : IsPGroup p ↥((P : Subgroup G).subgroupOf K) := by
-    obtain ⟨n, hn⟩ := P.isPGroup'.exists_card_eq
-    exact IsPGroup.of_card
-      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv]; exact hn)
-  have hidx : ¬ p ∣ ((P : Subgroup G).subgroupOf K).index := fun h =>
-    P.not_dvd_index (dvd_trans h (Subgroup.relIndex_dvd_index_of_le hPK))
-  exact ⟨hpg.toSylow hidx, hpg.toSylow_coe hidx⟩
 
 /-- **Core of BG Lemma 10.12** (book p.79): if `p ∈ σ(M) ∩ σ(H)` with `M`, `H` non-conjugate
 maximal subgroups, then `p ∉ α(M)` and `M_σ` is not nilpotent. The argument takes a common
