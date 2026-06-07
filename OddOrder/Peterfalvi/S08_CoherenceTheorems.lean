@@ -9741,6 +9741,82 @@ theorem restrict_extension_Yset_charValue_cong_of_frobenius
   simp only [← hsmul] at hcong2
   exact hcong2
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.1) `a ∣ c`** (mmd 04.8 L176, the `c ≡ 0 (mod a)` half of "`b ≡ c ≡ 0 (mod a)`").  For
+`η ∈ Y` and an `X`-anchor `χ₁ ∈ X(Zc)` of degree `χ₁(1) = a·|W₁|` (`a > 0`, the degree ratio against
+the `Y`-degree `|W₁|`), the multiplicity `c = ⟨Res^G_L(η^{τ₁}), χ₁⟩` is an **integer divisible by
+`a`**.
+
+This is the (6.7) divisibility step.  The value identity
+`restrict_extension_Yset_degree_value_eq_of_frobenius` gives `χ₁(1)·(R(z)−R(1)) = −c·|L|` for
+`z ∈ Zc^#` (`R = Res^G_L(η^{τ₁})`); with `χ₁(1) = a|W₁|` and `|L| = |H|·|W₁|`
+(`index_H_eq_card_W1` + `index_mul_card`) it becomes `a·(R(z)−R(1)) = −c·|H|`, i.e.
+`(R(z)−R(1))/|H| = −c/a`.  The (6.7)-congruence
+`restrict_extension_Yset_charValue_cong_of_frobenius` says `(R(z)−R(1))/|H|` is an algebraic integer;
+so the rational `−c/a` is an algebraic integer, hence an integer (`isIntegral_rat_imp_int`), i.e.
+`a ∣ c`.  (`c ∈ ℤ` because `R ∈ ZIrr L` and `χ₁` is irreducible, `mem_ZIrr_inner_int`.) -/
+theorem dvd_inner_restrict_extension_Yset_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha_pos : 0 < a) (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ∃ cc : ℤ,
+      ClassFunction.inner (ClassFunction.restrict L (hyp.coherentYset.extension η)) χ₁ = (cc : ℂ)
+        ∧ (a : ℤ) ∣ cc := by
+  classical
+  set R := ClassFunction.restrict L (hyp.coherentYset.extension η) with hRdef
+  -- `c := ⟨R, χ₁⟩` is an integer (`R ∈ ZIrr L`, `χ₁` irreducible).
+  have hηtZ : hyp.coherentYset.extension η ∈ ZIrr G :=
+    hyp.coherentYset.extension_mem_ZIrr η (Submodule.subset_span hη)
+  have hRZ : R ∈ ZIrr (↥L) := OddOrder.RepresentationTheory.ClassFunction.restrict_mem_ZIrr L hηtZ
+  have hχ₁irr : IsIrreducibleCharacter χ₁ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
+  obtain ⟨cc, hcc⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int
+    (⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L) hRZ
+  rw [show ((⟨χ₁, hχ₁irr⟩ : IrreducibleCharacter ↥L) : ClassFunction ↥L ℂ) = χ₁ from rfl] at hcc
+  refine ⟨cc, hcc, ?_⟩
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hane : (a : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr ha_pos.ne'
+  have hHne : (Nat.card ↥H : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  -- pick `z ∈ Zc^#`.
+  obtain ⟨⟨z, hz⟩, hzne⟩ :=
+    Subgroup.ne_bot_iff_exists_ne_one.mp (hyp.centralCommutator_ne_bot hHnonab)
+  have hz1 : z ≠ 1 := fun h => hzne (Subtype.ext h)
+  -- value identity: `χ₁(1)·(R z − R 1) = −c·|L|`, with `χ₁(1) = a|W₁|`, `c = cc`, `|L| = |H||W₁|`.
+  have hval := hyp.restrict_extension_Yset_degree_value_eq_of_frobenius
+    hF hHnonab hp hp3 hHp hη hχ₁ hz hz1
+  rw [← hRdef, hcc, ha] at hval
+  have hLcard : (Nat.card ↥L : ℂ) = (Nat.card ↥H : ℂ) * (Nat.card hyp.W1 : ℂ) := by
+    have h := Subgroup.index_mul_card H
+    rw [hyp.index_H_eq_card_W1] at h
+    have hc : ((Nat.card hyp.W1 * Nat.card ↥H : ℕ) : ℂ) = (Nat.card ↥L : ℂ) := by rw [h]
+    push_cast at hc; linear_combination -hc
+  rw [hLcard] at hval
+  -- cancel `|W₁|`: `a·(R z − R 1) = −c·|H|`.
+  have haD : (a : ℂ) * (R z - R 1) = -(cc : ℂ) * (Nat.card ↥H : ℂ) := by
+    apply mul_left_cancel₀ hW1ne
+    linear_combination hval
+  -- the (6.7)-congruence: `(R z − R 1)/|H|` is an algebraic integer.
+  have hcong := hyp.restrict_extension_Yset_charValue_cong_of_frobenius
+    hF hHnonab hp hp3 hHp hη hz hz1
+  rw [← hRdef, OddOrder.AlgInt.cong_def, Int.cast_natCast] at hcong
+  -- `c/a = −((R z − R 1)/|H|)`, so `c/a` is an algebraic integer.
+  have hccdiv : (cc : ℂ) / (a : ℂ) = -((R z - R 1) / (Nat.card ↥H : ℂ)) := by
+    rw [← neg_div, div_eq_div_iff hane hHne]
+    linear_combination haD
+  have hintc : IsIntegral ℤ ((cc : ℂ) / (a : ℂ)) := by rw [hccdiv]; exact hcong.neg
+  -- a rational algebraic integer is an integer ⟹ `a ∣ c`.
+  have hqcast : (((cc : ℚ) / (a : ℚ) : ℚ) : ℂ) = (cc : ℂ) / (a : ℂ) := by push_cast; ring
+  obtain ⟨n, hn⟩ := OddOrder.RepresentationTheory.isIntegral_rat_imp_int
+    (q := (cc : ℚ) / (a : ℚ)) (by rw [hqcast]; exact hintc)
+  rw [hqcast, div_eq_iff hane] at hn
+  refine ⟨n, ?_⟩
+  have : (cc : ℂ) = ((a : ℤ) * n : ℤ) := by rw [hn]; push_cast; ring
+  exact_mod_cast this
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
