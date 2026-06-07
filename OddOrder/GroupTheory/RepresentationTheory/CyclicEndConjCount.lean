@@ -154,4 +154,68 @@ theorem sum_mult_add_eq {h : ℕ} [NeZero h] (n : ZMod h → ℤ)
     _ = ∑ _i : ZMod h, h := Finset.sum_congr rfl fun i _ => hcompl i
     _ = h ^ 2 := by rw [Finset.sum_const, Finset.card_univ, ZMod.card, smul_eq_mul]; ring
 
+/-- **Exactly one outlier index** (BG Prop 2.4(j), steps P4–P5): under the shift hypothesis, `n` is
+constant (`= v₀`) off a single index `i₁`. The most frequent value has multiplicity exactly `h − 1`
+(from `∑ mult = h² − 2h + 2`, `max mult ≥ h−1`, and `≠ h` since `n` is non-constant). -/
+theorem exists_outlier {h : ℕ} [NeZero h] (hh : 2 ≤ h) (n : ZMod h → ℤ)
+    (H : ∀ m : ZMod h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    ∃ (i₁ : ZMod h) (v₀ : ℤ), (∀ i, i ≠ i₁ → n i = v₀) ∧ n i₁ ≠ v₀ := by
+  classical
+  haveI : Fact (1 < h) := ⟨by omega⟩
+  have hcu : (univ : Finset (ZMod h)).card = h := by rw [Finset.card_univ, ZMod.card]
+  obtain ⟨i₀, -, hi₀⟩ :=
+    Finset.exists_max_image (univ : Finset (ZMod h))
+      (fun i => (univ.filter (fun j => n j = n i)).card) ⟨0, mem_univ 0⟩
+  set C := (univ.filter (fun j => n j = n i₀)).card with hC
+  -- ∑ mult ≤ h * C
+  have hbound : (∑ i, (univ.filter (fun j => n j = n i)).card) ≤ h * C :=
+    calc (∑ i, (univ.filter (fun j => n j = n i)).card)
+        ≤ ∑ _i : ZMod h, C := Finset.sum_le_sum fun i _ => hi₀ i (mem_univ i)
+      _ = h * C := by rw [Finset.sum_const, hcu, smul_eq_mul]
+  have hP3 := sum_mult_add_eq n H
+  have hle : C ≤ h := hC ▸ le_trans (Finset.card_filter_le _ _) (le_of_eq hcu)
+  -- `C ≠ h`: otherwise `n` is constant, contradicting the shift hypothesis.
+  have hcne : C ≠ h := by
+    intro hc
+    have huniv : univ.filter (fun j => n j = n i₀) = univ :=
+      Finset.eq_univ_of_card _ (by rw [← hC, hc, ZMod.card])
+    have hconst : ∀ j, n j = n i₀ := fun j => by
+      have hj : j ∈ univ.filter (fun j => n j = n i₀) := by rw [huniv]; exact mem_univ j
+      simpa using hj
+    have := H 1 one_ne_zero
+    rw [Finset.sum_eq_zero fun i _ => by rw [hconst i, hconst (i + 1)]; ring] at this
+    exact two_ne_zero this.symm
+  -- `C ≥ h − 1` from the multiplicity bound (worked in ℤ).
+  have hge : h - 1 ≤ C := by
+    by_contra hlt
+    rw [not_le] at hlt
+    have hC2 : (C : ℤ) + 2 ≤ (h : ℤ) := by
+      have : C + 2 ≤ h := by omega
+      exact_mod_cast this
+    have h1 : (1 : ℕ) ≤ h := by omega
+    have hbz : (∑ i, ((univ.filter (fun j => n j = n i)).card : ℤ)) ≤ (h : ℤ) * C := by
+      exact_mod_cast hbound
+    have hpz : (∑ i, ((univ.filter (fun j => n j = n i)).card : ℤ)) + 2 * ((h : ℤ) - 1)
+        = (h : ℤ) ^ 2 := by
+      have hh3 := hP3; zify [h1] at hh3; linarith [hh3]
+    have hmul : (h : ℤ) * C ≤ (h : ℤ) * ((h : ℤ) - 2) :=
+      mul_le_mul_of_nonneg_left (by linarith) (by positivity)
+    nlinarith [hbz, hpz, hmul]
+  have hCeq : C = h - 1 := by omega
+  -- complement has exactly one element
+  have hcompl : (univ.filter (fun j => n j ≠ n i₀)).card = 1 := by
+    have hadd := Finset.card_filter_add_card_filter_not (s := (univ : Finset (ZMod h)))
+      (fun j => n j = n i₀)
+    simp only [ne_eq] at hadd ⊢
+    rw [hcu, ← hC] at hadd
+    omega
+  obtain ⟨i₁, hi₁⟩ := Finset.card_eq_one.mp hcompl
+  refine ⟨i₁, n i₀, fun i hi => ?_, ?_⟩
+  · by_contra hni
+    have : i ∈ univ.filter (fun j => n j ≠ n i₀) := by simp [hni]
+    rw [hi₁, mem_singleton] at this
+    exact hi this
+  · have : i₁ ∈ univ.filter (fun j => n j ≠ n i₀) := by rw [hi₁]; exact mem_singleton_self i₁
+    simpa using this
+
 end OddOrder.RepresentationTheory
