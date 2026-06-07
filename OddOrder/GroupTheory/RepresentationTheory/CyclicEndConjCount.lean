@@ -108,4 +108,27 @@ theorem card_filter_ne_shift_eq_two {h : ℕ} [NeZero h] (n : ZMod h → ℤ) {m
       · rw [hb]; norm_num
   rw [hfilter, Finset.card_pair hab]
 
+/-- **Total number of "moved" ordered pairs is `2(h−1)`** (BG Prop 2.4(j), step P2): summing the
+per-shift count over the `h−1` nonzero shifts. -/
+theorem sum_ne_pairs_eq {h : ℕ} [NeZero h] (n : ZMod h → ℤ)
+    (H : ∀ m : ZMod h, m ≠ 0 → ∑ i, (n i - n (i + m)) ^ 2 = 2) :
+    ∑ i, ∑ j, (if n i ≠ n j then (1 : ℕ) else 0) = 2 * (h - 1) := by
+  classical
+  have step1 : (∑ i, ∑ j, (if n i ≠ n j then (1 : ℕ) else 0))
+      = ∑ i, ∑ m, (if n i ≠ n (i + m) then (1 : ℕ) else 0) :=
+    Finset.sum_congr rfl fun i _ =>
+      (Fintype.sum_equiv (Equiv.addLeft i) _ _ fun _ => rfl).symm
+  rw [step1, Finset.sum_comm]
+  have step2 : ∀ m : ZMod h, (∑ i, (if n i ≠ n (i + m) then (1 : ℕ) else 0))
+      = if m = 0 then 0 else 2 := by
+    intro m
+    by_cases hm : m = 0
+    · subst hm; simp
+    · rw [if_neg hm, Finset.sum_boole]
+      exact_mod_cast card_filter_ne_shift_eq_two n (H m hm)
+  rw [Finset.sum_congr rfl fun m _ => step2 m, Finset.sum_ite, Finset.sum_const_zero, zero_add,
+    Finset.sum_const, smul_eq_mul, Finset.filter_ne', Finset.card_erase_of_mem (Finset.mem_univ 0),
+    Finset.card_univ, ZMod.card]
+  ring
+
 end OddOrder.RepresentationTheory
