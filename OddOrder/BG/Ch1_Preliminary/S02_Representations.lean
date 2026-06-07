@@ -20,6 +20,7 @@ import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.RepresentationTheory.EigenspaceUnderCyclicAction
 import OddOrder.GroupTheory.RepresentationTheory.PGroupFixedVector
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch05_Transfer.Main
 
@@ -159,6 +160,8 @@ Frobenius Actions であって Clifford 章ではない). したがって本節�
 namespace OddOrder.BG.Ch1.S02
 
 open scoped Pointwise
+open OddOrder.RepresentationTheory (baseChangeRepresentation baseChangeRepresentation_apply_tmul
+  baseChangeRepresentation_faithful)
 
 /-! ## §2A: Schur + Absolute Irreducibility (Prop 2.1, mmd L598-612)
 
@@ -4147,59 +4150,6 @@ private theorem
     hind P
 
 /-! ### Base change toward the algebraically closed reduction -/
-
-/-- Scalar extension of a representation along a field extension.
-
-This is the concrete base-change object needed to run the algebraically closed
-q≠p reduction on `K ⊗[F] V` and then descend the group-theoretic conclusion
-back to the original representation. -/
-noncomputable def baseChangeRepresentation
-    {F : Type*} [Field F] {G : Type*} [Group G]
-    {V : Type*} [AddCommGroup V] [Module F V]
-    (K : Type*) [Field K] [Algebra F K]
-    (ρ : Representation F G V) :
-    Representation K G (TensorProduct F K V) where
-  toFun g := TensorProduct.AlgebraTensorModule.map (R := F) (A := K)
-    (M := K) (N := V) (P := K) (Q := V)
-    (LinearMap.id : K →ₗ[K] K) (ρ g)
-  map_one' := by
-    apply TensorProduct.AlgebraTensorModule.ext
-    intro a v
-    simp
-  map_mul' g h := by
-    apply TensorProduct.AlgebraTensorModule.ext
-    intro a v
-    simp [map_mul]
-
-/-- `baseChangeRepresentation` の単純テンソル上の作用: `a ⊗ₜ v ↦ a ⊗ₜ ρ g v`. -/
-@[simp]
-theorem baseChangeRepresentation_apply_tmul
-    {F : Type*} [Field F] {G : Type*} [Group G]
-    {V : Type*} [AddCommGroup V] [Module F V]
-    (K : Type*) [Field K] [Algebra F K]
-    (ρ : Representation F G V) (g : G) (a : K) (v : V) :
-    baseChangeRepresentation K ρ g (a ⊗ₜ[F] v) = a ⊗ₜ[F] ρ g v := by
-  simp [baseChangeRepresentation]
-
-/-- Faithfulness survives scalar extension along a faithfully flat field
-extension.
-
-For the eventual algebraic-closure route, `K` will be `AlgebraicClosure F`.
-The proof uses the canonical injection `V → K ⊗[F] V`; no representation
-theorem is merely being renamed here. -/
-theorem baseChangeRepresentation_faithful
-    {F : Type*} [Field F] {G : Type*} [Group G]
-    {V : Type*} [AddCommGroup V] [Module F V]
-    (K : Type*) [Field K] [Algebra F K] [Module.FaithfullyFlat F K]
-    (ρ : Representation F G V) (hfaithful : Function.Injective ρ) :
-    Function.Injective (baseChangeRepresentation K ρ) := by
-  intro g h hgh
-  apply hfaithful
-  ext v
-  apply Module.FaithfullyFlat.tensorProduct_mk_injective (A := F) (B := K) V
-  have hmap := congrArg
-    (fun f : TensorProduct F K V →ₗ[K] TensorProduct F K V => f (1 ⊗ₜ[F] v)) hgh
-  simpa [baseChangeRepresentation] using hmap
 
 /-- Scalar extension preserves the determinant kernel.
 

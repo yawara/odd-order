@@ -1450,7 +1450,7 @@ private noncomputable def mulAutToEnd
   map_one' := by ext x; rfl
   map_mul' φ ψ := by ext x; rfl
 
-open OddOrder.GroupTheory OddOrder.BG.Ch1.S02 in
+open OddOrder.GroupTheory OddOrder.BG.Ch1.S02 OddOrder.RepresentationTheory in
 open scoped commutatorElement IsMulCommutative in
 /-- **PSTAB — per-chief-factor p-stability** (= Gorenstein 6.5.3 steps 1-3, A.4(c)):
 `M` 有限可解奇数位数, `p` odd, `K ◁ M` を `p`-群, `A ≤ M` を `p`-部分群で `[K,A,A]=1`.
