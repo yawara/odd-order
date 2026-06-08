@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi §5: TI-Subsets with Cyclic Normalizers
@@ -46,6 +47,11 @@ structure TICyclicHypothesis (G : Type*) [Group G] [Fintype G] where
   W_disjoint : Disjoint W1 W2
   W_card_coprime : Nat.Coprime (Nat.card W1) (Nat.card W2)
   W_card_odd : Odd (Nat.card W)
+  /-- (3.1): `W = W₁ × W₂` is cyclic.  Cyclicity is part of Peterfalvi's Hypothesis (3.1)
+  ("`W` is cyclic of odd order"); it makes `W` abelian, so `Irr(W)` consists of linear
+  characters (used to build the `ω_{ij}` family in (3.3)).  It also forces `W₁` and `W₂`
+  to be cyclic and `W = W₁ × W₂` to be an internal direct product. -/
+  W_cyclic : IsCyclic W
   V : Set G
   V_subset_sharp : V ⊆ OddOrder.Peterfalvi.S04.sharp (Set.univ : Set G)
   V_subset_W : V ⊆ W
@@ -174,6 +180,66 @@ theorem full_maps_virtualCharacter {hyp : TICyclicHypothesis G}
     (hα : (α : ClassFunction hyp.W ℂ) ∈ ZIrr hyp.W) :
     app.tau.toDadeMap α ∈ ZIrr G :=
   app.tau.maps_virtualCharacter α hα
+
+end TICyclicHypothesis
+
+namespace TICyclicHypothesis
+
+/- 3.3: The linear-character family `ω` of the cyclic group `W` (pp. 16-17) -/
+
+/-- **Peterfalvi (3.1)/(3.3)**: `W` is commutative.  It is cyclic by `W_cyclic`, and a cyclic
+group is abelian (`commutative_of_cyclic_center_quotient` applied to the identity map).  This is
+what makes every irreducible character of `W` linear, so that the `ω_{ij}` of (3.3) exhaust
+`Irr(W)` (`omegaEquiv`). -/
+theorem isMulCommutative_W (hyp : TICyclicHypothesis G) : IsMulCommutative hyp.W :=
+  haveI := hyp.W_cyclic
+  ⟨⟨fun a b =>
+    commutative_of_cyclic_center_quotient (MonoidHom.id hyp.W)
+      (by
+        intro x hx
+        rw [MonoidHom.mem_ker, MonoidHom.id_apply] at hx
+        rw [hx]
+        exact Subgroup.one_mem _) a b⟩⟩
+
+/-- **Peterfalvi (3.3)**: the irreducible character `ω(χ)` of `W` attached to a linear character
+`χ : W →* ℂˣ`.  Since `W` is abelian, every irreducible character of `W` is of this form
+(`omega_surjective`) and distinct linear characters give distinct irreducible characters
+(`omega_injective`); the two facts are packaged as the bijection `omegaEquiv`.  In Peterfalvi's
+notation these are the `ω_{ij}` (`0 ≤ i < w₁`, `0 ≤ j < w₂`). -/
+noncomputable def omega (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    IrreducibleCharacter hyp.W :=
+  linearIrreducibleCharacter χ
+
+@[simp] theorem omega_apply (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) (w : hyp.W) :
+    ((hyp.omega χ : ClassFunction hyp.W ℂ)) w = (χ w : ℂ) :=
+  linearClassFunction_apply χ w
+
+/-- (3.3): each `ω(χ)` has degree one. -/
+@[simp] theorem omega_apply_one (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    ((hyp.omega χ : ClassFunction hyp.W ℂ)) 1 = 1 := by
+  rw [omega_apply, map_one, Units.val_one]
+
+theorem omega_injective (hyp : TICyclicHypothesis G) :
+    Function.Injective hyp.omega :=
+  linearIrreducibleCharacter_injective
+
+theorem omega_surjective (hyp : TICyclicHypothesis G) :
+    Function.Surjective hyp.omega := by
+  haveI := hyp.isMulCommutative_W
+  intro χ
+  obtain ⟨h, hh⟩ := χ.2.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  exact ⟨h, Subtype.ext hh⟩
+
+/-- **Peterfalvi (3.3)**: `Irr(W) = {ω_{ij}}`, packaged as the bijection `Hom(W, ℂˣ) ≃ Irr(W)`.
+Every irreducible character of the cyclic group `W` is the linear character `ω(χ)` of a unique
+`χ : W →* ℂˣ`. -/
+noncomputable def omegaEquiv (hyp : TICyclicHypothesis G) :
+    (hyp.W →* ℂˣ) ≃ IrreducibleCharacter hyp.W :=
+  Equiv.ofBijective hyp.omega ⟨hyp.omega_injective, hyp.omega_surjective⟩
+
+@[simp] theorem omegaEquiv_apply (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    hyp.omegaEquiv χ = hyp.omega χ :=
+  rfl
 
 end TICyclicHypothesis
 

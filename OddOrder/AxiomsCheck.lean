@@ -44,6 +44,7 @@ import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -3216,3 +3217,11 @@ set_option linter.style.longLine false in
 -- BG App C Lemma C.2: combine the q=3 cubic branch with the q≥5 class-sum
 -- branch to show that the norm set has at least two elements.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC2
+
+-- Peterfalvi (3.1)/(3.3): the linear-character family `ω` of the cyclic group `W = W₁ × W₂`.
+-- `W` is abelian (cyclic), so `χ ↦ ω(χ) = linearIrreducibleCharacter χ` is a bijection
+-- `Hom(W, ℂˣ) ≃ Irr(W)` (`omegaEquiv`); each `ω(χ)` has degree one (`omega_apply_one`).
+-- Foundation for the `ω_{ij}` / `α_{ij}` basis (3.4) and the `σ`-isometry (3.5).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.isMulCommutative_W
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaEquiv
