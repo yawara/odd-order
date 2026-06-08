@@ -533,10 +533,15 @@ commits `d54869a5` + `e1ac4947`):
   が消費する形 (`Nonempty (↥W ≃ₗ[k[↥H]] ↥(W.map (conjSemilinearEnd ρ g)))`), 仮説 = `[IsSimpleModule k[↥H] ↥W]`
   + hf (faithful) + hcl (class≤2) + hgc (g が Z 中心化)。
 
-**▶▶ 残 = 群入力のみ (group-wiring, ExtraspecialThm25Group へ)**:
-1. **hf = constituent faithful (BG 2.10)**: extraspecial P で Z(P) が unique minimal normal ⟹ constituent も faithful
-   (Z(P) が nontrivial に作用)。**未形式化、要群論**。
-2. **hgc = ∀ g∈G, g が Z(P) 中心化**: `C_P(x)=Z(P)` ⟹ x が Z(P) 中心化 + P が Z(P) 中心化 ⟹ G=⟨P,x⟩ 全体。**容易**。
-3. **W 存在**: V_P 非零 f.d. semisimple ⟹ simple 部分加群存在 (mathlib `IsSemisimpleModule`)。**容易**。
-4. **hgen = ⟨P,x⟩=⊤** (= G=P⋊⟨x⟩ setup): materialize 定理の仮説に。
-これらで ∀g hconj → `restriction_isIrreducible` → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) 開放。
+**▶▶ 残 = 群入力のみ (group-wiring)**:
+- ✅✅ **hgc/W存在/hgen/∀g hconj/assembly DONE** (2026-06-08 cont., commit `fed77d1b`, full 3612 green):
+  - `conjNormalMulAut_center_eq_of_closure` (hgc): `C_G(z)` が P と x を含む ⟹ ⟨P,x⟩=⊤ ⟹ ∀g が Z(P) 中心化。
+    仮説 = `hxZ` (x が Z(P) 中心化, = `C_P(x)=Z(P)` の ⊇ 方向) + hgen。
+  - **`restriction_isIrreducible_of_faithful_constituents`** (materialization): ρ 既約/alg-closed/`char∤|H|`,
+    `⟨H,x⟩=⊤`, class≤2, x が Z(H) 中心化, **∀ 非零 simple constituent が faithful (hf)** ⟹ `(resRep ρ H).IsIrreducible`。
+    W 存在 (`exists_simple_submodule`) + ∀g hconj (`conjugate_submodule_iso`) + `restriction_isIrreducible` を組立。
+- **▶▶▶ 残る唯一の入力 = hf = constituent faithful (BG 2.10)**: extraspecial P で Z(P)=unique minimal normal ⟹
+  各 constituent も faithful (Z(P) が nontrivial 作用; 不 faithful なら ker⊇Z(P) で V 全体に Z(P) 自明作用 ⟹ V 非 faithful 矛盾)。
+  **要群論・未形式化**。`IsExtraspecial.lean` の Z(P) 構造 (Z(P)=P'=Φ(P) cyclic order p, unique minimal normal) を要確認。
+  これを discharge すれば materialization → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) → 3.4 → 3.6 → §10.6 全開放。
+  ※ hxZ (x が Z(P) 中心化) も group-level setup (`C_P(x)=Z(P)` 完全等号) から供給要 — 現状 finrank_modEq の hCP は ⊆ 方向のみ。
