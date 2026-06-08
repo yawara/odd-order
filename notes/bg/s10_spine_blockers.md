@@ -59,11 +59,20 @@ order-p 部分群 X,Y≠Z₀ が σ^k で結ばれる) に持ち上げる。infr
   "Function expected" で coerce しない** — letI module 下で `DFunLike (Additive E ≃ₗ[ZMod p] Additive E)`
   の synth が壊れる。PRank は `Additive E` 上で **GL/matrix までしか行かず bare LinearEquiv を coerce
   しない**ので、この層は repo に前例なし。
-**⟹ 推奨アプローチ変更 = concrete transport**: `Additive E` の synonym+letI を避け、E elem ab rank-2 を
-**explicit iso で `Fin 2 → ZMod p` (clean canonical module, diamond 無) に移送**して transvection
-transitivity をそこで証明し、subgroup↔line 対応を transport する。または `mulAutEquivGeneralLinearGroup`
-(GL 経由, WORKING) を起点に GL(2,p) の line 作用で組む。いずれも focused session。**これが済めば
-10.13(c) は Cor 10.7(b) のみ待ち。** (Layer 1/2 の fix は確定なので transport ルートでも再利用可。)
+  - **2026-06-09 精査**: `φ.toEquiv a` (plain `Equiv` coercion, **module 不要**) は **✅ coerce する**;
+    `φ.toLinearMap a` は ✗ stuck (LinearMap FunLike が module 依存)。⟹ 直接適用は `.toEquiv` で回避可だが、
+    **`Submodule.map (φ^k).toLinearMap` / そのメンバー reasoning (`(φ^k).toLinearMap b`) が pervasively
+    stuck** — `.toEquiv` だけでは abstract lemma の結論 (`W.map (φ^k).toLinearMap`) を group 側へ繋げない。
+**⟹ 結論 = module route は `Submodule.map` 層で diamond に詰む。diamond-free な道は 2 つ:**
+  1. **(推奨) group-theoretic 再証明 (C)**: `Additive E`/module を一切触らず、E を multiplicative group の
+     まま `E = Z₀ × ⟨e⟩` 分解 + 指数 (ZMod p) 算術で transvection transitivity を直接証明 (abstract
+     `exists_pow_map_line_eq` の証明を group 言語に翻訳, ~160 行, diamond 無だが fresh effort)。
+     abstract lemma は 𝔽_p 版として残す (orphan 化だが valid)。
+  2. concrete transport: term-level map-commutation 補題 (`Subgroup.toAddSubgroup`/`toZModSubmodule` が
+     map と可換) を組んで element coercion を避ける — 可能だが補題群が要り、これも focused session。
+- **⚠ ROI 注意**: bridge が済んでも **10.13(c) は更に Cor 10.7(b) (= rep-theory keystone, Lane A) 待ち**
+  なので即座には閉じない。bridge は「keystone 着地後に 10.13(c) を即閉じる ingredient」の位置付け。
+  Layer 1/2 の fix は確定 (transport ルートでも再利用可)。
 
 ## 直列スパインは Theorem 10.6 に全面ブロックされている
 
