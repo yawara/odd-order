@@ -37,6 +37,7 @@ import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.AppA_PStability
@@ -3210,3 +3211,8 @@ set_option linter.style.longLine false in
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_center_of_faithful_irreducible
+
+-- BG Theorem 3.4 (algebraically closed core, the keystone consumer of BG Theorem 2.5): a solvable
+-- group `G` of odd order with a normal Hall subgroup `K`, a prime-order complement `R`, acting on
+-- `V/F` with `char F ∤ |G|`, `F` algebraically closed, and `C_V(R) = 0`, gives `[R,K] ⊆ C_K(V)`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34_algClosed
