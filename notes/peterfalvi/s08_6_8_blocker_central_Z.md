@@ -1033,3 +1033,53 @@ isometry from ℤ[Y]/ℤ[X] coinciding with τ on ℤ[·,L^#]_"; the relabel fli
 crux variants; (4) capstone redesign + wiring; (5) case B.  The generic (m,n≥3) spine
 (`coherentXunionYset_centralCommutator_diagonal_of_frobenius` → `nonempty_coherent_S_caseA_of_card`)
 is the template the edge cases mirror.
+
+## 2026-06-08 (session 7): relabel step (1) DONE — sign-swap witness `coherentEqualDegree_swap_neg` (S07, 1 commit, full build 3599, axiom-clean)
+
+The relabel foundation is landed in `S07_Coherence.lean` (right after `coherentEqualDegree`), all three
+`[propext, Classical.choice, Quot.sound]`:
+- ✅ **`coherentEqualDegree_swap_neg`** — given a coherence witness `c` for an orthonormal **equal-degree**
+  pair `{φ₀, φ₁}` (`⟨φ₀,φ₁⟩=0`, `⟨φ₀,φ₀⟩=⟨φ₁,φ₁⟩=1`, `φ₁(1)=φ₀(1)≠0`, `(φ₁−φ₀).support ⊆ A`, `1∉A`),
+  produces `c' : IsCoherent τ {φ₀,φ₁} A` with **`c'.ext φ₀ = −c.ext φ₁`**, **`c'.ext φ₁ = −c.ext φ₀`**.
+  Built via `coherentEqualDegree` with source `![φ₀,φ₁]`, target `![−c.ext φ₁, −c.ext φ₀]`; the swapped
+  images stay orthonormal + ZIrr (signs square), and the supported diff is preserved
+  (`τ(φ₁−φ₀)=c.ext φ₁−c.ext φ₀`) so `extends_on_supported` survives.
+- ✅ helpers: `coherentEqualDegree_extension` (`.extension = coherentImageMap χ X`, `rfl`);
+  `IsCoherent.extension_eqRec` (transport `.extension` across set-equality `▸`, `subst;rfl`).
+- API gotchas (don't re-derive): both live in ambient ns `OddOrder.Peterfalvi.S07` (NOT inside
+  `namespace IntegralCharacterMap`, which closes @ S07:3233) → need **`open IntegralCharacterMap in`** to
+  see `coherentImageMap`/`coherentImageMap_apply_eq`. `inner_neg_left/right` are in **`ClassFunction`** ns.
+  Fin-2 `∀ i j` orthonormality: **`Fin.forall_fin_two.mpr ⟨…⟩`** (NOT `fin_cases`, which leaves indices as
+  `⟨1,⋯⟩` so `Matrix.cons_val_one` won't fire) + `simp only [Matrix.cons_val_zero/one, Fin.isValue,
+  Fin.reduceEq, ↓reduceIte]`.
+
+### 🔴 Remaining for the edge cases (the real work = relabel steps (2)/(3) = crux-spine parameterization)
+**`coherentEqualDegree_swap_neg` alone does NOT close the edge** — the crux spine is hard-coded to the
+FIXED witnesses, so the swapped `cY'`/`cX'` need their OWN crux.  mmd + code re-confirmed this session:
+- **both edges are 2-elt equal-degree-WHOLE-SET swaps**: `Y=S(H′)` is all degree-`|W₁|` ⟹ `m=2` ⟹
+  `Y={η₁,η₂}`; for `n=2`, `X=S−S(Z)` is conj-closed + no real char (|L| odd) ⟹ `|X|` even ⟹ `|X|=2` is a
+  **conjugate pair** `{χ,χ̄}`, EQUAL degree.  So `coherentEqualDegree_swap_neg` applies to BOTH (each is
+  the whole equal-degree set).  ⚠ swap preserves `extends_on_supported` ONLY at equal degree (`d=1`); fine
+  here since both edges are equal-degree pairs.
+- **crux spine is cY/cX-parameterizable (verified by reading `coeff_eq_neg_or_edge_of_frobenius` S08:10187)**:
+  its cY-use is ONLY via generic `IsCoherent` fields (`extension_inner_eq`/`extends_on_supported` ⟹
+  injectivity/orthonormality of `cY.ext` on `Y`) + **witness-INDEPENDENT** τ-lemmas
+  (`inner_tau_scaledDiff_tau_Yset_diff_of_frobenius` = `⟨v,(η−η₁)^τ⟩=a`, `inner_self_tau_scaledDiff` =
+  `‖v‖²=1+a²`; `v=hyp.tau(χ₁−aη₁)` is τ, not cY) + Bessel/arith.  The deepest cY-dep is **step-3 `a∣bb`**
+  (`dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius`, the (6.7)/reg-char `b≡0` argument): applied to
+  `cY.ext η₁` "const on Z^#"; for `cY'`, `cY'.ext η₁ = −cY.ext η₂` is also const on Z^# (same arg), so it
+  generalizes — but the lemma is stated for `coherentYset`, so threading cY through is required.
+- **m=2 mechanics**: step-4 dichotomy gives `⟨v,cY.ext η₁⟩=−a (good) ∨ (m=2 ∧ =0 (bad))`.  In bad,
+  `⟨v,cY.ext η₂⟩=a` (the η-part is `a·cY.ext η₂`), so `cY'.ext η₁=−cY.ext η₂` ⟹ `⟨v,cY'.ext η₁⟩=−a` (good).
+  So: case-split; good→existing `crux_of_third_anchor` (needs n≥3 only, NOT |Y|≥3 — it takes hgood as hyp);
+  bad→re-run with cY'.  **n=2 mechanics**: step-5 dichotomy `X=cX.ext χ₁ ∨ X=−cX.ext χ₂` lacks the 3rd
+  anchor; `cX'.ext χ₁=−cX.ext χ₂` flips it to good.
+- **PLAN for steps (2)/(3)** (the multi-lemma parameterization, ~6-7 lemmas, mechanical-but-large): thread
+  `(cY : IsCoherent τ Yset A) (cX : IsCoherent τ (Xset Zc) A)` through `coeff_eq_neg_or_edge`,
+  `orthogonal_normOne_tau_scaledDiff_add_extension`, `inner_extension_Xset_sub_eq_neg_one`,
+  `extension_eq_or_eq_neg`, `crux_of_third_anchor`, `inner_extension_Xset_centralCommutator_Yset_eq_zero`
+  (himg_ortho), replacing `hyp.coherentYset`/`Xset_centralCommutator_isCoherent` by cY/cX.  Generic case
+  re-plugs the fixed witnesses; edges plug swapped witnesses.  Then a cX/cY-param diagonal capstone
+  (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` S08:9018 hard-codes them) +
+  case-split on `2≤|xBaseBlock|`/`2≤|Y|` into generic (≥3) + edge (=2, swap).  Step-5 isometry value
+  `inner_tau_scaledDiff_tau_Xset_diff` (S08:10427) is already witness-independent — no change.
