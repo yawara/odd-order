@@ -5691,6 +5691,61 @@ theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
     hyp.index_H_eq_card_W1, hχ₁deg]
   ring
 
+open scoped Classical in
+/-- **Degree-ratio integrality against a base-block anchor.**  For `χ ∈ X(Z)` and a minimal-degree
+anchor `χ₁ ∈ xBaseBlock Z`, the degree ratio `χ(1)/χ₁(1)` is a positive natural number:
+`∃ d : ℕ, 0 < d ∧ χ(1) = d·χ₁(1)`.  Both source degrees are powers of `p` (`H` a `p`-group,
+`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`); minimality
+(`natDegree_le_of_xBaseBlock_anchor`) gives `χ₁(1) ≤ χ(1)`, so the smaller `p`-power divides the
+larger and the ratio `p^{k−k₁}` is a positive integer.  This is the `dᵢ ∈ ℤ` datum of the (6.8.1)
+`hgen'` decomposition (the degree side; `zSpan_S_support_subset_of_apply_one_eq_zero` is the support
+side). -/
+theorem exists_charValue_one_eq_mul_xBaseBlock_anchor (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {Z : Subgroup ↥L}
+    {χ χ₁ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) (hχ₁base : χ₁ ∈ hyp.xBaseBlock Z) :
+    ∃ d : ℕ, 0 < d ∧ χ 1 = (d : ℂ) * χ₁ 1 := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  -- sources of `χ` and `χ₁`.
+  have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχX
+  have hχ₁S : χ₁ ∈ hyp.S := hyp.Xset_subset_S (hyp.xBaseBlock_subset Z hχ₁base)
+  rw [hyp.S_eq] at hχS hχ₁S
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨θ₁, -, hχ₁eq⟩ := hχ₁S
+  obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  obtain ⟨a₁, ha₁_pos, ha₁⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ₁
+  -- source degrees are `p`-powers.
+  obtain ⟨k, hk⟩ := θ.2.exists_charValue_one_eq_prime_pow_of_isPGroup hHp
+  obtain ⟨k₁, hk₁⟩ := θ₁.2.exists_charValue_one_eq_prime_pow_of_isPGroup hHp
+  have hak : a = p ^ k := by exact_mod_cast ha.symm.trans hk
+  have ha₁k₁ : a₁ = p ^ k₁ := by exact_mod_cast ha₁.symm.trans hk₁
+  -- `χ(1) = |W₁|·a`, `χ₁(1) = |W₁|·a₁` (nat degrees).
+  have hχ1 : χ 1 = ((Nat.card hyp.W1 * a : ℕ) : ℂ) := by
+    rw [hχeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha,
+      hyp.index_H_eq_card_W1]; push_cast; ring
+  have hχ₁1 : χ₁ 1 = ((Nat.card hyp.W1 * a₁ : ℕ) : ℂ) := by
+    rw [hχ₁eq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha₁,
+      hyp.index_H_eq_card_W1]; push_cast; ring
+  -- minimality of `χ₁`: `|W₁|·a₁ ≤ |W₁|·a`, hence `a₁ ≤ a`, hence `k₁ ≤ k`.
+  have hirr : IsIrreducibleCharacter χ := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hirr₁ : IsIrreducibleCharacter χ₁ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF (hyp.xBaseBlock_subset Z hχ₁base)
+  have hle : Nat.card hyp.W1 * a₁ ≤ Nat.card hyp.W1 * a :=
+    hyp.natDegree_le_of_xBaseBlock_anchor (χ₁ := ⟨χ₁, hirr₁⟩) (χ := ⟨χ, hirr⟩) hχ₁base hχX hχ₁1 hχ1
+  have hW1pos : 0 < Nat.card hyp.W1 := Nat.card_pos
+  have ha₁a : a₁ ≤ a := Nat.le_of_mul_le_mul_left hle hW1pos
+  have hkk₁ : k₁ ≤ k := by
+    rw [hak, ha₁k₁] at ha₁a; exact (Nat.pow_le_pow_iff_right hp.one_lt).mp ha₁a
+  -- the ratio is `p^{k−k₁}`.
+  refine ⟨p ^ (k - k₁), pow_pos hp.pos _, ?_⟩
+  have hap : a = p ^ (k - k₁) * a₁ := by rw [hak, ha₁k₁, ← pow_add]; congr 1; omega
+  rw [hχ1, hχ₁1]
+  have : Nat.card hyp.W1 * a = p ^ (k - k₁) * (Nat.card hyp.W1 * a₁) := by rw [hap]; ring
+  rw [this]; push_cast; ring
+
 /-- **(6.2) member-family core for `S₁ ⊆ S`** (Frobenius case): the flat enumeration of `S₁` with
 its per-member orthonormality, non-realness, conjugate-difference support, and `S₁`-membership
 facts.
