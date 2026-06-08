@@ -1150,3 +1150,46 @@ isometry/relation lemmas with `d₃`), then E2/E3 (relabel selections, consume
 `coherentEqualDegree_swap_neg`), then E4 + wiring.  ALL feed the landed
 `coherentXunionYset_centralCommutator_diagonal_general`.  **Don't re-grind the spine
 parameterization or the swap witness — landed + axiom-clean.**
+
+## 2026-06-08 (session 7 cont.²): edge logic E1–E4 COMPLETE — (6.8) Frobenius case (A) UNCONDITIONAL (4 more commits, full AxiomsCheck 3557 green, all axiom-clean)
+
+The entire edge-case relabel programme is landed; **`nonempty_coherent_S_caseA_of_frobenius` proves
+`S` coherent in the Frobenius / case-(A) branch with NO `3 ≤` cardinality hypotheses** (the `m = 2`
+/ `n = 2` edge relabels are handled internally).  Commits on `b-peterfalvi`, each axiom-clean
+`[propext, Classical.choice, Quot.sound]`:
+
+- ✅ **E1** `143ce5b7` — degree-ratio crux closing the `|xBaseBlock| = 2 ∧ |X(Zc)| ≥ 3` gap:
+  `inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius` (`⟨(χ₁−aη₁)^τ,(χ₃−d·χ₁)^τ⟩ = −d`) +
+  `inner_extension_Xset_scaledSub_eq_neg_general` (relation) + `crux_general_of_higher_anchor`
+  (good case + dichotomy + degree-ratio exclusion of the right disjunct by ANY third member χ₃:
+  `X = −cX χ₂ ⟹ 0 = −d`, impossible since `d > 0`).  Covers `|X(Zc)| ≥ 3` uniformly.
+- ✅ **E2** `bed633a0` — `exists_Ycoherence_hgood_of_frobenius`: `∃ cY, ⟨(χ₁−aη₁)^τ, cY η₁⟩ = −a`
+  (good `cY`).  `|Y| ≥ 3` → coherentYset; `|Y| = 2` bad → `cY'` = `coherentEqualDegree_swap_neg`
+  (η₁ ↦ −η₂^{τ₁}), hgood via `⟨v, cY η₂⟩ = ⟨v, cY η₁⟩ + a = a`.
+- ✅ **E3** `36c184c4` — `exists_Xcoherence_crux_of_card_two_of_frobenius`: when `X(Zc) = {χ₁,χ₂}`,
+  `∃ cX,` crux.  Dichotomy left → `cX = cX₀`; right (`X = −cX₀ χ₂`) → `cX'` = swap (valid since
+  `|X| = 2` whole set), `cX' χ₁ = −cX₀ χ₂ = X`.
+- ✅✅ **E4** `fd10b360` — `nonempty_coherent_S_caseA_of_frobenius` (UNCONDITIONAL).  `2≤|xBaseBlock|`
+  (`two_le_xBaseBlock_ncard`) + `2≤|Y|` (`two_le_Yset_ncard`) → 2 base-block anchors + a + η₁ + hdeg2;
+  E2 → (cY, hgood); `by_cases 3≤|X(Zc)|` → E1 (third anchor) ‖ E3 (`|X|=2`); crux →
+  `coherentXunionYset_centralCommutator_diagonal_general` (X(Zc)∪Y coherent) → L4
+  `false_of_coherentXunionYset_of_not_coherentS` → `S` coherent.  ⚠ Type-data from the E2/E3
+  existentials extracted via **`.choose`** (`Exists` over `IsCoherent` cannot eliminate into the
+  Type-valued assembly — `obtain` fails with `Exists.casesOn can only eliminate into Prop`).
+
+**⟹ (6.8) case (A) is fully discharged, sorry-free + axiom-clean.**
+
+### 🔴 Remaining for the full (6.8) capstone `sibleySetup_is_coherent` (S08 sole sorry)
+1. **CertainType case (B)** (mmd (6.8.2): `Z = W₂`, (6.8.2.1) `η^{τ₁}` const on `Z^#` /
+   (6.8.2.2) `Ind_Z φ` decomposition / (6.8.2.3) per-χ `X₁ − aY`) — **UNPLANNED**, separate deep
+   character theory (the `w₂`-prime / `(4.6)` machinery).  This is the sole remaining blocker.
+2. **final wiring** into `sibleySetup_is_coherent` (currently the OLD `by_cases Xset ⁅H,H⁆ = ∅`
+   design): restructure to `hyp.cases` (A)/(B); case A = `nonempty_coherent_S_caseA_of_frobenius
+   |>.some` (DONE), case B from (1).  Deferred until (1) is ready (else it commits a case-B sorry).
+   Also derive `hHnonab` (X-nonempty ⟹ H non-abelian) + p-group data (hp/hp3/hHp from (6.5)) at the
+   wiring site.
+
+**Recommended next phase:** CertainType case (B) — a fresh multi-session piece (plan from scratch,
+mmd (6.8.2)).  Case (A) is the template (Z central, glue via diagonal shell), but (B) uses `Z = W₂`
+and the `w₂`-prime structure.  Then the trivial final wiring.  **Don't re-grind case A / the edge
+relabels — landed + axiom-clean.**
