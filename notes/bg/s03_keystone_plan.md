@@ -422,3 +422,38 @@ centralizer-dimension 補題が **不要**になった。
   hconj (`W≅W^g`) は Gor 5.5.4 待ち (別 sub-piece, 未着手 — hVP の最終仮説)。
 - **wire-E 残工数見積**: θ packaging (~60-100) + IsSimpleRing E (~30, module-Schur 利用) + bridge (~25) + assembly (~30)
   ≈ 1 セッション。SN core/wrapper/module-Schur (本セッション 3 commit) で **材料は出揃った**; 残は asModule 越しの組立。
+
+### ✅✅ wire-E 進捗 (2026-06-08 続き, `a-keystone`): θ + hfix LANDED, 残 = IsSimpleRing E + assembly
+
+`CliffordMultiplicityOne.lean` (新規, sorry-free + axiom-clean, full build 3611, OddOrder root 配線済,
+commits `d54869a5` + `e1ac4947`):
+- **✅ θ = `cliffordConj ρ x : End_{k[H]}V ≃ₐ[k] End_{k[H]}V`** (conjugation by ρx)。`cliffordConjMap`
+  (toFun=`conjSL(x)∘f∘conjSL(x⁻¹)`, map_smul' は conjSL の semilinear smul × 3 + `σ_x∘σ_{x⁻¹}=id`)、
+  helpers `conjNormalMulAut_conjNormalMulAut_inv`/`conjMonoidAlgRingHom_conj_inv`/`conjSemilinearEnd_conj_inv`/
+  `_inv_conj`/`_one_apply`/`_mul_apply`/`conjMonoidAlgRingHom_algebraMap`/`conjSemilinearEnd_smul_k`、
+  `cliffordConjMap_one`/`_mul`/`_smul`/`_apply`、AlgEquiv packaging (commutes' = `cliffordConjMap_smul`+`_one`)。
+- **✅ hfix = `cliffordConj_fixed_imp_scalar`** (`[ρ.IsIrreducible][IsAlgClosed k][Module.Finite k V][Nontrivial V]`,
+  `hgen : Subgroup.closure (↑H ∪ {x}) = ⊤`): θ-固定 f は scalar。証明 = `commute_conjSemilinearEnd_of_cliffordConj_fixed`
+  (`Subgroup.closure_induction` で f が全 ρg と可換: H 上は k[H]-linearity, x 上は hf) → f の固有値 c (V 上で
+  `Module.End.exists_eigenvalue (f.restrictScalars k)`) → `ker(fk−c•1)` が ρ(G)-不変 `Subrepresentation` ⟹
+  既約で ⊤ ⟹ `f=c•id`。**全部 V 上で実行** (asModule の Module-k 検索回避)。
+- **▶ 残 = (1) `IsSimpleRing E` + (2) finrank=1⟹V_H simple bridge + (3) assembly** (= 最終 `restriction_isSimpleModule`,
+  group-level Thm 2.5 が消費)。
+- **⚠⚠ KEY BLOCKER (次セッション最初に解く)**: **`Module k (resRep ρ H).asModule` が bare `inferInstance` で
+  見つからない** (deriving 由来; type-ascription `(... : Module.End k …)` や `restrictScalars`/`asModuleEquiv`
+  経由なら解決するが、`Module.End.exists_eigenvalue` / Maschke `IsSemisimpleModule k[↥H] asModule` /
+  `linearEquiv_fun` の `Module.Finite k[↥H] asModule` は bare 検索 ⟹ 全部失敗)。smul 自体は V と **defeq**
+  (確認済 `rfl`)。**回避策候補**: (a) section/proof 冒頭で derived instance を名前指定 `attribute [local instance]`
+  (deriving 生成名を要特定) ‖ (b) `letI` で V 由来を consistent に注入 (Module.Finite と diamond 注意, smul defeq
+  なので可能性あり) ‖ (c) IsSimpleRing E を `asModuleEquiv` で V の End へ全 transport してから組む。
+  hfix では (V 上実行 + `f.restrictScalars k` ascription) でこの罠を回避できた — 同手法を IsSimpleRing E にも。
+- **IsSimpleRing E の math**: V W-isotypic + Maschke ⟹ `V≅Fin m→W` (`linearEquiv_fun`) ⟹
+  `E≅ₐ Matrix m m (End_{k[H]}W)` (`endVecAlgEquivMatrixEnd`+`e.conjAlgEquiv`), `End_{k[H]}W≅k`
+  (module-Schur `algebraMap_end_bijective_of_isSimpleModule`), `Matrix.isSimpleRing` (m≥1) → transport
+  (`IsSimpleRing.of_ringEquiv`)。**前提 instance (要 derive, 上記 blocker)**: `IsSemisimpleModule k[↥H] asModule`
+  (Maschke, `[Finite ↥H][NeZero (Nat.card ↥H:k)]`), `Module.Finite k[↥H] asModule`。
+- **bridge math**: `finrank E=1` ⟹ E=scalar。W の補元 (Maschke) の射影 p∈E は idempotent, scalar (c•id),
+  c∈{0,1}, range p=W, W≠⊥ ⟹ W=⊤ ⟹ `IsSimpleModule k[↥H] asModule`。
+- **assembly**: `restriction_isSimpleModule` — isotypic (`isIsotypicOfType_of_conjugates`) + IsSimpleRing E +
+  `finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x) (cliffordConj_fixed_imp_scalar …)` ⟹ finrank E=1 ⟹ bridge
+  ⟹ `IsSimpleModule k[↥H] (resRep ρ H).asModule` = `Representation.IsIrreducible (resRep ρ H)` (= hVP, group-level Thm2.5 消費)。
