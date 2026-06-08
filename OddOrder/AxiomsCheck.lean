@@ -37,6 +37,7 @@ import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.AppA_PStability
@@ -3324,3 +3325,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induce_apply_eq_self_of_mem_V
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.isDadeMap_inducedDadeMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.tau_eq_induce
+
+-- BG Theorem 3.4 (algebraically closed core, the keystone consumer of BG Theorem 2.5): a solvable
+-- group `G` of odd order with a normal Hall subgroup `K`, a prime-order complement `R`, acting on
+-- `V/F` with `char F ∤ |G|`, `F` algebraically closed, and `C_V(R) = 0`, gives `[R,K] ⊆ C_K(V)`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34_algClosed
