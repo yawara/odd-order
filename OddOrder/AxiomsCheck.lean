@@ -3225,3 +3225,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.isMulCommutative_W
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaEquiv
+
+-- Peterfalvi (3.1)/(3.3): `W = W₁ × W₂` as an internal direct product — the multiplication map
+-- `↥W₁ × ↥W₂ ≃* ↥W` (W abelian, W₁ ⊓ W₂ = ⊥, W₁ ⊔ W₂ = ⊤), used to split `ω_{ij} = ω_{i0}·ω_{0j}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wProdEquiv

@@ -241,6 +241,65 @@ noncomputable def omegaEquiv (hyp : TICyclicHypothesis G) :
     hyp.omegaEquiv χ = hyp.omega χ :=
   rfl
 
+/- 3.3 (cont.): `W = W₁ × W₂` as an internal direct product, used to split `ω_{ij} = ω_{i0}·ω_{0j}` -/
+
+/-- `W₁` and `W₂`, viewed inside `↥W`, intersect trivially (from `W_disjoint`). -/
+theorem W1_subgroupOf_inf_W2_subgroupOf_eq_bot (hyp : TICyclicHypothesis G) :
+    hyp.W1.subgroupOf hyp.W ⊓ hyp.W2.subgroupOf hyp.W = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hx
+  have hxbot : (x : G) ∈ hyp.W1 ⊓ hyp.W2 := hx
+  rw [disjoint_iff.mp hyp.W_disjoint, Subgroup.mem_bot] at hxbot
+  rw [Subgroup.mem_bot]
+  exact Subtype.ext hxbot
+
+/-- `W₁` and `W₂`, viewed inside `↥W`, generate `↥W` (from `W_sup`). -/
+theorem W1_subgroupOf_sup_W2_subgroupOf_eq_top (hyp : TICyclicHypothesis G) :
+    hyp.W1.subgroupOf hyp.W ⊔ hyp.W2.subgroupOf hyp.W = ⊤ := by
+  rw [← Subgroup.subgroupOf_sup hyp.W1_le_W hyp.W2_le_W, hyp.W_sup, Subgroup.subgroupOf_self]
+
+section
+open scoped IsMulCommutative
+
+/-- **Peterfalvi (3.1)/(3.3)**: `W = W₁ × W₂` is an internal direct product — the multiplication
+map `↥W₁ × ↥W₂ → ↥W` is a group isomorphism (`W` is abelian, `W₁ ⊓ W₂ = 1`, `W₁ ⊔ W₂ = W`).
+This is what lets a linear character `ω` of `W` split as `ω_{i0}·ω_{0j}` with `ω_{i0}` trivial on
+`W₂` and `ω_{0j}` trivial on `W₁`. -/
+noncomputable def wProdEquiv (hyp : TICyclicHypothesis G) :
+    (hyp.W1.subgroupOf hyp.W) × (hyp.W2.subgroupOf hyp.W) ≃* hyp.W :=
+  haveI := hyp.isMulCommutative_W
+  MulEquiv.ofBijective
+    (MonoidHom.coprod (hyp.W1.subgroupOf hyp.W).subtype (hyp.W2.subgroupOf hyp.W).subtype) <| by
+    constructor
+    · rw [injective_iff_map_eq_one]
+      rintro ⟨a, b⟩ hab
+      rw [MonoidHom.coprod_apply, Subgroup.coe_subtype, Subgroup.coe_subtype] at hab
+      have hain : (a : hyp.W) ∈ hyp.W1.subgroupOf hyp.W ⊓ hyp.W2.subgroupOf hyp.W := by
+        refine ⟨a.2, ?_⟩
+        have hinv : (a : hyp.W) = ((b : hyp.W))⁻¹ := mul_eq_one_iff_eq_inv.mp hab
+        rw [hinv]
+        exact (hyp.W2.subgroupOf hyp.W).inv_mem b.2
+      rw [hyp.W1_subgroupOf_inf_W2_subgroupOf_eq_bot, Subgroup.mem_bot] at hain
+      have hb1 : (b : hyp.W) = 1 := by rw [hain, one_mul] at hab; exact hab
+      exact Prod.ext (Subtype.ext hain) (Subtype.ext hb1)
+    · intro w
+      have hw : w ∈ hyp.W1.subgroupOf hyp.W ⊔ hyp.W2.subgroupOf hyp.W := by
+        rw [hyp.W1_subgroupOf_sup_W2_subgroupOf_eq_top]; exact Subgroup.mem_top w
+      rw [Subgroup.mem_sup] at hw
+      obtain ⟨x, hx, y, hy, hxy⟩ := hw
+      refine ⟨(⟨x, hx⟩, ⟨y, hy⟩), ?_⟩
+      rw [MonoidHom.coprod_apply, Subgroup.coe_subtype, Subgroup.coe_subtype]
+      exact hxy
+
+@[simp] theorem wProdEquiv_apply (hyp : TICyclicHypothesis G)
+    (p : (hyp.W1.subgroupOf hyp.W) × (hyp.W2.subgroupOf hyp.W)) :
+    (hyp.wProdEquiv p : hyp.W) = (p.1 : hyp.W) * (p.2 : hyp.W) := by
+  haveI := hyp.isMulCommutative_W
+  rfl
+
+end
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
