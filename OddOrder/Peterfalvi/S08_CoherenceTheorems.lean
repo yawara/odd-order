@@ -10850,6 +10850,167 @@ theorem hgen_withDiagonal_of_frobenius
   · exact Submodule.smul_mem _ s
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
+/-- **(6.8.1) generic capstone Frobenius branch (`m, n ≥ 3`):** `X(Zc) ∪ Y` is coherent.
+
+Given three distinct equal-degree `X(Zc)`-anchors `χ₁ ∈ xBaseBlock`, `χ₂, χ₃` (the `n ≥ 3`
+pinning) with `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y` and `|Y| ≥ 3` (the `m ≥ 3` good case), the union is
+coherent.  The `τ₃` glue `ν` is built internally (`exists_integralCharacterMap_glue_of_orthonormal`,
+`νX = τ₂`, `νY = τ₁`); its agreement discharges `hagreeX`/`hagreeY`, `hmixed` reduces to himg_ortho
+(`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`, both sides `0`), `hDτ` for
+`D = {χ₁ − a·η₁}` is the crux `crux_of_frobenius` (`ν(χ₁−aη₁) = χ₁^{τ₂} − a·η₁^{τ₁} = (χ₁−aη₁)^τ`),
+and `hgen` is `hgen_withDiagonal_of_frobenius`.  The `m = 2` / `n = 2` edge cases (relabel) are not
+covered. -/
+noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  have hχ₁X : χ₁ ∈ hyp.Xset hyp.centralCommutator := hyp.xBaseBlock_subset _ hχ₁base
+  have hinner : ∀ (φ ψ : ClassFunction ↥L ℂ), IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  have hXY : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner x y = 0 := fun x hx y hy => by
+    rw [hinner x y (hXirr x hx) (hYirr y hy),
+      if_neg (by intro h; exact Set.disjoint_left.mp hdisj hx (h ▸ hy))]
+  have hglue :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
+      (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite
+      (fun x hx x' hx' => hinner x x' (hXirr x hx) (hXirr x' hx'))
+      (fun y hy y' hy' => hinner y y' (hYirr y hy) (hYirr y' hy')) hXY
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension)
+      hyp.coherentYset.extension
+  refine hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
+    hF hHnonab hp hp3 hHp hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_)
+    {χ₁ - a • η₁} (fun d hd => ?_)
+    (hyp.hgen_withDiagonal_of_frobenius hF hp hHp hη₁ hχ₁base ha)
+  · -- `hmixed`: `⟨ν x, ν y⟩ = ⟨x, y⟩` (both `0`).
+    rw [hglue.choose_spec.1 x hx, hglue.choose_spec.2 y hy,
+      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+        hF hHnonab hp hp3 hHp hx hy, hXY x hx y hy]
+  · -- `hDτ`: `ν(χ₁−aη₁) = (χ₁−aη₁)^τ` = the crux.
+    rw [Set.mem_singleton_iff] at hd
+    subst hd
+    rw [map_sub, map_nsmul, hglue.choose_spec.1 χ₁ hχ₁X, hglue.choose_spec.2 η₁ hη₁,
+      ← Nat.cast_smul_eq_nsmul ℂ a (hyp.coherentYset.extension η₁)]
+    exact (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁X hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
+      ha hdeg2 hdeg3 hm3).symm
+
+/-- **(6.8) capstone, case (A) (Frobenius, `m, n ≥ 3` with given anchors): `S` is coherent.**
+Combines the generic capstone Frobenius branch
+(`coherentXunionYset_centralCommutator_diagonal_of_frobenius`, giving `X(Zc) ∪ Y` coherent) with the
+(6.8.3) extension `false_of_coherentXunionYset_of_not_coherentS` (`X ∪ Y` coherent ∧ `S` not
+coherent ⟹ False): so `S` is coherent.  The anchors `χ₁ ∈ xBaseBlock, χ₂, χ₃` (distinct,
+equal-degree, the `n ≥ 3` data) and `3 ≤ |Y|` (the `m ≥ 3` data) are taken as hypotheses; their
+existence (vs the
+`m = 2` / `n = 2` relabels) is a separate concern. -/
+theorem nonempty_coherent_S_caseA_of_anchors_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  by_contra hncoh
+  exact hyp.false_of_coherentXunionYset_of_not_coherentS hF hHnonab
+    ⟨hyp.coherentXunionYset_centralCommutator_diagonal_of_frobenius hF hHnonab hp hp3 hHp
+      hη₁ hχ₁base hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂ ha hdeg2 hdeg3 hm3⟩ hncoh
+
+/-- **(6.8) capstone, case (A) under the `m, n ≥ 3` cardinality data: `S` is coherent.**
+From `3 ≤ |xBaseBlock Zc|` (giving three distinct base-block anchors `χ₁, χ₂, χ₃`, all of equal
+degree since the base block is equal-degree, `xBaseBlock_degree_re_eq`) and `3 ≤ |Y|`, the anchor
+hypotheses of `nonempty_coherent_S_caseA_of_anchors_of_frobenius` are met (with `χ₁(1) = a·|W₁|`
+extracted via a degree-`|W₁|` `Y`-anchor), so `S` is coherent.  This is the (6.8) capstone Frobenius
+branch in the generic `m, n ≥ 3` case; the `m = 2` / `n = 2` edge cases (relabels) are not
+covered. -/
+theorem nonempty_coherent_S_caseA_of_card_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (h3X : 3 ≤ (hyp.xBaseBlock hyp.centralCommutator).ncard)
+    (h3Y : 3 ≤ hyp.Yset.ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
+  -- three distinct base-block anchors (from `3 ≤ |xBaseBlock|`).
+  obtain ⟨χ₁, hχ₁base, χ₂, hχ₂base, χ₃, hχ₃base, hne12, hne13, hne23⟩ :
+      ∃ a ∈ hyp.xBaseBlock hyp.centralCommutator, ∃ b ∈ hyp.xBaseBlock hyp.centralCommutator,
+        ∃ c ∈ hyp.xBaseBlock hyp.centralCommutator, a ≠ b ∧ a ≠ c ∧ b ≠ c := by
+    obtain ⟨a, ha⟩ : (hyp.xBaseBlock hyp.centralCommutator).Nonempty :=
+      Set.nonempty_of_ncard_ne_zero (by omega)
+    obtain ⟨b, hb, hba⟩ := Set.exists_ne_of_one_lt_ncard
+      (s := hyp.xBaseBlock hyp.centralCommutator) (by omega) a
+    have hpair : ({a, b} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.xBaseBlock hyp.centralCommutator := by
+      intro x hx; rcases hx with rfl | rfl
+      · exact ha
+      · exact hb
+    have hdc : (hyp.xBaseBlock hyp.centralCommutator \ {a, b}).ncard
+        = (hyp.xBaseBlock hyp.centralCommutator).ncard - 2 := by
+      rw [Set.ncard_diff hpair, Set.ncard_pair (Ne.symm hba)]
+    have hcne : (hyp.xBaseBlock hyp.centralCommutator \ {a, b}).Nonempty := by
+      rw [Set.nonempty_iff_ne_empty]; intro he; rw [he, Set.ncard_empty] at hdc; omega
+    obtain ⟨c, hcs, hcnp⟩ := hcne
+    rw [Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at hcnp
+    exact ⟨a, ha, b, hb, c, hcs, Ne.symm hba, fun h => hcnp.1 h.symm, fun h => hcnp.2 h.symm⟩
+  have hχ₁X := hyp.xBaseBlock_subset _ hχ₁base
+  have hχ₂X := hyp.xBaseBlock_subset _ hχ₂base
+  have hχ₃X := hyp.xBaseBlock_subset _ hχ₃base
+  -- `η₁ ∈ Y` (degree `|W₁|`) and the degree ratio `a`.
+  obtain ⟨η₁, hη₁⟩ := hyp.Yset_nonempty
+  obtain ⟨a, _, ha⟩ := hyp.sMember_charValue_one_eq_mul_anchor (hyp.Xset_subset_S hχ₁X)
+    (hyp.Yset_apply_one hη₁)
+  rw [hyp.Yset_apply_one hη₁] at ha
+  -- the base block is equal-degree.
+  have hdegeq : ∀ χ' ∈ hyp.xBaseBlock hyp.centralCommutator, χ' 1 = χ₁ 1 := by
+    intro χ' hχ'
+    have hre := hyp.xBaseBlock_degree_re_eq hχ' hχ₁base
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+      OddOrder.Peterfalvi.S03.characterDegree_def] at hre
+    obtain ⟨d', _, hd'⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ', hXirr χ' (hyp.xBaseBlock_subset _ hχ')⟩ : IrreducibleCharacter ↥L)
+    obtain ⟨d₁, _, hd₁⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ₁, hXirr χ₁ hχ₁X⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hd' hd₁
+    rw [hd', hd₁] at hre ⊢
+    exact_mod_cast hre
+  exact hyp.nonempty_coherent_S_caseA_of_anchors_of_frobenius hF hHnonab hp hp3 hHp hη₁
+    hχ₁base hχ₂X hne12.symm hχ₃X hne13.symm hne23.symm ha
+    (hdegeq χ₂ hχ₂base) (hdegeq χ₃ hχ₃base) h3Y
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley

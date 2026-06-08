@@ -898,3 +898,92 @@ generalisation of the 2-term `sMember_(scaled)diffSupport_of_charValue_eq` — u
 **Then** ν-shell wiring (under `3≤|xBaseBlock Zc|, 3≤|Y|` ⟹ crux + hgen' both available) ⟹ generic
 capstone Frobenius branch.  Then relabels; then CertainType (B).  **Next session: degree-ratio
 integrality (small, p-power lemma available) → the Finsupp decomposition → ν-shell.**
+
+## 2026-06-08 (session 6 cont.³): `hgen'` COMPLETE + generic capstone Frobenius branch ASSEMBLED (3 more commits, axiom-clean)
+
+The entire (6.8.1) generic-case spine is now assembled end-to-end.  All leaf-green (3467) +
+axiom-clean.  Commits:
+
+- ✅ **degree-ratio integrality** `6f38d283`: `exists_charValue_one_eq_mul_xBaseBlock_anchor` —
+  `χ∈X(Z)`, `χ₁∈xBaseBlock Z` ⟹ `∃ d:ℕ, 0<d ∧ χ(1)=d·χ₁(1)`.  Sources p-power
+  (`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`) + minimality
+  (`natDegree_le_of_xBaseBlock_anchor`) ⟹ `p^{k₁} | p^k`.  (hgen' degree side.)
+- ✅ **`hgen'` assembly** `d2867ae3`: `hgen_withDiagonal_of_frobenius` —
+  `ℤ[X(Zc)∪Y,A] ⊆ span(ℤ[X(Zc),A] ∪ ℤ[Y,A] ∪ {χ₁−a·η₁})`.  `φ=φ_X+φ_Y` (`span_union`/`mem_sup`),
+  `s∈ℤ` via span induction + degree-ratio, three-piece decomposition (the `s·χ₁`/`s·(a·η₁)` cancel,
+  `abel`), supports via `zSpan_S_support_subset_of_apply_one_eq_zero`.
+- ✅✅ **generic capstone Frobenius branch** `021808e3`:
+  `coherentXunionYset_centralCommutator_diagonal_of_frobenius` — given 3 distinct equal-degree
+  anchors `χ₁∈xBaseBlock, χ₂, χ₃` (n≥3) + `η₁∈Y` + `3≤|Y|` (m≥3), **`X(Zc)∪Y` is coherent**.
+  ν built internally (`exists_integralCharacterMap_glue_of_orthonormal`); hDτ=`crux_of_frobenius`
+  (via `map_sub`/`map_nsmul` + glue), hgen=`hgen_withDiagonal_of_frobenius`, hmixed=himg_ortho;
+  routed through `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` (S08:8928).
+
+**⟹ the (6.8.1) generic (m,n≥3) case is COMPLETE end-to-end** (step 4 → step 5 → crux → hgen' →
+ν-shell → X(Zc)∪Y coherent).  No `sorry`, axiom-clean.
+
+### 🔴 Remaining for the full (6.8) capstone `sibleySetup_is_coherent`
+1. **edge cases (m=2 / n=2) = the relabels** — the generic branch needs `3≤|xBaseBlock Zc|` (for
+   χ₂,χ₃) and `3≤|Y|`.  When |xBaseBlock|=2 or |Y|=2, relabel (2-elt sign-swap `IsCoherent` ctor,
+   template `retarget` S07:2987–3360).  Still the structural bottleneck; could also be handled by an
+   honest case split if the FT groups always satisfy m,n≥3 (CHECK Peterfalvi — likely not, hence the
+   relabel).
+2. **the anchor/`a` existence + capstone wiring**: pick χ₁∈xBaseBlock, get `a` (χ₁(1)=a|W₁| from the
+   source degree), χ₂,χ₃ distinct (needs `3≤|xBaseBlock|`), η₁∈Y; feed
+   `coherentXunionYset_centralCommutator_diagonal_of_frobenius`; then **X(Zc)∪Y coherent + L4
+   `false_of_coherentXunionYset_of_not_coherentS` ⟹ S coherent** (the (6.8.3) extension); wire into
+   `sibleySetup_is_coherent` (the S08 sole sorry), with the case split (A)/(B).
+3. **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, (6.8.2.1)/(6.8.2.2)/(6.8.2.3)) — unplanned.
+
+**Next session:** the anchor-existence + capstone wiring (2) under explicit `3≤|xBaseBlock|, 3≤|Y|`,
+to connect the generic branch to `sibleySetup_is_coherent`; then the relabels (1); then (B).
+
+### Key API (session 6 cont.³)
+- `coherentXunionYset_centralCommutator_diagonal_of_frobenius (hyp)(hF)(hHnonab)(hp)(hp3)(hHp)
+  (hη₁)(hχ₁base:χ₁∈xBaseBlock Zc)(hχ₂)(hne₂)(hχ₃)(hne₃₁)(hne₃₂)(ha:χ₁ 1=a·|W₁|)(hdeg2)(hdeg3)
+  (hm3:3≤|Y|)` : `IsCoherent hyp.tau (Xset Zc ∪ Yset) A`.
+- `hgen_withDiagonal_of_frobenius (hyp)(hF)(hp)(hHp)(hη₁)(hχ₁base)(ha)` : the hgen containment.
+- `exists_charValue_one_eq_mul_xBaseBlock_anchor (hyp)(hF)(hp)(hHp)(hχX)(hχ₁base)` : `∃d:ℕ,0<d∧χ(1)=d·χ₁(1)`.
+- `IntegralCharacterMap = ClassFunction →ₗ[ℤ] ClassFunction` (ℤ-linear; `map_sub`/`map_nsmul`).
+
+## 2026-06-08 (session 6 cont.⁴): (6.8) capstone case A assembled to S-coherence (2 more commits, axiom-clean)
+
+The generic Frobenius branch now reaches **S-coherence** end-to-end.  All leaf-green (3467) +
+axiom-clean.  Commits:
+
+- ✅ **case A with anchors** `9c90c508`: `nonempty_coherent_S_caseA_of_anchors_of_frobenius` —
+  generic branch (`coherentXunionYset_centralCommutator_diagonal_of_frobenius`, X(Zc)∪Y coherent) +
+  L4 `false_of_coherentXunionYset_of_not_coherentS` ((6.8.3) extension) ⟹ `Nonempty (IsCoherent S)`.
+  (`by_contra hncoh; exact L4 ⟨generic branch⟩ hncoh`.)
+- ✅✅ **case A from cardinality** `5a1331a4`: `nonempty_coherent_S_caseA_of_card_of_frobenius` —
+  from `3≤|xBaseBlock Zc|` + `3≤|Y|`, **`S` is coherent**.  Discharges the anchors: 3 distinct
+  base-block anchors (ncard_diff/ncard_pair + `exists_ne_of_one_lt_ncard`), equal degree
+  (`xBaseBlock_degree_re_eq` + nat-degree reality), `χ₁(1)=a·|W₁|`
+  (`sMember_charValue_one_eq_mul_anchor` vs a degree-|W₁| Y-anchor).
+
+**⟹ the (6.8) Frobenius branch is COMPLETE from cardinality hypotheses to S-coherence** (generic
+m,n≥3).  The L4 (6.8.3) bridge was already landed; this session connected it to the generic branch.
+
+### 🔴 Remaining for the full (6.8) capstone `sibleySetup_is_coherent` (S08 sole sorry, ~10954)
+1. **drop the `3≤|xBaseBlock|, 3≤|Y|` hypotheses (m=2/n=2 relabels)** — the structural bottleneck.
+   The generic branch needs 3 anchors + 3 Y-members; when |xBaseBlock|=2 or |Y|=2, relabel (2-elt
+   sign-swap `IsCoherent` ctor, template `retarget` S07:2987–3360).  ⚠ CHECK whether FT minimal-simple
+   groups can have |xBaseBlock|=2 or |Y|=2 — if always ≥3, an honest cardinality lemma suffices and the
+   relabels are unnecessary.  **This is the key open question for closing case A.**
+2. **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, (6.8.2.1)/(6.8.2.2)/(6.8.2.3)) — unplanned.
+3. **wiring into `sibleySetup_is_coherent`**: restructure the capstone's `by_cases Xset ⁅H,H⁆ = ∅`
+   into the `hyp.cases` split (Frobenius / CertainType); in the Frobenius case derive `hHnonab` (X
+   nonempty ⟹ H non-abelian) + p-group data (hp/hp3/hHp from (6.5)) + the cardinality (1), then
+   `nonempty_coherent_S_caseA_of_card_of_frobenius |>.some`.
+
+**Next session:** resolve (1) — determine if |xBaseBlock|,|Y|≥3 always holds for FT groups (Peterfalvi
+text / (6.5) p-group structure); if so, the cardinality lemma closes case A with no relabels.  Then (3)
+wiring + (2) case B.
+
+### Key API (session 6 cont.⁴)
+- `nonempty_coherent_S_caseA_of_card_of_frobenius (hyp)(hF)(hHnonab)(hp)(hp3)(hHp)(h3X:3≤|xBaseBlock
+  Zc|)(h3Y:3≤|Y|)` : `Nonempty (IsCoherent hyp.tau hyp.S A)`.
+- `nonempty_coherent_S_caseA_of_anchors_of_frobenius (… anchors …)` : same, with explicit anchors.
+- `false_of_coherentXunionYset_of_not_coherentS` (S08:6564, LANDED): X(cc)∪Y coh + ¬S coh ⟹ False.
+- `Set.ncard_diff`/`Set.ncard_pair`/`Set.exists_ne_of_one_lt_ncard`/`Set.nonempty_of_ncard_ne_zero`
+  (3-distinct selection); `characterDegree_def : characterDegree χ = χ 1`.
