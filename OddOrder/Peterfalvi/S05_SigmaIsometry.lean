@@ -92,8 +92,6 @@ theorem alphaCF_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
 
 end TICyclicHypothesis
 
-variable [Invertible (Nat.card G : ℂ)]
-
 namespace TICyclicHypothesis
 
 open Classical in
@@ -102,7 +100,7 @@ Since `Ind_W^G` is an isometry on `CF(W, V)` (the §4 Dade isometry, `full_inner
 products of the induced family equal those of the `α_{ij}` (`alphaCF_inner`):
 `⟨Ind α_{ij}, Ind α_{kl}⟩ = 1 + δ_{ik} + δ_{jl} + δ_{(ij),(kl)}`. -/
 theorem tau_alpha_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
-    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
     (app : FullDadeApplication (G := G) hyp)
     {p₁ q₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {p₂ q₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
     (hp₁ : p₁ ≠ 1) (hp₂ : p₂ ≠ 1) (hq₁ : q₁ ≠ 1) (hq₂ : q₂ ≠ 1) :
@@ -111,6 +109,117 @@ theorem tau_alpha_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       1 + (if p₁ = q₁ then 1 else 0) + (if p₂ = q₂ then 1 else 0)
         + (if p₁ = q₁ ∧ p₂ = q₂ then 1 else 0) := by
   rw [hyp.full_inner_eq app, hyp.alpha_coe, hyp.alpha_coe, hyp.alphaCF_inner hp₁ hp₂ hq₁ hq₂]
+
+end TICyclicHypothesis
+
+/- 3.2(a): the Dade map is induction `Ind_W^G` on `CF(W, V)` (pp. 17) -/
+
+section DadeMapIsInduction
+
+variable {k : Type*} [CommRing k]
+
+namespace TICyclicHypothesis
+
+open Classical in
+/-- The `x`-summand of `Ind_W^G α` at `a ∈ V`: it is `α(a)` when `x ∈ W` (then `x⁻¹ a x ∈ V`
+since `W` normalizes `V`, and `α` is `W`-class-invariant) and `0` otherwise (then `x⁻¹ a x ∉ V`
+by the TI property, so the `V`-supported `α` vanishes there).  This is the per-term computation
+behind `induce_apply_eq_self_of_mem_V`. -/
+theorem induceTerm_eq_of_mem_V (hyp : TICyclicHypothesis G)
+    (α : SupportedOnV (G := G) k hyp) {a : G} (ha : a ∈ hyp.V) (x : G) :
+    ClassFunction.induceTerm hyp.W (α : ClassFunction hyp.W k) x a =
+      if x ∈ hyp.W then (α : ClassFunction hyp.W k) ⟨a, hyp.V_subset_W ha⟩ else 0 := by
+  by_cases hx : x ∈ hyp.W
+  · rw [if_pos hx]
+    have haxV : x⁻¹ * a * x ∈ hyp.V := by
+      have h := hyp.W_normalizes_V ⟨x⁻¹, hyp.W.inv_mem hx⟩ ha
+      simpa using h
+    have haxW : x⁻¹ * a * x ∈ hyp.W := hyp.V_subset_W haxV
+    rw [ClassFunction.induceTerm_of_mem _ haxW]
+    have harg : (⟨x⁻¹ * a * x, haxW⟩ : hyp.W) =
+        ⟨x⁻¹, hyp.W.inv_mem hx⟩ * ⟨a, hyp.V_subset_W ha⟩ * ⟨x⁻¹, hyp.W.inv_mem hx⟩⁻¹ := by
+      apply Subtype.ext
+      simp [inv_inv]
+    rw [harg]
+    exact (α : ClassFunction hyp.W k).conj_eq ⟨a, hyp.V_subset_W ha⟩ ⟨x⁻¹, hyp.W.inv_mem hx⟩
+  · rw [if_neg hx]
+    by_cases hax : x⁻¹ * a * x ∈ hyp.W
+    · rw [ClassFunction.induceTerm_of_mem _ hax]
+      have hnotV : x⁻¹ * a * x ∉ hyp.V := by
+        intro hV
+        exact hx (by simpa using hyp.W.inv_mem (hyp.V_ti x⁻¹ ⟨a, ha, by simpa using hV⟩))
+      by_contra hne
+      exact hnotV ((OddOrder.Peterfalvi.S04.mem_supportInSubgroup).mp
+        (α.2 (ClassFunction.mem_support.mpr hne)))
+    · rw [ClassFunction.induceTerm_of_not_mem _ hax]
+
+/-- **Peterfalvi (3.2.c)** at `a ∈ V` (value half): the induced class function `Ind_W^G α`
+equals `α` on `V`.  Only the `|W|` conjugators `x ∈ W` contribute to the induction sum, each with
+value `α(a)`, so `Ind_W^G α(a) = ⅟|W| · |W| · α(a) = α(a)`. -/
+theorem induce_apply_eq_self_of_mem_V (hyp : TICyclicHypothesis G)
+    [Invertible (Nat.card hyp.W : k)]
+    (α : SupportedOnV (G := G) k hyp) {a : G} (ha : a ∈ hyp.V) :
+    ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) a =
+      (α : ClassFunction hyp.W k) ⟨a, hyp.V_subset_W ha⟩ := by
+  classical
+  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
+  rw [ClassFunction.induce_apply,
+    Finset.sum_congr rfl (fun x _ => hyp.induceTerm_eq_of_mem_V α ha x),
+    ← Finset.sum_filter, Finset.sum_const]
+  have hcard : (Finset.univ.filter (· ∈ hyp.W)).card = Nat.card hyp.W := by
+    rw [Nat.card_eq_fintype_card]
+    exact (Fintype.card_subtype _).symm
+  rw [hcard, nsmul_eq_mul, ← mul_assoc, invOf_mul_self, one_mul]
+
+/-- The induced-class-function `DadeMap` candidate for the TI-cyclic hypothesis: `α ↦ Ind_W^G α`. -/
+noncomputable def inducedDadeMap (hyp : TICyclicHypothesis G) [Invertible (Nat.card hyp.W : k)] :
+    OddOrder.Peterfalvi.S04.DadeMap (G := G) k hyp.V hyp.W :=
+  fun α => ClassFunction.induce hyp.W (α : ClassFunction hyp.W k)
+
+/-- **Peterfalvi (3.2.a)/(2.5)**: `Ind_W^G` (restricted to `CF(W, V)`) satisfies the §4 Dade-map
+equations for the TI-cyclic hypothesis.  Value half = `induce_apply_eq_self_of_mem_V` (`H(a) = ⊥`,
+so the coset condition reduces to `IsConj a g`); support half = induced functions vanish off the
+conjugates `V^G` of the support. -/
+theorem isDadeMap_inducedDadeMap (hyp : TICyclicHypothesis G)
+    [Invertible (Nat.card hyp.W : k)] :
+    OddOrder.Peterfalvi.S04.IsDadeMap hyp.toDadeHypothesis (hyp.inducedDadeMap (k := k)) where
+  map_eq_of_isConj_hCoset := by
+    intro α g a h hh hconj
+    have hh1 : h = 1 := by
+      have : h ∈ (⊥ : Subgroup G) := by rw [← hyp.toDadeHypothesis_H a]; exact hh
+      exact Subgroup.mem_bot.mp this
+    subst hh1
+    have hga : IsConj a.1 g := by simpa using hconj
+    change ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) g = _
+    rw [← (ClassFunction.induce hyp.W (α : ClassFunction hyp.W k)).of_isConj hga,
+      hyp.induce_apply_eq_self_of_mem_V α a.2]
+  map_eq_zero_of_not_mem_dadeSupport := by
+    intro α g hg
+    change ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) g = 0
+    refine ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet α.2 (fun hgin => hg ?_)
+    rw [hyp.toDadeHypothesis.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot
+      (fun a => hyp.toDadeHypothesis_H a)]
+    obtain ⟨x, hx, hxV⟩ := hgin
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hxV
+    exact Group.mem_conjugatesOfSet_iff.mpr ⟨x⁻¹ * g * x, hxV, isConj_iff.mpr ⟨x, by group⟩⟩
+
+end TICyclicHypothesis
+
+end DadeMapIsInduction
+
+namespace TICyclicHypothesis
+
+/-- **Peterfalvi (3.2.a)**: on `CF(W, V)`, the §4 Dade map *is* induction `Ind_W^G`.  By the
+uniqueness of the Dade map (`IsDadeMap.unique`), the abstract carrier `app.tau` agrees with the
+concrete `inducedDadeMap`.  This is the bridge that makes Frobenius reciprocity
+(`inner_induce_eq_inner_restrict`) available for the abstract `τ`. -/
+theorem tau_eq_induce {k : Type*} [CommRing k] [StarRing k] [Invertible (Nat.card G : k)]
+    (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : k)] (app : DadeApplication (G := G) (k := k) hyp)
+    (α : SupportedOnV (G := G) k hyp) :
+    app.tau.toDadeMap α = ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) :=
+  congrFun (OddOrder.Peterfalvi.S04.IsDadeMap.unique app.tau.isDadeMap
+    hyp.isDadeMap_inducedDadeMap) α
 
 end TICyclicHypothesis
 
