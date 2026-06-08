@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RepresentationTheory.Semisimple
+import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Multiplicity one: the restriction `V_H` is irreducible (BG Prop 2.2(a), the `m = 1` finish)
@@ -241,6 +244,85 @@ theorem cliffordConj_fixed_imp_scalar [ρ.IsIrreducible] [IsAlgClosed k] [Module
   have hfw : f w = c • w := LinearMap.congr_fun hfkscalar w
   rw [Algebra.algebraMap_eq_smul_one, LinearMap.smul_apply, Module.End.one_apply]
   exact hfw.symm
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **The restriction is irreducible** (Bender–Glauberman Proposition 2.2(a), the multiplicity-one
+finish).  Assume `G = ⟨H, x⟩`, `ρ` is irreducible over an algebraically closed field `k` with `V`
+finite-dimensional and nontrivial, `H` is finite with `char k ∤ |H|`, and a nonzero simple
+`k[H]`-submodule `W` of the restriction has every `G`-conjugate isomorphic to it (the input from
+Gorenstein 5.5.4).  Then the restriction `V_H` is itself simple.
+
+The restriction is `W`-isotypic (`isIsotypicOfType_of_conjugates`), so `V_H ≅ Wⁿ` and
+`E := End_{k[H]} V ≅ M_n(k)` (`End_{k[H]} W = k` by Schur).  Conjugation by `ρ x` is an algebra
+automorphism `cliffordConj ρ x` of `E` whose fixed subalgebra is the scalars
+(`cliffordConj_fixed_imp_scalar`), so Skolem–Noether (`finrank_eq_one_of_aut_fixedScalar`) forces
+`finrank k E = 1`, i.e. `n = 1`, i.e. `V_H ≅ W` is simple. -/
+theorem restriction_isSimpleModule [ρ.IsIrreducible] [IsAlgClosed k] [Module.Finite k V]
+    [Nontrivial V] [Finite ↥H] [NeZero (Nat.card ↥H : k)]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
+    (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
+    IsSimpleModule k[↥H] (resRep ρ H).asModule := by
+  haveI hVnt : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+  haveI hVfin : Module.Finite k (resRep ρ H).asModule := inferInstance
+  haveI : IsNoetherian k (resRep ρ H).asModule := inferInstance
+  haveI hHfin : Module.Finite k[↥H] (resRep ρ H).asModule :=
+    Module.Finite.of_restrictScalars_finite k k[↥H] (resRep ρ H).asModule
+  haveI hWfin : Module.Finite k ↥W :=
+    Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective
+  haveI hss : IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
+    rw [← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
+  -- The restriction is `W`-isotypic, hence `V_H ≅ Wⁿ`.
+  have hiso : IsIsotypicOfType k[↥H] (resRep ρ H).asModule ↥W :=
+    isIsotypicOfType_of_conjugates ρ W hW hconj
+  obtain ⟨n, ⟨e⟩⟩ := hiso.linearEquiv_fun
+  -- Schur: `End_{k[H]} W ≅ k`.
+  have hbij : Function.Bijective (algebraMap k (Module.End k[↥H] ↥W)) :=
+    algebraMap_end_bijective_of_isSimpleModule
+  let schur : k ≃ₐ[k] Module.End k[↥H] ↥W := AlgEquiv.ofBijective (Algebra.ofId k _) hbij
+  -- `n ≠ 0`: otherwise `V_H` would be a subsingleton.
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    haveI : Subsingleton (resRep ρ H).asModule := e.toEquiv.subsingleton
+    exact not_subsingleton _ this
+  haveI hne : Nonempty (Fin n) := ⟨⟨0, Nat.pos_of_ne_zero hn0⟩⟩
+  -- `Ψ : E ≅ M_n(k)`.
+  let Ψ : Module.End k[↥H] (resRep ρ H).asModule ≃ₐ[k] Matrix (Fin n) (Fin n) k :=
+    (e.conjAlgEquiv k).trans
+      ((endVecAlgEquivMatrixEnd ..).trans schur.symm.mapMatrix)
+  haveI : IsSimpleRing (Module.End k[↥H] (resRep ρ H).asModule) :=
+    IsSimpleRing.of_ringEquiv Ψ.symm.toRingEquiv inferInstance
+  haveI : FiniteDimensional k (Module.End k[↥H] (resRep ρ H).asModule) :=
+    Module.Finite.equiv Ψ.symm.toLinearEquiv
+  -- Skolem–Noether: the fixed-scalar automorphism `cliffordConj ρ x` forces `finrank k E = 1`.
+  have hrank : Module.finrank k (Module.End k[↥H] (resRep ρ H).asModule) = 1 :=
+    finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x)
+      (fun f hf => cliffordConj_fixed_imp_scalar ρ x hgen f hf)
+  -- `finrank k (M_n k) = n² = 1`, so `n = 1`.
+  have hn1 : n = 1 := by
+    have h1 : Module.finrank k (Matrix (Fin n) (Fin n) k) = 1 := by
+      rw [← Ψ.toLinearEquiv.finrank_eq]; exact hrank
+    rw [Module.finrank_matrix, Fintype.card_fin, Module.finrank_self, mul_one] at h1
+    exact Nat.dvd_one.mp ⟨n, h1.symm⟩
+  -- `n = 1` gives `V_H ≅ W`, and `W` is simple.
+  subst hn1
+  have e1 : (resRep ρ H).asModule ≃ₗ[k[↥H]] ↥W :=
+    e.trans (LinearEquiv.funUnique (Fin 1) k[↥H] ↥W)
+  exact IsSimpleModule.congr e1
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Bender–Glauberman Proposition 2.2(a)**, in the form consumed by the group-level Theorem 2.5
+(`finrank_modEq_of_faithful_irreducible`): the restriction representation `Res^G_H ρ` is
+irreducible.  This repackages `restriction_isSimpleModule` through
+`Representation.irreducible_iff_isSimpleModule_asModule`. -/
+theorem restriction_isIrreducible [ρ.IsIrreducible] [IsAlgClosed k] [Module.Finite k V]
+    [Nontrivial V] [Finite ↥H] [NeZero (Nat.card ↥H : k)]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (W : Submodule k[↥H] (resRep ρ H).asModule) (hW : W ≠ ⊥) [IsSimpleModule k[↥H] W]
+    (hconj : ∀ g : G, Nonempty (W ≃ₗ[k[↥H]] (W.map (conjSemilinearEnd (H := H) ρ g)))) :
+    (resRep ρ H).IsIrreducible :=
+  (Representation.irreducible_iff_isSimpleModule_asModule (resRep ρ H)).mpr
+    (restriction_isSimpleModule ρ x hgen W hW hconj)
 
 end MultOne
 

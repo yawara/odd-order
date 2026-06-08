@@ -457,3 +457,36 @@ commits `d54869a5` + `e1ac4947`):
 - **assembly**: `restriction_isSimpleModule` — isotypic (`isIsotypicOfType_of_conjugates`) + IsSimpleRing E +
   `finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x) (cliffordConj_fixed_imp_scalar …)` ⟹ finrank E=1 ⟹ bridge
   ⟹ `IsSimpleModule k[↥H] (resRep ρ H).asModule` = `Representation.IsIrreducible (resRep ρ H)` (= hVP, group-level Thm2.5 消費)。
+
+### ✅✅✅ wire-E COMPLETE (2026-06-08 続き, `a-keystone`): hVP = Prop 2.2(a) discharged (mod hconj=Gor5.5.4)
+
+`CliffordMultiplicityOne.lean` 完成 — **`restriction_isSimpleModule` + `restriction_isIrreducible`**
+(sorry-free + axiom-clean [propext/Choice/Quot のみ], full build **3611** green + AxiomsCheck OK)。
+**新 commit (このセッション)**; main 未マージ (司令塔がマージ予定)。
+
+- **`restriction_isSimpleModule`** (`[ρ.IsIrreducible][IsAlgClosed k][Module.Finite k V][Nontrivial V][Finite ↥H]
+  [NeZero (Nat.card ↥H:k)]`, `x`, `hgen:closure(↑H∪{x})=⊤`, `W` 非零 simple `k[↥H]`-部分加群, `hconj`):
+  `IsSimpleModule k[↥H] (resRep ρ H).asModule`。証明 = 計画どおり: isotypic → `linearEquiv_fun` で `V≅Fin n→W`
+  → Schur `End_{k[H]}W≅k` (`AlgEquiv.ofBijective (Algebra.ofId k _) (algebraMap_end_bijective_of_isSimpleModule)`)
+  → `Ψ : E ≃ₐ[k] Matrix (Fin n)(Fin n) k` (`e.conjAlgEquiv k` ▸ `endVecAlgEquivMatrixEnd ..` ▸ `schur.symm.mapMatrix`)
+  → `IsSimpleRing E`+`FiniteDimensional E` を Ψ で transport → `finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x) hfix`
+  ⟹ `finrank E=1` ⟹ `Module.finrank_matrix`+`Nat.dvd_one` で `n=1` ⟹ `V≅W` (`LinearEquiv.funUnique`) ⟹
+  `IsSimpleModule.congr`。n≠0 は `e.toEquiv.subsingleton`+`not_subsingleton` で nontrivial 矛盾。
+- **`restriction_isIrreducible`** = `(resRep ρ H).IsIrreducible` (= `Representation.IsIrreducible (ρ.comp H.subtype)`,
+  group-level Thm 2.5 `finrank_modEq_of_faithful_irreducible` が直消費する形)。
+  `Representation.irreducible_iff_isSimpleModule_asModule` でラップ。
+
+- **🔑 KEY BLOCKER 解決法 (再調査不要)**: notes 旧「`Module k (resRep ρ H).asModule` bare inferInstance 失敗」=
+  **`set_option backward.isDefEq.respectTransparency false in`** を定理頭に付ければ全解決 (CliffordAlgClosed/Irreducible/
+  Semisimple と同じ; instance 名 `instModuleMonoidAlgebraAsModule`)。これで `Module k[↥H] asModule` / Maschke
+  `IsSemisimpleModule` (via `← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule; infer_instance`) /
+  `IsScalarTower k k[↥H] asModule` / `Module.Finite k asModule` が解決。
+- **diamond fix の確定レシピ**:
+  - `Module.Finite k[↥H] asModule` = `Module.Finite.of_restrictScalars_finite k k[↥H] _` (k-finite + scalar tower)。
+  - `Module.Finite k ↥W` (submodule) = `haveI : IsNoetherian k asModule := inferInstance` →
+    `Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective`。
+  - `Nontrivial asModule` = `‹Nontrivial V›` (defeq ascription; bare inferInstance は不可)。
+  - `endVecAlgEquivMatrixEnd` の明示引数順は `ι R A M` → **`..` で全推論**させる (mathlib WedderburnArtin と同様)。
+- **▶▶ hVP は hconj (Gor 5.5.4 = `W≅W^g`) を仮説に取った形で COMPLETE。残る唯一の sub-piece = Gor 5.5.4**
+  (W-conjugate の同型供給, 未着手) + group-level setup で W 存在 (非零 f.d. semisimple) と hgen (`G=P⋊⟨x⟩`) を供給して
+  `restriction_isIrreducible` を呼び hVP を materialize する配線。これで Thm 2.5 → Thm 3.4 → 3.6 → §10.6 が開く。
