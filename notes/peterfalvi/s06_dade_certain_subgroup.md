@@ -511,6 +511,10 @@ S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interfa
 2. **CF(W,V) 次元 = インフラ構築**。`dim CF(W,V) = |V| = (w₁−1)(w₂−1)` を新規補題で(abelian W ⟹ `ClassFunction = 点上関数`, `supportedSubmodule (supportInSubgroup V W)` 次元 = |V|; `|V| = |W|−w₁−w₂+1`)。
 3. **線形独立 = Fourier** (`sum_inner_irreducibleCharacter_smul` + `irreducibleCharacter_inner`)、basis = lin-indep + 次元一致。
 - sub-leaf 順: α 定義 + CF(W,V) membership(今 session の kernel 補題で出る)→ CF 次元インフラ → lin-indep → basis 組立。**loop 再開 (min-interval); (3.5) hard core 到達で再停止。**
+
+**⚠ V-handling 決定 (session 9 loop で発見)**: `TICyclicHypothesis.V` は §6/§8 再利用のため一般フィールドで、**(3.4) が要求する `V = ↑W∖(↑W₁∪↑W₂)` に固定されていない**(`dim CF(W,V)=|V|=(w₁−1)(w₂−1)` はこの特定 V 必須)。**解決 = (3.x) 定理は `hVeq : hyp.V = (↑W:Set G)∖(↑hyp.W₁∪↑hyp.W₂)` を仮説に取る**(構造体は一般のまま、(3.1) 忠実; (3.2) σ が hyp.V の Dade map から来るので hVeq で V=Vdiff を固定)。
+
+**進捗 (session 9 loop)**: ✅ **factor 射影 `wFst`/`wSnd : ↥W →* ↥W₁'/↥W₂'` + kill facts `wFst/wSnd_eq_one_of_mem_W2/W1` DONE** (commit `b3b93c3a`, full 3599 green, AxiomsCheck 登録) — α の prerequisite。**次 = `alpha (χ₁:↥W₁'→*ℂˣ)(χ₂:↥W₂'→*ℂˣ) := (1 − (omega(χ₁.comp wFst):CF))·(1 − (omega(χ₂.comp wSnd):CF))` 定義 + membership `alpha ∈ CF(W, Vdiff)`**(`hVeq` 下; W₁ 上 ω_0j=1⟹因子0、W₂ 上 ω_i0=1⟹因子0、`wFst/wSnd_eq_one` + `omega_apply_one` で)→ CF 次元インフラ → lin-indep → basis。
 2. **(3.4) α_ij basis** of CF(W,V), V=W−(W₁∪W₂)。α_ij=(1−ω_i0)(1−ω_0j)、dim=(w₁−1)(w₂−1)。線形独立 + 次元一致。
 3. **(3.5) χ_ij 直交族 [HARD]**。(3.5.1) inner-product relations → (3.5.2) |A₁₁∩A₁₂|=1 → (3.5.4) ∩A_i1 → (3.5.5) decomposition。w₁≥5 仮定、A_ij=3 元 ±Irr 集合の case I/II 排除。abstract combinatorial lemma に切り出すと再利用しやすい。
 4. **(3.2) σ-isometry** assembly ((3.5)+(1.3)→(3.2.a-d))。
