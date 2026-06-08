@@ -3206,3 +3206,7 @@ set_option linter.style.longLine false in
 -- the divisibility `dim V ≡ ±1 (mod h)` and the `C_V(H)` dichotomy.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_modEq_of_extraspecial
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_eq_sub_one_of_extraspecial
+
+-- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
+-- representation over an algebraically closed field has cyclic centre `Z(G)`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_center_of_faithful_irreducible
