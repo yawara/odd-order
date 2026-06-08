@@ -38,6 +38,7 @@ import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3216,3 +3217,47 @@ set_option linter.style.longLine false in
 -- BG App C Lemma C.2: combine the q=3 cubic branch with the q≥5 class-sum
 -- branch to show that the norm set has at least two elements.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC2
+
+/-! ### Forward-axiom islands (conditional, keystone-gated)
+
+Unlike the flagship checks above (which guarantee *unconditional* theorems), the islands below
+pin theorems that are wired against **provisional forward axioms** — `sorry`-free but
+mathematically contingent on the named axioms (see `scaffold-sorry-free-not-done`). The
+`#assert_axioms_island` guard asserts that such a theorem depends on *exactly* the standard
+axioms plus the explicitly listed forward axioms: it is **stricter** than mere existence (any
+unlisted axiom — a `sorryAx`, or a different forward axiom — fails the build) and it requires
+each listed axiom to actually be used (no stale entries). When a keystone lands and its forward
+axiom becomes a theorem, the corresponding island here is deleted and the consumer migrates to
+an unconditional `#assert_only_allowed_axioms` check. -/
+
+/-- Assert that `name` depends on *exactly* the standard axioms together with the explicitly
+listed forward axioms (an "expected island"). Fails if `name` uses any unlisted axiom, or if any
+listed axiom is not actually used. -/
+elab "#assert_axioms_island " name:ident " expecting " "[" extra:ident,* "]" : command => do
+  let constName := name.getId
+  let env ← getEnv
+  unless env.contains constName do
+    throwError m!"axioms island: constant `{constName}` not found"
+  let extraNames : List Name := (extra.getElems.toList).map (·.getId)
+  for e in extraNames do
+    unless env.contains e do
+      throwError m!"axioms island: expected forward axiom `{e}` not found"
+  let axs ← liftCoreM <| Lean.collectAxioms constName
+  let allowed := OddOrder.AxiomsCheck.allowedStandard ++ extraNames
+  let bad := axs.filter (fun a => !allowed.contains a)
+  let missing := extraNames.filter (fun e => !axs.contains e)
+  unless missing.isEmpty do
+    throwError m!"axioms island FAILED: `{constName}` does not depend on listed \
+axiom(s):{indentD m!"{missing}"} — remove them from the island"
+  if bad.isEmpty then
+    logInfo m!"axioms island OK: `{constName}` ⊆ standard ∪ {extraNames}"
+  else
+    throwError m!"axioms island FAILED: `{constName}` has unexpected \
+axiom(s):{indentD m!"{bad.toList}"}"
+
+-- BG §10 (β-radical spine), conditional on the representation-theory keystone (BG Thm 3.6):
+-- Theorem 10.6 (every proper subgroup has `p`-length one). Wired against the two forward
+-- axioms of `S10_ForwardFromKeystone` (BG Thm 3.6 + BG Lem 10.4(b)); see that file.
+#assert_axioms_island OddOrder.BG.Ch3.S10.proper_hasPLengthOne expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

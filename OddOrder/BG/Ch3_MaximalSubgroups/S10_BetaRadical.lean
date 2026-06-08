@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_ForwardFromKeystone
+import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 
 /-!
 # BG §10 β-radical spine (Thm 10.6/10.7/10.8, Cor 10.9, Prop 10.10/10.14)
@@ -30,7 +32,87 @@ Lem 6.3/10.4 + Thm 3.6。 -/
 theorem proper_hasPLengthOne [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
     (H : Subgroup G) (hH : H < ⊤) :
     Ch1.hasPLengthOne p ↥H := by
-  sorry
+  classical
+  -- Reduce to a maximal subgroup `M ⊇ H`: `p`-length one passes to subgroups (Lemma 1.21(a)).
+  obtain ⟨M, hMco, hHM⟩ := (IsCoatomic.eq_top_or_exists_le_coatom H).resolve_left hH.ne
+  have hM : M ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMco
+  suffices hMpl : Ch1.hasPLengthOne p ↥M by
+    exact Ch1.hasPLengthOne_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hHM)
+      (Ch1.hasPLengthOne_subgroup hMpl (H.subgroupOf M))
+  by_cases hpα : p ∈ alpha M
+  · -- `r_p(M) ≥ 3` branch (`p ∈ α(M)`): the representation-theory keystone (BG Theorem 3.6).
+    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+    have hp_dvd_M : p ∣ Nat.card ↥M :=
+      (Nat.mem_primeFactors.mp (alpha_subset_primeFactors M hpα)).2.1
+    haveI hMnt : Nontrivial ↥M := by
+      rw [← Finite.one_lt_card_iff_nontrivial]
+      exact lt_of_lt_of_le (Fact.out : p.Prime).one_lt (Nat.le_of_dvd Nat.card_pos hp_dvd_M)
+    -- `N := M_α` viewed inside `↥M`: a normal Hall `α(M)`-subgroup.
+    set N : Subgroup ↥M := (Malpha M).subgroupOf M with hN_def
+    haveI hNnorm : N.Normal := by rw [hN_def]; infer_instance
+    have hHallN : Ch03.IsHallSubgroup (alpha M) N := by
+      rw [hN_def]; exact Malpha_subgroupOf_isHall_of_isHall (Malpha_isHall hG hM)
+    have hcoprime : Nat.Coprime (Nat.card ↥N) N.index := hHallN.coprime_index
+    -- `N ≤ ↥M'` (Theorem 10.2: `M_α ⊆ M_σ ⊆ M'`); and `↥M'` is proper (solvable, nontrivial).
+    have hN_der : N ≤ commutator ↥M := by
+      have h1 : Malpha M ≤ derivedInG M :=
+        (Malpha_le_Msigma hG hM).trans (Msigma_le_derived hG hM)
+      rw [derivedInG] at h1
+      rw [hN_def, Subgroup.subgroupOf]
+      calc (Malpha M).comap M.subtype
+          ≤ ((commutator ↥M).map M.subtype).comap M.subtype := Subgroup.comap_mono h1
+        _ = commutator ↥M :=
+            Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+    have hN_lt : N < ⊤ :=
+      lt_of_le_of_lt hN_der (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M))
+    -- `p ∣ |N|` (Hall + `p ∈ α(M)`), hence `M_α ≠ 1`.
+    have hp_dvd_N : p ∣ Nat.card ↥N := by
+      have hp_prod : p ∣ Nat.card ↥N * N.index := by
+        rw [Subgroup.card_mul_index]; exact hp_dvd_M
+      rcases (Nat.Prime.dvd_mul Fact.out).mp hp_prod with h | h
+      · exact h
+      · exact absurd hpα (hHallN.index_no_pi p
+          (Nat.mem_primeFactors.mpr ⟨Fact.out, h, Subgroup.index_ne_zero_of_finite⟩))
+    have hMα_ne : Malpha M ≠ ⊥ := by
+      intro hbot
+      have hN_bot : N = ⊥ := by rw [hN_def, hbot]; simp
+      rw [hN_bot, Subgroup.card_bot] at hp_dvd_N
+      exact (Fact.out : p.Prime).ne_one (Nat.dvd_one.mp hp_dvd_N)
+    -- Schur–Zassenhaus: a complement `K` to `N` in `↥M`; `K ≠ ⊥` (else `N = ⊤`).
+    obtain ⟨K, hKcompl⟩ := Subgroup.exists_right_complement'_of_coprime hcoprime
+    have hK_ne : K ≠ ⊥ := by
+      intro hKbot
+      have hsup := hKcompl.isCompl.sup_eq_top
+      rw [hKbot, sup_bot_eq] at hsup
+      exact hN_lt.ne hsup
+    -- Choose a prime `q ∈ π(K/K')` (`K` is solvable and nontrivial, hence not perfect).
+    haveI hKnt : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hK_ne
+    haveI hKsolv : IsSolvable ↥K := solvable_of_solvable_injective K.subtype_injective
+    have hidx_ne1 : (commutator ↥K).index ≠ 1 := fun h =>
+      (IsSolvable.commutator_lt_top_of_nontrivial (G := ↥K)).ne
+        (Subgroup.index_eq_one.mp h)
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hidx_ne1
+    have hqK' : q ∈ ((commutator ↥K).index).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hq, hqdvd, Subgroup.index_ne_zero_of_finite⟩
+    -- Lemma 10.4(b): an order-`q` element `x ∈ K` with `C_{M_α}(⟨x⟩)` a `Z`-group.
+    obtain ⟨x, hxK, hxord, hxZ⟩ :=
+      exists_prime_orderOf_zgroupCentralizer_of_complement hG hM hMα_ne hKcompl hq hqK'
+    -- Theorem 3.6: `⁅N, K⁆` has `p`-length one (with `R₀ = ⟨x⟩`).
+    have hR₀le : Subgroup.zpowers x ≤ K := Subgroup.zpowers_le.mpr hxK
+    have hR₀prime : (Nat.card ↥(Subgroup.zpowers x)).Prime := by
+      rw [Nat.card_zpowers, hxord]; exact hq
+    have hpl_comm : Ch1.hasPLengthOne p ↥⁅N, K⁆ :=
+      pLengthOne_commutator_of_zgroupCentralizer hMsolv hoddM hNnorm hcoprime hKcompl
+        hR₀le hR₀prime hxZ p
+    -- Lemma 6.3(a): `⁅N, K⁆ = N` (since `N ≤ ↥M'`).
+    rw [Ch1.S06.commutator_eq_self_of_isComplement'_le_commutator hKcompl hN_der] at hpl_comm
+    -- Lift `N`'s `p`-length one to `↥M` along the `p'`-quotient `↥M/N` (`p ∈ α(M)`).
+    have hquot : ¬ p ∣ Nat.card (↥M ⧸ N) := fun hdvd => hHallN.index_no_pi p
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Subgroup.index_ne_zero_of_finite⟩) hpα
+    exact Ch1.hasPLengthOne_of_normal_pPrime_quotient hquot hpl_comm
+  · -- `r_p(M) ≤ 2` branch (`p ∉ α(M)`): BG Theorem 4.18 (landed).
+    exact maximal_hasPLengthOne_of_not_mem_alpha hG hM hpα
 /-! ## Corollary 10.7 — Sylow `p`-部分群の構造 (mmd L2787) -/
 
 /-- **BG Corollary 10.7** (mmd L2787): `p` prime, `P ∈ Syl_p(G)`。
