@@ -34,6 +34,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
