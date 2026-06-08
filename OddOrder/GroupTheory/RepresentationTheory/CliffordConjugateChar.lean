@@ -68,6 +68,34 @@ theorem mulEquiv_mem_center_iff {Γ : Type*} [Group Γ] (e : Γ ≃* Γ) (h : Γ
   · rw [map_mul, map_mul, H (e z)]
   · rw [← e.apply_symm_apply y, ← map_mul, ← map_mul, H (e.symm y)]
 
+/-- **`G = ⟨P, x⟩` centralises `Z(P)`** when `x` does (the `hgc` group input).  Every `z ∈ Z(P)` is
+fixed by conjugation by any `g ∈ G`: the centraliser of `z` in `G` contains `P` (`z` is central in
+`P`) and `x` (hypothesis `hxZ`), hence contains `⟨P, x⟩ = ⊤`. -/
+theorem conjNormalMulAut_center_eq_of_closure {P : Subgroup G} [P.Normal] (x : G)
+    (hxZ : ∀ z : ↥P, z ∈ Subgroup.center ↥P → conjNormalMulAut P x z = z)
+    (hgen : Subgroup.closure ((P : Set G) ∪ {x}) = ⊤)
+    (g : G) {z : ↥P} (hz : z ∈ Subgroup.center ↥P) :
+    conjNormalMulAut P g z = z := by
+  apply Subtype.ext
+  rw [conjNormalMulAut_apply_coe]
+  have hle : Subgroup.closure ((P : Set G) ∪ {x}) ≤ Subgroup.centralizer {(z : G)} := by
+    rw [Subgroup.closure_le]
+    rintro s (hsP | hsx)
+    · rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+      rintro y rfl
+      have hc := Subgroup.mem_center_iff.mp hz ⟨s, hsP⟩
+      exact congrArg (Subtype.val) hc.symm
+    · rw [Set.mem_singleton_iff] at hsx; subst hsx
+      rw [SetLike.mem_coe, Subgroup.mem_centralizer_iff]
+      rintro y rfl
+      have hx := congrArg (Subtype.val) (hxZ z hz)
+      rw [conjNormalMulAut_apply_coe, mul_inv_eq_iff_eq_mul] at hx
+      exact hx.symm
+  have hmem := hle (hgen ▸ Subgroup.mem_top g)
+  rw [Subgroup.mem_centralizer_iff] at hmem
+  rw [show g * (z : G) = (z : G) * g from (hmem (z : G) rfl).symm, mul_assoc,
+    mul_inv_cancel, mul_one]
+
 section SubrepAsModule
 
 /-! General-field analogues of the `ℂ`-pinned `ofSubmodulePrime*` lemmas in `CharacterCompleteness`,
@@ -255,5 +283,45 @@ theorem conjugate_submodule_iso [IsAlgClosed k] [FiniteDimensional k V] [Finite 
   submodule_iso_of_character_eq ρ W g (character_subRep_conj_eq ρ W hf hcl g hgc)
 
 end ConjChar
+
+section Materialize
+
+variable {H : Subgroup G} [hH : H.Normal]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **BG Prop 2.2(a), materialised** (the `hVP` input to the group-level Theorem 2.5).  If `ρ` is a
+faithful-type irreducible representation over an algebraically closed field with `char k ∤ |H|`,
+`G = ⟨H, x⟩`, `H` has nilpotency class `≤ 2`, `x` centralises `Z(H)`, and *every* nonzero simple
+`k[H]`-constituent of the restriction is faithful (BG 2.10), then the restriction `Res^G_H ρ` is
+irreducible.  Assembles: a simple constituent `W` exists (`exists_simple_submodule`); each conjugate
+is isomorphic to it (`conjugate_submodule_iso`, with `hgc` from
+`conjNormalMulAut_center_eq_of_closure`); so `restriction_isIrreducible` applies. -/
+theorem restriction_isIrreducible_of_faithful_constituents [ρ.IsIrreducible] [IsAlgClosed k]
+    [Module.Finite k V] [Nontrivial V] [Finite ↥H] [Invertible (Nat.card ↥H : k)]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hcl : commutator ↥H ≤ Subgroup.center ↥H)
+    (hxZ : ∀ z : ↥H, z ∈ Subgroup.center ↥H → conjNormalMulAut H x z = z)
+    (hf : ∀ W : Submodule k[↥H] (resRep ρ H).asModule, W ≠ ⊥ → IsSimpleModule k[↥H] ↥W →
+        Function.Injective ((Subrepresentation.ofSubmodule' W).toRepresentation)) :
+    (resRep ρ H).IsIrreducible := by
+  haveI : NeZero (Nat.card ↥H : k) := inferInstance
+  haveI : Module.Finite k (resRep ρ H).asModule := inferInstance
+  haveI : Module.Finite k[↥H] (resRep ρ H).asModule :=
+    Module.Finite.of_restrictScalars_finite k k[↥H] (resRep ρ H).asModule
+  haveI : IsSemisimpleModule k[↥H] (resRep ρ H).asModule := by
+    rw [← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
+  haveI : Nontrivial (resRep ρ H).asModule := ‹Nontrivial V›
+  obtain ⟨W, hWs⟩ := IsSemisimpleModule.exists_simple_submodule k[↥H] (resRep ρ H).asModule
+  haveI := hWs
+  have hWne : W ≠ ⊥ := by
+    rintro rfl
+    haveI : Nontrivial ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule) :=
+      IsSimpleModule.nontrivial k[↥H] _
+    exact false_of_nontrivial_of_subsingleton ↥(⊥ : Submodule k[↥H] (resRep ρ H).asModule)
+  exact restriction_isIrreducible ρ x hgen W hWne (fun g =>
+    conjugate_submodule_iso ρ W (hf W hWne hWs) hcl g
+      (fun z hz => conjNormalMulAut_center_eq_of_closure x hxZ hgen g⁻¹ hz))
+
+end Materialize
 
 end OddOrder.RepresentationTheory
