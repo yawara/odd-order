@@ -29,7 +29,7 @@
      - `AxiomsCheck.lean` / `OddOrder.lean` の**独立追記衝突** = 両ブロック保持で解決して続行
        （A=keystone 系の `#assert_only_allowed_axioms`、B=Peterfalvi 系の同コマンドは別定理ゆえ両方有効）
      - それ以外・内容が絡む衝突 = `git merge --abort` で**報告**（自動解決しない）
-   - `lake build OddOrder OddOrder.AxiomsCheck`（background, 完了待ち）
+   - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。`.lean` を含むなら `lake build OddOrder OddOrder.AxiomsCheck`（background, 完了待ち）
    - **合格条件**（全て満たす）:
      - build exit 0 かつ最終行 "Build completed successfully (N jobs)"
      - AxiomsCheck OK（`#assert_only_allowed_axioms` 由来のエラーなし）
