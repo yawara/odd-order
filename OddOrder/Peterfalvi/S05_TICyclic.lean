@@ -535,6 +535,117 @@ noncomputable def alpha (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
       = hyp.alphaCF χ₁ χ₂ :=
   rfl
 
+/- 3.4 (cont.): `dim CF(W, V) = (w₁ − 1)(w₂ − 1)`, the dimension count behind the `α_{ij}` basis -/
+
+@[simp] theorem wFst_wProdEquiv (hyp : TICyclicHypothesis G)
+    (p : (hyp.W1.subgroupOf hyp.W) × (hyp.W2.subgroupOf hyp.W)) :
+    hyp.wFst (hyp.wProdEquiv p) = p.1 := by
+  rw [wFst_apply, MulEquiv.symm_apply_apply]
+
+@[simp] theorem wSnd_wProdEquiv (hyp : TICyclicHypothesis G)
+    (p : (hyp.W1.subgroupOf hyp.W) × (hyp.W2.subgroupOf hyp.W)) :
+    hyp.wSnd (hyp.wProdEquiv p) = p.2 := by
+  rw [wSnd_apply, MulEquiv.symm_apply_apply]
+
+/-- Reconstruction `x = (W₁-part) · (W₂-part)` through `wFst`/`wSnd`. -/
+theorem eq_wFst_mul_wSnd (hyp : TICyclicHypothesis G) (x : hyp.W) :
+    x = (hyp.wFst x : hyp.W) * (hyp.wSnd x : hyp.W) := by
+  conv_lhs => rw [← hyp.wProdEquiv.apply_symm_apply x]
+  rw [hyp.wProdEquiv_apply]
+  rfl
+
+/-- `x` lies in `W₂` iff its `W₁`-component is trivial. -/
+theorem mem_W2_subgroupOf_iff_wFst_eq_one (hyp : TICyclicHypothesis G) {x : hyp.W} :
+    x ∈ hyp.W2.subgroupOf hyp.W ↔ hyp.wFst x = 1 := by
+  refine ⟨hyp.wFst_eq_one_of_mem_W2, fun h => ?_⟩
+  have hx := hyp.eq_wFst_mul_wSnd x
+  rw [h] at hx
+  simp only [OneMemClass.coe_one, one_mul] at hx
+  rw [hx]
+  exact SetLike.coe_mem _
+
+/-- `x` lies in `W₁` iff its `W₂`-component is trivial. -/
+theorem mem_W1_subgroupOf_iff_wSnd_eq_one (hyp : TICyclicHypothesis G) {x : hyp.W} :
+    x ∈ hyp.W1.subgroupOf hyp.W ↔ hyp.wSnd x = 1 := by
+  refine ⟨hyp.wSnd_eq_one_of_mem_W1, fun h => ?_⟩
+  have hx := hyp.eq_wFst_mul_wSnd x
+  rw [h] at hx
+  simp only [OneMemClass.coe_one, mul_one] at hx
+  rw [hx]
+  exact SetLike.coe_mem _
+
+/-- The bijection behind the count `|V| = (w₁−1)(w₂−1)`: via the internal product `W = W₁ × W₂`,
+an element of `V = W ∖ (W₁ ∪ W₂)` is exactly a pair of a nontrivial `W₁`-component and a nontrivial
+`W₂`-component. -/
+noncomputable def supportInVdiffEquiv (hyp : TICyclicHypothesis G) :
+    ↥(OddOrder.Peterfalvi.S04.supportInSubgroup hyp.Vdiff hyp.W) ≃
+      ({a : (hyp.W1.subgroupOf hyp.W) // a ≠ 1} ×
+        {b : (hyp.W2.subgroupOf hyp.W) // b ≠ 1}) where
+  toFun := fun x =>
+    have hx : (x.1 : G) ∈ hyp.W ∧ (x.1 : G) ∉ hyp.W1 ∧ (x.1 : G) ∉ hyp.W2 :=
+      hyp.mem_Vdiff.mp (OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp x.2)
+    (⟨hyp.wFst x.1, fun h =>
+        hx.2.2 ((Subgroup.mem_subgroupOf).mp ((hyp.mem_W2_subgroupOf_iff_wFst_eq_one).mpr h))⟩,
+     ⟨hyp.wSnd x.1, fun h =>
+        hx.2.1 ((Subgroup.mem_subgroupOf).mp ((hyp.mem_W1_subgroupOf_iff_wSnd_eq_one).mpr h))⟩)
+  invFun := fun p =>
+    ⟨hyp.wProdEquiv (p.1.1, p.2.1), by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hyp.mem_Vdiff]
+      refine ⟨SetLike.coe_mem _, ?_, ?_⟩
+      · intro hW1
+        refine p.2.2 ?_
+        have h := (hyp.mem_W1_subgroupOf_iff_wSnd_eq_one).mp ((Subgroup.mem_subgroupOf).mpr hW1)
+        rwa [hyp.wSnd_wProdEquiv] at h
+      · intro hW2
+        refine p.1.2 ?_
+        have h := (hyp.mem_W2_subgroupOf_iff_wFst_eq_one).mp ((Subgroup.mem_subgroupOf).mpr hW2)
+        rwa [hyp.wFst_wProdEquiv] at h⟩
+  left_inv := fun x => by
+    apply Subtype.ext
+    show hyp.wProdEquiv (hyp.wFst x.1, hyp.wSnd x.1) = x.1
+    rw [wFst_apply, wSnd_apply, Prod.mk.eta, MulEquiv.apply_symm_apply]
+  right_inv := fun p => by
+    apply Prod.ext
+    · apply Subtype.ext
+      show hyp.wFst (hyp.wProdEquiv (p.1.1, p.2.1)) = p.1.1
+      rw [wFst_wProdEquiv]
+    · apply Subtype.ext
+      show hyp.wSnd (hyp.wProdEquiv (p.1.1, p.2.1)) = p.2.1
+      rw [wSnd_wProdEquiv]
+
+/-- The count `|V| = (w₁ − 1)(w₂ − 1)`, `V = W ∖ (W₁ ∪ W₂)`. -/
+theorem card_supportInSubgroup_Vdiff (hyp : TICyclicHypothesis G) :
+    Nat.card ↥(OddOrder.Peterfalvi.S04.supportInSubgroup hyp.Vdiff hyp.W)
+      = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ↥(hyp.W1.subgroupOf hyp.W) := Fintype.ofFinite _
+  haveI : Fintype ↥(hyp.W2.subgroupOf hyp.W) := Fintype.ofFinite _
+  rw [Nat.card_congr hyp.supportInVdiffEquiv, Nat.card_prod]
+  have h1 : Nat.card {a : (hyp.W1.subgroupOf hyp.W) // a ≠ 1} = Nat.card hyp.W1 - 1 := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.W1_le_W).toEquiv,
+      Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
+      Fintype.card_subtype_compl, Fintype.card_subtype_eq]
+  have h2 : Nat.card {b : (hyp.W2.subgroupOf hyp.W) // b ≠ 1} = Nat.card hyp.W2 - 1 := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.W2_le_W).toEquiv,
+      Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
+      Fintype.card_subtype_compl, Fintype.card_subtype_eq]
+  rw [h1, h2]
+
+/-- **Peterfalvi (3.4)**: `dim_ℂ CF(W, V) = (w₁ − 1)(w₂ − 1)` with `V = W ∖ (W₁ ∪ W₂)` and
+`w_k = |W_k|`.  Together with the linear independence of the `α_{ij}`, this dimension count gives
+that the family `(α_{ij})` (`1 ≤ i < w₁`, `1 ≤ j < w₂`) is a basis of `CF(W, V)`. -/
+theorem finrank_supportedOnV (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff) :
+    Module.finrank ℂ (SupportedOnV ℂ hyp) = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1) := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
+  haveI : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
+  show Module.finrank ℂ
+      ↥(ClassFunction.supportedSubmodule (G := ↥hyp.W)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W))
+      = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1)
+  rw [finrank_supportedSubmodule_eq_card, hVeq, hyp.card_supportInSubgroup_Vdiff]
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
