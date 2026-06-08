@@ -3216,3 +3216,5 @@ set_option linter.style.longLine false in
 -- group `G` of odd order with a normal Hall subgroup `K`, a prime-order complement `R`, acting on
 -- `V/F` with `char F ∤ |G|`, `F` algebraically closed, and `C_V(R) = 0`, gives `[R,K] ⊆ C_K(V)`.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34_algClosed
+-- BG Theorem 3.4 (general field, via base change to the algebraic closure, BG (2.9)).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34

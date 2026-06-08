@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Subrepresentation
 import Mathlib.FieldTheory.IsAlgClosed.Basic
+import Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
@@ -15,6 +16,7 @@ import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.RepresentationTheory.BaseChange
 
 /-!
 # BG §3: Theorem 3.4 (coprime action, fixed-point-free complement)
@@ -57,11 +59,11 @@ This is the keystone consumer of BG Theorem 2.5 (`finrank_*_of_extraspecial`,
 core (`thm34_algClosed`) は **`[IsAlgClosed F]` 付き**で証明し (Thm 2.5 / Gor 3.2.2 が alg-closed 必須),
 一般 `F` は base change (BG (2.9) = `BaseChange.lean`) で別 leaf (`thm34`) として導く.
 
-**状態**: `thm34_algClosed` は **完全証明済 (sorry-free, axiom-clean)**.  rep-carrying induction は
-`Nat.card G` での強帰納法 (template = `frobeniusKernelIsNilpotent_aux`, S03c), 再帰 2 形:
-(a) `HR ≤ G` on same `V` (`ρ.comp (H ⊔ R).subtype`), (b) `G/N` on submodule `M`
-(`Subrepresentation.toRepresentation` → `Representation.ofQuotient`).  残るのは一般 `F` への
-base-change wrapper (`thm34`, BG (2.9)) のみ — downstream Thm 3.6 が消費する独立 leaf.
+**状態**: `thm34_algClosed` (alg-closed core) と `thm34` (一般 `F`, base change 経由) はともに
+**完全証明済 (sorry-free, axiom-clean)**.  core の rep-carrying induction は `Nat.card G` での強帰納法
+(template = `frobeniusKernelIsNilpotent_aux`, S03c), 再帰 2 形: (a) `HR ≤ G` on same `V`
+(`ρ.comp (H ⊔ R).subtype`), (b) `G/N` on submodule `M` (`Subrepresentation.toRepresentation` →
+`Representation.ofQuotient`).  一般 `F` は base change (BG (2.9) = `BaseChange.lean`) で導く.
 -/
 
 namespace OddOrder.BG.Ch1.S03d
@@ -1057,5 +1059,57 @@ theorem thm34_algClosed
     (hCV : ∀ v : V, (∀ r : ↥R, ρ (r : G) v = v) → v = 0) :
     ∀ g ∈ ⁅R, K⁆, ρ g = 1 :=
   thm34_aux (Nat.card G) ρ K R hcompl hHall hRp hodd hchar hCV rfl
+
+open OddOrder.RepresentationTheory in
+/-- **BG Theorem 3.4** (general field).  `G` solvable of odd order, `K` a normal Hall subgroup with
+prime-order complement `R`, `G` acting on `V/F` with `char F ∤ |G|` (any field `F`).  If
+`C_V(R) = 0` then `[R, K] ⊆ C_K(V)`.
+
+Reduces to the algebraically closed core `thm34_algClosed` by base change to the algebraic closure
+`F̄` (BG (2.9)): `char F̄ ∤ |G|` and `C_{F̄⊗V}(R) = 0` transfer along `F → F̄`
+(`invariants_baseChangeRepresentation_eq_bot`), and `ρ̄ g = 1 ⟹ ρ g = 1` descends because
+`v ↦ 1 ⊗ v` is injective (`F̄` is faithfully flat over `F`). -/
+theorem thm34
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (ρ : Representation F G V) (K R : Subgroup G) [K.Normal]
+    (hcompl : Subgroup.IsComplement' K R)
+    (hHall : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R))
+    (hRp : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
+    (hodd : Odd (Nat.card G))
+    (hchar : (Nat.card G : F) ≠ 0)
+    (hCV : ∀ v : V, (∀ r : ↥R, ρ (r : G) v = v) → v = 0) :
+    ∀ g ∈ ⁅R, K⁆, ρ g = 1 := by
+  -- `char F̄ ∤ |G|`.
+  have hchar' : (Nat.card G : AlgebraicClosure F) ≠ 0 := by
+    rw [← map_natCast (algebraMap F (AlgebraicClosure F))]
+    rwa [Ne, map_eq_zero_iff _ (algebraMap F (AlgebraicClosure F)).injective]
+  -- `C_V(R) = 0` ⟹ `C_{F̄⊗V}(R) = 0` (vanishing of invariants survives base change).
+  have hCVinv : Representation.invariants (ρ.comp R.subtype) = ⊥ := by
+    rw [Submodule.eq_bot_iff]
+    exact fun v hv => hCV v hv
+  have hCVinv' : Representation.invariants
+      ((baseChangeRepresentation (AlgebraicClosure F) ρ).comp R.subtype) = ⊥ := by
+    rw [← baseChangeRepresentation_comp]
+    exact invariants_baseChangeRepresentation_eq_bot (AlgebraicClosure F) (ρ.comp R.subtype) hCVinv
+  have hCV' : ∀ v : TensorProduct F (AlgebraicClosure F) V,
+      (∀ r : ↥R, baseChangeRepresentation (AlgebraicClosure F) ρ (r : G) v = v) → v = 0 := by
+    intro v hv
+    have hmem : v ∈ Representation.invariants
+        ((baseChangeRepresentation (AlgebraicClosure F) ρ).comp R.subtype) := hv
+    rwa [hCVinv', Submodule.mem_bot] at hmem
+  -- apply the algebraically closed core over `F̄`, then descend `v ↦ 1 ⊗ v`.
+  intro g hg
+  have hbar : baseChangeRepresentation (AlgebraicClosure F) ρ g = 1 :=
+    thm34_algClosed (baseChangeRepresentation (AlgebraicClosure F) ρ) K R hcompl hHall hRp hodd
+      hchar' hCV' g hg
+  apply LinearMap.ext
+  intro v
+  apply Module.FaithfullyFlat.tensorProduct_mk_injective (A := F) (B := AlgebraicClosure F) V
+  have hmap := congrArg
+    (fun f : TensorProduct F (AlgebraicClosure F) V →ₗ[AlgebraicClosure F]
+      TensorProduct F (AlgebraicClosure F) V => f (1 ⊗ₜ[F] v)) hbar
+  simpa using hmap
 
 end OddOrder.BG.Ch1.S03d
