@@ -34,6 +34,10 @@
      - build exit 0 かつ最終行 "Build completed successfully (N jobs)"
      - AxiomsCheck OK（`#assert_only_allowed_axioms` 由来のエラーなし）
      - 実 sorry 数がマージ前**以下**（増えていない。main は既に ~144 の scaffold sorry を持つので絶対数でなく増分で判定）
+       - ⚠ **count 増加でも即 abort しない**: `(^|[^a-zA-Z-])sorry` は docstring の「`(sorry-free`」を
+         直前 `(` ゆえ誤マッチする（偽陽性）。増分があれば `git diff --cached` で新規マッチ箇所を特定し、
+         真の tactic sorry か確認（`grep -nwE 'sorry' <file> | grep -vE 'sorry-(free|ax)'`、コメント/docstring 内なら偽陽性）。
+         真の sorry 増のみ不合格。実例: BG Thm 3.4 keystone landing は「完全証明済 (sorry-free, axiom-clean)」comment で +1 偽陽性が出た。
    - 合格 → `git commit`:
      `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾
      `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
