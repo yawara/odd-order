@@ -543,13 +543,20 @@ commits `d54869a5` + `e1ac4947`):
 - **▶▶▶ 残る唯一の入力 = hf = constituent faithful (BG 2.10) — ✅ TRACTABLE (多セッション級でない), 証明スケッチ確定**:
   **鍵 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`** (`Ch01_Sylow/Main.lean:357`, 既証:
   finite p-group の非自明正規 N ⟹ `N ⊓ Z(P)` nontrivial)。証明手順:
-  1. **unique minimal normal** (新 helper, `IsExtraspecial.lean` 候補): `IsExtraspecial p ↥P` + `[Finite]` + N⊴P, N≠⊥ ⟹
-     Z(P)≤N。`normal_inf_center_nontrivial` で N⊓Z≠⊥, `center_card=p` prime ⟹ N⊓Z=Z (prime-order subgroup は ⊥/⊤;
-     card-dvd or `subgroupOf` + IsSimpleOrder ルート) ⟹ Z≤N。
-  2. **faithfulness** (新 thm, hf を discharge): ρ_W=(ofSubmodule' W).toRepresentation の ker は ⊴↥P。ker≠⊥ なら
-     Z(↥P)≤ker (上記) ⟹ Z(↥P) が W に自明作用。各共役 ρg(W) でも自明 (z 作用 = ρ(z), w'=ρg w で ρ(z)ρg w=ρ(zg)w=
-     ρg ρ(g⁻¹zg)w, g⁻¹zg∈Z(P) 自明 ⟹ =w')。共役 span ⊤ (`iSup_map_conjSemilinearEnd_eq_top`, ρ既約) ⟹ Z(↥P) が V 自明 ⟹
-     Z(↥P)⊆ker ρ=⊥ (ρ faithful) ⟹ |Z|=1, `center_card=p` と矛盾 ⟹ ker=⊥ ⟹ ρ_W injective。
-  discharge ⟹ materialization → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) → 3.4 → 3.6 → §10.6 全開放。
-  ※ hxZ (x が Z(P) 中心化) も group-level setup の `C_P(x)=Z(P)` 完全等号から供給要 (現状 finrank_modEq の hCP は ⊆ のみ)。
-  ※ 要 `[Fact p.Prime]` + `IsExtraspecial p ↥P` を faithfulness thm の仮説に。CliffordConjugateChar が IsExtraspecial を import。
+  1. ✅ **unique minimal normal DONE** (commit `e53c5c9a`, `CliffordConjugateChar.lean`):
+     `extraspecial_center_le_of_normal_ne_bot` — `IsExtraspecial p P` + `[Finite P][Fact p.Prime]` + N⊴P, N≠⊥ ⟹
+     Z(P)≤N。`normal_inf_center_nontrivial` (N⊓Z≠⊥) + `(N.subgroupOf Z).eq_bot_or_eq_top_of_prime_card`
+     (`center_card=p` prime) → ⊥ ケース矛盾 / ⊤ ケース `subgroupOf_eq_top` で Z≤N。
+  2. ✅ **faithfulness DONE** (`extraspecial_constituent_faithful`): ρ既約+faithful+`IsExtraspecial p ↥H`+`[Finite]` ⟹
+     ∀ 非零 simple constituent W で `(ofSubmodule' W).toRepresentation` injective。`MonoidHom.ker ρ_W` ≠⊥ なら
+     `extraspecial_center_le_of_normal_ne_bot` で Z(↥H)≤ker ⟹ 中心 z₀≠1 が W 自明。各共役 ρg(W) でも z₀ 自明
+     (`z'':=conjNormalMulAut H g⁻¹ z₀` が `mulEquiv_mem_center_iff` で中心 ⟹ ker ⟹ W 自明; ρ(z₀)ρg w=ρ(z₀g)w=
+     ρ(g·z'')w=ρg(ρ(z'')w)=ρg w)。共役 span ⊤ (`iSup_map_conjSemilinearEnd_eq_top`) を `Submodule.iSup_induction`
+     (明示 motive 必須・高階推論回避) ⟹ ρ(z₀) が V 自明 ⟹ (z₀:G)∈ker ρ=1 (faithful) ⟹ z₀=1 矛盾 (`center_card=p`)。
+  3. ✅ **wrapper DONE** (`restriction_isIrreducible_of_extraspecial`): materialization + faithfulness 合成。
+     ρ faithful+irreducible/alg-closed/char∤|H|, `⟨H,x⟩=⊤`, `IsExtraspecial p ↥H`, x が Z(H) 中心化 (hxZ) ⟹
+     `(resRep ρ H).IsIrreducible` (= hVP)。class≤2 は `commutator=center` から自動。**constituent faithfulness 仮説は消えた**。
+  **✅✅✅ BG 2.10 COMPLETE — hVP は extraspecial setup から完全 materialize 可能に。**
+  **▶ 残る group input = hxZ (x が Z(P) 中心化)** = `C_P(x)=Z(P)` 完全等号の ⊇ 方向 (現状 finrank_modEq の hCP は ⊆ のみ;
+  group-level Thm 2.5 setup に追加要)。これと `IsExtraspecial` を §3 文脈が供給すれば Thm 2.5 → 3.4 → 3.6 → §10.6 全開放。
+  ※ CliffordConjugateChar が IsExtraspecial + Isaacs Ch01 を import。`MonoidHom.ker` は End(monoid) codomain で Subgroup 化 OK。

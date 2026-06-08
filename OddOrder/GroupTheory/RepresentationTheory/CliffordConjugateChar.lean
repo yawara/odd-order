@@ -314,6 +314,59 @@ section Materialize
 variable {H : Subgroup G} [hH : H.Normal]
 
 set_option backward.isDefEq.respectTransparency false in
+/-- **BG 2.10: every simple constituent of a faithful irreducible is faithful** (over an
+extraspecial `H`).  If `ρ` is irreducible and faithful and `H` is extraspecial, then any nonzero
+simple `k[H]`-submodule `W` of the restriction carries a faithful representation of `H`.  Proof: the
+kernel of the constituent is normal; if nonzero it contains `Z(H)` (unique minimal normal,
+`extraspecial_center_le_of_normal_ne_bot`); then a central `z₀ ≠ 1` acts trivially on `W`, hence on
+every conjugate `(ρ g)(W)` (the conjugate of `z₀` is again central, so also acts trivially), hence
+on their span `⊤ = V`; thus `z₀ ∈ ker ρ = 1`, contradicting `|Z(H)| = p`. -/
+theorem extraspecial_constituent_faithful {p : ℕ} [Fact p.Prime] [ρ.IsIrreducible]
+    (hρf : Function.Injective ρ) (hPe : OddOrder.GroupTheory.IsExtraspecial p ↥H) [Finite ↥H]
+    (W : Submodule k[↥H] (resRep ρ H).asModule) (hWne : W ≠ ⊥) [IsSimpleModule k[↥H] ↥W] :
+    Function.Injective ((Subrepresentation.ofSubmodule' W).toRepresentation) := by
+  rw [← MonoidHom.ker_eq_bot_iff]
+  by_contra hne
+  have hZker : Subgroup.center ↥H ≤ (Subrepresentation.ofSubmodule' W).toRepresentation.ker :=
+    extraspecial_center_le_of_normal_ne_bot hPe hne
+  haveI : Nontrivial ↥(Subgroup.center ↥H) := by
+    rw [← Finite.one_lt_card_iff_nontrivial, hPe.center_card]; exact (Fact.out : p.Prime).one_lt
+  obtain ⟨c, hc⟩ := exists_ne (1 : ↥(Subgroup.center ↥H))
+  set z₀ : ↥H := (c : ↥H) with hz₀def
+  have hz₀mem : z₀ ∈ Subgroup.center ↥H := c.2
+  have hz₀ne : z₀ ≠ 1 := fun h => hc (Subtype.ext h)
+  have hVtriv : ∀ v : (resRep ρ H).asModule, ρ ((z₀ : G)) v = v := by
+    intro v
+    have hv : v ∈ ⨆ g : G, W.map (conjSemilinearEnd (H := H) ρ g) := by
+      rw [iSup_map_conjSemilinearEnd_eq_top ρ W hWne]; exact Submodule.mem_top
+    refine Submodule.iSup_induction
+      (motive := fun u => ρ ((z₀ : G)) u = u)
+      (fun g : G => W.map (conjSemilinearEnd (H := H) ρ g)) hv ?_ ?_ ?_
+    · intro g y hy
+      rw [mem_map_conjSemilinearEnd] at hy
+      obtain ⟨w, hwW, rfl⟩ := hy
+      have hz''mem : conjNormalMulAut H g⁻¹ z₀ ∈ Subgroup.center ↥H :=
+        (mulEquiv_mem_center_iff (conjNormalMulAut H g⁻¹) z₀).mpr hz₀mem
+      have hz''W : ρ ((conjNormalMulAut H g⁻¹ z₀ : ↥H) : G) w = w := by
+        have hker := MonoidHom.mem_ker.mp (hZker hz''mem)
+        have hwmem : w ∈ (Subrepresentation.ofSubmodule' W).toSubmodule := hwW
+        have h2 : (Subrepresentation.ofSubmodule' W).toRepresentation
+            (conjNormalMulAut H g⁻¹ z₀) ⟨w, hwmem⟩ = ⟨w, hwmem⟩ := by rw [hker]; rfl
+        simpa [coe_toRepresentation_apply] using Subtype.ext_iff.mp h2
+      have hcoe : ((conjNormalMulAut H g⁻¹ z₀ : ↥H) : G) = g⁻¹ * (z₀ : G) * g := by
+        rw [conjNormalMulAut_apply_coe, inv_inv]
+      change ρ ((z₀ : G)) (ρ g w) = ρ g w
+      rw [← Module.End.mul_apply, ← map_mul,
+        show (z₀ : G) * g = g * ((conjNormalMulAut H g⁻¹ z₀ : ↥H) : G) by rw [hcoe]; group,
+        map_mul, Module.End.mul_apply, hz''W]
+    · exact map_zero _
+    · intro a b ha hb; rw [map_add, ha, hb]
+  have hVtriv' : ρ ((z₀ : G)) = 1 := by
+    ext v; rw [Module.End.one_apply]; exact hVtriv v
+  have hz1 : (z₀ : G) = 1 := hρf (show ρ ((z₀ : G)) = ρ 1 by rw [hVtriv', map_one])
+  exact hz₀ne (OneMemClass.coe_eq_one.mp hz1)
+
+set_option backward.isDefEq.respectTransparency false in
 /-- **BG Prop 2.2(a), materialised** (the `hVP` input to the group-level Theorem 2.5).  If `ρ` is a
 faithful-type irreducible representation over an algebraically closed field with `char k ∤ |H|`,
 `G = ⟨H, x⟩`, `H` has nilpotency class `≤ 2`, `x` centralises `Z(H)`, and *every* nonzero simple
@@ -346,6 +399,24 @@ theorem restriction_isIrreducible_of_faithful_constituents [ρ.IsIrreducible] [I
   exact restriction_isIrreducible ρ x hgen W hWne (fun g =>
     conjugate_submodule_iso ρ W (hf W hWne hWs) hcl g
       (fun z hz => conjNormalMulAut_center_eq_of_closure x hxZ hgen g⁻¹ hz))
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **BG Theorem 2.5's `hVP`, fully materialised for an extraspecial `H`.**  If `ρ` is faithful and
+irreducible over an algebraically closed field with `char k ∤ |H|`, `G = ⟨H, x⟩`, `H` is
+extraspecial of prime-order centre, and `x` centralises `Z(H)`, then the restriction `Res^G_H ρ` is
+irreducible.
+Combines `restriction_isIrreducible_of_faithful_constituents` with the constituent faithfulness
+`extraspecial_constituent_faithful` (BG 2.10), so no faithfulness hypothesis on the constituents
+remains.  The class-`≤2` condition is automatic (`commutator H = Z(H)` for extraspecial `H`). -/
+theorem restriction_isIrreducible_of_extraspecial {p : ℕ} [Fact p.Prime] [ρ.IsIrreducible]
+    [IsAlgClosed k] [Module.Finite k V] [Nontrivial V] [Finite ↥H] [Invertible (Nat.card ↥H : k)]
+    (hρf : Function.Injective ρ) (hPe : OddOrder.GroupTheory.IsExtraspecial p ↥H)
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hxZ : ∀ z : ↥H, z ∈ Subgroup.center ↥H → conjNormalMulAut H x z = z) :
+    (resRep ρ H).IsIrreducible :=
+  restriction_isIrreducible_of_faithful_constituents ρ x hgen hPe.commutator_eq_center.le hxZ
+    (fun W hWne hWs => by
+      haveI := hWs; exact extraspecial_constituent_faithful ρ hρf hPe W hWne)
 
 end Materialize
 
