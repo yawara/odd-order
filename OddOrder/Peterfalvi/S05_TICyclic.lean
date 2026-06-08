@@ -678,6 +678,159 @@ theorem omega_inner_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (hyp.omega χ' : ClassFunction hyp.W ℂ) = 0 := by
   rw [irreducibleCharacter_inner, if_neg (fun hc => h (hyp.omega_injective hc))]
 
+/- 3.4 (cont.): the character-group separation behind `⟨α_{kl}, ω_{ij}⟩ = δ` -/
+
+/-- `wFst` restricted to `W₁` is the identity (the `W₁`-component of a `W₁`-element is itself). -/
+theorem wFst_W1_subtype (hyp : TICyclicHypothesis G)
+    (w : (hyp.W1.subgroupOf hyp.W)) :
+    hyp.wFst ((hyp.W1.subgroupOf hyp.W).subtype w) = w := by
+  have hsymm : hyp.wProdEquiv.symm ((hyp.W1.subgroupOf hyp.W).subtype w) = (w, 1) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wFst_apply, hsymm]
+
+/-- `wSnd` kills `W₁` (the `W₂`-component of a `W₁`-element is trivial). -/
+theorem wSnd_W1_subtype (hyp : TICyclicHypothesis G)
+    (w : (hyp.W1.subgroupOf hyp.W)) :
+    hyp.wSnd ((hyp.W1.subgroupOf hyp.W).subtype w) = 1 := by
+  have hsymm : hyp.wProdEquiv.symm ((hyp.W1.subgroupOf hyp.W).subtype w) = (w, 1) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wSnd_apply, hsymm]
+
+/-- `wFst` kills `W₂`. -/
+theorem wFst_W2_subtype (hyp : TICyclicHypothesis G)
+    (w : (hyp.W2.subgroupOf hyp.W)) :
+    hyp.wFst ((hyp.W2.subgroupOf hyp.W).subtype w) = 1 := by
+  have hsymm : hyp.wProdEquiv.symm ((hyp.W2.subgroupOf hyp.W).subtype w) = (1, w) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wFst_apply, hsymm]
+
+/-- `wSnd` restricted to `W₂` is the identity. -/
+theorem wSnd_W2_subtype (hyp : TICyclicHypothesis G)
+    (w : (hyp.W2.subgroupOf hyp.W)) :
+    hyp.wSnd ((hyp.W2.subgroupOf hyp.W).subtype w) = w := by
+  have hsymm : hyp.wProdEquiv.symm ((hyp.W2.subgroupOf hyp.W).subtype w) = (1, w) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wSnd_apply, hsymm]
+
+/-- **Injectivity of the dual `Ŵ₁ × Ŵ₂ → Ŵ`** (`(χ₁, χ₂) ↦ χ₁∘wFst · χ₂∘wSnd`): composing with the
+`W₁`- and `W₂`-inclusions recovers `χ₁` and `χ₂`.  This is the character-group counterpart of the
+internal product `W = W₁ × W₂` (`wProdEquiv`) and is what makes the `ω_{ij}` pairwise distinct. -/
+theorem comp_mul_injective (hyp : TICyclicHypothesis G)
+    {χ₁ χ₁' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (h : χ₁.comp hyp.wFst * χ₂.comp hyp.wSnd = χ₁'.comp hyp.wFst * χ₂'.comp hyp.wSnd) :
+    χ₁ = χ₁' ∧ χ₂ = χ₂' := by
+  refine ⟨MonoidHom.ext fun w => ?_, MonoidHom.ext fun w => ?_⟩
+  · have hw := congrArg (fun f : hyp.W →* ℂˣ => f ((hyp.W1.subgroupOf hyp.W).subtype w)) h
+    simp only [MonoidHom.mul_apply, MonoidHom.comp_apply, hyp.wFst_W1_subtype,
+      hyp.wSnd_W1_subtype, map_one, mul_one] at hw
+    exact hw
+  · have hw := congrArg (fun f : hyp.W →* ℂˣ => f ((hyp.W2.subgroupOf hyp.W).subtype w)) h
+    simp only [MonoidHom.mul_apply, MonoidHom.comp_apply, hyp.wFst_W2_subtype,
+      hyp.wSnd_W2_subtype, map_one, one_mul] at hw
+    exact hw
+
+/-- `ω_{ij} = χ₁∘wFst · χ₂∘wSnd`, the linear character of `W` whose value at `Irr(W)` is `ω_{ij}`;
+its image under `ω` is Peterfalvi's `ω_{ij}`. -/
+noncomputable def omegaProdChar (hyp : TICyclicHypothesis G) (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ)
+    (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) : hyp.W →* ℂˣ :=
+  χ₁.comp hyp.wFst * χ₂.comp hyp.wSnd
+
+theorem omegaProdChar_one_left (hyp : TICyclicHypothesis G)
+    (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.omegaProdChar 1 χ₂ = χ₂.comp hyp.wSnd := by
+  rw [omegaProdChar, MonoidHom.one_comp, one_mul]
+
+theorem omegaProdChar_one_right (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.omegaProdChar χ₁ 1 = χ₁.comp hyp.wFst := by
+  rw [omegaProdChar, MonoidHom.one_comp, mul_one]
+
+theorem omegaProdChar_one_one (hyp : TICyclicHypothesis G) :
+    hyp.omegaProdChar 1 1 = 1 := by
+  rw [omegaProdChar, MonoidHom.one_comp, MonoidHom.one_comp, one_mul]
+
+theorem omegaProdChar_inj (hyp : TICyclicHypothesis G)
+    {χ₁ χ₁' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (h : hyp.omegaProdChar χ₁ χ₂ = hyp.omegaProdChar χ₁' χ₂') : χ₁ = χ₁' ∧ χ₂ = χ₂' :=
+  hyp.comp_mul_injective h
+
+/-- `1_W ≠ ω_{ij}` for `i ≠ 0` (i.e. `a₁ ≠ 1`): `ω_{ij}` is nontrivial unless both indices are. -/
+theorem one_ne_omegaProdChar (hyp : TICyclicHypothesis G)
+    {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} (ha₁ : a₁ ≠ 1)
+    (a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (1 : hyp.W →* ℂˣ) ≠ hyp.omegaProdChar a₁ a₂ := by
+  intro h
+  rw [← hyp.omegaProdChar_one_one] at h
+  exact ha₁ (hyp.omegaProdChar_inj h).1.symm
+
+/-- `ω_{i0} ≠ ω_{kl}` when `l ≠ 0` (`a₂ ≠ 1`): a `W₂`-trivial character is not an `ω_{kl}` with a
+nontrivial `W₂`-part. -/
+theorem comp_wFst_ne_omegaProdChar (hyp : TICyclicHypothesis G)
+    (b₁ a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) {a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₂ : a₂ ≠ 1) :
+    b₁.comp hyp.wFst ≠ hyp.omegaProdChar a₁ a₂ := by
+  intro h
+  rw [← hyp.omegaProdChar_one_right b₁] at h
+  exact ha₂ (hyp.omegaProdChar_inj h).2.symm
+
+/-- `ω_{0j} ≠ ω_{kl}` when `k ≠ 0` (`a₁ ≠ 1`). -/
+theorem comp_wSnd_ne_omegaProdChar (hyp : TICyclicHypothesis G)
+    (b₂ a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) :
+    b₂.comp hyp.wSnd ≠ hyp.omegaProdChar a₁ a₂ := by
+  intro h
+  rw [← hyp.omegaProdChar_one_left b₂] at h
+  exact ha₁ (hyp.omegaProdChar_inj h).1.symm
+
+/-- Distinct index pairs give distinct `ω_{ij}` (`omegaProdChar` is injective). -/
+theorem omegaProdChar_ne (hyp : TICyclicHypothesis G)
+    {b₁ a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {b₂ a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (h : ¬ (b₁ = a₁ ∧ b₂ = a₂)) :
+    hyp.omegaProdChar b₁ b₂ ≠ hyp.omegaProdChar a₁ a₂ :=
+  fun heq => h (hyp.omegaProdChar_inj heq)
+
+/-- **Peterfalvi (3.4), diagonal**: `⟨α_{ij}, ω_{ij}⟩ = 1` for `i, j ≥ 1`.  Computed from the
+expansion `α = 1 - ω_{i0} - ω_{0j} + ω_{ij}` and orthonormality: only the `ω_{ij}` term survives. -/
+theorem alpha_inner_omega_self (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    {p₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} (hp₁ : p₁ ≠ 1)
+    {p₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hp₂ : p₂ ≠ 1) :
+    ClassFunction.inner (hyp.alphaCF p₁ p₂)
+      (hyp.omega (hyp.omegaProdChar p₁ p₂) : ClassFunction hyp.W ℂ) = 1 := by
+  rw [alphaCF_eq_omega_combination, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_left,
+    show p₁.comp hyp.wFst * p₂.comp hyp.wSnd = hyp.omegaProdChar p₁ p₂ from rfl,
+    hyp.omega_inner_ne (hyp.one_ne_omegaProdChar hp₁ p₂),
+    hyp.omega_inner_ne (hyp.comp_wFst_ne_omegaProdChar p₁ p₁ hp₂),
+    hyp.omega_inner_ne (hyp.comp_wSnd_ne_omegaProdChar p₂ p₂ hp₁),
+    hyp.omega_inner_self]
+  ring
+
+/-- **Peterfalvi (3.4), off-diagonal**: `⟨α_{kl}, ω_{ij}⟩ = 0` for `(k,l) ≠ (i,j)` (`i, j ≥ 1`).
+All four `ω`-terms of `α_{kl}` are orthogonal to `ω_{ij}`. -/
+theorem alpha_inner_omega_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    {q₁ p₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {q₂ p₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (hp₁ : p₁ ≠ 1) (hp₂ : p₂ ≠ 1) (hne : ¬ (q₁ = p₁ ∧ q₂ = p₂)) :
+    ClassFunction.inner (hyp.alphaCF q₁ q₂)
+      (hyp.omega (hyp.omegaProdChar p₁ p₂) : ClassFunction hyp.W ℂ) = 0 := by
+  rw [alphaCF_eq_omega_combination, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_left,
+    show q₁.comp hyp.wFst * q₂.comp hyp.wSnd = hyp.omegaProdChar q₁ q₂ from rfl,
+    hyp.omega_inner_ne (hyp.one_ne_omegaProdChar hp₁ p₂),
+    hyp.omega_inner_ne (hyp.comp_wFst_ne_omegaProdChar q₁ p₁ hp₂),
+    hyp.omega_inner_ne (hyp.comp_wSnd_ne_omegaProdChar q₂ p₂ hp₁),
+    hyp.omega_inner_ne (hyp.omegaProdChar_ne hne)]
+  ring
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
