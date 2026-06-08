@@ -3275,3 +3275,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_zero_of_mem_W1_subgroupOf
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_mem_supportedSubmodule
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha
+
+-- Peterfalvi (3.4) dimension input: for a finite commutative group the class functions supported
+-- on `A` have dimension `|A|` (restriction/extension-by-zero gives `CF(H,A) ≃ (↥A → ℂ)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.finrank_supportedSubmodule_eq_card

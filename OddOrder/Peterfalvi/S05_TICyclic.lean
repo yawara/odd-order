@@ -183,6 +183,56 @@ theorem full_maps_virtualCharacter {hyp : TICyclicHypothesis G}
 
 end TICyclicHypothesis
 
+section SupportedDimension
+open scoped IsMulCommutative
+open Module (finrank)
+
+/-- For a finite **commutative** group `H`, the class functions supported on `A ⊆ H` form a space
+of dimension `|A|`.  For commutative `H` conjugation is trivial, so every function on `H` is a class
+function; restriction to `A` and extension-by-zero then give a linear isomorphism
+`CF(H, A) ≃ (↥A → ℂ)`.  This is the dimension input for Peterfalvi (3.4)
+(`dim CF(W, V) = (w₁−1)(w₂−1)`). -/
+theorem finrank_supportedSubmodule_eq_card {H : Type*} [Group H] [Fintype H] [IsMulCommutative H]
+    (A : Set H) :
+    finrank ℂ (ClassFunction.supportedSubmodule (G := H) (k := ℂ) A) = Nat.card A := by
+  classical
+  haveI : Fintype A := Fintype.ofFinite _
+  let restr : ClassFunction.supportedSubmodule (G := H) (k := ℂ) A →ₗ[ℂ] (A → ℂ) :=
+    { toFun := fun φ a => (φ : ClassFunction H ℂ) (a : H)
+      map_add' := fun φ ψ => by funext a; rfl
+      map_smul' := fun c φ => by funext a; rfl }
+  have hbij : Function.Bijective restr := by
+    constructor
+    · intro φ ψ h
+      apply Subtype.ext
+      apply ClassFunction.ext
+      intro w
+      by_cases hw : w ∈ A
+      · exact congrFun h ⟨w, hw⟩
+      · have hφ0 : (φ : ClassFunction H ℂ) w = 0 := by
+          by_contra hne
+          exact hw (ClassFunction.mem_supportedSubmodule.mp φ.2 (ClassFunction.mem_support.mpr hne))
+        have hψ0 : (ψ : ClassFunction H ℂ) w = 0 := by
+          by_contra hne
+          exact hw (ClassFunction.mem_supportedSubmodule.mp ψ.2 (ClassFunction.mem_support.mpr hne))
+        rw [hφ0, hψ0]
+    · intro g
+      refine ⟨⟨⟨fun w => if hw : w ∈ A then g ⟨w, hw⟩ else 0, ?_⟩, ?_⟩, ?_⟩
+      · intro x y
+        have hxy : y * x * y⁻¹ = x := by rw [mul_comm y x, mul_inv_cancel_right]
+        rw [hxy]
+      · intro w hw
+        rw [ClassFunction.mem_support] at hw
+        by_contra hwA
+        exact hw (dif_neg hwA)
+      · funext a
+        show (if hw : (a : H) ∈ A then g ⟨(a : H), hw⟩ else 0) = g a
+        rw [dif_pos a.2]
+  rw [(LinearEquiv.ofBijective restr hbij).finrank_eq, Module.finrank_fintype_fun_eq_card,
+    Nat.card_eq_fintype_card]
+
+end SupportedDimension
+
 namespace TICyclicHypothesis
 
 /- 3.3: The linear-character family `ω` of the cyclic group `W` (pp. 16-17) -/
