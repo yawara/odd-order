@@ -43,13 +43,27 @@ order-p 部分群 X,Y≠Z₀ が σ^k で結ばれる) に持ち上げる。infr
   と同型、map_pow で `φ^k = β(σ^k)`),
 - 部分群↔部分加群 (carrier 保存 ≃o): `Subgroup.toAddSubgroup` ∘ `ZMod.toZModSubmodule`; card p ↔ finrank 1。
 - 結論翻訳: `Φ(X.map σ^k) = (Φ X).map φ^k` を **carrier 集合等式**で (`φ a = σ a` synonym).
-**⚠ GOTCHA (2026-06-08 で判明、未解決)**: `letI := hE.zmodModule` 後の `Additive E` の
-`AddCommGroup`/`CommGroup`/`Module` インスタンスが diamond で `set β` の elaboration が詰まる
-(`@AddAut (Additive E) Additive.add` vs `AddCommGroup.toAdd` 不一致, `Module (ZMod p) (Additive E)`
-synth 失敗)。PRank が `mulAutEquivGeneralLinearGroup` を WORKING で持つので解決可 — 推定 fix =
-`AddAut.toZModLinearEquiv (p := p)` で p 明示 + β に型注釈を付けない (PRank 同様 codomain 自由) +
-`CommGroup E` letI は不要。PRank の動く setup を逐語的にミラーすること。**focused session 推奨**
-(diamond 慣れ + carrier synonym の bookkeeping)。これが済めば 10.13(c) は Cor 10.7(b) のみ待ち。
+**⚠ Additive-synonym diamond — 3 層 (2026-06-09 精査)**。`Additive E` + `letI := hE.zmodModule`
+の組合せが instance/coercion synthesis を段階的に壊す。判明した layer と fix:
+- **Layer 1 (CommGroup) ✅ FIX 判明**: `letI : CommGroup E := inferInstance` が失敗するのは
+  `[Group][IsMulCommutative]→CommGroup` が **scoped instance** (`Mathlib/Algebra/Group/Defs.lean`
+  L1328-1368, `IsMulCommutative` scope) のため。**`open scoped IsMulCommutative`** で解決 (PRank L16 が
+  これを open している)。これで `letI : IsMulCommutative E := .of_comm hE.comm; letI : CommGroup E :=
+  inferInstance; letI := hE.zmodModule` が通る。
+- **Layer 2 (Mul stuck) ✅ FIX 判明**: `(AddAutAdditive.symm).trans (AddAut.toZModLinearEquiv)` の
+  `.trans` (MulEquiv) が `Mul (Additive E ≃ₗ[ZMod p] Additive E)` を metavar で stuck。**β を `.trans`
+  で組まず、`φ := AddAut.toZModLinearEquiv (p := p) (M := Additive E) ((AddAutAdditive (G:=E)).symm σ)`
+  と直接適用**すれば stuck 回避 (φ:LinearEquiv の型注釈で OK; φ^k は `← map_pow, ← map_pow` で
+  `toZModLinearEquiv (AddAutAdditive.symm (σ^k))` に書ける)。
+- **Layer 3 (LinearEquiv coercion) ✗ DEEP・未解決**: 上記 φ に対し **`φ a` (bare LinearEquiv 適用) が
+  "Function expected" で coerce しない** — letI module 下で `DFunLike (Additive E ≃ₗ[ZMod p] Additive E)`
+  の synth が壊れる。PRank は `Additive E` 上で **GL/matrix までしか行かず bare LinearEquiv を coerce
+  しない**ので、この層は repo に前例なし。
+**⟹ 推奨アプローチ変更 = concrete transport**: `Additive E` の synonym+letI を避け、E elem ab rank-2 を
+**explicit iso で `Fin 2 → ZMod p` (clean canonical module, diamond 無) に移送**して transvection
+transitivity をそこで証明し、subgroup↔line 対応を transport する。または `mulAutEquivGeneralLinearGroup`
+(GL 経由, WORKING) を起点に GL(2,p) の line 作用で組む。いずれも focused session。**これが済めば
+10.13(c) は Cor 10.7(b) のみ待ち。** (Layer 1/2 の fix は確定なので transport ルートでも再利用可。)
 
 ## 直列スパインは Theorem 10.6 に全面ブロックされている
 
