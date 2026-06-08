@@ -11136,6 +11136,83 @@ theorem crux_general_of_higher_anchor
     rw [Nat.cast_eq_zero] at hd0
     omega
 
+open scoped Classical in
+/-- **(6.8.1) E2: a `Y`-coherence witness in the good case** (the `m = 2` relabel, folded in).
+Produces a `Y`-coherence witness `cY` with `⟨(χ₁−aη₁)^τ, cY η₁⟩ = −a` — the `hgood` that the crux
+consumes.  Generic `|Y| ≥ 3`: `cY = coherentYset` (good branch of the step-4 dichotomy
+`coeff_eq_neg_or_edge_of_frobenius`).  Edge `|Y| = 2`: `coherentYset` may give the bad value `0`;
+then `Y = {η₁, η₂}` and the sign-swapped witness `cY'` (`coherentEqualDegree_swap_neg`,
+`η₁ ↦ −η₂^{τ₁}`) gives `⟨v, cY' η₁⟩ = −⟨v, coherentYset η₂⟩ = −a`, since
+`⟨v, coherentYset η₂⟩ = ⟨v, coherentYset η₁⟩ + a = 0 + a = a` (`inner_tau_scaledDiff_tau_Yset_diff`
++ `extends_on_supported`). -/
+theorem exists_Ycoherence_hgood_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha_pos : 0 < a) (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ∃ cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁) = -(a : ℂ) := by
+  classical
+  rcases hyp.coeff_eq_neg_or_edge_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos ha with
+    hgood | ⟨hm2, hbad⟩
+  · exact ⟨hyp.coherentYset, hgood⟩
+  · -- edge `|Y| = 2`: relabel.
+    obtain ⟨η₂, hη₂Y, hη₂ne⟩ := Set.exists_ne_of_one_lt_ncard (by omega : 1 < hyp.Yset.ncard) η₁
+    have hpairsub : ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.Yset := by
+      intro x hx; rcases hx with rfl | rfl
+      · exact hη₁
+      · exact hη₂Y
+    have hYeq : hyp.Yset = ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) :=
+      (Set.eq_of_subset_of_ncard_le hpairsub (hm2.le.trans_eq (Set.ncard_pair hη₂ne.symm).symm)
+        hyp.Yset_finite).symm
+    -- orthonormality of `η₁, η₂` (distinct irreducible `Y`-members).
+    have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+        ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+      intro φ ψ hφ hψ
+      have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+        (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at h
+      rw [h]
+      by_cases hpq : φ = ψ
+      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+    have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
+    have horth : ClassFunction.inner η₁ η₂ = 0 := by
+      rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
+    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
+    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+    have hdeg : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
+      (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
+    have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
+      rw [hyp.Yset_apply_one hη₁]; exact_mod_cast Nat.card_pos.ne'
+    have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+    have hsupp : (η₂ - η₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη₂Y) (hyp.Yset_subset_S hη₁) hdeg
+    -- transport `coherentYset` to the pair, build the swapped witness, transport back.
+    have hcY0map : (hYeq ▸ hyp.coherentYset).extension = hyp.coherentYset.extension :=
+      OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq hyp.coherentYset
+    obtain ⟨cY', hcY'1, _⟩ := OddOrder.Peterfalvi.S07.coherentEqualDegree_swap_neg
+      (hYeq ▸ hyp.coherentYset) horth hn1 hn2 hdeg hdeg0 h1A hsupp
+    refine ⟨hYeq.symm ▸ cY', ?_⟩
+    -- `⟨v, η₂^{τ₁}⟩ = a` from the constancy + the bad value `⟨v, η₁^{τ₁}⟩ = 0`.
+    have hconst := hyp.inner_tau_scaledDiff_tau_Yset_diff_of_frobenius hF hη₁ hη₂Y hη₂ne hχ₁ ha
+    have htaud : hyp.tau (η₂ - η₁)
+        = hyp.coherentYset.extension η₂ - hyp.coherentYset.extension η₁ := by
+      rw [← hyp.coherentYset.extends_on_supported (η₂ - η₁)
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hη₂Y) (Submodule.subset_span hη₁), hsupp⟩,
+        map_sub]
+    rw [htaud, ClassFunction.inner_sub_right, hbad, sub_zero] at hconst
+    -- assemble: `⟨v, (cY' η₁)⟩ = −⟨v, coherentYset η₂⟩ = −a`.
+    rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq.symm cY', hcY'1, hcY0map,
+      ClassFunction.inner_neg_right, hconst]
+
 /-- **(6.8.1) capstone `X(Zc) ∪ Y` coherence from a witness-level crux** (general form).  Given
 arbitrary coherence witnesses `cX` (for `X(Zc)`), `cY` (for `Y`), a base-block anchor `χ₁` with
 `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y`, and the **crux** `(χ₁−aη₁)^τ = cX χ₁ − a·cY η₁` (whichever way it is
