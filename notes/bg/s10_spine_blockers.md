@@ -134,23 +134,48 @@ landed (S7B2 private 版を再現)。M_σ は `(Msigma M).subgroupOf (derivedInG
 (commit `e98792c8`, **forward-conditional via Thm 10.6**, AxiomsCheck §10 island 登録済 = 2 forward
 axioms ちょうど)。Thm 5.6(c) を ↥M に適用 (narrow Sylow + proper_hasPLengthOne)。
 
-**残フロンティア = conjunct 1, 2, 3 (bundle 完成に要)**:
-- **conjunct 1 (M_β Hall) = p-complement 交差論 (~150 行, 次の sub-task, 2026-06-09 精査)**:
-  M_β = ∩_{p∈S} (M' の normal p-complement), S:=π(M)−β(M)。詳細 step:
-  1. 各 p∈S で M' の normal p-complement = `O_{p'}(↥(commutator ↥M))` — 10.8(c)
-     (`derived_msigma_hasNormalPComplement_of_not_mem_beta`) + **`normalPComplement_eq_oPiCore_compl`**
-     (S04g:988, ✅ landed; `∀Sylow IsComplement' K Sylow ⟹ K=O_{p'}`)。
-  2. 🛑 **新規 O_π 交差補題** `∩_{p∈S} O_{{p}ᶜ}(H) = O_{Sᶜ}(H)` (finite S) — **未 landed**
-     (`oPiCore_mono` ✅ はあるが交差は無)。⊇ は mono、⊆ は ∩ が Sᶜ-群 normal ⟹ `IsPiGroup.le_oPiCore`。
-     ~30-50 行の core API 作業。**conjunct 1 の第一ピース (独立 landable, unconditional)**。
-  3. `O_{Sᶜ}(↥M') = O_{β(M)}(↥M')` (Sᶜ∩π(M') = β(M)∩π(M'); O_π は π∩π(G) のみ依存)。
-  4. `O_{β(M)}(↥M') = M_β` (= `O_{β(M)}(↥M)`): M_β⊆M_σ⊆M' (`Mbeta≤Msigma≤derived`) かつ M_β◁M、
-     O_{β}(M') char M'◁M ⟹ ◁M ∧ β-群 ⟹ ⊆M_β。両包含。
-  5. Hall β(M): |M_β| が β-part = full (各 q∈β で Sylow q⊆M_β; M'/M_β は S-群 ⟹ q∤index)。
-- **conjunct 2,3 (nilpotent Hall β')**: M'/M_β は全 prime で normal p-complement ⟹ nilpotent;
-  W = Hall β(M)'-subgroup。M_β⊆M_σ⊆M' で M_σ 版も。
-- **assembly**: conjunct 1 → 2,3 → bundle `isHall_Mbeta` (= ⟨conjunct1, W_M', W_Mσ, conjunct4⟩)。
-  **第一ピース = step 2 の O_π 交差補題** (unconditional, 独立 commit 可)。
+### ✅✅✅ Lemma 10.8 COMPLETE (2026-06-09, branch `bg-s10-fwd`, 4 commits)
+
+**`isHall_Mbeta` (a)(b)(c) 全 conjunct 配線完了・sorry-free・keystone island ちょうど**
+(`#print axioms` = standard 3 + 2 forward = `pLengthOne_commutator_of_zgroupCentralizer`,
+`exists_prime_orderOf_zgroupCentralizer_of_complement`)。full build 3613 green + AxiomsCheck OK。
+
+実装は当初の「5-step 交差=M_β」プランより clean な **engine 2 本**に集約された
+(交差を M_β と明示同定する step 3/4 は engine 内部で IsPiGroup.le_oPiCore 両方向に吸収):
+
+1. **O_π 交差補題** `Ch03.iInf_oPiCore_compl_singleton` (Ch03 Main, **unconditional**, commit
+   `5dc29632`): 有限 G, S:Set ℕ で `⨅ p∈S, O_{p'}(G) = O_{Sᶜ}(G)`。⊇=oPiCore_mono、⊆=交差が
+   normal Sᶜ-群 (normal_iInf_normal + oPiCore.isPiGroup)。
+2. **Hall engine** `isHall_oPiCore_of_forall_hasNormalPComplement` (S10_BetaRadical,
+   **unconditional**, commit `db2af624`): 有限 H が ∀p∈π(H)−π で normal p-complement ⟹
+   `O_π(H)` Hall π。O_π(H)=O_{Tᶜ}(H)=⋂O_{p'}(H) (T=π(H)−π)、r∈π が index 割れば Sylow r が各
+   normal p-complement (helper `le_of_coprime_card_index`) ⟹ ⊆O_π ⟹ 矛盾。
+3. **conjunct 1** `Mbeta_isHall` (commit `77d158d0`, **forward-conditional**): engine を
+   H=↥(commutator ↥M) に適用 + step E' `oPiCore_subgroupOf_eq_of_normal` (D◁G' で
+   (O_π G').subgroupOf D = O_π ↥D, **一般・unconditional**) + |M:M'| coprime β (M_α⊆M' Hall α⊇β)
+   + σ⊇β で G へ lift (`isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index` ×2)。
+4. **nilpotency engine** `isNilpotent_of_forall_hasNormalPComplement` (**unconditional**, commit
+   `f31fe53f`): ∀p∈π(H) normal p-complement ⟹ nilpotent (各 p で engine 2 が O_p=Hall{p}=
+   正規 Sylow ⟹ 全 Sylow 正規 ⟹ `isNilpotent_of_finite_tfae`; `Sylow.ofCard`/`unique_of_normal`)。
+5. **(b) producer** `exists_isNilpotent_isHall_compl` (**unconditional**): 有限可解 K が π(K)−β で
+   normal p-complement ⟹ nilpotent Hall βᶜ-部分群 (hall_E_exists + hasNormalPComplement_of_subgroup
+   + engine 4)。conjunct 2,3 は K∈{M',M_σ} に適用、W₀ を M.subtype で G へ map
+   (solvable=`solvable_of_surjective`∘equivMapOfInjective, nilpotent=`nilpotent_of_surjective`)。
+
+**再利用可能 unconditional 資産** (keystone 非依存、他章でも使える): O_π 交差補題、Hall engine、
+nilpotency engine、(b) producer、step E' `oPiCore_subgroupOf_eq_of_normal`、helper
+`le_of_coprime_card_index`。
+
+### 次の leaf (Lane D 継続) — 10.6→10.8 完了後
+
+- **Cor 10.9** `beta_complement_*` (3 本, S10_BetaRadical@659/677/696) = 10.8 + Lem 6.5 (✅) +
+  Frattini (✅) + Hall (✅)。**isHall_Mbeta 完成で型レベル unblock**。spine 直列の次。
+- **Prop 10.10** `normalizer_factorization` (@710) = §7 Prop7.3/7.4/7.5 (✅) + **Cor 10.7** + Lem 6.5。
+  Cor 10.7 (`sylow_structure`@125 sorry) 経由ゆえブロック。
+- **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。Cor 10.7(b) は更に rep-theory
+  keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) ゆえ (b) は後回し。(a) は配線可。
+- **Prop 10.11** `sigma_complement_rank_le_one` (S10_LocalLemmas@460) = Cor 10.7 経由 keystone gated。
+- 旧「残フロンティア conjunct 1-3」は**全消化** (上記)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
