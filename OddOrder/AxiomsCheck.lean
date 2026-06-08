@@ -3233,3 +3233,8 @@ set_option linter.style.longLine false in
 -- Peterfalvi (3.3): the `ω_{ij} = ω_{i0}·ω_{0j}` factorization of a linear character of `W`,
 -- via the internal-product projections `wProj1`/`wProj2` and their reconstruction `w = w₁·w₂`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.char_eq_wProj_comp_mul
+
+-- Peterfalvi (3.3): the `ω_{i0}` / `ω_{0j}` factors have `W₂` / `W₁` in their kernels (the
+-- defining property of the two sub-families of `Irr(W)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W2_subgroupOf_le_ker_comp_wProj1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W1_subgroupOf_le_ker_comp_wProj2

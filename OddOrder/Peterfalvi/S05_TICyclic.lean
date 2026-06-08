@@ -331,6 +331,41 @@ theorem char_eq_wProj_comp_mul (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂ
   rw [MonoidHom.mul_apply, MonoidHom.comp_apply, MonoidHom.comp_apply, ← map_mul,
     hyp.wProj1_mul_wProj2]
 
+/-- The `W₁`-projection kills `W₂`: this is why `χ ∘ wProj1` (the `ω_{i0}` factor) has `W₂` in
+its kernel. -/
+theorem wProj1_eq_one_of_mem_W2 (hyp : TICyclicHypothesis G) {w : hyp.W}
+    (hw : w ∈ hyp.W2.subgroupOf hyp.W) : hyp.wProj1 w = 1 := by
+  have hsymm : hyp.wProdEquiv.symm w = (1, ⟨w, hw⟩) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wProj1_apply, hsymm]
+  simp
+
+/-- The `W₂`-projection kills `W₁`: this is why `χ ∘ wProj2` (the `ω_{0j}` factor) has `W₁` in
+its kernel. -/
+theorem wProj2_eq_one_of_mem_W1 (hyp : TICyclicHypothesis G) {w : hyp.W}
+    (hw : w ∈ hyp.W1.subgroupOf hyp.W) : hyp.wProj2 w = 1 := by
+  have hsymm : hyp.wProdEquiv.symm w = (⟨w, hw⟩, 1) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  rw [wProj2_apply, hsymm]
+  simp
+
+/-- **Peterfalvi (3.3)**: the `ω_{i0}` factor `χ ∘ wProj1` of a linear character has `W₂` in its
+kernel (it is one of the irreducible characters of `W` trivial on `W₂`). -/
+theorem W2_subgroupOf_le_ker_comp_wProj1 (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    hyp.W2.subgroupOf hyp.W ≤ (χ.comp hyp.wProj1).ker := by
+  intro w hw
+  rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hyp.wProj1_eq_one_of_mem_W2 hw, map_one]
+
+/-- **Peterfalvi (3.3)**: the `ω_{0j}` factor `χ ∘ wProj2` has `W₁` in its kernel. -/
+theorem W1_subgroupOf_le_ker_comp_wProj2 (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    hyp.W1.subgroupOf hyp.W ≤ (χ.comp hyp.wProj2).ker := by
+  intro w hw
+  rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hyp.wProj2_eq_one_of_mem_W1 hw, map_one]
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
