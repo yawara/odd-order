@@ -46,6 +46,7 @@ import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -3311,3 +3312,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaLinearIndependent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.nonempty_charNeOne
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis
+
+-- §5 (3.5.1): the Gram matrix of the induced family `(Ind_W^G α_{ij})`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_omegaProdChar_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_omegaProdChar_combination
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.tau_alpha_inner

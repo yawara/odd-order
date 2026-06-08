@@ -98,6 +98,7 @@ import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
