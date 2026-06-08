@@ -366,6 +366,41 @@ theorem W1_subgroupOf_le_ker_comp_wProj2 (hyp : TICyclicHypothesis G) (χ : hyp.
   intro w hw
   rw [MonoidHom.mem_ker, MonoidHom.comp_apply, hyp.wProj2_eq_one_of_mem_W1 hw, map_one]
 
+/-- Factor projection `↥W →* ↥W₁`, used to lift a character `χ₁ : ↥W₁ →* ℂˣ` to the `ω_{i0}` of
+`W` as `χ₁.comp wFst` (`χ₁` on the `W₁`-component, trivial on `W₂`). -/
+noncomputable def wFst (hyp : TICyclicHypothesis G) :
+    hyp.W →* hyp.W1.subgroupOf hyp.W :=
+  (MonoidHom.fst _ _).comp hyp.wProdEquiv.symm.toMonoidHom
+
+/-- Factor projection `↥W →* ↥W₂`. -/
+noncomputable def wSnd (hyp : TICyclicHypothesis G) :
+    hyp.W →* hyp.W2.subgroupOf hyp.W :=
+  (MonoidHom.snd _ _).comp hyp.wProdEquiv.symm.toMonoidHom
+
+@[simp] theorem wFst_apply (hyp : TICyclicHypothesis G) (w : hyp.W) :
+    hyp.wFst w = (hyp.wProdEquiv.symm w).1 := rfl
+
+@[simp] theorem wSnd_apply (hyp : TICyclicHypothesis G) (w : hyp.W) :
+    hyp.wSnd w = (hyp.wProdEquiv.symm w).2 := rfl
+
+/-- `wFst` kills `W₂`: hence `χ₁.comp wFst` (an `ω_{i0}`) is trivial on `W₂`. -/
+theorem wFst_eq_one_of_mem_W2 (hyp : TICyclicHypothesis G) {w : hyp.W}
+    (hw : w ∈ hyp.W2.subgroupOf hyp.W) : hyp.wFst w = 1 := by
+  have hsymm : hyp.wProdEquiv.symm w = (1, ⟨w, hw⟩) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  simp [wFst_apply, hsymm]
+
+/-- `wSnd` kills `W₁`: hence `χ₂.comp wSnd` (an `ω_{0j}`) is trivial on `W₁`. -/
+theorem wSnd_eq_one_of_mem_W1 (hyp : TICyclicHypothesis G) {w : hyp.W}
+    (hw : w ∈ hyp.W1.subgroupOf hyp.W) : hyp.wSnd w = 1 := by
+  have hsymm : hyp.wProdEquiv.symm w = (⟨w, hw⟩, 1) := by
+    apply hyp.wProdEquiv.injective
+    rw [MulEquiv.apply_symm_apply, hyp.wProdEquiv_apply]
+    simp
+  simp [wSnd_apply, hsymm]
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

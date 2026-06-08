@@ -3238,3 +3238,8 @@ set_option linter.style.longLine false in
 -- defining property of the two sub-families of `Irr(W)`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W2_subgroupOf_le_ker_comp_wProj1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W1_subgroupOf_le_ker_comp_wProj2
+
+-- Peterfalvi (3.3)→(3.4): factor projections `wFst`/`wSnd : ↥W →* ↥W₁/↥W₂` kill `W₂`/`W₁`,
+-- so `χ₁.comp wFst` / `χ₂.comp wSnd` are the `ω_{i0}` / `ω_{0j}` used to build the `α_{ij}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wFst_eq_one_of_mem_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wSnd_eq_one_of_mem_W1
