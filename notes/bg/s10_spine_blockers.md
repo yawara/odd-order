@@ -135,12 +135,22 @@ landed (S7B2 private 版を再現)。M_σ は `(Msigma M).subgroupOf (derivedInG
 axioms ちょうど)。Thm 5.6(c) を ↥M に適用 (narrow Sylow + proper_hasPLengthOne)。
 
 **残フロンティア = conjunct 1, 2, 3 (bundle 完成に要)**:
-- **conjunct 1 (M_β Hall) = p-complement 交差論**: M_β = ∩_{p∈π(M)−β(M)} (M' の normal p-complement)
-  = O_{β(M)}(M') で Hall β(M)。要: normal p-complement = O_{p'} 一意性、prime-set 上の O_{p'} 交差
-  = O_{β}、Hall 性。conjunct 4 の p-complement 群を束ねる。**次の sub-task**。
+- **conjunct 1 (M_β Hall) = p-complement 交差論 (~150 行, 次の sub-task, 2026-06-09 精査)**:
+  M_β = ∩_{p∈S} (M' の normal p-complement), S:=π(M)−β(M)。詳細 step:
+  1. 各 p∈S で M' の normal p-complement = `O_{p'}(↥(commutator ↥M))` — 10.8(c)
+     (`derived_msigma_hasNormalPComplement_of_not_mem_beta`) + **`normalPComplement_eq_oPiCore_compl`**
+     (S04g:988, ✅ landed; `∀Sylow IsComplement' K Sylow ⟹ K=O_{p'}`)。
+  2. 🛑 **新規 O_π 交差補題** `∩_{p∈S} O_{{p}ᶜ}(H) = O_{Sᶜ}(H)` (finite S) — **未 landed**
+     (`oPiCore_mono` ✅ はあるが交差は無)。⊇ は mono、⊆ は ∩ が Sᶜ-群 normal ⟹ `IsPiGroup.le_oPiCore`。
+     ~30-50 行の core API 作業。**conjunct 1 の第一ピース (独立 landable, unconditional)**。
+  3. `O_{Sᶜ}(↥M') = O_{β(M)}(↥M')` (Sᶜ∩π(M') = β(M)∩π(M'); O_π は π∩π(G) のみ依存)。
+  4. `O_{β(M)}(↥M') = M_β` (= `O_{β(M)}(↥M)`): M_β⊆M_σ⊆M' (`Mbeta≤Msigma≤derived`) かつ M_β◁M、
+     O_{β}(M') char M'◁M ⟹ ◁M ∧ β-群 ⟹ ⊆M_β。両包含。
+  5. Hall β(M): |M_β| が β-part = full (各 q∈β で Sylow q⊆M_β; M'/M_β は S-群 ⟹ q∤index)。
 - **conjunct 2,3 (nilpotent Hall β')**: M'/M_β は全 prime で normal p-complement ⟹ nilpotent;
   W = Hall β(M)'-subgroup。M_β⊆M_σ⊆M' で M_σ 版も。
 - **assembly**: conjunct 1 → 2,3 → bundle `isHall_Mbeta` (= ⟨conjunct1, W_M', W_Mσ, conjunct4⟩)。
+  **第一ピース = step 2 の O_π 交差補題** (unconditional, 独立 commit 可)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
