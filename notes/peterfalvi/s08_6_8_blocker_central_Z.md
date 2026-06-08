@@ -987,3 +987,49 @@ wiring + (2) case B.
 - `false_of_coherentXunionYset_of_not_coherentS` (S08:6564, LANDED): X(cc)∪Y coh + ¬S coh ⟹ False.
 - `Set.ncard_diff`/`Set.ncard_pair`/`Set.exists_ne_of_one_lt_ncard`/`Set.nonempty_of_ncard_ne_zero`
   (3-distinct selection); `characterDegree_def : characterDegree χ = χ 1`.
+
+## 2026-06-08 (session 6 cont.⁵): cardinality question RESOLVED — relabels are genuinely needed (mmd-confirmed)
+
+**KEY FINDING (resolves the session-6-cont.⁴ open question):** the `m = 2` / `n = 2` edge cases DO
+occur in (6.8), so `3 ≤ |Y|` / `3 ≤ |xBaseBlock|` are **FALSE in general** — the relabels are
+unavoidable.  Evidence:
+- **mmd 04.8 (6.8.1)** explicitly contains both relabels: "_The second case reduces to the first on
+  replacing `η₁^{τ₁}` and `η₂^{τ₁}` by `−η₂^{τ₁}` and `−η₁^{τ₁}`_" (`m = 2`), and "_If `n = 2`, we may
+  assume `X = χ₁^{τ₂}`, possibly on replacing `χ₁^{τ₂}` and `χ₂^{τ₂}` by `−χ₂^{τ₂}` and `−χ₁^{τ₂}`_".
+- **Arithmetic:** `Y = S(H′)` = degree-`|W₁|` members = `W₁`-orbits on nontrivial linear chars of `H`;
+  `W₁` acts FPF ⟹ `|Y| = (|H/H′|−1)/|W₁|`, which can be `2` (e.g. `p=3`, `|H/H′|=3`, `|W₁|=1`).  Only
+  `2 ≤ |Y|` (`two_le_Yset_ncard`) and `2 ≤ |xBaseBlock|` (`two_le_xBaseBlock_ncard`) hold in general.
+
+**⟹ closing case A requires the relabels** (the `nonempty_coherent_S_caseA_of_card_of_frobenius`'s
+`3≤` hypotheses cannot be discharged unconditionally).
+
+### Relabel plan (the structural bottleneck — multi-piece refactor)
+The relabel = choosing a **re-signed coherence witness**.  Concretely (mmd: `τ₁`/`τ₂` are "_an
+isometry from ℤ[Y]/ℤ[X] coinciding with τ on ℤ[·,L^#]_"; the relabel flips signs on 2 members):
+1. **relabeled witness via `coherentEqualDegree` (S07:3529)** — for `Y` (`m=2`): apply
+   `coherentEqualDegree` with source `χ = ![η₁,η₂]` and **flipped target** `X' = ![−η₂^{τ₁},−η₁^{τ₁}]`
+   (`η^{τ₁} = coherentYset.extension`).  `himg`: `τ(η₂−η₁) = X'₁−X'₀ = η₂^{τ₁}−η₁^{τ₁}` ✓ (same
+   supported difference); `horthX'`/`hXZ'` ✓ (signs square out).  Gives `IsCoherent τ {η₁,η₂} A` =
+   relabeled `Y`-coherence (`range ![η₁,η₂] = Yset` via `Set.ncard_eq_two`).  Analogue for `X` (`n=2`).
+2. **parameterized diagonal shell** — the S07 shell
+   `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4442) takes `hX, hY` as
+   **arbitrary** `IsCoherent` witnesses + `ν` + agreement; the Sibley wrapper
+   `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` (S08:8928) HARD-CODES
+   `hyp.coherentYset` / `Xset_centralCommutator_isCoherent`.  ⟹ need a **cY/cX-parameterized** Sibley
+   shell, and the crux/hgen'/himg_ortho re-proven (or generalized) for the relabeled witness.  ⚠ the
+   crux's step-4/5 (`crux_of_frobenius`) is stated for the FIXED extensions — for the edge case the
+   sign-flipped witness makes the bad disjunct (`X=−χ₂^{τ₂}`, `bb=0`) into the good one.
+3. **edge-case crux variants** — `m=2`: re-run step 4 with the flipped `cY'` ⟹ `bb=−a` (good).
+   `n=2`: flipped `cX'` ⟹ `X=χ₁^{τ₂'}`.  Then the diagonal shell with `cX'/cY'` ⟹ `X∪Y` coherent.
+
+### Other remaining (unchanged)
+- **capstone redesign + wiring** `sibleySetup_is_coherent` (S08 sole sorry ~10954): the current
+  `by_cases Xset ⁅H,H⁆ = ∅` is the OLD `Z=⁅H,H⁆` design; must restructure to the `Z=centralCommutator`
+  redesign + `hyp.cases` (A)/(B) split, then in case A invoke the (relabel-complete) case-A result.
+- **CertainType case (B)** (mmd (6.8.2), `Z=W₂`, (6.8.2.1)/(6.8.2.2)/(6.8.2.3)) — unplanned.
+
+**Recommended next phase (fresh multi-session):** (1) relabeled-witness lemma via `coherentEqualDegree`
+(self-contained, ~80 lines each for Y/X); (2) cX/cY-parameterized Sibley diagonal shell; (3) edge-case
+crux variants; (4) capstone redesign + wiring; (5) case B.  The generic (m,n≥3) spine
+(`coherentXunionYset_centralCommutator_diagonal_of_frobenius` → `nonempty_coherent_S_caseA_of_card`)
+is the template the edge cases mirror.
