@@ -271,6 +271,94 @@ theorem derived_msigma_hasNormalPComplement_of_not_mem_beta [Finite G]
   exact hasNormalPComplement_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσ_le)
     (Ch05.hasNormalPComplement_of_subgroup hNPC_der ((Msigma M).subgroupOf (derivedInG M)))
 
+/-- A subgroup whose order is coprime to the index of a normal subgroup `K` lies in `K`:
+the image of `Q` in the quotient `H/K` has order dividing both `|Q|` and `[H:K]`, hence
+trivial. (Used for "a normal `p`-complement contains every `p'`-subgroup".) -/
+private theorem le_of_coprime_card_index {H : Type*} [Group H] [Finite H] {K Q : Subgroup H}
+    [K.Normal] (h : Nat.Coprime (Nat.card ↥Q) K.index) : Q ≤ K := by
+  have hdvd1 : Nat.card ↥(Q.map (QuotientGroup.mk' K)) ∣ Nat.card ↥Q :=
+    Subgroup.card_map_dvd Q (QuotientGroup.mk' K)
+  have hdvd2 : Nat.card ↥(Q.map (QuotientGroup.mk' K)) ∣ K.index := by
+    rw [Subgroup.index_eq_card]
+    exact Subgroup.card_subgroup_dvd_card _
+  have hone : Nat.card ↥(Q.map (QuotientGroup.mk' K)) = 1 :=
+    Nat.dvd_one.mp (h ▸ Nat.dvd_gcd hdvd1 hdvd2)
+  have hbot : Q.map (QuotientGroup.mk' K) = ⊥ := Subgroup.card_eq_one.mp hone
+  have hle : Q ≤ (QuotientGroup.mk' K).ker := (Subgroup.map_eq_bot_iff (H := Q)).mp hbot
+  rwa [QuotientGroup.ker_mk'] at hle
+
+/-- **Engine for Lemma 10.8(a)** (unconditional): in a finite group `H`, if `H` has a normal
+`p`-complement for every prime `p ∈ π(H) - π`, then the `π`-radical `O_π(H)` is a Hall
+`π`-subgroup of `H`.
+
+`O_π(H)` is always a `π`-group; the content is that its index is coprime to `π`. Writing
+`T = π(H) - π`, one has `O_π(H) = O_{Tᶜ}(H) = ⋂_{p∈T} O_{p'}(H)` (each `O_{p'}(H)` being the
+normal `p`-complement). For a prime `r ∈ π` dividing the index, a Sylow `r`-subgroup `P`
+is a `p'`-group for every `p ∈ T` (as `r ≠ p`), hence lies in each normal `p`-complement
+(`le_of_coprime_card_index`) and so in `O_π(H)` — contradicting `r ∣ [H : O_π(H)]`. -/
+theorem isHall_oPiCore_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite H]
+    (π : Set ℕ)
+    (hNPC : ∀ p : ℕ, p.Prime → p ∈ (Nat.card H).primeFactors → p ∉ π →
+      Ch05.HasNormalPComplement p H) :
+    Ch03.IsHallSubgroup π (Ch03.oPiCore π H) := by
+  classical
+  set T : Set ℕ := {p | p ∈ (Nat.card H).primeFactors ∧ p ∉ π} with hT
+  -- `O_π(H) = O_{Tᶜ}(H)`: both have the same prime divisors among `π(H)`.
+  have hcardCore : ∀ ρ : Set ℕ, Nat.card ↥(Ch03.oPiCore ρ H) ∣ Nat.card H :=
+    fun ρ => Subgroup.card_subgroup_dvd_card _
+  have hmemH : ∀ {ρ : Set ℕ} {q : ℕ}, q ∈ (Nat.card ↥(Ch03.oPiCore ρ H)).primeFactors →
+      q ∈ (Nat.card H).primeFactors :=
+    fun {ρ q} hq => Nat.primeFactors_mono (hcardCore ρ) Nat.card_pos.ne' hq
+  have hEq : Ch03.oPiCore π H = Ch03.oPiCore Tᶜ H := by
+    apply le_antisymm
+    · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
+      have hqπ : q ∈ π := Ch03.oPiCore.isPiGroup π q hq
+      rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not]
+      exact fun _ => hqπ
+    · refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
+      have hqTc : q ∈ Tᶜ := Ch03.oPiCore.isPiGroup Tᶜ q hq
+      rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not] at hqTc
+      exact hqTc (hmemH hq)
+  rw [hEq]
+  refine ⟨fun q hq => ?_, ?_⟩
+  · -- `O_{Tᶜ}(H)` is a `π`-group: a prime divisor `q` is in `Tᶜ` and in `π(H)`, hence in `π`.
+    have hqTc : q ∈ Tᶜ := Ch03.oPiCore.isPiGroup Tᶜ q hq
+    rw [Set.mem_compl_iff, hT, Set.mem_setOf_eq, not_and, not_not] at hqTc
+    exact hqTc (hmemH hq)
+  · -- index coprime to `π`: a prime `r ∈ π` dividing the index gives a Sylow `r` inside `O_{Tᶜ}`.
+    intro r hridx hrπ
+    obtain ⟨hr_prime, hr_dvd_idx, -⟩ := Nat.mem_primeFactors.mp hridx
+    haveI : Fact r.Prime := ⟨hr_prime⟩
+    obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow r H))
+    have hP_le : (P : Subgroup H) ≤ Ch03.oPiCore Tᶜ H := by
+      rw [← Ch03.iInf_oPiCore_compl_singleton T]
+      refine le_iInf₂ fun p hp => ?_
+      obtain ⟨hpH, hpπ⟩ := hp
+      have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hpH
+      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have hrp_ne : r ≠ p := fun h => hpπ (h ▸ hrπ)
+      obtain ⟨N', hN'normal, hN'compl⟩ := hNPC p hp_prime hpH hpπ
+      haveI := hN'normal
+      obtain ⟨Q⟩ := (inferInstance : Nonempty (Sylow p H))
+      have hN'idx : N'.index = Nat.card ↥(Q : Subgroup H) := (hN'compl Q).symm.index_eq_card
+      have hcardN' : Nat.card ↥N' = (Q : Subgroup H).index := ((hN'compl Q).index_eq_card).symm
+      -- `N'` is a `{p}ᶜ`-group (`p ∤ |N'| = [H : Q]`), so `N' ≤ O_{p'}(H)`.
+      have hN'pi : Ch03.Subgroup.IsPiGroup ({p}ᶜ : Set ℕ) N' := by
+        intro s hs
+        rw [hcardN'] at hs
+        rw [Set.mem_compl_iff, Set.mem_singleton_iff]
+        rintro rfl
+        exact Q.not_dvd_index (Nat.dvd_of_mem_primeFactors hs)
+      -- `P` (an `r`-group, `r ≠ p`) has order coprime to `[H : N'] = |Q|`, so `P ≤ N'`.
+      have hPcop : Nat.Coprime (Nat.card ↥(P : Subgroup H)) N'.index := by
+        rw [hN'idx]
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp P.isPGroup'
+        obtain ⟨j, hj⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+        rw [hk, hj]
+        exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hr_prime hp_prime).mpr hrp_ne)
+      exact (le_of_coprime_card_index hPcop).trans hN'pi.le_oPiCore
+    exact P.not_dvd_index (hr_dvd_idx.trans (Subgroup.index_dvd_of_le hP_le))
+
 /-! ## Lemma 10.8 — `M_β` の Hall 性 (mmd L2810) -/
 
 /-- **BG Lemma 10.8** (mmd L2810): `M ∈ ℳ`。
