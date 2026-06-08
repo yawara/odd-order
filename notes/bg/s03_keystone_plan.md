@@ -560,3 +560,70 @@ commits `d54869a5` + `e1ac4947`):
   **▶ 残る group input = hxZ (x が Z(P) 中心化)** = `C_P(x)=Z(P)` 完全等号の ⊇ 方向 (現状 finrank_modEq の hCP は ⊆ のみ;
   group-level Thm 2.5 setup に追加要)。これと `IsExtraspecial` を §3 文脈が供給すれば Thm 2.5 → 3.4 → 3.6 → §10.6 全開放。
   ※ CliffordConjugateChar が IsExtraspecial + Isaacs Ch01 を import。`MonoidHom.ker` は End(monoid) codomain で Subgroup 化 OK。
+
+### ✅✅✅✅ END-TO-END Thm 2.5 COMPLETE (2026-06-08, `a-keystone`, commit `8ac99c6e`): hVP 配線済 — keystone 完全閉
+
+`ExtraspecialThm25Final.lean` (新規, sorry-free + axiom-clean [3 標準公理], full build **3613** green, OddOrder root +
+AxiomsCheck 配線済) が hVP producer と consumer を合体し、**extraspecial `P` に対する group-level BG Thm 2.5 を hVP 仮説なしで完全 grounded 化**:
+- `conjNormalMulAut_eq_conjAutOfNormal` — Clifford 側 `conjNormalMulAut P x` と keystone 側 `conjAutOfNormal P x`
+  が一致 (両者 `p ↦ x p x⁻¹`, 各 `_apply_coe` が rfl ⟹ `MulEquiv.ext`+`Subtype.ext`)。公開仮説は単一 `conjAutOfNormal` に統一。
+- **`finrank_modEq_of_extraspecial`** — 可除性 `dim V ≡ ±1 (mod h)`。`restriction_isIrreducible_of_extraspecial`
+  (hVP) → `finrank_modEq_of_faithful_irreducible_of_centralizer` に配線。
+- **`finrank_eq_sub_one_of_extraspecial`** — `C_V(H)` 二分律 `h = dim V + 1` (対偶: `h ≠ dim V+1 ⟹ C_V(H)≠0`)。
+- 両者の仮説 = §3 setup data のみ: `IsExtraspecial p ↥P`, faithful irreducible `ρ`/alg-closed `F`/char∤|P|, `x^h=1`(h≥2),
+  `ε` primitive, char∤h, `(h,|P|)=1`, `G=⟨P,x⟩` (hgen), **hxZ** (x が Z(P) 中心化, ⊇), **hCP** (`C_P(xᵏ)⊆Z(P)`, ⊆)。
+  hxZ/hCP は §3 で `C_P(xᵏ)=Z(P)` 完全等号から両方向供給。**AxiomsCheck に keystone chain 5 件追加**
+  (keystone (2.11) `finrank_cyclicEndConjEigenspaceFin_succ`, `restriction_isIrreducible_of_extraspecial`,
+  `finrank_modEq_of_faithful_irreducible`, 上記 final 2 件 — 全 3 公理のみ)。
+
+**⟹ keystone (BG 2.11) + Thm 2.5 (両結論) 完全閉。次フロンティア = BG Thm 3.4。**
+
+### ▶▶▶▶ 次フロンティア = BG Theorem 3.4 (mmd L863-901) — 「大物」, 多セッション級, ingredient 6/8 既存
+
+**Thm 3.4**: G solvable・odd order, normal Hall subgroup K + complement R of prime order, G acts on V/F
+(char∤|G|)。**C_V(R)=0 ⟹ [R,K]⊆C_K(V)**。証明 = minimal counterexample (mmd L867-901):
+1. proper R-invariant H≤K ⟹ HR は仮説満たし |HR|<|G| ⟹ minimality で [H,R]⊆C。∴ [R,K]⊄C より **(3.2) K は proper
+   R-invariant subgroup 群で生成されない**。
+2. Maschke ⟹ V=⊕ irred。[K,R] が自明でない irred G-submodule M を選ぶ。N=C_G(M), p=|R|。C_M(R)⊆C_V(R)=0 ⟹ N∩R=1
+   ⟹ |G|=p|K|, N◁G は p'-subgroup ⊂ K=O_{p'}(G)。
+3. Ḡ=G/N に移行 ⟹ minimality で **N=1 ⟹ G は M 上 faithful irreducible** (∴ V 上も faithful)。**Gor 3.2.2 ⟹ Z(G) cyclic**。
+4. |K| が 2 素数以上で割れる ⟹ Prop 1.5(a) で R-invariant Sylow 各 p ⟹ K が proper R-inv で生成 ⟹ (3.2) 矛盾。
+   ∴ **|K|=qⁿ** (単一素数)。
+5. **Gor 5.3.7 (=S04e) ⟹ K は elementary abelian か nonabelian special, かつ (3.3) R は K/K' に既約作用 + K' を中心化**。
+6. K elem.ab. ⟹ K'=1, [R,K]≠1 ⟹ C_K(R)⊂K, (3.3) で C_K(R)=1 ⟹ **Lemma 3.1 で G=KR Frobenius** ⟹ G faithful on V
+   ⟹ K nontrivial ⟹ **Lemma 3.3 で C_V(R)≠0** 矛盾。∴ K nonabelian special。
+7. K nonabelian special ⟹ Z(K)=K', (3.3) で R が Z(K) 中心化 ⟹ Z(K)⊆Z(G) ⟹ Z(K) cyclic ⟹ **K extraspecial**。
+8. (3.3) で R は K/Z(K) 既約作用, Z(K) maximal R-inv ⟹ **Z(K)=C_K(R)=C_K(x) ∀x∈R^#**。**Thm 2.5 適用で最終矛盾**。
+
+**Ingredient inventory (2026-06-08, Explore agent; 再調査不要)** — 6/8 既存:
+- ✅ **Maschke** = mathlib `IsSemisimpleModule k[G] V` instance (Thm 1.20, S01_Solvable docstring)。
+- ✅ **Prop 1.5(a)** (coprime ⟹ R-inv Sylow/Hall) = `OddOrder.BG.Ch1_Preliminary.S01_Solvable.exists_aInvariant_hall`
+  (S01:661) / `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow`。
+- ✅ **Lemma 3.1** (Frobenius criterion) = `OddOrder.Isaacs.Ch06.IsFrobeniusGroup` 構造体 + `of_centralizer_kernel_le`
+  (`FrobeniusGroup.lean:240`)。C_K(R)=1 から G=KR Frobenius を構成。
+- ✅ **Lemma 3.3** = `OddOrder.BG.Ch1.S03b.centralizer_ne_bot_of_nontrivial_kernel` (`S03b_Lemma33.lean:114`):
+  `IsFrobeniusGroup G K R` + (card K:F)≠0 + K 非自明作用 ⟹ ∃ v≠0, ∀r∈R fixed (= C_V(R)≠0)。
+- ✅ **Gor 5.3.7** = `OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper` (`S04e_GorThm37.lean:206`):
+  `φ:A→*MulAut P`, P p-group, coprime, ψ 非自明 + proper A-inv N 上自明 ⟹ commutator≤center ∧ K/K' elem.ab.
+  ∧ (A-inv N で K'≤N ⟹ N=K' or ⊤ = **R 既約 on K/K'**) ∧ ∃g (φψ)g·g⁻¹∉K' (=非中心化) ∧ `IsSpecial p P`。
+- ✅ **Thm 2.5** = `finrank_modEq_of_extraspecial` + `finrank_eq_sub_one_of_extraspecial` (本セッション)。
+- ✅ **IsExtraspecial/IsSpecial** = `OddOrder/GroupTheory/IsExtraspecial.lean` (`IsExtraspecial` 構造体 + `IsSpecial` def)。
+  special + Z cyclic ⟹ extraspecial の補題は要確認 (center_card=p を special + cyclic から導く)。
+- ⚠ **GAP 1 = Gor 3.2.2 (Z(G) cyclic from faithful irreducible)**: partial。`AbsolutelyIrreducible.center_isScalar`
+  (alg-closed, irred, f.d. ⟹ center は scalar `ρ z = c•id`) は有。**未形式化 = 「Z(G) cyclic」標準定理**。
+  **TRACTABLE (~40 行)**: center G ∋ z ↦ scalar c(z) ∈ F は monoid hom (ρ(zz')=ρz·ρz' より乗法的), faithful ⟹ injective
+  (c(z)=c(z')⟹ρz=ρz'⟹z=z'), c(z)≠0 (ρz 可逆) ⟹ `center G →* F` injective + `[Finite (center G)]` ⟹
+  `isCyclic_of_subgroup_isDomain` (mathlib, 有限部分群 of 体は cyclic) で `IsCyclic (center G)`。**第一 leaf 候補**。
+- ⚠ **GAP 2 (設計判断) = alg-closure 戦略**: Thm 3.4 は**一般体 F** で述べる (char∤|G| のみ) が、本 repo の Thm 2.5
+  (`finrank_modEq_of_extraspecial`) は **`[IsAlgClosed F]` 必須**。BG 原文 (L863-901) は alg closure に拡張せず一般 F で
+  Gor 3.2.2 + Thm 2.5 を使う (Thm 2.5 自体が一般体可? — 本 repo keystone は alg-closed 固定)。**要決定**: (a) Thm 3.4 を
+  alg-closed F に限定して述べ、§3 適用側で base change (2.9=`BaseChange.lean`) する — ただし irreducibility は base change で
+  壊れ得る (M⊗F̄ が可約) ので Clifford/Wedderburn で扱う必要 ‖ (b) Thm 2.5 を一般体に拡張 (keystone の alg-closed 依存箇所を
+  division-ring End で一般化 — 大仕事) ‖ (c) Thm 3.4 を alg-closed 前提で形式化し、FT 適用文脈が実際 alg-closed (or 拡張済) かを
+  §10 で確認。**Thm 3.5 (L907) は冒頭で alg closure に拡張している** (base change で V⊗F̄, 仮説保存) ので、3.4 も同様に
+  「WLOG alg-closed」できる可能性大 — ただし 3.4 は irreducible M を base-change するので 3.5 (Frobenius, C_V(R) 1-dim) と
+  事情が違う。**最初に原文 L905-915 (3.5 の alg-closure reduction) を精読し 3.4 に転用可能か判断せよ**。
+- **着手順序案 (次セッション)**: (1) GAP 1 = Z(G)-cyclic lemma (alg-closed 版, center_isScalar + isCyclic_of_subgroup_isDomain,
+  自己完結・Thm 3.4 step 7 で必須) を `AbsolutelyIrreducible.lean` か新 leaf に → (2) alg-closure 戦略を原文精読で決定 →
+  (3) Thm 3.4 minimal-counterexample scaffold (新 `S03d_Thm34.lean`, induction on |G| + (3.2) 生成論法 + G/N 移行;
+  bulk・最難)。Thm 3.5/3.6 は 3.4 後。**Lane C (`c-bg-s10`) が §10 spine で Thm 3.4/3.6 を consume 予定 — forward-axiom 境界に注意**。
