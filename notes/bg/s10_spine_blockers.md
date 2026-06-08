@@ -91,10 +91,56 @@ p-length one → Lem6.3a (`Ch1.S06.commutator_eq_self_of_isComplement'_le_commut
 ### 次の leaf (Lane D 継続)
 
 Thm 10.6 が landed したので下流が順に unblock (型検査レベル; 数学的には keystone 待ち):
-- **Cor 10.7** `sylow_structure` (S10_BetaRadical@~66) = 10.6 ("P⊆O_{p',p}(M)") + Lem 6.6 (✅)。次の leaf。
-- **Lem 10.8** `isHall_Mbeta` (@~86) = 10.6 + Thm 5.6 (✅)。
-- 10.9 (3 本)/10.10 = 10.7/10.8 経由。Cor 10.7(b) は更に rep-theory keystone を要する点に注意
-  (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ)。
+- **Lem 10.8** `isHall_Mbeta` (S10_BetaRadical@168) = 10.6 + Thm 5.6 (✅)。**spine 直列 (10.6→10.8→10.9)、
+  ユーザ選択で次の対象**。10.7 は経由しない (下記)。
+- **Cor 10.7** `sylow_structure` (@125) = 10.6 + Lem 6.6 (✅)。**5 部結合の大物・spine 直列線外**
+  (下流は Prop 10.10 / Lem 10.13 のみ; 10.8 は 10.7 非依存)。各部 Lem 6.6 各成分を ↥M で適用し
+  G↔↥M 共役変換で戻すプラグ作業 (推定 300-500 行)。Cor 10.7(b) は更に rep-theory keystone
+  (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ)。後回し。
+- 10.9 (3 本)/10.10 = 10.7/10.8 経由。
+
+### Lem 10.8 (`isHall_Mbeta`) 実行プラン (2026-06-09 精査)
+
+**4 conjunct**: (1) `IsHallSubgroup (beta M) (Mbeta M)`; (2) ∃W≤M', Hall β(M)' in M', nilpotent;
+(3) 同 for M_σ; (4) ∀p∈π(M)−β(M): M' と M_σ が normal p-complement。BG 証明順 = (4)→(1)→(2,3)。
+
+**エンジン = Thm 5.6 `narrow_sylow_solvable_structure` (S05:3268, 5-conjunct, landed)**: solvable odd
+G, p∣|G|, S Sylow p **narrow**, (3≤pRank↥S p → hasPLengthOne p G) ⟹ (c) `HasNormalPComplement p
+↥(commutator G)` 他。↥M に適用 (hasPLengthOne は `proper_hasPLengthOne` から無条件供給)。
+
+**landed tools**: `hasNormalPComplement_of_subgroup` (Ch05:1984, M_σ⊆M' 継承); `Msigma_le_derived`
+(M_σ⊆M'); `proper_hasPLengthOne` (Thm 5.6 の hasPLengthOne 仮説); narrow 特徴づけ
+`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq` (S05:2055, pRank≥3 で narrow⟺∃max-elem-ab p²),
+`narrow_iff_exists_card_prime_centralizer_pRank_le_two` (S05:2121).
+
+**🛑 GAP 1 (conjunct 4 の本質ブロッカー) = narrowness 補題**
+`isNarrow_sylow_of_not_mem_beta`: p∈π(M)−β(M), S Sylow p of M ⟹ `IsNarrow p ↥S`。
+- 易: p∉α(M) ⟹ pRank↥M p≤2 ⟹ pRank↥S p≤2 ⟹ narrow (rank disjunct)。
+- 易: ¬idealPrime かつ pRank G p<3 ⟹ pRank↥M p<3 ⟹ rank≤2 narrow。
+- **✅ 解決: p∈α(M) ∧ ¬idealPrime p G** ⟺ r_p(M)≥3 ∧ **Sylow of G narrow**。当初「narrowness 部分群
+  継承が要・非自明」と懸念したが**不要**だった: **p∈α(M) ⊆ σ(M) ⟹ Sylow p of M = Sylow p of G**
+  (`isSylow_sylowMap_of_mem_sigma`; p∈σ(M) の witness Sylow は N_G⊆M で p-群の normalizer 成長が M
+  内に閉じる ⟹ Sylow of M が Sylow of G)。よって narrowness は**同一群上で transfer** (継承不要)。
+  ¬idealPrime + r_p(G)≥3 で Sylow of G に p²-max-elem-ab ⟹ narrow
+  (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`)、Sylow 共役 iso (`IsNarrow.of_mulEquiv`)
+  で当該 S へ、map iso で ↥P へ。**✅ `isNarrow_sylow_of_not_mem_beta` (private, UNCONDITIONAL) landed**
+  (commit `e98792c8`)。
+
+**✅ GAP 2 解決 = `hasNormalPComplement_of_mulEquiv` (public, UNCONDITIONAL)** を S10_BetaRadical に
+landed (S7B2 private 版を再現)。M_σ は `(Msigma M).subgroupOf (derivedInG M)` +
+`hasNormalPComplement_of_subgroup` + iso。
+
+**✅ conjunct 4 (= Lem 10.8(c)) landed** `derived_msigma_hasNormalPComplement_of_not_mem_beta`
+(commit `e98792c8`, **forward-conditional via Thm 10.6**, AxiomsCheck §10 island 登録済 = 2 forward
+axioms ちょうど)。Thm 5.6(c) を ↥M に適用 (narrow Sylow + proper_hasPLengthOne)。
+
+**残フロンティア = conjunct 1, 2, 3 (bundle 完成に要)**:
+- **conjunct 1 (M_β Hall) = p-complement 交差論**: M_β = ∩_{p∈π(M)−β(M)} (M' の normal p-complement)
+  = O_{β(M)}(M') で Hall β(M)。要: normal p-complement = O_{p'} 一意性、prime-set 上の O_{p'} 交差
+  = O_{β}、Hall 性。conjunct 4 の p-complement 群を束ねる。**次の sub-task**。
+- **conjunct 2,3 (nilpotent Hall β')**: M'/M_β は全 prime で normal p-complement ⟹ nilpotent;
+  W = Hall β(M)'-subgroup。M_β⊆M_σ⊆M' で M_σ 版も。
+- **assembly**: conjunct 1 → 2,3 → bundle `isHall_Mbeta` (= ⟨conjunct1, W_M', W_Mσ, conjunct4⟩)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
