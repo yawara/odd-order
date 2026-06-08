@@ -23,6 +23,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import OddOrder.Isaacs.Ch04_Commutators.Main
@@ -3216,3 +3217,25 @@ set_option linter.style.longLine false in
 -- BG App C Lemma C.2: combine the q=3 cubic branch with the q≥5 class-sum
 -- branch to show that the norm set has at least two elements.
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.lemmaC2
+
+-- BG (2.11) keystone: for the conjugation operator `T = ρ x` on `End V`, the `εᵐ`-eigenspaces
+-- satisfy `dim E₀ = dim E_m + 1` (`m ≢ 0`).  Combines the abstract orbit-count
+-- (`CyclicPermEigen.finrank_eigenspace_fixed_succ`) with the Burnside-basis monomial action.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_cyclicEndConjEigenspaceFin_succ
+
+-- BG Prop 2.2(a) (alg-closed Clifford) materialised for an extraspecial `H`: the restriction
+-- `Res^G_H ρ` of a faithful irreducible `ρ` is irreducible — `hVP`, via Clifford multiplicity-one
+-- (`CliffordMultiplicityOne`), the conjugate-character bridge, and BG 2.10 constituent faithfulness.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.restriction_isIrreducible_of_extraspecial
+
+-- BG Theorem 2.5 (group level), divisibility part, conditional on `hVP`: `dim V ≡ ±1 (mod h)`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_modEq_of_faithful_irreducible
+
+-- BG Theorem 2.5 (group level), fully grounded for an extraspecial `P` (no `hVP` hypothesis):
+-- the divisibility `dim V ≡ ±1 (mod h)` and the `C_V(H)` dichotomy.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_modEq_of_extraspecial
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.finrank_eq_sub_one_of_extraspecial
+
+-- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
+-- representation over an algebraically closed field has cyclic centre `Z(G)`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_center_of_faithful_irreducible

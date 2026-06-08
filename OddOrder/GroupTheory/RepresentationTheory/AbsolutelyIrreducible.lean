@@ -9,6 +9,7 @@ import Mathlib.RepresentationTheory.AlgebraRepresentation.Basic
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 import Mathlib.RingTheory.Finiteness.Basic
+import Mathlib.RingTheory.IntegralDomain
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 
 /-!
@@ -171,6 +172,53 @@ theorem center_isScalar (ρ : Representation F G V) [ρ.IsIrreducible] [FiniteDi
   -- built intertwiner's coercion at `v` is `ρ z v`.  All these are `rfl`, so this typechecks.
   have hv : c • v = (ρ z) v := DFunLike.congr_fun hc v
   simpa using hv.symm
+
+/-- **Gorenstein Theorem 3.2.2** (cyclic centre from a faithful irreducible).  A finite group `G`
+with a faithful irreducible representation on a nonzero finite-dimensional space over an
+algebraically closed field has cyclic centre `Z(G)`.
+
+By `center_isScalar` each central `z` acts as a scalar `c(z) • 1`; the scalar is determined by the
+operator (`V ≠ 0`), so `z ↦ c(z)` is a group homomorphism `Z(G) →* F` into the field's
+multiplicative monoid, injective because `ρ` is faithful.  A finite group with an injective
+homomorphism into an integral domain is cyclic (`isCyclic_of_injective_ringHom`).
+
+This is the input to BG Theorem 3.4 (`Z(K) ⊆ Z(G)` cyclic ⟹ the special group `K` is
+extraspecial). -/
+theorem isCyclic_center_of_faithful_irreducible [Finite G] [FiniteDimensional F V] [Nontrivial V]
+    (ρ : Representation F G V) [ρ.IsIrreducible] (hf : Function.Injective ρ) :
+    IsCyclic (Subgroup.center G) := by
+  classical
+  -- the central scalar `c z`, characterised by `ρ z = c z • 1`
+  let c : ↥(Subgroup.center G) → F := fun z => Classical.choose (center_isScalar ρ z.property)
+  -- `1 : Module.End F V` is `LinearMap.id` definitionally, and `c z` is the chosen scalar
+  have hc : ∀ z : ↥(Subgroup.center G), ρ (z : G) = c z • (1 : Module.End F V) := fun z =>
+    Classical.choose_spec (center_isScalar ρ z.property)
+  -- a nonzero operator determines its scalar (`V ≠ 0`)
+  have huniq : ∀ {a b : F}, a • (1 : Module.End F V) = b • (1 : Module.End F V) → a = b := by
+    intro a b hab
+    obtain ⟨v, hv⟩ := exists_ne (0 : V)
+    have hv2 : a • v = b • v := by simpa using DFunLike.congr_fun hab v
+    rcases smul_eq_zero.mp (show (a - b) • v = 0 by rw [sub_smul, hv2, sub_self]) with h | h
+    · exact sub_eq_zero.mp h
+    · exact absurd h hv
+  -- the central character `Z(G) →* F`
+  let f : ↥(Subgroup.center G) →* F :=
+    { toFun := c
+      map_one' := by
+        have h1 := hc 1
+        rw [Subgroup.coe_one, map_one] at h1
+        have h1' : (1 : F) • (1 : Module.End F V) = c 1 • 1 := by rw [one_smul]; exact h1
+        exact (huniq h1').symm
+      map_mul' := fun z₁ z₂ => by
+        have h12 := hc (z₁ * z₂)
+        rw [Subgroup.coe_mul, map_mul, hc z₁, hc z₂, smul_mul_smul_comm, mul_one] at h12
+        exact (huniq h12).symm }
+  -- faithfulness ⟹ injective
+  have hf_inj : Function.Injective f := by
+    intro z₁ z₂ h
+    have hcc : c z₁ = c z₂ := h
+    exact Subtype.ext (hf (by rw [hc z₁, hc z₂, hcc]))
+  exact isCyclic_of_injective_ringHom f hf_inj
 
 /-- **Burnside basis, spanning step.** A transversal `{ρ(out c) : c ∈ G/Z}` of the central cosets
 still spans `End_F V`: every `ρ g` is a scalar multiple of `ρ(out (gZ))` (central character), so the

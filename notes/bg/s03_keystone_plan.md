@@ -457,3 +457,245 @@ commits `d54869a5` + `e1ac4947`):
 - **assembly**: `restriction_isSimpleModule` — isotypic (`isIsotypicOfType_of_conjugates`) + IsSimpleRing E +
   `finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x) (cliffordConj_fixed_imp_scalar …)` ⟹ finrank E=1 ⟹ bridge
   ⟹ `IsSimpleModule k[↥H] (resRep ρ H).asModule` = `Representation.IsIrreducible (resRep ρ H)` (= hVP, group-level Thm2.5 消費)。
+
+### ✅✅✅ wire-E COMPLETE (2026-06-08 続き, `a-keystone`): hVP = Prop 2.2(a) discharged (mod hconj=Gor5.5.4)
+
+`CliffordMultiplicityOne.lean` 完成 — **`restriction_isSimpleModule` + `restriction_isIrreducible`**
+(sorry-free + axiom-clean [propext/Choice/Quot のみ], full build **3611** green + AxiomsCheck OK)。
+**新 commit (このセッション)**; main 未マージ (司令塔がマージ予定)。
+
+- **`restriction_isSimpleModule`** (`[ρ.IsIrreducible][IsAlgClosed k][Module.Finite k V][Nontrivial V][Finite ↥H]
+  [NeZero (Nat.card ↥H:k)]`, `x`, `hgen:closure(↑H∪{x})=⊤`, `W` 非零 simple `k[↥H]`-部分加群, `hconj`):
+  `IsSimpleModule k[↥H] (resRep ρ H).asModule`。証明 = 計画どおり: isotypic → `linearEquiv_fun` で `V≅Fin n→W`
+  → Schur `End_{k[H]}W≅k` (`AlgEquiv.ofBijective (Algebra.ofId k _) (algebraMap_end_bijective_of_isSimpleModule)`)
+  → `Ψ : E ≃ₐ[k] Matrix (Fin n)(Fin n) k` (`e.conjAlgEquiv k` ▸ `endVecAlgEquivMatrixEnd ..` ▸ `schur.symm.mapMatrix`)
+  → `IsSimpleRing E`+`FiniteDimensional E` を Ψ で transport → `finrank_eq_one_of_aut_fixedScalar (cliffordConj ρ x) hfix`
+  ⟹ `finrank E=1` ⟹ `Module.finrank_matrix`+`Nat.dvd_one` で `n=1` ⟹ `V≅W` (`LinearEquiv.funUnique`) ⟹
+  `IsSimpleModule.congr`。n≠0 は `e.toEquiv.subsingleton`+`not_subsingleton` で nontrivial 矛盾。
+- **`restriction_isIrreducible`** = `(resRep ρ H).IsIrreducible` (= `Representation.IsIrreducible (ρ.comp H.subtype)`,
+  group-level Thm 2.5 `finrank_modEq_of_faithful_irreducible` が直消費する形)。
+  `Representation.irreducible_iff_isSimpleModule_asModule` でラップ。
+
+- **🔑 KEY BLOCKER 解決法 (再調査不要)**: notes 旧「`Module k (resRep ρ H).asModule` bare inferInstance 失敗」=
+  **`set_option backward.isDefEq.respectTransparency false in`** を定理頭に付ければ全解決 (CliffordAlgClosed/Irreducible/
+  Semisimple と同じ; instance 名 `instModuleMonoidAlgebraAsModule`)。これで `Module k[↥H] asModule` / Maschke
+  `IsSemisimpleModule` (via `← isSemisimpleRepresentation_iff_isSemisimpleModule_asModule; infer_instance`) /
+  `IsScalarTower k k[↥H] asModule` / `Module.Finite k asModule` が解決。
+- **diamond fix の確定レシピ**:
+  - `Module.Finite k[↥H] asModule` = `Module.Finite.of_restrictScalars_finite k k[↥H] _` (k-finite + scalar tower)。
+  - `Module.Finite k ↥W` (submodule) = `haveI : IsNoetherian k asModule := inferInstance` →
+    `Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective`。
+  - `Nontrivial asModule` = `‹Nontrivial V›` (defeq ascription; bare inferInstance は不可)。
+  - `endVecAlgEquivMatrixEnd` の明示引数順は `ι R A M` → **`..` で全推論**させる (mathlib WedderburnArtin と同様)。
+- **▶▶ hVP は hconj (`W≅W^g`) を仮説に取った形で COMPLETE。残る = hconj 供給 + group-setup 配線。**
+
+### 🔁 hconj は Gor 5.5.4 をゼロ形式化しない — char_orthonormal 経路 (2026-06-08 訂正, 再調査不要)
+
+**重要な訂正**: 旧 notes は hconj (`W≅W^g`) を「Gor 5.5.4 = extraspecial faithful irred 一意性、mathlib 不在、
+複数セッションの新規ピース」と記録していたが、これは**過大評価で誤り**。BG mmd **L756** が出所:
+> "by **G** Thm 5.5.4 … a faithful irreducible rep of an extraspecial group is **determined by its center**.
+> It follows that … M and M^g are isomorphic."
+
+これは **既形式化の Gor 5.5.5 + mathlib 一般体指標直交性**で出る (Gor 5.5.4 本体不要):
+- ✅ **`character_eq_zero_of_notMem_center`** (`ExtraspecialFaithful.lean`, **一般 alg-closed F**, 既証 = Gor 5.5.5):
+  faithful irred + class≤2 ⟹ χ は Z(P) 外で 0。
+- ✅ **mathlib `Representation.char_orthonormal`** (`RepresentationTheory/Character.lean:230`, **一般 alg-closed k +
+  `Invertible (Nat.card G:k)`** — ℂ-pin でない!): `[IsIrreducible ρ][IsIrreducible σ]` ⟹
+  `(card G)⁻¹·∑ ρ.char g · σ.char g⁻¹ = if Nonempty (σ.Equiv ρ) then 1 else 0`。
+  + `card_inv_mul_sum_char_mul_char_eq_finrank` (= `⟨χ⟩ = finrank (IntertwiningMap ρ σ)`), `char_conj`
+  (`ρ.char (hgh⁻¹)=ρ.char g`), `char_iso`, `Representation.character g := trace k V (ρ g)`, `Representation.Equiv`
+  (`Intertwining.lean:232`)。
+- **論法**: W faithful irred P-加群 (V_P の constituent, BG 2.10), g が Z(P) を中心化 (C_P(x)=Z(P) ⟹ x が Z 上自明,
+  一般 g=p·xᵏ も Z 中心化) ⟹ **χ_{W^g}(h)=χ_W(g⁻¹hg)=χ_W(h)** (h∈Z は g 固定; h∉Z は両者 0 by χ-vanishing)
+  ⟹ `⟨χ_W,χ_W⟩=1≠0` ⟹ `Nonempty (W^g.Equiv W)` ⟹ **W≅W^g = hconj**。
+- **NeZero→Invertible**: 体上 `NeZero (Nat.card ↥H:k)` ⟹ `Invertible` (非零元は単元); `Fintype ↥H` from `Finite`.
+- **残工数 (focused session 級, NOT multi-session)**: (1) 共役部分加群 `W.map (conjSemilinearEnd ρ g)` を
+  `Representation k ↥H` として実現しその指標 = χ_W(g⁻¹·g) を示す plumbing (conjSemilinearEnd の twist 利用,
+  CliffordAlgClosed と同系統) → (2) χ 等式 (χ-vanishing + g 中心化) → (3) char_orthonormal で `W≅W^g` → hconj。
+- **group-setup 配線**: W = V_P の simple constituent (非零 f.d. semisimple から存在), W faithful (BG 2.10), hgen
+  (`closure(↑P∪{x})=⊤`, = `G=P⋊⟨x⟩`) → `restriction_isIrreducible` 呼出 ⟹ hVP materialize。
+  ⟹ Thm 2.5 → Thm 3.4 (parity 矛盾) → 3.5 → 3.6 → §10.6 が開く。
+- **⚠ Isaacs FGT には無い** (S02 表確認済: FGT は character/Clifford 章なし); repo の `CharacterCompleteness`/
+  `CharacterConjugate`/`CharacterRowOrthogonality` は **ℂ-pin** ゆえ一般 k に使えない — **mathlib `char_orthonormal`
+  (一般体) が正解の経路**。
+
+### ✅✅✅ character route to hconj COMPLETE (2026-06-08 cont., `CliffordConjugateChar.lean`, commits `836324bf`+`83cf1180`)
+
+**hconj の指標論機械が完成** (sorry-free + axiom-clean, full build 3612 green)。hconj は今や**群入力だけ**に還元:
+- ✅ `repEquiv ρ g`/`repEquiv_conj` (ρg を k-線形 auto 化 + 大域共役 `ρh∘ρg=ρg∘ρ(g⁻¹hg)`)。
+- ✅ `subRep_coe_smul`/`subRepAsModuleEquiv`/`subRep_isIrreducible`/`equivAsModule` (一般体 subrep↔asModule 基盤;
+  CharacterCompleteness の ℂ-pin `ofSubmodulePrime*` の一般 k 版。**⚠ ℂ 重複は後で統一すべき** — spawn task 候補)。
+- ✅ `character_subRep_conj` : `χ_{(ρg)W}(h) = χ_W(g⁻¹hg)` (`char_iso` + `repEquiv` で共役表現の同型)。
+- ✅ `character_subRep_conj_eq` : W faithful simple class≤2 + g が Z(H) 中心化 ⟹ `χ_{W^g}=χ_W`
+  (共役指標 + `character_eq_zero_of_notMem_center` [Gor 5.5.5, 既証] + `mulEquiv_mem_center_iff`)。
+- ✅ `submodule_iso_of_character_eq` : 等指標 ⟹ `W≅(ρg)W` (`Representation.char_orthonormal` 一般体 + Equiv→submodule)。
+- ✅ `conjugate_submodule_iso` : **per-g hconj capstone** = `restriction_isIrreducible`/`isIsotypicOfType_of_conjugates`
+  が消費する形 (`Nonempty (↥W ≃ₗ[k[↥H]] ↥(W.map (conjSemilinearEnd ρ g)))`), 仮説 = `[IsSimpleModule k[↥H] ↥W]`
+  + hf (faithful) + hcl (class≤2) + hgc (g が Z 中心化)。
+
+**▶▶ 残 = 群入力のみ (group-wiring)**:
+- ✅✅ **hgc/W存在/hgen/∀g hconj/assembly DONE** (2026-06-08 cont., commit `fed77d1b`, full 3612 green):
+  - `conjNormalMulAut_center_eq_of_closure` (hgc): `C_G(z)` が P と x を含む ⟹ ⟨P,x⟩=⊤ ⟹ ∀g が Z(P) 中心化。
+    仮説 = `hxZ` (x が Z(P) 中心化, = `C_P(x)=Z(P)` の ⊇ 方向) + hgen。
+  - **`restriction_isIrreducible_of_faithful_constituents`** (materialization): ρ 既約/alg-closed/`char∤|H|`,
+    `⟨H,x⟩=⊤`, class≤2, x が Z(H) 中心化, **∀ 非零 simple constituent が faithful (hf)** ⟹ `(resRep ρ H).IsIrreducible`。
+    W 存在 (`exists_simple_submodule`) + ∀g hconj (`conjugate_submodule_iso`) + `restriction_isIrreducible` を組立。
+- **▶▶▶ 残る唯一の入力 = hf = constituent faithful (BG 2.10) — ✅ TRACTABLE (多セッション級でない), 証明スケッチ確定**:
+  **鍵 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`** (`Ch01_Sylow/Main.lean:357`, 既証:
+  finite p-group の非自明正規 N ⟹ `N ⊓ Z(P)` nontrivial)。証明手順:
+  1. ✅ **unique minimal normal DONE** (commit `e53c5c9a`, `CliffordConjugateChar.lean`):
+     `extraspecial_center_le_of_normal_ne_bot` — `IsExtraspecial p P` + `[Finite P][Fact p.Prime]` + N⊴P, N≠⊥ ⟹
+     Z(P)≤N。`normal_inf_center_nontrivial` (N⊓Z≠⊥) + `(N.subgroupOf Z).eq_bot_or_eq_top_of_prime_card`
+     (`center_card=p` prime) → ⊥ ケース矛盾 / ⊤ ケース `subgroupOf_eq_top` で Z≤N。
+  2. ✅ **faithfulness DONE** (`extraspecial_constituent_faithful`): ρ既約+faithful+`IsExtraspecial p ↥H`+`[Finite]` ⟹
+     ∀ 非零 simple constituent W で `(ofSubmodule' W).toRepresentation` injective。`MonoidHom.ker ρ_W` ≠⊥ なら
+     `extraspecial_center_le_of_normal_ne_bot` で Z(↥H)≤ker ⟹ 中心 z₀≠1 が W 自明。各共役 ρg(W) でも z₀ 自明
+     (`z'':=conjNormalMulAut H g⁻¹ z₀` が `mulEquiv_mem_center_iff` で中心 ⟹ ker ⟹ W 自明; ρ(z₀)ρg w=ρ(z₀g)w=
+     ρ(g·z'')w=ρg(ρ(z'')w)=ρg w)。共役 span ⊤ (`iSup_map_conjSemilinearEnd_eq_top`) を `Submodule.iSup_induction`
+     (明示 motive 必須・高階推論回避) ⟹ ρ(z₀) が V 自明 ⟹ (z₀:G)∈ker ρ=1 (faithful) ⟹ z₀=1 矛盾 (`center_card=p`)。
+  3. ✅ **wrapper DONE** (`restriction_isIrreducible_of_extraspecial`): materialization + faithfulness 合成。
+     ρ faithful+irreducible/alg-closed/char∤|H|, `⟨H,x⟩=⊤`, `IsExtraspecial p ↥H`, x が Z(H) 中心化 (hxZ) ⟹
+     `(resRep ρ H).IsIrreducible` (= hVP)。class≤2 は `commutator=center` から自動。**constituent faithfulness 仮説は消えた**。
+  **✅✅✅ BG 2.10 COMPLETE — hVP は extraspecial setup から完全 materialize 可能に。**
+  **▶ 残る group input = hxZ (x が Z(P) 中心化)** = `C_P(x)=Z(P)` 完全等号の ⊇ 方向 (現状 finrank_modEq の hCP は ⊆ のみ;
+  group-level Thm 2.5 setup に追加要)。これと `IsExtraspecial` を §3 文脈が供給すれば Thm 2.5 → 3.4 → 3.6 → §10.6 全開放。
+  ※ CliffordConjugateChar が IsExtraspecial + Isaacs Ch01 を import。`MonoidHom.ker` は End(monoid) codomain で Subgroup 化 OK。
+
+### ✅✅✅✅ END-TO-END Thm 2.5 COMPLETE (2026-06-08, `a-keystone`, commit `8ac99c6e`): hVP 配線済 — keystone 完全閉
+
+`ExtraspecialThm25Final.lean` (新規, sorry-free + axiom-clean [3 標準公理], full build **3613** green, OddOrder root +
+AxiomsCheck 配線済) が hVP producer と consumer を合体し、**extraspecial `P` に対する group-level BG Thm 2.5 を hVP 仮説なしで完全 grounded 化**:
+- `conjNormalMulAut_eq_conjAutOfNormal` — Clifford 側 `conjNormalMulAut P x` と keystone 側 `conjAutOfNormal P x`
+  が一致 (両者 `p ↦ x p x⁻¹`, 各 `_apply_coe` が rfl ⟹ `MulEquiv.ext`+`Subtype.ext`)。公開仮説は単一 `conjAutOfNormal` に統一。
+- **`finrank_modEq_of_extraspecial`** — 可除性 `dim V ≡ ±1 (mod h)`。`restriction_isIrreducible_of_extraspecial`
+  (hVP) → `finrank_modEq_of_faithful_irreducible_of_centralizer` に配線。
+- **`finrank_eq_sub_one_of_extraspecial`** — `C_V(H)` 二分律 `h = dim V + 1` (対偶: `h ≠ dim V+1 ⟹ C_V(H)≠0`)。
+- 両者の仮説 = §3 setup data のみ: `IsExtraspecial p ↥P`, faithful irreducible `ρ`/alg-closed `F`/char∤|P|, `x^h=1`(h≥2),
+  `ε` primitive, char∤h, `(h,|P|)=1`, `G=⟨P,x⟩` (hgen), **hxZ** (x が Z(P) 中心化, ⊇), **hCP** (`C_P(xᵏ)⊆Z(P)`, ⊆)。
+  hxZ/hCP は §3 で `C_P(xᵏ)=Z(P)` 完全等号から両方向供給。**AxiomsCheck に keystone chain 5 件追加**
+  (keystone (2.11) `finrank_cyclicEndConjEigenspaceFin_succ`, `restriction_isIrreducible_of_extraspecial`,
+  `finrank_modEq_of_faithful_irreducible`, 上記 final 2 件 — 全 3 公理のみ)。
+
+**⟹ keystone (BG 2.11) + Thm 2.5 (両結論) 完全閉。次フロンティア = BG Thm 3.4。**
+
+### ▶▶▶▶ 次フロンティア = BG Theorem 3.4 (mmd L863-901) — 「大物」, 多セッション級, ingredient 6/8 既存
+
+**Thm 3.4**: G solvable・odd order, normal Hall subgroup K + complement R of prime order, G acts on V/F
+(char∤|G|)。**C_V(R)=0 ⟹ [R,K]⊆C_K(V)**。証明 = minimal counterexample (mmd L867-901):
+1. proper R-invariant H≤K ⟹ HR は仮説満たし |HR|<|G| ⟹ minimality で [H,R]⊆C。∴ [R,K]⊄C より **(3.2) K は proper
+   R-invariant subgroup 群で生成されない**。
+2. Maschke ⟹ V=⊕ irred。[K,R] が自明でない irred G-submodule M を選ぶ。N=C_G(M), p=|R|。C_M(R)⊆C_V(R)=0 ⟹ N∩R=1
+   ⟹ |G|=p|K|, N◁G は p'-subgroup ⊂ K=O_{p'}(G)。
+3. Ḡ=G/N に移行 ⟹ minimality で **N=1 ⟹ G は M 上 faithful irreducible** (∴ V 上も faithful)。**Gor 3.2.2 ⟹ Z(G) cyclic**。
+4. |K| が 2 素数以上で割れる ⟹ Prop 1.5(a) で R-invariant Sylow 各 p ⟹ K が proper R-inv で生成 ⟹ (3.2) 矛盾。
+   ∴ **|K|=qⁿ** (単一素数)。
+5. **Gor 5.3.7 (=S04e) ⟹ K は elementary abelian か nonabelian special, かつ (3.3) R は K/K' に既約作用 + K' を中心化**。
+6. K elem.ab. ⟹ K'=1, [R,K]≠1 ⟹ C_K(R)⊂K, (3.3) で C_K(R)=1 ⟹ **Lemma 3.1 で G=KR Frobenius** ⟹ G faithful on V
+   ⟹ K nontrivial ⟹ **Lemma 3.3 で C_V(R)≠0** 矛盾。∴ K nonabelian special。
+7. K nonabelian special ⟹ Z(K)=K', (3.3) で R が Z(K) 中心化 ⟹ Z(K)⊆Z(G) ⟹ Z(K) cyclic ⟹ **K extraspecial**。
+8. (3.3) で R は K/Z(K) 既約作用, Z(K) maximal R-inv ⟹ **Z(K)=C_K(R)=C_K(x) ∀x∈R^#**。**Thm 2.5 適用で最終矛盾**。
+
+**Ingredient inventory (2026-06-08, Explore agent; 再調査不要)** — 6/8 既存:
+- ✅ **Maschke** = mathlib `IsSemisimpleModule k[G] V` instance (Thm 1.20, S01_Solvable docstring)。
+- ✅ **Prop 1.5(a)** (coprime ⟹ R-inv Sylow/Hall) = `OddOrder.BG.Ch1_Preliminary.S01_Solvable.exists_aInvariant_hall`
+  (S01:661) / `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow`。
+- ✅ **Lemma 3.1** (Frobenius criterion) = `OddOrder.Isaacs.Ch06.IsFrobeniusGroup` 構造体 + `of_centralizer_kernel_le`
+  (`FrobeniusGroup.lean:240`)。C_K(R)=1 から G=KR Frobenius を構成。
+- ✅ **Lemma 3.3** = `OddOrder.BG.Ch1.S03b.centralizer_ne_bot_of_nontrivial_kernel` (`S03b_Lemma33.lean:114`):
+  `IsFrobeniusGroup G K R` + (card K:F)≠0 + K 非自明作用 ⟹ ∃ v≠0, ∀r∈R fixed (= C_V(R)≠0)。
+- ✅ **Gor 5.3.7** = `OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper` (`S04e_GorThm37.lean:206`):
+  `φ:A→*MulAut P`, P p-group, coprime, ψ 非自明 + proper A-inv N 上自明 ⟹ commutator≤center ∧ K/K' elem.ab.
+  ∧ (A-inv N で K'≤N ⟹ N=K' or ⊤ = **R 既約 on K/K'**) ∧ ∃g (φψ)g·g⁻¹∉K' (=非中心化) ∧ `IsSpecial p P`。
+- ✅ **Thm 2.5** = `finrank_modEq_of_extraspecial` + `finrank_eq_sub_one_of_extraspecial` (本セッション)。
+- ✅ **IsExtraspecial/IsSpecial** = `OddOrder/GroupTheory/IsExtraspecial.lean` (`IsExtraspecial` 構造体 + `IsSpecial` def)。
+  special + Z cyclic ⟹ extraspecial の補題は要確認 (center_card=p を special + cyclic から導く)。
+- ⚠ **GAP 1 = Gor 3.2.2 (Z(G) cyclic from faithful irreducible)**: partial。`AbsolutelyIrreducible.center_isScalar`
+  (alg-closed, irred, f.d. ⟹ center は scalar `ρ z = c•id`) は有。**未形式化 = 「Z(G) cyclic」標準定理**。
+  **TRACTABLE (~40 行)**: center G ∋ z ↦ scalar c(z) ∈ F は monoid hom (ρ(zz')=ρz·ρz' より乗法的), faithful ⟹ injective
+  (c(z)=c(z')⟹ρz=ρz'⟹z=z'), c(z)≠0 (ρz 可逆) ⟹ `center G →* F` injective + `[Finite (center G)]` ⟹
+  `isCyclic_of_subgroup_isDomain` (mathlib, 有限部分群 of 体は cyclic) で `IsCyclic (center G)`。**第一 leaf 候補**。
+- ⚠ **GAP 2 (設計判断) = alg-closure 戦略**: Thm 3.4 は**一般体 F** で述べる (char∤|G| のみ) が、本 repo の Thm 2.5
+  (`finrank_modEq_of_extraspecial`) は **`[IsAlgClosed F]` 必須**。BG 原文 (L863-901) は alg closure に拡張せず一般 F で
+  Gor 3.2.2 + Thm 2.5 を使う (Thm 2.5 自体が一般体可? — 本 repo keystone は alg-closed 固定)。**要決定**: (a) Thm 3.4 を
+  alg-closed F に限定して述べ、§3 適用側で base change (2.9=`BaseChange.lean`) する — ただし irreducibility は base change で
+  壊れ得る (M⊗F̄ が可約) ので Clifford/Wedderburn で扱う必要 ‖ (b) Thm 2.5 を一般体に拡張 (keystone の alg-closed 依存箇所を
+  division-ring End で一般化 — 大仕事) ‖ (c) Thm 3.4 を alg-closed 前提で形式化し、FT 適用文脈が実際 alg-closed (or 拡張済) かを
+  §10 で確認。**Thm 3.5 (L907) は冒頭で alg closure に拡張している** (base change で V⊗F̄, 仮説保存) ので、3.4 も同様に
+  「WLOG alg-closed」できる可能性大 — ただし 3.4 は irreducible M を base-change するので 3.5 (Frobenius, C_V(R) 1-dim) と
+  事情が違う。**最初に原文 L905-915 (3.5 の alg-closure reduction) を精読し 3.4 に転用可能か判断せよ**。
+- **着手順序案 (次セッション)**: (1) GAP 1 = Z(G)-cyclic lemma (alg-closed 版, center_isScalar + isCyclic_of_subgroup_isDomain,
+  自己完結・Thm 3.4 step 7 で必須) を `AbsolutelyIrreducible.lean` か新 leaf に → (2) alg-closure 戦略を原文精読で決定 →
+  (3) Thm 3.4 minimal-counterexample scaffold (新 `S03d_Thm34.lean`, induction on |G| + (3.2) 生成論法 + G/N 移行;
+  bulk・最難)。Thm 3.5/3.6 は 3.4 後。**Lane C (`c-bg-s10`) が §10 spine で Thm 3.4/3.6 を consume 予定 — forward-axiom 境界に注意**。
+
+### ✅ Thm 3.4 セッション (2026-06-08 pm, `a-keystone`) — GAP 1/2 解決 + 第一 leaf 着地, 残=induction scaffold
+
+GAP 1 (Gor 3.2.2) は前セッションで ✅ done (`isCyclic_center_of_faithful_irreducible`, commit `2ea2cfa8`)。
+本セッションで **GAP 2 (alg-closure 戦略) を決定 + 最終矛盾を確定 + step-7 leaf を着地**。残りは induction scaffold + 2 leaf。
+
+**✅ GAP 2 決定 = Option A (alg-closed core + base-change wrapper)。** 原文精読 (mmd L907, Thm 3.5 冒頭) で確定:
+"The hypotheses remain intact if we replace **F** by F̄ and V by V⊗_F F̄, WLOG **F** alg-closed." この reduction は
+**Thm 3.4 にもそのまま転用可能** — 3.4 の仮説 `C_V(R)=0` と結論 `[R,K]⊆C_K(V)` は両方 **base-change 安定**:
+`dim_F C_V(R) = dim_F̄ C_{V⊗F̄}(R)` (fixed-point は flat base change と可換; Thm 2.5 自身が (2.8) でこれを使用),
+`g が V 上自明 ⟺ V⊗F̄ 上自明` ⟹ `C_K(V)` 不変。char/`|G|` 不変。よって:
+- **core**: Thm 3.4 を **`[IsAlgClosed F]` 付き**で証明 (minimal-counterexample, step 1-8)。repo の alg-closed
+  Gor 3.2.2 + Thm 2.5 (`finrank_eq_sub_one_of_extraspecial`) を直接呼ぶ。**induction は alg-closed F を保つ** (subgroup
+  HR も quotient G/N も同じ F 上; base change は最外で一度きり)。
+- **wrapper**: 一般 F は core から base change (BG (2.9)=`BaseChange.lean`) で導く別 leaf。**downstream (Thm 3.6, L1057/1109/1257)
+  は一般 F で consume するので wrapper 必須だが、core 完成後の独立 leaf でよい** (3.5 の L909-913 と同じ reduction)。
+  ⟹ Option B (Thm 2.5 を一般体拡張) / Option C (alg-closed 前提で放置) は不要。core+wrapper の 2 定理に分けるのが Lean 的に clean。
+
+**✅ 最終矛盾 (step 8) 確定 = parity, クリーン版**: Thm 2.5 (`finrank_eq_sub_one_of_extraspecial`) は `C_M(R)=0`
+(+`dim M≥2`) から `dim M = h-1 = p-1` を出す (h=p=|R|)。一方 `(dim M)² = |K/Z(K)|` (`sq_finrank_eq_card_quotient_center`,
+ExtraspecialFaithful) は **奇数** (`|K| ∣ |G|` odd) ⟹ **dim M 奇数**。`p-1` は **偶数** (p 奇素数)。奇=偶 ⟹ False。
+**`dim M = qᵐ` を陽に出す必要なし** — `(dim M)² odd ⟹ dim M odd` で十分。`dim M≥2` は `(dim M)²=|K/Z(K)|=q^{2m}, m≥1`
+(K nonabelian) から `dim M=qᵐ≥q≥3`。
+
+**✅ Leaf 1 (step 7 tail) DONE** (commit `a262fa1b`, sorry-free + axiom-clean, build green 2171):
+`IsExtraspecial.of_isSpecial_of_isCyclic_center` (`IsExtraspecial.lean`) — `IsSpecial p G` + `¬IsElementaryAbelian p G`
+(nonabelian) + `IsCyclic (center G)` ⟹ `IsExtraspecial p G`。証明: nonabelian ⟹ IsSpecial 第二 disjunct
+(commutator=center=frattini, center elem ab) + center cyclic ⟹ `exponent=card ∣ p` + p-group center nontrivial ⟹ `card=p`。
+Nontrivial は `¬IsElementaryAbelian` から導出 (subsingleton ⟹ elem ab)。
+
+**✅ Ingredient inventory 確定 (Explore agent, exact signatures, 再調査不要)** — **7/8 done, 残 scaffold のみ**:
+- ✅ **Maschke** = mathlib `IsSemisimpleModule k[G] V` instance。
+- ✅ **Prop 1.5(a) Hall** = `OddOrder.BG.Ch1.S01.exists_aInvariant_hall` (`S01_Solvable.lean:661`):
+  `{φ : A →* MulAut G}(hCop : Coprime |A| |G|)(π) : ∃ H, IsHallSubgroup π H ∧ IsAInvariant φ H`。
+- ✅ **Prop 1.5(a) Sylow** = `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow` (`Ch04_Commutators/ForwardFromCh03.lean:440`):
+  `{φ : A →* MulAut G}(hCop)(hSolv : IsSolvable A ∨ IsSolvable G)(p)[Fact p.Prime] : ∃ P : Sylow p G, IsAInvariant φ ↑P`。
+- ✅ **Lemma 3.1 (Frobenius)** = `OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R` 構造体 (`FrobeniusGroup.lean:240`,
+  fields: `isNormal`, `isComplement : IsComplement' N A`, `ne_bot_kernel`, `ne_bot_complement`, `conj_frobenius`)
+  + `of_centralizer_kernel_le` (`:324`, `C_G(n)≤N ∀ 1≠n∈N` から構成)。
+- ✅ **Lemma 3.3** = `OddOrder.BG.Ch1.S03b.centralizer_ne_bot_of_nontrivial_kernel` (`S03b_Lemma33.lean:114`):
+  `[Finite G]{K R}(hFrob : IsFrobeniusGroup G K R)(ρ : Representation F G V)(hchar : (|K|:F)≠0)(hKnt : ∃ k:K, ρ k ≠ 1)
+  : ∃ v≠0, ∀ r:R, ρ r v = v`。**対偶 `kernel_acts_trivially_of_centralizer_eq_bot` (`:207`)** も有 (`C_V(R)=0 ⟹ K 自明`)。
+- ✅ **Gor 5.3.7** = `OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper` (`S04e_GorThm37.lean:206`):
+  `(φ : A →* MulAut P)(hP : IsPGroup p P)(hCop){ψ:A}(hψ_ntriv : ¬∀g,(φψ)g=g)(hψ_proper : ∀ N normal A-inv ≠⊤, φψ|_N=id)`
+  ⟹ **5-連言**: `commutator P≤center P ∧ IsElementaryAbelian p (P⧸commutator P) ∧ (∀ N A-inv, [P,P]≤N → N=[P,P]∨N=⊤)
+  ∧ (∃ g, (φψ)g·g⁻¹∉[P,P]) ∧ IsSpecial p P`。第 3 連言 = R irreducible on K/K' = (3.3) 前半; 中心化 = `commutator≤center`。
+- ✅ **Thm 2.5** = `finrank_eq_sub_one_of_extraspecial` + `finrank_modEq_of_extraspecial` (`ExtraspecialThm25Final.lean:63/89`)。
+  step-8 interface = 大量仮説 (ε primitive root, Invertible(|P|:F), hgen=`closure(P∪{x})=⊤`, hxZ, hCP, x^h=1, Coprime h |P|, …);
+  Thm 3.4 文脈 (G=K⋊R, R prime order p, C_K(x)=Z(K), G faithful irred on M) から全組立が L4 の主工数。
+- ✅ **special+Z cyclic ⟹ extraspecial** = `IsExtraspecial.of_isSpecial_of_isCyclic_center` (本セッション Leaf 1)。
+
+**▶ 残り = induction scaffold (最難・bulk) + 2 leaf。** **着手順序 (次セッション)**:
+1. **scaffold `S03d_Thm34.lean`** = minimal-counterexample。**architecture template = `frobeniusKernelIsNilpotent_aux`
+   (`S03c_Thm37.lean:595`)**: `private ..._aux : ∀ (n:ℕ){G}[inst…](…)→ Nat.card G = n → concl`,
+   `induction n using Nat.strong_induction_on`, 再帰は `subgroupOf (L⊔R)` + `subgroupOfEquivOfLe`.toEquiv +
+   `nilpotent_of_surjective` 系で transport。**Thm 3.4 は Thm 3.7 より複雑** — induction が **群 G だけでなく加群 V/表現 ρ
+   にも polymorphic** (quotient case で G→G/N かつ V→M に同時移行), 再帰が **2 形**: (a) HR≤G on same V (subgroupOf
+   パターン), (b) G/N on submodule M (quotient — `frobenius_quotient_of_normal_lt_kernel` `S03c:233` 系の quotient-Frobenius
+   transport + ρ が N=C_G(M) を kernel に持つので G/N 表現に factor)。statement は `Representation F G V` + `K R : Subgroup G`
+   + `[K.Normal]` + `IsComplement' K R` + R prime order + `IsSolvable G` + `Odd |G|` + char∤|G| (`(|G|:F)≠0`) + alg-closed,
+   `C_V(R)=0` (`∀ v, (∀ r:R, ρ r v = v) → v=0`), 結論 `∀ g∈⁅R,K⁆, ρ g = 1`。**Lemma 3.3 の `Representation F G V` + 部分群
+   convention に揃える** (S03b と同形)。
+2. **Leaf 2 (step 4) = |K| prime power** — (3.2)「K は proper R-inv 部分群で生成されない」+ ≥2 primes ⟹ R-inv Sylows
+   (`exists_aInvariant_sylow`, R solvable=prime cyclic) が proper (|Sylow_p|=p^{v_p}<|K|) かつ join=⊤ ⟹ 矛盾。
+   join=⊤ の核心: `S=⨆(proper A-inv)`, 各 p∈primeFactors|K| で A-inv Sylow_p≤S ⟹ `p^{v_p(|K|)} ∣ |S|` ⟹
+   (factorization) `|K| ∣ |S|`, `|S| ∣ |K|` ⟹ `|S|=|K|` ⟹ `S=⊤`。tools: `Nat.factorization_le_iff_dvd`,
+   `Nat.Prime.pow_dvd_iff_le_factorization`, Sylow card。~60-80 行, (3.2) の iSup 形を scaffold に合わせて確定後に書く
+   (form coupling ゆえ scaffold と同時推奨)。
+3. **Leaf 4 (step 8) = parity finish** — 上記「最終矛盾」を Thm 2.5 interface に配線 (大量仮説組立 + `(dim M)² odd` parity)。
+4. **base-change wrapper** (一般 F, core 完成後の独立 leaf, BG (2.9))。
+- **着手順序案**: scaffold statement + 骨格 (step 1-8 を sorry, IH 配線確認) → Leaf 2/4 を順に充足 → step 1-3,5-7 を
+  既 ingredient で埋める → wrapper。**Thm 3.5/3.6 は 3.4 完成後** (3.6 が 3.4 を L1057/1109 で consume)。

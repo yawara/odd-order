@@ -117,6 +117,39 @@ theorem commutator_card (h : IsExtraspecial p G) : Nat.card (commutator G) = p :
 theorem frattini_card (h : IsExtraspecial p G) : Nat.card (frattini G) = p := by
   rw [h.frattini_eq_center]; exact h.center_card
 
+/-- **A nonabelian special group with cyclic centre is extraspecial.**
+A special `p`-group `G` (`IsSpecial p G`) that is *not* elementary abelian (equivalently,
+nonabelian) and whose centre is cyclic is extraspecial: in the nonabelian branch of `IsSpecial`,
+`Z(G) = [G, G] = Φ(G)` is elementary abelian, and being additionally cyclic forces `|Z(G)| = p`.
+
+This is the closing structural step of **BG Theorem 3.4** (step 7): Gorenstein's Theorem 5.3.7
+leaves `K` either elementary abelian or nonabelian special; the elementary abelian case is excluded
+earlier, and `Z(K) ⊆ Z(G)` is cyclic, so `K` is extraspecial and Theorem 2.5 applies. -/
+theorem of_isSpecial_of_isCyclic_center [Finite G] [Fact p.Prime]
+    (hsp : IsSpecial p G) (hnonab : ¬ IsElementaryAbelian p G)
+    (hcyc : IsCyclic (Subgroup.center G)) :
+    IsExtraspecial p G := by
+  obtain ⟨hpg, hdisj⟩ := hsp
+  rcases hdisj with helem | ⟨hcomm, hfrat, hZelem⟩
+  · exact absurd helem hnonab
+  -- Nonabelian branch: `Z(G) = [G,G] = Φ(G)` elementary abelian.  `G` (hence `Z(G)`) is nontrivial.
+  haveI : Nontrivial G := by
+    by_contra hcon
+    rw [not_nontrivial_iff_subsingleton] at hcon
+    exact hnonab ⟨fun x y => Subsingleton.elim _ _, fun x => Subsingleton.elim _ _⟩
+  haveI hZnt : Nontrivial (Subgroup.center G) := hpg.center_nontrivial
+  haveI : IsCyclic (Subgroup.center G) := hcyc
+  refine ⟨hpg, hcomm, hfrat, ?_⟩
+  -- `Z(G)` cyclic + elementary abelian ⟹ `exponent = card` divides `p`; nontrivial ⟹ `card = p`.
+  have hZea : IsElementaryAbelian p (Subgroup.center G) := hZelem
+  have hdvd : Nat.card (Subgroup.center G) ∣ p := by
+    rw [← IsCyclic.exponent_eq_card, Monoid.exponent_dvd_iff_forall_pow_eq_one]
+    exact hZea.pow_eq_one
+  have hgt : 1 < Nat.card (Subgroup.center G) := Finite.one_lt_card_iff_nontrivial.mpr hZnt
+  rcases (Nat.dvd_prime (Fact.out : p.Prime)).mp hdvd with h1 | hp
+  · omega
+  · exact hp
+
 end IsExtraspecial
 
 /-- **Extraspecial p-group of exponent p**: an extraspecial `p`-group all of whose
