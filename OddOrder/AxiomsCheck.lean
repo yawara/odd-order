@@ -3312,3 +3312,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_trivial
+
+-- §5 (3.5.1): the norm-3 decomposition `β_{ij} = ∑_{χ ∈ A_{ij}} χ` into signed nontrivial irreducibles.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.card_eq_three_of_sum_sq_eq_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_signedTriple_of_inner_self_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_betaSet

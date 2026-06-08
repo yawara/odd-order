@@ -288,6 +288,121 @@ theorem inner_trivialClassFunction_self (G : Type*) [Group G] [Fintype G]
   rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter, irreducibleCharacter_inner,
     if_pos rfl]
 
+/-! ### Norm-`3` virtual characters orthogonal to `1_G` (abstract, candidate for `ZIrrFourier`)
+
+The combinatorial heart of Peterfalvi (3.5.1): a virtual character of squared norm `3` orthogonal
+to the trivial character is a sum of three pairwise-orthogonal *signed nontrivial irreducibles*.
+These three results are `G`-level and TI-cyclic-independent — companions to the norm-`2` lemma
+`OddOrder.RepresentationTheory.exists_irr_sub_irr_of_inner_self_two`.  They are kept here, rather
+than in the shared `ZIrrFourier` module, to leave the active frontier in this leaf. -/
+
+/-- Finite integer-vector combinatorics: if integer coefficients on a finite set `s` are all
+nonzero and their squares sum to `3`, then `s` has exactly three elements, each with coefficient
+`±1`.  (`3` is a sum of nonzero integer squares only as `1 + 1 + 1`: a square `≥ 2` is `≥ 4`.)
+Companion to `OddOrder.RepresentationTheory.exists_pair_of_sum_sq_eq_two`. -/
+theorem card_eq_three_of_sum_sq_eq_three {ι : Type*} {s : Finset ι} {c : ι → ℤ}
+    (hne : ∀ a ∈ s, c a ≠ 0) (hsum : ∑ a ∈ s, c a ^ 2 = 3) :
+    s.card = 3 ∧ ∀ a ∈ s, c a = 1 ∨ c a = -1 := by
+  have hle : ∀ a ∈ s, c a ^ 2 ≤ 3 := fun a ha =>
+    le_of_le_of_eq (Finset.single_le_sum (fun b _ => sq_nonneg (c b)) ha) hsum
+  have hsign : ∀ a ∈ s, c a = 1 ∨ c a = -1 := fun a ha => by
+    have hane := hne a ha
+    have hb := hle a ha
+    -- `c a ^ 2 ≤ 3` forces `|c a| ≤ 1` (a square `≥ 2 ` is `≥ 4`), and `c a ≠ 0`.
+    have habs1 : |c a| ≤ 1 := by
+      by_contra h
+      have h2 : (2 : ℤ) ≤ |c a| := by omega
+      have h4 : (4 : ℤ) ≤ c a ^ 2 :=
+        calc (4 : ℤ) = 2 ^ 2 := by norm_num
+          _ ≤ |c a| ^ 2 := by gcongr
+          _ = c a ^ 2 := sq_abs (c a)
+      omega
+    rcases abs_le.mp habs1 with ⟨h1, h2⟩
+    omega
+  have hone : ∀ a ∈ s, c a ^ 2 = 1 := fun a ha => by
+    rcases hsign a ha with h | h <;> rw [h] <;> norm_num
+  refine ⟨?_, hsign⟩
+  have hcard : (s.card : ℤ) = 3 :=
+    calc (s.card : ℤ) = ∑ _a ∈ s, (1 : ℤ) := by
+            rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+      _ = ∑ a ∈ s, c a ^ 2 := (Finset.sum_congr rfl hone).symm
+      _ = 3 := hsum
+  exact_mod_cast hcard
+
+/-- The set `±(Irr(G) - {1_G})` of *signed nontrivial irreducible characters*, as class functions:
+`x` is `±χ` for some nontrivial irreducible character `χ`.  This is the type of the elements of
+Peterfalvi's set `A_{ij}` in (3.5.1). -/
+def IsSignedNontrivialIrr (x : ClassFunction G ℂ) : Prop :=
+  ∃ χ : IrreducibleCharacter G, χ ≠ trivialIrreducibleCharacter G ∧
+    (x = (χ : ClassFunction G ℂ) ∨ x = -(χ : ClassFunction G ℂ))
+
+/-- **Peterfalvi (3.5.1)** (abstract form): a virtual character `φ ∈ ℤ[Irr G]` of squared norm `3`
+orthogonal to `1_G` is `φ = ∑_{x ∈ A} x` for a `3`-element set `A` of pairwise-orthogonal signed
+nontrivial irreducibles.  Indeed `φ = ∑ c_a · a` over irreducibles with `∑ c_a² = 3`, so the
+support has three elements with `c_a = ±1` (`card_eq_three_of_sum_sq_eq_three`); orthogonality to
+`1_G` excludes the trivial character from the support, and the signed irreducibles `c_a · a` form
+the set `A`.  Companion to the norm-`2` lemma `exists_irr_sub_irr_of_inner_self_two`. -/
+theorem exists_signedTriple_of_inner_self_three [Invertible (Nat.card G : ℂ)]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 3)
+    (htriv : ClassFunction.inner φ (trivialClassFunction G) = 0) :
+    ∃ A : Finset (ClassFunction G ℂ),
+      A.card = 3 ∧ (∀ x ∈ A, IsSignedNontrivialIrr x) ∧
+      (∀ x ∈ A, ∀ y ∈ A, x ≠ y → ClassFunction.inner x y = 0) ∧
+      φ = ∑ x ∈ A, x := by
+  classical
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφ
+  have hsumC : ∑ a ∈ c.support, (c a : ℂ) ^ 2 = 3 := hsq.symm.trans hnorm
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = 3 := by exact_mod_cast hsumC
+  have hne : ∀ a ∈ c.support, c a ≠ 0 := fun a ha => Finsupp.mem_support_iff.mp ha
+  obtain ⟨hcard3, hsign⟩ := card_eq_three_of_sum_sq_eq_three hne hsumZ
+  -- the trivial character is not in the support (else `⟨φ, 1_G⟩ = c_{1_G} ≠ 0`)
+  have htrivnot : trivialClassFunction G ∉ c.support := by
+    intro hmem
+    have hcoeff : ClassFunction.inner φ (trivialClassFunction G) =
+        (c (trivialClassFunction G) : ℂ) := by
+      rw [hrepr]; exact inner_eq_coeff_of_repr (trivialIrreducibleCharacter G) hsupp
+    rw [htriv] at hcoeff
+    exact (Finsupp.mem_support_iff.mp hmem) (by exact_mod_cast hcoeff.symm)
+  -- the signed-irreducible map `a ↦ (c a) • a` is injective on the support
+  have hinj : Set.InjOn (fun a => (c a : ℂ) • a) (c.support : Set (ClassFunction G ℂ)) := by
+    intro a ha b hb hfab
+    by_contra hab
+    have haa : a ∈ irreducibleCharacters G := hsupp ha
+    have hba : b ∈ irreducibleCharacters G := hsupp hb
+    have e1 : ClassFunction.inner ((c a : ℂ) • a) a = (c a : ℂ) := by
+      rw [ClassFunction.inner_smul_left, irr_cf_inner haa haa, if_pos rfl, mul_one]
+    have e2 : ClassFunction.inner ((c b : ℂ) • b) a = 0 := by
+      rw [ClassFunction.inner_smul_left, irr_cf_inner hba haa, if_neg (Ne.symm hab), mul_zero]
+    change (c a : ℂ) • a = (c b : ℂ) • b at hfab
+    have hca0 : (c a : ℂ) = 0 := by rw [← e1, hfab, e2]
+    exact hne a (Finset.mem_coe.mp ha) (by exact_mod_cast hca0)
+  refine ⟨c.support.image (fun a => (c a : ℂ) • a), ?_, ?_, ?_, ?_⟩
+  · rw [Finset.card_image_of_injOn hinj]; exact hcard3
+  · intro x hx
+    rw [Finset.mem_image] at hx
+    obtain ⟨a, ha, rfl⟩ := hx
+    have haa : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    have hane : a ≠ trivialClassFunction G := fun h => htrivnot (h ▸ ha)
+    refine ⟨⟨a, haa⟩, fun h => hane (Subtype.ext_iff.mp h), ?_⟩
+    rcases hsign a ha with h | h
+    · refine Or.inl ?_
+      change (c a : ℂ) • a = a
+      rw [h, Int.cast_one, one_smul]
+    · refine Or.inr ?_
+      change (c a : ℂ) • a = -a
+      rw [h, Int.cast_neg, Int.cast_one, neg_one_smul]
+  · intro x hx y hy hxy
+    rw [Finset.mem_image] at hx hy
+    obtain ⟨a, ha, rfl⟩ := hx
+    obtain ⟨b, hb, rfl⟩ := hy
+    have haa : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    have hbb : b ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr hb)
+    have hab : a ≠ b := fun h => hxy (by rw [h])
+    change ClassFunction.inner ((c a : ℂ) • a) ((c b : ℂ) • b) = 0
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      irr_cf_inner haa hbb, if_neg hab, mul_zero, mul_zero]
+  · rw [Finset.sum_image hinj]; exact hrepr
+
 namespace TICyclicHypothesis
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
@@ -359,6 +474,23 @@ theorem beta_inner_trivial (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       (trivialClassFunction G) = 0
   rw [ClassFunction.inner_sub_left, hyp.tau_alpha_inner_trivial hVeq app ha₁ ha₂,
     inner_trivialClassFunction_self, sub_self]
+
+/-- **Peterfalvi (3.5.1)**: `β_{ij} = ∑_{χ ∈ A_{ij}} χ` for a set `A_{ij}` of three pairwise
+orthogonal elements of `±(Irr(G) - {1_G})` (`i, j ≥ 1`).  This extracts the set `A_{ij}` from the
+norm-`3` virtual character `β_{ij}` (`beta_mem_ZIrr`, `beta_inner_self = 3`, `beta_inner_trivial =
+0`) via `exists_signedTriple_of_inner_self_three`.  It is the combinatorial starting point of
+(3.5.2)-(3.5.5). -/
+theorem exists_betaSet (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) :
+    ∃ A : Finset (ClassFunction G ℂ),
+      A.card = 3 ∧ (∀ x ∈ A, IsSignedNontrivialIrr x) ∧
+      (∀ x ∈ A, ∀ y ∈ A, x ≠ y → ClassFunction.inner x y = 0) ∧
+      hyp.beta hVeq app a₁ a₂ = ∑ x ∈ A, x :=
+  exists_signedTriple_of_inner_self_three (hyp.beta_mem_ZIrr hVeq app a₁ a₂)
+    (hyp.beta_inner_self hVeq app ha₁ ha₂) (hyp.beta_inner_trivial hVeq app ha₁ ha₂)
 
 end TICyclicHypothesis
 
