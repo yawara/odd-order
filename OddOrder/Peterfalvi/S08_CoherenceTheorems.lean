@@ -10979,27 +10979,25 @@ theorem hgen_withDiagonal_of_frobenius
   · exact Submodule.smul_mem _ s
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
-/-- **(6.8.1) generic capstone Frobenius branch (`m, n ≥ 3`):** `X(Zc) ∪ Y` is coherent.
-
-Given three distinct equal-degree `X(Zc)`-anchors `χ₁ ∈ xBaseBlock`, `χ₂, χ₃` (the `n ≥ 3`
-pinning) with `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y` and `|Y| ≥ 3` (the `m ≥ 3` good case), the union is
-coherent.  The `τ₃` glue `ν` is built internally (`exists_integralCharacterMap_glue_of_orthonormal`,
-`νX = τ₂`, `νY = τ₁`); its agreement discharges `hagreeX`/`hagreeY`, `hmixed` reduces to himg_ortho
-(`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`, both sides `0`), `hDτ` for
-`D = {χ₁ − a·η₁}` is the crux `crux_of_frobenius` (`ν(χ₁−aη₁) = χ₁^{τ₂} − a·η₁^{τ₁} = (χ₁−aη₁)^τ`),
-and `hgen` is `hgen_withDiagonal_of_frobenius`.  The `m = 2` / `n = 2` edge cases (relabel) are not
-covered. -/
-noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
+/-- **(6.8.1) capstone `X(Zc) ∪ Y` coherence from a witness-level crux** (general form).  Given
+arbitrary coherence witnesses `cX` (for `X(Zc)`), `cY` (for `Y`), a base-block anchor `χ₁` with
+`χ₁(1) = a·|W₁|`, an `η₁ ∈ Y`, and the **crux** `(χ₁−aη₁)^τ = cX χ₁ − a·cY η₁` (whichever way it is
+established — the generic `n,m ≥ 3` argument or the `m=2`/`n=2` relabel), the union `X(Zc) ∪ Y` is
+coherent.  `ν` is the `τ₃` glue of `cX`/`cY`; `hmixed = himg_ortho_general`, `hDτ = hcrux`,
+`hgen = hgen_withDiagonal`.  This is the common assembly shared by the generic case and both edge
+cases (which differ only in how `hcrux` is produced for the chosen witnesses). -/
+noncomputable def coherentXunionYset_centralCommutator_diagonal_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    (hHnonab : _root_.commutator ↥H ≠ ⊥)
-    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
-    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
-    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
-    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
-    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    (hcrux : hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
@@ -11032,23 +11030,46 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
       (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite
       (fun x hx x' hx' => hinner x x' (hXirr x hx) (hXirr x' hx'))
       (fun y hy y' hy' => hinner y y' (hYirr y hy) (hYirr y' hy')) hXY
-      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension)
-      hyp.coherentYset.extension
-  refine hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
-    hF hHnonab hp hp3 hHp hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_)
+      cX.extension cY.extension
+  refine hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_general
+    hF cX cY hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_)
     {χ₁ - a • η₁} (fun d hd => ?_)
     (hyp.hgen_withDiagonal_of_frobenius hF hp hHp hη₁ hχ₁base ha)
   · -- `hmixed`: `⟨ν x, ν y⟩ = ⟨x, y⟩` (both `0`).
     rw [hglue.choose_spec.1 x hx, hglue.choose_spec.2 y hy,
-      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
-        hF hHnonab hp hp3 hHp hx hy, hXY x hx y hy]
+      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general hF cX cY hx hy, hXY x hx y hy]
   · -- `hDτ`: `ν(χ₁−aη₁) = (χ₁−aη₁)^τ` = the crux.
     rw [Set.mem_singleton_iff] at hd
     subst hd
     rw [map_sub, map_nsmul, hglue.choose_spec.1 χ₁ hχ₁X, hglue.choose_spec.2 η₁ hη₁,
-      ← Nat.cast_smul_eq_nsmul ℂ a (hyp.coherentYset.extension η₁)]
-    exact (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁X hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
-      ha hdeg2 hdeg3 hm3).symm
+      ← Nat.cast_smul_eq_nsmul ℂ a (cY.extension η₁)]
+    exact hcrux.symm
+
+/-- **(6.8.1) generic capstone Frobenius branch (`m, n ≥ 3`):** `X(Zc) ∪ Y` is coherent.
+
+Given three distinct equal-degree `X(Zc)`-anchors `χ₁ ∈ xBaseBlock`, `χ₂, χ₃` (the `n ≥ 3`
+pinning) with `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y` and `|Y| ≥ 3` (the `m ≥ 3` good case), the union is
+coherent.  Delegates to `coherentXunionYset_centralCommutator_diagonal_general` at the fixed
+witnesses, with `hcrux = crux_of_frobenius`.  The `m = 2` / `n = 2` edge cases (relabel) are not
+covered. -/
+noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.coherentXunionYset_centralCommutator_diagonal_general hF hp hHp
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hη₁ hχ₁base ha
+    (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ (hyp.xBaseBlock_subset _ hχ₁base) hχ₂ hne₂
+      hχ₃ hne₃₁ hne₃₂ ha hdeg2 hdeg3 hm3)
 
 /-- **(6.8) capstone, case (A) (Frobenius, `m, n ≥ 3` with given anchors): `S` is coherent.**
 Combines the generic capstone Frobenius branch
