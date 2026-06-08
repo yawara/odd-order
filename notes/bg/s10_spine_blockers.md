@@ -31,7 +31,70 @@ landable な grounded prerequisite / helper を 2 件**着地 (full build 3609, 
 
 ⟹ **Thm 10.6 r_p≥3 branch の残ゲートは Lem 10.4(b) + Thm 3.6 の 2 件のみ** (ゲート 1=Thm 10.2 ✅,
 2=Lem 6.3(a) ✅, 3=p-length 単調性 ✅, 4=p'-quotient lift ✅)。両者とも Lane A keystone 系・
-forward-axiom 待ち (ユーザ判断で forward-axiom 配線は保留中)。
+forward-axiom 待ち。
+
+### ✅ Lane D first leaf landed — Thm 10.6 forward-wired (2026-06-09, branch `bg-s10-fwd`)
+
+**`proper_hasPLengthOne` (Thm 10.6) を 2 forward-axiom 上に本物の証明として配線** (commit
+`a07d9b6e`, full build 3613, AxiomsCheck island OK)。`#print axioms` = `[propext,
+Classical.choice, Quot.sound, exists_prime_orderOf_zgroupCentralizer_of_complement,
+pLengthOne_commutator_of_zgroupCentralizer]` = expected island ちょうど。
+
+**新ファイル `S10_ForwardFromKeystone.lean`** に 2 forward-axiom (namespace `OddOrder.BG.Ch3.S10`):
+
+1. **`pLengthOne_commutator_of_zgroupCentralizer`** = **BG Thm 3.6** (keystone-gated)。署名 (Lane A
+   が解消時にこの statement と一致させること = de-axiom は name swap):
+   ```
+   {Γ} [Group Γ] [Finite Γ] (hsolv : IsSolvable Γ) (hodd : Odd (Nat.card Γ))
+   {H R : Subgroup Γ} (hHnormal : H.Normal) (hHall : Nat.Coprime (Nat.card ↥H) H.index)
+   (hcompl : H.IsComplement' R) {R₀ : Subgroup Γ} (hR₀ : R₀ ≤ R) (hR₀prime : (Nat.card ↥R₀).Prime)
+   (hZ : IsZGroup ↥(Subgroup.centralizer (R₀ : Set Γ) ⊓ H)) (p : ℕ) [Fact p.Prime] :
+   Ch1.hasPLengthOne p ↥⁅H, R⁆
+   ```
+   normal Hall は `H.Normal` + `Coprime (card H) (index)` でエンコード。**Lane A は §3 で Thm 3.6 を
+   landed したらこの署名でこの axiom を置換** (forward_dep_policy)。
+2. **`exists_prime_orderOf_zgroupCentralizer_of_complement`** = **BG Lem 10.4(b)** (grounded,
+   lane a1 領域, keystone-gated でない・deferred)。10.6 用に特化:
+   ```
+   (hG : IsMinimalSimpleOdd G) {M} (hM : M ∈ maximalSubgroups G) (hMα : Malpha M ≠ ⊥)
+   {K : Subgroup ↥M} (hK : ((Malpha M).subgroupOf M).IsComplement' K)
+   {q} (hq : q.Prime) (hqK' : q ∈ ((commutator ↥K).index).primeFactors) :
+   ∃ x : ↥M, x ∈ K ∧ orderOf x = q ∧
+     IsZGroup ↥(Subgroup.centralizer (↑(Subgroup.zpowers x) : Set ↥M) ⊓ (Malpha M).subgroupOf M)
+   ```
+   `q ∈ π(K/K')` は `(commutator ↥K).index` の primeFactors でエンコード。R₀=⟨x⟩=zpowers x に合わせ
+   centralizer は zpowers 形。
+
+**⚠ Lem 10.4(b) 仮説の訂正** (p.87 PDF visual-read で確定, references commit `ded5acd`): 原典は
+**「`p ∉ σ(M)` ∧ `M_α ≠ 1` ⇒ ∃ x∈Ω₁(Z(P))#: {M}≠ℳ(C_G(x)) ∧ C_{M_α}(x) Z-群」**。
+本ノート/旧 scaffold が (b) を「`p∈α(M)`」と書いていたのは**誤り**。10.6 適用では prime=q・Sylow=Q⊆K で、
+`q∈π(K/K') ⟹ q∣|M/M'| (M/M'↠K/K') ⟹ q∉σ(M)` (Lem 10.4(a)=`alpha_criterion`) 経由で (b) が効く。
+de-axiom 時はこの還元 + 一般 10.4(b) を組む。
+
+**証明の骨子** (S10_BetaRadical `proper_hasPLengthOne`): M∈ℳ(H) 取得→Lem1.21(a)で H に落とす。
+case `p∉α(M)` = `maximal_hasPLengthOne_of_not_mem_alpha` (landed)。case `p∈α(M)`: Nontrivial ↥M
+(p∣|M|) → N:=M_α.subgroupOf M は normal Hall (`Malpha_subgroupOf_isHall_of_isHall`) →
+`N≤commutator ↥M` (Thm10.2: Malpha≤Msigma≤derived; comap_mono) → `N<⊤`
+(`IsSolvable.commutator_lt_top_of_nontrivial`, G 明示引数!) → Schur-Zassenhaus 補群 K → K≠⊥ →
+q∈π(K/K') (K solvable nontrivial⟹not perfect) → Lem10.4b axiom で x → Thm3.6 axiom で ⁅N,K⁆
+p-length one → Lem6.3a (`Ch1.S06.commutator_eq_self_of_isComplement'_le_commutator`) で ⁅N,K⁆=N →
+`Ch1.hasPLengthOne_of_normal_pPrime_quotient` で M へ lift。**地雷: PLengthTransfer helper は `Ch1.`
+修飾要; `commutator_lt_top_of_nontrivial` は `variable (G)` で G 明示; `comap_map_eq_self_of_injective`
+は H 明示引数。**
+
+**AxiomsCheck に新マクロ `#assert_axioms_island name expecting [ax...]`** 追加 (3 レーン共有, 末尾)。
+`#assert_only_allowed_axioms` (標準 3 公理のみ=unconditional 保証) と別に、conditional/island 定理が
+**ちょうど** standard∪{列挙 axiom} に依存することを assert (未列挙 axiom=sorry/別 axiom creep を検出、
+かつ列挙 axiom が実際に使われることも要求)。keystone landed 時は island 削除→`#assert_only_allowed_axioms`
+へ移行。**§10 spine は従来 AxiomsCheck 未カバー** (Ch1-2+AppABC のみ); Lane D が §10 import を追加。
+
+### 次の leaf (Lane D 継続)
+
+Thm 10.6 が landed したので下流が順に unblock (型検査レベル; 数学的には keystone 待ち):
+- **Cor 10.7** `sylow_structure` (S10_BetaRadical@~66) = 10.6 ("P⊆O_{p',p}(M)") + Lem 6.6 (✅)。次の leaf。
+- **Lem 10.8** `isHall_Mbeta` (@~86) = 10.6 + Thm 5.6 (✅)。
+- 10.9 (3 本)/10.10 = 10.7/10.8 経由。Cor 10.7(b) は更に rep-theory keystone を要する点に注意
+  (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
