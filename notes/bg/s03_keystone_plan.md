@@ -540,8 +540,16 @@ commits `d54869a5` + `e1ac4947`):
   - **`restriction_isIrreducible_of_faithful_constituents`** (materialization): ρ 既約/alg-closed/`char∤|H|`,
     `⟨H,x⟩=⊤`, class≤2, x が Z(H) 中心化, **∀ 非零 simple constituent が faithful (hf)** ⟹ `(resRep ρ H).IsIrreducible`。
     W 存在 (`exists_simple_submodule`) + ∀g hconj (`conjugate_submodule_iso`) + `restriction_isIrreducible` を組立。
-- **▶▶▶ 残る唯一の入力 = hf = constituent faithful (BG 2.10)**: extraspecial P で Z(P)=unique minimal normal ⟹
-  各 constituent も faithful (Z(P) が nontrivial 作用; 不 faithful なら ker⊇Z(P) で V 全体に Z(P) 自明作用 ⟹ V 非 faithful 矛盾)。
-  **要群論・未形式化**。`IsExtraspecial.lean` の Z(P) 構造 (Z(P)=P'=Φ(P) cyclic order p, unique minimal normal) を要確認。
-  これを discharge すれば materialization → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) → 3.4 → 3.6 → §10.6 全開放。
-  ※ hxZ (x が Z(P) 中心化) も group-level setup (`C_P(x)=Z(P)` 完全等号) から供給要 — 現状 finrank_modEq の hCP は ⊆ 方向のみ。
+- **▶▶▶ 残る唯一の入力 = hf = constituent faithful (BG 2.10) — ✅ TRACTABLE (多セッション級でない), 証明スケッチ確定**:
+  **鍵 = `OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial`** (`Ch01_Sylow/Main.lean:357`, 既証:
+  finite p-group の非自明正規 N ⟹ `N ⊓ Z(P)` nontrivial)。証明手順:
+  1. **unique minimal normal** (新 helper, `IsExtraspecial.lean` 候補): `IsExtraspecial p ↥P` + `[Finite]` + N⊴P, N≠⊥ ⟹
+     Z(P)≤N。`normal_inf_center_nontrivial` で N⊓Z≠⊥, `center_card=p` prime ⟹ N⊓Z=Z (prime-order subgroup は ⊥/⊤;
+     card-dvd or `subgroupOf` + IsSimpleOrder ルート) ⟹ Z≤N。
+  2. **faithfulness** (新 thm, hf を discharge): ρ_W=(ofSubmodule' W).toRepresentation の ker は ⊴↥P。ker≠⊥ なら
+     Z(↥P)≤ker (上記) ⟹ Z(↥P) が W に自明作用。各共役 ρg(W) でも自明 (z 作用 = ρ(z), w'=ρg w で ρ(z)ρg w=ρ(zg)w=
+     ρg ρ(g⁻¹zg)w, g⁻¹zg∈Z(P) 自明 ⟹ =w')。共役 span ⊤ (`iSup_map_conjSemilinearEnd_eq_top`, ρ既約) ⟹ Z(↥P) が V 自明 ⟹
+     Z(↥P)⊆ker ρ=⊥ (ρ faithful) ⟹ |Z|=1, `center_card=p` と矛盾 ⟹ ker=⊥ ⟹ ρ_W injective。
+  discharge ⟹ materialization → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) → 3.4 → 3.6 → §10.6 全開放。
+  ※ hxZ (x が Z(P) 中心化) も group-level setup の `C_P(x)=Z(P)` 完全等号から供給要 (現状 finrank_modEq の hCP は ⊆ のみ)。
+  ※ 要 `[Fact p.Prime]` + `IsExtraspecial p ↥P` を faithfulness thm の仮説に。CliffordConjugateChar が IsExtraspecial を import。
