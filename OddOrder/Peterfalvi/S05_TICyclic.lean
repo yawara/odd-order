@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import Mathlib.GroupTheory.FiniteAbelian.Duality
+import Mathlib.RingTheory.RootsOfUnity.AlgebraicallyClosed
+import Mathlib.LinearAlgebra.FiniteDimensional.Lemmas
 
 /-!
 # Peterfalvi §5: TI-Subsets with Cyclic Normalizers
@@ -830,6 +833,83 @@ theorem alpha_inner_omega_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     hyp.omega_inner_ne (hyp.comp_wSnd_ne_omegaProdChar q₂ p₂ hp₁),
     hyp.omega_inner_ne (hyp.omegaProdChar_ne hne)]
   ring
+
+/- 3.4 (cont.): the index count (Pontryagin self-duality `|Ŵ_k| = w_k`) and the `α_{ij}` basis -/
+
+/-- **Pontryagin self-duality** for the cyclic factors: the character group of `W_k` (viewed inside
+`W`) has the same cardinality as `W_k`.  Since `W` is cyclic, `W_k.subgroupOf W` is cyclic, hence a
+finite commutative group, and `ℂ` (being algebraically closed) has enough roots of unity, so
+`|Hom(W_k, ℂˣ)| = |W_k|`.  This is the count of the nontrivial-character index set behind the
+`(w₁−1)(w₂−1)` basis. -/
+theorem card_charGroup_subgroupOf (hyp : TICyclicHypothesis G) {H : Subgroup G}
+    (hHW : H ≤ hyp.W) :
+    Nat.card ((H.subgroupOf hyp.W) →* ℂˣ) = Nat.card H := by
+  haveI := hyp.W_cyclic
+  haveI : Finite G := Finite.of_fintype G
+  have key : Nat.card ((H.subgroupOf hyp.W) →* ℂˣ) = Nat.card (H.subgroupOf hyp.W) := by
+    letI : CommGroup ↥(H.subgroupOf hyp.W) := IsCyclic.commGroup
+    haveI : NeZero ((Monoid.exponent ↥(H.subgroupOf hyp.W) : ℂ)) :=
+      ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+    exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥(H.subgroupOf hyp.W) ℂ
+  rw [key, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHW).toEquiv]
+
+/-- **Peterfalvi (3.4), linear independence**: the family `(α_{ij})` (`1 ≤ i < w₁`, `1 ≤ j < w₂`,
+indexed by nontrivial character pairs) is linearly independent in `CF(W, V)`.  Proof by the
+biorthogonal system: the dual functional `⟨·, ω_{ij}⟩` evaluates `α_{kl}` to `δ_{(k,l),(i,j)}`
+(`alpha_inner_omega_self`/`_ne`). -/
+theorem alphaLinearIndependent (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff) :
+    LinearIndependent ℂ
+      (fun p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
+          {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} =>
+        hyp.alpha hVeq p.1.1 p.2.1) := by
+  refine LinearIndependent.of_pairwise_dual_eq_zero_one _
+    (fun p => (innerDual (hyp.omega (hyp.omegaProdChar p.1.1 p.2.1))).comp
+      (Submodule.subtype _)) (fun p q hpq => ?_) (fun p => ?_)
+  · simp only [LinearMap.comp_apply, Submodule.subtype_apply, innerDual_apply, alpha_coe]
+    exact hyp.alpha_inner_omega_ne p.1.2 p.2.2
+      (fun heq => hpq (Prod.ext (Subtype.ext heq.1) (Subtype.ext heq.2)).symm)
+  · simp only [LinearMap.comp_apply, Submodule.subtype_apply, innerDual_apply, alpha_coe]
+    exact hyp.alpha_inner_omega_self p.1.2 p.2.2
+
+/-- A nontrivial subgroup of `W` has a nontrivial character (its character group is nontrivial,
+having the same cardinality `> 1`).  Gives `Nonempty` of the index set of nontrivial characters. -/
+theorem nonempty_charNeOne (hyp : TICyclicHypothesis G) {H : Subgroup G} (hHW : H ≤ hyp.W)
+    (hH : H ≠ ⊥) : Nonempty {χ : (H.subgroupOf hyp.W) →* ℂˣ // χ ≠ 1} := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((H.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  have hcard : 1 < Fintype.card ((H.subgroupOf hyp.W) →* ℂˣ) := by
+    rw [← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hHW]
+    exact Finite.one_lt_card
+  haveI : Nontrivial ((H.subgroupOf hyp.W) →* ℂˣ) :=
+    Fintype.one_lt_card_iff_nontrivial.mp hcard
+  obtain ⟨χ, hχ⟩ := exists_ne (1 : (H.subgroupOf hyp.W) →* ℂˣ)
+  exact ⟨⟨χ, hχ⟩⟩
+
+/-- **Peterfalvi (3.4)**: the family `(α_{ij})` (`1 ≤ i < w₁`, `1 ≤ j < w₂`) is a basis of
+`CF(W, V)`.  Linear independence (`alphaLinearIndependent`) together with the matching count
+`|{(i,j)}| = (w₁−1)(w₂−1) = dim CF(W, V)` (`card_charGroup_subgroupOf`, `finrank_supportedOnV`)
+gives the basis. -/
+noncomputable def alphaBasis (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff) :
+    Module.Basis ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
+        {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ℂ (SupportedOnV ℂ hyp) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  haveI : Fintype {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := Fintype.ofFinite _
+  haveI := hyp.nonempty_charNeOne hyp.W1_le_W hyp.W1_nontrivial
+  haveI := hyp.nonempty_charNeOne hyp.W2_le_W hyp.W2_nontrivial
+  refine basisOfLinearIndependentOfCardEqFinrank (hyp.alphaLinearIndependent hVeq) ?_
+  rw [Fintype.card_prod, hyp.finrank_supportedOnV hVeq]
+  congr 1
+  · rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+  · rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W2_le_W]
 
 end TICyclicHypothesis
 
