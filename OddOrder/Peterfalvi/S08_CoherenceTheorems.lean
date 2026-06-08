@@ -5691,6 +5691,61 @@ theorem sMember_charValue_one_eq_mul_anchor (hyp : SibleyDadeHypothesis G L H)
     hyp.index_H_eq_card_W1, hχ₁deg]
   ring
 
+open scoped Classical in
+/-- **Degree-ratio integrality against a base-block anchor.**  For `χ ∈ X(Z)` and a minimal-degree
+anchor `χ₁ ∈ xBaseBlock Z`, the degree ratio `χ(1)/χ₁(1)` is a positive natural number:
+`∃ d : ℕ, 0 < d ∧ χ(1) = d·χ₁(1)`.  Both source degrees are powers of `p` (`H` a `p`-group,
+`IsIrreducibleCharacter.exists_charValue_one_eq_prime_pow_of_isPGroup`); minimality
+(`natDegree_le_of_xBaseBlock_anchor`) gives `χ₁(1) ≤ χ(1)`, so the smaller `p`-power divides the
+larger and the ratio `p^{k−k₁}` is a positive integer.  This is the `dᵢ ∈ ℤ` datum of the (6.8.1)
+`hgen'` decomposition (the degree side; `zSpan_S_support_subset_of_apply_one_eq_zero` is the support
+side). -/
+theorem exists_charValue_one_eq_mul_xBaseBlock_anchor (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {Z : Subgroup ↥L}
+    {χ χ₁ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) (hχ₁base : χ₁ ∈ hyp.xBaseBlock Z) :
+    ∃ d : ℕ, 0 < d ∧ χ 1 = (d : ℂ) * χ₁ 1 := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  -- sources of `χ` and `χ₁`.
+  have hχS : χ ∈ hyp.S := hyp.Xset_subset_S hχX
+  have hχ₁S : χ₁ ∈ hyp.S := hyp.Xset_subset_S (hyp.xBaseBlock_subset Z hχ₁base)
+  rw [hyp.S_eq] at hχS hχ₁S
+  obtain ⟨θ, -, hχeq⟩ := hχS
+  obtain ⟨θ₁, -, hχ₁eq⟩ := hχ₁S
+  obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  obtain ⟨a₁, ha₁_pos, ha₁⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ₁
+  -- source degrees are `p`-powers.
+  obtain ⟨k, hk⟩ := θ.2.exists_charValue_one_eq_prime_pow_of_isPGroup hHp
+  obtain ⟨k₁, hk₁⟩ := θ₁.2.exists_charValue_one_eq_prime_pow_of_isPGroup hHp
+  have hak : a = p ^ k := by exact_mod_cast ha.symm.trans hk
+  have ha₁k₁ : a₁ = p ^ k₁ := by exact_mod_cast ha₁.symm.trans hk₁
+  -- `χ(1) = |W₁|·a`, `χ₁(1) = |W₁|·a₁` (nat degrees).
+  have hχ1 : χ 1 = ((Nat.card hyp.W1 * a : ℕ) : ℂ) := by
+    rw [hχeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha,
+      hyp.index_H_eq_card_W1]; push_cast; ring
+  have hχ₁1 : χ₁ 1 = ((Nat.card hyp.W1 * a₁ : ℕ) : ℂ) := by
+    rw [hχ₁eq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha₁,
+      hyp.index_H_eq_card_W1]; push_cast; ring
+  -- minimality of `χ₁`: `|W₁|·a₁ ≤ |W₁|·a`, hence `a₁ ≤ a`, hence `k₁ ≤ k`.
+  have hirr : IsIrreducibleCharacter χ := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
+  have hirr₁ : IsIrreducibleCharacter χ₁ :=
+    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF (hyp.xBaseBlock_subset Z hχ₁base)
+  have hle : Nat.card hyp.W1 * a₁ ≤ Nat.card hyp.W1 * a :=
+    hyp.natDegree_le_of_xBaseBlock_anchor (χ₁ := ⟨χ₁, hirr₁⟩) (χ := ⟨χ, hirr⟩) hχ₁base hχX hχ₁1 hχ1
+  have hW1pos : 0 < Nat.card hyp.W1 := Nat.card_pos
+  have ha₁a : a₁ ≤ a := Nat.le_of_mul_le_mul_left hle hW1pos
+  have hkk₁ : k₁ ≤ k := by
+    rw [hak, ha₁k₁] at ha₁a; exact (Nat.pow_le_pow_iff_right hp.one_lt).mp ha₁a
+  -- the ratio is `p^{k−k₁}`.
+  refine ⟨p ^ (k - k₁), pow_pos hp.pos _, ?_⟩
+  have hap : a = p ^ (k - k₁) * a₁ := by rw [hak, ha₁k₁, ← pow_add]; congr 1; omega
+  rw [hχ1, hχ₁1]
+  have : Nat.card hyp.W1 * a = p ^ (k - k₁) * (Nat.card hyp.W1 * a₁) := by rw [hap]; ring
+  rw [this]; push_cast; ring
+
 /-- **(6.2) member-family core for `S₁ ⊆ S`** (Frobenius case): the flat enumeration of `S₁` with
 its per-member orthonormality, non-realness, conjugate-difference support, and `S₁`-membership
 facts.
@@ -10693,6 +10748,107 @@ theorem crux_of_frobenius
     ha hdeg2 hdeg3
     (hyp.inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha
       hm3)
+
+open scoped Classical in
+/-- **(6.8.1) `hgen'` — the diagonal-aware generation hypothesis** (mmd 04.8 L176).  Every supported
+`X(Zc) ∪ Y`-combination lies in the span of the supported `X(Zc)`-combinations, the supported
+`Y`-combinations, and the single cross-diagonal `χ₁ − a·η₁`:
+`ℤ[X(Zc) ∪ Y, A] ⊆ span(ℤ[X(Zc), A] ∪ ℤ[Y, A] ∪ {χ₁ − a·η₁})`.
+
+For `φ = φ_X + φ_Y` (`X, Y` disjoint, `Submodule.span_union`), the degree-ratio integrality
+(`exists_charValue_one_eq_mul_xBaseBlock_anchor`) gives `s ∈ ℤ` with `φ_X(1) = s·χ₁(1)` (span
+induction); then `φ = (φ_X − s·χ₁) + (φ_Y + s·(a·η₁)) + s·(χ₁ − a·η₁)`, where the first two pieces
+are degree-`0` (`φ(1) = 0` from support) hence supported
+(`zSpan_S_support_subset_of_apply_one_eq_zero`) and the last is a multiple of the diagonal.  This is
+the `hgen` field of `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` with
+`D = {χ₁ − a·η₁}`. -/
+theorem hgen_withDiagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+      Submodule.span ℤ
+        (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+        OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+        {χ₁ - a • η₁}) := by
+  classical
+  have hχ₁X : χ₁ ∈ hyp.Xset hyp.centralCommutator := hyp.xBaseBlock_subset _ hχ₁base
+  intro φ hφ
+  obtain ⟨hφspan, hφsupp⟩ := hφ
+  -- `φ(1) = 0`: `1 ∉ A = H^#`.
+  have h1 : φ 1 = 0 := by
+    by_contra h
+    have hmem := hφsupp (ClassFunction.mem_support.mpr h)
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
+    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at hmem
+    exact hmem.2 (by simp)
+  -- split `φ = φ_X + φ_Y`.
+  rw [OddOrder.Peterfalvi.S07.zSpan, Submodule.span_union] at hφspan
+  obtain ⟨φX, hφX, φY, hφY, hsum⟩ := Submodule.mem_sup.mp hφspan
+  -- the integer `s` with `φ_X(1) = s·χ₁(1)` (span induction + degree-ratio integrality).
+  have hsX : ∀ ψ ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator),
+      ∃ s : ℤ, ψ 1 = (s : ℂ) * χ₁ 1 := by
+    intro ψ hψ
+    induction hψ using Submodule.span_induction with
+    | mem x hx =>
+        obtain ⟨d, -, hd⟩ := hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor hF hp hHp hx hχ₁base
+        exact ⟨d, by rw [hd]; push_cast; ring⟩
+    | zero => exact ⟨0, by simp⟩
+    | add x y _ _ hx hy =>
+        obtain ⟨sx, hsx⟩ := hx; obtain ⟨sy, hsy⟩ := hy
+        exact ⟨sx + sy, by rw [ClassFunction.add_apply, hsx, hsy]; push_cast; ring⟩
+    | smul c x _ hx =>
+        obtain ⟨sx, hsx⟩ := hx
+        refine ⟨c * sx, ?_⟩
+        rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply, hsx]; push_cast; ring
+  obtain ⟨s, hφX1⟩ := hsX φX hφX
+  -- `φ_Y(1) = −s·χ₁(1)`.
+  have hφY1 : φY 1 = -((s : ℂ) * χ₁ 1) := by
+    have haux : φX 1 + φY 1 = 0 := by
+      have hc := congrArg (fun ψ : ClassFunction ↥L ℂ => ψ 1) hsum
+      simpa [ClassFunction.add_apply, h1] using hc
+    linear_combination haux - hφX1
+  -- the smul degrees.
+  have hsχ₁1 : (s • χ₁ : ClassFunction ↥L ℂ) 1 = (s : ℂ) * χ₁ 1 := by
+    rw [← Int.cast_smul_eq_zsmul ℂ s χ₁, ClassFunction.smul_apply]
+  have hsaη₁1 : (s • (a • η₁) : ClassFunction ↥L ℂ) 1 = (s : ℂ) * ((a : ℂ) * η₁ 1) := by
+    rw [← Int.cast_smul_eq_zsmul ℂ s (a • η₁), ClassFunction.smul_apply,
+      ← Nat.cast_smul_eq_nsmul ℂ a η₁, ClassFunction.smul_apply]
+  -- the three pieces are degree 0 (for the supported ones) and span-members.
+  have hp1deg : (φX - s • χ₁ : ClassFunction ↥L ℂ) 1 = 0 := by
+    rw [ClassFunction.sub_apply, hφX1, hsχ₁1]; ring
+  have hp2deg : (φY + s • (a • η₁) : ClassFunction ↥L ℂ) 1 = 0 := by
+    rw [ClassFunction.add_apply, hφY1, hsaη₁1, ha, hyp.Yset_apply_one hη₁]; ring
+  have hp1span : (φX - s • χ₁) ∈ Submodule.span ℤ (hyp.Xset hyp.centralCommutator) :=
+    Submodule.sub_mem _ hφX (Submodule.smul_mem _ s (Submodule.subset_span hχ₁X))
+  have hp2span : (φY + s • (a • η₁)) ∈ Submodule.span ℤ hyp.Yset :=
+    Submodule.add_mem _ hφY
+      (Submodule.smul_mem _ s (nsmul_mem (Submodule.subset_span hη₁) a))
+  -- supports via the degree-0 ⟹ supported helper.
+  have hp1supp : (φX - s • χ₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.zSpan_S_support_subset_of_apply_one_eq_zero
+      (Submodule.span_mono hyp.Xset_subset_S hp1span) hp1deg
+  have hp2supp : (φY + s • (a • η₁)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.zSpan_S_support_subset_of_apply_one_eq_zero
+      (Submodule.span_mono hyp.Yset_subset_S hp2span) hp2deg
+  -- assemble `φ = p1 + p2 + p3` (the `s·χ₁`, `s·(a·η₁)` terms cancel).
+  have hφeq : φ = (φX - s • χ₁) + (φY + s • (a • η₁)) + s • (χ₁ - a • η₁) := by
+    rw [smul_sub, ← hsum]; abel
+  rw [hφeq]
+  refine Submodule.add_mem _ (Submodule.add_mem _ ?_ ?_) ?_
+  · exact Submodule.subset_span (Set.mem_union_left _ (Set.mem_union_left _ ⟨hp1span, hp1supp⟩))
+  · exact Submodule.subset_span (Set.mem_union_left _ (Set.mem_union_right _ ⟨hp2span, hp2supp⟩))
+  · exact Submodule.smul_mem _ s
+      (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
 end SibleyDadeHypothesis
 
