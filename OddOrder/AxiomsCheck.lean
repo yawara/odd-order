@@ -3301,3 +3301,14 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induce_apply_eq_self_of_mem_V
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.isDadeMap_inducedDadeMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.tau_eq_induce
+
+-- §5 (3.5.1) complete: Frobenius reciprocity input + the norm-3 virtual characters `β_{ij}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.restrict_trivialClassFunction_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_inner_omega_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.tau_alpha_inner_trivial
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.inner_trivialClassFunction_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_trivial

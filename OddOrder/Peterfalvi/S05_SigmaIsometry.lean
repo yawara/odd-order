@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi §5: The isometry `σ` (Theorem (3.2)) and its construction (3.5)
@@ -210,16 +211,154 @@ end DadeMapIsInduction
 namespace TICyclicHypothesis
 
 /-- **Peterfalvi (3.2.a)**: on `CF(W, V)`, the §4 Dade map *is* induction `Ind_W^G`.  By the
-uniqueness of the Dade map (`IsDadeMap.unique`), the abstract carrier `app.tau` agrees with the
-concrete `inducedDadeMap`.  This is the bridge that makes Frobenius reciprocity
-(`inner_induce_eq_inner_restrict`) available for the abstract `τ`. -/
+uniqueness of the Dade map (`IsDadeMap.unique`), any §4 Dade-isometry carrier `τ` for the
+TI-cyclic hypothesis agrees with the concrete `inducedDadeMap`.  This is the bridge that makes
+Frobenius reciprocity (`inner_induce_eq_inner_restrict`) available for the abstract `τ` (both
+`DadeApplication` and `FullDadeApplication` expose such a `DadeIsometryData`). -/
 theorem tau_eq_induce {k : Type*} [CommRing k] [StarRing k] [Invertible (Nat.card G : k)]
-    (hyp : TICyclicHypothesis G) [Fintype hyp.W]
-    [Invertible (Nat.card hyp.W : k)] (app : DadeApplication (G := G) (k := k) hyp)
+    (hyp : TICyclicHypothesis G) [Fintype hyp.W] [Invertible (Nat.card hyp.W : k)]
+    (τ : OddOrder.Peterfalvi.S04.DadeIsometryData (G := G) (k := k) hyp.toDadeHypothesis)
     (α : SupportedOnV (G := G) k hyp) :
-    app.tau.toDadeMap α = ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) :=
-  congrFun (OddOrder.Peterfalvi.S04.IsDadeMap.unique app.tau.isDadeMap
+    τ.toDadeMap α = ClassFunction.induce hyp.W (α : ClassFunction hyp.W k) :=
+  congrFun (OddOrder.Peterfalvi.S04.IsDadeMap.unique τ.isDadeMap
     hyp.isDadeMap_inducedDadeMap) α
+
+/- 3.5.1 (cont.): Frobenius reciprocity `⟨Ind_W^G α_{ij}, 1_G⟩ = 1` -/
+
+/-- `Res^G_W 1_G = ω_{00}`: the trivial character of `G` restricts to the trivial linear character
+`ω(omegaProdChar 1 1) = ω_{00}` of `W` (both are constant `1`). -/
+theorem restrict_trivialClassFunction_eq (hyp : TICyclicHypothesis G) :
+    ClassFunction.restrict hyp.W (trivialClassFunction G) =
+      (hyp.omega (hyp.omegaProdChar 1 1) : ClassFunction hyp.W ℂ) := by
+  ext w
+  rw [ClassFunction.restrict_apply, trivialClassFunction_apply, omega_apply,
+    hyp.omegaProdChar_one_one, MonoidHom.one_apply, Units.val_one]
+
+open Classical in
+/-- `⟨α_{ij}, ω_{00}⟩ = 1` for `i, j ≥ 1`: the trivial-character coefficient of
+`α_{ij} = ω_{00} - ω_{i0} - ω_{0j} + ω_{ij}` is `1` (the other three terms are orthogonal to
+`ω_{00}` since `i, j ≥ 1`). -/
+theorem alphaCF_inner_omega_one (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    {p₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {p₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (hp₁ : p₁ ≠ 1) (hp₂ : p₂ ≠ 1) :
+    ClassFunction.inner (hyp.alphaCF p₁ p₂)
+        (hyp.omega (hyp.omegaProdChar 1 1) : ClassFunction hyp.W ℂ) = 1 := by
+  rw [hyp.alphaCF_eq_omegaProdChar_combination p₁ p₂]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_add_left,
+    hyp.omega_omegaProdChar_inner]
+  simp only [hp₁, hp₂, and_false, if_false, if_true, and_true]
+  ring
+
+/-- **Peterfalvi (3.5.1)** (Frobenius reciprocity): `⟨Ind_W^G α_{ij}, 1_G⟩ = ⟨α_{ij}, 1_W⟩ = 1`
+for `i, j ≥ 1`.  Via the bridge `tau_eq_induce` (`τ = Ind_W^G`), Frobenius reciprocity
+(`inner_induce_eq_inner_restrict`) turns this into `⟨α_{ij}, Res^G_W 1_G⟩ = ⟨α_{ij}, ω_{00}⟩ = 1`.
+Together with the Gram matrix `tau_alpha_inner`, this is the second input that makes
+`β_{ij} = Ind_W^G α_{ij} - 1_G` a norm-`3` virtual character orthogonal to `1_G`. -/
+theorem tau_alpha_inner_trivial (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {p₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {p₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (hp₁ : p₁ ≠ 1) (hp₂ : p₂ ≠ 1) :
+    ClassFunction.inner (app.tau.toDadeMap (hyp.alpha hVeq p₁ p₂))
+        (trivialClassFunction G) = 1 := by
+  change ClassFunction.inner (app.tau.toDadeIsometryData.toDadeMap (hyp.alpha hVeq p₁ p₂))
+    (trivialClassFunction G) = 1
+  rw [hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq p₁ p₂),
+    ClassFunction.inner_induce_eq_inner_restrict, hyp.alpha_coe,
+    hyp.restrict_trivialClassFunction_eq, hyp.alphaCF_inner_omega_one hp₁ hp₂]
+
+/-- `α_{ij} ∈ ℤ[Irr W]`: it is the ℤ-combination `ω_{00} - ω_{i0} - ω_{0j} + ω_{ij}` of irreducible
+(linear) characters of `W`. -/
+theorem alpha_mem_ZIrr (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.alpha hVeq χ₁ χ₂ : ClassFunction hyp.W ℂ) ∈ ZIrr hyp.W := by
+  rw [hyp.alpha_coe, hyp.alphaCF_eq_omega_combination]
+  exact Submodule.add_mem _ (Submodule.sub_mem _ (Submodule.sub_mem _
+    (hyp.omega 1).mem_ZIrr (hyp.omega (χ₁.comp hyp.wFst)).mem_ZIrr)
+    (hyp.omega (χ₂.comp hyp.wSnd)).mem_ZIrr)
+    (hyp.omega (χ₁.comp hyp.wFst * χ₂.comp hyp.wSnd)).mem_ZIrr
+
+end TICyclicHypothesis
+
+/-- `⟨1_G, 1_G⟩ = 1`: the trivial character has norm `1`. -/
+theorem inner_trivialClassFunction_self (G : Type*) [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] :
+    ClassFunction.inner (trivialClassFunction G) (trivialClassFunction G) = 1 := by
+  rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter, irreducibleCharacter_inner,
+    if_pos rfl]
+
+namespace TICyclicHypothesis
+
+/- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
+
+/-- **Peterfalvi (3.5.1)**: `β_{ij} = Ind_W^G α_{ij} - 1_G` (for `i, j ≥ 1`). -/
+noncomputable def beta (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    ClassFunction G ℂ :=
+  app.tau.toDadeMap (hyp.alpha hVeq χ₁ χ₂) - trivialClassFunction G
+
+/-- `β_{ij} ∈ ℤ[Irr G]`: `Ind_W^G` preserves virtual characters (`α_{ij} ∈ ℤ[Irr W]`) and `1_G`
+is a character. -/
+theorem beta_mem_ZIrr (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.beta hVeq app χ₁ χ₂ ∈ ZIrr G :=
+  Submodule.sub_mem _
+    (app.tau.maps_virtualCharacter (hyp.alpha hVeq χ₁ χ₂) (hyp.alpha_mem_ZIrr hVeq χ₁ χ₂))
+    (trivialClassFunction_isIrreducible.mem_ZIrr)
+
+open Classical in
+/-- **Peterfalvi (3.5.1)**: the Gram matrix of the `β_{ij}` family (`i, j ≥ 1`):
+`⟨β_{ij}, β_{kl}⟩ = δ_{ik} + δ_{jl} + δ_{(ij),(kl)}`.  Subtracting `1_G` from the induced family
+(whose Gram matrix is `tau_alpha_inner`) drops each entry by `1` (Frobenius
+`tau_alpha_inner_trivial` and `⟨1_G, 1_G⟩ = 1`), giving `3` on the diagonal, `1` for one shared
+index, and `0` when both indices differ. -/
+theorem beta_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ b₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ b₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1) :
+    ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app b₁ b₂) =
+      (if a₁ = b₁ then 1 else 0) + (if a₂ = b₂ then 1 else 0)
+        + (if a₁ = b₁ ∧ a₂ = b₂ then 1 else 0) := by
+  change ClassFunction.inner
+      (app.tau.toDadeMap (hyp.alpha hVeq a₁ a₂) - trivialClassFunction G)
+      (app.tau.toDadeMap (hyp.alpha hVeq b₁ b₂) - trivialClassFunction G) = _
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hyp.tau_alpha_inner hVeq app ha₁ ha₂ hb₁ hb₂,
+    hyp.tau_alpha_inner_trivial hVeq app ha₁ ha₂,
+    inner_conj_symm (app.tau.toDadeMap (hyp.alpha hVeq b₁ b₂)) (trivialClassFunction G),
+    hyp.tau_alpha_inner_trivial hVeq app hb₁ hb₂, inner_trivialClassFunction_self]
+  simp only [star_one]
+  ring
+
+/-- **Peterfalvi (3.5.1)**: `‖β_{ij}‖² = 3` for `i, j ≥ 1`. -/
+theorem beta_inner_self (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) :
+    ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app a₁ a₂) = 3 := by
+  rw [hyp.beta_inner hVeq app ha₁ ha₂ ha₁ ha₂]
+  norm_num
+
+/-- **Peterfalvi (3.5.1)**: `⟨β_{ij}, 1_G⟩ = 0` for `i, j ≥ 1` (Frobenius `⟨Ind α_{ij}, 1_G⟩ = 1`
+cancels `⟨1_G, 1_G⟩ = 1`). -/
+theorem beta_inner_trivial (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) :
+    ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (trivialClassFunction G) = 0 := by
+  change ClassFunction.inner
+      (app.tau.toDadeMap (hyp.alpha hVeq a₁ a₂) - trivialClassFunction G)
+      (trivialClassFunction G) = 0
+  rw [ClassFunction.inner_sub_left, hyp.tau_alpha_inner_trivial hVeq app ha₁ ha₂,
+    inner_trivialClassFunction_self, sub_self]
 
 end TICyclicHypothesis
 
