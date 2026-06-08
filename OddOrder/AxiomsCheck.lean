@@ -3280,3 +3280,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar_inj
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha_inner_omega_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha_inner_omega_ne
+
+-- Peterfalvi (3.4): the `α_{ij}` family is a basis of `CF(W, V)`.  Linear independence via the
+-- biorthogonal system, the index count via Pontryagin self-duality `|Hom(W_k, ℂˣ)| = |W_k|`, and
+-- the basis = lin-indep family of the right cardinality.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.card_charGroup_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaLinearIndependent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.nonempty_charNeOne
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis
