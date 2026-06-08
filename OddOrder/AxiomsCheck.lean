@@ -3243,3 +3243,12 @@ set_option linter.style.longLine false in
 -- so `χ₁.comp wFst` / `χ₂.comp wSnd` are the `ω_{i0}` / `ω_{0j}` used to build the `α_{ij}`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wFst_eq_one_of_mem_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wSnd_eq_one_of_mem_W1
+
+-- Peterfalvi (3.4): `α_{ij} = (1_W - ω_{i0})(1_W - ω_{0j})` as a class function, its vanishing on
+-- `W₁`/`W₂`, and its membership in `CF(W, V)` (`V = W ∖ (W₁ ∪ W₂)`), packaged as `alpha`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.mem_Vdiff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_zero_of_mem_W2_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_zero_of_mem_W1_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_mem_supportedSubmodule
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha

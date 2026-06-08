@@ -401,6 +401,90 @@ theorem wSnd_eq_one_of_mem_W1 (hyp : TICyclicHypothesis G) {w : hyp.W}
     simp
   simp [wSnd_apply, hsymm]
 
+/- 3.4: The basis `α_{ij} = (1_W - ω_{i0})(1_W - ω_{0j})` of `CF(W, V)` (p. 17) -/
+
+/-- The TI-subset `V = W ∖ (W₁ ∪ W₂)` of Peterfalvi (3.4).  The field `hyp.V` is kept abstract so
+that §6/§8 can reuse the same interface; the (3.x) results that need the explicit shape take the
+hypothesis `hVeq : hyp.V = hyp.Vdiff`. -/
+def Vdiff (hyp : TICyclicHypothesis G) : Set G :=
+  (hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))
+
+@[simp] theorem mem_Vdiff (hyp : TICyclicHypothesis G) {g : G} :
+    g ∈ hyp.Vdiff ↔ g ∈ hyp.W ∧ g ∉ hyp.W1 ∧ g ∉ hyp.W2 := by
+  simp only [Vdiff, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or]
+
+section
+open scoped IsMulCommutative
+
+/-- **Peterfalvi (3.4)**: the class function `α = (1_W - ω_{i0})(1_W - ω_{0j})` on `W`, where
+`ω_{i0} = χ₁ ∘ wFst` is trivial on `W₂` and `ω_{0j} = χ₂ ∘ wSnd` is trivial on `W₁`.  Expanding the
+product gives Peterfalvi's `α_{ij} = 1_W - ω_{i0} - ω_{0j} + ω_{ij}`.  For nontrivial `χ₁` and `χ₂`
+the family `(α_{ij})` is a basis of `CF(W, V)` with `V = W ∖ (W₁ ∪ W₂)`; the product shape makes
+`α` vanish on `W₁ ∪ W₂`, hence supported on `V` (`alphaCF_mem_supportedSubmodule`). -/
+noncomputable def alphaCF (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    ClassFunction hyp.W ℂ :=
+  ⟨fun w => (1 - (χ₁ (hyp.wFst w) : ℂ)) * (1 - (χ₂ (hyp.wSnd w) : ℂ)), by
+    haveI := hyp.isMulCommutative_W
+    intro g h
+    have hg : (h * g * h⁻¹ : hyp.W) = g := by rw [mul_comm h g, mul_inv_cancel_right]
+    rw [hg]⟩
+
+end
+
+@[simp] theorem alphaCF_apply (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ)
+    (w : hyp.W) :
+    (hyp.alphaCF χ₁ χ₂ : ClassFunction hyp.W ℂ) w
+      = (1 - (χ₁ (hyp.wFst w) : ℂ)) * (1 - (χ₂ (hyp.wSnd w) : ℂ)) :=
+  rfl
+
+/-- `α` vanishes on `W₂`: there the `(1_W - ω_{i0})` factor is `0`, because `wFst` kills `W₂`. -/
+theorem alphaCF_eq_zero_of_mem_W2_subgroupOf (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ)
+    {w : hyp.W} (hw : w ∈ hyp.W2.subgroupOf hyp.W) :
+    (hyp.alphaCF χ₁ χ₂ : ClassFunction hyp.W ℂ) w = 0 := by
+  rw [alphaCF_apply, hyp.wFst_eq_one_of_mem_W2 hw, map_one, Units.val_one, sub_self, zero_mul]
+
+/-- `α` vanishes on `W₁`: there the `(1_W - ω_{0j})` factor is `0`, because `wSnd` kills `W₁`. -/
+theorem alphaCF_eq_zero_of_mem_W1_subgroupOf (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ)
+    {w : hyp.W} (hw : w ∈ hyp.W1.subgroupOf hyp.W) :
+    (hyp.alphaCF χ₁ χ₂ : ClassFunction hyp.W ℂ) w = 0 := by
+  rw [alphaCF_apply, hyp.wSnd_eq_one_of_mem_W1 hw, map_one, Units.val_one, sub_self, mul_zero]
+
+/-- **Peterfalvi (3.4)**: `α = (1_W - ω_{i0})(1_W - ω_{0j})` is supported on `V = W ∖ (W₁ ∪ W₂)`,
+hence lies in `CF(W, V)`.  This is the membership `α_{ij} ∈ CF(W, V)` of (3.4). -/
+theorem alphaCF_mem_supportedSubmodule (hyp : TICyclicHypothesis G)
+    (hVeq : hyp.V = hyp.Vdiff)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.alphaCF χ₁ χ₂ : ClassFunction hyp.W ℂ) ∈
+      ClassFunction.supportedSubmodule
+        (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W) := by
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro w hw
+  rw [ClassFunction.mem_support] at hw
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hVeq, mem_Vdiff]
+  refine ⟨w.2, ?_, ?_⟩
+  · intro h1
+    exact hw (hyp.alphaCF_eq_zero_of_mem_W1_subgroupOf χ₁ χ₂
+      ((Subgroup.mem_subgroupOf).mpr h1))
+  · intro h2
+    exact hw (hyp.alphaCF_eq_zero_of_mem_W2_subgroupOf χ₁ χ₂
+      ((Subgroup.mem_subgroupOf).mpr h2))
+
+/-- **Peterfalvi (3.4)**: `α_{ij}` packaged as an element of `CF(W, V) = SupportedOnV`. -/
+noncomputable def alpha (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    SupportedOnV ℂ hyp :=
+  ⟨hyp.alphaCF χ₁ χ₂, hyp.alphaCF_mem_supportedSubmodule hVeq χ₁ χ₂⟩
+
+@[simp] theorem alpha_coe (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    ((hyp.alpha hVeq χ₁ χ₂ : SupportedOnV ℂ hyp) : ClassFunction hyp.W ℂ)
+      = hyp.alphaCF χ₁ χ₂ :=
+  rfl
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
