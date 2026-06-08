@@ -553,3 +553,36 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
   abelian 群の既約指標 = linear character (`MonoidHom ↥W ℂˣ` 相当) をどう表すか、Irr(W₁×W₂) の積分解
   API があるか (mathlib `MonoidHom (G×H) →` や character group の積)。これが (3.3) の工数を決める。
   まず `grep`/leansearch で確認してから書く。
+
+---
+
+## 2026-06-09 (session 11, b-peterfalvi): (3.5.1) COMPLETE + (3.2.a) bridge — new leaf file `S05_SigmaIsometry.lean`
+
+(3.5) hard core 着手。新ファイル **`OddOrder/Peterfalvi/S05_SigmaIsometry.lean`** (imports `S05_TICyclic`、namespace `S05.TICyclicHypothesis` を再 open; 凍結 (3.1)-(3.4) は S05_TICyclic に残し active frontier を leaf に分離)。OddOrder root + AxiomsCheck 配線済、full AxiomsCheck 3558 green、全 axiom-clean。3 commits。
+
+### ✅✅ 着地したもの (session 11)
+1. **(3.5.1) Gram matrix** (commit `2e1fe55f`): `α_ij` の内積 `⟨α_ij,α_kl⟩ = 1 + δ_ik + δ_jl + δ_(ij)(kl)` (= 4/2/1) + 等長 `⟨Ind α_ij, Ind α_kl⟩` 同値 (`tau_alpha_inner`, `full_inner_eq` 経由)。
+2. **(3.2.a) bridge `tau_eq_induce`** (commit `d75a38e1`): **§4 抽象 Dade carrier `app.tau` = 具体的 `Ind_W^G` on CF(W,V)**。`IsDadeMap.unique` + `induce ∈ IsDadeMap` で。これが Frobenius を解禁する鍵。
+3. **(3.5.1) COMPLETE: β_ij** (commit `073b645e`): Frobenius `⟨Ind α_ij,1_G⟩=1` (`tau_alpha_inner_trivial`) + **`β_ij := Ind_W^G α_ij − 1_G`** の `beta_mem_ZIrr` / `beta_inner` (`⟨β,β'⟩=δ_ik+δ_jl+δ`) / `beta_inner_self`(=3) / `beta_inner_trivial`(=0)。
+
+### 🔑 再利用可能な技術事実 (再調査不要)
+- **omegaProdChar-uniform Gram 技法**: `α_ij` の 4 ラベル (`1, χ₁∘wFst, χ₂∘wSnd, χ₁∘wFst·χ₂∘wSnd`) を**全て `omegaProdChar (·,·)` 形に書く** (`alphaCF_eq_omegaProdChar_combination`) ⟹ ラベル一致が全て `omegaProdChar_inj`(成分一致)に帰着 ⟹ cross-type separation 補題不要。Gram の simp パターン: `simp only [inner_{sub,add}_{left,right}, omega_omegaProdChar_inner]` → `simp only [hp₁,hp₂,hq₁.symm,hq₂.symm, false_and, and_false, if_false, if_true, true_and, and_true]` → `ring`。`omega_omegaProdChar_inner : ⟨ω_b,ω_a⟩ = if (b₁=a₁∧b₂=a₂) then 1 else 0` (`open Classical in`)。
+- **`tau_eq_induce`**: `(τ : S04.DadeIsometryData hyp.toDadeHypothesis)` を取る (DadeApplication.tau / FullDadeApplication.tau.toDadeIsometryData 両用)。`isDadeMap_inducedDadeMap` (= `induce` が IsDadeMap を満たす) が中身。**value half** = `induce_apply_eq_self_of_mem_V` ((3.2.c) on V; `{x: x⁻¹ax∈V}=W` を W_normalizes_V (⊇) + V_ti (⊆) で、`Σ_x induceTerm = |W|·α(a)`)、**support half** = `induce_eq_zero_of_not_conjugatesIntoSet` (dadeSupport=conjugatesOfSet V 経由)。k-general (CommRing k)。
+- **Frobenius**: `inner_induce_eq_inner_restrict` (InducedCharacter:531, `⟨Ind θ,χ⟩=⟨θ,Res χ⟩`)。`1_G = trivialClassFunction G` (= `(trivialIrreducibleCharacter G : CF G)`); `Res_W 1_G = ω_00 = omega(omegaProdChar 1 1)` (`restrict_trivialClassFunction_eq`)。`⟨1_G,1_G⟩=1` = `inner_trivialClassFunction_self` (`irreducibleCharacter_inner` 対角)。
+- **`inner_conj_symm`** (ZIrrFourier:147, **要 import** `OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier`; namespace = `OddOrder.RepresentationTheory.inner_conj_symm`, NOT `ClassFunction.`): `⟨ψ,φ⟩ = star ⟨φ,ψ⟩`。β pairwise の `⟨1_G, Ind⟩` 項に使用。
+- **`α_ij ∈ ZIrr W`** = `alpha_mem_ZIrr` (`omega χ : IrreducibleCharacter W` ⟹ `.mem_ZIrr`、ZIrr submodule の add/sub 閉)。
+- **gotchas**: `open Classical in` は docstring の**前**に置く (後置は parse error)。`if x ∈ W` を含む statement は `open Classical in` 必須。`[Fintype hyp.W]` を type で使わない補題は lint (`unusedFintypeInType`) ⟹ binder 外して `haveI : Fintype ↥W := Fintype.ofFinite _`。`FullDadeApplication.tau.toDadeMap` は abbrev ゆえ `rw [tau_eq_induce ..toDadeIsometryData..]` 前に `change ..toDadeIsometryData.toDadeMap..` 要。`show`→`change` (goal 変える場合)。
+
+### ▶▶ 次 leaf = β_ij の norm-3 分解 (3.5.1 末) → (3.5.2)-(3.5.6) 組合せ論 [真の hard core]
+**(3.5.1) の最後**: `β_ij ∈ ZIrr G`, `‖β_ij‖²=3`, `⟨β_ij,1_G⟩=0` から **`β_ij = Σ_{χ∈A_ij} χ`** (A_ij = 3 個の pairwise-orthogonal `±(Irr(G)∖{1})`)。これは「**norm² 3 + integer coeffs ⟹ 相異 3 個の ±irreducible**」の一般補題 (3 = 1+1+1 が唯一の平方和分解; `mem_ZIrr` の Fourier 係数 + `Σ n²=3`)。repo に既存の norm-小分解補題があるか要確認 (ZIrrFourier に `norm=2` 版 `..._norm..eq_2..` あり=line 529 付近; norm-3 は新規か拡張)。**この A_ij 集合の抽出が (3.5.2)-(3.5.6) 組合せ論の入口** — 真の multi-session hard core (case I/II 排除、w₁≥5、∩A_i1 等)。
+
+**leaf 計画 (依存順)**:
+1. ✅ (3.5.1) Gram + β (DONE session 11)
+2. **norm-3 分解補題** (`β ∈ ZIrr ∧ ‖β‖²=3 ∧ ⟨β,1⟩=0 ⟹ ∃ 3 個の ±Irr∖{1} pairwise-orth, 和=β`)。抽象に切り出す (G レベル、TICyclic 非依存)。← 次セッション第一 leaf
+3. (3.5.2) `|A₁₁∩A₁₂|=1` (β の `2χ=Ind(α-α)` が 1 で消える矛盾) → L(ij,i'j') / O(ij,i'j') notation
+4. (3.5.4) `|∩A_i1|=1` (w₁≥5、case I/II 排除 — 最重)、(3.5.5) decomposition → χ_ij 族
+5. (3.5.3-3.5.5) で `χ_ij ∈ ZIrr`, `χ_00=1_G`, `Ind α_ij = 1−χ_i0−χ_0j+χ_ij` 確立 = **(3.5) 完成**
+6. (3.2) σ assembly: `ω_ij^σ := χ_ij`, linearity 拡張, (3.2.a-d) ((3.2.c)/(d) は (1.3))
+7. (3.6)Hyp/(3.7)/(3.8) NC(ψ) → (3.9) Galois ((1.9)) → §6 (4.x)
+
+正本 = 本ノート (session 11 セクション)。S05_SigmaIsometry.lean が (3.5)/(3.2)/(3.6)-(3.9) の home。
