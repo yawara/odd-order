@@ -3303,6 +3303,17 @@ theorem eq_one_of_fixedPointFree_invariant {Z : Type*} [Group Z] [Finite Z]
     _ = f z₀ * (f z₀)⁻¹ := by rw [hinv]
     _ = 1 := mul_inv_cancel₀ (hne z₀)
 
+/-- A subgroup contained in a **prime-order** subgroup is either trivial or the whole subgroup.
+
+Group-theoretic core of the math-case (A)/(B) dichotomy of Peterfalvi (6.8): with `|W₂|` prime
+and `Z(H) ⊓ W₂ ≤ W₂`, the intersection is `⊥` (case A, `Z(H) ∩ W₂ = 1`) or `W₂` (case B, forcing
+`W₂ ⊆ Z(H)`). -/
+theorem eq_bot_or_eq_of_le_of_card_prime {Γ : Type*} [Group Γ] {K W : Subgroup Γ}
+    [Finite W] (hle : K ≤ W) (hp : (Nat.card W).Prime) : K = ⊥ ∨ K = W := by
+  rcases (Nat.dvd_prime hp).mp (Subgroup.card_dvd_of_le hle) with h1 | hcard
+  · exact Or.inl (Subgroup.eq_bot_of_card_eq _ h1)
+  · exact Or.inr (Subgroup.eq_of_le_of_card_ge hle hcard.ge)
+
 /-- **(T8.11p0) natural degree witnesses for one X-adjoin member family.**
 
 This packages the positive natural degree of the new character, the anchor, and every member of a
@@ -3989,6 +4000,29 @@ theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
   intro hbot
   apply hkey
   rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
+
+/-- **(6.8) case (B) centrality** (Peterfalvi (6.8), case (B): *"`1 ≠ W₂ ⊆ Z(H)`"*, mmd 04.8 L154).
+
+In the CertainType branch `cert.W2 ≤ K = H` has prime order (`cert.W2` is cyclic of prime order
+`w₂`), so the math-case split on `Z(H) ⊓ W₂` is a dichotomy (`eq_bot_or_eq_of_le_of_card_prime`):
+either `Z(H) ⊓ W₂ = 1` (case A, handled at the central `Z = Z(H) ∩ H'`) or `W₂ ⊆ Z(H)` (case B).
+This lemma extracts the case-(B) hypothesis `hB : Z(H) ⊓ W₂ ≠ 1` into the centrality
+`W₂.subgroupOf H ≤ Z(↥H)` — the (6.6) / [Is] Cor 2.30 bound enabler at `Z = W₂`, the analogue of
+`centralCommutator_subgroupOf_le_center`. -/
+theorem W2_subgroupOf_le_center_of_caseB (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hprime : (Nat.card cert.W2).Prime)
+    (hB : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H ≠ ⊥) :
+    cert.W2.subgroupOf H ≤ Subgroup.center ↥H := by
+  have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
+  haveI : Finite ↥H := Subtype.finite
+  haveI : Finite (cert.W2.subgroupOf H) := Subtype.finite
+  have hcard : Nat.card (cert.W2.subgroupOf H) = Nat.card cert.W2 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
+  have hpsub : (Nat.card (cert.W2.subgroupOf H)).Prime := by rw [hcard]; exact hprime
+  rcases eq_bot_or_eq_of_le_of_card_prime inf_le_right hpsub with h | h
+  · exact absurd h hB
+  · exact le_of_eq_of_le h.symm inf_le_left
 
 /-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
 `z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`

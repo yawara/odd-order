@@ -1193,3 +1193,76 @@ The entire edge-case relabel programme is landed; **`nonempty_coherent_S_caseA_o
 mmd (6.8.2)).  Case (A) is the template (Z central, glue via diagonal shell), but (B) uses `Z = W₂`
 and the `w₂`-prime structure.  Then the trivial final wiring.  **Don't re-grind case A / the edge
 relabels — landed + axiom-clean.**
+
+## 2026-06-08 (session 8): CertainType (c2) branch — RECON + dependency-audited PLAN + CB1 foundation
+
+Resumed the B lane.  (c1) Frobenius / case-(A) is fully discharged (`nonempty_coherent_S_caseA_of_frobenius`,
+session 7 cont.²).  This session reconnoiters and PLANS the remaining `hyp.cases.inr` (CertainType /
+(c2)) branch — the note's "sole remaining blocker" — and lands the foundational leaf CB1.
+
+### 🔑 KEY FINDINGS (don't re-derive)
+
+**F1. The (c2) branch math-splits on `Z(H) ⊓ W₂`; `|W₂|` prime makes it a clean dichotomy.**
+`cases.inr` gives `cert : S06.CertainTypeHypothesis (sharpImage H) L` with `cert.K = H`,
+`cert.W2 ≤ ⁅H,H⁆`, `(Nat.card cert.W2).Prime`, `Nat.Coprime |H| |W₁|`.  The mmd (A)/(B) split
+(04.8 L152-154) is `Z(H) ⊓ W₂ =? 1`:
+- math-(A) `Z(H)∩W₂ = 1`: `Z := centralCommutator = Z(H)∩H'`; uses (6.8.1).
+- math-(B) `Z(H)∩W₂ ≠ 1` ⟹ (prime) `W₂ ⊆ Z(H)`: `Z := W₂ = cert.W2`; uses (6.8.2).
+`W₂.subgroupOf H` has prime card, so `center ⊓ W₂sub ∈ {⊥, W₂sub}` (`eq_bot_or_eq_of_le_of_card_prime`).
+
+**F2. Prerequisites MOSTLY EXIST (the note's "unplanned/deep" framing was too pessimistic).**
+- (6.8.2.1) `Z^#`-constancy: ✅ `IsCoherent.extension_constant_on_sharp_of_prime` (S07_CoherenceGalois:424),
+  GENERIC for prime-order Z, (1.9) produced internally — just needs wiring.
+- [Is] 2.27 central restriction: ✅ `IsIrreducibleCharacter.exists_central_linear_restriction`
+  (SchurCenterBound:241) — docstring literally says "behind (6.8.2.3)".
+- (4.1): ✅ `pairwise_inner_eq_zero_of_orthogonal_signedDifference` (S08:204).
+- (5.9.a): ✅ `IsCoherent.extension_mapRingEquiv_comm` (S07_CoherenceGalois:109).
+- (6.7): ✅ `peterfalvi_67_of_odd` (SylowTICongruence:140); the S08 adapter (9797) is
+  centralCommutator+Frobenius-hardcoded → needs a W₂ analogue.
+- (5.6): ✅ `coherentDegreeSumBound_of_not_coherent` (S08:2419) + `exists_coherentBreakPair` (S08:995).
+- [Is] 2.30: ✅ `exists_degree_sq_le_index` (SchurCenterBound:193).
+- (4.5) "S, S(Z) have w₂−1 reducible chars": NOT formalized, but **BYPASSED** — the formalization
+  proves `X⊆Irr` per-member via `inertia_eq_H_of_c2_caseA` (S08:3716), not the global count.
+
+**F3. The case-A/c1 machinery's TRUE hypothesis is "W₁ FPF on Z" + coprimality, NOT "Frobenius".**
+In c2+math(A), `W₁` DOES act FPF on `Zc=Z(H)∩H'`: `C_{Zc}(w) = Zc ∩ C_H(w) = Zc ∩ W₂ ⊆ Z(H)∩W₂ = 1`.
+So (c1) ∪ (c2+math-A) UNIFY under FPF-on-Z.  **Low-level case-A pieces are ALREADY FPF-generic**:
+`isIrreducibleCharacter_of_mem_Xset_caseA` (5177, takes hZcentral/hZnorm/hZfpf), `inertia_eq_H_of_c2_caseA`
+(3716), `xBaseBlock_isCoherent_caseA` (7074).  **High-level assembly is Frobenius-wired** (needs
+generalization to FPF): `Xset_centralCommutator_isCoherent_of_frobenius` (8764), the diagonal shell
+`coherentXunionYset_centralCommutator_diagonal_general` (11287), L4
+`false_of_coherentXunionYset_of_not_coherentS` (6564), `peterfalvi_67_centralCommutator` (9797),
+`centralCommutator_card_subgroupOf_lower` (4043), capstones (11380/11405/11472).
+Z-generic reusables: (6.6) consumer `...withCover_of_irreducible_X` (8583),
+`false_of_centralCommutator_break_arith` (6286, pure arith), `xSum_le_two_psi` (6421, Z-param).
+
+**F4. ⚠️ math-(B) does NOT reuse the case-A coherence architecture.**  In case B the X-members are NOT
+all irreducible — `W₁` is NOT FPF on `W₂` (`C_L(w)⊓W₂ = W₂` via `cert.centralizer_W2`), so the inertia
+`I_L(θ)` can exceed `H` and `Ind θ` can be reducible.  Hence "X coherent via (6.6) + Y coherent +
+diagonal glue" FAILS.  (6.8.2) instead builds the `X∪Y` isometry τ₂ DIRECTLY via the §5 reflection
+machinery `R(χ)` / Hypothesis (5.2) / (5.3)/(5.4.a,b)/(5.5) (mmd L214-222).  **OPEN RISK (investigate
+at CB4 start): is the `R(χ)` reflection machinery formalized in S05/S07?** If not, CB4 is large.
+
+### Layered plan (CertainType branch)
+- **CB1 (foundation — ✅ THIS SESSION)**: `eq_bot_or_eq_of_le_of_card_prime` (general group theory) +
+  `W2_subgroupOf_le_center_of_caseB` (the (6.6) centrality enabler at `Z=W₂`, analogue of
+  `centralCommutator_subgroupOf_le_center`).  axiom-clean.
+- **CB2**: case-B `W₂ ◁ L` (H centralizes W₂ via centrality; W₁ normalizes via `centralizer_W2` +
+  W₁ abelian) + the FPF-on-`Zc` facts (hZnorm/hZfpf at `Zc`) for c2+math(A), from `Z(H)∩W₂=1` +
+  `centralizer_W2`.  Foundation for CB3.
+- **CB3 (c2+math-A)**: GENERALIZE the high-level case-A assembly (L2/L3/L4 + capstone) from `hF` to the
+  FPF-on-Z hypotheses (`hZcentral`/`hZnorm`/`hZfpf` + coprimality).  Then both (c1) and (c2+math-A)
+  instantiate it.  Largest "refactor" milestone; F3 low-level pieces already support it.
+- **CB4 (math-B / 6.8.2)**: the §5-reflection construction of τ₂ (6.8.2.1 wire `extension_constant_on_sharp_of_prime`
+  + 6.8.2.2 `Ind_Z φ` decomp via (6.7)+(1.5.b)+fpf-on-`H/Z` + 6.8.2.3 per-χ via [Is]2.27 + (5.4)).
+  Deep; gated on the F4 §5.2 investigation.
+- **CB5 (6.8.3 shared)**: generalize L4 `false_of_coherentXunionYset_of_not_coherentS` over Z; apply at
+  `W₂`.  (5.6)-based; `xSum_le_two_psi`/`false_of_centralCommutator_break_arith` are already Z-param.
+- **CB6 (wiring)**: restructure `sibleySetup_is_coherent` to `hyp.cases`; `inl`→case-A-frobenius (done);
+  `inr`→`by_cases center⊓W₂sub=⊥` → CB3 (math-A) / CB4+CB5 (math-B).
+
+### Scope honesty
+The (c2) branch is comparable in size to the entire case-A effort (~7 sessions).  CB3 (FPF
+generalization) is tractable and well-supported (F3).  CB4 (math-B) is the deep/risky piece (the §5.2
+reflection machinery, F4).  This is full-Pf-scope completionism, **off the FT critical path** (per the
+FT master roadmap — (6.8)/(7.10) are genuine but orphaned).
