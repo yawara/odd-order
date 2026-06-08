@@ -3266,3 +3266,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.supportInVdiffEquiv
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.card_supportInSubgroup_Vdiff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.finrank_supportedOnV
+
+-- Peterfalvi (3.4) linear-independence foundations: the Fourier expansion of `α_{ij}` into the
+-- `ω`-family (`α = 1 - ω_{i0} - ω_{0j} + ω_{ij}`) and orthonormality of `Irr(W) = {ω(χ)}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_omega_combination
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_inner_ne

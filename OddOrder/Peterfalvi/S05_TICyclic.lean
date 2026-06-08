@@ -646,6 +646,38 @@ theorem finrank_supportedOnV (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vd
       = (Nat.card hyp.W1 - 1) * (Nat.card hyp.W2 - 1)
   rw [finrank_supportedSubmodule_eq_card, hVeq, hyp.card_supportInSubgroup_Vdiff]
 
+/- 3.4 (cont.): linear independence of the `α_{ij}` via the Fourier expansion `α = 1 - ω_{i0} -
+ω_{0j} + ω_{ij}` and orthonormality of `Irr(W)` -/
+
+/-- **Peterfalvi (3.4)**: `α_{ij} = 1_W - ω_{i0} - ω_{0j} + ω_{ij}` as the expansion of the product
+`(1_W - ω_{i0})(1_W - ω_{0j})` into the `ω`-family, where `ω_{i0} = ω(χ₁∘wFst)`,
+`ω_{0j} = ω(χ₂∘wSnd)`, `ω_{ij} = ω((χ₁∘wFst)·(χ₂∘wSnd))` and `1_W = ω(1)`.  This is the bridge from
+the product definition `alphaCF` to the linear `Irr(W)`-combination used in the Fourier argument. -/
+theorem alphaCF_eq_omega_combination (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.alphaCF χ₁ χ₂ =
+      (hyp.omega 1 : ClassFunction hyp.W ℂ) - hyp.omega (χ₁.comp hyp.wFst)
+        - hyp.omega (χ₂.comp hyp.wSnd) + hyp.omega ((χ₁.comp hyp.wFst) * (χ₂.comp hyp.wSnd)) := by
+  ext w
+  simp only [alphaCF_apply, ClassFunction.sub_apply, ClassFunction.add_apply, omega_apply,
+    MonoidHom.comp_apply, MonoidHom.one_apply, MonoidHom.mul_apply, Units.val_mul, Units.val_one]
+  ring
+
+/-- The `ω`-family is orthonormal (diagonal): `⟨ω(χ), ω(χ)⟩ = 1`. -/
+theorem omega_inner_self (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (χ : hyp.W →* ℂˣ) :
+    ClassFunction.inner (hyp.omega χ : ClassFunction hyp.W ℂ)
+      (hyp.omega χ : ClassFunction hyp.W ℂ) = 1 := by
+  rw [irreducibleCharacter_inner, if_pos rfl]
+
+/-- The `ω`-family is orthonormal (off-diagonal): distinct linear characters give distinct
+irreducible characters (`omega_injective`), so `⟨ω(χ), ω(χ')⟩ = 0` for `χ ≠ χ'`. -/
+theorem omega_inner_ne (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] {χ χ' : hyp.W →* ℂˣ} (h : χ ≠ χ') :
+    ClassFunction.inner (hyp.omega χ : ClassFunction hyp.W ℂ)
+      (hyp.omega χ' : ClassFunction hyp.W ℂ) = 0 := by
+  rw [irreducibleCharacter_inner, if_neg (fun hc => h (hyp.omega_injective hc))]
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
