@@ -300,6 +300,37 @@ noncomputable def wProdEquiv (hyp : TICyclicHypothesis G) :
 
 end
 
+/-- Projection `↥W →* ↥W` onto the `W₁`-component (image in `W₁`, kills the `W₂`-component),
+through the internal-product iso `wProdEquiv`. -/
+noncomputable def wProj1 (hyp : TICyclicHypothesis G) : hyp.W →* hyp.W :=
+  (hyp.W1.subgroupOf hyp.W).subtype.comp
+    ((MonoidHom.fst _ _).comp hyp.wProdEquiv.symm.toMonoidHom)
+
+/-- Projection `↥W →* ↥W` onto the `W₂`-component. -/
+noncomputable def wProj2 (hyp : TICyclicHypothesis G) : hyp.W →* hyp.W :=
+  (hyp.W2.subgroupOf hyp.W).subtype.comp
+    ((MonoidHom.snd _ _).comp hyp.wProdEquiv.symm.toMonoidHom)
+
+@[simp] theorem wProj1_apply (hyp : TICyclicHypothesis G) (w : hyp.W) :
+    hyp.wProj1 w = ((hyp.wProdEquiv.symm w).1 : hyp.W) := rfl
+
+@[simp] theorem wProj2_apply (hyp : TICyclicHypothesis G) (w : hyp.W) :
+    hyp.wProj2 w = ((hyp.wProdEquiv.symm w).2 : hyp.W) := rfl
+
+/-- Reconstruction from the internal direct product: `w = (W₁-part of w) · (W₂-part of w)`. -/
+theorem wProj1_mul_wProj2 (hyp : TICyclicHypothesis G) (w : hyp.W) :
+    hyp.wProj1 w * hyp.wProj2 w = w := by
+  rw [wProj1_apply, wProj2_apply, ← hyp.wProdEquiv_apply, MulEquiv.apply_symm_apply]
+
+/-- **Peterfalvi (3.3)**: every linear character of `W` factors as its `W₂`-trivial part
+(`χ ∘ wProj1`, an `ω_{i0}`) times its `W₁`-trivial part (`χ ∘ wProj2`, an `ω_{0j}`).  This is the
+`ω_{ij} = ω_{i0}·ω_{0j}` decomposition at the level of `Hom(W, ℂˣ)`. -/
+theorem char_eq_wProj_comp_mul (hyp : TICyclicHypothesis G) (χ : hyp.W →* ℂˣ) :
+    χ = (χ.comp hyp.wProj1) * (χ.comp hyp.wProj2) := by
+  ext w
+  rw [MonoidHom.mul_apply, MonoidHom.comp_apply, MonoidHom.comp_apply, ← map_mul,
+    hyp.wProj1_mul_wProj2]
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

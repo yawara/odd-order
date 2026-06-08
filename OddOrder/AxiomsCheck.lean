@@ -3229,3 +3229,7 @@ set_option linter.style.longLine false in
 -- Peterfalvi (3.1)/(3.3): `W = W₁ × W₂` as an internal direct product — the multiplication map
 -- `↥W₁ × ↥W₂ ≃* ↥W` (W abelian, W₁ ⊓ W₂ = ⊥, W₁ ⊔ W₂ = ⊤), used to split `ω_{ij} = ω_{i0}·ω_{0j}`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wProdEquiv
+
+-- Peterfalvi (3.3): the `ω_{ij} = ω_{i0}·ω_{0j}` factorization of a linear character of `W`,
+-- via the internal-product projections `wProj1`/`wProj2` and their reconstruction `w = w₁·w₂`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.char_eq_wProj_comp_mul
