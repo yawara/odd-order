@@ -627,3 +627,75 @@ AxiomsCheck 配線済) が hVP producer と consumer を合体し、**extraspeci
   自己完結・Thm 3.4 step 7 で必須) を `AbsolutelyIrreducible.lean` か新 leaf に → (2) alg-closure 戦略を原文精読で決定 →
   (3) Thm 3.4 minimal-counterexample scaffold (新 `S03d_Thm34.lean`, induction on |G| + (3.2) 生成論法 + G/N 移行;
   bulk・最難)。Thm 3.5/3.6 は 3.4 後。**Lane C (`c-bg-s10`) が §10 spine で Thm 3.4/3.6 を consume 予定 — forward-axiom 境界に注意**。
+
+### ✅ Thm 3.4 セッション (2026-06-08 pm, `a-keystone`) — GAP 1/2 解決 + 第一 leaf 着地, 残=induction scaffold
+
+GAP 1 (Gor 3.2.2) は前セッションで ✅ done (`isCyclic_center_of_faithful_irreducible`, commit `2ea2cfa8`)。
+本セッションで **GAP 2 (alg-closure 戦略) を決定 + 最終矛盾を確定 + step-7 leaf を着地**。残りは induction scaffold + 2 leaf。
+
+**✅ GAP 2 決定 = Option A (alg-closed core + base-change wrapper)。** 原文精読 (mmd L907, Thm 3.5 冒頭) で確定:
+"The hypotheses remain intact if we replace **F** by F̄ and V by V⊗_F F̄, WLOG **F** alg-closed." この reduction は
+**Thm 3.4 にもそのまま転用可能** — 3.4 の仮説 `C_V(R)=0` と結論 `[R,K]⊆C_K(V)` は両方 **base-change 安定**:
+`dim_F C_V(R) = dim_F̄ C_{V⊗F̄}(R)` (fixed-point は flat base change と可換; Thm 2.5 自身が (2.8) でこれを使用),
+`g が V 上自明 ⟺ V⊗F̄ 上自明` ⟹ `C_K(V)` 不変。char/`|G|` 不変。よって:
+- **core**: Thm 3.4 を **`[IsAlgClosed F]` 付き**で証明 (minimal-counterexample, step 1-8)。repo の alg-closed
+  Gor 3.2.2 + Thm 2.5 (`finrank_eq_sub_one_of_extraspecial`) を直接呼ぶ。**induction は alg-closed F を保つ** (subgroup
+  HR も quotient G/N も同じ F 上; base change は最外で一度きり)。
+- **wrapper**: 一般 F は core から base change (BG (2.9)=`BaseChange.lean`) で導く別 leaf。**downstream (Thm 3.6, L1057/1109/1257)
+  は一般 F で consume するので wrapper 必須だが、core 完成後の独立 leaf でよい** (3.5 の L909-913 と同じ reduction)。
+  ⟹ Option B (Thm 2.5 を一般体拡張) / Option C (alg-closed 前提で放置) は不要。core+wrapper の 2 定理に分けるのが Lean 的に clean。
+
+**✅ 最終矛盾 (step 8) 確定 = parity, クリーン版**: Thm 2.5 (`finrank_eq_sub_one_of_extraspecial`) は `C_M(R)=0`
+(+`dim M≥2`) から `dim M = h-1 = p-1` を出す (h=p=|R|)。一方 `(dim M)² = |K/Z(K)|` (`sq_finrank_eq_card_quotient_center`,
+ExtraspecialFaithful) は **奇数** (`|K| ∣ |G|` odd) ⟹ **dim M 奇数**。`p-1` は **偶数** (p 奇素数)。奇=偶 ⟹ False。
+**`dim M = qᵐ` を陽に出す必要なし** — `(dim M)² odd ⟹ dim M odd` で十分。`dim M≥2` は `(dim M)²=|K/Z(K)|=q^{2m}, m≥1`
+(K nonabelian) から `dim M=qᵐ≥q≥3`。
+
+**✅ Leaf 1 (step 7 tail) DONE** (commit `a262fa1b`, sorry-free + axiom-clean, build green 2171):
+`IsExtraspecial.of_isSpecial_of_isCyclic_center` (`IsExtraspecial.lean`) — `IsSpecial p G` + `¬IsElementaryAbelian p G`
+(nonabelian) + `IsCyclic (center G)` ⟹ `IsExtraspecial p G`。証明: nonabelian ⟹ IsSpecial 第二 disjunct
+(commutator=center=frattini, center elem ab) + center cyclic ⟹ `exponent=card ∣ p` + p-group center nontrivial ⟹ `card=p`。
+Nontrivial は `¬IsElementaryAbelian` から導出 (subsingleton ⟹ elem ab)。
+
+**✅ Ingredient inventory 確定 (Explore agent, exact signatures, 再調査不要)** — **7/8 done, 残 scaffold のみ**:
+- ✅ **Maschke** = mathlib `IsSemisimpleModule k[G] V` instance。
+- ✅ **Prop 1.5(a) Hall** = `OddOrder.BG.Ch1.S01.exists_aInvariant_hall` (`S01_Solvable.lean:661`):
+  `{φ : A →* MulAut G}(hCop : Coprime |A| |G|)(π) : ∃ H, IsHallSubgroup π H ∧ IsAInvariant φ H`。
+- ✅ **Prop 1.5(a) Sylow** = `OddOrder.Isaacs.Ch04.exists_aInvariant_sylow` (`Ch04_Commutators/ForwardFromCh03.lean:440`):
+  `{φ : A →* MulAut G}(hCop)(hSolv : IsSolvable A ∨ IsSolvable G)(p)[Fact p.Prime] : ∃ P : Sylow p G, IsAInvariant φ ↑P`。
+- ✅ **Lemma 3.1 (Frobenius)** = `OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R` 構造体 (`FrobeniusGroup.lean:240`,
+  fields: `isNormal`, `isComplement : IsComplement' N A`, `ne_bot_kernel`, `ne_bot_complement`, `conj_frobenius`)
+  + `of_centralizer_kernel_le` (`:324`, `C_G(n)≤N ∀ 1≠n∈N` から構成)。
+- ✅ **Lemma 3.3** = `OddOrder.BG.Ch1.S03b.centralizer_ne_bot_of_nontrivial_kernel` (`S03b_Lemma33.lean:114`):
+  `[Finite G]{K R}(hFrob : IsFrobeniusGroup G K R)(ρ : Representation F G V)(hchar : (|K|:F)≠0)(hKnt : ∃ k:K, ρ k ≠ 1)
+  : ∃ v≠0, ∀ r:R, ρ r v = v`。**対偶 `kernel_acts_trivially_of_centralizer_eq_bot` (`:207`)** も有 (`C_V(R)=0 ⟹ K 自明`)。
+- ✅ **Gor 5.3.7** = `OddOrder.BG.Ch1.S04.isSpecial_of_pprimeAction_trivialOnProper` (`S04e_GorThm37.lean:206`):
+  `(φ : A →* MulAut P)(hP : IsPGroup p P)(hCop){ψ:A}(hψ_ntriv : ¬∀g,(φψ)g=g)(hψ_proper : ∀ N normal A-inv ≠⊤, φψ|_N=id)`
+  ⟹ **5-連言**: `commutator P≤center P ∧ IsElementaryAbelian p (P⧸commutator P) ∧ (∀ N A-inv, [P,P]≤N → N=[P,P]∨N=⊤)
+  ∧ (∃ g, (φψ)g·g⁻¹∉[P,P]) ∧ IsSpecial p P`。第 3 連言 = R irreducible on K/K' = (3.3) 前半; 中心化 = `commutator≤center`。
+- ✅ **Thm 2.5** = `finrank_eq_sub_one_of_extraspecial` + `finrank_modEq_of_extraspecial` (`ExtraspecialThm25Final.lean:63/89`)。
+  step-8 interface = 大量仮説 (ε primitive root, Invertible(|P|:F), hgen=`closure(P∪{x})=⊤`, hxZ, hCP, x^h=1, Coprime h |P|, …);
+  Thm 3.4 文脈 (G=K⋊R, R prime order p, C_K(x)=Z(K), G faithful irred on M) から全組立が L4 の主工数。
+- ✅ **special+Z cyclic ⟹ extraspecial** = `IsExtraspecial.of_isSpecial_of_isCyclic_center` (本セッション Leaf 1)。
+
+**▶ 残り = induction scaffold (最難・bulk) + 2 leaf。** **着手順序 (次セッション)**:
+1. **scaffold `S03d_Thm34.lean`** = minimal-counterexample。**architecture template = `frobeniusKernelIsNilpotent_aux`
+   (`S03c_Thm37.lean:595`)**: `private ..._aux : ∀ (n:ℕ){G}[inst…](…)→ Nat.card G = n → concl`,
+   `induction n using Nat.strong_induction_on`, 再帰は `subgroupOf (L⊔R)` + `subgroupOfEquivOfLe`.toEquiv +
+   `nilpotent_of_surjective` 系で transport。**Thm 3.4 は Thm 3.7 より複雑** — induction が **群 G だけでなく加群 V/表現 ρ
+   にも polymorphic** (quotient case で G→G/N かつ V→M に同時移行), 再帰が **2 形**: (a) HR≤G on same V (subgroupOf
+   パターン), (b) G/N on submodule M (quotient — `frobenius_quotient_of_normal_lt_kernel` `S03c:233` 系の quotient-Frobenius
+   transport + ρ が N=C_G(M) を kernel に持つので G/N 表現に factor)。statement は `Representation F G V` + `K R : Subgroup G`
+   + `[K.Normal]` + `IsComplement' K R` + R prime order + `IsSolvable G` + `Odd |G|` + char∤|G| (`(|G|:F)≠0`) + alg-closed,
+   `C_V(R)=0` (`∀ v, (∀ r:R, ρ r v = v) → v=0`), 結論 `∀ g∈⁅R,K⁆, ρ g = 1`。**Lemma 3.3 の `Representation F G V` + 部分群
+   convention に揃える** (S03b と同形)。
+2. **Leaf 2 (step 4) = |K| prime power** — (3.2)「K は proper R-inv 部分群で生成されない」+ ≥2 primes ⟹ R-inv Sylows
+   (`exists_aInvariant_sylow`, R solvable=prime cyclic) が proper (|Sylow_p|=p^{v_p}<|K|) かつ join=⊤ ⟹ 矛盾。
+   join=⊤ の核心: `S=⨆(proper A-inv)`, 各 p∈primeFactors|K| で A-inv Sylow_p≤S ⟹ `p^{v_p(|K|)} ∣ |S|` ⟹
+   (factorization) `|K| ∣ |S|`, `|S| ∣ |K|` ⟹ `|S|=|K|` ⟹ `S=⊤`。tools: `Nat.factorization_le_iff_dvd`,
+   `Nat.Prime.pow_dvd_iff_le_factorization`, Sylow card。~60-80 行, (3.2) の iSup 形を scaffold に合わせて確定後に書く
+   (form coupling ゆえ scaffold と同時推奨)。
+3. **Leaf 4 (step 8) = parity finish** — 上記「最終矛盾」を Thm 2.5 interface に配線 (大量仮説組立 + `(dim M)² odd` parity)。
+4. **base-change wrapper** (一般 F, core 完成後の独立 leaf, BG (2.9))。
+- **着手順序案**: scaffold statement + 骨格 (step 1-8 を sorry, IH 配線確認) → Leaf 2/4 を順に充足 → step 1-3,5-7 を
+  既 ingredient で埋める → wrapper。**Thm 3.5/3.6 は 3.4 完成後** (3.6 が 3.4 を L1057/1109 で consume)。
