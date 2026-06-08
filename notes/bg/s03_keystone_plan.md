@@ -518,3 +518,25 @@ commits `d54869a5` + `e1ac4947`):
 - **⚠ Isaacs FGT には無い** (S02 表確認済: FGT は character/Clifford 章なし); repo の `CharacterCompleteness`/
   `CharacterConjugate`/`CharacterRowOrthogonality` は **ℂ-pin** ゆえ一般 k に使えない — **mathlib `char_orthonormal`
   (一般体) が正解の経路**。
+
+### ✅✅✅ character route to hconj COMPLETE (2026-06-08 cont., `CliffordConjugateChar.lean`, commits `836324bf`+`83cf1180`)
+
+**hconj の指標論機械が完成** (sorry-free + axiom-clean, full build 3612 green)。hconj は今や**群入力だけ**に還元:
+- ✅ `repEquiv ρ g`/`repEquiv_conj` (ρg を k-線形 auto 化 + 大域共役 `ρh∘ρg=ρg∘ρ(g⁻¹hg)`)。
+- ✅ `subRep_coe_smul`/`subRepAsModuleEquiv`/`subRep_isIrreducible`/`equivAsModule` (一般体 subrep↔asModule 基盤;
+  CharacterCompleteness の ℂ-pin `ofSubmodulePrime*` の一般 k 版。**⚠ ℂ 重複は後で統一すべき** — spawn task 候補)。
+- ✅ `character_subRep_conj` : `χ_{(ρg)W}(h) = χ_W(g⁻¹hg)` (`char_iso` + `repEquiv` で共役表現の同型)。
+- ✅ `character_subRep_conj_eq` : W faithful simple class≤2 + g が Z(H) 中心化 ⟹ `χ_{W^g}=χ_W`
+  (共役指標 + `character_eq_zero_of_notMem_center` [Gor 5.5.5, 既証] + `mulEquiv_mem_center_iff`)。
+- ✅ `submodule_iso_of_character_eq` : 等指標 ⟹ `W≅(ρg)W` (`Representation.char_orthonormal` 一般体 + Equiv→submodule)。
+- ✅ `conjugate_submodule_iso` : **per-g hconj capstone** = `restriction_isIrreducible`/`isIsotypicOfType_of_conjugates`
+  が消費する形 (`Nonempty (↥W ≃ₗ[k[↥H]] ↥(W.map (conjSemilinearEnd ρ g)))`), 仮説 = `[IsSimpleModule k[↥H] ↥W]`
+  + hf (faithful) + hcl (class≤2) + hgc (g が Z 中心化)。
+
+**▶▶ 残 = 群入力のみ (group-wiring, ExtraspecialThm25Group へ)**:
+1. **hf = constituent faithful (BG 2.10)**: extraspecial P で Z(P) が unique minimal normal ⟹ constituent も faithful
+   (Z(P) が nontrivial に作用)。**未形式化、要群論**。
+2. **hgc = ∀ g∈G, g が Z(P) 中心化**: `C_P(x)=Z(P)` ⟹ x が Z(P) 中心化 + P が Z(P) 中心化 ⟹ G=⟨P,x⟩ 全体。**容易**。
+3. **W 存在**: V_P 非零 f.d. semisimple ⟹ simple 部分加群存在 (mathlib `IsSemisimpleModule`)。**容易**。
+4. **hgen = ⟨P,x⟩=⊤** (= G=P⋊⟨x⟩ setup): materialize 定理の仮説に。
+これらで ∀g hconj → `restriction_isIrreducible` → hVP → Thm 2.5 (`finrank_modEq_of_faithful_irreducible`) 開放。
