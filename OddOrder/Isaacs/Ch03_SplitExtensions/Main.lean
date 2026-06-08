@@ -1621,6 +1621,40 @@ theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [
   exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π₂ K} =>
     (K.val : Subgroup G)) ⟨H, hHN, fun p hp => h (hHpi p hp)⟩
 
+/-- **`O_π` 交差補題**: 有限群 `G` と素数集合 `S` について、各 `p ∈ S` の補集合 π-radical
+`O_{p'}(G) = oPiCore {p}ᶜ G` の交差は `O_{S'}(G) = oPiCore Sᶜ G` に一致する:
+`⨅ p ∈ S, O_{p'}(G) = O_{S'}(G)`.
+
+- `⊇` (`oPiCore Sᶜ G ≤ ⨅ ...`): 各 `p ∈ S` で `Sᶜ ⊆ {p}ᶜ` ゆえ `oPiCore_mono`。
+- `⊆` (`⨅ ... ≤ oPiCore Sᶜ G`): 交差 `D` は normal な `Sᶜ`-group。実際 `q ∈ S` を仮に
+  `q ∣ |D|` とすると `D ≤ oPiCore {q}ᶜ G` (`q` 番目の項) は `{q}ᶜ`-group (`oPiCore.isPiGroup`)
+  なので `q ∤ |D|`、矛盾。よって `IsPiGroup.le_oPiCore`。
+
+用途: BG Lemma 10.8 conjunct 1 (`M_β` が Hall) — `M_β = ⋂_{p∈π(M)−β(M)} (M' の normal
+p-complement)` を `O_{(π(M)−β(M))ᶜ}(M')` にまとめる第一ピース (unconditional)。 -/
+theorem iInf_oPiCore_compl_singleton {G : Type*} [Group G] [Finite G] (S : Set ℕ) :
+    ⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G = oPiCore Sᶜ G := by
+  apply le_antisymm
+  · -- `D := ⨅ p ∈ S, O_{p'}(G)` is a normal `Sᶜ`-group.
+    haveI hDnormal : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G).Normal :=
+      Subgroup.normal_iInf_normal fun _ =>
+        Subgroup.normal_iInf_normal fun _ => inferInstance
+    refine Subgroup.IsPiGroup.le_oPiCore ?_
+    intro q hq
+    rw [Set.mem_compl_iff]
+    intro hqS
+    have hDle : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G) ≤ oPiCore ({q}ᶜ : Set ℕ) G :=
+      iInf₂_le q hqS
+    have hmem : q ∈ ({q}ᶜ : Set ℕ) :=
+      Subgroup.IsPiGroup.le hDle (oPiCore.isPiGroup ({q}ᶜ : Set ℕ)) q hq
+    simp at hmem
+  · refine le_iInf₂ fun p hp => ?_
+    refine oPiCore_mono ?_ G
+    intro x hx
+    simp only [Set.mem_compl_iff, Set.mem_singleton_iff] at hx ⊢
+    rintro rfl
+    exact hx hp
+
 /-- **Hall-Higman prereq**: 有限非自明可解群は π-radical または π'-radical が非自明.
 
 `oPiCore π G ≠ ⊥ ∨ oPiCore {p | p ∉ π} G ≠ ⊥`.
