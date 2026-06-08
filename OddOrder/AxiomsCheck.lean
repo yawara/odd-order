@@ -3276,3 +3276,12 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- BG §10: Lemma 10.8 (full bundle): `M_β` Hall, `M'`/`M_σ` have nilpotent Hall `β(M)'`-subgroups,
+-- and normal `p`-complements for `p ∈ π(M) - β(M)`. Same keystone island (via Theorem 10.6).
+-- (The (b)-engines `isNilpotent_of_forall_hasNormalPComplement` /
+-- `exists_isNilpotent_isHall_compl` are themselves unconditional.)
+#assert_axioms_island OddOrder.BG.Ch3.S10.isHall_Mbeta
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

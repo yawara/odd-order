@@ -387,6 +387,61 @@ theorem oPiCore_subgroupOf_eq_of_normal {G' : Type*} [Group G'] [Finite G'] (π 
         at hq
     exact hpi.le_oPiCore ⟨x, hx, rfl⟩
 
+/-- A finite group with a normal `p`-complement for every prime `p` is nilpotent.
+For each prime `p`, the engine `isHall_oPiCore_of_forall_hasNormalPComplement` (applied with
+`π = {p}`, using the complements at all `q ≠ p`) shows `O_p(H) = oPiCore {p} H` is a Hall
+`{p}`-subgroup, i.e. a normal Sylow `p`-subgroup; so every Sylow is normal and `H` is nilpotent
+(`isNilpotent_of_finite_tfae`). Companion to the Hall engine. -/
+theorem isNilpotent_of_forall_hasNormalPComplement {H : Type*} [Group H] [Finite H]
+    (h : ∀ p : ℕ, p.Prime → p ∈ (Nat.card H).primeFactors → Ch05.HasNormalPComplement p H) :
+    Group.IsNilpotent H := by
+  refine ((isNilpotent_of_finite_tfae (G := H)).out 0 3).mpr ?_
+  intro p hp P
+  haveI := hp
+  have hHall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) H) :=
+    isHall_oPiCore_of_forall_hasNormalPComplement _ (fun q hq_prime hq_mem _ => h q hq_prime hq_mem)
+  have hOp_pg : IsPGroup p ↥(Ch03.oPiCore ({p} : Set ℕ) H) :=
+    Ch04.isPGroup_of_isPiGroup_singleton hHall.1
+  have hp_ndvd : ¬ p ∣ (Ch03.oPiCore ({p} : Set ℕ) H).index := fun hdvd =>
+    hHall.2 p (Nat.mem_primeFactors.mpr ⟨hp.out, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl
+  -- `O_p(H)` has full `p`-order, hence is a Sylow `p`-subgroup.
+  have hcard : Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) H) = p ^ (Nat.card H).factorization p := by
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hOp_pg
+    have hmul : Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) H) *
+        (Ch03.oPiCore ({p} : Set ℕ) H).index = Nat.card H := Subgroup.card_mul_index _
+    have hfac : (Nat.card H).factorization p = k := by
+      rw [← hmul, hk,
+        Nat.factorization_mul (pow_ne_zero k hp.out.pos.ne') Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hp.out.factorization_pow, Finsupp.single_eq_same,
+        Nat.factorization_eq_zero_of_not_dvd hp_ndvd, add_zero]
+    rw [hk, hfac]
+  set Q : Sylow p H := Sylow.ofCard (Ch03.oPiCore ({p} : Set ℕ) H) hcard with hQdef
+  have hQcoe : (Q : Subgroup H) = Ch03.oPiCore ({p} : Set ℕ) H := Sylow.coe_ofCard _ hcard
+  haveI hQnorm : (Q : Subgroup H).Normal := by rw [hQcoe]; infer_instance
+  haveI := Sylow.unique_of_normal Q hQnorm
+  rw [Subsingleton.elim P Q, hQcoe]
+  infer_instance
+
+/-- **Engine for Lemma 10.8(b)** (unconditional): a finite solvable group `K` with a normal
+`p`-complement for every prime `p ∈ π(K) − β` has a *nilpotent* Hall `βᶜ`-subgroup.
+
+A Hall `βᶜ`-subgroup `W` exists by solvability (`hall_E_exists`); each prime divisor of `|W|`
+lies in `π(K) − β`, so `K` (hence `W ≤ K`) has a normal `p`-complement
+(`hasNormalPComplement_of_subgroup`), making `W` nilpotent
+(`isNilpotent_of_forall_hasNormalPComplement`). -/
+theorem exists_isNilpotent_isHall_compl {K : Type*} [Group K] [Finite K] [IsSolvable K]
+    (β : Set ℕ)
+    (hNPC : ∀ p : ℕ, p.Prime → p ∈ (Nat.card K).primeFactors → p ∉ β →
+      Ch05.HasNormalPComplement p K) :
+    ∃ W : Subgroup K, Ch03.IsHallSubgroup βᶜ W ∧ Group.IsNilpotent ↥W := by
+  obtain ⟨W, hW⟩ := Ch03.hall_E_exists (G := K) βᶜ
+  refine ⟨W, hW, isNilpotent_of_forall_hasNormalPComplement (fun p hp_prime hp_mem => ?_)⟩
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hpβc : p ∈ βᶜ := hW.1 p hp_mem
+  have hpK : p ∈ (Nat.card K).primeFactors :=
+    Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card W) Nat.card_pos.ne' hp_mem
+  exact Ch05.hasNormalPComplement_of_subgroup (hNPC p hp_prime hpK hpβc) W
+
 /-! ## Lemma 10.8 — `M_β` の Hall 性 (mmd L2810) -/
 
 /-- **BG Lemma 10.8(a)** (mmd L2841, forward-conditional via Theorem 10.6): `M_β` is a Hall
@@ -461,7 +516,48 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
     (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
       Ch05.HasNormalPComplement p ↥(derivedInG M) ∧
       Ch05.HasNormalPComplement p ↥(Msigma M)) := by
-  sorry
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- (c) = Lemma 10.8(c), landed.
+  have h4 : ∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥M).primeFactors → p ∉ beta M →
+      Ch05.HasNormalPComplement p ↥(derivedInG M) ∧ Ch05.HasNormalPComplement p ↥(Msigma M) :=
+    fun p hp_prime hpπ hpβ => by
+      haveI : Fact p.Prime := ⟨hp_prime⟩
+      exact derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpπ hpβ
+  -- Common producer for (b): a nilpotent Hall `βᶜ`-subgroup of a subgroup `A ≤ M` with
+  -- normal `p`-complements outside `β(M)`.
+  have produce : ∀ A : Subgroup G, IsSolvable ↥A →
+      (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥A).primeFactors → p ∉ beta M →
+        Ch05.HasNormalPComplement p ↥A) →
+      ∃ W : Subgroup G, W ≤ A ∧
+        Ch03.IsHallSubgroup (beta M)ᶜ (W.subgroupOf A) ∧ Group.IsNilpotent ↥W := by
+    intro A hAsolv hANPC
+    haveI := hAsolv
+    obtain ⟨W₀, hW₀hall, hW₀nil⟩ :=
+      exists_isNilpotent_isHall_compl (K := ↥A) (beta M) hANPC
+    haveI := hW₀nil
+    refine ⟨W₀.map A.subtype, Subgroup.map_subtype_le _, ?_, ?_⟩
+    · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective A.subtype_injective]
+      exact hW₀hall
+    · let e := Subgroup.equivMapOfInjective W₀ A.subtype A.subtype_injective
+      exact nilpotent_of_surjective e.toMonoidHom e.surjective
+  refine ⟨Mbeta_isHall hG hM, ?_, ?_, h4⟩
+  · -- (b) for `M' = derivedInG M`.
+    haveI : IsSolvable ↥(derivedInG M) := by
+      let e := Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective
+      exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+    refine produce (derivedInG M) inferInstance (fun p hp_prime hpπA hpβ => ?_)
+    have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_dvd_of_le (Subgroup.map_subtype_le _))
+        Nat.card_pos.ne' hpπA
+    exact (h4 p hp_prime hpM hpβ).1
+  · -- (b) for `M_σ = Msigma M`.
+    haveI : IsSolvable ↥(Msigma M) := by
+      let e := Subgroup.equivMapOfInjective (Ch03.oPiCore (sigma M) ↥M) M.subtype M.subtype_injective
+      exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+    refine produce (Msigma M) inferInstance (fun p hp_prime hpπA hpβ => ?_)
+    have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_dvd_of_le (Msigma_le M)) Nat.card_pos.ne' hpπA
+    exact (h4 p hp_prime hpM hpβ).2
 
 /-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2894) -/
 
