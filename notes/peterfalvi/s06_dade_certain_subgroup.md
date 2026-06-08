@@ -490,7 +490,7 @@ S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interfa
 その後: (4.9) を (6.8.2) `inr`/math-B に配線 (CB4) + CB5 (6.8.3) + CB6 wiring → capstone 完了。
 
 ### 依存順 leaf plan (build-green + axiom-clean を 1 leaf ずつ)
-1. **(3.3) ω_ij family** ← FIRST LEAF。W=W₁×W₂ (cyclic coprime odd) の linear character 族。Irr(W)≅Irr(W₁)×Irr(W₂)、ω_i0 (W₂⊆ker)/ω_0j (W₁⊆ker)/ω_ij=ω_i0·ω_0j、各 deg 1。mathlib の abelian/product character API。foundation・self-contained。
+1. **(3.3) ω_ij family** ← 🟡 FOUNDATION ✅ DONE (session 9, commit `086dac8f`, full 3599 + AxiomsCheck 3557 green, axiom-clean)。S05 に: (3.1) field `W_cyclic : IsCyclic W` 追加 (構築箇所 0 ゆえ安全) + `isMulCommutative_W` (W abelian) + `omega χ := linearIrreducibleCharacter χ` + `omega_apply`/`omega_apply_one` (deg 1) + `omega_injective`/`omega_surjective` (後者は `exists_linearIrreducibleCharacter_eq_of_isMulCommutative`) → **`omegaEquiv : (W →* ℂˣ) ≃ Irr(W)`** (= 「(3.3): Irr(W)={ω_ij}」)。**残 (3.3) = ω_i0/ω_0j sub-family** (`W2.subgroupOf W ≤ χ.ker` / `W1.subgroupOf W ≤ χ.ker`) **+ 積分解 `ω_ij = ω_i0·ω_0j`** — 内部直積 `↥W ≅ ↥W₁ × ↥W₂` (W cyclic coprime ⟹ `Hom(W,ℂˣ)≅Hom(W₁,ℂˣ)×Hom(W₂,ℂˣ)`; mathlib の `IsComplement'`/CRT で hom 射影を作る) が core。Fin w₁×Fin w₂ indexing は W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k` で後付け。これが次 leaf。
 2. **(3.4) α_ij basis** of CF(W,V), V=W−(W₁∪W₂)。α_ij=(1−ω_i0)(1−ω_0j)、dim=(w₁−1)(w₂−1)。線形独立 + 次元一致。
 3. **(3.5) χ_ij 直交族 [HARD]**。(3.5.1) inner-product relations → (3.5.2) |A₁₁∩A₁₂|=1 → (3.5.4) ∩A_i1 → (3.5.5) decomposition。w₁≥5 仮定、A_ij=3 元 ±Irr 集合の case I/II 排除。abstract combinatorial lemma に切り出すと再利用しやすい。
 4. **(3.2) σ-isometry** assembly ((3.5)+(1.3)→(3.2.a-d))。
