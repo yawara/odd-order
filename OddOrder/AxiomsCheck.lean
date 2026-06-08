@@ -3256,3 +3256,13 @@ set_option linter.style.longLine false in
 -- Peterfalvi (3.4) dimension input: for a finite commutative group the class functions supported
 -- on `A` have dimension `|A|` (restriction/extension-by-zero gives `CF(H,A) ≃ (↥A → ℂ)`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.finrank_supportedSubmodule_eq_card
+
+-- Peterfalvi (3.4) dimension count: `W = W₁ × W₂` membership characterization (`x ∈ W₂ ↔ wFst x = 1`
+-- etc.), the bijection `V ≃ (W₁ \ 1) × (W₂ \ 1)`, the count `|V| = (w₁−1)(w₂−1)`, and the resulting
+-- `dim CF(W, V) = (w₁−1)(w₂−1)` behind the `α_{ij}` basis.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_wFst_mul_wSnd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.mem_W2_subgroupOf_iff_wFst_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.mem_W1_subgroupOf_iff_wSnd_eq_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.supportInVdiffEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.card_supportInSubgroup_Vdiff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.finrank_supportedOnV
