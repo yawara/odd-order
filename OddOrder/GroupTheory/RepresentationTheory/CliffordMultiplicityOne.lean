@@ -64,6 +64,20 @@ theorem conjSemilinearEnd_conj_inv (x : G) (v : (resRep ρ H).asModule) :
   rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one]
   rfl
 
+/-- `conjSemilinearEnd ρ 1` is the identity. -/
+theorem conjSemilinearEnd_one_apply (v : (resRep ρ H).asModule) :
+    conjSemilinearEnd (H := H) ρ 1 v = v := by
+  rw [conjSemilinearEnd_apply, map_one]; rfl
+
+/-- `conjSemilinearEnd ρ` is multiplicative (pointwise): `ρ (g₁ g₂) = ρ g₁ ∘ ρ g₂`. -/
+theorem conjSemilinearEnd_mul_apply (g₁ g₂ : G) (v : (resRep ρ H).asModule) :
+    conjSemilinearEnd (H := H) ρ (g₁ * g₂) v
+      = conjSemilinearEnd (H := H) ρ g₁ (conjSemilinearEnd (H := H) ρ g₂ v) := by
+  rw [conjSemilinearEnd_apply, conjSemilinearEnd_apply, conjSemilinearEnd_apply]
+  change (show (resRep ρ H).asModule from ρ (g₁ * g₂) v)
+    = (show (resRep ρ H).asModule from ρ g₁ (ρ g₂ v))
+  rw [map_mul, Module.End.mul_apply]
+
 /-- The `k[H]`-linear endomorphism `f ↦ ρ x ∘ f ∘ ρ x⁻¹` of the restriction.  It is `k[H]`-linear
 (not merely `k`-linear) because the two conjugation twists cancel. -/
 noncomputable def cliffordConjMap (x : G)
@@ -140,6 +154,93 @@ noncomputable def cliffordConj (x : G) :
   map_add' f g := by ext v; simp only [cliffordConjMap_apply, LinearMap.add_apply, map_add]
   commutes' c := by
     rw [Algebra.algebraMap_eq_smul_one, cliffordConjMap_smul, cliffordConjMap_one]
+
+@[simp] theorem cliffordConj_apply (x : G) (f : Module.End k[↥H] (resRep ρ H).asModule) :
+    cliffordConj ρ x f = cliffordConjMap ρ x f := rfl
+
+/-- If `f ∈ End_{k[H]} V` is fixed by conjugation by `ρ x`, then `f` commutes (pointwise) with
+`conjSemilinearEnd ρ g` for **every** `g`, provided `G = ⟨H, x⟩`.  Proof by induction on the
+generation of `G`: on `H` from `k[H]`-linearity of `f`, on `x` from the fixed hypothesis. -/
+theorem commute_conjSemilinearEnd_of_cliffordConj_fixed (x : G)
+    (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    {f : Module.End k[↥H] (resRep ρ H).asModule} (hf : cliffordConj ρ x f = f) (g : G) :
+    ∀ v, f (conjSemilinearEnd (H := H) ρ g v)
+      = conjSemilinearEnd (H := H) ρ g (f v) := by
+  have hmem : g ∈ Subgroup.closure ((H : Set G) ∪ {x}) := hgen ▸ Subgroup.mem_top g
+  induction hmem using Subgroup.closure_induction with
+  | mem s hs =>
+      intro v
+      rcases hs with hsH | hsx
+      · -- `s ∈ H`: `f` is `k[H]`-linear, so commutes with `ρ s`.
+        have hsmul : ∀ w : (resRep ρ H).asModule,
+            conjSemilinearEnd (H := H) ρ s w
+              = MonoidAlgebra.single (⟨s, hsH⟩ : ↥H) (1 : k) • w := fun w => by
+          simp only [Representation.single_smul, one_smul, resRep_apply, conjSemilinearEnd_apply]
+          rfl
+        rw [hsmul v, hsmul (f v)]
+        exact map_smul f (MonoidAlgebra.single (⟨s, hsH⟩ : ↥H) (1 : k)) v
+      · -- `s = x`: from the fixed hypothesis.
+        rw [Set.mem_singleton_iff] at hsx
+        rw [hsx]
+        have hfp := LinearMap.congr_fun ((cliffordConj_apply ρ x f).symm.trans hf)
+          (conjSemilinearEnd (H := H) ρ x v)
+        rw [cliffordConjMap_apply, conjSemilinearEnd_inv_conj] at hfp
+        exact hfp.symm
+  | one => intro v; rw [conjSemilinearEnd_one_apply, conjSemilinearEnd_one_apply]
+  | mul a b _ _ ha hb =>
+      intro v
+      rw [conjSemilinearEnd_mul_apply, ha, hb, ← conjSemilinearEnd_mul_apply]
+  | inv a _ ha =>
+      intro v
+      have key := ha (conjSemilinearEnd (H := H) ρ a⁻¹ v)
+      rw [conjSemilinearEnd_conj_inv] at key
+      rw [key, conjSemilinearEnd_inv_conj]
+
+/-- **The fixed subalgebra of `cliffordConj ρ x` is the scalars** (when `G = ⟨H, x⟩`, `V`
+irreducible, `k` algebraically closed).  A fixed `f` commutes with every `ρ g`, so it has an
+eigenvalue `c` whose eigenspace is a nonzero `G`-invariant submodule, hence `⊤` (irreducibility);
+thus `f = c • id`.  This is the `hfix` hypothesis of `finrank_eq_one_of_aut_fixedScalar`. -/
+theorem cliffordConj_fixed_imp_scalar [ρ.IsIrreducible] [IsAlgClosed k] [Module.Finite k V]
+    [Nontrivial V]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (f : Module.End k[↥H] (resRep ρ H).asModule) (hf : cliffordConj ρ x f = f) :
+    ∃ c : k, algebraMap k (Module.End k[↥H] (resRep ρ H).asModule) c = f := by
+  have hcomm := commute_conjSemilinearEnd_of_cliffordConj_fixed ρ x hgen hf
+  -- `f` as a `k`-linear endomorphism of `V` (`asModule = V`), which has an eigenvalue.
+  let fk : Module.End k V := f.restrictScalars k
+  obtain ⟨c, hc⟩ := Module.End.exists_eigenvalue fk
+  obtain ⟨v, hv⟩ := hc.exists_hasEigenvector
+  have hv0 : v ≠ 0 := (Module.End.hasEigenvector_iff.mp hv).2
+  have hfkv : fk v = c • v := hv.apply_eq_smul
+  -- `fk` commutes with every `ρ g` (the conjugation-fixed property, via `conjSemilinearEnd = ρ`).
+  have hfkcomm : ∀ (g : G) (w : V), fk (ρ g w) = ρ g (fk w) := fun g w => hcomm g w
+  refine ⟨c, ?_⟩
+  -- `fk - c • 1` commutes with `ρ`, so its kernel is a `G`-invariant submodule of `V`.
+  have hfkscalar : fk = c • (1 : Module.End k V) := by
+    set g₀ : Module.End k V := fk - c • 1 with hg₀
+    have hg₀comm : ∀ (y : G) (w : V), g₀ (ρ y w) = ρ y (g₀ w) := fun y w => by
+      simp only [hg₀, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply,
+        hfkcomm y w, map_smul, map_sub]
+    let W' : Subrepresentation ρ :=
+      { toSubmodule := LinearMap.ker g₀
+        apply_mem_toSubmodule := fun y w hw => by
+          rw [LinearMap.mem_ker] at hw ⊢; rw [hg₀comm y w, hw, map_zero] }
+    rcases IsSimpleOrder.eq_bot_or_eq_top W' with hbot | htop
+    · refine absurd ?_ hv0
+      have hker : LinearMap.ker g₀ = ⊥ := congrArg Subrepresentation.toSubmodule hbot
+      have : v ∈ LinearMap.ker g₀ := by
+        rw [LinearMap.mem_ker]
+        simp only [hg₀, LinearMap.sub_apply, LinearMap.smul_apply, Module.End.one_apply, hfkv,
+          sub_self]
+      rw [hker, Submodule.mem_bot] at this; exact this
+    · have hker : LinearMap.ker g₀ = ⊤ := congrArg Subrepresentation.toSubmodule htop
+      have : g₀ = 0 := LinearMap.ker_eq_top.mp hker
+      rw [hg₀, sub_eq_zero] at this; exact this
+  -- therefore `f = c • id`.
+  refine LinearMap.ext fun w => ?_
+  have hfw : f w = c • w := LinearMap.congr_fun hfkscalar w
+  rw [Algebra.algebraMap_eq_smul_one, LinearMap.smul_apply, Module.End.one_apply]
+  exact hfw.symm
 
 end MultOne
 
