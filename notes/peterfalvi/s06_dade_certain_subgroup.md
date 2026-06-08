@@ -505,6 +505,12 @@ S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interfa
 - **🔴 設計判断**: α の indexing。character-group `↥W1'→*ℂˣ × ↥W2'→*ℂˣ` (自然、命名軽) vs `Fin w₁×Fin w₂` (Peterfalvi 準拠)。**(3.5) σ-construction は明示 index `i,j` の組合せ論 (A_ij 3-元集合, case I/II) を使う** ⟹ Fin-indexing が (3.5) で要る公算大 (W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k` で橋渡し)。この選択は (3.4)/(3.5) 全体の foundation を決める。
 
 ⟹ **stop checkpoint**: (3.3) 完成は綺麗な milestone。(3.4) は「設計判断 (indexing) + API gap (CF(W,V) 次元)」の領域で、直後が hard core (3.5)。loop を止めユーザに選択肢提示 (2026-06-08 session 9 末)。
+
+### ✅ 設計決定 (2026-06-08 session 9、ユーザ承認済み)
+1. **indexing = character-group**(再調査不要)。α を **非自明 `Irr(W₁') × Irr(W₂')`**(= `(↥W₁'→*ℂˣ) × (↥W₂'→*ℂˣ)`)で index。**Fin/ZMod は使わない**。根拠: (3.5) の組合せ論 ((3.5.4) の β_i1 case 分析・"w₁≥5"・"|A_12|≥1+(w₁−2)") は index 集合の**濃度** `|Irr(W_k)\{1}|=w_k−1` と**相異な元の存在**のみ使い、index の算術は使わない ⟹ character-group(濃度 `|Irr(W_k)|=w_k`+相異)で (3.4) も (3.5) も回る。必要事実 = 有限 abelian 双対 `|↥W_k'→*ℂˣ| = w_k`(mathlib Pontryagin)。
+2. **CF(W,V) 次元 = インフラ構築**。`dim CF(W,V) = |V| = (w₁−1)(w₂−1)` を新規補題で(abelian W ⟹ `ClassFunction = 点上関数`, `supportedSubmodule (supportInSubgroup V W)` 次元 = |V|; `|V| = |W|−w₁−w₂+1`)。
+3. **線形独立 = Fourier** (`sum_inner_irreducibleCharacter_smul` + `irreducibleCharacter_inner`)、basis = lin-indep + 次元一致。
+- sub-leaf 順: α 定義 + CF(W,V) membership(今 session の kernel 補題で出る)→ CF 次元インフラ → lin-indep → basis 組立。**loop 再開 (min-interval); (3.5) hard core 到達で再停止。**
 2. **(3.4) α_ij basis** of CF(W,V), V=W−(W₁∪W₂)。α_ij=(1−ω_i0)(1−ω_0j)、dim=(w₁−1)(w₂−1)。線形独立 + 次元一致。
 3. **(3.5) χ_ij 直交族 [HARD]**。(3.5.1) inner-product relations → (3.5.2) |A₁₁∩A₁₂|=1 → (3.5.4) ∩A_i1 → (3.5.5) decomposition。w₁≥5 仮定、A_ij=3 元 ±Irr 集合の case I/II 排除。abstract combinatorial lemma に切り出すと再利用しやすい。
 4. **(3.2) σ-isometry** assembly ((3.5)+(1.3)→(3.2.a-d))。
