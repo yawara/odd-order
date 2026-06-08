@@ -501,3 +501,19 @@ S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interfa
 
 ### 改訂見積もり
 verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し引いても **§5+§6 で ~30-40h** (hard core ×2)。FT critical path 外だが §12/§13/§15 も (4.x) 消費ゆえ full-Pf completion の真ゲート。**正本 = 本ノート (本セクション); s08 blocker note の session-8 verdict は本訂正で superseded (Brauer 部分)。**
+
+### 第一 leaf (3.3) の前提 (session 9 末で de-risk 済、再調査不要)
+- **配置 = `S05_TICyclic.lean`** (results (3.x) の home, `namespace OddOrder.Peterfalvi.S05`)。
+- **🔴 構造体ギャップ**: `S05.TICyclicHypothesis` (S05:37) は (3.1) の「W cyclic of odd order」を**欠く** —
+  `W_card_odd` はあるが `W`/`W1`/`W2` の cyclic/abelian 仮説なし。ω_ij は linear character (deg 1) ゆえ
+  (3.3) には **W abelian (cyclic) 必須**。⟹ `W1_cyclic : IsCyclic ↥W1` / `W2_cyclic : IsCyclic ↥W2`
+  (W=W₁×W₂ coprime ⟹ W cyclic 導出) を**追加する**。
+- **✅ field 追加は安全**: `TICyclicHypothesis` は repo 内で**一度も構築されていない** (`.mk`/`{W:=}` 0 件;
+  参照は S05 自身の API と S15 docstring のみ)。consumer は `hyp : TICyclicHypothesis G` を取るだけ ⟹
+  field 追加で既存 theorem は壊れない (full build で確認)。
+- **構造体の `W_sup : W1⊔W2=W` + `W_disjoint` + coprime** ⟹ W=W₁×W₂ 内部直積。`W1_cyclic`+`W2_cyclic`
+  追加で W cyclic (∴ abelian)。
+- **⚠ 次セッション最初に scope すべき infra Q**: repo の `IrreducibleCharacter`/`ClassFunction` 枠組みで
+  abelian 群の既約指標 = linear character (`MonoidHom ↥W ℂˣ` 相当) をどう表すか、Irr(W₁×W₂) の積分解
+  API があるか (mathlib `MonoidHom (G×H) →` や character group の積)。これが (3.3) の工数を決める。
+  まず `grep`/leansearch で確認してから書く。
