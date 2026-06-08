@@ -11213,6 +11213,70 @@ theorem exists_Ycoherence_hgood_of_frobenius
     rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq.symm cY', hcY'1, hcY0map,
       ClassFunction.inner_neg_right, hconst]
 
+open scoped Classical in
+/-- **(6.8.1) E3: `X`-coherence witness + crux in the `|X(Zc)| = 2` edge** (the `n = 2` relabel).
+When `X(Zc) = {χ₁, χ₂}` (a conjugate pair, equal degree), the step-5 dichotomy
+`X = cX₀ χ₁ ∨ X = −cX₀ χ₂` (`extension_eq_or_eq_neg_general` at the fixed `cX₀`) has no third anchor
+to exclude the right disjunct; instead, the right disjunct is *absorbed* by the sign-swapped witness
+`cX'` (`coherentEqualDegree_swap_neg`, `χ₁ ↦ −χ₂^{τ₂}`, valid because `|X| = 2` is the whole set):
+`cX' χ₁ = −cX₀ χ₂ = X`, giving the crux `(χ₁−aη₁)^τ = cX' χ₁ − a·cY η₁`.  Left disjunct uses `cX = cX₀`
+directly.  Produces a witness + crux for *some* `cX`. -/
+theorem exists_Xcoherence_crux_of_card_two_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁) (hdeg2 : χ₂ 1 = χ₁ 1)
+    (hXeq : hyp.Xset hyp.centralCommutator = ({χ₁, χ₂} : Set (ClassFunction ↥L ℂ)))
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁) = -(a : ℂ)) :
+    ∃ cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁ := by
+  classical
+  set cX0 := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hcX0def
+  rcases hyp.extension_eq_or_eq_neg_general hF cX0 cY hη₁ hχ₁ hχ₂ hne ha hdeg2 hgood with h | h
+  · -- left disjunct `X = cX₀ χ₁` ⟹ crux for `cX₀`.
+    exact ⟨cX0, eq_sub_of_add_eq h⟩
+  · -- right disjunct `X = −cX₀ χ₂` ⟹ relabel `cX' χ₁ = −cX₀ χ₂`.
+    have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+        ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+      intro φ ψ hφ hψ
+      have hh := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+        (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at hh
+      rw [hh]
+      by_cases hpq : φ = ψ
+      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    have hX1irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
+    have hX2irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₂
+    have horth : ClassFunction.inner χ₁ χ₂ = 0 := by
+      rw [hinner χ₁ χ₂ hX1irr hX2irr, if_neg (Ne.symm hne)]
+    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, if_pos rfl]
+    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, if_pos rfl]
+    have hdeg0 : (χ₁ : ↥L → ℂ) 1 ≠ 0 := by
+      obtain ⟨d, hdpos, hdeq⟩ :=
+        irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ₁, hX1irr⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at hdeq
+      rw [hdeq]; exact_mod_cast hdpos.ne'
+    have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+    have hsupp : (χ₂ - χ₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_diffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₂) (hyp.Xset_subset_S hχ₁) hdeg2
+    have hcX0map : (hXeq ▸ cX0).extension = cX0.extension :=
+      OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hXeq cX0
+    obtain ⟨cX', hcX'1, _⟩ := OddOrder.Peterfalvi.S07.coherentEqualDegree_swap_neg
+      (hXeq ▸ cX0) horth hn1 hn2 hdeg2 hdeg0 h1A hsupp
+    refine ⟨hXeq.symm ▸ cX', ?_⟩
+    rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hXeq.symm cX', hcX'1, hcX0map]
+    exact eq_sub_of_add_eq h
+
 /-- **(6.8.1) capstone `X(Zc) ∪ Y` coherence from a witness-level crux** (general form).  Given
 arbitrary coherence witnesses `cX` (for `X(Zc)`), `cY` (for `Y`), a base-block anchor `χ₁` with
 `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y`, and the **crux** `(χ₁−aη₁)^τ = cX χ₁ − a·cY η₁` (whichever way it is
