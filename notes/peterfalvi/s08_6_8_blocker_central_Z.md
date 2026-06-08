@@ -1260,14 +1260,36 @@ at CB4 start): is the `R(χ)` reflection machinery formalized in S05/S07?** If n
   instantiate it.  Largest "refactor" milestone; F3 low-level pieces already support it.
 - **CB4 (math-B / 6.8.2)**: the §5-reflection construction of τ₂ (6.8.2.1 wire `extension_constant_on_sharp_of_prime`
   + 6.8.2.2 `Ind_Z φ` decomp via (6.7)+(1.5.b)+fpf-on-`H/Z` + 6.8.2.3 per-χ via [Is]2.27 + (5.4)).
-  Deep; gated on the F4 §5.2 investigation.
+  **🛑 VERDICT (session 8 CB4-feasibility investigation): BLOCKED on Peterfalvi §4 (certain-type
+  structure theory), NOT near-term feasible.** The §5/§7 reflection machinery `R(χ)` itself IS
+  formalized and 0-sorry — `OrthonormalCharacterImageFamily` (S07_Coherence:759), (5.4.a)/(5.4.b)
+  norm bounds, (5.5), and the Dade producer `dadeOrthonormalCharacterImageFamily` (S07:5387).  BUT
+  that producer **requires `χ : IrreducibleCharacter`**.  In case B the X-members `χ = Ind θ` can be
+  **reducible** (W₁ is NOT FPF on `W₂` ⟹ `I_L(θ)` can exceed `H`), and `R(χ)` for reducible induced
+  χ comes from **Peterfalvi (4.9)** (the `μ_j = ±δ_j ∑ ω_{ij}^σ` certain-type structure).  Per
+  `notes/peterfalvi/s06_dade_certain_subgroup.md`: **(4.3)/(4.4)/(4.5)/(4.7)/(4.9)/(4.10) are ALL
+  unformalized** (only the (4.6) `CertainTypeHypothesis` bundle exists), and (4.5) is itself blocked
+  on **Brauer's permutation lemma** ([Is] 6.32, also unformalized → needs new `BrauerPermutation.lean`).
+  Estimated ~18–22h of independent §4 work.  **⟹ CB4 is gated on the full §4 certain-type project**
+  (which also unblocks §12/§13/§15 downstream).
 - **CB5 (6.8.3 shared)**: generalize L4 `false_of_coherentXunionYset_of_not_coherentS` over Z; apply at
   `W₂`.  (5.6)-based; `xSum_le_two_psi`/`false_of_centralCommutator_break_arith` are already Z-param.
 - **CB6 (wiring)**: restructure `sibleySetup_is_coherent` to `hyp.cases`; `inl`→case-A-frobenius (done);
   `inr`→`by_cases center⊓W₂sub=⊥` → CB3 (math-A) / CB4+CB5 (math-B).
 
-### Scope honesty
+### Scope honesty + CB4-feasibility VERDICT (session 8 conclusion)
 The (c2) branch is comparable in size to the entire case-A effort (~7 sessions).  CB3 (FPF
-generalization) is tractable and well-supported (F3).  CB4 (math-B) is the deep/risky piece (the §5.2
-reflection machinery, F4).  This is full-Pf-scope completionism, **off the FT critical path** (per the
-FT master roadmap — (6.8)/(7.10) are genuine but orphaned).
+generalization) is tractable and well-supported (F3).  **But CB4 (math-B) is confirmed BLOCKED on the
+unformalized Peterfalvi §4 certain-type structure theory ((4.3)/(4.4)/(4.5)/(4.7)/(4.9)/(4.10) +
+Brauer's permutation lemma [Is] 6.32; ~18–22h, see the CB4 verdict above and
+`s06_dade_certain_subgroup.md`).**  Because the `inr`/CertainType branch of the capstone needs BOTH
+math-A (CB3) AND math-B (CB4), **doing CB3 alone CANNOT close `sibleySetup_is_coherent`** — the
+capstone stays blocked on §4 regardless.  This is full-Pf-scope completionism, **off the FT critical
+path** (per the FT master roadmap — (6.8)/(7.10) are genuine but orphaned).
+
+**⟹ Strategic fork (user's call):** (A) take on the Peterfalvi §4 certain-type project (unblocks CB4
+*and* §12/§13/§15) — large but the true gate; (B) do CB3 (math-A) as partial, capstone-still-blocked
+progress; (C) pause the (6.8) capstone (record blocked-on-§4) and redirect to the FT critical path
+(BG §7–16 / the rep-theory keystone).  Recommendation: (A) if full-Pf completion is the goal and the
+§4 investment is acceptable; (C) if FT-shortest-path progress is the priority.  CB1/CB2a stand as
+landed, axiom-clean foundation either way.
