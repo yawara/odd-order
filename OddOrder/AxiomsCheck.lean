@@ -3268,3 +3268,11 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- BG §10: Lemma 10.8(a) — `M_β` is a Hall `β(M)`-subgroup of `G`. The intersection of the
+-- normal `p`-complements of Lemma 10.8(c) over `p ∈ π(M) - β(M)`, hence the same keystone island.
+-- (The engine `isHall_oPiCore_of_forall_hasNormalPComplement` is itself unconditional.)
+#assert_axioms_island OddOrder.BG.Ch3.S10.Mbeta_isHall
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

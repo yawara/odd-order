@@ -359,7 +359,91 @@ theorem isHall_oPiCore_of_forall_hasNormalPComplement {H : Type*} [Group H] [Fin
       exact (le_of_coprime_card_index hPcop).trans hN'pi.le_oPiCore
     exact P.not_dvd_index (hr_dvd_idx.trans (Subgroup.index_dvd_of_le hP_le))
 
+/-- For a normal subgroup `D ◁ G'` of a finite group, the `π`-radical of `↥D` is the
+restriction of the `π`-radical of `G'`: `O_π(G').subgroupOf D = O_π(↥D)`. (Both inclusions
+use `IsPiGroup.le_oPiCore`: `≤` since `O_π(G') ∩ D` is a normal `π`-subgroup of `↥D`; `≥`
+since `O_π(↥D)` is characteristic in `D ◁ G'`, hence a normal `π`-subgroup of `G'`.) -/
+theorem oPiCore_subgroupOf_eq_of_normal {G' : Type*} [Group G'] [Finite G'] (π : Set ℕ)
+    (D : Subgroup G') [D.Normal] :
+    (Ch03.oPiCore π G').subgroupOf D = Ch03.oPiCore π ↥D := by
+  apply le_antisymm
+  · haveI : ((Ch03.oPiCore π G').subgroupOf D).Normal :=
+      Subgroup.Normal.subgroupOf inferInstance D
+    refine Ch03.Subgroup.IsPiGroup.le_oPiCore (fun q hq => ?_)
+    refine Ch03.oPiCore.isPiGroup (G := G') π q ?_
+    have hcard : Nat.card ↥((Ch03.oPiCore π G').subgroupOf D) =
+        Nat.card ↥(Ch03.oPiCore π G' ⊓ D) := by
+      rw [← Subgroup.subgroupOf_map_subtype (Ch03.oPiCore π G') D]
+      exact Nat.card_congr (Subgroup.equivMapOfInjective _ D.subtype D.subtype_injective).toEquiv
+    rw [hcard] at hq
+    exact Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_left) Nat.card_pos.ne' hq
+  · intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    haveI : ((Ch03.oPiCore π ↥D).map D.subtype).Normal := inferInstance
+    have hpi : Ch03.Subgroup.IsPiGroup π ((Ch03.oPiCore π ↥D).map D.subtype) := by
+      intro q hq
+      refine Ch03.oPiCore.isPiGroup (G := ↥D) π q ?_
+      rwa [← Nat.card_congr (Subgroup.equivMapOfInjective _ D.subtype D.subtype_injective).toEquiv]
+        at hq
+    exact hpi.le_oPiCore ⟨x, hx, rfl⟩
+
 /-! ## Lemma 10.8 — `M_β` の Hall 性 (mmd L2810) -/
+
+/-- **BG Lemma 10.8(a)** (mmd L2841, forward-conditional via Theorem 10.6): `M_β` is a Hall
+`β(M)`-subgroup of `G`.
+
+Proof (BG p.81): for `p ∈ π(M) − β(M)`, `M' = ↥(commutator ↥M)` has a normal `p`-complement
+(Lemma 10.8(c) = `derived_msigma_hasNormalPComplement_of_not_mem_beta`). Hence the `β(M)`-radical
+`O_{β(M)}(M')` is a Hall `β(M)`-subgroup of `M'`
+(`isHall_oPiCore_of_forall_hasNormalPComplement`). As `O_{β(M)}(M') = O_{β(M)}(M).subgroupOf M'`
+(`oPiCore_subgroupOf_eq_of_normal`, `M' ◁ M`) and `[M : M']` is coprime to `β(M)`
+(`M_α ⊆ M'` is Hall `α(M) ⊇ β(M)`), `O_{β(M)}(M)` is Hall `β(M)` in `M`; finally `σ(M) ⊇ β(M)`
+and `not_dvd_index_of_mem_sigma` lift this to `G`. -/
+theorem Mbeta_isHall [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Ch03.IsHallSubgroup (beta M) (Mbeta M) := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hβσ : beta M ⊆ sigma M := fun p hp => alpha_subset_sigma hG hM (beta_subset_alpha M hp)
+  -- internal: `O_{σ(M)}(↥M) ≤ commutator ↥M` (from `M_σ ≤ M'`).
+  have hMσ_le : Ch03.oPiCore (sigma M) ↥M ≤ commutator ↥M := by
+    have h := Msigma_le_derived hG hM
+    simp only [Msigma, derivedInG, opiCoreInG] at h
+    exact Subgroup.map_subtype_le_map_subtype.mp h
+  have hOβ_le_comm : Ch03.oPiCore (beta M) ↥M ≤ commutator ↥M :=
+    (Ch03.oPiCore_mono hβσ ↥M).trans hMσ_le
+  -- `O_{β(M)}(M')` is Hall `β(M)` in `M' = ↥(commutator ↥M)` (crux + Lemma 10.8(c)).
+  have hHallD : Ch03.IsHallSubgroup (beta M) (Ch03.oPiCore (beta M) ↥(commutator ↥M)) := by
+    apply isHall_oPiCore_of_forall_hasNormalPComplement
+    intro p hp_prime hpπD hpβ
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_subgroup_dvd_card (commutator ↥M)) Nat.card_pos.ne' hpπD
+    have h4 := (derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpM hpβ).1
+    exact hasNormalPComplement_of_mulEquiv
+      (Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective).symm h4
+  -- `[M : M']` is coprime to `β(M)`: `M_α ⊆ M'` is Hall `α(M) ⊇ β(M)`.
+  have hidxD : ∀ p : ℕ, p ∈ beta M → p.Prime → ¬ p ∣ (commutator ↥M).index := by
+    intro p hpβ hp_prime hp_dvd
+    have hMα_le : Ch03.oPiCore (alpha M) ↥M ≤ commutator ↥M :=
+      (Ch03.oPiCore_mono (alpha_subset_sigma hG hM) ↥M).trans hMσ_le
+    have hHallα : Ch03.IsHallSubgroup (alpha M) (Ch03.oPiCore (alpha M) ↥M) := by
+      have h := Malpha_subgroupOf_isHall_of_isHall (Malpha_isHall hG hM)
+      simpa only [Malpha, opiCoreInG_subgroupOf] using h
+    exact hHallα.2 p (Nat.mem_primeFactors.mpr ⟨hp_prime,
+      hp_dvd.trans (Subgroup.index_dvd_of_le hMα_le), Subgroup.index_ne_zero_of_finite⟩)
+      (beta_subset_alpha M hpβ)
+  -- `O_{β(M)}(↥M)` is Hall `β(M)` in `↥M`.
+  have hT1 : Ch03.IsHallSubgroup (beta M) (Ch03.oPiCore (beta M) ↥M) := by
+    refine isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index hOβ_le_comm ?_ hidxD
+    rw [oPiCore_subgroupOf_eq_of_normal (beta M) (commutator ↥M)]
+    exact hHallD
+  -- lift `↥M`-Hall to `G`-Hall via `σ(M) ⊇ β(M)`.
+  refine isHallSubgroup_of_subgroupOf_isHall_of_forall_not_dvd_index (Mbeta_le M) ?_ ?_
+  · simpa only [Mbeta, opiCoreInG_subgroupOf] using hT1
+  · intro p hpβ hp_prime
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    exact not_dvd_index_of_mem_sigma (hβσ hpβ)
+
 
 /-- **BG Lemma 10.8** (mmd L2810): `M ∈ ℳ`。
 (a) `M_β` は `M` および `G` の Hall 部分群;
