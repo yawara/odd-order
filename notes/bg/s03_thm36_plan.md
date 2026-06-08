@@ -9,6 +9,37 @@ worktree `bg-s10-spine`。§10 スパインの根本ブロッカー (10.6 経由
 `C_H(R₀)` が Z-群。任意素数 `p` で `[H,R]` は p-length one」。
 証明 = 最小反例法、~4 ページ、equation (3.6)–(3.38)。
 
+### Lean interface（D レーン forward axiom — **verbatim 一致対象**, 2026-06-09 固定）
+
+lane `bg-s10-fwd` が §10→§16 スパインを *genuine type-checked reduction* として今組むため、Thm 3.6 を
+forward axiom `OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer`
+（`OddOrder/BG/Ch3_MaximalSubgroups/S10_ForwardFromKeystone.lean`）として宣言済み。
+**A レーンが Thm 3.6 を証明するときは下記 signature と完全一致させること** — de-axiomatization は
+「同名 axiom → theorem の name-swap」なので、引数順・暗黙/明示・型のどれか 1 つでもズレると
+下流 Thm 10.6 → Cor 10.7 → … が再コンパイルで落ちる:
+
+```lean
+theorem pLengthOne_commutator_of_zgroupCentralizer
+    {Γ : Type*} [Group Γ] [Finite Γ]
+    (hsolv : IsSolvable Γ) (hodd : Odd (Nat.card Γ))
+    {H R : Subgroup Γ} (hHnormal : H.Normal)
+    (hHall : Nat.Coprime (Nat.card ↥H) H.index)               -- normal Hall（|H| と [Γ:H] 互いに素）
+    (hcompl : H.IsComplement' R)
+    {R₀ : Subgroup Γ} (hR₀ : R₀ ≤ R) (hR₀prime : (Nat.card ↥R₀).Prime)
+    (hZ : IsZGroup ↥(Subgroup.centralizer (R₀ : Set Γ) ⊓ H))   -- C_H(R₀) が Z-群
+    (p : ℕ) [Fact p.Prime] :
+    Ch1.hasPLengthOne p ↥⁅H, R⁆
+```
+
+一致チェックポイント（合流モニター照合 2026-06-09）:
+- `Ch1.hasPLengthOne` は main 共有（`PLength.lean:32`）→ A も同一述語を使える ✓
+- ⚠ **Hall encoding の表現差**: 既 landed の Thm 3.4 (`thm34_algClosed`/`thm34`, S03d) は
+  `Nat.Coprime (Nat.card ↥K) (Nat.card ↥R)`、Thm 3.6 は `Nat.Coprime (Nat.card ↥H) H.index`。
+  補群があれば `H.index = Nat.card ↥R` で同値だが **Lean の項としては別物** → Thm 3.6 では
+  `H.index` 表現に揃える（3.6 内部で 3.4 を呼ぶ箇所は encoding 変換が要る）。
+- もう 1 本の forward axiom `exists_prime_orderOf_zgroupCentralizer_of_complement`（Lem 10.4(b)）は
+  keystone-gated でなく **lane a1 担当**（A=keystone レーンの対象外）。
+
 ### 証明フェーズ (equation 番号)
 - **Phase A 還元** (3.6)–(3.11): `H=[H,R]` (3.6); 商帰納 (3.7); `O_{p'}(H)=1` (3.8, **Lem 1.21(b)**);
   `V=F(H)=O_p(H)` elementary abelian (3.9, **Lem 1.21(c)** + Lem 1.7/Thm 1.8/Prop 1.3); `C_H(V)=V`
