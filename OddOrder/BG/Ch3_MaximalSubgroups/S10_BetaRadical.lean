@@ -147,6 +147,130 @@ theorem sylow_structure [Finite G] (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p
       Subgroup.normalizer (R : Set G) ≤ Subgroup.normalizer (Q : Set G)) := by
   sorry
 
+/-- **Narrowness of Sylow `p` of `M` for `p ∈ π(M) - β(M)`** (BG Lemma 10.8 setup, mmd L2812):
+if `p ∈ π(M)` and `p ∉ β(M)`, then every Sylow `p`-subgroup of `M` is narrow.
+
+If `p ∉ α(M)` then `r_p(M) ≤ 2`, so the Sylow has rank `≤ 2` and is narrow directly. If
+`p ∈ α(M) ⊆ σ(M)`, then a Sylow `p`-subgroup of `M` *is* a Sylow `p`-subgroup of `G`
+(`isSylow_sylowMap_of_mem_sigma`: no normalizer growth out of `M`); and `p ∈ α(M)` with
+`p ∉ β(M)` forces `¬ idealPrime p G`, which (with `r_p(G) ≥ 3`) means some — hence every, by
+conjugacy — Sylow `p`-subgroup of `G` has a maximal elementary abelian subgroup of order `p²`,
+i.e. is narrow (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`). -/
+private theorem isNarrow_sylow_of_not_mem_beta [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) (P : Sylow p ↥M) :
+    IsNarrow p ↥(P : Subgroup ↥M) := by
+  have hp_prime : p.Prime := Fact.out
+  have hp_odd : Odd p := hG.odd.of_dvd_nat (dvd_trans (Nat.mem_primeFactors.mp hpπ).2.1
+    (Subgroup.card_subgroup_dvd_card M))
+  by_cases hpα : p ∈ alpha M
+  · -- `p ∈ α(M) ⊆ σ(M)`: the Sylow of `M` is a Sylow of `G`, narrow from `¬ idealPrime`.
+    have hpσ : p ∈ sigma M := alpha_subset_sigma hG hM hpα
+    have h3M : 3 ≤ pRank ↥M p := ((mem_alpha_iff M p).mp hpα).2
+    have h3G : 3 ≤ pRank G p := le_trans h3M (pRank_le_of_injective M.subtype_injective)
+    -- `S` is a Sylow `p`-subgroup of `G` isomorphic to `P`.
+    obtain ⟨S, hS_eq⟩ := isSylow_sylowMap_of_mem_sigma hpσ P
+    have ePS : ↥(P : Subgroup ↥M) ≃* ↥(S : Subgroup G) :=
+      (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective).trans
+        (MulEquiv.subgroupCongr hS_eq.symm)
+    -- `¬ idealPrime p G` (else `p ∈ β(M)`).
+    have hnotideal : ¬ idealPrime p G := fun hideal => hpβ ⟨hpα, hideal⟩
+    -- `¬ idealPrime` with `3 ≤ pRank G p` yields a narrow Sylow `Q` of `G`.
+    rw [mem_idealPrime_iff, not_and_or] at hnotideal
+    rcases hnotideal with h3 | hQex
+    · exact absurd h3G h3
+    · push_neg at hQex
+      obtain ⟨Q, A, hAcard, hAmax⟩ := hQex
+      have h3Q : 3 ≤ pRank ↥(Q : Subgroup G) p := by rw [pRank_sylow_eq Q]; exact h3G
+      have hQnarrow : IsNarrow p ↥(Q : Subgroup G) :=
+        (Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hp_odd Q.2 h3Q).mpr
+          ⟨A, hAcard, hAmax⟩
+      -- Transfer narrowness `Q → S` (conjugate Sylows) then `S → P`.
+      obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q S
+      have hgeq : MulAut.conj g • (Q : Subgroup G) = (S : Subgroup G) := by
+        rw [← Sylow.coe_subgroup_smul, hg]
+      have eQS : ↥(Q : Subgroup G) ≃* ↥(S : Subgroup G) :=
+        (Subgroup.equivSMul (MulAut.conj g) (Q : Subgroup G)).trans
+          (MulEquiv.subgroupCongr hgeq)
+      exact IsNarrow.of_mulEquiv ePS.symm (IsNarrow.of_mulEquiv eQS hQnarrow)
+  · -- `p ∉ α(M)`: `r_p(M) ≤ 2`, so the Sylow has rank `≤ 2`.
+    have hr2 : pRank ↥M p ≤ 2 := by
+      by_contra h
+      exact hpα ⟨hpπ, by omega⟩
+    exact isNarrow_of_pRank_le_two (by rw [pRank_sylow_eq P]; exact hr2)
+
+/-- **`HasNormalPComplement` is invariant under group isomorphism.** Transport the normal
+complement `N` to `N.map e`; each Sylow `Q` of the target pulls back along `e` to a Sylow of the
+source, where it complements `N`, and the cardinalities/coprimality transfer. (Public form of the
+private helper in `S7B2_NormalJ_PComplement`; needed to move `HasNormalPComplement` between
+`↥(commutator ↥M)` and `↥(derivedInG M)`.) -/
+theorem hasNormalPComplement_of_mulEquiv {A B : Type*} [Group A] [Group B]
+    [Finite A] [Finite B] {p : ℕ} [Fact p.Prime] (e : A ≃* B)
+    (hA : Ch05.HasNormalPComplement p A) : Ch05.HasNormalPComplement p B := by
+  classical
+  obtain ⟨N, hN_normal, hN_compl⟩ := hA
+  refine ⟨N.map e.toMonoidHom, Subgroup.Normal.map hN_normal _ e.surjective, fun Q => ?_⟩
+  have h_range_top : (e.toMonoidHom).range = ⊤ := MonoidHom.range_eq_top.mpr e.surjective
+  have hQ_le_range : (Q : Subgroup B) ≤ (e.toMonoidHom).range := by rw [h_range_top]; exact le_top
+  let Q' : Sylow p A := Q.comapOfInjective e.toMonoidHom e.injective hQ_le_range
+  have hQ'_compl : Subgroup.IsComplement' N (Q' : Subgroup A) := hN_compl Q'
+  have hQ'_eq : (Q' : Subgroup A) = (Q : Subgroup B).comap e.toMonoidHom := by
+    simp [Q', Sylow.coe_comapOfInjective]
+  have hQ_map : (Q' : Subgroup A).map e.toMonoidHom = (Q : Subgroup B) := by
+    rw [hQ'_eq, Subgroup.map_comap_eq, h_range_top, top_inf_eq]
+  have hG_card : Nat.card A = Nat.card B := Nat.card_congr e.toEquiv
+  have hN_card : Nat.card (N.map e.toMonoidHom : Subgroup B) = Nat.card N :=
+    (Nat.card_congr (Subgroup.equivMapOfInjective N e.toMonoidHom e.injective).toEquiv).symm
+  have hQ_card : Nat.card (Q : Subgroup B) = Nat.card (Q' : Subgroup A) := by
+    rw [← hQ_map]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective).toEquiv).symm
+  have h_card_eq : Nat.card N * Nat.card (Q' : Subgroup A) = Nat.card A := hQ'_compl.card_mul_card
+  have h_card_H : Nat.card (N.map e.toMonoidHom : Subgroup B) * Nat.card (Q : Subgroup B) =
+      Nat.card B := by rw [hN_card, hQ_card, h_card_eq, hG_card]
+  have hp_ndvd_N : ¬ p ∣ Nat.card N := by
+    rw [← hQ'_compl.index_eq_card]; exact Q'.not_dvd_index
+  obtain ⟨k, hQ'_pow⟩ := IsPGroup.iff_card.mp Q'.isPGroup'
+  have hp_prime : p.Prime := Fact.out
+  have h_coprime' : Nat.Coprime (Nat.card N) (Nat.card (Q' : Subgroup A)) := by
+    rw [hQ'_pow]; exact ((hp_prime.coprime_iff_not_dvd.mpr hp_ndvd_N).symm).pow_right k
+  have h_coprime : Nat.Coprime (Nat.card (N.map e.toMonoidHom : Subgroup B))
+      (Nat.card (Q : Subgroup B)) := by rw [hN_card, hQ_card]; exact h_coprime'
+  exact Subgroup.isComplement'_of_coprime h_card_H h_coprime
+
+/-- **BG Lemma 10.8(c) — normal `p`-complements** (mmd L2812), forward-conditional on the keystone
+(via Theorem 10.6): for `p ∈ π(M) - β(M)`, both `M'` and `M_σ` have normal `p`-complements.
+
+A Sylow `p`-subgroup of `M` is narrow (`isNarrow_sylow_of_not_mem_beta`) and `M` has `p`-length
+one (Theorem 10.6 — `proper_hasPLengthOne`), so Theorem 5.6(c)
+(`narrow_sylow_solvable_structure`) gives a normal `p`-complement for `↥(commutator ↥M)`;
+transport it to `↥(derivedInG M)` by isomorphism, and inherit it for `↥(Msigma M)`
+(`Msigma ⊆ M'`, `hasNormalPComplement_of_subgroup`). -/
+theorem derived_msigma_hasNormalPComplement_of_not_mem_beta [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ}
+    [Fact p.Prime] (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) :
+    Ch05.HasNormalPComplement p ↥(derivedInG M) ∧ Ch05.HasNormalPComplement p ↥(Msigma M) := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpπ).2.1
+  have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1
+  -- Some Sylow `p`-subgroup of `M`, narrow; `M` has `p`-length one (Theorem 10.6).
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p ↥M))
+  have hPnarrow : IsNarrow p ↥(P : Subgroup ↥M) := isNarrow_sylow_of_not_mem_beta hG hM hpπ hpβ P
+  have hpl : 3 ≤ pRank ↥(P : Subgroup ↥M) p → Ch1.hasPLengthOne p ↥M :=
+    fun _ => proper_hasPLengthOne hG M hM_lt
+  -- Theorem 5.6(c): `↥(commutator ↥M)` has a normal `p`-complement.
+  have hNPC_comm : Ch05.HasNormalPComplement p ↥(commutator ↥M) :=
+    (Ch1.S05.narrow_sylow_solvable_structure hoddM hp_dvd P hPnarrow hpl).2.2.1
+  -- Transport to `↥(derivedInG M) = ↥((commutator ↥M).map M.subtype)`.
+  have hNPC_der : Ch05.HasNormalPComplement p ↥(derivedInG M) :=
+    hasNormalPComplement_of_mulEquiv
+      (Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective) hNPC_comm
+  refine ⟨hNPC_der, ?_⟩
+  -- `M_σ ⊆ M'`: inherit the complement, then transport to `↥(Msigma M)`.
+  have hMσ_le : Msigma M ≤ derivedInG M := Msigma_le_derived hG hM
+  exact hasNormalPComplement_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσ_le)
+    (Ch05.hasNormalPComplement_of_subgroup hNPC_der ((Msigma M).subgroupOf (derivedInG M)))
+
 /-! ## Lemma 10.8 — `M_β` の Hall 性 (mmd L2810) -/
 
 /-- **BG Lemma 10.8** (mmd L2810): `M ∈ ℳ`。

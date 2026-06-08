@@ -3261,3 +3261,10 @@ axiom(s):{indentD m!"{bad.toList}"}"
 #assert_axioms_island OddOrder.BG.Ch3.S10.proper_hasPLengthOne expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- BG §10: Lemma 10.8(c) — for `p ∈ π(M) - β(M)`, `M'` and `M_σ` have normal `p`-complements.
+-- Forward-conditional via Theorem 10.6 (`proper_hasPLengthOne`), hence the same keystone island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.derived_msigma_hasNormalPComplement_of_not_mem_beta
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
