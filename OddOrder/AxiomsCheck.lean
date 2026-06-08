@@ -3272,3 +3272,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_omega_combination
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_inner_ne
+
+-- Peterfalvi (3.4) Fourier coefficients `⟨α_{kl}, ω_{ij}⟩ = δ`: the character-group dual
+-- `(χ₁,χ₂) ↦ χ₁∘wFst·χ₂∘wSnd` is injective (`comp_mul_injective`, the dual of W = W₁ × W₂), and the
+-- inner products of α against the ω_{ij} collapse to the Kronecker delta.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.comp_mul_injective
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar_inj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha_inner_omega_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha_inner_omega_ne
