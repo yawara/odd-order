@@ -5,8 +5,11 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
+import OddOrder.GroupTheory.IsExtraspecial
+import OddOrder.Isaacs.Ch01_Sylow.Main
 import Mathlib.RepresentationTheory.Character
 import Mathlib.RepresentationTheory.Subrepresentation
+import Mathlib.GroupTheory.SpecificGroups.Cyclic.Basic
 
 /-!
 # Conjugate characters of the constituents of a restriction (toward BG Prop 2.2(a)'s `hconj`)
@@ -283,6 +286,28 @@ theorem conjugate_submodule_iso [IsAlgClosed k] [FiniteDimensional k V] [Finite 
   submodule_iso_of_character_eq ρ W g (character_subRep_conj_eq ρ W hf hcl g hgc)
 
 end ConjChar
+
+section UniqueMinimalNormal
+
+/-- **`Z(P)` is the unique minimal normal subgroup of an extraspecial group**: every nontrivial
+normal subgroup contains the centre.  Since `N ⊓ Z(P)` is nontrivial
+(`normal_inf_center_nontrivial`, `N ⊴ P` nontrivial in a finite `p`-group) and `|Z(P)| = p` is
+prime, the corresponding subgroup of
+`↥Z(P)` is `⊥` or `⊤`; nontriviality forces `⊤`, i.e. `Z(P) ≤ N`. -/
+theorem extraspecial_center_le_of_normal_ne_bot {p : ℕ} [Fact p.Prime] {P : Type*} [Group P]
+    [Finite P] (h : OddOrder.GroupTheory.IsExtraspecial p P) {N : Subgroup P} [N.Normal]
+    (hN : N ≠ ⊥) : Subgroup.center P ≤ N := by
+  haveI hNnt : Nontrivial N := (Subgroup.nontrivial_iff_ne_bot N).mpr hN
+  have hinf : Nontrivial ↥(N ⊓ Subgroup.center P) :=
+    OddOrder.Isaacs.Ch01.IsPGroup.normal_inf_center_nontrivial h.isPGroup hNnt
+  haveI : Fact (Nat.card ↥(Subgroup.center P)).Prime := ⟨h.center_card.symm ▸ Fact.out⟩
+  rcases (N.subgroupOf (Subgroup.center P)).eq_bot_or_eq_top_of_prime_card with hbot | htop
+  · exfalso
+    rw [Subgroup.subgroupOf_eq_bot, disjoint_iff] at hbot
+    exact (Subgroup.nontrivial_iff_ne_bot _).mp hinf hbot
+  · rwa [Subgroup.subgroupOf_eq_top] at htop
+
+end UniqueMinimalNormal
 
 section Materialize
 
