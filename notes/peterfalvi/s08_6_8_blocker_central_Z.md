@@ -1272,6 +1272,13 @@ at CB4 start): is the `R(χ)` reflection machinery formalized in S05/S07?** If n
   on **Brauer's permutation lemma** ([Is] 6.32, also unformalized → needs new `BrauerPermutation.lean`).
   Estimated ~18–22h of independent §4 work.  **⟹ CB4 is gated on the full §4 certain-type project**
   (which also unblocks §12/§13/§15 downstream).
+  **⚠️ SUPERSEDED (2026-06-08 session 9, see `s06_dade_certain_subgroup.md` "session 9")**: this
+  verdict is WRONG about Brauer — [Is] 6.32 IS fully formalized & 0-sorry (`BrauerPermutation.lean` /
+  `BrauerPermutationUnconditional.lean` / `ConjugationBrauer.lean`). The real (and larger) bottleneck
+  the verdict MISSED is **§5 (3.x) σ-isometry**, esp. the (3.5) χ_ij combinatorial construction —
+  the §7 per-pair R(χ) producer (`dadeOrthonormalCharacterImageFamily`) does NOT subsume the global
+  (3.2) σ. Corrected scope = §5 (3.x) + §6 (4.x) theorem bodies, ~30-40h, hard cores (3.5) & (4.3),
+  Brauer-free. Dependency-ordered leaf plan + first leaf (3.3) in the s06 note.
 - **CB5 (6.8.3 shared)**: generalize L4 `false_of_coherentXunionYset_of_not_coherentS` over Z; apply at
   `W₂`.  (5.6)-based; `xSum_le_two_psi`/`false_of_centralCommutator_break_arith` are already Z-param.
 - **CB6 (wiring)**: restructure `sibleySetup_is_coherent` to `hyp.cases`; `inl`→case-A-frobenius (done);
