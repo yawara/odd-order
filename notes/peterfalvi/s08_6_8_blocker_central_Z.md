@@ -1083,3 +1083,70 @@ FIXED witnesses, so the swapped `cY'`/`cX'` need their OWN crux.  mmd + code re-
   (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` S08:9018 hard-codes them) +
   case-split on `2≤|xBaseBlock|`/`2≤|Y|` into generic (≥3) + edge (=2, swap).  Step-5 isometry value
   `inner_tau_scaledDiff_tau_Xset_diff` (S08:10427) is already witness-independent — no change.
+
+## 2026-06-08 (session 7 cont.): spine parameterization + general diagonal capstone DONE; KEY degree-ratio finding (3 more commits, full build 3557 + AxiomsCheck OK, all axiom-clean)
+
+Relabel steps (1)+(2) of the plan are now LANDED.  Commits on `b-peterfalvi`:
+- ✅ **swap witness** `7108ab59` (session 7 above): `coherentEqualDegree_swap_neg` (S07).
+- ✅ **spine parameterization** `e63822ec`: 6 `_general` lemmas over `cX : IsCoherent τ (Xset Zc) A`,
+  `cY : IsCoherent τ Yset A` (the SHALLOW spine — NOT the deep step-3/step-4): himg_ortho
+  (`inner_extension_Xset_centralCommutator_Yset_eq_zero_general`), good-case-X
+  (`orthogonal_normOne_tau_scaledDiff_add_extension_general`), step-5 relation
+  (`inner_extension_Xset_sub_eq_neg_one_general`), dichotomy (`extension_eq_or_eq_neg_general`),
+  crux (`crux_of_third_anchor_general`), L3 shell
+  (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`).  Each fixed `_of_frobenius`
+  is now a thin specialization (passes fixed witnesses) → generic chain + S09 UNCHANGED.  Mechanism:
+  `set hXc := cX` alias / replace `hyp.coherentYset → cY` (proofs use only generic IsCoherent fields +
+  witness-independent τ-lemmas, so they transfer verbatim).
+- ✅ **general diagonal capstone** `35e55bc8`: `coherentXunionYset_centralCommutator_diagonal_general
+  (hyp)(hF)(hp)(hHp)(cX)(cY)(hη₁)(hχ₁base)(ha)(hcrux : τ(χ₁−aη₁) = cX χ₁ − a·cY η₁)` ⟹ `X(Zc)∪Y`
+  coherent.  **This is the SHARED interface** for the generic case AND both edges — they differ only
+  in how `hcrux` is produced for the chosen (possibly swapped) witnesses.  Generic
+  `..._diagonal_of_frobenius` now delegates to it (fixed witnesses + `crux_of_frobenius`).
+
+### 🔑 KEY FINDING (don't re-derive): the X-relabel needs a DEGREE-RATIO exclusion, not just a swap
+The session-6-cont.⁵ relabel plan was INCOMPLETE.  Re-examined the swap's validity:
+- **The 2-element sign-swap `cX'` is a valid `IsCoherent` witness ONLY when `|X(Zc)| = 2`** (the whole
+  set).  Proof: `cX'` differs from `cX` on `χ₁,χ₂` (the swapped pair); for a supported
+  `φ = ∑cᵢχᵢ ∈ ℤ[X,A]`, `cX' φ − cX φ = −(c₁+c₂)(cX χ₁ + cX χ₂)`, which is `0` (so `extends_on_supported`
+  survives) **iff `c₁+c₂ = 0`**.  With higher-degree members present, a supported combo like
+  `χ₁+χ₂−χ'` (`χ'(1)=2·χ₁(1)`) has `c₁+c₂=2≠0` → swap BREAKS `extends_on_supported`.  So the X-swap
+  is invalid once `|X(Zc)|>2`.  (Y-swap is fine: `Y` is all equal degree, `|Y|=2` ⟹ whole set.)
+- ⟹ the boundary is **`|X(Zc)|` (not `|xBaseBlock|`)**: `|X(Zc)|=2` ⟹ `X={χ,χ̄}` conj pair (|L| odd,
+  no real char ⟹ |X| even) ⟹ equal degree ⟹ swap OK.  But **`|xBaseBlock|=2 ∧ |X(Zc)|≥4` is a real
+  case** (one min-degree pair + a higher pair) where NEITHER the equal-degree generic (needs
+  `|xBaseBlock|≥3`) NOR the swap (needs `|X|=2`) applies.
+- **Fix = Peterfalvi's actual argument: a DEGREE-RATIO third anchor.**  His `n` is `|X|`, and the
+  exclusion uses `(χ₃−d₃χ₁)^τ` for ANY third member `χ₃` (`d₃ = χ₃(1)/χ₁(1) ∈ ℕ`), needing only
+  `|X(Zc)|≥3`.  In the right disjunct `X=−cX χ₂`: the relation
+  `⟨X,cX χ₃⟩ − d₃·⟨X,cX χ₁⟩ = −d₃` becomes `0 − d₃·0 = −d₃` ⟹ `d₃=0`, contra (`d₃>0`).  So a
+  degree-ratio exclusion covers `|X(Zc)|≥3` uniformly; the swap is needed ONLY for `|X(Zc)|=2`.
+
+### 🔴 Remaining edge logic (precise, all feeding `coherentXunionYset_centralCommutator_diagonal_general`)
+- **E1 — degree-ratio crux `crux_general_of_higher_anchor (cX,cY,χ₁∈xBaseBlock,χ₂ equal,χ₃ ANY,hgood)`
+  ⟹ crux** (closes `|xBaseBlock|=2 ∧ |X|≥3`).  Needs: (a) degree-ratio isometry value
+  `⟨τ(χ₁−aη₁), τ(χ₃−d₃•χ₁)⟩ = −d₃` (mirror `inner_tau_scaledDiff_tau_Xset_diff_of_frobenius` S08:10492
+  with `d₃` from `exists_charValue_one_eq_mul_xBaseBlock_anchor`, `χ₃−d₃•χ₁` supported via
+  `sMember_scaledDiffSupport_of_charValue_eq`); (b) degree-ratio relation
+  `⟨X,cX χ₃⟩ − d₃·⟨X,cX χ₁⟩ = −d₃` (mirror `inner_extension_Xset_sub_eq_neg_one_general`); (c) the
+  exclusion + `extension_eq_or_eq_neg_general` dichotomy.  ~3 lemmas, ~150 lines.
+- **E2 — m=2 hgood selection.**  Step-4 dichotomy `coeff_eq_neg_or_edge_of_frobenius` (FIXED cY, S08
+  ~10232): `⟨v,cY η₁⟩=−a (good) ∨ (|Y|=2 ∧ =0 (bad))`.  good ⟹ `cY*=coherentYset`, hgood.  bad ⟹
+  `|Y|=2` ⟹ `Y={η₁,η₂}`, `cY'=coherentEqualDegree_swap_neg` (transport `{η₁,η₂}→Yset`), hgood for cY'
+  via `⟨v,cY' η₁⟩=⟨v,−cY η₂⟩=−(⟨v,cY η₁⟩+a)=−a` (the `⟨v,cY η₂⟩=⟨v,cY η₁⟩+a` from
+  `inner_tau_scaledDiff_tau_Yset_diff` + extends_on_supported).
+- **E3 — |X(Zc)|=2 relabel.**  `X={χ₁,χ₂}` conj pair; `extension_eq_or_eq_neg_general (cX,cY*)`:
+  left ⟹ crux for `cX`; right (`X=−cX χ₂`) ⟹ `cX'=swap` (valid, |X|=2 whole set), `cX' χ₁=−cX χ₂=X` ⟹
+  crux for `cX'`.
+- **E4 — master edge lemma** under `2≤|xBaseBlock|`, `2≤|Y|` (always true): pick χ₁,χ₂∈xBaseBlock, η₁;
+  E2 → (cY*,hgood); then `by_cases |X(Zc)|≥3`: E1 (cX*=cX) ‖ E3 (|X|=2, cX*∈{cX,cX'}); feed
+  `..._diagonal_general (cX*,cY*,hcrux)` ⟹ X∪Y coherent → L4 → S coherent.
+- **wiring** into `sibleySetup_is_coherent` (S08 sole sorry): restructure `by_cases Xset⁅H,H⁆=∅` →
+  `hyp.cases` (A)/(B); case A derive hHnonab(X≠∅)+p-data((6.5))+`2≤` cards, invoke E4; case B = (6.8.2)
+  unplanned.
+
+**Recommended next session:** E1 (degree-ratio crux, the gating piece — mirror the equal-degree
+isometry/relation lemmas with `d₃`), then E2/E3 (relabel selections, consume
+`coherentEqualDegree_swap_neg`), then E4 + wiring.  ALL feed the landed
+`coherentXunionYset_centralCommutator_diagonal_general`.  **Don't re-grind the spine
+parameterization or the swap witness — landed + axiom-clean.**
