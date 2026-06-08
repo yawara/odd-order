@@ -487,6 +487,34 @@ commits `d54869a5` + `e1ac4947`):
     `Module.Finite.of_injective ((W.subtype).restrictScalars k) Subtype.val_injective`。
   - `Nontrivial asModule` = `‹Nontrivial V›` (defeq ascription; bare inferInstance は不可)。
   - `endVecAlgEquivMatrixEnd` の明示引数順は `ι R A M` → **`..` で全推論**させる (mathlib WedderburnArtin と同様)。
-- **▶▶ hVP は hconj (Gor 5.5.4 = `W≅W^g`) を仮説に取った形で COMPLETE。残る唯一の sub-piece = Gor 5.5.4**
-  (W-conjugate の同型供給, 未着手) + group-level setup で W 存在 (非零 f.d. semisimple) と hgen (`G=P⋊⟨x⟩`) を供給して
-  `restriction_isIrreducible` を呼び hVP を materialize する配線。これで Thm 2.5 → Thm 3.4 → 3.6 → §10.6 が開く。
+- **▶▶ hVP は hconj (`W≅W^g`) を仮説に取った形で COMPLETE。残る = hconj 供給 + group-setup 配線。**
+
+### 🔁 hconj は Gor 5.5.4 をゼロ形式化しない — char_orthonormal 経路 (2026-06-08 訂正, 再調査不要)
+
+**重要な訂正**: 旧 notes は hconj (`W≅W^g`) を「Gor 5.5.4 = extraspecial faithful irred 一意性、mathlib 不在、
+複数セッションの新規ピース」と記録していたが、これは**過大評価で誤り**。BG mmd **L756** が出所:
+> "by **G** Thm 5.5.4 … a faithful irreducible rep of an extraspecial group is **determined by its center**.
+> It follows that … M and M^g are isomorphic."
+
+これは **既形式化の Gor 5.5.5 + mathlib 一般体指標直交性**で出る (Gor 5.5.4 本体不要):
+- ✅ **`character_eq_zero_of_notMem_center`** (`ExtraspecialFaithful.lean`, **一般 alg-closed F**, 既証 = Gor 5.5.5):
+  faithful irred + class≤2 ⟹ χ は Z(P) 外で 0。
+- ✅ **mathlib `Representation.char_orthonormal`** (`RepresentationTheory/Character.lean:230`, **一般 alg-closed k +
+  `Invertible (Nat.card G:k)`** — ℂ-pin でない!): `[IsIrreducible ρ][IsIrreducible σ]` ⟹
+  `(card G)⁻¹·∑ ρ.char g · σ.char g⁻¹ = if Nonempty (σ.Equiv ρ) then 1 else 0`。
+  + `card_inv_mul_sum_char_mul_char_eq_finrank` (= `⟨χ⟩ = finrank (IntertwiningMap ρ σ)`), `char_conj`
+  (`ρ.char (hgh⁻¹)=ρ.char g`), `char_iso`, `Representation.character g := trace k V (ρ g)`, `Representation.Equiv`
+  (`Intertwining.lean:232`)。
+- **論法**: W faithful irred P-加群 (V_P の constituent, BG 2.10), g が Z(P) を中心化 (C_P(x)=Z(P) ⟹ x が Z 上自明,
+  一般 g=p·xᵏ も Z 中心化) ⟹ **χ_{W^g}(h)=χ_W(g⁻¹hg)=χ_W(h)** (h∈Z は g 固定; h∉Z は両者 0 by χ-vanishing)
+  ⟹ `⟨χ_W,χ_W⟩=1≠0` ⟹ `Nonempty (W^g.Equiv W)` ⟹ **W≅W^g = hconj**。
+- **NeZero→Invertible**: 体上 `NeZero (Nat.card ↥H:k)` ⟹ `Invertible` (非零元は単元); `Fintype ↥H` from `Finite`.
+- **残工数 (focused session 級, NOT multi-session)**: (1) 共役部分加群 `W.map (conjSemilinearEnd ρ g)` を
+  `Representation k ↥H` として実現しその指標 = χ_W(g⁻¹·g) を示す plumbing (conjSemilinearEnd の twist 利用,
+  CliffordAlgClosed と同系統) → (2) χ 等式 (χ-vanishing + g 中心化) → (3) char_orthonormal で `W≅W^g` → hconj。
+- **group-setup 配線**: W = V_P の simple constituent (非零 f.d. semisimple から存在), W faithful (BG 2.10), hgen
+  (`closure(↑P∪{x})=⊤`, = `G=P⋊⟨x⟩`) → `restriction_isIrreducible` 呼出 ⟹ hVP materialize。
+  ⟹ Thm 2.5 → Thm 3.4 (parity 矛盾) → 3.5 → 3.6 → §10.6 が開く。
+- **⚠ Isaacs FGT には無い** (S02 表確認済: FGT は character/Clifford 章なし); repo の `CharacterCompleteness`/
+  `CharacterConjugate`/`CharacterRowOrthogonality` は **ℂ-pin** ゆえ一般 k に使えない — **mathlib `char_orthonormal`
+  (一般体) が正解の経路**。
