@@ -166,16 +166,45 @@ axioms ちょうど)。Thm 5.6(c) を ↥M に適用 (narrow Sylow + proper_hasP
 nilpotency engine、(b) producer、step E' `oPiCore_subgroupOf_eq_of_normal`、helper
 `le_of_coprime_card_index`。
 
-### 次の leaf (Lane D 継続) — 10.6→10.8 完了後
+### ✅ Lemma 10.8(c) 完全化 (2026-06-09, commit `4666dbe4`)
 
-- **Cor 10.9** `beta_complement_*` (3 本, S10_BetaRadical@659/677/696) = 10.8 + Lem 6.5 (✅) +
-  Frattini (✅) + Hall (✅)。**isHall_Mbeta 完成で型レベル unblock**。spine 直列の次。
-- **Prop 10.10** `normalizer_factorization` (@710) = §7 Prop7.3/7.4/7.5 (✅) + **Cor 10.7** + Lem 6.5。
-  Cor 10.7 (`sylow_structure`@125 sorry) 経由ゆえブロック。
-- **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。Cor 10.7(b) は更に rep-theory
-  keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) ゆえ (b) は後回し。(a) は配線可。
+isHall_Mbeta docstring で deferred だった **「p は |M/O_{p'}(M)| の最大素因子」**を形式化:
+- `largestPrime_quotient_oPiCore_compl_of_not_mem_beta`: Thm 5.6 第1 conjunct を ↥M narrow Sylow に適用。
+- `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta`: 帰結「q>p ⟹ Sylow q of M ⊆ O_{p'}(M)」
+  (= BG mmd L2862「O_{p'}(M) contains all q-elements」; `le_of_coprime_card_index` 再利用)。
+  **Cor 10.9(a) の X⊄M' (p<q) ケースの前提**。両者 forward-conditional、AxiomsCheck §10 island 登録。
+
+### 🛑 次の leaf = Cor 10.9 — **Hall-D + Hall∩normal が前提 (repo 未収載・大物)**
+
+**Cor 10.9 (3 本)**: (a)(1)(2)=`beta_complement_centralizes`, (a)(3)=
+`beta_complement_normalizer_derived_contains_sylow`, (b)=
+`beta_factorization_of_sylow_normalizer_in_intersection`。すべて (a) の **W nilpotent** が核。
+
+**BG 証明骨子 (p.81, mmd L2860)**: p,q∈β(M)' distinct, X q-部分群 (X⊆M' or p<q)。
+W := Hall {p,q}-subgroup of XM' **containing X**。W⊆W* (Hall β'-subgroup)、10.8(b) で W*∩M' nilpotent
+⟹ W∩M' nilpotent。**W nilpotent**: X⊆M' なら W=W∩M'; else p<q で
+`sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` (✅) より W∩O_{p'}(M)=normal Sylow q of W、
+W∩M' nilpotent + W/(W∩M') q-群 ⟹ O_p(W∩M')=normal Sylow p of W ⟹ 両 Sylow normal ⟹ nilpotent
+(`isNilpotent_of_forall_hasNormalPComplement` ✅ or tfae)。M_σ◁M' で W∩M_σ Hall {p,q} of M_σ ⟹
+(1) X が Sylow p of M_σ を中心化 (W nilpotent ⟹ Sylow 同士可換)。(2)=(1)+Uniqueness。(3): X=Sylow q of M',
+M_βX=O_{β∪{q}}(M')◁M, Frattini で M=M_β N_M(X), Lem 6.5 で O_p(W)⊆N_M(X)'。(b)=(a)(2)+(a)(3)。
+
+**🛑 BLOCKER = 2 つの未収載 Hall 補題** (両者 unconditional・一般 Isaacs Ch03 infra・再利用可):
+1. **Hall-D (Wielandt)** `∃ Hall π-subgroup ⊇ 任意 π-subgroup` (solvable G)。repo は `hall_E_exists`
+   (存在) + `hall_C` (共役 H^g=K) のみ。**containment は無**。W⊇X の構成に必須。`hall_C_strong_aux`
+   (Main.lean:857-1207) 級の |G|-induction (~200-350 行)。minimal normal r-group で r∈π/r∉π 場合分け。
+2. **Hall ∩ normal = Hall of normal** `IsHallSubgroup π H, N◁G ⟹ IsHallSubgroup π (H∩N の N 内)`。
+   W∩M' Hall {p,q} of M' / W∩M_σ Hall {p,q} of M_σ に必須。~50-80 行。
+
+⟹ **Cor 10.9 は Hall-D + Hall∩normal を先に landing してからでないと組めない** (各々別 unconditional leaf)。
+**推奨次手 = Hall-D を Isaacs Ch03 に landing** (general infra, Cor 10.9 + §12+ が消費)。その後 Cor 10.9(a)→(b)。
+
+### その他の §10 残ターゲット (keystone gated)
+- **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。(a) 配線可だが (b) は rep-theory
+  keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) gated。
+- **Prop 10.10** `normalizer_factorization` = §7 (✅) + Cor 10.7 + Lem 6.5 ⟹ Cor 10.7 経由 gated。
 - **Prop 10.11** `sigma_complement_rank_le_one` (S10_LocalLemmas@460) = Cor 10.7 経由 keystone gated。
-- 旧「残フロンティア conjunct 1-3」は**全消化** (上記)。
+- 旧「残フロンティア conjunct 1-3」は**全消化** (Lemma 10.8 完成)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
