@@ -3285,3 +3285,14 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- BG §10: Lemma 10.8(c) largest-prime part + its "O_{p'}(M) ⊇ all q-elements (q > p)" consequence.
+-- Same keystone island (via Theorem 10.6 / Theorem 5.6's first conjunct).
+#assert_axioms_island OddOrder.BG.Ch3.S10.largestPrime_quotient_oPiCore_compl_of_not_mem_beta
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+#assert_axioms_island OddOrder.BG.Ch3.S10.sylow_le_oPiCore_compl_of_lt_of_not_mem_beta
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

@@ -559,6 +559,46 @@ theorem isHall_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G)
       Nat.primeFactors_mono (Subgroup.card_dvd_of_le (Msigma_le M)) Nat.card_pos.ne' hpπA
     exact (h4 p hp_prime hpM hpβ).2
 
+/-- **BG Lemma 10.8(c), largest-prime part** (mmd L2843, forward-conditional via Theorem 10.6):
+for `p ∈ π(M) − β(M)`, `p` is the largest prime divisor of `|M / O_{p'}(M)|`. Together with
+`derived_msigma_hasNormalPComplement_of_not_mem_beta` (the normal-`p`-complement part) this is the
+full Lemma 10.8(c). It is the first conjunct of Theorem 5.6 applied to a narrow Sylow `p`-subgroup
+of the `p`-length-one group `↥M`. -/
+theorem largestPrime_quotient_oPiCore_compl_of_not_mem_beta [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ}
+    [Fact p.Prime] (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) :
+    ∀ q ∈ (Nat.card (↥M ⧸ Ch03.oPiCore {r : ℕ | r ≠ p} ↥M)).primeFactors, q ≤ p := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hp_dvd : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpπ).2.1
+  have hM_lt : M < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow p ↥M))
+  have hPnarrow : IsNarrow p ↥(P : Subgroup ↥M) := isNarrow_sylow_of_not_mem_beta hG hM hpπ hpβ P
+  have hpl : 3 ≤ pRank ↥(P : Subgroup ↥M) p → Ch1.hasPLengthOne p ↥M :=
+    fun _ => proper_hasPLengthOne hG M hM_lt
+  exact (Ch1.S05.narrow_sylow_solvable_structure hoddM hp_dvd P hPnarrow hpl).1
+
+/-- **Consequence of Lemma 10.8(c)** (mmd L2862): for `p ∈ π(M) − β(M)` and a prime `q > p`, every
+Sylow `q`-subgroup of `M` lies in `O_{p'}(M)` ("`O_{p'}(M)` contains all `q`-elements"). Indeed
+`q ∤ |M / O_{p'}(M)|` because every prime divisor of that quotient is `≤ p < q`
+(`largestPrime_quotient_oPiCore_compl_of_not_mem_beta`), so a Sylow `q`-subgroup has order coprime
+to the (normal) `O_{p'}(M)`'s index (`le_of_coprime_card_index`). Used in Corollary 10.9(a),
+case `X ⊄ M'` (`p < q`). -/
+theorem sylow_le_oPiCore_compl_of_lt_of_not_mem_beta [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ}
+    [Fact p.Prime] [Fact q.Prime] (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M)
+    (hpq : p < q) (Q : Sylow q ↥M) :
+    (Q : Subgroup ↥M) ≤ Ch03.oPiCore {r : ℕ | r ≠ p} ↥M := by
+  apply le_of_coprime_card_index
+  have hq_ndvd : ¬ q ∣ (Ch03.oPiCore {r : ℕ | r ≠ p} ↥M).index := by
+    rw [Subgroup.index_eq_card]
+    intro hdvd
+    exact absurd (largestPrime_quotient_oPiCore_compl_of_not_mem_beta hG hM hpπ hpβ q
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)) (not_le.mpr hpq)
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+  rw [hk]
+  exact Nat.Coprime.pow_left k ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hq_ndvd)
+
 /-! ## Proposition 10.14 — β(G)-prime の global 構造 (mmd L2894) -/
 
 /-- **Cyclic uniqueness by order**: in a finite cyclic group, two subgroups of equal
