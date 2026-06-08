@@ -3337,6 +3337,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_trivial
 
+-- §5 (3.5.1): the norm-3 decomposition `β_{ij} = ∑_{χ ∈ A_{ij}} χ` into signed nontrivial irreducibles.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.card_eq_three_of_sum_sq_eq_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_signedTriple_of_inner_self_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_betaSet
+
 -- BG Theorem 3.4 (algebraically closed core, the keystone consumer of BG Theorem 2.5): a solvable
 -- group `G` of odd order with a normal Hall subgroup `K`, a prime-order complement `R`, acting on
 -- `V/F` with `char F ∤ |G|`, `F` algebraically closed, and `C_V(R) = 0`, gives `[R,K] ⊆ C_K(V)`.
