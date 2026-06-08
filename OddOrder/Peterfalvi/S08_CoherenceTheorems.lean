@@ -4024,6 +4024,39 @@ theorem W2_subgroupOf_le_center_of_caseB (hyp : SibleyDadeHypothesis G L H)
   · exact absurd h hB
   · exact le_of_eq_of_le h.symm inf_le_left
 
+/-- **(c2)+math-(A) fixed-point-freeness on `Zc = Z(H) ∩ H'`** (Peterfalvi (6.8), case (A) in the
+CertainType branch, i.e. `Z(H) ⊓ W₂ = 1`).  `W₁` acts fixed-point-freely on `Zc`: for `w ∈ W₁^#`,
+`C_L(w) ⊓ Zc = 1`.  Indeed `C_L(w) ⊓ H = W₂` (`cert.centralizer_W2`) and `Zc ≤ H ⊓ Z(H).map`, so
+`C_L(w) ⊓ Zc ≤ W₂ ⊓ (Z(H)).map = 1` (the lifted math-(A) hypothesis).  This is the `hZfpf` input
+that `isIrreducibleCharacter_of_mem_Xset_caseA` (and the CB3 FPF generalization) needs at `Z = Zc`,
+the (c2) analogue of the Frobenius fixed-point-free property. -/
+theorem centralizer_inf_centralCommutator_eq_bot_of_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {w : ↥L} (hw : w ∈ hyp.W1) (hw1 : w ≠ 1) :
+    Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator = ⊥ := by
+  haveI := hyp.H_normal
+  have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
+  -- `C_L(w) ⊓ H = W₂`
+  have hCW2 : Subgroup.centralizer ({w} : Set ↥L) ⊓ H = cert.W2 := by
+    have h := cert.centralizer_W2 w (hW1.symm ▸ hw) hw1
+    rwa [hK] at h
+  -- lift the math-(A) hypothesis from `↥H` to `↥L`: `(Z(H)).map ⊓ W₂ = ⊥`
+  have hAmap : (Subgroup.center ↥H).map H.subtype ⊓ cert.W2 = ⊥ := by
+    have h1 := congrArg (Subgroup.map H.subtype) hA
+    rwa [Subgroup.map_inf _ _ H.subtype H.subtype_injective,
+      Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_bot] at h1
+  have hccZ : hyp.centralCommutator ≤ (Subgroup.center ↥H).map H.subtype := by
+    simp only [centralCommutator]; exact inf_le_left
+  rw [← le_bot_iff]
+  calc Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator
+      ≤ (Subgroup.centralizer ({w} : Set ↥L) ⊓ H) ⊓ (Subgroup.center ↥H).map H.subtype :=
+        le_inf (le_inf inf_le_left (inf_le_right.trans hyp.centralCommutator_le))
+          (inf_le_right.trans hccZ)
+    _ = cert.W2 ⊓ (Subgroup.center ↥H).map H.subtype := by rw [hCW2]
+    _ = ⊥ := by rw [inf_comm]; exact hAmap
+
 /-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
 `z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`
 (`centralizer_kernel_le`).  Hence `|C_L(z)| = |H|` is **constant on `Z^#`** — the `|C_L(·)|`-constancy
@@ -5226,6 +5259,28 @@ theorem isIrreducibleCharacter_of_mem_Xset_caseA (hyp : SibleyDadeHypothesis G L
   have hinertia := hyp.inertia_eq_H_of_c2_caseA hZH hZcentral hZnorm hZfpf hZker
   rw [hχeq]
   exact isIrreducibleCharacter_induce_of_inertia_eq θ hinertia
+
+/-- **(c2)+math-(A) `X ⊆ Irr L`** (Peterfalvi (6.8.1) in the CertainType branch, math-case A).
+Every `χ ∈ X = S − S(Zc)` is irreducible at the central `Zc = Z(H) ∩ H'`.  This is the (c2)
+analogue of `isIrreducibleCharacter_of_mem_Xset_of_frobenius`: it discharges the four hypotheses of
+the FPF-generic `isIrreducibleCharacter_of_mem_Xset_caseA` at `Z = Zc` — centrality
+(`centralCommutator_subgroupOf_le_center`), normality (`Zc ◁ L`, so every `w` normalizes it), and
+fixed-point-freeness (`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`, from the math-(A)
+hypothesis `hA : Z(H) ⊓ W₂ = 1`). -/
+theorem isIrreducibleCharacter_of_mem_Xset_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset hyp.centralCommutator) :
+    letI : H.Normal := hyp.H_normal
+    IsIrreducibleCharacter χ := by
+  haveI := hyp.H_normal
+  exact hyp.isIrreducibleCharacter_of_mem_Xset_caseA hyp.centralCommutator_le
+    hyp.centralCommutator_subgroupOf_le_center
+    (fun w _ => by
+      rw [Subgroup.normalizer_eq_top_iff.mpr hyp.centralCommutator_normal]; exact Subgroup.mem_top w)
+    (fun w hw hw1 => hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA hw hw1)
+    hχX
 
 /-- **Peterfalvi (6.6) `X`-characterization** (mmd 04.8 L74-76).  For a normal `Z ≤ H` such that
 every member of `X = S − S(Z)` is irreducible (the (6.8) Frobenius/case-A input `hX`), `X` is

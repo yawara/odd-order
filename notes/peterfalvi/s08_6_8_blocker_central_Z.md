@@ -1247,9 +1247,14 @@ at CB4 start): is the `R(χ)` reflection machinery formalized in S05/S07?** If n
 - **CB1 (foundation — ✅ THIS SESSION)**: `eq_bot_or_eq_of_le_of_card_prime` (general group theory) +
   `W2_subgroupOf_le_center_of_caseB` (the (6.6) centrality enabler at `Z=W₂`, analogue of
   `centralCommutator_subgroupOf_le_center`).  axiom-clean.
-- **CB2**: case-B `W₂ ◁ L` (H centralizes W₂ via centrality; W₁ normalizes via `centralizer_W2` +
-  W₁ abelian) + the FPF-on-`Zc` facts (hZnorm/hZfpf at `Zc`) for c2+math(A), from `Z(H)∩W₂=1` +
-  `centralizer_W2`.  Foundation for CB3.
+- **CB2a (c2+math-A FPF/irreducibility — ✅ THIS SESSION)**:
+  `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` (`W₁` FPF on `Zc`: `C_L(w)⊓Zc=⊥` from the
+  math-(A) hyp `Z(H)⊓W₂=1` + `cert.centralizer_W2`, lifted ↥H→↥L) +
+  `isIrreducibleCharacter_of_mem_Xset_c2_caseA` (the (c2) mirror of
+  `isIrreducibleCharacter_of_mem_Xset_of_frobenius`: discharges hZH/hZcentral/hZnorm/hZfpf into the
+  FPF-generic `isIrreducibleCharacter_of_mem_Xset_caseA`).  axiom-clean.
+- **CB2b**: case-B `W₂ ◁ L` (H centralizes W₂ via centrality; W₁ normalizes via `centralizer_W2` +
+  W₁ abelian/conjugation) — needed for `Xset W₂` in math-(B) (CB4).  Pending.
 - **CB3 (c2+math-A)**: GENERALIZE the high-level case-A assembly (L2/L3/L4 + capstone) from `hF` to the
   FPF-on-Z hypotheses (`hZcentral`/`hZnorm`/`hZfpf` + coprimality).  Then both (c1) and (c2+math-A)
   instantiate it.  Largest "refactor" milestone; F3 low-level pieces already support it.
