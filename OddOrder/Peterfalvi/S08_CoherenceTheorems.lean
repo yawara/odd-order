@@ -10921,6 +10921,32 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
     exact (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁X hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
       ha hdeg2 hdeg3 hm3).symm
 
+/-- **(6.8) capstone, case (A) (Frobenius, `m, n ≥ 3` with given anchors): `S` is coherent.**
+Combines the generic capstone Frobenius branch
+(`coherentXunionYset_centralCommutator_diagonal_of_frobenius`, giving `X(Zc) ∪ Y` coherent) with the
+(6.8.3) extension `false_of_coherentXunionYset_of_not_coherentS` (`X ∪ Y` coherent ∧ `S` not
+coherent ⟹ False): so `S` is coherent.  The anchors `χ₁ ∈ xBaseBlock, χ₂, χ₃` (distinct,
+equal-degree, the `n ≥ 3` data) and `3 ≤ |Y|` (the `m ≥ 3` data) are taken as hypotheses; their
+existence (vs the
+`m = 2` / `n = 2` relabels) is a separate concern. -/
+theorem nonempty_coherent_S_caseA_of_anchors_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  by_contra hncoh
+  exact hyp.false_of_coherentXunionYset_of_not_coherentS hF hHnonab
+    ⟨hyp.coherentXunionYset_centralCommutator_diagonal_of_frobenius hF hHnonab hp hp3 hHp
+      hη₁ hχ₁base hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂ ha hdeg2 hdeg3 hm3⟩ hncoh
+
 end SibleyDadeHypothesis
 
 /-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
