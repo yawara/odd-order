@@ -53,6 +53,34 @@ pLengthOne_commutator_of_zgroupCentralizer]` = expected island ちょうど。
    ```
    normal Hall は `H.Normal` + `Coprime (card H) (index)` でエンコード。**Lane A は §3 で Thm 3.6 を
    landed したらこの署名でこの axiom を置換** (forward_dep_policy)。
+
+   ### 🔎 Thm 3.6 de-axiom contract — Lane A 規約との整合精査 (2026-06-09)
+
+   **(1) faithfulness ✅**: 上記署名は BG mmd L955 と完全一致 (G 可解奇 / H 正規 Hall / R 補群 /
+   R₀≤R 素数位数 / C_H(R₀) Z-群 / ∀ prime p, [H,R] p-length one)。`IsZGroup` = mathlib (Sylow 全 cyclic,
+   mmd L953 定義と一致)。`Ch1.hasPLengthOne`/`⁅H,R⁆` は §3/§10 共有。
+   **内部整合 ✅**: 本 axiom と Lem 10.4(b) axiom は `C_H(R₀) = centralizer(R₀)⊓H` (ambient Subgroup Γ
+   形) で一致 — `proper_hasPLengthOne@106` で齟齬なく適用。
+
+   **(2) Lane A 現況**: Thm 3.6 は **未 Lean 化** (a-keystone: 3.4 `thm34` ✅ landed, 3.5 `thm35` WIP,
+   3.6 は §3C 予定地のみ)。**現時点で署名衝突は無い**。keystone_plan L629 が「§10 spine が Thm 3.4/3.6 を
+   forward-axiom で consume — 境界に注意」と明記、Lane A は境界を認識済み。
+
+   **(3) ⚠ encoding 差分 (vs Lane A landed `thm34`/`thm35` 規約) — すべて shallow・bridgeable**:
+   | 項目 | 本 axiom | thm34/35 規約 | 影響 |
+   |---|---|---|---|
+   | 可解性 | `(hsolv : IsSolvable Γ)` 明示 | `[IsSolvable G]` instance (thm34) | 呼出側 binder 調整 1 行 |
+   | normal Hall | `Coprime (card H) H.index` | `Coprime (card K)(card R)` (thm34) | 補群で index=card R、等値・rw 1 行 |
+   | 素数位数 | `(card R₀).Prime` | `∃ p, p.Prime ∧ card=p` (thm34/35) | ⟨⟩ 包装 1 行 |
+   | 結論 prime | `[Fact p.Prime]` | `(hp : p.Prime)` の可能性 | Fact 化 1 行 |
+
+   いずれも forward_dep_policy の「convention 適応」許容ブリッジ範囲。**数学的ミスマッチは無し**。
+   3.4/3.5 は rep-level (`∀g∈⁅⁆, ρg=1`) で Thm 3.6 (group-level) の直接 template でないため、3.6 署名は
+   Lane A が新規に書く ⟹ **本 axiom 署名が declared interface (Lane A が match すべき対象)**。
+
+   **(4) 結論 = 不安 LOW**。faithful + 内部整合 + Lane A 認識済 + 差分は trivial bridge。**推奨**: Lane A が
+   Thm 3.6 を書く直前に本署名を提示し (a) verbatim 採用、または (b) 上表の convention で書いて §10 側に
+   1 行 adapter を置く、のどちらかを事前合意。`S10_ForwardFromKeystone.lean` docstring が contract を明記済。
 2. **`exists_prime_orderOf_zgroupCentralizer_of_complement`** = **BG Lem 10.4(b)** (grounded,
    lane a1 領域, keystone-gated でない・deferred)。10.6 用に特化:
    ```
