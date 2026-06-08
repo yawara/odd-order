@@ -496,7 +496,15 @@ S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interfa
 
 **⟹ (3.3) Notation 完成** (omega/omegaEquiv=Irr(W)=linear chars + wProdEquiv=W₁×W₂ + ω=ω_i0·ω_0j + ω_i0/ω_0j の kernel 特性; 全 axiom-clean・AxiomsCheck 登録)。**Fin w₁×Fin w₂ の明示 indexing は (3.4) で count が要るとき後付け**(W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k`)。
 
-**次 leaf = (3.4)** `α_ij = (1−ω_i0)(1−ω_0j)` が `CF(W,V)` (V=W−(W₁∪W₂)) の basis、`dim = |V| = (w₁−1)(w₂−1)`。線形独立 (inner product) + 次元一致。**より大きい線形代数 leaf** — Irr(W) が CF(W) の orthonormal basis である事実 (mathlib `Representation`/`ClassFunction` の orthogonality) + CF(W,V) 部分空間の次元。
+**次 leaf = (3.4)** `α_ij = (1−ω_i0)(1−ω_0j)` が `CF(W,V)` (V=W−(W₁∪W₂)) の basis、`dim = |V| = (w₁−1)(w₂−1)`。
+
+### (3.4) feasibility assessment (session 9 loop、stop checkpoint で精査)
+`CF(W,V)` = `S04.SupportedClassFunctions ℂ V W` = `↥(ClassFunction.supportedSubmodule (supportInSubgroup V W))` (S04:148)。
+- **tractable な sub-piece**: (a) `alpha (χ₁:↥W1'→*ℂˣ)(χ₂:↥W2'→*ℂˣ) := (1 − ω(χ₁∘wFst))·(1 − ω(χ₂∘wSnd))` の定義 + **membership `alpha ∈ CF(W,V)`** — 今 session の `W2/W1_subgroupOf_le_ker_comp_wProj1/2` で直接出る(W₁ 上 ω_0j=1⟹(1−ω_0j)=0、W₂ 上同様)。(b) 線形独立 — Fourier infra あり: `sum_inner_irreducibleCharacter_smul` (CharacterCompleteness:600) + `irreducibleCharacter_inner` (直交性)。`a_ij = ⟨∑a_kl α_kl, ω_ij⟩`。
+- **🔴 インフラ gap**: `dim CF(W,V) = |V| = (w₁−1)(w₂−1)`。repo/mathlib に `finrank SupportedClassFunctions`/`finrank supportedSubmodule` の直接 API **無し** (grep 0)。`supportedSubmodule (supportInSubgroup V W)` の次元 = (W abelian ⟹ class=点 ⟹) `|V|` を新規に建てる要 (`finrank ClassFunction = |ConjClasses|` は CharacterCompleteness:557 にあるが supported 版は要構築)。`|V| = |W|−w₁−w₂+1 = (w₁−1)(w₂−1)`。
+- **🔴 設計判断**: α の indexing。character-group `↥W1'→*ℂˣ × ↥W2'→*ℂˣ` (自然、命名軽) vs `Fin w₁×Fin w₂` (Peterfalvi 準拠)。**(3.5) σ-construction は明示 index `i,j` の組合せ論 (A_ij 3-元集合, case I/II) を使う** ⟹ Fin-indexing が (3.5) で要る公算大 (W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k` で橋渡し)。この選択は (3.4)/(3.5) 全体の foundation を決める。
+
+⟹ **stop checkpoint**: (3.3) 完成は綺麗な milestone。(3.4) は「設計判断 (indexing) + API gap (CF(W,V) 次元)」の領域で、直後が hard core (3.5)。loop を止めユーザに選択肢提示 (2026-06-08 session 9 末)。
 2. **(3.4) α_ij basis** of CF(W,V), V=W−(W₁∪W₂)。α_ij=(1−ω_i0)(1−ω_0j)、dim=(w₁−1)(w₂−1)。線形独立 + 次元一致。
 3. **(3.5) χ_ij 直交族 [HARD]**。(3.5.1) inner-product relations → (3.5.2) |A₁₁∩A₁₂|=1 → (3.5.4) ∩A_i1 → (3.5.5) decomposition。w₁≥5 仮定、A_ij=3 元 ±Irr 集合の case I/II 排除。abstract combinatorial lemma に切り出すと再利用しやすい。
 4. **(3.2) σ-isometry** assembly ((3.5)+(1.3)→(3.2.a-d))。
