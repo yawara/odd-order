@@ -3303,6 +3303,17 @@ theorem eq_one_of_fixedPointFree_invariant {Z : Type*} [Group Z] [Finite Z]
     _ = f z₀ * (f z₀)⁻¹ := by rw [hinv]
     _ = 1 := mul_inv_cancel₀ (hne z₀)
 
+/-- A subgroup contained in a **prime-order** subgroup is either trivial or the whole subgroup.
+
+Group-theoretic core of the math-case (A)/(B) dichotomy of Peterfalvi (6.8): with `|W₂|` prime
+and `Z(H) ⊓ W₂ ≤ W₂`, the intersection is `⊥` (case A, `Z(H) ∩ W₂ = 1`) or `W₂` (case B, forcing
+`W₂ ⊆ Z(H)`). -/
+theorem eq_bot_or_eq_of_le_of_card_prime {Γ : Type*} [Group Γ] {K W : Subgroup Γ}
+    [Finite W] (hle : K ≤ W) (hp : (Nat.card W).Prime) : K = ⊥ ∨ K = W := by
+  rcases (Nat.dvd_prime hp).mp (Subgroup.card_dvd_of_le hle) with h1 | hcard
+  · exact Or.inl (Subgroup.eq_bot_of_card_eq _ h1)
+  · exact Or.inr (Subgroup.eq_of_le_of_card_ge hle hcard.ge)
+
 /-- **(T8.11p0) natural degree witnesses for one X-adjoin member family.**
 
 This packages the positive natural degree of the new character, the anchor, and every member of a
@@ -3989,6 +4000,62 @@ theorem centralCommutator_ne_bot (hyp : SibleyDadeHypothesis G L H)
   intro hbot
   apply hkey
   rw [← hyp.centralCommutator_subgroupOf_eq, hbot, Subgroup.bot_subgroupOf]
+
+/-- **(6.8) case (B) centrality** (Peterfalvi (6.8), case (B): *"`1 ≠ W₂ ⊆ Z(H)`"*, mmd 04.8 L154).
+
+In the CertainType branch `cert.W2 ≤ K = H` has prime order (`cert.W2` is cyclic of prime order
+`w₂`), so the math-case split on `Z(H) ⊓ W₂` is a dichotomy (`eq_bot_or_eq_of_le_of_card_prime`):
+either `Z(H) ⊓ W₂ = 1` (case A, handled at the central `Z = Z(H) ∩ H'`) or `W₂ ⊆ Z(H)` (case B).
+This lemma extracts the case-(B) hypothesis `hB : Z(H) ⊓ W₂ ≠ 1` into the centrality
+`W₂.subgroupOf H ≤ Z(↥H)` — the (6.6) / [Is] Cor 2.30 bound enabler at `Z = W₂`, the analogue of
+`centralCommutator_subgroupOf_le_center`. -/
+theorem W2_subgroupOf_le_center_of_caseB (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hprime : (Nat.card cert.W2).Prime)
+    (hB : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H ≠ ⊥) :
+    cert.W2.subgroupOf H ≤ Subgroup.center ↥H := by
+  have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
+  haveI : Finite ↥H := Subtype.finite
+  haveI : Finite (cert.W2.subgroupOf H) := Subtype.finite
+  have hcard : Nat.card (cert.W2.subgroupOf H) = Nat.card cert.W2 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
+  have hpsub : (Nat.card (cert.W2.subgroupOf H)).Prime := by rw [hcard]; exact hprime
+  rcases eq_bot_or_eq_of_le_of_card_prime inf_le_right hpsub with h | h
+  · exact absurd h hB
+  · exact le_of_eq_of_le h.symm inf_le_left
+
+/-- **(c2)+math-(A) fixed-point-freeness on `Zc = Z(H) ∩ H'`** (Peterfalvi (6.8), case (A) in the
+CertainType branch, i.e. `Z(H) ⊓ W₂ = 1`).  `W₁` acts fixed-point-freely on `Zc`: for `w ∈ W₁^#`,
+`C_L(w) ⊓ Zc = 1`.  Indeed `C_L(w) ⊓ H = W₂` (`cert.centralizer_W2`) and `Zc ≤ H ⊓ Z(H).map`, so
+`C_L(w) ⊓ Zc ≤ W₂ ⊓ (Z(H)).map = 1` (the lifted math-(A) hypothesis).  This is the `hZfpf` input
+that `isIrreducibleCharacter_of_mem_Xset_caseA` (and the CB3 FPF generalization) needs at `Z = Zc`,
+the (c2) analogue of the Frobenius fixed-point-free property. -/
+theorem centralizer_inf_centralCommutator_eq_bot_of_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {w : ↥L} (hw : w ∈ hyp.W1) (hw1 : w ≠ 1) :
+    Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator = ⊥ := by
+  haveI := hyp.H_normal
+  have hle : cert.W2 ≤ H := cert.W2_le_K.trans_eq hK
+  -- `C_L(w) ⊓ H = W₂`
+  have hCW2 : Subgroup.centralizer ({w} : Set ↥L) ⊓ H = cert.W2 := by
+    have h := cert.centralizer_W2 w (hW1.symm ▸ hw) hw1
+    rwa [hK] at h
+  -- lift the math-(A) hypothesis from `↥H` to `↥L`: `(Z(H)).map ⊓ W₂ = ⊥`
+  have hAmap : (Subgroup.center ↥H).map H.subtype ⊓ cert.W2 = ⊥ := by
+    have h1 := congrArg (Subgroup.map H.subtype) hA
+    rwa [Subgroup.map_inf _ _ H.subtype H.subtype_injective,
+      Subgroup.map_subgroupOf_eq_of_le hle, Subgroup.map_bot] at h1
+  have hccZ : hyp.centralCommutator ≤ (Subgroup.center ↥H).map H.subtype := by
+    simp only [centralCommutator]; exact inf_le_left
+  rw [← le_bot_iff]
+  calc Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator
+      ≤ (Subgroup.centralizer ({w} : Set ↥L) ⊓ H) ⊓ (Subgroup.center ↥H).map H.subtype :=
+        le_inf (le_inf inf_le_left (inf_le_right.trans hyp.centralCommutator_le))
+          (inf_le_right.trans hccZ)
+    _ = cert.W2 ⊓ (Subgroup.center ↥H).map H.subtype := by rw [hCW2]
+    _ = ⊥ := by rw [inf_comm]; exact hAmap
 
 /-- **(6.7)-wiring step (c): the centralizer in `↥L` of a nontrivial `z ∈ Z = Z(H) ∩ H′` is `H`.**
 `z ∈ Z(H)` gives `H ≤ C_L(z)`; `z ∈ H^#` with `L` Frobenius (kernel `H`) gives `C_L(z) ≤ H`
@@ -5192,6 +5259,28 @@ theorem isIrreducibleCharacter_of_mem_Xset_caseA (hyp : SibleyDadeHypothesis G L
   have hinertia := hyp.inertia_eq_H_of_c2_caseA hZH hZcentral hZnorm hZfpf hZker
   rw [hχeq]
   exact isIrreducibleCharacter_induce_of_inertia_eq θ hinertia
+
+/-- **(c2)+math-(A) `X ⊆ Irr L`** (Peterfalvi (6.8.1) in the CertainType branch, math-case A).
+Every `χ ∈ X = S − S(Zc)` is irreducible at the central `Zc = Z(H) ∩ H'`.  This is the (c2)
+analogue of `isIrreducibleCharacter_of_mem_Xset_of_frobenius`: it discharges the four hypotheses of
+the FPF-generic `isIrreducibleCharacter_of_mem_Xset_caseA` at `Z = Zc` — centrality
+(`centralCommutator_subgroupOf_le_center`), normality (`Zc ◁ L`, so every `w` normalizes it), and
+fixed-point-freeness (`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`, from the math-(A)
+hypothesis `hA : Z(H) ⊓ W₂ = 1`). -/
+theorem isIrreducibleCharacter_of_mem_Xset_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {χ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset hyp.centralCommutator) :
+    letI : H.Normal := hyp.H_normal
+    IsIrreducibleCharacter χ := by
+  haveI := hyp.H_normal
+  exact hyp.isIrreducibleCharacter_of_mem_Xset_caseA hyp.centralCommutator_le
+    hyp.centralCommutator_subgroupOf_le_center
+    (fun w _ => by
+      rw [Subgroup.normalizer_eq_top_iff.mpr hyp.centralCommutator_normal]; exact Subgroup.mem_top w)
+    (fun w hw hw1 => hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA hw hw1)
+    hχX
 
 /-- **Peterfalvi (6.6) `X`-characterization** (mmd 04.8 L74-76).  For a normal `Z ≤ H` such that
 every member of `X = S − S(Z)` is irreducible (the (6.8) Frobenius/case-A input `hX`), `X` is
@@ -9015,6 +9104,44 @@ a supported `Y`-combination (see `notes/peterfalvi/s08_6_8_blocker_central_Z.md`
 #2, and the `coherentUnion_of_glued_withDiagonal` docstring).  Here `D` carries those cross-diagonals
 with `hDτ : ∀ d ∈ D, ν d = τ d` (the (6.8.1) `b ≡ 0` conclusion
 `(χ₁ − a·η₁)^τ = χ₁^{τ₂} − a·η₁^{τ₁}`), and `hgen` is the satisfiable generation including `D`. -/
+noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_general
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset hyp.centralCommutator, ν x = cX.extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = cY.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    cX cY ν hagreeX hagreeY
+    (inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
+    hmixed D hDτ hgen
+
+/-- L3 outer shell at the fixed witnesses (specialization of
+`coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`). -/
 noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
@@ -9037,19 +9164,10 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_
           OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
             (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
-      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
-  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
-    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
-      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
-    exact Set.disjoint_of_subset_right hYsub
-      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
-  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_general hF
     (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
-    hyp.coherentYset ν hagreeX hagreeY
-    (inner_eq_zero_of_mem_span_of_disjoint_irreducible
-      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
-      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
-    hmixed D hDτ hgen
+    hyp.coherentYset ν hagreeX hagreeY hmixed D hDτ hgen
 
 /-- **Peterfalvi (6.8.1) image orthogonality `himg_ortho` via (4.1)** (Frobenius case, mmd 04.8 L166).
 `X(Zc)^{τ₂} ⊥ Y^{τ₁}`: for `χ ∈ X(Zc)`, `η ∈ Y`, the coherent images are orthogonal,
@@ -9065,20 +9183,20 @@ Pick distinct references `χ' ≠ χ` in `X(Zc)` (`2 ≤ |X(Zc)|`, from `two_le_
 the difference-orthogonality `inner_extension_eq_inner_of_supported` (`= 0` by `X ⊥ Y`) and degree-`0`
 `extension_apply_one_eq_zero_of_supported` discharge `hdiff`/`hα1`/`hγδ1`.  The conclusion `⟨α,γ⟩ = 0`
 gives the claim by conjugate symmetry. -/
-theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    (hHnonab : _root_.commutator ↥H ≠ ⊥)
-    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
     {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
-    ClassFunction.inner
-      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ)
-      (hyp.coherentYset.extension η) = 0 := by
+    ClassFunction.inner (cX.extension χ) (cY.extension η) = 0 := by
   classical
   haveI : (hyp.centralCommutator).Normal := hyp.centralCommutator_normal
-  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
-  set hYc := hyp.coherentYset with hYc_def
+  set hXc := cX with hXc_def
+  set hYc := cY with hYc_def
   -- irreducibility of members
   have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
     fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
@@ -9096,8 +9214,7 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
     · rw [if_pos (Subtype.ext hpq), if_pos hpq]
     · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
   -- distinct references (n, m ≥ 2)
-  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty :=
-    hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty := ⟨χ, hχ⟩
   have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.xSet_finite_of_irreducible_X hXirr
   have hX2 : 2 ≤ (hyp.Xset hyp.centralCommutator).ncard :=
     le_trans (hyp.two_le_xBaseBlock_ncard hF hyp.centralCommutator_le hXne)
@@ -9182,6 +9299,23 @@ theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
     (by -- hγδ1
       rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj hXc hx_supp)
   rw [inner_conj_symm (hYc.extension η) (hXc.extension χ), hconcl.1, star_zero]
+
+/-- **Peterfalvi (6.8.1) `himg_ortho`** at the fixed Frobenius-case witnesses `τ₂ =
+`Xset_centralCommutator_isCoherent`, `τ₁ = coherentYset` (specialization of
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_general`). -/
+theorem inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset hyp.centralCommutator)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner
+      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ)
+      (hyp.coherentYset.extension η) = 0 :=
+  hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general hF
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hχ hη
 
 /-- **Span form of `himg_ortho`:** `⟨x^{τ₂}, η^{τ₁}⟩ = 0` for any `x ∈ ℤ[X(Zc)]` and `η ∈ Y`
 (by `ℤ`-linearity from the per-member
@@ -10331,28 +10465,30 @@ The orthogonality uses the constancy `inner_tau_scaledDiff_tau_Yset_diff_of_frob
 (`⟨v, (η − η₁)^τ⟩ = a`, so `⟨v, η^{τ₁}⟩ = ⟨v, η₁^{τ₁}⟩ + a = 0` for `η ≠ η₁`) and the norm
 `‖v‖² = 1 + a²` (`inner_self_tau_scaledDiff_of_frobenius`); the norm of `X` is
 `(1 + a²) − a² − a² + a² = 1`. -/
-theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
+theorem orthogonal_normOne_tau_scaledDiff_add_extension_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
-    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁)
       = -(a : ℂ)) :
     (∀ η ∈ hyp.Yset,
-        ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-          (hyp.coherentYset.extension η) = 0)
-      ∧ ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-          (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁) = 1
-      ∧ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+        ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁)
+          (cY.extension η) = 0)
+      ∧ ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁)
+          (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁) = 1
+      ∧ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁ ∈ ZIrr G := by
   classical
   set v := hyp.tau (χ₁ - a • η₁) with hv
   -- Y-image orthonormality: `⟨η^{τ₁}, η'^{τ₁}⟩ = ⟨η, η'⟩ = δ`.
   have hYon : ∀ η η', η ∈ hyp.Yset → η' ∈ hyp.Yset →
-      ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η')
+      ClassFunction.inner (cY.extension η) (cY.extension η')
         = if η = η' then (1 : ℂ) else 0 := by
     intro η η' hη hη'
-    rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
+    rw [cY.extension_inner_eq η η' (Submodule.subset_span hη)
       (Submodule.subset_span hη')]
     have h := irreducibleCharacter_inner_eq_ite
       (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
@@ -10360,15 +10496,15 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
     simpa using h
   -- `⟨v, η^{τ₁}⟩ = 0` for `η ≠ η₁` (constancy `⟨v, (η−η₁)^τ⟩ = a` plus `⟨v, η₁^{τ₁}⟩ = −a`).
   have hcoeff0 : ∀ η ∈ hyp.Yset, η ≠ η₁ →
-      ClassFunction.inner v (hyp.coherentYset.extension η) = 0 := by
+      ClassFunction.inner v (cY.extension η) = 0 := by
     intro η hη hne
     have hconst := hyp.inner_tau_scaledDiff_tau_Yset_diff_of_frobenius hF hη₁ hη hne hχ₁ ha
     have hsuppd : (η - η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
       hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη₁)
         ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη₁).symm)
     have htaud : hyp.tau (η - η₁)
-        = hyp.coherentYset.extension η - hyp.coherentYset.extension η₁ := by
-      rw [← hyp.coherentYset.extends_on_supported (η - η₁)
+        = cY.extension η - cY.extension η₁ := by
+      rw [← cY.extends_on_supported (η - η₁)
         ⟨Submodule.sub_mem _ (Submodule.subset_span hη) (Submodule.subset_span hη₁), hsuppd⟩,
         map_sub]
     rw [htaud, ClassFunction.inner_sub_right, hgood] at hconst
@@ -10376,10 +10512,10 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
   -- norm and the conjugate of the good-case coefficient.
   have hvv : ClassFunction.inner v v = 1 + (a : ℂ) ^ 2 :=
     hyp.inner_self_tau_scaledDiff_of_frobenius hF hη₁ hχ₁ ha
-  have he₁e₁ : ClassFunction.inner (hyp.coherentYset.extension η₁)
-      (hyp.coherentYset.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
-  have he₁v : ClassFunction.inner (hyp.coherentYset.extension η₁) v = -(a : ℂ) := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm v (hyp.coherentYset.extension η₁), hgood]
+  have he₁e₁ : ClassFunction.inner (cY.extension η₁)
+      (cY.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+  have he₁v : ClassFunction.inner (cY.extension η₁) v = -(a : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm v (cY.extension η₁), hgood]
     simp
   refine ⟨?_, ?_, ?_⟩
   · -- orthogonality `⟨X, η^{τ₁}⟩ = 0`.
@@ -10406,11 +10542,29 @@ theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
       rw [hv]
       exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
         hyp.dade hyp.hconj hsuppX hsrcZ
-    have he₁Z : hyp.coherentYset.extension η₁ ∈ ZIrr G :=
-      hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)
-    have haZ : (a : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+    have he₁Z : cY.extension η₁ ∈ ZIrr G :=
+      cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)
+    have haZ : (a : ℂ) • cY.extension η₁ ∈ ZIrr G := by
       rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem he₁Z a
     exact add_mem hvZ haZ
+
+/-- **(6.8.1) step-4 good-case `X`-structure** at the fixed witness `τ₁ = coherentYset`
+(specialization of `orthogonal_normOne_tau_scaledDiff_add_extension_general`). -/
+theorem orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+      = -(a : ℂ)) :
+    (∀ η ∈ hyp.Yset,
+        ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+          (hyp.coherentYset.extension η) = 0)
+      ∧ ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+          (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁) = 1
+      ∧ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G :=
+  hyp.orthogonal_normOne_tau_scaledDiff_add_extension_general hF hyp.coherentYset hη₁ hχ₁ ha hgood
 
 /-- **(6.8.1) `X`-difference isometry** (mmd 04.8 L176, the step-5 input).  For `η₁ ∈ Y`, an
 `X`-anchor `χ₁ ∈ X(Zc)` with `χ₁(1) = a·|W₁|`, and a second `X`-member `χ₂ ∈ X(Zc)`, `χ₂ ≠ χ₁`, of
@@ -10494,34 +10648,35 @@ and the isometry value `⟨(χ₁−aη₁)^τ, (χ₂−χ₁)^τ⟩ = −1`
 (`inner_tau_scaledDiff_tau_Xset_diff_of_frobenius`) close it.  Together with `‖X‖² = 1` and Bessel
 over the orthonormal `{χ₁^{τ₂}, χ₂^{τ₂}}`, this pins `X = χ₁^{τ₂}` (or `−χ₂^{τ₂}`, the `n = 2`
 edge). -/
-theorem inner_extension_Xset_sub_eq_neg_one_of_frobenius
+theorem inner_extension_Xset_sub_eq_neg_one_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    (hHnonab : _root_.commutator ↥H ≠ ⊥)
-    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
     (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁)
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hdeg2 : χ₂ 1 = χ₁ 1) :
-    ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-        ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₂)
-      - ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
-        ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁)
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁)
+        (cX.extension χ₂)
+      - ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁)
+        (cX.extension χ₁)
       = -1 := by
   classical
-  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
+  set hXc := cX with hXc_def
   set v := hyp.tau (χ₁ - a • η₁) with hv
   -- `⟨X, χ_j^{τ₂}⟩ = ⟨v, χ_j^{τ₂}⟩` (himg_ortho `η₁^{τ₁} ⊥ X^{τ₂}`).
   have hXv : ∀ χ ∈ hyp.Xset hyp.centralCommutator,
-      ClassFunction.inner (v + (a : ℂ) • hyp.coherentYset.extension η₁) (hXc.extension χ)
+      ClassFunction.inner (v + (a : ℂ) • cY.extension η₁) (hXc.extension χ)
         = ClassFunction.inner v (hXc.extension χ) := by
     intro χ hχ
-    have h := hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
-      hF hHnonab hp hp3 hHp hχ hη₁
+    have h := hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general hF cX cY hχ hη₁
     rw [← hXc_def] at h
     rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
       OddOrder.RepresentationTheory.inner_conj_symm (hXc.extension χ)
-        (hyp.coherentYset.extension η₁), h, star_zero, mul_zero, add_zero]
+        (cY.extension η₁), h, star_zero, mul_zero, add_zero]
   -- `(χ₂−χ₁)^τ = χ₂^{τ₂} − χ₁^{τ₂}` (X-coherence `extends_on_supported`).
   have hsuppX2 : (χ₂ - χ₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
@@ -10537,6 +10692,26 @@ theorem inner_extension_Xset_sub_eq_neg_one_of_frobenius
   rw [hXv χ₂ hχ₂, hXv χ₁ hχ₁]
   exact hiso
 
+/-- **(6.8.1) step-5 relation** at the fixed witnesses (specialization of
+`inner_extension_Xset_sub_eq_neg_one_general`). -/
+theorem inner_extension_Xset_sub_eq_neg_one_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hdeg2 : χ₂ 1 = χ₁ 1) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+        ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₂)
+      - ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁)
+        ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁)
+      = -1 :=
+  hyp.inner_extension_Xset_sub_eq_neg_one_general hF
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hη₁ hχ₁ hχ₂ hne ha hdeg2
+
 open scoped Classical in
 /-- **(6.8.1) step-5 dichotomy `X = χ₁^{τ₂} ∨ X = −χ₂^{τ₂}`** (mmd 04.8 L176).  In the good case
 `⟨(χ₁−aη₁)^τ, η₁^{τ₁}⟩ = −a`, the element `X := (χ₁−aη₁)^τ + a·η₁^{τ₁}` (norm `1`, `⊥ Y^{τ₁}`)
@@ -10548,28 +10723,28 @@ and Bessel `c₁² + c₂² ≤ ‖X‖² = 1` (`sum_sq_le_inner_self_re` over t
 forcing `(1,0)` or `(0,−1)`; `⟨X,χ₁^{τ₂}⟩=1` (resp. `⟨X,−χ₂^{τ₂}⟩=1`) with both norm `1` gives
 `X=χ₁^{τ₂}` (resp. `X=−χ₂^{τ₂}`) by positive-definiteness.  The `n=2` edge `X=−χ₂^{τ₂}` is
 resolved by relabelling (deferred); for `n≥3` a third anchor pins `X=χ₁^{τ₂}`. -/
-theorem extension_eq_or_eq_neg_of_frobenius
+theorem extension_eq_or_eq_neg_general
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    (hHnonab : _root_.commutator ↥H ≠ ⊥)
-    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
     (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁)
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hdeg2 : χ₂ 1 = χ₁ 1)
-    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁)
       = -(a : ℂ)) :
-    hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
-        = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
-      ∨ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
-        = -(hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₂
+    hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁ = cX.extension χ₁
+      ∨ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁ = -cX.extension χ₂
       := by
   classical
-  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
-  set X := hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁ with hX_def
+  set hXc := cX with hXc_def
+  set X := hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁ with hX_def
   -- good-case structure: `‖X‖² = 1`, `X ∈ ZIrr` (fold the unfolded `X` from the good-case lemma).
-  obtain ⟨_, hXnorm, hXZ⟩ := hyp.orthogonal_normOne_tau_scaledDiff_add_extension_of_frobenius
-    hF hη₁ hχ₁ ha hgood
+  obtain ⟨_, hXnorm, hXZ⟩ := hyp.orthogonal_normOne_tau_scaledDiff_add_extension_general
+    hF cY hη₁ hχ₁ ha hgood
   rw [← hX_def] at hXnorm hXZ
   -- `X`-image orthonormality, ZIrr membership, distinctness.
   have hX1Z : hXc.extension χ₁ ∈ ZIrr G := hXc.extension_mem_ZIrr χ₁ (Submodule.subset_span hχ₁)
@@ -10595,7 +10770,7 @@ theorem extension_eq_or_eq_neg_of_frobenius
   obtain ⟨c₁, hc₁⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int hXZ hX1Z
   obtain ⟨c₂, hc₂⟩ := OddOrder.RepresentationTheory.ClassFunction.inner_mem_ZIrr_int hXZ hX2Z
   -- the step-5 relation `c₂ − c₁ = −1`.
-  have hrel := hyp.inner_extension_Xset_sub_eq_neg_one_of_frobenius hF hHnonab hp hp3 hHp
+  have hrel := hyp.inner_extension_Xset_sub_eq_neg_one_general hF cX cY
     hη₁ hχ₁ hχ₂ hne ha hdeg2
   rw [← hXc_def, ← hX_def, hc₁, hc₂] at hrel
   have hrelℤ : c₂ - c₁ = -1 := by exact_mod_cast hrel
@@ -10652,6 +10827,27 @@ theorem extension_eq_or_eq_neg_of_frobenius
     refine heq X (hXc.extension χ₁) hXnorm hX1norm ?_
     rw [hc₁]; norm_num
 
+/-- **(6.8.1) step-5 dichotomy** at the fixed witnesses (specialization of
+`extension_eq_or_eq_neg_general`). -/
+theorem extension_eq_or_eq_neg_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hdeg2 : χ₂ 1 = χ₁ 1)
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.coherentYset.extension η₁)
+      = -(a : ℂ)) :
+    hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
+        = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
+      ∨ hyp.tau (χ₁ - a • η₁) + (a : ℂ) • hyp.coherentYset.extension η₁
+        = -(hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₂ :=
+  hyp.extension_eq_or_eq_neg_general hF
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hη₁ hχ₁ hχ₂ hne ha hdeg2 hgood
+
 open scoped Classical in
 /-- **(6.8.1) crux `hDτ` (`n ≥ 3` case)** (mmd 04.8 L176).  Given a third equal-degree `X`-anchor
 `χ₃` (distinct from `χ₁, χ₂`), the good-case crux holds:
@@ -10662,6 +10858,50 @@ disjunct is excluded by the step-5 relation for `χ₃` (`⟨X,χ₃^{τ₂}⟩ 
 `inner_extension_Xset_sub_eq_neg_one`): under `X = −χ₂^{τ₂}` both `⟨χ₂^{τ₂},χ₃^{τ₂}⟩` and
 `⟨χ₂^{τ₂},χ₁^{τ₂}⟩` vanish (distinct `X`-images), giving `0 = −1`.  Hence `X = χ₁^{τ₂}`, i.e. the
 crux.  (The `n = 2` case — no third anchor — needs the relabel of `χ₁^{τ₂}, χ₂^{τ₂}`, deferred.) -/
+theorem crux_of_third_anchor_general
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1)
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁)
+      = -(a : ℂ)) :
+    hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁ := by
+  classical
+  set hXc := cX with hXc_def
+  -- `X`-image orthonormality.
+  have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
+      ψ' ∈ hyp.Xset hyp.centralCommutator →
+      ClassFunction.inner (hXc.extension ψ) (hXc.extension ψ') = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    rw [hXc.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  rcases hyp.extension_eq_or_eq_neg_general hF cX cY hη₁ hχ₁ hχ₂ hne₂ ha hdeg2
+    hgood with h | h
+  · -- left disjunct `X = χ₁^{τ₂}` ⟹ the crux by `eq_sub_of_add_eq`.
+    rw [← hXc_def] at h
+    exact eq_sub_of_add_eq h
+  · -- right disjunct `X = −χ₂^{τ₂}` is excluded by the `χ₃` relation.
+    exfalso
+    rw [← hXc_def] at h
+    have hrel3 := hyp.inner_extension_Xset_sub_eq_neg_one_general hF cX cY
+      hη₁ hχ₁ hχ₃ hne₃₁ ha hdeg3
+    rw [← hXc_def, h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
+      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
+    norm_num at hrel3
+
+/-- **(6.8.1) crux (`n ≥ 3` case)** at the fixed witnesses (specialization of
+`crux_of_third_anchor_general`). -/
 theorem crux_of_third_anchor_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
@@ -10677,32 +10917,10 @@ theorem crux_of_third_anchor_of_frobenius
       = -(a : ℂ)) :
     hyp.tau (χ₁ - a • η₁)
       = (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension χ₁
-        - (a : ℂ) • hyp.coherentYset.extension η₁ := by
-  classical
-  set hXc := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hXc_def
-  -- `X`-image orthonormality.
-  have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
-      ψ' ∈ hyp.Xset hyp.centralCommutator →
-      ClassFunction.inner (hXc.extension ψ) (hXc.extension ψ') = if ψ = ψ' then (1 : ℂ) else 0 := by
-    intro ψ ψ' hψ hψ'
-    rw [hXc.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
-    have h := irreducibleCharacter_inner_eq_ite
-      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ⟩ : IrreducibleCharacter ↥L)
-      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ'⟩ : IrreducibleCharacter ↥L)
-    simpa using h
-  rcases hyp.extension_eq_or_eq_neg_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ hχ₂ hne₂ ha hdeg2
-    hgood with h | h
-  · -- left disjunct `X = χ₁^{τ₂}` ⟹ the crux by `eq_sub_of_add_eq`.
-    rw [← hXc_def] at h
-    exact eq_sub_of_add_eq h
-  · -- right disjunct `X = −χ₂^{τ₂}` is excluded by the `χ₃` relation.
-    exfalso
-    rw [← hXc_def] at h
-    have hrel3 := hyp.inner_extension_Xset_sub_eq_neg_one_of_frobenius hF hHnonab hp hp3 hHp
-      hη₁ hχ₁ hχ₃ hne₃₁ ha hdeg3
-    rw [← hXc_def, h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
-      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁, if_neg hne₂] at hrel3
-    norm_num at hrel3
+        - (a : ℂ) • hyp.coherentYset.extension η₁ :=
+  hyp.crux_of_third_anchor_general hF
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hη₁ hχ₁ hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂ ha hdeg2 hdeg3 hgood
 
 open scoped Classical in
 /-- For `m = |Y| ≥ 3` the step-4 edge case (`m = 2`) is impossible, so the good case
@@ -10850,27 +11068,323 @@ theorem hgen_withDiagonal_of_frobenius
   · exact Submodule.smul_mem _ s
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
-/-- **(6.8.1) generic capstone Frobenius branch (`m, n ≥ 3`):** `X(Zc) ∪ Y` is coherent.
+open scoped Classical in
+/-- **(6.8.1) `X`-difference isometry, degree-ratio form** (mmd 04.8 L176: the `n ≥ 3` exclusion uses
+`(χ₃ − d₃χ₁)^τ` for ANY third `X`-member `χ₃`, of any degree).  For `η₁ ∈ Y`, `χ₁ ∈ X(Zc)` with
+`χ₁(1) = a·|W₁|`, and a second member `χ₃ ∈ X(Zc)`, `χ₃ ≠ χ₁`, with degree ratio `d` (`χ₃(1) =
+d·χ₁(1)`):  `⟨(χ₁−aη₁)^τ, (χ₃−d·χ₁)^τ⟩ = −d`.  Generalizes
+`inner_tau_scaledDiff_tau_Xset_diff_of_frobenius` (the `d = 1` equal-degree case `= −1`); the
+supported diff `χ₃ − d·χ₁` is degree-`0` (`sMember_scaledDiffSupport_of_charValue_eq`), so the Dade
+isometry reduces to the source `⟨χ₁−aη₁, χ₃−d·χ₁⟩ = −d` (`X`-orthonormality + `X ⊥ Y`). -/
+theorem inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₃ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₃ ≠ χ₁)
+    {a d : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hd : χ₃ 1 = (d : ℂ) * χ₁ 1) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (hyp.tau (χ₃ - d • χ₁)) = -(d : ℂ) := by
+  classical
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  have hdegX : χ₁ 1 = (a : ℂ) * η₁ 1 := by rw [ha, hyp.Yset_apply_one hη₁]
+  have hsuppX : (χ₁ - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₁) (hyp.Yset_subset_S hη₁)
+      hdegX
+  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
+  have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj (S := ({χ₁ - a • η₁, χ₃ - d • χ₁} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+        rcases hs with rfl | rfl
+        · exact hsuppX
+        · exact hsuppX3)
+    (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
+      ψ' ∈ hyp.Xset hyp.centralCommutator →
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hXirr ψ hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hXirr ψ' hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hYXz : ∀ ψ ∈ hyp.Xset hyp.centralCommutator, ClassFunction.inner η₁ ψ = 0 := by
+    intro ψ hψ
+    rw [OddOrder.RepresentationTheory.inner_conj_symm ψ η₁,
+      inner_eq_zero_of_mem_span_of_disjoint_irreducible (fun φ hφ => hXirr φ hφ)
+        (fun φ hφ => hYirr φ hφ) hdisj ψ (Submodule.subset_span hψ) η₁ (Submodule.subset_span hη₁),
+      star_zero]
+  have e13 : ClassFunction.inner χ₁ χ₃ = 0 := by rw [hXon χ₁ χ₃ hχ₁ hχ₃, if_neg (Ne.symm hne)]
+  have e11 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hXon χ₁ χ₁ hχ₁ hχ₁, if_pos rfl]
+  have ey3 : ClassFunction.inner η₁ χ₃ = 0 := hYXz χ₃ hχ₃
+  have ey1 : ClassFunction.inner η₁ χ₁ = 0 := hYXz χ₁ hχ₁
+  rw [hiso, ← Nat.cast_smul_eq_nsmul ℂ a η₁, ← Nat.cast_smul_eq_nsmul ℂ d χ₁]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    e13, e11, ey3, ey1, star_natCast]
+  ring
 
-Given three distinct equal-degree `X(Zc)`-anchors `χ₁ ∈ xBaseBlock`, `χ₂, χ₃` (the `n ≥ 3`
-pinning) with `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y` and `|Y| ≥ 3` (the `m ≥ 3` good case), the union is
-coherent.  The `τ₃` glue `ν` is built internally (`exists_integralCharacterMap_glue_of_orthonormal`,
-`νX = τ₂`, `νY = τ₁`); its agreement discharges `hagreeX`/`hagreeY`, `hmixed` reduces to himg_ortho
-(`inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius`, both sides `0`), `hDτ` for
-`D = {χ₁ − a·η₁}` is the crux `crux_of_frobenius` (`ν(χ₁−aη₁) = χ₁^{τ₂} − a·η₁^{τ₁} = (χ₁−aη₁)^τ`),
-and `hgen` is `hgen_withDiagonal_of_frobenius`.  The `m = 2` / `n = 2` edge cases (relabel) are not
-covered. -/
-noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
+open scoped Classical in
+/-- **(6.8.1) step-5 relation, degree-ratio form.**  For the good-case element
+`X := (χ₁−aη₁)^τ + a·η₁^{τ₁}` and a third `X`-member `χ₃` of degree ratio `d` (`χ₃(1) = d·χ₁(1)`):
+`⟨X, χ₃^{τ₂}⟩ − d·⟨X, χ₁^{τ₂}⟩ = −d`.  himg_ortho (`η₁^{τ₁} ⊥ X^{τ₂}`) gives `⟨X,·⟩ = ⟨v,·⟩`; the
+`X`-coherence `(χ₃−d·χ₁)^τ = χ₃^{τ₂} − d·χ₁^{τ₂}` and the degree-ratio isometry value
+`⟨v, (χ₃−d·χ₁)^τ⟩ = −d` close it.  Generalizes `inner_extension_Xset_sub_eq_neg_one_general`
+(the `d = 1` case). -/
+theorem inner_extension_Xset_scaledSub_eq_neg_general
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₃ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₃ ≠ χ₁)
+    {a d : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) (hd : χ₃ 1 = (d : ℂ) * χ₁ 1) :
+    ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁) (cX.extension χ₃)
+      - (d : ℂ) * ClassFunction.inner (hyp.tau (χ₁ - a • η₁) + (a : ℂ) • cY.extension η₁)
+        (cX.extension χ₁) = -(d : ℂ) := by
+  classical
+  set v := hyp.tau (χ₁ - a • η₁) with hv
+  have hXv : ∀ χ ∈ hyp.Xset hyp.centralCommutator,
+      ClassFunction.inner (v + (a : ℂ) • cY.extension η₁) (cX.extension χ)
+        = ClassFunction.inner v (cX.extension χ) := by
+    intro χ hχ
+    have h := hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general hF cX cY hχ hη₁
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_conj_symm (cX.extension χ)
+        (cY.extension η₁), h, star_zero, mul_zero, add_zero]
+  have hsuppX3 : (χ₃ - d • χ₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₃) (hyp.Xset_subset_S hχ₁) hd
+  have hXcoh : hyp.tau (χ₃ - d • χ₁) = cX.extension χ₃ - (d : ℂ) • cX.extension χ₁ := by
+    have h := cX.extends_on_supported (χ₃ - d • χ₁)
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hχ₃)
+        (nsmul_mem (Submodule.subset_span hχ₁) d), hsuppX3⟩
+    rw [map_sub, map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ d (cX.extension χ₁)] at h
+    exact h.symm
+  have hiso := hyp.inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius hF hη₁ hχ₁ hχ₃ hne ha hd
+  rw [hXcoh, ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+    star_natCast] at hiso
+  rw [hXv χ₃ hχ₃, hXv χ₁ hχ₁]
+  exact hiso
+
+open scoped Classical in
+/-- **(6.8.1) crux, general witnesses + ANY third anchor (`|X(Zc)| ≥ 3`)** — closes the
+`|xBaseBlock| = 2 ∧ |X(Zc)| ≥ 3` gap that the equal-degree `crux_of_third_anchor_general` (which
+needs a *third equal-degree* anchor, i.e. `|xBaseBlock| ≥ 3`) cannot reach.  Given the good case
+`⟨(χ₁−aη₁)^τ, cY η₁⟩ = −a`, the dichotomy `X = cX χ₁ ∨ X = −cX χ₂` (equal-degree `χ₂`); the right
+disjunct is excluded by ANY third `X`-member `χ₃` (any degree) via the degree-ratio relation
+`⟨X, cX χ₃⟩ − d₃·⟨X, cX χ₁⟩ = −d₃` (`inner_extension_Xset_scaledSub_eq_neg_general`): under
+`X = −cX χ₂` both inner products vanish (distinct `X`-images), giving `0 = −d₃`, impossible since
+`d₃ > 0`.  Hence the crux `(χ₁−aη₁)^τ = cX χ₁ − a·cY η₁`. -/
+theorem crux_general_of_higher_anchor
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁) (hdeg2 : χ₂ 1 = χ₁ 1)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁) = -(a : ℂ)) :
+    hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁ := by
+  classical
+  have hχ₁X : χ₁ ∈ hyp.Xset hyp.centralCommutator := hyp.xBaseBlock_subset _ hχ₁base
+  obtain ⟨d, hdpos, hd⟩ :=
+    hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor hF hp hHp hχ₃ hχ₁base
+  have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
+      ψ' ∈ hyp.Xset hyp.centralCommutator →
+      ClassFunction.inner (cX.extension ψ) (cX.extension ψ') = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    rw [cX.extension_inner_eq ψ ψ' (Submodule.subset_span hψ) (Submodule.subset_span hψ')]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  rcases hyp.extension_eq_or_eq_neg_general hF cX cY hη₁ hχ₁X hχ₂ hne₂ ha hdeg2 hgood with h | h
+  · exact eq_sub_of_add_eq h
+  · exfalso
+    have hrel3 := hyp.inner_extension_Xset_scaledSub_eq_neg_general hF cX cY hη₁ hχ₁X hχ₃ hne₃₁ ha hd
+    rw [h, ClassFunction.inner_neg_left, ClassFunction.inner_neg_left,
+      hXon χ₂ χ₃ hχ₂ hχ₃, if_neg (Ne.symm hne₃₂), hXon χ₂ χ₁ hχ₂ hχ₁X, if_neg hne₂] at hrel3
+    have hd0 : (d : ℂ) = 0 := by linear_combination hrel3
+    rw [Nat.cast_eq_zero] at hd0
+    omega
+
+open scoped Classical in
+/-- **(6.8.1) E2: a `Y`-coherence witness in the good case** (the `m = 2` relabel, folded in).
+Produces a `Y`-coherence witness `cY` with `⟨(χ₁−aη₁)^τ, cY η₁⟩ = −a` — the `hgood` that the crux
+consumes.  Generic `|Y| ≥ 3`: `cY = coherentYset` (good branch of the step-4 dichotomy
+`coeff_eq_neg_or_edge_of_frobenius`).  Edge `|Y| = 2`: `coherentYset` may give the bad value `0`;
+then `Y = {η₁, η₂}` and the sign-swapped witness `cY'` (`coherentEqualDegree_swap_neg`,
+`η₁ ↦ −η₂^{τ₁}`) gives `⟨v, cY' η₁⟩ = −⟨v, coherentYset η₂⟩ = −a`, since
+`⟨v, coherentYset η₂⟩ = ⟨v, coherentYset η₁⟩ + a = 0 + a = a` (`inner_tau_scaledDiff_tau_Yset_diff`
++ `extends_on_supported`). -/
+theorem exists_Ycoherence_hgood_of_frobenius
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
     (hHnonab : _root_.commutator ↥H ≠ ⊥)
     {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
-    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
-    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
-    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    {a : ℕ} (ha_pos : 0 < a) (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ)) :
+    ∃ cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁) = -(a : ℂ) := by
+  classical
+  rcases hyp.coeff_eq_neg_or_edge_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁ ha_pos ha with
+    hgood | ⟨hm2, hbad⟩
+  · exact ⟨hyp.coherentYset, hgood⟩
+  · -- edge `|Y| = 2`: relabel.
+    obtain ⟨η₂, hη₂Y, hη₂ne⟩ := Set.exists_ne_of_one_lt_ncard (by omega : 1 < hyp.Yset.ncard) η₁
+    have hpairsub : ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.Yset := by
+      intro x hx; rcases hx with rfl | rfl
+      · exact hη₁
+      · exact hη₂Y
+    have hYeq : hyp.Yset = ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) :=
+      (Set.eq_of_subset_of_ncard_le hpairsub (hm2.le.trans_eq (Set.ncard_pair hη₂ne.symm).symm)
+        hyp.Yset_finite).symm
+    -- orthonormality of `η₁, η₂` (distinct irreducible `Y`-members).
+    have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+        ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+      intro φ ψ hφ hψ
+      have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+        (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at h
+      rw [h]
+      by_cases hpq : φ = ψ
+      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+    have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
+    have horth : ClassFunction.inner η₁ η₂ = 0 := by
+      rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
+    have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
+    have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+    have hdeg : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
+      (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
+    have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
+      rw [hyp.Yset_apply_one hη₁]; exact_mod_cast Nat.card_pos.ne'
+    have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+    have hsupp : (η₂ - η₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη₂Y) (hyp.Yset_subset_S hη₁) hdeg
+    -- transport `coherentYset` to the pair, build the swapped witness, transport back.
+    have hcY0map : (hYeq ▸ hyp.coherentYset).extension = hyp.coherentYset.extension :=
+      OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq hyp.coherentYset
+    obtain ⟨cY', hcY'1, _⟩ := OddOrder.Peterfalvi.S07.coherentEqualDegree_swap_neg
+      (hYeq ▸ hyp.coherentYset) horth hn1 hn2 hdeg hdeg0 h1A hsupp
+    refine ⟨hYeq.symm ▸ cY', ?_⟩
+    -- `⟨v, η₂^{τ₁}⟩ = a` from the constancy + the bad value `⟨v, η₁^{τ₁}⟩ = 0`.
+    have hconst := hyp.inner_tau_scaledDiff_tau_Yset_diff_of_frobenius hF hη₁ hη₂Y hη₂ne hχ₁ ha
+    have htaud : hyp.tau (η₂ - η₁)
+        = hyp.coherentYset.extension η₂ - hyp.coherentYset.extension η₁ := by
+      rw [← hyp.coherentYset.extends_on_supported (η₂ - η₁)
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hη₂Y) (Submodule.subset_span hη₁), hsupp⟩,
+        map_sub]
+    rw [htaud, ClassFunction.inner_sub_right, hbad, sub_zero] at hconst
+    -- assemble: `⟨v, (cY' η₁)⟩ = −⟨v, coherentYset η₂⟩ = −a`.
+    rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq.symm cY', hcY'1, hcY0map,
+      ClassFunction.inner_neg_right, hconst]
+
+open scoped Classical in
+/-- **(6.8.1) E3: `X`-coherence witness + crux in the `|X(Zc)| = 2` edge** (the `n = 2` relabel).
+When `X(Zc) = {χ₁, χ₂}` (a conjugate pair, equal degree), the step-5 dichotomy
+`X = cX₀ χ₁ ∨ X = −cX₀ χ₂` (`extension_eq_or_eq_neg_general` at the fixed `cX₀`) has no third anchor
+to exclude the right disjunct; instead, the right disjunct is *absorbed* by the sign-swapped witness
+`cX'` (`coherentEqualDegree_swap_neg`, `χ₁ ↦ −χ₂^{τ₂}`, valid because `|X| = 2` is the whole set):
+`cX' χ₁ = −cX₀ χ₂ = X`, giving the crux `(χ₁−aη₁)^τ = cX' χ₁ − a·cY η₁`.  Left disjunct uses `cX = cX₀`
+directly.  Produces a witness + crux for *some* `cX`. -/
+theorem exists_Xcoherence_crux_of_card_two_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Xset hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne : χ₂ ≠ χ₁) (hdeg2 : χ₂ 1 = χ₁ 1)
+    (hXeq : hyp.Xset hyp.centralCommutator = ({χ₁, χ₂} : Set (ClassFunction ↥L ℂ)))
     {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
-    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    (hgood : ClassFunction.inner (hyp.tau (χ₁ - a • η₁)) (cY.extension η₁) = -(a : ℂ)) :
+    ∃ cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁ := by
+  classical
+  set cX0 := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp with hcX0def
+  rcases hyp.extension_eq_or_eq_neg_general hF cX0 cY hη₁ hχ₁ hχ₂ hne ha hdeg2 hgood with h | h
+  · -- left disjunct `X = cX₀ χ₁` ⟹ crux for `cX₀`.
+    exact ⟨cX0, eq_sub_of_add_eq h⟩
+  · -- right disjunct `X = −cX₀ χ₂` ⟹ relabel `cX' χ₁ = −cX₀ χ₂`.
+    have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+        ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+      intro φ ψ hφ hψ
+      have hh := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+        (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at hh
+      rw [hh]
+      by_cases hpq : φ = ψ
+      · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+      · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+    have hX1irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₁
+    have hX2irr := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχ₂
+    have horth : ClassFunction.inner χ₁ χ₂ = 0 := by
+      rw [hinner χ₁ χ₂ hX1irr hX2irr, if_neg (Ne.symm hne)]
+    have hn1 : ClassFunction.inner χ₁ χ₁ = 1 := by rw [hinner χ₁ χ₁ hX1irr hX1irr, if_pos rfl]
+    have hn2 : ClassFunction.inner χ₂ χ₂ = 1 := by rw [hinner χ₂ χ₂ hX2irr hX2irr, if_pos rfl]
+    have hdeg0 : (χ₁ : ↥L → ℂ) 1 ≠ 0 := by
+      obtain ⟨d, hdpos, hdeq⟩ :=
+        irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ₁, hX1irr⟩ : IrreducibleCharacter ↥L)
+      simp only [IrreducibleCharacter.coe_mk] at hdeq
+      rw [hdeq]; exact_mod_cast hdpos.ne'
+    have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+    have hsupp : (χ₂ - χ₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.sMember_diffSupport_of_charValue_eq (hyp.Xset_subset_S hχ₂) (hyp.Xset_subset_S hχ₁) hdeg2
+    have hcX0map : (hXeq ▸ cX0).extension = cX0.extension :=
+      OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hXeq cX0
+    obtain ⟨cX', hcX'1, _⟩ := OddOrder.Peterfalvi.S07.coherentEqualDegree_swap_neg
+      (hXeq ▸ cX0) horth hn1 hn2 hdeg2 hdeg0 h1A hsupp
+    refine ⟨hXeq.symm ▸ cX', ?_⟩
+    rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hXeq.symm cX', hcX'1, hcX0map]
+    exact eq_sub_of_add_eq h
+
+/-- **(6.8.1) capstone `X(Zc) ∪ Y` coherence from a witness-level crux** (general form).  Given
+arbitrary coherence witnesses `cX` (for `X(Zc)`), `cY` (for `Y`), a base-block anchor `χ₁` with
+`χ₁(1) = a·|W₁|`, an `η₁ ∈ Y`, and the **crux** `(χ₁−aη₁)^τ = cX χ₁ − a·cY η₁` (whichever way it is
+established — the generic `n,m ≥ 3` argument or the `m=2`/`n=2` relabel), the union `X(Zc) ∪ Y` is
+coherent.  `ν` is the `τ₃` glue of `cX`/`cY`; `hmixed = himg_ortho_general`, `hDτ = hcrux`,
+`hgen = hgen_withDiagonal`.  This is the common assembly shared by the generic case and both edge
+cases (which differ only in how `hcrux` is produced for the chosen witnesses). -/
+noncomputable def coherentXunionYset_centralCommutator_diagonal_general
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hcrux : hyp.tau (χ₁ - a • η₁) = cX.extension χ₁ - (a : ℂ) • cY.extension η₁) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
@@ -10903,23 +11417,46 @@ noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
       (hyp.Xset_finite hyp.centralCommutator) hyp.Yset_finite
       (fun x hx x' hx' => hinner x x' (hXirr x hx) (hXirr x' hx'))
       (fun y hy y' hy' => hinner y y' (hYirr y hy) (hYirr y' hy')) hXY
-      ((hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp).extension)
-      hyp.coherentYset.extension
-  refine hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
-    hF hHnonab hp hp3 hHp hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_)
+      cX.extension cY.extension
+  refine hyp.coherentXunionYset_centralCommutator_of_glued_withDiagonal_general
+    hF cX cY hglue.choose hglue.choose_spec.1 hglue.choose_spec.2 (fun x hx y hy => ?_)
     {χ₁ - a • η₁} (fun d hd => ?_)
     (hyp.hgen_withDiagonal_of_frobenius hF hp hHp hη₁ hχ₁base ha)
   · -- `hmixed`: `⟨ν x, ν y⟩ = ⟨x, y⟩` (both `0`).
     rw [hglue.choose_spec.1 x hx, hglue.choose_spec.2 y hy,
-      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_of_frobenius
-        hF hHnonab hp hp3 hHp hx hy, hXY x hx y hy]
+      hyp.inner_extension_Xset_centralCommutator_Yset_eq_zero_general hF cX cY hx hy, hXY x hx y hy]
   · -- `hDτ`: `ν(χ₁−aη₁) = (χ₁−aη₁)^τ` = the crux.
     rw [Set.mem_singleton_iff] at hd
     subst hd
     rw [map_sub, map_nsmul, hglue.choose_spec.1 χ₁ hχ₁X, hglue.choose_spec.2 η₁ hη₁,
-      ← Nat.cast_smul_eq_nsmul ℂ a (hyp.coherentYset.extension η₁)]
-    exact (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁X hχ₂ hne₂ hχ₃ hne₃₁ hne₃₂
-      ha hdeg2 hdeg3 hm3).symm
+      ← Nat.cast_smul_eq_nsmul ℂ a (cY.extension η₁)]
+    exact hcrux.symm
+
+/-- **(6.8.1) generic capstone Frobenius branch (`m, n ≥ 3`):** `X(Zc) ∪ Y` is coherent.
+
+Given three distinct equal-degree `X(Zc)`-anchors `χ₁ ∈ xBaseBlock`, `χ₂, χ₃` (the `n ≥ 3`
+pinning) with `χ₁(1) = a·|W₁|`, an `η₁ ∈ Y` and `|Y| ≥ 3` (the `m ≥ 3` good case), the union is
+coherent.  Delegates to `coherentXunionYset_centralCommutator_diagonal_general` at the fixed
+witnesses, with `hcrux = crux_of_frobenius`.  The `m = 2` / `n = 2` edge cases (relabel) are not
+covered. -/
+noncomputable def coherentXunionYset_centralCommutator_diagonal_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₁ χ₂ χ₃ : ClassFunction ↥L ℂ} (hχ₁base : χ₁ ∈ hyp.xBaseBlock hyp.centralCommutator)
+    (hχ₂ : χ₂ ∈ hyp.Xset hyp.centralCommutator) (hne₂ : χ₂ ≠ χ₁)
+    (hχ₃ : χ₃ ∈ hyp.Xset hyp.centralCommutator) (hne₃₁ : χ₃ ≠ χ₁) (hne₃₂ : χ₃ ≠ χ₂)
+    {a : ℕ} (ha : χ₁ 1 = (a : ℂ) * (Nat.card hyp.W1 : ℂ))
+    (hdeg2 : χ₂ 1 = χ₁ 1) (hdeg3 : χ₃ 1 = χ₁ 1) (hm3 : 3 ≤ hyp.Yset.ncard) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.coherentXunionYset_centralCommutator_diagonal_general hF hp hHp
+    (hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp)
+    hyp.coherentYset hη₁ hχ₁base ha
+    (hyp.crux_of_frobenius hF hHnonab hp hp3 hHp hη₁ (hyp.xBaseBlock_subset _ hχ₁base) hχ₂ hne₂
+      hχ₃ hne₃₁ hne₃₂ ha hdeg2 hdeg3 hm3)
 
 /-- **(6.8) capstone, case (A) (Frobenius, `m, n ≥ 3` with given anchors): `S` is coherent.**
 Combines the generic capstone Frobenius branch
@@ -11010,6 +11547,104 @@ theorem nonempty_coherent_S_caseA_of_card_of_frobenius
   exact hyp.nonempty_coherent_S_caseA_of_anchors_of_frobenius hF hHnonab hp hp3 hHp hη₁
     hχ₁base hχ₂X hne12.symm hχ₃X hne13.symm hne23.symm ha
     (hdegeq χ₂ hχ₂base) (hdegeq χ₃ hχ₃base) h3Y
+
+open scoped Classical in
+/-- **(6.8) capstone, case (A) (Frobenius): `S` is coherent — UNCONDITIONAL** (no `3 ≤` cardinality
+hypotheses; the `m = 2` / `n = 2` edge relabels are handled internally).  This is the full case-(A)
+result: only `2 ≤ |xBaseBlock|` (`two_le_xBaseBlock_ncard`) and `2 ≤ |Y|` (`two_le_Yset_ncard`),
+both unconditionally available, are used.  E2 (`exists_Ycoherence_hgood_of_frobenius`) supplies the
+`Y`-witness + good case (the `m = 2` relabel).  The `X`-side splits on `|X(Zc)|`: `≥ 3` uses the
+degree-ratio crux E1 (`crux_general_of_higher_anchor`) at the fixed `X`-witness; `= 2` uses the
+relabel crux E3 (`exists_Xcoherence_crux_of_card_two_of_frobenius`).  Either way the crux feeds the
+shared assembly `coherentXunionYset_centralCommutator_diagonal_general`, giving `X(Zc) ∪ Y` coherent,
+and the (6.8.3) extension `false_of_coherentXunionYset_of_not_coherentS` lifts it to `S`. -/
+theorem nonempty_coherent_S_caseA_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  by_contra hncoh
+  have hXirr : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ
+  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty :=
+    hyp.Xset_centralCommutator_nonempty hF hHnonab
+  have hXfin : (hyp.Xset hyp.centralCommutator).Finite := hyp.Xset_finite hyp.centralCommutator
+  have h2X : 2 ≤ (hyp.xBaseBlock hyp.centralCommutator).ncard :=
+    hyp.two_le_xBaseBlock_ncard hF hyp.centralCommutator_le hXne
+  -- two distinct base-block anchors.
+  obtain ⟨χ₁, hχ₁base, χ₂, hχ₂base, hne⟩ : ∃ a ∈ hyp.xBaseBlock hyp.centralCommutator,
+      ∃ b ∈ hyp.xBaseBlock hyp.centralCommutator, b ≠ a := by
+    obtain ⟨a, ha⟩ : (hyp.xBaseBlock hyp.centralCommutator).Nonempty :=
+      Set.nonempty_of_ncard_ne_zero (by omega)
+    obtain ⟨b, hb, hba⟩ := Set.exists_ne_of_one_lt_ncard
+      (s := hyp.xBaseBlock hyp.centralCommutator) (by omega) a
+    exact ⟨a, ha, b, hb, hba⟩
+  have hχ₁X := hyp.xBaseBlock_subset _ hχ₁base
+  have hχ₂X := hyp.xBaseBlock_subset _ hχ₂base
+  -- `η₁ ∈ Y` (degree `|W₁|`) and the degree ratio `a`.
+  obtain ⟨η₁, hη₁⟩ := hyp.Yset_nonempty
+  obtain ⟨a, ha_pos, ha⟩ := hyp.sMember_charValue_one_eq_mul_anchor (hyp.Xset_subset_S hχ₁X)
+    (hyp.Yset_apply_one hη₁)
+  rw [hyp.Yset_apply_one hη₁] at ha
+  -- base block equal-degree.
+  have hdegeq : ∀ χ' ∈ hyp.xBaseBlock hyp.centralCommutator, χ' 1 = χ₁ 1 := by
+    intro χ' hχ'
+    have hre := hyp.xBaseBlock_degree_re_eq hχ' hχ₁base
+    rw [OddOrder.Peterfalvi.S03.characterDegree_def,
+      OddOrder.Peterfalvi.S03.characterDegree_def] at hre
+    obtain ⟨d', _, hd'⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ', hXirr χ' (hyp.xBaseBlock_subset _ hχ')⟩ : IrreducibleCharacter ↥L)
+    obtain ⟨d₁, _, hd₁⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨χ₁, hXirr χ₁ hχ₁X⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hd' hd₁
+    rw [hd', hd₁] at hre ⊢
+    exact_mod_cast hre
+  have hdeg2 : χ₂ 1 = χ₁ 1 := hdegeq χ₂ hχ₂base
+  -- E2: the `Y`-witness with the good case (m = 2 relabel folded in).
+  obtain ⟨cY, hgood⟩ :=
+    hyp.exists_Ycoherence_hgood_of_frobenius hF hHnonab hp hp3 hHp hη₁ hχ₁X ha_pos ha
+  -- build `X(Zc) ∪ Y` coherent, splitting on `|X(Zc)|`.
+  have hXYcoh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    by_cases h3X : 3 ≤ (hyp.Xset hyp.centralCommutator).ncard
+    · -- `|X(Zc)| ≥ 3`: a third `X`-member of ANY degree (E1, degree-ratio exclusion).
+      have hex : ∃ c ∈ hyp.Xset hyp.centralCommutator, c ≠ χ₁ ∧ c ≠ χ₂ := by
+        have hpair : ({χ₁, χ₂} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.Xset hyp.centralCommutator := by
+          intro x hx; rcases hx with rfl | rfl
+          · exact hχ₁X
+          · exact hχ₂X
+        have hdc : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).ncard
+            = (hyp.Xset hyp.centralCommutator).ncard - 2 := by
+          rw [Set.ncard_diff hpair, Set.ncard_pair (Ne.symm hne)]
+        have hcne : (hyp.Xset hyp.centralCommutator \ {χ₁, χ₂}).Nonempty := by
+          rw [Set.nonempty_iff_ne_empty]; intro he; rw [he, Set.ncard_empty] at hdc; omega
+        obtain ⟨c, hcs, hcnp⟩ := hcne
+        rw [Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at hcnp
+        exact ⟨c, hcs, hcnp.1, hcnp.2⟩
+      have cX0 := hyp.Xset_centralCommutator_isCoherent_of_frobenius hF hHnonab hp hp3 hHp
+      exact hyp.coherentXunionYset_centralCommutator_diagonal_general hF hp hHp cX0 cY hη₁
+        hχ₁base ha (hyp.crux_general_of_higher_anchor hF hp hHp cX0 cY hη₁ hχ₁base hχ₂X hne hdeg2
+          hex.choose_spec.1 hex.choose_spec.2.1 hex.choose_spec.2.2 ha hgood)
+    · -- `|X(Zc)| = 2`: relabel (E3).
+      have h2Xle : 2 ≤ (hyp.Xset hyp.centralCommutator).ncard :=
+        le_trans h2X (Set.ncard_le_ncard (hyp.xBaseBlock_subset _) hXfin)
+      have h2Xeq : (hyp.Xset hyp.centralCommutator).ncard = 2 := by omega
+      have hpairsub : ({χ₁, χ₂} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.Xset hyp.centralCommutator := by
+        intro x hx; rcases hx with rfl | rfl
+        · exact hχ₁X
+        · exact hχ₂X
+      have hXeq : hyp.Xset hyp.centralCommutator = ({χ₁, χ₂} : Set (ClassFunction ↥L ℂ)) :=
+        (Set.eq_of_subset_of_ncard_le hpairsub
+          (h2Xeq.le.trans_eq (Set.ncard_pair (Ne.symm hne)).symm) hXfin).symm
+      have hexX := hyp.exists_Xcoherence_crux_of_card_two_of_frobenius hF hHnonab hp hp3 hHp
+        cY hη₁ hχ₁X hχ₂X hne hdeg2 hXeq ha hgood
+      exact hyp.coherentXunionYset_centralCommutator_diagonal_general hF hp hHp hexX.choose cY hη₁
+        hχ₁base ha hexX.choose_spec
+  exact hyp.false_of_coherentXunionYset_of_not_coherentS hF hHnonab ⟨hXYcoh⟩ hncoh
 
 end SibleyDadeHypothesis
 

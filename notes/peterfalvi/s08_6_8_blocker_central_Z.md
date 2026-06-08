@@ -1033,3 +1033,270 @@ isometry from ℤ[Y]/ℤ[X] coinciding with τ on ℤ[·,L^#]_"; the relabel fli
 crux variants; (4) capstone redesign + wiring; (5) case B.  The generic (m,n≥3) spine
 (`coherentXunionYset_centralCommutator_diagonal_of_frobenius` → `nonempty_coherent_S_caseA_of_card`)
 is the template the edge cases mirror.
+
+## 2026-06-08 (session 7): relabel step (1) DONE — sign-swap witness `coherentEqualDegree_swap_neg` (S07, 1 commit, full build 3599, axiom-clean)
+
+The relabel foundation is landed in `S07_Coherence.lean` (right after `coherentEqualDegree`), all three
+`[propext, Classical.choice, Quot.sound]`:
+- ✅ **`coherentEqualDegree_swap_neg`** — given a coherence witness `c` for an orthonormal **equal-degree**
+  pair `{φ₀, φ₁}` (`⟨φ₀,φ₁⟩=0`, `⟨φ₀,φ₀⟩=⟨φ₁,φ₁⟩=1`, `φ₁(1)=φ₀(1)≠0`, `(φ₁−φ₀).support ⊆ A`, `1∉A`),
+  produces `c' : IsCoherent τ {φ₀,φ₁} A` with **`c'.ext φ₀ = −c.ext φ₁`**, **`c'.ext φ₁ = −c.ext φ₀`**.
+  Built via `coherentEqualDegree` with source `![φ₀,φ₁]`, target `![−c.ext φ₁, −c.ext φ₀]`; the swapped
+  images stay orthonormal + ZIrr (signs square), and the supported diff is preserved
+  (`τ(φ₁−φ₀)=c.ext φ₁−c.ext φ₀`) so `extends_on_supported` survives.
+- ✅ helpers: `coherentEqualDegree_extension` (`.extension = coherentImageMap χ X`, `rfl`);
+  `IsCoherent.extension_eqRec` (transport `.extension` across set-equality `▸`, `subst;rfl`).
+- API gotchas (don't re-derive): both live in ambient ns `OddOrder.Peterfalvi.S07` (NOT inside
+  `namespace IntegralCharacterMap`, which closes @ S07:3233) → need **`open IntegralCharacterMap in`** to
+  see `coherentImageMap`/`coherentImageMap_apply_eq`. `inner_neg_left/right` are in **`ClassFunction`** ns.
+  Fin-2 `∀ i j` orthonormality: **`Fin.forall_fin_two.mpr ⟨…⟩`** (NOT `fin_cases`, which leaves indices as
+  `⟨1,⋯⟩` so `Matrix.cons_val_one` won't fire) + `simp only [Matrix.cons_val_zero/one, Fin.isValue,
+  Fin.reduceEq, ↓reduceIte]`.
+
+### 🔴 Remaining for the edge cases (the real work = relabel steps (2)/(3) = crux-spine parameterization)
+**`coherentEqualDegree_swap_neg` alone does NOT close the edge** — the crux spine is hard-coded to the
+FIXED witnesses, so the swapped `cY'`/`cX'` need their OWN crux.  mmd + code re-confirmed this session:
+- **both edges are 2-elt equal-degree-WHOLE-SET swaps**: `Y=S(H′)` is all degree-`|W₁|` ⟹ `m=2` ⟹
+  `Y={η₁,η₂}`; for `n=2`, `X=S−S(Z)` is conj-closed + no real char (|L| odd) ⟹ `|X|` even ⟹ `|X|=2` is a
+  **conjugate pair** `{χ,χ̄}`, EQUAL degree.  So `coherentEqualDegree_swap_neg` applies to BOTH (each is
+  the whole equal-degree set).  ⚠ swap preserves `extends_on_supported` ONLY at equal degree (`d=1`); fine
+  here since both edges are equal-degree pairs.
+- **crux spine is cY/cX-parameterizable (verified by reading `coeff_eq_neg_or_edge_of_frobenius` S08:10187)**:
+  its cY-use is ONLY via generic `IsCoherent` fields (`extension_inner_eq`/`extends_on_supported` ⟹
+  injectivity/orthonormality of `cY.ext` on `Y`) + **witness-INDEPENDENT** τ-lemmas
+  (`inner_tau_scaledDiff_tau_Yset_diff_of_frobenius` = `⟨v,(η−η₁)^τ⟩=a`, `inner_self_tau_scaledDiff` =
+  `‖v‖²=1+a²`; `v=hyp.tau(χ₁−aη₁)` is τ, not cY) + Bessel/arith.  The deepest cY-dep is **step-3 `a∣bb`**
+  (`dvd_inner_tau_scaledDiff_extension_Yset_of_frobenius`, the (6.7)/reg-char `b≡0` argument): applied to
+  `cY.ext η₁` "const on Z^#"; for `cY'`, `cY'.ext η₁ = −cY.ext η₂` is also const on Z^# (same arg), so it
+  generalizes — but the lemma is stated for `coherentYset`, so threading cY through is required.
+- **m=2 mechanics**: step-4 dichotomy gives `⟨v,cY.ext η₁⟩=−a (good) ∨ (m=2 ∧ =0 (bad))`.  In bad,
+  `⟨v,cY.ext η₂⟩=a` (the η-part is `a·cY.ext η₂`), so `cY'.ext η₁=−cY.ext η₂` ⟹ `⟨v,cY'.ext η₁⟩=−a` (good).
+  So: case-split; good→existing `crux_of_third_anchor` (needs n≥3 only, NOT |Y|≥3 — it takes hgood as hyp);
+  bad→re-run with cY'.  **n=2 mechanics**: step-5 dichotomy `X=cX.ext χ₁ ∨ X=−cX.ext χ₂` lacks the 3rd
+  anchor; `cX'.ext χ₁=−cX.ext χ₂` flips it to good.
+- **PLAN for steps (2)/(3)** (the multi-lemma parameterization, ~6-7 lemmas, mechanical-but-large): thread
+  `(cY : IsCoherent τ Yset A) (cX : IsCoherent τ (Xset Zc) A)` through `coeff_eq_neg_or_edge`,
+  `orthogonal_normOne_tau_scaledDiff_add_extension`, `inner_extension_Xset_sub_eq_neg_one`,
+  `extension_eq_or_eq_neg`, `crux_of_third_anchor`, `inner_extension_Xset_centralCommutator_Yset_eq_zero`
+  (himg_ortho), replacing `hyp.coherentYset`/`Xset_centralCommutator_isCoherent` by cY/cX.  Generic case
+  re-plugs the fixed witnesses; edges plug swapped witnesses.  Then a cX/cY-param diagonal capstone
+  (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius` S08:9018 hard-codes them) +
+  case-split on `2≤|xBaseBlock|`/`2≤|Y|` into generic (≥3) + edge (=2, swap).  Step-5 isometry value
+  `inner_tau_scaledDiff_tau_Xset_diff` (S08:10427) is already witness-independent — no change.
+
+## 2026-06-08 (session 7 cont.): spine parameterization + general diagonal capstone DONE; KEY degree-ratio finding (3 more commits, full build 3557 + AxiomsCheck OK, all axiom-clean)
+
+Relabel steps (1)+(2) of the plan are now LANDED.  Commits on `b-peterfalvi`:
+- ✅ **swap witness** `7108ab59` (session 7 above): `coherentEqualDegree_swap_neg` (S07).
+- ✅ **spine parameterization** `e63822ec`: 6 `_general` lemmas over `cX : IsCoherent τ (Xset Zc) A`,
+  `cY : IsCoherent τ Yset A` (the SHALLOW spine — NOT the deep step-3/step-4): himg_ortho
+  (`inner_extension_Xset_centralCommutator_Yset_eq_zero_general`), good-case-X
+  (`orthogonal_normOne_tau_scaledDiff_add_extension_general`), step-5 relation
+  (`inner_extension_Xset_sub_eq_neg_one_general`), dichotomy (`extension_eq_or_eq_neg_general`),
+  crux (`crux_of_third_anchor_general`), L3 shell
+  (`coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`).  Each fixed `_of_frobenius`
+  is now a thin specialization (passes fixed witnesses) → generic chain + S09 UNCHANGED.  Mechanism:
+  `set hXc := cX` alias / replace `hyp.coherentYset → cY` (proofs use only generic IsCoherent fields +
+  witness-independent τ-lemmas, so they transfer verbatim).
+- ✅ **general diagonal capstone** `35e55bc8`: `coherentXunionYset_centralCommutator_diagonal_general
+  (hyp)(hF)(hp)(hHp)(cX)(cY)(hη₁)(hχ₁base)(ha)(hcrux : τ(χ₁−aη₁) = cX χ₁ − a·cY η₁)` ⟹ `X(Zc)∪Y`
+  coherent.  **This is the SHARED interface** for the generic case AND both edges — they differ only
+  in how `hcrux` is produced for the chosen (possibly swapped) witnesses.  Generic
+  `..._diagonal_of_frobenius` now delegates to it (fixed witnesses + `crux_of_frobenius`).
+
+### 🔑 KEY FINDING (don't re-derive): the X-relabel needs a DEGREE-RATIO exclusion, not just a swap
+The session-6-cont.⁵ relabel plan was INCOMPLETE.  Re-examined the swap's validity:
+- **The 2-element sign-swap `cX'` is a valid `IsCoherent` witness ONLY when `|X(Zc)| = 2`** (the whole
+  set).  Proof: `cX'` differs from `cX` on `χ₁,χ₂` (the swapped pair); for a supported
+  `φ = ∑cᵢχᵢ ∈ ℤ[X,A]`, `cX' φ − cX φ = −(c₁+c₂)(cX χ₁ + cX χ₂)`, which is `0` (so `extends_on_supported`
+  survives) **iff `c₁+c₂ = 0`**.  With higher-degree members present, a supported combo like
+  `χ₁+χ₂−χ'` (`χ'(1)=2·χ₁(1)`) has `c₁+c₂=2≠0` → swap BREAKS `extends_on_supported`.  So the X-swap
+  is invalid once `|X(Zc)|>2`.  (Y-swap is fine: `Y` is all equal degree, `|Y|=2` ⟹ whole set.)
+- ⟹ the boundary is **`|X(Zc)|` (not `|xBaseBlock|`)**: `|X(Zc)|=2` ⟹ `X={χ,χ̄}` conj pair (|L| odd,
+  no real char ⟹ |X| even) ⟹ equal degree ⟹ swap OK.  But **`|xBaseBlock|=2 ∧ |X(Zc)|≥4` is a real
+  case** (one min-degree pair + a higher pair) where NEITHER the equal-degree generic (needs
+  `|xBaseBlock|≥3`) NOR the swap (needs `|X|=2`) applies.
+- **Fix = Peterfalvi's actual argument: a DEGREE-RATIO third anchor.**  His `n` is `|X|`, and the
+  exclusion uses `(χ₃−d₃χ₁)^τ` for ANY third member `χ₃` (`d₃ = χ₃(1)/χ₁(1) ∈ ℕ`), needing only
+  `|X(Zc)|≥3`.  In the right disjunct `X=−cX χ₂`: the relation
+  `⟨X,cX χ₃⟩ − d₃·⟨X,cX χ₁⟩ = −d₃` becomes `0 − d₃·0 = −d₃` ⟹ `d₃=0`, contra (`d₃>0`).  So a
+  degree-ratio exclusion covers `|X(Zc)|≥3` uniformly; the swap is needed ONLY for `|X(Zc)|=2`.
+
+### 🔴 Remaining edge logic (precise, all feeding `coherentXunionYset_centralCommutator_diagonal_general`)
+- **E1 — degree-ratio crux `crux_general_of_higher_anchor (cX,cY,χ₁∈xBaseBlock,χ₂ equal,χ₃ ANY,hgood)`
+  ⟹ crux** (closes `|xBaseBlock|=2 ∧ |X|≥3`).  Needs: (a) degree-ratio isometry value
+  `⟨τ(χ₁−aη₁), τ(χ₃−d₃•χ₁)⟩ = −d₃` (mirror `inner_tau_scaledDiff_tau_Xset_diff_of_frobenius` S08:10492
+  with `d₃` from `exists_charValue_one_eq_mul_xBaseBlock_anchor`, `χ₃−d₃•χ₁` supported via
+  `sMember_scaledDiffSupport_of_charValue_eq`); (b) degree-ratio relation
+  `⟨X,cX χ₃⟩ − d₃·⟨X,cX χ₁⟩ = −d₃` (mirror `inner_extension_Xset_sub_eq_neg_one_general`); (c) the
+  exclusion + `extension_eq_or_eq_neg_general` dichotomy.  ~3 lemmas, ~150 lines.
+- **E2 — m=2 hgood selection.**  Step-4 dichotomy `coeff_eq_neg_or_edge_of_frobenius` (FIXED cY, S08
+  ~10232): `⟨v,cY η₁⟩=−a (good) ∨ (|Y|=2 ∧ =0 (bad))`.  good ⟹ `cY*=coherentYset`, hgood.  bad ⟹
+  `|Y|=2` ⟹ `Y={η₁,η₂}`, `cY'=coherentEqualDegree_swap_neg` (transport `{η₁,η₂}→Yset`), hgood for cY'
+  via `⟨v,cY' η₁⟩=⟨v,−cY η₂⟩=−(⟨v,cY η₁⟩+a)=−a` (the `⟨v,cY η₂⟩=⟨v,cY η₁⟩+a` from
+  `inner_tau_scaledDiff_tau_Yset_diff` + extends_on_supported).
+- **E3 — |X(Zc)|=2 relabel.**  `X={χ₁,χ₂}` conj pair; `extension_eq_or_eq_neg_general (cX,cY*)`:
+  left ⟹ crux for `cX`; right (`X=−cX χ₂`) ⟹ `cX'=swap` (valid, |X|=2 whole set), `cX' χ₁=−cX χ₂=X` ⟹
+  crux for `cX'`.
+- **E4 — master edge lemma** under `2≤|xBaseBlock|`, `2≤|Y|` (always true): pick χ₁,χ₂∈xBaseBlock, η₁;
+  E2 → (cY*,hgood); then `by_cases |X(Zc)|≥3`: E1 (cX*=cX) ‖ E3 (|X|=2, cX*∈{cX,cX'}); feed
+  `..._diagonal_general (cX*,cY*,hcrux)` ⟹ X∪Y coherent → L4 → S coherent.
+- **wiring** into `sibleySetup_is_coherent` (S08 sole sorry): restructure `by_cases Xset⁅H,H⁆=∅` →
+  `hyp.cases` (A)/(B); case A derive hHnonab(X≠∅)+p-data((6.5))+`2≤` cards, invoke E4; case B = (6.8.2)
+  unplanned.
+
+**Recommended next session:** E1 (degree-ratio crux, the gating piece — mirror the equal-degree
+isometry/relation lemmas with `d₃`), then E2/E3 (relabel selections, consume
+`coherentEqualDegree_swap_neg`), then E4 + wiring.  ALL feed the landed
+`coherentXunionYset_centralCommutator_diagonal_general`.  **Don't re-grind the spine
+parameterization or the swap witness — landed + axiom-clean.**
+
+## 2026-06-08 (session 7 cont.²): edge logic E1–E4 COMPLETE — (6.8) Frobenius case (A) UNCONDITIONAL (4 more commits, full AxiomsCheck 3557 green, all axiom-clean)
+
+The entire edge-case relabel programme is landed; **`nonempty_coherent_S_caseA_of_frobenius` proves
+`S` coherent in the Frobenius / case-(A) branch with NO `3 ≤` cardinality hypotheses** (the `m = 2`
+/ `n = 2` edge relabels are handled internally).  Commits on `b-peterfalvi`, each axiom-clean
+`[propext, Classical.choice, Quot.sound]`:
+
+- ✅ **E1** `143ce5b7` — degree-ratio crux closing the `|xBaseBlock| = 2 ∧ |X(Zc)| ≥ 3` gap:
+  `inner_tau_scaledDiff_tau_Xset_scaledDiff_of_frobenius` (`⟨(χ₁−aη₁)^τ,(χ₃−d·χ₁)^τ⟩ = −d`) +
+  `inner_extension_Xset_scaledSub_eq_neg_general` (relation) + `crux_general_of_higher_anchor`
+  (good case + dichotomy + degree-ratio exclusion of the right disjunct by ANY third member χ₃:
+  `X = −cX χ₂ ⟹ 0 = −d`, impossible since `d > 0`).  Covers `|X(Zc)| ≥ 3` uniformly.
+- ✅ **E2** `bed633a0` — `exists_Ycoherence_hgood_of_frobenius`: `∃ cY, ⟨(χ₁−aη₁)^τ, cY η₁⟩ = −a`
+  (good `cY`).  `|Y| ≥ 3` → coherentYset; `|Y| = 2` bad → `cY'` = `coherentEqualDegree_swap_neg`
+  (η₁ ↦ −η₂^{τ₁}), hgood via `⟨v, cY η₂⟩ = ⟨v, cY η₁⟩ + a = a`.
+- ✅ **E3** `36c184c4` — `exists_Xcoherence_crux_of_card_two_of_frobenius`: when `X(Zc) = {χ₁,χ₂}`,
+  `∃ cX,` crux.  Dichotomy left → `cX = cX₀`; right (`X = −cX₀ χ₂`) → `cX'` = swap (valid since
+  `|X| = 2` whole set), `cX' χ₁ = −cX₀ χ₂ = X`.
+- ✅✅ **E4** `fd10b360` — `nonempty_coherent_S_caseA_of_frobenius` (UNCONDITIONAL).  `2≤|xBaseBlock|`
+  (`two_le_xBaseBlock_ncard`) + `2≤|Y|` (`two_le_Yset_ncard`) → 2 base-block anchors + a + η₁ + hdeg2;
+  E2 → (cY, hgood); `by_cases 3≤|X(Zc)|` → E1 (third anchor) ‖ E3 (`|X|=2`); crux →
+  `coherentXunionYset_centralCommutator_diagonal_general` (X(Zc)∪Y coherent) → L4
+  `false_of_coherentXunionYset_of_not_coherentS` → `S` coherent.  ⚠ Type-data from the E2/E3
+  existentials extracted via **`.choose`** (`Exists` over `IsCoherent` cannot eliminate into the
+  Type-valued assembly — `obtain` fails with `Exists.casesOn can only eliminate into Prop`).
+
+**⟹ (6.8) case (A) is fully discharged, sorry-free + axiom-clean.**
+
+### 🔴 Remaining for the full (6.8) capstone `sibleySetup_is_coherent` (S08 sole sorry)
+1. **CertainType case (B)** (mmd (6.8.2): `Z = W₂`, (6.8.2.1) `η^{τ₁}` const on `Z^#` /
+   (6.8.2.2) `Ind_Z φ` decomposition / (6.8.2.3) per-χ `X₁ − aY`) — **UNPLANNED**, separate deep
+   character theory (the `w₂`-prime / `(4.6)` machinery).  This is the sole remaining blocker.
+2. **final wiring** into `sibleySetup_is_coherent` (currently the OLD `by_cases Xset ⁅H,H⁆ = ∅`
+   design): restructure to `hyp.cases` (A)/(B); case A = `nonempty_coherent_S_caseA_of_frobenius
+   |>.some` (DONE), case B from (1).  Deferred until (1) is ready (else it commits a case-B sorry).
+   Also derive `hHnonab` (X-nonempty ⟹ H non-abelian) + p-group data (hp/hp3/hHp from (6.5)) at the
+   wiring site.
+
+**Recommended next phase:** CertainType case (B) — a fresh multi-session piece (plan from scratch,
+mmd (6.8.2)).  Case (A) is the template (Z central, glue via diagonal shell), but (B) uses `Z = W₂`
+and the `w₂`-prime structure.  Then the trivial final wiring.  **Don't re-grind case A / the edge
+relabels — landed + axiom-clean.**
+
+## 2026-06-08 (session 8): CertainType (c2) branch — RECON + dependency-audited PLAN + CB1 foundation
+
+Resumed the B lane.  (c1) Frobenius / case-(A) is fully discharged (`nonempty_coherent_S_caseA_of_frobenius`,
+session 7 cont.²).  This session reconnoiters and PLANS the remaining `hyp.cases.inr` (CertainType /
+(c2)) branch — the note's "sole remaining blocker" — and lands the foundational leaf CB1.
+
+### 🔑 KEY FINDINGS (don't re-derive)
+
+**F1. The (c2) branch math-splits on `Z(H) ⊓ W₂`; `|W₂|` prime makes it a clean dichotomy.**
+`cases.inr` gives `cert : S06.CertainTypeHypothesis (sharpImage H) L` with `cert.K = H`,
+`cert.W2 ≤ ⁅H,H⁆`, `(Nat.card cert.W2).Prime`, `Nat.Coprime |H| |W₁|`.  The mmd (A)/(B) split
+(04.8 L152-154) is `Z(H) ⊓ W₂ =? 1`:
+- math-(A) `Z(H)∩W₂ = 1`: `Z := centralCommutator = Z(H)∩H'`; uses (6.8.1).
+- math-(B) `Z(H)∩W₂ ≠ 1` ⟹ (prime) `W₂ ⊆ Z(H)`: `Z := W₂ = cert.W2`; uses (6.8.2).
+`W₂.subgroupOf H` has prime card, so `center ⊓ W₂sub ∈ {⊥, W₂sub}` (`eq_bot_or_eq_of_le_of_card_prime`).
+
+**F2. Prerequisites MOSTLY EXIST (the note's "unplanned/deep" framing was too pessimistic).**
+- (6.8.2.1) `Z^#`-constancy: ✅ `IsCoherent.extension_constant_on_sharp_of_prime` (S07_CoherenceGalois:424),
+  GENERIC for prime-order Z, (1.9) produced internally — just needs wiring.
+- [Is] 2.27 central restriction: ✅ `IsIrreducibleCharacter.exists_central_linear_restriction`
+  (SchurCenterBound:241) — docstring literally says "behind (6.8.2.3)".
+- (4.1): ✅ `pairwise_inner_eq_zero_of_orthogonal_signedDifference` (S08:204).
+- (5.9.a): ✅ `IsCoherent.extension_mapRingEquiv_comm` (S07_CoherenceGalois:109).
+- (6.7): ✅ `peterfalvi_67_of_odd` (SylowTICongruence:140); the S08 adapter (9797) is
+  centralCommutator+Frobenius-hardcoded → needs a W₂ analogue.
+- (5.6): ✅ `coherentDegreeSumBound_of_not_coherent` (S08:2419) + `exists_coherentBreakPair` (S08:995).
+- [Is] 2.30: ✅ `exists_degree_sq_le_index` (SchurCenterBound:193).
+- (4.5) "S, S(Z) have w₂−1 reducible chars": NOT formalized, but **BYPASSED** — the formalization
+  proves `X⊆Irr` per-member via `inertia_eq_H_of_c2_caseA` (S08:3716), not the global count.
+
+**F3. The case-A/c1 machinery's TRUE hypothesis is "W₁ FPF on Z" + coprimality, NOT "Frobenius".**
+In c2+math(A), `W₁` DOES act FPF on `Zc=Z(H)∩H'`: `C_{Zc}(w) = Zc ∩ C_H(w) = Zc ∩ W₂ ⊆ Z(H)∩W₂ = 1`.
+So (c1) ∪ (c2+math-A) UNIFY under FPF-on-Z.  **Low-level case-A pieces are ALREADY FPF-generic**:
+`isIrreducibleCharacter_of_mem_Xset_caseA` (5177, takes hZcentral/hZnorm/hZfpf), `inertia_eq_H_of_c2_caseA`
+(3716), `xBaseBlock_isCoherent_caseA` (7074).  **High-level assembly is Frobenius-wired** (needs
+generalization to FPF): `Xset_centralCommutator_isCoherent_of_frobenius` (8764), the diagonal shell
+`coherentXunionYset_centralCommutator_diagonal_general` (11287), L4
+`false_of_coherentXunionYset_of_not_coherentS` (6564), `peterfalvi_67_centralCommutator` (9797),
+`centralCommutator_card_subgroupOf_lower` (4043), capstones (11380/11405/11472).
+Z-generic reusables: (6.6) consumer `...withCover_of_irreducible_X` (8583),
+`false_of_centralCommutator_break_arith` (6286, pure arith), `xSum_le_two_psi` (6421, Z-param).
+
+**F4. ⚠️ math-(B) does NOT reuse the case-A coherence architecture.**  In case B the X-members are NOT
+all irreducible — `W₁` is NOT FPF on `W₂` (`C_L(w)⊓W₂ = W₂` via `cert.centralizer_W2`), so the inertia
+`I_L(θ)` can exceed `H` and `Ind θ` can be reducible.  Hence "X coherent via (6.6) + Y coherent +
+diagonal glue" FAILS.  (6.8.2) instead builds the `X∪Y` isometry τ₂ DIRECTLY via the §5 reflection
+machinery `R(χ)` / Hypothesis (5.2) / (5.3)/(5.4.a,b)/(5.5) (mmd L214-222).  **OPEN RISK (investigate
+at CB4 start): is the `R(χ)` reflection machinery formalized in S05/S07?** If not, CB4 is large.
+
+### Layered plan (CertainType branch)
+- **CB1 (foundation — ✅ THIS SESSION)**: `eq_bot_or_eq_of_le_of_card_prime` (general group theory) +
+  `W2_subgroupOf_le_center_of_caseB` (the (6.6) centrality enabler at `Z=W₂`, analogue of
+  `centralCommutator_subgroupOf_le_center`).  axiom-clean.
+- **CB2a (c2+math-A FPF/irreducibility — ✅ THIS SESSION)**:
+  `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` (`W₁` FPF on `Zc`: `C_L(w)⊓Zc=⊥` from the
+  math-(A) hyp `Z(H)⊓W₂=1` + `cert.centralizer_W2`, lifted ↥H→↥L) +
+  `isIrreducibleCharacter_of_mem_Xset_c2_caseA` (the (c2) mirror of
+  `isIrreducibleCharacter_of_mem_Xset_of_frobenius`: discharges hZH/hZcentral/hZnorm/hZfpf into the
+  FPF-generic `isIrreducibleCharacter_of_mem_Xset_caseA`).  axiom-clean.
+- **CB2b**: case-B `W₂ ◁ L` (H centralizes W₂ via centrality; W₁ normalizes via `centralizer_W2` +
+  W₁ abelian/conjugation) — needed for `Xset W₂` in math-(B) (CB4).  Pending.
+- **CB3 (c2+math-A)**: GENERALIZE the high-level case-A assembly (L2/L3/L4 + capstone) from `hF` to the
+  FPF-on-Z hypotheses (`hZcentral`/`hZnorm`/`hZfpf` + coprimality).  Then both (c1) and (c2+math-A)
+  instantiate it.  Largest "refactor" milestone; F3 low-level pieces already support it.
+- **CB4 (math-B / 6.8.2)**: the §5-reflection construction of τ₂ (6.8.2.1 wire `extension_constant_on_sharp_of_prime`
+  + 6.8.2.2 `Ind_Z φ` decomp via (6.7)+(1.5.b)+fpf-on-`H/Z` + 6.8.2.3 per-χ via [Is]2.27 + (5.4)).
+  **🛑 VERDICT (session 8 CB4-feasibility investigation): BLOCKED on Peterfalvi §4 (certain-type
+  structure theory), NOT near-term feasible.** The §5/§7 reflection machinery `R(χ)` itself IS
+  formalized and 0-sorry — `OrthonormalCharacterImageFamily` (S07_Coherence:759), (5.4.a)/(5.4.b)
+  norm bounds, (5.5), and the Dade producer `dadeOrthonormalCharacterImageFamily` (S07:5387).  BUT
+  that producer **requires `χ : IrreducibleCharacter`**.  In case B the X-members `χ = Ind θ` can be
+  **reducible** (W₁ is NOT FPF on `W₂` ⟹ `I_L(θ)` can exceed `H`), and `R(χ)` for reducible induced
+  χ comes from **Peterfalvi (4.9)** (the `μ_j = ±δ_j ∑ ω_{ij}^σ` certain-type structure).  Per
+  `notes/peterfalvi/s06_dade_certain_subgroup.md`: **(4.3)/(4.4)/(4.5)/(4.7)/(4.9)/(4.10) are ALL
+  unformalized** (only the (4.6) `CertainTypeHypothesis` bundle exists), and (4.5) is itself blocked
+  on **Brauer's permutation lemma** ([Is] 6.32, also unformalized → needs new `BrauerPermutation.lean`).
+  Estimated ~18–22h of independent §4 work.  **⟹ CB4 is gated on the full §4 certain-type project**
+  (which also unblocks §12/§13/§15 downstream).
+  **⚠️ SUPERSEDED (2026-06-08 session 9, see `s06_dade_certain_subgroup.md` "session 9")**: this
+  verdict is WRONG about Brauer — [Is] 6.32 IS fully formalized & 0-sorry (`BrauerPermutation.lean` /
+  `BrauerPermutationUnconditional.lean` / `ConjugationBrauer.lean`). The real (and larger) bottleneck
+  the verdict MISSED is **§5 (3.x) σ-isometry**, esp. the (3.5) χ_ij combinatorial construction —
+  the §7 per-pair R(χ) producer (`dadeOrthonormalCharacterImageFamily`) does NOT subsume the global
+  (3.2) σ. Corrected scope = §5 (3.x) + §6 (4.x) theorem bodies, ~30-40h, hard cores (3.5) & (4.3),
+  Brauer-free. Dependency-ordered leaf plan + first leaf (3.3) in the s06 note.
+- **CB5 (6.8.3 shared)**: generalize L4 `false_of_coherentXunionYset_of_not_coherentS` over Z; apply at
+  `W₂`.  (5.6)-based; `xSum_le_two_psi`/`false_of_centralCommutator_break_arith` are already Z-param.
+- **CB6 (wiring)**: restructure `sibleySetup_is_coherent` to `hyp.cases`; `inl`→case-A-frobenius (done);
+  `inr`→`by_cases center⊓W₂sub=⊥` → CB3 (math-A) / CB4+CB5 (math-B).
+
+### Scope honesty + CB4-feasibility VERDICT (session 8 conclusion)
+The (c2) branch is comparable in size to the entire case-A effort (~7 sessions).  CB3 (FPF
+generalization) is tractable and well-supported (F3).  **But CB4 (math-B) is confirmed BLOCKED on the
+unformalized Peterfalvi §4 certain-type structure theory ((4.3)/(4.4)/(4.5)/(4.7)/(4.9)/(4.10) +
+Brauer's permutation lemma [Is] 6.32; ~18–22h, see the CB4 verdict above and
+`s06_dade_certain_subgroup.md`).**  Because the `inr`/CertainType branch of the capstone needs BOTH
+math-A (CB3) AND math-B (CB4), **doing CB3 alone CANNOT close `sibleySetup_is_coherent`** — the
+capstone stays blocked on §4 regardless.  This is full-Pf-scope completionism, **off the FT critical
+path** (per the FT master roadmap — (6.8)/(7.10) are genuine but orphaned).
+
+**⟹ Strategic fork (user's call):** (A) take on the Peterfalvi §4 certain-type project (unblocks CB4
+*and* §12/§13/§15) — large but the true gate; (B) do CB3 (math-A) as partial, capstone-still-blocked
+progress; (C) pause the (6.8) capstone (record blocked-on-§4) and redirect to the FT critical path
+(BG §7–16 / the rep-theory keystone).  Recommendation: (A) if full-Pf completion is the goal and the
+§4 investment is acceptable; (C) if FT-shortest-path progress is the priority.  CB1/CB2a stand as
+landed, axiom-clean foundation either way.

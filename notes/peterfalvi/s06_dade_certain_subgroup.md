@@ -425,3 +425,119 @@ Peterfalvi (6.8)(c2) (= "Hyp (4.6) holds with H=K") の formalize 中に `Certai
 *作成: 2026-05-22. 出典: Peterfalvi `references/peterfalvi/04.6_pp_21_24_*.mmd` (108 行), `04.4_pp_10_14_*.mmd` (§4 参照), `04.5_pp_15_20_*.mmd` (§5 参照), `notes/peterfalvi/_overview.md`, `notes/peterfalvi/s04_dade_isometry.md`, `notes/peterfalvi/s07_coherence.md`.*
 
 **次ステップ**: §4 の predicate-based Dade isometry 設計が (4.2)-(4.5) の character construction と compatible か Stage 4 (construction) で検証. §7 preview time の coherence setup sanity check.
+
+---
+
+## 2026-06-08 (session 9, b-peterfalvi): certain-type プロジェクト着手 — RECON + Brauer-done 訂正 + 真スコープ + 依存順 plan
+
+ユーザが「§4 certain-type に着手」(strategic fork option A) を選択。CB4 = (6.8.2) math-B の真のゲート。
+**着手前の dependency-audit で session-8 CB4 verdict の中核主張が誤りと判明** (verify, don't assume)。
+
+### 🔢 numbering 確定 (再調査するな)
+repo `S0N` ファイル = PDF chunk `04.N`、**Peterfalvi の result 番号 = N−2**。
+- result **(1.x)** prelim = chunk 04.3 = repo `S03_PreliminaryCharacter`
+- result **(2.x)** Dade = chunk 04.4 = repo `S04_DadeIsometry`
+- result **(3.x)** TI-cyclic σ = chunk 04.5 = repo `S05_TICyclic`
+- result **(4.x)** certain-type = chunk 04.6 = repo `S06_DadeIsometryCertain`  ← **本プロジェクト**
+- result **(5.x)** Coherence = chunk 04.7 = repo `S07_Coherence`
+- result **(6.8)** capstone = chunk 04.8 = repo `S08_CoherenceTheorems`
+verdict が「§4」と呼んだのは result 番号が 4.x だから。section/file は **S06** (本体) + 依存先 **S05** (σ)。
+
+### 🛑→✅ session-8 verdict 訂正: Brauer [Is] 6.32 は形式化済み (verdict は誤り)
+verdict は「(4.5.b) は Brauer permutation lemma [Is] 6.32 にブロック、未形式化 → 新 `BrauerPermutation.lean` 要、~4-6h」と書いたが、**既に完全形式化・0-sorry**:
+- `OddOrder/GroupTheory/RepresentationTheory/BrauerPermutation.lean`: `brauer_permutation_lemma` (一般形 + 仮説), `brauer_permutation_lemma_general/'`
+- `BrauerPermutationUnconditional.lean`: `brauer_permutation_lemma'` (unconditional, hypothesis-free, [Is] 6.32)
+- `ConjugationBrauer.lean`: ambient-conjugation packaging — docstring に "needed by Peterfalvi (6.8)", `inertia_eq_of_freeAction` 等 (= (4.5.b) の fixed-point 部分の道具)
+**⟹ (4.5.b) の単一最大 blocker は消滅。** verdict の ~18-22h 見積もりの Brauer 部分は free。
+
+### 真のスコープ (verify 済): §5 (3.x) σ-isometry + §6 (4.x) certain-type の**定理本体**
+S05 (180 行) / S06 (151 行) は **hypothesis bundle + Dade-application interface のみ**。定理本体 (3.1)-(3.9) / (4.1)-(4.10) は**未形式化**。case-A (c1, DONE) は S08 で ad-hoc 構成し (4.x)/(3.x) を bypass したため、math-B (CB4) は本体を新規に要す。
+
+**利用可能な基盤** (再調査するな):
+- (4.1) ✅ `pairwise_inner_eq_zero_of_orthogonal_signedDifference` (S08:204) — orthogonality criterion
+- (1.x) building blocks: S03 に `inductionCoefficient`/`IsInductionExpansion`/`characterDegree`/induction-restriction 補題群 (= (1.2)-(1.5) の素材豊富)
+- (2.x) 汎用 Dade τ: S04 `Hypothesis`/`dadeIntegralCharacterMap`/`FullDadeIsometryData`/`IsDadeIsometry` (4326 行, 完成)
+- §7 R(χ) per-pair producer: `dadeOrthonormalCharacterImageFamily` / `…OfDiff` (S07:5387/5472) — **{χ,χ̄} conjPairFamily 単位**の R(χ) を Dade map から生成 (irreducible χ 限定)
+- Brauer ✅ (上記)、`TICyclicHypothesis`→`toDadeHypothesis`→S04 (S05) の配線
+
+**未形式化 (本プロジェクトで書く)**:
+- §5: (3.2) σ-isometry, (3.3) ω_ij notation, (3.4) α_ij basis, **(3.5) χ_ij 直交族 [HARD core]**, (3.6)Hyp/(3.7)/(3.8) NC(ψ) 構造, (3.9) Galois ((1.9) 要)
+- §6: **(4.3) μ_ij 構成 [HARD, 山場]**, (4.4) kernel, (4.5) χ_j factorization (Brauer 消費), (4.7) Supp, (4.8), **(4.9) τ-isometry [CB4 target]**, (4.10) 4-term
+
+### 🔑 核心の設計判断 (再調査するな): §7 producer は (3.5) を subsume しない
+`dadeOrthonormalCharacterImageFamily` は **{χ,χ̄} pair 単位**の 2-元 R(χ) (coherence reflection) を作る。
+(3.2) σ は **CF(W) 全体 (w₁·w₂ 次元) 上の global isometry** で、χ_ij = ω_ij^σ が**全 index 横断の直交族**を成す ((3.5) の構成)。両者は別物 — per-pair producer から global σ は出ない。
+- **ω_ij^σ の存在 = (3.5) が本質的に必要** (Ind_W^G α_ij = 1−χ_i0−χ_0j+χ_ij の clean 分解の存在が (3.5))。
+- (3.9.a) は「χ∈±Irr(G), χ|_V=ω|_V ⟹ χ=ω^σ」で**一意性**を与えるが**存在は (3.5)**。
+- ω_ij は linear (deg 1=irred) だが、Dade map は supported 関数 (ω_ij(1)=1≠0 ゆえ ω_ij 自体は non-supported) にしか効かない → supported **差** Ind_W^G α_ij 経由でしか σ-image は出ず、その分解の存在が (3.5)。
+
+⟹ **verdict が見落とした真のボトルネック = §5 (3.5) σ-construction** (Brauer ではない)。hard core は **2 つ: (3.5) と (4.3)**。
+
+### 依存グラフ (CB4 = (4.9) への最短連鎖)
+```
+(3.3)ω_ij ─→ (3.4)α_ij basis ─→ (3.5)χ_ij 直交族 [HARD] ─→ (3.2)σ assembly
+                                       │                        │
+                                       ├─→ (3.6/3.7/3.8) NC(ψ) ─┤
+                                       └─→ (3.9) Galois ((1.9))  │
+(4.1)✅ ─────────────────────────────────────────────────────────┤
+                                                                  ▼
+   (3.2)σ + (1.4) ─→ (4.3)μ_ij [HARD,山場] ─→ (4.4)kernel
+                          │                       │
+                          ├─→ (4.5)χ_j (Brauer✅) │
+                          ├─→ (4.7)Supp ──────────┤
+                          └─→ (4.8)(uses 3.8) ─→ (4.9)τ-isometry [CB4 target] ─→ (4.10)
+```
+その後: (4.9) を (6.8.2) `inr`/math-B に配線 (CB4) + CB5 (6.8.3) + CB6 wiring → capstone 完了。
+
+### 依存順 leaf plan (build-green + axiom-clean を 1 leaf ずつ)
+1. **(3.3) ω_ij family** ← 🟡 FOUNDATION ✅ DONE (session 9, commit `086dac8f`, full 3599 + AxiomsCheck 3557 green, axiom-clean)。S05 に: (3.1) field `W_cyclic : IsCyclic W` 追加 (構築箇所 0 ゆえ安全) + `isMulCommutative_W` (W abelian) + `omega χ := linearIrreducibleCharacter χ` + `omega_apply`/`omega_apply_one` (deg 1) + `omega_injective`/`omega_surjective` (後者は `exists_linearIrreducibleCharacter_eq_of_isMulCommutative`) → **`omegaEquiv : (W →* ℂˣ) ≃ Irr(W)`** (= 「(3.3): Irr(W)={ω_ij}」)。**残 (3.3) = ω_i0/ω_0j sub-family** (`W2.subgroupOf W ≤ χ.ker` / `W1.subgroupOf W ≤ χ.ker`) **+ 積分解 `ω_ij = ω_i0·ω_0j`** — 内部直積 `↥W ≅ ↥W₁ × ↥W₂` が core。**構成レシピ (session 9 で API scope 済、再調査不要)**: mathlib に「2 部分群内部直積→group MulEquiv」の既製品は**無い** (`Subgroup.prodEquiv` は外部積、`IsComplement'.QuotientMulEquiv` は商)。自前構成: `W1' := hyp.W1.subgroupOf hyp.W`, `W2' := hyp.W2.subgroupOf hyp.W` (↥W の subgroup; `W1'⊓W2'=⊥` は `W_disjoint`、`W1'⊔W2'=⊤` は `W_sup`)。写像 `f : ↥W1' × ↥W2' →* ↥W := MonoidHom.noncommCoprod W1'.subtype W2'.subtype (commute は `isMulCommutative_W` から; ⚠ `MonoidHom.coprod` は `[CommMonoid]` instance 要で ↥W は Group+mixin のみゆえ避ける)`。injective (kernel ⊆ W1'⊓W2'=⊥)・surjective (range = W1'⊔W2'=⊤) → `MulEquiv.ofBijective`。次いで `Hom(↥W,ℂˣ) ≃ Hom(↥W1',ℂˣ)×Hom(↥W2',ℂˣ)` を `f.symm` 経由 + `MonoidHom.prod`/`MonoidHom.fst,snd` で。ω_i0 = W2'-trivial の χ (= W1' 成分のみ)、ω_0j = W1'-trivial、ω_ij = ω_i0·ω_0j (`omega` の multiplicativity: `omega_apply`+`map_mul`+`Units.val_mul`)。Fin w₁×Fin w₂ indexing は W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k` で後付け。
+
+**進捗 (session 9 loop)**: ✅ **`wProdEquiv : ↥W1' × ↥W2' ≃* ↥W` + `W1_subgroupOf_inf/sup_W2_subgroupOf_eq_bot/top` DONE** (commit `a6a1f61f`, full 3599 green, axiom-clean, AxiomsCheck 登録)。レシピ通り `MonoidHom.coprod`(`open scoped IsMulCommutative` で `CommMonoid ↥W`)+ bijectivity。✅ **積分解 DONE** (commit `b0ae2f1b`): Hom-積 equiv は mathlib 不在ゆえ、より直接的に射影 `wProj1/wProj2 : ↥W →* ↥W` (`subtype∘fst/snd∘wProdEquiv.symm`) + 再構成 `wProj1 w · wProj2 w = w` + **`char_eq_wProj_comp_mul`** (`χ = (χ∘wProj1)·(χ∘wProj2)` = ω = ω_i0·ω_0j at Hom level) で実装。✅ **ω_i0/ω_0j defining property DONE** (commit `5a4373f7`): `wProj1_eq_one_of_mem_W2`/`wProj2_eq_one_of_mem_W1` + `W2/W1_subgroupOf_le_ker_comp_wProj1/2` (ω_i0 factor は W₂ を kernel に、ω_0j は W₁ を)。
+
+**⟹ (3.3) Notation 完成** (omega/omegaEquiv=Irr(W)=linear chars + wProdEquiv=W₁×W₂ + ω=ω_i0·ω_0j + ω_i0/ω_0j の kernel 特性; 全 axiom-clean・AxiomsCheck 登録)。**Fin w₁×Fin w₂ の明示 indexing は (3.4) で count が要るとき後付け**(W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k`)。
+
+**次 leaf = (3.4)** `α_ij = (1−ω_i0)(1−ω_0j)` が `CF(W,V)` (V=W−(W₁∪W₂)) の basis、`dim = |V| = (w₁−1)(w₂−1)`。
+
+### (3.4) feasibility assessment (session 9 loop、stop checkpoint で精査)
+`CF(W,V)` = `S04.SupportedClassFunctions ℂ V W` = `↥(ClassFunction.supportedSubmodule (supportInSubgroup V W))` (S04:148)。
+- **tractable な sub-piece**: (a) `alpha (χ₁:↥W1'→*ℂˣ)(χ₂:↥W2'→*ℂˣ) := (1 − ω(χ₁∘wFst))·(1 − ω(χ₂∘wSnd))` の定義 + **membership `alpha ∈ CF(W,V)`** — 今 session の `W2/W1_subgroupOf_le_ker_comp_wProj1/2` で直接出る(W₁ 上 ω_0j=1⟹(1−ω_0j)=0、W₂ 上同様)。(b) 線形独立 — Fourier infra あり: `sum_inner_irreducibleCharacter_smul` (CharacterCompleteness:600) + `irreducibleCharacter_inner` (直交性)。`a_ij = ⟨∑a_kl α_kl, ω_ij⟩`。
+- **🔴 インフラ gap**: `dim CF(W,V) = |V| = (w₁−1)(w₂−1)`。repo/mathlib に `finrank SupportedClassFunctions`/`finrank supportedSubmodule` の直接 API **無し** (grep 0)。`supportedSubmodule (supportInSubgroup V W)` の次元 = (W abelian ⟹ class=点 ⟹) `|V|` を新規に建てる要 (`finrank ClassFunction = |ConjClasses|` は CharacterCompleteness:557 にあるが supported 版は要構築)。`|V| = |W|−w₁−w₂+1 = (w₁−1)(w₂−1)`。
+- **🔴 設計判断**: α の indexing。character-group `↥W1'→*ℂˣ × ↥W2'→*ℂˣ` (自然、命名軽) vs `Fin w₁×Fin w₂` (Peterfalvi 準拠)。**(3.5) σ-construction は明示 index `i,j` の組合せ論 (A_ij 3-元集合, case I/II) を使う** ⟹ Fin-indexing が (3.5) で要る公算大 (W₁/W₂ cyclic ⟹ `Irr(W_k)≅ZMod w_k` で橋渡し)。この選択は (3.4)/(3.5) 全体の foundation を決める。
+
+⟹ **stop checkpoint**: (3.3) 完成は綺麗な milestone。(3.4) は「設計判断 (indexing) + API gap (CF(W,V) 次元)」の領域で、直後が hard core (3.5)。loop を止めユーザに選択肢提示 (2026-06-08 session 9 末)。
+
+### ✅ 設計決定 (2026-06-08 session 9、ユーザ承認済み)
+1. **indexing = character-group**(再調査不要)。α を **非自明 `Irr(W₁') × Irr(W₂')`**(= `(↥W₁'→*ℂˣ) × (↥W₂'→*ℂˣ)`)で index。**Fin/ZMod は使わない**。根拠: (3.5) の組合せ論 ((3.5.4) の β_i1 case 分析・"w₁≥5"・"|A_12|≥1+(w₁−2)") は index 集合の**濃度** `|Irr(W_k)\{1}|=w_k−1` と**相異な元の存在**のみ使い、index の算術は使わない ⟹ character-group(濃度 `|Irr(W_k)|=w_k`+相異)で (3.4) も (3.5) も回る。必要事実 = 有限 abelian 双対 `|↥W_k'→*ℂˣ| = w_k`(mathlib Pontryagin)。
+2. **CF(W,V) 次元 = インフラ構築**。`dim CF(W,V) = |V| = (w₁−1)(w₂−1)` を新規補題で(abelian W ⟹ `ClassFunction = 点上関数`, `supportedSubmodule (supportInSubgroup V W)` 次元 = |V|; `|V| = |W|−w₁−w₂+1`)。
+3. **線形独立 = Fourier** (`sum_inner_irreducibleCharacter_smul` + `irreducibleCharacter_inner`)、basis = lin-indep + 次元一致。
+- sub-leaf 順: α 定義 + CF(W,V) membership(今 session の kernel 補題で出る)→ CF 次元インフラ → lin-indep → basis 組立。**loop 再開 (min-interval); (3.5) hard core 到達で再停止。**
+
+**⚠ V-handling 決定 (session 9 loop で発見)**: `TICyclicHypothesis.V` は §6/§8 再利用のため一般フィールドで、**(3.4) が要求する `V = ↑W∖(↑W₁∪↑W₂)` に固定されていない**(`dim CF(W,V)=|V|=(w₁−1)(w₂−1)` はこの特定 V 必須)。**解決 = (3.x) 定理は `hVeq : hyp.V = (↑W:Set G)∖(↑hyp.W₁∪↑hyp.W₂)` を仮説に取る**(構造体は一般のまま、(3.1) 忠実; (3.2) σ が hyp.V の Dade map から来るので hVeq で V=Vdiff を固定)。
+
+**進捗 (session 9 loop)**: ✅ **factor 射影 `wFst`/`wSnd : ↥W →* ↥W₁'/↥W₂'` + kill facts `wFst/wSnd_eq_one_of_mem_W2/W1` DONE** (commit `b3b93c3a`, full 3599 green, AxiomsCheck 登録) — α の prerequisite。**次 = `alpha (χ₁:↥W₁'→*ℂˣ)(χ₂:↥W₂'→*ℂˣ) := (1 − (omega(χ₁.comp wFst):CF))·(1 − (omega(χ₂.comp wSnd):CF))` 定義 + membership `alpha ∈ CF(W, Vdiff)`**(`hVeq` 下; W₁ 上 ω_0j=1⟹因子0、W₂ 上 ω_i0=1⟹因子0、`wFst/wSnd_eq_one` + `omega_apply_one` で)→ CF 次元インフラ → lin-indep → basis。
+2. **(3.4) α_ij basis** of CF(W,V), V=W−(W₁∪W₂)。α_ij=(1−ω_i0)(1−ω_0j)、dim=(w₁−1)(w₂−1)。線形独立 + 次元一致。
+3. **(3.5) χ_ij 直交族 [HARD]**。(3.5.1) inner-product relations → (3.5.2) |A₁₁∩A₁₂|=1 → (3.5.4) ∩A_i1 → (3.5.5) decomposition。w₁≥5 仮定、A_ij=3 元 ±Irr 集合の case I/II 排除。abstract combinatorial lemma に切り出すと再利用しやすい。
+4. **(3.2) σ-isometry** assembly ((3.5)+(1.3)→(3.2.a-d))。
+5. **(3.6)Hyp + (3.7)/(3.8) NC(ψ)**。(3.7) は supported α との内積で linear identity、(3.8) は NC<2w₁ の 3-case 排除 (counting)。
+6. **(3.9) Galois** ((1.9) field-automorphism 要 — S03/mathlib `Qbar`/cyclotomic で要確認)。
+7. **(4.3) μ_ij [HARD,山場]** → **(4.4)/(4.5)/(4.7)/(4.8)** → **(4.9) [CB4 target]** → **(4.10)**。
+8. **CB4 wiring**: (4.9) を (6.8.2) に。**CB5/CB6** は session-8 plan のまま。
+
+### 改訂見積もり
+verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し引いても **§5+§6 で ~30-40h** (hard core ×2)。FT critical path 外だが §12/§13/§15 も (4.x) 消費ゆえ full-Pf completion の真ゲート。**正本 = 本ノート (本セクション); s08 blocker note の session-8 verdict は本訂正で superseded (Brauer 部分)。**
+
+### 第一 leaf (3.3) の前提 (session 9 末で de-risk 済、再調査不要)
+- **配置 = `S05_TICyclic.lean`** (results (3.x) の home, `namespace OddOrder.Peterfalvi.S05`)。
+- **🔴 構造体ギャップ**: `S05.TICyclicHypothesis` (S05:37) は (3.1) の「W cyclic of odd order」を**欠く** —
+  `W_card_odd` はあるが `W`/`W1`/`W2` の cyclic/abelian 仮説なし。ω_ij は linear character (deg 1) ゆえ
+  (3.3) には **W abelian (cyclic) 必須**。⟹ `W1_cyclic : IsCyclic ↥W1` / `W2_cyclic : IsCyclic ↥W2`
+  (W=W₁×W₂ coprime ⟹ W cyclic 導出) を**追加する**。
+- **✅ field 追加は安全**: `TICyclicHypothesis` は repo 内で**一度も構築されていない** (`.mk`/`{W:=}` 0 件;
+  参照は S05 自身の API と S15 docstring のみ)。consumer は `hyp : TICyclicHypothesis G` を取るだけ ⟹
+  field 追加で既存 theorem は壊れない (full build で確認)。
+- **構造体の `W_sup : W1⊔W2=W` + `W_disjoint` + coprime** ⟹ W=W₁×W₂ 内部直積。`W1_cyclic`+`W2_cyclic`
+  追加で W cyclic (∴ abelian)。
+- **⚠ 次セッション最初に scope すべき infra Q**: repo の `IrreducibleCharacter`/`ClassFunction` 枠組みで
+  abelian 群の既約指標 = linear character (`MonoidHom ↥W ℂˣ` 相当) をどう表すか、Irr(W₁×W₂) の積分解
+  API があるか (mathlib `MonoidHom (G×H) →` や character group の積)。これが (3.3) の工数を決める。
+  まず `grep`/leansearch で確認してから書く。

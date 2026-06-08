@@ -45,6 +45,7 @@ import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.Peterfalvi.S04_DadeIsometry
+import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -3239,3 +3240,38 @@ set_option linter.style.longLine false in
 -- Gorenstein Theorem 3.2.2 (input to BG Theorem 3.4): a finite group with a faithful irreducible
 -- representation over an algebraically closed field has cyclic centre `Z(G)`.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.isCyclic_center_of_faithful_irreducible
+
+-- Peterfalvi (3.1)/(3.3): the linear-character family `ω` of the cyclic group `W = W₁ × W₂`.
+-- `W` is abelian (cyclic), so `χ ↦ ω(χ) = linearIrreducibleCharacter χ` is a bijection
+-- `Hom(W, ℂˣ) ≃ Irr(W)` (`omegaEquiv`); each `ω(χ)` has degree one (`omega_apply_one`).
+-- Foundation for the `ω_{ij}` / `α_{ij}` basis (3.4) and the `σ`-isometry (3.5).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.isMulCommutative_W
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaEquiv
+
+-- Peterfalvi (3.1)/(3.3): `W = W₁ × W₂` as an internal direct product — the multiplication map
+-- `↥W₁ × ↥W₂ ≃* ↥W` (W abelian, W₁ ⊓ W₂ = ⊥, W₁ ⊔ W₂ = ⊤), used to split `ω_{ij} = ω_{i0}·ω_{0j}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wProdEquiv
+
+-- Peterfalvi (3.3): the `ω_{ij} = ω_{i0}·ω_{0j}` factorization of a linear character of `W`,
+-- via the internal-product projections `wProj1`/`wProj2` and their reconstruction `w = w₁·w₂`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.char_eq_wProj_comp_mul
+
+-- Peterfalvi (3.3): the `ω_{i0}` / `ω_{0j}` factors have `W₂` / `W₁` in their kernels (the
+-- defining property of the two sub-families of `Irr(W)`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W2_subgroupOf_le_ker_comp_wProj1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.W1_subgroupOf_le_ker_comp_wProj2
+
+-- Peterfalvi (3.3)→(3.4): factor projections `wFst`/`wSnd : ↥W →* ↥W₁/↥W₂` kill `W₂`/`W₁`,
+-- so `χ₁.comp wFst` / `χ₂.comp wSnd` are the `ω_{i0}` / `ω_{0j}` used to build the `α_{ij}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wFst_eq_one_of_mem_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.wSnd_eq_one_of_mem_W1
+
+-- Peterfalvi (3.4): `α_{ij} = (1_W - ω_{i0})(1_W - ω_{0j})` as a class function, its vanishing on
+-- `W₁`/`W₂`, and its membership in `CF(W, V)` (`V = W ∖ (W₁ ∪ W₂)`), packaged as `alpha`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.mem_Vdiff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_zero_of_mem_W2_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_eq_zero_of_mem_W1_subgroupOf
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaCF_mem_supportedSubmodule
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alpha
