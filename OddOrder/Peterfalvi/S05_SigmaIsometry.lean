@@ -2389,6 +2389,158 @@ theorem exists_rowCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   choose w hw using hrow
   exact ⟨w, hw⟩
 
+open scoped Classical in
+/-- **Peterfalvi (3.5)**, symmetric case `w₁, w₂ ≥ 5`: there is an orthonormal family `(χ_{ij})`
+indexed by `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G` and
+`Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Assembled from the (3.5.5)
+orthonormal `gridFamily` on `Afam` (column-commons `z`, row-commons `w`, interior thirds `φ`):
+`χ_{i0} = -w`, `χ_{0j} = -z`, `χ_{ij} = φ`, `χ_{00} = 1_G`.  The orthonormality lifts the
+`gridFamily` one (`symm_orthonormal_family`) by negating individual members (sign-invariant) and
+adjoining `1_G` (orthogonal to the signed nontrivial irreducibles, `inner_trivial`); the `Ind`
+relation is the cell sum `β_{ij} = z + w + φ` (`IsSignedTriple.sum_eq`). -/
+theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+        ClassFunction G ℂ,
+      χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (χ a) (χ b) = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
+  obtain ⟨w, hw⟩ := hyp.exists_rowCommon hVeq app hw2
+  have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W1_le_W]; omega
+  have hκ : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W2_le_W]; omega
+  have hgrid := hyp.Afam_isSignedTripleGrid hVeq app
+  obtain ⟨φ, hcells, hortho⟩ := hgrid.symm_orthonormal_family hι hκ hz hw
+  haveI : Nonempty {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} :=
+    Fintype.card_pos_iff.mp (by omega)
+  haveI : Nonempty {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} :=
+    Fintype.card_pos_iff.mp (by omega)
+  -- every interior member, column-common, and row-common is a signed nontrivial irreducible
+  have hsigw : ∀ p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}, IsSignedNontrivialIrr (w p) :=
+    fun p => hgrid.signed _ (Classical.arbitrary _) _ (hw p (Classical.arbitrary _))
+  have hsigz : ∀ q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}, IsSignedNontrivialIrr (z q) :=
+    fun q => hgrid.signed (Classical.arbitrary _) _ _ (hz q (Classical.arbitrary _))
+  have hsigφ : ∀ p q, IsSignedNontrivialIrr (φ p q) := fun p q => by
+    refine hgrid.signed p q _ ?_
+    rw [hcells]
+    exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  -- abbreviations for the four χ-values
+  set χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+      ClassFunction G ℂ := fun pq => if hp : pq.1 = 1 then
+        (if hq : pq.2 = 1 then trivialClassFunction G else -z ⟨pq.2, hq⟩)
+      else (if hq : pq.2 = 1 then -w ⟨pq.1, hp⟩ else φ ⟨pq.1, hp⟩ ⟨pq.2, hq⟩) with hχdef
+  have hχ11 : χ (1, 1) = trivialClassFunction G := by
+    simp only [hχdef, dif_pos]
+  have hχp1 : ∀ (p) (hp : p ≠ 1), χ (p, 1) = -w ⟨p, hp⟩ := fun p hp => by
+    simp only [hχdef, dif_neg hp, dif_pos]
+  have hχ1q : ∀ (q) (hq : q ≠ 1), χ (1, q) = -z ⟨q, hq⟩ := fun q hq => by
+    simp only [hχdef, dif_pos, dif_neg hq]
+  have hχpq : ∀ (p q) (hp : p ≠ 1) (hq : q ≠ 1), χ (p, q) = φ ⟨p, hp⟩ ⟨q, hq⟩ := fun p q hp hq => by
+    simp only [hχdef, dif_neg hp, dif_neg hq]
+  -- the gridFamily values, as themselves (definitional), and `1_G ⊥ signed`
+  have hgw : ∀ p, w p = IsSignedTripleGrid.gridFamily z w φ (Sum.inl p) := fun _ => rfl
+  have hgz : ∀ q, z q = IsSignedTripleGrid.gridFamily z w φ (Sum.inr (Sum.inl q)) := fun _ => rfl
+  have hgφ : ∀ p q, φ p q = IsSignedTripleGrid.gridFamily z w φ (Sum.inr (Sum.inr (p, q))) :=
+    fun _ _ => rfl
+  have h1Gx : ∀ {x : ClassFunction G ℂ}, IsSignedNontrivialIrr x →
+      ClassFunction.inner (trivialClassFunction G) x = 0 := fun hx => by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hx.inner_trivial, star_zero]
+  refine ⟨χ, hχ11, ?_, ?_, ?_⟩
+  · -- ZIrr
+    rintro ⟨p, q⟩
+    by_cases hp : p = 1 <;> by_cases hq : q = 1
+    · subst hp; subst hq; rw [hχ11]; exact trivialClassFunction_isIrreducible.mem_ZIrr
+    · subst hp; rw [hχ1q q hq]; exact Submodule.neg_mem _ (hsigz ⟨q, hq⟩).mem_ZIrr
+    · subst hq; rw [hχp1 p hp]; exact Submodule.neg_mem _ (hsigw ⟨p, hp⟩).mem_ZIrr
+    · rw [hχpq p q hp hq]; exact (hsigφ ⟨p, hp⟩ ⟨q, hq⟩).mem_ZIrr
+  · -- orthonormality, via the diagonal (norm 1) and off-diagonal (orthogonal) facts
+    have hdiag : ∀ a, ClassFunction.inner (χ a) (χ a) = 1 := by
+      rintro ⟨p, q⟩
+      by_cases hp : p = 1 <;> by_cases hq : q = 1
+      · subst hp; subst hq; rw [hχ11]; exact inner_trivialClassFunction_self G
+      · subst hp; rw [hχ1q q hq, ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg]; exact (hsigz _).inner_self
+      · subst hq; rw [hχp1 p hp, ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg]; exact (hsigw _).inner_self
+      · rw [hχpq p q hp hq]; exact (hsigφ _ _).inner_self
+    have hoff : ∀ a b, a ≠ b → ClassFunction.inner (χ a) (χ b) = 0 := by
+      rintro ⟨p, q⟩ ⟨p', q'⟩ hab
+      by_cases hp : p = 1 <;> by_cases hq : q = 1 <;> by_cases hp' : p' = 1 <;> by_cases hq' : q' = 1
+      · subst hp; subst hq; subst hp'; subst hq'; exact absurd rfl hab
+      · subst hp; subst hq; subst hp'
+        rw [hχ11, hχ1q q' hq', ClassFunction.inner_neg_right, h1Gx (hsigz _), neg_zero]
+      · subst hp; subst hq; subst hq'
+        rw [hχ11, hχp1 p' hp', ClassFunction.inner_neg_right, h1Gx (hsigw _), neg_zero]
+      · subst hp; subst hq
+        rw [hχ11, hχpq p' q' hp' hq', h1Gx (hsigφ _ _)]
+      · subst hp; subst hp'; subst hq'
+        rw [hχ1q q hq, hχ11, ClassFunction.inner_neg_left, (hsigz _).inner_trivial, neg_zero]
+      · subst hp; subst hp'
+        rw [hχ1q q hq, hχ1q q' hq', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg, hgz, hgz, hortho, if_neg (by
+            simp only [ne_eq, Sum.inr.injEq, Sum.inl.injEq, Subtype.mk.injEq]
+            exact fun h => hab (by rw [h]))]
+      · subst hp; subst hq'
+        rw [hχ1q q hq, hχp1 p' hp', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg, hgz, hgw, hortho, if_neg (by simp)]
+      · subst hp
+        rw [hχ1q q hq, hχpq p' q' hp' hq', ClassFunction.inner_neg_left, hgz, hgφ, hortho,
+          if_neg (by simp), neg_zero]
+      · subst hq; subst hp'; subst hq'
+        rw [hχp1 p hp, hχ11, ClassFunction.inner_neg_left, (hsigw _).inner_trivial, neg_zero]
+      · subst hq; subst hp'
+        rw [hχp1 p hp, hχ1q q' hq', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg, hgw, hgz, hortho, if_neg (by simp)]
+      · subst hq; subst hq'
+        rw [hχp1 p hp, hχp1 p' hp', ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+          neg_neg, hgw, hgw, hortho, if_neg (by
+            simp only [ne_eq, Sum.inr.injEq, Sum.inl.injEq, Subtype.mk.injEq]
+            exact fun h => hab (by rw [h]))]
+      · subst hq
+        rw [hχp1 p hp, hχpq p' q' hp' hq', ClassFunction.inner_neg_left, hgw, hgφ, hortho,
+          if_neg (by simp), neg_zero]
+      · subst hp'; subst hq'
+        rw [hχpq p q hp hq, hχ11, (hsigφ _ _).inner_trivial]
+      · subst hp'
+        rw [hχpq p q hp hq, hχ1q q' hq', ClassFunction.inner_neg_right, hgφ, hgz, hortho,
+          if_neg (by simp), neg_zero]
+      · subst hq'
+        rw [hχpq p q hp hq, hχp1 p' hp', ClassFunction.inner_neg_right, hgφ, hgw, hortho,
+          if_neg (by simp), neg_zero]
+      · rw [hχpq p q hp hq, hχpq p' q' hp' hq', hgφ, hgφ, hortho, if_neg (by
+          simp only [ne_eq, Sum.inr.injEq, Prod.mk.injEq, Subtype.mk.injEq]
+          exact fun h => hab (by rw [h.1, h.2]))]
+    intro a b
+    split_ifs with hab
+    · subst hab; exact hdiag a
+    · exact hoff a b hab
+  · -- the Ind relation: `Ind α = 1_G + β` and `β = ∑ (cell) = z + w + φ`
+    intro p q hp hq
+    have hst := hyp.Afam_isSignedTriple hVeq app ⟨p, hp⟩ ⟨q, hq⟩
+    obtain ⟨hzw, hzφ, hwφ⟩ := triple_distinct (hcells ⟨p, hp⟩ ⟨q, hq⟩ ▸ hst.card_eq_three)
+    have hbeta : hyp.beta hVeq app p q
+        = z ⟨q, hq⟩ + (w ⟨p, hp⟩ + φ ⟨p, hp⟩ ⟨q, hq⟩) := by
+      rw [hst.sum_eq, hcells ⟨p, hp⟩ ⟨q, hq⟩, Finset.sum_insert (by simp [hzw, hzφ]),
+        Finset.sum_insert (by simp [hwφ]), Finset.sum_singleton]
+    have hind : app.tau.toDadeMap (hyp.alpha hVeq p q)
+        = hyp.beta hVeq app p q + trivialClassFunction G := by
+      rw [show hyp.beta hVeq app p q
+        = app.tau.toDadeMap (hyp.alpha hVeq p q) - trivialClassFunction G from rfl, sub_add_cancel]
+    rw [hind, hbeta, hχp1 p hp, hχ1q q hq, hχpq p q hp hq]
+    abel
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
