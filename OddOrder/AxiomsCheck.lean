@@ -3333,7 +3333,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.no_neg_of_inner_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.L_of_inner_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.O_card_inter_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_apply_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_isSignedTriple_beta
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_eq_one_of_one_shared
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.betaTriple_L
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_eq_zero_of_both_diff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.betaTriple_O
