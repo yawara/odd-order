@@ -1096,6 +1096,34 @@ theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleO
 
 /-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
 
+/-- **Cor 10.9(a) L1 (W の構成)**: `X` を `M` の `q`-部分群とすると, `XM' = X ⊔ M'` の中に `X` を
+含む Hall `{p,q}`-部分群 `W` がある (BG Cor 10.9(a) 第 1 文)。`Y := X ⊔ M'` は可解 (`≤ M`) ゆえ
+Hall-D (`Ch03.hall_D`) を `X.subgroupOf Y` (`q`-群 ⊆ `{p,q}`) に適用し, `↥Y` から `G` へ map back。 -/
+theorem exists_hall_pq_containing [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact q.Prime]
+    {X : Subgroup G} (hXM : X ≤ M) (hXq : IsPGroup q ↥X) :
+    ∃ W : Subgroup G, X ≤ W ∧ W ≤ X ⊔ derivedInG M ∧
+      Ch03.IsHallSubgroup ({p, q} : Set ℕ) (W.subgroupOf (X ⊔ derivedInG M)) := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Y : Subgroup G := X ⊔ derivedInG M with hY
+  have hYM : Y ≤ M := sup_le hXM (Subgroup.map_subtype_le _)
+  haveI hYsolv : IsSolvable ↥Y := solvable_of_solvable_injective (Subgroup.inclusion_injective hYM)
+  have hXYle : X ≤ Y := le_sup_left
+  have hXY_pi : ∀ r ∈ (Nat.card ↥(X.subgroupOf Y)).primeFactors, r ∈ ({p, q} : Set ℕ) := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXYle).toEquiv] at hr
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hXq
+    rw [hk, Nat.mem_primeFactors] at hr
+    have hrq : r = q := (Nat.prime_dvd_prime_iff_eq hr.1 Fact.out).mp (hr.1.dvd_of_dvd_pow hr.2.1)
+    exact Set.mem_insert_of_mem _ hrq
+  obtain ⟨W₀, hW₀hall, hXW₀⟩ := Ch03.hall_D (G := ↥Y) hXY_pi
+  refine ⟨W₀.map Y.subtype, ?_, Subgroup.map_subtype_le _, ?_⟩
+  · have hle : (X.subgroupOf Y).map Y.subtype ≤ W₀.map Y.subtype := Subgroup.map_mono hXW₀
+    rwa [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
+      inf_of_le_right hXYle] at hle
+  · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective Y.subtype_injective]
+    exact hW₀hall
+
 /-- **BG Corollary 10.9 (a)(1)(2)** (mmd L2826): `M ∈ ℳ`, `p, q ∈ β(M)'` distinct, `X` を `M` の
 `q`-部分群で `X ⊆ M'` または `p < q` とする。(1) `X` は `M_σ` の Sylow `p`-部分群を中心化する;
 (2) `p ∈ α(M)` なら `C_M(X) ∈ 𝒰`。原典 (a)(3)/(b) は
