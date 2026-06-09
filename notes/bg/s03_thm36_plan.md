@@ -176,3 +176,48 @@ PLengthTransfer.lean を `OddOrder.lean` root に配線済 (full build 3587 + Ax
 **進捗ログ**: overnight loop (`4a9bf08`..`3b841e9`, 7 commits: foundation+(b)+(c)+(a) building block 4つ)、
 朝 attended (`5aeb6f0` crux + `2271b55` (a) 完成)、(e) landing (このセッション: (e)-1〜本体 4 補題 +
 root 配線)。**Lemma 1.21 全完。次 = Thm 3.4 着手** (S03 表現論新ファイル, Lem 3.3 ✅ を使う)。
+
+## ✅ 2026-06-09 session 4 cont. (a-keystone): Thm 3.4/3.5 完成後の Thm 3.6 着手準備 — 依存監査 COMPLETE
+
+**Thm 3.4 (`S03d.thm34`) + Thm 3.5 (`S03e.thm35`) とも任意体で完全形式化済** (sorry-free+axiom-clean,
+AxiomsCheck 登録)。⟹ Thm 3.6 の 2 大表現論ブロッカーは解消。残りの依存を全て **repo 内で実在確認**:
+
+| 依存 | 実体 (検証済 exact name) |
+|---|---|
+| Lem 1.21(b) | `PLengthTransfer.hasPLengthOne_of_isPiPrime_normal_quotient` |
+| Lem 1.21(c) | `PLengthTransfer.hasPLengthOne_of_isPGroup_normal_quotient` |
+| Lem 1.21(e) | `PLengthTransfer.hasPLengthOne_of_inf_eq_bot` |
+| Lem 1.21(a) | `PLengthTransfer.hasPLengthOne_subgroup` |
+| Thm 3.4 | `S03d.thm34` (一般体), `S03d.thm34_algClosed` |
+| Thm 3.5 | `S03e.thm35` (一般体), `S03e.thm35_algClosed` |
+| Lem 3.3 | `S03b.kernel_acts_trivially_of_centralizer_eq_bot` 他 |
+| Prop 1.3 | `S01_Solvable:181` (Fitting self-centralizing) |
+| Prop 1.5(a)(b)(c)(e) | `S01_Solvable:655/1401/688/1480` |
+| Prop 1.6(b) | `OperatorQuotientAction:101` (semidirect-product 形, `[[H,R],R]=[H,R]`) |
+| Prop 1.6(c)(d) | `S01_Solvable:1521/1540` |
+| Lem 1.7 | `S01_Solvable:1575+` / `FrattiniPGroup` |
+| Prop 1.16 | `S01b_Prop116` |
+| Thm 1.8 | `S01_Solvable:1702` (Burnside operator on p-group) |
+| Thm 1.13 | `CriticalSubgroup` (`S6`/`S8` 等) |
+| Thm 2.6(a) | `S04_PGroupsSmallRank:86/96` |
+| Gor 5.3.7 | `S04e.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality` |
+| IsZGroup | `OddOrder.GroupTheory.IsZGroup` (ZGroup.lean:26; ⚠ mathlib `_root_.IsZGroup` と曖昧→明示修飾) |
+
+**✅ statement 型検証済** (`S03f_Thm36.lean`, **local untracked scaffold**, proof = sorry, leaf build 3016 green,
+long-line 0)。exact form:
+```lean
+theorem thm36 {G} [Group G] [Finite G] [IsSolvable G] (hodd : Odd (Nat.card G))
+    {H R : Subgroup G} [H.Normal] (hcompl : Subgroup.IsComplement' H R)
+    (hHall : Nat.Coprime (Nat.card ↥H) (Nat.card ↥R))
+    {R₀ : Subgroup G} (hR₀R : R₀ ≤ R) (hR₀p : ∃ r : ℕ, r.Prime ∧ Nat.card ↥R₀ = r)
+    (hZ : OddOrder.GroupTheory.IsZGroup ↥(H ⊓ Subgroup.centralizer (R₀ : Set G)))
+    {p : ℕ} (hp : p.Prime) : hasPLengthOne p ↥(⁅H, R⁆ : Subgroup G)
+```
+docstring に Phase A–F の equation-by-equation roadmap 込み。**bare-sorry は commit しない方針** (merge-monitor
+の sorry-不増 auto-merge を阻害しないため; thm34 も untracked scaffold だった先例)。
+
+**▶ 次セッション (Thm 3.6 本体, multi-session)**: minimal-counterexample induction backbone
+(`thm36_aux` を thm34_aux/thm35_aux 型で strong induction on `|G|`) を組み、Phase A (3.6–3.11) から着地。
+- (3.6) は Prop 1.6(b) の semidirect-product 形を `⁅H,R⁆ < H` ケースの `⁅⁅H,R⁆,R⁆=⁅H,R⁆` に適応する要あり。
+- Phase A の reusable standalone helper 候補: `F(H)=O_p(H) when O_{p'}(H)=1` (Fitting=∏O_q 分解)。
+- 最重量は Phase D–F (Gor 5.3.7 適用 + special q-group 構造 + orbit-length parity 矛盾)。
