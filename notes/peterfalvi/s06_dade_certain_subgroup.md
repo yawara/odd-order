@@ -651,3 +651,27 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 最終 assembly (`w₂=3` で完了 or `w₂≥5` で対称適用) → χ_ij 族 → (3.2) σ。
 
 正本 = 本ノート (session 12 セクション)。
+
+## 2026-06-09 (session 12 cont., b-peterfalvi): (3.5.4) 着手 — grid + 還元 + named-triangle + Case II
+
+(3.5.4) `|⋂_i A_i1|=1` の sunflower 論法に着手。基盤 + Case II 完成。全て `S05_SigmaIsometry.lean`、sorry-free・axiom-clean・full AxiomsCheck green。3 commits (`97fc1c90`/`4fb2798b`/`aca41a24`)。
+
+### ✅ 着地
+1. **抽象 grid `IsSignedTripleGrid A`** (`97fc1c90`): row/col index `ι, κ` 上の signed-triple 族 + L/O 関係 (fields `card_eq_three`/`signed`/`orthogonal`/`inter_L`/`noNeg_L`/`inter_O`; `i i' j j'` は明示引数)。`Afam_isSignedTripleGrid` で β-族を instance 化。
+   - `common_unique` (⋂≤1, 易) + `exists_triangle_of_not_exists_common` (¬∃common ⟹ 3 行 no-common; 「全 triple が共通元 ⟹ e₁₂ 一意性で ⋂≠∅」の対偶) + `neg_not_mem_self`。
+2. **named-triangle `exists_namedTriangle`** (`4fb2798b`): 3 行 no-common ⟹ vertices e₁₂,e₁₃,e₂₃ (相異) + thirds t₁,t₂,t₃ + 3 集合等式 (`A i₁ j₀={e₁₂,e₁₃,t₁}` 等)。汎用 Finset 補助 `exists_third_of_card_three`。
+3. **Case II `caseII_false`** (`aca41a24`): K₄ config (4 行目 `A i₄ j₀={χ3,χ5,χ6}`=thirds) ⟹ False。**🔑 パリティ論法 (WLOG 不要)**: `B=A i₁ j₁`、`n_k=[χ_k∈B]`,`p_k=[-χ_k∈B]`。L(i₁,i₁)⟹`n₁+n₂+n₃=1,p₁=p₂=p₃=0`; O(i₁,i_p) p=2,3,4 ⟹ 3 式; **3 式を足すと `1+2(n₄+n₅+n₆)=2(p₄+p₅+p₆)` = 奇=偶**、`omega`。論文 (3.5.4.6) の場合分けを 1 つの parity で置換。
+   - 翻訳補助 `card_inter_triple` (`|s∩{a,b,c}|`=指標和, distinct a,b,c) + `card_filter_neg_triple` (filter 版, `-x∈{a,b,c}↔x∈{-a,-b,-c}`) + `triple_distinct` (card 3 ⟹ pairwise 相異)。
+
+### 🔑 再利用可能 (再調査不要)
+- **Case II の omega 帰着**: card 関係を指標和に翻訳 (`card_inter_triple`/`card_filter_neg_triple`、要 per-triple distinctness、cross-distinctness 不要) → `set n_k,p_k` で if を atom 化 (omega が ite split しないため必須) → `p₁=p₂=p₃=0` を noNeg から → omega (parity)。
+- mathlib v4.30 名: `Finset.card_insert_of_notMem` (notMem!), `Finset.notMem_singleton`, `Finset.card_sdiff_of_subset` (部分群版; `card_sdiff` は ∩ 版で引数取らない), `Finset.card_pair` は不可→`card_insert_of_notMem`+`card_singleton`。
+- `{χ..}` Finset 表記を含む文/補題は `open scoped Classical in` 必須 (DecidableEq)。
+
+### ▶▶ 残り (3.5.4) = Case I + assembly [次セッション, hard]
+- **Case I** (4 行目が三角形の頂点を含む, 例 `A i₄ j₀={χ1,χ6,χ7}`, χ7 新): **単一集合 B₁ counting は FEASIBLE** (`B₁={χ1,-χ5,-χ7}` が L+O 全部満たす, parity 不成立) ⟹ **マルチセット要素追跡が本質**。論文 3.5.4.1-5 は B₁,B₂,B₃,B₄ (=A_{i_p j₁}) を使い χ8(∈B₃),χ9(∈B₂) を命名して追う + WLOG (3.5.4.2/3)。**counting/omega は列 j₁ 同士の `B_p∩B_q` が固定元上でない (B_q が未知 3-集合) ため直接効かない** ⟹ B の新元素を named で追う必要。WLOG=「どの頂点 χ1/χ2/χ4 が A_{i₄} に入るか」(i₁i₂i₃ 対称) + 3.5.4.2/3 の選択。**multi-session 級。**
+- **assembly `exists_common`**: triangle + 4 行目で `by_cases` (A_{i₄} が頂点を含むか) → Case I / Case II 適用 → ⋂≠∅ ⟹ `∃! z,∀i z∈A i j₀` (+ common_unique)。Case I の「どの頂点」WLOG を assembly で処理 (3 頂点対称、caseI_false を相応の relabel で適用 or 対称版で陳述)。
+- その後: (3.5.5) decomposition → 最終 (3.5) → (3.2)σ。
+- **w₁≥5 WLOG**: (3.5.4) を `4≤Fintype.card ι` 仮説で証明済設計 (ι=非自明χ₁); `sup_card_ge_five` の disjunction で W₁/W₂ 側を選ぶ (assembly/§3.5 末)。
+
+正本 = 本ノート (session 12 cont. セクション)。
