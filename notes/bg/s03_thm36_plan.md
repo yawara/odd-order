@@ -266,3 +266,49 @@ scaffold `S03f_Thm36.lean` (untracked, leaf 3016 green) で **(3.7) `h37` を so
 h37 → `H/X` plen1 → Lem 1.21(b) `hasPLengthOne_of_isPiPrime_normal_quotient` (N=O_{p'}(↥H), p'-群) ⟹
 H plen1 = ⁅H,R⁆ plen1 (h36) ⟹ hcounter 矛盾。**要: O_{p'}(↥H) を Subgroup G に上げる + char⟹⊴G**。
 → (3.9) V=F(H) (opCore↔oPiCore + fitting sup-split) → (3.10)(3.11) → Phase B-F。正本=本ファイル「session 5 cont.」。
+
+## ✅✅ 2026-06-10 session 6 (a-keystone): Phase A **完成** ((3.8)–(3.11) 全着地)
+
+**Phase A (3.6)–(3.11) すべて scaffold `S03f_Thm36.lean` で sorry-free。残 real sorry = Phase B–F のみ。**
+(3.8) も実は session 5 cont. の handoff 後に着地済だった (h38 完成、(3.9) Part1 `hfit` も)。本 session の成果:
+
+### committed: (3.9) infrastructure (S03f_Prelim.lean, commit `c4497132`, full build 3619 green, axiom-clean)
+標準ヘルパー 4 本 (namespace `OddOrder.BG.Ch1.S03f`):
+- `mulAut_eq_one_of_coprime_orderOf_of_frattini`: Thm 1.8 の **element 形** — p-群 H の p'-order
+  automorphism が Φ(H) mod 自明 ⟹ =1。`burnside_operator` を cyclic `⟨f⟩` に適用 (S04 private 版の
+  public 複製、consolidate は task_1f77b0d7)。
+- `isPGroup_of_forall_eq_one_of_not_dvd_orderOf`: 非自明 p'-元なし ⟹ p-群 (p'-part
+  `g^(p^vₚ(orderOf g))` の位数 = `ordCompl[p]` で p 互素、それが自明 ⟹ g は p冪位数)。
+- `frattini_fitting_map_characteristic`: `(frattini ↥(fitting Hb)).map (fitting Hb).subtype` は Hb で
+  **characteristic** (char-of-char; `characteristicRestrictMulEquiv` は使わず `φ.subgroupMap V`+
+  `subgroupCongr` で restriction を自前構成)。**characteristic 強度が要**: Hb=↥H・H◁G で G-lift normal が
+  mathlib instance `ConjAct.normal_of_characteristic_of_normal` で自動 + oPiCore helper の `[Normal]` も自動。
+- `oPiCore_compl_quotient_frattini_fitting_eq_bot` ⭐ (3.9 核): F(Hb) p-群 ⟹ `O_{p'}(Hb/Φ(F(Hb)))=⊥`。
+  Q=Hb/Φ で V̄ (p) と Ō=O_{p'}(Q) (p') は coprime normal ⟹ `⁅V̄,Ō⁆=⊥` (commutator_le_inf +
+  `inf_eq_bot_of_coprime`)、pull back で `⁅V,W⁆≤Φ` (W=Ō.comap mk')。p'-元 w∈W: conjNormal w を
+  Burnside helper で =1 ⟹ w∈C_Hb(V)≤V (Prop 1.3 `centralizer_fitting_le_fitting`) ⟹ w∈V (p群) p'元
+  ⟹ w=1 ⟹ W は p群 ⟹ Ō=W.map は p群かつp'群 ⟹ ⊥。
+
+### scaffold `S03f_Thm36.lean` (untracked) に Phase A 完全配線 (leaf build 3017 green)
+hfit の後に (3.9)–(3.11) を追加。**確立した文脈ファクト (Phase B が直接使う)**:
+- `hVp : IsPGroup p ↥(fitting ↥H)` (= O_p(↥H), hfit + opCore_isPGroup)
+- `hΦbot : frattini ↥(fitting ↥H) = ⊥` ((3.9) Part2-4: Φ(V)≠⊥ なら Phi を G-lift して h37+Lem1.21(c)
+  `hasPLengthOne_of_isPGroup_normal_quotient` で H plen1 ⟹ hcounter 矛盾。`quotientMulEquivOfEq` で
+  `↥H⧸X.subgroupOf H ≃* ↥H⧸Phi` transport [motive error 回避、rw 不可])
+- `hVelem : IsElementaryAbelian p ↥(fitting ↥H)` (Lem 1.7c `frattini_eq_bot_iff_isElementaryAbelian`)
+- `hCHV : centralizer (fitting ↥H : Set ↥H) = fitting ↥H` ((3.10) Prop 1.3 + hVelem.1 可換)
+- **`h311 : ∀ (A B : Subgroup G) [A.Normal] [B.Normal], A ≤ H → B ≤ H → A ⊓ B = ⊥ → A = ⊥ ∨ B = ⊥`**
+  ((3.11) を minimal-normal 抽象を経ず Phase B/F が実際に使う形で。両 nontrivial なら h37 A/h37 B +
+  Lem 1.21(e) `hasPLengthOne_of_inf_eq_bot` (ambient ↥H, `A.subgroupOf H ⊓ B.subgroupOf H=⊥`) ⟹
+  H plen1 ⟹ hcounter 矛盾)。
+
+### ▶ 次セッション = Phase B (3.12)–(3.16)
+- `U` = preimage of `F(H/V)` in `↥H`、`V` = Sylow-p of U、`K` = R-invariant complement (Prop 1.5(a) +
+  Schur-Zassenhaus)。`P` = R-invariant Sylow-p of `N_H(K)` (Thm 1.13/critical 系)。
+- (3.12) Frattini argument `H = V·N_H(K)`。(3.13) `[K,P]≠1` (else V=Sylow-p ⟹ H plen1)。
+- **(3.14) `[V,K]=V, C_V(K)=1`**: Prop 1.6(d) `V=C_V(K)×[V,K]`、両 ◁ G、**`h311` で一方 ⊥**、`hCHV` で
+  `C_V(K)≠V` ⟹ `C_V(K)=1`。**h311 がここで効く** (C_V(K), [V,K] を Subgroup G・normal・≤H で渡す)。
+- (3.15) `K=F(N_H(K))`、(3.16) `C_H(K)⊆K` (Prop 1.3)。
+- 最重量は Phase D–F (Gor 5.3.7 `S04e` 適用 + special q-group + orbit-parity)。Thm 3.4/3.5 は ✅ 済。
+- **scaffold long-line cleanup を Thm 3.6 完成 commit 前に**: session 5 既知分 (117/123/153/155/188/191
+  系) + 本 session 追加分 (371/372/390 系) を ≤100 codepoint に。正本=本ファイル「session 6」。
