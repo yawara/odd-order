@@ -315,3 +315,39 @@ hfit の後に (3.9)–(3.11) を追加。**確立した文脈ファクト (Phas
 - 最重量は Phase D–F (Gor 5.3.7 `S04e` 適用 + special q-group + orbit-parity)。Thm 3.4/3.5 は ✅ 済。
 - **scaffold long-line cleanup を Thm 3.6 完成 commit 前に**: session 5 既知分 (117/123/153/155/188/191
   系) + 本 session 追加分 (371/372/390 系) を ≤100 codepoint に。正本=本ファイル「session 6」。
+
+## ✅ 2026-06-10 session 6 cont. (a-keystone): Phase B foundation (Hall fact) 着地 + K-construction 精密化
+
+別途ユーザーが Burnside element-form 重複を consolidate (`mulAut_eq_one_of_coprime_orderOf_of_frattini`
+→ S01_Solvable に一本化, commit `ff28b600`, full build 3619 green)。
+
+**scaffold に Phase B Part 1 (foundation) 着地** (leaf build green、残 sorry = K-construction〜3.38):
+- `set V := fitting ↥H` (3.9/3.10 facts を fold)、`hVnorm`、**`hVoPi : V = oPiCore {p} ↥H`** (hfit +
+  `oPiCore_singleton_eq_opCore`)。
+- **`hFQ_compl`**: F(↥H/V) は {p}ᶜ-群。**変数分母形** `∀ N [N.Normal], N = oPiCore {p} ↥H →
+  IsPiGroup {p}ᶜ (fitting (↥H⧸N))` で dependent-rewrite 回避。proof = Sylow-q of F(Q) を Q に push
+  (`Sylow.normal_of_isNilpotent`+`Sylow.characteristic_of_normal`+`normal_pgroup_le_opCore`) ⟹
+  ≤ oPiCore {p} Q = ⊥ (`oPiCore_quotient_self_eq_bot`) 矛盾。
+- **`hp_ndvd : ¬ p ∣ |fitting (↥H⧸V)|`** ⟹ **V は U の Hall p-部分群**。
+- **⚠ inline 重複**: hFQ_compl は S10 `fitting_quotient_oPiCore_isPiGroup_compl` と重複 (S10=BG Ch3 は
+  scaffold の下流ゆえ import 不可)。untracked ゆえ committed dup でない。**Phase B commit 前に consolidate**
+  (S10 の pSubgroup_le_opCore_of_le_fitting + fitting_quotient... を BG Ch1 base へ移動; S04
+  `isPiGroup_singleton` 依存は inline 化)。
+
+### ✅ K-construction setup (steps 1-3) 着地 — 一発 green (char-restriction の難所 解決)
+- **U := `(fitting (↥H⧸V)).comap (QuotientGroup.mk' V)`**、**`hUchar : U.Characteristic`**
+  (`Subgroup.Characteristic.comap_quotient_mk` [V char + fitting Q char]、一行)、`hVU : V ≤ U`。
+- **🔑 R-作用** `φ := (MulAut.conjNormal (G:=G)(H:=H)).comp R.subtype` → `hU_inv : IsAInvariant φ U`
+  (= `IsAInvariant.of_characteristic φ`, U char) → **`φU := hU_inv.toMulAutHom : ↥R →* MulAut ↥U`**。
+- **`K' : Subgroup ↥U`** = `exists_aInvariant_hall (G:=↥U)(φ:=φU) hCopU ({p}ᶜ)` で取得;
+  **`hK'_hall : IsHallSubgroup {p}ᶜ K'`** + **`hK'_inv : IsAInvariant φU K'`** (= R-不変補群)。
+  hCopU = `hHall.symm.coprime_dvd_right (card_subgroup_dvd_card U)`。
+
+### ▶ 次 = K の complement 性 + P + (3.12)–(3.16)
+- **K は V の complement in U**: V Hall {p} of U (hp_ndvd ⟹ |V| が U の p-part)、K' Hall {p}ᶜ ⟹
+  V·K'=U, V⊓K'=⊥ (coprime Hall product)。K (↥H 版) := `K'.map U.subtype`。
+- **P** = R-不変 Sylow-p of N_H(K): `exists_aInvariant_sylow` (N_H(K) に R-作用, IsAInvariant)。
+- **(3.12) Frattini** `↥H=V·N_H(K)`: U◁↥H(char), V◁↥H, K Hall p' of U, 全 Hall p' conjugate (`hall_C`)
+  ⟹ ∀h, K^h=K^u (u∈U) ⟹ h∈N_H(K)·U ⟹ ↥H=U·N_H(K)=V·N_H(K)。
+- (3.13) `[K,P]≠1`、**(3.14) `[V,K]=V, C_V(K)=1`** (Prop 1.6(d)+両◁G+**h311**+**hCHV**)、
+  (3.15) K=F(N_H(K))、(3.16) C_H(K)⊆K。最重量は Phase D–F。正本=本ファイル「session 6 cont.」。
