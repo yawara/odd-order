@@ -775,3 +775,28 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 - 残 hard core ×1=(4.3)§6本体 (FT経路外)。
 
 正本 = 本ノート (session 14 + cont.)。**Don't re-grind 抽象 (3.5.5) 正規直交 (symm/two_col/gridFamily_orthonormal) / foundations (mem_ZIrr/inner_trivial) / commons (col/rowCommon) — 完成・axiom-clean.**
+
+## 2026-06-09 (session 15, b-peterfalvi): ✅✅✅ (3.5) χ_ij family COMPLETE — 全 (w₁,w₂) orientations
+
+session 14 cont. が残した「χ-assembly → orientation wrapper」を完全形式化。**Peterfalvi (3.5) は任意の admissible `W=W₁×W₂` に対し concrete に成立** (`exists_chiFamily`)。4 commits、全 `S05_SigmaIsometry.lean`、sorry-free・axiom-clean・full build 3558 + AxiomsCheck green。
+
+### ✅ 着地 (session 15, 4 commits)
+1. **共有 χ-assembly 抽出 `exists_chiFamily_of_decomposition`** (`cb771e28`, refactor): symm の ~100 行 assembly (正規直交 16-case + Ind 関係) を共有補題に。入力 = `(z,w,φ, hcells: ∀pq Afam=√{z q,w p,φ p q}, hdiag0, hoff0)`。出力 = (3.5) χ-family 4 性質。3 orientation 共通。**ite-instance 地雷回避**: 仮説を `if a=b` でなく ite-free な `hdiag0`/`hoff0` で取り、内部で `hortho` を split_ifs 再構成 (具体 ι の genuine DecidableEq と generic ι の Classical が衝突しないように)。symm は thin caller に。
+2. **w₂=3 ケース `exists_chiFamily_two_col`** (`dcc74409`): `w₁≥5, w₂=3`。新 reusable 抽象 bridge `IsSignedTripleGrid.two_col_orthonormal_family_reindexed` — two_col の Bool 出力を card κ=2 の κ へ `Fintype.equivOfCardEq` で再添字 ⟹ **symm と完全同形の出力** `(w,φ, A i j={z j,w i,φ i j}, gridFamily ortho)`。正規直交は reindex equiv `E` で移送 (split_ifs + `E.injective`)。
+3. **transpose ケース `exists_chiFamily_transpose`** (`b26a857c` 同梱): `w₁=3, w₂≥5`。**転置グリッド** `(Afam_isSignedTripleGrid).transpose` (rows=Ĉ₂≥4, cols=Ĉ₁ card 2) に `two_col_orthonormal_family_reindexed` を適用。T-列共通 = 元の行共通 = `exists_rowCommon`(w₂≥5)。転置 gridFamily (`Ĉ₂⊕Ĉ₁⊕Ĉ₂×Ĉ₁`) を標準 `Ĉ₁⊕Ĉ₂⊕Ĉ₁×Ĉ₂` へ relabel: 平凡関数 `toT` (anchor swap + 積転置), injective は left-inverse `fromT`, `gridFamily _ = gridFamily _ ∘ toT` は構成子毎 `rfl`。col-anchor=`wMeet`(T-row-meet), row-anchor=`wRow`(元 row-common)。
+4. **全体 `exists_chiFamily`** (`b26a857c` 同梱, capstone): `sup_card_ge_five` + |W₁|,|W₂| 奇数>1 (∈{3}∪[5,∞)) で 3 orientation を場合分け束ね。**= 真の Peterfalvi (3.5)** (case-complete)。
+
+### 🔑 再利用可能 (再調査不要)
+- **設計の要 = `exists_chiFamily_of_decomposition`**: 任意 orientation は `(z:Ĉ₂→CF col-anchor, w:Ĉ₁→CF row-anchor, φ:Ĉ₁→Ĉ₂→CF interior, hcells, ortho)` を作れば χ-family が出る。3 ケースは「どう (z,w,φ) を作るか」だけが違う。
+- **`two_col_orthonormal_family_reindexed`** (card κ=2): two_col(Bool) → symm 形(κ) の汎用変換。w₂=3 と transpose で再利用。
+- **転置の使い方**: `(grid).transpose` で rows↔cols 入替 ⟹ row-result を col に適用。transpose grid の cell は `fun q p => Afam p q`、col-common は `exists_rowCommon`。標準レイアウトへの戻しは `toT` relabel (Equiv 不要、平凡関数+left-inverse で injective、rfl で gridFamily 等式)。
+- **ite-instance 地雷**: 抽象族 (generic ι) の `if a=b` は Classical、具体 ι は genuine DecidableEq。境界を跨ぐ補題は仮説を `hdiag0`/`hoff0` (ite-free) で取り、内部で `if a=b` 再構成。
+
+### ▶▶ 次 = (3.2) σ-isometry [次セッション、新インフラ要]
+**(3.5) は完成。次は (3.2) σ の構成。** {ω_ij}=Irr(W) を正規直交基底とし、χ_ij への線形写像が isometry σ:ℤIrr(W)→ℤIrr(G)。
+- **要 scope (未確認)**: CF(W) inner product space instance + Irr(W) orthonormal basis + 「orthonormal family → linear isometry」(mathlib `Orthonormal`/`LinearIsometry`/`Basis` 周辺)。χ_ij∈ZIrr(G) は確保済 (`exists_chiFamily` の `∀pq χ pq∈ZIrr`)。
+- (3.2) の性質: (a) σ(α_ij)=Ind (= (3.5) の Ind 関係から), (b) σ(ω_00=1_W)=1_G (= χ(1,1)=1_G から), (c)(d) from (1.3)。
+- **設計判断 (次セッション最初)**: ω_ij (=Irr(W) の元 = W1×W2 の線形指標) と χ-family の index `Ĉ₁×Ĉ₂` の対応。Irr(W)≅Ĉ₁×Ĉ₂ (W abelian) の橋渡しが要るか、index を直接 Ĉ₁×Ĉ₂ で扱うか。
+- 残 hard core ×1=(4.3)§6本体 (FT経路外)。
+
+正本 = 本ノート (session 15)。**Don't re-grind (3.5) χ-family (symm/two_col/transpose/full) / 共有 assembly / reindex wrapper — 完成・axiom-clean.**
