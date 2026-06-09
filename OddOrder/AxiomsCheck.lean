@@ -3326,6 +3326,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.isSignedNontrivialIrr_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.ne_neg_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_trivial
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_isSignedTriple_of_inner_self_three
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.neg_not_mem

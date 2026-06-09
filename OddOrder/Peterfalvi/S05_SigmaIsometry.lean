@@ -473,6 +473,28 @@ theorem IsSignedNontrivialIrr.inner_self [Invertible (Nat.card G : ℂ)] {x : Cl
     (hx : IsSignedNontrivialIrr x) : ClassFunction.inner x x = 1 := by
   rw [isSignedNontrivialIrr_inner hx hx, if_pos rfl, if_neg (fun h => hx.ne_neg_self h), sub_zero]
 
+omit [Fintype G] in
+/-- A signed nontrivial irreducible is a virtual character (`x = ±χ`, both in `ℤ[Irr G]`). -/
+theorem IsSignedNontrivialIrr.mem_ZIrr {x : ClassFunction G ℂ} (hx : IsSignedNontrivialIrr x) :
+    x ∈ ZIrr G := by
+  obtain ⟨χ, _, hx⟩ := hx
+  rcases hx with rfl | rfl
+  · exact χ.mem_ZIrr
+  · exact Submodule.neg_mem _ χ.mem_ZIrr
+
+/-- A signed nontrivial irreducible is orthogonal to `1_G` (its underlying irreducible is
+nontrivial). -/
+theorem IsSignedNontrivialIrr.inner_trivial [Invertible (Nat.card G : ℂ)]
+    {x : ClassFunction G ℂ} (hx : IsSignedNontrivialIrr x) :
+    ClassFunction.inner x (trivialClassFunction G) = 0 := by
+  obtain ⟨χ, hχ, hx⟩ := hx
+  have h0 : ClassFunction.inner (χ : ClassFunction G ℂ) (trivialClassFunction G) = 0 := by
+    rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter, irreducibleCharacter_inner,
+      if_neg hχ]
+  rcases hx with rfl | rfl
+  · exact h0
+  · rw [ClassFunction.inner_neg_left, h0, neg_zero]
+
 /-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
 *injective* and *no member is another's negative*: the diagonal inner products are `1` and the
 off-diagonal ones are `0`.  This is the bridge from the combinatorial facts of (3.5.5) (distinctness
