@@ -3345,3 +3345,11 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Cor 10.7 (`sylow_structure`, 5 parts a–e): Sylow `p`-structure. All parts route through a maximal
+-- `M ⊇ N_G(P)` with `p ∈ σ(M)`, where `↥M` has `p`-length one (Theorem 10.6, forward-conditional);
+-- Lemma 6.6 / 6.3(a) / Theorem 10.1 / Blackburn 4.16 then control `P`. Same keystone island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.sylow_structure
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
