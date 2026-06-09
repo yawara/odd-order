@@ -221,3 +221,50 @@ docstring に Phase A–F の equation-by-equation roadmap 込み。**bare-sorry
 - (3.6) は Prop 1.6(b) の semidirect-product 形を `⁅H,R⁆ < H` ケースの `⁅⁅H,R⁆,R⁆=⁅H,R⁆` に適応する要あり。
 - Phase A の reusable standalone helper 候補: `F(H)=O_p(H) when O_{p'}(H)=1` (Fitting=∏O_q 分解)。
 - 最重量は Phase D–F (Gor 5.3.7 適用 + special q-group 構造 + orbit-length parity 矛盾)。
+
+## ✅ 2026-06-09 session 5 (a-keystone): インフラ 3 commit + Phase A (3.6) 着地
+
+このセッションは **standalone infra を 3 commit + scaffold で thm36_aux backbone + (3.6) を完全証明**
+(後者は untracked scaffold ゆえ未 commit、precedent 通り)。
+
+### committed infra (3 commit, full build 3618 green, all axiom-clean)
+1. **Z-群インフラ** (`af71f3a6`, `OddOrder/GroupTheory/ZGroup.lean`):
+   - `isZGroup_iff_mathlib`: repo `OddOrder.GroupTheory.IsZGroup` ↔ mathlib `_root_.IsZGroup`
+     (フィールド同一)。これで mathlib の Z-群 API (`of_injective`/`of_surjective` 部分群/商閉包、
+     `exponent_eq_card`、`IsPGroup.isCyclic_of_isZGroup`) が使える。
+   - `card_eq_prime_of_isZGroup_exponent_dvd`: 非自明 Z-群で全元 `g^p=1` ⟹ `|G|=p`。
+   - `card_eq_prime_of_le_isZGroup`: `A ≤ Z` (Z-群)・非自明・exponent|p ⟹ `|A|=p`。
+     **⟹ (3.19) `|C_V(R₀)|=p`、(3.31) `|C_K(R)|=q` で直接使う**。
+2. **actionCommutator↔subgroup 基盤橋** (`c307c0fa`, `OperatorQuotientAction.lean`):
+   `actionCommutator_conjNormal_map_subtype_eq : (actionCommutator (conjNormal∘R.subtype)).map H.subtype = ⁅H,R⁆`
+   (`H ⊴ G`)。内部共役作用の actionCommutator 言語 ↔ 部分群交換子 `⁅H,R⁆` の翻訳土台。
+3. **Prop 1.6(b) subgroup 形** (`fabbeed1`, `OperatorQuotientAction.lean`):
+   `commutator_commutator_right_eq : ⁅⁅H,R⁆,R⁆=⁅H,R⁆` (`H ⊴ G`, coprime, `G` solvable)。
+   `actionCommutator_restrict_self_map_subtype_eq` (= `[[N,A],A]=[N,A]`、`⁅H,R⁆⊴G` 不要) を
+   2 段 nest して bridge #2 経由で導く。**核 = nested generator 橋** (`toMulAutHom_apply_val` で
+   制限作用が φ と一致、`↑↑(nN·(ψr)nN⁻¹)=⁅↑↑nN,↑r⁆`)。⟹ (3.6)/(3.24)/(3.32) で使う。
+
+### scaffold (`S03f_Thm36.lean`, **untracked**, leaf build 3016 green, 唯一 real sorry = (3.7)-(3.38))
+- `thm36_aux` (strong induction on `|G|`) + `by_contra hcounter` backbone を組んだ。
+- **✅ (3.6) `⁅H,R⁆ = H` を完全証明** (sorry-free within (3.6)):
+  - subgroup-IH を `S := ⁅H,R⁆ ⊔ R` (= `⁅H,R⁆R`) に適用 (thm34 の wiring_check パターン)。
+  - `S ⊴`-normality: `subgroup_le_normalizer_commutator_self R H` (Isaacs Lem 4.1, 仮定なし) +
+    `commutator_comm` で `R ≤ N(⁅H,R⁆)`、`Subgroup.le_normalizer` で `⁅H,R⁆ ≤ N(⁅H,R⁆)`。
+  - **Z-群 hyp transport** (新パターン): `C_S(R₀').map S.subtype ≤ ⁅H,R⁆⊓C_G(R₀) ≤ H⊓C_G(R₀)`
+    ⟹ `IsZGroup.of_injective` (`inclusion_injective hle`) + `equivMapOfInjective` で `IsZGroup ↥(C_S(R₀'))`。
+  - 結論橋: IH → `hasPLengthOne p ↥⁅H'.subgroupOf S, R'.subgroupOf S⁆`、`map_commutator`+
+    `subgroupOf_map_subtype` で `(...).map S.subtype = ⁅⁅H,R⁆,R⁆`、`equivMapOfInjective`+
+    `hasPLengthOne_of_mulEquiv` で transfer、`commutator_commutator_right_eq` で `=⁅H,R⁆` ⟹ `hcounter` 矛盾。
+
+### 次セッション (Phase A 続き (3.7)–(3.11) → Phase B–F)
+- **(3.7) 商 IH** (`G/X`, `1≠X⊴H` R-invariant): thm36_aux の **新しい IH 適用形** (subgroup でなく商)。
+  - `X ⊴ G` (char H ◁ G より)、`G/X` で `H/X` normal Hall、`R` 商で補群、`R₀` 商 prime。
+  - **Z-群 transport (商側)**: Prop 1.5(d) `C_{H/X}(R₀)=C_H(R₀)X/X` (= image of Z-群) ⟹
+    mathlib `of_surjective` で Z-群。**Prop 1.5(d) の clean 形** (`C_{G/N}(A)=C_G(A)N/N`) の repo 所在を
+    要確認 (`S03_FrobeniusActions` に bridge 形あるが `hlift` 付き; Isaacs Cor 3.28 が underlying)。
+  - (3.7) は (3.6) `H=⁅H,R⁆` を使い `⁅H/X,R⁆=H/X` ⟹ `H/X` plen1。
+- **(3.8) `O_{p'}(H)=1`**: `O_{p'}(H)≠1` なら X:=O_{p'}(H) で (3.7) + Lem 1.21(b) ⟹ H plen1 ⟹ 矛盾。
+- **(3.9) `V=F(H)=O_p(H)` elem abelian**: `F(H)=O_p(H)` (O_{p'}=1; **opCore↔oPiCore 橋 + fitting sup-split
+  が要**, `fitting=⨆opCore p`/`oPiCore {p}ᶜ=O_{p'}`)、Φ(V)=1 reduction (Lem 1.21(c)+Thm1.8+Prop1.3)、Lem 1.7。
+- **scaffold の既知 cleanup (commit 前に要)**: long-line 6 箇所 (117,123,153,155,188,191) を ≤100 に。
+- 最重量は依然 Phase D–F (Gor 5.3.7 + special q-group + orbit-parity)。
