@@ -319,6 +319,36 @@ theorem trivial_of_invariants_comp_ne_bot
     rw [Representation.mem_invariants] at hv
     exact hv ⟨g, hg⟩
 
+open OddOrder.RepresentationTheory in
+/-- **Inner conjugates are trivial** (orbit-machinery entry point for step 9).  For `g ∈ H`, the
+conjugate `M^g = M.map (conjSemilinearEnd ρ g)` of an `F[H]`-submodule `M` equals `M` itself: `ρ g`
+preserves the `H`-submodule `M` (it is the action of the group element `single ⟨g,·⟩ 1`).
+
+This supplies the `hconj` hypothesis of `restriction_isIrreducible` (BG Prop 2.2(a)) on the subgroup
+elements; combined with `map_map_conjSemilinearEnd`, an isomorphism `M ≅ M^x` for a generator `x`
+propagates to all of `G = ⟨H, x⟩`. -/
+theorem map_conjSemilinearEnd_eq_self_of_mem (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] {g : G} (hg : g ∈ H)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) :
+    M.map (conjSemilinearEnd (H := H) ρ g) = M := by
+  -- For `h ∈ H`, `conjSemilinearEnd ρ h v = single ⟨h,·⟩ 1 • v`, which stays in the
+  -- `F[H]`-submodule `M`.
+  have hact : ∀ {h : G} (hh : h ∈ H) (v : (resRep ρ H).asModule),
+      (conjSemilinearEnd (H := H) ρ h v)
+        = MonoidAlgebra.single (⟨h, hh⟩ : ↥H) (1 : F) • v := by
+    intro h hh v
+    rw [conjSemilinearEnd_apply, Representation.single_smul, one_smul, resRep_apply]; rfl
+  refine le_antisymm ?_ ?_
+  · rintro w ⟨v, hv, rfl⟩
+    rw [hact hg v]; exact M.smul_mem _ hv
+  · intro w hw
+    rw [mem_map_conjSemilinearEnd]
+    refine ⟨conjSemilinearEnd (H := H) ρ g⁻¹ w, ?_, ?_⟩
+    · rw [hact (H.inv_mem hg) w]; exact M.smul_mem _ hw
+    · rw [conjSemilinearEnd_apply]
+      show ρ g (ρ g⁻¹ w) = w
+      rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
+
 end Step9
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
