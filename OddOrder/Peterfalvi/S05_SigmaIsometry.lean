@@ -824,6 +824,61 @@ theorem sup_card_ge_five (hyp : TICyclicHypothesis G) :
   rw [hc1, hc2] at hcop
   exact absurd hcop (by decide)
 
+/- 3.5.1 (cont.) / 3.5.2: the fixed family of signed triples `A_{ij}` -/
+
+/-- **Peterfalvi (3.5.1)**, family form: a fixed choice of signed-triple set `A_{ij}` for each
+`β_{ij}` (`i, j ≥ 1`), indexed by pairs of nontrivial linear characters of `W₁`, `W₂`.  This is
+the family the `(3.5.4)`-`(3.5.5)` combinatorics reason about. -/
+noncomputable def Afam (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1})
+    (q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) : Finset (ClassFunction G ℂ) :=
+  (hyp.exists_isSignedTriple_beta hVeq app p.2 q.2).choose
+
+/-- `A_{ij}` is a signed triple for `β_{ij}`. -/
+theorem Afam_isSignedTriple (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1})
+    (q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) :
+    IsSignedTriple (hyp.beta hVeq app p.1 q.1) (hyp.Afam hVeq app p q) :=
+  (hyp.exists_isSignedTriple_beta hVeq app p.2 q.2).choose_spec
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `L(ij, i'j')`, family form: `A_{ij}` and `A_{i'j'}` with index pairs
+sharing exactly one coordinate intersect in one element, with no negated common element. -/
+theorem Afam_L (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {p p' : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}}
+    {q q' : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}}
+    (hshared : (p = p' ∧ q ≠ q') ∨ (p ≠ p' ∧ q = q')) :
+    (hyp.Afam hVeq app p q ∩ hyp.Afam hVeq app p' q').card = 1 ∧
+      ∀ x ∈ hyp.Afam hVeq app p q, -x ∉ hyp.Afam hVeq app p' q' := by
+  refine (hyp.Afam_isSignedTriple hVeq app p q).L_of_inner_one
+    (hyp.Afam_isSignedTriple hVeq app p' q') ?_ ?_
+  · apply hyp.beta_inner_eq_one_of_one_shared hVeq app p.2 q.2 p'.2 q'.2
+    rcases hshared with ⟨rfl, hq⟩ | ⟨hp, rfl⟩
+    · exact Or.inl ⟨rfl, fun h => hq (Subtype.ext h)⟩
+    · exact Or.inr ⟨fun h => hp (Subtype.ext h), rfl⟩
+  · rw [hyp.beta_apply_one, hyp.beta_apply_one]
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `O(ij, i'j')`, family form: `A_{ij}` and `A_{i'j'}` with both indices
+different satisfy `|A_{ij} ∩ A_{i'j'}| = |{x ∈ A_{ij} : -x ∈ A_{i'j'}}|`. -/
+theorem Afam_O (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {p p' : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}}
+    {q q' : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}}
+    (hp : p ≠ p') (hq : q ≠ q') :
+    (hyp.Afam hVeq app p q ∩ hyp.Afam hVeq app p' q').card =
+      ((hyp.Afam hVeq app p q).filter (fun x => -x ∈ hyp.Afam hVeq app p' q')).card :=
+  (hyp.Afam_isSignedTriple hVeq app p q).O_card_inter_eq (hyp.Afam_isSignedTriple hVeq app p' q')
+    (hyp.beta_inner_eq_zero_of_both_diff hVeq app p.2 q.2 p'.2 q'.2
+      (fun h => hp (Subtype.ext h)) (fun h => hq (Subtype.ext h)))
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

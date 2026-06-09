@@ -3343,3 +3343,9 @@ set_option linter.style.longLine false in
 
 -- §5 (3.5.3): `sup(w₁, w₂) ≥ 5`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sup_card_ge_five
+
+-- §5 (3.5.1/3.5.2): the fixed family of signed triples `A_{ij}` with its `L`/`O` relations.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_isSignedTriple
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_L
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_O
