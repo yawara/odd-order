@@ -455,6 +455,24 @@ theorem character_eq_of_nonempty_linearEquiv [FiniteDimensional F W] (ρ : Repre
       (e.trans (subRepAsModuleEquiv (resRep ρ H) B))))
 
 open OddOrder.RepresentationTheory in
+/-- **ISO case, iso-phrased** (perf-safe variant of `resRep_isIrreducible_of_char_eq_generator`).
+If a simple `F[H]`-constituent `M` of an irreducible `ρ` (alg-closed, `char F ∤ |H|`, `H ◁ G`,
+`G = ⟨H, x⟩`) is isomorphic to its conjugate `M^x`, then `Res^G_H ρ` is irreducible.  Converts the
+iso to the equal-character hypothesis once (`character_eq_of_nonempty_linearEquiv`). -/
+theorem resRep_isIrreducible_of_iso_generator
+    [IsAlgClosed F] [FiniteDimensional F W] [Nontrivial W] (ρ : Representation F G W)
+    [ρ.IsIrreducible] {H : Subgroup G} [H.Normal] [Finite ↥H] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) (hM : M ≠ ⊥)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hx : Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ x)))) :
+    (resRep ρ H).IsIrreducible := by
+  obtain ⟨e⟩ := hx
+  exact resRep_isIrreducible_of_char_eq_generator ρ hHchar M hM x hgen
+    (character_eq_of_nonempty_linearEquiv ρ e).symm
+
+open OddOrder.RepresentationTheory in
 /-- **`hconj` propagation, iso-phrased** (perf-safe variant of
 `nonempty_linearEquiv_map_conjSemilinearEnd_forall`).  If the conjugate `M^x` for a generator `x`
 (with `G = ⟨H, x⟩`) is `F[H]`-linearly isomorphic to `M`, then `M ≅ M^g` for **every** `g ∈ G`.
@@ -1003,6 +1021,62 @@ theorem restrictScalars_le_invariants_of_finrank_one [FiniteDimensional F W]
   rw [← hgk]
   simpa [hMρ, Subrepresentation.toRepresentation] using h3
 
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **The reducible `N R`-case of step 9** (`N = K'`).  If `ρ` restricted to `N ⊔ R` is *not*
+irreducible, then `N` has a nonzero fixed vector: `C_W(N) ≠ 0`.
+
+A simple `F[N⊔R]`-submodule `A` is proper (else `ρ|_{NR}` would be irreducible) and nonzero; Maschke
+gives a complement `B` (also nonzero).  Both are `NR`-invariant and disjoint, so the dichotomy
+`dichotomy_3_5` makes `N` act trivially on `A` or on `B`; that summand lies in `C_W(N)`. -/
+theorem invariants_ne_bot_of_not_irreducible_sup [Finite G] [FiniteDimensional F W] [Nontrivial W]
+    (σ : Representation F G W) {K R N : Subgroup G} [N.Normal]
+    (hFrob : IsFrobeniusGroup G K R) (hNK : N ≤ K) (hNinv : R ≤ Subgroup.normalizer N)
+    (hNne : N ≠ ⊥) (hchar : (Nat.card G : F) ≠ 0) (hcharNR : (Nat.card ↥(N ⊔ R) : F) ≠ 0)
+    (hCV1 : Module.finrank F (Representation.invariants (σ.comp R.subtype)) = 1)
+    (hNRnotirr : ¬ Representation.IsIrreducible (σ.comp (N ⊔ R).subtype)) :
+    Representation.invariants (σ.comp N.subtype) ≠ ⊥ := by
+  haveI : NeZero (Nat.card ↥(N ⊔ R) : F) := ⟨hcharNR⟩
+  haveI : Nontrivial (resRep σ (N ⊔ R)).asModule := inferInstanceAs (Nontrivial W)
+  haveI hss : IsSemisimpleModule (MonoidAlgebra F ↥(N ⊔ R)) (resRep σ (N ⊔ R)).asModule := by
+    rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
+  -- a simple `F[N⊔R]`-submodule `A`, necessarily proper (else `ρ|_{NR}` irreducible).
+  obtain ⟨A, hAsimple⟩ :=
+    IsSemisimpleModule.exists_simple_submodule (MonoidAlgebra F ↥(N ⊔ R))
+      (resRep σ (N ⊔ R)).asModule
+  haveI := hAsimple
+  have hAne : A ≠ ⊥ := IsSimpleModule.isAtom.1
+  have hAtop : A ≠ ⊤ := by
+    rintro rfl
+    refine hNRnotirr ((Representation.irreducible_iff_isSimpleModule_asModule _).mpr ?_)
+    exact IsSimpleModule.congr Submodule.topEquiv.symm
+  obtain ⟨B, hAB⟩ := exists_isCompl A
+  have hBne : B ≠ ⊥ := by
+    rintro rfl
+    exact hAtop (by simpa using codisjoint_iff.mp hAB.codisjoint)
+  -- invariance bridge: `F[N⊔R]`-submodules are `σ`-invariant on `N ⊔ R`.
+  have hinv : ∀ (D : Submodule (MonoidAlgebra F ↥(N ⊔ R)) (resRep σ (N ⊔ R)).asModule),
+      ∀ g ∈ N ⊔ R, ∀ a ∈ D.restrictScalars F, σ g a ∈ D.restrictScalars F := by
+    intro D g hg a ha
+    have h := D.smul_mem (MonoidAlgebra.single (⟨g, hg⟩ : ↥(N ⊔ R)) (1 : F)) ha
+    rwa [Representation.single_smul, one_smul, resRep_apply] at h
+  have hdisj : Disjoint (A.restrictScalars F) (B.restrictScalars F) :=
+    Submodule.disjoint_def.mpr fun v hvA hvB =>
+      (Submodule.disjoint_def.mp hAB.disjoint) v hvA hvB
+  -- `dichotomy_3_5`: `N` acts trivially on `A` or on `B`; that summand lies in `C_W(N)`.
+  have hmemInv : ∀ (D : Submodule (MonoidAlgebra F ↥(N ⊔ R)) (resRep σ (N ⊔ R)).asModule),
+      D ≠ ⊥ → (∀ n : ↥N, ∀ a ∈ D.restrictScalars F, σ (n : G) a = a) →
+      Representation.invariants (σ.comp N.subtype) ≠ ⊥ := by
+    intro D hDne hDtriv hcontra
+    obtain ⟨a₀, ha₀D, ha₀0⟩ := (Submodule.ne_bot_iff _).mp hDne
+    have : a₀ ∈ Representation.invariants (σ.comp N.subtype) := by
+      rw [Representation.mem_invariants]; intro n; exact hDtriv n a₀ ha₀D
+    rw [hcontra, Submodule.mem_bot] at this
+    exact ha₀0 this
+  rcases dichotomy_3_5 hFrob hNK hNinv hNne σ hchar hCV1 (hinv A) (hinv B) hdisj with hA | hB
+  · exact hmemInv A hAne hA
+  · exact hmemInv B hBne hB
+
 end Step9Bridges
 
 
@@ -1137,6 +1211,7 @@ theorem thm35_algClosed
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
 end OddOrder.BG.Ch1.S03e
+
 
 
 
