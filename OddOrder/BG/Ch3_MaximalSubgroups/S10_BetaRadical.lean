@@ -20,7 +20,7 @@ namespace OddOrder.BG.Ch3.S10
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -2640,6 +2640,173 @@ theorem beta_factorization_of_sylow_normalizer_in_intersection [Finite G]
 
 /-! ## Proposition 10.10 — N_G(P) の分解 (mmd L2844) -/
 
+/-- **Prop 10.10 prep**: `A ∈ ℰ_p²(G) ∩ ℰ_p^*(G)` satisfies BG Hypothesis 7.1, via Proposition
+7.5 case (1): `A = Ω₁(C_G(A))` (from maximality of `A` as elementary abelian — any `p`-torsion
+element of `C_G(A)` generates with `A` an elementary abelian group, which collapses to `A`) and
+every proper subgroup of `G` has `p`-length one (Theorem 10.6, `proper_hasPLengthOne`). Mirrors
+the Hypothesis 7.1 step of `S11_ExceptionalMaximal`. -/
+private theorem hypothesis71_of_mem_elemAbelianOfRank_two_of_maximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
+    (hAmax : IsMaximalElementaryAbelian p A) :
+    Ch2.S07.Hypothesis71 A := by
+  have hAelem : A.IsElementaryAbelian p := hA.1
+  have hAcomm : IsMulCommutative ↥A := ⟨⟨fun x y => hAelem.comm x y⟩⟩
+  have hAcard : Nat.card ↥A = p ^ 2 := hA.2
+  have hpG : p ∣ Nat.card G := by
+    have hdvd : Nat.card ↥A ∣ Nat.card G := Subgroup.card_subgroup_dvd_card A
+    rw [hAcard] at hdvd
+    exact dvd_trans (dvd_pow_self p (by norm_num)) hdvd
+  refine Ch2.S07.hypothesis71_of_scn2_or_pLengthOne hG hpG A hAcomm hAelem.isPGroup
+    (Or.inl ⟨?_, fun N hN => proper_hasPLengthOne hG N hN⟩)
+  -- `(A : Set G) = {x | x ∈ C_G(A) ∧ x ^ p = 1}` (maximality of `A`).
+  ext x
+  simp only [Set.mem_setOf_eq, SetLike.mem_coe]
+  constructor
+  · intro hx
+    refine ⟨Subgroup.le_centralizer (H := A) hx, ?_⟩
+    have hxp1 : (⟨x, hx⟩ : ↥A) ^ p = 1 := hAelem.2 _
+    have := congrArg (Subgroup.subtype A) hxp1
+    simpa using this
+  · rintro ⟨hxc, hxp⟩
+    have hgen_comm : ∀ a ∈ (A : Set G) ∪ {x}, ∀ b ∈ (A : Set G) ∪ {x}, a * b = b * a := by
+      rintro a (ha | ha) b (hb | hb)
+      · have := hAelem.comm ⟨a, ha⟩ ⟨b, hb⟩
+        simpa using congrArg (Subgroup.subtype A) this
+      · rw [Set.mem_singleton_iff] at hb; subst hb; exact hxc a ha
+      · rw [Set.mem_singleton_iff] at ha; subst ha; exact (hxc b hb).symm
+      · rw [Set.mem_singleton_iff] at ha hb; subst ha; subst hb; rfl
+    set B : Subgroup G := Subgroup.closure ((A : Set G) ∪ {x}) with hB_def
+    haveI hBcomm : IsMulCommutative ↥B := Subgroup.isMulCommutative_closure hgen_comm
+    have hgen_pow : ∀ w ∈ (A : Set G) ∪ {x}, w ^ p = 1 := by
+      rintro w (hw | hw)
+      · have := hAelem.2 ⟨w, hw⟩; simpa using congrArg (Subgroup.subtype A) this
+      · rw [Set.mem_singleton_iff] at hw; subst hw; exact hxp
+    have hBclos_comm : ∀ a ∈ B, ∀ b ∈ B, a * b = b * a := fun a ha b hb => by
+      have := hBcomm.is_comm.comm (⟨a, ha⟩ : ↥B) ⟨b, hb⟩
+      simpa using congrArg (Subgroup.subtype B) this
+    have hclos_pow : ∀ y ∈ Subgroup.closure ((A : Set G) ∪ {x}), y ^ p = 1 := by
+      intro y hy
+      induction hy using Subgroup.closure_induction with
+      | mem z hz => exact hgen_pow z hz
+      | one => simp
+      | mul z₁ z₂ hz₁ hz₂ h₁ h₂ =>
+          have hc : Commute z₁ z₂ := hBclos_comm z₁ hz₁ z₂ hz₂
+          rw [hc.mul_pow, h₁, h₂, mul_one]
+      | inv z _ h => rw [inv_pow, h, inv_one]
+    have hB_pow : ∀ u : ↥B, u ^ p = 1 := fun u =>
+      Subtype.ext (by simpa using hclos_pow (u : G) u.2)
+    have hBelem : B.IsElementaryAbelian p := ⟨fun u v => hBcomm.is_comm.comm u v, hB_pow⟩
+    have hAleB : A ≤ B := fun z hz => Subgroup.subset_closure (Or.inl hz)
+    have hBeqA : B = A := hAmax.2 B hBelem hAleB
+    have hxB : x ∈ B := Subgroup.subset_closure (Or.inr (Set.mem_singleton x))
+    rw [hBeqA] at hxB
+    exact hxB
+
+/-- **Prop 10.10 prep**: conjugation transports membership in `ℋ_⊤(A;π)` along the acting
+subgroup as well: `Q ∈ ℋ_⊤(P;π) ⟹ Q^g ∈ ℋ_⊤(P^g;π)`. (The library lemma
+`conj_smul_mem_hInvariant_top_of_normalizer` keeps `P` fixed; here both `Q` and `P` move.) -/
+private theorem conj_smul_mem_hInvariant_top_conj {P Q : Subgroup G} {π : Set ℕ}
+    (hQ : Q ∈ hInvariant ⊤ P π) (g : G) :
+    MulAut.conj g • Q ∈ hInvariant ⊤ (MulAut.conj g • P) π := by
+  obtain ⟨-, hQnorm, hQpi⟩ := hQ
+  refine ⟨le_top, ?_, ?_⟩
+  · -- `g•P ≤ N_G(g•Q)`: a `g•P`-element `b = g a g⁻¹` (`a ∈ P ≤ N_G(Q)`) fixes `g•Q`.
+    intro b hb
+    apply mem_normalizer_of_conj_smul_eq_self
+    have ha : g⁻¹ * b * g ∈ P := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hb
+      simpa only [map_inv, MulAut.conj_inv_apply] using hb
+    calc MulAut.conj b • MulAut.conj g • Q
+        = MulAut.conj (b * g) • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj (g * (g⁻¹ * b * g)) • Q := by group
+      _ = MulAut.conj g • MulAut.conj (g⁻¹ * b * g) • Q := by rw [smul_smul, ← map_mul]
+      _ = MulAut.conj g • Q := by
+          rw [conj_smul_eq_self_of_mem_normalizer (hQnorm ha)]
+  · have hcard : Nat.card ↥(MulAut.conj g • Q) = Nat.card ↥Q :=
+      (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g) Q).toEquiv).symm
+    intro r hr
+    rw [hcard] at hr
+    exact hQpi r hr
+
+/-- **Prop 10.10 prep**: conjugation transports membership in `ℋ_⊤^*(A;π)` along the acting
+subgroup: `Q ∈ ℋ_⊤^*(P;π) ⟹ Q^g ∈ ℋ_⊤^*(P^g;π)`. Maximality transports along the order
+isomorphism `· ↦ ·^g`. -/
+private theorem conj_smul_mem_hInvariantStar_top_conj {P Q : Subgroup G} {π : Set ℕ} (g : G)
+    (hQ : Q ∈ hInvariantStar ⊤ P π) :
+    MulAut.conj g • Q ∈ hInvariantStar ⊤ (MulAut.conj g • P) π := by
+  obtain ⟨hQmem, hQmax⟩ := hQ
+  refine ⟨conj_smul_mem_hInvariant_top_conj hQmem g, ?_⟩
+  intro Q' hQ' hle
+  have h1 : MulAut.conj g⁻¹ • Q' ∈ hInvariant ⊤ P π := by
+    have h := conj_smul_mem_hInvariant_top_conj hQ' g⁻¹
+    rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
+  have h2 : Q ≤ MulAut.conj g⁻¹ • Q' := by
+    calc Q = MulAut.conj g⁻¹ • MulAut.conj g • Q := by
+          rw [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ ≤ MulAut.conj g⁻¹ • Q' := by
+          rw [Subgroup.pointwise_smul_le_pointwise_smul_iff]; exact hle
+  have h3 : MulAut.conj g⁻¹ • Q' = Q := hQmax _ h1 h2
+  calc Q' = MulAut.conj g • MulAut.conj g⁻¹ • Q' := by
+        rw [smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    _ = MulAut.conj g • Q := by rw [h3]
+
+/-- **Prop 10.10 prep (the §7 core)**: from BG Hypothesis 7.1 and `K`-transitivity on
+`ℋ_G^*(A;q)`, every `Q ∈ ℋ_G^*(A;q)` is `ℋ_G^*(P;q)`-maximal for *some* Sylow `p`-subgroup
+`P ⊇ A`. Take any Sylow `P₀ ⊇ A` and a maximal `P₀`-invariant `q`-subgroup `Q₀`; by Theorem 7.4
+`Q₀ ∈ ℋ_G^*(A;q)`, so transitivity gives `k ∈ K ⊆ C_G(A)` with `Q₀^k = Q`. Then `P := P₀^k` is a
+Sylow `p`-subgroup containing `A^k = A` with `Q ∈ ℋ_G^*(P;q)` (conjugation equivariance). -/
+private theorem exists_sylow_mem_hInvariantStar [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] {A : Subgroup G}
+    (hAp : IsPGroup p ↥A) (hAne : A ≠ ⊥) (hHyp71 : Ch2.S07.Hypothesis71 A)
+    (hπ : Ch2.S07.primesOf A = {p}) (hq : q ∈ (Ch2.S07.primesOf A)ᶜ)
+    (htrans : Ch2.S07.ConjTransitiveOn (Ch2.S07.kSubgroup A) (hInvariantStar ⊤ A {q}))
+    {Q : Subgroup G} (hQ : Q ∈ hInvariantStar ⊤ A {q}) :
+    ∃ P : Sylow p G, A ≤ (P : Subgroup G) ∧ Q ∈ hInvariantStar ⊤ (P : Subgroup G) {q} := by
+  classical
+  -- A Sylow `p`-subgroup `P₀ ⊇ A`.
+  obtain ⟨P₀, hAP₀⟩ := IsPGroup.exists_le_sylow hAp
+  -- `↑P₀` is a proper `π(A) = {p}`-subgroup; `A` is subnormal in the nilpotent `p`-group `↑P₀`.
+  have hP₀proper : (P₀ : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    have hGp : IsPGroup p G := (htop ▸ P₀.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+      (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    exact hG.notSolvable inferInstance
+  have hP₀pi : Subgroup.IsPiSubgroup (Ch2.S07.primesOf A) (P₀ : Subgroup G) := by
+    rw [hπ]; exact isPiSubgroup_singleton_of_isPGroup P₀.isPGroup'
+  haveI : Group.IsNilpotent ↥(P₀ : Subgroup G) := P₀.isPGroup'.isNilpotent
+  have hAsub₀ : (A.subgroupOf (P₀ : Subgroup G)).IsSubnormal :=
+    Ch02.isSubnormal_of_isNilpotent_finite (A.subgroupOf (P₀ : Subgroup G))
+  -- A maximal `P₀`-invariant `q`-subgroup `Q₀` exists (extend `⊥`).
+  have hbot : (⊥ : Subgroup G) ∈ hInvariant ⊤ (P₀ : Subgroup G) {q} := by
+    rw [mem_hInvariant]
+    refine ⟨bot_le, ?_, ?_⟩
+    · intro x _
+      rw [Subgroup.mem_normalizer_iff]
+      intro y
+      simp
+    · intro r hr
+      rw [Subgroup.card_bot] at hr
+      simp at hr
+  obtain ⟨Q₀, hQ₀star, -⟩ := exists_le_hInvariantStar hbot
+  -- Theorem 7.4: `ℋ_G^*(P₀;q) ⊆ ℋ_G^*(A;q)`, so `Q₀ ∈ ℋ_G^*(A;q)`.
+  obtain ⟨-, -, hsub, -⟩ := Ch2.S07.transitivity_propagates hG hHyp71 hq (P₀ : Subgroup G)
+    hP₀proper hP₀pi hAP₀ hAsub₀ htrans
+  have hQ₀A : Q₀ ∈ hInvariantStar ⊤ A {q} := hsub hQ₀star
+  -- Transitivity: `k ∈ K ⊆ C_G(A) ⊆ N_G(A)` with `Q₀^k = Q`.
+  obtain ⟨k, hkK, hkQ⟩ := htrans Q₀ hQ₀A Q hQ
+  have hkc : k ∈ Subgroup.centralizer (A : Set G) := Ch2.S07.kSubgroup_le_centralizer A hkK
+  have hkA : MulAut.conj k • A = A :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.centralizer_le_normalizer (A : Set G) hkc)
+  -- `P := P₀^k`.
+  refine ⟨k • P₀, ?_, ?_⟩
+  · rw [Sylow.coe_subgroup_smul, ← hkA]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hAP₀
+  · rw [Sylow.coe_subgroup_smul, ← hkQ]
+    exact conj_smul_mem_hInvariantStar_top_conj k hQ₀star
+
 /-- **BG Proposition 10.10 (a)(b)(c)** (mmd L2844): `p ≠ q`, `A ∈ ℰ_p²(G)∩ℰ_p*(G)`,
 `Q ∈ ℋ_G*(A;q)`, `q ∈ π(C_G(A))`。すると `A ⊆ P` となるある `P ∈ Syl_p(G)` で、
 (a) `N_G(P) = O_{p'}(C_G(P))·(N_G(P)∩N_G(Q))`; (b) `P ⊆ N_G(Q)'`;
@@ -2657,7 +2824,179 @@ theorem normalizer_factorization [Finite G] (hG : IsMinimalSimpleOdd G) {p q : �
       (P : Subgroup G) ≤ derivedInG (Subgroup.normalizer (Q : Set G)) ∧
       ((IsCyclic ↥Q ∨ ∃ B : Subgroup ↥Q, Nat.card ↥B = q ^ 2 ∧ IsMaximalElementaryAbelian q B) →
         (P : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) := by
-  sorry
+  classical
+  have hAelem : A.IsElementaryAbelian p := hA.1
+  have hAp : IsPGroup p ↥A := hAelem.isPGroup
+  have hAcard : Nat.card ↥A = p ^ 2 := hA.2
+  have hAne : A ≠ ⊥ := by
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hAcard
+    have : 1 < p ^ 2 := Nat.one_lt_pow (by norm_num) (Fact.out : p.Prime).one_lt
+    omega
+  have hπ : Ch2.S07.primesOf A = {p} := by
+    have hpf : (Nat.card ↥A).primeFactors = {p} := by
+      rw [hAcard]; exact Nat.primeFactors_prime_pow (by norm_num) Fact.out
+    ext r
+    show r ∈ (Nat.card ↥A).primeFactors ↔ r ∈ ({p} : Set ℕ)
+    rw [hpf, Finset.mem_singleton, Set.mem_singleton_iff]
+  have hq : q ∈ (Ch2.S07.primesOf A)ᶜ := by
+    rw [hπ]; exact fun h => hpq (Set.mem_singleton_iff.mp h).symm
+  -- BG Hypothesis 7.1 and `K`-transitivity on `ℋ_G^*(A;q)` (Theorem 7.3, `m(Z(A)) = 2`).
+  have hHyp71 := hypothesis71_of_mem_elemAbelianOfRank_two_of_maximal hG hA hAmax
+  have hm : 2 ≤ rank ↥(Subgroup.center ↥A) := by
+    haveI : IsMulCommutative ↥A := ⟨⟨fun x y => hAelem.comm x y⟩⟩
+    have hcenter : Subgroup.center ↥A = ⊤ := Subgroup.center_eq_top
+    have e : ↥(Subgroup.center ↥A) ≃* ↥A :=
+      (MulEquiv.subgroupCongr hcenter).trans Subgroup.topEquiv
+    have h2A : 2 ≤ pRank ↥A p := by
+      have hlog : Nat.log p (Nat.card ↥A) = 2 := by
+        rw [hAcard, Nat.log_pow (Fact.out : p.Prime).one_lt]
+      exact hlog ▸ hAelem.log_card_le_pRank
+    calc 2 ≤ pRank ↥A p := h2A
+      _ ≤ pRank ↥(Subgroup.center ↥A) p :=
+          pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective
+      _ ≤ rank ↥(Subgroup.center ↥A) := pRank_le_rank p
+  have htrans := Ch2.S07.transitive_of_two_le_rank_center_of_dvd hG hHyp71 hq hm hqc
+  -- A Sylow `p`-subgroup `P ⊇ A` with `Q ∈ ℋ_G^*(P;q)` (the §7 core, `exists_sylow_…`).
+  obtain ⟨P, hAP, hQP⟩ := exists_sylow_mem_hInvariantStar hG hAp hAne hHyp71 hπ hq htrans hQ
+  -- Theorem 7.4(d) for `(A, P)` and `Q`: the normalizer factorization and `P ⊓ N_G(P)' ⊆ N_G(Q)'`.
+  have hPproper : (P : Subgroup G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    have hGp : IsPGroup p G := (htop ▸ P.isPGroup' : IsPGroup p ↥(⊤ : Subgroup G)).of_surjective
+      (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+    haveI : Group.IsNilpotent G := hGp.isNilpotent
+    exact hG.notSolvable inferInstance
+  have hPpi : Subgroup.IsPiSubgroup (Ch2.S07.primesOf A) (P : Subgroup G) := by
+    rw [hπ]; exact isPiSubgroup_singleton_of_isPGroup P.isPGroup'
+  haveI : Group.IsNilpotent ↥(P : Subgroup G) := P.isPGroup'.isNilpotent
+  have hAsub : (A.subgroupOf (P : Subgroup G)).IsSubnormal :=
+    Ch02.isSubnormal_of_isNilpotent_finite (A.subgroupOf (P : Subgroup G))
+  obtain ⟨-, -, -, hd⟩ := Ch2.S07.transitivity_propagates hG hHyp71 hq (P : Subgroup G)
+    hPproper hPpi hAP hAsub htrans
+  obtain ⟨hd1, hd2⟩ := hd Q hQP
+  -- (b)+(c) share `P ≤ N_G(Q)'`: Corollary 10.7 gives `P ≤ N_G(P)'`, so `P ⊓ N_G(P)' = P`.
+  have hPderQ : (P : Subgroup G) ≤ derivedInG (Subgroup.normalizer (Q : Set G)) := by
+    obtain ⟨V, hV, hPVinf, hPVsup⟩ := exists_sylow_complement_normalizer P
+    have hPder : (P : Subgroup G) ≤ derivedInG (Subgroup.normalizer ((P : Subgroup G) : Set G)) :=
+      ((sylow_structure hG P).1 V hV hPVinf hPVsup).2
+    rwa [inf_eq_left.mpr hPder] at hd1
+  refine ⟨P, hAP, ?_, hPderQ, ?_⟩
+  · -- (a): the factorization `N_G(P) = O_{p'}(C_G(P)) · (N_G(P) ∩ N_G(Q))`.
+    intro n hn
+    obtain ⟨c, hc, m, hm', hcm⟩ := hd2 n hn
+    exact ⟨c, by rwa [hπ] at hc, m, hm', hcm⟩
+  · -- (c): under the narrowness hypothesis on `Q`, `P ≤ C_G(Q)` (Theorem 5.5(a)).
+    -- `N_G(Q)'` induces a `q`-group of automorphisms on `Q`; the `p`-group `P ≤ N_G(Q)'`
+    -- therefore acts trivially, i.e. lies in `C_G(Q)`.
+    intro hcase
+    rcases eq_or_ne Q ⊥ with hQbot | hQne
+    · subst hQbot
+      intro x _
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [Subgroup.coe_bot, Set.mem_singleton_iff] at hy
+      subst hy
+      group
+    have hQpg : IsPGroup q ↥Q := isPGroup_of_isPiSubgroup_singleton (hInvariantStar_isPiSubgroup hQ)
+    have hq_odd : Odd q := by
+      obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hQpg
+      have hn0 : n ≠ 0 := by
+        intro h0
+        rw [h0, pow_zero] at hn
+        exact hQne (Subgroup.card_eq_one.mp hn)
+      have hqdvd : q ∣ Nat.card G := by
+        refine dvd_trans ?_ (Subgroup.card_subgroup_dvd_card Q)
+        rw [hn]; exact dvd_pow_self q hn0
+      exact hG.odd.of_dvd_nat hqdvd
+    -- `Q` is narrow.
+    have hQnarrow : IsNarrow q ↥Q := by
+      rcases hcase with hcyc | ⟨B, hBcard, hBmax⟩
+      · refine isNarrow_of_pRank_le_two ?_
+        by_contra hcon
+        obtain ⟨E, hEea, hEnc⟩ :=
+          exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank (by omega : 2 ≤ pRank ↥Q q)
+        haveI : IsCyclic ↥Q := hcyc
+        exact hEnc (isCyclic_of_injective E.subtype E.subtype_injective)
+      · by_cases h3 : 3 ≤ pRank ↥Q q
+        · exact (Ch1.S05.narrow_iff_exists_maximalElementaryAbelian_card_prime_sq hq_odd hQpg h3).mpr
+            ⟨B, hBcard, hBmax⟩
+        · exact isNarrow_of_pRank_le_two (by omega)
+    -- `N := N_G(Q)` is a proper (hence solvable) subgroup, since `Q ≠ 1, ⊤` in the simple `G`.
+    set N : Subgroup G := Subgroup.normalizer (Q : Set G) with hN_def
+    have hNlt : N < ⊤ := by
+      rw [lt_top_iff_ne_top]
+      intro htop
+      have hQnorm : Q.Normal := by
+        rw [← Subgroup.normalizer_eq_top_iff]; exact htop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal Q hQnorm with h | h
+      · exact hQne h
+      · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
+          (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+        haveI : Group.IsNilpotent G := hGpg.isNilpotent
+        exact hG.notSolvable inferInstance
+    haveI hNsolv : IsSolvable ↥N := hG.solvable_of_lt_top N hNlt
+    -- The conjugation action `ψ : N → Aut Q` with kernel `C_G(Q) ∩ N`.
+    set ψ : ↥N →* MulAut ↥Q := Q.normalizerMonoidHom with hψ_def
+    have hψker : ψ.ker = (Subgroup.centralizer (Q : Set G)).subgroupOf N :=
+      Q.normalizerMonoidHom_ker
+    -- `A := N / ker ψ` acts faithfully, is solvable and odd.
+    haveI : IsSolvable (↥N ⧸ ψ.ker) := inferInstance
+    have hA_odd : Odd (Nat.card (↥N ⧸ ψ.ker)) := by
+      refine hG.odd.of_dvd_nat (dvd_trans ?_ (Subgroup.card_subgroup_dvd_card N))
+      have := Subgroup.card_subgroup_dvd_card ψ.ker
+      calc Nat.card (↥N ⧸ ψ.ker) ∣ Nat.card ↥N := by
+            simpa [Subgroup.index] using Subgroup.index_dvd_card ψ.ker
+        _ ∣ Nat.card ↥N := dvd_rfl
+    -- Theorem 5.5(a): `(N / ker)'` is a `q`-group.
+    obtain ⟨hcomm, -, -, -⟩ := Ch1.S05.solvableAut_of_narrow hq_odd hQpg hQnarrow
+      (QuotientGroup.kerLift ψ) (QuotientGroup.kerLift_injective ψ) hA_odd
+    have hA' : IsPGroup q (_root_.commutator (↥N ⧸ ψ.ker)) := by
+      have hle : _root_.commutator (↥N ⧸ ψ.ker) ≤ Ch01.opCore q (↥N ⧸ ψ.ker) := by
+        rw [_root_.commutator, Subgroup.commutator_le]
+        intro x _ y _
+        have h1 : QuotientGroup.mk' (Ch01.opCore q (↥N ⧸ ψ.ker)) ⁅x, y⁆ = 1 := by
+          rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+          exact hcomm _ _
+        exact (QuotientGroup.eq_one_iff _).mp h1
+      exact (Ch01.opCore_isPGroup q _).to_le hle
+    -- `P ≤ N` and `P.subgroupOf N ≤ commutator ↥N`.
+    have hPN : (P : Subgroup G) ≤ N := hPderQ.trans (Subgroup.map_subtype_le _)
+    have hPcomm : (P : Subgroup G).subgroupOf N ≤ _root_.commutator ↥N := by
+      have key : ((_root_.commutator ↥N).map N.subtype).comap N.subtype = _root_.commutator ↥N :=
+        Subgroup.comap_map_eq_self_of_injective N.subtype_injective (_root_.commutator ↥N)
+      calc (P : Subgroup G).subgroupOf N
+          ≤ (derivedInG N).comap N.subtype := Subgroup.comap_mono hPderQ
+        _ = _root_.commutator ↥N := key
+    -- The image of `P` in `A` is both a `p`-group and `≤ (N/ker)'` (a `q`-group): hence trivial.
+    set PA : Subgroup (↥N ⧸ ψ.ker) :=
+      ((P : Subgroup G).subgroupOf N).map (QuotientGroup.mk' ψ.ker) with hPA_def
+    have hPsubN_p : IsPGroup p ↥((P : Subgroup G).subgroupOf N) :=
+      P.isPGroup'.of_surjective (Subgroup.subgroupOfEquivOfLe hPN).symm.toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hPN).symm.surjective
+    have hPA_p : IsPGroup p ↥PA := hPsubN_p.map _
+    have hPA_q : IsPGroup q ↥PA := by
+      refine hA'.to_le ?_
+      calc PA ≤ (_root_.commutator ↥N).map (QuotientGroup.mk' ψ.ker) :=
+            Subgroup.map_mono hPcomm
+        _ ≤ _root_.commutator (↥N ⧸ ψ.ker) := by
+            rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator]
+            exact Subgroup.commutator_mono le_top le_top
+    have hPA_bot : PA = ⊥ := by
+      have hcop : Nat.Coprime (Nat.card ↥PA) (Nat.card ↥PA) :=
+        IsPGroup.coprime_card_of_ne p q hpq PA PA hPA_p hPA_q
+      exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcop dvd_rfl dvd_rfl)
+    -- Trivial image means `P ≤ ker ψ = C_G(Q) ∩ N`, hence `P ≤ C_G(Q)`.
+    have hPker : (P : Subgroup G).subgroupOf N ≤ ψ.ker := by
+      rw [hPA_def, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hPA_bot
+      exact hPA_bot
+    rw [hψker] at hPker
+    intro x hx
+    have hxN : x ∈ N := hPN hx
+    have : (⟨x, hxN⟩ : ↥N) ∈ (Subgroup.centralizer (Q : Set G)).subgroupOf N :=
+      hPker (by rw [Subgroup.mem_subgroupOf]; exact hx)
+    rw [Subgroup.mem_subgroupOf] at this
+    exact this
 
 
 end OddOrder.BG.Ch3.S10

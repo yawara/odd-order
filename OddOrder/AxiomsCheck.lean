@@ -3353,3 +3353,12 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Prop 10.10 (`normalizer_factorization`): for `A ∈ ℰ_p²(G)∩ℰ_p*(G)` and `Q ∈ ℋ_G*(A;q)`, some
+-- Sylow `p`-subgroup `P ⊇ A` factors `N_G(P) = O_{p'}(C_G(P))·(N_G(P)∩N_G(Q))` with `P ⊆ N_G(Q)'`.
+-- Part (a) is the §7 transitivity core (Prop 7.5 + Thm 7.3/7.4, unconditional); parts (b)/(c) use
+-- Cor 10.7 (`sylow_structure`, forward-conditional) and Thm 5.5(a). Same keystone island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.normalizer_factorization
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
