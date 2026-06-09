@@ -3424,3 +3424,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear_apply
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_eq_tau
+-- §5 Peterfalvi (1.3)(a) engine + (3.2)(c)(d): vanishing on `V` from orthogonality to `CF(W, V)`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.eq_zero_of_mem_of_inner_supported_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.innerLeftFunctional
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.innerLeftFunctional_apply
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.vanishOnV_of_inner_alphaCF
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_apply_irreducibleCharacter_of_mem_V
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_apply_of_mem_V
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_zero_of_mem_V_of_inner_chiFam_eq_zero
