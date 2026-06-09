@@ -3000,6 +3000,58 @@ theorem sigma_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   refine Finset.sum_congr rfl fun ω _ => Finset.sum_congr rfl fun ω' _ => ?_
   rw [hbω ω, hbω ω', hyp.sigma_inner_irreducibleCharacter hVeq app ω ω']
 
+/-- `omegaProdEquiv.symm` inverts `omegaProdChar`: `(ω_{i0}·ω_{0j})` has index pair `(χ₁, χ₂)`. -/
+theorem omegaProdEquiv_symm_omegaProdChar (hyp : TICyclicHypothesis G)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.omegaProdEquiv.symm (hyp.omegaProdChar χ₁ χ₂) = (χ₁, χ₂) := by
+  rw [show hyp.omegaProdChar χ₁ χ₂ = hyp.omegaProdEquiv (χ₁, χ₂) from rfl, Equiv.symm_apply_apply]
+
+/-- `σ` on a single linear character: `(ω(ξ))^σ = χ` at the index pair `omegaProdEquiv.symm ξ`. -/
+theorem sigma_omega (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) (ξ : hyp.W →* ℂˣ) :
+    hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (hyp.omegaProdEquiv.symm ξ) := by
+  rw [sigma_irreducibleCharacter]
+  congr 1
+  show hyp.omegaProdEquiv.symm (hyp.omegaEquiv.symm (hyp.omega ξ)) = hyp.omegaProdEquiv.symm ξ
+  congr 1
+  exact hyp.omegaEquiv.symm_apply_apply ξ
+
+/-- **Peterfalvi (3.2)(b)**: `1_W^σ = 1_G`.  The trivial character is `ω(1)` at index `(1, 1)`,
+and `χ_{00} = 1_G` (`chiFam_spec`). -/
+theorem sigma_trivial (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    hyp.sigma hVeq app (trivialClassFunction hyp.W) = trivialClassFunction G := by
+  have h1W : trivialClassFunction hyp.W = (hyp.omega 1 : ClassFunction hyp.W ℂ) := by
+    ext w; simp
+  rw [h1W, sigma_omega,
+    show (1 : hyp.W →* ℂˣ) = hyp.omegaProdChar 1 1 from hyp.omegaProdChar_one_one.symm,
+    omegaProdEquiv_symm_omegaProdChar, (hyp.chiFam_spec hVeq app).1]
+
+/-- **Peterfalvi (3.2)(a)** on the basis `α_{ij}`: `α_{ij}^σ = Ind_W^G α_{ij}` for `i, j ≥ 1`.
+Expand `α_{ij} = ω_{00} - ω_{i0} - ω_{0j} + ω_{ij}` (`alphaCF_eq_omega_combination`), apply `σ`
+term-by-term (`sigma_omega`), and recognise the result as the `(3.5)` `Ind` relation
+(`chiFam_spec`). -/
+theorem sigma_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ)
+    (hp : p ≠ 1) (hq : q ≠ 1) :
+    hyp.sigma hVeq app (hyp.alphaCF p q) = app.tau.toDadeMap (hyp.alpha hVeq p q) := by
+  rw [alphaCF_eq_omega_combination,
+    -- normalise each `ω`-argument to `omegaProdChar` form (the product term first, as it is `rfl`)
+    show p.comp hyp.wFst * q.comp hyp.wSnd = hyp.omegaProdChar p q from rfl,
+    show (1 : hyp.W →* ℂˣ) = hyp.omegaProdChar 1 1 from hyp.omegaProdChar_one_one.symm,
+    show p.comp hyp.wFst = hyp.omegaProdChar p 1 from (hyp.omegaProdChar_one_right p).symm,
+    show q.comp hyp.wSnd = hyp.omegaProdChar 1 q from (hyp.omegaProdChar_one_left q).symm,
+    map_add, map_sub, map_sub, sigma_omega, sigma_omega, sigma_omega, sigma_omega,
+    omegaProdEquiv_symm_omegaProdChar, omegaProdEquiv_symm_omegaProdChar,
+    omegaProdEquiv_symm_omegaProdChar, omegaProdEquiv_symm_omegaProdChar,
+    (hyp.chiFam_spec hVeq app).1]
+  exact ((hyp.chiFam_spec hVeq app).2.2.2 p q hp hq).symm
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
