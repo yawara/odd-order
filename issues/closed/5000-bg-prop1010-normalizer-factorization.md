@@ -55,3 +55,24 @@ standard 3 + `pLengthOne_commutator_of_zgroupCentralizer` +
 - Cor 10.7 完成: commit `a1767214`, notes `notes/bg/s10_spine_blockers.md`「Cor 10.7 COMPLETE」節。
 - §7: `OddOrder/BG/Ch2_Uniqueness/S07_Transitivity.lean` (全 sorry-free)。
 - consumer: Prop 10.11 (mmd L2901 が Prop 10.10 を引用), §13。
+
+## 完了 (2026-06-10, commit de75651e)
+
+`normalizer_factorization` を sorry-free で証明、§10 `S10_BetaRadical.lean` は完全 sorry-free に。
+全 3 部 (a)(b)(c) 実装。helper 3 本 (`hypothesis71_of_mem_elemAbelianOfRank_two_of_maximal`,
+`conj_smul_mem_hInvariant{,Star}_top_conj`, `exists_sylow_mem_hInvariantStar`) 追加。
+
+- (a) 本体 = §7 transitivity (Thm 7.3 `transitive_of_two_le_rank_center_of_dvd`) + propagation
+  (Thm 7.4 `transitivity_propagates`) の conjunct (d)。Sylow P を `exists_sylow_mem_hInvariantStar`
+  で構成 (P₀→Q₀∈ℋ*(P₀;q)⊆ℋ*(A;q)→transitivity で Q₀^k=Q→P:=P₀^k)。**§7-gated だが §7 は real**
+  ゆえ (a) 自体は unconditional 部分。
+- (b) = propagation (d.1) `P⊓N_G(P)' ≤ N_G(Q)'` + Cor 10.7 `sylow_structure`.1 (`P⊆N_G(P)'`)。
+- (c) = Q narrow (cyclic/ℰ²∩ℰ* → `IsNarrow`) + Thm 5.5(a) `solvableAut_of_narrow` で
+  `N_G(Q)'/C` が q-群, p-群 `P⊆N_G(Q)'` の image trivial ⟹ `P⊆C_G(Q)`。
+
+axiom island (AxiomsCheck L3361 登録, full build 3613 green): standard 3 +
+`pLengthOne_commutator_of_zgroupCentralizer` + `exists_prime_orderOf_zgroupCentralizer_of_complement`
+ちょうど。完了条件を満たす。
+
+**次 frontier**: Prop 10.11 (`sigma_complement_rank_le_one`, `S10_LocalLemmas.lean:451`)。
+(b) は本 Prop 10.10 を使うので依存解消済。Thm 4.20 / Thm 10.2 / Uniqueness Theorem を要する。

@@ -1,5 +1,25 @@
 # BG §10 直列スパイン: ブロッカー精査 (2026-06-07)
 
+> **更新 (2026-06-10, Lane D `bg-s10-fwd`)**: 以下の「全面ブロック」分析は **forward-axiom 配線後の
+> 現状では古い**。`bg-s10-fwd` で Thm 3.6 を named forward-axiom (`pLengthOne_commutator_of_zgroupCentralizer`
+> + `exists_prime_orderOf_zgroupCentralizer_of_complement`) 化し、その上で **Thm 10.6 → Cor 10.7 →
+> Thm 10.8 → Cor 10.9 → Prop 10.10 を「型検査の通る本物の証明」として配線済**。`S10_BetaRadical.lean`
+> は **完全 sorry-free** (Prop 10.10 `normalizer_factorization` 完成, commit `de75651e`)。
+> de-axiomatization は Lane A が Thm 3.6 を landed した瞬間に名前 swap だけで済む。
+>
+> **§10 の残 sorry (2026-06-10)**:
+> - `S10_LocalLemmas.lean:451` = **Prop 10.11** `sigma_complement_rank_le_one`。(b) は Prop 10.10
+>   を使うので依存解消済 → **次の D-lane frontier**。Thm 4.20 / Thm 10.2 / Uniqueness Theorem を要する。
+> - `S10_LocalLemmas.lean:1063` = **Lemma 10.13** `nonabelian_pSubgroup_rankTwo_elemAbelian_structure`。
+>   group-level Additive diamond で hard, **D 対象外** (休止 `c-bg-s10` 領域)。
+>
+> Prop 10.10 実装知見: §7 capstone `transitivity_propagates` の conjunct (d) が factorization
+> そのもの (primesOf A={p})。Sylow P 構成は transitivity の K-共役で given Q を ℋ*(P;q) に乗せる
+> (`exists_sylow_mem_hInvariantStar`); ℋ* の共役同変は acting group も動く版が要 (新 helper)。
+> part (c) は Thm 5.6 narrow core (`S05` L3155-3254) が完璧なテンプレート。
+>
+> 以下は当時 (全 sorry) の依存分析として歴史的価値で残置。
+
 worktree `bg-s10-spine` (branch `bg-s10-spine`, `ODD_ISSUE_BASE=4000`)。
 対象ファイル `OddOrder/BG/Ch3_MaximalSubgroups/S10_BetaRadical.lean`。
 
