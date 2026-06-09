@@ -991,6 +991,53 @@ theorem oStep_both_out (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
     rw [if_neg (fun hz => hG.neg_not_mem_self hz hnz), if_pos hnz] at hO; omega
 
 open scoped Classical in
+/-- **(3.5.4) L-step (third)**: in an `L`-linked cell `{x, y, z}` with `x, y ∉ B`, the unique
+shared element is `z`, so `z ∈ B`. -/
+theorem lStep_third (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {x y z : ClassFunction G ℂ}
+    (hC : A i' j' = {x, y, z}) (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z)
+    (hx : x ∉ A i j) (hy : y ∉ A i j) : z ∈ A i j := by
+  classical
+  have hcard := hG.inter_L i i' j j' h
+  rw [hC, card_inter_triple _ hxy hxz hyz, if_neg hx, if_neg hy] at hcard
+  by_contra hz; rw [if_neg hz] at hcard; omega
+
+/-- Two distinct elements cannot both be shared by an `L`-linked pair of cells (`|A ∩ A'| = 1`). -/
+theorem not_two_shared (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {u v : ClassFunction G ℂ}
+    (hu : u ∈ A i j) (hu' : u ∈ A i' j') (hv : v ∈ A i j) (hv' : v ∈ A i' j')
+    (huv : u ≠ v) : False := by
+  classical
+  have hcard := hG.inter_L i i' j j' h
+  have h2 : 1 < (A i j ∩ A i' j').card := Finset.one_lt_card.mpr
+    ⟨u, Finset.mem_inter.mpr ⟨hu, hu'⟩, v, Finset.mem_inter.mpr ⟨hv, hv'⟩, huv⟩
+  omega
+
+open scoped Classical in
+/-- An `L`-linked pair of cells given by *disjoint* explicit triples is impossible (`|A ∩ A'| = 1`
+forces a shared element).  Engine of the "`χ ∉ A_{i2}`" steps: a cell forced by `pencilCell` to be
+`{χ, -f, -f'}` is disjoint from another determined cell, contradicting `L`. -/
+theorem not_disjoint_Llinked (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {a1 a2 a3 b1 b2 b3 : ClassFunction G ℂ}
+    (hX : A i j = {a1, a2, a3}) (hY : A i' j' = {b1, b2, b3})
+    (ha1 : a1 ∉ ({b1, b2, b3} : Finset (ClassFunction G ℂ)))
+    (ha2 : a2 ∉ ({b1, b2, b3} : Finset (ClassFunction G ℂ)))
+    (ha3 : a3 ∉ ({b1, b2, b3} : Finset (ClassFunction G ℂ))) : False := by
+  classical
+  have hcard := hG.inter_L i i' j j' h
+  have hdisj : Disjoint ({a1, a2, a3} : Finset (ClassFunction G ℂ)) {b1, b2, b3} := by
+    rw [Finset.disjoint_left]
+    intro x hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
+    rcases hx with rfl | rfl | rfl
+    · exact ha1
+    · exact ha2
+    · exact ha3
+  have hz : (A i j ∩ A i' j').card = 0 := by
+    rw [hX, hY]; exact Finset.card_eq_zero.mpr (Finset.disjoint_iff_inter_eq_empty.mp hdisj)
+  omega
+
+open scoped Classical in
 /-- **(3.5.4.1) pencil cell**: in the Case-I configuration, three pencil rows `ra, rb, rc` share
 the apex `χ` (so `A ra j₀ = {χ, ma, fa}`, etc.) and a transversal row `rt` meets them at the
 "meet-points" (`A rt j₀ = {ma, mb, mc}`).  If `χ ∈ A ra j₁` for a second column `j₁`, then the
@@ -1145,6 +1192,142 @@ theorem transversalCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j�
   exact ⟨χ8, hBset, fun h => hχ_nB (h ▸ hχ8B), fun h => hfb_nB (h ▸ hχ8B),
     fun h => hfc_nB (h ▸ hχ8B), fun h => hnegfb_nB (h ▸ hχ8B), fun h => hnegfc_nB (h ▸ hχ8B),
     fun h => hnegmb_nB (h ▸ hχ8B), fun h => hnegmc_nB (h ▸ hχ8B)⟩
+
+open scoped Classical in
+/-- **(3.5.4.4)-(3.5.4.5) Case-I endgame**: with the roles fixed as `ra` = special row (whose
+`j₁`-cell `B₁ = {ma, -mb, fb}` is determined in (3.5.4.3)), `rb` = active row, `rc` = passive row,
+and `B₃ = A rt j₁ = {ma, -fa, χ8}` the transversal cell, the configuration is impossible.
+
+(3.5.4.4): the active cell `B₂ = A rb j₁` has `fb, χ8 ∈ B₂` (`χ ∉ B₂` by `pencilCell` ⊥ `B₁`;
+`mb ∉ B₂` by `noNeg(B₁,B₂)`; then `fb ∈ B₂`; `ma ∉ B₂` as the `B₁∩B₂`-share is `fb`; `-fa ∉ B₂`
+by an O-step; finally `χ8 ∈ B₂`).  (3.5.4.5): in the passive cell `B₄ = A rc j₁`, `χ ∉ B₄`
+(`pencilCell` ⊥ `B₁`); `ma, -fa ∉ B₄` (each forces the other in, contradicting `L(B₄,B₃)`, using
+`-χ ∉ B₄` from the *same-row* `noNeg`); so `χ8 ∈ B₄`; then `fb ∉ B₄` (share with `B₂` is `χ8`),
+forcing `-mb ∈ B₄` (share with `B₁`); but then `O(B₄, A rb j₀)` forces `mb ∈ B₄` too — impossible. -/
+theorem caseI_tail (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
+    (hab : ra ≠ rb) (hac : ra ≠ rc) (hbc : rb ≠ rc)
+    (hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)
+    {χ ma mb mc fa fb fc χ8 : ClassFunction G ℂ}
+    (hLa : A ra j₀ = {χ, ma, fa}) (hLb : A rb j₀ = {χ, mb, fb})
+    (hLc : A rc j₀ = {χ, mc, fc}) (hT : A rt j₀ = {ma, mb, mc})
+    (hB3 : A rt j₁ = {ma, -fa, χ8}) (hB1 : A ra j₁ = {ma, -mb, fb})
+    (hχ8fb : χ8 ≠ fb) (hχ8negmb : χ8 ≠ -mb) : False := by
+  classical
+  obtain ⟨dχma, dχfa, dmafa⟩ := triple_distinct (hLa ▸ hG.card_eq_three ra j₀)
+  obtain ⟨dχmb, dχfb, dmbfb⟩ := triple_distinct (hLb ▸ hG.card_eq_three rb j₀)
+  obtain ⟨dχmc, dχfc, dmcfc⟩ := triple_distinct (hLc ▸ hG.card_eq_three rc j₀)
+  obtain ⟨dma_negfa, dma_χ8, dnegfa_χ8⟩ := triple_distinct (hB3 ▸ hG.card_eq_three rt j₁)
+  obtain ⟨dma_negmb, dma_fb, dnegmb_fb⟩ := triple_distinct (hB1 ▸ hG.card_eq_three ra j₁)
+  -- column-`j₀` memberships
+  have hχLa : χ ∈ A ra j₀ := by rw [hLa]; exact Finset.mem_insert_self _ _
+  have hmaLa : ma ∈ A ra j₀ := by
+    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have hfaLa : fa ∈ A ra j₀ := by
+    rw [hLa]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
+  have hmbLb : mb ∈ A rb j₀ := by
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have hfbLb : fb ∈ A rb j₀ := by
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
+  have hfcLc : fc ∈ A rc j₀ := by
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  -- `B₁`, `B₃` memberships
+  have hmaB1 : ma ∈ A ra j₁ := by rw [hB1]; exact Finset.mem_insert_self _ _
+  have hfbB1 : fb ∈ A ra j₁ := by
+    rw [hB1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have hnegmbB1 : -mb ∈ A ra j₁ := by
+    rw [hB1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have hmaB3 : ma ∈ A rt j₁ := by rw [hB3]; exact Finset.mem_insert_self _ _
+  have hnegfaB3 : -fa ∈ A rt j₁ := by
+    rw [hB3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  -- uniform non-negation among named column-`j₀` elements
+  have hnn : ∀ {r s : ι} {x y : ClassFunction G ℂ}, x ∈ A r j₀ → y ∈ A s j₀ → x ≠ -y := by
+    intro r s x y hx hy
+    by_cases hrs : r = s
+    · subst hrs; exact ne_neg_of_mem_same hG hx hy
+    · exact ne_neg_of_Llinked hG (Or.inr ⟨hrs, rfl⟩) hx hy
+  -- distinctness of non-apex elements from different pencil rows
+  have hcross : ∀ {r s : ι} {x y : ClassFunction G ℂ}, r ≠ s → χ ∈ A r j₀ → χ ∈ A s j₀ →
+      x ∈ A r j₀ → y ∈ A s j₀ → x ≠ χ → x ≠ y := by
+    intro r s x y hrs hχr hχs hx hy hxχ hxy
+    exact hxχ (eq_of_mem_Llinked hG (Or.inr ⟨hrs, rfl⟩) hχr hχs hx (by rw [hxy]; exact hy))
+  have hfa_mb : fa ≠ mb := hcross hab hχLa hχLb hfaLa hmbLb dχfa.symm
+  -- ===== (3.5.4.4): the active cell `B₂ = A rb j₁` =====
+  have hχ_nB2 : χ ∉ A rb j₁ := by
+    intro hχB2
+    have hpc : A rb j₁ = {χ, -fa, -fc} := pencilCell hG hab.symm hbc hbt hac hj hLb hLa hLc
+      (by rw [hT]; ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto) hχB2
+    refine not_disjoint_Llinked hG (Or.inr ⟨hab.symm, rfl⟩) hpc hB1 ?_ ?_ ?_
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨dχma, hnn hχLb hmbLb, dχfb⟩
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨(hnn hmaLa hfaLa).symm, neg_injective.ne hfa_mb, (hnn hfbLb hfaLa).symm⟩
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨(hnn hmaLa hfcLc).symm, neg_injective.ne (hcross hbc.symm hχLc hχLb hfcLc hmbLb dχfc.symm),
+        (hnn hfbLb hfcLc).symm⟩
+  have hmb_nB2 : mb ∉ A rb j₁ := by
+    have h := hG.noNeg_L ra rb j₁ j₁ (Or.inr ⟨hab, rfl⟩) (-mb) hnegmbB1
+    rwa [neg_neg] at h
+  have hfbB2 : fb ∈ A rb j₁ :=
+    lStep_third hG (Or.inl ⟨rfl, hj.symm⟩) hLb dχmb dχfb dmbfb hχ_nB2 hmb_nB2
+  have hma_nB2 : ma ∉ A rb j₁ := fun hmaB2 =>
+    not_two_shared hG (Or.inr ⟨hab.symm, rfl⟩) hfbB2 hfbB1 hmaB2 hmaB1
+      (hcross hab.symm hχLb hχLa hfbLb hmaLa dχfb.symm)
+  have hnegfa_nB2 : -fa ∉ A rb j₁ := by
+    intro hnfa
+    have hfaB2 : fa ∈ A rb j₁ := by
+      have hO := hG.inter_O rb ra j₁ j₀ hab.symm hj.symm
+      rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
+        if_neg hχ_nB2, if_neg hma_nB2, if_pos hnfa] at hO
+      by_contra h; rw [if_neg h] at hO; omega
+    exact hG.neg_not_mem_self hfaB2 hnfa
+  have hχ8B2 : χ8 ∈ A rb j₁ :=
+    lStep_third hG (Or.inr ⟨hbt, rfl⟩) hB3 dma_negfa dma_χ8 dnegfa_χ8 hma_nB2 hnegfa_nB2
+  -- ===== (3.5.4.5): the passive cell `B₄ = A rc j₁` =====
+  have hχ_nB4 : χ ∉ A rc j₁ := by
+    intro hχB4
+    have hpc : A rc j₁ = {χ, -fa, -fb} := pencilCell hG hac.symm hbc.symm hct hab hj hLc hLa hLb
+      (by rw [hT]; ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto) hχB4
+    refine not_disjoint_Llinked hG (Or.inr ⟨hac.symm, rfl⟩) hpc hB1 ?_ ?_ ?_
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨dχma, hnn hχLb hmbLb, dχfb⟩
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨(hnn hmaLa hfaLa).symm, neg_injective.ne hfa_mb, (hnn hfbLb hfaLa).symm⟩
+    · simp only [Finset.mem_insert, Finset.mem_singleton, not_or]
+      exact ⟨(hnn hmaLa hfbLb).symm, neg_injective.ne dmbfb.symm, (hnn hfbLb hfbLb).symm⟩
+  have hnegχ_nB4 : -χ ∉ A rc j₁ := hG.noNeg_L rc rc j₀ j₁ (Or.inl ⟨rfl, hj⟩) χ hχLc
+  have hma_nB4 : ma ∉ A rc j₁ := by
+    intro hma
+    have hnegfaB4 : -fa ∈ A rc j₁ := by
+      have hO := hG.inter_O rc ra j₁ j₀ hac.symm hj.symm
+      rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
+        if_neg hχ_nB4, if_pos hma, if_neg hnegχ_nB4, if_neg (hG.neg_not_mem_self hma)] at hO
+      by_contra h; rw [if_neg h] at hO; omega
+    exact not_two_shared hG (Or.inr ⟨hct, rfl⟩) hma hmaB3 hnegfaB4 hnegfaB3 dma_negfa
+  have hnegfa_nB4 : -fa ∉ A rc j₁ := by
+    intro hnfa
+    have hmaB4 : ma ∈ A rc j₁ := by
+      have hO := hG.inter_O rc ra j₁ j₀ hac.symm hj.symm
+      rw [hLa, card_inter_triple _ dχma dχfa dmafa, card_filter_neg_triple _ dχma dχfa dmafa,
+        if_neg hχ_nB4, if_neg (fun hfa => hG.neg_not_mem_self hfa hnfa), if_neg hnegχ_nB4,
+        if_pos hnfa] at hO
+      by_contra h; rw [if_neg h] at hO; omega
+    exact hma_nB4 hmaB4
+  have hχ8B4 : χ8 ∈ A rc j₁ :=
+    lStep_third hG (Or.inr ⟨hct, rfl⟩) hB3 dma_negfa dma_χ8 dnegfa_χ8 hma_nB4 hnegfa_nB4
+  have hfb_nB4 : fb ∉ A rc j₁ := fun hfbB4 =>
+    not_two_shared hG (Or.inr ⟨hbc.symm, rfl⟩) hχ8B4 hχ8B2 hfbB4 hfbB2 hχ8fb
+  have hnegmbB4 : -mb ∈ A rc j₁ := by
+    have hB1' : A ra j₁ = {ma, fb, -mb} := by
+      rw [hB1]; ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto
+    exact lStep_third hG (Or.inr ⟨hac.symm, rfl⟩) hB1' dma_fb dma_negmb dnegmb_fb.symm
+      hma_nB4 hfb_nB4
+  have hO := hG.inter_O rc rb j₁ j₀ hbc.symm hj.symm
+  rw [hLb, card_inter_triple _ dχmb dχfb dmbfb, card_filter_neg_triple _ dχmb dχfb dmbfb,
+    if_neg hχ_nB4, if_neg hfb_nB4, if_pos hnegmbB4] at hO
+  have hmbB4 : mb ∈ A rc j₁ := by by_contra h; rw [if_neg h] at hO; omega
+  exact hG.neg_not_mem_self hmbB4 hnegmbB4
 
 end IsSignedTripleGrid
 
