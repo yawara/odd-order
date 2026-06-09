@@ -792,11 +792,18 @@ session 14 cont. が残した「χ-assembly → orientation wrapper」を完全�
 - **転置の使い方**: `(grid).transpose` で rows↔cols 入替 ⟹ row-result を col に適用。transpose grid の cell は `fun q p => Afam p q`、col-common は `exists_rowCommon`。標準レイアウトへの戻しは `toT` relabel (Equiv 不要、平凡関数+left-inverse で injective、rfl で gridFamily 等式)。
 - **ite-instance 地雷**: 抽象族 (generic ι) の `if a=b` は Classical、具体 ι は genuine DecidableEq。境界を跨ぐ補題は仮説を `hdiag0`/`hoff0` (ite-free) で取り、内部で `if a=b` 再構成。
 
-### ▶▶ 次 = (3.2) σ-isometry [次セッション、新インフラ要]
-**(3.5) は完成。次は (3.2) σ の構成。** {ω_ij}=Irr(W) を正規直交基底とし、χ_ij への線形写像が isometry σ:ℤIrr(W)→ℤIrr(G)。
-- **要 scope (未確認)**: CF(W) inner product space instance + Irr(W) orthonormal basis + 「orthonormal family → linear isometry」(mathlib `Orthonormal`/`LinearIsometry`/`Basis` 周辺)。χ_ij∈ZIrr(G) は確保済 (`exists_chiFamily` の `∀pq χ pq∈ZIrr`)。
-- (3.2) の性質: (a) σ(α_ij)=Ind (= (3.5) の Ind 関係から), (b) σ(ω_00=1_W)=1_G (= χ(1,1)=1_G から), (c)(d) from (1.3)。
-- **設計判断 (次セッション最初)**: ω_ij (=Irr(W) の元 = W1×W2 の線形指標) と χ-family の index `Ĉ₁×Ĉ₂` の対応。Irr(W)≅Ĉ₁×Ĉ₂ (W abelian) の橋渡しが要るか、index を直接 Ĉ₁×Ĉ₂ で扱うか。
+### ✅ 着地 (session 15 cont.): (3.2) foundation — Irr(G)=CF(G) ℂ-基底 (`3dd8fb41`)
+**(3.2) σ の最初の前提を整備。** mathlib `Module.Basis.constr` で σ:CF(W)→CF(G) を ω↦χ で定義するには「Irr が CF を張る基底」が要る。
+- `classFunction_span_irreducibleCharacter_eq_top` (一般有限群): Irr が CF を張る。`f=Σ_χ⟨f,χ⟩•χ`、差が⊥Irr→0 (`classFunction_eq_zero_of_orthogonal` ← `CharacterCompleteness`)。
+- `irreducibleCharacterBasis`: `Module.Basis.mk linearIndependent_irreducibleCharacter spanning.ge` (両方 `CharacterCount` 由来)。`+ _apply` simp。
+- **🔑 再利用 (再調査不要)**: `ClassFunction.inner` は **Inner typeclass でなく素の def** (InnerProductSpace instance 無し) → 左引数線形 (`inner_smul_left`/`inner_add_left`/`inner_sub_left`)、共役は右。基底は `Module.Basis.mk` で手組み。`Basis`=`Module.Basis` (mathlib リネーム、`Module.Basis`/`.mk`/`.mk_apply` と書く)。`Finite/Fintype (IrreducibleCharacter G)` は `finite_irreducibleCharacter`(theorem, instance でない)→`haveI`+`Fintype.ofFinite`。S05 に `import CharacterCompleteness + Mathlib.LinearAlgebra.Basis.Basic` 追加済。
+
+### ▶▶ 次 = (3.2) σ の本体 [次セッション]
+**foundation (基底) 済。次の前提 = prod-char 全単射。**
+- **🛑 次の一手 = `Ĉ₁ × Ĉ₂ ≃ (W →* ℂˣ)` (omegaProdChar の全単射化)**: `omegaProdChar : Ĉ₁→Ĉ₂→(W→*ℂˣ)` は injective のみ (`omegaProdChar_inj`, S05_TICyclic:745)。σ には全 index 対応 `Ĉ₁×Ĉ₂ ≃ Hom(W,ℂˣ) ≃[omegaEquiv] Irr(W)` が要る。W=W₁×W₂ 内部直積 (S05_TICyclic にある乗法 iso `↥W₁×↥W₂≃↥W`) から `Hom(W,ℂˣ)≃Hom(W₁)×Hom(W₂)` を作る。注意: `Ĉ_k = W_k.subgroupOf W →* ℂˣ` (subgroupOf)。**`alphaBasis`(S05_TICyclic:896) は CF(W,V) を `Ĉ₁ⁿᵉ×Ĉ₂ⁿᵉ` で張る既存基底 — 参考になるが σ は CF(W) 全体 (trivial 込み Ĉ₁×Ĉ₂) なので別物。**
+- **σ 定義**: `σ := (irreducibleCharacterBasis (G:=hyp.W)).constr ℂ (fun ω => χfam (prodCharEquiv.symm (omegaEquiv.symm ω)))` 形 (χfam = `exists_chiFamily` の選択した族)。`Module.Basis.constr` は `M→ₗ[ℂ]M'`、`constr b f (b i)=f i`。
+- **isometry**: ⟨σa,σb⟩=⟨a,b⟩ を基底上で (χ族正規直交 ⟨χp,χp'⟩=δ + Irr(W)正規直交 ⟨ω,ω'⟩=δ + bridge 単射) → 双線形拡張。**`ClassFunction.inner` は素の def なので mathlib `LinearIsometry` でなく手で双線形拡張**。
+- **(3.2) 性質**: (a) σ(α_ij)=Ind (← (3.5) の Ind 関係 + α_ij=ω-combination `alphaCF_eq_omega_combination`), (b) σ(1_W)=1_G (← χ(1,1)=1_G), (c)(d) from (1.3) [**(1.3) の形式化状況 未確認**]。
 - 残 hard core ×1=(4.3)§6本体 (FT経路外)。
 
-正本 = 本ノート (session 15)。**Don't re-grind (3.5) χ-family (symm/two_col/transpose/full) / 共有 assembly / reindex wrapper — 完成・axiom-clean.**
+正本 = 本ノート (session 15 + cont.)。**Don't re-grind (3.5) χ-family (symm/two_col/transpose/full) / 共有 assembly / reindex wrapper / (3.2) Irr-基底 (span+`irreducibleCharacterBasis`) — 完成・axiom-clean.**
