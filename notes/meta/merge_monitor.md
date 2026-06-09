@@ -72,9 +72,11 @@
 
 ## 現状メモ
 
-- **2026-06-09 — A=現状維持 (ユーザー判断)**: Lane A が初めて Thm 3.5 の `.lean`
-  (`OddOrder/BG/Ch1_Preliminary/S03e_Thm35.lean`) を持ち込んだが、`thm35_aux` の **faithful 枝に
-  hard-core sorry**(steps 3.4/3.5/Clifford)が 1 個残る(non-faithful 枝は COMPLETE、BG Thm 3.4 は
-  既に main に landed 済)。ユーザー判断は **sorry 不増ゲート堅持・A は faithful 枝が sorry-free になるまで
-  報告のみ**。⟹ A が ahead でも、上記「sorry 先行チェック」でこの sorry を検出したら build せず即 abort し、
-  「A: faithful 枝 sorry 残り報告のみ」と報告する(scaffold を main に入れない)。A が sorry-free になったら通常合流に戻す。
+- **2026-06-09 (後刻) — A: BG Thm 3.5 landed, 通常合流に復帰**: faithful 枝が sorry-free に到達
+  (`S03e_Thm35.lean` real sorry = 0, commit `f51e4e85` "faithful-branch assembly COMPLETE
+  (thm35_algClosed done)")。**BG Thm 3.5 を任意体で完全形式化**し main へ合流済 (merge `e42f4260`,
+  build 3616 green / AxiomsCheck 違反なし / 実 sorry 273 不増)。⟹ 下の「A=報告のみ」特例は**失効**。
+  A は通常の自動合流対象に戻る。**次の A frontier = BG Thm 3.6** (これが landed されると §10.6 keystone
+  + Lane D の forward-axiom de-axiom が解禁され、D を手動合流できる)。それまで D は従来どおり報告のみ。
+- ~~**2026-06-09 — A=現状維持 (ユーザー判断)**: faithful 枝に hard-core sorry 1 個ゆえ報告のみ~~
+  (上記で解消・失効)。
