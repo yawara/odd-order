@@ -349,7 +349,46 @@ M'/M_β ≅ W* (nilpotent Hall β' of M', 10.8(b)) via W* からの全射 (`sup_
 ⚠ statement の商型が Normal instance 要 ⟹ `[((Mbeta M).subgroupOf (derivedInG M)).Normal]` を
 **instance 引数化** (caller が `normal_subgroupOf_iff_le_normalizer` で供給)。
 
-### 🛑 残 Cor 10.9 = (a)(3) + (b) — de-risked、残は nested-↥M plumbing (~150-200 行)
+### ✅✅ (a)(3) 概念コア 2 件 landed (2026-06-09, commits `1d0d403e`, `575433f5`)
+
+- **A** `derivedQuotientMbeta_isNilpotent` (M'/M_β nilpotent)。
+- **B1** `normal_sup_sylow_of_quotient_nilpotent` (unconditional 汎用): Γ 有限, N◁Γ, Γ/N nilpotent,
+  N が q'-群, Q Sylow q ⟹ N⊔Q ◁ Γ。`Q.map mk' = Sylow q of Γ/N` (normal) + comap。
+
+**⟹ (a)(3) は K=O_{β∪{q}}(M') route で char を完全回避できると確定 (最良)**:
+
+### 🛑 残 Cor 10.9(a)(3) packaging — **確定レシピ (K-route, char 不要, 全補題確認済)**
+
+`beta_complement_normalizer_derived_contains_sylow` (@~1620)。D:=derivedInG M, X_G:=X↑G。
+1. producer (X⊆M' case) ⟹ W⊇X_G Hall{p,q} of D nilpotent; **S:=O_p(W)** (Sylow p of D, |S|=p-part|D|
+   via W Hall ⟹ fact p|W|=fact p|D|); A1 (`isPGroup_le_centralizer_of_isNilpotent_ambient hWnil hpq
+   hXW hS_le_W hX_G_q hS_pg` ⟹ X_G≤C(S)) + `le_centralizer_iff.mp` + `centralizer_le_normalizer`(✅mathlib)
+   ⟹ **S≤U:=N_G(X_G)⊓M**。
+2. **M_β X_G ◁ D**: B1 (Γ=↥D, N=(Mbeta M).subgroupOf D [normal instance要], Q=X, hNil=A, hNq'=q∤|M_β|)
+   ⟹ `(M_β'⊔X').Normal` (M_β'=(Mbeta M).subgroupOf D, X'=(X:Subgroup ↥D))。
+3. **K:=opiCoreInG (beta M∪{q}) D**, X_G≤K Sylow q of K:
+   - `M_β X_G:=(M_β'⊔X').map D.subtype`; IsPiSubgroup(β∪{q}): |M_β X_G|=|M_β'⊔X'| ∣ |M_β'||X'|
+     (`Subgroup.card_HK_mul_card_inf_eq_card_mul_card` + `mul_normal`) ⟹ primeFactors⊆β∪{q}。
+   - `le_opiCoreInG_of_normal_of_isPiSubgroup (M_β X_G≤D) ((M_β X_G).subgroupOf D=M_β'⊔X' ◁D via
+     comap_map_eq_self_of_injective) (IsPiSub)` ⟹ M_β X_G≤K。X_G≤M_β X_G≤K。
+   - X_G Sylow q of K: |X_G|=q-part|D|≤|K|_q≤q-part|D| (X_G≤K≤D) ⟹ =。
+   - **K◁M (free)**: `le_normalizer_opiCoreInG_of_le_normalizer (β∪{q}) (le_normalizer_derivedInG M)`。
+4. **Frattini** `Sylow.normalizer_sup_eq_top` (ambient ↥M, N=K.subgroupOf M, P:Sylow q ↥(K.subgroupOf M)):
+   P を `(Sylow.ofCard (X_G.subgroupOf K) _).comapOfKerIsPGroup` で `↥(K.subgroupOf M)≃*↥K`
+   (`subgroupOfEquivOfLe (K≤M)`) 経由構成; P.map subtype=X_G.subgroupOf M ⟹
+   **K.subgroupOf M ⊔ U.subgroupOf M=⊤** (N_↥M(X_G.subgroupOf M)=U.subgroupOf M 同定要)。
+5. **Lem 6.5** `inf_commutator_eq_of_coprime` (ambient ↥M, K_lem=K.subgroupOf M◁, U.subgroupOf M,
+   H=S.subgroupOf M, **coprime |S||K| via p∉β∪{q}** [hpβ+hpq], hKU=step4): S.subgroupOf M⊓commutator ↥M
+   = S.subgroupOf M⊓⁅U.subgroupOf M,U.subgroupOf M⁆; S.subgroupOf M≤commutator ↥M [S≤D] ⟹ S.subgroupOf M
+   ≤⁅U.subgroupOf M,U.subgroupOf M⁆。
+6. **commutator-layer**: map M.subtype (`Subgroup.map_commutator`+`subgroupOf_map_subtype`) ⟹
+   S≤⁅U,U⁆; ⁅U,U⁆=derivedInG U (= (commutator ↥U).map U.subtype, 要 `Subgroup.commutator`↔derivedInG 補題)。
+   witness=`Sylow.ofCard (S.subgroupOf D) _` (|S|=p-part|D|), witness↑G=S ⟹ 結論。
+**(b)** は (a)(3) の M_β S◁M+Frattini 共有 + (a)(2) で α=β。
+
+#### 旧記録 (char route — K-route の方が clean)
+
+### 🛑 旧: 残 Cor 10.9 = (a)(3) + (b) — de-risked、残は nested-↥M plumbing (~150-200 行)
 
 **(a)(3) 確定レシピ** (全インフラ確認済): X_G=X↑G (Sylow q of M'=D);
 producer (X⊆M' case) ⟹ W⊇X_G Hall{p,q} of D nilpotent, X_G=O_q(W), **S=O_p(W)=Sylow p of D**;
