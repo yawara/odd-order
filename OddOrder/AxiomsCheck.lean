@@ -3357,6 +3357,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.isSignedNontrivialIrr_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.ne_neg_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_trivial
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_isSignedTriple_of_inner_self_three
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.neg_not_mem
@@ -3418,7 +3420,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.third_not_mem_far_cell
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.common_ne_other_row_mem
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.orthonormal_of_injective_of_no_neg
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.symmFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.gridFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.gridFamily_orthonormal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.symm_orthonormal_family
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.two_col_orthonormal_family
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_isSignedTripleGrid
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_existsUnique_common

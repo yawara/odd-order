@@ -727,3 +727,40 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 - 残 hard core ×1=(4.3)§6本体 (FT経路外)。
 
 正本 = 本ノート (session 13 / session 13 cont.)。**Don't re-grind (3.5.4)/(3.5.5)-core/transpose/Afam接続 — 完成・axiom-clean.**
+
+## 2026-06-09 (session 14, b-peterfalvi): (3.5.5) 抽象直交性 両レジーム COMPLETE — abstract grid の χ_ij 族正規直交性
+
+(3.5.5) の組合せ論的核心 = **「z_j (列共通)・row-anchor・φ_ij (第3元) から成る族が正規直交」** を抽象 `IsSignedTripleGrid` 上で完全形式化。w₂≥5 (対称) と w₂=3 (2列) の両レジーム。全 `S05_SigmaIsometry.lean`、sorry-free・axiom-clean・full build 3558 + AxiomsCheck green。2 commits (`869c2a87` w₂≥5 backbone, `42b844b4` w₂=3 + DRY refactor)。
+
+### ✅ 着地 (session 14)
+1. **構造プリミティブ** (`869c2a87`):
+   - `cell_decomposition`: 2列 行分解 `A i j₀ = {z₀, m_i, φ_i}` (z₀=列共通 via existsUnique_common, m_i=同行 meet A i j₀∩A i j₁, φ_i=第3元); `z₀≠m_i` は `common_not_mem_other_column` から。
+   - `common_ne_other_column_mem`: **列共通元は他列の任意の元と直交** (≠, ≠-neg) — χ_0j 直交性の workhorse。
+   - `symm_cell_decomposition`: w₂≥5 対称分解 `A i j = {z j, w i, φ}` (列共通 z j + 行共通 w i 両方)。
+   - `third_not_mem_far_cell`: O(ij,kl) — far な内部 third が相互直交 (`oStep_both_out` + `transpose` で行側)。
+   - `common_ne_other_row_mem`: 列版の transpose ラッパー (行共通元の直交性)。
+   - `orthonormal_of_injective_of_no_neg`: **signed 族が injective ∧ no-neg ⟹ 正規直交** (diagonal 1, off-diag 0; `if a=b` を避け `DecidableEq` instance 問題を回避)。
+2. **DRY 汎用組立** (`42b844b4`):
+   - `symmFamily` → **`gridFamily {γ}`** (row-anchor m, col-anchor z (一般 γ), 内部 φ; index `ι ⊕ γ ⊕ ι×γ`)。
+   - **`gridFamily_orthonormal`**: 6 つの atomic 関係 (Rmm/Rzz/Rzm/Rzφ/Rmφ/Rφφ) + signedness から正規直交を組立。**w₂≥5 と w₂=3 で共有** (差は row-anchor 関係 Rmm/Rmφ の証明法のみ)。3×3 case 分析 (injective + no-neg) はここに集約。
+   - **`symm_orthonormal_family`** (w₂≥5): row-anchor=行共通、`common_ne_other_row_mem`/`third_not_mem_far_cell` で関係を作り gridFamily_orthonormal へ。
+   - **`two_col_orthonormal_family`** (w₂=3): γ=Bool、row-anchor=行 meet `m_i∈A i (j false)∩A i (j true)`; meet は2参照列のみに居るので関係は L (meet≠列共通) と O (`oStep_both_out`) から (行共通でない)。論文が (3.5.5) 後「proof complete」と呼ぶケース。
+
+### 🔑 再利用可能 (再調査不要)
+- **正規直交 = injective + no-neg** (signed 族): `orthonormal_of_injective_of_no_neg` で内積に変換。組立は `gridFamily_orthonormal` (6 関係を渡すだけ)。新しい grid 族の正規直交はこの2つで即座。
+- **row-anchor の2流儀**: 行共通 (w₂≥5, `common_ne_other_row_mem`=transpose) vs 行meet (w₂=3, L+O 手動)。両方 `gridFamily_orthonormal` の Rmm/Rmφ に詰める。
+- **`gridFamily` の `cond b ψt ψf`** (γ=Bool の φ): `cases b` で defeq 簡約 (simp 不要)。
+- **`if a=b` 出力**: `gridFamily_orthonormal` は diag/off-diag 連言を返す→使用側で `split_ifs` で `if` 形に (DecidableEq instance mismatch 回避)。
+
+### ▶▶ 次 = 具体橋渡し: Afam → χ_ij 族 → (3.5) → (3.2) σ [次セッション]
+**残りは具体的 plumbing (抽象 hard core は解除済)**:
+1. **Afam に instantiate**: `Afam_isSignedTripleGrid` の grid に `symm_orthonormal_family` (w₂≥5) / `two_col_orthonormal_family` (w₂=3) を適用。
+   - 列共通 z_q : 各列 q で `Afam_existsUnique_common` の choose (要 別列 q'≠q = w₂≥3 で常成立)。
+   - 行共通 (w₂≥5): transpose grid に `existsUnique_common` (要 ≥4 列 = w₂≥5)。
+   - **w₂ で dispatch**: `sup_card_ge_five` + w₁≥5 WLOG。w₂=3 or w₂≥5 で `by_cases`。
+2. **χ_ij 族構成**: χ_0j=-z_j, χ_i0=-(row-anchor), χ_ij=φ_ij, **χ_00=1_G** (具体追加); index = Ŵ₁'×Ŵ₂' (trivial char=0)。1_G ⊥ 全 χ (χ は nontrivial signed irr ⟹ ⟨1_G,χ⟩=0)。負号は正規直交を保つ (⟨-a,-b⟩=⟨a,b⟩)。
+3. **(3.5) 最終**: 正規直交族 (χ_ij) + χ_00=1 + **Ind α_ij = 1 - χ_i0 - χ_0j + χ_ij** (= β_ij=Σ_{A_ij}=z_j+m_i+φ_ij from IsSignedTriple.sum_eq + cell decomp)。
+4. **(3.2) σ**: {ω_ij}=Irr(W) 正規直交基底 → χ_ij への線形写像 (`Basis.constr`/orthonormal-basis-to-family) = isometry; ℤIrr→ℤIrr (χ_ij∈ZIrr); (a) α_ij→Ind α_ij, (b) ω_00→1_G, (c)(d) from (1.3)。
+- 残 hard core ×1=(4.3)§6本体 (FT経路外)。
+
+正本 = 本ノート (session 14)。**Don't re-grind 抽象 (3.5.5) 正規直交 (symm/two_col/gridFamily_orthonormal) — 完成・axiom-clean.**
