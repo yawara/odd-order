@@ -3052,6 +3052,64 @@ theorem sigma_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     (hyp.chiFam_spec hVeq app).1]
   exact ((hyp.chiFam_spec hVeq app).2.2.2 p q hp hq).symm
 
+/-- The basis `alphaBasis` evaluated at an index pair: `alphaBasis (p, q) = α_{pq}`
+(`coe_basisOfLinearIndependentOfCardEqFinrank` for the family `alphaLinearIndependent`). -/
+theorem alphaBasis_apply (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (pq : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
+        {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) :
+    hyp.alphaBasis hVeq pq = hyp.alpha hVeq pq.1.1 pq.2.1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  letI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  letI : Fintype {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := Fintype.ofFinite _
+  haveI := hyp.nonempty_charNeOne hyp.W1_le_W hyp.W1_nontrivial
+  haveI := hyp.nonempty_charNeOne hyp.W2_le_W hyp.W2_nontrivial
+  have h : ⇑(hyp.alphaBasis hVeq) = fun p => hyp.alpha hVeq p.1.1 p.2.1 := by
+    unfold TICyclicHypothesis.alphaBasis
+    exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  exact congrFun h pq
+
+/-- `Ind_W^G` packaged as a `ℂ`-linear map `CF(W) →ₗ[ℂ] CF(G)` (linearity from `induce_add` /
+`induce_smul`).  Used to phrase (3.2)(a) as an equality of linear maps on the basis `(α_{ij})`. -/
+noncomputable def induceLinear (hyp : TICyclicHypothesis G) [Invertible (Nat.card hyp.W : ℂ)] :
+    ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ where
+  toFun := ClassFunction.induce hyp.W
+  map_add' := ClassFunction.induce_add hyp.W
+  map_smul' c θ := ClassFunction.induce_smul hyp.W c θ
+
+@[simp] theorem induceLinear_apply (hyp : TICyclicHypothesis G) [Invertible (Nat.card hyp.W : ℂ)]
+    (θ : ClassFunction hyp.W ℂ) :
+    hyp.induceLinear θ = ClassFunction.induce hyp.W θ := rfl
+
+/-- **Peterfalvi (3.2)(a)** (full form): on all of `CF(W, V)`, `σ` agrees with the Dade map `τ`,
+`α^σ = τ(α) = Ind_W^G α`.  Both `α ↦ σ(↑α)` and `α ↦ Ind_W^G ↑α` are `ℂ`-linear on `CF(W, V)` and
+agree on the basis `(α_{ij})` (`alphaBasis`) — LHS by `sigma_alphaCF`, RHS by `tau_eq_induce`
+(`τ = Ind`) — hence agree everywhere. -/
+theorem sigma_eq_tau (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV ℂ hyp) :
+    hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ) = app.tau.toDadeMap α := by
+  -- the two `ℂ`-linear maps `CF(W,V) →ₗ CF(G)` (`σ ∘ ↪` and `Ind ∘ ↪`) agree on the basis `α_{ij}`
+  have key : ((hyp.sigma hVeq app).comp (Submodule.subtype _) :
+        SupportedOnV ℂ hyp →ₗ[ℂ] ClassFunction G ℂ)
+      = hyp.induceLinear.comp (Submodule.subtype _) := by
+    refine Module.Basis.ext (hyp.alphaBasis hVeq) (fun pq => ?_)
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, hyp.alphaBasis_apply hVeq,
+      induceLinear_apply, hyp.alpha_coe]
+    rw [hyp.sigma_alphaCF hVeq app pq.1.1 pq.2.1 pq.1.2 pq.2.2]
+    -- LHS `= τ(α_{pq})` (now); RHS `Ind ↑α_{pq} = τ(α_{pq})` by `tau_eq_induce` (`τ = Ind`)
+    have h := hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq pq.1.1 pq.2.1)
+    rw [hyp.alpha_coe] at h
+    exact h
+  have hα := DFunLike.congr_fun key α
+  simp only [LinearMap.comp_apply, Submodule.subtype_apply] at hα
+  rw [hα, induceLinear_apply]
+  exact (hyp.tau_eq_induce app.tau.toDadeIsometryData α).symm
+
 /-- **Peterfalvi (3.2)** (virtual characters): `σ` maps `ZIrr(W)` into `ZIrr(G)`.  Each `Irr(W)`
 basis vector maps to a member of the `(3.5)` family `χ ∈ ZIrr(G)` (`chiFam_spec`); a `ℤ`-combination
 maps to a `ℤ`-combination, which stays in the `ℤ`-submodule `ZIrr(G)` (`span` induction). -/
