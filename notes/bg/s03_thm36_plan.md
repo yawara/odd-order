@@ -273,10 +273,13 @@ H plen1 = ⁅H,R⁆ plen1 (h36) ⟹ hcounter 矛盾。**要: O_{p'}(↥H) を Su
 (3.8) も実は session 5 cont. の handoff 後に着地済だった (h38 完成、(3.9) Part1 `hfit` も)。本 session の成果:
 
 ### committed: (3.9) infrastructure (S03f_Prelim.lean, commit `c4497132`, full build 3619 green, axiom-clean)
-標準ヘルパー 4 本 (namespace `OddOrder.BG.Ch1.S03f`):
+標準ヘルパー 4 本 (commit 時点 namespace `OddOrder.BG.Ch1.S03f`; うち Burnside element 形は
+後に S01 へ移動 → 下記):
 - `mulAut_eq_one_of_coprime_orderOf_of_frattini`: Thm 1.8 の **element 形** — p-群 H の p'-order
-  automorphism が Φ(H) mod 自明 ⟹ =1。`burnside_operator` を cyclic `⟨f⟩` に適用 (S04 private 版の
-  public 複製、consolidate は task_1f77b0d7)。
+  automorphism が Φ(H) mod 自明 ⟹ =1。`burnside_operator` を cyclic `⟨f⟩` に適用。
+  **✅ 2026-06-10 consolidate 済 (task_1f77b0d7, commit `ff28b600`)**: S04 private 版と本 public 版を
+  統合し `OddOrder.BG.Ch1.S01` (`burnside_operator` の隣) へ移動。以後は下記 (3.9) 核 + S04 Lem 4.17 が
+  `S01.mulAut_eq_one_of_coprime_orderOf_of_frattini` を参照 (S03f には残らない)。
 - `isPGroup_of_forall_eq_one_of_not_dvd_orderOf`: 非自明 p'-元なし ⟹ p-群 (p'-part
   `g^(p^vₚ(orderOf g))` の位数 = `ordCompl[p]` で p 互素、それが自明 ⟹ g は p冪位数)。
 - `frattini_fitting_map_characteristic`: `(frattini ↥(fitting Hb)).map (fitting Hb).subtype` は Hb で
