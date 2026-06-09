@@ -285,6 +285,36 @@ subgroupOf)。Hall-D 自体は解決済ゆえ「W⊇X 構成」は `hall_D` 一�
 Cor 10.9 statement (`beta_complement_centralizes` 等) は G ゆえ最終 wiring で `Sylow p ↥(Msigma M)` への
 map 変換が要る。**全部 forward-conditional (§10 island; via isHall_Mbeta→Thm10.6→2 forward axioms)。**
 
+### ✅✅ 2026-06-09 cont. — Cor 10.9(a)(1) 抽象コア全 landed + L1 landed (5 commit)
+
+抽象/数学コアは **全て landed** (unconditional, sorry-free, axiom-clean):
+`isPGroup_le_centralizer_of_isNilpotent` (A1, L4核)、`isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient`
+(N2, L3核)、`normal_map_subtype_of_characteristic` (char⊴normal⟹normal)、`betacompl_subgroup_derived_isNilpotent`
+(W∩M' nilpotent, forward-cond)、`exists_hall_pq_containing` (L1 W構成, `45c75510`)。
+
+**▶ 残 = nilpotency producer (L3) + L2 + L4 配線 (全 plumbing、数学コア消費のみ)。producer 精密レシピ (API 確定済):**
+`exists_nilpotent_hall_pq` (L1 consume → W nilpotent):
+- **W∩M' nilpotent**: `betacompl_subgroup_derived_isNilpotent hG hM (inf_le_right : W⊓D ≤ D)` + primeFactors(W⊓D)⊆{p,q}∌β。
+- **N := (W⊓D).subgroupOf W ◁ ↥W**: 🔑 `M ≤ normalizer(derivedInG M)` = **`Subgroup.le_normalizer_map M.subtype`**
+  (H=commutator ↥M normal⟹normalizer=⊤, ⊤.map subtype=range=M); W≤M⟹W≤normalizer(D); +W≤normalizer(W)
+  ⟹ W≤normalizer(W⊓D) (normalizer-of-inf: 要 `normalizer A⊓normalizer B≤normalizer(A⊓B)`, mathlib 名未確認→
+  inline 可) ⟹ `Subgroup.normal_subgroupOf_iff_le_normalizer (inf_le_left)`。
+- **case X≤D**: `sup_eq_right.mpr hXD : X⊔D=D` ⟹ W≤D ⟹ W⊓D=W (`inf_eq_left.mpr`) ⟹ W∩M' nilpotent = W nilpotent。
+- **case p<q**: N2 適用。3 入力:
+  - hWpq: W Hall{p,q}⟹primeFactors(|W|)⊆{p,q} (hWhall.1 + |W.subgroupOf Y|=|W|)。
+  - **正規 Sylow q `Qs` = (W⊓O'_G).subgroupOf W**, O'_G:=`opiCoreInG {r|r≠p} M`:
+    (a) W⊓O'_G は q-群 (O'_G p'-群 `opiCoreInG_le`+oPiCore{r≠p}=p'; W {p,q}-群; ∩⟹{q}-群);
+    (b) Sylow q of ↥W ⊆ O'_G (Q_W→↥M で Sylow q `Q_M`=`IsPGroup.exists_le_sylow`→
+    `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta hG hM hpπ hpβ hpq Q_M`→map G); ⟹|W⊓O'_G|=q-part⟹`Sylow.ofCard`;
+    (c) 正規 = `le_normalizer_opiCoreInG {r|r≠p} M`+W≤M+normal_subgroupOf_iff_le_normalizer。
+    ⚠ p∉π(M) のときは W が q-群 ⟹ `IsPGroup.isNilpotent` で即 nilpotent (10.8c 不要; by_cases hpM 分岐)。
+  - N (上記) nilpotent + W/N q-群 = WD/D⊆(X⊔D)/D (X q-群; `QuotientGroup.quotientInfEquivProdNormalQuotient`
+    or card 論で primeFactors(|W/N|)⊆{q})。
+- **L2** `W∩M_σ Hall{p,q} of M_σ`: `isHallSubgroup_subgroupOf_of_normal` (ambient ↥Y; M_σ.subgroupOf Y◁Y via
+  `le_normalizer_opiCoreInG (sigma M) M`)。**L4**: P_σ:=Sylow p of (W⊓M_σ) (nilpotent⟹O_p)=Sylow p of M_σ
+  (Hall{p,q}⟹p-part); A1 (X q-群≤W, P_σ p-群≤W, W nilpotent)⟹X 中心化 P_σ; G で commute は element-level 自動。
+- **(a)(2)** p∈α(M)→C_M(X)∈𝒰: (1)+Uniqueness(§9 `isUniquelyMaximal_of_*` / `beta_global_structure`)。
+
 ### その他の §10 残ターゲット (keystone gated)
 - **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。(a) 配線可だが (b) は rep-theory
   keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) gated。
