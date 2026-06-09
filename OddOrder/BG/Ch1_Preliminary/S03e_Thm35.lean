@@ -435,6 +435,24 @@ theorem resRep_isIrreducible_of_char_eq_generator
   exact restriction_isIrreducible ρ x hgen M hM
     (nonempty_linearEquiv_map_conjSemilinearEnd_forall ρ hHchar M x hgen hx)
 
+open OddOrder.RepresentationTheory in
+/-- **Isomorphic constituents have equal characters** (reverse of `submodule_iso_of_character_eq`).
+An `F[H]`-linear isomorphism `A ≃ₗ B` of constituents gives equal characters: compose with
+`subRepAsModuleEquiv` to get an `F[H]`-linear iso of the subrepresentation `asModule`s, turn it into
+a `Representation.Equiv` (`equivOfAsModuleEquiv`), and apply `Representation.char_iso`.
+
+Used in the NONISO branch of step 9 to rule out `M ≅ M^{x^j}` from the character distinctness
+`char(M^x) ≠ char(M)`. -/
+theorem character_eq_of_nonempty_linearEquiv [FiniteDimensional F W] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal]
+    {A B : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule}
+    (e : ↥A ≃ₗ[MonoidAlgebra F ↥H] ↥B) :
+    ((Subrepresentation.ofSubmodule' A).toRepresentation).character
+      = ((Subrepresentation.ofSubmodule' B).toRepresentation).character :=
+  Representation.char_iso (equivOfAsModuleEquiv
+    ((subRepAsModuleEquiv (resRep ρ H) A).symm.trans
+      (e.trans (subRepAsModuleEquiv (resRep ρ H) B))))
+
 end Step9
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).

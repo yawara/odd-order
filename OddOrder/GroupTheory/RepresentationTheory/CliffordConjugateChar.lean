@@ -149,6 +149,29 @@ noncomputable def equivAsModule {N : Type*} [AddCommGroup N] [Module k N]
     (Representation.IntertwiningMap.equivLinearMapAsModule ρ₁ ρ₂ φ.toIntertwiningMap)
     φ.toLinearEquiv.bijective
 
+open Representation.IntertwiningMap in
+/-- **Reverse of `equivAsModule`**: a `k[J]`-linear isomorphism of `asModule`s is an isomorphism of
+representations.  Its `J`-equivariance comes from the intertwining map underlying
+`equivLinearMapAsModule.symm e.toLinearMap` (the reduction `IM.toLinearMap v = e v` goes through
+`apply_symm_apply`, since the `.symm`-built map does not definitionally compute). -/
+noncomputable def equivOfAsModuleEquiv {N : Type*} [AddCommGroup N] [Module k N]
+    {ρ₁ : Representation k J M} {ρ₂ : Representation k J N}
+    (e : ρ₁.asModule ≃ₗ[k[J]] ρ₂.asModule) : ρ₁.Equiv ρ₂ :=
+  Representation.Equiv.mk (e.restrictScalars k) (by
+    have hIM : ∀ v, ((equivLinearMapAsModule ρ₁ ρ₂).symm e.toLinearMap).toLinearMap v = e v := by
+      intro v
+      have key := (equivLinearMapAsModule ρ₁ ρ₂).apply_symm_apply e.toLinearMap
+      have h2 : (equivLinearMapAsModule ρ₁ ρ₂ ((equivLinearMapAsModule ρ₁ ρ₂).symm e.toLinearMap)) v
+          = ((equivLinearMapAsModule ρ₁ ρ₂).symm e.toLinearMap).toLinearMap v := rfl
+      rw [← h2, key]; rfl
+    intro g
+    ext v
+    rw [LinearMap.comp_apply, LinearMap.comp_apply]
+    show e (ρ₁ g v) = ρ₂ g (e v)
+    rw [← hIM (ρ₁ g v), ← hIM v]
+    exact LinearMap.congr_fun
+      (((equivLinearMapAsModule ρ₁ ρ₂).symm e.toLinearMap).isIntertwining' g) v)
+
 end SubrepAsModule
 
 section ConjChar
