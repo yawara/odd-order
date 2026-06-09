@@ -357,9 +357,26 @@ M'/M_β ≅ W* (nilpotent Hall β' of M', 10.8(b)) via W* からの全射 (`sup_
 
 **⟹ (a)(3) は K=O_{β∪{q}}(M') route で char を完全回避できると確定 (最良)**:
 
-### 🛑 残 Cor 10.9(a)(3) packaging — **確定レシピ (K-route, char 不要, 全補題確認済)**
+### ✅✅✅ Cor 10.9(a)(3) COMPLETE (2026-06-09, branch `bg-s10-fwd`, commit `423b18d9`)
 
-`beta_complement_normalizer_derived_contains_sylow` (@~1620)。D:=derivedInG M, X_G:=X↑G。
+**`beta_complement_normalizer_derived_contains_sylow` sorry-free + forward-axiom island OK**
+(full build 3566, island ⊆ standard ∪ keystone-2axioms)。下記「確定レシピ (K-route)」を完全実行。
+着手時に前セッションの書きかけ ~163 行が 4 系統のエラーで未完だった。修正点 (handoff 用):
+- `card_HK_mul_card_inf_eq_card_mul_card` は **`Subgroup.` 名前空間必須**; N_β normal ゆえ
+  set product → sup は **`Subgroup.normal_mul`** (第1引数 normal、`mul_normal` は第2引数 normal で誤り)。
+- **`Subgroup.subgroupOf_mono` は ambient subgroup を第1引数に明示で取る** (`subgroupOf_mono M h`)。
+- `Subgroup.subgroupOf_normalizer_eq h : (N(H)).subgroupOf N = N(H.subgroupOf N)` (`H≤N` で十分);
+  Frattini 後の goal は RHS 形ゆえ **`← subgroupOf_normalizer_eq`** で畳む。`Subgroup.normalizer` は
+  **Set を取る** (`def normalizer (S : Set G)`) ので `subgroupOf_normalizer_eq` の normalizer と一致。
+- `(N(X_G)⊓M).subgroupOf M = (N(X_G)).subgroupOf M` は **`inf_subgroupOf_right`** (ambient が第2 operand)。
+- `inf_commutator_eq_of_coprime` は `OddOrder.BG.Ch1.S06` namespace (file は推移 import 済、要修飾)。
+- **🔑 最大の罠**: `set D := derivedInG M with hD` が **`X : Sylow q ↥(derivedInG M)` の型を畳む際に
+  `X` を分裂** (goal は旧 `X✝`、本体は新 `X` を参照 → 最終 `exact` が defeq 不成立で fail)。
+  → **`set D` の前に `revert X`、後に `intro X`** で ∀-binder ごと型を畳み `X` を一貫させて解消。
+- `(derivedInG M).subgroupOf M = commutator ↥M` は `rw [hD, Subgroup.subgroupOf, derivedInG,
+  comap_map_eq_self_of_injective]` (goal を `D.subgroupOf M` 表記にして `hD` がマッチするように)。
+
+`beta_complement_normalizer_derived_contains_sylow` (@~1624)。D:=derivedInG M, X_G:=X↑G。
 1. producer (X⊆M' case) ⟹ W⊇X_G Hall{p,q} of D nilpotent; **S:=O_p(W)** (Sylow p of D, |S|=p-part|D|
    via W Hall ⟹ fact p|W|=fact p|D|); A1 (`isPGroup_le_centralizer_of_isNilpotent_ambient hWnil hpq
    hXW hS_le_W hX_G_q hS_pg` ⟹ X_G≤C(S)) + `le_centralizer_iff.mp` + `centralizer_le_normalizer`(✅mathlib)
