@@ -1565,6 +1565,55 @@ theorem derivedQuotientMbeta_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hf, MonoidHom.range_comp, Subgroup.range_subtype, hmaptop]
   exact nilpotent_of_surjective f (MonoidHom.range_eq_top.mp hrange)
 
+/-- **`N ⊔ Q` is normal when `Γ/N` is nilpotent** (`N` a `q'`-group, `Q` a Sylow `q`-subgroup):
+the image `Q̄ = Q.map (mk' N)` is a Sylow `q`-subgroup of the nilpotent `Γ/N`, hence normal, and
+`N ⊔ Q = (mk' N)⁻¹(Q̄)` is normal as the preimage of a normal subgroup. Used in Corollary 10.9(a)(3)
+with `Γ = ↥M'`, `N = M_β`, `Q = X` to get `M_β X ◁ M'` (the Frattini setup). -/
+theorem normal_sup_sylow_of_quotient_nilpotent {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Normal] (hNil : Group.IsNilpotent (Γ ⧸ N)) {q : ℕ} [Fact q.Prime]
+    (hNq' : ¬ q ∣ Nat.card ↥N) (Q : Sylow q Γ) :
+    (N ⊔ (Q : Subgroup Γ)).Normal := by
+  have hQN : (Q : Subgroup Γ) ⊓ N = ⊥ := by
+    apply Subgroup.card_eq_one.mp
+    by_contra hne
+    obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hne
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+    have hrq : r = q := (Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp
+      (hr_prime.dvd_of_dvd_pow (hk ▸ hr_dvd.trans (Subgroup.card_dvd_of_le inf_le_left)))
+    exact hNq' (hrq ▸ hr_dvd.trans (Subgroup.card_dvd_of_le inf_le_right))
+  -- `mk' N` is injective on `Q`, so `|Q.map (mk' N)| = |Q|`.
+  have hg_inj : Function.Injective ((QuotientGroup.mk' N).comp (Q : Subgroup Γ).subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, ← MonoidHom.comap_ker, QuotientGroup.ker_mk',
+      Subgroup.comap_subtype, Subgroup.subgroupOf_eq_bot]
+    exact disjoint_iff.mpr (by rw [inf_comm]; exact hQN)
+  have hcard : Nat.card ↥((Q : Subgroup Γ).map (QuotientGroup.mk' N)) =
+      Nat.card ↥(Q : Subgroup Γ) := by
+    have hr : ((QuotientGroup.mk' N).comp (Q : Subgroup Γ).subtype).range =
+        (Q : Subgroup Γ).map (QuotientGroup.mk' N) := by
+      rw [MonoidHom.range_comp, Subgroup.range_subtype]
+    rw [← hr]
+    exact (Nat.card_congr (MonoidHom.ofInjective hg_inj).toEquiv).symm
+  -- so `Q.map (mk' N)` is a Sylow `q`-subgroup of `Γ/N`.
+  have hSylcard : Nat.card ↥((Q : Subgroup Γ).map (QuotientGroup.mk' N)) =
+      q ^ (Nat.card (Γ ⧸ N)).factorization q := by
+    rw [hcard, Sylow.card_eq_multiplicity Q]
+    congr 1
+    have hsplit : Nat.card Γ = Nat.card (Γ ⧸ N) * Nat.card ↥N :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup N
+    rw [hsplit, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hNq', add_zero]
+  set Qbar : Sylow q (Γ ⧸ N) := Sylow.ofCard _ hSylcard with hQbar
+  have hQbar_eq : (Q : Subgroup Γ).map (QuotientGroup.mk' N) = (Qbar : Subgroup (Γ ⧸ N)) := by
+    rw [hQbar, Sylow.coe_ofCard]
+  have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r (Γ ⧸ N)),
+      (↑R : Subgroup (Γ ⧸ N)).Normal :=
+    ((isNilpotent_of_finite_tfae (G := Γ ⧸ N)).out 0 3).mp hNil
+  haveI hQbar_norm : (Qbar : Subgroup (Γ ⧸ N)).Normal := hAllNormal q ‹Fact q.Prime› Qbar
+  rw [show N ⊔ (Q : Subgroup Γ) =
+      ((Q : Subgroup Γ).map (QuotientGroup.mk' N)).comap (QuotientGroup.mk' N) from
+      (QuotientGroup.comap_map_mk' N (Q : Subgroup Γ)).symm, hQbar_eq]
+  exact hQbar_norm.comap (QuotientGroup.mk' N)
+
 /-! ## Corollary 10.9(a)(3)/(b) — β(M)'-normalizer gates (mmd L2826) -/
 
 /-- **BG Corollary 10.9(a)(3)** (mmd L2826): in the setup of Corollary 10.9(a), if `X` is a
