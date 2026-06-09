@@ -349,6 +349,70 @@ theorem map_conjSemilinearEnd_eq_self_of_mem (ρ : Representation F G W)
       show ρ g (ρ g⁻¹ w) = w
       rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
 
+open OddOrder.RepresentationTheory in
+/-- **`hconj` propagation (character route).**  Let `ρ` be irreducible on `W` over an algebraically
+closed `F` with `char F ∤ |H|`, `H ◁ G`, `G = ⟨H, x⟩`, and `M` a simple `F[H]`-submodule of the
+restriction.  If the conjugate `M^x` has the same character as `M`, then `M ≅ M^g` for **every**
+`g ∈ G` — exactly the `hconj` input of `restriction_isIrreducible` (BG Prop 2.2(a)).
+
+The set of `g` with `char(M^g) = char(M)` is the conjugation-stabilizer of `char(M)` (a subgroup of
+`G`, via the `conjNormalMulAut` composition law).  It contains `H` (inner conjugates are trivial,
+`map_conjSemilinearEnd_eq_self_of_mem`) and `x` (hypothesis), hence all of `G = ⟨H, x⟩`; then
+`submodule_iso_of_character_eq` (Schur orthogonality) turns equal characters into isomorphisms. -/
+theorem nonempty_linearEquiv_map_conjSemilinearEnd_forall
+    [IsAlgClosed F] [FiniteDimensional F W] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] [Finite ↥H] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hx : ((Subrepresentation.ofSubmodule'
+              (M.map (conjSemilinearEnd (H := H) ρ x))).toRepresentation).character
+        = ((Subrepresentation.ofSubmodule' M).toRepresentation).character) :
+    ∀ g : G, Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ g))) := by
+  haveI : Invertible (Nat.card ↥H : F) := invertibleOfNonzero hHchar
+  set χ := ((Subrepresentation.ofSubmodule' M).toRepresentation).character with hχ
+  -- Conjugation composition law for `conjNormalMulAut`.
+  have hcomp : ∀ (a b : G) (h : ↥H),
+      conjNormalMulAut H (a * b) h = conjNormalMulAut H a (conjNormalMulAut H b h) := by
+    intro a b h; apply Subtype.ext
+    rw [conjNormalMulAut_apply_coe, conjNormalMulAut_apply_coe, conjNormalMulAut_apply_coe]; group
+  have hone : ∀ h : ↥H, conjNormalMulAut H 1 h = h := by
+    intro h; apply Subtype.ext; rw [conjNormalMulAut_apply_coe]; group
+  -- The conjugation-stabilizer subgroup of `χ`.
+  let S : Subgroup G :=
+    { carrier := {g | ∀ h : ↥H, χ (conjNormalMulAut H g⁻¹ h) = χ h}
+      one_mem' := by intro h; rw [inv_one, hone]
+      mul_mem' := fun {a b} ha hb h => by
+        rw [mul_inv_rev, hcomp, hb (conjNormalMulAut H a⁻¹ h)]; exact ha h
+      inv_mem' := fun {a} ha h => by
+        have hkey := ha (conjNormalMulAut H a h)
+        rw [← hcomp, inv_mul_cancel, hone] at hkey
+        rw [inv_inv]; exact hkey.symm }
+  -- `H ≤ S`: inner conjugates are trivial (`M^h = M`), so `char(M^h) = χ`.
+  have hHS : (H : Set G) ⊆ (S : Set G) := by
+    intro h₀ hh₀ h
+    have hMM : M.map (conjSemilinearEnd (H := H) ρ h₀) = M :=
+      map_conjSemilinearEnd_eq_self_of_mem ρ hh₀ M
+    have hc := character_subRep_conj ρ M h₀ h
+    rw [hMM] at hc
+    exact hc.symm
+  -- `x ∈ S`: hypothesis.
+  have hxS : x ∈ S := by
+    intro h
+    have hc := character_subRep_conj ρ M x h
+    rw [hx] at hc
+    exact hc.symm
+  -- `S = ⊤`, so every `g` stabilises `χ`, giving `char(M^g) = χ` and hence `M ≅ M^g`.
+  have htop : (⊤ : Subgroup G) ≤ S := by
+    rw [← hgen]; exact Subgroup.closure_le S |>.mpr (Set.union_subset hHS (by simpa using hxS))
+  intro g
+  have hgS : ∀ h : ↥H, χ (conjNormalMulAut H g⁻¹ h) = χ h := htop (Subgroup.mem_top g)
+  have hcharg : ((Subrepresentation.ofSubmodule'
+      (M.map (conjSemilinearEnd (H := H) ρ g))).toRepresentation).character = χ := by
+    funext h; rw [character_subRep_conj]; exact hgS h
+  exact submodule_iso_of_character_eq ρ M g hcharg
+
 end Step9
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
