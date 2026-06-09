@@ -3312,3 +3312,15 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Cor 10.9(a) producer (W nilpotent) と Cor 10.9(a)(1)(2) (`beta_complement_centralizes`):
+-- `betacompl_subgroup_derived_isNilpotent` / `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta`
+-- 経由ゆえ同じ keystone island。
+#assert_axioms_island OddOrder.BG.Ch3.S10.exists_nilpotent_hall_pq
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+#assert_axioms_island OddOrder.BG.Ch3.S10.beta_complement_centralizes
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
