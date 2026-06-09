@@ -1077,6 +1077,157 @@ theorem invariants_ne_bot_of_not_irreducible_sup [Finite G] [FiniteDimensional F
   · exact hmemInv A hAne hA
   · exact hmemInv B hBne hB
 
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **The single-weight (ISO) case of step 9's `K'`-analysis.**  Suppose `ρ` restricted to `K' ⊔ R`
+is irreducible, `K'` is abelian and normal, `R = ⟨x⟩`, and there is a character `χ` with nonzero
+weight space that is *fixed* by `x` (`conjChar x χ = χ`).  Then `W` is one-dimensional.
+
+The `χ`-weight space is `K' ⊔ R`-invariant (`K'` acts trivially on characters, `x` fixes `χ`), hence
+all of `W` (irreducibility); so `K'` acts by the scalar `χ`.  An eigenvalue `λ` of `ρ x` then has a
+`K' ⊔ R`-invariant eigenspace (the scalars `ρ k'` commute with `ρ x`), hence all of `W`, so `ρ x` is
+also scalar.  With every `ρ g` (`g ∈ K' ⊔ R`) scalar, any line is `K' ⊔ R`-invariant, forcing
+`dim W = 1`. -/
+theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontrivial W]
+    [IsAlgClosed F] (σ : Representation F G W) {K' R : Subgroup G} [K'.Normal]
+    (hcomm : ∀ a b : ↥K', (a : G) * (b : G) = (b : G) * (a : G))
+    (x : G) (hxR : Subgroup.zpowers x = R)
+    (hKRirr : Representation.IsIrreducible (σ.comp (K' ⊔ R).subtype))
+    {χ : ↥K' → F} (hχne : weightSpace σ K' χ ≠ ⊥) (hχfix : conjChar K' x χ = χ) :
+    Module.finrank F W = 1 := by
+  haveI := hKRirr
+  -- `K' ⊔ R = ⟨K', x⟩`.
+  have hgen : Subgroup.closure ((K' : Set G) ∪ {x}) = K' ⊔ R := by
+    rw [Subgroup.closure_union, Subgroup.closure_eq, ← Subgroup.zpowers_eq_closure, hxR]
+  -- `K' ⊔ R`-invariant submodules are `⊥` or `⊤`.
+  have hsub : ∀ D : Submodule F W, (∀ g ∈ K' ⊔ R, ∀ d ∈ D, σ g d ∈ D) → D = ⊥ ∨ D = ⊤ := by
+    intro D hD
+    let Dρ : Subrepresentation (σ.comp (K' ⊔ R).subtype) :=
+      { toSubmodule := D
+        apply_mem_toSubmodule := fun g d hd => hD (g : G) g.2 d hd }
+    rcases IsSimpleOrder.eq_bot_or_eq_top Dρ with h | h
+    · exact Or.inl (congrArg Subrepresentation.toSubmodule h)
+    · exact Or.inr (congrArg Subrepresentation.toSubmodule h)
+  -- every `g ∈ K' ⊔ R` fixes the character `χ`.
+  have hK'fix : ∀ k' : ↥K', conjChar K' (k' : G) χ = χ := by
+    intro k'
+    funext k''
+    simp only [conjChar]
+    congr 1
+    apply Subtype.ext
+    rw [conjNormalMulAut_apply_coe, inv_inv]
+    have hc := hcomm k'' k'
+    rw [mul_assoc, hc, ← mul_assoc, inv_mul_cancel, one_mul]
+  have hSfix : ∀ g ∈ K' ⊔ R, conjChar K' g χ = χ := by
+    have hle : (K' ⊔ R : Subgroup G) ≤
+        { carrier := {g | conjChar K' g χ = χ}
+          one_mem' := conjChar_one K' χ
+          mul_mem' := fun {a b} ha hb => by
+            simp only [Set.mem_setOf_eq] at *; rw [conjChar_mul, hb, ha]
+          inv_mem' := fun {a} ha => by
+            simp only [Set.mem_setOf_eq] at *
+            conv_lhs => rw [← ha]
+            rw [← conjChar_mul, inv_mul_cancel, conjChar_one] } := by
+      rw [← hgen, Subgroup.closure_le]
+      rintro s (hsK' | hsx)
+      · exact hK'fix ⟨s, hsK'⟩
+      · rw [Set.mem_singleton_iff] at hsx; subst hsx; exact hχfix
+    exact fun g hg => hle hg
+  -- `weightSpace χ = ⊤`: it is `K' ⊔ R`-invariant and nonzero.
+  have hwtop : weightSpace σ K' χ = ⊤ := by
+    refine (hsub _ ?_).resolve_left hχne
+    intro g hg d hd
+    have : σ g d ∈ (weightSpace σ K' χ).map (σ g) := Submodule.mem_map_of_mem hd
+    rwa [map_weightSpace, hSfix g hg] at this
+  -- `K'` acts by the scalar `χ` on all of `W`.
+  have hK'scalar : ∀ (k' : ↥K') (w : W), σ (k' : G) w = χ k' • w := by
+    intro k' w
+    have hw : w ∈ weightSpace σ K' χ := by rw [hwtop]; exact Submodule.mem_top
+    rw [mem_weightSpace] at hw
+    exact hw k'
+  -- `ρ x` commutes with every `ρ g` (`g ∈ K' ⊔ R`).
+  have hcommx : ∀ g ∈ K' ⊔ R, σ g * σ x = σ x * σ g := by
+    have hle : (K' ⊔ R : Subgroup G) ≤
+        { carrier := {g | σ g * σ x = σ x * σ g}
+          one_mem' := by simp only [Set.mem_setOf_eq, map_one, one_mul, mul_one]
+          mul_mem' := fun {a b} ha hb => by
+            simp only [Set.mem_setOf_eq, map_mul] at *
+            rw [mul_assoc, hb, ← mul_assoc, ha, mul_assoc]
+          inv_mem' := fun {a} ha => by
+            simp only [Set.mem_setOf_eq] at *
+            have hcomm : Commute (↑(σ.asGroupHom a)) (σ x) := by
+              rw [σ.asGroupHom_apply]; exact ha
+            have hinv := hcomm.units_inv_left
+            have heq : (↑((σ.asGroupHom a)⁻¹) : Module.End F W) = σ a⁻¹ := by
+              rw [← map_inv, σ.asGroupHom_apply]
+            rwa [heq] at hinv } := by
+      rw [← hgen, Subgroup.closure_le]
+      rintro s (hsK' | hsx)
+      · refine LinearMap.ext fun w => ?_
+        simp only [Module.End.mul_apply, hK'scalar ⟨s, hsK'⟩, map_smul]
+      · rw [Set.mem_singleton_iff] at hsx; subst hsx; rfl
+    exact fun g hg => hle hg
+  -- `ρ x` is scalar (its eigenspace is `K' ⊔ R`-invariant, hence `⊤`).
+  obtain ⟨lam, hlam⟩ := Module.End.exists_eigenvalue (σ x)
+  have hEtop : Module.End.eigenspace (σ x) lam = ⊤ := by
+    refine (hsub _ ?_).resolve_left hlam
+    intro g hg d hd
+    rw [Module.End.mem_eigenspace_iff] at hd ⊢
+    have hcg := LinearMap.congr_fun (hcommx g hg) d
+    simp only [Module.End.mul_apply] at hcg
+    rw [← hcg, hd, map_smul]
+  have hxscalar : ∀ w : W, σ x w = lam • w := by
+    intro w
+    have hw : w ∈ Module.End.eigenspace (σ x) lam := by rw [hEtop]; exact Submodule.mem_top
+    rwa [Module.End.mem_eigenspace_iff] at hw
+  -- every `g ∈ K' ⊔ R` maps a fixed nonzero `v` into the line `F • v`.
+  obtain ⟨v, hv⟩ := exists_ne (0 : W)
+  have hgv : ∀ g ∈ K' ⊔ R, σ g v ∈ Submodule.span F {v} := by
+    have hle : (K' ⊔ R : Subgroup G) ≤
+        { carrier := {g | σ g v ∈ Submodule.span F {v}}
+          one_mem' := by
+            simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply]
+            exact Submodule.mem_span_singleton_self v
+          mul_mem' := fun {a b} ha hb => by
+            simp only [Set.mem_setOf_eq] at *
+            rw [map_mul, Module.End.mul_apply]
+            obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp hb
+            rw [← hc, map_smul]
+            exact Submodule.smul_mem _ c ha
+          inv_mem' := fun {a} ha => by
+            simp only [Set.mem_setOf_eq] at *
+            obtain ⟨c, hc⟩ := Submodule.mem_span_singleton.mp ha
+            have hc0 : c ≠ 0 := by
+              rintro rfl
+              rw [zero_smul] at hc
+              exact hv ((σ.apply_bijective a).injective (by rw [← hc, map_zero]))
+            rw [Submodule.mem_span_singleton]
+            refine ⟨c⁻¹, ?_⟩
+            have hcav : c • σ a⁻¹ v = v := by
+              rw [← map_smul, hc, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
+                Module.End.one_apply]
+            rw [inv_smul_eq_iff₀ hc0]; exact hcav.symm } := by
+      rw [← hgen, Subgroup.closure_le]
+      rintro s (hsK' | hsx)
+      · show σ s v ∈ Submodule.span F {v}
+        rw [hK'scalar ⟨s, hsK'⟩]
+        exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
+      · rw [Set.mem_singleton_iff] at hsx; subst hsx
+        show σ s v ∈ Submodule.span F {v}
+        rw [hxscalar]
+        exact Submodule.smul_mem _ _ (Submodule.mem_span_singleton_self v)
+    exact fun g hg => hle hg
+  -- `F • v` is `K' ⊔ R`-invariant and nonzero, hence `⊤`; so `dim W = 1`.
+  have hspan : Submodule.span F {v} = ⊤ := by
+    refine (hsub _ ?_).resolve_left (by rw [Submodule.span_singleton_eq_bot]; exact hv)
+    intro g hg d hd
+    obtain ⟨a, ha⟩ := Submodule.mem_span_singleton.mp hd
+    rw [← ha, map_smul]
+    exact Submodule.smul_mem _ a (hgv g hg)
+  have hfr := finrank_span_singleton (K := F) hv
+  rw [hspan, finrank_top] at hfr
+  exact hfr
+
 end Step9Bridges
 
 
