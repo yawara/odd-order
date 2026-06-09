@@ -752,15 +752,26 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 - **`gridFamily` の `cond b ψt ψf`** (γ=Bool の φ): `cases b` で defeq 簡約 (simp 不要)。
 - **`if a=b` 出力**: `gridFamily_orthonormal` は diag/off-diag 連言を返す→使用側で `split_ifs` で `if` 形に (DecidableEq instance mismatch 回避)。
 
-### ▶▶ 次 = 具体橋渡し: Afam → χ_ij 族 → (3.5) → (3.2) σ [次セッション]
-**残りは具体的 plumbing (抽象 hard core は解除済)**:
-1. **Afam に instantiate**: `Afam_isSignedTripleGrid` の grid に `symm_orthonormal_family` (w₂≥5) / `two_col_orthonormal_family` (w₂=3) を適用。
-   - 列共通 z_q : 各列 q で `Afam_existsUnique_common` の choose (要 別列 q'≠q = w₂≥3 で常成立)。
-   - 行共通 (w₂≥5): transpose grid に `existsUnique_common` (要 ≥4 列 = w₂≥5)。
-   - **w₂ で dispatch**: `sup_card_ge_five` + w₁≥5 WLOG。w₂=3 or w₂≥5 で `by_cases`。
-2. **χ_ij 族構成**: χ_0j=-z_j, χ_i0=-(row-anchor), χ_ij=φ_ij, **χ_00=1_G** (具体追加); index = Ŵ₁'×Ŵ₂' (trivial char=0)。1_G ⊥ 全 χ (χ は nontrivial signed irr ⟹ ⟨1_G,χ⟩=0)。負号は正規直交を保つ (⟨-a,-b⟩=⟨a,b⟩)。
-3. **(3.5) 最終**: 正規直交族 (χ_ij) + χ_00=1 + **Ind α_ij = 1 - χ_i0 - χ_0j + χ_ij** (= β_ij=Σ_{A_ij}=z_j+m_i+φ_ij from IsSignedTriple.sum_eq + cell decomp)。
-4. **(3.2) σ**: {ω_ij}=Irr(W) 正規直交基底 → χ_ij への線形写像 (`Basis.constr`/orthonormal-basis-to-family) = isometry; ℤIrr→ℤIrr (χ_ij∈ZIrr); (a) α_ij→Ind α_ij, (b) ω_00→1_G, (c)(d) from (1.3)。
+### ✅ 着地 (session 14 cont.): 具体 foundations + commons 抽出
+2 commits 追加 (`86a36fdd` foundations, `c376cf8e` commons)。
+- **signed-irr foundations** (`86a36fdd`): `IsSignedNontrivialIrr.mem_ZIrr` (x=±χ∈ZIrr) + `.inner_trivial` (⟨x,1_G⟩=0)。`inner_trivialClassFunction_self`(既存) と併せ「χ族 + 1_G」正規直交の具体 prep 完成 (これ以上抽象 prep 不要)。
+- **commons 抽出** (`c376cf8e`): `exists_colCommon` (w₁≥5: `∃ z:Ĉ₂ⁿᵉ→CF, ∀q p, z q∈Afam p q` via existsUnique_common) + `exists_rowCommon` (w₂≥5: `∃ w:Ĉ₁ⁿᵉ→CF, ∀p q, w p∈Afam p q` via **transpose** grid の existsUnique_common — W₁↔W₂ 橋渡し検証済)。card 補題: Nontrivial Ĉ_kⁿᵉ (card W_k≥3 from odd+>1)、4≤card Ĉ₂ⁿᵉ (w₂≥5)。symm/two_col の z/w 入力が揃った。
+
+### ▶▶ 次 = χ-assembly (3.5) → orientation wrapper → (3.2) σ [次セッション]
+**残りは具体 plumbing。入力 (commons + 抽象正規直交 symm/two_col) 全て準備済。**
+
+**χ-assembly (w₁≥5 前提)**: χ : Ĉ₁×Ĉ₂ → CF を 4-case で:
+- (1,1)↦1_G, (p,1)[p≠1]↦-(row-anchor⟨p⟩), (1,q)[q≠1]↦-(col-common⟨q⟩), (p,q)[both≠1]↦third⟨p⟩⟨q⟩。
+- 出力 (3.5): χ(1,1)=1_G ∧ ∀pq χ pq∈ZIrr ∧ 正規直交 ∧ **Ind α_pq = 1_G - χ(p,1) - χ(1,q) + χ(p,q)** (= β_pq=Σ_{Afam p q}=col+row+third via IsSignedTriple.sum_eq + cell {z,m,φ})。
+- 正規直交: 16-case (p,q,p',q' の trivial 判定) を `inner_trivial`/`inner_trivialClassFunction_self`/hortho (symm or two_col の `⟨gridFamily a,gridFamily b⟩=if a=b`) + 符号 (inner_neg) で。
+
+**🛑 設計論点 (次セッション最初に解決)**: symm は gridFamily を **γ=κ (=Ĉ₂ⁿᵉ)** で、two_col は **γ=Bool** で出力 (列 index 型が違う)。χ-over-Ĉ₁×Ĉ₂ は列 index=Ĉ₂ⁿᵉ を要す。
+- w₂≥5: symm の κ=Ĉ₂ⁿᵉ で直接 OK。
+- w₂=3: two_col の j:Bool→κ は card κ=2 ゆえ全単射。χ の列 q∈Ĉ₂ⁿᵉ を `q=j(false) or j(true)` で case 分けして two_col の Bool-φ に橋渡し (j 全単射の bookkeeping)。または two_col を「card κ=2 のとき γ=κ で出力」する補題に reindex (gridFamily の Bool↔κ 移送、~20行)。**推奨 = χ-assembly 内で q→Bool case 分け (reindex 補題より局所的)。**
+
+**orientation wrapper (w₁<5 ⟹ w₁=3∧w₂≥5)**: colCommon が w₁≥5 を要すので、w₁<5 では **transpose grid (W₂ を rows, w₂≥5⟹≥4 rows)** で χ-assembly を回し、結果を transpose back (α_ij は W₁↔W₂ 対称、ω_ij も swap+transpose で対応)。`sup_card_ge_five` で w₁≥5∨w₂≥5、後者は transpose。**TICyclicHypothesis.swap が無いので transpose 経由が現実的。**
+
+**(3.2) σ**: {ω_ij}=Irr(W) 正規直交基底 → χ_ij 線形写像 = isometry。**要 scope: CF(W) inner product space instance + Irr(W) orthonormal basis + 「orthonormal family → linear isometry」(mathlib `Orthonormal`/`LinearIsometry` 周辺)**。ℤIrr→ℤIrr (χ∈ZIrr); (a) α_ij→Ind, (b) ω_00→1_G, (c)(d) from (1.3)。
 - 残 hard core ×1=(4.3)§6本体 (FT経路外)。
 
-正本 = 本ノート (session 14)。**Don't re-grind 抽象 (3.5.5) 正規直交 (symm/two_col/gridFamily_orthonormal) — 完成・axiom-clean.**
+正本 = 本ノート (session 14 + cont.)。**Don't re-grind 抽象 (3.5.5) 正規直交 (symm/two_col/gridFamily_orthonormal) / foundations (mem_ZIrr/inner_trivial) / commons (col/rowCommon) — 完成・axiom-clean.**
