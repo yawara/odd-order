@@ -3337,3 +3337,11 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Cor 10.9(b): `N_G(S) ⊆ H ∩ M` (`H ≠ M`) ⟹ `M = (H∩M)·M_β` and `α(M)=β(M)`. Uses the
+-- Uniqueness Theorem (`q ∉ α(M)` via `S ∈ 𝒰` contradiction), the same Frattini argument as (a)(3)
+-- (`K = O_{β∪{q}}(M') = M_β·S`), and Cor 10.9(a)(2) (`beta_complement_centralizes`); same island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.beta_factorization_of_sylow_normalizer_in_intersection
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
