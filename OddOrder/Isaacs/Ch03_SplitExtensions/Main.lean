@@ -1488,6 +1488,56 @@ theorem hall_D [Finite G] [IsSolvable G] {π : Set ℕ} {U : Subgroup G}
     ∃ H : Subgroup G, IsHallSubgroup π H ∧ U ≤ H :=
   hall_D_strong_aux (Nat.card G) G le_rfl hU
 
+/-- `N ⊴ G` のとき, 任意の `H` について `[N : H ∩ N] = H.relIndex N` は `[G : H] = H.index`
+を割る. (mathlib `relIndex_dvd_index_of_normal` は正規部分群側の relindex を扱うので, その
+「右版」を指数の塔等式 + 第二同型から導く.)
+
+`[G:H]·[H:H∩N] = [G:N]·[N:H∩N]` (どちらも `[G:H∩N]`), かつ `[H:H∩N] ∣ [G:N]` (正規) より
+`[N:H∩N] ∣ [G:H]`. -/
+theorem relIndex_dvd_index_of_normal_right [Finite G] (H : Subgroup G) {N : Subgroup G}
+    [N.Normal] : H.relIndex N ∣ H.index := by
+  -- (H⊓N).relIndex H * H.index = [G:H∩N] と (H⊓N).relIndex N * N.index = [G:H∩N].
+  have hA : N.relIndex H * H.index = (H ⊓ N : Subgroup G).index := by
+    rw [← Subgroup.inf_relIndex_left]; exact Subgroup.relIndex_mul_index inf_le_left
+  have hB : H.relIndex N * N.index = (H ⊓ N : Subgroup G).index := by
+    rw [← Subgroup.inf_relIndex_right]; exact Subgroup.relIndex_mul_index inf_le_right
+  -- [H:H∩N] = N.relIndex H ∣ [G:N] = N.index (正規).
+  obtain ⟨t, ht⟩ : N.relIndex H ∣ N.index := Subgroup.relIndex_dvd_index_of_normal N H
+  have hb_ne : N.relIndex H ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hA
+    exact Subgroup.index_ne_zero_of_finite hA.symm
+  -- N.relIndex H * H.index = N.relIndex H * (H.relIndex N * t).
+  have key : N.relIndex H * H.index = N.relIndex H * (H.relIndex N * t) := by
+    rw [hA, ← hB, ht]; ring
+  exact ⟨t, Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hb_ne) key⟩
+
+/-- **Hall ∩ normal**: `H` が `G` の `π`-Hall 部分群, `N ⊴ G` なら `H ∩ N` (= `N` 内で
+`H.subgroupOf N`) は `N` の `π`-Hall 部分群.
+
+`|H ∩ N| ∣ |H|` なので素因子は `π` に含まれ, `[N : H∩N] ∣ [G:H] = index H` (π'-number,
+`relIndex_dvd_index_of_normal_right`) なので余指数の素因子は `π` の外. BG Cor 10.9 で
+`W ∩ M'` / `W ∩ M_σ` が `M'` / `M_σ` の Hall になることに使う. -/
+theorem isHallSubgroup_subgroupOf_of_normal [Finite G] {π : Set ℕ} {H N : Subgroup G}
+    (hH : IsHallSubgroup π H) [N.Normal] :
+    IsHallSubgroup π (H.subgroupOf N) := by
+  have hcard : Nat.card ↥(H.subgroupOf N) = Nat.card ↥(H ⊓ N : Subgroup G) := by
+    rw [← Subgroup.inf_subgroupOf_right]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
+  refine ⟨?_, ?_⟩
+  · -- |H.subgroupOf N| = |H ⊓ N| ∣ |H|, so prime factors ⊆ π.
+    intro q hq
+    rw [hcard] at hq
+    apply hH.1
+    rw [Nat.mem_primeFactors] at hq ⊢
+    exact ⟨hq.1, hq.2.1.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩
+  · -- index = H.relIndex N ∣ H.index, so prime factors ⊆ π'.
+    intro q hq hqπ
+    have hdvd : (H.subgroupOf N).index ∣ H.index := relIndex_dvd_index_of_normal_right H
+    rw [Nat.mem_primeFactors] at hq
+    exact hH.2 q (Nat.mem_primeFactors.mpr
+      ⟨hq.1, hq.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩) hqπ
+
 /-! **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
 

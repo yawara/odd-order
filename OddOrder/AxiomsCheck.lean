@@ -557,6 +557,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_D
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.exists_conj_le_of_isComplement'_of_coprime
 
+-- Ch.3 (Split Extensions): Hall ∩ normal — H が π-Hall, N ⊴ G ⇒ H ∩ N は N の π-Hall.
+-- (BG Cor 10.9 で W ∩ M' / W ∩ M_σ が Hall になることに使う; unconditional)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.isHallSubgroup_subgroupOf_of_normal
+
 -- Ch.3 (Split Extensions): Thm 3.36 cyclic extension existence (Phase 4 完成)
 -- N, m > 0, a ∈ N, σ ∈ Aut(N) で σ a = a かつ σ^m = MulAut.conj a
 --   ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x.
