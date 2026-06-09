@@ -2898,6 +2898,50 @@ noncomputable def omegaIrrEquiv (hyp : TICyclicHypothesis G) :
     (p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
     hyp.omegaIrrEquiv p = hyp.omega (hyp.omegaProdChar p.1 p.2) := rfl
 
+/-! ### The isometry `σ` of Theorem (3.2) -/
+
+/-- A fixed choice of the `(3.5)` orthonormal family `(χ_{ij})` (indexed by `Ĉ₁ × Ĉ₂`), extracted
+from `exists_chiFamily`.  `σ` is built from this. -/
+noncomputable def chiFam (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) → ClassFunction G ℂ :=
+  (hyp.exists_chiFamily hVeq app).choose
+
+open scoped Classical in
+theorem chiFam_spec (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    hyp.chiFam hVeq app (1, 1) = trivialClassFunction G ∧
+      (∀ pq, hyp.chiFam hVeq app pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (hyp.chiFam hVeq app a) (hyp.chiFam hVeq app b)
+        = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - hyp.chiFam hVeq app (p, 1) - hyp.chiFam hVeq app (1, q)
+            + hyp.chiFam hVeq app (p, q) :=
+  (hyp.exists_chiFamily hVeq app).choose_spec
+
+/-- **Peterfalvi (3.2)**, the map: the linear `σ : CF(W) → CF(G)` defined by `ω^σ = χ` on the
+basis `Irr(W)` (`(3.3)`) via the chosen `(3.5)` family (`Module.Basis.constr`).  Linearity is
+automatic; the isometry property and (a)-(d) are proved separately. -/
+noncomputable def sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ :=
+  (irreducibleCharacterBasis (G := hyp.W)).constr ℂ
+    fun ω => hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω)
+
+/-- The defining property of `σ` on the basis `Irr(W)`: `ω^σ = χ` at the matching index pair. -/
+theorem sigma_irreducibleCharacter (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω) := by
+  conv_lhs => rw [← irreducibleCharacterBasis_apply (G := hyp.W) ω]
+  exact (irreducibleCharacterBasis (G := hyp.W)).constr_basis ℂ _ ω
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
