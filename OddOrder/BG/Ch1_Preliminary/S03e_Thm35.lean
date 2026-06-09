@@ -1228,6 +1228,133 @@ theorem finrank_eq_one_of_weight_fixed [Finite G] [FiniteDimensional F W] [Nontr
   rw [hspan, finrank_top] at hfr
   exact hfr
 
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **Step 9 capstone (mmd L945-951): `C_W(K') ≠ 0`.**  Let `σ` be an *irreducible* representation of
+the Frobenius group `G = K R` (`R = ⟨x⟩` of prime order, `gcd(|K|, |R|) = 1`) over an algebraically
+closed field, with `dim C_W(R) = 1` and `K' = ⁅K, K⁆` nontrivial and abelian.  Then `C_W(K') ≠ 0`.
+
+This is the Clifford-theoretic core of Theorem 3.5, assembled from the step-9 pieces:
+* **`K`-analysis.**  A simple `F[K]`-constituent `M` is either isomorphic to its conjugate `M^x`
+  (then `Res^G_K σ` is irreducible, `resRep_isIrreducible_of_iso_generator`) or not (then
+  `dim M = 1` by the projection argument `finrank_eq_one_of_not_iso_generator`, so
+  `M ⊆ C_W(K')`, done).
+* **`K'R`-analysis.**  If `Res^G_{K'R} σ` is reducible, `invariants_ne_bot_of_not_irreducible_sup`
+  gives `C_W(K') ≠ 0`.
+* **`K'`-analysis.**  Otherwise a simple `F[K']`-constituent `M'` is one-dimensional (`K'` abelian,
+  alg-closed) with a weight `χ₁`.  If `x` fixes `χ₁` then `dim W = 1`
+  (`finrank_eq_one_of_weight_fixed`), so `K'` acts trivially; if not, the two distinct weights `χ₁`,
+  `x·χ₁` contradict the orbit count `false_of_two_weights`. -/
+theorem invariants_commutator_ne_bot_of_irreducible
+    [IsAlgClosed F] [FiniteDimensional F W] [Nontrivial W] [Finite G]
+    (σ : Representation F G W) [σ.IsIrreducible]
+    {K R : Subgroup G} (hFrob : IsFrobeniusGroup G K R)
+    (x : G) (hxR : Subgroup.zpowers x = R) (hRp : (Nat.card ↥R).Prime)
+    (hgen : Subgroup.closure ((K : Set G) ∪ {x}) = ⊤)
+    (hchar : (Nat.card G : F) ≠ 0) (hcharK : (Nat.card ↥K : F) ≠ 0)
+    (hcharKR : (Nat.card ↥((⁅K, K⁆ : Subgroup G) ⊔ R) : F) ≠ 0)
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R))
+    (hK'ne : (⁅K, K⁆ : Subgroup G) ≠ ⊥)
+    (hcomm : ∀ a b : ↥(⁅K, K⁆ : Subgroup G), (a : G) * (b : G) = (b : G) * (a : G))
+    (hCV1 : Module.finrank F (Representation.invariants (σ.comp R.subtype)) = 1) :
+    Representation.invariants (σ.comp (⁅K, K⁆ : Subgroup G).subtype) ≠ ⊥ := by
+  haveI hKnorm : K.Normal := hFrob.isNormal
+  haveI hK'norm : (⁅K, K⁆ : Subgroup G).Normal := Subgroup.commutator_normal K K
+  have hK'le : (⁅K, K⁆ : Subgroup G) ≤ K := Subgroup.commutator_le_right K K
+  have hRnormK' : R ≤ Subgroup.normalizer (⁅K, K⁆ : Subgroup G) :=
+    Subgroup.le_normalizer_of_normal
+  haveI : NeZero (Nat.card ↥K : F) := ⟨hcharK⟩
+  -- a simple `F[K]`-constituent `M`.
+  haveI hssK : IsSemisimpleModule (MonoidAlgebra F ↥K) (resRep σ K).asModule := by
+    rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]; infer_instance
+  haveI : Nontrivial (resRep σ K).asModule := ‹Nontrivial W›
+  obtain ⟨M, hMs⟩ :=
+    IsSemisimpleModule.exists_simple_submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule
+  haveI := hMs
+  have hMne : M ≠ ⊥ := by
+    rintro rfl
+    haveI : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule) :=
+      IsSimpleModule.nontrivial (MonoidAlgebra F ↥K) _
+    exact false_of_nontrivial_of_subsingleton
+      ↥(⊥ : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule)
+  by_cases hMiso : Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥K]
+      ↥(M.map (conjSemilinearEnd (H := K) σ x)))
+  · -- **`K`-analysis, ISO**: `Res^G_K σ` is irreducible.
+    have hKirr : (resRep σ K).IsIrreducible :=
+      resRep_isIrreducible_of_iso_generator σ hcharK M hMne x hgen hMiso
+    by_cases hKRirr : Representation.IsIrreducible (σ.comp ((⁅K, K⁆ : Subgroup G) ⊔ R).subtype)
+    · -- **`K'R`-analysis, irreducible**: pass to the `K'`-analysis.
+      have hcharK' : (Nat.card ↥(⁅K, K⁆ : Subgroup G) : F) ≠ 0 := by
+        obtain ⟨m, hm⟩ := Subgroup.card_dvd_of_le hK'le
+        intro h0; exact hcharK (by rw [hm, Nat.cast_mul, h0, zero_mul])
+      haveI : NeZero (Nat.card ↥(⁅K, K⁆ : Subgroup G) : F) := ⟨hcharK'⟩
+      haveI hssK' : IsSemisimpleModule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
+          (resRep σ (⁅K, K⁆ : Subgroup G)).asModule := by
+        rw [← Representation.isSemisimpleRepresentation_iff_isSemisimpleModule_asModule]
+        infer_instance
+      haveI : Nontrivial (resRep σ (⁅K, K⁆ : Subgroup G)).asModule := ‹Nontrivial W›
+      obtain ⟨M', hM's⟩ := IsSemisimpleModule.exists_simple_submodule
+        (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G)) (resRep σ (⁅K, K⁆ : Subgroup G)).asModule
+      haveI := hM's
+      have hM'ne : M' ≠ ⊥ := by
+        rintro rfl
+        haveI : Nontrivial ↥(⊥ : Submodule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
+            (resRep σ (⁅K, K⁆ : Subgroup G)).asModule) :=
+          IsSimpleModule.nontrivial (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G)) _
+        exact false_of_nontrivial_of_subsingleton
+          ↥(⊥ : Submodule (MonoidAlgebra F ↥(⁅K, K⁆ : Subgroup G))
+            (resRep σ (⁅K, K⁆ : Subgroup G)).asModule)
+      haveI : IsMulCommutative ↥(⁅K, K⁆ : Subgroup G) :=
+        ⟨⟨fun a b => Subtype.ext (hcomm a b)⟩⟩
+      haveI := subRep_isIrreducible (resRep σ (⁅K, K⁆ : Subgroup G)) M'
+      haveI : Module.Finite F ↥M' :=
+        Module.Finite.of_injective ((M'.subtype).restrictScalars F) Subtype.val_injective
+      have hM'dim : Module.finrank F ↥M' = 1 :=
+        Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative
+          (Subrepresentation.ofSubmodule' M').toRepresentation
+      obtain ⟨χ₁, hχ₁⟩ := exists_weightSpace_ge_of_finrank_one σ M' hM'ne hM'dim
+      have hwt1 : weightSpace σ (⁅K, K⁆ : Subgroup G) χ₁ ≠ ⊥ := by
+        intro hbot
+        obtain ⟨m', hm'M, hm'0⟩ := (Submodule.ne_bot_iff M').mp hM'ne
+        have hmem : m' ∈ weightSpace σ (⁅K, K⁆ : Subgroup G) χ₁ := hχ₁ hm'M
+        rw [hbot, Submodule.mem_bot] at hmem
+        exact hm'0 hmem
+      by_cases hfix : conjChar (⁅K, K⁆ : Subgroup G) x χ₁ = χ₁
+      · -- **`K'`-analysis, ISO**: `dim W = 1`, so `K'` acts trivially.
+        have hUdim := finrank_eq_one_of_weight_fixed σ hcomm x hxR hKRirr hwt1 hfix
+        have htriv := trivial_on_commutator_of_finrank_eq_one σ hUdim K
+        obtain ⟨w, hw⟩ := exists_ne (0 : W)
+        rw [Submodule.ne_bot_iff]
+        refine ⟨w, ?_, hw⟩
+        rw [Representation.mem_invariants]
+        intro k'
+        show σ (k' : G) w = w
+        rw [htriv (k' : G) k'.2]; rfl
+      · -- **`K'`-analysis, NONISO**: two distinct weights contradict the orbit count.
+        have hwt2 : weightSpace σ (⁅K, K⁆ : Subgroup G) (conjChar (⁅K, K⁆ : Subgroup G) x χ₁) ≠ ⊥ := by
+          rw [← map_weightSpace σ x χ₁]
+          intro hbot
+          apply hwt1
+          rw [eq_bot_iff]
+          intro v hv
+          have hmem : σ x v ∈ (weightSpace σ (⁅K, K⁆ : Subgroup G) χ₁).map (σ x) :=
+            Submodule.mem_map_of_mem hv
+          rw [hbot, Submodule.mem_bot] at hmem
+          rw [Submodule.mem_bot]
+          exact (σ.apply_bijective x).injective (by rw [hmem, map_zero])
+        exact (false_of_two_weights σ hcomm hKirr hKRirr hcop hwt1 hwt2
+          (fun h => hfix h.symm)).elim
+    · -- **`K'R`-analysis, reducible**: `C_W(K') ≠ 0` directly.
+      exact invariants_ne_bot_of_not_irreducible_sup σ hFrob hK'le hRnormK' hK'ne hchar
+        hcharKR hCV1 hKRirr
+  · -- **`K`-analysis, NONISO**: `dim M = 1`, so `M ⊆ C_W(K')`.
+    have hMdim : Module.finrank F ↥M = 1 :=
+      finrank_eq_one_of_not_iso_generator σ hcharK M hxR hRp hgen hCV1 hMiso
+    have hsub := restrictScalars_le_invariants_of_finrank_one σ M hMdim
+    obtain ⟨m, hmM, hm0⟩ := (Submodule.ne_bot_iff M).mp hMne
+    rw [Submodule.ne_bot_iff]
+    exact ⟨m, hsub hmM, hm0⟩
+
 end Step9Bridges
 
 
