@@ -3398,3 +3398,4 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_existsUnique_common
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_colCommon
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_rowCommon
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_symm
