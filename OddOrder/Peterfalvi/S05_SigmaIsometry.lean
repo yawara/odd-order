@@ -495,6 +495,34 @@ theorem IsSignedNontrivialIrr.inner_trivial [Invertible (Nat.card G : ℂ)]
   · exact h0
   · rw [ClassFunction.inner_neg_left, h0, neg_zero]
 
+open Classical in
+/-- Adjoining the trivial character `1_G` (at `none`) to an orthonormal family `X` of signed
+nontrivial irreducibles yields an orthonormal family over `Option τ`: `1_G` has unit norm
+(`inner_trivialClassFunction_self`) and is orthogonal to every `X a` (`inner_trivial`).  This is the
+abstract "adjoin `χ_{00} = 1_G`" step that turns the (3.5.5) family into the full (3.5) family. -/
+theorem orthonormal_option_trivial [Invertible (Nat.card G : ℂ)] {τ : Type*}
+    (X : τ → ClassFunction G ℂ) (hsig : ∀ a, IsSignedNontrivialIrr (X a))
+    (hortho : ∀ a b, ClassFunction.inner (X a) (X b) = if a = b then 1 else 0) (a b : Option τ) :
+    ClassFunction.inner (a.elim (trivialClassFunction G) X) (b.elim (trivialClassFunction G) X)
+      = if a = b then 1 else 0 := by
+  cases a with
+  | none =>
+    cases b with
+    | none => rw [if_pos rfl]; exact inner_trivialClassFunction_self G
+    | some b =>
+      rw [if_neg (by simp)]
+      show ClassFunction.inner (trivialClassFunction G) (X b) = 0
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, (hsig b).inner_trivial, star_zero]
+  | some a =>
+    cases b with
+    | none => rw [if_neg (by simp)]; exact (hsig a).inner_trivial
+    | some b =>
+      show ClassFunction.inner (X a) (X b) = _
+      rw [hortho a b]
+      by_cases h : a = b
+      · rw [if_pos h, if_pos (congrArg some h)]
+      · rw [if_neg h, if_neg (fun hh => h (Option.some.inj hh))]
+
 /-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
 *injective* and *no member is another's negative*: the diagonal inner products are `1` and the
 off-diagonal ones are `0`.  This is the bridge from the combinatorial facts of (3.5.5) (distinctness
@@ -2302,6 +2330,64 @@ theorem Afam_existsUnique_common (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         hyp.card_charGroup_subgroupOf hyp.W1_le_W]
     rw [h1]; omega
   exact (hyp.Afam_isSignedTripleGrid hVeq app).existsUnique_common hcard hne
+
+open scoped Classical in
+/-- **Column-common family** (the `-χ_{0j}` of (3.5)): when `w₁ ≥ 5`, each column `χ₂` (nontrivial)
+of the `Afam` grid has a common element `z χ₂ ∈ A_{χ₁, χ₂}` for every row `χ₁` (`existsUnique_common`,
+which needs `≥ 4` rows `= w₁ ≥ 5`).  A witness column `χ₂' ≠ χ₂` exists because `w₂ ≥ 3`. -/
+theorem exists_colCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) (hw1 : 5 ≤ Nat.card hyp.W1) :
+    ∃ z : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} → ClassFunction G ℂ,
+      ∀ q p, z q ∈ hyp.Afam hVeq app p q := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Nontrivial {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
+      ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+    have hodd : Odd (Nat.card hyp.W2) :=
+      hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+    have hgt : 1 < Nat.card hyp.W2 := Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+    obtain ⟨k, hk⟩ := hodd; omega
+  have hcol : ∀ q, ∃ z, ∀ p, z ∈ hyp.Afam hVeq app p q := fun q => by
+    obtain ⟨q', hq'⟩ := exists_ne q
+    exact ⟨_, (hyp.Afam_existsUnique_common hVeq app hw1 (Ne.symm hq')).choose_spec.1⟩
+  choose z hz using hcol
+  exact ⟨z, hz⟩
+
+open scoped Classical in
+/-- **Row-common family** (the `-χ_{i0}` of (3.5) in the `w₂ ≥ 5` case): when `w₂ ≥ 5`, each row
+`χ₁` (nontrivial) has a common element `w χ₁ ∈ A_{χ₁, χ₂}` for every column `χ₂`.  Obtained by
+applying `existsUnique_common` to the `transpose` grid (whose `≥ 4` rows are the `w₂ ≥ 5` columns);
+a witness row `χ₁' ≠ χ₁` exists because `w₁ ≥ 3`. -/
+theorem exists_rowCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    ∃ w : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} → ClassFunction G ℂ,
+      ∀ p q, w p ∈ hyp.Afam hVeq app p q := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Nontrivial {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    rw [← Fintype.one_lt_card_iff_nontrivial, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
+      ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+    have hodd : Odd (Nat.card hyp.W1) :=
+      hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+    have hgt : 1 < Nat.card hyp.W1 := Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+    obtain ⟨k, hk⟩ := hodd; omega
+  have hcardκ : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W2_le_W]; omega
+  have hrow : ∀ p, ∃ w, ∀ q, w ∈ hyp.Afam hVeq app p q := fun p => by
+    obtain ⟨p', hp'⟩ := exists_ne p
+    exact ⟨_, ((hyp.Afam_isSignedTripleGrid hVeq app).transpose.existsUnique_common hcardκ
+      (Ne.symm hp')).choose_spec.1⟩
+  choose w hw using hrow
+  exact ⟨w, hw⟩
 
 end TICyclicHypothesis
 

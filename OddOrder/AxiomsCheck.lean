@@ -3360,6 +3360,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.mem_ZIrr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_trivial
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.orthonormal_option_trivial
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_isSignedTriple_of_inner_self_three
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.neg_not_mem
@@ -3433,3 +3434,5 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35_algClosed
 -- BG Theorem 3.5 (general field, via base change to the algebraic closure, BG (2.9)).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_colCommon
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_rowCommon
