@@ -1124,6 +1124,15 @@ theorem exists_hall_pq_containing [Finite G] (hG : IsMinimalSimpleOdd G)
   · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective Y.subtype_injective]
     exact hW₀hall
 
+/-- `M` は自身の導来部分群 `M' = derivedInG M` を正規化する。`derivedInG M = (commutator ↥M).map
+M.subtype` で `commutator ↥M ◁ ↥M` ゆえ `normalizer(commutator ↥M) = ⊤`、これを `Subgroup.le_normalizer_map`
+で押し出すと `range M.subtype = M ≤ normalizer(M')`。Cor 10.9 で `W ⊓ M' ◁ W` (`W ≤ M`) を出すのに使う。 -/
+theorem le_normalizer_derivedInG (M : Subgroup G) :
+    M ≤ Subgroup.normalizer (derivedInG M) := by
+  have h := Subgroup.le_normalizer_map (H := commutator ↥M) M.subtype
+  rwa [Subgroup.normalizer_eq_top_iff.mpr inferInstance, ← MonoidHom.range_eq_map,
+    Subgroup.range_subtype] at h
+
 /-- **BG Corollary 10.9 (a)(1)(2)** (mmd L2826): `M ∈ ℳ`, `p, q ∈ β(M)'` distinct, `X` を `M` の
 `q`-部分群で `X ⊆ M'` または `p < q` とする。(1) `X` は `M_σ` の Sylow `p`-部分群を中心化する;
 (2) `p ∈ α(M)` なら `C_M(X) ∈ 𝒰`。原典 (a)(3)/(b) は
