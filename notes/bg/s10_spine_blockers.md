@@ -471,8 +471,14 @@ rep-theory keystone gated」は **誤り/更新要**: (b) が要する **BG Thm 
 - (a) `P=[P,V]⊆N_G(P)'`: Thm 10.2 (`P⊆M_σ⊆M'`) + **Lem 6.6(2)** `S06_Additional:913` (`S≤G'⟹S≤N_G(S)'`)
   + Lem 6.3(a) (`commutator_eq_self_of_isComplement'_le_commutator`, ✅)。
 - (b) `r(P)≤2 ⟹ abelian/central product`: (a) + **Thm 4.16** (`blackburnRankTwoClassification`,
-  ✅ axiom-clean)。要 bridge: `[P,V]=P`→`actionCommutator=⊤`, `BlackburnCentralProductCase`→
-  Cor 10.7(b) の `IsExpPExtraspecial`/`IsCentralProduct` 形。V=N_G(P) 補群は p'・奇位数。
+  ✅ axiom-clean, R=↥P, A=V)。要 bridge (~50-80 行, (b) の実質コア):
+  - `[P,V]=P` → `Ch04.actionCommutator φ = ⊤` (φ:V→MulAut ↥P 共役作用); V=N_G(P) 補群は p'・奇位数
+    (`hcop`/`hAodd`); `rank ↥P ≤ 2` → `pRank (↥P) p ≤ 2`。
+  - `BlackburnCentralProductCase p ↥P` (= `∃R₁R₂≤↥P, IsCentralProduct ⊤ R₁R₂ ∧ ¬IsMulComm R₁ ∧
+    |R₁|=p³ ∧ exp R₁=p ∧ IsCyclic R₂ ∧ Ω₁(R₂)=commutator R₁`) → Cor 10.7(b) 形:
+    (i) `¬IsMulComm ∧ |R₁|=p³ ∧ exp=p` → `IsExpPExtraspecial p ↥R₁` (nonab p³ exp p = extraspecial);
+    (ii) `commutator R₁` → `Z(R₁)` (extraspecial p³ で `R₁'=Z(R₁)`, 位数 p);
+    (iii) `IsCentralProduct ⊤ (↥P)` → `IsCentralProduct P (G)` + R₁R₂≤↥P を `.map P.subtype` で P≤G へ。
 - (c) conjugacy: Thm 10.1 + **Lem 6.6(3)** `S06_Additional:936`。
 - (d) `N_P(Q) Sylow of N_G(Q)`: **Lem 6.6(4)** `S06_Additional:1023` 系。
 - (e): (c) + 正規性。
