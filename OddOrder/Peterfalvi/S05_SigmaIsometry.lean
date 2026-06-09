@@ -473,6 +473,22 @@ theorem IsSignedNontrivialIrr.inner_self [Invertible (Nat.card G : ℂ)] {x : Cl
     (hx : IsSignedNontrivialIrr x) : ClassFunction.inner x x = 1 := by
   rw [isSignedNontrivialIrr_inner hx hx, if_pos rfl, if_neg (fun h => hx.ne_neg_self h), sub_zero]
 
+/-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
+*injective* and *no member is another's negative*: the diagonal inner products are `1` and the
+off-diagonal ones are `0`.  This is the bridge from the combinatorial facts of (3.5.5) (distinctness
+and "no negated coincidence") to the analytic orthonormality of the family `(χ_{ij})` that powers the
+isometry `σ` of (3.2).  (Stated diagonal/off-diagonal rather than via `if a = b` to stay free of any
+`DecidableEq τ` instance.) -/
+theorem orthonormal_of_injective_of_no_neg [Invertible (Nat.card G : ℂ)] {τ : Type*}
+    (X : τ → ClassFunction G ℂ) (hsig : ∀ a, IsSignedNontrivialIrr (X a))
+    (hinj : Function.Injective X) (hneg : ∀ a b, X a ≠ -X b) :
+    (∀ a, ClassFunction.inner (X a) (X a) = 1) ∧
+      (∀ a b, a ≠ b → ClassFunction.inner (X a) (X b) = 0) := by
+  classical
+  refine ⟨fun a => (hsig a).inner_self, fun a b hab => ?_⟩
+  rw [isSignedNontrivialIrr_inner (hsig a) (hsig b), if_neg (fun h => hab (hinj h)),
+    if_neg (hneg a b), sub_zero]
+
 /-- A *signed triple*: `β` is the sum of a 3-element set `A` of pairwise-orthogonal signed
 nontrivial irreducible characters.  This is the structure of each `β_{ij}` of Peterfalvi (3.5.1)
 (`exists_betaSet`); the `A_{ij}` of the (3.5.2)-(3.5.5) combinatorics are the carriers `A`. -/
@@ -1628,6 +1644,67 @@ theorem common_not_mem_other_column [Fintype ι] (hG : IsSignedTripleGrid A)
       (hYpos i hir) (hYY.symm ▸ hYpos i' hir')
     exact hG.neg_not_mem_self hzB (by rw [neg_neg]; exact heq ▸ hYmem i hir)
 
+open scoped Classical in
+/-- **(3.5.5) cell decomposition**: with `≥ 4` rows and two distinct columns `j₀ ≠ j₁`, let `z₀` be
+the element common to every `A i j₀` (`existsUnique_common`).  Then each cell `A i j₀` splits as
+`{z₀, m, φ}` where `m` is the (unique) element of the same-row meet `A i j₀ ∩ A i j₁` and `φ` is the
+remaining "third" element; the three are pairwise distinct and `φ ∉ A i j₁`.  This is Peterfalvi's
+`β_{i1} = -χ_{i0} - χ_{01} + χ_{i1}` read off the set `A_{i1} = {-χ_{01}, -χ_{i0}, χ_{i1}}`
+(`z₀ = -χ₀₁`, `m = -χ_{i0}`, `φ = χ_{i1}`).  `z₀ ≠ m` because `z₀ ∉ A i j₁` (`common_not_mem_other
+_column`) while `m ∈ A i j₁`. -/
+theorem cell_decomposition [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fintype.card ι)
+    {j₀ j₁ : κ} (hjne : j₀ ≠ j₁) {z₀ : ClassFunction G ℂ} (hz₀ : ∀ i, z₀ ∈ A i j₀) (i : ι) :
+    ∃ m φ : ClassFunction G ℂ, A i j₀ = {z₀, m, φ} ∧ m ∈ A i j₁ ∧ φ ∉ A i j₁ ∧
+      z₀ ≠ m ∧ z₀ ≠ φ ∧ m ≠ φ := by
+  classical
+  -- the same-row meet `A i j₀ ∩ A i j₁` is a singleton `{m}` (`L(i j₀, i j₁)`)
+  obtain ⟨m, hm⟩ := Finset.card_eq_one.mp (hG.inter_L i i j₀ j₁ (Or.inl ⟨rfl, hjne⟩))
+  obtain ⟨hmj₀, hmj₁⟩ := Finset.mem_inter.mp (hm ▸ Finset.mem_singleton_self m)
+  -- `z₀ ≠ m`: `z₀` is orthogonal to the other column, but `m` lies in it
+  have hz₀notj₁ := (hG.common_not_mem_other_column hι hjne hz₀ i).1
+  have hzm : z₀ ≠ m := fun h => hz₀notj₁ (h ▸ hmj₁)
+  -- the third element `φ`
+  obtain ⟨φ, hφmem, hφz, hφm, hset⟩ :=
+    exists_third_of_card_three (hG.card_eq_three i j₀) (hz₀ i) hmj₀ hzm
+  -- `φ ∉ A i j₁`: else `φ ∈ A i j₀ ∩ A i j₁ = {m}`, so `φ = m`
+  have hφnotj₁ : φ ∉ A i j₁ := fun h =>
+    hφm (eq_of_mem_Llinked hG (Or.inl ⟨rfl, hjne⟩) hmj₀ hmj₁ hφmem h)
+  exact ⟨m, φ, hset, hmj₁, hφnotj₁, hzm, Ne.symm hφz, Ne.symm hφm⟩
+
+/-- **(3.5.5) orthogonality core**: the element `z` common to every `A · j` is orthogonal to every
+member `y` of any *other* column `A i l` (`l ≠ j`): `z ≠ y` and `z ≠ -y`.  Both `z ∉ A i l` and
+`-z ∉ A i l` hold (`common_not_mem_other_column`), so neither `y` nor `-y` can equal `z`.  This is
+the workhorse for the orthogonality of the column characters `χ_{0j}` to the row characters
+`χ_{i0}` and the interior characters `χ_{ij}` (`j ≠ l`). -/
+theorem common_ne_other_column_mem [Fintype ι] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) {i : ι} {j l : κ} (hjl : j ≠ l) {z y : ClassFunction G ℂ}
+    (hz : ∀ i', z ∈ A i' j) (hy : y ∈ A i l) : z ≠ y ∧ z ≠ -y := by
+  obtain ⟨h1, h2⟩ := hG.common_not_mem_other_column hι hjl hz i
+  exact ⟨fun h => h1 (h ▸ hy), fun h => h2 (by rw [h, neg_neg]; exact hy)⟩
+
+open scoped Classical in
+/-- **(3.5.5) symmetric cell decomposition**: with `≥ 4` rows and `≥ 2` columns, a cell `A i j`
+containing both its column-common element `zc` (in every `A · j`) and its row-common element `wr`
+(in every `A i ·`) splits as `{zc, wr, φ}` with the three pairwise distinct.  `zc ≠ wr` because
+`zc` lies outside every other column (`common_not_mem_other_column`) while `wr`, being row-common,
+lies in some other column.  This is the `w₂ ≥ 5` form, where `zc = -χ_{0j}`, `wr = -χ_{i0}`,
+`φ = χ_{ij}`. -/
+theorem symm_cell_decomposition [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) (hκ : 2 ≤ Fintype.card κ) {i : ι} {j : κ}
+    {zc wr : ClassFunction G ℂ} (hzc : ∀ i', zc ∈ A i' j) (hwr : ∀ j', wr ∈ A i j') :
+    ∃ φ : ClassFunction G ℂ, A i j = {zc, wr, φ} ∧ zc ≠ wr ∧ zc ≠ φ ∧ wr ≠ φ := by
+  classical
+  obtain ⟨j', hj'⟩ : ∃ j' : κ, j ≠ j' := by
+    haveI : Nontrivial κ := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+    obtain ⟨a, b, hab⟩ := exists_pair_ne κ
+    rcases eq_or_ne j a with rfl | ha
+    · exact ⟨b, hab⟩
+    · exact ⟨a, ha⟩
+  have hzw : zc ≠ wr := (hG.common_ne_other_column_mem hι hj' hzc (hwr j')).1
+  obtain ⟨φ, _, hφz, hφw, hset⟩ :=
+    exists_third_of_card_three (hG.card_eq_three i j) (hzc i) (hwr j) hzw
+  exact ⟨φ, hset, hzw, Ne.symm hφz, Ne.symm hφw⟩
+
 /-- The **transpose** of a signed-triple grid (swap rows and columns) is again a signed-triple grid.
 Used for the `W₁ ↔ W₂` interchange in the (3.5.4)/(3.5.5) WLOG `w₁ ≥ 5`: when only `w₂ ≥ 5`, apply
 the row-indexed results to the transposed grid. -/
@@ -1639,6 +1716,142 @@ theorem transpose (hG : IsSignedTripleGrid A) :
   inter_L j j' i i' h := hG.inter_L i i' j j' (by tauto)
   noNeg_L j j' i i' h := hG.noNeg_L i i' j j' (by tauto)
   inter_O j j' i i' hjj hii := hG.inter_O i i' j j' hii hjj
+
+open scoped Classical in
+/-- **(3.5.5) cross-cell orthogonality of the interior characters** (the `O(ij, kl)` step): in the
+symmetric regime (`≥ 4` rows and columns), if `A i j = {zj, wi, φ}` with `zj` column-`j`-common and
+`wi` row-`i`-common, then for any *far* cell `A k l` (`i ≠ k`, `j ≠ l`) the third element `φ` and
+its negative both lie outside `A k l`.  Indeed `zj, wi ∉ A k l` and `-zj, -wi ∉ A k l`
+(`common_not_mem_other_column` for the column `j`, and via `transpose` for the row `i`), so the
+`O`-relation `O(ij, kl)` forces `[φ ∈ A k l] = [-φ ∈ A k l]`, hence both `0` (`oStep_both_out`).
+This makes the interior characters `χ_{ij}` pairwise orthogonal when both indices differ. -/
+theorem third_not_mem_far_cell [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) (hκ : 4 ≤ Fintype.card κ) {i k : ι} {j l : κ}
+    (hik : i ≠ k) (hjl : j ≠ l) {zj wi φ : ClassFunction G ℂ}
+    (hzj : ∀ i', zj ∈ A i' j) (hwi : ∀ j', wi ∈ A i j')
+    (hcell : A i j = {zj, wi, φ}) (hd1 : zj ≠ wi) (hd2 : zj ≠ φ) (hd3 : wi ≠ φ) :
+    φ ∉ A k l ∧ -φ ∉ A k l := by
+  obtain ⟨hzj1, hzj2⟩ := hG.common_not_mem_other_column hι hjl hzj k
+  obtain ⟨hwi1, hwi2⟩ := hG.transpose.common_not_mem_other_column hκ hik hwi l
+  exact hG.oStep_both_out (Ne.symm hik) (Ne.symm hjl) hcell hd1 hd2 hd3 hzj1 hwi1 hzj2 hwi2
+
+/-- The row-analogue of `common_ne_other_column_mem` (via `transpose`): an element `wr` common to
+every cell of row `i` is orthogonal to every member `y` of any *other* row `A k j` (`k ≠ i`). -/
+theorem common_ne_other_row_mem [Fintype κ] (hG : IsSignedTripleGrid A)
+    (hκ : 4 ≤ Fintype.card κ) {i k : ι} {j : κ} (hik : i ≠ k) {wr y : ClassFunction G ℂ}
+    (hwr : ∀ j', wr ∈ A i j') (hy : y ∈ A k j) : wr ≠ y ∧ wr ≠ -y :=
+  hG.transpose.common_ne_other_column_mem hκ hik hwr hy
+
+/-- The **combined character family** of a symmetric grid: row-commons `w i`, column-commons `z j`,
+and interior thirds `φ i j`, packaged as a single family indexed by `ι ⊕ κ ⊕ ι × κ`.  These are the
+`χ_{i0}`, `χ_{0j}`, `χ_{ij}` of Peterfalvi (3.5) (up to sign — all but `χ_{00} = 1_G`). -/
+def symmFamily (z : κ → ClassFunction G ℂ) (w : ι → ClassFunction G ℂ)
+    (φ : ι → κ → ClassFunction G ℂ) : ι ⊕ κ ⊕ (ι × κ) → ClassFunction G ℂ
+  | Sum.inl i => w i
+  | Sum.inr (Sum.inl j) => z j
+  | Sum.inr (Sum.inr ⟨i, j⟩) => φ i j
+
+open scoped Classical in
+/-- **(3.5.5)/(3.5) symmetric orthonormal family** (the `w₂ ≥ 5` heart of (3.5)): a symmetric grid
+(`≥ 4` rows and columns) with column-commons `z j` (in every `A · j`) and row-commons `w i` (in
+every `A i ·`) admits interior thirds `φ i j` with `A i j = {z j, w i, φ i j}`, and the combined
+family `(w i, z j, φ i j)` is **orthonormal** (`⟨·, ·⟩ = δ`).  This packages all the pairwise
+orthogonalities of (3.5.5) — column-commons (`common_ne_other_column_mem`), row-commons
+(`common_ne_other_row_mem`), interior thirds (`third_not_mem_far_cell` far case, `L`-relations for
+the same row/column), and the cross relations — into the single orthonormality that defines `σ`. -/
+theorem symm_orthonormal_family [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) (hκ : 4 ≤ Fintype.card κ)
+    {z : κ → ClassFunction G ℂ} {w : ι → ClassFunction G ℂ}
+    (hz : ∀ j i, z j ∈ A i j) (hw : ∀ i j, w i ∈ A i j) :
+    ∃ φ : ι → κ → ClassFunction G ℂ, (∀ i j, A i j = {z j, w i, φ i j}) ∧
+      ∀ a b, ClassFunction.inner (symmFamily z w φ a) (symmFamily z w φ b)
+        = if a = b then 1 else 0 := by
+  classical
+  haveI : Nonempty ι := Fintype.card_pos_iff.mp (by omega)
+  haveI : Nonempty κ := Fintype.card_pos_iff.mp (by omega)
+  have hcell : ∀ i j, ∃ φ, A i j = {z j, w i, φ} ∧ z j ≠ w i ∧ z j ≠ φ ∧ w i ≠ φ := fun i j =>
+    hG.symm_cell_decomposition hι (by omega) (fun i' => hz j i') (fun j' => hw i j')
+  choose φ hφcell hd1 hd2 hd3 using hcell
+  have hφc : ∀ i j, φ i j ∈ A i j := fun i j => by
+    rw [hφcell i j]
+    exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  refine ⟨φ, hφcell, ?_⟩
+  -- every family member is a signed nontrivial irreducible
+  have hsigz : ∀ j, IsSignedNontrivialIrr (z j) := fun j =>
+    hG.signed (Classical.arbitrary ι) j _ (hz j (Classical.arbitrary ι))
+  have hsigw : ∀ i, IsSignedNontrivialIrr (w i) := fun i =>
+    hG.signed i (Classical.arbitrary κ) _ (hw i (Classical.arbitrary κ))
+  have hsigφ : ∀ i j, IsSignedNontrivialIrr (φ i j) := fun i j => hG.signed i j _ (hφc i j)
+  -- `x ≠ -y ↔ y ≠ -x`
+  have flip : ∀ {x y : ClassFunction G ℂ}, x ≠ -y → y ≠ -x := fun h hh => h (by rw [hh, neg_neg])
+  -- atomic orthogonality relations (`≠` and `≠ -`)
+  have Rww : ∀ i k, i ≠ k → w i ≠ w k ∧ w i ≠ -w k := fun i k hik =>
+    hG.common_ne_other_row_mem hκ hik (hw i) (hw k (Classical.arbitrary κ))
+  have Rzz : ∀ j l, j ≠ l → z j ≠ z l ∧ z j ≠ -z l := fun j l hjl =>
+    hG.common_ne_other_column_mem hι hjl (hz j) (hz l (Classical.arbitrary ι))
+  have Rzw : ∀ i j, z j ≠ w i ∧ z j ≠ -w i := fun i j =>
+    ⟨hd1 i j, hG.ne_neg_of_mem_same (hz j i) (hw i j)⟩
+  have Rzφ : ∀ j k l, z j ≠ φ k l ∧ z j ≠ -φ k l := fun j k l => by
+    rcases eq_or_ne l j with rfl | hlj
+    · exact ⟨hd2 k l, hG.ne_neg_of_mem_same (hz l k) (hφc k l)⟩
+    · exact hG.common_ne_other_column_mem hι (Ne.symm hlj) (hz j) (hφc k l)
+  have Rwφ : ∀ i k l, w i ≠ φ k l ∧ w i ≠ -φ k l := fun i k l => by
+    rcases eq_or_ne k i with rfl | hki
+    · exact ⟨hd3 k l, hG.ne_neg_of_mem_same (hw k l) (hφc k l)⟩
+    · exact hG.common_ne_other_row_mem hκ (Ne.symm hki) (hw i) (hφc k l)
+  have Rφφ : ∀ i j k l, (i, j) ≠ (k, l) → φ i j ≠ φ k l ∧ φ i j ≠ -φ k l := fun i j k l hne => by
+    rcases eq_or_ne i k with rfl | hik
+    · have hjl : j ≠ l := fun h => hne (by rw [h])
+      have hnm : φ i j ∉ A i l := fun hmem =>
+        Ne.symm (hd3 i j) (eq_of_mem_Llinked hG (Or.inl ⟨rfl, hjl⟩) (hw i j) (hw i l) (hφc i j) hmem)
+      exact ⟨fun h => hnm (h ▸ hφc i l), hG.ne_neg_of_Llinked (Or.inl ⟨rfl, hjl⟩) (hφc i j) (hφc i l)⟩
+    · rcases eq_or_ne j l with rfl | hjl
+      · have hnm : φ i j ∉ A k j := fun hmem =>
+          Ne.symm (hd2 i j) (eq_of_mem_Llinked hG (Or.inr ⟨hik, rfl⟩) (hz j i) (hz j k) (hφc i j) hmem)
+        exact ⟨fun h => hnm (h ▸ hφc k j), hG.ne_neg_of_Llinked (Or.inr ⟨hik, rfl⟩) (hφc i j) (hφc k j)⟩
+      · obtain ⟨h1, h2⟩ := hG.third_not_mem_far_cell hι hκ hik hjl (hz j) (hw i)
+          (hφcell i j) (hd1 i j) (hd2 i j) (hd3 i j)
+        exact ⟨fun h => h1 (h ▸ hφc k l), fun h => h2 (by rw [h, neg_neg]; exact hφc k l)⟩
+  -- the combined family is signed, injective, and has no negated coincidences
+  have hsig : ∀ a, IsSignedNontrivialIrr (symmFamily z w φ a) := by
+    rintro (i | j | ⟨i, j⟩) <;> simp only [symmFamily]
+    · exact hsigw i
+    · exact hsigz j
+    · exact hsigφ i j
+  have hinj : Function.Injective (symmFamily z w φ) := by
+    rintro (i | j | ⟨i, j⟩) (k | l | ⟨k, l⟩) hab <;> simp only [symmFamily] at hab ⊢
+    · by_contra hne; exact (Rww i k (fun h => hne (by rw [h]))).1 hab
+    · exact absurd hab (Ne.symm (Rzw i l).1)
+    · exact absurd hab (Rwφ i k l).1
+    · exact absurd hab (Rzw k j).1
+    · by_contra hne; exact (Rzz j l (fun h => hne (by rw [h]))).1 hab
+    · exact absurd hab (Rzφ j k l).1
+    · exact absurd hab (Ne.symm (Rwφ k i j).1)
+    · exact absurd hab (Ne.symm (Rzφ l i j).1)
+    · by_contra hne; exact (Rφφ i j k l (fun h => hne (by rw [h]))).1 hab
+  have hneg : ∀ a b, symmFamily z w φ a ≠ -symmFamily z w φ b := by
+    rintro (i | j | ⟨i, j⟩) (k | l | ⟨k, l⟩) <;> simp only [symmFamily]
+    · rcases eq_or_ne i k with rfl | hik
+      · exact (hsigw i).ne_neg_self
+      · exact (Rww i k hik).2
+    · exact flip (Rzw i l).2
+    · exact (Rwφ i k l).2
+    · exact (Rzw k j).2
+    · rcases eq_or_ne j l with rfl | hjl
+      · exact (hsigz j).ne_neg_self
+      · exact (Rzz j l hjl).2
+    · exact (Rzφ j k l).2
+    · exact flip (Rwφ k i j).2
+    · exact flip (Rzφ l i j).2
+    · rcases eq_or_ne (Prod.mk i j) (Prod.mk k l) with h | h
+      · obtain ⟨rfl, rfl⟩ := Prod.ext_iff.mp h
+        exact (hsigφ i j).ne_neg_self
+      · exact (Rφφ i j k l h).2
+  obtain ⟨hdiag, hoff⟩ := orthonormal_of_injective_of_no_neg (symmFamily z w φ) hsig hinj hneg
+  intro a b
+  split_ifs with hab
+  · subst hab; exact hdiag a
+  · exact hoff a b hab
 
 end IsSignedTripleGrid
 
