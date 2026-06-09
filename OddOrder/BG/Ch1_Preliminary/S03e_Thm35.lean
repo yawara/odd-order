@@ -929,6 +929,82 @@ theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W]
 
 end WeightSpace
 
+/-! ## Step 9 assembly bridges (mmd L945-951) -/
+
+section Step9Bridges
+
+variable {F : Type*} [Field F] {G : Type*} [Group G]
+variable {W : Type*} [AddCommGroup W] [Module F W]
+
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **A simple one-dimensional `F[K']`-constituent is a weight space.**  If `M'` is a nonzero
+`F[K']`-submodule of the restriction that is one-dimensional over `F`, then `K'` acts on it by a
+single character `χ`, so `M' ⊆ weightSpace χ` (in particular `weightSpace χ ≠ ⊥`).  Bridges the
+constituent picture of step 9's `K'`-analysis to the weight-space contradiction
+`false_of_two_weights`. -/
+theorem exists_weightSpace_ge_of_finrank_one [FiniteDimensional F W] (σ : Representation F G W)
+    {K' : Subgroup G}
+    (M' : Submodule (MonoidAlgebra F ↥K') (resRep σ K').asModule)
+    (hM'ne : M' ≠ ⊥) (hM'dim : Module.finrank F ↥M' = 1) :
+    ∃ χ : ↥K' → F, M'.restrictScalars F ≤ weightSpace σ K' χ := by
+  classical
+  obtain ⟨m₀, hm₀M, hm₀0⟩ := (Submodule.ne_bot_iff M').mp hM'ne
+  -- `M'.restrictScalars F = span F {m₀}` (one-dimensional, `m₀ ≠ 0`).
+  have hspan : M'.restrictScalars F = Submodule.span F {m₀} := by
+    refine (Submodule.eq_of_le_of_finrank_eq
+      (Submodule.span_le.mpr (Set.singleton_subset_iff.mpr hm₀M)) ?_).symm
+    rw [finrank_span_singleton hm₀0]
+    exact hM'dim.symm
+  -- `σ k' m₀ ∈ M'` (it is the `single k' 1`-action), so `= χ k' • m₀`.
+  have hσmem : ∀ k' : ↥K', σ (k' : G) m₀ ∈ M'.restrictScalars F := by
+    intro k'
+    have h := M'.smul_mem (MonoidAlgebra.single k' (1 : F)) hm₀M
+    rwa [Representation.single_smul, one_smul, resRep_apply] at h
+  choose χ hχ using fun k' => Submodule.mem_span_singleton.mp (hspan ▸ hσmem k')
+  refine ⟨χ, ?_⟩
+  rw [hspan]
+  intro m hm
+  rw [Submodule.mem_span_singleton] at hm
+  obtain ⟨c, rfl⟩ := hm
+  rw [mem_weightSpace]
+  intro k'
+  show σ (k' : G) (c • m₀) = χ k' • (c • m₀)
+  rw [map_smul, ← hχ k', smul_smul, smul_smul, mul_comm]
+
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **A one-dimensional `K`-constituent is fixed by `K' = ⁅K, K⁆`.**  If `M` is an `F[K]`-submodule
+of the restriction that is one-dimensional over `F`, then every element of `⁅K, K⁆` acts trivially
+on `M` (scalars commute), so `M ⊆ C_W(⁅K, K⁆)`.  This finishes the NONISO `K`-analysis of step 9:
+`(P)` gives `dim M = 1`, so `M ⊆ C_U(K')`, hence `C_U(K') ≠ 0`. -/
+theorem restrictScalars_le_invariants_of_finrank_one [FiniteDimensional F W]
+    (σ : Representation F G W) {K : Subgroup G}
+    (M : Submodule (MonoidAlgebra F ↥K) (resRep σ K).asModule)
+    (hMdim : Module.finrank F ↥M = 1) :
+    M.restrictScalars F ≤ Representation.invariants (σ.comp (⁅K, K⁆ : Subgroup G).subtype) := by
+  -- the subrepresentation carried by `M` over `K` is one-dimensional, so `⁅⊤, ⊤⁆` acts trivially.
+  set Mρ := (Subrepresentation.ofSubmodule' M).toRepresentation with hMρ
+  have hdim1 : Module.finrank F ↥(Subrepresentation.ofSubmodule' M).toSubmodule = 1 := hMdim
+  have htriv := trivial_on_commutator_of_finrank_eq_one Mρ hdim1 (⊤ : Subgroup ↥K)
+  -- transport to `⁅K, K⁆ ≤ G`.
+  intro v hv
+  rw [Representation.mem_invariants]
+  intro k'
+  have hk'mem : (k' : G) ∈ (⁅(⊤ : Subgroup ↥K), ⊤⁆ : Subgroup ↥K).map K.subtype := by
+    rw [Subgroup.map_commutator, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    exact k'.2
+  obtain ⟨g, hg, hgk⟩ := hk'mem
+  have hg1 : Mρ g = 1 := htriv g hg
+  have hvmem : v ∈ (Subrepresentation.ofSubmodule' M).toSubmodule := hv
+  have h2 : Mρ g ⟨v, hvmem⟩ = ⟨v, hvmem⟩ := by rw [hg1]; rfl
+  have h3 := congrArg (Subtype.val) h2
+  show σ (k' : G) v = v
+  rw [← hgk]
+  simpa [hMρ, Subrepresentation.toRepresentation] using h3
+
+end Step9Bridges
+
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
 
@@ -1061,6 +1137,7 @@ theorem thm35_algClosed
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
 end OddOrder.BG.Ch1.S03e
+
 
 
 
