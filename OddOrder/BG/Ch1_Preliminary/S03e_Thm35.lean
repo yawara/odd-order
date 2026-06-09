@@ -413,6 +413,28 @@ theorem nonempty_linearEquiv_map_conjSemilinearEnd_forall
     funext h; rw [character_subRep_conj]; exact hgS h
   exact submodule_iso_of_character_eq ρ M g hcharg
 
+open OddOrder.RepresentationTheory in
+/-- **ISO case: the restriction `Res^G_H ρ` is irreducible** (BG Prop 2.2(a) applied).  If `M` is a
+simple `F[H]`-submodule of an irreducible `ρ` (alg-closed, `char F ∤ |H|`, `H ◁ G`, `G = ⟨H, x⟩`)
+and the conjugate `M^x` has the same character as `M`, then `ρ` restricted to `H` is irreducible.
+
+Composes the character-route `hconj` propagation
+(`nonempty_linearEquiv_map_conjSemilinearEnd_forall`) with `restriction_isIrreducible`.  Used in
+step 9 with `H = K` (over `G`) and `H = K'` (over `K'R`). -/
+theorem resRep_isIrreducible_of_char_eq_generator
+    [IsAlgClosed F] [FiniteDimensional F W] [Nontrivial W] (ρ : Representation F G W)
+    [ρ.IsIrreducible] {H : Subgroup G} [H.Normal] [Finite ↥H] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) (hM : M ≠ ⊥)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hx : ((Subrepresentation.ofSubmodule'
+              (M.map (conjSemilinearEnd (H := H) ρ x))).toRepresentation).character
+        = ((Subrepresentation.ofSubmodule' M).toRepresentation).character) :
+    (resRep ρ H).IsIrreducible := by
+  haveI : NeZero (Nat.card ↥H : F) := ⟨hHchar⟩
+  exact restriction_isIrreducible ρ x hgen M hM
+    (nonempty_linearEquiv_map_conjSemilinearEnd_forall ρ hHchar M x hgen hx)
+
 end Step9
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
