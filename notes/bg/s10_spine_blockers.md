@@ -202,7 +202,25 @@ isHall_Mbeta docstring で deferred だった **「p は |M/O_{p'}(M)| の最大
   (= BG mmd L2862「O_{p'}(M) contains all q-elements」; `le_of_coprime_card_index` 再利用)。
   **Cor 10.9(a) の X⊄M' (p<q) ケースの前提**。両者 forward-conditional、AxiomsCheck §10 island 登録。
 
-### 🛑 次の leaf = Cor 10.9 — **Hall-D + Hall∩normal が前提 (repo 未収載・大物)**
+### ✅✅✅✅ Cor 10.9 COMPLETE (2026-06-09, branch `bg-s10-fwd`, commits `423b18d9`+`0c0e316d`)
+
+**3 本すべて sorry-free + forward-axiom island OK** (full build 3566)。Cor 10.9 完全形式化:
+(a)(1)(2)=`beta_complement_centralizes` (既), (a)(3)=`beta_complement_normalizer_derived_contains_sylow`
+(commit 423b18d9), (b)=`beta_factorization_of_sylow_normalizer_in_intersection` (commit 0c0e316d)。
+
+**(b) の handoff 知見**:
+- **q∉α(M) が α=β の唯一の鍵** (q∉α ⟹ q∉β で (a)(2) 適用可、かつ α⊆β∪{q} を α⊆β に閉じる)。
+  導出: q∈α ⟹ r(S)≥3 ⟹ `OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_three_le_rank_of_lt_top` で
+  S∈𝒰、しかし S⊆M⊓H (H≠M) で `…not_isUniquelyMaximal_of_le_inf_distinct_maximals` と矛盾。
+  rank plumbing = `sylow_subgroupOf_of_le` (private 複製) + `pRank_sylow_eq`/`pRank_le_of_injective`/`pRank_le_rank`。
+- **α=β は 𝒰 単調性すら不要**: C_M(S)=C_G(S)⊓M ≤ N_G(S)⊓M ≤ M⊓H で直接 ∉𝒰、(a)(2) の C_M(S)∈𝒰 と矛盾。
+- **K=O_{β∪{q}}(M')=M_β⊔S** は card で: `eq_of_le_of_card_ge hMβX_le_K (|K|≤|M_β⊔S|)`。
+  `|K| ∣ |M_β|·|S|` は factorization 3 分岐 (p∈β: fact_p|K|≤fact_p|D|=fact_p|M_β| [Hall squeeze];
+  p=q: hKq_card + |S|=q^e; p∉β∪{q}: `isPiSubgroup_opiCoreInG` で fact_p|K|=0)。M_β Hall β of M' の
+  fact 等式は `Mbeta_isHall` の index-coprime (.2) + `card_mul_index` + squeeze (M_β≤D≤G)。
+- (a)(3)/(b) は K-construction (~50 行) を重複 → 将来 shared lemma 化候補 (今回は安全優先で別々)。
+
+### 🛑 (旧) 次の leaf = Cor 10.9 — **Hall-D + Hall∩normal が前提 (repo 未収載・大物)**
 
 **Cor 10.9 (3 本)**: (a)(1)(2)=`beta_complement_centralizes`, (a)(3)=
 `beta_complement_normalizer_derived_contains_sylow`, (b)=
