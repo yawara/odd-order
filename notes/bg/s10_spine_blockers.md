@@ -462,12 +462,26 @@ N_M(S)∉𝒰 + (a)(2) ⟹ α(M)=β(M)。**(a)(3) 先行が自然 (Frattini 部�
   「(a) の証明が M=M_β N_M(S)」⟹ M=M_β(H∩M) (N_M(S)⊆H∩M)。N_M(S)∉𝒰。(a)(2) で α(M)=β(M)。
   **(a)(3) の M_β S◁M + Frattini 部分を共有** ⟹ (a)(3) 先行が自然。
 
-### その他の §10 残ターゲット (keystone gated)
-- **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。(a) 配線可だが (b) は rep-theory
-  keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) gated。
-- **Prop 10.10** `normalizer_factorization` = §7 (✅) + Cor 10.7 + Lem 6.5 ⟹ Cor 10.7 経由 gated。
-- **Prop 10.11** `sigma_complement_rank_le_one` (S10_LocalLemmas@460) = Cor 10.7 経由 keystone gated。
-- 旧「残フロンティア conjunct 1-3」は**全消化** (Lemma 10.8 完成)。
+### 🎯 次の gateway = Cor 10.7 `sylow_structure` (**forward-wire 可能、全部品ランド済**, 2026-06-09 検証)
+
+**Cor 10.9 完成後の唯一の §10 残 leaf。5 部結合 (a)-(e) が 1 sorry (@148)。** 旧記録の「(b) は
+rep-theory keystone gated」は **誤り/更新要**: (b) が要する **BG Thm 4.16 = `blackburnRankTwoClassification`
+(`S04f_Blackburn.lean:2642`) は 0-sorry + axiom-clean でランド済**。よって Cor 10.7 は Thm 10.6
+(forward-wired) island に乗せて **本物の証明として配線可能**。確認済み部品:
+- (a) `P=[P,V]⊆N_G(P)'`: Thm 10.2 (`P⊆M_σ⊆M'`) + **Lem 6.6(2)** `S06_Additional:913` (`S≤G'⟹S≤N_G(S)'`)
+  + Lem 6.3(a) (`commutator_eq_self_of_isComplement'_le_commutator`, ✅)。
+- (b) `r(P)≤2 ⟹ abelian/central product`: (a) + **Thm 4.16** (`blackburnRankTwoClassification`,
+  ✅ axiom-clean)。要 bridge: `[P,V]=P`→`actionCommutator=⊤`, `BlackburnCentralProductCase`→
+  Cor 10.7(b) の `IsExpPExtraspecial`/`IsCentralProduct` 形。V=N_G(P) 補群は p'・奇位数。
+- (c) conjugacy: Thm 10.1 + **Lem 6.6(3)** `S06_Additional:936`。
+- (d) `N_P(Q) Sylow of N_G(Q)`: **Lem 6.6(4)** `S06_Additional:1023` 系。
+- (e): (c) + 正規性。
+**完成すれば Prop 10.10 (`normalizer_factorization`) + Prop 10.11 (`sigma_complement_rank_le_one`)
+も解除** (両者 Cor 10.7 経由 gated)。~150-250 行、(b) の central-product bridge が要注意。
+
+- **Prop 10.10** `normalizer_factorization` (@2107 sorry) = §7 (✅) + Cor 10.7 + Lem 6.5 ⟹ Cor 10.7 待ち。
+- **Prop 10.11** `sigma_complement_rank_le_one` (S10_LocalLemmas@460) = Cor 10.7 待ち。
+- 旧「残フロンティア conjunct 1-3」は**全消化** (Lemma 10.8 完成); Cor 10.9 (3本) 完成 (上記)。
 
 ### 次の grounded leaf = group-level transvection bridge (scoped, ⚠ Additive 診断ダイヤモンド要注意)
 
