@@ -340,7 +340,35 @@ producer + helper も全 landed (この commit):
 **再利用 unconditional 資産**: `isHallSubgroup_map_mulEquiv` (Hall ≃* 移送),
 `isPGroup_le_centralizer_of_isNilpotent_ambient` (nilpotent W で q-部分群が p-部分群を G-中心化)。
 
-### 🛑 残 Cor 10.9 = (a)(3) + (b) — **`M_β X ◁ M` が新 sub-blocker (M'/M_β nilpotent 要露出)**
+### ✅ (a)(3) sub-blocker 解消: M'/M_β nilpotent landed (2026-06-09, commit `1d0d403e`)
+
+**`derivedQuotientMbeta_isNilpotent`** (forward-cond, §10 island, AxiomsCheck 登録) +
+汎用 helper **`isHallSubgroup_subgroupOf_of_le`** (π-Hall H≤K ⟹ H π-Hall in K, unconditional)。
+M'/M_β ≅ W* (nilpotent Hall β' of M', 10.8(b)) via W* からの全射 (`sup_eq_top_of_coprime_index`
+[index W* は β-数, index M_β' は β'-数, `Nat.coprime_of_dvd`] + `comap_map_mk'` で像=⊤ + `range_comp`)。
+⚠ statement の商型が Normal instance 要 ⟹ `[((Mbeta M).subgroupOf (derivedInG M)).Normal]` を
+**instance 引数化** (caller が `normal_subgroupOf_iff_le_normalizer` で供給)。
+
+### 🛑 残 Cor 10.9 = (a)(3) + (b) — de-risked、残は nested-↥M plumbing (~150-200 行)
+
+**(a)(3) 確定レシピ** (全インフラ確認済): X_G=X↑G (Sylow q of M'=D);
+producer (X⊆M' case) ⟹ W⊇X_G Hall{p,q} of D nilpotent, X_G=O_q(W), **S=O_p(W)=Sylow p of D**;
+S 中心化 X_G (A1) ⟹ S≤U:=N_G(X_G)⊓M。**残 step**:
+1. **M_β X_G ◁ M** (char 経路, A で tractable): π:=mk' M_β' (M_β'=(Mbeta M).subgroupOf D);
+   D/M_β' nilpotent (A) ⟹ Sylow q `Q̄` 正規 (`Sylow.characteristic_of_normal`/`of_subsingleton`) char;
+   M_β'=O_β(D) char (normal Hall β=O_β; `le_opiCoreInG_of_normal_of_isPiSubgroup`+card); 
+   **K:=comap π Q̄ char in D** (`Subgroup.Characteristic.comap_quotient_mk`) ⟹ K◁M (M≤N(D) `le_normalizer_derivedInG`);
+   X_G'≤K (像 ≤ Q̄ unique Sylow q), X_G' Sylow q of K (|K|_q=|Q̄|=q-part|D|, M_β' q'-群)。
+   ⟹ K=M_β X_G (= M_β'⊔X_G' via `comap_map_mk'`)。
+2. **Frattini** `Sylow.normalizer_sup_eq_top` (ambient ↥M, N=K.subgroupOf M◁, P:Sylow q ↥(K.subgroupOf M)
+   = X_G via `Sylow.ofCard`): N_↥M(X_G'')⊔(K.subgroupOf M)=⊤ ⟹ **M=M_β U** (M_β X_G⊇M_β, X_G≤U)。
+3. **Lem 6.5** `inf_commutator_eq_of_coprime` (ambient ↥M, K=M_β.subgroupOf M◁, U.subgroupOf M,
+   H=S.subgroupOf M, coprime |S||M_β| [p∉β], M_β⊔U=⊤): H⊓(↥M)'=H⊓U', H≤(↥M)' [S≤M'] ⟹ S≤U'=derivedInG U。
+4. **packaging**: S を `Sylow p ↥D` 化 (`Sylow.ofCard (S.subgroupOf D)`), 結論 S↑G ≤ derivedInG U。
+**(b)** S Sylow of G, N_G(S)⊆H∩M ⟹ q=π(S)∈σ-β, S⊆M_σ⊆M'; (a)(3) の M_β S◁M+Frattini 共有で M=M_β(H∩M);
+N_M(S)∉𝒰 + (a)(2) ⟹ α(M)=β(M)。**(a)(3) 先行が自然 (Frattini 部共有)。**
+
+#### 旧記録 (sub-blocker 解消前)
 
 **(a)(3)** `beta_complement_normalizer_derived_contains_sylow` (@1531) / **(b)**
 `beta_factorization_of_sylow_normalizer_in_intersection` (@1544)。両者 BG 証明骨子:
