@@ -3350,11 +3350,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_L
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_O
 
--- §5 (3.5.4): the abstract signed-triple grid + uniqueness + triangle reduction.
+-- §5 (3.5.4): the abstract signed-triple grid + uniqueness + triangle reduction + Case II.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_third_of_card_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.card_inter_triple
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.card_filter_neg_triple
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.triple_distinct
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.neg_not_mem_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.common_unique
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.exists_triangle_of_not_exists_common
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.exists_namedTriangle
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.caseII_false
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_isSignedTripleGrid

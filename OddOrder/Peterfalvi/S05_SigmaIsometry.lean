@@ -651,6 +651,43 @@ theorem exists_third_of_card_three {α : Type*} [DecidableEq α] {s : Finset α}
     · exact hb
     · exact hcs
 
+/-- The number of a 3-element list `{a, b, c}` of distinct elements that lie in `s`, as a sum of
+indicators.  Used to turn the `(3.5.4)` cardinality relations into a linear-arithmetic system. -/
+theorem card_inter_triple {α : Type*} [DecidableEq α] (s : Finset α) {a b c : α}
+    (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c) :
+    (s ∩ {a, b, c}).card =
+      (if a ∈ s then 1 else 0) + (if b ∈ s then 1 else 0) + (if c ∈ s then 1 else 0) := by
+  rw [Finset.inter_comm, ← Finset.filter_mem_eq_inter, Finset.card_filter,
+    Finset.sum_insert (by simp [hab, hac]), Finset.sum_insert (by simp [hbc]),
+    Finset.sum_singleton, add_assoc]
+
+/-- The number of `x ∈ s` whose negative lies in a 3-element set `{a, b, c}` of distinct elements,
+as a sum of indicators (`-x ∈ {a,b,c} ↔ x ∈ {-a,-b,-c}`).  The "negated" companion of
+`card_inter_triple`, for the `filter` side of the `O`-relation. -/
+theorem card_filter_neg_triple {α : Type*} [AddGroup α] [DecidableEq α] (s : Finset α)
+    {a b c : α} (hab : a ≠ b) (hac : a ≠ c) (hbc : b ≠ c) :
+    (s.filter (fun x => -x ∈ ({a, b, c} : Finset α))).card =
+      (if -a ∈ s then 1 else 0) + (if -b ∈ s then 1 else 0) + (if -c ∈ s then 1 else 0) := by
+  have heq : s.filter (fun x => -x ∈ ({a, b, c} : Finset α)) = s ∩ {-a, -b, -c} := by
+    ext x
+    simp only [Finset.mem_filter, Finset.mem_inter, Finset.mem_insert, Finset.mem_singleton,
+      neg_eq_iff_eq_neg]
+  rw [heq, card_inter_triple s (neg_injective.ne hab) (neg_injective.ne hac) (neg_injective.ne hbc)]
+
+/-- From `card {a,b,c} = 3`, the three elements are pairwise distinct. -/
+theorem triple_distinct {α : Type*} [DecidableEq α] {a b c : α}
+    (h : ({a, b, c} : Finset α).card = 3) : a ≠ b ∧ a ≠ c ∧ b ≠ c := by
+  have key : ∀ x y z : α, x ∈ ({y, z} : Finset α) → ({x, y, z} : Finset α).card ≠ 3 := by
+    intro x y z hx
+    rw [show ({x, y, z} : Finset α) = {y, z} from Finset.insert_eq_self.mpr hx]
+    have := Finset.card_insert_le y ({z} : Finset α)
+    rw [Finset.card_singleton] at this; omega
+  refine ⟨fun hab => key a b c ?_ h, fun hac => key a b c ?_ h, fun hbc => ?_⟩
+  · rw [hab]; exact Finset.mem_insert_self b {c}
+  · rw [hac]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self c)
+  · exact key b a c (by rw [hbc]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self c))
+      (by rw [Finset.insert_comm]; exact h)
+
 open scoped Classical in
 /-- An abstract *grid of signed triples*: a family `A i j` (rows `i : ι`, columns `j : κ`) of
 signed-triple sets satisfying the Peterfalvi relations.  `card_eq_three`/`signed`/`orthogonal` are
@@ -751,6 +788,65 @@ theorem exists_namedTriangle (hG : IsSignedTripleGrid A) {i₁ i₂ i₃ : ι} {
   obtain ⟨t₃, _, _, _, hset3⟩ :=
     exists_third_of_card_three (hG.card_eq_three i₃ j₀) m13b m23b d1323
   exact ⟨e₁₂, e₁₃, e₂₃, t₁, t₂, t₃, hset1, hset2, hset3, d1213, d1223, d1323⟩
+
+open scoped Classical in
+/-- **(3.5.4) Case II is impossible**: a fourth row `i₄` whose `j₀`-cell is exactly the three
+"third" elements `{χ₃, χ₅, χ₆}` (the K₄ configuration, Peterfalvi's `β₄₁ = χ₃+χ₅+χ₆`) yields a
+contradiction.  Look at the second-column cell `B = A i₁ j₁`: writing `n_k = [χ_k ∈ B]`,
+`p_k = [-χ_k ∈ B]`, the relations `L(i₁j₁, i₁j₀)` (gives `n₁+n₂+n₃ = 1`, `p₁=p₂=p₃=0`) and
+`O(i₁j₁, i_pj₀)` for `p = 2,3,4` (give `n₁+n₄+n₅ = p₁+p₄+p₅` etc.) sum to `1 + 2(n₄+n₅+n₆) =
+2(p₄+p₅+p₆)` — an odd number equal to an even one.  (This single parity argument replaces
+Peterfalvi's case-by-case (3.5.4.6).) -/
+theorem caseII_false (hG : IsSignedTripleGrid A) {i₁ i₂ i₃ i₄ : ι} {j₀ j₁ : κ}
+    {χ1 χ2 χ3 χ4 χ5 χ6 : ClassFunction G ℂ} (hj : j₁ ≠ j₀)
+    (hi12 : i₁ ≠ i₂) (hi13 : i₁ ≠ i₃) (hi14 : i₁ ≠ i₄)
+    (hset1 : A i₁ j₀ = {χ1, χ2, χ3}) (hset2 : A i₂ j₀ = {χ1, χ4, χ5})
+    (hset3 : A i₃ j₀ = {χ2, χ4, χ6}) (hset4 : A i₄ j₀ = {χ3, χ5, χ6}) : False := by
+  classical
+  obtain ⟨d12, d13, d23⟩ := triple_distinct (hset1 ▸ hG.card_eq_three i₁ j₀)
+  obtain ⟨d14, d15, d45⟩ := triple_distinct (hset2 ▸ hG.card_eq_three i₂ j₀)
+  obtain ⟨d24, d26, d46⟩ := triple_distinct (hset3 ▸ hG.card_eq_three i₃ j₀)
+  obtain ⟨d35, d36, d56⟩ := triple_distinct (hset4 ▸ hG.card_eq_three i₄ j₀)
+  have hnoNeg : ∀ x ∈ A i₁ j₁, -x ∉ A i₁ j₀ := hG.noNeg_L i₁ i₁ j₁ j₀ (Or.inl ⟨rfl, hj⟩)
+  have hL : (A i₁ j₁ ∩ ({χ1, χ2, χ3} : Finset _)).card = 1 := by
+    have h := hG.inter_L i₁ i₁ j₁ j₀ (Or.inl ⟨rfl, hj⟩); rwa [hset1] at h
+  have hO2 : (A i₁ j₁ ∩ ({χ1, χ4, χ5} : Finset _)).card =
+      (A i₁ j₁ |>.filter (fun x => -x ∈ ({χ1, χ4, χ5} : Finset _))).card := by
+    have h := hG.inter_O i₁ i₂ j₁ j₀ hi12 hj; rwa [hset2] at h
+  have hO3 : (A i₁ j₁ ∩ ({χ2, χ4, χ6} : Finset _)).card =
+      (A i₁ j₁ |>.filter (fun x => -x ∈ ({χ2, χ4, χ6} : Finset _))).card := by
+    have h := hG.inter_O i₁ i₃ j₁ j₀ hi13 hj; rwa [hset3] at h
+  have hO4 : (A i₁ j₁ ∩ ({χ3, χ5, χ6} : Finset _)).card =
+      (A i₁ j₁ |>.filter (fun x => -x ∈ ({χ3, χ5, χ6} : Finset _))).card := by
+    have h := hG.inter_O i₁ i₄ j₁ j₀ hi14 hj; rwa [hset4] at h
+  rw [card_inter_triple _ d12 d13 d23] at hL
+  rw [card_inter_triple _ d14 d15 d45, card_filter_neg_triple _ d14 d15 d45] at hO2
+  rw [card_inter_triple _ d24 d26 d46, card_filter_neg_triple _ d24 d26 d46] at hO3
+  rw [card_inter_triple _ d35 d36 d56, card_filter_neg_triple _ d35 d36 d56] at hO4
+  -- `-χ₁, -χ₂, -χ₃ ∉ B` (the `noNeg` half of `L(i₁j₁, i₁j₀)`).
+  have hp1 : -χ1 ∉ A i₁ j₁ := fun hm =>
+    hnoNeg _ hm (by rw [neg_neg, hset1]; exact Finset.mem_insert_self _ _)
+  have hp2 : -χ2 ∉ A i₁ j₁ := fun hm =>
+    hnoNeg _ hm (by rw [neg_neg, hset1]
+                    exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _))
+  have hp3 : -χ3 ∉ A i₁ j₁ := fun hm =>
+    hnoNeg _ hm (by rw [neg_neg, hset1]
+                    exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem
+                      (Finset.mem_singleton_self _)))
+  rw [if_neg hp1] at hO2
+  rw [if_neg hp2] at hO3
+  rw [if_neg hp3] at hO4
+  -- Atomise the indicators and finish by parity (sum of the three `O`s is `odd = even`).
+  set n1 := (if χ1 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set n2 := (if χ2 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set n3 := (if χ3 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set n4 := (if χ4 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set n5 := (if χ5 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set n6 := (if χ6 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set p4 := (if -χ4 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set p5 := (if -χ5 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  set p6 := (if -χ6 ∈ A i₁ j₁ then 1 else 0 : ℕ)
+  omega
 
 end IsSignedTripleGrid
 
