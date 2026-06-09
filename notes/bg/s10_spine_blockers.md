@@ -462,7 +462,39 @@ N_M(S)∉𝒰 + (a)(2) ⟹ α(M)=β(M)。**(a)(3) 先行が自然 (Frattini 部�
   「(a) の証明が M=M_β N_M(S)」⟹ M=M_β(H∩M) (N_M(S)⊆H∩M)。N_M(S)∉𝒰。(a)(2) で α(M)=β(M)。
   **(a)(3) の M_β S◁M + Frattini 部分を共有** ⟹ (a)(3) 先行が自然。
 
-### 🎯 次の gateway = Cor 10.7 `sylow_structure` (**forward-wire 可能、全部品ランド済**, 2026-06-09 検証)
+### ✅✅✅✅✅ Cor 10.7 COMPLETE (2026-06-09, branch `bg-s10-fwd`, commit `a1767214`)
+
+**`sylow_structure` (BG Cor 10.7, 5 部 a-e) を sorry-free + §10 keystone island ちょうどで完全配線**
+(`#print axioms` = standard 3 + 2 forward; full build 3613 green; AxiomsCheck island 登録済)。各部を
+private helper に分解 (`sylow_structure_a`..`_e`) + 共通セットアップ `exists_sigma_maximal_of_sylow`
+(P≠⊥ ⟹ ∃M maximal, N_G(P)≤M, p∈σ(M)) + 補群 producer `exists_sylow_complement_normalizer` (SZ)。
+
+**実装知見 (handoff)**:
+- **共通骨子**: 全部 `M∈ℳ(N_G(P))` で `p∈σ(M)` (N_G(P)⊆M ⟹ P=Sylow of M, N_G⊆M) ⟹ Thm 10.6 で
+  `↥M` p-length one ⟹ Lemma 6.6 を ↥M で適用 → G へ翻訳。`P=⊥` (p∤|G|) は各 part 冒頭で degenerate 処理。
+- **(b) Blackburn bridge が最重**: φ:V→MulAut↥P = `Subgroup.normalizerMonoidHom.comp (inclusion hV)`
+  (coe は `rfl`)。`actionCommutator φ=⊤` は **片方向** `⁅P,V⁆≤(actionComm).map subtype` (commutator_le +
+  generator `r*(φv)r⁻¹`↦⁅r,v⁆) + 自明 `map≤P` + (a)`⁅P,V⁆=P` で map=P ⟹ map_injective で =⊤。central-product
+  transport: R₁R₂(Subgroup↥P)→P₁P₂=.map subtype, iso `equivMapOfInjective`, **Omega/center 自然性 helper**
+  (`omega_map_mulEquiv`/`center_map_mulEquiv`, characteristic proof パターン), extraspecial の
+  `commutator_eq_center` で Blackburn の `commutator R₁`→`center P₁`, `IsCentralProduct` は `map_sup`+
+  `map_commutator` で容易。**`isExtraspecial_of_noncomm_card_prime_cube_exp_prime` を public 化**
+  (S04f; Blackburn の packaging が extraspecial witness を落とすので (b) で再構成)。
+- **(c)/(d)/(e) 共通の conj 翻訳 helper** (全 unconditional, 再利用可): `conj_smul_eq_of_mem_centralizer`,
+  `conj_smul_le_of_mem`, `card_conj_smul`, `mem_normalizer_of_conj_smul_eq` (mem_set_normalizer_iff 経由),
+  `conj_smul_eq_self_of_mem_normalizer`。`Subgroup.conj_smul_subgroupOf` で ↥M↔G の共役を移送。
+- **(c)**: Thm 10.1(a) で x=m·c (c∈C(Q)) ⟹ conj x•Q=conj m•Q; Lemma 6.6(3) を ↥M で **入力 m̃⁻¹** に適用
+  (m̃⁻¹=c'·g' ⟹ m̃=g'⁻¹c'⁻¹, c'⁻¹∈C(Q') ⟹ conj m•Q=conj ↑g'⁻¹•Q, g'⁻¹∈N_↥M(P)→N_G(P))。
+- **(d)**: R Sylow of N_G(Q) ⊇ N_P(Q); Sylow II で R̄≤conj a•P ⟹ conj a⁻¹•R̄≤P; (c) で y∈N_G(P),
+  n=y⁻¹a⁻¹∈N_G(Q); conj n•R̄≤N_P(Q)≤R̄ + card 同値 ⟹ R̄≤P ⟹ R̄=N_P(Q)。
+- **(e)**: Sylow conjugate a で R≤conj a•P; (c) を a⁻¹ と a⁻¹z で 2 回 ⟹ a∈N_G(Q), z∈N_G(Q) (N_G(P)≤N_G(Q) 必須)。
+- **地雷**: 結合チルダ `m̃`/`R̄` は Lean 識別子で parse 不可 → `mM`/`RG` にリネーム。`Subgroup.coe_subtype`
+  で subtype↔↑ を simp、`map_top` は無く `← MonoidHom.range_eq_map`+`range_subtype`。
+
+**▶ §10 残 = Prop 10.10 のみ (`normalizer_factorization` @2660)**。下流 §11-§16 cascade は型検査レベルで
+unblock (数学的には keystone 待ち)。Prop 10.11 (`sigma_complement_rank_le_one`) は S10_LocalLemmas (別 leaf)。
+
+#### 旧: 🎯 次の gateway = Cor 10.7 `sylow_structure` (forward-wire 検証, 2026-06-09)
 
 **Cor 10.9 完成後の唯一の §10 残 leaf。5 部結合 (a)-(e) が 1 sorry (@148)。** 旧記録の「(b) は
 rep-theory keystone gated」は **誤り/更新要**: (b) が要する **BG Thm 4.16 = `blackburnRankTwoClassification`
