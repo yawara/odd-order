@@ -1563,6 +1563,83 @@ theorem existsUnique_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 �
   obtain ⟨z, hz⟩ := exists_common hG hι hjne
   exact ⟨z, hz, fun z' hz' => common_unique hG (by omega) hz' hz⟩
 
+open scoped Classical in
+/-- **(3.5.5) core**: the element `z` common to every `A i j₀` is orthogonal to every other column
+— neither `z` nor `-z` lies in any `A r j₁` (`j₁ ≠ j₀`).  Peterfalvi: "`χ₀₁` is orthogonal to
+`A_{i2}`".  If `±z ∈ A r j₁`, then for each of the `≥ 3` other rows `i ≠ r` the `O`-relation
+`O(r j₁, i j₀)` forces a member of `A r j₁` tied to `A i j₀` and distinct from `±z`; these are
+pairwise distinct (a shared one would be the common `z`), giving an injection of the `≥ 4` rows
+into the 3-element `A r j₁` — impossible. -/
+theorem common_not_mem_other_column [Fintype ι] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) {j₀ j₁ : κ} (hjne : j₀ ≠ j₁) {z : ClassFunction G ℂ}
+    (hz : ∀ i, z ∈ A i j₀) (r : ι) : z ∉ A r j₁ ∧ -z ∉ A r j₁ := by
+  classical
+  -- injection engine: a `w ∈ A r j₁` plus an injective `Y : (· ≠ r) → A r j₁ ∖ {w}` is impossible
+  have engine : ∀ (w : ClassFunction G ℂ) (Y : ι → ClassFunction G ℂ), w ∈ A r j₁ →
+      (∀ i, i ≠ r → Y i ∈ A r j₁) → (∀ i, i ≠ r → Y i ≠ w) →
+      (∀ i, i ≠ r → ∀ i', i' ≠ r → Y i = Y i' → i = i') → False := by
+    intro w Y hwB hYmem hYne hYinj
+    have hsub : insert w (Finset.image Y (Finset.univ.erase r)) ⊆ A r j₁ := by
+      intro x hx
+      rw [Finset.mem_insert, Finset.mem_image] at hx
+      rcases hx with rfl | ⟨i, hi, rfl⟩
+      · exact hwB
+      · exact hYmem i (Finset.mem_erase.mp hi).1
+    have hwnot : w ∉ Finset.image Y (Finset.univ.erase r) := by
+      rw [Finset.mem_image]; rintro ⟨i, hi, hYi⟩
+      exact hYne i (Finset.mem_erase.mp hi).1 hYi
+    have hinj : Set.InjOn Y (Finset.univ.erase r : Finset ι) := by
+      intro i hi i' hi' h
+      exact hYinj i (Finset.mem_erase.mp hi).1 i' (Finset.mem_erase.mp hi').1 h
+    have hcard := Finset.card_le_card hsub
+    rw [Finset.card_insert_of_notMem hwnot, Finset.card_image_of_injOn hinj,
+      Finset.card_erase_of_mem (Finset.mem_univ r), Finset.card_univ,
+      Nat.sub_add_cancel (by omega), hG.card_eq_three r j₁] at hcard
+    omega
+  refine ⟨fun hzB => ?_, fun hzB => ?_⟩
+  · -- `z ∈ A r j₁`: each `i ≠ r` gives `y` with `-y ∈ A i j₀`, `y ≠ z`
+    have hex : ∀ i, i ≠ r → ∃ y, y ∈ A r j₁ ∧ -y ∈ A i j₀ ∧ y ≠ z := by
+      intro i hir
+      have hpos : 0 < (A r j₁ ∩ A i j₀).card :=
+        Finset.card_pos.mpr ⟨z, Finset.mem_inter.mpr ⟨hzB, hz i⟩⟩
+      rw [hG.inter_O r i j₁ j₀ hir.symm hjne.symm] at hpos
+      obtain ⟨y, hyf⟩ := Finset.card_pos.mp hpos
+      rw [Finset.mem_filter] at hyf
+      exact ⟨y, hyf.1, hyf.2, fun hyz => hG.neg_not_mem_self (hz i) (hyz ▸ hyf.2)⟩
+    choose! Y hYmem hYneg hYne using hex
+    refine engine z Y hzB hYmem hYne (fun i hir i' hir' hYY => ?_)
+    by_contra hne
+    have heq : -Y i = z := eq_of_mem_Llinked hG (Or.inr ⟨hne, rfl⟩) (hz i) (hz i')
+      (hYneg i hir) (hYY.symm ▸ hYneg i' hir')
+    exact hG.neg_not_mem_self hzB (by rw [← heq, neg_neg]; exact hYmem i hir)
+  · -- `-z ∈ A r j₁`: each `i ≠ r` gives `y` with `y ∈ A i j₀`, `y ≠ -z`
+    have hex : ∀ i, i ≠ r → ∃ y, y ∈ A r j₁ ∧ y ∈ A i j₀ ∧ y ≠ -z := by
+      intro i hir
+      have hpos : 0 < (A r j₁ |>.filter (fun x => -x ∈ A i j₀)).card :=
+        Finset.card_pos.mpr ⟨-z, Finset.mem_filter.mpr ⟨hzB, by rw [neg_neg]; exact hz i⟩⟩
+      rw [← hG.inter_O r i j₁ j₀ hir.symm hjne.symm] at hpos
+      obtain ⟨y, hyf⟩ := Finset.card_pos.mp hpos
+      rw [Finset.mem_inter] at hyf
+      exact ⟨y, hyf.1, hyf.2, fun hyz => hG.neg_not_mem_self (hz i) (hyz ▸ hyf.2)⟩
+    choose! Y hYmem hYpos hYne using hex
+    refine engine (-z) Y hzB hYmem hYne (fun i hir i' hir' hYY => ?_)
+    by_contra hne
+    have heq : Y i = z := eq_of_mem_Llinked hG (Or.inr ⟨hne, rfl⟩) (hz i) (hz i')
+      (hYpos i hir) (hYY.symm ▸ hYpos i' hir')
+    exact hG.neg_not_mem_self hzB (by rw [neg_neg]; exact heq ▸ hYmem i hir)
+
+/-- The **transpose** of a signed-triple grid (swap rows and columns) is again a signed-triple grid.
+Used for the `W₁ ↔ W₂` interchange in the (3.5.4)/(3.5.5) WLOG `w₁ ≥ 5`: when only `w₂ ≥ 5`, apply
+the row-indexed results to the transposed grid. -/
+theorem transpose (hG : IsSignedTripleGrid A) :
+    IsSignedTripleGrid (fun (j : κ) (i : ι) => A i j) where
+  card_eq_three j i := hG.card_eq_three i j
+  signed j i := hG.signed i j
+  orthogonal j i := hG.orthogonal i j
+  inter_L j j' i i' h := hG.inter_L i i' j j' (by tauto)
+  noNeg_L j j' i i' h := hG.noNeg_L i i' j j' (by tauto)
+  inter_O j j' i i' hjj hii := hG.inter_O i i' j j' hii hjj
+
 end IsSignedTripleGrid
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
@@ -1846,6 +1923,30 @@ theorem Afam_isSignedTripleGrid (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   inter_L _ _ _ _ hshared := (hyp.Afam_L hVeq app hshared).1
   noNeg_L _ _ _ _ hshared := (hyp.Afam_L hVeq app hshared).2
   inter_O _ _ _ _ hp hq := hyp.Afam_O hVeq app hp hq
+
+open scoped Classical in
+/-- **Peterfalvi (3.5.4)** for the fixed family `A_{ij}`, in the `w₁ ≥ 5` orientation: there is a
+*unique* signed irreducible `z = -χ₀₁` common to every `A_{χ₁ χ₂₀}` as `χ₁` ranges over the
+nontrivial characters of `W₁`.  This activates the abstract sunflower `existsUnique_common` on the
+concrete `Afam` grid: the `≥ 4` rows come from `|W₁| ≥ 5` via `|Irr(W₁') ∖ {1}| = |W₁| − 1`
+(Pontryagin `card_charGroup_subgroupOf`).  When only `|W₂| ≥ 5`, apply this to `transpose`. -/
+theorem Afam_existsUnique_common (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1)
+    {χ₂₀ χ₂₁ : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}} (hne : χ₂₀ ≠ χ₂₁) :
+    ∃! z, ∀ χ₁ : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1},
+      z ∈ hyp.Afam hVeq app χ₁ χ₂₀ := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have hcard : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    have h1 : Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}
+        = Nat.card hyp.W1 - 1 := by
+      rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+        hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+    rw [h1]; omega
+  exact (hyp.Afam_isSignedTripleGrid hVeq app).existsUnique_common hcard hne
 
 end TICyclicHypothesis
 

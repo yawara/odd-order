@@ -705,3 +705,25 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 - まだ hard core ×1 = (4.3) が残る (§6 定理本体)。FT 経路外。
 
 正本 = 本ノート (session 13 セクション)。
+
+## 2026-06-09 (session 13 cont., b-peterfalvi): (3.5.5) core + transpose + Afam 接続 — 抽象結果を実 β-族で活性化
+
+(3.5.4) 完成後、3 commits 追加 (`989a27af`/`4f7bb2e5`/`ea4fc3e4`)。全 axiom-clean・AxiomsCheck 3558 green。
+
+### ✅ 着地
+1. **(3.5.5) core `common_not_mem_other_column`** (`989a27af`): 列 j₀ の共通元 z は他列に直交 (`z∉A r j₁ ∧ -z∉A r j₁`)。論文「χ₀₁ は A_{i2} に直交」。**証明 (w₁≥5 counting)**: `±z∈A r j₁` なら各 i≠r (≥3 行) に対し O(r j₁, i j₀) (両辺相等、±z が片側を打つ) が A r j₁ の z と相異な witness を強制 → 相異 (共有なら共通 z) → ≥4 行が 3-元 cell に単射 → 矛盾。内部 engine = 単射 ι→A r j₁ で card ≤3。
+2. **`IsSignedTripleGrid.transpose`** (`4f7bb2e5`): grid の row↔col 転置も grid (L/O 条件は対称)。**W₁↔W₂ interchange (WLOG w₁≥5) を可能に**: w₂≥5 のみのとき転置 Afam grid に row-indexed 結果を適用。
+3. **Afam 接続 `Afam_existsUnique_common`** (`ea4fc3e4`): **抽象 sunflower を実 β-族で活性化**。w₁≥5 orientation で `∃! z=-χ₀₁, ∀χ₁(≠1) z∈A_{χ₁ χ₂₀}`。`≥4 行` は `|Irr(W₁')∖{1}|=|W₁|-1` (`Fintype.card_subtype_compl`/`_eq` + Pontryagin `card_charGroup_subgroupOf`) + |W₁|≥5。
+
+### 🔑 再利用 (再調査不要)
+- **Afam 接続レシピ**: `haveI:Finite G:=Finite.of_fintype G; haveI:Fintype(charGroup):=Fintype.ofFinite _; Fintype.card{χ//≠1}=Nat.card W_k-1` via `[Fintype.card_subtype_compl, Fintype.card_subtype_eq, ←Nat.card_eq_fintype_card, card_charGroup_subgroupOf hyp.W_k_le_W]`; 適用は `(hyp.Afam_isSignedTripleGrid hVeq app).existsUnique_common hcard hne` (dot-notation)。
+- `card_charGroup_subgroupOf hyp (hHW:H≤W) : Nat.card((H.subgroupOf W)→*ℂˣ)=Nat.card H` (S05_TICyclic:844, Pontryagin)。
+- `common_not_mem_other_column` 内 engine の単射: `choose!` で total witness Y → `insert w (image Y (univ.erase r)) ⊆ A r j₁` + card 計算 (`card_insert_of_notMem`+`card_image_of_injOn`+`card_erase_of_mem`+`Nat.sub_add_cancel`) で card ι ≤ 3 矛盾。
+
+### ▶▶ 次 = (3.5.5) full decomposition → (3.5) 最終 → (3.2) σ
+- **(3.5.5) decomposition (残)**: 各行 i で `A_{i,j₀}={-χ₀₁, -χ_{i0}, φ_i}` (`-χ₀₁`=列共通, `-χ_{i0}`=A_{i,j₀}∩A_{i,j₁} 元 [同行 L], `φ_i`=第3元)。`-χ₀₁≠-χ_{i0}` は `common_not_mem` から (後者∈A_{i,j₁}, 前者∉)。φ_i 正規直交族 + φ_i⊥ψ_{i'} (L/O から)。抽象 grid で記述可。
+- **Afam 用 common_not_mem 接続**: `common_not_mem_other_column` も Afam に instantiate (transpose 付き)。
+- **(3.5) 最終 assembly**: w₂=3 完了 / w₂≥5 で transpose 適用 → χ_ij 族 → (3.2) σ-isometry → (3.6)-(3.9)。
+- 残 hard core ×1=(4.3)§6本体 (FT経路外)。
+
+正本 = 本ノート (session 13 / session 13 cont.)。**Don't re-grind (3.5.4)/(3.5.5)-core/transpose/Afam接続 — 完成・axiom-clean.**
