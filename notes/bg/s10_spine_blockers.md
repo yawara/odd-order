@@ -260,19 +260,14 @@ subgroupOf)。Hall-D 自体は解決済ゆえ「W⊇X 構成」は `hall_D` 一�
 - **L3 (W nilpotent)**: X⊆M' (⟺ X'≤D ⟺ Y=D) なら W ≤ D, betacompl 核で nilpotent
   (G 版なので W.map M.subtype ≤ derivedInG M に翻訳, or ↥M-内部版 betacompl を別途。**推奨: ↥M-内部
   `betacompl' : V ≤ commutator ↥M, β'-群 ⟹ IsNilpotent ↥V` を G 版から map で導出**)。
-  X⊄M' (p<q) は **抽象 nilpotency 補題 N2** (一般・再利用可, ~100-150 行, ⚠ 未着手):
-  `W {p,q}-群, normal Sylow q `Q`, N◁W nilpotent + W/N q-群 ⟹ IsNilpotent W`。
-  ルート = `isNilpotent_of_forall_hasNormalPComplement` (✅) に r∈{p,q} の HasNormalPComplement を供給:
-  - r=p: 補群 = 正規 Sylow q `Q` (normal Hall p')。HasNormalPComplement の `IsComplement' Q (Sylow p)` は
-    `Q⊓P=⊥`(異素数 `IsPGroup.disjoint_of_ne`)+`|Q||P|=|W|`({p,q}-群)で構成。
-  - r=q: 補群 = 正規 Sylow p `PN`。**PN 構成 = N2 の難所**: PN := Sylow p of N (N nilpotent ⟹ TFAE で
-    normal in N ⟹ `Sylow.characteristic_of_normal` で **char in N**); PN.map N.subtype が W で normal
-    = **「char ⊴ normal ⟹ ambient で normal」(mathlib に直接補題なし、~30-50 行インライン**:
-    `characteristic_iff_map_eq` + ∀w∈W conj が N の aut に制限 [N◁W] + char で固定; or 一意 Sylow p of N を
-    W-共役が保つ [`Subsingleton (Sylow p ↥N)`]); PN が Sylow p of W = card 論 (`|PN|=p-part |N|=p-part |W|`,
-    W/N q-群ゆえ p∤[W:N])。
-  W の normal Sylow q `Q` = `W∩O_{p'}(M)` (10.8(c) `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` ✅:
-  全 q-元 ⊆ O_{p'}(M)); N = W∩M' (`betacompl` 核で nilpotent); W/N q-群 = WM'/M'⊆XM'/M' (X q-群)。
+  X⊄M' (p<q) は **抽象 nilpotency 補題 N2 = ✅ landed** `isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient`
+  (commit `75bf9026`, **unconditional**, S10_BetaRadical betacompl 直前): `W {p,q}-群, normal Sylow q
+  `Qs`, N◁W nilpotent + W/N q-群 ⟹ IsNilpotent W`。N から正規 Sylow p を構成 (Sylow p of N char in N
+  `Sylow.characteristic_of_normal` → W 正規 `normal_map_subtype_of_characteristic` [✅ landed, char⊴normal⟹normal,
+  `MulAut.conjNormal`]; |W|_p=|N|_p で W の Sylow p)、全 Sylow 正規 (`Sylow.unique_of_normal`) ⟹
+  `isNilpotent_of_finite_tfae` 3→0。**N2 の M-適用に要る入力 (M-assembly で供給)**: W の normal Sylow q `Qs`
+  = `W∩O_{p'}(M)` (10.8(c) `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` ✅: 全 q-元 ⊆ O_{p'}(M));
+  N = W∩M' (`betacompl` 核で nilpotent); W/N q-群 = WM'/M'⊆XM'/M' (X q-群)。
 - **L4 ((a)(1)) — ✅ 核 `isPGroup_le_centralizer_of_isNilpotent` landed** (commit 後述, **unconditional**,
   `S10_BetaRadical.lean` betacompl 直前): nilpotent W で q-部分群 X が p-部分群 P を中心化
   (`X ≤ Sylow q `Q` normal, `P ≤ Sylow p `P_W` normal, 異素数 disjoint ⟹ `commute_of_normal_of_disjoint`)。
