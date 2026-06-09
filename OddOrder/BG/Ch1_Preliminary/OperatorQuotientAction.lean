@@ -43,7 +43,7 @@ complement bridge は `notes/bg/s04_n4_maschke_bridge_design.md` を参照。
 (制限作用 `toMulAutHom` も Ch04 既存の本物の構成、`sorry` instance ではない)。
 -/
 
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 namespace OddOrder.BG.Ch1.OperatorQuotientAction
 
@@ -256,5 +256,45 @@ theorem exists_maximal_isCyclic_isAInvariant_commutator_le
     le_antisymm hST (hmax.2 ⟨hT, hTcyc, hTle⟩ hST)⟩
 
 end CentralizerOfCyclicAInvariant
+
+section ConjNormalBridge
+
+/-- **`actionCommutator` ↔ subgroup commutator 基盤橋**: `H ⊴ G`, `R ≤ G`.  `R` の `H` への
+**共役作用** `φ := conjNormal ∘ R.subtype : R →* MulAut H` の作用交換子を `H.subtype` で `G` に
+押し戻すと, 部分群交換子 `⁅H, R⁆` に一致する。
+
+`actionCommutator φ` の生成元は `h * (φ r) h⁻¹` (`h ∈ H`, `r ∈ R`) で, `G` 内の値は
+`h * (r h⁻¹ r⁻¹) = ⁅h, r⁆` (= mathlib `⁅H, R⁆` の生成元)。両 `closure` が同じ生成集合を持つ。
+
+BG §3 (Theorem 3.6) ほか, 内部共役作用に対する Prop 1.6 系 (`actionCommutator` 言語で証明済) を
+部分群交換子 `⁅H, R⁆` の主張へ翻訳する際の土台。`OddOrder.Isaacs.Ch05` (transfer) に同型の
+生成元計算の先例がある。 -/
+theorem actionCommutator_conjNormal_map_subtype_eq {G : Type*} [Group G] (H R : Subgroup G)
+    [H.Normal] :
+    (actionCommutator ((MulAut.conjNormal (G := G) (H := H)).comp R.subtype)).map H.subtype
+      = ⁅H, R⁆ := by
+  set φ : ↥R →* MulAut ↥H := (MulAut.conjNormal (G := G) (H := H)).comp R.subtype with hφ
+  -- generator value: `↑(hA * (φ rB) hA⁻¹) = ⁅↑hA, ↑rB⁆` in `G`.
+  have hval : ∀ (hA : ↥H) (rB : ↥R),
+      ((hA * (φ rB) hA⁻¹ : ↥H) : G) = ⁅(hA : G), (rB : G)⁆ := by
+    intro hA rB
+    have he : (φ rB) hA⁻¹ = MulAut.conjNormal (rB : G) hA⁻¹ := by
+      simp only [hφ, MonoidHom.comp_apply, Subgroup.coe_subtype]
+    rw [Subgroup.coe_mul, he, MulAut.conjNormal_apply, Subgroup.coe_inv, commutatorElement_def]
+    group
+  apply le_antisymm
+  · rw [Subgroup.map_le_iff_le_comap]
+    unfold actionCommutator
+    rw [Subgroup.closure_le]
+    rintro x ⟨h, r, rfl⟩
+    rw [SetLike.mem_coe, Subgroup.mem_comap, Subgroup.coe_subtype, hval]
+    exact Subgroup.commutator_mem_commutator h.2 r.2
+  · rw [Subgroup.commutator_le]
+    intro a ha b hb
+    refine ⟨(⟨a, ha⟩ : ↥H) * (φ ⟨b, hb⟩) (⟨a, ha⟩)⁻¹,
+      Subgroup.subset_closure ⟨⟨a, ha⟩, ⟨b, hb⟩, rfl⟩, ?_⟩
+    rw [Subgroup.coe_subtype, hval]
+
+end ConjNormalBridge
 
 end OddOrder.BG.Ch1.OperatorQuotientAction
