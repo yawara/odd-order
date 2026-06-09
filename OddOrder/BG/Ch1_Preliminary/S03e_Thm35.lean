@@ -453,6 +453,219 @@ theorem character_eq_of_nonempty_linearEquiv [FiniteDimensional F W] (ρ : Repre
     ((subRepAsModuleEquiv (resRep ρ H) A).symm.trans
       (e.trans (subRepAsModuleEquiv (resRep ρ H) B))))
 
+open OddOrder.RepresentationTheory in
+/-- **`hconj` propagation, iso-phrased** (perf-safe variant of
+`nonempty_linearEquiv_map_conjSemilinearEnd_forall`).  If the conjugate `M^x` for a generator `x`
+(with `G = ⟨H, x⟩`) is `F[H]`-linearly isomorphic to `M`, then `M ≅ M^g` for **every** `g ∈ G`.
+
+Converts the iso `M ≅ M^x` to the equal-character hypothesis once
+(`character_eq_of_nonempty_linearEquiv`) and feeds it to the character-route propagation.  Phrasing
+the hypothesis as a *module isomorphism* (rather than a character identity) keeps the downstream
+NONISO arguments off the pathological nested-character `isDefEq` path. -/
+theorem nonempty_linearEquiv_forall_of_iso_generator
+    [IsAlgClosed F] [FiniteDimensional F W] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] [Finite ↥H] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    (x : G) (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hx : Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ x)))) :
+    ∀ g : G, Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ g))) := by
+  obtain ⟨e⟩ := hx
+  exact nonempty_linearEquiv_map_conjSemilinearEnd_forall ρ hHchar M x hgen
+    (character_eq_of_nonempty_linearEquiv ρ e).symm
+
+open OddOrder.RepresentationTheory in
+/-- **Distinctness of conjugates** (NONISO branch of step 9, iso-phrased).  Let `R = ⟨x⟩` be of
+prime order with `G = ⟨H, x⟩`.  If `M` is *not* isomorphic to its conjugate `M^x`, then `M` is not
+isomorphic to `M^{x^j}` for any `j` with `x^j ≠ 1` (i.e. for `1 ≤ j < |R|`).
+
+Proof: a non-identity power `x^j` again generates the prime-order `R`
+(`zpowers_eq_of_prime_card`), so `G = ⟨H, x^j⟩`; an iso `M ≅ M^{x^j}` would propagate
+(`nonempty_linearEquiv_forall_of_iso_generator`) to `M ≅ M^x`, contradicting the hypothesis. -/
+theorem not_nonempty_linearEquiv_pow_of_not_generator
+    [IsAlgClosed F] [FiniteDimensional F W] [Finite G] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    {R : Subgroup G} {x : G} (hxR : Subgroup.zpowers x = R) (hRp : (Nat.card ↥R).Prime)
+    (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hniso : ¬ Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ x))))
+    {j : ℕ} (hxj : x ^ j ≠ 1) :
+    ¬ Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ (x ^ j)))) := by
+  intro hiso
+  have hxR' : x ∈ R := hxR ▸ Subgroup.mem_zpowers x
+  have hxjR : x ^ j ∈ R := R.pow_mem hxR' j
+  have hgenj : Subgroup.zpowers (x ^ j) = R :=
+    OddOrder.BG.Ch1.S03d.zpowers_eq_of_prime_card hRp hxjR hxj
+  have hgenj' : Subgroup.closure ((H : Set G) ∪ {x ^ j}) = ⊤ := by
+    have hle : Subgroup.zpowers (x ^ j) ≤ Subgroup.closure ((H : Set G) ∪ {x ^ j}) :=
+      (Subgroup.zpowers_le).mpr (Subgroup.subset_closure (Or.inr rfl))
+    have hxmem : x ∈ Subgroup.closure ((H : Set G) ∪ {x ^ j}) :=
+      hle (by rw [hgenj, ← hxR]; exact Subgroup.mem_zpowers x)
+    rw [eq_top_iff, ← hgen, Subgroup.closure_le]
+    rintro s (hsH | hsx)
+    · exact Subgroup.subset_closure (Or.inl hsH)
+    · rw [Set.mem_singleton_iff] at hsx; rw [hsx]; exact hxmem
+  exact hniso
+    (nonempty_linearEquiv_forall_of_iso_generator ρ hHchar M (x ^ j) hgenj' hiso x)
+
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **(P) disjointness** (NONISO branch of step 9).  Let `R = ⟨x⟩` be of prime order `p` with
+`G = ⟨H, x⟩`.  If `M` is a simple `F[H]`-constituent not isomorphic to its conjugate `M^x`, then `M`
+meets the sum of the *other* conjugates `M^{x^i}` (`1 ≤ i < p`) trivially.
+
+Proof: `M` is an atom, so `M ⊓ (⨆ …)` is `⊥` or `M`; if it were `M` then `M ≤ ⨆ M^{x^i}`, and a
+simple submodule of a sum of simple modules is isomorphic to one of them
+(`Submodule.linearEquiv_of_le_sSup`), i.e. `M ≅ M^{x^i}` for some `1 ≤ i < p` — contradicting the
+distinctness `not_nonempty_linearEquiv_pow_of_not_generator`. -/
+theorem inf_iSup_map_conjSemilinearEnd_eq_bot
+    [IsAlgClosed F] [FiniteDimensional F W] [Finite G] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    {R : Subgroup G} {x : G} (hxR : Subgroup.zpowers x = R) (hRp : (Nat.card ↥R).Prime)
+    (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hniso : ¬ Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ x)))) :
+    M ⊓ (⨆ i ∈ Set.Ioo 0 (Nat.card ↥R),
+        M.map (conjSemilinearEnd (H := H) ρ (x ^ i))) = ⊥ := by
+  set p := Nat.card ↥R with hp
+  have hordx : orderOf x = p := by rw [hp, ← hxR, Nat.card_zpowers]
+  set Sup := ⨆ i ∈ Set.Ioo 0 p, M.map (conjSemilinearEnd (H := H) ρ (x ^ i)) with hSup
+  have hatom : IsAtom M := IsSimpleModule.isAtom
+  rcases eq_or_lt_of_le (inf_le_left : M ⊓ Sup ≤ M) with heq | hlt
+  · exfalso
+    have hMle : M ≤ Sup := by rw [← heq]; exact inf_le_right
+    set s : Set (Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) :=
+      (fun i => M.map (conjSemilinearEnd (H := H) ρ (x ^ i))) '' Set.Ioo 0 p with hs
+    have hssup : sSup s = Sup := by rw [hs, sSup_image]
+    haveI hsimple : ∀ m : s, IsSimpleModule (MonoidAlgebra F ↥H)
+        ↥(m : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule) := by
+      rintro ⟨_, i, _, rfl⟩
+      exact isSimpleModule_map_conjSemilinearEnd ρ (x ^ i) M
+    obtain ⟨S, hSs, ⟨e⟩⟩ := M.linearEquiv_of_le_sSup s (by rw [hssup]; exact hMle)
+    obtain ⟨i, hiIoo, rfl⟩ := hSs
+    have hxi1 : x ^ i ≠ 1 := by
+      intro h
+      have hdvd := orderOf_dvd_of_pow_eq_one h
+      rw [hordx] at hdvd
+      exact Nat.not_dvd_of_pos_of_lt hiIoo.1 hiIoo.2 hdvd
+    exact not_nonempty_linearEquiv_pow_of_not_generator ρ hHchar M hxR hRp hgen hniso hxi1 ⟨e⟩
+  · exact hatom.2 (M ⊓ Sup) hlt
+
+open OddOrder.RepresentationTheory in
+set_option backward.isDefEq.respectTransparency false in
+/-- **(P) projection / dimension bound** (NONISO branch of step 9).  With the hypotheses of
+`inf_iSup_map_conjSemilinearEnd_eq_bot` and `dim C_W(R) = 1`, a simple `F[H]`-constituent `M` not
+isomorphic to `M^x` is **one-dimensional** over `F`.
+
+Proof (the BG projection argument): the `F`-linear map `T : M → W`, `m ↦ ∑_{i<p} ρ(xⁱ) m`, lands in
+`C_W(R)` (it is `x`-invariant since `xᵖ = 1`: `a · Φ = Φ` for `a = ρ x`, `Φ = ∑ aⁱ`, by the
+geometric-sum identity `Φ·(a-1) = aᵖ-1 = 0`) and is injective (if `T m = 0` then
+`m = -∑_{1≤i<p} ρ(xⁱ) m ∈ M ⊓ ⨆ M^{xⁱ} = ⊥`, the disjointness above).  Hence
+`dim_F M ≤ dim_F C_W(R) = 1`, and `M ≠ 0`, so `dim_F M = 1`. -/
+theorem finrank_eq_one_of_not_iso_generator
+    [IsAlgClosed F] [FiniteDimensional F W] [Finite G] (ρ : Representation F G W)
+    {H : Subgroup G} [H.Normal] (hHchar : (Nat.card ↥H : F) ≠ 0)
+    (M : Submodule (MonoidAlgebra F ↥H) (resRep ρ H).asModule)
+    [IsSimpleModule (MonoidAlgebra F ↥H) M]
+    {R : Subgroup G} {x : G} (hxR : Subgroup.zpowers x = R) (hRp : (Nat.card ↥R).Prime)
+    (hgen : Subgroup.closure ((H : Set G) ∪ {x}) = ⊤)
+    (hCV1 : Module.finrank F (Representation.invariants (ρ.comp R.subtype)) = 1)
+    (hniso : ¬ Nonempty (↥M ≃ₗ[MonoidAlgebra F ↥H]
+      ↥(M.map (conjSemilinearEnd (H := H) ρ x)))) :
+    Module.finrank F ↥M = 1 := by
+  set p := Nat.card ↥R with hp
+  have hordx : orderOf x = p := by rw [hp, ← hxR, Nat.card_zpowers]
+  have hxp : x ^ p = 1 := by rw [← hordx]; exact pow_orderOf_eq_one x
+  set a : Module.End F W := ρ x with ha
+  have hap : a ^ p = 1 := by rw [ha, ← map_pow, hxp, map_one]
+  set Φ : Module.End F W := ∑ i ∈ Finset.range p, a ^ i with hΦ
+  -- `a · Φ = Φ` (geometric sum, `aᵖ = 1`).
+  have hΦfix : a * Φ = Φ := by
+    have hcomm : a * Φ = Φ * a :=
+      Commute.sum_right (Finset.range p) (fun i => a ^ i) a
+        (fun i _ => (Commute.refl a).pow_right i)
+    have hgs := geom_sum_mul a p
+    rw [hap, sub_self, ← hΦ, mul_sub, mul_one, sub_eq_zero] at hgs
+    rw [hcomm]; exact hgs
+  -- disjointness from (P-disjoint).
+  have hdisj := inf_iSup_map_conjSemilinearEnd_eq_bot ρ hHchar M hxR hRp hgen hniso
+  set Sup := ⨆ i ∈ Set.Ioo 0 p, M.map (conjSemilinearEnd (H := H) ρ (x ^ i)) with hSup
+  -- the projection `T`.
+  let T : ↥M →ₗ[F] W := Φ ∘ₗ (M.subtype.restrictScalars F)
+  have hTm : ∀ m : ↥M, T m = Φ (m : (resRep ρ H).asModule) := fun _ => rfl
+  have hTsum : ∀ m : ↥M,
+      T m = ∑ i ∈ Finset.range p, ρ (x ^ i) (m : (resRep ρ H).asModule) := by
+    intro m
+    rw [hTm, hΦ, LinearMap.sum_apply]
+    exact Finset.sum_congr rfl (fun i _ => by rw [ha, ← map_pow])
+  -- `T` injective.
+  have hTinj : Function.Injective T := by
+    rw [← LinearMap.ker_eq_bot, eq_bot_iff]
+    intro m hm
+    rw [LinearMap.mem_ker, hTsum] at hm
+    have hp0 : 0 ∈ Finset.range p := Finset.mem_range.mpr hRp.pos
+    rw [← Finset.add_sum_erase _ _ hp0, pow_zero, map_one, Module.End.one_apply] at hm
+    -- hm : (m : W) + ∑_{i ∈ erase 0} ρ(xⁱ) m = 0.
+    have hmem : (m : (resRep ρ H).asModule) ∈ Sup := by
+      have heq : (m : (resRep ρ H).asModule)
+          = -(∑ i ∈ (Finset.range p).erase 0, ρ (x ^ i) (m : (resRep ρ H).asModule)) :=
+        eq_neg_of_add_eq_zero_left hm
+      rw [heq]
+      refine Submodule.neg_mem _ (Submodule.sum_mem _ (fun i hi => ?_))
+      rw [Finset.mem_erase, Finset.mem_range] at hi
+      have hiIoo : i ∈ Set.Ioo 0 p := ⟨Nat.pos_of_ne_zero hi.1, hi.2⟩
+      have hsub : M.map (conjSemilinearEnd (H := H) ρ (x ^ i)) ≤ Sup :=
+        le_iSup₂ (f := fun i (_ : i ∈ Set.Ioo 0 p) =>
+          M.map (conjSemilinearEnd (H := H) ρ (x ^ i))) i hiIoo
+      refine hsub ?_
+      rw [mem_map_conjSemilinearEnd]
+      exact ⟨(m : (resRep ρ H).asModule), m.2, rfl⟩
+    have hbot : (m : (resRep ρ H).asModule) ∈ M ⊓ Sup := ⟨m.2, hmem⟩
+    rw [hdisj, Submodule.mem_bot] at hbot
+    rw [Submodule.mem_bot]
+    exact Submodule.coe_eq_zero.mp hbot
+  -- range `T` lands in `C_W(R)`.
+  have hTinv : LinearMap.range T ≤ Representation.invariants (ρ.comp R.subtype) := by
+    rw [SetLike.le_def]
+    rintro v ⟨m, rfl⟩
+    rw [Representation.mem_invariants]
+    have hxfix : ρ x (T m) = T m := by
+      have h := LinearMap.congr_fun hΦfix (m : (resRep ρ H).asModule)
+      rwa [Module.End.mul_apply, ← hTm, ha] at h
+    let Stab : Subgroup G :=
+      { carrier := {g | ρ g (T m) = T m}
+        one_mem' := by simp only [Set.mem_setOf_eq, map_one, Module.End.one_apply]
+        mul_mem' := fun {b c} hb hc => by
+          simp only [Set.mem_setOf_eq, map_mul] at *
+          rw [Module.End.mul_apply, hc, hb]
+        inv_mem' := fun {b} hb => by
+          simp only [Set.mem_setOf_eq] at *
+          have h1 : ρ b⁻¹ (ρ b (T m)) = T m := by
+            rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+          rwa [hb] at h1 }
+    have hRStab : R ≤ Stab := by rw [← hxR, Subgroup.zpowers_le]; exact hxfix
+    intro r
+    exact hRStab r.2
+  -- dimension count.
+  haveI : Nontrivial ↥M := IsSimpleModule.nontrivial (MonoidAlgebra F ↥H) ↥M
+  haveI : Module.Finite F ↥M :=
+    Module.Finite.of_injective (M.subtype.restrictScalars F) Subtype.val_injective
+  have hle : Module.finrank F ↥M ≤ 1 := by
+    rw [← hCV1]
+    calc Module.finrank F ↥M
+        = Module.finrank F ↥(LinearMap.range T) := (LinearEquiv.ofInjective T hTinj).finrank_eq
+      _ ≤ Module.finrank F ↥(Representation.invariants (ρ.comp R.subtype)) :=
+          Submodule.finrank_mono hTinv
+  have hpos : 0 < Module.finrank F ↥M := Module.finrank_pos
+  omega
+
 end Step9
 
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
@@ -586,3 +799,4 @@ theorem thm35_algClosed
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
 end OddOrder.BG.Ch1.S03e
+
