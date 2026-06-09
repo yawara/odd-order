@@ -3324,3 +3324,9 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- M'/M_β nilpotent (Lemma 10.8 系, §13 + Cor 10.9(a)(3)/(b) で使う): isHall_Mbeta 経由ゆえ同 island。
+#assert_axioms_island OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

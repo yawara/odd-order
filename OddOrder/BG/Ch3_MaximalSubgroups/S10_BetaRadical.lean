@@ -1509,6 +1509,62 @@ theorem beta_complement_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     lt_of_le_of_lt inf_le_right (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hM).1)
   exact isUniquelyMaximal_of_le hAU hA_le hCXM_lt
 
+/-- A `π`-Hall subgroup `H` of `G` contained in `K` is also `π`-Hall in `K` (`H.subgroupOf K`):
+`|H ∩ K| = |H|` (`H ≤ K`) so its prime factors stay in `π`, and `[K:H] = H.relIndex K ∣ [G:H]`
+is a `π'`-number. Used to descend `M_β` (Hall `β(G)`) to a Hall `β`-subgroup of `M'`. -/
+theorem isHallSubgroup_subgroupOf_of_le [Finite G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : Ch03.IsHallSubgroup π H) (hHK : H ≤ K) :
+    Ch03.IsHallSubgroup π (H.subgroupOf K) := by
+  refine ⟨fun r hr => hH.1 r ?_, fun r hr hrπ => hH.2 r ?_ hrπ⟩
+  · rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv] at hr
+  · rw [Nat.mem_primeFactors] at hr ⊢
+    exact ⟨hr.1, hr.2.1.trans (Subgroup.relIndex_dvd_index_of_le hHK),
+      Subgroup.index_ne_zero_of_finite⟩
+
+/-- **M'/M_β is nilpotent** (consequence of Lemma 10.8, mmd L3322/L3534, forward-conditional):
+`M' = derivedInG M` modulo its Hall `β(M)`-subgroup `M_β` is nilpotent. `M'` has a nilpotent
+Hall `β(M)'`-subgroup `W*` (Lemma 10.8(b)) and `M_β` (Hall `β(G)`, normal in `M'`) is a complement,
+so `M' = M_β W*` and the quotient `M'/M_β` is a surjective image of the nilpotent `W*`. -/
+theorem derivedQuotientMbeta_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    [((Mbeta M).subgroupOf (derivedInG M)).Normal] :
+    Group.IsNilpotent (↥(derivedInG M) ⧸ (Mbeta M).subgroupOf (derivedInG M)) := by
+  obtain ⟨Wstar, hWstar_le, hWstar_hall, hWstar_nilp⟩ := (isHall_Mbeta hG hM).2.1
+  have hβσ : beta M ⊆ sigma M := fun r hr => alpha_subset_sigma hG hM (beta_subset_alpha M hr)
+  have hMβD : Mbeta M ≤ derivedInG M :=
+    le_trans (Subgroup.map_mono (Ch03.oPiCore_mono hβσ ↥M)) (Msigma_le_derived hG hM)
+  haveI hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
+    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
+      (MulEquiv.surjective _)
+  have hMβHall : Ch03.IsHallSubgroup (beta M) ((Mbeta M).subgroupOf (derivedInG M)) :=
+    isHallSubgroup_subgroupOf_of_le (isHall_Mbeta hG hM).1 hMβD
+  -- `W* ⊔ M_β = ⊤` in `↥M'` (their indices are coprime: `β'` resp. `β`).
+  have hsup : Wstar.subgroupOf (derivedInG M) ⊔ (Mbeta M).subgroupOf (derivedInG M) = ⊤ := by
+    apply Ch03.sup_eq_top_of_coprime_index
+    apply Nat.coprime_of_dvd
+    intro r hr hrW hrMβ
+    have hrβ : r ∈ beta M := by
+      by_contra hc
+      exact hWstar_hall.2 r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrW, Subgroup.index_ne_zero_of_finite⟩) hc
+    exact hMβHall.2 r
+      (Nat.mem_primeFactors.mpr ⟨hr, hrMβ, Subgroup.index_ne_zero_of_finite⟩) hrβ
+  -- the surjection `W* ↪ M' → M'/M_β`.
+  set f : ↥(Wstar.subgroupOf (derivedInG M)) →*
+      (↥(derivedInG M) ⧸ (Mbeta M).subgroupOf (derivedInG M)) :=
+    (QuotientGroup.mk' ((Mbeta M).subgroupOf (derivedInG M))).comp
+      (Wstar.subgroupOf (derivedInG M)).subtype with hf
+  have hmaptop : (Wstar.subgroupOf (derivedInG M)).map
+      (QuotientGroup.mk' ((Mbeta M).subgroupOf (derivedInG M))) = ⊤ := by
+    have h := QuotientGroup.comap_map_mk' ((Mbeta M).subgroupOf (derivedInG M))
+      (Wstar.subgroupOf (derivedInG M))
+    rw [sup_comm, hsup] at h
+    exact Subgroup.comap_injective (QuotientGroup.mk'_surjective _)
+      (h.trans (Subgroup.comap_top _).symm)
+  have hrange : f.range = ⊤ := by
+    rw [hf, MonoidHom.range_comp, Subgroup.range_subtype, hmaptop]
+  exact nilpotent_of_surjective f (MonoidHom.range_eq_top.mp hrange)
+
 /-! ## Corollary 10.9(a)(3)/(b) — β(M)'-normalizer gates (mmd L2826) -/
 
 /-- **BG Corollary 10.9(a)(3)** (mmd L2826): in the setup of Corollary 10.9(a), if `X` is a
