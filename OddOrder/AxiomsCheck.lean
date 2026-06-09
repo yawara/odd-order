@@ -3318,3 +3318,22 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_signedTriple_of_inner_self_three
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_betaSet
+
+-- §5 (3.5.2): the signed-irreducible API and the lemma `L(ij, i'j')`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.apply_one_ne_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.ne_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.irreducibleCharacter_coe_ne_neg
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.isSignedNontrivialIrr_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.ne_neg_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedNontrivialIrr.inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.exists_isSignedTriple_of_inner_self_three
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.neg_not_mem
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.inner_right_signed
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.no_neg_of_inner_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTriple.L_of_inner_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_apply_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_isSignedTriple_beta
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_eq_one_of_one_shared
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.betaTriple_L
