@@ -796,6 +796,34 @@ theorem betaTriple_O (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   exact ⟨A, A', hA, hA',
     hA.O_card_inter_eq hA' (hyp.beta_inner_eq_zero_of_both_diff hVeq app ha₁ ha₂ hb₁ hb₂ hd₁ hd₂)⟩
 
+/- 3.5.3: `sup(w₁, w₂) ≥ 5` -/
+
+/-- **Peterfalvi (3.5.3)**: `sup(w₁, w₂) ≥ 5`.  Both `w₁ = |W₁|` and `w₂ = |W₂|` are odd (dividing
+the odd `|W|`), greater than `1` (`W₁`, `W₂` nontrivial), and coprime (Hypothesis (3.1)).  Were
+both `≤ 4`, each would equal `3` (the only odd number in `(1, 4]`), contradicting coprimality
+(`gcd 3 3 = 3 ≠ 1`).  Peterfalvi then assumes `w₁ ≥ 5` by the `W₁ ↔ W₂` symmetry. -/
+theorem sup_card_ge_five (hyp : TICyclicHypothesis G) :
+    5 ≤ Nat.card hyp.W1 ∨ 5 ≤ Nat.card hyp.W2 := by
+  haveI : Finite G := Finite.of_fintype G
+  have h1odd : Odd (Nat.card hyp.W1) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+  have h2odd : Odd (Nat.card hyp.W2) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+  have h1gt : 1 < Nat.card hyp.W1 :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+  have h2gt : 1 < Nat.card hyp.W2 :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+  by_contra h
+  obtain ⟨hlt1, hlt2⟩ := not_or.mp h
+  rw [not_le] at hlt1 hlt2
+  obtain ⟨k, hk⟩ := h1odd
+  obtain ⟨l, hl⟩ := h2odd
+  have hc1 : Nat.card hyp.W1 = 3 := by omega
+  have hc2 : Nat.card hyp.W2 = 3 := by omega
+  have hcop := hyp.W_card_coprime
+  rw [hc1, hc2] at hcop
+  exact absurd hcop (by decide)
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

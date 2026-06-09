@@ -3340,3 +3340,6 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.betaTriple_L
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.beta_inner_eq_zero_of_both_diff
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.betaTriple_O
+
+-- §5 (3.5.3): `sup(w₁, w₂) ≥ 5`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sup_card_ge_five
