@@ -1722,6 +1722,34 @@ theorem burnside_operator {p : ℕ} [Fact p.Prime] {R : Type*} [Group R] [Finite
   haveI : Group.IsNilpotent R := hP.isNilpotent
   exact OddOrder.Isaacs.Ch04.aFixed_quotient_frattini hCop (Or.inr inferInstance) h_triv_quot
 
+/-- **Element form of BG Theorem 1.8 (Burnside)**: a `p'`-order automorphism `f` of a finite
+`p`-group `H` all of whose powers act trivially modulo `Φ(H)` is the identity.
+
+The elementwise companion of `burnside_operator`: apply it to the cyclic operator group
+`⟨f⟩ = Subgroup.zpowers f` (coprimality of `|⟨f⟩|` with `|H| = pⁿ` follows from the `p'`-order
+of `f`).  Used by BG Theorem 3.6 (3.9) (`S03f_Prelim`) and Lemma 4.17 (`S04_PGroupsSmallRank`). -/
+theorem mulAut_eq_one_of_coprime_orderOf_of_frattini {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] (hH : IsPGroup p H)
+    (f : MulAut H) (hcop : Nat.Coprime (orderOf f) p)
+    (htriv : ∀ z : ℤ, ∀ r : H, ∃ x ∈ _root_.frattini H, (f ^ z) r = r * x) :
+    f = 1 := by
+  classical
+  set B : Subgroup (MulAut H) := Subgroup.zpowers f with hB
+  set ψ : ↥B →* MulAut H := B.subtype with hψ
+  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hH
+  have hcop' : Nat.Coprime (Nat.card ↥B) (Nat.card H) := by
+    rw [hB, Nat.card_zpowers, hn]
+    exact Nat.Coprime.pow_right n hcop
+  have htriv' : ∀ b : ↥B, ∀ r : H, ∃ x ∈ _root_.frattini H, (ψ b) r = r * x := by
+    rintro ⟨b, hb⟩ r
+    rw [hB, Subgroup.mem_zpowers_iff] at hb
+    obtain ⟨z, rfl⟩ := hb
+    exact htriv z r
+  have hconc := burnside_operator hH (φ := ψ) hcop' htriv'
+  ext r
+  rw [MulAut.one_apply]
+  exact hconc ⟨f, Subgroup.mem_zpowers f⟩ r
+
 /-- **BG Lemma 1.9 (2-step instance, ambient G 形)**: 有限群 `G`, `A` coprime operator,
 `N ⊴ G` が `A`-不変. `A` が `N` 上に自明 + `A` が `G/N` 上に自明 ⇒ `A` が `G` 上に自明.
 

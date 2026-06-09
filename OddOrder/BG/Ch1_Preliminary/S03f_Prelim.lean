@@ -18,8 +18,6 @@ can land on their own.
 
 * `fitting_eq_opCore_of_oPiCore_compl_eq_bot`: if `O_{p'}(G) = ⊥` then `F(G) = O_p(G)`.  Used at
   BG Theorem 3.6 (3.9) (`V = F(H) = O_p(H)`).
-* `mulAut_eq_one_of_coprime_orderOf_of_frattini`: element form of Burnside's Theorem 1.8 — a
-  `p'`-order automorphism of a finite `p`-group acting trivially modulo `Φ` is trivial.
 * `isPGroup_of_forall_eq_one_of_not_dvd_orderOf`: a finite group with no nontrivial `p'`-element is
   a `p`-group.
 * `oPiCore_compl_quotient_frattini_fitting_eq_bot`: BG Theorem 3.6 (3.9) substep — if `F(Hb)` is a
@@ -57,32 +55,6 @@ theorem fitting_eq_opCore_of_oPiCore_compl_eq_bot {G : Type*} [Group G] [Finite 
       simp [hrq, hq]
     rw [h] at hle
     exact le_trans hle bot_le
-
-/-- **Element form of BG Theorem 1.8 (Burnside)**: a `p'`-order automorphism `f` of a finite
-`p`-group `H` all of whose powers act trivially modulo `Φ(H)` is the identity.
-
-This is `burnside_operator` applied to the cyclic group `⟨f⟩` (coprimality from the `p'`-order). -/
-theorem mulAut_eq_one_of_coprime_orderOf_of_frattini {p : ℕ} [Fact p.Prime]
-    {H : Type*} [Group H] [Finite H] (hH : IsPGroup p H)
-    (f : MulAut H) (hcop : Nat.Coprime (orderOf f) p)
-    (htriv : ∀ z : ℤ, ∀ r : H, ∃ x ∈ _root_.frattini H, (f ^ z) r = r * x) :
-    f = 1 := by
-  classical
-  set B : Subgroup (MulAut H) := Subgroup.zpowers f with hB
-  set ψ : ↥B →* MulAut H := B.subtype with hψ
-  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hH
-  have hcop' : Nat.Coprime (Nat.card ↥B) (Nat.card H) := by
-    rw [hB, Nat.card_zpowers, hn]
-    exact Nat.Coprime.pow_right n hcop
-  have htriv' : ∀ b : ↥B, ∀ r : H, ∃ x ∈ _root_.frattini H, (ψ b) r = r * x := by
-    rintro ⟨b, hb⟩ r
-    rw [hB, Subgroup.mem_zpowers_iff] at hb
-    obtain ⟨z, rfl⟩ := hb
-    exact htriv z r
-  have hconc := OddOrder.BG.Ch1.S01.burnside_operator hH (φ := ψ) hcop' htriv'
-  ext r
-  rw [MulAut.one_apply]
-  exact hconc ⟨f, Subgroup.mem_zpowers f⟩ r
 
 /-- A finite group with no nontrivial `p'`-element is a `p`-group: the `p'`-part `g ^ (p ^ vₚ)`
 of any element has order coprime to `p`, hence is trivial, so `g` has `p`-power order. -/
@@ -206,7 +178,8 @@ theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
       rw [Subgroup.coe_subtype] at hyx
       have hyx' : y = x := Subtype.coe_injective hyx
       rwa [hyx'] at hy
-    have hf1 : f = 1 := mulAut_eq_one_of_coprime_orderOf_of_frattini hVp f hfcop hftriv
+    have hf1 : f = 1 :=
+      OddOrder.BG.Ch1.S01.mulAut_eq_one_of_coprime_orderOf_of_frattini hVp f hfcop hftriv
     have hg_cent : g ∈ Subgroup.centralizer (V : Set Hb) := by
       rw [Subgroup.mem_centralizer_iff]
       intro v hv
