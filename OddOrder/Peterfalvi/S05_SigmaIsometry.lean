@@ -848,6 +848,170 @@ theorem caseII_false (hG : IsSignedTripleGrid A) {i₁ i₂ i₃ i₄ : ι} {j�
   set p6 := (if -χ6 ∈ A i₁ j₁ then 1 else 0 : ℕ)
   omega
 
+/- Helper layer for Case I (3.5.4.1)-(3.5.4.5): the `L`/`O` relations as membership deductions. -/
+
+/-- For two `L`-linked cells, no member of one is the negative of a member of the other (the
+`noNeg_L` field, read symmetrically). -/
+theorem ne_neg_of_Llinked (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {x y : ClassFunction G ℂ}
+    (hx : x ∈ A i j) (hy : y ∈ A i' j') : x ≠ -y := by
+  have hsymm : (i' = i ∧ j' ≠ j) ∨ (i' ≠ i ∧ j' = j) := by
+    rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact Or.inl ⟨h1.symm, h2.symm⟩
+    · exact Or.inr ⟨h1.symm, h2.symm⟩
+  intro hxy
+  exact hG.noNeg_L i' i j' j hsymm y hy (hxy ▸ hx)
+
+/-- For two `L`-linked cells sharing the element `z`, any common element equals `z`
+(`|A ∩ A'| = 1`). -/
+theorem eq_of_mem_Llinked (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {z w : ClassFunction G ℂ}
+    (hz : z ∈ A i j) (hz' : z ∈ A i' j') (hw : w ∈ A i j) (hw' : w ∈ A i' j') : w = z := by
+  classical
+  have hcard := hG.inter_L i i' j j' h
+  exact Finset.card_le_one.mp (le_of_eq hcard) w (Finset.mem_inter.mpr ⟨hw, hw'⟩) z
+    (Finset.mem_inter.mpr ⟨hz, hz'⟩)
+
+open scoped Classical in
+/-- **(3.5.4) `L`-step**: if `B = A i j` and `A i' j' = {χ, u, v}` are `L`-linked cells with
+`χ ∈ B` (so `χ` is *the* shared element), then `u, v ∉ B`, and none of `χ, u, v` has its negative
+in `B`. -/
+theorem lStep (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ}
+    (h : (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j')) {χ u v : ClassFunction G ℂ}
+    (hC : A i' j' = {χ, u, v}) (hχu : χ ≠ u) (hχv : χ ≠ v) (_huv : u ≠ v)
+    (hχB : χ ∈ A i j) :
+    u ∉ A i j ∧ v ∉ A i j ∧ -χ ∉ A i j ∧ -u ∉ A i j ∧ -v ∉ A i j := by
+  have hsymm : (i' = i ∧ j' ≠ j) ∨ (i' ≠ i ∧ j' = j) := by
+    rcases h with ⟨h1, h2⟩ | ⟨h1, h2⟩
+    · exact Or.inl ⟨h1.symm, h2.symm⟩
+    · exact Or.inr ⟨h1.symm, h2.symm⟩
+  have hχC : χ ∈ A i' j' := by rw [hC]; exact Finset.mem_insert_self _ _
+  have huC : u ∈ A i' j' := by
+    rw [hC]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have hvC : v ∈ A i' j' := by
+    rw [hC]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · exact fun h' => hχu (eq_of_mem_Llinked hG h hχB hχC h' huC).symm
+  · exact fun h' => hχv (eq_of_mem_Llinked hG h hχB hχC h' hvC).symm
+  · exact hG.noNeg_L i' i j' j hsymm χ hχC
+  · exact hG.noNeg_L i' i j' j hsymm u huC
+  · exact hG.noNeg_L i' i j' j hsymm v hvC
+
+open scoped Classical in
+/-- **(3.5.4) O-step**: if `B = A i j` and `A i' j' = {χ, u, v}` are `O`-related cells (`i ≠ i'`,
+`j ≠ j'`) with `χ ∈ B` and `-χ ∉ B`, then `u, v ∉ B` and *exactly one* of `-u, -v` lies in `B`
+(stated as `-u ∈ B ↔ -v ∉ B`).  This is the engine of (3.5.4.1). -/
+theorem oStep (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i ≠ i') (hjj : j ≠ j')
+    {χ u v : ClassFunction G ℂ} (hC : A i' j' = {χ, u, v})
+    (hχu : χ ≠ u) (hχv : χ ≠ v) (huv : u ≠ v)
+    (hχB : χ ∈ A i j) (hnegχ : -χ ∉ A i j) :
+    u ∉ A i j ∧ v ∉ A i j ∧ (-u ∈ A i j ↔ -v ∉ A i j) := by
+  classical
+  have hO := hG.inter_O i i' j j' hii hjj
+  rw [hC, card_inter_triple _ hχu hχv huv, card_filter_neg_triple _ hχu hχv huv,
+    if_pos hχB, if_neg hnegχ] at hO
+  set au := (if u ∈ A i j then (1 : ℕ) else 0) with hau
+  set av := (if v ∈ A i j then (1 : ℕ) else 0) with hav
+  set bu := (if -u ∈ A i j then (1 : ℕ) else 0) with hbu
+  set bv := (if -v ∈ A i j then (1 : ℕ) else 0) with hbv
+  have hau1 : au ≤ 1 := by rw [hau]; split <;> omega
+  have hav1 : av ≤ 1 := by rw [hav]; split <;> omega
+  have hbu1 : bu ≤ 1 := by rw [hbu]; split <;> omega
+  have hbv1 : bv ≤ 1 := by rw [hbv]; split <;> omega
+  have cu : au + bu ≤ 1 := by
+    rw [hau, hbu]; by_cases h : u ∈ A i j
+    · rw [if_pos h, if_neg (hG.neg_not_mem_self h)]
+    · rw [if_neg h]; split <;> omega
+  have cv : av + bv ≤ 1 := by
+    rw [hav, hbv]; by_cases h : v ∈ A i j
+    · rw [if_pos h, if_neg (hG.neg_not_mem_self h)]
+    · rw [if_neg h]; split <;> omega
+  obtain ⟨hau0, hav0, hsum⟩ : au = 0 ∧ av = 0 ∧ bu + bv = 1 := by omega
+  refine ⟨?_, ?_, ?_⟩
+  · intro h; rw [hau, if_pos h] at hau0; exact one_ne_zero hau0
+  · intro h; rw [hav, if_pos h] at hav0; exact one_ne_zero hav0
+  · constructor
+    · intro h hnv'; rw [hbu, if_pos h, hbv, if_pos hnv'] at hsum; omega
+    · intro h; by_contra h'; rw [hbu, if_neg h', hbv, if_neg h] at hsum; omega
+
+open scoped Classical in
+/-- **(3.5.4) O-step (all-out)**: if `B = A i j` and `A i' j' = {x, y, z}` are `O`-related and
+none of `x, y, z` lies in `B`, then none of `-x, -y, -z` lies in `B`.  Used with the transversal
+cell to kill the negated meet-points at once. -/
+theorem oStep_out (hG : IsSignedTripleGrid A) {i i' : ι} {j j' : κ} (hii : i ≠ i') (hjj : j ≠ j')
+    {x y z : ClassFunction G ℂ} (hC : A i' j' = {x, y, z})
+    (hxy : x ≠ y) (hxz : x ≠ z) (hyz : y ≠ z)
+    (hx : x ∉ A i j) (hy : y ∉ A i j) (hz : z ∉ A i j) :
+    -x ∉ A i j ∧ -y ∉ A i j ∧ -z ∉ A i j := by
+  classical
+  have hO := hG.inter_O i i' j j' hii hjj
+  rw [hC, card_inter_triple _ hxy hxz hyz, card_filter_neg_triple _ hxy hxz hyz,
+    if_neg hx, if_neg hy, if_neg hz] at hO
+  refine ⟨?_, ?_, ?_⟩ <;> intro h
+  · rw [if_pos h] at hO; omega
+  · rw [if_pos h] at hO; omega
+  · rw [if_pos h] at hO; omega
+
+open scoped Classical in
+/-- **(3.5.4.1) pencil cell**: in the Case-I configuration, three pencil rows `ra, rb, rc` share
+the apex `χ` (so `A ra j₀ = {χ, ma, fa}`, etc.) and a transversal row `rt` meets them at the
+"meet-points" (`A rt j₀ = {ma, mb, mc}`).  If `χ ∈ A ra j₁` for a second column `j₁`, then the
+whole cell is `A ra j₁ = {χ, -fb, -fc}` — the apex together with the *negated free-points* of the
+other two pencil rows.  (Peterfalvi: `χ₁ ∈ A₁₂ ⟹ β₁₂ = χ₁ - χ₅ - χ₇`.)  The proof: `L(ra j₁, ra j₀)`
+removes `ma, fa`; `O` against `Lb`, `Lc` forces "exactly one of the two negated others"; and the
+`O` against the transversal `T` kills both negated meet-points at once, leaving the free ones. -/
+theorem pencilCell (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
+    (hab : ra ≠ rb) (hac : ra ≠ rc) (hat : ra ≠ rt) (hbc : rb ≠ rc) (hj : j₀ ≠ j₁)
+    {χ ma mb mc fa fb fc : ClassFunction G ℂ}
+    (hLa : A ra j₀ = {χ, ma, fa}) (hLb : A rb j₀ = {χ, mb, fb})
+    (hLc : A rc j₀ = {χ, mc, fc}) (hT : A rt j₀ = {ma, mb, mc})
+    (hχB : χ ∈ A ra j₁) :
+    A ra j₁ = {χ, -fb, -fc} := by
+  classical
+  obtain ⟨dχma, dχfa, dmafa⟩ := triple_distinct (hLa ▸ hG.card_eq_three ra j₀)
+  obtain ⟨dχmb, dχfb, dmbfb⟩ := triple_distinct (hLb ▸ hG.card_eq_three rb j₀)
+  obtain ⟨dχmc, dχfc, dmcfc⟩ := triple_distinct (hLc ▸ hG.card_eq_three rc j₀)
+  obtain ⟨dmamb, dmamc, dmbmc⟩ := triple_distinct (hT ▸ hG.card_eq_three rt j₀)
+  -- Step 1: `L(ra j₁, ra j₀)` — `χ` is the unique shared element; `ma, fa ∉ B`, `-χ ∉ B`.
+  obtain ⟨hmaB, hfaB, hnegχB, _, _⟩ :=
+    lStep hG (Or.inl ⟨rfl, hj.symm⟩) hLa dχma dχfa dmafa hχB
+  -- Step 2/3: `O` against the other two pencil rows.
+  obtain ⟨hmbB, _, hxorb⟩ := oStep hG hab hj.symm hLb dχmb dχfb dmbfb hχB hnegχB
+  obtain ⟨hmcB, _, hxorc⟩ := oStep hG hac hj.symm hLc dχmc dχfc dmcfc hχB hnegχB
+  -- Step 4: `O` against the transversal — `ma, mb, mc ∉ B`, so `-mb, -mc ∉ B`.
+  obtain ⟨_, hnegmbB, hnegmcB⟩ :=
+    oStep_out hG hat hj.symm hT dmamb dmamc dmbmc hmaB hmbB hmcB
+  -- Step 5: hence `-fb, -fc ∈ B`.
+  have hnegfbB : -fb ∈ A ra j₁ := not_not.mp (fun h => hnegmbB (hxorb.mpr h))
+  have hnegfcB : -fc ∈ A ra j₁ := not_not.mp (fun h => hnegmcB (hxorc.mpr h))
+  -- Distinctness for the final triple.
+  have hχLa : χ ∈ A ra j₀ := by rw [hLa]; exact Finset.mem_insert_self _ _
+  have hχLb : χ ∈ A rb j₀ := by rw [hLb]; exact Finset.mem_insert_self _ _
+  have hχLc : χ ∈ A rc j₀ := by rw [hLc]; exact Finset.mem_insert_self _ _
+  have hfbLb : fb ∈ A rb j₀ := by
+    rw [hLb]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have hfcLc : fc ∈ A rc j₀ := by
+    rw [hLc]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have dχnfb : χ ≠ -fb := ne_neg_of_Llinked hG (Or.inr ⟨hab, rfl⟩) hχLa hfbLb
+  have dχnfc : χ ≠ -fc := ne_neg_of_Llinked hG (Or.inr ⟨hac, rfl⟩) hχLa hfcLc
+  have dnfbnfc : (-fb) ≠ -fc := by
+    intro h
+    exact dχfb (eq_of_mem_Llinked hG (Or.inr ⟨hbc, rfl⟩) hχLb hχLc hfbLb
+      (neg_injective h ▸ hfcLc)).symm
+  -- Conclude `B = {χ, -fb, -fc}` by cardinality.
+  have hsub : ({χ, -fb, -fc} : Finset (ClassFunction G ℂ)) ⊆ A ra j₁ := by
+    intro w hw
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hw
+    rcases hw with rfl | rfl | rfl
+    · exact hχB
+    · exact hnegfbB
+    · exact hnegfcB
+  have hcard3 : ({χ, -fb, -fc} : Finset (ClassFunction G ℂ)).card = 3 := by
+    rw [Finset.card_insert_of_notMem (by simp [dχnfb, dχnfc]),
+      Finset.card_insert_of_notMem (by simp [dnfbnfc]), Finset.card_singleton]
+  exact (Finset.eq_of_subset_of_card_le hsub
+    (le_of_eq (by rw [hG.card_eq_three ra j₁, hcard3]))).symm
+
 end IsSignedTripleGrid
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
