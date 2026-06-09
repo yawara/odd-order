@@ -807,3 +807,28 @@ session 14 cont. が残した「χ-assembly → orientation wrapper」を完全�
 - 残 hard core ×1=(4.3)§6本体 (FT経路外)。
 
 正本 = 本ノート (session 15 + cont.)。**Don't re-grind (3.5) χ-family (symm/two_col/transpose/full) / 共有 assembly / reindex wrapper / (3.2) Irr-基底 (span+`irreducibleCharacterBasis`) — 完成・axiom-clean.**
+
+## 2026-06-09 (session 16, b-peterfalvi, /loop 自走): (3.2) σ 本体 CORE COMPLETE — 定義+等長+ (a)基底+(b)+virtual→virtual
+
+`/loop` dynamic mode で 5 commits、全 `S05_SigmaIsometry.lean`、build-green + axiom-clean (full build 3558 + AxiomsCheck green、guard 登録)。**σ:CF(W)→CF(G) (= Peterfalvi (3.2)) の核を構成完了。**
+
+### ✅ 着地 (session 16, leaf 1-5)
+1. **index bridge `Ĉ₁×Ĉ₂≃Irr(W)`** (`f5b3e32f`): `omegaProdChar_surjective` (ξ=(ξ|W₁)·(ξ|W₂) via `wProj1_mul_wProj2`) + `omegaProdEquiv` (Equiv.ofBijective, inj=既存 omegaProdChar_inj) + `omegaIrrEquiv` (= omegaProdEquiv.trans omegaEquiv)。
+2. **σ 定義** (`f832ed39`): `chiFam`/`chiFam_spec` (= `exists_chiFamily` の選択族 + 4 性質, `.choose`/`.choose_spec`) + **`sigma := (irreducibleCharacterBasis (G:=W)).constr ℂ (fun ω => chiFam (omegaIrrEquiv.symm ω))`** (Module.Basis.constr) + `sigma_irreducibleCharacter` (σ(↑ω)=chiFam(...) via constr_basis)。
+3. **σ 等長性** (`adfdb08a`): `sigma_inner` (⟨σa,σb⟩=⟨a,b⟩) + `sigma_inner_irreducibleCharacter` (基底 Gram 一致=δ) + **再利用 `inner_sum_smul_sum`** (一般 ι,H: ⟨∑r•F,∑s•F⟩=∑∑ r·conj(s)·⟨F,F⟩, 双線形展開 workhorse)。基底 repr + map_sum で全体に拡張。
+4. **(3.2)(a)基底 + (b)** (`8169cd0e`): `sigma_omega` (σ(↑ω(ξ))=chiFam(omegaProdEquiv.symm ξ)) + `omegaProdEquiv_symm_omegaProdChar` + **(b) `sigma_trivial`** (σ(1_W)=1_G) + **(a)基底 `sigma_alphaCF`** (σ(alphaCF p q)=app.tau.toDadeMap(alpha p q), p,q≠1; alphaCF_eq_omega_combination で ω 4-項展開→sigma_omega→chiFam→(3.5) Ind 関係)。
+5. **σ virtual→virtual** (`40748166`): `sigma_mem_ZIrr` (σ(ZIrr W)⊆ZIrr G; ZIrr_eq_span + span 帰納、各基底→chiFam∈ZIrr, ℤ-submodule 閉性)。
+
+### 🔑 再利用可能 (再調査不要)
+- **`inner_sum_smul_sum`** (S05, 一般): 「基底上 Gram 一致 → 等長」の workhorse。`ClassFunction.inner` は素の def なので mathlib LinearIsometry 不可、これで手動双線形展開。
+- **`sigma_omega`**: σ on linear char = chiFam at omegaProdEquiv.symm。任意の ω-項を chiFam に落とす。
+- ZIrrFourier に `inner_sum_left`/`inner_sum_right`/`inner_smul_right` 既存 (S05 が import 済、namespace `OddOrder.RepresentationTheory`、`inner_smul_right` は `_root_` と曖昧→qualify 要)。
+
+### ▶▶ 残り (3.2): (a)全体 + (c)(d) — 両者 infra leaf 要 [STOP point, 次セッション/再loop]
+**σ CORE は完成。残り 2 piece は別インフラを要し、loop STOP。両者 route 確定:**
+- **(a) 全体** `∀ α∈CF(W,V), σ(↑α)=app.tau.toDadeMap α` [scoped, 未着手]: **route** = `induceₗ : CF(W)→ₗ[ℂ]CF(G)` を `{toFun:=induce W, map_add':=induce_add, map_smul':=induce_smul}` で構成 (InducedCharacter:312/317) → `(σ.comp submodule.subtype)` と `(induceₗ.comp subtype)` を `Module.Basis.ext (alphaBasis hVeq)` で一致 (各基底: `alphaBasis pq = alpha hVeq pq.1.1 pq.2.1` via `coe_basisOfLinearIndependentOfCardEqFinrank`, `alpha_coe`, `sigma_alphaCF` [pq.1.2/pq.2.2 で ≠1], `tau_eq_induce` [app.tau.toDadeMap=induce, S05:293; **要確認: app.tau.toDadeMap = app.tau.toDadeIsometryData.toDadeMap が rfl か**])。SupportedOnV=↥(supportedSubmodule ...)。~40-60行。
+- **(c)(d)** [**(1.3)(b) gating**]: S03 は仮説述語 `IsInductionExpansion` (Ind ψ=∑⟨ψ,χ_i⟩•μ_i, S03:512) のみで **(1.3)(b) の結論 (μ_i|A=χ_i|A; μ⊥all μ_i→μ|A=0) は未形式化**。route = (1.3)(b) を形式化 [直交補空間 `CF(H,A)^⊥=CF(H,H-A)` 論法、mmd 04.3 (1.3) proof; 実質 leaf ~80-120行] → H=W,A=V,ψ_j=α_ij,χ_i=ω,μ_i=ω^σ で適用 ((c)=μ_i|V=χ_i|V→線形拡張、(d)=⊥im→vanish)。
+- **exists_sigma 組立**: (a)全体 完了後、isometry+virtual→virtual+(a)+(b) を `∃ σ, ...` に束ねられる ((c)(d) は (1.3)(b) 後)。
+- 残 hard core ×1=(4.3)§6本体 (FT経路外)。
+
+正本 = 本ノート (session 16)。**Don't re-grind (3.2) σ CORE (sigma/sigma_inner/sigma_alphaCF/sigma_trivial/sigma_mem_ZIrr/sigma_omega/index bridge/inner_sum_smul_sum) — 完成・axiom-clean.**
