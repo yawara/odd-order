@@ -3363,6 +3363,113 @@ theorem exists_sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   rw [hbridge]
   exact hd (hyp.omegaIrrEquiv (a, b))
 
+/-! ### Peterfalvi (3.6)-(3.8): the coefficient grid `a_{ij} = ⟨ψ, ω_{ij}^σ⟩` and `NC(ψ)` -/
+
+open scoped Classical in
+/-- **Peterfalvi (3.7) support input**: the 4-term combination
+`ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q}` lies in `CF(W, V)`.  On `W₁` the `W₂`-parts (`q`) collapse to
+`1`, on `W₂` the `W₁`-parts (`p`) collapse, so the combination vanishes on `W₁ ∪ W₂`. -/
+theorem omegaCombo_mem_supportedSubmodule (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+       - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q)
+       : ClassFunction hyp.W ℂ)
+      ∈ ClassFunction.supportedSubmodule
+          (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W) := by
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro w hw
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hVeq, mem_Vdiff]
+  refine ⟨w.2, fun h1 => (ClassFunction.mem_support.mp hw) ?_,
+    fun h2 => (ClassFunction.mem_support.mp hw) ?_⟩
+  · -- `↑w ∈ W₁`: the `q`-parts collapse, the four terms cancel
+    have hw1 : w ∈ hyp.W1.subgroupOf hyp.W := (Subgroup.mem_subgroupOf).mpr h1
+    simp only [ClassFunction.add_apply, ClassFunction.sub_apply, omega_apply,
+      TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply,
+      hyp.wSnd_eq_one_of_mem_W1 hw1, map_one, mul_one]
+    ring
+  · -- `↑w ∈ W₂`: the `p`-parts collapse, the four terms cancel
+    have hw2 : w ∈ hyp.W2.subgroupOf hyp.W := (Subgroup.mem_subgroupOf).mpr h2
+    simp only [ClassFunction.add_apply, ClassFunction.sub_apply, omega_apply,
+      TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply,
+      hyp.wFst_eq_one_of_mem_W2 hw2, map_one, one_mul]
+    ring
+
+/-- The (3.7) test element `ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q} ∈ CF(W, V)`. -/
+noncomputable def omegaCombo (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    SupportedOnV ℂ hyp :=
+  ⟨hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+     - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q),
+   hyp.omegaCombo_mem_supportedSubmodule hVeq p p' q q'⟩
+
+@[simp] theorem omegaCombo_coe (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.omegaCombo hVeq p p' q q' : ClassFunction hyp.W ℂ)
+      = hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+        - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q) := rfl
+
+/-- For `α ∈ CF(W, V)` and `ψ ∈ CF(G)` vanishing on `V`, `⟨ψ, α^σ⟩ = 0`.  By (3.2)(a),
+`α^σ = Ind_W^G α` is supported on `V^G = conjugatesOfSet V`; the class function `ψ` (vanishing on
+`V`) vanishes there too, so the supports are disjoint. -/
+theorem inner_sigma_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV ℂ hyp) {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0) :
+    ClassFunction.inner ψ (hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ)) = 0 := by
+  apply ClassFunction.inner_eq_zero_of_disjoint_support
+  rw [Set.disjoint_left]
+  intro g hgψ hgσ
+  -- `g ∈ Supp(α^σ) ⟹ g ∈ conjugatesOfSet V` (else `α^σ g = τ(α) g = 0`)
+  have hgconj : g ∈ Group.conjugatesOfSet hyp.V := by
+    by_contra hg
+    refine (ClassFunction.mem_support.mp hgσ) ?_
+    rw [show hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ) = app.tau.toDadeMap α from
+      hyp.sigma_eq_tau hVeq app α]
+    exact full_map_eq_zero_of_not_mem_conjugatesOfSet_V app α hg
+  -- `g ∈ conjugatesOfSet V ⟹ ψ g = 0` (`ψ` vanishes on `V`, class function)
+  obtain ⟨v, hv, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hgconj
+  exact (ClassFunction.mem_support.mp hgψ) ((ψ.of_isConj hconj).symm.trans (hψ v hv))
+
+/-- **Peterfalvi (3.6)**: the `σ`-image coefficient `a_{ij} = ⟨ψ, ω_{ij}^σ⟩` of `ψ ∈ CF(G)`.  As
+`{ω_{ij}^σ} = {χ_{ij}}` (`chiFam`) is orthonormal, these are the Fourier coefficients of `ψ` along
+`Im σ`, and `β = ψ − ∑ a_{ij} ω_{ij}^σ` is automatically orthogonal to `Im σ`.  Indexed by
+`Ĉ₁ × Ĉ₂` (index `(1, 1) = ω_{00} = 1_W`). -/
+noncomputable def sigmaCoeff (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ψ : ClassFunction G ℂ)
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) : ℂ :=
+  ClassFunction.inner ψ (hyp.chiFam hVeq app pq)
+
+/-- **Peterfalvi (3.6)**: `NC(ψ)` = number of nonzero `σ`-image coefficients of `ψ`. -/
+noncomputable def sigmaNC (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ψ : ClassFunction G ℂ) : ℕ :=
+  {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard
+
+/-- **Peterfalvi (3.7)**: under Hypothesis (3.6) (`ψ` vanishing on `V`), the `σ`-image coefficients
+satisfy the additive grid identity `a_{ij} + a_{i'j'} = a_{ij'} + a_{i'j}`.  Apply
+`inner_sigma_eq_zero_of_vanishOnV` to `α = ω_{ij} + ω_{i'j'} − ω_{ij'} − ω_{i'j} ∈ CF(W, V)`:
+`σ(α) = χ_{ij} + χ_{i'j'} − χ_{ij'} − χ_{i'j}` (σ linear, `sigma_omega`), and `⟨ψ, σ(α)⟩ = 0`. -/
+theorem sigmaCoeff_add_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.sigmaCoeff hVeq app ψ (p, q) + hyp.sigmaCoeff hVeq app ψ (p', q')
+      = hyp.sigmaCoeff hVeq app ψ (p, q') + hyp.sigmaCoeff hVeq app ψ (p', q) := by
+  have hσ : hyp.sigma hVeq app (hyp.omegaCombo hVeq p p' q q' : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (p, q) + hyp.chiFam hVeq app (p', q')
+        - hyp.chiFam hVeq app (p, q') - hyp.chiFam hVeq app (p', q) := by
+    simp only [omegaCombo_coe, map_add, map_sub, hyp.sigma_omega hVeq app,
+      hyp.omegaProdEquiv_symm_omegaProdChar]
+  have h0 := hyp.inner_sigma_eq_zero_of_vanishOnV hVeq app (hyp.omegaCombo hVeq p p' q q') hψ
+  rw [hσ] at h0
+  simp only [ClassFunction.inner_add_right, ClassFunction.inner_sub_right] at h0
+  simp only [sigmaCoeff]
+  linear_combination h0
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05

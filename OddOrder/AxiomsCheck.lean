@@ -3434,3 +3434,11 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_zero_of_mem_V_of_inner_chiFam_eq_zero
 -- §5 Peterfalvi Theorem (3.2) capstone: the linear isometry `σ` with properties (a)-(d).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigma
+-- §5 Peterfalvi (3.6)-(3.7): the σ-image coefficient grid `a_{ij}` and its additive identity.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo_mem_supportedSubmodule
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo_coe
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.inner_sigma_eq_zero_of_vanishOnV
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_add_eq
