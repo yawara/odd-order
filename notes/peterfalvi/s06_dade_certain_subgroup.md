@@ -857,3 +857,30 @@ session 16 が残した「(3.2)(a)全体 + (c)(d) [(1.3) gating]」を完全形�
 - 残 hard core ×1 = (4.3) §6本体 (FT経路外)。
 
 正本 = 本ノート (session 17)。**Don't re-grind Peterfalvi (3.2) — (a)-(d) 完全・axiom-clean・`exists_sigma` で bundle 済。**
+
+## 2026-06-10 (session 18, b-peterfalvi, Ultracode): ✅ (3.6)+(3.7)+(3.8)-corollary — σ-coefficient grid `NC(ψ)` theory
+
+After (3.2) complete (session 17), advanced the §5 frontier through the `NC(ψ)` coefficient theory. All `S05_SigmaIsometry.lean`, sorry-free・axiom-clean・full build 3558 + AxiomsCheck green. 3 commits (`a81f8127` (3.6)+(3.7), `6e6257a4` (3.8)-cor). Preceded by an **understand-workflow** (4 parallel readers, run `wf_cf660de5-cba`) mapping downstream consumers + Galois infra + σ-API + (3.6) design.
+
+### ✅ 着地 (session 18)
+1. **(3.6) defs** (`a81f8127`): `sigmaCoeff ψ (p,q) := ⟨ψ, chiFam (p,q)⟩` (= a_ij, the Fourier coeff along the orthonormal σ-image family {ω_ij^σ}={χ_ij}; β=ψ−∑a_ij ω_ij^σ auto ⊥ Im σ) + `sigmaNC ψ := {pq | sigmaCoeff ψ pq ≠ 0}.ncard`.
+2. **(3.7) `sigmaCoeff_add_eq`**: ψ vanishing on V ⟹ `a_ij + a_i'j' = a_ij' + a_i'j`. Via `omegaCombo`=ω_ij+ω_i'j'−ω_ij'−ω_i'j ∈ CF(W,V) (support lemma `omegaCombo_mem_supportedSubmodule`: vanishes on W₁/W₂ as q/p-parts collapse) → `inner_sigma_eq_zero_of_vanishOnV` (⟨ψ,σ(α)⟩=0 since σ(α)=Ind α supported on V^G=conjugatesOfSet V, ψ vanishes there; disjoint-support) → σ(omegaCombo)=χ_ij+… (σ linear + `sigma_omega`) → read off coeffs (`inner_add/sub_right` + `linear_combination`).
+3. **(3.8) corollary `sigmaCoeff_eq_zero_of_sigmaNC_lt`** (`6e6257a4`): ψ vanishing on V ∧ `NC(ψ) < min(w₁,w₂)` ⟹ ALL a_ij=0. **🔑 KEY INSIGHT: the (3.7) identity makes the grid ADDITIVELY SEPARABLE** (`a(i,j)=f(i)+g(j)`). Abstract `grid_eq_zero_of_ncard_support_lt` (general ℂ-grid ι×κ→ℂ, vanishing mixed differences, #support < min|ι||κ| ⟹ ≡0): rows differ by a col-independent constant ⟹ two distinct rows give a nonzero in EVERY column (≥|κ|) / else all rows equal so one nonzero fills a column (≥|ι|). Instantiated at sigmaCoeff via card_charGroup_subgroupOf (w_k=|Ĉ_k|). **This is the part of (3.8) (3.9.a) and most §6/§7 consumers use** (small-NC⟹⊥image). 
+
+### 🔑 再利用可能 / 検証済インフラ (再調査不要)
+- **separable-grid lemma** `grid_eq_zero_of_ncard_support_lt` (ncard/Nat.card interface, converts to Finset internally to avoid caller Fintype-instance friction).
+- **Galois infra EXISTS** (再調査するな): `CyclotomicGaloisAction.lean` = Peterfalvi (1.9) 完全形式化 (`exists_complexRingEquiv_mapRingEquiv_eq_pow`:363 [σ(φ g)=φ(g^k) on ZIrr, ord g∣a; =φ g if coprime], `exists_complexRingEquiv_pow_and_fixed`:311); `GaloisCharacter.lean` = `ClassFunction.mapRingEquiv`(coeffwise ℂ≃+*ℂ action)/`IrreducibleCharacter.galoisMap`/`galoisPerm`/`mapRingEquiv_inner`/`mapRingEquiv_mem_ZIrr`. S07 precedent `IsCoherent.extension_mapRingEquiv_comm` (isometry commutes with cyclotomic σc). ω^k = MonoidHom power (W abelian, ω:W→*ℂˣ); ord ω = orderOf in (W→*ℂˣ).
+- **ZIrr integrality/norm tools**: `inner_mem_ZIrr_int {φ ψ}(∈ZIrr)(∈ZIrr):∃m:ℤ,⟨φ,ψ⟩=m` (InducedCharacter:716, **imported by S05**), `mem_ZIrr_inner_self_eq_sum_sq`(ZIrrFourier:234), positive-def `eq_zero_of_inner_self_re_eq_zero`(ZIrrFourier:189), `exists_pair_of_sum_sq_eq_two`(ZIrrFourier, norm-2 combinatorics template). **Bessel `sum_sq_le_inner_self_re` は S08 にあり S05 からは import 不可** (S05 は upstream) — (3.9.a) は Bessel 不要の norm-1-classifier 経路を使う。
+
+### ▶▶ 次 = (3.9)(a)(b)(c) + (3.8) full trichotomy [全ルート確定・実装待ち]
+**(3.9)(a) `χ∈±Irr, χ|_V=ω|_V ⟹ χ=ω^σ`** [§6 keystone, ~200 行, multi-piece]:
+- **norm-1 classifier** (新, S05 leaf, mirror `exists_pair_of_sum_sq_eq_two`): `exists_single_of_sum_sq_eq_one` (∑c²=1,c≠0⟹単一±1) → `exists_irr_eq_or_neg_of_inner_self_one` (φ∈ZIrr,⟨φ,φ⟩=1⟹φ=±μ via mem_ZIrr_inner_self_eq_sum_sq).
+- **χ-support≤1** `card_inner_chiFam_ne_zero_le_one`: χ=±μ₀, chiFam pq=±ν (classifier, chiFam∈ZIrr norm1 from chiFam_spec.2.1/.2.2.1-diag) ⟹ ⟨χ,chiFam pq⟩≠0⟺chiFam pq=±μ₀; 2つ⟹⟨chiFam pq,chiFam pq'⟩=±1≠0 contra chiFam_spec.2.2.1 (`Set.ncard_le_one`).
+- **NC(σ↑ω−χ)≤2**: support⊆{ω-idx}∪χ-support (⟨σ↑ω,chiFam pq⟩=δ_{pq,ω-idx} via sigma_irreducibleCharacter+orthonormal).
+- **min(w₁,w₂)≥3**: W_k nontrivial(≠⊥, card≥2) + |W_k| odd (∣|W| odd via Lagrange) ⟹ odd>1⟹≥3. (helper `three_le_card_W1/W2`.)
+- **assembly**: corollary ⟹ coeffs 0 ⟹ ⟨φ,chiFam(ω-idx)⟩=0 ⟹ ⟨χ,σ↑ω⟩=1 ⟹ χ=σ↑ω via `⟨χ−σ↑ω,χ−σ↑ω⟩=2−1−1=0`+positive-def. φ vanishes on V from (3.2c) sigma_apply_of_mem_V + hyp.
+- **σ-Galois "in particular"** ω^{σu}=ω^{uσ}: `mapRingEquiv u` commutes with σ on basis (S07 pattern `extension_mapRingEquiv_comm`).
+**(3.9)(b)(c)** [independent of (3.8)/(3.9a), ~150-300 行]: bridge `omega(χ^k)=mapRingEquiv σ_k (omega χ)` (σ_k=(·^k) on |W|-th roots, ω linear) + push through σ (S07 commutation) ⟹ (ω^k)^σ=ω^{uσ}=ω^{σu}; value-part = `mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr` b-branch; (c) rationality = fixed-field + algebraic-integer (ClassSumAlgebra integrality).
+**(3.8) full trichotomy (b)/(c)** [§12+ only, defer]: separable structure — subcase f-const⟹case(b) (one column, |{j:nonzero}|<2⟹=1), symmetric⟹(c), both-non-const⟹NC≥2w₁ (textbook (3.8.1) counting, the hard sub-lemma).
+
+正本 = 本ノート (session 18)。**Don't re-grind (3.6)/(3.7)/(3.8-cor)/separable-grid — 完成・axiom-clean.**
