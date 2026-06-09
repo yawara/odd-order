@@ -552,6 +552,11 @@ set_option linter.style.longLine false in
 -- G finite solvable, π set of primes, H K both π-Hall ⇒ ∃ g, H^g = K.
 #assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_C
 
+-- Ch.3 (Split Extensions): Thm 3C.1 Hall-D (Wielandt) — π-subgroup ⊆ Hall π-subgroup.
+-- G finite solvable, U a π-subgroup ⇒ ∃ Hall π-subgroup H with U ≤ H. (BG Cor 10.9 の前提)
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.hall_D
+#assert_only_allowed_axioms OddOrder.Isaacs.Ch03.exists_conj_le_of_isComplement'_of_coprime
+
 -- Ch.3 (Split Extensions): Thm 3.36 cyclic extension existence (Phase 4 完成)
 -- N, m > 0, a ∈ N, σ ∈ Aut(N) で σ a = a かつ σ^m = MulAut.conj a
 --   ⇒ ∃ G ⊇ N (N ⊴ G), G/N cyclic of order m, generator g, g^m = a, x^g = σ x.
