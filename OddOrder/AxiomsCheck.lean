@@ -3426,6 +3426,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.gridFamily_orthonormal
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.symm_orthonormal_family
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.two_col_orthonormal_family
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.two_col_orthonormal_family_reindexed
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_isSignedTripleGrid
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_existsUnique_common
 -- BG Theorem 3.5 (algebraically closed core): a Frobenius group `G = KR` with solvable kernel `K`
@@ -3436,4 +3437,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_colCommon
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_rowCommon
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_of_decomposition
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_symm
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_two_col
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_transpose
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily

@@ -2023,6 +2023,46 @@ theorem two_col_orthonormal_family [Fintype ι] (hG : IsSignedTripleGrid A)
   · subst hab; exact hdiag a
   · exact hoff a b hab
 
+open scoped Classical in
+/-- **(3.5.5) two-column family, reindexed to `κ`** (the `w₂ = 3` shape, in the
+`symm_orthonormal_family` interface): when there are exactly two columns (`Fintype.card κ = 2`) with
+column-commons `z j` (`z j ∈ A i j` for every row `i`), the `Bool`-indexed
+`two_col_orthonormal_family` is reindexed back to `κ` via a bijection `Bool ≃ κ`, yielding row-anchors
+`w i` (the per-row meet of the two cells), interior thirds `φ i j`, cells `A i j = {z j, w i, φ i j}`,
+and an orthonormal `gridFamily z w φ` over `ι ⊕ κ ⊕ ι × κ`.  This lets the `w₂ = 3` and transpose
+`w₁ = 3` orientations of (3.5) share the `κ`-indexed χ-assembly. -/
+theorem two_col_orthonormal_family_reindexed [Fintype ι] [Fintype κ] (hG : IsSignedTripleGrid A)
+    (hι : 4 ≤ Fintype.card ι) (hκ2 : Fintype.card κ = 2)
+    {z : κ → ClassFunction G ℂ} (hz : ∀ j i, z j ∈ A i j) :
+    ∃ (w : ι → ClassFunction G ℂ) (φ : ι → κ → ClassFunction G ℂ),
+      (∀ i j, A i j = {z j, w i, φ i j}) ∧
+      ∀ a b, ClassFunction.inner (gridFamily z w φ a) (gridFamily z w φ b)
+        = if a = b then 1 else 0 := by
+  classical
+  -- `κ` has exactly two elements, so fix a bijection `e : Bool ≃ κ`
+  have hbc : Fintype.card Bool = Fintype.card κ := by rw [Fintype.card_bool, hκ2]
+  let e : Bool ≃ κ := Fintype.equivOfCardEq hbc
+  obtain ⟨m, ψ, hcell, _hmem, hortho⟩ := hG.two_col_orthonormal_family hι (j := ⇑e)
+    e.injective (z := fun b => z (e b)) (fun b i => hz (e b) i)
+  refine ⟨m, fun i j => ψ i (e.symm j), ?_, ?_⟩
+  · intro i j
+    have h := hcell i (e.symm j)
+    rwa [Equiv.apply_symm_apply] at h
+  · -- transport orthonormality along the reindex equiv `E : ι ⊕ κ ⊕ ι×κ ≃ ι ⊕ Bool ⊕ ι×Bool`
+    let E : ι ⊕ κ ⊕ ι × κ ≃ ι ⊕ Bool ⊕ ι × Bool :=
+      Equiv.sumCongr (Equiv.refl ι) (Equiv.sumCongr e.symm (Equiv.prodCongr (Equiv.refl ι) e.symm))
+    have hgfeq : ∀ a, gridFamily z m (fun i j => ψ i (e.symm j)) a
+        = gridFamily (fun b => z (e b)) m ψ (E a) := by
+      rintro (i | j | ⟨i, j⟩)
+      · rfl
+      · show z j = z (e (e.symm j)); rw [Equiv.apply_symm_apply]
+      · rfl
+    intro a b
+    rw [hgfeq a, hgfeq b]
+    split_ifs with hab
+    · subst hab; rw [hortho (E a) (E a), if_pos rfl]
+    · rw [hortho (E a) (E b), if_neg (fun h => hab (E.injective h))]
+
 end IsSignedTripleGrid
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
@@ -2390,18 +2430,27 @@ theorem exists_rowCommon (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   exact ⟨w, hw⟩
 
 open scoped Classical in
-/-- **Peterfalvi (3.5)**, symmetric case `w₁, w₂ ≥ 5`: there is an orthonormal family `(χ_{ij})`
-indexed by `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G` and
-`Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Assembled from the (3.5.5)
-orthonormal `gridFamily` on `Afam` (column-commons `z`, row-commons `w`, interior thirds `φ`):
-`χ_{i0} = -w`, `χ_{0j} = -z`, `χ_{ij} = φ`, `χ_{00} = 1_G`.  The orthonormality lifts the
-`gridFamily` one (`symm_orthonormal_family`) by negating individual members (sign-invariant) and
-adjoining `1_G` (orthogonal to the signed nontrivial irreducibles, `inner_trivial`); the `Ind`
-relation is the cell sum `β_{ij} = z + w + φ` (`IsSignedTriple.sum_eq`). -/
-theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+/-- **(3.5) χ-assembly** (case-independent core): given the `(3.5.5)` cell decomposition of the
+`Afam` grid into column-anchors `z`, row-anchors `w`, and interior thirds `φ`
+(`A_{pq} = {z q, w p, φ p q}`) together with the orthonormality of `gridFamily z w φ`, build the
+family `(χ_{pq})` over `Ĉ₁ × Ĉ₂` of (3.5): `χ_{00} = 1_G`, `χ_{p0} = -w p`, `χ_{0q} = -z q`,
+`χ_{pq} = φ p q`.  It is orthonormal, lies in `ZIrr`, and satisfies
+`Ind α_{pq} = 1_G - χ_{p0} - χ_{0q} + χ_{pq}`.  The three orientations of (3.5)
+(`w₂ ≥ 5` symmetric, `w₂ = 3`, and the transpose `w₁ = 3`) differ only in how `(z, w, φ)` is
+produced; the orthonormality lift (negating individual members, adjoining `1_G ⊥` signed) and the
+`Ind` relation (cell sum `β = z + w + φ`) are shared here. -/
+theorem exists_chiFamily_of_decomposition (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
-    (hw1 : 5 ≤ Nat.card hyp.W1) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    {z : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} → ClassFunction G ℂ}
+    {w : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} → ClassFunction G ℂ}
+    {φ : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} →
+        {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} → ClassFunction G ℂ}
+    (hcells : ∀ p q, hyp.Afam hVeq app p q = {z q, w p, φ p q})
+    (hdiag0 : ∀ a, ClassFunction.inner
+        (IsSignedTripleGrid.gridFamily z w φ a) (IsSignedTripleGrid.gridFamily z w φ a) = 1)
+    (hoff0 : ∀ a b, a ≠ b → ClassFunction.inner
+        (IsSignedTripleGrid.gridFamily z w φ a) (IsSignedTripleGrid.gridFamily z w φ b) = 0) :
     ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
         ClassFunction G ℂ,
       χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
@@ -2413,29 +2462,39 @@ theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   haveI : Finite G := Finite.of_fintype G
   haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
   haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
-  obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
-  obtain ⟨w, hw⟩ := hyp.exists_rowCommon hVeq app hw2
-  have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
-    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
-      hyp.card_charGroup_subgroupOf hyp.W1_le_W]; omega
-  have hκ : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
-    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
-      hyp.card_charGroup_subgroupOf hyp.W2_le_W]; omega
+  haveI : Nonempty {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    rw [← Fintype.card_pos_iff, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
+      ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+    have hgt : 1 < Nat.card hyp.W1 := Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+    omega
+  haveI : Nonempty {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [← Fintype.card_pos_iff, Fintype.card_subtype_compl, Fintype.card_subtype_eq,
+      ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+    have hgt : 1 < Nat.card hyp.W2 := Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+    omega
   have hgrid := hyp.Afam_isSignedTripleGrid hVeq app
-  obtain ⟨φ, hcells, hortho⟩ := hgrid.symm_orthonormal_family hι hκ hz hw
-  haveI : Nonempty {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} :=
-    Fintype.card_pos_iff.mp (by omega)
-  haveI : Nonempty {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} :=
-    Fintype.card_pos_iff.mp (by omega)
-  -- every interior member, column-common, and row-common is a signed nontrivial irreducible
-  have hsigw : ∀ p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}, IsSignedNontrivialIrr (w p) :=
-    fun p => hgrid.signed _ (Classical.arbitrary _) _ (hw p (Classical.arbitrary _))
-  have hsigz : ∀ q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}, IsSignedNontrivialIrr (z q) :=
-    fun q => hgrid.signed (Classical.arbitrary _) _ _ (hz q (Classical.arbitrary _))
-  have hsigφ : ∀ p q, IsSignedNontrivialIrr (φ p q) := fun p q => by
-    refine hgrid.signed p q _ ?_
-    rw [hcells]
-    exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  -- every column-anchor, row-anchor, and interior third is a signed nontrivial irreducible
+  have hsigw : ∀ p, IsSignedNontrivialIrr (w p) := fun p =>
+    hgrid.signed p (Classical.arbitrary _) _ (by
+      rw [hcells p (Classical.arbitrary _)]
+      exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _))
+  have hsigz : ∀ q, IsSignedNontrivialIrr (z q) := fun q =>
+    hgrid.signed (Classical.arbitrary _) q _ (by
+      rw [hcells (Classical.arbitrary _) q]; exact Finset.mem_insert_self _ _)
+  have hsigφ : ∀ p q, IsSignedNontrivialIrr (φ p q) := fun p q =>
+    hgrid.signed p q _ (by
+      rw [hcells p q]
+      exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _)))
+  -- repackage the `gridFamily` orthonormality as a single `ite`, elaborated here (concrete index)
+  -- so the assembly's `if_neg` rewrites use the matching `Decidable` instance
+  have hortho : ∀ a b, ClassFunction.inner
+      (IsSignedTripleGrid.gridFamily z w φ a) (IsSignedTripleGrid.gridFamily z w φ b)
+      = if a = b then 1 else 0 := fun a b => by
+    split_ifs with h
+    · subst h; exact hdiag0 a
+    · exact hoff0 a b h
   -- abbreviations for the four χ-values
   set χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
       ClassFunction G ℂ := fun pq => if hp : pq.1 = 1 then
@@ -2540,6 +2599,195 @@ theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
         = app.tau.toDadeMap (hyp.alpha hVeq p q) - trivialClassFunction G from rfl, sub_add_cancel]
     rw [hind, hbeta, hχp1 p hp, hχ1q q hq, hχpq p q hp hq]
     abel
+
+open scoped Classical in
+/-- **Peterfalvi (3.5)**, symmetric case `w₁, w₂ ≥ 5`: there is an orthonormal family `(χ_{ij})`
+indexed by `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G` and
+`Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Assembled from the (3.5.5)
+orthonormal `gridFamily` on `Afam` (column-commons `z`, row-commons `w`, interior thirds `φ`):
+`χ_{i0} = -w`, `χ_{0j} = -z`, `χ_{ij} = φ`, `χ_{00} = 1_G`.  The orthonormality lifts the
+`gridFamily` one (`symm_orthonormal_family`) by negating individual members (sign-invariant) and
+adjoining `1_G` (orthogonal to the signed nontrivial irreducibles, `inner_trivial`); the `Ind`
+relation is the cell sum `β_{ij} = z + w + φ` (`IsSignedTriple.sum_eq`). -/
+theorem exists_chiFamily_symm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+        ClassFunction G ℂ,
+      χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (χ a) (χ b) = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
+  obtain ⟨w, hw⟩ := hyp.exists_rowCommon hVeq app hw2
+  have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W1_le_W]; omega
+  have hκ : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W2_le_W]; omega
+  obtain ⟨φ, hcells, hortho⟩ :=
+    (hyp.Afam_isSignedTripleGrid hVeq app).symm_orthonormal_family hι hκ hz hw
+  exact hyp.exists_chiFamily_of_decomposition hVeq app hcells
+    (fun a => by rw [hortho a a, if_pos rfl]) (fun a b h => by rw [hortho a b, if_neg h])
+
+open scoped Classical in
+/-- **Peterfalvi (3.5)**, two-column case `w₁ ≥ 5`, `w₂ = 3`: there is an orthonormal family
+`(χ_{ij})` over `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G` and
+`Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Here `W₂` has only two nontrivial
+characters, so the column-anchors `z` (from `exists_colCommon`, which needs `w₁ ≥ 5`) live over a
+two-element index; `two_col_orthonormal_family_reindexed` produces the per-row meets `w` and interior
+thirds `φ` with `A_{ij} = {z j, w i, φ i j}` and an orthonormal `gridFamily`, after which the χ-family
+is assembled by the shared `exists_chiFamily_of_decomposition`.  (This is the case Peterfalvi calls
+"complete" after (3.5.5).) -/
+theorem exists_chiFamily_two_col (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1) (hw2 : Nat.card hyp.W2 = 3) :
+    ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+        ClassFunction G ℂ,
+      χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (χ a) (χ b) = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨z, hz⟩ := hyp.exists_colCommon hVeq app hw1
+  have hι : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W1_le_W]; omega
+  have hκ2 : Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} = 2 := by
+    have h2 : Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}
+        = Nat.card hyp.W2 - 1 := by
+      rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+        hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+    omega
+  obtain ⟨w, φ, hcells, hortho⟩ :=
+    (hyp.Afam_isSignedTripleGrid hVeq app).two_col_orthonormal_family_reindexed hι hκ2 hz
+  exact hyp.exists_chiFamily_of_decomposition hVeq app hcells
+    (fun a => by rw [hortho a a, if_pos rfl]) (fun a b h => by rw [hortho a b, if_neg h])
+
+open scoped Classical in
+/-- **Peterfalvi (3.5)**, transpose case `w₁ = 3`, `w₂ ≥ 5`: the `W₁ ↔ W₂`-swapped counterpart of
+`exists_chiFamily_two_col`.  Now `W₁` has only two nontrivial characters, so we run the two-column
+construction on the **transposed** `Afam` grid (rows `= Ĉ₂` with `w₂ ≥ 5 ⟹ ≥ 4` rows, columns
+`= Ĉ₁` with `w₁ = 3 ⟹ 2` columns), whose column-commons are the original *row*-commons
+(`exists_rowCommon`, needs `w₂ ≥ 5`).  The transposed orthonormal `gridFamily` (over
+`Ĉ₂ ⊕ Ĉ₁ ⊕ Ĉ₂ × Ĉ₁`) is relabelled to the standard `Ĉ₁ ⊕ Ĉ₂ ⊕ Ĉ₁ × Ĉ₂` layout (swap the two
+anchors, transpose the interior product index) via the bijection `toT`, and the χ-family is then the
+shared `exists_chiFamily_of_decomposition` with column-anchor `= wMeet` (transposed row-meet) and
+row-anchor `= wRow` (original row-common). -/
+theorem exists_chiFamily_transpose (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : Nat.card hyp.W1 = 3) (hw2 : 5 ≤ Nat.card hyp.W2) :
+    ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+        ClassFunction G ℂ,
+      χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (χ a) (χ b) = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨wRow, hwRow⟩ := hyp.exists_rowCommon hVeq app hw2
+  have hκT : 4 ≤ Fintype.card {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      hyp.card_charGroup_subgroupOf hyp.W2_le_W]; omega
+  have hιT2 : Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} = 2 := by
+    have h2 : Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}
+        = Nat.card hyp.W1 - 1 := by
+      rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+        hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+    omega
+  obtain ⟨wMeet, φT, hcellsT, horthoT⟩ :=
+    (hyp.Afam_isSignedTripleGrid hVeq app).transpose.two_col_orthonormal_family_reindexed
+      hκT hιT2 (z := wRow) hwRow
+  -- the standard-layout decomposition: column-anchor `= wMeet`, row-anchor `= wRow`
+  have hcells : ∀ p q, hyp.Afam hVeq app p q = {wMeet q, wRow p, φT q p} := fun p q => by
+    rw [hcellsT q p, Finset.insert_comm]
+  -- relabel the transposed `gridFamily` layout to the standard one
+  let toT : ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ⊕
+        ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ⊕
+        ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ×
+          ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) →
+      ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ⊕
+        ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ⊕
+        ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ×
+          ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) := fun a => match a with
+    | Sum.inl p => Sum.inr (Sum.inl p)
+    | Sum.inr (Sum.inl q) => Sum.inl q
+    | Sum.inr (Sum.inr (p, q)) => Sum.inr (Sum.inr (q, p))
+  let fromT : ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ⊕
+        ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ⊕
+        ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ×
+          ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) →
+      ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ⊕
+        ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) ⊕
+        ({χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}) ×
+          ({χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) := fun a => match a with
+    | Sum.inl q => Sum.inr (Sum.inl q)
+    | Sum.inr (Sum.inl p) => Sum.inl p
+    | Sum.inr (Sum.inr (q, p)) => Sum.inr (Sum.inr (p, q))
+  have htoT_inj : Function.Injective toT :=
+    Function.LeftInverse.injective (g := fromT) (by rintro (p | q | ⟨p, q⟩) <;> rfl)
+  have hgfeq : ∀ a, IsSignedTripleGrid.gridFamily wMeet wRow (fun p q => φT q p) a
+      = IsSignedTripleGrid.gridFamily wRow wMeet φT (toT a) := by
+    rintro (p | q | ⟨p, q⟩) <;> rfl
+  exact hyp.exists_chiFamily_of_decomposition hVeq app (z := wMeet) (w := wRow)
+    (φ := fun p q => φT q p) hcells
+    (fun a => by rw [hgfeq a, horthoT (toT a) (toT a), if_pos rfl])
+    (fun a b h => by rw [hgfeq a, hgfeq b, horthoT (toT a) (toT b),
+      if_neg (fun hh => h (htoT_inj hh))])
+
+open scoped Classical in
+/-- **Peterfalvi (3.5)** (full): for any admissible `W = W₁ × W₂` there is an orthonormal family
+`(χ_{ij})` indexed by `Ĉ₁ × Ĉ₂ = Irr(W)` of virtual characters with `χ_{00} = 1_G`, all `χ_{ij} ∈
+ZIrr G`, and `Ind_W^G α_{ij} = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` for `i, j ≥ 1`.  Since `|W₁|, |W₂|` are
+odd `> 1` (so `∈ {3, 5, 7, …}`) and `max(|W₁|, |W₂|) ≥ 5` (`sup_card_ge_five`), the three orientations
+cover every case: `w₁, w₂ ≥ 5` (`exists_chiFamily_symm`), `w₁ ≥ 5 ∧ w₂ = 3`
+(`exists_chiFamily_two_col`), and `w₁ = 3 ∧ w₂ ≥ 5` (`exists_chiFamily_transpose`). -/
+theorem exists_chiFamily (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ∃ χ : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) →
+        ClassFunction G ℂ,
+      χ (1, 1) = trivialClassFunction G ∧ (∀ pq, χ pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (χ a) (χ b) = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - χ (p, 1) - χ (1, q) + χ (p, q) := by
+  haveI : Finite G := Finite.of_fintype G
+  have hodd1 : Odd (Nat.card hyp.W1) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+  have hodd2 : Odd (Nat.card hyp.W2) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+  have hgt1 : 1 < Nat.card hyp.W1 := Finite.one_lt_card_iff_nontrivial.mpr
+    ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+  have hgt2 : 1 < Nat.card hyp.W2 := Finite.one_lt_card_iff_nontrivial.mpr
+    ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+  rcases hyp.sup_card_ge_five with hw1 | hw2
+  · -- `w₁ ≥ 5`: split on `w₂ = 3` vs `w₂ ≥ 5` (odd `> 1`)
+    obtain ⟨k, hk⟩ := hodd2
+    rcases (by omega : Nat.card hyp.W2 = 3 ∨ 5 ≤ Nat.card hyp.W2) with h3 | h5
+    · exact hyp.exists_chiFamily_two_col hVeq app hw1 h3
+    · exact hyp.exists_chiFamily_symm hVeq app hw1 h5
+  · -- `w₂ ≥ 5`: either `w₁ ≥ 5` (symmetric) or `w₁ = 3` (transpose)
+    by_cases hw1 : 5 ≤ Nat.card hyp.W1
+    · exact hyp.exists_chiFamily_symm hVeq app hw1 hw2
+    · obtain ⟨k, hk⟩ := hodd1
+      exact hyp.exists_chiFamily_transpose hVeq app (by omega) hw2
 
 end TICyclicHypothesis
 
