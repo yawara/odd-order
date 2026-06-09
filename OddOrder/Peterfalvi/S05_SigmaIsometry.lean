@@ -612,6 +612,80 @@ theorem IsSignedTriple.O_card_inter_eq [Invertible (Nat.card G : ℂ)]
     sub_eq_zero.mp key.symm
   exact_mod_cast hpm
 
+/- 3.5.4: the grid of signed triples and the sunflower lemma `|⋂_i A_{i1}| = 1` -/
+
+open scoped Classical in
+/-- An abstract *grid of signed triples*: a family `A i j` (rows `i : ι`, columns `j : κ`) of
+signed-triple sets satisfying the Peterfalvi relations.  `card_eq_three`/`signed`/`orthogonal` are
+the per-cell `IsSignedTriple` data; `inter_L`/`noNeg_L` are `L(ij,i'j')` (index pairs sharing
+exactly one coordinate) and `inter_O` is `O(ij,i'j')` (both coordinates differing).  This is the
+data the (3.5.4) sunflower argument consumes; the concrete `β`-family `Afam` is an instance
+(`Afam_isSignedTripleGrid`). -/
+structure IsSignedTripleGrid [Invertible (Nat.card G : ℂ)] {ι κ : Type*}
+    (A : ι → κ → Finset (ClassFunction G ℂ)) : Prop where
+  card_eq_three : ∀ i j, (A i j).card = 3
+  signed : ∀ i j, ∀ x ∈ A i j, IsSignedNontrivialIrr x
+  orthogonal : ∀ i j, ∀ x ∈ A i j, ∀ y ∈ A i j, x ≠ y → ClassFunction.inner x y = 0
+  inter_L : ∀ (i i' : ι) (j j' : κ), (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j') →
+    (A i j ∩ A i' j').card = 1
+  noNeg_L : ∀ (i i' : ι) (j j' : κ), (i = i' ∧ j ≠ j') ∨ (i ≠ i' ∧ j = j') →
+    ∀ x ∈ A i j, -x ∉ A i' j'
+  inter_O : ∀ (i i' : ι) (j j' : κ), i ≠ i' → j ≠ j' →
+    (A i j ∩ A i' j').card = ((A i j).filter (fun x => -x ∈ A i' j')).card
+
+namespace IsSignedTripleGrid
+
+variable [Invertible (Nat.card G : ℂ)] {ι κ : Type*} {A : ι → κ → Finset (ClassFunction G ℂ)}
+
+/-- In a single cell `A i j`, the negative of a member is not a member (it is a signed triple). -/
+theorem neg_not_mem_self (hG : IsSignedTripleGrid A) {i : ι} {j : κ} {x : ClassFunction G ℂ}
+    (hx : x ∈ A i j) : -x ∉ A i j := by
+  intro hnx
+  have hxsig := hG.signed i j x hx
+  have h0 := hG.orthogonal i j x hx (-x) hnx (fun h => hxsig.ne_neg_self h)
+  rw [ClassFunction.inner_neg_right, hxsig.inner_self] at h0
+  exact one_ne_zero (neg_eq_zero.mp h0)
+
+/-- **Uniqueness half of (3.5.4)**: for a fixed column `j₀`, at most one element lies in every
+`A i j₀` (two such would both lie in `A i₁ j₀ ∩ A i₂ j₀`, a singleton by `L`). -/
+theorem common_unique [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 2 ≤ Fintype.card ι) {j₀ : κ}
+    {z z' : ClassFunction G ℂ} (hz : ∀ i, z ∈ A i j₀) (hz' : ∀ i, z' ∈ A i j₀) : z = z' := by
+  classical
+  haveI : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+  obtain ⟨i₁, i₂, h12⟩ := exists_pair_ne ι
+  have hcard : (A i₁ j₀ ∩ A i₂ j₀).card = 1 := hG.inter_L i₁ i₂ j₀ j₀ (Or.inr ⟨h12, rfl⟩)
+  have hle := Finset.card_le_one.mp (le_of_eq hcard)
+  exact hle z (Finset.mem_inter.mpr ⟨hz i₁, hz i₂⟩) z' (Finset.mem_inter.mpr ⟨hz' i₁, hz' i₂⟩)
+
+/-- **(3.5.4) reduction**: if no element is common to every `A i j₀` (the negation of (3.5.4)),
+then three rows `i₁, i₂, i₃` have *no* common element — a "triangle" (their three pairwise
+intersection elements are then forced distinct).  Pick distinct `i₁, i₂` with common element `z`
+(unique by `L`); since `z` is not common to all rows there is `i₃` with `z ∉ A i₃ j₀`; the triple
+`{i₁, i₂, i₃}` then shares no element (a common `w` would equal `z ∉ A i₃ j₀`). -/
+theorem exists_triangle_of_not_exists_common [Fintype ι] (hG : IsSignedTripleGrid A)
+    (hι : 2 ≤ Fintype.card ι) (j₀ : κ) (hno : ¬ ∃ z, ∀ i, z ∈ A i j₀) :
+    ∃ i₁ i₂ i₃ : ι, i₁ ≠ i₂ ∧ i₁ ≠ i₃ ∧ i₂ ≠ i₃ ∧
+      ¬ ∃ w, w ∈ A i₁ j₀ ∧ w ∈ A i₂ j₀ ∧ w ∈ A i₃ j₀ := by
+  classical
+  haveI : Nontrivial ι := Fintype.one_lt_card_iff_nontrivial.mp (by omega)
+  obtain ⟨i₁, i₂, h12⟩ := exists_pair_ne ι
+  have hcard : (A i₁ j₀ ∩ A i₂ j₀).card = 1 := hG.inter_L i₁ i₂ j₀ j₀ (Or.inr ⟨h12, rfl⟩)
+  obtain ⟨z, hz⟩ := Finset.card_eq_one.mp hcard
+  have hzmem : z ∈ A i₁ j₀ ∩ A i₂ j₀ := hz ▸ Finset.mem_singleton_self z
+  obtain ⟨hz1, hz2⟩ := Finset.mem_inter.mp hzmem
+  -- some row misses `z`, else `z` is common.
+  obtain ⟨i₃, hz3⟩ : ∃ i₃, z ∉ A i₃ j₀ := by
+    by_contra hcon
+    exact hno ⟨z, fun i => not_not.mp (fun h => hcon ⟨i, h⟩)⟩
+  refine ⟨i₁, i₂, i₃, h12, ?_, ?_, ?_⟩
+  · rintro rfl; exact hz3 hz1
+  · rintro rfl; exact hz3 hz2
+  · rintro ⟨w, hw1, hw2, hw3⟩
+    have hle := Finset.card_le_one.mp (le_of_eq hcard)
+    exact hz3 ((hle w (Finset.mem_inter.mpr ⟨hw1, hw2⟩) z hzmem) ▸ hw3)
+
+end IsSignedTripleGrid
+
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
 
 namespace TICyclicHypothesis
@@ -878,6 +952,21 @@ theorem Afam_O (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   (hyp.Afam_isSignedTriple hVeq app p q).O_card_inter_eq (hyp.Afam_isSignedTriple hVeq app p' q')
     (hyp.beta_inner_eq_zero_of_both_diff hVeq app p.2 q.2 p'.2 q'.2
       (fun h => hp (Subtype.ext h)) (fun h => hq (Subtype.ext h)))
+
+/-- The fixed family `Afam` is a signed-triple grid (`IsSignedTripleGrid`), indexed by nontrivial
+linear characters of `W₁` (rows) and `W₂` (columns).  Bundles `Afam_isSignedTriple`/`Afam_L`/
+`Afam_O` so the abstract (3.5.4) sunflower argument applies to the `β`-family. -/
+theorem Afam_isSignedTripleGrid (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp) :
+    IsSignedTripleGrid (fun (p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1})
+      (q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) => hyp.Afam hVeq app p q) where
+  card_eq_three p q := (hyp.Afam_isSignedTriple hVeq app p q).card_eq_three
+  signed p q := (hyp.Afam_isSignedTriple hVeq app p q).signed
+  orthogonal p q := (hyp.Afam_isSignedTriple hVeq app p q).pairwise_orthogonal
+  inter_L _ _ _ _ hshared := (hyp.Afam_L hVeq app hshared).1
+  noNeg_L _ _ _ _ hshared := (hyp.Afam_L hVeq app hshared).2
+  inter_O _ _ _ _ hp hq := hyp.Afam_O hVeq app hp hq
 
 end TICyclicHypothesis
 
