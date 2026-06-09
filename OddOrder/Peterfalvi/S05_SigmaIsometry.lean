@@ -2851,6 +2851,97 @@ theorem exists_chiFamily (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     · obtain ⟨k, hk⟩ := hodd1
       exact hyp.exists_chiFamily_transpose hVeq app (by omega) hw2
 
+/-! ### The index bridge `Ĉ₁ × Ĉ₂ ≃ Irr(W)` for `σ`
+
+The `χ`-family of (3.5) is indexed by `Ĉ₁ × Ĉ₂ = Hom(W₁) × Hom(W₂)`; the isometry `σ` is defined on
+the basis `Irr(W)` of `CF(W)`.  These are identified via the product-character bijection
+(`omegaProdChar` is bijective because `W = W₁ × W₂` is an internal direct product) followed by
+`omegaEquiv : Hom(W, ℂˣ) ≃ Irr(W)`. -/
+
+/-- **`omegaProdChar` is surjective**: every linear character `ξ : W →* ℂˣ` equals `ω_{i0}·ω_{0j}`
+for the restrictions `χ_k = ξ|_{W_k}`.  With `omegaProdChar_inj` this makes the product map a
+bijection.  Uses the internal direct product reconstruction `w = wProj1 w · wProj2 w`. -/
+theorem omegaProdChar_surjective (hyp : TICyclicHypothesis G) :
+    Function.Surjective fun p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) ×
+      ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) => hyp.omegaProdChar p.1 p.2 := by
+  intro ξ
+  refine ⟨(ξ.comp (hyp.W1.subgroupOf hyp.W).subtype, ξ.comp (hyp.W2.subgroupOf hyp.W).subtype), ?_⟩
+  ext w
+  simp only [omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
+  rw [← map_mul]
+  congr 1
+  have e1 : (↑(hyp.wFst w) : hyp.W) = hyp.wProj1 w := by rw [wProj1_apply, wFst_apply]
+  have e2 : (↑(hyp.wSnd w) : hyp.W) = hyp.wProj2 w := by rw [wProj2_apply, wSnd_apply]
+  rw [e1, e2, wProj1_mul_wProj2]
+
+/-- The product-character bijection `Ĉ₁ × Ĉ₂ ≃ (W →* ℂˣ)` (`omegaProdChar`, injective + surjective).
+-/
+noncomputable def omegaProdEquiv (hyp : TICyclicHypothesis G) :
+    (((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ≃ (hyp.W →* ℂˣ) :=
+  Equiv.ofBijective (fun p => hyp.omegaProdChar p.1 p.2)
+    ⟨fun _ _ h => Prod.ext (hyp.omegaProdChar_inj h).1 (hyp.omegaProdChar_inj h).2,
+      hyp.omegaProdChar_surjective⟩
+
+@[simp] theorem omegaProdEquiv_apply (hyp : TICyclicHypothesis G)
+    (p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.omegaProdEquiv p = hyp.omegaProdChar p.1 p.2 := rfl
+
+/-- **(3.3) index bridge** `Ĉ₁ × Ĉ₂ ≃ Irr(W)`: the product-character bijection composed with
+`omegaEquiv`.  Its inverse turns an irreducible character of `W` into the index pair at which the
+(3.5) `χ`-family is evaluated, so `σ` can be defined on the `Irr(W)`-basis. -/
+noncomputable def omegaIrrEquiv (hyp : TICyclicHypothesis G) :
+    (((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ≃
+      IrreducibleCharacter hyp.W :=
+  hyp.omegaProdEquiv.trans hyp.omegaEquiv
+
+@[simp] theorem omegaIrrEquiv_apply (hyp : TICyclicHypothesis G)
+    (p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.omegaIrrEquiv p = hyp.omega (hyp.omegaProdChar p.1 p.2) := rfl
+
+/-! ### The isometry `σ` of Theorem (3.2) -/
+
+/-- A fixed choice of the `(3.5)` orthonormal family `(χ_{ij})` (indexed by `Ĉ₁ × Ĉ₂`), extracted
+from `exists_chiFamily`.  `σ` is built from this. -/
+noncomputable def chiFam (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) → ClassFunction G ℂ :=
+  (hyp.exists_chiFamily hVeq app).choose
+
+open scoped Classical in
+theorem chiFam_spec (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    hyp.chiFam hVeq app (1, 1) = trivialClassFunction G ∧
+      (∀ pq, hyp.chiFam hVeq app pq ∈ ZIrr G) ∧
+      (∀ a b, ClassFunction.inner (hyp.chiFam hVeq app a) (hyp.chiFam hVeq app b)
+        = if a = b then 1 else 0) ∧
+      ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+        p ≠ 1 → q ≠ 1 → app.tau.toDadeMap (hyp.alpha hVeq p q)
+          = trivialClassFunction G - hyp.chiFam hVeq app (p, 1) - hyp.chiFam hVeq app (1, q)
+            + hyp.chiFam hVeq app (p, q) :=
+  (hyp.exists_chiFamily hVeq app).choose_spec
+
+/-- **Peterfalvi (3.2)**, the map: the linear `σ : CF(W) → CF(G)` defined by `ω^σ = χ` on the
+basis `Irr(W)` (`(3.3)`) via the chosen `(3.5)` family (`Module.Basis.constr`).  Linearity is
+automatic; the isometry property and (a)-(d) are proved separately. -/
+noncomputable def sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ :=
+  (irreducibleCharacterBasis (G := hyp.W)).constr ℂ
+    fun ω => hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω)
+
+/-- The defining property of `σ` on the basis `Irr(W)`: `ω^σ = χ` at the matching index pair. -/
+theorem sigma_irreducibleCharacter (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) :
+    hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω) := by
+  conv_lhs => rw [← irreducibleCharacterBasis_apply (G := hyp.W) ω]
+  exact (irreducibleCharacterBasis (G := hyp.W)).constr_basis ℂ _ ω
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
