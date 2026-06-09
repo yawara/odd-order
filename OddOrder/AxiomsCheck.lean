@@ -3404,3 +3404,5 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_two_col
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily_transpose
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_chiFamily
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.classFunction_span_irreducibleCharacter_eq_top
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.irreducibleCharacterBasis
