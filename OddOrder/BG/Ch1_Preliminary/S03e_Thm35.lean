@@ -767,6 +767,166 @@ theorem iSupIndep_weightSpace (ρ : Representation F G W) {K' : Subgroup G}
   intro χ
   exact iInf_mono (fun _ => Module.End.eigenspace_le_maxGenEigenspace)
 
+/-- **Irreducibility ⟹ transitivity on weights** (Clifford's transitivity, weight-space form).
+If `ρ` restricted to `H` is irreducible and the weight spaces are independent, then `H` acts
+transitively (by conjugation of characters) on the set of weights: any two characters `χ₁, χ₂` with
+nonzero weight spaces are `H`-conjugate.
+
+Proof: the sum `V = ⨆_{χ ∈ H·χ₁} weightSpace χ` over the `H`-orbit of `χ₁` is `H`-invariant
+(`map_weightSpace`, `conjChar_mul`), hence a subrepresentation; it is nonzero (`χ₁`'s weight space),
+so by irreducibility it is `⊤`.  Then `weightSpace χ₂ ≤ ⊤ = V`; were `χ₂` outside the orbit,
+independence (`iSupIndep`) would force `weightSpace χ₂ = ⊥`, contradicting `h₂`. -/
+theorem exists_conjChar_eq_of_irreducible (ρ : Representation F G W) {H K' : Subgroup G}
+    [K'.Normal] (hHirr : Representation.IsIrreducible (ρ.comp H.subtype))
+    (hindep : iSupIndep (weightSpace ρ K'))
+    {χ₁ χ₂ : ↥K' → F} (h₁ : weightSpace ρ K' χ₁ ≠ ⊥) (h₂ : weightSpace ρ K' χ₂ ≠ ⊥) :
+    ∃ h : ↥H, conjChar K' (h : G) χ₁ = χ₂ := by
+  classical
+  haveI := hHirr
+  set O : Set (↥K' → F) := {χ | ∃ h : ↥H, conjChar K' (h : G) χ₁ = χ} with hO
+  set V : Submodule F W := ⨆ χ ∈ O, weightSpace ρ K' χ with hV
+  have hmemO : ∀ χ, χ ∈ O → weightSpace ρ K' χ ≤ V :=
+    fun χ hχ => le_iSup₂ (f := fun χ (_ : χ ∈ O) => weightSpace ρ K' χ) χ hχ
+  -- `V` is `H`-invariant.
+  have hVinv : ∀ h : ↥H, V.map (ρ (h : G)) ≤ V := by
+    intro h
+    rw [hV, Submodule.map_iSup]
+    refine iSup_le (fun χ => ?_)
+    rw [Submodule.map_iSup]
+    refine iSup_le (fun hχ => ?_)
+    rw [map_weightSpace]
+    obtain ⟨h', hh'⟩ := hχ
+    refine hmemO (conjChar K' (h : G) χ) ⟨h * h', ?_⟩
+    rw [Subgroup.coe_mul, conjChar_mul, hh']
+  -- `V` carries a subrepresentation of `ρ|_H`.
+  let Vsub : Subrepresentation (ρ.comp H.subtype) :=
+    { toSubmodule := V
+      apply_mem_toSubmodule := fun h v hv => hVinv h (Submodule.mem_map_of_mem hv) }
+  -- `χ₁ ∈ O`, so `V ≠ ⊥`.
+  have hχ₁O : χ₁ ∈ O := ⟨1, by rw [OneMemClass.coe_one, conjChar_one]⟩
+  have hVne : V ≠ ⊥ := fun hbot => h₁ (le_bot_iff.mp (hbot ▸ hmemO χ₁ hχ₁O))
+  -- irreducibility forces `V = ⊤`.
+  have hVtop : V = ⊤ := by
+    rcases IsSimpleOrder.eq_bot_or_eq_top Vsub with hb | ht
+    · exact absurd (congrArg Subrepresentation.toSubmodule hb) hVne
+    · exact congrArg Subrepresentation.toSubmodule ht
+  -- `χ₂ ∈ O`.
+  by_contra hχ₂
+  push_neg at hχ₂
+  have hle : weightSpace ρ K' χ₂ ≤ ⨆ j, ⨆ _ : j ≠ χ₂, weightSpace ρ K' j := by
+    calc weightSpace ρ K' χ₂ ≤ V := le_top.trans_eq hVtop.symm
+      _ = ⨆ χ ∈ O, weightSpace ρ K' χ := hV
+      _ ≤ ⨆ j, ⨆ _ : j ≠ χ₂, weightSpace ρ K' j := by
+          refine iSup₂_mono' (fun χ hχ => ⟨χ, ?_, le_rfl⟩)
+          obtain ⟨h, hh⟩ := hχ
+          exact fun heq => hχ₂ h (heq ▸ hh)
+  exact h₂ ((hindep χ₂).eq_bot_of_le hle)
+
+/-- **(O) orbit count contradiction** (NONISO branch of step 9).  Suppose `ρ` is irreducible both
+over `K` and over `K' ⊔ R`, `K'` is abelian and normal, `|K|` and `|R|` are coprime, and there are
+**two distinct weights** `χ₁ ≠ χ₂` (the NONISO data `M'ˣ ≇ M'`).  This is impossible.
+
+Both `K` and `R` act transitively on the (finite) weight set `Ω`
+(`exists_conjChar_eq_of_irreducible`; for `R` the transitivity is inherited from `K' ⊔ R` because
+`K'` acts trivially on characters, `K'` being abelian).  Hence `|Ω|` — the common orbit size —
+divides both `|K|` and `|R|`, so divides `gcd(|K|, |R|) = 1`; but `χ₁ ≠ χ₂` forces `|Ω| ≥ 2`. -/
+theorem false_of_two_weights (ρ : Representation F G W) [FiniteDimensional F W] [Finite G]
+    {K K' R : Subgroup G} [K'.Normal]
+    (hcomm : ∀ a b : ↥K', (a : G) * (b : G) = (b : G) * (a : G))
+    (hKirr : Representation.IsIrreducible (ρ.comp K.subtype))
+    (hKRirr : Representation.IsIrreducible (ρ.comp (K' ⊔ R).subtype))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R))
+    {χ₁ χ₂ : ↥K' → F}
+    (h₁ : weightSpace ρ K' χ₁ ≠ ⊥) (h₂ : weightSpace ρ K' χ₂ ≠ ⊥) (hne : χ₁ ≠ χ₂) :
+    False := by
+  classical
+  have hindep := iSupIndep_weightSpace ρ hcomm
+  -- conjugation preserves "being a weight".
+  have hconj_wt : ∀ (g : G) (χ : ↥K' → F),
+      weightSpace ρ K' χ ≠ ⊥ → weightSpace ρ K' (conjChar K' g χ) ≠ ⊥ := by
+    intro g χ hχ
+    rw [← map_weightSpace ρ g χ]
+    intro hbot
+    refine hχ (eq_bot_iff.mpr fun v hv => ?_)
+    have hmem : ρ g v ∈ (weightSpace ρ K' χ).map (ρ g) := Submodule.mem_map_of_mem hv
+    rw [hbot, Submodule.mem_bot] at hmem
+    rw [Submodule.mem_bot]
+    exact (ρ.apply_bijective g).injective (by rw [hmem, map_zero])
+  -- `K'` acts trivially on characters (abelian).
+  have hK'triv : ∀ (k' : G), k' ∈ K' → ∀ χ : ↥K' → F, conjChar K' k' χ = χ := by
+    intro k' hk' χ
+    funext k''
+    simp only [conjChar]
+    congr 1
+    apply Subtype.ext
+    rw [OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe, inv_inv]
+    have hc := hcomm k'' ⟨k', hk'⟩
+    rw [mul_assoc, hc, ← mul_assoc, inv_mul_cancel, one_mul]
+  -- MulActions of `↥K` and `↥R` on characters via conjugation.
+  letI actK : MulAction ↥K (↥K' → F) :=
+    { smul := fun k χ => conjChar K' (k : G) χ
+      one_smul := fun χ => by
+        show conjChar K' ((1 : ↥K) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
+      mul_smul := fun a b χ => by
+        show conjChar K' ((a * b : ↥K) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
+        rw [Subgroup.coe_mul, conjChar_mul] }
+  letI actR : MulAction ↥R (↥K' → F) :=
+    { smul := fun r χ => conjChar K' (r : G) χ
+      one_smul := fun χ => by
+        show conjChar K' ((1 : ↥R) : G) χ = χ; rw [OneMemClass.coe_one, conjChar_one]
+      mul_smul := fun a b χ => by
+        show conjChar K' ((a * b : ↥R) : G) χ = conjChar K' (a : G) (conjChar K' (b : G) χ)
+        rw [Subgroup.coe_mul, conjChar_mul] }
+  have hsmulK : ∀ (k : ↥K) (χ : ↥K' → F), k • χ = conjChar K' (k : G) χ := fun _ _ => rfl
+  have hsmulR : ∀ (r : ↥R) (χ : ↥K' → F), r • χ = conjChar K' (r : G) χ := fun _ _ => rfl
+  set Ω : Set (↥K' → F) := {χ | weightSpace ρ K' χ ≠ ⊥} with hΩ
+  -- both orbits of `χ₁` equal `Ω`.
+  have horbK : MulAction.orbit ↥K χ₁ = Ω := by
+    ext χ
+    rw [MulAction.mem_orbit_iff]
+    constructor
+    · rintro ⟨k, rfl⟩
+      show weightSpace ρ K' (k • χ₁) ≠ ⊥
+      rw [hsmulK]; exact hconj_wt (k : G) χ₁ h₁
+    · intro hχ
+      obtain ⟨k, hk⟩ := exists_conjChar_eq_of_irreducible ρ hKirr hindep h₁ hχ
+      exact ⟨k, by rw [hsmulK]; exact hk⟩
+  have horbR : MulAction.orbit ↥R χ₁ = Ω := by
+    ext χ
+    rw [MulAction.mem_orbit_iff]
+    constructor
+    · rintro ⟨r, rfl⟩
+      show weightSpace ρ K' (r • χ₁) ≠ ⊥
+      rw [hsmulR]; exact hconj_wt (r : G) χ₁ h₁
+    · intro hχ
+      obtain ⟨h, hh⟩ := exists_conjChar_eq_of_irreducible ρ hKRirr hindep h₁ hχ
+      -- decompose `h ∈ K' ⊔ R` as `k' * r`, with `k'` acting trivially.
+      have hmem : (h : G) ∈ (↑(K' ⊔ R) : Set G) := h.2
+      rw [Subgroup.normal_mul] at hmem
+      obtain ⟨k', hk', r, hr, hkr⟩ := hmem
+      refine ⟨⟨r, hr⟩, ?_⟩
+      rw [hsmulR]
+      have hcr : conjChar K' (h : G) χ₁ = conjChar K' r χ₁ := by
+        rw [← hkr, conjChar_mul, hK'triv k' hk']
+      rw [← hcr]; exact hh
+  -- the common orbit size divides `|K|` and `|R|`.
+  have hcardK : Nat.card ↥(MulAction.orbit ↥K χ₁) ∣ Nat.card ↥K := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (α := ↥K) χ₁)]
+    exact (MulAction.stabilizer ↥K χ₁).index_dvd_card
+  have hcardR : Nat.card ↥(MulAction.orbit ↥R χ₁) ∣ Nat.card ↥R := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer (α := ↥R) χ₁)]
+    exact (MulAction.stabilizer ↥R χ₁).index_dvd_card
+  rw [horbK] at hcardK
+  rw [horbR] at hcardR
+  -- `|Ω| ∣ gcd(|K|, |R|) = 1`.
+  have hΩ1 : Nat.card ↥Ω = 1 := Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hcardK hcardR)
+  -- but `χ₁, χ₂ ∈ Ω` are distinct, so `|Ω| ≥ 2`.
+  haveI hΩfin : Finite ↥Ω := by
+    rw [← horbK]; exact Set.finite_coe_iff.mpr (Set.finite_range _)
+  have hnt : Nontrivial ↥Ω := ⟨⟨χ₁, h₁⟩, ⟨χ₂, h₂⟩, fun h => hne (Subtype.ext_iff.mp h)⟩
+  rw [← Finite.one_lt_card_iff_nontrivial, hΩ1] at hnt
+  exact lt_irrefl 1 hnt
+
 end WeightSpace
 
 
@@ -901,5 +1061,6 @@ theorem thm35_algClosed
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
 end OddOrder.BG.Ch1.S03e
+
 
 
