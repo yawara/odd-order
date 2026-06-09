@@ -268,3 +268,32 @@ docstring に Phase A–F の equation-by-equation roadmap 込み。**bare-sorry
   が要**, `fitting=⨆opCore p`/`oPiCore {p}ᶜ=O_{p'}`)、Φ(V)=1 reduction (Lem 1.21(c)+Thm1.8+Prop1.3)、Lem 1.7。
 - **scaffold の既知 cleanup (commit 前に要)**: long-line 6 箇所 (117,123,153,155,188,191) を ≤100 に。
 - 最重量は依然 Phase D–F (Gor 5.3.7 + special q-group + orbit-parity)。
+
+## ✅ 2026-06-09 session 5 cont. (a-keystone, /loop 自走): (3.7) 商 IH 完全証明 COMPLETE
+
+scaffold `S03f_Thm36.lean` (untracked, leaf 3016 green) で **(3.7) `h37` を sorry-free 化**。
+唯一の real sorry は最終 (3.8)-(3.38) のみ。⟹ **Phase A の (3.6)+(3.7) 完成**。
+
+**Prop 1.5(d) = `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient` (実在確認・Cor 3.28 element 形)**:
+`{φ : A →* MulAut G}(hCop : Coprime |A| |G|)(hSolv){N⊴G}(hN_inv : IsAInvariant φ N){g}
+(hg_fix : ∀ a, ∃ n∈N, φ a g = g*n) : ∃ c, (∀ a, φ a c = c) ∧ ∃ n∈N, c = g*n`。**再調査不要**。
+
+`h37 : ∀ (X : Subgroup G) [X.Normal], X ≠ ⊥ → X ≤ H → hasPLengthOne p (↥H ⧸ X.subgroupOf H)`:
+- easy transports: hcardQ (`card_eq_card_quotient_mul_card_subgroup` + `lt_mul_iff_one_lt_right`)、
+  hoddQ、hHQnorm (`Normal.map` + `mk'_surjective`)、hcomplQ (`S03.quotient_complement_of_normal_le_kernel`)、
+  hHallQ (`card_map_dvd` ×2)、hR₀pQ (mk'X が R₀ 上単射: `Disjoint R₀ X`=`hcompl.disjoint.symm.mono`、
+  `MonoidHom.ofInjective`+`range_comp`)。
+- **hZQ (Z-群 transport, 核)**: 共役作用 `φ:=conjNormal∘R₀.subtype`、`hval`、`isAInvariant_iff_smul_mem`
+  +`Normal.conj_mem` で N=X.subgroupOf H 不変、`coprime_fixedPoints_quotient` で
+  `C_{H/X}(R₀) ≤ (H⊓C_G(R₀)).map mk'X` (hg_fix は商内可換 `hcomm` から: `← eq_one_iff`+`← mk'_apply`+
+  `simp[map_mul,map_inv]`+`hcomm a`+`group`; **GOTCHA**: eq_one_iff は coe `↑` 形ゆえ `← mk'_apply` で
+  mk' に変換要、`(⟨h,hhH⟩:G)=h` は中間 `hnnval` で吸収)、image-of-Z は `of_surjective(subgroupMap_surjective)`、
+  subgroup-of-Z は `of_injective(inclusion_injective)`。
+- hiso `↥H⧸X.subgroupOf H ≃* ↥(H.map mk'X)`: `quotientKerEquivRange(mk'X∘H.subtype)` + ker=X.subgroupOf H
+  (`ext`+simp) + range=H.map mk'X (`range_comp`) + `quotientMulEquivOfEq`/`subgroupCongr`。
+- bridge `⁅HQ,RQ⁆=HQ`: `← map_commutator` + h36。conclusion `hasPLengthOne_of_mulEquiv hiso.symm`。
+
+**▶ 次 = (3.8) `O_{p'}(H)=1`**: `O_{p'}(↥H)≠1` なら X:=`(O_{p'}(↥H)).map H.subtype` (char H⟹⊴G, ≤H) で
+h37 → `H/X` plen1 → Lem 1.21(b) `hasPLengthOne_of_isPiPrime_normal_quotient` (N=O_{p'}(↥H), p'-群) ⟹
+H plen1 = ⁅H,R⁆ plen1 (h36) ⟹ hcounter 矛盾。**要: O_{p'}(↥H) を Subgroup G に上げる + char⟹⊴G**。
+→ (3.9) V=F(H) (opCore↔oPiCore + fitting sup-split) → (3.10)(3.11) → Phase B-F。正本=本ファイル「session 5 cont.」。
