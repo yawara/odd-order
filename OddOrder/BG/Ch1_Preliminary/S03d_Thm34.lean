@@ -308,7 +308,7 @@ subrepresentation pointwise it would fix their join `⊤ = ⨆ simple`, contradi
 `ρ g₀ ≠ 1`.  In the
 proof of Theorem 3.4 this is applied to a `g₀ ∈ ⁅R, K⁆` with `ρ g₀ ≠ 1` (from `hRK`) to choose the
 irreducible `M` on which `[K, R]` acts nontrivially. -/
-private lemma exists_irreducible_subrep_apply_ne
+theorem exists_irreducible_subrep_apply_ne
     {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
     {V : Type*} [AddCommGroup V] [Module F V] [NeZero (Nat.card G : F)]
     (ρ : Representation F G V) {g₀ : G} (hg₀ : ρ g₀ ≠ 1) :
