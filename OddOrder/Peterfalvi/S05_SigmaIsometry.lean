@@ -3052,6 +3052,25 @@ theorem sigma_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     (hyp.chiFam_spec hVeq app).1]
   exact ((hyp.chiFam_spec hVeq app).2.2.2 p q hp hq).symm
 
+/-- **Peterfalvi (3.2)** (virtual characters): `σ` maps `ZIrr(W)` into `ZIrr(G)`.  Each `Irr(W)`
+basis vector maps to a member of the `(3.5)` family `χ ∈ ZIrr(G)` (`chiFam_spec`); a `ℤ`-combination
+maps to a `ℤ`-combination, which stays in the `ℤ`-submodule `ZIrr(G)` (`span` induction). -/
+theorem sigma_mem_ZIrr (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {z : ClassFunction hyp.W ℂ} (hz : z ∈ ZIrr hyp.W) :
+    hyp.sigma hVeq app z ∈ ZIrr G := by
+  rw [ZIrr_eq_span] at hz
+  induction hz using Submodule.span_induction with
+  | mem x hx =>
+      have hx' : hyp.sigma hVeq app x
+          = hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ⟨x, hx⟩) :=
+        hyp.sigma_irreducibleCharacter hVeq app ⟨x, hx⟩
+      rw [hx']; exact (hyp.chiFam_spec hVeq app).2.1 _
+  | zero => rw [map_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih => rw [map_zsmul]; exact (ZIrr G).smul_mem a ih
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
