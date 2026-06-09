@@ -2851,6 +2851,53 @@ theorem exists_chiFamily (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     · obtain ⟨k, hk⟩ := hodd1
       exact hyp.exists_chiFamily_transpose hVeq app (by omega) hw2
 
+/-! ### The index bridge `Ĉ₁ × Ĉ₂ ≃ Irr(W)` for `σ`
+
+The `χ`-family of (3.5) is indexed by `Ĉ₁ × Ĉ₂ = Hom(W₁) × Hom(W₂)`; the isometry `σ` is defined on
+the basis `Irr(W)` of `CF(W)`.  These are identified via the product-character bijection
+(`omegaProdChar` is bijective because `W = W₁ × W₂` is an internal direct product) followed by
+`omegaEquiv : Hom(W, ℂˣ) ≃ Irr(W)`. -/
+
+/-- **`omegaProdChar` is surjective**: every linear character `ξ : W →* ℂˣ` equals `ω_{i0}·ω_{0j}`
+for the restrictions `χ_k = ξ|_{W_k}`.  With `omegaProdChar_inj` this makes the product map a
+bijection.  Uses the internal direct product reconstruction `w = wProj1 w · wProj2 w`. -/
+theorem omegaProdChar_surjective (hyp : TICyclicHypothesis G) :
+    Function.Surjective fun p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) ×
+      ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) => hyp.omegaProdChar p.1 p.2 := by
+  intro ξ
+  refine ⟨(ξ.comp (hyp.W1.subgroupOf hyp.W).subtype, ξ.comp (hyp.W2.subgroupOf hyp.W).subtype), ?_⟩
+  ext w
+  simp only [omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
+  rw [← map_mul]
+  congr 1
+  have e1 : (↑(hyp.wFst w) : hyp.W) = hyp.wProj1 w := by rw [wProj1_apply, wFst_apply]
+  have e2 : (↑(hyp.wSnd w) : hyp.W) = hyp.wProj2 w := by rw [wProj2_apply, wSnd_apply]
+  rw [e1, e2, wProj1_mul_wProj2]
+
+/-- The product-character bijection `Ĉ₁ × Ĉ₂ ≃ (W →* ℂˣ)` (`omegaProdChar`, injective + surjective).
+-/
+noncomputable def omegaProdEquiv (hyp : TICyclicHypothesis G) :
+    (((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ≃ (hyp.W →* ℂˣ) :=
+  Equiv.ofBijective (fun p => hyp.omegaProdChar p.1 p.2)
+    ⟨fun _ _ h => Prod.ext (hyp.omegaProdChar_inj h).1 (hyp.omegaProdChar_inj h).2,
+      hyp.omegaProdChar_surjective⟩
+
+@[simp] theorem omegaProdEquiv_apply (hyp : TICyclicHypothesis G)
+    (p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.omegaProdEquiv p = hyp.omegaProdChar p.1 p.2 := rfl
+
+/-- **(3.3) index bridge** `Ĉ₁ × Ĉ₂ ≃ Irr(W)`: the product-character bijection composed with
+`omegaEquiv`.  Its inverse turns an irreducible character of `W` into the index pair at which the
+(3.5) `χ`-family is evaluated, so `σ` can be defined on the `Irr(W)`-basis. -/
+noncomputable def omegaIrrEquiv (hyp : TICyclicHypothesis G) :
+    (((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ≃
+      IrreducibleCharacter hyp.W :=
+  hyp.omegaProdEquiv.trans hyp.omegaEquiv
+
+@[simp] theorem omegaIrrEquiv_apply (hyp : TICyclicHypothesis G)
+    (p : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.omegaIrrEquiv p = hyp.omega (hyp.omegaProdChar p.1 p.2) := rfl
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
