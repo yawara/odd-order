@@ -217,15 +217,68 @@ W∩M' nilpotent + W/(W∩M') q-群 ⟹ O_p(W∩M')=normal Sylow p of W ⟹ 両 
 (1) X が Sylow p of M_σ を中心化 (W nilpotent ⟹ Sylow 同士可換)。(2)=(1)+Uniqueness。(3): X=Sylow q of M',
 M_βX=O_{β∪{q}}(M')◁M, Frattini で M=M_β N_M(X), Lem 6.5 で O_p(W)⊆N_M(X)'。(b)=(a)(2)+(a)(3)。
 
-**🛑 BLOCKER = 2 つの未収載 Hall 補題** (両者 unconditional・一般 Isaacs Ch03 infra・再利用可):
-1. **Hall-D (Wielandt)** `∃ Hall π-subgroup ⊇ 任意 π-subgroup` (solvable G)。repo は `hall_E_exists`
-   (存在) + `hall_C` (共役 H^g=K) のみ。**containment は無**。W⊇X の構成に必須。`hall_C_strong_aux`
-   (Main.lean:857-1207) 級の |G|-induction (~200-350 行)。minimal normal r-group で r∈π/r∉π 場合分け。
-2. **Hall ∩ normal = Hall of normal** `IsHallSubgroup π H, N◁G ⟹ IsHallSubgroup π (H∩N の N 内)`。
-   W∩M' Hall {p,q} of M' / W∩M_σ Hall {p,q} of M_σ に必須。~50-80 行。
+### ✅✅ 2 ブロッカー解消 + W-core landed (2026-06-09, branch `bg-s10-fwd`, 3 commits)
 
-⟹ **Cor 10.9 は Hall-D + Hall∩normal を先に landing してからでないと組めない** (各々別 unconditional leaf)。
-**推奨次手 = Hall-D を Isaacs Ch03 に landing** (general infra, Cor 10.9 + §12+ が消費)。その後 Cor 10.9(a)→(b)。
+**かつての「Cor 10.9 は組めない」ブロッカー (2 つの未収載 Hall 補題) を両方 landing 済み**
+(両者 unconditional・sorry-free・axiom-clean・AxiomsCheck `#assert_only_allowed_axioms` 登録):
+
+1. **Hall-D (Wielandt) = `Ch03.hall_D`** (commit `8ae2c873`, `Isaacs/Ch03_SplitExtensions/Main.lean`
+   §3C, hall_C の直後): `[Finite G][IsSolvable G] (hU : ∀ q ∈ (card ↥U).primeFactors, q ∈ π) →
+   ∃ H, IsHallSubgroup π H ∧ U ≤ H`。`hall_E_strong_aux` と同型の `|G|`-強誘導 `hall_D_strong_aux`
+   (極小正規 M elem-ab p-group, G/M への IH, p∈π/p∉π 場合分け)。E-定理への 2 追加点 = (1) IH を
+   「U の像 U.map(mk' M) を含む π-Hall」で呼ぶ→引き戻し H が U を含む, (2) p∉π では SZ-E の補群を
+   「U を含む共役」に取り替える。後者 = 抽象 **SZ-D 補題 `exists_conj_le_of_isComplement'_of_coprime`**
+   (M⊴G solvable 補群 K + coprime(|U|,|M|) ⟹ ∃x, U≤Kˣ; P:=U⊔M 内で U も P⊓K も M.subgroupOf P の
+   補群 ⟹ SZ-C 共役)。`hall_C_strong_aux` の p∉π subgroupOf/conj 舞踏が template。
+2. **Hall ∩ normal = `Ch03.isHallSubgroup_subgroupOf_of_normal`** (commit `b095f2cd`, 同ファイル
+   hall_D の直後): `(hH : IsHallSubgroup π H) [N.Normal] → IsHallSubgroup π (H.subgroupOf N)`。
+   |H∩N|∣|H| (π) + [N:H∩N]∣[G:H] (π'; 支持補題 `relIndex_dvd_index_of_normal_right` = 指数の塔等式
+   [G:H][H:H∩N]=[G:N][N:H∩N] + mathlib `relIndex_dvd_index_of_normal`)。
+
+3. **W∩M' nilpotent 核 = `betacompl_subgroup_derived_isNilpotent`** (commit `d512c842`,
+   `S10_BetaRadical.lean` Cor 10.9 section 直前, **forward-conditional §10 island**): `V ≤ derivedInG M`,
+   `V` が β(M)'-群 ⟹ `IsNilpotent ↥V`。`isHall_Mbeta` 出力 2 (M' の nilpotent Hall β' = W*) +
+   `hall_D` (V⊆Hall β' W') + `hall_C` (W'≅W* 共役→nilpotent) + `Subgroup.isNilpotent` (部分群)。
+   **= BG「W∩M' nilpotent」+「X⊆M' ⟹ W nilpotent」**。
+
+### 🛑 残 Cor 10.9 frontier = W-construction (nested ambient が本質的負担)
+
+Cor 10.9(a)(1)(2)(3)/(b) の 4 sorry (`S10_BetaRadical.lean` @1018/1039/1052/1073) は依然 sorry。
+残りは「W を XM' 内に構成」とその下流。**真のボトルネック = nested-subgroupOf bookkeeping**
+(W が Hall {p,q} of `XM' = X⊔M'` ⟹ ambient `↥(XM')` で全部やる必要; M_σ, W∩M_σ も全部その中の
+subgroupOf)。Hall-D 自体は解決済ゆえ「W⊇X 構成」は `hall_D` 一発だが、ambient 翻訳が重い (~400-600 行)。
+
+**依存順 leaf plan (次セッション直行用)**:
+- **L1 (W 構成)**: `↥M` を ambient に, `D := commutator ↥M`, `X' := X.subgroupOf M`,
+  `Y := X' ⊔ D` (= XM' in ↥M)。`hall_D (G := ↥Y)` を `X'.subgroupOf Y` (q-群) に適用 →
+  `W₀ : Subgroup ↥Y` Hall {p,q} ⊇ X'。`W := W₀.map Y.subtype : Subgroup ↥M`, `X' ≤ W ≤ Y`。
+  ⚠ `{p,q}` は `Set ℕ = {p, q}` (両 prime)。`hall_D` の仮説 `primeFactors(|X'|) ⊆ {p,q}` は X' が
+  q-群ゆえ `⊆ {q} ⊆ {p,q}`。
+- **L2 (W∩M_σ Hall {p,q} of M_σ)**: `Mσ' := (Msigma M).subgroupOf M ≤ D ≤ Y` (Msigma_le_derived の
+  subgroupOf 版; `(derivedInG M).subgroupOf M = commutator ↥M`)。`Mσ' ◁ ↥M` (Msigma◁M) ⟹ `Mσ'.subgroupOf Y ◁ Y`。
+  `isHallSubgroup_subgroupOf_of_normal` を ambient `↥Y` で `H := W₀`, `N := Mσ'.subgroupOf Y` に適用。
+- **L3 (W nilpotent)**: X⊆M' (⟺ X'≤D ⟺ Y=D) なら W ≤ D, betacompl 核で nilpotent
+  (G 版なので W.map M.subtype ≤ derivedInG M に翻訳, or ↥M-内部版 betacompl を別途。**推奨: ↥M-内部
+  `betacompl' : V ≤ commutator ↥M, β'-群 ⟹ IsNilpotent ↥V` を G 版から map で導出**)。
+  X⊄M' (p<q) は **抽象 nilpotency 補題** (一般・再利用可, ~80-120 行):
+  `W {p,q}-群, normal Sylow q, N◁W nilpotent + W/N q-群 ⟹ IsNilpotent W` —
+  Sylow p of W = Sylow p of N (W/N q-群) = O_p(N) char in N◁W ⟹ normal; +normal Sylow q
+  ⟹ `isNilpotent_of_forall_hasNormalPComplement` (各 r∈{p,q} で他方 Sylow が normal 補群)。
+  W の normal Sylow q = `W∩O_{p'}(M)` (10.8(c) `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` ✅:
+  全 q-元 ⊆ O_{p'}(M)); N = W∩M' (`betacompl` 核で nilpotent); W/N q-群 = WM'/M'⊆XM'/M' (X q-群)。
+- **L4 ((a)(1))**: W nilpotent ⟹ Sylow 同士可換 (`IsNilpotent` の Sylow 直積; mathlib
+  `IsNilpotent` ⟹ Sylow normal ⟹ 異素数 Sylow centralize, 要 API 調査)。X ≤ Sylow-q of W,
+  Sylow-p of (W∩M_σ) = Sylow-p of M_σ (W∩M_σ Hall {p,q} of M_σ ⊇ full p-part)。X が中心化。
+- **L5 ((a)(2))**: (1) + Uniqueness Thm (§9 `isUniquelyMaximal_of_*`)。p∈α(M) で C_M(X)⊇C centralizing,
+  ∈𝒰。
+- **L6 ((a)(3))**: X=Sylow q of M' ⟹ X=O_q(W*), M'=M_β W*, M_βX=O_{β∪{q}}(M')◁M, Frattini
+  M=M_β N_M(X), Lem 6.5 (`inf_commutator_eq_of_coprime`等) で O_p(W)⊆N_M(X)'。
+- **L7 ((b))**: S Sylow of G, N_G(S)⊆H∩M ⟹ q=π(S) の素数 ∈σ(M)-β(M), S⊆M_σ⊆M', M_βS◁M (10.8(b)),
+  (a) の証明で M=M_β N_M(S)=M_β(H∩M), N_M(S)∉𝒰, (a)(2) で α(M)=β(M)。
+
+⚠ **ambient 推奨**: L1-L4 は `↥M` 一貫 (D=commutator ↥M)。betacompl の ↥M-内部版を先に作ると L3 が楽。
+Cor 10.9 statement (`beta_complement_centralizes` 等) は G ゆえ最終 wiring で `Sylow p ↥(Msigma M)` への
+map 変換が要る。**全部 forward-conditional (§10 island; via isHall_Mbeta→Thm10.6→2 forward axioms)。**
 
 ### その他の §10 残ターゲット (keystone gated)
 - **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。(a) 配線可だが (b) は rep-theory
