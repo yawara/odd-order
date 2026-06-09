@@ -1670,6 +1670,47 @@ theorem thm35_algClosed
     ∀ g ∈ ⁅K, K⁆, ρ g = 1 :=
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
+open OddOrder.RepresentationTheory in
+/-- **BG Theorem 3.5** (general field).  `G = KR` a Frobenius group with solvable kernel `K` and
+prime-order complement `R`, acting on `V/F` with `char F ∤ |G|` (any field `F`).  If `C_V(R)` is
+one-dimensional then `K' ⊆ C_K(V)` (i.e. `ρ` kills every element of `⁅K, K⁆`).
+
+Reduces to the algebraically closed core `thm35_algClosed` by base change to the algebraic closure
+`F̄` (BG (2.9)): `char F̄ ∤ |G|`, and `dim C_{F̄⊗V}(R) = dim C_V(R) = 1` transfers along `F → F̄`
+(`finrank_invariants_baseChangeRepresentation`); the conclusion `ρ̄ g = 1 ⟹ ρ g = 1` descends
+because `v ↦ 1 ⊗ v` is injective (`F̄` is faithfully flat over `F`). -/
+theorem thm35
+    {F : Type*} [Field F]
+    {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (ρ : Representation F G V) (K R : Subgroup G)
+    (hFrob : IsFrobeniusGroup G K R) (hKsolv : IsSolvable ↥K)
+    (hRp : ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p)
+    (hchar : (Nat.card G : F) ≠ 0)
+    (hCV1 : Module.finrank F (Representation.invariants (ρ.comp R.subtype)) = 1) :
+    ∀ g ∈ ⁅K, K⁆, ρ g = 1 := by
+  -- `char F̄ ∤ |G|`.
+  have hchar' : (Nat.card G : AlgebraicClosure F) ≠ 0 := by
+    rw [← map_natCast (algebraMap F (AlgebraicClosure F))]
+    rwa [Ne, map_eq_zero_iff _ (algebraMap F (AlgebraicClosure F)).injective]
+  -- `dim C_{F̄⊗V}(R) = dim C_V(R) = 1`.
+  have hCV1' : Module.finrank (AlgebraicClosure F) (Representation.invariants
+      ((baseChangeRepresentation (AlgebraicClosure F) ρ).comp R.subtype)) = 1 := by
+    rw [← baseChangeRepresentation_comp, finrank_invariants_baseChangeRepresentation]
+    exact hCV1
+  -- apply the algebraically closed core over `F̄`, then descend `v ↦ 1 ⊗ v`.
+  intro g hg
+  have hbar : baseChangeRepresentation (AlgebraicClosure F) ρ g = 1 :=
+    thm35_algClosed (baseChangeRepresentation (AlgebraicClosure F) ρ) K R hFrob hKsolv hRp
+      hchar' hCV1' g hg
+  apply LinearMap.ext
+  intro v
+  apply Module.FaithfullyFlat.tensorProduct_mk_injective (A := F) (B := AlgebraicClosure F) V
+  have hmap := congrArg
+    (fun f : TensorProduct F (AlgebraicClosure F) V →ₗ[AlgebraicClosure F]
+      TensorProduct F (AlgebraicClosure F) V => f (1 ⊗ₜ[F] v)) hbar
+  simpa using hmap
+
 end OddOrder.BG.Ch1.S03e
 
 
