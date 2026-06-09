@@ -3382,3 +3382,4 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.common_not_mem_other_column
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.IsSignedTripleGrid.transpose
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_isSignedTripleGrid
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.Afam_existsUnique_common

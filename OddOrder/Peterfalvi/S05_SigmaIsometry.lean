@@ -1924,6 +1924,30 @@ theorem Afam_isSignedTripleGrid (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   noNeg_L _ _ _ _ hshared := (hyp.Afam_L hVeq app hshared).2
   inter_O _ _ _ _ hp hq := hyp.Afam_O hVeq app hp hq
 
+open scoped Classical in
+/-- **Peterfalvi (3.5.4)** for the fixed family `A_{ij}`, in the `w₁ ≥ 5` orientation: there is a
+*unique* signed irreducible `z = -χ₀₁` common to every `A_{χ₁ χ₂₀}` as `χ₁` ranges over the
+nontrivial characters of `W₁`.  This activates the abstract sunflower `existsUnique_common` on the
+concrete `Afam` grid: the `≥ 4` rows come from `|W₁| ≥ 5` via `|Irr(W₁') ∖ {1}| = |W₁| − 1`
+(Pontryagin `card_charGroup_subgroupOf`).  When only `|W₂| ≥ 5`, apply this to `transpose`. -/
+theorem Afam_existsUnique_common (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (hw1 : 5 ≤ Nat.card hyp.W1)
+    {χ₂₀ χ₂₁ : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}} (hne : χ₂₀ ≠ χ₂₁) :
+    ∃! z, ∀ χ₁ : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1},
+      z ∈ hyp.Afam hVeq app χ₁ χ₂₀ := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  have hcard : 4 ≤ Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := by
+    have h1 : Fintype.card {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}
+        = Nat.card hyp.W1 - 1 := by
+      rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+        hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+    rw [h1]; omega
+  exact (hyp.Afam_isSignedTripleGrid hVeq app).existsUnique_common hcard hne
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
