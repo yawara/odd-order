@@ -38,6 +38,7 @@ import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.AppA_PStability
@@ -3218,3 +3219,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34_algClosed
 -- BG Theorem 3.4 (general field, via base change to the algebraic closure, BG (2.9)).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03d.thm34
+
+-- BG Theorem 3.5 (algebraically closed core): a Frobenius group `G = KR` with solvable kernel `K`
+-- and prime-order complement `R`, acting on `V/F` (`char F ∤ |G|`, `F` algebraically closed), with
+-- `dim C_V(R) = 1`, gives `K' = ⁅K,K⁆ ⊆ C_K(V)`.  Hard core = step-9 Clifford theory.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35_algClosed
+-- BG Theorem 3.5 (general field, via base change to the algebraic closure, BG (2.9)).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35

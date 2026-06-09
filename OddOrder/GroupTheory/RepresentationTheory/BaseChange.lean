@@ -9,6 +9,8 @@ import Mathlib.LinearAlgebra.TensorProduct.Tower
 import Mathlib.LinearAlgebra.TensorProduct.Pi
 import Mathlib.RingTheory.Flat.FaithfullyFlat.Algebra
 import Mathlib.RingTheory.Flat.Basic
+import Mathlib.RingTheory.Flat.Equalizer
+import Mathlib.LinearAlgebra.Dimension.Constructions
 
 /-!
 # Scalar extension (base change) of group representations
@@ -147,6 +149,57 @@ theorem invariants_baseChangeRepresentation_eq_bot
     rw [show ⇑(invariantsObstruction ρ') = _ from hfun]
     exact (TensorProduct.piRight F K K (fun _ : G => V)).injective.comp hlt
   rw [← ker_invariantsObstruction ρ', LinearMap.ker_eq_bot.mpr hinj']
+
+/-- **Base change preserves the dimension of the invariants** (BG (2.9), dimension form).  For a
+finite group `G` and a field extension `K/F`, the `K`-dimension of `C_{K⊗V}(G)` equals the
+`F`-dimension of `C_V(G)`.
+
+The space of invariants is the kernel of the obstruction map `f : v ↦ (g ↦ ρ g v - v)`; the
+obstruction map of the base-changed representation factors as `piRight ∘ (K ⊗ f)`, so its kernel
+(over `K`) equals `ker (K ⊗ f)`.  Flatness of `K/F` (`Module.Flat.ker_lTensor_eq`) identifies that
+kernel with `K ⊗ ker f`, whose `K`-dimension is `finrank F (ker f) = finrank F C_V(G)`
+(`Module.finrank_baseChange`).
+
+Applied to `ρ.comp R.subtype` this transfers `dim C_V(R) = 1` to the algebraic closure, the
+hypothesis form needed by BG Theorem 3.5. -/
+theorem finrank_invariants_baseChangeRepresentation
+    {F : Type*} [Field F] {G : Type*} [Group G] [Finite G]
+    {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V]
+    (K : Type*) [Field K] [Algebra F K]
+    (ρ : Representation F G V) :
+    Module.finrank K (Representation.invariants (baseChangeRepresentation K ρ))
+      = Module.finrank F (Representation.invariants ρ) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  set f := invariantsObstruction ρ with hf
+  set e := TensorProduct.piRight F K K (fun _ : G => V) with he
+  -- the `K`-linear obstruction map of `baseChange ρ` factors as `e ∘ (K ⊗ f)`.
+  have hfactor : invariantsObstruction (baseChangeRepresentation K ρ)
+      = e.toLinearMap ∘ₗ TensorProduct.AlgebraTensorModule.lTensor K K f := by
+    apply LinearMap.ext
+    intro x
+    induction x using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a v =>
+        funext g
+        simp only [hf, he, invariantsObstruction, LinearMap.pi_apply, LinearMap.sub_apply,
+          LinearMap.id_coe, id_eq, baseChangeRepresentation_apply_tmul, LinearMap.comp_apply,
+          TensorProduct.AlgebraTensorModule.lTensor_tmul, LinearEquiv.coe_coe,
+          TensorProduct.piRight_apply, TensorProduct.piRightHom_tmul, TensorProduct.tmul_sub]
+    | add x y hx hy => rw [map_add, map_add, hx, hy]
+  -- kernels agree (`e` is an isomorphism).
+  have hkere : LinearMap.ker e.toLinearMap = ⊥ := LinearMap.ker_eq_bot.mpr e.injective
+  have hker : LinearMap.ker (invariantsObstruction (baseChangeRepresentation K ρ))
+      = LinearMap.ker (TensorProduct.AlgebraTensorModule.lTensor K K f) := by
+    rw [hfactor, LinearMap.ker_comp, hkere, Submodule.comap_bot]
+  -- `K ⊗ (subtype of ker f)` is injective (flatness), so its range has dimension `finrank F (ker f)`.
+  have hinj : Function.Injective (TensorProduct.AlgebraTensorModule.lTensor K K
+      (LinearMap.ker f).subtype) :=
+    Module.Flat.lTensor_preserves_injective_linearMap (M := K)
+      (LinearMap.ker f).subtype (Submodule.injective_subtype _)
+  rw [← ker_invariantsObstruction (baseChangeRepresentation K ρ), hker,
+    Module.Flat.ker_lTensor_eq K K f, LinearMap.finrank_range_of_inj hinj,
+    Module.finrank_baseChange, hf, ker_invariantsObstruction]
 
 /-- Base change commutes with restriction along a group hom `φ : H →* G`.
 
