@@ -614,6 +614,43 @@ theorem IsSignedTriple.O_card_inter_eq [Invertible (Nat.card G : ℂ)]
 
 /- 3.5.4: the grid of signed triples and the sunflower lemma `|⋂_i A_{i1}| = 1` -/
 
+/-- A 3-element finset containing two distinct elements `a, b` is `{a, b, c}` for a (unique)
+third element `c ∉ {a, b}`.  Used to name "the third element" of each `A_{ij}` in (3.5.4). -/
+theorem exists_third_of_card_three {α : Type*} [DecidableEq α] {s : Finset α} (hs : s.card = 3)
+    {a b : α} (ha : a ∈ s) (hb : b ∈ s) (hab : a ≠ b) :
+    ∃ c, c ∈ s ∧ c ≠ a ∧ c ≠ b ∧ s = {a, b, c} := by
+  have hsub : ({a, b} : Finset α) ⊆ s := by
+    intro x hx
+    rcases Finset.mem_insert.mp hx with rfl | hx
+    · exact ha
+    · rw [Finset.mem_singleton] at hx; exact hx ▸ hb
+  have hcard2 : ({a, b} : Finset α).card = 2 := by
+    rw [Finset.card_insert_of_notMem (Finset.notMem_singleton.mpr hab), Finset.card_singleton]
+  have hd : (s \ {a, b}).card = 1 := by rw [Finset.card_sdiff_of_subset hsub, hs, hcard2]
+  obtain ⟨c, hc⟩ := Finset.card_eq_one.mp hd
+  have hcmem : c ∈ s \ {a, b} := hc ▸ Finset.mem_singleton_self c
+  rw [Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton, not_or] at hcmem
+  obtain ⟨hcs, hcab⟩ := hcmem
+  refine ⟨c, hcs, hcab.1, hcab.2, ?_⟩
+  apply Finset.ext
+  intro x
+  simp only [Finset.mem_insert, Finset.mem_singleton]
+  constructor
+  · intro hx
+    by_cases hxa : x = a
+    · exact Or.inl hxa
+    · by_cases hxb : x = b
+      · exact Or.inr (Or.inl hxb)
+      · refine Or.inr (Or.inr ?_)
+        have : x ∈ s \ {a, b} := by
+          rw [Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton]
+          exact ⟨hx, fun h => h.elim hxa hxb⟩
+        rw [hc, Finset.mem_singleton] at this; exact this
+  · rintro (rfl | rfl | rfl)
+    · exact ha
+    · exact hb
+    · exact hcs
+
 open scoped Classical in
 /-- An abstract *grid of signed triples*: a family `A i j` (rows `i : ι`, columns `j : κ`) of
 signed-triple sets satisfying the Peterfalvi relations.  `card_eq_three`/`signed`/`orthogonal` are
@@ -683,6 +720,37 @@ theorem exists_triangle_of_not_exists_common [Fintype ι] (hG : IsSignedTripleGr
   · rintro ⟨w, hw1, hw2, hw3⟩
     have hle := Finset.card_le_one.mp (le_of_eq hcard)
     exact hz3 ((hle w (Finset.mem_inter.mpr ⟨hw1, hw2⟩) z hzmem) ▸ hw3)
+
+open scoped Classical in
+/-- **(3.5.4) named triangle**: from three rows `i₁, i₂, i₃` with no common element, name their
+three pairwise-intersection elements `e₁₂, e₁₃, e₂₃` (the "vertices", forced distinct) and the
+three remaining "third" elements `t₁, t₂, t₃`, giving the explicit decompositions
+`A i₁ j₀ = {e₁₂, e₁₃, t₁}`, `A i₂ j₀ = {e₁₂, e₂₃, t₂}`, `A i₃ j₀ = {e₁₃, e₂₃, t₃}`
+(Peterfalvi's `β₁₁ = χ₁+χ₂+χ₃`, `β₂₁ = χ₁+χ₄+χ₅`, `β₃₁ = χ₂+χ₄+χ₆`).  Input to the Cases-I/II
+argument that adds a fourth row. -/
+theorem exists_namedTriangle (hG : IsSignedTripleGrid A) {i₁ i₂ i₃ : ι} {j₀ : κ}
+    (h12 : i₁ ≠ i₂) (h13 : i₁ ≠ i₃) (h23 : i₂ ≠ i₃)
+    (hnoc : ¬ ∃ w, w ∈ A i₁ j₀ ∧ w ∈ A i₂ j₀ ∧ w ∈ A i₃ j₀) :
+    ∃ e₁₂ e₁₃ e₂₃ t₁ t₂ t₃ : ClassFunction G ℂ,
+      A i₁ j₀ = {e₁₂, e₁₃, t₁} ∧ A i₂ j₀ = {e₁₂, e₂₃, t₂} ∧ A i₃ j₀ = {e₁₃, e₂₃, t₃} ∧
+      e₁₂ ≠ e₁₃ ∧ e₁₂ ≠ e₂₃ ∧ e₁₃ ≠ e₂₃ := by
+  classical
+  obtain ⟨e₁₂, he12⟩ := Finset.card_eq_one.mp (hG.inter_L i₁ i₂ j₀ j₀ (Or.inr ⟨h12, rfl⟩))
+  obtain ⟨e₁₃, he13⟩ := Finset.card_eq_one.mp (hG.inter_L i₁ i₃ j₀ j₀ (Or.inr ⟨h13, rfl⟩))
+  obtain ⟨e₂₃, he23⟩ := Finset.card_eq_one.mp (hG.inter_L i₂ i₃ j₀ j₀ (Or.inr ⟨h23, rfl⟩))
+  obtain ⟨m12a, m12b⟩ := Finset.mem_inter.mp (he12 ▸ Finset.mem_singleton_self e₁₂)
+  obtain ⟨m13a, m13b⟩ := Finset.mem_inter.mp (he13 ▸ Finset.mem_singleton_self e₁₃)
+  obtain ⟨m23a, m23b⟩ := Finset.mem_inter.mp (he23 ▸ Finset.mem_singleton_self e₂₃)
+  have d1213 : e₁₂ ≠ e₁₃ := by rintro rfl; exact hnoc ⟨e₁₂, m12a, m12b, m13b⟩
+  have d1223 : e₁₂ ≠ e₂₃ := by rintro rfl; exact hnoc ⟨e₁₂, m12a, m12b, m23b⟩
+  have d1323 : e₁₃ ≠ e₂₃ := by rintro rfl; exact hnoc ⟨e₁₃, m13a, m23a, m13b⟩
+  obtain ⟨t₁, _, _, _, hset1⟩ :=
+    exists_third_of_card_three (hG.card_eq_three i₁ j₀) m12a m13a d1213
+  obtain ⟨t₂, _, _, _, hset2⟩ :=
+    exists_third_of_card_three (hG.card_eq_three i₂ j₀) m12b m23a d1223
+  obtain ⟨t₃, _, _, _, hset3⟩ :=
+    exists_third_of_card_three (hG.card_eq_three i₃ j₀) m13b m23b d1323
+  exact ⟨e₁₂, e₁₃, e₂₃, t₁, t₂, t₃, hset1, hset2, hset3, d1213, d1223, d1323⟩
 
 end IsSignedTripleGrid
 
