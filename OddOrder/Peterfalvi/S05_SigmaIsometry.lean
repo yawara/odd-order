@@ -495,6 +495,34 @@ theorem IsSignedNontrivialIrr.inner_trivial [Invertible (Nat.card G : ℂ)]
   · exact h0
   · rw [ClassFunction.inner_neg_left, h0, neg_zero]
 
+open Classical in
+/-- Adjoining the trivial character `1_G` (at `none`) to an orthonormal family `X` of signed
+nontrivial irreducibles yields an orthonormal family over `Option τ`: `1_G` has unit norm
+(`inner_trivialClassFunction_self`) and is orthogonal to every `X a` (`inner_trivial`).  This is the
+abstract "adjoin `χ_{00} = 1_G`" step that turns the (3.5.5) family into the full (3.5) family. -/
+theorem orthonormal_option_trivial [Invertible (Nat.card G : ℂ)] {τ : Type*}
+    (X : τ → ClassFunction G ℂ) (hsig : ∀ a, IsSignedNontrivialIrr (X a))
+    (hortho : ∀ a b, ClassFunction.inner (X a) (X b) = if a = b then 1 else 0) (a b : Option τ) :
+    ClassFunction.inner (a.elim (trivialClassFunction G) X) (b.elim (trivialClassFunction G) X)
+      = if a = b then 1 else 0 := by
+  cases a with
+  | none =>
+    cases b with
+    | none => rw [if_pos rfl]; exact inner_trivialClassFunction_self G
+    | some b =>
+      rw [if_neg (by simp)]
+      show ClassFunction.inner (trivialClassFunction G) (X b) = 0
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, (hsig b).inner_trivial, star_zero]
+  | some a =>
+    cases b with
+    | none => rw [if_neg (by simp)]; exact (hsig a).inner_trivial
+    | some b =>
+      show ClassFunction.inner (X a) (X b) = _
+      rw [hortho a b]
+      by_cases h : a = b
+      · rw [if_pos h, if_pos (congrArg some h)]
+      · rw [if_neg h, if_neg (fun hh => h (Option.some.inj hh))]
+
 /-- A family `X : τ → ±Irr(G)` of signed nontrivial irreducibles is **orthonormal** as soon as it is
 *injective* and *no member is another's negative*: the diagonal inner products are `1` and the
 off-diagonal ones are `0`.  This is the bridge from the combinatorial facts of (3.5.5) (distinctness
