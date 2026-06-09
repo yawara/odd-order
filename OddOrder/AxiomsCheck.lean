@@ -3452,3 +3452,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_irreducibleCharacter
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_inner_irreducibleCharacter
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdEquiv_symm_omegaProdChar
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_omega
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_trivial
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_alphaCF
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_mem_ZIrr
