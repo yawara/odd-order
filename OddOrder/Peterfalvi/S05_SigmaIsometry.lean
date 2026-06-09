@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
+import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import Mathlib.LinearAlgebra.Basis.Basic
 
 /-!
 # Peterfalvi §5: The isometry `σ` (Theorem (3.2)) and its construction (3.5)
@@ -34,6 +36,66 @@ namespace OddOrder.Peterfalvi.S05
 open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Fintype G]
+
+/-! ### `Irr(G)` is a `ℂ`-basis of `CF(G)`
+
+The isometry `σ` of (3.2) is defined by sending the orthonormal basis `(ω_{ij}) = Irr(W)` of `CF(W)`
+to the orthonormal family `(χ_{ij})` of (3.5).  This needs `Irr` to be a basis of the class
+functions, which we assemble here (general finite group) from linear independence
+(`linearIndependent_irreducibleCharacter`) and completeness
+(`classFunction_eq_zero_of_orthogonal`). -/
+
+/-- **Completeness of `Irr` (spanning form).** The irreducible characters span `CF(G)`: for any
+`f`, the difference `f - ∑_χ ⟨f, χ⟩ • χ` is orthogonal to every irreducible character (by
+orthonormality of `Irr`), hence zero by `classFunction_eq_zero_of_orthogonal`, so
+`f = ∑_χ ⟨f, χ⟩ • χ` lies in the span. -/
+theorem classFunction_span_irreducibleCharacter_eq_top [Invertible (Nat.card G : ℂ)] :
+    Submodule.span ℂ (Set.range (fun χ : IrreducibleCharacter G => (χ : ClassFunction G ℂ)))
+      = ⊤ := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Finite (IrreducibleCharacter G) := finite_irreducibleCharacter
+  haveI : Fintype (IrreducibleCharacter G) := Fintype.ofFinite _
+  rw [eq_top_iff]
+  rintro f -
+  -- `inner · ψ` distributes over the finite `∑_χ ⟨f, χ⟩ • χ` (linear in the left argument)
+  have hsum : ∀ (s : Finset (IrreducibleCharacter G)) (ψ : ClassFunction G ℂ),
+      ClassFunction.inner (∑ χ ∈ s, ClassFunction.inner f (χ : ClassFunction G ℂ)
+          • (χ : ClassFunction G ℂ)) ψ
+        = ∑ χ ∈ s, ClassFunction.inner f (χ : ClassFunction G ℂ)
+            * ClassFunction.inner (χ : ClassFunction G ℂ) ψ := fun s ψ => by
+    refine Finset.induction_on s (by simp) ?_
+    intro χ t hχt ih
+    rw [Finset.sum_insert hχt, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, ih,
+      Finset.sum_insert hχt]
+  have key : f = ∑ χ : IrreducibleCharacter G,
+      ClassFunction.inner f (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ) := by
+    rw [← sub_eq_zero]
+    refine classFunction_eq_zero_of_orthogonal _ fun ψ => ?_
+    rw [ClassFunction.inner_sub_left, hsum]
+    have hδ : (∑ χ : IrreducibleCharacter G, ClassFunction.inner f (χ : ClassFunction G ℂ)
+        * ClassFunction.inner (χ : ClassFunction G ℂ) ψ) = ClassFunction.inner f ψ := by
+      rw [Finset.sum_eq_single ψ
+        (fun χ _ hχ => by rw [irreducibleCharacter_inner_eq_ite χ ψ, if_neg hχ, mul_zero])
+        (fun h => absurd (Finset.mem_univ ψ) h),
+        irreducibleCharacter_inner_eq_ite ψ ψ, if_pos rfl, mul_one]
+    rw [hδ, sub_self]
+  rw [key]
+  exact Submodule.sum_mem _ fun χ _ =>
+    Submodule.smul_mem _ _ (Submodule.subset_span ⟨χ, rfl⟩)
+
+/-- **`Irr(G)` as a `ℂ`-basis of `CF(G)`** (general finite group): linear independence
+(`linearIndependent_irreducibleCharacter`) together with spanning
+(`classFunction_span_irreducibleCharacter_eq_top`).  The basis vector at `χ` is `χ` itself. -/
+noncomputable def irreducibleCharacterBasis [Invertible (Nat.card G : ℂ)] :
+    Module.Basis (IrreducibleCharacter G) ℂ (ClassFunction G ℂ) :=
+  Module.Basis.mk linearIndependent_irreducibleCharacter
+    classFunction_span_irreducibleCharacter_eq_top.ge
+
+@[simp] theorem irreducibleCharacterBasis_apply [Invertible (Nat.card G : ℂ)]
+    (χ : IrreducibleCharacter G) :
+    irreducibleCharacterBasis χ = (χ : ClassFunction G ℂ) := by
+  rw [irreducibleCharacterBasis, Module.Basis.mk_apply]
 
 namespace TICyclicHypothesis
 
