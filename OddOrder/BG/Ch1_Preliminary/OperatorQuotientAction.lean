@@ -295,6 +295,55 @@ theorem actionCommutator_conjNormal_map_subtype_eq {G : Type*} [Group G] (H R : 
       Subgroup.subset_closure ⟨⟨a, ha⟩, ⟨b, hb⟩, rfl⟩, ?_⟩
     rw [Subgroup.coe_subtype, hval]
 
+/-- **BG Prop 1.6(b), subgroup-commutator form** ⭐: `H ⊴ G`, `R ≤ G`, coprime orders, `G`
+solvable ⟹ `⁅⁅H, R⁆, R⁆ = ⁅H, R⁆`.
+
+This is the `G`-internal subgroup-commutator statement BG uses directly (e.g. Theorem 3.6 (3.6):
+`[H,R] = [[H,R],R]` lets one assume `H = [H,R]`; also (3.24), (3.32)).  Derived from the
+`actionCommutator` "restrict-self" lemma (`actionCommutator_restrict_self_map_subtype_eq`, which
+already encodes `[[N,A],A]=[N,A]` *without* needing `[H,R] ⊴ G`) plus the conjugation bridge
+`actionCommutator_conjNormal_map_subtype_eq` at two nesting levels.  The restricted `R`-action on
+`N := actionCommutator φ` agrees with `φ` on `N` (`toMulAutHom_apply_val`), so its generators carry
+the same commutator values `⁅↑↑n, ↑r⁆`. -/
+theorem commutator_commutator_right_eq {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (H R : Subgroup G) [H.Normal] (hCop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥R)) :
+    ⁅⁅H, R⁆, R⁆ = ⁅H, R⁆ := by
+  set φ : ↥R →* MulAut ↥H := (MulAut.conjNormal (G := G) (H := H)).comp R.subtype with hφ
+  set N : Subgroup ↥H := actionCommutator φ with hN
+  set ψ : ↥R →* MulAut ↥N := (IsAInvariant.actionCommutator φ).toMulAutHom with hψ
+  have hb : N.map H.subtype = ⁅H, R⁆ := actionCommutator_conjNormal_map_subtype_eq H R
+  have hself : (actionCommutator ψ).map N.subtype = N :=
+    actionCommutator_restrict_self_map_subtype_eq (φ := φ) hCop.symm (Or.inr inferInstance)
+  -- generator value (two coercion layers `↥N → ↥H → G`): `↑↑(nN * (ψ rB) nN⁻¹) = ⁅↑↑nN, ↑rB⁆`.
+  have hval2 : ∀ (nN : ↥N) (rB : ↥R),
+      (((nN * (ψ rB) nN⁻¹ : ↥N) : ↥H) : G) = ⁅(((nN : ↥H) : G)), (rB : G)⁆ := by
+    intro nN rB
+    have hφr : φ rB = MulAut.conjNormal (rB : G) := by rw [hφ]; rfl
+    simp only [hψ, Subgroup.coe_mul,
+      OddOrder.Isaacs.Ch03.IsAInvariant.toMulAutHom_apply_val, Subgroup.coe_inv, hφr,
+      MulAut.conjNormal_apply, commutatorElement_def]
+    group
+  -- nested bridge: `((actionCommutator ψ).map N.subtype).map H.subtype = ⁅⁅H,R⁆, R⁆`.
+  have hnest : ((actionCommutator ψ).map N.subtype).map H.subtype = ⁅⁅H, R⁆, R⁆ := by
+    rw [Subgroup.map_map]
+    apply le_antisymm
+    · rw [Subgroup.map_le_iff_le_comap]
+      unfold actionCommutator
+      rw [Subgroup.closure_le]
+      rintro x ⟨nN, rB, rfl⟩
+      rw [SetLike.mem_coe, Subgroup.mem_comap, MonoidHom.comp_apply, Subgroup.coe_subtype,
+        Subgroup.coe_subtype, hval2]
+      have hmem : (((nN : ↥H) : G)) ∈ ⁅H, R⁆ := hb ▸ ⟨(nN : ↥H), nN.2, rfl⟩
+      exact Subgroup.commutator_mem_commutator hmem rB.2
+    · rw [Subgroup.commutator_le]
+      intro c hc r hr
+      rw [← hb] at hc
+      obtain ⟨nH, hnH, rfl⟩ := hc
+      refine ⟨(⟨nH, hnH⟩ : ↥N) * (ψ ⟨r, hr⟩) (⟨nH, hnH⟩ : ↥N)⁻¹,
+        Subgroup.subset_closure ⟨(⟨nH, hnH⟩ : ↥N), ⟨r, hr⟩, rfl⟩, ?_⟩
+      rw [MonoidHom.comp_apply, Subgroup.coe_subtype, Subgroup.coe_subtype, hval2]
+  rw [← hnest, hself, hb]
+
 end ConjNormalBridge
 
 end OddOrder.BG.Ch1.OperatorQuotientAction
