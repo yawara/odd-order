@@ -1432,6 +1432,137 @@ theorem caseI_special (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ 
     have hT' : A rt j₀ = {ma, mc, mb} := by rw [hT, Finset.pair_comm]
     exact caseI_tail hG hac hab hbc.symm hat hct hbt hj hLa hLc hLb hT' hB3 hB1 hχ8fc hχ8nmc
 
+open scoped Classical in
+/-- **(3.5.4) Case I is impossible**: the full pencil configuration (apex `χ` shared by rows
+`ra, rb, rc`, transversal `rt` with `A rt j₀ = {ma, mb, mc}`).  The transversal's `j₁`-cell shares
+exactly one of `ma, mb, mc` (an `L`-relation), naming the special row; dispatch to `caseI_special`
+with that row in the lead (the configuration is symmetric in the three pencil rows). -/
+theorem caseI_false (hG : IsSignedTripleGrid A) {ra rb rc rt : ι} {j₀ j₁ : κ}
+    (hab : ra ≠ rb) (hac : ra ≠ rc) (hbc : rb ≠ rc)
+    (hat : ra ≠ rt) (hbt : rb ≠ rt) (hct : rc ≠ rt) (hj : j₀ ≠ j₁)
+    {χ ma mb mc fa fb fc : ClassFunction G ℂ}
+    (hLa : A ra j₀ = {χ, ma, fa}) (hLb : A rb j₀ = {χ, mb, fb})
+    (hLc : A rc j₀ = {χ, mc, fc}) (hT : A rt j₀ = {ma, mb, mc}) : False := by
+  classical
+  obtain ⟨w, hw⟩ := Finset.card_eq_one.mp (hG.inter_L rt rt j₁ j₀ (Or.inl ⟨rfl, hj.symm⟩))
+  obtain ⟨hwB, hwT⟩ := Finset.mem_inter.mp (hw ▸ Finset.mem_singleton_self w)
+  rw [hT] at hwT
+  simp only [Finset.mem_insert, Finset.mem_singleton] at hwT
+  rcases hwT with rfl | rfl | rfl
+  · exact caseI_special hG hab hac hbc hat hbt hct hj hLa hLb hLc hT hwB
+  · exact caseI_special hG hab.symm hbc hac hbt hat hct hj hLb hLa hLc
+      (by rw [hT, Finset.insert_comm]) hwB
+  · refine caseI_special hG hac.symm hbc.symm hab hct hat hbt hj hLc hLa hLb ?_ hwB
+    rw [hT]; ext x; simp only [Finset.mem_insert, Finset.mem_singleton]; tauto
+
+open scoped Classical in
+/-- **(3.5.4)**, existence half: with at least four rows and a second column `j₁ ≠ j₀`, some element
+is common to every `A i j₀`.  If not, three rows form a triangle (`exists_namedTriangle`); a fourth
+row's `j₀`-cell either hits a vertex of the triangle (Case I — `caseI_false`, three sub-cases by
+which vertex) or hits none, so equals the three "third" elements (Case II — `caseII_false`).  With
+`common_unique`, this gives `|⋂ᵢ A i j₀| = 1`. -/
+theorem exists_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fintype.card ι)
+    {j₀ j₁ : κ} (hjne : j₀ ≠ j₁) : ∃ z, ∀ i, z ∈ A i j₀ := by
+  classical
+  by_contra hno
+  obtain ⟨i₁, i₂, i₃, h12, h13, h23, hnoc⟩ :=
+    exists_triangle_of_not_exists_common hG (by omega) j₀ hno
+  obtain ⟨e12, e13, e23, t1, t2, t3, hS1, hS2, hS3, d1213, d1223, d1323⟩ :=
+    exists_namedTriangle hG h12 h13 h23 hnoc
+  obtain ⟨i₄, hi4⟩ : ∃ i₄, i₄ ∉ ({i₁, i₂, i₃} : Finset ι) := by
+    have hb : ({i₁, i₂, i₃} : Finset ι).card ≤ 3 := by
+      have hb1 := Finset.card_insert_le i₁ ({i₂, i₃} : Finset ι)
+      have hb2 := Finset.card_insert_le i₂ ({i₃} : Finset ι)
+      simp only [Finset.card_singleton] at hb1 hb2; omega
+    by_contra hcon; push_neg at hcon
+    have hle : (Finset.univ : Finset ι).card ≤ ({i₁, i₂, i₃} : Finset ι).card :=
+      Finset.card_le_card (fun x _ => hcon x)
+    rw [Finset.card_univ] at hle; omega
+  simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hi4
+  obtain ⟨h41, h42, h43⟩ := hi4
+  obtain ⟨_, de12t1, de13t1⟩ := triple_distinct (hS1 ▸ hG.card_eq_three i₁ j₀)
+  obtain ⟨_, de12t2, de23t2⟩ := triple_distinct (hS2 ▸ hG.card_eq_three i₂ j₀)
+  obtain ⟨_, de13t3, de23t3⟩ := triple_distinct (hS3 ▸ hG.card_eq_three i₃ j₀)
+  have he12_1 : e12 ∈ A i₁ j₀ := by rw [hS1]; exact Finset.mem_insert_self _ _
+  have he12_2 : e12 ∈ A i₂ j₀ := by rw [hS2]; exact Finset.mem_insert_self _ _
+  have he13_1 : e13 ∈ A i₁ j₀ := by
+    rw [hS1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have he13_3 : e13 ∈ A i₃ j₀ := by rw [hS3]; exact Finset.mem_insert_self _ _
+  have he23_2 : e23 ∈ A i₂ j₀ := by
+    rw [hS2]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have he23_3 : e23 ∈ A i₃ j₀ := by
+    rw [hS3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_self _ _)
+  have ht1_1 : t1 ∈ A i₁ j₀ := by
+    rw [hS1]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have ht2_2 : t2 ∈ A i₂ j₀ := by
+    rw [hS2]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  have ht3_3 : t3 ∈ A i₃ j₀ := by
+    rw [hS3]; exact Finset.mem_insert_of_mem (Finset.mem_insert_of_mem (Finset.mem_singleton_self _))
+  by_cases he12 : e12 ∈ A i₄ j₀
+  · -- Case I, apex `e12`, pencil `i₁, i₂, i₄`, transversal `i₃`
+    obtain ⟨hne13_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 he12
+    obtain ⟨hne23_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h42, rfl⟩) hS2 d1223 de12t2 de23t2 he12
+    have ht3_4 : t3 ∈ A i₄ j₀ :=
+      lStep_third hG (Or.inr ⟨h43, rfl⟩) hS3 d1323 de13t3 de23t3 hne13_4 hne23_4
+    have he12t3 : e12 ≠ t3 := fun h =>
+      d1213 (eq_of_mem_Llinked hG (Or.inr ⟨h13, rfl⟩) he13_1 he13_3 he12_1 (by rw [h]; exact ht3_3))
+    obtain ⟨fc, _, _, _, hA4⟩ := exists_third_of_card_three (hG.card_eq_three i₄ j₀) he12 ht3_4 he12t3
+    exact caseI_false hG h12 (Ne.symm h41) (Ne.symm h42) h13 h23 h43 hjne hS1 hS2 hA4 hS3
+  · by_cases he13 : e13 ∈ A i₄ j₀
+    · -- Case I, apex `e13`, pencil `i₁, i₃, i₄`, transversal `i₂`
+      have hS1' : A i₁ j₀ = {e13, e12, t1} := by rw [hS1, Finset.insert_comm]
+      obtain ⟨hne12_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h41, rfl⟩) hS1' d1213.symm de13t1 de12t1 he13
+      obtain ⟨hne23_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h43, rfl⟩) hS3 d1323 de13t3 de23t3 he13
+      have ht2_4 : t2 ∈ A i₄ j₀ :=
+        lStep_third hG (Or.inr ⟨h42, rfl⟩) hS2 d1223 de12t2 de23t2 hne12_4 hne23_4
+      have he13t2 : e13 ≠ t2 := fun h =>
+        (d1213 (eq_of_mem_Llinked hG (Or.inr ⟨h12, rfl⟩) he12_1 he12_2 he13_1
+          (by rw [h]; exact ht2_2)).symm)
+      obtain ⟨fc, _, _, _, hA4⟩ :=
+        exists_third_of_card_three (hG.card_eq_three i₄ j₀) he13 ht2_4 he13t2
+      exact caseI_false hG h13 (Ne.symm h41) (Ne.symm h43) h12 h23.symm h42 hjne hS1' hS3 hA4 hS2
+    · by_cases he23 : e23 ∈ A i₄ j₀
+      · -- Case I, apex `e23`, pencil `i₂, i₃, i₄`, transversal `i₁`
+        have hS2' : A i₂ j₀ = {e23, e12, t2} := by rw [hS2, Finset.insert_comm]
+        have hS3' : A i₃ j₀ = {e23, e13, t3} := by rw [hS3, Finset.insert_comm]
+        obtain ⟨hne12_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h42, rfl⟩) hS2' d1223.symm de23t2 de12t2 he23
+        obtain ⟨hne13_4, _, _, _, _⟩ := lStep hG (Or.inr ⟨h43, rfl⟩) hS3' d1323.symm de23t3 de13t3 he23
+        have ht1_4 : t1 ∈ A i₄ j₀ :=
+          lStep_third hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 hne12_4 hne13_4
+        have he23t1 : e23 ≠ t1 := fun h =>
+          d1223 (eq_of_mem_Llinked hG (Or.inr ⟨h12, rfl⟩) he12_1 he12_2
+            (by rw [h]; exact ht1_1) he23_2).symm
+        obtain ⟨fc, _, _, _, hA4⟩ :=
+          exists_third_of_card_three (hG.card_eq_three i₄ j₀) he23 ht1_4 he23t1
+        exact caseI_false hG h23 (Ne.symm h42) (Ne.symm h43) h12.symm h13.symm h41 hjne hS2' hS3' hA4 hS1
+      · -- Case II: the fourth cell is the three "third" elements
+        have ht1_4 : t1 ∈ A i₄ j₀ :=
+          lStep_third hG (Or.inr ⟨h41, rfl⟩) hS1 d1213 de12t1 de13t1 he12 he13
+        have ht2_4 : t2 ∈ A i₄ j₀ :=
+          lStep_third hG (Or.inr ⟨h42, rfl⟩) hS2 d1223 de12t2 de23t2 he12 he23
+        have ht3_4 : t3 ∈ A i₄ j₀ :=
+          lStep_third hG (Or.inr ⟨h43, rfl⟩) hS3 d1323 de13t3 de23t3 he13 he23
+        have ht1t2 : t1 ≠ t2 := fun h =>
+          de12t1 (eq_of_mem_Llinked hG (Or.inr ⟨h12, rfl⟩) he12_1 he12_2 ht1_1
+            (by rw [h]; exact ht2_2)).symm
+        have ht1t3 : t1 ≠ t3 := fun h =>
+          de13t1 (eq_of_mem_Llinked hG (Or.inr ⟨h13, rfl⟩) he13_1 he13_3 ht1_1
+            (by rw [h]; exact ht3_3)).symm
+        have ht2t3 : t2 ≠ t3 := fun h =>
+          de23t2 (eq_of_mem_Llinked hG (Or.inr ⟨h23, rfl⟩) he23_2 he23_3 ht2_2
+            (by rw [h]; exact ht3_3)).symm
+        have hA4 : A i₄ j₀ = {t1, t2, t3} := cell_eq_triple hG ht1_4 ht2_4 ht3_4 ht1t2 ht1t3 ht2t3
+        exact caseII_false hG hjne.symm h12 h13 (Ne.symm h41) hS1 hS2 hS3 hA4
+
+/-- **Peterfalvi (3.5.4)**: `|⋂_{1 ≤ i < w₁} A_{i1}| = 1` (abstract form).  With at least four rows
+and a second column, exactly one element lies in every `A i j₀`.  Combines the existence half
+`exists_common` (the sunflower argument: triangle + Cases I/II) with the uniqueness half
+`common_unique` (two such share `A i₁ j₀ ∩ A i₂ j₀`, a singleton). -/
+theorem existsUnique_common [Fintype ι] (hG : IsSignedTripleGrid A) (hι : 4 ≤ Fintype.card ι)
+    {j₀ j₁ : κ} (hjne : j₀ ≠ j₁) : ∃! z, ∀ i, z ∈ A i j₀ := by
+  obtain ⟨z, hz⟩ := exists_common hG hι hjne
+  exact ⟨z, hz, fun z' hz' => common_unique hG (by omega) hz' hz⟩
+
 end IsSignedTripleGrid
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/

@@ -675,3 +675,33 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 - **w₁≥5 WLOG**: (3.5.4) を `4≤Fintype.card ι` 仮説で証明済設計 (ι=非自明χ₁); `sup_card_ge_five` の disjunction で W₁/W₂ 側を選ぶ (assembly/§3.5 末)。
 
 正本 = 本ノート (session 12 cont. セクション)。
+
+## 2026-06-09 (session 13, b-peterfalvi): (3.5.4) COMPLETE — sunflower `|⋂_i A_{i1}|=1` 完成 [真のボトルネック解除]
+
+**hard core (3.5.4) を 1 セッションで完全形式化。** メモリが「真のボトルネック・multi-session 級・~400-600 行」と記した部分。すべて `S05_SigmaIsometry.lean`、sorry-free・axiom-clean・full AxiomsCheck green (3558 jobs)。6 commits (`0d02c134`/`99c62c80`/`ee9dbe42`/`646b0627`/`b38adc35`/`88692770`)。
+
+### ✅ 着地 (session 13)
+1. **L/O membership-deduction ヘルパー層** (`0d02c134`): abstract grid の `inter_L`/`noNeg_L`/`inter_O` フィールドを membership 演繹に変換。
+   - `ne_neg_of_Llinked` (L-linked 2 cell の元は互いに負でない) / `eq_of_mem_Llinked` (共有元一意)。
+   - **`oStep`** (核エンジン): `{χ,u,v}` が `B∋χ` と O 関係 (`-χ∉B`) ⟹ `u,v∉B` かつ `-u,-v` の**ちょうど一方**が B (`-u∈B ↔ -v∉B`)。
+   - `lStep` (L 版: u,v∉B + 負も∉)、`oStep_out` (全員 out ⟹ 負も out)、`oStep_force` (`-x∈B`⟹z∈B)、`oStep_both_out` (新元素の cell 単位 newness)、`lStep_third` (L で z∈B)、`not_two_shared`、`not_disjoint_Llinked` (disjoint triple ⊥ L)、`cell_eq_triple`、`ne_neg_of_mem_same`。
+2. **(3.5.4.1) `pencilCell`** (`0d02c134`): `χ∈A ra j₁ ⟹ A ra j₁={χ,-fb,-fc}`。**🔑 論文より clean**: 横断線 (transversal) の O 関係が**両 meet-point の負を一度に殺す** (`oStep_out`) ので、論文の「-χ₄ 仮定→χ₆→O(12,41) 矛盾」の迂回が不要。
+3. **(3.5.4.2) `transversalCell`** (`99c62c80`): 横断 cell が meet `ma` を共有 ⟹ `A rt j₁={ma,-fa,χ8}`、χ8 新 (χ,fb,fc,-fb,-fc,-mb,-mc と相異)。`-fa` (not `-χ`) は「`-χ∈B` だと両 free `fb,fc∈B` (各 oStep_force) だが空きは 1 枠 ⟹ fb=fc 矛盾」で確定。χ8-newness は `oStep_both_out` の 7 連発。
+4. **(3.5.4.4)-(3.5.4.5) endgame `caseI_tail`** (`ee9dbe42`): 役割固定 (ra=special/rb=active/rc=passive)。`B₁={ma,-mb,fb}`+`B₃={ma,-fa,χ8}` ⟹ False。(3.5.4.4) で `fb,χ8∈B₂`; (3.5.4.5) で `χ8∈B₄`→`-mb∈B₄`→`O(B₄,A rb j₀)` が `mb∈B₄` 強制で矛盾。**🔑 論文に無い明示化**: `-χ∉B₄` は**同じ行の noNeg_L** (χ∈A rc j₀) から自明 — これが論文「O(42,11)⟹χ₂∧-χ₃」の根拠。距離 bookkeeping は局所 `hnn` (任意の col-j₀ 名前付き元は互いに非負) + `hcross` (異 pencil 行の非 apex 元は相異) で圧縮。
+5. **(3.5.4.3)+glue `caseI_special`** (`646b0627`): transversalCell→caseI_tail を接続。B₁ 確定 (χ∉B₁ via pencilCell⊥B₃; fa∉B₁ via noNeg(B₃,B₁); ma∈B₁; O で `-mb`/`-mc` のちょうど一方) → active 行を `by_cases` で命名 → 各枝 `oStep_force` で `B₁={ma,-m_act,f_act}` → caseI_tail (b↔c 対称を 2 呼び出しで処理)。**⚠ 性能**: cell 並べ替えは `Finset.insert_comm`/`pair_comm` で (旧 `ext;simp;tauto` は passive 枝でヒープ超過)。
+6. **(3.5.4) `caseI_false` + assembly `exists_common` + capstone `existsUnique_common`** (`b38adc35`): 横断 cell が ma/mb/mc のどれを共有か rcases→caseI_special (pencil 3 行対称); assembly は triangle 抽出→4 行目→頂点 3 ケース [Case I] + 頂点なし [Case II→caseII_false]→`∃! z,∀i z∈A i j₀`。
+
+### 🔑 再利用可能な技術事実 (再調査不要)
+- **abstract `IsSignedTripleGrid` で (3.5.4) を完全に閉じた** — TICyclic 非依存。`existsUnique_common (hι:4≤card ι)(hjne:j₀≠j₁) : ∃! z,∀i z∈A i j₀`。Afam への instantiate は `Afam_isSignedTripleGrid` + w₁≥5 WLOG で (次セッション)。
+- **距離 bookkeeping 圧縮レシピ**: `hnn : ∀{r s x y}, x∈A r j₀→y∈A s j₀→x≠-y` (by_cases r=s で ne_neg_of_mem_same / ne_neg_of_Llinked) + `hcross : r≠s→χ∈A r→χ∈A s→x∈A r→y∈A s→x≠χ→x≠y` (eq_of_mem_Llinked)。± 符号組合せは: `+x≠+y`=hcross/triple, `+x≠-y`=hnn, `-x≠+y`=(hnn y x).symm, `-x≠-y`=neg_injective.ne。
+- **`simp not_or` 由来の `h:¬(a=b)` は `Ne` ヘッドでなく `Not` ⟹ `h.symm` 不可** → `Ne.symm h` を使う (defeq だが dot-notation が Function.symm を探す)。
+- **大証明のヒープ**: 巨大 theorem を多数 `exact` する証明 + `tauto` 並べ替えはヒープ超過し得る。Finset 並べ替えは `insert_comm`/`pair_comm` を使う。
+- mmd の (3.5.4.1)-(3.5.4.6) は faithful に再現したが、(3.5.4.1) は transversal-O で、Case II は単一 parity で簡略化。
+
+### ▶▶ 次 = (3.5.5) decomposition → Afam 接続 → (3.5) 完成 → (3.2) σ
+- **(3.5.5)**: `-χ_01 := ⋂A_i1 の元` (existsUnique_common で取得)、`-χ_02 := ⋂A_i2 の元`、`-χ_i0 := A_i1∩A_i2 の元`、`β_i1=-χ_i0-χ_01+φ_i`/`β_i2=-χ_i0-χ_02+ψ_i`、(φ_i)(ψ_i) 正規直交族で φ⊥ψ (i≠i')。mmd L97-107。
+- **Afam 接続 (w₁≥5 WLOG)**: abstract `existsUnique_common` を `Afam_isSignedTripleGrid` に instantiate。ι=非自明χ₁ (card=w₁-1)、κ=非自明χ₂ (card=w₂-1)。`4≤card ι` は w₁≥5、`∃j₁≠j₀` は w₂≥3 (常成立)。`sup_card_ge_five` で w₁≥5∨w₂≥5、≥5 側を rows に取る (Afam は W₁↔W₂ 対称)。
+- **w₂=3 で (3.5) 完了、w₂≥5 で W₁↔W₂ 適用** (mmd 末)。→ χ_ij 族確立 → (3.2) σ-isometry → (3.6)-(3.9)。
+- まだ hard core ×1 = (4.3) が残る (§6 定理本体)。FT 経路外。
+
+正本 = 本ノート (session 13 セクション)。
