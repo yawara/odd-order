@@ -29,7 +29,11 @@
      - `AxiomsCheck.lean` / `OddOrder.lean` の**独立追記衝突** = 両ブロック保持で解決して続行
        （A=keystone 系の `#assert_only_allowed_axioms`、B=Peterfalvi 系の同コマンドは別定理ゆえ両方有効）
      - それ以外・内容が絡む衝突 = `git merge --abort` で**報告**（自動解決しない）
-   - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。`.lean` を含むなら `lake build OddOrder OddOrder.AxiomsCheck`（background, 完了待ち）
+   - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。
+   - **`.lean` を含む場合 — sorry 先行チェックで build 短絡**: build は重い (~3600 jobs) ので**先に**
+     `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/ | wc -l` を取る。マージ前から増えていれば下記ゲートの ⚠ 手順で
+     真の tactic sorry か判定し、**真の sorry 増なら build せず即 `git merge --abort`**(build が通っても sorry
+     ゲートで落ちるため無駄)。増えていなければ `lake build OddOrder OddOrder.AxiomsCheck`(background, 完了待ち)へ。
    - **合格条件**（全て満たす）:
      - build exit 0 かつ最終行 "Build completed successfully (N jobs)"
      - AxiomsCheck OK（`#assert_only_allowed_axioms` 由来のエラーなし）
@@ -65,3 +69,12 @@
   (2) `git grep -lE '^(<<<<<<<|=======|>>>>>>>)'` でコンフリクトマーカー残存なしを確認、(3) 通常の
   build + AxiomsCheck + sorry 不増ゲートを通し、(4) 合格なら `git commit` で完結（不合格は `git merge --abort`）。
   注意: 真の pre-merge sorry 数は既にマージ適用後なので、`git show main:<file>` で touched .lean を main HEAD と比較する。
+
+## 現状メモ
+
+- **2026-06-09 — A=現状維持 (ユーザー判断)**: Lane A が初めて Thm 3.5 の `.lean`
+  (`OddOrder/BG/Ch1_Preliminary/S03e_Thm35.lean`) を持ち込んだが、`thm35_aux` の **faithful 枝に
+  hard-core sorry**(steps 3.4/3.5/Clifford)が 1 個残る(non-faithful 枝は COMPLETE、BG Thm 3.4 は
+  既に main に landed 済)。ユーザー判断は **sorry 不増ゲート堅持・A は faithful 枝が sorry-free になるまで
+  報告のみ**。⟹ A が ahead でも、上記「sorry 先行チェック」でこの sorry を検出したら build せず即 abort し、
+  「A: faithful 枝 sorry 残り報告のみ」と報告する(scaffold を main に入れない)。A が sorry-free になったら通常合流に戻す。
