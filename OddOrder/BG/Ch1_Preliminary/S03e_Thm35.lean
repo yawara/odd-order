@@ -248,6 +248,79 @@ theorem dichotomy_3_5
 
 end Dichotomy35
 
+/-! ## Step 9 foundations: the Clifford hard core (mmd L945-951) -/
+
+section Step9
+
+variable {F : Type*} [Field F] {G : Type*} [Group G]
+variable {W : Type*} [AddCommGroup W] [Module F W]
+
+/-- On a one-dimensional module every linear endomorphism is a scalar (a homothety), so the
+endomorphisms `ρ g` pairwise commute and the representation kills commutators: `⁅K, K⁆ ⊆ C_W(K)`
+for any subgroup `K`.
+
+This is the punchline of step 9 of Theorem 3.5: once the reductions force `dim_F U = 1`, the
+abelian group `K' = ⁅K, K⁆` acts trivially on `U`, so `C_U(K') = U ≠ 0`. -/
+theorem trivial_on_commutator_of_finrank_eq_one
+    (ρ : Representation F G W) (hdim : Module.finrank F W = 1) (K : Subgroup G) :
+    ∀ g ∈ (⁅K, K⁆ : Subgroup G), ρ g = 1 := by
+  -- Every `ρ a` is a scalar `algebraMap F (End) c`.
+  have hsc : ∀ a : G, ∃ c : F, ρ a = algebraMap F (Module.End F W) c := fun a => by
+    obtain ⟨c, hc⟩ := (LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one hdim (ρ a)).exists
+    exact ⟨c, by rw [hc]; exact (Algebra.algebraMap_eq_smul_one c).symm⟩
+  -- Scalars commute, so all `ρ x` commute.
+  have hcomm : ∀ x y : G, ρ x * ρ y = ρ y * ρ x := fun x y => by
+    obtain ⟨cx, hx⟩ := hsc x; obtain ⟨cy, hy⟩ := hsc y
+    rw [hx, hy, ← map_mul, ← map_mul, mul_comm cx cy]
+  -- `⁅K, K⁆ ≤ ker ρ`, checking single commutators.
+  suffices hle : (⁅K, K⁆ : Subgroup G) ≤ MonoidHom.ker ρ from fun g hg => hle hg
+  rw [Subgroup.commutator_le]
+  intro a _ b _
+  rw [MonoidHom.mem_ker, commutatorElement_def, map_mul, map_mul, map_mul]
+  calc ρ a * ρ b * ρ a⁻¹ * ρ b⁻¹
+      = ρ a * (ρ b * ρ a⁻¹) * ρ b⁻¹ := by rw [mul_assoc (ρ a)]
+    _ = ρ a * (ρ a⁻¹ * ρ b) * ρ b⁻¹ := by rw [hcomm b a⁻¹]
+    _ = (ρ a * ρ a⁻¹) * (ρ b * ρ b⁻¹) := by simp only [mul_assoc]
+    _ = ρ (a * a⁻¹) * ρ (b * b⁻¹) := by rw [← map_mul, ← map_mul]
+    _ = 1 := by rw [mul_inv_cancel, mul_inv_cancel, map_one, mul_one]
+
+/-- **The fixed space of a normal subgroup is `G`-invariant**, so for an irreducible `ρ` it is `⊥`
+or `⊤`.  Hence if a normal subgroup `N ◁ G` has a nonzero fixed vector (`C_W(N) ≠ 0`), it acts
+trivially on the whole irreducible module: `∀ g ∈ N, ρ g = 1`.
+
+This is the step-8/9 reduction `C_U(K') ≠ 0 ⟹ K' ⊆ C_K(V)` (BG mmd L943): once `C_U(K')` is
+shown nonzero, irreducibility upgrades it to all of `U`. -/
+theorem trivial_of_invariants_comp_ne_bot
+    (ρ : Representation F G W) [ρ.IsIrreducible] (N : Subgroup G) [hNnorm : N.Normal]
+    (hne : Representation.invariants (ρ.comp N.subtype) ≠ ⊥) :
+    ∀ g ∈ N, ρ g = 1 := by
+  -- The fixed space `C_W(N)` carries a subrepresentation (it is `G`-invariant by normality of `N`).
+  let Wρ : Subrepresentation ρ :=
+    { toSubmodule := Representation.invariants (ρ.comp N.subtype)
+      apply_mem_toSubmodule := fun g v hv => by
+        rw [Representation.mem_invariants] at hv ⊢
+        intro n
+        have hn' : g⁻¹ * (n : G) * g ∈ N := by
+          have := hNnorm.conj_mem (n : G) n.2 g⁻¹; simpa using this
+        have hfix := hv ⟨g⁻¹ * (n : G) * g, hn'⟩
+        show ρ (n : G) (ρ g v) = ρ g v
+        have hfix' : ρ (g⁻¹ * (n : G) * g) v = v := hfix
+        rw [← Module.End.mul_apply, ← map_mul,
+          show (n : G) * g = g * (g⁻¹ * (n : G) * g) by group, map_mul, Module.End.mul_apply,
+          hfix'] }
+  -- Irreducibility: `Wρ` is `⊥` or `⊤`; nonzero rules out `⊥`, so `N` fixes everything.
+  rcases IsSimpleOrder.eq_bot_or_eq_top Wρ with hbot | htop
+  · exact absurd (congrArg Subrepresentation.toSubmodule hbot) hne
+  · have htop' : Representation.invariants (ρ.comp N.subtype) = ⊤ :=
+      congrArg Subrepresentation.toSubmodule htop
+    intro g hg
+    ext v
+    have hv : v ∈ Representation.invariants (ρ.comp N.subtype) := htop' ▸ Submodule.mem_top
+    rw [Representation.mem_invariants] at hv
+    exact hv ⟨g, hg⟩
+
+end Step9
+
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
 
 `Nat.card G = n` での強帰納法。結論 `∀ g ∈ ⁅K, K⁆, ρ g = 1` (= `K' ⊆ C_K(V)`)。
