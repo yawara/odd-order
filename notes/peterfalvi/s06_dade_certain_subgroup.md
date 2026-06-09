@@ -586,3 +586,68 @@ verdict の 18-22h は §5 (3.x) を見落とし過少。Brauer free を差し�
 7. (3.6)Hyp/(3.7)/(3.8) NC(ψ) → (3.9) Galois ((1.9)) → §6 (4.x)
 
 正本 = 本ノート (session 11 セクション)。S05_SigmaIsometry.lean が (3.5)/(3.2)/(3.6)-(3.9) の home。
+
+## 2026-06-09 (session 12, b-peterfalvi): (3.5.2) L/O + (3.5.3) + 固定族インフラ — 4 commits
+
+(3.5) hard core の**組合せ論ツール層が完成**。すべて `S05_SigmaIsometry.lean`、sorry-free・axiom-clean・full AxiomsCheck green。次セッションは (3.5.4) 本体（sunflower）に集中できる。
+
+### ✅ 着地 (session 12, 4 commits)
+1. **signed-irreducible API** (S05 namespace, TICyclic 非依存・抽象):
+   - `IsSignedNontrivialIrr.{apply_one_ne_zero, ne_zero, ne_neg_self, inner_self}`,
+     `irreducibleCharacter_coe_ne_neg`, 三分法 `isSignedNontrivialIrr_inner`
+     (`⟨x,c⟩ = 1/-1/0` ⟺ `x=c` / `x=-c` / else)。
+   - **`IsSignedTriple β A` 構造体** (`[Invertible (Nat.card G : ℂ)]` を構造体束縛で持つ; β = 3 個の
+     pairwise-orth signed nontrivial irr の和)。helper: `neg_not_mem`, `inner_right_signed`
+     (`⟨β,c⟩ = [c∈A]-[-c∈A]`), `inner_self` (= |A|), `exists_isSignedTriple_of_inner_self_three`。
+2. **(3.5.2) L補題** (commit `53799f92`):
+   - `IsSignedTriple.no_neg_of_inner_one` (抽象): `⟨β,β'⟩=1 ∧ β(1)=β'(1) ⟹ ∀c∈A, -c∉A'`。
+     **証明の核** = `δ := (β-β') - 2c` の `⟨δ,δ⟩=0` (正定値 `eq_zero_of_inner_self_re_eq_zero`)
+     ⟹ `β-β'=2c` ⟹ `(β-β')(1)=2c(1)≠0`、しかし `β(1)=β'(1)` で 0 ⟹ 矛盾。
+     (= 論文の「`2χ₃ = Ind(α₁₁-α₁₂)` が 1∈G で消える」。Cauchy-Schwarz も対称差も不要。)
+   - `IsSignedTriple.L_of_inner_one`: + `|A∩A'| = ⟨β',β⟩ = 1`。
+   - 値-at-1 供給: **`beta_apply_one`** (`β_ij(1)=-1`; `induce_apply_one` + `α_ij(1)=0` via
+     `alphaCF_eq_zero_of_mem_W1_subgroupOf` (1∈W1.subgroupOf W))。
+   - concrete: `beta_inner_eq_one_of_one_shared` + `betaTriple_L`。
+3. **(3.5.2) O補題** (commit `1b04d612`):
+   - `IsSignedTriple.O_card_inter_eq` (抽象): `⟨β,β'⟩=0 ⟹ |A∩A'| = |{x∈A : -x∈A'}|`。
+     (`⟨β',β⟩ = |A∩A'| - |{x∈A:-x∈A'}| = ⟨β,β'⟩* = 0`。) downstream 用法: A,A' の共通元 ⟹ negated 共通元も。
+   - concrete: `beta_inner_eq_zero_of_both_diff` + `betaTriple_O`。
+4. **(3.5.3)** (commit `a17ebbde`): `sup_card_ge_five : 5 ≤ |W₁| ∨ 5 ≤ |W₂|`。
+   両 odd (`Odd.of_dvd_nat` + `Subgroup.card_dvd_of_le`)・>1・coprime ⟹ 両≤4 なら両=3 ⟹ `¬Coprime 3 3`。
+5. **固定族 A_ij** (commit `b0c8dcfd`): 論文が (3.5.1) 直後に固定する `A_ij`。index = 非自明 χ₁,χ₂ の subtype pair。
+   - `Afam p q := (exists_isSignedTriple_beta ..).choose` (Classical.choose で一意固定)。
+   - `Afam_isSignedTriple`, `Afam_L` (shared one index), `Afam_O` (both differ)。
+   - 抽象 `IsSignedTriple.{L_of_inner_one, O_card_inter_eq}` を固定族に instantiate。
+
+### 🔑 再利用可能な技術事実 (再調査不要)
+- **`IsSignedTriple` 構造体は `[Invertible (Nat.card G : ℂ)]` を構造体束縛で持つ** (field `pairwise_orthogonal`
+  が `ClassFunction.inner` を使うため)。使用側の補題は全て同 instance を持つので透過。
+- **三分法 `isSignedNontrivialIrr_inner`**: 4-way `rcases hxχ with rfl|rfl <;> rcases hcψ with rfl|rfl`、
+  各 case で `irr_cf_inner` + `irreducibleCharacter_coe_ne_neg` (X≠-Y は 1∈G で +d vs -d') + neg 操作
+  (`inner_neg_left/right`, `neg_inj`, `neg_eq_iff_eq_neg`)。
+- **L補題の value-at-1 核**: bilinear 展開を `simp only [inner_sub_left, inner_sub_right,
+  inner_smul_left, inner_smul_right, ...]` で潰し `⟨δ,δ⟩=0`、`sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero (by rw[hzero]; exact Complex.zero_re))` で `β-β'=2•c`。`star (2:ℂ) = 2` は `by norm_num`。
+- **`Finset.sum_boole` + `Finset.filter_mem_eq_inter`** で `Σ_{x∈A}(if x∈A' then 1 else 0) = |A∩A'|`。
+- **O の対称性**: `⟨β',β⟩ = star ⟨β,β'⟩` (`inner_conj_symm β β'`); `star 0 = 0` (`star_zero`), `star 1 = 1` (`star_one`)。
+- **`omit [Fintype G] in` は docstring の前**に置く (後置は parse error)。`open Classical in` も同様。
+- `∩`/`filter` を含む statement は `open Classical in` 必須 (`DecidableEq (CF G ℂ)`)。
+
+### ▶▶ 次 leaf = (3.5.4) `|⋂_i A_i1| = 1` [真の hard core, 多セッション]
+**正本テキスト** = `references/peterfalvi/04.5_..._Cyclic_Normalizers.mmd` L59-107。
+
+**構造** (≥4 行 × ≥2 列の signed-triple grid; 道具は全て揃った: `Afam_isSignedTriple/_L/_O`, `sup_card_ge_five`):
+- **`⋂ ≤ 1` は易** (2 行の L で共通元一意)。**`⋂ ≠ ∅` が hard** (Cases I/II)。
+- 「false ⟺ `⋂_i A_i1 = ∅`」(⋂≤1 なので |⋂|≠1 ⟺ ⋂=∅)。
+- ⋂=∅ ⟹ 3 行が **triangle**: `β_11=χ1+χ2+χ3, β_21=χ1+χ4+χ5, β_31=χ2+χ4+χ6` (pairwise ∩ = {χ1},{χ2},{χ4} 相異)。
+- **Case I** (A_41 が triangle の ∩点を含む, WLOG χ1∈A_41 ⟹ `β_41=χ1+χ6+χ7`): 補題 (3.5.4.1)〔χ1∈A_i2 ⟹ β_i2 の形〕,
+  (3.5.4.2) `β_32=χ2-χ3+χ8`, (3.5.4.3) `β_12=χ2-χ4+χ5`, (3.5.4.4) `β_22=χ5+χ8+χ9`, (3.5.4.5) Case I 矛盾。
+- **Case II** (A_41 が ∩点を含まない, `β_41=χ3+χ5+χ6`): (3.5.4.6) で `χ1∈A_12,−χ4∈A_12 ⟹ χ6∈A_12` が O(12,41) と矛盾。
+- 各補題は L/O の連鎖 + membership 簿記。**WLOG/対称性が形式化の壁** (「β_21 と β_41 の対称性で -χ4∈A_12 と仮定」等)
+  → 両 branch を証明 or 明示対称化が必要。faithful 形式化は ~400-600 行・複数セッション。
+- **w₁≥5 の WLOG**: (3.5.4) は「≥4 非自明 χ₁ がある側」で証明 → 最終 assembly で `sup_card_ge_five` の
+  `5≤|W₁| ∨ 5≤|W₂|` に応じて W₁/W₂ を swap (現状 `Afam_L/_O` は W₁↔W₂ 対称なので両側適用可)。
+
+**(3.5.4) 後**: (3.5.5) decomposition (`-χ_01 := ⋂A_i1 の元`, `-χ_i0 := A_i1∩A_i2 の元`, `β_i1=-χ_i0-χ_01+φ_i`),
+最終 assembly (`w₂=3` で完了 or `w₂≥5` で対称適用) → χ_ij 族 → (3.2) σ。
+
+正本 = 本ノート (session 12 セクション)。

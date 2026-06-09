@@ -403,9 +403,218 @@ theorem exists_signedTriple_of_inner_self_three [Invertible (Nat.card G : ℂ)]
       irr_cf_inner haa hbb, if_neg hab, mul_zero, mul_zero]
   · rw [Finset.sum_image hinj]; exact hrepr
 
-namespace TICyclicHypothesis
+/- 3.5.2: the combinatorics of the sets `A_{ij}` -- the signed-irreducible API -/
+
+omit [Fintype G] in
+/-- A signed nontrivial irreducible character is nonzero at `1`: its value there is `±d` with
+`d > 0` the degree. -/
+theorem IsSignedNontrivialIrr.apply_one_ne_zero {x : ClassFunction G ℂ}
+    (hx : IsSignedNontrivialIrr x) : x 1 ≠ 0 := by
+  obtain ⟨χ, _, hx⟩ := hx
+  obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  rcases hx with rfl | rfl
+  · rw [hd1]; exact_mod_cast hd.ne'
+  · rw [ClassFunction.neg_apply, hd1, neg_ne_zero]; exact_mod_cast hd.ne'
+
+omit [Fintype G] in
+/-- A signed nontrivial irreducible character is nonzero (it is nonzero at `1`). -/
+theorem IsSignedNontrivialIrr.ne_zero {x : ClassFunction G ℂ}
+    (hx : IsSignedNontrivialIrr x) : x ≠ 0 := fun h => hx.apply_one_ne_zero (by rw [h]; rfl)
+
+omit [Fintype G] in
+/-- The coercion of an irreducible character is never the negative of the coercion of an
+irreducible character: at `1` one value is `+d` and the other `-d'` with `d, d' > 0`. -/
+theorem irreducibleCharacter_coe_ne_neg (χ ψ : IrreducibleCharacter G) :
+    (χ : ClassFunction G ℂ) ≠ -(ψ : ClassFunction G ℂ) := by
+  obtain ⟨dχ, hdχ, hχ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  obtain ⟨dψ, hdψ, hψ1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ψ
+  intro h
+  have h1 : (χ : ClassFunction G ℂ) (1 : G) = (-(ψ : ClassFunction G ℂ)) (1 : G) := by rw [h]
+  rw [hχ1, ClassFunction.neg_apply, hψ1] at h1
+  have hsum : ((dχ + dψ : ℕ) : ℂ) = 0 := by push_cast; rw [h1]; ring
+  have : dχ + dψ = 0 := by exact_mod_cast hsum
+  omega
+
+open Classical in
+/-- **Inner product of two signed nontrivial irreducibles** (the orthonormality of `±Irr`):
+`⟨x, c⟩` is `1` if `x = c`, `-1` if `x = -c`, and `0` otherwise. -/
+theorem isSignedNontrivialIrr_inner [Invertible (Nat.card G : ℂ)] {x c : ClassFunction G ℂ}
+    (hx : IsSignedNontrivialIrr x) (hc : IsSignedNontrivialIrr c) :
+    ClassFunction.inner x c = (if x = c then 1 else 0) - (if x = -c then 1 else 0) := by
+  obtain ⟨χ, -, hxχ⟩ := hx
+  obtain ⟨ψ, -, hcψ⟩ := hc
+  set X : ClassFunction G ℂ := (χ : ClassFunction G ℂ) with hX
+  set Y : ClassFunction G ℂ := (ψ : ClassFunction G ℂ) with hY
+  have hXY : ClassFunction.inner X Y = if X = Y then (1 : ℂ) else 0 :=
+    irr_cf_inner χ.mem_irreducibleCharacters ψ.mem_irreducibleCharacters
+  have hXnegY : ¬ (X = -Y) := irreducibleCharacter_coe_ne_neg χ ψ
+  rcases hxχ with rfl | rfl <;> rcases hcψ with rfl | rfl
+  · rw [hXY, if_neg hXnegY, sub_zero]
+  · rw [ClassFunction.inner_neg_right, hXY, neg_neg, if_neg hXnegY, zero_sub]
+  · rw [ClassFunction.inner_neg_left, hXY, neg_inj,
+      if_neg (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), zero_sub]
+  · rw [ClassFunction.inner_neg_left, ClassFunction.inner_neg_right, neg_neg, hXY, neg_inj,
+      neg_neg, if_neg (fun h => hXnegY (neg_eq_iff_eq_neg.mp h)), sub_zero]
+
+omit [Fintype G] in
+/-- A signed nontrivial irreducible is not its own negative (it is nonzero). -/
+theorem IsSignedNontrivialIrr.ne_neg_self {x : ClassFunction G ℂ}
+    (hx : IsSignedNontrivialIrr x) : x ≠ -x := by
+  intro h
+  apply hx.apply_one_ne_zero
+  have hval : x 1 = -(x 1) := by
+    conv_lhs => rw [h]
+    rw [ClassFunction.neg_apply]
+  linear_combination hval / 2
+
+open Classical in
+/-- A signed nontrivial irreducible has unit norm: `⟨x, x⟩ = 1`. -/
+theorem IsSignedNontrivialIrr.inner_self [Invertible (Nat.card G : ℂ)] {x : ClassFunction G ℂ}
+    (hx : IsSignedNontrivialIrr x) : ClassFunction.inner x x = 1 := by
+  rw [isSignedNontrivialIrr_inner hx hx, if_pos rfl, if_neg (fun h => hx.ne_neg_self h), sub_zero]
+
+/-- A *signed triple*: `β` is the sum of a 3-element set `A` of pairwise-orthogonal signed
+nontrivial irreducible characters.  This is the structure of each `β_{ij}` of Peterfalvi (3.5.1)
+(`exists_betaSet`); the `A_{ij}` of the (3.5.2)-(3.5.5) combinatorics are the carriers `A`. -/
+structure IsSignedTriple [Invertible (Nat.card G : ℂ)] (β : ClassFunction G ℂ)
+    (A : Finset (ClassFunction G ℂ)) : Prop where
+  card_eq_three : A.card = 3
+  signed : ∀ x ∈ A, IsSignedNontrivialIrr x
+  pairwise_orthogonal : ∀ x ∈ A, ∀ y ∈ A, x ≠ y → ClassFunction.inner x y = 0
+  sum_eq : β = ∑ x ∈ A, x
+
+/-- Packaging of `exists_signedTriple_of_inner_self_three` as an `IsSignedTriple`. -/
+theorem exists_isSignedTriple_of_inner_self_three [Invertible (Nat.card G : ℂ)]
+    {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (hnorm : ClassFunction.inner φ φ = 3)
+    (htriv : ClassFunction.inner φ (trivialClassFunction G) = 0) :
+    ∃ A : Finset (ClassFunction G ℂ), IsSignedTriple φ A := by
+  obtain ⟨A, hcard, hsig, horth, hsum⟩ := exists_signedTriple_of_inner_self_three hφ hnorm htriv
+  exact ⟨A, ⟨hcard, hsig, horth, hsum⟩⟩
+
+/-- In a signed triple, the negative of a member is not a member (else the member and its
+negative, both in `A`, would not be orthogonal: `⟨x, -x⟩ = -1 ≠ 0`). -/
+theorem IsSignedTriple.neg_not_mem [Invertible (Nat.card G : ℂ)]
+    {β : ClassFunction G ℂ} {A : Finset (ClassFunction G ℂ)} (hA : IsSignedTriple β A)
+    {x : ClassFunction G ℂ} (hx : x ∈ A) : -x ∉ A := by
+  intro hnx
+  have hxsig := hA.signed x hx
+  have h0 := hA.pairwise_orthogonal x hx (-x) hnx (fun h => hxsig.ne_neg_self h)
+  rw [ClassFunction.inner_neg_right, hxsig.inner_self] at h0
+  exact one_ne_zero (neg_eq_zero.mp h0)
+
+open Classical in
+/-- **(3.5.2) coefficient formula**: for a signed triple `β = ∑ A` and a signed irreducible `c`,
+`⟨β, c⟩ = [c ∈ A] - [-c ∈ A]`. -/
+theorem IsSignedTriple.inner_right_signed [Invertible (Nat.card G : ℂ)]
+    {β : ClassFunction G ℂ} {A : Finset (ClassFunction G ℂ)} (hA : IsSignedTriple β A)
+    {c : ClassFunction G ℂ} (hc : IsSignedNontrivialIrr c) :
+    ClassFunction.inner β c = (if c ∈ A then 1 else 0) - (if -c ∈ A then 1 else 0) := by
+  rw [hA.sum_eq, inner_sum_left,
+    Finset.sum_congr rfl (fun x hx => isSignedNontrivialIrr_inner (hA.signed x hx) hc),
+    Finset.sum_sub_distrib, Finset.sum_ite_eq' A c (fun _ => (1 : ℂ)),
+    Finset.sum_ite_eq' A (-c) (fun _ => (1 : ℂ))]
+
+/-- **(3.5.1) norm**: a signed triple has `⟨β, β⟩ = |A| = 3`. -/
+theorem IsSignedTriple.inner_self [Invertible (Nat.card G : ℂ)]
+    {β : ClassFunction G ℂ} {A : Finset (ClassFunction G ℂ)} (hA : IsSignedTriple β A) :
+    ClassFunction.inner β β = (A.card : ℂ) := by
+  classical
+  nth_rewrite 2 [hA.sum_eq]
+  rw [inner_sum_right]
+  rw [Finset.sum_congr rfl (fun x hx => by
+    rw [hA.inner_right_signed (hA.signed x hx), if_pos hx,
+      if_neg (hA.neg_not_mem hx), sub_zero])]
+  rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+
+/-- **Peterfalvi (3.5.2)** (no-negatives half): if two signed triples `β = ∑ A`, `β' = ∑ A'` have
+`⟨β, β'⟩ = 1` and agree at `1` (`β 1 = β' 1`), then no `c ∈ A` has `-c ∈ A'`.  Were there such a
+`c`, then `⟨β, c⟩ = 1`, `⟨β', c⟩ = -1`, so `⟨β - β', c⟩ = 2`; with `‖β - β'‖² = 4`, the vector
+`(β - β') - 2c` has zero norm, hence `β - β' = 2c`.  But `(β - β')(1) = β(1) - β'(1) = 0` while
+`2 · c(1) ≠ 0` (signed irreducibles are nonzero at `1`) — a contradiction.  (Peterfalvi's
+`2χ₃ = Ind(α₁₁ - α₁₂)` vanishing at `1 ∈ G`.) -/
+theorem IsSignedTriple.no_neg_of_inner_one [Invertible (Nat.card G : ℂ)]
+    {β β' : ClassFunction G ℂ} {A A' : Finset (ClassFunction G ℂ)}
+    (hA : IsSignedTriple β A) (hA' : IsSignedTriple β' A')
+    (hinner : ClassFunction.inner β β' = 1) (hone : β 1 = β' 1)
+    {c : ClassFunction G ℂ} (hcA : c ∈ A) (hcA' : -c ∈ A') : False := by
+  have hcsig : IsSignedNontrivialIrr c := hA.signed c hcA
+  -- `⟨β, c⟩ = 1` and `⟨β', c⟩ = -1`.
+  have hbc : ClassFunction.inner β c = 1 := by
+    rw [hA.inner_right_signed hcsig, if_pos hcA, if_neg (hA.neg_not_mem hcA), sub_zero]
+  have hcnA' : c ∉ A' := fun h => hA'.neg_not_mem h hcA'
+  have hb'c : ClassFunction.inner β' c = -1 := by
+    rw [hA'.inner_right_signed hcsig, if_neg hcnA', if_pos hcA', zero_sub]
+  -- norms: `⟨β,β⟩ = ⟨β',β'⟩ = 3`, `⟨β',β⟩ = 1`.
+  have hbb : ClassFunction.inner β β = 3 := by rw [hA.inner_self, hA.card_eq_three]; norm_num
+  have hb'b' : ClassFunction.inner β' β' = 3 := by rw [hA'.inner_self, hA'.card_eq_three]; norm_num
+  have hb'b : ClassFunction.inner β' β = 1 := by rw [inner_conj_symm β β', hinner, star_one]
+  set g : ClassFunction G ℂ := β - β' with hg
+  -- `⟨g, c⟩ = 2`, `⟨c, g⟩ = 2`, `⟨g, g⟩ = 4`.
+  have hgc : ClassFunction.inner g c = 2 := by
+    rw [hg, ClassFunction.inner_sub_left, hbc, hb'c]; ring
+  have hcg : ClassFunction.inner c g = 2 := by rw [inner_conj_symm g c, hgc]; norm_num
+  have hgg : ClassFunction.inner g g = 4 := by
+    rw [hg, ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hbb, hb'b', hinner, hb'b]; norm_num
+  -- `(β - β') - 2c` has zero norm, so it is `0`.
+  have hs2 : star (2 : ℂ) = 2 := by norm_num
+  have hzero : ClassFunction.inner (g - (2 : ℂ) • c) (g - (2 : ℂ) • c) = 0 := by
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hgg, hgc, hcg, hcsig.inner_self, hs2]
+    ring
+  have hg2c : g = (2 : ℂ) • c :=
+    sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero (by rw [hzero]; exact Complex.zero_re))
+  -- evaluate at `1`: `0 = g(1) = 2 · c(1)`, contradicting `c(1) ≠ 0`.
+  have hg1 : g 1 = 0 := by rw [hg, ClassFunction.sub_apply, hone, sub_self]
+  rw [hg2c, ClassFunction.smul_apply] at hg1
+  exact hcsig.apply_one_ne_zero ((mul_eq_zero.mp hg1).resolve_left (by norm_num))
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `L(ij, i'j')`: two signed triples with `⟨β, β'⟩ = 1` that agree at `1`
+share exactly one element (`|A ∩ A'| = 1`) and no element of one is the negative of an element of
+the other (`∀ x ∈ A, -x ∉ A'`).  The no-negatives half is `no_neg_of_inner_one`; given it,
+`⟨β', β⟩ = ∑_{x ∈ A} [x ∈ A'] = |A ∩ A'|`, which equals `⟨β, β'⟩* = 1`. -/
+theorem IsSignedTriple.L_of_inner_one [Invertible (Nat.card G : ℂ)]
+    {β β' : ClassFunction G ℂ} {A A' : Finset (ClassFunction G ℂ)}
+    (hA : IsSignedTriple β A) (hA' : IsSignedTriple β' A')
+    (hinner : ClassFunction.inner β β' = 1) (hone : β 1 = β' 1) :
+    (A ∩ A').card = 1 ∧ ∀ x ∈ A, -x ∉ A' := by
+  have hno : ∀ x ∈ A, -x ∉ A' :=
+    fun x hx hnx => hA.no_neg_of_inner_one hA' hinner hone hx hnx
+  refine ⟨?_, hno⟩
+  have key : ClassFunction.inner β' β = ((A ∩ A').card : ℂ) := by
+    conv_lhs => rw [hA.sum_eq]
+    rw [inner_sum_right, Finset.sum_congr rfl (fun x hx => by
+      rw [hA'.inner_right_signed (hA.signed x hx), if_neg (hno x hx), sub_zero]),
+      Finset.sum_boole, Finset.filter_mem_eq_inter]
+  have : ((A ∩ A').card : ℂ) = 1 := by rw [← key, inner_conj_symm β β', hinner, star_one]
+  exact_mod_cast this
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `O(ij, i'j')`: two signed triples that are orthogonal (`⟨β, β'⟩ = 0`)
+have `|A ∩ A'| = |{x ∈ A : -x ∈ A'}|`.  (Expanding `⟨β', β⟩ = ∑_{x ∈ A}([x ∈ A'] - [-x ∈ A'])`
+gives `|A ∩ A'| - |{x ∈ A : -x ∈ A'}|`, which equals `⟨β, β'⟩* = 0`.)  Downstream this is used as:
+a shared element of `A` and `A'` forces a *negated* shared element too. -/
+theorem IsSignedTriple.O_card_inter_eq [Invertible (Nat.card G : ℂ)]
+    {β β' : ClassFunction G ℂ} {A A' : Finset (ClassFunction G ℂ)}
+    (hA : IsSignedTriple β A) (hA' : IsSignedTriple β' A')
+    (hinner : ClassFunction.inner β β' = 0) :
+    (A ∩ A').card = (A.filter (fun x => -x ∈ A')).card := by
+  have key : ClassFunction.inner β' β =
+      ((A ∩ A').card : ℂ) - ((A.filter (fun x => -x ∈ A')).card : ℂ) := by
+    conv_lhs => rw [hA.sum_eq]
+    rw [inner_sum_right,
+      Finset.sum_congr rfl (fun x hx => hA'.inner_right_signed (hA.signed x hx)),
+      Finset.sum_sub_distrib, Finset.sum_boole, Finset.sum_boole, Finset.filter_mem_eq_inter]
+  rw [inner_conj_symm β β', hinner, star_zero] at key
+  have hpm : ((A ∩ A').card : ℂ) = ((A.filter (fun x => -x ∈ A')).card : ℂ) :=
+    sub_eq_zero.mp key.symm
+  exact_mod_cast hpm
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
+
+namespace TICyclicHypothesis
 
 /-- **Peterfalvi (3.5.1)**: `β_{ij} = Ind_W^G α_{ij} - 1_G` (for `i, j ≥ 1`). -/
 noncomputable def beta (hyp : TICyclicHypothesis G) [Fintype hyp.W]
@@ -425,6 +634,22 @@ theorem beta_mem_ZIrr (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   Submodule.sub_mem _
     (app.tau.maps_virtualCharacter (hyp.alpha hVeq χ₁ χ₂) (hyp.alpha_mem_ZIrr hVeq χ₁ χ₂))
     (trivialClassFunction_isIrreducible.mem_ZIrr)
+
+/-- **Peterfalvi (3.5.2)** input: every `β_{ij}` takes the value `-1` at `1 ∈ G`.  Indeed
+`Ind_W^G α_{ij}(1) = [G : W] · α_{ij}(1) = 0` because `α_{ij}` vanishes on `W₁ ⊇ {1}`, so
+`β_{ij}(1) = 0 - 1_G(1) = -1`.  In particular all the `β_{ij}` agree at `1`, which is what powers
+the no-negatives half of `L(ij, i'j')` (Peterfalvi's `2χ₃ = Ind(α₁₁ - α₁₂)` vanishing at `1`). -/
+theorem beta_apply_one (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.beta hVeq app χ₁ χ₂ : ClassFunction G ℂ) 1 = -1 := by
+  change (app.tau.toDadeIsometryData.toDadeMap (hyp.alpha hVeq χ₁ χ₂) -
+    trivialClassFunction G) 1 = -1
+  rw [ClassFunction.sub_apply, trivialClassFunction_apply,
+    hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq χ₁ χ₂),
+    ClassFunction.induce_apply_one, hyp.alpha_coe,
+    hyp.alphaCF_eq_zero_of_mem_W1_subgroupOf χ₁ χ₂ (Subgroup.one_mem _), mul_zero, zero_sub]
 
 open Classical in
 /-- **Peterfalvi (3.5.1)**: the Gram matrix of the `β_{ij}` family (`i, j ≥ 1`):
@@ -491,6 +716,168 @@ theorem exists_betaSet (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       hyp.beta hVeq app a₁ a₂ = ∑ x ∈ A, x :=
   exists_signedTriple_of_inner_self_three (hyp.beta_mem_ZIrr hVeq app a₁ a₂)
     (hyp.beta_inner_self hVeq app ha₁ ha₂) (hyp.beta_inner_trivial hVeq app ha₁ ha₂)
+
+/-- `β_{ij}` packaged as a signed triple: `∃ A, IsSignedTriple β_{ij} A`. -/
+theorem exists_isSignedTriple_beta (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) :
+    ∃ A : Finset (ClassFunction G ℂ), IsSignedTriple (hyp.beta hVeq app a₁ a₂) A :=
+  exists_isSignedTriple_of_inner_self_three (hyp.beta_mem_ZIrr hVeq app a₁ a₂)
+    (hyp.beta_inner_self hVeq app ha₁ ha₂) (hyp.beta_inner_trivial hVeq app ha₁ ha₂)
+
+open Classical in
+/-- `⟨β_{ij}, β_{i'j'}⟩ = 1` when the two index pairs agree in **exactly one** coordinate
+(`i = i', j ≠ j'` or `i ≠ i', j = j'`).  Immediate from the Gram matrix `beta_inner`. -/
+theorem beta_inner_eq_one_of_one_shared (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ b₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ b₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1)
+    (hshared : (a₁ = b₁ ∧ a₂ ≠ b₂) ∨ (a₁ ≠ b₁ ∧ a₂ = b₂)) :
+    ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app b₁ b₂) = 1 := by
+  rw [hyp.beta_inner hVeq app ha₁ ha₂ hb₁ hb₂]
+  rcases hshared with ⟨h1, h2⟩ | ⟨h1, h2⟩
+  · rw [if_pos h1, if_neg h2, if_neg (fun h => h2 h.2)]; norm_num
+  · rw [if_neg h1, if_pos h2, if_neg (fun h => h1 h.1)]; norm_num
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `L(ij, i'j')` for the `β_{ij}`: signed triples `A`, `A'` of two
+`β`-characters whose index pairs share exactly one coordinate intersect in exactly one element and
+admit no negated common element.  Combines `beta_inner_eq_one_of_one_shared`, the common value
+`β(1) = -1` (`beta_apply_one`), and the abstract `IsSignedTriple.L_of_inner_one`. -/
+theorem betaTriple_L (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ b₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ b₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1)
+    (hshared : (a₁ = b₁ ∧ a₂ ≠ b₂) ∨ (a₁ ≠ b₁ ∧ a₂ = b₂)) :
+    ∃ A A' : Finset (ClassFunction G ℂ),
+      IsSignedTriple (hyp.beta hVeq app a₁ a₂) A ∧ IsSignedTriple (hyp.beta hVeq app b₁ b₂) A' ∧
+      (A ∩ A').card = 1 ∧ ∀ x ∈ A, -x ∉ A' := by
+  obtain ⟨A, hA⟩ := hyp.exists_isSignedTriple_beta hVeq app ha₁ ha₂
+  obtain ⟨A', hA'⟩ := hyp.exists_isSignedTriple_beta hVeq app hb₁ hb₂
+  have hinner := hyp.beta_inner_eq_one_of_one_shared hVeq app ha₁ ha₂ hb₁ hb₂ hshared
+  have hone : (hyp.beta hVeq app a₁ a₂) 1 = (hyp.beta hVeq app b₁ b₂) 1 := by
+    rw [hyp.beta_apply_one, hyp.beta_apply_one]
+  obtain ⟨hcard, hno⟩ := hA.L_of_inner_one hA' hinner hone
+  exact ⟨A, A', hA, hA', hcard, hno⟩
+
+open Classical in
+/-- `⟨β_{ij}, β_{i'j'}⟩ = 0` when the two index pairs differ in **both** coordinates
+(`i ≠ i'`, `j ≠ j'`).  Immediate from the Gram matrix `beta_inner`. -/
+theorem beta_inner_eq_zero_of_both_diff (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ b₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ b₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1)
+    (hd₁ : a₁ ≠ b₁) (hd₂ : a₂ ≠ b₂) :
+    ClassFunction.inner (hyp.beta hVeq app a₁ a₂) (hyp.beta hVeq app b₁ b₂) = 0 := by
+  rw [hyp.beta_inner hVeq app ha₁ ha₂ hb₁ hb₂, if_neg hd₁, if_neg hd₂, if_neg (fun h => hd₁ h.1)]
+  norm_num
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `O(ij, i'j')` for the `β_{ij}`: signed triples `A`, `A'` of two
+orthogonal `β`-characters (index pairs differing in both coordinates) satisfy
+`|A ∩ A'| = |{x ∈ A : -x ∈ A'}|`.  Combines `beta_inner_eq_zero_of_both_diff` and the abstract
+`IsSignedTriple.O_card_inter_eq`. -/
+theorem betaTriple_O (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {a₁ b₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {a₂ b₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
+    (ha₁ : a₁ ≠ 1) (ha₂ : a₂ ≠ 1) (hb₁ : b₁ ≠ 1) (hb₂ : b₂ ≠ 1)
+    (hd₁ : a₁ ≠ b₁) (hd₂ : a₂ ≠ b₂) :
+    ∃ A A' : Finset (ClassFunction G ℂ),
+      IsSignedTriple (hyp.beta hVeq app a₁ a₂) A ∧ IsSignedTriple (hyp.beta hVeq app b₁ b₂) A' ∧
+      (A ∩ A').card = (A.filter (fun x => -x ∈ A')).card := by
+  obtain ⟨A, hA⟩ := hyp.exists_isSignedTriple_beta hVeq app ha₁ ha₂
+  obtain ⟨A', hA'⟩ := hyp.exists_isSignedTriple_beta hVeq app hb₁ hb₂
+  exact ⟨A, A', hA, hA',
+    hA.O_card_inter_eq hA' (hyp.beta_inner_eq_zero_of_both_diff hVeq app ha₁ ha₂ hb₁ hb₂ hd₁ hd₂)⟩
+
+/- 3.5.3: `sup(w₁, w₂) ≥ 5` -/
+
+/-- **Peterfalvi (3.5.3)**: `sup(w₁, w₂) ≥ 5`.  Both `w₁ = |W₁|` and `w₂ = |W₂|` are odd (dividing
+the odd `|W|`), greater than `1` (`W₁`, `W₂` nontrivial), and coprime (Hypothesis (3.1)).  Were
+both `≤ 4`, each would equal `3` (the only odd number in `(1, 4]`), contradicting coprimality
+(`gcd 3 3 = 3 ≠ 1`).  Peterfalvi then assumes `w₁ ≥ 5` by the `W₁ ↔ W₂` symmetry. -/
+theorem sup_card_ge_five (hyp : TICyclicHypothesis G) :
+    5 ≤ Nat.card hyp.W1 ∨ 5 ≤ Nat.card hyp.W2 := by
+  haveI : Finite G := Finite.of_fintype G
+  have h1odd : Odd (Nat.card hyp.W1) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+  have h2odd : Odd (Nat.card hyp.W2) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+  have h1gt : 1 < Nat.card hyp.W1 :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+  have h2gt : 1 < Nat.card hyp.W2 :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+  by_contra h
+  obtain ⟨hlt1, hlt2⟩ := not_or.mp h
+  rw [not_le] at hlt1 hlt2
+  obtain ⟨k, hk⟩ := h1odd
+  obtain ⟨l, hl⟩ := h2odd
+  have hc1 : Nat.card hyp.W1 = 3 := by omega
+  have hc2 : Nat.card hyp.W2 = 3 := by omega
+  have hcop := hyp.W_card_coprime
+  rw [hc1, hc2] at hcop
+  exact absurd hcop (by decide)
+
+/- 3.5.1 (cont.) / 3.5.2: the fixed family of signed triples `A_{ij}` -/
+
+/-- **Peterfalvi (3.5.1)**, family form: a fixed choice of signed-triple set `A_{ij}` for each
+`β_{ij}` (`i, j ≥ 1`), indexed by pairs of nontrivial linear characters of `W₁`, `W₂`.  This is
+the family the `(3.5.4)`-`(3.5.5)` combinatorics reason about. -/
+noncomputable def Afam (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1})
+    (q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) : Finset (ClassFunction G ℂ) :=
+  (hyp.exists_isSignedTriple_beta hVeq app p.2 q.2).choose
+
+/-- `A_{ij}` is a signed triple for `β_{ij}`. -/
+theorem Afam_isSignedTriple (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    (p : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1})
+    (q : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) :
+    IsSignedTriple (hyp.beta hVeq app p.1 q.1) (hyp.Afam hVeq app p q) :=
+  (hyp.exists_isSignedTriple_beta hVeq app p.2 q.2).choose_spec
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `L(ij, i'j')`, family form: `A_{ij}` and `A_{i'j'}` with index pairs
+sharing exactly one coordinate intersect in one element, with no negated common element. -/
+theorem Afam_L (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {p p' : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}}
+    {q q' : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}}
+    (hshared : (p = p' ∧ q ≠ q') ∨ (p ≠ p' ∧ q = q')) :
+    (hyp.Afam hVeq app p q ∩ hyp.Afam hVeq app p' q').card = 1 ∧
+      ∀ x ∈ hyp.Afam hVeq app p q, -x ∉ hyp.Afam hVeq app p' q' := by
+  refine (hyp.Afam_isSignedTriple hVeq app p q).L_of_inner_one
+    (hyp.Afam_isSignedTriple hVeq app p' q') ?_ ?_
+  · apply hyp.beta_inner_eq_one_of_one_shared hVeq app p.2 q.2 p'.2 q'.2
+    rcases hshared with ⟨rfl, hq⟩ | ⟨hp, rfl⟩
+    · exact Or.inl ⟨rfl, fun h => hq (Subtype.ext h)⟩
+    · exact Or.inr ⟨fun h => hp (Subtype.ext h), rfl⟩
+  · rw [hyp.beta_apply_one, hyp.beta_apply_one]
+
+open Classical in
+/-- **Peterfalvi (3.5.2)** `O(ij, i'j')`, family form: `A_{ij}` and `A_{i'j'}` with both indices
+different satisfy `|A_{ij} ∩ A_{i'j'}| = |{x ∈ A_{ij} : -x ∈ A_{i'j'}}|`. -/
+theorem Afam_O (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (app : FullDadeApplication (G := G) hyp)
+    {p p' : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1}}
+    {q q' : {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}}
+    (hp : p ≠ p') (hq : q ≠ q') :
+    (hyp.Afam hVeq app p q ∩ hyp.Afam hVeq app p' q').card =
+      ((hyp.Afam hVeq app p q).filter (fun x => -x ∈ hyp.Afam hVeq app p' q')).card :=
+  (hyp.Afam_isSignedTriple hVeq app p q).O_card_inter_eq (hyp.Afam_isSignedTriple hVeq app p' q')
+    (hyp.beta_inner_eq_zero_of_both_diff hVeq app p.2 q.2 p'.2 q'.2
+      (fun h => hp (Subtype.ext h)) (fun h => hq (Subtype.ext h)))
 
 end TICyclicHypothesis
 
