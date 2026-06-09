@@ -981,6 +981,77 @@ theorem isPGroup_le_centralizer_of_isNilpotent {W : Type*} [Group W] [Finite W]
   exact (Subgroup.commute_of_normal_of_disjoint _ _ hQnorm hPWnorm hdis x y
     (hXQ hx) (hPPW hy)).symm.eq
 
+/-- `N ⊴ W` の characteristic 部分群 `L : Subgroup ↥N` は, `↥N` から `W` へ押し出すと `W` で正規。
+共役自己同型 `MulAut.conjNormal w : MulAut ↥N` (`N ⊴ W` ゆえ各 `w ∈ W` の共役が `↥N` の自己同型に
+制限) が `L` を固定する (`characteristic_iff_map_eq`)。 -/
+theorem normal_map_subtype_of_characteristic {W : Type*} [Group W] {N : Subgroup W} [N.Normal]
+    {L : Subgroup ↥N} (hL : L.Characteristic) : (L.map N.subtype).Normal := by
+  refine ⟨fun a ha w => ?_⟩
+  obtain ⟨⟨a', ha'N⟩, ha'L, rfl⟩ := ha
+  have hmap : L.map (MulAut.conjNormal w).toMonoidHom = L :=
+    (Subgroup.characteristic_iff_map_eq.mp hL) (MulAut.conjNormal w)
+  have hmem : (MulAut.conjNormal w) ⟨a', ha'N⟩ ∈ L := by
+    rw [← hmap]; exact Subgroup.mem_map_of_mem _ ha'L
+  exact ⟨(MulAut.conjNormal w) ⟨a', ha'N⟩, hmem, MulAut.conjNormal_apply w ⟨a', ha'N⟩⟩
+
+/-- **Cor 10.9(a) 核 (`X ⊄ M'` の `W` nilpotent 判定)** (一般・unconditional): `W` が
+`{p,q}`-群 (`p ≠ q`), 正規 Sylow `q`-部分群 `Qs` を持ち, `N ⊴ W` が nilpotent で `W/N` が
+`q`-群なら `W` は nilpotent。
+
+`N` nilpotent ⟹ Sylow `p` `PN` が `N` で正規・characteristic (`Sylow.characteristic_of_normal`)、
+`N ⊴ W` で押し出すと `W` で正規 (`normal_map_subtype_of_characteristic`)。`W/N` が `q`-群ゆえ
+`|W|_p = |N|_p` で `PN.map N.subtype` は `W` の Sylow `p`。正規 Sylow `p`/`q` で全 Sylow 正規
+(`Sylow.unique_of_normal`)、よって `W` nilpotent (`isNilpotent_of_finite_tfae` 3→0)。
+BG Cor 10.9(a) の `X ⊄ M'` (`p < q`) ケースで `W` の nilpotency に使う。 -/
+theorem isNilpotent_of_normalSylowQ_of_nilpotent_qQuotient {W : Type*} [Group W] [Finite W]
+    {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    (hWpq : ∀ r ∈ (Nat.card W).primeFactors, r = p ∨ r = q)
+    (Qs : Sylow q W) (hQnorm : (Qs : Subgroup W).Normal)
+    {N : Subgroup W} [N.Normal] (hNnil : Group.IsNilpotent ↥N)
+    (hWNq : ∀ r ∈ (Nat.card (W ⧸ N)).primeFactors, r = q) :
+    Group.IsNilpotent W := by
+  -- `|W|_p = |N|_p` since `W/N` is a `q`-group.
+  have hp_ndvd_quot : ¬ p ∣ Nat.card (W ⧸ N) := fun hdvd =>
+    hpq (hWNq p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
+  have hfact : (Nat.card W).factorization p = (Nat.card ↥N).factorization p := by
+    have hq0 : Nat.card (W ⧸ N) ≠ 0 := Nat.card_pos.ne'
+    have hn0 : Nat.card ↥N ≠ 0 := Nat.card_pos.ne'
+    rw [Subgroup.card_eq_card_quotient_mul_card_subgroup N,
+        Nat.factorization_mul hq0 hn0, Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd hp_ndvd_quot, zero_add]
+  -- A normal Sylow `p`-subgroup of `W`, built from `N`.
+  obtain ⟨PN⟩ := (inferInstance : Nonempty (Sylow p ↥N))
+  have hAllNormalN : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r ↥N), (↑R : Subgroup ↥N).Normal :=
+    ((isNilpotent_of_finite_tfae (G := ↥N)).out 0 3).mp hNnil
+  have hPNnorm : (PN : Subgroup ↥N).Normal := hAllNormalN p ‹Fact p.Prime› PN
+  have hPNchar : (PN : Subgroup ↥N).Characteristic := Sylow.characteristic_of_normal PN hPNnorm
+  have hPpcard : Nat.card ↥((PN : Subgroup ↥N).map N.subtype) =
+      p ^ (Nat.card W).factorization p := by
+    rw [Subgroup.card_subtype, Sylow.card_eq_multiplicity PN, hfact]
+  haveI hPpnorm : ((PN : Subgroup ↥N).map N.subtype).Normal :=
+    normal_map_subtype_of_characteristic hPNchar
+  set Psyl : Sylow p W := Sylow.ofCard _ hPpcard with hPsyl
+  have hPsyl_coe : (Psyl : Subgroup W) = (PN : Subgroup ↥N).map N.subtype :=
+    Sylow.coe_ofCard _ hPpcard
+  haveI hPsylnorm : (Psyl : Subgroup W).Normal := by rw [hPsyl_coe]; exact hPpnorm
+  -- Every Sylow of `W` is normal ⟹ `W` nilpotent.
+  have hAllNormalW : ∀ (r : ℕ), Fact r.Prime → ∀ (P : Sylow r W), (↑P : Subgroup W).Normal := by
+    intro r hr_fact P
+    haveI := hr_fact
+    by_cases hrW : r ∈ (Nat.card W).primeFactors
+    · rcases hWpq r hrW with rfl | rfl
+      · haveI := Sylow.unique_of_normal Psyl hPsylnorm
+        rw [Subsingleton.elim P Psyl]; exact hPsylnorm
+      · haveI := Sylow.unique_of_normal Qs hQnorm
+        rw [Subsingleton.elim P Qs]; exact hQnorm
+    · -- `r ∉ π(W)`: the Sylow `r`-subgroup is trivial.
+      have hr_ndvd : ¬ r ∣ Nat.card W := fun hdvd =>
+        hrW (Nat.mem_primeFactors.mpr ⟨hr_fact.out, hdvd, Nat.card_pos.ne'⟩)
+      have hPcard : Nat.card ↥(P : Subgroup W) = 1 := by
+        rw [Sylow.card_eq_multiplicity P, Nat.factorization_eq_zero_of_not_dvd hr_ndvd, pow_zero]
+      rw [Subgroup.card_eq_one.mp hPcard]; infer_instance
+  exact ((isNilpotent_of_finite_tfae (G := W)).out 3 0).mp hAllNormalW
+
 /-- **Corollary 10.9 核 (W ∩ M' is nilpotent)** (mmd L2860, forward-conditional via Theorem 10.6):
 `M' = derivedInG M` の任意の `β(M)'`-部分群 `V` は nilpotent。
 
