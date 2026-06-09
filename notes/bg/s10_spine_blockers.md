@@ -315,6 +315,51 @@ map 変換が要る。**全部 forward-conditional (§10 island; via isHall_Mbet
   (Hall{p,q}⟹p-part); A1 (X q-群≤W, P_σ p-群≤W, W nilpotent)⟹X 中心化 P_σ; G で commute は element-level 自動。
 - **(a)(2)** p∈α(M)→C_M(X)∈𝒰: (1)+Uniqueness(§9 `isUniquelyMaximal_of_*` / `beta_global_structure`)。
 
+### ✅✅✅ Cor 10.9(a)(1)(2) COMPLETE (2026-06-09, branch `bg-s10-fwd`, commit `d4e979d5`)
+
+**`beta_complement_centralizes` (Cor 10.9(a)(1)(2)) sorry-free + axiom-clean** (§10 keystone island =
+2 forward axioms ちょうど, AxiomsCheck `#assert_axioms_island` 登録済; full build 3613 green)。
+producer + helper も全 landed (この commit):
+- **`exists_nilpotent_hall_pq` (L3 producer)**: 上記レシピ通り実装。case X≤M' = `betacompl` で W=W∩M';
+  case p<q = N2、正規 Sylow q = W∩O_{p'}(M)、W/(W∩M') が q-群 = **mk' 像が ⊤ over Y/M'**
+  (`QuotientGroup.comap_map_mk'` + `comap_injective` で `(X.subgroupOf Y).map mk' = ⊤`、`IsPGroup.map`
+  + `topEquiv`; その後 `f : ↥W →* ↥Y⧸D.subgroupOf Y` の ker = (W⊓D).subgroupOf W で card 割り)。
+  by_cases p∈π(M): p∉π(M) は W が q-群 ⟹ `IsPGroup.isNilpotent` 即。
+- **conjunct (1)**: **L2 transport** = `isHallSubgroup_subgroupOf_of_normal` (ambient ↥Y) →
+  `isHallSubgroup_map_mulEquiv` (新 helper, ≃* 沿い Hall 移送) along `subgroupOfEquivOfLe (M_σ≤Y)`;
+  nested subgroupOf 等式は **comap-comp** で (`hcomp : M_σ.subtype.comp e = Y.subtype.comp (M_σ.subgroupOf Y).subtype`
+  = `ext;rfl`, `comap_comap`, `map_comap_eq_self_of_surjective`)。**L4** = Hall{p,q} の p-part = full
+  (`card_mul_index` + p∤index) ⟹ Sylow p of M_σ ≤ W, `isPGroup_le_centralizer_of_isNilpotent_ambient`
+  (新 helper, A1 の G-座標版)。
+- **conjunct (2)**: p∈α(M) ⟹ `pRank M_σ p = pRank M p ≥ 3` (M_σ σ-Hall in M `Msigma_subgroupOf_isHall_of_isHall`
+  + p∈σ ⟹ fact p|M_σ|=fact p|M| ⟹ Sylow p of M_σ = Sylow p of M, pRank 一致 via `pRank_le_of_injective` 両向き)
+  ⟹ rank-3 elem-ab B≤P_σ (`exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank`) 内に rank-2 A
+  (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`)、|B|>|A| ⟹ A 非極大 ⟹
+  `isUniquelyMaximal_of_mem_e2_not_maximal` ⟹ `isUniquelyMaximal_of_le` で C_M(X)。
+
+**再利用 unconditional 資産**: `isHallSubgroup_map_mulEquiv` (Hall ≃* 移送),
+`isPGroup_le_centralizer_of_isNilpotent_ambient` (nilpotent W で q-部分群が p-部分群を G-中心化)。
+
+### 🛑 残 Cor 10.9 = (a)(3) + (b) — **`M_β X ◁ M` が新 sub-blocker (M'/M_β nilpotent 要露出)**
+
+**(a)(3)** `beta_complement_normalizer_derived_contains_sylow` (@1531) / **(b)**
+`beta_factorization_of_sylow_normalizer_in_intersection` (@1544)。両者 BG 証明骨子:
+
+- **(a)(3)** (X = Sylow q of M'): X_G:=X↑G (Sylow q of M', ≤M'); producer (case X⊆M') で W⊇X_G Hall{p,q}
+  of M' nilpotent ⟹ **X_G=O_q(W)** (|X_G|=q-part|M'|=q-part|W|, X_G≤W q-群)、**S:=O_p(W)=Sylow p of M'**
+  (p-part)。S は X_G を中心化 (A1, W nilpotent) ⟹ S≤C_G(X_G)≤N_G(X_G), S≤M' ⟹ S≤U:=N_M(X_G)=N_G(X_G)⊓M。
+  **🔑 残: S≤U'**。要 (i) `M_β X_G ◁ M` + X_G=Sylow q of M_β X_G ⟹ **Frattini** (`Sylow.normalizer_sup_eq_top`)
+  M=(M_β X_G)U=M_β U; (ii) **Lem 6.5(a)** `inf_commutator_eq_of_coprime` (S06_Additional:345, ambient ↥M,
+  K=M_β.subgroupOf M ◁, U.subgroupOf M, H=S.subgroupOf M, coprime |S||M_β|=1 [p∉β], K⊔U=⊤): `H⊓(↥M)'=H⊓U'`,
+  H≤(↥M)'=commutator ↥M [S≤M'] ⟹ H=H⊓U' ⟹ S≤U'。結論 `derivedInG U` へ。
+  **🛑 ボトルネック = `M_β X_G ◁ M`**: = O_{β∪{q}}(M')◁M。要 **M'/M_β nilpotent** (isHall_Mbeta は
+  Hall β' 形でしか露出せず quotient nilpotent 未exposed; (4) の normal q-complement から組むか、
+  M'/M_β nilpotent を別 helper で露出) + O_q(M'/M_β) char + 引き戻し char + M_β char in M' ⟹ char in M'
+  ⟹ ◁M (M≤normalizer M')。**~200-250 行の新 leaf、helper 要**。
+- **(b)** S Sylow of G, N_G(S)⊆H∩M, H≠M: S≠1, q=π(S), q∈σ(M)−β(M), S⊆M_σ⊆M'。M_β S◁M (10.8(b))。
+  「(a) の証明が M=M_β N_M(S)」⟹ M=M_β(H∩M) (N_M(S)⊆H∩M)。N_M(S)∉𝒰。(a)(2) で α(M)=β(M)。
+  **(a)(3) の M_β S◁M + Frattini 部分を共有** ⟹ (a)(3) 先行が自然。
+
 ### その他の §10 残ターゲット (keystone gated)
 - **Cor 10.7** `sylow_structure` (@125 sorry) = 10.6 + Lem 6.6 (✅)。(a) 配線可だが (b) は rep-theory
   keystone (`r(P)=2⇒Z(P) cyclic`、10.13 と同じ) gated。
