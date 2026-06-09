@@ -3330,3 +3330,10 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Cor 10.9(a)(3): `N_M(X)'` contains a Sylow `p`-subgroup of `M'` (Frattini + Lemma 6.5(a) +
+-- the nilpotent Hall `{p,q}`-producer `exists_nilpotent_hall_pq`), hence the same keystone island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.beta_complement_normalizer_derived_contains_sylow
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
