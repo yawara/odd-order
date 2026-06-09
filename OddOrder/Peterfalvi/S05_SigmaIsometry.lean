@@ -3320,6 +3320,49 @@ theorem eq_zero_of_mem_V_of_inner_chiFam_eq_zero (hyp : TICyclicHypothesis G) [F
   have hzero := hyp.vanishOnV_of_inner_alphaCF hVeq hkey hv
   rwa [ClassFunction.restrict_apply] at hzero
 
+open scoped Classical in
+/-- **Peterfalvi Theorem (3.2)** (capstone).  There is a linear isometry `σ : CF(W) → CF(G)`
+sending virtual characters of `W` to virtual characters of `G`, such that:
+* **(a)** `α^σ = Ind_W^G α` for `α ∈ CF(W, V)`;
+* **(b)** `1_W^σ = 1_G`;
+* **(c)** `α^σ(x) = α(x)` for `x ∈ V`;
+* **(d)** every `χ ∈ CF(G)` orthogonal to the whole image `σ(Irr W)` vanishes on `V` (in
+  particular an irreducible character of `G` not in the image of `σ` vanishes on `V`).
+
+The witness is the constructed `σ` (`sigma`); the six conjuncts are `sigma_inner`,
+`sigma_mem_ZIrr`, `sigma_eq_tau` ∘ `tau_eq_induce`, `sigma_trivial`, `sigma_apply_of_mem_V`,
+and `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` (with the index bridge `χ_{ij} = (ω_{ij})^σ`). -/
+theorem exists_sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ∃ σ : ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ,
+      (∀ x y, ClassFunction.inner (σ x) (σ y) = ClassFunction.inner x y) ∧
+      (∀ z ∈ ZIrr hyp.W, σ z ∈ ZIrr G) ∧
+      (∀ α : SupportedOnV ℂ hyp,
+        σ (α : ClassFunction hyp.W ℂ) = ClassFunction.induce hyp.W (α : ClassFunction hyp.W ℂ)) ∧
+      σ (trivialClassFunction hyp.W) = trivialClassFunction G ∧
+      (∀ (α : ClassFunction hyp.W ℂ) (v : G) (hv : v ∈ hyp.V),
+        σ α v = α ⟨v, hyp.V_subset_W hv⟩) ∧
+      (∀ χ : ClassFunction G ℂ,
+        (∀ ω : IrreducibleCharacter hyp.W,
+          ClassFunction.inner χ (σ (ω : ClassFunction hyp.W ℂ)) = 0) →
+        ∀ (v : G), v ∈ hyp.V → χ v = 0) := by
+  refine ⟨hyp.sigma hVeq app, hyp.sigma_inner hVeq app,
+    fun z hz => hyp.sigma_mem_ZIrr hVeq app hz,
+    fun α => (hyp.sigma_eq_tau hVeq app α).trans
+      (hyp.tau_eq_induce app.tau.toDadeIsometryData α),
+    hyp.sigma_trivial hVeq app,
+    fun α v hv => hyp.sigma_apply_of_mem_V hVeq app α hv,
+    fun χ hd v hv => ?_⟩
+  refine hyp.eq_zero_of_mem_V_of_inner_chiFam_eq_zero hVeq app (fun a b => ?_) hv
+  -- index bridge: `χ_{ab} = (ω_{ab})^σ`, so orthogonality to `σ(Irr W)` gives `⟨χ, χ_{ab}⟩ = 0`
+  have hbridge : hyp.chiFam hVeq app (a, b)
+      = hyp.sigma hVeq app (hyp.omegaIrrEquiv (a, b) : ClassFunction hyp.W ℂ) := by
+    rw [hyp.sigma_irreducibleCharacter hVeq app (hyp.omegaIrrEquiv (a, b)),
+      Equiv.symm_apply_apply]
+  rw [hbridge]
+  exact hd (hyp.omegaIrrEquiv (a, b))
+
 end TICyclicHypothesis
 
 end OddOrder.Peterfalvi.S05
