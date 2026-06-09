@@ -957,6 +957,48 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     _ ≤ C := hNXC
     _ = M := by rw [hCeq, ← hM_eq]
 
+/-- **Corollary 10.9 核 (W ∩ M' is nilpotent)** (mmd L2860, forward-conditional via Theorem 10.6):
+`M' = derivedInG M` の任意の `β(M)'`-部分群 `V` は nilpotent。
+
+BG Cor 10.9(a) の証明で「`W ∩ M'` is nilpotent」(及び `X ⊆ M'` のとき `W` 自身が nilpotent) に
+使う。`M'` は nilpotent な Hall `β(M)'`-部分群 `W*` を持つ (Lemma 10.8(b) = `isHall_Mbeta`)。
+任意の `β(M)'`-部分群 `V` は Hall `β(M)'`-部分群 `W'` に含まれ (Hall-D = `Ch03.hall_D`)、`W'` は
+`W*` と共役 (Hall-C = `Ch03.hall_C`) ゆえ nilpotent、よって部分群 `V ≤ W'` も nilpotent。 -/
+theorem betacompl_subgroup_derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {V : Subgroup G} (hVD : V ≤ derivedInG M)
+    (hVβ : ∀ r ∈ (Nat.card ↥V).primeFactors, r ∉ beta M) :
+    Group.IsNilpotent ↥V := by
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hDsolv : IsSolvable ↥(derivedInG M) := by
+    let e := Subgroup.equivMapOfInjective (commutator ↥M) M.subtype M.subtype_injective
+    exact solvable_of_surjective (f := e.toMonoidHom) e.surjective
+  -- `W*`: a nilpotent Hall `β(M)'`-subgroup of `M'` (Lemma 10.8(b)).
+  obtain ⟨Wstar, hWstar_le, hWstar_hall, hWstar_nilp⟩ := (isHall_Mbeta hG hM).2.1
+  haveI := hWstar_nilp
+  haveI hWstar'_nilp : Group.IsNilpotent ↥(Wstar.subgroupOf (derivedInG M)) :=
+    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hWstar_le).symm.surjective
+  -- `V.subgroupOf M'` is a `β(M)'`-subgroup; embed it in a Hall `β(M)'`-subgroup `W'` (Hall-D).
+  have hV'β : ∀ r ∈ (Nat.card ↥(V.subgroupOf (derivedInG M))).primeFactors, r ∈ (beta M)ᶜ := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hVD).toEquiv] at hr
+    exact hVβ r hr
+  obtain ⟨W', hW'_hall, hV'_le⟩ := Ch03.hall_D (G := ↥(derivedInG M)) hV'β
+  -- `W'` is conjugate to `W*` (Hall-C), hence nilpotent.
+  obtain ⟨g, hg⟩ := Ch03.hall_C hWstar_hall hW'_hall
+  haveI hW'_nilp : Group.IsNilpotent ↥W' := by
+    rw [← hg]
+    exact nilpotent_of_surjective
+      (Subgroup.equivMapOfInjective (Wstar.subgroupOf (derivedInG M))
+        (MulAut.conj g).toMonoidHom (MulEquiv.injective _)).toMonoidHom (MulEquiv.surjective _)
+  -- `V ≤ W'` (in `M'`) and `W'` nilpotent ⟹ `V` nilpotent.
+  haveI : Group.IsNilpotent ↥((V.subgroupOf (derivedInG M)).subgroupOf W') := inferInstance
+  haveI hV'_nilp : Group.IsNilpotent ↥(V.subgroupOf (derivedInG M)) :=
+    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hV'_le).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hV'_le).surjective
+  exact nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hVD).toMonoidHom
+    (Subgroup.subgroupOfEquivOfLe hVD).surjective
+
 /-! ## Corollary 10.9 — β(M)'-部分群の centralization (mmd L2826) -/
 
 /-- **BG Corollary 10.9 (a)(1)(2)** (mmd L2826): `M ∈ ℳ`, `p, q ∈ β(M)'` distinct, `X` を `M` の

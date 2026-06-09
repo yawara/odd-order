@@ -3305,3 +3305,10 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Cor 10.9 核 (W ∩ M' is nilpotent): M' の任意の β(M)'-部分群は nilpotent。
+-- Lemma 10.8(b) (`isHall_Mbeta`) 経由ゆえ同じ keystone island。
+#assert_axioms_island OddOrder.BG.Ch3.S10.betacompl_subgroup_derived_isNilpotent
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
