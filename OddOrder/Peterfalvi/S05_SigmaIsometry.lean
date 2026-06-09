@@ -1628,6 +1628,18 @@ theorem common_not_mem_other_column [Fintype ι] (hG : IsSignedTripleGrid A)
       (hYpos i hir) (hYY.symm ▸ hYpos i' hir')
     exact hG.neg_not_mem_self hzB (by rw [neg_neg]; exact heq ▸ hYmem i hir)
 
+/-- The **transpose** of a signed-triple grid (swap rows and columns) is again a signed-triple grid.
+Used for the `W₁ ↔ W₂` interchange in the (3.5.4)/(3.5.5) WLOG `w₁ ≥ 5`: when only `w₂ ≥ 5`, apply
+the row-indexed results to the transposed grid. -/
+theorem transpose (hG : IsSignedTripleGrid A) :
+    IsSignedTripleGrid (fun (j : κ) (i : ι) => A i j) where
+  card_eq_three j i := hG.card_eq_three i j
+  signed j i := hG.signed i j
+  orthogonal j i := hG.orthogonal i j
+  inter_L j j' i i' h := hG.inter_L i i' j j' (by tauto)
+  noNeg_L j j' i i' h := hG.noNeg_L i i' j j' (by tauto)
+  inter_O j j' i i' hjj hii := hG.inter_O i i' j j' hii hjj
+
 end IsSignedTripleGrid
 
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
