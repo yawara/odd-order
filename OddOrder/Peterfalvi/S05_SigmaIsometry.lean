@@ -2207,6 +2207,61 @@ def innerLeftFunctional {H : Type*} [Group H] [Fintype H] [Invertible (Nat.card 
     [Invertible (Nat.card H : ℂ)] (f φ : ClassFunction H ℂ) :
     innerLeftFunctional f φ = ClassFunction.inner φ f := rfl
 
+/-- **Abstract (3.8) core.** A `ℂ`-valued grid `a : ι × κ → ℂ` whose mixed differences vanish
+(`a(i,j) + a(i',j') = a(i,j') + a(i',j)`, the (3.7) identity) and whose nonzero set is *smaller*
+than `min |ι| |κ|` is identically zero.  Such a grid is additively separable, so its rows differ by
+a column-independent constant: if two rows differ, every column carries a nonzero entry (`≥ |κ|`
+nonzeros); otherwise all rows are equal, and a single nonzero entry fills a whole column (`≥ |ι|`
+nonzeros).  Either way `min |ι| |κ| ≤ #support`, contradicting the hypothesis. -/
+theorem grid_eq_zero_of_ncard_support_lt {ι κ : Type*} [Finite ι] [Finite κ]
+    (a : ι × κ → ℂ)
+    (hadd : ∀ i i' (j j' : κ), a (i, j) + a (i', j') = a (i, j') + a (i', j))
+    (hlt : {x | a x ≠ 0}.ncard < min (Nat.card ι) (Nat.card κ))
+    (x : ι × κ) : a x = 0 := by
+  classical
+  haveI : Fintype ι := Fintype.ofFinite _
+  haveI : Fintype κ := Fintype.ofFinite _
+  haveI : Fintype ↥{x : ι × κ | a x ≠ 0} := Fintype.ofFinite _
+  rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf, Nat.card_eq_fintype_card,
+    Nat.card_eq_fintype_card] at hlt
+  by_contra hx
+  set S := Finset.univ.filter (fun x => a x ≠ 0) with hS
+  have hmem : ∀ {y : ι × κ}, y ∈ S ↔ a y ≠ 0 := by
+    intro y; rw [hS, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ y)
+  by_cases hrows : ∀ (i i' : ι) (j : κ), a (i, j) = a (i', j)
+  · -- all rows equal: the column through `x` is entirely nonzero, so `|ι| ≤ #S`
+    have hcol : (Finset.univ.image fun i => (i, x.2)) ⊆ S := by
+      intro y hy
+      simp only [Finset.mem_image, Finset.mem_univ, true_and] at hy
+      obtain ⟨i, rfl⟩ := hy
+      rw [hmem, hrows i x.1 x.2]
+      exact hx
+    have hcard : Fintype.card ι ≤ S.card := by
+      have hinj : Function.Injective fun i : ι => (i, x.2) := fun a b h => by simpa using h
+      calc Fintype.card ι = (Finset.univ.image fun i => (i, x.2)).card := by
+            rw [Finset.card_image_of_injective _ hinj, Finset.card_univ]
+        _ ≤ S.card := Finset.card_le_card hcol
+    omega
+  · -- two rows differ in some column ⟹ they differ in *every* column ⟹ `|κ| ≤ #S`
+    push_neg at hrows
+    obtain ⟨i, i', j₀, hjj⟩ := hrows
+    have hdiff : ∀ j, a (i, j) ≠ a (i', j) := fun j hj => by
+      apply hjj
+      have h1 := hadd i i' j j₀
+      linear_combination hj - h1
+    -- every column `j` contains a nonzero entry, so `S.image (·.2) = univ`
+    have himg : S.image (fun y => y.2) = Finset.univ := by
+      rw [Finset.eq_univ_iff_forall]
+      intro j
+      rw [Finset.mem_image]
+      by_cases h : a (i, j) = 0
+      · exact ⟨(i', j), hmem.mpr fun hi' => hdiff j (h.trans hi'.symm), rfl⟩
+      · exact ⟨(i, j), hmem.mpr h, rfl⟩
+    have hcard : Fintype.card κ ≤ S.card := by
+      calc Fintype.card κ = (S.image fun y => y.2).card := by rw [himg, Finset.card_univ]
+        _ ≤ S.card := Finset.card_image_le
+    omega
+
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
 
 namespace TICyclicHypothesis
@@ -3469,6 +3524,25 @@ theorem sigmaCoeff_add_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   simp only [ClassFunction.inner_add_right, ClassFunction.inner_sub_right] at h0
   simp only [sigmaCoeff]
   linear_combination h0
+
+/-- **Peterfalvi (3.8) corollary** (`NC` too small for a row or column): if `ψ` vanishes on `V` and
+`NC(ψ) < min(w₁, w₂)`, then *all* `σ`-image coefficients of `ψ` vanish — i.e. `ψ = β` is orthogonal
+to `Im σ`.  By (3.7) the coefficient grid `a_{ij}` is additively separable; the abstract grid lemma
+`grid_eq_zero_of_ncard_support_lt` then forces `a ≡ 0` (a nonzero separable grid fills a whole row
+or column, needing `≥ min(w₁, w₂)` nonzeros).  This is the part of (3.8) used by (3.9.a) and most
+§6/§7 consumers; the full row/column trichotomy (3.8.b)/(3.8.c) is only needed in §12+. -/
+theorem sigmaCoeff_eq_zero_of_sigmaNC_lt (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (hNC : hyp.sigmaNC hVeq app ψ < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.sigmaCoeff hVeq app ψ pq = 0 := by
+  haveI : Finite G := Finite.of_fintype G
+  refine grid_eq_zero_of_ncard_support_lt (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
+    (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
+  rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+  exact hNC
 
 end TICyclicHypothesis
 
