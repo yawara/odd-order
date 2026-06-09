@@ -957,6 +957,30 @@ theorem normalizer_le_of_nontrivial_beta_subgroup [Finite G] (hG : IsMinimalSimp
     _ ≤ C := hNXC
     _ = M := by rw [hCeq, ← hM_eq]
 
+/-- 有限 nilpotent 群では `q`-部分群 `X` が `p`-部分群 `P` を中心化する (`p ≠ q`)。
+nilpotent ⟹ 各 Sylow 正規 (`isNilpotent_of_finite_tfae`)、`X ≤` Sylow `q` `Q`,
+`P ≤` Sylow `p` `P_W`, 異素数ゆえ `Q ⊓ P_W = ⊥` (`IsPGroup.disjoint_of_ne`)、正規 2 部分群は
+disjoint なら可換 (`commute_of_normal_of_disjoint`)。BG Cor 10.9(a)(1) で「`W` nilpotent ⟹
+`X` が `M_σ` の Sylow `p` を中心化」に使う。 -/
+theorem isPGroup_le_centralizer_of_isNilpotent {W : Type*} [Group W] [Finite W]
+    (hW : Group.IsNilpotent W) {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hpq : p ≠ q)
+    {X P : Subgroup W} (hX : IsPGroup q ↥X) (hP : IsPGroup p ↥P) :
+    X ≤ Subgroup.centralizer (P : Set W) := by
+  obtain ⟨Q, hXQ⟩ := hX.exists_le_sylow
+  obtain ⟨PW, hPPW⟩ := hP.exists_le_sylow
+  have hAllNormal : ∀ (r : ℕ), Fact r.Prime → ∀ (R : Sylow r W), (↑R : Subgroup W).Normal :=
+    ((isNilpotent_of_finite_tfae (G := W)).out 0 3).mp hW
+  have hQnorm : (Q : Subgroup W).Normal := hAllNormal q ‹Fact q.Prime› Q
+  have hPWnorm : (PW : Subgroup W).Normal := hAllNormal p ‹Fact p.Prime› PW
+  have hdis : Disjoint (Q : Subgroup W) (PW : Subgroup W) :=
+    IsPGroup.disjoint_of_ne q p hpq.symm (Q : Subgroup W) (PW : Subgroup W)
+      Q.isPGroup' PW.isPGroup'
+  intro x hx
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  exact (Subgroup.commute_of_normal_of_disjoint _ _ hQnorm hPWnorm hdis x y
+    (hXQ hx) (hPPW hy)).symm.eq
+
 /-- **Corollary 10.9 核 (W ∩ M' is nilpotent)** (mmd L2860, forward-conditional via Theorem 10.6):
 `M' = derivedInG M` の任意の `β(M)'`-部分群 `V` は nilpotent。
 

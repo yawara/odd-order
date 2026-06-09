@@ -260,15 +260,25 @@ subgroupOf)。Hall-D 自体は解決済ゆえ「W⊇X 構成」は `hall_D` 一�
 - **L3 (W nilpotent)**: X⊆M' (⟺ X'≤D ⟺ Y=D) なら W ≤ D, betacompl 核で nilpotent
   (G 版なので W.map M.subtype ≤ derivedInG M に翻訳, or ↥M-内部版 betacompl を別途。**推奨: ↥M-内部
   `betacompl' : V ≤ commutator ↥M, β'-群 ⟹ IsNilpotent ↥V` を G 版から map で導出**)。
-  X⊄M' (p<q) は **抽象 nilpotency 補題** (一般・再利用可, ~80-120 行):
-  `W {p,q}-群, normal Sylow q, N◁W nilpotent + W/N q-群 ⟹ IsNilpotent W` —
-  Sylow p of W = Sylow p of N (W/N q-群) = O_p(N) char in N◁W ⟹ normal; +normal Sylow q
-  ⟹ `isNilpotent_of_forall_hasNormalPComplement` (各 r∈{p,q} で他方 Sylow が normal 補群)。
-  W の normal Sylow q = `W∩O_{p'}(M)` (10.8(c) `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` ✅:
+  X⊄M' (p<q) は **抽象 nilpotency 補題 N2** (一般・再利用可, ~100-150 行, ⚠ 未着手):
+  `W {p,q}-群, normal Sylow q `Q`, N◁W nilpotent + W/N q-群 ⟹ IsNilpotent W`。
+  ルート = `isNilpotent_of_forall_hasNormalPComplement` (✅) に r∈{p,q} の HasNormalPComplement を供給:
+  - r=p: 補群 = 正規 Sylow q `Q` (normal Hall p')。HasNormalPComplement の `IsComplement' Q (Sylow p)` は
+    `Q⊓P=⊥`(異素数 `IsPGroup.disjoint_of_ne`)+`|Q||P|=|W|`({p,q}-群)で構成。
+  - r=q: 補群 = 正規 Sylow p `PN`。**PN 構成 = N2 の難所**: PN := Sylow p of N (N nilpotent ⟹ TFAE で
+    normal in N ⟹ `Sylow.characteristic_of_normal` で **char in N**); PN.map N.subtype が W で normal
+    = **「char ⊴ normal ⟹ ambient で normal」(mathlib に直接補題なし、~30-50 行インライン**:
+    `characteristic_iff_map_eq` + ∀w∈W conj が N の aut に制限 [N◁W] + char で固定; or 一意 Sylow p of N を
+    W-共役が保つ [`Subsingleton (Sylow p ↥N)`]); PN が Sylow p of W = card 論 (`|PN|=p-part |N|=p-part |W|`,
+    W/N q-群ゆえ p∤[W:N])。
+  W の normal Sylow q `Q` = `W∩O_{p'}(M)` (10.8(c) `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta` ✅:
   全 q-元 ⊆ O_{p'}(M)); N = W∩M' (`betacompl` 核で nilpotent); W/N q-群 = WM'/M'⊆XM'/M' (X q-群)。
-- **L4 ((a)(1))**: W nilpotent ⟹ Sylow 同士可換 (`IsNilpotent` の Sylow 直積; mathlib
-  `IsNilpotent` ⟹ Sylow normal ⟹ 異素数 Sylow centralize, 要 API 調査)。X ≤ Sylow-q of W,
-  Sylow-p of (W∩M_σ) = Sylow-p of M_σ (W∩M_σ Hall {p,q} of M_σ ⊇ full p-part)。X が中心化。
+- **L4 ((a)(1)) — ✅ 核 `isPGroup_le_centralizer_of_isNilpotent` landed** (commit 後述, **unconditional**,
+  `S10_BetaRadical.lean` betacompl 直前): nilpotent W で q-部分群 X が p-部分群 P を中心化
+  (`X ≤ Sylow q `Q` normal, `P ≤ Sylow p `P_W` normal, 異素数 disjoint ⟹ `commute_of_normal_of_disjoint`)。
+  残 = W nilpotent (L3) を渡し, X ≤ W (q-群), P_σ = Sylow p of (W∩M_σ) = Sylow p of M_σ
+  (W∩M_σ Hall {p,q} of M_σ ⊇ full p-part) に適用 → `∃ S : Sylow p ↥(Msigma M), X ≤ centralizer (S↑G)`
+  の形へ map 変換。
 - **L5 ((a)(2))**: (1) + Uniqueness Thm (§9 `isUniquelyMaximal_of_*`)。p∈α(M) で C_M(X)⊇C centralizing,
   ∈𝒰。
 - **L6 ((a)(3))**: X=Sylow q of M' ⟹ X=O_q(W*), M'=M_β W*, M_βX=O_{β∪{q}}(M')◁M, Frattini
