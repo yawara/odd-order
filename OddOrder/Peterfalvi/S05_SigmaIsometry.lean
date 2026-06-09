@@ -97,6 +97,19 @@ noncomputable def irreducibleCharacterBasis [Invertible (Nat.card G : ℂ)] :
     irreducibleCharacterBasis χ = (χ : ClassFunction G ℂ) := by
   rw [irreducibleCharacterBasis, Module.Basis.mk_apply]
 
+/-- **Bilinear expansion of the inner product of two basis-coefficient combinations** of a single
+finite family `F`: `⟨∑ r_ω • F ω, ∑ s_ω' • F ω'⟩ = ∑_{ω,ω'} r_ω · conj(s_ω') · ⟨F ω, F ω'⟩`.
+The workhorse for proving a map defined on a basis is an isometry (compare Gram matrices). -/
+theorem inner_sum_smul_sum {ι H : Type*} [Fintype ι] [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (r s : ι → ℂ) (F : ι → ClassFunction H ℂ) :
+    ClassFunction.inner (∑ ω, r ω • F ω) (∑ ω', s ω' • F ω')
+      = ∑ ω, ∑ ω', r ω * star (s ω') * ClassFunction.inner (F ω) (F ω') := by
+  rw [inner_sum_left]
+  refine Finset.sum_congr rfl fun ω _ => ?_
+  rw [ClassFunction.inner_smul_left, inner_sum_right, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun ω' _ => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right, ← mul_assoc]
+
 namespace TICyclicHypothesis
 
 /- 3.5.1: the Gram matrix of `(Ind_W^G α_{ij})` (pp. 17-18) -/
@@ -2941,6 +2954,51 @@ theorem sigma_irreducibleCharacter (hyp : TICyclicHypothesis G) [Fintype hyp.W]
       = hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω) := by
   conv_lhs => rw [← irreducibleCharacterBasis_apply (G := hyp.W) ω]
   exact (irreducibleCharacterBasis (G := hyp.W)).constr_basis ℂ _ ω
+
+/-- The Gram matrix of `σ` on the basis matches that of `Irr(W)`: `⟨ω^σ, ω'^σ⟩ = ⟨ω, ω'⟩`.  Both
+sides are `δ_{ω,ω'}` — the `χ`-family is orthonormal (`chiFam_spec`) and `omegaIrrEquiv.symm` is
+injective, while `Irr(W)` is orthonormal (`irreducibleCharacter_inner_eq_ite`). -/
+theorem sigma_inner_irreducibleCharacter (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω ω' : IrreducibleCharacter hyp.W) :
+    ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+        (hyp.sigma hVeq app (ω' : ClassFunction hyp.W ℂ))
+      = ClassFunction.inner (ω : ClassFunction hyp.W ℂ) (ω' : ClassFunction hyp.W ℂ) := by
+  rw [sigma_irreducibleCharacter, sigma_irreducibleCharacter, (hyp.chiFam_spec hVeq app).2.2.1,
+    irreducibleCharacter_inner_eq_ite]
+  by_cases h : ω = ω'
+  · rw [if_pos h, if_pos (congrArg _ h)]
+  · rw [if_neg h, if_neg fun hh => h (hyp.omegaIrrEquiv.symm.injective hh)]
+
+/-- **Peterfalvi (3.2)** (isometry): `σ` preserves the class-function inner product,
+`⟨α^σ, β^σ⟩ = ⟨α, β⟩`.  Expand `α, β` in the `Irr(W)` basis; both inner products become the same
+double sum `∑_{ω,ω'} r_ω · conj(s_{ω'}) · ⟨·,·⟩`, and the per-pair Gram entries agree by
+`sigma_inner_irreducibleCharacter`. -/
+theorem sigma_inner (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (x y : ClassFunction hyp.W ℂ) :
+    ClassFunction.inner (hyp.sigma hVeq app x) (hyp.sigma hVeq app y)
+      = ClassFunction.inner x y := by
+  classical
+  haveI : Finite hyp.W := Finite.of_fintype _
+  haveI : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
+  haveI : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
+  set b := irreducibleCharacterBasis (G := hyp.W) with hb
+  have hbω : ∀ ω, b ω = (ω : ClassFunction hyp.W ℂ) := fun ω => by
+    rw [hb]; exact irreducibleCharacterBasis_apply ω
+  have hσ : ∀ z, hyp.sigma hVeq app z = ∑ ω, b.repr z ω • hyp.sigma hVeq app (b ω) := fun z => by
+    conv_lhs => rw [← b.sum_repr z]
+    rw [map_sum]; exact Finset.sum_congr rfl fun ω _ => map_smul _ _ _
+  -- both inner products expand to the same double sum over the (matching) Gram entries
+  have hL := inner_sum_smul_sum (fun ω => b.repr x ω) (fun ω => b.repr y ω)
+    (fun ω => hyp.sigma hVeq app (b ω))
+  have hR := inner_sum_smul_sum (fun ω => b.repr x ω) (fun ω => b.repr y ω) (fun ω => b ω)
+  rw [hσ x, hσ y, hL]
+  conv_rhs => rw [← b.sum_repr x, ← b.sum_repr y, hR]
+  refine Finset.sum_congr rfl fun ω _ => Finset.sum_congr rfl fun ω' _ => ?_
+  rw [hbω ω, hbω ω', hyp.sigma_inner_irreducibleCharacter hVeq app ω ω']
 
 end TICyclicHypothesis
 
