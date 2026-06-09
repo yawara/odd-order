@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.RepresentationTheory.Basic
 import Mathlib.RepresentationTheory.Invariants
+import Mathlib.LinearAlgebra.Eigenspace.Pi
 import Mathlib.FieldTheory.IsAlgClosed.Basic
 import Mathlib.GroupTheory.Commutator.Basic
 import OddOrder.BG.Ch1_Preliminary.S03b_Lemma33
@@ -668,6 +669,107 @@ theorem finrank_eq_one_of_not_iso_generator
 
 end Step9
 
+/-! ## Step 9, (O): weight spaces of an abelian normal subgroup and the orbit count (mmd L949-951)
+
+For the `K'`-analysis of step 9.  When `K'` is abelian and `F` is algebraically closed, the simple
+`F[K']`-constituents of `U` are one-dimensional, indexed by *characters* `χ : K' → F`.  Their weight
+spaces `U_χ = {v | ∀ k', ρ k' v = χ k' • v}` are independent (distinct characters), `G` permutes
+them by conjugation (`ρ g (U_χ) = U_{g·χ}`), and irreducibility over a subgroup forces that subgroup
+to act transitively on the (finite) set of weights.  Running this for `K` (number of weights divides
+`|K|`) and for `R = ⟨x⟩` (number divides `p`), with the two weights `χ` and `x·χ` distinct in the
+NONISO case, forces the weight count to be `p`, hence `p ∣ |K|` — contradicting `gcd(p, |K|) = 1`. -/
+
+section WeightSpace
+
+variable {F : Type*} [Field F] {G : Type*} [Group G]
+variable {W : Type*} [AddCommGroup W] [Module F W]
+
+/-- The `χ`-**weight space** of `K'` acting via `ρ`: the simultaneous `χ k'`-eigenspace of every
+`ρ k'` (`k' ∈ K'`).  For abelian `K'` over an algebraically closed field these are the
+one-dimensional `F[K']`-isotypic pieces of `U`. -/
+def weightSpace (ρ : Representation F G W) (K' : Subgroup G) (χ : ↥K' → F) : Submodule F W :=
+  ⨅ k' : ↥K', Module.End.eigenspace (ρ (k' : G)) (χ k')
+
+theorem mem_weightSpace {ρ : Representation F G W} {K' : Subgroup G} {χ : ↥K' → F} {v : W} :
+    v ∈ weightSpace ρ K' χ ↔ ∀ k' : ↥K', ρ (k' : G) v = χ k' • v := by
+  simp only [weightSpace, Submodule.mem_iInf, Module.End.mem_eigenspace_iff]
+
+/-- The conjugation action of `G` on characters of a normal subgroup `K'`:
+`(g · χ) k' = χ (g⁻¹ k' g)`. -/
+noncomputable def conjChar (K' : Subgroup G) [K'.Normal] (g : G) (χ : ↥K' → F) : ↥K' → F :=
+  fun k' => χ (OddOrder.RepresentationTheory.conjNormalMulAut K' g⁻¹ k')
+
+theorem conjChar_one (K' : Subgroup G) [K'.Normal] (χ : ↥K' → F) : conjChar K' 1 χ = χ := by
+  funext k'
+  simp only [conjChar, inv_one]
+  congr 1
+  apply Subtype.ext
+  rw [OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe]; group
+
+theorem conjChar_mul (K' : Subgroup G) [K'.Normal] (g₁ g₂ : G) (χ : ↥K' → F) :
+    conjChar K' (g₁ * g₂) χ = conjChar K' g₁ (conjChar K' g₂ χ) := by
+  funext k'
+  simp only [conjChar]
+  congr 1
+  apply Subtype.ext
+  rw [OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe,
+    OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe,
+    OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe]
+  group
+
+/-- **`G` permutes the weight spaces**: `ρ g` carries the `χ`-weight space onto the
+`(g · χ)`-weight space.  This is the key conjugation identity — purely an eigenspace computation
+(`ρ g` is `F`-linear), with no semilinearity, because `ρ k' (ρ g v) = ρ g (ρ (g⁻¹ k' g) v)`. -/
+theorem map_weightSpace (ρ : Representation F G W) {K' : Subgroup G} [K'.Normal] (g : G)
+    (χ : ↥K' → F) :
+    (weightSpace ρ K' χ).map (ρ g) = weightSpace ρ K' (conjChar K' g χ) := by
+  have hkey : ∀ (h : G) (v : W) (k' : ↥K'),
+      ρ (k' : G) (ρ h v)
+        = ρ h (ρ ((OddOrder.RepresentationTheory.conjNormalMulAut K' h⁻¹ k' : ↥K') : G) v) := by
+    intro h v k'
+    rw [← Module.End.mul_apply, ← Module.End.mul_apply, ← map_mul, ← map_mul]
+    congr 2
+    rw [OddOrder.RepresentationTheory.conjNormalMulAut_apply_coe]; group
+  ext w
+  rw [Submodule.mem_map]
+  constructor
+  · rintro ⟨v, hv, rfl⟩
+    rw [mem_weightSpace] at hv ⊢
+    intro k'
+    rw [hkey g v k', hv (OddOrder.RepresentationTheory.conjNormalMulAut K' g⁻¹ k'), map_smul]
+    rfl
+  · intro hw
+    rw [mem_weightSpace] at hw
+    refine ⟨ρ g⁻¹ w, ?_, ?_⟩
+    · rw [mem_weightSpace]
+      intro k'
+      rw [hkey g⁻¹ w k']
+      have hcc : conjChar K' g χ
+          (OddOrder.RepresentationTheory.conjNormalMulAut K' (g⁻¹)⁻¹ k') = χ k' := by
+        simp only [conjChar]
+        rw [OddOrder.RepresentationTheory.conjNormalMulAut_conjNormalMulAut_inv]
+      rw [hw (OddOrder.RepresentationTheory.conjNormalMulAut K' (g⁻¹)⁻¹ k'), hcc, map_smul]
+    · rw [← Module.End.mul_apply, ← map_mul, mul_inv_cancel, map_one, Module.End.one_apply]
+
+/-- **Weight spaces are independent** (distinct characters ⟹ independent eigenspaces).  For a
+commuting family `{ρ k' : k' ∈ K'}` the simultaneous maximal generalised eigenspaces are independent
+(`Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo`); the weight spaces are contained in
+them, so are independent too. -/
+theorem iSupIndep_weightSpace (ρ : Representation F G W) {K' : Subgroup G}
+    (hcomm : ∀ a b : ↥K', (a : G) * (b : G) = (b : G) * (a : G)) :
+    iSupIndep (weightSpace ρ K') := by
+  have hC : ∀ a b : ↥K', Commute (ρ (a : G)) (ρ (b : G)) := fun a b => by
+    show ρ (a : G) * ρ (b : G) = ρ (b : G) * ρ (a : G)
+    rw [← map_mul, ← map_mul, hcomm a b]
+  refine (Module.End.independent_iInf_maxGenEigenspace_of_forall_mapsTo
+    (fun k' : ↥K' => ρ (k' : G))
+    (fun i j φ => Module.End.mapsTo_maxGenEigenspace_of_comm (hC j i) φ)).mono ?_
+  intro χ
+  exact iInf_mono (fun _ => Module.End.eigenspace_le_maxGenEigenspace)
+
+end WeightSpace
+
+
 /-- **BG Theorem 3.5, group-order strong-induction core** (algebraically closed `F`).
 
 `Nat.card G = n` での強帰納法。結論 `∀ g ∈ ⁅K, K⁆, ρ g = 1` (= `K' ⊆ C_K(V)`)。
@@ -799,4 +901,5 @@ theorem thm35_algClosed
   thm35_aux (Nat.card G) ρ K R hFrob hKsolv hRp hchar hCV1 rfl
 
 end OddOrder.BG.Ch1.S03e
+
 
