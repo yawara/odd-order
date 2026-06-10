@@ -580,6 +580,82 @@ scaffold 1684 行、唯一 real sorry = **Phase D–F ((3.22)–(3.38)) のみ**
 - Phase D が最重量。その後 Phase E ((3.32)–(3.37), Thm 3.5 消費) → Phase F (orbit-parity 矛盾)。
 - 正本 = 本ファイル「session 8」。
 
+## ✅✅✅ 2026-06-10 session 9 (a-keystone): **Phase D (3.22)–(3.26) COMPLETE** — G/H/R/K の構造確定
+
+scaffold 単一 sorry = Phase D 末尾 ((3.27)–(3.31) 以降)。leaf 3017 green (47s)、full 3619 green。
+`maxHeartbeats 2400000` に増額 (1.6M から)。commits: `48dcde08` `e14db66e` `fd9b7a25` `931c0cd2`。
+
+### 着地した文脈 (Phase D 後半が消費できる形)
+- **(3.22)** `h322 : ∀ X ≤ KG, R₀ ≤ N(X) → PG ≤ N(X) → VG ⊔ X ⊔ PG ⊔ R₀ ≠ ⊤ → ⁅X, PG⁆ = ⊥`
+  (PG := `P.map H.subtype` 表記)。実装 = 設計通り 7 ステップ: `set HX/S₂/WG` → S₂ ≤ N(HX)
+  (`mem_normalizer_sup` ×2 + `normalizer_eq_top` + `mem_normalizer_map_subtype_of_isAInvariant`)
+  → IH transport battery ((3.6) ミラー; card lt は `eq_top_of_card_eq S₂` **subgroup 明示引数**)
+  → `hasPLengthOne ↥WG` 橋 → `O_{p'}(↥HX) = ⊥` (**Helper A** + hCHV val-chase) →
+  `O_{p'}(↥WG) = ⊥` (**Helper B**, `WG ⊴ HX` in-context) → kernel
+  (`le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`; `PG ≤ WG` は h321G + commutator_mono)
+  → `⁅X,PG⁆ ≤ X ⊓ OpG = ⊥` (coprime)。
+- **(3.23)** `h313G` (G-level (3.13)) / `h323G : VG ⊔ KG ⊔ PG ⊔ R₀ = ⊤` / `hDedekind`
+  (一般形: Y ≤ KG R₀-正規化 + VYPR₀=⊤ ⟹ VYP=H; `coe_mul_of_right_le_normalizer_left` +
+  H⊓R=⊥ 殺し) / `h323H : VG ⊔ KG ⊔ PG = H` / `h323R : R = R₀`。
+- **(3.22)' 無条件形** `h322' : X ≤ KG → X ≠ KG → R₀ ≤ N(X) → PG ≤ N(X) → ⁅X,PG⁆ = ⊥`
+  (VXPR₀=⊤ なら hDedekind + **counting** `hcard_VYP : |VG ⊔ Y ⊔ PG| = |VG|·(|Y|·|PG|)`
+  [`card_sup_of_le_normalizer_of_disjoint` ×2; disjoint 部品 = `hVG_disj` (hVN_inf 経由) +
+  `hPG_p'_disj`/`hcop_KG_PG`] で X = KG)。
+- **(3.24)** `h324 : ⁅KG, PG⁆ = KG` (`h16bKP` = Prop 1.6(b) を `KP := KG ⊔ PG` 内で
+  `commutator_commutator_right_eq` + subgroupOf 2 連 transport; `mem_normalizer_commutator` で
+  R₀-不変性)。
+- **(3.25) 前半** `q, hq_prime, hq_ne_p, hq_ne_r, hKGq : IsPGroup q ↥KG`
+  (`hKG_nilp` via hKN_fit; fitting ↥KG = ⊤ = ⨆ opCore [`nilpotent_normal_le_fitting` N:=⊤ +
+  `fitting_eq_iSup_primeFactors`] + `Subgroup.iSup_induction` + h322' を proper opCore-lift に)。
+- **(3.25)+(3.26)** `hK_special : IsSpecial q ↥KG` / `hK_exp : Monoid.exponent ↥KG = q`:
+  **Gor 5.3.7** (`S04.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality`)
+  を `φA := KG.normalizerMonoidHom.comp (inclusion (PG ⊔ R₀ ≤ N(KG)))` に適用 (`hφA_val` は
+  **rfl**!)。minimal Q は proper だと h322' で ψ₀-中心化矛盾 ⟹ Q = ⊤ ⟹
+  `IsSpecial.of_mulEquiv topEquiv` + `Monoid.exponent_eq_of_mulEquiv` で K に転送。
+  hCop = `card_sup_of_le_normalizer_of_disjoint` で |A| = |PG|·|R₀|。
+  **⚠ BG (3.25) の第 2 文 `C_{K/K'}(P) = 1` は未形式化** ((3.29)/(3.30) 実装時に要否判断)。
+
+### 新規 committed 部品
+- `S03f_Prelim` (+10 lemmas, 全 axiom-clean): `map_conj_eq_self_of_mem_normalizer` /
+  `mem_normalizer_of_map_conj_eq` (core) / `mem_normalizer_sup` / `mem_normalizer_commutator` /
+  `mem_normalizer_map_subtype_of_characteristic` / `mem_normalizer_map_subtype_of_isAInvariant`
+  (conjNormal 形) / **`mem_normalizer_map_subtype_of_smul_val`** (任意作用の generic 形) /
+  `oPiCore_compl_eq_bot_of_isPGroup_centralizer_le` (Helper A) /
+  `oPiCore_eq_bot_of_subgroupOf_normal` (Helper B) / `card_sup_of_le_normalizer_of_disjoint`。
+- `IsExtraspecial.lean`: **`IsSpecial.of_mulEquiv`** (center/commutator/frattini の iso 対応;
+  frattini は `frattini_le_comap_frattini_of_surjective` 両方向)。
+
+### Gotchas (再利用)
+- `Set.mem_mul` destructure は β-未簡約 `(fun x1 x2 ↦ x1*x2) a 1` を残す → `rw [mul_one]` 不発。
+  `rw [hr₀bot] at heq; simp only [mul_one] at heq` (simp は β する)。
+- sup-membership に `le_sup_left h` は metavar で coercion 不発 → **`Subgroup.mem_sup_left/right`**。
+- `Nat.Coprime.mul` は無い → `Nat.coprime_mul_iff_left.mpr ⟨_, _⟩`。
+- `.toMonoidHom` 形は `Subgroup.map_equiv_eq_comap_symm'` (**primed**)。
+- `Subgroup.iSup_induction` は `induction … using` 不可 (too many targets) → 明示
+  `(C := fun w : ↥KG => …)` で直接 apply。
+- `Subgroup.normalizerMonoidHom` 由来の作用の val は rfl で出る (comp/inclusion 越しでも)。
+
+### ▶ 次セッション = (3.27)–(3.31) (Phase D 完結)
+1. **(3.27)** `C_P(K) = 1`: PG ⊓ C_G(KG) ≤ (P ⊓ K)-lift = ⊥ — h316 (`centralizer K ≤ K` in ↥H)
+   の G-level 化 + p/p'-disjoint (`hPG_p'_disj`)。
+2. **(3.28)** `C_A(K) = ⊥` (A = PG ⊔ R₀): Cg := A ⊓ C_G(KG) ⊴ A (A ≤ N 両成分)。
+   p-元: A の normal Sylow-p = PG (A/PG ≅ R₀ r-群) ⟹ p-元 ∈ PG ⟹ (3.27) で 1。
+   r-元 y: ⟨y⟩, R₀ とも A の Sylow-r (|A| = pᵃ·r) ⟹ 共役 ⟹ R₀ ⊓ Cg ≠ ⊥ ⟹ |R₀|=r で
+   R₀ ≤ Cg ⟹ KG ≤ C(R₀) = h317 矛盾。mathlib Sylow 共役 API を ↥A で使う (型 juggling 注意)。
+3. **(3.29)** `C_A(K/K') = ⊥`: K special ⟹ K' = Φ(K) (hK_special.2 右枝) ⟹ **Thm 1.8**
+   (`mulAut_eq_one_of_coprime_orderOf_of_frattini`, S01) で kernel(K/Φ(K) 作用) = kernel(K 作用)。
+   φA の quotient 作用構成は `IsAInvariant.quotientMulAutHom` 系 (h317 ブロックの φQ パターン)。
+4. **(3.30)** `C_{K/K'}(R₀) ≠ 1`: 背理 — PR₀ faithful on K/K' ((3.29)) + C(R₀)=1 と **Thm 3.4**
+   (`S03d.thm34`, 二度目の実消費; (3.19) の thm34-bridge パターン: AppA:1541) ⟹ ⁅PG,R₀⁆ = ⊥
+   ⟹ h321G で PG = ⊥ ⟹ h320/(3.13) 系で矛盾 (BG は (3.20) 違反と書く; Lean では
+   ⁅P,R₀⁆ = P ≠ ⊥ を使う方が早い — P ≠ ⊥ は h313 ⟸ ⁅K,⊥⁆=⊥)。
+5. **(3.31)** `|C_K(R₀)| = q ∧ C_K(R₀) ⊓ K' = ⊥`: q² ∣ |C_K(R₀)| なら exponent q ((3.26)) の
+   位数 q² 部分群は elementary abelian ⟹ hZ (Z-group) 矛盾 — (3.19) の
+   `card_eq_prime_of_le_isZGroup` 周辺パターン再利用。Prop 1.5(d) で C_K(R₀) ⊄ K'。
+6. その後 Phase E (3.32)–(3.37): K ≠ [K,R], C_{[K,R]}(R)=1, Lemma 3.1 (Frobenius), **Thm 3.5**
+   消費 ([K,R] abelian), Thm 2.6(a), K elementary abelian, |K| > q²。
+正本 = 本節。(3.19)-(3.21) 実装詳細は session 8 節。
+
 ### ▶ (旧) session 7 cont. の (3.19) プラン (実装済み、参照用)
 - 入口: thm34 への bridge。G' := ↥S₁ (= ↥(K_G ⊔ R₀)、h318 の S₁ をそのまま再利用 —
   hKG'norm/hcompl₁/hKG'card/hR₀'card/hr_ndvd_K は h318 内 local なので**再構築要** (h318 の外へ
