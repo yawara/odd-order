@@ -635,14 +635,21 @@ scaffold 単一 sorry = Phase D 末尾 ((3.27)–(3.31) 以降)。leaf 3017 gree
   `(C := fun w : ↥KG => …)` で直接 apply。
 - `Subgroup.normalizerMonoidHom` 由来の作用の val は rfl で出る (comp/inclusion 越しでも)。
 
-### ▶ 次セッション = (3.27)–(3.31) (Phase D 完結)
-1. **(3.27)** `C_P(K) = 1`: PG ⊓ C_G(KG) ≤ (P ⊓ K)-lift = ⊥ — h316 (`centralizer K ≤ K` in ↥H)
-   の G-level 化 + p/p'-disjoint (`hPG_p'_disj`)。
-2. **(3.28)** `C_A(K) = ⊥` (A = PG ⊔ R₀): Cg := A ⊓ C_G(KG) ⊴ A (A ≤ N 両成分)。
-   p-元: A の normal Sylow-p = PG (A/PG ≅ R₀ r-群) ⟹ p-元 ∈ PG ⟹ (3.27) で 1。
-   r-元 y: ⟨y⟩, R₀ とも A の Sylow-r (|A| = pᵃ·r) ⟹ 共役 ⟹ R₀ ⊓ Cg ≠ ⊥ ⟹ |R₀|=r で
-   R₀ ≤ Cg ⟹ KG ≤ C(R₀) = h317 矛盾。mathlib Sylow 共役 API を ↥A で使う (型 juggling 注意)。
-3. **(3.29)** `C_A(K/K') = ⊥`: K special ⟹ K' = Φ(K) (hK_special.2 右枝) ⟹ **Thm 1.8**
+### ✅ session 9 cont.: (3.27)+(3.28) も COMPLETE
+- **(3.27)** `h327 : PG ⊓ C_G(KG) = ⊥` — h316 G-level 化 (val-chase) + `hPG_p'_disj`。
+- **(3.28)** `h328 : A ⊓ C_G(KG) = ⊥` — **A/φA/hφA_val/hAcard を main flow へ hoist 済**
+  ((3.29) が再利用可)。素数 ℓ ∣ |A⊓C| で ℓ∈{p,r} 分岐
+  (⚠ `rcases … with rfl` は **p/r 側を subst で消す**ので `hℓeq` + `rw [hℓeq] at hy_ordG`):
+  p-枝 = PG ⊴ A (normal Sylow) + 商位数 r で像消滅 → h327; r-枝 = **Sylow II**
+  (`Sylow.ofCard` ×2 [factorization 計算: `Nat.factorization_mul` + `Finsupp.single_apply` +
+  `factorization_self`] + `MulAction.exists_smul_eq ↥A` + `Sylow.smul_def`/`pointwise_smul_def`/
+  `coe_ofCard` simpa + `mem_smul_pointwise_iff_exists`) で ⟨y⟩ ~ R₀ 共役 ⟹ 中心化性転送
+  (a⁻¹ka ∈ KG calc) ⟹ h317 矛盾。
+  gotcha: `orderOf_dvd_natCard` (Nat.card 版; `orderOf_dvd_card` は Fintype)。
+
+### ▶ 次セッション = (3.29)–(3.31) (Phase D 完結)
+3. **(3.29)** `C_A(K/K') = ⊥`: K special ⟹ K' = Φ(K) (hK_special.2 — **⚠ 左枝 elem-abelian の
+   場合は K'=Φ(K)=⊥ を別証**: 可換 ⟹ K'=⊥, `frattini_eq_bot_iff_isElementaryAbelian`) ⟹ **Thm 1.8**
    (`mulAut_eq_one_of_coprime_orderOf_of_frattini`, S01) で kernel(K/Φ(K) 作用) = kernel(K 作用)。
    φA の quotient 作用構成は `IsAInvariant.quotientMulAutHom` 系 (h317 ブロックの φQ パターン)。
 4. **(3.30)** `C_{K/K'}(R₀) ≠ 1`: 背理 — PR₀ faithful on K/K' ((3.29)) + C(R₀)=1 と **Thm 3.4**
