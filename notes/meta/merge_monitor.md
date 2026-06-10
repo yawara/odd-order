@@ -77,6 +77,19 @@
 
 ## 現状メモ
 
+- **2026-06-10 — Thm 3.6 完成 → D 合流 → de-axiom 完了。D の「報告のみ」規約は役目を終了**:
+  Lane A が BG Thm 3.6 を完成 (`18a12a88`) → main 合流 (merge `36eb07db`)。ユーザー承認のもと
+  **D (`bg-s10-fwd`) 全 67 commits を合流** (merge `2794232f`) し、`S10_ForwardFromKeystone.lean` の
+  Thm 3.6 forward axiom を `Ch1.S03f.thm36` への bridge theorem に置換 (de-axiom, `fabd8efd`)。
+  §10 spine の island は **Lem 10.4(b) axiom 1 本のみ**に縮小 (AxiomsCheck 1343 checks green)。
+  **以後 D に新規 commit が来た場合の auto-merge 可否はユーザー未決** — 条件付き定理は引き続き
+  10.4(b) island になるため、当面は従来どおり報告して指示を仰ぐ。同日 B も (4.3.b)→(4.3) COMPLETE
+  →(4.4) anchor を連続合流 (`404d8814`/`1368e8fb`/`7c7045cc`/`f3eb00eb`/`4752484d`)。
+  監視 loop はユーザー指示で停止中 (再開時は CronCreate 再作成)。
+  ⚠ 実務知見: (1) `lake build … | tail` は exit code をマスクする — 判定には
+  `; exit ${PIPESTATUS[0]}` を付ける。(2) de-axiom で S03f を import すると
+  `OddOrder.GroupTheory.IsZGroup` が closure に入り、`open OddOrder.GroupTheory` 下の bare
+  `IsZGroup` が mathlib 版と ambiguous になる → `_root_.IsZGroup` 修飾で解消 (型不変)。
 - **2026-06-09 (後刻) — A: BG Thm 3.5 landed, 通常合流に復帰**: faithful 枝が sorry-free に到達
   (`S03e_Thm35.lean` real sorry = 0, commit `f51e4e85` "faithful-branch assembly COMPLETE
   (thm35_algClosed done)")。**BG Thm 3.5 を任意体で完全形式化**し main へ合流済 (merge `e42f4260`,
