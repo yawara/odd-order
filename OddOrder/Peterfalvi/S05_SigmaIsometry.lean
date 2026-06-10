@@ -2140,6 +2140,128 @@ theorem two_col_orthonormal_family_reindexed [Fintype ι] [Fintype κ] (hG : IsS
 
 end IsSignedTripleGrid
 
+/-! ### Peterfalvi (1.3)(a) engine: vanishing on `A` from orthogonality to `CF(H, A)`
+
+The combinatorial heart of Peterfalvi (1.3): a class function `f` orthogonal to *every* class
+function supported on a conjugation-closed set `A` must vanish on `A`.  Test against the "masking"
+`f · 1_A` — itself a class function precisely because `A` is conjugation-closed — for which
+`⟨f · 1_A, f⟩ = ⅟|H| · ∑_{a ∈ A} |f(a)|²`.  This sum of nonnegative reals is `0` only if every
+`f(a) = 0`.  This is the orthogonal-complement fact `CF(H, A)^⊥ = CF(H, H ∖ A)` of (1.3)(a). -/
+
+open scoped Classical in
+/-- **Peterfalvi (1.3)(a) engine** (vanishing on `A`).  If `f` is orthogonal to every class function
+supported on the conjugation-closed set `A`, then `f` vanishes on `A`. -/
+theorem eq_zero_of_mem_of_inner_supported_eq_zero
+    {H : Type*} [Group H] [Fintype H] [Invertible (Nat.card H : ℂ)]
+    {A : Set H} (hA : ∀ x ∈ A, ∀ h : H, h * x * h⁻¹ ∈ A)
+    {f : ClassFunction H ℂ}
+    (hf : ∀ φ : ClassFunction H ℂ, φ.support ⊆ A → ClassFunction.inner φ f = 0)
+    {a : H} (ha : a ∈ A) : f a = 0 := by
+  classical
+  -- conjugation-closedness is an equivalence (conjugation permutes `A`)
+  have hAconj : ∀ g h : H, h * g * h⁻¹ ∈ A ↔ g ∈ A := fun g h => by
+    refine ⟨fun hc => ?_, fun hc => hA g hc h⟩
+    have := hA _ hc h⁻¹
+    simpa [mul_assoc] using this
+  -- the masking `m = f · 1_A`, a class function since `A` is conjugation-closed
+  have hconj : ∀ g h : H, (if h * g * h⁻¹ ∈ A then f (h * g * h⁻¹) else 0)
+      = (if g ∈ A then f g else (0 : ℂ)) := fun g h => by
+    by_cases hg : g ∈ A
+    · rw [if_pos ((hAconj g h).mpr hg), if_pos hg, f.conj_eq]
+    · rw [if_neg (fun hc => hg ((hAconj g h).mp hc)), if_neg hg]
+  let m : ClassFunction H ℂ := ⟨fun x => if x ∈ A then f x else 0, hconj⟩
+  have hmval : ∀ g, m g = if g ∈ A then f g else 0 := fun _ => rfl
+  have hmsupp : m.support ⊆ A := fun g hg => by
+    by_contra hgA
+    exact (ClassFunction.mem_support.mp hg) (by rw [hmval, if_neg hgA])
+  -- `innerSum m f = ↑(∑_g 1_A(g) · ‖f g‖²)`, a sum of nonnegative reals
+  have he : ClassFunction.innerSum m f
+      = ((∑ g : H, (if g ∈ A then Complex.normSq (f g) else 0) : ℝ) : ℂ) := by
+    rw [ClassFunction.innerSum, Complex.ofReal_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [hmval]
+    by_cases hg : g ∈ A
+    · rw [if_pos hg, if_pos hg, Complex.star_def, Complex.mul_conj]
+    · rw [if_neg hg, if_neg hg, zero_mul, Complex.ofReal_zero]
+  -- `⟨m, f⟩ = 0 ⟹ ∑ ‖f‖²·1_A = 0 ⟹ each term 0`
+  have h0 : ClassFunction.innerSum m f = 0 := by
+    rw [← ClassFunction.card_mul_inner, hf m hmsupp, mul_zero]
+  rw [he, Complex.ofReal_eq_zero] at h0
+  have hterm := (Finset.sum_eq_zero_iff_of_nonneg fun g _ => by
+    by_cases hg : g ∈ A
+    · rw [if_pos hg]; exact Complex.normSq_nonneg _
+    · rw [if_neg hg]).mp h0 a (Finset.mem_univ a)
+  rw [if_pos ha] at hterm
+  exact Complex.normSq_eq_zero.mp hterm
+
+/-- The linear functional `φ ↦ ⟨φ, f⟩` on class functions (linear in the *left* argument,
+since `⟨·, ·⟩` is conjugate-linear on the right).  Used to phrase "`f ⊥ CF(H, A)`" as the
+vanishing of a linear map on a basis. -/
+def innerLeftFunctional {H : Type*} [Group H] [Fintype H] [Invertible (Nat.card H : ℂ)]
+    (f : ClassFunction H ℂ) : ClassFunction H ℂ →ₗ[ℂ] ℂ where
+  toFun φ := ClassFunction.inner φ f
+  map_add' a b := ClassFunction.inner_add_left a b f
+  map_smul' c a := by simp only [ClassFunction.inner_smul_left, RingHom.id_apply, smul_eq_mul]
+
+@[simp] theorem innerLeftFunctional_apply {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (f φ : ClassFunction H ℂ) :
+    innerLeftFunctional f φ = ClassFunction.inner φ f := rfl
+
+/-- **Abstract (3.8) core.** A `ℂ`-valued grid `a : ι × κ → ℂ` whose mixed differences vanish
+(`a(i,j) + a(i',j') = a(i,j') + a(i',j)`, the (3.7) identity) and whose nonzero set is *smaller*
+than `min |ι| |κ|` is identically zero.  Such a grid is additively separable, so its rows differ by
+a column-independent constant: if two rows differ, every column carries a nonzero entry (`≥ |κ|`
+nonzeros); otherwise all rows are equal, and a single nonzero entry fills a whole column (`≥ |ι|`
+nonzeros).  Either way `min |ι| |κ| ≤ #support`, contradicting the hypothesis. -/
+theorem grid_eq_zero_of_ncard_support_lt {ι κ : Type*} [Finite ι] [Finite κ]
+    (a : ι × κ → ℂ)
+    (hadd : ∀ i i' (j j' : κ), a (i, j) + a (i', j') = a (i, j') + a (i', j))
+    (hlt : {x | a x ≠ 0}.ncard < min (Nat.card ι) (Nat.card κ))
+    (x : ι × κ) : a x = 0 := by
+  classical
+  haveI : Fintype ι := Fintype.ofFinite _
+  haveI : Fintype κ := Fintype.ofFinite _
+  haveI : Fintype ↥{x : ι × κ | a x ≠ 0} := Fintype.ofFinite _
+  rw [Set.ncard_eq_toFinset_card', Set.toFinset_setOf, Nat.card_eq_fintype_card,
+    Nat.card_eq_fintype_card] at hlt
+  by_contra hx
+  set S := Finset.univ.filter (fun x => a x ≠ 0) with hS
+  have hmem : ∀ {y : ι × κ}, y ∈ S ↔ a y ≠ 0 := by
+    intro y; rw [hS, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ y)
+  by_cases hrows : ∀ (i i' : ι) (j : κ), a (i, j) = a (i', j)
+  · -- all rows equal: the column through `x` is entirely nonzero, so `|ι| ≤ #S`
+    have hcol : (Finset.univ.image fun i => (i, x.2)) ⊆ S := by
+      intro y hy
+      simp only [Finset.mem_image, Finset.mem_univ, true_and] at hy
+      obtain ⟨i, rfl⟩ := hy
+      rw [hmem, hrows i x.1 x.2]
+      exact hx
+    have hcard : Fintype.card ι ≤ S.card := by
+      have hinj : Function.Injective fun i : ι => (i, x.2) := fun a b h => by simpa using h
+      calc Fintype.card ι = (Finset.univ.image fun i => (i, x.2)).card := by
+            rw [Finset.card_image_of_injective _ hinj, Finset.card_univ]
+        _ ≤ S.card := Finset.card_le_card hcol
+    omega
+  · -- two rows differ in some column ⟹ they differ in *every* column ⟹ `|κ| ≤ #S`
+    push_neg at hrows
+    obtain ⟨i, i', j₀, hjj⟩ := hrows
+    have hdiff : ∀ j, a (i, j) ≠ a (i', j) := fun j hj => by
+      apply hjj
+      have h1 := hadd i i' j j₀
+      linear_combination hj - h1
+    -- every column `j` contains a nonzero entry, so `S.image (·.2) = univ`
+    have himg : S.image (fun y => y.2) = Finset.univ := by
+      rw [Finset.eq_univ_iff_forall]
+      intro j
+      rw [Finset.mem_image]
+      by_cases h : a (i, j) = 0
+      · exact ⟨(i', j), hmem.mpr fun hi' => hdiff j (h.trans hi'.symm), rfl⟩
+      · exact ⟨(i, j), hmem.mpr h, rfl⟩
+    have hcard : Fintype.card κ ≤ S.card := by
+      calc Fintype.card κ = (S.image fun y => y.2).card := by rw [himg, Finset.card_univ]
+        _ ≤ S.card := Finset.card_image_le
+    omega
+
 /- 3.5.1 (cont.): the virtual characters `β_{ij} = Ind_W^G α_{ij} - 1_G` -/
 
 namespace TICyclicHypothesis
@@ -3052,6 +3174,64 @@ theorem sigma_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     (hyp.chiFam_spec hVeq app).1]
   exact ((hyp.chiFam_spec hVeq app).2.2.2 p q hp hq).symm
 
+/-- The basis `alphaBasis` evaluated at an index pair: `alphaBasis (p, q) = α_{pq}`
+(`coe_basisOfLinearIndependentOfCardEqFinrank` for the family `alphaLinearIndependent`). -/
+theorem alphaBasis_apply (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    (pq : {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} ×
+        {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1}) :
+    hyp.alphaBasis hVeq pq = hyp.alpha hVeq pq.1.1 pq.2.1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  letI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  letI : Fintype {χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ // χ₂ ≠ 1} := Fintype.ofFinite _
+  haveI := hyp.nonempty_charNeOne hyp.W1_le_W hyp.W1_nontrivial
+  haveI := hyp.nonempty_charNeOne hyp.W2_le_W hyp.W2_nontrivial
+  have h : ⇑(hyp.alphaBasis hVeq) = fun p => hyp.alpha hVeq p.1.1 p.2.1 := by
+    unfold TICyclicHypothesis.alphaBasis
+    exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  exact congrFun h pq
+
+/-- `Ind_W^G` packaged as a `ℂ`-linear map `CF(W) →ₗ[ℂ] CF(G)` (linearity from `induce_add` /
+`induce_smul`).  Used to phrase (3.2)(a) as an equality of linear maps on the basis `(α_{ij})`. -/
+noncomputable def induceLinear (hyp : TICyclicHypothesis G) [Invertible (Nat.card hyp.W : ℂ)] :
+    ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ where
+  toFun := ClassFunction.induce hyp.W
+  map_add' := ClassFunction.induce_add hyp.W
+  map_smul' c θ := ClassFunction.induce_smul hyp.W c θ
+
+@[simp] theorem induceLinear_apply (hyp : TICyclicHypothesis G) [Invertible (Nat.card hyp.W : ℂ)]
+    (θ : ClassFunction hyp.W ℂ) :
+    hyp.induceLinear θ = ClassFunction.induce hyp.W θ := rfl
+
+/-- **Peterfalvi (3.2)(a)** (full form): on all of `CF(W, V)`, `σ` agrees with the Dade map `τ`,
+`α^σ = τ(α) = Ind_W^G α`.  Both `α ↦ σ(↑α)` and `α ↦ Ind_W^G ↑α` are `ℂ`-linear on `CF(W, V)` and
+agree on the basis `(α_{ij})` (`alphaBasis`) — LHS by `sigma_alphaCF`, RHS by `tau_eq_induce`
+(`τ = Ind`) — hence agree everywhere. -/
+theorem sigma_eq_tau (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV ℂ hyp) :
+    hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ) = app.tau.toDadeMap α := by
+  -- the two `ℂ`-linear maps `CF(W,V) →ₗ CF(G)` (`σ ∘ ↪` and `Ind ∘ ↪`) agree on the basis `α_{ij}`
+  have key : ((hyp.sigma hVeq app).comp (Submodule.subtype _) :
+        SupportedOnV ℂ hyp →ₗ[ℂ] ClassFunction G ℂ)
+      = hyp.induceLinear.comp (Submodule.subtype _) := by
+    refine Module.Basis.ext (hyp.alphaBasis hVeq) (fun pq => ?_)
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, hyp.alphaBasis_apply hVeq,
+      induceLinear_apply, hyp.alpha_coe]
+    rw [hyp.sigma_alphaCF hVeq app pq.1.1 pq.2.1 pq.1.2 pq.2.2]
+    -- LHS `= τ(α_{pq})` (now); RHS `Ind ↑α_{pq} = τ(α_{pq})` by `tau_eq_induce` (`τ = Ind`)
+    have h := hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq pq.1.1 pq.2.1)
+    rw [hyp.alpha_coe] at h
+    exact h
+  have hα := DFunLike.congr_fun key α
+  simp only [LinearMap.comp_apply, Submodule.subtype_apply] at hα
+  rw [hα, induceLinear_apply]
+  exact (hyp.tau_eq_induce app.tau.toDadeIsometryData α).symm
+
 /-- **Peterfalvi (3.2)** (virtual characters): `σ` maps `ZIrr(W)` into `ZIrr(G)`.  Each `Irr(W)`
 basis vector maps to a member of the `(3.5)` family `χ ∈ ZIrr(G)` (`chiFam_spec`); a `ℤ`-combination
 maps to a `ℤ`-combination, which stays in the `ℤ`-submodule `ZIrr(G)` (`span` induction). -/
@@ -3070,6 +3250,299 @@ theorem sigma_mem_ZIrr (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   | zero => rw [map_zero]; exact Submodule.zero_mem _
   | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
   | smul a x _ ih => rw [map_zsmul]; exact (ZIrr G).smul_mem a ih
+
+/-- **(1.3)(a) → (3.2) bridge** (vanishing on `V`): a class function `f` on `W` orthogonal to
+every `α_{ij}` (`i, j ≥ 1`) vanishes on `V`.  The `α_{ij}` are a basis of `CF(W, V)` ((3.4)), so the
+linear functional `⟨·, f⟩` is zero on all of `CF(W, V)`; the (1.3)(a) engine
+(`eq_zero_of_mem_of_inner_supported_eq_zero`) then forces `f|_V = 0`.  (`V` is conjugation-closed in
+the abelian `W`.) -/
+theorem vanishOnV_of_inner_alphaCF (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] (hVeq : hyp.V = hyp.Vdiff)
+    {f : ClassFunction hyp.W ℂ}
+    (hf : ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      p ≠ 1 → q ≠ 1 → ClassFunction.inner (hyp.alphaCF p q) f = 0)
+    {v : G} (hv : v ∈ hyp.V) : f ⟨v, hyp.V_subset_W hv⟩ = 0 := by
+  classical
+  haveI : IsMulCommutative ↥hyp.W := hyp.isMulCommutative_W
+  -- `⟨·, f⟩` is zero on `CF(W, V)`: zero on the basis `α_{ij}` (so on the whole submodule)
+  have hL0 : (innerLeftFunctional f).comp (Submodule.subtype
+      (ClassFunction.supportedSubmodule (G := ↥hyp.W)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W))) = 0 := by
+    refine Module.Basis.ext (hyp.alphaBasis hVeq) (fun pq => ?_)
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearMap.zero_apply,
+      innerLeftFunctional_apply, hyp.alphaBasis_apply hVeq, hyp.alpha_coe]
+    exact hf pq.1.1 pq.2.1 pq.1.2 pq.2.2
+  refine eq_zero_of_mem_of_inner_supported_eq_zero
+    (A := OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W) (fun x _ h => ?_)
+    (fun φ hφ => ?_) ?_
+  · -- `V` is conjugation-closed in the abelian `W`, so `h * x * h⁻¹ = x`
+    have hxx : h * x * h⁻¹ = x := by rw [mul_comm' h x, mul_assoc, mul_inv_cancel, mul_one]
+    rw [hxx]; assumption
+  · -- orthogonal to every `φ ∈ CF(W, V)` via `hL0`
+    have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+    simpa using this
+  · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
+
+open scoped Classical in
+/-- **Peterfalvi (3.2)(c)** on a basis character: `ω^σ(v) = ω(v)` for `ω ∈ Irr(W)` and `v ∈ V`.
+By the bridge `vanishOnV_of_inner_alphaCF` it suffices that `f = Res_W(ω^σ) - ω ⊥ α_{ij}`; this
+holds because `⟨α_{ij}, Res_W(ω^σ)⟩ = ⟨Ind α_{ij}, ω^σ⟩ = ⟨α_{ij}^σ, ω^σ⟩ = ⟨α_{ij}, ω⟩`
+(Frobenius `+` (a) `+` isometry). -/
+theorem sigma_apply_irreducibleCharacter_of_mem_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) {v : G} (hv : v ∈ hyp.V) :
+    hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) v
+      = (ω : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩ := by
+  have hkey : ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      p ≠ 1 → q ≠ 1 → ClassFunction.inner (hyp.alphaCF p q)
+        (ClassFunction.restrict hyp.W (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+          - (ω : ClassFunction hyp.W ℂ)) = 0 := by
+    intro p q hp hq
+    have hinduce : ClassFunction.induce hyp.W (hyp.alphaCF p q)
+        = hyp.sigma hVeq app (hyp.alphaCF p q) := by
+      have h1 := hyp.sigma_eq_tau hVeq app (hyp.alpha hVeq p q)
+      have h2 := hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq p q)
+      rw [hyp.alpha_coe] at h1 h2
+      exact h2.symm.trans h1.symm
+    rw [ClassFunction.inner_sub_right, ← ClassFunction.inner_induce_eq_inner_restrict, hinduce,
+      hyp.sigma_inner hVeq app, sub_self]
+  have hzero := hyp.vanishOnV_of_inner_alphaCF hVeq hkey hv
+  rw [ClassFunction.sub_apply, ClassFunction.restrict_apply] at hzero
+  exact sub_eq_zero.mp hzero
+
+open scoped Classical in
+/-- **Peterfalvi (3.2)(c)**: `α^σ(x) = α(x)` for every `α ∈ CF(W)` and `x ∈ V`.  Both sides are
+`ℂ`-linear in `α`, and they agree on the orthonormal basis `Irr(W)`
+(`sigma_apply_irreducibleCharacter_of_mem_V`), hence everywhere. -/
+theorem sigma_apply_of_mem_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (α : ClassFunction hyp.W ℂ) {v : G} (hv : v ∈ hyp.V) :
+    hyp.sigma hVeq app α v = α ⟨v, hyp.V_subset_W hv⟩ := by
+  classical
+  haveI : Finite hyp.W := Finite.of_fintype _
+  haveI : Finite (IrreducibleCharacter hyp.W) := finite_irreducibleCharacter
+  haveI : Fintype (IrreducibleCharacter hyp.W) := Fintype.ofFinite _
+  -- the linear functional `D α = α^σ(v) - α(v)` vanishes on the basis `Irr(W)`, hence is `0`
+  let D : ClassFunction hyp.W ℂ →ₗ[ℂ] ℂ :=
+    { toFun := fun α => hyp.sigma hVeq app α v - α ⟨v, hyp.V_subset_W hv⟩
+      map_add' := fun a b => by
+        simp only [map_add, ClassFunction.add_apply]; ring
+      map_smul' := fun c a => by
+        simp only [map_smul, ClassFunction.smul_apply, RingHom.id_apply, smul_eq_mul]; ring }
+  have hD0 : D = 0 := by
+    refine Module.Basis.ext (irreducibleCharacterBasis (G := hyp.W)) (fun ω => ?_)
+    show hyp.sigma hVeq app (irreducibleCharacterBasis (G := hyp.W) ω) v
+        - (irreducibleCharacterBasis (G := hyp.W) ω) ⟨v, hyp.V_subset_W hv⟩ = 0
+    rw [irreducibleCharacterBasis_apply,
+      hyp.sigma_apply_irreducibleCharacter_of_mem_V hVeq app ω hv, sub_self]
+  have hDα : hyp.sigma hVeq app α v - α ⟨v, hyp.V_subset_W hv⟩ = 0 := DFunLike.congr_fun hD0 α
+  exact sub_eq_zero.mp hDα
+
+open scoped Classical in
+/-- **Peterfalvi (3.2)(d)**: any `χ ∈ CF(G)` orthogonal to every `χ_{ij}` (the images of the basis
+`Irr(W)` under `σ`) vanishes on `V`.  Since `σ(α_{ij}) = 1_G - χ_{i0} - χ_{0j} + χ_{ij}` ((3.5)) and
+`1_G = χ_{00}`, all four terms are orthogonal to `χ`, so `⟨α_{ij}, Res_W χ⟩ = ⟨σ(α_{ij}), χ⟩ = 0`
+(Frobenius `+` (a)); the bridge then gives `χ|_V = 0`.  An irreducible character of `G` not in the
+image of `σ` is in particular orthogonal to all `χ_{ij}`, so this is the stated form of (d). -/
+theorem eq_zero_of_mem_V_of_inner_chiFam_eq_zero (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {χ : ClassFunction G ℂ}
+    (hχ : ∀ (a : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (b : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      ClassFunction.inner χ (hyp.chiFam hVeq app (a, b)) = 0)
+    {v : G} (hv : v ∈ hyp.V) : χ v = 0 := by
+  -- each `χ_{ij}` is orthogonal to `χ` (conjugate symmetry of the hypothesis)
+  have hcf : ∀ (a : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (b : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      ClassFunction.inner (hyp.chiFam hVeq app (a, b)) χ = 0 := fun a b => by
+    rw [inner_conj_symm χ (hyp.chiFam hVeq app (a, b)), hχ a b, star_zero]
+  have hkey : ∀ (p : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q : (hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      p ≠ 1 → q ≠ 1 → ClassFunction.inner (hyp.alphaCF p q)
+        (ClassFunction.restrict hyp.W χ) = 0 := by
+    intro p q hp hq
+    have hinduce : ClassFunction.induce hyp.W (hyp.alphaCF p q)
+        = hyp.sigma hVeq app (hyp.alphaCF p q) := by
+      have h1 := hyp.sigma_eq_tau hVeq app (hyp.alpha hVeq p q)
+      have h2 := hyp.tau_eq_induce app.tau.toDadeIsometryData (hyp.alpha hVeq p q)
+      rw [hyp.alpha_coe] at h1 h2
+      exact h2.symm.trans h1.symm
+    rw [← ClassFunction.inner_induce_eq_inner_restrict, hinduce,
+      hyp.sigma_alphaCF hVeq app p q hp hq, (hyp.chiFam_spec hVeq app).2.2.2 p q hp hq,
+      ClassFunction.inner_add_left, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+      ← (hyp.chiFam_spec hVeq app).1, hcf 1 1, hcf p 1, hcf 1 q, hcf p q]
+    ring
+  have hzero := hyp.vanishOnV_of_inner_alphaCF hVeq hkey hv
+  rwa [ClassFunction.restrict_apply] at hzero
+
+open scoped Classical in
+/-- **Peterfalvi Theorem (3.2)** (capstone).  There is a linear isometry `σ : CF(W) → CF(G)`
+sending virtual characters of `W` to virtual characters of `G`, such that:
+* **(a)** `α^σ = Ind_W^G α` for `α ∈ CF(W, V)`;
+* **(b)** `1_W^σ = 1_G`;
+* **(c)** `α^σ(x) = α(x)` for `x ∈ V`;
+* **(d)** every `χ ∈ CF(G)` orthogonal to the whole image `σ(Irr W)` vanishes on `V` (in
+  particular an irreducible character of `G` not in the image of `σ` vanishes on `V`).
+
+The witness is the constructed `σ` (`sigma`); the six conjuncts are `sigma_inner`,
+`sigma_mem_ZIrr`, `sigma_eq_tau` ∘ `tau_eq_induce`, `sigma_trivial`, `sigma_apply_of_mem_V`,
+and `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` (with the index bridge `χ_{ij} = (ω_{ij})^σ`). -/
+theorem exists_sigma (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp) :
+    ∃ σ : ClassFunction hyp.W ℂ →ₗ[ℂ] ClassFunction G ℂ,
+      (∀ x y, ClassFunction.inner (σ x) (σ y) = ClassFunction.inner x y) ∧
+      (∀ z ∈ ZIrr hyp.W, σ z ∈ ZIrr G) ∧
+      (∀ α : SupportedOnV ℂ hyp,
+        σ (α : ClassFunction hyp.W ℂ) = ClassFunction.induce hyp.W (α : ClassFunction hyp.W ℂ)) ∧
+      σ (trivialClassFunction hyp.W) = trivialClassFunction G ∧
+      (∀ (α : ClassFunction hyp.W ℂ) (v : G) (hv : v ∈ hyp.V),
+        σ α v = α ⟨v, hyp.V_subset_W hv⟩) ∧
+      (∀ χ : ClassFunction G ℂ,
+        (∀ ω : IrreducibleCharacter hyp.W,
+          ClassFunction.inner χ (σ (ω : ClassFunction hyp.W ℂ)) = 0) →
+        ∀ (v : G), v ∈ hyp.V → χ v = 0) := by
+  refine ⟨hyp.sigma hVeq app, hyp.sigma_inner hVeq app,
+    fun z hz => hyp.sigma_mem_ZIrr hVeq app hz,
+    fun α => (hyp.sigma_eq_tau hVeq app α).trans
+      (hyp.tau_eq_induce app.tau.toDadeIsometryData α),
+    hyp.sigma_trivial hVeq app,
+    fun α v hv => hyp.sigma_apply_of_mem_V hVeq app α hv,
+    fun χ hd v hv => ?_⟩
+  refine hyp.eq_zero_of_mem_V_of_inner_chiFam_eq_zero hVeq app (fun a b => ?_) hv
+  -- index bridge: `χ_{ab} = (ω_{ab})^σ`, so orthogonality to `σ(Irr W)` gives `⟨χ, χ_{ab}⟩ = 0`
+  have hbridge : hyp.chiFam hVeq app (a, b)
+      = hyp.sigma hVeq app (hyp.omegaIrrEquiv (a, b) : ClassFunction hyp.W ℂ) := by
+    rw [hyp.sigma_irreducibleCharacter hVeq app (hyp.omegaIrrEquiv (a, b)),
+      Equiv.symm_apply_apply]
+  rw [hbridge]
+  exact hd (hyp.omegaIrrEquiv (a, b))
+
+/-! ### Peterfalvi (3.6)-(3.8): the coefficient grid `a_{ij} = ⟨ψ, ω_{ij}^σ⟩` and `NC(ψ)` -/
+
+open scoped Classical in
+/-- **Peterfalvi (3.7) support input**: the 4-term combination
+`ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q}` lies in `CF(W, V)`.  On `W₁` the `W₂`-parts (`q`) collapse to
+`1`, on `W₂` the `W₁`-parts (`p`) collapse, so the combination vanishes on `W₁ ∪ W₂`. -/
+theorem omegaCombo_mem_supportedSubmodule (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+       - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q)
+       : ClassFunction hyp.W ℂ)
+      ∈ ClassFunction.supportedSubmodule
+          (OddOrder.Peterfalvi.S04.supportInSubgroup hyp.V hyp.W) := by
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro w hw
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hVeq, mem_Vdiff]
+  refine ⟨w.2, fun h1 => (ClassFunction.mem_support.mp hw) ?_,
+    fun h2 => (ClassFunction.mem_support.mp hw) ?_⟩
+  · -- `↑w ∈ W₁`: the `q`-parts collapse, the four terms cancel
+    have hw1 : w ∈ hyp.W1.subgroupOf hyp.W := (Subgroup.mem_subgroupOf).mpr h1
+    simp only [ClassFunction.add_apply, ClassFunction.sub_apply, omega_apply,
+      TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply,
+      hyp.wSnd_eq_one_of_mem_W1 hw1, map_one, mul_one]
+    ring
+  · -- `↑w ∈ W₂`: the `p`-parts collapse, the four terms cancel
+    have hw2 : w ∈ hyp.W2.subgroupOf hyp.W := (Subgroup.mem_subgroupOf).mpr h2
+    simp only [ClassFunction.add_apply, ClassFunction.sub_apply, omega_apply,
+      TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply,
+      hyp.wFst_eq_one_of_mem_W2 hw2, map_one, one_mul]
+    ring
+
+/-- The (3.7) test element `ω_{pq} + ω_{p'q'} − ω_{pq'} − ω_{p'q} ∈ CF(W, V)`. -/
+noncomputable def omegaCombo (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    SupportedOnV ℂ hyp :=
+  ⟨hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+     - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q),
+   hyp.omegaCombo_mem_supportedSubmodule hVeq p p' q q'⟩
+
+@[simp] theorem omegaCombo_coe (hyp : TICyclicHypothesis G) (hVeq : hyp.V = hyp.Vdiff)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    (hyp.omegaCombo hVeq p p' q q' : ClassFunction hyp.W ℂ)
+      = hyp.omega (hyp.omegaProdChar p q) + hyp.omega (hyp.omegaProdChar p' q')
+        - hyp.omega (hyp.omegaProdChar p q') - hyp.omega (hyp.omegaProdChar p' q) := rfl
+
+/-- For `α ∈ CF(W, V)` and `ψ ∈ CF(G)` vanishing on `V`, `⟨ψ, α^σ⟩ = 0`.  By (3.2)(a),
+`α^σ = Ind_W^G α` is supported on `V^G = conjugatesOfSet V`; the class function `ψ` (vanishing on
+`V`) vanishes there too, so the supports are disjoint. -/
+theorem inner_sigma_eq_zero_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (α : SupportedOnV ℂ hyp) {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0) :
+    ClassFunction.inner ψ (hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ)) = 0 := by
+  apply ClassFunction.inner_eq_zero_of_disjoint_support
+  rw [Set.disjoint_left]
+  intro g hgψ hgσ
+  -- `g ∈ Supp(α^σ) ⟹ g ∈ conjugatesOfSet V` (else `α^σ g = τ(α) g = 0`)
+  have hgconj : g ∈ Group.conjugatesOfSet hyp.V := by
+    by_contra hg
+    refine (ClassFunction.mem_support.mp hgσ) ?_
+    rw [show hyp.sigma hVeq app (α : ClassFunction hyp.W ℂ) = app.tau.toDadeMap α from
+      hyp.sigma_eq_tau hVeq app α]
+    exact full_map_eq_zero_of_not_mem_conjugatesOfSet_V app α hg
+  -- `g ∈ conjugatesOfSet V ⟹ ψ g = 0` (`ψ` vanishes on `V`, class function)
+  obtain ⟨v, hv, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hgconj
+  exact (ClassFunction.mem_support.mp hgψ) ((ψ.of_isConj hconj).symm.trans (hψ v hv))
+
+/-- **Peterfalvi (3.6)**: the `σ`-image coefficient `a_{ij} = ⟨ψ, ω_{ij}^σ⟩` of `ψ ∈ CF(G)`.  As
+`{ω_{ij}^σ} = {χ_{ij}}` (`chiFam`) is orthonormal, these are the Fourier coefficients of `ψ` along
+`Im σ`, and `β = ψ − ∑ a_{ij} ω_{ij}^σ` is automatically orthogonal to `Im σ`.  Indexed by
+`Ĉ₁ × Ĉ₂` (index `(1, 1) = ω_{00} = 1_W`). -/
+noncomputable def sigmaCoeff (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ψ : ClassFunction G ℂ)
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) : ℂ :=
+  ClassFunction.inner ψ (hyp.chiFam hVeq app pq)
+
+/-- **Peterfalvi (3.6)**: `NC(ψ)` = number of nonzero `σ`-image coefficients of `ψ`. -/
+noncomputable def sigmaNC (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ψ : ClassFunction G ℂ) : ℕ :=
+  {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard
+
+/-- **Peterfalvi (3.7)**: under Hypothesis (3.6) (`ψ` vanishing on `V`), the `σ`-image coefficients
+satisfy the additive grid identity `a_{ij} + a_{i'j'} = a_{ij'} + a_{i'j}`.  Apply
+`inner_sigma_eq_zero_of_vanishOnV` to `α = ω_{ij} + ω_{i'j'} − ω_{ij'} − ω_{i'j} ∈ CF(W, V)`:
+`σ(α) = χ_{ij} + χ_{i'j'} − χ_{ij'} − χ_{i'j}` (σ linear, `sigma_omega`), and `⟨ψ, σ(α)⟩ = 0`. -/
+theorem sigmaCoeff_add_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (p p' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (q q' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.sigmaCoeff hVeq app ψ (p, q) + hyp.sigmaCoeff hVeq app ψ (p', q')
+      = hyp.sigmaCoeff hVeq app ψ (p, q') + hyp.sigmaCoeff hVeq app ψ (p', q) := by
+  have hσ : hyp.sigma hVeq app (hyp.omegaCombo hVeq p p' q q' : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (p, q) + hyp.chiFam hVeq app (p', q')
+        - hyp.chiFam hVeq app (p, q') - hyp.chiFam hVeq app (p', q) := by
+    simp only [omegaCombo_coe, map_add, map_sub, hyp.sigma_omega hVeq app,
+      hyp.omegaProdEquiv_symm_omegaProdChar]
+  have h0 := hyp.inner_sigma_eq_zero_of_vanishOnV hVeq app (hyp.omegaCombo hVeq p p' q q') hψ
+  rw [hσ] at h0
+  simp only [ClassFunction.inner_add_right, ClassFunction.inner_sub_right] at h0
+  simp only [sigmaCoeff]
+  linear_combination h0
+
+/-- **Peterfalvi (3.8) corollary** (`NC` too small for a row or column): if `ψ` vanishes on `V` and
+`NC(ψ) < min(w₁, w₂)`, then *all* `σ`-image coefficients of `ψ` vanish — i.e. `ψ = β` is orthogonal
+to `Im σ`.  By (3.7) the coefficient grid `a_{ij}` is additively separable; the abstract grid lemma
+`grid_eq_zero_of_ncard_support_lt` then forces `a ≡ 0` (a nonzero separable grid fills a whole row
+or column, needing `≥ min(w₁, w₂)` nonzeros).  This is the part of (3.8) used by (3.9.a) and most
+§6/§7 consumers; the full row/column trichotomy (3.8.b)/(3.8.c) is only needed in §12+. -/
+theorem sigmaCoeff_eq_zero_of_sigmaNC_lt (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (hNC : hyp.sigmaNC hVeq app ψ < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.sigmaCoeff hVeq app ψ pq = 0 := by
+  haveI : Finite G := Finite.of_fintype G
+  refine grid_eq_zero_of_ncard_support_lt (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
+    (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
+  rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+  exact hNC
 
 end TICyclicHypothesis
 

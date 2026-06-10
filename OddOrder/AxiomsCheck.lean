@@ -3457,3 +3457,29 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_trivial
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_alphaCF
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_mem_ZIrr
+-- §5 (3.2.a) full: `σ` agrees with the Dade map `τ = Ind_W^G` on all of `CF(W, V)`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis_apply
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear_apply
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_eq_tau
+-- §5 Peterfalvi (1.3)(a) engine + (3.2)(c)(d): vanishing on `V` from orthogonality to `CF(W, V)`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.eq_zero_of_mem_of_inner_supported_eq_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.innerLeftFunctional
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.innerLeftFunctional_apply
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.vanishOnV_of_inner_alphaCF
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_apply_irreducibleCharacter_of_mem_V
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_apply_of_mem_V
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_zero_of_mem_V_of_inner_chiFam_eq_zero
+-- §5 Peterfalvi Theorem (3.2) capstone: the linear isometry `σ` with properties (a)-(d).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.exists_sigma
+-- §5 Peterfalvi (3.6)-(3.7): the σ-image coefficient grid `a_{ij}` and its additive identity.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo_mem_supportedSubmodule
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaCombo_coe
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.inner_sigma_eq_zero_of_vanishOnV
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_add_eq
+-- §5 Peterfalvi (3.8) corollary: a small-support separable coefficient grid is identically zero.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_of_sigmaNC_lt
