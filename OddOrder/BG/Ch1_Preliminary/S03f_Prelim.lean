@@ -420,6 +420,28 @@ theorem mem_normalizer_map_subtype_of_isAInvariant {G : Type*} [Group G] {H R : 
     have h3 := hv2.symm.trans hkeq
     exact mul_left_cancel (mul_right_cancel h3)
 
+/-- **Invariant subgroups have `G`-level normalizer elements, for any action with conjugation
+values**: if `L ≤ ↥W` is invariant under `φ : A →* MulAut ↥W` and `φ a` is conjugation by `g`
+(`↑(φ a k) = g·k·g⁻¹`), then `g` normalizes `L.map W.subtype`.  Generic core of
+`mem_normalizer_map_subtype_of_isAInvariant`; used with the `Subgroup.normalizerMonoidHom`
+action at BG Theorem 3.6 (3.25). -/
+theorem mem_normalizer_map_subtype_of_smul_val {G : Type*} [Group G] {W : Subgroup G}
+    {A : Type*} [Group A] {φ : A →* MulAut ↥W} {L : Subgroup ↥W}
+    (hL : OddOrder.Isaacs.Ch03.IsAInvariant φ L) {a : A} {g : G}
+    (hval : ∀ k : ↥W, ((φ a k : ↥W) : G) = g * (k : G) * g⁻¹) :
+    g ∈ Subgroup.normalizer ((L.map W.subtype : Subgroup G) : Set G) := by
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · rintro ⟨k, hk, rfl⟩
+    exact ⟨φ a k, hL.smul_mem _ hk, hval k⟩
+  · rintro ⟨k, hk, hkeq⟩
+    refine ⟨(φ a)⁻¹ k, hL.inv_smul_mem _ hk, ?_⟩
+    have hv2 := hval ((φ a)⁻¹ k)
+    rw [MulAut.apply_inv_self] at hv2
+    have h3 := hv2.symm.trans hkeq
+    exact mul_left_cancel (mul_right_cancel h3)
+
 /-- **`O_{p'}(W) = ⊥` when `W` has a self-centralizing normal `p`-subgroup** (BG Theorem 3.6,
 (3.10)→(3.22) step): `N` and `O_{p'}(W)` are coprime normal subgroups, hence commute elementwise,
 so `O_{p'}(W) ≤ C_W(N) ≤ N`; a `p'`-subgroup of a `p`-group is trivial. -/
