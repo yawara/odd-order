@@ -41,16 +41,16 @@ mmd 出典: `references/bg/local-analysis.mmd` L2856-2880 (Prop 10.11 statement 
 
 ## やること / 依存の現状
 
-- [ ] **(a)**: **Theorem 4.20** (「`E` 可解, `r(E)≤2`, `p` 最大素因子 ⟹ `O_p(E)` が Sylow p」)
+- [x] **(a)**: **Theorem 4.20** (「`E` 可解, `r(E)≤2`, `p` 最大素因子 ⟹ `O_p(E)` が Sylow p」)
       の正確な Lean 形を同定。`S04g_Thm418.lean` に 4.20(c) machinery はあるが capstone 形を要確認。
       `α(M) ⊆ σ(M)` (`alpha_subset_sigma`) で `r(E) ≤ 2`。`N_G(P) ⊄ M` は `p ∉ σ(M)` から。
-- [ ] **(b)**: **Uniqueness Theorem** の必要方向 = 「`A ∉ 𝒰` ⟹ `r(C_G(A)) ≤ 2` ∧ `A ∈ ℰ_p*(G)`」。
+- [x] **(b)**: **Uniqueness Theorem** の必要方向 = 「`A ∉ 𝒰` ⟹ `r(C_G(A)) ≤ 2` ∧ `A ∈ ℰ_p*(G)`」。
       S09 capstone は対偶 (`r ≥ 3 ⟹ 𝒰`)。`isUniquelyMaximal_of_three_le_rank_of_lt_top` の対偶 +
       `A ∈ ℰ_p*` の導出を要確認。**Thm 10.2 の M_α 形**: 現状 `derivedQuotientMbeta_isNilpotent`
       は M'/M_β。M_α=1 のケースでは M_β=M_α=1 で M' nilpotent が出るか要確認 (or M_α 版を別途)。
       Prop 10.10 適用部は `normalizer_factorization` (✅) を直接呼ぶ。
-- [ ] **(c)**: `Z = O_{σ(M)'}(F(M))`, `[Z, M_σ] ⊆ Z ⊓ M_σ = 1`, Fitting/centralizer 包含チェーン。
-- [ ] forward-axiom island (Prop 10.10 / Cor 10.7 経由) を AxiomsCheck に登録 (同 keystone island)。
+- [x] **(c)**: `Z = O_{σ(M)'}(F(M))`, `[Z, M_σ] ⊆ Z ⊓ M_σ = 1`, Fitting/centralizer 包含チェーン。
+- [x] forward-axiom island (Prop 10.10 / Cor 10.7 経由) を AxiomsCheck に登録 (同 keystone island)。
 
 ## 完了条件
 
@@ -156,3 +156,31 @@ S09 capstone は対偶 (`isUniquelyMaximal_of_three_le_rank_of_lt_top`)。その
 ### part (c) 要点
 `Z := Fsigma' M = O_{σ'}(F(M))`。`[Z,M_σ]⊆Z⊓M_σ=1` で (b) を Z に適用 ⟹ Z cyclic。
 `C_K(M_σ)∩M' ⊆ C_M(M_σ·Z) ⊆ C_M(F(M)) ⊆ F(M)` の Fitting 包含チェーン。
+
+## 完了記録 (2026-06-10)
+
+**COMPLETE**。`sigma_complement_rank_le_one` (a)(b)(c) capstone 実装、sorry 解消。
+
+- **(a)** は独立 theorem `sigma_complement_not_isUniquelyMaximal` に切り出し
+  (+ helper `not_isUniquelyMaximal_bot`)。**unconditional・axiom-clean** (standard 3 のみ;
+  `#assert_only_allowed_axioms` 登録)。Hall σ'-overgroup (`aInvariant_piSubgroup_le_aInvariant_hall`,
+  φ=1) + Thm 4.20(c) char Sylow series 終端正規 Sylow + relIndex 乗法で M-Sylow 化 +
+  `q ∉ σ(M)` で N_G(R) ⊄ M + `not_isUniquelyMaximal_of_le_inf_distinct_maximals`。
+- **(b)** = `rank_centralizer_Msigma_inf_le_one`。blueprint どおり: Uniqueness Thm は
+  `isUniquelyMaximal_of_mem_e2_not_maximal` (⟹ A∈ℰ_p*) と `uniquenessTheorem` (⟹ r(C_G(A))≤2)
+  の対偶 2 本。α(M)=∅ は「r∈α なら r³-elem-abelian ≤ M_σ ≤ C_G(A) で rank 矛盾」(M_α 経由不要)。
+  M' nilpotent は Thm 4.20(a) `derived_le_fitting_of_rank_fitting_le_two`。Prop 10.10 の
+  P ≤ N_G(S)' ⊆ M' から `Sylow.smul_eq_iff_mem_normalizer` + nilpotent M' の正規 Sylow 一意性で
+  M = N_G(P)、p ∈ σ(M) 矛盾。
+- **(c)**: Z = O_{σ'}(F(M))。`normal_subgroupOf_iff_le_normalizer` で Z,M_σ ⊴ M 化 →
+  `commutator_le_inf` + π-coprime で Z ≤ C(M_σ) → (b) を Z に適用 → rank ≤ 1 →
+  nilpotent + `IsZGroup` (mathlib instance) で Z cyclic → M' ≤ C(Z) は
+  ψ : M →* MulAut Z (`normalizerMonoidHom`) + `IsCyclic.mulAutMulEquiv` 可換性で commutator 消滅 →
+  X = C_K(M_σ)⊓M' ≤ C(F(M))⊓M ≤ F(M) (nilpotent π-分解 `top_le_oPiCore_sup_compl_of_isNilpotent`
+  + `centralizer_fittingInG_inf_le_fittingInG`) → X ≤ O_σ'(F)=Z
+  (`isPiGroup_le_of_normal_isHallSubgroup`、S10_HallStructure で public 化) →
+  cyclic uniqueness (`cyclic_subgroup_eq_of_card_eq`、capstone 前へ移動) で M ≤ N(X)。
+
+`#print axioms`: (a) = standard 3 ちょうど; (b)/capstone/(d) = standard 3 + keystone island 2
+ちょうど (完了条件どおり)。AxiomsCheck 4 エントリ登録 (S10_LocalLemmas import 追加)。
+full build 3613 green。§10 の D-lane 残 sorry は Lemma 10.13 のみ (対象外、c-bg-s10 委任)。

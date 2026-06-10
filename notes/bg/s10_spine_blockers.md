@@ -7,11 +7,17 @@
 > は **完全 sorry-free** (Prop 10.10 `normalizer_factorization` 完成, commit `de75651e`)。
 > de-axiomatization は Lane A が Thm 3.6 を landed した瞬間に名前 swap だけで済む。
 >
-> **§10 の残 sorry (2026-06-10)**:
-> - `S10_LocalLemmas.lean:451` = **Prop 10.11** `sigma_complement_rank_le_one`。(b) は Prop 10.10
->   を使うので依存解消済 → **次の D-lane frontier**。Thm 4.20 / Thm 10.2 / Uniqueness Theorem を要する。
-> - `S10_LocalLemmas.lean:1063` = **Lemma 10.13** `nonabelian_pSubgroup_rankTwo_elemAbelian_structure`。
->   group-level Additive diamond で hard, **D 対象外** (休止 `c-bg-s10` 領域)。
+> **§10 の残 sorry (2026-06-10 夕更新)**:
+> - ~~**Prop 10.11** `sigma_complement_rank_le_one`~~ → **✅ COMPLETE (2026-06-10, issue 5001
+>   closed)**。(a) は独立 theorem `sigma_complement_not_isUniquelyMaximal` として
+>   **unconditional・axiom-clean** (standard 3 ちょうど)。(b) `rank_centralizer_Msigma_inf_le_one`
+>   /capstone/(d) は keystone island ちょうど。実装詳細 = issue `closed/5001`。これにより
+>   **(d) `sigma_complement_commutator_cyclic_normal` も sorryAx が抜けて island 入り** (§12/§13
+>   が使う形)。AxiomsCheck に 4 エントリ登録済。
+> - `S10_LocalLemmas.lean` 末尾 = **Lemma 10.13** `nonabelian_pSubgroup_rankTwo_elemAbelian_structure`
+>   (唯一の残 sorry)。group-level Additive diamond で hard, **D 対象外** (休止 `c-bg-s10` 領域)。
+>   ⟹ **D-lane の §10 仕事は完了**。次 frontier = §11 conditional 配線 (Cor 11.4 / Thm 11.5 /
+>   Cor 11.6 / Thm 11.7; 10.12/10.13 依存箇所は要 triage) → §12–§16 cascade。
 >
 > Prop 10.10 実装知見: §7 capstone `transitivity_propagates` の conjunct (d) が factorization
 > そのもの (primesOf A={p})。Sylow P 構成は transitivity の K-共役で given Q を ℋ*(P;q) に乗せる
