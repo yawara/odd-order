@@ -3501,6 +3501,10 @@ set_option linter.style.longLine false in
 -- solvable of odd order, `H ◁ G` a normal Hall subgroup with complement `R`, `R₀ ≤ R` of prime
 -- order such that `C_H(R₀)` is a `Z`-group, gives `⁅H,R⁆` of `p`-length one for every prime `p`.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03f.thm36
+-- BG Theorem 3.6 in the §10 interface form (`S10_ForwardFromKeystone`): the former forward
+-- axiom `pLengthOne_commutator_of_zgroupCentralizer`, de-axiomatized (2026-06-10) to a
+-- convention bridge onto `thm36`.
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer
 
 /-! ### Forward-axiom islands (conditional, keystone-gated)
 
@@ -3540,26 +3544,23 @@ axiom(s):{indentD m!"{missing}"} — remove them from the island"
 axiom(s):{indentD m!"{bad.toList}"}"
 
 -- BG §10 (β-radical spine), conditional on the representation-theory keystone (BG Thm 3.6):
--- Theorem 10.6 (every proper subgroup has `p`-length one). Wired against the two forward
+-- Theorem 10.6 (every proper subgroup has `p`-length one). Originally wired against two forward
 -- axioms of `S10_ForwardFromKeystone` (BG Thm 3.6 + BG Lem 10.4(b)); see that file.
 #assert_axioms_island OddOrder.BG.Ch3.S10.proper_hasPLengthOne expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- BG §10: Lemma 10.8(c) — for `p ∈ π(M) - β(M)`, `M'` and `M_σ` have normal `p`-complements.
 -- Forward-conditional via Theorem 10.6 (`proper_hasPLengthOne`), hence the same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.derived_msigma_hasNormalPComplement_of_not_mem_beta
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- BG §10: Lemma 10.8(a) — `M_β` is a Hall `β(M)`-subgroup of `G`. The intersection of the
 -- normal `p`-complements of Lemma 10.8(c) over `p ∈ π(M) - β(M)`, hence the same keystone island.
 -- (The engine `isHall_oPiCore_of_forall_hasNormalPComplement` is itself unconditional.)
 #assert_axioms_island OddOrder.BG.Ch3.S10.Mbeta_isHall
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- BG §10: Lemma 10.8 (full bundle): `M_β` Hall, `M'`/`M_σ` have nilpotent Hall `β(M)'`-subgroups,
 -- and normal `p`-complements for `p ∈ π(M) - β(M)`. Same keystone island (via Theorem 10.6).
@@ -3567,67 +3568,57 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- `exists_isNilpotent_isHall_compl` are themselves unconditional.)
 #assert_axioms_island OddOrder.BG.Ch3.S10.isHall_Mbeta
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- BG §10: Lemma 10.8(c) largest-prime part + its "O_{p'}(M) ⊇ all q-elements (q > p)" consequence.
 -- Same keystone island (via Theorem 10.6 / Theorem 5.6's first conjunct).
 #assert_axioms_island OddOrder.BG.Ch3.S10.largestPrime_quotient_oPiCore_compl_of_not_mem_beta
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 #assert_axioms_island OddOrder.BG.Ch3.S10.sylow_le_oPiCore_compl_of_lt_of_not_mem_beta
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Cor 10.9 核 (W ∩ M' is nilpotent): M' の任意の β(M)'-部分群は nilpotent。
 -- Lemma 10.8(b) (`isHall_Mbeta`) 経由ゆえ同じ keystone island。
 #assert_axioms_island OddOrder.BG.Ch3.S10.betacompl_subgroup_derived_isNilpotent
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Cor 10.9(a) producer (W nilpotent) と Cor 10.9(a)(1)(2) (`beta_complement_centralizes`):
 -- `betacompl_subgroup_derived_isNilpotent` / `sylow_le_oPiCore_compl_of_lt_of_not_mem_beta`
 -- 経由ゆえ同じ keystone island。
 #assert_axioms_island OddOrder.BG.Ch3.S10.exists_nilpotent_hall_pq
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 #assert_axioms_island OddOrder.BG.Ch3.S10.beta_complement_centralizes
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- M'/M_β nilpotent (Lemma 10.8 系, §13 + Cor 10.9(a)(3)/(b) で使う): isHall_Mbeta 経由ゆえ同 island。
 #assert_axioms_island OddOrder.BG.Ch3.S10.derivedQuotientMbeta_isNilpotent
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Cor 10.9(a)(3): `N_M(X)'` contains a Sylow `p`-subgroup of `M'` (Frattini + Lemma 6.5(a) +
 -- the nilpotent Hall `{p,q}`-producer `exists_nilpotent_hall_pq`), hence the same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.beta_complement_normalizer_derived_contains_sylow
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Cor 10.9(b): `N_G(S) ⊆ H ∩ M` (`H ≠ M`) ⟹ `M = (H∩M)·M_β` and `α(M)=β(M)`. Uses the
 -- Uniqueness Theorem (`q ∉ α(M)` via `S ∈ 𝒰` contradiction), the same Frattini argument as (a)(3)
 -- (`K = O_{β∪{q}}(M') = M_β·S`), and Cor 10.9(a)(2) (`beta_complement_centralizes`); same island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.beta_factorization_of_sylow_normalizer_in_intersection
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Cor 10.7 (`sylow_structure`, 5 parts a–e): Sylow `p`-structure. All parts route through a maximal
 -- `M ⊇ N_G(P)` with `p ∈ σ(M)`, where `↥M` has `p`-length one (Theorem 10.6, forward-conditional);
 -- Lemma 6.6 / 6.3(a) / Theorem 10.1 / Blackburn 4.16 then control `P`. Same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.sylow_structure
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Prop 10.10 (`normalizer_factorization`): for `A ∈ ℰ_p²(G)∩ℰ_p*(G)` and `Q ∈ ℋ_G*(A;q)`, some
 -- Sylow `p`-subgroup `P ⊇ A` factors `N_G(P) = O_{p'}(C_G(P))·(N_G(P)∩N_G(Q))` with `P ⊆ N_G(Q)'`.
@@ -3635,8 +3626,7 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- Cor 10.7 (`sylow_structure`, forward-conditional) and Thm 5.5(a). Same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.normalizer_factorization
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Prop 10.11(a) (`sigma_complement_not_isUniquelyMaximal`): a `σ(M)'`-subgroup `K ≤ M` is not
 -- uniquely maximal. Hall `σ'`-overgroup + Theorem 4.20(c) terminal normal Sylow + `q ∉ σ(M)`
@@ -3648,23 +3638,20 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- (`normalizer_factorization`, forward-conditional). Same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.rank_centralizer_Msigma_inf_le_one
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Prop 10.11(a)(b)(c) capstone (`sigma_complement_rank_le_one`): part (c) applies (b) to
 -- `Z = O_{σ'}(F(M))` (cyclic) and pins `C_K(M_σ) ∩ M' ≤ Z` via the Fitting centralizer chain.
 -- Same keystone island (via part (b)).
 #assert_axioms_island OddOrder.BG.Ch3.S10.sigma_complement_rank_le_one
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 -- Prop 10.11(d) (`sigma_complement_commutator_cyclic_normal`): `[K,P]` centralizes `M_σ` and is
 -- cyclic normal in `M` (Thm 3.7 fixed-point-free nilpotency + part (c)). Same island via (c).
 #assert_axioms_island OddOrder.BG.Ch3.S10.sigma_complement_commutator_cyclic_normal
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
 
 /-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
 
@@ -3699,9 +3686,8 @@ characteristic in it, so `N_G(P) ≤ N_G(X) ≤ M*` and `p ∈ σ(M*)`, a contra
 (`beta_complement_centralizes`, per-prime Sylow centralization) and Prop 1.5(c)
 (`aInvariant_hall_conj`) to coordinate the per-Sylow data into one `E'`-centralized Hall via the
 abstract `exists_hall_actsTrivially_of_forall_sylow`. Because Cor 10.9(a) sits in the §10 keystone
-island, so does this lemma — the same two axioms as Prop 10.11(b)(c)(d). -/
+island, so does this lemma — the same axiom as Prop 10.11(b)(c)(d). -/
 
 #assert_axioms_island OddOrder.BG.Ch3.S12.derivedE_centralizes_betaComplement
   expecting
-  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
-   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+  [OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]

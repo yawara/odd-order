@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
@@ -14,32 +15,36 @@ Bender–Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 19
 The §10 → §16 spine of the Feit–Thompson proof is gated by the representation-theory
 **keystone** BG Theorem 3.6 (`references/bg/local-analysis.mmd` L955), whose own proof needs
 BG Theorem 3.4/3.5 = algebraically-closed extraspecial representation theory (lane `a-keystone`).
-This file declares that keystone — together with the local input BG Lemma 10.4(b) — as
+This file declared that keystone — together with the local input BG Lemma 10.4(b) — as
 **provisional forward axioms**, so that the §10 spine (Theorem 10.6 → Corollary 10.7 → … →
-Proposition 10.14) and the §11–§16 cascade can be wired as *genuine, type-checked reductions*
-right now.
+Proposition 10.14) and the §11–§16 cascade could be wired as *genuine, type-checked reductions*
+ahead of the keystone.
+
+**De-axiomatized (2026-06-10)**: lane `a-keystone` landed BG Theorem 3.6 as
+`OddOrder.BG.Ch1.S03f.thm36`, and `pLengthOne_commutator_of_zgroupCentralizer` below is now a
+**theorem** (a convention bridge to `thm36`).  Only BG Lemma 10.4(b) remains a forward axiom.
 
 ## Honesty boundary
 
-A theorem proved via these axioms is **`sorry`-free but mathematically unproven**: its truth is
-contingent on the constructibility of the axioms, not on `#print axioms` (see
+A theorem proved via the remaining axiom is **`sorry`-free but mathematically unproven**: its
+truth is contingent on the constructibility of the axiom, not on `#print axioms` (see
 `scaffold-sorry-free-not-done`). The value delivered here is twofold:
 
-1. the reduction Thm 3.6 ⟹ Thm 10.6 ⟹ (Cor 10.7, …) is a *real* Lean proof — only the keystone
-   is taken on faith;
-2. de-axiomatization is a **name swap**: when lane `a-keystone` lands BG Theorem 3.6 and lane
-   `a1`/this lane lands BG Lemma 10.4(b), each axiom below is replaced by the corresponding
-   theorem (with the *same statement*), and the entire §10–§16 spine turns genuinely green with
-   no change to the downstream proofs.
+1. the reduction Thm 3.6 ⟹ Thm 10.6 ⟹ (Cor 10.7, …) is a *real* Lean proof — with Thm 3.6
+   landed, only Lemma 10.4(b) is still taken on faith;
+2. de-axiomatization is a **name swap**: the Thm 3.6 axiom was replaced by the bridge theorem
+   below (same statement) with no change to the downstream proofs, and the same will happen to
+   the Lemma 10.4(b) axiom when it lands.
 
-Both axioms are registered as an *expected island* in `OddOrder/AxiomsCheck.lean`.
+The remaining axiom is registered as an *expected island* in `OddOrder/AxiomsCheck.lean`.
 
 ## Resolution conditions
 
-* `pLengthOne_commutator_of_zgroupCentralizer` — BG **Theorem 3.6**. **keystone-gated.**
-  Resolved when lane `a-keystone` completes BG Theorem 3.6 (which currently waits on BG
-  Theorem 3.4 = algebraically-closed extraspecial representation theory). The statement below is
-  the intended interface; lane `a-keystone`'s eventual theorem should match it verbatim.
+* `pLengthOne_commutator_of_zgroupCentralizer` — BG **Theorem 3.6**. ✅ **resolved
+  (2026-06-10)**: lane `a-keystone` landed `OddOrder.BG.Ch1.S03f.thm36`; the declaration below
+  is now a theorem bridging the declared §10 interface to `thm36` (convention adaptations only:
+  instance binders, `H.index = Nat.card R`, prime-order packaging, `Fact`, `inf_comm`, and the
+  repo↔mathlib `IsZGroup` bridge).
 * `exists_prime_orderOf_zgroupCentralizer_of_complement` — BG **Lemma 10.4(b)**, specialized to
   the Theorem 10.6 application. **grounded (not keystone-gated), deferred.** BG Lemma 10.4(b)
   (mmd p.87, recovered 2026-06-08) is provable from BG Lemma 10.3 + the `Ω₁(Z(P))` machinery
@@ -53,31 +58,37 @@ namespace OddOrder.BG.Ch3.S10
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
 
-/-! ## BG Theorem 3.6 — the representation-theory keystone (forward axiom) -/
+/-! ## BG Theorem 3.6 — the representation-theory keystone (de-axiomatized 2026-06-10) -/
 
-/-- **BG Theorem 3.6** (mmd L955), as a provisional forward axiom (**keystone-gated**).
+/-- **BG Theorem 3.6** (mmd L955), in the §10 interface form.
 
 Let `Γ` be a solvable group of odd order, `H` a normal Hall subgroup of `Γ` (encoded by
 `H.Normal` + `Nat.Coprime (Nat.card ↥H) H.index`), `R` a complement of `H`, and `R₀ ≤ R` a
 subgroup of prime order such that the centralizer `C_H(R₀)` is a `Z`-group. Then for every prime
 `p`, the commutator `⁅H, R⁆` has `p`-length one.
 
-This is the engine of the `r_p(M) ≥ 3` branch of BG Theorem 10.6. Its BG proof is a
-minimal-counterexample argument (~4 pages, equations (3.6)–(3.38)) resting on BG Theorem 3.4/3.5
-(algebraically-closed extraspecial representation theory), which lane `a-keystone` is building.
+This is the engine of the `r_p(M) ≥ 3` branch of BG Theorem 10.6.
 
-**Provisional axiom.** Resolution condition: lane `a-keystone` lands BG Theorem 3.6 with this
-statement; replace this axiom by that theorem. -/
-axiom pLengthOne_commutator_of_zgroupCentralizer
+**De-axiomatized.** Declared as a provisional forward axiom while lane `a-keystone` built BG
+Theorem 3.4/3.5/3.6; since 2026-06-10 it is a theorem bridging this (unchanged) interface to
+`OddOrder.BG.Ch1.S03f.thm36` — convention adaptations only: instance binders, `H.index =
+Nat.card ↥R` (`IsComplement'.index_eq_card`), prime-order packaging, `Fact.out`, `inf_comm`,
+and the repo↔mathlib `IsZGroup` bridge `isZGroup_iff_mathlib`. -/
+theorem pLengthOne_commutator_of_zgroupCentralizer
     {Γ : Type*} [Group Γ] [Finite Γ]
     (hsolv : IsSolvable Γ) (hodd : Odd (Nat.card Γ))
     {H R : Subgroup Γ} (hHnormal : H.Normal)
     (hHall : Nat.Coprime (Nat.card ↥H) H.index)
     (hcompl : H.IsComplement' R)
     {R₀ : Subgroup Γ} (hR₀ : R₀ ≤ R) (hR₀prime : (Nat.card ↥R₀).Prime)
-    (hZ : IsZGroup ↥(Subgroup.centralizer (R₀ : Set Γ) ⊓ H))
+    (hZ : _root_.IsZGroup ↥(Subgroup.centralizer (R₀ : Set Γ) ⊓ H))
     (p : ℕ) [Fact p.Prime] :
-    Ch1.hasPLengthOne p ↥⁅H, R⁆
+    Ch1.hasPLengthOne p ↥⁅H, R⁆ := by
+  haveI := hsolv
+  haveI := hHnormal
+  rw [hcompl.symm.index_eq_card] at hHall
+  exact Ch1.S03f.thm36 hodd hcompl hHall hR₀ ⟨_, hR₀prime, rfl⟩
+    (by rw [inf_comm]; exact isZGroup_iff_mathlib.mpr hZ) Fact.out
 
 /-! ## BG Lemma 10.4(b) — the `Z`-group element (forward axiom, specialized) -/
 
@@ -107,7 +118,7 @@ axiom exists_prime_orderOf_zgroupCentralizer_of_complement
     {K : Subgroup ↥M} (hK : ((Malpha M).subgroupOf M).IsComplement' K)
     {q : ℕ} (hq : q.Prime) (hqK' : q ∈ ((commutator ↥K).index).primeFactors) :
     ∃ x : ↥M, x ∈ K ∧ orderOf x = q ∧
-      IsZGroup ↥(Subgroup.centralizer (↑(Subgroup.zpowers x) : Set ↥M) ⊓
+      _root_.IsZGroup ↥(Subgroup.centralizer (↑(Subgroup.zpowers x) : Set ↥M) ⊓
         (Malpha M).subgroupOf M)
 
 end OddOrder.BG.Ch3.S10

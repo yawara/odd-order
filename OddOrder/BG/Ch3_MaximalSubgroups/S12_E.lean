@@ -492,7 +492,7 @@ group is a nilpotent Z-group. Packages the `E₁`/`E₃` cyclicity argument of L
 theorem isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one {H : Type*} [Group H] [Finite H]
     [Group.IsNilpotent H] (hodd : Odd (Nat.card H))
     (hrank : ∀ p : ℕ, p.Prime → pRank H p ≤ 1) : IsCyclic H := by
-  haveI : IsZGroup H := by
+  haveI : _root_.IsZGroup H := by
     rw [isZGroup_iff]
     intro r hr R
     haveI : Fact r.Prime := ⟨hr⟩

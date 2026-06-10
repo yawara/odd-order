@@ -940,7 +940,7 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hZ_le_M).trans
       (Subgroup.card_subgroup_dvd_card M))
   haveI hZcyc : IsCyclic ↥Z := by
-    haveI : IsZGroup ↥Z := by
+    haveI : _root_.IsZGroup ↥Z := by
       rw [isZGroup_iff]
       intro r hr R
       haveI : Fact r.Prime := ⟨hr⟩
