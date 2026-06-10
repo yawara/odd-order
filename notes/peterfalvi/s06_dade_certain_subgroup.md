@@ -1196,10 +1196,10 @@ sorry-free・axiom-clean・leaf green (3452 jobs)。3 commits。S06_CertainTypeC
     sigma 適用時の LinearMap-application defeq check に委ねる (sdiff.W=toTICyclic.W=h.W1⊔h.W2 は unifier が unfold)。
     bridge instance `instFintypeToTICyclicW`/`instInvertibleCardToTICyclicW` 追加。
 
-### ▶▶ 次 = (4.3.c)(d) → (4.4) → (4.5)
-- **(4.3.c)** part 1 `μ_{ij}(x)=δ_j ω_{ij}(x)` (x∈W−W₂) は step2 (`δ_j μ_{ij}(v)=ω_{ij}(v)`) の δ_j 倍
-  で**ほぼ即** (δ_j²=1)。part 2「μ_{ij} 以外の Irr(L) は W−W₂ 上消失」= completeness (orthogonal-complement,
-  σ-image 完全性; `exists_sigma` 最終 clause は V 上のみ→W−W₂ への拡張要)。
+### ▶▶ 次 = (4.3.c) part2 → (4.3.d) → (4.4) → (4.5)
+- **(4.3.c)** part 1 `μ_{ij}(x)=δ_j ω_{ij}(x)` (x∈W−W₂) ✅ **DONE** (`certainType_apply_eq_of_mem_V`,
+  commit `acd39ea1`; step2 の δ_j 倍 + δ_j²=1)。残 part 2「μ_{ij} 以外の Irr(L) は W−W₂ 上消失」=
+  completeness (orthogonal-complement, σ-image 完全性; `exists_sigma` 最終 clause は V 上のみ→W−W₂ 拡張要)。
 - **(4.3.d)** μ_{ij}(1) ≡ δ_j (mod w₁): Res^L_{W1} μ_{ij} = δ_j Res^W_{W1} ω_{ij} + a·ρ_{W1} (regular char)
   → μ_{ij}(1)=δ_j+a·w₁。restriction-to-W1 分解が要。
 - **(4.4)** μ_{i0}=K⊆ker の Irr(L); δ_0=1, μ_{00}=1_L。**(4.5)** μ_j=∑_i μ_{ij}, χ_j=Res_K μ_{ij}∈Irr(K)
