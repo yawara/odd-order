@@ -367,14 +367,14 @@ theorem isCyclic_sup [Finite L] : IsCyclic ↥(h.W1 ⊔ h.W2) := by
     hoa, hob, h.card_sup_eq_mul]
 
 open scoped IsMulCommutative in
-/-- **Peterfalvi (4.3)(a), second half** (mmd 04.6 L17): Hypothesis (3.1) holds with
-`L` in place of `G` — `W = W₁ ⊔ W₂` with `V = W − (W₁ ∪ W₂)` is a TI-cyclic
-normalizer setup inside `L`.  The TI property of `V` follows from that of the larger
-set `W − W₂` (`isTISubset_sup_sdiff` + `IsTISubset.subset`), `W` normalizes `V`
-because `W` is abelian, and `W` is cyclic by `isCyclic_sup`.  Through this
-constructor the entire §5 σ-machinery ((3.2)-(3.9), `S05_SigmaIsometry`) applies
-with `L` as the ambient group, as required by (4.3.b). -/
-noncomputable def toTICyclicHypothesis [Fintype L] :
+/-- Build a TI-cyclic normalizer setup (Peterfalvi (3.1) data) on `W = W₁ ⊔ W₂` inside
+`L` from any TI subset `V ⊆ W` avoiding `1`.  Because `W` is abelian
+(`isMulCommutative_sup`), `W` normalizes every subset of itself, so only `1 ∉ V`,
+`V ⊆ W` and the TI property vary between the §6 instantiations (the
+`TICyclicHypothesis.V` field was deliberately kept free for exactly this reuse). -/
+noncomputable def toTICyclicHypothesisOfV [Fintype L] (V : Set L)
+    (hV1 : (1 : L) ∉ V) (hVW : V ⊆ ↑(h.W1 ⊔ h.W2))
+    (hti : OddOrder.GroupTheory.IsTISubset V (h.W1 ⊔ h.W2)) :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis L where
   W := h.W1 ⊔ h.W2
   W1 := h.W1
@@ -388,25 +388,71 @@ noncomputable def toTICyclicHypothesis [Fintype L] :
   W_card_coprime := h.coprime_card_W1_card_W2
   W_card_odd := h.W_odd
   W_cyclic := h.isCyclic_sup
-  V := (↑(h.W1 ⊔ h.W2) : Set L) \ (↑h.W1 ∪ ↑h.W2)
-  V_subset_sharp := by
-    rintro v ⟨hvW, hv⟩
+  V := V
+  V_subset_sharp := fun v hv => by
     rw [OddOrder.Peterfalvi.S04.mem_sharp]
-    exact ⟨Set.mem_univ v,
-      fun heq => hv (by rw [heq]; exact Or.inl (Subgroup.one_mem h.W1))⟩
-  V_subset_W := fun v hv => hv.1
+    exact ⟨Set.mem_univ v, fun heq => hV1 (heq ▸ hv)⟩
+  V_subset_W := hVW
   W_normalizes_V := by
     intro w v hv
     haveI := h.isMulCommutative_sup
-    have h1 : (⟨v, hv.1⟩ : ↥(h.W1 ⊔ h.W2)) * w = w * ⟨v, hv.1⟩ := mul_comm _ _
+    have h1 : (⟨v, hVW hv⟩ : ↥(h.W1 ⊔ h.W2)) * w = w * ⟨v, hVW hv⟩ := mul_comm _ _
     have h2 : (w : L) * v = v * (w : L) := (Subtype.ext_iff.mp h1).symm
     have h3 : (w : L) * v * (w : L)⁻¹ = v := by
       rw [h2]
       exact mul_inv_cancel_right v w
     rw [h3]
     exact hv
-  V_ti := h.isTISubset_sup_sdiff.subset
-    (fun v hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩)
+  V_ti := hti
+
+/-- **Peterfalvi (4.3)(a), second half** (mmd 04.6 L17): Hypothesis (3.1) holds with
+`L` in place of `G` — `W = W₁ ⊔ W₂` with `V = W − (W₁ ∪ W₂)` is a TI-cyclic
+normalizer setup inside `L`.  The TI property of `V` follows from that of the larger
+set `W − W₂` (`isTISubset_sup_sdiff` + `IsTISubset.subset`).  Through this
+constructor the entire §5 σ-machinery ((3.2)-(3.9), `S05_SigmaIsometry`) applies
+with `L` as the ambient group, as required by (4.3.b). -/
+noncomputable def toTICyclicHypothesis [Fintype L] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis L :=
+  h.toTICyclicHypothesisOfV ((↑(h.W1 ⊔ h.W2) : Set L) \ (↑h.W1 ∪ ↑h.W2))
+    (fun hmem => hmem.2 (Or.inl (Subgroup.one_mem h.W1)))
+    (fun _ hv => hv.1)
+    (h.isTISubset_sup_sdiff.subset
+      (fun _ hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩))
+
+/-- The TI-cyclic setup on the **larger** TI set `W − W₂` (4.3.a), used by (4.3.b) for
+the induction isometry on `CF(W, W − W₂)` (the `ω_{ij} − ω_{0j}` live there, not in
+`CF(W, V)`). -/
+noncomputable def sdiffTICyclicHypothesis [Fintype L] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis L :=
+  h.toTICyclicHypothesisOfV ((↑(h.W1 ⊔ h.W2) : Set L) \ ↑h.W2)
+    (fun hmem => hmem.2 (Subgroup.one_mem h.W2))
+    (fun _ hv => hv.1)
+    h.isTISubset_sup_sdiff
+
+/-- The §4 Dade hypothesis (2.2) on `(L, W − W₂, W)` from (4.3.a), with the supported
+set and normalizer stated in syntactic `W₁ ⊔ W₂` form (definitionally
+`h.sdiffTICyclicHypothesis.toDadeHypothesis`, restated so that instance arguments
+about `↥(W₁ ⊔ W₂)` resolve at use sites).  All its local subgroups are trivial,
+`H(a) = ⊥`. -/
+noncomputable def sdiffDadeHypothesis [Fintype L] :
+    OddOrder.Peterfalvi.S04.Hypothesis L
+      ((↑(h.W1 ⊔ h.W2) : Set L) \ ↑h.W2) (h.W1 ⊔ h.W2) :=
+  h.sdiffTICyclicHypothesis.toDadeHypothesis
+
+/-- **"`Ind_W^L` is an isometry on `CF(W, W − W₂)`"** (textbook (4.3) proof step,
+mmd 04.6 L25): the §4 Dade isometry package — Theorem (2.6) — for the TI set
+`W − W₂` of (4.3.a).  Its underlying Dade map *is* induction `Ind_W^L`
+(`TICyclicHypothesis.tau_eq_induce`), it preserves inner products (`inner_eq`) and
+virtual characters (`maps_virtualCharacter`), which is what (4.3.b) feeds into the
+(1.4) difference machinery.  The `L`-equivariance input is automatic because all the
+local subgroups `H(a)` of the TI-derived Dade hypothesis are trivial. -/
+noncomputable def sdiffFullDadeIsometryData [Fintype L]
+    [Invertible (Nat.card L : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] :
+    OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := L) h.sdiffDadeHypothesis :=
+  h.sdiffDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _
+      (fun _ => rfl))
 
 end Hypothesis
 
