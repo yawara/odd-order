@@ -8,6 +8,8 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicGaloisAction
+import Mathlib.FieldTheory.Minpoly.IsConjRoot
 import Mathlib.LinearAlgebra.Basis.Basic
 
 /-!
@@ -3731,6 +3733,232 @@ theorem sigma_mapRingEquiv_comm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     intro v hv
     rw [ClassFunction.mapRingEquiv_apply, hyp.sigma_apply_of_mem_V hVeq app _ hv,
       IrreducibleCharacter.galoisMap_apply_apply]
+
+/-! ### Peterfalvi (3.9)(b): `σ` and powers of a linear character -/
+
+/-- Every linear character of the finite `W` has finite multiplicative order:
+`ξ ^ |W| = 1` pointwise. -/
+theorem orderOf_char_ne_zero (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    (ξ : hyp.W →* ℂˣ) : orderOf ξ ≠ 0 := by
+  have hξpow : ξ ^ Fintype.card hyp.W = 1 := by
+    ext w
+    rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one, map_one]
+  exact ((isOfFinOrder_iff_pow_eq_one.mpr
+    ⟨Fintype.card hyp.W, Fintype.card_pos, hξpow⟩).orderOf_pos).ne'
+
+/-- **Peterfalvi (3.9)(b)**: let `a` be the multiplicative order of the linear character `ξ` of
+`W` and let `k` be coprime to `a`.  There is a ring automorphism `u` of `ℂ` such that
+`(ω(ξ^k))^σ = (ω(ξ))^{σu}`; moreover `(ω(ξ^k))^σ(g) = (ω(ξ))^σ(g)` for every `g : G` of order
+prime to `a`.
+
+The automorphism is `(· ^ k)` on `a`-th roots of unity and the identity on `B`-th roots, where
+`B` is the product of the divisors of `|G|` coprime to `a` ((1.9), CRT form
+`exists_complexRingEquiv_pow_and_fixed`).  Since `ξ` takes values in the `a`-th roots,
+`ω(ξ^k) = (ω(ξ))^u`, and `σ` commutes with `u` by (3.9)(a); at `g` of order prime to `a` the
+eigenvalues of `g` are `B`-th roots of unity, which `u` fixes. -/
+theorem exists_mapRingEquiv_sigma_omega_pow (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ξ : hyp.W →* ℂˣ) {k : ℕ} (hk : k.Coprime (orderOf ξ)) :
+    ∃ u : ℂ ≃+* ℂ,
+      hyp.sigma hVeq app (hyp.omega (ξ ^ k) : ClassFunction hyp.W ℂ)
+        = ClassFunction.mapRingEquiv u
+            (hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ)) ∧
+      ∀ g : G, (orderOf g).Coprime (orderOf ξ) →
+        hyp.sigma hVeq app (hyp.omega (ξ ^ k) : ClassFunction hyp.W ℂ) g
+          = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have ha : orderOf ξ ≠ 0 := hyp.orderOf_char_ne_zero ξ
+  -- `B` = product of the divisors of `|G|` coprime to `a`: coprime to `a`, and any
+  -- `orderOf g` coprime to `a` divides it
+  set B := ((Nat.card G).divisors.filter (fun d => d.Coprime (orderOf ξ))).prod id with hB_def
+  have hB : B ≠ 0 :=
+    (Finset.prod_pos fun d hd => Nat.pos_of_mem_divisors (Finset.mem_filter.mp hd).1).ne'
+  have hab : (orderOf ξ).Coprime B :=
+    Nat.coprime_prod_right_iff.mpr fun d hd =>
+      Nat.coprime_comm.mp (Finset.mem_filter.mp hd).2
+  obtain ⟨u, hua, huB⟩ := exists_complexRingEquiv_pow_and_fixed ha hB hab hk
+  -- the bridge `ω(ξ^k) = (ω(ξ))^u`: the values of `ξ` are `a`-th roots of unity
+  have hbridge : (hyp.omega (ξ ^ k) : ClassFunction hyp.W ℂ)
+      = (IrreducibleCharacter.galoisMap u (hyp.omega ξ) : ClassFunction hyp.W ℂ) := by
+    ext w
+    rw [IrreducibleCharacter.galoisMap_apply_apply, omega_apply, omega_apply,
+      MonoidHom.pow_apply, Units.val_pow_eq_pow_val]
+    refine (hua (ξ w : ℂ) ?_).symm
+    rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, pow_orderOf_eq_one ξ,
+      MonoidHom.one_apply, Units.val_one]
+  refine ⟨u, ?_, ?_⟩
+  · rw [hbridge]
+    exact (hyp.sigma_mapRingEquiv_comm hVeq app u (hyp.omega ξ)).symm
+  · -- the value part: at `g` of order coprime to `a`, the eigenvalues are `B`-th roots
+    intro g hg
+    have hdvdB : orderOf g ∣ B := by
+      refine Finset.dvd_prod_of_mem id (Finset.mem_filter.mpr ⟨?_, hg⟩)
+      exact Nat.mem_divisors.mpr ⟨orderOf_dvd_natCard g, Nat.card_pos.ne'⟩
+    have hσZ : hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
+      hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr (hyp.omega ξ).2)
+    have hval := mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hσZ u
+      (isOfFinOrder_of_finite g) (k := 1) (fun ζ hζ => by
+        rw [pow_one]
+        refine huB ζ ?_
+        obtain ⟨c, hc⟩ := hdvdB
+        rw [hc, pow_mul, hζ, one_pow])
+    rw [hbridge, ← hyp.sigma_mapRingEquiv_comm hVeq app u (hyp.omega ξ), hval, pow_one]
+
+end TICyclicHypothesis
+
+/-! ### Peterfalvi (3.9)(c): ingredients
+
+Three `TICyclic`-independent ingredients for (3.9)(c): virtual-character values are algebraic
+integers (candidate for `ClassSumAlgebra`), every ring automorphism of `ℂ` acts on `a`-th roots
+of unity as a power map (candidate for `CyclotomicGaloisAction`), and a complex number that is
+integral over `ℚ` and fixed by every ring automorphism of `ℂ` is rational (candidate for
+`CyclotomicGaloisAction`).  They are kept here to leave the active frontier in this leaf. -/
+
+/-- Virtual-character values are algebraic integers: each irreducible character value is a sum
+of roots of unity (`character_isIntegral`), and `IsIntegral ℤ` is closed under the `ℤ`-span
+operations. -/
+theorem isIntegral_apply_of_mem_ZIrr {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G) (g : G) :
+    IsIntegral ℤ (φ g) := by
+  haveI : Finite G := Finite.of_fintype G
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, hchar⟩ := IsIrreducibleCharacter.isCharacter hx
+      rw [show x g = ρ.character g from congrFun hchar g]
+      exact character_isIntegral ρ g
+  | zero => rw [ClassFunction.zero_apply]; exact isIntegral_zero
+  | add a b _ _ ha hb => rw [ClassFunction.add_apply]; exact ha.add hb
+  | smul n a _ ha =>
+      rw [ClassFunction.zsmul_apply, zsmul_eq_mul]
+      exact (isIntegral_algebraMap (x := n)).mul ha
+
+/-- Every ring automorphism of `ℂ` acts on the `a`-th roots of unity as `(· ^ i)` for some `i`
+coprime to `a`: the image of a primitive root `ζ₀` is again a primitive root, hence `ζ₀ ^ i`
+with `i` coprime to `a`, and every `a`-th root is a power of `ζ₀`. -/
+theorem exists_pow_forall_rootsOfUnity (u : ℂ ≃+* ℂ) {a : ℕ} (ha : a ≠ 0) :
+    ∃ i : ℕ, i.Coprime a ∧ ∀ ζ : ℂ, ζ ^ a = 1 → u ζ = ζ ^ i := by
+  haveI : NeZero a := ⟨ha⟩
+  have hζ₀ := Complex.isPrimitiveRoot_exp a ha
+  have hupow : u (Complex.exp (2 * Real.pi * Complex.I / a)) ^ a = 1 := by
+    rw [← map_pow, hζ₀.pow_eq_one, map_one]
+  obtain ⟨i, _, hi⟩ := hζ₀.eq_pow_of_pow_eq_one hupow
+  have hprim : IsPrimitiveRoot (u (Complex.exp (2 * Real.pi * Complex.I / a))) a :=
+    hζ₀.map_of_injective u.injective
+  have hcop : i.Coprime a := by
+    rw [← hi] at hprim
+    exact (hζ₀.pow_iff_coprime (Nat.pos_of_ne_zero ha) i).mp hprim
+  refine ⟨i, hcop, fun ζ hζ => ?_⟩
+  obtain ⟨m, _, hm⟩ := hζ₀.eq_pow_of_pow_eq_one hζ
+  rw [← hm, map_pow, ← hi, ← pow_mul, ← pow_mul, mul_comm i m]
+
+/-- A complex number that is integral over `ℚ` and fixed by every ring automorphism of `ℂ` is
+rational.  The subfield `K = ℚ(rootSet p ℂ)` generated by the roots of `p = minpoly ℚ x` is a
+splitting field, hence normal over `ℚ`; any root `y` of `p` is then `v x` for some
+`v : K ≃ₐ[ℚ] K` (`IsConjRoot.exists_algEquiv`), and extending `v` to `ℂ`
+(`exists_complexRingEquiv_extends`) the fixed-point hypothesis forces `y = x`.  So the separable
+`p` has a single root in `ℂ`, hence degree `1`. -/
+theorem exists_ratCast_of_forall_complexRingEquiv_eq {x : ℂ} (hint : IsIntegral ℚ x)
+    (hfix : ∀ u : ℂ ≃+* ℂ, u x = x) : ∃ q : ℚ, x = (q : ℂ) := by
+  classical
+  have hsplits : ((minpoly ℚ x).map (algebraMap ℚ ℂ)).Splits := IsAlgClosed.splits _
+  haveI : (minpoly ℚ x).IsSplittingField ℚ
+      (IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
+    IntermediateField.adjoin_rootSet_isSplittingField hsplits
+  haveI : Normal ℚ (IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
+    Normal.of_isSplittingField (minpoly ℚ x)
+  have hxroot : x ∈ (minpoly ℚ x).rootSet ℂ := by
+    rw [Polynomial.mem_rootSet]
+    exact ⟨minpoly.ne_zero hint, minpoly.aeval ℚ x⟩
+  have hxK : x ∈ IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ) :=
+    IntermediateField.subset_adjoin ℚ _ hxroot
+  -- every root of `minpoly ℚ x` equals `x`
+  have hall : ∀ y ∈ (minpoly ℚ x).rootSet ℂ, y = x := by
+    intro y hy
+    have hyK : y ∈ IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ) :=
+      IntermediateField.subset_adjoin ℚ _ hy
+    -- `⟨y⟩` is a conjugate root of `⟨x⟩` in the normal extension `K/ℚ`
+    have hminy : minpoly ℚ y = minpoly ℚ x :=
+      (isConjRoot_of_aeval_eq_zero hint (Polynomial.mem_rootSet.mp hy).2).symm
+    have hconj : IsConjRoot ℚ
+        (⟨y, hyK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ))
+        (⟨x, hxK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) := by
+      show minpoly ℚ _ = minpoly ℚ _
+      calc minpoly ℚ (⟨y, hyK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ))
+          = minpoly ℚ y := IntermediateField.minpoly_eq _
+        _ = minpoly ℚ x := hminy
+        _ = minpoly ℚ (⟨x, hxK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ)) :=
+            (IntermediateField.minpoly_eq
+              (⟨x, hxK⟩ : IntermediateField.adjoin ℚ ((minpoly ℚ x).rootSet ℂ))).symm
+    obtain ⟨v, hv⟩ := hconj.exists_algEquiv
+    obtain ⟨u, hu⟩ := exists_complexRingEquiv_extends _ v.toRingEquiv
+    have hux : u x = y := by
+      have h := hu ⟨x, hxK⟩
+      rw [show v.toRingEquiv ⟨x, hxK⟩ = v ⟨x, hxK⟩ from rfl, hv] at h
+      exact h
+    rw [← hux, hfix u]
+  -- `minpoly ℚ x` is separable with a single root, hence has degree `1`
+  have hone : Fintype.card ((minpoly ℚ x).rootSet ℂ) = 1 :=
+    Fintype.card_eq_one_iff.mpr ⟨⟨x, hxroot⟩, fun z => Subtype.ext (hall z.1 z.2)⟩
+  have hdeg : (minpoly ℚ x).natDegree = 1 := by
+    rw [← Polynomial.card_rootSet_eq_natDegree (minpoly.irreducible hint).separable hsplits,
+      hone]
+  obtain ⟨q, hq⟩ := minpoly.natDegree_eq_one_iff.mp hdeg
+  exact ⟨q, by rw [← hq, eq_ratCast]⟩
+
+namespace TICyclicHypothesis
+
+/-- **Peterfalvi (3.9)(c)**: if `g : G` has order prime to the multiplicative order `a` of the
+linear character `ξ` of `W`, then `(ω(ξ))^σ(g) ∈ ℤ`.
+
+The value is an algebraic integer (`isIntegral_apply_of_mem_ZIrr`), and it is fixed by every
+ring automorphism `u` of `ℂ`: `u` acts on `a`-th roots of unity as `(· ^ i)` with `i` coprime
+to `a` (`exists_pow_forall_rootsOfUnity`), so `(ω(ξ))^{σu} = (ω(ξ^i))^σ` by (3.9)(a), whose
+value at `g` is `(ω(ξ))^σ(g)` by the value part of (3.9)(b).  Rationality follows by
+`exists_ratCast_of_forall_complexRingEquiv_eq`, and a rational algebraic integer is an
+integer. -/
+theorem exists_intCast_sigma_omega_apply (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ξ : hyp.W →* ℂˣ) {g : G} (hg : (orderOf g).Coprime (orderOf ξ)) :
+    ∃ n : ℤ, hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g = (n : ℂ) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have ha : orderOf ξ ≠ 0 := hyp.orderOf_char_ne_zero ξ
+  have hσZ : hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
+    hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr (hyp.omega ξ).2)
+  -- the value is fixed by every ring automorphism of `ℂ`
+  have hfix : ∀ u : ℂ ≃+* ℂ,
+      u (hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g)
+        = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g := by
+    intro u
+    obtain ⟨i, hicop, hipow⟩ := exists_pow_forall_rootsOfUnity u ha
+    -- `(ω(ξ))^u = ω(ξ^i)`: `u` is `(· ^ i)` on the values of `ξ`
+    have hbridge : (IrreducibleCharacter.galoisMap u (hyp.omega ξ) : ClassFunction hyp.W ℂ)
+        = (hyp.omega (ξ ^ i) : ClassFunction hyp.W ℂ) := by
+      ext w
+      rw [IrreducibleCharacter.galoisMap_apply_apply, omega_apply, omega_apply,
+        MonoidHom.pow_apply, Units.val_pow_eq_pow_val]
+      refine hipow (ξ w : ℂ) ?_
+      rw [← Units.val_pow_eq_pow_val, ← MonoidHom.pow_apply, pow_orderOf_eq_one ξ,
+        MonoidHom.one_apply, Units.val_one]
+    obtain ⟨_, _, hval⟩ := hyp.exists_mapRingEquiv_sigma_omega_pow hVeq app ξ hicop
+    calc u (hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g)
+        = ClassFunction.mapRingEquiv u
+            (hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ)) g :=
+          (ClassFunction.mapRingEquiv_apply u _ g).symm
+      _ = hyp.sigma hVeq app
+            (IrreducibleCharacter.galoisMap u (hyp.omega ξ) : ClassFunction hyp.W ℂ) g := by
+          rw [hyp.sigma_mapRingEquiv_comm hVeq app u (hyp.omega ξ)]
+      _ = hyp.sigma hVeq app (hyp.omega (ξ ^ i) : ClassFunction hyp.W ℂ) g := by
+          rw [hbridge]
+      _ = hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g := hval g hg
+  -- algebraic integer and rational, hence an integer
+  have hint : IsIntegral ℤ (hyp.sigma hVeq app (hyp.omega ξ : ClassFunction hyp.W ℂ) g) :=
+    isIntegral_apply_of_mem_ZIrr hσZ g
+  obtain ⟨q, hq⟩ := exists_ratCast_of_forall_complexRingEquiv_eq (hint.tower_top (A := ℚ)) hfix
+  obtain ⟨n, hn⟩ := isIntegral_rat_imp_int (hq ▸ hint)
+  exact ⟨n, hq.trans hn⟩
 
 end TICyclicHypothesis
 
