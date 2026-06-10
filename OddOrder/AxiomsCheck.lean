@@ -3624,6 +3624,14 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- cyclic normal in `M` (Thm 3.7 fixed-point-free nilpotency + part (c)). Formerly the same island via (c); now unconditional.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.sigma_complement_commutator_cyclic_normal
 
+-- BG §10: Lemma 10.13 (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`): for a maximal
+-- rank-two elementary abelian `A` inside a nonabelian `p`-subgroup `P`, `Z₀ = Ω₁(Z(P)) ∈ ℰ¹(A)`,
+-- `C_P(A) = A₀ × Z` (`Z` cyclic ⊇ `Z₀`), and `N_P(A)` is transitive on `ℰ¹(A) − {Z₀}`.
+-- Low rank via Cor 10.7(b) (central product), high rank via Thm 5.3(d)
+-- (`narrow_centralizer_decomp`); part (c) is a multiplicative GL₂(p)-transvection argument.
+-- **Unconditional** (the §10 island dissolved before this landed).
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure
+
 /-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
 
 Lemma 12.1 (the easy structure of the complement `E = E₁E₂E₃`) is fully grounded:
