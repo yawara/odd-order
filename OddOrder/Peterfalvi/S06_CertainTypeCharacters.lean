@@ -922,6 +922,61 @@ theorem certainType_degree_modEq [NeZero (Nat.card h.W1)]
   rw [hψ1] at hm
   exact ⟨m, by linear_combination hm⟩
 
+/-- `ω_{00} = 1_W`: the index-`(0,0)` member of the column family (trivial `W₂`-dual, base
+`W₁`-index) is the trivial character of `W` (`omegaProdChar 1 1 = 1`, `ω(1) = 1_W`). -/
+theorem chiColumn_one_zero_eq_trivial [NeZero (Nat.card h.W1)] :
+    (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = trivialClassFunction h.sdiffTICyclicHypothesis.W := by
+  apply ClassFunction.ext
+  intro w
+  rw [trivialClassFunction_apply, chiColumn, h.sdiffTICyclicHypothesis.omega_apply]
+  -- the value `ω_{00}(w) = (w1CharEquiv 0)(wFst w) · 1(wSnd w) = 1`
+  have hv : (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv 0)
+      (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) w = 1 := by
+    show (h.w1CharEquiv 0) (h.sdiffTICyclicHypothesis.wFst w)
+        * (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (h.sdiffTICyclicHypothesis.wSnd w) = 1
+    rw [h.w1CharEquiv_zero, MonoidHom.one_apply, MonoidHom.one_apply, one_mul]
+  rw [hv, Units.val_one]
+
+/-- **Peterfalvi (4.4), the `(0,0)` anchor**: `δ_0 = 1` and `μ_{00} = 1_L`.  The (4.3.b)
+σ-identification sends the trivial character `ω_{00} = 1_W` to `δ_0·μ_{00}`, while `σ` fixes the
+trivial character (`sigma_trivial`), so `δ_0·μ_{00} = 1_L`.  Pairing with `1_L` (irreducible)
+forces the multiplicity `⟨μ_{00}, 1_L⟩ = 1`, i.e. `μ_{00} = 1_L`, and then `δ_0 = 1`. -/
+theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
+    (h.columnFamily 1).sign = 1 ∧
+      ((h.columnFamily 1).mu 0 : ClassFunction L ℂ) = trivialClassFunction L := by
+  classical
+  set oneIrr : IrreducibleCharacter L :=
+    ⟨trivialClassFunction L, trivialClassFunction_isIrreducible⟩ with honeIrr
+  -- `δ_0 · μ_{00} = 1_L`, the σ-image of the trivial character
+  have hkey : ((h.columnFamily 1).sign) • ((h.columnFamily 1).mu 0 : ClassFunction L ℂ)
+      = trivialClassFunction L := by
+    rw [← h.sigma_chiColumn_eq_certainType 1 0, h.chiColumn_one_zero_eq_trivial]
+    exact h.toTICyclicHypothesis.sigma_trivial rfl h.toTICyclicFullDadeApplication
+  -- pair with `1_L`: `δ_0 · ⟨μ_{00}, 1_L⟩ = ⟨1_L, 1_L⟩ = 1`
+  have hinner : ((h.columnFamily 1).sign : ℂ)
+      * (if (h.columnFamily 1).mu 0 = oneIrr then (1 : ℂ) else 0) = 1 := by
+    have h2 := congrArg
+      (fun f : ClassFunction L ℂ => ClassFunction.inner f (oneIrr : ClassFunction L ℂ)) hkey
+    simp only at h2
+    rw [(by rfl : (oneIrr : ClassFunction L ℂ) = trivialClassFunction L).symm,
+      irreducibleCharacter_inner oneIrr oneIrr, if_pos rfl,
+      ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, irreducibleCharacter_inner] at h2
+    exact h2
+  rcases (h.columnFamily 1).sign_eq with hs | hs
+  · -- `δ_0 = 1`
+    rw [hs] at hinner
+    have hP : (h.columnFamily 1).mu 0 = oneIrr := by
+      by_contra hne
+      rw [if_neg hne] at hinner; norm_num at hinner
+    exact ⟨hs, by rw [hP]⟩
+  · -- `δ_0 = -1` is impossible (a multiplicity is `0` or `1`)
+    exfalso
+    rw [hs] at hinner
+    by_cases hP : (h.columnFamily 1).mu 0 = oneIrr
+    · rw [if_pos hP] at hinner; norm_num at hinner
+    · rw [if_neg hP] at hinner; norm_num at hinner
+
 end Recipe
 
 end Hypothesis
