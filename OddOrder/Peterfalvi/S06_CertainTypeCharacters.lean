@@ -265,17 +265,55 @@ theorem chiColumn_one_apply [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1))
 elaborate). -/
 instance instKNormal : h.K.Normal := h.K_normal
 
-/-- `L/K` is abelian: it is isomorphic to the cyclic complement `W₁`
-(`Subgroup.IsComplement'.QuotientMulEquiv`), hence cyclic, hence commutative.  This is what makes
-an irreducible character of `L` whose kernel contains `K` linear (degree one) — the engine of the
-forward direction of (4.4). -/
-theorem isMulCommutative_quotient_K : IsMulCommutative (L ⧸ h.K) := by
+/-- `L/K` is cyclic: it is isomorphic to the cyclic complement `W₁`
+(`Subgroup.IsComplement'.QuotientMulEquiv`). -/
+theorem isCyclic_quotient_K : IsCyclic (L ⧸ h.K) := by
   haveI := h.W1_cyclic
-  haveI : IsCyclic (L ⧸ h.K) :=
-    isCyclic_of_surjective
-      (h.isComplement.symm.QuotientMulEquiv.symm : (↥h.W1) →* (L ⧸ h.K))
-      (h.isComplement.symm.QuotientMulEquiv.symm).surjective
+  exact isCyclic_of_surjective
+    (h.isComplement.symm.QuotientMulEquiv.symm : (↥h.W1) →* (L ⧸ h.K))
+    (h.isComplement.symm.QuotientMulEquiv.symm).surjective
+
+/-- `L/K` is abelian (it is cyclic, `isCyclic_quotient_K`).  This is what makes an irreducible
+character of `L` whose kernel contains `K` linear (degree one) — the engine of the forward
+direction of (4.4). -/
+theorem isMulCommutative_quotient_K : IsMulCommutative (L ⧸ h.K) := by
+  haveI := h.isCyclic_quotient_K
   infer_instance
+
+/-- The number of irreducible characters of the abelian quotient `L/K` equals `|W₁| = w₁`: via
+the linear-character bijection `Irr(L/K) ≃ Hom(L/K, ℂˣ)` (`L/K` abelian), Pontryagin duality
+(`card_monoidHom_of_hasEnoughRootsOfUnity`), and `L/K ≅ W₁`. -/
+theorem card_irreducibleCharacter_quotient_K :
+    Nat.card (IrreducibleCharacter (L ⧸ h.K)) = Nat.card ↥h.W1 := by
+  haveI := h.isCyclic_quotient_K
+  haveI := h.isMulCommutative_quotient_K
+  have hbij : Function.Bijective (linearIrreducibleCharacter (H := L ⧸ h.K)) := by
+    refine ⟨linearIrreducibleCharacter_injective, fun φ => ?_⟩
+    obtain ⟨χ, hχ⟩ := φ.2.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+    exact ⟨χ, Subtype.ext hχ⟩
+  rw [← Nat.card_congr (Equiv.ofBijective _ hbij)]
+  have key : Nat.card ((L ⧸ h.K) →* ℂˣ) = Nat.card (L ⧸ h.K) := by
+    letI : CommGroup (L ⧸ h.K) := IsCyclic.commGroup
+    haveI : NeZero ((Monoid.exponent (L ⧸ h.K) : ℂ)) :=
+      ⟨Nat.cast_ne_zero.2 (NeZero.ne _)⟩
+    exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity (L ⧸ h.K) ℂ
+  rw [key]
+  exact Nat.card_congr h.isComplement.symm.QuotientMulEquiv.toEquiv
+
+/-- Inflation is a bijection `Irr(L/K) ≃ {χ ∈ Irr L | K ⊆ ker χ}`, so the two have equal
+cardinality (the half of (4.4) used to count the `K`-trivial irreducibles). -/
+theorem card_kernelContaining_quotient_K :
+    Nat.card {χ : IrreducibleCharacter L //
+        (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)}
+      = Nat.card (IrreducibleCharacter (L ⧸ h.K)) := by
+  refine Nat.card_congr (Equiv.ofBijective
+    (fun χbar : IrreducibleCharacter (L ⧸ h.K) =>
+      ⟨inflate h.K χbar, subset_characterKernel_inflate (N := h.K) χbar⟩) ⟨?_, ?_⟩).symm
+  · intro a b hab
+    exact inflate_injective (N := h.K) (Subtype.ext_iff.mp hab)
+  · rintro ⟨χ, hχ⟩
+    obtain ⟨χbar, hχbar⟩ := exists_inflate_eq_of_subset_characterKernel (N := h.K) χ hχ
+    exact ⟨χbar, Subtype.ext hχbar⟩
 
 section Recipe
 
@@ -1092,6 +1130,45 @@ theorem exists_certainType_zero_column_eq_of_subset_characterKernel [NeZero (Nat
   rw [h.sigma_chiColumn_eq_certainType 1 i, h.certainType_zero_column_anchor.1, one_zsmul]
     at heqsigma
   exact Subtype.ext heqsigma.symm
+
+/-- **Peterfalvi (4.4), converse direction.**  Each `j = 0` certain-type character `μ_{i0}` has
+`K` in its kernel.  By the forward direction every `K`-trivial irreducible is some `μ_{k0}`, so
+inflation `Irr(L/K) → Fin w₁`, `χ̄ ↦ (the k with μ_{k0} = inflate χ̄)`, is injective; as both
+sides have cardinality `w₁` (`card_irreducibleCharacter_quotient_K`) it is bijective, hence each
+`μ_{i0}` is `inflate χ̄` for some `χ̄`, and `K ⊆ ker (inflate χ̄)`. -/
+theorem subset_characterKernel_certainType_zero_column [NeZero (Nat.card h.W1)]
+    (i : Fin (Nat.card h.W1)) :
+    (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+      ((h.columnFamily 1).mu i : ClassFunction L ℂ) := by
+  classical
+  -- every inflation `inflate χ̄` is `K`-trivial, hence some `μ_{k0}` (forward direction)
+  have hPsi : ∀ χbar : IrreducibleCharacter (L ⧸ h.K),
+      ∃ k, (h.columnFamily 1).mu k = inflate h.K χbar := fun χbar =>
+    h.exists_certainType_zero_column_eq_of_subset_characterKernel (inflate h.K χbar)
+      (subset_characterKernel_inflate (N := h.K) χbar)
+  choose Ψ hΨ using hPsi
+  have hΨinj : Function.Injective Ψ := by
+    intro a b hab
+    exact inflate_injective (N := h.K) (by rw [← hΨ a, ← hΨ b, hab])
+  haveI : Fintype (IrreducibleCharacter (L ⧸ h.K)) := Fintype.ofFinite _
+  have hcard : Fintype.card (IrreducibleCharacter (L ⧸ h.K))
+      = Fintype.card (Fin (Nat.card h.W1)) := by
+    rw [Fintype.card_fin, ← Nat.card_eq_fintype_card, h.card_irreducibleCharacter_quotient_K]
+  obtain ⟨χbar, hχbar⟩ :=
+    ((Fintype.bijective_iff_injective_and_card Ψ).mpr ⟨hΨinj, hcard⟩).surjective i
+  have hμi : (h.columnFamily 1).mu i = inflate h.K χbar := by rw [← hχbar]; exact hΨ χbar
+  rw [show ((h.columnFamily 1).mu i : ClassFunction L ℂ) = (inflate h.K χbar : ClassFunction L ℂ)
+      from congrArg (fun c : IrreducibleCharacter L => (c : ClassFunction L ℂ)) hμi]
+  exact subset_characterKernel_inflate (N := h.K) χbar
+
+/-- **Peterfalvi (4.4)** (full characterization): the irreducible characters of `L` whose kernel
+contains `K` are exactly the `j = 0` certain-type characters `μ_{i0}`. -/
+theorem subset_characterKernel_iff_eq_certainType_zero_column [NeZero (Nat.card h.W1)]
+    (χ : IrreducibleCharacter L) :
+    (h.K : Set L) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)
+      ↔ ∃ i, (h.columnFamily 1).mu i = χ :=
+  ⟨h.exists_certainType_zero_column_eq_of_subset_characterKernel χ,
+    fun ⟨i, hi⟩ => hi ▸ h.subset_characterKernel_certainType_zero_column i⟩
 
 end Recipe
 
