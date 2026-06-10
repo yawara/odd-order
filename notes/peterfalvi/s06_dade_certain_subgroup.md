@@ -1211,7 +1211,14 @@ sorry-free・axiom-clean・leaf green (3452 jobs)。3 commits。S06_CertainTypeC
   `Subtype.ext rfl` で値点一致, Invertible は `invertibleOfNonzero`+`Nat.card_pos.ne'`。
 
 ### ▶▶ 次 = (4.4) → (4.5) [§6 構造定理, K-kernel/Clifford 機構]
-- **(4.4)** μ_{i0} (j=0 列) = K⊆ker の Irr(L); δ_0=1, μ_{00}=1_L。K-kernel + |Irr(L/K)|=w₁ + (3.9)。
+- **(4.4)** μ_{i0} (j=0 列) = K⊆ker の Irr(L); δ_0=1, μ_{00}=1_L。
+  - ✅ **(0,0)-anchor DONE** (`certainType_zero_column_anchor`, commit `a3ce7133`): δ_0=1 ∧ μ_{00}=1_L。
+    σ(ω_{00})=σ(1_W)=1_L (`chiColumn_one_zero_eq_trivial`+`sigma_trivial`) ⟹ δ_0•μ_{00}=1_L ⟹
+    ⟨μ_{00},1_L⟩∈{0,1} で δ_0=1 (oneIrr:=⟨trivialClassFunction,_⟩ bundling)。
+  - 🔲 **残 = kernel 特徴付け** (χ∈Irr(L), K⊆ker χ ⟺ χ=μ_{i0}): **L/K≅W₁ (isComplement) + inflation 機構が要**。
+    forward: K⊆ker χ ⟹ χ は L/K≅W₁ (abelian cyclic) を経由 ⟹ **χ linear** (χ(1)=1) ⟹ Res^L_W χ=ω_{i0}
+    (W₂≤K⊆ker で W₂ 上自明) ⟹ V 上 χ=ω_{i0} ⟹ `eq_sigma_of_apply_eq_on_V` で χ=σ(ω_{i0})=δ_0 μ_{i0}=μ_{i0}。
+    converse: K⊆ker μ_{i0} (μ_{i0} は |Irr(L/K)|=w₁ 個の inflation)。**InflationCharacter 機構 (repo 済) の recon が最初の手。**
 - **(4.5)** μ_j=∑_i μ_{ij}, χ_j=Res_K μ_{ij}∈Irr(K) (Clifford, K∩W=W₂ で μ-diff が K 上消失),
   Ind^L_K で Irr(L) を尽くす ([Is]6.32=ConjugationBrauer 済)。→ (4.6)-(4.9) → S08 capstone CertainType case-B。
 
