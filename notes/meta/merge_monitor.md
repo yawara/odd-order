@@ -8,12 +8,13 @@
 
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
-| **B** | `b-peterfalvi` | Pf §6 certain-type (4.4)→(4.9) → S08 case-B → (6.8) | Opus 4.8 (1M); (4.4) kernel と停滞時は Fable 5 | ✅ 対象 |
-| **E** | `bg-local` | BG 局所解析: Lem 10.4(b)→de-axiom→Lem 10.13→§11.5-7 | Fable 5 (1M); §11.5-7 以降は Opus 4.8 可 | ✅ 対象 |
+| **B** | `b-peterfalvi` | Pf §6 certain-type (4.5)→(4.9) → S08 case-B → (6.8) | Opus 4.8 (1M); 停滞時は Fable 5 | ✅ 対象 |
+| **E** | `bg-local` | BG §11.5-7 (10.4(b)/10.13 は完了済) | Fable 5 (1M); §11.5-7 は Opus 4.8 可 | ✅ 対象 |
+| **F** | `bg-s12` | BG §12 残 14 件 (10.13 解禁済) → §13 | Opus 4.8 (1M); 12.18/§13 大物と停滞時は Fable 5 | ✅ 対象 |
 
+**F は 2026-06-11 増設** (Lemma 10.13 着地 [merge `b5e0f541`] による解禁; issue base **7000**)。
 旧 **A** (`a-keystone`) / **D** (`bg-s10-fwd`) は 2026-06-11 退役 — 全量 main 合流済みを検証の上、
 worktree・branch とも削除済み (旧 `c-bg-s10` branch も同時削除。履歴は main の merge commit に全残存)。
-10.13 着地後に **Lane F** (`bg-s12`, §12 残 14 件→§13) を増設予定。
 
 **forward-axiom ポリシー**: 残存 axiom = Lem 10.4(b) 1 本 (E が消滅させる)。レーンが**新規の**
 forward axiom を導入する commit は自動合流しない — 報告してユーザー承認を待つ
