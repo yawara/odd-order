@@ -1893,6 +1893,39 @@ theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G
       S10.Msigma Mstar ⊓ (M ⊓ Mstar) = ⊥ ∧ S10.Msigma Mstar ⊔ (M ⊓ Mstar) = Mstar) := by
   sorry
 
+/-- For an `α(M)'`-subgroup `X` of `M` (`X ≠ 1`) with `ℳ(N_G(X)) ≠ {M}`, the centralizer
+`C_{M_α}(X)` has rank `≤ 1`. Contrapositive of Lemma 10.3: rank `≥ 2` would make `C_M(X)`
+uniquely maximal with unique maximal `M`; then `C_M(X) ≤ N_G(X)` (a proper subgroup of the simple
+`G`) forces `N_G(X)` uniquely maximal with the same maximal `M`, i.e. `ℳ(N_G(X)) = {M}`. The
+`M_α`-analogue of `rank_centralizer_Msigma_inf_le_one`; used twice in Lemma 12.18. -/
+theorem rank_centralizer_Malpha_le_one_of_not_uniqueMaximal [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {X : Subgroup G}
+    (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ X)
+    (hMNX : maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)) ≠ {M}) :
+    rank ↥(Subgroup.centralizer (X : Set G) ⊓ S10.Malpha M) ≤ 1 := by
+  by_contra hcon
+  have hr2 : 2 ≤ rank ↥(Subgroup.centralizer (X : Set G) ⊓ S10.Malpha M) := by omega
+  have hMcoatom : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hU : IsUniquelyMaximal (Subgroup.centralizer (X : Set G) ⊓ M) :=
+    S10.centralizer_isUniquelyMaximal_of_two_le_rank hG hM hXM hXpi hr2
+  have hCN : Subgroup.centralizer (X : Set G) ⊓ M ≤ Subgroup.normalizer (X : Set G) :=
+    inf_le_left.trans (Subgroup.centralizer_le_normalizer _)
+  -- `N_G(X) < ⊤` (else `X ⊴ G`, impossible in the simple group `G` for `1 ≠ X ≤ M < ⊤`).
+  have hNXlt : Subgroup.normalizer (X : Set G) < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro hNtop
+    haveI hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+    · exact hXne hXbot
+    · exact hMcoatom.1 (top_le_iff.mp (hXtop ▸ hXM))
+  have hUNX : IsUniquelyMaximal (Subgroup.normalizer (X : Set G)) := hU.of_le_of_lt_top hCN hNXlt
+  -- the unique maximal of `N_G(X)` is `M`.
+  have huniqNX : hUNX.uniqueMaximalSubgroup = M :=
+    (hU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hUNX.uniqueMaximalSubgroup_isCoatom
+        (hCN.trans hUNX.le_uniqueMaximalSubgroup)).trans
+      (hU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hMcoatom inf_le_right).symm
+  exact hMNX (hUNX.maximalSubgroupsContaining_eq_singleton.trans (by rw [huniqNX]))
+
 /-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
 `P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
 (a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
