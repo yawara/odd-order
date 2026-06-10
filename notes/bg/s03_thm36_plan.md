@@ -674,3 +674,67 @@ scaffold 単一 sorry = Phase D 末尾 ((3.27)–(3.31) 以降)。leaf 3017 gree
   ⟸ H ≠ ⊥... H≠⊥ は hcounter から (H=⊥ なら ⁅H,R⁆=⊥ plen1) — どこかで `hV_ne_bot` を確立)。
 - thm34 結論 `∀ g ∈ ⁅R₀',K'⁆, ρ g = 1` → ⁅R₀,K_G⁆ ≤ S₁ ⊓ C_G(V_G) `=h318=` ⊥ → h317 矛盾。
 - その後 (3.19) 後半 (Z-群 ⟹ |C_V(R₀)|=p) → (3.20) → (3.21) → Phase D。
+
+## ✅✅ 2026-06-10 session 10 (a-keystone): **(3.29)–(3.31) COMPLETE — Phase D 完結**
+
+scaffold 唯一 sorry = **Phase E 入口** ((3.32)–(3.37))。leaf 3017 green (72s; 旧 ~50s +
+下記 synth 爆発の一回限りコスト)。`thm36_aux` に `set_option synthInstance.maxHeartbeats
+400000` を追加。
+
+### 着地した文脈 (Phase E が消費できる形)
+- **(3.29)** `h329 : ∀ a : ↥A, (∀ kq : ↥KG ⧸ commutator ↥KG, φAQ a kq = kq) → a = 1`
+  (**pointwise faithfulness 形** — MulAut 等式でなく各点; (3.30) 側の供給・消費とも ext
+  juggling が消える)。支持: `hK'Φ : commutator ↥KG = frattini ↥KG` (IsSpecial 両枝;
+  elem-ab 枝は `commutator_eq_bot_iff_le_centralizer` + `frattini_eq_bot_iff_isElementaryAbelian`
+  で両方 ⊥) / `hK'_inv` (of_characteristic) / `φAQ := quotientMulAutHom hK'_inv` (set;
+  二重 namespace フルネーム) / `hq_ndvd_A : ¬ q ∣ |A|`。証明: pointwise → ext → `φAQ (a^z) = 1`
+  (map_zpow) → `QuotientGroup.eq` で `k⁻¹·(φA (a^z)) k ∈ K' = Φ(K)` → **Thm 1.8**
+  (`S01.mulAut_eq_one_of_coprime_orderOf_of_frattini`; hcop = `orderOf_map_dvd` +
+  `orderOf_dvd_natCard` + hq_ndvd_A) → `φA a = 1` → val-chase → h328 (`A ⊓ C_G(KG) = ⊥`) → a=1。
+- **(3.30)** `h330 : ¬ (KG ⊓ C_G(R₀) ≤ ⁅KG, KG⁆)` (BG の C_{K/K'}(R₀)≠1 を **1.5(d)-lift 済の
+  消費形で直接陳述** — quotient 非自明性を経由しない)。**Thm 3.4 二度目の実消費**: by_contra
+  hsub → Qbar := ↥KG ⧸ commutator ↥KG を ZMod q module 化 (IsMulCommutative 手証明 [商の
+  mul_comm = `QuotientGroup.eq` + `⁅y⁻¹,x⁻¹⁆ ∈ ⁅⊤,⊤⁆`] + hexpQ [`QuotientGroup.mk_pow` +
+  hK_exp] + `AddCommGroup.zmodModule`) → `ρ := mulAutToEnd Qbar q ∘ φAQ` (hρ_apply = rfl) →
+  PG' ⊴ A (`normal_subgroupOf_of_le_normalizer`) + complement
+  (`isComplement'_of_disjoint_and_mul_eq_univ`; sup-side は `subgroupOf_sup` + `← hAdef` +
+  `subgroupOf_self`) → **hCV = `coprime_fixedPoints_quotient` lifting** (fixed vector ↑k を
+  C_K(R₀)-元 c に持ち上げ [hCop = r vs q-群全体で安い] → hsub で c ∈ K' → mk c = 1 → v = 0)
+  → `S03d.thm34` → ⁅R₀',PG'⁆ pointwise-trivial → h329 → ⊥ → map_commutator transport
+  ((3.19) hmapeq パターン) → `⁅R₀,PG⁆ = ⊥` → h321G (⁅PG,R₀⁆ = PG) → PG = ⊥ → h313G 矛盾。
+- **(3.31)** `h331a : |KG ⊓ C_G(R₀)| = q` (`card_eq_prime_of_le_isZGroup` hZ; exp は hK_exp の
+  `Monoid.pow_exponent_eq_one`; ≠⊥ は h330 + bot_le) / `h331b : (KG ⊓ C_G(R₀)) ⊓ ⁅KG,KG⁆ = ⊥`
+  (|·| ∣ q の素数二分; q 枝は `Subgroup.eq_of_le_of_card_ge` で C ≤ K' → h330 矛盾)。
+
+### Gotchas (再利用)
+- **🔑 `open scoped IsMulCommutative` × 商型 = synthInstance 爆発**: scoped instances
+  (prio 50, `IsMulCommutative → CommMagma/…/CommGroup`) と global `CommMagma.to_isCommutative`
+  がサイクルを成し、`↥KG ⧸ commutator ↥KG` 上の Monoid/One 等の探索の**失敗枝**
+  (CommGroup ↥KG / DivisionMonoid ↥KG) の exhaust が既定 20000 heartbeats を超過。
+  **fix = `set_option synthInstance.maxHeartbeats 400000 in`** (ゴール単位キャッシュ →
+  一回限り ~+20s)。`(commutator ↥KG).Normal` も haveI で pin (`normal_of_comm` 経由の
+  wandering 防止)。mathlib 自身 Defs.lean:1277 に「CommGroup ← IsMulCommutative は性能上
+  instance にしない」と明記の既知トラップ。
+- **`group` tactic も同サイクルで死ぬ** (内部の DivisionMonoid 探索が timeout し
+  「unsolved goals」に見える) → 商可換性の核は `mul_inv_rev` + `inv_inv` ×2 +
+  `(mul_assoc _ y x).symm` の明示書き。
+- mem_centralizer の向き: `h6 : m·c·m⁻¹ = c` → `mul_inv_eq_iff_eq_mul.mp h6` が**直接**
+  `m*c = c*m` (h329 側の `a·m·a⁻¹ = m` とは .symm 要否が逆 — 動く元がどちらかで変わる)。
+- `hφA_val` は rfl ゆえ `congrArg Subtype.val h5` を**目標型注釈付き have に直接代入**できる
+  (`have h6 : m * c * m⁻¹ = c := congrArg Subtype.val h5`) — rw パターン不一致
+  (comp 越し適用) を完全回避。
+
+### ▶ 次セッション = Phase E (3.32)–(3.37) (mmd L1131–L1152)
+1. **(3.32)** `⁅KG,R₀⁆ ≠ KG`: Prop 1.5(d)+1.6(d) の K/K' = C × [K/K',R] 直積分解 + (3.30)。
+   repo の Prop 1.6(d) 形を要確認 (S03_FrobeniusActions / OperatorQuotientAction)。
+2. **(3.33)** `⁅KG,R₀⁆ ⊓ C_G(R₀) = ⊥`: C_K(R)∩[K,R] ⊆ K' (1.6(d)) + h331b。
+3. **Lemma 3.1** で `[K,R]R₀` Frobenius → **(3.34) Thm 3.5 消費**: ⁅KG,R₀⁆ abelian
+   (h318 faithful on V + h319 dim C_V(R₀) = 1 が Thm 3.5 の入力)。
+4. **(3.35)** ∃ x ∈ P, [K,R] ≠ [K,R]^x (else [K,R] P-inv proper → (3.23)/h322' で
+   [K,R] ⊆ C_K(P) ⊆ K' [(3.25) 第2文 C_{K/K'}(P)=1 をここで初めて要する可能性 — 要否再判断]
+   → Thm 1.8 → [K,R]=1 ✗ h317)。
+5. **(3.36)** K elementary abelian: K = [K,R]·[K,R]^x, 交わり ⊆ Z(K), |K:Z(K)| ≤ q² 分析;
+   = q² 枝は **Thm 2.6(a)** (S02 — 形式化済) + h321G 矛盾で殺す。
+6. **(3.37)** |K| > q² (Thm 2.6 再び、h328 faithful)。
+7. その後 Phase F = (3.38) orbit-parity (V = V₁×…×Vₙ, Prop 1.16 = Isaacs 6.21 既存)。
+正本 = 本節。(3.29)–(3.31) 実装詳細は上記; (3.22)–(3.28) は session 9 節。
