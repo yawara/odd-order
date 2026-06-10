@@ -571,6 +571,27 @@ noncomputable def omegaColumnDiffBasis :
     rw [← Nat.card_eq_fintype_card, hc2]
   rw [e1, e2]
 
+/-- The `ω_{ij} − ω_{0j}` basis evaluated at an index pair `⟨k, l⟩` is the column difference
+`ω_{kl} − ω_{0l}` (`coe_basisOfLinearIndependentOfCardEqFinrank` on the family of
+`omegaColumnDiff_linearIndependent`). -/
+theorem omegaColumnDiffBasis_apply
+    (pq : {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} ×
+        ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) :
+    h.omegaColumnDiffBasis pq = h.omegaColumnDiff pq.1.1 1 pq.2 := by
+  classical
+  haveI : Finite L := Finite.of_fintype L
+  letI : Fintype ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  haveI : Nonempty ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := ⟨1⟩
+  haveI : Nonempty {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} :=
+    h.sdiffTICyclicHypothesis.nonempty_charNeOne
+      h.sdiffTICyclicHypothesis.W1_le_W h.sdiffTICyclicHypothesis.W1_nontrivial
+  have hcoe : ⇑h.omegaColumnDiffBasis = fun p => h.omegaColumnDiff p.1.1 1 p.2 := by
+    unfold omegaColumnDiffBasis
+    exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  exact congrFun hcoe pq
+
 /-- `ω_{kl} = chiColumn l (e⁻¹ k)`: the basis index `k` (a `W₁`-dual) is `e (e⁻¹ k)` of
 the column family. -/
 theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
@@ -663,6 +684,38 @@ theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
       if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
         (h.sdiffTICyclicHypothesis.omega_injective he))]
     ring
+
+/-- **Step 4, the (1.3) masking.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}`
+vanishes on the TI set `W − W₂`.  The `ω_{kl} − ω_{0l}` are a basis of `CF(W, W − W₂)`
+(`omegaColumnDiffBasis`), so the linear functional `⟨·, g⟩` is zero on all of `CF(W, W − W₂)`
+(by `certainTypeRestrictDiff_inner_basis`); the (1.3)(a) engine
+(`eq_zero_of_mem_of_inner_supported_eq_zero`) then forces `g` to vanish on `W − W₂`. -/
+theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 := by
+  classical
+  haveI : IsMulCommutative ↥h.sdiffTICyclicHypothesis.W :=
+    h.sdiffTICyclicHypothesis.isMulCommutative_W
+  -- `⟨·, g⟩` is zero on `CF(W, W − W₂)`: zero on the `ω`-basis, so on the whole submodule
+  have hL0 : (innerLeftFunctional (h.certainTypeRestrictDiff χ₂ i)).comp
+      (Submodule.subtype (ClassFunction.supportedSubmodule (G := ↥h.sdiffTICyclicHypothesis.W)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+          h.sdiffTICyclicHypothesis.W))) = 0 := by
+    refine Module.Basis.ext h.omegaColumnDiffBasis (fun pq => ?_)
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearMap.zero_apply,
+      innerLeftFunctional_apply, h.omegaColumnDiffBasis_apply]
+    exact h.certainTypeRestrictDiff_inner_basis χ₂ i pq.2 pq.1.1
+  refine eq_zero_of_mem_of_inner_supported_eq_zero
+    (A := OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+      h.sdiffTICyclicHypothesis.W) (fun x _ t => ?_) (fun φ hφ => ?_) ?_
+  · -- `W − W₂` is conjugation-closed in the abelian `W`, so `t * x * t⁻¹ = x`
+    have hxx : t * x * t⁻¹ = x := by rw [mul_comm' t x, mul_assoc, mul_inv_cancel, mul_one]
+    rw [hxx]; assumption
+  · -- orthogonal to every `φ ∈ CF(W, W − W₂)` via `hL0`
+    have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+    simpa using this
+  · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
 
 end Recipe
 
