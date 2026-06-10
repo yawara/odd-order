@@ -90,6 +90,35 @@ theorem omega_diff_cross_inner_eq_zero (hyp : TICyclicHypothesis L)
     hyp.omega_inner_ne (omegaProdChar_ne_of_ne_right hyp hne a₀ b₀)]
   ring
 
+/-- Biorthogonality (diagonal) for the `CF(W, W − W₂)` basis: `⟨ω_{ij} − ω_{0j}, ω_{ij}⟩ = 1`
+(for `χ₁ ≠ 1`).  Only the `ω_{ij}` term survives; `ω_{0j} ⊥ ω_{ij}` since `χ₁ ≠ 1`. -/
+theorem omegaColumnDiff_inner_omega_self (hyp : TICyclicHypothesis L)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    {χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} (hχ₁ : χ₁ ≠ 1)
+    (χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    ClassFunction.inner
+      ((hyp.omega (hyp.omegaProdChar χ₁ χ₂) : ClassFunction hyp.W ℂ)
+        - (hyp.omega (hyp.omegaProdChar 1 χ₂) : ClassFunction hyp.W ℂ))
+      (hyp.omega (hyp.omegaProdChar χ₁ χ₂) : ClassFunction hyp.W ℂ) = 1 := by
+  rw [ClassFunction.inner_sub_left, hyp.omega_inner_self,
+    hyp.omega_inner_ne (hyp.omegaProdChar_ne (fun h => hχ₁ h.1.symm))]
+  ring
+
+/-- Biorthogonality (off-diagonal) for the `CF(W, W − W₂)` basis: `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = 0`
+for `(i', j') ≠ (i, j)` (`χ₁ ≠ 1`).  Both `ω`-terms are distinct from `ω_{ij}`. -/
+theorem omegaColumnDiff_inner_omega_ne (hyp : TICyclicHypothesis L)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    {χ₁' χ₁ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} (hχ₁ : χ₁ ≠ 1)
+    {χ₂' χ₂ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hne : ¬ (χ₁' = χ₁ ∧ χ₂' = χ₂)) :
+    ClassFunction.inner
+      ((hyp.omega (hyp.omegaProdChar χ₁' χ₂') : ClassFunction hyp.W ℂ)
+        - (hyp.omega (hyp.omegaProdChar 1 χ₂') : ClassFunction hyp.W ℂ))
+      (hyp.omega (hyp.omegaProdChar χ₁ χ₂) : ClassFunction hyp.W ℂ) = 0 := by
+  rw [ClassFunction.inner_sub_left,
+    hyp.omega_inner_ne (hyp.omegaProdChar_ne hne),
+    hyp.omega_inner_ne (hyp.omegaProdChar_ne (fun h => hχ₁ h.1.symm))]
+  ring
+
 namespace Hypothesis
 
 variable (h : Hypothesis L)
@@ -438,6 +467,25 @@ theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
   intro heq
   rw [heq, irreducibleCharacter_inner, if_pos rfl] at hinner
   exact one_ne_zero hinner
+
+/-- **Linear independence of the `CF(W, W − W₂)` family** `ω_{ij} − ω_{0j}` (`i ≠ 0`, all `j`):
+the biorthogonal system `⟨ω_{i'j'} − ω_{0j'}, ω_{ij}⟩ = δ` (`omegaColumnDiff_inner_omega_self`/`_ne`)
+witnesses linear independence.  With the matching count `(w₁−1)·w₂ = |W − W₂| = dim CF(W, W − W₂)`
+this gives the basis of (4.3.b) (the `ω_{ij} − ω_{0j}` comprise a basis of `CF(W, W − W₂)`). -/
+theorem omegaColumnDiff_linearIndependent :
+    LinearIndependent ℂ
+      (fun p : {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} ×
+          ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) =>
+        h.omegaColumnDiff p.1.1 1 p.2) := by
+  refine LinearIndependent.of_pairwise_dual_eq_zero_one _
+    (fun p => (innerDual (h.sdiffTICyclicHypothesis.omega
+        (h.sdiffTICyclicHypothesis.omegaProdChar p.1.1 p.2))).comp (Submodule.subtype _))
+    (fun p q hpq => ?_) (fun p => ?_)
+  · simp only [LinearMap.comp_apply, Submodule.subtype_apply, innerDual_apply, omegaColumnDiff_coe]
+    exact omegaColumnDiff_inner_omega_ne h.sdiffTICyclicHypothesis p.1.2
+      (fun heq => hpq (Prod.ext (Subtype.ext heq.1.symm) heq.2.symm))
+  · simp only [LinearMap.comp_apply, Submodule.subtype_apply, innerDual_apply, omegaColumnDiff_coe]
+    exact omegaColumnDiff_inner_omega_self h.sdiffTICyclicHypothesis p.1.2 p.2
 
 /-- **Peterfalvi (4.3.b), all certain-type characters distinct**: the global family
 `(χ₂, i) ↦ μ_{ij}` is injective.  Within a column by the (1.4) `injective` field;
