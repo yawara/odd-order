@@ -1,5 +1,40 @@
 # BG §10 直列スパイン: ブロッカー精査 (2026-06-07)
 
+> **✅✅✅ 更新 (2026-06-11, Lane E `bg-local`, commit `ce49f862`): BG Lemma 10.4(b) 完成 +
+> 最終 de-axiom — §10 spine は完全 unconditional**。
+>
+> - **新 leaf `S10_LocalCriteria.lean`** (`S10_HallStructure` → ここ → `S10_ForwardFromKeystone`):
+>   Lemma 10.3 + Lemma 10.4(a)(c) (`alpha_criterion`) を `S10_LocalLemmas` から移設
+>   (ForwardFromKeystone ← BetaRadical ← LocalLemmas の import 循環回避のため、消費側の上流へ)。
+>   下流は import 推移で無傷 (名前・namespace 不変)。
+> - **一般形 Lemma 10.4(b) = `exists_mem_omega1_center_zgroupCentralizer`** (unconditional,
+>   axiom-clean): `M ∈ ℳ`, `p ∈ π(M)`, `p ∉ σ(M)`, `M_α ≠ 1`, `P` Sylow p of M ⟹
+>   `∃ x ∈ Ω₁(Z(P))^#`: (∃ L ∈ ℳ, C_G(⟨x⟩) ≤ L, L ≠ M) ∧ `C_{M_α}(⟨x⟩)` Z-群。
+>   `{M} ≠ ℳ(C_G(x))` は「第二極大の存在」で正値エンコード。証明 = book p.74 の反例法:
+>   `u ∈ N_G(P)−M` (p∉σ で存在)、反例仮定の ¬Z-群 case は Lemma 10.3 (X=⟨y⟩, noncyclic
+>   Sylow ⟹ rank ≥ 2) で {M}=ℳ(C_G(y)) へ昇格、y と y^{u⁻¹} の一意性 + 共役で
+>   u⁻¹Mu = M ⟹ u ∈ N_G(M) = M 矛盾。
+> - **de-axiom**: `exists_prime_orderOf_zgroupCentralizer_of_complement` は同一 statement の
+>   theorem に置換。還元 = q∈π(K/K') ⟹ q∣|M/M'| (**補群同型 `(mk' N).comp K.subtype` 単射
+>   [complement disjoint] + 全単射 [`Nat.bijective_iff_injective_and_card`, |K| = [M:N]] +
+>   `Subgroup.index_map_of_bijective`/`index_map_eq` で abelianization index 一致**;
+>   N = M_α ≤ M' は Thm 10.2) ⟹ q∉σ(M) (10.4(a)) ⟹ Sylow q of K = Sylow q of M
+>   (M_α は α-群, q∉α) ⟹ 一般形 ⟹ ↥M 座標へ (`centralizer_zpowers_inf_subgroupOf_eq` +
+>   `IsZGroup.of_injective`)。**`S10_ForwardFromKeystone` の axiom は 0 本**。
+> - **AxiomsCheck**: `#assert_axioms_island` 全 18 件 → `#assert_only_allowed_axioms` 移行。
+>   §10 spine (10.6/10.7/10.8/10.9/10.10/10.11(b)(c)(d)) + §12.19 が standard 3 公理のみ。
+>   island elab は将来の forward-axiom phase 用に残置。
+> - full build 3627 jobs green、実 sorry 不増。
+> - **実装知見**: (1) 巨大 ambient 型 (`↥(centralizer ⊓ Malpha M)`) 上の `▸`/Subsingleton
+>   instance 探索は whnf 暴走する → ¬Z-群 ⟹ rank ≥ 2 を抽象群 H 上の private
+>   `two_le_rank_of_not_isZGroup` に切り出して解消 (Thm 3.6 session 12 の知見の再演)。
+>   (2) `open scoped Pointwise` を忘れると `MulAut.conj u • M` が `HSMul` synth 失敗で
+>   ファイル後半が連鎖崩壊する。(3) mem_map で得た元の coe `⇑M.subtype x` は `↑x` と
+>   syntactic 不一致 → `simp only [Subgroup.coe_subtype] at *` で正規化してから instance を渡す。
+>
+> ⟹ **§10 の残 = Lemma 10.13 (`S10_LocalLemmas` 唯一の sorry) のみ**。次節以降の
+> 「keystone island」「forward-conditional」記述はすべて歴史的記録。
+
 > **更新 (2026-06-10, Lane D `bg-s10-fwd`)**: 以下の「全面ブロック」分析は **forward-axiom 配線後の
 > 現状では古い**。`bg-s10-fwd` で Thm 3.6 を named forward-axiom (`pLengthOne_commutator_of_zgroupCentralizer`
 > + `exists_prime_orderOf_zgroupCentralizer_of_complement`) 化し、その上で **Thm 10.6 → Cor 10.7 →
