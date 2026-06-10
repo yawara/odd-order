@@ -945,3 +945,82 @@ After (3.2) complete (session 17), advanced the §5 frontier through the `NC(ψ)
   §12/§13/§15/§16 (grep 済: 04.12 L17/L67, 04.13 L85, 04.15 L136, 04.16 L103)。
 
 正本 = 本ノート (session 19)。**Don't re-grind (3.9) — (a)(b)(c) 完成・axiom-clean。**
+
+## 2026-06-10 (session 20, b-peterfalvi): ✅ (4.2) 構造 + (4.3.a) COMPLETE + (4.3.b) isometry 基盤
+
+§6 本体に着手。4 commits、全 build-green + axiom-clean (full 3601 + AxiomsCheck)。
+
+### ✅ 着地 (session 20)
+
+1. **(4.1) upstream 移動** (`686ffa1c`): S08:72-239 の (4.1) cluster
+   (`inner_eq_zero_of_orthogonal_signedDifference` + pairwise 版 + 2 helpers) を
+   `InducedIrreducible.lean` へ verbatim 移動 (同 namespace
+   `OddOrder.RepresentationTheory` ⟹ S08 呼び出し側・AxiomsCheck guard 無変更)。
+   S06 leaf から (4.1) が import 可能に (S08 は S06 の下流ゆえ必須だった)。
+2. **(4.2) 抽象化 + Hall** (`bf1fdd03`): `S06.Hypothesis (L : Type*)` — 抽象有限群上の
+   忠実な (4.2)。**新 field `card_coprime : Coprime |K| |W₁|`** (= Hall 性; 旧構造に欠落、
+   S08 (c2) が side condition で外付けしていたもの)。`W_disjoint` は field → 導出 lemma。
+   `CertainTypeHypothesis A L` は `extends Hypothesis ↥L` + `dade` に refactor
+   (構成箇所ゼロ・S08 の field access 全て温存、S08 無変更で compile)。
+   基本 API: `commute_of_mem_of_isCyclic` (generic)、`commute_of_mem_W1_of_mem_W2`、
+   `coprime_card_W1_card_W2`、`isMulCommutative_sup` (`sup_eq_closure` +
+   `isMulCommutative_closure`)、subgroupOf inf/sup、`exists_mul_of_mem_sup` (w = x·y)、
+   **`exists_zpow_proj`** (∃n:ℤ, (xy)^n = x — Bézout `Nat.gcdA/gcdB` 直接、Euler/CRT 不要、
+   finiteness-free)。
+3. **(4.3.a) COMPLETE** (`fcc927ec`): `centralizer_eq_sup` (C_L(x) = W, x∈W₁^#; ≤ は
+   c = k·u 分解 + W₁ abelian ⟹ k ∈ C_K(x) = W₂)、`isTISubset_sup_sdiff` (**W−W₂ TI**;
+   x = a^n ⟹ g·x·g⁻¹ = (g·a·g⁻¹)^n ∈ W₁、κ ∈ K ⊓ W₁ = ⊥)、`supMulEquiv` +
+   `card_sup_eq_mul` (|W| = |W₁||W₂|)、`isCyclic_sup` (生成元積の order = |W|)、
+   `toTICyclicHypothesis` (**(3.1)-for-L**)。
+4. **(4.3.b) isometry 基盤** (`8d506b44`): `toTICyclicHypothesisOfV` (V-パラメトリック
+   (3.1) builder; W abelian ⟹ 任意 V ⊆ W を正規化)、`sdiffTICyclicHypothesis`
+   (V = W−W₂)、`sdiffDadeHypothesis` ((2.2) on (L, W−W₂, W) を syntactic W₁⊔W₂ 形で)、
+   **`sdiffFullDadeIsometryData`** = 「Ind_W^L は CF(W, W−W₂) 上 isometry」(教科書の
+   "We know" 一文)。
+
+### 🔑 KEY 発見 (再調査するな)
+
+- **`TICyclicHypothesis.V` は§6 再利用のための free field** (S05:38 の設計コメント通り)。
+  `toTICyclicHypothesisOfV` で V = W−(W₁∪W₂) と V = W−W₂ の両方を一つの builder から。
+- **§4 Theorem (2.6) は構成済み**: `S04.Hypothesis.fullDadeIsometryData (hconj)` が
+  isometry + ZIrr 保存を**証明付きで**返す。TI 由来 (H(a) ≡ ⊥) なら
+  `HConjInvariant.of_forall_H_eq_bot` で hconj 自動 (toDadeHypothesis_H は rfl 証明
+  ⟹ `fun _ => rfl` で渡せる)。**TI 誘導等長性の手証明は不要**。
+- **`tau_eq_induce`** (S05:297) が任意の DadeIsometryData の写像を Ind と同定
+  (IsDadeMap.unique 経由) — sdiff 側にも適用可。
+- sdiff 系と (3.1) 系は **同じ W/W₁/W₂** (defeq) ⟹ ω/omegaProdChar 機構は両者で共有。
+- Lean 地雷 (今回踏んだ): (i) `IsComplement.existsUnique` の等式は projection 形 →
+  `change kk * u = c at hku` で正規化 (defeq 保証)。(ii) `refine ⟨?_, hk⟩` を
+  `∈ A ⊓ B` に使うと Submonoid-coe 形に unfold され `mem_centralizer_iff` の rw が
+  死ぬ → `Subgroup.mem_inf.mpr` 経由。(iii) `subst hz` (hz : z = x) は **x を消去**
+  (calc が x を書いていると Unknown identifier) → 後続が x を使うなら `rw [hz]`。
+  (iv) def の射影 (`(def).W`) は TC 探索で unfold されない → instance を要する
+  hypothesis は syntactic 形で別 def に restate (`sdiffDadeHypothesis` パターン)。
+
+### ▶▶ 次 = (4.3.b) 本体 [新 leaf `S06_CertainTypeCharacters.lean` 推奨]
+
+新 import: S05_SigmaIsometry + S06_DadeIsometryCertain + IsometryDifferencePair。手順:
+
+1. **CF(W, W−W₂) の基底** {ω_ij − ω_0j : i ≠ 1, j}: (w₁−1)·w₂ 本 = |W−W₂|
+   (`card_sup_eq_mul` から counting)。S05 `SupportedDimension` section (S05:189) が
+   CF(H,A) の次元 = |A| (可換 H) を供給。lin indep は alphaLinearIndependent
+   (S05:856) パターン + `basisOfLinearIndependentOfCardEqFinrank` (session-17
+   `alphaBasis_apply` の `unfold`+`letI` tip 再利用)。ω_ij − ω_0j が W₂ 上消える:
+   wFst kills W₂ (S05:439)。
+2. **(1.4) 適用 per column j**: `IsometryDifferencePair.lean` の
+   `SignedIrreducibleDifferenceFamily` (:312) + structure theorem (:309 周辺,
+   `IsometryDifferencePairNumerics` :250) を**まず読む** (interface 未精査)。
+   isometry 入力 = `sdiffFullDadeIsometryData` (inner_eq + maps_virtualCharacter)、
+   写像の Ind 同定 = `tau_eq_induce`。⟹ μ_ij ∈ Irr(L), δ_j = ±1,
+   Ind(ω_ij − ω_0j) = δ_j(μ_ij − μ_0j), 列内 distinct。
+3. **列間 distinct**: (4.1) `pairwise_inner_eq_zero_of_orthogonal_signedDifference`
+   (InducedIrreducible に移動済 ✓ S05 経由で import される)。
+4. **σ 同定**: (3.9.a) `eq_sigma_of_apply_eq_on_V` + `exists_sigma`
+   (S05_SigmaIsometry) を `toTICyclicHypothesis` (hVeq = rfl) 上で ⟹
+   σ(ω_ij) = δ_j μ_ij。
+5. その後 (4.3.c) 値 + 消滅 ((1.3)(a) masking engine
+   `eq_zero_of_mem_of_inner_supported_eq_zero` S05:2158 再利用) → (4.3.d) 次数合同
+   (Res_{W₁} + 正則指標) → (4.4) (小) → (4.5) ([Is]6.32 = ConjugationBrauer 形式化済)。
+
+正本 = 本ノート (session 20)。**Don't re-grind (4.2)/(4.3.a)/sdiff-isometry 基盤 —
+完成・axiom-clean。(4.1) は InducedIrreducible に在る。**
