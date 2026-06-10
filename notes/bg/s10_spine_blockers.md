@@ -1,5 +1,46 @@
 # BG §10 直列スパイン: ブロッカー精査 (2026-06-07)
 
+> **✅✅✅✅✅ 更新 2 (2026-06-11, Lane E `bg-local`): BG Lemma 10.13 完全証明 —
+> `S10_LocalLemmas` は sorry 0、§11.5-7 + §12 の 10.13-ブロック 14 件が解除**。
+>
+> `nonabelian_pSubgroup_rankTwo_elemAbelian_structure` (a)(b)(c) 全部、unconditional・
+> axiom-clean (standard 3)、AxiomsCheck 登録済。実装構成 (book p.79-80 に忠実):
+>
+> - **共有 helper 群**: `elemAbelian_le_of_le_centralizer` (ℰ-maximality ⟹ C_G(A) 内の
+>   elem-ab は ⊆ A = BG (10.4) のエンジン) / `mem_of_mem_centralizer_of_pow_eq_one`
+>   (A = Ω₁(C_S(A)) elementwise) / `le_normalizer_of_forall_comm` / `comm_sup_of_comm_of_comm`
+>   / `inf_eq_bot_of_card_prime_of_ne` / `eq_sup_of_card_prime_of_ne` (位数 p² 群 = 2 直線の join;
+>   **set-product を避け Lagrange 整除で**) / `centralizer_subgroupOf_inf_eq`
+>   (C_{↥S}(L') = (C_G(L)⊓S).subgroupOf S ブリッジ)。
+> - **case r(S) ≤ 2** (`centralizer_sylow_decomp_of_rank_le_two`): Cor 10.7(b) central product
+>   S = P₁∘P₂ → **Ω₁-trap** (exp-p 元は P₁ 内: s = s₁s₂, s₂^p = 1 ⟹ s₂ ∈ Ω₁(P₂) = Z(P₁) ⊆ P₁)
+>   → A ≤ P₁ self-centralizing (card 論法: C = P₁ なら A ⊆ Z(P₁) で p² ∣ p 矛盾) →
+>   C_S(A) = A⊔P₂ = A₀⊔P₂ abelian; Z₀ = Z(P₁)-map = Ω₁(P₂)-map ≤ P₂ (card p で同定)。
+> - **case r(S) ≥ 3** (`centralizer_sylow_decomp_of_three_le_rank`): A の ↥S-maximality は
+>   map-で直接継承 → narrow witness → **Thm 5.3(d) = `Ch1.S05.narrow_centralizer_decomp` が
+>   そのまま核** (line L ≤ A, L ≠ Z₁ に対し C_S(L) = L × C_T(L) cyclic)。C_S(A) = C_S(L) は
+>   A = L⊔Z₁ + Z₁ central。|Z₁| = p は narrow と独立に (Z₁ = A ⟹ C_S(A) = S ⟹
+>   pRank ≥ 3 が (10.4)-rank-bound と矛盾)。generic line で abelian → (10.5) → Z₀ = Z₁ →
+>   A₀ ≠ Z₁ で再適用。
+> - **(b) 組立**: C_P(A) = (C_S(A))⊓P = (A₀⊔Y)⊓P = A₀⊔(Y⊓P) — **Dedekind は set-level
+>   分解 (c = a₀y, y = a₀⁻¹c ∈ P) で直接**、modular-lattice 不要。
+> - **(c) transvection は乗法的に直接証明** (`exists_conj_pow_eq_of_fixes_line`, route C —
+>   **Additive/ZMod-module diamond 完全回避**): A = ⟨a⟩×⟨z₀⟩ 座標 (a = X の生成元) で
+>   x a x⁻¹ = a^{i₀} z₀^{j₀}; `hiter` (X-座標は i₀^k、z₀-係数は existential) を
+>   x^{orderOf x} = 1 で評価し **Fermat (`ZMod.pow_card` 反復) で i₀ ≡ 1**; j₀ ≢ 0
+>   (さもなくば x ∈ C(A)); x^k a x^{-k} = a z₀^{kj₀}; 目標線 ⟨a^m z₀^s⟩ (m ≢ 0) へは
+>   **ZMod p の体構造で k := (s·(j₀m)⁻¹).val を解いて** ⟨φ^k(a)⟩ = Y (card p 同定)。
+>   N_P(A)−C_P(A) ≠ ∅ は `normalizerCondition_of_isNilpotent` + C_P(A) abelian ⊊ P;
+>   x が A を正規化するのは **A = {g ∈ C_P(A) | g^p = 1} (集合として)** の保存から。
+> - **地雷メモ**: (1) `refine ⟨?_, h⟩` で inf-membership を割ると component goal が
+>   `↑(...).toSubmonoid` 表示になり `rw [mem_centralizer_iff]` が失敗 →
+>   **`Subgroup.mem_inf.mpr ⟨?_, h⟩` 経由にする**。(2) S05 補題は `Ch1.S05.` 修飾。
+>   (3) hmap への bridge-rw は RHS 内部の `centralizer L'` まで巻き込む → 標的等式
+>   (`hmapL`) を先に作って 1 回だけ rw。(4) `zpow_sub` は div でなく mul-inv 形。
+>
+> §10 は **完結** (S10_* 全ファイル sorry 0)。次 frontier = §11.5-7 (S11 の 3 sorries) と
+> §12 (issue 5003)。
+
 > **✅✅✅ 更新 (2026-06-11, Lane E `bg-local`, commit `ce49f862`): BG Lemma 10.4(b) 完成 +
 > 最終 de-axiom — §10 spine は完全 unconditional**。
 >
