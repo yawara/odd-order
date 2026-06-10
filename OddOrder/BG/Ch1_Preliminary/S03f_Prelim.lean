@@ -325,19 +325,16 @@ theorem map_conj_eq_self_of_mem_normalizer {G : Type*} [Group G] {A : Subgroup G
     have heq : g * (g⁻¹ * x * g) * g⁻¹ = x := by group
     rwa [heq]
 
-/-- **Normalizing two subgroups normalizes their join**.  Used at BG Theorem 3.6 (3.22) to see
-that `R₀` normalizes `VXP = V ⊔ X ⊔ P`. -/
-theorem mem_normalizer_sup {G : Type*} [Group G] {A B : Subgroup G} {g : G}
-    (hA : g ∈ Subgroup.normalizer (A : Set G)) (hB : g ∈ Subgroup.normalizer (B : Set G)) :
-    g ∈ Subgroup.normalizer ((A ⊔ B : Subgroup G) : Set G) := by
-  have hmap : (A ⊔ B).map (MulAut.conj g).toMonoidHom = A ⊔ B := by
-    rw [Subgroup.map_sup, map_conj_eq_self_of_mem_normalizer hA,
-      map_conj_eq_self_of_mem_normalizer hB]
+/-- **A subgroup fixed by the conjugation automorphism of `g` admits `g` in its normalizer**
+(converse of `map_conj_eq_self_of_mem_normalizer`). -/
+theorem mem_normalizer_of_map_conj_eq {G : Type*} [Group G] {A : Subgroup G} {g : G}
+    (hmap : A.map (MulAut.conj g).toMonoidHom = A) :
+    g ∈ Subgroup.normalizer (A : Set G) := by
   rw [Subgroup.mem_normalizer_iff]
   intro x
   constructor
   · intro hx
-    have h1 : (MulAut.conj g).toMonoidHom x ∈ (A ⊔ B).map (MulAut.conj g).toMonoidHom :=
+    have h1 : (MulAut.conj g).toMonoidHom x ∈ A.map (MulAut.conj g).toMonoidHom :=
       Subgroup.mem_map_of_mem _ hx
     rw [hmap] at h1
     simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using h1
@@ -347,6 +344,24 @@ theorem mem_normalizer_sup {G : Type*} [Group G] {A B : Subgroup G} {g : G}
     simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at haeq
     have hax : a = x := mul_left_cancel (mul_right_cancel haeq)
     rwa [← hax]
+
+/-- **Normalizing two subgroups normalizes their join**.  Used at BG Theorem 3.6 (3.22) to see
+that `R₀` normalizes `VXP = V ⊔ X ⊔ P`. -/
+theorem mem_normalizer_sup {G : Type*} [Group G] {A B : Subgroup G} {g : G}
+    (hA : g ∈ Subgroup.normalizer (A : Set G)) (hB : g ∈ Subgroup.normalizer (B : Set G)) :
+    g ∈ Subgroup.normalizer ((A ⊔ B : Subgroup G) : Set G) :=
+  mem_normalizer_of_map_conj_eq (by
+    rw [Subgroup.map_sup, map_conj_eq_self_of_mem_normalizer hA,
+      map_conj_eq_self_of_mem_normalizer hB])
+
+/-- **Normalizing both arguments normalizes their commutator subgroup**.  Used at BG Theorem 3.6
+(3.24) to see that `R₀` normalizes `[K, P]`. -/
+theorem mem_normalizer_commutator {G : Type*} [Group G] {A B : Subgroup G} {g : G}
+    (hA : g ∈ Subgroup.normalizer (A : Set G)) (hB : g ∈ Subgroup.normalizer (B : Set G)) :
+    g ∈ Subgroup.normalizer ((⁅A, B⁆ : Subgroup G) : Set G) :=
+  mem_normalizer_of_map_conj_eq (by
+    rw [Subgroup.map_commutator, map_conj_eq_self_of_mem_normalizer hA,
+      map_conj_eq_self_of_mem_normalizer hB])
 
 /-- **Lifted characteristic subgroups inherit normalizer elements**: if `g` normalizes `W ≤ G`,
 then `g` normalizes `C.map W.subtype` for every characteristic `C ≤ ↥W` (conjugation by `g`
@@ -500,6 +515,37 @@ theorem oPiCore_eq_bot_of_subgroupOf_normal {G : Type*} [Group G] [Finite G] {π
     rw [Subgroup.map_bot, ← hL]
     exact hLbot
   exact Subgroup.map_injective (Subgroup.subtype_injective A) h3
+
+/-- **Cardinality of a join with a normalizing, disjoint factor**: if `B ≤ N_G(A)` and
+`A ⊓ B = ⊥`, then `|A ⊔ B| = |A| · |B|` (`A` is normal in `A ⊔ B` with complement `B`).
+Used in the counting step of BG Theorem 3.6 (3.23) (`|VYP| = |V|·|Y|·|P|`). -/
+theorem card_sup_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
+    {A B : Subgroup G} (hn : B ≤ Subgroup.normalizer (A : Set G)) (hd : Disjoint A B) :
+    Nat.card ↥(A ⊔ B : Subgroup G) = Nat.card ↥A * Nat.card ↥B := by
+  set S : Subgroup G := A ⊔ B with hS
+  have hA_le : A ≤ S := le_sup_left
+  have hB_le : B ≤ S := le_sup_right
+  have hnorm : S ≤ Subgroup.normalizer (A : Set G) := sup_le Subgroup.le_normalizer hn
+  haveI hAnormal : ((A.subgroupOf S) : Subgroup ↥S).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hnorm
+  have hcompl' : Subgroup.IsComplement' (A.subgroupOf S) (B.subgroupOf S) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · refine disjoint_iff.mpr (eq_bot_iff.mpr fun x hx => ?_)
+      rw [Subgroup.mem_inf] at hx
+      simp only [Subgroup.mem_subgroupOf] at hx
+      have hmem : (x : G) ∈ A ⊓ B := ⟨hx.1, hx.2⟩
+      rw [hd.eq_bot, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      exact Subtype.ext (by simpa using hmem)
+    · have hsup : ((A.subgroupOf S) : Subgroup ↥S) ⊔ (B.subgroupOf S) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hA_le hB_le, Subgroup.subgroupOf_self]
+      have hmul := Subgroup.normal_mul ((A.subgroupOf S) : Subgroup ↥S) (B.subgroupOf S)
+      rw [hsup, Subgroup.coe_top] at hmul
+      exact hmul.symm
+  have hcard := hcompl'.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hB_le).toEquiv] at hcard
+  exact hcard.symm
 
 /-- **A group of `p`-length one with `O_{p'}(W) = ⊥` has a normal Sylow `p`-subgroup**: every
 `p`-subgroup lies in `O_p(W)`.  (`O_{p',p}(W) = O_p(W)` by
