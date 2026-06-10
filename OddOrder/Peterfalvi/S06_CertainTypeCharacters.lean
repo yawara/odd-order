@@ -766,6 +766,23 @@ theorem sigma_chiColumn_eq_certainType [NeZero (Nat.card h.W1)]
       ClassFunction.restrict_apply] at hg
     exact hg
 
+/-- **Peterfalvi (4.3.c), first part** (the value identity).  For `x ∈ W − W₂`,
+`μ_{ij}(x) = δ_j·ω_{ij}(x)`.  This is the (1.3) value-match
+`certainTypeRestrictDiff_apply_eq_zero_of_mem_V` (`δ_j·μ_{ij}(x) = ω_{ij}(x)`) multiplied by
+`δ_j` (using `δ_j² = 1`). -/
+theorem certainType_apply_eq_of_mem_V [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) v
+      = ((h.columnFamily χ₂).sign : ℂ)
+        * (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+            ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ := by
+  have hg := h.certainTypeRestrictDiff_apply_eq_zero_of_mem_V χ₂ i hv
+  rw [certainTypeRestrictDiff, ClassFunction.sub_apply, sub_eq_zero,
+    ClassFunction.restrict_apply, ClassFunction.zsmul_apply, zsmul_eq_mul] at hg
+  rw [← hg, ← mul_assoc]
+  rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> push_cast <;> ring
+
 end Recipe
 
 end Hypothesis
