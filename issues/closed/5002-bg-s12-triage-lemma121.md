@@ -58,3 +58,30 @@ Lemma 10.13 は D 対象外 (group-level Additive diamond、休止 `c-bg-s10` ba
 
 - Prop 10.11 実装知見: `issues/closed/5001-bg-prop1011-sigma-complement-rank.md` 完了記録
 - §11 ブロック詳細: `notes/bg/s10_spine_blockers.md` 2026-06-10 夕更新
+
+## 完了記録 (2026-06-10)
+
+**COMPLETE**。両タスク完了 (triage = commit 9806fcf1, Lemma 12.1 = commits 9f1d22c4 /
+9b83352c / 6b7b335a / 0107bdf2)。
+
+`subgroupE_basic` (a)-(g) 全 conjunct sorry-free、**unconditional・axiom-clean**
+(`#print axioms` = standard 3 のみ、keystone forward-axiom 非依存)。
+`#assert_only_allowed_axioms` 登録、full build 3613 green。
+
+実装上の主要決定 (詳細 = notes/bg/s12_subgroup_e.md):
+- **scaffold 訂正 2 件**: SubgroupESetup に field `E₁₂_hall` 追加 (12.1(e) `E₂⊴E₁E₂` は
+  旧 setup で反例)、capstone (g) に `p.Prime` 明示 (composite で偽)。
+- **(a) は Thm 4.20(a) 代替** (Thm 10.2 の M'/M_σ nilpotent が repo 未収載のため)。
+- **(b)(f) per-prime core は Burnside 再編**: BG の Frattini 論法を
+  `hasNormalPComplement_of_sylow_normalizer_le_centralizer` + mathlib
+  `Sylow.commutator_eq_bot_or_commutator_eq_self` (cyclic Sylow dichotomy) で置換。
+  Prop 1.6(d) は conjugation bridges (`actionCommutator_conj_map_subtype` /
+  `fixedPointsOfMulAut_conj_map_subtype`) 経由で (f) にのみ使用。
+- 再利用可能資産: `one_le_pRank_of_mem_primeFactors`、
+  `isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one`、conjugation bridges、
+  `inf_derivedInG_le_derivedInG` (E∩M' ≤ E')、`isPiGroup_tau23_derived`、
+  τ-partition 基本層 (`mem_tau_union_of_mem_primeFactors` 等)。
+- public 化: `S10.isCyclic_of_pRank_le_one`、`S10.le_of_coprime_card_index`。
+
+次 frontier (triage 済の着手可能残): 12.2(a) (Lem 10.5 のみ)、12.19 (Cor 10.9(a) のみ)、
+12.17 (Lem 6.3(a) 第 2 結論要)、12.18 (大物)。

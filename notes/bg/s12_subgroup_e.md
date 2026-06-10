@@ -1,5 +1,43 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅ 2026-06-10 Lemma 12.1 COMPLETE (issue 5002 closed)
+
+**`subgroupE_basic` (a)-(g) 全 conjunct sorry-free、unconditional・axiom-clean**
+(standard 3 のみ; keystone forward-axiom にすら非依存)。AxiomsCheck
+`#assert_only_allowed_axioms` 登録、full build 3613 green。commits 9f1d22c4 → 0107bdf2。
+
+下記レシピからの実装上の差分 (handoff 用):
+- **(b)(f) は Frattini でなく Burnside 再編で実装**: `W = N_E(P)`、SZ-補群 `K`、
+  mathlib **`Sylow.commutator_eq_bot_or_commutator_eq_self`** (cyclic Sylow の
+  ⁅K,P⁆ = ⊥ ∨ P dichotomy — Prop 1.6(d) + 鎖論法のパッケージ!) で分岐し、
+  ⊥ 枝は `W ≤ C_E(P)` → Burnside normal p-complement ⊇ E' が `p ∣ |E'|`
+  (`dvd_card_derived_of_mem_tau3`) と矛盾。P 枝が `P = ⁅K,P⁆ ≤ E'`。
+  (f) は P 枝で Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`) +
+  **conjugation bridges** (`actionCommutator_conj_map_subtype` = ⁅P,K⁆,
+  `fixedPointsOfMulAut_conj_map_subtype` = C(K)⊓P) で `C_P(K) = ⊥`。
+- **E∩M' ≤ E'** (`inf_derivedInG_le_derivedInG`): mk' M_σ 商へ写し complement が
+  derived を運ぶ (`Subgroup.map_commutator` + ker 差吸収)。`p∈τ₃ ⟹ p∣|E'|` は
+  `M' ≤ M_σ(E⊓M')` 分解 (IsComplement'.existsUnique) + p∤|M_σ|。
+- **(e) E₂⊴E₁₂** は新 field `E₁₂_hall` 経由: commutator ↥(E₁⊔E₂) の素因子は
+  (τ₁∪τ₂)∩(τ₂∪τ₃) = τ₂ ⟹ Hall τ₂ = E₂ に `normal_le_hall` で吸収 ⟹
+  `normal_of_commutator_le`。E₂ の Hall-in-J 化は `relIndex_mul_relIndex` tower。
+- **(e) E=E₁E₂E₃**: join の subgroupOf index が τ-分割の各 Hall index を割る ⟹ 1。
+- **E₃ ⊴ E**: E₃ = `opiCoreInG τ₃ E'` (nilpotent E' の `oPiCore_isHall_of_isNilpotent` +
+  Hall card 同定) → `le_normalizer_opiCoreInG_of_le_normalizer`。
+- 技法メモ: ⁅g,x⁆ element bracket をソースに直接書くと `Bracket Γ Γ` 不能
+  (scoped notation)。`Subgroup.commutator_mem_commutator` + `commutatorElement_def` rw で回避。
+  `(... : Subgroup _)` の型穴は normalizer 系で解決不能 → private abbrev
+  (`sylowNormalizerE`/`sylowSelfE`) で明示。`set W := ...` を rcases 後の枝でやると
+  既存変数を分裂させる (S09 の罠と同根) → obtain/rcases の前に固定。
+- 再利用資産: `one_le_pRank_of_mem_primeFactors` (Cauchy→pRank≥1)、
+  `isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one`、conjugation bridges、
+  τ-partition 基本層、`isPiGroup_tau23_derived`。public 化:
+  `S10.isCyclic_of_pRank_le_one`、`S10.le_of_coprime_card_index`。
+
+**▶ 次 frontier** (着手可能残): **12.2(a)** (Lem 10.5 のみ・軽)、**12.19** (Cor 10.9(a)
+のみ・軽)、**12.17** (Lem 6.3(a) 第 2 結論 `C_H(K)≤H'` の §6 補完が必要)、**12.18** (大物:
+Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (下記 triage)。
+
 ## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
 
 mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
