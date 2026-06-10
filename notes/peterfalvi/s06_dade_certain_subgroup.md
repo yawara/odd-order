@@ -884,3 +884,64 @@ After (3.2) complete (session 17), advanced the §5 frontier through the `NC(ψ)
 **(3.8) full trichotomy (b)/(c)** [§12+ only, defer]: separable structure — subcase f-const⟹case(b) (one column, |{j:nonzero}|<2⟹=1), symmetric⟹(c), both-non-const⟹NC≥2w₁ (textbook (3.8.1) counting, the hard sub-lemma).
 
 正本 = 本ノート (session 18)。**Don't re-grind (3.6)/(3.7)/(3.8-cor)/separable-grid — 完成・axiom-clean.**
+
+## 2026-06-10 (session 19, b-peterfalvi): ✅✅✅ (3.9) COMPLETE — (a) §6-keystone + (b) + (c)
+
+(3.9) 全体 (a)(b)(c) を `S05_SigmaIsometry.lean` で完全形式化。sorry-free・axiom-clean・full build
+3601 + AxiomsCheck green。2 commits: `7af66f4b` (3.9.a), `295d06d9` (3.9.b)+(3.9.c)。
+
+### ✅ 着地 (session 19)
+
+1. **(3.9)(a)** `eq_sigma_of_apply_eq_on_V` [§6 keystone]: χ ∈ ZIrr G, ‖χ‖²=1, χ|_V=ω|_V ⟹
+   χ = ω^σ。部品: `three_le_card_W1/W2` (odd ∧ >1 ⟹ ≥3)、`ncard_inner_chiFam_ne_zero_le_one`
+   (norm-1 ⟹ chiFam-support ≤ 1)、NC(ω^σ−χ) ≤ 2 < 3 ≤ min(w₁,w₂) → (3.8)-cor で全係数 0 →
+   ⟨χ,ω^σ⟩=1 → ‖χ−ω^σ‖²=0 + positive-def。
+   - **norm-1 classifier の新設は不要だった**: `exists_zsmul_irreducibleCharacter_of_inner_self_one`
+     が `InducedIrreducible.lean` に既存 (session-18 plan の「classifier 新設」項は verify で消えた)。
+     S05 に import 追加: `InducedIrreducible` + `GaloisCharacter`。
+   - "in particular" = `sigma_mapRingEquiv_comm`: (ω^σ)^u = (ω^u)^σ, ∀u : ℂ ≃+* ℂ。
+     **star-commutation 仮定不要** — `mapRingEquiv_inner` を避け、ω^σ = ε•μ の ±Irr 表現経由で
+     norm 1 を運ぶ (mapRingEquiv は ±Irr → ±Irr)。
+2. **(3.9)(b)** `exists_mapRingEquiv_sigma_omega_pow`: a = orderOf ξ, k coprime a ⟹
+   ∃u, (ω(ξ^k))^σ = (ω(ξ))^{σu} ∧ 値一致 at g (orderOf g coprime a)。
+   - **🔑 B := ∏(divisors |G| coprime to a) trick**: `exists_complexRingEquiv_pow_and_fixed` の
+     第2モジュラスに divisor-積を使い「a-coprime part」の因数分解 plumbing を完全回避
+     (orderOf g ∣ B は `Finset.dvd_prod_of_mem` 一発、coprime は `Nat.coprime_prod_right_iff`)。
+   - helper `orderOf_char_ne_zero` (ξ^|W| = 1 pointwise)。
+3. **(3.9)(c)** `exists_intCast_sigma_omega_apply`: (ω(ξ))^σ(g) ∈ ℤ for orderOf g coprime a。
+   - 核: 値が**全ての** u : ℂ ≃+* ℂ で固定 — u は a-th roots 上 (·^i) i coprime a
+     (`exists_pow_forall_rootsOfUnity`) → bridge (ω(ξ))^u = ω(ξ^i) → (3.9.a)-comm +
+     (3.9.b)-値部で元の値に戻る → 有理 → 整数 (`isIntegral_rat_imp_int`)。
+   - **新 G-free infra** (S05 leaf 内に保持、docstring で upstream 候補と明記):
+     `isIntegral_apply_of_mem_ZIrr` [→ ClassSumAlgebra 候補]、`exists_pow_forall_rootsOfUnity` /
+     `exists_ratCast_of_forall_complexRingEquiv_eq` [→ CyclotomicGaloisAction 候補]。後者 =
+     「ℚ-整 + 全自己同型固定 ⟹ ℚ」: 分解体 K = ℚ(rootSet p ℂ) は normal
+     (`IntermediateField.adjoin_rootSet_isSplittingField` + `Normal.of_isSplittingField`)、
+     `IsConjRoot.exists_algEquiv` で任意の根へ動かす自己同型を K 内に取り
+     `exists_complexRingEquiv_extends` で ℂ に拡張 → 分離多項式の根が 1 個 →
+     `Polynomial.card_rootSet_eq_natDegree` + `minpoly.natDegree_eq_one_iff` で deg 1。
+   - 新 import: `Mathlib.FieldTheory.Minpoly.IsConjRoot` + `CyclotomicGaloisAction` ((1.9) 供給)。
+   - elaboration tips: `IsPrimitiveRoot.eq_pow_of_pow_eq_one` は `[NeZero a]` 要 (haveI ⟨ha⟩);
+     `IntermediateField.minpoly_eq` の `.symm` 側は引数明示しないと unifier が ↑?x で詰まる。
+
+### ▶▶ 次 = §6 (4.2)/(4.3) 本体 [残 hard core ×1] — RECON 済 (再調査するな)
+
+- **(3.1) の V に fork 無し**: V = W−(W₁∪W₂) で固定 (原文 (3.1) 確認済)。(4.3.a) の
+  「W−W₂ is TI in L」は **追加構造** (CF(W, W−W₂) の Ind_W^L isometry 用) で、(3.1)-for-L は
+  そこから従う。§5 σ 機構 (hVeq 前提) はそのまま L をアンビエントに適用できる。
+- **(4.3) 証明部品の所在**:
+  - (a) = 群論 (xy ∈ W−W₂, (xy)^g ∈ W−W₂ ⟹ x^g ∈ Kx ∩ W₁ ⟹ x^g = x ⟹ g ∈ C_L(x) = W)。
+  - (b) = CF(W, W−W₂) 基底 (ω_ij−ω_0j) [(3.4) 類似の counting |W−W₂| = (w₁−1)w₂] +
+    Ind_W^L isometry on CF(W, W−W₂) [TI 古典; S05 `inducedDadeMap`/`isDadeMap_inducedDadeMap`
+    が L-side `FullDadeApplication` 構成の素材] + **(1.4) = `IsometryDifferencePair.lean` 整備済** +
+    **(4.1) = S08:72-195 形式化済 ⚠ S08 は S06 の下流** — (4.3) の置き場 (新 leaf
+    `S06_CertainType.lean`?) と (4.1) の upstream 移動の import-DAG 設計が最初の決定事項 +
+    **(3.9.a) = 本セッションで解除 ✅**。
+  - (c) = (1.3) 値 + 消滅; (d) = Res_{W₁} + 正則指標で μ_ij(1) ≡ δ_j mod w₁。
+  - ⚠ TICyclicHypothesis を **L に対して** 立てる constructor (CertainTypeHypothesis →
+    TICyclicHypothesis L) が最初の Lean leaf。
+- **(4.4)** は (3.9)+(4.3) 消費で小; **(4.5.b)** は [Is] 6.32 Brauer (形式化済) 消費。
+- **(3.8) full trichotomy (b)/(c)** は §12+ 専用で defer 継続。(3.9.b)/(3.9.c) の下流消費は
+  §12/§13/§15/§16 (grep 済: 04.12 L17/L67, 04.13 L85, 04.15 L136, 04.16 L103)。
+
+正本 = 本ノート (session 19)。**Don't re-grind (3.9) — (a)(b)(c) 完成・axiom-clean。**
