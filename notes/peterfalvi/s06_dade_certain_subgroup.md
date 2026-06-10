@@ -1266,6 +1266,11 @@ session 22 が残した「(4.4) kernel 特徴付け」を完全形式化。**μ_
 - **(4.5)** μ_j=∑_{i} μ_{ij}, χ_j=Res^L_K μ_{ij}∈Irr(K) (Clifford; (4.3.b) で μ_{ij}−μ_{0j} は W−W₂^L 外で消える
   ⟹ K∩W=W₂ で K 上消失 ⟹ χ_j は i 非依存), Ind^L_K χ_j=μ_j。(b) χ∉{χ_j}⟹Ind^L_K χ∈Irr(L) かつ Irr(L) を尽くす
   (g∈W₁^# の固定点計数 + [Is]6.32=`ConjugationBrauer` 済 + (1.5.b))。
+  - **infra 確認済 (session 23 recon, 再 recon 不要)**: 既約↔誘導/制限 Clifford 機構は `Clifford.lean`
+    (`restrictionMultiplicity`(+`_int`/`_conjBy_right`[Normal]/`_nonneg`), `IrreducibleCharacter.LiesOver`,
+    restriction-constituent API)。誘導は `InducedCharacter.lean` (`induce`/`induceSum`,
+    **support 補題 `support_induce_subset_conjugatesInto` / `support_induce_subset_of_normal`** =
+    (4.5.a) の「K 上消失」の核)。(4.5) は (4.4) 同等規模の Clifford 本体作業 (単一 leaf でない)。
 - これ以降 (4.6)+ は G-埋込 `CertainTypeHypothesis` + A-set + τ Dade が要 ((4.8) は (3.8) full trichotomy 待ち=§12 defer)。
 
 正本 = 本ノート (session 23)。**Don't re-grind (4.4) — forward/converse/iff 完成・axiom-clean。**
