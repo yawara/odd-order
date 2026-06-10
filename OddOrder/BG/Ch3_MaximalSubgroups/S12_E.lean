@@ -236,7 +236,7 @@ theorem fixedPointsOfMulAut_conj_map_subtype {P K : Subgroup Γ}
     _ = (x : Γ) * k := by rw [hcoe]
   · rintro ⟨hy, hyP⟩
     refine ⟨⟨y, hyP⟩, Subgroup.mem_fixedPointsOfMulAut.mpr fun a => Subtype.ext ?_, rfl⟩
-    show (a : Γ) * y * (a : Γ)⁻¹ = y
+    change (a : Γ) * y * (a : Γ)⁻¹ = y
     rw [hy (a : Γ) a.2]
     group
 
@@ -615,6 +615,17 @@ theorem SubgroupESetup.derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G
     exact nilpotent_of_mulEquiv
       (Subgroup.equivMapOfInjective (commutator ↥E) E.subtype (Subgroup.subtype_injective E))
 
+/-- The normalizer in `↥E` of a Sylow `p`-subgroup `P` (local shorthand for the
+Lemma 12.1 internals). -/
+private abbrev sylowNormalizerE {G : Type*} [Group G] (E : Subgroup G) {p : ℕ}
+    (P : Sylow p ↥E) : Subgroup ↥E :=
+  Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)
+
+/-- `P` viewed as a (normal) Sylow subgroup of its own normalizer (local shorthand). -/
+private abbrev sylowSelfE {G : Type*} [Group G] (E : Subgroup G) {p : ℕ}
+    (P : Sylow p ↥E) : Subgroup ↥(sylowNormalizerE E P) :=
+  (P.subtype P.le_normalizer : Subgroup ↥(sylowNormalizerE E P))
+
 /-- **Per-prime core of Lemma 12.1(b)/(f)** (mmd L3041-3055): for `p ∈ τ₃(M)` and a Sylow
 `p`-subgroup `P` of `E`, the ambient image of `P` lies in `E'` and meets `C_G(E)` trivially.
 
@@ -649,7 +660,7 @@ private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd
   -- Sylow `p`-subgroup `Q` of the normalizer `W`, with its complement `K`
   haveI hQnorm : (P.subtype P.le_normalizer).Normal := P.normal_in_normalizer
   haveI hQcyc : IsCyclic ↥(P.subtype P.le_normalizer : Subgroup
-      ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
+      ↥(sylowNormalizerE E P)) := by
     rw [P.coe_subtype]
     exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe P.le_normalizer).symm.surjective
   obtain ⟨K, hK⟩ :=
@@ -660,30 +671,29 @@ private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd
     exfalso
     have hKcent : K ≤ Subgroup.centralizer
         ((P.subtype P.le_normalizer :
-          Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :
-          Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :=
+          Subgroup ↥(sylowNormalizerE E P)) :
+          Set ↥(sylowNormalizerE E P)) :=
       Subgroup.commutator_eq_bot_iff_le_centralizer.mp hbot
     have hQcent : (P.subtype P.le_normalizer :
-        Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
+        Subgroup ↥(sylowNormalizerE E P))
         ≤ Subgroup.centralizer
           ((P.subtype P.le_normalizer :
-            Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :
-            Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :=
+            Subgroup ↥(sylowNormalizerE E P)) :
+            Set ↥(sylowNormalizerE E P)) :=
       Subgroup.le_centralizer _
-    have htop : Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)
+    have htop : sylowNormalizerE E P
         ≤ Subgroup.centralizer ((P : Subgroup ↥E) : Set ↥E) := by
       intro x hx
       rw [Subgroup.mem_centralizer_iff]
       intro y hy
-      have hyW : y ∈ Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E) := P.le_normalizer hy
-      have hyQ : (⟨y, hyW⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-          ∈ (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
-        rw [P.coe_subtype]
-        exact Subgroup.mem_subgroupOf.mpr hy
-      have hxcent : (⟨x, hx⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-          ∈ Subgroup.centralizer ((P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) : Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
-        have hmem : (⟨x, hx⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-            ∈ K ⊔ (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
+      have hyW : y ∈ sylowNormalizerE E P := P.le_normalizer hy
+      have hyQ : (⟨y, hyW⟩ : ↥(sylowNormalizerE E P))
+          ∈ sylowSelfE E P :=
+        Subgroup.mem_subgroupOf.mpr hy
+      have hxcent : (⟨x, hx⟩ : ↥(sylowNormalizerE E P))
+          ∈ Subgroup.centralizer (sylowSelfE E P : Set ↥(sylowNormalizerE E P)) := by
+        have hmem : (⟨x, hx⟩ : ↥(sylowNormalizerE E P))
+            ∈ K ⊔ sylowSelfE E P := by
           rw [hK.sup_eq_top]
           exact Subgroup.mem_top _
         exact sup_le hKcent hQcent hmem
@@ -734,23 +744,23 @@ private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd
   · -- `⁅K, Q⁆ = Q`: `P ≤ E'` and `C_P(K) = ⊥`
     -- push the commutator identity to `↥E`
     have hmapQ : (P.subtype P.le_normalizer :
-        Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))).map
-          (Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)).subtype
+        Subgroup ↥(sylowNormalizerE E P)).map
+          (sylowNormalizerE E P).subtype
         = (P : Subgroup ↥E) := by
       rw [P.coe_subtype]
       exact Subgroup.map_subgroupOf_eq_of_le P.le_normalizer
-    have hmapped : ⁅K.map (Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)).subtype,
+    have hmapped : ⁅K.map (sylowNormalizerE E P).subtype,
         (P : Subgroup ↥E)⁆ = (P : Subgroup ↥E) := by
       have hc := congrArg
-        (Subgroup.map (Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)).subtype) hself
+        (Subgroup.map (sylowNormalizerE E P).subtype) hself
       rwa [Subgroup.map_commutator, hmapQ] at hc
     constructor
     · -- `P ≤ E'`
       have hd : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
       calc (P : Subgroup ↥E).map E.subtype
-          = (⁅K.map (Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)).subtype,
+          = (⁅K.map (sylowNormalizerE E P).subtype,
               (P : Subgroup ↥E)⁆).map E.subtype := by rw [hmapped]
-        _ = ⁅(K.map (Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)).subtype).map E.subtype,
+        _ = ⁅(K.map (sylowNormalizerE E P).subtype).map E.subtype,
               ((P : Subgroup ↥E)).map E.subtype⁆ :=
             Subgroup.map_commutator _ _ _
         _ ≤ ⁅E, E⁆ :=
@@ -758,74 +768,73 @@ private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd
         _ = derivedInG E := hd.symm
     · -- `C_G(E) ⊓ P = ⊥` via Prop 1.6(d)
       have hKnormQ : K ≤ Subgroup.normalizer
-          ((P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :
-            Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
+          (sylowSelfE E P :
+            Set ↥(sylowNormalizerE E P)) := by
         have heq : Subgroup.normalizer
-            ((P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :
-              Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) = ⊤ :=
+            (sylowSelfE E P :
+              Set ↥(sylowNormalizerE E P)) = ⊤ :=
           Subgroup.normalizer_eq_top_iff.mpr hQnorm
         rw [heq]
         exact le_top
       -- `actionCommutator φ = ⊤`
       have hac : Ch04.actionCommutator
-          ((Subgroup.normalizerMonoidHom (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))).comp
+          ((Subgroup.normalizerMonoidHom (sylowSelfE E P)).comp
             (Subgroup.inclusion hKnormQ)) = ⊤ := by
         apply Subgroup.map_injective
-          (Subgroup.subtype_injective (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))))
+          (Subgroup.subtype_injective (sylowSelfE E P))
         rw [actionCommutator_conj_map_subtype hKnormQ]
-        rw [show Subgroup.map (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))).subtype ⊤
-            = (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) from by
+        rw [show Subgroup.map (sylowSelfE E P).subtype ⊤
+            = sylowSelfE E P from by
           rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]]
         rw [Subgroup.commutator_comm]
         exact hself
       -- Prop 1.6(d): fixed points form a complement of `⊤`, hence are trivial
-      letI : CommGroup ↥(P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :=
-        { (inferInstance : Group ↥(P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))) with
+      letI : CommGroup ↥(sylowSelfE E P) :=
+        { (inferInstance : Group ↥(sylowSelfE E P)) with
           mul_comm := fun a b => by
-            have hcentral : (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-                ≤ Subgroup.centralizer ((P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :
-                  Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) :=
+            have hcentral : sylowSelfE E P
+                ≤ Subgroup.centralizer (sylowSelfE E P :
+                  Set ↥(sylowNormalizerE E P)) :=
               Subgroup.le_centralizer _
             exact Subtype.ext
               (Subgroup.mem_centralizer_iff.mp (hcentral a.2) _ b.2).symm }
       have hcop : Nat.Coprime (Nat.card ↥K)
-          (Nat.card ↥(P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))) := by
+          (Nat.card ↥(sylowSelfE E P)) := by
         have hidx := (P.subtype P.le_normalizer).card_coprime_index
         rw [hK.index_eq_card] at hidx
         exact hidx.symm
       have h16d := OddOrder.BG.Ch1.S01.fixedPoints_isComplement_actionCommutator_of_abelian
-        (φ := (Subgroup.normalizerMonoidHom (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))).comp
+        (φ := (Subgroup.normalizerMonoidHom (sylowSelfE E P)).comp
           (Subgroup.inclusion hKnormQ)) hcop
       rw [hac] at h16d
       have hfpbot : Subgroup.fixedPointsOfMulAut
-          ((Subgroup.normalizerMonoidHom (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))).comp
+          ((Subgroup.normalizerMonoidHom (sylowSelfE E P)).comp
             (Subgroup.inclusion hKnormQ)) = ⊥ :=
         Subgroup.isComplement'_top_right.mp h16d
       have hcentbot : Subgroup.centralizer (K :
-          Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-          ⊓ (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) = ⊥ := by
+          Set ↥(sylowNormalizerE E P))
+          ⊓ sylowSelfE E P = ⊥ := by
         rw [← fixedPointsOfMulAut_conj_map_subtype hKnormQ, hfpbot, Subgroup.map_bot]
       -- transfer to the ambient group
       rw [eq_bot_iff]
       rintro x ⟨hxc, hxP⟩
       obtain ⟨xE, hxE, rfl⟩ := hxP
-      have hxW : xE ∈ Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E) := P.le_normalizer hxE
-      have hxQ : (⟨xE, hxW⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-          ∈ (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
-        rw [P.coe_subtype]
-        exact Subgroup.mem_subgroupOf.mpr hxE
-      have hxcent : (⟨xE, hxW⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
+      have hxW : xE ∈ sylowNormalizerE E P := P.le_normalizer hxE
+      have hxQ : (⟨xE, hxW⟩ : ↥(sylowNormalizerE E P))
+          ∈ sylowSelfE E P :=
+        Subgroup.mem_subgroupOf.mpr hxE
+      have hxcent : (⟨xE, hxW⟩ : ↥(sylowNormalizerE E P))
           ∈ Subgroup.centralizer (K :
-            Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := by
+            Set ↥(sylowNormalizerE E P)) := by
         rw [Subgroup.mem_centralizer_iff]
         intro k hk
         have hgcomm : ((k : ↥E) : G) * (xE : G) = (xE : G) * ((k : ↥E) : G) :=
           Subgroup.mem_centralizer_iff.mp hxc _ (k : ↥E).2
         exact Subtype.ext (Subtype.ext hgcomm)
-      have hbotmem : (⟨xE, hxW⟩ : ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
+      have hbotmem : (⟨xE, hxW⟩ : ↥(sylowNormalizerE E P))
           ∈ Subgroup.centralizer (K :
-            Set ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E)))
-            ⊓ (P.subtype P.le_normalizer : Subgroup ↥(Subgroup.normalizer ((P : Subgroup ↥E) : Set ↥E))) := ⟨hxcent, hxQ⟩
+            Set ↥(sylowNormalizerE E P))
+            ⊓ sylowSelfE E P := ⟨hxcent, hxQ⟩
       rw [hcentbot, Subgroup.mem_bot] at hbotmem
       have hxE1 : xE = 1 := congrArg Subtype.val hbotmem
       rw [Subgroup.mem_bot, hxE1]
@@ -1035,6 +1044,239 @@ theorem SubgroupESetup.E1_isCyclic [Finite G] (hG : IsMinimalSimpleOdd G)
   · by_contra hcon
     exact hpE (Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega))
 
+/-- A subgroup containing the commutator subgroup is normal. -/
+private theorem normal_of_commutator_le {Γ : Type*} [Group Γ] {H : Subgroup Γ}
+    (h : commutator Γ ≤ H) : H.Normal := by
+  refine ⟨fun x hx g => ?_⟩
+  have hcm := Subgroup.commutator_mem_commutator (Subgroup.mem_top g) (Subgroup.mem_top x)
+  rw [commutatorElement_def] at hcm
+  have hc : g * x * g⁻¹ * x⁻¹ ∈ H := h hcm
+  have hgx : g * x * g⁻¹ = g * x * g⁻¹ * x⁻¹ * x := by group
+  rw [hgx]
+  exact H.mul_mem hc hx
+
+/-- `E'` is a `τ₂(M) ∪ τ₃(M)`-group: its primes avoid `τ₁(M)` since they divide `|M'|`. -/
+theorem SubgroupESetup.isPiGroup_tau23_derived [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Ch03.Subgroup.IsPiGroup (tau2 M ∪ tau3 M) (derivedInG E) := by
+  intro p hp
+  have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+  have hpE : p ∈ (Nat.card ↥E).primeFactors := by
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hprime, hp.2.1.trans (Subgroup.card_dvd_of_le (Subgroup.map_subtype_le _)),
+      Nat.card_pos.ne'⟩
+  have hpM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors := by
+    have hled : derivedInG E ≤ derivedInG M := by
+      have hdE : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
+      have hdM : derivedInG M = ⁅(M : Subgroup G), M⁆ := Subgroup.map_subtype_commutator M
+      rw [hdE, hdM]
+      exact Subgroup.commutator_mono h.E_le h.E_le
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hprime, hp.2.1.trans (Subgroup.card_dvd_of_le hled), Nat.card_pos.ne'⟩
+  rcases h.mem_tau_union_of_mem_primeFactors hG hpE with h12 | h3
+  · rcases h12 with h1 | h2
+    · exact absurd hpM' h1.2.1
+    · exact Or.inl h2
+  · exact Or.inr h3
+
+/-- **BG Lemma 12.1(e), normality clause** (mmd L3052): `E₂E₃ ⊴ E`. The join `E₂ ⊔ E₃` is
+a Hall `τ₂ ∪ τ₃`-subgroup of `E` containing the normal `τ₂∪τ₃`-subgroup `E'`, hence
+contains the commutator subgroup and is normal. -/
+theorem SubgroupESetup.E23_normal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    E ≤ Subgroup.normalizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) := by
+  classical
+  haveI hE₃norm : ((E₃.subgroupOf E)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
+  -- `(E₂ ⊔ E₃).subgroupOf E` is a Hall `τ₂ ∪ τ₃`-subgroup of `↥E`
+  have hsgsup : (E₂ ⊔ E₃).subgroupOf E = E₂.subgroupOf E ⊔ E₃.subgroupOf E :=
+    Subgroup.subgroupOf_sup h.E₂_le h.E₃_le
+  have hHall : Ch03.IsHallSubgroup (tau2 M ∪ tau3 M) ((E₂ ⊔ E₃).subgroupOf E) := by
+    constructor
+    · -- π-part: `|E₂' ⊔ E₃'| ∣ |E₂| ⬝ |E₃|`
+      intro p hp
+      have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+      have hdvd : Nat.card ↥((E₂ ⊔ E₃).subgroupOf E)
+          ∣ Nat.card ↥(E₂.subgroupOf E) * Nat.card ↥(E₃.subgroupOf E) := by
+        rw [hsgsup]
+        have hmul := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+          (E₂.subgroupOf E) (E₃.subgroupOf E)
+        rw [← Subgroup.mul_normal] at hmul
+        exact ⟨_, hmul.symm⟩
+      have hpd : p ∣ Nat.card ↥(E₂.subgroupOf E) * Nat.card ↥(E₃.subgroupOf E) :=
+        (Nat.dvd_of_mem_primeFactors hp).trans hdvd
+      rcases hprime.dvd_mul.mp hpd with h2 | h3
+      · exact Or.inl (h.E₂_hall.1 p (Nat.mem_primeFactors.mpr ⟨hprime, h2, Nat.card_pos.ne'⟩))
+      · exact Or.inr (h.E₃_hall.1 p (Nat.mem_primeFactors.mpr ⟨hprime, h3, Nat.card_pos.ne'⟩))
+    · -- index part: the index divides both Hall indices
+      intro p hp
+      rw [Set.mem_union]
+      push Not
+      constructor
+      · refine h.E₂_hall.2 p ?_
+        have hidx : ((E₂ ⊔ E₃).subgroupOf E).index ∣ (E₂.subgroupOf E).index :=
+          Subgroup.index_dvd_of_le (hsgsup ▸ le_sup_left)
+        rw [Nat.mem_primeFactors] at hp ⊢
+        exact ⟨hp.1, hp.2.1.trans hidx, Subgroup.index_ne_zero_of_finite⟩
+      · refine h.E₃_hall.2 p ?_
+        have hidx : ((E₂ ⊔ E₃).subgroupOf E).index ∣ (E₃.subgroupOf E).index :=
+          Subgroup.index_dvd_of_le (hsgsup ▸ le_sup_right)
+        rw [Nat.mem_primeFactors] at hp ⊢
+        exact ⟨hp.1, hp.2.1.trans hidx, Subgroup.index_ne_zero_of_finite⟩
+  -- `commutator ↥E` is a normal `τ₂∪τ₃`-subgroup, hence sits inside the Hall subgroup
+  have hcommpi : Ch03.Subgroup.IsPiGroup (tau2 M ∪ tau3 M) (commutator ↥E) := by
+    intro p hp
+    have hcardeq : Nat.card ↥(commutator ↥E) = Nat.card ↥(derivedInG E) :=
+      Nat.card_congr (Subgroup.equivMapOfInjective (commutator ↥E) E.subtype
+        (Subgroup.subtype_injective E)).toEquiv
+    exact h.isPiGroup_tau23_derived hG p (hcardeq ▸ hp)
+  have hcomm_le : commutator ↥E ≤ (E₂ ⊔ E₃).subgroupOf E :=
+    Ch03.Subgroup.IsPiGroup.normal_le_hall hcommpi hHall
+  haveI : ((E₂ ⊔ E₃).subgroupOf E).Normal := normal_of_commutator_le hcomm_le
+  exact (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le h.E₂_le h.E₃_le)).mp
+    inferInstance
+
+/-- **BG Lemma 12.1(e), product clause** (mmd L3052): `E = E₁E₂E₃`. The join contains a
+Hall subgroup at every prime of `π(E)`, so its index in `E` is `1`. -/
+theorem SubgroupESetup.eq_sup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    E = E₁ ⊔ E₂ ⊔ E₃ := by
+  classical
+  refine le_antisymm ?_ (sup_le (sup_le h.E₁_le h.E₂_le) h.E₃_le)
+  have hidx1 : ((E₁ ⊔ E₂ ⊔ E₃).subgroupOf E).index = 1 := by
+    by_contra hne
+    have hne0 : ((E₁ ⊔ E₂ ⊔ E₃).subgroupOf E).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    obtain ⟨p, hprime, hdvd⟩ := Nat.exists_prime_and_dvd hne
+    haveI : Fact p.Prime := ⟨hprime⟩
+    have hsg : (E₁ ⊔ E₂ ⊔ E₃).subgroupOf E
+        = E₁.subgroupOf E ⊔ E₂.subgroupOf E ⊔ E₃.subgroupOf E := by
+      rw [Subgroup.subgroupOf_sup (sup_le h.E₁_le h.E₂_le) h.E₃_le,
+        Subgroup.subgroupOf_sup h.E₁_le h.E₂_le]
+    have hpE : p ∈ (Nat.card ↥E).primeFactors := by
+      rw [Nat.mem_primeFactors]
+      refine ⟨hprime, hdvd.trans (Subgroup.index_dvd_card _), Nat.card_pos.ne'⟩
+    rcases h.mem_tau_union_of_mem_primeFactors hG hpE with h12 | h3
+    · rcases h12 with h1 | h2
+      · exact h.E₁_hall.2 p (Nat.mem_primeFactors.mpr ⟨hprime,
+          hdvd.trans (Subgroup.index_dvd_of_le (hsg ▸ le_sup_of_le_left le_sup_left)),
+          Subgroup.index_ne_zero_of_finite⟩) h1
+      · exact h.E₂_hall.2 p (Nat.mem_primeFactors.mpr ⟨hprime,
+          hdvd.trans (Subgroup.index_dvd_of_le (hsg ▸ le_sup_of_le_left le_sup_right)),
+          Subgroup.index_ne_zero_of_finite⟩) h2
+    · exact h.E₃_hall.2 p (Nat.mem_primeFactors.mpr ⟨hprime,
+        hdvd.trans (Subgroup.index_dvd_of_le (hsg ▸ le_sup_right)),
+        Subgroup.index_ne_zero_of_finite⟩) h3
+  have htop : (E₁ ⊔ E₂ ⊔ E₃).subgroupOf E = ⊤ := Subgroup.index_eq_one.mp hidx1
+  intro x hx
+  have := htop ▸ Subgroup.mem_top (⟨x, hx⟩ : ↥E)
+  exact Subgroup.mem_subgroupOf.mp this
+
+/-- **BG Lemma 12.1(e), `E₂ ⊴ E₁₂` clause** (mmd L3052): `E₂` is normal in the Hall
+`τ₁∪τ₂`-subgroup `E₁E₂`. Its commutator subgroup is a normal `τ₂`-subgroup (its primes lie
+in `(τ₁∪τ₂) ∩ (τ₂∪τ₃) = τ₂`), hence sits inside the Hall `τ₂`-subgroup `E₂`. -/
+theorem SubgroupESetup.E2_normal_in_E12 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    (E₁ ⊔ E₂ : Subgroup G) ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G) := by
+  classical
+  set J : Subgroup G := E₁ ⊔ E₂ with hJ
+  have hJE : J ≤ E := sup_le h.E₁_le h.E₂_le
+  have hE₂J : E₂ ≤ J := le_sup_right
+  -- `commutator ↥J` is a `τ₂`-group
+  have hcommtau2 : Ch03.Subgroup.IsPiGroup (tau2 M) (commutator ↥J) := by
+    intro p hp
+    have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+    -- `p ∈ τ₁ ∪ τ₂` (inside `J`, a Hall `τ₁∪τ₂`-subgroup)
+    have hcardJ : Nat.card ↥(commutator ↥J) ∣ Nat.card ↥(J.subgroupOf E) := by
+      have h1 : Nat.card ↥(commutator ↥J) ∣ Nat.card ↥J :=
+        Subgroup.card_subgroup_dvd_card (commutator ↥J)
+      have h2 : Nat.card ↥(J.subgroupOf E) = Nat.card ↥J :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hJE).toEquiv
+      rwa [h2]
+    have hp12 : p ∈ tau1 M ∪ tau2 M := h.E₁₂_hall.1 p (Nat.mem_primeFactors.mpr
+      ⟨hprime, (Nat.dvd_of_mem_primeFactors hp).trans hcardJ, Nat.card_pos.ne'⟩)
+    -- `p ∈ τ₂ ∪ τ₃` (the commutator maps into `E'`)
+    have hled : (commutator ↥J).map J.subtype ≤ derivedInG E := by
+      have hdJ : (commutator ↥J).map J.subtype = ⁅J, J⁆ := Subgroup.map_subtype_commutator J
+      have hdE : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
+      rw [hdJ, hdE]
+      exact Subgroup.commutator_mono hJE hJE
+    have hp23 : p ∈ tau2 M ∪ tau3 M := by
+      refine h.isPiGroup_tau23_derived hG p (Nat.mem_primeFactors.mpr ⟨hprime, ?_,
+        Nat.card_pos.ne'⟩)
+      have hcardmap : Nat.card ↥((commutator ↥J).map J.subtype) = Nat.card ↥(commutator ↥J) :=
+        Subgroup.card_map_of_injective (Subgroup.subtype_injective J)
+      exact ((Nat.dvd_of_mem_primeFactors hp).trans (hcardmap ▸ dvd_rfl)).trans
+        (Subgroup.card_dvd_of_le hled)
+    rcases hp12 with h1 | h2
+    · rcases hp23 with h2' | h3'
+      · exact h2'
+      · exact absurd h3'.2.1 h1.2.1
+    · exact h2
+  -- `E₂` is a Hall `τ₂`-subgroup of `J`
+  have hHallJ : Ch03.IsHallSubgroup (tau2 M) (E₂.subgroupOf J) := by
+    constructor
+    · intro p hp
+      have hcard : Nat.card ↥(E₂.subgroupOf J) = Nat.card ↥(E₂.subgroupOf E) := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hE₂J).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv]
+      exact h.E₂_hall.1 p (hcard ▸ hp)
+    · intro p hp
+      refine h.E₂_hall.2 p ?_
+      have hidx : (E₂.subgroupOf J).index ∣ (E₂.subgroupOf E).index :=
+        ⟨(J.subgroupOf E).index, (Subgroup.relIndex_mul_relIndex E₂ J E hE₂J hJE).symm⟩
+      rw [Nat.mem_primeFactors] at hp ⊢
+      exact ⟨hp.1, hp.2.1.trans hidx, Subgroup.index_ne_zero_of_finite⟩
+  have hcomm_le : commutator ↥J ≤ E₂.subgroupOf J :=
+    Ch03.Subgroup.IsPiGroup.normal_le_hall hcommtau2 hHallJ
+  haveI : (E₂.subgroupOf J).Normal := normal_of_commutator_le hcomm_le
+  exact (Subgroup.normal_subgroupOf_iff_le_normalizer hE₂J).mp inferInstance
+
+/-- The complement `E` is nontrivial: `M_σ ≤ M' ⊊ M` for the solvable nontrivial `M`. -/
+theorem SubgroupESetup.E_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    E ≠ ⊥ := by
+  intro hbot
+  have hMσ : S10.Msigma M = M := by
+    have := h.E_compl_sup
+    rwa [hbot, sup_bot_eq] at this
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI : Nontrivial ↥M := by
+    refine (Subgroup.nontrivial_iff_ne_bot M).mpr fun hM => ?_
+    exact S10.Msigma_ne_bot hG h.mem_maximal (hMσ.trans hM)
+  have hcomm : commutator ↥M = ⊤ := by
+    have hled : M ≤ derivedInG M := by
+      have hl := S10.Msigma_le_derived hG h.mem_maximal
+      rwa [hMσ] at hl
+    have hD : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective M)]
+    rw [← hD, eq_top_iff]
+    intro x _
+    exact Subgroup.mem_subgroupOf.mpr (hled x.2)
+  exact absurd hcomm (IsSolvable.commutator_lt_top_of_nontrivial ↥M).ne
+
+/-- **BG Lemma 12.1(c)** (mmd L3053): if `E₂ = 1` then `E₁ ≠ 1` (otherwise `E = E₃ ≤ E'`
+would make the nontrivial solvable `E` perfect). -/
+theorem SubgroupESetup.E1_ne_bot_of_E2_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (h2 : E₂ = ⊥) :
+    E₁ ≠ ⊥ := by
+  intro h1
+  have hE3 : E = E₃ := by
+    have := h.eq_sup hG
+    rwa [h1, h2, bot_sup_eq, bot_sup_eq] at this
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  haveI : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot E).mpr (h.E_ne_bot hG)
+  have hled : E ≤ derivedInG E := hE3 ▸ (hE3 ▸ h.E3_le_derived hG)
+  have hcomm : commutator ↥E = ⊤ := by
+    have hD : (derivedInG E).subgroupOf E = commutator ↥E := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective E)]
+    rw [← hD, eq_top_iff]
+    intro x _
+    exact Subgroup.mem_subgroupOf.mpr (hled x.2)
+  exact absurd hcomm (IsSolvable.commutator_lt_top_of_nontrivial ↥E).ne
+
 /-- **BG Lemma 12.1** (mmd L3035): §12 setup のもと、
 (a) `E'` nilpotent; (b) `E₃ ⊆ E'` かつ `E₃ ⊴ E`; (c) `E₂=1 → E₁≠1`; (d) `E₁`,`E₃` cyclic;
 (e) `E=E₁E₂E₃`, `E₂E₃⊴E`, `E₂⊴E₁₂`; (f) `C_{E₃}(E)=1`;
@@ -1051,8 +1293,15 @@ theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E�
       (E₁ ⊔ E₂ : Subgroup G) ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G)) ∧
     Subgroup.centralizer (E : Set G) ⊓ E₃ = ⊥ ∧
     (∀ p : ℕ, p.Prime → p ∈ tau2 M → ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
-      IsMaximalElementaryAbelian p A ∧ ¬ S10.idealPrime p G) := by
-  sorry
+      IsMaximalElementaryAbelian p A ∧ ¬ S10.idealPrime p G) :=
+  ⟨h.derived_isNilpotent hG,
+   ⟨h.E3_le_derived hG, h.E3_normal hG⟩,
+   h.E1_ne_bot_of_E2_eq_bot hG,
+   ⟨h.E1_isCyclic hG, h.E3_isCyclic hG⟩,
+   ⟨h.eq_sup hG, h.E23_normal hG, h.E2_normal_in_E12 hG⟩,
+   h.centralizer_inf_E3_eq_bot hG,
+   fun _ hprime hp _ hAM hA =>
+     isMaximalElementaryAbelian_of_mem_tau2 hG h.mem_maximal hprime hp hAM hA⟩
 
 /-! ## §12 追加結果 (clean core; 多部分の一部は後続) -/
 

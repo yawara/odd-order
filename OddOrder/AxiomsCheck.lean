@@ -40,6 +40,7 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3391,3 +3392,12 @@ axiom(s):{indentD m!"{bad.toList}"}"
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+/-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
+
+Lemma 12.1 (the easy structure of the complement `E = E₁E₂E₃`) is fully grounded:
+its proof routes Thm 10.2's "`M'/M_σ` nilpotent" through Thm 4.20(a) instead, and the
+per-prime core replaces BG's Frattini argument with Burnside + the mathlib cyclic-Sylow
+commutator dichotomy. No keystone forward axiom is involved. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.subgroupE_basic
