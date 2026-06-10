@@ -1226,3 +1226,47 @@ sorry-free・axiom-clean・leaf green (3452 jobs)。3 commits。S06_CertainTypeC
 `sigma_chiColumn_eq_certainType` (σ(ω_{ij})=δ_j μ_{ij})。**W 整合は sdiff.W ascription で回避済 (再調査するな)。**
 **masking engine = `apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff` (再利用可)。汎用 degree-divisibility =
 `exists_apply_one_eq_card_mul_of_vanishing_off_one` (upstream 候補)。**
+
+## 2026-06-11 (session 23, b-peterfalvi): ✅✅✅ Peterfalvi (4.4) COMPLETE — kernel 特徴付け 両方向 + iff
+
+session 22 が残した「(4.4) kernel 特徴付け」を完全形式化。**μ_{i0} (j=0 列) は ちょうど K⊆ker の Irr(L)**。
+全 `S06_CertainTypeCharacters.lean`、sorry-free・axiom-clean・full build 3630 + AxiomsCheck green。
+2 commits (`be084608` forward, 次=converse+iff)。**§6 frontier = (4.5) に前進。**
+
+### ✅ 着地 (session 23)
+- **forward** `exists_certainType_zero_column_eq_of_subset_characterKernel` (χ∈Irr L, K⊆ker χ ⟹ ∃i, μ_{i0}=χ):
+  χ は L/K(abelian)経由で linear ⟹ Res χ=ω_{i0} on V ⟹ `eq_sigma_of_apply_eq_on_V` で χ=δ_0μ_{i0}=μ_{i0}。
+  - helpers: `instKNormal` (K⊴L を instance 化 → `L ⧸ h.K` が elaborate), `isCyclic_quotient_K` /
+    `isMulCommutative_quotient_K` (L/K≅W₁ via `IsComplement'.QuotientMulEquiv` → cyclic → commutative),
+    `chiColumn_one_apply` (ω_{i0}(w)=(w1CharEquiv i)(wFst w) 値補題)。
+  - linearize: `χ.2.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one h1` で χ̂:L→*ℂˣ。χ̂ は K 上自明
+    (K⊆ker+χ(1)=1)。v=x·y∈V (x∈W₁,y∈W₂⊆K) で χ(v)=χ̂(x)=χ₁(wFst v)、χ₁=χ̂|_{W₁}, i=`w1CharEquiv.symm χ₁`。
+- **converse** `subset_characterKernel_certainType_zero_column` (∀i, K⊆ker μ_{i0}): inflation 全単射で counting。
+  - `card_irreducibleCharacter_quotient_K`: |Irr(L/K)|=w₁ (linearIrr 全単射 [abelian] +
+    `CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity` [Pontryagin] + `QuotientMulEquiv` card)。
+  - `card_kernelContaining_quotient_K`: {χ//K⊆ker}≃Irr(L/K) (inflate 全単射)。
+  - forward で得る単射 Ψ:Irr(L/K)→Fin w₁ が等濃度ゆえ全射 (`Fintype.bijective_iff_injective_and_card`) ⟹
+    μ_{i0}=inflate χ̄ ⟹ `subset_characterKernel_inflate`。
+- **iff** `subset_characterKernel_iff_eq_certainType_zero_column` (capstone, 両方向 bundle)。
+
+### 🔑 KEY / 再調査するな
+- **inflation API は N を explicit auto-bound 第1引数に取る** (`inflate`/`inflate_injective`/
+  `subset_characterKernel_inflate`/`exists_inflate_eq_of_subset_characterKernel`/`inflate_apply_one`) →
+  **必ず `(N := h.K)` を付ける** (付けないと χbar が N スロットに入り型エラー)。
+  `import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter` を S06_CertainTypeCharacters に追加済。
+- **abelian→linear→multiplicative の repo infra は全て既存** (`LinearCharacter.lean`):
+  `IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative` / `map_mul_of_apply_one_eq_one` /
+  `exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one` / `linearIrreducibleCharacter(_apply/_injective)`。
+- **W 整合 (chiColumn_one_apply の値一致)**: `(w1CharEquiv i)` の domain は `W₁.subgroupOf (W₁⊔W₂)`、
+  `wFst` の出力は `W₁.subgroupOf sdiff.W` — defeq だが DFunLike の α が違うので rw の reducible-rfl で閉じない。
+  **`exact congrArg _ hmatch` (default transparency) で閉じる**。`χ1` は sdiff.W 上の subgroupOf で定義し
+  `w1CharEquiv.symm` には defeq cast で渡す。
+
+### ▶▶ 次 = (4.5) [§6 構造定理, Clifford/Ind 機構] → (4.6)-(4.9) → S08 case-B
+- **(4.5)** μ_j=∑_{i} μ_{ij}, χ_j=Res^L_K μ_{ij}∈Irr(K) (Clifford; (4.3.b) で μ_{ij}−μ_{0j} は W−W₂^L 外で消える
+  ⟹ K∩W=W₂ で K 上消失 ⟹ χ_j は i 非依存), Ind^L_K χ_j=μ_j。(b) χ∉{χ_j}⟹Ind^L_K χ∈Irr(L) かつ Irr(L) を尽くす
+  (g∈W₁^# の固定点計数 + [Is]6.32=`ConjugationBrauer` 済 + (1.5.b))。
+- これ以降 (4.6)+ は G-埋込 `CertainTypeHypothesis` + A-set + τ Dade が要 ((4.8) は (3.8) full trichotomy 待ち=§12 defer)。
+
+正本 = 本ノート (session 23)。**Don't re-grind (4.4) — forward/converse/iff 完成・axiom-clean。**
+**inflation API は `(N := h.K)` 必須 (再調査するな)。**
