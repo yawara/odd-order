@@ -64,26 +64,31 @@ Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (�
   (`M_σ⊆M'`), `Msigma_subgroupOf_isHall.coprime_index`+`IsComplement'.index_eq_card` (coprime)。
   原典 (12.17) の `M_σ∩M^g` cyclic 評価は docstring 通り後続。
 
+### ✅ 12.19 COMPLETE (keystone island, commit da142ebf)
+
+- **12.19** `derivedE_centralizes_betaComplement` COMPLETE。⚠ **keystone island** (Cor 10.9(a)
+  `beta_complement_centralizes` 消費ゆえ Prop 10.11(b)(c)(d) と同じ 2 軸に属す; unconditional
+  ではない)。`#assert_axioms_island` 登録、full build 3613 green。実装した具体経路:
+  - **抽象 Key Lemma** `exists_hall_actsTrivially_of_forall_sylow` (private, 再利用可能): A が
+    可解 N に coprime 作用し各 Sylow が Hall π を固定 ⟹ A が Hall π を固定。witness = A-invariant
+    Hall H₀ (`exists_aInvariant_hall`); 各 Sylow D は共役 c•H_D=H₀ (c は D-fixed,
+    `aInvariant_hall_conj`) を固定 ⟹ D が H₀ 固定; 固定元は部分群で全 Sylow を含む ⟹ ⊤
+    (index の各素因子 p で Sylow_p ≤ K ⟹ p∤index)。
+  - **Helper** `exists_hall_subgroupOf_of_full_factorization` (private): C≤Nsub が full π-part を
+    持てば C の Hall π は Nsub の Hall π (factorization 比較)。
+  - **供給**: 各 prime Sylow D_q (image X_G ≤ M' q-group) は Cor 10.9 を r∈β'∩π(M_σ) ごと集めて
+    C_{M_σ}(X_G) が full β'-part ⟹ Helper で Hall β' を中心化。φ:↥E'→*MulAut↥M_σ は
+    `MulDistribMulAction.compHom`+`toMulAut` (S10_LocalLemmas テンプレ)。X_G=⊥ 枝は C=M_σ で
+    Cor 10.9 不要 (∀ prime q を供給する必要があるため)。
+  - 技法メモ: subgroup の MulAut smul は `toMonoidEnd` で展開されるので `show ... = c*h'*c⁻¹` で
+    conj 形に戻す。`Subtype.ext` は `.val` 形を出し `.subtype` 形の hφ_coe と不一致 → `subtype_injective`
+    を使う。`map_subtype_commutator` は bare だと unfold 形を rw 探索 → `have h:derivedInG=⁅,⁆` 経由。
+
 ### ▶ 残り着手可能 leaf (D-lane §12 next frontier)
 
-- **12.19** `derivedE_centralizes_betaComplement`: 「E' は M_σ の Hall β'-部分群を中心化」。
-  coprime-action 証明。**具体経路を特定済 (新規汎用補題は不要、既存 Prop 1.5(c) で閉じる)**:
-  各素数 `r ∈ β'∩π(M_σ)` ごとに **「E' は M_σ の Sylow r を中心化」** を示し、それを Hall β' に
-  束ねる。per-r の核心:
-  1. E'-invariant Sylow r `R` を取る (`exists_aInvariant_hall`, π={r}; E'↷M_σ 共役作用 φ)。
-  2. 各 Sylow `D_q` of E' (q∈π(E')) は M_σ の **ある** Sylow r `R_q` を中心化
-     (Cor 10.9(a) `beta_complement_centralizes`; r,q∈β' distinct で `X≤M'` 枝)。
-  3. `R`, `R_q` は共に D_q-invariant Sylow r ⇒ **`aInvariant_hall_conj` (Prop 1.5(c)) で
-     `R = R_q^c`, `c∈C(D_q)`**。`R_q≤C(D_q)`, `c∈C(D_q)` ⇒ `R=R_q^c≤C(D_q)` ⇒ D_q が R を中心化。
-  4. 全 D_q ⇒ E'=⟨D_q⟩ が R を中心化 ⇒ `C_{M_σ}(E')` が full Sylow r を含む。
-  5. 全 r ⇒ `C_{M_σ}(E')` が full β'-Hall を含む ⇒ その Hall β' `W`(≤C_{M_σ}(E')) が
-     M_σ の Hall β' かつ E'≤C_G(W)。
-  **残実装課題 = plumbing (~120-150 行)**: (a) E'(及び各 D_q)↷M_σ の共役作用 φ:↥E'→*MulAut↥(M_σ)
-  を `normalizerMonoidHom (Msigma M)`+inclusion (E'≤M≤N_G(M_σ)) で構成; (b) Cor 10.9 は G-level、
-  exists_aInvariant_hall/conj は ↥(M_σ)-internal ゆえ Sylow r の ↥M_σ↔G 変換が要; (c) per-r
-  ループの r∈β'∩π(M_σ) 走査と Hall 組立。E' coprime M_σ は E complement of Hall M_σ から。
 - **12.18** `tau1_Malpha_interaction`: 大物 (Thm 1.13 + Thm 3.7(両 landed) + Uniqueness +
-  Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。
+  Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。Cor 10.9(a)(2) 消費なら
+  keystone island になる見込み。S12_E 実 sorry は 12.19 完了で 15。
 
 ## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
 
