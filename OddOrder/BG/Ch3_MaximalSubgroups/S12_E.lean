@@ -2186,6 +2186,199 @@ theorem inf_centralizer_sup_eq_bot_of_le_normalizer {G : Type*} [Group G]
     rwa [hCR, Subgroup.mem_bot] at hmem
   rw [Subgroup.mem_bot, hu1, hv1, mul_one]
 
+/-- **BG Lemma 12.18(a), first conclusion**: under the hypotheses of Lemma 12.18 with `M_α ≠ 1`
+and `q ∉ α(M)`, we have `C_{M_α}(P) ≠ 1`. (The order count `(12.7)` is unnecessary for this half:
+Theorem 3.7 already yields `C_{R₁}(P) ≠ 1` for the characteristic subgroup `R₁ ⊆ R ⊆ M_α`, whence
+`C_{M_α}(P) ⊇ C_{R₁}(P) ≠ 1`.) -/
+theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hqp : q ≠ p) (hp : p ∈ tau1 M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPM : P ≤ M) {Q : Subgroup G} (hQM : Q ≤ M) (hQne : Q ≠ ⊥) (hQq : IsPGroup q ↥Q)
+    (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
+    (hCQP : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hMNQ : maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) ≠ {M})
+    (hαne : S10.Malpha M ≠ ⊥) (hqα : q ∉ S10.alpha M) :
+    S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `P` facts.
+  obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
+  have hPp : IsPGroup p ↥P := hPea.isPGroup
+  have hPcard : Nat.card ↥P = p := by rw [hPcard1, pow_one]
+  have hPne : P ≠ ⊥ := by
+    intro h; rw [h, Subgroup.card_bot] at hPcard
+    have := (Fact.out : p.Prime).one_lt; omega
+  have hpα : p ∉ S10.alpha M := by
+    intro hpa; have h3 := ((S10.mem_alpha_iff M p).mp hpa).2; rw [hp.2.2] at h3; omega
+  -- `α(M)'`-subgroup hypotheses for `P` and `Q`.
+  have hPpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ P := by
+    intro s hs; rw [hPcard, (Fact.out : p.Prime).primeFactors, Finset.mem_singleton] at hs
+    exact hs ▸ hpα
+  have hQpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ Q := by
+    intro s hs
+    obtain ⟨k, hk⟩ := hQq.exists_card_eq
+    rw [hk] at hs
+    have hsp := Nat.prime_of_mem_primeFactors hs
+    have hsq : s = q :=
+      (Nat.prime_dvd_prime_iff_eq hsp Fact.out).mp (hsp.dvd_of_dvd_pow (Nat.dvd_of_mem_primeFactors hs))
+    exact hsq ▸ hqα
+  -- `(12.6)` and `(12.5)`.
+  have h126 : rank ↥(Subgroup.centralizer (P : Set G) ⊓ S10.Malpha M) ≤ 1 :=
+    rank_centralizer_Malpha_le_one_of_not_uniqueMaximal hG hM hPM hPne hPpi
+      (maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1 hG hM hp hPM hPne hPp)
+  have h125 : rank ↥(Subgroup.centralizer (Q : Set G) ⊓ S10.Malpha M) ≤ 1 :=
+    rank_centralizer_Malpha_le_one_of_not_uniqueMaximal hG hM hQM hQne hQpi hMNQ
+  -- some `r ∈ α(M)`.
+  obtain ⟨r, hrα⟩ : ∃ r, r ∈ S10.alpha M := by
+    have hne1 : Nat.card ↥(S10.Malpha M) ≠ 1 := fun h => hαne (Subgroup.card_eq_one.mp h)
+    obtain ⟨r, hrp, hrdvd⟩ := (Nat.card ↥(S10.Malpha M)).exists_prime_and_dvd hne1
+    exact ⟨r, S10.Malpha_isPiGroup M r (Nat.mem_primeFactors.mpr ⟨hrp, hrdvd, Nat.card_pos.ne'⟩)⟩
+  haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors ((S10.mem_alpha_iff M r).mp hrα).1⟩
+  have hqr : q ≠ r := fun h => hqα (h ▸ hrα)
+  have hrp_ne : r ≠ p := fun h => hpα (h ▸ hrα)
+  -- `X := P ⊔ Q` is an `α(M)'`-subgroup of `M`.
+  have hXM : (P ⊔ Q : Subgroup G) ≤ M := sup_le hPM hQM
+  have hPQdisj : P ⊓ Q = ⊥ := by
+    apply OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPp
+    obtain ⟨k, hk⟩ := hQq.exists_card_eq
+    rw [hk]; exact ((Nat.coprime_primes Fact.out Fact.out).mpr hqp).pow_left k
+  have hXcard : Nat.card ↥(P ⊔ Q) = Nat.card ↥P * Nat.card ↥Q :=
+    card_sup_eq_mul_of_le_normalizer_of_disjoint hQinv hPQdisj
+  have hXpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ (P ⊔ Q) := by
+    intro s hs
+    rw [hXcard, Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hs
+    rcases Finset.mem_union.mp hs with h | h
+    · exact hPpi s h
+    · exact hQpi s h
+  -- `R` = a `PQ`-invariant Sylow `r`-subgroup of `M_α` with `r(R) ≥ 3`.
+  obtain ⟨R, hRMa, hRr, hXnormR, hRrank⟩ :=
+    exists_invariant_sylow_Malpha_rank_three hG hM hrα hXM hXpi
+  have hPnormR : P ≤ Subgroup.normalizer (R : Set G) := le_sup_left.trans hXnormR
+  have hQnormR : Q ≤ Subgroup.normalizer (R : Set G) := le_sup_right.trans hXnormR
+  have hRMle : R ≤ M := hRMa.trans (S10.Malpha_le M)
+  -- `Q` does not centralize `R` (else `R ≤ C_{M_α}(Q)` has rank `≥ 3 > 1`).
+  have hQncR : ¬ Q ≤ Subgroup.centralizer (R : Set G) := by
+    intro hQcR
+    have hRleCQ : R ≤ Subgroup.centralizer (Q : Set G) ⊓ S10.Malpha M := by
+      refine le_inf (fun x hxR => ?_) hRMa
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hyQ
+      have hy := hQcR hyQ
+      rw [Subgroup.mem_centralizer_iff] at hy
+      exact (hy x hxR).symm
+    have hrk : (3 : ℕ) ≤ rank ↥(Subgroup.centralizer (Q : Set G) ⊓ S10.Malpha M) :=
+      le_trans hRrank (rank_le_of_injective (Subgroup.inclusion_injective hRleCQ))
+    omega
+  have hRne : R ≠ ⊥ := by
+    rintro rfl
+    refine hQncR fun x _ => ?_
+    rw [Subgroup.coe_bot, Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy; subst hy; rw [one_mul, mul_one]
+  -- `R₁` = Thompson characteristic subgroup of `R`, exponent `r`, not centralized by `Q`.
+  obtain ⟨R₁, hR₁R, hR₁char, hR₁exp, hQncR₁⟩ :=
+    exists_charSubgroup_exponent_not_centralized hG.odd hqr hRr hRne hQq hQnormR hQncR
+  haveI : (R₁.subgroupOf R).Characteristic := hR₁char
+  have hR₁r : IsPGroup r ↥R₁ := by
+    obtain ⟨n, hn⟩ := hRr.exists_card_eq
+    obtain ⟨m, _, hm⟩ := (Nat.dvd_prime_pow Fact.out).mp (hn ▸ Subgroup.card_dvd_of_le hR₁R)
+    exact IsPGroup.of_card hm
+  have hR₁M : R₁ ≤ M := hR₁R.trans hRMle
+  have hNRle : Subgroup.normalizer (R : Set G) ≤ Subgroup.normalizer (R₁ : Set G) := by
+    have h := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+      (K := R) (W := R₁.subgroupOf R)
+    rwa [Subgroup.map_subgroupOf_eq_of_le hR₁R] at h
+  have hPnormR₁ : P ≤ Subgroup.normalizer (R₁ : Set G) := hPnormR.trans hNRle
+  have hQnormR₁ : Q ≤ Subgroup.normalizer (R₁ : Set G) := hQnormR.trans hNRle
+  have hQR₁disj : Q ⊓ R₁ = ⊥ := by
+    apply OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hQq
+    obtain ⟨k, hk⟩ := hR₁r.exists_card_eq
+    rw [hk]; exact ((Nat.coprime_primes Fact.out Fact.out).mpr hqr.symm).pow_left k
+  -- `QR₁` is not nilpotent (`Q` does not centralize `R₁`, but coprime orders would commute).
+  have hQR₁nn : ¬ Group.IsNilpotent ↥(Q ⊔ R₁) := by
+    intro hnil
+    apply hQncR₁
+    intro x hxQ
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hyR₁
+    have hx' : x ∈ Q ⊔ R₁ := Subgroup.mem_sup_left hxQ
+    have hy' : y ∈ Q ⊔ R₁ := Subgroup.mem_sup_right hyR₁
+    have hoxq : ∃ a, orderOf x = q ^ a := by
+      obtain ⟨a, ha⟩ := IsPGroup.iff_orderOf.mp hQq ⟨x, hxQ⟩
+      exact ⟨a, by rw [← ha]; exact orderOf_injective Q.subtype Q.subtype_injective ⟨x, hxQ⟩⟩
+    have hoyr : ∃ b, orderOf y = r ^ b := by
+      obtain ⟨b, hb⟩ := IsPGroup.iff_orderOf.mp hR₁r ⟨y, hyR₁⟩
+      exact ⟨b, by rw [← hb]; exact orderOf_injective R₁.subtype R₁.subtype_injective ⟨y, hyR₁⟩⟩
+    have hcop : Nat.Coprime (orderOf (⟨x, hx'⟩ : ↥(Q ⊔ R₁))) (orderOf (⟨y, hy'⟩ : ↥(Q ⊔ R₁))) := by
+      have hxo : orderOf (⟨x, hx'⟩ : ↥(Q ⊔ R₁)) = orderOf x :=
+        (orderOf_injective (Q ⊔ R₁).subtype (Q ⊔ R₁).subtype_injective ⟨x, hx'⟩).symm
+      have hyo : orderOf (⟨y, hy'⟩ : ↥(Q ⊔ R₁)) = orderOf y :=
+        (orderOf_injective (Q ⊔ R₁).subtype (Q ⊔ R₁).subtype_injective ⟨y, hy'⟩).symm
+      rw [hxo, hyo]
+      obtain ⟨a, ha⟩ := hoxq; obtain ⟨b, hb⟩ := hoyr
+      rw [ha, hb]
+      exact (((Nat.coprime_primes Fact.out Fact.out).mpr hqr).pow_left a).pow_right b
+    have hcomm := S10.commute_of_coprime_orderOf_of_isNilpotent hcop
+    have hxy : x * y = y * x := by simpa using congrArg Subtype.val hcomm
+    exact hxy.symm
+  -- `C_{R₁}(P) ≠ 1` (else Theorem 3.7 makes `QR₁` nilpotent).
+  have hCR₁Pne : R₁ ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ := by
+    intro hCR₁P
+    apply hQR₁nn
+    have hFPFbot : (Q ⊔ R₁) ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
+      inf_centralizer_sup_eq_bot_of_le_normalizer hQinv hPnormR₁ hQnormR₁ hQR₁disj hCQP hCR₁P
+    have hYM : (Q ⊔ R₁) ⊔ P ≤ M := sup_le (sup_le hQM hR₁M) hPM
+    haveI : IsSolvable ↥((Q ⊔ R₁) ⊔ P) :=
+      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hYM).toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hYM).surjective
+    have hQR₁card : Nat.card ↥(Q ⊔ R₁) = Nat.card ↥Q * Nat.card ↥R₁ :=
+      card_sup_eq_mul_of_le_normalizer_of_disjoint hQnormR₁ hQR₁disj
+    have hQR₁cop : (Nat.card ↥(Q ⊔ R₁)).Coprime p := by
+      rw [hQR₁card]
+      have h1 : (Nat.card ↥Q).Coprime p := by
+        obtain ⟨k, hk⟩ := hQq.exists_card_eq
+        rw [hk]; exact ((Nat.coprime_primes Fact.out Fact.out).mpr hqp).pow_left k
+      have h2 : (Nat.card ↥R₁).Coprime p := by
+        obtain ⟨k, hk⟩ := hR₁r.exists_card_eq
+        rw [hk]; exact ((Nat.coprime_primes Fact.out Fact.out).mpr hrp_ne).pow_left k
+      exact Nat.coprime_comm.mp
+        (Nat.Coprime.mul_right (Nat.coprime_comm.mp h1) (Nat.coprime_comm.mp h2))
+    refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+      (N := Q ⊔ R₁) (R := P) ?_ ?_ ?_ hPne ⟨p, Fact.out, hPcard⟩ ?_
+    · exact (le_inf hQinv hPnormR₁).trans (Subgroup.normalizer_inf_normalizer_le_normalizer_sup Q R₁)
+    · rw [disjoint_iff, inf_comm]
+      exact OddOrder.BG.Ch1.S01.inf_eq_bot_of_pGroup_coprime hPp hQR₁cop
+    · exact fun h => hQne (le_bot_iff.mp (le_sup_left.trans h.le))
+    · intro a haP ha1 n hn hn1 hfix
+      have hcomm_an : Commute a n := mul_inv_eq_iff_eq_mul.mp hfix
+      have hzpa : Subgroup.zpowers a = P := by
+        have hle : Subgroup.zpowers a ≤ P := by rw [Subgroup.zpowers_le]; exact haP
+        have horder : orderOf a = p := by
+          have hdvd : orderOf a ∣ p := hPcard ▸ Subgroup.orderOf_dvd_natCard P haP
+          rcases (Nat.dvd_prime Fact.out).mp hdvd with h | h
+          · exact absurd (orderOf_eq_one_iff.mp h) ha1
+          · exact h
+        have hcard : Nat.card ↥(Subgroup.zpowers a) = Nat.card ↥P := by
+          rw [Nat.card_zpowers, horder, hPcard]
+        exact Subgroup.eq_of_le_of_card_ge hle (le_of_eq hcard.symm)
+      have hnC : n ∈ Subgroup.centralizer (P : Set G) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro b hbP
+        rw [← hzpa] at hbP
+        obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hbP
+        exact (hcomm_an.zpow_left k).eq
+      have hmem : n ∈ (Q ⊔ R₁) ⊓ Subgroup.centralizer (P : Set G) := ⟨hn, hnC⟩
+      rw [hFPFbot, Subgroup.mem_bot] at hmem
+      exact hn1 hmem
+  -- `C_{M_α}(P) ⊇ C_{R₁}(P) ≠ 1`.
+  intro hCMaP
+  apply hCR₁Pne
+  rw [eq_bot_iff]
+  calc R₁ ⊓ Subgroup.centralizer (P : Set G)
+      ≤ S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) :=
+        inf_le_inf_right _ (hR₁R.trans hRMa)
+    _ = ⊥ := hCMaP
+
 /-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
 `P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
 (a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
