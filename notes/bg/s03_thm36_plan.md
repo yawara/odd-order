@@ -500,3 +500,38 @@ scaffold 唯一 real sorry = (3.18)–(3.38)。(3.17) は **Prop 1.4 / [N,R]≅N
   部分群」は mathlib `IsCyclic` API (`IsPGroup.isCyclic_of_isZGroup` + cyclic p-群の部分群一意性
   `IsCyclic.card_orderOf_eq_totient` 系? 要探索) か ⟨x⟩·C_V(R₀) rank-2 で Z-群 Sylow-cyclic 矛盾。
 - 正本 = 本ファイル「session 7 cont.」。scaffold 1090 行、leaf build 3017 green。
+
+## ✅ 2026-06-10 session 7 cont.² (a-keystone): **(3.18) COMPLETE** (scaffold 1323 行, leaf 3017 green)
+
+上記プラン通り着地。`h318 : ((K.map H.subtype) ⊔ R₀) ⊓ centralizer (V.map H.subtype : Set G) = ⊥`。
+`obtain ⟨r, hr_prime, hr_card⟩ := hR₀p` を h318 の**直前**で展開済 (以降のフェーズでも r 使用可)。
+
+実装メモ (プラン との差分・GOTCHA):
+- `hS₁norm : S₁ ≤ normalizer (KG : Set G)`: R₀ 側は `mem_normalizer_iff` を **G-element レベル**で
+  (x : G は subtype でないので Subtype.ext 不可); 逆向きは witness `(φ ⟨g⟩)⁻¹ k` +
+  `MulAut.apply_inv_self` + `mul_left_cancel (mul_right_cancel ·)`。
+- `hcompl₁` は (3.6) S-block のコピーパターンそのまま。`hr_ndvd_K : ¬ r ∣ |K|` は
+  `Nat.Coprime.eq_one_of_dvd (hHall.coprime_dvd_left ·) ·`。
+- `hC'norm` ((S₁ ⊓ C_G(V_G)).subgroupOf S₁ ⊴ ↥S₁): V_G ⊴ G は **手動 conj_mem** (h38 の
+  X-normality パターン; instance 自動発火せず)、centralizer 部は calc 3 段。
+- **|C'| ∣ r**: 埋め込み `(mk' KG').comp (C.subgroupOf S₁).subtype` + ker=⊥ (hCK) +
+  **`Subgroup.card_dvd_of_injective`** (⚠ `Nat.card_dvd_of_injective` は存在しない) +
+  `hquot_card : |S₁/KG'| = r` (card_eq_card_quotient_mul + hcompl₁.card_mul + cancel)。
+- **C' = R₀' (|C'|=r 枝)**: C'≠R₀' なら C'⊓R₀'=⊥ (prime order ⟹ ⊥ or 等しい,
+  `Nat.dvd_prime`+`eq_of_le_of_card_ge`) ⟹ R₀'↪S₁/C' injective ⟹ r ∣ |S₁/C'| ⟹
+  r² ∣ |S₁| = |K|·r (`Nat.mul_dvd_mul_iff_right hr_prime.pos`) ⟹ r ∣ |K| 矛盾。
+- 結末: R₀' = C' ⊴ ↥S₁ ⟹ `⁅KG',R₀'⁆ ≤ KG'⊓R₀' = ⊥` (`commutator_le_left/right` + 両 Normal) ⟹
+  elementwise (`commutator_mem_commutator` + `commutatorElement_eq_one_iff_commute` + val) で
+  KG ≤ C_G(R₀) ⟹ **h317 矛盾**。
+
+### ▶ 次セッション = (3.19) から (プラン上記「session 7 cont.」(3.19) 項参照)
+- 入口: thm34 への bridge。G' := ↥S₁ (= ↥(K_G ⊔ R₀)、h318 の S₁ をそのまま再利用 —
+  hKG'norm/hcompl₁/hKG'card/hR₀'card/hr_ndvd_K は h318 内 local なので**再構築要** (h318 の外へ
+  hoist するか (3.19) 内で再演)。⚠ hoist する場合 leaf build で順序確認)。
+- V-module 化: `IsElementaryAbelian.zmodModule` (PRank:87) + conj-rep は
+  **AppA_PStability:1541 / S03c_Thm37:90 パターン** (`Representation.ofDistribMulAction`)。
+- hchar : (|↥S₁| : ZMod p) ≠ 0 ⟸ p ∤ |S₁| = |K|·r ⟸ hK'p' (p∤|K|) + p ≠ r
+  (p ∣ |V| ∣ |H| would-be... r ∣ |R|, hHall ⟹ p≠r; |V|=p^a, a≥1? **V ≠ ⊥ 要**: V=F(H)≠⊥
+  ⟸ H ≠ ⊥... H≠⊥ は hcounter から (H=⊥ なら ⁅H,R⁆=⊥ plen1) — どこかで `hV_ne_bot` を確立)。
+- thm34 結論 `∀ g ∈ ⁅R₀',K'⁆, ρ g = 1` → ⁅R₀,K_G⁆ ≤ S₁ ⊓ C_G(V_G) `=h318=` ⊥ → h317 矛盾。
+- その後 (3.19) 後半 (Z-群 ⟹ |C_V(R₀)|=p) → (3.20) → (3.21) → Phase D。
