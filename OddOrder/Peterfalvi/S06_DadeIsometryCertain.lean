@@ -185,6 +185,229 @@ theorem exists_zpow_proj :
     rw [hn, zpow_sub, zpow_one, zpow_mul, hx1, one_zpow, inv_one, mul_one]
   rw [hxn, hyn, mul_one]
 
+/- 4.3 (a): `W − W₂` is TI in `L` and Hypothesis (3.1) holds for `L` (mmd 04.6 L17, L25) -/
+
+/-- **Peterfalvi (4.3)(a), centralizer form** (mmd 04.6 proof L25): for `x ∈ W₁^#`,
+`C_L(x) = W = W₁ ⊔ W₂`.  `⊇`: `W₁` is abelian and `W₂` centralizes `W₁` (4.2.b).  `⊆`:
+write `c = k·u` with `k ∈ K`, `u ∈ W₁` (complement); conjugation by `c` fixes `x` and
+`u` commutes with `x` (`W₁` abelian), so `k ∈ C_K(x) = W₂` (4.2.b) and
+`c = k·u ∈ W₂·W₁ ⊆ W`. -/
+theorem centralizer_eq_sup {x : L} (hx : x ∈ h.W1) (hx1 : x ≠ 1) :
+    Subgroup.centralizer ({x} : Set L) = h.W1 ⊔ h.W2 := by
+  refine le_antisymm ?_ (sup_le ?_ ?_)
+  · intro c hc
+    obtain ⟨⟨⟨kk, hk⟩, ⟨u, hu⟩⟩, hku, -⟩ :=
+      Subgroup.IsComplement.existsUnique h.isComplement c
+    change kk * u = c at hku
+    have hxc : x * c = c * x := Subgroup.mem_centralizer_iff.mp hc x rfl
+    have hxu : Commute x u := commute_of_mem_of_isCyclic h.W1_cyclic hx hu
+    have hxk : x * kk = kk * x := by
+      have h1 : x * kk * u = kk * x * u := by
+        calc x * kk * u = x * (kk * u) := by rw [mul_assoc]
+          _ = (kk * u) * x := by rw [hku]; exact hxc
+          _ = kk * (u * x) := by rw [mul_assoc]
+          _ = kk * (x * u) := by rw [← hxu.eq]
+          _ = kk * x * u := by rw [← mul_assoc]
+      exact mul_right_cancel h1
+    have hkW2 : kk ∈ h.W2 := by
+      have hkc : kk ∈ Subgroup.centralizer ({x} : Set L) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro z hz
+        rw [Set.mem_singleton_iff] at hz
+        subst hz
+        exact hxk
+      rw [← h.centralizer_W2 x hx hx1]
+      exact Subgroup.mem_inf.mpr ⟨hkc, hk⟩
+    rw [← hku]
+    exact Subgroup.mul_mem _ ((le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2) hkW2)
+      ((le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) hu)
+  · intro w hw
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff] at hz
+    subst hz
+    exact (commute_of_mem_of_isCyclic h.W1_cyclic hx hw).eq
+  · intro w hw
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff] at hz
+    subst hz
+    exact (h.commute_of_mem_W1_of_mem_W2 hx hw).eq
+
+/-- **Peterfalvi (4.3)(a), TI part** (mmd 04.6 L17, proof L25): `W − W₂` is a TI-subset
+of `L` relative to `W = W₁ ⊔ W₂`.  For `g ∈ L` and `a = x·y ∈ W − W₂` (`x ∈ W₁^#`,
+`y ∈ W₂`) with `g·a·g⁻¹ ∈ W − W₂`: the Bézout projection (`exists_zpow_proj`) recovers
+`x = a^n` and shows `g·x·g⁻¹ = (g·a·g⁻¹)^n ∈ W₁`; writing `g = k·u` (complement) and
+using that `W₁` is abelian and `K ⊴ L`, the commutator `g·x·g⁻¹·x⁻¹` lies in
+`K ⊓ W₁ = ⊥` (this is the textbook step `x^g ∈ Kx ∩ W₁ = {x}` since `L/K` is abelian),
+so `g` centralizes `x` and `g ∈ C_L(x) = W` (`centralizer_eq_sup`). -/
+theorem isTISubset_sup_sdiff :
+    OddOrder.GroupTheory.IsTISubset
+      ((↑(h.W1 ⊔ h.W2) : Set L) \ ↑h.W2) (h.W1 ⊔ h.W2) := by
+  obtain ⟨n, hn⟩ := h.exists_zpow_proj
+  rintro g ⟨a, ha, hga⟩
+  obtain ⟨x, hx, y, hy, hxy⟩ := h.exists_mul_of_mem_sup ha.1
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    exact ha.2 (by rw [← hxy, one_mul]; exact hy)
+  have hxa : a ^ n = x := by rw [← hxy]; exact hn x hx y hy
+  obtain ⟨x', hx', y', hy', hxy'⟩ := h.exists_mul_of_mem_sup hga.1
+  have hxa' : (g * a * g⁻¹) ^ n = x' := by rw [← hxy']; exact hn x' hx' y' hy'
+  have hgx : g * x * g⁻¹ = x' := by
+    rw [← hxa, ← hxa']
+    have hmz := map_zpow (MulAut.conj g) a n
+    simp only [MulAut.conj_apply] at hmz
+    exact hmz
+  obtain ⟨⟨⟨kk, hk⟩, ⟨u, hu⟩⟩, hku, -⟩ :=
+    Subgroup.IsComplement.existsUnique h.isComplement g
+  change kk * u = g at hku
+  have hux : u * x * u⁻¹ = x := by
+    have hc := commute_of_mem_of_isCyclic h.W1_cyclic hu hx
+    rw [hc.eq]
+    exact mul_inv_cancel_right x u
+  have hkappaK : g * x * g⁻¹ * x⁻¹ ∈ h.K := by
+    have hexp : g * x * g⁻¹ * x⁻¹ = kk * (u * x * u⁻¹) * kk⁻¹ * x⁻¹ := by
+      rw [← hku]; group
+    rw [hexp, hux]
+    have hexp2 : kk * x * kk⁻¹ * x⁻¹ = kk * (x * kk⁻¹ * x⁻¹) := by group
+    rw [hexp2]
+    exact Subgroup.mul_mem _ hk (h.K_normal.conj_mem _ (Subgroup.inv_mem _ hk) x)
+  have hkappaW1 : g * x * g⁻¹ * x⁻¹ ∈ h.W1 := by
+    rw [hgx]
+    exact Subgroup.mul_mem _ hx' (Subgroup.inv_mem _ hx)
+  have hgxx : g * x * g⁻¹ = x := by
+    have hbot : g * x * g⁻¹ * x⁻¹ ∈ h.K ⊓ h.W1 := ⟨hkappaK, hkappaW1⟩
+    rw [disjoint_iff.mp h.isComplement.disjoint, Subgroup.mem_bot] at hbot
+    exact mul_inv_eq_one.mp hbot
+  have hgc : g ∈ Subgroup.centralizer ({x} : Set L) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff] at hz
+    rw [hz]
+    calc x * g = (g * x * g⁻¹) * g := by rw [hgxx]
+      _ = g * x := by group
+  rw [h.centralizer_eq_sup hx hx1] at hgc
+  exact hgc
+
+open scoped IsMulCommutative in
+/-- `W = W₁ × W₂` as an internal direct product: multiplication is a group isomorphism
+from the product of the `subgroupOf` copies onto `W = W₁ ⊔ W₂` (mirror of
+`TICyclicHypothesis.wProdEquiv` at the (4.2) level — available *before* the
+TI-cyclic hypothesis for `L` is assembled, and used to count `|W| = |W₁|·|W₂|`). -/
+noncomputable def supMulEquiv :
+    (h.W1.subgroupOf (h.W1 ⊔ h.W2)) × (h.W2.subgroupOf (h.W1 ⊔ h.W2)) ≃*
+      ↥(h.W1 ⊔ h.W2) :=
+  haveI := h.isMulCommutative_sup
+  MulEquiv.ofBijective
+    (MonoidHom.coprod (h.W1.subgroupOf (h.W1 ⊔ h.W2)).subtype
+      (h.W2.subgroupOf (h.W1 ⊔ h.W2)).subtype) <| by
+    constructor
+    · rw [injective_iff_map_eq_one]
+      rintro ⟨a, b⟩ hab
+      rw [MonoidHom.coprod_apply, Subgroup.coe_subtype, Subgroup.coe_subtype] at hab
+      have hain : (a : ↥(h.W1 ⊔ h.W2)) ∈
+          h.W1.subgroupOf (h.W1 ⊔ h.W2) ⊓ h.W2.subgroupOf (h.W1 ⊔ h.W2) := by
+        refine ⟨a.2, ?_⟩
+        have hinv : (a : ↥(h.W1 ⊔ h.W2)) = ((b : ↥(h.W1 ⊔ h.W2)))⁻¹ :=
+          mul_eq_one_iff_eq_inv.mp hab
+        rw [hinv]
+        exact (h.W2.subgroupOf (h.W1 ⊔ h.W2)).inv_mem b.2
+      rw [h.W1_subgroupOf_inf_W2_subgroupOf_eq_bot, Subgroup.mem_bot] at hain
+      have hb1 : (b : ↥(h.W1 ⊔ h.W2)) = 1 := by rw [hain, one_mul] at hab; exact hab
+      exact Prod.ext (Subtype.ext hain) (Subtype.ext hb1)
+    · intro w
+      have hw : w ∈ h.W1.subgroupOf (h.W1 ⊔ h.W2) ⊔ h.W2.subgroupOf (h.W1 ⊔ h.W2) := by
+        rw [h.W1_subgroupOf_sup_W2_subgroupOf_eq_top]
+        exact Subgroup.mem_top w
+      rw [Subgroup.mem_sup] at hw
+      obtain ⟨x, hx, y, hy, hxy⟩ := hw
+      refine ⟨(⟨x, hx⟩, ⟨y, hy⟩), ?_⟩
+      rw [MonoidHom.coprod_apply, Subgroup.coe_subtype, Subgroup.coe_subtype]
+      exact hxy
+
+/-- The order count `|W| = |W₁| · |W₂|` for `W = W₁ ⊔ W₂`, via `supMulEquiv`. -/
+theorem card_sup_eq_mul :
+    Nat.card ↥(h.W1 ⊔ h.W2) = Nat.card h.W1 * Nat.card h.W2 :=
+  calc Nat.card ↥(h.W1 ⊔ h.W2)
+      = Nat.card ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) ×
+          (h.W2.subgroupOf (h.W1 ⊔ h.W2))) :=
+        (Nat.card_congr h.supMulEquiv.toEquiv).symm
+    _ = Nat.card (h.W1.subgroupOf (h.W1 ⊔ h.W2)) *
+          Nat.card (h.W2.subgroupOf (h.W1 ⊔ h.W2)) := Nat.card_prod _ _
+    _ = Nat.card h.W1 * Nat.card h.W2 := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+            (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2)).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+            (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2)).toEquiv]
+
+/-- **Peterfalvi (4.2)(c)/(3.1) cyclicity**: `W = W₁ ⊔ W₂` is cyclic — it is the
+internal direct product of the cyclic groups `W₁`, `W₂` of coprime orders, so the
+product of two generators has order `|W₁|·|W₂| = |W|` (`card_sup_eq_mul`). -/
+theorem isCyclic_sup [Finite L] : IsCyclic ↥(h.W1 ⊔ h.W2) := by
+  haveI hc1 := h.W1_cyclic
+  haveI hc2 := h.W2_cyclic
+  obtain ⟨a, ha⟩ := IsCyclic.exists_generator (α := ↥h.W1)
+  obtain ⟨b, hb⟩ := IsCyclic.exists_generator (α := ↥h.W2)
+  have hoa : orderOf (Subgroup.inclusion (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) a) =
+      Nat.card h.W1 := by
+    rw [orderOf_injective _ (Subgroup.inclusion_injective _) a,
+      orderOf_eq_card_of_forall_mem_zpowers ha]
+  have hob : orderOf (Subgroup.inclusion (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2) b) =
+      Nat.card h.W2 := by
+    rw [orderOf_injective _ (Subgroup.inclusion_injective _) b,
+      orderOf_eq_card_of_forall_mem_zpowers hb]
+  have hcomm : Commute (Subgroup.inclusion (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) a)
+      (Subgroup.inclusion (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2) b) :=
+    Subtype.ext (h.commute_of_mem_W1_of_mem_W2 a.2 b.2)
+  refine isCyclic_of_orderOf_eq_card
+    (Subgroup.inclusion (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) a *
+      Subgroup.inclusion (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2) b) ?_
+  rw [hcomm.orderOf_mul_eq_mul_orderOf_of_coprime
+      (by rw [hoa, hob]; exact h.coprime_card_W1_card_W2),
+    hoa, hob, h.card_sup_eq_mul]
+
+open scoped IsMulCommutative in
+/-- **Peterfalvi (4.3)(a), second half** (mmd 04.6 L17): Hypothesis (3.1) holds with
+`L` in place of `G` — `W = W₁ ⊔ W₂` with `V = W − (W₁ ∪ W₂)` is a TI-cyclic
+normalizer setup inside `L`.  The TI property of `V` follows from that of the larger
+set `W − W₂` (`isTISubset_sup_sdiff` + `IsTISubset.subset`), `W` normalizes `V`
+because `W` is abelian, and `W` is cyclic by `isCyclic_sup`.  Through this
+constructor the entire §5 σ-machinery ((3.2)-(3.9), `S05_SigmaIsometry`) applies
+with `L` as the ambient group, as required by (4.3.b). -/
+noncomputable def toTICyclicHypothesis [Fintype L] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis L where
+  W := h.W1 ⊔ h.W2
+  W1 := h.W1
+  W2 := h.W2
+  W1_le_W := le_sup_left
+  W2_le_W := le_sup_right
+  W1_nontrivial := h.W1_nontrivial
+  W2_nontrivial := h.W2_nontrivial
+  W_sup := rfl
+  W_disjoint := h.W_disjoint
+  W_card_coprime := h.coprime_card_W1_card_W2
+  W_card_odd := h.W_odd
+  W_cyclic := h.isCyclic_sup
+  V := (↑(h.W1 ⊔ h.W2) : Set L) \ (↑h.W1 ∪ ↑h.W2)
+  V_subset_sharp := by
+    rintro v ⟨hvW, hv⟩
+    rw [OddOrder.Peterfalvi.S04.mem_sharp]
+    exact ⟨Set.mem_univ v,
+      fun heq => hv (by rw [heq]; exact Or.inl (Subgroup.one_mem h.W1))⟩
+  V_subset_W := fun v hv => hv.1
+  W_normalizes_V := by
+    intro w v hv
+    haveI := h.isMulCommutative_sup
+    have h1 : (⟨v, hv.1⟩ : ↥(h.W1 ⊔ h.W2)) * w = w * ⟨v, hv.1⟩ := mul_comm _ _
+    have h2 : (w : L) * v = v * (w : L) := (Subtype.ext_iff.mp h1).symm
+    have h3 : (w : L) * v * (w : L)⁻¹ = v := by
+      rw [h2]
+      exact mul_inv_cancel_right v w
+    rw [h3]
+    exact hv
+  V_ti := h.isTISubset_sup_sdiff.subset
+    (fun v hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩)
+
 end Hypothesis
 
 section CertainType
