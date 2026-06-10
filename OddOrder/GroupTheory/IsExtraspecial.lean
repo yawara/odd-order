@@ -98,6 +98,49 @@ theorem isPGroup (h : IsSpecial p G) : IsPGroup p G := h.1
 theorem of_isElementaryAbelian (h : IsElementaryAbelian p G) : IsSpecial p G :=
   ⟨h.isPGroup, Or.inl h⟩
 
+/-- **`IsSpecial` transports along group isomorphisms** (each ingredient — `p`-group,
+elementary abelian, commutator, centre, Frattini — corresponds under `e`). -/
+theorem of_mulEquiv {H : Type*} [Group H] (e : G ≃* H) (h : IsSpecial p G) : IsSpecial p H := by
+  obtain ⟨hpg, hcase⟩ := h
+  refine ⟨hpg.of_injective e.symm.toMonoidHom e.symm.injective, ?_⟩
+  rcases hcase with hEA | ⟨hcomm, hfrat, hZEA⟩
+  · exact Or.inl (IsElementaryAbelian.of_mulEquiv e hEA)
+  refine Or.inr ?_
+  have hcenter : (Subgroup.center G).map e.toMonoidHom = Subgroup.center H := by
+    ext x
+    simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom]
+    constructor
+    · rintro ⟨z, hz, rfl⟩
+      rw [Subgroup.mem_center_iff] at hz ⊢
+      intro g
+      calc g * e z = e (e.symm g * z) := by rw [map_mul, e.apply_symm_apply]
+        _ = e (z * e.symm g) := by rw [hz (e.symm g)]
+        _ = e z * g := by rw [map_mul, e.apply_symm_apply]
+    · intro hx
+      refine ⟨e.symm x, ?_, e.apply_symm_apply x⟩
+      rw [Subgroup.mem_center_iff] at hx ⊢
+      intro g
+      apply e.injective
+      rw [map_mul, map_mul, e.apply_symm_apply]
+      exact hx (e g)
+  have hcommutator : (commutator G).map e.toMonoidHom = commutator H := by
+    rw [commutator_def, commutator_def, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ e.surjective]
+  have hfrattini : (frattini G).map e.toMonoidHom = frattini H := by
+    refine le_antisymm ?_ ?_
+    · rw [Subgroup.map_le_iff_le_comap]
+      exact frattini_le_comap_frattini_of_surjective e.surjective
+    · have h2 := frattini_le_comap_frattini_of_surjective
+        (φ := e.symm.toMonoidHom) e.symm.surjective
+      rwa [Subgroup.map_equiv_eq_comap_symm']
+  refine ⟨?_, ?_, ?_⟩
+  · rw [← hcommutator, hcomm]
+    exact hcenter
+  · rw [← hfrattini, hfrat]
+    exact hcenter
+  · rw [← hcenter]
+    exact Subgroup.IsElementaryAbelian.map e.injective hZEA
+
 end IsSpecial
 
 namespace IsExtraspecial
