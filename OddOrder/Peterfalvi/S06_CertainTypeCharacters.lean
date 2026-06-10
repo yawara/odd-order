@@ -119,6 +119,26 @@ theorem omegaColumnDiff_inner_omega_ne (hyp : TICyclicHypothesis L)
     hyp.omega_inner_ne (hyp.omegaProdChar_ne (fun h => hχ₁ h.1.symm))]
   ring
 
+/-- A virtual character `ψ` of a finite group `H` that vanishes off the identity has degree
+divisible by `|H|`: `ψ(1) = |H|·m` for some integer `m` (the multiplicity `⟨ψ, 1_H⟩` of the
+trivial character).  The masking sum `|H|·⟨ψ, 1_H⟩ = ∑_x ψ(x)` collapses to the single
+identity term. -/
+theorem exists_apply_one_eq_card_mul_of_vanishing_off_one {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] {ψ : ClassFunction H ℂ} (hψ : ψ ∈ ZIrr H)
+    (hvan : ∀ x : H, x ≠ 1 → ψ x = 0) :
+    ∃ m : ℤ, ψ 1 = (Nat.card H : ℂ) * (m : ℂ) := by
+  obtain ⟨m, hm⟩ :=
+    ClassFunction.inner_mem_ZIrr_int hψ (trivialClassFunction_isIrreducible (G := H)).mem_ZIrr
+  refine ⟨m, ?_⟩
+  have hsum : ClassFunction.innerSum ψ (trivialClassFunction H) = ψ 1 := by
+    rw [ClassFunction.innerSum,
+      Finset.sum_eq_single (1 : H) (fun b _ hb => by rw [hvan b hb, zero_mul])
+        (fun hb => absurd (Finset.mem_univ (1 : H)) hb),
+      trivialClassFunction_apply, star_one, mul_one]
+  have hcard := ClassFunction.card_mul_inner ψ (trivialClassFunction H)
+  rw [hsum, hm] at hcard
+  exact hcard.symm
+
 namespace Hypothesis
 
 variable (h : Hypothesis L)
@@ -837,6 +857,70 @@ theorem certainType_vanishes_of_ne [NeZero (Nat.card h.W1)]
     (f := ClassFunction.restrict h.sdiffTICyclicHypothesis.W (μ : ClassFunction L ℂ))
     (fun l k => h.inner_omegaColumnDiff_restrict_eq_zero hμ l k) hv
   rwa [ClassFunction.restrict_apply] at hres
+
+/-- **Peterfalvi (4.3.d)** (the degree congruence).  `μ_{ij}(1) ≡ δ_j (mod w₁)`: there is an
+integer `a` with `μ_{ij}(1) = δ_j + a·w₁`.
+
+The class function `ψ = Res_{W₁}(μ_{ij}) − δ_j·Res_{W₁}(ω_{ij})` on `W₁` (both restrictions
+taken inside `W`, so the proof never leaves `↥W`) is a virtual character that vanishes on
+`W₁^# ⊆ W − W₂` (the (4.3.c) value identity), hence `ψ(1) = w₁·m` for some integer `m`
+(`exists_apply_one_eq_card_mul_of_vanishing_off_one`).  Evaluating `ψ(1) = μ_{ij}(1) − δ_j`
+(both `ω_{ij}` and the restriction are degree-preserving at `1`) gives the congruence. -/
+theorem certainType_degree_modEq [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ∃ a : ℤ, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) 1
+      = ((h.columnFamily χ₂).sign : ℂ) + (Nat.card h.W1 : ℂ) * (a : ℂ) := by
+  classical
+  haveI : Finite L := Finite.of_fintype L
+  haveI : Fintype ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) := Fintype.ofFinite _
+  have hcard : Nat.card ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) = Nat.card h.W1 :=
+    Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe h.sdiffTICyclicHypothesis.W1_le_W).toEquiv
+  haveI : Invertible (Nat.card ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) : ℂ) :=
+    invertibleOfNonzero (by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne')
+  -- `ψ = Res_{W₁⊆W}(Res_W μ_{ij}) − δ_j · Res_{W₁⊆W}(ω_{ij})`, a class function on `↥(W₁ ∩ W)`
+  set ψ : ClassFunction ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) ℂ :=
+    ClassFunction.restrict (h.W1.subgroupOf h.sdiffTICyclicHypothesis.W)
+        (ClassFunction.restrict h.sdiffTICyclicHypothesis.W
+          ((h.columnFamily χ₂).mu i : ClassFunction L ℂ))
+      - (h.columnFamily χ₂).sign •
+        ClassFunction.restrict (h.W1.subgroupOf h.sdiffTICyclicHypothesis.W)
+          (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) with hψdef
+  -- `ψ` is a virtual character
+  have hψZ : ψ ∈ ZIrr ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) :=
+    Submodule.sub_mem _
+      (ClassFunction.restrict_mem_ZIrr _
+        (ClassFunction.restrict_mem_ZIrr _ ((h.columnFamily χ₂).mu i).mem_ZIrr))
+      ((ZIrr _).smul_mem _
+        (ClassFunction.restrict_mem_ZIrr _ (h.chiColumn χ₂ i).mem_ZIrr))
+  -- `ψ` vanishes off the identity (`W₁^# ⊆ W − W₂`, the (4.3.c) value identity)
+  have hvan : ∀ y : ↥(h.W1.subgroupOf h.sdiffTICyclicHypothesis.W), y ≠ 1 → ψ y = 0 := by
+    intro y hy
+    have hyW1 : ((y : ↥h.sdiffTICyclicHypothesis.W) : L) ∈ h.W1 :=
+      Subgroup.mem_subgroupOf.mp (SetLike.coe_mem y)
+    have hyne : ((y : ↥h.sdiffTICyclicHypothesis.W) : L) ≠ 1 := fun heq =>
+      hy (Subtype.ext (Subtype.ext heq))
+    have hmemV : ((y : ↥h.sdiffTICyclicHypothesis.W) : L) ∈ h.sdiffTICyclicHypothesis.V := by
+      refine ⟨(le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) hyW1, fun hW2 => hyne ?_⟩
+      have hmem : ((y : ↥h.sdiffTICyclicHypothesis.W) : L) ∈ h.W1 ⊓ h.W2 :=
+        Subgroup.mem_inf.mpr ⟨hyW1, hW2⟩
+      rwa [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hmem
+    rw [hψdef, ClassFunction.sub_apply, ClassFunction.restrict_apply, ClassFunction.zsmul_apply,
+      ClassFunction.restrict_apply, ClassFunction.restrict_apply, zsmul_eq_mul,
+      h.certainType_apply_eq_of_mem_V χ₂ i hmemV]
+    rw [show (⟨((y : ↥h.sdiffTICyclicHypothesis.W) : L),
+        h.sdiffTICyclicHypothesis.V_subset_W hmemV⟩ : ↥h.sdiffTICyclicHypothesis.W)
+        = (y : ↥h.sdiffTICyclicHypothesis.W) from Subtype.ext rfl, sub_self]
+  obtain ⟨m, hm⟩ := exists_apply_one_eq_card_mul_of_vanishing_off_one hψZ hvan
+  rw [hcard] at hm
+  -- `ψ(1) = μ_{ij}(1) − δ_j`
+  have hψ1 : ψ 1 = ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) 1
+      - ((h.columnFamily χ₂).sign : ℂ) := by
+    rw [hψdef, ClassFunction.sub_apply, ClassFunction.restrict_apply, ClassFunction.restrict_apply,
+      ClassFunction.zsmul_apply, ClassFunction.restrict_apply, zsmul_eq_mul]
+    simp [h.chiColumn_apply_one χ₂ i]
+  rw [hψ1] at hm
+  exact ⟨m, by linear_combination hm⟩
 
 end Recipe
 
