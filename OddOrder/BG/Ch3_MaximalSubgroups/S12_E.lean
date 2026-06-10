@@ -831,6 +831,163 @@ private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd
       rw [Subgroup.mem_bot, hxE1]
       rfl
 
+/-- **BG Lemma 12.1(b), first half** (mmd L3041-3052): `E₃ ≤ E'`. Each Sylow subgroup of
+`E` at a `τ₃`-prime lies in `E'` (`sylow_le_derived_of_mem_tau3`), so `[E : E']` is coprime
+to `|E₃|` and the `τ₃`-Hall subgroup is absorbed. -/
+theorem SubgroupESetup.E3_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    E₃ ≤ derivedInG E := by
+  classical
+  have hcop : Nat.Coprime (Nat.card ↥(E₃.subgroupOf E)) (commutator ↥E).index := by
+    rw [Nat.coprime_comm]
+    by_contra hncop
+    obtain ⟨p, hprime, hp1, hp2⟩ := Nat.Prime.not_coprime_iff_dvd.mp hncop
+    haveI : Fact p.Prime := ⟨hprime⟩
+    have hcardE₃ : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+    have hpτ₃ : p ∈ tau3 M := h.isPiGroup_tau3 p (Nat.mem_primeFactors.mpr
+      ⟨hprime, hcardE₃ ▸ hp2, Nat.card_pos.ne'⟩)
+    -- a Sylow `p`-subgroup of `E` lies in `E'`, so `p` cannot divide the index
+    obtain ⟨P⟩ : Nonempty (Sylow p ↥E) := inferInstance
+    have hPle := (sylow_le_derived_of_mem_tau3 hG h hpτ₃ P).1
+    have hPcomm : (P : Subgroup ↥E) ≤ commutator ↥E := by
+      have hD : (derivedInG E).subgroupOf E = commutator ↥E := by
+        rw [derivedInG, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective (Subgroup.subtype_injective E)]
+      rw [← hD]
+      intro x hx
+      exact Subgroup.mem_subgroupOf.mpr (hPle ⟨x, hx, rfl⟩)
+    -- factorization bookkeeping: the full `p`-part sits inside `commutator ↥E`
+    have hPdvd : p ^ (Nat.card ↥E).factorization p ∣ Nat.card ↥(commutator ↥E) := by
+      have hPP := Subgroup.card_dvd_of_le hPcomm
+      rwa [P.card_eq_multiplicity] at hPP
+    have hfull : p ^ ((Nat.card ↥E).factorization p + 1) ∣ Nat.card ↥E := by
+      calc p ^ ((Nat.card ↥E).factorization p + 1)
+          = p ^ (Nat.card ↥E).factorization p * p := by ring
+      _ ∣ Nat.card ↥(commutator ↥E) * (commutator ↥E).index :=
+          mul_dvd_mul hPdvd hp1
+      _ = Nat.card ↥E := Subgroup.card_mul_index (commutator ↥E)
+    exact Nat.pow_succ_factorization_not_dvd Nat.card_pos.ne' hprime hfull
+  have hle := S10.le_of_coprime_card_index (K := commutator ↥E) (Q := E₃.subgroupOf E) hcop
+  intro x hx
+  exact ⟨_, hle (Subgroup.mem_subgroupOf.mpr hx : (⟨x, h.E₃_le hx⟩ : ↥E) ∈ _), rfl⟩
+
+/-- **BG Lemma 12.1(b), second half** (mmd L3052): `E₃ ⊴ E`. Since `E'` is nilpotent,
+`E₃ = O_{τ₃}(E')`, which `E` normalizes because it normalizes `E'`. -/
+theorem SubgroupESetup.E3_normal [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G) := by
+  classical
+  haveI hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
+  have hE₃D : E₃ ≤ derivedInG E := h.E3_le_derived hG
+  have hcoreHall : Ch03.IsHallSubgroup (tau3 M) (Ch03.oPiCore (tau3 M) ↥(derivedInG E)) :=
+    S10.oPiCore_isHall_of_isNilpotent (tau3 M)
+  have hE₃core : E₃ ≤ opiCoreInG (tau3 M) (derivedInG E) := by
+    have hsub : E₃.subgroupOf (derivedInG E) ≤ Ch03.oPiCore (tau3 M) ↥(derivedInG E) :=
+      S10.isPiGroup_le_of_normal_isHallSubgroup hcoreHall
+        (Ch03.Subgroup.IsPiGroup.subgroupOf hE₃D h.isPiGroup_tau3)
+    intro x hx
+    exact ⟨⟨x, hE₃D hx⟩, hsub (Subgroup.mem_subgroupOf.mpr hx), rfl⟩
+  have hcorele : Nat.card ↥(opiCoreInG (tau3 M) (derivedInG E)) ≤ Nat.card ↥E₃ := by
+    have hcorepi : Ch03.Subgroup.IsPiGroup (tau3 M)
+        ((opiCoreInG (tau3 M) (derivedInG E)).subgroupOf E) := by
+      refine Ch03.Subgroup.IsPiGroup.subgroupOf
+        ((opiCoreInG_le _ _).trans (Subgroup.map_subtype_le _)) ?_
+      intro r hr
+      have hcard : Nat.card ↥(opiCoreInG (tau3 M) (derivedInG E))
+          = Nat.card ↥(Ch03.oPiCore (tau3 M) ↥(derivedInG E)) :=
+        (Nat.card_congr (Subgroup.equivMapOfInjective _ _
+          (Subgroup.subtype_injective (derivedInG E))).toEquiv).symm
+      exact Ch03.oPiCore.isPiGroup (tau3 M) r (hcard ▸ hr)
+    have hdvd := h.E₃_hall.card_dvd_of_isPiGroup hcorepi
+    have hcard1 : Nat.card ↥((opiCoreInG (tau3 M) (derivedInG E)).subgroupOf E)
+        = Nat.card ↥(opiCoreInG (tau3 M) (derivedInG E)) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        ((opiCoreInG_le _ _).trans (Subgroup.map_subtype_le _))).toEquiv
+    have hcard2 : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+    rw [hcard1, hcard2] at hdvd
+    exact Nat.le_of_dvd Nat.card_pos hdvd
+  have heq : E₃ = opiCoreInG (tau3 M) (derivedInG E) :=
+    Subgroup.eq_of_le_of_card_ge hE₃core hcorele
+  rw [heq]
+  exact le_normalizer_opiCoreInG_of_le_normalizer (tau3 M) (S10.le_normalizer_derivedInG E)
+
+/-- **BG Lemma 12.1(d), `E₃` half** (mmd L3052): `E₃` is cyclic (it sits inside the
+nilpotent `E'` with all `p`-ranks `≤ 1`). -/
+theorem SubgroupESetup.E3_isCyclic [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    IsCyclic ↥E₃ := by
+  haveI hnilp : Group.IsNilpotent ↥(derivedInG E) := h.derived_isNilpotent hG
+  haveI : Group.IsNilpotent ↥E₃ :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (h.E3_le_derived hG))
+  have hodd : Odd (Nat.card ↥E₃) :=
+    hG.odd.of_dvd_nat
+      ((Subgroup.card_dvd_of_le h.E3_le_M).trans (Subgroup.card_subgroup_dvd_card M))
+  refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_cases hpE : p ∈ (Nat.card ↥E₃).primeFactors
+  · have hp3 : p ∈ tau3 M := h.isPiGroup_tau3 p hpE
+    exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E3_le_M))
+      (le_of_eq hp3.2.2)
+  · by_contra hcon
+    exact hpE (Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega))
+
+/-- **BG Lemma 12.1(f)** (mmd L3055): `C_{E₃}(E) = 1`. Any nontrivial element of
+`C_G(E) ⊓ E₃` would yield a nontrivial `p`-subgroup (`p ∈ τ₃`) inside some Sylow
+`p`-subgroup of `E`, contradicting `C_G(E) ⊓ P = ⊥` from the per-prime core. -/
+theorem SubgroupESetup.centralizer_inf_E3_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Subgroup.centralizer (E : Set G) ⊓ E₃ = ⊥ := by
+  classical
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hprime, hdvd⟩ := Nat.exists_prime_and_dvd hne
+  haveI : Fact p.Prime := ⟨hprime⟩
+  have hpE₃ : p ∈ (Nat.card ↥E₃).primeFactors := Nat.mem_primeFactors.mpr
+    ⟨hprime, hdvd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩
+  have hpτ₃ : p ∈ tau3 M := h.isPiGroup_tau3 p hpE₃
+  -- a nontrivial Sylow `p`-subgroup `Y` of `Z := C_G(E) ⊓ E₃`
+  obtain ⟨Y⟩ : Nonempty (Sylow p ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)) := inferInstance
+  have hYne : Nat.card
+      ↥(Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)) ≠ 1 := by
+    rw [Y.card_eq_multiplicity]
+    intro hone
+    have hpos := hprime.factorization_pos_of_dvd Nat.card_pos.ne' hdvd
+    rcases Nat.pow_eq_one.mp hone with h1 | h0
+    · exact hprime.one_lt.ne' h1
+    · omega
+  -- realize `Y` inside a Sylow `p`-subgroup of `E`
+  have hYG_le_Z : (Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype ≤ Subgroup.centralizer (E : Set G) ⊓ E₃ :=
+    Subgroup.map_subtype_le _
+  have hYG_le_E : (Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype ≤ E :=
+    hYG_le_Z.trans (inf_le_right.trans h.E₃_le)
+  have hYG_pgroup : IsPGroup p ↥((Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype) :=
+    Y.isPGroup'.map _
+  have hYE_pgroup : IsPGroup p ↥(((Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype).subgroupOf E) :=
+    hYG_pgroup.of_injective (Subgroup.subgroupOfEquivOfLe hYG_le_E).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hYG_le_E).injective
+  obtain ⟨P, hYP⟩ := hYE_pgroup.exists_le_sylow
+  have hPbot := (sylow_le_derived_of_mem_tau3 hG h hpτ₃ P).2
+  -- `Y ≤ C_G(E) ⊓ P = ⊥`
+  have hYbot : (Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype = ⊥ := by
+    rw [eq_bot_iff, ← hPbot]
+    intro x hx
+    refine ⟨(hYG_le_Z hx).1, ?_⟩
+    exact ⟨⟨x, hYG_le_E hx⟩, hYP (Subgroup.mem_subgroupOf.mpr hx), rfl⟩
+  have hmap : Nat.card ↥((Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)).map
+      (Subgroup.centralizer (E : Set G) ⊓ E₃).subtype)
+      = Nat.card ↥(Y : Subgroup ↥(Subgroup.centralizer (E : Set G) ⊓ E₃)) :=
+    Subgroup.card_map_of_injective
+      (Subgroup.subtype_injective (Subgroup.centralizer (E : Set G) ⊓ E₃))
+  rw [hYbot, Subgroup.card_bot] at hmap
+  exact hYne hmap.symm
+
 /-- **BG Lemma 12.1(d), `E₁` half** (mmd L3040-3041): `E₁` is cyclic.
 
 `E₁' ≤ E₁ ⊓ M' = 1` (`τ₁(M)` avoids `π(M')`), so `E₁` is abelian; each Sylow subgroup is
