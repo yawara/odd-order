@@ -3410,3 +3410,12 @@ For a nonidentity `p`-subgroup `X` and `M* ∈ ℳ(N_G(X))`, the prime `p` lies 
 characteristic in it, so `N_G(P) ≤ N_G(X) ≤ M*` and `p ∈ σ(M*)`, a contradiction. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.prime_mem_sigma_or_tau2
+
+/-! ### BG §12: Lemma 12.17 (`Msigma_E_relations`) — unconditional
+
+`C_{M_σ}(E) ⊆ M_σ'` and `⁅M_σ, E⁆ = M_σ`. Both are Lemma 6.3(a) applied inside `↥M`
+(`M_σ` a normal Hall subgroup with complement `E`, `M_σ ⊆ M'`) and transported to `G` along
+`M.subtype`: the first conclusion gives `⁅M_σ, E⁆ = M_σ`, the second (coprime split) gives
+`C_{M_σ}(E) ⊆ M_σ'`. No keystone input. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_E_relations

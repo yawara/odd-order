@@ -1358,7 +1358,53 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
     Subgroup.centralizer (E : Set G) ⊓ S10.Msigma M ≤ derivedInG (S10.Msigma M) ∧
     ⁅S10.Msigma M, E⁆ = S10.Msigma M := by
-  sorry
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  -- Complement data inside `↥M`: `M_σ` is a normal Hall subgroup of `M` with complement `E`.
+  have hcomplement := h.isComplement'_subgroupOf
+  haveI hMσ_norm : ((S10.Msigma M).subgroupOf M).Normal := by
+    rw [S10.Msigma_subgroupOf]; infer_instance
+  have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+  have hMσ_le_comm : (S10.Msigma M).subgroupOf M ≤ commutator ↥M :=
+    calc (S10.Msigma M).subgroupOf M
+        ≤ (derivedInG M).subgroupOf M :=
+          Subgroup.comap_mono (S10.Msigma_le_derived hG h.mem_maximal)
+      _ = commutator ↥M := hid
+  have hcop : Nat.Coprime (Nat.card ↥((S10.Msigma M).subgroupOf M)) (Nat.card ↥(E.subgroupOf M)) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rwa [hcomplement.symm.index_eq_card] at h1
+  -- Second conjunct `⁅M_σ, E⁆ = M_σ`: first conclusion of Lemma 6.3(a) inside `↥M`, mapped to `G`.
+  have hsecond : ⁅(S10.Msigma M : Subgroup G), E⁆ = S10.Msigma M := by
+    have h1 := OddOrder.BG.Ch1.S06.commutator_eq_self_of_isComplement'_le_commutator
+      (G := ↥M) hcomplement hMσ_le_comm
+    have h2 := congrArg (Subgroup.map M.subtype) h1
+    rwa [Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le hMσM,
+      Subgroup.map_subgroupOf_eq_of_le h.E_le] at h2
+  -- First conjunct `C_G(E) ⊓ M_σ ≤ M_σ'`: second conclusion of Lemma 6.3(a) inside `↥M`, mapped.
+  have hderiv_transport :
+      (derivedInG ((S10.Msigma M).subgroupOf M)).map M.subtype = derivedInG (S10.Msigma M) := by
+    rw [show derivedInG ((S10.Msigma M).subgroupOf M)
+          = ⁅(S10.Msigma M).subgroupOf M, (S10.Msigma M).subgroupOf M⁆
+          from Subgroup.map_subtype_commutator _,
+      Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le hMσM,
+      show ⁅(S10.Msigma M : Subgroup G), S10.Msigma M⁆ = derivedInG (S10.Msigma M)
+          from (Subgroup.map_subtype_commutator _).symm]
+  have h632 := OddOrder.BG.Ch1.S06.centralizer_inf_le_derivedInG_of_isComplement'
+    (G := ↥M) hcomplement hMσ_le_comm hcop
+  refine ⟨fun x hx => ?_, hsecond⟩
+  obtain ⟨hxC, hxMσ⟩ := hx
+  have hxM : x ∈ M := hMσM hxMσ
+  have hx'mem : (⟨x, hxM⟩ : ↥M) ∈
+      Subgroup.centralizer ((E.subgroupOf M : Subgroup ↥M) : Set ↥M)
+        ⊓ (S10.Msigma M).subgroupOf M := by
+    refine ⟨Subgroup.mem_centralizer_iff.mpr ?_, Subgroup.mem_subgroupOf.mpr hxMσ⟩
+    intro e' he'
+    have heE : ((e' : ↥M) : G) ∈ E := Subgroup.mem_subgroupOf.mp he'
+    exact Subtype.ext (Subgroup.mem_centralizer_iff.mp hxC (e' : G) heE)
+  have hmapped := Subgroup.mem_map_of_mem M.subtype (h632 hx'mem)
+  rwa [hderiv_transport] at hmapped
 
 /-- **BG Lemma 12.3** (mmd L3071): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
 `N_G(A₀) ⊆ M*` なら `A` は `M_σ ∩ M*` と `M_α ∩ M*` を中心化する。 -/
