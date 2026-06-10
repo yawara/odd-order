@@ -38,6 +38,48 @@
 のみ・軽)、**12.17** (Lem 6.3(a) 第 2 結論 `C_H(K)≤H'` の §6 補完が必要)、**12.18** (大物:
 Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (下記 triage)。
 
+## ✅ 2026-06-10 (session 2): 12.2(a) + 6.3(a).2 + 12.17 COMPLETE
+
+着手可能 leaf のうち 3 件を unconditional・axiom-clean で完成 (commits 240809c6 / 6cca7ee2 /
+76f5fcbf)。全 full build 3613 green、AxiomsCheck 登録済。
+
+- **12.2(a)** `prime_mem_sigma_or_tau2` (240809c6): 非自明 p-部分群 `X`, `M*∈ℳ(N_G(X))` ⇒
+  `p∈σ(M*)∪τ₂(M*)`。BG は「by Lemma 10.5」と書くが Lem 10.5 は `X∈ℰ_p¹` 専用ゆえ直接不可。
+  その内部の **cyclic-Sylow 論法** (`pRank_eq_two_of_normalizer_le` step(i) と同型) を一般
+  p-部分群へ適応: `p∉σ(M*)` ⇒ `r_p(M*)≤2`; `r_p=1` なら Sylow p cyclic で `X` characteristic
+  ⇒ `N_G(P)≤N_G(X)≤M*` ⇒ `p∈σ(M*)` 矛盾。Lem 10.5 自体は不使用。
+  支持: `Isaacs.Ch04.characteristic_of_subgroup_of_isCyclic` を public 化。
+  ⚠ 署名の `M/hM/hXM` は part (b) (τ₁∪τ₃ 非共役) 用に保持 (a では未使用、linter warning 容認)。
+- **6.3(a) 第2結論** `centralizer_inf_le_derivedInG_of_isComplement'` (6cca7ee2, S06_Additional):
+  `G` 可解, `H⊴G` 補群 `K`, `H⊆G'`, `(|H|,|K|)=1` ⇒ `C_H(K)⊆H'`。S06 docstring の「§10 critical
+  path 外で TODO」を充足。証明 = `Ḡ=G/H'` で `H̄` 可換・`K̄` coprime 共役作用、action commutator
+  `⁅H̄,K̄⁆=H̄` (第1結論) で全体 ⇒ Prop 1.6(d) で fixed points `C_Ḡ(K̄)⊓H̄=⊥` ⇒ `C_H(K)⊆ker=H'`。
+  **リファクタ**: 汎用共役 bridge `actionCommutator_conj_map_subtype` /
+  `fixedPointsOfMulAut_conj_map_subtype` を S12_E → S06_Additional へ上流移動 (S12 は selective
+  open で従来どおり 12.1(f) 使用)。
+- **12.17** `Msigma_E_relations` (76f5fcbf): `C_{M_σ}(E)⊆M_σ'` ∧ `⁅M_σ,E⁆=M_σ`。両結論とも
+  Lem 6.3(a) を ↥M 内で適用 (M_σ normal Hall, 補群 E, M_σ⊆M') し `M.subtype` で G へ transport。
+  transport 技法: `⁅A,B⁆.map=⁅A.map,B.map⁆` + `map_subgroupOf_eq_of_le`; centralizer は元ごと
+  に ↥M へ持ち上げ。prereq: `Msigma_subgroupOf` (正規), `Msigma_le_derived`+`comap_map_eq_self`
+  (`M_σ⊆M'`), `Msigma_subgroupOf_isHall.coprime_index`+`IsComplement'.index_eq_card` (coprime)。
+  原典 (12.17) の `M_σ∩M^g` cyclic 評価は docstring 通り後続。
+
+### ▶ 残り着手可能 leaf (D-lane §12 next frontier)
+
+- **12.19** `derivedE_centralizes_betaComplement`: 「E' は M_σ の Hall β'-部分群を中心化」。
+  **🛑 coprime-action coordination が本質的ハードル。** mmd 証明 2 段:
+  (I) E' の各 Sylow `D_q` は M_σ の Hall β'-部分群を中心化 [Cor 10.9(a) `beta_complement_centralizes`
+      を p∈β' ごとに集め `C_{M_σ}(D_q)` が full β'-Hall を含む] — これは比較的直接。
+  (II) ⇒ E' 全体が単一 Hall β' を中心化 [互いに素]。**ここが非自明** — 各 D_q が中心化する
+      Hall β' は M_σ 内で共役だが別物で、単一 W への coordination は coprime conjugacy 論法。
+  infra: `exists_aInvariant_hall` (Prop 1.5, S01) で E'-invariant Hall β' は取れるが、
+  invariant ⇒ centralize の橋渡し (各 D_q の per-Sylow 中心化を invariant W へ集約) が
+  ~150 行規模で未着手。E' nilpotent (12.1(a)) は使えるが coordination の決め手にならず。
+  次セッションは (II) 用の汎用 coprime 補題 (「A=∏D_q が各 D_q で Hall π を中心化 ⇒ A で単一
+  Hall π を中心化」) を S01/S06 に立てるのが筋。
+- **12.18** `tau1_Malpha_interaction`: 大物 (Thm 1.13 + Thm 3.7(両 landed) + Uniqueness +
+  Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。
+
 ## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
 
 mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
