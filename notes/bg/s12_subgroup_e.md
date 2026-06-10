@@ -117,6 +117,21 @@ Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (�
   `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (Thm 3.7 form-2), `mem_elemAbelianOfRank` (|P|=p)。
   nilpotent⟹commute は S10_LocalLemmas:1080 が private ゆえ 2 行再証 (coprime orderOf)。
 
+### session 3 cont.: assembly helpers 2 件 + (a) 第1連言 COMPLETE (計 6 commit)
+
+- **H2** `inf_centralizer_sup_eq_bot_of_le_normalizer` + **card helper** `card_sup_eq_mul_of_le_normalizer_of_disjoint`
+  (commit b6935baa) + `commute_of_coprime_orderOf_of_isNilpotent` de-privatize (S10_LocalLemmas)。
+- **✅✅ (a) 第1連言 `tau1_Malpha_centralizer_P_ne_bot` COMPLETE** (commit fc769550,
+  **unconditional・axiom-clean**) — `C_{M_α}(P)≠⊥`。building blocks 5 件が実合流。
+  **(12.7) order-count 不要** (C_{R₁}(P)≠1 ⟹ C_{M_α}(P)⊇C_{R₁}(P)≠1)。FPF は H2 → element-wise
+  (⟨a⟩=P via `eq_of_le_of_card_ge`) → Thm 3.7 form-2。
+- **残 = (a) 第2連言 `C_{M_α}(PQ)=⊥`** [hard core: Ω₁ cyclic bookkeeping + QN/R₀ ambient-quotient
+  Thm 3.7] + **part(b) reduction** (BB4 Thm10.2(d) + Uniqueness + Cor10.9(a)(2)) + assemble。
+  全 building block は再利用可ゆえ第2連言/(b) は setup 共有可。詳細手順 = issue 5003。
+- build 地雷録 (issue 5003 にも): `Nat.Coprime.mul` 不在 (Coprime=Eq, dot 不可) → `coprime_comm`+`Nat.Coprime.mul_right`;
+  `orderOf_coe`/`orderOf_mk` 不在 → `orderOf_injective`; `rank_bot` 不在 → R≠⊥ は C(⊥)=⊤ 経由;
+  `Subgroup.orderOf_dvd_natCard P haP` (subgroup 明示)。
+
 ## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
 
 mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
