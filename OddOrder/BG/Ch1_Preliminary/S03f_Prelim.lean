@@ -24,6 +24,11 @@ can land on their own.
   a `p`-group.
 * `oPiCore_compl_quotient_frattini_fitting_eq_bot`: BG Theorem 3.6 (3.9) substep — if `F(Hb)` is a
   `p`-group then `O_{p'}(Hb / Φ(F(Hb))) = ⊥`.
+* normalizer transport helpers (`mem_normalizer_sup`,
+  `mem_normalizer_map_subtype_of_characteristic`, `mem_normalizer_map_subtype_of_isAInvariant`)
+  and the (3.22) `O_{p'}`-vanishing engines
+  (`oPiCore_compl_eq_bot_of_isPGroup_centralizer_le`, `oPiCore_eq_bot_of_subgroupOf_normal`,
+  `le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`).
 -/
 
 namespace OddOrder.BG.Ch1.S03f
@@ -303,6 +308,198 @@ theorem isHallSubgroup_map_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Grou
     rw [hcard, ← Nat.card_congr e.toEquiv] at h2
     exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
   exact ⟨fun q hq => hK.1 q (hcard ▸ hq), fun q hq => hK.2 q (hidx ▸ hq)⟩
+
+/-- **Conjugation by a normalizer element fixes the subgroup**: if `g` normalizes `A`, the
+conjugation automorphism `MulAut.conj g` maps `A` onto `A`. -/
+theorem map_conj_eq_self_of_mem_normalizer {G : Type*} [Group G] {A : Subgroup G} {g : G}
+    (hg : g ∈ Subgroup.normalizer (A : Set G)) :
+    A.map (MulAut.conj g).toMonoidHom = A := by
+  rw [Subgroup.mem_normalizer_iff] at hg
+  ext x
+  simp only [Subgroup.mem_map, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+  constructor
+  · rintro ⟨a, ha, rfl⟩
+    exact (hg a).mp ha
+  · intro hx
+    refine ⟨g⁻¹ * x * g, (hg _).mpr ?_, by group⟩
+    have heq : g * (g⁻¹ * x * g) * g⁻¹ = x := by group
+    rwa [heq]
+
+/-- **Normalizing two subgroups normalizes their join**.  Used at BG Theorem 3.6 (3.22) to see
+that `R₀` normalizes `VXP = V ⊔ X ⊔ P`. -/
+theorem mem_normalizer_sup {G : Type*} [Group G] {A B : Subgroup G} {g : G}
+    (hA : g ∈ Subgroup.normalizer (A : Set G)) (hB : g ∈ Subgroup.normalizer (B : Set G)) :
+    g ∈ Subgroup.normalizer ((A ⊔ B : Subgroup G) : Set G) := by
+  have hmap : (A ⊔ B).map (MulAut.conj g).toMonoidHom = A ⊔ B := by
+    rw [Subgroup.map_sup, map_conj_eq_self_of_mem_normalizer hA,
+      map_conj_eq_self_of_mem_normalizer hB]
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · intro hx
+    have h1 : (MulAut.conj g).toMonoidHom x ∈ (A ⊔ B).map (MulAut.conj g).toMonoidHom :=
+      Subgroup.mem_map_of_mem _ hx
+    rw [hmap] at h1
+    simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using h1
+  · intro hx
+    rw [← hmap, Subgroup.mem_map] at hx
+    obtain ⟨a, ha, haeq⟩ := hx
+    simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at haeq
+    have hax : a = x := mul_left_cancel (mul_right_cancel haeq)
+    rwa [← hax]
+
+/-- **Lifted characteristic subgroups inherit normalizer elements**: if `g` normalizes `W ≤ G`,
+then `g` normalizes `C.map W.subtype` for every characteristic `C ≤ ↥W` (conjugation by `g`
+restricts to an automorphism of `↥W`, which fixes `C`).  Used at BG Theorem 3.6 (3.22) for
+`O_p([VXP, R₀])`. -/
+theorem mem_normalizer_map_subtype_of_characteristic {G : Type*} [Group G] {W : Subgroup G}
+    {C : Subgroup ↥W} [hC : C.Characteristic] {g : G}
+    (hg : g ∈ Subgroup.normalizer (W : Set G)) :
+    g ∈ Subgroup.normalizer ((C.map W.subtype : Subgroup G) : Set G) := by
+  have key : ∀ k : G, k ∈ Subgroup.normalizer (W : Set G) →
+      ∀ x ∈ C.map W.subtype, k * x * k⁻¹ ∈ C.map W.subtype := by
+    intro k hk x hx
+    obtain ⟨c, hc, rfl⟩ := hx
+    have hWmap : W.map (MulAut.conj k).toMonoidHom = W :=
+      map_conj_eq_self_of_mem_normalizer hk
+    set ψ : ↥W ≃* ↥W :=
+      ((MulAut.conj k).subgroupMap W).trans (MulEquiv.subgroupCongr hWmap) with hψ
+    have hψc : ψ c ∈ C := by
+      have hmap := Subgroup.characteristic_iff_map_eq.mp hC ψ
+      rw [← hmap]
+      exact Subgroup.mem_map_of_mem _ hc
+    refine ⟨ψ c, hψc, ?_⟩
+    simp only [hψ, Subgroup.coe_subtype, MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply,
+      MulEquiv.coe_subgroupMap_apply, MulAut.conj_apply]
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · exact fun hx => key g hg x hx
+  · intro hx
+    have h2 := key g⁻¹ (Subgroup.inv_mem _ hg) _ hx
+    have heq : g⁻¹ * (g * x * g⁻¹) * g⁻¹⁻¹ = x := by group
+    rwa [heq] at h2
+
+/-- **An `R`-invariant subgroup of `H ⊴ G` is normalized by every element of `R` at the `G`
+level**: the `G`-level form of `IsAInvariant` for the conjugation action.  Used at BG Theorem 3.6
+Phase C/D for `K_G`, `P_G` and the (3.22) ambient `VXP`. -/
+theorem mem_normalizer_map_subtype_of_isAInvariant {G : Type*} [Group G] {H R : Subgroup G}
+    [H.Normal] {L : Subgroup ↥H}
+    (hL : OddOrder.Isaacs.Ch03.IsAInvariant
+      ((MulAut.conjNormal (G := G) (H := H)).comp R.subtype) L)
+    {g : G} (hg : g ∈ R) :
+    g ∈ Subgroup.normalizer ((L.map H.subtype : Subgroup G) : Set G) := by
+  set φ : ↥R →* MulAut ↥H := (MulAut.conjNormal (G := G) (H := H)).comp R.subtype with hφ
+  rw [Subgroup.mem_normalizer_iff]
+  intro x
+  constructor
+  · rintro ⟨k, hk, rfl⟩
+    refine ⟨φ ⟨g, hg⟩ k, hL.smul_mem _ hk, ?_⟩
+    simp only [hφ, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conjNormal_apply]
+  · rintro ⟨k, hk, hkeq⟩
+    refine ⟨(φ ⟨g, hg⟩)⁻¹ k, hL.inv_smul_mem _ hk, ?_⟩
+    have hv2 : ((φ ⟨g, hg⟩ ((φ ⟨g, hg⟩)⁻¹ k) : ↥H) : G)
+        = g * ((((φ ⟨g, hg⟩)⁻¹ k : ↥H)) : G) * g⁻¹ := by
+      simp only [hφ, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conjNormal_apply]
+    rw [MulAut.apply_inv_self] at hv2
+    have h3 := hv2.symm.trans hkeq
+    exact mul_left_cancel (mul_right_cancel h3)
+
+/-- **`O_{p'}(W) = ⊥` when `W` has a self-centralizing normal `p`-subgroup** (BG Theorem 3.6,
+(3.10)→(3.22) step): `N` and `O_{p'}(W)` are coprime normal subgroups, hence commute elementwise,
+so `O_{p'}(W) ≤ C_W(N) ≤ N`; a `p'`-subgroup of a `p`-group is trivial. -/
+theorem oPiCore_compl_eq_bot_of_isPGroup_centralizer_le {p : ℕ} [hp : Fact p.Prime]
+    {W : Type*} [Group W] [Finite W] {N : Subgroup W} [N.Normal] (hNp : IsPGroup p ↥N)
+    (hCent : Subgroup.centralizer (N : Set W) ≤ N) :
+    OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) W = ⊥ := by
+  set O : Subgroup W := OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) W with hO
+  haveI hOnorm : O.Normal := by rw [hO]; infer_instance
+  have hOp' : ¬ p ∣ Nat.card ↥O := by
+    intro hd
+    have hmem := OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := W) ({p}ᶜ : Set ℕ) p
+      (Nat.mem_primeFactors.mpr ⟨hp.out, hO ▸ hd, Nat.card_pos.ne'⟩)
+    simp at hmem
+  have hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥O) := by
+    obtain ⟨k, hk⟩ := hNp.exists_card_eq
+    rw [hk]
+    exact Nat.Coprime.pow_left k (hp.out.coprime_iff_not_dvd.mpr hOp')
+  have hcomm : (⁅O, N⁆ : Subgroup W) = ⊥ := by
+    have hle : (⁅N, O⁆ : Subgroup W) ≤ N ⊓ O := Subgroup.commutator_le_inf N O
+    rw [Subgroup.inf_eq_bot_of_coprime hcop] at hle
+    rw [Subgroup.commutator_comm]
+    exact le_bot_iff.mp hle
+  have hO_le_N : O ≤ N :=
+    (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm).trans hCent
+  have hOp : IsPGroup p ↥O := hNp.to_le hO_le_N
+  obtain ⟨k, hk⟩ := hOp.exists_card_eq
+  have hk0 : k = 0 := by
+    by_contra h
+    exact hOp' (hk ▸ dvd_pow_self p h)
+  exact Subgroup.eq_bot_of_card_eq _ (by rw [hk, hk0, pow_zero])
+
+/-- **`O_π`-triviality descends along normal-in-context inclusions**: if `A ≤ B` with
+`A.subgroupOf B` normal in `↥B` and `O_π(↥B) = ⊥`, then `O_π(↥A) = ⊥`: the lift of `O_π(↥A)`
+(characteristic in `↥A`) is a normal π-subgroup of `↥B`, hence lands in `O_π(↥B)`
+(`IsPiGroup.le_oPiCore`).  Used at BG Theorem 3.6 (3.22) with `A = [VXP, R₀] ⊴ B = VXP`. -/
+theorem oPiCore_eq_bot_of_subgroupOf_normal {G : Type*} [Group G] [Finite G] {π : Set ℕ}
+    {A B : Subgroup G} (hAB : A ≤ B) (hnorm : (A.subgroupOf B).Normal)
+    (hB : OddOrder.Isaacs.Ch03.oPiCore π ↥B = ⊥) :
+    OddOrder.Isaacs.Ch03.oPiCore π ↥A = ⊥ := by
+  set O : Subgroup ↥A := OddOrder.Isaacs.Ch03.oPiCore π ↥A with hO
+  haveI hOchar : O.Characteristic := by rw [hO]; infer_instance
+  set L : Subgroup G := O.map A.subtype with hL
+  have hLA : L ≤ A := Subgroup.map_subtype_le O
+  have hLB : L ≤ B := hLA.trans hAB
+  -- every element of `B` normalizes `A` in `G`
+  have hbn : ∀ b : ↥B, (b : G) ∈ Subgroup.normalizer (A : Set G) := by
+    intro b
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    constructor
+    · intro hx
+      have h1 : (⟨x, hAB hx⟩ : ↥B) ∈ A.subgroupOf B := Subgroup.mem_subgroupOf.mpr hx
+      have h2 := hnorm.conj_mem _ h1 b
+      rw [Subgroup.mem_subgroupOf] at h2
+      simpa using h2
+    · intro hx
+      have h1 : (⟨(b : G) * x * (b : G)⁻¹, hAB hx⟩ : ↥B) ∈ A.subgroupOf B :=
+        Subgroup.mem_subgroupOf.mpr hx
+      have h2 := hnorm.conj_mem _ h1 b⁻¹
+      rw [Subgroup.mem_subgroupOf] at h2
+      have h4 : ((b⁻¹ * (⟨(b : G) * x * (b : G)⁻¹, hAB hx⟩ : ↥B) * b⁻¹⁻¹ : ↥B) : G) = x := by
+        simp only [Subgroup.coe_mul, Subgroup.coe_inv, inv_inv]
+        group
+      rwa [h4] at h2
+  -- the lift `L` is normal in context `↥B`
+  haveI hLnorm : (L.subgroupOf B).Normal := by
+    constructor
+    intro n hn b
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    have hkey := mem_normalizer_map_subtype_of_characteristic (C := O) (hbn b)
+    rw [Subgroup.mem_normalizer_iff] at hkey
+    have h2 := (hkey (n : G)).mp hn
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+    exact h2
+  -- `L.subgroupOf B` is a π-group, hence lands in `O_π(↥B) = ⊥`
+  have hcardL : Nat.card ↥(L.subgroupOf B) = Nat.card ↥O := by
+    rw [hL]
+    exact (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLB).toEquiv).trans
+      (Subgroup.card_map_of_injective (Subgroup.subtype_injective A))
+  have hpiL : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup π (L.subgroupOf B) := by
+    intro q hq
+    rw [hcardL] at hq
+    exact OddOrder.Isaacs.Ch03.oPiCore.isPiGroup (G := ↥A) π q (hO ▸ hq)
+  have hle : L.subgroupOf B ≤ OddOrder.Isaacs.Ch03.oPiCore π ↥B :=
+    OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup.le_oPiCore hpiL
+  rw [hB] at hle
+  have hLbot : L = ⊥ := by
+    have hdisj := Subgroup.subgroupOf_eq_bot.mp (le_bot_iff.mp hle)
+    have h2 : L ⊓ B = ⊥ := disjoint_iff.mp hdisj
+    rwa [inf_eq_left.mpr hLB] at h2
+  have h3 : O.map A.subtype = (⊥ : Subgroup ↥A).map A.subtype := by
+    rw [Subgroup.map_bot, ← hL]
+    exact hLbot
+  exact Subgroup.map_injective (Subgroup.subtype_injective A) h3
 
 /-- **A group of `p`-length one with `O_{p'}(W) = ⊥` has a normal Sylow `p`-subgroup**: every
 `p`-subgroup lies in `O_p(W)`.  (`O_{p',p}(W) = O_p(W)` by
