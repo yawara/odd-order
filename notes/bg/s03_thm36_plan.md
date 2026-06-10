@@ -351,3 +351,62 @@ hfit の後に (3.9)–(3.11) を追加。**確立した文脈ファクト (Phas
   ⟹ ∀h, K^h=K^u (u∈U) ⟹ h∈N_H(K)·U ⟹ ↥H=U·N_H(K)=V·N_H(K)。
 - (3.13) `[K,P]≠1`、**(3.14) `[V,K]=V, C_V(K)=1`** (Prop 1.6(d)+両◁G+**h311**+**hCHV**)、
   (3.15) K=F(N_H(K))、(3.16) C_H(K)⊆K。最重量は Phase D–F。正本=本ファイル「session 6 cont.」。
+
+## ✅✅ 2026-06-10 session 7 (a-keystone): **Phase B (3.12)–(3.16) COMPLETE**
+
+scaffold `S03f_Thm36.lean` (untracked, 1006 行, leaf build 3017 green) の唯一 real sorry = Phase C 以降
+((3.17)–(3.38)) のみ。**Phase A+B 全て sorry-free**。
+
+### committed: transport helpers ×4 (`S03f_Prelim.lean`, commit `05df50fa`, axiom-clean)
+- `isAInvariant_map_subtype_of_restrict`: U A-inv + L (↥U) restrict-inv ⟹ `L.map U.subtype` A-inv
+  (S01/S04e の private 重複の公開版; **Ch03 への consolidation は cleanup pass で**)。
+- `normal_map_subtype_of_isAInvariant_conjNormal` ⭐: `H ⊔ R = ⊤`, X ⊴ ↥H + R-inv (conjNormal∘subtype)
+  ⟹ `X.map H.subtype ⊴ G`。(3.14) の C_V(K)/[V,K] の G-lift 正規性。Phase D でも使う。
+- `fitting_map_le_of_mulEquiv` / `fitting_map_eq_of_mulEquiv`: F(G) の同型転送 ((3.15) が使用)。
+- `isHallSubgroup_map_of_mulEquiv`: Hall の同型転送 (card は `card_map_of_injective`、index は
+  `card_mul_index` ×2 + cancel)。(3.12) Frattini の conjugate-Hall。
+
+### scaffold 着地分 (Phase B 全部; 確立済み文脈ファクト一覧 = Phase C が直接使う)
+- `hK_le_U / hK_inv / hKcard / hK'p'`; `hUcard : |U| = |F(H/V)|·|V|` (ψ=mk'V∘U.subtype, ker=V.subgroupOf U
+  [`hψker`], range=F(Q) [`hψrange`]); `hK'm : |K'| = |F(H/V)|` (p'-part 一意性, `hCop_mFidx` 経由);
+  `hcomplVK : IsComplement' (V.subgroupOf U) K'`; **`hVK_sup : V ⊔ K = U`**; **`hVK_inf : V ⊓ K = ⊥`**。
+- **N/P**: `N := Subgroup.normalizer (K : Set ↥H)` (⚠ mathlib normalizer は **Set 引数**、subgroup は
+  coercion)、`hN_inv` (= `hK_inv.normalizer`)、`P := P'.map N.subtype` (P' = `exists_aInvariant_sylow`
+  via `hN_inv.restrict`)、`hP_le_N / hP_inv / hPp`。⚠ φU/φN は `.restrict` を使う (`.toMulAutHom` は
+  Ch04 の重複 def で `restrict_apply_val` が無い → session 7 で restrict に切替済)。
+- **(3.12) `h312 : V ⊔ N = ⊤`**: hall_C を ↥U 内で (K'^hh ↦ K'^u)、commuting square `hsq`/`hsq'`
+  (conjNormal/conj vs subtype; **`congr 1` だけで閉じる** — hom が defeq、ext/simp を足すと
+  no-goals エラー)、`mem_normalizer_iff` で ↑u·hh ∈ N、分解 hh = ↑u⁻¹·(↑u·hh)。
+  + `hVmap_bot / hNmap_top` (mk' V での像)。
+- `hUmap / hKmap : U.map (mk' V) = F(H/V) = K.map (mk' V)`。
+- **(3.13) `h313 : ⁅K,P⁆ ≠ ⊥`**: P-image ≤ C_Q(F(Q)) ≤ F(Q) (Prop 1.3 in Q) は p-群∩p'-群 ⟹ P ≤ V
+  ⟹ Sylow P' ≤ ker(↥N ↠ H/V) ⟹ p ∤ |H/V| (`pow_succ_factorization_not_dvd`; **⚠ `rw [hNcard]` は
+  factorization 指数内も書換える → calc で forward 構成**) ⟹ H plen1
+  (`hasPLengthOne` + `oPiPrimePiCore_eq_oPiCore_of_compl_bot h38` + `hcard_eq` quotientMulEquivOfEq) ⟹ hcounter。
+- **(3.14)**: `letI : CommGroup ↥V` (hVelem.1)、φKV := conjNormal∘K.subtype、Prop 1.6(d)
+  `fixedPoints_isComplement_actionCommutator_of_abelian`、橋 `hAC` (= `actionCommutator_conjNormal_map_subtype_eq V K`)
+  + `hFP : FP.map V.subtype = V ⊓ C_{↥H}(K)` (手証明)。`hconjK`/`hconjC` (N-共役で K/C(K) 不変,
+  elementwise)、`hnormal_of_VN` (X ≤ V + N-conj 不変 ⟹ X ⊴ ↥H; V は abelian で中心化)、
+  R-inv `hB_inv`/`hC_inv`、G-lift 正規 (helper ⭐)、`hCB_inf`/`hCB_sup` (complement の像)、
+  **`h314C : V ⊓ C_{↥H}(K) = ⊥`** (h311 二分法; [V,K]=⊥ 枝は K ≤ C_H(V) =hCHV= V ⟹ K=⊥ ⟹ (3.13) 矛盾)、
+  **`h314B : ⁅V,K⁆ = V`**、**`hVN_inf : V ⊓ N = ⊥`** (v∈V∩N ⟹ ⁅v,k⁆∈V⊓K=⊥ ⟹ v∈C(K))。
+- **(3.15) `h315 : F(↥N).map N.subtype = K`** + `hKN_fit : K.subgroupOf N = F(↥N)`:
+  eN := ofBijective (mk'V∘N.subtype) (inj=hVN_inf, surj=hNmap_top)、`heN_hom : eN.toMonoidHom = ψN`
+  (ext+rfl)、fitting 転送 helper + `map_injective`。
+- **(3.16) `h316 : C_{↥H}(K) ≤ K`**: `centralizer_le_normalizer` → ↥N 内で Prop 1.3 + hKN_fit。
+
+### ▶ 次セッション = Phase C (3.17)–(3.21)
+- **(3.17) `⁅K,R₀⁆ ≠ ⊥`** (最重量): 仮定 =⊥ ⟹ Prop 1.4 (`S01_Solvable:?` 要確認 — F(N)=K 中心化 ⟹
+  N 中心化の形) で `⁅N,R₀⁆=⊥` ⟹ N ≤ C_H(R₀) (Z-群 hZ) ⟹ K cyclic ⟹ Aut K abelian ⟹
+  `⁅N,R⁆ ≤ C_H(K) ≤ K` (3.16); 一方 `⁅N,R⁆ ≅ ⁅H/V,R⁆ = (H/V) ≅ N` ((3.6)+商) ⟹ P ≤ K、
+  (|P|,|K|)=1 ⟹ P=⊥ ⟹ V Sylow ⟹ (3.13) と同じ矛盾ルート (p ∤ |H/V|... 要再構成)。
+- (3.18) `C_{KR₀}(V)=⊥`: C_K(V) ≤ K∩C_H(V) =(3.10)= K∩V = ⊥; R₀ prime order なので C_{R₀}(V)=⊥ or R₀;
+  後者なら R₀ ⊴ KR₀ ⟹ ⁅K,R₀⁆=⊥ contra (3.17)。
+- (3.19) `|C_V(R₀)| = p`: C_V(R₀)=⊥ なら KR₀ faithful on V ⟹ **Thm 3.4** (`S03d.thm34`) ⟹
+  ⁅K,R₀⁆=⊥ contra; ≠⊥ なら elem abelian + Z-群 (`card_eq_prime_of_le_isZGroup`) ⟹ =p。
+- (3.20) `C_P(R₀)=⊥`: C_V(R₀) cyclic order p には p-冪 Aut なし ⟹ C_P(R₀) centralizes C_V(R₀)、
+  C_P(R₀)×C_V(R₀) ≤ C_H(R₀) Z-群 (Z-群は Sylow cyclic ⟹ p-rank 1) ⟹ C_P(R₀)=⊥。
+- (3.21) `P = ⁅P,R₀⁆`: Prop 1.6(a) (`fixedPoints_sup_actionCommutator_eq_top` 形) + (3.20)。
+- 残最重量 = Phase D (Gor 5.3.7 `S04e` 適用) + Phase F (orbit-parity)。
+- cleanup TODO (Thm 3.6 完成 commit 前): hFQ_compl ↔ S10 重複 consolidate / helper ×4 の Ch03 配置
+  / private 2 copy 削除。正本=本ファイル「session 7」。
