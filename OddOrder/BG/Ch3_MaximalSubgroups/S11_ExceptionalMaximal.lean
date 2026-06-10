@@ -77,6 +77,9 @@ structure Hypothesis111 (M : Subgroup G) (p : ℕ) (A₀ A P : Subgroup G) : Pro
   P_pgroup : IsPGroup p ↥P
   A_le_P : A ≤ P
   P_le : P ≤ M
+  /-- `P` is a Sylow `p`-subgroup of `M` (`p`-maximality inside `M`; the literal
+  `P ∈ Syl_p(M)` of BG Hypothesis 11.1, produced by Lemma 10.5). -/
+  P_sylow : ∀ R : Subgroup G, P ≤ R → R ≤ M → IsPGroup p ↥R → R = P
   normalizer_P_not_le : ¬ Subgroup.normalizer (P : Set G) ≤ M
   A_maximal : IsMaximalElementaryAbelian p A
 
@@ -129,6 +132,12 @@ theorem A_le_normalizer (h : IsAInvSylowIn q A Q H) :
 theorem maximal (h : IsAInvSylowIn q A Q H) :
     ∀ R : Subgroup G, Q ≤ R → R ≤ H → IsPGroup q ↥R → R = Q :=
   h.2.2.2
+
+/-- The `A`-slot of `IsAInvSylowIn` is antitone: a `B`-invariant Sylow is `A`-invariant for
+`A ≤ B`. -/
+theorem of_le {B : Subgroup G} (h : IsAInvSylowIn q B Q H) (hAB : A ≤ B) :
+    IsAInvSylowIn q A Q H :=
+  ⟨h.1, h.2.1, hAB.trans h.2.2.1, h.2.2.2⟩
 
 end IsAInvSylowIn
 
@@ -808,20 +817,386 @@ theorem eq_of_Msigma_meet_Hsigma [Finite G] (hG : IsMinimalSimpleOdd G)
         (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hgM)).symm
     _ = H := hgMH
 
-/-- **BG Theorem 11.5** (mmd L2963): `M` の Sylow `p`-部分群は abelian。 -/
+/-- Conjugation commutes with centralizers of subgroups: `C_G(H)^g = C_G(H^g)`. -/
+private theorem centralizer_conj_smul (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.centralizer ((H : Subgroup G) : Set G)
+      = Subgroup.centralizer ((MulAut.conj g • H : Subgroup G) : Set G) := by
+  ext c
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  simp only [Subgroup.mem_centralizer_iff]
+  have hinv : ∀ d : G, (MulAut.conj g)⁻¹ • d = g⁻¹ * d * g := by
+    intro d
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  constructor
+  · intro hc y hy
+    rw [mulAut_smul_eq_map] at hy
+    obtain ⟨x, hx, rfl⟩ := hy
+    have h1 := hc x hx
+    rw [hinv c] at h1
+    show (MulAut.conj g) x * c = c * (MulAut.conj g) x
+    rw [MulAut.conj_apply]
+    calc g * x * g⁻¹ * c = g * (x * (g⁻¹ * c * g)) * g⁻¹ := by group
+      _ = g * ((g⁻¹ * c * g) * x) * g⁻¹ := by rw [h1]
+      _ = c * (g * x * g⁻¹) := by group
+  · intro hc y hy
+    have hgy : (MulAut.conj g) y ∈ (MulAut.conj g • H : Subgroup G) := by
+      rw [mulAut_smul_eq_map]
+      exact ⟨y, hy, rfl⟩
+    have h1 := hc _ hgy
+    rw [MulAut.conj_apply] at h1
+    rw [hinv c]
+    calc y * (g⁻¹ * c * g) = g⁻¹ * ((g * y * g⁻¹) * c) * g := by group
+      _ = g⁻¹ * (c * (g * y * g⁻¹)) * g := by rw [h1]
+      _ = g⁻¹ * c * g * y := by group
+
+/-- A conjugate of a nontrivial subgroup is nontrivial. -/
+private theorem conj_smul_ne_bot {H : Subgroup G} (g : G) (hH : H ≠ ⊥) :
+    MulAut.conj g • H ≠ ⊥ := by
+  intro hbot
+  apply hH
+  rw [mulAut_smul_eq_map] at hbot
+  rwa [Subgroup.map_eq_bot_iff_of_injective _ (MulAut.conj g).injective] at hbot
+
+/-- `C_G(⟨x⟩) = C_G(x)`. -/
+private theorem centralizer_zpowers_eq_singleton (x : G) :
+    Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)
+      = Subgroup.centralizer ({x} : Set G) := by
+  ext c
+  simp only [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hc y hy
+    rw [Set.mem_singleton_iff] at hy
+    exact hy ▸ hc x (Subgroup.mem_zpowers x)
+  · intro hc y hy
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+    exact ((show Commute x c from hc x rfl).zpow_left k).eq
+
+/-- `IsAInvSylowIn` transports along conjugation. -/
+private theorem isAInvSylowIn_conj_smul {q : ℕ} {A Q H : Subgroup G} (g : G)
+    (h : IsAInvSylowIn q A Q H) :
+    IsAInvSylowIn q (MulAut.conj g • A) (MulAut.conj g • Q) (MulAut.conj g • H) := by
+  obtain ⟨hQH, hQp, hAN, hmax⟩ := h
+  refine ⟨Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hQH, ?_, ?_, ?_⟩
+  · rw [mulAut_smul_eq_map]
+    exact hQp.of_equiv (Subgroup.equivMapOfInjective Q _ (MulAut.conj g).injective)
+  · rw [← normalizer_conj_smul]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hAN
+  · intro R hQR hRH hRq
+    have h1 : Q ≤ (MulAut.conj g)⁻¹ • R := by
+      have h0 : (MulAut.conj g)⁻¹ • (MulAut.conj g • Q) ≤ (MulAut.conj g)⁻¹ • R :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hQR
+      rwa [inv_smul_smul] at h0
+    have h2 : (MulAut.conj g)⁻¹ • R ≤ H := by
+      have h0 : (MulAut.conj g)⁻¹ • R ≤ (MulAut.conj g)⁻¹ • (MulAut.conj g • H) :=
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hRH
+      rwa [inv_smul_smul] at h0
+    have h3 : IsPGroup q ↥((MulAut.conj g)⁻¹ • R) := by
+      rw [← map_inv, mulAut_smul_eq_map]
+      exact hRq.of_equiv (Subgroup.equivMapOfInjective R _ (MulAut.conj g⁻¹).injective)
+    have h4 := hmax _ h1 h2 h3
+    rw [← h4, smul_inv_smul]
+
+/-- Commutativity transports along a group isomorphism. -/
+private theorem isMulCommutative_of_mulEquiv {H K : Type*} [Group H] [Group K]
+    (e : H ≃* K) (hH : IsMulCommutative H) : IsMulCommutative K :=
+  ⟨⟨fun a b => by
+    have := congrArg e (hH.is_comm.comm (e.symm a) (e.symm b))
+    rwa [map_mul, map_mul, e.apply_symm_apply, e.apply_symm_apply] at this⟩⟩
+
+/-- **BG Theorem 11.5** (mmd L2963): `M` の Sylow `p`-部分群は abelian。
+
+証明: `P` が nonabelian と仮定。`g ∈ N_G(P) − M`、`q ∈ σ(M)`、`Q₁` を `M_σ` の `P`-不変
+Sylow `q`-部分群、`Q₂ = Q₁^g` とする (`g ∈ N_G(P)` ゆえ `Q₂` も `P`-不変、特に `A`-不変)。
+Prop 1.16 (`exists_mem_inf_centralizer_ne_bot_of_not_isCyclic`) で `C_{Q₁}(X₁) ≠ 1`,
+`C_{Q₂}(X₂) ≠ 1` なる `X₁, X₂ ∈ ℰ¹(A)` が取れ、Lemma 11.1(b) から `C_{Q₁}(X₂) = 1`、
+よって `X₂` は `X₁` と `P`-共役でない (`Q₁` は `P`-不変)。Lemma 10.13(c) により
+`ℰ¹(A) − {Z₀ = Ω₁(Z(P))}` は `P`-共役で推移的なので `X₁ = Z₀` または `X₂ = Z₀`。しかし
+`Z₀` は `g`-不変なので `C(Z₀) ⊓ Q₂ = (C(Z₀) ⊓ Q₁)^g` となり、どちらの場合も
+`C(Z₀) ⊓ Q₁ ≠ 1 ≠ C(Z₀) ⊓ Q₂` — Lemma 11.1(b) に矛盾。最後に `P` は `M` の Sylow
+(`P_sylow`) なので Sylow 共役で任意の `S ∈ Syl_p(M)` が abelian。 -/
 theorem sylow_p_isCommutative [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P)
     (S : Sylow p ↥M) :
     IsMulCommutative (S : Subgroup ↥M) := by
-  sorry
+  classical
+  haveI : Fact p.Prime := ⟨h.prime⟩
+  have hAea : A.IsElementaryAbelian p := h.A_mem.1
+  have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
+  -- Step 1: the distinguished Sylow `P` is abelian.
+  have hPcomm : ∀ x ∈ P, ∀ y ∈ P, x * y = y * x := by
+    by_contra hPnc
+    have hPnonab : ¬ IsMulCommutative ↥P := by
+      intro hab
+      apply hPnc
+      intro x hx y hy
+      have hc := hab.is_comm.comm (⟨x, hx⟩ : ↥P) ⟨y, hy⟩
+      simpa using congrArg Subtype.val hc
+    obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+    -- `q ∈ σ(M)` via `M_σ ≠ ⊥`.
+    have hMσne : S10.Msigma M ≠ ⊥ := S10.Msigma_ne_bot hG h.mem_maximal
+    haveI : Nontrivial ↥(S10.Msigma M) := (Subgroup.nontrivial_iff_ne_bot _).mpr hMσne
+    obtain ⟨q, hq⟩ : ∃ q, q ∈ (Nat.card ↥(S10.Msigma M)).primeFactors := by
+      rcases (Nat.card ↥(S10.Msigma M)).primeFactors.eq_empty_or_nonempty with h0 | h0
+      · rcases Nat.primeFactors_eq_empty.mp h0 with h1 | h1
+        · exact absurd h1 Nat.card_pos.ne'
+        · exact absurd h1 Finite.one_lt_card.ne'
+      · exact h0
+    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+    have hqσ : q ∈ S10.sigma M := S10.Msigma_isPiGroup M q hq
+    have hpq : p ≠ q := fun hpq => h.notMem_sigma (hpq ▸ hqσ)
+    -- `P` normalizes `M_σ`, coprimely.
+    have hM_norm_Mσ : M ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) := by
+      rw [S10.Msigma, OddOrder.GroupTheory.opiCoreInG]
+      have hle := Subgroup.le_normalizer_map (H := Ch03.oPiCore (S10.sigma M) ↥M) M.subtype
+      rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hle
+    have hP_norm_Mσ : P ≤ Subgroup.normalizer ((S10.Msigma M) : Set G) :=
+      h.P_le.trans hM_norm_Mσ
+    have hp_ndvd_Mσ : ¬ p ∣ Nat.card ↥(S10.Msigma M) := fun hdvd =>
+      h.notMem_sigma (S10.Msigma_isPiGroup M p
+        (Nat.mem_primeFactors.mpr ⟨h.prime, hdvd, Nat.card_pos.ne'⟩))
+    have hcopP : Nat.Coprime (Nat.card ↥P) (Nat.card ↥(S10.Msigma M)) := by
+      obtain ⟨n, hn⟩ := h.P_pgroup.exists_card_eq
+      rw [hn]
+      exact ((Nat.Prime.coprime_iff_not_dvd h.prime).mpr hp_ndvd_Mσ).pow_left n
+    -- `Q₁`: a `P`-invariant Sylow `q`-subgroup of `M_σ`; `Q₂ := Q₁^g`.
+    have hbot_pg : IsPGroup q ↥(⊥ : Subgroup G) :=
+      IsPGroup.of_card (n := 0) (by rw [Subgroup.card_bot, pow_zero])
+    obtain ⟨Q₁, hQ₁P, -⟩ := exists_isAInvSylowIn h.P_pgroup hP_norm_Mσ hcopP
+      (P₀ := ⊥) hbot_pg bot_le
+      (by rw [Subgroup.normalizer_eq_top]; exact le_top)
+    have hQ₁A : IsAInvSylowIn q A Q₁ (S10.Msigma M) := hQ₁P.of_le h.A_le_P
+    have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hgN
+    have hQ₂P : IsAInvSylowIn q P (MulAut.conj g • Q₁)
+        (MulAut.conj g • S10.Msigma M) := by
+      have htr := isAInvSylowIn_conj_smul g hQ₁P
+      rwa [hgP] at htr
+    have hQ₂A : IsAInvSylowIn q A (MulAut.conj g • Q₁)
+        (MulAut.conj g • S10.Msigma M) := hQ₂P.of_le h.A_le_P
+    -- `A ⊆ M^g` and Lemma 11.1.
+    have hAgM : A ≤ MulAut.conj g • M := by
+      refine le_trans h.A_le_P (le_trans (le_of_eq hgP.symm) ?_)
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.P_le
+    obtain ⟨-, hkey⟩ := invariant_sylow_disjoint hG h hgM hAgM hqσ hQ₁A hQ₂A
+    -- `A` is noncyclic abelian, coprime to the `Qᵢ`.
+    haveI hAcommI : IsMulCommutative ↥A := ⟨⟨fun x y => hAea.1 x y⟩⟩
+    have hAnc : ¬ IsCyclic ↥A := by
+      intro hcyc
+      have hexp : Monoid.exponent ↥A = p ^ 2 := by
+        rw [IsCyclic.exponent_eq_card, hAcard]
+      have hdvd : Monoid.exponent ↥A ∣ p :=
+        Monoid.exponent_dvd_of_forall_pow_eq_one hAea.2
+      rw [hexp] at hdvd
+      have h1 := Nat.le_of_dvd h.prime.pos hdvd
+      have h2 := h.prime.one_lt
+      nlinarith
+    have hQcop : ∀ {Q : Subgroup G}, IsPGroup q ↥Q →
+        Nat.Coprime (Nat.card ↥A) (Nat.card ↥Q) := by
+      intro Q hQpg
+      obtain ⟨k, hk⟩ := hQpg.exists_card_eq
+      rw [hAcard, hk]
+      exact Nat.Coprime.pow _ _ ((Nat.coprime_primes h.prime Fact.out).mpr hpq)
+    -- `Q₁ ≠ ⊥ ≠ Q₂`.
+    have hq_dvd_Mσ : q ∣ Nat.card ↥(S10.Msigma M) := (Nat.mem_primeFactors.mp hq).2.1
+    have hQ₁ne : Q₁ ≠ ⊥ := by
+      intro hbot
+      have hd := isAInvSylowIn_card_dvd hQ₁A hq_dvd_Mσ
+      rw [hbot, Subgroup.card_bot] at hd
+      exact (Fact.out : q.Prime).one_lt.ne' (Nat.dvd_one.mp hd)
+    have hQ₂ne : MulAut.conj g • Q₁ ≠ ⊥ := conj_smul_ne_bot g hQ₁ne
+    -- `X₁, X₂ ∈ ℰ¹(A)` with nontrivial centralizers in `Q₁`, `Q₂` (Prop 1.16).
+    obtain ⟨x₁, hx₁A, hx₁ne, hx₁C⟩ :=
+      Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic hQ₁A.2.2.1 hAnc
+        (hQcop hQ₁A.2.1) hQ₁ne
+    obtain ⟨x₂, hx₂A, hx₂ne, hx₂C⟩ :=
+      Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic hQ₂A.2.2.1 hAnc
+        (hQcop hQ₂A.2.1) hQ₂ne
+    have hordx : ∀ x ∈ A, x ≠ (1 : G) → Nat.card ↥(Subgroup.zpowers x) = p := by
+      intro x hx hxne
+      rw [Nat.card_zpowers]
+      refine orderOf_eq_prime ?_ hxne
+      have h1 := congrArg Subtype.val (hAea.2 ⟨x, hx⟩)
+      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h1
+    have hX₁mem : Subgroup.zpowers x₁ ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime (hordx x₁ hx₁A hx₁ne),
+        by rw [pow_one]; exact hordx x₁ hx₁A hx₁ne⟩
+    have hX₂mem : Subgroup.zpowers x₂ ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime (hordx x₂ hx₂A hx₂ne),
+        by rw [pow_one]; exact hordx x₂ hx₂A hx₂ne⟩
+    -- Lemma 10.13(c): transitivity off `Z₀ = Ω₁(Z(P))`.
+    have hpG' : p ∈ (Nat.card G).primeFactors := by
+      refine Nat.mem_primeFactors.mpr ⟨h.prime, ?_, Nat.card_pos.ne'⟩
+      refine dvd_trans ?_ (Subgroup.card_subgroup_dvd_card A)
+      rw [hAcard]
+      exact dvd_pow_self p two_ne_zero
+    have hA₀ne : A₀ ≠ S10.omega1CenterInG P p := by
+      intro heq
+      apply hgM
+      apply h.normalizer_A₀_le
+      rw [heq]
+      exact S10.normalizer_le_normalizer_omega1CenterInG P p hgN
+    obtain ⟨hZ₀line, -, htrans⟩ :=
+      S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure hG hpG' h.A_mem h.A_maximal
+        h.P_pgroup hPnonab h.A_le_P ⟨h.A₀_mem, h.A₀_le_A⟩ hA₀ne
+    -- The two centralizer intersections, in subgroup-of-`A` form.
+    have hX₁Q₁ne : Subgroup.centralizer
+        ((Subgroup.zpowers x₁ : Subgroup G) : Set G) ⊓ Q₁ ≠ ⊥ := by
+      rw [centralizer_zpowers_eq_singleton, inf_comm]
+      exact hx₁C
+    have hX₂Q₂ne : Subgroup.centralizer
+        ((Subgroup.zpowers x₂ : Subgroup G) : Set G) ⊓ (MulAut.conj g • Q₁) ≠ ⊥ := by
+      rw [centralizer_zpowers_eq_singleton, inf_comm]
+      exact hx₂C
+    have hX₂Q₁ : Subgroup.centralizer
+        ((Subgroup.zpowers x₂ : Subgroup G) : Set G) ⊓ Q₁ = ⊥ :=
+      (hkey _ hX₂mem (Subgroup.zpowers_le.mpr hx₂A)).resolve_right hX₂Q₂ne
+    -- `X₁ = Z₀` or `X₂ = Z₀` (otherwise Lemma 10.13(c) would conjugate `X₁` to `X₂` in `P`).
+    have hcases : Subgroup.zpowers x₁ = S10.omega1CenterInG P p ∨
+        Subgroup.zpowers x₂ = S10.omega1CenterInG P p := by
+      by_contra hcon
+      push Not at hcon
+      obtain ⟨n, hnNA, hn⟩ := htrans _ _
+        ⟨hX₁mem, Subgroup.zpowers_le.mpr hx₁A⟩ hcon.1
+        ⟨hX₂mem, Subgroup.zpowers_le.mpr hx₂A⟩ hcon.2
+      have hnQ₁ : MulAut.conj n • Q₁ = Q₁ :=
+        conj_smul_eq_self_of_mem_normalizer (hQ₁P.2.2.1 hnNA.2)
+      have heq2 : Subgroup.centralizer
+          ((Subgroup.zpowers x₂ : Subgroup G) : Set G) ⊓ Q₁
+          = MulAut.conj n • (Subgroup.centralizer
+            ((Subgroup.zpowers x₁ : Subgroup G) : Set G) ⊓ Q₁) := by
+        rw [Subgroup.smul_inf, hnQ₁, centralizer_conj_smul, hn]
+      rw [heq2] at hX₂Q₁
+      exact conj_smul_ne_bot n hX₁Q₁ne hX₂Q₁
+    -- `Z₀` is `g`-stable, so both `C(Z₀) ⊓ Q₁` and `C(Z₀) ⊓ Q₂` are nontrivial — contradiction.
+    have hgZ₀ : MulAut.conj g • S10.omega1CenterInG P p = S10.omega1CenterInG P p :=
+      conj_smul_eq_self_of_mem_normalizer
+        (S10.normalizer_le_normalizer_omega1CenterInG P p hgN)
+    have heqZ : Subgroup.centralizer
+        ((S10.omega1CenterInG P p : Subgroup G) : Set G) ⊓ (MulAut.conj g • Q₁)
+        = MulAut.conj g • (Subgroup.centralizer
+          ((S10.omega1CenterInG P p : Subgroup G) : Set G) ⊓ Q₁) := by
+      rw [Subgroup.smul_inf, centralizer_conj_smul, hgZ₀]
+    have hkeyZ₀ := hkey _ hZ₀line.1 hZ₀line.2
+    rcases hcases with hc1 | hc2
+    · rw [hc1] at hX₁Q₁ne
+      rcases hkeyZ₀ with hk | hk
+      · exact hX₁Q₁ne hk
+      · rw [heqZ] at hk
+        exact conj_smul_ne_bot g hX₁Q₁ne hk
+    · rw [hc2] at hX₂Q₂ne hX₂Q₁
+      rw [heqZ, hX₂Q₁, mulAut_smul_eq_map, Subgroup.map_bot] at hX₂Q₂ne
+      exact hX₂Q₂ne rfl
+  -- Step 2: `P` is the Sylow `p`-subgroup of `M` up to conjugacy; transfer commutativity.
+  have hPab : IsMulCommutative ↥P :=
+    ⟨⟨fun x y => Subtype.ext (by
+      simp only [Subgroup.coe_mul]
+      exact hPcomm x x.2 y y.2)⟩⟩
+  obtain ⟨T, hPT⟩ := h.P_pgroup.comap_subtype.exists_le_sylow (G := M)
+  have hTmap : (T : Subgroup ↥M).map M.subtype = P := by
+    refine h.P_sylow _ ?_ (Subgroup.map_subtype_le _) (T.2.map M.subtype)
+    rw [← Subgroup.map_subgroupOf_eq_of_le h.P_le]
+    exact Subgroup.map_mono hPT
+  have hTeq : (T : Subgroup ↥M) = P.subgroupOf M := by
+    rw [← hTmap, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  have hTab : IsMulCommutative ↥(T : Subgroup ↥M) := by
+    rw [hTeq]
+    exact isMulCommutative_of_mulEquiv (Subgroup.subgroupOfEquivOfLe h.P_le).symm hPab
+  obtain ⟨m, hm⟩ := MulAction.exists_smul_eq ↥M T S
+  have hSeq : (S : Subgroup ↥M) = (T : Subgroup ↥M).map (MulAut.conj m : ↥M →* ↥M) := by
+    rw [← hm, Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def]
+    rfl
+  rw [hSeq]
+  exact isMulCommutative_of_mulEquiv
+    (Subgroup.equivMapOfInjective _ _ (MulAut.conj m).injective) hTab
 
 /-- **BG Corollary 11.6 (a)(b)** (mmd L2977): (a) `A = Ω₁(P)`、(b) `C_{M_σ}(A) = 1`。
-(原典 (c): `g₁,g₂∈N_G(P)−N_M(P)` で `C_{M_σ}(A₀^{gᵢ})=1` ∧ `A=A₁×A₂` — 後続。) -/
+(原典 (c): `g₁,g₂∈N_G(P)−N_M(P)` で `C_{M_σ}(A₀^{gᵢ})=1` ∧ `A=A₁×A₂` — 後続。)
+
+証明: Theorem 11.5 で `P` は abelian。(a) `Ω₁(P)` の生成元 (exp-`p` 元) は `A` を中心化する
+ので極大性により `A` に落ち、逆向きは自明。(b) `g ∈ N_G(P) − M` を取ると `Ω₁(P)` は
+characteristic ゆえ `g` は `A` を正規化し、`A₀^g ≤ A`; Corollary 11.2(b) の
+`M_σ ⊓ C_G(A₀^g) = 1` に `C_G(A) ≤ C_G(A₀^g)` を合わせる。 -/
 theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
     A = (Omega ↥P p 1).map P.subtype ∧
     Subgroup.centralizer (A : Set G) ⊓ S10.Msigma M = ⊥ := by
-  sorry
+  classical
+  haveI : Fact p.Prime := ⟨h.prime⟩
+  have hAea : A.IsElementaryAbelian p := h.A_mem.1
+  -- `P` is abelian (Theorem 11.5, transported from the Sylow `T` with `T.map = P`).
+  obtain ⟨T, hPT⟩ := h.P_pgroup.comap_subtype.exists_le_sylow (G := M)
+  have hTmap : (T : Subgroup ↥M).map M.subtype = P := by
+    refine h.P_sylow _ ?_ (Subgroup.map_subtype_le _) (T.2.map M.subtype)
+    rw [← Subgroup.map_subgroupOf_eq_of_le h.P_le]
+    exact Subgroup.map_mono hPT
+  have hPab : IsMulCommutative ↥P := by
+    have hTab := sylow_p_isCommutative hG h T
+    have e : ↥(T : Subgroup ↥M) ≃* ↥P := by
+      rw [← hTmap]
+      exact Subgroup.equivMapOfInjective _ _ M.subtype_injective
+    exact isMulCommutative_of_mulEquiv e hTab
+  have hPcomm : ∀ x ∈ P, ∀ y ∈ P, x * y = y * x := by
+    intro x hx y hy
+    have hc := hPab.is_comm.comm (⟨x, hx⟩ : ↥P) ⟨y, hy⟩
+    simpa using congrArg Subtype.val hc
+  -- exp-`p` elements of `P` lie in `A` (maximality of `A`, `P` abelian).
+  have htrap : ∀ x ∈ P, x ^ p = 1 → x ∈ A := by
+    intro x hx hxp
+    rcases eq_or_ne x 1 with rfl | hxne
+    · exact A.one_mem
+    have hzx : (Subgroup.zpowers x).IsElementaryAbelian p :=
+      Subgroup.IsElementaryAbelian.of_card_prime
+        (by rw [Nat.card_zpowers, orderOf_eq_prime hxp hxne])
+    have hA_le_C : A ≤ Subgroup.centralizer
+        ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+      intro a ha
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+      exact ((show Commute x a from hPcomm x hx a (h.A_le_P ha)).zpow_left k).eq
+    have hsup : (A ⊔ Subgroup.zpowers x).IsElementaryAbelian p :=
+      hAea.sup_of_le_centralizer hzx hA_le_C
+    have heq := h.A_maximal.2 _ hsup le_sup_left
+    exact heq ▸ Subgroup.mem_sup_right (Subgroup.mem_zpowers x)
+  -- (a)
+  have ha_eq : A = (Omega ↥P p 1).map P.subtype := by
+    apply le_antisymm
+    · intro a ha
+      refine ⟨⟨a, h.A_le_P ha⟩, Omega.mem_of_pow_eq_one ?_, rfl⟩
+      rw [pow_one]
+      refine Subtype.ext ?_
+      rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]
+      have h1 := congrArg Subtype.val (hAea.2 ⟨a, ha⟩)
+      rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h1
+    · rw [Subgroup.map_le_iff_le_comap, Omega, Subgroup.closure_le]
+      intro z hz
+      rw [Set.mem_setOf_eq, pow_one] at hz
+      rw [SetLike.mem_coe, Subgroup.mem_comap]
+      refine htrap (P.subtype z) z.2 ?_
+      rw [← map_pow, hz, map_one]
+  refine ⟨ha_eq, ?_⟩
+  -- (b)
+  obtain ⟨g, hgN, hgM⟩ := SetLike.not_le_iff_exists.mp h.normalizer_P_not_le
+  have hgA : MulAut.conj g • A = A := by
+    rw [ha_eq]
+    exact conj_smul_eq_self_of_mem_normalizer
+      (OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic (K := P)
+        (W := Omega ↥P p 1) hgN)
+  have hA₀gA : MulAut.conj g • A₀ ≤ A := by
+    rw [← hgA]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.A₀_le_A
+  have hAgM : A ≤ MulAut.conj g • M := by
+    have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hgN
+    refine le_trans h.A_le_P (le_trans (le_of_eq hgP.symm) ?_)
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.P_le
+  have h112 := (Msigma_meet_conjugate hG h hgM hAgM).2
+  rw [eq_bot_iff]
+  intro c hc
+  have hcC : c ∈ S10.Msigma M ⊓ Subgroup.centralizer
+      ((MulAut.conj g • A₀ : Subgroup G) : Set G) :=
+    ⟨hc.2, Subgroup.centralizer_le (fun y hy => hA₀gA hy) hc.1⟩
+  rw [h112] at hcC
+  exact hcC
 
 /-- **BG Theorem 11.7** (mmd L2997): `M_σ A ⊴ M`。§11 の主結果。 -/
 theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
