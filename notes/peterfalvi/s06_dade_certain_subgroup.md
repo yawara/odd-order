@@ -1116,21 +1116,41 @@ orthonormal family μ で `Ind ψ_j=∑_i(ψ_j,χ_i)μ_i` なら **μ_i|_A=χ_i|
 - **基底 `omegaColumnDiffBasis`** (`card_supportInSubgroup_sdiff`=|W−W₂|=(w₁−1)w₂ [complement of W₂
   in W] + `finrank_sdiffSupported` + `basisOfLinearIndependentOfCardEqFinrank`)。
 
-### ▶▶ 次 = step 4 残: (1.3) value-match → eq_sigma [精査済・再調査するな]
+### ✅ 着地 (session 21 cont.³): step 4 (1.4)-image bridge + g-setup COMPLETE (commit 8d5c193f)
 
-**g ⊥ 基底 ⟹ masking ⟹ hres の recipe** (g := `restrict_W(δ_{χ₂}•(columnFamily χ₂).mu i) − chiColumn χ₂ i`
-on ↥W; A = `supportInSubgroup sdiffV W`):
-1. **g ⊥ 各基底 `ω_{kl}−ω_{0l}`** (k=p.1.1≠1, l=p.2): `inner(ω_{kl}−ω_{0l}) g
-   = inner(Ind(ω_{kl}−ω_{0l}))(δ_{χ₂}μ_{i,χ₂}) − inner(ω_{kl}−ω_{0l})(ω_{e i,χ₂})` [Frobenius]。
-   `Ind(ω_{kl}−ω_{0l}) = (columnFamily l).signedDifference (e.symm k)` [columnFamily_spec; ω_{kl}=chiColumn l (e⁻¹k), ω_{0l}=chiColumn l 0]。
-   **✅ 検算: 両項とも `[e⁻¹k=i]−[i=0]` (l=χ₂; sign²=1+μ orthonormal+omega inner) / 両項 0 (l≠χ₂; cross-col) ⟹ 全 i で相殺 = 0**
-   (i=0 注意: ω_{ij} 項にも `−[i=0]` があるので相殺、初回検算で見落とした罠)。
-2. **masking**: g ⊥ 基底 ⟹ 線形汎関数 `(innerDual g)∘subtype = 0` on `SupportedOnV` (`omegaColumnDiffBasis.ext`)
+- **`chiColumn_w1CharEquiv_symm`**: ω_{kl}=chiColumn l (e⁻¹k) (`rw [chiColumn, Equiv.apply_symm_apply]`)。
+- **`induce_omegaColumnDiff_eq`**: `Ind_W^L(ω_{kl}−ω_{0l})=(columnFamily l).signedDifference (e⁻¹k)`
+  (`← columnFamily_spec`+`isometryDifferenceImage_induceZ`; val-eq は `rw[chiColumn_..symm, chiColumn_zero]; exact omegaColumnDiff_coe` で X=X 罠回避)。
+- **`certainTypeRestrictDiff`** (= g) def 済。
+
+### ▶▶ 次 = step 4 残: g⊥基底 → masking → eq_sigma [recipe 確定・Lean 名前判明・再調査するな]
+
+**🔑 Lean 名前/手法 (今回判明)**: Frobenius=`ClassFunction.inner_induce_eq_inner_restrict` (qualify必須);
+omega/μ 両方 `irreducibleCharacter_inner` (=if χ=χ' then 1 else 0; `omega_inner` は存在せず self/ne のみ);
+条件変換は **`if_congr <iff> rfl rfl`** で; **`omega_injective.eq_iff`** + **`omegaProdChar_inj`** (W側) /
+**`columnFamily_mu_injective.eq_iff`** (L側, global μ injective を直接!); `e.symm` 変換は `Equiv.symm_apply_eq`;
+sign²=1 は `rcases sign_eq <;> norm_num`。
+
+1. **`certainTypeRestrictDiff_inner_basis`** (χ₂)(i)(l){k:≠1}: `inner(omegaColumnDiff k 1 l : CF)(g χ₂ i)=0`。
+   `rw [certainTypeRestrictDiff, inner_sub_right, ← ClassFunction.inner_induce_eq_inner_restrict,
+   induce_omegaColumnDiff_eq l k]` ⟹ goal `T1 − T2 = 0` (T1=L側 `inner(signedDiff_l(e⁻¹k))(δ_{χ₂}μ_{i,χ₂})`,
+   T2=W側 `inner(omegaColumnDiff k 1 l)(chiColumn χ₂ i)`)。**T1=T2 を示す**:
+   - **T2** (W側): `irreducibleCharacter_inner` ×2 → `(if ω_{kl}=ω_{e i,χ₂} then 1 else 0)−(if ω_{0l}=ω_{e i,χ₂}...)`;
+     `if_congr` で条件 → `(e⁻¹k=i∧l=χ₂)` / `(0=i∧l=χ₂)` (omega_injective.eq_iff+omegaProdChar_inj+`k=e i↔e⁻¹k=i`)。
+   - **T1** (L側): `signedDifference_apply`+`difference`+`← Int.cast_smul_eq_zsmul ℂ`×2+`inner_smul_left`+
+     `RepresentationTheory.inner_smul_right`+`star_intCast`+`inner_sub_left`+`classFunction`×3+
+     `irreducibleCharacter_inner`×2 → `sign_l·sign_χ₂·((if μ_{e⁻¹k,l}=μ_{i,χ₂}..)−(if μ_{0,l}=μ_{i,χ₂}..))`;
+     条件 → `(l=χ₂∧e⁻¹k=i)` via `columnFamily_mu_injective.eq_iff` (Prod.ext)。
+   - **by_cases l=χ₂**: l=χ₂ で sign²=1, 両条件 `[e⁻¹k=i]−[0=i]` 一致; l≠χ₂ で T1 の μ-if は `columnFamily_mu_ne` で 0,
+     T2 の omega-if も l≠χ₂ で 0 ⟹ 両 0。**✅ 全 i 相殺検算済 (i=0 で ω_{ij} 項の −[0=i] が効く罠)**。
+   ⚠ session 21 cont.³ で初回実装試行 → omega_inner 名 + inner_induce qualify + if 条件変換で未完;
+   上記名前で再実装すれば通る (~50-70 行, 検算は完了)。
+2. **masking**: g ⊥ 基底 ⟹ `(innerDual g).comp subtype = 0` on `SupportedOnV` (`omegaColumnDiffBasis.ext`)
    ⟹ ∀φ supported, inner φ g=0 ⟹ `eq_zero_of_mem_of_inner_supported_eq_zero` (↥W abelian ∴ A conj-closed)
    ⟹ g a=0 ∀a∈A ⟹ `(δ_{χ₂}•μ_{i,χ₂})(a:L)=ω_{ij}(a)` on W−W₂ ⊇ V。
-3. **eq_sigma**: hres (V⊆W−W₂ で値一致) + ZIrr (δ•μ irr) + inner=1 → `eq_sigma_of_apply_eq_on_V`
-   (`toTICyclicHypothesis`, hVeq=rfl, app=⟨toTICyclic Dade⟩) ⟹ **σ(ω_{ij})=δ_j μ_{ij}** = (4.3.b) capstone。
-   ⚠ σ は `toTICyclicHypothesis` (V=Vdiff); (1.4)/基底は `sdiffTICyclicHypothesis` (V=W−W₂); ω 共有 (defeq)。
+3. **eq_sigma**: hres (V⊆W−W₂ 値一致) + ZIrr + inner=1 → `eq_sigma_of_apply_eq_on_V` (`toTICyclicHypothesis`,
+   hVeq=rfl, app=⟨toTICyclic Dade⟩) ⟹ **σ(ω_{ij})=δ_j μ_{ij}** = (4.3.b) capstone。⚠ σ=`toTICyclicHypothesis`(V=Vdiff),
+   (1.4)/基底=`sdiffTICyclicHypothesis`(V=W−W₂); ω 共有 (defeq)。
 
 その後 (4.3.c)(d) → (4.4)(小) → (4.5) ([Is]6.32=ConjugationBrauer 済)。
 

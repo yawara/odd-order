@@ -571,6 +571,40 @@ noncomputable def omegaColumnDiffBasis :
     rw [← Nat.card_eq_fintype_card, hc2]
   rw [e1, e2]
 
+/-- `ω_{kl} = chiColumn l (e⁻¹ k)`: the basis index `k` (a `W₁`-dual) is `e (e⁻¹ k)` of
+the column family. -/
+theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
+    (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    h.chiColumn l (h.w1CharEquiv.symm k)
+      = h.sdiffTICyclicHypothesis.omega (h.sdiffTICyclicHypothesis.omegaProdChar k l) := by
+  rw [chiColumn, Equiv.apply_symm_apply]
+
+/-- **The (1.4) image of a basis vector** `ω_{kl} − ω_{0l}` is the column-`l` signed
+difference at index `e⁻¹ k`: `Ind_W^L(ω_{kl} − ω_{0l}) = (columnFamily l).signedDifference (e⁻¹ k)`. -/
+theorem induce_omegaColumnDiff_eq [NeZero (Nat.card h.W1)]
+    (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.induce h.sdiffTICyclicHypothesis.W
+        (h.omegaColumnDiff k 1 l : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = (h.columnFamily l).signedDifference (h.w1CharEquiv.symm k) := by
+  have hval : (h.omegaColumnDiff k 1 l : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = (h.chiColumn l (h.w1CharEquiv.symm k) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn l 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
+    rw [h.chiColumn_w1CharEquiv_symm l k, h.chiColumn_zero l]
+    exact h.omegaColumnDiff_coe k 1 l
+  rw [hval, ← h.isometryDifferenceImage_induceZ l (h.w1CharEquiv.symm k),
+    h.columnFamily_spec l (h.w1CharEquiv.symm k)]
+
+/-- The "certain-type difference" `g = Res_W(δ_{χ₂}·μ_{ij}) − ω_{ij}` on `↥W`, whose
+vanishing on `W − W₂` (the (1.3) value-match) gives the σ-identification. -/
+noncomputable def certainTypeRestrictDiff [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ClassFunction h.sdiffTICyclicHypothesis.W ℂ :=
+  ClassFunction.restrict h.sdiffTICyclicHypothesis.W
+      ((h.columnFamily χ₂).sign • ((h.columnFamily χ₂).mu i : ClassFunction L ℂ))
+    - (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+
 end Recipe
 
 end Hypothesis
