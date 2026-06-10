@@ -1926,6 +1926,110 @@ theorem rank_centralizer_Malpha_le_one_of_not_uniqueMaximal [Finite G]
       (hU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hMcoatom inf_le_right).symm
   exact hMNX (hUNX.maximalSubgroupsContaining_eq_singleton.trans (by rw [huniqNX]))
 
+/-- For `p ∈ τ₁(M)` and a nonidentity `p`-subgroup `P ≤ M`, the normalizer `N_G(P)` is not
+uniquely contained in `M`: `ℳ(N_G(P)) ≠ {M}`. If it were `{M}`, then `M ∈ ℳ(N_G(P))` and Lemma
+12.2(a) would give `p ∈ σ(M) ∪ τ₂(M)`, contradicting `p ∈ τ₁(M)` (`τ₁ ∩ σ = ∅`, and `r_p(M) = 1 ≠ 2
+= r_p(M)` if `p ∈ τ₂`). Supplies the input `ℳ(N_G(P)) ≠ {M}` for the rank bound `(12.6)` in
+Lemma 12.18(a). -/
+theorem maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1 [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ}
+    [Fact p.Prime] (hp : p ∈ tau1 M) {P : Subgroup G} (hPM : P ≤ M) (hPne : P ≠ ⊥)
+    (hPp : IsPGroup p ↥P) :
+    maximalSubgroupsContaining (Subgroup.normalizer (P : Set G)) ≠ {M} := by
+  intro hsingle
+  have hMmem : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (P : Set G)) := by
+    rw [hsingle]; exact Set.mem_singleton M
+  rcases prime_mem_sigma_or_tau2 hG hM hPM hPne hPp hMmem with hσ | hτ2
+  · exact hp.1 hσ
+  · exact absurd (hτ2.2.symm.trans hp.2.2) (by norm_num)
+
+/-- **Thompson critical-subgroup mechanism for Lemma 12.18(a)** (BG Theorem 1.13). If a `q`-group
+`Q` normalizes but does not centralize an `r`-group `R` (`q ≠ r`, ambient order odd), then `R` has
+a characteristic subgroup `R₁` of exponent `r` that `Q` does not centralize either. Theorem 1.13
+supplies a characteristic `R₁ ⊴ R` of exponent `r` with `C_{Aut R}(R₁)` an `r`-group; were `Q` to
+centralize `R₁`, conjugation would land each `x ∈ Q` in `C_{Aut R}(R₁)`, so (coprimality of
+`q`-order and `r`-order) the induced automorphism is trivial, forcing `Q` to centralize all of
+`R`. -/
+theorem exists_charSubgroup_exponent_not_centralized [Finite G]
+    (hodd : Odd (Nat.card G)) {q r : ℕ} [Fact q.Prime] [Fact r.Prime] (hqr : q ≠ r)
+    {R Q : Subgroup G} (hRr : IsPGroup r ↥R) (hRne : R ≠ ⊥)
+    (hQq : IsPGroup q ↥Q) (hQnorm : Q ≤ Subgroup.normalizer (R : Set G))
+    (hnc : ¬ Q ≤ Subgroup.centralizer (R : Set G)) :
+    ∃ R₁ : Subgroup G, R₁ ≤ R ∧ (R₁.subgroupOf R).Characteristic ∧
+      Monoid.exponent ↥R₁ = r ∧ ¬ Q ≤ Subgroup.centralizer (R₁ : Set G) := by
+  classical
+  haveI : Nontrivial ↥R := (Subgroup.nontrivial_iff_ne_bot R).mpr hRne
+  -- `r ∣ |G|`, hence `r` is odd, so `r ≠ 2`.
+  have hr_dvd : r ∣ Nat.card G := by
+    obtain ⟨n, hn⟩ := hRr.exists_card_eq
+    have hcard1 : 1 < Nat.card ↥R := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    have hn0 : n ≠ 0 := by rintro rfl; rw [pow_zero] at hn; omega
+    exact (hn ▸ dvd_pow_self r hn0).trans (Subgroup.card_subgroup_dvd_card R)
+  have hr2 : r ≠ 2 := by
+    rintro rfl
+    rw [Nat.odd_iff] at hodd
+    obtain ⟨c, hc⟩ := hr_dvd
+    omega
+  -- Theorem 1.13 applied to the `r`-group `↥R`.
+  obtain ⟨H, hHchar, -, -, hHexp, hHaut⟩ :=
+    OddOrder.BG.Ch1.S01.thompson_critical_omega (G := ↥R) hr2 hRr
+  set R₁ : Subgroup G := H.map R.subtype with hR₁_def
+  have hR₁R : R₁ ≤ R := Subgroup.map_subtype_le H
+  have hsubgroupOf : R₁.subgroupOf R = H :=
+    Subgroup.comap_map_eq_self_of_injective R.subtype_injective H
+  refine ⟨R₁, hR₁R, ?_, ?_, ?_⟩
+  · rw [hsubgroupOf]; exact hHchar
+  · rw [hR₁_def, ← Monoid.exponent_eq_of_mulEquiv
+      (Subgroup.equivMapOfInjective H R.subtype R.subtype_injective)]
+    exact hHexp
+  · -- if `Q` centralized `R₁`, conjugation would be trivial on `R`.
+    intro hQcent
+    apply hnc
+    letI act : MulDistribMulAction ↥Q ↥R :=
+      MulDistribMulAction.compHom
+        (M := ↥(Subgroup.normalizer (R : Set G))) ↥R (Subgroup.inclusion hQnorm)
+    set φ : ↥Q →* MulAut ↥R := MulDistribMulAction.toMulAut ↥Q ↥R with hφ
+    have hφ_coe : ∀ (a : ↥Q) (x : ↥R),
+        (R.subtype ((φ a) x)) = (↑a) * (R.subtype x) * (↑a)⁻¹ := fun _ _ => rfl
+    -- each `a ∈ Q` induces the trivial automorphism of `R`.
+    have hφ1 : ∀ a : ↥Q, φ a = 1 := by
+      intro a
+      have hmem : φ a ∈ autCentralizer H := by
+        rw [mem_autCentralizer]
+        intro h hh
+        apply R.subtype_injective
+        rw [hφ_coe]
+        have hR1mem : (R.subtype h : G) ∈ R₁ := Subgroup.mem_map_of_mem R.subtype hh
+        have hcomm := Subgroup.mem_centralizer_iff.mp (hQcent a.2) (R.subtype h) hR1mem
+        rw [← hcomm]; group
+      have hord_r : ∃ m, orderOf (φ a) = r ^ m := by
+        obtain ⟨m, hm⟩ := IsPGroup.iff_orderOf.mp hHaut ⟨φ a, hmem⟩
+        refine ⟨m, ?_⟩
+        rw [← hm]
+        exact orderOf_injective (autCentralizer H).subtype
+          (autCentralizer H).subtype_injective ⟨φ a, hmem⟩
+      have hord_dvd : orderOf (φ a) ∣ orderOf a := orderOf_map_dvd φ a
+      obtain ⟨k, hk⟩ := IsPGroup.iff_orderOf.mp hQq a
+      obtain ⟨m, hm⟩ := hord_r
+      have hcoprq : Nat.Coprime r q := (Nat.coprime_primes Fact.out Fact.out).mpr hqr.symm
+      have hcop : Nat.Coprime (r ^ m) (q ^ k) := (hcoprq.pow_left m).pow_right k
+      have hdvd : r ^ m ∣ q ^ k := by rw [← hm, ← hk]; exact hord_dvd
+      have hr1 : r ^ m = 1 := by
+        have h := Nat.dvd_gcd (dvd_refl (r ^ m)) hdvd
+        rwa [Nat.Coprime.gcd_eq_one hcop, Nat.dvd_one] at h
+      have hord1 : orderOf (φ a) = 1 := by rw [hm, hr1]
+      exact orderOf_eq_one_iff.mp hord1
+    -- conjugation by every `x ∈ Q` fixes every `y ∈ R`, i.e. `Q ≤ C_G(R)`.
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have hfix := hφ_coe ⟨x, hx⟩ ⟨y, hy⟩
+    rw [hφ1 ⟨x, hx⟩] at hfix
+    simp only [MulAut.one_apply] at hfix
+    have hyx : y = x * y * x⁻¹ := hfix
+    calc y * x = (x * y * x⁻¹) * x := by rw [← hyx]
+      _ = x * y := by group
+
 /-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
 `P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
 (a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
