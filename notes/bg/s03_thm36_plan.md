@@ -890,3 +890,94 @@ dim 0 = `eq_bot_of_card_eq` ✗ h313G / **dim 1 = `S03e.trivial_on_commutator_of
    **n = r+1**: n 偶 (r 奇) vs n = |PR : N_PR(V_{r+1})| ∣ |PR| 奇 ✗ — **最終矛盾 = thm36 完成**。
 7. 完成後: long-line cleanup → scaffold commit → AxiomsCheck 登録 → **§10.6 keystone 解除**
    (Lane D de-axiom 解禁)。
+
+## ✅✅✅✅ 2026-06-10 session 12 (a-keystone): **Phase F (3.38) COMPLETE ⟹ BG Theorem 3.6 全証明完了**
+
+`thm36` **sorry-free + axiom-clean** (`propext, Classical.choice, Quot.sound` のみ)、leaf build 緑、
+maxHeartbeats は **元の 2400000 で足りる** (4.8M 一時増は不要だった、下記暴走が原因)。
+root (`OddOrder.lean`) 配線 + `AxiomsCheck` 登録 (`OddOrder.BG.Ch1.S03f.thm36`) 済。
+**⟹ §10.6 keystone 解除 — 残る §10 spine ゲートは Lem 10.4(b) のみ、Lane D の de-axiom 解禁。**
+
+### 実装サマリ (Phase F = 計画 6 手の実現形)
+
+前セッション末に Phase F 全体 (~1100 行) を未検証ドラフトとして書き切っていた
+(commit `287e7c8c` は helper 群のみ)。本セッションは **build デバッグに徹し 6 iteration で緑**:
+3 timeout → 28 errors → 5 errors → 0。数学的構成は計画どおり + 改良:
+
+- **直積分解の代替**: maximal-W 論法を使わず、`Pfam` (index-`q` + `Vᵢ ≠ ⊥`) の subtype 族に
+  **averaging 射影 `efam i = avgConj Kᵢ VG`** で直交性 (`hVfam_disj` + `disjoint_biSup_biSup_of_proj`)、
+  **Prop 1.16(2)** (`S01b_Prop116.cocyclicFixedByClosure_eq_top_of_not_isCyclic`, φV = conj-action,
+  cocyclic Y ↦ index-q `Kᵢ` 変換) で spanning `hspan`。
+- **PR-推移性** `htrans`: 軌道 sup ×2 が (3.11) `h311` に矛盾 (軌道 sup の正規性は
+  `horbitSup_normal`、`h323G` の 4-sup 分解で各生成元を normalizer に)。
+- **非全固定** `hnotallfix`: perm-kernel が `R₀'` を含む ⟹ (3.21) `h321G` 転送で `P_G'` も ⟹ ⊤
+  ⟹ 全 `Vᵢ` 正規 ⟹ (3.11) で singleton ⟹ `Kᵢ₀ = ⊥` ⟹ `relIndex ⊥ = q` が `|K| > q²` と矛盾。
+- **ノルム** `normR = avgConj R₀ VG`: 非固定 j で `efam j ∘ normR = (·^q^(kK−1))` (`hnorm_proj`,
+  stabilizer 自明 = `hfix_only`) ⟹ 単射 ⟹ `|V_{i₁}| ≤ |C_{VG}(R₀)| = p` = (3.19) `h319` ⟹
+  **全 `|Vⱼ| = p`** (推移性で transport)。カード一致で `normR : V_{i₁} ≅ C(R₀)` 全射
+  (`hnorm_surj`) ⟹ **非固定 index は i₁ の R₀-軌道内** (`hnonfix_in_orbit`, さもなくば
+  `efam j` が全ノルムを殺すのに `efam j (normR vⱼ) ≠ 1`)。
+- **固定 index の一意性** `hfix_eq`: `Vⱼ` cyclic 素数位数 ⟹ Aut 可換 ⟹ `⁅K_G,R₀⁆ ≤ C_{K_G}(Vⱼ)`
+  = `Kⱼ` (maximality via relIndex 積) ⟹ 固定 j は全て `⁅K_G,R₀⁆` ⟹ **高々 1 個**。
+- **最終二分** (`horbit_card` = r, stabilizer ⊥): 固定 jstar 有 ⟹ `n = r+1` 偶 vs
+  `n = |orbit| ∣ |A| ∣ |G|` 奇 (`Nat.not_odd_iff_even`)。固定無 ⟹ `n = r`, `p ∤ n` ⟹
+  `IsPGroup.nonempty_fixed_point_of_prime_not_dvd_card` で P-固定 `V_{jP}` ⟹
+  `⁅K,P⁆ = K` (3.24) が `V_{jP}` 中心化 ⟹ (3.14) `hVG_CKG_bot` 矛盾。
+
+### 🔑 デバッグ知見 (巨大単一宣言 + `set`-fvar 文脈での再発防止集)
+
+1. **whnf 暴走 (本セッション最大の障害)**: `SetLike.mem_coe.mpr (Subgroup.mem_iSup_of_mem
+   ⟨YG, hPYG⟩ h10)` が **単独で ≥2.4M heartbeats** (2.4M→4.8M に倍増しても同地点で死亡が証拠;
+   per-decl 予算共有ゆえ後続行 4080 にもカスケード報告)。原因 = `?S ⟨constructor⟩` の
+   非パターン HO 単一化が set-fvar (`Pfam`/`Vfam`/`YG`) の値を whnf 展開し爆発。
+   **fix = `le_iSup (f := 明示) idx` を `have h11` で立てて `exact h11 h10`** (メタ変数ゼロ)。
+2. **`le_iSup₂ idx proof` は proof が複合項だと非 Miller パターン** → f がメタのまま
+   `CompleteLattice ?m` stuck。**常に `(f := fun j' (_ : j' ∈ s) => …)` を明示** + RHS が
+   set-fvar (`S`/`S₁`/`S₂`) なら先に `rw [hSdef]` で iSup を露出 + **`map_mono` で包まない**
+   (map-of-iSup ≠ iSup-of-maps は構文不一致)。
+3. **orbit 分解の β-redex**: `obtain ⟨g, hg⟩ := (orbit-mem)` の `hg : (fun m => m • i₀) g = j` に
+   `rw [mul_smul]` は効かない → **`have hg2 : g • i₀ = j := hg`** (defeq cast) / goal 側は `show`。
+4. **`Subtype.ext_iff.mp h` を期待型付き `have` に直書きすると implicit `a₁ a₂` が期待型側
+   (別の subtype!) に誤単一化** → **2 段**: `have h' := Subtype.ext_iff.mp h` (期待型なし) →
+   `have hG : <coe 等式> := h'` (defeq cast)。`congrArg Subtype.val` も同罠。
+5. `Normal.conj_mem … v⁻¹` は `v⁻¹ * x * (v⁻¹)⁻¹` 形 → goal の `… * v` に合わせるには
+   **`rw [inv_inv] at`** を挟む (defeq でも rw/exact の構文照合は通らない)。
+6. **`rw` は set-fvar (local let) を透過して意図しない出現を書き換える**: `efam j (normR v)` への
+   `rw [avgConj_apply]` が **外側の `efam` を展開して** 内側 `normR` を残した。
+   **fix = `rw [show normR v = ∏ … from avgConj_apply R₀ VG v, map_prod]`** (パターンを固定)。
+7. `orderOf ↑x₀` vs `orderOf (R₀.subtype x₀)` は構文不一致 (rw 不可) →
+   **defeq `have h0 : orderOf xG = orderOf x₀ := orderOf_injective …`** で橋渡し。
+8. subtype 値の `Fintype`: λ 内 `letI` は使用側に見えない → **`haveI instSubFT :
+   ∀ X : Subgroup G, Fintype ↥X := fun _ => Fintype.ofFinite _`** (Π-local-instance) を 1 個 hoist。
+9. **API 名 drift**: `Nat.card_coe_set_eq` (root; `Set.…` でない) / `Nat.not_odd_iff_even`
+   (`Nat.even_iff_not_odd` は不在) / `Subgroup.relIndex_mul_relIndex` は **H K L 明示** /
+   `Nat.Coprime.pow` は m n 明示 (`pow _ _ h`) / `Nat.mul_lt_mul_left (pos)` は **iff** (`.mpr`) /
+   `sq` は **`pow_two` の alias (証明)** / Perm 等式に裸 `ext` は Subgroup-membership まで掘る →
+   `refine Equiv.ext fun i => ?_` + `Equiv.Perm.one_apply`。
+10. **import 漏れ**: Prop 1.16(2) は `S01b_Prop116` (namespace `OddOrder.BG.Ch1.S01`) — 本ファイル
+    から未 import だった (依存表に載っていても import を確認せよ)。
+11. `relIndex` は plain def: `card_mul_index (subgroupOf)` の結果は **型注釈付き
+    `have h1 : … relIndex … := h0`** (defeq) で relIndex 形に乗せ替えてから rw する。
+
+### ▶ 次セッション (Lane A 次フロンティア)
+
+1. **§10.6 `proper_hasPLengthOne`** (thm36 の第一消費者; ゲートは 1=Thm10.2✅ 2=Lem6.3(a)✅
+   3=Lem1.21(a)✅ 4=p'-lift✅ + **Thm 3.6✅(本セッション)** — 残 = Lem 10.4(b) の statement/証明) か、
+2. 司令塔 (main) へのマージ報告を優先し、Lane D (bg-s10-fwd) の forward-axiom de-axiom を解禁。
+ファイル分割 (S03f_Thm36 は 4900 行) は §10.6 着地後の独立リファクタとして検討。
+
+### session 12 cont. — ファイル分割 (commit `4f6c9ec6`)
+
+**Phase F を `S03f_OrbitParity.lean` の独立補題 `orbit_parity_contradiction` に分離**
+(S03f_Thm36: 4951→3826 行; (3.11)–(3.37) の確立事実 27 個を仮説に取り `False` を返す)。
+Phase F は IH 非消費ゆえ誘導から自然に切り出せる; **Phase A–E は (3.6)/(3.7)/(3.22) で IH を
+消費するため thm36_aux 内に残す** (これ以上の分割は IH 自体の仮説化が必要 = 別設計)。
+heartbeat 実測: 新補題 800k で十分 / thm36_aux は 2.4M 維持。
+
+**🔑 切り出し時の set-fvar 透過性ロス (今後の phase 抽出で再利用)**: 親証明で `set`-bound
+だった VG/KG/A は補題側で不透明変数になる ⟹ ① membership の直接 destructure
+(`obtain ⟨v, hv, rfl⟩ := hxV`) は先に `rw [hVG] at hxV` が要る (×2)、② `le_trans` を
+`Subgroup.map_subtype_le V` と直接繋ぐ箇所は `have hVG_le_H : VG ≤ H := hVG ▸ …` を 1 個
+立てて差し替え (×3)、③ `mem_sup_left/right` を A-membership に充てる箇所は `rw [hAdef]`
+(×2)、④ `Fact q.Prime` instance の haveI 再掲が要る。自由変数の機械列挙 (Python で
+have/set/obtain 束縛名と使用名の diff) が漏れ防止に有効だった (`hKRs_index` を検出)。

@@ -39,6 +39,7 @@ import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.AppA_PStability
@@ -3483,3 +3484,8 @@ set_option linter.style.longLine false in
 -- §5 Peterfalvi (3.8) corollary: a small-support separable coefficient grid is identically zero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_of_sigmaNC_lt
+
+-- BG Theorem 3.6 (the vertex of the §3 subprogram and the engine of BG Theorem 10.6): `G`
+-- solvable of odd order, `H ◁ G` a normal Hall subgroup with complement `R`, `R₀ ≤ R` of prime
+-- order such that `C_H(R₀)` is a `Z`-group, gives `⁅H,R⁆` of `p`-length one for every prime `p`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03f.thm36

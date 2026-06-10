@@ -69,6 +69,7 @@ import OddOrder.BG.Ch1_Preliminary.S01c_Omega1Rigidity
 import OddOrder.BG.Ch1_Preliminary.S02_Representations
 import OddOrder.BG.Ch1_Preliminary.S03_FrobeniusActions
 import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
+import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 import OddOrder.BG.Ch1_Preliminary.S04_PGroupsSmallRank
