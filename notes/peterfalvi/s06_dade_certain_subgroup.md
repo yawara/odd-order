@@ -1007,12 +1007,25 @@ After (3.2) complete (session 17), advanced the §5 frontier through the `NC(ψ)
    (S05:856) パターン + `basisOfLinearIndependentOfCardEqFinrank` (session-17
    `alphaBasis_apply` の `unfold`+`letI` tip 再利用)。ω_ij − ω_0j が W₂ 上消える:
    wFst kills W₂ (S05:439)。
-2. **(1.4) 適用 per column j**: `IsometryDifferencePair.lean` の
-   `SignedIrreducibleDifferenceFamily` (:312) + structure theorem (:309 周辺,
-   `IsometryDifferencePairNumerics` :250) を**まず読む** (interface 未精査)。
-   isometry 入力 = `sdiffFullDadeIsometryData` (inner_eq + maps_virtualCharacter)、
-   写像の Ind 同定 = `tau_eq_induce`。⟹ μ_ij ∈ Irr(L), δ_j = ±1,
-   Ind(ω_ij − ω_0j) = δ_j(μ_ij − μ_0j), 列内 distinct。
+2. **(1.4) 適用 per column j**: ✅ interface 精査済 (session 20 末) —
+   **`isometry_difference_pair_structure`** (IsometryDifferencePair.lean:730,
+   docstring に「§6 (4.5) consumer」明記の抽象 (1.4))。入力 (全て session-20
+   成果物で賄える):
+   - `n := w₁`, `2 ≤ n` (← w₁ ≥ 3, S05 `three_le_card_W1` 系), `[NeZero n]`;
+   - `χ : Fin w₁ → Irr(W)` = `i ↦ ω_{e(i),j}` (e : Fin w₁ ≃ Ĉ₁, **e 0 = 1 に pin**
+     [`Fintype.equivOfCardEq` + swap; card = `card_charGroup_subgroupOf`]),
+     injective (omegaProdChar_inj + omega_injective), same degree (全 linear,
+     `omega_apply_one`);
+   - `τ := (induceLinear …).restrictScalars ℤ` (S05 session-17 の bundled Ind);
+   - `h_image_virtual` = `induce_mem_ZIrr` (差 ∈ ZIrr W);
+   - `h_image_degree_zero` = `induce_apply_one` (差の degree 0);
+   - `h_isom` = **ω_ij − ω_0j ∈ CF(W, W−W₂)** (wSnd-kills W₂ 計算, 新補題要) →
+     `SupportedClassFunctions` に包んで `sdiffFullDadeIsometryData.inner_eq` +
+     `tau_eq_induce` (Dade map = Ind) で transfer。
+   出力: `SignedIrreducibleDifferenceFamily L w₁` = (μ_i injective, 一様 sign
+   δ_j = ±1, `Ind(ω_ij − ω_0j) = δ_j • (μ_ij − μ_0j)`) — **列内 distinct は
+   `.injective` field で出る**。注意: `signedDifference` 形 (sign • (μ_i − μ_0))
+   との等式が結論; (4.3.b) の文言へは `sign_eq` で ±1 場合分け。
 3. **列間 distinct**: (4.1) `pairwise_inner_eq_zero_of_orthogonal_signedDifference`
    (InducedIrreducible に移動済 ✓ S05 経由で import される)。
 4. **σ 同定**: (3.9.a) `eq_sigma_of_apply_eq_on_V` + `exists_sigma`
