@@ -524,7 +524,94 @@ scaffold 唯一 real sorry = (3.18)–(3.38)。(3.17) は **Prop 1.4 / [N,R]≅N
   elementwise (`commutator_mem_commutator` + `commutatorElement_eq_one_iff_commute` + val) で
   KG ≤ C_G(R₀) ⟹ **h317 矛盾**。
 
-### ▶ 次セッション = (3.19) から (プラン上記「session 7 cont.」(3.19) 項参照)
+## ✅✅✅ 2026-06-10 session 8 (a-keystone): **Phase C (3.19)–(3.21) COMPLETE = Phase A+B+C 全完**
+
+scaffold 1684 行、唯一 real sorry = **Phase D–F ((3.22)–(3.38)) のみ**。leaf 3017 green。
+**⚠ `set_option maxHeartbeats 1600000 in` を thm36_aux に付与** — 宣言が単一予算 200k を超過
+(timeout が line 99 等あちこちに出たら予算切れのサイン; ファイル分割で最終解消予定)。
+
+### 構造変更 (hoist)
+- h318 の前に **Phase C ambient を hoist**: `set KG := K.map H.subtype` / `set VG := V.map H.subtype` /
+  `set S₁ := KG ⊔ R₀` + hKG_le_S₁/hR₀_le_S₁/hKG_le_H/hS₁norm/hKG'norm/hdisjKR/**hcompl₁**/
+  hR₀'card/hKG'card/hr_ndvd_K/**hVGnorm** (V_G ⊴ G 手動)。h318 は `S₁ ⊓ centralizer ↑VG = ⊥` 形に。
+- scaffold が `OperatorMaschke` を import (**`OddOrder.BG.Ch1_Preliminary.mulAutToEnd` は public**;
+  AppA の private とは別; S03f_Prelim への複製は不要だった)。
+- `open scoped IsMulCommutative` を file top に追加 (CommGroup 経路)。
+
+### (3.19) 実装 (`h319 : Nat.card ↥(VG ⊓ centralizer ↑R₀) = p`)
+- 前提群: `hH_ne_bot` (H=⊥ なら plen1 で hcounter 矛盾; |quot| ∣ |group| は
+  `⟨_, card_eq_card_quotient_mul_card_subgroup _⟩` 一行)、`hV_ne_bot` (fitting_ne_bot)、`ha0 : a ≠ 0`、
+  `hpr : p ≠ r`、`hp_ndvd_S₁`、`hVGelem` (equivMapOfInjective 転送)。
+- **Part 1 `h319a` (≠⊥) = thm34 初実消費**: AppA:1541 パターン踏襲 — `IsMulCommutative` haveI →
+  `hpsmul` → `AddCommGroup.zmodModule` → `Module.Finite.of_finite` → ρ :=
+  `mulAutToEnd ∘ conjNormal(H:=VG) ∘ S₁.subtype`、`hρ_apply` は rfl。hCV は by_contra 仮定から
+  (toMul/ofMul + conjNormal_apply val-chase)。`S03d.thm34` 適用 → ⁅R₀,KG⁆ 各元が V_G 中心化
+  → **h318 で ⊥** → `commutator_eq_bot_iff_le_centralizer` + `commutator_comm` → **h317 矛盾**。
+- Part 2: `hA_exp` (exponent p, hoist 済) + `card_eq_prime_of_le_isZGroup hZ`。
+
+### (3.20) 実装 (`h320 : P_G ⊓ centralizer ↑R₀ = ⊥`) — Sylow 機構レス
+- `hPV_inf : P_G ⊓ VG = ⊥` (hVN_inf + hP_le_N + map_inf)。
+- Cauchy `exists_prime_orderOf_dvd_card'` で order-p 元 y ∈ W := P_G ⊓ C。`hCnorm` (centralizer は
+  中心化元の共役で不変, calc 7 段 + `Commute.inv_right`)。**A は `obtain ⟨A, hA⟩ : ∃ A, A = …`
+  の opaque 形** (`set` だと文脈書換えが重い) + 必要箇所で `rw [hA]`/`hA ▸`。
+- T := A ⊔ zpowers ↑y: `coe_mul_of_right_le_normalizer_left` (T=A·Y 集合分解) → T/A″ は
+  mk y で生成 (`zpowers_le`/`mem_zpowers_iff`/zpow witness `Subtype.ext`+`coe_zpow`) →
+  |T/A″| = orderOf(mk yT) (`Nat.card_zpowers`+`topEquiv.symm`) ∣ p (`orderOf_map_dvd`) →
+  |T| ∣ p² → `IsPGroup.of_card`。
+- T ≤ H⊓C (Z-群) → `IsZGroup.of_injective` + **mathlib `IsPGroup.isCyclic_of_isZGroup`**
+  (⊤-subgroup 経由 + topEquiv) → T cyclic。
+- 仕上げ: `IsCyclic.card_pow_eq_one_le` (`#{a | a^p = 1}` は **filter-univ と同形で直 unify、
+  convert using 2 で OK**) + `Set.toFinset` + `Finset.insert_subset`/`card_insert_of_notMem`
+  (⚠ notMem 綴り) + omega → y ∈ A ≤ VG → hPV_inf 矛盾。
+- ⚠ GOTCHA: `orderOf_injective f hf x : orderOf (f x) = orderOf x` (向き注意)。
+
+### (3.21) 実装 (`h321 : actionCommutator hP₀_inv.restrict = ⊤`, action-commutator 形)
+- `hP₀_inv : IsAInvariant (φ.comp (inclusion hR₀R)) P := fun a => hP_inv (inclusion a)` (一行!)。
+- Prop 1.6(a) `fixedPoints_sup_actionCommutator_eq_top` + fixedPoints = ⊥ (h320 へ val-chase 2 段:
+  `restrict_apply_val` → `simp only [hφ, …, coe_inclusion]` → `mul_inv_eq_iff_eq_mul`)。
+- **G-level 形 (`⁅P_G,R₀⁆ = P_G`) は未変換** — Phase D の消費形が決まってから橋を書く
+  (2 段 map の generator-chase、`actionCommutator_conjNormal_map_subtype_eq` の類似)。
+
+## ✅ 2026-06-10 session 8 cont. (a-keystone): Phase D 入口 — h321G 橋 + (3.22) kernel
+
+- **scaffold: `h321G : ⁅P.map H.subtype, R₀⁆ = P_G`** ((3.21) の G-level 形) 着地。
+  ≤ は generator ⁅↑ph,g₂⁆ = ↑ph·(g₂ ↑ph⁻¹ g₂⁻¹) 分解 (**⚠ goal は `H.subtype ph` 形なので
+  `show ⁅(ph : G), g₂⁆ ∈ _` で coe 形に直してから rw**)、≥ は `h321` + actionCommutator を
+  `Subgroup.closure_induction` で 2 段 val 押し下げ (`restrict_apply_val` → congrArg val →
+  `simp only [hφ, …, coe_inclusion]`、mem ケースは `commutatorElement_def`+group)。
+- **committed `825953a7` (S03f_Prelim): `le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`**
+  = (3.22) のエンジン (plen1 + O_{p'}=⊥ ⟹ 任意 p-部分群 ≤ O_p)。axiom-clean。
+  新 import: PLengthTransfer + Ch04_Commutators.Main。
+
+### ▶ 次セッション = (3.22) 本体から
+- **(3.22) `[X,P]=1` for X = X^{PR₀} ≤ K with VXPR₀ ≠ G** の実装手順:
+  1. `HX := VG ⊔ (X ⊔ P.map H.subtype)` (G-level), `S₂ := HX ⊔ R₀`。HX ≤ H。
+  2. **HX ⊴ S₂**: R₀ は V (char)/X (仮定)/P_G (hP_inv) を normalize ⟹ sup を normalize
+     (pointwise smul_sup)。h318 の hS₁norm パターン (mem_normalizer_iff, G-element level)。
+  3. **IH 適用** ((3.6)/(3.7) と同型の transport 8 点セット): hcompl (disjoint = hcompl.disjoint
+     mono / sup via normal_mul)、hHall (card_dvd)、hR₀ (≤ + prime card)、hZ (C_{S₂}(R₀') ↪
+     H ⊓ C_G(R₀) — (3.6) の hZ' パターン)、card lt (S₂ ≠ ⊤ 仮定 + `eq_top_of_card_eq` 対偶)。
+     ⟹ `hasPLengthOne p ↥⁅HX', R₀'⁆`。
+  4. **O_{p'}(↥HX') = ⊥**: O_{p'} と V.subgroupOf HX (p-群, normal: V ⊴ H ≥ HX) は coprime normal
+     ⟹ commutator ⊥ (`commutator_le_inf` + `inf_eq_bot_of_coprime`) ⟹ O_{p'} 元は V を中心化
+     ⟹ (↥H に押し下げ) hCHV で ≤ V ⟹ p'∩p = ⊥。
+  5. **O_{p'}(⁅HX',R₀'⁆-group) = ⊥**: char-in-normal で ↥HX-normal 化 ⟹
+     `IsPiGroup.le_oPiCore` ⟹ ≤ O_{p'}(↥HX) = ⊥ (4.)。subgroupOf 2 段に注意。
+  6. **kernel helper** (`le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`) ⟹
+     P-image ≤ O_p(⁅HX',R₀'⁆): P ≤ ⁅HX,R₀⁆ は **h321G** (P_G = ⁅P_G,R₀⁆ ≤ ⁅HX,R₀⁆ mono)。
+  7. `[X,P] ≤ X ⊓ O_p-lift = ⊥` (X は p'-群 ⊆ K)。
+- **(3.23)**: X := K で `G = VKPR₀` (≠ なら (3.22)+h313 矛盾)。`H = VKP`: H = G⊓H とカード;
+  `R = R₀`: |R| = |R₀| (カード比較) + R₀ ≤ R。**以後 R = R₀ で書き換え可能になり Phase D 後半が
+  単純化** (R₀ 添字を R に)。
+- (3.24) `K = ⁅K,P⁆` (Prop 1.6(b) 橋 `commutator_commutator_right_eq` は ⊴ G 要 — K_G は
+  ⊴ G でないので **S₂=G 内の actionCommutator 版** `actionCommutator_restrict_self_…` 系で)。
+- (3.25) K special q-群 (**Gor 5.3.7 = `S04e.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality`**)、
+  (3.26) exp q (Thm 1.13 = CriticalSubgroup)、(3.28)(3.29)、(3.30) **Thm 3.4 二度目**、(3.31) Z-群
+  (`card_eq_prime_of_le_isZGroup` 再利用)。
+- Phase D が最重量。その後 Phase E ((3.32)–(3.37), Thm 3.5 消費) → Phase F (orbit-parity 矛盾)。
+- 正本 = 本ファイル「session 8」。
+
+### ▶ (旧) session 7 cont. の (3.19) プラン (実装済み、参照用)
 - 入口: thm34 への bridge。G' := ↥S₁ (= ↥(K_G ⊔ R₀)、h318 の S₁ をそのまま再利用 —
   hKG'norm/hcompl₁/hKG'card/hR₀'card/hr_ndvd_K は h318 内 local なので**再構築要** (h318 の外へ
   hoist するか (3.19) 内で再演)。⚠ hoist する場合 leaf build で順序確認)。

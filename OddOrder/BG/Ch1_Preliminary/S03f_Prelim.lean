@@ -5,7 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Isaacs.Ch01_Sylow.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
+import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
+import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
 
 /-!
 # BG §3: standalone preliminaries for Theorem 3.6
@@ -301,6 +303,33 @@ theorem isHallSubgroup_map_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Grou
     rw [hcard, ← Nat.card_congr e.toEquiv] at h2
     exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
   exact ⟨fun q hq => hK.1 q (hcard ▸ hq), fun q hq => hK.2 q (hidx ▸ hq)⟩
+
+/-- **A group of `p`-length one with `O_{p'}(W) = ⊥` has a normal Sylow `p`-subgroup**: every
+`p`-subgroup lies in `O_p(W)`.  (`O_{p',p}(W) = O_p(W)` by
+`oPiPrimePiCore_eq_oPiCore_of_compl_bot`, and `W/O_p(W)` is then a `p'`-group, so the image of a
+`p`-subgroup is trivial.)  Used at BG Theorem 3.6 (3.22) for `W = [VXP, R₀]`. -/
+theorem le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot
+    {p : ℕ} [hp : Fact p.Prime] {W : Type*} [Group W] [Finite W]
+    (hpl : hasPLengthOne p W)
+    (hOp' : OddOrder.Isaacs.Ch03.oPiCore ({p}ᶜ : Set ℕ) W = ⊥)
+    {Q : Subgroup W} (hQ : IsPGroup p ↥Q) :
+    Q ≤ OddOrder.Isaacs.Ch01.opCore p W := by
+  rw [hasPLengthOne, oPiPrimePiCore_eq_oPiCore_of_compl_bot hOp'] at hpl
+  have hQmap : Q.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) W)) = ⊥ := by
+    have hQp : IsPGroup p
+        ↥(Q.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) W))) :=
+      hQ.map _
+    obtain ⟨k, hk⟩ := hQp.exists_card_eq
+    have hdvd : Nat.card
+        ↥(Q.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) W)))
+        ∣ Nat.card (W ⧸ OddOrder.Isaacs.Ch03.oPiCore ({p} : Set ℕ) W) :=
+      Subgroup.card_subgroup_dvd_card _
+    have hk0 : k = 0 := by
+      by_contra hk0
+      exact hpl ((hk ▸ dvd_pow_self p hk0).trans hdvd)
+    exact Subgroup.eq_bot_of_card_eq _ (by rw [hk, hk0, pow_zero])
+  rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hQmap
+  rwa [← OddOrder.Isaacs.Ch04.oPiCore_singleton_eq_opCore]
 
 end
 
