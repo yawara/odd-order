@@ -71,6 +71,7 @@ namespace OddOrder.BG.Ch3.S12
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open OddOrder.BG.Ch1.S06 (actionCommutator_conj_map_subtype fixedPointsOfMulAut_conj_map_subtype)
 open scoped Pointwise
 
 variable {G : Type*} [Group G]
@@ -177,70 +178,10 @@ private theorem commutator_self_le {Γ : Type*} [Group Γ] (H : Subgroup Γ) : �
 
 /-! ### Conjugation-action bridges
 
-`Prop 1.6(d)` (`fixedPoints_isComplement_actionCommutator_of_abelian`) is stated for an
-abstract action `φ : A →* MulAut G`. The two bridges below identify, for the conjugation
-action of `K ≤ N_Γ(P)` on `P`, the action commutator with the ambient subgroup commutator
-`⁅P, K⁆` and the fixed points with `C_Γ(K) ⊓ P`. Used in Lemma 12.1(f). -/
-
-section ConjugationBridges
-
-variable {Γ : Type*} [Group Γ]
-
-/-- Push-forward of the conjugation-action commutator: for `K ≤ N_Γ(P)`, the
-`actionCommutator` of the conjugation action of `K` on `P` realizes the ambient
-subgroup commutator `⁅P, K⁆`. -/
-theorem actionCommutator_conj_map_subtype {P K : Subgroup Γ}
-    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
-    (Ch04.actionCommutator
-        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype
-      = ⁅P, K⁆ := by
-  rw [Ch04.actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
-  congr 1
-  ext y
-  constructor
-  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
-    refine ⟨(g : Γ), g.2, (a : Γ), a.2, ?_⟩
-    rw [commutatorElement_def]
-    have hcoe : (P.subtype
-          (g * ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) a g⁻¹) : Γ)
-        = (g : Γ) * ((a : Γ) * (g : Γ)⁻¹ * (a : Γ)⁻¹) := rfl
-    rw [hcoe]
-    group
-  · rintro ⟨g, hg, a, ha, rfl⟩
-    refine ⟨(⟨g, hg⟩ : ↥P) *
-      ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩ ⟨g, hg⟩⁻¹,
-      ⟨⟨g, hg⟩, ⟨a, ha⟩, rfl⟩, ?_⟩
-    rw [commutatorElement_def]
-    have hcoe : (P.subtype
-          ((⟨g, hg⟩ : ↥P) *
-            ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩
-              (⟨g, hg⟩ : ↥P)⁻¹) : Γ)
-        = g * (a * g⁻¹ * a⁻¹) := rfl
-    rw [hcoe]
-    group
-
-/-- Push-forward of the conjugation-action fixed points: `C_Γ(K) ⊓ P`. -/
-theorem fixedPointsOfMulAut_conj_map_subtype {P K : Subgroup Γ}
-    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
-    (Subgroup.fixedPointsOfMulAut
-        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype
-      = Subgroup.centralizer (K : Set Γ) ⊓ P := by
-  ext y
-  simp only [Subgroup.mem_map, Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
-  constructor
-  · rintro ⟨x, hx, rfl⟩
-    refine ⟨fun k hk => ?_, x.2⟩
-    have hfix := Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨k, hk⟩
-    have hcoe : k * (x : Γ) * k⁻¹ = (x : Γ) := congrArg Subtype.val hfix
-    calc k * (x : Γ) = (k * x * k⁻¹) * k := by group
-    _ = (x : Γ) * k := by rw [hcoe]
-  · rintro ⟨hy, hyP⟩
-    refine ⟨⟨y, hyP⟩, Subgroup.mem_fixedPointsOfMulAut.mpr fun a => Subtype.ext ?_, rfl⟩
-    change (a : Γ) * y * (a : Γ)⁻¹ = y
-    rw [hy (a : Γ) a.2]
-    group
-
-end ConjugationBridges
+The generic conjugation-action bridges `actionCommutator_conj_map_subtype` and
+`fixedPointsOfMulAut_conj_map_subtype` (relating the abstract `Prop 1.6(d)` action to the
+ambient `⁅P, K⁆` and `C_Γ(K) ⊓ P`) live upstream in `OddOrder.BG.Ch1.S06` (next to BG Lemma
+6.3(a)), opened above. They are used here in Lemma 12.1(f). -/
 
 /-- `E₁E₂` in BG §12, represented as the subgroup join. -/
 def E12 (E₁ E₂ : Subgroup G) : Subgroup G :=
