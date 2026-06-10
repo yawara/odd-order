@@ -501,6 +501,76 @@ theorem columnFamily_mu_injective [NeZero (Nat.card h.W1)] :
     rfl
   · exact absurd heq (h.columnFamily_mu_ne hχ i i')
 
+/-- The count `|W − W₂| = (w₁ − 1)·w₂`: the support set of the sdiff hypothesis is the
+complement of `W₂` in `W`, so `|W| − |W₂| = w₁w₂ − w₂`. -/
+theorem card_supportInSubgroup_sdiff :
+    Nat.card ↥(OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+        h.sdiffTICyclicHypothesis.W) = (Nat.card h.W1 - 1) * Nat.card h.W2 := by
+  classical
+  haveI : Finite L := Finite.of_fintype L
+  haveI : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
+  haveI : Fintype ↥(h.W2.subgroupOf h.sdiffTICyclicHypothesis.W) := Fintype.ofFinite _
+  have hmemiff : ∀ x : ↥h.sdiffTICyclicHypothesis.W,
+      x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+        h.sdiffTICyclicHypothesis.W ↔ x ∉ h.W2.subgroupOf h.sdiffTICyclicHypothesis.W := by
+    intro x
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, Subgroup.mem_subgroupOf]
+    exact ⟨fun hxV => hxV.2, fun hxW2 => ⟨SetLike.coe_mem x, hxW2⟩⟩
+  have hcompl := Nat.card_congr (Equiv.subtypeEquivRight hmemiff)
+  have hW : Nat.card ↥h.sdiffTICyclicHypothesis.W = Nat.card h.W1 * Nat.card h.W2 :=
+    h.card_sup_eq_mul
+  have hW2 : Nat.card ↥(h.W2.subgroupOf h.sdiffTICyclicHypothesis.W) = Nat.card h.W2 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.sdiffTICyclicHypothesis.W2_le_W).toEquiv
+  have hsub : Nat.card {x : ↥h.sdiffTICyclicHypothesis.W //
+        x ∉ h.W2.subgroupOf h.sdiffTICyclicHypothesis.W}
+      = Nat.card ↥h.sdiffTICyclicHypothesis.W
+        - Nat.card ↥(h.W2.subgroupOf h.sdiffTICyclicHypothesis.W) := by
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Nat.card_eq_fintype_card,
+      Fintype.card_subtype_compl]
+  rw [hcompl, hsub, hW, hW2, Nat.sub_one_mul]
+
+/-- `dim_ℂ CF(W, W − W₂) = (w₁ − 1)·w₂`, the dimension behind the `ω_{ij} − ω_{0j}` basis. -/
+theorem finrank_sdiffSupported :
+    Module.finrank ℂ (TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis)
+      = (Nat.card h.W1 - 1) * Nat.card h.W2 := by
+  haveI : Finite L := Finite.of_fintype L
+  haveI : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
+  haveI : IsMulCommutative ↥h.sdiffTICyclicHypothesis.W :=
+    h.sdiffTICyclicHypothesis.isMulCommutative_W
+  show Module.finrank ℂ ↥(ClassFunction.supportedSubmodule
+      (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+        h.sdiffTICyclicHypothesis.W)) = _
+  rw [finrank_supportedSubmodule_eq_card, h.card_supportInSubgroup_sdiff]
+
+/-- **Peterfalvi (4.3.b) basis**: the `ω_{ij} − ω_{0j}` (`i ≠ 0`, all `j`) form a basis of
+`CF(W, W − W₂)` — linearly independent (`omegaColumnDiff_linearIndependent`) with the matching
+count `(w₁−1)·w₂ = dim` (`finrank_sdiffSupported`). -/
+noncomputable def omegaColumnDiffBasis :
+    Module.Basis ({χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} ×
+        ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) ℂ
+      (TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis) := by
+  classical
+  haveI : Finite L := Finite.of_fintype L
+  haveI : Fintype ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  haveI : Nonempty ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := ⟨1⟩
+  haveI : Nonempty {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} :=
+    h.sdiffTICyclicHypothesis.nonempty_charNeOne
+      h.sdiffTICyclicHypothesis.W1_le_W h.sdiffTICyclicHypothesis.W1_nontrivial
+  refine basisOfLinearIndependentOfCardEqFinrank h.omegaColumnDiff_linearIndependent ?_
+  rw [h.finrank_sdiffSupported, Fintype.card_prod]
+  have hc1 : Nat.card ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W1 :=
+    h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W1_le_W
+  have hc2 : Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 :=
+    h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
+  have e1 : Fintype.card {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1}
+      = Nat.card h.W1 - 1 := by
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card, hc1]
+  have e2 : Fintype.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 := by
+    rw [← Nat.card_eq_fintype_card, hc2]
+  rw [e1, e2]
+
 end Recipe
 
 end Hypothesis
