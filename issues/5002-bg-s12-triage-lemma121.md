@@ -40,13 +40,19 @@ Lemma 10.13 は D 対象外 (group-level Additive diamond、休止 `c-bg-s10` ba
 
 ## やること
 
-- [ ] §12 各 sorry の依存 triage: mmd L3029- を読み、§11 (Thm 11.5/11.7) 依存のものと
+- [x] §12 各 sorry の依存 triage: mmd L3029- を読み、§11 (Thm 11.5/11.7) 依存のものと
       §10-only のものを分類 (file docstring は「imports §11 intentional」と言うが定理単位で要確認)。
       Lemma 12.1 (`subgroupE_basic`, mmd L3035) は r(E)≤2 / E' nilpotent / Sylow abelian の
       基本パッケージで、おそらく Prop 10.9/10.11 + Thm 4.20 で §11 非依存 — 第一 leaf 候補。
+      **⟹ 2026-06-10 完了: 着手可能 5 件 (12.1 / 12.2(a) / 12.17 / 12.19 / 12.18) vs
+      ブロック 14 件 (根 = Thm 11.7 直接使用の 12.3 と Lem 10.13 直接使用の 12.7)。
+      詳細 = notes/bg/s12_subgroup_e.md「2026-06-10 D-lane triage」**。
 - [ ] 第一 leaf の実装 (issue 5001 の実装知見が直接効く: Hall σ'-overgroup パターン、
       Thm 4.20(a)(c)、`rank_le_iff`+`alpha_subset_sigma` の r(E)≤2 論法は §12 でも頻出)。
-- [ ] §11 依存と判明した定理は §11 と同様 10.13 ブロックとして notes に記録 (forward-axiom 化はしない)。
+      **レシピ確定済 (notes 同節): (a) は Thm 4.20(a) 代替 (Thm 10.2 の M'/M_σ nilpotent は
+      repo 未収載のため)。⚠ 12.1(e) `E₂ ⊴ E₁⊔E₂` は旧 SubgroupESetup で反例があり偽 —
+      field `E₁₂_hall` 追加で原文 faithful 化 (constructor 使用ゼロで波及なし)**。
+- [x] §11 依存と判明した定理は §11 と同様 10.13 ブロックとして notes に記録 (forward-axiom 化はしない)。
 
 ## 参照
 

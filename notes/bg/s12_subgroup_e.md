@@ -1,5 +1,71 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
+
+mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
+**ブロッカーの根 = Thm 11.7 / Lem 10.13 (どちらも Lemma 10.13 = c-bg-s10 委任領域)**。
+
+### 着手可能 (§11 非依存) — 5 件
+
+| 結果 | Lean name | 依存 (mmd 確認済) |
+|---|---|---|
+| **Lem 12.1** | `subgroupE_basic` | Thm 10.2 (`isHall_Msigma_Malpha`), Lem 4.5(a) (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` の対偶), Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`), Lem 10.4(c) (`alpha_criterion`.2) |
+| **Lem 12.2(a)** | `prime_mem_sigma_or_tau2` | Lem 10.5 のみ ((b) 非共役 clause が Thm 10.1(b) — Lean surface は (a) のみ) |
+| **Lem 12.17** | `Msigma_E_relations` | Lem 6.3(a) のみ。`[M_σ,E]=M_σ` は landed (`commutator_eq_self_of_isComplement'_le_commutator`); `C_{M_σ}(E)⊆M_σ'` は Lem 6.3(a) **第 2 結論** (未 landed、§6 で証明可能・keystone 非依存) |
+| **Lem 12.19** | `derivedE_centralizes_betaComplement` | Cor 10.9(a) (✅ landed) + 互いに素 |
+| **Lem 12.18** | `tau1_Malpha_interaction` | Lem 12.2(a) + Thm 1.13 + Thm 3.7 (✅ landed) + Thm 10.2(d) + Uniqueness + Cor 10.9(a)(2) + 式 (12.5)-(12.7)。§11 非依存だが大物 |
+
+### ブロック (Thm 11.7 = Lem 10.13 経由) — 14 件
+
+- **Lem 12.3** (`elemAb_centralizes_meet`): 証明が **Thm 11.7 を直接使用** ("it follows from
+  Theorem 11.7 that M*_σA ⊴ M*") + Cor 11.4 + Lem 10.12(a) + Lem 12.2(b)。
+- **Prop 12.4** ← 12.3。 **Thm 12.5** ← 12.4 + **Thm 11.3/11.5/11.7 + Cor 11.6 直接**。
+- τ₂-case cascade: **Cor 12.6** ← 12.5; **Thm 12.7** ← 12.5/12.6 + **Lem 10.13(b)(c) 直接**;
+  **Lem 12.8** ← 12.7(a); **Cor 12.9** ← 12.8(e)/12.7(c); **Cor 12.10** ← 12.5(b)/12.7(a)/12.8(a);
+  **Lem 12.11** ← 12.6/12.5/12.10(c)/12.7(d); **Thm 12.12** ← 12.7/12.8/12.6(c)/12.5(f)/12.11(c)。
+- σ-side: **Thm 12.13** ← 12.10(a)(d)/12.4 + Cor 10.7(b); **Cor 12.14** ← 12.13;
+  **Prop 12.15** ← 12.10(d)/12.2/12.5(e)/12.6; **Cor 12.16** ← 12.15/12.5(e)/12.6(f)。
+
+⟹ forward-axiom 化はしない (LAUNCH.md の方針どおり §11 ブロック分は素通し)。10.13 が
+解ければ §11 (11.5/11.6/11.7) → 12.3 → cascade が一斉に開く。
+
+### ⚠ scaffold statement 訂正 (2026-06-10): 12.1(e) `E₂ ⊴ E₁⊔E₂` は旧 setup で偽
+
+原文は **`E₁₂` を Hall τ₁∪τ₂-subgroup として固定し、`E₁`,`E₂` をその内部の Hall** に取る
+(mmd L3029)。旧 `SubgroupESetup` は E₁/E₂ を E の独立な Hall とし `E12 := E₁ ⊔ E₂` と
+再定義していたため、E₁ だけ共役でずらすと `E₂ ⋪ E₁⊔E₂` の反例が組める
+(例: E = (C₃₁⋊C₁₅)×C₅, τ₁={3}, τ₂={5}, τ₃={31}; E₁ = ⟨a y a⁻¹⟩ (a∈C₃₁) に対し
+⁅E₁,E₂⁆ が C₃₁ 成分を持ち E₁⊔E₂ = E ⊉ normalizer E₂)。
+**修正 = `SubgroupESetup` に field `E₁₂_hall : IsHallSubgroup (tau1 M ∪ tau2 M)
+((E₁ ⊔ E₂).subgroupOf E)` を追加** (原文 faithful 化)。producer 義務は §13 活用時に
+12.1(e) と同じ論法 (E₁₂' ≤ O_{τ₂}(E₁₂) ≤ E₂ ⟹ E₂ ⊴ E₁₂ ⟹ |E₁E₂|=|E₁₂|) で果たせる
+(非 vacuous)。S12/S13 に constructor 使用なし ⟹ 波及ゼロ。
+
+### Lem 12.1 実装レシピ (確定)
+
+- **(a) E' nilpotent**: 原文の Thm 10.2「M'/M_σ nilpotent」は repo 未収載 (docstring「追加予定」)。
+  **Thm 4.20(a) `derived_le_fitting_of_rank_fitting_le_two` で代替** (issue 5001(b) と同じ手):
+  E は σ'-群 (M_σ Hall σ の補群) ⟹ π(E)∩α=∅ ⟹ rank E ≤ 2 ⟹ E' ≤ F(E) nilpotent。
+  rank≤2 論法は issue 5001 part(a) Step 2 のコードがテンプレート。
+- **(d) E₁ cyclic**: E₁∩M' = ⊥ (π(E₁)⊆τ₁, π(M') 排反, card 論法) ⟹ E₁' = ⊥ abelian;
+  各 Sylow cyclic (Lem 4.5(a) 対偶 + r_p(M)=1); abelian + 全 Sylow cyclic ⟹ cyclic
+  (nilpotent π-分解 or `IsZGroup`)。E₃ cyclic は (b) E₃ ⊆ E' nilpotent + Sylow cyclic で同様。
+- **(b)(f)**: p∈τ₃ ごと P = Sylow p of E。E' nilpotent ⟹ O_p(E')⊴E は P に入り
+  O_{p'}(E')⊴E ⟹ **N⊔P_G ⊇ E' ⟹ N⊔P_G ⊴ E** (N = O_{p'}(E); quotient 回避、derived を含む
+  部分群は normal)。Frattini (`Sylow.normalizer_sup_eq_top`) ⟹ E = N·N_E(P)。SZ で
+  K = complement of P in N_E(P)。[P,K]=1 と仮定 ⟹ E' ≤ N⊔K' (commutator calculus,
+  P abelian) ⟹ E' ≤ NK p'-群 ⟹ P∩E'=⊥、p∈π(E') に矛盾 ⟹ [P,K]≠1。
+  Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`, φ = conj action) ⟹
+  P = C_P(K) × [P,K]、P cyclic p-群の部分群束は鎖 ⟹ C_P(K)=⊥ ∧ [P,K]=P ⊆ E'。
+  (f) は C_{E₃}(E) の p-part ⊆ C_P(K) = ⊥。
+- **(e)**: π(E') ⊆ τ₂∪τ₃ (E'≤M'∩E, τ₁∩π(M')=∅) ⟹ E' ≤ E₂⊔E₃
+  (`Subgroup.IsPiGroup.normal_le_hall`; E₂⊔E₃ = E₂E₃ Hall τ₂∪τ₃, card = |E₂||E₃| via E₃⊴E)
+  ⟹ E₂⊔E₃ ⊴ E (⊇ derived)。E = E₁⊔(E₂⊔E₃) は card。E₂ ⊴ E₁₂ は新 field `E₁₂_hall` 経由で
+  E₁₂'( ≤ E'∩E₁₂ τ₂-群 normal) ≤ O_{τ₂}(E₁₂) ≤ E₂。
+- **(c)**: E ≠ ⊥ (M_σ ≤ M' ⊊ M, solvable nontrivial M ⟹ E ≅ M/M_σ ≠ 1)。E₂=E₁=⊥ なら
+  (e) で E = E₃ ⊆ E' ⟹ perfect ⟹ E 可解と矛盾。
+- **(g)**: `alpha_criterion`.2 直接 (p.Prime は `mem_primeFactors_card_of_pos_pRank` 経由)。
+
 ## 2026-06-02 B7 foundation checkpoint
 
 Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S12_E.lean`.
