@@ -243,6 +243,13 @@ instance instInvertibleCardSdiffW :
     Invertible (Nat.card ↥h.sdiffTICyclicHypothesis.W : ℂ) :=
   ‹Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)›
 
+instance instFintypeToTICyclicW : Fintype ↥h.toTICyclicHypothesis.W :=
+  ‹Fintype ↥(h.W1 ⊔ h.W2)›
+
+instance instInvertibleCardToTICyclicW :
+    Invertible (Nat.card ↥h.toTICyclicHypothesis.W : ℂ) :=
+  ‹Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)›
+
 /-- `Ind_W^L` as a `ℤ`-linear map `CF(W) →ₗ[ℤ] CF(L)`, the map fed to the (1.4)
 orthonormal difference-pair machinery (`isometry_difference_pair_structure`). -/
 noncomputable def induceZ :
@@ -571,6 +578,27 @@ noncomputable def omegaColumnDiffBasis :
     rw [← Nat.card_eq_fintype_card, hc2]
   rw [e1, e2]
 
+/-- The `ω_{ij} − ω_{0j}` basis evaluated at an index pair `⟨k, l⟩` is the column difference
+`ω_{kl} − ω_{0l}` (`coe_basisOfLinearIndependentOfCardEqFinrank` on the family of
+`omegaColumnDiff_linearIndependent`). -/
+theorem omegaColumnDiffBasis_apply
+    (pq : {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} ×
+        ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) :
+    h.omegaColumnDiffBasis pq = h.omegaColumnDiff pq.1.1 1 pq.2 := by
+  classical
+  haveI : Finite L := Finite.of_fintype L
+  letI : Fintype ((h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  letI : Fintype {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} := Fintype.ofFinite _
+  haveI : Nonempty ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := ⟨1⟩
+  haveI : Nonempty {χ₁ : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₁ ≠ 1} :=
+    h.sdiffTICyclicHypothesis.nonempty_charNeOne
+      h.sdiffTICyclicHypothesis.W1_le_W h.sdiffTICyclicHypothesis.W1_nontrivial
+  have hcoe : ⇑h.omegaColumnDiffBasis = fun p => h.omegaColumnDiff p.1.1 1 p.2 := by
+    unfold omegaColumnDiffBasis
+    exact coe_basisOfLinearIndependentOfCardEqFinrank _ _
+  exact congrFun hcoe pq
+
 /-- `ω_{kl} = chiColumn l (e⁻¹ k)`: the basis index `k` (a `W₁`-dual) is `e (e⁻¹ k)` of
 the column family. -/
 theorem chiColumn_w1CharEquiv_symm [NeZero (Nat.card h.W1)]
@@ -663,6 +691,80 @@ theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
       if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
         (h.sdiffTICyclicHypothesis.omega_injective he))]
     ring
+
+/-- **Step 4, the (1.3) masking.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}`
+vanishes on the TI set `W − W₂`.  The `ω_{kl} − ω_{0l}` are a basis of `CF(W, W − W₂)`
+(`omegaColumnDiffBasis`), so the linear functional `⟨·, g⟩` is zero on all of `CF(W, W − W₂)`
+(by `certainTypeRestrictDiff_inner_basis`); the (1.3)(a) engine
+(`eq_zero_of_mem_of_inner_supported_eq_zero`) then forces `g` to vanish on `W − W₂`. -/
+theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 := by
+  classical
+  haveI : IsMulCommutative ↥h.sdiffTICyclicHypothesis.W :=
+    h.sdiffTICyclicHypothesis.isMulCommutative_W
+  -- `⟨·, g⟩` is zero on `CF(W, W − W₂)`: zero on the `ω`-basis, so on the whole submodule
+  have hL0 : (innerLeftFunctional (h.certainTypeRestrictDiff χ₂ i)).comp
+      (Submodule.subtype (ClassFunction.supportedSubmodule (G := ↥h.sdiffTICyclicHypothesis.W)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+          h.sdiffTICyclicHypothesis.W))) = 0 := by
+    refine Module.Basis.ext h.omegaColumnDiffBasis (fun pq => ?_)
+    simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearMap.zero_apply,
+      innerLeftFunctional_apply, h.omegaColumnDiffBasis_apply]
+    exact h.certainTypeRestrictDiff_inner_basis χ₂ i pq.2 pq.1.1
+  refine eq_zero_of_mem_of_inner_supported_eq_zero
+    (A := OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+      h.sdiffTICyclicHypothesis.W) (fun x _ t => ?_) (fun φ hφ => ?_) ?_
+  · -- `W − W₂` is conjugation-closed in the abelian `W`, so `t * x * t⁻¹ = x`
+    have hxx : t * x * t⁻¹ = x := by rw [mul_comm' t x, mul_assoc, mul_inv_cancel, mul_one]
+    rw [hxx]; assumption
+  · -- orthogonal to every `φ ∈ CF(W, W − W₂)` via `hL0`
+    have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+    simpa using this
+  · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
+
+/-- The canonical (3.1)-for-`L` Dade application of (4.3)(a): the §4 Dade package (2.6) on the
+TI set `V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so
+`HConjInvariant` holds for free.  This `app` drives the §5 σ-machinery on `(L, W)`. -/
+noncomputable def toTICyclicFullDadeApplication :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication h.toTICyclicHypothesis :=
+  ⟨h.toTICyclicHypothesis.toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
+/-- **Peterfalvi (4.3.b), the certain-type characters as σ-images.**  For each `W₂`-column `χ₂`
+and `W₁`-index `i`, the (3.2) isometry `σ` of the `(L, W)` TI-cyclic setup sends the linear
+character `ω_{ij}` of `W` to the signed certain-type character `δ_j·μ_{ij}` of `L`:
+
+  `σ(ω_{ij}) = δ_j · μ_{ij}`.
+
+The σ-machinery runs on `toTICyclicHypothesis` (`V = W − (W₁ ∪ W₂)`), while the `μ_{ij}` come
+from the (1.4) difference family on the larger TI set `W − W₂` (`sdiffTICyclicHypothesis`); the
+two share the same `W = W₁ ⊔ W₂`.  Applying `eq_sigma_of_apply_eq_on_V`: `δ_j·μ_{ij}` is a
+norm-one virtual character (`δ_j² = 1`, `μ_{ij}` irreducible) whose values on `V` match `ω_{ij}`
+— this is the (1.3) value-match `certainTypeRestrictDiff_apply_eq_zero_of_mem_V`, transported
+from `W − W₂ ⊇ V`. -/
+theorem sigma_chiColumn_eq_certainType [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+        (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = (h.columnFamily χ₂).sign • ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  symm
+  refine h.toTICyclicHypothesis.eq_sigma_of_apply_eq_on_V rfl h.toTICyclicFullDadeApplication
+    (h.chiColumn χ₂ i) ((ZIrr L).smul_mem _ ((h.columnFamily χ₂).mu i).mem_ZIrr) ?_ ?_
+  · -- norm one: `⟨δ_j μ_{ij}, δ_j μ_{ij}⟩ = δ_j² = 1`
+    rw [← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign
+        ((h.columnFamily χ₂).mu i : ClassFunction L ℂ),
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_intCast,
+      irreducibleCharacter_inner, if_pos rfl]
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> norm_num
+  · -- value-match on `V ⊆ W − W₂` from the (1.3) masking
+    intro v hv
+    have hvs : v ∈ h.sdiffTICyclicHypothesis.V := ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+    have hg := h.certainTypeRestrictDiff_apply_eq_zero_of_mem_V χ₂ i hvs
+    rw [certainTypeRestrictDiff, ClassFunction.sub_apply, sub_eq_zero,
+      ClassFunction.restrict_apply] at hg
+    exact hg
 
 end Recipe
 
