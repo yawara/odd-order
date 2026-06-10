@@ -51,7 +51,13 @@ forward axiom を導入する commit は自動合流しない — 報告して�
    - 不合格 → `git merge --abort` で**報告**（何が落ちたか・どのファイルか）
 3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
    自動合流せず abort → 報告（上記ポリシー）。
-4. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数。
+4. **サイズ watch (粒度規約の enforcement, 2026-06-11)**: 合流後に
+   `git diff HEAD^ --stat -- '*.lean'` で touched .lean の現在行数を `wc -l` 確認。
+   **1,500 行超の既存ファイルへの追記**を検出したら: 合流は維持しつつ ⚠ flag をサマリに含め、
+   分割 issue が未起票なら起票する（分割の実施 owner = hub。lane の frontier と衝突しない
+   凍結境界で prefix-split する）。lane 側のデフォルト（新主結果番号 = 新 leaf）は LAUNCH.md に記載。
+5. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
+   + サイズ flag。
 
 ## 注意
 
