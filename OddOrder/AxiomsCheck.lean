@@ -39,6 +39,7 @@ import OddOrder.BG.Ch1_Preliminary.S05_NarrowPGroups
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
+import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.AppA_PStability
@@ -3226,3 +3227,8 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35_algClosed
 -- BG Theorem 3.5 (general field, via base change to the algebraic closure, BG (2.9)).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03e.thm35
+
+-- BG Theorem 3.6 (the vertex of the §3 subprogram and the engine of BG Theorem 10.6): `G`
+-- solvable of odd order, `H ◁ G` a normal Hall subgroup with complement `R`, `R₀ ≤ R` of prime
+-- order such that `C_H(R₀)` is a `Z`-group, gives `⁅H,R⁆` of `p`-length one for every prime `p`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03f.thm36

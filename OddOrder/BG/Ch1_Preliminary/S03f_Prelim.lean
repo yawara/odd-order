@@ -627,12 +627,14 @@ open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
-/-- The single conjugate `b v b⁻¹ ∈ W` (`W` normal), as an element of `↥W`. -/
-private def avgFactor (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) : ↥W :=
+/-- The single conjugate `b v b⁻¹ ∈ W` (`W` normal), as an element of `↥W` — the factor of the
+averaging map `avgConj`.  Public so that consumers can compute `avgConj` factor-by-factor
+(BG (3.38) evaluates `eᵢ ∘ norm` this way). -/
+def avgFactor (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) : ↥W :=
   ⟨(b : G) * (v : G) * (b : G)⁻¹,
     Subgroup.Normal.conj_mem inferInstance _ v.2 _⟩
 
-private theorem avgFactor_coe (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) :
+theorem avgFactor_coe (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) :
     ((avgFactor B W v b : ↥W) : G) = (b : G) * (v : G) * (b : G)⁻¹ :=
   rfl
 
