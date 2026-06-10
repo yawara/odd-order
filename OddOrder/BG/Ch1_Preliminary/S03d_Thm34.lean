@@ -509,8 +509,9 @@ of `R` (`hFix`, i.e. `C_K(R) = 1`), then `G = KR` is a Frobenius group.  The Fro
 `a k a⁻¹ ≠ k` (for `a ∈ R^#`, `k ∈ K^#`) follows because `a` of prime order generates `R`
 (`zpowers_eq_of_prime_card`), so if `a` centralised `k` then so would every power of
 `a`, i.e. all of
-`R`, forcing `k = 1` by `hFix`.  Used in the elementary-abelian branch of Theorem 3.4. -/
-private lemma isFrobeniusGroup_of_prime_complement_fixedFree
+`R`, forcing `k = 1` by `hFix`.  Used in the elementary-abelian branch of Theorem 3.4 and at
+Theorem 3.6 (3.34) (`S03f_Thm36`, building the Frobenius group `⁅K,R₀⁆·R₀`). -/
+lemma isFrobeniusGroup_of_prime_complement_fixedFree
     {G : Type*} [Group G] [Finite G] {K R : Subgroup G} [K.Normal]
     (hcompl : Subgroup.IsComplement' K R) (hp : (Nat.card ↥R).Prime) (hKne : K ≠ ⊥)
     (hFix : ∀ k ∈ K, (∀ r ∈ R, r * k * r⁻¹ = k) → k = 1) :
