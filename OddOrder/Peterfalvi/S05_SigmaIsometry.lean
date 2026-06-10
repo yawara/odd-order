@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
 import Mathlib.LinearAlgebra.Basis.Basic
 
 /-!
@@ -3543,6 +3545,192 @@ theorem sigmaCoeff_eq_zero_of_sigmaNC_lt (hyp : TICyclicHypothesis G) [Fintype h
     (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
   rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
   exact hNC
+
+/-! ### Peterfalvi (3.9)(a): the `σ`-image of `ω ∈ Irr(W)` is determined by its values on `V` -/
+
+/-- `w₁ = |W₁| ≥ 3`: `|W₁|` is odd (it divides the odd `|W|`) and `> 1` (`W₁` is nontrivial). -/
+theorem three_le_card_W1 (hyp : TICyclicHypothesis G) : 3 ≤ Nat.card hyp.W1 := by
+  haveI : Finite G := Finite.of_fintype G
+  have hodd : Odd (Nat.card hyp.W1) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W1_le_W)
+  have hgt : 1 < Nat.card hyp.W1 :=
+    Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W1_nontrivial)
+  obtain ⟨k, hk⟩ := hodd
+  omega
+
+/-- `w₂ = |W₂| ≥ 3`: `|W₂|` is odd (it divides the odd `|W|`) and `> 1` (`W₂` is nontrivial). -/
+theorem three_le_card_W2 (hyp : TICyclicHypothesis G) : 3 ≤ Nat.card hyp.W2 := by
+  haveI : Finite G := Finite.of_fintype G
+  have hodd : Odd (Nat.card hyp.W2) :=
+    hyp.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.W2_le_W)
+  have hgt : 1 < Nat.card hyp.W2 :=
+    Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot _).mpr hyp.W2_nontrivial)
+  obtain ⟨k, hk⟩ := hodd
+  omega
+
+/-- **(3.9)(a) support bound**: a norm-`1` virtual character `χ` (i.e. `χ ∈ ±Irr(G)`) has at most
+one nonzero inner product against the orthonormal family `(χ_{ij})`.  By the norm-`1` classifier
+`χ = ε • μ`, and any `χ_{pq}` with `⟨χ, χ_{pq}⟩ ≠ 0` equals `±μ`; two distinct such indices would
+give `⟨χ_{pq}, χ_{p'q'}⟩ = ±1 ≠ 0`, contradicting the orthonormality of the family. -/
+theorem ncard_inner_chiFam_ne_zero_le_one (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) (hχ1 : ClassFunction.inner χ χ = 1) :
+    {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+      ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0}.ncard ≤ 1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  obtain ⟨ε, μ, hε, hχrepr⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hχ hχ1
+  -- any index in the support has `χ_{pq} = ±μ`
+  have hkey : ∀ pq, ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0 →
+      ∃ δ : ℤ, (δ = 1 ∨ δ = -1) ∧
+        hyp.chiFam hVeq app pq = δ • (μ : ClassFunction G ℂ) := by
+    intro pq hpq
+    have hnorm : ClassFunction.inner (hyp.chiFam hVeq app pq) (hyp.chiFam hVeq app pq) = 1 := by
+      rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+    obtain ⟨δ, ν, hδ, hνrepr⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one
+      ((hyp.chiFam_spec hVeq app).2.1 pq) hnorm
+    refine ⟨δ, hδ, ?_⟩
+    have hμν : μ = ν := by
+      by_contra hne
+      apply hpq
+      rw [hχrepr, hνrepr, ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+        ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+        irreducibleCharacter_inner_eq_ite, if_neg hne, mul_zero, mul_zero]
+    rw [hνrepr, hμν]
+  -- two indices in the support coincide (their `χ`-values are both `±μ`, hence not orthogonal)
+  by_cases hempty :
+      {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+        ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0} = ∅
+  · rw [hempty]; simp
+  · obtain ⟨pq₀, hpq₀⟩ := Set.nonempty_iff_ne_empty.mpr hempty
+    obtain ⟨δ₀, hδ₀, hrepr₀⟩ := hkey pq₀ hpq₀
+    have hsub : {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+        ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0} ⊆ {pq₀} := by
+      intro pq hpq
+      obtain ⟨δ, hδ, hrepr⟩ := hkey pq hpq
+      have hinner : ClassFunction.inner (hyp.chiFam hVeq app pq)
+          (hyp.chiFam hVeq app pq₀) ≠ 0 := by
+        rw [hrepr, hrepr₀, ← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+          ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+          irreducibleCharacter_inner_eq_ite, if_pos rfl, star_intCast, mul_one]
+        rcases hδ with rfl | rfl <;> rcases hδ₀ with rfl | rfl <;> norm_num
+      rw [(hyp.chiFam_spec hVeq app).2.2.1] at hinner
+      by_cases heq : pq = pq₀
+      · exact heq
+      · rw [if_neg heq] at hinner; exact absurd rfl hinner
+    calc {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+          ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0}.ncard
+        ≤ ({pq₀} : Set _).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+      _ = 1 := Set.ncard_singleton pq₀
+
+/-- **Peterfalvi (3.9)(a)** (§6 keystone): if `χ ∈ ±Irr(G)` (a virtual character of norm `1`)
+agrees with `ω ∈ Irr(W)` on `V`, then `χ = ω^σ`.  The difference `φ = ω^σ − χ` vanishes on `V`
+((3.2)(c) + the hypothesis), and its `σ`-coefficient support is contained in
+`{index of ω} ∪ {pq | ⟨χ, χ_{pq}⟩ ≠ 0}`, so `NC(φ) ≤ 2 < 3 ≤ min(w₁, w₂)`; the (3.8) corollary
+then kills all coefficients of `φ`.  At the `ω`-index this gives `⟨χ, ω^σ⟩ = 1`, whence
+`‖χ − ω^σ‖² = 1 − 1 − 1 + 1 = 0` and positive definiteness concludes. -/
+theorem eq_sigma_of_apply_eq_on_V (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (ω : IrreducibleCharacter hyp.W) {χ : ClassFunction G ℂ}
+    (hχ : χ ∈ ZIrr G) (hχ1 : ClassFunction.inner χ χ = 1)
+    (hres : ∀ v (hv : v ∈ hyp.V), χ v = (ω : ClassFunction hyp.W ℂ) ⟨v, hyp.V_subset_W hv⟩) :
+    χ = hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  -- the difference `φ = ω^σ − χ` vanishes on `V` ((3.2)(c) + the hypothesis)
+  have hφV : ∀ v ∈ hyp.V,
+      (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) - χ) v = 0 := by
+    intro v hv
+    rw [ClassFunction.sub_apply, hres v hv, hyp.sigma_apply_of_mem_V hVeq app _ hv, sub_self]
+  -- `ω^σ` is the family member at the `ω`-index
+  have hσωeq : hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)
+      = hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω) :=
+    hyp.sigma_irreducibleCharacter hVeq app ω
+  -- `NC(φ) ≤ 2 < 3 ≤ min(w₁, w₂)`
+  have hNC : hyp.sigmaNC hVeq app (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) - χ)
+      < min (Nat.card hyp.W1) (Nat.card hyp.W2) := by
+    have hsub : {pq | hyp.sigmaCoeff hVeq app
+          (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) - χ) pq ≠ 0}
+        ⊆ insert (hyp.omegaIrrEquiv.symm ω)
+            {pq | ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0} := by
+      intro pq hpq
+      simp only [Set.mem_setOf_eq, sigmaCoeff] at hpq
+      by_cases h0 : pq = hyp.omegaIrrEquiv.symm ω
+      · exact Set.mem_insert_iff.mpr (Or.inl h0)
+      · refine Set.mem_insert_iff.mpr (Or.inr ?_)
+        simp only [Set.mem_setOf_eq]
+        intro hc
+        apply hpq
+        rw [ClassFunction.inner_sub_left, hc, hσωeq, (hyp.chiFam_spec hVeq app).2.2.1,
+          if_neg (fun h => h0 h.symm), sub_zero]
+    have hle := Set.ncard_le_ncard hsub (Set.toFinite _)
+    have hins := Set.ncard_insert_le (hyp.omegaIrrEquiv.symm ω)
+      {pq | ClassFunction.inner χ (hyp.chiFam hVeq app pq) ≠ 0}
+    have hone := hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app hχ hχ1
+    have h31 := hyp.three_le_card_W1
+    have h32 := hyp.three_le_card_W2
+    simp only [sigmaNC]
+    omega
+  -- all `σ`-coefficients of `φ` vanish; at the `ω`-index this gives `⟨χ, ω^σ⟩ = 1`
+  have hσσ : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+      (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 1 := by
+    rw [hyp.sigma_inner hVeq app, irreducibleCharacter_inner_eq_ite, if_pos rfl]
+  have hinner : ClassFunction.inner χ (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 1 := by
+    have h0 : ClassFunction.inner
+        (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) - χ)
+        (hyp.chiFam hVeq app (hyp.omegaIrrEquiv.symm ω)) = 0 :=
+      hyp.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hφV hNC (hyp.omegaIrrEquiv.symm ω)
+    rw [← hσωeq, ClassFunction.inner_sub_left, hσσ] at h0
+    linear_combination -h0
+  -- `‖χ − ω^σ‖² = 0` ⟹ `χ = ω^σ`
+  have hfinal : ClassFunction.inner
+      (χ - hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+      (χ - hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 0 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hχ1, hinner, hσσ,
+      inner_conj_symm χ (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)), hinner, star_one]
+    norm_num
+  have hsub0 : χ - hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) = 0 :=
+    eq_zero_of_inner_self_re_eq_zero (by rw [hfinal]; exact Complex.zero_re)
+  exact sub_eq_zero.mp hsub0
+
+/-- **Peterfalvi (3.9)(a)** ("in particular"): `σ` commutes with coefficientwise field
+automorphisms on `Irr(W)`: `(ω^σ)^u = (ω^u)^σ` for any `u : ℂ ≃+* ℂ`.  Indeed `(ω^σ)^u` is again
+a norm-`1` virtual character (`ω^σ = ±μ` by the norm-`1` classifier, and `u` maps `±Irr(G)` into
+`±Irr(G)`), and on `V` it agrees with `ω^u` (apply `u` inside (3.2)(c)); the main part of (3.9)(a)
+then identifies it with `(ω^u)^σ`.  No star-commutation hypothesis on `u` is needed. -/
+theorem sigma_mapRingEquiv_comm (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    (u : ℂ ≃+* ℂ) (ω : IrreducibleCharacter hyp.W) :
+    ClassFunction.mapRingEquiv u (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+      = hyp.sigma hVeq app
+          ((IrreducibleCharacter.galoisMap u ω : IrreducibleCharacter hyp.W) :
+            ClassFunction hyp.W ℂ) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have hσZ : hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ) ∈ ZIrr G :=
+    hyp.sigma_mem_ZIrr hVeq app (IsIrreducibleCharacter.mem_ZIrr ω.2)
+  have hσ1 : ClassFunction.inner (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ))
+      (hyp.sigma hVeq app (ω : ClassFunction hyp.W ℂ)) = 1 := by
+    rw [hyp.sigma_inner hVeq app, irreducibleCharacter_inner_eq_ite, if_pos rfl]
+  obtain ⟨ε, μ, hε, hrepr⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hσZ hσ1
+  refine hyp.eq_sigma_of_apply_eq_on_V hVeq app (IrreducibleCharacter.galoisMap u ω)
+    (ClassFunction.mapRingEquiv_mem_ZIrr u hσZ) ?_ ?_
+  · -- norm `1`: `(ω^σ)^u = ε • μ^u` with `μ^u ∈ Irr(G)`
+    rw [hrepr, ClassFunction.mapRingEquiv_zsmul, ← Int.cast_smul_eq_zsmul ℂ,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      star_intCast, ← IrreducibleCharacter.galoisMap_apply_coe,
+      irreducibleCharacter_inner_eq_ite, if_pos rfl, mul_one]
+    rcases hε with rfl | rfl <;> norm_num
+  · -- values on `V`: `u ((ω^σ)(v)) = u (ω(v)) = (ω^u)(v)` by (3.2)(c)
+    intro v hv
+    rw [ClassFunction.mapRingEquiv_apply, hyp.sigma_apply_of_mem_V hVeq app _ hv,
+      IrreducibleCharacter.galoisMap_apply_apply]
 
 end TICyclicHypothesis
 
