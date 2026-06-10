@@ -3639,6 +3639,10 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- (Corollary 11.2(b)). **Unconditional.**
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S11.sylow_p_isCommutative
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S11.omega1_eq_and_centralizer_trivial
+-- BG §11: Corollary 11.6(c) (`exists_distinct_conj_lines`): two distinct conjugate lines
+-- `A₁ = A₀^{g₁} ≠ A₂ = A₀^{g₂}` with `A = A₁ × A₂` and trivial `M_σ`-centralizers
+-- (odd index `|N_G(P) : N_M(P)| ≥ 3`). Input for Theorem 11.7. **Unconditional.**
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.exists_distinct_conj_lines
 
 /-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
 

@@ -1,5 +1,72 @@
 # BG §11: Exceptional Maximal Subgroups — mini-roadmap
 
+## ✅✅ 2026-06-11 Lane E: Thm 11.5 + Cor 11.6(a)(b)(c) 完成 — 残 = Thm 11.7 のみ
+
+| 結果 | Lean 名 | 状態 |
+|---|---|---|
+| **Thm 11.5** | `sylow_p_isCommutative` | ✅ 9581665d |
+| **Cor 11.6(a)(b)** | `omega1_eq_and_centralizer_trivial` | ✅ 9581665d |
+| **Cor 11.6(c)** | `exists_distinct_conj_lines` | ✅ 662851c1 |
+| Thm 11.7 | `MsigmaA_normal` | 🔲 唯一の残 sorry |
+
+全部 unconditional・axiom-clean・AxiomsCheck 登録済 (前提の Lem 10.13 は同日
+a024b293 で着地済、§10 は完全 sorry-free)。
+
+### 実装メモ
+
+- **`Hypothesis111` に `P_sylow` field を追加** (9581665d): 原文 Hyp 11.1 の
+  「`A ⊆ P ∈ Syl_p(M)`」の Sylow 性が構造体に欠落していた (11.5 の「全 Sylow」主張に必須)。
+  形 = `∀ R, P ≤ R → R ≤ M → IsPGroup p ↥R → R = P`。**§12 で Hypothesis111 を構成する側
+  (Prop 12.4) はこの field も埋めること** (P を Sylow に取れば T ⊇ P.subgroupOf M →
+  T.map = P の同定でそのまま出る)。
+- 11.5 = Thompson transitivity: `exists_isAInvSylowIn` は **A-slot が任意の p-群**なので
+  A := P で「P-不変 Sylow q of M_σ」が直接取れる (Q₂ = Q₁^g の A-不変性は g ∈ N_G(P) と
+  P-不変性経由でしか出ない — 本質)。`IsAInvSylowIn.of_le` (A-slot antitone) +
+  `isAInvSylowIn_conj_smul` (conj 移送) + `centralizer_conj_smul` / `conj_smul_ne_bot` /
+  `centralizer_zpowers_eq_singleton` / `isMulCommutative_of_mulEquiv` を private 追加。
+  Prop 1.16 の存在形 = `Ch2.S07.exists_mem_inf_centralizer_ne_bot_of_not_isCyclic`。
+  10.13(c) の A₀ ≠ Z₀ 前提は `normalizer_A₀_le` + `S10.normalizer_le_normalizer_omega1CenterInG`。
+- 11.6(c) = odd-index 論法: `|N_G(P) : N_G(P)⊓M|` 奇数 (∣ |G|) ∧ ≠1 ⟹ ≥3; coset 全射は
+  **`Fin.cases` ベース** (if-then-else は Fin 数値リテラル簡約が地雷)。
+  `H.index = Nat.card (↥N ⧸ H)` は rfl。
+
+### 🔲 Thm 11.7 (`MsigmaA_normal`) — 設計図 (原文 mmd L3027-L3047)
+
+statement: `M ≤ N_G(M_σ ⊔ A)`。背理法。手順と repo 対応:
+
+1. **E = M_σ の補群 ⊇ A**: `Msigma_isHall` (normal σ-Hall) + ↥M 内 SZ
+   (`Subgroup.exists_right_complement'_of_coprime`) + A を含む共役へ取替え =
+   **`exists_conj_le_of_isComplement'_of_coprime`** (Ch03, SZ-D; A は p-群, p ∉ σ で coprime)。
+2. **r(E) = 2**: ≥ は r(A) = 2; ≤ 2 は E ≅ M/M_σ + §10 の quotient-rank 系
+   (S10_HallStructure L1554 周辺 `Msigma_quotient_…`、要 recon)。
+3. 🛑 **本定理の唯一の本質ギャップ**: τ = {q ∈ π(E) | q > p}, **K = O_τ(E) が Hall τ ∧
+   K·P_E が normal Hall τ∪{p}** (Thm 4.20(c) の素数降順 Sylow tower)。
+   `Ch1.S05.exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two` は raw series で
+   **ラベル順序が未露出** (S04g doc 言「increasing order は later statements で課す」)。
+   選択肢: (a) S04g を遡って順序付き producer 新設; (b) Thm 5.6 側から normal q-complement
+   を積む; (c) **`isHall_oPiCore_of_forall_hasNormalPComplement` (S10_BetaRadical の
+   unconditional Hall engine) を E に適用** — 必要入力「∀ r ∈ π(E)−τ で normal
+   r-complement」を 4.20/5.6 から出せるか要精査。**(c) 最有力**。
+4. **A centralizes K の枝**: KA = K×A, A = Ω₁(O_p(KP)) ⊴ E ⟹ M_σA ⊴ M_σE = M (= 結論)。
+5. **しない枝**: q ∣ |K : C_K(A)|, Q = A-不変 Sylow q of K (`exists_isAInvSylowIn`)。
+   - C_Q(A) ≠ 1: Q noncyclic (cyclic なら S01c Ω₁-rigidity で A が Q を中心化し矛盾)
+     ⟹ B ∈ ℰ²(Q), Lem 10.4(c) = `alpha_criterion .2` で B ∈ ℰ_q*(G); Q ⊆ Q* ∈ ℋ*(A;q);
+     **Prop 10.10(c) = `normalizer_factorization` 第 4 conjunct**
+     (`IsCyclic ∨ ∃ B card q² max → P ≤ centralizer Q`) で [A,Q*] = 1 ⟹ 矛盾。
+   - C_Q(A) = 1: Q₀ = Z(Q); Prop 1.6(d) = `Isaacs.Ch05.fitting_coprime_abelian_decomp` で
+     Q₀ = [A,Q₀]; **11.6(c) (`exists_distinct_conj_lines`, 着地済)** で A = A₁ ⊔ A₂ +
+     C_{M_σ}(Aᵢ) = ⊥ ⟹ Q₀ = [A₁,Q₀] ⊔ [A₂,Q₀] (可換 Q₀ 上の分配 helper 要);
+     **Prop 10.11(d) = `sigma_complement_commutator_cyclic_normal`** (K:=Q₀, P:=Aᵢ) で
+     [Aᵢ,Q₀] ⊴ M ⟹ Q₀ ⊴ M ⟹ N_G(Q) ≤ N_G(Q₀) = M; Q は M の Sylow q (Hall 連鎖) で
+     q ∉ σ(M) ⟹ 矛盾。
+
+推定 ~500-700 行。**先に (3) を解決すること** (他は部品が揃っている)。
+
+### 運用注意
+
+- **commit 後の amend/rebase 禁止** (monitor が 15 分毎に main へ合流するため;
+  2026-06-11 に amend divergence の実例発生、monitor 側で解決。merge_monitor.md 参照)。
+
 ## 2026-06-02 B7 foundation checkpoint
 
 Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S11_ExceptionalMaximal.lean`.

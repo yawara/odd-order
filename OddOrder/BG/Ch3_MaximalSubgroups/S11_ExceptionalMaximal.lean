@@ -1198,6 +1198,152 @@ theorem omega1_eq_and_centralizer_trivial [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [h112] at hcC
   exact hcC
 
+/-- **BG Corollary 11.6(c)** (mmd L2977): there are `A₁ = A₀^{g₁} ≠ A₂ = A₀^{g₂}`
+(`g₁, g₂ ∈ N_G(P) − M`) with `A = A₁ × A₂` and `C_{M_σ}(A₁) = C_{M_σ}(A₂) = 1`.
+
+`|N_G(P) : N_M(P)|` is odd (it divides the odd `|G|`) and `> 1` (`N_G(P) ⊄ M`), hence `≥ 3`;
+so there are `g₁, g₂ ∈ N_G(P) − M` in distinct cosets of `N_G(P) ⊓ M`, giving
+`g₂⁻¹g₁ ∉ M ⊇ N_G(A₀)` and `A₀^{g₁} ≠ A₀^{g₂}`. Both lie in `A = Ω₁(P) ⊴ N_G(P)`
+(Corollary 11.6(a)), and Corollary 11.2(b) kills both `M_σ`-centralizers. -/
+theorem exists_distinct_conj_lines [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
+    ∃ A₁ A₂ : Subgroup G, A₁ ≤ A ∧ A₂ ≤ A ∧ A₁ ≠ A₂ ∧
+      Nat.card ↥A₁ = p ∧ Nat.card ↥A₂ = p ∧ A₁ ⊔ A₂ = A ∧ A₁ ⊓ A₂ = ⊥ ∧
+      Subgroup.centralizer (A₁ : Set G) ⊓ S10.Msigma M = ⊥ ∧
+      Subgroup.centralizer (A₂ : Set G) ⊓ S10.Msigma M = ⊥ := by
+  classical
+  haveI : Fact p.Prime := ⟨h.prime⟩
+  have hAcard : Nat.card ↥A = p ^ 2 := h.A_mem.2
+  set N : Subgroup G := Subgroup.normalizer (P : Set G) with hNdef
+  set H : Subgroup ↥N := (N ⊓ M).subgroupOf N with hHdef
+  -- `[N_G(P) : N_G(P) ⊓ M] ≥ 3`.
+  have hidx_ne_one : H.index ≠ 1 := by
+    intro h1
+    apply h.normalizer_P_not_le
+    intro x hx
+    have hxH : (⟨x, hx⟩ : ↥N) ∈ H := by
+      rw [Subgroup.index_eq_one] at h1
+      rw [h1]
+      exact Subgroup.mem_top _
+    exact (Subgroup.mem_subgroupOf.mp hxH).2
+  have hidx_odd : Odd H.index := by
+    refine (hG.odd.of_dvd_nat ?_)
+    exact (Subgroup.index_dvd_card H).trans (Subgroup.card_subgroup_dvd_card N)
+  have hidx3 : 3 ≤ H.index := by
+    obtain ⟨k, hk⟩ := hidx_odd
+    have h1 : H.index ≠ 1 := hidx_ne_one
+    omega
+  -- two elements of `N − M` in distinct `H`-cosets.
+  obtain ⟨g₁, hg₁N, hg₁M, g₂, hg₂N, hg₂M, hg₁₂⟩ :
+      ∃ g₁ ∈ N, g₁ ∉ M ∧ ∃ g₂ ∈ N, g₂ ∉ M ∧ g₂⁻¹ * g₁ ∉ M := by
+    by_contra hcon
+    push Not at hcon
+    -- then `N` is covered by two cosets of `H`, so the index is `≤ 2`.
+    obtain ⟨w, hwN, hwM⟩ : ∃ w ∈ N, w ∉ M := by
+      by_contra hcov
+      push Not at hcov
+      exact h.normalizer_P_not_le (fun x hx => hcov x hx)
+    have hsurj : Function.Surjective (Fin.cases (motive := fun _ => ↥N ⧸ H)
+        (QuotientGroup.mk 1) (fun _ => QuotientGroup.mk ⟨w, hwN⟩) : Fin 2 → ↥N ⧸ H) := by
+      intro x
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective x
+      by_cases hgM : (g : G) ∈ M
+      · refine ⟨0, ?_⟩
+        rw [Fin.cases_zero]
+        apply (QuotientGroup.eq (s := H)).mpr
+        refine Subgroup.mem_subgroupOf.mpr ⟨((1 : ↥N)⁻¹ * g).2, ?_⟩
+        simpa using hgM
+      · refine ⟨1, ?_⟩
+        rw [show ((1 : Fin 2)) = Fin.succ 0 from rfl, Fin.cases_succ]
+        apply (QuotientGroup.eq (s := H)).mpr
+        have hmem : w⁻¹ * (g : G) ∈ M := hcon g g.2 hgM w hwN hwM
+        refine Subgroup.mem_subgroupOf.mpr ⟨((⟨w, hwN⟩ : ↥N)⁻¹ * g).2, ?_⟩
+        simpa using hmem
+    have hcard_le := Nat.card_le_card_of_surjective _ hsurj
+    have h2 : Nat.card (Fin (1 + 1)) = 2 := by simp
+    have hidx_eq : H.index = Nat.card (↥N ⧸ H) := rfl
+    omega
+  -- `g₁, g₂` normalize `A` (Corollary 11.6(a): `A = Ω₁(P)` is characteristic).
+  obtain ⟨haΩ, -⟩ := omega1_eq_and_centralizer_trivial hG h
+  have hgA : ∀ g ∈ N, MulAut.conj g • A = A := by
+    intro g hg
+    rw [haΩ]
+    exact conj_smul_eq_self_of_mem_normalizer
+      (OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic (K := P)
+        (W := Omega ↥P p 1) hg)
+  have hA₀card : Nat.card ↥A₀ = p := by
+    have := h.A₀_mem.2
+    rwa [pow_one] at this
+  have hconj_card : ∀ g : G, Nat.card ↥(MulAut.conj g • A₀ : Subgroup G) = p := by
+    intro g
+    rw [mulAut_smul_eq_map,
+      Subgroup.card_map_of_injective (MulAut.conj g).injective]
+    exact hA₀card
+  have hconj_le : ∀ g ∈ N, MulAut.conj g • A₀ ≤ A := by
+    intro g hg
+    rw [← hgA g hg]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.A₀_le_A
+  -- the two conjugate lines are distinct.
+  have hne : MulAut.conj g₁ • A₀ ≠ MulAut.conj g₂ • A₀ := by
+    intro heq
+    apply hg₁₂
+    apply h.normalizer_A₀_le
+    have hstab : MulAut.conj (g₂⁻¹ * g₁) • A₀ = A₀ := by
+      rw [map_mul, mul_smul, heq, map_inv, inv_smul_smul]
+    exact mem_normalizer_of_conj_smul_eq_self hstab
+  -- `A = A₁ ⊔ A₂` and `A₁ ⊓ A₂ = ⊥` (two distinct order-`p` lines in the `p²`-group `A`).
+  have hinf : MulAut.conj g₁ • A₀ ⊓ MulAut.conj g₂ • A₀ = ⊥ := by
+    by_contra hbot
+    obtain ⟨x, hx, hx1⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hbot
+    have hzle₁ : Subgroup.zpowers x ≤ MulAut.conj g₁ • A₀ := Subgroup.zpowers_le.mpr hx.1
+    have hzle₂ : Subgroup.zpowers x ≤ MulAut.conj g₂ • A₀ := Subgroup.zpowers_le.mpr hx.2
+    have hzcard : Nat.card ↥(Subgroup.zpowers x) = p := by
+      have hdvd : Nat.card ↥(Subgroup.zpowers x) ∣ p := by
+        rw [← hconj_card g₁]
+        exact Subgroup.card_dvd_of_le hzle₁
+      rcases (Nat.dvd_prime Fact.out).mp hdvd with h1 | hp
+      · exact absurd (Subgroup.card_eq_one.mp h1)
+          (fun hb => hx1 (Subgroup.zpowers_eq_bot.mp hb))
+      · exact hp
+    exact hne ((Subgroup.eq_of_le_of_card_ge hzle₁
+        (by rw [hconj_card, hzcard])).symm.trans
+      (Subgroup.eq_of_le_of_card_ge hzle₂ (by rw [hconj_card, hzcard])))
+  have hsup : MulAut.conj g₁ • A₀ ⊔ MulAut.conj g₂ • A₀ = A := by
+    have hsupA : MulAut.conj g₁ • A₀ ⊔ MulAut.conj g₂ • A₀ ≤ A :=
+      sup_le (hconj_le g₁ hg₁N) (hconj_le g₂ hg₂N)
+    have hdvd1 : p ∣ Nat.card ↥(MulAut.conj g₁ • A₀ ⊔ MulAut.conj g₂ • A₀) := by
+      rw [← hconj_card g₁]
+      exact Subgroup.card_dvd_of_le le_sup_left
+    have hdvd2 : Nat.card ↥(MulAut.conj g₁ • A₀ ⊔ MulAut.conj g₂ • A₀) ∣ p ^ 2 := by
+      rw [← hAcard]
+      exact Subgroup.card_dvd_of_le hsupA
+    obtain ⟨k, hk2, hkeq⟩ := (Nat.dvd_prime_pow Fact.out).mp hdvd2
+    interval_cases k
+    · rw [hkeq, pow_zero] at hdvd1
+      exact absurd (Nat.dvd_one.mp hdvd1) (Fact.out : p.Prime).ne_one
+    · exfalso
+      have hXeq : MulAut.conj g₁ • A₀ = MulAut.conj g₁ • A₀ ⊔ MulAut.conj g₂ • A₀ :=
+        Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [hconj_card, hkeq, pow_one])
+      have hYX : MulAut.conj g₂ • A₀ ≤ MulAut.conj g₁ • A₀ := hXeq ▸ le_sup_right
+      exact hne (Subgroup.eq_of_le_of_card_ge hYX
+        (by rw [hconj_card, hconj_card])).symm
+    · exact Subgroup.eq_of_le_of_card_ge hsupA (by rw [hAcard, hkeq])
+  -- Corollary 11.2(b) kills both centralizers.
+  have hcent : ∀ g ∈ N, g ∉ M →
+      Subgroup.centralizer ((MulAut.conj g • A₀ : Subgroup G) : Set G)
+        ⊓ S10.Msigma M = ⊥ := by
+    intro g hg hgM
+    have hAgM : A ≤ MulAut.conj g • M := by
+      have hgP : MulAut.conj g • P = P := conj_smul_eq_self_of_mem_normalizer hg
+      refine le_trans h.A_le_P (le_trans (le_of_eq hgP.symm) ?_)
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.P_le
+    have h112 := (Msigma_meet_conjugate hG h hgM hAgM).2
+    rw [inf_comm]
+    exact h112
+  exact ⟨MulAut.conj g₁ • A₀, MulAut.conj g₂ • A₀,
+    hconj_le g₁ hg₁N, hconj_le g₂ hg₂N, hne, hconj_card g₁, hconj_card g₂,
+    hsup, hinf, hcent g₁ hg₁N hg₁M, hcent g₂ hg₂N hg₂M⟩
+
 /-- **BG Theorem 11.7** (mmd L2997): `M_σ A ⊴ M`。§11 の主結果。 -/
 theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
