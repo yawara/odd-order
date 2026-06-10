@@ -692,27 +692,34 @@ theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
         (h.sdiffTICyclicHypothesis.omega_injective he))]
     ring
 
-/-- **Step 4, the (1.3) masking.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}`
-vanishes on the TI set `W − W₂`.  The `ω_{kl} − ω_{0l}` are a basis of `CF(W, W − W₂)`
-(`omegaColumnDiffBasis`), so the linear functional `⟨·, g⟩` is zero on all of `CF(W, W − W₂)`
-(by `certainTypeRestrictDiff_inner_basis`); the (1.3)(a) engine
-(`eq_zero_of_mem_of_inner_supported_eq_zero`) then forces `g` to vanish on `W − W₂`. -/
-theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
-    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+/-- **The (1.3)(a) masking engine for `CF(W, W − W₂)`.**  Any class function `f` on `↥W`
+orthogonal to every `ω_{kl} − ω_{0l}` basis vector vanishes on the TI set `W − W₂`.  The
+`ω_{kl} − ω_{0l}` are a basis of `CF(W, W − W₂)` (`omegaColumnDiffBasis`), so the ℂ-linear
+functional `⟨·, f⟩` is zero on all of `CF(W, W − W₂)`; the (1.3)(a) engine
+(`eq_zero_of_mem_of_inner_supported_eq_zero`, with `W − W₂` conjugation-closed in the abelian
+`W`) then forces `f` to vanish on `W − W₂`. -/
+theorem apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
+    {f : ClassFunction h.sdiffTICyclicHypothesis.W ℂ}
+    (hf : ∀ (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ),
+      ClassFunction.inner
+        ((h.omegaColumnDiff k 1 l :
+            TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis) :
+          ClassFunction h.sdiffTICyclicHypothesis.W ℂ) f = 0)
     {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
-    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 := by
+    f ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 := by
   classical
   haveI : IsMulCommutative ↥h.sdiffTICyclicHypothesis.W :=
     h.sdiffTICyclicHypothesis.isMulCommutative_W
-  -- `⟨·, g⟩` is zero on `CF(W, W − W₂)`: zero on the `ω`-basis, so on the whole submodule
-  have hL0 : (innerLeftFunctional (h.certainTypeRestrictDiff χ₂ i)).comp
+  -- `⟨·, f⟩` is zero on `CF(W, W − W₂)`: zero on the `ω`-basis, so on the whole submodule
+  have hL0 : (innerLeftFunctional f).comp
       (Submodule.subtype (ClassFunction.supportedSubmodule (G := ↥h.sdiffTICyclicHypothesis.W)
         (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
           h.sdiffTICyclicHypothesis.W))) = 0 := by
     refine Module.Basis.ext h.omegaColumnDiffBasis (fun pq => ?_)
     simp only [LinearMap.comp_apply, Submodule.subtype_apply, LinearMap.zero_apply,
       innerLeftFunctional_apply, h.omegaColumnDiffBasis_apply]
-    exact h.certainTypeRestrictDiff_inner_basis χ₂ i pq.2 pq.1.1
+    exact hf pq.2 pq.1.1
   refine eq_zero_of_mem_of_inner_supported_eq_zero
     (A := OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
       h.sdiffTICyclicHypothesis.W) (fun x _ t => ?_) (fun φ hφ => ?_) ?_
@@ -723,6 +730,16 @@ theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
     have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
     simpa using this
   · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
+
+/-- **Step 4, the (1.3) masking.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}`
+vanishes on the TI set `W − W₂` — `g ⊥` the `ω_{kl} − ω_{0l}` basis
+(`certainTypeRestrictDiff_inner_basis`) feeds the masking engine. -/
+theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    h.certainTypeRestrictDiff χ₂ i ⟨v, h.sdiffTICyclicHypothesis.V_subset_W hv⟩ = 0 :=
+  h.apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
+    (fun l k => h.certainTypeRestrictDiff_inner_basis χ₂ i l k) hv
 
 /-- The canonical (3.1)-for-`L` Dade application of (4.3)(a): the §4 Dade package (2.6) on the
 TI set `V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so
@@ -782,6 +799,44 @@ theorem certainType_apply_eq_of_mem_V [NeZero (Nat.card h.W1)]
     ClassFunction.restrict_apply, ClassFunction.zsmul_apply, zsmul_eq_mul] at hg
   rw [← hg, ← mul_assoc]
   rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> push_cast <;> ring
+
+/-- An irreducible character `μ` of `L` distinct from all certain-type characters `μ_{ij}` is
+orthogonal to every `ω_{kl} − ω_{0l}` basis vector after restriction to `W`: via Frobenius and
+the (1.4) image `Ind_W^L(ω_{kl} − ω_{0l}) = δ_l(μ_{e⁻¹k,l} − μ_{0,l})`, the pairing is
+`δ_l·(⟨μ_{e⁻¹k,l}, μ⟩ − ⟨μ_{0,l}, μ⟩) = 0` since `μ` differs from both. -/
+theorem inner_omegaColumnDiff_restrict_eq_zero [NeZero (Nat.card h.W1)]
+    {μ : IrreducibleCharacter L} (hμ : ∀ (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      (i : Fin (Nat.card h.W1)), (h.columnFamily χ₂).mu i ≠ μ)
+    (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner
+      ((h.omegaColumnDiff k 1 l : TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis) :
+        ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      (ClassFunction.restrict h.sdiffTICyclicHypothesis.W (μ : ClassFunction L ℂ)) = 0 := by
+  rw [← ClassFunction.inner_induce_eq_inner_restrict, h.induce_omegaColumnDiff_eq l k,
+    SignedIrreducibleDifferenceFamily.signedDifference_apply,
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily l).sign
+      ((h.columnFamily l).difference (h.w1CharEquiv.symm k)),
+    ClassFunction.inner_smul_left, SignedIrreducibleDifferenceFamily.difference_apply,
+    SignedIrreducibleDifferenceFamily.classFunction_apply,
+    SignedIrreducibleDifferenceFamily.classFunction_apply, ClassFunction.inner_sub_left,
+    irreducibleCharacter_inner, irreducibleCharacter_inner,
+    if_neg (hμ l (h.w1CharEquiv.symm k)), if_neg (hμ l 0)]
+  ring
+
+/-- **Peterfalvi (4.3.c), second part** (completeness).  Every irreducible character `μ` of `L`
+that is not one of the certain-type characters `μ_{ij}` vanishes on `W − W₂`.  `Res_W μ` is
+orthogonal to the `ω_{kl} − ω_{0l}` basis of `CF(W, W − W₂)`
+(`inner_omegaColumnDiff_restrict_eq_zero`), so the (1.3)(a) masking engine forces it to vanish
+on `W − W₂`. -/
+theorem certainType_vanishes_of_ne [NeZero (Nat.card h.W1)]
+    {μ : IrreducibleCharacter L} (hμ : ∀ (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      (i : Fin (Nat.card h.W1)), (h.columnFamily χ₂).mu i ≠ μ)
+    {v : L} (hv : v ∈ h.sdiffTICyclicHypothesis.V) :
+    (μ : ClassFunction L ℂ) v = 0 := by
+  have hres := h.apply_eq_zero_of_mem_V_of_inner_omegaColumnDiff
+    (f := ClassFunction.restrict h.sdiffTICyclicHypothesis.W (μ : ClassFunction L ℂ))
+    (fun l k => h.inner_omegaColumnDiff_restrict_eq_zero hμ l k) hv
+  rwa [ClassFunction.restrict_apply] at hres
 
 end Recipe
 
