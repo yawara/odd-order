@@ -1,5 +1,159 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🔵 2026-06-11 (Lane F session 1, Opus): scope 確定 + 12.18 (a) 第2連言 完全 recon → Fable 5 へ昇格
+
+**Lane F 初回。10.13 解禁後の §12 回収を担う想定だったが、scope を精査して以下を確定:**
+
+### scope 確定 (再 triage 不要)
+
+- **§12 cascade 13 結果 (12.3→12.4→12.5→τ₂ cascade 12.6-12.12 + σ-side 12.13-12.16) は全て
+  Thm 11.7 でブロック中**。11.5/11.6 は landed (merge 25f27343/9581665d) だが、cascade の根
+  **Lemma 12.3** (`elemAb_centralizes_meet`@S12_E:132) が証明本体で **Thm 11.7 を直接使用**
+  (mmd L3107「it follows from Theorem 11.7 that M*_σA ⊴ M*」を原文確認)。12.4(a) も
+  12.3(a)(b) 経由 (mmd L3135/L3147 確認)。**Thm 11.7 (`MsigmaA_normal`@S11:1202, S11 唯一の残
+  sorry L1205) = Lane E 担当・未完了** ⟹ F は cascade に着手不可。
+- **着手可能な §11 非依存 sorry は `tau1_Malpha_interaction` (Lemma 12.18, S12_E:1107) のみ**。
+  building blocks 5 件 + (a) 第1連言 `tau1_Malpha_centralizer_P_ne_bot` (S12_E:914) は landed。
+
+### 決定: 12.18 (a) 第2連言 hard core は **Fable 5 (1M) へ昇格** (ユーザー裁可, LAUNCH.md 方針)
+
+12.18 は §12 最厚クラス。Opus session で **全証明スケルトンを詰めて** Fable 5 に引き継ぐ。
+**全ステップが既存 API にマップ済み (下記)。新規ボトルネックは無く、組立 + 小 API hunt のみ。**
+
+### 🎯 12.18 残タスク (3 件) と推奨ファイル構造
+
+**専用 leaf `S12_Lemma1218.lean`** を新設 (S12_E を import; building blocks 再利用)。
+`tau1_Malpha_interaction` を S12_E から **移動** (S12_E の sorry −1, 新 leaf に sorry-free 版)。
+`OddOrder.lean` に import 追加。S13 は将来この leaf を import (現状 §13 は未使用、grep 確認済)。
+※ S12_E は現在 1123 行。12.18 残 (~350 行) を足すと 1500 超 ⟹ 新 leaf 必須。
+
+1. **BB4 helper** `isNilpotent_derived_of_Malpha_eq_bot` [~30 行, 低リスク, 最初に land 推奨]:
+   `M_α = ⊥ ⇒ IsNilpotent ↥(M')`。`S10.derived_quotient_Malpha_le_fitting`
+   (S10_HallStructure:1490, 無条件: `(M/M_α)' ≤ F(M/M_α)`) を `M_α=⊥` で quotient-by-⊥ transport
+   ⟹ `M' ≤ F(M)` nilpotent。part (b) の M_α≠⊥ 用 (Thm 10.2(d) 代替)。
+
+2. **(a) 第2連言** `tau1_Malpha_centralizer_PQ_eq_bot` [hard core, ~250 行]:
+   `… → S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥`。**完全スケルトン↓**。
+
+3. **assemble** `tau1_Malpha_interaction` [~40 行]: (a) = ⟨第1連言, 第2連言⟩; (b) reduction↓。
+
+---
+
+### 📐 (a) 第2連言の完全証明スケルトン (Opus が詰めた; mmd L3502-3506)
+
+**背理法**: `hcon : C_{M_α}(PQ) ≠ ⊥` を仮定し ⊥ を導く (背理で False)。
+
+**Step B — r, R の選択** (mmd「we can choose r and R such that C_R(PQ)≠1」):
+- `C := S10.Malpha M ⊓ C(P⊔Q)` (= `C_{M_α}(PQ)`). hcon: C ≠ ⊥。
+- prime `r ∣ |C|` を取る ⟹ `r ∈ α(M)` (C ≤ M_α は α-群; `S10.Malpha_isPiGroup`)。
+- `z ∈ C`, `orderOf z = r` (Cauchy: `exists_prime_orderOf_dvd_card` 等)。`⟨z⟩ = zpowers z` は
+  **PQ-invariant な r-部分群 of M_α** (z は P⊔Q に中心化される ⟹ P,Q が ⟨z⟩ を正規化)。
+- **R⊇⟨z⟩ rank-3 helper** で `R ≤ M_α`, `IsPGroup r R`, `P⊔Q ≤ N_G(R)`, `rank R ≥ 3`,
+  **`zpowers z ≤ R`** を得る。⟹ `z ∈ C_R(PQ)` ⟹ `C_R(PQ) ≠ 1`。
+  - この helper = **BB3 (`exists_invariant_sylow_Malpha_rank_three`@S12_E:759) を `P₀=zpowers z`
+    開始に一般化**。BB3 は内部で `aInvariant_pSubgroup_le_aInvariant_sylow`
+    (ForwardFromCh03:554, 結論に `P ≤ S` を含む) を `P:=⊥` で呼ぶだけ ⟹ `P:=zpowers z` に替え、
+    `IsAInvariant φ (zpowers z)` を供給 (z が PQ 中心化ゆえ). rank≥3 導出 (S12_E:809-825) は不変
+    (R が M_α の Sylow r ⟹ `pRank M r ≤ pRank R r`、`((mem_alpha_iff).mp hrα).2` で `3 ≤ pRank M r`)。
+    BB3 を直接編集 (param 追加) か新 helper として複製、どちらでも可。
+
+**Step (12.7) 機構** (第1連言 S12_E:946-1101 とほぼ同一; この r,R で再構築):
+- `C_R(P)`, `C_R(Q)` は **cyclic** (r-群, rank ≤ 1): `C_R(P) ≤ C(P)⊓M_α` (R≤M_α) で
+  `rank ≤ 1` (= 12.6/12.5 = `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal`)、
+  `pRank ≤ rank` (`pRank_le_rank`@PRank:601) ⟹ `S10.isCyclic_of_pRank_le_one`
+  (S10_LocalCriteria:57)。**C_R(P) cyclic ∧ C_R(Q) cyclic が Ω₁ bookkeeping の前提**。
+- Thompson R₁ (char in R, exp r, Q 非中心化) = `exists_charSubgroup_exponent_not_centralized`
+  (BB2@S12_E:674)。R₀ := `C_{R₁}(Q)` (= `R₁ ⊓ C(Q)`)、N := `N_{R₁}(R₀)` (normalizer in R₁).
+- **C_{R₁}(P) 位数 r** (= 第1連言と同じ; (12.7) の前半): `C_{R₁}(P) ≠ 1` (FPF-decomp
+  `inf_centralizer_sup_eq_bot_of_le_normalizer`@S12_E:880 + Thm 3.7 で QR₁ 矛盾)。
+  `C_{R₁}(P) = R₁ ⊓ C(P) ⊆ C_R(P)` cyclic, exp r ⟹ 位数 ∣ r、≠1 ⟹ **位数 r**。
+
+**Step Ω₁ bookkeeping** (mmd「C_{R₁}(P)=Ω₁(C_R(Q))=C_{R₁}(Q)=R₀」; 一般 Ω₁ 演算子は不要、
+**cyclic 群の「位数 r の部分群は一意」で回避**):
+- `z ∈ C_R(PQ) ⊆ C_R(P)`, `orderOf z = r` ⟹ `zpowers z` は cyclic `C_R(P)` の位数 r 部分群。
+- `C_{R₁}(P)` も `C_R(P)` の位数 r 部分群 ⟹ **`zpowers z = C_{R₁}(P)`** (cyclic の同位数部分群一意)。
+  ⟹ **`z ∈ R₁`**。
+- `z ∈ C_R(Q) ∩ R₁ = C_{R₁}(Q) = R₀` ⟹ `zpowers z ⊆ R₀`、位数 ≥ r。`R₀ = C_{R₁}(Q) ⊆ C_R(Q)`
+  cyclic exp r ⟹ 位数 ≤ r ⟹ **`R₀ = zpowers z = C_{R₁}(P)`** (位数 r)。
+- ⟹ **`C_{R₁}(P) = R₀` かつ `R₀` は P-不変 (= C_{R₁}(P), P 中心化) ∧ Q-不変 (= C_{R₁}(Q))**。
+- ⚠ **要 API**: 「finite cyclic 群で同位数の 2 部分群は等しい」。候補 = `zpowers z` と `C_{R₁}(P)`
+  を共に `{x ∈ C_R(P) | x^r = 1}` (= r-torsion, 位数 gcd(r,|C_R(P)|)=r) に等号 (両者 ⊆, 同位数,
+  `Subgroup.eq_of_le_of_card_ge`)。mathlib hunt (`IsCyclic`/`card_nthRoots`/r-torsion subgroup)。
+  **これが唯一の小 API gap**。
+
+**Step QN/R₀ 非 nilpotent** (mmd「neither is QN/R₀」を一行で済ますが要論証 — Opus が詰めた):
+- `R₀ ⊊ R₁`: Q 非中心化 R₁ ⟹ `C_{R₁}(Q) = R₀ ≠ R₁`。
+- `N = N_{R₁}(R₀) ⊋ R₀`: R₁ は r-群 (nilpotent), proper subgroup の normalizer は真に大きい =
+  **`S08.lt_inf_normalizer_of_isPGroup_lt`** (S09_Theorem91:851 で使用例) または
+  `Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top` (Main:410)。⟹ `N/R₀ ≠ 1`。
+- `C_{N/R₀}(Q) = 1`: coprime quotient fixed points = `C_N(Q)/R₀`、`C_N(Q) = C_{R₁}(Q) ⊓ N =
+  R₀ ⊓ N = R₀` (R₀ ⊆ N) ⟹ `C_{N/R₀}(Q) = R₀/R₀ = 1` (`coprime_fixedPoints_quotient`
+  ForwardFromCh03:808)。
+- QN/R₀ nilpotent と仮定 ⟹ Q が N/R₀ を中心化 (coprime: nilpotent ⟹ commute,
+  `commute_of_coprime_orderOf_of_isNilpotent`@S10_LocalLemmas) ⟹ `C_{N/R₀}(Q) = N/R₀ ≠ 1`、
+  上と矛盾 ⟹ **QN/R₀ 非 nilpotent**。
+
+**Step 最終矛盾** (quotient 形 Thm 3.7):
+- `C_{QN/R₀}(P) = 1`: `C_{R₁}(P) = R₀` ⟹ `C_N(P) = C_{R₁}(P) ⊓ N = R₀` ⟹ `C_{N/R₀}(P)=1`
+  (同 coprime quotient FP); `C_Q(P) = 1` (hCQP)。両者で `C_{QN/R₀}(P)=1`。
+- **quotient 形 Thm 3.7 なし** ⟹ ambient `(Q ⊔ N ⊔ P)/R₀` で適用 (R₀ ⊴ ambient: P,Q,N が R₀ 正規化):
+  `N' := (Q ⊔ N).map (QuotientGroup.mk' R₀sub)`, `R' := P.map (...)`、
+  `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (S03c:676, form-2) を
+  `(N:=N', R:=R')` で。FPF = `C_{QN/R₀}(P)=1` を element-wise に。⟹ QN/R₀ nilpotent。
+- 上の「QN/R₀ 非 nilpotent」と矛盾 ⟹ False。∎
+
+---
+
+### 📐 part (b) reduction (mmd L3508; (a) を消費)
+
+`(∀ T ≤ M, q-group, Q≤T → Q=T)` (Q Sylow q) 仮定下:
+- `Q ⊆ M'`: `C_Q(P)=1` (hCQP) ⟹ coprime FPF action で `Q = [Q,P] ⊆ M'`
+  (`[Q,P] ⊆ M'` は P,Q ⊆ M)。
+- `Q ⋪ M`: `ℳ(N_G(Q))≠{M}` (hMNQ) ⟹ Q 非正規 (正規なら M ⊆ N_G(Q) ⟹ ℳ={M})。
+- `M' 非 nilpotent`: Q ⊆ M', Q ⋪ M ⟹ M' に非正規 Sylow ⟹ 非 nilpotent (nilpotent ⟹ 全 Sylow 正規)。
+- `M_α ≠ ⊥`: **BB4** (M_α=⊥ ⟹ M' nilpotent の対偶)。
+- `q ∉ α(M)`: Uniqueness 9.6 (`S09.uniquenessTheorem`)。q∈α ⟹ r_q≥3 ⟹ N_G(Q) uniquely maximal
+  ⟹ ℳ(N_G(Q))={M} 矛盾。
+- `α = β`: `∃ r ∈ α−β` ⟹ Cor 10.9(a)(2) (`S10.beta_complement_centralizes` 第2連言) で
+  `C_M(Q) ∈ 𝒰`、偽 ⟹ α−β=∅ ⟹ (α⊆... で) α=β。
+- 以上で (a) の仮定 (M_α≠⊥, q∉α) が成立 ⟹ (a) 適用で 4 結論 + α=β を束ねる。
+- ⚠ **keystone island**: (b) は Cor 10.9(a)(2) 消費。**ただし 2026-06-11 に Cor 10.9 は de-axiom
+  済 (Lem 10.4(b) 実証明化 ce49f862) ⟹ (a)(b) とも unconditional の可能性大**。要 `#print axioms`
+  確認 (Cor 10.9 経路が standard 3 axioms のみなら island 登録不要)。
+
+---
+
+### 📋 API 所在 (Opus 確認済; Fable 5 は再 probe 不要)
+
+**EXISTS (そのまま使える)**:
+- BB4 入力: `S10.derived_quotient_Malpha_le_fitting` (S10_HallStructure:1490, 無条件)
+- rank→cyclic: `pRank_le_rank` (PRank:601), `S10.isCyclic_of_pRank_le_one` (S10_LocalCriteria:57)
+- R⊇P₀ Sylow: `aInvariant_pSubgroup_le_aInvariant_sylow` (ForwardFromCh03:554, 結論 `P ≤ S` 含む)
+- Thm 3.7 form-2: `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (S03c:676) — 署名 =
+  `{N R}(R≤N(N))(Disjoint N R)(N≠⊥)(R≠⊥)(∃p prime,|R|=p)(∀r∈R,r≠1,∀n∈N,n≠1,r*n*r⁻¹≠n):IsNilpotent N`
+- coprime quotient FP: `coprime_fixedPoints_quotient` (ForwardFromCh03:808)
+- normalizer 増大 (p-群): `S08.lt_inf_normalizer_of_isPGroup_lt` / `Ch01.lt_normalizer_of_isNilpotent_of_lt_top`
+- nilpotent⟹commute: `S10.commute_of_coprime_orderOf_of_isNilpotent`
+- 12.18 building blocks (全 S12_E): `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` (622),
+  `maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1` (Helper A, 655),
+  `exists_charSubgroup_exponent_not_centralized` (BB2, 674),
+  `exists_invariant_sylow_Malpha_rank_three` (BB3, 759),
+  `inf_centralizer_sup_eq_bot_of_le_normalizer` (FPF-decomp, 880),
+  `card_sup_eq_mul_of_le_normalizer_of_disjoint` (card, 868),
+  `tau1_Malpha_centralizer_P_ne_bot` ((a)第1連言, 914)
+- (b) 用: `S09.uniquenessTheorem`, `S10.beta_complement_centralizes` (Cor10.9(a))
+
+**NEEDS BUILDING (3 件)**:
+- R⊇⟨z⟩ rank-3 helper (BB3 を P₀ 開始に一般化/複製; mechanical)
+- **cyclic 同位数部分群一意** (唯一の小 API gap; r-torsion `{x|x^r=1}` 経由 + `eq_of_le_of_card_ge`)
+- quotient 形 Thm 3.7 の ambient `(Q⊔N⊔P)/R₀` 組立 (mechanical だが慎重に; `QuotientGroup.mk'`)
+
+### Fable 5 の着手順 (推奨)
+1. `S12_Lemma1218.lean` 新設 + BB4 land (緑確認) + `tau1_Malpha_interaction` を S12_E から移動 (sorry 版)。
+2. cyclic 同位数一意 の小 helper を先に潰す (Ω₁ bookkeeping の心臓)。
+3. R⊇⟨z⟩ helper → 第2連言を上記スケルトン通り組立。
+4. quotient Thm 3.7 → 最終矛盾。assemble + (b) + BB4 配線。`#print axioms` で island 判定。
+
 ## ✅ 2026-06-10 Lemma 12.1 COMPLETE (issue 5002 closed)
 
 **`subgroupE_basic` (a)-(g) 全 conjunct sorry-free、unconditional・axiom-clean**
