@@ -1077,7 +1077,7 @@ theorem sigma_complement_rank_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
 A finite nilpotent group is the internal direct product of its Sylow subgroups
 (`Sylow.directProductOfNormal`); two coprime-order elements have disjoint sets of relevant
 primes, so in every Sylow factor at least one of their components is trivial. -/
-private theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite L]
+theorem commute_of_coprime_orderOf_of_isNilpotent {L : Type*} [Group L] [Finite L]
     [Group.IsNilpotent L] {x y : L} (hxy : Nat.Coprime (orderOf x) (orderOf y)) :
     Commute x y := by
   classical

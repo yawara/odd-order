@@ -2105,6 +2105,87 @@ theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpl
   refine ⟨R, Subgroup.map_subtype_le _, hR_pgrp, hX_norm_R, ?_⟩
   exact le_trans (le_trans ((S10.mem_alpha_iff M r).mp hrα).2 hRpr) (pRank_le_rank r)
 
+/-- For subgroups `A`, `B` with `A` normalizing `B` and `A ⊓ B = ⊥`, `|A ⊔ B| = |A|·|B|`
+(applying the disjoint-normal product formula inside `↥(A ⊔ B)`, where `B` is normal). Used in
+Lemma 12.18(a) to confine the primes of `P ⊔ Q` (resp. `Q ⊔ R₁`) to `{p, q}` (resp. `{q, r}`). -/
+private theorem card_sup_eq_mul_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
+    {A B : Subgroup G} (hAB : A ≤ Subgroup.normalizer (B : Set G)) (hdisj : A ⊓ B = ⊥) :
+    Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
+  have hAle : A ≤ A ⊔ B := le_sup_left
+  have hBle : B ≤ A ⊔ B := le_sup_right
+  haveI hBn : (B.subgroupOf (A ⊔ B)).Normal :=
+    Subgroup.normal_subgroupOf_sup_of_le_normalizer hAB
+  have hdisj' : A.subgroupOf (A ⊔ B) ⊓ B.subgroupOf (A ⊔ B) = ⊥ := by
+    rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxA, hxB⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_subgroupOf] at hxA hxB
+    have hxAB : (x : G) ∈ A ⊓ B := ⟨hxA, hxB⟩
+    rw [hdisj, Subgroup.mem_bot] at hxAB
+    rw [Subgroup.mem_bot]; exact Subtype.ext hxAB
+  have htop : A.subgroupOf (A ⊔ B) ⊔ B.subgroupOf (A ⊔ B) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hAle hBle, Subgroup.subgroupOf_self]
+  have h := OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal
+    (T := A.subgroupOf (A ⊔ B)) (M := B.subgroupOf (A ⊔ B)) hdisj'
+  rw [htop, Nat.card_congr (Subgroup.topEquiv).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBle).toEquiv] at h
+  exact h
+
+/-- **Fixed-point-free decomposition for Lemma 12.18(a)**. If `P` normalizes both `Q` and `R`,
+`Q` normalizes `R`, `Q ⊓ R = ⊥`, and `P` centralizes nothing nontrivial in either `Q` or `R`,
+then `P` centralizes nothing nontrivial in `Q ⊔ R`. (Each `g ∈ Q ⊔ R` factors as `u·v`,
+`u ∈ Q`, `v ∈ R`; if `g` is `P`-central then `Q ⊓ R = ⊥` forces `u, v` to be `P`-central, hence
+trivial.) Provides the fixed-point-freeness hypothesis for Theorem 3.7 in Lemma 12.18(a). -/
+theorem inf_centralizer_sup_eq_bot_of_le_normalizer {G : Type*} [Group G]
+    {P Q R : Subgroup G} (hPQ : P ≤ Subgroup.normalizer (Q : Set G))
+    (hPR : P ≤ Subgroup.normalizer (R : Set G)) (hQR : Q ≤ Subgroup.normalizer (R : Set G))
+    (hdisj : Q ⊓ R = ⊥)
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hCR : R ⊓ Subgroup.centralizer (P : Set G) = ⊥) :
+    (Q ⊔ R) ⊓ Subgroup.centralizer (P : Set G) = ⊥ := by
+  rw [eq_bot_iff]
+  intro g hg
+  rw [Subgroup.mem_inf] at hg
+  obtain ⟨hgQR, hgC⟩ := hg
+  rw [Subgroup.mem_centralizer_iff] at hgC
+  rw [← SetLike.mem_coe, Subgroup.coe_mul_of_left_le_normalizer_right Q R hQR, Set.mem_mul] at hgQR
+  obtain ⟨u, hu, v, hv, rfl⟩ := hgQR
+  have key : ∀ a ∈ P, a * u * a⁻¹ = u ∧ a * v * a⁻¹ = v := by
+    intro a ha
+    have hau : a * u * a⁻¹ ∈ Q := (Subgroup.mem_set_normalizer_iff.mp (hPQ ha) u).mp hu
+    have hav : a * v * a⁻¹ ∈ R := (Subgroup.mem_set_normalizer_iff.mp (hPR ha) v).mp hv
+    have hcomm : a * (u * v) = (u * v) * a := hgC a ha
+    have hconj : (a * u * a⁻¹) * (a * v * a⁻¹) = u * v := by
+      have h1 : a * (u * v) * a⁻¹ = u * v := by rw [hcomm]; group
+      calc (a * u * a⁻¹) * (a * v * a⁻¹) = a * (u * v) * a⁻¹ := by group
+        _ = u * v := h1
+    have hwQ : u⁻¹ * (a * u * a⁻¹) ∈ Q := Q.mul_mem (Q.inv_mem hu) hau
+    have hwR : u⁻¹ * (a * u * a⁻¹) ∈ R := by
+      have h2 : a * u * a⁻¹ = u * v * (a * v * a⁻¹)⁻¹ := by
+        rw [eq_comm, mul_inv_eq_iff_eq_mul]; exact hconj.symm
+      have heq : u⁻¹ * (a * u * a⁻¹) = v * (a * v * a⁻¹)⁻¹ := by rw [h2]; group
+      rw [heq]; exact R.mul_mem hv (R.inv_mem hav)
+    have hw1 : u⁻¹ * (a * u * a⁻¹) = 1 := by
+      have hmem : u⁻¹ * (a * u * a⁻¹) ∈ Q ⊓ R := ⟨hwQ, hwR⟩
+      rwa [hdisj, Subgroup.mem_bot] at hmem
+    have hu_fix : a * u * a⁻¹ = u := by rw [inv_mul_eq_one] at hw1; exact hw1.symm
+    refine ⟨hu_fix, ?_⟩
+    rw [hu_fix] at hconj
+    exact mul_left_cancel hconj
+  have huC : u ∈ Subgroup.centralizer (P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro a ha
+    have h := (key a ha).1; rwa [mul_inv_eq_iff_eq_mul] at h
+  have hvC : v ∈ Subgroup.centralizer (P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro a ha
+    have h := (key a ha).2; rwa [mul_inv_eq_iff_eq_mul] at h
+  have hu1 : u = 1 := by
+    have hmem : u ∈ Q ⊓ Subgroup.centralizer (P : Set G) := ⟨hu, huC⟩
+    rwa [hCQ, Subgroup.mem_bot] at hmem
+  have hv1 : v = 1 := by
+    have hmem : v ∈ R ⊓ Subgroup.centralizer (P : Set G) := ⟨hv, hvC⟩
+    rwa [hCR, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot, hu1, hv1, mul_one]
+
 /-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
 `P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
 (a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
