@@ -142,6 +142,32 @@ theorem not_mem_tau1_of_mem_tau3 {M : Subgroup G} {p : ℕ} (hp : p ∈ tau3 M) 
     p ∉ tau1 M :=
   fun hp1 => hp1.2.1 hp.2.1
 
+/-- A prime divisor of `|H|` forces `pRank H p ≥ 1` (Cauchy: an order-`p` element
+generates an elementary abelian subgroup of order `p`). -/
+theorem one_le_pRank_of_mem_primeFactors {H : Type*} [Group H] [Finite H] {p : ℕ}
+    (hp : p ∈ (Nat.card H).primeFactors) : 1 ≤ pRank H p := by
+  obtain ⟨hprime, hdvd, -⟩ := Nat.mem_primeFactors.mp hp
+  haveI : Fact p.Prime := ⟨hprime⟩
+  obtain ⟨x, hx⟩ := Ch01.cauchy hdvd
+  have hcard : Nat.card ↥(Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hx]
+  have helem : (Subgroup.zpowers x).IsElementaryAbelian p := by
+    constructor
+    · rintro ⟨a, ha⟩ ⟨b, hb⟩
+      obtain ⟨m, hm⟩ := Subgroup.mem_zpowers_iff.mp ha
+      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp hb
+      apply Subtype.ext
+      simp only [Subgroup.coe_mul]
+      rw [← hm, ← hn, ← zpow_add, ← zpow_add, add_comm]
+    · intro a
+      have h1 : orderOf a ∣ p := hcard ▸ orderOf_dvd_natCard a
+      exact orderOf_dvd_iff_pow_eq_one.mp h1
+  have hle := le_pRank (Subgroup.zpowers x) helem
+  rw [hcard] at hle
+  have hlog : Nat.log p p = 1 := by
+    nth_rewrite 2 [show p = p ^ 1 from (pow_one p).symm]
+    exact Nat.log_pow hprime.one_lt 1
+  rwa [hlog] at hle
+
 /-- `E₁E₂` in BG §12, represented as the subgroup join. -/
 def E12 (E₁ E₂ : Subgroup G) : Subgroup G :=
   E₁ ⊔ E₂
@@ -155,7 +181,13 @@ def E123 (E₁ E₂ E₃ : Subgroup G) : Subgroup G :=
   E₁ ⊔ E₂ ⊔ E₃
 
 /-- **BG §12 setup**: `E` は `M_σ` の `M` 内補群 (`M_σ ⊓ E = 1`, `M_σ ⊔ E = M`)、`E₁/E₂/E₃` は
-`E` の Hall `τ₁/τ₂/τ₃(M)`-部分群。`E₁₂ = E₁E₂` (= `E₁ ⊔ E₂`)。 -/
+`E` の Hall `τ₁/τ₂/τ₃(M)`-部分群。
+
+原文 (mmd L3029) は **`E₁₂` を `E` の Hall `τ₁(M)∪τ₂(M)`-部分群として固定し、`E₁`,`E₂` を
+その内部の Hall** に取る。この入れ子を field `E₁₂_hall` (`E₁ ⊔ E₂` が Hall `τ₁∪τ₂`) で表現する。
+`E₁`,`E₂` を `E` の独立な Hall として取るだけでは `E₁ ⊔ E₂` は Hall `τ₁∪τ₂` にならず
+(`E₁` だけ共役でずれた取り方が可能)、Lemma 12.1(e) の `E₂ ⊴ E₁E₂` が反例を持つ
+(notes/bg/s12_subgroup_e.md 2026-06-10 節)。 -/
 structure SubgroupESetup (M E E₁ E₂ E₃ : Subgroup G) : Prop where
   mem_maximal : M ∈ maximalSubgroups G
   E_le : E ≤ M
@@ -167,6 +199,7 @@ structure SubgroupESetup (M E E₁ E₂ E₃ : Subgroup G) : Prop where
   E₁_hall : Ch03.IsHallSubgroup (tau1 M) (E₁.subgroupOf E)
   E₂_hall : Ch03.IsHallSubgroup (tau2 M) (E₂.subgroupOf E)
   E₃_hall : Ch03.IsHallSubgroup (tau3 M) (E₃.subgroupOf E)
+  E₁₂_hall : Ch03.IsHallSubgroup (tau1 M ∪ tau2 M) ((E₁ ⊔ E₂).subgroupOf E)
 
 namespace SubgroupESetup
 
@@ -200,14 +233,151 @@ theorem E12_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E12 E₁ E₂ ≤ M :
 theorem E23_le_M (h : SubgroupESetup M E E₁ E₂ E₃) : E23 E₂ E₃ ≤ M :=
   (h.E23_le_E).trans h.E_le
 
+/-! ### Complement bookkeeping: `E ≅ M/M_σ`, `π(E) ⊆ σ(M)'`, `r(E) ≤ 2` -/
+
+section Basic
+
+variable [Finite G]
+
+omit [Finite G] in
+/-- `M_σ` and `E` are complements inside `↥M` (internal form of `M = M_σ E`,
+`M_σ ∩ E = 1`; `M_σ ⊴ M` makes the disjoint join a genuine complement). -/
+theorem isComplement'_subgroupOf (h : SubgroupESetup M E E₁ E₂ E₃) :
+    ((S10.Msigma M).subgroupOf M).IsComplement' (E.subgroupOf M) := by
+  haveI : ((S10.Msigma M).subgroupOf M).Normal := by
+    rw [S10.Msigma_subgroupOf]; infer_instance
+  apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+  · rw [disjoint_iff]
+    have hinf : (S10.Msigma M).subgroupOf M ⊓ E.subgroupOf M
+        = (S10.Msigma M ⊓ E).subgroupOf M := rfl
+    rw [hinf, h.E_compl_inf, Subgroup.bot_subgroupOf]
+  · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup (S10.Msigma_le M) h.E_le,
+      h.E_compl_sup, Subgroup.subgroupOf_self, Subgroup.coe_top]
+
+omit [Finite G] in
+/-- `|M_σ| · |E| = |M|`. -/
+theorem card_Msigma_mul_card_E (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Nat.card ↥(S10.Msigma M) * Nat.card ↥E = Nat.card ↥M := by
+  have hc := h.isComplement'_subgroupOf.card_mul
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at hc
+
+/-- `E` is a `σ(M)'`-group: `|E|` equals the index of the Hall subgroup `M_σ` in `M`. -/
+theorem isPiGroup_sigma_compl (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Ch03.Subgroup.IsPiGroup (S10.sigma M)ᶜ E := by
+  intro p hp
+  have hidx : ((S10.Msigma M).subgroupOf M).index = Nat.card ↥E := by
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv]
+  have hHall := S10.Msigma_subgroupOf_isHall_of_isHall
+    (S10.isHall_Msigma_Malpha hG h.mem_maximal).1
+  exact hHall.2 p (by rwa [hidx])
+
+/-- No prime divisor of `|E|` lies in `σ(M)`. -/
+theorem not_mem_sigma_of_mem_primeFactors (hG : IsMinimalSimpleOdd G)
+    (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ}
+    (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∉ S10.sigma M :=
+  h.isPiGroup_sigma_compl hG p hp
+
+/-- Prime divisors of `|E|` have `r_p(M) ≤ 2` (they avoid `α(M) ⊆ σ(M)`). -/
+theorem pRank_M_le_two (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : pRank ↥M p ≤ 2 := by
+  have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+  by_contra hcon
+  have hpM : p ∈ (Nat.card ↥M).primeFactors := by
+    rw [Nat.mem_primeFactors] at hp ⊢
+    exact ⟨hprime, hp.2.1.trans (Subgroup.card_dvd_of_le h.E_le), Nat.card_pos.ne'⟩
+  exact h.not_mem_sigma_of_mem_primeFactors hG hp
+    (S10.alpha_subset_sigma hG h.mem_maximal
+      ((S10.mem_alpha_iff M p).mpr ⟨hpM, by omega⟩))
+
+/-- `r_p(E) ≤ 2` for every prime `p`. -/
+theorem pRank_le_two (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} (hp : p.Prime) : pRank ↥E p ≤ 2 := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_cases hpE : p ∈ (Nat.card ↥E).primeFactors
+  · exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective h.E_le))
+      (h.pRank_M_le_two hG hpE)
+  · by_contra hcon
+    exact hpE (Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega))
+
+/-- `r(E) ≤ 2` (BG: `π(E) ∩ α(M) = ∅`, mmd L3032). -/
+theorem rank_le_two (hG : IsMinimalSimpleOdd G) (h : SubgroupESetup M E E₁ E₂ E₃) :
+    rank ↥E ≤ 2 :=
+  rank_le_iff.mpr fun _ hp => h.pRank_le_two hG hp
+
+/-- **BG (12.1)** (mmd L3032): the prime divisors of `|E|` are partitioned by
+`τ₁(M) ∪ τ₂(M) ∪ τ₃(M)`. -/
+theorem mem_tau_union_of_mem_primeFactors (hG : IsMinimalSimpleOdd G)
+    (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ}
+    (hp : p ∈ (Nat.card ↥E).primeFactors) :
+    p ∈ tau1 M ∪ tau2 M ∪ tau3 M := by
+  have hprime : p.Prime := Nat.prime_of_mem_primeFactors hp
+  haveI : Fact p.Prime := ⟨hprime⟩
+  have hσ : p ∉ S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hp
+  have h1M : 1 ≤ pRank ↥M p :=
+    (one_le_pRank_of_mem_primeFactors hp).trans
+      (pRank_le_of_injective (Subgroup.inclusion_injective h.E_le))
+  have h2M : pRank ↥M p ≤ 2 := h.pRank_M_le_two hG hp
+  by_cases hr2 : pRank ↥M p = 2
+  · exact Or.inl (Or.inr ⟨hσ, hr2⟩)
+  · have hr1 : pRank ↥M p = 1 := by omega
+    by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+    · exact Or.inr ⟨hσ, hM', hr1⟩
+    · exact Or.inl (Or.inl ⟨hσ, hM', hr1⟩)
+
+end Basic
+
 end SubgroupESetup
 
 /-! ## Lemma 12.1 — `E` の構造の易しい帰結 (mmd L3035) -/
 
+/-- **BG Lemma 12.1(g)** (mmd L3060, = Lemma 10.4(c) at the `τ₂` interface): for a prime
+`p ∈ τ₂(M)` and `A ∈ ℰ_p²(M)` with `A ≤ M`, the subgroup `A` is maximal elementary
+abelian in `G` and `p` is not an ideal prime. Direct application of `alpha_criterion`. -/
+theorem isMaximalElementaryAbelian_of_mem_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} (hprime : p.Prime)
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hAM : A ≤ M) (hA : A ∈ elemAbelianOfRank G p 2) :
+    IsMaximalElementaryAbelian p A ∧ ¬ S10.idealPrime p G := by
+  obtain ⟨hideal, hmax⟩ := (S10.alpha_criterion hG hM).2 p hprime hp.1 hp.2
+  exact ⟨hmax A hAM hA, hideal⟩
+
+/-- **BG Lemma 12.1(a)** (mmd L3037): `E'` is nilpotent.
+
+原文は Thm 10.2 の「`M'/M_σ` nilpotent」から導くが、repo は商型を経由せず
+Thm 4.20(a) (`derived_le_fitting_of_rank_fitting_le_two`) を `E` に直接適用する:
+`E` は `σ(M)'`-群ゆえ `r(E) ≤ 2` (`SubgroupESetup.rank_le_two`)、従って
+`E' ≤ F(E)` は冪零部分群。 -/
+theorem SubgroupESetup.derived_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
+    Group.IsNilpotent ↥(derivedInG E) := by
+  by_cases hE : E = ⊥
+  · have hbot : derivedInG E = ⊥ := by
+      rw [hE]
+      exact le_bot_iff.mp (Subgroup.map_subtype_le _)
+    rw [hbot]
+    infer_instance
+  · haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+    haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+    haveI : Nontrivial ↥E := (Subgroup.nontrivial_iff_ne_bot _).mpr hE
+    have hodd : Odd (Nat.card ↥E) :=
+      hG.odd.of_dvd_nat
+        ((Subgroup.card_dvd_of_le h.E_le).trans (Subgroup.card_subgroup_dvd_card M))
+    have hrankF : rank ↥(Ch01.fitting ↥E) ≤ 2 :=
+      le_trans (rank_le_of_injective (Subgroup.subtype_injective (Ch01.fitting ↥E)))
+        (h.rank_le_two hG)
+    have hderived : commutator ↥E ≤ Ch01.fitting ↥E :=
+      Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hodd hrankF
+    haveI : Group.IsNilpotent ↥(commutator ↥E) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hderived)
+    exact nilpotent_of_mulEquiv
+      (Subgroup.equivMapOfInjective (commutator ↥E) E.subtype (Subgroup.subtype_injective E))
+
 /-- **BG Lemma 12.1** (mmd L3035): §12 setup のもと、
 (a) `E'` nilpotent; (b) `E₃ ⊆ E'` かつ `E₃ ⊴ E`; (c) `E₂=1 → E₁≠1`; (d) `E₁`,`E₃` cyclic;
 (e) `E=E₁E₂E₃`, `E₂E₃⊴E`, `E₂⊴E₁₂`; (f) `C_{E₃}(E)=1`;
-(g) `p∈τ₂(M)`, `A∈ℰ_p²(M)` ⇒ `A∈ℰ_p*(G)` かつ `p` は ideal でない (⇒ `p∉β(G)`)。 -/
+(g) 素数 `p∈τ₂(M)`, `A∈ℰ_p²(M)` ⇒ `A∈ℰ_p*(G)` かつ `p` は ideal でない (⇒ `p∉β(G)`)。
+((g) の `p.Prime` は原典の暗黙仮定 (τ₂ ⊆ π(M)); repo の `tau2` は素数性を含まないため明示。) -/
 theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
     (h : SubgroupESetup M E E₁ E₂ E₃) :
     Group.IsNilpotent ↥(derivedInG E) ∧
@@ -218,7 +388,7 @@ theorem subgroupE_basic [Finite G] (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E�
       E ≤ Subgroup.normalizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) ∧
       (E₁ ⊔ E₂ : Subgroup G) ≤ Subgroup.normalizer ((E₂ : Subgroup G) : Set G)) ∧
     Subgroup.centralizer (E : Set G) ⊓ E₃ = ⊥ ∧
-    (∀ p : ℕ, p ∈ tau2 M → ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
+    (∀ p : ℕ, p.Prime → p ∈ tau2 M → ∀ A : Subgroup G, A ≤ M → A ∈ elemAbelianOfRank G p 2 →
       IsMaximalElementaryAbelian p A ∧ ¬ S10.idealPrime p G) := by
   sorry
 

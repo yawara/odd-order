@@ -43,8 +43,9 @@ private theorem sylow_subgroupOf_of_le {p : ℕ} [Fact p.Prime] [Finite G] (P : 
 
 /-- **Converse of BG Lemma 4.5**: a finite `p`-group (`p` odd) of `p`-rank `≤ 1` is cyclic.
 Contrapositive of `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (a noncyclic odd
-`p`-group has a rank-`2` elementary abelian subgroup, forcing `pRank ≥ 2`). Used in Lemma 10.5. -/
-private theorem isCyclic_of_pRank_le_one {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
+`p`-group has a rank-`2` elementary abelian subgroup, forcing `pRank ≥ 2`). Used in Lemma 10.5
+and §12 (Lemma 12.1: `E₁`, `E₃` and all rank-one Sylow subgroups of `E` are cyclic). -/
+theorem isCyclic_of_pRank_le_one {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
     [Fact p.Prime] (hQ : IsPGroup p Q) (hodd : Odd p) (hr : pRank Q p ≤ 1) : IsCyclic Q := by
   by_contra hnc
   obtain ⟨E, hEea, hEcard⟩ :=
