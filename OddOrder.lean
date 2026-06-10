@@ -105,6 +105,7 @@ import OddOrder.Peterfalvi.S05_SignedTripleGrid
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S06_CertainTypeCharacters
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceCore

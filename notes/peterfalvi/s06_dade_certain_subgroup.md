@@ -1275,3 +1275,62 @@ session 22 が残した「(4.4) kernel 特徴付け」を完全形式化。**μ_
 
 正本 = 本ノート (session 23)。**Don't re-grind (4.4) — forward/converse/iff 完成・axiom-clean。**
 **inflation API は `(N := h.K)` 必須 (再調査するな)。**
+
+## 2026-06-11 (session 24, b-peterfalvi): ✅ (4.5)(a) 土台 — μ_{ij}−μ_{0j} は K 上消失 + χ_j は i 非依存
+
+新 leaf **`S06_CertainTypeClifford.lean`** を起こした (新主結果番号ゆえ新 leaf, 粒度規約どおり;
+`OddOrder.lean` 配線済み, `import OddOrder.Peterfalvi.S06_CertainTypeCharacters`)。commit `c1ee2178`,
+axiom-clean (allowlist 3), **full build 3631 + AxiomsCheck OK**。
+
+### ✅ 着地 (session 24) — 全 `Hypothesis` 名前空間 (`OddOrder.Peterfalvi.S06.Hypothesis.*`)
+- **`mem_W2_of_mem_sup_of_mem_K`** (`a∈W₁⊔W₂ → a∈K → a∈W₂`; 原文 "K∩W=W₂"): `exists_mul_of_mem_sup`
+  で a=x·y (x∈W₁,y∈W₂≤K) → x=a·y⁻¹∈K → x∈K⊓W₁=⊥ (`isComplement.disjoint`) → x=1 → a=y∈W₂。
+- **`induce_chiColumnDiff_eq_zero_of_mem_K`** (Ind_W^L(ω_{ij}−ω_{0j}) は K 上消失):
+  `ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet` を A:={w:↥W | (w:L)∉W₂} で。
+  support⊆A = 列内 ω は W₂ 上一致 (`omega_omegaProdChar_sub_eq_zero_of_mem_W2`; **`.support` は
+  `ClassFunction.mem_support` で開く — `Function.mem_support` でない**)。k∉conjugatesIntoSet =
+  `K_normal.conj_mem k hk x⁻¹` (要 `simpa`, x⁻¹⁻¹=x) で x⁻¹kx∈K, `mem_W2_of_mem_sup_of_mem_K` で W₂ 落ち。
+- **`columnFamily_difference_vanishes_on_K`** ((columnFamily χ₂).difference i は K 上 0):
+  `← columnFamily_spec`+`isometryDifferenceImage_induceZ` で induce 形へ → 上補題 → `signedDifference_apply`
+  +`zsmul_eq_mul` で δ_j·diff=0, δ_j=±1≠0 → diff=0。
+- **`restrict_certainType_eq`** (Res^L_K μ_{ij} = Res^L_K μ_{0j}, (4.5.a) 前半): `ext k`+`restrict_apply`
+  +`← sub_eq_zero`+`difference_apply`/`classFunction_apply` で上補題に帰着。
+
+### ▶▶ 次 = (4.5)(a) 後半 [χ_j∈Irr(K) + Ind^L_K χ_j=μ_j] — Clifford degree-counting (~200 行, 別単位)
+
+**全 API 特定済み・再 recon 不要。recipe (検算済み, 論文 mmd 04.6 L45-49):**
+1. **χ_j 定義**: `ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0)`。IsCharacter は (mu 0).isIrreducible
+   .isCharacter を restrict 越しに (要確認: restrict が IsCharacter 保存。`restrict_repCharacterClassFunction`
+   InducedCharacter:625 経由 or `IsCharacter.restrict` を探す/自作)。
+2. **index=w₁**: `K.index = Nat.card h.W1`。`Subgroup.index_eq_card` (K.index=Nat.card(L⧸K))+
+   `Nat.card_congr h.isComplement.QuotientMulEquiv.toEquiv` (S06_CertainTypeCharacters:300-301 と同型)。
+   `(Ind χ)(1) = (K.index:ℂ)·χ(1)` = `ClassFunction.induce_apply_one`。
+3. **constituent χ**: `exists_liesOver (h.columnFamily χ₂).mu 0 : ∃ θ:Irr K, LiesOver K (mu 0) θ`
+   (= θ は Res(mu 0)=χ_j の constituent; LiesOver=restrictionMultiplicity≠0)。Clifford.lean:626。
+4. **μ_{ij} liesOver θ**: restrictionMultiplicity K (mu i) θ = restrictionMultiplicity K (mu 0) θ
+   (restrict 一致 = `restrict_certainType_eq` ⟹ multiplicity の inner が一致) ⟹ LiesOver K (mu i) θ。
+5. **μ_{ij} は Ind θ の constituent**: `inner_induce_ne_zero_iff_liesOver (mu i) θ` (Clifford:583)
+   ⟹ ⟨Ind θ, mu i⟩≠0。
+6. **degree bound (iv) [要自作 helper]**: 「相異なる constituent (∀θ∈S, ⟨χ,θ⟩≠0, distinct) の次数和
+   ∑_{θ∈S}(θ1).re ≤ (χ1).re」。`IsCharacter.exists_natFinsupp_eq_sum` から
+   `apply_one_re_le_of_inner_ne_zero` (Clifford:1065, **単一版は既存**) を Finset 化:
+   χ(1).re=∑_{a∈m.support}m_a(a1).re (全項≥0, deg>0), S⊆m.support, m_θ≥1, `Finset.sum_le_sum_of_subset_of_nonneg`。
+   S = (mu ·) の像 finset (w₁ 個, columnFamily.injective で distinct)。
+7. **等次数⟹一致 (H2) [要自作 or sharper bound]**: χ_j(1).re=χ(1).re ∧ χ constituent ⟹ χ_j=χ。
+   同 decomposition で support={χ}, m_χ=1 を絞る (positivity)。⟹ χ_j∈Irr(K)。
+8. **chain** (.re で): w₁χ(1)=(Ind θ)(1) ≥ ∑_iμ_{ij}(1) = w₁χ_j(1) ≥ w₁χ(1)
+   [μ_{ij}(1)=χ_j(1) via restrict@1; χ_j(1)≥χ(1) via `apply_one_re_le_of_inner_ne_zero`] ⟹ 全等。
+9. **Ind χ_j=μ_j**: 等号成立で Ind θ の constituent は ちょうど {μ_{ij}} 各 mult 1 ⟹ Ind θ=∑_iμ_{ij}=μ_j。
+
+### ▶▶ その後 = (4.5)(b) [Ind^L_K χ で Irr(L) を尽くす] → (4.6)-(4.9) → S08 case-B
+- g∈W₁^# の K-共役類への作用: ⟨g⟩ FPF on class C ⟹ |⟨g⟩| ∣ |C| ∣ |K| ⟹ coprime(|K|,w₁) 矛盾
+  (`h.card_coprime`) ⟹ ∃x∈⟨g⟩^#, C∩C_K(x)=C∩W₂≠∅ ⟹ g-不変な K-class は ≤ w₂ 個。
+- **Brauer [Is]6.32**: g-不変 class 数 = g-固定 Irr(K) 数 ⟹ g 固定の Irr(K) は ≤ w₂ 個。
+  **`ConjugationBrauer.lean` / `BrauerPermutationUnconditional.lean` で正確な補題名を grep (まだ未特定)**。
+- χ_j (w₂ 個) は g 固定 (μ_{0j}∈Irr(L)) ⟹ χ∉{χ_j} は g 非固定 ⟹ I_L(χ)=K ⟹
+  **`isIrreducibleCharacter_induce_of_inertia_eq θ (hinertia : inertia θ=K)`** (InducedIrreducible:424,
+  =(1.5.b); S08 `inertia_eq_H_of_c2` が同型論法の先例) ⟹ Ind^L_K χ∈Irr(L)。exhaustion で締め。
+
+正本 = 本ノート (session 24)。**Don't re-grind (4.5)(a) 土台 — 完成・axiom-clean (c1ee2178)。**
+**degree-counting helper (iv)(H2) は exists_natFinsupp_eq_sum から自作 (単一版 apply_one_re_le は既存)。
+他レーン (BG/RepresentationTheory) ファイルは触らず helper は leaf 内に置く (CLAUDE 規約)。**
