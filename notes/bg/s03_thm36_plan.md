@@ -738,3 +738,56 @@ scaffold 唯一 sorry = **Phase E 入口** ((3.32)–(3.37))。leaf 3017 green (
 6. **(3.37)** |K| > q² (Thm 2.6 再び、h328 faithful)。
 7. その後 Phase F = (3.38) orbit-parity (V = V₁×…×Vₙ, Prop 1.16 = Isaacs 6.21 既存)。
 正本 = 本節。(3.29)–(3.31) 実装詳細は上記; (3.22)–(3.28) は session 9 節。
+
+### session 10 cont.: Phase E (3.32)–(3.35) も COMPLETE (同セッション続行)
+
+scaffold 唯一 sorry = **(3.36)–(3.37) + Phase F**。leaf 3017 green。**Thm 3.5 実消費達成 ((3.34))。**
+
+- **(3.32)+(3.33)** `h332 : ⁅KG,R₀⁆ ≠ KG` / `h333 : ⁅KG,R₀⁆ ⊓ C_G(R₀) = ⊥`。核 =
+  `hCcap : (KG ⊓ C_G(R₀)) ⊓ ⁅KG,R₀⁆ ≤ ⁅KG,KG⁆` (**Prop 1.6(d) on K/K'**):
+  `hQbar_mul_comm` を main flow に hoist (h330 と共有) → `letI CommGroup Qbar`
+  (structure-update, (3.14) の letI パターン) → **`S01.fixedPoints_isComplement_actionCommutator_of_abelian`**
+  (1.6(d) IsComplement' 形, hCop = r vs |Qbar| ∣ |KG|) → FP⊓AC=⊥。
+  **`hbridge`** (∀ x ∈ ⁅KG,R₀⁆, mk x ∈ AC(φAQ∘R₀'-incl)) = `Subgroup.commutator_def` +
+  `closure_induction` (∃ hxK 内包 motive; mem-case は generator `g·(φ a)g⁻¹` 形に
+  `mul_inv_cancel_right` rfl で一致 — **`rw [hval]; rfl` が商レベルで全部 rfl で閉じる**)。
+- **(3.34)** `h334 : ⁅⁅KG,R₀⁆,⁅KG,R₀⁆⁆ = ⊥`。`T := ⁅KG,R₀⁆ ⊔ R₀` を
+  **`S03d.isFrobeniusGroup_of_prime_complement_fixedFree`** (private → **public 化**) で
+  Frobenius 化 (FPF = h333)。(3.19) パターンの ρT (mulAutToEnd∘conjNormal∘T.subtype) +
+  **hCV1 = invariants ↔ C_{VG}(R₀) の Equiv bridge** (`Equiv.subtypeEquiv (Additive.toMul)`
+  [**q 述語明示必須** — HO unification 失敗] + 明示 Equiv → h319 card=p →
+  `Module.card_eq_pow_finrank` + `Nat.pow_right_injective` で finrank=1) → **`S03e.thm35`**
+  → ⁅KR,KR⁆ 元が VG 中心化 → h318 で ⊥。
+- **(3.35)** `h335 : ∃ x ∈ PG, ⁅KG,R₀⁆^x ≠ ⁅KG,R₀⁆`。**BG の「(3.25) 第 2 文
+  C_{K/K'}(P)=1 + Thm 1.8」を完全回避する自前ルート**: by_contra → `h322'` で
+  ⁅⁅KG,R₀⁆,PG⁆=⊥ → `hbridgeP` (P 版 bridge) + **h324 (K=[K,P]) で AC_P = ⊤** →
+  1.6(d) complement + `isComplement'_top_right` で **FP_P = ⊥** → ⁅KG,R₀⁆ の
+  mk-像 ≡ 1 (`hKR_mk_one`) → R₀ の Qbar 作用 pointwise 自明 (⁅a,k⁆ ∈ ⁅R₀,KG⁆ =
+  comm-swap ≤ K' + calc mk-分解) → **h329 で R₀ = ⊥** → `Subgroup.card_bot` vs
+  hr_prime ✗。
+- 追加 gotchas: (1) Subtype-mk 内の値の rw は dependent-motive 失敗 → **`show` で
+  bare 形に落としてから rw** (hval); (2) `rw [← h319]` は `ZMod p` 内の p まで抽象化
+  して motive 破綻 → **rw を避け `.trans h319` 合成**; (3) `Equiv.subtypeEquiv` の
+  ターゲット述語は HO-unify 不可 → `(q := fun w => …)` 明示; (4) `QuotientGroup.mk_mul`
+  は直接 term 適用不可 (引数形) → `by rw [QuotientGroup.mk_mul]`。
+
+### ▶ 次セッション (session 11) = (3.36)+(3.37) → Phase F
+1. **(3.36) K elementary abelian** (mmd L1147): x := h335 の witness。
+   - 1.6(a) K-level: `K = C_K(R₀)·⁅K,R₀⁆` (repo の fixedPoints_sup_actionCommutator
+     系 — **K 非可換版の所在要確認**; 無ければ |K|=|C|·|KR| counting は h333+h331a で
+     直積 card から) ⟹ `|K : ⁅K,R₀⁆| = q`。
+   - K = ⁅K,R₀⁆·⁅K,R₀⁆^x (相異なる index-q 正規部分群の積; ⁅K,R₀⁆ ⊴ K は
+     subgroup_le_normalizer_commutator_self), 交わり ⊆ Z(K) (両側可換 h334 + 積=K),
+     |K:∩| = q² ⟹ |K:Z(K)| ≤ q²。
+   - |K:Z| = q² 枝: hK_special 右枝で Z=K'=Φ ⟹ |K/K'| = q² ⟹ dim 2 ⟹
+     **Thm 2.6(a) = `S02.odd_two_dim_abelian`** (結論 `Std.Commutative`; hchar は
+     `¬ CharP (ZMod q) ℓ` 形 = CharP.eq で ℓ=q に還元, |A|=p^k·r は q-free ✓;
+     faithful = h329 → `Function.Injective` 橋) ⟹ A 可換 ⟹ ⁅PG,R₀⁆=⊥ ⟹
+     h321G+h313G ✗。
+   - |K:Z| ≤ q ⟹ K/Z cyclic ⟹ K 可換 (mathlib **commGroup-of-cyclic-center-quotient
+     の正確な名前要確認**) ⟹ hK_exp で elementary abelian。
+2. **(3.37) |K| > q²**: h328 faithful + K elem ab ⟹ dim ≤ 2 の 3 枝
+   (dim 0 = h313G ✗ / dim 1 = Aut(𝔽_q) 可換 ✗ 同型 / dim 2 = Thm 2.6(a) ✗)。
+3. **Phase F (3.38)**: V = V₁×…×Vₙ (index-q 部分群の固定空間生成, **Prop 1.16 =
+   Isaacs 6.21 既存** [[bg-gorenstein-reread-as-isaacs]]) + R₀ 順列作用 + parity。
+   mmd L1152–L1187。最終矛盾 = thm36_aux 完結 → `thm36` un-sorry → **§10.6 keystone 解除**。
