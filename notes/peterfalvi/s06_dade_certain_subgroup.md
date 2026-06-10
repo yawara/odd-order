@@ -1037,3 +1037,59 @@ After (3.2) complete (session 17), advanced the §5 frontier through the `NC(ψ)
 
 正本 = 本ノート (session 20)。**Don't re-grind (4.2)/(4.3.a)/sdiff-isometry 基盤 —
 完成・axiom-clean。(4.1) は InducedIrreducible に在る。**
+
+## 2026-06-10 (session 21, b-peterfalvi): ✅ (4.3.b) step 1+2 — per-column signed family `exists_columnSignedFamily`
+
+新 leaf **`OddOrder/Peterfalvi/S06_CertainTypeCharacters.lean`** を作成 (OddOrder.lean 登録済)。
+session 20 の「次の一手」step 2 = (1.4) per-column 適用を完成。build-green + axiom-clean
+(`[propext, Classical.choice, Quot.sound]` のみ)。
+
+### ✅ 着地 (session 21)
+
+`S06.Hypothesis L` 上 (`[Fintype L]`, recipe section で `[Invertible (Nat.card L : ℂ)]` +
+`[Fintype ↥(W₁⊔W₂)]` + `[Invertible (Nat.card ↥(W₁⊔W₂):ℂ)]` + `[NeZero (Nat.card W1)]`):
+
+1. **support 補題 (一般 hyp)**: `omegaProdChar_apply_of_mem_W2` (列内 ω は W₂ 上 χ₂∘wSnd で
+   χ₁ 非依存) + `omega_omegaProdChar_sub_eq_zero_of_mem_W2` (列差は W₂ で消える)。
+2. **packaging**: `omegaColumnDiff χ₁ χ₁' χ₂ : SupportedOnV ℂ sdiffTICyclicHypothesis`
+   (= ω_{ij}−ω_{kj} ∈ CF(W, W−W₂)) + `omegaColumnDiff_coe` (rfl simp)。
+3. **再添字**: `neZero_card_W1` (≥3 から) + `w1BaseEquiv` (card_charGroup 経由 `Fin w₁ ≃ Ŵ₁`)
+   + **`w1CharEquiv`** (swap で `0 ↦ 1` に pin; `w1CharEquiv_zero`/`_injective`)。
+4. **列族**: `chiColumn χ₂ : Fin w₁ → Irr(W)`, `i ↦ ω(omegaProdChar (e i) χ₂)` +
+   `chiColumn_zero`/`_injective`/`_apply_one` (全 linear, degree 1)。
+5. **(1.4) 適用**: `induceZ` (= Ind_W^L の ℤ-linear化 `induceLinear.restrictScalars ℤ`) +
+   `isometryDifferenceImage_induceZ` (rfl: image = Ind(diff)) +
+   **`isometryDifferenceImage_eq_dade`** (image = sdiffDade(α), `tau_eq_induce` 経由) +
+   **`exists_columnSignedFamily`** (capstone): 3 hypotheses
+   [virtual=`induce_mem_ZIrr`, degree-0=`induce_apply_one`+chiColumn_apply_one,
+   isometry=`isometryDifferenceImage_eq_dade`+`full_inner_eq`] → `isometry_difference_pair_structure`
+   ⟹ `∃ data : SignedIrreducibleDifferenceFamily L w₁, ∀ i, Ind(ω_{ij}−ω_{0j}) = data.signedDifference i`
+   (= δ_j•(μ_{ij}−μ_{0j}), δ_j=±1, μ injective)。**列内 distinct は `.injective` field**。
+
+### 🔑 KEY (再調査するな)
+
+- **σ と (1.4)-isometry は別 hyp**: σ=`toTICyclicHypothesis` (V=W−(W₁∪W₂)=Vdiff, `exists_sigma`
+  が `hVeq` 要求)、(1.4) の等長は `sdiffTICyclicHypothesis` (V=W−W₂, より大きい TI)。ω は W のみ
+  依存ゆえ両 hyp で共有 (defeq)。
+- **bridge instance 必須**: `h.sdiffTICyclicHypothesis.W` は `h.W1⊔h.W2` と defeq だが instance 探索は
+  構文的 → recipe section に `instFintypeSdiffW`/`instInvertibleCardSdiffW` (`‹_›` で W₁⊔W₂ 形から移送)。
+- **NeZero は statement binder に**: `(0 : Fin w₁)` を含む statement は `[NeZero (Nat.card W1)]` を
+  binder に持つ必要 (proof 内 haveI は手遅れ)。use site で `haveI := h.neZero_card_W1`。
+- **omega は ℤ-induction 経路**: 3 hypotheses のうち virtual/degree は素の induce 補題 (Dade 不要)、
+  isometry のみ Dade (induce は一般に非等長; TI-supported でのみ等長)。
+- Lean 地雷: (i) `rw [def]` は def 展開不可 → `rfl`-have or `congrArg`; (ii) omega defeq を omega
+  tactic は見ない → 明示型 `have h3 : 3 ≤ Nat.card h.W1 := …`; (iii) coercion 先型は omega 本来の
+  出力型 `↥sdiffTICyclicHypothesis.W` に合わせる (構文的 instance 探索)。
+
+### ▶▶ 次 = (4.3.b) step 3-5 [cross-column distinct → σ 同定 → (4.3.c)(d)]
+
+1. **列間 distinct** (step 3): (4.1) `pairwise_inner_eq_zero_of_orthogonal_signedDifference`
+   (InducedIrreducible) で異 χ₂ 列の μ が直交 → 全 μ_{ij} distinct。署名族の合成が要。
+2. **σ 同定** (step 4): `eq_sigma_of_apply_eq_on_V` (3.9.a) + `exists_sigma` を
+   `toTICyclicHypothesis` (hVeq=rfl) 上で。σ(ω_{ij}) = δ_j μ_{ij} を確立。ここが (4.3.b) の
+   deep piece — μ_{ij} (族から) が σ(ω_{ij}) と一致することを示す (norm-1 virtual + V 上一致)。
+3. その後 (4.3.c) 値 + 消滅 ((1.3)(a) `eq_zero_of_mem_of_inner_supported_eq_zero` S05:2158) →
+   (4.3.d) 次数合同 → (4.4)(小) → (4.5) ([Is]6.32=ConjugationBrauer 済)。
+
+正本 = 本ノート (session 21)。**Don't re-grind (4.3.b) step 1-2 — `exists_columnSignedFamily`
+完成・axiom-clean。bridge instance パターン確立。**
