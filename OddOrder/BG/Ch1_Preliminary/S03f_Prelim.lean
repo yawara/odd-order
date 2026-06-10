@@ -212,4 +212,96 @@ theorem oPiCore_compl_quotient_frattini_fitting_eq_bot
   have hk0 : k = 0 := by by_contra hk0; exact hO_p' (hk ▸ dvd_pow_self p hk0)
   exact Subgroup.card_eq_one.mp (by rw [hk, hk0, pow_zero])
 
+section /- transport helpers for the Theorem 3.6 assembly (Phase B–F) -/
+
+open scoped Pointwise
+
+/-- **Push an invariant subgroup of an invariant ambient subgroup back to the whole group**: if
+`U ≤ G` is `A`-invariant and `L ≤ ↥U` is invariant under the restricted action, then
+`L.map U.subtype ≤ G` is `A`-invariant.
+
+(Public version of a helper that exists `private`ly in `S01_Solvable` and `S04e_GorThm37`;
+consolidating the three copies into `Ch03_SplitExtensions` is part of the Theorem 3.6 cleanup.) -/
+theorem isAInvariant_map_subtype_of_restrict
+    {G A : Type*} [Group G] [Group A] {φ : A →* MulAut G}
+    {U : Subgroup G} (hU : OddOrder.Isaacs.Ch03.IsAInvariant φ U)
+    {L : Subgroup ↥U} (hL : OddOrder.Isaacs.Ch03.IsAInvariant hU.restrict L) :
+    OddOrder.Isaacs.Ch03.IsAInvariant φ (L.map U.subtype) := by
+  rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+  intro a x hx
+  rw [Subgroup.mem_map] at hx ⊢
+  obtain ⟨l, hl, rfl⟩ := hx
+  exact ⟨(hU.restrict a) l, hL.smul_mem a hl,
+    OddOrder.Isaacs.Ch03.IsAInvariant.restrict_apply_val hU a l⟩
+
+/-- **A subgroup of `H ⊴ G` that is normal in `↥H` and `R`-invariant is normal in `G = HR`**: with
+`H ⊔ R = ⊤`, conjugation by any `g = h * r` preserves `X.map H.subtype` (the `r`-part by
+`R`-invariance under the conjugation action, the `h`-part by normality in `↥H`).
+
+Used at BG Theorem 3.6 (3.14) for `C_V(K)` and `[V,K]` (normal in `↥H` via (3.12), `R`-invariant
+since `V` is characteristic and `K` is `R`-invariant), and again in Phase D. -/
+theorem normal_map_subtype_of_isAInvariant_conjNormal
+    {G : Type*} [Group G] {H R : Subgroup G} [H.Normal] (hsup : H ⊔ R = ⊤)
+    {X : Subgroup ↥H} [hXn : X.Normal]
+    (hX_inv : OddOrder.Isaacs.Ch03.IsAInvariant
+      ((MulAut.conjNormal (G := G) (H := H)).comp R.subtype) X) :
+    (X.map H.subtype).Normal := by
+  constructor
+  rintro _ ⟨x, hx, rfl⟩ g
+  -- decompose `g = h * r` with `h ∈ H`, `r ∈ R` (normal product, `H ⊔ R = ⊤`).
+  have hg : g ∈ (H : Set G) * (R : Set G) := by
+    rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top]; trivial
+  obtain ⟨h, hh, r, hr, rfl⟩ := hg
+  -- conjugate by `r` first (`R`-invariance), then by `h` (normality in `↥H`).
+  set y : ↥H := ((MulAut.conjNormal (G := G) (H := H)).comp R.subtype) ⟨r, hr⟩ x with hy
+  have hyX : y ∈ X := hX_inv.smul_mem ⟨r, hr⟩ hx
+  have hyval : (y : G) = r * (x : G) * r⁻¹ := by
+    simp only [hy, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conjNormal_apply]
+  refine ⟨⟨h, hh⟩ * y * ⟨h, hh⟩⁻¹, hXn.conj_mem y hyX ⟨h, hh⟩, ?_⟩
+  rw [Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_mul, Subgroup.coe_inv, hyval]
+  group
+
+/-- One inequality of `fitting_map_eq_of_mulEquiv`: the image of the Fitting subgroup under an
+isomorphism is a normal nilpotent subgroup, hence contained in the Fitting subgroup. -/
+theorem fitting_map_le_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Group G'] [Finite G']
+    (f : G ≃* G') :
+    (OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom ≤ OddOrder.Isaacs.Ch01.fitting G' := by
+  haveI : ((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom).Normal :=
+    Subgroup.Normal.map inferInstance f.toMonoidHom f.surjective
+  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting G).map f.toMonoidHom) := by
+    have e' := Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting G) f.toMonoidHom
+      f.injective
+    exact nilpotent_of_surjective e'.toMonoidHom e'.surjective
+  exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+
+/-- **The Fitting subgroup transports along group isomorphisms**: `F(G).map e = F(G')` for
+`e : G ≃* G'`.  (The image is a normal nilpotent subgroup, hence `≤ F(G')`; symmetrically with
+`e.symm`.)  Used at BG Theorem 3.6 (3.15) (`K = F(N_H(K))` via `N_H(K) ≃* H/V`). -/
+theorem fitting_map_eq_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Group G'] [Finite G']
+    (e : G ≃* G') :
+    (OddOrder.Isaacs.Ch01.fitting G).map e.toMonoidHom = OddOrder.Isaacs.Ch01.fitting G' := by
+  refine le_antisymm (fitting_map_le_of_mulEquiv e) ?_
+  have h2 := fitting_map_le_of_mulEquiv e.symm
+  rw [Subgroup.map_equiv_eq_comap_symm', MulEquiv.symm_symm] at h2
+  have h3 := Subgroup.map_mono (f := e.toMonoidHom) h2
+  rwa [Subgroup.map_comap_eq_self_of_surjective e.surjective] at h3
+
+/-- **Hall subgroups transport along group isomorphisms** (cardinality and index are preserved).
+Used in the Frattini argument at BG Theorem 3.6 (3.12): the conjugate of a Hall `p'`-subgroup of
+`U` under `MulAut.conjNormal h` is again a Hall `p'`-subgroup. -/
+theorem isHallSubgroup_map_of_mulEquiv {G G' : Type*} [Group G] [Finite G] [Group G'] [Finite G']
+    {π : Set ℕ} {K : Subgroup G} (e : G ≃* G')
+    (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup π K) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup π (K.map e.toMonoidHom) := by
+  have hcard : Nat.card ↥(K.map e.toMonoidHom) = Nat.card ↥K :=
+    Subgroup.card_map_of_injective e.injective
+  have hidx : (K.map e.toMonoidHom).index = K.index := by
+    have h1 := Subgroup.card_mul_index K
+    have h2 := Subgroup.card_mul_index (K.map e.toMonoidHom)
+    rw [hcard, ← Nat.card_congr e.toEquiv] at h2
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
+  exact ⟨fun q hq => hK.1 q (hcard ▸ hq), fun q hq => hK.2 q (hidx ▸ hq)⟩
+
+end
+
 end OddOrder.BG.Ch1.S03f
