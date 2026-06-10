@@ -791,3 +791,71 @@ scaffold 唯一 sorry = **(3.36)–(3.37) + Phase F**。leaf 3017 green。**Thm 
 3. **Phase F (3.38)**: V = V₁×…×Vₙ (index-q 部分群の固定空間生成, **Prop 1.16 =
    Isaacs 6.21 既存** [[bg-gorenstein-reread-as-isaacs]]) + R₀ 順列作用 + parity。
    mmd L1152–L1187。最終矛盾 = thm36_aux 完結 → `thm36` un-sorry → **§10.6 keystone 解除**。
+
+## ✅✅✅ 2026-06-10 session 11 (a-keystone): **(3.36)+(3.37) COMPLETE — 残り Phase F のみ**
+
+scaffold (3797 行) 唯一 sorry = **Phase F ((3.38) orbit-parity)**。leaf 3017 green。
+**Thm 2.6(a) (`S02.odd_two_dim_abelian`) を 2 回実消費** — §2 の全大物 (2.5/2.6) が spine に接続済。
+
+### (3.36) K elementary abelian — 実装の要点
+- **Step 1 (index q)**: 🔑 **一般形 Prop 1.6(a) = `Ch04.fixedPoints_sup_actionCommutator_eq_top`**
+  (coprime + solvable 片側; CommGroup 不要!) を φAR := φA∘R₀'-incl (K-level) に適用。
+  `hFPval : FP = (KG ⊓ C_G(R₀)).subgroupOf KG` (val-chase) + `hACval : AC = ⁅KG,R₀⁆.subgroupOf KG`
+  (≤ = closure_le + generator val 計算; ≥ = `hbridgeK` [hbridge の商なし版, ∃-motive
+  closure_induction]) + h333-disjoint + `card_sup_of_le_normalizer_of_disjoint`
+  (normalizer 側は `Subgroup.normalizer_eq_top` rw idiom) ⟹ `|KG| = |⁅KG,R₀⁆|·q` ⟹
+  `hKRs_index : (⁅KG,R₀⁆.subgroupOf KG).index = q` (`index_mul_card` + cancel)。
+- **Step 2 (共役と中心)**: KRx := ⁅KG,R₀⁆.map (conj x) — `hcomp` (conj 合成 = conj (a*b);
+  `map_map` + congr 1 + ext + simp) で **KG ≤ N(KRx)** (g x = x·(x⁻¹gx) 分解 +
+  `map_conj_eq_self_of_mem_normalizer`)。distinctness は subgroupOf ≠ へ transport
+  (`congrArg (·.map KG.subtype)` + `subgroupOf_map_subtype` + inf_eq_left)。
+  **sup = ⊤** は index-divides 論法 (sup.index ∣ q; = q なら `eq_of_le_of_card_ge` ×2 で
+  KRx = KR ✗)。**∩ ≤ Z(K)** は `normal_mul` で k = k₁k₂ 分解 + 両側可換
+  (h334/h334x + `commutatorElement_eq_one_iff_mul_comm`)。
+- **Step 3 (case split)**: `index_inf_le` + `Nat.dvd_prime_pow` で
+  `(center ↥KG).index = q^j, j ≤ 2`。
+  - **j = 2 枝 = Thm 2.6(a) 一回目**: hK_special 右枝で `commutator = center` ⟹
+    `|K/K'| = q²` ⟹ dim 2 (`Module.card_eq_pow_finrank`; `Nat.card (Additive X) = Nat.card X`
+    は **rfl**)。ρ2 := mulAutToEnd ∘ φAQ; **faithful = h329** (ρ2(ab⁻¹)=1 → pointwise →
+    a=b)。hchar は `CharP.eq (ZMod q) hcharP (ZMod.charP q)` で ℓ=q に還元 → q∉{p,r} ✗。
+    `Std.Commutative ↥A` → ⁅PG,R₀⁆=⊥ → h321G ▸ → h313G ✗。
+  - j ∈ {0,1}: `index_eq_card` で商位数 q^j → `isCyclic_of_subsingleton` /
+    `isCyclic_of_prime_card` → **`commutative_of_cyclic_center_quotient (mk' (center ↥KG))`**
+    (mk' の center は明示必須 — `_` だと Normal instance が stuck) + `ker_mk'`。
+- 結論: `h336 : ⁅KG,KG⁆ = ⊥` + `h336ea : IsElementaryAbelian q ↥KG`。
+
+### (3.37) |K| > q² — 実装の要点
+by_contra → K 自体を ZMod q module 化 (h336ea.2 で q-smul) → ρ3 := mulAutToEnd ∘ φA →
+**hker3 (faithful) は h328 で直接** (商不要)。dim ≤ 2 の三枝:
+dim 0 = `eq_bot_of_card_eq` ✗ h313G / **dim 1 = `S03e.trivial_on_commutator_of_finrank_eq_one`
+ρ3 _ ⊤** (1次元 End は scalar ⟹ ⁅a,b⁆ 自明 ⟹ hker3) / **dim 2 = Thm 2.6(a) 二回目**
+(faithful = hker3 経由)。いずれも A 可換 → h321G+h313G ✗。
+`rcases hfr : finrank … with _ | _ | _ | fr4` (等式付き rcases) が効く。
+
+### 新規 gotchas
+- `Subgroup.index_dvd_card` は **H 明示** (`index_dvd_card _`)。
+- `Nat.card_pos.ne'` は `card = 0` 形を取る (0 = card は .symm)。
+- `QuotientGroup.mk' _` の `_` (N) は instance-stuck → 明示。
+- q-power 不等式の場合分けは atom-omega (q^j ≤ q*q < q^3 ≤ q^j サイクル) が一発。
+
+### ▶ 次セッション (session 12) = Phase F (3.38) — 最終ピース (mmd L1154–L1196)
+1. **Setup**: `K₁,…,Kₙ` = index-q 部分群で `V_i := C_{VG}(K_i) ≠ ⊥` なもの (Finset/Fintype of
+   subgroups? — `{Ki : Subgroup ↥KG // Ki.index = q ∧ …}` の Fintype 化 or G-level)。
+   **Prop 1.16 = Isaacs 6.21 (形式化済, repo 形要確認** [[bg-gorenstein-reread-as-isaacs]]**)**:
+   K abelian noncyclic (|K| > q² elem ab ⟹ noncyclic) ⟹ `⨆ V_i = VG`。
+2. **直積分解 V = V₁×⋯×Vₙ**: VG elem abelian ⟹ ZMod p 加群で `iSupIndep` +
+   `⨆ = ⊤` 形を推奨 (maximal-W 論法; (3.38)-eq = C_W(K_i) の成分分解 + C_{V_i}(K_j)=⊥
+   [K_i ⊔ K_j = ⊤ + (3.14)=hCHV 系])。**機械要 recon: Submodule.iSupIndep への移行 vs
+   Subgroup 直積 API**。
+3. **PR-推移性** on {V_i}: h311 (unique minimal normal) + 軌道が distinct minimal normal を
+   生成 ⟹ 1 軌道。**¬全 R₀-固定** (else P=[P,R]⊆⋂N_PR(V_i) ⟹ V_i G-inv ⟹ n=1 ✗
+   faithful+|K|>q²)。
+4. **ノルム射影**: 非自明 R₀-軌道 {V₁..V_r} (r = |R₀|); v ↦ Σ v^{x^i} ∈ C(R₀) の π₁ 全射 ⟹
+   h319 (|C_V(R₀)|=p) で |V₁| = p ∧ C_{V_{r+1}×…}(R₀) = ⊥ ⟹ 第二の長さ-r 軌道なし ⟹
+   i > r は R₀-固定。
+5. **i > r**: Aut(V_i) abelian (位数 p) ⟹ [K,R₀] ≤ C_K(V_i) = K_i, index q ⟹ [K,R₀] = K_i
+   ∀ i > r ⟹ **n = r ∨ n = r+1** (K_i 相異なら 2 個まで)。
+6. **n = r**: P-軌道長 1 存在 (p ∤ r) ⟹ V_i P-固定 ⟹ K = [K,P] が V_i 中心化 ✗ (3.14)。
+   **n = r+1**: n 偶 (r 奇) vs n = |PR : N_PR(V_{r+1})| ∣ |PR| 奇 ✗ — **最終矛盾 = thm36 完成**。
+7. 完成後: long-line cleanup → scaffold commit → AxiomsCheck 登録 → **§10.6 keystone 解除**
+   (Lane D de-axiom 解禁)。
