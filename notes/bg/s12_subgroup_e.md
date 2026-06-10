@@ -67,16 +67,21 @@ Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (�
 ### ▶ 残り着手可能 leaf (D-lane §12 next frontier)
 
 - **12.19** `derivedE_centralizes_betaComplement`: 「E' は M_σ の Hall β'-部分群を中心化」。
-  **🛑 coprime-action coordination が本質的ハードル。** mmd 証明 2 段:
-  (I) E' の各 Sylow `D_q` は M_σ の Hall β'-部分群を中心化 [Cor 10.9(a) `beta_complement_centralizes`
-      を p∈β' ごとに集め `C_{M_σ}(D_q)` が full β'-Hall を含む] — これは比較的直接。
-  (II) ⇒ E' 全体が単一 Hall β' を中心化 [互いに素]。**ここが非自明** — 各 D_q が中心化する
-      Hall β' は M_σ 内で共役だが別物で、単一 W への coordination は coprime conjugacy 論法。
-  infra: `exists_aInvariant_hall` (Prop 1.5, S01) で E'-invariant Hall β' は取れるが、
-  invariant ⇒ centralize の橋渡し (各 D_q の per-Sylow 中心化を invariant W へ集約) が
-  ~150 行規模で未着手。E' nilpotent (12.1(a)) は使えるが coordination の決め手にならず。
-  次セッションは (II) 用の汎用 coprime 補題 (「A=∏D_q が各 D_q で Hall π を中心化 ⇒ A で単一
-  Hall π を中心化」) を S01/S06 に立てるのが筋。
+  coprime-action 証明。**具体経路を特定済 (新規汎用補題は不要、既存 Prop 1.5(c) で閉じる)**:
+  各素数 `r ∈ β'∩π(M_σ)` ごとに **「E' は M_σ の Sylow r を中心化」** を示し、それを Hall β' に
+  束ねる。per-r の核心:
+  1. E'-invariant Sylow r `R` を取る (`exists_aInvariant_hall`, π={r}; E'↷M_σ 共役作用 φ)。
+  2. 各 Sylow `D_q` of E' (q∈π(E')) は M_σ の **ある** Sylow r `R_q` を中心化
+     (Cor 10.9(a) `beta_complement_centralizes`; r,q∈β' distinct で `X≤M'` 枝)。
+  3. `R`, `R_q` は共に D_q-invariant Sylow r ⇒ **`aInvariant_hall_conj` (Prop 1.5(c)) で
+     `R = R_q^c`, `c∈C(D_q)`**。`R_q≤C(D_q)`, `c∈C(D_q)` ⇒ `R=R_q^c≤C(D_q)` ⇒ D_q が R を中心化。
+  4. 全 D_q ⇒ E'=⟨D_q⟩ が R を中心化 ⇒ `C_{M_σ}(E')` が full Sylow r を含む。
+  5. 全 r ⇒ `C_{M_σ}(E')` が full β'-Hall を含む ⇒ その Hall β' `W`(≤C_{M_σ}(E')) が
+     M_σ の Hall β' かつ E'≤C_G(W)。
+  **残実装課題 = plumbing (~120-150 行)**: (a) E'(及び各 D_q)↷M_σ の共役作用 φ:↥E'→*MulAut↥(M_σ)
+  を `normalizerMonoidHom (Msigma M)`+inclusion (E'≤M≤N_G(M_σ)) で構成; (b) Cor 10.9 は G-level、
+  exists_aInvariant_hall/conj は ↥(M_σ)-internal ゆえ Sylow r の ↥M_σ↔G 変換が要; (c) per-r
+  ループの r∈β'∩π(M_σ) 走査と Hall 組立。E' coprime M_σ は E complement of Hall M_σ から。
 - **12.18** `tau1_Malpha_interaction`: 大物 (Thm 1.13 + Thm 3.7(両 landed) + Uniqueness +
   Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。
 
