@@ -31,6 +31,297 @@ namespace OddOrder.Peterfalvi.S06
 open OddOrder.RepresentationTheory
 open OddOrder.Peterfalvi.S05
 
+/-! ### General character-theoretic infrastructure
+
+The following are general facts about genuine characters (restriction and induction preserve
+genuineness, the inner product of two genuine characters is non-negative, the
+non-negative-integer decomposition of an induced character) together with two degree-counting
+lemmas for the constituent set of a genuine character.
+
+`OddOrder.Peterfalvi.S08` already proves `isCharacter_restrict`, `inner_isCharacter_nonneg`,
+`induce_exists_natFinsupp_eq_sum`, `isCharacter_induce`, but `S08` is *downstream* of this file,
+so those copies are not importable here.  These are re-stated for the (4.5) Clifford
+degree-counting argument and are candidates for hoisting to `Clifford.lean` /
+`InducedCharacter.lean` (deduplicating with the `S08` copies). -/
+section CharacterInfra
+
+variable {G : Type*} [Group G]
+
+/-- The restriction `Res^G_H φ` of a genuine character is genuine (cf. `S08.isCharacter_restrict`).
+The witnessing representation `ρ` of `φ` restricts to `ρ.comp H.subtype` on `H`. -/
+theorem isCharacter_restrict [Finite G] {φ : ClassFunction G ℂ}
+    (hφ : IsCharacter φ) (H : Subgroup G) :
+    IsCharacter (ClassFunction.restrict H φ) := by
+  obtain ⟨V, _, _, _, ρ, hρ⟩ := hφ
+  have hφeq : φ = repCharacterClassFunction ρ :=
+    ClassFunction.ext fun g => by rw [repCharacterClassFunction_apply]; exact congrFun hρ g
+  rw [hφeq, ClassFunction.restrict_repCharacterClassFunction H ρ]
+  exact repCharacterClassFunction_isCharacter (ρ.comp H.subtype)
+
+open scoped ComplexOrder in
+/-- The inner product of two genuine characters is `≥ 0` (cf. `S08.inner_isCharacter_nonneg`).
+Decompose the right argument into a non-negative integer combination of irreducibles; each
+summand `⟨χ, a⟩` is `≥ 0` by `inner_irreducible_nonneg`. -/
+theorem inner_isCharacter_nonneg [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {χ ψ : ClassFunction G ℂ} (hχ : IsCharacter χ) (hψ : IsCharacter ψ) :
+    0 ≤ ClassFunction.inner χ ψ := by
+  obtain ⟨m, hsupp, hsum, _⟩ := hψ.exists_natFinsupp_eq_sum
+  rw [hsum, inner_sum_right]
+  refine Finset.sum_nonneg fun a ha => ?_
+  have ha' : IsIrreducibleCharacter a :=
+    mem_irreducibleCharacters.mp (hsupp (Finset.mem_coe.mpr ha))
+  rw [OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+  exact mul_nonneg (Nat.cast_nonneg _) (hχ.inner_irreducible_nonneg ha')
+
+set_option linter.unusedFintypeInType false in
+open scoped ComplexOrder in
+/-- The induced character `Ind_H^G θ` of a genuine character decomposes as a non-negative integer
+combination of irreducibles, with multiplicity `⟨Ind θ, ψ⟩` at `ψ ∈ Irr G`
+(cf. `S08.induce_exists_natFinsupp_eq_sum`).  Reconstructed from `Ind θ ∈ ZIrr G`
+(`induce_mem_ZIrr`) plus the non-negativity of `⟨Ind θ, ψ⟩ = ⟨θ, Res ψ⟩` (Frobenius reciprocity
+and `inner_isCharacter_nonneg`), pushed through `Int.toNat`. -/
+theorem induce_exists_natFinsupp_eq_sum [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {H : Subgroup G} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ) :
+    ∃ m : ClassFunction G ℂ →₀ ℕ, (↑m.support ⊆ irreducibleCharacters G) ∧
+      ClassFunction.induce H θ = ∑ a ∈ m.support, (m a : ℂ) • a ∧
+      ∀ ψ : ClassFunction G ℂ, IsIrreducibleCharacter ψ →
+        (m ψ : ℂ) = ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+  classical
+  obtain ⟨c, hsupp, hsum⟩ := mem_ZIrr_repr (ClassFunction.induce_mem_ZIrr H hθ.mem_ZIrr)
+  have hcoeff : ∀ ψ : ClassFunction G ℂ, ψ ∈ irreducibleCharacters G →
+      (c ψ : ℂ) = ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+    intro ψ hψ
+    have h := inner_eq_coeff_of_repr (⟨ψ, hψ⟩ : IrreducibleCharacter G) hsupp
+    rw [show ((⟨ψ, hψ⟩ : IrreducibleCharacter G) : ClassFunction G ℂ) = ψ from rfl] at h
+    rw [← h, hsum]
+  have hcnn : ∀ ψ : ClassFunction G ℂ, ψ ∈ c.support → 0 ≤ c ψ := by
+    intro ψ hψsupp
+    have hψ : ψ ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr hψsupp)
+    have hψirr : IsIrreducibleCharacter ψ := mem_irreducibleCharacters.mp hψ
+    have hnn : (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.induce H θ) ψ := by
+      rw [ClassFunction.inner_induce_eq_inner_restrict]
+      exact inner_isCharacter_nonneg hθ (isCharacter_restrict hψirr.isCharacter H)
+    have : (0 : ℂ) ≤ (c ψ : ℂ) := by rw [hcoeff ψ hψ]; exact hnn
+    exact_mod_cast this
+  refine ⟨Finsupp.mapRange Int.toNat Int.toNat_zero c, ?_, ?_, ?_⟩
+  · refine subset_trans ?_ hsupp
+    intro ψ hψ
+    exact Finset.mem_coe.mpr (Finsupp.support_mapRange (Finset.mem_coe.mp hψ))
+  · have hsupp_eq : (Finsupp.mapRange Int.toNat Int.toNat_zero c).support = c.support := by
+      apply Finset.Subset.antisymm Finsupp.support_mapRange
+      intro a ha
+      rw [Finsupp.mem_support_iff, Finsupp.mapRange_apply]
+      have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+      omega
+    rw [hsum, hsupp_eq]
+    refine Finset.sum_congr rfl fun a ha => ?_
+    rw [Finsupp.mapRange_apply]
+    have : 0 < c a := lt_of_le_of_ne (hcnn a ha) (Ne.symm (Finsupp.mem_support_iff.mp ha))
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c a)), Int.toNat_of_nonneg (le_of_lt this)]
+  · intro ψ hψ
+    rw [Finsupp.mapRange_apply, ← hcoeff ψ hψ]
+    have hnn : 0 ≤ c ψ := by
+      by_cases hsupp_mem : ψ ∈ c.support
+      · exact hcnn ψ hsupp_mem
+      · rw [Finsupp.notMem_support_iff.mp hsupp_mem]
+    rw [← Int.cast_natCast (R := ℂ) (Int.toNat (c ψ)), Int.toNat_of_nonneg hnn]
+
+set_option linter.unusedFintypeInType false in
+/-- The induced character `Ind_H^G θ` of a genuine character is genuine
+(cf. `S08.isCharacter_induce`).  Combine `induce_exists_natFinsupp_eq_sum` with its converse
+`isCharacter_of_natFinsupp_eq_sum`. -/
+theorem isCharacter_induce [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {H : Subgroup G} [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] {θ : ClassFunction ↥H ℂ} (hθ : IsCharacter θ) :
+    IsCharacter (ClassFunction.induce H θ) := by
+  obtain ⟨m, hsupp, hsum, _⟩ := induce_exists_natFinsupp_eq_sum hθ
+  exact isCharacter_of_natFinsupp_eq_sum m hsupp hsum
+
+/-- **Finset constituent-degree bound.**  If `χ` is a genuine character and `f` is a family,
+injective and consisting of irreducible constituents of `χ` (`⟨χ, f i⟩ ≠ 0`) on a finset `s`,
+then the sum of the degrees `∑_{i ∈ s} (f i)(1)` is at most `χ(1)` (real parts).  Each `f i` is a
+distinct irreducible summand of the `ℕ`-decomposition of `χ` with multiplicity `≥ 1`
+(the Finset generalization of `IsCharacter.apply_one_re_le_of_inner_ne_zero`). -/
+theorem sum_apply_one_re_le_of_inner_ne_zero [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ : ClassFunction G ℂ} (hχ : IsCharacter χ)
+    {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G ℂ}
+    (hinj : Function.Injective f)
+    (hirr : ∀ i ∈ s, IsIrreducibleCharacter (f i))
+    (hconst : ∀ i ∈ s, ClassFunction.inner χ (f i) ≠ 0) :
+    ∑ i ∈ s, (f i 1).re ≤ (χ 1).re := by
+  classical
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := hχ.exists_natFinsupp_eq_sum
+  have hsum_apply : ∀ (t : Finset (ClassFunction G ℂ))
+      (F : ClassFunction G ℂ → ClassFunction G ℂ),
+      (∑ a ∈ t, F a) 1 = ∑ a ∈ t, (F a) 1 := by
+    intro t F
+    induction t using Finset.cons_induction with
+    | empty => simp
+    | cons a t ha ih => rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.add_apply, ih]
+  have hχ1 : (χ 1).re = ∑ a ∈ m.support, (m a : ℝ) * (a 1).re := by
+    have hval : χ 1 = ∑ a ∈ m.support, (m a : ℂ) * (a 1) := by
+      rw [hsum, hsum_apply]
+      exact Finset.sum_congr rfl fun a _ => ClassFunction.smul_apply _ _ _
+    rw [hval, Complex.re_sum]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero]
+  have hdeg_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (a 1).re := by
+    intro a ha
+    have ha_mem : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    obtain ⟨d, _, hd1⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, ha_mem⟩ : IrreducibleCharacter G)
+    have hd1' : a (1 : G) = (d : ℂ) := hd1
+    rw [hd1', Complex.natCast_re]
+    exact Nat.cast_nonneg d
+  have hterm_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (m a : ℝ) * (a 1).re := fun a ha =>
+    mul_nonneg (Nat.cast_nonneg _) (hdeg_nonneg a ha)
+  have hfsupp : ∀ i ∈ s, f i ∈ m.support := by
+    intro i hi
+    refine Finsupp.mem_support_iff.mpr ?_
+    intro h0
+    exact hconst i hi (by rw [← hcoeff (f i) (hirr i hi), h0, Nat.cast_zero])
+  have himg : Finset.image f s ⊆ m.support := by
+    intro a ha; obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp ha; exact hfsupp i hi
+  have hsum_img : ∑ i ∈ s, (f i 1).re = ∑ a ∈ Finset.image f s, (a 1).re := by
+    rw [Finset.sum_image fun x _ y _ h => hinj h]
+  rw [hsum_img, hχ1]
+  refine le_trans (Finset.sum_le_sum fun a ha => ?_)
+    (Finset.sum_le_sum_of_subset_of_nonneg himg fun a ha _ => hterm_nonneg a ha)
+  have ha_supp : a ∈ m.support := himg ha
+  have hm1 : (1 : ℝ) ≤ (m a : ℝ) :=
+    by exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Finsupp.mem_support_iff.mp ha_supp)
+  exact le_mul_of_one_le_left (hdeg_nonneg a ha_supp) hm1
+
+/-- **Tight constituent-degree bound forces the exact decomposition.**  In addition to the
+hypotheses of `sum_apply_one_re_le_of_inner_ne_zero`, if the degree sum dominates `χ(1)`
+(`(χ 1).re ≤ ∑_{i ∈ s} (f i)(1)`), then `χ = ∑_{i ∈ s} f i`: the `f i` are *all* the irreducible
+constituents of `χ`, each with multiplicity exactly `1`.  (The textbook "a genuine character whose
+degree equals the sum of the degrees of distinct constituents is their sum" step.) -/
+theorem eq_sum_of_apply_one_re_le_of_inner_ne_zero [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ : ClassFunction G ℂ} (hχ : IsCharacter χ)
+    {ι : Type*} {s : Finset ι} {f : ι → ClassFunction G ℂ}
+    (hinj : Function.Injective f)
+    (hirr : ∀ i ∈ s, IsIrreducibleCharacter (f i))
+    (hconst : ∀ i ∈ s, ClassFunction.inner χ (f i) ≠ 0)
+    (hle : (χ 1).re ≤ ∑ i ∈ s, (f i 1).re) :
+    χ = ∑ i ∈ s, f i := by
+  classical
+  obtain ⟨m, hsupp, hsum, hcoeff⟩ := hχ.exists_natFinsupp_eq_sum
+  have hsum_apply : ∀ (t : Finset (ClassFunction G ℂ))
+      (F : ClassFunction G ℂ → ClassFunction G ℂ),
+      (∑ a ∈ t, F a) 1 = ∑ a ∈ t, (F a) 1 := by
+    intro t F
+    induction t using Finset.cons_induction with
+    | empty => simp
+    | cons a t ha ih => rw [Finset.sum_cons, Finset.sum_cons, ClassFunction.add_apply, ih]
+  have hχ1 : (χ 1).re = ∑ a ∈ m.support, (m a : ℝ) * (a 1).re := by
+    have hval : χ 1 = ∑ a ∈ m.support, (m a : ℂ) * (a 1) := by
+      rw [hsum, hsum_apply]
+      exact Finset.sum_congr rfl fun a _ => ClassFunction.smul_apply _ _ _
+    rw [hval, Complex.re_sum]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    rw [Complex.mul_re, Complex.natCast_re, Complex.natCast_im, zero_mul, sub_zero]
+  have hdeg_nonneg : ∀ a ∈ m.support, (0 : ℝ) ≤ (a 1).re := by
+    intro a ha
+    have ha_mem : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    obtain ⟨d, _, hd1⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, ha_mem⟩ : IrreducibleCharacter G)
+    have hd1' : a (1 : G) = (d : ℂ) := hd1
+    rw [hd1', Complex.natCast_re]
+    exact Nat.cast_nonneg d
+  have hdeg_pos : ∀ a ∈ m.support, (0 : ℝ) < (a 1).re := by
+    intro a ha
+    have ha_mem : a ∈ irreducibleCharacters G := hsupp (Finset.mem_coe.mpr ha)
+    obtain ⟨d, hd, hd1⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨a, ha_mem⟩ : IrreducibleCharacter G)
+    have hd1' : a (1 : G) = (d : ℂ) := hd1
+    rw [hd1', Complex.natCast_re]
+    exact_mod_cast hd
+  have hm_ge1 : ∀ a ∈ m.support, (1 : ℝ) ≤ (m a : ℝ) := fun a ha => by
+    exact_mod_cast Nat.one_le_iff_ne_zero.mpr (Finsupp.mem_support_iff.mp ha)
+  have hfsupp : ∀ i ∈ s, f i ∈ m.support := by
+    intro i hi
+    refine Finsupp.mem_support_iff.mpr ?_
+    intro h0
+    exact hconst i hi (by rw [← hcoeff (f i) (hirr i hi), h0, Nat.cast_zero])
+  have himg : Finset.image f s ⊆ m.support := by
+    intro a ha; obtain ⟨i, hi, rfl⟩ := Finset.mem_image.mp ha; exact hfsupp i hi
+  have hsum_img : ∑ i ∈ s, (f i 1).re = ∑ a ∈ Finset.image f s, (a 1).re := by
+    rw [Finset.sum_image fun x _ y _ h => hinj h]
+  -- key degree equality: `∑_{supp} m_a (a1).re = ∑_{image} (a1).re`
+  have hkey : ∑ a ∈ m.support, (m a : ℝ) * (a 1).re
+      = ∑ a ∈ Finset.image f s, (a 1).re := by
+    have hbound := sum_apply_one_re_le_of_inner_ne_zero hχ hinj hirr hconst
+    rw [hsum_img] at hbound hle
+    rw [hχ1] at hbound hle
+    exact le_antisymm hle hbound
+  -- split the support into `image` and `support \ image`
+  have hsplit : (∑ a ∈ m.support \ Finset.image f s, (m a : ℝ) * (a 1).re)
+      + ∑ a ∈ Finset.image f s, (m a : ℝ) * (a 1).re
+      = ∑ a ∈ m.support, (m a : ℝ) * (a 1).re := Finset.sum_sdiff himg
+  have himg_ge : ∑ a ∈ Finset.image f s, (a 1).re
+      ≤ ∑ a ∈ Finset.image f s, (m a : ℝ) * (a 1).re :=
+    Finset.sum_le_sum fun a ha =>
+      le_mul_of_one_le_left (hdeg_nonneg a (himg ha)) (hm_ge1 a (himg ha))
+  have hsdiff_nonneg : 0 ≤ ∑ a ∈ m.support \ Finset.image f s, (m a : ℝ) * (a 1).re :=
+    Finset.sum_nonneg fun a ha =>
+      mul_nonneg (Nat.cast_nonneg _) (hdeg_nonneg a (Finset.mem_sdiff.mp ha).1)
+  -- `hkey` + `hsplit`: the `support \ image` and the `image` gaps both vanish
+  have heq_total : (∑ a ∈ m.support \ Finset.image f s, (m a : ℝ) * (a 1).re)
+      + ∑ a ∈ Finset.image f s, (m a : ℝ) * (a 1).re
+      = ∑ a ∈ Finset.image f s, (a 1).re := hsplit.trans hkey
+  have hsdiff_zero : (∑ a ∈ m.support \ Finset.image f s, (m a : ℝ) * (a 1).re) = 0 := by
+    linarith
+  have himg_eq : ∑ a ∈ Finset.image f s, (m a : ℝ) * (a 1).re
+      = ∑ a ∈ Finset.image f s, (a 1).re := by linarith
+  -- the support is exactly the image
+  have hsupp_eq : m.support = Finset.image f s := by
+    refine Finset.Subset.antisymm ?_ himg
+    intro a ha
+    by_contra hnot
+    have ha_sdiff : a ∈ m.support \ Finset.image f s := Finset.mem_sdiff.mpr ⟨ha, hnot⟩
+    have hga0 : (m a : ℝ) * (a 1).re = 0 :=
+      (Finset.sum_eq_zero_iff_of_nonneg fun b hb =>
+        mul_nonneg (Nat.cast_nonneg _) (hdeg_nonneg b (Finset.mem_sdiff.mp hb).1)).mp
+        hsdiff_zero a ha_sdiff
+    have hga_pos : 0 < (m a : ℝ) * (a 1).re :=
+      mul_pos (by exact_mod_cast Nat.pos_of_ne_zero (Finsupp.mem_support_iff.mp ha))
+        (hdeg_pos a ha)
+    linarith
+  -- the multiplicity on the image is exactly `1`
+  have hm_one : ∀ a ∈ Finset.image f s, m a = 1 := by
+    have hgg : ∀ a ∈ Finset.image f s, (a 1).re = (m a : ℝ) * (a 1).re :=
+      (Finset.sum_eq_sum_iff_of_le fun b hb =>
+        le_mul_of_one_le_left (hdeg_nonneg b (himg hb)) (hm_ge1 b (himg hb))).mp himg_eq.symm
+    intro a ha
+    have h1 := hgg a ha
+    have hpos := hdeg_pos a (himg ha)
+    have : (m a : ℝ) = 1 :=
+      mul_right_cancel₀ (ne_of_gt hpos) (by rw [one_mul]; exact h1.symm)
+    exact_mod_cast this
+  -- assemble
+  have hsum_f : ∑ i ∈ s, f i = ∑ a ∈ Finset.image f s, a := by
+    rw [Finset.sum_image fun x _ y _ h => hinj h]
+  rw [hsum_f, hsum, hsupp_eq]
+  refine Finset.sum_congr rfl fun a ha => ?_
+  rw [hm_one a ha, Nat.cast_one, one_smul]
+
+/-- **Singleton case of `eq_sum_of_apply_one_re_le_of_inner_ne_zero`**: a genuine character whose
+degree is at most that of one of its irreducible constituents `θ` equals `θ`.  (Together with the
+automatic `θ(1) ≤ χ(1)`, this is the equal-degree-constituent uniqueness.) -/
+theorem eq_of_apply_one_re_le_of_inner_ne_zero [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ θ : ClassFunction G ℂ} (hχ : IsCharacter χ)
+    (hθ : IsIrreducibleCharacter θ) (hconst : ClassFunction.inner χ θ ≠ 0)
+    (hle : (χ 1).re ≤ (θ 1).re) :
+    χ = θ := by
+  have h := eq_sum_of_apply_one_re_le_of_inner_ne_zero (ι := Unit) (s := {()})
+    (f := fun _ => θ) hχ (fun a b _ => Subsingleton.elim a b)
+    (fun _ _ => hθ) (fun _ _ => hconst) (by simpa using hle)
+  simpa using h
+
+end CharacterInfra
+
 variable {L : Type*} [Group L] [Fintype L]
 
 namespace Hypothesis
@@ -125,6 +416,139 @@ theorem restrict_certainType_eq [NeZero (Nat.card h.W1)]
   rwa [SignedIrreducibleDifferenceFamily.difference_apply, ClassFunction.sub_apply,
     SignedIrreducibleDifferenceFamily.classFunction_apply,
     SignedIrreducibleDifferenceFamily.classFunction_apply] at hdiff
+
+/-- **`[L : K] = w₁`** (mmd 04.6, (4.5) proof): the index of the normal subgroup `K` equals
+`|W₁|`, since `K` is a complement to `W₁` in `L` (`L/K ≅ W₁` via `isComplement.QuotientMulEquiv`). -/
+theorem index_K_eq : h.K.index = Nat.card h.W1 := by
+  rw [Subgroup.index_eq_card]
+  exact Nat.card_congr h.isComplement.symm.QuotientMulEquiv.toEquiv
+
+variable [Invertible (Nat.card ↥h.K : ℂ)]
+
+/-- **Peterfalvi (4.5.a), structure of the restriction** (core): there is an irreducible
+character `θ` of `K` equal to the restriction `χ_j = Res^L_K μ_{0j}`, with `Ind^L_K θ = ∑_i μ_{ij}`.
+
+Take an irreducible constituent `θ` of `χ_j` (`exists_liesOver`).  Every `μ_{ij}` restricts to
+`χ_j` (`restrict_certainType_eq`), hence lies over `θ`, so the `w₁` distinct irreducibles
+`μ_{ij}` are all constituents of `Ind_K^L θ`; the constituent-degree bound
+(`sum_apply_one_re_le_of_inner_ne_zero`) gives
+`w₁·μ_{0j}(1) = ∑_i μ_{ij}(1) ≤ (Ind θ)(1) = w₁·θ(1)`, so `χ_j(1) = μ_{0j}(1) ≤ θ(1)`.  Since `θ`
+is a constituent of `χ_j`, the reverse inequality `θ(1) ≤ χ_j(1)` is automatic, so the
+equal-degree uniqueness (`eq_of_apply_one_re_le_of_inner_ne_zero`) forces `χ_j = θ`.  The degree
+inequality is then an equality, so the same tight bound (`eq_sum_of_apply_one_re_le…`) identifies
+`Ind θ` as exactly `∑_i μ_{ij}`. -/
+theorem exists_irreducible_restrict_certainType [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ∃ θ : IrreducibleCharacter ↥h.K,
+      ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+          = (θ : ClassFunction ↥h.K ℂ) ∧
+      ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
+          = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  classical
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  -- `χ_j = Res^L_K μ_{0j}` is a genuine character
+  have hχj_char : IsCharacter
+      (ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) :=
+    isCharacter_restrict ((h.columnFamily χ₂).mu 0).isIrreducible.isCharacter h.K
+  -- a constituent `θ` of `χ_j`
+  obtain ⟨θ, hθ0⟩ :=
+    IrreducibleCharacter.exists_liesOver (H := h.K) ((h.columnFamily χ₂).mu 0)
+  have hθ_const : ClassFunction.inner
+      (ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ))
+      (θ : ClassFunction ↥h.K ℂ) ≠ 0 := hθ0
+  -- every `μ_{ij}` is a constituent of `Ind θ` (restrictions agree)
+  have hθi : ∀ i, ClassFunction.inner
+      (ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ))
+      ((h.columnFamily χ₂).classFunction i) ≠ 0 := by
+    intro i
+    rw [SignedIrreducibleDifferenceFamily.classFunction_apply]
+    refine (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver
+      h.K ((h.columnFamily χ₂).mu i) θ).mpr ?_
+    rw [IrreducibleCharacter.liesOver_iff, ClassFunction.restrictionMultiplicity_def,
+      h.restrict_certainType_eq χ₂ i]
+    exact hθ0
+  -- `Ind θ` is genuine
+  have hIndθ_char : IsCharacter (ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)) :=
+    isCharacter_induce θ.isIrreducible.isCharacter
+  -- degree bookkeeping: all `μ_{ij}` have the same value at `1`
+  have hμi1 : ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) 1
+      = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
+    intro i
+    have hrw := congrArg (fun (φ : ClassFunction ↥h.K ℂ) => φ (1 : ↥h.K))
+      (h.restrict_certainType_eq χ₂ i)
+    simpa only [ClassFunction.restrict_apply, OneMemClass.coe_one] using hrw
+  -- LHS of the bound: `∑_i μ_{ij}(1) = w₁·μ_{0j}(1)`
+  have hsumμ : (∑ i, ((h.columnFamily χ₂).classFunction i 1).re)
+      = (Nat.card h.W1 : ℝ) * (((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1).re := by
+    have hterm : ∀ i : Fin (Nat.card h.W1),
+        ((h.columnFamily χ₂).classFunction i 1).re
+        = (((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1).re := by
+      intro i
+      rw [SignedIrreducibleDifferenceFamily.classFunction_apply]
+      exact congrArg Complex.re (hμi1 i)
+    rw [Finset.sum_congr rfl (fun i _ => hterm i), Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul]
+  -- RHS of the bound: `(Ind θ)(1) = w₁·θ(1)`
+  have hIndθ1 : ((ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)) 1).re
+      = (Nat.card h.W1 : ℝ) * ((θ : ClassFunction ↥h.K ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, h.index_K_eq, Complex.mul_re, Complex.natCast_re,
+      Complex.natCast_im, zero_mul, sub_zero]
+  -- assemble the degree inequality and cancel `w₁`
+  have hbound := sum_apply_one_re_le_of_inner_ne_zero (s := Finset.univ) hIndθ_char
+    (h.columnFamily χ₂).classFunction_injective
+    (fun i _ => (h.columnFamily χ₂).classFunction_irreducible i) (fun i _ => hθi i)
+  rw [hsumμ, hIndθ1] at hbound
+  have hw1pos : (0 : ℝ) < (Nat.card h.W1 : ℝ) := by
+    have h1 := h.one_lt_card_W1
+    have : 0 < Nat.card h.W1 := by omega
+    exact_mod_cast this
+  have hle : ((ClassFunction.restrict h.K
+        ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) 1).re
+      ≤ ((θ : ClassFunction ↥h.K ℂ) 1).re := by
+    rw [ClassFunction.restrict_apply, OneMemClass.coe_one]
+    exact le_of_mul_le_mul_left hbound hw1pos
+  -- equal-degree-with-constituent uniqueness: `χ_j = θ`
+  have hχj_eq : ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+      = (θ : ClassFunction ↥h.K ℂ) :=
+    eq_of_apply_one_re_le_of_inner_ne_zero hχj_char θ.isIrreducible hθ_const hle
+  refine ⟨θ, hχj_eq, ?_⟩
+  -- `μ_{0j}(1) = θ(1)` (from `χ_j = θ`), so the degree bound is tight on `Ind θ`
+  have hdeg_eq : ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1
+      = (θ : ClassFunction ↥h.K ℂ) 1 := by
+    have hrw := congrArg (fun (φ : ClassFunction ↥h.K ℂ) => φ (1 : ↥h.K)) hχj_eq
+    simpa only [ClassFunction.restrict_apply, OneMemClass.coe_one] using hrw
+  have hle2 : ((ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)) 1).re
+      ≤ ∑ i, ((h.columnFamily χ₂).classFunction i 1).re :=
+    le_of_eq (by rw [hIndθ1, hsumμ, hdeg_eq])
+  -- tight bound ⟹ `Ind θ = ∑_i μ_{ij}`
+  have hIndeq : ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
+      = ∑ i, (h.columnFamily χ₂).classFunction i :=
+    eq_sum_of_apply_one_re_le_of_inner_ne_zero (s := Finset.univ) hIndθ_char
+      (h.columnFamily χ₂).classFunction_injective
+      (fun i _ => (h.columnFamily χ₂).classFunction_irreducible i) (fun i _ => hθi i) hle2
+  rw [hIndeq]
+
+/-- **Peterfalvi (4.5.a), irreducibility of the restriction**: `χ_j = Res^L_K μ_{0j}` is an
+irreducible character of `K` (the first half of `exists_irreducible_restrict_certainType`). -/
+theorem certainTypeRestrict_isIrreducible [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    IsIrreducibleCharacter
+      (ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) := by
+  obtain ⟨θ, hχj_eq, _⟩ := h.exists_irreducible_restrict_certainType χ₂
+  rw [hχj_eq]
+  exact θ.isIrreducible
+
+/-- **Peterfalvi (4.5.a), `Ind^L_K χ_j = μ_j`**: the induction of the (irreducible) restriction
+`χ_j = Res^L_K μ_{0j}` is the column sum `μ_j = ∑_i μ_{ij}` (the second half of
+`exists_irreducible_restrict_certainType`, with `χ_j = θ`). -/
+theorem induce_restrict_certainType_eq [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.induce h.K
+        (ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ))
+      = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  obtain ⟨θ, hχj_eq, hind⟩ := h.exists_irreducible_restrict_certainType χ₂
+  rw [hχj_eq]
+  exact hind
 
 end Recipe
 
