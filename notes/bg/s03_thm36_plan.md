@@ -410,3 +410,62 @@ scaffold `S03f_Thm36.lean` (untracked, 1006 行, leaf build 3017 green) の唯�
 - 残最重量 = Phase D (Gor 5.3.7 `S04e` 適用) + Phase F (orbit-parity)。
 - cleanup TODO (Thm 3.6 完成 commit 前): hFQ_compl ↔ S10 重複 consolidate / helper ×4 の Ch03 配置
   / private 2 copy 削除。正本=本ファイル「session 7」。
+
+## ✅ 2026-06-10 session 7 cont. (a-keystone): **(3.17) COMPLETE** — BG 原文より短い経路で
+
+scaffold 唯一 real sorry = (3.18)–(3.38)。(3.17) は **Prop 1.4 / [N,R]≅N counting / Aut-hom 構成を
+全て回避**する短縮経路で着地 (上の旧プラン記載は obsolete):
+
+### (3.17) 実装経路 (`h317 : ¬ (K.map H.subtype ≤ centralizer (R₀ : Set G))`)
+仮定 hKcent ⟹
+1. **K_G は nilpotent Z-群 ⟹ cyclic**: `K_G ≤ H ⊓ C_G(R₀)` (le_inf 直接! BG の N 経由は不要)、
+   `IsZGroup.of_injective` + nilpotent (↥K ≅ ↥(K.subgroupOf N) `=hKN_fit=` ↥(F(↥N)) で
+   `fitting.isNilpotent` 転送、`nilpotent_of_surjective`+`MonoidHom.coe_comp`) ⟹
+   **mathlib instance `[Finite][IsZGroup][IsNilpotent] : IsCyclic`** (ZGroup.lean:127) が自動発火。
+2. **F(H/V) cyclic**: `hKmap` + mk'V の K 上単射 (hVK_inf) + `MonoidHom.ofInjective`+`subgroupCongr`
+   + `isCyclic_of_surjective`。
+3. **φQ := `hV_inv.quotientMulAutHom`** (Ch04, ⚠ 二重 namespace
+   `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`、フルネーム必須) +
+   simp 補題 `quotientMulAutHom_apply_mk'`。
+4. **actionCommutator φ = ⊤** ((3.6): bridge `actionCommutator_conjNormal_map_subtype_eq H R` +
+   h36、element-chase で ⊤; ⚠ simpa は過剰変形するので手動) → **actionCommutator φQ = ⊤**
+   (generator 転送 `hmap_le` + `map_top_of_surjective` calc)。
+5. **🔑 `actionCommutator_le_centralizer_of_isCyclic_isAInvariant`** (OperatorQuotientAction:176,
+   = cyclic normal A-inv S ⟹ [G,A] ≤ C_G(S); **Aut-cyclic-abelian 論法を完全内包**) を
+   (Q, φQ, S=F(Q)) に適用 ⟹ `⊤ ≤ C_Q(F(Q))` ⟹ Prop 1.3 で `F(Q) = ⊤` ⟹ `p ∤ |Q|`
+   (hp_ndvd + `Nat.card_congr Subgroup.topEquiv.toEquiv`) ⟹ **`hfalse_of_pndvd`** で矛盾。
+- **refactor**: (3.13) の結末を `hfalse_of_pndvd : ¬ p ∣ |↥H ⧸ V| → False` に抽出
+  ((3.13)/(3.17) 共有; `hasPLengthOne` rw + `oPiPrimePiCore_eq_oPiCore_of_compl_bot h38` +
+  `quotientMulEquivOfEq hVoPi.symm` card 橋)。
+
+### ▶ 次セッション = (3.18)–(3.21) (設計確定済)
+- **(3.18) 形式**: `h318 : ((K.map H.subtype) ⊔ R₀) ⊓ centralizer (V.map H.subtype : Set G) = ⊥`
+  (G-level)。証明: C := LHS。(i) C ⊓ K_G = ⊥ (c ∈ C∩K_G ⟹ ↥H に落として C_{↥H}(V) =hCHV= V ⟹
+  V⊓K=⊥)。(ii) S₁ := K_G ⊔ R₀ 内で K_G ⊴ S₁ ((3.6) の S-block precedent: line 113-117 の
+  `normal_subgroupOf_of_le_normalizer` パターン; R₀ は hK_inv の G-level conj で normalize)、
+  `IsComplement' (K_G.subgroupOf S₁) (R₀.subgroupOf S₁)` (disjoint: hcompl.disjoint mono +
+  normal_mul、(3.6) block コピー) ⟹ |S₁| = |K_G|·r。(iii) C ≠ ⊥ なら C.subgroupOf S₁ ⊴ ↥S₁
+  (centralizer V_G ⊴ G: V_G ⊴ G instance [V char ↥H + H ⊴ G] + centralizer-of-normal normal;
+  要 instance 確認、なければ elementwise) + C⊓K_G=⊥ ⟹ |C| ∣ |S₁:K_G| = r ⟹ |C|=r ⟹
+  **C も R₀ も ↥S₁ の Sylow-r** (r ∤ |K_G|) ⟹ C normal Sylow ⟹ R₀ = C (mathlib Sylow 一意性;
+  `Sylow.normal...unique` 系 or conjugacy `exists_smul_eq` で C^g = C) ⟹ R₀ ≤ centralizer V_G。
+  (iv) すると ⁅K_G,R₀⁆ ≤ ... 直接: R₀ = C ⊴ S₁ ⟹ ⁅K_G,R₀⁆ ≤ K_G ⊓ R₀ = ⊥ (両 normal in S₁)
+  ⟹ `commutator_eq_bot_iff_le_centralizer` で K_G ≤ C_G(R₀) ⟹ **h317 矛盾**。
+- **(3.19) 形式**: `h319 : Nat.card ↥(V ⊓ Subgroup.centralizer ... R₀-in-↥H ...) = p` 級。
+  **bridge 先例 = `AppA_PStability.lean:1541`**: `Representation (ZMod p) M (Additive ↥W)`
+  (W elem abelian subgroup への conj 作用を `Representation.ofDistribMulAction` で; S03c_Thm37:90
+  も同型)。手順: (i) C_V(R₀) ≠ ⊥ を出す: by_contra で thm34 を
+  G' := ↥(K_G ⊔ R₀), K' := K_G.subgroupOf, R' := R₀.subgroupOf, V := Additive ↥V_G,
+  ρ := conj-rep に適用 (hchar: (|G'| : ZMod p) ≠ 0 ⟸ p ∤ |K_G|·r [hK'p' + p≠r ⟸ r ∣ |R|
+
+  coprime |H| ∋ p... 要 p ≠ r 補題: p ∣ |V| ∣ |H|, r ∣ |R|, hHall ⟹ p≠r]; hCV = by_contra 仮定;
+  hcompl/hHall = (3.18) の (ii) で構築済を再利用) ⟹ `∀ g ∈ ⁅R',K'⁆, ρ g = 1` ⟹
+  ⁅R₀,K_G⁆ ≤ centralizer V_G、⁅R₀,K_G⁆ ≤ S₁ ⟹ **h318 で ⁅R₀,K_G⁆ = ⊥** ⟹ h317 矛盾
+  (`commutator_comm` で ⁅K,R₀⁆ 向き合わせ)。(ii) C_V(R₀) ≠ ⊥ + elem abelian (exponent p) +
+  Z-群 hZ ⟹ `card_eq_prime_of_le_isZGroup` (ZGroup.lean:26 の repo 補題、session 5 infra) で
+  **|C_V(R₀)| = p**。C_V(R₀) の ambient 選択は ↥H (V ⊓ centralizer-in-↥H of R₀-image?) でなく
+  **G-level `V_G ⊓ C_G(R₀)`** が hZ (`H ⊓ C_G(R₀)`) と整合的 — 要 `≤ H ⊓ C_G(R₀)` は V_G ≤ H ✓。
+- (3.20)(3.21) は session 7 プラン (上) のまま有効。(3.20) の「cyclic p-Sylow ⟹ 唯一 order-p
+  部分群」は mathlib `IsCyclic` API (`IsPGroup.isCyclic_of_isZGroup` + cyclic p-群の部分群一意性
+  `IsCyclic.card_orderOf_eq_totient` 系? 要探索) か ⟨x⟩·C_V(R₀) rank-2 で Z-群 Sylow-cyclic 矛盾。
+- 正本 = 本ファイル「session 7 cont.」。scaffold 1090 行、leaf build 3017 green。
