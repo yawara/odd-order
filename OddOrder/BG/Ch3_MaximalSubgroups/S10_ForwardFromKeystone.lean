@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_HallStructure
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalCriteria
 import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 /-!
@@ -12,7 +13,7 @@ import Mathlib.GroupTheory.SpecificGroups.ZGroup
 
 Bender–Glauberman, *Local Analysis for the Odd Order Theorem* (LMS LNS 188, 1994).
 
-The §10 → §16 spine of the Feit–Thompson proof is gated by the representation-theory
+The §10 → §16 spine of the Feit–Thompson proof was gated by the representation-theory
 **keystone** BG Theorem 3.6 (`references/bg/local-analysis.mmd` L955), whose own proof needs
 BG Theorem 3.4/3.5 = algebraically-closed extraspecial representation theory (lane `a-keystone`).
 This file declared that keystone — together with the local input BG Lemma 10.4(b) — as
@@ -20,37 +21,24 @@ This file declared that keystone — together with the local input BG Lemma 10.4
 Proposition 10.14) and the §11–§16 cascade could be wired as *genuine, type-checked reductions*
 ahead of the keystone.
 
-**De-axiomatized (2026-06-10)**: lane `a-keystone` landed BG Theorem 3.6 as
-`OddOrder.BG.Ch1.S03f.thm36`, and `pLengthOne_commutator_of_zgroupCentralizer` below is now a
-**theorem** (a convention bridge to `thm36`).  Only BG Lemma 10.4(b) remains a forward axiom.
+**Fully de-axiomatized — this file contains no axioms.**
 
-## Honesty boundary
+* **2026-06-10**: lane `a-keystone` landed BG Theorem 3.6 as `OddOrder.BG.Ch1.S03f.thm36`, and
+  `pLengthOne_commutator_of_zgroupCentralizer` became a **theorem** (a convention bridge to
+  `thm36`: instance binders, `H.index = Nat.card ↥R` via `IsComplement'.index_eq_card`,
+  prime-order packaging, `Fact.out`, `inf_comm`, and the repo↔mathlib `IsZGroup` bridge
+  `isZGroup_iff_mathlib`).
+* **2026-06-11**: the general BG Lemma 10.4(b) (`exists_mem_omega1_center_zgroupCentralizer`)
+  landed in `S10_LocalCriteria` (together with Lemma 10.3 and Lemma 10.4(a)(c), moved there
+  from `S10_LocalLemmas` to sit upstream of this file), and
+  `exists_prime_orderOf_zgroupCentralizer_of_complement` became a **theorem** carrying out the
+  `q ∈ π(K/K') ⟹ q ∉ σ(M)` reduction (Lemma 10.4(a) = `alpha_criterion`), with the unchanged
+  statement.  The §10 spine is now **unconditional**: every `#assert_axioms_island` entry for
+  the spine migrated to `#assert_only_allowed_axioms` in `OddOrder/AxiomsCheck.lean`.
 
-A theorem proved via the remaining axiom is **`sorry`-free but mathematically unproven**: its
-truth is contingent on the constructibility of the axiom, not on `#print axioms` (see
-`scaffold-sorry-free-not-done`). The value delivered here is twofold:
-
-1. the reduction Thm 3.6 ⟹ Thm 10.6 ⟹ (Cor 10.7, …) is a *real* Lean proof — with Thm 3.6
-   landed, only Lemma 10.4(b) is still taken on faith;
-2. de-axiomatization is a **name swap**: the Thm 3.6 axiom was replaced by the bridge theorem
-   below (same statement) with no change to the downstream proofs, and the same will happen to
-   the Lemma 10.4(b) axiom when it lands.
-
-The remaining axiom is registered as an *expected island* in `OddOrder/AxiomsCheck.lean`.
-
-## Resolution conditions
-
-* `pLengthOne_commutator_of_zgroupCentralizer` — BG **Theorem 3.6**. ✅ **resolved
-  (2026-06-10)**: lane `a-keystone` landed `OddOrder.BG.Ch1.S03f.thm36`; the declaration below
-  is now a theorem bridging the declared §10 interface to `thm36` (convention adaptations only:
-  instance binders, `H.index = Nat.card R`, prime-order packaging, `Fact`, `inf_comm`, and the
-  repo↔mathlib `IsZGroup` bridge).
-* `exists_prime_orderOf_zgroupCentralizer_of_complement` — BG **Lemma 10.4(b)**, specialized to
-  the Theorem 10.6 application. **grounded (not keystone-gated), deferred.** BG Lemma 10.4(b)
-  (mmd p.87, recovered 2026-06-08) is provable from BG Lemma 10.3 + the `Ω₁(Z(P))` machinery
-  (lane `a1`, `S10_LocalLemmas`); it is forward-axiomatized here only to keep the spine moving.
-  Resolved when the general Lemma 10.4(b) lands and the `q ∈ π(K/K') ⟹ q ∉ σ(M)` reduction
-  (via Lemma 10.4(a) = `alpha_criterion`) is supplied.
+The file is kept (rather than inlined away) because ~19 downstream theorems cite these two
+declarations by name and the historical interface boundary documents the forward-axiom
+methodology (`notes/meta/forward_dep_policy.md`).
 -/
 
 namespace OddOrder.BG.Ch3.S10
@@ -92,8 +80,7 @@ theorem pLengthOne_commutator_of_zgroupCentralizer
 
 /-! ## BG Lemma 10.4(b) — the `Z`-group element (forward axiom, specialized) -/
 
-/-- **BG Lemma 10.4(b)** (mmd p.87), specialized to the BG Theorem 10.6 application, as a
-provisional forward axiom (**grounded, deferred** — not keystone-gated).
+/-- **BG Lemma 10.4(b)** (mmd p.87), specialized to the BG Theorem 10.6 application.
 
 Setup: `G` minimal simple of odd order, `M ∈ ℳ` with `M_α ≠ 1`, `K` a complement to `M_α` in
 `M` (inside `↥M`), and `q ∈ π(K/K')` a prime divisor of the abelianization of `K`. Then there is
@@ -109,16 +96,119 @@ equals `|K/K'|`). The centralizer is stated for the cyclic subgroup `⟨x⟩ = z
 the `R₀ = ⟨x⟩` of `pLengthOne_commutator_of_zgroupCentralizer` (BG Theorem 3.6); since `R₀`
 is generated by `x`, `C_{M_α}(⟨x⟩) = C_{M_α}(x)`.
 
-**Provisional axiom.** Resolution condition: lane `a1` lands the general BG Lemma 10.4(b) in
-`S10_LocalLemmas` (`Ω₁(Z(P))` machinery + Lemma 10.3); together with the
-`q ∈ π(K/K') ⟹ q ∉ σ(M)` reduction above, this specialized form follows. -/
-axiom exists_prime_orderOf_zgroupCentralizer_of_complement
+**De-axiomatized (2026-06-11)**: the general BG Lemma 10.4(b)
+(`exists_mem_omega1_center_zgroupCentralizer`) landed in `S10_LocalCriteria` together with
+Lemma 10.3 and Lemma 10.4(a); this declaration is now a theorem carrying out the
+`q ∈ π(K/K') ⟹ q ∉ σ(M)` reduction above (unchanged statement). -/
+theorem exists_prime_orderOf_zgroupCentralizer_of_complement
     {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMα : Malpha M ≠ ⊥)
     {K : Subgroup ↥M} (hK : ((Malpha M).subgroupOf M).IsComplement' K)
     {q : ℕ} (hq : q.Prime) (hqK' : q ∈ ((commutator ↥K).index).primeFactors) :
     ∃ x : ↥M, x ∈ K ∧ orderOf x = q ∧
       _root_.IsZGroup ↥(Subgroup.centralizer (↑(Subgroup.zpowers x) : Set ↥M) ⊓
-        (Malpha M).subgroupOf M)
+        (Malpha M).subgroupOf M) := by
+  classical
+  haveI : Fact q.Prime := ⟨hq⟩
+  -- (1) `q ∣ |M/M'|`: the projection `↥M ↠ ↥M ⧸ M_α ≃* K` identifies the two
+  -- abelianization indices, using `M_α ≤ M'` (Theorem 10.2).
+  have hder_eq : (derivedInG M).subgroupOf M = commutator ↥M := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  have hN_le_M' : (Malpha M).subgroupOf M ≤ commutator ↥M := by
+    rw [← hder_eq]
+    exact Subgroup.comap_mono ((Malpha_le_Msigma hG hM).trans (Msigma_le_derived hG hM))
+  set f : ↥K →* ↥M ⧸ (Malpha M).subgroupOf M :=
+    (QuotientGroup.mk' ((Malpha M).subgroupOf M)).comp K.subtype with hfdef
+  have hinj : Function.Injective f := by
+    rw [← MonoidHom.ker_eq_bot_iff]
+    ext k
+    simp only [hfdef, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      Subgroup.coe_subtype, QuotientGroup.eq_one_iff, Subgroup.mem_bot]
+    constructor
+    · intro hk
+      have hmem : (k : ↥M) ∈ (Malpha M).subgroupOf M ⊓ K := ⟨hk, k.2⟩
+      rw [disjoint_iff.mp hK.disjoint, Subgroup.mem_bot] at hmem
+      exact OneMemClass.coe_eq_one.mp hmem
+    · rintro rfl
+      exact Subgroup.one_mem _
+  have hbij : Function.Bijective f :=
+    (Nat.bijective_iff_injective_and_card f).mpr ⟨hinj, hK.symm.index_eq_card.symm⟩
+  have hcomm_map : (commutator ↥K).map f = commutator (↥M ⧸ (Malpha M).subgroupOf M) := by
+    rw [commutator_def, commutator_def, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective f hbij.surjective]
+  have h1 : (commutator (↥M ⧸ (Malpha M).subgroupOf M)).index = (commutator ↥K).index := by
+    rw [← hcomm_map]
+    exact Subgroup.index_map_of_bijective hbij _
+  have h2 : (commutator (↥M ⧸ (Malpha M).subgroupOf M)).index = (commutator ↥M).index := by
+    have hmap : (commutator ↥M).map (QuotientGroup.mk' ((Malpha M).subgroupOf M)) =
+        commutator (↥M ⧸ (Malpha M).subgroupOf M) := by
+      rw [commutator_def, commutator_def, Subgroup.map_commutator,
+        Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective _)]
+    rw [← hmap]
+    exact Subgroup.index_map_eq _ (QuotientGroup.mk'_surjective _)
+      (by rw [QuotientGroup.ker_mk']; exact hN_le_M')
+  have hq_dvd : q ∣ (commutator ↥M).index := by
+    have hd := (Nat.mem_primeFactors.mp hqK').2.1
+    rw [← h1, h2] at hd
+    exact hd
+  -- (2) `q ∉ σ(M)` (Lemma 10.4(a)), hence `q ∉ α(M)`.
+  have hqσ : q ∉ sigma M := (alpha_criterion hG hM).1 q hq hq_dvd
+  have hqα : q ∉ alpha M := fun h => hqσ (alpha_subset_sigma hG hM h)
+  -- (3) a Sylow `q`-subgroup of `K` is a Sylow `q`-subgroup of `↥M`
+  -- (`M_α` is an `α(M)`-group and `q ∉ α(M)`).
+  obtain ⟨Q⟩ : Nonempty (Sylow q ↥K) := inferInstance
+  have hQM_pg : IsPGroup q ↥((Q : Subgroup ↥K).map K.subtype) :=
+    Q.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ K.subtype K.subtype_injective)
+  have hq_not_N : ¬ q ∣ Nat.card ↥((Malpha M).subgroupOf M) := by
+    intro hdvd
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Malpha_le M)).toEquiv] at hdvd
+    exact hqα (Malpha_isPiGroup M q (Nat.mem_primeFactors.mpr ⟨hq, hdvd, Nat.card_pos.ne'⟩))
+  have hidx : ¬ q ∣ ((Q : Subgroup ↥K).map K.subtype).index := by
+    intro hdvd
+    rw [← Subgroup.relIndex_mul_index (Subgroup.map_subtype_le (Q : Subgroup ↥K))] at hdvd
+    rcases (Nat.Prime.dvd_mul hq).mp hdvd with h | h
+    · have hsub : ((Q : Subgroup ↥K).map K.subtype).subgroupOf K = (Q : Subgroup ↥K) := by
+        rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
+      rw [show ((Q : Subgroup ↥K).map K.subtype).relIndex K
+          = (((Q : Subgroup ↥K).map K.subtype).subgroupOf K).index from rfl, hsub] at h
+      exact Q.not_dvd_index h
+    · rw [hK.index_eq_card] at h
+      exact hq_not_N h
+  obtain ⟨P, hP_coe⟩ : ∃ P : Sylow q ↥M,
+      (P : Subgroup ↥M) = (Q : Subgroup ↥K).map K.subtype :=
+    ⟨hQM_pg.toSylow hidx, hQM_pg.toSylow_coe hidx⟩
+  -- (4) `q ∈ π(M)`.
+  have hqM : q ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hq,
+      (((Nat.mem_primeFactors.mp hqK').2.1).trans (Subgroup.index_dvd_card _)).trans
+        (Subgroup.card_subgroup_dvd_card K),
+      Nat.card_pos.ne'⟩
+  -- (5) the general Lemma 10.4(b) supplies `x ∈ Ω₁(Z(Q))^#` with `C_{M_α}(x)` a Z-group.
+  obtain ⟨xG, hxΩ, hx1, -, hxZ⟩ :=
+    exists_mem_omega1_center_zgroupCentralizer hG hM hqM hqσ hMα P
+  -- (6) translate the conclusion into `↥M`-coordinates.
+  have hxPG : xG ∈ ((Q : Subgroup ↥K).map K.subtype).map M.subtype := by
+    have h := omega1CenterInG_le ((P : Subgroup ↥M).map M.subtype) q hxΩ
+    rwa [hP_coe] at h
+  obtain ⟨x, hxQM, rfl⟩ := Subgroup.mem_map.mp hxPG
+  simp only [Subgroup.coe_subtype] at hxΩ hx1 hxZ
+  refine ⟨x, Subgroup.map_subtype_le _ hxQM, ?_, ?_⟩
+  · -- `orderOf x = q`, from `(↑x)^q = 1` and `↑x ≠ 1`.
+    refine orderOf_eq_prime (Subtype.ext ?_) ?_
+    · rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]
+      exact pow_eq_one_of_mem_omega1CenterInG hxΩ
+    · intro h
+      exact hx1 (by rw [h, OneMemClass.coe_one])
+  · -- Z-group transfer along `C_{↥M}(⟨x⟩) ⊓ M_α = (C_G(⟨↑x⟩) ⊓ M_α).subgroupOf M`.
+    rw [centralizer_zpowers_inf_subgroupOf_eq M x]
+    haveI : _root_.IsZGroup
+        ↥(Subgroup.centralizer (↑(Subgroup.zpowers (x : G)) : Set G) ⊓ Malpha M) := hxZ
+    exact IsZGroup.of_injective
+      (f := (Subgroup.subgroupOfEquivOfLe
+        (inf_le_right.trans (Malpha_le M) :
+          Subgroup.centralizer (↑(Subgroup.zpowers (x : G)) : Set G) ⊓ Malpha M
+            ≤ M)).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe _).injective
 
 end OddOrder.BG.Ch3.S10
