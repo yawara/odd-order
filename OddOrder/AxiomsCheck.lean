@@ -3632,6 +3632,14 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- **Unconditional** (the §10 island dissolved before this landed).
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure
 
+-- BG §11: Theorem 11.5 (`sylow_p_isCommutative`) and Corollary 11.6
+-- (`omega1_eq_and_centralizer_trivial`): under Hypothesis 11.1 the Sylow `p`-subgroups of the
+-- exceptional maximal `M` are abelian (Thompson-transitivity ideas: Lemma 11.1(b) + Prop 1.16
+-- + Lemma 10.13(c) conjugation-transitivity), `A = Ω₁(P)`, and `C_{M_σ}(A) = 1`
+-- (Corollary 11.2(b)). **Unconditional.**
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.sylow_p_isCommutative
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.omega1_eq_and_centralizer_trivial
+
 /-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
 
 Lemma 12.1 (the easy structure of the complement `E = E₁E₂E₃`) is fully grounded:
