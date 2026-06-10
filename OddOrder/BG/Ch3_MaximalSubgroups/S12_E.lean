@@ -1313,7 +1313,71 @@ theorem prime_mem_sigma_or_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     {Mstar : Subgroup G}
     (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
     p ∈ S10.sigma Mstar ∨ p ∈ tau2 Mstar := by
-  sorry
+  classical
+  -- Unpack `M* ∈ ℳ(N_G(X))`: `M*` is maximal and `N_G(X) ≤ M*`, hence `X ≤ M*`.
+  obtain ⟨hMstarCoatom, hNX⟩ := mem_maximalSubgroupsContaining.mp hMstar
+  have hMstarMax : Mstar ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMstarCoatom
+  have hXMstar : X ≤ Mstar := le_trans Subgroup.le_normalizer hNX
+  -- `p ∈ π(M*)` because `1 ≠ X ≤ M*` is a `p`-group.
+  have hpdvdMstar : p ∣ Nat.card ↥Mstar := by
+    obtain ⟨n, hn⟩ := hXp.exists_card_eq
+    have hX1 : Nat.card ↥X ≠ 1 := fun h => hXne (Subgroup.card_eq_one.mp h)
+    have hn0 : n ≠ 0 := by rintro rfl; rw [pow_zero] at hn; exact hX1 hn
+    exact dvd_trans (hn ▸ dvd_pow_self p hn0) (Subgroup.card_dvd_of_le hXMstar)
+  have hpπ : p ∈ (Nat.card ↥Mstar).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdMstar, Nat.card_pos.ne'⟩
+  have hodd : Odd p :=
+    hG.odd.of_dvd_nat (dvd_trans hpdvdMstar (Subgroup.card_subgroup_dvd_card Mstar))
+  by_cases hpσ : p ∈ S10.sigma Mstar
+  · exact Or.inl hpσ
+  · -- `p ∉ σ(M*)`: show `p ∈ τ₂(M*)`, i.e. `r_p(M*) = 2`.
+    right
+    rw [mem_tau2_iff]
+    refine ⟨hpσ, ?_⟩
+    -- `r_p(M*) ≤ 2` since `p ∉ σ(M*) ⊇ α(M*)`.
+    have hpα : p ∉ S10.alpha Mstar := fun h => hpσ (S10.alpha_subset_sigma hG hMstarMax h)
+    have hr_le : pRank ↥Mstar p ≤ 2 := by
+      by_contra h
+      exact hpα ((S10.mem_alpha_iff Mstar p).mpr ⟨hpπ, by omega⟩)
+    rcases Nat.lt_or_ge (pRank ↥Mstar p) 2 with hlt | hge
+    · -- `r_p(M*) = 1` forces a cyclic Sylow `P` of `M*` with `X` characteristic in `P`,
+      -- so `N_G(P) ≤ N_G(X) ≤ M*`, giving `p ∈ σ(M*)` — contrary to assumption.
+      exfalso
+      have hr1 : pRank ↥Mstar p ≤ 1 := by omega
+      have hXMpg : IsPGroup p ↥(X.subgroupOf Mstar) :=
+        hXp.of_equiv (Subgroup.subgroupOfEquivOfLe hXMstar).symm
+      obtain ⟨PM, hXPM⟩ := hXMpg.exists_le_sylow
+      set P : Subgroup G := (PM : Subgroup ↥Mstar).map Mstar.subtype with hPdef
+      have hXP : X ≤ P := by
+        rw [hPdef, ← Subgroup.map_subgroupOf_eq_of_le hXMstar]
+        exact Subgroup.map_mono hXPM
+      have hPpg : IsPGroup p ↥P := by
+        obtain ⟨k, hk⟩ := PM.isPGroup'.exists_card_eq
+        refine IsPGroup.of_card (n := k) ?_
+        rw [hPdef, ← Nat.card_congr (Subgroup.equivMapOfInjective (PM : Subgroup ↥Mstar)
+          Mstar.subtype Mstar.subtype_injective).toEquiv]
+        exact hk
+      have hPrank : pRank ↥P p = pRank ↥Mstar p := by
+        have e : ↥(PM : Subgroup ↥Mstar) ≃* ↥P := by
+          rw [hPdef]
+          exact Subgroup.equivMapOfInjective (PM : Subgroup ↥Mstar) Mstar.subtype
+            Mstar.subtype_injective
+        have h1 : pRank ↥P p ≤ pRank ↥(PM : Subgroup ↥Mstar) p :=
+          pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective
+        have h2 : pRank ↥(PM : Subgroup ↥Mstar) p ≤ pRank ↥P p :=
+          pRank_le_of_injective (f := e.toMonoidHom) e.injective
+        have h3 : pRank ↥(PM : Subgroup ↥Mstar) p = pRank ↥Mstar p := pRank_sylow_eq PM
+        omega
+      have hPr1 : pRank ↥P p ≤ 1 := by rw [hPrank]; exact hr1
+      haveI : IsCyclic ↥P := S10.isCyclic_of_pRank_le_one hPpg hodd hPr1
+      haveI : (X.subgroupOf P).Characteristic :=
+        Ch04.characteristic_of_subgroup_of_isCyclic (X.subgroupOf P)
+      have hNPX : Subgroup.normalizer (P : Set G) ≤ Subgroup.normalizer (X : Set G) := by
+        have h := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+          (K := P) (W := X.subgroupOf P)
+        rwa [Subgroup.map_subgroupOf_eq_of_le hXP] at h
+      exact hpσ ((S10.mem_sigma_iff Mstar p).mpr ⟨hpπ, PM, le_trans hNPX hNX⟩)
+    · omega
 
 /-- **BG Proposition 12.4(a)** (mmd L3095): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
 (原典 (b): `N_G(A₀)` の uniqueness ⇒ `p∈σ(M), M_α=1, M_σ` nilpotent は後続。) -/

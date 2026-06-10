@@ -3401,3 +3401,12 @@ per-prime core replaces BG's Frattini argument with Burnside + the mathlib cycli
 commutator dichotomy. No keystone forward axiom is involved. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.subgroupE_basic
+
+/-! ### BG §12: Lemma 12.2(a) (`prime_mem_sigma_or_tau2`) — unconditional
+
+For a nonidentity `p`-subgroup `X` and `M* ∈ ℳ(N_G(X))`, the prime `p` lies in
+`σ(M*) ∪ τ₂(M*)`. The proof needs no keystone input: `p ∉ σ(M*)` forces `r_p(M*) ≤ 2`
+(via `α ⊆ σ`), and `r_p(M*) = 1` would make a Sylow `p` of `M*` cyclic with `X`
+characteristic in it, so `N_G(P) ≤ N_G(X) ≤ M*` and `p ∈ σ(M*)`, a contradiction. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.prime_mem_sigma_or_tau2
