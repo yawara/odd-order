@@ -2030,6 +2030,81 @@ theorem exists_charSubgroup_exponent_not_centralized [Finite G]
     calc y * x = (x * y * x⁻¹) * x := by rw [← hyx]
       _ = x * y := by group
 
+/-- **PQ-invariant Sylow subgroup of `M_α` for Lemma 12.18(a)**. For `r ∈ α(M)` and an
+`α(M)'`-subgroup `X ≤ M`, `M_α` has an `X`-invariant Sylow `r`-subgroup `R` with `r(R) ≥ 3`,
+since `R` carries the full `r`-rank `r_r(M) ≥ 3` of `M` (`r ∈ α(M)` ⟹ a Sylow `r` of `M` lies
+in the Hall `α`-subgroup `M_α`). The coprime-action construction mirrors Lemma 10.3
+(`aInvariant_pSubgroup_le_aInvariant_sylow`). Applied with `X = P ⊔ Q` in Lemma 12.18(a). -/
+theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {r : ℕ} [Fact r.Prime]
+    (hrα : r ∈ S10.alpha M) {X : Subgroup G} (hXM : X ≤ M)
+    (hXpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ X) :
+    ∃ R : Subgroup G, R ≤ S10.Malpha M ∧ IsPGroup r ↥R ∧
+      X ≤ Subgroup.normalizer (R : Set G) ∧ 3 ≤ rank ↥R := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable ↥(S10.Malpha M) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (S10.Malpha_le M)).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe (S10.Malpha_le M)).surjective
+  have hX_norm_Ma : X ≤ Subgroup.normalizer (S10.Malpha M : Set G) :=
+    hXM.trans (le_normalizer_opiCoreInG (S10.alpha M) M)
+  have hcop : Nat.Coprime (Nat.card ↥X) (Nat.card ↥(S10.Malpha M)) :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (S10.alpha M)ᶜ)
+      Nat.card_pos.ne' Nat.card_pos.ne' hXpi
+      (fun q hq hqc => hqc (S10.Malpha_isPiGroup M q hq))
+  letI act : MulDistribMulAction ↥X ↥(S10.Malpha M) :=
+    MulDistribMulAction.compHom
+      (M := ↥(Subgroup.normalizer (S10.Malpha M : Set G))) ↥(S10.Malpha M)
+      (Subgroup.inclusion hX_norm_Ma)
+  set φ : ↥X →* MulAut ↥(S10.Malpha M) :=
+    MulDistribMulAction.toMulAut ↥X ↥(S10.Malpha M) with hφ
+  have hφ_coe : ∀ (a : ↥X) (x : ↥(S10.Malpha M)),
+      ((S10.Malpha M).subtype ((φ a) x)) = (↑a) * ((S10.Malpha M).subtype x) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hφ_inv_coe : ∀ (a : ↥X) (x : ↥(S10.Malpha M)),
+      ((S10.Malpha M).subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * ((S10.Malpha M).subtype x) * (↑a) := by
+    intro a x
+    rw [← map_inv]; simpa using hφ_coe a⁻¹ x
+  obtain ⟨S, hS_inv, -⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow (G := ↥(S10.Malpha M)) (A := ↥X)
+      (φ := φ) hcop (Or.inr inferInstance) (p := r) (P := ⊥)
+      (IsPGroup.of_card (n := 0) (by simp)) (Ch03.IsAInvariant.bot φ)
+  set R : Subgroup G := (S : Subgroup ↥(S10.Malpha M)).map (S10.Malpha M).subtype with hRdef
+  have hR_pgrp : IsPGroup r ↥R :=
+    S.2.of_equiv (Subgroup.equivMapOfInjective _ _ (S10.Malpha M).subtype_injective)
+  have hX_norm_R : X ≤ Subgroup.normalizer (R : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨x, hxS, rfl⟩
+      exact ⟨(φ ⟨a, ha⟩) x, hS_inv.smul_mem ⟨a, ha⟩ hxS, hφ_coe ⟨a, ha⟩ x⟩
+    · rintro ⟨x, hxS, hx⟩
+      refine ⟨((φ ⟨a, ha⟩)⁻¹) x, hS_inv.inv_smul_mem ⟨a, ha⟩ hxS, ?_⟩
+      rw [hφ_inv_coe ⟨a, ha⟩ x, hx]
+      change a⁻¹ * (a * y * a⁻¹) * a = y
+      group
+  have eR : ↥(S : Subgroup ↥(S10.Malpha M)) ≃* ↥R :=
+    hRdef ▸ Subgroup.equivMapOfInjective _ (S10.Malpha M).subtype (S10.Malpha M).subtype_injective
+  have hRpr : pRank ↥M r ≤ pRank ↥R r := by
+    have h1 : pRank ↥(S : Subgroup ↥(S10.Malpha M)) r ≤ pRank ↥R r :=
+      pRank_le_of_injective (f := eR.toMonoidHom) eR.injective
+    rw [pRank_sylow_eq S] at h1
+    obtain ⟨T⟩ : Nonempty (Sylow r ↥M) := inferInstance
+    have hTle : ((T : Subgroup ↥M).map M.subtype) ≤ S10.Malpha M :=
+      S10.sylow_le_Malpha_of_mem_alpha_of_isHall (S10.Malpha_isHall hG hM) hrα T
+    have eT : ↥(T : Subgroup ↥M) ≃* ↥((T : Subgroup ↥M).map M.subtype) :=
+      Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective
+    have hTeq : pRank ↥M r = pRank ↥((T : Subgroup ↥M).map M.subtype) r := by
+      rw [← pRank_sylow_eq T]
+      exact le_antisymm (pRank_le_of_injective (f := eT.toMonoidHom) eT.injective)
+        (pRank_le_of_injective (f := eT.symm.toMonoidHom) eT.symm.injective)
+    have hTpr : pRank ↥((T : Subgroup ↥M).map M.subtype) r ≤ pRank ↥(S10.Malpha M) r :=
+      pRank_le_of_injective (f := Subgroup.inclusion hTle) (Subgroup.inclusion_injective hTle)
+    omega
+  refine ⟨R, Subgroup.map_subtype_le _, hR_pgrp, hX_norm_R, ?_⟩
+  exact le_trans (le_trans ((S10.mem_alpha_iff M r).mp hrα).2 hRpr) (pRank_le_rank r)
+
 /-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
 `P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
 (a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
