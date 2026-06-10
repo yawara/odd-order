@@ -90,6 +90,33 @@ Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (�
   Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。Cor 10.9(a)(2) 消費なら
   keystone island になる見込み。S12_E 実 sorry は 12.19 完了で 15。
 
+## ✅ 2026-06-10 (session 3): 12.18 building blocks 3 件 landed + 精密 assembly recipe
+
+12.18 (`tau1_Malpha_interaction`, mmd L3484-3508, 本文最厚) を精密 recon し、**hard かつ
+再利用可能な infrastructure 3 件**を sorry-free・unconditional・axiom-clean で land
+(commits f111961f, b113206c)。assembly の全依存署名を確定 (全 dep 存在確認済)。
+
+### landed building blocks (S12_E.lean, 全 axiom-clean)
+- `maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1` (Helper A): `p∈τ₁ ∧ P≤M ∧
+  P≠⊥ ∧ IsPGroup p P ⇒ ℳ(N_G(P))≠{M}`。Lemma 12.2(a) 背理。⟹ (12.6) の入力。
+- `exists_charSubgroup_exponent_not_centralized` (BG Thm 1.13 機構): q-群 Q が r-群 R 正規化・
+  非中心化 (奇位数) ⇒ ∃ R₁≤R char-in-R, exp r, Q 非中心化。`thompson_critical_omega` の
+  `autCentralizer` r-群性 + φ:↥Q→*MulAut↥R で orderOf(φx) r-冪∧q-冪⟹1。**pure group theory・§13+ 再利用可**。
+- `exists_invariant_sylow_Malpha_rank_three` (BB3): r∈α, α'-subgroup X≤M ⇒ ∃ R≤M_α X-不変 Sylow r,
+  rank≥3。Lemma 10.3 テンプレ (`aInvariant_pSubgroup_le_aInvariant_sylow` を ⊥ から)。**X:=P⊔Q で使う**。
+
+### 残 = (a) assembly + (b) reduction (issue 5003 に手順詳細・全 dep 名)
+- **2 つの infra ギャップ判明**: (1) **Thm 10.2(d)** (M'非nilpotent⇒M_α≠1) 未形式化 →
+  `derived_quotient_Malpha_le_fitting` (S10:1490) + quotient-by-⊥ で BB4 として要構築 (part b の M_α≠⊥);
+  (2) **quotient 形 Thm 3.7 なし** → (a) hard core の QN/R₀ は ambient (Q⊔N⊔P)/R₀ 商で form-2 適用。
+- (a) は **2 conjunct 別 land 推奨**: 第1 `C_{M_α}(P)≠⊥` [reachable ~150 行, 全 dep 確認] /
+  第2 `C_{M_α}(PQ)=⊥` [hard core, Ω₁ cyclic bookkeeping + QN/R₀ quotient]。
+- 確認済 assembly dep: `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` (12.5/12.6),
+  `normalizer_le_normalizer_map_of_characteristic` (AppB:232, char⟹normalizer),
+  `coprime_fixedPoints_quotient` (ForwardFromCh03:808, C_{QR₁}(P)≤R₁),
+  `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (Thm 3.7 form-2), `mem_elemAbelianOfRank` (|P|=p)。
+  nilpotent⟹commute は S10_LocalLemmas:1080 が private ゆえ 2 行再証 (coprime orderOf)。
+
 ## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
 
 mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
