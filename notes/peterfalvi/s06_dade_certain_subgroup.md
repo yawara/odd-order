@@ -1157,3 +1157,53 @@ sign²=1 は `rcases sign_eq <;> norm_num`。
 正本 = 本ノート (session 21 + cont. + cont.²)。**Don't re-grind step 1-3 + step-4 基底 — 完成・axiom-clean。
 残 = 上記 1-3 (g⊥基底計算が intricate だが検算済; ~80-100 行)。bridge instance + defeq-bridge `have hc` +
 sign-removal パターン確立。**
+
+## 2026-06-10 (session 22, b-peterfalvi): ✅✅✅ (4.3.b) COMPLETE — certain-type characters as σ-images
+
+session 21 cont.³ が残した step-4 recipe (1-3) を完全形式化。**Peterfalvi (4.3.b) は任意の admissible
+`S06.Hypothesis L` に対し成立**: σ(ω_{ij}) = δ_j·μ_{ij}。全 `S06_CertainTypeCharacters.lean`、
+sorry-free・axiom-clean・leaf green (3452 jobs)。3 commits。S06_CertainTypeCharacters は importer 無の真 leaf。
+
+### ✅ 着地 (session 22)
+- **step 1 = `certainTypeRestrictDiff_inner_basis`** (commit 173d66d0): g = Res_W(δ_j·μ_{ij}) − ω_{ij}
+  が基底 ω_{kl}−ω_{0l} と直交。recipe 通り一発で通過 (recon 検算が正確だった)。
+  - spine: `certainTypeRestrictDiff` → `inner_sub_right` → `sub_eq_zero` → Frobenius
+    `← ClassFunction.inner_induce_eq_inner_restrict` → (1.4)-image `induce_omegaColumnDiff_eq` →
+    `signedDifference_apply` + `← Int.cast_smul_eq_zsmul ℂ`×2 + `inner_smul_left`/`inner_smul_right`/
+    `star_intCast` + `difference_apply`/`classFunction_apply`×2 + `inner_sub_left` + `omegaColumnDiff_coe` +
+    `chiColumn` + `inner_sub_left` + `irreducibleCharacter_inner`×4。
+  - `by_cases hl : l=χ₂`: diagonal は `(columnFamily l).injective.eq_iff` + `omega_injective.eq_iff` +
+    局所 `hcol` iff (omegaProdChar_inj 単方向→iff) + `← Equiv.symm_apply_eq` + `hs1 : e.symm 1 = 0` で
+    両条件を `e.symm k = i`/`0 = i` に統一 → sign²=1 (`← mul_assoc, hsign2, one_mul`)。
+    off-diagonal は `if_neg`×4 (`columnFamily_mu_ne hl`×2 + omega 不等 ×2) + `ring`。
+- **step 2 = masking** (commit 97c8e2b8): `omegaColumnDiffBasis_apply` (coe lemma via
+  `coe_basisOfLinearIndependentOfCardEqFinrank`, alphaBasis_apply ミラー) +
+  `certainTypeRestrictDiff_apply_eq_zero_of_mem_V` (g は W−W₂ 上消失)。
+  - `vanishOnV_of_inner_alphaCF` (S05:3263) の純粋ミラー: `innerLeftFunctional g` (ℂ-linear,
+    inner 第1引数線形) を `Module.Basis.ext h.omegaColumnDiffBasis` で 0 (step1)→
+    `eq_zero_of_mem_of_inner_supported_eq_zero` (W−W₂ は abelian W で conj-closed)。
+- **step 3 = capstone** (commit e97dd094): `toTICyclicFullDadeApplication` (=(3.1)-for-L Dade,
+  `HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)`、sdiffFullDadeIsometryData ミラー) +
+  `sigma_chiColumn_eq_certainType`。
+  - `eq_sigma_of_apply_eq_on_V rfl app (chiColumn χ₂ i) hZIrr hnorm1 hres`:
+    hZIrr=`(ZIrr L).smul_mem _ (mu i).mem_ZIrr`; hnorm1=δ_j²=1 (`← Int.cast_smul_eq_zsmul`+
+    `inner_smul_left/right`+`star_intCast`+`irreducibleCharacter_inner if_pos`+sign_eq);
+    hres=値一致 (step2 を `toTICyclic.V ⊆ sdiff.V`=`⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩` で transport,
+    `certainTypeRestrictDiff`+`sub_apply`+`sub_eq_zero`+`restrict_apply` で `exact hg`)。
+  - **🔑 W 整合の罠**: `chiColumn χ₂ i : IrreducibleCharacter sdiff.W` を `ClassFunction toTICyclic.W ℂ`
+    に**直接 coercion すると Type mismatch** (defeq だが coercion machinery 厳格、toTICyclicHypothesisOfV の
+    非 reducible unfold が要る)。**回避: statement で `(... : ClassFunction sdiff.W ℂ)` と ascription** →
+    sigma 適用時の LinearMap-application defeq check に委ねる (sdiff.W=toTICyclic.W=h.W1⊔h.W2 は unifier が unfold)。
+    bridge instance `instFintypeToTICyclicW`/`instInvertibleCardToTICyclicW` 追加。
+
+### ▶▶ 次 = (4.3.c)(d) → (4.4) → (4.5)
+- **(4.3.c)** part 1 `μ_{ij}(x)=δ_j ω_{ij}(x)` (x∈W−W₂) は step2 (`δ_j μ_{ij}(v)=ω_{ij}(v)`) の δ_j 倍
+  で**ほぼ即** (δ_j²=1)。part 2「μ_{ij} 以外の Irr(L) は W−W₂ 上消失」= completeness (orthogonal-complement,
+  σ-image 完全性; `exists_sigma` 最終 clause は V 上のみ→W−W₂ への拡張要)。
+- **(4.3.d)** μ_{ij}(1) ≡ δ_j (mod w₁): Res^L_{W1} μ_{ij} = δ_j Res^W_{W1} ω_{ij} + a·ρ_{W1} (regular char)
+  → μ_{ij}(1)=δ_j+a·w₁。restriction-to-W1 分解が要。
+- **(4.4)** μ_{i0}=K⊆ker の Irr(L); δ_0=1, μ_{00}=1_L。**(4.5)** μ_j=∑_i μ_{ij}, χ_j=Res_K μ_{ij}∈Irr(K)
+  (Clifford), Ind^L_K で Irr(L) を尽くす ([Is]6.32=ConjugationBrauer 済)。
+
+正本 = 本ノート (session 22)。**Don't re-grind (4.3.b) step 1-3 — 完成・axiom-clean。** capstone =
+`sigma_chiColumn_eq_certainType` (σ(ω_{ij})=δ_j μ_{ij})。**W 整合は sdiff.W ascription で回避済 (再調査するな)。**
