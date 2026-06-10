@@ -3419,3 +3419,16 @@ characteristic in it, so `N_G(P) ≤ N_G(X) ≤ M*` and `p ∈ σ(M*)`, a contra
 `C_{M_σ}(E) ⊆ M_σ'`. No keystone input. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_E_relations
+
+/-! ### BG §12: Lemma 12.19 (`derivedE_centralizes_betaComplement`) — keystone island
+
+`E'` centralizes a Hall `β(M)'`-subgroup of `M_σ`. The proof consumes Corollary 10.9(a)
+(`beta_complement_centralizes`, per-prime Sylow centralization) and Prop 1.5(c)
+(`aInvariant_hall_conj`) to coordinate the per-Sylow data into one `E'`-centralized Hall via the
+abstract `exists_hall_actsTrivially_of_forall_sylow`. Because Cor 10.9(a) sits in the §10 keystone
+island, so does this lemma — the same two axioms as Prop 10.11(b)(c)(d). -/
+
+#assert_axioms_island OddOrder.BG.Ch3.S12.derivedE_centralizes_betaComplement
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
