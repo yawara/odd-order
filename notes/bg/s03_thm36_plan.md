@@ -934,3 +934,19 @@ root (`OddOrder.lean`) 配線 + `AxiomsCheck` 登録 (`OddOrder.BG.Ch1.S03f.thm3
    3=Lem1.21(a)✅ 4=p'-lift✅ + **Thm 3.6✅(本セッション)** — 残 = Lem 10.4(b) の statement/証明) か、
 2. 司令塔 (main) へのマージ報告を優先し、Lane D (bg-s10-fwd) の forward-axiom de-axiom を解禁。
 ファイル分割 (S03f_Thm36 は 4900 行) は §10.6 着地後の独立リファクタとして検討。
+
+### session 12 cont. — ファイル分割 (commit `4f6c9ec6`)
+
+**Phase F を `S03f_OrbitParity.lean` の独立補題 `orbit_parity_contradiction` に分離**
+(S03f_Thm36: 4951→3826 行; (3.11)–(3.37) の確立事実 27 個を仮説に取り `False` を返す)。
+Phase F は IH 非消費ゆえ誘導から自然に切り出せる; **Phase A–E は (3.6)/(3.7)/(3.22) で IH を
+消費するため thm36_aux 内に残す** (これ以上の分割は IH 自体の仮説化が必要 = 別設計)。
+heartbeat 実測: 新補題 800k で十分 / thm36_aux は 2.4M 維持。
+
+**🔑 切り出し時の set-fvar 透過性ロス (今後の phase 抽出で再利用)**: 親証明で `set`-bound
+だった VG/KG/A は補題側で不透明変数になる ⟹ ① membership の直接 destructure
+(`obtain ⟨v, hv, rfl⟩ := hxV`) は先に `rw [hVG] at hxV` が要る (×2)、② `le_trans` を
+`Subgroup.map_subtype_le V` と直接繋ぐ箇所は `have hVG_le_H : VG ≤ H := hVG ▸ …` を 1 個
+立てて差し替え (×3)、③ `mem_sup_left/right` を A-membership に充てる箇所は `rw [hAdef]`
+(×2)、④ `Fact q.Prime` instance の haveI 再掲が要る。自由変数の機械列挙 (Python で
+have/set/obtain 束縛名と使用名の diff) が漏れ防止に有効だった (`hKRs_index` を検出)。
