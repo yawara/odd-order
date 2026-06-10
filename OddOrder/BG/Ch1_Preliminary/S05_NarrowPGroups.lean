@@ -3851,6 +3851,96 @@ theorem derived_le_fitting_of_rank_fitting_le_two [IsSolvable G] [Nontrivial G]
         Subgroup.centralizer (E : Set G) ⊓ Ch01.fitting G ≤ Ch01.fitting G))) hrank
   exact derived_le_fitting_of_centralizer_rank_le_two hodd E hE_elem hEF hrank_cent
 
+/-- **BG Theorem 4.20(c) — minimal-prime step**: a finite solvable group of odd order with
+`r(F(G)) ≤ 2` has a normal `p`-complement for the *smallest* prime `p` dividing `|G|`.
+
+This is the engine inside BG's induction for Theorem 4.20(c) (mmd L1786): `F := F(G)`; by
+Theorem 4.20(a) (`derived_le_fitting_of_rank_fitting_le_two`) `G' ≤ F`, so `G/F` is abelian.
+With `H := (mk' F)⁻¹(O_{p'}(G/F))`, the quotient `G/H ≅ (G/F)/O_{p'}(G/F)` is a `p`-group and
+`F` contains a Sylow `p`-subgroup of `H`; Theorem 4.18(b) (via
+`solvable_structure_of_pRank_le_two`, minimality of `p` enters through its prime-comparison
+side condition) gives a normal `p`-complement of `H`, which combines with the `p`-group `G/H`
+into one for `G`.  Exposed standalone (2026-06-11) so that Hall-radical arguments downstream
+(BG Theorem 11.7 via `S05b_Thm420Hall`) can iterate it without rebuilding the series. -/
+theorem hasNormalPComplement_minFac_of_rank_fitting_le_two
+    [IsSolvable G] [Nontrivial G] (hodd : Odd (Nat.card G))
+    (hrank : rank ↥(Ch01.fitting G) ≤ 2) :
+    Ch05.HasNormalPComplement (Nat.minFac (Nat.card G)) G := by
+  classical
+  have hcard_ne1 : Nat.card G ≠ 1 := (Finite.one_lt_card).ne'
+  have hp_prime : (Nat.minFac (Nat.card G)).Prime := Nat.minFac_prime hcard_ne1
+  set p := Nat.minFac (Nat.card G) with hpdef
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hp_min : ∀ q ∈ (Nat.card G).primeFactors, p ≤ q := fun q hq =>
+    Nat.minFac_le_of_dvd (Nat.prime_of_mem_primeFactors hq).two_le
+      (Nat.dvd_of_mem_primeFactors hq)
+  -- `G/F` is abelian
+  have hG' : commutator G ≤ Ch01.fitting G :=
+    derived_le_fitting_of_rank_fitting_le_two hodd hrank
+  have habel : ∀ x y : G ⧸ Ch01.fitting G, x * y = y * x :=
+    isMulCommutative_iff.mp
+      (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hG')
+  -- `H = (mk' F)⁻¹(O_{p'}(G/F))`
+  set Nbar : Subgroup (G ⧸ Ch01.fitting G) :=
+    Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ Ch01.fitting G) with hNbar
+  set Hsub : Subgroup G :=
+    Subgroup.comap (QuotientGroup.mk' (Ch01.fitting G)) Nbar with hHsub
+  haveI hHnorm : Hsub.Normal := by rw [hHsub]; infer_instance
+  have hF_le_H : Ch01.fitting G ≤ Hsub := by
+    rw [hHsub]
+    intro y hy
+    rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff y).mpr hy]
+    exact Nbar.one_mem
+  have hHmap : Hsub.map (QuotientGroup.mk' (Ch01.fitting G)) = Nbar := by
+    rw [hHsub]
+    exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
+  -- `G/H ≅ (G/F)/O_{p'}(G/F)` is a `p`-group
+  have houter : IsPGroup p (G ⧸ Hsub) :=
+    (isPGroup_quotient_oPiCore_of_comm habel).of_equiv
+      ((QuotientGroup.quotientMulEquivOfEq hHmap).symm.trans
+        (QuotientGroup.quotientQuotientEquivQuotient _ _ hF_le_H))
+  by_cases hpH : p ∣ Nat.card ↥Hsub
+  · -- `p ∣ |H|`: Theorem 4.18(b) gives one for `H`, extended by `houter`
+    have hoddH : Odd (Nat.card ↥Hsub) := by
+      rcases Nat.even_or_odd (Nat.card ↥Hsub) with he | ho
+      · exfalso
+        have h2 : (2 : ℕ) ∣ Nat.card G :=
+          he.two_dvd.trans (Subgroup.card_subgroup_dvd_card Hsub)
+        rw [Nat.odd_iff] at hodd; omega
+      · exact ho
+    have hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥Hsub).primeFactors, p ≤ q :=
+      Or.inr fun q hq => hp_min q (Nat.primeFactors_mono
+        (Subgroup.card_subgroup_dvd_card Hsub) Nat.card_pos.ne' hq)
+    haveI : ((Ch01.fitting G).subgroupOf Hsub).Normal :=
+      Subgroup.Normal.subgroupOf inferInstance Hsub
+    haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf Hsub) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hF_le_H).symm
+    -- `p ∤ [H:F]` because `H/F ≅ O_{p'}(G/F)` is a `p'`-group
+    have hidx : ¬ p ∣ ((Ch01.fitting G).subgroupOf Hsub).index := by
+      have hker : ((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).ker
+          = (Ch01.fitting G).subgroupOf Hsub := by
+        ext h
+        simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+          QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+      have hrange : ((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).range = Nbar := by
+        rw [MonoidHom.range_comp, Subgroup.range_subtype, hHmap]
+      have hcardq : Nat.card (↥Hsub ⧸ (Ch01.fitting G).subgroupOf Hsub) = Nat.card ↥Nbar := by
+        have e : (↥Hsub ⧸ (Ch01.fitting G).subgroupOf Hsub) ≃*
+            ↥((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).range :=
+          (QuotientGroup.quotientMulEquivOfEq hker.symm).trans
+            (QuotientGroup.quotientKerEquivRange _)
+        rw [Nat.card_congr e.toEquiv, hrange]
+      rw [Subgroup.index_eq_card, hcardq, hNbar]
+      exact not_dvd_card_oPiCore (by simp)
+    obtain ⟨P, hP_le⟩ := exists_sylow_le_fitting_of_nilpotent_normal_index_coprime
+      (X := ↥Hsub) (M := (Ch01.fitting G).subgroupOf Hsub) hidx
+    have hrH : pRank ↥Hsub p ≤ 2 :=
+      pRank_le_two_of_sylow_le_fitting P hP_le (rank_fitting_le_two_of_normal_subgroup hrank)
+    exact hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient_isPGroup
+      ((solvable_structure_of_pRank_le_two hoddH hpH hrH).2.1 hpCaseH) houter
+  · -- `p ∤ |H|`: `H` itself is a normal `p`-complement
+    exact hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup hpH houter
+
 /-- **BG Theorem 4.20(c) — existence** (mmd L1764/L1771): a finite solvable group of odd order
 with `r(F(G)) ≤ 2` possesses a *characteristic Sylow series* `G = G₀ ⊃ ⋯ ⊃ Gₙ = 1` whose factors
 are isomorphic to Sylow subgroups of `G`, packaged as `CharacteristicSylowSeriesPackage G`.
@@ -3894,77 +3984,9 @@ theorem exists_characteristicSylowSeriesPackage_of_rank_fitting_le_two
     have hp_dvd : p ∣ Nat.card G := Nat.minFac_dvd _
     have hp_in_piG : p ∈ (Nat.card G).primeFactors :=
       Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, Nat.card_pos.ne'⟩
-    have hp_min : ∀ q ∈ (Nat.card G).primeFactors, p ≤ q := fun q hq =>
-      Nat.minFac_le_of_dvd (Nat.prime_of_mem_primeFactors hq).two_le
-        (Nat.dvd_of_mem_primeFactors hq)
-    -- `G/F` is abelian
-    have hG' : commutator G ≤ Ch01.fitting G :=
-      derived_le_fitting_of_rank_fitting_le_two hodd' hrank'
-    have habel : ∀ x y : G ⧸ Ch01.fitting G, x * y = y * x :=
-      isMulCommutative_iff.mp
-        (Subgroup.Normal.quotient_commutative_iff_commutator_le.mpr hG')
-    -- `H = (mk' F)⁻¹(O_{p'}(G/F))`
-    set Nbar : Subgroup (G ⧸ Ch01.fitting G) :=
-      Ch03.oPiCore {r : ℕ | r ≠ p} (G ⧸ Ch01.fitting G) with hNbar
-    set Hsub : Subgroup G :=
-      Subgroup.comap (QuotientGroup.mk' (Ch01.fitting G)) Nbar with hHsub
-    haveI hHnorm : Hsub.Normal := by rw [hHsub]; infer_instance
-    have hF_le_H : Ch01.fitting G ≤ Hsub := by
-      rw [hHsub]
-      intro y hy
-      rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff y).mpr hy]
-      exact Nbar.one_mem
-    have hHmap : Hsub.map (QuotientGroup.mk' (Ch01.fitting G)) = Nbar := by
-      rw [hHsub]
-      exact Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective _) _
-    -- `G/H ≅ (G/F)/O_{p'}(G/F)` is a `p`-group
-    have houter : IsPGroup p (G ⧸ Hsub) :=
-      (isPGroup_quotient_oPiCore_of_comm habel).of_equiv
-        ((QuotientGroup.quotientMulEquivOfEq hHmap).symm.trans
-          (QuotientGroup.quotientQuotientEquivQuotient _ _ hF_le_H))
-    -- `G` has a normal `p`-complement
-    have hG : Ch05.HasNormalPComplement p G := by
-      by_cases hpH : p ∣ Nat.card ↥Hsub
-      · -- `p ∣ |H|`: Theorem 4.18(b) gives one for `H`, extended by `houter`
-        have hoddH : Odd (Nat.card ↥Hsub) := by
-          rcases Nat.even_or_odd (Nat.card ↥Hsub) with he | ho
-          · exfalso
-            have h2 : (2 : ℕ) ∣ Nat.card G :=
-              he.two_dvd.trans (Subgroup.card_subgroup_dvd_card Hsub)
-            rw [Nat.odd_iff] at hodd'; omega
-          · exact ho
-        have hpCaseH : p = 3 ∨ ∀ q ∈ (Nat.card ↥Hsub).primeFactors, p ≤ q :=
-          Or.inr fun q hq => hp_min q (Nat.primeFactors_mono
-            (Subgroup.card_subgroup_dvd_card Hsub) Nat.card_pos.ne' hq)
-        haveI : ((Ch01.fitting G).subgroupOf Hsub).Normal :=
-          Subgroup.Normal.subgroupOf inferInstance Hsub
-        haveI : Group.IsNilpotent ↥((Ch01.fitting G).subgroupOf Hsub) :=
-          nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hF_le_H).symm
-        -- `p ∤ [H:F]` because `H/F ≅ O_{p'}(G/F)` is a `p'`-group
-        have hidx : ¬ p ∣ ((Ch01.fitting G).subgroupOf Hsub).index := by
-          have hker : ((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).ker
-              = (Ch01.fitting G).subgroupOf Hsub := by
-            ext h
-            simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
-              QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
-          have hrange : ((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).range = Nbar := by
-            rw [MonoidHom.range_comp, Subgroup.range_subtype, hHmap]
-          have hcardq : Nat.card (↥Hsub ⧸ (Ch01.fitting G).subgroupOf Hsub) = Nat.card ↥Nbar := by
-            have e : (↥Hsub ⧸ (Ch01.fitting G).subgroupOf Hsub) ≃*
-                ↥((QuotientGroup.mk' (Ch01.fitting G)).comp Hsub.subtype).range :=
-              (QuotientGroup.quotientMulEquivOfEq hker.symm).trans
-                (QuotientGroup.quotientKerEquivRange _)
-            rw [Nat.card_congr e.toEquiv, hrange]
-          rw [Subgroup.index_eq_card, hcardq, hNbar]
-          exact not_dvd_card_oPiCore (by simp)
-        obtain ⟨P, hP_le⟩ := exists_sylow_le_fitting_of_nilpotent_normal_index_coprime
-          (X := ↥Hsub) (M := (Ch01.fitting G).subgroupOf Hsub) hidx
-        have hrH : pRank ↥Hsub p ≤ 2 :=
-          pRank_le_two_of_sylow_le_fitting P hP_le (rank_fitting_le_two_of_normal_subgroup hrank')
-        exact hasNormalPComplement_of_normal_subgroup_hasNormalPComplement_of_quotient_isPGroup
-          ((solvable_structure_of_pRank_le_two hoddH hpH hrH).2.1 hpCaseH) houter
-      · -- `p ∤ |H|`: `H` itself is a normal `p`-complement
-        exact hasNormalPComplement_of_normal_pPrime_of_quotient_isPGroup hpH houter
+    -- `G` has a normal `p`-complement (minimal-prime engine, extracted above)
+    have hG : Ch05.HasNormalPComplement p G :=
+      hasNormalPComplement_minFac_of_rank_fitting_le_two hodd' hrank'
     -- recurse (or stop) on the complement `K = O_{p'}(G)`
     set K : Subgroup G := Ch03.oPiCore {r : ℕ | r ≠ p} G with hKdef
     haveI hKnorm : K.Normal := by rw [hKdef]; infer_instance
