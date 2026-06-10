@@ -229,7 +229,7 @@ theorem Msigma_isPiGroup [Finite G] (M : Subgroup G) :
   exact Ch03.oPiCore.isPiGroup (sigma M) r hr
 
 /-- A normal `π`-Hall subgroup absorbs every `π`-subgroup. -/
-private theorem isPiGroup_le_of_normal_isHallSubgroup {H : Type*} [Group H] [Finite H]
+theorem isPiGroup_le_of_normal_isHallSubgroup {H : Type*} [Group H] [Finite H]
     {π : Set ℕ} {K L : Subgroup H} [K.Normal] (hK : Ch03.IsHallSubgroup π K)
     (hL : Ch03.Subgroup.IsPiGroup π L) : L ≤ K := by
   -- `L ⊔ K` is a `π`-group: its order divides `|L| * |K|`, and `K` is normal.

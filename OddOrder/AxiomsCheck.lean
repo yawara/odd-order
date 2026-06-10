@@ -39,6 +39,7 @@ import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
+import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3359,6 +3360,34 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- Part (a) is the §7 transitivity core (Prop 7.5 + Thm 7.3/7.4, unconditional); parts (b)/(c) use
 -- Cor 10.7 (`sylow_structure`, forward-conditional) and Thm 5.5(a). Same keystone island.
 #assert_axioms_island OddOrder.BG.Ch3.S10.normalizer_factorization
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Prop 10.11(a) (`sigma_complement_not_isUniquelyMaximal`): a `σ(M)'`-subgroup `K ≤ M` is not
+-- uniquely maximal. Hall `σ'`-overgroup + Theorem 4.20(c) terminal normal Sylow + `q ∉ σ(M)`
+-- normalizer escape. **Unconditional** (no keystone dependency).
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S10.sigma_complement_not_isUniquelyMaximal
+
+-- Prop 10.11(b) (`rank_centralizer_Msigma_inf_le_one`): `r(C_K(M_σ)) ≤ 1`. Routes through the
+-- Uniqueness Theorem (contrapositives), Theorem 4.20(a) (`M' ⊆ F(M)`), and Prop 10.10
+-- (`normalizer_factorization`, forward-conditional). Same keystone island.
+#assert_axioms_island OddOrder.BG.Ch3.S10.rank_centralizer_Msigma_inf_le_one
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Prop 10.11(a)(b)(c) capstone (`sigma_complement_rank_le_one`): part (c) applies (b) to
+-- `Z = O_{σ'}(F(M))` (cyclic) and pins `C_K(M_σ) ∩ M' ≤ Z` via the Fitting centralizer chain.
+-- Same keystone island (via part (b)).
+#assert_axioms_island OddOrder.BG.Ch3.S10.sigma_complement_rank_le_one
+  expecting
+  [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
+   OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
+
+-- Prop 10.11(d) (`sigma_complement_commutator_cyclic_normal`): `[K,P]` centralizes `M_σ` and is
+-- cyclic normal in `M` (Thm 3.7 fixed-point-free nilpotency + part (c)). Same island via (c).
+#assert_axioms_island OddOrder.BG.Ch3.S10.sigma_complement_commutator_cyclic_normal
   expecting
   [OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer,
    OddOrder.BG.Ch3.S10.exists_prime_orderOf_zgroupCentralizer_of_complement]
