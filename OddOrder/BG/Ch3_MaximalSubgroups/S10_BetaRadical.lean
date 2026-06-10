@@ -840,8 +840,9 @@ theorem derived_msigma_hasNormalPComplement_of_not_mem_beta [Finite G]
 
 /-- A subgroup whose order is coprime to the index of a normal subgroup `K` lies in `K`:
 the image of `Q` in the quotient `H/K` has order dividing both `|Q|` and `[H:K]`, hence
-trivial. (Used for "a normal `p`-complement contains every `p'`-subgroup".) -/
-private theorem le_of_coprime_card_index {H : Type*} [Group H] [Finite H] {K Q : Subgroup H}
+trivial. (Used for "a normal `p`-complement contains every `p'`-subgroup"; also §12,
+Lemma 12.1(b): `E₃ ≤ E'` once each Sylow subgroup of `E` at a `τ₃`-prime lies in `E'`.) -/
+theorem le_of_coprime_card_index {H : Type*} [Group H] [Finite H] {K Q : Subgroup H}
     [K.Normal] (h : Nat.Coprime (Nat.card ↥Q) K.index) : Q ≤ K := by
   have hdvd1 : Nat.card ↥(Q.map (QuotientGroup.mk' K)) ∣ Nat.card ↥Q :=
     Subgroup.card_map_dvd Q (QuotientGroup.mk' K)
