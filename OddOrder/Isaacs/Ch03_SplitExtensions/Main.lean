@@ -1213,6 +1213,331 @@ theorem hall_C [Finite G] [IsSolvable G] {π : Set ℕ} {H K : Subgroup G}
     ∃ g : G, H.map (MulAut.conj g).toMonoidHom = K :=
   hall_C_strong_aux (Nat.card G) G le_rfl hH hK
 
+/-- **Schur-Zassenhaus D-part (抽象版)**: `M ⊴ G` が可解で補群 `K` を持つとき, `|M|` と
+位数が互いに素な部分群 `U` は `K` の共役 `Kˣ` に含まれる.
+
+Hall D-定理 (`hall_D`) のエンジン. 証明: `P := U ⊔ M` の中で `U` も `P ⊓ K` も
+正規部分群 `M.subgroupOf P` (index は `|U|`, よって `|M|` と互いに素) の補群になる.
+Schur-Zassenhaus 共役性 (`IsComplement'.exists_conj_of_coprime`) を `P` 内で適用すると,
+`P ⊓ K` の (`M` の元による) 共役が `U` に一致するので, `U = (P ⊓ K)ᵐ ≤ Kᵐ`. -/
+theorem exists_conj_le_of_isComplement'_of_coprime [Finite G] {M K : Subgroup G} [M.Normal]
+    (hMsolv : IsSolvable ↥M) (hK : M.IsComplement' K) {U : Subgroup G}
+    (hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥M)) :
+    ∃ x : G, U ≤ K.map (MulAut.conj x).toMonoidHom := by
+  set P : Subgroup G := U ⊔ M with hP_def
+  have hM_le_P : M ≤ P := le_sup_right
+  have hU_le_P : U ≤ P := le_sup_left
+  have hMnorm : M.Normal := inferInstance
+  haveI hMP_normal : (M.subgroupOf P).Normal := Subgroup.normal_subgroupOf
+  have hU_inf_M : (U ⊓ M : Subgroup G) = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hM_inf_K : (M ⊓ K : Subgroup G) = ⊥ := hK.disjoint.eq_bot
+  have h_card_MP : Nat.card ↥(M.subgroupOf P) = Nat.card ↥M :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM_le_P).toEquiv
+  have h_card_UP : Nat.card ↥(U.subgroupOf P) = Nat.card ↥U :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU_le_P).toEquiv
+  -- Complement 1: `U.subgroupOf P` complements `M.subgroupOf P` in `P`.
+  have h_compl_U : Subgroup.IsComplement' (M.subgroupOf P) (U.subgroupOf P) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [disjoint_iff]
+      ext ⟨x, hx⟩
+      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot,
+                 Subtype.ext_iff, OneMemClass.coe_one]
+      refine ⟨fun ⟨hxM, hxU⟩ => ?_, fun h => by simp [h]⟩
+      have : x ∈ (U ⊓ M : Subgroup G) := ⟨hxU, hxM⟩
+      rwa [hU_inf_M, Subgroup.mem_bot] at this
+    · rw [Set.eq_univ_iff_forall]
+      rintro ⟨x, hx_P⟩
+      have hx_sup : x ∈ (U ⊔ M : Subgroup G) := hx_P
+      rw [Subgroup.mem_sup_of_normal_right] at hx_sup
+      obtain ⟨u, huU, m, hmM, h_eq⟩ := hx_sup
+      refine ⟨⟨u * m * u⁻¹, hM_le_P (hMnorm.conj_mem m hmM u)⟩,
+        Subgroup.mem_subgroupOf.mpr (hMnorm.conj_mem m hmM u), ⟨u, hU_le_P huU⟩,
+        Subgroup.mem_subgroupOf.mpr huU, ?_⟩
+      ext; change u * m * u⁻¹ * u = x; rw [← h_eq]; group
+  -- Complement 2: `K.subgroupOf P` (= `(P ⊓ K).subgroupOf P`) complements `M.subgroupOf P`.
+  have h_compl_K : Subgroup.IsComplement' (M.subgroupOf P) (K.subgroupOf P) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [disjoint_iff]
+      ext ⟨x, hx⟩
+      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot,
+                 Subtype.ext_iff, OneMemClass.coe_one]
+      refine ⟨fun ⟨hxM, hxK⟩ => ?_, fun h => by simp [h]⟩
+      have : x ∈ (M ⊓ K : Subgroup G) := ⟨hxM, hxK⟩
+      rwa [hM_inf_K, Subgroup.mem_bot] at this
+    · rw [Set.eq_univ_iff_forall]
+      rintro ⟨x, hx_P⟩
+      have hx_top : x ∈ (M ⊔ K : Subgroup G) := by rw [hK.sup_eq_top]; trivial
+      rw [Subgroup.mem_sup_of_normal_left] at hx_top
+      obtain ⟨m, hmM, k, hkK, h_eq⟩ := hx_top
+      have hk_P : k ∈ P := by
+        have hkeq : k = m⁻¹ * x := by rw [← h_eq]; group
+        rw [hkeq]; exact P.mul_mem (P.inv_mem (hM_le_P hmM)) hx_P
+      refine ⟨⟨m, hM_le_P hmM⟩, Subgroup.mem_subgroupOf.mpr hmM, ⟨k, hk_P⟩,
+        Subgroup.mem_subgroupOf.mpr hkK, ?_⟩
+      ext; exact h_eq
+  -- index of `M.subgroupOf P` in `P` is `|U|`, hence coprime to `|M|`.
+  have h_idx_MP : (M.subgroupOf P).index = Nat.card ↥U := by
+    rw [h_compl_U.symm.index_eq_card, h_card_UP]
+  have h_cop_MP : Nat.Coprime (Nat.card ↥(M.subgroupOf P)) (M.subgroupOf P).index := by
+    rw [h_card_MP, h_idx_MP]; exact hcop.symm
+  haveI hMP_solv : IsSolvable ↥(M.subgroupOf P) := by
+    have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_P
+    exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+  -- SZ conjugacy in `P`: conjugate `K.subgroupOf P` to `U.subgroupOf P` by `n ∈ M.subgroupOf P`.
+  obtain ⟨n, hn_mem, hn_eq⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime h_cop_MP (Or.inl hMP_solv) h_compl_K h_compl_U
+  let m : G := n.val
+  refine ⟨m, ?_⟩
+  -- Push `hn_eq` through `P.subtype`: `(P ⊓ K)ᵐ = U`, hence `U ≤ Kᵐ`.
+  have h_intertwine : P.subtype.comp (MulAut.conj n).toMonoidHom =
+      ((MulAut.conj (n.val : G)).toMonoidHom).comp P.subtype := by
+    ext ⟨x, hx⟩; rfl
+  have h_lhs : (((K.subgroupOf P).map (MulAut.conj n).toMonoidHom).map P.subtype) =
+      (P ⊓ K).map (MulAut.conj m).toMonoidHom := by
+    rw [Subgroup.map_map, h_intertwine, ← Subgroup.map_map]
+    congr 1
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype]
+  have h_rhs : ((U.subgroupOf P).map P.subtype) = U := by
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
+        inf_of_le_right hU_le_P]
+  have h_eq_lifted := congrArg (·.map P.subtype) hn_eq
+  simp only at h_eq_lifted
+  rw [h_lhs, h_rhs] at h_eq_lifted
+  rw [← h_eq_lifted]
+  exact Subgroup.map_mono inf_le_right
+
+/-- Hall D-定理の `|G|`-強誘導本体. `hall_E_strong_aux` と同じ骨格 (極小正規 `M`,
+`G/M` への IH, `p ∈ π` / `p ∉ π` 場合分け) に, 「IH は `U` の像を含む π-Hall を返す」
++「`p ∉ π` では補群を `U` を含むものに取り替える (`exists_conj_le_of_isComplement'_of_coprime`)」
+の 2 点を加えたもの. -/
+private theorem hall_D_strong_aux : ∀ n : ℕ,
+    ∀ (G : Type*) [Group G] [Finite G] [IsSolvable G],
+      Nat.card G ≤ n → ∀ {π : Set ℕ} {U : Subgroup G},
+      (∀ q ∈ (Nat.card ↥U).primeFactors, q ∈ π) →
+      ∃ H : Subgroup G, IsHallSubgroup π H ∧ U ≤ H := by
+  intro n
+  induction n with
+  | zero =>
+    intro G _ _ _ hcard _ _ _
+    exact absurd hcard (Nat.not_le_of_lt Nat.card_pos)
+  | succ n ih =>
+    intro G _ _ _ hcard π U hU
+    by_cases hsmall : Nat.card G ≤ n
+    · exact ih G hsmall hU
+    by_cases hG_one : Nat.card G = 1
+    · -- |G| = 1: G subsingleton, so U ≤ ⊥; take H = ⊥.
+      haveI : Subsingleton G := Nat.card_eq_one_iff_unique.mp hG_one |>.1
+      refine ⟨⊥, IsHallSubgroup.bot_of_card_eq_one π hG_one, ?_⟩
+      intro x _
+      rw [Subgroup.mem_bot]; exact Subsingleton.elim x 1
+    haveI hG_nontrivial : Nontrivial G :=
+      Finite.one_lt_card_iff_nontrivial.mp
+        (Nat.one_lt_iff_ne_zero_and_ne_one.mpr ⟨Nat.card_pos.ne', hG_one⟩)
+    obtain ⟨M, hM, _⟩ :=
+      OddOrder.Isaacs.Ch02.exists_isMinimalNormal_le_of_normal (⊤ : Subgroup G) top_ne_bot
+    haveI hMnormal : M.Normal := hM.1
+    have hM_ne_bot : M ≠ ⊥ := hM.2.1
+    obtain ⟨p, hp_prime, hp_elem⟩ := solvable_minimal_normal_isElementaryAbelian hM
+    haveI hM_nontrivial : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hM_ne_bot
+    have hM_card_ge_two : 2 ≤ Nat.card ↥M := Finite.one_lt_card
+    have hquot_card : Nat.card (G ⧸ M) ≤ n := by
+      have key : Nat.card G = Nat.card (G ⧸ M) * Nat.card ↥M :=
+        Subgroup.card_eq_card_quotient_mul_card_subgroup M
+      have h1 : Nat.card (G ⧸ M) * 2 ≤ Nat.card G := by
+        rw [key]; exact Nat.mul_le_mul_left _ hM_card_ge_two
+      omega
+    -- |M| is a p-power; its prime factors are {p}.
+    have hM_pPower : ∃ k, Nat.card ↥M = p ^ k := by
+      haveI : Fact p.Prime := ⟨hp_prime⟩
+      have hPG : IsPGroup p ↥M := fun x => ⟨1, by rw [pow_one]; exact hp_elem.2 x⟩
+      exact IsPGroup.iff_card.mp hPG
+    have hM_primes : ∀ q ∈ (Nat.card ↥M).primeFactors, q = p := by
+      obtain ⟨k, hk⟩ := hM_pPower
+      intro q hq
+      rw [hk, Nat.mem_primeFactors] at hq
+      exact (Nat.prime_dvd_prime_iff_eq hq.1 hp_prime).mp (hq.1.dvd_of_dvd_pow hq.2.1)
+    -- IH on G/M with the π-subgroup `U.map (mk' M)`: get a π-Hall ⊇ image of U.
+    set Ubar : Subgroup (G ⧸ M) := U.map (QuotientGroup.mk' M) with hUbar_def
+    have hUbar_pi : ∀ q ∈ (Nat.card ↥Ubar).primeFactors, q ∈ π := by
+      intro q hq
+      apply hU
+      rw [Nat.mem_primeFactors] at hq ⊢
+      exact ⟨hq.1, hq.2.1.trans (Subgroup.card_map_dvd _ _), Nat.card_pos.ne'⟩
+    obtain ⟨Hbar, hHbar, hUbar_le⟩ := ih (G ⧸ M) hquot_card hUbar_pi
+    -- Pull back: H = comap (mk' M) Hbar contains both M and U.
+    set H : Subgroup G := Subgroup.comap (QuotientGroup.mk' M) Hbar with hH_def
+    have hM_le_H : M ≤ H := QuotientGroup.le_comap_mk' M Hbar
+    have hU_le_H : U ≤ H := by
+      intro u hu
+      rw [hH_def, Subgroup.mem_comap]
+      exact hUbar_le (Subgroup.mem_map_of_mem _ hu)
+    have hH_index : H.index = Hbar.index :=
+      Hbar.index_comap_of_surjective (QuotientGroup.mk'_surjective (N := M))
+    have hHbar_idx_pos : 0 < Hbar.index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+    have hH_card_eq : Nat.card ↥H = Nat.card ↥Hbar * Nat.card ↥M := by
+      have eq1 : Nat.card ↥H * H.index = Nat.card G := Subgroup.card_mul_index H
+      have eq2 : Nat.card ↥Hbar * Hbar.index = Nat.card (G ⧸ M) := Subgroup.card_mul_index Hbar
+      have eq3 : Nat.card (G ⧸ M) * Nat.card ↥M = Nat.card G :=
+        (Subgroup.card_eq_card_quotient_mul_card_subgroup M).symm
+      have h_eq : Nat.card ↥H * Hbar.index = (Nat.card ↥Hbar * Nat.card ↥M) * Hbar.index := by
+        calc Nat.card ↥H * Hbar.index
+            = Nat.card ↥H * H.index := by rw [hH_index]
+          _ = Nat.card G := eq1
+          _ = Nat.card (G ⧸ M) * Nat.card ↥M := eq3.symm
+          _ = (Nat.card ↥Hbar * Hbar.index) * Nat.card ↥M := by rw [eq2]
+          _ = (Nat.card ↥Hbar * Nat.card ↥M) * Hbar.index := by ring
+      exact Nat.mul_right_cancel hHbar_idx_pos h_eq
+    by_cases hp_pi : p ∈ π
+    · -- Case p ∈ π: H is a Hall π-subgroup of G and U ≤ H.
+      refine ⟨H, ⟨?_, ?_⟩, hU_le_H⟩
+      · intro q hq_pf
+        rw [hH_card_eq, Nat.mem_primeFactors] at hq_pf
+        obtain ⟨hq_prime, hq_dvd, _⟩ := hq_pf
+        rcases hq_prime.dvd_mul.mp hq_dvd with h_in_Hbar | h_in_M
+        · exact hHbar.1 q (Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_Hbar, Nat.card_pos.ne'⟩)
+        · have hqM : q ∈ (Nat.card ↥M).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩
+          rw [hM_primes q hqM]; exact hp_pi
+      · rw [hH_index]; exact hHbar.2
+    · -- Case p ∉ π: replace a complement of `M.subgroupOf H` by one containing `U`.
+      have hMH_card : Nat.card ↥(M.subgroupOf H) = Nat.card ↥M :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM_le_H).toEquiv
+      have h_coprime_M_Hbar : Nat.Coprime (Nat.card ↥M) (Nat.card ↥Hbar) := by
+        rw [Nat.coprime_iff_gcd_eq_one]
+        by_contra hne
+        obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
+        rw [Nat.dvd_gcd_iff] at hq_dvd
+        have hqM : q ∈ (Nat.card ↥M).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.1, Nat.card_pos.ne'⟩
+        have hqHbar : q ∈ (Nat.card ↥Hbar).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.2, Nat.card_pos.ne'⟩
+        exact hp_pi (hM_primes q hqM ▸ hHbar.1 q hqHbar)
+      have h_idx_MH : (M.subgroupOf H).index = Nat.card ↥Hbar := by
+        have hlag : Nat.card ↥(M.subgroupOf H) * (M.subgroupOf H).index = Nat.card ↥H :=
+          Subgroup.card_mul_index (M.subgroupOf H)
+        rw [hMH_card, hH_card_eq] at hlag
+        have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+        have : Nat.card ↥M * (M.subgroupOf H).index = Nat.card ↥M * Nat.card ↥Hbar := by
+          rw [hlag, mul_comm (Nat.card ↥Hbar)]
+        exact Nat.mul_left_cancel hM_pos this
+      have h_cop_MH : Nat.Coprime (Nat.card ↥(M.subgroupOf H)) (M.subgroupOf H).index := by
+        rw [hMH_card, h_idx_MH]; exact h_coprime_M_Hbar
+      haveI hMH_normal : (M.subgroupOf H).Normal := hMnormal.subgroupOf H
+      haveI hMH_solv : IsSolvable ↥(M.subgroupOf H) := by
+        have h_iso := Subgroup.subgroupOfEquivOfLe hM_le_H
+        exact solvable_of_solvable_injective (f := h_iso.toMonoidHom) h_iso.injective
+      obtain ⟨K, hK⟩ := Subgroup.exists_right_complement'_of_coprime h_cop_MH
+      -- `U.subgroupOf H` is a π-subgroup with order coprime to `|M.subgroupOf H|`.
+      have hUH_card : Nat.card ↥(U.subgroupOf H) = Nat.card ↥U :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU_le_H).toEquiv
+      have h_cop_UH_MH :
+          Nat.Coprime (Nat.card ↥(U.subgroupOf H)) (Nat.card ↥(M.subgroupOf H)) := by
+        rw [hUH_card, hMH_card, Nat.coprime_iff_gcd_eq_one]
+        by_contra hne
+        obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hne
+        rw [Nat.dvd_gcd_iff] at hq_dvd
+        have hqU : q ∈ (Nat.card ↥U).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.1, Nat.card_pos.ne'⟩
+        have hqM : q ∈ (Nat.card ↥M).primeFactors :=
+          Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd.2, Nat.card_pos.ne'⟩
+        exact hp_pi (hM_primes q hqM ▸ hU q hqU)
+      -- SZ-D: `U.subgroupOf H` lies in a conjugate `K' = K.map (conj x)` of `K`.
+      obtain ⟨x, hx⟩ := exists_conj_le_of_isComplement'_of_coprime hMH_solv hK h_cop_UH_MH
+      set K' : Subgroup ↥H := K.map (MulAut.conj x).toMonoidHom with hK'_def
+      have hK'_card : Nat.card ↥K' = Nat.card ↥K :=
+        Nat.card_congr (Subgroup.equivMapOfInjective K _ (MulEquiv.injective _)).toEquiv.symm
+      have hK'_index : K'.index = K.index := Subgroup.index_map_equiv K (MulAut.conj x)
+      have hK_index : K.index = Nat.card ↥(M.subgroupOf H) := hK.index_eq_card
+      have hK_card : Nat.card ↥K = Nat.card ↥Hbar := by
+        have hcm := hK.card_mul
+        rw [hMH_card, hH_card_eq] at hcm
+        have hM_pos : 0 < Nat.card ↥M := Nat.card_pos
+        have h_eq : Nat.card ↥M * Nat.card ↥K = Nat.card ↥M * Nat.card ↥Hbar := by
+          rw [hcm, mul_comm]
+        exact Nat.mul_left_cancel hM_pos h_eq
+      -- `K'.map H.subtype` is the desired Hall π-subgroup of G, and contains U.
+      refine ⟨K'.map H.subtype, ⟨?_, ?_⟩, ?_⟩
+      · intro q hq_pf
+        rw [Subgroup.card_subtype, hK'_card, hK_card] at hq_pf
+        exact hHbar.1 q hq_pf
+      · intro q hq_pf hq_pi
+        rw [show (K'.map H.subtype).index = Nat.card ↥M * Hbar.index from ?_] at hq_pf
+        · rw [Nat.mem_primeFactors] at hq_pf
+          obtain ⟨hq_prime, hq_dvd, _⟩ := hq_pf
+          rcases hq_prime.dvd_mul.mp hq_dvd with h_in_M | h_in_HbarIdx
+          · have hqM : q ∈ (Nat.card ↥M).primeFactors :=
+              Nat.mem_primeFactors.mpr ⟨hq_prime, h_in_M, Nat.card_pos.ne'⟩
+            rw [hM_primes q hqM] at hq_pi; exact hp_pi hq_pi
+          · exact hHbar.2 q (Nat.mem_primeFactors.mpr
+              ⟨hq_prime, h_in_HbarIdx, Subgroup.index_ne_zero_of_finite⟩) hq_pi
+        · rw [Subgroup.index_map, Subgroup.ker_subtype, sup_bot_eq, hK'_index, hK_index,
+              hMH_card, Subgroup.range_subtype, hH_index]
+      · calc U = (U.subgroupOf H).map H.subtype := by
+                rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype,
+                    inf_of_le_right hU_le_H]
+          _ ≤ K'.map H.subtype := Subgroup.map_mono hx
+
+/-- **Isaacs 3C.1 (Hall D-定理, Wielandt)** ⭐: 有限可解群では, 任意の `π`-部分群は
+ある Hall `π`-部分群に含まれる.
+
+`U` を `π`-部分群 (`|U|` の全素因子が `π` に属す) とすると, `U ≤ H` なる `π`-Hall `H` が存在.
+Hall E (`hall_E_exists`) / Hall C (`hall_C`) と合わせて Hall E-C-D を完備化する.
+証明は `hall_E_strong_aux` と同型の `|G|`-強誘導 (`hall_D_strong_aux`). -/
+theorem hall_D [Finite G] [IsSolvable G] {π : Set ℕ} {U : Subgroup G}
+    (hU : ∀ q ∈ (Nat.card ↥U).primeFactors, q ∈ π) :
+    ∃ H : Subgroup G, IsHallSubgroup π H ∧ U ≤ H :=
+  hall_D_strong_aux (Nat.card G) G le_rfl hU
+
+/-- `N ⊴ G` のとき, 任意の `H` について `[N : H ∩ N] = H.relIndex N` は `[G : H] = H.index`
+を割る. (mathlib `relIndex_dvd_index_of_normal` は正規部分群側の relindex を扱うので, その
+「右版」を指数の塔等式 + 第二同型から導く.)
+
+`[G:H]·[H:H∩N] = [G:N]·[N:H∩N]` (どちらも `[G:H∩N]`), かつ `[H:H∩N] ∣ [G:N]` (正規) より
+`[N:H∩N] ∣ [G:H]`. -/
+theorem relIndex_dvd_index_of_normal_right [Finite G] (H : Subgroup G) {N : Subgroup G}
+    [N.Normal] : H.relIndex N ∣ H.index := by
+  -- (H⊓N).relIndex H * H.index = [G:H∩N] と (H⊓N).relIndex N * N.index = [G:H∩N].
+  have hA : N.relIndex H * H.index = (H ⊓ N : Subgroup G).index := by
+    rw [← Subgroup.inf_relIndex_left]; exact Subgroup.relIndex_mul_index inf_le_left
+  have hB : H.relIndex N * N.index = (H ⊓ N : Subgroup G).index := by
+    rw [← Subgroup.inf_relIndex_right]; exact Subgroup.relIndex_mul_index inf_le_right
+  -- [H:H∩N] = N.relIndex H ∣ [G:N] = N.index (正規).
+  obtain ⟨t, ht⟩ : N.relIndex H ∣ N.index := Subgroup.relIndex_dvd_index_of_normal N H
+  have hb_ne : N.relIndex H ≠ 0 := by
+    intro h0
+    rw [h0, zero_mul] at hA
+    exact Subgroup.index_ne_zero_of_finite hA.symm
+  -- N.relIndex H * H.index = N.relIndex H * (H.relIndex N * t).
+  have key : N.relIndex H * H.index = N.relIndex H * (H.relIndex N * t) := by
+    rw [hA, ← hB, ht]; ring
+  exact ⟨t, Nat.eq_of_mul_eq_mul_left (Nat.pos_of_ne_zero hb_ne) key⟩
+
+/-- **Hall ∩ normal**: `H` が `G` の `π`-Hall 部分群, `N ⊴ G` なら `H ∩ N` (= `N` 内で
+`H.subgroupOf N`) は `N` の `π`-Hall 部分群.
+
+`|H ∩ N| ∣ |H|` なので素因子は `π` に含まれ, `[N : H∩N] ∣ [G:H] = index H` (π'-number,
+`relIndex_dvd_index_of_normal_right`) なので余指数の素因子は `π` の外. BG Cor 10.9 で
+`W ∩ M'` / `W ∩ M_σ` が `M'` / `M_σ` の Hall になることに使う. -/
+theorem isHallSubgroup_subgroupOf_of_normal [Finite G] {π : Set ℕ} {H N : Subgroup G}
+    (hH : IsHallSubgroup π H) [N.Normal] :
+    IsHallSubgroup π (H.subgroupOf N) := by
+  have hcard : Nat.card ↥(H.subgroupOf N) = Nat.card ↥(H ⊓ N : Subgroup G) := by
+    rw [← Subgroup.inf_subgroupOf_right]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_right).toEquiv
+  refine ⟨?_, ?_⟩
+  · -- |H.subgroupOf N| = |H ⊓ N| ∣ |H|, so prime factors ⊆ π.
+    intro q hq
+    rw [hcard] at hq
+    apply hH.1
+    rw [Nat.mem_primeFactors] at hq ⊢
+    exact ⟨hq.1, hq.2.1.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩
+  · -- index = H.relIndex N ∣ H.index, so prime factors ⊆ π'.
+    intro q hq hqπ
+    have hdvd : (H.subgroupOf N).index ∣ H.index := relIndex_dvd_index_of_normal_right H
+    rw [Nat.mem_primeFactors] at hq
+    exact hH.2 q (Nat.mem_primeFactors.mpr
+      ⟨hq.1, hq.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩) hqπ
+
 /-! **Isaacs Thm 3.15**: 全ての素数 `p` について `p`-complement (i.e., `{p}'`-Hall) が
 存在 ⇒ `G` 可解.
 
@@ -1620,6 +1945,40 @@ theorem oPiCore_mono {π₁ π₂ : Set ℕ} (h : π₁ ⊆ π₂) (G : Type*) [
   rintro ⟨H, hHN, hHpi⟩
   exact le_iSup (fun K : {K : Subgroup G // K.Normal ∧ Subgroup.IsPiGroup π₂ K} =>
     (K.val : Subgroup G)) ⟨H, hHN, fun p hp => h (hHpi p hp)⟩
+
+/-- **`O_π` 交差補題**: 有限群 `G` と素数集合 `S` について、各 `p ∈ S` の補集合 π-radical
+`O_{p'}(G) = oPiCore {p}ᶜ G` の交差は `O_{S'}(G) = oPiCore Sᶜ G` に一致する:
+`⨅ p ∈ S, O_{p'}(G) = O_{S'}(G)`.
+
+- `⊇` (`oPiCore Sᶜ G ≤ ⨅ ...`): 各 `p ∈ S` で `Sᶜ ⊆ {p}ᶜ` ゆえ `oPiCore_mono`。
+- `⊆` (`⨅ ... ≤ oPiCore Sᶜ G`): 交差 `D` は normal な `Sᶜ`-group。実際 `q ∈ S` を仮に
+  `q ∣ |D|` とすると `D ≤ oPiCore {q}ᶜ G` (`q` 番目の項) は `{q}ᶜ`-group (`oPiCore.isPiGroup`)
+  なので `q ∤ |D|`、矛盾。よって `IsPiGroup.le_oPiCore`。
+
+用途: BG Lemma 10.8 conjunct 1 (`M_β` が Hall) — `M_β = ⋂_{p∈π(M)−β(M)} (M' の normal
+p-complement)` を `O_{(π(M)−β(M))ᶜ}(M')` にまとめる第一ピース (unconditional)。 -/
+theorem iInf_oPiCore_compl_singleton {G : Type*} [Group G] [Finite G] (S : Set ℕ) :
+    ⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G = oPiCore Sᶜ G := by
+  apply le_antisymm
+  · -- `D := ⨅ p ∈ S, O_{p'}(G)` is a normal `Sᶜ`-group.
+    haveI hDnormal : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G).Normal :=
+      Subgroup.normal_iInf_normal fun _ =>
+        Subgroup.normal_iInf_normal fun _ => inferInstance
+    refine Subgroup.IsPiGroup.le_oPiCore ?_
+    intro q hq
+    rw [Set.mem_compl_iff]
+    intro hqS
+    have hDle : (⨅ p ∈ S, oPiCore ({p}ᶜ : Set ℕ) G) ≤ oPiCore ({q}ᶜ : Set ℕ) G :=
+      iInf₂_le q hqS
+    have hmem : q ∈ ({q}ᶜ : Set ℕ) :=
+      Subgroup.IsPiGroup.le hDle (oPiCore.isPiGroup ({q}ᶜ : Set ℕ)) q hq
+    simp at hmem
+  · refine le_iInf₂ fun p hp => ?_
+    refine oPiCore_mono ?_ G
+    intro x hx
+    simp only [Set.mem_compl_iff, Set.mem_singleton_iff] at hx ⊢
+    rintro rfl
+    exact hx hp
 
 /-- **Hall-Higman prereq**: 有限非自明可解群は π-radical または π'-radical が非自明.
 

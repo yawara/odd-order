@@ -400,7 +400,7 @@ private theorem eq_bot_of_le_normalCore_bot {A M : Subgroup G}
 This proof uses a generator directly: an automorphism sends the generator to another power of the
 generator, so it sends each element `x` of a subgroup to an integral power of `x`, still in that
 subgroup. -/
-private theorem characteristic_of_subgroup_of_isCyclic
+theorem characteristic_of_subgroup_of_isCyclic
     {C : Type*} [Group C] [IsCyclic C] (H : Subgroup C) :
     H.Characteristic := by
   obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)

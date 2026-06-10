@@ -763,7 +763,7 @@ This packages the standard rank-two Blackburn Case B structure: the quotient by 
 center has order `p²`, hence is abelian, so the commutator subgroup is nontrivial and
 lies in the center of order `p`; exponent `p` then collapses the p-power part in
 BG Lemma 1.7(d), giving `Φ(G)=G'=Z(G)`. -/
-private theorem isExtraspecial_of_noncomm_card_prime_cube_exp_prime
+theorem isExtraspecial_of_noncomm_card_prime_cube_exp_prime
     {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
     (hcard : Nat.card G = p ^ 3)
     (hnoncomm : ¬ IsMulCommutative G)

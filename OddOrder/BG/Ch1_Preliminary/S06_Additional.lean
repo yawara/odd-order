@@ -182,12 +182,80 @@ private theorem commutator_le_sup_commutator {K U : Subgroup G} [K.Normal]
     _ = Subgroup.comap q ((K ⊔ ⁅U, U⁆).map q) := by rw [hmapeq]
     _ = K ⊔ ⁅U, U⁆ := Subgroup.comap_map_eq_self (by rw [hkerq]; exact le_sup_left)
 
+/-! ### 共役作用 bridge (Prop 1.6(d) の subgroup-共役版インターフェース)
+
+`Prop 1.6(d)` (`S01.fixedPoints_isComplement_actionCommutator_of_abelian`) は抽象作用
+`φ : A →* MulAut G` に対する命題。下の 2 bridge は `K ≤ N_Γ(P)` の `P` への共役作用について、
+action commutator を ambient の `⁅P, K⁆` に、fixed points を `C_Γ(K) ⊓ P` に同定する。
+Lemma 6.3(a) 第 2 結論 (本ファイル) と BG Lemma 12.1(f) (§12) で使用。 -/
+
+section ConjugationActionBridges
+
+variable {Γ : Type*} [Group Γ]
+
+/-- Push-forward of the conjugation-action commutator: for `K ≤ N_Γ(P)`, the
+`actionCommutator` of the conjugation action of `K` on `P` realizes the ambient
+subgroup commutator `⁅P, K⁆`. -/
+theorem actionCommutator_conj_map_subtype {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (Ch04.actionCommutator
+        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype
+      = ⁅P, K⁆ := by
+  rw [Ch04.actionCommutator, MonoidHom.map_closure, Subgroup.commutator_def]
+  congr 1
+  ext y
+  constructor
+  · rintro ⟨_, ⟨g, a, rfl⟩, rfl⟩
+    refine ⟨(g : Γ), g.2, (a : Γ), a.2, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          (g * ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) a g⁻¹) : Γ)
+        = (g : Γ) * ((a : Γ) * (g : Γ)⁻¹ * (a : Γ)⁻¹) := rfl
+    rw [hcoe]
+    group
+  · rintro ⟨g, hg, a, ha, rfl⟩
+    refine ⟨(⟨g, hg⟩ : ↥P) *
+      ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩ ⟨g, hg⟩⁻¹,
+      ⟨⟨g, hg⟩, ⟨a, ha⟩, rfl⟩, ?_⟩
+    rw [commutatorElement_def]
+    have hcoe : (P.subtype
+          ((⟨g, hg⟩ : ↥P) *
+            ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP)) ⟨a, ha⟩
+              (⟨g, hg⟩ : ↥P)⁻¹) : Γ)
+        = g * (a * g⁻¹ * a⁻¹) := rfl
+    rw [hcoe]
+    group
+
+/-- Push-forward of the conjugation-action fixed points: `C_Γ(K) ⊓ P`. -/
+theorem fixedPointsOfMulAut_conj_map_subtype {P K : Subgroup Γ}
+    (hKP : K ≤ Subgroup.normalizer (P : Set Γ)) :
+    (Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKP))).map P.subtype
+      = Subgroup.centralizer (K : Set Γ) ⊓ P := by
+  ext y
+  simp only [Subgroup.mem_map, Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
+  constructor
+  · rintro ⟨x, hx, rfl⟩
+    refine ⟨fun k hk => ?_, x.2⟩
+    have hfix := Subgroup.mem_fixedPointsOfMulAut.mp hx ⟨k, hk⟩
+    have hcoe : k * (x : Γ) * k⁻¹ = (x : Γ) := congrArg Subtype.val hfix
+    calc k * (x : Γ) = (k * x * k⁻¹) * k := by group
+    _ = (x : Γ) * k := by rw [hcoe]
+  · rintro ⟨hy, hyP⟩
+    refine ⟨⟨y, hyP⟩, Subgroup.mem_fixedPointsOfMulAut.mpr fun a => Subtype.ext ?_, rfl⟩
+    change (a : Γ) * y * (a : Γ)⁻¹ = y
+    rw [hy (a : Γ) a.2]
+    group
+
+end ConjugationActionBridges
+
 /-! ## 6.3: 可解群の normal Hall 補群と commutator (pp. 63-64, mmd L1981)
 
 **Lemma 6.3(a)**: `G` 可解, `H ⊴ G` が補群 `K` を持ち (`H.IsComplement' K`), `H ⊆ G'` のとき
-`H = ⁅H, K⁆` (かつ `C_H(K) ⊆ H'`)。Thm 10.6 Step 4 (`M_α = ⁅M_α, K⁆`), Cor 10.7(a)
-(`⁅P, V⁆ = P`), §15 (`⁅M_σ, K⁆ = M_σ`) で第 1 結論を引用。第 2 結論 `C_H(K) ⊆ H'` は §10
-critical path 外 (coprime action 分解を要する) ゆえ後続。第 1 結論には coprime 性は不要。 -/
+`H = ⁅H, K⁆` (かつ coprime 仮定の下で `C_H(K) ⊆ H'`)。Thm 10.6 Step 4 (`M_α = ⁅M_α, K⁆`),
+Cor 10.7(a) (`⁅P, V⁆ = P`), §15 (`⁅M_σ, K⁆ = M_σ`) で第 1 結論を引用。第 1 結論には coprime
+性は不要; 第 2 結論 `C_H(K) ⊆ H'` (`centralizer_inf_le_derivedInG_of_isComplement'`) は
+`H/H'` への coprime 直積分解 (Prop 1.6(d)) を要し、Lemma 12.17 で引用。 -/
 
 section /- 6.3 -/
 
@@ -313,6 +381,78 @@ theorem commutator_eq_self_of_isComplement'_le_commutator [IsSolvable G]
       (lt_irrefl _)
   have hmap_bot : H.map q = ⊥ := hHbar ▸ hHbar_bot
   rwa [Subgroup.map_eq_bot_iff, hq, QuotientGroup.ker_mk'] at hmap_bot
+
+open OddOrder.GroupTheory in
+/-- **BG Lemma 6.3(a)** (second conclusion, mmd L1981): with the first conclusion's hypotheses
+plus coprimality `(|H|, |K|) = 1`, the fixed points `C_H(K)` lie in `H' = derivedInG H`.
+
+Proof (BG): pass to `Ḡ = G/H'`, where `H̄ = H/H'` is abelian and `K̄` acts on it coprimely by
+conjugation. The action commutator is `⁅H̄, K̄⁆ = (⁅H,K⁆)‾ = H̄` (first conclusion), i.e. the
+whole of `H̄`; Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`) then makes
+the fixed points `C_Ḡ(K̄) ⊓ H̄` trivial. Any `x ∈ C_H(K)` maps into these fixed points, so
+`x̄ = 1`, i.e. `x ∈ H'`. -/
+theorem centralizer_inf_le_derivedInG_of_isComplement' [Finite G] [IsSolvable G]
+    {H K : Subgroup G} [H.Normal] (hHK : H.IsComplement' K) (hH : H ≤ commutator G)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥K)) :
+    Subgroup.centralizer (K : Set G) ⊓ H ≤ derivedInG H := by
+  classical
+  have hNeq : derivedInG H = ⁅H, H⁆ := Subgroup.map_subtype_commutator H
+  rw [hNeq]
+  set N : Subgroup G := ⁅H, H⁆ with hNdef
+  haveI hNnorm : N.Normal := by rw [hNdef]; infer_instance
+  set q : G →* G ⧸ N := QuotientGroup.mk' N with hq
+  have hqsurj : Function.Surjective q := QuotientGroup.mk'_surjective _
+  have hkerq : (q : G →* G ⧸ N).ker = N := QuotientGroup.ker_mk' N
+  set Hbar : Subgroup (G ⧸ N) := H.map q with hHbar
+  set Kbar : Subgroup (G ⧸ N) := K.map q with hKbar
+  haveI hHbarN : Hbar.Normal := by
+    rw [hHbar]; exact (inferInstance : H.Normal).map q hqsurj
+  -- `H̄` is abelian: `⁅H̄, H̄⁆ = (⁅H,H⁆)‾ = N‾ = ⊥`.
+  have hHbar_comm : ⁅Hbar, Hbar⁆ = ⊥ := by
+    rw [hHbar, ← Subgroup.map_commutator, ← hNdef, Subgroup.map_eq_bot_iff, hkerq]
+  letI : CommGroup ↥Hbar :=
+    { (inferInstance : Group ↥Hbar) with
+      mul_comm := fun a b => Subtype.ext (by
+        have hmem : ⁅(a : G ⧸ N), (b : G ⧸ N)⁆ = 1 := by
+          have h := Subgroup.commutator_mem_commutator (G := G ⧸ N) a.2 b.2
+          rwa [hHbar_comm, Subgroup.mem_bot] at h
+        exact (commutatorElement_eq_one_iff_commute.mp hmem).eq) }
+  -- `K̄ ≤ N_Ḡ(H̄) = ⊤`.
+  have hKbarnorm : Kbar ≤ Subgroup.normalizer (Hbar : Set (G ⧸ N)) := by
+    rw [Subgroup.normalizer_eq_top_iff.mpr hHbarN]; exact le_top
+  -- `actionCommutator = ⊤` because `⁅H̄, K̄⁆ = (⁅H,K⁆)‾ = H̄` (first conclusion).
+  have hac : Ch04.actionCommutator
+      ((Subgroup.normalizerMonoidHom Hbar).comp (Subgroup.inclusion hKbarnorm)) = ⊤ := by
+    apply Subgroup.map_injective (Subgroup.subtype_injective Hbar)
+    rw [actionCommutator_conj_map_subtype hKbarnorm,
+      show Subgroup.map Hbar.subtype ⊤ = Hbar from by
+        rw [← MonoidHom.range_eq_map, Subgroup.range_subtype],
+      hHbar, hKbar, ← Subgroup.map_commutator,
+      commutator_eq_self_of_isComplement'_le_commutator hHK hH]
+  -- Prop 1.6(d): fixed points complement `⊤`, hence are trivial.
+  have hcop' : Nat.Coprime (Nat.card ↥Kbar) (Nat.card ↥Hbar) :=
+    (hcop.symm.coprime_dvd_left (K.card_map_dvd q)).coprime_dvd_right (H.card_map_dvd q)
+  have h16d := OddOrder.BG.Ch1.S01.fixedPoints_isComplement_actionCommutator_of_abelian
+    (φ := (Subgroup.normalizerMonoidHom Hbar).comp (Subgroup.inclusion hKbarnorm)) hcop'
+  rw [hac] at h16d
+  have hfpbot : Subgroup.fixedPointsOfMulAut
+      ((Subgroup.normalizerMonoidHom Hbar).comp (Subgroup.inclusion hKbarnorm)) = ⊥ :=
+    Subgroup.isComplement'_top_right.mp h16d
+  have hcentbot : Subgroup.centralizer (Kbar : Set (G ⧸ N)) ⊓ Hbar = ⊥ := by
+    rw [← fixedPointsOfMulAut_conj_map_subtype hKbarnorm, hfpbot, Subgroup.map_bot]
+  -- Transfer: `x ∈ C_H(K) ↦ x̄ ∈ C_Ḡ(K̄) ⊓ H̄ = ⊥`, so `x ∈ ker q = N = H'`.
+  intro x hx
+  obtain ⟨hxC, hxH⟩ := hx
+  have hqx : q x ∈ Subgroup.centralizer (Kbar : Set (G ⧸ N)) ⊓ Hbar := by
+    refine ⟨Subgroup.mem_centralizer_iff.mpr ?_, Subgroup.mem_map_of_mem q hxH⟩
+    intro gb hgb
+    rw [SetLike.mem_coe, hKbar, Subgroup.mem_map] at hgb
+    obtain ⟨k, hkK, rfl⟩ := hgb
+    have hcomm : k * x = x * k := Subgroup.mem_centralizer_iff.mp hxC k hkK
+    rw [← map_mul, ← map_mul, hcomm]
+  rw [hcentbot, Subgroup.mem_bot] at hqx
+  have hxker : x ∈ (q : G →* G ⧸ N).ker := by rw [MonoidHom.mem_ker]; exact hqx
+  rwa [hkerq] at hxker
 
 end /- 6.3 -/
 

@@ -1,5 +1,203 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅ 2026-06-10 Lemma 12.1 COMPLETE (issue 5002 closed)
+
+**`subgroupE_basic` (a)-(g) 全 conjunct sorry-free、unconditional・axiom-clean**
+(standard 3 のみ; keystone forward-axiom にすら非依存)。AxiomsCheck
+`#assert_only_allowed_axioms` 登録、full build 3613 green。commits 9f1d22c4 → 0107bdf2。
+
+下記レシピからの実装上の差分 (handoff 用):
+- **(b)(f) は Frattini でなく Burnside 再編で実装**: `W = N_E(P)`、SZ-補群 `K`、
+  mathlib **`Sylow.commutator_eq_bot_or_commutator_eq_self`** (cyclic Sylow の
+  ⁅K,P⁆ = ⊥ ∨ P dichotomy — Prop 1.6(d) + 鎖論法のパッケージ!) で分岐し、
+  ⊥ 枝は `W ≤ C_E(P)` → Burnside normal p-complement ⊇ E' が `p ∣ |E'|`
+  (`dvd_card_derived_of_mem_tau3`) と矛盾。P 枝が `P = ⁅K,P⁆ ≤ E'`。
+  (f) は P 枝で Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`) +
+  **conjugation bridges** (`actionCommutator_conj_map_subtype` = ⁅P,K⁆,
+  `fixedPointsOfMulAut_conj_map_subtype` = C(K)⊓P) で `C_P(K) = ⊥`。
+- **E∩M' ≤ E'** (`inf_derivedInG_le_derivedInG`): mk' M_σ 商へ写し complement が
+  derived を運ぶ (`Subgroup.map_commutator` + ker 差吸収)。`p∈τ₃ ⟹ p∣|E'|` は
+  `M' ≤ M_σ(E⊓M')` 分解 (IsComplement'.existsUnique) + p∤|M_σ|。
+- **(e) E₂⊴E₁₂** は新 field `E₁₂_hall` 経由: commutator ↥(E₁⊔E₂) の素因子は
+  (τ₁∪τ₂)∩(τ₂∪τ₃) = τ₂ ⟹ Hall τ₂ = E₂ に `normal_le_hall` で吸収 ⟹
+  `normal_of_commutator_le`。E₂ の Hall-in-J 化は `relIndex_mul_relIndex` tower。
+- **(e) E=E₁E₂E₃**: join の subgroupOf index が τ-分割の各 Hall index を割る ⟹ 1。
+- **E₃ ⊴ E**: E₃ = `opiCoreInG τ₃ E'` (nilpotent E' の `oPiCore_isHall_of_isNilpotent` +
+  Hall card 同定) → `le_normalizer_opiCoreInG_of_le_normalizer`。
+- 技法メモ: ⁅g,x⁆ element bracket をソースに直接書くと `Bracket Γ Γ` 不能
+  (scoped notation)。`Subgroup.commutator_mem_commutator` + `commutatorElement_def` rw で回避。
+  `(... : Subgroup _)` の型穴は normalizer 系で解決不能 → private abbrev
+  (`sylowNormalizerE`/`sylowSelfE`) で明示。`set W := ...` を rcases 後の枝でやると
+  既存変数を分裂させる (S09 の罠と同根) → obtain/rcases の前に固定。
+- 再利用資産: `one_le_pRank_of_mem_primeFactors` (Cauchy→pRank≥1)、
+  `isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one`、conjugation bridges、
+  τ-partition 基本層、`isPiGroup_tau23_derived`。public 化:
+  `S10.isCyclic_of_pRank_le_one`、`S10.le_of_coprime_card_index`。
+
+**▶ 次 frontier** (着手可能残): **12.2(a)** (Lem 10.5 のみ・軽)、**12.19** (Cor 10.9(a)
+のみ・軽)、**12.17** (Lem 6.3(a) 第 2 結論 `C_H(K)≤H'` の §6 補完が必要)、**12.18** (大物:
+Thm 1.13 + Thm 3.7 + 式 (12.5)-(12.7))。残り 14 件は 10.13 ブロック (下記 triage)。
+
+## ✅ 2026-06-10 (session 2): 12.2(a) + 6.3(a).2 + 12.17 COMPLETE
+
+着手可能 leaf のうち 3 件を unconditional・axiom-clean で完成 (commits 240809c6 / 6cca7ee2 /
+76f5fcbf)。全 full build 3613 green、AxiomsCheck 登録済。
+
+- **12.2(a)** `prime_mem_sigma_or_tau2` (240809c6): 非自明 p-部分群 `X`, `M*∈ℳ(N_G(X))` ⇒
+  `p∈σ(M*)∪τ₂(M*)`。BG は「by Lemma 10.5」と書くが Lem 10.5 は `X∈ℰ_p¹` 専用ゆえ直接不可。
+  その内部の **cyclic-Sylow 論法** (`pRank_eq_two_of_normalizer_le` step(i) と同型) を一般
+  p-部分群へ適応: `p∉σ(M*)` ⇒ `r_p(M*)≤2`; `r_p=1` なら Sylow p cyclic で `X` characteristic
+  ⇒ `N_G(P)≤N_G(X)≤M*` ⇒ `p∈σ(M*)` 矛盾。Lem 10.5 自体は不使用。
+  支持: `Isaacs.Ch04.characteristic_of_subgroup_of_isCyclic` を public 化。
+  ⚠ 署名の `M/hM/hXM` は part (b) (τ₁∪τ₃ 非共役) 用に保持 (a では未使用、linter warning 容認)。
+- **6.3(a) 第2結論** `centralizer_inf_le_derivedInG_of_isComplement'` (6cca7ee2, S06_Additional):
+  `G` 可解, `H⊴G` 補群 `K`, `H⊆G'`, `(|H|,|K|)=1` ⇒ `C_H(K)⊆H'`。S06 docstring の「§10 critical
+  path 外で TODO」を充足。証明 = `Ḡ=G/H'` で `H̄` 可換・`K̄` coprime 共役作用、action commutator
+  `⁅H̄,K̄⁆=H̄` (第1結論) で全体 ⇒ Prop 1.6(d) で fixed points `C_Ḡ(K̄)⊓H̄=⊥` ⇒ `C_H(K)⊆ker=H'`。
+  **リファクタ**: 汎用共役 bridge `actionCommutator_conj_map_subtype` /
+  `fixedPointsOfMulAut_conj_map_subtype` を S12_E → S06_Additional へ上流移動 (S12 は selective
+  open で従来どおり 12.1(f) 使用)。
+- **12.17** `Msigma_E_relations` (76f5fcbf): `C_{M_σ}(E)⊆M_σ'` ∧ `⁅M_σ,E⁆=M_σ`。両結論とも
+  Lem 6.3(a) を ↥M 内で適用 (M_σ normal Hall, 補群 E, M_σ⊆M') し `M.subtype` で G へ transport。
+  transport 技法: `⁅A,B⁆.map=⁅A.map,B.map⁆` + `map_subgroupOf_eq_of_le`; centralizer は元ごと
+  に ↥M へ持ち上げ。prereq: `Msigma_subgroupOf` (正規), `Msigma_le_derived`+`comap_map_eq_self`
+  (`M_σ⊆M'`), `Msigma_subgroupOf_isHall.coprime_index`+`IsComplement'.index_eq_card` (coprime)。
+  原典 (12.17) の `M_σ∩M^g` cyclic 評価は docstring 通り後続。
+
+### ✅ 12.19 COMPLETE (keystone island, commit da142ebf)
+
+- **12.19** `derivedE_centralizes_betaComplement` COMPLETE。⚠ **keystone island** (Cor 10.9(a)
+  `beta_complement_centralizes` 消費ゆえ Prop 10.11(b)(c)(d) と同じ 2 軸に属す; unconditional
+  ではない)。`#assert_axioms_island` 登録、full build 3613 green。実装した具体経路:
+  - **抽象 Key Lemma** `exists_hall_actsTrivially_of_forall_sylow` (private, 再利用可能): A が
+    可解 N に coprime 作用し各 Sylow が Hall π を固定 ⟹ A が Hall π を固定。witness = A-invariant
+    Hall H₀ (`exists_aInvariant_hall`); 各 Sylow D は共役 c•H_D=H₀ (c は D-fixed,
+    `aInvariant_hall_conj`) を固定 ⟹ D が H₀ 固定; 固定元は部分群で全 Sylow を含む ⟹ ⊤
+    (index の各素因子 p で Sylow_p ≤ K ⟹ p∤index)。
+  - **Helper** `exists_hall_subgroupOf_of_full_factorization` (private): C≤Nsub が full π-part を
+    持てば C の Hall π は Nsub の Hall π (factorization 比較)。
+  - **供給**: 各 prime Sylow D_q (image X_G ≤ M' q-group) は Cor 10.9 を r∈β'∩π(M_σ) ごと集めて
+    C_{M_σ}(X_G) が full β'-part ⟹ Helper で Hall β' を中心化。φ:↥E'→*MulAut↥M_σ は
+    `MulDistribMulAction.compHom`+`toMulAut` (S10_LocalLemmas テンプレ)。X_G=⊥ 枝は C=M_σ で
+    Cor 10.9 不要 (∀ prime q を供給する必要があるため)。
+  - 技法メモ: subgroup の MulAut smul は `toMonoidEnd` で展開されるので `show ... = c*h'*c⁻¹` で
+    conj 形に戻す。`Subtype.ext` は `.val` 形を出し `.subtype` 形の hφ_coe と不一致 → `subtype_injective`
+    を使う。`map_subtype_commutator` は bare だと unfold 形を rw 探索 → `have h:derivedInG=⁅,⁆` 経由。
+
+### ▶ 残り着手可能 leaf (D-lane §12 next frontier)
+
+- **12.18** `tau1_Malpha_interaction`: 大物 (Thm 1.13 + Thm 3.7(両 landed) + Uniqueness +
+  Cor 10.9(a)(2) + 式 (12.5)-(12.7))。§11 非依存だが本文最厚クラス。Cor 10.9(a)(2) 消費なら
+  keystone island になる見込み。S12_E 実 sorry は 12.19 完了で 15。
+
+## ✅ 2026-06-10 (session 3): 12.18 building blocks 3 件 landed + 精密 assembly recipe
+
+12.18 (`tau1_Malpha_interaction`, mmd L3484-3508, 本文最厚) を精密 recon し、**hard かつ
+再利用可能な infrastructure 3 件**を sorry-free・unconditional・axiom-clean で land
+(commits f111961f, b113206c)。assembly の全依存署名を確定 (全 dep 存在確認済)。
+
+### landed building blocks (S12_E.lean, 全 axiom-clean)
+- `maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1` (Helper A): `p∈τ₁ ∧ P≤M ∧
+  P≠⊥ ∧ IsPGroup p P ⇒ ℳ(N_G(P))≠{M}`。Lemma 12.2(a) 背理。⟹ (12.6) の入力。
+- `exists_charSubgroup_exponent_not_centralized` (BG Thm 1.13 機構): q-群 Q が r-群 R 正規化・
+  非中心化 (奇位数) ⇒ ∃ R₁≤R char-in-R, exp r, Q 非中心化。`thompson_critical_omega` の
+  `autCentralizer` r-群性 + φ:↥Q→*MulAut↥R で orderOf(φx) r-冪∧q-冪⟹1。**pure group theory・§13+ 再利用可**。
+- `exists_invariant_sylow_Malpha_rank_three` (BB3): r∈α, α'-subgroup X≤M ⇒ ∃ R≤M_α X-不変 Sylow r,
+  rank≥3。Lemma 10.3 テンプレ (`aInvariant_pSubgroup_le_aInvariant_sylow` を ⊥ から)。**X:=P⊔Q で使う**。
+
+### 残 = (a) assembly + (b) reduction (issue 5003 に手順詳細・全 dep 名)
+- **2 つの infra ギャップ判明**: (1) **Thm 10.2(d)** (M'非nilpotent⇒M_α≠1) 未形式化 →
+  `derived_quotient_Malpha_le_fitting` (S10:1490) + quotient-by-⊥ で BB4 として要構築 (part b の M_α≠⊥);
+  (2) **quotient 形 Thm 3.7 なし** → (a) hard core の QN/R₀ は ambient (Q⊔N⊔P)/R₀ 商で form-2 適用。
+- (a) は **2 conjunct 別 land 推奨**: 第1 `C_{M_α}(P)≠⊥` [reachable ~150 行, 全 dep 確認] /
+  第2 `C_{M_α}(PQ)=⊥` [hard core, Ω₁ cyclic bookkeeping + QN/R₀ quotient]。
+- 確認済 assembly dep: `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` (12.5/12.6),
+  `normalizer_le_normalizer_map_of_characteristic` (AppB:232, char⟹normalizer),
+  `coprime_fixedPoints_quotient` (ForwardFromCh03:808, C_{QR₁}(P)≤R₁),
+  `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (Thm 3.7 form-2), `mem_elemAbelianOfRank` (|P|=p)。
+  nilpotent⟹commute は S10_LocalLemmas:1080 が private ゆえ 2 行再証 (coprime orderOf)。
+
+### session 3 cont.: assembly helpers 2 件 + (a) 第1連言 COMPLETE (計 6 commit)
+
+- **H2** `inf_centralizer_sup_eq_bot_of_le_normalizer` + **card helper** `card_sup_eq_mul_of_le_normalizer_of_disjoint`
+  (commit b6935baa) + `commute_of_coprime_orderOf_of_isNilpotent` de-privatize (S10_LocalLemmas)。
+- **✅✅ (a) 第1連言 `tau1_Malpha_centralizer_P_ne_bot` COMPLETE** (commit fc769550,
+  **unconditional・axiom-clean**) — `C_{M_α}(P)≠⊥`。building blocks 5 件が実合流。
+  **(12.7) order-count 不要** (C_{R₁}(P)≠1 ⟹ C_{M_α}(P)⊇C_{R₁}(P)≠1)。FPF は H2 → element-wise
+  (⟨a⟩=P via `eq_of_le_of_card_ge`) → Thm 3.7 form-2。
+- **残 = (a) 第2連言 `C_{M_α}(PQ)=⊥`** [hard core: Ω₁ cyclic bookkeeping + QN/R₀ ambient-quotient
+  Thm 3.7] + **part(b) reduction** (BB4 Thm10.2(d) + Uniqueness + Cor10.9(a)(2)) + assemble。
+  全 building block は再利用可ゆえ第2連言/(b) は setup 共有可。詳細手順 = issue 5003。
+- build 地雷録 (issue 5003 にも): `Nat.Coprime.mul` 不在 (Coprime=Eq, dot 不可) → `coprime_comm`+`Nat.Coprime.mul_right`;
+  `orderOf_coe`/`orderOf_mk` 不在 → `orderOf_injective`; `rank_bot` 不在 → R≠⊥ は C(⊥)=⊤ 経由;
+  `Subgroup.orderOf_dvd_natCard P haP` (subgroup 明示)。
+
+## 2026-06-10 D-lane triage (issue 5002): §11 依存 vs 着手可能の定理単位分類
+
+mmd L3023-3483 全 19 結果の証明を精読して依存を確定 (再 triage 不要)。
+**ブロッカーの根 = Thm 11.7 / Lem 10.13 (どちらも Lemma 10.13 = c-bg-s10 委任領域)**。
+
+### 着手可能 (§11 非依存) — 5 件
+
+| 結果 | Lean name | 依存 (mmd 確認済) |
+|---|---|---|
+| **Lem 12.1** | `subgroupE_basic` | Thm 10.2 (`isHall_Msigma_Malpha`), Lem 4.5(a) (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` の対偶), Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`), Lem 10.4(c) (`alpha_criterion`.2) |
+| **Lem 12.2(a)** | `prime_mem_sigma_or_tau2` | Lem 10.5 のみ ((b) 非共役 clause が Thm 10.1(b) — Lean surface は (a) のみ) |
+| **Lem 12.17** | `Msigma_E_relations` | Lem 6.3(a) のみ。`[M_σ,E]=M_σ` は landed (`commutator_eq_self_of_isComplement'_le_commutator`); `C_{M_σ}(E)⊆M_σ'` は Lem 6.3(a) **第 2 結論** (未 landed、§6 で証明可能・keystone 非依存) |
+| **Lem 12.19** | `derivedE_centralizes_betaComplement` | Cor 10.9(a) (✅ landed) + 互いに素 |
+| **Lem 12.18** | `tau1_Malpha_interaction` | Lem 12.2(a) + Thm 1.13 + Thm 3.7 (✅ landed) + Thm 10.2(d) + Uniqueness + Cor 10.9(a)(2) + 式 (12.5)-(12.7)。§11 非依存だが大物 |
+
+### ブロック (Thm 11.7 = Lem 10.13 経由) — 14 件
+
+- **Lem 12.3** (`elemAb_centralizes_meet`): 証明が **Thm 11.7 を直接使用** ("it follows from
+  Theorem 11.7 that M*_σA ⊴ M*") + Cor 11.4 + Lem 10.12(a) + Lem 12.2(b)。
+- **Prop 12.4** ← 12.3。 **Thm 12.5** ← 12.4 + **Thm 11.3/11.5/11.7 + Cor 11.6 直接**。
+- τ₂-case cascade: **Cor 12.6** ← 12.5; **Thm 12.7** ← 12.5/12.6 + **Lem 10.13(b)(c) 直接**;
+  **Lem 12.8** ← 12.7(a); **Cor 12.9** ← 12.8(e)/12.7(c); **Cor 12.10** ← 12.5(b)/12.7(a)/12.8(a);
+  **Lem 12.11** ← 12.6/12.5/12.10(c)/12.7(d); **Thm 12.12** ← 12.7/12.8/12.6(c)/12.5(f)/12.11(c)。
+- σ-side: **Thm 12.13** ← 12.10(a)(d)/12.4 + Cor 10.7(b); **Cor 12.14** ← 12.13;
+  **Prop 12.15** ← 12.10(d)/12.2/12.5(e)/12.6; **Cor 12.16** ← 12.15/12.5(e)/12.6(f)。
+
+⟹ forward-axiom 化はしない (LAUNCH.md の方針どおり §11 ブロック分は素通し)。10.13 が
+解ければ §11 (11.5/11.6/11.7) → 12.3 → cascade が一斉に開く。
+
+### ⚠ scaffold statement 訂正 (2026-06-10): 12.1(e) `E₂ ⊴ E₁⊔E₂` は旧 setup で偽
+
+原文は **`E₁₂` を Hall τ₁∪τ₂-subgroup として固定し、`E₁`,`E₂` をその内部の Hall** に取る
+(mmd L3029)。旧 `SubgroupESetup` は E₁/E₂ を E の独立な Hall とし `E12 := E₁ ⊔ E₂` と
+再定義していたため、E₁ だけ共役でずらすと `E₂ ⋪ E₁⊔E₂` の反例が組める
+(例: E = (C₃₁⋊C₁₅)×C₅, τ₁={3}, τ₂={5}, τ₃={31}; E₁ = ⟨a y a⁻¹⟩ (a∈C₃₁) に対し
+⁅E₁,E₂⁆ が C₃₁ 成分を持ち E₁⊔E₂ = E ⊉ normalizer E₂)。
+**修正 = `SubgroupESetup` に field `E₁₂_hall : IsHallSubgroup (tau1 M ∪ tau2 M)
+((E₁ ⊔ E₂).subgroupOf E)` を追加** (原文 faithful 化)。producer 義務は §13 活用時に
+12.1(e) と同じ論法 (E₁₂' ≤ O_{τ₂}(E₁₂) ≤ E₂ ⟹ E₂ ⊴ E₁₂ ⟹ |E₁E₂|=|E₁₂|) で果たせる
+(非 vacuous)。S12/S13 に constructor 使用なし ⟹ 波及ゼロ。
+
+### Lem 12.1 実装レシピ (確定)
+
+- **(a) E' nilpotent**: 原文の Thm 10.2「M'/M_σ nilpotent」は repo 未収載 (docstring「追加予定」)。
+  **Thm 4.20(a) `derived_le_fitting_of_rank_fitting_le_two` で代替** (issue 5001(b) と同じ手):
+  E は σ'-群 (M_σ Hall σ の補群) ⟹ π(E)∩α=∅ ⟹ rank E ≤ 2 ⟹ E' ≤ F(E) nilpotent。
+  rank≤2 論法は issue 5001 part(a) Step 2 のコードがテンプレート。
+- **(d) E₁ cyclic**: E₁∩M' = ⊥ (π(E₁)⊆τ₁, π(M') 排反, card 論法) ⟹ E₁' = ⊥ abelian;
+  各 Sylow cyclic (Lem 4.5(a) 対偶 + r_p(M)=1); abelian + 全 Sylow cyclic ⟹ cyclic
+  (nilpotent π-分解 or `IsZGroup`)。E₃ cyclic は (b) E₃ ⊆ E' nilpotent + Sylow cyclic で同様。
+- **(b)(f)**: p∈τ₃ ごと P = Sylow p of E。E' nilpotent ⟹ O_p(E')⊴E は P に入り
+  O_{p'}(E')⊴E ⟹ **N⊔P_G ⊇ E' ⟹ N⊔P_G ⊴ E** (N = O_{p'}(E); quotient 回避、derived を含む
+  部分群は normal)。Frattini (`Sylow.normalizer_sup_eq_top`) ⟹ E = N·N_E(P)。SZ で
+  K = complement of P in N_E(P)。[P,K]=1 と仮定 ⟹ E' ≤ N⊔K' (commutator calculus,
+  P abelian) ⟹ E' ≤ NK p'-群 ⟹ P∩E'=⊥、p∈π(E') に矛盾 ⟹ [P,K]≠1。
+  Prop 1.6(d) (`fixedPoints_isComplement_actionCommutator_of_abelian`, φ = conj action) ⟹
+  P = C_P(K) × [P,K]、P cyclic p-群の部分群束は鎖 ⟹ C_P(K)=⊥ ∧ [P,K]=P ⊆ E'。
+  (f) は C_{E₃}(E) の p-part ⊆ C_P(K) = ⊥。
+- **(e)**: π(E') ⊆ τ₂∪τ₃ (E'≤M'∩E, τ₁∩π(M')=∅) ⟹ E' ≤ E₂⊔E₃
+  (`Subgroup.IsPiGroup.normal_le_hall`; E₂⊔E₃ = E₂E₃ Hall τ₂∪τ₃, card = |E₂||E₃| via E₃⊴E)
+  ⟹ E₂⊔E₃ ⊴ E (⊇ derived)。E = E₁⊔(E₂⊔E₃) は card。E₂ ⊴ E₁₂ は新 field `E₁₂_hall` 経由で
+  E₁₂'( ≤ E'∩E₁₂ τ₂-群 normal) ≤ O_{τ₂}(E₁₂) ≤ E₂。
+- **(c)**: E ≠ ⊥ (M_σ ≤ M' ⊊ M, solvable nontrivial M ⟹ E ≅ M/M_σ ≠ 1)。E₂=E₁=⊥ なら
+  (e) で E = E₃ ⊆ E' ⟹ perfect ⟹ E 可解と矛盾。
+- **(g)**: `alpha_criterion`.2 直接 (p.Prime は `mem_primeFactors_card_of_pos_pRank` 経由)。
+
 ## 2026-06-02 B7 foundation checkpoint
 
 Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S12_E.lean`.
