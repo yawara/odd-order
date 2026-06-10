@@ -1081,15 +1081,47 @@ session 20 の「次の一手」step 2 = (1.4) per-column 適用を完成。buil
   tactic は見ない → 明示型 `have h3 : 3 ≤ Nat.card h.W1 := …`; (iii) coercion 先型は omega 本来の
   出力型 `↥sdiffTICyclicHypothesis.W` に合わせる (構文的 instance 探索)。
 
-### ▶▶ 次 = (4.3.b) step 3-5 [cross-column distinct → σ 同定 → (4.3.c)(d)]
+### ✅ 着地 (session 21 cont.): step 3 = cross-column distinctness COMPLETE
 
-1. **列間 distinct** (step 3): (4.1) `pairwise_inner_eq_zero_of_orthogonal_signedDifference`
-   (InducedIrreducible) で異 χ₂ 列の μ が直交 → 全 μ_{ij} distinct。署名族の合成が要。
-2. **σ 同定** (step 4): `eq_sigma_of_apply_eq_on_V` (3.9.a) + `exists_sigma` を
-   `toTICyclicHypothesis` (hVeq=rfl) 上で。σ(ω_{ij}) = δ_j μ_{ij} を確立。ここが (4.3.b) の
-   deep piece — μ_{ij} (族から) が σ(ω_{ij}) と一致することを示す (norm-1 virtual + V 上一致)。
-3. その後 (4.3.c) 値 + 消滅 ((1.3)(a) `eq_zero_of_mem_of_inner_supported_eq_zero` S05:2158) →
-   (4.3.d) 次数合同 → (4.4)(小) → (4.5) ([Is]6.32=ConjugationBrauer 済)。
+`exists_columnSignedFamily` の上に列間 distinct を完成 (全 build-green + axiom-clean):
 
-正本 = 本ノート (session 21)。**Don't re-grind (4.3.b) step 1-2 — `exists_columnSignedFamily`
-完成・axiom-clean。bridge instance パターン確立。**
+1. **`columnFamily`** (choice) + `columnFamily_spec` — per-column `SignedIrreducibleDifferenceFamily L w₁`。
+2. **`omega_diff_cross_inner_eq_zero`** (一般 hyp): χ₂≠χ₂' で ω-差の CF(W) 直交 (4 項とも
+   `omegaProdChar` 別 index ⟹ `omega_inner_ne` で 0)。`omegaProdChar_ne_of_ne_right` 補助。
+3. **`ind_cross_inner_eq_zero`**: Dade 等長 (`sdiffFullDadeIsometryData.inner_eq`) で Ind 像の列間直交
+   = ω-差直交 = 0。
+4. **`columnFamily_difference_apply_one`** (μ-差は 1 で消える, sign 除去) +
+   **`columnFamily_difference_cross_inner_eq_zero`** (μ-差の列間直交, 両 sign 除去;
+   `Int.cast_smul_eq_zsmul`+`inner_smul_left/right`+`star_intCast`)。
+5. **`columnFamily_cross_products_zero`** (核): (4.1) `pairwise_inner_eq_zero_of_orthogonal_signedDifference`
+   適用 (u=v=1, witnesses k,k'≠0) → 4 cross products `(μ_{kj},μ_{k'j'})`/`(μ_{kj},μ_{0j'})`/
+   `(μ_{0j},μ_{k'j'})`/`(μ_{0j},μ_{0j'})` 全 = 0。
+6. **`columnFamily_mu_ne`** (capstone): χ₂≠χ₂' で μ_{ij}≠μ_{i'j'} (i,i'=0? の 4 ケース分析で
+   cross_products の適切な射影を選択; nonzero witness=`⟨1,one_lt_card_W1⟩`) +
+   **`columnFamily_mu_injective`** (global: (χ₂,i)↦μ injective; 列内=`.injective`, 列間=`columnFamily_mu_ne`)。
+
+Lean 地雷追記: (iv) (4.1) の `u•γ` は `((1:ℝ):ℂ)•` ⟹ `Complex.ofReal_one`+`one_smul`;
+(v) `inner_smul_right` は mathlib と RepresentationTheory で曖昧 → 後者を明示修飾;
+(vi) `difference`/`classFunction` abbrev は exact では defeq だが simpa では要 `difference_apply`/`classFunction_apply`。
+
+### ▶▶ 次 = (4.3.b) step 4-5 [σ 同定 → (4.3.c)(d)] — RECON 済 (session 21 cont.)
+
+**🔑 step 4 の正確な還元 (再調査するな)**: `eq_sigma_of_apply_eq_on_V` (S05:3637, hyp=`toTICyclicHypothesis`,
+hVeq=rfl, app=`FullDadeApplication`) は `σ(ω_{ij})=δ_j μ_{ij}` を **3 入力のみ**に還元する:
+(i) δ_j μ_{ij} ∈ ZIrr (易: μ irr × δ=±1), (ii) inner=1 (易), (iii) **hres: ∀v∈V, (δ_j μ_{ij})(v)=ω_{ij}(v)**。
+NC≤2 論法は theorem 内部。⟹ **step 4 の唯一の hard piece = hres (V=W−(W₁∪W₂) 上の個別値一致)**。
+
+**🛑 hres の障害 = (1.3) value-transport (個別値)**: `full_map_eq_of_mem_V` (S05:151, Dade=restriction on V)
+は **差の値一致しか出ない** — `δ_j(μ_{ij}−μ_{0j})(v)=(ω_{ij}−ω_{0j})(v)` (v∈W−W₂⊇V)。個別
+`δ_j μ_{ij}(v)=ω_{ij}(v)` には Peterfalvi (1.3) の value-transport 機構が要る (i=0 基底が非自明)。
+S03 に (1.3) inner-product naming (L447) + induced-char expansion (L505) は在るが、σ-同定用の
+個別 value-match lemma は**未形式化**。候補ルート: (a) α-basis `α_{ij}=1−ω_{i0}−ω_{0j}+ω_{ij}∈CF(W,V)`
+で σ(α_{ij})=Ind(α_{ij}) (σ=Ind on CF(W,V)) + σ-linearity の漸化構造 (σ(1)=1_L base) → 個別値;
+(b) (1.3) を S03 に直接形式化。**未着手 — 次セッションの第一 leaf。**
+
+その後 (4.3.c) 値 + 消滅 ((1.3.a) masking `eq_zero_of_mem_of_inner_supported_eq_zero` S05:2158) →
+(4.3.d) 次数合同 → (4.4)(小) → (4.5) ([Is]6.32=ConjugationBrauer 済)。
+
+正本 = 本ノート (session 21 + cont.)。**Don't re-grind (4.3.b) step 1-3 — `exists_columnSignedFamily` +
+`columnFamily_mu_injective` 完成・axiom-clean。bridge instance + sign-removal パターン確立。
+step 4 = hres (個別 V-値) のみ、(1.3) value-transport が gating。**

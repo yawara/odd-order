@@ -60,6 +60,36 @@ theorem omega_omegaProdChar_sub_eq_zero_of_mem_W2 (hyp : TICyclicHypothesis L)
     omegaProdChar_apply_of_mem_W2 hyp χ₁ χ₂ hw,
     omegaProdChar_apply_of_mem_W2 hyp χ₁' χ₂ hw, sub_self]
 
+/-- Characters in different `W₂`-columns are distinct: `ω_{aj} ≠ ω_{bj'}` when `j ≠ j'`
+(`omegaProdChar` is injective in the index pair, `omegaProdChar_inj`). -/
+theorem omegaProdChar_ne_of_ne_right (hyp : TICyclicHypothesis L)
+    {χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (χ₁ χ₁' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.omegaProdChar χ₁ χ₂ ≠ hyp.omegaProdChar χ₁' χ₂' :=
+  hyp.omegaProdChar_ne (fun h => hne h.2)
+
+/-- **Cross-column orthogonality of `ω`-differences**: for `χ₂ ≠ χ₂'`, the difference
+`ω_{aj} − ω_{a₀j}` is orthogonal to `ω_{bj'} − ω_{b₀j'}`.  All four `ω`-terms have
+distinct index pairs (the `W₂`-components differ), so each cross inner product vanishes
+(`omega_inner_ne`).  This is the source-side input feeding (4.1) for the cross-column
+distinctness of the certain-type characters. -/
+theorem omega_diff_cross_inner_eq_zero (hyp : TICyclicHypothesis L)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)]
+    {χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (a a₀ b b₀ : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) :
+    ClassFunction.inner
+      ((hyp.omega (hyp.omegaProdChar a χ₂) : ClassFunction hyp.W ℂ)
+        - (hyp.omega (hyp.omegaProdChar a₀ χ₂) : ClassFunction hyp.W ℂ))
+      ((hyp.omega (hyp.omegaProdChar b χ₂') : ClassFunction hyp.W ℂ)
+        - (hyp.omega (hyp.omegaProdChar b₀ χ₂') : ClassFunction hyp.W ℂ)) = 0 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right,
+    hyp.omega_inner_ne (omegaProdChar_ne_of_ne_right hyp hne a b),
+    hyp.omega_inner_ne (omegaProdChar_ne_of_ne_right hyp hne a b₀),
+    hyp.omega_inner_ne (omegaProdChar_ne_of_ne_right hyp hne a₀ b),
+    hyp.omega_inner_ne (omegaProdChar_ne_of_ne_right hyp hne a₀ b₀)]
+  ring
+
 namespace Hypothesis
 
 variable (h : Hypothesis L)
@@ -92,6 +122,12 @@ noncomputable def omegaColumnDiff
 that `(0 : Fin w₁)` — the distinguished index of the (1.4) machinery — is available. -/
 theorem neZero_card_W1 : NeZero (Nat.card h.W1) :=
   ⟨by have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1; omega⟩
+
+/-- `1 < w₁` (it is `≥ 3`), giving a nonzero index `⟨1, _⟩ : Fin w₁` for the (4.1)
+witnesses in the cross-column distinctness argument. -/
+theorem one_lt_card_W1 : 1 < Nat.card h.W1 := by
+  have h3 : 3 ≤ Nat.card h.W1 := h.sdiffTICyclicHypothesis.three_le_card_W1
+  omega
 
 /-- An arbitrary reindexing `Fin w₁ ≃ Ŵ₁` of the `W₁`-dual, from the cardinality match
 (Pontryagin self-duality `card_charGroup_subgroupOf`: `|Ŵ₁| = |W₁| = w₁`). -/
@@ -266,6 +302,156 @@ theorem exists_columnSignedFamily [NeZero (Nat.card h.W1)]
   exact isometry_difference_pair_structure (G := L)
     (H := h.sdiffTICyclicHypothesis.W) hn (h.chiColumn χ₂) (h.chiColumn_injective χ₂)
     hdeg h.induceZ h_image_virtual h_image_degree_zero h_isom
+
+/-- A choice of the (1.4) signed irreducible-difference family for the `W₂`-column `χ₂`
+(`exists_columnSignedFamily`): the data `{μ_{ij}, δ_j}` of (4.3.b). -/
+noncomputable def columnFamily [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    SignedIrreducibleDifferenceFamily L (Nat.card h.W1) :=
+  (h.exists_columnSignedFamily χ₂).choose
+
+theorem columnFamily_spec [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i =
+      (h.columnFamily χ₂).signedDifference i :=
+  (h.exists_columnSignedFamily χ₂).choose_spec i
+
+/-- **Cross-column orthogonality of the (1.4) images** (4.3.b proof step): for `χ₂ ≠ χ₂'`,
+`(Ind_W^L(ω_{ij} − ω_{0j}), Ind_W^L(ω_{i'j'} − ω_{0j'})) = 0`.  The §4 Dade map on
+`CF(W, W − W₂)` is an isometry, so this equals the source cross inner product
+`omega_diff_cross_inner_eq_zero`, which vanishes because the two columns use distinct
+`W₂`-duals. -/
+theorem ind_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (i i' : Fin (Nat.card h.W1)) :
+    ClassFunction.inner (isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i)
+      (isometryDifferenceImage h.induceZ (h.chiColumn χ₂') i') = 0 := by
+  rw [h.isometryDifferenceImage_eq_dade χ₂ i, h.isometryDifferenceImage_eq_dade χ₂' i',
+    h.sdiffFullDadeIsometryData.inner_eq, omegaColumnDiff_coe, omegaColumnDiff_coe]
+  exact omega_diff_cross_inner_eq_zero h.sdiffTICyclicHypothesis hne _ _ _ _
+
+/-- The (1.4) image of the column family vanishes at `1` (the source difference
+`ω_{ij} − ω_{0j}` has degree `0`, and `Ind` preserves that). -/
+theorem image_apply_one_eq_zero [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    isometryDifferenceImage h.induceZ (h.chiColumn χ₂) i (1 : L) = 0 := by
+  rw [isometryDifferenceImage_induceZ, ClassFunction.induce_apply_one,
+    ClassFunction.sub_apply, h.chiColumn_apply_one χ₂ i, h.chiColumn_apply_one χ₂ 0,
+    sub_self, mul_zero]
+
+/-- The signed differences `μ_{ij} − μ_{0j}` of the column family vanish at `1`
+(same degree within a column), since the (1.4) image does and `δ_j ≠ 0`. -/
+theorem columnFamily_difference_apply_one [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    (h.columnFamily χ₂).difference i (1 : L) = 0 := by
+  have h0 : (h.columnFamily χ₂).signedDifference i (1 : L) = 0 := by
+    rw [← h.columnFamily_spec χ₂ i]; exact h.image_apply_one_eq_zero χ₂ i
+  rw [SignedIrreducibleDifferenceFamily.signedDifference_apply, ClassFunction.zsmul_apply,
+    zsmul_eq_mul] at h0
+  have hs : ((h.columnFamily χ₂).sign : ℂ) ≠ 0 := by
+    rcases (h.columnFamily χ₂).sign_eq with he | he <;> rw [he] <;> norm_num
+  exact (mul_eq_zero.mp h0).resolve_left hs
+
+/-- **Cross-column orthogonality of the `μ`-differences** (4.3.b proof step): for `χ₂ ≠ χ₂'`,
+`(μ_{ij} − μ_{0j}, μ_{i'j'} − μ_{0j'}) = 0`.  From the (1.4)-image cross orthogonality
+(`ind_cross_inner_eq_zero`) after removing both signs `δ_j, δ_{j'} = ±1`. -/
+theorem columnFamily_difference_cross_inner_eq_zero [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (i i' : Fin (Nat.card h.W1)) :
+    ClassFunction.inner ((h.columnFamily χ₂).difference i)
+      ((h.columnFamily χ₂').difference i') = 0 := by
+  have h0 := h.ind_cross_inner_eq_zero hne i i'
+  rw [h.columnFamily_spec χ₂ i, h.columnFamily_spec χ₂' i',
+    SignedIrreducibleDifferenceFamily.signedDifference_apply,
+    SignedIrreducibleDifferenceFamily.signedDifference_apply,
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign ((h.columnFamily χ₂).difference i),
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂').sign ((h.columnFamily χ₂').difference i'),
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    star_intCast] at h0
+  have hs : ((h.columnFamily χ₂).sign : ℂ) ≠ 0 := by
+    rcases (h.columnFamily χ₂).sign_eq with he | he <;> rw [he] <;> norm_num
+  have hs' : ((h.columnFamily χ₂').sign : ℂ) ≠ 0 := by
+    rcases (h.columnFamily χ₂').sign_eq with he | he <;> rw [he] <;> norm_num
+  exact (mul_eq_zero.mp ((mul_eq_zero.mp h0).resolve_left hs)).resolve_left hs'
+
+/-- **The four cross inner products vanish** (4.3.b proof step, via (4.1)).  For `χ₂ ≠ χ₂'`
+and nonzero `k, k'`, the signed differences `μ_{kj} − μ_{0j}` and `μ_{k'j'} − μ_{0j'}` are
+orthogonal (`columnFamily_difference_cross_inner_eq_zero`) and vanish at `1`
+(`columnFamily_difference_apply_one`), so Peterfalvi (4.1) forces all four cross inner
+products `(μ_{kj}, μ_{k'j'})`, `(μ_{kj}, μ_{0j'})`, `(μ_{0j}, μ_{k'j'})`, `(μ_{0j}, μ_{0j'})`
+to vanish. -/
+theorem columnFamily_cross_products_zero [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    {k k' : Fin (Nat.card h.W1)} (hk : k ≠ 0) (hk' : k' ≠ 0) :
+    ClassFunction.inner ((h.columnFamily χ₂).mu k : ClassFunction L ℂ)
+        ((h.columnFamily χ₂').mu k' : ClassFunction L ℂ) = 0 ∧
+      ClassFunction.inner ((h.columnFamily χ₂).mu k : ClassFunction L ℂ)
+        ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) = 0 ∧
+      ClassFunction.inner ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+        ((h.columnFamily χ₂').mu k' : ClassFunction L ℂ) = 0 ∧
+      ClassFunction.inner ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+        ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) = 0 := by
+  have hself : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1)) (m : Fin (Nat.card h.W1)),
+      ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu m : ClassFunction L ℂ) = 1 := by
+    intro d m; rw [irreducibleCharacter_inner, if_pos rfl]
+  have horth : ∀ (d : SignedIrreducibleDifferenceFamily L (Nat.card h.W1))
+      {m n : Fin (Nat.card h.W1)}, m ≠ n →
+      ClassFunction.inner (d.mu m : ClassFunction L ℂ) (d.mu n : ClassFunction L ℂ) = 0 := by
+    intro d m n hmn
+    rw [irreducibleCharacter_inner, if_neg (fun heq => hmn (d.injective heq))]
+  refine pairwise_inner_eq_zero_of_orthogonal_signedDifference (Γ := L)
+    (u := 1) (v := 1) one_ne_zero one_ne_zero
+    ((h.columnFamily χ₂).mu k).mem_ZIrr (hself _ k)
+    ((h.columnFamily χ₂).mu 0).mem_ZIrr (hself _ 0)
+    ((h.columnFamily χ₂').mu k').mem_ZIrr (hself _ k')
+    ((h.columnFamily χ₂').mu 0).mem_ZIrr (hself _ 0)
+    (horth _ hk) (horth _ hk') ?_ ?_ ?_
+  · -- (μ_{kj} − μ_{0j}, 1•μ_{k'j'} − 1•μ_{0j'}) = 0
+    simp only [Complex.ofReal_one, one_smul]
+    exact h.columnFamily_difference_cross_inner_eq_zero hne k k'
+  · -- (μ_{kj} − μ_{0j})(1) = 0
+    exact h.columnFamily_difference_apply_one χ₂ k
+  · -- (1•μ_{k'j'} − 1•μ_{0j'})(1) = 0
+    simp only [Complex.ofReal_one, one_smul]
+    exact h.columnFamily_difference_apply_one χ₂' k'
+
+/-- **Peterfalvi (4.3.b), cross-column distinctness**: certain-type characters from
+different `W₂`-columns are distinct — `μ_{ij} ≠ μ_{i'j'}` for `χ₂ ≠ χ₂'` and any `i, i'`.
+By `columnFamily_cross_products_zero` (the four cross inner products vanish, via (4.1)),
+`(μ_{ij}, μ_{i'j'}) = 0`; orthogonal irreducibles are distinct.  A case split on `i, i' = 0`
+selects which of the four products to read (the (4.1) witnesses use the nonzero index `1`). -/
+theorem columnFamily_mu_ne [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (i i' : Fin (Nat.card h.W1)) :
+    (h.columnFamily χ₂).mu i ≠ (h.columnFamily χ₂').mu i' := by
+  have hz : (⟨1, h.one_lt_card_W1⟩ : Fin (Nat.card h.W1)) ≠ 0 := Fin.ne_of_val_ne (by simp)
+  have hinner : ClassFunction.inner ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
+      ((h.columnFamily χ₂').mu i' : ClassFunction L ℂ) = 0 := by
+    rcases eq_or_ne i 0 with hi | hi <;> rcases eq_or_ne i' 0 with hi' | hi'
+    · subst hi; subst hi'
+      exact (h.columnFamily_cross_products_zero hne hz hz).2.2.2
+    · subst hi
+      exact (h.columnFamily_cross_products_zero hne hz hi').2.2.1
+    · subst hi'
+      exact (h.columnFamily_cross_products_zero hne hi hz).2.1
+    · exact (h.columnFamily_cross_products_zero hne hi hi').1
+  intro heq
+  rw [heq, irreducibleCharacter_inner, if_pos rfl] at hinner
+  exact one_ne_zero hinner
+
+/-- **Peterfalvi (4.3.b), all certain-type characters distinct**: the global family
+`(χ₂, i) ↦ μ_{ij}` is injective.  Within a column by the (1.4) `injective` field;
+across columns by `columnFamily_mu_ne`. -/
+theorem columnFamily_mu_injective [NeZero (Nat.card h.W1)] :
+    Function.Injective
+      (fun p : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) × Fin (Nat.card h.W1) =>
+        (h.columnFamily p.1).mu p.2) := by
+  rintro ⟨χ₂, i⟩ ⟨χ₂', i'⟩ heq
+  by_cases hχ : χ₂ = χ₂'
+  · subst hχ
+    obtain rfl : i = i' := (h.columnFamily χ₂).injective heq
+    rfl
+  · exact absurd heq (h.columnFamily_mu_ne hχ i i')
 
 end Recipe
 
