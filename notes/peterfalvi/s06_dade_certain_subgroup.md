@@ -1334,3 +1334,68 @@ axiom-clean (allowlist 3), **full build 3631 + AxiomsCheck OK**。
 正本 = 本ノート (session 24)。**Don't re-grind (4.5)(a) 土台 — 完成・axiom-clean (c1ee2178)。**
 **degree-counting helper (iv)(H2) は exists_natFinsupp_eq_sum から自作 (単一版 apply_one_re_le は既存)。
 他レーン (BG/RepresentationTheory) ファイルは触らず helper は leaf 内に置く (CLAUDE 規約)。**
+
+## 2026-06-11 (session 25, b-peterfalvi): ✅✅ (4.5)(a) 完結 — χ_j∈Irr(K) + Ind^L_K χ_j = μ_j
+
+session 24 が残した「(4.5)(a) 後半」を完全形式化。全 `S06_CertainTypeClifford.lean`、sorry-free・
+axiom-clean (allowlist 3: propext/Classical.choice/Quot.sound)・**full build 3631 + AxiomsCheck OK**。
+leaf 557 行 (1500 trigger 未満)。**§6 frontier = (4.5)(b) [Irr(L) exhaustion] に前進。**
+
+### ✅ 着地 (session 25)
+- **core `exists_irreducible_restrict_certainType`** (`OddOrder.Peterfalvi.S06.Hypothesis.*`):
+  `∃ θ:Irr(↥K), Res^L_K μ_{0j} = ↑θ ∧ Ind^L_K ↑θ = ∑_i μ_{ij}` を一度に返す
+  (packaging の defeq 罠を避けるため両結論を 1 証明に束ねた)。
+  - θ = `exists_liesOver (cf.mu 0)` の constituent → 各 μ_{ij} liesOver θ (`restrict_certainType_eq`
+    で制限一致) → μ_{ij} は Ind θ の constituent (`inner_induce_ne_zero_iff_liesOver`) →
+    degree bound `w₁·μ_{0j}(1) = ∑_i μ_{ij}(1) ≤ (Ind θ)(1) = w₁·θ(1)` で `μ_{0j}(1) ≤ θ(1)` →
+    `eq_of_apply_one_re_le_of_inner_ne_zero` (singleton tight-bound) で χ_j = ↑θ。
+  - degree 等号成立 ⟹ `eq_sum_of_apply_one_re_le_of_inner_ne_zero` (Fin w₁ tight-bound) で
+    Ind ↑θ = ∑_i classFunction = ∑_i ↑μ_{ij} (最後の classFunction→↑mu は rw が defeq で閉じる)。
+- **派生 (thin, core 消費)**: `certainTypeRestrict_isIrreducible` (χ_j∈Irr(K)) +
+  `induce_restrict_certainType_eq` (Ind^L_K χ_j = μ_j; χ_j=↑θ で書換)。
+- **helper `index_K_eq`** (`[L:K] = w₁`): `Subgroup.index_eq_card` + `isComplement.symm.QuotientMulEquiv`
+  (S06_CTC:300-301 と同パターン)。
+
+### 🔑 degree-counting 汎用補題 (leaf 内, 全 `OddOrder.Peterfalvi.S06.*`, 汎用 G)
+- **#1 `sum_apply_one_re_le_of_inner_ne_zero`**: IsCharacter χ + 単射既約 constituent 族 ⟹
+  `∑_{i∈s}(f i 1).re ≤ (χ1).re` (`apply_one_re_le_of_inner_ne_zero` の Finset 版,
+  `exists_natFinsupp_eq_sum` から `sum_le_sum`+`sum_le_sum_of_subset_of_nonneg`)。
+- **#2 `eq_sum_of_apply_one_re_le_of_inner_ne_zero`**: さらに `(χ1).re ≤ ∑` ⟹ `χ = ∑_{i∈s} f i`
+  (tight ⟹ support 完全同定: supp=image (sum_sdiff+正項), m_a=1 (`sum_eq_sum_iff_of_le`))。
+- **#2' `eq_of_apply_one_re_le_of_inner_ne_zero`** (singleton, ι=Unit 経由): 既約 constituent θ で
+  `(χ1).re ≤ (θ1).re` ⟹ χ = θ (等次数⟹一致)。
+
+### ⚠ hub への hoist 候補 (再調査するな)
+- **infra 4 補題を S08 から leaf に複製**: `isCharacter_restrict` / `inner_isCharacter_nonneg` /
+  `induce_exists_natFinsupp_eq_sum` / `isCharacter_induce` (全て S08_CoherenceCore に既存だが S08 は
+  S06 の**下流**ゆえ import 不可)。**これら + 上の #1/#2/#2' は本来 `Clifford.lean`/`InducedCharacter.lean`
+  に属する汎用補題** → hub が Clifford へ hoist + S08 版と dedup するのが望ましい (CLAUDE ラッパー方針)。
+  現状は CLAUDE「他レーン RepresentationTheory を触らない」に従い leaf 内複製。
+
+### 🔑 KEY / 再調査するな (Lean 機構の罠)
+- **`inner_induce_ne_zero_iff_liesOver` / `exists_liesOver` は `H : Subgroup G` が EXPLICIT 第1引数**
+  (`variable (H : Subgroup G)` 由来) → `inner_induce_ne_zero_iff_liesOver h.K (mu i) θ` と H 明示必須
+  (S03:699 が先例)。これらは `IrreducibleCharacter` namespace ゆえ `IrreducibleCharacter.` 修飾要。
+- **`set` 禁止 (defeq 暴走)**: `set χj := restrict h.K (mu 0)` 等は χj を opaque fvar 化し
+  `restrict h.K ((columnFamily χ₂).mu 0)` との defeq を切る → `:= hθ0` 等が落ちる。さらに
+  `columnFamily := (...).choose` の unfold が絡むと `isDefEq`/`whnf` heartbeat timeout。
+  **既存スタイル通り `h.columnFamily χ₂` を明示展開で書く**。packaged IrreducibleCharacter が要るときは
+  core 定理が `exists_liesOver` の θ を返し下流は ↑θ で扱う (inline ⟨_,_⟩ の coe_mk 経由)。
+- **`Finset.sum_image` は被加算関数 g が HO 単一化で決まらず term 適用が落ちる** → `rw [Finset.sum_image
+  (fun x _ y _ h => hinj h)]` の **rw 形**にする (goal の具体形が f/g を決める; `(g := …)` 明示は g が
+  image 関数側に化けて誤る)。
+- **statement の `ClassFunction.induce h.K (...)` は `[Invertible (Nat.card ↥h.K : ℂ)]` を要求** (induce 定義が
+  `(Nat.card H)⁻¹•` ゆえ) → **section variable / 定理 binder で渡す** (haveI は proof 内で遅すぎ statement に
+  効かない)。`Fintype ↥h.K` は statement に出ない (inner/induce_char の proof のみ) ので **proof 内
+  `haveI : Fintype ↥h.K := Fintype.ofFinite _`** に留める (binder にすると unusedFintypeInType 警告 +
+  caller 負担)。caller は `haveI : Invertible (Nat.card ↥h.K:ℂ) := invertibleOfNonzero (…)` で供給。
+
+### ▶▶ 次 = (4.5)(b) [Ind^L_K χ で Irr(L) を尽くす] → (4.6)-(4.9) → S08 case-B
+- session 24 末尾の (4.5)(b) recon そのまま有効 (g∈W₁^# の K-class 作用 FPF + Brauer [Is]6.32=
+  `ConjugationBrauer` 済 + (1.5.b) `isIrreducibleCharacter_induce_of_inertia_eq`)。χ_j (w₂ 個) は g 固定、
+  χ∉{χ_j} は I_L(χ)=K で Ind∈Irr(L)、exhaustion で締め。
+- 利用可能: `certainTypeRestrict_isIrreducible` / `induce_restrict_certainType_eq` / `index_K_eq` /
+  上記 degree-counting #1/#2/#2'。
+
+正本 = 本ノート (session 25)。**Don't re-grind (4.5)(a) — core+派生 完成・axiom-clean。**
+**inner_induce/exists_liesOver は H explicit, set 禁止, sum_image は rw 形, induce statement は Invertible binder (再調査するな)。**
