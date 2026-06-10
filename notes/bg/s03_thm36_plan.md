@@ -541,10 +541,39 @@ scaffold 1684 行、唯一 real sorry = **Phase D–F ((3.22)–(3.38)) のみ**
 - **G-level 形 (`⁅P_G,R₀⁆ = P_G`) は未変換** — Phase D の消費形が決まってから橋を書く
   (2 段 map の generator-chase、`actionCommutator_conjNormal_map_subtype_eq` の類似)。
 
-### ▶ 次セッション = Phase D (3.22)–(3.31)
-- (3.22) 最小性帰納 `[X,P]=1` (X = X^{PR} ⊊ K): thm36_aux の IH を `VXPR₀` 部分群に適用する
-  3 つ目の IH 形。(3.23) `G = VKPR₀, H = VKP, R = R₀`。(3.24) `K = ⁅K,P⁆` (Prop 1.6(b)
-  subgroup 形 `commutator_commutator_right_eq` の類似を P-action で)。
+## ✅ 2026-06-10 session 8 cont. (a-keystone): Phase D 入口 — h321G 橋 + (3.22) kernel
+
+- **scaffold: `h321G : ⁅P.map H.subtype, R₀⁆ = P_G`** ((3.21) の G-level 形) 着地。
+  ≤ は generator ⁅↑ph,g₂⁆ = ↑ph·(g₂ ↑ph⁻¹ g₂⁻¹) 分解 (**⚠ goal は `H.subtype ph` 形なので
+  `show ⁅(ph : G), g₂⁆ ∈ _` で coe 形に直してから rw**)、≥ は `h321` + actionCommutator を
+  `Subgroup.closure_induction` で 2 段 val 押し下げ (`restrict_apply_val` → congrArg val →
+  `simp only [hφ, …, coe_inclusion]`、mem ケースは `commutatorElement_def`+group)。
+- **committed `825953a7` (S03f_Prelim): `le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`**
+  = (3.22) のエンジン (plen1 + O_{p'}=⊥ ⟹ 任意 p-部分群 ≤ O_p)。axiom-clean。
+  新 import: PLengthTransfer + Ch04_Commutators.Main。
+
+### ▶ 次セッション = (3.22) 本体から
+- **(3.22) `[X,P]=1` for X = X^{PR₀} ≤ K with VXPR₀ ≠ G** の実装手順:
+  1. `HX := VG ⊔ (X ⊔ P.map H.subtype)` (G-level), `S₂ := HX ⊔ R₀`。HX ≤ H。
+  2. **HX ⊴ S₂**: R₀ は V (char)/X (仮定)/P_G (hP_inv) を normalize ⟹ sup を normalize
+     (pointwise smul_sup)。h318 の hS₁norm パターン (mem_normalizer_iff, G-element level)。
+  3. **IH 適用** ((3.6)/(3.7) と同型の transport 8 点セット): hcompl (disjoint = hcompl.disjoint
+     mono / sup via normal_mul)、hHall (card_dvd)、hR₀ (≤ + prime card)、hZ (C_{S₂}(R₀') ↪
+     H ⊓ C_G(R₀) — (3.6) の hZ' パターン)、card lt (S₂ ≠ ⊤ 仮定 + `eq_top_of_card_eq` 対偶)。
+     ⟹ `hasPLengthOne p ↥⁅HX', R₀'⁆`。
+  4. **O_{p'}(↥HX') = ⊥**: O_{p'} と V.subgroupOf HX (p-群, normal: V ⊴ H ≥ HX) は coprime normal
+     ⟹ commutator ⊥ (`commutator_le_inf` + `inf_eq_bot_of_coprime`) ⟹ O_{p'} 元は V を中心化
+     ⟹ (↥H に押し下げ) hCHV で ≤ V ⟹ p'∩p = ⊥。
+  5. **O_{p'}(⁅HX',R₀'⁆-group) = ⊥**: char-in-normal で ↥HX-normal 化 ⟹
+     `IsPiGroup.le_oPiCore` ⟹ ≤ O_{p'}(↥HX) = ⊥ (4.)。subgroupOf 2 段に注意。
+  6. **kernel helper** (`le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot`) ⟹
+     P-image ≤ O_p(⁅HX',R₀'⁆): P ≤ ⁅HX,R₀⁆ は **h321G** (P_G = ⁅P_G,R₀⁆ ≤ ⁅HX,R₀⁆ mono)。
+  7. `[X,P] ≤ X ⊓ O_p-lift = ⊥` (X は p'-群 ⊆ K)。
+- **(3.23)**: X := K で `G = VKPR₀` (≠ なら (3.22)+h313 矛盾)。`H = VKP`: H = G⊓H とカード;
+  `R = R₀`: |R| = |R₀| (カード比較) + R₀ ≤ R。**以後 R = R₀ で書き換え可能になり Phase D 後半が
+  単純化** (R₀ 添字を R に)。
+- (3.24) `K = ⁅K,P⁆` (Prop 1.6(b) 橋 `commutator_commutator_right_eq` は ⊴ G 要 — K_G は
+  ⊴ G でないので **S₂=G 内の actionCommutator 版** `actionCommutator_restrict_self_…` 系で)。
 - (3.25) K special q-群 (**Gor 5.3.7 = `S04e.exists_minimal_aInvariant_isExpPSpecial_of_pprimeAction_with_minimality`**)、
   (3.26) exp q (Thm 1.13 = CriticalSubgroup)、(3.28)(3.29)、(3.30) **Thm 3.4 二度目**、(3.31) Z-群
   (`card_eq_prime_of_le_isZGroup` 再利用)。
