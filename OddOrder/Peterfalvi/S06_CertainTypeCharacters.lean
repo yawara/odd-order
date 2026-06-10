@@ -605,6 +605,65 @@ noncomputable def certainTypeRestrictDiff [NeZero (Nat.card h.W1)]
       ((h.columnFamily χ₂).sign • ((h.columnFamily χ₂).mu i : ClassFunction L ℂ))
     - (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
 
+/-- **Step 4, `g ⊥ basis`.**  The certain-type difference `g = Res_W(δ_j·μ_{ij}) − ω_{ij}` is
+orthogonal to every basis vector `ω_{kl} − ω_{0l}` of `CF(W, W − W₂)`.
+
+Frobenius reciprocity (`inner_induce_eq_inner_restrict`) turns the `Res`-part into
+`⟨Ind_W^L(ω_{kl} − ω_{0l}), δ_j μ_{ij}⟩`, and the (1.4) image
+`Ind_W^L(ω_{kl} − ω_{0l}) = δ_l·(μ_{e⁻¹k,l} − μ_{0,l})` (`induce_omegaColumnDiff_eq`) reduces
+both pairings to character orthonormality.  On the diagonal `l = χ₂` the within-column
+orthonormality `(μ_{·l}, μ_{·χ₂})` matches the source pairing `(ω_{·l}, ω_{·χ₂})` once the
+sign `δ_l² = 1` is removed (`k = e i ↔ e⁻¹k = i`, `1 = e i ↔ 0 = i`); off the diagonal both
+sides vanish because distinct `W₂`-columns are orthogonal (`columnFamily_mu_ne` / the source
+`ω`-orthogonality). -/
+theorem certainTypeRestrictDiff_inner_basis [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    (l : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    (k : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner
+      ((h.omegaColumnDiff k 1 l : TICyclicHypothesis.SupportedOnV ℂ h.sdiffTICyclicHypothesis) :
+          ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      (h.certainTypeRestrictDiff χ₂ i) = 0 := by
+  classical
+  rw [certainTypeRestrictDiff, ClassFunction.inner_sub_right, sub_eq_zero,
+    ← ClassFunction.inner_induce_eq_inner_restrict, h.induce_omegaColumnDiff_eq l k,
+    SignedIrreducibleDifferenceFamily.signedDifference_apply,
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily l).sign
+      ((h.columnFamily l).difference (h.w1CharEquiv.symm k)),
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign
+      ((h.columnFamily χ₂).mu i : ClassFunction L ℂ),
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_intCast,
+    SignedIrreducibleDifferenceFamily.difference_apply,
+    SignedIrreducibleDifferenceFamily.classFunction_apply,
+    SignedIrreducibleDifferenceFamily.classFunction_apply,
+    ClassFunction.inner_sub_left, omegaColumnDiff_coe, chiColumn, ClassFunction.inner_sub_left,
+    irreducibleCharacter_inner, irreducibleCharacter_inner,
+    irreducibleCharacter_inner, irreducibleCharacter_inner]
+  -- LHS = δ_l·(δ_χ₂·([μ_{e⁻¹k,l}=μ_{iχ₂}] − [μ_{0,l}=μ_{iχ₂}]));
+  -- RHS = [ω_{kl}=ω_{e i,χ₂}] − [ω_{0l}=ω_{e i,χ₂}].
+  by_cases hl : l = χ₂
+  · subst hl
+    -- the within-column index equalities
+    have hcol : ∀ (a : (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ),
+        (h.sdiffTICyclicHypothesis.omegaProdChar a l
+          = h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) l) ↔ a = h.w1CharEquiv i :=
+      fun a => ⟨fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_inj he).1,
+        fun he => by rw [he]⟩
+    have hs1 : h.w1CharEquiv.symm 1 = 0 := by rw [Equiv.symm_apply_eq, h.w1CharEquiv_zero]
+    simp only [(h.columnFamily l).injective.eq_iff,
+      h.sdiffTICyclicHypothesis.omega_injective.eq_iff, hcol, ← Equiv.symm_apply_eq, hs1]
+    have hsign2 : ((h.columnFamily l).sign : ℂ) * ((h.columnFamily l).sign : ℂ) = 1 := by
+      rcases (h.columnFamily l).sign_eq with hs | hs <;> rw [hs] <;> norm_num
+    rw [← mul_assoc, hsign2, one_mul]
+  · -- distinct columns: all four pairings vanish
+    rw [if_neg (h.columnFamily_mu_ne hl (h.w1CharEquiv.symm k) i),
+      if_neg (h.columnFamily_mu_ne hl 0 i),
+      if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
+        (h.sdiffTICyclicHypothesis.omega_injective he)),
+      if_neg (fun he => (h.sdiffTICyclicHypothesis.omegaProdChar_ne (fun hand => hl hand.2))
+        (h.sdiffTICyclicHypothesis.omega_injective he))]
+    ring
+
 end Recipe
 
 end Hypothesis
