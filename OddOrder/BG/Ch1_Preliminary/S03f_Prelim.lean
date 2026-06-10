@@ -598,4 +598,243 @@ theorem le_opCore_of_hasPLengthOne_of_oPiCore_compl_eq_bot
 
 end
 
+/-! ### Phase F ((3.38)) helpers: coprime averaging, conjugation action on subgroup families,
+`MulAut`-commutativity consequences, and conjugation transport for centralizers
+
+BG Theorem 3.6 (3.38) decomposes `V = V₁ × ⋯ × Vₙ` (`Vᵢ = C_V(Kᵢ)` for the index-`q` subgroups
+`Kᵢ ≤ K` with nontrivial fixed points) and runs an orbit-counting argument on `{Vᵢ}`.  The four
+tools below carry the lattice-free part of that argument:
+
+* `avgConj B W : ↥W →* ↥W` — the (unnormalized) averaging endomorphism
+  `v ↦ ∏_{b ∈ B} b v b⁻¹` of an abelian normal subgroup `W`; its image centralizes `B`
+  (`avgConj_coe_mem_centralizer`), it is the `|B|`-power map on `C_W(B)`
+  (`avgConj_apply_of_mem_centralizer`), and it preserves `B`-stable subgroups
+  (`avgConj_coe_mem`).  Both the "independence" of the `Vᵢ` and the (3.38) norm argument
+  (`v + vx + ⋯ + vx^{r-1}`, with `B = R₀`) are instances.
+* `disjoint_biSup_biSup_of_proj` — disjointness of sups of subgroup families over disjoint index
+  sets, given pointwise projections that fix one family member (up to a coprime power) and kill
+  the others.
+* `conjSubtypeMulAction` — the conjugation `MulAction` of a subgroup `A` on a conjugation-closed
+  family of subgroups (the `PR`-action on `{Kᵢ}`).
+* `commutator_mem_centralizer_of_isCyclic` — normalizing elements of a cyclic subgroup have
+  centralizing commutator (`Aut` of a cyclic group is abelian; the `i > r` step of (3.38)).
+* `centralizer_map_conj` — `C_G(K^g) = C_G(K)^g`.
+-/
+
+section PhaseF
+
+open scoped IsMulCommutative
+
+variable {G : Type*} [Group G]
+
+/-- The single conjugate `b v b⁻¹ ∈ W` (`W` normal), as an element of `↥W`. -/
+private def avgFactor (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) : ↥W :=
+  ⟨(b : G) * (v : G) * (b : G)⁻¹,
+    Subgroup.Normal.conj_mem inferInstance _ v.2 _⟩
+
+private theorem avgFactor_coe (B W : Subgroup G) [W.Normal] (v : ↥W) (b : ↥B) :
+    ((avgFactor B W v b : ↥W) : G) = (b : G) * (v : G) * (b : G)⁻¹ :=
+  rfl
+
+/-- **Averaging over a finite subgroup `B` inside an abelian normal subgroup `W`**:
+`avgConj B W v = ∏_{b ∈ B} b v b⁻¹` (no normalization; on `C_W(B)` it is the `|B|`-power map,
+which is injective when `(|B|, exp W) = 1`).  BG (3.38) uses it both as the projection
+`V → Vᵢ = C_V(Kᵢ)` (with `B = Kᵢ`) and as the norm map `v ↦ v + vx + ⋯ + vx^{r-1}`
+(with `B = R₀ = ⟨x⟩`). -/
+def avgConj (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W] [Fintype ↥B] : ↥W →* ↥W :=
+  MonoidHom.mk' (fun v => ∏ b : ↥B, avgFactor B W v b) (fun v w => by
+    rw [← Finset.prod_mul_distrib]
+    refine Finset.prod_congr rfl fun b _ => Subtype.ext ?_
+    simp only [avgFactor_coe, Subgroup.coe_mul]
+    group)
+
+theorem avgConj_apply (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W] [Fintype ↥B]
+    (v : ↥W) :
+    avgConj B W v = ∏ b : ↥B, avgFactor B W v b :=
+  rfl
+
+/-- The average `avgConj B W v` centralizes `B` (conjugating by `b₀ ∈ B` permutes the factors). -/
+theorem avgConj_coe_mem_centralizer (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W]
+    [Fintype ↥B] (v : ↥W) :
+    ((avgConj B W v : ↥W) : G) ∈ Subgroup.centralizer (B : Set G) := by
+  rw [Subgroup.mem_centralizer_iff]
+  intro b hb
+  -- conjugation by `b` as an endomorphism of `↥W`
+  set c : ↥W →* ↥W := MonoidHom.mk' (fun w => avgFactor B W w ⟨b, hb⟩) (fun w₁ w₂ => by
+    refine Subtype.ext ?_
+    simp only [avgFactor_coe, Subgroup.coe_mul]
+    group) with hc
+  have h1 : c (avgConj B W v) = avgConj B W v := by
+    have h2 : ∀ b' : ↥B, c (avgFactor B W v b') = avgFactor B W v (⟨b, hb⟩ * b') := by
+      intro b'
+      refine Subtype.ext ?_
+      have hcval : (c (avgFactor B W v b') : G)
+          = b * ((avgFactor B W v b' : ↥W) : G) * b⁻¹ := rfl
+      rw [hcval, avgFactor_coe, avgFactor_coe]
+      simp only [Subgroup.coe_mul]
+      group
+    calc c (avgConj B W v) = ∏ b' : ↥B, c (avgFactor B W v b') := by
+          rw [avgConj_apply, map_prod]
+      _ = ∏ b' : ↥B, avgFactor B W v (⟨b, hb⟩ * b') :=
+          Finset.prod_congr rfl fun b' _ => h2 b'
+      _ = ∏ b' : ↥B, avgFactor B W v b' :=
+          Fintype.prod_equiv (Equiv.mulLeft (⟨b, hb⟩ : ↥B)) _ _ (fun _ => rfl)
+      _ = avgConj B W v := (avgConj_apply B W v).symm
+  have h3 : b * ((avgConj B W v : ↥W) : G) * b⁻¹ = ((avgConj B W v : ↥W) : G) :=
+    congrArg Subtype.val h1
+  rw [mul_inv_eq_iff_eq_mul] at h3
+  exact h3
+
+/-- On `C_W(B)` the average is the `|B|`-power map. -/
+theorem avgConj_apply_of_mem_centralizer (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W]
+    [Fintype ↥B] {v : ↥W} (hv : (v : G) ∈ Subgroup.centralizer (B : Set G)) :
+    avgConj B W v = v ^ Nat.card ↥B := by
+  rw [avgConj_apply]
+  have h1 : ∀ b : ↥B, avgFactor B W v b = v := by
+    intro b
+    refine Subtype.ext ?_
+    rw [avgFactor_coe, Subgroup.mem_centralizer_iff.mp hv (b : G) b.2, mul_inv_cancel_right]
+  rw [Finset.prod_congr rfl fun b _ => h1 b, Finset.prod_const, Finset.card_univ,
+    Nat.card_eq_fintype_card]
+
+/-- The average of an element of a `B`-stable subgroup `X` stays in `X`. -/
+theorem avgConj_coe_mem (B W : Subgroup G) [W.Normal] [IsMulCommutative ↥W] [Fintype ↥B]
+    {X : Subgroup G} (hX : ∀ b ∈ B, ∀ x ∈ X, b * x * b⁻¹ ∈ X) {v : ↥W} (hv : (v : G) ∈ X) :
+    ((avgConj B W v : ↥W) : G) ∈ X := by
+  rw [avgConj_apply]
+  refine Finset.prod_induction _ (fun w : ↥W => (w : G) ∈ X)
+    (fun a b ha hb => by
+      show ((a * b : ↥W) : G) ∈ X
+      rw [Subgroup.coe_mul]
+      exact X.mul_mem ha hb)
+    (by
+      show ((1 : ↥W) : G) ∈ X
+      rw [Subgroup.coe_one]
+      exact X.one_mem)
+    (fun b _ => ?_)
+  show ((avgFactor B W v b : ↥W) : G) ∈ X
+  rw [avgFactor_coe]
+  exact hX (b : G) b.2 _ hv
+
+/-- **Disjointness of sups over disjoint index sets from pointwise projections.**  If each `e i`
+is the `m`-power map on `V i` and kills `V j` (`j ≠ i`), and `x ↦ x^m` is injective at `1`, then
+`⨆_{i ∈ s} V i` and `⨆_{i ∈ t} V i` intersect trivially for disjoint `s t`.  (Applied with
+`e i = avgConj (Kᵢ) W`: both the directness of `V = V₁ × ⋯ × Vₙ` and the separation of distinct
+`R`-orbit blocks in BG (3.38).) -/
+theorem disjoint_biSup_biSup_of_proj {M : Type*} [Group M] [IsMulCommutative M] {ι : Type*}
+    (V : ι → Subgroup M) (e : ι → (M →* M)) {m : ℕ}
+    (hfix : ∀ i, ∀ v ∈ V i, e i v = v ^ m)
+    (hkill : ∀ i j, i ≠ j → ∀ v ∈ V j, e i v = 1)
+    (hm : ∀ x : M, x ^ m = 1 → x = 1)
+    (s t : Finset ι) (hst : Disjoint s t) :
+    Disjoint (⨆ i ∈ s, V i) (⨆ i ∈ t, V i) := by
+  rw [disjoint_iff_inf_le]
+  intro z hz
+  obtain ⟨hzs, hzt⟩ := Subgroup.mem_inf.mp hz
+  set E : M →* M := ∏ l ∈ t, e l with hE
+  have hEt : E z = z ^ m := by
+    have hle : (⨆ i ∈ t, V i : Subgroup M) ≤ MonoidHom.eqLocus E (powMonoidHom m) := by
+      refine iSup₂_le fun j hj => fun v hv => ?_
+      show E v = powMonoidHom m v
+      rw [powMonoidHom_apply, hE, MonoidHom.finset_prod_apply]
+      rw [Finset.prod_eq_single j (fun b _ hbj => hkill b j hbj v hv)
+        (fun hj' => absurd hj hj')]
+      exact hfix j v hv
+    exact hle hzt
+  have hEs : E z = 1 := by
+    rw [hE, MonoidHom.finset_prod_apply]
+    refine Finset.prod_eq_one fun l hl => ?_
+    have hker : (⨆ i ∈ s, V i : Subgroup M) ≤ (e l).ker := by
+      refine iSup₂_le fun k hk => fun v hv => ?_
+      rw [MonoidHom.mem_ker]
+      refine hkill l k (fun h => ?_) v hv
+      exact Finset.disjoint_left.mp hst hk (h ▸ hl)
+    exact hker hzs
+  rw [Subgroup.mem_bot]
+  exact hm z (by rw [← hEt, hEs])
+
+/-- **Conjugation action of a subgroup `A` on a conjugation-closed family of subgroups of `G`**
+(as a subtype of `Subgroup G`).  BG (3.38): the `PR`-action on `{K₁, …, Kₙ}`. -/
+def conjSubtypeMulAction (A : Subgroup G) (P : Subgroup G → Prop)
+    (hP : ∀ (a : ↥A) (X : Subgroup G), P X → P (X.map (MulAut.conj (a : G)).toMonoidHom)) :
+    MulAction ↥A {X : Subgroup G // P X} where
+  smul a X := ⟨(X : Subgroup G).map (MulAut.conj (a : G)).toMonoidHom, hP a X X.2⟩
+  one_smul X := by
+    refine Subtype.ext ?_
+    show Subgroup.map _ _ = _
+    have h1 : (MulAut.conj ((1 : ↥A) : G)).toMonoidHom = MonoidHom.id G := by
+      ext g
+      simp [MulAut.conj_apply]
+    rw [h1, Subgroup.map_id]
+  mul_smul a b X := by
+    refine Subtype.ext ?_
+    show Subgroup.map _ _ = Subgroup.map _ (Subgroup.map _ _)
+    rw [Subgroup.map_map]
+    congr 1
+    ext g
+    simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+      Subgroup.coe_mul]
+    group
+
+theorem conjSubtypeMulAction_smul_coe (A : Subgroup G) (P : Subgroup G → Prop)
+    (hP : ∀ (a : ↥A) (X : Subgroup G), P X → P (X.map (MulAut.conj (a : G)).toMonoidHom))
+    (a : ↥A) (X : {X : Subgroup G // P X}) :
+    letI := conjSubtypeMulAction A P hP
+    ((a • X : {X : Subgroup G // P X}) : Subgroup G)
+      = (X : Subgroup G).map (MulAut.conj (a : G)).toMonoidHom :=
+  rfl
+
+/-- **Normalizing elements of a cyclic subgroup have centralizing commutator** (`Aut` of a cyclic
+group is abelian).  BG (3.38), `i > r` step: `[K, R] ⊆ C_K(Vᵢ)` for `R`-invariant `Vᵢ` of prime
+order. -/
+theorem commutator_mem_centralizer_of_isCyclic {W : Subgroup G} [IsCyclic ↥W] {a b : G}
+    (ha : a ∈ Subgroup.normalizer (W : Set G)) (hb : b ∈ Subgroup.normalizer (W : Set G)) :
+    ⁅a, b⁆ ∈ Subgroup.centralizer (W : Set G) := by
+  set ψ := W.normalizerMonoidHom with hψ
+  obtain ⟨ma, hma⟩ := (ψ ⟨a, ha⟩).toMonoidHom.map_cyclic
+  obtain ⟨mb, hmb⟩ := (ψ ⟨b, hb⟩).toMonoidHom.map_cyclic
+  have hcomm : ψ ⟨a, ha⟩ * ψ ⟨b, hb⟩ = ψ ⟨b, hb⟩ * ψ ⟨a, ha⟩ := by
+    ext w
+    have h1 : ∀ w : ↥W, ψ ⟨a, ha⟩ w = w ^ ma := fun w => hma w
+    have h2 : ∀ w : ↥W, ψ ⟨b, hb⟩ w = w ^ mb := fun w => hmb w
+    rw [MulAut.mul_apply, MulAut.mul_apply, h1, h2, h1, h2, ← zpow_mul, ← zpow_mul,
+      mul_comm ma mb]
+  have hker : ψ ⁅(⟨a, ha⟩ : ↥(Subgroup.normalizer (W : Set G))), ⟨b, hb⟩⁆ = 1 := by
+    rw [map_commutatorElement]
+    exact commutatorElement_eq_one_iff_mul_comm.mpr hcomm
+  rw [Subgroup.mem_centralizer_iff]
+  intro w hw
+  have h5 : ⁅a, b⁆ * w * ⁅a, b⁆⁻¹ = w := by
+    have h3 : (ψ ⁅(⟨a, ha⟩ : ↥(Subgroup.normalizer (W : Set G))), ⟨b, hb⟩⁆ ⟨w, hw⟩ : G)
+        = ⁅a, b⁆ * w * ⁅a, b⁆⁻¹ := rfl
+    rw [← h3, hker]
+    rfl
+  calc w * ⁅a, b⁆ = ⁅a, b⁆ * w * ⁅a, b⁆⁻¹ * ⁅a, b⁆ := by rw [h5]
+    _ = ⁅a, b⁆ * w := by group
+
+/-- **Conjugation transport for centralizers**: `C_G(K^g) = C_G(K)^g`. -/
+theorem centralizer_map_conj (g : G) (K : Subgroup G) :
+    Subgroup.centralizer ((K.map (MulAut.conj g).toMonoidHom : Subgroup G) : Set G)
+      = (Subgroup.centralizer (K : Set G)).map (MulAut.conj g).toMonoidHom := by
+  ext x
+  simp only [Subgroup.mem_map, Subgroup.mem_centralizer_iff, MulEquiv.coe_toMonoidHom,
+    MulAut.conj_apply]
+  constructor
+  · intro hx
+    refine ⟨g⁻¹ * x * g, fun k hk => ?_, by group⟩
+    have h1 := hx (g * k * g⁻¹) ⟨k, hk, rfl⟩
+    have h2 := congrArg (fun z => g⁻¹ * z * g) h1
+    simp only at h2
+    calc k * (g⁻¹ * x * g) = g⁻¹ * (g * k * g⁻¹ * x) * g := by group
+      _ = g⁻¹ * (x * (g * k * g⁻¹)) * g := by rw [h1]
+      _ = g⁻¹ * x * g * k := by group
+  · rintro ⟨y, hy, rfl⟩ z hz
+    obtain ⟨k, hk, rfl⟩ := hz
+    have h1 := hy k hk
+    calc g * k * g⁻¹ * (g * y * g⁻¹) = g * (k * y) * g⁻¹ := by group
+      _ = g * (y * k) * g⁻¹ := by rw [h1]
+      _ = g * y * g⁻¹ * (g * k * g⁻¹) := by group
+
+end PhaseF
+
 end OddOrder.BG.Ch1.S03f
