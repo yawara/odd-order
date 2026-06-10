@@ -4,23 +4,26 @@
 > ユーザー方針 (2026-06-08): **「検証通過は自動合流」**。build green + axiom-clean + sorry 不増を
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` して報告。
 
-## レーン
+## レーン (2026-06-11 再編成)
 
-| レーン | branch | 内容 | 自動合流 |
-|---|---|---|---|
-| **A** | `a-keystone` | rep-theory keystone (BG Thm 2.5→3.4) | ✅ 対象 |
-| **B** | `b-peterfalvi` | Peterfalvi §6 coherence + §5 TICyclic | ✅ 対象 |
-| **D** | `bg-s10-fwd` | BG §10→16 **forward-axiom scaffold** | ❌ **報告のみ** |
+| レーン | branch | 内容 | 推奨モデル | 自動合流 |
+|---|---|---|---|---|
+| **B** | `b-peterfalvi` | Pf §6 certain-type (4.4)→(4.9) → S08 case-B → (6.8) | Opus 4.8 (1M); (4.4) kernel と停滞時は Fable 5 | ✅ 対象 |
+| **E** | `bg-local` | BG 局所解析: Lem 10.4(b)→de-axiom→Lem 10.13→§11.5-7 | Fable 5 (1M); §11.5-7 以降は Opus 4.8 可 | ✅ 対象 |
 
-**D を自動合流しない理由**: forward-axiom = 未証明の仮定。main に入れると FT 形式化の健全性を
-損なう ([[scaffold-sorry-free-not-done]])。A が BG Thm 3.6 を landed して de-axiomatize された後、
-**手動で**合流する。D に未マージがあれば「N commits 待機中（forward-axiom, Thm 3.6 待ち）」と報告のみ。
+旧 **A** (`a-keystone`) / **D** (`bg-s10-fwd`) は 2026-06-11 退役 (任務完遂・全量 main 合流済み・
+worktree 削除済み。branch はアーカイブとして残置)。10.13 着地後に **Lane F** (`bg-s12`, §12 残
+14 件→§13) を増設予定。
+
+**forward-axiom ポリシー**: 残存 axiom = Lem 10.4(b) 1 本 (E が消滅させる)。レーンが**新規の**
+forward axiom を導入する commit は自動合流しない — 報告してユーザー承認を待つ
+([[scaffold-sorry-free-not-done]])。island は縮小方向のみ自動合流可。
 
 ## 各イテレーションの手順
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
-2. **A → B の順**で（A=keystone が下流の根）、未マージがあれば自動合流:
+2. **E → B の順**で（独立レーンゆえ順序は形式的; BG=E を先に固定）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録:
      `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/ | wc -l`
      （コメント "sorry-free" 等の誤カウント回避に `(^|[^a-zA-Z-])sorry` を使う — [[memory: grep sorry]]）
@@ -46,7 +49,8 @@
      `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾
      `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
    - 不合格 → `git merge --abort` で**報告**（何が落ちたか・どのファイルか）
-3. **D** (`bg-s10-fwd`): 未マージがあれば報告のみ（上記理由）。
+3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
+   自動合流せず abort → 報告（上記ポリシー）。
 4. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数。
 
 ## 注意
@@ -77,6 +81,11 @@
 
 ## 現状メモ
 
+- **2026-06-11 — レーン再編成 (B+E の 2 レーン体制)**: A/D 退役 (worktree 削除・branch 残置)、
+  B は main へ fast-forward 同期 (`f608143c`) + LAUNCH.md を session-22 現在地に刷新、
+  **E (`bg-local`) 新設** (issue base **6000**, LAUNCH.md 配置済み): Lem 10.4(b)→de-axiom→
+  Lem 10.13→§11.5-7。モデル配分 = E: Fable 5 (1M) / B: Opus 4.8 (1M) ((4.4) kernel と停滞時は
+  Fable 5) / hub: Fable 5。10.13 着地後に F (`bg-s12`, base 7000) 増設予定。
 - **2026-06-10 — Thm 3.6 完成 → D 合流 → de-axiom 完了。D の「報告のみ」規約は役目を終了**:
   Lane A が BG Thm 3.6 を完成 (`18a12a88`) → main 合流 (merge `36eb07db`)。ユーザー承認のもと
   **D (`bg-s10-fwd`) 全 67 commits を合流** (merge `2794232f`) し、`S10_ForwardFromKeystone.lean` の
