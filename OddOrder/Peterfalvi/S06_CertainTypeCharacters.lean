@@ -243,6 +243,13 @@ instance instInvertibleCardSdiffW :
     Invertible (Nat.card ↥h.sdiffTICyclicHypothesis.W : ℂ) :=
   ‹Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)›
 
+instance instFintypeToTICyclicW : Fintype ↥h.toTICyclicHypothesis.W :=
+  ‹Fintype ↥(h.W1 ⊔ h.W2)›
+
+instance instInvertibleCardToTICyclicW :
+    Invertible (Nat.card ↥h.toTICyclicHypothesis.W : ℂ) :=
+  ‹Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)›
+
 /-- `Ind_W^L` as a `ℤ`-linear map `CF(W) →ₗ[ℤ] CF(L)`, the map fed to the (1.4)
 orthonormal difference-pair machinery (`isometry_difference_pair_structure`). -/
 noncomputable def induceZ :
@@ -716,6 +723,48 @@ theorem certainTypeRestrictDiff_apply_eq_zero_of_mem_V [NeZero (Nat.card h.W1)]
     have := DFunLike.congr_fun hL0 ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
     simpa using this
   · rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hv
+
+/-- The canonical (3.1)-for-`L` Dade application of (4.3)(a): the §4 Dade package (2.6) on the
+TI set `V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so
+`HConjInvariant` holds for free.  This `app` drives the §5 σ-machinery on `(L, W)`. -/
+noncomputable def toTICyclicFullDadeApplication :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication h.toTICyclicHypothesis :=
+  ⟨h.toTICyclicHypothesis.toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
+/-- **Peterfalvi (4.3.b), the certain-type characters as σ-images.**  For each `W₂`-column `χ₂`
+and `W₁`-index `i`, the (3.2) isometry `σ` of the `(L, W)` TI-cyclic setup sends the linear
+character `ω_{ij}` of `W` to the signed certain-type character `δ_j·μ_{ij}` of `L`:
+
+  `σ(ω_{ij}) = δ_j · μ_{ij}`.
+
+The σ-machinery runs on `toTICyclicHypothesis` (`V = W − (W₁ ∪ W₂)`), while the `μ_{ij}` come
+from the (1.4) difference family on the larger TI set `W − W₂` (`sdiffTICyclicHypothesis`); the
+two share the same `W = W₁ ⊔ W₂`.  Applying `eq_sigma_of_apply_eq_on_V`: `δ_j·μ_{ij}` is a
+norm-one virtual character (`δ_j² = 1`, `μ_{ij}` irreducible) whose values on `V` match `ω_{ij}`
+— this is the (1.3) value-match `certainTypeRestrictDiff_apply_eq_zero_of_mem_V`, transported
+from `W − W₂ ⊇ V`. -/
+theorem sigma_chiColumn_eq_certainType [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+        (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = (h.columnFamily χ₂).sign • ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  symm
+  refine h.toTICyclicHypothesis.eq_sigma_of_apply_eq_on_V rfl h.toTICyclicFullDadeApplication
+    (h.chiColumn χ₂ i) ((ZIrr L).smul_mem _ ((h.columnFamily χ₂).mu i).mem_ZIrr) ?_ ?_
+  · -- norm one: `⟨δ_j μ_{ij}, δ_j μ_{ij}⟩ = δ_j² = 1`
+    rw [← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign
+        ((h.columnFamily χ₂).mu i : ClassFunction L ℂ),
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_intCast,
+      irreducibleCharacter_inner, if_pos rfl]
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> norm_num
+  · -- value-match on `V ⊆ W − W₂` from the (1.3) masking
+    intro v hv
+    have hvs : v ∈ h.sdiffTICyclicHypothesis.V := ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+    have hg := h.certainTypeRestrictDiff_apply_eq_zero_of_mem_V χ₂ i hvs
+    rw [certainTypeRestrictDiff, ClassFunction.sub_apply, sub_eq_zero,
+      ClassFunction.restrict_apply] at hg
+    exact hg
 
 end Recipe
 
