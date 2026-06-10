@@ -3121,32 +3121,6 @@ open scoped commutatorElement IsMulCommutative
 
 variable {R : Type*} [Group R] [Finite R] {p : ℕ} [Fact p.Prime]
 
-/-- **Burnside kernel step (elementwise BG Thm 1.8)**: a `p'`-order automorphism `f` of a
-finite `p`-group `H` all of whose powers act trivially modulo `Φ(H)` is trivial.
-
-This is `burnside_operator` applied to the cyclic group `⟨f⟩` (coprimality = `p'`-order). -/
-private theorem mulAut_eq_one_of_coprime_orderOf_of_frattini
-    {H : Type*} [Group H] [Finite H] (hH : IsPGroup p H)
-    (f : MulAut H) (hcop : Nat.Coprime (orderOf f) p)
-    (htriv : ∀ z : ℤ, ∀ r : H, ∃ x ∈ _root_.frattini H, (f ^ z) r = r * x) :
-    f = 1 := by
-  classical
-  set B : Subgroup (MulAut H) := Subgroup.zpowers f with hB
-  set ψ : ↥B →* MulAut H := B.subtype with hψ
-  obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hH
-  have hcop' : Nat.Coprime (Nat.card ↥B) (Nat.card H) := by
-    rw [hB, Nat.card_zpowers, hn]
-    exact Nat.Coprime.pow_right n hcop
-  have htriv' : ∀ b : ↥B, ∀ r : H, ∃ x ∈ _root_.frattini H, (ψ b) r = r * x := by
-    rintro ⟨b, hb⟩ r
-    rw [hB, Subgroup.mem_zpowers_iff] at hb
-    obtain ⟨z, rfl⟩ := hb
-    exact htriv z r
-  have hconc := OddOrder.BG.Ch1.S01.burnside_operator hH (φ := ψ) hcop' htriv'
-  ext r
-  rw [MulAut.one_apply]
-  exact hconc ⟨f, Subgroup.mem_zpowers f⟩ r
-
 /-- **GL(2,p) branch engine for Lemma 4.17**: a finite odd-order group `B` mapping
 injectively into `GL (Fin 2) (ZMod p)` either has `p`-group commutator (`p ∣ |B|`,
 Thm 2.6(b) via `isPGroup_commutator_of_faithful_two_dim_charP`) or is abelian
@@ -3262,7 +3236,7 @@ theorem isPGroup_commutator_of_mulAut_odd_of_pRank_le_two
     have hψ_cop : Nat.Coprime (orderOf (ψH (a ^ p ^ k))) p :=
       Nat.Coprime.coprime_dvd_left ((orderOf_map_dvd ψH _).trans ha'_order_dvd) hm_cop.symm
     have hf_one : ψH (a ^ p ^ k) = 1 :=
-      mulAut_eq_one_of_coprime_orderOf_of_frattini hH_pg _ hψ_cop htriv
+      OddOrder.BG.Ch1.S01.mulAut_eq_one_of_coprime_orderOf_of_frattini hH_pg _ hψ_cop htriv
     have ha'_kerH : a ^ p ^ k ∈ ψH.ker := hf_one
     -- inside the `p`-group `ker ψH`, a `p'`-order element is trivial
     obtain ⟨j, hj⟩ := hkerH_pg ⟨a ^ p ^ k, ha'_kerH⟩
