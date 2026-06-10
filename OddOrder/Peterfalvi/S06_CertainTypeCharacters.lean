@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
+import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 
 /-!
 # Peterfalvi §6 (4.3.b): the certain-type characters
@@ -246,6 +247,35 @@ theorem chiColumn_injective [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ((h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) 1 = 1 :=
   h.sdiffTICyclicHypothesis.omega_apply_one _
+
+/-- Value of the `j = 0` column character: `ω_{i0}(w) = (w1CharEquiv i)(wFst w)` — the `W₂`-dual
+`χ₂ = 1` is trivial on the `W₂`-component, so only the `W₁`-component survives. -/
+theorem chiColumn_one_apply [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1))
+    (w : ↥h.sdiffTICyclicHypothesis.W) :
+    (h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) w
+      = ((h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w) : ℂ) := by
+  rw [chiColumn, h.sdiffTICyclicHypothesis.omega_apply]
+  congr 1
+  change (h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w)
+      * (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (h.sdiffTICyclicHypothesis.wSnd w)
+      = (h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w)
+  rw [MonoidHom.one_apply, mul_one]
+
+/-- The normal subgroup `K ⊴ L` of Hypothesis (4.2), as an instance (so quotients `L ⧸ K`
+elaborate). -/
+instance instKNormal : h.K.Normal := h.K_normal
+
+/-- `L/K` is abelian: it is isomorphic to the cyclic complement `W₁`
+(`Subgroup.IsComplement'.QuotientMulEquiv`), hence cyclic, hence commutative.  This is what makes
+an irreducible character of `L` whose kernel contains `K` linear (degree one) — the engine of the
+forward direction of (4.4). -/
+theorem isMulCommutative_quotient_K : IsMulCommutative (L ⧸ h.K) := by
+  haveI := h.W1_cyclic
+  haveI : IsCyclic (L ⧸ h.K) :=
+    isCyclic_of_surjective
+      (h.isComplement.symm.QuotientMulEquiv.symm : (↥h.W1) →* (L ⧸ h.K))
+      (h.isComplement.symm.QuotientMulEquiv.symm).surjective
+  infer_instance
 
 section Recipe
 
@@ -976,6 +1006,92 @@ theorem certainType_zero_column_anchor [NeZero (Nat.card h.W1)] :
     by_cases hP : (h.columnFamily 1).mu 0 = oneIrr
     · rw [if_pos hP] at hinner; norm_num at hinner
     · rw [if_neg hP] at hinner; norm_num at hinner
+
+/-! ### Peterfalvi (4.4): the `j = 0` certain-type characters are the `K`-trivial ones -/
+
+/-- **Peterfalvi (4.4), forward direction.**  An irreducible character `χ` of `L` whose kernel
+contains `K` is one of the `j = 0` certain-type characters `μ_{i0}`.
+
+Since `L/K ≅ W₁` is abelian (`isMulCommutative_quotient_K`), `χ` is linear (degree one): it
+inflates from `L/K` (`exists_inflate_eq_of_subset_characterKernel`) and irreducible characters of
+abelian groups are degree one (`apply_one_eq_one_of_isMulCommutative`).  Writing the linear
+character `χ̂ : L →* ℂˣ` and `χ₁ = χ̂|_{W₁}`, the value of `χ` on `V = W − (W₁ ∪ W₂)`
+decomposes as `χ(x·y) = χ̂(x)·χ̂(y) = χ̂(x)` (since `y ∈ W₂ ⊆ K ⊆ ker χ`), which matches `ω_{i0}`
+for `i = w1CharEquiv.symm χ₁`.  Theorem (3.9.a) (`eq_sigma_of_apply_eq_on_V`) then identifies `χ`
+with `σ(ω_{i0}) = δ_0·μ_{i0} = μ_{i0}` (`δ_0 = 1` by the `(0,0)`-anchor). -/
+theorem exists_certainType_zero_column_eq_of_subset_characterKernel [NeZero (Nat.card h.W1)]
+    (χ : IrreducibleCharacter L)
+    (hker : (h.K : Set L) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction L ℂ)) :
+    ∃ i, (h.columnFamily 1).mu i = χ := by
+  classical
+  haveI := h.isMulCommutative_quotient_K
+  -- (1) `χ` is linear: `χ(1) = 1`, since `χ` inflates from the abelian quotient `L/K`.
+  obtain ⟨χbar, hχbar⟩ := exists_inflate_eq_of_subset_characterKernel (N := h.K) χ hker
+  have h1 : (χ : ClassFunction L ℂ) 1 = 1 := by
+    conv_lhs => rw [← hχbar]
+    rw [inflate_apply_one]
+    exact χbar.2.apply_one_eq_one_of_isMulCommutative
+  -- (2) the linear character `χ̂ : L →* ℂˣ` with `(χ̂ g : ℂ) = χ g`
+  obtain ⟨χhat, hχhat⟩ := χ.2.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one h1
+  have hval : ∀ g, (χ : ClassFunction L ℂ) g = (χhat g : ℂ) := by
+    intro g
+    rw [← linearIrreducibleCharacter_apply χhat g, hχhat]
+  -- (3) `χ̂` is trivial on `K` (`K ⊆ ker χ`, `χ(1) = 1`)
+  have hKtriv : ∀ k : L, k ∈ h.K → χhat k = 1 := by
+    intro k hk
+    have hk1 : (χ : ClassFunction L ℂ) k = 1 := by
+      have hmem := hker hk
+      rwa [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def, h1] at hmem
+    rw [hval k] at hk1
+    exact Units.val_eq_one.mp hk1
+  -- (4) the `W₁`-restriction `χ₁ : Ŵ₁` (over the ambient `W = W₁ ⊔ W₂`) and its index `i`
+  let χ1 : (h.W1.subgroupOf h.sdiffTICyclicHypothesis.W) →* ℂˣ :=
+    χhat.comp ((h.sdiffTICyclicHypothesis.W.subtype).comp
+      (h.W1.subgroupOf h.sdiffTICyclicHypothesis.W).subtype)
+  refine ⟨h.w1CharEquiv.symm χ1, ?_⟩
+  set i := h.w1CharEquiv.symm χ1 with hidef
+  have hwi : h.w1CharEquiv i = χ1 := h.w1CharEquiv.apply_symm_apply χ1
+  -- the σ-identification `χ = σ(ω_{i0})`
+  have heqsigma : (χ : ClassFunction L ℂ)
+      = h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+          (h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
+    refine h.toTICyclicHypothesis.eq_sigma_of_apply_eq_on_V rfl h.toTICyclicFullDadeApplication
+      (h.chiColumn 1 i) χ.mem_ZIrr ?_ ?_
+    · rw [irreducibleCharacter_inner, if_pos rfl]
+    · intro v hv
+      have hvW : v ∈ h.sdiffTICyclicHypothesis.W := h.toTICyclicHypothesis.V_subset_W hv
+      -- decompose `v = x₀ · y₀` in `L` (`x₀, y₀` the `W₁`/`W₂` components)
+      have hvL : v = ((h.sdiffTICyclicHypothesis.wFst ⟨v, hvW⟩ :
+            ↥h.sdiffTICyclicHypothesis.W) : L)
+          * ((h.sdiffTICyclicHypothesis.wSnd ⟨v, hvW⟩ :
+            ↥h.sdiffTICyclicHypothesis.W) : L) := by
+        have h2 := congrArg (h.sdiffTICyclicHypothesis.W.subtype)
+          (h.sdiffTICyclicHypothesis.eq_wFst_mul_wSnd ⟨v, hvW⟩)
+        rw [map_mul] at h2
+        simpa using h2
+      have hy0 : ((h.sdiffTICyclicHypothesis.wSnd ⟨v, hvW⟩ :
+          ↥h.sdiffTICyclicHypothesis.W) : L) ∈ h.K := by
+        apply h.W2_le_K
+        have hmem := (h.sdiffTICyclicHypothesis.wSnd ⟨v, hvW⟩).2
+        rwa [Subgroup.mem_subgroupOf] at hmem
+      -- both sides equal `χ̂(x₀)`: `χ(v) = χ̂(v) = χ̂(x₀·y₀) = χ̂(x₀) = χ₁(wFst v) = ω_{i0}(v)`
+      have hmatch : χhat v = χ1 (h.sdiffTICyclicHypothesis.wFst ⟨v, hvW⟩) := by
+        have hx : χ1 (h.sdiffTICyclicHypothesis.wFst ⟨v, hvW⟩)
+            = χhat ((h.sdiffTICyclicHypothesis.wFst ⟨v, hvW⟩ :
+                ↥h.sdiffTICyclicHypothesis.W) : L) := rfl
+        rw [hx]
+        conv_lhs => rw [hvL]
+        rw [map_mul, hKtriv _ hy0, mul_one]
+      change (χ : ClassFunction L ℂ) v
+        = (h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) ⟨v, hvW⟩
+      rw [h.chiColumn_one_apply, hwi, hval v]
+      exact congrArg _ hmatch
+  -- conclude: `χ = σ(ω_{i0}) = δ_0 · μ_{i0} = μ_{i0}`
+  rw [h.sigma_chiColumn_eq_certainType 1 i, h.certainType_zero_column_anchor.1, one_zsmul]
+    at heqsigma
+  exact Subtype.ext heqsigma.symm
 
 end Recipe
 
