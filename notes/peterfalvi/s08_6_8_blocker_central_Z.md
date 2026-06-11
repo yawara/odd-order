@@ -1478,3 +1478,36 @@ routing (1) の前に **「c2 break ψ は既約か、reducible-adjoined を S07
 **正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial) + analytical 機構の
 大半 (reducible S₁ メンバー = famPairwise) は S07 に既存 (再導出不要)。残 precise 未解決 = reducible-adjoined-ψ
 の扱い + S08 norm-weighted (5.6) chain 配線 + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
+
+## 2026-06-11 (session 28 cont.³): reducible-adjoined-ψ の真の深さ = R(reducible) ⟹ (4.9) 再浮上の可能性 (調査のみ、Lean 変更なし)
+
+(5.6) 原文 (mmd 04.7 L59-79) + S07 内部精読で reducible-adjoined-ψ の正確な障害を確定:
+
+### (5.6) 原文 = norm-weighted、adjoined χ 既約性要求なし
+**(5.6) Theorem** 条件: (a) S₁ coherent (b) χ₁(1)|χ(1) (c) `2χ(1)χ₁(1) < ∑ᵢ χᵢ(1)²/‖χᵢ‖²`
+⟹ S₁∪{χ,χ̄} coherent。**χᵢ も χ も reducible 可** (‖·‖² で正規化)。proof (5.6.1) は
+`(χ−aχ₁)^τ = X−Y, X∈ℤ[R(χ)]`、Y⊥R(χ) で R(χ) = adjoined χ の反射族 (Hypothesis (5.2) が
+全 S に与える、reducible 含む)。
+
+### 形式化の精査: 2 段階に分かれる
+- ✅ **Dade image step は reducible ψ で OK**: `scaledDiff_dadeImage_mem_ZIrr` (S08:6006) は
+  `χ.mem_ZIrr` のみ使用 (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。**reducible ψ=Ind θ も
+  ψ∈ZIrr** (非負整数結合) ゆえ `τ(ψ−aχ₁)∈ZIrr` は成立。R(ψ) 不要。
+- 🛑 **(5.6.1) 分解は R(ψ) を要する**: `DadeChainStep` (S07:6237) は adjoined の反射族
+  `dadeOrthonormalCharacterImageFamilyOfDiff` を持ち、`hχχ:‖χ‖²=1`/`hχbarχbar:‖χ̄‖²=1` を**必須 field**。
+  reducible ψ (‖ψ‖²>1) では不成立。R(reducible ψ) = §5 (5.2)-reflection-for-reducible は
+  形式化に無い (`dadeOrthonormalCharacterImageFamily` = `χ:IrreducibleCharacter` 専用)。
+
+### 🚨 含意: (6.8.3) reducible break ψ は (4.9) 級を要しうる (session-27 RECON の盲点)
+- (6.8.3) の break ψ∈S∖S₁ (S₁⊇X∪Y)。reducible は S(Z)∖Y に w₂−1 個 (Y は既約 deg|W₁|)。
+  ψ がその一つなら **R(reducible ψ) = (4.9) certain-type 反射構造** (μ_j=±δ∑ω^σ がまさに reducible 反射)。
+- **session-27 RECON「(4.9) 不要」は (6.8.2.3) [χ_i 既約] には正しいが、(6.8.3) の break ψ を見落とし**。
+  ⟹ c2 (6.8.3) は (4.9) 級に再接続しうる (off-path・full §6)。
+- **escape 候補 (要検討、未解決)**: break を既約に confine — もし **S(Z) coherent** (reducibles を
+  S₁ に full 収容、break は X 既約メンバーで起きる) なら reducible-adjoined 回避。S(Z) は H/Z-characters
+  由来の induced で sub-(6.8) 的構造 (inductive?) — 設定は非自明だが (4.9) 回避の最有望路。
+
+**∴ CB5 真の障害 = reducible break ψ の R(ψ)**。(a) S(Z) coherence で break を既約 confine (有望、要設計) /
+(b) R(reducible) = (4.9) 形式化 (off-path)。**combinatorial foundation (exists_*_general) と S07
+famPairwise [reducible S₁ メンバー] は landed/確認済で無駄でない** — full norm-weighted (5.6) 配線で再利用。
+**正本 = 本 session 28 cont.³。次手 = S(Z) coherence の inductive 構造を精査 (4.9 回避可否の判定)。**
