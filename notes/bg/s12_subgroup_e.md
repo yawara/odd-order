@@ -266,11 +266,64 @@ mmd L3294-3316。`nilpotent_sigmaComplement_abelian` (S12_E scaffold 移設・�
   `Dvd.intro_left` でなく `dvd_of_mul_left_eq`。mem_center/centralizer の comm 向きは `.symm` 要確認。
 - conj_smul_mono (S12_Corollary129) を public 化 (12.10 (e) が使用)。
 
-▶ **次 = Lemma 12.11** (S12_E:450 scaffold `tau2_transfer_to_maximal`; mmd L3318-3340;
-消費 = 12.6(a)(b)(f)/12.5(a)(d)/12.10(c)/12.2(a)/12.4(a)/10.2(c)/12.1(b)(g)/Lem 10.8/
-Thm 10.1(b)/12.7(d) — **大物**)。残 S12_E sorry 6 = 12.4(a) 系 ×3
+### ✅✅✅ session 7: **Lemma 12.11 COMPLETE — (a)(b)(c) + assembly** (新 leaf `S12_Lemma1211.lean`, unconditional・axiom-clean)
+
+mmd L3318-3334。**S12_E 実 sorry 6→5** (scaffold `tau2_transfer_to_maximal` を leaf に
+移設・充足; (a)-連言は素数限定形に faithful 化 — 12.3/12.7(a)/12.10(c) と同型)。
+AxiomsCheck 計 8 本 (sessions 6-7 で leaf 分全登録)。
+
+- **前段 (session 7 開始時に commit 済)**: `exists_subgroupESetup` (§12 冒頭の setup 存在
+  — SZ 補群 + Hall-in-Hall `isHallSubgroup_of_isHallSubgroup_of_le` で `E₁⊔E₂` を `K₀` に
+  同定) / (a) `tau2_prime_mem_sigma_diff_beta` (`p` 自身 = 12.2(a)
+  `prime_mem_sigma_or_tau2` + τ₂-枝は 12.6(b) `N(A^w)⊄M*` 衝突; `q ≠ p` は押し込み
+  `A_q ≤ E₂` + coprime normal 可換 + **12.5(d)** rank-clash; β = 12.1(g)) /
+  (b) `index_primeFactors_subset_tau1_union_tau2` (σ∪τ₃ に落ちると `Q ≤ M*'` →
+  Lem 10.8(c) normal `p`-補群 → `⁅A,Q⁆ = ⊥` → `q ∤ [E:C_E(A)]` 矛盾) / 汎用押し込み
+  `exists_conj_smul_le_hallPiece` + `hallPiece_isHall_in_M`。
+- **(c) = `tau2_normalSylow_abelianSylow_of_mem_index_card`** (本セッション):
+  - **line パッケージ** (private `exists_line_package`): `C_G(A) ≤ E` (12.6(b)) の Sylow
+    `q`-部分群 `Q₁` (cyclic — `q ∈ τ₁(M)` = **12.10(c)**) とその唯一の位数 `q` 部分群
+    `Q₀ = Ω₁(Q₁)`、`Q₁` を含む `E` の Sylow `q` の像 `Q` (cyclic, `q² ≤ |Q|` ⟸
+    `q ∣ |C_E(A)|` × `q ∣ [E:C_E(A)]`)、**Frattini 性** (∀T: `C_G(A) ≤ T` ∧
+    `N_G(Q₀) ≤ T` ⟹ `N_G(A) ≤ T`) を bundle。Frattini = mathlib
+    `Sylow.normalizer_sup_eq_top` (ambient `↥N_G(A)`, normal `C.subgroupOf N`
+    [`normal_subgroupOf_iff_le_normalizer` + `normalizer_le_normalizer_centralizer`]) +
+    `Subgroup.mul_normal` 分解 + `map_subtype_conj_smul` で G-level 化 + cyclic 一意性
+    (`le_of_ne_bot_of_le_cyclic` + `eq_of_le_of_card_ge`) で `N(Q₁)` 元が `Q₀` も正規化。
+  - **M\*\* 構成と同定**: `M** ∈ ℳ(N_G(Q₀))` → `A ≤ C(Q₀) ≤ M**` → **12.4(a)** で
+    `C_G(A) ≤ M**` → Frattini 性で `N_G(A) ≤ M**` ⟹ `M** ∈ ℳ(N_G(A))` → (b)@M** +
+    **12.2(a)** (X := Q₀) で `q ∈ τ₂(M**)` → (a)@両方で `p ∈ σ(M*) ∩ σ(M**)` →
+    **12.6(f)** (M** 基準, A_q は押し込み構成) で共役 → **Thm 10.1(b)** transitivity
+    (`(g₁,g₂) := (g,1)`, `c ∈ C_G(A) ≤ M*` 固定) で `M* = M**` (subst でなく
+    `rw [← hMeq] at hs hqτ₂ss` — binder-consume 回避)。
+  - **結論 2** (Sylow `p` ⊴ M*): **12.5(a)** (A_q ≤ M*) で `M*_σ` nilpotent →
+    `S10.exists_sylow_le_normalizer_le_of_mem_sigma` の `S ≤ M*` を
+    `sigma_subgroup_le_Msigma_of_isHall` で `M*_σ` へ → `S.subtype` + nilpotent tfae 0 3
+    → `Sylow.characteristic_of_normal` → AppB transport + `le_normalizer_opiCoreInG`
+    (`Sylow.coe_subtype` + `subgroupOf_map_subtype` + `inf_of_le_left` で写像同定)。
+  - **結論 3** (abelian Sylow `q` ≤ M*): Syl ⊇ A_q を by_cases。abelian = **12.8(c)**
+    chain `S ≤ N(S)' ≤ F(E*) ≤ C(S) ≤ E* ≤ M*` で即。nonabelian = **12.7 assembly**
+    (A₀ card q, (c)-清掃条項, 補群 E₀) → `Q` を `E₂*` へ押し込み (`Q₀^w ≤ Q^w` 保持) →
+    `⊥ ≠ A^w ≤ M*_σ ⊓ C(Q₀^w)` で 12.7(c) 対偶から `Q₀^w = A₀` → `K' := E₀ ⊔ M*_σ`
+    (`|K'|·q = |M*|` [card_sup ×2 + `card_Msigma_mul_card_E`], `A₀ ⊓ K' = ⊥` [card 勘定])
+    → **`no_complement_of_lt_cyclic`** (`[Q^w : Q^w⊓K'] ≤ [M*:K'] = q` vs `q² ≤ |Q^w|`)
+    で False。
+- ⚠ 技法 (新規): **`rw [← hs.E_compl_sup]` は RHS の `S10.Msigma Mstar` 内の `Mstar` も
+  巻き込み** → モンスター型が heartbeats を食い尽くし**後続 tactic に timeout が連鎖**
+  (エラー行 ≠ 原因行; 12.9 の conv_lhs 罠の正規化版)。**sup/inf の片側だけ展開する rw は
+  `conv_lhs => rw [...]` を既定にする**。`le_normalizer_inf` は「N(A)⊓N(B) ≤ N(A⊓B)」
+  でなく 2 つの bound (hA : H ≤ N(A)) (hB : H ≤ N(B)) を直接取る。
+  `card_sup_eq_mul_of_le_normalizer_of_disjoint` は S12_E に public 既存 (重複宣言注意)。
+- leaf 内 private 再掲 (hoist は hub 仕事): `card_conj_smul` / `map_subtype_conj_smul` /
+  `le_of_ne_bot_of_le_cyclic` (cyclic q-群の最小部分群一意性; 新規) /
+  `no_complement_of_lt_cyclic` (新規; relIndex 論法)。
+
+▶ **次 = Theorem 12.12** (S12_E:449 scaffold `frobenius_factorization_of_regular`;
+mmd L3336-3383 — **大物** (Frobenius 因子分解); 消費 = 12.7/12.8/12.5/12.6 + Ch06
+Frobenius 機構)。残 S12_E sorry 5 = 12.4(a) 系 ×3
 (`nonabelian_pgroup_isUniquelyMaximal` / `maximalContaining_centralizer_eq_singleton` /
-`sigma_subgroup_conj_into_Msigma`) + 12.11 + 12.12 + 12.15。
+`sigma_subgroup_conj_into_Msigma`) + 12.12 + 12.15。12.13 は S12_E に scaffold 無し
+(リスト上は次の大物)。
 
 ### (履歴) 残 = 12.8 (d)(e)(f) + assembly — 設計メモ (session 5)
 
