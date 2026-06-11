@@ -1546,3 +1546,56 @@ trichotomy がある**ことが判明 (既存 repo 注記の訂正が必要)。
 
 正本 = 本ノート (session 26 cont.)。**(3.8) full trichotomy 完成・axiom-clean。Don't re-grind。**
 **trichotomy 結論は DecidableEq-free, beta-redex で omega atom 注意, card_sdiff は add 版 (再調査するな)。**
+
+### 🚨🚨 依存関係の訂正 (session 26 cont.², mmd 04.8 (6.8) 全証明精読): (4.7)-(4.9) は (6.8) case-B の経路上に「ない」
+
+session 26 の RECON「case-B ← (4.9) ← (4.8) ← (3.8)」は**不正確だった**。mmd `04.8` の **(6.8) Theorem
+全証明**を精読した結果:
+- **(6.8)(c2) の証明 (mmd L160-)**: 「L と L/Z が (4.2) を満たし…**(1.6) と Theorem (4.5)** で S, S(Z) が
+  各 w₂−1 個 reducible…」+ **(6.8.2) case-B (L176-)** は τ₁/τ₂ (Dade isometry rel A₁⊆A₀)・regular char・
+  **(6.7)** を使う。**(4.7)/(4.8)/(4.9) は (6.8) 証明に一切登場しない。**
+- ⟹ **(6.8) case-B (c2) が §6 から要するのは: Hypothesis (4.6) [構造、特に Dade τ rel A₀=A∪V^L] +
+  Theorem (4.5)[✅完成] + (1.6)。** 加えて §8 engine (6.6)/(6.7) + s08_6_8_blocker_central_Z.md の
+  Zc-central X-coherence + (6.8.1)/(6.8.2)/(6.8.3)。
+- **(4.7)/(4.8)/(4.9) は §6 内部の結果** (Hypothesis (4.6) 下) で、(6.8) case-B の**critical path 外**。
+  別 consumer (§9 Feit-Sibley か §11+ maximal subgroups) 用。**∴ (3.8)→(4.8) も §6 完成スコープで
+  あって (6.8) closer ではない** (3.8 自体は full-Pf scope の正当な成果)。
+
+**∴ (6.8) case-B closing の真の gateway = Hypothesis (4.6) 構造体** (S08 (c2) が carry する `cert` を
+full (4.6) に拡張: 現 `CertainTypeHypothesis`=(4.2)+(2.2)-Dade-on-A のみで、**A₀=A∪V₀ の combined Dade
+τ・(3.1) が欠落**; (6.8) の τ₁ は τ|_{A₁} で A₀ Dade が要る)。これを建てれば (6.8)(c2) の τ machinery が
+供給され、残りは §8 program (Zc-central, (6.6)/(6.7)[要 status 確認], (1.6))。
+
+**訂正後の選択肢:**
+1. **(4.6) Hypothesis 構造体** (gateway; (6.8)(c2) の τ rel A₀ + §6 (4.7)-(4.9) 双方の土台)。
+   combined Dade は **field として仮定** (構成は instantiator=S08 (6.8) application の責務)。
+   設計難所 = L≤G coercion (W₁,W₂≤↥L vs W≤G via TICyclic) + 二 (2.2) instance (A, A₀)。
+2. **§8 (6.8) program 直接** (s08_6_8_blocker_central_Z.md; Zc-central coherence; (1.6)/(6.7) status 確認要)。
+3. **(4.7)-(4.9) §6 完成** ((3.8) を活かす; (6.8) 経路外だが full-Pf scope; (4.6) structure 要)。
+
+### ✅ 着地 (session 26 cont.²): Pf (4.6) Hypothesis 構造体 (gateway scaffold, commit 2fa0830e)
+
+`Hypothesis46 (A : Set G) (L : Subgroup G)` を新 leaf `S06_CertainHypothesis46.lean` に定義
+(構造体のみ, warning-free, full build 3765 + AxiomsCheck OK)。**`extends CertainTypeHypothesis A L`**
+(= (4.2) on ↥L + (2.2)-Dade on A) + 追加フィールド:
+- (4.6.b) `tic : TICyclicHypothesis G` + `tic_W1/tic_W2 : tic.W_k = (W_k).map L.subtype` (L↪G 像で matching)
+- (4.6.c) `subH : Subgroup ↥L` + `subH_normal` + `W2_le_subH` + `subH_le_K`
+- (4.6.d) `A_covers : ∀hh∈subH^#, ∀x∈C_K(hh)^#, L.subtype x ∈ A` (covering ⋃C_K(h)^#⊆A) +
+  `dade0 : S04.Hypothesis G (A ∪ {l·v·l⁻¹ | l∈L, v∈tic.V}) L` (A₀=A∪V^L の (2.2))
+- (4.6.e) `tau : FullDadeIsometryData dade0` (τ rel A₀)
+- **🔑 instance: `[Fintype ↥L] [Invertible (Nat.card G:ℂ)] [Invertible (Nat.card ↥L:ℂ)]` を構造体
+  シグネチャに要求** (dade0/tau フィールドが要する; Fintype ↥L は [Fintype G] から自動でない)。
+- **Dade data (dade/dade0/tau) は field として仮定** — 構成 (K-local + V-TI Dade の合成) は
+  instantiator=§8 (6.8) application の責務。S08 の `CertainTypeHypothesis`(現 (c2) carry)を
+  `Hypothesis46` に拡張すれば (6.8)(c2) の τ rel A₀ が供給される。
+
+### ▶▶ 次 = (4.7) [Supp χ⊆A∪{1}] — ⚠ **(1.2) がブロッカー (未着手)**
+- **(1.2)** (mmd 04.3): H⊴G, χ∈Irr(G), H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0。**repo 未着手**。
+  証明 = 第二直交関係 `∑_χ|χ(g)|²=|C_G(g)|` + `C_H(g)=1⟹|C_G(g)|≤|C_{G/H}(ḡ)|` +
+  inflation (Φ=H-trivial chars=Irr(G/H), `∑_{φ∈Φ}|φ(g)|²=|C_{G/H}(ḡ)|`) ⟹ χ∉Φ で χ(g)=0。
+  clean self-contained (~100 行), 汎用 char theory (InflationCharacter + 第二直交)。
+- (4.7) は (1.2) + (4.6.d) A_covers で `Supp χ⊆A∪{1}` (χ∈Irr(K), H⊄Ker χ); χ_j (j≥1) part も。
+  Hypothesis46 のフィールドアクセス + (4.5) の χ_j (`certainTypeRestrict_isIrreducible` 等) を使う。
+
+正本 = 本ノート (session 26 cont.²)。**(4.6) structure 完成 (gateway)。次 = (1.2) [未着手, 第二直交+inflation]
+→ (4.7)。** **(4.7)-(4.9) は (6.8) case-B 経路外 (上記訂正); (6.8) closer は §8 Zc program。**
