@@ -319,11 +319,81 @@ AxiomsCheck 計 8 本 (sessions 6-7 で leaf 分全登録)。
   `no_complement_of_lt_cyclic` (新規; relIndex 論法)。
 
 ▶ **次 = Theorem 12.12** (S12_E:449 scaffold `frobenius_factorization_of_regular`;
-mmd L3336-3383 — **大物** (Frobenius 因子分解); 消費 = 12.7/12.8/12.5/12.6 + Ch06
-Frobenius 機構)。残 S12_E sorry 5 = 12.4(a) 系 ×3
+mmd L3336-3383 — **大物** (Frobenius 因子分解))。残 S12_E sorry 5 = 12.4(a) 系 ×3
 (`nonabelian_pgroup_isUniquelyMaximal` / `maximalContaining_centralizer_eq_singleton` /
 `sigma_subgroup_conj_into_Msigma`) + 12.12 + 12.15。12.13 は S12_E に scaffold 無し
 (リスト上は次の大物)。
+
+### ▶ Thm 12.12 実装レシピ (session 7 末 recon 済 — 再調査不要)
+
+**scaffold**: `frobenius_factorization_of_regular` (S12_E:449)。hreg =
+「∀ e ∈ E#, π(ord e) ⊆ τ₁∪τ₃ → M_σ ⊓ C_G({e}) = ⊥」。新 leaf `S12_Theorem1212.lean`。
+
+**3 大ケース** (mmd L3340-3383):
+1. **τ₂(M) = ∅** (E = E₁E₃): A₀ := ⊥, E₀ := E。(a) = ∀e∈E#, π(ord e)⊆τ₁∪τ₃ (τ-分割
+   `mem_tau_union_of_mem_primeFactors` + E₂ trivial) → hreg → C_E(x) = ⊥。
+   (b) Frobenius = hreg 直。exponent = rfl。
+2. **nonabelian Sylow p** (p∈τ₂): **12.7 部分定理を直接呼ぶ** (assembly でなく):
+   `exists_canonical_line_of_nonabelianSylow` (A₀, card p, habs) →
+   `fitting_eq_sup_of_canonical_line` **第1連言 = M ≤ N(A₀)** (E-正規性) →
+   `exists_complement_of_canonical_line` (E₀) + (e) `primeFactors_centralizer_le_tau1_of_disjoint`
+   + hreg → C_{E₀}(x) = ⊥。(a) の C_E(x) ≤ A₀: A₀ ≤ C_E(x) (hMσC swap) +
+   C_E(x)⊓E₀ = ⊥ + [E:E₀] = p で card ≤ p。**exponent**: E₀ の Sylow p ≅ P/A₀ ≅ Z cyclic
+   (P = A₀ × Z, 10.13(b)) — per-prime exponent 勘定 (下記 4)。
+3. **abelian Sylow** (12.8 regime): (a): A₀ := E₂ (12.8(a))、C_E(x) ≤ E₂ =
+   「C_E(x) は τ₂-群 (e = e₁e₂ 素数分解で τ₁τ₃-部分は hreg で死ぬ; e_r ∈ ⟨e⟩ ⟹
+   C(e) ≤ C(e_r)) + `IsPiGroup.normal_le_hall`」。(b): 各 p∈τ₂ に cyclic Z_p ⊴ E,
+   exp(Z_p) = exp(S_p), C_{M_σ}(Ω₁(Z_p)) = ⊥ を構成 → E₀ := E₁ ⊔ (⊔_p Z_p) ⊔ E₃:
+   - **N_G(S)-不変 cyclic Z ≠ ⊥ は自動的に C_{M_σ}(Ω₁(Z)) = ⊥** (mmd L3345): さもなくば
+     12.6(c) `maximalContaining_centralizer_line_eq_singleton`-経由で N_G(S) ≤ N_G(Ω₁(Z)) ≤ M
+     — 12.5(b) `N_G(S) ⊄ M` に矛盾。Ω₁(Z) char Z ⊴ N_G(S) の transport。
+   - **case C_E(S) = E**: S = Y × Z cyclic ×2 (**abelian rank-2 の cyclic 分解 — 要 recon**:
+     mathlib に直接形が無ければ S ≅ Z/p^a × Z/p^b を `IsPGroup.commutative...` 経由で?
+     12.7(d) の Maschke 流 or `Subgroup.pow_index_mem` 流で手組みも可)。|Y|<|Z| なら
+     Ω₁(Z) char S (= Ω₁(℧^{k}(S)) 形) → N_G(S)-不変。|Y|=|Z| なら任意の
+     A₁ ∈ ℰ¹(A) を Ω₁(Z) に取れる + **12.5(f)** (`Msigma_nilpotent_of_tau2 ….2.2.2.2.2`:
+     ∃A₁, C_{M_σ}(A₁) = ⊥)。⚠ この枝は「Z ⊴ E」を C_E(S) = E (E が S を中心化) から得る。
+   - **case C_E(S) ≠ E**: q ∈ π(E/C_E(S)), Q := Sylow q of N_G(S) ⊇ Q₁ := Sylow q of E
+     (E ≤ N_G(S) = 12.8 `sylow_eq_opiCore_fittingInG_of_tau2` 第2連言)。
+     Q₁ ⊄ C_E(A) = **Prop 1.6(e)** (新 helper ~15 行: (d) `fitting_coprime_abelian_decomp` +
+     「Ω₁([S,Q₁]) ≤ C⊓[S,Q₁] = ⊥ ⟹ [S,Q₁] = ⊥」+ **A = Ω₁(S)** = `omega1_eq_of_tau2`) →
+     12.10(c) で q ∈ τ₁(M), Q₁ cyclic。Q₀ := C_Q(S) ⊂ Q₁ (C_G(S) ≤ E [12.8(c)] ⟹
+     Q₀ ≤ Q⊓E = Q₁ [Sylow 極大性])。
+     **regular 仮定の反駁**: (i) r_q(N_G(S)) = 2: Ω₁(Q₁) は A を中心化 (12.8(e)
+     `central_line_of_abelianSylow` … 要シグネチャ確認) → **12.11(c)** (q ∈ π(index)∩π(card)
+     ✓) で q ∈ τ₂(M*) ∧ P ⊴ M* → **S = P** (S, P とも abelian Sylow-p-of-G ∋ A ⟹
+     ≤ C_G(A) ≤ M*; P ⊴ M* は唯一 Sylow ⟹ S ≤ P ⟹ S = P) ⟹ **N_G(S) = M*** (maximal)
+     ⟹ r_q(N_G(S)) = pRank M* q = 2。(ii) regular ⟹ **Prop 3.9** で Q/Q₀ cyclic ⟹
+     Ω₁(Q) ≤ Q₁ (Q₀ ≤ Q₁ + quotient Ω₁ 持ち上げ) ⟹ r(Q) ≤ 1 (elem-ab B ≤ Ω₁(Q) ≤
+     cyclic) — (i) と omega 矛盾。
+     **non-regular 出口**: ∃x ∈ Q−Q₀, C_S(x) ≠ ⊥ → S₀ := C_S(⟨x⟩), S₁ := [S,⟨x⟩]:
+     S = S₀ × S₁ (1.6(d)), 両方 cyclic (rank-2 の直積因子, 両方 ≠ ⊥... S₁ = ⊥ なら
+     x ∈ C(S) = Q₀ ✗), **12.8(f)** `relative_normality_of_abelianSylow` で両方 ⊴ N_G(S)
+     → 上の自動 regularity → Z := |S₀|≥|S₁| ? S₀ : S₁ (exp(Z) = exp(S) = max)。
+4. **Prop 3.9 (新規形式化, leaf 内 public — BG は G 5.3.14 引用だが repo 流の短証明)**:
+   `R` p-群 (p odd) が `H ≠ 1` に coprime FPF 作用 (φ : R →* MulAut H) ⟹ IsCyclic R。
+   証明 = `S10.isCyclic_of_pRank_le_one` + by_contra で rank ≥ 2 → B ≤ R elem-ab p²
+   (`exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank` + `exists_subgroup_card_prime_sq`)
+   → **Isaacs 6.21** `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`
+   (S01b_Prop116; φ' := φ.comp B.subtype, ¬cyclic = elem-ab p² rank2) → 各 C_H(b) = ⊥
+   (FPF) → H = ⊥ ✗。**12.12 での適用は quotient 作用 Q/Q₀ ↷ S**: φ̄ を
+   `QuotientGroup.lift`-form で組む (ker ⊇ Q₀ = C_Q(S)); regular 仮定がちょうど FPF。
+5. **Frobenius 判定**: `Ch06.IsFrobeniusGroup` fields = isNormal/isComplement'/ne_bot ×2/
+   conj_frobenius (∀a∈A#, ∀n∈N#, ana⁻¹ ≠ n)。M_σ ⊴ M_σ⊔E₀ = `normal_subgroupOf_…`,
+   IsComplement' = disjoint + card (`Subgroup.isComplement'_…` 要 recon)、
+   conj_frobenius ⟺ C_{M_σ}(a) = ⊥ (元計算)。
+6. **E₀ 全体の regularity** (∀e∈E₀#, C_{M_σ}(e) = ⊥): e の素数部分 e_r ∈ ⟨e⟩ (∃k, e_r = e^k)
+   ⟹ C(e) ≤ C(e_r); r ∈ τ₁∪τ₃ → hreg; r ∈ τ₂ → e_r ∈ Sylow-r(E₀) = Z_r
+   (|E₀|_r = |Z_r| ∧ Z_r ⊴ E₀ ⟹ 唯一 Sylow) → ⟨e_r⟩ ⊇ Ω₁(Z_r)-条項。
+   **exponent**: exp = lcm-of-Sylow-exponents の per-prime 勘定
+   (**mathlib `Monoid.exponent` API 要 recon**: `Monoid.exponent_eq_iSup_orderOf` 系 +
+   Sylow ごとの分解; E₀ の Sylow: r∈τ₁τ₃ は E₁/E₃ 全体が入るので E と同一, r∈τ₂ は
+   Z_r で exp(Z_r) = exp(S_r) を構成時に確保)。
+
+**未 recon (session 8 冒頭で)**: (i) abelian p-群 rank-2 の cyclic×cyclic 分解の mathlib 形,
+(ii) `Monoid.exponent` × Sylow API, (iii) `IsComplement'` 構成 lemma 名,
+(iv) 12.8(e)/(f) の正確なシグネチャ, (v) quotient 作用 φ̄ の組み方
+(`MulAut.conjNormal`? `QuotientGroup.lift`)。
 
 ### (履歴) 残 = 12.8 (d)(e)(f) + assembly — 設計メモ (session 5)
 
