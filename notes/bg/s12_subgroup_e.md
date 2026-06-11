@@ -99,10 +99,55 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
 12.2(b)τ₁τ₃ + 12.5(e)**; §13 で再利用可能) / `centralizer_zpowers_eq_singleton` /
 assembly `elemAb_normal_in_E_of_tau2` (S12_E から移動)。**S12_E 実 sorry 10**。
 
-### ▶ 次 = **Thm 12.7** `tau2_singleton_of_nonabelianSylow` (大物・専用 leaf 推奨,
-**Lem 10.13(b)(c) 直接消費**) → 12.8 → 12.9 → 12.10 → 12.11 → 12.12 → σ-side。
-12.7 着手時は mmd L3171-3220 を精読し、10.13 の repo surface
-(`S10_LocalLemmas`/`S10_LocalCriteria` 内) を先に確認すること。
+### 🔵 session 4: **Thm 12.7 設計 (recon 完了, 全依存 EXISTS 確認済)** — mmd L3201-3251
+
+leaf `S12_Theorem127.lean` (import S12_Corollary126)。3 commit 構成。**確認済 API**:
+
+- **Lem 10.13** = `S10.nonabelian_pSubgroup_rankTwoElemAbelian_structure` (S10_LocalLemmas:976):
+  入力 (p∈π(G), A∈ℰ_p², `IsMaximalElementaryAbelian` [= `isMaximalElementaryAbelian_of_mem_tau2`
+  S12_ECore:490], P nonab p-群, A≤P, A₀∈`elemAbelianOfRankIn p 1 A`, A₀≠`omega1CenterInG P p`) →
+  (a) Z₀∈ℰ¹(A); (b) ∃Z≤P cyclic, Z₀≤Z, A₀⊓Z=⊥, C(A)⊓P=A₀⊔Z; (c) ∀X,Y∈ℰ¹(A)∖{Z₀}:
+  ∃n∈N(A)⊓P, conj n•X=Y。
+- **Prop 10.10(c)** = `S10.normalizer_factorization` (S10_BetaRadical:2815): 入力 (p≠q,
+  A∈ℰ_p²∩ℰ*, **Q∈`hInvariantStar ⊤ A {q}`**, q∈π(C_G(A))) → ∃P∈Syl_p(G), A≤P, …,
+  (Q cyclic ∨ ∃B:Subgroup ↥Q, card=q²∧max-elem-ab) → P ≤ C_G(Q)。
+  Q 構成 = `exists_le_hInvariantStar` (AInvariantPiSubgroups:255, public)。
+- **(d) Maschke** = `Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient`
+  (OperatorMaschke:159): R:=P abelian, φ:E₁-action, S:=Y:=`Agemo ↥P p 1`-image
+  (characteristic ✓), W₀:=A₀ → E₁-不変 X, Y≤X, X̄⊓Ā₀=⊥, X̄⊔Ā₀=Ω₁(P/Y)=⊤ (P/Y exp p)。
+  E₀ := E₁⊔X⊔E₃ (E₁ norm X+E₃ ✓), card = |E|/p (`card_sup_eq_mul_of_le_normalizer_of_disjoint`
+  連鎖: X⊓E₃=⊥ coprime, E₁⊓XE₃=⊥) ⟹ A₀⊓E₀=⊥ (A₀⊆E₀ なら ⊔=E₀≠E ✗)。
+- fittingInG API (S08_FittingOfMaximal): `fittingInG_isNilpotent`,
+  `le_fittingInG_of_normal_isPiSubgroup_singleton`, `fittingInG_le` 等。
+- partition: `h.mem_tau_union_of_mem_primeFactors` (S12_ECore:295)。
+- π-群≤normal Hall: `S10.isPiGroup_le_of_normal_isHallSubgroup` (S10:232)。
+- ℰ_q² 存在 = `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (S04_PGroupsSmallRank:947)。
+
+**証明スケッチ (BG faithful)**: P := Sylow p of E (= Sylow of M: ν_p(|M|)=ν_p(|E|),
+|M|=|M_σ||E|); S ⊇ P Sylow of G (nonab 移送); C_S(A)=P⊂S (P abelian [12.5(b)] +
+C_G(A)≤E [12.6(b)] ⟹ C_S(A)≤E p-群 ⊇P Sylow-of-E ⟹ =P)。
+(a): q∈τ₂∖{p} → B∈ℰ_q²(E) (pRank=2 → Sylow-q of ↥M 内 elem-ab card q² →conj into E)
+→ B ⊴ E [12.6(a)-q] → A 中心化 B (⁅A,B⁆≤A⊓B=⊥ 双方正規+coprime) → Q := hInvStar ⊇ B
+(B∈ℰ*(G) [12.1(g)] ⟹ B.subgroupOf Q ∈ℰ²(Q)∩ℰ*(Q) 移送) → 10.10(c): Syl_p(G) P'≤C(Q)≤C(B)≤E
+[12.6(b)-q] → |P'|=|S|>|P|=p-part(|E|) ✗。
+(c): A₀ 存在 = 一般 line-engine 対偶 (M_σ≠⊥ [isHall_Msigma_Malpha .2.2.2.2?? — 要素確認] +
+∀line C=⊥ ⟹ M_σ=⊥); ℳ(C(A₀))={M} [12.6(c)]; S⊄M (S≤M⟹|S|≤|P| ✗); A₀≠Z₀ (A₀≤Z₀⟹S≤C(A₀)≤M ✗);
+X=Z₀ 枝: S≤C(Z₀) ⟹ C(X)⊄M ⟹ C_{M_σ}(X)=⊥ [12.6(c) 対偶]; X≠Z₀ 枝: 10.13(c) (X,A₀) →
+n∈N(A)⊓S, A₀^n=X; n∉P (P abelian: A₀^n=A₀≠X); S⊓M=P (P Sylow-of-M card-max) ⟹ n∉M;
+ℳ(C(X))={M^n} (conj 移送) ⟹ C_{M_σ}(X)=⊥ ∧ C(X)⊄M (どちらも M=M^n⟹n∈N_G(M)=M ✗)。
+M_σ=C_{M_σ}(A₀): line-engine T:=C(A₀)。A₀=A⊓C(M_σ): ⊇ swap; ⊊ なら A⊆C(M_σ) ⟹ 第2の line も
+C_{M_σ}≠⊥ ✗ (c)。
+(b): A₀⊴M (m=se 分解: A₀^e=A₀ [A⊴E+C(M_σ) e-不変], A₀^s=A₀ [s∈M_σ⊆C(A₀)]); F(M)⊇M_σ⊔A₀
+(nilpotent normal ≤ F ×2); ⊆: q∈π(F): O_q(F)⊴M → 12.2(a) (M*:=M) → q∈σ∪{p};
+O_p(F)=:W⊴M p-群 → W≤全 Sylow ⟹ W≤P → W≤C(M_σ) (⁅W,M_σ⁆≤W⊓M_σ=⊥) → W≤C_P(M_σ)=A₀
+(P=A₀×Z [10.13(b)], C_Z(M_σ)=⊥ [(c): Z の line ≠A₀], C_P(M_σ)=A₀×C_Z=A₀); σ-part ≤ M_σ。
+(e): r∈π(C_{E₀}(x)) → y order r (Cauchy in ↥C_{E₀}(x)) → r∈τ₁∪τ₂∪τ₃ [partition];
+r∈τ₃ ⟹ y∈E₃ [normal Hall 吸収] ⟹ 12.6(d) ✗; r=p ⟹ line X_y≤⟨y⟩: C_{M_σ}(X_y)∋x≠1 ⟹
+(c) X_y=A₀ ⟹ A₀≤E₀ ✗; ⟹ r∈τ₁。
+**prep (commit 1)**: 一般 engine `le_of_forall_line_inf_centralizer_le` (bridge へ;
+旧 `le_centralizer_of_forall_line` をそれ経由に refactor) + bridge の conj privates を
+public 化 (mulAut_smul_eq_map/normalizer_conj_smul) + `centralizer_conj_smul`/
+`isCoatom_conj_smul` 追加 + B-存在 helper + P-Sylow-of-M-from-E helper。
 
 — (12.6 の) **完全レシピ (session 3 recon 済, 履歴用)**:
 

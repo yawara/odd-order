@@ -255,18 +255,66 @@ theorem not_conj_of_mem_sigma_of_normalizer_le [Finite G] (hG : IsMinimalSimpleO
   rw [hfix] at hc
   exact hMne hc
 
-/-- Pointwise `MulAut`-smul of a subgroup is its image. -/
-private theorem mulAut_smul_eq_map (φ : MulAut G) (H : Subgroup G) :
+/-- Pointwise `MulAut`-smul of a subgroup is its image.
+(Public: §12 uses this for conjugation transport, e.g. in Theorem 12.7.) -/
+theorem mulAut_smul_eq_map (φ : MulAut G) (H : Subgroup G) :
     φ • H = H.map φ.toMonoidHom := by
   ext x
   exact ⟨fun ⟨y, hy, hyx⟩ => ⟨y, hy, hyx⟩, fun ⟨y, hy, hyx⟩ => ⟨y, hy, hyx⟩⟩
 
 /-- Conjugation commutes with the normalizer. -/
-private theorem normalizer_conj_smul (g : G) (H : Subgroup G) :
+theorem normalizer_conj_smul (g : G) (H : Subgroup G) :
     MulAut.conj g • Subgroup.normalizer (H : Set G)
       = Subgroup.normalizer ((MulAut.conj g • H : Subgroup G) : Set G) := by
   rw [mulAut_smul_eq_map, mulAut_smul_eq_map]
   exact Subgroup.map_normalizer_eq_of_bijective H (MulAut.conj g).bijective
+
+/-- Conjugation commutes with the centralizer. -/
+theorem centralizer_conj_smul (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.centralizer (H : Set G)
+      = Subgroup.centralizer ((MulAut.conj g • H : Subgroup G) : Set G) := by
+  ext x
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+    Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hx h hh
+    rw [SetLike.mem_coe, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hh
+    have h1 := hx _ (SetLike.mem_coe.mpr hh)
+    -- `h1` says `(g⁻¹hg)(g⁻¹xg) = (g⁻¹xg)(g⁻¹hg)`; conjugate back by `g`.
+    have h2 := congrArg (fun z => g * z * g⁻¹) h1
+    simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using h2
+  · intro hx h hh
+    have hgh : g * h * g⁻¹ ∈ (MulAut.conj g • H : Subgroup G) := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using hh
+    have h1 := hx _ (SetLike.mem_coe.mpr hgh)
+    have h2 := congrArg (fun z => g⁻¹ * z * g) h1
+    simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using h2
+
+/-- Conjugation preserves coatoms (maximal subgroups). -/
+theorem isCoatom_conj_smul {g : G} {M : Subgroup G} (h : IsCoatom M) :
+    IsCoatom (MulAut.conj g • M) := by
+  have hMeq : M = MulAut.conj g⁻¹ • (MulAut.conj g • M) := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  constructor
+  · intro htop
+    apply h.1
+    rw [eq_top_iff]
+    intro x _
+    have hx : g * x * g⁻¹ ∈ MulAut.conj g • M := by
+      rw [htop]; exact Subgroup.mem_top _
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+    simpa [MulAut.smul_def, mul_assoc] using hx
+  · intro b hb
+    have hle : M ≤ MulAut.conj g⁻¹ • b := by
+      rw [hMeq]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hb.le
+    have h1 : M < MulAut.conj g⁻¹ • b := by
+      refine lt_of_le_of_ne hle (fun heq => hb.ne ?_)
+      rw [heq, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    have h2 := h.2 _ h1
+    have h3 := congrArg (fun K => MulAut.conj g • K) h2
+    simpa [← mul_smul, ← map_mul, mul_inv_cancel] using h3
 
 /-- **BG Lemma 12.2(b)** (τ₁∪τ₃-case): if `p ∈ τ₁(M) ∪ τ₃(M)`, `X` is a nonidentity
 `p`-subgroup of `M`, and `N_G(X) ≤ M*`, then `M*` is not conjugate to `M` in `G`.
@@ -710,28 +758,29 @@ theorem two_le_rank_of_mem_elemAbelianOfRank_two [Finite G] {p : ℕ} [Fact p.Pr
     Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
   exact hle.trans (pRank_le_rank p)
 
-/-! ## Proposition 12.4 — generation engine (BG Proposition 1.16(2)) -/
+/-! ## Generation engine (BG Proposition 1.16(2)) -/
 
-/-- **Generation engine for Proposition 12.4** (mmd L3133-3137 / L3149-3151): under the
-hypothesis of 12.4(b), let `W` be an `A`-invariant `p'`-subgroup of `M` such that for
-every line `Y ∈ ℰ¹(A)` and every maximal `M* ≠ M` over `N_G(Y)`, `A` centralizes
-`W ⊓ M*` (this is what Lemma 12.3(a)/(b) supplies). Then `W ≤ C_G(A)`: by BG
-Proposition 1.16(2), `W = ⟨C_W(Y) | Y ≤ A, A/Y cyclic⟩`, and each cocyclic `Y` is
-either all of `A` (then `C_W(Y) ≤ C_G(A)` trivially) or a line (then
-`C_W(Y) ≤ W ⊓ M*` for some `M* ∈ ℳ(N_G(Y)) − {M}` and the supplied centralizing
-applies). -/
-private theorem le_centralizer_of_forall_line [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M)
-    (hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
-      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M})
+/-- **Line-generation engine** (BG Proposition 1.16(2), specialised to a rank-two
+elementary abelian `A`): if `A` normalizes a `p'`-subgroup `W` and
+`C_W(Y) = W ⊓ C_G(Y) ≤ T` for **every** line `Y ∈ ℰ¹(A)`, then `W ≤ T`.
+By 1.16(2), `W = ⟨C_W(Y) | Y ≤ A, A/Y cyclic⟩`; a cocyclic `Y ≤ A` is `⊥` (impossible:
+`A` is not cyclic), a line (supplied), or all of `A` (then `C_W(A) ≤ C_W(Y₀)` for any
+line `Y₀`). Used in Proposition 12.4 (`T = C_G(A)`) and Theorem 12.7 (`T = C_G(A₀)`). -/
+theorem le_of_forall_line_inf_centralizer_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
     {W : Subgroup G} (hWinv : A ≤ Subgroup.normalizer (W : Set G))
-    (hWp : ¬ p ∣ Nat.card ↥W)
-    (hsupply : ∀ Y ∈ elemAbelianOfRank G p 1, Y ≤ A → ∀ Mstar ∈ maximalSubgroups G,
-      Mstar ≠ M → Subgroup.normalizer (Y : Set G) ≤ Mstar →
-      A ≤ Subgroup.centralizer ((W ⊓ Mstar : Subgroup G) : Set G)) :
-    W ≤ Subgroup.centralizer (A : Set G) := by
+    (hWp : ¬ p ∣ Nat.card ↥W) {T : Subgroup G}
+    (hsupply : ∀ Y ∈ elemAbelianOfRank G p 1, Y ≤ A →
+      W ⊓ Subgroup.centralizer (Y : Set G) ≤ T) :
+    W ≤ T := by
   classical
+  have hAne : A ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥A = 1 := by rw [hbot]; exact Subgroup.card_bot
+    rw [hA.2] at h1
+    have := (Fact.out : p.Prime).one_lt
+    nlinarith
+  obtain ⟨X₀, hX₀, hX₀A⟩ := exists_line_le hA.1 hAne
   -- conjugation action of `A` on `W`.
   letI act : MulDistribMulAction ↥A ↥W :=
     MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (W : Set G))) ↥W
@@ -748,15 +797,26 @@ private theorem le_centralizer_of_forall_line [Finite G] (hG : IsMinimalSimpleOd
   haveI : IsMulCommutative ↥A := ⟨⟨hA.1.comm⟩⟩
   have hgen :=
     OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic φ hcop hAnc
-  -- every cocyclic generator centralizes `A`.
-  have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ ≤
-      (Subgroup.centralizer (A : Set G)).comap W.subtype := by
+  -- the fixed points of a cocyclic subgroup land in `T`.
+  have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ ≤ T.comap W.subtype := by
     refine (Subgroup.closure_le _).mpr ?_
     rintro g ⟨Y, ⟨a, hYa⟩, hfix⟩
     rw [SetLike.mem_coe, Subgroup.mem_comap]
     have hYdvd : Nat.card ↥Y ∣ Nat.card ↥A := Subgroup.card_subgroup_dvd_card Y
     rw [hA.2] at hYdvd
     obtain ⟨i, hi2, hicard⟩ := (Nat.dvd_prime_pow Fact.out).mp hYdvd
+    -- the generator centralizes the image of `Y` in `G`.
+    have hgC : W.subtype g ∈ Subgroup.centralizer ((Y.map A.subtype : Subgroup G) : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      intro y hy
+      rw [SetLike.mem_coe, Subgroup.mem_map] at hy
+      obtain ⟨y', hy', rfl⟩ := hy
+      have h1 := congrArg W.subtype (hfix y' hy')
+      rw [hφ_coe] at h1
+      show (y' : G) * W.subtype g = W.subtype g * (y' : G)
+      calc (y' : G) * W.subtype g
+          = ((y' : G) * W.subtype g * (↑y')⁻¹) * ↑y' := by group
+        _ = W.subtype g * (y' : G) := by rw [h1]
     interval_cases i
     · -- `|Y| = 1`: then `A = ⟨a⟩` is cyclic, contradiction.
       exfalso
@@ -765,47 +825,52 @@ private theorem le_centralizer_of_forall_line [Finite G] (hG : IsMinimalSimpleOd
       refine hAnc ⟨⟨a, fun x => ?_⟩⟩
       have hx : x ∈ Subgroup.zpowers a := by rw [hYa]; exact Subgroup.mem_top x
       exact hx
-    · -- `|Y| = p`: a line; Lemma 12.3 supplies the centralizing.
+    · -- `|Y| = p`: a line; the supply applies directly.
       set Yg : Subgroup G := Y.map A.subtype with hYgdef
       have hYg_card : Nat.card ↥Yg = p := by
         rw [hYgdef, Subgroup.card_map_of_injective A.subtype_injective, hicard, pow_one]
       have hYg_mem : Yg ∈ elemAbelianOfRank G p 1 :=
         ⟨Subgroup.IsElementaryAbelian.of_card_prime hYg_card, by rw [hYg_card, pow_one]⟩
-      have hYg_le : Yg ≤ A := Subgroup.map_subtype_le _
-      obtain ⟨Mst, hMst_mem, hMst_ne, hMst_le⟩ :=
-        exists_maximal_ne_of_normalizer_ne_singleton hG hM
-          (ne_bot_of_mem_elemAbelianOfRank_one hYg_mem) (hYg_le.trans hAM)
-          (hb Yg hYg_mem hYg_le)
-      have hcent := hsupply Yg hYg_mem hYg_le Mst hMst_mem hMst_ne hMst_le
-      have hgC : W.subtype g ∈ Subgroup.centralizer (Yg : Set G) := by
-        rw [Subgroup.mem_centralizer_iff]
-        intro y hy
-        rw [SetLike.mem_coe, hYgdef, Subgroup.mem_map] at hy
-        obtain ⟨y', hy', rfl⟩ := hy
-        have h1 := congrArg W.subtype (hfix y' hy')
-        rw [hφ_coe] at h1
-        show (y' : G) * W.subtype g = W.subtype g * (y' : G)
-        calc (y' : G) * W.subtype g
-            = ((y' : G) * W.subtype g * (↑y')⁻¹) * ↑y' := by group
-          _ = W.subtype g * (y' : G) := by rw [h1]
-      have hgMst : W.subtype g ∈ Mst := hMst_le (Subgroup.centralizer_le_normalizer _ hgC)
-      rw [Subgroup.mem_centralizer_iff]
-      intro h hh
-      exact (Subgroup.mem_centralizer_iff.mp (hcent hh) (W.subtype g) ⟨g.2, hgMst⟩).symm
-    · -- `|Y| = p²`: `Y = ⊤`, the generator centralizes all of `A` directly.
+      exact hsupply Yg hYg_mem (Subgroup.map_subtype_le _) ⟨g.2, hgC⟩
+    · -- `|Y| = p²`: `Y = ⊤`, so the generator centralizes `A ⊇ X₀` and the supply
+      -- for the line `X₀` applies.
       have hYtop : Y = ⊤ := Subgroup.eq_top_of_card_eq _ (by rw [hicard, hA.2])
-      rw [Subgroup.mem_centralizer_iff]
-      intro h hh
-      have h1 := congrArg W.subtype (hfix ⟨h, hh⟩ (hYtop ▸ Subgroup.mem_top _))
-      rw [hφ_coe] at h1
-      show h * W.subtype g = W.subtype g * h
-      calc h * W.subtype g = (h * W.subtype g * h⁻¹) * h := by group
-        _ = W.subtype g * h := by
-            rw [show h * W.subtype g * h⁻¹ = W.subtype g from h1]
+      have hmapA : (Y.map A.subtype : Subgroup G) = A := by
+        rw [hYtop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+      have hgCA : W.subtype g ∈ Subgroup.centralizer (A : Set G) := hmapA ▸ hgC
+      exact hsupply X₀ hX₀ hX₀A
+        ⟨g.2, Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hX₀A) hgCA⟩
   intro w hw
   have hmem : (⟨w, hw⟩ : ↥W) ∈ OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ := by
     rw [hgen]; exact Subgroup.mem_top _
   exact Subgroup.mem_comap.mp (hle hmem)
+
+/-- **Generation engine for Proposition 12.4** (mmd L3133-3137 / L3149-3151): under the
+hypothesis of 12.4(b), let `W` be an `A`-invariant `p'`-subgroup of `M` such that for
+every line `Y ∈ ℰ¹(A)` and every maximal `M* ≠ M` over `N_G(Y)`, `A` centralizes
+`W ⊓ M*` (this is what Lemma 12.3(a)/(b) supplies). Then `W ≤ C_G(A)`. -/
+private theorem le_centralizer_of_forall_line [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M)
+    (hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M})
+    {W : Subgroup G} (hWinv : A ≤ Subgroup.normalizer (W : Set G))
+    (hWp : ¬ p ∣ Nat.card ↥W)
+    (hsupply : ∀ Y ∈ elemAbelianOfRank G p 1, Y ≤ A → ∀ Mstar ∈ maximalSubgroups G,
+      Mstar ≠ M → Subgroup.normalizer (Y : Set G) ≤ Mstar →
+      A ≤ Subgroup.centralizer ((W ⊓ Mstar : Subgroup G) : Set G)) :
+    W ≤ Subgroup.centralizer (A : Set G) := by
+  refine le_of_forall_line_inf_centralizer_le hA hWinv hWp ?_
+  intro Y hY hYA
+  obtain ⟨Mst, hMst_mem, hMst_ne, hMst_le⟩ :=
+    exists_maximal_ne_of_normalizer_ne_singleton hG hM
+      (ne_bot_of_mem_elemAbelianOfRank_one hY) (hYA.trans hAM) (hb Y hY hYA)
+  have hcent := hsupply Y hY hYA Mst hMst_mem hMst_ne hMst_le
+  rintro x ⟨hxW, hxC⟩
+  have hxMst : x ∈ Mst := hMst_le (Subgroup.centralizer_le_normalizer _ hxC)
+  rw [Subgroup.mem_centralizer_iff]
+  intro a ha
+  exact (Subgroup.mem_centralizer_iff.mp (hcent ha) x ⟨hxW, hxMst⟩).symm
 
 /-! ## Proposition 12.4 (mmd L3125-3157) -/
 
