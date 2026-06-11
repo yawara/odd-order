@@ -44,6 +44,7 @@ import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -3643,6 +3644,12 @@ axiom(s):{indentD m!"{bad.toList}"}"
 -- `A₁ = A₀^{g₁} ≠ A₂ = A₀^{g₂}` with `A = A₁ × A₂` and trivial `M_σ`-centralizers
 -- (odd index `|N_G(P) : N_M(P)| ≥ 3`). Input for Theorem 11.7. **Unconditional.**
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S11.exists_distinct_conj_lines
+-- BG §11: Theorem 11.7 (`MsigmaA_normal`): `M_σ A ⊴ M` — the climax of §11. The complement
+-- `E ⊇ A` to `M_σ` carries the descending Hall radicals `K = O_τ(E)`, `W = O_{τ∪{p}}(E)`
+-- (Thm 4.20(c), `S05b_Thm420Hall`); either `A` centralises `K` and `A = Ω₁(O_p(W))` is
+-- characteristic in `W ⊴ E`, or an `A`-invariant Sylow `q` of `K` forces `q ∈ σ(M)` via
+-- Prop 10.10(c) / Prop 1.6(d) + Cor 11.6(c) + Prop 10.11(d). **Unconditional.**
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.MsigmaA_normal
 
 /-! ### BG §12: Lemma 12.1 (`subgroupE_basic`) — unconditional
 
