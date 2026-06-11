@@ -53,6 +53,44 @@ theorem normalizer_le_of_maximalSubgroupsContaining_eq_singleton [Finite G]
   rw [hsingle, Set.mem_singleton_iff] at hmem
   exact hmem ▸ hMst_le
 
+/-- **Proposition 12.4(b), contrapositive form** (the §11 entry from `τ₂`): for
+`p ∉ σ(M)` and `A ∈ ℰ_p²(M)`, some line `A₀ ∈ ℰ¹(A)` has `N_G(A₀) ≤ M`
+(mmd L3168: "By Proposition 12.4, `N_G(A₀) ⊆ M` for some subgroup `A₀ ∈ ℰ¹(A)`
+because `p ∉ σ(M)`"). -/
+theorem exists_line_normalizer_le_of_notMem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpσ : p ∉ S10.sigma M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
+    (hAM : A ≤ M) :
+    ∃ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A ∧
+      Subgroup.normalizer (A₀ : Set G) ≤ M := by
+  by_contra hno
+  have hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M} := by
+    intro A₀ hA₀ hA₀A hsingle
+    exact hno ⟨A₀, hA₀, hA₀A,
+      normalizer_le_of_maximalSubgroupsContaining_eq_singleton hG hM (hA₀A.trans hAM)
+        (ne_bot_of_mem_elemAbelianOfRank_one hA₀) hsingle⟩
+  exact hpσ (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM hb).1
+
+/-- **BG Theorem 12.5(b), `Ω₁`-clause** (mmd L3162): for `p ∈ τ₂(M)` and `A ∈ ℰ_p²(M)`,
+**every** Sylow `p`-subgroup `P` of `M` containing `A` satisfies `A = Ω₁(P)` and
+`N_G(P) ⊄ M`. (The Sylow-independent strengthening of the `P`-clause of
+`Msigma_nilpotent_of_tau2`; Corollary 11.6(a) transported along
+`Hypothesis111.of_sylow`. Used in Corollary 12.6(a) to identify `ℰ_p¹(E) = ℰ¹(A)`.) -/
+theorem omega1_eq_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M)
+    {P : Subgroup G} (hPpg : IsPGroup p ↥P) (hAP : A ≤ P) (hPM : P ≤ M)
+    (hPsyl : ∀ R : Subgroup G, P ≤ R → R ≤ M → IsPGroup p ↥R → R = P) :
+    A = (Omega ↥P p 1).map P.subtype ∧ ¬ Subgroup.normalizer (P : Set G) ≤ M := by
+  classical
+  have hpσ : p ∉ S10.sigma M := tau2_subset_sigma_compl M hp
+  obtain ⟨A₀, hA₀, hA₀A, hN⟩ :=
+    exists_line_normalizer_le_of_notMem_sigma hG hM hpσ hA hAM
+  obtain ⟨P₀, h111₀⟩ := S11.Hypothesis111.of_normalizer_le hG hM hpσ hA₀ hN hA hA₀A hAM
+  have h111 := h111₀.of_sylow hPpg hAP hPM hPsyl
+  exact ⟨(S11.omega1_eq_and_centralizer_trivial hG h111).1, h111.normalizer_P_not_le⟩
+
 /-- **BG Theorem 12.5** (mmd L3159): suppose `p ∈ τ₂(M)` and `A ∈ ℰ_p²(M)`. Then
 (a) `M_σ` is nilpotent; (b) `M` has abelian Sylow `p`-subgroups, and there is a Sylow
 `p`-subgroup `P` of `M` containing `A` with `N_G(P) ⊄ M`; (c) `M_σ A ⊴ M`;
@@ -76,17 +114,8 @@ theorem Msigma_nilpotent_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
   classical
   have hpσ : p ∉ S10.sigma M := tau2_subset_sigma_compl M hp
   -- Proposition 12.4 (contrapositive of (b)): some `A₀ ∈ ℰ¹(A)` has `N_G(A₀) ≤ M`.
-  obtain ⟨A₀, hA₀, hA₀A, hN⟩ : ∃ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A ∧
-      Subgroup.normalizer (A₀ : Set G) ≤ M := by
-    by_contra hno
-    have hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
-        maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M} := by
-      intro A₀ hA₀ hA₀A hsingle
-      exact hno ⟨A₀, hA₀, hA₀A,
-        normalizer_le_of_maximalSubgroupsContaining_eq_singleton hG hM (hA₀A.trans hAM)
-          (ne_bot_of_mem_elemAbelianOfRank_one hA₀) hsingle⟩
-    exact hpσ
-      (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM hb).1
+  obtain ⟨A₀, hA₀, hA₀A, hN⟩ :=
+    exists_line_normalizer_le_of_notMem_sigma hG hM hpσ hA hAM
   -- Hypothesis 11.1 holds for `(M, p, A₀, A)`.
   obtain ⟨P, h111⟩ := S11.Hypothesis111.of_normalizer_le hG hM hpσ hA₀ hN hA hA₀A hAM
   -- (d) `C_{M_σ}(A) = 1` (Corollary 11.6(b)).

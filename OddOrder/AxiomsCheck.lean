@@ -3753,3 +3753,7 @@ Hypothesis 11.1, then Theorems 11.3/11.5/11.7, Corollary 11.6, and Lemma 12.3(a)
 the conclusions — all unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_nilpotent_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega1_eq_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.not_conj_of_mem_tau1_union_tau3_of_normalizer_le

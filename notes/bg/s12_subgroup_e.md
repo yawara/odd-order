@@ -76,9 +76,81 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
   (`rw [hMα', bot_sup_eq]`) → `⁅A,K⁆ ≤ K⊓S = ⊥` (p'∩p) → `K ≤ C(A)` → (d)。
   原文の `A ⊆ O_p(M*)` 経路は O_p 機構不要のこの形で代替。
 
-### ▶ 残 cascade 11 件 (S12_E 実 sorry 11): τ₂-cascade 解禁。次 = **Cor 12.6**
-(`elemAb_normal_in_E_of_tau2`; 12.5 + (12.2) 消費, E-setup 文脈) → 12.7 (Lem 10.13(b)(c)
-直接消費・大物) → 12.8 → ...。12.6 の (f) は 10.12(b) + 12.5(a)。
+### ✅ session 3 cont.³: **Cor 12.6 前提 2 点 landed** (12.2(b) τ₁∪τ₃-case + 12.5(b) Ω₁ 条項)
+
+- **`not_conj_of_mem_tau1_union_tau3_of_normalizer_le`** (bridge): 12.2(b) τ₁∪τ₃-case
+  完成 — **σ/τ の共役移送一切不要**の contrapositive 実装: `M*=M^g` なら
+  `X' := conj g⁻¹ • X ≤ M` かつ `N_G(X') ≤ M` ⟹ 12.2(a) を **(M, X', M*:=M)** で呼ぶと
+  `p ∈ σ(M)∪τ₂(M)` — τ₁/τ₃ の `pRank=1` と `∉σ` に矛盾。private 複製 2 本
+  (`mulAut_smul_eq_map`/`normalizer_conj_smul`) のみ。12.2(b) は**これで全 case 完成**。
+- **`omega1_eq_of_tau2`** (S12_Theorem125): 12.5(b) の deferred Ω₁ 条項 —
+  `A ⊆ P ∈ Syl_p(M)` なる**任意の** P で `A = Ω₁(P)` ∧ `N_G(P)⊄M`。entry を
+  `exists_line_normalizer_le_of_notMem_sigma` に抽出 (12.5 本体もリファクタ) +
+  `Hypothesis111.of_sylow` + Cor 11.6(a)。
+
+### ▶ 残 cascade 11 件 (S12_E 実 sorry 11)。次 = **Cor 12.6** `elemAb_normal_in_E_of_tau2`
+— **完全レシピ (session 3 recon 済, 再調査不要)**:
+
+新 leaf `S12_Corollary126.lean` (import S12_Theorem125) 推奨。mmd L3179-3196。
+前提整理: `h : SubgroupESetup M E E₁ E₂ E₃`, `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)` (`hAE : A ≤ E`)。
+12.5 を `hAM := hAE.trans h.E_le` で呼んで全成果を取得しておく。
+
+1. **(a)-1 `E ≤ N(A)`**: Thm 12.5(c) `M ≤ N(M_σ⊔A)` + **Dedekind**: `e ∈ E ⊆ M`:
+   `A^e ≤ (M_σ⊔A)^e = M_σ⊔A` ∧ `A^e ≤ E` ⟹ `A^e ≤ (M_σ⊔A)⊓E = A`。
+   `(M_σ⊔A)⊓E = A` は ↥M 内で分解: `(Msigma M).subgroupOf M` Normal ⟹
+   `x ∈ M_σ⊔A` を `x = s·a` に分解 (mathlib `Subgroup.mul_normal`/`normal_mul` 系で
+   `↑(N ⊔ H) = ↑N * ↑H`; ↥M 内 or G 内どちらでも — G 内なら A ≤ N_G(M_σ) で
+   `Subgroup.sup_eq_range...` 不可なので **↥M 内が安全**)、`s = x·a⁻¹ ∈ M_σ⊓E = ⊥`
+   (h.isComplement'_subgroupOf.disjoint)。card 同値 conj: `A^e` と `A` の card 一致 +
+   `≤` ⟹ `eq_of_le_of_card_ge` で = (normalizer 化は mem_normalizer_iff 両向き)。
+2. **(a)-2 `X ≤ E ↔ X ≤ A` (X ∈ ℰ_p¹)**: ←は `hAE.trans` 自明。→: `X⊔A` は p-群
+   (`A ⊴ E` ⟹ X normalizes A, card_sup or IsPGroup of sup via ↥E-quotient…
+   実装は「X⊔A ≤ E p-部分群」: mathlib `IsPGroup.sup` 不在なら
+   `card_sup_eq_mul_of_le_normalizer_of_disjoint` 不要 — X·A ≤ Sylow まで行かず:
+   `(hX.isPGroup ⊔-route)` 詰まったら: X⊔A の代わりに **X ≤ Sylow P_X of M with A ≤ P_X**:
+   `A ⊴ E` でなく直接: X p-群 ≤ M ⟹ ∃ Sylow PM ⊇ (X⊔A).subgroupOf?? — X⊔A p-群の証明:
+   φ-quotient 不要、`Subgroup.sup_eq_mul`-card: |X⊔A| = |X·A| ∣ |X||A| (X norm A:
+   `card_sup_eq...disjoint` は disjoint 版なので不可) → 安全策 = `(X⊔A).subgroupOf E` 内
+   で O_p… **最簡**: X, A ≤ E、A ⊴ E: X⊔A ≤ E は p-群: mathlib
+   `IsPGroup.to_sup_of_normal_right (hX) (hA) [A.Normal]`?? — ↥E 内で
+   `(X.subgroupOf E) ⊔ (A.subgroupOf E)` に `IsPGroup.to_sup_of_normal_right`
+   (mathlib 存在: normal 側仮定で sup p-群 ✓) を適用し map で戻す。
+   そのあと Sylow PM of ↥M ⊇ (X⊔A).subgroupOf M、P' := map、`omega1_eq_of_tau2` の
+   P'-data (hPsyl は constructor 内のパターン) ⟹ `A = Ω₁(P')`;
+   x ∈ X: x^p = 1 (ℰ¹ elem-ab) ∧ x ∈ P' ⟹ `⟨x,_⟩ ∈ Omega ↥P' p 1`
+   (`Subgroup.subset_closure`, pow_one 注意: p^1) ⟹ x ∈ A ✓。
+3. **(b)**: `N_M(A) = E`: ⊇ は (a)-1 + h.E_le; ⊆: `N_M(A) = (N_M(A)⊓M_σ)·E` (Dedekind,
+   E ≤ N_M(A)) で `N_{M_σ}(A) = C_{M_σ}(A)` (s ∈ M_σ⊓N(A): `⁅A,s⁆ ≤ A⊓M_σ = ⊥`
+   [A ≤ E, M_σ⊓E=⊥] ⟹ centralize) `= ⊥` (12.5(d))。`C_G(A) ≤ E`:
+   12.4(a) `centralizer_le_of_elemAb_rank_two` ⟹ C_G(A) ≤ M ⟹ ≤ N_M(A) = E。
+   `N_G(A) ⊄ M`: A = Ω₁(P) char P (omega1_eq_of_tau2 + char 転送は
+   `normalizer_le_normalizer_omega1CenterInG` でなく Omega-char:
+   `N_G(P) ≤ N_G(Ω₁(P).map)` — AppB.normalizer_le_normalizer_map_of_characteristic
+   (W := Omega ↥P p 1, Characteristic instance 要 — OmegaSubgroup に instance あるはず)
+   + `¬N_G(P) ≤ M` (omega1_eq_of_tau2 .2)。
+4. **(c)**: X ∈ ℰ¹(A), C_{M_σ}(X) ≠ ⊥ ⟹ ℳ(C_G(X)) = {M}: M* ∈ ℳ(C_G(X)):
+   `A ≤ C(X)` (le_centralizer_self + centralizer_le) `≤ M*` ⟹ M* ∈ ℳ(A);
+   M* ≠ M なら 12.5(e) ⟹ `C_{M_σ}(X) ≤ M_σ⊓M* = ⊥` 矛盾 ⟹ 全員 = M;
+   nonempty: `C_G(X) < ⊤` (X ≠ ⊥ central なら X ⊴ G 矛盾 — C(X) = ⊤ ⟹ X ≤ center:
+   simple 群の center = ⊥ route か normalizer_lt_top 流用 C ≤ N) + coatom 存在。
+   = {M} は `Set.eq_singleton_iff_unique_mem`。
+5. **(d)(e)**: WLOG x prime order r (y := x^(orderOf x / r), C_{M_σ}(x) ≤ C_{M_σ}(y));
+   **(d)**: r ∈ π(E₃) ⊆ τ₃ (`h.E₃...` isPiGroup field); **`⁅A,E₃⁆ ≤ A⊓E₃ = ⊥`**
+   (A ⊴ E [(a)], E₃ ⊴ E [12.1(d), S12_ECore に landed], 双方 normal ⟹ commutator ≤ inf;
+   A⊓E₃ = ⊥ は p ∈ τ₂ vs π(E₃) ⊆ τ₃ の card 互いに素) ⟹ A ≤ C(x) ≤ N(⟨x⟩);
+   M* ∈ ℳ(N(⟨x⟩)) (coatom 存在; N < ⊤): `not_conj_of_mem_tau1_union_tau3_of_normalizer_le`
+   (Or.inr, X := ⟨x⟩ zpowers) ⟹ M* ≁ M ⟹ M* ≠ M (conj-refl: ⟨1, one_smul⟩);
+   A ≤ M* ⟹ 12.5(e) ⟹ C_{M_σ}(x) ≤ M_σ⊓M* = ⊥ (C(x) ≤ N(⟨x⟩) ≤ M*:
+   centralizer {x} vs zpowers: `centralizer_zpowers_eq_singleton`-ish S11:862 private —
+   C({x}) = C(⟨x⟩) 同値補題を自前 5 行)。**(e)**: x ∈ C_{E₁}(A)#: r ∈ π(E₁) ⊆ τ₁;
+   A ≤ C(x) は x ∈ C(A) の swap (`le_centralizer_swap` 単元版) — 残り同型。
+6. **(f)**: `S10.disjoint_of_not_conj hG hM hM* hnc |>.2 (12.5(a))` 直接 (10.12(b))。
+
+⚠ (d)(e) の「x prime order に reduce」: `orderOf` の素因数 r、y := x^(orderOf x / r):
+orderOf y = r (`orderOf_pow` + div); y ∈ E₃ (subgroup pow-closed); y ≠ 1;
+C_{M_σ}(x) ≤ C_{M_σ}(y) (centralizer {x} ⊆ centralizer {y}: y ∈ zpowers x)。
+π(E₃) ⊆ τ₃: SubgroupESetup の field 名要確認 (E₃_hall から isPiGroup 経由?
+`h.isPiGroup_tau3`?? — S12_ECore の SubgroupESetup projection 群を grep)。
 
 12.4 実装メモ (recon 済): worker = (b)-仮定 (`∀A₀∈ℰ¹(A), ℳ(N_G(A₀))≠{M}`) 下で
 `p∈σ ∧ M_α=⊥ ∧ M_σ nilpotent ∧ C_G(A)≤M` 一括証明 → (a) は by_cases で direct 枝

@@ -255,6 +255,66 @@ theorem not_conj_of_mem_sigma_of_normalizer_le [Finite G] (hG : IsMinimalSimpleO
   rw [hfix] at hc
   exact hMne hc
 
+/-- Pointwise `MulAut`-smul of a subgroup is its image. -/
+private theorem mulAut_smul_eq_map (φ : MulAut G) (H : Subgroup G) :
+    φ • H = H.map φ.toMonoidHom := by
+  ext x
+  exact ⟨fun ⟨y, hy, hyx⟩ => ⟨y, hy, hyx⟩, fun ⟨y, hy, hyx⟩ => ⟨y, hy, hyx⟩⟩
+
+/-- Conjugation commutes with the normalizer. -/
+private theorem normalizer_conj_smul (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.normalizer (H : Set G)
+      = Subgroup.normalizer ((MulAut.conj g • H : Subgroup G) : Set G) := by
+  rw [mulAut_smul_eq_map, mulAut_smul_eq_map]
+  exact Subgroup.map_normalizer_eq_of_bijective H (MulAut.conj g).bijective
+
+/-- **BG Lemma 12.2(b)** (τ₁∪τ₃-case): if `p ∈ τ₁(M) ∪ τ₃(M)`, `X` is a nonidentity
+`p`-subgroup of `M`, and `N_G(X) ≤ M*`, then `M*` is not conjugate to `M` in `G`.
+If `M* = M^g`, then `X' = X^{g⁻¹}` is a nonidentity `p`-subgroup of `M` with
+`N_G(X') ≤ M`, so Lemma 12.2(a) (applied with `M* := M`) forces `p ∈ σ(M) ∪ τ₂(M)` —
+contradicting `r_p(M) = 1` and `p ∉ σ(M)`. -/
+theorem not_conj_of_mem_tau1_union_tau3_of_normalizer_le [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M ∪ tau3 M) {X : Subgroup G} (hXM : X ≤ M)
+    (hXne : X ≠ ⊥) (hXp : IsPGroup p ↥X)
+    (hN : Subgroup.normalizer (X : Set G) ≤ Mstar) :
+    ¬ ∃ g : G, MulAut.conj g • M = Mstar := by
+  rintro ⟨g, hg⟩
+  set X' : Subgroup G := MulAut.conj g⁻¹ • X with hX'def
+  have hcollapse : MulAut.conj g⁻¹ • Mstar = M := by
+    rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hX'M : X' ≤ M := by
+    rw [hX'def, ← hcollapse]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr
+      (Subgroup.le_normalizer.trans hN)
+  have hX'ne : X' ≠ ⊥ := by
+    intro hbot
+    apply hXne
+    have h1 : MulAut.conj g • X' = X := by
+      rw [hX'def, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    rw [← h1, hbot]
+    ext x
+    simp [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  have hX'p : IsPGroup p ↥X' := by
+    rw [hX'def, mulAut_smul_eq_map]
+    exact hXp.map _
+  have hN' : Subgroup.normalizer (X' : Set G) ≤ M := by
+    rw [hX'def, ← normalizer_conj_smul, ← hcollapse]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hN
+  have h122a := prime_mem_sigma_or_tau2 hG hM hX'M hX'ne hX'p
+    (mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hN'⟩)
+  rcases hp with hp1 | hp3
+  · rcases h122a with hσ | hτ2
+    · exact hp1.1 hσ
+    · have h1 := tau1_pRank_eq_one hp1
+      have h2 := ((mem_tau2_iff M p).mp hτ2).2
+      omega
+  · rcases h122a with hσ | hτ2
+    · exact hp3.1 hσ
+    · have h1 := tau3_pRank_eq_one hp3
+      have h2 := ((mem_tau2_iff M p).mp hτ2).2
+      omega
+
 /-! ## Theorem 10.2(d) Sylow closure: `M_α S ⊴ M` for `p ∈ σ(M)` -/
 
 /-- **BG Theorem 10.2(d), Sylow `p`-closure** (used in the proof of Lemma 12.3(a),
