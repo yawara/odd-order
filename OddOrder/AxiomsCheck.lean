@@ -47,6 +47,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -3884,3 +3885,20 @@ For `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `q ∈ τ₁(M)`, `Q ∈ ℰ_q¹(E)` w
 case via Lemma 12.8(e) and a Hall-`τ₁` conjugation). Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.commutator_decomp_of_tau1_action
+
+/-! ### BG Corollary 12.10 (`S12_Corollary1210`)
+
+(a) every nilpotent `σ(M)'`-subgroup of `M` is abelian (the supporting
+`sylow_isMulCommutative_of_sigma_compl` gives abelian Sylow `r`-subgroups of `M` for all
+`r ∉ σ(M)` — cyclic for `r ∈ τ₁ ∪ τ₃` by the rank-1 bound, Theorem 12.5(b) for `r ∈ τ₂` —
+and `isMulCommutative_of_isNilpotent_of_forall_sylow` assembles the Sylow direct product);
+(b) `E₂` and `E' = derivedInG E` are abelian; (c) `E₂E₃ ≤ C_E(A) ⊴ E` with
+`π(E/C_E(A)) ⊆ τ₁(M)`; (d) noncyclic `p`-subgroups for `p ∈ σ(M)` satisfy `N_G(P) ≤ M`
+(Theorem 10.1(c) + Proposition 12.4(a)); (e) `τ₂`-elements `x` with `C_{M_σ}(x) ≠ 1` have
+`ℳ(C_G(x)) = {M}` (Hall-conjugate into `E₂`, then Theorem 12.5(e)). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isMulCommutative_of_isNilpotent_of_forall_sylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_isMulCommutative_of_sigma_compl
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.nilpotent_sigmaComplement_abelian
