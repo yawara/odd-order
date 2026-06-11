@@ -506,6 +506,45 @@ theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjCl
     rwa [h.centralizer_W2 g hg hg1] at hmem_inf
   exact hno a ha_mem haW2
 
+/-- **Peterfalvi (4.5.b), counting bound on `g`-stable classes** (mmd 04.6, (4.5.b) proof):
+for `g ∈ W₁^#`, the number of conjugacy classes of `K` normalized by `g` is at most `w₂`.
+Each such class meets `W₂` (`conjClass_meets_W2`), and distinct classes are disjoint, so picking
+a `W₂`-representative injects the `g`-stable classes into `W₂`. -/
+theorem card_fixed_conjClasses_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g))
+      ≤ Nat.card ↥h.W2 := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  classical
+  -- a `W₂`-representative of each `g`-stable class
+  let wit : Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g) → ↥h.K :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose
+  have hwit_carrier : ∀ p, wit p ∈ p.1.carrier :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose_spec.1
+  have hwit_W2 : ∀ p, ((wit p : L)) ∈ h.W2 :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose_spec.2
+  refine Nat.card_le_card_of_injective (fun p => (⟨(wit p : L), hwit_W2 p⟩ : ↥h.W2)) ?_
+  intro p q hpq
+  have hL := Subtype.ext_iff.mp hpq
+  have hwit_eq : wit p = wit q := Subtype.ext hL
+  apply Subtype.ext
+  calc p.1 = ConjClasses.mk (wit p) := (ConjClasses.mem_carrier_iff_mk_eq.mp (hwit_carrier p)).symm
+    _ = ConjClasses.mk (wit q) := by rw [hwit_eq]
+    _ = q.1 := ConjClasses.mem_carrier_iff_mk_eq.mp (hwit_carrier q)
+
+/-- **Peterfalvi (4.5.b), `g` fixes at most `w₂` irreducibles** (mmd 04.6, (4.5.b) proof, via
+[Is] Theorem 6.32): for `g ∈ W₁^#`, conjugation by `g` fixes at most `w₂` irreducible characters
+of `K`.  Brauer's permutation lemma equates the count of `g`-fixed irreducibles with the count of
+`g`-stable conjugacy classes (`card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
+which is `≤ w₂` by `card_fixed_conjClasses_le_W2`. -/
+theorem card_fixed_irr_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+    Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g))
+      ≤ Nat.card ↥h.W2 := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  rw [card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm]
+  exact h.card_fixed_conjClasses_le_W2 g hg hg1
+
 section Recipe
 
 variable [Invertible (Nat.card L : ℂ)]
