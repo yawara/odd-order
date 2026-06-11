@@ -1599,3 +1599,65 @@ full (4.6) に拡張: 現 `CertainTypeHypothesis`=(4.2)+(2.2)-Dade-on-A のみ�
 
 正本 = 本ノート (session 26 cont.²)。**(4.6) structure 完成 (gateway)。次 = (1.2) [未着手, 第二直交+inflation]
 → (4.7)。** **(4.7)-(4.9) は (6.8) case-B 経路外 (上記訂正); (6.8) closer は §8 Zc program。**
+
+## 2026-06-11 (session 27, b-peterfalvi): ✅✅✅ Peterfalvi (1.2) + (4.7) core + (4.7) induced COMPLETE (3 commits)
+
+(1.2) ブロッカー解除 + (4.7) の (1.2)-消費する core 2 半分を完全形式化。全 axiom-clean
+(allowlist 3)・full build 3774 (1.2 commit 時) / leaf build 緑。**3 commits**:
+`0f2bc684` (1.2) / `de5471ea` (4.7) core / `6f30fe6d` (4.7) induced。
+
+### ✅ 着地 1 — Peterfalvi (1.2) [新 leaf `S03b_Vanishing.lean`, `OddOrder.Peterfalvi.S03.*`]
+- **`irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`** ((1.2) 本体):
+  H⊴G, χ∈Irr(G), H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0。証明 = 第二直交を G と G/H に適用
+  (`column_orthogonality_diagonal`、**repo に既存**=`ColumnOrthogonality.lean`、ノートの「未着手」は
+  定理本体のことでインフラは完備だった) + 値保存 inflation bijection (`inflate_apply` +
+  `exists_inflate_eq_of_subset_characterKernel`、**InflationCharacter.lean に既存**) + centralizer
+  埋め込み `|C_G(g)|≤|C_{G/H}(ḡ)|` ⟹ ∑_χ normSq(χ g) の squeeze で H⊄ker 項を 0 に。
+- **`card_centralizer_le_card_centralizer_quotient`** (centralizer 不等式):
+  C_H(g)=1 ⟹ `mk' H` は C_G(g) 上 injective (ker∩C=C_H(g)=⊥) かつ像が ḡ を centralize
+  (`MonoidHom.ofInjective` で `C_G(g)≃*range` + `Nat.card_mono`)。
+- `vanishesOnTrivialSubgroupCentralizers_of_not_subset_characterKernel`: S03 述語への packaging。
+- **AxiomsCheck 登録済** ((1.2) 本体 + centralizer 不等式、§3 kernel block 内)。**(1.2) は汎用 char theory
+  ゆえ repo 全体で再利用可。** 🔑 **InflationCharacter は S03_PreliminaryCharacter を import する**
+  ので (1.2) は S03 本体に置けず別 leaf に分離 (循環回避; 「新 leaf default」とも合致)。
+
+### ✅ 着地 2/3 — Peterfalvi (4.7) core + induced [新 leaf `S06_CertainTypeSupport.lean`, `…S06.*`]
+χ_j 機構に**非依存**で Hypothesis46 のフィールド + (1.2) のみ消費 (∴ abstract-Hypothesis bridge 不要)。
+- **`mem_A_of_apply_ne_zero_of_not_subset_characterKernel`** ((4.7) core, Supp χ⊆A∪{1}):
+  (1.2) を群 K・正規部分群 `h.subH.subgroupOf h.K ⊴ ↥K` に適用。χ(g)≠0 ⟹ (1.2) 対偶で
+  C_H(g)≠⊥ ⟹ ∃ c∈H^# が g を centralize ⟹ (4.6.d) `A_covers` で g の G-像 (=`L.subtype (K.subtype g)`)∈A。
+- **`apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`** (support form, 対偶)。
+- **`induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel`** ((4.7) induced,
+  Supp Ind_K^L χ⊆A∪{1}): `ClassFunction.support_induce_subset_conjugatesIntoSet` で非零点 z は
+  Supp χ の w∈K に L-共役 → core で w の G-像∈A∪{1} → A は L-共役不変 (**S04.Hypothesis フィールド
+  `L_normalizes_A`** = `h.dade.L_normalizes_A`) ＋ z,w L-共役ゆえ z の G-像∈A∪{1}。
+  **`[Invertible (Nat.card ↥h.K : ℂ)]` を instance binder で要求** ((4.5) lemma 群と同様、statement
+  に `induce` があるため elaboration 時必須; in-proof haveI では遅い ← 罠)。
+
+### 🔑 KEY / 再調査するな (session 27)
+- **第二直交は repo に完備** (`OddOrder.RepresentationTheory.column_orthogonality_diagonal`:
+  `∑_χ χ(g)·star(χ(g))=|C_G(g)|`)。inflation も完備 (`inflate`/`inflate_apply`/`inflate_injective`/
+  `exists_inflate_eq_of_subset_characterKernel`/`subset_characterKernel_inflate`、kernel 述語 =
+  `(N:Set G)⊆OddOrder.Peterfalvi.S03.characterKernel χ`)。
+- **`conjugatesIntoSet`/`support_induce_subset_conjugatesIntoSet`/`mem_conjugatesIntoSet` は
+  `OddOrder.RepresentationTheory.ClassFunction` namespace** (要 `ClassFunction.` 修飾; `open …RepresentationTheory`
+  だけでは出ない)。
+- **`h.K`/`h.subH`/`h.dade` は projection 解決する** (Hypothesis46→CertainTypeHypothesis→Hypothesis ↥L
+  の extends 連鎖; `h.toCertainTypeHypothesis.K` と書かなくてよい)。
+- G-像は `L.subtype (h.K.subtype g)` で統一 (A_covers/L_normalizes_A と整合)。subtype injective は
+  `h.K.subtype_injective`、≠1 は `map_one` 経由。
+
+### ▶▶ 次 = (4.7) j≥1 part → (4.8)[sigmaCoeff_trichotomy 消費]/(4.9) [全て (6.8) 経路外・full-Pf scope]
+- **(4.7) j≥1 part** (mmd 04.6 L69-73): χ_j (j≥1) について H⊄Ker χ_j を示し、core/induced を χ_j に
+  適用して Supp χ_j, Supp μ_j ⊆ A∪{1}。**H⊄Ker χ_j の ω_{0j} 論法**が核 (背理法: H⊆Ker χ_j 仮定 →
+  W₂⊂H ゆえ ω_{0j}(y)=ω_{0j}(xy)=δ_j μ_{0j}(xy)=δ_j μ_{0j}(x)=ω_{0j}(x)=1 [x∈W₁^#,y∈W₂, by (4.3)] →
+  χ₂=1 → j=0 矛盾)。**要 API 層** (未 survey): χ_j bridge = `h.toCertainTypeHypothesis.toHypothesis.chiRestrict χ₂`
+  ([NeZero (Nat.card h.W1)] 要、W1_nontrivial から)、ω_{0j} 積構造 (`omegaColumnDiff`/`columnFamily`/
+  `chiColumn`/`omega_apply` @ S06_CertainTypeCharacters)、(4.3.c) value-match。**substantial (~100-200 行)、
+  (4.3) API 精読が前提。** core/induced は既に χ_j に適用可 (χ_j : IrreducibleCharacter ↥h.K)。
+- **(4.8)/(4.9)**: session 26 cont. の `sigmaCoeff_trichotomy` を消費 ((4.8) は NC≤4 で full (3.8) の
+  case(b)/(c) 排除 → 全係数0)。(4.9) は (4.8)+(3.9)+(4.3)+(4.7)。
+
+正本 = 本ノート (session 27)。**(1.2) 完成 (汎用・AxiomsCheck 登録) + (4.7) core/induced 完成
+(χ_j 非依存)。Don't re-grind。** **(4.7)-(4.9) は (6.8) case-B 経路外 (full-Pf scope); (6.8) closer は
+§8 Zc program (s08_6_8_blocker_central_Z.md)。**

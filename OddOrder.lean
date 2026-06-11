@@ -106,6 +106,7 @@ import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 import OddOrder.Peterfalvi.S01_Introduction
 import OddOrder.Peterfalvi.S02_Notation
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import OddOrder.Peterfalvi.S03b_Vanishing
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SignedTripleGrid
@@ -116,6 +117,7 @@ import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S06_CertainHypothesis46
 import OddOrder.Peterfalvi.S06_CertainTypeCharacters
 import OddOrder.Peterfalvi.S06_CertainTypeClifford
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceCore

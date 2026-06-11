@@ -1300,3 +1300,77 @@ progress; (C) pause the (6.8) capstone (record blocked-on-§4) and redirect to t
 (BG §7–16 / the rep-theory keystone).  Recommendation: (A) if full-Pf completion is the goal and the
 §4 investment is acceptable; (C) if FT-shortest-path progress is the priority.  CB1/CB2a stand as
 landed, axiom-clean foundation either way.
+
+## 2026-06-11 (session 27, b-peterfalvi): 経路逆算 RECON — case-A 完全 landed判明 + (4.9) 要否の真の crux 特定
+
+監視レーンの一押し(「経路逆算せよ — (4.7)-(4.9) off-path なら skip して case-B 直行」)を受け、
+capstone `sibleySetup_is_coherent` から逆算して全フロンティアを精査。**この note の上部 (2026-06-07
+deep-dive) は stale** — その後 case-A は大幅前進していた。
+
+### ✅ 判明: case-A (6.8.1 / Frobenius) は L1-L4 すべて sorry-free で landed
+S08_CoherenceCore.lean は **sorry 0**。case-A の全 brick が存在:
+- L1 `centralCommutator_*` (Zc=Z(H)∩H′ central facts) ✅
+- L2 monolith `Xset_centralCommutator_isCoherent_of_frobenius` (S08:8691, **inline で hstepData 構築済**、
+  hcover threading は `..._withCover_of_frobenius` variant で**既に解決**) ✅
+- L3 ν-glue `coherentXunionYset_centralCommutator_of_glued_of_frobenius` (S08:8902) ✅
+- L4 `false_of_coherentXunionYset_of_not_coherentS` (S08:6491) ✅
+- `isPGroup_of_not_coherent` ✅ / `Xset_centralCommutator_nonempty` ✅
+⟹ **capstone の Frobenius branch は landed lemma から組立可能**。唯一の sorry = S08_CoherenceTheorems:59
+(`sibleySetup_is_coherent` の X-nonempty branch)、残ギャップ = **CertainType (case-B/6.8.2) branch のみ**。
+
+### ✅ 判明: case-B が要する §1/§6 prerequisite は全て済 — (4.7)-(4.9) は教科書証明に非出現
+mmd 04.8 (6.8.1)/(6.8.2) 全証明精読:
+- **X⊆Irr L** (case c2): 「(1.6)+Theorem (4.5) で S,S(Z) 各 w₂−1 個 reducible ⟹ X⊆Irr L」。
+  (4.5)=✅完了、(1.6) needed direction=`not_subsetCharacterKernel_of_not_induce`(S03:636)=✅完了。
+  **X-members は全て既約** (reducible は S(Z) に入り X=S−S(Z) で相殺)。
+- W₂ centrality `W2_subgroupOf_le_center_of_caseB` (S08:3850) ✅、inertia `inertia_eq_H_of_c2` ✅。
+- (6.8.2.1)→(1.9)/(5.9.a)=T4✅; (6.8.2.2)→(6.7)=T3✅+(1.5.b); (6.8.2.3)→[Is]2.27=T5✅+R(χ)+(5.3/5.4/5.5)。
+
+### 🔑🔑 真の crux (session 8 CB4 verdict と session 26 RECON の矛盾の決着)
+**(6.8.2.3) は `R(χ_i)` を χ_i=Ind_H^L θ_i ∈ S に適用するが、これらは reducible になりうる**
+(case B では W₁ が W₂ に FPF とは限らず I_L(θ_i)>H)。一方、形式化された §7 producer
+`dadeOrthonormalCharacterImageFamily` (S07:5389) は **`χ : IrreducibleCharacter` 専用**。
+⟹ **矛盾の真相**: 教科書 (6.8.2) は (4.9) を明示引用しない (session 26 RECON 正) が、**reducible
+χ∈S の R(χ) を形式化するには「一般 R(reducible χ∈S)」か「(4.9) (certain-type structure
+T(μ_j)=δ_k∑ω_ij^σ)」が要る** (session 8 CB4 の懸念は形式化レベルで妥当)。
+**∴ 精査の結論: (6.8.2.3) の χ_i は実は既約 ⟹ (4.9) 不要 (RECON 正・CB4 誤)**:
+(6.8.2.3) の χ_i=Ind_H^L θ_i は `Res_Z θ_i = a_i φ` (φ≠1_Z, [Is]2.27) ゆえ **Z⊄Ker θ_i** ⟹
+([Is]2.21 = 1.6.a 逆で) Z⊄Ker(Ind θ_i) ⟹ **Ind θ_i ∈ X = {χ∈Irr L | Z⊄Ker χ} ⊆ Irr L ⟹ χ_i 既約**。
+∴ R(χ_i) は既約専用 producer `dadeOrthonormalCharacterImageFamily` で供給でき、**(4.9) は不要**。
+**session-8 CB4 verdict の「X-members χ=Ind θ は reducible ⟹ R に (4.9) 要」は誤り** — Z⊄Ker θ_i が
+Ind θ_i を X(⊆Irr L) に押し込んで既約化する点を見落としていた。
+
+### ▶▶ case-B 完遂の残務 (mirror case-A; (4.9) 不要・[Is]2.21 不要 = §1/§6 prerequisite 皆無)
+**✅ [Is]2.21 は不要と確定 (前 entry の「prerequisite」claim を撤回)**: S08:265
+`characterKernel_subset_of_isCharacter_of_inner_ne_zero` (genuine ψ の既約 constituent χ
+[⟨ψ,χ⟩≠0] は g∈Ker ψ ⟹ g∈Ker χ) が**既に landed**で、X⊆Irr L はこれ経由でルート。S08:186-191
+docstring が明示: 「両方向 (Res_H φ / Ind_K^L θ) は genuine character 経由ゆえ **[Is] Lemma 2.21 は
+不要**」。⟹ **case-B 閉鎖に §1/§6 の新規 prerequisite は皆無、純粋に §8 Zc 機構のみ**。
+- math-A/math-B split (CertainType 内): **math-A** (Z(H)⊓W₂=⊥) は **Zc=Z(H)∩H' で case-A 機構を再利用**
+  (FPF 入力 `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` landed)、ただし case-A monolith
+  `Xset_centralCommutator_isCoherent_of_frobenius` の `hF:IsFrobeniusGroup` を「W₁ FPF on Zc」へ一般化要
+  (CB3); **math-B** (W₂⊆Z(H)) は **Z=W₂ 機構** (CB4, `W2_subgroupOf_le_center_of_caseB` landed)。
+1. **CB3 (math-A)**: ✅✅ **次数平方和の c2 reworking 完了** (session 27 cont.³, 2 commits):
+   `sum_re_sq_Xset_eq_of_irreducible_X` (33a1b7f6, B2 orbit-counting `sum_div_normSq_induce_kernelFilter_eq`
+   [χ(1)²/‖χ‖² 形=reducible OK] + sum_sdiff + X-irr で X 側のみ (χ(1).re)² 変換) +
+   `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (6ec05402)。**⟹ monolith の全 hF 依存に c2/generic 版
+   が揃った**: X⊆Irr=`isIrreducibleCharacter_of_mem_Xset_c2_caseA`/two_le=`two_le_xBaseBlock_ncard_of_irreducible_X`/
+   degree-sum=`sum_re_sq_Xset_eq_of_irreducible_X`/nonempty=`..._of_irreducible_X`/index=`index_H_eq_card_W1`[generic]/
+   coprime=`cert.card_coprime`/consumer=`Xset_isCoherent_from_..._withCover_of_irreducible_X`[generic, S08:8532]。
+   **残 = monolith assembly のみ (機械的)**: `Xset_centralCommutator_isCoherent_of_frobenius` (S08:8861, ~200行)
+   を copy → 署名を math-A hyps (cert/hK/hW1/hA: Z(H)⊓W₂=⊥) へ → `hX := isIrreducibleCharacter_of_mem_Xset_c2_caseA`
+   を冒頭で確立 → 5 つの hF-use を上記 c2 版へ差し替え → consumer を generic 版へ。
+2. **CB4 (math-B)**: Z=W₂ の monolith + 支持 lemma。⚠ W₂ の L-normality (Xset Z が要する Z⊴L) は
+   要解決 (W₂=C_K(x) は一般に L-正規でない)。
+3. case-B L3 τ₂ glue + L4 ((6.8.2)/(6.8.3))。
+4. capstone assembly (`hyp.cases` split: Frobenius=landed brick / CertainType=math-A∧math-B)。
+
+**⟹ 確定: case-B closure は genuine multi-session §8 work** (CB3 の hard core [次数平方和] は解除済み;
+残 = CB3 monolith 機械的 assembly + CB4 [W₂-normality] + L3/L4 + capstone)。case-A が ~7
+session を要した規模。**次セッション第一手 = CB3 monolith assembly** (上記 recipe; 全 piece landed)
+※旧記述「X(Z) 次数平方和 c2 版」は session 27 cont.³ で完了 (reducible S-members
+を分離して Irr 部分のみ (χ(1).re)² 化、reducible 部分は ⟨χ,χ⟩ 重み付き)。
+
+**正本 = 本 session 27 entry (上部 2026-06-07 deep-dive は stale: case-A は landed)。**
+**(4.7)-(4.9) は case-B 完全 off-path 確定 (監視レーン裁可と一致); §6 (4.x) は full-Pf scope の正当成果。**
+**case-B の真の残務 = §8 Zc=W₂ branch (monolith+τ₂+L4, case-A mirror) + [Is]2.21。multi-session §8 work。**
