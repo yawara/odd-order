@@ -99,7 +99,43 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
 12.2(b)τ₁τ₃ + 12.5(e)**; §13 で再利用可能) / `centralizer_zpowers_eq_singleton` /
 assembly `elemAb_normal_in_E_of_tau2` (S12_E から移動)。**S12_E 実 sorry 10**。
 
-### 🟢 session 4 進捗: **12.7 = (a)(b)(c)+A₀+habs+(e) 完了、残 = (d)+assembly のみ**
+### ✅✅✅ session 4-5: **Theorem 12.7 COMPLETE — 全 (a)(b)(c)(d)(e) + assembly, unconditional・axiom-clean**
+
+**(d) + assembly は session 5 で着地** (新 leaf `S12_Theorem127d.lean`, 578 行,
+root/AxiomsCheck 登録済, full build 緑)。レシピ通り一発 (数学的逸脱なし, ビルド修正
+4 ラウンドのみ)。S12_E から 12.7 scaffold 削除 → **S12_E 実 sorry 9**
+(12.4(a)系 ×3 + 12.8〜12.13 系 ×6)。AxiomsCheck に 12.7 全 6 結果登録
+(standard 3 axioms のみ確認済)。
+
+**(d) 実装メモ** (`exists_complement_of_canonical_line`):
+- **step 1-2**: `E₂` は Sylow-p of E (`card_E2_eq_pow`: Hall τ₂ + (a) 素数限定 ⟹
+  card = p^{ν_p(E)}) → `A ≤ E₂` (`elemAb_le_E2_of_prime_eq`: A ⊴ E + Sylow 共役) →
+  `E₂` abelian (`E2_isMulCommutative_of_prime_eq`: ν_p(E)=ν_p(M) + 12.5(b))。
+- **step 3**: S' ⊇ E₂ Sylow-of-G nonab → 10.13(b) (A₀ ≠ Ω₁(Z(S')) は
+  C(A₀) ≤ M [12.6(c) 復元] vs S' ⊄ M) → C_{S'}(A) = A₀⊔Z'、
+  **C_{S'}(A) = E₂ は `map_sylow_E_maximal_in_M` 一発** (E₂ ≤ C(A)⊓S' ≤ E の p-群)。
+  **℧¹(E₂) ≤ Z' は商を取らず `Subgroup.pow_index_mem`**: [E₂:Z'] = p (card 勘定)
+  ⟹ x^p ∈ Z' ∀x。⟹ A₀ ⊓ ℧¹-image = ⊥。
+- **step 4**: Maschke は S12_E:298 の compHom テンプレそのまま
+  (φ : ↥E₁ →* MulAut ↥E₂, E₁ ≤ N(E₂) = `E2_normal_in_E12`)。S := Agemo ↥E₂ p 1
+  (characteristic ⟹ Normal instance 自動 + `IsAInvariant.of_characteristic`)。
+  W₀ := A₀.subgroupOf E₂ の不変性は hMnorm (= 12.7(b) M ≤ N(A₀)) 経由。
+  商は exp p ⟹ Ω₁(quot) = ⊤ ⟹ X̄'⊔Ā₀ = ⊤; E₂-level 復元は
+  `Subgroup.comap_map_eq` + `QuotientGroup.ker_mk'` (ker = Agemo ≤ X')。
+- **step 5**: E₀ := E₁ ⊔ (X ⊔ E₃)。card 連鎖 5 本
+  (`card_sup_eq_mul_of_le_normalizer_of_disjoint` + 素因子 disjoint→coprime→inf ⊥
+  ×4) ⟹ |E| = p·|E₀| ⟹ A₀⊓E₀ = ⊥ (∣p + =p なら E=E₀ 矛盾)。
+- **新設汎用 helper** (leaf 内 public, 12.8+ 再利用可):
+  `le_centralizer_of_le_of_le` (可換包絡), `le_normalizer_sup`,
+  (private) `coprime_of_forall_prime_not_dvd`。
+- ⚠ 技法: rw リストに証明項 (`(....).mpr ?_`) を入れない — refine で分離。
+  `E₂.subtype x` vs `(↑x : G)` の混在は `show` で defeq 切替してから rw。
+- assembly **(a)-conjunct は素数限定形** `∀ q, q.Prime → q ∈ tau2 M → q = p`
+  (docstring に deviation 明記済; 旧 scaffold の `tau2 M = {p}` から変更)。
+
+▶ **次 = Lemma 12.8** (S abelian 側; S12_E:443 scaffold)。
+
+### 🟢 session 4 進捗 (履歴): **12.7 = (a)(b)(c)+A₀+habs+(e) 完了、残 = (d)+assembly のみ**
 
 leaf `S12_Theorem127.lean` (root/AxiomsCheck 登録済)。commits: `bec4e194` (prep:
 一般 line-engine `le_of_forall_line_inf_centralizer_le` + conj transports public 化) /

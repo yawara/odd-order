@@ -415,26 +415,11 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
 /-! **BG Corollary 12.6** は `S12_Corollary126.lean` に移動した
 (`elemAb_normal_in_E_of_tau2` + 部分定理群)。 -/
 
-/-- **BG Theorem 12.7** (mmd L3171): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `G` が非可換 Sylow `p` を持つとき
-(a) `τ₂(M)={p}`; (b) `A₀=C_A(M_σ)` は位数 `p` で `F(M)=M_σ × A₀`; (c) `X ∈ ℰ_p¹(E)-{A₀}` で
-`C_{M_σ}(X)=1` かつ `C_G(X) ⊄ M`; (d) `A₀` は `E` 内に補群 `E₀`; (e) `x ∈ M_σ#` で
-`π(C_{E₀}(x)) ⊆ τ₁(M)`。(内部直積 `F(M)=M_σ×A₀` は join + 自明交叉で表現。) -/
-theorem tau2_singleton_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
-    (hnonab : ∃ S : Sylow p G, ¬ IsMulCommutative (S : Subgroup G)) :
-    tau2 M = {p} ∧
-    (∃ A₀ : Subgroup G, A₀ = A ⊓ Subgroup.centralizer (S10.Msigma M : Set G) ∧
-      Nat.card ↥A₀ = p ∧
-      (Ch2.S08.fittingInG M = S10.Msigma M ⊔ A₀ ∧ S10.Msigma M ⊓ A₀ = ⊥) ∧
-      (∀ X ∈ elemAbelianOfRank G p 1, X ≤ E → X ≠ A₀ →
-        S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) = ⊥ ∧
-        ¬ (Subgroup.centralizer (X : Set G) ≤ M)) ∧
-      (∃ E₀ : Subgroup G, E₀ ≤ E ∧ A₀ ⊓ E₀ = ⊥ ∧ A₀ ⊔ E₀ = E ∧
-        ∀ x ∈ S10.Msigma M, x ≠ 1 →
-          ∀ r ∈ (Nat.card ↥(E₀ ⊓ Subgroup.centralizer ({x} : Set G))).primeFactors,
-            r ∈ tau1 M)) := by
-  sorry
+/-! **BG Theorem 12.7** は `S12_Theorem127.lean` ((a)(b)(c) =
+`tau2_prime_eq_of_nonabelianSylow` / `exists_canonical_line_of_nonabelianSylow` /
+`fitting_eq_sup_of_canonical_line` / `primeFactors_centralizer_le_tau1_of_disjoint`)
+と `S12_Theorem127d.lean` ((d) = `exists_complement_of_canonical_line` + assembly
+`tau2_singleton_of_nonabelianSylow`) に移動した。 -/
 
 /-- **BG Lemma 12.8** (mmd L3223): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `S` を `A` を含む `G` の Sylow
 `p`-部分群とし `S` abelian とする。(a) `E₂` abelian normal in `E`; (b) `E₂` は `G` の Hall
