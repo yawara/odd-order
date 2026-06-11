@@ -1399,3 +1399,68 @@ leaf 557 行 (1500 trigger 未満)。**§6 frontier = (4.5)(b) [Irr(L) exhaustio
 
 正本 = 本ノート (session 25)。**Don't re-grind (4.5)(a) — core+派生 完成・axiom-clean。**
 **inner_induce/exists_liesOver は H explicit, set 禁止, sum_image は rw 形, induce statement は Invertible binder (再調査するな)。**
+
+## 2026-06-11 (session 26, b-peterfalvi): ✅✅✅ Peterfalvi Theorem (4.5)(b) COMPLETE — Ind^L_K χ で Irr(L) を尽くす
+
+(4.5)(b) を 3 文すべて完全形式化。全 `S06_CertainTypeClifford.lean` (975 行, 1500 trigger 未満)、
+sorry-free・axiom-clean (allowlist 3)・**full build 3631 + AxiomsCheck OK**。**§6 frontier = (4.6)-(4.9) →
+S08 case-B に前進。** 6 commits (301a6b79 / 3b112b93 / 93b44015 / 011645b0 / a1679621 + 着手時の build fix)。
+
+### ✅ 着地 (session 26) — 全 `OddOrder.Peterfalvi.S06.Hypothesis.*`
+- **counting 部品** (`card_fixed_irr_le_W2`, session 26 冒頭): g∈W₁^# 固定の Irr(K) は ≤ w₂ 個。
+  `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm` ([Is]6.32 Brauer) で g-不変
+  K-共役類数に等値 → `card_fixed_conjClasses_le_W2` (各 g-不変類が W₂ と交わる `conjClass_meets_W2` →
+  W₂ 代表元単射)。
+- **bridge** `mem_inertia_iff_isFixedPt_conjByPerm`: g∈inertia θ ↔ θ∈fixedPoints(conjByPerm g)。
+  `IrreducibleCharacter.mem_inertia` + `conjByPerm_apply` の **defeq** (`exact Iff.rfl`)。
+- **`chiRestrict χ₂` = χ_j を IrreducibleCharacter K に束ねる def** (+ `coe_chiRestrict` simp)。
+  - `chiRestrict_isFixedPt`: ∀g∈L で fixed。`ClassFunction.conjBy_restrict` (L-指標の制限は L-共役不変)。
+  - `chiRestrict_injective`: χ₂ で単射。Ind=μ_j (`induce_restrict_certainType_eq`) + `inner_sum_left` で
+    ⟨μ_j,μ_{0j}⟩=1 (Finset.sum_ite_eq' + injective.eq_iff) vs ⟨μ_{j'},μ_{0j}⟩=0 (cross-column 直交
+    `columnFamily_mu_ne`)。
+  - `card_charGroup_W2`: |Ŵ₂|=w₂。`sdiffTICyclicHypothesis.card_charGroup_subgroupOf W2_le_W` 一発。
+- **counting collapse** `exists_eq_chiRestrict_of_isFixedPt`: g∈W₁^# 固定の χ は χ_j のいずれか。
+  w₂ 個 distinct χ_j (chiRestrict_injective + card_charGroup_W2) が card_fixed_irr_le_W2 の bound を
+  埋める → `F : Ŵ₂ ↪ Fix(g)` を `Fintype.bijective_iff_injective_and_card` (injective + card 一致 ⟹
+  surjective) で全単射 → preimage。card sandwich は `le_antisymm` + `Nat.card_le_card_of_injective`。
+- **🔑 inertia 核心** `inertia_eq_K_of_forall_chiRestrict_ne`: χ が χ_j のいずれでもない ⟹ I_L(χ)=K。
+  `Subgroup.IsComplement.existsUnique h.isComplement ℓ` で ℓ=k·w 分解 (k∈K,w∈W₁; `change kk*u=ℓ`),
+  w=k⁻¹ℓ∈inertia; w≠1 なら counting collapse で χ=χ_j 矛盾ゆえ w=1, ℓ=k∈K。
+- **capstone 3 文**:
+  - `induce_isIrreducible_of_forall_chiRestrict_ne`: Ind^L_K χ∈Irr(L)。I_L(χ)=K + (1.5.b/[Is]6.34)
+    `isIrreducibleCharacter_induce_of_inertia_eq` (inertia abbrev は ClassFunction.inertia と defeq)。
+  - `induce_ne_certainType_of_forall_chiRestrict_ne`: Ind^L_K χ≠μ_{ij}。Frobenius
+    `ClassFunction.inner_induce_eq_inner_restrict` で ⟨Ind χ,μ_{ij}⟩=⟨χ,Res μ_{ij}⟩=⟨χ,χ_j⟩=0
+    (`restrict_certainType_eq` + χ≠χ_j) vs ⟨μ_{ij},μ_{ij}⟩=1。
+  - `exists_eq_certainType_or_induce` (exhaustion): μ∈Irr(L) は μ_{ij} or Ind^L_K χ。
+    `exists_liesOver` で Res μ の成分 θ → `inner_induce_ne_zero_iff_liesOver` で μ は Ind θ の成分。
+    θ=χ_j なら Ind θ=∑_i μ_{ij} (`Finset.exists_ne_zero_of_sum_ne_zero`) ゆえ μ=μ_{ij};
+    そうでなければ Ind θ∈Irr(L) ゆえ μ=Ind θ (`irreducibleCharacter_inner_eq_ite` + `coe_mk`)。
+
+### 🔑 KEY / 再調査するな (Lean 機構の罠, session 26 新規)
+- **`Subtype.ext_iff.mp hpq` の逆向き単一化トラップ**: `Subtype.ext (Subtype.ext_iff.mp hpq)` のように
+  2 段ネストすると、外側 `Subtype.ext` の expected type `↑?a=↑?b` が内側 `?a ?b` を**誤った subtype 層**
+  (K-val) に固定し、引数 hpq (W₂ 要素の等式) と型不一致になる。さらに `have hL : (wit p:L)=(wit q:L) :=
+  Subtype.ext_iff.mp hpq` の**型注釈も** `(wit p:L)` を `↑(wit p)` と読んで K-subtype を選ばせ同じ失敗。
+  **解 = 型注釈を外し `have hL := Subtype.ext_iff.mp hpq` で引数駆動にし、次段 `Subtype.ext hL` の
+  defeq に委ねる** (congrArg Subtype.val も同じ逆向き単一化で落ちる)。
+- **`congrArg (fun θ => ↑θ) heq` / `congrArg (fun φ => inner φ ψ) h` は beta-redex が残り後続 rw が
+  パターン不一致**。**解 = lambda を使わず `congrArg IrreducibleCharacter.toClassFunction heq` (直接の
+  coercion 関数)、inner は `have key : inner (∑…) ψ = inner (∑…) ψ := by rw [hind]` と明示 statement**。
+- **`h.coe_chiRestrict χ₂` は h 明示必須** (Hypothesis namespace の `variable (h)` ゆえ第1引数=h)。
+  bare `coe_chiRestrict χ₂` は χ₂ を h と誤解 (rw 内で implicit 化されるとき以外)。
+- **`ClassFunction.inner_induce_eq_inner_restrict` は `ClassFunction.` 修飾要** (open しても
+  bare `inner_induce_eq_inner_restrict` は unknown)。
+- **`if` の Decidable は `classical` で統一** (sum_congr で irreducibleCharacter_inner_eq_ite を rw すると
+  IrreducibleCharacter 等式の Decidable インスタンス不整合 → proof 冒頭 `classical`)。
+
+### ▶▶ 次 = (4.6)-(4.9) → S08 case-B
+- (4.5) cluster は (a)(b) 両方 COMPLETE。利用可能 (全 axiom-clean):
+  `chiRestrict` / `chiRestrict_injective` / `card_charGroup_W2` / `inertia_eq_K_of_forall_chiRestrict_ne`
+  / `induce_isIrreducible_of_forall_chiRestrict_ne` / `induce_ne_certainType_of_forall_chiRestrict_ne`
+  / `exists_eq_certainType_or_induce` / (session 25) `certainTypeRestrict_isIrreducible` /
+  `induce_restrict_certainType_eq` / `index_K_eq`。
+- (4.6) Hypothesis (G⊃L が (4.2) + Dade τ rel A₀ 等) の構造体定義から。mmd 04.6 (4.6)-(4.9)。
+
+正本 = 本ノート (session 26)。**Don't re-grind (4.5) — (a)(b) 完成・axiom-clean (full build 3631)。**
+**Subtype.ext_iff 逆向き単一化トラップ + congrArg beta-redex + h.coe_chiRestrict 明示 (再調査するな)。**
