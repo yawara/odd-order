@@ -98,4 +98,42 @@ theorem apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
   exact hgA.1
     (mem_A_of_apply_ne_zero_of_not_subset_characterKernel h χ hker hgA.2 hval)
 
+/-- **Peterfalvi (4.7)**, induced-character support (`Supp Ind_K^L χ ⊆ A ∪ {1}`).
+Under Hypothesis (4.6), if `χ ∈ Irr(K)` has `H ⊄ Ker χ`, then the induced character
+`Ind_K^L χ` vanishes at every `z ∈ L` whose ambient image lies outside `A ∪ {1}`.
+
+Proof: a nonvanishing point `z` of `Ind_K^L χ` is `L`-conjugate to a point `w ∈ K` of
+`Supp χ` (`support_induce_subset_conjugatesIntoSet`).  By the core support lemma the
+ambient image of `w` is in `A ∪ {1}`; since `A` is closed under `L`-conjugation
+(`L_normalizes_A`) and `z`, `w` are `L`-conjugate, the image of `z` is in `A ∪ {1}`. -/
+theorem induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
+    (h : Hypothesis46 A L) [Invertible (Nat.card ↥h.K : ℂ)]
+    (χ : IrreducibleCharacter ↥h.K)
+    (hker : ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
+      S03.characterKernel (χ : ClassFunction ↥h.K ℂ)))
+    {z : ↥L} (hz : L.subtype z ∉ A ∪ ({1} : Set G)) :
+    ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ) z = 0 := by
+  classical
+  by_contra hnz
+  -- `z` is `L`-conjugate into the support of `χ`.
+  have hz_in : z ∈ ClassFunction.conjugatesIntoSet h.K ((χ : ClassFunction ↥h.K ℂ).support) :=
+    ClassFunction.support_induce_subset_conjugatesIntoSet (subset_refl _) hnz
+  rw [ClassFunction.mem_conjugatesIntoSet] at hz_in
+  obtain ⟨x, hx, hxsupp⟩ := hz_in
+  rw [Set.mem_union, Set.mem_singleton_iff, not_or] at hz
+  obtain ⟨hzA, hz1⟩ := hz
+  -- the `K`-element `w = x⁻¹ z x` and its `L`-image.
+  have hKw : h.K.subtype (⟨x⁻¹ * z * x, hx⟩ : ↥h.K) = x⁻¹ * z * x := rfl
+  have hconj : L.subtype z
+      = L.subtype x * L.subtype (x⁻¹ * z * x) * (L.subtype x)⁻¹ := by
+    rw [map_mul, map_mul, map_inv]; group
+  have hw_val : (χ : ClassFunction ↥h.K ℂ) (⟨x⁻¹ * z * x, hx⟩ : ↥h.K) ≠ 0 :=
+    Function.mem_support.mp hxsupp
+  have hw_ne : L.subtype (h.K.subtype (⟨x⁻¹ * z * x, hx⟩ : ↥h.K)) ≠ 1 := by
+    rw [hKw]; intro hw1; exact hz1 (by rw [hconj, hw1]; group)
+  have hwA : L.subtype (h.K.subtype (⟨x⁻¹ * z * x, hx⟩ : ↥h.K)) ∈ A :=
+    mem_A_of_apply_ne_zero_of_not_subset_characterKernel h χ hker hw_ne hw_val
+  rw [hKw] at hwA
+  exact hzA (by rw [hconj]; exact h.dade.L_normalizes_A x hwA)
+
 end OddOrder.Peterfalvi.S06
