@@ -1464,3 +1464,36 @@ S08 case-B に前進。** 6 commits (301a6b79 / 3b112b93 / 93b44015 / 011645b0 /
 
 正本 = 本ノート (session 26)。**Don't re-grind (4.5) — (a)(b) 完成・axiom-clean (full build 3631)。**
 **Subtype.ext_iff 逆向き単一化トラップ + congrArg beta-redex + h.coe_chiRestrict 明示 (再調査するな)。**
+
+### 🚨 RECON (session 26 末): (4.6)-(4.9) → S08 case-B は full (3.8) trichotomy がブロッカー
+
+mmd 04.6 (4.6)-(4.9) を精読した結果、**S08 case-B (6.8) 閉鎖の critical path に未形式化の full (3.8)
+trichotomy がある**ことが判明 (既存 repo 注記の訂正が必要)。
+
+- **(4.6) Hypothesis** (新 leaf 要): G⊃L が (4.2)、G,W が (3.1)、H⊴L (W₂⊂H⊂K)、A は (2.2) を満たし
+  ⋃_{h∈H^#}C_K(h)^#⊂A⊂K^#、A₀=A∪V^L も (2.2) を満たす、τ=Dade isometry rel A₀。**(2.2)/(3.1)/(3.6)
+  の既存 Hypothesis 構造体 + Dade τ をバンドルする大きな structure。** σ,ω_ij,μ_ij,μ_j,χ_j,δ_j は
+  (3.3),(3.2),(4.3),(4.5) と同じ。
+- **(4.7)** [Supp χ⊂A∪{1} for H⊄Ker χ]: (4.6.d)+(1.2) で。**(3.8) 非依存**。χ_j (j≥1) も。
+- **(4.8)** [μ_ij(1)=μ_ik(1) ⟹ Supp(μ_ij−μ_ik)⊂A₀, δ_j=δ_k, (μ_ij−μ_ik)^τ=δ_j(ω_ij^σ−ω_ik^σ)]:
+  🚨 **full (3.8) trichotomy を使う**。NC(ψ)≤4 で「cases (b)/(c) は ≥3 同係数 ω 成分を要し不可能」と
+  排除して case (a) に落とす。**corollary `grid_eq_zero_of_ncard_support_lt` (NC<min(w₁,w₂)⟹0) では
+  不足**: w₁=3<w₂ のとき NC≤4 は min=3 未満でないので corollary 不適用、full trichotomy 必須
+  ((3.8) 仮説は NC<2w₁=6)。(2.1),(4.3.c)(d),(3.2.c),(3.6) も使用。
+- **(4.9)** [Z[𝒯] 上の等長 T が τ と一致]: (4.8)+(3.9)+(4.3)+(4.7) で。**(4.8) 経由で (3.8) に依存**。
+- **S08 case-B**: (4.9)(b) の等長 (μ_j↦δ_k∑_i ω_ij^σ, Z[𝒯,A] で τ 一致) が certain-type の coherence
+  ingredient。⟹ **case-B = (4.9) ← (4.8) ← full (3.8)**。
+
+**⟹ repo `S05_SigmaIsometry.lean:1418` の「full trichotomy (3.8.b)/(3.8.c) は §12+ のみ」は (4.8) を
+見落とした不正確な注記。(4.8) が w₁=3 で要求する。** ただし (4.8) は full (3.8) でなく「NC≤4 + 構造で
+(b)/(c) を排除する標的補題」で済む可能性あり (full trichotomy の (b)/(c)-exclusion 部分のみ)。
+
+**(3.8) full trichotomy の現状** (S05): (a) ψ=β / (b) NC=w₁ かつ ψ=a∑_i ω_ij^σ+β (full column) /
+(c) NC=w₂ かつ ψ=a∑_j ω_ij^σ+β (full row)。証明 = 3.8.1/3.8.2/3.8.3 の grid 組合せ論
+(既存の `S05_SignedTripleGrid` / `SigmaIsometry` infra 上)。corollary のみ済、本体 0。
+
+**次セッションの選択肢** (どれも substantial、(3.8) は (3.5) 級の組合せ論):
+1. **(4.6) Hypothesis + (4.7)** — unblocked・foundational ((4.x) すべての土台、(3.8) 非依存)。
+2. **full (3.8) trichotomy** ((4.8)/(4.9)→case-B の真のブロッカー解除; 標的 (b)/(c)-exclusion で
+   足りるか先に精査推奨)。
+3. (4.5) で打ち止め (クリーンな milestone)。
