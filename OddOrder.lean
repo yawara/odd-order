@@ -83,6 +83,7 @@ import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
 import OddOrder.BG.Ch1_Preliminary.S04e_GorThm37
 import OddOrder.BG.Ch1_Preliminary.S04f_Blackburn
 import OddOrder.BG.Ch1_Preliminary.S04g_Thm418
+import OddOrder.BG.Ch1_Preliminary.S05b_Thm420Hall
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
@@ -90,6 +91,7 @@ import OddOrder.BG.Ch2_Uniqueness.S09_Uniqueness
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_MalphaMsigma
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_Transvection
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_ExceptionalMaximal
+import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218

@@ -1,16 +1,42 @@
 # BG §11: Exceptional Maximal Subgroups — mini-roadmap
 
-## ✅✅ 2026-06-11 Lane E: Thm 11.5 + Cor 11.6(a)(b)(c) 完成 — 残 = Thm 11.7 のみ
+## ✅✅✅ 2026-06-11 Lane E: §11 完結 — 全 7 結果 sorry-free・unconditional
 
 | 結果 | Lean 名 | 状態 |
 |---|---|---|
 | **Thm 11.5** | `sylow_p_isCommutative` | ✅ 9581665d |
 | **Cor 11.6(a)(b)** | `omega1_eq_and_centralizer_trivial` | ✅ 9581665d |
 | **Cor 11.6(c)** | `exists_distinct_conj_lines` | ✅ 662851c1 |
-| Thm 11.7 | `MsigmaA_normal` | 🔲 唯一の残 sorry |
+| **Thm 11.7** | `MsigmaA_normal` | ✅ e58bacd7 (単一定理 leaf `S11_MsigmaANormal.lean`) |
 
 全部 unconditional・axiom-clean・AxiomsCheck 登録済 (前提の Lem 10.13 は同日
-a024b293 で着地済、§10 は完全 sorry-free)。
+a024b293 で着地済、§10 は完全 sorry-free)。**§11 に sorry は残っていない**
+(Lem 11.1 / Cor 11.2 / Thm 11.3 / Cor 11.4 は既着地)。§12 の Hypothesis111
+構成側 (Prop 12.4) は Lane F 管轄。
+
+### Thm 11.7 実装メモ (e58bacd7)
+
+- **設計図 step 3 のギャップは選択肢 (a)' で解消**: S04g 遡及でなく **S05b
+  `isHall_oPiCore_of_isUpperSet_of_rank_fitting_le_two` を新設** (0069a61d;
+  |X| 強帰納で最小素数 normal p-complement engine 6884f1c4 を反復)。上方閉
+  π ⟹ O_π(X) Hall π。τ = {q > p} / τ∪{p} = {q ≥ p} の両方が IsUpperSet で直接適用。
+- **中心化枝は「A ⊴ E」を経由しない**: W = O_{τ∪{p}}(E) の Sylow p の G-像 P_W へ
+  `Hypothesis111.of_sylow` (M 内 Sylow 共役で N_G(P)⊄M を移送) で仮説を取替え、
+  Thm 11.5/Cor 11.6(a) を P_W で発動 → A = Ω₁(O_p(W)) が W の特性鎖
+  (`AppB.normalizer_le_normalizer_map_of_characteristic` ×2) で E-不変。
+  W = K'·S 分解 (K ≤ C_G(A) + S ≤ P_W abelian) で W ≤ C_G(A) → A ≤ O_p(W)。
+- **q ∈ σ(M) 矛盾の Sylow 性**: 「Q は M の Sylow q」は relIndex 鎖
+  (`eq_of_le_of_isPGroup_of_not_dvd_relIndex`: q ∤ [M:Q] = [M:E][E:K][K:Q]) で。
+  σ への結論は `S10.mem_sigma_iff` + `hNQ₀_eq_M` (M maximal + G simple で
+  N_G(Q₀) = M に固定)。
+- **cyclic 排除** (C_Q(A) ≠ 1 枝): 位数 q の中心化元が `IsCyclic.card_pow_eq_one_le`
+  計数で Ω₁(Q) を張る (`mem_zpowers_of_pow_prime_eq_one`) → Cor 1.12
+  (`actsTrivially_of_fixes_omega1_centralizer`) で A-作用消滅。
+- **可換 commutator 分配** `commutator_le_sup_of_abelian`: ⁅Q₀,A⁆ ≤ ⁅Q₀,A₁⁆⊔⁅Q₀,A₂⁆
+  は「commutator が R に落ちる a の全体が部分群」という subgroup-induction で。
+- **root 登録ギャップを修正**: S05b・S11_MsigmaANormal は root `OddOrder.lean` の
+  import closure 外で `lake build OddOrder` の対象外だった (lakefile はデフォルト
+  glob = root closure のみ)。新 leaf を切ったら **root への import 追加を忘れない**。
 
 ### 実装メモ
 

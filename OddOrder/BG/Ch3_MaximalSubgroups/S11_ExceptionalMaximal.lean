@@ -22,13 +22,14 @@ L2913-3022, **7 結果** (Lem 11.1 + Thm 11.3/11.5/11.7 + Cor 11.2/11.4/11.6)。
 §11 は **Hypothesis 11.1** (`M ∈ ℳ`, `p ∈ σ(M)'`, `A₀ ∈ ℰ_p¹(M)`, `N_G(A₀) ⊆ M`) のもとで、
 *exceptional* maximal subgroup `M` (= `r(H/H_σ)=1` が破れる) の構造を示す: `M_σ` nilpotent (11.3)、
 `M` の Sylow `p` abelian (11.5)、`M_σ A ⊴ M` (11.7)。Thompson Transitivity (§7 Thm 7.6) に依存。
+Theorem 11.7 本体は単一定理 leaf `S11_MsigmaANormal.lean` (本ファイルの 11.5/11.6 を消費)。
 
 ## 記法
 
 - 固定 `M, p, A₀` + 導出 `A ∈ ℰ_p²(M)` (`A₀⊆A`, Lem 10.5), `A ⊆ P ∈ Syl_p(M)`, `N_G(P)⊄M`,
   `A∈ℰ_p*(G)` を `Hypothesis111 M p A₀ A P` に束ねる。`M_σ` = `S10.Msigma M`。
 - 「`A`-不変 Sylow `q`-部分群」= `IsAInvSylowIn` (M_σ 内の `A`-不変・`q`-極大 部分群)。
-- 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。proof は §7/§10 + Thm 3.7 等に依存 (全 sorry)。
+- 固定 G `(hG : IsMinimalSimpleOdd G)` を明示 thread。proof は §7/§10 + Thm 3.7 等に依存。
 
 ## Lane C proof-gate notes
 
@@ -473,7 +474,7 @@ private theorem sigma_subgroup_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
 
 The `↥A`-action on `↥H` is conjugation (`A ≤ N_G(H)`); `Cor 3.25` produces a conjugation-invariant
 Sylow `q` of `↥H` containing `P₀.subgroupOf H`, which maps back to the required `Q`. -/
-private theorem exists_isAInvSylowIn [Finite G] {A : Subgroup G} {p : ℕ} [Fact p.Prime]
+theorem exists_isAInvSylowIn [Finite G] {A : Subgroup G} {p : ℕ} [Fact p.Prime]
     (hAp : IsPGroup p ↥A) {H : Subgroup G} (hAH : A ≤ Subgroup.normalizer (H : Set G))
     {q : ℕ} [Fact q.Prime] (hCop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥H))
     {P₀ : Subgroup G} (hP₀q : IsPGroup q ↥P₀) (hP₀H : P₀ ≤ H)
@@ -897,7 +898,7 @@ private theorem isAInvSylowIn_conj_smul {q : ℕ} {A Q H : Subgroup G} (g : G)
     rw [← h4, smul_inv_smul]
 
 /-- Commutativity transports along a group isomorphism. -/
-private theorem isMulCommutative_of_mulEquiv {H K : Type*} [Group H] [Group K]
+theorem isMulCommutative_of_mulEquiv {H K : Type*} [Group H] [Group K]
     (e : H ≃* K) (hH : IsMulCommutative H) : IsMulCommutative K :=
   ⟨⟨fun a b => by
     have := congrArg e (hH.is_comm.comm (e.symm a) (e.symm b))
@@ -1344,10 +1345,8 @@ theorem exists_distinct_conj_lines [Finite G] (hG : IsMinimalSimpleOdd G)
     hconj_le g₁ hg₁N, hconj_le g₂ hg₂N, hne, hconj_card g₁, hconj_card g₂,
     hsup, hinf, hcent g₁ hg₁N hg₁M, hcent g₂ hg₂N hg₂M⟩
 
-/-- **BG Theorem 11.7** (mmd L2997): `M_σ A ⊴ M`。§11 の主結果。 -/
-theorem MsigmaA_normal [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} {p : ℕ} {A₀ A P : Subgroup G} (h : Hypothesis111 M p A₀ A P) :
-    M ≤ Subgroup.normalizer ((S10.Msigma M ⊔ A : Subgroup G) : Set G) := by
-  sorry
+/- **BG Theorem 11.7** (`MsigmaA_normal`, `M_σ A ⊴ M`) is the single-theorem leaf
+`S11_MsigmaANormal.lean` (it consumes Theorem 11.5 / Corollary 11.6 from this file
+together with §10 and the Theorem 4.20(c) Hall radicals). -/
 
 end OddOrder.BG.Ch3.S11
