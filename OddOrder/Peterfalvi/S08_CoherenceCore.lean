@@ -6103,6 +6103,109 @@ theorem sum_re_sq_Xset_eq (hyp : SibleyDadeHypothesis G L H)
   ring
 
 open scoped Classical in
+/-- **(6.6) X degree-sum identity, CertainType (case B) form.**  The Frobenius proof
+(`sum_re_sq_Xset_eq`) routes the degree-square sum over `X = S − S(Z)` through
+`sum_re_sq_induce_kernelFilter_eq`, which converts each summand `χ(1)²/‖χ‖² = (χ(1).re)²`
+using that **every** member of `S` is irreducible (Frobenius).  In case B `S` carries `w₂−1`
+reducible members, so that conversion fails on `S`.  But `X` itself is irreducible
+(Peterfalvi (6.8.1) for (c2): the reducibles all lie in `S(Z)`, and `X = S ∖ S(Z)`), so the
+conversion holds **on `X`** alone.  The orbit-counting identity `sum_div_normSq_induce_kernelFilter_eq`
+(in the `χ(1)²/‖χ‖²` form — valid for reducibles) supplies the two filter sums, and
+`Finset.sum_sdiff` extracts `∑_X = ∑_{S} − ∑_{S(Z)}`; the `X`-irreducibility hypothesis converts
+only the `X`-side terms.  This unblocks the case-B (CB3 math-A / CB4 math-B) `hstepData` `total`. -/
+theorem sum_re_sq_Xset_eq_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} [Z.Normal]
+    (hX : ∀ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        IsIrreducibleCharacter χ) :
+    ∑ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        ((χ 1).re) ^ 2
+      = (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hbotker : ∀ θ : IrreducibleCharacter ↥H,
+      (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ) := by
+    intro θ x hx
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
+    subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  have hsub : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) ⊆
+      (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+        (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥H ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) := by
+    apply Finset.image_subset_image
+    intro θ hθ
+    rw [Finset.mem_filter] at hθ ⊢
+    exact ⟨hθ.1, hbotker θ, hθ.2.2⟩
+  have hsd := Finset.sum_sdiff
+    (f := fun χ : ClassFunction ↥L ℂ => χ 1 ^ 2 / ClassFunction.inner χ χ) hsub
+  have hB2bot := sum_div_normSq_induce_kernelFilter_eq (G := ↥L) (H := H) (A := (⊥ : Subgroup ↥L))
+  have hB2Z := sum_div_normSq_induce_kernelFilter_eq (G := ↥L) (H := H) (A := Z)
+  have hbotcard : Nat.card (↥H ⧸ (⊥ : Subgroup ↥L).subgroupOf H) = Nat.card ↥H := by
+    rw [Subgroup.bot_subgroupOf]
+    exact Nat.card_congr (QuotientGroup.quotientBot (G := ↥H)).toEquiv
+  rw [hbotcard] at hB2bot
+  have hconv : ∀ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction) \
+      (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥H)).image
+        (fun θ => ClassFunction.induce H θ.toClassFunction)),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = ((((χ 1).re) ^ 2 : ℝ) : ℂ) := by
+    intro χ hχ
+    have hirr := hX χ hχ
+    have hinner : ClassFunction.inner χ χ = 1 := by
+      simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χ, hirr⟩
+    obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+    rw [hinner, div_one, hn1, Complex.natCast_re]
+    push_cast; ring
+  have key : ((∑ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        ((χ 1).re) ^ 2 : ℝ) : ℂ)
+      = (((H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ))) : ℝ) := by
+    rw [Complex.ofReal_sum, Finset.sum_congr rfl (fun χ hχ => (hconv χ hχ).symm),
+      eq_sub_of_add_eq hsd, hB2bot, hB2Z]
+    push_cast; ring
+  exact Complex.ofReal_inj.mp key
+
+open scoped Classical in
 /-- **Reindexing `X(Z)` to the `Irr L`-filter** (Frobenius case).  Any Finset `T` member-wise equal
 to the central `(6.6)` set `X(Z) = {χ ∈ Irr L | Z ⊄ ker χ}`
 (`Xset_eq_irreducible_not_subset_characterKernel`) sums the same as the `IrreducibleCharacter ↥L`
