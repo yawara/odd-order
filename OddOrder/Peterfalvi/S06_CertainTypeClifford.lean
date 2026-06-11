@@ -835,6 +835,139 @@ theorem card_charGroup_W2 :
     Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 :=
   h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
+/-- **Counting collapse** (mmd 04.6, (4.5.b) proof): for `g ∈ W₁^#`, every `g`-fixed irreducible
+character of `K` is one of the `χ_j`.  The `w₂` distinct `χ_j` (`chiRestrict_injective`,
+`card_charGroup_W2`) all lie in the `g`-fixed set (`chiRestrict_isFixedPt`), whose size is at most
+`w₂` (`card_fixed_irr_le_W2`); equality forces the injection `Ŵ₂ ↪ Fix(g)` to be onto. -/
+theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
+    (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) {χ : IrreducibleCharacter ↥h.K}
+    (hfix : Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) χ) :
+    ∃ χ₂, h.chiRestrict χ₂ = χ := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  classical
+  -- `F : Ŵ₂ → Fix(g)`, `χ₂ ↦ χ_j`, is injective into the `g`-fixed set
+  let F : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) →
+      Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) :=
+    fun χ₂ => ⟨h.chiRestrict χ₂, h.chiRestrict_isFixedPt χ₂ g⟩
+  have hFinj : Function.Injective F :=
+    fun a b hab => h.chiRestrict_injective (Subtype.ext_iff.mp hab)
+  -- cardinality sandwich: `w₂ = |Ŵ₂| ≤ |Fix(g)| ≤ w₂`
+  have hle1 : Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      ≤ Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) :=
+    Nat.card_le_card_of_injective F hFinj
+  have hle2 := h.card_fixed_irr_le_W2 g hg hg1
+  have hcardeq : Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      = Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) :=
+    le_antisymm hle1 (hle2.trans (le_of_eq h.card_charGroup_W2.symm))
+  -- injective + equal finite cardinality ⟹ bijective ⟹ surjective
+  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype (Function.fixedPoints
+      (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) := Fintype.ofFinite _
+  have hbij : Function.Bijective F := by
+    rw [Fintype.bijective_iff_injective_and_card]
+    exact ⟨hFinj, by rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]; exact hcardeq⟩
+  obtain ⟨χ₂, hχ₂⟩ := hbij.surjective ⟨χ, hfix⟩
+  exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
+
+/-- **Peterfalvi (4.5.b), inertia computation**: a `χ ∈ Irr(K)` that is none of the `χ_j` has full
+inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`, `w ∈ W₁`) via the complement
+`L = K ⋊ W₁`; then `w = k⁻¹ℓ ∈ I_L(χ)`.  If `w ≠ 1` then `w ∈ W₁^#` fixes `χ`
+(`mem_inertia_iff_isFixedPt_conjByPerm`), so `χ` is one of the `χ_j`
+(`exists_eq_chiRestrict_of_isFixedPt`) — a contradiction; hence `w = 1` and `ℓ = k ∈ K`. -/
+theorem inertia_eq_K_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
+    IrreducibleCharacter.inertia (G := L) (H := h.K) χ = h.K := by
+  haveI := h.K_normal
+  refine le_antisymm ?_ (IrreducibleCharacter.subgroup_le_inertia χ)
+  intro ℓ hℓ
+  obtain ⟨⟨⟨kk, hk⟩, ⟨u, hu⟩⟩, hku, -⟩ := Subgroup.IsComplement.existsUnique h.isComplement ℓ
+  change kk * u = ℓ at hku
+  have hkI : kk ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) χ :=
+    IrreducibleCharacter.subgroup_le_inertia χ hk
+  have huI : u ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) χ := by
+    have hueq : u = kk⁻¹ * ℓ := by rw [← hku]; group
+    rw [hueq]; exact mul_mem (inv_mem hkI) hℓ
+  rcases eq_or_ne u 1 with hu1 | hu1
+  · rw [← hku, hu1, mul_one]; exact hk
+  · exact absurd
+      (h.exists_eq_chiRestrict_of_isFixedPt u hu hu1
+        ((h.mem_inertia_iff_isFixedPt_conjByPerm u χ).mp huI))
+      (not_exists.mpr hχ)
+
+/-- **Peterfalvi (4.5.b), first sentence**: for `χ ∈ Irr(K)` not among the `χ_j`, the induced
+character `Ind^L_K χ` is irreducible.  Immediate from `I_L(χ) = K`
+(`inertia_eq_K_of_forall_chiRestrict_ne`) and [Is] Theorem 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`). -/
+theorem induce_isIrreducible_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
+    IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  exact isIrreducibleCharacter_induce_of_inertia_eq χ
+    (h.inertia_eq_K_of_forall_chiRestrict_ne hχ)
+
+/-- **Peterfalvi (4.5.b), `Ind^L_K χ ≠ μ_{ij}`**: for `χ` not among the `χ_j`, the irreducible
+`Ind^L_K χ` is distinct from every certain-type character.  By Frobenius reciprocity
+`⟨Ind^L_K χ, μ_{ij}⟩ = ⟨χ, Res^L_K μ_{ij}⟩ = ⟨χ, χ_j⟩ = 0` (`restrict_certainType_eq`, `χ ≠ χ_j`),
+whereas `⟨μ_{ij}, μ_{ij}⟩ = 1`. -/
+theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ)
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
+      ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  intro heq
+  have hinner : ClassFunction.inner (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
+      ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) = 0 := by
+    rw [ClassFunction.inner_induce_eq_inner_restrict h.K (χ : ClassFunction ↥h.K ℂ)
+      ((h.columnFamily χ₂).mu i : ClassFunction L ℂ), h.restrict_certainType_eq χ₂ i,
+      ← h.coe_chiRestrict χ₂, irreducibleCharacter_inner_eq_ite,
+      if_neg (Ne.symm (hχ χ₂))]
+  rw [heq, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hinner
+  exact one_ne_zero hinner
+
+/-- **Peterfalvi (4.5.b), exhaustion**: every irreducible character `μ` of `L` is either a
+certain-type character `μ_{ij}` or `Ind^L_K χ` for some `χ ∈ Irr(K)` not among the `χ_j`.
+
+Pick an irreducible constituent `θ` of `Res^L_K μ` (`exists_liesOver`); then `μ` is a constituent of
+`Ind^L_K θ` (`inner_induce_ne_zero_iff_liesOver`).  If `θ = χ_j` then `Ind^L_K θ = μ_j = ∑_i μ_{ij}`
+(`induce_restrict_certainType_eq`), so `μ = μ_{ij}` for some `i`.  Otherwise `Ind^L_K θ` is irreducible
+(`induce_isIrreducible_of_forall_chiRestrict_ne`), hence equals `μ`. -/
+theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : IrreducibleCharacter L) :
+    (∃ χ₂ i, (h.columnFamily χ₂).mu i = μ) ∨
+      (∃ χ : IrreducibleCharacter ↥h.K, (∀ χ₂, h.chiRestrict χ₂ ≠ χ) ∧
+        ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ) = (μ : ClassFunction L ℂ)) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  classical
+  -- an irreducible constituent `θ` of `Res^L_K μ`, hence `μ` is a constituent of `Ind^L_K θ`
+  obtain ⟨θ, hθ⟩ := IrreducibleCharacter.exists_liesOver (H := h.K) μ
+  have hcon : ClassFunction.inner (ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ))
+      (μ : ClassFunction L ℂ) ≠ 0 :=
+    (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver h.K μ θ).mpr hθ
+  by_cases hcase : ∃ χ₂, h.chiRestrict χ₂ = θ
+  · -- `θ = χ_j`: `μ` is a constituent of `∑_i μ_{ij}`, hence some `μ_{ij}`
+    obtain ⟨χ₂, hχ₂⟩ := hcase
+    left
+    rw [← hχ₂, h.coe_chiRestrict χ₂, h.induce_restrict_certainType_eq χ₂, inner_sum_left] at hcon
+    obtain ⟨i, -, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero hcon
+    refine ⟨χ₂, i, ?_⟩
+    by_contra hne
+    rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hi
+    exact hi rfl
+  · -- `θ ∉ {χ_j}`: `Ind^L_K θ` is irreducible, hence equals `μ`
+    push_neg at hcase
+    right
+    refine ⟨θ, hcase, ?_⟩
+    have hirr := h.induce_isIrreducible_of_forall_chiRestrict_ne hcase
+    have hite := irreducibleCharacter_inner_eq_ite (⟨_, hirr⟩ : IrreducibleCharacter L) μ
+    rw [IrreducibleCharacter.coe_mk] at hite
+    by_cases hEq : (⟨_, hirr⟩ : IrreducibleCharacter L) = μ
+    · exact Subtype.ext_iff.mp hEq
+    · rw [if_neg hEq] at hite; exact absurd hite hcon
+
 end Recipe
 
 end Hypothesis
