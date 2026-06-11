@@ -3914,3 +3914,20 @@ the §12 results on the `M*` side in Lemma 12.11 and later. Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isHallSubgroup_of_isHallSubgroup_of_le
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_subgroupESetup
+
+/-! ### BG Lemma 12.11(a)(b) (`S12_Lemma1211`)
+
+(a) the primes of `τ₂(M)` lie in `σ(M*) − β(M*)` for `M* ∈ ℳ(N_G(A))` (stated for primes —
+the repo `tau2` does not exclude composites, same faithfulness correction as 12.3/12.10(c));
+(b) `π(E/C_E(A)) ⊆ τ₁(M*) ∪ τ₂(M*)`, via the normal `p`-complement of `M*'`
+(Lemma 10.8(c)) instead of the nilpotent quotient `M*'/M*_β`. Supporting engine:
+`exists_conj_smul_le_hallPiece` (parametric Hall push-in extracted from 12.10(e)).
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_conj_smul_le_hallPiece
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_of_tau2_of_mem_maximalContaining
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_prime_mem_sigma_diff_beta
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.index_primeFactors_subset_tau1_union_tau2
