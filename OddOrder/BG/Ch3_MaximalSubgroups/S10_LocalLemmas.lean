@@ -55,8 +55,9 @@ cardinality coincide. (Each order-`d` subgroup equals the unique order-`d` kerne
 cyclic `Z` to its subgroups.
 
 This duplicates `S10_BetaRadical.cyclic_subgroup_eq_of_card_eq` (a sibling §10 leaf); the
-shared helper should be hoisted into `S10_HallStructure` once the parallel §10 lanes merge. -/
-private theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
+shared helper should be hoisted into `S10_HallStructure` (public here since Lemma 12.18 uses it
+for the `Ω₁` bookkeeping in `S12_Lemma1218`). -/
+theorem cyclic_subgroup_eq_of_card_eq {C : Type*} [Group C] [Finite C] [IsCyclic C]
     {H₁ H₂ : Subgroup C} (h : Nat.card H₁ = Nat.card H₂) : H₁ = H₂ := by
   letI : CommGroup C := IsCyclic.commGroup
   have key : ∀ {N : Subgroup C} {d : ℕ}, Nat.card N = d → N = (powMonoidHom d : C →* C).ker := by
