@@ -106,6 +106,7 @@ import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S05_GridTrichotomy
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
+import OddOrder.Peterfalvi.S06_CertainHypothesis46
 import OddOrder.Peterfalvi.S06_CertainTypeCharacters
 import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S07_Coherence
