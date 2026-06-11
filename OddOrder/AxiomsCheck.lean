@@ -45,8 +45,12 @@ import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3703,3 +3707,78 @@ Theorem 10.2(d) (`isNilpotent_derived_of_Malpha_eq_bot`). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_centralizer_PQ_eq_bot
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_interaction
+
+/-! ### BG Lemma 12.3 + Hypothesis 11.1 constructor (`S12_ExceptionalBridge`)
+
+**BG Lemma 12.3** (mmd L3101): for `M* ∈ ℳ − {M}`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ¹(A)` with
+`N_G(A₀) ⊆ M*`: (a) if `p ∉ σ(M)` then `A` centralizes `M_σ ∩ M*`
+(`elemAb_centralizes_Msigma_meet`); (b) if `p ∈ σ(M) − α(M)` then `A` centralizes
+`M_α ∩ M*` (`elemAb_centralizes_Malpha_meet`). Root of the §12 τ₂-cascade. Consumes
+Theorem 11.7 (`MsigmaA_normal`) through the new Hypothesis 11.1 constructor
+(`Hypothesis111.of_normalizer_le`), Corollary 11.4, Theorem 10.1(b), Lemma 10.12(a), and
+the Theorem 10.2(d) Sylow closure — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.Hypothesis111.of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.not_conj_of_mem_sigma_of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.normalizer_Malpha_sup_sylow_of_mem_sigma
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.commutator_le_inf_Msigma_of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Msigma_meet
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Malpha_meet
+
+/-! ### BG Proposition 12.4 (`S12_ExceptionalBridge`)
+
+**BG Proposition 12.4** (mmd L3125): for `A ∈ ℰ_p²(M)`: (a) `C_G(A) ≤ M`
+(`centralizer_le_of_elemAb_rank_two`); (b) if `ℳ(N_G(A₀)) ≠ {M}` for every
+`A₀ ∈ ℰ¹(A)`, then `p ∈ σ(M)`, `M_α = 1`, `M_σ` is nilpotent, and `C_G(A) ≤ M`
+(`mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`). Consumes Lemma 12.3, the
+Uniqueness Theorem (9.6), Proposition 1.16(2) (`cocyclicFixedByClosure`),
+Proposition 10.11(b), Theorem 10.2 (Hall structure + BB4), and `Ω₁(Z(P))`
+(`omega1CenterInG`) — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_of_elemAb_rank_two
+
+/-! ### BG Theorem 12.5 (`S12_Theorem125`)
+
+**BG Theorem 12.5** (mmd L3159): for `p ∈ τ₂(M)` and `A ∈ ℰ_p²(M)`: (a) `M_σ` is
+nilpotent; (b) `M` has abelian Sylow `p`-subgroups and a Sylow `p`-subgroup `P ⊇ A` with
+`N_G(P) ⊄ M`; (c) `M_σ A ⊴ M`; (d) `C_{M_σ}(A) = 1`; (e) `M_σ ∩ M* = 1` for every
+`M* ∈ ℳ(A) − {M}`; (f) some `A₁ ∈ ℰ¹(A)` has `C_{M_σ}(A₁) = 1`
+(`Msigma_nilpotent_of_tau2`). The τ₂-case gateway: Proposition 12.4(b) supplies
+Hypothesis 11.1, then Theorems 11.3/11.5/11.7, Corollary 11.6, and Lemma 12.3(a) give
+the conclusions — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_nilpotent_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega1_eq_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.not_conj_of_mem_tau1_union_tau3_of_normalizer_le
+
+/-! ### BG Corollary 12.6(a)(b) (`S12_Corollary126`)
+
+**BG Corollary 12.6(a)(b)** (mmd L3179): for `p ∈ τ₂(M)` and `A ∈ ℰ_p²(E)`:
+(a) `A ⊴ E` (`E_le_normalizer_of_tau2`) and every line of `E` lies in `A`
+(`line_le_of_le_E_of_tau2`); (b) `C_G(A) ≤ E`, `N_M(A) = E`, `N_G(A) ⊄ M`
+(`centralizer_le_E_of_tau2`). Consume Theorem 12.5(b)(c)(d), `omega1_eq_of_tau2`, and
+Proposition 12.4(a) — all unconditional. (c) `ℳ(C_G(X)) = {M}` for lines with nontrivial
+`M_σ`-centralizer, (d)(e) `C_{M_σ}(x) = 1` for `(τ₁∪τ₃)`-elements of `E₃` / `C_{E₁}(A)`
+(via Lemma 12.2(b) and Theorem 12.5(e)), (f) `M_σ ∩ M*_σ = 1` for non-conjugate `M*`
+(Lemma 10.12(b)); assembled as `elemAb_normal_in_E_of_tau2`. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_of_le_E_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_E_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.maximalContaining_centralizer_line_eq_singleton
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_centralizer_eq_bot_of_le_centralizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_normal_in_E_of_tau2
