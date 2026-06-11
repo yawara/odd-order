@@ -1424,3 +1424,36 @@ session 27 cont.³ の recipe「CB3 monolith assembly」を実施。**copy で�
   (inl=Frobenius landed brick / inr=`by_cases center⊓W₂sub=⊥` → math-A (CB3) / math-B (CB4))。
 
 **正本 = 本 session 28 entry。CB3-L2 done; 残 = CB3-L3/L4 一般化 (hF→c2) + CB4 (math-B τ₂, 別構造) + CB6 wiring。**
+
+## 2026-06-11 (session 28 cont.²): CB5 (6.8.3) の真相精査 + break-pair foundation landed (1 commit, axiom-clean)
+
+**🔑🔑 教科書 (6.8.3) 精読 (mmd 04.8 L226-244) で L4 障害の本質を確定**: (6.8.3) は case (A)/(B)
+**共有**の S-coherence 最終ステップ。証明は **norm-weighted sum `∑_{χ∈S₁} χ(1)²/‖χ‖²`** を使い
+(L230)、ψ は「源 θ∈Irr H から induce される」だけで十分 (L236 "induced from an irreducible
+character of H" = **源 θ の既約性 = S の定義から自動**; ψ 自身の既約性は不要)。最終算術のみ case 差:
+case(A) `|Z|−1≥2|W₁|` (W₁ FPF on Z), case(B) `|H:Z|≥(2|W₁|+1)²` (W₁ FPF on H/H' & H'/Z)。
+
+### ✅ landed (commit `6994ad08`, CB5 combinatorial foundation)
+formalization の障害 = break-pair 機構の **irreducibility 仮説のみ** (教科書には無い over-strong)。除去:
+- **`exists_conjugatePairCover_general`**: `hXirr` 除去。survey 結果 = irreducibility は **line 737 の
+  `hpairχ` (IrreducibleCharacter packaging) 1 箇所のみ**で使用、conjugate involution `cidx`/cover/
+  disjoint/monotone は `hXreal`+`hXconj` のみ。出力を ClassFunction pair + `(pair i).2=(pair i).1.conj` 直接出力に。
+- **`exists_coherentBreakPair_general`**: `hSbirr` 除去 (上記 cover 上に mirror)。ψ∈Sb は reducible OK。
+
+### 🔴 CB5 残 = norm-weighted degree-sum 解析 (deep analytical core)
+break-pair の **combinatorial** 部は済。残る **analytical** 部 (degree-sum bound chain) は全て
+`IrreducibleCharacter` orthonormal family ベースで、reducible S₁ に未対応:
+- (5.6) `coherentDegreeSumBound_of_not_coherent` (S08:2450): 抽象 `χmem : ι → IrreducibleCharacter ↥L`
+  orthonormal family でパラメタ化。
+- `sMember_degreeSumBound_of_not_coherent` (S08:6065): `exists_sMemberOrthonormalFamily hF` で **S₁ を
+  IrreducibleCharacter 列挙** (S₁⊆S 既約前提) → `∑ deg² ≤ 2a`。
+- `sMember_degreeSqReBound` (6153) / `xSum_le_two_psi` (6451) → `false_of_coherentXunionYset` (6661)。
+- **gap**: reducible S₁ では `∑_{χ∈S₁} χ(1)²/‖χ‖²` を**既約構成要素 family へ分解**して (5.6) を適用要
+  (`‖Ind θ‖²` = constituent 数)。X-sum 部 (`∑_X χ(1)²`, X⊆Irr) は既存 (`sum_re_sq_Xset_eq_of_irreducible_X`)、
+  `∑_X ≤ ∑_{S₁}` (norm-weighted, X⊆S₁, 正項) は易。**deep = (5.6) を reducible S₁ へ (constituent 経由)**。
+- **次手**: (a) `exists_sMemberOrthonormalFamily` の reducible 版 (S₁ の既約構成要素を orthonormal family 化) →
+  norm-weighted `sMember_degreeSumBound_general` → `xSum_le_two_psi_general` → `false_of_coherentXunionYset_general`
+  (FPF-on-Z arith), ‖ (b) 教科書通り `∑χ(1)²/‖χ‖²` を直接評価。**multi-lemma 解析、focused session 推奨**。
+
+**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial); 残 = norm-weighted
+degree-sum (analytical, constituent 分解) + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
