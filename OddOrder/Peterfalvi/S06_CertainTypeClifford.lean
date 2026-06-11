@@ -928,6 +928,46 @@ theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
   rw [heq, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hinner
   exact one_ne_zero hinner
 
+/-- **Peterfalvi (4.5.b), exhaustion**: every irreducible character `μ` of `L` is either a
+certain-type character `μ_{ij}` or `Ind^L_K χ` for some `χ ∈ Irr(K)` not among the `χ_j`.
+
+Pick an irreducible constituent `θ` of `Res^L_K μ` (`exists_liesOver`); then `μ` is a constituent of
+`Ind^L_K θ` (`inner_induce_ne_zero_iff_liesOver`).  If `θ = χ_j` then `Ind^L_K θ = μ_j = ∑_i μ_{ij}`
+(`induce_restrict_certainType_eq`), so `μ = μ_{ij}` for some `i`.  Otherwise `Ind^L_K θ` is irreducible
+(`induce_isIrreducible_of_forall_chiRestrict_ne`), hence equals `μ`. -/
+theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : IrreducibleCharacter L) :
+    (∃ χ₂ i, (h.columnFamily χ₂).mu i = μ) ∨
+      (∃ χ : IrreducibleCharacter ↥h.K, (∀ χ₂, h.chiRestrict χ₂ ≠ χ) ∧
+        ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ) = (μ : ClassFunction L ℂ)) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  classical
+  -- an irreducible constituent `θ` of `Res^L_K μ`, hence `μ` is a constituent of `Ind^L_K θ`
+  obtain ⟨θ, hθ⟩ := IrreducibleCharacter.exists_liesOver (H := h.K) μ
+  have hcon : ClassFunction.inner (ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ))
+      (μ : ClassFunction L ℂ) ≠ 0 :=
+    (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver h.K μ θ).mpr hθ
+  by_cases hcase : ∃ χ₂, h.chiRestrict χ₂ = θ
+  · -- `θ = χ_j`: `μ` is a constituent of `∑_i μ_{ij}`, hence some `μ_{ij}`
+    obtain ⟨χ₂, hχ₂⟩ := hcase
+    left
+    rw [← hχ₂, h.coe_chiRestrict χ₂, h.induce_restrict_certainType_eq χ₂, inner_sum_left] at hcon
+    obtain ⟨i, -, hi⟩ := Finset.exists_ne_zero_of_sum_ne_zero hcon
+    refine ⟨χ₂, i, ?_⟩
+    by_contra hne
+    rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hi
+    exact hi rfl
+  · -- `θ ∉ {χ_j}`: `Ind^L_K θ` is irreducible, hence equals `μ`
+    push_neg at hcase
+    right
+    refine ⟨θ, hcase, ?_⟩
+    have hirr := h.induce_isIrreducible_of_forall_chiRestrict_ne hcase
+    have hite := irreducibleCharacter_inner_eq_ite (⟨_, hirr⟩ : IrreducibleCharacter L) μ
+    rw [IrreducibleCharacter.coe_mk] at hite
+    by_cases hEq : (⟨_, hirr⟩ : IrreducibleCharacter L) = μ
+    · exact Subtype.ext_iff.mp hEq
+    · rw [if_neg hEq] at hite; exact absurd hite hcon
+
 end Recipe
 
 end Hypothesis
