@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S06_CertainHypothesis46
+import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S03b_Vanishing
 
 /-!
@@ -135,5 +136,167 @@ theorem induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
     mem_A_of_apply_ne_zero_of_not_subset_characterKernel h χ hker hw_ne hw_val
   rw [hKw] at hwA
   exact hzA (by rw [hconj]; exact h.dade.L_normalizes_A x hwA)
+
+/-! ### Peterfalvi (4.7), `j ≥ 1` half: `H ⊄ Ker χ_j`, hence `Supp χ_j, Supp μ_j ⊆ A ∪ {1}`
+
+The kernel step (mmd 04.6 L69-73): suppose `H ⊆ Ker χ_j`.  Since `W₂ ⊆ H`, every `y ∈ W₂` lies
+in `Ker μ_{0j}` (through the restriction `χ_j = Res_K μ_{0j}`), so for `x ∈ W₁^#`,
+
+`δ_j·ω_{0j}(xy) = μ_{0j}(xy) = μ_{0j}(x) = δ_j·ω_{0j}(x) = δ_j`
+
+by the (4.3.c) value identity on `V = W − W₂` (both `x` and `xy` lie there) and kernel
+translation invariance.  Hence `χ₂(y) = ω_{0j}(xy) = 1` for all `y ∈ W₂`, forcing `χ₂ = 1`
+(`j = 0`). -/
+
+section ChiJ
+
+open OddOrder.Peterfalvi.S05
+
+variable {L₀ : Type*} [Group L₀] [Fintype L₀] [Invertible (Nat.card L₀ : ℂ)]
+
+/-- **Peterfalvi (4.7), `j ≥ 1` kernel step** (the `ω_{0j}` argument): for a nontrivial column
+`χ₂ ≠ 1`, the certain-type restriction `χ_j = Res_K μ_{0j}` does **not** contain `W₂` in its
+kernel.  Stated with `W₂` itself (the minimal kernel input); the (4.6.c) form `H ⊄ Ker χ_j`
+follows by `W₂ ≤ H`. -/
+theorem Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
+    (h : Hypothesis L₀) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    ¬ ((h.W2.subgroupOf h.K : Set ↥h.K) ⊆
+      S03.characterKernel (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
+  intro hker
+  apply hχ₂
+  ext y
+  rw [MonoidHom.one_apply]
+  -- a nontrivial `x ∈ W₁`
+  obtain ⟨x, hxW1, hx1⟩ :=
+    (Subgroup.bot_or_exists_ne_one h.W1).resolve_left h.W1_nontrivial
+  set μ₀ : IrreducibleCharacter L₀ := (h.columnFamily χ₂).mu 0 with hμ₀def
+  -- `y` as an ambient element of `W₂`
+  have hyW2 : ((y : ↥(h.W1 ⊔ h.W2)) : L₀) ∈ h.W2 := by
+    have hy2 := y.2
+    rwa [Subgroup.mem_subgroupOf] at hy2
+  set yL : L₀ := ((y : ↥(h.W1 ⊔ h.W2)) : L₀) with hyLdef
+  -- `yL ∈ Ker μ₀` through the restriction `χ_j = Res_K μ₀`
+  have hyK : yL ∈ h.K := h.W2_le_K hyW2
+  have hyker : yL ∈ S03.characterKernel (μ₀ : ClassFunction L₀ ℂ) := by
+    have h1 := hker (Subgroup.mem_subgroupOf.mpr hyW2 :
+      (⟨yL, hyK⟩ : ↥h.K) ∈ h.W2.subgroupOf h.K)
+    rw [S03.mem_characterKernel, S03.characterDegree_def, coe_chiRestrict,
+      ClassFunction.restrict_apply, ClassFunction.restrict_apply, OneMemClass.coe_one] at h1
+    rw [S03.mem_characterKernel, S03.characterDegree_def]
+    exact h1
+  -- `x` and `x·y` lie in `V = W − W₂`
+  have hxW : x ∈ h.W1 ⊔ h.W2 := (le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) hxW1
+  have hyW : yL ∈ h.W1 ⊔ h.W2 := (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2) hyW2
+  have hVdef : h.sdiffTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup L₀) : Set L₀) \ (h.W2 : Set L₀) := rfl
+  have hxV : x ∈ h.sdiffTICyclicHypothesis.V := by
+    rw [hVdef]
+    refine ⟨hxW, fun hxW2 => hx1 ?_⟩
+    exact Subgroup.mem_bot.mp (h.W_disjoint.le_bot (Subgroup.mem_inf.mpr ⟨hxW1, hxW2⟩))
+  have hvV : x * yL ∈ h.sdiffTICyclicHypothesis.V := by
+    rw [hVdef]
+    refine ⟨mul_mem hxW hyW, fun hvW2 => hx1 ?_⟩
+    have hxW2 : x ∈ h.W2 := by
+      have hxeq : x = (x * yL) * yL⁻¹ := by group
+      rw [hxeq]
+      exact mul_mem hvW2 (inv_mem hyW2)
+    exact Subgroup.mem_bot.mp (h.W_disjoint.le_bot (Subgroup.mem_inf.mpr ⟨hxW1, hxW2⟩))
+  -- (4.3.c) at `x·y` and at `x`, and kernel translation
+  have hA := h.certainType_apply_eq_of_mem_V χ₂ 0 hvV
+  have hB := h.certainType_apply_eq_of_mem_V χ₂ 0 hxV
+  have hC : (μ₀ : ClassFunction L₀ ℂ) (x * yL) = (μ₀ : ClassFunction L₀ ℂ) x :=
+    OddOrder.RepresentationTheory.apply_mul_eq_of_mem_characterKernel
+      μ₀.isIrreducible hyker x
+  -- the `ω_{0j}` values: `ω_{0j}(x·y) = χ₂(y)`, `ω_{0j}(x) = 1`
+  have homega : ∀ (w : L₀) (hw : w ∈ h.sdiffTICyclicHypothesis.W),
+      (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) ⟨w, hw⟩
+        = ((χ₂ (h.sdiffTICyclicHypothesis.wSnd ⟨w, hw⟩) : ℂˣ) : ℂ) := by
+    intro w hw
+    rw [h.chiColumn_zero, TICyclicHypothesis.omega_apply,
+      h.sdiffTICyclicHypothesis.omegaProdChar_one_left, MonoidHom.comp_apply]
+    exact rfl
+  -- assemble: `δ·χ₂(y) = μ₀(x·y) = μ₀(x) = δ·1`
+  have hchain : ((h.columnFamily χ₂).sign : ℂ)
+        * ((χ₂ (h.sdiffTICyclicHypothesis.wSnd
+            ⟨x * yL, h.sdiffTICyclicHypothesis.V_subset_W hvV⟩) : ℂˣ) : ℂ)
+      = ((h.columnFamily χ₂).sign : ℂ)
+        * ((χ₂ (h.sdiffTICyclicHypothesis.wSnd
+            ⟨x, h.sdiffTICyclicHypothesis.V_subset_W hxV⟩) : ℂˣ) : ℂ) := by
+    rw [← homega _ _, ← homega _ _, ← hA, ← hB]
+    exact hC
+  have hsign : ((h.columnFamily χ₂).sign : ℂ) ≠ 0 := by
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> norm_num
+  have hval := mul_left_cancel₀ hsign hchain
+  -- compute the two `wSnd` values (everything inside `↥sdiff.W` to keep `HMul` happy)
+  have hyWs : yL ∈ h.sdiffTICyclicHypothesis.W := hyW
+  have hy'mem : (⟨yL, hyWs⟩ : ↥h.sdiffTICyclicHypothesis.W)
+      ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W :=
+    Subgroup.mem_subgroupOf.mpr hyW2
+  have hsplit : (⟨x * yL, h.sdiffTICyclicHypothesis.V_subset_W hvV⟩ :
+        ↥h.sdiffTICyclicHypothesis.W)
+      = (⟨x, h.sdiffTICyclicHypothesis.V_subset_W hxV⟩ : ↥h.sdiffTICyclicHypothesis.W)
+        * (⟨yL, hyWs⟩ : ↥h.sdiffTICyclicHypothesis.W) := rfl
+  have hxmem : (⟨x, h.sdiffTICyclicHypothesis.V_subset_W hxV⟩ :
+        ↥h.sdiffTICyclicHypothesis.W)
+      ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
+    Subgroup.mem_subgroupOf.mpr hxW1
+  have hysnd : h.sdiffTICyclicHypothesis.wSnd (⟨yL, hyWs⟩ : ↥h.sdiffTICyclicHypothesis.W)
+      = (⟨⟨yL, hyWs⟩, hy'mem⟩ :
+          ↥(h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W)) :=
+    h.sdiffTICyclicHypothesis.wSnd_W2_subtype ⟨⟨yL, hyWs⟩, hy'mem⟩
+  have hy'eq : (⟨⟨yL, hyWs⟩, hy'mem⟩ :
+        ↥(h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W)) = y := by
+    apply Subtype.ext
+    apply Subtype.ext
+    rfl
+  rw [hsplit, map_mul, h.sdiffTICyclicHypothesis.wSnd_eq_one_of_mem_W1 hxmem,
+    hysnd, hy'eq, one_mul] at hval
+  -- retype the `(1 : sdiff-form)` inside `hval` to the `h`-form (definitionally equal)
+  have hval' : ((χ₂ y : ℂˣ) : ℂ)
+      = ((χ₂ (1 : ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) : ℂˣ) : ℂ) := hval
+  rw [map_one] at hval'
+  exact hval'
+
+end ChiJ
+
+/-- **Peterfalvi (4.7), `j ≥ 1` kernel statement** in the Hypothesis (4.6) form: for a nontrivial
+column `χ₂ ≠ 1`, `H ⊄ Ker χ_j` (`H` the (4.6.c) normal subgroup, `W₂ ≤ H`). -/
+theorem not_subset_characterKernel_chiRestrict
+    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    ¬ ((h.subH.subgroupOf h.K : Set ↥h.K) ⊆
+      S03.characterKernel (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
+  intro hker
+  refine Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
+    h.toCertainTypeHypothesis.toHypothesis hχ₂ ?_
+  intro k hk
+  refine hker ?_
+  have hkW2 := Subgroup.mem_subgroupOf.mp hk
+  exact Subgroup.mem_subgroupOf.mpr (h.W2_le_subH hkW2)
+
+/-- **Peterfalvi (4.7), `j ≥ 1` support**: `Supp χ_j ⊆ A ∪ {1}` for a nontrivial column
+`χ₂ ≠ 1`. -/
+theorem chiRestrict_apply_eq_zero_of_not_mem_union
+    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    {g : ↥h.K} (hgA : L.subtype (h.K.subtype g) ∉ A ∪ ({1} : Set G)) :
+    (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ) g = 0 :=
+  apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel h (h.chiRestrict χ₂)
+    (not_subset_characterKernel_chiRestrict h hχ₂) hgA
+
+/-- **Peterfalvi (4.7), `j ≥ 1` induced support**: `Supp μ_j ⊆ A ∪ {1}` for a nontrivial column
+`χ₂ ≠ 1` (`μ_j = Ind_K^L χ_j = ∑_i μ_{ij}` by (4.5.a) `induce_restrict_certainType_eq`). -/
+theorem induce_chiRestrict_apply_eq_zero_of_not_mem_union
+    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    {z : ↥L} (hz : L.subtype z ∉ A ∪ ({1} : Set G)) :
+    ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ) z = 0 :=
+  induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel h (h.chiRestrict χ₂)
+    (not_subset_characterKernel_chiRestrict h hχ₂) hz
 
 end OddOrder.Peterfalvi.S06

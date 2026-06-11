@@ -253,6 +253,27 @@ theorem subset_characterKernel_inflate (χbar : IrreducibleCharacter (G ⧸ N)) 
 
 variable [Finite G]
 
+/-- **Character-kernel translation invariance.**  If `g` lies in the character kernel of an
+irreducible character `χ` (`χ(g) = χ(1)`), then `χ(x·g) = χ(x)` for every `x : G`.  The
+diagonalization keystone (`rep_eq_id_of_character_eq_one`) forces the witnessing representation
+to satisfy `ρ g = id`, so `χ(x·g) = tr(ρ(x) ∘ ρ(g)) = tr(ρ(x)) = χ(x)`. -/
+theorem apply_mul_eq_of_mem_characterKernel {χ : ClassFunction G ℂ}
+    (hχ : IsIrreducibleCharacter χ) {g : G}
+    (hg : g ∈ OddOrder.Peterfalvi.S03.characterKernel χ) (x : G) :
+    χ (x * g) = χ x := by
+  obtain ⟨V, _, _, _, ρ, _, hval⟩ := hχ
+  have hker : ρ.character g = ρ.character 1 := by
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def] at hg
+    rw [← congrFun hval g, ← congrFun hval 1]
+    exact hg
+  have hid : ρ g = LinearMap.id := rep_eq_id_of_character_eq_one ρ hker
+  have hrep : ρ (x * g) = ρ x := by
+    rw [map_mul, hid, ← Module.End.one_eq_id, mul_one]
+  rw [show χ (x * g) = ρ.character (x * g) from congrFun hval (x * g),
+    show χ x = ρ.character x from congrFun hval x]
+  exact congrArg (LinearMap.trace ℂ V) hrep
+
 /-- **Inflation is surjective onto the kernel-containing irreducible characters** ([Isaacs] (2.22),
 the reverse inclusion).  Every irreducible character `χ` of `G` whose character kernel contains the
 normal subgroup `N` arises by inflation: there is an irreducible character `χbar` of `G ⧸ N` with
