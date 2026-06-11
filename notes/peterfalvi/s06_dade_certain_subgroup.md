@@ -1572,3 +1572,30 @@ full (4.6) に拡張: 現 `CertainTypeHypothesis`=(4.2)+(2.2)-Dade-on-A のみ�
    設計難所 = L≤G coercion (W₁,W₂≤↥L vs W≤G via TICyclic) + 二 (2.2) instance (A, A₀)。
 2. **§8 (6.8) program 直接** (s08_6_8_blocker_central_Z.md; Zc-central coherence; (1.6)/(6.7) status 確認要)。
 3. **(4.7)-(4.9) §6 完成** ((3.8) を活かす; (6.8) 経路外だが full-Pf scope; (4.6) structure 要)。
+
+### ✅ 着地 (session 26 cont.²): Pf (4.6) Hypothesis 構造体 (gateway scaffold, commit 2fa0830e)
+
+`Hypothesis46 (A : Set G) (L : Subgroup G)` を新 leaf `S06_CertainHypothesis46.lean` に定義
+(構造体のみ, warning-free, full build 3765 + AxiomsCheck OK)。**`extends CertainTypeHypothesis A L`**
+(= (4.2) on ↥L + (2.2)-Dade on A) + 追加フィールド:
+- (4.6.b) `tic : TICyclicHypothesis G` + `tic_W1/tic_W2 : tic.W_k = (W_k).map L.subtype` (L↪G 像で matching)
+- (4.6.c) `subH : Subgroup ↥L` + `subH_normal` + `W2_le_subH` + `subH_le_K`
+- (4.6.d) `A_covers : ∀hh∈subH^#, ∀x∈C_K(hh)^#, L.subtype x ∈ A` (covering ⋃C_K(h)^#⊆A) +
+  `dade0 : S04.Hypothesis G (A ∪ {l·v·l⁻¹ | l∈L, v∈tic.V}) L` (A₀=A∪V^L の (2.2))
+- (4.6.e) `tau : FullDadeIsometryData dade0` (τ rel A₀)
+- **🔑 instance: `[Fintype ↥L] [Invertible (Nat.card G:ℂ)] [Invertible (Nat.card ↥L:ℂ)]` を構造体
+  シグネチャに要求** (dade0/tau フィールドが要する; Fintype ↥L は [Fintype G] から自動でない)。
+- **Dade data (dade/dade0/tau) は field として仮定** — 構成 (K-local + V-TI Dade の合成) は
+  instantiator=§8 (6.8) application の責務。S08 の `CertainTypeHypothesis`(現 (c2) carry)を
+  `Hypothesis46` に拡張すれば (6.8)(c2) の τ rel A₀ が供給される。
+
+### ▶▶ 次 = (4.7) [Supp χ⊆A∪{1}] — ⚠ **(1.2) がブロッカー (未着手)**
+- **(1.2)** (mmd 04.3): H⊴G, χ∈Irr(G), H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0。**repo 未着手**。
+  証明 = 第二直交関係 `∑_χ|χ(g)|²=|C_G(g)|` + `C_H(g)=1⟹|C_G(g)|≤|C_{G/H}(ḡ)|` +
+  inflation (Φ=H-trivial chars=Irr(G/H), `∑_{φ∈Φ}|φ(g)|²=|C_{G/H}(ḡ)|`) ⟹ χ∉Φ で χ(g)=0。
+  clean self-contained (~100 行), 汎用 char theory (InflationCharacter + 第二直交)。
+- (4.7) は (1.2) + (4.6.d) A_covers で `Supp χ⊆A∪{1}` (χ∈Irr(K), H⊄Ker χ); χ_j (j≥1) part も。
+  Hypothesis46 のフィールドアクセス + (4.5) の χ_j (`certainTypeRestrict_isIrreducible` 等) を使う。
+
+正本 = 本ノート (session 26 cont.²)。**(4.6) structure 完成 (gateway)。次 = (1.2) [未着手, 第二直交+inflation]
+→ (4.7)。** **(4.7)-(4.9) は (6.8) case-B 経路外 (上記訂正); (6.8) closer は §8 Zc program。**
