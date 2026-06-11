@@ -65,6 +65,7 @@ import OddOrder.Peterfalvi.S03b_Vanishing
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -715,6 +716,29 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.card_centralizer_le_card_centralizer_quotient
+-- Peterfalvi (4.7), support form (core + induced): for `χ ∈ Irr K` with `H ⊄ Ker χ` (`H ⊴ K` the
+-- (4.6.c) normal subgroup), `Supp χ ⊆ A ∪ {1}` and `Supp (Ind_K^L χ) ⊆ A ∪ {1}`.  (1.2) applied to
+-- `χ` on `K` + the (4.6.d) `A`-cover (core), then `L`-conjugacy invariance of `A` (induced).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.mem_A_of_apply_ne_zero_of_not_subset_characterKernel
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.induce_apply_eq_zero_of_not_mem_union_of_not_subset_characterKernel
+-- Character-kernel translation invariance: `g ∈ Ker χ ⟹ χ(x·g) = χ(x)` (diagonalization keystone
+-- `rep_eq_id_of_character_eq_one` forces `ρ g = id`).  Feeds the Peterfalvi (4.7) `j ≥ 1` kernel
+-- step (and any future use of kernel elements inside character values).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.apply_mul_eq_of_mem_characterKernel
+-- Peterfalvi (4.7), `j ≥ 1` half: `H ⊄ Ker χ_j` for a nontrivial column `χ₂ ≠ 1` (the `ω_{0j}`
+-- argument via the (4.3.c) value identity on `V = W − W₂` + kernel translation invariance), and
+-- the resulting supports `Supp χ_j, Supp μ_j ⊆ A ∪ {1}`.  Completes Theorem (4.7); feeds the
+-- (5.3.b) R-producer for the reducible certain-type characters (the (6.8.3) break-pair input).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.not_subset_characterKernel_chiRestrict
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiRestrict_apply_eq_zero_of_not_mem_union
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S06.induce_chiRestrict_apply_eq_zero_of_not_mem_union
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
