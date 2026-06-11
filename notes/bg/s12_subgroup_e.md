@@ -184,7 +184,49 @@ AxiomsCheck 5 本登録):
   subst h : r = p は **p 側 (binder) を消す** — 以降 r 表記。`set K` の fold ずれは
   `show` で正規化してから omega。
 
-▶ **次 = Corollary 12.9** (S12_E:447 scaffold; 12.8(e) + 12.7(c) 消費、レシピ = mmd L3286-3292)。
+### ✅ session 6: **Corollary 12.9 COMPLETE** (新 leaf `S12_Corollary129.lean`, unconditional・axiom-clean)
+
+mmd L3286-3292。`commutator_decomp_of_tau1_action` (S12_E scaffold を移設・充足、
+**S12_E 実 sorry 8→7**)。AxiomsCheck 登録済 (standard 3 のみ)。
+
+- **(a)**: 10.11(d) (`S10.sigma_complement_commutator_cyclic_normal`, **K := A, P := Q** —
+  A の q'-性は p ≠ q [pRank 2≠1] から) で `[A,Q] ≤ C(M_σ)`・cyclic・`M ≤ N([A,Q])`。
+  `Isaacs.Ch05.fitting_coprime_abelian_decomp (P := A, K := Q)` (Q ≤ N(A) は 12.6(a)
+  `elemAb_normal_in_E_of_tau2` 第1連言経由) で `A = (A⊓C(Q)) ⊔ [A,Q]` disjoint。
+  card 三分 (`Nat.dvd_prime_pow` + `interval_cases`): 1 = hAQ 矛盾 / p² = `A ≤ C(M_σ)` で
+  **rank-clash engine** (10.11(b) `rank_centralizer_Msigma_inf_le_one` + `inf_eq_right` +
+  `two_le_rank_of_mem_elemAbelianOfRank_two` + omega; bridge:953 パターン) ⟹ card A₀ = p。
+  `A₀ = A ⊓ C(M_σ)` も同じ三分で。`|A| = |A₁|·|A₀|`
+  (`card_sup_eq_mul_of_le_normalizer_of_disjoint`) ⟹ card A₁ = p。
+- **(b)**: `A₁ = A₀^g` と仮定 → swap で `Q^{g⁻¹} ≤ C(A₀)`。`N(A₀) = M`
+  (`normalizer_lt_top_of_le_of_ne_bot` + coatom)、`C(A₀)` は M-conj 不変
+  (`centralizer_conj_smul` + `conj_smul_eq_self_of_mem_normalizer`)。
+  **cyclic Sylow q 論法**: ↥M 内 Sylow `S₁ ⊇ Q.subgroupOf M`
+  (`comap_subtype.exists_le_sylow (G := M)`) へ `Q'.subgroupOf M` を共役で押し込み
+  (`exists_conj_le_sylow_of_isPGroup` = S09 private の再掲)、G レベル化
+  `SylG := map M.subtype S₁` は cyclic (`pRank_le_of_injective` ≤ r_q(M) = 1 [τ₁] +
+  `S10.isCyclic_of_pRank_le_one`; Odd q は `hG.odd.of_dvd_nat`) ⟹
+  `S10.cyclic_subgroup_eq_of_card_eq` で `Q = (Q')^m` ⟹ `Q ≤ C(A₀)` ⟹ `A₀ ≤ A₁` ⟹
+  直和性で `A₀ = ⊥`、card p に矛盾。
+- **(c)**: `C(A₁) ⊄ M` は by_cases: nonabelian Sylow p ⟹ **12.7 assembly**
+  `tau2_singleton_of_nonabelianSylow` の (c)-連言に `X := A₁ ≠ A₀ = A⊓C(M_σ)` を
+  食わせるだけ; abelian ⟹ `Q` を Hall-τ₁ へ
+  (`Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall` **trivial 作用 A := Unit, φ := 1** +
+  `Ch1.S06.exists_conj_eq_of_isHall_subgroupOf` で `X := Q^w ≤ E₁`, `w ∈ E`) →
+  **12.8(e)** `central_line_of_abelianSylow` ⟹ `E ≤ C(X)` ⟹ `[A,X] = ⊥` ⟹
+  (`A` は w-不変 = 12.6(a)) `[A,Q] = ⊥` 矛盾でこの枝は不発。
+- ⚠ 技法: `rw [hQ_eq]` は `⁅A,Q⁆` 内の Q も巻き込む → **`conv_lhs => rw [hQ_eq]`**。
+  `rw [← hsup]` も同罪 (card 等式は sup 側で作って `rw [hsup] at` で潰す)。
+  `Subgroup.card_map_of_injective` は injective 1 引数 (subgroup 暗黙)。
+  `(conj g)⁻¹` vs `conj g⁻¹` の不一致は `smul_smul + ← map_mul + inv_mul_cancel +
+  map_one + one_smul` で正規化。trivial Hall 作用の Coprime は `Nat.card_unique` で整形。
+  `push_neg` は deprecated → `push Not`。
+- leaf 内 private helper: `card_conj_smul` (S10 系 private の 3 例目重複 — hoist は hub 仕事)、
+  `conj_smul_mono`、`map_subtype_conj_smul` (↥M-conj と G-conj の subtype 交換)、
+  `exists_conj_le_sylow_of_isPGroup` (S09 private 再掲)。
+
+▶ **次 = Corollary 12.10** (S12_E:446 scaffold `nilpotent_sigmaComplement_abelian`;
+mmd L3293〜; 消費 = 12.5(b)/12.7(a)/12.8(a) [依存表 L778])。
 
 ### (履歴) 残 = 12.8 (d)(e)(f) + assembly — 設計メモ (session 5)
 
