@@ -36,6 +36,7 @@ namespace OddOrder.BG.Ch3.S12
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open OddOrder.BG.Ch1.S06 (actionCommutator_conj_map_subtype fixedPointsOfMulAut_conj_map_subtype)
 open scoped Pointwise
 
 variable {G : Type*} [Group G]
@@ -878,7 +879,7 @@ theorem tau1_Malpha_centralizer_PQ_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have hnY_R₀ : (nY : G) ∈ R₀ := by
       have hY_eq : (nY : G) = (c : G) * ((m : ↥Y) : G)⁻¹ := by
         rw [hc_eq]
-        simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
+        simp only [Subgroup.coe_mul]
         group
       rw [hY_eq]
       exact R₀.mul_mem hcR₀ (R₀.inv_mem hm')
@@ -1037,6 +1038,162 @@ theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
       S10.alpha M = S10.beta M ∧ S10.Malpha M ≠ ⊥ ∧ q ∉ S10.alpha M ∧
       S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
       S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) := by
-  sorry
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMcoatom : IsCoatom M := mem_maximalSubgroups.mp hM
+  obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
+  have hPp : IsPGroup p ↥P := hPea.isPGroup
+  have hPcard : Nat.card ↥P = p := by rw [hPcard1, pow_one]
+  refine ⟨fun hαne hqα =>
+    ⟨tau1_Malpha_centralizer_P_ne_bot hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQP hMNQ hαne hqα,
+     tau1_Malpha_centralizer_PQ_eq_bot hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQP hMNQ hqα⟩,
+    ?_⟩
+  intro hQsyl
+  -- `N_G(Q) < ⊤`; if `M ≤ N_G(Q)` then `N_G(Q) = M` and `ℳ(N_G(Q)) = {M}`, contradiction.
+  have hNQne_top : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with h | h
+    · exact hQne h
+    · exact hMcoatom.1 (top_le_iff.mp (h ▸ hQM))
+  have hnotMleNQ : ¬ M ≤ Subgroup.normalizer (Q : Set G) := by
+    intro hle
+    apply hMNQ
+    have hNQM : Subgroup.normalizer (Q : Set G) = M := by
+      by_contra hne
+      exact hNQne_top (hMcoatom.2 _ (lt_of_le_of_ne hle (Ne.symm hne)))
+    rw [hNQM]
+    ext L
+    simp only [Set.mem_singleton_iff]
+    constructor
+    · rintro ⟨hLco, hML⟩
+      by_contra hne
+      exact hLco.1 (hMcoatom.2 L (lt_of_le_of_ne hML (Ne.symm hne)))
+    · intro hLM
+      rw [hLM]
+      exact ⟨hMcoatom, le_refl M⟩
+  -- Step 1: `Q ≤ M'` — the coprime fixed-point-free action of `P` gives `Q = [Q, P]`.
+  have hQM' : Q ≤ derivedInG M := by
+    haveI : IsSolvable ↥Q :=
+      solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hQM).toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hQM).surjective
+    have hfix_bot : Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hQinv)) = ⊥ := by
+      have h2 : (Subgroup.fixedPointsOfMulAut
+          ((Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hQinv))).map Q.subtype
+          = ⊥ := by
+        rw [fixedPointsOfMulAut_conj_map_subtype hQinv, inf_comm]; exact hCQP
+      exact ((Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom Q).comp
+          (Subgroup.inclusion hQinv))).map_eq_bot_iff_of_injective
+        Q.subtype_injective).mp h2
+    have hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) := by
+      obtain ⟨k, hk⟩ := hQq.exists_card_eq
+      rw [hPcard, hk]
+      exact ((Nat.coprime_primes Fact.out Fact.out).mpr (Ne.symm hqp)).pow_right k
+    have htop : Ch04.actionCommutator
+        ((Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hQinv)) = ⊤ := by
+      have h := Ch04.fixedPoints_sup_actionCommutator_eq_top
+        (φ := (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hQinv)) hcop
+        (Or.inr inferInstance)
+      rwa [hfix_bot, bot_sup_eq] at h
+    have hAC := actionCommutator_conj_map_subtype hQinv
+    rw [htop] at hAC
+    have hQeq : Q = ⁅Q, P⁆ := by
+      rw [← hAC, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    calc Q = ⁅Q, P⁆ := hQeq
+      _ ≤ ⁅M, M⁆ := Subgroup.commutator_mono hQM hPM
+      _ = derivedInG M := (Subgroup.map_subtype_commutator M).symm
+  -- Steps 2-3: `Q ⋪ M`, so `M'` is not nilpotent (its Sylow `q` would be characteristic).
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hM'nn : ¬ Group.IsNilpotent ↥(derivedInG M) := by
+    intro hnil
+    apply hnotMleNQ
+    have hQ₀pgrp : IsPGroup q ↥(Q.subgroupOf (derivedInG M)) :=
+      hQq.of_equiv (Subgroup.subgroupOfEquivOfLe hQM').symm
+    have hmax : ∀ {T : Subgroup ↥(derivedInG M)}, IsPGroup q ↥T →
+        Q.subgroupOf (derivedInG M) ≤ T → T = Q.subgroupOf (derivedInG M) := by
+      intro T hT hle
+      have hTmap_le : T.map (derivedInG M).subtype ≤ M :=
+        (Subgroup.map_subtype_le T).trans hM'le
+      have hTq : IsPGroup q ↥(T.map (derivedInG M).subtype) := hT.map _
+      have hQle : Q ≤ T.map (derivedInG M).subtype := by
+        conv_lhs => rw [← Subgroup.map_subgroupOf_eq_of_le hQM']
+        exact Subgroup.map_mono hle
+      have hTeq := hQsyl _ hTmap_le hTq hQle
+      apply Subgroup.map_injective (derivedInG M).subtype_injective
+      rw [Subgroup.map_subgroupOf_eq_of_le hQM', ← hTeq]
+    let S : Sylow q ↥(derivedInG M) := ⟨Q.subgroupOf (derivedInG M), hQ₀pgrp, hmax⟩
+    have htfae := (isNilpotent_of_finite_tfae (G := ↥(derivedInG M))).out 0 3
+    have hnormal : (Q.subgroupOf (derivedInG M)).Normal := htfae.mp hnil q ⟨Fact.out⟩ S
+    haveI hchar : (Q.subgroupOf (derivedInG M)).Characteristic :=
+      Sylow.characteristic_of_normal S hnormal
+    have hNle : Subgroup.normalizer (derivedInG M : Set G) ≤
+        Subgroup.normalizer (Q : Set G) := by
+      have h := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+        (K := derivedInG M) (W := Q.subgroupOf (derivedInG M))
+      rwa [Subgroup.map_subgroupOf_eq_of_le hQM'] at h
+    exact (S10.le_normalizer_derivedInG M).trans hNle
+  -- Step 4: `M_α ≠ 1` (BB4 contrapositive).
+  have hαne : S10.Malpha M ≠ ⊥ := fun h => hM'nn (isNilpotent_derived_of_Malpha_eq_bot hG hM h)
+  -- Step 5: `q ∉ α(M)` (else `r(Q) ≥ 3` makes `N_G(Q)` uniquely maximal — Theorem 9.6).
+  have hqα : q ∉ S10.alpha M := by
+    intro hqa
+    apply hMNQ
+    have h3 : 3 ≤ pRank ↥M q := ((S10.mem_alpha_iff M q).mp hqa).2
+    have hQM_pgrp : IsPGroup q ↥(Q.subgroupOf M) :=
+      hQq.of_equiv (Subgroup.subgroupOfEquivOfLe hQM).symm
+    have hmaxM : ∀ {T : Subgroup ↥M}, IsPGroup q ↥T → Q.subgroupOf M ≤ T →
+        T = Q.subgroupOf M := by
+      intro T hT hle
+      have hTmap_le : T.map M.subtype ≤ M := Subgroup.map_subtype_le T
+      have hTq : IsPGroup q ↥(T.map M.subtype) := hT.map _
+      have hQle : Q ≤ T.map M.subtype := by
+        conv_lhs => rw [← Subgroup.map_subgroupOf_eq_of_le hQM]
+        exact Subgroup.map_mono hle
+      have hTeq := hQsyl _ hTmap_le hTq hQle
+      apply Subgroup.map_injective M.subtype_injective
+      rw [Subgroup.map_subgroupOf_eq_of_le hQM, ← hTeq]
+    let S : Sylow q ↥M := ⟨Q.subgroupOf M, hQM_pgrp, hmaxM⟩
+    have hrank3 : 3 ≤ rank ↥Q := by
+      have e : ↥(Q.subgroupOf M) ≃* ↥Q := Subgroup.subgroupOfEquivOfLe hQM
+      calc (3 : ℕ) ≤ pRank ↥M q := h3
+        _ = pRank ↥(S : Subgroup ↥M) q := (pRank_sylow_eq S).symm
+        _ ≤ pRank ↥Q q := pRank_le_of_injective (f := e.toMonoidHom) e.injective
+        _ ≤ rank ↥Q := pRank_le_rank q
+    have hQlt : Q < ⊤ := lt_of_le_of_lt hQM hMcoatom.lt_top
+    have hUQ := OddOrder.BG.Ch2.S09.uniquenessTheorem hG hQlt (by omega) (Or.inl hrank3)
+    have hUNQ : IsUniquelyMaximal (Subgroup.normalizer (Q : Set G)) :=
+      hUQ.of_le_of_lt_top Subgroup.le_normalizer (lt_top_iff_ne_top.mpr hNQne_top)
+    have huniq : hUNQ.uniqueMaximalSubgroup = M :=
+      (hUQ.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hUNQ.uniqueMaximalSubgroup_isCoatom
+          (Subgroup.le_normalizer.trans hUNQ.le_uniqueMaximalSubgroup)).trans
+        (hUQ.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hMcoatom hQM).symm
+    exact hUNQ.maximalSubgroupsContaining_eq_singleton.trans (by rw [huniq])
+  -- Step 6: `α(M) = β(M)` (a prime `r ∈ α − β` would put `C_M(Q) ∈ 𝒰` by Corollary 10.9(a)(2)).
+  have hαβ : S10.alpha M = S10.beta M := by
+    apply Set.Subset.antisymm
+    · intro r hra
+      by_contra hrb
+      haveI : Fact r.Prime :=
+        ⟨Nat.prime_of_mem_primeFactors ((S10.mem_alpha_iff M r).mp hra).1⟩
+      have hrq : r ≠ q := fun h => hqα (h ▸ hra)
+      have hqβ : q ∉ S10.beta M := fun h => hqα (S10.beta_subset_alpha M h)
+      have h109 :=
+        (S10.beta_complement_centralizes hG hM hrq hrb hqβ hQM hQq (Or.inl hQM')).2 hra
+      apply hMNQ
+      have hCN : Subgroup.centralizer (Q : Set G) ⊓ M ≤ Subgroup.normalizer (Q : Set G) :=
+        inf_le_left.trans (Subgroup.centralizer_le_normalizer _)
+      have hUNQ : IsUniquelyMaximal (Subgroup.normalizer (Q : Set G)) :=
+        h109.of_le_of_lt_top hCN (lt_top_iff_ne_top.mpr hNQne_top)
+      have huniq : hUNQ.uniqueMaximalSubgroup = M :=
+        (h109.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hUNQ.uniqueMaximalSubgroup_isCoatom
+            (hCN.trans hUNQ.le_uniqueMaximalSubgroup)).trans
+          (h109.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hMcoatom inf_le_right).symm
+      exact hUNQ.maximalSubgroupsContaining_eq_singleton.trans (by rw [huniq])
+    · exact S10.beta_subset_alpha M
+  exact ⟨hαβ, hαne, hqα,
+    tau1_Malpha_centralizer_P_ne_bot hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQP hMNQ hαne hqα,
+    tau1_Malpha_centralizer_PQ_eq_bot hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQP hMNQ hqα⟩
 
 end OddOrder.BG.Ch3.S12

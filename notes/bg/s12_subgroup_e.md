@@ -1,5 +1,68 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅✅✅ 2026-06-11 (Lane F session 2, Fable 5): **Lemma 12.18 COMPLETE — unconditional・axiom-clean**
+
+**`tau1_Malpha_interaction` (a)(b) 全結論 sorry-free** (leaf `S12_Lemma1218.lean`, 1,180 行,
+commits `9854236d` [(a) 第2連言] + 本 commit [(b)+assemble+AxiomsCheck])。
+session 1 スケルトン通りに組立、数学的逸脱なし。**`#print axioms` = standard 3 のみ**:
+(b) の Cor 10.9(a)(2) 消費は de-axiom 済 (ce49f862) ゆえ **island 化せず** (session 1 の
+「keystone island 見込み」は解消済)。AxiomsCheck に BB4/第2連言/capstone の 3 本登録。
+
+### 実装プロファイル ((a) 第2連言 = hard core ~420 行 + helpers ~250 行)
+
+- **cyclic 同位数一意** `eq_of_card_eq_of_le_of_isCyclic` (素数位数版): 両部分群を
+  `zpowers (g^(|C|/r))` に同定。**mathlib に直接形は無い** (leansearch/moogle 共にダウンで
+  自作; `IsCyclic.card_powMonoidHom_ker` は CommGroup 要件で不採用)。部品 =
+  `orderOf_pow` + `Nat.gcd_eq_right` + `Nat.div_div_self` + `Subgroup.eq_of_le_of_card_ge`。
+- **(12.7) カード評価** `card_eq_prime_of_le_exponent_prime`: `S ≤ C` cyclic ∧ `S ≤ R₁`
+  (exp r) ∧ `S ≠ ⊥` ⟹ `|S| = r`。`C_{R₁}(P)`/`R₀ = C_{R₁}(Q)` の両方に適用。
+- **Ω₁ bookkeeping は z 経由の card 比較のみで完結**: `⟨z⟩ = C_{R₁}(P)` (一意性) ⟹ `z ∈ R₁`
+  ⟹ `⟨z⟩ ≤ R₀` ⟹ `R₀ = ⟨z⟩` (eq_of_le_of_card_ge)。原文の Ω₁ 演算子は不要。
+- **FPF-decomp ≤ 版** `inf_centralizer_sup_le_inf_of_le_normalizer`: `C_{Q⊔N}(P) ≤ C_N(P)`
+  (S12_E の eq_bot 版の第2成分保持変種; quotient FP の witness を `R₀` へ落とす要)。
+- **normalizer 移送 3 点** `le_normalizer_inf` / `normalizer_le_normalizer_centralizer` /
+  `normalizer_le_normalizer_normalizer` (mathlib 不在、element 計算 ~15 行ずつ)。
+- **Thm 3.7 矛盾 step** `inf_centralizer_ne_bot_of_not_le_centralizer`: 第1連言の
+  1034-1113 を R₁ 任意で抽出 (Q⊔R₁ 非冪零 + FPF ⟹ C_{R₁}(P)≠1)。第1連言は無改変。
+- **quotient 形 Thm 3.7**: ambient `Hgrp := (Q⊔N)⊔P`、`R₀.subgroupOf Hgrp` Normal、
+  `N' := π(Y)`, `R' := π(P)` に form-2 適用。**FPF/可換性の引き戻しは
+  `Ch04.coprime_fixedPoints_quotient` (coset-fixed 形) で element-wise** — quotient 内
+  centralizer subgroup を扱わない。card: `card_map_dvd` (H explicit!) + `range_comp` 経由。
+- **(b) reduction**: `Q ≤ M'` = `Ch04.fixedPoints_sup_actionCommutator_eq_top`
+  (Isaacs Lem 4.28) + S06 conjugation bridges (`fixedPointsOfMulAut_conj_map_subtype` で
+  C_Q(P)=⊥ → fixedPoints=⊥、`actionCommutator_conj_map_subtype` で AC=⊤ → Q=⁅Q,P⁆)
+  + `Subgroup.map_subtype_commutator`。`M'` 非冪零 = nilpotent なら Sylow q
+  (`isNilpotent_of_finite_tfae.out 0 3`) が normal→char (`Sylow.characteristic_of_normal`)
+  → `AppB.normalizer_le_normalizer_map_of_characteristic` で `M ≤ N_G(Q)` ⟹ `N_G(Q)=M`
+  ⟹ `ℳ(N_G(Q))={M}` 矛盾。`q∉α` = Uniqueness 9.6 (`rank Q ≥ 3` は Sylow.mk +
+  `pRank_sylow_eq`)。`α=β` = `beta_complement_centralizes` (p:=r∈α−β) .2 で
+  `C_M(Q)∈𝒰` → S12_E:627-648 の uniquely-maximal 矛盾パターン。
+
+### build 地雷録 (このセッションで踏んだ分)
+
+- **combining tilde 識別子は不正**: `x̃`(x+U+0303) は Lean 識別子にならない (`ñ` 単一 CP は
+  可)。expected token エラー位置で発覚。ASCII 化 (`xt`/`nt`/`mt`) が安全。
+- **`orderOf_injective f hf x` は必ず明示引数 + 必要なら `.symm`**: `_` だと
+  `orderOf (f ?) = orderOf ?` の unification が `↑x` 表示と合わず失敗。第1連言の
+  「`(orderOf_injective ... ⟨x, hx⟩).symm`」パターンに統一。
+- **element membership の sup は `Subgroup.mem_sup_left/right`** (`le_sup_left h` は
+  ≤ proof ゆえ関数適用不可)。
+- **`Subgroup.map_eq_bot_iff` 系は H が explicit variable** → dot notation
+  `(H.map_eq_bot_iff_of_injective hf).mp`。`Subgroup.card_map_dvd` も同様 H explicit。
+- **`rintro rfl` が theorem binder を subst する**: `L = M` で M (binder) 側が消され
+  後続の `M` が unknown に。`intro h; rw [h]` で回避。
+- **TFAE `.out 0 3` は have で分離**: 適用を直結すると auto-param が metavariable のまま
+  「Function expected」化 (Frattini.lean:60 と同パターンに)。
+- `simp only [Subgroup.coe_mul, InvMemClass.coe_inv]` 後の `congr 1` は rfl-proof
+  (`hφ_coe`) 側を defeq で閉じる — 後続 `exact` を置くと「No goals」。
+
+### ▶ §12 残 = cascade 14 件 (S12_E) — 全解禁済・次セッションから回収
+
+根 = **Lemma 12.3** `elemAb_centralizes_meet` (Thm 11.7 = `S11.MsigmaA_normal` landed 済) →
+12.4 → 12.5 → τ₂ cascade (12.6-12.12) + σ-side (12.13-12.16)。12.15/12.16 が §13-14 の gate。
+モデルは Opus 4.8 で可 (LAUNCH.md)。大物 (12.5/12.12/12.13) は専用 leaf を切ること
+(S12_E は 1,126 行で上限接近)。
+
 ## 🔵 2026-06-11 (Lane F session 1, Opus): scope 確定 + 12.18 (a) 第2連言 完全 recon → Fable 5 へ昇格
 
 **Lane F 初回。10.13 解禁後の §12 回収を担う想定だったが、scope を精査して以下を確定:**
