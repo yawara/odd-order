@@ -95,6 +95,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ECore
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
