@@ -1469,6 +1469,12 @@ S08 `xAdjoinStep` (2261)/`coherentDegreeSumBound` (2450) は orthonormal (mc=1) 
   `exists_sMemberOrthonormalFamily` の代替) → (3) `xSum_le_two_psi_general` (X-sum は既存、∑_X≤∑_{S₁}) →
   (4) `false_of_coherentXunionYset_general` (break-pair = `exists_coherentBreakPair_general` [済] + FPF-on-Z arith)。
 
-**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial) + analytical 機構は
-S07 に既存と判明 (再導出不要・routing のみ)。残 = S08 norm-weighted (5.6) chain を S07 経由で配線 + L4 FPF-arith。
-CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
+⚠ **精度補正 (DadeChainStep 精読後)**: S07 norm-weighted は **S₁ メンバー (famS) の reducible 対応は確証**
+(`famPairwise` = pairwise orthogonal、‖·‖²=mc)。だが **adjoined break character χ は `DadeChainStep.hχχ:‖χ‖²=1`
+で既約前提**。(6.8.3) の break ψ は reducible でありうる (S∖S₁ で constituent が S₁ に未収なら break しうる) ので、
+routing (1) の前に **「c2 break ψ は既約か、reducible-adjoined を S07 が別途扱うか」を要確認**
+(候補: ψ の既約 constituent を adjoin する / ψ 既約性を break 構造から導く)。これが CB5 の残る precise 未解決点。
+
+**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial) + analytical 機構の
+大半 (reducible S₁ メンバー = famPairwise) は S07 に既存 (再導出不要)。残 precise 未解決 = reducible-adjoined-ψ
+の扱い + S08 norm-weighted (5.6) chain 配線 + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
