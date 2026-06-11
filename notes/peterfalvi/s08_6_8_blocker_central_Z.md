@@ -1448,12 +1448,99 @@ break-pair の **combinatorial** 部は済。残る **analytical** 部 (degree-s
 - `sMember_degreeSumBound_of_not_coherent` (S08:6065): `exists_sMemberOrthonormalFamily hF` で **S₁ を
   IrreducibleCharacter 列挙** (S₁⊆S 既約前提) → `∑ deg² ≤ 2a`。
 - `sMember_degreeSqReBound` (6153) / `xSum_le_two_psi` (6451) → `false_of_coherentXunionYset` (6661)。
-- **gap**: reducible S₁ では `∑_{χ∈S₁} χ(1)²/‖χ‖²` を**既約構成要素 family へ分解**して (5.6) を適用要
-  (`‖Ind θ‖²` = constituent 数)。X-sum 部 (`∑_X χ(1)²`, X⊆Irr) は既存 (`sum_re_sq_Xset_eq_of_irreducible_X`)、
-  `∑_X ≤ ∑_{S₁}` (norm-weighted, X⊆S₁, 正項) は易。**deep = (5.6) を reducible S₁ へ (constituent 経由)**。
-- **次手**: (a) `exists_sMemberOrthonormalFamily` の reducible 版 (S₁ の既約構成要素を orthonormal family 化) →
-  norm-weighted `sMember_degreeSumBound_general` → `xSum_le_two_psi_general` → `false_of_coherentXunionYset_general`
-  (FPF-on-Z arith), ‖ (b) 教科書通り `∑χ(1)²/‖χ‖²` を直接評価。**multi-lemma 解析、focused session 推奨**。
+- **gap**: reducible S₁ では `∑_{χ∈S₁} χ(1)²/‖χ‖²` (norm-weighted) を扱う。X-sum 部 (`∑_X χ(1)²`, X⊆Irr)
+  は既存 (`sum_re_sq_Xset_eq_of_irreducible_X`)、`∑_X ≤ ∑_{S₁}` (norm-weighted, X⊆S₁, 正項) は易。
+  ⚠ S₁ の既約 sub-family (例 X) を (5.6) に渡すのは**不可** — (5.6) は family が S₁ の span を**生成**要
+  (`hSgen`/`hgen` via `hcover`)、reducible S₁ では既約 member family で代替できない。
 
-**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial); 残 = norm-weighted
-degree-sum (analytical, constituent 分解) + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
+### ✅✅ DE-RISK (session 28 cont.²、再調査するな): norm-weighted 機構は **S07 に既存** — CB5 は再導出でなくルーティング
+S08 `xAdjoinStep` (2261)/`coherentDegreeSumBound` (2450) は orthonormal (mc=1) 特殊化を使うが、**底層 S07
+は完全 norm-weighted** (`mc i = ‖χ_i‖²`, member は reducible 可):
+- **`S07.lambda_eq_zero_and_Z_eq_zero`** (S07:2184): (5.6.2) capstone、`mc i = ‖χ_i‖²` (line 2175 明記)、
+  `hD : 2a < ∑ (rc i)²·mc i` (rc i = a_i/‖χ_i‖²)。Pythagoras + arith は mc 一般で成立。
+- **`S07.dade_Y_collapse_of_family`** (S07:5769): Dade 版 collapse、`hdeg_c : 2a < ∑ (B.ratio i/mc i)²·mc i`。
+- **`S07.CharacterPsiDecomposition.Y_collapse_of_family`** (S07:5059): `mc` パラメトリック、`hmc : ⟨B.chiFam i,
+  B.chiFam i⟩ = mc i`。
+- **`S07.DadeChainStep`** (S07:6237): S₁ を `famS` (**`famPairwise` = pairwise orthogonal、orthonormal 不要 →
+  reducible member OK**) として扱う構造 + `advance` (6329)。
+- **次手 (CB5 routing、multi-lemma だが re-derivation 不要)**: (1) S08 `xAdjoinStep_general`/(5.6)`_general`
+  を `mc i = ‖χ_i‖²` で上記 S07 norm-weighted 経由に (mc=1 を一般 mc へ; ‖·‖² gram を hmemortho の代わりに) →
+  (2) `sMember_degreeSumBound` の norm-weighted 版 (S₁ を `DadeChainStep.famS` pairwise-orthogonal で列挙、
+  `exists_sMemberOrthonormalFamily` の代替) → (3) `xSum_le_two_psi_general` (X-sum は既存、∑_X≤∑_{S₁}) →
+  (4) `false_of_coherentXunionYset_general` (break-pair = `exists_coherentBreakPair_general` [済] + FPF-on-Z arith)。
+
+⚠ **精度補正 (DadeChainStep 精読後)**: S07 norm-weighted は **S₁ メンバー (famS) の reducible 対応は確証**
+(`famPairwise` = pairwise orthogonal、‖·‖²=mc)。だが **adjoined break character χ は `DadeChainStep.hχχ:‖χ‖²=1`
+で既約前提**。(6.8.3) の break ψ は reducible でありうる (S∖S₁ で constituent が S₁ に未収なら break しうる) ので、
+routing (1) の前に **「c2 break ψ は既約か、reducible-adjoined を S07 が別途扱うか」を要確認**
+(候補: ψ の既約 constituent を adjoin する / ψ 既約性を break 構造から導く)。これが CB5 の残る precise 未解決点。
+
+**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial) + analytical 機構の
+大半 (reducible S₁ メンバー = famPairwise) は S07 に既存 (再導出不要)。残 precise 未解決 = reducible-adjoined-ψ
+の扱い + S08 norm-weighted (5.6) chain 配線 + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
+
+## 2026-06-11 (session 28 cont.³): reducible-adjoined-ψ の真の深さ = R(reducible) ⟹ (4.9) 再浮上の可能性 (調査のみ、Lean 変更なし)
+
+(5.6) 原文 (mmd 04.7 L59-79) + S07 内部精読で reducible-adjoined-ψ の正確な障害を確定:
+
+### (5.6) 原文 = norm-weighted、adjoined χ 既約性要求なし
+**(5.6) Theorem** 条件: (a) S₁ coherent (b) χ₁(1)|χ(1) (c) `2χ(1)χ₁(1) < ∑ᵢ χᵢ(1)²/‖χᵢ‖²`
+⟹ S₁∪{χ,χ̄} coherent。**χᵢ も χ も reducible 可** (‖·‖² で正規化)。proof (5.6.1) は
+`(χ−aχ₁)^τ = X−Y, X∈ℤ[R(χ)]`、Y⊥R(χ) で R(χ) = adjoined χ の反射族 (Hypothesis (5.2) が
+全 S に与える、reducible 含む)。
+
+### 形式化の精査: 2 段階に分かれる
+- ✅ **Dade image step は reducible ψ で OK**: `scaledDiff_dadeImage_mem_ZIrr` (S08:6006) は
+  `χ.mem_ZIrr` のみ使用 (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。**reducible ψ=Ind θ も
+  ψ∈ZIrr** (非負整数結合) ゆえ `τ(ψ−aχ₁)∈ZIrr` は成立。R(ψ) 不要。
+- 🛑 **(5.6.1) 分解は R(ψ) を要する**: `DadeChainStep` (S07:6237) は adjoined の反射族
+  `dadeOrthonormalCharacterImageFamilyOfDiff` を持ち、`hχχ:‖χ‖²=1`/`hχbarχbar:‖χ̄‖²=1` を**必須 field**。
+  reducible ψ (‖ψ‖²>1) では不成立。R(reducible ψ) = §5 (5.2)-reflection-for-reducible は
+  形式化に無い (`dadeOrthonormalCharacterImageFamily` = `χ:IrreducibleCharacter` 専用)。
+
+### 🚨 含意: (6.8.3) reducible break ψ は (4.9) 級を要しうる (session-27 RECON の盲点)
+- (6.8.3) の break ψ∈S∖S₁ (S₁⊇X∪Y)。reducible は S(Z)∖Y に w₂−1 個 (Y は既約 deg|W₁|)。
+  ψ がその一つなら **R(reducible ψ) = (4.9) certain-type 反射構造** (μ_j=±δ∑ω^σ がまさに reducible 反射)。
+- **session-27 RECON「(4.9) 不要」は (6.8.2.3) [χ_i 既約] には正しいが、(6.8.3) の break ψ を見落とし**。
+  ⟹ c2 (6.8.3) は (4.9) 級に再接続しうる (off-path・full §6)。
+- **escape 候補 (要検討、未解決)**: break を既約に confine — もし **S(Z) coherent** (reducibles を
+  S₁ に full 収容、break は X 既約メンバーで起きる) なら reducible-adjoined 回避。S(Z) は H/Z-characters
+  由来の induced で sub-(6.8) 的構造 (inductive?) — 設定は非自明だが (4.9) 回避の最有望路。
+
+**∴ CB5 真の障害 = reducible break ψ の R(ψ)**。(a) S(Z) coherence で break を既約 confine (有望、要設計) /
+(b) R(reducible) = (4.9) 形式化 (off-path)。**combinatorial foundation (exists_*_general) と S07
+famPairwise [reducible S₁ メンバー] は landed/確認済で無駄でない** — full norm-weighted (5.6) 配線で再利用。
+**正本 = 本 session 28 cont.³。次手 = S(Z) coherence の inductive 構造を精査 (4.9 回避可否の判定)。**
+
+## 2026-06-11 (session 29, Fable 5): (5.3) 原文精読で経路 100% 確定 — R(reducible) = (5.3.b) = (4.9) 引用、「(4.7)-(4.9) off-path」撤回
+
+### FT-critical 再確認 (repo 実配線で検証済)
+- `field_normalizer_structure` (Pf 14.2, S16_NonExistenceG:6846) = **sorry** — `nonexistence_of_G` →
+  BG.AppC final contradiction の唯一の carrier 供給源。S16.Hypothesis は S15.Hypothesis を base に持つ。
+- (7.10) `card_G0_lower_bound` (S09:6479) = sorry (issue 0044)、(6.8) (issue 0046) が block。
+- ⟹ **FT 経路の Pf 側 = S15/S16 scaffold 充足、数学的供給源 = §3-§8 → (6.8) → (7.10) → §9+ 連鎖。
+  (6.8) 完遂が Lane B の FT-critical 第一任務** (「orphaned」は現 import 配線の話で数学的には必須)。
+
+### 🔑🔑🔑 (5.3) 原文 (mmd 04.7 L15-29) — R(χ) producer の全貌
+- **(5.3.a)**: S ⊆ Irr L なら (5.2.a)+(5.2.b) だけで Hyp (5.2) 成立 (‖(χ−χ̄)^τ‖²=2 ⟹ |R(χ)|=2;
+  (5.2.e) は (4.1))。= 形式化済みの既約 producer。
+- **(5.3.b)**: **Hypothesis (4.6)** + (5.2.a) + S ⊆ {Ind_K^L θ | θ∈Irr K, H⊄Ker θ} ⟹ Hyp (5.2) 成立:
+  - (4.7) で ℤ[S,L^#] = ℤ[S,A] (τ の定義域)。pairwise ⊥ は (1.5.c)。
+  - (5.2.d): χ 既約 → (a) 同様。**χ reducible → (4.4)+Thm(4.5) で χ = μ_j (0<j<w₂)、Thm (4.9) で
+    R(μ_j) = {δ_j ω_ij^σ, −δ_j ω_ik^σ | 0≤i<w₁}** (k: μ̄_j=μ_k)。
+  - (5.2.e): 既約×既約 = (4.1); reducible×reducible = R(μ_j) の形から; **既約 φ × reducible μ_j =
+    (4.7) Supp(φ−φ̄)⊂A → (φ−φ̄)^τ は V で消滅 → NC((φ−φ̄)^τ) ≤ 2 → (3.8) で R(φ)⊥ω^σ 全 ω∈Irr W**。
+- ⟹ **session 28 cont.³ の「(4.9) 級」評価は教科書的に正確** ((5.3.b) が文字通り (4.9) を引用)。
+  **session 27 RECON の「(4.7)-(4.9) は case-B 経路外」は撤回** — (6.8.2.3) の直接引用としては正しいが、
+  **(6.8.3) reducible break ψ の R(ψ) が (5.3.b) 経由で (4.7)/(4.8)/(4.9) を要求**。S(Z)-confine escape は
+  不要 (教科書の正攻法が (4.9) ルート)。
+
+### ▶▶ 確定経路 (case-B (6.8) 完遂 = FT-critical):
+1. **(4.7) j≥1 part** (Supp μ_j ⊆ A∪{1}; recipe = s06 note session 27 末尾の ω_{0j} 論法) ← 今ここ
+2. **(4.8)** (`sigmaCoeff_trichotomy` [landed] 消費)
+3. **(4.9)** (= (4.8)+(3.9)+(4.3)+(4.7)、R(μ_j) の certain-type reflection)
+4. **(5.3.b)** general R-producer (§7; OrthonormalCharacterImageFamily for reducible μ_j)
+5. norm-weighted (5.6) chain (S07 機構既存 [famPairwise/mc]、S08 配線; DadeChainStep の hχχ=1 を ‖χ‖²=m 化)
+6. CB5 L4-general (break-pair `exists_*_general` landed) → CB3-L3 → CB4 → CB6 capstone。
+依存 landed 済: Hyp(4.6)/(4.1)/(4.3)/(4.4)/(4.5)/(4.7)core+induced/(3.8)trichotomy/(3.9)/(1.5.c)。
+**正本 = 本 session 29 entry。これは s06 note「次 = (4.7) j≥1 → (4.8)/(4.9)」と完全一致 — 一本道。**
