@@ -52,6 +52,7 @@ import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
 import OddOrder.BG.AppB_Thm62
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
+import OddOrder.Peterfalvi.S03b_Vanishing
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
@@ -698,6 +699,13 @@ set_option linter.style.longLine false in
 -- characters contains no real class function. Discharges the `no_real_characters` field of the §7
 -- coherence hypothesis (Hypothesis (5.2)(a)) directly from oddness.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S03.hasNoRealCharacters_nontrivialIrreducibleClassFunctions
+-- Peterfalvi §3 (1.2): if `H ⊴ G`, `χ ∈ Irr G` has `H ⊄ Ker χ`, and `C_H(g) = 1`, then `χ(g) = 0`.
+-- Second (column) orthogonality on `G` and on `G ⧸ H` + the value-preserving inflation bijection
+-- `Irr(G ⧸ H) ≃ {χ | H ⊆ ker χ}` + the centralizer embedding `|C_G(g)| ≤ |C_{G ⧸ H}(ḡ)|`; the
+-- resulting squeeze on `∑ |χ(g)|²` forces the `H ⊄ ker` terms to vanish.  Feeds Peterfalvi (4.7).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S03.card_centralizer_le_card_centralizer_quotient
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
