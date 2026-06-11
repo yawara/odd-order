@@ -3765,10 +3765,19 @@ the conclusions — all unconditional. -/
 (a) `A ⊴ E` (`E_le_normalizer_of_tau2`) and every line of `E` lies in `A`
 (`line_le_of_le_E_of_tau2`); (b) `C_G(A) ≤ E`, `N_M(A) = E`, `N_G(A) ⊄ M`
 (`centralizer_le_E_of_tau2`). Consume Theorem 12.5(b)(c)(d), `omega1_eq_of_tau2`, and
-Proposition 12.4(a) — all unconditional. Parts (c)-(f) and the assembled corollary follow. -/
+Proposition 12.4(a) — all unconditional. (c) `ℳ(C_G(X)) = {M}` for lines with nontrivial
+`M_σ`-centralizer, (d)(e) `C_{M_σ}(x) = 1` for `(τ₁∪τ₃)`-elements of `E₃` / `C_{E₁}(A)`
+(via Lemma 12.2(b) and Theorem 12.5(e)), (f) `M_σ ∩ M*_σ = 1` for non-conjugate `M*`
+(Lemma 10.12(b)); assembled as `elemAb_normal_in_E_of_tau2`. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_of_tau2
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_of_le_E_of_tau2
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_E_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.maximalContaining_centralizer_line_eq_singleton
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_centralizer_eq_bot_of_le_centralizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_normal_in_E_of_tau2

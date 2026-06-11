@@ -88,8 +88,23 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
   `exists_line_normalizer_le_of_notMem_sigma` に抽出 (12.5 本体もリファクタ) +
   `Hypothesis111.of_sylow` + Cor 11.6(a)。
 
-### ▶ 残 cascade 11 件 (S12_E 実 sorry 11)。次 = **Cor 12.6** `elemAb_normal_in_E_of_tau2`
-— **完全レシピ (session 3 recon 済, 再調査不要)**:
+### ✅✅ session 3 cont.⁴: **Cor 12.6 COMPLETE** (新 leaf `S12_Corollary126.lean`, 全 6 結論)
+
+下のレシピ通りに実装、ほぼ一発 (修正 = beta-unreduced `one_mul` は defeq `exact` /
+`Commute.zpow_left` 向き / `hr r` binder)。全 unconditional・axiom-clean、AxiomsCheck 6 本。
+部分定理: `sup_Msigma_inf_E_eq_of_le` (Dedekind) / `E_le_normalizer_of_tau2` /
+`line_le_of_le_E_of_tau2` / `centralizer_le_E_of_tau2` /
+`maximalContaining_centralizer_line_eq_singleton` /
+`Msigma_inf_centralizer_eq_bot_of_le_centralizer` ((d)(e) 共通 core, **素数位数 reduce +
+12.2(b)τ₁τ₃ + 12.5(e)**; §13 で再利用可能) / `centralizer_zpowers_eq_singleton` /
+assembly `elemAb_normal_in_E_of_tau2` (S12_E から移動)。**S12_E 実 sorry 10**。
+
+### ▶ 次 = **Thm 12.7** `tau2_singleton_of_nonabelianSylow` (大物・専用 leaf 推奨,
+**Lem 10.13(b)(c) 直接消費**) → 12.8 → 12.9 → 12.10 → 12.11 → 12.12 → σ-side。
+12.7 着手時は mmd L3171-3220 を精読し、10.13 の repo surface
+(`S10_LocalLemmas`/`S10_LocalCriteria` 内) を先に確認すること。
+
+— (12.6 の) **完全レシピ (session 3 recon 済, 履歴用)**:
 
 新 leaf `S12_Corollary126.lean` (import S12_Theorem125) 推奨。mmd L3179-3196。
 前提整理: `h : SubgroupESetup M E E₁ E₂ E₃`, `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)` (`hAE : A ≤ E`)。

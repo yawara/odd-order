@@ -412,27 +412,8 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
 
 **BG Theorem 12.5** は `S12_Theorem125.lean` に移動した (`Msigma_nilpotent_of_tau2`)。 -/
 
-/-- **BG Corollary 12.6** (mmd L3150): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)` のとき
-(a) `A ⊴ E` かつ `ℰ_p¹(E)=ℰ¹(A)`; (b) `C_G(A) ⊆ N_M(A)=E`, `N_G(A) ⊄ M`;
-(c) `X ∈ ℰ¹(A)` で `C_{M_σ}(X)≠1` なら `ℳ(C_G(X))={M}`; (d) `x ∈ E₃#` で `C_{M_σ}(x)=1`;
-(e) `x ∈ C_{E₁}(A)#` で `C_{M_σ}(x)=1`; (f) `M^*` が `M` と非共役なら `M_σ ∩ M^*_σ = 1` かつ
-`σ(M) ∩ σ(M^*) = ∅`。 -/
-theorem elemAb_normal_in_E_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E) :
-    (E ≤ Subgroup.normalizer (A : Set G) ∧
-      (∀ X ∈ elemAbelianOfRank G p 1, X ≤ E ↔ X ≤ A)) ∧
-    (Subgroup.centralizer (A : Set G) ≤ E ∧
-      M ⊓ Subgroup.normalizer (A : Set G) = E ∧ ¬ (Subgroup.normalizer (A : Set G) ≤ M)) ∧
-    (∀ X ∈ elemAbelianOfRank G p 1, X ≤ A →
-      S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
-      maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) ∧
-    (∀ x ∈ E₃, x ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) = ⊥) ∧
-    (∀ x ∈ E₁, x ∈ Subgroup.centralizer (A : Set G) → x ≠ 1 →
-      S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) = ⊥) ∧
-    (∀ Mstar ∈ maximalSubgroups G, (¬ ∃ g : G, MulAut.conj g • M = Mstar) →
-      S10.Msigma M ⊓ S10.Msigma Mstar = ⊥ ∧ Disjoint (S10.sigma M) (S10.sigma Mstar)) := by
-  sorry
+/-! **BG Corollary 12.6** は `S12_Corollary126.lean` に移動した
+(`elemAb_normal_in_E_of_tau2` + 部分定理群)。 -/
 
 /-- **BG Theorem 12.7** (mmd L3171): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `G` が非可換 Sylow `p` を持つとき
 (a) `τ₂(M)={p}`; (b) `A₀=C_A(M_σ)` は位数 `p` で `F(M)=M_σ × A₀`; (c) `X ∈ ℰ_p¹(E)-{A₀}` で
