@@ -45,6 +45,7 @@ import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
@@ -3757,3 +3758,17 @@ the conclusions — all unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega1_eq_of_tau2
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.not_conj_of_mem_tau1_union_tau3_of_normalizer_le
+
+/-! ### BG Corollary 12.6(a)(b) (`S12_Corollary126`)
+
+**BG Corollary 12.6(a)(b)** (mmd L3179): for `p ∈ τ₂(M)` and `A ∈ ℰ_p²(E)`:
+(a) `A ⊴ E` (`E_le_normalizer_of_tau2`) and every line of `E` lies in `A`
+(`line_le_of_le_E_of_tau2`); (b) `C_G(A) ≤ E`, `N_M(A) = E`, `N_G(A) ⊄ M`
+(`centralizer_le_E_of_tau2`). Consume Theorem 12.5(b)(c)(d), `omega1_eq_of_tau2`, and
+Proposition 12.4(a) — all unconditional. Parts (c)-(f) and the assembled corollary follow. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_of_le_E_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_E_of_tau2
