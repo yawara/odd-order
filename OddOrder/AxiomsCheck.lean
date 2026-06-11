@@ -2158,6 +2158,15 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.mem_xSetFinset_iff_mem_Xset
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_centralCommutator_isCoherent_of_irreducible_X
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.Xset_centralCommutator_isCoherent_of_c2_caseA
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.two_mul_lt_sq_of_commonIndex_primePower_gap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.realDegreeBound_of_natDegreeSumCommonIndexPrimePowerGap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.normalizedDegreeGap_of_natDegreeSumCommonIndexPrimePowerGap
