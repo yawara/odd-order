@@ -99,6 +99,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF

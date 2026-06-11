@@ -51,6 +51,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3782,3 +3783,27 @@ Proposition 12.4(a) — all unconditional. (c) `ℳ(C_G(X)) = {M}` for lines wit
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_centralizer_eq_bot_of_le_centralizer
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_normal_in_E_of_tau2
+
+/-! ### BG Theorem 12.7 (`S12_Theorem127` / `S12_Theorem127d`)
+
+**BG Theorem 12.7** (mmd L3201-3251): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `G` with nonabelian
+Sylow `p`-subgroups. (a) `p` is the only prime in `τ₂(M)`
+(`tau2_prime_eq_of_nonabelianSylow`; faithful 化 = 素数限定形); (b)(c) the canonical
+line `A₀ = A ⊓ C_G(M_σ)` of order `p` with the dichotomy for other lines
+(`exists_canonical_line_of_nonabelianSylow`, via Lemma 10.13) and
+`F(M) = M_σ × A₀` (`fitting_eq_sup_of_canonical_line`); (d) the complement `E₀` of
+`A₀` in `E` (`exists_complement_of_canonical_line`, via Maschke on `E₂/℧¹(E₂)`);
+(e) `π(C_{E₀}(x)) ⊆ τ₁(M)` (`primeFactors_centralizer_le_tau1_of_disjoint`);
+assembled as `tau2_singleton_of_nonabelianSylow`. All unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_prime_eq_of_nonabelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_canonical_line_of_nonabelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.fitting_eq_sup_of_canonical_line
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_complement_of_canonical_line
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.primeFactors_centralizer_le_tau1_of_disjoint
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_singleton_of_nonabelianSylow

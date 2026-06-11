@@ -766,8 +766,9 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
 
 /-! ## Theorem 12.7(b): `F(M) = M_σ × A₀` -/
 
-/-- A natural number whose prime factors all equal `q` is a power of `q`. -/
-private theorem eq_pow_factorization_of_forall_eq {n q : ℕ}
+/-- A natural number whose prime factors all equal `q` is a power of `q`.
+(Public: `S12_Theorem127d` reuses this for the Hall `τ₂`-subgroup `E₂`.) -/
+theorem eq_pow_factorization_of_forall_eq {n q : ℕ}
     (hn : n ≠ 0) (hpi : ∀ r ∈ n.primeFactors, r = q) :
     n = q ^ n.factorization q := by
   classical
