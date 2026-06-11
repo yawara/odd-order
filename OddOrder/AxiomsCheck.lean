@@ -1937,6 +1937,10 @@ set_option linter.style.longLine false in
 -- and the breaking pair `{ψ, ψ̄}` cited at the start of the (6.2) proof.  `S_hasNoRealCharacters`
 -- (Frobenius case) supplies the real-free input for any `S(A) ⊆ S`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair
+-- (6.8.3)/case-(c2) generalizations: drop the irreducibility hypothesis so the breaking pair `ψ`
+-- may be reducible (needed where `S` contains the `w₂−1` reducible induced characters).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_conjugatePairCover_general
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.exists_coherentBreakPair_general
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.S_hasNoRealCharacters
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S08.SibleyDadeHypothesis.SsubFiltration_hasNoRealCharacters
