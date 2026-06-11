@@ -69,11 +69,11 @@ theorem card_support_const_fst {ι κ : Type*} [Fintype ι] [Fintype κ] (c : ι
     simp [Finset.mem_filter, Finset.mem_product]
   rw [h, Finset.card_product, Finset.card_univ]
 
-/-- A function with at most one nonzero value is either identically zero or a scaled indicator of a
-single point. -/
-theorem eq_zero_or_single {κ : Type*} [Fintype κ] [DecidableEq κ] (b : κ → ℂ)
+/-- A function with at most one nonzero value is either identically zero or supported on a single
+point `j₀`. -/
+theorem eq_zero_or_single {κ : Type*} [Fintype κ] (b : κ → ℂ)
     (h : (Finset.univ.filter (fun j => b j ≠ 0)).card ≤ 1) :
-    (∀ j, b j = 0) ∨ ∃ (j₀ : κ) (c : ℂ), c ≠ 0 ∧ ∀ j, b j = if j = j₀ then c else 0 := by
+    (∀ j, b j = 0) ∨ ∃ j₀ : κ, b j₀ ≠ 0 ∧ ∀ j, j ≠ j₀ → b j = 0 := by
   classical
   rcases Nat.le_one_iff_eq_zero_or_eq_one.mp h with h0 | h1
   · left
@@ -89,13 +89,9 @@ theorem eq_zero_or_single {κ : Type*} [Fintype κ] [DecidableEq κ] (b : κ →
       intro j
       rw [← Finset.mem_singleton, ← hj₀, Finset.mem_filter]
       exact ⟨fun hb => ⟨Finset.mem_univ j, hb⟩, fun h => h.2⟩
-    have hb₀ : b j₀ ≠ 0 := (hmem j₀).mpr rfl
-    refine ⟨j₀, b j₀, hb₀, fun j => ?_⟩
-    by_cases hj : j = j₀
-    · rw [if_pos hj, hj]
-    · rw [if_neg hj]
-      by_contra hb
-      exact hj ((hmem j).mp hb)
+    refine ⟨j₀, (hmem j₀).mpr rfl, fun j hj => ?_⟩
+    by_contra hb
+    exact hj ((hmem j).mp hb)
 
 /-- **Both factors non-constant ⟹ large support.**  For a rank-one grid `a (i,j) = f i + g j`
 with neither `f` nor `g` constant, the support has at least `|ι| + |κ| - 2` elements.
@@ -181,13 +177,13 @@ is constant, symmetrically `≤ 1` nonzero row (using `|κ| > |ι|`) — case (a
 constant, the support has `≥ |ι| + |κ| - 2 ≥ 2|ι|` elements (`card_support_ge_of_not_const`),
 contradicting the hypothesis. -/
 theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [Nonempty κ]
-    [DecidableEq ι] [DecidableEq κ] (a : ι × κ → ℂ)
+    (a : ι × κ → ℂ)
     (hadd : ∀ i i' (j j' : κ), a (i, j) + a (i', j') = a (i, j') + a (i', j))
     (hgap : Nat.card ι + 2 ≤ Nat.card κ)
     (hlt : {x | a x ≠ 0}.ncard < 2 * Nat.card ι) :
     (∀ x, a x = 0) ∨
-      (∃ (j₀ : κ) (c : ℂ), c ≠ 0 ∧ ∀ i j, a (i, j) = if j = j₀ then c else 0) ∨
-      (∃ (i₀ : ι) (c : ℂ), c ≠ 0 ∧ ∀ i j, a (i, j) = if i = i₀ then c else 0) := by
+      (∃ (j₀ : κ) (c : ℂ), c ≠ 0 ∧ (∀ i, a (i, j₀) = c) ∧ ∀ i j, j ≠ j₀ → a (i, j) = 0) ∨
+      (∃ (i₀ : ι) (c : ℂ), c ≠ 0 ∧ (∀ j, a (i₀, j) = c) ∧ ∀ i j, i ≠ i₀ → a (i, j) = 0) := by
   classical
   haveI : Fintype ι := Fintype.ofFinite _
   haveI : Fintype κ := Fintype.ofFinite _
@@ -210,9 +206,11 @@ theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [N
       rw [mul_comm] at hlt
       have := Nat.lt_of_mul_lt_mul_right hlt
       omega
-    rcases eq_zero_or_single (fun j => f i₀ + g j) hNκ with hz | ⟨j₀, c, hc, hcj⟩
+    rcases eq_zero_or_single (fun j => f i₀ + g j) hNκ with hz | ⟨j₀, hj₀, hrest⟩
     · exact Or.inl (fun ⟨i, j⟩ => by rw [hfg i j, hfc i i₀]; exact hz j)
-    · exact Or.inr (Or.inl ⟨j₀, c, hc, fun i j => by rw [hfg i j, hfc i i₀]; exact hcj j⟩)
+    · refine Or.inr (Or.inl ⟨j₀, f i₀ + g j₀, hj₀, fun i => ?_, fun i j hj => ?_⟩)
+      · rw [hfg i j₀, hfc i i₀]
+      · rw [hfg i j, hfc i i₀]; exact hrest j hj
   · by_cases hgc : ∀ j j', g j = g j'
     · -- `g` constant: grid depends only on the row
       obtain ⟨j₀⟩ := ‹Nonempty κ›
@@ -228,9 +226,11 @@ theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [N
           gcongr
           omega
         omega
-      rcases eq_zero_or_single (fun i => f i + g j₀) hNι with hz | ⟨i₀, c, hc, hci⟩
+      rcases eq_zero_or_single (fun i => f i + g j₀) hNι with hz | ⟨i₀, hi₀, hrest⟩
       · exact Or.inl (fun ⟨i, j⟩ => by rw [hfg i j, hgc j j₀]; exact hz i)
-      · exact Or.inr (Or.inr ⟨i₀, c, hc, fun i j => by rw [hfg i j, hgc j j₀]; exact hci i⟩)
+      · refine Or.inr (Or.inr ⟨i₀, f i₀ + g j₀, hi₀, fun j => ?_, fun i j hi => ?_⟩)
+        · rw [hfg i₀ j, hgc j j₀]
+        · rw [hfg i j, hgc j j₀]; exact hrest i hi
     · -- neither constant: support too large, contradiction
       exfalso
       have hge := card_support_ge_of_not_const f g hfc hgc
