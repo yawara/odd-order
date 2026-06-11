@@ -99,7 +99,7 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
 12.2(b)τ₁τ₃ + 12.5(e)**; §13 で再利用可能) / `centralizer_zpowers_eq_singleton` /
 assembly `elemAb_normal_in_E_of_tau2` (S12_E から移動)。**S12_E 実 sorry 10**。
 
-### 🟢 session 4 進捗: **12.7 = (a)(b)(c)+A₀+habs 完了、残 = (d)(e)+assembly**
+### 🟢 session 4 進捗: **12.7 = (a)(b)(c)+A₀+habs+(e) 完了、残 = (d)+assembly のみ**
 
 leaf `S12_Theorem127.lean` (root/AxiomsCheck 登録済)。commits: `bec4e194` (prep:
 一般 line-engine `le_of_forall_line_inf_centralizer_le` + conj transports public 化) /
@@ -114,9 +114,13 @@ leaf `S12_Theorem127.lean` (root/AxiomsCheck 登録済)。commits: `bec4e194` (p
 `fitting_eq_sup_of_canonical_line`: M ≤ N(A₀) [M_σ⊔E 分解 sup_le 一発] +
 F(M) = M_σ⊔A₀ [card-divisibility: Fq = {q}-core per prime → M_σ/A₀] + M_σ⊓A₀ = ⊥;
 `normalizer_le_normalizer_centralizer` de-private; helper
-`eq_pow_factorization_of_forall_eq`)。全部 unconditional・axiom-clean。
+`eq_pow_factorization_of_forall_eq`) / `c7d48549` (**(e) parametrized**
+`primeFactors_centralizer_le_tau1_of_disjoint`: E₀ ≤ E, A₀⊓E₀=⊥ の任意候補に対し
+π(C_{E₀}(x)) ⊆ τ₁ — Cauchy は `exists_prime_orderOf_dvd_card'` [Nat.card 版・要 prime]、
+normal-Hall 吸収は `S10.isPiGroup_le_of_normal_isHallSubgroup hHall hPi` [Hall が第1引数、
+π-側は `Ch03.Subgroup.IsPiGroup`])。全部 unconditional・axiom-clean。
 
-### ▶ 残 = (d) 補群 E₀ + (e) + assembly — **精密レシピ (session 4 設計済)**
+### ▶ 残 = (d) 補群 E₀ + assembly — **精密レシピ (session 4 設計済; (e) は landed 済で assembly が呼ぶだけ)**
 
 **(d)** `∃ E₀ ≤ E, A₀⊓E₀ = ⊥ ∧ A₀⊔E₀ = E`: E₀ := E₁ ⊔ X ⊔ E₃ (X = Maschke 補空間 ≤ E₂):
 1. **A ≤ E₂**: A ⊴ E p-群 (12.6(a)) → A.subgroupOf E ≤ Sylow T_A of ↥E; E₂.subgroupOf E
