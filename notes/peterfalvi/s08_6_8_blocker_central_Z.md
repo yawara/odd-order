@@ -1448,12 +1448,27 @@ break-pair の **combinatorial** 部は済。残る **analytical** 部 (degree-s
 - `sMember_degreeSumBound_of_not_coherent` (S08:6065): `exists_sMemberOrthonormalFamily hF` で **S₁ を
   IrreducibleCharacter 列挙** (S₁⊆S 既約前提) → `∑ deg² ≤ 2a`。
 - `sMember_degreeSqReBound` (6153) / `xSum_le_two_psi` (6451) → `false_of_coherentXunionYset` (6661)。
-- **gap**: reducible S₁ では `∑_{χ∈S₁} χ(1)²/‖χ‖²` を**既約構成要素 family へ分解**して (5.6) を適用要
-  (`‖Ind θ‖²` = constituent 数)。X-sum 部 (`∑_X χ(1)²`, X⊆Irr) は既存 (`sum_re_sq_Xset_eq_of_irreducible_X`)、
-  `∑_X ≤ ∑_{S₁}` (norm-weighted, X⊆S₁, 正項) は易。**deep = (5.6) を reducible S₁ へ (constituent 経由)**。
-- **次手**: (a) `exists_sMemberOrthonormalFamily` の reducible 版 (S₁ の既約構成要素を orthonormal family 化) →
-  norm-weighted `sMember_degreeSumBound_general` → `xSum_le_two_psi_general` → `false_of_coherentXunionYset_general`
-  (FPF-on-Z arith), ‖ (b) 教科書通り `∑χ(1)²/‖χ‖²` を直接評価。**multi-lemma 解析、focused session 推奨**。
+- **gap**: reducible S₁ では `∑_{χ∈S₁} χ(1)²/‖χ‖²` (norm-weighted) を扱う。X-sum 部 (`∑_X χ(1)²`, X⊆Irr)
+  は既存 (`sum_re_sq_Xset_eq_of_irreducible_X`)、`∑_X ≤ ∑_{S₁}` (norm-weighted, X⊆S₁, 正項) は易。
+  ⚠ S₁ の既約 sub-family (例 X) を (5.6) に渡すのは**不可** — (5.6) は family が S₁ の span を**生成**要
+  (`hSgen`/`hgen` via `hcover`)、reducible S₁ では既約 member family で代替できない。
 
-**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial); 残 = norm-weighted
-degree-sum (analytical, constituent 分解) + L4 FPF-arith。CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
+### ✅✅ DE-RISK (session 28 cont.²、再調査するな): norm-weighted 機構は **S07 に既存** — CB5 は再導出でなくルーティング
+S08 `xAdjoinStep` (2261)/`coherentDegreeSumBound` (2450) は orthonormal (mc=1) 特殊化を使うが、**底層 S07
+は完全 norm-weighted** (`mc i = ‖χ_i‖²`, member は reducible 可):
+- **`S07.lambda_eq_zero_and_Z_eq_zero`** (S07:2184): (5.6.2) capstone、`mc i = ‖χ_i‖²` (line 2175 明記)、
+  `hD : 2a < ∑ (rc i)²·mc i` (rc i = a_i/‖χ_i‖²)。Pythagoras + arith は mc 一般で成立。
+- **`S07.dade_Y_collapse_of_family`** (S07:5769): Dade 版 collapse、`hdeg_c : 2a < ∑ (B.ratio i/mc i)²·mc i`。
+- **`S07.CharacterPsiDecomposition.Y_collapse_of_family`** (S07:5059): `mc` パラメトリック、`hmc : ⟨B.chiFam i,
+  B.chiFam i⟩ = mc i`。
+- **`S07.DadeChainStep`** (S07:6237): S₁ を `famS` (**`famPairwise` = pairwise orthogonal、orthonormal 不要 →
+  reducible member OK**) として扱う構造 + `advance` (6329)。
+- **次手 (CB5 routing、multi-lemma だが re-derivation 不要)**: (1) S08 `xAdjoinStep_general`/(5.6)`_general`
+  を `mc i = ‖χ_i‖²` で上記 S07 norm-weighted 経由に (mc=1 を一般 mc へ; ‖·‖² gram を hmemortho の代わりに) →
+  (2) `sMember_degreeSumBound` の norm-weighted 版 (S₁ を `DadeChainStep.famS` pairwise-orthogonal で列挙、
+  `exists_sMemberOrthonormalFamily` の代替) → (3) `xSum_le_two_psi_general` (X-sum は既存、∑_X≤∑_{S₁}) →
+  (4) `false_of_coherentXunionYset_general` (break-pair = `exists_coherentBreakPair_general` [済] + FPF-on-Z arith)。
+
+**正本 = 本 session 28 cont.² entry。CB5 = break-pair foundation done (combinatorial) + analytical 機構は
+S07 に既存と判明 (再導出不要・routing のみ)。残 = S08 norm-weighted (5.6) chain を S07 経由で配線 + L4 FPF-arith。
+CB3-L3 (X∪Y glue) と CB4 (math-B τ₂) は別途。**
