@@ -1660,4 +1660,49 @@ full (4.6) に拡張: 現 `CertainTypeHypothesis`=(4.2)+(2.2)-Dade-on-A のみ�
 
 正本 = 本ノート (session 27)。**(1.2) 完成 (汎用・AxiomsCheck 登録) + (4.7) core/induced 完成
 (χ_j 非依存)。Don't re-grind。** **(4.7)-(4.9) は (6.8) case-B 経路外 (full-Pf scope); (6.8) closer は
-§8 Zc program (s08_6_8_blocker_central_Z.md)。**
+§8 Zc program (s08_6_8_blocker_central_Z.md)。** ← ⚠ この経路評価は **session 29 (s08) で撤回**
+(R(reducible)=(5.3.b)=(4.9) 引用ゆえ (4.7)-(4.9) は on-path)。session 30 参照。
+
+## 2026-06-12 (session 30, b-peterfalvi, Opus 4.8 1M): ✅ (4.7) j≥1 landed + (4.8)-(4.10) PDF proof 精読
+
+### ✅ (4.7) j≥1 COMPLETE (commit 751943f1) + AxiomsCheck import 漏れ是正
+前セッション未コミットの (4.7) j≥1 part を build-green + axiom-clean 検証してコミット (S06_CertainTypeSupport)。
+`Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one` (ω_{0j} 背理法) + Hyp46 form
+`not_subset_characterKernel_chiRestrict` + `chiRestrict_apply_eq_zero_of_not_mem_union` /
+`induce_chiRestrict_apply_eq_zero_of_not_mem_union` (Supp χ_j, Supp μ_j ⊆ A∪{1})。基盤 =
+`apply_mul_eq_of_mem_characterKernel` (InflationCharacter; kernel translation `g∈Ker χ⟹χ(x·g)=χ(x)`,
+`rep_eq_id_of_character_eq_one` 経由)。**PDF (4.7) proof の ω_{0j} 論法と完全一致確認済み。**
+
+- 🛑 **運用教訓 (再発防止)**: session 27 で S06_CertainTypeSupport を新 leaf 化したとき
+  **AxiomsCheck に import し忘れ** + core/induced の guard 未登録だった。今回 j≥1 の assert を登録したら
+  「constant not found」で full build 赤。**新 leaf は root(OddOrder.lean:123 在)+AxiomsCheck 両方に
+  import + 全 top-level を guard 登録**が必須。S06_CertainTypeSupport の全7結果を登録済み
+  (full build 3781 + AxiomsCheck 緑、全 allowlist 3)。
+
+### 📖 (4.8)-(4.10) PDF 精読 (pdf/04.6 p.23-24; ⚠ mmd 04.6 は (4.8) 以降 Nougat 破損で信頼不可 — 再読不要)
+**(4.8)** Hyp(4.6), 0≤i<w₁, 0<j,k<w₂, μ_{ij}(1)=μ_{ik}(1) ⟹ 3 結論:
+`Supp(μ_ij−μ_ik) ⊂ A₀`、`δ_j=δ_k`、`(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)`. **proof 8 step**:
+(1) δ_j≡δ_k (mod w₁) by (4.3.d), w₁>2 ⟹ δ_j=δ_k. (2) μ_ij−μ_ik vanishes on W₁ by (4.3.c).
+(3) z∈L−K ⟹ (2.1) で z は xW₂ (x∈W₁^#) に L-共役 ⟹ Supp 内なら z∈V^L; Supp∩K⊂A by (4.7) ⟹
+Supp(μ_ij−μ_ik)⊂A₀. (4) ψ:=(μ_ij−μ_ik)^τ−δ_j(ω_ij^σ−ω_ik^σ) は V で消滅 ((3.2.c)(4.3.c)+τ def).
+(5) τ isometry + (μ_ij−μ_ik)^τ は 1 で消滅 ⟹ ∃λ₁,λ₂∈Irr(G), ψ=λ₁−λ₂−δ_j(ω_ij^σ−ω_ik^σ).
+(6) NC(ψ)≤4<2inf(w₁,w₂). (7) (3.8) cases(b)(c) 不可能 — これらは同係数 ω_rs^σ を**3 個以上**含むが
+ψ は持たない (ψ の ω^σ 係数は j,k 2 列に ±δ_j のみ). (8) (3.8) ⟹ ψ⊥ω_ij^σ,ω_ik^σ ⟹ ψ=0.
+
+**(4.9) Theorem** Hyp(4.6), 0<k<w₂, T={μ_j|0<j<w₂,μ_j(1)=μ_k(1)}:
+(a) μ_j∈T ⟹ μ̄_j∈T ∧ μ̄_j≠μ_j; 0≠Z[T,L^#]=Z[T,A]. proof: ω̄_ij=ω_{i'j'}, j'≠j (j≠0,|W| odd, j' は i 非依存),
+(3.9)+(4.3) で δ_j μ̄_ij=δ_{j'} μ_{i'j'} ⟹ μ̄_ij=μ_{i'j'} ⟹ μ̄_j=μ_{j'}≠μ_j; 0≠μ̄_k−μ_k∈Z[T,L^#],
+(4.7) で Z[T,L^#]=Z[T,A]. (b) Z[T]→Z[Irr G], μ_j↦δ_k∑_{0≤i<w₁}ω_ij^σ は isometry で Z[T,A] 上 τ と一致.
+proof: isometry 明らか; Z[T,A] は μ_j−μ_k で生成、(4.8) で (μ_j−μ_k)^τ=∑_i(μ_ij−μ_ik)^τ=δ_k∑_i(ω_ij^σ−ω_ik^σ).
+
+**(4.10)** Hyp(4.6), 0≤i<w₁,0≤j<w₂: `(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`.
+proof: α=ω_ij−ω_0j−ω_i0+ω_00, β=δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00; (4.3.b)+(4.4) で β=Ind_W^L α;
+(3.4) で Supp(α)⊂V ⟹ Supp(β)⊂V^L; x∈V で C_G(x)=W⊂L; τ def で β^τ(g)=α^σ(g) ∀g ((4.3.c)(3.2.c)).
+
+### ▶▶ 次 = (4.8) 実装 (新 leaf S06_CertainTypeIsometry.lean 想定)
+消費 API (要 survey で Lean 名確定): (4.3.c)(d) [certainType value / δ 合同 mod w₁], (3.2.c)
+sigma_apply_of_mem_V, (3.8) sigmaCoeff_trichotomy [S05_SigmaTrichotomy, DecidableEq-free 形:
+(a)全0/(b)定数W₂列/(c)定数W₁行], τ Dade isometry [sdiffFullDadeIsometryData /
+toTICyclicFullDadeApplication], NC=sigmaNC, ω_ij^σ=sigma_chiColumn_eq_certainType。
+**最難所 = step (7) cases(b)(c) 排除** (ψ の ω^σ 係数構造が「2 列 j,k に ±δ_j」⟹ 単一定数列/行と矛盾)。
+正本 = 本 session 30。**(4.8)-(4.10) statement/proof は PDF 確定、mmd 再読不要。**
