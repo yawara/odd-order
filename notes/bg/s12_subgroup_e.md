@@ -1,5 +1,56 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
+
+**新 leaf `S12_ExceptionalBridge.lean`** (imports S10_LocalLemmasCore + S11_MsigmaANormal +
+S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)、AxiomsCheck 6 本登録。
+
+- **⚠ scaffold 訂正**: 旧 `elemAb_centralizes_meet` (S12_E) は **unfaithful** だった
+  (場合分け仮定 `p∉σ(M)` / `p∈σ(M)−α(M)` と `M*≠M` を欠き、両結論を無条件連言で主張 —
+  `M*=M` で偽になりうる)。faithful な 2 定理に分割して置換:
+  `elemAb_centralizes_Msigma_meet` (12.3(a)) / `elemAb_centralizes_Malpha_meet` (12.3(b))。
+- **`S11.Hypothesis111.of_normalizer_le`** (§11 入口 constructor, 初の Hyp111 producer):
+  `p∉σ(M)`, `A₀∈ℰ_p¹`, `N_G(A₀)≤M`, `A₀≤A∈ℰ_p²(M)` → `∃P, Hypothesis111 M p A₀ A P`。
+  `r_p(M)=2` = Lem 10.5 (`pRank_eq_two_of_normalizer_le`); `A∈ℰ_p*(G)` は
+  `F ⊇ A elem-ab ⟹ F ≤ C(A) ≤ C(A₀) ≤ N(A₀) ≤ M` + rank-2; `N_G(P)⊄M` は σ の定義から
+  (witness Sylow `PM` がそのまま `mem_sigma_iff` の witness)。**12.4/12.5 もこれを使う**。
+- **`not_conj_of_mem_sigma_of_normalizer_le`** (12.2(b) σ-case): Thm 10.1(b)
+  (`fusion_control_of_mem_sigma .2.1`) の transitivity を `(g₁,g₂):=(h,1)` で呼び、
+  `c ∈ C(X) ⊆ M*` が `M*` を固定 ⟹ `M*=M`。τ₁∪τ₃-case は消費者出現時に追加。
+- **`normalizer_Malpha_sup_sylow_of_mem_sigma`** (Thm 10.2(d) Sylow closure): `p∈σ(M)`,
+  `SM : Sylow p ↥M` ⟹ `M ≤ N_G(M_α ⊔ S̄)`。実装 = quotient `M/M_α` で
+  `Sylow.mapSurjective` (mk' surjective; **card 計算不要・p∈α 場合分け不要**) →
+  `S̄ ≤ F(M/M_α)` (`Msigma_quotient_Malpha_le_fitting`) → nilpotent 内 Sylow normal
+  (`isNilpotent_of_finite_tfae.out 0 3`) → char → AppB transport → `comap_map_eq` で
+  `SM ⊔ N` ⊴ ↥M → `le_normalizer_map_subtype_of_normal` (新汎用 helper) で G へ。
+- **engine `commutator_le_inf_Msigma_of_normalizer_le`** (mmd L3107-3111): `A`-不変
+  `p'`-部分群 `K ≤ M*` ⟹ `⁅A,K⁆ ≤ K ⊓ M*_σ`。`M*_σ⊔A` の正規性を
+  `p∈σ(M*)` (sup 吸収) / `p∉σ(M*)` (constructor + **Thm 11.7**) で統一し、
+  **`le_of_le_sup_of_coprime_card`** (新汎用: `P ≤ N_G(N)`, `H ≤ N⊔P`, `(|H|,|P|)=1` ⟹
+  `H ≤ N`; 商 `L/N` = `P` の像で `|H像| ∣ gcd=1`) で `K⊓(M*_σ⊔A) ≤ M*_σ` に落とす。
+- **12.3(a)**: `p∈σ(M*)` 枝 = 非共役 (sigma_conj 移送) → 10.12(a) `M*_α⊓M_σ=⊥` +
+  Sylow closure `T=M*_α⊔S` 経由で `⁅A,K⁆ ≤ K⊓T ≤ M*_α`; `p∉σ(M*)` 枝 = engine +
+  **Cor 11.4** (`eq_of_Msigma_meet_Hsigma`) で `M_σ⊓M*_σ≠⊥ ⟹ M*=M` 矛盾。
+  **12.3(b)**: 12.2(b)σ (X:=A₀) → 10.12(a) `M_α⊓M*_σ=⊥` + engine で即。
+- de-private 2 件: `S10.sigma_conj` (S10_HallStructure)、`le_normalizer_inf` (S12_Lemma1218)。
+- build 地雷: `Subgroup.card_map_dvd _ π` (H explicit); `map_eq_bot_iff.mp` は定数解決失敗
+  → `rw [← map_eq_bot_iff]`; `M.subtype x` 適用形には coe-simp 不発 → `map_mul/map_inv` で;
+  `subgroupOf` への `map_le_iff_le_comap` rw はパターン不一致 → element-wise が安全。
+
+### ▶ 残 cascade 13 件 (S12_E): 次 = **Prop 12.4** (12.3 消費・(b) も必要 — 12.5 が対偶使用)
+
+12.4 実装メモ (recon 済): worker = (b)-仮定 (`∀A₀∈ℰ¹(A), ℳ(N_G(A₀))≠{M}`) 下で
+`p∈σ ∧ M_α=⊥ ∧ M_σ nilpotent ∧ C_G(A)≤M` 一括証明 → (a) は by_cases で direct 枝
+(`ℳ(N(A₀))={M}` ⟹ `C(A)≤C(A₀)≤N(A₀)≤M`)。部品: r(C_M(X))≤2 = uniquenessTheorem
+(S12_E `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` パターン); 生成 = Prop 1.16(2)
+`cocyclicFixedByClosure_eq_top_of_not_isCyclic` (cocyclic Y を card ∈ {1,p,p²} で分類:
+1=⊥ は noncyclic 矛盾, p = ℰ¹ → 12.3(a)/(b), p² = ⊤ 直接) + 12.19 の φ-setup テンプレ
+(S12_E:307-315); 矛盾 = Prop 10.11(b) `rank_centralizer_Msigma_inf_le_one` (K:=A);
+`Z=Ω₁(Z(P))` は **`S10.omega1CenterInG`** (S10:128, `normalizer_le_normalizer_omega1CenterInG`
+あり); `M_σ` nilpotent = BB4 + `Msigma_le_derived` + `nilpotent_of_mulEquiv`;
+`ℳ(N(Y))≠{M} ⟹ ∃M*∈ℳ(N(Y))−{M}` は nonemptiness 要 (`eq_top_or_exists_le_coatom` 経由,
+MaximalSubgroup.lean:155 参照)。
+
 ## ✅✅✅ 2026-06-11 (Lane F session 2, Fable 5): **Lemma 12.18 COMPLETE — unconditional・axiom-clean**
 
 **`tau1_Malpha_interaction` (a)(b) 全結論 sorry-free** (leaf `S12_Lemma1218.lean`, 1,180 行,

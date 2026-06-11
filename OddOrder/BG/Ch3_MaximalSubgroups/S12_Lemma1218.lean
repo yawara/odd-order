@@ -182,8 +182,9 @@ private theorem inf_centralizer_sup_le_inf_of_le_normalizer {G : Type*} [Group G
   rw [hu1, one_mul]
   exact ⟨hv, hvC⟩
 
-/-- A subgroup normalizing both `A` and `B` normalizes `A ⊓ B`. -/
-private theorem le_normalizer_inf {G : Type*} [Group G] {H A B : Subgroup G}
+/-- A subgroup normalizing both `A` and `B` normalizes `A ⊓ B`.
+(Public: shared with `S12_ExceptionalBridge` for Lemma 12.3.) -/
+theorem le_normalizer_inf {G : Type*} [Group G] {H A B : Subgroup G}
     (hA : H ≤ Subgroup.normalizer (A : Set G)) (hB : H ≤ Subgroup.normalizer (B : Set G)) :
     H ≤ Subgroup.normalizer ((A ⊓ B : Subgroup G) : Set G) := by
   intro x hx

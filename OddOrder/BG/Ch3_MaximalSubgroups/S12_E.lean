@@ -127,16 +127,11 @@ theorem Msigma_E_relations [Finite G] (hG : IsMinimalSimpleOdd G)
   have hmapped := Subgroup.mem_map_of_mem M.subtype (h632 hx'mem)
   rwa [hderiv_transport] at hmapped
 
-/-- **BG Lemma 12.3** (mmd L3071): `M, M* ∈ ℳ`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ_p¹` (`A₀ ⊆ A`),
-`N_G(A₀) ⊆ M*` なら `A` は `M_σ ∩ M*` と `M_α ∩ M*` を中心化する。 -/
-theorem elemAb_centralizes_meet [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
-    {p : ℕ} [Fact p.Prime] {A A₀ : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
-    (hAM : A ≤ M ⊓ Mstar) (hA₀ : A₀ ∈ elemAbelianOfRank G p 1) (hA₀A : A₀ ≤ A)
-    (hN : Subgroup.normalizer (A₀ : Set G) ≤ Mstar) :
-    A ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) ∧
-    A ≤ Subgroup.centralizer ((S10.Malpha M ⊓ Mstar : Subgroup G) : Set G) := by
-  sorry
+/-! **BG Lemma 12.3** は `S12_ExceptionalBridge.lean` に移動した
+(`elemAb_centralizes_Msigma_meet` / `elemAb_centralizes_Malpha_meet`)。
+旧 scaffold `elemAb_centralizes_meet` は場合分け仮定 (`p ∉ σ(M)` / `p ∈ σ(M) − α(M)`)
+と `M* ≠ M` を欠く unfaithful な statement だったため、faithful な 2 定理に分割して
+置き換えた。 -/
 
 /-- If a subgroup `C ≤ Nsub` carries the **full `π`-part** of `Nsub` (their `π`-prime
 factorizations agree), then a Hall `π`-subgroup of `C` is a Hall `π`-subgroup of `Nsub`. Used to

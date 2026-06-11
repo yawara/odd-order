@@ -608,8 +608,10 @@ private theorem normalizer_conj_smul (g : G) (H : Subgroup G) :
   exact Subgroup.map_normalizer_eq_of_bijective H (MulAut.conj g).bijective
 
 /-- **σ is conjugation-equivariant**: `p ∈ σ(M) ⟹ p ∈ σ(M^g)`. The Sylow `P` witnessing
-`σ(M)` conjugates to a Sylow of `M^g`, and `N_G(P̄) ≤ M` conjugates to `N_G(P̄^g) ≤ M^g`. -/
-private theorem sigma_conj [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+`σ(M)` conjugates to a Sylow of `M^g`, and `N_G(P̄) ≤ M` conjugates to `N_G(P̄^g) ≤ M^g`.
+(Public: §12 uses this to rule out conjugacy of maximal subgroups with distinct σ-sets,
+e.g. in Lemmas 12.2(b) and 12.3.) -/
+theorem sigma_conj [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
     (g : G) (hp : p ∈ sigma M) : p ∈ sigma (MulAut.conj g • M) := by
   rw [mem_sigma_iff] at hp ⊢
   obtain ⟨hpf, P, hP⟩ := hp

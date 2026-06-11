@@ -46,6 +46,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -3703,3 +3704,25 @@ Theorem 10.2(d) (`isNilpotent_derived_of_Malpha_eq_bot`). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_centralizer_PQ_eq_bot
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_interaction
+
+/-! ### BG Lemma 12.3 + Hypothesis 11.1 constructor (`S12_ExceptionalBridge`)
+
+**BG Lemma 12.3** (mmd L3101): for `M* ∈ ℳ − {M}`, `A ∈ ℰ_p²(M ∩ M*)`, `A₀ ∈ ℰ¹(A)` with
+`N_G(A₀) ⊆ M*`: (a) if `p ∉ σ(M)` then `A` centralizes `M_σ ∩ M*`
+(`elemAb_centralizes_Msigma_meet`); (b) if `p ∈ σ(M) − α(M)` then `A` centralizes
+`M_α ∩ M*` (`elemAb_centralizes_Malpha_meet`). Root of the §12 τ₂-cascade. Consumes
+Theorem 11.7 (`MsigmaA_normal`) through the new Hypothesis 11.1 constructor
+(`Hypothesis111.of_normalizer_le`), Corollary 11.4, Theorem 10.1(b), Lemma 10.12(a), and
+the Theorem 10.2(d) Sylow closure — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S11.Hypothesis111.of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.not_conj_of_mem_sigma_of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.normalizer_Malpha_sup_sylow_of_mem_sigma
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.commutator_le_inf_Msigma_of_normalizer_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Msigma_meet
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Malpha_meet
