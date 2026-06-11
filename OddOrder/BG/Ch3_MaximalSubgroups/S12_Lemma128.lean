@@ -237,13 +237,17 @@ theorem normalizer_sylow_le_normalizer_elemAb [Finite G] (hG : IsMinimalSimpleOd
 `F(N) ≤ C_G(B)` (the `O_q`-part is an abelian `q`-group containing `B`, the
 `O_q'`-part commutes with `B` by coprimality), so `F(N) ≤ E` (Corollary 12.6(b)) and
 `F(N) ≤ F(E)` (it is a nilpotent subgroup normalized by `E ≤ N`); `N' ≤ F(N)` by
-Theorem 4.20(a), since `r(F(N)) ≤ r(E) ≤ 2`. -/
+Theorem 4.20(a), since `r(F(N)) ≤ r(E) ≤ 2`. The intermediate facts
+`F(N) ≤ C_G(B)` and `F(N) ≤ F(E)` are exported for Lemma 12.8(d). -/
 theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {q : ℕ} [Fact q.Prime] (hq : q ∈ tau2 M)
     {B : Subgroup G} (hB : B ∈ elemAbelianOfRank G q 2) (hBE : B ≤ E)
     (hallab : ∀ T : Subgroup G, IsPGroup q ↥T → IsMulCommutative ↥T) :
-    derivedInG (Subgroup.normalizer (B : Set G)) ≤ Ch2.S08.fittingInG E := by
+    derivedInG (Subgroup.normalizer (B : Set G)) ≤ Ch2.S08.fittingInG E ∧
+    Ch2.S08.fittingInG (Subgroup.normalizer (B : Set G)) ≤
+      Subgroup.centralizer (B : Set G) ∧
+    Ch2.S08.fittingInG (Subgroup.normalizer (B : Set G)) ≤ Ch2.S08.fittingInG E := by
   classical
   set N : Subgroup G := Subgroup.normalizer (B : Set G) with hNdef
   have hBM : B ≤ M := hBE.trans h.E_le
@@ -363,6 +367,7 @@ theorem derivedInG_normalizer_elemAb_le_fittingInG [Finite G] (hG : IsMinimalSim
     exact h.rank_le_two hG
   have hderived : commutator ↥N ≤ Ch01.fitting ↥N :=
     Ch1.S05.derived_le_fitting_of_rank_fitting_le_two hodd hrankFN
+  refine ⟨?_, hFN_le_C, hFN_le_FE⟩
   calc derivedInG N = (commutator ↥N).map N.subtype := rfl
     _ ≤ (Ch01.fitting ↥N).map N.subtype := Subgroup.map_mono hderived
     _ = FN := rfl
@@ -417,7 +422,7 @@ theorem sylow_eq_opiCore_fittingInG_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd 
     have hN := normalizer_sylow_le_normalizer_elemAb hG h hq hB hBE hBSq hSqM
     exact (sylow_le_derivedInG_normalizer hG Sq).trans
       ((derivedInG_le_derivedInG hN.1).trans
-        (derivedInG_normalizer_elemAb_le_fittingInG hG h hq hB hBE hallab))
+        (derivedInG_normalizer_elemAb_le_fittingInG hG h hq hB hBE hallab).1)
   -- `Sq = O_q(F(E))` (both are `q`-subgroups of full order in `F(E)`).
   have hSq_le_O : (Sq : Subgroup G) ≤ opiCoreInG ({q} : Set ℕ) FE :=
     pGroup_le_opiCoreInG_fittingInG Sq.isPGroup' hSq_le_FE
@@ -770,7 +775,7 @@ theorem sylow_chain_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   refine ⟨sylow_le_derivedInG_normalizer hG S, ?_, hFE_le_C, ?_⟩
   · exact (derivedInG_le_derivedInG
       (normalizer_sylow_le_normalizer_elemAb hG h hp hA hAE hAS hSM).1).trans
-      (derivedInG_normalizer_elemAb_le_fittingInG hG h hp hA hAE hallab)
+      (derivedInG_normalizer_elemAb_le_fittingInG hG h hp hA hAE hallab).1
   · exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAS)).trans
       (centralizer_le_E_of_tau2 hG h hp hA hAE).1
 
