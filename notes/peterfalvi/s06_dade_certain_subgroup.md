@@ -1744,3 +1744,65 @@ toTICyclicFullDadeApplication], NC=sigmaNC, ω_ij^σ=sigma_chiColumn_eq_certainT
 - step(3)Supp⊂A₀/step(5)λ₁−λ₂/step(7)(8)trichotomy+counting = step(7)セクション参照。
 - ⚠⚠ (4.8) 複数セッション規模 (σ_G 群移行 L↔G + τ-σ_G V値 + λ₁−λ₂ + counting)。
   段階: step(1)→statement→(3)(4)→(5)→(7)(8)。新 leaf S06_CertainTypeIsometry.lean (root+AxiomsCheck import必須)。
+
+## 2026-06-12 (session 31, b-peterfalvi, Opus 4.8 1M): ✅ (4.8) step(1)+step(2) landed + 🚨 (2.1) critical-path blocker 判明
+
+新 leaf **`S06_CertainTypeIsometry.lean`** 作成 (root + AxiomsCheck 両 import + guard 登録済、full build 3782 緑、allowlist 3)。
+
+### ✅ step(1) `certainType_sign_eq_of_degree_eq` (commit 268d0940)
+同一行 i・2 列 χ₂,χ₂' で `μ_ij(1)=μ_ik(1) ⟹ δ_j=δ_k`。`certainType_degree_modEq` (μ(1)≡δ mod w₁) を
+2 列に適用 → ℂ 等式を `exact_mod_cast` で ℤ 化 → δ_j−δ_k=w₁·(b−a) ⟹ `(w₁:ℤ)∣2` (sign∈{±1} で
+場合分け) → `Int.le_of_dvd (by norm_num) hdvd : w₁≤2` と `three_le_card_W1` (w₁≥3) で矛盾。
+off-diag 2 case の witness 符号差は `first | …⟨b-a, linear_combination hZ⟩ | …⟨a-b, linear_combination -hZ⟩`。
+
+### ✅ step(2) `certainType_apply_eq_of_mem_W1` + helper `chiColumn_apply_of_mem_W1` (commit 26e92857)
+μ_ij−μ_ik が **W₁ 上で消失**。helper: ω_{ij}=chiColumn χ₂ i は W₁ 上で**列 χ₂ 非依存**
+(`wSnd_eq_one_of_mem_W1` で W₂-射影自明 ⟹ ω_{ij}(w)=(w1CharEquiv i)(wFst w))。本体: W₁^#⊆W−W₂=sdiff.V
+上 (4.3.c) `certainType_apply_eq_of_mem_V` (μ=δ·chiColumn) + step(1) + helper、1 では equal-degree 仮定。
+σ_G/τ/(2.1) 全て非依存。
+
+### 🚨🚨 CRITICAL FINDING — session-30 plan を訂正: **(2.1) が critical path 上の未形式化 blocker**
+session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 点を見落としていた**:
+1. **conclusion 3 (FT-critical な isometry 恒等式) は conclusion 1 に依存する**。理由: LHS `(μ_ij−μ_ik)^τ`
+   の τ (=`h.tau : S04.FullDadeIsometryData dade0`) の domain は **A₀ 上 supported な CF(L)**
+   (`full_map_eq_of_mem_V` の入力は `SupportedOnV`)。μ_ij−μ_ik を τ に渡すには **Supp⊆A₀ = conclusion 1**
+   を先に確立せねばならない。よって statement 単独では書けず、conclusion 1 が前提。
+2. **conclusion 1 (Supp(μ_ij−μ_ik)⊆A₀) は (2.1) [L−K conjugacy] を要し、これは未形式化**。
+   - 内訳: step(2) [vanish on W₁] ✅ + **(2.1)** [z∈L−K ⟹ z は xW₂ (x∈W₁^#) に L-共役] + L↔G V-bridge
+     (A₀=A∪V^L の **V^L は ambient `tic.V` (G-level)** = `{g:G|∃l∈L,∃v∈tic.V,g=lvl⁻¹}`、CertainHypothesis46:63)。
+   - **(2.1) は S04/S05/S06 に無い** (grep 済、`V_subset_sharp` のみ存在)。Peterfalvi §2 の構造定理
+     (L=K⋊W₁, C_K(x)=W₂ ⟹ L−K の元は xW₂ に共役)。
+   ⟹ **(2.1) は conclusion 1・conclusion 3 双方の critical-path blocker** (Task #4)。
+
+### ▶▶ 次セッション推奨 (この順)
+1. **(2.1) derivability 調査**: 既存 API (`centralizer_eq_sup` C_L(x)=W [session 20]、`isComplement`、
+   `|L−K|=|K|(w₁−1)` counting、`coprime_card_W1_card_W2`) から導けるか精査。導ければ conclusion 1 leaf 内補題、
+   重ければ独自 leaf/issue (base 1000)。**ここが真の hard core** (σ_G/τ より前)。
+2. **conclusion 1** `certainType_diff_supp_subset_A0` (新 leaf 継続): step(2) + (2.1) + (4.7)
+   (`chiRestrict_apply_eq_zero_of_not_mem_union`/`induce_…`) + L↔G bridge。
+3. **conclusion 3** statement (σ_G=`h.tic.sigma rfl app`, τ=`h.tau`) + step(4) [step(1) で
+   `ψ(v)=(δ_j−δ_k)ω_ik(v)=0` と簡単化済] → (5) λ₁−λ₂ → (7)(8) `sigmaCoeff_trichotomy`+counting。
+
+### API 確定 (再調査不要)
+- σ_G: `h.tic.sigma rfl app : ClassFunction h.tic.W ℂ →ₗ[ℂ] ClassFunction G ℂ` (S05_SigmaIsometry:948);
+  `sigma_apply_of_mem_V` (1203): `sigma … α v = α ⟨v,_⟩` for v∈V (=(3.2.c))。
+- τ value-on-V: `full_map_eq_of_mem_V` (S05_TICyclic:151), `full_inner_eq` (171, isometry),
+  `full_maps_virtualCharacter` (179, ZIrr)。`FullDadeApplication` (133) = {tau : FullDadeIsometryData …}。
+- `certainType_apply_eq_of_mem_V` (878): `μ_ij(v)=δ_j·chiColumn χ₂ i ⟨v,_⟩` for v∈sdiff.V=W−W₂。
+  `certainType_degree_modEq` (937), `three_le_card_W1` (w₁≥3), `wSnd_eq_one_of_mem_W1` (S05_TICyclic:449)。
+- SignedIrreducibleDifferenceFamily (IsometryDifferencePair:312): `mu : Fin n→IrreducibleCharacter G`,
+  `sign : ℤ`, `sign_eq : sign=1∨sign=-1`。
+
+### Lean gotchas (本 session 確立、再調査不要)
+- **新 S06-level lemma (h : Hypothesis46 を明示第一引数) は `h.foo` dot 不可** → `foo h …` で呼ぶ
+  (foo は `namespace S06` 直下で Hypothesis46 namespace でないため)。既存 `Hypothesis L` members
+  (`certainType_apply_eq_of_mem_V` 等) は `h.` dot OK (extends 連鎖 Hypothesis46→CTH→Hypothesis ↥L)。
+- **χ₂ 系結果 (columnFamily/certainType_degree_modEq を呼ぶ) は `[NeZero (Nat.card h.W1)]
+  [Fintype ↥(h.W1⊔h.W2)] [Invertible (Nat.card ↥(h.W1⊔h.W2):ℂ)]` を instance binder で明示**
+  (CertainTypeSupport (4.7) と同; `[Fintype ↥L]` から部分群の Fintype は自動導出されない)。
+  **chiColumn のみの結果は `[Fintype]` 不要** (columnFamily が要る; helper は NeZero のみ)。
+- **W-consistency**: `χ₂(wSnd w)=1` は `rw [wSnd_eq_one_of_mem_W1 hw]; exact map_one χ₂` (defeq) で。
+  `simp`/`rw [map_one]` は syntactic で defeq-`1` (sdiff form vs χ₂ domain form) に不発。
+- chiColumn unfold は外側 namespace から `rw [Hypothesis.chiColumn]` (修飾要)。
+
+正本 = 本 session 31。**step(1)(2) landed。(4.8) の真 blocker = (2.1) [未形式化、conclusion 1/3 双方の前提]。**
