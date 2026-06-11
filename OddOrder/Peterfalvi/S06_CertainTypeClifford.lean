@@ -895,6 +895,39 @@ theorem inertia_eq_K_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
         ((h.mem_inertia_iff_isFixedPt_conjByPerm u χ).mp huI))
       (not_exists.mpr hχ)
 
+/-- **Peterfalvi (4.5.b), first sentence**: for `χ ∈ Irr(K)` not among the `χ_j`, the induced
+character `Ind^L_K χ` is irreducible.  Immediate from `I_L(χ) = K`
+(`inertia_eq_K_of_forall_chiRestrict_ne`) and [Is] Theorem 6.34
+(`isIrreducibleCharacter_induce_of_inertia_eq`). -/
+theorem induce_isIrreducible_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
+    IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  exact isIrreducibleCharacter_induce_of_inertia_eq χ
+    (h.inertia_eq_K_of_forall_chiRestrict_ne hχ)
+
+/-- **Peterfalvi (4.5.b), `Ind^L_K χ ≠ μ_{ij}`**: for `χ` not among the `χ_j`, the irreducible
+`Ind^L_K χ` is distinct from every certain-type character.  By Frobenius reciprocity
+`⟨Ind^L_K χ, μ_{ij}⟩ = ⟨χ, Res^L_K μ_{ij}⟩ = ⟨χ, χ_j⟩ = 0` (`restrict_certainType_eq`, `χ ≠ χ_j`),
+whereas `⟨μ_{ij}, μ_{ij}⟩ = 1`. -/
+theorem induce_ne_certainType_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ)
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
+      ≠ ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  intro heq
+  have hinner : ClassFunction.inner (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
+      ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) = 0 := by
+    rw [ClassFunction.inner_induce_eq_inner_restrict h.K (χ : ClassFunction ↥h.K ℂ)
+      ((h.columnFamily χ₂).mu i : ClassFunction L ℂ), h.restrict_certainType_eq χ₂ i,
+      ← h.coe_chiRestrict χ₂, irreducibleCharacter_inner_eq_ite,
+      if_neg (Ne.symm (hχ χ₂))]
+  rw [heq, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hinner
+  exact one_ne_zero hinner
+
 end Recipe
 
 end Hypothesis
