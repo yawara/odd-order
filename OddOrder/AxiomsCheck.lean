@@ -3726,3 +3726,17 @@ the Theorem 10.2(d) Sylow closure — all unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Msigma_meet
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.elemAb_centralizes_Malpha_meet
+
+/-! ### BG Proposition 12.4 (`S12_ExceptionalBridge`)
+
+**BG Proposition 12.4** (mmd L3125): for `A ∈ ℰ_p²(M)`: (a) `C_G(A) ≤ M`
+(`centralizer_le_of_elemAb_rank_two`); (b) if `ℳ(N_G(A₀)) ≠ {M}` for every
+`A₀ ∈ ℰ¹(A)`, then `p ∈ σ(M)`, `M_α = 1`, `M_σ` is nilpotent, and `C_G(A) ≤ M`
+(`mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`). Consumes Lemma 12.3, the
+Uniqueness Theorem (9.6), Proposition 1.16(2) (`cocyclicFixedByClosure`),
+Proposition 10.11(b), Theorem 10.2 (Hall structure + BB4), and `Ω₁(Z(P))`
+(`omega1CenterInG`) — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_of_elemAb_rank_two

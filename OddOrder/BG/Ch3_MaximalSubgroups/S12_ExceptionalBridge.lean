@@ -512,6 +512,549 @@ theorem elemAb_centralizes_Malpha_meet [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, ← le_bot_iff, ← h1012]
   exact le_inf ((heng.trans inf_le_left).trans hKMα) (heng.trans inf_le_right)
 
+/-! ## Proposition 12.4 — helper layer -/
+
+/-- A member of `ℰ_p¹(G)` is nontrivial. -/
+theorem ne_bot_of_mem_elemAbelianOfRank_one {p : ℕ} [Fact p.Prime] {X : Subgroup G}
+    (hX : X ∈ elemAbelianOfRank G p 1) : X ≠ ⊥ := by
+  intro hbot
+  have h1 : Nat.card ↥X = 1 := by rw [hbot]; exact Subgroup.card_bot
+  rw [hX.2, pow_one] at h1
+  exact (Fact.out : p.Prime).one_lt.ne' h1
+
+/-- A nontrivial elementary abelian `p`-subgroup contains a line (`ℰ¹`-member). -/
+theorem exists_line_le [Finite G] {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A.IsElementaryAbelian p) (hne : A ≠ ⊥) :
+    ∃ X ∈ elemAbelianOfRank G p 1, X ≤ A := by
+  obtain ⟨x, hxA, hx1⟩ := (A.bot_or_exists_ne_one).resolve_left hne
+  have hxp : x ^ p = 1 := by
+    simpa using congrArg Subtype.val (hA.pow_eq_one ⟨x, hxA⟩)
+  have hord : orderOf x = p := orderOf_eq_prime hxp hx1
+  refine ⟨Subgroup.zpowers x, ⟨?_, ?_⟩, (Subgroup.zpowers_le).mpr hxA⟩
+  · exact Subgroup.IsElementaryAbelian.of_card_prime (by rw [Nat.card_zpowers, hord])
+  · rw [Nat.card_zpowers, hord, pow_one]
+
+/-- The normalizer of a nontrivial subgroup of a maximal subgroup is proper (the ambient
+group is simple). -/
+theorem normalizer_lt_top_of_le_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {X : Subgroup G} (hXM : X ≤ M)
+    (hXne : X ≠ ⊥) :
+    Subgroup.normalizer (X : Set G) < ⊤ := by
+  rw [lt_top_iff_ne_top]
+  intro hNtop
+  haveI hXnormal : X.Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal X inferInstance with hXbot | hXtop
+  · exact hXne hXbot
+  · exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (hXtop ▸ hXM))
+
+/-- If `ℳ(N_G(X)) ≠ {M}` for a nontrivial `X ≤ M`, then some maximal subgroup other than
+`M` contains `N_G(X)`. -/
+theorem exists_maximal_ne_of_normalizer_ne_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {X : Subgroup G} (hXne : X ≠ ⊥)
+    (hXM : X ≤ M)
+    (hne : maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)) ≠ {M}) :
+    ∃ Mstar ∈ maximalSubgroups G, Mstar ≠ M ∧
+      Subgroup.normalizer (X : Set G) ≤ Mstar := by
+  classical
+  have hNlt := normalizer_lt_top_of_le_of_ne_bot hG hM hXM hXne
+  obtain ⟨Mst, hMst_co, hMst_le⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (X : Set G))).resolve_left hNlt.ne
+  rcases Classical.em (∃ H ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)),
+      H ≠ M) with ⟨H, hH, hHne⟩ | hall
+  · obtain ⟨hH_co, hH_le⟩ := mem_maximalSubgroupsContaining.mp hH
+    exact ⟨H, mem_maximalSubgroups.mpr hH_co, hHne, hH_le⟩
+  · exfalso
+    apply hne
+    have hMstM : Mst = M := by
+      by_contra hMM
+      exact hall ⟨Mst, mem_maximalSubgroupsContaining.mpr ⟨hMst_co, hMst_le⟩, hMM⟩
+    refine Set.eq_singleton_iff_unique_mem.mpr
+      ⟨hMstM ▸ mem_maximalSubgroupsContaining.mpr ⟨hMst_co, hMst_le⟩, fun H hH => ?_⟩
+    by_contra hHne
+    exact hall ⟨H, hH, hHne⟩
+
+/-- Centralizing is symmetric: `H ≤ C_G(K)` iff `K ≤ C_G(H)` (one direction). -/
+theorem le_centralizer_swap {H K : Subgroup G}
+    (h : H ≤ Subgroup.centralizer (K : Set G)) :
+    K ≤ Subgroup.centralizer (H : Set G) := by
+  intro k hk
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  exact (Subgroup.mem_centralizer_iff.mp (h hy) k hk).symm
+
+/-- An elementary abelian subgroup centralizes itself. -/
+theorem le_centralizer_self_of_isElementaryAbelian {p : ℕ} {A : Subgroup G}
+    (hA : A.IsElementaryAbelian p) : A ≤ Subgroup.centralizer (A : Set G) := by
+  intro a ha
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  exact congrArg Subtype.val (hA.comm ⟨y, hy⟩ ⟨a, ha⟩)
+
+/-- An element centralizing `A` and `B` centralizes `A ⊔ B`. -/
+theorem inf_centralizer_le_centralizer_sup {A B : Subgroup G} :
+    Subgroup.centralizer (A : Set G) ⊓ Subgroup.centralizer (B : Set G) ≤
+      Subgroup.centralizer ((A ⊔ B : Subgroup G) : Set G) := by
+  rintro x ⟨hxA, hxB⟩
+  rw [Subgroup.mem_centralizer_iff]
+  intro h hh
+  have hle : A ⊔ B ≤ Subgroup.centralizer ({x} : Set G) := by
+    refine sup_le ?_ ?_ <;> intro a ha <;> rw [Subgroup.mem_centralizer_iff] <;>
+      intro y hy <;> rw [Set.mem_singleton_iff] at hy <;> subst hy
+    · exact (Subgroup.mem_centralizer_iff.mp hxA a ha).symm
+    · exact (Subgroup.mem_centralizer_iff.mp hxB a ha).symm
+  exact (Subgroup.mem_centralizer_iff.mp (hle hh) x (Set.mem_singleton x)).symm
+
+/-- The join of two elementwise-commuting elementary abelian `p`-subgroups is elementary
+abelian. -/
+theorem isElementaryAbelian_sup_of_le_centralizer {p : ℕ} {A B : Subgroup G}
+    (hA : A.IsElementaryAbelian p) (hB : B.IsElementaryAbelian p)
+    (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
+    (A ⊔ B).IsElementaryAbelian p := by
+  have hsup_eq : A ⊔ B = Subgroup.closure ((A : Set G) ∪ B) := by
+    rw [Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq]
+  have hcent : A ⊔ B ≤ Subgroup.centralizer ((A ⊔ B : Subgroup G) : Set G) :=
+    sup_le
+      ((le_inf (le_centralizer_self_of_isElementaryAbelian hA) hAB).trans
+        inf_centralizer_le_centralizer_sup)
+      ((le_inf (le_centralizer_swap hAB) (le_centralizer_self_of_isElementaryAbelian hB)).trans
+        inf_centralizer_le_centralizer_sup)
+  constructor
+  · intro x y
+    exact Subtype.ext (Subgroup.mem_centralizer_iff.mp (hcent y.2) (x : G) x.2)
+  · intro x
+    have hx : (x : G) ∈ Subgroup.closure ((A : Set G) ∪ B) := by
+      rw [← hsup_eq]; exact x.2
+    have hxp : (x : G) ^ p = 1 := by
+      refine Subgroup.closure_induction ?_ ?_ ?_ ?_ hx
+      · rintro g (hg | hg)
+        · simpa using congrArg Subtype.val (hA.pow_eq_one ⟨g, hg⟩)
+        · simpa using congrArg Subtype.val (hB.pow_eq_one ⟨g, hg⟩)
+      · exact one_pow p
+      · intro g h hg hh hgp hhp
+        have hgs : g ∈ A ⊔ B := by rw [hsup_eq]; exact hg
+        have hhs : h ∈ A ⊔ B := by rw [hsup_eq]; exact hh
+        have hcomm : Commute g h :=
+          (Subgroup.mem_centralizer_iff.mp (hcent hgs) h hhs).symm
+        rw [hcomm.mul_pow, hgp, hhp, mul_one]
+      · intro g hg hgp
+        rw [inv_pow, hgp, inv_one]
+    exact Subtype.ext (by simpa using hxp)
+
+/-- A rank-two member of `ℰ_p²(G)` has rank at least `2` (as an abstract group). -/
+theorem two_le_rank_of_mem_elemAbelianOfRank_two [Finite G] {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) : 2 ≤ rank ↥A := by
+  have htop_ea : (⊤ : Subgroup ↥A).IsElementaryAbelian p :=
+    OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv Subgroup.topEquiv.symm hA.1
+  have hle := le_pRank (G := ↥A) ⊤ htop_ea
+  rw [Nat.card_congr Subgroup.topEquiv.toEquiv, hA.2,
+    Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+  exact hle.trans (pRank_le_rank p)
+
+/-! ## Proposition 12.4 — generation engine (BG Proposition 1.16(2)) -/
+
+/-- **Generation engine for Proposition 12.4** (mmd L3133-3137 / L3149-3151): under the
+hypothesis of 12.4(b), let `W` be an `A`-invariant `p'`-subgroup of `M` such that for
+every line `Y ∈ ℰ¹(A)` and every maximal `M* ≠ M` over `N_G(Y)`, `A` centralizes
+`W ⊓ M*` (this is what Lemma 12.3(a)/(b) supplies). Then `W ≤ C_G(A)`: by BG
+Proposition 1.16(2), `W = ⟨C_W(Y) | Y ≤ A, A/Y cyclic⟩`, and each cocyclic `Y` is
+either all of `A` (then `C_W(Y) ≤ C_G(A)` trivially) or a line (then
+`C_W(Y) ≤ W ⊓ M*` for some `M* ∈ ℳ(N_G(Y)) − {M}` and the supplied centralizing
+applies). -/
+private theorem le_centralizer_of_forall_line [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M)
+    (hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M})
+    {W : Subgroup G} (hWinv : A ≤ Subgroup.normalizer (W : Set G))
+    (hWp : ¬ p ∣ Nat.card ↥W)
+    (hsupply : ∀ Y ∈ elemAbelianOfRank G p 1, Y ≤ A → ∀ Mstar ∈ maximalSubgroups G,
+      Mstar ≠ M → Subgroup.normalizer (Y : Set G) ≤ Mstar →
+      A ≤ Subgroup.centralizer ((W ⊓ Mstar : Subgroup G) : Set G)) :
+    W ≤ Subgroup.centralizer (A : Set G) := by
+  classical
+  -- conjugation action of `A` on `W`.
+  letI act : MulDistribMulAction ↥A ↥W :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (W : Set G))) ↥W
+      (Subgroup.inclusion hWinv)
+  set φ : ↥A →* MulAut ↥W := MulDistribMulAction.toMulAut ↥A ↥W with hφdef
+  have hφ_coe : ∀ (a : ↥A) (x : ↥W),
+      (W.subtype ((φ a) x)) = (↑a) * (W.subtype x) * (↑a)⁻¹ := fun _ _ => rfl
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥W) := by
+    rw [hA.2]
+    exact Nat.Coprime.pow_left 2 ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hWp)
+  have hAnc : ¬ IsCyclic ↥A := by
+    refine not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hA.1 ?_
+    rw [hA.2, Nat.log_pow (Fact.out : p.Prime).one_lt]
+  haveI : IsMulCommutative ↥A := ⟨⟨hA.1.comm⟩⟩
+  have hgen :=
+    OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic φ hcop hAnc
+  -- every cocyclic generator centralizes `A`.
+  have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ ≤
+      (Subgroup.centralizer (A : Set G)).comap W.subtype := by
+    refine (Subgroup.closure_le _).mpr ?_
+    rintro g ⟨Y, ⟨a, hYa⟩, hfix⟩
+    rw [SetLike.mem_coe, Subgroup.mem_comap]
+    have hYdvd : Nat.card ↥Y ∣ Nat.card ↥A := Subgroup.card_subgroup_dvd_card Y
+    rw [hA.2] at hYdvd
+    obtain ⟨i, hi2, hicard⟩ := (Nat.dvd_prime_pow Fact.out).mp hYdvd
+    interval_cases i
+    · -- `|Y| = 1`: then `A = ⟨a⟩` is cyclic, contradiction.
+      exfalso
+      have hYbot : Y = ⊥ := Subgroup.card_eq_one.mp (by rw [hicard, pow_zero])
+      rw [hYbot, bot_sup_eq] at hYa
+      refine hAnc ⟨⟨a, fun x => ?_⟩⟩
+      have hx : x ∈ Subgroup.zpowers a := by rw [hYa]; exact Subgroup.mem_top x
+      exact hx
+    · -- `|Y| = p`: a line; Lemma 12.3 supplies the centralizing.
+      set Yg : Subgroup G := Y.map A.subtype with hYgdef
+      have hYg_card : Nat.card ↥Yg = p := by
+        rw [hYgdef, Subgroup.card_map_of_injective A.subtype_injective, hicard, pow_one]
+      have hYg_mem : Yg ∈ elemAbelianOfRank G p 1 :=
+        ⟨Subgroup.IsElementaryAbelian.of_card_prime hYg_card, by rw [hYg_card, pow_one]⟩
+      have hYg_le : Yg ≤ A := Subgroup.map_subtype_le _
+      obtain ⟨Mst, hMst_mem, hMst_ne, hMst_le⟩ :=
+        exists_maximal_ne_of_normalizer_ne_singleton hG hM
+          (ne_bot_of_mem_elemAbelianOfRank_one hYg_mem) (hYg_le.trans hAM)
+          (hb Yg hYg_mem hYg_le)
+      have hcent := hsupply Yg hYg_mem hYg_le Mst hMst_mem hMst_ne hMst_le
+      have hgC : W.subtype g ∈ Subgroup.centralizer (Yg : Set G) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        rw [SetLike.mem_coe, hYgdef, Subgroup.mem_map] at hy
+        obtain ⟨y', hy', rfl⟩ := hy
+        have h1 := congrArg W.subtype (hfix y' hy')
+        rw [hφ_coe] at h1
+        show (y' : G) * W.subtype g = W.subtype g * (y' : G)
+        calc (y' : G) * W.subtype g
+            = ((y' : G) * W.subtype g * (↑y')⁻¹) * ↑y' := by group
+          _ = W.subtype g * (y' : G) := by rw [h1]
+      have hgMst : W.subtype g ∈ Mst := hMst_le (Subgroup.centralizer_le_normalizer _ hgC)
+      rw [Subgroup.mem_centralizer_iff]
+      intro h hh
+      exact (Subgroup.mem_centralizer_iff.mp (hcent hh) (W.subtype g) ⟨g.2, hgMst⟩).symm
+    · -- `|Y| = p²`: `Y = ⊤`, the generator centralizes all of `A` directly.
+      have hYtop : Y = ⊤ := Subgroup.eq_top_of_card_eq _ (by rw [hicard, hA.2])
+      rw [Subgroup.mem_centralizer_iff]
+      intro h hh
+      have h1 := congrArg W.subtype (hfix ⟨h, hh⟩ (hYtop ▸ Subgroup.mem_top _))
+      rw [hφ_coe] at h1
+      show h * W.subtype g = W.subtype g * h
+      calc h * W.subtype g = (h * W.subtype g * h⁻¹) * h := by group
+        _ = W.subtype g * h := by
+            rw [show h * W.subtype g * h⁻¹ = W.subtype g from h1]
+  intro w hw
+  have hmem : (⟨w, hw⟩ : ↥W) ∈ OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ := by
+    rw [hgen]; exact Subgroup.mem_top _
+  exact Subgroup.mem_comap.mp (hle hmem)
+
+/-! ## Proposition 12.4 (mmd L3125-3157) -/
+
+/-- **BG Proposition 12.4(b)** (mmd L3125): `A ∈ ℰ_p²(M)`, and suppose
+`ℳ(N_G(A₀)) ≠ {M}` for every `A₀ ∈ ℰ¹(A)`. Then `p ∈ σ(M)`, `M_α = 1`, and `M_σ` is
+nilpotent — and moreover `C_G(A) ≤ M` (the case of (a) under this hypothesis).
+
+Proof (mmd L3131-3157): the Uniqueness Theorem bounds `r(C_M(X)) ≤ 2` for every line
+`X ∈ ℰ¹(A)`. If `p ∉ σ(M)`, Lemma 12.3(a) and Proposition 1.16(2) give
+`M_σ = ⟨C_{M_σ}(Y)⟩ ≤ C_M(A)`, contradicting Proposition 10.11(b); so `p ∈ σ(M)`.
+For a Sylow `p`-subgroup `P` of `M_σ` containing `A`, the rank bound forces
+`Z = Ω₁(Z(P)) ≤ A`, whence `r(P) ≤ r(C_M(X)) ≤ 2` for a line `X ≤ Z` and `p ∉ α(M)`.
+Lemma 12.3(b) and Proposition 1.16(2) then give `M_α ≤ C_M(A)`, forcing `M_α = 1`
+(any `q ∈ α(M)` would put a rank-`3` subgroup inside `C_M(A)`); `M_σ ≅ M_σ/M_α` is
+nilpotent by Theorem 10.2(d). Finally `P ⊴ M`, so `N_G(Z) = M` and
+`C_G(A) ≤ C_G(Z) ≤ N_G(Z) = M`. -/
+theorem mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2)
+    (hAM : A ≤ M)
+    (hb : ∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M}) :
+    p ∈ S10.sigma M ∧ S10.Malpha M = ⊥ ∧ Group.IsNilpotent ↥(S10.Msigma M) ∧
+      Subgroup.centralizer (A : Set G) ≤ M := by
+  classical
+  have hMcoatom : IsCoatom M := mem_maximalSubgroups.mp hM
+  have hAne : A ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥A = 1 := by rw [hbot]; exact Subgroup.card_bot
+    rw [hA.2] at h1
+    have := (Fact.out : p.Prime).one_lt
+    nlinarith
+  -- (1) the Uniqueness rank bound: `r(C_M(X)) ≤ 2` for every line `X ∈ ℰ¹(A)`.
+  have hrCX : ∀ X ∈ elemAbelianOfRank G p 1, X ≤ A →
+      rank ↥(Subgroup.centralizer (X : Set G) ⊓ M) ≤ 2 := by
+    intro X hX hXA
+    by_contra hcon
+    have h3 : 3 ≤ rank ↥(Subgroup.centralizer (X : Set G) ⊓ M) := by omega
+    have hlt : Subgroup.centralizer (X : Set G) ⊓ M < ⊤ :=
+      lt_of_le_of_lt inf_le_right hMcoatom.lt_top
+    have hU := OddOrder.BG.Ch2.S09.uniquenessTheorem hG hlt (by omega) (Or.inl h3)
+    have hXne := ne_bot_of_mem_elemAbelianOfRank_one hX
+    have hNXlt := normalizer_lt_top_of_le_of_ne_bot hG hM (hXA.trans hAM) hXne
+    have hCN : Subgroup.centralizer (X : Set G) ⊓ M ≤ Subgroup.normalizer (X : Set G) :=
+      inf_le_left.trans (Subgroup.centralizer_le_normalizer _)
+    have hUNX := hU.of_le_of_lt_top hCN hNXlt
+    have huniq : hUNX.uniqueMaximalSubgroup = M :=
+      (hU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hUNX.uniqueMaximalSubgroup_isCoatom
+          (hCN.trans hUNX.le_uniqueMaximalSubgroup)).trans
+        (hU.eq_uniqueMaximalSubgroup_of_isCoatom_of_le hMcoatom inf_le_right).symm
+    exact hb X hX hXA
+      (hUNX.maximalSubgroupsContaining_eq_singleton.trans (by rw [huniq]))
+  -- (2) `r(C_M(A)) ≤ 2` via any line of `A`.
+  obtain ⟨X₀, hX₀, hX₀A⟩ := exists_line_le hA.1 hAne
+  have hrA : rank ↥(Subgroup.centralizer (A : Set G) ⊓ M) ≤ 2 := by
+    refine le_trans ?_ (hrCX X₀ hX₀ hX₀A)
+    have hle : Subgroup.centralizer (A : Set G) ⊓ M ≤
+        Subgroup.centralizer (X₀ : Set G) ⊓ M :=
+      inf_le_inf_right M (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hX₀A))
+    exact rank_le_of_injective (f := Subgroup.inclusion hle)
+      (Subgroup.inclusion_injective hle)
+  -- (3) `p ∈ σ(M)`.
+  have hpσ : p ∈ S10.sigma M := by
+    by_contra hpσ
+    have hWp : ¬ p ∣ Nat.card ↥(S10.Msigma M) := fun h =>
+      hpσ (S10.Msigma_isPiGroup M p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, h, Nat.card_pos.ne'⟩))
+    have hsupply : ∀ Y ∈ elemAbelianOfRank G p 1, Y ≤ A → ∀ Mstar ∈ maximalSubgroups G,
+        Mstar ≠ M → Subgroup.normalizer (Y : Set G) ≤ Mstar →
+        A ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) := by
+      intro Y hY hYA Mstar hMst hMne hNle
+      have hAMst : A ≤ Mstar :=
+        ((le_centralizer_self_of_isElementaryAbelian hA.1).trans
+          (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hYA))).trans
+          ((Subgroup.centralizer_le_normalizer _).trans hNle)
+      exact elemAb_centralizes_Msigma_meet hG hM hMst hMne hpσ hA (le_inf hAM hAMst)
+        hY hYA hNle
+    have hgen := le_centralizer_of_forall_line hG hM hA hAM hb
+      (hAM.trans (le_normalizer_opiCoreInG _ _)) hWp hsupply
+    -- `A` centralizes `M_σ`, contradicting Proposition 10.11(b).
+    have hAC : A ≤ Subgroup.centralizer ((S10.Msigma M : Subgroup G) : Set G) :=
+      le_centralizer_swap hgen
+    have h1011 := S10.rank_centralizer_Msigma_inf_le_one hG hM hAM
+      (isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
+    rw [inf_eq_right.mpr hAC] at h1011
+    have h2 := two_le_rank_of_mem_elemAbelianOfRank_two hA
+    omega
+  -- (4) `A ≤ M_σ` and a Sylow `p`-subgroup `Pg` of `M_σ` containing `A`.
+  have hAMσ : A ≤ S10.Msigma M := S10.sigma_subgroup_le_Msigma_of_isHall
+    (S10.isHall_Msigma_Malpha hG hM).1 hAM
+    (isPiSubgroup_of_isPGroup_of_mem hA.1.isPGroup hpσ)
+  obtain ⟨PW, hAPW⟩ := hA.1.isPGroup.comap_subtype.exists_le_sylow (G := S10.Msigma M)
+  set Pg : Subgroup G := (PW : Subgroup ↥(S10.Msigma M)).map (S10.Msigma M).subtype
+    with hPgdef
+  have hAP : A ≤ Pg := by
+    rw [hPgdef, ← Subgroup.map_subgroupOf_eq_of_le hAMσ]
+    exact Subgroup.map_mono hAPW
+  have hPg_le : Pg ≤ S10.Msigma M := Subgroup.map_subtype_le _
+  have hPg_le_M : Pg ≤ M := hPg_le.trans (S10.Msigma_le M)
+  have hPg_pg : IsPGroup p ↥Pg := by rw [hPgdef]; exact PW.isPGroup'.map _
+  -- (5) `Z = Ω₁(Z(Pg))` and its basic properties.
+  set Z : Subgroup G := S10.omega1CenterInG Pg p with hZdef
+  have hZ_eq : Z = (omega1OfAbelian ↥Pg (Subgroup.center ↥Pg) p
+      (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)).map Pg.subtype := rfl
+  have hZ_le : Z ≤ Pg := S10.omega1CenterInG_le Pg p
+  have hPg_cent_Z : Pg ≤ Subgroup.centralizer (Z : Set G) := by
+    intro q hq
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [SetLike.mem_coe, hZ_eq, Subgroup.mem_map] at hz
+    obtain ⟨z', hz', rfl⟩ := hz
+    have hz'c : z' ∈ Subgroup.center ↥Pg := (mem_omega1OfAbelian.mp hz').1
+    exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp hz'c ⟨q, hq⟩)).symm
+  haveI : Nontrivial ↥Pg := by
+    rw [← Finite.one_lt_card_iff_nontrivial]
+    calc 1 < p ^ 2 := Nat.one_lt_pow two_ne_zero (Fact.out : p.Prime).one_lt
+      _ = Nat.card ↥A := hA.2.symm
+      _ ≤ Nat.card ↥Pg := Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hAP)
+  have hZ_ne : Z ≠ ⊥ := by
+    haveI hcent_nt : Nontrivial ↥(Subgroup.center ↥Pg) := hPg_pg.center_nontrivial
+    have hp_center : p ∣ Nat.card ↥(Subgroup.center ↥Pg) := by
+      obtain ⟨k, hk⟩ := (hPg_pg.to_subgroup (Subgroup.center ↥Pg)).exists_card_eq
+      have hne1 : Nat.card ↥(Subgroup.center ↥Pg) ≠ 1 :=
+        (Finite.one_lt_card_iff_nontrivial.mpr hcent_nt).ne'
+      rw [hk] at hne1 ⊢
+      exact dvd_pow_self p (fun h0 => hne1 (by rw [h0, pow_zero]))
+    have hpRank1 : 1 ≤ pRank ↥(Subgroup.center ↥Pg) p :=
+      one_le_pRank_of_mem_primeFactors
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hp_center, Nat.card_pos.ne'⟩)
+    have h1 : p ^ 1 ∣ Nat.card ↥(omega1OfAbelian ↥Pg (Subgroup.center ↥Pg) p
+        (fun _ hx y _ => (Subgroup.mem_center_iff.mp hx y).symm)) :=
+      pow_dvd_card_omega1OfAbelian_of_pos_le_pRank one_pos hpRank1
+    intro hbot
+    rw [hZ_eq] at hbot
+    have h2 := Subgroup.card_eq_one.mpr
+      ((Subgroup.map_eq_bot_iff_of_injective _ Pg.subtype_injective).mp hbot)
+    rw [pow_one] at h1
+    rw [h2] at h1
+    exact (Fact.out : p.Prime).one_lt.ne' (Nat.eq_one_of_dvd_one h1)
+  have hZ_ea : Z.IsElementaryAbelian p := by
+    rw [hZ_eq]
+    exact Subgroup.IsElementaryAbelian.map Pg.subtype_injective
+      omega1OfAbelian_isElementaryAbelian
+  -- (6) `Z ≤ A` via the rank bound on `C_M(A)`.
+  have hA_cent_Z : A ≤ Subgroup.centralizer (Z : Set G) := hAP.trans hPg_cent_Z
+  have hsup_ea : (A ⊔ Z).IsElementaryAbelian p :=
+    isElementaryAbelian_sup_of_le_centralizer hA.1 hZ_ea hA_cent_Z
+  have hAZ_le : A ⊔ Z ≤ Subgroup.centralizer (A : Set G) ⊓ M :=
+    sup_le (le_inf (le_centralizer_self_of_isElementaryAbelian hA.1) hAM)
+      (le_inf (le_centralizer_swap hA_cent_Z) (hZ_le.trans hPg_le_M))
+  have hZA : Z ≤ A := by
+    obtain ⟨k, hk⟩ := hsup_ea.isPGroup.exists_card_eq
+    have hsub_ea : ((A ⊔ Z).subgroupOf
+        (Subgroup.centralizer (A : Set G) ⊓ M)).IsElementaryAbelian p :=
+      OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe hAZ_le).symm hsup_ea
+    have hle := le_pRank (G := ↥(Subgroup.centralizer (A : Set G) ⊓ M)) _ hsub_ea
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAZ_le).toEquiv, hk,
+      Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+    have h2 := (pRank_le_rank (G := ↥(Subgroup.centralizer (A : Set G) ⊓ M)) p).trans hrA
+    have hcard_le : Nat.card ↥(A ⊔ Z) ≤ p ^ 2 := by
+      rw [hk]
+      exact Nat.pow_le_pow_right (Fact.out : p.Prime).pos (by omega)
+    have hsup_eq : A = A ⊔ Z :=
+      Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [hA.2]; exact hcard_le)
+    exact le_sup_right.trans hsup_eq.ge
+  -- (7) `p ∉ α(M)`: a line `X₁ ≤ Z` gives `r_p(M) = r(Pg) ≤ r(C_M(X₁)) ≤ 2`.
+  obtain ⟨X₁, hX₁, hX₁Z⟩ := exists_line_le hZ_ea hZ_ne
+  have hX₁A : X₁ ≤ A := hX₁Z.trans hZA
+  have hPg_max_M : ∀ R : Subgroup G, Pg ≤ R → R ≤ M → IsPGroup p ↥R → R = Pg := by
+    intro R hPR hRM hRpg
+    have hRMσ : R ≤ S10.Msigma M := S10.sigma_subgroup_le_Msigma_of_isHall
+      (S10.isHall_Msigma_Malpha hG hM).1 hRM
+      (isPiSubgroup_of_isPGroup_of_mem hRpg hpσ)
+    have hle : (PW : Subgroup ↥(S10.Msigma M)) ≤ R.subgroupOf (S10.Msigma M) := by
+      refine le_trans (fun x hx => Subgroup.mem_subgroupOf.mpr ?_) (Subgroup.comap_mono hPR)
+      rw [hPgdef]
+      exact Subgroup.mem_map_of_mem _ hx
+    have heq : R.subgroupOf (S10.Msigma M) = PW := PW.3 hRpg.comap_subtype hle
+    rw [← Subgroup.map_subgroupOf_eq_of_le hRMσ, heq, hPgdef]
+  have hpα : p ∉ S10.alpha M := by
+    intro hα
+    have h3 : 3 ≤ pRank ↥M p := ((S10.mem_alpha_iff M p).mp hα).2
+    have hmaxM : ∀ {T : Subgroup ↥M}, IsPGroup p ↥T → Pg.subgroupOf M ≤ T →
+        T = Pg.subgroupOf M := by
+      intro T hT hle
+      have hTmap_le : T.map M.subtype ≤ M := Subgroup.map_subtype_le T
+      have hTpg : IsPGroup p ↥(T.map M.subtype) := hT.map _
+      have hPgle : Pg ≤ T.map M.subtype := by
+        conv_lhs => rw [← Subgroup.map_subgroupOf_eq_of_le hPg_le_M]
+        exact Subgroup.map_mono hle
+      have hTeq := hPg_max_M _ hPgle hTmap_le hTpg
+      apply Subgroup.map_injective M.subtype_injective
+      rw [Subgroup.map_subgroupOf_eq_of_le hPg_le_M, ← hTeq]
+    let SM' : Sylow p ↥M := ⟨Pg.subgroupOf M, hPg_pg.comap_subtype, hmaxM⟩
+    have e : ↥(Pg.subgroupOf M) ≃* ↥Pg := Subgroup.subgroupOfEquivOfLe hPg_le_M
+    have hPg_cent : Pg ≤ Subgroup.centralizer (X₁ : Set G) ⊓ M :=
+      le_inf (hPg_cent_Z.trans
+        (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hX₁Z))) hPg_le_M
+    have hchain : pRank ↥M p ≤ 2 := by
+      calc pRank ↥M p = pRank ↥(SM' : Subgroup ↥M) p := (pRank_sylow_eq SM').symm
+        _ ≤ pRank ↥Pg p := pRank_le_of_injective (f := e.toMonoidHom) e.injective
+        _ ≤ pRank ↥(Subgroup.centralizer (X₁ : Set G) ⊓ M) p :=
+            pRank_le_of_injective (f := Subgroup.inclusion hPg_cent)
+              (Subgroup.inclusion_injective hPg_cent)
+        _ ≤ rank ↥(Subgroup.centralizer (X₁ : Set G) ⊓ M) := pRank_le_rank p
+        _ ≤ 2 := hrCX X₁ hX₁ hX₁A
+    omega
+  -- (8) `M_α = ⊥` via Lemma 12.3(b) and Proposition 1.16(2).
+  have hMαC : S10.Malpha M ≤ Subgroup.centralizer (A : Set G) := by
+    have hWp : ¬ p ∣ Nat.card ↥(S10.Malpha M) := fun h =>
+      hpα (S10.Malpha_isPiGroup M p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, h, Nat.card_pos.ne'⟩))
+    refine le_centralizer_of_forall_line hG hM hA hAM hb
+      (hAM.trans (le_normalizer_opiCoreInG _ _)) hWp ?_
+    intro Y hY hYA Mstar hMst hMne hNle
+    have hAMst : A ≤ Mstar :=
+      ((le_centralizer_self_of_isElementaryAbelian hA.1).trans
+        (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hYA))).trans
+        ((Subgroup.centralizer_le_normalizer _).trans hNle)
+    exact elemAb_centralizes_Malpha_meet hG hM hMst hMne hpσ hpα hA (le_inf hAM hAMst)
+      hY hYA hNle
+  have hMαbot : S10.Malpha M = ⊥ := by
+    by_contra hne'
+    have hcard_ne : Nat.card ↥(S10.Malpha M) ≠ 1 := fun h =>
+      hne' (Subgroup.card_eq_one.mp h)
+    obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
+    haveI : Fact q.Prime := ⟨hq_prime⟩
+    have hqα : q ∈ S10.alpha M := S10.Malpha_isPiGroup M q
+      (Nat.mem_primeFactors.mpr ⟨hq_prime, hq_dvd, Nat.card_pos.ne'⟩)
+    have h3 : 3 ≤ pRank ↥M q := ((S10.mem_alpha_iff M q).mp hqα).2
+    -- a Sylow `q`-subgroup of `M` lies in `M_α ≤ C_M(A)`, giving rank `≥ 3` there.
+    obtain ⟨Sq⟩ := (inferInstance : Nonempty (Sylow q ↥M))
+    have hSq_le : (Sq : Subgroup ↥M).map M.subtype ≤ S10.Malpha M := by
+      refine S10.alpha_subgroup_le_Malpha_of_isHall (S10.isHall_Msigma_Malpha hG hM).2.1
+        (Subgroup.map_subtype_le _) ?_
+      exact isPiSubgroup_of_isPGroup_of_mem (Sq.isPGroup'.map _) hqα
+    have hSq_le' : (Sq : Subgroup ↥M).map M.subtype ≤
+        Subgroup.centralizer (A : Set G) ⊓ M :=
+      le_inf (hSq_le.trans hMαC) (Subgroup.map_subtype_le _)
+    have e : ↥(Sq : Subgroup ↥M) ≃* ↥((Sq : Subgroup ↥M).map M.subtype) :=
+      Subgroup.equivMapOfInjective _ _ M.subtype_injective
+    have hchain : 3 ≤ rank ↥(Subgroup.centralizer (A : Set G) ⊓ M) := by
+      calc (3 : ℕ) ≤ pRank ↥M q := h3
+        _ = pRank ↥(Sq : Subgroup ↥M) q := (pRank_sylow_eq Sq).symm
+        _ ≤ pRank ↥((Sq : Subgroup ↥M).map M.subtype) q :=
+            pRank_le_of_injective (f := e.toMonoidHom) e.injective
+        _ ≤ pRank ↥(Subgroup.centralizer (A : Set G) ⊓ M) q :=
+            pRank_le_of_injective (f := Subgroup.inclusion hSq_le')
+              (Subgroup.inclusion_injective hSq_le')
+        _ ≤ rank ↥(Subgroup.centralizer (A : Set G) ⊓ M) := pRank_le_rank q
+    omega
+  -- (9) `M_σ` is nilpotent.
+  haveI hM'nil := isNilpotent_derived_of_Malpha_eq_bot hG hM hMαbot
+  have hMσM' : S10.Msigma M ≤ derivedInG M := S10.Msigma_le_derived hG hM
+  have hMσnil : Group.IsNilpotent ↥(S10.Msigma M) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM')
+  -- (10) `C_G(A) ≤ M`: `Pg ⊴`-by-`M`, `Z` characteristic, `N_G(Z) = M`.
+  have hPW_norm : (PW : Subgroup ↥(S10.Msigma M)).Normal := by
+    have htfae := (isNilpotent_of_finite_tfae (G := ↥(S10.Msigma M))).out 0 3
+    exact htfae.mp hMσnil p ⟨Fact.out⟩ PW
+  haveI hPW_char : (PW : Subgroup ↥(S10.Msigma M)).Characteristic :=
+    Sylow.characteristic_of_normal PW hPW_norm
+  have hM_norm_P : M ≤ Subgroup.normalizer (Pg : Set G) := by
+    have h1 := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+      (K := S10.Msigma M) (W := (PW : Subgroup ↥(S10.Msigma M)))
+    rw [← hPgdef] at h1
+    exact (le_normalizer_opiCoreInG _ _).trans h1
+  have hM_norm_Z : M ≤ Subgroup.normalizer (Z : Set G) :=
+    hM_norm_P.trans (S10.normalizer_le_normalizer_omega1CenterInG Pg p)
+  have hNZ_eq : Subgroup.normalizer (Z : Set G) = M := by
+    have hlt := normalizer_lt_top_of_le_of_ne_bot hG hM (hZ_le.trans hPg_le_M) hZ_ne
+    by_contra hne'
+    exact hlt.ne (hMcoatom.2 _ (lt_of_le_of_ne hM_norm_Z (Ne.symm hne')))
+  refine ⟨hpσ, hMαbot, hMσnil, ?_⟩
+  calc Subgroup.centralizer (A : Set G)
+      ≤ Subgroup.centralizer (Z : Set G) :=
+        Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hZA)
+    _ ≤ Subgroup.normalizer (Z : Set G) := Subgroup.centralizer_le_normalizer _
+    _ = M := hNZ_eq
+
+/-- **BG Proposition 12.4(a)** (mmd L3125): `A ∈ ℰ_p²(M)` implies `C_G(A) ≤ M`.
+
+If some `A₀ ∈ ℰ¹(A)` has `ℳ(N_G(A₀)) = {M}`, then `N_G(A₀) ≤ M` and
+`C_G(A) ≤ C_G(A₀) ≤ N_G(A₀) ≤ M` directly; otherwise the hypothesis of (b) holds and
+`mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` concludes. -/
+theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) :
+    Subgroup.centralizer (A : Set G) ≤ M := by
+  classical
+  rcases Classical.em (∀ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A →
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) ≠ {M}) with hball | hex
+  · exact (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM hball).2.2.2
+  · simp only [not_forall, not_not] at hex
+    obtain ⟨A₀, hA₀, hA₀A, hsingle⟩ := hex
+    have hNM : Subgroup.normalizer (A₀ : Set G) ≤ M := by
+      have hNlt := normalizer_lt_top_of_le_of_ne_bot hG hM (hA₀A.trans hAM)
+        (ne_bot_of_mem_elemAbelianOfRank_one hA₀)
+      obtain ⟨Mst, hMst_co, hMst_le⟩ :=
+        (eq_top_or_exists_le_coatom (Subgroup.normalizer (A₀ : Set G))).resolve_left
+          hNlt.ne
+      have hmem : Mst ∈ maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) :=
+        mem_maximalSubgroupsContaining.mpr ⟨hMst_co, hMst_le⟩
+      rw [hsingle, Set.mem_singleton_iff] at hmem
+      exact hmem ▸ hMst_le
+    exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hA₀A)).trans
+      ((Subgroup.centralizer_le_normalizer _).trans hNM)
+
 end S12
 
 end OddOrder.BG.Ch3

@@ -41,13 +41,9 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
-/-- **BG Proposition 12.4(a)** (mmd L3095): `A ∈ ℰ_p²(M)` なら `C_G(A) ⊆ M`。
-(原典 (b): `N_G(A₀)` の uniqueness ⇒ `p∈σ(M), M_α=1, M_σ` nilpotent は後続。) -/
-theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) :
-    Subgroup.centralizer (A : Set G) ≤ M := by
-  sorry
+/-! **BG Proposition 12.4** は `S12_ExceptionalBridge.lean` に移動した
+(`centralizer_le_of_elemAb_rank_two` (a) /
+`mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` (b))。 -/
 
 /-- **BG Theorem 12.13** (mmd L3347): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)

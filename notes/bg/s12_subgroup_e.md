@@ -37,7 +37,33 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
   → `rw [← map_eq_bot_iff]`; `M.subtype x` 適用形には coe-simp 不発 → `map_mul/map_inv` で;
   `subgroupOf` への `map_le_iff_le_comap` rw はパターン不一致 → element-wise が安全。
 
-### ▶ 残 cascade 13 件 (S12_E): 次 = **Prop 12.4** (12.3 消費・(b) も必要 — 12.5 が対偶使用)
+### ✅ session 3 cont.: **Prop 12.4 (a)(b) COMPLETE** (同 leaf, unconditional・axiom-clean)
+
+- **(b) = worker `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`**: (b)-仮定下で
+  `p∈σ(M) ∧ M_α=⊥ ∧ M_σ nilpotent ∧ C_G(A)≤M` を一括証明 (mmd L3131-3157 通り)。
+  **(a) `centralizer_le_of_elemAb_rank_two`** = by_cases: (b)-仮定 → worker.2.2.2 /
+  否定 → `ℳ(N(A₀))={M}` 直接枝 (`eq_top_or_exists_le_coatom` で nonempty → singleton)。
+- 部品 (全部 leaf 内、再利用可): rank 境界 = `uniquenessTheorem` (S12_E:622 パターン移植);
+  生成 = `le_centralizer_of_forall_line` (private; **Prop 1.16(2)
+  `cocyclicFixedByClosure_eq_top_of_not_isCyclic`** + 12.19 の φ-template; cocyclic `Y` を
+  `card ∈ {1,p,p²}` で trichotomy [`Nat.dvd_prime_pow` + `interval_cases`]: 1=cyclic 矛盾 /
+  p=ℰ¹ 供給 (hsupply に 12.3(a)/(b) を差す) / p²=⊤ 直接); 矛盾 = `rank_centralizer_Msigma_inf_le_one`
+  (K:=A, inf_eq_right で rank A=2 と衝突); `Z=Ω₁(Z(P))` = `omega1CenterInG` (centrality は
+  `mem_omega1OfAbelian`+`mem_center_iff` 手出し, `Z≠⊥` は `center_nontrivial`+
+  `pow_dvd_card_omega1OfAbelian_of_pos_le_pRank`); **`Z≤A` = A⊔Z elem-ab** (新汎用
+  `isElementaryAbelian_sup_of_le_centralizer`: closure_union + 可換 closure_induction;
+  supporting `inf_centralizer_le_centralizer_sup` / `le_centralizer_swap` /
+  `le_centralizer_self_of_isElementaryAbelian`) + card ≤ p² (le_pRank) + `eq_of_le_of_card_ge`;
+  `p∉α` = Sylow p ↥M を `⟨Pg.subgroupOf M, _, hmax⟩` で手組み (12.18:1146 template) +
+  `pRank_sylow_eq` 鎖; `M_α=⊥` = α の素数 q の Sylow が `M_α ≤ C_M(A)` 内で rank≥3 矛盾;
+  nilpotent = BB4 + `Msigma_le_derived` + `nilpotent_of_mulEquiv`; 末尾 = PW normal-in-nilpotent
+  (tfae 0 3) → char → AppB transport → `normalizer_le_normalizer_omega1CenterInG` → `N_G(Z)=M`。
+- 地雷: `cocyclicFixedByClosure_eq_top` は `[IsMulCommutative A]` instance 要 (`⟨⟨hA.1.comm⟩⟩`);
+  `IsCyclic` field の goal は zpowers が ∃-unfold された形 → rw 不可、defeq exact で;
+  `isHall_Msigma_Malpha` の Malpha-Hall は `.2.1` (右は 4 連言)。
+
+### ▶ 残 cascade 12 件 (S12_E): 次 = **Thm 12.5** (新 leaf S12_Theorem125; 12.4(b) 対偶 →
+Hyp111 constructor → 11.3/11.5/11.7/Cor11.6 + 12.3(a))
 
 12.4 実装メモ (recon 済): worker = (b)-仮定 (`∀A₀∈ℰ¹(A), ℳ(N_G(A₀))≠{M}`) 下で
 `p∈σ ∧ M_α=⊥ ∧ M_σ nilpotent ∧ C_G(A)≤M` 一括証明 → (a) は by_cases で direct 枝
