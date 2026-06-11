@@ -332,7 +332,9 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
       S10.Msigma M ≤ Subgroup.centralizer (A₀ : Set G) ∧
       (∀ X ∈ elemAbelianOfRank G p 1, X ≤ E → X ≠ A₀ →
         S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) = ⊥ ∧
-        ¬ (Subgroup.centralizer (X : Set G) ≤ M)) := by
+        ¬ (Subgroup.centralizer (X : Set G) ≤ M)) ∧
+      (∀ W : Subgroup G, M ≤ Subgroup.normalizer (W : Set G) → IsPGroup p ↥W →
+        W ≤ M → W ≤ A₀) := by
   classical
   have hAM : A ≤ M := hAE.trans h.E_le
   have hpσ : p ∉ S10.sigma M := tau2_subset_sigma_compl M hp
@@ -579,6 +581,187 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
       apply hMσ_ne
       rw [← le_bot_iff, ← h125d]
       exact le_inf le_rfl (le_centralizer_swap hA_cent)
-  exact ⟨A₀, hinf_eq.symm, by rw [hA₀.2, pow_one], hA₀A, hMσ_cent, hc⟩
+  -- `M`-invariant `p`-subgroups land in `A₀` (`C_P(M_σ) = A₀` via the cyclic complement
+  -- `Z` of Lemma 10.13(b)).
+  have hP_le_E : P ≤ E := by rw [hPdef]; exact Subgroup.map_subtype_le _
+  have habs : ∀ W : Subgroup G, M ≤ Subgroup.normalizer (W : Set G) → IsPGroup p ↥W →
+      W ≤ M → W ≤ A₀ := by
+    -- the decomposition `P = C_S(A) = A₀ ⊔ Z` with `Z` cyclic.
+    obtain ⟨Z, hZS, hZcyc, hZ₀Z, hA₀Z, hCSA⟩ :=
+      (S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure hG hpG hA
+        hAmax S.isPGroup' hS_nonab (hAP.trans hPS) ⟨hA₀, hA₀A⟩ hA₀_ne_Z₀).2.1
+    have hP_eq : Subgroup.centralizer (A : Set G) ⊓ (S : Subgroup G) = P := by
+      refine map_sylow_E_maximal_in_M h hpσ PE ?_ ?_ ?_
+      · rw [← hPdef]
+        refine le_inf ?_ hPS
+        intro x hx
+        rw [Subgroup.mem_centralizer_iff]
+        intro a ha
+        exact congrArg Subtype.val
+          (hP_ab.is_comm.comm (⟨a, hAP ha⟩ : ↥P) ⟨x, hx⟩)
+      · exact inf_le_left.trans
+          ((centralizer_le_E_of_tau2 hG h hp hA hAE).1.trans h.E_le)
+      · exact (S.isPGroup'.to_inf_right :
+          IsPGroup p ↥(Subgroup.centralizer (A : Set G) ⊓ (S : Subgroup G)))
+    have hP_sup : P = A₀ ⊔ Z := by rw [← hP_eq, hCSA]
+    have hZ_le_P : Z ≤ P := hP_sup ▸ le_sup_right
+    have hA₀_le_P : A₀ ≤ P := hP_sup ▸ le_sup_left
+    -- `Z ⊓ C_G(M_σ) = ⊥`: a line in `Z` would violate (c).
+    have hZC_bot : Z ⊓ Subgroup.centralizer (S10.Msigma M : Set G) = ⊥ := by
+      by_contra hne
+      obtain ⟨z, hz, hz1⟩ :=
+        ((Z ⊓ Subgroup.centralizer (S10.Msigma M : Set G)).bot_or_exists_ne_one).resolve_left
+          hne
+      -- pass to a power `y` of order `p`.
+      have hzS : z ∈ (S : Subgroup G) := hZS hz.1
+      obtain ⟨k, hk⟩ := S.isPGroup' ⟨z, hzS⟩
+      have hk_ord : orderOf z ∣ p ^ k := by
+        rw [orderOf_dvd_iff_pow_eq_one]
+        exact congrArg Subtype.val hk
+      obtain ⟨i, hik, hi_ord⟩ := (Nat.dvd_prime_pow Fact.out).mp hk_ord
+      have hipos : 0 < i := by
+        rcases Nat.eq_zero_or_pos i with rfl | hpos
+        · exfalso
+          rw [pow_zero, orderOf_eq_one_iff] at hi_ord
+          exact hz1 hi_ord
+        · exact hpos
+      set y : G := z ^ (p ^ (i - 1)) with hydef
+      have hyord : orderOf y = p := by
+        rw [hydef, orderOf_pow, hi_ord, Nat.gcd_eq_right (pow_dvd_pow p (by omega)),
+          Nat.pow_div (by omega) (Fact.out : p.Prime).pos,
+          Nat.sub_sub_self (by omega : 1 ≤ i), pow_one]
+      have hy1 : y ≠ 1 := by
+        intro h1
+        rw [h1, orderOf_one] at hyord
+        exact (Fact.out : p.Prime).one_lt.ne hyord
+      have hyZ : y ∈ Z := Z.pow_mem hz.1 _
+      have hyC : y ∈ Subgroup.centralizer (S10.Msigma M : Set G) :=
+        Subgroup.pow_mem _ hz.2 _
+      set Xz : Subgroup G := Subgroup.zpowers y with hXzdef
+      have hXz_mem : Xz ∈ elemAbelianOfRank G p 1 := by
+        refine ⟨Subgroup.IsElementaryAbelian.of_card_prime ?_, ?_⟩
+        · rw [hXzdef, Nat.card_zpowers, hyord]
+        · rw [hXzdef, Nat.card_zpowers, hyord, pow_one]
+      have hXzE : Xz ≤ E := by
+        rw [hXzdef, Subgroup.zpowers_le]
+        exact (hZ_le_P.trans hP_le_E) hyZ
+      have hXz_ne_A₀ : Xz ≠ A₀ := by
+        intro heq
+        have h1 : y ∈ A₀ ⊓ Z := ⟨heq ▸ Subgroup.mem_zpowers y, hyZ⟩
+        rw [hA₀Z] at h1
+        exact hy1 (Subgroup.mem_bot.mp h1)
+      have hcXz := (hc Xz hXz_mem hXzE hXz_ne_A₀).1
+      apply hMσ_ne
+      rw [← le_bot_iff, ← hcXz]
+      refine le_inf le_rfl ?_
+      rw [hXzdef, centralizer_zpowers_eq_singleton]
+      intro s hs
+      rw [Subgroup.mem_centralizer_iff]
+      intro w hw
+      rw [Set.mem_singleton_iff] at hw
+      subst hw
+      exact (Subgroup.mem_centralizer_iff.mp hyC s (SetLike.mem_coe.mpr hs)).symm
+    -- main body of the absorption.
+    intro W hWnorm hWp hWM
+    -- `W ≤ P` by Sylow conjugacy and `M`-invariance.
+    have hWP : W ≤ P := by
+      obtain ⟨TW, hWTW⟩ := hWp.comap_subtype.exists_le_sylow (G := M)
+      have hPcard : Nat.card ↥(P.subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_M).toEquiv, hPdef,
+          Subgroup.card_map_of_injective E.subtype_injective, PE.card_eq_multiplicity,
+          factorization_card_eq_of_notMem_sigma h hpσ]
+      obtain ⟨m, hm⟩ := MulAction.exists_smul_eq ↥M TW (Sylow.ofCard (P.subgroupOf M) hPcard)
+      have hW_le_TWmap : W ≤ (TW : Subgroup ↥M).map M.subtype := by
+        rw [← Subgroup.map_subgroupOf_eq_of_le hWM]
+        exact Subgroup.map_mono hWTW
+      have hsmul_eq : MulAut.conj (m : G) • ((TW : Subgroup ↥M).map M.subtype) = P := by
+        have h1 : ((m • TW : Sylow p ↥M) : Subgroup ↥M).map M.subtype = P := by
+          rw [hm]
+          show (P.subgroupOf M).map M.subtype = P
+          exact Subgroup.map_subgroupOf_eq_of_le hP_le_M
+        rw [← h1, Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def,
+          Subgroup.pointwise_smul_def, Subgroup.map_map, Subgroup.map_map]
+        rfl
+      have hWfix : MulAut.conj (m : G) • W = W :=
+        conj_smul_eq_self_of_mem_normalizer (hWnorm m.2)
+      calc W = MulAut.conj (m : G) • W := hWfix.symm
+        _ ≤ MulAut.conj (m : G) • ((TW : Subgroup ↥M).map M.subtype) :=
+            Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hW_le_TWmap
+        _ = P := hsmul_eq
+    -- `W ≤ C_G(M_σ)`.
+    have hWMσ_bot : W ⊓ S10.Msigma M = ⊥ := by
+      rw [← Subgroup.card_eq_one]
+      obtain ⟨k, hk⟩ := hWp.exists_card_eq
+      have h1 : Nat.card ↥(W ⊓ S10.Msigma M : Subgroup G) ∣ p ^ k := by
+        rw [← hk]
+        exact Subgroup.card_dvd_of_le inf_le_left
+      have hnp : ¬ p ∣ Nat.card ↥(W ⊓ S10.Msigma M : Subgroup G) := by
+        intro hdvd
+        exact hMσp (hdvd.trans (Subgroup.card_dvd_of_le inf_le_right))
+      exact Nat.Coprime.eq_one_of_dvd
+        (Nat.Coprime.pow_right k
+          ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hnp).symm) h1
+    have hWC : W ≤ Subgroup.centralizer (S10.Msigma M : Set G) := by
+      rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, ← le_bot_iff, ← hWMσ_bot]
+      rw [Subgroup.commutator_le]
+      intro w hw s hs
+      refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+      · have h1 : s * w⁻¹ * s⁻¹ ∈ W :=
+          (Subgroup.mem_normalizer_iff.mp (hWnorm ((S10.Msigma_le M) hs)) w⁻¹).mp
+            (W.inv_mem hw)
+        have h2 : w * (s * w⁻¹ * s⁻¹) ∈ W := W.mul_mem hw h1
+        rw [commutatorElement_def]
+        simpa [mul_assoc] using h2
+      · have h1 : w * s * w⁻¹ ∈ S10.Msigma M :=
+          (Subgroup.mem_normalizer_iff.mp
+            ((le_normalizer_opiCoreInG _ _) (hWM hw)) s).mp hs
+        have h2 : w * s * w⁻¹ * s⁻¹ ∈ S10.Msigma M :=
+          Subgroup.mul_mem _ h1 (Subgroup.inv_mem _ hs)
+        rwa [commutatorElement_def]
+    -- decompose `x ∈ W ≤ P = A₀ ⊔ Z`; the `Z`-part centralizes `M_σ`, hence is trivial.
+    intro x hx
+    have hxP : x ∈ P := hWP hx
+    have hxC : x ∈ Subgroup.centralizer (S10.Msigma M : Set G) := hWC hx
+    haveI hA₀P_norm : (A₀.subgroupOf P).Normal := by
+      constructor
+      intro n hn g
+      rw [Subgroup.mem_subgroupOf] at hn ⊢
+      have hcomm : (g : G) * (n : G) = (n : G) * (g : G) :=
+        congrArg Subtype.val (hP_ab.is_comm.comm (g : ↥P) (n : ↥P))
+      have heq : ((g * n * g⁻¹ : ↥P) : G) = (n : G) := by
+        simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
+        rw [hcomm]
+        group
+      rw [heq]
+      exact hn
+    have hxsub : (⟨x, hxP⟩ : ↥P) ∈ A₀.subgroupOf P ⊔ Z.subgroupOf P := by
+      rw [← Subgroup.subgroupOf_sup hA₀_le_P hZ_le_P, ← hP_sup]
+      exact Subgroup.mem_subgroupOf.mpr hxP
+    have hxsub' : (⟨x, hxP⟩ : ↥P) ∈
+        (A₀.subgroupOf P : Set ↥P) * (Z.subgroupOf P : Set ↥P) := by
+      rw [← Subgroup.normal_mul]
+      exact hxsub
+    obtain ⟨a, ha, z, hz', haz⟩ := hxsub'
+    have haA₀ : (a : G) ∈ A₀ := Subgroup.mem_subgroupOf.mp ha
+    have hzZ : (z : G) ∈ Z := Subgroup.mem_subgroupOf.mp hz'
+    have hzeq : (z : G) = ((a : ↥P) : G)⁻¹ * x := by
+      have h1 : (z : ↥P) = a⁻¹ * ⟨x, hxP⟩ := by rw [← haz]; group
+      calc (z : G) = ((a⁻¹ * ⟨x, hxP⟩ : ↥P) : G) := congrArg Subtype.val h1
+        _ = ((a : ↥P) : G)⁻¹ * x := rfl
+    have hzC : (z : G) ∈ Z ⊓ Subgroup.centralizer (S10.Msigma M : Set G) := by
+      refine ⟨hzZ, ?_⟩
+      rw [hzeq]
+      exact Subgroup.mul_mem _
+        (Subgroup.inv_mem _ ((hA₀_le_inf.trans inf_le_right) haA₀)) hxC
+    rw [hZC_bot, Subgroup.mem_bot] at hzC
+    have hxa : x = ((a : ↥P) : G) := by
+      have h1 : (⟨x, hxP⟩ : ↥P) = a := by
+        rw [← haz, show z = 1 from Subtype.ext hzC]
+        exact mul_one a
+      calc x = ((⟨x, hxP⟩ : ↥P) : G) := rfl
+        _ = ((a : ↥P) : G) := congrArg Subtype.val h1
+    rw [hxa]
+    exact haA₀
+  exact ⟨A₀, hinf_eq.symm, by rw [hA₀.2, pow_one], hA₀A, hMσ_cent, hc, habs⟩
 
 end OddOrder.BG.Ch3.S12
