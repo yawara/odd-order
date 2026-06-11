@@ -752,16 +752,20 @@ theorem exists_charSubgroup_exponent_not_centralized [Finite G]
       _ = x * y := by group
 
 /-- **PQ-invariant Sylow subgroup of `M_α` for Lemma 12.18(a)**. For `r ∈ α(M)` and an
-`α(M)'`-subgroup `X ≤ M`, `M_α` has an `X`-invariant Sylow `r`-subgroup `R` with `r(R) ≥ 3`,
-since `R` carries the full `r`-rank `r_r(M) ≥ 3` of `M` (`r ∈ α(M)` ⟹ a Sylow `r` of `M` lies
-in the Hall `α`-subgroup `M_α`). The coprime-action construction mirrors Lemma 10.3
-(`aInvariant_pSubgroup_le_aInvariant_sylow`). Applied with `X = P ⊔ Q` in Lemma 12.18(a). -/
+`α(M)'`-subgroup `X ≤ M`, `M_α` has an `X`-invariant Sylow `r`-subgroup `R` with `r(R) ≥ 3`
+containing any prescribed `X`-invariant `r`-subgroup `P₀` of `M_α`, since `R` carries the full
+`r`-rank `r_r(M) ≥ 3` of `M` (`r ∈ α(M)` ⟹ a Sylow `r` of `M` lies in the Hall `α`-subgroup
+`M_α`). The coprime-action construction mirrors Lemma 10.3
+(`aInvariant_pSubgroup_le_aInvariant_sylow`). Applied with `X = P ⊔ Q` and `P₀ = ⊥`
+(first conjunct) resp. `P₀ = ⟨z⟩` (second conjunct) in Lemma 12.18(a). -/
 theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {r : ℕ} [Fact r.Prime]
     (hrα : r ∈ S10.alpha M) {X : Subgroup G} (hXM : X ≤ M)
-    (hXpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ X) :
+    (hXpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ X) {P₀ : Subgroup G}
+    (hP₀a : P₀ ≤ S10.Malpha M) (hP₀r : IsPGroup r ↥P₀)
+    (hP₀inv : X ≤ Subgroup.normalizer (P₀ : Set G)) :
     ∃ R : Subgroup G, R ≤ S10.Malpha M ∧ IsPGroup r ↥R ∧
-      X ≤ Subgroup.normalizer (R : Set G) ∧ 3 ≤ rank ↥R := by
+      X ≤ Subgroup.normalizer (R : Set G) ∧ 3 ≤ rank ↥R ∧ P₀ ≤ R := by
   classical
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
   haveI : IsSolvable ↥(S10.Malpha M) :=
@@ -786,10 +790,19 @@ theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpl
       ((S10.Malpha M).subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * ((S10.Malpha M).subtype x) * (↑a) := by
     intro a x
     rw [← map_inv]; simpa using hφ_coe a⁻¹ x
-  obtain ⟨S, hS_inv, -⟩ :=
+  have hP₀'_pgrp : IsPGroup r ↥(P₀.subgroupOf (S10.Malpha M)) :=
+    hP₀r.of_equiv (Subgroup.subgroupOfEquivOfLe hP₀a).symm
+  have hP₀'_inv : Ch03.IsAInvariant φ (P₀.subgroupOf (S10.Malpha M)) := by
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro a g hg
+    rw [Subgroup.mem_subgroupOf] at hg ⊢
+    have hcoe : ((φ a) g : G) = (↑a) * (g : G) * (↑a)⁻¹ := hφ_coe a g
+    rw [hcoe]
+    exact (Subgroup.mem_normalizer_iff.mp (hP₀inv a.2) _).mp hg
+  obtain ⟨S, hS_inv, hP₀S⟩ :=
     OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow (G := ↥(S10.Malpha M)) (A := ↥X)
-      (φ := φ) hcop (Or.inr inferInstance) (p := r) (P := ⊥)
-      (IsPGroup.of_card (n := 0) (by simp)) (Ch03.IsAInvariant.bot φ)
+      (φ := φ) hcop (Or.inr inferInstance) (p := r) (P := P₀.subgroupOf (S10.Malpha M))
+      hP₀'_pgrp hP₀'_inv
   set R : Subgroup G := (S : Subgroup ↥(S10.Malpha M)).map (S10.Malpha M).subtype with hRdef
   have hR_pgrp : IsPGroup r ↥R :=
     S.2.of_equiv (Subgroup.equivMapOfInjective _ _ (S10.Malpha M).subtype_injective)
@@ -823,13 +836,17 @@ theorem exists_invariant_sylow_Malpha_rank_three [Finite G] (hG : IsMinimalSimpl
     have hTpr : pRank ↥((T : Subgroup ↥M).map M.subtype) r ≤ pRank ↥(S10.Malpha M) r :=
       pRank_le_of_injective (f := Subgroup.inclusion hTle) (Subgroup.inclusion_injective hTle)
     omega
-  refine ⟨R, Subgroup.map_subtype_le _, hR_pgrp, hX_norm_R, ?_⟩
-  exact le_trans (le_trans ((S10.mem_alpha_iff M r).mp hrα).2 hRpr) (pRank_le_rank r)
+  refine ⟨R, Subgroup.map_subtype_le _, hR_pgrp, hX_norm_R,
+    le_trans (le_trans ((S10.mem_alpha_iff M r).mp hrα).2 hRpr) (pRank_le_rank r), ?_⟩
+  calc P₀ = (P₀.subgroupOf (S10.Malpha M)).map (S10.Malpha M).subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le hP₀a).symm
+    _ ≤ R := Subgroup.map_mono hP₀S
 
 /-- For subgroups `A`, `B` with `A` normalizing `B` and `A ⊓ B = ⊥`, `|A ⊔ B| = |A|·|B|`
 (applying the disjoint-normal product formula inside `↥(A ⊔ B)`, where `B` is normal). Used in
-Lemma 12.18(a) to confine the primes of `P ⊔ Q` (resp. `Q ⊔ R₁`) to `{p, q}` (resp. `{q, r}`). -/
-private theorem card_sup_eq_mul_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
+Lemma 12.18(a) to confine the primes of `P ⊔ Q` (resp. `Q ⊔ R₁`) to `{p, q}` (resp. `{q, r}`);
+public because the second-conjunct file `S12_Lemma1218` reuses it for `Q ⊔ N`. -/
+theorem card_sup_eq_mul_of_le_normalizer_of_disjoint {G : Type*} [Group G] [Finite G]
     {A B : Subgroup G} (hAB : A ≤ Subgroup.normalizer (B : Set G)) (hdisj : A ⊓ B = ⊥) :
     Nat.card ↥(A ⊔ B) = Nat.card ↥A * Nat.card ↥B := by
   have hAle : A ≤ A ⊔ B := le_sup_left
@@ -972,8 +989,11 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     · exact hPpi s h
     · exact hQpi s h
   -- `R` = a `PQ`-invariant Sylow `r`-subgroup of `M_α` with `r(R) ≥ 3`.
-  obtain ⟨R, hRMa, hRr, hXnormR, hRrank⟩ :=
-    exists_invariant_sylow_Malpha_rank_three hG hM hrα hXM hXpi
+  obtain ⟨R, hRMa, hRr, hXnormR, hRrank, -⟩ :=
+    exists_invariant_sylow_Malpha_rank_three hG hM hrα hXM hXpi bot_le
+      (IsPGroup.of_card (n := 0) (by simp))
+      (fun x _ => Subgroup.mem_normalizer_iff.mpr fun h => by
+        simp [Subgroup.mem_bot, conj_eq_one_iff])
   have hPnormR : P ≤ Subgroup.normalizer (R : Set G) := le_sup_left.trans hXnormR
   have hQnormR : Q ≤ Subgroup.normalizer (R : Set G) := le_sup_right.trans hXnormR
   have hRMle : R ≤ M := hRMa.trans (S10.Malpha_le M)
@@ -1100,24 +1120,7 @@ theorem tau1_Malpha_centralizer_P_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
         inf_le_inf_right _ (hR₁R.trans hRMa)
     _ = ⊥ := hCMaP
 
-/-- **BG Lemma 12.18** (mmd L3454): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, `q ∈ p'`, `Q` を `M` の非自明
-`P`-不変 `q`-部分群で `C_Q(P)=1`, `ℳ(N_G(Q))≠{M}` とすると
-(a) `M_α≠1` かつ `q∉α(M)` なら `C_{M_α}(P)≠1` かつ `C_{M_α}(PQ)=1`;
-(b) `Q` が `M` の Sylow `q` なら `α(M)=β(M)` で (a) の状況が成立。 -/
-theorem tau1_Malpha_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
-    (hqp : q ≠ p) (hp : p ∈ tau1 M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
-    (hPM : P ≤ M) {Q : Subgroup G} (hQM : Q ≤ M) (hQne : Q ≠ ⊥) (hQq : IsPGroup q ↥Q)
-    (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
-    (hCQP : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
-    (hMNQ : maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) ≠ {M}) :
-    (S10.Malpha M ≠ ⊥ → q ∉ S10.alpha M →
-      S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
-      S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) ∧
-    ((∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T) →
-      S10.alpha M = S10.beta M ∧ S10.Malpha M ≠ ⊥ ∧ q ∉ S10.alpha M ∧
-      S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
-      S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) := by
-  sorry
+/- **BG Lemma 12.18** `tau1_Malpha_interaction` lives in the dedicated leaf
+`S12_Lemma1218.lean` (second conjunct of (a) is the hard core; part (b) reduction there). -/
 
 end OddOrder.BG.Ch3.S12
