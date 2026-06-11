@@ -3960,3 +3960,16 @@ Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_prime_mem_sigma_diff_beta
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.index_primeFactors_subset_tau1_union_tau2
+
+/-! ### BG Lemma 12.11(c) + assembly (`S12_Lemma1211`)
+
+(c) `q ∈ π(E/C_E(A)) ∩ π(C_E(A))` forces `q ∈ τ₂(M*)`, a Sylow `p`-subgroup of `G` normal
+in `M*` (`M*_σ` nilpotent by 12.5(a)), and an abelian Sylow `q`-subgroup of `G` inside `M*`
+(12.8(c) chain; the nonabelian case is killed by the 12.7(d) complement against the
+no-complement property of `Ω₁` of the cyclic `q`-Sylow). The maximal `M** ∈ ℳ(N_G(Q₀))`
+is identified with `M*` via 12.6(f) + Theorem 10.1(b). `tau2_transfer_to_maximal` bundles
+(a)(b)(c) (scaffold moved from `S12_E`, (a)-conjunct prime-restricted). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_normalSylow_abelianSylow_of_mem_index_card
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_transfer_to_maximal

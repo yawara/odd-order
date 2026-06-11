@@ -430,24 +430,7 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
 /-! **BG Corollary 12.10** は `S12_Corollary1210.lean` に移動した
 (`nilpotent_sigmaComplement_abelian`)。 -/
 
-/-- **BG Lemma 12.11** (mmd L3284): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `M^* ∈ ℳ(N_G(A))` のとき
-(a) `τ₂(M) ⊆ σ(M^*) - β(M^*)`; (b) `π(E/C_E(A)) ⊆ τ₁(M^*) ∪ τ₂(M^*)`;
-(c) `q ∈ π(E/C_E(A)) ∩ π(C_E(A))` なら `q ∈ τ₂(M^*)`, `G` の Sylow `p` が `M^*` で正規,
-`M^*` は `G` の abelian Sylow `q` を含む。 -/
-theorem tau2_transfer_to_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
-    {Mstar : Subgroup G}
-    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (A : Set G))) :
-    tau2 M ⊆ S10.sigma Mstar \ S10.beta Mstar ∧
-    (∀ r ∈ (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors,
-      r ∈ tau1 Mstar ∪ tau2 Mstar) ∧
-    (∀ q : ℕ, q ∈ (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors →
-      q ∈ (Nat.card ↥(E ⊓ Subgroup.centralizer (A : Set G))).primeFactors →
-      q ∈ tau2 Mstar ∧
-      (∃ P : Sylow p G, Mstar ≤ Subgroup.normalizer ((P : Subgroup G) : Set G)) ∧
-      (∃ Q : Sylow q G, (Q : Subgroup G) ≤ Mstar ∧ IsMulCommutative (Q : Subgroup G))) := by
-  sorry
+/-! **BG Lemma 12.11** は `S12_Lemma1211.lean` に移動した (`tau2_transfer_to_maximal`)。 -/
 
 /-- **BG Theorem 12.12** (mmd L3306): すべての `(τ₁(M)∪τ₃(M))`-元 `e ∈ E#` で `C_{M_σ}(e)=1`
 なら (a) `E` は abelian normal `A₀` を含み `∀ x ∈ M_σ#, C_E(x) ⊆ A₀`;
