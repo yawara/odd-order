@@ -1497,3 +1497,52 @@ trichotomy がある**ことが判明 (既存 repo 注記の訂正が必要)。
 2. **full (3.8) trichotomy** ((4.8)/(4.9)→case-B の真のブロッカー解除; 標的 (b)/(c)-exclusion で
    足りるか先に精査推奨)。
 3. (4.5) で打ち止め (クリーンな milestone)。
+
+## 2026-06-11 (session 26 cont., b-peterfalvi): ✅✅✅ Peterfalvi (3.8) FULL trichotomy COMPLETE
+
+ユーザー選択 (選択肢2) に従い full (3.8) trichotomy を完全形式化。**(4.8)/(4.9)→S08 case-B の
+ブロッカー解除済み。** 3 commits、全 axiom-clean (allowlist 3)、**full build 3764 + AxiomsCheck OK**。
+(3.5) 級と覚悟したが textbook の index-relabelling を回避する clean な分解で 1 セッション内に完了。
+
+### ✅ 着地 — 2 新 leaf
+- **抽象 `grid_trichotomy`** (`S05_GridTrichotomy.lean`, 純 ℂ-grid, minimal import, commit 619ba765):
+  separable grid `a:ι×κ→ℂ` (`a(i,j)+a(i',j')=a(i,j')+a(i',j)`), `|ι|+2≤|κ|`, `|support|<2|ι|` ⟹
+  (a) 全0 / (b) 単一定数列 j₀ / (c) 単一定数行 i₀。
+  - **🔑 核心トリック**: separable grid は `a(i,j)=f i+g j` に分解 (`exists_param`: f i=a(i,j₀),
+    g j=a(i₀,j)-a(i₀,j₀), `linear_combination hadd`)。⟹ f/g の定数性で場合分け (textbook の
+    a_{00}≠0 WLOG + index 並べ替えが**不要**になる)。
+  - f 定数 ⟹ 列依存 b j=f i₀+g j、`card_support_const_snd` で `|support|=|ι|·#{b≠0}`<2|ι| ⟹
+    #{b≠0}≤1 (`Nat.lt_of_mul_lt_mul_right`) ⟹ `eq_zero_or_single` で (a)/(b)。
+  - g 定数 ⟹ 行依存、`card_support_const_fst` で `#{c≠0}·|κ|`<2|ι|、|κ|>|ι| (gcongr+omega) で
+    #{c≠0}≤1 ⟹ (a)/(c)。
+  - 両非定数 ⟹ **`card_support_ge_of_not_const`**: 行ごと二重数え上げ — 各行 ≥1 非零 (g 非定数)、
+    異2行 i₁,i₂ (f i₁≠f i₂) は零集合 disjoint で nonzero 合計 ≥|κ|、`Finset.sum_sdiff` で
+    `|support|=∑_i Srow ≥ |κ|+(|ι|-2)` ⟹ ≥2|ι| (|κ|≥|ι|+2) で hyp と矛盾。
+  - helper: `exists_param`/`card_support_const_snd`/`_fst`/`eq_zero_or_single`/`card_support_ge_of_not_const`。
+- **具体 `sigmaCoeff_trichotomy`** (`S05_SigmaTrichotomy.lean`, imports SigmaIsometry+GridTrichotomy,
+  commit 4b6c79bf): 抽象版を σ-係数 grid `sigmaCoeff=⟨ψ,ω_{ij}^σ⟩` に適用。separability=
+  `sigmaCoeff_add_eq`(3.7), 支持数=`sigmaNC`(3.6 def そのもの), |Ŵ_k|=w_k=`card_charGroup_subgroupOf`,
+  Nonempty Ŵ_k=trivial char `⟨1⟩`。**(4.8) が直接消費する形** ((a)全係数0/(b)単一定数W₂列/(c)単一定数W₁行)。
+  既存 corollary `sigmaCoeff_eq_zero_of_sigmaNC_lt` (NC<min のみ) を真に拡張。
+
+### 🔑 KEY / 再調査するな (session 26 cont. 新規)
+- **trichotomy 結論は DecidableEq-free 形にした** (commit 58454341, consumer hardening): `if j=j₀ then c
+  else 0` 形だと `[DecidableEq κ]` を要求し、Ŵ_k=`(W_k.subgroupOf W)→*ℂˣ` は **DecidableEq 無**で
+  consumer がブロックされる。⟹ 結論を `c≠0 ∧ (∀i, a(i,j₀)=c) ∧ ∀i j, j≠j₀→a(i,j)=0` 形へ。
+  proof 内の Finset 操作 ({i₁,i₂}/sdiff) は `classical` で供給。**MonoidHom→ℂˣ に DecidableEq を期待しない。**
+- **omega の atom 不一致 = beta-redex**: 目標 filter が `(fun j=>f i₀+g j) j` (un-beta)、hlt が
+  `f i₀+g j` (beta'd) だと omega が別 atom 扱い → fail。**`have` の filter は beta'd で書き、
+  `card_support_const_snd (fun j=>...)` は明示引数で渡す** (rw の HO 単一化が b を推論しないため)。
+- **`Finset.card_sdiff` はこの mathlib で `(s\t).card=s.card-(s∩t).card` (subset 仮説なし版)** →
+  subset 版は `Finset.card_sdiff_add_card_eq_card hsub : (t\s).card+s.card=t.card` を使う。
+- **`Nat.mul_le_mul_right` の署名揺れ回避** = `gcongr` で `2*card κ ≤ X*card κ` を `2≤X` に落とす。
+
+### ▶▶ 次 = (4.6) Hypothesis + (4.7) → (4.8)[sigmaCoeff_trichotomy 消費] → (4.9) → S08 case-B
+- **(3.8) ブロッカーは解除済み。** (4.8) は `sigmaCoeff_trichotomy` を ψ=(μ_ij−μ_ik)^τ−δ_j(ω_ij^σ−ω_ik^σ)
+  に適用し、NC(ψ)≤4 で cases (b)/(c) を「ψ は 2 列 j,k に異なる係数」で排除 → case (a)=全係数0 ⟹
+  ψ⊥ω_ij^σ,ω_ik^σ ⟹ ψ=0。
+- 残る最初の大物 = **(4.6) Hypothesis 構造体** (G⊃L が (4.2)+(3.1)+(3.6)+H[W₂⊂H⊂K]+A[(2.2)]+A₀+Dade τ
+  をバンドル)。(2.2)/(3.6) の既存構造体 recon が要る。
+
+正本 = 本ノート (session 26 cont.)。**(3.8) full trichotomy 完成・axiom-clean。Don't re-grind。**
+**trichotomy 結論は DecidableEq-free, beta-redex で omega atom 注意, card_sdiff は add 版 (再調査するな)。**
