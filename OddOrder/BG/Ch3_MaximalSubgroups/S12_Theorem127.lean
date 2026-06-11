@@ -953,4 +953,113 @@ theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
   exact (Subgroup.eq_of_le_of_card_ge hJ_le_F
     (Nat.le_of_dvd Nat.card_pos hF_dvd)).symm
 
+/-! ## Theorem 12.7(e): `π(C_{E₀}(x)) ⊆ τ₁(M)` -/
+
+/-- **BG Theorem 12.7(e), parametrized core** (mmd L3245): for any `E₀ ≤ E` with
+`A₀ ⊓ E₀ = ⊥` and `x ∈ M_σ#`, every prime of `|C_{E₀}(x)|` lies in `τ₁(M)`:
+a `τ₃`-element of `E` lies in `E₃` and is excluded by Corollary 12.6(d); a `p`-element
+centralizing `x` would give a line `X ≠ A₀` with `C_{M_σ}(X) ∋ x ≠ 1`, contradicting
+(c) (or `A₀ ≤ E₀`, contradicting disjointness). -/
+theorem primeFactors_centralizer_le_tau1_of_disjoint [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    (hprime_eq : ∀ q : ℕ, q.Prime → q ∈ tau2 M → q = p)
+    {A₀ : Subgroup G}
+    (hc : ∀ X ∈ elemAbelianOfRank G p 1, X ≤ E → X ≠ A₀ →
+      S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) = ⊥ ∧
+      ¬ (Subgroup.centralizer (X : Set G) ≤ M))
+    {E₀ : Subgroup G} (hE₀E : E₀ ≤ E) (hA₀E₀ : A₀ ⊓ E₀ = ⊥)
+    {x : G} (hx : x ∈ S10.Msigma M) (hx1 : x ≠ 1) :
+    ∀ r ∈ (Nat.card ↥(E₀ ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G)).primeFactors,
+      r ∈ tau1 M := by
+  classical
+  intro r hr
+  have hr_prime : r.Prime := Nat.prime_of_mem_primeFactors hr
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  -- Cauchy: an element `y` of order `r` in `E₀ ⊓ C_G(x)`.
+  obtain ⟨y', hy'ord⟩ := exists_prime_orderOf_dvd_card' r (Nat.mem_primeFactors.mp hr).2.1
+  set y : G := ((y' : ↥(E₀ ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G)) : G)
+    with hydef
+  have hyord : orderOf y = r := by
+    rw [hydef, ← hy'ord]
+    exact orderOf_injective
+      (E₀ ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G).subtype
+      (Subgroup.subtype_injective _) y'
+  have hyE₀ : y ∈ E₀ := y'.2.1
+  have hyC : y ∈ Subgroup.centralizer ({x} : Set G) := y'.2.2
+  have hy1 : y ≠ 1 := by
+    intro h1
+    rw [h1, orderOf_one] at hyord
+    exact hr_prime.one_lt.ne hyord
+  have hyE : y ∈ E := hE₀E hyE₀
+  -- `x ∈ C_G(⟨y⟩)`.
+  have hx_cent : x ∈ Subgroup.centralizer ((Subgroup.zpowers y : Subgroup G) : Set G) := by
+    rw [centralizer_zpowers_eq_singleton]
+    rw [Subgroup.mem_centralizer_iff]
+    intro w hw
+    rw [Set.mem_singleton_iff] at hw
+    subst hw
+    exact (Subgroup.mem_centralizer_iff.mp hyC x (Set.mem_singleton x)).symm
+  -- `r ∈ τ₁ ∪ τ₂ ∪ τ₃`.
+  have hrE : r ∈ (Nat.card ↥E).primeFactors := by
+    refine Nat.mem_primeFactors.mpr ⟨hr_prime, ?_, Nat.card_pos.ne'⟩
+    rw [← hyord]
+    exact Subgroup.orderOf_dvd_natCard E hyE
+  rcases h.mem_tau_union_of_mem_primeFactors hG hrE with h12 | h3
+  rcases h12 with h1 | h2
+  · exact h1
+  · -- `r ∈ τ₂`: then `r = p` and `⟨y⟩` is a line violating (c) or the disjointness.
+    exfalso
+    have hrp : r = p := hprime_eq r hr_prime h2
+    subst hrp
+    set Xy : Subgroup G := Subgroup.zpowers y with hXydef
+    have hXy_mem : Xy ∈ elemAbelianOfRank G r 1 := by
+      refine ⟨Subgroup.IsElementaryAbelian.of_card_prime ?_, ?_⟩
+      · rw [hXydef, Nat.card_zpowers, hyord]
+      · rw [hXydef, Nat.card_zpowers, hyord, pow_one]
+    have hXyE : Xy ≤ E := by
+      rw [hXydef, Subgroup.zpowers_le]
+      exact hyE
+    rcases eq_or_ne Xy A₀ with heq | hne
+    · have h1 : y ∈ A₀ ⊓ E₀ := ⟨heq ▸ Subgroup.mem_zpowers y, hyE₀⟩
+      rw [hA₀E₀, Subgroup.mem_bot] at h1
+      exact hy1 h1
+    · have hcXy := (hc Xy hXy_mem hXyE hne).1
+      have hxmem : x ∈ S10.Msigma M ⊓ Subgroup.centralizer (Xy : Set G) :=
+        ⟨hx, hXydef ▸ hx_cent⟩
+      rw [hcXy, Subgroup.mem_bot] at hxmem
+      exact hx1 hxmem
+  · -- `r ∈ τ₃`: then `y ∈ E₃`, contradicting Corollary 12.6(d).
+    exfalso
+    have hyE₃ : y ∈ E₃ := by
+      have hzpE : Subgroup.zpowers y ≤ E := by
+        rw [Subgroup.zpowers_le]
+        exact hyE
+      haveI hE₃norm : (E₃.subgroupOf E).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr (h.E3_normal hG)
+      have hzp_pi : Ch03.Subgroup.IsPiGroup (tau3 M)
+          ((Subgroup.zpowers y).subgroupOf E) := by
+        intro q hq
+        have h1 : Nat.card ↥((Subgroup.zpowers y).subgroupOf E) = r := by
+          rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hzpE).toEquiv,
+            Nat.card_zpowers, hyord]
+        rw [h1] at hq
+        have h2 : q = r :=
+          (Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hq) hr_prime).mp
+            (Nat.mem_primeFactors.mp hq).2.1
+        rwa [h2]
+      have h1 : (Subgroup.zpowers y).subgroupOf E ≤ E₃.subgroupOf E :=
+        S10.isPiGroup_le_of_normal_isHallSubgroup h.E₃_hall hzp_pi
+      have h2 : (⟨y, hyE⟩ : ↥E) ∈ (Subgroup.zpowers y).subgroupOf E :=
+        Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers y)
+      exact Subgroup.mem_subgroupOf.mp (h1 h2)
+    have h126d := (elemAb_normal_in_E_of_tau2 hG h hp hA hAE).2.2.2.1 y hyE₃ hy1
+    have hxmem : x ∈ S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) := by
+      refine ⟨hx, ?_⟩
+      have := hx_cent
+      rw [centralizer_zpowers_eq_singleton] at this
+      exact this
+    rw [h126d, Subgroup.mem_bot] at hxmem
+    exact hx1 hxmem
+
 end OddOrder.BG.Ch3.S12
