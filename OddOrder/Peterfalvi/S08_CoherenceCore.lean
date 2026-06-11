@@ -6562,6 +6562,73 @@ theorem Xset_nonempty_of_subgroupOf_ne_bot (hyp : SibleyDadeHypothesis G L H)
       ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
   exact hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩
 
+open scoped Classical in
+/-- **(6.6)/(6.8) X-set nonemptiness, CertainType (case B) form.**  As
+`Xset_nonempty_of_subgroupOf_ne_bot` but the strictly-positive degree-square sum is supplied by the
+case-B identity `sum_re_sq_Xset_eq_of_irreducible_X` (which needs only `X`-irreducibility, valid in
+case B) instead of the Frobenius `sum_re_sq_Xset_eq`.  The `hX` hypothesis is the `X = S − S(Z) ⊆ Irr L`
+fact (Peterfalvi (6.8.1) for (c2), discharged by `isIrreducibleCharacter_of_mem_Xset_c2_caseA`). -/
+theorem Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} [Z.Normal] (hZbot : Z.subgroupOf H ≠ ⊥)
+    (hX : ∀ χ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)),
+        IsIrreducibleCharacter χ) :
+    (hyp.Xset Z).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hXsum := hyp.sum_re_sq_Xset_eq_of_irreducible_X (Z := Z) hX
+  set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hXdiffdef
+  have hlt : Nat.card (↥H ⧸ Z.subgroupOf H) < Nat.card ↥H := by
+    have h2 : 1 < Nat.card ↥(Z.subgroupOf H) := (Z.subgroupOf H).one_lt_card_iff_ne_bot.mpr hZbot
+    have hcard : Nat.card ↥H
+        = Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup (Z.subgroupOf H)
+    calc Nat.card (↥H ⧸ Z.subgroupOf H)
+        < Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+          lt_mul_of_one_lt_right Nat.card_pos h2
+      _ = Nat.card ↥H := hcard.symm
+  have hidxpos : 0 < H.index := by rw [hyp.index_H_eq_card_W1]; exact Nat.card_pos
+  have hpos : (0 : ℝ) < (H.index : ℝ) *
+      ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+    refine mul_pos (by exact_mod_cast hidxpos) ?_
+    have : (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ) < (Nat.card ↥H : ℝ) := by exact_mod_cast hlt
+    linarith
+  rw [← hXsum] at hpos
+  have hne : Xdiff.Nonempty := by
+    by_contra h
+    rw [Finset.not_nonempty_iff_eq_empty] at h
+    rw [h, Finset.sum_empty] at hpos
+    exact lt_irrefl 0 hpos
+  obtain ⟨χ, hχ⟩ := hne
+  refine ⟨χ, ?_⟩
+  rw [hXdiffdef, Finset.mem_sdiff] at hχ
+  obtain ⟨hχbot, hχnotZ⟩ := hχ
+  obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχbot
+  obtain ⟨-, -, hθne⟩ := Finset.mem_filter.mp hθ
+  have hχS : ClassFunction.induce H θ.toClassFunction ∈ hyp.S := by
+    rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩
+  have hχnotSZ : ClassFunction.induce H θ.toClassFunction ∉ hyp.SsubFiltration Z := by
+    intro hmem
+    rw [hyp.mem_SsubFiltration] at hmem
+    obtain ⟨θ', hne', hker', heq'⟩ := hmem
+    exact hχnotZ (Finset.mem_image.mpr
+      ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+  exact hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩
+
 /-- **(6.6)/(6.8) X-set nonemptiness at the central commutator** (the redesign's `hXne`).
 `X(Zc)` with `Zc = Z(H) ∩ H′` is nonempty whenever `H` is non-abelian (`commutator ↥H ≠ ⊥`),
 since then `Zc ≠ ⊥` (`centralCommutator_ne_bot`), hence `Zc.subgroupOf H ≠ ⊥` (`Zc ≤ H`). -/
