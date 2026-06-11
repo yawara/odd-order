@@ -20,12 +20,12 @@ E は LAUNCH.md の新 leaf デフォルト (10.13 → `S10_RankTwoStructure.lea
 
 ## やること
 
-- [ ] topic 境界の特定 (候補: Lemma 10.13 cluster ~1,108 行を `S10_RankTwoStructure.lean` へ
+- [x] topic 境界の特定 (候補: Lemma 10.13 cluster ~1,108 行を `S10_RankTwoStructure.lean` へ
       suffix-split; 10.3/10.4 は既に E が `S10_LocalCriteria.lean` へ移動済みなので残部の結束を確認)
-- [ ] prefix/suffix-split 実施 (手順 = CLAUDE.md「分割の owner と trigger」; 前例 = S08/S12_E/S05
+- [x] prefix/suffix-split 実施 (手順 = CLAUDE.md「分割の owner と trigger」; 前例 = S08/S12_E/S05
       split commits `1c03ec60`/`b2416203`/`954408b2` の python 境界 assert パターン)
-- [ ] OddOrder.lean 登録 + full build + AxiomsCheck green
-- [ ] 下流 import / AxiomsCheck guard 名の不変確認
+- [x] full build + AxiomsCheck green (OddOrder.lean 登録は不要 — Core は S10_LocalLemmas 経由で root closure 内)
+- [x] 下流 import / AxiomsCheck guard 名の不変確認 (module 名 S10_LocalLemmas 保持)
 
 ## 完了条件
 
@@ -37,3 +37,10 @@ S10_LocalLemmas 系の各ファイルが ≤1,500 行で、full build 3631+ gree
 - merge `b5e0f541` (発火元), CLAUDE.md「ファイル粒度 — 分割の owner と trigger」
 - notes/meta/merge_monitor.md 手順 4 (サイズ watch)
 - 分割前例: `1c03ec60` (S08) / `b2416203` (S12_E) / `954408b2` (S05)
+
+## ✅ DONE (2026-06-11, hub)
+
+prefix-split @ L1231 (10.13 cluster 境界): `S10_LocalLemmasCore.lean` 新設 (1,235 行;
+Prop 10.11 + Lemma 10.12) ← `S10_LocalLemmas.lean` (1,158 行; Lemma 10.13 cluster, module 名保持で
+下流不変)。cross-boundary private 1 件 (`conjSmul_eq_map`) を de-private。full build 3635 green /
+AxiomsCheck OK / 実 sorry 264 不変。
