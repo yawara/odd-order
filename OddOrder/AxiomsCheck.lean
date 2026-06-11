@@ -46,6 +46,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -3871,3 +3872,15 @@ All unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.relative_normality_of_abelianSylow
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E2_abelian_of_abelianSylow
+
+/-! ### BG Corollary 12.9 (`S12_Corollary129`)
+
+For `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)`, `q ∈ τ₁(M)`, `Q ∈ ℰ_q¹(E)` with `C_{M_σ}(Q) = 1` and
+`[A,Q] ≠ 1`: (a) `A₀ = [A,Q] ∈ ℰ¹(A)` equals `C_A(M_σ)` and is normal in `M`
+(Proposition 10.11(d) at `K := A`, `P := Q`, sharpened by the 10.11(b) rank bound);
+(b) `A₀` is not conjugate to `A₁ = C_A(Q)` in `G` (cyclic Sylow `q` of `M` forces
+`Q ≤ C_G(A₀)`, collapsing the coprime decomposition `A = A₁ × A₀`);
+(c) `A₁ ∈ ℰ¹(A)` and `C_G(A₁) ⊄ M` (Theorem 12.7(c) after excluding the abelian-Sylow
+case via Lemma 12.8(e) and a Hall-`τ₁` conjugation). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.commutator_decomp_of_tau1_action
