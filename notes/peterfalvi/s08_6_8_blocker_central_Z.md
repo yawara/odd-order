@@ -1374,3 +1374,53 @@ session を要した規模。**次セッション第一手 = CB3 monolith assemb
 **正本 = 本 session 27 entry (上部 2026-06-07 deep-dive は stale: case-A は landed)。**
 **(4.7)-(4.9) は case-B 完全 off-path 確定 (監視レーン裁可と一致); §6 (4.x) は full-Pf scope の正当成果。**
 **case-B の真の残務 = §8 Zc=W₂ branch (monolith+τ₂+L4, case-A mirror) + [Is]2.21。multi-session §8 work。**
+
+## 2026-06-11 (session 28, b-peterfalvi): CB3 の L2 monolith COMPLETE — X(Zc) coherence for c2/math-A (1 commit, full build 3774 + AxiomsCheck 3622 緑、axiom-clean)
+
+session 27 cont.³ の recipe「CB3 monolith assembly」を実施。**copy でなく generic core 化**で着地
+(両 case が 1 つの core を instantiate; CB3 の「generalize して両者が instantiate」哲学に合致)。commit `1b7cd80a`:
+
+### ✅ 着地 (S08_CoherenceCore、全 axiom-clean allowlist 3、AxiomsCheck 登録)
+- **`mem_xSetFinset_iff_mem_Xset`** (bridge): `X=S−S(Z)` の Finset 形 (filter bot-ker `.image Ind` `\`
+  filter Z-ker `.image Ind`) ↔ Set 形 `Xset Z`。monolith inline の hmemXF を generic Z で抽出。
+  c2 の Set 形 irreducibility を Finset 形 nonempty 補題へ橋渡しするため。
+- **`Xset_centralCommutator_isCoherent_of_irreducible_X`** (generic L2 core): Frobenius monolith
+  (旧 8861) を `hX`/`hXne`/`hidxp` パラメトリック化。6 つの hF-use を差し替え (consumer→generic
+  `…withCover_of_irreducible_X`、irr→hX、two_le→`…_of_irreducible_X`、nonempty→hXne param、
+  degree-sum→`sum_re_sq_Xset_eq_of_irreducible_X` + bridge、hidxp→param)。**Z=Zc は両 case 共通**
+  (math-A も Zc=Z(H)∩H′ central を使う; W₁ FPF on Zc は math-A 仮説 Z(H)⊓W₂=⊥ から)。
+- **`Xset_centralCommutator_isCoherent_of_frobenius`**: 上記 generic への薄い delegate へ refactor
+  (hX←`isIrreducibleCharacter_of_mem_Xset_of_frobenius`、hidxp←`hF.coprime_card_kernel_complement`)。
+  **downstream defeq 保存を full build で検証** (consumer は同一引数で呼ばれ `.extension` 不変; S09 等緑)。
+- **`Xset_centralCommutator_isCoherent_of_c2_caseA`** (CB3 deliverable): math-A `Z(H)⊓W₂=⊥` で
+  hX←`isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA`、hXne←`Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X`
+  (hZbot は hHnonab→`centralCommutator_ne_bot`; Form-A は bridge 経由)、hidxp←`cert.card_coprime`
+  (`rw [hK] at hcop`) + `index_H_eq_card_W1`。署名 = `{cert}(hK:cert.K=H)(hW1:cert.W1=hyp.W1)(hA)(hHnonab){p}(hp)(hp3)(hHp)`。
+
+### 🔑 罠 (再調査しない)
+- delegate に `haveI : Fact p.Prime := ⟨hp⟩` 必須 (`hHp.exists_card_eq` が要求; 削ると instance 不足)。
+- `hK ▸ cert.card_coprime` は motive 計算失敗 → `have hcop := cert.card_coprime; rw [hK] at hcop` で回避。
+- 巨大 body の prefix-replace 後の残骸は `sed -i '<start>,<end>d'` で line-range 削除 (string-match は generic と
+  body 重複で曖昧化)。
+
+### ▶▶ 次 = CB3 の L3/L4 一般化 → CB4 (math-B) → CB6 wiring
+- **CB3 残 (math-A 上位 assembly)**: L2 (X(Zc) coherence) は landed。**L3 glue
+  `coherentXunionYset_centralCommutator_of_glued_of_frobenius` (S08:9176) + L4
+  `false_of_coherentXunionYset_of_not_coherentS` (S08:6661) + capstone
+  `nonempty_coherent_S_caseA_of_frobenius` (S08:11673) は全て hF 固有**で要一般化。
+  **🛑 L4 は機械的でない (session 28 survey 結果)**: L4 は break-pair `ψ∈S` の**既約性**を実質使用
+  (`isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS` @ ~6703 で ψ を Ind θ と分解)。だが **c2 では
+  W₁ は H 全体に FPF でない** (`cert.centralizer_W2`: w∈W₁^# で C_L(w)⊓H=W₂≠1) ⟹ **S-members は既約とは
+  限らない** (reducible Ind θ は I_L(θ)>H 由来; これらは S(Z) に入り X=S−S(Z) からは除かれるが、L4 の
+  break-pair ψ は S 全体から来るので reducible でありうる)。∴ c2 L4 は **reducible ψ を扱う別論法**が要る
+  (X-members だけで break するか、(5.6) 評価を reducible ψ へ拡張するか — 要設計)。他の hF-use
+  (`S_hasNoRealCharacters hF` @ ~6691 [|L| 奇 ⟹ no real char; hF 非依存化可能か?] / `xSum_le_two_psi hF` @ ~6715 /
+  `centralCommutator_card_subgroupOf_lower hF hHnonab` @ ~6750) も要 c2 版。`_general` diagonal 変種 (9219/11488) は既存。
+- **CB4 (math-B, Z=W₂)**: ⚠ 当 generic core は **Z=Zc 固定** (math-B の Z=W₂ には非適用; かつ math-B では
+  W₁ が W₂ に FPF でない ⟹ X(W₂)⊆Irr は (4.5)/(1.6) 経由・FPF 不可)。math-B は X(Z) coherence でなく
+  **§5/§7 reflection で τ₂ を直接構成** (session 27 RECON: χ_i 既約 ⟹ `dadeOrthonormalCharacterImageFamily`
+  供給可・(4.9) 不要)。W₂ の L-normality も要解決。CB4 は CB3 と別構造。
+- **CB6 (wiring)**: `sibleySetup_is_coherent` (S08_CoherenceTheorems:59 sole sorry) を `hyp.cases` split へ
+  (inl=Frobenius landed brick / inr=`by_cases center⊓W₂sub=⊥` → math-A (CB3) / math-B (CB4))。
+
+**正本 = 本 session 28 entry。CB3-L2 done; 残 = CB3-L3/L4 一般化 (hF→c2) + CB4 (math-B τ₂, 別構造) + CB6 wiring。**

@@ -8849,20 +8849,66 @@ theorem natSum_partition_of_realSum {α : Type*} [DecidableEq α]
   exact hXsumN
 
 open scoped Classical in
-/-- **(6.6)/(6.8) X = S − S(Zc) coherence at the central commutator — the L2 producer.**
-The redesign's L2 deliverable: `X(Zc)` is coherent, with `Zc = Z(H) ∩ H′` central.  Builds the
-per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (the first-ever such term) for every
-chain step and feeds it to the `…withCover…` Zc shell.  Per step: the current head `χs i` and every
-`X`-member `Ind θ` have degree `|L:H|·p^k` (`exists_index_primePow_degree_of_mem_S`), the central
-degree bound `θχ² ≤ |H:Zc|` holds ([Is] Cor 2.30 via `exists_source_primePow_centralBound_of_mem_Xset`),
-the `htail_le` field is `characterDegree_re_le_of_not_mem_pairUnion` (uses `hcover`), and the `hsum`
-partition is `natSum_partition_of_realSum` pinned by `sum_re_sq_Xset_eq`.  `H` is supplied as a
-`p`-group (the capstone's ¬-coherent branch gives this via `isPGroup_of_not_coherent`). -/
-noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
+/-- **`X = S − S(Z)` membership bridge: the induced-character `Finset` form equals the `Set` form.**
+For any `Z`, a class function `φ` lies in the explicit `Finset`
+`(filter bot-kernel).image (Ind ·) \ (filter Z-kernel).image (Ind ·)` (the degree-square-sum domain
+of `sum_re_sq_Xset_eq_of_irreducible_X` / `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X`) iff
+`φ ∈ Xset Z = S − S(Z)`.  Extracted from the L2 monolith's inline `hmemXF` so that a `Set`-form
+irreducibility hypothesis (the `c2`/case-A `isIrreducibleCharacter_of_mem_Xset_c2_caseA`) can feed the
+`Finset`-form nonemptiness lemma. -/
+theorem mem_xSetFinset_iff_mem_Xset (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} [Z.Normal] (φ : ClassFunction ↥L ℂ) :
+    φ ∈ ((Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction)) ↔
+      φ ∈ hyp.Xset Z := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  rw [Finset.mem_sdiff]
+  constructor
+  · rintro ⟨hbot, hnotZ⟩
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hbot
+    obtain ⟨-, -, hθne⟩ := Finset.mem_filter.mp hθ
+    refine hyp.mem_Xset.mpr ⟨by rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩, ?_⟩
+    intro hmem
+    rw [hyp.mem_SsubFiltration] at hmem
+    obtain ⟨θ', hne', hker', heq'⟩ := hmem
+    exact hnotZ (Finset.mem_image.mpr
+      ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+  · intro hφ
+    obtain ⟨hφS, hφnotZ⟩ := hyp.mem_Xset.mp hφ
+    rw [hyp.S_eq, Set.mem_setOf_eq] at hφS
+    obtain ⟨θ, hθne, rfl⟩ := hφS
+    refine ⟨Finset.mem_image.mpr ⟨θ, Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_, hθne⟩, rfl⟩, ?_⟩
+    · intro x hx
+      rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
+      subst hx; exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+    · intro hmem
+      obtain ⟨θ', hθ', hθ'eq⟩ := Finset.mem_image.mp hmem
+      obtain ⟨-, hker', hne'⟩ := Finset.mem_filter.mp hθ'
+      exact hφnotZ (hyp.mem_SsubFiltration.mpr ⟨θ', hne', hker', hθ'eq.symm⟩)
+
+open scoped Classical in
+/-- **(6.6)/(6.8) X = S − S(Zc) coherence — the L2 producer, generalized over the irreducibility
+input.**  `X(Zc)` is coherent (`Zc = Z(H) ∩ H′` central) given **only** that every `X`-member is
+irreducible (`hX`), that `X` is nonempty (`hXne`), and that `|L:H|` is coprime to `p` (`hidxp`).
+Builds the per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` for every chain step and feeds
+it to the `…withCover…` generic shell.  The Frobenius case (`…_of_frobenius`) and the
+certain-type/case-A case (`…_of_c2_caseA`) are thin specializations differing only in how
+`hX`/`hXne`/`hidxp` are produced (`isIrreducibleCharacter_of_mem_Xset_of_frobenius` +
+`hF.coprime_card_kernel_complement` vs `isIrreducibleCharacter_of_mem_Xset_c2_caseA` +
+`cert.card_coprime`). -/
+noncomputable def Xset_centralCommutator_isCoherent_of_irreducible_X
     (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
-    (hHnonab : _root_.commutator ↥H ≠ ⊥)
-    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H) :
+    (hX : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ)
+    (hXne : (hyp.Xset hyp.centralCommutator).Nonempty)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H)
+    (hidxp : Nat.Coprime H.index p) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   letI : H.Normal := hyp.H_normal
@@ -8870,17 +8916,6 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
   haveI : Fintype ↥H := Fintype.ofFinite _
   haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
   haveI : Fact p.Prime := ⟨hp⟩
-  -- `|L:H|` coprime to `p`
-  have hpdvd : p ∣ Nat.card ↥H := by
-    obtain ⟨n, hn⟩ := hHp.exists_card_eq
-    have hn0 : n ≠ 0 := by
-      rintro rfl
-      rw [pow_zero] at hn
-      exact (Finite.one_lt_card_iff_nontrivial.mpr inferInstance).ne' hn
-    rw [hn]; exact dvd_pow_self p hn0
-  have hidxp : Nat.Coprime H.index p := by
-    rw [hyp.index_H_eq_card_W1]
-    exact (Nat.Coprime.coprime_dvd_left hpdvd hF.coprime_card_kernel_complement).symm
   -- the common-index degree exponent over `X(Zc)`
   have hdegX : ∀ φ ∈ hyp.Xset hyp.centralCommutator,
       ∃ kφ : ℕ, (φ : ClassFunction ↥L ℂ) 1 = ((H.index * p ^ kφ : ℕ) : ℂ) :=
@@ -8893,8 +8928,8 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
     exists_primePow_card_quotient_of_isPGroup hp hHp (hyp.centralCommutator.subgroupOf H)
   have hZle : Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) ≤ Nat.card ↥H :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.card_quotient_dvd_card _)
-  refine hyp.Xset_centralCommutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_frobenius
-    hF hHnonab ?_
+  refine hyp.Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover_of_irreducible_X
+    (Z := hyp.centralCommutator) hyp.centralCommutator_le hX hXne ?_
   intro pair N χs hpair0 hpair1 hpairs hdisj hmono hcover i hi
   -- `χs i ∈ X(Zc)`
   have hχiX : (χs i : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
@@ -8906,8 +8941,7 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
   -- member-family enumeration
   choose k χmem hconj using
     hyp.exists_pairUnion_memberFamily_of_irreducible_X hyp.centralCommutator_le
-      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
-      hpair0 hpair1 hpairs hi
+      hX hpair0 hpair1 hpairs hi
   obtain ⟨hχinj, hrange, -, -, -, -, -, -⟩ := hconj
   -- members lie in `X(Zc)`
   have hmemX : ∀ j : Fin k, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Xset hyp.centralCommutator := by
@@ -8920,11 +8954,10 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
     · exact hpairs j' (hj'.trans hi) hj'pair
   -- base-block anchor
   have hbbne : (hyp.xBaseBlock hyp.centralCommutator).Nonempty := by
-    rw [← Set.ncard_pos (hyp.xSet_finite_of_irreducible_X
-      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ) |>.subset
+    rw [← Set.ncard_pos (hyp.xSet_finite_of_irreducible_X hX |>.subset
         (hyp.xBaseBlock_subset _))]
-    exact lt_of_lt_of_le (by norm_num) (hyp.two_le_xBaseBlock_ncard hF hyp.centralCommutator_le
-      (hyp.Xset_centralCommutator_nonempty hF hHnonab))
+    exact lt_of_lt_of_le (by norm_num) (hyp.two_le_xBaseBlock_ncard_of_irreducible_X
+      hyp.centralCommutator_le hX hXne)
   choose i₁ hanchor using hyp.exists_xBaseBlock_anchor_index hrange hbbne
   -- the `X(Zc)` index Finset (the `sum_re_sq_Xset_eq` domain) and its coe
   set XF := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
@@ -8936,35 +8969,13 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
                 (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
           (fun θ => ClassFunction.induce H θ.toClassFunction) with hXFdef
   have hmemXF : ∀ φ, φ ∈ XF ↔ φ ∈ hyp.Xset hyp.centralCommutator := by
-    intro φ
-    rw [hXFdef, Finset.mem_sdiff]
-    constructor
-    · rintro ⟨hbot, hnotZ⟩
-      obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hbot
-      obtain ⟨-, -, hθne⟩ := Finset.mem_filter.mp hθ
-      refine hyp.mem_Xset.mpr ⟨by rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩, ?_⟩
-      intro hmem
-      rw [hyp.mem_SsubFiltration] at hmem
-      obtain ⟨θ', hne', hker', heq'⟩ := hmem
-      exact hnotZ (Finset.mem_image.mpr
-        ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
-    · intro hφ
-      obtain ⟨hφS, hφnotZ⟩ := hyp.mem_Xset.mp hφ
-      rw [hyp.S_eq, Set.mem_setOf_eq] at hφS
-      obtain ⟨θ, hθne, rfl⟩ := hφS
-      refine ⟨Finset.mem_image.mpr ⟨θ, Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_, hθne⟩, rfl⟩, ?_⟩
-      · intro x hx
-        rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot, Set.mem_singleton_iff] at hx
-        subst hx; exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
-      · intro hmem
-        obtain ⟨θ', hθ', hθ'eq⟩ := Finset.mem_image.mp hmem
-        obtain ⟨-, hker', hne'⟩ := Finset.mem_filter.mp hθ'
-        exact hφnotZ (hyp.mem_SsubFiltration.mpr ⟨θ', hne', hker', hθ'eq.symm⟩)
+    intro φ; rw [hXFdef]; exact hyp.mem_xSetFinset_iff_mem_Xset (Z := hyp.centralCommutator) φ
   -- real degree-square sum over `XF`
   have hrealSum : (∑ φ ∈ XF, ((H.index * p ^ e φ : ℕ) : ℝ) ^ 2)
       = (H.index : ℝ) * ((Nat.card ↥H : ℝ)
           - (Nat.card (↥H ⧸ hyp.centralCommutator.subgroupOf H) : ℝ)) := by
-    rw [← hyp.sum_re_sq_Xset_eq hF (Z := hyp.centralCommutator)]
+    rw [← hyp.sum_re_sq_Xset_eq_of_irreducible_X (Z := hyp.centralCommutator)
+      (fun χ hχ => hX χ ((hmemXF χ).mp hχ))]
     refine Finset.sum_congr rfl (fun φ hφ => ?_)
     have hφX := (hmemXF φ).mp hφ
     rw [he φ hφX, Complex.natCast_re]
@@ -9059,6 +9070,99 @@ noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
       hθsq_le_qtot := by rw [← pow_two]; exact hχsq
       htotal := hyp.index_mul_card_sub_factor (Z := hyp.centralCommutator)
       hidx_p := hidxp }
+
+open scoped Classical in
+/-- **(6.6)/(6.8) X = S − S(Zc) coherence at the central commutator — the L2 producer.**
+The redesign's L2 deliverable: `X(Zc)` is coherent, with `Zc = Z(H) ∩ H′` central.  Builds the
+per-step `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (the first-ever such term) for every
+chain step and feeds it to the `…withCover…` Zc shell.  Per step: the current head `χs i` and every
+`X`-member `Ind θ` have degree `|L:H|·p^k` (`exists_index_primePow_degree_of_mem_S`), the central
+degree bound `θχ² ≤ |H:Zc|` holds ([Is] Cor 2.30 via `exists_source_primePow_centralBound_of_mem_Xset`),
+the `htail_le` field is `characterDegree_re_le_of_not_mem_pairUnion` (uses `hcover`), and the `hsum`
+partition is `natSum_partition_of_realSum` pinned by `sum_re_sq_Xset_eq`.  `H` is supplied as a
+`p`-group (the capstone's ¬-coherent branch gives this via `isPGroup_of_not_coherent`). -/
+noncomputable def Xset_centralCommutator_isCoherent_of_frobenius
+    (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `|L:H|` coprime to `p`
+  have hpdvd : p ∣ Nat.card ↥H := by
+    obtain ⟨n, hn⟩ := hHp.exists_card_eq
+    have hn0 : n ≠ 0 := by
+      rintro rfl
+      rw [pow_zero] at hn
+      exact (Finite.one_lt_card_iff_nontrivial.mpr inferInstance).ne' hn
+    rw [hn]; exact dvd_pow_self p hn0
+  have hidxp : Nat.Coprime H.index p := by
+    rw [hyp.index_H_eq_card_W1]
+    exact (Nat.Coprime.coprime_dvd_left hpdvd hF.coprime_card_kernel_complement).symm
+  exact hyp.Xset_centralCommutator_isCoherent_of_irreducible_X
+    (fun _ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hφ)
+    (hyp.Xset_centralCommutator_nonempty hF hHnonab) hp hp3 hHp hidxp
+
+open scoped Classical in
+/-- **(6.6)/(6.8) X(Zc) coherence, certain-type case (B), math-(A) sub-case `Z(H) ∩ W₂ = ⊥` (CB3).**
+The CertainType/(c2) analogue of `Xset_centralCommutator_isCoherent_of_frobenius` under the math-(A)
+hypothesis `Z(H) ⊓ W₂ = 1` (`hA`): `W₁` still acts fixed-point-freely on `Zc = Z(H) ∩ H′`
+(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`), so the same central-`Zc` coherence machinery
+of `Xset_centralCommutator_isCoherent_of_irreducible_X` applies.  The three irreducibility/coprimality
+inputs are produced from the certain-type data: `hX` from `isIrreducibleCharacter_of_mem_Xset_c2_caseA`,
+`hXne` from `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (the `Set`→`Finset` form converted by
+`mem_xSetFinset_iff_mem_Xset`), and `hidxp` from `cert.card_coprime` + `index_H_eq_card_W1`. -/
+noncomputable def Xset_centralCommutator_isCoherent_of_c2_caseA
+    (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥)
+    {p : ℕ} (hp : p.Prime) (hp3 : 3 ≤ p) (hHp : IsPGroup p ↥H) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  letI : H.Normal := hyp.H_normal
+  haveI := hyp.centralCommutator_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- every `X`-member is irreducible (`W₁` FPF on `Zc` from math-(A))
+  have hX : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hφ
+  -- `Zc.subgroupOf H ≠ ⊥` (since `H` is non-abelian)
+  have hZbot : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
+    intro hbot
+    apply hyp.centralCommutator_ne_bot hHnonab
+    rw [eq_bot_iff]
+    intro z hz
+    have hzH : z ∈ H := hyp.centralCommutator_le hz
+    have hmem : (⟨z, hzH⟩ : ↥H) ∈ hyp.centralCommutator.subgroupOf H :=
+      (Subgroup.mem_subgroupOf).mpr hz
+    rw [hbot, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    exact congrArg Subtype.val hmem
+  -- `X` is nonempty
+  have hXne : (hyp.Xset hyp.centralCommutator).Nonempty :=
+    hyp.Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X hZbot
+      (fun χ hχ => hX χ ((hyp.mem_xSetFinset_iff_mem_Xset (Z := hyp.centralCommutator) χ).mp hχ))
+  -- `|L:H| = |W₁|` coprime to `p`
+  have hpdvd : p ∣ Nat.card ↥H := by
+    obtain ⟨n, hn⟩ := hHp.exists_card_eq
+    have hn0 : n ≠ 0 := by
+      rintro rfl
+      rw [pow_zero] at hn
+      exact (Finite.one_lt_card_iff_nontrivial.mpr inferInstance).ne' hn
+    rw [hn]; exact dvd_pow_self p hn0
+  have hidxp : Nat.Coprime H.index p := by
+    rw [hyp.index_H_eq_card_W1, ← hW1]
+    have hcop := cert.card_coprime
+    rw [hK] at hcop
+    exact (Nat.Coprime.coprime_dvd_left hpdvd hcop).symm
+  exact hyp.Xset_centralCommutator_isCoherent_of_irreducible_X hX hXne hp hp3 hHp hidxp
 
 /-- **(6.8.1)/(6.8), L3 outer shell:** `X(Zc) ∪ Y` is coherent, given the (6.8.1) `τ₃` glue data
 `ν`.  Mirrors `coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner` but at
