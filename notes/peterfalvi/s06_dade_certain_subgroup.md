@@ -1727,3 +1727,20 @@ toTICyclicFullDadeApplication], NC=sigmaNC, ω_ij^σ=sigma_chiColumn_eq_certainT
   実データは S05_SigmaTrichotomy:41 直接 Read と明示行番号で確認済み（信頼可）。次セッションも要警戒。
 
 正本 = 本 session 30。**(4.8)-(4.10) statement/proof は PDF 確定、mmd 再読不要。step(7) 設計も確定。**
+
+### 🔑🔑 残課題確定 (session 30 cont.² — 再調査するな; Edit tool が効かず cat 追記)
+(4.8) 核心 = σ 2層 + τ:
+- `h.tic : TICyclicHypothesis G` (Hypothesis46 field 43, (4.6.b) (3.1)-for-G, tic.W1=W1.map L.subtype)
+  = σ_G (W→G)。**(4.8) trichotomy はこの h.tic で回す** (ψ∈CF(G) で (μ−μ)^τ と型整合)。
+- `h.toTICyclicHypothesis : TICyclicHypothesis L` = σ_L(chiColumn)=δ_j•μ_ij
+  (sigma_chiColumn_eq_certainType @ S06_CertainTypeCharacters:852) — σ_G とは別物。
+- `h.tau : S04.FullDadeIsometryData dade0` (field 65, dade0 field 62) = Dade τ (L→G)。
+- `FullDadeApplication hyp = {tau : FullDadeIsometryData hyp.toDadeHypothesis}` (S05_TICyclic:133 wrapper;
+  helper full_map_eq_of_mem_V[τ の V 値≈(3.2.c)]/full_inner_eq[isometry]/full_maps_virtualCharacter[ZIrr] @151-185)。
+- (4.8) ω_ij^σ = h.tic.sigma rfl <app> (omegaProdCharImage) [tic.W ベース, NOT chiColumn]。
+- step(1) δ_j=δ_k: certainType_degree_modEq(937: μ_ij(1)=δ_j+w₁a)×2列 + μ_ij(1)=μ_ik(1) ⟹
+  |δ_j−δ_k|≤2<w₁(奇数>2) ⟹ δ_j=δ_k [独立小補題、最初に実装]。
+- step(4) ψ|_V=0: v∈V で ψ(v)=(δ_j−δ_k)ω_ik(v)=0 [full_map_eq_of_mem_V+(3.2.c)+certainType_apply_eq_of_mem_V(878)]。
+- step(3)Supp⊂A₀/step(5)λ₁−λ₂/step(7)(8)trichotomy+counting = step(7)セクション参照。
+- ⚠⚠ (4.8) 複数セッション規模 (σ_G 群移行 L↔G + τ-σ_G V値 + λ₁−λ₂ + counting)。
+  段階: step(1)→statement→(3)(4)→(5)→(7)(8)。新 leaf S06_CertainTypeIsometry.lean (root+AxiomsCheck import必須)。
