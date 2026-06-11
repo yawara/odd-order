@@ -48,6 +48,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
@@ -3807,3 +3808,25 @@ assembled as `tau2_singleton_of_nonabelianSylow`. All unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.primeFactors_centralizer_le_tau1_of_disjoint
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_singleton_of_nonabelianSylow
+
+/-! ### BG Lemma 12.8(a)(b)(c) (`S12_Lemma128`)
+
+**BG Lemma 12.8** (mmd L3253), abelian-Sylow case, parts (a)(b)(c): with `S` an abelian
+Sylow `p`-subgroup of `G` containing `A ∈ ℰ_p²(E)`, every `τ₂`-prime has abelian Sylow
+subgroups in `G` (12.7(a) contrapositive), each contributing its full `G`-Sylow inside
+`E`; the chain `S ⊆ N_G(S)' ⊆ F(E) ⊆ C_G(S) ⊆ E` (`sylow_chain_of_abelianSylow`, via
+Corollary 10.7(a) `sylow_le_derivedInG_normalizer`, the Fitting chain through `N_G(A)`
+`derivedInG_normalizer_elemAb_le_fittingInG` [Theorem 4.20(a)], and the
+`O_q × O_q'`-decomposition `sylow_eq_opiCore_fittingInG_of_tau2`); and
+`E₂ = O_{τ₂}(F(E))` is abelian, normal in `E`, and Hall `τ₂(M)` in `G`
+(`E2_abelian_normal_hall_of_abelianSylow`). All unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_le_derivedInG_normalizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.derivedInG_normalizer_elemAb_le_fittingInG
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_eq_opiCore_fittingInG_of_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E2_abelian_normal_hall_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_chain_of_abelianSylow

@@ -62,8 +62,9 @@ theorem le_normalizer_sup {H K L : Subgroup G}
     conj_smul_eq_self_of_mem_normalizer (hK ha),
     conj_smul_eq_self_of_mem_normalizer (hL ha)]
 
-/-- Two naturals with no common prime divisor are coprime. -/
-private theorem coprime_of_forall_prime_not_dvd {m n : ℕ}
+/-- Two naturals with no common prime divisor are coprime.
+(Public: `S12_Lemma128` reuses this for the `O_π × O_π'` order bookkeeping.) -/
+theorem coprime_of_forall_prime_not_dvd {m n : ℕ}
     (h : ∀ r : ℕ, r.Prime → r ∣ m → ¬ r ∣ n) : Nat.Coprime m n := by
   by_contra hne
   obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hne

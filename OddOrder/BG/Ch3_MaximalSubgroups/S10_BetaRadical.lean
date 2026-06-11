@@ -644,8 +644,9 @@ private theorem sylow_structure_e [Finite G] (hG : IsMinimalSimpleOdd G) {p : �
 
 /-- **Schur–Zassenhaus complement to the Sylow `p`-subgroup in its normalizer**: since `P` is a
 normal Sylow `p`-subgroup of `N_G(P)` of order coprime to its index, there is a complement `V`
-with `P ⊓ V = ⊥` and `P ⊔ V = N_G(P)`. This supplies the complement consumed by part (b). -/
-private theorem exists_sylow_complement_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
+with `P ⊓ V = ⊥` and `P ⊔ V = N_G(P)`. This supplies the complement consumed by part (b).
+(Public: §12 uses this to extract `P ≤ N_G(P)'` from `sylow_structure` (Lemma 12.8(c)).) -/
+theorem exists_sylow_complement_normalizer [Finite G] {p : ℕ} [Fact p.Prime]
     (P : Sylow p G) :
     ∃ V : Subgroup G, V ≤ Subgroup.normalizer ((P : Subgroup G) : Set G) ∧
       (P : Subgroup G) ⊓ V = ⊥ ∧
