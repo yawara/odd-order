@@ -225,8 +225,52 @@ mmd L3286-3292。`commutator_decomp_of_tau1_action` (S12_E scaffold を移設・
   `conj_smul_mono`、`map_subtype_conj_smul` (↥M-conj と G-conj の subtype 交換)、
   `exists_conj_le_sylow_of_isPGroup` (S09 private 再掲)。
 
-▶ **次 = Corollary 12.10** (S12_E:446 scaffold `nilpotent_sigmaComplement_abelian`;
-mmd L3293〜; 消費 = 12.5(b)/12.7(a)/12.8(a) [依存表 L778])。
+### ✅ session 6 cont.: **Corollary 12.10 COMPLETE — 全 5 結論** (新 leaf `S12_Corollary1210.lean`, unconditional・axiom-clean)
+
+mmd L3294-3316。`nilpotent_sigmaComplement_abelian` (S12_E scaffold 移設・充足、
+**S12_E 実 sorry 7→6**)。AxiomsCheck 3 本登録 (standard 3 のみ)。
+
+- **⚠ scaffold faithful 化**: (c) 連言に `p.Prime →` を追加 (BG の τ₂ は素数集合だが repo
+  `tau2` は pRank 条件のみで合成数を排除しない — 12.3 の unfaithful 訂正と同類)。
+- **鍵部品 ×2** (public, 12.11+ 再利用可):
+  `sylow_isMulCommutative_of_sigma_compl` (r ∉ σ(M), r ∣ |M| ⟹ M の Sylow r abelian;
+  τ-分割 `SubgroupESetup.mem_tau_union_of_mem_primeFactors` → τ₁/τ₃ = rank-1 cyclic
+  [`pRank_sylow_eq` + `S10.isCyclic_of_pRank_le_one`], τ₂ = **12.5(b) 第 2 連言が直接**
+  [`Msigma_nilpotent_of_tau2 ….2.1.1`]) と
+  `isMulCommutative_of_isNilpotent_of_forall_sylow` (汎用: nilpotent + 全 Sylow abelian ⟹
+  abelian; **`isNilpotent_of_finite_tfae .out 0 4`** の Sylow 直積 equiv + 2 重 funext)。
+- **(a)**: Sylow-of-N → G-level map → ↥M の Sylow へ `exists_le_sylow (G := M)` → 鍵部品。
+  S = ⊥ 枝は Subsingleton で comm。
+- **(b)**: E₂ = by_cases ∃τ₂-素数 (空なら card 1 で trivial) → by_cases nonabelian Sylow:
+  12.7(a)文脈 `E2_isMulCommutative_of_prime_eq` / 12.8(a) `E2_abelian_normal_hall_of_abelianSylow .1.1`。
+  E' = 12.1(a) `h.derived_isNilpotent` + (a)。
+- **(c)**: `A ≤ E₂` = **`IsPiGroup.normal_le_hall`** (A ⊴ E は 12.6(a)、Normal instance =
+  `normal_subgroupOf_iff_le_normalizer`); E₂ ≤ C(A) = `le_centralizer_of_le_of_le`;
+  E₃ ≤ C(A) = ⁅E₃,A⁆ ≤ E₃⊓A = ⊥ (commutator_le 元計算 + coprime [τ₃ vs p∈τ₂ pRank 衝突]);
+  正規性 = `mem_normalizer_of_conj_smul_eq_self` + **`Subgroup.smul_inf`** + `centralizer_conj_smul`;
+  index 素因子 = **`relIndex_mul_relIndex` (hHK/hKL named — H K L が explicit variable)** で
+  `index_{C⊆E} ∣ index_{E₂⊆E}` → Hall .2 で τ₂/τ₃ 排除。
+- **(d)**: `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (↥P 内) → map →
+  **12.4(a) `centralizer_le_of_elemAb_rank_two` は σ/σ' 不問で適用可** (bridge 版に hpσ 引数なし) →
+  10.1(c) = `S10.fusion_control_of_mem_sigma ….2.2.1` の N(P) 元分解 n = a·c。
+- **(e)**: E₂ は M の Hall τ₂ でもある (relIndex 連鎖 + `E.relIndex M = |M_σ|` card 消去) →
+  trivial-action Hall 押し込み + `exists_conj_eq_of_isHall_subgroupOf` で y := x^w ∈ E₂ →
+  A ≤ C(y) (E₂ abelian) → coatom M* ⊇ C(y) は **12.5(e) (`.2.2.2.2.1`)** で = M
+  (C_{M_σ}(y) ≠ ⊥ と M_σ⊓M* = ⊥ の衝突) → C(y) ≠ ⊤ (center = ⊥) で ≤ M →
+  conj 引き戻し (private `centralizer_singleton_conj_smul` + `isCoatom_conj_smul`)。
+- ⚠ 技法: **`rintro rfl` が theorem binder `M` を consume して識別子 `M` が消える**
+  (ext 変数 Mstar = M の subst が M 側を選ぶ) → `intro hMs; rw [hMs]` で回避。
+  `subst hu` (hu : u = x, x = binder) も同罪 → `rw [hu]`。
+  `Subgroup.relIndex_mul_relIndex` は H K L explicit → named (hHK :=)/(hKL :=) で渡す。
+  `(MulAut.conj g).toMonoidHom z = g*z*g⁻¹` は rfl で潰す (conj_apply simp は coe 形に不発)。
+  `Dvd.intro_left` でなく `dvd_of_mul_left_eq`。mem_center/centralizer の comm 向きは `.symm` 要確認。
+- conj_smul_mono (S12_Corollary129) を public 化 (12.10 (e) が使用)。
+
+▶ **次 = Lemma 12.11** (S12_E:450 scaffold `tau2_transfer_to_maximal`; mmd L3318-3340;
+消費 = 12.6(a)(b)(f)/12.5(a)(d)/12.10(c)/12.2(a)/12.4(a)/10.2(c)/12.1(b)(g)/Lem 10.8/
+Thm 10.1(b)/12.7(d) — **大物**)。残 S12_E sorry 6 = 12.4(a) 系 ×3
+(`nonabelian_pgroup_isUniquelyMaximal` / `maximalContaining_centralizer_eq_singleton` /
+`sigma_subgroup_conj_into_Msigma`) + 12.11 + 12.12 + 12.15。
 
 ### (履歴) 残 = 12.8 (d)(e)(f) + assembly — 設計メモ (session 5)
 
