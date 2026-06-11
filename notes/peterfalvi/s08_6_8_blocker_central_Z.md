@@ -1340,14 +1340,21 @@ T(μ_j)=δ_k∑ω_ij^σ)」が要る** (session 8 CB4 の懸念は形式化レ�
 **session-8 CB4 verdict の「X-members χ=Ind θ は reducible ⟹ R に (4.9) 要」は誤り** — Z⊄Ker θ_i が
 Ind θ_i を X(⊆Irr L) に押し込んで既約化する点を見落としていた。
 
-### ▶▶ case-B 完遂の残務 (mirror case-A; (4.9) 不要確定)
-0. ⚠ §1 残 prerequisite = **[Is]2.21** (1.6.a 逆: A⊆Ker Ind θ ⟹ A⊆Ker θ; 現 repo は forward
-   `subsetCharacterKernel_induce_of_subgroupOf` + contrapositive のみ、逆未形式化)。χ_i∈X 判定に要る
-   (X⊆Irr L counting で代替可かは L2 着手時精査)。clean char-theory 補題、(1.2) 級。**(4.9) ではない**。
-1. case-B central-Z facts (Zc=W₂): 大半 landed (W₂ centrality/inertia/X⊆Irr c2 部分@S08:5101)。
-2. case-B X(W₂)-coherence monolith (case-A `Xset_centralCommutator_isCoherent_of_frobenius` の mirror)。
+### ▶▶ case-B 完遂の残務 (mirror case-A; (4.9) 不要・[Is]2.21 不要 = §1/§6 prerequisite 皆無)
+**✅ [Is]2.21 は不要と確定 (前 entry の「prerequisite」claim を撤回)**: S08:265
+`characterKernel_subset_of_isCharacter_of_inner_ne_zero` (genuine ψ の既約 constituent χ
+[⟨ψ,χ⟩≠0] は g∈Ker ψ ⟹ g∈Ker χ) が**既に landed**で、X⊆Irr L はこれ経由でルート。S08:186-191
+docstring が明示: 「両方向 (Res_H φ / Ind_K^L θ) は genuine character 経由ゆえ **[Is] Lemma 2.21 は
+不要**」。⟹ **case-B 閉鎖に §1/§6 の新規 prerequisite は皆無、純粋に §8 Zc 機構のみ**。
+- math-A/math-B split (CertainType 内): **math-A** (Z(H)⊓W₂=⊥) は **Zc=Z(H)∩H' で case-A 機構を再利用**
+  (FPF 入力 `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` landed)、ただし case-A monolith
+  `Xset_centralCommutator_isCoherent_of_frobenius` の `hF:IsFrobeniusGroup` を「W₁ FPF on Zc」へ一般化要
+  (CB3); **math-B** (W₂⊆Z(H)) は **Z=W₂ 機構** (CB4, `W2_subgroupOf_le_center_of_caseB` landed)。
+1. **CB3 (math-A)**: case-A monolith+支持 lemma 群の Frobenius 依存を「W₁ FPF on Z」へ一般化
+   (Z-generic 化)。`isIrreducibleCharacter_of_mem_Xset_caseA` 等 caseA 版の既存度を要監査。
+2. **CB4 (math-B)**: Z=W₂ の monolith + 支持 lemma (W₂ normal/≤H/⊆H'/centrality)。
 3. case-B L3 τ₂ glue + L4 ((6.8.2)/(6.8.3))。
-4. capstone assembly (`hyp.cases` split: Frobenius=landed brick / CertainType=上記)。
+4. capstone assembly (`hyp.cases` split: Frobenius=landed brick / CertainType=math-A∧math-B)。
 
 **正本 = 本 session 27 entry (上部 2026-06-07 deep-dive は stale: case-A は landed)。**
 **(4.7)-(4.9) は case-B 完全 off-path 確定 (監視レーン裁可と一致); §6 (4.x) は full-Pf scope の正当成果。**
