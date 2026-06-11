@@ -135,6 +135,59 @@ root/AxiomsCheck 登録済, full build 緑)。レシピ通り一発 (数学的�
 
 ▶ **次 = Lemma 12.8** (S abelian 側; S12_E:443 scaffold)。
 
+### 🟢 session 5 続き: **Lemma 12.8 (a)(b)(c) COMPLETE** (新 leaf `S12_Lemma128.lean`, 777 行)
+
+mmd L3253-3298 (証明全文 L3260-3284 取得済)。**部品構成** (全 unconditional・axiom-clean,
+AxiomsCheck 5 本登録):
+- `sylow_le_derivedInG_normalizer` = **Cor 10.7(a) complement-free 形** (S ≤ N_G(S)')。
+  `S10.sylow_structure …`.1 + `S10.exists_sylow_complement_normalizer` (**de-private 化**
+  @ S10_BetaRadical:648 — SZ complement producer)。
+- `sylow_isMulCommutative_of_tau2_of_abelian`: S abelian ⟹ **∀ q ∈ τ₂ ∀ Sylow-q-of-G abelian**
+  (12.7(a) 対偶 + Sylow 共役)。`exists_sylow_le_E_of_tau2`: B_q ∈ ℰ_q²(E) ⊆ S_q ≤ C(B_q) ≤ E
+  [12.6(b)]。`factorization_card_E_eq_of_tau2`: ν_q(E) = ν_q(G)。
+- `derivedInG_normalizer_elemAb_le_fittingInG` = **chain core** N_G(B)' ≤ F(E):
+  F(N) ≤ C_G(B) は **O_q × O_q' 分解** (新 helper `oPiCore_sup_compl_eq_top`:
+  nilpotent K で O_π ⊔ O_πᶜ = ⊤, Hall card ×2 + coprime-⊥); O_q-part は abelian q-群 ⊇ B、
+  O_q'-part は coprime normal commutator ⊥。F(N) ≤ F(E) は nilpotent-normal transport。
+  N' ≤ F(N) = **Thm 4.20(a)** (`Ch1.S05.derived_le_fitting_of_rank_fitting_le_two`;
+  rank transport = `rank_le_of_injective` ×2, r(E) ≤ 2 = `h.rank_le_two`)。
+- `sylow_eq_opiCore_fittingInG_of_tau2`: **S_q = O_q(F(E))** ∧ E ≤ N(S_q) ∧ F(E) ≤ C(S_q)。
+  q-群 ≤ O_q(F(E)) は `S10.isPiGroup_le_of_normal_isHallSubgroup` (oPiCore = normal Hall)
+  + card ⟹ eq。汎用 `pGroup_le_opiCoreInG_fittingInG` / π 版 `piGroup_le_…`。
+- **(a)(b)** `E2_abelian_normal_hall_of_abelianSylow`: **E₂ = O_{τ₂}(F(E))**
+  (W := O_{τ₂}(F(E)) が E の normal Hall τ₂ [ν_r(W) = ν_r(E) ∀r∈τ₂-prime ⟸ S_r ≤ W] ⟹
+  E₂ ≤ W 吸収 + card ⟹ =)。abelian は per-prime: Sylow-r(E₂) = O_r(F(E)) ≤ C(E₂)
+  (F(E) ≤ C(S_r) + swap) + `le_of_sylow_le_of_nilpotent`。Hall-of-G は ν_r 連鎖。
+- **(c)** `sylow_chain_of_abelianSylow`: S ≤ N(S)' ≤ F(E) ≤ C(S) ≤ E (部品合成のみ)。
+- 他 de-private: `coprime_of_forall_prime_not_dvd` (127d)。新 helper:
+  `isMulCommutative_of_le` / `isMulCommutative_of_le_centralizer` / `derivedInG_le_derivedInG`。
+
+### ▶ 残 = 12.8 (d)(e)(f) + assembly — **設計済み (session 5)、新 leaf `S12_Lemma128d.lean` 推奨** (777+~700 > 1,500 行 gate)
+
+- **(d)** N(A)=N(S)=N(E₂)=N(E₂E₃)=N(F(E)): **char-chain 一周** N(F(E)) ≤ N(E₂E₃) ≤ N(E₂)
+  ≤ N(S) ≤ N(A) ≤ N(F(E))。部品: S = opiCoreInG {p} E₂ / E₂ = O_{τ₂}(E₂⊔E₃) /
+  E₂⊔E₃ = O_{τ₂∪τ₃}(F(E)) (各 piGroup_le + card; ν_r(F(E)) = ν_r(E₃) ∀r∈τ₃ は
+  E₃ ≤ F(E) [E₃ cyclic→ab→nilp ⊴ E] + E₃_hall)、transport = `le_normalizer_opiCoreInG_of_le_normalizer`。
+  **最後の N(A) ≤ N(F(E)) は F(N)=F(C)=F(E)** (C := C_G(A) ⊴ N [centralizer_conj_smul +
+  conj_smul_eq_self]; F(N) ≤ C [chain core 内既証 — 再導出] ⟹ F(N) ⊴-in-C ⟹ ≤ F(C);
+  F(C) char C ⊴ N ⟹ ≤ F(N); F(C) = F(E) 同型: C ⊴ E + F(E) ≤ C [F(E)≤C(S)≤C(A)])。
+- **(f)** X ≤ N(S) ⟹ C_S(X), ⁅S,X⁆ ⊴ N(S): H := C_G(S) ⊔ X ⊴ N(S)
+  (`Ch06.normal_of_commutator_le`: N(S)' ≤ F(E)∩… ≤ C(S) ≤ H)。
+  C_S(X) = S ⊓ C_G(H) (**centralizer_sup helper 要**: C(H⊔K) = C(H)⊓C(K),
+  sup_eq_closure + closure_induction ~15 行; c ∈ S ⟹ c ∈ C(C_G(S)) swap)。
+  正規性 = conj-invariance (conj_smul_eq_self + centralizer_conj_smul + map_inf injective)。
+  ⁅S,H⁆ = ⁅S,X⁆: h = c·x (`Subgroup.mul_normal`: C(S) ⊴ N(S)) ⟹ [s,cx] = [s,x]。
+- **(e)** X ∈ ℰ_q¹, X ≤ E₁, C_{M_σ}(X) = ⊥ ⟹ X ≤ E ∧ E ≤ C(X): K := E₂⊔E₃ abelian
+  (E₃ cyclic + ⁅E₂,E₃⁆ ≤ ⊓ = ⊥ + centralizer_sup ⟹ K ≤ C(K))。F(E) ≤ C(K)
+  (oPiCore_sup_compl π:=τ₂ で C(E₂)、τ₃ 版で C(E₃))。⁅K,X⁆ ⊴ N(S) ((f) 機構 mirror) ⟹
+  N(S) ≤ N(⁅K,X⁆)。**10.11(d)** = `S10.sigma_complement_commutator_cyclic_normal`
+  (K abelian ✓, hKp' : {q}ᶜ-群 [q∈τ₁ vs τ₂∪τ₃], hPN : X ≤ N(K)⊓M, hCP ✓) ⟹ M ≤ N(⁅K,X⁆)。
+  ⁅K,X⁆ ≠ ⊥ なら N(⁅K,X⁆) = M (maximal + normalizer_lt_top) ⟹ N(S) ≤ M ✗
+  (`normalizer_sylow_le_normalizer_elemAb`.2) ⟹ ⁅K,X⁆ = ⊥ ⟹ K ≤ C(X)。
+  E = E₁ ⊔ K (eq_sup + sup_assoc) + E₁ cyclic (`h.E1_isCyclic`) ⟹ E ≤ C(X)。
+- **assembly**: scaffold `E2_abelian_of_abelianSylow` (S12_E:443) を素直に束ねて移植・削除。
+  ⚠ scaffold (c) の `derivedInG (normalizer …)` 表記と (f) の `S ⊓ C(X)` 形は部品と一致確認。
+
 ### 🟢 session 4 進捗 (履歴): **12.7 = (a)(b)(c)+A₀+habs+(e) 完了、残 = (d)+assembly のみ**
 
 leaf `S12_Theorem127.lean` (root/AxiomsCheck 登録済)。commits: `bec4e194` (prep:
