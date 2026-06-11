@@ -1705,4 +1705,25 @@ sigma_apply_of_mem_V, (3.8) sigmaCoeff_trichotomy [S05_SigmaTrichotomy, Decidabl
 (a)全0/(b)定数W₂列/(c)定数W₁行], τ Dade isometry [sdiffFullDadeIsometryData /
 toTICyclicFullDadeApplication], NC=sigmaNC, ω_ij^σ=sigma_chiColumn_eq_certainType。
 **最難所 = step (7) cases(b)(c) 排除** (ψ の ω^σ 係数構造が「2 列 j,k に ±δ_j」⟹ 単一定数列/行と矛盾)。
-正本 = 本 session 30。**(4.8)-(4.10) statement/proof は PDF 確定、mmd 再読不要。**
+### step(7) 先行調査結果 (session 30 cont. — ユーザー指示「最難所先行調査」)
+- **`sigmaCoeff_trichotomy`** (S05_SigmaTrichotomy:41) signature 確定:
+  `(hyp : TICyclicHypothesis G) [Fintype hyp.W] [Invertible (card W:ℂ)] [Invertible (card G:ℂ)]
+   (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication hyp) {ψ : ClassFunction G ℂ}
+   (hψ : ∀v∈hyp.V, ψ v=0) (hgap : card W1 + 2 ≤ card W2) (hNC : sigmaNC hVeq app ψ < 2*card W1)`
+  → (a) `∀pq, sigmaCoeff..pq=0` / (b) `∃ j₀ c, c≠0 ∧ ∀p sigmaCoeff(p,j₀)=c ∧ ∀p q≠j₀→0` /
+  (c) `∃ i₀ c, c≠0 ∧ ∀q sigmaCoeff(i₀,q)=c ∧ ∀p≠i₀ q→0`。p:Ŵ₁=(W1.subgroupOf W)→*ℂˣ, q:Ŵ₂。
+- **`sigmaCoeff hVeq app ψ (p,q) = ⟨ψ, (omegaProdCharImage hVeq app p q)^σ⟩ = ⟨ψ, ω_{pq}^σ⟩`**
+  (S05_SigmaIsometry:1377)。`sigmaNC` (1385) = 非零係数の個数、`sigmaCoeff_add_eq` (1395, 3.7 separability)。
+- **🔑 cases(b)(c) 排除の設計** (PDF「3個以上同係数 ω^σ 成分」の Lean 化方針):
+  ψ=λ₁−λ₂−δ_j(ω_ij^σ−ω_ik^σ) (step5) ⟹ `sigmaCoeff(ψ)(p,q)=⟨λ₁−λ₂,ω_pq^σ⟩−δ_j([pq=ij]−[pq=ik])`。
+  非零は高々 4 個 (λ₁:+1 を≤1箇所, λ₂:−1 を≤1箇所, (i,j):−δ_j, (i,k):+δ_j)、**各値の出現は高々2回**。
+  (b)(c) は単一列/行に w_k≥3 個の同値 c≠0 を要求 ⟹ 矛盾。**w₁=3 でも**: j₀ 列の行≠i 成分は
+  λ₁−λ₂ のみ (≤2箇所, 値 +1/−1 で異符号) ⟹ 3 行が同値 c≠0 は不可能。counting argument で行ける。
+- **残課題 (実装時に確定要)**: ① **FullDadeApplication の供給元**（S06 直接 grep ヒットせず → `h.dade`
+  経由 or S05 構成、(4.3)/(4.5) certainType 構成で既出のはず — 実装最初に特定）② step(5) τ-image=λ₁−λ₂
+  (norm²=2 virtual + 1 で消滅 ⟹ 2 既約差; `mem_ZIrr`+norm 系) ③ ω^σ 正規直交 ⟨ω_pq^σ,ω_rs^σ⟩=[pq=rs]
+  (`sigma_inner` 系、S05:1310 付近) ④ τ↔σ 関係で ⟨(μ_ij−μ_ik)^τ, ω_pq^σ⟩ を λ₁,λ₂ で表す。
+- ⚠ **環境注記**: 本 session で grep/Read の tool 出力に narration ノイズ + 偽行番号が断続混入。
+  実データは S05_SigmaTrichotomy:41 直接 Read と明示行番号で確認済み（信頼可）。次セッションも要警戒。
+
+正本 = 本 session 30。**(4.8)-(4.10) statement/proof は PDF 確定、mmd 再読不要。step(7) 設計も確定。**
