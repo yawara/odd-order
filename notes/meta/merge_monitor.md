@@ -54,10 +54,12 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
    自動合流せず abort → 報告（上記ポリシー）。
 3b. **root closure 検査 (2026-06-11 追加, E の発見)**: 新規追加 `.lean` ファイル
-   (`git diff --cached --name-only --diff-filter=A -- '*.lean'`) は **`OddOrder.lean` に
-   対応する import 行が必須** (flat list 規約)。欠けていると `lake build OddOrder` の対象外で
-   ゲートをすり抜ける (実例: S05b / S11_MsigmaANormal が closure 外で未検証だった)。
-   欠落時 = hub が import 行を追記してから build (機械的修正、abort 不要)。
+   (`git diff --cached --name-only --diff-filter=A -- '*.lean'`) は **root closure から到達可能**
+   でなければならない — `OddOrder.lean` に import 行があるか、closure 内の他 `.lean` が import
+   している (例: hub の prefix-split で旧 module 名ファイルが新 Core を import する場合は追記不要)。
+   どちらも無いと `lake build OddOrder` の対象外でゲートをすり抜ける (実例: S05b /
+   S11_MsigmaANormal が closure 外で未検証だった)。孤立時 = hub が `OddOrder.lean` に import 行を
+   追記してから build (機械的修正、abort 不要)。
 4. **サイズ watch (粒度規約の enforcement, 2026-06-11)**: 合流後に
    `git diff HEAD^ --stat -- '*.lean'` で touched .lean の現在行数を `wc -l` 確認。
    **1,500 行超の既存ファイルへの追記**を検出したら: 合流は維持しつつ ⚠ flag をサマリに含め、
