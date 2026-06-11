@@ -99,7 +99,71 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
 12.2(b)τ₁τ₃ + 12.5(e)**; §13 で再利用可能) / `centralizer_zpowers_eq_singleton` /
 assembly `elemAb_normal_in_E_of_tau2` (S12_E から移動)。**S12_E 実 sorry 10**。
 
-### 🔵 session 4: **Thm 12.7 設計 (recon 完了, 全依存 EXISTS 確認済)** — mmd L3201-3251
+### 🟢 session 4 進捗: **12.7 = (a)(b)(c)+A₀+habs 完了、残 = (d)(e)+assembly**
+
+leaf `S12_Theorem127.lean` (root/AxiomsCheck 登録済)。commits: `bec4e194` (prep:
+一般 line-engine `le_of_forall_line_inf_centralizer_le` + conj transports public 化) /
+`0cf44a9c` ((a) `tau2_prime_eq_of_nonabelianSylow` — **⚠ faithful 化: tau2 は素数性を
+含まないため素数限定形** + helpers `card_Msigma_mul_card_E` /
+`factorization_card_eq_of_notMem_sigma` / `map_sylow_E_maximal_in_M` /
+`exists_elemAb_rank_two_le_E_of_tau2`) / `a3d2631e` ((c)+A₀ =
+`exists_canonical_line_of_nonabelianSylow`: A₀ = A⊓C(M_σ) card p, M_σ ≤ C(A₀),
+(c) 二分律 [Z₀-枝 = S ≤ C / 10.13(c)-枝 = n∈N_S(A)−M 共役 + ℳ-移送]) /
+`83003c06` (habs: **∀ W ⊴-by-M p-群 → W ≤ A₀** を同定理の結論に追加 — W ≤ P Sylow 共役
++ W ≤ C(M_σ) + C_P(M_σ) ≤ A₀ [10.13(b) の Z, Z⊓C(M_σ) = ⊥]) / `72f3ecf7` ((b) =
+`fitting_eq_sup_of_canonical_line`: M ≤ N(A₀) [M_σ⊔E 分解 sup_le 一発] +
+F(M) = M_σ⊔A₀ [card-divisibility: Fq = {q}-core per prime → M_σ/A₀] + M_σ⊓A₀ = ⊥;
+`normalizer_le_normalizer_centralizer` de-private; helper
+`eq_pow_factorization_of_forall_eq`)。全部 unconditional・axiom-clean。
+
+### ▶ 残 = (d) 補群 E₀ + (e) + assembly — **精密レシピ (session 4 設計済)**
+
+**(d)** `∃ E₀ ≤ E, A₀⊓E₀ = ⊥ ∧ A₀⊔E₀ = E`: E₀ := E₁ ⊔ X ⊔ E₃ (X = Maschke 補空間 ≤ E₂):
+1. **A ≤ E₂**: A ⊴ E p-群 (12.6(a)) → A.subgroupOf E ≤ Sylow T_A of ↥E; E₂.subgroupOf E
+   も Sylow (card: |E₂| = p^{ν_p(E)} — Hall τ₂ の素因子 ⊆ τ₂∩primes = {p} [(a)!] +
+   index 互いに素; `Sylow.ofCard`); conj e ∈ E で A = A^e ≤ E₂ (確立済 hsmul_eq パターン)。
+2. **E₂ abelian + Sylow-of-M**: ν_p(E₂) = ν_p(E) = ν_p(M) → `Sylow.ofCard` in ↥M →
+   12.5(b) → 移送 (= `map_sylow_E_isMulCommutative` の E₂ 版; E₂ は map 形でないので
+   subgroupOfEquivOfLe 直)。
+3. **A₀⊓Agemo(↥E₂)-image = ⊥**: S' ⊇ E₂ Sylow-of-G (nonab 移送); 10.13(b) (A, A₀, S') →
+   C_{S'}(A) = A₀⊔Z' cyclic; **C_{S'}(A) = E₂** (E₂ ≤ C(A)⊓S' [abelian ⊇ A] ≤ E-p-群
+   [12.6(b)] ⊇ E₂-Sylow-of-E ⟹ = E₂ 最大性 — hP_eq パターン); Agemo ≤ Z'
+   (`Subgroup.closure_le`: 生成元 y^p = (az)^p = z^p ∈ Z' [abelian, a^p=1]) ⟹
+   A₀⊓Agemo ≤ A₀⊓Z' = ⊥。
+4. **Maschke**: `Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient`
+   (R := ↥E₂, φ : ↥E₁ →* MulAut ↥E₂ [E₁ ≤ N(E₂) = 12.1(e) `h.E2_normal_in_E12`;
+   compHom テンプレ], S := Agemo ↥E₂ p 1 [`Agemo.characteristic` +
+   `IsAInvariant.of_characteristic`], coprime |E₁| |E₂| [τ₁ vs p], p ∣ |E₂| [A₀ ≤],
+   hQab = quotient-comm [E₂ abelian induction], W₀ := A₀.subgroupOf E₂
+   [`isAInvariant_subgroupOf_restrict` 群: OperatorMaschke:94-138 の plumbing helpers],
+   hWΩ: 全像 ≤ Ω₁ [exp p: x̄^p = (x^p)-class = 1, x^p ∈ Agemo `subset_closure ⟨x, rfl⟩`])
+   → X' : Subgroup ↥E₂, Agemo ≤ X', E₁-不変, X̄'⊓Ā₀ = ⊥, X̄'⊔Ā₀ = Ω₁(quot) **= ⊤**
+   (quot exp p)。E₂-level: X := X'.map E₂.subtype: A₀⊓X = ⊥ (x̄ ∈ ⊥ → x ∈ ker = Agemo →
+   A₀⊓Agemo = ⊥ [step 3]); A₀⊔X = E₂ (π-sup = ⊤ + ker ≤ X')。
+5. **E₀ 組立**: E₀ := E₁ ⊔ (X ⊔ E₃)。card 連鎖 (全て
+   `card_sup_eq_mul_of_le_normalizer_of_disjoint` + 素因子-coprime-inf-⊥ パターン):
+   |X⊔E₃| = |X||E₃| (X ≤ E ≤ N(E₃), p vs τ₃); |E₀| = |E₁||X||E₃| (E₁ ≤ N(X) [Maschke
+   不変性 → G-level: mem_normalizer 移送] ∧ N(E₃) → N(X⊔E₃) [conj smul_sup helper 要
+   ~10 行 or `Subgroup.smul_sup`]; E₁⊓(X⊔E₃) = ⊥ [τ₁ vs {p}∪τ₃]); |E₂| = p|X|
+   (A₀⊔X = E₂, X ≤ N(A₀) [A₀ ⊴ M], A₀⊓X = ⊥); |E| = |E₁||E₂||E₃|
+   (|E₁₂| = |E₁||E₂| [E₁ ≤ N(E₂), τ₁ vs τ₂-primes={p}]; |E| = |E₁₂||E₃| [eq_sup +
+   E₁₂⊓E₃ = ⊥]) ⟹ |E₀| = |E|/p。**A₀⊔E₀ = E** (lattice: ⊇ E₁,E₃,E₂=A₀⊔X);
+   **A₀⊓E₀ = ⊥**: A₀ ≤ E₀ なら E₀ = A₀⊔E₀ = E だが |E₀| = |E|/p < |E| ✗;
+   |A₀⊓E₀| ∣ p ⟹ ⊥。
+**(e)** `∀ x ∈ M_σ#, ∀ r ∈ π(C_{E₀}(x)), r ∈ τ₁`: y ∈ C_{E₀}(x) order r (Cauchy
+`exists_prime_orderOf_dvd_card` in ↥(E₀⊓C({x})) → coe); r ∈ τ₁∪τ₂∪τ₃
+(`h.mem_tau_union_of_mem_primeFactors`; r ∣ |E|); **r∈τ₃ 枝**: ⟨y⟩ τ₃... y ∈ E₃
+(`S10.isPiGroup_le_of_normal_isHallSubgroup` in ↥E: zpowers y ≤ E₃) → 12.6(d)
+(`elemAb_normal_in_E_of_tau2 .2.2.2.1`-shape か standalone 部分定理) で C_{M_σ}(y) = ⊥
+だが x ∈ それ ✗; **r=p 枝** ((a) で τ₂∩primes={p}): X_y := zpowers(y の p-order-power —
+y 自体 order p なので zpowers y) ∈ ℰ_p¹(E), C_{M_σ}(X_y) ∋ x ≠ ⊥ ⟹ (c) 対偶で
+X_y = A₀ ⟹ A₀ ≤ ⟨y⟩ ≤ E₀ ✗ (A₀⊓E₀ = ⊥); ⟹ r ∈ τ₁ ✓。
+**assembly** `tau2_singleton_of_nonabelianSylow`: scaffold を S12_E から削除して移植。
+**⚠ (a)-conjunct は素数限定形に変更** (`∀ q, q.Prime → q ∈ tau2 M → q = p`) —
+docstring に deviation 明記。残りの conjunct は部分定理を束ねるだけ。
+AxiomsCheck 登録 (tau2_prime_eq / exists_canonical_line / fitting_eq_sup / assembly)。
+
+## 🔵 session 4: **Thm 12.7 設計 (recon 完了, 全依存 EXISTS 確認済)** — mmd L3201-3251
 
 leaf `S12_Theorem127.lean` (import S12_Corollary126)。3 commit 構成。**確認済 API**:
 
