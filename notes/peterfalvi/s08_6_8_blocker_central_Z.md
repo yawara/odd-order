@@ -1407,9 +1407,15 @@ session 27 cont.³ の recipe「CB3 monolith assembly」を実施。**copy で�
 - **CB3 残 (math-A 上位 assembly)**: L2 (X(Zc) coherence) は landed。**L3 glue
   `coherentXunionYset_centralCommutator_of_glued_of_frobenius` (S08:9176) + L4
   `false_of_coherentXunionYset_of_not_coherentS` (S08:6661) + capstone
-  `nonempty_coherent_S_caseA_of_frobenius` (S08:11673) は全て hF 固有**で要一般化。⚠ L4 は hF を実質使用
-  (`S_hasNoRealCharacters hF` / `isIrreducibleCharacter_of_mem_S_of_frobenius hF`) → c2 版 (S-no-real-chars
-  / S-members-irr) が要る (FPF でなく [Is]2.x 経由? 要 survey)。`_general` diagonal 変種 (9219/11488) は既存。
+  `nonempty_coherent_S_caseA_of_frobenius` (S08:11673) は全て hF 固有**で要一般化。
+  **🛑 L4 は機械的でない (session 28 survey 結果)**: L4 は break-pair `ψ∈S` の**既約性**を実質使用
+  (`isIrreducibleCharacter_of_mem_S_of_frobenius hF hψS` @ ~6703 で ψ を Ind θ と分解)。だが **c2 では
+  W₁ は H 全体に FPF でない** (`cert.centralizer_W2`: w∈W₁^# で C_L(w)⊓H=W₂≠1) ⟹ **S-members は既約とは
+  限らない** (reducible Ind θ は I_L(θ)>H 由来; これらは S(Z) に入り X=S−S(Z) からは除かれるが、L4 の
+  break-pair ψ は S 全体から来るので reducible でありうる)。∴ c2 L4 は **reducible ψ を扱う別論法**が要る
+  (X-members だけで break するか、(5.6) 評価を reducible ψ へ拡張するか — 要設計)。他の hF-use
+  (`S_hasNoRealCharacters hF` @ ~6691 [|L| 奇 ⟹ no real char; hF 非依存化可能か?] / `xSum_le_two_psi hF` @ ~6715 /
+  `centralCommutator_card_subgroupOf_lower hF hHnonab` @ ~6750) も要 c2 版。`_general` diagonal 変種 (9219/11488) は既存。
 - **CB4 (math-B, Z=W₂)**: ⚠ 当 generic core は **Z=Zc 固定** (math-B の Z=W₂ には非適用; かつ math-B では
   W₁ が W₂ に FPF でない ⟹ X(W₂)⊆Irr は (4.5)/(1.6) 経由・FPF 不可)。math-B は X(Z) coherence でなく
   **§5/§7 reflection で τ₂ を直接構成** (session 27 RECON: χ_i 既約 ⟹ `dadeOrthonormalCharacterImageFamily`
