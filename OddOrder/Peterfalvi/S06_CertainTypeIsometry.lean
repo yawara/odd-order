@@ -82,4 +82,55 @@ theorem certainType_sign_eq_of_degree_eq (h : Hypothesis46 A L)
        have hle := Int.le_of_dvd (by norm_num) hdvd
        omega)
 
+/-- On `W₁`, the column character `ω_{ij} = chiColumn χ₂ i` is independent of the column `χ₂`:
+the `W₂`-projection `wSnd` is trivial on `W₁` (`wSnd_eq_one_of_mem_W1`), so
+`ω_{ij}(w) = (w1CharEquiv i)(wFst w)` for every column `χ₂`.  (Generalizes `chiColumn_one_apply`
+— the `χ₂ = 1` column for all `w` — to every column, with the point restricted to `W₁`.) -/
+theorem chiColumn_apply_of_mem_W1 (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {w : ↥h.sdiffTICyclicHypothesis.W}
+    (hw : w ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W) :
+    (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) w
+      = ((h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w) : ℂ) := by
+  have hχ : χ₂ (h.sdiffTICyclicHypothesis.wSnd w) = 1 := by
+    rw [h.sdiffTICyclicHypothesis.wSnd_eq_one_of_mem_W1 hw]; exact map_one χ₂
+  have h1 : h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂ w
+      = (h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w)
+        * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) := rfl
+  rw [Hypothesis.chiColumn, h.sdiffTICyclicHypothesis.omega_apply, h1, hχ, mul_one]
+
+/-- **Peterfalvi (4.8), step (2)** (agreement on `W₁`).  Two equal-degree certain-type characters
+`μ_{ij}, μ_{ik}` (same row `i`, columns `χ₂, χ₂'`) agree on all of `W₁`, so `μ_{ij} − μ_{ik}`
+vanishes there.
+
+On `W₁^# ⊆ W − W₂` the (4.3.c) value identity gives `μ_{ij}(w) = δ_j·ω_{ij}(w)` and
+`μ_{ik}(w) = δ_k·ω_{ik}(w)`; `δ_j = δ_k` (step (1), `certainType_sign_eq_of_degree_eq`) and the
+column-independence of `ω` on `W₁` (`chiColumn_apply_of_mem_W1`) make these equal.  At `1` it is
+the equal-degree hypothesis. -/
+theorem certainType_apply_eq_of_mem_W1 (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    {w : ↥L} (hw : w ∈ h.W1) :
+    ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) w
+      = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) w := by
+  by_cases hw1 : w = 1
+  · rw [hw1]; exact hdeg
+  · -- `w ∈ W₁^# ⊆ sdiff.V = W − W₂`
+    have hwV : w ∈ h.sdiffTICyclicHypothesis.V := by
+      have hVdef : h.sdiffTICyclicHypothesis.V
+          = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ (h.W2 : Set ↥L) := rfl
+      rw [hVdef]
+      refine ⟨(le_sup_left : h.W1 ≤ h.W1 ⊔ h.W2) hw, fun hw2 => hw1 ?_⟩
+      exact Subgroup.mem_bot.mp (h.W_disjoint.le_bot (Subgroup.mem_inf.mpr ⟨hw, hw2⟩))
+    -- the point `⟨w, _⟩` lies in `W₁` inside `sdiff.W`
+    have hwsub : (⟨w, h.sdiffTICyclicHypothesis.V_subset_W hwV⟩ : ↥h.sdiffTICyclicHypothesis.W)
+        ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
+      Subgroup.mem_subgroupOf.mpr hw
+    rw [h.certainType_apply_eq_of_mem_V χ₂ i hwV, h.certainType_apply_eq_of_mem_V χ₂' i hwV,
+      certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg,
+      chiColumn_apply_of_mem_W1 h χ₂ i hwsub, chiColumn_apply_of_mem_W1 h χ₂' i hwsub]
+
 end OddOrder.Peterfalvi.S06

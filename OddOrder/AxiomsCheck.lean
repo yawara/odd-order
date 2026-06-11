@@ -742,6 +742,11 @@ set_option linter.style.longLine false in
 -- (`μ_{ij}(1) = μ_{ik}(1) ⟹ δ_j = δ_k`).  Via the (4.3.d) degree congruence `μ(1) ≡ δ (mod w₁)`
 -- twice and `w₁ ≥ 3` (`W₁ ≠ 1` of odd order): `w₁ ∣ (δ_j − δ_k)` with `|δ_j − δ_k| ≤ 2 < w₁`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_sign_eq_of_degree_eq
+-- Peterfalvi (4.8), step (2): equal-degree certain-type characters agree on `W₁`
+-- (`certainType_apply_eq_of_mem_W1`), via the column-independence of `ω` on `W₁`
+-- (`chiColumn_apply_of_mem_W1`: the `W₂`-projection `wSnd` is trivial on `W₁`) + step (1).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_apply_eq_of_mem_W1
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
