@@ -94,6 +94,14 @@ forward axiom を導入する commit は自動合流しない — 報告して�
 
 ## 現状メモ
 
+- **2026-06-11 (cron 再開) — 監視 loop 再開、自動合流対象 = B・E のみ**: ユーザー指示で
+  15min cron (`2,17,32,47 * * * *`, session-only/durable=false, 7 日 auto-expire, job `e5af088c`)
+  を再作成。再開巡で B (`d9d2b9da` Pf (4.5.b) 土台) と F (`6f6d7afc` BG 12.18 infra) を各 1 commit
+  合流 (merge `004f6ae3` / `3336dc31`; build 3632 緑 / AxiomsCheck OK / 実 sorry 266 不増)。
+  **F (bg-s12) は今回 1 回だけ手動合流し、以降の cron 監視対象からは外す** (ユーザー選択)。
+  E (bg-local) は未マージ 0。⚠ サイズ flag: `S10_LocalLemmas.lean` 2364 行 (>1500) →
+  分割 issue `0063-s10-locallemmas-split.md` 既起票済み (新規起票不要; E の active frontier ゆえ
+  凍結境界が定まるまで実施は保留)。
 - **2026-06-11 — レーン再編成 (B+E の 2 レーン体制)**: A/D 退役 (worktree 削除・branch 残置)、
   B は main へ fast-forward 同期 (`f608143c`) + LAUNCH.md を session-22 現在地に刷新、
   **E (`bg-local`) 新設** (issue base **6000**, LAUNCH.md 配置済み): Lem 10.4(b)→de-axiom→
