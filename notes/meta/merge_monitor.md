@@ -3,21 +3,22 @@
 > 横断運用ドキュメント。`/loop 15m` から参照される。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針 (2026-06-08): **「検証通過は自動合流」**。build green + axiom-clean + sorry 不増を
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` して報告。
+> **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
+> 変化なし/全 abort 時は push しない)。
 
-## レーン (2026-06-11 再編成)
+## レーン (2026-06-11 夜 再編成: B+F の 2 レーン体制)
 
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
 | **B** | `b-peterfalvi` | Pf §6 certain-type (4.5)→(4.9) → S08 case-B → (6.8) | Opus 4.8 (1M); 停滞時は Fable 5 | ✅ 対象 |
-| **E** | `bg-local` | BG §11.5-7 (10.4(b)/10.13 は完了済) | Fable 5 (1M); §11.5-7 は Opus 4.8 可 | ✅ 対象 |
-| **F** | `bg-s12` | BG §12 残 14 件 (10.13 解禁済) → §13 | Opus 4.8 (1M); 12.18/§13 大物と停滞時は Fable 5 | ✅ 対象 |
+| **F** | `bg-s12` | BG §12: **12.18 先行 (skeleton 済)** → cascade 12.3→12.16 (11.7 着地で全解禁) → §13 | 12.18 = **Fable 5 (1M)**; cascade は Opus 4.8 (1M) | ✅ 対象 |
 
-**F は 2026-06-11 増設** (Lemma 10.13 着地 [merge `b5e0f541`] による解禁; issue base **7000**)。
-旧 **A** (`a-keystone`) / **D** (`bg-s10-fwd`) は 2026-06-11 退役 — 全量 main 合流済みを検証の上、
-worktree・branch とも削除済み (旧 `c-bg-s10` branch も同時削除。履歴は main の merge commit に全残存)。
+**E (`bg-local`) は 2026-06-11 退役** — 任務完遂 (Lem 10.4(b) de-axiom / Lem 10.13 / Thm 11.5 /
+Cor 11.6 / **Thm 11.7 = §11 完結**)。全量 main 合流 (merge `77ab5173`) を検証の上 worktree・
+branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴は main の merge commit に全残存)。
 
-**forward-axiom ポリシー**: 残存 axiom = Lem 10.4(b) 1 本 (E が消滅させる)。レーンが**新規の**
-forward axiom を導入する commit は自動合流しない — 報告してユーザー承認を待つ
+**forward-axiom ポリシー**: 残存 forward axiom **0 本** (10.4(b) は E が実証明化済)。レーンが
+**新規の** forward axiom を導入する commit は自動合流しない — 報告してユーザー承認を待つ
 ([[scaffold-sorry-free-not-done]])。island は縮小方向のみ自動合流可。
 
 ## 各イテレーションの手順
@@ -52,13 +53,20 @@ forward axiom を導入する commit は自動合流しない — 報告して�
    - 不合格 → `git merge --abort` で**報告**（何が落ちたか・どのファイルか）
 3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
    自動合流せず abort → 報告（上記ポリシー）。
+3b. **root closure 検査 (2026-06-11 追加, E の発見)**: 新規追加 `.lean` ファイル
+   (`git diff --cached --name-only --diff-filter=A -- '*.lean'`) は **`OddOrder.lean` に
+   対応する import 行が必須** (flat list 規約)。欠けていると `lake build OddOrder` の対象外で
+   ゲートをすり抜ける (実例: S05b / S11_MsigmaANormal が closure 外で未検証だった)。
+   欠落時 = hub が import 行を追記してから build (機械的修正、abort 不要)。
 4. **サイズ watch (粒度規約の enforcement, 2026-06-11)**: 合流後に
    `git diff HEAD^ --stat -- '*.lean'` で touched .lean の現在行数を `wc -l` 確認。
    **1,500 行超の既存ファイルへの追記**を検出したら: 合流は維持しつつ ⚠ flag をサマリに含め、
    分割 issue が未起票なら起票する（分割の実施 owner = hub。lane の frontier と衝突しない
    凍結境界で prefix-split する）。lane 側のデフォルト（新主結果番号 = 新 leaf）は LAUNCH.md に記載。
-5. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
-   + サイズ flag。
+5. **push**: 合流 commit が 1 件以上成立していれば最後に `git push origin main` (exit 0 確認、
+   失敗は報告)。変化なし/全 abort なら push しない。
+6. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
+   + サイズ flag + push 結果。
 
 ## 注意
 
@@ -94,8 +102,20 @@ forward axiom を導入する commit は自動合流しない — 報告して�
 
 ## 現状メモ
 
+- **2026-06-11 (夜) — §11 完結・E 退役・F 再開 (12.18 先行)**: E の最終成果 Thm 11.7
+  (`S11_MsigmaANormal.lean` 977 行 leaf) を合流 (merge `77ab5173`, 実 sorry 266→264) し
+  **BG §1-§11 が proof レベル完結**。E は worktree+branch 削除で退役 (ユーザー裁可)。
+  B (4.5.b) Brauer counting bound も合流 (merge `cc81837b`)。**F 再開方針 (ユーザー裁可) =
+  12.18 先行**: skeleton (notes/bg/s12_subgroup_e.md「Lane F session 1」) が鮮度の高いうちに
+  Fable 5 (1M) で組立 → 着地後 cascade 12.3→12.16 (Thm 11.7 着地で全解禁済) を Opus 4.8 で回収
+  → §13 Prime Action (notes/bg/s13_prime_action.md, S13 ファイル新設 ~800-1100 行)。
+  cron は B+F 監視に更新 (job 旧 `a8824a71` → 新 `d87f439a`; F→B 順, push 込み)。ゲートに root closure 検査 (手順 3b)
+  を追加 — E の「root 登録ギャップ」gotcha のメカニズム化。hub 保留タスク = 分割 issue
+  0063 (S10_LocalLemmas 2364 行) / 0064 (S05_NarrowPGroups 4039 行) の実施 (全 BG §4/§5/§10
+  ファイルが凍結済みの今が安全窓)。
 - **2026-06-11 (cron 再開) — 監視 loop 再開、自動合流対象 = B・E のみ**: ユーザー指示で
-  15min cron (`2,17,32,47 * * * *`, session-only/durable=false, 7 日 auto-expire, job `e5af088c`)
+  15min cron (`2,17,32,47 * * * *`, session-only/durable=false, 7 日 auto-expire, job `a8824a71`,
+  合流成立時 `git push origin main` 込み — 2026-06-11 ユーザー指示で追加)
   を再作成。再開巡で B (`d9d2b9da` Pf (4.5.b) 土台) と F (`6f6d7afc` BG 12.18 infra) を各 1 commit
   合流 (merge `004f6ae3` / `3336dc31`; build 3632 緑 / AxiomsCheck OK / 実 sorry 266 不増)。
   **F (bg-s12) は今回 1 回だけ手動合流し、以降の cron 監視対象からは外す** (ユーザー選択)。
