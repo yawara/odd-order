@@ -68,8 +68,8 @@ private theorem card_conj_smul (g : G) (H : Subgroup G) :
     Nat.card ↥(MulAut.conj g • H) = Nat.card ↥H :=
   Subgroup.card_map_of_injective (MulAut.conj g).injective
 
-/-- conj-smul は単調。 -/
-private theorem conj_smul_mono (φ : MulAut G) {H K : Subgroup G} (h : H ≤ K) :
+/-- conj-smul は単調。(12.10 でも使うため public。) -/
+theorem conj_smul_mono (φ : MulAut G) {H K : Subgroup G} (h : H ≤ K) :
     φ • H ≤ φ • K := by
   rw [mulAut_smul_eq_map, mulAut_smul_eq_map]
   exact Subgroup.map_mono h
