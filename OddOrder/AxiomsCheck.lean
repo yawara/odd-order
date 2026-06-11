@@ -64,6 +64,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -737,6 +738,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiRestrict_apply_eq_zero_of_not_mem_union
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S06.induce_chiRestrict_apply_eq_zero_of_not_mem_union
+-- Peterfalvi (4.8), step (1): equal-degree certain-type characters share their column sign
+-- (`μ_{ij}(1) = μ_{ik}(1) ⟹ δ_j = δ_k`).  Via the (4.3.d) degree congruence `μ(1) ≡ δ (mod w₁)`
+-- twice and `w₁ ≥ 3` (`W₁ ≠ 1` of odd order): `w₁ ∣ (δ_j − δ_k)` with `|δ_j − δ_k| ≤ 2 < w₁`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_sign_eq_of_degree_eq
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
