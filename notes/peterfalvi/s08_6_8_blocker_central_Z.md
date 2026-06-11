@@ -1350,11 +1350,23 @@ docstring が明示: 「両方向 (Res_H φ / Ind_K^L θ) は genuine character 
   (FPF 入力 `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` landed)、ただし case-A monolith
   `Xset_centralCommutator_isCoherent_of_frobenius` の `hF:IsFrobeniusGroup` を「W₁ FPF on Zc」へ一般化要
   (CB3); **math-B** (W₂⊆Z(H)) は **Z=W₂ 機構** (CB4, `W2_subgroupOf_le_center_of_caseB` landed)。
-1. **CB3 (math-A)**: case-A monolith+支持 lemma 群の Frobenius 依存を「W₁ FPF on Z」へ一般化
-   (Z-generic 化)。`isIrreducibleCharacter_of_mem_Xset_caseA` 等 caseA 版の既存度を要監査。
-2. **CB4 (math-B)**: Z=W₂ の monolith + 支持 lemma (W₂ normal/≤H/⊆H'/centrality)。
+1. **CB3 (math-A)**: ✅ landed pieces = generic consumer `Xset_isCoherent_from_..._withCover_of_irreducible_X`
+   (Z-parametric, S08:8532) + X⊆Irr L `isIrreducibleCharacter_of_mem_Xset_c2_caseA` (S08:5108) +
+   `two_le_xBaseBlock_ncard_of_irreducible_X` (S08:6896)。🔴 **真の障害 = 次数平方和 `sum_re_sq_Xset_eq`
+   は機械的に一般化不可**: その hF は `sum_re_sq_induce_kernelFilter_eq`→`isIrreducibleCharacter_of_mem_S_of_frobenius`
+   (**S 全体が既約**) に依存するが、c2 では S に w₂−1 個 reducible があるため χ(1)²/⟨χ,χ⟩=(χ(1).re)²
+   が崩れる。⟹ **CB3 は hF→c2 の差し替えでなく、X(Z) 次数平方和の c2 版 (reducible S-members 対応)
+   の真の reworking を要する**(monolith hsum/htotal 部)。
+2. **CB4 (math-B)**: Z=W₂ の monolith + 支持 lemma。⚠ W₂ の L-normality (Xset Z が要する Z⊴L) は
+   要解決 (W₂=C_K(x) は一般に L-正規でない)。
 3. case-B L3 τ₂ glue + L4 ((6.8.2)/(6.8.3))。
 4. capstone assembly (`hyp.cases` split: Frobenius=landed brick / CertainType=math-A∧math-B)。
+
+**⟹ 確定: case-B closure は genuine multi-session §8 work** (mechanical adaptation ではない;
+X(Z) 次数平方和の c2 reworking + W₂-normality + CB4 monolith + L3/L4 + capstone)。case-A が ~7
+session を要した規模。clean な小 committable 単位は残っていない (全 prerequisite は landed か、
+残りは深い §8 assembly)。**次セッション第一手 = CB3 の X(Z) 次数平方和 c2 版** (reducible S-members
+を分離して Irr 部分のみ (χ(1).re)² 化、reducible 部分は ⟨χ,χ⟩ 重み付き)。
 
 **正本 = 本 session 27 entry (上部 2026-06-07 deep-dive は stale: case-A は landed)。**
 **(4.7)-(4.9) は case-B 完全 off-path 確定 (監視レーン裁可と一致); §6 (4.x) は full-Pf scope の正当成果。**
