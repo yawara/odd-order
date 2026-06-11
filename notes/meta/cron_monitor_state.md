@@ -1,0 +1,62 @@
+# cron monitor — 稼働状態メモ (away 対応)
+
+> このセッション (main 合流モニター) の cron/監視まわりの現状。ユーザー離席中の判断を文書化。
+> 次に起きたエージェント (自己起床 / 次 tick / ユーザー復帰) はまずここを読む。
+
+## 現況 (2026-06-12, セッション「各レーンを監視します」継続)
+
+- **新セッション開始時、前セッションの session-only cron は消滅していた** (CronList = "No scheduled jobs.")。
+  session-only cron は Claude セッション終了で死ぬので、**セッションが切れたら必ず再作成が要る**。
+- **session-only cron 再作成成功**: job `11a96c38` (`2,17,32,47 * * * *`, 15分, F→B 自動合流 +
+  MERGE_HEAD ガード内蔵 + 合流時 push)。CronCreate は今回も出力を返し登録確認済み。
+  (旧 job: `297aecb0` → `d87f439a` → `a8824a71` は全てセッション終了で失効。現役は `11a96c38` のみ)
+- **durable (scheduled-tasks) は未登録**: `list_scheduled_tasks` = 空。cloud 実行で worktree アクセス
+  不明の懸念が未解消ゆえ当面 session-only で回す。真の away (セッション終了) 耐性が要るならユーザー判断で durable 化。
+- **この tick の合流実績 (2026-06-12 初回)**: F (bg-s12) 2 commits (Cor 12.10 COMPLETE + 新 leaf
+  S12_Corollary1210 548行) → merge `d7a0bbe5`。B (b-peterfalvi) 未マージ 0 (変化なし)。
+  build 3783 jobs green / AxiomsCheck OK / 実 sorry 256→255 (−1) / 新規 axiom なし /
+  root closure OK / サイズ flag なし (最大 touched = S12_E 1005行)。`git push origin main` 成功 (`d4d712f8..d7a0bbe5`)。
+- **未処理 size flag（§10/§5 大型ファイル分割 backlog の集約）**: §10 凍結ファイル群が複数 1,500 行超。
+  いずれも frontier でなく lane work による bloat でもない（§12 から呼ぶための private→public 昇格等の
+  小改変で touch されているだけ）ので urgency 低 → 個別 issue 乱立を避け **ここに集約記録**:
+  - S10_LocalLemmas 2364 行 → issue **0063**（既起票）
+  - S05_NarrowPGroups 4039 行 → issue **0064**（既起票）
+  - S10_HallStructure 2290 行 → 未起票（記録のみ）
+  - S10_BetaRadical 3004 行 → 未起票（記録のみ、2026-06-11 tick で検出）
+  ユーザーが §10/§5 分割 batch を望むなら 0063/0064 と合わせて hub が凍結境界で実施。
+  S08_CoherenceCore 11659→11820 行は B 現役 (6.8) frontier ゆえ分割保留。
+
+## 確定事実
+
+- **session-only 系 (CronCreate / CronList / ScheduleWakeup) はこの環境で結果出力が落ちる**
+  (`Tool ran without output` だが `provided no error`)。登録の確証が取れない。連打しても無駄。
+- **`scheduled-tasks` MCP は結果が返る** (実績: `list` が「No scheduled tasks found」を返した)。
+  → 離席中の自律監視は **`scheduled-tasks` 系に一本化**するのが正解。
+- send_message はこのセッションで使用不可 (`not available in the current context`)。
+  → レーンへの一押しはコピペ運用 (memory: lane-nudge-via-copypaste)。
+
+## 試行と未確証
+
+- `scheduled-tasks` の `create_scheduled_task` で **durable monitor タスク** を作成試行
+  (schedule `9,39 * * * *` = 30分間隔, prompt = merge_monitor.md 準拠の F→B 自動合流 +
+  「火事のときのみ通知」)。**結果が pending/空で成否未確証**。
+  - ⚠ ツール名: ToolSearch は `create` を `list` と同名で誤ラベルした (registry の癖)。
+    正式名 = `mcp__scheduled-tasks__create_scheduled_task` (deferred リストにある)。
+  - ⚠ worktree アクセス: scheduled-tasks の agent が別セッション。`/home/ywr/odd-order` に
+    アクセスできるか不明。タスク prompt の step1 で「アクセス不可なら無害終了」を仕込んだので、
+    初回実行で判明する。cloud 実行でアクセス不可なら別手段 (ローカル session-only) が要る。
+
+## 次に起きたときの手順 (連打禁止・1確認のみ)
+
+1. `mcp__scheduled-tasks__list_scheduled_tasks` を **1回**呼ぶ。
+   - durable monitor が登録されていれば → 正常。何もしない (火事なら imessage)。
+   - 空なら → `create_scheduled_task` を **1回**で再作成 (上記 schedule/prompt)。
+2. 各レーン未マージを git で1回確認: `git -C /home/ywr/odd-order rev-list --count main..b-peterfalvi`
+   と `..bg-s12`。溜まっていれば merge_monitor.md 手順で F→B 自動合流。
+3. ユーザー復帰時のみ一行リマインド。離席中は記録だけ、火事以外 ping しない。
+
+## ユーザー方針 (2026-06-11, 5回強調 + away 設定)
+
+「cron はうまく行ってるか、ときどき監視してね。きちんと『ときどき』たまにみるのがコツ。リマインドして」
+= 離席中、**軽く1回・連打せず・たまに**確認し、状態を残す。質問・選択肢提示はしない。
+(memory: cron-monitor-cadence-gentle)
