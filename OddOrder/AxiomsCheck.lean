@@ -46,6 +46,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_LocalLemmas
 import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3687,3 +3688,18 @@ abstract `exists_hall_actsTrivially_of_forall_sylow`. Formerly in the §10 keyst
 Cor 10.9(a); unconditional since the 2026-06-11 de-axiomatization. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.derivedE_centralizes_betaComplement
+
+/-! ### BG §12: Lemma 12.18 (`tau1_Malpha_interaction`) — unconditional
+
+For `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(M)`, and a nontrivial `P`-invariant `q`-subgroup `Q ≤ M` with
+`C_Q(P) = 1` and `ℳ(N_G(Q)) ≠ {M}`: (a) if `M_α ≠ 1` and `q ∉ α(M)` then `C_{M_α}(P) ≠ 1` and
+`C_{M_α}(PQ) = 1`; (b) if `Q` is moreover a Sylow `q`-subgroup of `M` then `α(M) = β(M)` and
+the conclusions of (a) hold. Part (b) consumes Corollary 10.9(a)(2) — unconditional since the
+2026-06-11 de-axiomatization — together with the Uniqueness Theorem 9.6 and the degenerate
+Theorem 10.2(d) (`isNilpotent_derived_of_Malpha_eq_bot`). -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isNilpotent_derived_of_Malpha_eq_bot
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_centralizer_PQ_eq_bot
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau1_Malpha_interaction
