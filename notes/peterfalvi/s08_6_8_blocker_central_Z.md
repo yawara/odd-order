@@ -1511,3 +1511,36 @@ routing (1) の前に **「c2 break ψ は既約か、reducible-adjoined を S07
 (b) R(reducible) = (4.9) 形式化 (off-path)。**combinatorial foundation (exists_*_general) と S07
 famPairwise [reducible S₁ メンバー] は landed/確認済で無駄でない** — full norm-weighted (5.6) 配線で再利用。
 **正本 = 本 session 28 cont.³。次手 = S(Z) coherence の inductive 構造を精査 (4.9 回避可否の判定)。**
+
+## 2026-06-11 (session 29, Fable 5): (5.3) 原文精読で経路 100% 確定 — R(reducible) = (5.3.b) = (4.9) 引用、「(4.7)-(4.9) off-path」撤回
+
+### FT-critical 再確認 (repo 実配線で検証済)
+- `field_normalizer_structure` (Pf 14.2, S16_NonExistenceG:6846) = **sorry** — `nonexistence_of_G` →
+  BG.AppC final contradiction の唯一の carrier 供給源。S16.Hypothesis は S15.Hypothesis を base に持つ。
+- (7.10) `card_G0_lower_bound` (S09:6479) = sorry (issue 0044)、(6.8) (issue 0046) が block。
+- ⟹ **FT 経路の Pf 側 = S15/S16 scaffold 充足、数学的供給源 = §3-§8 → (6.8) → (7.10) → §9+ 連鎖。
+  (6.8) 完遂が Lane B の FT-critical 第一任務** (「orphaned」は現 import 配線の話で数学的には必須)。
+
+### 🔑🔑🔑 (5.3) 原文 (mmd 04.7 L15-29) — R(χ) producer の全貌
+- **(5.3.a)**: S ⊆ Irr L なら (5.2.a)+(5.2.b) だけで Hyp (5.2) 成立 (‖(χ−χ̄)^τ‖²=2 ⟹ |R(χ)|=2;
+  (5.2.e) は (4.1))。= 形式化済みの既約 producer。
+- **(5.3.b)**: **Hypothesis (4.6)** + (5.2.a) + S ⊆ {Ind_K^L θ | θ∈Irr K, H⊄Ker θ} ⟹ Hyp (5.2) 成立:
+  - (4.7) で ℤ[S,L^#] = ℤ[S,A] (τ の定義域)。pairwise ⊥ は (1.5.c)。
+  - (5.2.d): χ 既約 → (a) 同様。**χ reducible → (4.4)+Thm(4.5) で χ = μ_j (0<j<w₂)、Thm (4.9) で
+    R(μ_j) = {δ_j ω_ij^σ, −δ_j ω_ik^σ | 0≤i<w₁}** (k: μ̄_j=μ_k)。
+  - (5.2.e): 既約×既約 = (4.1); reducible×reducible = R(μ_j) の形から; **既約 φ × reducible μ_j =
+    (4.7) Supp(φ−φ̄)⊂A → (φ−φ̄)^τ は V で消滅 → NC((φ−φ̄)^τ) ≤ 2 → (3.8) で R(φ)⊥ω^σ 全 ω∈Irr W**。
+- ⟹ **session 28 cont.³ の「(4.9) 級」評価は教科書的に正確** ((5.3.b) が文字通り (4.9) を引用)。
+  **session 27 RECON の「(4.7)-(4.9) は case-B 経路外」は撤回** — (6.8.2.3) の直接引用としては正しいが、
+  **(6.8.3) reducible break ψ の R(ψ) が (5.3.b) 経由で (4.7)/(4.8)/(4.9) を要求**。S(Z)-confine escape は
+  不要 (教科書の正攻法が (4.9) ルート)。
+
+### ▶▶ 確定経路 (case-B (6.8) 完遂 = FT-critical):
+1. **(4.7) j≥1 part** (Supp μ_j ⊆ A∪{1}; recipe = s06 note session 27 末尾の ω_{0j} 論法) ← 今ここ
+2. **(4.8)** (`sigmaCoeff_trichotomy` [landed] 消費)
+3. **(4.9)** (= (4.8)+(3.9)+(4.3)+(4.7)、R(μ_j) の certain-type reflection)
+4. **(5.3.b)** general R-producer (§7; OrthonormalCharacterImageFamily for reducible μ_j)
+5. norm-weighted (5.6) chain (S07 機構既存 [famPairwise/mc]、S08 配線; DadeChainStep の hχχ=1 を ‖χ‖²=m 化)
+6. CB5 L4-general (break-pair `exists_*_general` landed) → CB3-L3 → CB4 → CB6 capstone。
+依存 landed 済: Hyp(4.6)/(4.1)/(4.3)/(4.4)/(4.5)/(4.7)core+induced/(3.8)trichotomy/(3.9)/(1.5.c)。
+**正本 = 本 session 29 entry。これは s06 note「次 = (4.7) j≥1 → (4.8)/(4.9)」と完全一致 — 一本道。**
