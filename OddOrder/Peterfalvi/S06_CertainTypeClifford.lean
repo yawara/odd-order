@@ -31,6 +31,42 @@ namespace OddOrder.Peterfalvi.S06
 open OddOrder.RepresentationTheory
 open OddOrder.Peterfalvi.S05
 
+/-! ### A free finite group action divides the set it acts on
+
+If a finite group `G` acts on a finite type `α` with all stabilizers trivial (a *free*
+action, `s • a = a → s = 1`), then `|G|` divides `|α|`.  By Burnside's lemma the sum over
+`s ∈ G` of the fixed-point counts is `(#orbits)·|G|`; freeness collapses the sum to the
+single term `s = 1` (where `fixedBy α 1 = univ`), so `|α| = (#orbits)·|G|`.  This is the
+divisibility engine behind the count of `g`-stable conjugacy classes in Peterfalvi (4.5.b). -/
+section GroupActionInfra
+
+/-- A free action of a finite group `G` on a finite type `α` has `|G| ∣ |α|`. -/
+theorem card_group_dvd_card_of_freeAction {G α : Type*} [Group G] [Finite G] [Finite α]
+    [MulAction G α] (hfree : ∀ (s : G) (a : α), s • a = a → s = 1) :
+    Nat.card G ∣ Nat.card α := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Fintype α := Fintype.ofFinite α
+  haveI : ∀ s : G, Fintype (MulAction.fixedBy α s) := fun _ => Fintype.ofFinite _
+  haveI : Fintype (MulAction.orbitRel.Quotient G α) := Fintype.ofFinite _
+  have key := MulAction.sum_card_fixedBy_eq_card_orbits_mul_card_group G α
+  have h0 : ∀ s ∈ (Finset.univ : Finset G), s ≠ 1 →
+      Fintype.card (MulAction.fixedBy α s) = 0 := by
+    intro s _ hs
+    rw [Fintype.card_eq_zero_iff]
+    exact ⟨fun a => hs (hfree s (a : α) (MulAction.mem_fixedBy.mp a.2))⟩
+  have h1 : Fintype.card (MulAction.fixedBy α (1 : G)) = Fintype.card α := by
+    have huniv : MulAction.fixedBy α (1 : G) = Set.univ := by
+      ext a; simp [MulAction.mem_fixedBy]
+    exact Fintype.card_congr ((Equiv.setCongr huniv).trans (Equiv.Set.univ α))
+  have hsum : (∑ s : G, Fintype.card (MulAction.fixedBy α s)) = Fintype.card α :=
+    (Finset.sum_eq_single (1 : G) h0 (fun h => absurd (Finset.mem_univ _) h)).trans h1
+  rw [hsum] at key
+  rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card]
+  exact ⟨Fintype.card (MulAction.orbitRel.Quotient G α), by rw [key]; ring⟩
+
+end GroupActionInfra
+
 /-! ### General character-theoretic infrastructure
 
 The following are general facts about genuine characters (restriction and induction preserve
@@ -345,6 +381,130 @@ theorem mem_W2_of_mem_sup_of_mem_K {a : L} (ha : a ∈ h.W1 ⊔ h.W2) (haK : a �
     rwa [disjoint_iff.mp h.isComplement.disjoint, Subgroup.mem_bot] at hmem
   rw [← hxy, hx1, one_mul]
   exact hy
+
+/-- **Peterfalvi (4.5.b), key fixed-class lemma** (mmd 04.6, (4.5.b) proof): a conjugacy class
+`C` of `K` normalized by `g ∈ W₁^#` meets `W₂`.
+
+The cyclic group `⟨φ⟩ ≤ MulAut K`, `φ =` conjugation by `g`, acts on the (`φ`-invariant) class
+`C`.  Were `C` disjoint from `W₂`, this action would be free: a fixed point `c` of a nontrivial
+power `φⁿ =` conjugation by `gⁿ` (`gⁿ ≠ 1` because `φⁿ ≠ 1`) would lie in `C_K(gⁿ) = W₂`
+(`centralizer_W2`, as `gⁿ ∈ W₁^#`).  A free action of a finite group divides the set it acts
+on (`card_group_dvd_card_of_freeAction`), so `|⟨φ⟩| = ord φ` divides `|C|`, which divides `|K|`;
+but `ord φ ∣ ord g ∣ w₁` and `gcd(|K|, w₁) = 1` force `ord φ = 1`, i.e. `φ = 1`.  Then `g`
+centralizes all of `K`, so the representative `a ∈ C` lies in `C_K(g) = W₂` — contradiction. -/
+theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjClasses ↥h.K)
+    (hC : ConjClasses.conjByPerm (G := L) (H := h.K) g C = C) :
+    ∃ c : ↥h.K, c ∈ C.carrier ∧ (c : L) ∈ h.W2 := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  classical
+  obtain ⟨a, ha⟩ := C.exists_rep
+  -- membership in the class ⟺ conjugacy with the representative `a`
+  have hmem_iff : ∀ x : ↥h.K, x ∈ C.carrier ↔ IsConj x a := fun x => by
+    rw [ConjClasses.mem_carrier_iff_mk_eq, ← ha, ConjClasses.mk_eq_mk_iff_isConj]
+  -- automorphisms preserve conjugacy
+  have hmapconj : ∀ (ψ : MulAut ↥h.K) {x y : ↥h.K}, IsConj x y → IsConj (ψ x) (ψ y) := by
+    intro ψ x y hxy
+    simpa only [MulEquiv.coe_toMonoidHom] using ψ.toMonoidHom.map_isConj hxy
+  by_contra hno
+  push_neg at hno
+  set φ : MulAut ↥h.K := MulAut.conjNormal g with hφ
+  -- `C` is `g`-stable: `IsConj (φ a) a`
+  have hconj_a : IsConj (φ a) a := by
+    have hh := hC
+    rw [← ha, ConjClasses.conjByPerm_mk] at hh
+    have heq : ClassFunction.conjByMulEquiv (G := L) (H := h.K) g a = φ a := by
+      apply Subtype.ext
+      rw [ClassFunction.conjByMulEquiv_apply, hφ, MulAut.conjNormal_apply]
+    rw [heq] at hh
+    exact ConjClasses.mk_eq_mk_iff_isConj.mp hh
+  -- every power of `φ` fixes the conjugacy class of `a`
+  have hψa : ∀ ψ ∈ Subgroup.zpowers φ, IsConj (ψ a) a := by
+    let S : Subgroup (MulAut ↥h.K) :=
+      { carrier := {ψ | IsConj (ψ a) a}
+        one_mem' := by simpa only [Set.mem_setOf_eq, MulAut.one_apply] using IsConj.refl a
+        mul_mem' := fun {ψ₁ ψ₂} h₁ h₂ => by
+          show IsConj ((ψ₁ * ψ₂) a) a
+          rw [MulAut.mul_apply]
+          exact (hmapconj ψ₁ h₂).trans h₁
+        inv_mem' := fun {ψ} hψ => by
+          show IsConj (ψ⁻¹ a) a
+          have h3 : IsConj (ψ⁻¹ (ψ a)) (ψ⁻¹ a) := hmapconj ψ⁻¹ hψ
+          rw [MulAut.inv_apply_self] at h3
+          exact h3.symm }
+    exact fun ψ hψ => (Subgroup.zpowers_le.mpr (show φ ∈ S from hconj_a)) hψ
+  -- the cyclic group `⟨φ⟩` acts on `C` (its carrier is `φ`-invariant)
+  let sma : SubMulAction ↥(Subgroup.zpowers φ) ↥h.K :=
+    { carrier := C.carrier
+      smul_mem' := fun c {x} hx => by
+        rw [hmem_iff] at hx ⊢
+        exact ((hmapconj _ hx).trans (hψa _ c.2) : IsConj ((c : MulAut ↥h.K) x) a) }
+  haveI : Finite (MulAut ↥h.K) := inferInstance
+  -- free action: under `hno`, no nontrivial power of `φ` fixes a point of `C`
+  have hfree : ∀ (s : ↥(Subgroup.zpowers φ)) (y : ↥sma), s • y = y → s = 1 := by
+    intro s y hsy
+    by_contra hs1
+    obtain ⟨n, hn⟩ := (s.2 : (s : MulAut ↥h.K) ∈ Subgroup.zpowers φ)
+    have hsval : (s : MulAut ↥h.K) = MulAut.conjNormal (g ^ n) := by
+      have hmz := (MulAut.conjNormal (H := h.K)).map_zpow g n
+      rw [← hn, hφ, hmz]
+    -- `s • y = y` ⟹ `gⁿ` centralizes `↑y`
+    have hyval : (MulAut.conjNormal (g ^ n)) (y : ↥h.K) = (y : ↥h.K) := by
+      have h2 : (s : MulAut ↥h.K) (y : ↥h.K) = (y : ↥h.K) := Subtype.ext_iff.mp hsy
+      rwa [hsval] at h2
+    have hgn1 : g ^ n ≠ 1 := fun hgn =>
+      hs1 (OneMemClass.coe_eq_one.mp (by rw [hsval, hgn, map_one] : (s : MulAut ↥h.K) = 1))
+    have hgnW1 : g ^ n ∈ h.W1 := h.W1.zpow_mem hg n
+    have hcomm : (g ^ n) * ((y : ↥h.K) : L) * (g ^ n)⁻¹ = ((y : ↥h.K) : L) := by
+      have := congrArg Subtype.val hyval
+      rwa [MulAut.conjNormal_apply] at this
+    have hyW2 : ((y : ↥h.K) : L) ∈ h.W2 := by
+      have hmem_inf : ((y : ↥h.K) : L) ∈ Subgroup.centralizer ({g ^ n} : Set L) ⊓ h.K :=
+        Subgroup.mem_inf.mpr ⟨by
+          rw [Subgroup.mem_centralizer_iff]
+          rintro m hm
+          rw [Set.mem_singleton_iff] at hm; subst hm
+          exact mul_inv_eq_iff_eq_mul.mp hcomm, (y : ↥h.K).2⟩
+      rwa [h.centralizer_W2 (g ^ n) hgnW1 hgn1] at hmem_inf
+    exact hno (y : ↥h.K) y.2 hyW2
+  -- divisibility chain ⟹ `ord φ = 1` ⟹ `φ = 1`
+  have hdvd1 : Nat.card ↥(Subgroup.zpowers φ) ∣ Nat.card ↥sma :=
+    card_group_dvd_card_of_freeAction hfree
+  have hsma_card : Nat.card ↥sma = Nat.card ↥(C.carrier) := rfl
+  have hcar_dvd : Nat.card ↥(C.carrier) ∣ Nat.card ↥h.K := by
+    have hcar : (C.carrier : Set ↥h.K) = MulAction.orbit (ConjAct ↥h.K) a := by
+      rw [← ha, ← ConjAct.orbit_eq_carrier_conjClasses]
+    rw [hcar]
+    calc Nat.card ↥(MulAction.orbit (ConjAct ↥h.K) a)
+        = Nat.card (ConjAct ↥h.K ⧸ MulAction.stabilizer (ConjAct ↥h.K) a) :=
+          Nat.card_congr (MulAction.orbitEquivQuotientStabilizer _ a)
+      _ = (MulAction.stabilizer (ConjAct ↥h.K) a).index := (Subgroup.index_eq_card _).symm
+      _ ∣ Nat.card (ConjAct ↥h.K) := Subgroup.index_dvd_card _
+      _ = Nat.card ↥h.K := Nat.card_congr ConjAct.ofConjAct.toEquiv
+  have hφdvdK : orderOf φ ∣ Nat.card ↥h.K := by
+    rw [← Nat.card_zpowers]; exact (hsma_card ▸ hdvd1).trans hcar_dvd
+  have hφdvdW1 : orderOf φ ∣ Nat.card ↥h.W1 := by
+    have hφg : orderOf φ ∣ orderOf g := by rw [hφ]; exact orderOf_map_dvd _ g
+    exact hφg.trans (Subgroup.orderOf_dvd_natCard _ hg)
+  have hφ1 : orderOf φ = 1 := by
+    have := Nat.dvd_gcd hφdvdK hφdvdW1
+    rwa [h.card_coprime, Nat.dvd_one] at this
+  -- `φ = 1`: `g` centralizes `a`, so `a ∈ C_K(g) = W₂` — contradicting `hno`
+  have hφeq1 : φ = 1 := orderOf_eq_one_iff.mp hφ1
+  have ha_mem : a ∈ C.carrier := (hmem_iff a).mpr (IsConj.refl a)
+  have haW2 : (a : L) ∈ h.W2 := by
+    have hcomm : g * (a : L) * g⁻¹ = (a : L) := by
+      have hval : (φ a : L) = (a : L) := by rw [hφeq1, MulAut.one_apply]
+      rw [hφ, MulAut.conjNormal_apply] at hval
+      exact hval
+    have hmem_inf : (a : L) ∈ Subgroup.centralizer ({g} : Set L) ⊓ h.K :=
+      Subgroup.mem_inf.mpr ⟨by
+        rw [Subgroup.mem_centralizer_iff]
+        rintro m hm
+        rw [Set.mem_singleton_iff] at hm; subst hm
+        exact mul_inv_eq_iff_eq_mul.mp hcomm, a.2⟩
+    rwa [h.centralizer_W2 g hg hg1] at hmem_inf
+  exact hno a ha_mem haW2
 
 section Recipe
 
