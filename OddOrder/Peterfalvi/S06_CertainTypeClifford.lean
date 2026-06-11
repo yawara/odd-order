@@ -506,6 +506,45 @@ theorem conjClass_meets_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) (C : ConjCl
     rwa [h.centralizer_W2 g hg hg1] at hmem_inf
   exact hno a ha_mem haW2
 
+/-- **Peterfalvi (4.5.b), counting bound on `g`-stable classes** (mmd 04.6, (4.5.b) proof):
+for `g ∈ W₁^#`, the number of conjugacy classes of `K` normalized by `g` is at most `w₂`.
+Each such class meets `W₂` (`conjClass_meets_W2`), and distinct classes are disjoint, so picking
+a `W₂`-representative injects the `g`-stable classes into `W₂`. -/
+theorem card_fixed_conjClasses_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g))
+      ≤ Nat.card ↥h.W2 := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  classical
+  -- a `W₂`-representative of each `g`-stable class
+  let wit : Function.fixedPoints (ConjClasses.conjByPerm (G := L) (H := h.K) g) → ↥h.K :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose
+  have hwit_carrier : ∀ p, wit p ∈ p.1.carrier :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose_spec.1
+  have hwit_W2 : ∀ p, ((wit p : L)) ∈ h.W2 :=
+    fun p => (h.conjClass_meets_W2 g hg hg1 p.1 p.2).choose_spec.2
+  refine Nat.card_le_card_of_injective (fun p => (⟨(wit p : L), hwit_W2 p⟩ : ↥h.W2)) ?_
+  intro p q hpq
+  have hL := Subtype.ext_iff.mp hpq
+  have hwit_eq : wit p = wit q := Subtype.ext hL
+  apply Subtype.ext
+  calc p.1 = ConjClasses.mk (wit p) := (ConjClasses.mem_carrier_iff_mk_eq.mp (hwit_carrier p)).symm
+    _ = ConjClasses.mk (wit q) := by rw [hwit_eq]
+    _ = q.1 := ConjClasses.mem_carrier_iff_mk_eq.mp (hwit_carrier q)
+
+/-- **Peterfalvi (4.5.b), `g` fixes at most `w₂` irreducibles** (mmd 04.6, (4.5.b) proof, via
+[Is] Theorem 6.32): for `g ∈ W₁^#`, conjugation by `g` fixes at most `w₂` irreducible characters
+of `K`.  Brauer's permutation lemma equates the count of `g`-fixed irreducibles with the count of
+`g`-stable conjugacy classes (`card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`),
+which is `≤ w₂` by `card_fixed_conjClasses_le_W2`. -/
+theorem card_fixed_irr_le_W2 (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) :
+    Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g))
+      ≤ Nat.card ↥h.W2 := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  rw [card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm]
+  exact h.card_fixed_conjClasses_le_W2 g hg hg1
+
 section Recipe
 
 variable [Invertible (Nat.card L : ℂ)]
@@ -709,6 +748,92 @@ theorem induce_restrict_certainType_eq [NeZero (Nat.card h.W1)]
   obtain ⟨θ, hχj_eq, hind⟩ := h.exists_irreducible_restrict_certainType χ₂
   rw [hχj_eq]
   exact hind
+
+/-! ### Peterfalvi (4.5)(b): `Ind^L_K χ` exhausts `Irr(L)` (mmd 04.6)
+
+For `χ ∈ Irr(K)` not one of the `χ_j`, `Ind^L_K χ` is irreducible, distinct from every `μ_{ij}`,
+and every irreducible character of `L` is some `μ_{ij}` or such an `Ind^L_K χ`.  The heart is the
+*inertia* computation `I_L(χ) = K`: a character not among the `χ_j` is fixed by no `g ∈ W₁^#`
+(`card_fixed_irr_le_W2` says `g` fixes at most `w₂` irreducibles, and the `w₂` distinct `χ_j` already
+exhaust them), and the complement `L = K ⋊ W₁` then forces the inertia group down to `K`. -/
+
+/-- **Bridge: inertia ↔ conjugation-permutation fixed point.**  For `g : L` and `θ ∈ Irr(K)`, `g`
+lies in the inertia group of `θ` iff `θ` is fixed by the conjugation permutation
+`IrreducibleCharacter.conjByPerm g` (whose fixed-point count is bounded by `card_fixed_irr_le_W2`). -/
+theorem mem_inertia_iff_isFixedPt_conjByPerm (g : L) (θ : IrreducibleCharacter ↥h.K) :
+    g ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) θ ↔
+      Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) θ := by
+  haveI := h.K_normal
+  rw [IrreducibleCharacter.mem_inertia]
+  exact Iff.rfl
+
+/-- **`χ_j` packaged as an irreducible character of `K`** (`certainTypeRestrict_isIrreducible`).
+Indexed by the `W₂`-column `χ₂ ∈ Ŵ₂`; there are `w₂` of them. -/
+noncomputable def chiRestrict [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    IrreducibleCharacter ↥h.K :=
+  ⟨ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ),
+   h.certainTypeRestrict_isIrreducible χ₂⟩
+
+@[simp] theorem coe_chiRestrict [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)
+      = ClassFunction.restrict h.K ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) :=
+  rfl
+
+/-- **`χ_j` is fixed by every `g ∈ L`** (in particular `g ∈ W₁^#`): it is the restriction of the
+`L`-character `μ_{0j}`, so conjugation by any `g ∈ L` fixes it (`conjBy_restrict`). -/
+theorem chiRestrict_isFixedPt [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (g : L) :
+    Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)
+      (h.chiRestrict χ₂) := by
+  haveI := h.K_normal
+  apply IrreducibleCharacter.ext
+  simp only [IrreducibleCharacter.conjByPerm_apply, IrreducibleCharacter.coe_conjBy,
+    coe_chiRestrict]
+  exact ClassFunction.conjBy_restrict g ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+
+/-- **The `χ_j` are distinct** (injective in the column `χ₂`): if `χ_j = χ_{j'}` then their
+inductions `μ_j = ∑_i μ_{ij}` and `μ_{j'} = ∑_i μ_{ij'}` coincide (`induce_restrict_certainType_eq`),
+but `⟨μ_j, μ_{0j}⟩ = 1` while `⟨μ_{j'}, μ_{0j}⟩ = 0` for `j ≠ j'` (cross-column orthogonality
+`columnFamily_mu_ne`), a contradiction. -/
+theorem chiRestrict_injective [NeZero (Nat.card h.W1)] :
+    Function.Injective h.chiRestrict := by
+  classical
+  intro χ₂ χ₂' heq
+  by_contra hne
+  -- the column sums coincide
+  have hind : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ))
+      = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction L ℂ) := by
+    have hcoe := congrArg (ClassFunction.induce h.K)
+      (congrArg IrreducibleCharacter.toClassFunction heq)
+    rwa [coe_chiRestrict, coe_chiRestrict, h.induce_restrict_certainType_eq χ₂,
+      h.induce_restrict_certainType_eq χ₂'] at hcoe
+  -- inner with `μ_{0j}`: `1` on the left, `0` on the right
+  have key : ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ))
+        ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)
+      = ClassFunction.inner (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction L ℂ))
+        ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) := by rw [hind]
+  rw [inner_sum_left, inner_sum_left] at key
+  have hLHS : (∑ i, ClassFunction.inner ((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
+      ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) = 1 := by
+    rw [Finset.sum_congr rfl (fun i _ => irreducibleCharacter_inner_eq_ite _ _)]
+    rw [Finset.sum_congr rfl (fun i _ => if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
+      Finset.sum_ite_eq' Finset.univ (0 : Fin (Nat.card h.W1)) (fun _ => (1 : ℂ)),
+      if_pos (Finset.mem_univ _)]
+  have hRHS : (∑ i, ClassFunction.inner ((h.columnFamily χ₂').mu i : ClassFunction L ℂ)
+      ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) = 0 := by
+    refine Finset.sum_eq_zero (fun i _ => ?_)
+    rw [irreducibleCharacter_inner_eq_ite, if_neg (h.columnFamily_mu_ne (Ne.symm hne) i 0)]
+  rw [hLHS, hRHS] at key
+  exact one_ne_zero key
+
+/-- **The number of columns is `w₂`** (`|Ŵ₂| = |W₂|`, Pontryagin self-duality
+`card_charGroup_subgroupOf`).  Together with `chiRestrict_injective` this gives `w₂` distinct
+`χ_j ∈ Irr(K)`, matching the `card_fixed_irr_le_W2` bound. -/
+theorem card_charGroup_W2 :
+    Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 :=
+  h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
 end Recipe
 
