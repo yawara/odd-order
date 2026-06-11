@@ -408,27 +408,9 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
     conv_lhs => rw [hco]
     group
 
-/-! ## §12 τ₂(M) ≠ ∅ の場合 (mmd L3129-3344) — 最複雑 subsection -/
+/-! ## §12 τ₂(M) ≠ ∅ の場合 (mmd L3129-3344) — 最複雑 subsection
 
-/-- **BG Theorem 12.5** (mmd L3129): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(M)` のとき
-(a) `M_σ` nilpotent; (b) `M` は abelian Sylow `p` を持ち、`A` を含む Sylow `p`-部分群 `P` で
-`N_G(P) ⊄ M`; (c) `M_σA ⊴ M`; (d) `C_{M_σ}(A)=1`; (e) `M^* ∈ ℳ(A)-{M}` で `M_σ ∩ M^* = 1`;
-(f) `∃ A₁ ∈ ℰ¹(A)` で `C_{M_σ}(A₁)=1`。
-(原典 (b) の `Ω₁(P)=A` は Omega の入れ子のため docstring で defer。) -/
-theorem Msigma_nilpotent_of_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) :
-    Group.IsNilpotent ↥(S10.Msigma M) ∧
-    ((∀ P : Sylow p ↥M, IsMulCommutative (P : Subgroup ↥M)) ∧
-      ∃ P : Subgroup G, P ≤ M ∧ IsPGroup p ↥P ∧ A ≤ P ∧
-        (∀ T : Subgroup G, T ≤ M → IsPGroup p ↥T → P ≤ T → P = T) ∧
-        ¬ (Subgroup.normalizer (P : Set G) ≤ M)) ∧
-    M ≤ Subgroup.normalizer ((S10.Msigma M ⊔ A : Subgroup G) : Set G) ∧
-    S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ ∧
-    (∀ Mstar ∈ maximalSubgroupsContaining A, Mstar ≠ M → S10.Msigma M ⊓ Mstar = ⊥) ∧
-    (∃ A₁ ∈ elemAbelianOfRank G p 1, A₁ ≤ A ∧
-      S10.Msigma M ⊓ Subgroup.centralizer (A₁ : Set G) = ⊥) := by
-  sorry
+**BG Theorem 12.5** は `S12_Theorem125.lean` に移動した (`Msigma_nilpotent_of_tau2`)。 -/
 
 /-- **BG Corollary 12.6** (mmd L3150): `p ∈ τ₂(M)`, `A ∈ ℰ_p²(E)` のとき
 (a) `A ⊴ E` かつ `ℰ_p¹(E)=ℰ¹(A)`; (b) `C_G(A) ⊆ N_M(A)=E`, `N_G(A) ⊄ M`;

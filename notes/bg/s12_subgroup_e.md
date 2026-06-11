@@ -62,8 +62,23 @@ S12_Lemma1218)。全結果 **unconditional・axiom-clean** (standard 3 のみ)�
   `IsCyclic` field の goal は zpowers が ∃-unfold された形 → rw 不可、defeq exact で;
   `isHall_Msigma_Malpha` の Malpha-Hall は `.2.1` (右は 4 連言)。
 
-### ▶ 残 cascade 12 件 (S12_E): 次 = **Thm 12.5** (新 leaf S12_Theorem125; 12.4(b) 対偶 →
-Hyp111 constructor → 11.3/11.5/11.7/Cor11.6 + 12.3(a))
+### ✅ session 3 cont.²: **Thm 12.5 COMPLETE** (新 leaf `S12_Theorem125.lean`, 一発 green)
+
+- `Msigma_nilpotent_of_tau2` 全 6 結論 unconditional・axiom-clean。**§11 中継完了 — 以後
+  §11 直接参照は不要** (BG L3177)。入口 = 12.4(b) 対偶 (`∃A₀, ℳ(N(A₀))={M}` →
+  `normalizer_le_of_maximalSubgroupsContaining_eq_singleton` [新 helper] → `N(A₀)≤M`) →
+  `Hypothesis111.of_normalizer_le`。(a)=11.3, (b)=11.5 + Hyp111 fields (P_sylow は引数順
+  reshape + .symm), (c)=11.7, (d)=Cor 11.6(b) (inf_comm), (f)=Cor 11.6(c)
+  `exists_distinct_conj_lines` の第1成分。
+- **(e) の二分** (mmd L3171-3176): `∃A₀', N(A₀')≤M*` → 12.3(a) + (d) /
+  otherwise → 12.4(b) を **M\* に適用** (`p∈σ(M*) ∧ M*_α=⊥`) →
+  `normalizer_Malpha_sup_sylow_of_mem_sigma` が `M*_α=⊥` で **`S ⊴ M*` に退化**
+  (`rw [hMα', bot_sup_eq]`) → `⁅A,K⁆ ≤ K⊓S = ⊥` (p'∩p) → `K ≤ C(A)` → (d)。
+  原文の `A ⊆ O_p(M*)` 経路は O_p 機構不要のこの形で代替。
+
+### ▶ 残 cascade 11 件 (S12_E 実 sorry 11): τ₂-cascade 解禁。次 = **Cor 12.6**
+(`elemAb_normal_in_E_of_tau2`; 12.5 + (12.2) 消費, E-setup 文脈) → 12.7 (Lem 10.13(b)(c)
+直接消費・大物) → 12.8 → ...。12.6 の (f) は 10.12(b) + 12.5(a)。
 
 12.4 実装メモ (recon 済): worker = (b)-仮定 (`∀A₀∈ℰ¹(A), ℳ(N_G(A₀))≠{M}`) 下で
 `p∈σ ∧ M_α=⊥ ∧ M_σ nilpotent ∧ C_G(A)≤M` 一括証明 → (a) は by_cases で direct 枝

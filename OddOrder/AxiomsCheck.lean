@@ -48,6 +48,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3740,3 +3741,15 @@ Proposition 10.11(b), Theorem 10.2 (Hall structure + BB4), and `Ω₁(Z(P))`
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_of_elemAb_rank_two
+
+/-! ### BG Theorem 12.5 (`S12_Theorem125`)
+
+**BG Theorem 12.5** (mmd L3159): for `p ∈ τ₂(M)` and `A ∈ ℰ_p²(M)`: (a) `M_σ` is
+nilpotent; (b) `M` has abelian Sylow `p`-subgroups and a Sylow `p`-subgroup `P ⊇ A` with
+`N_G(P) ⊄ M`; (c) `M_σ A ⊴ M`; (d) `C_{M_σ}(A) = 1`; (e) `M_σ ∩ M* = 1` for every
+`M* ∈ ℳ(A) − {M}`; (f) some `A₁ ∈ ℰ¹(A)` has `C_{M_σ}(A₁) = 1`
+(`Msigma_nilpotent_of_tau2`). The τ₂-case gateway: Proposition 12.4(b) supplies
+Hypothesis 11.1, then Theorems 11.3/11.5/11.7, Corollary 11.6, and Lemma 12.3(a) give
+the conclusions — all unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_nilpotent_of_tau2
