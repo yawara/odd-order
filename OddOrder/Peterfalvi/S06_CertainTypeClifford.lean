@@ -835,6 +835,66 @@ theorem card_charGroup_W2 :
     Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) = Nat.card h.W2 :=
   h.sdiffTICyclicHypothesis.card_charGroup_subgroupOf h.sdiffTICyclicHypothesis.W2_le_W
 
+/-- **Counting collapse** (mmd 04.6, (4.5.b) proof): for `g ∈ W₁^#`, every `g`-fixed irreducible
+character of `K` is one of the `χ_j`.  The `w₂` distinct `χ_j` (`chiRestrict_injective`,
+`card_charGroup_W2`) all lie in the `g`-fixed set (`chiRestrict_isFixedPt`), whose size is at most
+`w₂` (`card_fixed_irr_le_W2`); equality forces the injection `Ŵ₂ ↪ Fix(g)` to be onto. -/
+theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
+    (g : L) (hg : g ∈ h.W1) (hg1 : g ≠ 1) {χ : IrreducibleCharacter ↥h.K}
+    (hfix : Function.IsFixedPt (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) χ) :
+    ∃ χ₂, h.chiRestrict χ₂ = χ := by
+  haveI := h.K_normal
+  haveI : Finite ↥h.K := Fintype.ofFinite _ |>.finite
+  classical
+  -- `F : Ŵ₂ → Fix(g)`, `χ₂ ↦ χ_j`, is injective into the `g`-fixed set
+  let F : ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) →
+      Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g) :=
+    fun χ₂ => ⟨h.chiRestrict χ₂, h.chiRestrict_isFixedPt χ₂ g⟩
+  have hFinj : Function.Injective F :=
+    fun a b hab => h.chiRestrict_injective (Subtype.ext_iff.mp hab)
+  -- cardinality sandwich: `w₂ = |Ŵ₂| ≤ |Fix(g)| ≤ w₂`
+  have hle1 : Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      ≤ Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) :=
+    Nat.card_le_card_of_injective F hFinj
+  have hle2 := h.card_fixed_irr_le_W2 g hg hg1
+  have hcardeq : Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      = Nat.card (Function.fixedPoints (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) :=
+    le_antisymm hle1 (hle2.trans (le_of_eq h.card_charGroup_W2.symm))
+  -- injective + equal finite cardinality ⟹ bijective ⟹ surjective
+  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype (Function.fixedPoints
+      (IrreducibleCharacter.conjByPerm (G := L) (H := h.K) g)) := Fintype.ofFinite _
+  have hbij : Function.Bijective F := by
+    rw [Fintype.bijective_iff_injective_and_card]
+    exact ⟨hFinj, by rw [← Nat.card_eq_fintype_card, ← Nat.card_eq_fintype_card]; exact hcardeq⟩
+  obtain ⟨χ₂, hχ₂⟩ := hbij.surjective ⟨χ, hfix⟩
+  exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
+
+/-- **Peterfalvi (4.5.b), inertia computation**: a `χ ∈ Irr(K)` that is none of the `χ_j` has full
+inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`, `w ∈ W₁`) via the complement
+`L = K ⋊ W₁`; then `w = k⁻¹ℓ ∈ I_L(χ)`.  If `w ≠ 1` then `w ∈ W₁^#` fixes `χ`
+(`mem_inertia_iff_isFixedPt_conjByPerm`), so `χ` is one of the `χ_j`
+(`exists_eq_chiRestrict_of_isFixedPt`) — a contradiction; hence `w = 1` and `ℓ = k ∈ K`. -/
+theorem inertia_eq_K_of_forall_chiRestrict_ne [NeZero (Nat.card h.W1)]
+    {χ : IrreducibleCharacter ↥h.K} (hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ) :
+    IrreducibleCharacter.inertia (G := L) (H := h.K) χ = h.K := by
+  haveI := h.K_normal
+  refine le_antisymm ?_ (IrreducibleCharacter.subgroup_le_inertia χ)
+  intro ℓ hℓ
+  obtain ⟨⟨⟨kk, hk⟩, ⟨u, hu⟩⟩, hku, -⟩ := Subgroup.IsComplement.existsUnique h.isComplement ℓ
+  change kk * u = ℓ at hku
+  have hkI : kk ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) χ :=
+    IrreducibleCharacter.subgroup_le_inertia χ hk
+  have huI : u ∈ IrreducibleCharacter.inertia (G := L) (H := h.K) χ := by
+    have hueq : u = kk⁻¹ * ℓ := by rw [← hku]; group
+    rw [hueq]; exact mul_mem (inv_mem hkI) hℓ
+  rcases eq_or_ne u 1 with hu1 | hu1
+  · rw [← hku, hu1, mul_one]; exact hk
+  · exact absurd
+      (h.exists_eq_chiRestrict_of_isFixedPt u hu hu1
+        ((h.mem_inertia_iff_isFixedPt_conjByPerm u χ).mp huI))
+      (not_exists.mpr hχ)
+
 end Recipe
 
 end Hypothesis
