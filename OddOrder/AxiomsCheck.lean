@@ -48,6 +48,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S11_MsigmaANormal
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -3926,3 +3927,14 @@ and `isMulCommutative_of_isNilpotent_of_forall_sylow` assembles the Sylow direct
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_isMulCommutative_of_sigma_compl
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.nilpotent_sigmaComplement_abelian
+
+/-! ### BG §12 `SubgroupESetup` existence (`S12_Lemma1211`)
+
+The §12-preamble existence statement: every `M ∈ ℳ` carries a `SubgroupESetup`
+(Schur–Zassenhaus complement `E` to `M_σ`, Hall `τᵢ` pieces with `E₁E₂` a subgroup via
+the Hall-in-Hall transfer `isHallSubgroup_of_isHallSubgroup_of_le`). Required to apply
+the §12 results on the `M*` side in Lemma 12.11 and later. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isHallSubgroup_of_isHallSubgroup_of_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_subgroupESetup
