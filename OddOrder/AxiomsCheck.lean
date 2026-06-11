@@ -49,6 +49,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
@@ -3830,3 +3831,22 @@ Corollary 10.7(a) `sylow_le_derivedInG_normalizer`, the Fitting chain through `N
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E2_abelian_normal_hall_of_abelianSylow
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_chain_of_abelianSylow
+
+/-! ### BG Lemma 12.8(d)(e)(f) + assembly (`S12_Lemma128d`)
+
+(d) the normalizer chain `N_G(A) = N_G(S) = N_G(E₂) = N_G(E₂E₃) = N_G(F(E))`
+(`normalizer_chain_of_abelianSylow`; characteristic chain
+`A = Ω₁(S)`, `S = O_p(E₂)`, `E₂ = O_{τ₂}(E₂E₃)`, `E₂E₃ = O_{τ₂∪τ₃}(F(E))`, closed up by
+`F(N_G(A)) = F(C_G(A)) = F(E)`); (e) lines of `E₁` with trivial `M_σ`-centralizer are
+central in `E` (`central_line_of_abelianSylow`; `⁅E₂E₃, X⁆ ⊴ N_G(S)` against
+Proposition 10.11(d) and `N_G(S) ⊄ M`); (f) `C_S(X), ⁅S,X⁆ ⊴ N_G(S)`
+(`relative_normality_of_abelianSylow`); assembled as `E2_abelian_of_abelianSylow`.
+All unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.normalizer_chain_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.central_line_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.relative_normality_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E2_abelian_of_abelianSylow
