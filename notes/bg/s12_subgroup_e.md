@@ -162,7 +162,31 @@ AxiomsCheck 5 本登録):
 - 他 de-private: `coprime_of_forall_prime_not_dvd` (127d)。新 helper:
   `isMulCommutative_of_le` / `isMulCommutative_of_le_centralizer` / `derivedInG_le_derivedInG`。
 
-### ▶ 残 = 12.8 (d)(e)(f) + assembly — **設計済み (session 5)、新 leaf `S12_Lemma128d.lean` 推奨** (777+~700 > 1,500 行 gate)
+### ✅✅✅ session 5 完結: **Lemma 12.8 全 6 結論 + assembly COMPLETE** (leaf ×2, unconditional・axiom-clean)
+
+**(d)(e)(f) + assembly = 新 leaf `S12_Lemma128d.lean` (930 行)**, S12_E scaffold 削除
+(**実 sorry 8**: 12.4(a) 系 ×3 + 12.9〜12.13 系 ×5)。AxiomsCheck 計 9 本登録。
+- **(d)** `normalizer_chain_of_abelianSylow`: char-chain 一周。部品 = `S = O_p(E₂)` /
+  `E₂ = O_{τ₂}(K)` / `K := E₂E₃ = O_{τ₂∪τ₃}(F(E))` (汎用 `piGroup_le_opiCoreInG_of_nilpotent`
+  + `card_opiCoreInG_dvd_of_nilpotent` で card 同定) + transport
+  `le_normalizer_opiCoreInG_of_le_normalizer`; 一周の鍵 **N(A) ≤ N(F(E))** は
+  **F(N)=F(C)=F(E)** (C := C_G(A) ⊴ N [conj transport]; F(N) ≤ C は chain-core 拡張結論
+  [`derivedInG_normalizer_elemAb_le_fittingInG` を 3 連言化]; F(C) ⊴ N は
+  `AppB.normalizer_le_normalizer_map_of_characteristic` + `Ch01.fitting.characteristic`)。
+- **(e)** `central_line_of_abelianSylow`: K abelian (`centralizer_sup_eq` 新 helper +
+  ⁅E₂,E₃⁆ ≤ ⊓ = ⊥)、F(E) ≤ C(K) (`fittingInG_le_centralizer_opiCoreInG` 新汎用 +
+  E₃ = O_{τ₃}(F(E)) 同定)、⁅K,X⁆ ⊴ N(S) ((f) 機構 mirror) → **10.11(d)**
+  (`S10.sigma_complement_commutator_cyclic_normal`) → N(⁅K,X⁆) = M → N(S) ≤ M ✗。
+- **(f)** `relative_normality_of_abelianSylow`: H := C_G(S)⊔X ⊴ N(S)
+  (`Ch06.normal_of_commutator_le`)、C_S(X) = S⊓C(H)、⁅S,H⁆ = ⁅S,X⁆
+  (normal_mul 分解 + c-conj 固定)、conj-invariance (map_inf injective / map_commutator)。
+- ⚠ 技法: element commutator は `open scoped commutatorElement` 必須 (Bracket G G)。
+  subst h : r = p は **p 側 (binder) を消す** — 以降 r 表記。`set K` の fold ずれは
+  `show` で正規化してから omega。
+
+▶ **次 = Corollary 12.9** (S12_E:447 scaffold; 12.8(e) + 12.7(c) 消費、レシピ = mmd L3286-3292)。
+
+### (履歴) 残 = 12.8 (d)(e)(f) + assembly — 設計メモ (session 5)
 
 - **(d)** N(A)=N(S)=N(E₂)=N(E₂E₃)=N(F(E)): **char-chain 一周** N(F(E)) ≤ N(E₂E₃) ≤ N(E₂)
   ≤ N(S) ≤ N(A) ≤ N(F(E))。部品: S = opiCoreInG {p} E₂ / E₂ = O_{τ₂}(E₂⊔E₃) /
