@@ -196,8 +196,9 @@ theorem le_normalizer_inf {G : Type*} [Group G] {H A B : Subgroup G}
   · rintro ⟨h1, h2⟩; exact ⟨hxA.mp h1, hxB.mp h2⟩
   · rintro ⟨h1, h2⟩; exact ⟨hxA.mpr h1, hxB.mpr h2⟩
 
-/-- The normalizer of `Q` normalizes the centralizer of `Q`. -/
-private theorem normalizer_le_normalizer_centralizer {G : Type*} [Group G] (Q : Subgroup G) :
+/-- The normalizer of `Q` normalizes the centralizer of `Q`.
+(Public: shared with `S12_Theorem127`.) -/
+theorem normalizer_le_normalizer_centralizer {G : Type*} [Group G] (Q : Subgroup G) :
     Subgroup.normalizer (Q : Set G) ≤
       Subgroup.normalizer ((Subgroup.centralizer (Q : Set G) : Subgroup G) : Set G) := by
   intro x hx

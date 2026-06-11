@@ -764,4 +764,193 @@ theorem exists_canonical_line_of_nonabelianSylow [Finite G] (hG : IsMinimalSimpl
     exact haA₀
   exact ⟨A₀, hinf_eq.symm, by rw [hA₀.2, pow_one], hA₀A, hMσ_cent, hc, habs⟩
 
+/-! ## Theorem 12.7(b): `F(M) = M_σ × A₀` -/
+
+/-- A natural number whose prime factors all equal `q` is a power of `q`. -/
+private theorem eq_pow_factorization_of_forall_eq {n q : ℕ}
+    (hn : n ≠ 0) (hpi : ∀ r ∈ n.primeFactors, r = q) :
+    n = q ^ n.factorization q := by
+  classical
+  have h1 := Nat.prod_factorization_pow_eq_self hn
+  rcases Finset.eq_empty_or_nonempty n.primeFactors with hempty | ⟨r, hr⟩
+  · have hn1 : n = 1 := by
+      rcases Nat.primeFactors_eq_empty.mp hempty with h0 | h1'
+      · exact absurd h0 hn
+      · exact h1'
+    rw [hn1]
+    simp
+  · have hrq : r = q := hpi r hr
+    subst hrq
+    have hsupp : n.factorization.support = {r} := by
+      rw [Nat.support_factorization]
+      exact Finset.eq_singleton_iff_unique_mem.mpr ⟨hr, fun s hs => hpi s hs⟩
+    conv_lhs => rw [← h1]
+    rw [Finsupp.prod, hsupp, Finset.prod_singleton]
+
+/-- **BG Theorem 12.7(b)** (mmd L3237-3243): with the canonical line
+`A₀ = A ⊓ C_G(M_σ)`: `M ≤ N_G(A₀)`, `F(M) = M_σ ⊔ A₀`, and `M_σ ⊓ A₀ = ⊥`.
+By (a) and Lemma 12.2(a), `π(F(M)) ⊆ σ(M) ∪ {p}`; the `q`-core of the nilpotent `F(M)`
+lands in `M_σ` (`q ∈ σ`) or in `A₀` (`q = p`, by the absorption clause), so
+`|F(M)| ∣ |M_σ ⊔ A₀|`, while `M_σ ⊔ A₀ ≤ F(M)` since both factors are normal
+nilpotent. -/
+theorem fitting_eq_sup_of_canonical_line [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    (hprime_eq : ∀ q : ℕ, q.Prime → q ∈ tau2 M → q = p)
+    {A₀ : Subgroup G} (hA₀eq : A₀ = A ⊓ Subgroup.centralizer (S10.Msigma M : Set G))
+    (hA₀card : Nat.card ↥A₀ = p)
+    (hMσC : S10.Msigma M ≤ Subgroup.centralizer (A₀ : Set G))
+    (habs : ∀ W : Subgroup G, M ≤ Subgroup.normalizer (W : Set G) → IsPGroup p ↥W →
+      W ≤ M → W ≤ A₀) :
+    M ≤ Subgroup.normalizer (A₀ : Set G) ∧
+    Ch2.S08.fittingInG M = S10.Msigma M ⊔ A₀ ∧ S10.Msigma M ⊓ A₀ = ⊥ := by
+  classical
+  have hAM : A ≤ M := hAE.trans h.E_le
+  have hA₀A : A₀ ≤ A := hA₀eq ▸ inf_le_left
+  have hA₀M : A₀ ≤ M := hA₀A.trans hAM
+  have hpσ : p ∉ S10.sigma M := tau2_subset_sigma_compl M hp
+  have hMσp : ¬ p ∣ Nat.card ↥(S10.Msigma M) := by
+    intro hdvd
+    exact hpσ (S10.Msigma_isPiGroup M p
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
+  have hA₀pg : IsPGroup p ↥A₀ := IsPGroup.of_card (by rw [hA₀card, pow_one])
+  -- `M ≤ N_G(A₀)`.
+  have hA₀_norm : M ≤ Subgroup.normalizer (A₀ : Set G) := by
+    rw [← h.E_compl_sup]
+    refine sup_le (hMσC.trans (Subgroup.centralizer_le_normalizer _)) ?_
+    rw [hA₀eq]
+    exact le_normalizer_inf (E_le_normalizer_of_tau2 hG h hp hA hAE)
+      ((h.E_le.trans (le_normalizer_opiCoreInG _ _)).trans
+        (normalizer_le_normalizer_centralizer _))
+  -- `M_σ ⊓ A₀ = ⊥`.
+  have hMσA₀_bot : S10.Msigma M ⊓ A₀ = ⊥ := by
+    rw [← Subgroup.card_eq_one]
+    have h1 : Nat.card ↥(S10.Msigma M ⊓ A₀ : Subgroup G) ∣ p := by
+      rw [← hA₀card]
+      exact Subgroup.card_dvd_of_le inf_le_right
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ h1 with h2 | h2
+    · exact h2
+    · exfalso
+      apply hMσp
+      rw [← h2]
+      exact Subgroup.card_dvd_of_le inf_le_left
+  -- `M_σ ⊔ A₀ ≤ F(M)`.
+  have hMσ_le_F : S10.Msigma M ≤ Ch2.S08.fittingInG M := by
+    haveI h1 : ((S10.Msigma M).subgroupOf M).Normal := by
+      rw [S10.Msigma_subgroupOf]; infer_instance
+    haveI h2 : Group.IsNilpotent ↥(S10.Msigma M) :=
+      (Msigma_nilpotent_of_tau2 hG h.mem_maximal hp hA hAM).1
+    haveI h3 : Group.IsNilpotent ↥((S10.Msigma M).subgroupOf M) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).symm
+    have h4 : (S10.Msigma M).subgroupOf M ≤ Ch01.fitting ↥M :=
+      Ch01.nilpotent_normal_le_fitting
+    calc S10.Msigma M
+        = ((S10.Msigma M).subgroupOf M).map M.subtype :=
+          (Subgroup.map_subgroupOf_eq_of_le (S10.Msigma_le M)).symm
+      _ ≤ (Ch01.fitting ↥M).map M.subtype := Subgroup.map_mono h4
+      _ = Ch2.S08.fittingInG M := rfl
+  have hA₀_le_F : A₀ ≤ Ch2.S08.fittingInG M :=
+    Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hA₀M
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hA₀M).mpr hA₀_norm)
+      (isPiSubgroup_of_isPGroup_of_mem hA₀pg rfl)
+  have hJ_le_F : S10.Msigma M ⊔ A₀ ≤ Ch2.S08.fittingInG M := sup_le hMσ_le_F hA₀_le_F
+  -- `|F(M)| ∣ |M_σ ⊔ A₀|`: per-prime analysis of the nilpotent `F(M)`.
+  haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG M) := Ch2.S08.fittingInG_isNilpotent M
+  have hM_norm_F : M ≤ Subgroup.normalizer ((Ch2.S08.fittingInG M : Subgroup G) : Set G) :=
+    fun m hm => Ch2.S08.mem_normalizer_fittingInG_of_mem hm
+  have hkey : ∀ q : ℕ, q.Prime →
+      (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q ≤
+        (Nat.card ↥(S10.Msigma M ⊔ A₀ : Subgroup G)).factorization q := by
+    intro q hq_prime
+    haveI : Fact q.Prime := ⟨hq_prime⟩
+    by_cases hqF : q ∣ Nat.card ↥(Ch2.S08.fittingInG M)
+    case neg =>
+      rw [Nat.factorization_eq_zero_of_not_dvd hqF]
+      exact Nat.zero_le _
+    case pos =>
+    set Fq : Subgroup G := opiCoreInG ({q} : Set ℕ) (Ch2.S08.fittingInG M) with hFqdef
+    have hHall := S10.oPiCore_isHall_of_isNilpotent
+      (K := ↥(Ch2.S08.fittingInG M)) ({q} : Set ℕ)
+    have hc1 : Nat.card ↥Fq = Nat.card ↥(Ch03.oPiCore ({q} : Set ℕ)
+        ↥(Ch2.S08.fittingInG M)) :=
+      Subgroup.card_map_of_injective (Ch2.S08.fittingInG M).subtype_injective
+    -- `ν_q(|Fq|) = ν_q(|F|)` (Hall `{q}`-subgroup).
+    have hFq_card : (Nat.card ↥Fq).factorization q
+        = (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q := by
+      have hidx : ((Ch03.oPiCore ({q} : Set ℕ)
+          ↥(Ch2.S08.fittingInG M)).index).factorization q = 0 := by
+        apply Nat.factorization_eq_zero_of_not_dvd
+        intro hdvd
+        exact hHall.2 q (Nat.mem_primeFactors.mpr
+          ⟨hq_prime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl
+      have hmul := Subgroup.card_mul_index
+        (Ch03.oPiCore ({q} : Set ℕ) ↥(Ch2.S08.fittingInG M))
+      have hfac : (Nat.card ↥(Ch03.oPiCore ({q} : Set ℕ)
+            ↥(Ch2.S08.fittingInG M))).factorization q +
+          ((Ch03.oPiCore ({q} : Set ℕ) ↥(Ch2.S08.fittingInG M)).index).factorization q
+          = (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q := by
+        rw [← hmul, Nat.factorization_mul Nat.card_pos.ne'
+          Subgroup.index_ne_zero_of_finite, Finsupp.add_apply]
+      rw [hc1]
+      omega
+    have hFq_le_F : Fq ≤ Ch2.S08.fittingInG M := Subgroup.map_subtype_le _
+    have hFq_le_M : Fq ≤ M := hFq_le_F.trans (Ch2.S08.fittingInG_le M)
+    -- `Fq` is a `q`-group.
+    have hFq_pi : ∀ r ∈ (Nat.card ↥Fq).primeFactors, r = q := by
+      intro r hr
+      have h1 : r ∈ (Nat.card ↥(Ch03.oPiCore ({q} : Set ℕ)
+          ↥(Ch2.S08.fittingInG M))).primeFactors := by rwa [hc1] at hr
+      exact hHall.1 r h1
+    have hFq_pg : IsPGroup q ↥Fq :=
+      IsPGroup.of_card (eq_pow_factorization_of_forall_eq Nat.card_pos.ne' hFq_pi)
+    have hFq_ne : Fq ≠ ⊥ := by
+      intro hbot
+      have h1 : (Nat.card ↥Fq).factorization q = 0 := by
+        rw [hbot, Subgroup.card_bot]
+        simp
+      rw [hFq_card] at h1
+      have h2 : 0 < (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q :=
+        Nat.Prime.factorization_pos_of_dvd hq_prime Nat.card_pos.ne' hqF
+      omega
+    have hM_norm_Fq : M ≤ Subgroup.normalizer (Fq : Set G) :=
+      le_normalizer_opiCoreInG_of_le_normalizer _ hM_norm_F
+    have hNFq_le_M : Subgroup.normalizer (Fq : Set G) ≤ M := by
+      have hlt := normalizer_lt_top_of_le_of_ne_bot hG h.mem_maximal hFq_le_M hFq_ne
+      obtain ⟨Mst, hco, hle⟩ := (eq_top_or_exists_le_coatom _).resolve_left hlt.ne
+      have hMst_eq : Mst = M := by
+        have hM_le_Mst : M ≤ Mst := hM_norm_Fq.trans hle
+        by_contra hne
+        exact hco.1 ((mem_maximalSubgroups.mp h.mem_maximal).2 Mst
+          (lt_of_le_of_ne hM_le_Mst (Ne.symm hne)))
+      exact hMst_eq ▸ hle
+    have h122 := prime_mem_sigma_or_tau2 hG h.mem_maximal hFq_le_M hFq_ne hFq_pg
+      (mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp h.mem_maximal,
+        hNFq_le_M⟩)
+    have hFq_le_J : Fq ≤ S10.Msigma M ⊔ A₀ := by
+      rcases h122 with hσ | hτ2
+      · refine le_trans ?_ le_sup_left
+        exact S10.sigma_subgroup_le_Msigma_of_isHall
+          (S10.isHall_Msigma_Malpha hG h.mem_maximal).1 hFq_le_M
+          (isPiSubgroup_of_isPGroup_of_mem hFq_pg hσ)
+      · have hqp : q = p := hprime_eq q hq_prime hτ2
+        subst hqp
+        exact le_trans (habs Fq hM_norm_Fq hFq_pg hFq_le_M) le_sup_right
+    calc (Nat.card ↥(Ch2.S08.fittingInG M)).factorization q
+        = (Nat.card ↥Fq).factorization q := hFq_card.symm
+      _ ≤ (Nat.card ↥(S10.Msigma M ⊔ A₀ : Subgroup G)).factorization q := by
+          have hdvd := Subgroup.card_dvd_of_le hFq_le_J
+          exact (Nat.factorization_le_iff_dvd Nat.card_pos.ne'
+            Nat.card_pos.ne').mpr hdvd q
+  have hF_dvd : Nat.card ↥(Ch2.S08.fittingInG M) ∣
+      Nat.card ↥(S10.Msigma M ⊔ A₀ : Subgroup G) := by
+    rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne']
+    intro q
+    by_cases hq_prime : q.Prime
+    · exact hkey q hq_prime
+    · rw [Nat.factorization_eq_zero_of_not_prime _ hq_prime]
+      exact Nat.zero_le _
+  refine ⟨hA₀_norm, ?_, hMσA₀_bot⟩
+  exact (Subgroup.eq_of_le_of_card_ge hJ_le_F
+    (Nat.le_of_dvd Nat.card_pos hF_dvd)).symm
+
 end OddOrder.BG.Ch3.S12
