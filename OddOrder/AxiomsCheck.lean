@@ -4103,3 +4103,20 @@ fact `inf_centralizer_line_eq_bot_of_invariant` gives `M_σ ⊓ C_G(L) = 1` and 
 `inf_centralizer_eq_bot_of_line_le_cyclic` spreads it to all of `Z#`. Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_invariant_cyclic
+
+/-! ### BG Theorem 12.12: Case 3 back-half — the `Z`-construction assembly (`S12_Theorem1212b`)
+
+`isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two` / `exponent_eq_of_le_of_sup_eq_of_exponent_dvd`:
+`subgroupOf` casts of the two abstract back-half primitives to subgroups of `G` inside an abelian
+Sylow `S`.
+`exists_invariant_cyclic_sameExponent_regular`: in the abelian-Sylow regime, `X ≤ N_G(S)`
+(coprime to `S`) with `1 ⊊ C_S(X) ⊊ S` yields a cyclic `N_G(S)`-invariant `Z ≤ S` with
+`exp(Z) = exp(S)` acting regularly on `M_σ`. `S = C_S(X) × [S,X]` (`fitting_coprime_abelian_-`
+`decomp`), both factors cyclic (`r(S) = 2`) and invariant (Lemma 12.8(f)); `Z` is the larger.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_le_of_sup_eq_of_exponent_dvd
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_invariant_cyclic_sameExponent_regular
