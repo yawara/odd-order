@@ -45,12 +45,8 @@ variable {G : Type*} [Group G]
 (`centralizer_le_of_elemAb_rank_two` (a) /
 `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` (b))。 -/
 
-/-- **BG Theorem 12.13** (mmd L3347): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
-theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
-    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
-    (hPnab : ¬ IsMulCommutative P) :
-    IsUniquelyMaximal P := by
-  sorry
+/-! **BG Theorem 12.13** (`nonabelian_pgroup_isUniquelyMaximal`) は `S12_Theorem1213.lean` に
+移動した(σ(M)-side の最初の uniqueness 結果; Prop 12.4 から導出)。 -/
 
 /-- **BG Corollary 12.14** (mmd L3369): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
 `X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/

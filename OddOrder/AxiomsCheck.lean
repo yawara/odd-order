@@ -52,6 +52,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4365,3 +4366,10 @@ three-case glue this completes Theorem 12.12. Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_abelianSylow
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobenius_factorization_of_regular
+
+/-! **BG Theorem 12.13** reduction (`S12_Theorem1213`): `mem_sigma_normalizer_le_of_two_maximals`
+— a nonabelian `p`-subgroup `P ≤ M` (maximal) has `p ∈ σ(M)` (Cor 12.10(a) contrapositive: a
+`σ'`-`p`-subgroup is nilpotent hence abelian) and `N_G(P) ⊆ M` (Cor 12.10(d), `P` noncyclic).
+Unconditional. (`nonabelian_pgroup_isUniquelyMaximal` の本体 proof は σ-side cascade で後続。) -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_normalizer_le_of_two_maximals
