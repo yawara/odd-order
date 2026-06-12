@@ -52,6 +52,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4342,8 +4343,6 @@ fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|
 Sylow case — a cyclic `p`-subgroup `Z ≤ E`, normalized by `E`, of the same exponent as a Sylow
 `p`-subgroup `S ≤ E`, regular on `M_σ` (wires `exists_elemAb_rank_two_le_E_of_tau2`, the Sylow
 extension, `sylow_chain_of_abelianSylow` giving `S ≤ E`, and the per-prime capstone). Unconditional.
-(`frobenius_factorization_of_regular` / `frobFact_of_abelianSylow` の axiom 登録は Case 3 集約完了後。)
-
 `isPiSubgroup_le_of_normal_isHall`: a `π`-subgroup is contained in any *normal* Hall `π`-subgroup
 (companion to `Subgroup.IsPiGroup.normal_le_hall`). `frobFact_partA_of_abelianSylow`: part (a) of
 Theorem 12.12 in the abelian-Sylow case — `A₀ = E₂` is abelian normal with `C_E(x) ⊆ E₂` for
@@ -4374,3 +4373,19 @@ case — `≤ E`, nontrivial, `E`-normalized, a `τ₂(M)`-group, fully regular 
 direct-product lemmas (`card_finsetSup_eq_prod` / `mem_Z_of_orderOf_prime_mem`). Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_tau2_product
+
+/-! **BG Theorem 12.12** (`frobenius_factorization_of_regular`, `frobFact_of_abelianSylow`): the
+abelian-Sylow Case 3 aggregation `E₀ = ZZ ⊔ K` (`ZZ` the `τ₂`-product, `K` a Hall `τ₂'`-subgroup)
+realizes `exp(E₀) = exp(E)` and is regular on `M_σ`, so `M_σ E₀` is a Frobenius group; with the
+three-case glue this completes Theorem 12.12. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobenius_factorization_of_regular
+
+/-! **BG Theorem 12.13** reduction (`S12_Theorem1213`): `mem_sigma_normalizer_le_of_two_maximals`
+— a nonabelian `p`-subgroup `P ≤ M` (maximal) has `p ∈ σ(M)` (Cor 12.10(a) contrapositive: a
+`σ'`-`p`-subgroup is nilpotent hence abelian) and `N_G(P) ⊆ M` (Cor 12.10(d), `P` noncyclic).
+Unconditional. (`nonabelian_pgroup_isUniquelyMaximal` の本体 proof は σ-side cascade で後続。) -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_normalizer_le_of_two_maximals

@@ -1,5 +1,34 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
+
+**BG Theorem 12.12 (Frobenius 因子分解) を完全形式化**(`frobenius_factorization_of_regular`,
+S12_Theorem1212c, 全 capstone axiom-clean)。3 ケース (τ₂=∅ / 非可換 Sylow / 可換 Sylow) 全実証。
+新 leaf `S12_Theorem1212c.lean` (9 theorem, sorry-free) の構成 (commits 0e0ca590→5fe05044):
+
+1. **3-case glue** `frobenius_factorization_of_regular` (0e0ca590): selector = 「|E| を割る τ₂-素数で
+   非可換 Sylow をもつか」。Case 1 (`frobFact_of_regular_all` + hregAll 導出), Case 2
+   (`frobFact_of_nonabelianSylow`) 即決。素数性は `primeFactors` ケース分けで無料。
+2. **per-prime Z_p** `exists_regular_cyclic_of_mem_tau2` (6d2f3845): wiring。
+3. **part (a)** `frobFact_partA_of_abelianSylow` + 汎用 `isPiSubgroup_le_of_normal_isHall` (f5728ec9):
+   A₀=E₂ + `C_E(x)⊆E₂`。
+4. **piece B 直積** `card_finsetSup_eq_prod` + `mem_Z_of_orderOf_prime_mem` + `le_normalizer_finsetSup`
+   (a89342ad): 「⨆Z_p の素数位数 r 元 ∈ Z_r」。
+5. **τ₂-積バンドル** `exists_tau2_product` (e6ebf144): ZZ=∏Z_p [≤E, ≠⊥, E≤N, IsPiGroup τ₂, 全域 regular,
+   τ₂-exp realize]。`choose!` で族構成。
+6. **Case 3 最終 glue** `frobFact_of_abelianSylow` (5fe05044): K=Hall τ₂'(`hall_E_exists`),
+   E₀=ZZ⊔K, regularity (τ₂→a∈ZZ via E₀/ZZ τ₂' quotient; τ₁∪τ₃→hreg), exp (τ₂→ZZ exp-元;
+   τ₂'→K⊇Sylow_r exp-元), Frobenius (`isFrobeniusGroup_of_regular`)。
+
+**§12 残 sorry = 6** (全て S12_E, 12.12 経路外): 12.13 `nonabelian_pgroup_isUniquelyMaximal` /
+12.14 `maximalContaining_centralizer_eq_singleton` / 12.15 `sigma_subgroup_maximal_interaction` /
+12.16(a) `sigma_subgroup_conj_into_Msigma` + `sigma_subgroup_pRank_normalizer_le_one`[issue 0065 deferred] /
+12.16(b) `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`[issue 0065 deferred]。
+**次 = 12.13/12.14/12.15/12.16(a)pt1 の独立 hard 定理群** (issue 0065 の 12.16 ×2 は proof-deferred scaffold)。
+12.15/12.16 は §13-14 gate (Lane G 引用中)。再利用知見: `Subgroup.orderOf_coe` は `orderOf ↑x` 形のみ rw 可
+→ 直接 `H.orderOf_dvd_natCard hx`; `Finset.induction with | empty | insert` の empty 失敗は insert を
+誤吞 (case 消失に注意); 集合 normalizer の bot は `mem_normalizer_fintype`。
+
 ## 🟢 2026-06-13 (Lane F session 13, Opus 4.8): **Thm 12.12 三ケース組立 — Case 1/2 完了・Case 3 隔離**
 
 新 leaf `S12_Theorem1212c.lean` を切り、`frobenius_factorization_of_regular` (12.12 本体) を
