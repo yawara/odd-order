@@ -492,4 +492,81 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
         (hexpdvd hS₁cyc hS₀cyc hS₁S hS₀S hle)
     · exact inf_centralizer_eq_bot_of_invariant_cyclic hG h hp hA hAE hAS hSM hS₁S hS₁ne hS₁inv
 
+/-! ## Front-half (X existence): `Ω₁`-rank reasoning -/
+
+/-- In a finite cyclic `q`-group `C` (`q` odd), the order-`q` subgroup `Ω₁(C)` is contained in
+*every* nontrivial subgroup `H` (it is the unique minimal subgroup). Indeed `|Ω₁(C)| = q` (cyclic
+exponent) and, picking a nonidentity `h ∈ H`, `Ω₁(C) ≤ ⟨h⟩ ≤ H` by `line_le_zpowers_in_cyclic`. -/
+theorem omega_le_of_ne_bot_in_cyclic {C : Type*} [Group C] [Finite C] [IsCyclic C] {q : ℕ}
+    [Fact q.Prime] (hCq : IsPGroup q C) (hodd : Odd q) {H : Subgroup C} (hH : H ≠ ⊥) :
+    Omega C q 1 ≤ H := by
+  classical
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  obtain ⟨h, hhne⟩ := exists_ne (1 : ↥H)
+  have hhH : (h : C) ∈ H := h.2
+  have hh1 : (h : C) ≠ 1 := fun hc => hhne (Subtype.ext hc)
+  haveI : Nontrivial C := ⟨(h : C), 1, hh1⟩
+  have hcl : _root_.commutator C ≤ Subgroup.center C := by rw [commutator_eq_bot]; exact bot_le
+  have hqC : q ∣ Nat.card C := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := q)).mp hCq
+    have h1lt : 1 < Nat.card C := Finite.one_lt_card
+    have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+    rw [hk]; exact dvd_pow_self q hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' q hqC
+  have hxne : x ≠ 1 := by
+    intro hx1; rw [hx1, orderOf_one] at hx; exact absurd hx.symm (Fact.out : q.Prime).ne_one
+  have hxO : x ∈ Omega C q 1 :=
+    Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx ▸ pow_orderOf_eq_one x)
+  haveI : Nontrivial ↥(Omega C q 1) := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hbot; rw [hbot, Subgroup.mem_bot] at hxO; exact hxne hxO
+  have hOcard : Nat.card ↥(Omega C q 1) = q := by
+    rw [← IsCyclic.exponent_eq_card]; exact Omega.exponent_eq_of_class_le_two hodd hcl
+  exact (line_le_zpowers_in_cyclic hCq hOcard hh1).trans (Subgroup.zpowers_le.mpr hhH)
+
+/-- **Theorem 12.12, Case 3, the `r(Q) = 1` side** (BG L3363-3365): if a finite `q`-group `Q`
+(`q` odd) has cyclic quotient `Q ⧸ Q₀` and `Q₀ ⊊ Q₁ ≤ Q` with `Q₁` cyclic, then `pRank Q q ≤ 1`.
+Since `Q ⧸ Q₀` is cyclic, `Ω₁(Q ⧸ Q₀) ≤ Q₁ ⧸ Q₀` (the unique minimal subgroup lies in the
+nontrivial `Q₁ ⧸ Q₀`), so `Ω₁(Q) ≤ Q₁`; every elementary abelian `B ≤ Q` lies in `Ω₁(Q) ≤ Q₁`
+(cyclic), hence is cyclic of order `≤ q`. -/
+theorem pRank_le_one_of_cyclic_quotient {Q : Type*} [Group Q] [Finite Q] {q : ℕ}
+    [Fact q.Prime] {Q₀ Q₁ : Subgroup Q} [Q₀.Normal] (hQq : IsPGroup q Q) (hodd : Odd q)
+    (hcyc : IsCyclic (Q ⧸ Q₀)) (h0lt1 : Q₀ < Q₁) (hQ₁cyc : IsCyclic ↥Q₁) :
+    pRank Q q ≤ 1 := by
+  classical
+  set f := QuotientGroup.mk' Q₀ with hf
+  -- `Ω₁(Q) ≤ Q₁`.
+  have hOmegaQ₁ : Omega Q q 1 ≤ Q₁ := by
+    rw [Omega, Subgroup.closure_le]
+    intro g hg
+    have hgq : g ^ q = 1 := by simpa only [Set.mem_setOf_eq, pow_one] using hg
+    have hmapne : Q₁.map f ≠ ⊥ := by
+      intro hbot
+      rw [Subgroup.map_eq_bot_iff, hf, QuotientGroup.ker_mk'] at hbot
+      exact h0lt1.ne (le_antisymm h0lt1.le hbot)
+    have hgbar : f g ∈ Omega (Q ⧸ Q₀) q 1 :=
+      Omega.mem_of_pow_eq_one (by rw [pow_one, ← map_pow, hgq, map_one])
+    have hmem : f g ∈ Q₁.map f :=
+      omega_le_of_ne_bot_in_cyclic (hQq.to_quotient Q₀) hodd hmapne hgbar
+    have hcm : (Q₁.map f).comap f = Q₁ :=
+      Subgroup.comap_map_eq_self (by rw [hf, QuotientGroup.ker_mk']; exact h0lt1.le)
+    rw [← hcm]; exact Subgroup.mem_comap.mpr hmem
+  -- `pRank Q ≤ 1`.
+  rw [pRank_le_iff]
+  intro B hB
+  have hBOmega : B ≤ Omega Q q 1 := fun b hb => Omega.mem_of_pow_eq_one (by
+    rw [pow_one]
+    have h1 := congrArg (Subtype.val : ↥B → Q) (hB.pow_eq_one ⟨b, hb⟩)
+    simpa using h1)
+  have hBQ₁ : B ≤ Q₁ := hBOmega.trans hOmegaQ₁
+  haveI : IsCyclic ↥B := Subgroup.isCyclic_of_le hBQ₁
+  have hBexp : Monoid.exponent ↥B ∣ q := by
+    rw [Monoid.exponent_dvd]; intro b; exact orderOf_dvd_of_pow_eq_one (hB.pow_eq_one b)
+  have hBle : Nat.card ↥B ≤ q :=
+    Nat.le_of_dvd (Fact.out : q.Prime).pos (by rw [← IsCyclic.exponent_eq_card]; exact hBexp)
+  have hq2 : q < q ^ 2 := by rw [pow_two]; nlinarith [(Fact.out : q.Prime).one_lt]
+  have hlt2 : Nat.log q (Nat.card ↥B) < 2 :=
+    Nat.log_lt_of_lt_pow' two_ne_zero (lt_of_le_of_lt hBle hq2)
+  omega
+
 end OddOrder.BG.Ch3.S12

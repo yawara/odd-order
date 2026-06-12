@@ -4120,3 +4120,16 @@ Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_le_of_sup_eq_of_exponent_dvd
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_invariant_cyclic_sameExponent_regular
+
+/-! ### BG Theorem 12.12: Case 3 front-half — `Ω₁`-rank reasoning (`S12_Theorem1212b`)
+
+`omega_le_of_ne_bot_in_cyclic`: in a finite cyclic `q`-group the order-`q` subgroup `Ω₁` lies in
+every nontrivial subgroup (`|Ω₁| = q` + `line_le_zpowers_in_cyclic`).
+`pRank_le_one_of_cyclic_quotient`: the `r(Q) = 1` side of the Case 3 rank contradiction — a finite
+`q`-group `Q` with cyclic quotient `Q ⧸ Q₀` and `Q₀ ⊊ Q₁ ≤ Q` (`Q₁` cyclic) has `pRank Q q ≤ 1`,
+since `Ω₁(Q) ≤ Q₁` (via `Ω₁(Q ⧸ Q₀) ≤ Q₁ ⧸ Q₀`) and every elem-ab `B ≤ Ω₁(Q) ≤ Q₁` is cyclic
+of order `≤ q`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega_le_of_ne_bot_in_cyclic
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_le_one_of_cyclic_quotient
