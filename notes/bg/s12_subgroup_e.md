@@ -1,5 +1,26 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢 2026-06-12 (Lane F session 12, Opus 4.8): **Thm 12.12 Case 3 per-prime Z-construction COMPLETE**
+
+Case 3 の per-prime Z-construction を**両枝とも完全実装**(front-half `353c9d9d`, agemo
+`bda45cbe`, C_E(S)=E `debde8a5`, 統合 `0cc8d6de`)。capstone =
+**`exists_cyclic_Enormal_regular_of_abelianSylow`** (S12_Theorem1212b.lean): abelianSylow regime +
+正則仮定 ⟹ ∃ cyclic Z≤S, exp(Z)=exp(S), E≤N_G(Z), regular。C_E(S)=E で場合分け統合。
+全 axiom-clean、full build 3775。**Case 3 の数学的核心が完結。**
+
+### ▶ 残り = τ₂ 集約 → frobFact_of_abelianSylow → 3-case (12.12 完成まで)
+- **frobFact_of_abelianSylow**: A₀=E₂ で (a)。(b) E₀=E₁⊔E₃⊔(⊔_{p∈τ₂}Z_p)。各 p∈τ₂ で
+  A_p∈ℰ_p²(E)(Cor 12.6(a))+S_p abelian(Thm 12.7(a))から
+  `exists_cyclic_Enormal_regular_of_abelianSylow`。exp(E₀)=exp(E)。
+  M_σE₀ Frobenius = `isFrobeniusGroup_of_regular`(既存)に E₀ regular を渡す。
+  **E₀ regular の鍵 = 「prime-order 元 FPF ⟹ 全非単位元 FPF」**(a∈E₀#, prime power a^m で
+  C_{M_σ}(a)⊆C_{M_σ}(a^m); r∈τ₂ なら Z_r 共役[M_σ⊴M], r∈τ₁∪τ₃ なら hreg)。
+  **⚠ Frobenius-complement 理論 ~150 行 = 最難 wiring。**
+- **3-case**(frobenius_factorization_of_regular scaffold S12_E:438): τ₂=∅→Case1;
+  else ∃nonab Syl→Case2 / else→frobFact_of_abelianSylow。
+
+### ▶ 残 sorry (§12 完遂): 12.12(上記)/ 12.13 / 12.14 / 12.16(a)(b)。独立 hard 定理群。
+
 ## 🟢 2026-06-12 (Lane F session 10, Opus 4.8): **Thm 12.12 Case 3 front-half — 開問 c (r_q=2) 解決**
 
 front-half (C_E(S)≠E 枝, X 存在) の **真のボトルネック「Lemma 12.11(c) yields r_q(N_G(S))=2」
