@@ -59,6 +59,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3642,6 +3643,28 @@ axiom(s):{indentD m!"{missing}"} — remove them from the island"
   else
     throwError m!"axioms island FAILED: `{constName}` has unexpected \
 axiom(s):{indentD m!"{bad.toList}"}"
+
+/-! #### BG §13 Lemma 13.1 island (provisional forward axioms `cor1216_*`, issue 8000)
+
+Lemma 13.1 cites BG Corollary 12.16(a)(b), whose faithful statements are not yet exposed in §12;
+they are declared as provisional forward axioms in `S13_Lemma131` (user-approved 2026-06-12). When
+Lane F adds them to §12, de-axiomatize and migrate these to `#assert_only_allowed_axioms`. -/
+
+-- BG Lemma 13.1(a): every `p`-subgroup of `M ⊓ M*` centralizes `M_σ ⊓ M*` (axiom-clean).
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.pSubgroup_centralizes_Msigma_inf
+
+-- BG Lemma 13.1(b): `p ∉ τ₂(M*)`, conditional on Corollary 12.16(a).
+#assert_axioms_island OddOrder.BG.Ch3.S13.not_mem_tau2_of_interaction
+  expecting [OddOrder.BG.Ch3.S13.cor1216_pRank_normalizer_le_one]
+
+-- BG Lemma 13.1(c): `p ∈ τ₁(M) ⟹ p ∈ β(G)`, conditional on Corollary 12.16(b).
+#assert_axioms_island OddOrder.BG.Ch3.S13.mem_idealPrime_of_tau1_of_interaction
+  expecting [OddOrder.BG.Ch3.S13.cor1216_not_mem_primeFactors_derived_of_tau1]
+
+-- BG Lemma 13.1 (full): conditional on Corollary 12.16(a)(b).
+#assert_axioms_island OddOrder.BG.Ch3.S13.pSubgroup_centralizes_of_interaction
+  expecting [OddOrder.BG.Ch3.S13.cor1216_pRank_normalizer_le_one,
+    OddOrder.BG.Ch3.S13.cor1216_not_mem_primeFactors_derived_of_tau1]
 
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
