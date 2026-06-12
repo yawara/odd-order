@@ -3,7 +3,24 @@
 > このセッション (main 合流モニター) の cron/監視まわりの現状。ユーザー離席中の判断を文書化。
 > 次に起きたエージェント (自己起床 / 次 tick / ユーザー復帰) はまずここを読む。
 
-## 現況 (2026-06-12, セッション「各レーンを監視します」継続)
+## 現況 (2026-06-12 夕方更新: 3 レーン体制 B+F+G)
+
+- **レーン再設計 (ユーザー裁可)**: **G (`bg-s13`, BG §13 Prime Action) 新設** → 3 レーン体制。
+  worktree `/home/ywr/odd-order-bg-s13` 配置済み (symlink + olean warm-start 546M コピー済み、
+  LAUNCH.md 配置済み、issue base **8000**)。G は §12 未証明分 (12.13-12.16) を S12_E の sorry'd
+  statement 引用で賄う (新規 forward axiom 不要; F の proof 着地で自動 unconditional 化)。
+  **G は S12_E 編集禁止** (F の active ファイル) — cron ゲートにも組込み済み。
+  F の LAUNCH.md から §13 を G 管轄へ付け替え済み (F は §12 完結で STOP → §14 は再判断)。
+- **現役 cron = `71a627ea`** (3 レーン版: F→G→B、S12_E ガード付き)。
+  ⚠ **先代 `a637e8ce` は `/model` なしでも消滅していた** (CronDelete が "No scheduled job")。
+  session-only cron は /model 以外 (ユーザー interrupt?) でも死ぬ模様 — **ユーザー対話のたびに
+  CronList で生存確認するのを標準動作とする**。durable 化 (CronCreate durable:true =
+  scheduled_tasks.json 永続) は別セッション起動の副作用があるためユーザー判断待ち。
+- **hub 凍結窓タスク (ユーザー裁可)**: S10_HallStructure (2290 行) / S10_BetaRadical (3004 行) の
+  prefix-split を実施する (0063/0064 は完了済み — S10_LocalLemmas→1158 行+Core,
+  S05_NarrowPGroups→4 ファイル chain で消滅、を実地確認済み。下の旧記述は stale)。
+
+## 旧現況 (2026-06-12 午前, 参考)
 
 - **新セッション開始時、前セッションの session-only cron は消滅していた** (CronList = "No scheduled jobs.")。
   session-only cron は Claude セッション終了で死ぬので、**セッションが切れたら必ず再作成が要る**。

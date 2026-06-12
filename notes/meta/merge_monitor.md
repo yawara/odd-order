@@ -6,12 +6,20 @@
 > **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
 > 変化なし/全 abort 時は push しない)。
 
-## レーン (2026-06-11 夜 再編成: B+F の 2 レーン体制)
+## レーン (2026-06-12 再編成: B+F+G の 3 レーン体制)
 
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
-| **B** | `b-peterfalvi` | Pf §6 certain-type (4.5)→(4.9) → S08 case-B → (6.8) | Opus 4.8 (1M); 停滞時は Fable 5 | ✅ 対象 |
-| **F** | `bg-s12` | BG §12: **12.18 先行 (skeleton 済)** → cascade 12.3→12.16 (11.7 着地で全解禁) → §13 | 12.18 = **Fable 5 (1M)**; cascade は Opus 4.8 (1M) | ✅ 対象 |
+| **B** | `b-peterfalvi` | Pf §6: (4.8) assembly → (4.9) → S08 case-B → (6.8) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `bg-s12` | BG §12 完結: 12.12 Case 3 → 12.13→12.16 → 12.4(a)系。完了で STOP (§14 は再判断) | Opus 4.8 (1M) | ✅ 対象 |
+| **G** | `bg-s13` | BG §13 Prime Action (13.1→13.10; §12 未証明分は S12_E scaffold statement 引用 = 新規 axiom なし) | Opus 4.8 (1M) | ✅ 対象 |
+
+**G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
+(2) G の §12 依存は sorry'd statement の引用で賄う — **新規 `axiom` 宣言が G から来たら従来どおり
+abort+ユーザー承認**。(3) `notes/bg/s13_prime_action.md` は G 所有 (F は触らない)。
+(4) issue base: B=1000 / F=7000 / **G=8000**。
+マージ順 = **F → G → B** (F が S12_E の sorry を proof に置換し、G が同 statement を引用するため
+F 先行が自然; ただし git 上は独立で順序は形式的)。
 
 **E (`bg-local`) は 2026-06-11 退役** — 任務完遂 (Lem 10.4(b) de-axiom / Lem 10.13 / Thm 11.5 /
 Cor 11.6 / **Thm 11.7 = §11 完結**)。全量 main 合流 (merge `77ab5173`) を検証の上 worktree・
