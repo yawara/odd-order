@@ -184,4 +184,28 @@ theorem certainType_mu_conj_bridge (h : Hypothesis46 A L) [NeZero (Nat.card h.W1
   rw [sigma_chiColumn_conj, e2, ClassFunction.mapRingEquiv_zsmul] at key
   exact key.symm
 
+/-- **Peterfalvi (4.9)(a), `μ_{ij}̄ = μ_{i'j'}`.**  The conjugation bridge `δ_j·μ_{ij}̄ =
+δ_{j'}·μ_{i'j'}` forces the (genuine irreducible) characters equal: pairing both sides with
+`μ_{i'j'}` gives `δ_j·⟨μ_{ij}̄, μ_{i'j'}⟩ = δ_{j'}` (since `‖μ_{i'j'}‖² = 1`); as the inner product
+of two irreducibles is `0` or `1` and `δ_{j'} ≠ 0`, it must be `1`, i.e. `μ_{ij}̄ = μ_{i'j'}`. -/
+theorem certainType_mu_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv ((h.columnFamily χ₂).mu i)
+      = (h.columnFamily χ₂⁻¹).mu (rowInv h i) := by
+  by_contra hne
+  have hb := certainType_mu_conj_bridge h χ₂ i
+  rw [← IrreducibleCharacter.galoisMap_apply_coe,
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign
+      (IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv ((h.columnFamily χ₂).mu i) :
+        ClassFunction ↥L ℂ),
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂⁻¹).sign
+      ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ)] at hb
+  have hI := congrArg (fun φ => ClassFunction.inner φ
+    ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ)) hb
+  simp only [ClassFunction.inner_smul_left, irreducibleCharacter_inner_eq_ite, if_neg hne,
+    if_pos rfl, mul_zero, mul_one] at hI
+  exact absurd hI.symm (by
+    rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
+
 end OddOrder.Peterfalvi.S06

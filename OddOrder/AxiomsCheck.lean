@@ -837,6 +837,10 @@ set_option linter.style.longLine false in
 -- complex conjugation of (4.3.b) `σ_L(ω_{ij}) = δ_j·μ_{ij}`, using `sigma_chiColumn_conj` + (4.3.b) on
 -- the left and `mapRingEquiv_zsmul` on the right (δ_j ∈ ℤ).  The heart of (4.9)(a).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_mu_conj_bridge
+-- (4.9)(a) `μ_ij̄ = μ_{i'j'}` (`certainType_mu_conj_eq`): pairing the bridge δ_j·μ_ij̄ = δ_{j'}·μ_{i'j'}
+-- with μ_{i'j'} gives δ_j·⟨μ_ij̄, μ_{i'j'}⟩ = δ_{j'} ≠ 0, so the (0/1) inner product of the two
+-- irreducibles is 1, forcing equality.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_mu_conj_eq
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
