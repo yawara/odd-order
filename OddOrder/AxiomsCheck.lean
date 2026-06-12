@@ -4169,3 +4169,12 @@ of order `≤ q`. Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega_le_of_ne_bot_in_cyclic
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_le_one_of_cyclic_quotient
+
+/-! ### BG Theorem 12.12: Case 3 front-half setup — `E ≤ N_G(S)` (`S12_Theorem1212b`)
+
+`E_le_normalizer_sylow_of_abelianSylow`: in the abelian-Sylow regime `E ≤ N_G(S)`. `S ≤ F(E)`
+(Sylow chain), `S` is the Sylow `p`-subgroup of the nilpotent `F(E)` hence characteristic in it,
+and `E` normalizes `F(E)`, so `E ≤ N_G(F(E)) ≤ N_G(S)`. Lets the Sylow `q`-subgroups of `E` sit
+inside `N_G(S)` for the front-half rank argument. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_sylow_of_abelianSylow
