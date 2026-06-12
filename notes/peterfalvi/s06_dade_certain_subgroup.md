@@ -2049,3 +2049,28 @@ INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1
     ⟨φ,ωij⟩=s,⟨φ,ωik⟩=−s ⟹ ‖ψ‖²=2−2s·2s+2·s²=0 ⟹ ψ=0 [`eq_zero_of_inner_self_re_eq_zero`, ZIrrFourier:189]。
   - 最終: (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ) (χ₂≠χ₂' 仮説)。→ (4.9)→case-B→(6.8)。
 正本=本 cont.⁶。**残=final theorem (orientation+exclusion+conclude); component-structure 補題が最初の sub-step。**
+
+### 🔧 session 33 cont.⁷ (/loop) — assembly ~90% : conclude + distinctness landed; 残 = exclusion
+- **landed this loop** (4 commits): `sigmaCoeff_psi_eq` (a(pq)=g(pq)−s([P_ij=pq]−[P_ik=pq])),
+  `omegaProdCharTic_ne`/`omegaProdEquiv_symm_omegaProdCharTic_ne` (P_ij≠P_ik),
+  **`certainType_diff_dade_eq_of_all_sigmaCoeff_zero`** (case (a) ⟹ conclusion 3 = ψ=0 via ‖ψ‖²=0)。
+  + helper `exists_two_ne_ne` (fintype card≥3, 2 distinct ≠ d) landed (uncommitted→commit予定)。
+- **▶ 残 = exclusion `hnocol`/`hnorow` + orientation + final** (設計確定, ~150行):
+  - **hnocol** (¬∃ 列 j₀ c≠0 定数): rintro ⟨j₀,c,hc,hcol,hoff⟩; g:=sigmaCoeff(φ); hexp=sigmaCoeff_psi_eq;
+    hsupp2: {pq|g≠0}.ncard≤2 (=sigmaNC_dade_le_two, sigmaNC unfold); hg01 (sigmaCoeff_dade_eq_zero_or_one)。
+    by_cases hboth: P_ij.2=j₀ ∧ P_ik.2=j₀:
+    - **both**: hcol@P_ij.1, P_ik.1 → g(P_ij)=c+s, g(P_ik)=c−s; hsum:g(P_ij)+g(P_ik)=2c, hdiff:..=2s;
+      `rcases hg01 P_ij<;>hg01 P_ik<;>sign_eq<;>rw<;>first|exact hc(by linear_combination (-1/2)*hsum)|norm_num at hdiff`
+      (g diff=2s=±2 ⟹ {1,−1} ⟹ sum=0 ⟹ c=0 矛盾)。
+    - **¬both**: by_cases P_ij.2=j₀, P_ik.2=j₀ (3 combo, (T,T)=absurd hboth):
+      (T,F)P_off=P_ik,d=P_ij.1; (F,T)P_off=P_ij,d=P_ik.1; (F,F)P_off=P_ij,d=P_ij.1。
+      exists_two_ne_ne (card Ŵ₁=w₁≥3 via card_charGroup_subgroupOf+three_le_card) d → r₁,r₂≠d distinct;
+      witnesses {(r₁,j₀),(r₂,j₀),P_off} ⊆ {pq|g≠0} (g(r,j₀)=c≠0 [hcol+hexp+(r,j₀)∉{P_ij,P_ik}],
+      g(P_off)=±s≠0 [hoff+hexp]); 3 distinct (r₁≠r₂, P_off.2≠j₀) → ncard≥3 (ncard_eq_three+ncard_le_ncard) 矛盾 hsupp2。
+  - **hnorow** = hnocol の転置 (行 i₀, w₂≥3, P_ij.1/P_ik.1=i₀ で同 row 判定; 同構造)。
+  - **all-zero + orientation**: card(tic.W1)≠card(tic.W2) (coprime+both≥3⟹≠), |Δ|≥2 (odd);
+    w₁<w₂: `sigmaCoeff_trichotomy (ticVdiff h) rfl app hψV hgap hNC` → (a)∨(b)∨(c); kill b=hnocol,c=hnorow。
+    w₂<w₁: `grid_trichotomy` on a'(q,p)=sigmaCoeff(ψ)(p,q) over (Ŵ₂,Ŵ₁), gap w₂+2≤w₁; (b')=row→hnorow,(c')=col→hnocol。
+    hψV (step4 移項), hNC: sigmaNC(ψ)≤4 (supp⊆supp(φ)∪{P_ij,P_ik}) < 2·min(w)≥6。
+  - **final `certainType_diff_dade_eq`** = `apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero; [all-zero]`。
+正本=本 cont.⁷。**conclude+distinctness landed; 残=hnocol/hnorow/orientation/final (設計完備)。**

@@ -680,4 +680,13 @@ theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
   rw [hψ, sub_eq_zero] at this
   exact this
 
+/-- Two distinct elements of a fintype of card `≥ 3`, both different from a given `d`. -/
+private theorem exists_two_ne_ne {α : Type*} [Fintype α] (h3 : 3 ≤ Fintype.card α) (d : α) :
+    ∃ a b : α, a ≠ b ∧ a ≠ d ∧ b ≠ d := by
+  classical
+  have hcard : 2 ≤ ({d}ᶜ : Finset α).card := by
+    rw [Finset.card_compl, Finset.card_singleton]; omega
+  obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp (by omega : 1 < ({d}ᶜ : Finset α).card)
+  exact ⟨a, b, hab, by simpa using ha, by simpa using hb⟩
+
 end OddOrder.Peterfalvi.S06
