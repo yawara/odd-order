@@ -1977,3 +1977,75 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
 6. **最終 statement**: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)` (要 χ₂≠χ₂'; ψ=0 から移項) → (4.9) → case-B → (6.8)。
 
 正本 = 本 session 33 cont.³。**input 補題 全 landed (9 commits)。残 = assembly (orientation 込み trichotomy)、1 セッション。**
+
+### 🔧 session 33 cont.⁴ — 🚨 exclusion 精査: **|f|≤1 が必須** (|supp f|≤2 では不足)
+**🚨 重要発見 (notes cont.³ の exclusion 設計を訂正)**: trichotomy (b)(c) 排除は |supp f|≤2 だけでは
+**w₂=3 の row case を排除できない**。
+- P_ij=(omegaProdEquiv.symm(omegaProdCharTic χ₂ i)), P_ik=(... χ₂' i)。**P_ij.1=P_ik.1 (同 row, 両方 i)、
+  P_ij.2≠P_ik.2 (異 column, χ₂≠χ₂')**。
+- row i₀=P_ij.1 定数 c≠0, w₂=3: 純f列 1個 + δ列で f(P_ij)=c+δ_j, f(P_ik)=c−δ_j。
+  c=−δ_j なら f(P_ij)=0 だが **f(P_ik)=−2δ_j**。supp f={純f点, P_ik}=2 点 ⟹ |supp f|≤2 と無矛盾 = **排除できない**。
+  ⟹ **|f(pq)|≤1 (f∈{0,±1}) が必要** (f(P_ik)=±2 を弾く)。
+- ⟹ exclusion は **|supp f|≤2 (column case) + |f|≤1 (row w₂=3 case)** の両方を使う。
+  あるいは uniform に **∑f²≤2** (Bessel) でも可 (∑≥3c²+2≥5>2)。**|f|≤1 が最小限**。
+
+### ▶ 残 INPUT 補題 = **`sigmaCoeff_dade_eq_zero_or_one`** (f∈{0,±1})
+証明ルート (cont.⁴ で draft 着手→revert; 設計確定):
+φ=(cα:ℂ)•α+(cβ:ℂ)•β (mem_ZIrr_inner_self_eq_sum_sq+exists_pair_of_sum_sq_eq_two, cα,cβ∈{±1});
+chiFam pq=(ε:ℤ)•ν (exists_zsmul_irreducibleCharacter_of_inner_self_one, ε∈{±1}, ν:IrreducibleCharacter);
+f=⟨φ,chiFam pq⟩=cα·ε·⟨α,ν⟩+cβ·ε·⟨β,ν⟩=cα·ε·[⟨α,_⟩=ν]+cβ·ε·[⟨β,_⟩=ν]。
+α=ν⟹cα·ε∈{±1}; β=ν⟹cβ·ε∈{±1}; else 0 (α≠β で同時不可)。
+**🛑 draft で詰まった点 (次回修正)**:
+  (1) 右 smul lemma 名 = **`OddOrder.RepresentationTheory.inner_smul_right`** (`ClassFunction.inner_smul_right` 不在)。
+  (2) `irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν` の ite 条件は **IrreducibleCharacter 等式 `⟨α,hαm⟩=ν`** で
+      α:CF とは coercion 差 ⟹ by_cases も IrreducibleCharacter 等式で。⟨α,(ν:CF)⟩ rw に coe 整合注意。
+  (3) 最後の `(c:ℂ)=0∨=1∨=-1` 閉じは `rcases hcα<;>rcases hε<;>rw[…]<;>norm_num` で disjunct 自動選択不可 →
+      明示 `left/right` か `decide`不可(ℂ)→ `first|(left;norm_num)|(right;left;norm_num)|(right;right;norm_num)`。
+
+### ▶▶ 残 = assembly (cont.³ の 6 段 + |f|≤1; 1 セッション)
+INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1}**) 揃えば:
+ψ定義→V消失→NC(ψ)≤4→**orientation** (w₁<w₂直接/w₂<w₁ transposed grid_trichotomy)→
+(b)(c)排除 (|supp f|≤2 + |f|≤1, P 同row異col)→(a)⟹‖ψ‖²=0⟹ψ=0→最終 statement (χ₂≠χ₂' 要)。
+正本=本 session 33 cont.⁴。**10 commits landed; 残=f∈{0,±1}+assembly。**
+
+### ✅ session 33 cont.⁵ — f∈{0,±1} landed (`sigmaCoeff_dade_eq_zero_or_one`) = **全 INPUT 完了**
+- **landed (build-green, axiom-clean, AxiomsCheck 登録)**: `sigmaCoeff_dade_eq_zero_or_one`
+  (⟨φ,chiFam pq⟩∈{0,±1})。draft snag 解決済: **inner は left 線形・right 共役線形**
+  (`OddOrder.RepresentationTheory.inner_smul_right` が `star ↑ε` を出す → `star_intCast` 要)、
+  ite の CF↔IrreducibleCharacter coe は **型注釈 `have hαν : ... := irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν`**
+  で吸収、disjunct 閉じは `rcases<;>rw<;>norm_num`。
+- **🎉 (4.8) conclusion 3 の INPUT 補題 全 landed** (step4 / ‖φ‖²=2 / NC(φ)≤2 / ω_ij^σ=chiFam(P_ij) / f∈{0,±1})。
+  12 commits landed this session。
+- **▶▶ 残 = assembly のみ** (1 theorem, ~180 行, helper 分割推奨):
+  (1) `sigmaCoeff_psi_eq`: a(pq):=sigmaCoeff(ψ)(pq) = f(pq) − δ_j([pq=P_ij]−[pq=P_ik])
+      [certainTypeOmegaSigma_eq_chiFam + chiFam 正規直交; ψ:=φ−δ_j(certainTypeOmegaSigma χ₂ i−…χ₂' i)]。
+  (2) ψ vanish on V [step4 移項], a separable [sigmaCoeff_add_eq], NC(ψ)≤4 [supp a⊆supp f∪{P_ij,P_ik}, NC(φ)≤2]。
+  (3) orientation: w₁≠w₂(coprime)・|Δ|≥2(odd) ⟹ 小さい方 rows。w₁<w₂=直接 grid_trichotomy(Ŵ₁,Ŵ₂)、
+      w₂<w₁=transposed(Ŵ₂,Ŵ₁, a'(q,p)=a(p,q))。両者 (all-0)∨(row)∨(column) を出す。
+  (4) exclusion: column(w₁≥3)=|supp f|≤2 矛盾; row(w₂≥5 or w₂=3)=|supp f|≤2 **+ f∈{0,±1}**
+      (w₂=3,c=−δ_j で f(P_ik)=−2δ_j を弾く)。**P_ij.1=P_ik.1(同row,both i), P_ij.2≠P_ik.2(異col,χ₂≠χ₂')** 要証明。
+  (5) (a)⟹ a(P_ij)=a(P_ik)=0 ⟹ f(P_ij)=δ_j,f(P_ik)=−δ_j ⟹ ‖ψ‖²=2−2δ_j·2δ_j+2=0 ⟹ ψ=0。
+  (6) 最終 `certainType_diff_dade_eq` (χ₂≠χ₂' 仮説付): (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)。→ (4.9)→case-B→(6.8)。
+正本=本 session 33 cont.⁵。**全 INPUT landed (12 commits); 残=assembly 1 unit。**
+
+### ✅ session 33 cont.⁶ (/loop) — `sigmaCoeff_psi_eq` landed; 残=orientation+exclusion+conclude
+- **landed** (commit 68021c0a, full build 3787 + AxiomsCheck): `sigmaCoeff_psi_eq` (general φ):
+  a(pq)=sigmaCoeff(ψ)(pq) = ⟨φ,chiFam pq⟩ − δ_j·([P_ij=pq]−[P_ik=pq]), P_ij=omegaProdEquiv.symm(omegaProdCharTic χ₂ i)。
+  gotcha: `if`に `open scoped Classical in` (docstring の**前**)、columnFamily に `[Fintype ↥(W1⊔W2)]`+`[Invertible …]` 要。
+- **▶ 残 = final theorem `certainType_diff_dade_eq`** (1 unit, 最難 = exclusion):
+  - skeleton: set φ=h.tau.toDadeMap(certainTypeDiffSupported…), ψ=φ−δ_j•(certainTypeOmegaSigma χ₂ i−…χ₂' i);
+    ψ vanish on V [step4 移項 + ClassFunction.zsmul_apply]; a:=sigmaCoeff(ψ) separable [sigmaCoeff_add_eq];
+    a(pq)=sigmaCoeff_psi_eq。
+  - **all a=0** (orientation): w₁≠w₂(coprime, card_charGroup_subgroupOf で Ŵ card=w)、|Δ|≥2(odd) ⟹
+    w₁<w₂=`sigmaCoeff_trichotomy` 直接; w₂<w₁=`grid_trichotomy` transposed (ι=Ŵ₂,κ=Ŵ₁, a'(q,p)=a(p,q))。
+    両者 (all-0)∨(column)∨(row)。
+  - **exclusion** (要 component-structure 補題): **P_ij.1=P_ik.1 (同 Ŵ₁, both i), P_ij.2≠P_ik.2 (異 Ŵ₂, χ₂≠χ₂')**
+    [omegaProdEquiv.symm∘omegaProdCharTic の (Ŵ₁,Ŵ₂) 分解 = (w1charEquiv i 対応, χ₂ 対応); tic omegaProdEquiv ↔
+    transported char の compatibility 補題 ~40行 要]。
+    column j₀ const c≠0: {δ-rows in col}={P_ij.1}(1個, 同row) ⟹ Ŵ₁∖{P_ij.1} の ≥w₁−1≥2 行で g=sigmaCoeff(φ)=c≠0
+    + off-col δ(≥1, 異col) で g=±δ_j≠0 ⟹ |supp g|≥3 > 2 矛盾 [sigmaNC_dade_le_two]。
+    row i₀ const: w₂≥5 なら w₂−2≥3 pure-g; w₂=3 (transposed orientation) は **f∈{0,±1}** で f(P_ik)=±2 弾く。
+  - **conclude**: all a=0 ⟹ a(P_ij)=0 ⟹ sigmaCoeff(φ)(P_ij)=s, a(P_ik)=0 ⟹ sigmaCoeff(φ)(P_ik)=−s ⟹
+    ⟨φ,ωij⟩=s,⟨φ,ωik⟩=−s ⟹ ‖ψ‖²=2−2s·2s+2·s²=0 ⟹ ψ=0 [`eq_zero_of_inner_self_re_eq_zero`, ZIrrFourier:189]。
+  - 最終: (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ) (χ₂≠χ₂' 仮説)。→ (4.9)→case-B→(6.8)。
+正本=本 cont.⁶。**残=final theorem (orientation+exclusion+conclude); component-structure 補題が最初の sub-step。**

@@ -493,4 +493,114 @@ theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
       ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hαZ hα1)
       ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hβZ hβ1)
 
+/-- **Peterfalvi (4.8), step (7) input** (the `σ`-coefficients of `φ` lie in `{0, ±1}`).  Writing
+`φ = ε_α·α + ε_β·β` (norm-2 ⟹ two constituents) and `χ_{pq} = ε·ν` (norm-1 classifier), the
+coefficient `⟨φ, χ_{pq}⟩` is `ε_α·ε` if `ν = α`, `ε_β·ε` if `ν = β`, and `0` otherwise (`α ≠ β`).
+This `|·| ≤ 1` bound (beyond `NC ≤ 2`) is what excludes the `w₂ = 3` row case in the trichotomy
+endgame, where a coefficient would otherwise be `±2`. -/
+theorem sigmaCoeff_dade_eq_zero_or_one (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 0 ∨
+      (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 1 ∨
+      (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = -1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+  have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
+    ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
+      ((h.columnFamily χ₂').mu i).mem_ZIrr)
+  have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
+  obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  obtain ⟨ε, ν, hε, hν⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one
+    (((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.1 pq)
+    (by rw [((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl])
+  -- the two irreducible inner products (type ascription absorbs the `CF ↔ IrreducibleCharacter` coe)
+  have hαν : ClassFunction.inner α (ν : ClassFunction G ℂ)
+      = if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ν
+  have hβν : ClassFunction.inner β (ν : ClassFunction G ℂ)
+      = if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ν
+  have hf : (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
+      = (c α : ℂ) * ((ε : ℂ) * (if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0))
+        + (c β : ℂ) * ((ε : ℂ) * (if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0)) := by
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, hrepr, hs, Finset.sum_pair hαβ, hν,
+      ← Int.cast_smul_eq_zsmul ℂ ε, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hαν, hβν]
+  rw [hf]
+  by_cases hαe : (⟨α, hαm⟩ : IrreducibleCharacter G) = ν
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · exact absurd (Subtype.ext_iff.mp (hαe.trans hβe.symm)) hαβ
+    · rw [if_pos hαe, if_neg hβe]
+      simp only [mul_one, mul_zero, add_zero]
+      rcases hcα with hcα | hcα <;> rcases hε with hε | hε <;> rw [hcα, hε] <;> norm_num
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · rw [if_neg hαe, if_pos hβe]
+      simp only [mul_one, mul_zero, add_zero, zero_add]
+      rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
+    · rw [if_neg hαe, if_neg hβe]; left; ring
+
+open scoped Classical in
+/-- The `σ`-coefficient grid of `ψ = φ − δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.  As `ω_{ij}^σ = χ_{P_{ij}}`
+(`certainTypeOmegaSigma_eq_chiFam`) and the `χ`-family is orthonormal, the `δ`-part contributes
+`∓δ_j` exactly at the two grid positions `P_{ij}, P_{ik}`:
+`a(pq) = ⟨φ, χ_{pq}⟩ − δ_j·([P_{ij} = pq] − [P_{ik} = pq])`. -/
+theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (φ : ClassFunction G ℂ)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (φ - (h.columnFamily χ₂).sign •
+          (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq
+      = (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
+        - ((h.columnFamily χ₂).sign : ℂ)
+          * ((if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) = pq then (1 : ℂ) else 0)
+            - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
+                then (1 : ℂ) else 0)) := by
+  simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]
+  rw [certainTypeOmegaSigma_eq_chiFam, certainTypeOmegaSigma_eq_chiFam,
+    ClassFunction.inner_sub_left, ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign,
+    ClassFunction.inner_smul_left, ClassFunction.inner_sub_left,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1]
+
+/-- For distinct columns `χ₂ ≠ χ₂'`, the transported `tic`-side characters are distinct:
+`omegaProdCharTic` is injective in the column.  (Precompose-cancel the bridge iso `e`, then
+`omegaProdChar_inj`.) -/
+theorem omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    omegaProdCharTic h χ₂ i ≠ omegaProdCharTic h χ₂' i := by
+  intro heq
+  refine hχ (h.sdiffTICyclicHypothesis.omegaProdChar_inj (χ₁ := h.w1CharEquiv i)
+    (χ₁' := h.w1CharEquiv i) (MonoidHom.ext fun w => ?_)).2
+  obtain ⟨w', rfl⟩ := (ticWEquivSdiffW h).surjective w
+  exact DFunLike.congr_fun heq w'
+
+/-- The two `σ`-image grid indices are distinct: `P_{ij} ≠ P_{ik}` for `χ₂ ≠ χ₂'`
+(`omegaProdEquiv.symm` is injective and `omegaProdCharTic` is column-injective). -/
+theorem omegaProdEquiv_symm_omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)
+      ≠ (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) :=
+  fun heq => omegaProdCharTic_ne h hχ i ((ticVdiff h).omegaProdEquiv.symm.injective heq)
+
 end OddOrder.Peterfalvi.S06
