@@ -28,6 +28,7 @@ namespace OddOrder.BG.Ch3.S12
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
 open scoped Pointwise
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -59,6 +60,58 @@ theorem mem_sigma_normalizer_le_of_two_maximals [Finite G] (hG : IsMinimalSimple
   intro hcyc
   haveI := hcyc
   exact hPnab (IsMulCommutative.of_comm (IsCyclic.commGroup (α := ↥P)).mul_comm)
+
+/-- **Conjugates of a noncentral element cover its central coset** in an exponent-`p` extraspecial
+group: for `a₀ ∉ Z(Q)` and any `z ∈ Z(Q)`, there is `q` with `q a₀ q⁻¹ = z · a₀`.
+
+The map `φ : Q → Z(Q)`, `q ↦ ⁅q, a₀⁆`, is a homomorphism (commutators lie in `[Q,Q] = Z(Q)`,
+which is central), nontrivial since `a₀ ∉ Z(Q)`, hence surjective onto the order-`p` group `Z(Q)`.
+So every `z ∈ Z(Q)` is realized as `⁅q,a₀⁆`, i.e. `q a₀ q⁻¹ = z · a₀`. This is the conjugacy half of
+the BG 12.13 Heisenberg line-conjugacy argument. -/
+theorem exists_conj_eq_center_mul_of_expPExtraspecial {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
+    [Fact p.Prime] (hQ : IsExpPExtraspecial p Q) {a₀ : Q} (ha₀ : a₀ ∉ Subgroup.center Q)
+    {z : Q} (hz : z ∈ Subgroup.center Q) :
+    ∃ q : Q, q * a₀ * q⁻¹ = z * a₀ := by
+  classical
+  have hes := hQ.isExtraspecial
+  have hZcard : Nat.card (Subgroup.center Q) = p := hes.center_card
+  have hZcomm : commutator Q = Subgroup.center Q := hes.commutator_eq_center
+  -- (1) `⁅q, a₀⁆ ∈ Z(Q)` for all `q`.
+  have hmemZ : ∀ q : Q, ⁅q, a₀⁆ ∈ Subgroup.center Q := fun q => by
+    rw [← hZcomm]
+    exact Subgroup.commutator_mem_commutator (Subgroup.mem_top q) (Subgroup.mem_top a₀)
+  -- (2) `φ : Q →* Z(Q)`, `q ↦ ⁅q, a₀⁆` (homomorphism by centrality of commutators).
+  have hcentral : ∀ z : Q, z ∈ Subgroup.center Q → ∀ w : Q, Commute z w :=
+    fun z hz w => (Subgroup.mem_center_iff.mp hz w).symm
+  let φ : Q →* Subgroup.center Q := MonoidHom.mk'
+    (fun q => ⟨⁅q, a₀⁆, hmemZ q⟩) (fun x y => by
+      apply Subtype.ext
+      show ⁅x * y, a₀⁆ = ⁅x, a₀⁆ * ⁅y, a₀⁆
+      have hc := hcentral ⁅y, a₀⁆ (hmemZ y)
+      have e1 : ⁅x * y, a₀⁆ = x * ⁅y, a₀⁆ * x⁻¹ * ⁅x, a₀⁆ := by
+        simp only [commutatorElement_def]; group
+      have e2 : x * ⁅y, a₀⁆ * x⁻¹ = ⁅y, a₀⁆ := by rw [(hc x).symm.eq]; group
+      rw [e1, e2, (hc ⁅x, a₀⁆).eq])
+  -- (3) `φ` is surjective: its range is a nontrivial subgroup of the order-`p` group `Z(Q)`.
+  have hφsurj : Function.Surjective φ := by
+    rw [← MonoidHom.range_eq_top]
+    have hdvd : Nat.card ↥φ.range ∣ p := hZcard ▸ Subgroup.card_subgroup_dvd_card φ.range
+    have hne1 : Nat.card ↥φ.range ≠ 1 := by
+      rw [ne_eq, Subgroup.card_eq_one]
+      intro hbot
+      refine ha₀ (Subgroup.mem_center_iff.mpr fun g => ?_)
+      have hg1 : φ g = 1 := by rw [← Subgroup.mem_bot, ← hbot]; exact ⟨g, rfl⟩
+      have h2 : ⁅g, a₀⁆ = 1 := Subtype.ext_iff.mp hg1
+      exact commutatorElement_eq_one_iff_commute.mp h2
+    have hcardr : Nat.card ↥φ.range = p :=
+      (Nat.dvd_prime Fact.out).mp hdvd |>.resolve_left hne1
+    exact Subgroup.eq_top_of_card_eq _ (by rw [hcardr, hZcard])
+  -- (4) realize `z` as `⁅q, a₀⁆`, so `q a₀ q⁻¹ = z · a₀`.
+  obtain ⟨q, hq⟩ := hφsurj ⟨z, hz⟩
+  refine ⟨q, ?_⟩
+  have hqz : ⁅q, a₀⁆ = z := Subtype.ext_iff.mp hq
+  rw [commutatorElement_def] at hqz
+  exact mul_inv_eq_iff_eq_mul.mp hqz
 
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
