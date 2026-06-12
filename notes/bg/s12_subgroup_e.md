@@ -227,9 +227,14 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
    「Ω₁(Q₁)中心化A」とは別命題 — 12.8(e) の正しい形を S12_Lemma128d で要再特定。
 8. 6 と 7 で pRank Q q ≤1 vs =2 矛盾 ⟹ X 存在。
 
-**推奨 build 順**: (6) Ω₁-rank abstract lemma を先に着地 (自己完結・テスト可) → (a)(b) 開問解決
+**推奨 build 順**: **✅ (6) Ω₁-rank abstract lemma 着地 (session 9, commit 8672fd5c)** —
+`omega_le_of_ne_bot_in_cyclic` + `pRank_le_one_of_cyclic_quotient` (IsCyclic(Q⧸Q₀)∧Q₀⊊Q₁⟹
+pRank Q≤1; Ω₁(Q)≤Q₁ を `Subgroup.comap_map_eq_self`+omega-helper で、elem-ab≤Ω₁ は
+`IsElementaryAbelian.pow_eq_one`+`Omega.mem_of_pow_eq_one`、|B|≤q は cyclic exponent)。一発に
+近く通過 (修正 2: `h0lt1.ne`+`le_antisymm` / `≤` 型付け)。→ 次 = (a)(b) 開問解決
 (E/N_G(S), Cor12.10(c) 特定) で setup → (c) hard core (12.8(e) 正形 + r_q=2 接続) を BG 精読で
-攻略 → 統合。**(c) が front-half の真のボトルネック (BG 圧縮された rank 接続)。**
+攻略 → 統合 (r(Q)=1 [✅] + φ̄ wrapper [✅] + r_q=2 [c] で by_contra)。**(c) が front-half の真の
+ボトルネック (BG 圧縮された rank 接続)。**
 
 **残 (front-half 後)**: C_E(S)=E 枝 (generic rank-2 分解 S=Y×Z — mathlib
 `AddCommGroup.equiv_directSum_zmod_of_finite` 在だが rank2→2 cyclic 部分群への翻訳は別 sub;
