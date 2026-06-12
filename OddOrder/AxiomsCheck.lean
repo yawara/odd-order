@@ -820,6 +820,13 @@ set_option linter.style.longLine false in
 -- (`certainTypeOmegaSigma_conj`, via the (3.9) Galois commutation `sigma_mapRingEquiv_comm`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.galoisMap_conj_omega
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj
+-- (4.9)(a) grid-index conjugation: the inverse grid character is the grid character at the conjugate
+-- index (`omegaProdChar_inv` coordinatewise, `omegaProdCharTic_inv` with column `χ₂⁻¹`, row `rowInv`),
+-- so the conjugate of a σ-image is the σ-image at the conjugate index `(ω_ij^σ)̄ = ω_{i'j'}^σ`
+-- (`certainTypeOmegaSigma_conj_eq`).  This is the σ-side of Peterfalvi's `ω̄_ij = ω_{i'j'}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdChar_inv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdCharTic_inv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj_eq
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
