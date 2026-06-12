@@ -1943,3 +1943,37 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
   (ii) |supp f|≤2 (Bessel or norm2→≤2), (iii) w₁<w₂ ⟹ w₁+2≤w₂ (odd gap), (iv) sigmaCoeff(ψ) の f+δ 展開
   (ω_ij^σ=chiFam(P_ij) 同定 = omegaProdCharTic→sigma_omega→omegaProdEquiv.symm)。
 正本 = 本 session 33。**foundation+step4 DONE。endgame は上記 8 段で確定 (φ(1)=0/λ₁−λ₂ 回避済)。**
+
+### ✅ session 33 cont.³ — endgame INPUT 補題 全 landed (残 = trichotomy assembly のみ)
+**landed (build-green, axiom-clean, AxiomsCheck 登録済)**:
+- `certainType_diff_dade_apply_eq_of_mem_V` (step 4): ψ が V で消滅 (equality 形)。
+- `certainType_diff_dade_inner_self`: **‖φ‖²=2** (要 χ₂≠χ₂'; τ isometry `h.tau.inner_eq` + `columnFamily_mu_ne` (4.1))。
+- `sigmaNC_dade_le_two`: **NC(φ)≤2** (norm-2⟹2 constituents via `mem_ZIrr_inner_self_eq_sum_sq`+
+  `exists_pair_of_sum_sq_eq_two`、φ=ε_α α+ε_β β、各 `ncard_inner_chiFam_ne_zero_le_one`≤1、supp⊆S_α∪S_β)。
+  **gotcha (再調査不要)**: 文字群 index の `Finite` synth が ticVdiff unfold で timeout → proof 冒頭で
+  `haveI : Fintype (W1hat) := Fintype.ofFinite _` ×2 + `haveI : Fintype (prod) := inferInstance` +
+  `haveI : Finite (prod) := Finite.of_fintype _`、union finite は `Set.finite_univ.subset (subset_univ _)`。
+- `certainTypeOmegaSigma_eq_chiFam`: **ω_ij^σ = chiFam(P_ij)** where P_ij=`omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)`
+  (= `sigma_omega` 一発)。⟹ δ-term 位置 P_ij,P_ik 確定。
+
+### ▶▶ 残 = trichotomy assembly (1 セッション規模、設計確定)
+φ:=h.tau.toDadeMap(certainTypeDiffSupported …)、ψ:=φ − δ_j•(certainTypeOmegaSigma χ₂ i − certainTypeOmegaSigma χ₂' i)。
+1. **ψ vanish on V**: step4 (equality) を `ψ v=0` に (`ClassFunction.sub_apply`+`smul_apply`、自明)。
+2. **NC(ψ)≤4**: sigmaCoeff(ψ)(pq)=⟨ψ,chiFam pq⟩ = ⟨φ,chiFam pq⟩ − δ_j([pq=P_ij]−[pq=P_ik])
+   [certainTypeOmegaSigma_eq_chiFam + chiFam 正規直交 `chiFam_spec.2.2.1`]。
+   ⟹ supp(sigmaCoeff ψ) ⊆ supp(sigmaCoeff φ) ∪ {P_ij,P_ik}、NC(ψ)≤NC(φ)+2≤4。
+3. **🔑🔑 ORIENTATION 問題 (残 hard part の核)**: `sigmaCoeff_trichotomy` は **w₁+2≤w₂** (W₁=rows) を要求。
+   だが certain-type に w₁<w₂ は無い (確認済: CertainTypeHypothesis に順序無)。**ただし `coprime_card_W1_card_W2`
+   ⟹ w₁≠w₂、両 odd ⟹ |w₂−w₁|≥2**。⟹ **小さい方を rows に取れば gap 成立** (min+2≤max、max≥5)。
+   - w₁<w₂: `sigmaCoeff_trichotomy` 直接 (rows=Ŵ₁、gap=w₁+2≤w₂、NC<2w₁≥6)。
+   - w₂<w₁: **transposed** — `grid_trichotomy` を a'(q,p)=sigmaCoeff(p,q) に (ι=Ŵ₂,κ=Ŵ₁) で直接適用
+     (separability/NC は転置不変、gap=w₂+2≤w₁)。(b')(c') は (c)(b) に対応。**両 case 要 = 残最大作業**。
+   - 別解: min(w₁,w₂)≥5 なら corollary `sigmaCoeff_eq_zero_of_sigmaNC_lt` (NC<min) で case(a) 直接 ⟹
+     trichotomy 不要。**min=3 の時だけ** trichotomy+orientation 要 (w_smaller=3 を rows)。
+4. **(b)(c) 排除 = |supp f|≥3 矛盾** (f=sigmaCoeff φ、|supp f|≤2): 列定数 c≠0 (rows≥3 行) ⟹ p≠p_i の
+   ≥rows−1≥2 行 pure-f=c + 異列 δ-点≥1 個 off-column (f=±δ_j) ⟹ |supp f|≥3>2。行定数も同様 (cols≥5、cols−2≥3)。
+5. **(a) ⟹ ψ=0**: ⟨ψ,chiFam P_ij⟩=⟨ψ,chiFam P_ik⟩=0 ⟹ ⟨φ,ω_ij^σ⟩=δ_j,⟨φ,ω_ik^σ⟩=−δ_j ⟹
+   ‖ψ‖²=2−2δ_j(δ_j−(−δ_j))+2=0 (chiFam 正規直交+δ²=1) ⟹ ψ=0 (`ClassFunction.inner_self_eq_zero`)。
+6. **最終 statement**: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)` (要 χ₂≠χ₂'; ψ=0 から移項) → (4.9) → case-B → (6.8)。
+
+正本 = 本 session 33 cont.³。**input 補題 全 landed (9 commits)。残 = assembly (orientation 込み trichotomy)、1 セッション。**
