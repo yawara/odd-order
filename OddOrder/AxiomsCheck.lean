@@ -4251,3 +4251,16 @@ and a Sylow `p`-subgroup `P` of `G` normal in `M*`; `S ≤ N_G(S) = N_G(A) ≤ M
 setup tool: feeds `q ∈ π(E/C_E(A))` from `Q₁ ⊄ C_E(A)` with `C_E(A) ⊴ E`. Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.prime_dvd_index_of_sylow_not_le_of_normal
+
+/-! ### BG Theorem 12.12: Case 3 front-half — setup + `X` existence (`S12_Theorem1212b`)
+
+`exists_sylow_tau1_cyclic_notCentralizing`: in the abelian-Sylow regime with the regularity
+hypothesis, `C_E(S) ≠ E` yields a prime `q ≠ p` and a cyclic Sylow `q`-subgroup `Q₁` of `E` with
+`q ∈ τ₁(M)`, `Q₁ ⊄ C(S)`, and `q ∈ π(E/C_E(A)) ∩ π(C_E(A))` (the data for the `r_q = 2` lemma).
+`exists_partial_centralizer_of_abelianSylow`: hence some `X ≤ N_G(S)` has `1 ⊊ C_S(X) ⊊ S` —
+otherwise `Q ⧸ C_Q(S)` is cyclic (`pRank Q q ≤ 1`) yet `pRank Q q = r_q(N_G(S)) = 2`. Feeds the
+`Z`-construction `exists_invariant_cyclic_sameExponent_regular`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_sylow_tau1_cyclic_notCentralizing
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_partial_centralizer_of_abelianSylow
