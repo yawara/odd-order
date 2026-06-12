@@ -56,28 +56,25 @@
 ### Lemma 13.1 残 step plan (mmd L3534-3546; scaffold `pSubgroup_centralizes_of_interaction` は
 S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
 
-- **step 2 (Frattini) — 詳細設計済 (2026-06-12 session 1 末; Mbeta_le_derived 着地)**:
-  deliverable = `∃ Y, IsPGroup q Y ∧ Y Sylow q of M*' ∧ Mstar = K ⊔ (Mstar ⊓ N_G(Y))` where
-  **`K := opiCoreInG (β(M*)∪{q}) (derivedInG M*)` = O_{β∪q}(M*')**。K は p'(p∉β(M*) かつ p≠q)
-  ゆえ step 3 で `[M*:N_{M*}(Y)] ∣ |K|` が p' → Syl_p(M*)⊆N_{M*}(Y) → r_p=2。
-  - 🔑 **M*_β でなく K=O_{β∪q}(M*') を normal subgroup に使う** (M*_β Y は M*' に normal だが M* に
-    normal を出すのが面倒; K は M*' に characteristic ⟹ M*'⊴M* 経由で **K⊴M* が無料**)。
-  - **q∉β(M*)**: σ(M)∩α(M*)=∅ (`S10.disjoint_of_not_conj` 10.12(a), ただし hnc を M*↔M で対称化要)
-    + β⊆α ⟹ q∈σ(M)⟹q∉β(M*)。これが `normal_sup_sylow_of_quotient_nilpotent` の `hNq'`(q∤|M*_β|) を供給。
-  - **手順** (template = `S10_BetaRadical.lean:565-645` の Cor 10.9 機構を縮約):
-    (1) `Mbeta_le_derived` ✅ + 正規性 instance `((Mbeta M*).subgroupOf D).Normal` (S10:571 pattern)。
-    (2) `S10.normal_sup_sylow_of_quotient_nilpotent (derivedQuotientMbeta_isNilpotent …) hNq' Q`
-        (Q:Sylow q ↥D) ⟹ `(M*_β ⊔ Q) ⊴ D`。 (3) `le_opiCoreInG_of_normal_of_isPiSubgroup` ⟹ M*_β Q ≤ K、
-        ∴ Y(=Q_G) ≤ K、Y Sylow q of K (Sylow of D ⊇ K ⊇ Y)。 (4) `K⊴M*` via
-        `normal_subgroupOf_iff_le_normalizer + le_normalizer_opiCoreInG_of_le_normalizer (le_normalizer_derivedInG M*)`
-        (S10:623-625)。 (5) Frattini: `Sylow.ofCard` で Q':Sylow q ↥(K.subgroupOf M*) →
-        `Sylow.normalizer_sup_eq_top Q'` → transport (`subgroupOf_map_subtype`/`subgroupOf_normalizer_eq`)
-        ⟹ `M* = K ⊔ N_{M*}(Y)` (S10:627-645)。
-  - ⚠ **高名前密度・~120 行**。次ターン集中実行。surface 確認済 (Explore 2 回 + S10 template 精読)。
-- **step 3 = (b) `p∉τ₂(M*)`**: τ₂ 仮定下 `r_p(N_{M*}(Y))=2` [`tau2_pRank_eq_two` + `p∉β(M*)`
-  (τ₂∩σ=∅⊇β) + `M*_β` が p'-Hall ゆえ Sylow p が `N_{M*}(Y)` に入る] vs `≤1` [forward axiom
-  `cor1216_pRank_normalizer_le_one`, `M*∈ℳ(Y)`, `¬idealPrime` from 12.1(g)] の矛盾。**axiom 初使用**。
-  ⚠ hard sub: `r_p(N_{M*}(Y))=2` の導出 (Frattini factor 内 Sylow p)。
+- **step 2 (Frattini) ✅ COMPLETE (2026-06-12 session 1, commit `a93636c5`)**:
+  `exists_sylow_frattini_decomp` (sorry-free) = `q∉β(M*) ∧ q∣|M*'| ⟹ ∃ Y, Y≠⊥ ∧ IsPGroup q Y ∧
+  Y≤M*' ∧ Mstar = O_{β(M*)∪{q}}(M*') ⊔ (Mstar ⊓ N_G(Y))`。核 `M*_β Q ◁ D` =
+  `S10.normal_sup_sylow_of_quotient_nilpotent` (D/M*_β nilpotent) → O_{β∪q}(D) に押込 (char in D⊴M*
+  ⟹ K⊴M*)、Frattini = `Sylow.ofCard`+`Sylow.normalizer_sup_eq_top`+subtype transport (S10 Cor 10.9
+  機構縮約)。~100 行・4 build iteration で着地。helper `Mbeta_le_derived` も land。
+  🔑 **M*_β でなく K=O_{β∪q}(M*') を使うのが鍵** (K は M*' に characteristic ⟹ K⊴M* が無料)。
+- **step 3 = (b) `p∉τ₂(M*)` (NEXT, axiom 初使用)**: p∈τ₂(M*) 仮定→矛盾。
+  - `exists_sylow_frattini_decomp` (step 2) で Y + `M* = K ⊔ N_{M*}(Y)`, K=O_{β∪q}(M*')。
+    q∉β(M*) は σ(M)∩α(M*)=∅ (`S10.disjoint_of_not_conj` 10.12(a), hnc を M*↔M 対称化) + β⊆α。
+  - **r_p(N_{M*}(Y))=2**: K は {β∪q}-group, p∉β(M*)(τ₂∩σ=∅⊇β)∧p≠q(p∈σ',q∈σ) ⟹ p∤|K|。
+    `[M*:N] = |K|/|K⊓N| ∣ |K|` (K⊴M*, product formula) ⟹ p∤[M*:N] ⟹ |N|_p=|M*|_p ⟹
+    Syl_p(N)=Syl_p(M*) ⟹ `pRank N = pRank M* = 2` (`tau2_pRank_eq_two`)。⚠ rank 論法 ~40-60 行
+    (pRank が Sylow p で決まる事実 = `pRank` def 精査要; `pRank_mono_of_le` で ≤2)。
+  - **r_p(N_{M*}(Y))≤1**: forward axiom `cor1216_pRank_normalizer_le_one` を H=M* で適用。要 hyp:
+    Y≠⊥(✅step2)、Y は σ(M)-subgroup (`IsPiSubgroup (σ M) Y`: q∈σ(M)[step1] + Y は q-group), p∈π(E),
+    `¬idealPrime p G`(=p∉β(G), 12.1(g) `isMaximalElementaryAbelian_of_mem_tau2` 2nd 連言), M*∈ℳ(Y)
+    (Y≤M*'≤M*, M* maximal), M* non-conj M。⟹ 2≤1 矛盾。
+  - 完了後 **AxiomsCheck に island assert** + S13_Lemma131 を AxiomsCheck import に追加。
 - **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)`**: `p∈σ(M*)∪τ₃(M*)` ⟹ Sylow p `S⊆M*'`。`p∉β(M*)` なら
   `p∈π(N_{M*}(Y)')` → forward axiom `cor1216_not_mem_primeFactors_derived_of_tau1` の対偶。
   β(M*) 分岐の扱い要精査。
