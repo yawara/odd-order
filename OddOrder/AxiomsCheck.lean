@@ -4326,6 +4326,15 @@ fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|
 Sylow case — a cyclic `p`-subgroup `Z ≤ E`, normalized by `E`, of the same exponent as a Sylow
 `p`-subgroup `S ≤ E`, regular on `M_σ` (wires `exists_elemAb_rank_two_le_E_of_tau2`, the Sylow
 extension, `sylow_chain_of_abelianSylow` giving `S ≤ E`, and the per-prime capstone). Unconditional.
-(`frobenius_factorization_of_regular` / `frobFact_of_abelianSylow` の axiom 登録は Case 3 集約完了後。) -/
+(`frobenius_factorization_of_regular` / `frobFact_of_abelianSylow` の axiom 登録は Case 3 集約完了後。)
+
+`isPiSubgroup_le_of_normal_isHall`: a `π`-subgroup is contained in any *normal* Hall `π`-subgroup
+(companion to `Subgroup.IsPiGroup.normal_le_hall`). `frobFact_partA_of_abelianSylow`: part (a) of
+Theorem 12.12 in the abelian-Sylow case — `A₀ = E₂` is abelian normal with `C_E(x) ⊆ E₂` for
+`x ∈ M_σ#` (`C_E(x)` is a `τ₂`-group by `hreg`, then in the normal Hall `E₂`). Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_regular_cyclic_of_mem_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isPiSubgroup_le_of_normal_isHall
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_partA_of_abelianSylow
