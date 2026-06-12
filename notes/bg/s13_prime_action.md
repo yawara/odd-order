@@ -160,6 +160,20 @@ leaf を import し再 export。root + AxiomsCheck (island PASS, full build 3793
   (S13_PrimeAction 内)。leaf は ActsPrimeOn を要するので S13_PrimeAction を import
   ⟹ S13_PrimeAction は 13.3 leaf を import 不可 (cycle)、13.3 stub は leaf へ移し root 直 import。
 
+  **⚠ 13.3 は terse corollary に見えて real proof（mmd「this proves (a)」が coprime-action 論法を省略）**:
+  - `ActsPrimeOn` 定義 = element 形 `∀g∈P#, C_{M_σ}(g)=C_{M_σ}(P)`。cyclic P では
+    `ℰ¹(P)={Ω₁(P)}` ゆえ **`C_{M_σ}(Ω₁P) ⊆ C_{M_σ}(P)` に帰着**(両形同値、mmd L3490)。
+  - これは `D:=C_{M_σ}(Ω₁P)` に P を coprime 作用 (p∤|M_σ|) ⟹ `D=C_D(P)·[D,P]`,
+    `C_D(P)=C_{M_σ}(P)`。**crux = `[D,P]=1`**(P-FPF on [D,P])。
+  - Cor 13.2(a) は「N_E(P) の p-部分群が C_{M_σ}(P)=M_σ∩M* を中心化」を与える
+    (C_G(P)⊆N_G(P)⊆M* ゆえ C_{M_σ}(P)⊆M_σ∩M*) が、これだけでは `[D,P]=1`(D は Ω₁P の
+    centralizer で C_{M_σ}(P) より大) に直結しない。P が **E の Sylow** であること + [D,P] の
+    Sylow への Frattini/局所論法が要る。**未解決の path; 次セッションの第一課題**。
+  - coprime 分解 infra: `OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`
+    (抽象 action 形、subgroup 設定への適応要)。
+  - (b) E₃ は mmd 明快: E₃⊆E'⊆M*', π(E₃)⊆π(M*')⊆(τ₁M*)' ⟹ Cor 13.2(b) 直接
+    ((a) より易、先に landing 可)。
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
