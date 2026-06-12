@@ -55,9 +55,13 @@ hE₀E hA₀E₀ hx hx1` → π(C_{E₀}(x))⊆τ₁ ⟹ C_{E₀}(x)=⊥ (∃y o
 (∀a∈E₀#,M_σ⊓C(a)=⊥) [comm 対称、~12 行] → packaging。
 
 **(b) exponent `exp(E₀)=exp(E)`** = `exponent_eq_of_forall_factorization_le` の hattain を discharge:
-- **r≠p**: max-r-order 元 g (`exists_orderOf_eq_pow_factorization_exponent`) を E₀ へ共役。
-  E₀ は r∤[E:E₀]=p ゆえ Syl_r(E) を含む (Syl_r(E₀)=Syl_r(E))、Sylow 共役で g^{x⁻¹}∈E₀ 同位数。
-  **要 Sylow 機構**: 「Syl_r(subgroup,index coprime r)=Syl_r(group)」+「Sylow 共役」+「⟨g⟩≤Syl」。
+- **r≠p** (🔑 **Sylow 共役を回避する clean path 発見**): max-r-order 元 g:↥E
+  (`exists_orderOf_eq_pow_factorization_exponent`, ord g = r^k, k=v_r(exp E)) を **complement iso**
+  `Subgroup.IsComplement'.QuotientMulEquiv [K.Normal] (h:H.IsComplement' K) : G⧸K ≃* H` で E₀ へ。
+  K:=A₀.subgroupOf E (normal, A₀⊴E), H:=E₀.subgroupOf E (complement)。`mk g : ↥E⧸K` の位数 = r^k
+  (核 A₀ は |A₀|=p で r と互いに素: g^{ord(mk g)}∈K ⟹ ord g ∣ ord(mk g)·p、coprime で r^k∣ord(mk g);
+  逆は hom で ord(mk g)∣ord g)。iso で g₀:=e(mk g)∈↥E₀sub 同位数 → subgroupOfEquivOfLe で ↥E₀ の
+  r^k 位数元。**Sylow 機構不要・複素 iso のみ** (~40 行)。
 - **r=p**: E₂=Sylow p of E は abelian (`E2_isMulCommutative_of_prime_eq`)、|E₂|≥p² (r_p(M)=2)。
   Dedekind (A₀≤E₂): E₂=A₀⊔(E₂⊓E₀) disjoint ⟹ (abelian) E₂=A₀×(E₂⊓E₀)。|E₂⊓E₀|=|E₂|/p≥p ⟹
   C:=E₂⊓E₀ nontrivial p-群、exp(E₂)=lcm(p,exp C)=exp C (p∣exp C)。exp(E₂)=p^{v_p(exp E)}
