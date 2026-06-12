@@ -4084,3 +4084,12 @@ elem-ab order `p²`, with `y ∈ T₁` order `p` the join `B₀ ⊔ ⟨y⟩` is 
 Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_inf_eq_bot_of_pRank_le_two
+
+/-! ### BG Theorem 12.12: Case 3 back-half — exponent of internal product (`S12_Theorem1212b`)
+
+`exponent_eq_of_sup_eq_top_of_exponent_dvd`: in a finite abelian `T = T₀ ⊔ T₁ = ⊤`, if
+`exp(T₁) ∣ exp(T₀)` then `exp(T) = exp(T₀)` (each `g = a·b` factors, `ord g ∣ lcm(ord a, ord b)
+∣ exp T₀`). For `Z` = the larger cyclic factor of `S = C_S(X) × [S,X]`: `exp(Z) = exp(S)`.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_sup_eq_top_of_exponent_dvd

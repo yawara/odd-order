@@ -304,4 +304,27 @@ theorem isCyclic_of_inf_eq_bot_of_pRank_le_two {T : Type*} [CommGroup T] [Finite
   rw [hsupcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
   omega
 
+/-- In a finite abelian group `T` that is the internal product `T₀ ⊔ T₁ = ⊤` of two subgroups, if
+`exp(T₁) ∣ exp(T₀)` then `exp(T) = exp(T₀)`. Every `g ∈ T` factors as `g = a·b` (`a ∈ T₀`,
+`b ∈ T₁`, commuting), and `ord(g) ∣ lcm(ord a, ord b) ∣ exp(T₀)`. Used in Theorem 12.12 Case 3
+with `T = S`, `T₀ = Z` the larger of the two cyclic factors `C_S(X), [S,X]` (the larger has the
+bigger order, hence absorbs the exponent), giving `exp(Z) = exp(S)`. -/
+theorem exponent_eq_of_sup_eq_top_of_exponent_dvd {T : Type*} [CommGroup T] [Finite T]
+    {T₀ T₁ : Subgroup T} (hsup : T₀ ⊔ T₁ = ⊤)
+    (hexp : Monoid.exponent ↥T₁ ∣ Monoid.exponent ↥T₀) :
+    Monoid.exponent T = Monoid.exponent ↥T₀ := by
+  classical
+  refine dvd_antisymm ?_ (Monoid.exponent_dvd_of_monoidHom T₀.subtype T₀.subtype_injective)
+  rw [Monoid.exponent_dvd]
+  intro g
+  have hg : g ∈ T₀ ⊔ T₁ := by rw [hsup]; exact Subgroup.mem_top g
+  obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup.mp hg
+  subst hab
+  refine ((Commute.all a b).orderOf_mul_dvd_lcm).trans (Nat.lcm_dvd ?_ ?_)
+  · have h := Monoid.order_dvd_exponent (⟨a, ha⟩ : ↥T₀)
+    rwa [Subgroup.orderOf_mk] at h
+  · have h := Monoid.order_dvd_exponent (⟨b, hb⟩ : ↥T₁)
+    rw [Subgroup.orderOf_mk] at h
+    exact h.trans hexp
+
 end OddOrder.BG.Ch3.S12
