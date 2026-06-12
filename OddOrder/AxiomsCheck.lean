@@ -788,6 +788,12 @@ set_option linter.style.longLine false in
 -- NC ≤ 4 < 2·min(w₁,w₂); the (3.8) trichotomy (in the orientation given by coprimality of w₁,w₂)
 -- leaves only all-zero (constant column/row excluded by grid_no_constant_column/row), whence ψ = 0.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq
+-- Peterfalvi (4.9)(b), summed isometry: the Dade map is additive over finite sums of supported
+-- class functions (`tau_toDadeMap_sum`, via the (2.5) uniqueness `IsDadeMap.unique` reducing the
+-- abstract `τ` to the genuine `ℂ`-linear `dadeLinearMap`); summing (4.8) conclusion 3 over the rows
+-- `0 ≤ i < w₁` gives `(μ_j − μ_k)^τ = δ_j ∑_i (ω_ij^σ − ω_ik^σ)`, the (4.9)(b) τ-agreement on Z[T,A].
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.tau_toDadeMap_sum
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
