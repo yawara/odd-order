@@ -238,4 +238,49 @@ theorem certainType_columnSum_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1
   exact Equiv.sum_comp (rowInvEquiv h)
     (fun i => ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ))
 
+/-! ### The conjugate column is a new column (the (4.9)(a) `μ̄_j ≠ μ_j`) -/
+
+/-- **The conjugate column index differs** (`j' = χ₂⁻¹ ≠ χ₂ = j` for nontrivial `χ₂`).  The column
+character group `(W₂.subgroupOf W) →* ℂˣ` has odd order (`= |W₂|`, dividing `|W|` odd), so it has no
+involutions: `χ₂ = χ₂⁻¹` would force `χ₂² = 1`, hence `orderOf χ₂ ∣ 2` and odd, so `χ₂ = 1`. -/
+theorem column_inv_ne_self (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    χ₂⁻¹ ≠ χ₂ := by
+  have hodd : Odd (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) := by
+    rw [h.card_charGroup_W2]
+    exact h.W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)
+  intro heq
+  apply hχ₂
+  have hsq : χ₂ ^ 2 = 1 := by
+    have hm := mul_inv_cancel χ₂
+    rw [heq] at hm
+    rwa [pow_two]
+  have hcardodd : Odd (orderOf χ₂) := hodd.of_dvd_nat (orderOf_dvd_natCard χ₂)
+  have h1 : orderOf χ₂ = 1 := by
+    rcases (Nat.dvd_prime Nat.prime_two).mp (orderOf_dvd_of_pow_eq_one hsq) with h2 | h2
+    · exact h2
+    · exact absurd (h2 ▸ hcardodd) (by decide)
+  exact orderOf_eq_one_iff.mp h1
+
+/-- **Peterfalvi (4.9)(a), `μ̄_k ≠ μ_k`.**  For a nontrivial column `χ₂`, the conjugate column
+`μ̄_k = μ_{k'}` (`certainType_columnSum_conj`, `k' = χ₂⁻¹`) is a **different** certain-type character:
+`χ₂⁻¹ ≠ χ₂` (`column_inv_ne_self`, `|W|` odd) makes the two column sums orthogonal
+(`columnFamily_mu_sum_inner`), so `⟨μ̄_k, μ_k⟩ = 0 ≠ w₁ = ‖μ_k‖²`.  This is the nonvanishing
+`0 ≠ μ̄_k − μ_k ∈ Z[T, A]` input to the (4.9)(a) coherence (`IsCoherent.nonzero`). -/
+theorem certainType_columnSum_conj_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+      ≠ ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) := by
+  rw [certainType_columnSum_conj]
+  intro heq
+  have h0 := columnFamily_mu_sum_inner h χ₂⁻¹ χ₂
+  rw [if_neg (column_inv_ne_self h hχ₂), heq, columnFamily_mu_sum_inner h χ₂ χ₂,
+    if_pos rfl] at h0
+  exact (Nat.cast_ne_zero.mpr (NeZero.ne (Nat.card h.W1))) h0
+
 end OddOrder.Peterfalvi.S06
