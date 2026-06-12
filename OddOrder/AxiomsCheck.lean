@@ -4389,3 +4389,11 @@ three-case glue this completes Theorem 12.12. Unconditional. -/
 Unconditional. (`nonabelian_pgroup_isUniquelyMaximal` の本体 proof は σ-side cascade で後続。) -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_normalizer_le_of_two_maximals
+
+/-! **BG Theorem 12.13** Heisenberg piece (`S12_Theorem1213`):
+`exists_conj_eq_center_mul_of_expPExtraspecial` — in an exponent-`p` extraspecial group, the
+conjugates of a noncentral `a₀` cover its central coset `Z(Q)·a₀`. The map `q ↦ ⁅q,a₀⁆` is a
+homomorphism onto the order-`p` center (commutators central), nontrivial as `a₀ ∉ Z(Q)`, hence
+surjective. The conjugacy half of the 12.13 line-conjugacy argument. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_conj_eq_center_mul_of_expPExtraspecial
