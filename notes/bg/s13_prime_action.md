@@ -1,5 +1,52 @@
 # BG §13: Prime Action — per-section 調査ノート
 
+## 2026-06-12 Lane G session 1: STATEMENT AUDIT — 🛑 BLOCKER (issue 8000)
+
+**結論: §13 は現状の §12 surface では着工不能。根の Lemma 13.1 が BG Cor 12.16(a)(b) を要し、
+その statement が repo に存在しない。** LAUNCH.md 手順 3 (着工前必須 audit) の所見。
+
+### 環境
+- `git merge --ff-only main` 成功 (`aa5231be`→`f1408227`; S10 分割 4 ファイル取り込み)。
+- `lake build …S13_PrimeAction` 緑 (3067 jobs, scaffold 実 sorry 11)。
+- mmd 実行番号は notes 旧記載とズレ: §13 = **L3526-3739** (Lem 13.1 = L3528, notes 旧 L3498 は古い抽出)。
+  §12 cited: Thm 12.13=L3377, Cor 12.14=L3399, Prop 12.15=L3417, Cor 12.16=L3453, Lem 12.17=L3478,
+  Lem 12.18=L3484, Lem 12.19=L3510。
+
+### audit 結果 (4 指定 statement + 周辺)
+| BG | Lean (S12) | faithful? | 備考 |
+|---|---|---|---|
+| Thm 12.13 | `nonabelian_pgroup_isUniquelyMaximal` (S12_E:49) | ✅ | 完全一致 |
+| Cor 12.14 | `maximalContaining_centralizer_eq_singleton` (S12_E:57) | ⚠ 不完全 | `ℳ(C_G(X))={M}` のみ。原典 `ℳ(P)={M}` (P=Sylow p of M_σ) を**脱落**。Lemma 13.6 が `ℳ(S)` に要する → 13.6 着工時に要対応 |
+| Prop 12.15 | `sigma_subgroup_maximal_interaction` (S12_E:458) | ✅ | (a)-(e) 全 faithful。`complement` は `M*_σ⊓(M⊓M*)=⊥ ∧ ⊔=M*` |
+| **Cor 12.16(a)(b)** | **存在しない** | 🛑 | `sigma_subgroup_conj_into_Msigma` (S12_E:64) は docstring が「12.16(a)」だが**実体は前置節「Y conj into M_σ」のみ**。rank bound `r_p(N_H(Y))≤1` (a) と π-bound `p∈τ₁⟹p∉π(N_H(Y)')` (b) **未述**。S12_E:29 も「12.16(b) deferred」と自認 |
+
+### なぜ全 §13 が gate されるか
+- §13 は **Lemma 13.1 を根とする DAG**: Cor 13.2 は「follows directly from Lemma 13.1」(mmd L3554)、
+  以降 13.3/13.4/…/13.11 は全て 13.2 か 13.4 経由。独立に着工できる §13 結果は無い。
+- Lemma 13.1 (3 結論) の証明は **3 つとも Cor 12.16(a) を要する**:
+  - (b) `p∉τ₂(M*)`: `r_p(N_{M*}(Y))=2` (12.1(g)) vs `≤1` (12.16(a)) の矛盾 (mmd L3538)。
+  - (c) `p∈τ₁(M)⟹p∈β(G)`: 12.16(b) の対偶 (mmd L3540)。
+  - (a) centralization: `p∈σ(M*)∪τ₃(M*)` (= (b) で τ₂ 除外) 経由で Sylow `S⊆M*'` を取るので (b) 依存。
+
+### 在庫 OK な §12/§10 依存 (cite 可)
+12.1(d) E₁/E₃ cyclic (S12_ECore:835,910) ✅ / 12.1(g) `isMaximalElementaryAbelian_of_mem_tau2`
+(S12_ECore:490; ただし `¬idealPrime`=「p∉β(G)」部分のみ直接, 「r_p(N_{M*}(Y))=2」は別途要導出) /
+12.2(a) (S12_ECore:1218) ✅ / 12.5 (S12_Theorem125:94) ✅ / 12.6(a)(b)(c) (S12_Corollary126) ✅ /
+12.13/12.15/12.18(a) (S12_Lemma1218) ✅ / 12.17 (S12_E:74, **実証明済**) ✅ /
+10.8 (S10_BetaRadicalCore) ✅ / 10.12(a) `disjoint_of_not_conj` (S10_LocalLemmasCore:1200) ✅。
+未再確認 (13.6/13.7/13.9 着工時に): 12.5(d), 12.6(d), 12.6(f)。
+
+### 解消パス (要 hub/ユーザー裁可 — session 1 末で提示)
+1. **(推奨) hub/Lane F が S12_E へ Cor 12.16(a)(b) の sorry'd statement を追加** → G が cite。
+   architecture 最善 (statement は §12 に属す)。issue 8000 に drop-in 署名あり。G は短時間待機。
+2. ユーザー承認のもと G が §13 helper で 12.16(a)(b) を **forward axiom** 宣言 → 即着工、後で de-axiom。
+3. G が 12.16(a)(b) を §13 側で **実証明** (sorry 無し, sorry'd Prop 12.15 引用) → idle/axiom 無しだが
+   §12 仕事を G レーンで抱える + 合流時 relocate (~150-250 行, 非推奨)。
+
+→ 詳細・署名は **issue 8000** (`issues/8000-s13-blocked-cor1216ab.md`)。
+
+---
+
 ## 2026-06-02 B7 foundation checkpoint
 
 Lean file: `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeAction.lean`.
