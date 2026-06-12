@@ -70,4 +70,46 @@ axiom cor1216_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSim
     (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
     p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors
 
+/-! ## Lemma 13.1 — structural steps (mmd L3534-3546) -/
+
+/-- `⁅M_σ, M⁆ ≤ M_σ`: the radical `M_σ` is normal in `M`. (Reusable; via the normality of
+`(M_σ).subgroupOf M` inside `↥M`.) -/
+theorem Msigma_commutator_M_le (M : Subgroup G) :
+    ⁅S10.Msigma M, M⁆ ≤ S10.Msigma M := by
+  classical
+  haveI : ((S10.Msigma M).subgroupOf M).Normal := by rw [S10.Msigma_subgroupOf]; infer_instance
+  have h1 : ⁅(S10.Msigma M).subgroupOf M, (⊤ : Subgroup ↥M)⁆ ≤ (S10.Msigma M).subgroupOf M :=
+    Subgroup.commutator_le_left _ _
+  have h2 := Subgroup.map_mono (f := M.subtype) h1
+  rwa [Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le (S10.Msigma_le M),
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h2
+
+/-- **Lemma 13.1, step 1** (mmd L3534): from `⁅M_σ∩M*, M∩M*⁆ ≠ 1`, the commutator lies in
+`M_σ ⊓ M*'`, so there is a prime `q ∈ σ(M)` dividing `|M*'|`. -/
+theorem exists_sigma_prime_dvd_derived_Mstar [Finite G] {M Mstar : Subgroup G}
+    (hcomm : ⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≠ ⊥) :
+    ∃ q : ℕ, q.Prime ∧ q ∈ S10.sigma M ∧
+      q ∈ (Nat.card ↥(derivedInG Mstar)).primeFactors := by
+  classical
+  have hMsig : ⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≤ S10.Msigma M :=
+    (Subgroup.commutator_mono inf_le_left inf_le_left).trans (Msigma_commutator_M_le M)
+  have hderiv : ⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≤ derivedInG Mstar := by
+    have hmono := Subgroup.commutator_mono (H₁ := S10.Msigma M ⊓ Mstar) (H₂ := M ⊓ Mstar)
+      (K₁ := Mstar) (K₂ := Mstar) inf_le_right inf_le_right
+    rwa [show ⁅Mstar, Mstar⁆ = derivedInG Mstar from (Subgroup.map_subtype_commutator Mstar).symm]
+      at hmono
+  have hne : S10.Msigma M ⊓ derivedInG Mstar ≠ ⊥ := fun hbot =>
+    hcomm (le_bot_iff.mp ((le_inf hMsig hderiv).trans hbot.le))
+  have hcardne : Nat.card ↥(S10.Msigma M ⊓ derivedInG Mstar) ≠ 1 := by
+    have hnt : Nontrivial ↥(S10.Msigma M ⊓ derivedInG Mstar) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hne
+    exact (Finite.one_lt_card_iff_nontrivial.mpr hnt).ne'
+  obtain ⟨q, hqp, hqdvd⟩ := Nat.exists_prime_and_dvd hcardne
+  have hcardpos : ∀ K : Subgroup G, Nat.card ↥K ≠ 0 := fun K => Nat.card_pos.ne'
+  refine ⟨q, hqp, ?_, ?_⟩
+  · refine S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr ⟨hqp, ?_, hcardpos _⟩)
+    exact hqdvd.trans (Subgroup.card_dvd_of_le inf_le_left)
+  · exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd.trans (Subgroup.card_dvd_of_le inf_le_right),
+      hcardpos _⟩
+
 end OddOrder.BG.Ch3.S13

@@ -45,6 +45,39 @@
 
 → 詳細・署名は **issue 8000** (`issues/8000-s13-blocked-cor1216ab.md`)。
 
+### session 1 進捗 (forward axiom path 採択後)
+
+- **forward axiom インフラ確立** (commit `c8080f87`): 新 leaf `S13_Lemma131.lean` に
+  `cor1216_pRank_normalizer_le_one` (a) / `cor1216_not_mem_primeFactors_derived_of_tau1` (b)
+  を provisional axiom 宣言、root 配線、full build 3792 緑。
+- **Lemma 13.1 step 1 着地** (sorry-free): `Msigma_commutator_M_le` (`⁅M_σ,M⁆≤M_σ`, 再利用可) +
+  `exists_sigma_prime_dvd_derived_Mstar` (mmd L3534: `⁅M_σ∩M*,M∩M*⁆≠1` ⟹ `∃q∈σ(M)∩π(M*')`)。
+
+### Lemma 13.1 残 step plan (mmd L3534-3546; scaffold `pSubgroup_centralizes_of_interaction` は
+S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
+
+- **step 2 (Frattini)**: `Y` = Sylow `q` of `M*'`。`M*'/M*_β` nilpotent (`isHall_Mbeta` 4th/quotient) ⟹
+  `M*_β Y ⊴ M*` (nilpotent の Sylow は characteristic) → Frattini (`Sylow.normalizer_sup_eq_top'`) ⟹
+  `M* = N_{M*}(Y)·M*_β`。**未着手**。注意: Frattini は `↥M*` 内 or 適切 normal で。
+- **step 3 = (b) `p∉τ₂(M*)`**: τ₂ 仮定下 `r_p(N_{M*}(Y))=2` [`tau2_pRank_eq_two` + `p∉β(M*)`
+  (τ₂∩σ=∅⊇β) + `M*_β` が p'-Hall ゆえ Sylow p が `N_{M*}(Y)` に入る] vs `≤1` [forward axiom
+  `cor1216_pRank_normalizer_le_one`, `M*∈ℳ(Y)`, `¬idealPrime` from 12.1(g)] の矛盾。**axiom 初使用**。
+  ⚠ hard sub: `r_p(N_{M*}(Y))=2` の導出 (Frattini factor 内 Sylow p)。
+- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)`**: `p∈σ(M*)∪τ₃(M*)` ⟹ Sylow p `S⊆M*'`。`p∉β(M*)` なら
+  `p∈π(N_{M*}(Y)')` → forward axiom `cor1216_not_mem_primeFactors_derived_of_tau1` の対偶。
+  β(M*) 分岐の扱い要精査。
+- **step 5 = (a) centralization**: `P` p-subgroup of `M∩M*`。`M*'/M*_α` nilpotent ⟹ `M*_α S ⊴ M*`、
+  `P⊆M*_α S`、`M*_α S` は σ(M)'-group [`p∈π(E)` + `σ(M)∩α(M*)=∅` via `S10.disjoint_of_not_conj`
+  (10.12(a))] ⟹ `[M_σ∩M*,P]⊆M*_α S∩M_σ=1`。
+- **step 6 = assembly**: 上記を束ねて `pSubgroup_centralizes_of_interaction` を S13_Lemma131 で証明、
+  S13_PrimeAction の scaffold を削除 (migrate)、AxiomsCheck に island assert
+  `#assert_axioms_island … expecting [cor1216_…]` 追加。
+
+surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
+`S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
+`isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
+`tau2 M={p∉σ ∧ pRank=2}`/`tau2_pRank_eq_two`, `S10.disjoint_of_not_conj` (10.12)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
