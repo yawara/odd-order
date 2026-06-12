@@ -2007,3 +2007,23 @@ INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1
 ψ定義→V消失→NC(ψ)≤4→**orientation** (w₁<w₂直接/w₂<w₁ transposed grid_trichotomy)→
 (b)(c)排除 (|supp f|≤2 + |f|≤1, P 同row異col)→(a)⟹‖ψ‖²=0⟹ψ=0→最終 statement (χ₂≠χ₂' 要)。
 正本=本 session 33 cont.⁴。**10 commits landed; 残=f∈{0,±1}+assembly。**
+
+### ✅ session 33 cont.⁵ — f∈{0,±1} landed (`sigmaCoeff_dade_eq_zero_or_one`) = **全 INPUT 完了**
+- **landed (build-green, axiom-clean, AxiomsCheck 登録)**: `sigmaCoeff_dade_eq_zero_or_one`
+  (⟨φ,chiFam pq⟩∈{0,±1})。draft snag 解決済: **inner は left 線形・right 共役線形**
+  (`OddOrder.RepresentationTheory.inner_smul_right` が `star ↑ε` を出す → `star_intCast` 要)、
+  ite の CF↔IrreducibleCharacter coe は **型注釈 `have hαν : ... := irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν`**
+  で吸収、disjunct 閉じは `rcases<;>rw<;>norm_num`。
+- **🎉 (4.8) conclusion 3 の INPUT 補題 全 landed** (step4 / ‖φ‖²=2 / NC(φ)≤2 / ω_ij^σ=chiFam(P_ij) / f∈{0,±1})。
+  12 commits landed this session。
+- **▶▶ 残 = assembly のみ** (1 theorem, ~180 行, helper 分割推奨):
+  (1) `sigmaCoeff_psi_eq`: a(pq):=sigmaCoeff(ψ)(pq) = f(pq) − δ_j([pq=P_ij]−[pq=P_ik])
+      [certainTypeOmegaSigma_eq_chiFam + chiFam 正規直交; ψ:=φ−δ_j(certainTypeOmegaSigma χ₂ i−…χ₂' i)]。
+  (2) ψ vanish on V [step4 移項], a separable [sigmaCoeff_add_eq], NC(ψ)≤4 [supp a⊆supp f∪{P_ij,P_ik}, NC(φ)≤2]。
+  (3) orientation: w₁≠w₂(coprime)・|Δ|≥2(odd) ⟹ 小さい方 rows。w₁<w₂=直接 grid_trichotomy(Ŵ₁,Ŵ₂)、
+      w₂<w₁=transposed(Ŵ₂,Ŵ₁, a'(q,p)=a(p,q))。両者 (all-0)∨(row)∨(column) を出す。
+  (4) exclusion: column(w₁≥3)=|supp f|≤2 矛盾; row(w₂≥5 or w₂=3)=|supp f|≤2 **+ f∈{0,±1}**
+      (w₂=3,c=−δ_j で f(P_ik)=−2δ_j を弾く)。**P_ij.1=P_ik.1(同row,both i), P_ij.2≠P_ik.2(異col,χ₂≠χ₂')** 要証明。
+  (5) (a)⟹ a(P_ij)=a(P_ik)=0 ⟹ f(P_ij)=δ_j,f(P_ik)=−δ_j ⟹ ‖ψ‖²=2−2δ_j·2δ_j+2=0 ⟹ ψ=0。
+  (6) 最終 `certainType_diff_dade_eq` (χ₂≠χ₂' 仮説付): (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)。→ (4.9)→case-B→(6.8)。
+正本=本 session 33 cont.⁵。**全 INPUT landed (12 commits); 残=assembly 1 unit。**
