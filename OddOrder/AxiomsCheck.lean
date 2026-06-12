@@ -771,6 +771,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaNC_dade_le_two
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam
+-- Peterfalvi (4.8), step (7) input: the σ-coefficients of φ lie in `{0, ±1}` (norm-2 ⟹ two
+-- constituents `ε_α·α + ε_β·β`, each χ_{pq} matching at most one).  The `|·| ≤ 1` bound (beyond
+-- NC ≤ 2) excludes the `w₂ = 3` row case in the trichotomy endgame.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaCoeff_dade_eq_zero_or_one
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
