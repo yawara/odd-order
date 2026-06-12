@@ -2335,3 +2335,37 @@ supp μ_j⊆A∪{1}、差は1で消える)。
 4. **capstone** `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
    (certainTypeSet h k) (supportInSubgroup A L)` (要 k≠1)、5 field 組立。→ S08 case-B。
 **正本=本 session 37 cont.。field 4 核心 DONE; 次 = generated-by-differences Finsupp lemma。**
+
+## 2026-06-13 (session 37 cont.², /loop): 🎉🎉🎉 Peterfalvi (4.9)(b) COMPLETE — certain-type coherence
+
+**`certainType_isCoherent`** (S06_CertainTypeCoherence, capstone `187b5517`, axiom-clean, full build
+3794 + AxiomsCheck OK)。**Theorem (4.9)(b) 完全形式化** — Dade 写像 `τ = dadeIntegralCharacterMap
+h.dade0 h.tau` は certain-type 集合 `𝒯` 上 coherent:
+`S07.IsCoherent τ (certainTypeSet h k) (S04.supportInSubgroup A L)` (要 `k ≠ 1`)、5 field 全証明:
+
+- **field 2 (extension)** = `certainTypeExtension h` (μ_ij ↦ δ_j ω_ij^σ)。
+- **field 3 (isometry)** = `certainTypeExtension_inner_eq` (span_induction₂)。
+- **field 4 (τ-agree)** = `certainTypeExtension_eq_dade_of_mem_zSupportedSpan`:
+  generator `certainTypeExtension_columnDiff_eq_dade` (核心、`IsDadeMap.unique` + (4.8) summed) +
+  生成 `mem_span_columnDiff_of_mem_zSupportedSpan` (sup-decomp `Z[𝒯] ≤ D ⊔ ℤ·μ_k`、1∉A=`h.dade0.ne_one`、
+  μ_k(1)≠0=`irreducibleCharacter_apply_one_eq_pos_natCast`) + `eq_on_zSpan_of_eq_on`。
+- **field 5 (ZIrr)** = `certainTypeExtension_mem_ZIrr` (span_induction + `sigma_mem_ZIrr`)。
+- **field 1 (nonzero)** = `certainType_nonzero`: μ̄_k−μ_k (μ̄_k=μ_{k⁻¹}∈𝒯、`columnSum_inv_apply_one`
+  [複素共役は実次数固定: `map_natCast`]、≠0=`certainType_columnSum_conj_ne`)。
+
+session 37 全体 = **10 commits** (foundation→𝒯+ZIrr→isometry→support infra→field4 infra→generator
+agreement→field4→nonzero+capstone + notes×2)。**§5 (3.x) + §6 (4.1)-(4.9) 全 COMPLETE。**
+
+### ▶▶ 次 = case-B 配線 or (4.10) (session 38 で RECON 要)
+
+**(4.9) は S08 case-B (`sibleySetup_is_coherent` の CertainType branch / S08 sole sorry) の入力。**
+残る選択肢:
+1. **S08 case-B 配線** (本命): certain-type `Hypothesis46` ↔ Sibley setup の接続を精査し、
+   `certainType_isCoherent` を X-chain coherence に注入。**大 glue** (S08 X-nonempty sorry は
+   Frobenius/CertainType case split + per-step data + 合成 ν の構築要; (4.9) は CertainType 側の
+   coherence 供給のみ)。RECON 必須: S08_CoherenceTheorems:59 sorry の構造、何が Hypothesis46 を
+   構成するか、certainType_isCoherent をどの interface に渡すか。
+2. **(4.10)** (`(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`): (4.9) 非依存の
+   補助恒等式。(4.8) generator + grid 拡張で書けそうだが case-B critical path 外の可能性。
+**推奨第一手 = S08 case-B sorry (S08_CoherenceTheorems:46-59) を Read して配線可能性を RECON**。
+**正本=本 session 37 cont.²。(4.9)(b) COMPLETE; 次 = case-B 配線 RECON。**
