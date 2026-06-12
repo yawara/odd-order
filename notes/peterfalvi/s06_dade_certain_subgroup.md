@@ -2448,3 +2448,29 @@ one_apply/one_comp の単一化が失敗 (sdiff vs h の W-coord 罠、memory �
    (W₁∪W₂ で消失、`alphaCF_eq_zero_of_mem_W1/W2_subgroupOf` 流の omega 値計算)。
 3. piece (b) 完了後: (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
 **正本=本 session 37 cont.⁵。(4.10) piece (a) DONE; piece (b1) は W-coord `1` 罠で STOP、別ルート要。**
+
+## 2026-06-13 (session 37 cont.⁶, /loop): (4.10) — W-coord `1` 解決、chiColumn_apply_eq landed; alphaCF-match は coercion 残留 → route 2 へ
+
+✅ **W-coord `1` 罠 解決済**: `MonoidHom.one_apply` が `(1: _→*ℂˣ)(x)` で発火しないのは sdiff/h の `1`-domain
+非 syntactic ゆえ。**fix = `change` で omegaProdChar を defeq 展開 + explicit-domain `hone : (1:(h.W2.subgroupOf
+(h.W1⊔h.W2))→*ℂˣ)(wSnd w)=1 := MonoidHom.one_apply _`**。
+✅ **`chiColumn_apply_eq` landed** (`f83d9bc4`, build 3598, axiom-clean): `ω_ij(w)=↑((w1Eq i)(wFst w))·↑(χ₂(wSnd w))`
+(chiColumn unfold + omega_apply + `change`(omegaProdChar 展開) + Units.val_mul)。**(4.10) support の value 道具**。
+
+🛑 **`chiColumn_fourcorner_eq_alphaCF` (piece b1) は coercion 残留で STOP** (~14 試行): pointwise で
+hone1/hone2+chiColumn_apply_eq 適用後、goal は **表示上 `1−X+XY−Y = 1−X+XY−Y` (完全一致表示) なのに
+ring/rfl/push_cast/norm_cast/set 全滅**。原因 = LHS の atom (chiColumn_apply_eq 由来) と RHS の atom
+(alphaCF_apply 由来) が **表示同一だが別 term** (coercion instance か elaboration 差)。**2 lemma の coercion 不整合**。
+
+### ▶▶ 次 = (4.10) piece (b) **route 2 (alphaCF 回避)** (session 38)
+alphaCF-match を捨て、**`Supp(sdiff 4-corner) ⊂ sdiff.V` を直接** (vanish on W₁∪W₂, **全て chiColumn_apply_eq
+由来ゆえ coercion 不整合なし**):
+- w∈W₂ (`wFst w = 1` by `wFst_eq_one_of_mem_W2`): 各 chiColumn = ↑(1)·↑(χ(wSnd w))=↑(χ(wSnd w))、4-corner=0。
+- w∈W₁ (`wSnd w = 1` by `wSnd_eq_one_of_mem_W1`): 対称、4-corner=0。
+- `(w1Eq i)(1)=1`/`χ₂(1)=1` は `map_one`。`supportedSubmodule` 帰属で Supp⊂sdiff.V。
+- 必要なら fourcorner_signedDiff_eq_induce(piece a)で `signedDiff 4-corner = Ind(sdiff 4-corner)` →
+  `Supp(Ind) ⊂ (sdiff.V)^L ⊂ A₀` (induce support + sdiff.V⊂tic.V)。
+- **代替 (もし coercion を直したい)**: pp.all で LHS/RHS atom 差を特定 → chiColumn_apply_eq の coercion を
+  alphaCF_apply と一致させる。だが route 2 が安全。
+→ piece (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁶。chiColumn_apply_eq DONE; alphaCF-match は coercion で STOP、route 2 推奨。**
