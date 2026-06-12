@@ -115,6 +115,68 @@ theorem le_centralizer_of_forall_prime_isPGroup [Finite G] {K C : Subgroup G}
       rw [hyeq]
       exact Subgroup.mul_mem _ (Subgroup.zpow_mem _ hwC _) (Subgroup.zpow_mem _ hzC _)
 
+/-- **Order argument**: if `C ≤ H` (finite) and for every prime `q` some subgroup `S ≤ C` has
+the full `q`-part of `|H|` as its order (`|S| = q ^ v_q(|H|)`, i.e. `S` is a Sylow `q` of `H`
+lying in `C`), then `C = H`. The `S` witness that `|C|` carries the full `q`-part of `|H|` for
+every `q`, so `|H| ∣ |C|`, and `C ≤ H` gives `|C| ∣ |H|`, hence equality. Reusable for
+coprime-action "invariant Sylows generate" arguments. -/
+theorem eq_of_le_of_forall_full_prime_pow [Finite G] {H C : Subgroup G} (hCH : C ≤ H)
+    (hS : ∀ q : ℕ, q.Prime → ∃ S : Subgroup G, S ≤ C ∧
+      Nat.card ↥S = q ^ (Nat.card ↥H).factorization q) : C = H := by
+  have hdvd : Nat.card ↥H ∣ Nat.card ↥C := by
+    rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne']
+    intro q
+    by_cases hq : q.Prime
+    · haveI : Fact q.Prime := ⟨hq⟩
+      obtain ⟨S, hSC, hScard⟩ := hS q hq
+      have hpow : q ^ (Nat.card ↥H).factorization q ∣ Nat.card ↥C :=
+        hScard ▸ Subgroup.card_dvd_of_le hSC
+      exact (Nat.Prime.pow_dvd_iff_le_factorization hq Nat.card_pos.ne').mp hpow
+    · rw [Nat.factorization_eq_zero_of_non_prime _ hq]; exact Nat.zero_le _
+  have heq : Nat.card ↥C = Nat.card ↥H :=
+    Nat.dvd_antisymm (Subgroup.card_dvd_of_le hCH) hdvd
+  have hsub : C.subgroupOf H = ⊤ :=
+    Subgroup.eq_top_of_card_eq _
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv, heq])
+  exact le_antisymm hCH (Subgroup.subgroupOf_eq_top.mp hsub)
+
+/-- **Coprime `A`-invariant Sylow existence (subgroup form)**: if `A ≤ N_G(N)`, `|A|` and `|N|`
+are coprime, and `A` or `N` is solvable, then for every prime `q`, `N` has an `A`-invariant
+Sylow `q`-subgroup `S` (`S ≤ N`, `IsPGroup q S`, `A ≤ N_G(S)`, `|S| = q ^ v_q(|N|)`).
+Encapsulates the `MulDistribMulAction`/`φ`-action boilerplate around
+`Isaacs.Ch04.exists_aInvariant_sylow` (Isaacs Thm 3.23(a)); reusable for §13 coprime arguments. -/
+theorem exists_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) (q : ℕ) [Fact q.Prime] :
+    ∃ S : Subgroup G, S ≤ N ∧ IsPGroup q ↥S ∧ A ≤ Subgroup.normalizer (S : Set G) ∧
+      Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), (N.subtype ((φ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hφ_inv_coe : ∀ (a : ↥A) (x : ↥N),
+      (N.subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * (N.subtype x) * (↑a) := by
+    intro a x; rw [← map_inv]; simpa using hφ_coe a⁻¹ x
+  obtain ⟨S', hS'inv⟩ := OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (φ := φ) hcop hSolv q
+  set S : Subgroup G := (S' : Subgroup ↥N).map N.subtype with hSdef
+  refine ⟨S, Subgroup.map_subtype_le _,
+    S'.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective), ?_, ?_⟩
+  · intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨x, hxS, rfl⟩
+      exact ⟨(φ ⟨a, ha⟩) x, hS'inv.smul_mem ⟨a, ha⟩ hxS, hφ_coe ⟨a, ha⟩ x⟩
+    · rintro ⟨x, hxS, hx⟩
+      refine ⟨((φ ⟨a, ha⟩)⁻¹) x, hS'inv.inv_smul_mem ⟨a, ha⟩ hxS, ?_⟩
+      rw [hφ_inv_coe ⟨a, ha⟩ x, hx]
+      change a⁻¹ * (a * y * a⁻¹) * a = y
+      group
+  · rw [hSdef, Subgroup.card_map_of_injective N.subtype_injective, S'.card_eq_multiplicity]
+
 /-- A nonidentity `r`-subgroup `R` of `H` forces `r ∈ π(H)`. -/
 theorem mem_primeFactors_of_isPGroup_le [Finite G] {r : ℕ} (hr : r.Prime)
     {R H : Subgroup G} (hRH : R ≤ H) (hRne : R ≠ ⊥) (hRr : IsPGroup r ↥R) :
