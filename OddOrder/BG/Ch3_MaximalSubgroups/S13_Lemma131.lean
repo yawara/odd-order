@@ -120,4 +120,116 @@ theorem Mbeta_le_derived [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
     (fun r hr => S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M hr)) ↥M))
     (S10.Msigma_le_derived hG hM)
 
-end OddOrder.BG.Ch3.S13
+/-- **Lemma 13.1, step 2** (mmd L3534): for `q ∉ β(M*)` dividing `|M*'|`, there is a Sylow
+`q`-subgroup `Y` of `M*'` with the Frattini decomposition `M* = O_{β(M*)∪{q}}(M*') ⊔ N_{M*}(Y)`.
+The `{β∪{q}}`-core `K := O_{β(M*)∪{q}}(M*')` is normal in `M*` (characteristic in `M*' ⊴ M*`) and a
+`{β(M*)∪{q}}`-group, so `[M* : N_{M*}(Y)]` is prime to every `p ∉ β(M*) ∪ {q}` — the input that
+places a Sylow `p` of `M*` inside `N_{M*}(Y)` in step 3. Adapts the Cor 10.9 Frattini machinery of
+`S10_BetaRadical`. -/
+theorem exists_sylow_frattini_decomp [Finite G] (hG : IsMinimalSimpleOdd G)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (hqβ : q ∉ S10.beta Mstar) (hq_dvd : q ∣ Nat.card ↥(derivedInG Mstar)) :
+    ∃ Y : Subgroup G, Y ≠ ⊥ ∧ IsPGroup q ↥Y ∧ Y ≤ derivedInG Mstar ∧
+      Mstar = opiCoreInG (S10.beta Mstar ∪ {q}) (derivedInG Mstar) ⊔
+        (Mstar ⊓ Subgroup.normalizer (Y : Set G)) := by
+  classical
+  set D := derivedInG Mstar with hDdef
+  have hDM : D ≤ Mstar := Subgroup.map_subtype_le _
+  obtain ⟨Q⟩ : Nonempty (Sylow q ↥D) := inferInstance
+  set Y : Subgroup G := (Q : Subgroup ↥D).map D.subtype with hYdef
+  have hYD : Y ≤ D := Subgroup.map_subtype_le _
+  have hYq : IsPGroup q ↥Y :=
+    Q.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ D.subtype D.subtype_injective)
+  -- `|Y| = q ^ v_q(|D|)`: `Y` is a Sylow `q`-subgroup of `D`.
+  have hYcard : Nat.card ↥Y = q ^ (Nat.card ↥D).factorization q := by
+    rw [hYdef, Subgroup.card_map_of_injective D.subtype_injective]
+    exact Sylow.card_eq_multiplicity Q
+  have hvpos : 0 < (Nat.card ↥D).factorization q :=
+    (Fact.out : q.Prime).factorization_pos_of_dvd Nat.card_pos.ne' hq_dvd
+  have hYne : Y ≠ ⊥ := by
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hYcard
+    have h1lt : 1 < q ^ (Nat.card ↥D).factorization q :=
+      Nat.one_lt_pow hvpos.ne' (Fact.out : q.Prime).one_lt
+    omega
+  -- `M*_β ≤ D`, normal in `↥D`, and a `q′`-group.
+  have hMβD : S10.Mbeta Mstar ≤ D := Mbeta_le_derived hG hMstar
+  haveI hMβnorm : ((S10.Mbeta Mstar).subgroupOf D).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
+      (hDM.trans (le_normalizer_opiCoreInG (S10.beta Mstar) Mstar))
+  have hNq' : ¬ q ∣ Nat.card ↥((S10.Mbeta Mstar).subgroupOf D) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMβD).toEquiv]
+    intro hdvd
+    exact hqβ (isPiSubgroup_opiCoreInG (S10.beta Mstar) Mstar q
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
+  -- `M*_β ⊔ Q ◁ D` (nilpotent quotient `D/M*_β`).
+  haveI hMβQnorm : ((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
+    S10.normal_sup_sylow_of_quotient_nilpotent
+      (S10.derivedQuotientMbeta_isNilpotent hG hMstar) hNq' Q
+  set K : Subgroup G := opiCoreInG (S10.beta Mstar ∪ {q}) D with hKdef
+  have hKD : K ≤ D := Subgroup.map_subtype_le _
+  set MβQ : Subgroup G := ((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).map D.subtype
+    with hMβQdef
+  have hMβQ_le_D : MβQ ≤ D := Subgroup.map_subtype_le _
+  have hMβQ_pi : Subgroup.IsPiSubgroup (S10.beta Mstar ∪ {q}) MβQ := by
+    intro r hr
+    rw [hMβQdef, Subgroup.card_map_of_injective D.subtype_injective] at hr
+    have hdvd : Nat.card ↥((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)) ∣
+        Nat.card ↥((S10.Mbeta Mstar).subgroupOf D) * Nat.card ↥(Q : Subgroup ↥D) := by
+      have hform := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+        ((S10.Mbeta Mstar).subgroupOf D) (Q : Subgroup ↥D)
+      rw [show (↑((S10.Mbeta Mstar).subgroupOf D) * ↑(Q : Subgroup ↥D) : Set ↥D)
+          = ↑((S10.Mbeta Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D) : Subgroup ↥D) from
+          (Subgroup.normal_mul ((S10.Mbeta Mstar).subgroupOf D) (Q : Subgroup ↥D)).symm] at hform
+      exact ⟨_, hform.symm⟩
+    have hr_prime := Nat.prime_of_mem_primeFactors hr
+    rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd) with h | h
+    · exact Or.inl (isPiSubgroup_opiCoreInG (S10.beta Mstar) Mstar r
+        (Nat.mem_primeFactors.mpr ⟨hr_prime,
+          (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMβD).toEquiv) ▸ h, Nat.card_pos.ne'⟩))
+    · refine Or.inr ?_
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+      exact (Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp (hr_prime.dvd_of_dvd_pow (hk ▸ h))
+  have hMβQ_le_K : MβQ ≤ K := by
+    refine le_opiCoreInG_of_normal_of_isPiSubgroup hMβQ_le_D ?_ hMβQ_pi
+    rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective D.subtype_injective]
+    exact hMβQnorm
+  have hY_le_K : Y ≤ K :=
+    le_trans (hYdef ▸ Subgroup.map_mono (le_sup_right : (Q : Subgroup ↥D) ≤ _))
+      (hMβQdef ▸ hMβQ_le_K)
+  -- `|K|_q = |D|_q`, so `Y` is a Sylow `q`-subgroup of `K`.
+  have hKq_card : (Nat.card ↥K).factorization q = (Nat.card ↥D).factorization q := by
+    refine le_antisymm
+      ((Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+        (Subgroup.card_dvd_of_le hKD) q) ?_
+    have hdvd : q ^ (Nat.card ↥D).factorization q ∣ Nat.card ↥K :=
+      hYcard ▸ Subgroup.card_dvd_of_le hY_le_K
+    exact (Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp hdvd
+  haveI hKnorm : (K.subgroupOf Mstar).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (hKD.trans hDM)).mpr
+      (le_normalizer_opiCoreInG_of_le_normalizer (S10.beta Mstar ∪ {q})
+        (S10.le_normalizer_derivedInG Mstar))
+  -- **Frattini** in `↥M*`: `M* = K ⊔ N_{M*}(Y)`.
+  have hYK_card : Nat.card ↥((Y.subgroupOf Mstar).subgroupOf (K.subgroupOf Mstar)) =
+      q ^ (Nat.card ↥(K.subgroupOf Mstar)).factorization q := by
+    have hYM : Y ≤ Mstar := hYD.trans hDM
+    have hle : Y.subgroupOf Mstar ≤ K.subgroupOf Mstar := Subgroup.subgroupOf_mono Mstar hY_le_K
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hYM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hKD.trans hDM)).toEquiv,
+      hYcard, hKq_card]
+  set P : Sylow q ↥(K.subgroupOf Mstar) :=
+    Sylow.ofCard ((Y.subgroupOf Mstar).subgroupOf (K.subgroupOf Mstar)) hYK_card with hP
+  have hPmap : (P : Subgroup ↥(K.subgroupOf Mstar)).map (K.subgroupOf Mstar).subtype =
+      Y.subgroupOf Mstar := by
+    rw [hP, Sylow.coe_ofCard, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr (Subgroup.subgroupOf_mono Mstar hY_le_K)]
+  have hFrattini := Sylow.normalizer_sup_eq_top P
+  rw [hPmap, ← Subgroup.subgroupOf_normalizer_eq (hYD.trans hDM)] at hFrattini
+  -- transport `⊤ = N_{M*}(Y).subgroupOf M* ⊔ K.subgroupOf M*` to `M* = K ⊔ N_{M*}(Y)`.
+  refine ⟨Y, hYne, hYq, hYD, ?_⟩
+  have hmap := congrArg (Subgroup.map Mstar.subtype) hFrattini
+  rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype, inf_eq_left.mpr (hKD.trans hDM),
+    inf_comm, sup_comm] at hmap
+  exact hmap.symm
