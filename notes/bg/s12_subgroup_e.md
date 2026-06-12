@@ -64,7 +64,50 @@ Coprime(|S|,|X|) ∧ S⊓C(X)≠⊥ ∧ S⊓C(X)≠S`。
 - 完成後 → `frobFact_of_abelianSylow` で C_E(S)=E 枝 (generic rank-2 分解 S=Y×Z) と統合 →
   Z_p 集約 E₀=E₁E₃·∏Z_p → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular`。
 
-## 🟡 2026-06-12 (Lane F session 8, Opus 4.8): **Thm 12.12 — Case 1 + Case 2 完了、Case 3 残**
+## 🟢 2026-06-12 (Lane F session 11, Opus 4.8): **Thm 12.12 Case 3 front-half COMPLETE + C_E(S)=E plan**
+
+front-half (C_E(S)≠E 枝) を**完全実装・コミット** (`353c9d9d`): `exists_sylow_tau1_cyclic_notCentralizing`
+(開問 b) + `exists_partial_centralizer_of_abelianSylow` (assembly)。これで C_E(S)≠E 枝が
+back-half に X を供給し完結。AxiomsCheck 全登録、full build 3775。**残 = C_E(S)=E 枝 +
+τ₂ 集約 + 3-case 統合**(全て 12.12 内)。
+
+### ▶ C_E(S)=E 枝の **streamlined 構成** (Y×Z 分解を回避する recon 進展)
+
+BG は S=Y×Z (rank-2 cyclic 分解) を使うが、**agemo ℧^{a-1}(S) 経由で Y×Z を回避できる**:
+目標 = `∃ Z cyclic ≤S, exp(Z)=exp(S), E≤N_G(Z), ∀z∈Z#, M_σ⊓C(z)=⊥`。
+- `Monoid.exists_orderOf_eq_exponent` で max-order s₀∈↥S (ord=exp(S)=p^a)。
+- ℧ := (Agemo ↥S p (a-1)).map S.subtype。**agemo helpers landed** (`mem_agemo_iff_of_comm`:
+  abelian で x∈℧⟺∃y,x=y^(p^n); `agemo_eq_range_powMonoidHom`)。℧⊆Ω₁(S)=A (∵(x^{p^{a-1}})^p=1)、
+  ℧≠⊥ (s₀^{p^{a-1}}≠1)、℧ char in ↥S → N_G(S)-不変 (AppB.normalizer_le_normalizer_map_of_characteristic)。
+- **good line L** (C_{M_σ}(L)=1) を ℧ 内に取る (dichotomy `rcases eq_or_lt (℧≤A)`):
+  - ℧=A (rank 2, homocyclic): **12.5(f)** (`exists_distinct_conj_lines` 系, S12_Theorem125:202)
+    で A₁⊆A=℧ good。
+  - ℧⊊A: ℧ は line (proper nontrivial ≤ rank-2 elem-ab A) → char → 不変 → **key fact**
+    (`inf_centralizer_line_eq_bot_of_invariant`) で C_{M_σ}(℧)=1。L=℧。
+- gen w of L ⊆℧ → `mem_agemo_iff_of_comm` で w=s^{p^{a-1}} (↥S 内), ord(s)=p^a (s^{p^{a-1}}=w≠1)。
+  Z=⟨↑s⟩。exp(Z)=ord(↑s)=p^a=exp(S)。Ω₁(Z)=⟨↑s^{p^{a-1}}⟩=⟨w⟩=L。
+  regular: z∈Z# → Ω₁(Z)=L≤⟨z⟩ → C_{M_σ}(z)≤C_{M_σ}(L)=1。E≤N_G(Z): hCES (E≤C(S)) で E が ↑s 中心化。
+- **要 sub-facts**: `IsPGroup⟹exp=p^a` (exp∣card=p^n, `Nat.dvd_prime_pow`); a≥1 (S≠⊥);
+  rank-2 elem-ab の proper nontrivial 部分群 = line (order p); Ω₁(⟨s⟩)=⟨s^{ord/p}⟩。
+
+### ▶ τ₂ 集約 (C_E(S)=E/≠E 統合後) → `frobFact_of_abelianSylow` → 3-case
+
+各 p∈τ₂ で per-p Z_p (上記 2 枝統合 `exists_cyclic_Enormal_regular_of_abelianSylow`)。
+E₀ = E₁⊔E₃⊔(⊔_{p∈τ₂} Z_p)。**集約は finite τ₂ 上の product** — exp(E₀)=exp(E) と
+M_σE₀ Frobenius (各 Z_p regular ⟹ E₀ regular on M_σ; `isFrobeniusGroup_of_regular` 既存)。
+A₀=E₂ で (a)。3-case (`frobenius_factorization_of_regular` scaffold S12_E:438):
+τ₂=∅ → Case1 (`frobFact_of_regular_all`); nonab Syl → Case2 (`frobFact_of_nonabelianSylow`);
+ab Syl → Case3 (`frobFact_of_abelianSylow`)。**いずれも S12_Theorem1212.lean に Case1/2 完成済**。
+
+### ▶ 残 sorry (S12_E, §12 完遂に必要)
+
+1. **12.12** `frobenius_factorization_of_regular` (上記 Case3 残で完成)。
+2. **12.13** `nonabelian_pgroup_isUniquelyMaximal` (非可換 p-部分群 ∈ 𝒰)。
+3. **12.14** `maximalContaining_centralizer_eq_singleton` (σ-case 一意性, Prop 12.4 経由)。
+4. **12.16(a)** `sigma_subgroup_conj_into_Msigma`; **12.16(b)**。
+これらは独立な hard 定理群 (各 ~100-300 行)。**§12 完遂は multi-session 規模**。
+
+## 🟢 2026-06-12 (Lane F session 10, Opus 4.8): **Thm 12.12 Case 3 front-half — 開問 c (r_q=2) 解決**
 
 新 leaf `S12_Theorem1212.lean` (~510 行)。Thm 12.12 (Frobenius 因子分解、大物) を 3 ケースに分解。
 **Case 1 (τ₂=∅) + Case 2 (Sylow p 非可換) 完成**、共通インフラ + exponent 機構も完成。
