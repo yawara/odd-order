@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 
 /-!
 # BG §13: Prime Action
@@ -147,7 +148,11 @@ theorem pSubgroup_centralizes_of_interaction [Finite G] (hG : IsMinimalSimpleOdd
       P ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G)) ∧
     p ∉ tau2 Mstar ∧
     (p ∈ tau1 M → S10.idealPrime p G) := by
-  sorry
+  have hb : p ∉ tau2 Mstar := not_mem_tau2_of_interaction hG h hMstar hpE hcomm hnc
+  exact ⟨fun P hP hPp =>
+      pSubgroup_centralizes_Msigma_inf hG h hMstar hpE hpMstar hpτ1 hb hnc hP hPp,
+    hb, fun hpτ1M =>
+      mem_idealPrime_of_tau1_of_interaction hG h hMstar hpE hpMstar hpτ1 hb hcomm hnc hpτ1M⟩
 
 /-- **BG Corollary 13.2** (mmd L3518): `p ∈ τ₁(M)∪τ₃(M)`, `P` 非自明 `p`-部分群 of `M`,
 `M* ∈ ℳ(N_G(P))` なら (a) `M∩M*` の全 `p`-部分群が `M_σ∩M*` を中心化; (b) `E∩M*` の全
