@@ -751,6 +751,11 @@ set_option linter.style.longLine false in
 -- (`chiColumn_apply_of_mem_W1`: the `W₂`-projection `wSnd` is trivial on `W₁`) + step (1).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_apply_eq_of_mem_W1
+-- Peterfalvi (4.8), conclusion (1): `Supp(μ_{ij} − μ_{ik}) ⊆ A₀ = A ∪ V^L`.  `z = 1` excluded by
+-- equal degree; `z ∈ K` lands in `A` via (4.7) (`μ_{ij}|_K = μ_{ik}|_K = χ` off `A ∪ {1}`); and
+-- `z ∈ L − K` lands in `V^L` via (2.1) (`mem_compl_conj_into_W`: `z` conjugate to `xy ∈ W − W₂`,
+-- whose image lies in `tic.V = ↑W \ ↑W₂`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_supp_subset_A0
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
