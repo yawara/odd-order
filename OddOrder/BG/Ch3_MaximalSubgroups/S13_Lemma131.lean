@@ -667,6 +667,87 @@ theorem exists_sylow_le_derivedInG_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSi
         hEscard]
     · exact (sylow_le_derived_of_mem_tau3 hG hs hτ3 PE).1.trans (derivedInG_le_derivedInG hs.E_le)
 
+/-- The foundation Sylow `S ⊆ M*'` lies in `K_a = O_{α(M*)∪{p}}(M*')`. If `p ∈ α(M*)` then
+`S ⊆ M*_α ⊆ K_a`; otherwise `M*_α ⊔ S ⊴ M*'` (`M*'/M*_α` nilpotent + `normal_sup_sylow`), a
+`{α(M*)∪{p}}`-group, hence `⊆ K_a`. -/
+theorem sylow_le_opiCoreInG_alpha_p [Finite G] (hG : IsMinimalSimpleOdd G)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    {S : Subgroup G} (hS_le_deriv : S ≤ derivedInG Mstar) (hSp : IsPGroup p ↥S)
+    (hScard : Nat.card ↥S = p ^ (Nat.card ↥Mstar).factorization p) :
+    S ≤ opiCoreInG (S10.alpha Mstar ∪ {p}) (derivedInG Mstar) := by
+  classical
+  set D := derivedInG Mstar with hDdef
+  have hDM : D ≤ Mstar := Subgroup.map_subtype_le _
+  have hMαD : S10.Malpha Mstar ≤ D :=
+    (S10.Malpha_le_Msigma hG hMstar).trans (S10.Msigma_le_derived hG hMstar)
+  haveI hMαnorm : ((S10.Malpha Mstar).subgroupOf D).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMαD).mpr
+      (hDM.trans (le_normalizer_opiCoreInG (S10.alpha Mstar) Mstar))
+  by_cases hpα : p ∈ S10.alpha Mstar
+  · -- `p ∈ α(M*)`: `S ⊆ M*_α ⊆ K_a`.
+    have hSMstar : S ≤ Mstar := hS_le_deriv.trans hDM
+    have hSαsub : Ch03.Subgroup.IsPiGroup (S10.alpha Mstar) (S.subgroupOf Mstar) := by
+      intro r hr
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSMstar).toEquiv, hScard] at hr
+      have hr_prime := Nat.prime_of_mem_primeFactors hr
+      have : r = p := (Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp
+        (hr_prime.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hr).2.1)
+      rw [this]; exact hpα
+    have hsub := S10.isPiGroup_le_of_normal_isHallSubgroup
+      (S10.Malpha_subgroupOf_isHall_of_isHall (S10.Malpha_isHall hG hMstar)) hSαsub
+    have h2 := Subgroup.map_mono (f := Mstar.subtype) hsub
+    rw [Subgroup.map_subgroupOf_eq_of_le hSMstar,
+      Subgroup.map_subgroupOf_eq_of_le (S10.Malpha_le Mstar)] at h2
+    exact h2.trans (le_opiCoreInG_of_normal_of_isPiSubgroup hMαD hMαnorm
+      (fun r hr => Or.inl (S10.Malpha_isPiGroup Mstar r hr)))
+  · -- `p ∉ α(M*)`: `M*_α ⊔ S ⊴ M*'`, a `{α∪p}`-group containing `S`.
+    have hDp : (Nat.card ↥Mstar).factorization p = (Nat.card ↥D).factorization p :=
+      le_antisymm
+        ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp
+          (hScard ▸ Subgroup.card_dvd_of_le hS_le_deriv))
+        ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp
+          ((Nat.ordProj_dvd _ p).trans (Subgroup.card_dvd_of_le hDM)))
+    have hScardD : Nat.card ↥(S.subgroupOf D) = p ^ (Nat.card ↥D).factorization p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS_le_deriv).toEquiv, hScard, hDp]
+    set Q : Sylow p ↥D := Sylow.ofCard (S.subgroupOf D) hScardD with hQdef
+    have hQmap : (Q : Subgroup ↥D).map D.subtype = S := by
+      rw [hQdef, Sylow.coe_ofCard, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hS_le_deriv]
+    have hNp' : ¬ p ∣ Nat.card ↥((S10.Malpha Mstar).subgroupOf D) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMαD).toEquiv]
+      exact fun hdvd => hpα (S10.Malpha_isPiGroup Mstar p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
+    haveI hSupNorm : ((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).Normal :=
+      S10.normal_sup_sylow_of_quotient_nilpotent
+        (derivedQuotientMalpha_isNilpotent hG hMstar) hNp' Q
+    set MaS : Subgroup G :=
+      ((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)).map D.subtype with hMaSdef
+    have hMaS_le_D : MaS ≤ D := Subgroup.map_subtype_le _
+    haveI hMaS_norm : (MaS.subgroupOf D).Normal := by
+      rw [hMaSdef, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective D.subtype_injective]
+      exact hSupNorm
+    have hMaS_pi : Subgroup.IsPiSubgroup (S10.alpha Mstar ∪ {p}) MaS := by
+      intro r hr
+      rw [hMaSdef, Subgroup.card_map_of_injective D.subtype_injective] at hr
+      have hdvd : Nat.card ↥((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)) ∣
+          Nat.card ↥((S10.Malpha Mstar).subgroupOf D) * Nat.card ↥(Q : Subgroup ↥D) := by
+        have hform := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+          ((S10.Malpha Mstar).subgroupOf D) (Q : Subgroup ↥D)
+        rw [show (↑((S10.Malpha Mstar).subgroupOf D) * ↑(Q : Subgroup ↥D) : Set ↥D)
+            = ↑((S10.Malpha Mstar).subgroupOf D ⊔ (Q : Subgroup ↥D)) from
+            (Subgroup.normal_mul _ _).symm] at hform
+        exact ⟨_, hform.symm⟩
+      have hr_prime := Nat.prime_of_mem_primeFactors hr
+      rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd) with hα | hq
+      · refine Or.inl (S10.Malpha_isPiGroup Mstar r (Nat.mem_primeFactors.mpr ⟨hr_prime, ?_,
+          Nat.card_pos.ne'⟩))
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMαD).toEquiv] at hα
+      · obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp Q.isPGroup'
+        exact Or.inr (Set.mem_singleton_iff.mpr
+          ((Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp (hr_prime.dvd_of_dvd_pow (hk ▸ hq))))
+    have hS_le_MaS : S ≤ MaS :=
+      hQmap ▸ Subgroup.map_mono (le_sup_right : (Q : Subgroup ↥D) ≤ _)
+    exact hS_le_MaS.trans (le_opiCoreInG_of_normal_of_isPiSubgroup hMaS_le_D hMaS_norm hMaS_pi)
+
 /-- `⁅K, H⁆ ≤ K` whenever `K ⊴ H` (`K.subgroupOf H` normal in `↥H`). Generalises
 `Msigma_commutator_M_le`. -/
 theorem commutator_le_of_subgroupOf_normal {H K : Subgroup G} (hKH : K ≤ H)
