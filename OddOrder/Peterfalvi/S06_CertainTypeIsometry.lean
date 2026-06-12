@@ -583,4 +583,24 @@ theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
     ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1]
 
+/-- For distinct columns `χ₂ ≠ χ₂'`, the transported `tic`-side characters are distinct:
+`omegaProdCharTic` is injective in the column.  (Precompose-cancel the bridge iso `e`, then
+`omegaProdChar_inj`.) -/
+theorem omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    omegaProdCharTic h χ₂ i ≠ omegaProdCharTic h χ₂' i := by
+  intro heq
+  refine hχ (h.sdiffTICyclicHypothesis.omegaProdChar_inj (χ₁ := h.w1CharEquiv i)
+    (χ₁' := h.w1CharEquiv i) (MonoidHom.ext fun w => ?_)).2
+  obtain ⟨w', rfl⟩ := (ticWEquivSdiffW h).surjective w
+  exact DFunLike.congr_fun heq w'
+
+/-- The two `σ`-image grid indices are distinct: `P_{ij} ≠ P_{ik}` for `χ₂ ≠ χ₂'`
+(`omegaProdEquiv.symm` is injective and `omegaProdCharTic` is column-injective). -/
+theorem omegaProdEquiv_symm_omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)
+      ≠ (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) :=
+  fun heq => omegaProdCharTic_ne h hχ i ((ticVdiff h).omegaProdEquiv.symm.injective heq)
+
 end OddOrder.Peterfalvi.S06
