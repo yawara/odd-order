@@ -8,6 +8,17 @@ owner: Lane F (bg-s12)
 
 # BG Cor 12.16(a)(b) faithful statement を S12_E に追加 (G de-axiom 用)
 
+## ✅ F 側完了 (2026-06-12)
+
+S12_E.lean に 2 statement を追加 (sorry'd, build 緑, full build 3780):
+- `sigma_subgroup_pRank_normalizer_le_one` (Cor 12.16(a): `r_p(N_H(Y)) ≤ 1`)
+- `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (Cor 12.16(b): `p ∉ π(N_H(Y)')`)
+
+drop-in 署名から `maximalSubgroupsContaining Y` (Subgroup 引数; 元の `(Y : Set G)` は型誤り) に
+修正。それ以外は issue 通り。BG 原文 (mmd L3453-3456) と照合し faithful 確認済み。
+**G は main 同期後、forward axiom 2 本をこの 2 定理の cite に置換可能** (de-axiom handshake step 2)。
+本 issue は G の de-axiom + issue 8000 closed まで open のまま。
+
 ## 依頼者・経緯
 
 **hub → Lane F への依頼** (2026-06-12, ユーザー指示)。
