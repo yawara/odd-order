@@ -3999,3 +3999,5 @@ Isaacs 6.21 forces `⟨C_H(b) | b ∈ B^#⟩ = H`, contradicting fixed-point-fre
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isFrobeniusGroup_of_regular
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_regular_all
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_forall_factorization_le

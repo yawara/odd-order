@@ -1,5 +1,101 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟡 2026-06-12 (Lane F session 8, Opus 4.8): **Thm 12.12 着手 — 部品 4 本 landed、Case 1 完了、Case 2/3 残**
+
+新 leaf `S12_Theorem1212.lean`。Thm 12.12 (Frobenius 因子分解、大物) を 3 ケースに分解し、
+共通インフラ + Case 1 を完成。**全 unconditional・axiom-clean、AxiomsCheck 4 本登録、commit 4 本**
+(Prop 3.9 / packaging+Case1 / exponent reduction)。S12_E の 12.12 scaffold は**未充足のまま**
+(assembly は Case 2/3 完成後 — 実 sorry 5 不変)。
+
+### ✅ landed (この session)
+
+1. **`FrobFactConclusion M E`** (def): 12.12 二部結論の共通ゴール。各ケース helper がこれを返し、
+   assembly 時に scaffold へ defeq で流す設計。
+2. **Prop 3.9 `isCyclic_of_coprime_fpf_pgroup_action`**: finite p-群 R (p odd) が nontrivial
+   finite H に coprime FPF 作用 ⟹ IsCyclic R。非 cyclic なら elem-ab p² 部分群 B 経由で
+   **Isaacs 6.21** (`S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`) から
+   ⟨C_H(b)⟩=⊤、FPF (`actionFixedBy φ a = ⊥`) で `nontrivialActionFixedByClosure_le_iff` → ⊥ と矛盾。
+   **一発で通過**。Case 3 の Q/Q₀ ↷ S 適用で使う (作用の組み方 = recon v 未済)。
+3. **`isFrobeniusGroup_of_regular`** (packaging, 全ケース共通): regular な E₀≤E (∀a∈E₀#,
+   M_σ⊓C(a)=⊥) で E₀≠⊥ なら M_σ E₀ が kernel M_σ の Frobenius 群。M_σ⊴M⊇M_σE₀ で正規性
+   (`Msigma_subgroupOf`+`normal_subgroupOf_iff_le_normalizer`)、M_σ⊓E₀=⊥ (setup)、M_σ≠⊥
+   (`S10.Msigma_ne_bot` = Thm 10.2(e))、conj_frobenius は `subgroupOf_eq_bot↔Disjoint` +
+   `mul_inv_eq_iff_eq_mul` で regularity に帰着。
+4. **Case 1 `frobFact_of_regular_all`** (E=E₁E₃ = τ₂∅): regularity が E 全体に及ぶケース。
+   A₀=⊥ (IsMulCommutative=`IsMulCommutative.of_comm (Subsingleton.elim)`、E≤N(⊥)=S07:2045 の
+   `mem_normalizer_iff` パターン、(a)-conjunct は 1≠e∈E⊓C(x) が x∈M_σ⊓C(e)=⊥ を強制)、E₀=E
+   (exponent rfl、packaging)。**`E≠⊥` を要求** (E=⊥ なら part (b) Frobenius は偽 — BG も非自明
+   補群前提; faithful な追加仮定)。Cases 2/3 は τ₂≠∅⟹E₂≠⊥⟹E≠⊥ で自動。
+5. **`exponent_eq_of_forall_factorization_le`** (汎用, Cases 2/3 共通): E₀≤E で ∀素数 r に
+   ∃g₀∈E₀, v_r(exp E)≤v_r(ord g₀) なら exp(E₀)=exp(E)。exp(E₀)∣exp(E)=`exponent_dvd_of_monoidHom`、
+   逆は `Nat.factorization_le_iff_dvd`+`Finsupp.le_def` で素数ごと。**鍵 mathlib 補題**=
+   `Nat.Prime.exists_orderOf_eq_pow_factorization_exponent` (exp の r-part を達成する元の存在)。
+
+### ▶ Case 2 (nonabelian Sylow p) — **完全戦略 recon 済**、未実装
+
+discriminant: τ₂≠∅ で p∈τ₂ を固定、A∈ℰ_p²(E) を取り (`exists_elemAb_rank_two_le_E_of_tau2`?)、
+`by_cases ∃ S:Sylow p G, ¬IsMulCommutative S`。nonabelian 枝 = Case 2。
+
+**12.7 サブ定理の直接呼び出し** (assembly `tau2_singleton_of_nonabelianSylow` でなく):
+- `tau2_prime_eq_of_nonabelianSylow` → `hprime_eq : ∀q prime, q∈τ₂ M→q=p` (12.7(a))。
+- `exists_canonical_line_of_nonabelianSylow hG h hp hA hAE hnonab` →
+  `A₀ = A⊓C(M_σ)`, `|A₀|=p`, `A₀≤A`, `M_σ≤C(A₀)`, line 条件 `hc` (∀X∈ℰ¹,X≤E,X≠A₀ →
+  M_σ⊓C(X)=⊥ ∧ ¬C(X)≤M), `habs`。
+- `fitting_eq_sup_of_canonical_line …` 第1連言 → `M ≤ N(A₀)` (= hMnorm)。
+- `exists_complement_of_canonical_line hG h hp hA hAE hnonab hprime_eq hA₀A hA₀card hMσC hMnorm`
+  → `∃E₀, E₀≤E ∧ A₀⊓E₀=⊥ ∧ A₀⊔E₀=E`。
+
+**(a)-conjunct `E⊓C(x) ≤ A₀`** (x∈M_σ#): A₀≤C_E(x) (A₀≤E、M_σ≤C(A₀)⟹x∈M_σ⟹A₀≤C(x)) +
+C_E(x)⊓E₀=⊥ (≤E₀⊓C(x)=⊥) + [E:E₀]=p (=|A₀|、A₀⊴E disjoint) ⟹ |C_E(x)| ∣ p ⟹ C_E(x)=A₀ (card)。
+**要 helper**: 「H⊓K=⊥, A₀≤H, A₀⊴E, A₀⊔K=E ⟹ |H| ∣ p」or 直接 C_E(x)=A₀。
+
+**(b) regularity**: (e) `primeFactors_centralizer_le_tau1_of_disjoint hG h hp hA hAE hprime_eq hc
+hE₀E hA₀E₀ hx hx1` → π(C_{E₀}(x))⊆τ₁ ⟹ C_{E₀}(x)=⊥ (∃y order r∈τ₁⊆τ₁∪τ₃ → hreg → x∈M_σ⊓C(y)=⊥ ✗)
+⟹ `∀x∈M_σ#, E₀⊓C(x)=⊥`。**要 bridge `inf_centralizer_symm`** (∀x∈M_σ#,E₀⊓C(x)=⊥) ⟺
+(∀a∈E₀#,M_σ⊓C(a)=⊥) [comm 対称、~12 行] → packaging。
+
+**(b) exponent `exp(E₀)=exp(E)`** = `exponent_eq_of_forall_factorization_le` の hattain を discharge:
+- **r≠p** (🔑 **Sylow 共役を回避する clean path 発見**): max-r-order 元 g:↥E
+  (`exists_orderOf_eq_pow_factorization_exponent`, ord g = r^k, k=v_r(exp E)) を **complement iso**
+  `Subgroup.IsComplement'.QuotientMulEquiv [K.Normal] (h:H.IsComplement' K) : G⧸K ≃* H` で E₀ へ。
+  K:=A₀.subgroupOf E (normal, A₀⊴E), H:=E₀.subgroupOf E (complement)。`mk g : ↥E⧸K` の位数 = r^k
+  (核 A₀ は |A₀|=p で r と互いに素: g^{ord(mk g)}∈K ⟹ ord g ∣ ord(mk g)·p、coprime で r^k∣ord(mk g);
+  逆は hom で ord(mk g)∣ord g)。iso で g₀:=e(mk g)∈↥E₀sub 同位数 → subgroupOfEquivOfLe で ↥E₀ の
+  r^k 位数元。**Sylow 機構不要・複素 iso のみ** (~40 行)。
+- **r=p**: E₂=Sylow p of E は abelian (`E2_isMulCommutative_of_prime_eq`)、|E₂|≥p² (r_p(M)=2)。
+  Dedekind (A₀≤E₂): E₂=A₀⊔(E₂⊓E₀) disjoint ⟹ (abelian) E₂=A₀×(E₂⊓E₀)。|E₂⊓E₀|=|E₂|/p≥p ⟹
+  C:=E₂⊓E₀ nontrivial p-群、exp(E₂)=lcm(p,exp C)=exp C (p∣exp C)。exp(E₂)=p^{v_p(exp E)}
+  (E₂=Sylow p ⟹ p-part 一致)。abelian C は `Monoid.exists_orderOf_eq_exponent` で
+  ord=exp C=p^{v_p(exp E)} の g₀∈E₀ を供給。
+
+### ▶ Case 3 (abelian Sylow, 12.8 regime) — **最難、recon 部分的**
+
+A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (exp=exp(S_p)、C_{M_σ}(Ω₁(Z_p))=1)
+構成 → E₀=E₁E₃·∏Z_p。**N_G(S)-不変 cyclic Z≠⊥ ⟹ C_{M_σ}(Ω₁(Z))=1 自動** (12.6(c)+N_G(S)⊄M)。
+- **C_E(S)=E 枝**: S abelian rank2 ⟹ **S=Y×Z cyclic×cyclic** (= **recon (i) 未済**: mathlib に
+  rank-2 abelian p-群の cyclic 分解の直接形が要調査; `Monoid.exists_orderOf_eq_exponent` で
+  Z=⟨exp 元⟩ cyclic、Y=補空間を取る手組みが有力)。|Y|<|Z|: Ω₁(Z) char S。|Y|=|Z|: Ω₁(Z)=任意
+  A₁∈ℰ¹(A)、**12.5(f)** (`Msigma_nilpotent_of_tau2 ….2.2.2.2.2`) で C_{M_σ}(A₁)=1。
+- **C_E(S)≠E 枝**: q∈π(E/C_E(S))、Q=Syl_q(N_G(S))⊇Q₁=Syl_q(E)。Prop 1.6(e)⟹Q₁⊄C_E(A)⟹
+  12.10(c)⟹q∈τ₁,Q₁ cyclic。Q₀=C_Q(S)⊂Q₁。**Q/Q₀ regular on S ⟹ Prop 3.9 で cyclic** (← 作り方
+  = recon v: `MulAut.conjNormal`/`QuotientGroup.lift` で φ̄:Q/Q₀→MulAut S) ⟹ r_q(N_G(S))=1、
+  但し **12.8(e)** (`central_line_of_abelianSylow`, sig 確認済) で Ω₁(Q₁) が A 中心化 + **12.11(c)**
+  で r_q=2 矛盾。⟹ ∃X≤Q, 1⊂C_S(X)⊂S。S₀=C_S(X),S₁=[S,X] cyclic (S=S₀×S₁) + **12.8(f)**
+  (`relative_normality_of_abelianSylow`, sig 確認済) で両方⊴N_G(S) ⟹ regular。Z=大きい方。
+
+### 🔑 recon 結論 (5 点)
+
+- (i) cyclic×cyclic: **mathlib 直接形 未確認** — `exists_orderOf_eq_exponent` で手組み有力 (Case 3 のみ)。
+- (ii) exponent×Sylow: **解決** — `exists_orderOf_eq_pow_factorization_exponent` +
+  `exponent_eq_of_forall_factorization_le` (landed) + 上記 r≠p/r=p discharge。
+- (iii) IsComplement': `isComplement'_of_disjoint_and_mul_eq_univ` (packaging で使用済)。
+- (iv) 12.8(e)/(f) sig: 確認済 (S12_Lemma128d:583/405、単一 `S:Sylow p G` 引数)。
+- (v) quotient 作用 φ̄: **未確認** (Case 3 のみ; `MulAut.conjNormal`+`QuotientGroup.lift`)。
+
+**次の一手** (推奨): Case 2 を実装 (戦略確定、12.7 sig 既知)。最初に bridge `inf_centralizer_symm` +
+(a)-card helper + exponent の r≠p Sylow helper を leaf 内に立ててから assembly。Case 3 は (i)/(v)
+の recon 後。
+
 ## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
 
 **新 leaf `S12_ExceptionalBridge.lean`** (imports S10_LocalLemmasCore + S11_MsigmaANormal +

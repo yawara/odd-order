@@ -79,6 +79,36 @@ theorem isCyclic_of_coprime_fpf_pgroup_action
   obtain ⟨x, hx⟩ := exists_ne (1 : H)
   exact hx (Subgroup.mem_bot.mp (hbot ▸ Subgroup.mem_top x))
 
+/-! ## Exponent bookkeeping for the complement `E₀` -/
+
+/-- If `E₀ ≤ E` (finite) and, for every prime `r`, some element of `E₀` attains the `r`-part of
+`exp(E)` (i.e. `v_r(exp E) ≤ v_r(ord g₀)` for some `g₀ ∈ E₀`), then `exp(E₀) = exp(E)`.
+
+`exp(E₀) ∣ exp(E)` holds for any subgroup; the converse is checked prime-by-prime via
+`Nat.factorization`, using that the `r`-part of `exp(E)` is realized by an element
+(`Nat.Prime.exists_orderOf_eq_pow_factorization_exponent`) which the hypothesis lifts to `E₀`. -/
+theorem exponent_eq_of_forall_factorization_le [Finite G] {E E₀ : Subgroup G}
+    (hle : E₀ ≤ E)
+    (hattain : ∀ r : ℕ, r.Prime →
+      ∃ g₀ : ↥E₀, (Monoid.exponent ↥E).factorization r ≤ (orderOf g₀).factorization r) :
+    Monoid.exponent ↥E₀ = Monoid.exponent ↥E := by
+  have hExpE_ne : Monoid.exponent ↥E ≠ 0 := fun hz =>
+    (Nat.card_pos (α := ↥E)).ne' (Nat.eq_zero_of_zero_dvd (hz ▸ Group.exponent_dvd_nat_card))
+  have hExpE₀_ne : Monoid.exponent ↥E₀ ≠ 0 := fun hz =>
+    (Nat.card_pos (α := ↥E₀)).ne' (Nat.eq_zero_of_zero_dvd (hz ▸ Group.exponent_dvd_nat_card))
+  refine dvd_antisymm
+    (Monoid.exponent_dvd_of_monoidHom (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle))
+    ?_
+  rw [← Nat.factorization_le_iff_dvd hExpE_ne hExpE₀_ne, Finsupp.le_def]
+  intro r
+  by_cases hr : r.Prime
+  · obtain ⟨g₀, hg₀⟩ := hattain r hr
+    refine hg₀.trans ?_
+    exact (Finsupp.le_def.mp ((Nat.factorization_le_iff_dvd (orderOf_pos g₀).ne'
+      hExpE₀_ne).mpr (Monoid.order_dvd_exponent g₀))) r
+  · rw [Nat.factorization_eq_zero_of_not_prime _ hr]
+    exact Nat.zero_le _
+
 /-! ## Frobenius packaging: a regular complement `E₀` gives a Frobenius group `M_σ E₀` -/
 
 /-- **Frobenius packaging** for Theorem 12.12(b): if `E₀ ≤ E` is a nontrivial subgroup acting
