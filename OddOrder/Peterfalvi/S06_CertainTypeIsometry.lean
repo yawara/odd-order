@@ -43,6 +43,17 @@ variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
+/-- The canonical (3.1)-for-`G` Dade application of (4.6.b): the §4 Dade package on the ambient
+TI set `V = W − W₂ ⊆ G` of `h.tic`, whose local subgroups are all trivial (`H(a) = ⊥`), so
+`HConjInvariant` holds for free.  This `app` drives the §5 `σ`-machinery (`σ_G`) on `(G, W)`, the
+`G`-side isometry `ω_{ij}^σ ∈ CF(G)` used in (4.8) conclusion (3).  (Mirror of the `(L, W)`-side
+`toTICyclicFullDadeApplication`, the same `HConjInvariant.of_forall_H_eq_bot` recipe.) -/
+noncomputable def ticFullDadeApplication (h : Hypothesis46 A L)
+    [Fintype h.tic.W] [Invertible (Nat.card h.tic.W : ℂ)] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication h.tic :=
+  ⟨h.tic.toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
 `1`, then the two column signs coincide.
