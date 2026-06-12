@@ -173,8 +173,12 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   pRank S₀≥2 なら B₀(elem-ab,p²)⊆S₀ + y(order p)∈S₁ で **B₀⊔⟨y⟩ が elem-ab order p³**
   (`isElementaryAbelian_sup_of_le_centralizer` [S12_ExceptionalBridge:717, S abelian で中心化条件自明] +
   disjoint card |B₀⊔⟨y⟩|=p³) ⟹ `le_pRank` で pRank S≥3 vs pRank S=2 矛盾 ⟹ pRank S₀≤1。同 S₁。
-  **friction = disjoint 部分群積の card** (`B₀⊓⟨y⟩=⊥ ⟹ |B₀⊔⟨y⟩|=|B₀|·|⟨y⟩|` の mathlib 名未確定 —
-  card_sup_eq / Schur-Zassenhaus 系 / index_mul_card を要調査)。両 cyclic 後: 12.8(f)
+  **✅ friction 解消 (disjoint card)**: `OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal`
+  (`X⊓T=⊥ ⟹ |X⊔T|=|X|·|T|`, 片方 normal 要 — abelian S 内で自明)。**🔑 完全 template =
+  `S04f_Blackburn.lean:1924-1937`** (T:order p², X:order p, disjoint → |T⊔X|=p³ →
+  `isElementaryAbelian_sup_of_le_centralizer` で elem-ab → 用済; これを ↥S 型内で S₀,S₁ にミラー)。
+  ⚠ 型注意: `le_pRank (A:Subgroup ↥S)` は `pRank ↥S p`、`isCyclic_of_pRank_le_one` は `pRank ↥S₀ p`
+  — Subgroup G / ↥S / ↥S₀ 境界の cast が実装の主作業。両 cyclic 後: 12.8(f)
   `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) → Z=大きい方 (|S₀|≥|S₁| ? S₀ : S₁) →
   exp(Z)=exp(S) (S=S₀×S₁ 両 cyclic p-群 ⟹ exp=lcm=max order=|Z|) → key fact
   `inf_centralizer_line_eq_bot_of_invariant` (Ω₁(Z) on) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic`
