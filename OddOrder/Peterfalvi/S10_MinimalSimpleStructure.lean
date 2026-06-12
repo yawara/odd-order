@@ -8,6 +8,7 @@ import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.BG.Ch2_Uniqueness.Setup
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 
 /-!
 # Peterfalvi Section 10: Structure of a Minimal Simple Group of Odd Order
@@ -22,9 +23,13 @@ structural consequences consumed by Peterfalvi Sections 11--16.
 
 The actual type definitions live in `OddOrder.GroupTheory.MaximalSubgroupType`
 because BG Chapter IV uses the same taxonomy.  This file provides the
-Peterfalvi-numbered entry points and the main scaffold statements.  Proofs of
-(8.8), (8.11), (8.12), and (8.13) are intentionally left as `sorry`: they quote
-BG Theorems A--E / Theorems I--II, which are not yet scaffolded in Lean.
+Peterfalvi-numbered entry points and the main scaffold statements.  Those of
+(8.11), (8.12), (8.13) quote BG Theorems A--E / Theorems I--II, which are now
+stated (still `sorry`) in `OddOrder.BG.Ch4.S16` and are cited here as the
+Peterfalvi-facing wiring is built; (8.8) is already wired to BG Theorem I
+(`theoremI_nilpotentHall_conjugacy_and_type_dichotomy`).  The remaining `sorry`s
+reduce to those BG endpoints plus a notation dictionary, not to new axioms;
+see `notes/peterfalvi/s10_13_maximal_structure.md`.
 
 The Nougat extract drops the statements around (8.14)--(8.17).  The PDF page
 has now been recovered; this file records the `R(x)`/thickened-support notation,
@@ -100,7 +105,14 @@ theorem maximalSubgroup_type_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSim
         (∀ M : Subgroup G, M ∈ maximalSubgroups G →
           IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
             (∃ g : G, MulAut.conj g • M = T)) := by
-  sorry
+  -- BG Theorem I (`OddOrder.BG.Ch4.S16`) supplies exactly this dichotomy, in the
+  -- shared `IsTypeI`/`IsTypeNonI`/`IsTypeII` language, with extra `W₁,W₂,W` data
+  -- that Peterfalvi (8.8) drops.  `S14.IsConjugateSubgroup M S` is *defeq* to
+  -- `∃ g, MulAut.conj g • M = S`, so the covering clause transfers directly.
+  rcases (OddOrder.BG.Ch4.S16.theoremI_nilpotentHall_conjugacy_and_type_dichotomy hG).2 with
+    hI | ⟨S, T, _W1, _W2, _W, hS, hT, hST, _hW, _hWcyc, hSnonI, hTnonI, hII, hcov⟩
+  · exact Or.inl hI
+  · exact Or.inr ⟨S, T, hS, hT, hST, hSnonI, hTnonI, hII, hcov⟩
 
 /-! ## (8.10)--(8.13): `M_s`, support sets, and centralizer control -/
 
