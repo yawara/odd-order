@@ -1889,3 +1889,24 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
 - 段階: [bridge def + step4] → [step5 norm-2] → [steps6-8 grid+counting]。複数 commit 想定。同 leaf S06_CertainTypeIsometry。
 
 正本 = 本 session 33。**(3.8) AVAILABLE・ticFullDadeApplication landed・次 = sdiff↔tic ω bridge + step 4。**
+
+### 🔧 session 33 cont. — CORRECTION: σ_G は h.tic でなく **ticVdiff** (V=W−(W₁∪W₂))
+- **🚨 上の "σ_G = h.tic.sigma rfl …" は誤り**。`sigma` は `hVeq : hyp.V = hyp.Vdiff` を要求し
+  `Vdiff = W∖(W₁∪W₂)`。だが **tic.V = W∖W₂** (≠ Vdiff) ⟹ `h.tic.sigma` は型が付かない。
+  L-side も同じ理由で σ_L は `toTICyclicHypothesis` (V=W∖(W₁∪W₂)) 上で回す (sdiffTICyclicHypothesis
+  [V=W∖W₂] でなく)。
+- **解決 = `ticVdiff : TICyclicHypothesis G`** (新規, S06_CertainTypeIsometry) — h.tic の W/W₁/W₂ を流用、
+  V := ↑tic.W∖(↑tic.W₁∪↑tic.W₂)。鍵: **V_ti は再証明不要** = `h.tic.V_ti.subset` (Vdiff⊆tic.V、`IsTISubset`
+  は集合に antitone)。W_normalizes_V は `open scoped IsMulCommutative` + 可換性。**`ticVdiff.V = ticVdiff.Vdiff`
+  は rfl** ⟹ `(ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h)` が型付く。
+- **⚠ session 33 の `ticFullDadeApplication` (h.tic 上, commit 7fe9d8bc) は mis-targeted で削除済** →
+  `ticVdiffFullDadeApplication` (ticVdiff 上) に置換。bridge (ticWEquivSdiffW/omegaProdCharTic) は
+  V 非依存ゆえ不変・流用 (omegaProdCharTic は tic.W=ticVdiff.W 上の char)。
+- **landed (build-green, axiom-clean)**: `ticVdiff`, `ticVdiffFullDadeApplication`,
+  `certainTypeOmegaSigma` (= ω_ij^σ ∈ CF(G)), `certainTypeOmegaSigma_apply_of_mem_V`
+  (v∈ticVdiff.V で ω_ij^σ(v)=chiColumn χ₂ i (e⟨v⟩))。τ-side: `certainTypeDiffSupported`,
+  `tau_toDadeMap_apply_of_mem` (τ(α)(a)=α(a) ∀a∈A₀, via a∈hCoset a, H 自明性不要)。
+- **▶ 次 = step 4** (ψ:=(μ_ij−μ_ik)^τ − δ_j(ω_ij^σ−ω_ik^σ) が ticVdiff.V で消滅): v∈ticVdiff.V=W∖(W₁∪W₂)
+  ⊆ sdiff.V=W∖W₂ ゆえ (4.3.c) 適用可。(A) τ値 = tau_toDadeMap_apply_of_mem (要 v∈A₀ = `Or.inr ⟨1,_,v,hv',by group⟩`
+  + e⟨v⟩↔⟨v,mem_L⟩ 同一視 via coe_ticWEquivSdiffW+subtype_injective) → (4.3.c)×2; (B) ω値 =
+  certainTypeOmegaSigma_apply_of_mem_V; 差 = (δ_j−δ_k)·chiColumn χ₂' i (e⟨v⟩) = 0 (step 1)。

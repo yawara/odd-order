@@ -38,20 +38,54 @@ Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 30").
 namespace OddOrder.Peterfalvi.S06
 
 open OddOrder.RepresentationTheory
+open scoped IsMulCommutative
 
 variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
-/-- The canonical (3.1)-for-`G` Dade application of (4.6.b): the §4 Dade package on the ambient
-TI set `V = W − W₂ ⊆ G` of `h.tic`, whose local subgroups are all trivial (`H(a) = ⊥`), so
-`HConjInvariant` holds for free.  This `app` drives the §5 `σ`-machinery (`σ_G`) on `(G, W)`, the
-`G`-side isometry `ω_{ij}^σ ∈ CF(G)` used in (4.8) conclusion (3).  (Mirror of the `(L, W)`-side
-`toTICyclicFullDadeApplication`, the same `HConjInvariant.of_forall_H_eq_bot` recipe.) -/
-noncomputable def ticFullDadeApplication (h : Hypothesis46 A L)
-    [Fintype h.tic.W] [Invertible (Nat.card h.tic.W : ℂ)] :
-    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication h.tic :=
-  ⟨h.tic.toDadeHypothesis.fullDadeIsometryData
+/-- The (3.1)-for-`G` TI-cyclic hypothesis on the **smaller** TI set `V = W − (W₁ ∪ W₂)`, the one
+the §5 `σ`-machinery ((3.2)-(3.9)) runs on (the `ω_{ij}`-basis lives in `CF(W, V)`, vanishing on
+`W₁` and `W₂`).  The ambient `h.tic` carries `V = W − W₂` for the Dade isometry `τ`; this shrinks
+the TI set, which stays TI since `W − (W₁ ∪ W₂) ⊆ W − W₂` and `IsTISubset` is antitone in the set
+(`tic.V_ti.subset`).  This is the `G`-side analogue of the `(L, W)`-side `toTICyclicHypothesis`, and
+is what makes `σ_G` (its `sigma`) well-typed: `ticVdiff.V = ticVdiff.Vdiff` by `rfl`. -/
+noncomputable def ticVdiff (h : Hypothesis46 A L) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis G where
+  W := h.tic.W
+  W1 := h.tic.W1
+  W2 := h.tic.W2
+  W1_le_W := h.tic.W1_le_W
+  W2_le_W := h.tic.W2_le_W
+  W1_nontrivial := h.tic.W1_nontrivial
+  W2_nontrivial := h.tic.W2_nontrivial
+  W_sup := h.tic.W_sup
+  W_disjoint := h.tic.W_disjoint
+  W_card_coprime := h.tic.W_card_coprime
+  W_card_odd := h.tic.W_card_odd
+  W_cyclic := h.tic.W_cyclic
+  V := (↑h.tic.W : Set G) \ ((↑h.tic.W1 : Set G) ∪ (↑h.tic.W2 : Set G))
+  V_subset_sharp := fun v hv => by
+    rw [OddOrder.Peterfalvi.S04.mem_sharp]
+    exact ⟨Set.mem_univ v, fun heq => hv.2 (Or.inl (by rw [heq]; exact Subgroup.one_mem h.tic.W1))⟩
+  V_subset_W := fun _ hv => hv.1
+  W_normalizes_V := by
+    intro w v hv
+    haveI := h.tic.isMulCommutative_W
+    have h1 : (⟨v, hv.1⟩ : ↥h.tic.W) * w = w * ⟨v, hv.1⟩ := mul_comm _ _
+    have h2 : (w : G) * v = v * (w : G) := (Subtype.ext_iff.mp h1).symm
+    have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [h2]; exact mul_inv_cancel_right v w
+    rw [h3]; exact hv
+  V_ti := h.tic.V_ti.subset (by
+    rw [h.tic_V]; exact fun _ hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩)
+
+/-- The canonical Dade application driving `σ_G`: the §4 Dade package on `ticVdiff`'s TI set
+`V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so `HConjInvariant` holds
+for free.  Mirror of the `(L, W)`-side `toTICyclicFullDadeApplication`. -/
+noncomputable def ticVdiffFullDadeApplication (h : Hypothesis46 A L)
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (ticVdiff h) :=
+  ⟨(ticVdiff h).toDadeHypothesis.fullDadeIsometryData
     (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
 
 /-- `tic.W = (W₁ ⊔ W₂).map (L ↪ G)`: the ambient (3.1)-for-`G` group is the `G`-image of the
@@ -98,6 +132,28 @@ theorem omegaProdCharTic_apply (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   rw [omegaProdCharTic, MonoidHom.comp_apply, Hypothesis.chiColumn,
     h.sdiffTICyclicHypothesis.omega_apply]
   rfl
+
+/-- The `G`-side `σ`-image `ω_{ij}^σ ∈ CF(G)` of the certain-type column character `ω_{ij}`, built
+from the `ticVdiff` σ-machinery applied to the transported `tic`-side character `omegaProdCharTic`.
+This is the right-hand side ingredient of (4.8) conclusion (3). -/
+noncomputable def certainTypeOmegaSigma (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) : ClassFunction G ℂ :=
+  (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h)
+    ((ticVdiff h).omega (omegaProdCharTic h χ₂ i))
+
+/-- The `σ_G`-image on `V = W − (W₁ ∪ W₂)`: `ω_{ij}^σ(v) = ω_{ij}(v) = chiColumn χ₂ i (e v)`
+(`sigma_apply_of_mem_V` (3.2.c) + `omega_apply` + `omegaProdCharTic_apply`). -/
+theorem certainTypeOmegaSigma_apply_of_mem_V (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    certainTypeOmegaSigma h χ₂ i v
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          (ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩) := by
+  rw [certainTypeOmegaSigma, (ticVdiff h).sigma_apply_of_mem_V rfl _ _ hv,
+    (ticVdiff h).omega_apply]
+  exact omegaProdCharTic_apply h χ₂ i _
 
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
