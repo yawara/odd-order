@@ -4239,3 +4239,16 @@ the range of the `pⁿ`-th power map, so `x ∈ ℧ⁿ(H) ↔ ∃ y, x = y^(pⁿ
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.agemo_eq_range_powMonoidHom
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_agemo_iff_of_comm
+
+/-! ### BG Theorem 12.12: Case 3 — the `C_E(S) = E` branch (`S12_Theorem1212b`)
+
+`exists_generator_of_card_prime`: a subgroup of order `p` is `⟨w⟩` for any nonidentity `w`.
+`exists_cyclic_Enormal_regular_of_CES_eq`: in the abelian-Sylow regime with the regularity
+hypothesis, `C_E(S) = E` yields a cyclic `Z ≤ S` of exponent `exp(S)`, normalized by `E`, acting
+regularly on `M_σ`. Built from a good line `L = ⟨w⟩ ≤ ℧^{a-1}(S)` (`℧^{a-1}(S) = A` → Theorem
+12.5(f); else `℧^{a-1}(S)` is a characteristic line via the key fact) with `w = s^{p^{a-1}}`,
+`Z = ⟨s⟩`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_generator_of_card_prime
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_CES_eq
