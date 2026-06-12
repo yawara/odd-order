@@ -7,6 +7,18 @@ created: 2026-06-12
 
 # §13 blocker: Cor 12.16(a)(b) statement が S12_E に未露出 (§13 全体が gate)
 
+## ✅ CLOSED (2026-06-13): de-axiom 完了
+
+Lane F が issue 0065 で S12_E に faithful sorry'd statement
+(`sigma_subgroup_pRank_normalizer_le_one` / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`,
+commit `e876f29b`) を露出 → main 同期後、G が forward axiom 2 本
+(`cor1216_pRank_normalizer_le_one` / `cor1216_not_mem_primeFactors_derived_of_tau1`) を削除し
+cite 先を S12_E の 2 定理へ差し替え (de-axiom handshake step 2)。Lemma 13.1・Cor 13.2 とも
+**新規 axiom 0**、footprint は `[propext, sorryAx, Classical.choice, Quot.sound]`
+(sorryAx は S12_E Cor 12.16 由来 = repo 標準 scaffold-sorry)。AxiomsCheck の cor1216 island 削除、
+13.1(a) は S12_E 非依存ゆえ `#assert_only_allowed_axioms` 維持。full build + AxiomsCheck green。
+**HOLD 解消**: G の forward axiom が消えたので merge ブロッカー無し。
+
 ## 背景
 
 Lane G (`bg-s13`) の着工前 STATEMENT AUDIT (LAUNCH.md 手順 3) で発覚。
