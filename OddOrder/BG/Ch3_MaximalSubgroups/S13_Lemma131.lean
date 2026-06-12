@@ -672,7 +672,7 @@ theorem exists_sylow_le_derivedInG_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSi
 `{α(M*)∪{p}}`-group, hence `⊆ K_a`. -/
 theorem sylow_le_opiCoreInG_alpha_p [Finite G] (hG : IsMinimalSimpleOdd G)
     {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    {S : Subgroup G} (hS_le_deriv : S ≤ derivedInG Mstar) (hSp : IsPGroup p ↥S)
+    {S : Subgroup G} (hS_le_deriv : S ≤ derivedInG Mstar)
     (hScard : Nat.card ↥S = p ^ (Nat.card ↥Mstar).factorization p) :
     S ≤ opiCoreInG (S10.alpha Mstar ∪ {p}) (derivedInG Mstar) := by
   classical
@@ -737,7 +737,8 @@ theorem sylow_le_opiCoreInG_alpha_p [Finite G] (hG : IsMinimalSimpleOdd G)
             (Subgroup.normal_mul _ _).symm] at hform
         exact ⟨_, hform.symm⟩
       have hr_prime := Nat.prime_of_mem_primeFactors hr
-      rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd) with hα | hq
+      rcases (Nat.Prime.dvd_mul hr_prime).mp ((Nat.mem_primeFactors.mp hr).2.1.trans hdvd)
+        with hα | hq
       · refine Or.inl (S10.Malpha_isPiGroup Mstar r (Nat.mem_primeFactors.mpr ⟨hr_prime, ?_,
           Nat.card_pos.ne'⟩))
         rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMαD).toEquiv] at hα
@@ -757,5 +758,101 @@ theorem commutator_le_of_subgroupOf_normal {H K : Subgroup G} (hKH : K ≤ H)
   have h2 := Subgroup.map_mono (f := H.subtype) h1
   rwa [Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le hKH,
     ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h2
+
+/-- **BG Lemma 13.1(a)** (mmd L3542): under the Lemma 13.1 hypotheses (`p ∉ τ₁(M*)`,
+`p ∉ τ₂(M*)`), every `p`-subgroup `P` of `M ⊓ M*` centralizes `M_σ ⊓ M*`. Let
+`K_a = O_{α(M*)∪{p}}(M*') ⊴ M*`; a Sylow `p` of `M*` lies in `K_a` (`sylow_le_opiCoreInG_alpha_p`),
+so `p ∤ [M* : K_a]` and `P ⊆ K_a`. As `α(M*) ∩ σ(M) = ∅` and `p ∉ σ(M)`, `K_a` is a `σ(M)'`-group,
+so `M_σ ⊓ K_a = ⊥` and `⁅M_σ ⊓ M*, P⁆ ⊆ M_σ ⊓ K_a = ⊥`. -/
+theorem pSubgroup_centralizes_Msigma_inf [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)
+    (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors)
+    (hpτ1 : p ∉ tau1 Mstar) (hpτ2 : p ∉ tau2 Mstar)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar)
+    {P : Subgroup G} (hPM : P ≤ M ⊓ Mstar) (hPp : IsPGroup p ↥P) :
+    P ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) := by
+  classical
+  obtain ⟨S, _, _, hScard, hS_le_deriv⟩ :=
+    exists_sylow_le_derivedInG_of_not_tau1_tau2 hG hMstar hpMstar hpτ1 hpτ2
+  have hDM : derivedInG Mstar ≤ Mstar := Subgroup.map_subtype_le _
+  set Ka : Subgroup G := opiCoreInG (S10.alpha Mstar ∪ {p}) (derivedInG Mstar) with hKadef
+  have hKaM : Ka ≤ Mstar := (Subgroup.map_subtype_le _).trans hDM
+  haveI hKa_norm : (Ka.subgroupOf Mstar).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hKaM).mpr
+      (le_normalizer_opiCoreInG_of_le_normalizer (S10.alpha Mstar ∪ {p})
+        (S10.le_normalizer_derivedInG Mstar))
+  have hKa_pi : Subgroup.IsPiSubgroup (S10.alpha Mstar ∪ {p}) Ka :=
+    isPiSubgroup_opiCoreInG _ _
+  have hS_le_Ka : S ≤ Ka := sylow_le_opiCoreInG_alpha_p hG hMstar hS_le_deriv hScard
+  have hKaP : Nat.card ↥(Ka.subgroupOf Mstar) = Nat.card ↥Ka :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKaM).toEquiv
+  -- `p ∤ [M* : K_a]`: `|K_a|_p = |M*|_p` (`S ⊆ K_a`, `|S| = |M*|_p`).
+  have hpindex : ¬ p ∣ (Ka.subgroupOf Mstar).index := by
+    have heq : (Nat.card ↥Ka).factorization p = (Nat.card ↥Mstar).factorization p :=
+      le_antisymm
+        ((Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+          (Subgroup.card_dvd_of_le hKaM) p)
+        ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp
+          (hScard ▸ Subgroup.card_dvd_of_le hS_le_Ka))
+    intro hdvd
+    have hcong : (Nat.card ↥(Ka.subgroupOf Mstar) * (Ka.subgroupOf Mstar).index).factorization p
+        = (Nat.card ↥Mstar).factorization p := by rw [Subgroup.card_mul_index]
+    rw [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, hKaP, heq] at hcong
+    have hidx : 0 < (Ka.subgroupOf Mstar).index.factorization p :=
+      (Fact.out : p.Prime).factorization_pos_of_dvd Subgroup.index_ne_zero_of_finite hdvd
+    omega
+  -- `P ⊆ K_a`: the image of `P` in `↥M* ⧸ K_a` is a `p`-group of order prime to `p`, hence trivial.
+  have hPMstar : P ≤ Mstar := hPM.trans inf_le_right
+  have hP_le_Ka : P ≤ Ka := by
+    have himg_pg : IsPGroup p ↥((P.subgroupOf Mstar).map
+        (QuotientGroup.mk' (Ka.subgroupOf Mstar))) :=
+      (hPp.of_equiv (Subgroup.subgroupOfEquivOfLe hPMstar).symm).map _
+    have himg_dvd : Nat.card ↥((P.subgroupOf Mstar).map
+        (QuotientGroup.mk' (Ka.subgroupOf Mstar))) ∣ (Ka.subgroupOf Mstar).index :=
+      Subgroup.card_subgroup_dvd_card _
+    have himg_card1 : Nat.card ↥((P.subgroupOf Mstar).map
+        (QuotientGroup.mk' (Ka.subgroupOf Mstar))) = 1 := by
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp himg_pg
+      rw [hk]
+      rcases Nat.eq_zero_or_pos k with hk0 | hk0
+      · rw [hk0, pow_zero]
+      · exact absurd (hk ▸ himg_dvd)
+          (fun hd => hpindex (dvd_trans (dvd_pow_self p hk0.ne') hd))
+    have hsub : P.subgroupOf Mstar ≤ Ka.subgroupOf Mstar := by
+      have hbot := Subgroup.card_eq_one.mp himg_card1
+      rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+      exact hbot
+    have h2 := Subgroup.map_mono (f := Mstar.subtype) hsub
+    rwa [Subgroup.map_subgroupOf_eq_of_le hPMstar,
+      Subgroup.map_subgroupOf_eq_of_le hKaM] at h2
+  -- `M_σ ⊓ K_a = ⊥` (`K_a` is a `σ(M)'`-group).
+  have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
+    rintro ⟨g, hg⟩
+    exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hασ : S10.alpha Mstar ∩ S10.sigma M = ∅ :=
+    (S10.disjoint_of_not_conj hG hMstar h.mem_maximal hnc').1.2
+  have hpσM : p ∉ S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hpE
+  have hKa_pi' : Subgroup.IsPiSubgroup (S10.sigma M)ᶜ Ka := by
+    intro r hr
+    rcases hKa_pi r hr with hα | hp'
+    · exact fun hrσ => Set.eq_empty_iff_forall_notMem.mp hασ r ⟨hα, hrσ⟩
+    · rw [Set.mem_singleton_iff] at hp'; rw [hp']; exact hpσM
+  have hinf_bot : S10.Msigma M ⊓ Ka = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime
+      (coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl (S10.Msigma_isPiGroup M) hKa_pi')
+  -- `⁅M_σ ⊓ M*, P⁆ ⊆ M_σ ⊓ K_a = ⊥`.
+  have hcomm_Msig : ⁅S10.Msigma M ⊓ Mstar, P⁆ ≤ S10.Msigma M :=
+    (Subgroup.commutator_mono inf_le_left (hPM.trans inf_le_left)).trans
+      (Msigma_commutator_M_le M)
+  have hcomm_Ka : ⁅S10.Msigma M ⊓ Mstar, P⁆ ≤ Ka := by
+    rw [Subgroup.commutator_comm]
+    exact (Subgroup.commutator_mono hP_le_Ka inf_le_right).trans
+      (commutator_le_of_subgroupOf_normal hKaM)
+  have hcomm_bot : ⁅S10.Msigma M ⊓ Mstar, P⁆ = ⊥ :=
+    le_bot_iff.mp (hinf_bot ▸ le_inf hcomm_Msig hcomm_Ka)
+  exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+    (Subgroup.commutator_comm (S10.Msigma M ⊓ Mstar) P ▸ hcomm_bot)
 
 end OddOrder.BG.Ch3.S13
