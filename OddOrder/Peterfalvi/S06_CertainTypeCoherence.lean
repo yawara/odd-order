@@ -119,4 +119,64 @@ theorem certainTypeExtension_columnSum (h : Hypothesis46 A L) [NeZero (Nat.card 
   rw [columnSum_def, map_sum, Finset.smul_sum]
   exact Finset.sum_congr rfl fun i _ => certainTypeExtension_mu h χ₂ i
 
+/-! ### The certain-type set `𝒯` and the `ZIrr`-codomain field -/
+
+/-- **The certain-type set** `𝒯 = {μ_j | 0 < j < w₂, μ_j(1) = μ_k(1)}` of Peterfalvi (4.9): the
+column characters `μ_j` from nontrivial `W₂`-columns (`χ₂ ≠ 1`) whose degree matches the fixed
+reference column `k`. -/
+noncomputable def certainTypeSet (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) : Set (ClassFunction ↥L ℂ) :=
+  {f | ∃ χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+    (columnSum h χ₂ : ClassFunction ↥L ℂ) (1 : ↥L)
+      = (columnSum h k : ClassFunction ↥L ℂ) (1 : ↥L) ∧ f = columnSum h χ₂}
+
+/-- A column character `μ_j` with `χ₂ ≠ 1` and `μ_j(1) = μ_k(1)` lies in `𝒯`. -/
+theorem columnSum_mem_certainTypeSet (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {k χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (columnSum h χ₂ : ClassFunction ↥L ℂ) (1 : ↥L)
+      = (columnSum h k : ClassFunction ↥L ℂ) (1 : ↥L)) :
+    columnSum h χ₂ ∈ certainTypeSet h k :=
+  ⟨χ₂, hχ₂, hdeg, rfl⟩
+
+/-- **The `σ`-image `ω_{ij}^σ` is a virtual character.**  `ω_{ij}^σ = σ_G(ω(P_{ij}))` and `σ_G` maps
+`ZIrr(W) → ZIrr(G)` (`sigma_mem_ZIrr`); the source `ω(P_{ij})` is irreducible. -/
+theorem certainTypeOmegaSigma_mem_ZIrr (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    certainTypeOmegaSigma h χ₂ i ∈ ZIrr G := by
+  rw [certainTypeOmegaSigma]
+  exact (ticVdiff h).sigma_mem_ZIrr rfl (ticVdiffFullDadeApplication h)
+    ((ticVdiff h).omega (omegaProdCharTic h χ₂ i)).mem_ZIrr
+
+/-- `ν(μ_j) ∈ ZIrr G`: the column-sum image `δ_j ∑_i ω_{ij}^σ` is a `ℤ`-combination of the virtual
+characters `ω_{ij}^σ`. -/
+theorem certainTypeExtension_columnSum_mem_ZIrr (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    certainTypeExtension h (columnSum h χ₂) ∈ ZIrr G := by
+  rw [certainTypeExtension_columnSum]
+  exact Submodule.smul_mem _ _
+    (Submodule.sum_mem _ fun i _ => certainTypeOmegaSigma_mem_ZIrr h χ₂ i)
+
+/-- **Peterfalvi (4.9)(b), `ZIrr`-codomain (`IsCoherent.extension_mem_ZIrr`)**: `ν` carries the
+coherent lattice `Z[𝒯]` into `Z[Irr G]`.  By `span_induction`: generators `μ_j ∈ 𝒯` map into `ZIrr`
+(`certainTypeExtension_columnSum_mem_ZIrr`); `ZIrr` is closed under `0`, `+`, `ℤ•`. -/
+theorem certainTypeExtension_mem_ZIrr (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ S07.zSpan (certainTypeSet h k)) :
+    certainTypeExtension h φ ∈ ZIrr G := by
+  rw [S07.zSpan] at hφ
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨χ₂, _, _, rfl⟩ := hx
+      exact certainTypeExtension_columnSum_mem_ZIrr h χ₂
+  | zero => rw [map_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
+  | smul a x _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ a ih
+
 end OddOrder.Peterfalvi.S06
