@@ -2423,3 +2423,28 @@ in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 con
 (c) value-on-V (mirror 4.8 step-4, `sigma_eq_tau` for RHS) → (d) off-V^G vanishing 両辺 → (e) assembly
 (`ClassFunction.ext` + V^G class-fn 論法)。**~3-5 commits, §4 Dade-support 機構の deep dive だが trichotomy 不要**。
 **正本=本 session 37 cont.⁴。次 = (4.10) piece (a) から coding。**
+
+## 2026-06-13 (session 37 cont.⁵, /loop): (4.10) piece (a) landed; piece (b1) STOP — W-coord `1` 罠
+
+✅ **piece (a) `fourcorner_signedDiff_eq_induce`** landed (`fa5a578e`, S06_CertainTypeFourCorner, axiom-clean,
+full build 3795): `δ_j(μ_ij−μ_0j) − δ_0(μ_i0−μ_00) = Ind_W^L(sdiff 4-corner)` via columnFamily_spec +
+`h.isometryDifferenceImage_induceZ` (← **Hypothesis method, dot 修飾必須**) + induceLinear/map_sub
+(induce_sub 無)。
+
+🛑 **piece (b1) `chiColumn 4-corner = alphaCF` STOP (~8 試行、真の W-coord 罠)**: 目標
+`(chiColumn χ₂ i − chiColumn χ₂ 0 − (chiColumn 1 i − chiColumn 1 0)) = sdiff.alphaCF (w1CharEquiv i) χ₂`。
+pointwise (alphaCF_apply+omega_apply+omegaProdChar+ring) も omega-combination (abel) も**同じ箇所で詰む**:
+**`(1 : M →* ℂˣ)(x) = 1` の simp が発火しない** (`MonoidHom.one_apply` も `MonoidHom.one_comp` も unused、
+full simp も不可)。**根本原因**: chiColumn の χ₂=1 列 / w1CharEquiv 0=1 行で出る `1` の domain は
+`h.W2.subgroupOf (h.W1⊔h.W2)` 系だが、適用先 arg は `sdiff.W2sub` 系 — **defeq だが非 syntactic** ゆえ
+one_apply/one_comp の単一化が失敗 (sdiff vs h の W-coord 罠、memory 既出)。goal は `↑(1(wSnd w))`/
+`↑(1(wFst w))` が atom 残留で ring 不可 (これらが 1 になれば閉じる: 両辺 (1−a)(1−b))。
+
+### ▶▶ 次 = (4.10) piece (b) 別ルート (session 38; W-coord 回避)
+1. **`1`型整合の workaround**: (a) chiColumn 1-列の `1` を `change`/`convert` で sdiff 型に揃える、
+   (b) `omegaProdChar_one_left/right/one` を CF レベルで先に適用し pointwise の `(1)(x)` を回避
+   (omega(1) は line 666 (S05_TICyclic) パターンで one_apply 可)、(c) chiColumn の coe を ascription。
+2. **alphaCF 経由を捨てる別 support 証明**: sdiff 4-corner が sdiff.V 上 support を直接
+   (W₁∪W₂ で消失、`alphaCF_eq_zero_of_mem_W1/W2_subgroupOf` 流の omega 値計算)。
+3. piece (b) 完了後: (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁵。(4.10) piece (a) DONE; piece (b1) は W-coord `1` 罠で STOP、別ルート要。**
