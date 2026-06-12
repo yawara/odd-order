@@ -54,6 +54,51 @@ noncomputable def ticFullDadeApplication (h : Hypothesis46 A L)
   ⟨h.tic.toDadeHypothesis.fullDadeIsometryData
     (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
 
+/-- `tic.W = (W₁ ⊔ W₂).map (L ↪ G)`: the ambient (3.1)-for-`G` group is the `G`-image of the
+certain-type `W = W₁ ⊔ W₂ ≤ L`.  (Named so the bridge `ticWEquivSdiffW` and its coherence share one
+proof term.) -/
+theorem tic_W_eq_map (h : Hypothesis46 A L) :
+    h.tic.W = (h.W1 ⊔ h.W2).map L.subtype := by
+  rw [← h.tic.W_sup, h.tic_W1, h.tic_W2, ← Subgroup.map_sup]
+
+/-- The bridge isomorphism `tic.W ≃* sdiff.W` — both are `W₁ ⊔ W₂`, one as a subgroup of `G`, the
+other of `L`, identified by the corestriction of `L ↪ G`.  Transports the `sdiff`-side `(L, W)`
+characters (`omegaProdChar`, `chiColumn`) to the `tic`-side `(G, W)` for the `G`-side `σ`. -/
+noncomputable def ticWEquivSdiffW (h : Hypothesis46 A L) :
+    h.tic.W ≃* h.sdiffTICyclicHypothesis.W :=
+  (MulEquiv.subgroupCongr (tic_W_eq_map h)).trans
+    (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).symm
+
+/-- Carrier coherence for the bridge: the underlying `G`-element of `g : tic.W` equals the image of
+its `sdiff.W` partner under `L ↪ G`. -/
+theorem coe_ticWEquivSdiffW (h : Hypothesis46 A L) (g : h.tic.W) :
+    ((ticWEquivSdiffW h g : ↥L) : G) = (g : G) := by
+  -- `equivMapOfInjective` undoes the `.symm` in the bridge, landing back on the `subgroupCongr` cast
+  have key : (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective)
+      (ticWEquivSdiffW h g) = MulEquiv.subgroupCongr (tic_W_eq_map h) g :=
+    (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).apply_symm_apply _
+  simpa [Subgroup.coe_equivMapOfInjective_apply, MulEquiv.subgroupCongr_apply] using
+    congrArg (fun x : ((h.W1 ⊔ h.W2).map L.subtype) => (x : G)) key
+
+/-- The `tic`-side (`G`) linear character `ω_{ij}` of `W = W₁ ⊔ W₂`, transported from the
+`sdiff`-side `omegaProdChar (w1CharEquiv i) χ₂` along the bridge `ticWEquivSdiffW`.  Its `σ_G`-image
+`h.tic.sigma rfl (ticFullDadeApplication h) (h.tic.omega …)` is the `ω_{ij}^σ ∈ CF(G)` of (4.8)
+conclusion (3). -/
+noncomputable def omegaProdCharTic (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    h.tic.W →* ℂˣ :=
+  (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂).comp (ticWEquivSdiffW h)
+
+/-- The transported `tic`-side character evaluates as the `sdiff`-side `chiColumn` at the bridge
+partner: `ω_{ij}^{tic}(g) = ω_{ij}(e g) = chiColumn χ₂ i (e g)` (`e = ticWEquivSdiffW`). -/
+theorem omegaProdCharTic_apply (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (g : h.tic.W) :
+    ((omegaProdCharTic h χ₂ i g : ℂˣ) : ℂ)
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) (ticWEquivSdiffW h g) := by
+  rw [omegaProdCharTic, MonoidHom.comp_apply, Hypothesis.chiColumn,
+    h.sdiffTICyclicHypothesis.omega_apply]
+  rfl
+
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
 `1`, then the two column signs coincide.
