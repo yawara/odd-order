@@ -590,7 +590,14 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
   rw [← hNdef] at hax
   exact hax hpNderiv
 
-/-! ## Lemma 13.1 — conclusion (a) (mmd L3542) -/
+/-! ## Lemma 13.1 — conclusion (a) (mmd L3542) — remaining (K_a construction)
+
+The remaining `(a)` steps (`P ⊆ K_a = O_{α(M*)∪{p}}(M*') ⊴ M*` a `σ(M)'`-group, then
+`[M_σ∩M*, P] ⊆ M_σ ⊓ K_a = ⊥`) require `M*'/M*_α` nilpotent
+(from `S10.derivedQuotientMbeta_isNilpotent` + `nilpotent_of_surjective` over the projection
+`M*'/M*_β ↠ M*'/M*_α`; the `QuotientGroup.map_surjective_of_surjective` wiring needs care) and the
+case split `p ∈ α(M*)` / `p ∉ α(M*)` for `S ⊆ K_a`. See `notes/bg/s13_prime_action.md`
+"step 5 = (a)". The Sylow input `exists_sylow_le_derivedInG_of_not_tau1_tau2` (below) is ready. -/
 
 /-- For `p ∈ π(M*) ∖ τ₁(M*) ∖ τ₂(M*)` (`p ∈ σ(M*) ∪ τ₃(M*)`), there is a Sylow `p`-subgroup `S`
 of `M*` (as a subgroup of `G`) lying in `M*'`. In the `σ` case `S ⊆ M*_σ ⊆ M*'`; in the `τ₃` case
