@@ -2173,3 +2173,45 @@ IsCoherent packaging(extension map on Z[𝒯])も同様。両者で **§6 残り
 (Galois は (3.9) で既 landed = 利用のみ; full (3.8) 級の新規 grid 組合せ論は不要)。
 **第一 leaf 候補 = `S06_CertainTypeConjugation.lean`**(2 → 3 → 4 → 5 の順; nonzero まで)。
 **正本=本 session 35。(4.9)(b) 完全 DONE; 次 = (4.9)(a) チェーン step 1-2 から。**
+
+## 2026-06-12 (session 36, /loop): ✅ (4.9)(a) 共役インフラ — μ-bridge `δ_j μ̄_ij = δ_{j'} μ_{i'j'}` 到達
+
+新 leaf **`S06_CertainTypeConjugation.lean`** (5 commits, 全 axiom-clean, full build 3792)。(4.9)(a)
+の共役論法を σ-side + L-side 両方で構築し、**核心の μ-character bridge まで landed**:
+
+- **commit `b14c19a5`** 共役 foundation: `galoisMap_conj_omega` (複素共役 = 逆指標 `galoisMap conj
+  (ω χ) = ω χ⁻¹`; 値は 1 の冪根ゆえ `Complex.norm_eq_one_of_pow_eq_one`+`Complex.inv_eq_conj`;
+  **conj RingEquiv = `Complex.conjAe.toRingEquiv`**) + `certainTypeOmegaSigma_conj` (G-side σ_G の
+  共役 = σ_G(ω P⁻¹), via `sigma_mapRingEquiv_comm` (3.9))。**`galoisMap_conj_omega` は general
+  (任意 TICyclicHypothesis) で σ_G/σ_L 両方に再利用**。
+- **commit `902c2533`** grid-index 共役: `omegaProdChar_inv` (ω(χ₁,χ₂)⁻¹=ω(χ₁⁻¹,χ₂⁻¹), ℂˣ 可換) +
+  `rowInv`/`w1CharEquiv_rowInv` (行反転 index, w1CharEquiv (rowInv i)=(w1CharEquiv i)⁻¹) +
+  `omegaProdCharTic_inv` + `certainTypeOmegaSigma_conj_eq` (**(ω_ij^σ)̄ = ω_{i'j'}^σ**, σ-side 閉包)。
+- **commit `02011962`** L-side 閉包: `chiColumn_conj` (χ_ij̄=χ_{i'j'}; chiColumn=ω(omegaProdChar)
+  ゆえ general lemma 再利用) + `sigma_chiColumn_conj` (**σ_L(ω_ij)̄ = σ_L(ω_{i'j'})**)。
+- **commit `7b7ea8ff`** ✅ **μ-bridge** `certainType_mu_conj_bridge`: **`δ_j • μ_ij̄ = δ_{j'} •
+  μ_{i'j'}`** = (4.3.b) `sigma_chiColumn_eq_certainType` に `mapRingEquiv conj` 適用
+  (左=`sigma_chiColumn_conj`+4.3.b再適用、右=`ClassFunction.mapRingEquiv_zsmul` [sign∈ℤ])。
+
+**🔑 W-整合の罠 (session 36 で 3 回踏んだ; 再調査不要)**: `(ticVdiff h).W` vs `h.tic.W`、
+`toTICyclicHypothesis.W` vs `sdiffTICyclicHypothesis.W` は defeq だが非 syntactic → `rw`/`simp only`
+の pattern matching が黙って失敗 (「did not find pattern」/「unused simp arg」)。**回避 = term-mode
+`congrArg`+`exact`(defeq) か、goal 側を `← lemma` で書き換えてから `exact`**(sigma_chiColumn_conj が
+好例: goal は sdiff ascription で chiColumn_conj に一致 → `rw [← chiColumn_conj]` → `exact
+sigma_mapRingEquiv_comm`)。**explicit `[Fintype toTICyclic.W]` 等の binder は canonical (W1⊔W2 由来)
+と diamond → 宣言せず `[Fintype ↥(W1⊔W2)]` のみ供給**。hom 逆 `f⁻¹ a` は defeq `(f a)⁻¹` だが
+`MonoidHom.inv_apply` simp が発火しないことあり → `congrArg`+引数等式で defeq 閉じ。
+
+### ▶▶ 次 = (4.9)(a) 残り → nonzero → IsCoherent (session 37 以降; **Opus 継続**)
+1. **`μ_ij̄ = μ_{i'j'}`** (bridge から): `δ_j • μ_ij̄ = δ_{j'} • μ_{i'j'}` の両辺を `1` で評価 →
+   μ_ij̄(1)=μ_ij(1)>0、μ_{i'j'}(1)>0 ゆえ δ_j δ_{j'}=1 ⟹ **δ_j=δ_{j'}** ⟹ μ_ij̄=μ_{i'j'}
+   (「指標は別の指標の −1 倍になれない」; 次数正値 or inner)。
+2. **`μ̄_j = μ_{j'}`**: μ_j=∑_i μ_ij ([[certainTypeDiffSupported]] の和構造) ⟹ μ̄_j=∑_i μ_ij̄=
+   ∑_i μ_{i'j'}=μ_{j'} (i↦rowInv i は行の全単射)。
+3. **`μ_{j'} ≠ μ_j`**: j'=χ₂⁻¹≠χ₂ (|W| 奇 ⟹ χ₂²≠1 ∨ χ₂=1; χ₂≠1 前提) ⟹ `chiRestrict_injective`
+   で μ_{χ₂⁻¹}≠μ_{χ₂}。
+4. **nonzero**: μ̄_k−μ_k≠0 ∈ Z[𝒯,A]。**Z[𝒯,L^#]=Z[𝒯,A]** は (4.7)(Supp μ_j⊆A∪{1})+次数零。
+5. **IsCoherent packaging** (`S07.IsCoherent τ 𝒯 A`, 5 fields; session 35 ノート参照): extension map
+   on Z[𝒯] + 等長 (`certainType_omega_sum_isometry` lift) + τ一致 (`certainType_diff_dade_sum_eq_of_degree`
+   lift) + nonzero (step 4) + ZIrr codomain。**重い** (IntegralCharacterMap/zSpan/zSupportedSpan 機構)。
+→ (4.9) → S08 case-B → (6.8)。**正本=本 session 36。(4.9)(a) μ-bridge DONE; 次 = step 1 (μ_ij̄=μ_{i'j'})。**
