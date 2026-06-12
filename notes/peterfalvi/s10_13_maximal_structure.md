@@ -167,8 +167,39 @@ S11–13 の (C) は実証明不能。Lane B の sorried statement を cite し�
   `supportKernel`:64, `thickenedSupport`:74, `thickenedA1`:269), `MaxNilpotentNormalHall.lean`:34。
   いずれも **BG notation とは独立定義** ⟹ 辞書補題が要る(§3)。
 
-## 5. TODO（着工で更新）
+## 5. session 1 計測結果 — 残 11 を 3 tier に + interface gap
 
-- [ ] S10 docstring の stale 記述訂正(「BG §16 未 scaffold」→「BG.Ch4.S16 に statement 在, cite」)。
-- [ ] Phase A 初手 (8.8) wiring + conjugacy 辞書補題。
-- [ ] 辞書補題が新規 axiom を要するか各 sorry で判定(要時 issue base 2000 → 承認ゲート)。
+**✅ (8.8) 完了**(commit 6de1edea, axiom 0)。`theoremI_…` 第2連言が shared predicate 言語 +
+`S14.IsConjugateSubgroup M N := ∃ g, conj g•M=N`(**defeq**)ゆえ辞書不要で wiring。S10 12→11。
+**この clean さは (8.8) 固有**(BG Thm I だけが shared 言語で pre-translate 済)。
+
+**辞書実体**(grep 確定):
+- `S15.MF M := maxNilpotentNormalHall M`(**abbrev = defeq・無料**)。S14 も `K = maxNilpotentNormalHall M`。
+- `Msigma M := opiCoreInG (sigma M) M`(σ-Hall, **MF と別物**)。Prop 16.1[sorried] が I/II/V で `MF=Msigma`。
+- `escapingCentralizerSet M X = {x|x∈X ∧ ¬C{x}≤M}`(BG ThmII の D は `+x≠1`; near-defeq)。
+- `maximalSubgroupsContaining H = {N|IsCoatom N ∧ H≤N}`,`IsUniquelyMaximal H = H<⊤ ∧ ∃!coatom⊇H`
+  ⟹ `IsUniquelyMaximal ↔ maximalSubgroupsContaining=singleton ∧ H<⊤`(provable)。
+- `A1 M tau = sharpSubgroup(mainSubgroup)` vs BG `ASet/A0Set = hatMsigma ∩/∖ …` = **実際に異なる集合。
+  等式を与える citeable BG statement が無い**(← 壁)。
+
+| tier | sorry | 状態 |
+|---|---|---|
+| **T1 wireable**(tighten + cite) | (8.12),(8.11) | `theoremB`/`theoremA` cite。但し `theoremB` 仮説 `hU : IsHallSubgroup ((kappa∪sigma)ᶜ) U` が BG-internal ⟹ S10 を BG notation に結合する要(↓ gap) |
+| **T2 blocked**(support-set 等式不在) | (8.16),(8.13),(8.17),(8.18) | `typePA0=A0Set` / `A1⊆…` / `thickenedA1=tildeM` の citeable 等式 無し。sorried BG §14-15 構造に bottom-out |
+| **T3 別ゲート** | (8.2.a)(8.2.b),(8.15) | (8.2)=BG Prop 3.9(main 在否要確認)/ThmA,B extreme; (8.15)=(8.16)[T2]依存 |
+
+### ⚠ interface gap(session 1 の主発見)
+
+BG §16 file docstring 明記:「Peterfalvi §10+ should consume these BG endpoints **through the shared
+type predicates**」。しかし `theoremB/C/E` は仮説・support-set とも **BG-internal notation**
+(`kappa`/`sigma`/`ASet`/`A0Set`/`tildeM`)で露出。S10 は shared notation で書かれ、両者を繋ぐ
+**shared-notation 消費層が不在**。⟹ T1/T2 の wiring は「S10 を BG-internal に結合」か「BG §16 に
+shared-notation wrapper/bridge を足す(BG spine 編集)」の**設計・所有権判断**を伴う。
+**独断で結合させない → ユーザー裁可待ち。**(8.8) 以降の自動 wiring は gap 解消後。
+
+### 残 TODO
+
+- [x] S10 docstring stale 訂正(commit 6de1edea)。 [x] (8.8) wiring。
+- [ ] **interface gap の設計裁可**(S10↔BG notation 結合方針)→ 確定後 T1 着手。
+- [ ] (8.2.a) の BG Prop 3.9 が main 在否を確認(T3; 不在なら issue base 2000 → 承認)。
+- [ ] T2 = BG §14-15 の support-set 構造 landing 待ち(Lane F/G/spine 進捗連動)。
