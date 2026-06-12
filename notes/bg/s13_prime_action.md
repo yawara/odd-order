@@ -255,6 +255,34 @@ Lem 10.12(a) `S10.disjoint_of_not_conj` 系, Thm 12.13 (要特定)。
 **次 iteration: per-q core skeleton を WIP leaf に (step 1-3 = Cor 13.2 は concrete に proof,
 step 4-9 = Prop 12.15/Lem 12.18 部は sorry で構造化) → 順次充足。**
 
+### 2026-06-13 Lane G (loop): per-q core skeleton 着地 (WIP) + **PDF 精読で proof 確定**
+
+**WIP leaf S13_Theorem134**: per_q_centralizes (setup + step 2-3 proven, step 4-9 sorry) +
+centralizer_le_centralizer_of_tau1 (outer reduction + per_q で proof)。build 緑 (sorry 1)。
+- step 2 (r∈τ₁M*) = Cor 13.2(b) 対偶 (R が τ₁M*'-部分群なら M_σ∩M* 中心化 → [S,R]=1 矛盾)。✅ proven。
+- step 3 (p∈β(M*)) = Cor 13.2(c) ([M_σ∩M*,M∩M*]⊇[S,R]≠1)。✅ proven。
+- M* = `eq_top_or_exists_le_coatom` (N_G(P)≠⊤ via P 非正規)。setup ✅。
+
+**📖 PDF 精読 (book p.94-99 = PDF 107-112; offset +13) — Prop 12.15 / Lem 12.18 / Thm 13.4 exact**:
+- **M_p̃ = M*_σ** 確定: `1⊂P⊆C_{M*_σ}(RQ)`。
+- **Prop 12.15** (book p.94, `sigma_subgroup_maximal_interaction` S12_E:484, sorry'd): X=Q, M* で
+  (e) 排除 (P⊆M∩M*_σ) → (Lem 10.12(a)) q∈σ(M*) → (d) M_α≠1, τ₁(M*)⊆τ₁(M)∪α(M)。
+- **Lem 12.18** (book p.96, `tau1_Malpha_interaction`): (a) M_α≠1∧q∉α(M) ⟹ C_{M_α}(P)≠1∧C_{M_α}(PQ)=1。
+- **⚠ 2 つの BG proof 省略 (OCR でなく原文の "we can conclude"/"to get")**:
+  1. **`ℳ(N_G(Q))={M*}`**: 原文「apply Lem 12.18(a) ... to get ℳ(N_G(Q))={M*}」だが **Lem 12.18(a)
+     の結論は C_{M_α} であって ℳ ではない** → 原文の shorthand。実質要るのは **N_G(Q)⊆M***
+     (⟹ M*∈ℳ(N_G(Q))-{M} で Prop 12.15 適用可、かつ ℳ(N_G(Q))≠{M} で step 9 の Lem 12.18 可)。
+     導出は §12 の σ-uniqueness 系を要する見込み (Q=[S,R]⊆M*_σ, q∈σ(M*))。**要 §12 study**。
+  2. **`C_{M_α}(P)⊆C_{M_α}(R)` と逆**: 原文「Since [S,R]≠1 yields q∉α(M), we can conclude」。
+     q∉α(M) で Lem 12.18(a) (C_{M_α}(P)≠1, C_{M_α}(PQ)=1; rank≤1 cyclic) は出るが、**包含 itself は
+     さらに rank-1/cyclic + FPF 論法を要する** (原文 elide)。**要 derivation**。
+- step 8: C_{M_α}(P)=C_{M_α}(R) は S で正規化 (S⊆C_M(P)) + Q=[S,R] で中心化 (three-subgroups:
+  [A,R]=1 [A=C_{M_α}(R)⊆C(R)], [A,S]⊆A [S 正規化], ⟹ [Q,A]=[[S,R],A]=1) → C_{M_α}(R)=C_{M_α}(RQ)。
+- step 9: Lem 12.18(a) (r,R 版) で C_{M_α}(R)≠1, C_{M_α}(RQ)=M_α⊓C(R⊔Q)=1 ⟹ ≠ → 矛盾。
+**評価**: per-q core は ~100-150 行・2 つの BG 省略 (ℳ(N_G(Q))={M*} の N_G(Q)⊆M* / C_{M_α} 包含) の
+derivation を要する深い部分。outer reduction まで完成・committed ゆえ、ここは focused task。
+**次: N_G(Q)⊆M* の導出 (§12 σ-uniqueness) を最初に攻める。**
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
