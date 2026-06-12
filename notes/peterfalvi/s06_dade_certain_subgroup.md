@@ -1847,3 +1847,133 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
   - **要 full (3.8) trichotomy `sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41)** = LAUNCH flagged hard part
     (Fable 5 候補). step(7) counting 設計は session 30 cont. に確定済.
 - → (4.9) → S08 case-B → (6.8). 正本=本 session 32. **issue 1003 は CLOSED (条件達成).**
+
+## 2026-06-12 (session 33, b-peterfalvi, Opus 4.8 1M): ✅ (3.8) precheck=AVAILABLE + ticFullDadeApplication (σ_G 供給元) landed
+
+### ✅✅ (3.8) PRECHECK 結論: full trichotomy は既に証明済 — **Fable 5 不要**
+- `sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41) は **sorry-free + axiom-clean** (allowlist 3)。
+  abstract `grid_trichotomy` (S05_GridTrichotomy, 0 sorry) への specialization。既 landed
+  (commits 4b6c79bf/58454341/619ba765, sessions 18-19 era)。
+- ⟹ LAUNCH/session-32 の「(3.8) 本体 = この lane の真 hard part、Fable 5 候補」は **OUTDATED**。
+  本体は構築済。conclusion 3 は **Opus で `sigmaCoeff_trichotomy` を black-box 利用**で足りる。
+- signature: hVeq, app:FullDadeApplication, hψ(∀v∈V,ψv=0), hgap(w₁+2≤w₂), hNC(sigmaNC<2w₁) →
+  (a) ∀pq sigmaCoeff=0 / (b) ∃j₀ c≠0 列定数,他0 / (c) ∃i₀ c≠0 行定数,他0。
+
+### ✅ ticFullDadeApplication (σ_G の app 供給元) = session-30 blocker #1 解決 (S06_CertainTypeIsometry)
+- **h.tic も TICyclicHypothesis G ゆえ L-side `toTICyclicFullDadeApplication` と同 recipe で構成可**:
+  `⟨h.tic.toDadeHypothesis.fullDadeIsometryData (S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩`。
+  TI-cyclic ⟹ local H(a)=⊥ ⟹ HConjInvariant 無料。**build-green + axiom-clean**。
+- instance binder 要: `[Fintype h.tic.W] [Invertible (Nat.card h.tic.W : ℂ)]` (subtype Fintype は
+  DecidablePred 無で非自動合成)。**def は AxiomsCheck 非登録**(L-side app も非登録; theorem のみ登録)。
+
+### 🔑 conclusion 3 の精密 plan (以下 ▶=design、未 Lean 検証; 実装時に確認)
+σ_G = `h.tic.sigma rfl h.ticFullDadeApplication`、τ = `h.tau.toDadeMap`
+(domain = `S04.SupportedClassFunctions ℂ A₀ L` = CF(L) supported on A₀; membership = conclusion 1)。
+- **既存 certain-type 機構は全て sdiff-side** (`h.sdiffTICyclicHypothesis.W`=W1⊔W2 in L; chiColumn/columnFamily/
+  w1CharEquiv 全部 sdiff)。tic-side(G) に omega/chiColumn 無 ⟹ **sdiff↔tic 文字 bridge を新規構築要**
+  (= L↔G 群移行の hard part)。iso e:sdiff.W ≃* tic.W = `Subgroup.equivMapOfInjective (W1⊔W2) L.subtype …`。
+  ω_ij^{σ_G} := h.tic.sigma rfl app (h.tic.omega ((omegaProdChar (w1CharEquiv i) χ₂).comp e.symm))。
+- ▶ **step 4 (ψ|V=0) は full grid-index bridge 不要 — V 上の値だけで足りる(本 session の鍵 simplification)**:
+  v∈tic.V (↔ w∈sdiff.V via subtype) で ω_ij^{σ_G}(v)=(omega ξ_tic)⟨v⟩=chiColumn(χ₂,i)(w) [sigma_apply_of_mem_V],
+  (μ_ij−μ_ik)^τ(v)=(μ_ij−μ_ik)(w) [full_map_eq_of_mem_V]=δ_j·chiColumn(χ₂,i)(w)−δ_k·chiColumn(χ₂',i)(w) [(4.3.c)],
+  δ_j=δ_k (step 1) ⟹ ψ(v)=0。grid-index identification (omegaProdEquiv.symm) は steps 6-8 のみ。
+- ▶ **(b)(c) 排除 = |supp(L)|≤2 clean counting**(session-30 の row-counting より明快):
+  step 5 で (μ_ij−μ_ik)^τ=λ₁−λ₂ (distinct Irr)。sigmaCoeff(ψ)(p,q)=⟨λ₁−λ₂,chiFam(p,q)⟩−δ_j(δ[pq=ij]−δ[pq=ik])。
+  L(p,q):=⟨λ₁−λ₂,chiFam(p,q)⟩ は **非零 ≤2 個** (`ncard_inner_chiFam_ne_zero_le_one` ×2)。
+  D=δ-part=2 点 (p_i,q_j)↦−δ_j,(p_i,q_k)↦+δ_j (異列 q_j≠q_k)。
+  - (b) 列 q₀ 定数 c≠0 (w₁≥3): q_j≠q_k ⟹ ≥1 δ-点が q₀ 外 (a=0⟹L=−D≠0∈supp L); 列 q₀ の δ-点でない
+    ≥w₁−1≥2 行は a=L=c≠0∈supp L。disjoint ⟹ |supp L|≥3>2 矛盾。
+  - (c) 行 i₀ 定数 c≠0 (w₂≥5 by gap): i₀≠p_i⟹行 w₂≥5 全 pure-L; i₀=p_i⟹q∉{q_j,q_k} の w₂−2≥3 列 pure-L=c。
+    両者 |supp L|>2 矛盾。
+  - (a) ⟹ ⟨ψ,ω_ij^σ⟩=⟨ψ,ω_ik^σ⟩=0 + norm²((μ−μ)^τ)=2 ⟹ ⟨λ₁−λ₂,ω_ij^σ⟩=δ_j,⟨…,ω_ik^σ⟩=−δ_j ⟹ λ₁−λ₂=δ_j(ω_ij^σ−ω_ik^σ) ⟹ ψ=0。
+- 段階: [bridge def + step4] → [step5 norm-2] → [steps6-8 grid+counting]。複数 commit 想定。同 leaf S06_CertainTypeIsometry。
+
+正本 = 本 session 33。**(3.8) AVAILABLE・ticFullDadeApplication landed・次 = sdiff↔tic ω bridge + step 4。**
+
+### 🔧 session 33 cont. — CORRECTION: σ_G は h.tic でなく **ticVdiff** (V=W−(W₁∪W₂))
+- **🚨 上の "σ_G = h.tic.sigma rfl …" は誤り**。`sigma` は `hVeq : hyp.V = hyp.Vdiff` を要求し
+  `Vdiff = W∖(W₁∪W₂)`。だが **tic.V = W∖W₂** (≠ Vdiff) ⟹ `h.tic.sigma` は型が付かない。
+  L-side も同じ理由で σ_L は `toTICyclicHypothesis` (V=W∖(W₁∪W₂)) 上で回す (sdiffTICyclicHypothesis
+  [V=W∖W₂] でなく)。
+- **解決 = `ticVdiff : TICyclicHypothesis G`** (新規, S06_CertainTypeIsometry) — h.tic の W/W₁/W₂ を流用、
+  V := ↑tic.W∖(↑tic.W₁∪↑tic.W₂)。鍵: **V_ti は再証明不要** = `h.tic.V_ti.subset` (Vdiff⊆tic.V、`IsTISubset`
+  は集合に antitone)。W_normalizes_V は `open scoped IsMulCommutative` + 可換性。**`ticVdiff.V = ticVdiff.Vdiff`
+  は rfl** ⟹ `(ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h)` が型付く。
+- **⚠ session 33 の `ticFullDadeApplication` (h.tic 上, commit 7fe9d8bc) は mis-targeted で削除済** →
+  `ticVdiffFullDadeApplication` (ticVdiff 上) に置換。bridge (ticWEquivSdiffW/omegaProdCharTic) は
+  V 非依存ゆえ不変・流用 (omegaProdCharTic は tic.W=ticVdiff.W 上の char)。
+- **landed (build-green, axiom-clean)**: `ticVdiff`, `ticVdiffFullDadeApplication`,
+  `certainTypeOmegaSigma` (= ω_ij^σ ∈ CF(G)), `certainTypeOmegaSigma_apply_of_mem_V`
+  (v∈ticVdiff.V で ω_ij^σ(v)=chiColumn χ₂ i (e⟨v⟩))。τ-side: `certainTypeDiffSupported`,
+  `tau_toDadeMap_apply_of_mem` (τ(α)(a)=α(a) ∀a∈A₀, via a∈hCoset a, H 自明性不要)。
+- **▶ 次 = step 4** (ψ:=(μ_ij−μ_ik)^τ − δ_j(ω_ij^σ−ω_ik^σ) が ticVdiff.V で消滅): v∈ticVdiff.V=W∖(W₁∪W₂)
+  ⊆ sdiff.V=W∖W₂ ゆえ (4.3.c) 適用可。(A) τ値 = tau_toDadeMap_apply_of_mem (要 v∈A₀ = `Or.inr ⟨1,_,v,hv',by group⟩`
+  + e⟨v⟩↔⟨v,mem_L⟩ 同一視 via coe_ticWEquivSdiffW+subtype_injective) → (4.3.c)×2; (B) ω値 =
+  certainTypeOmegaSigma_apply_of_mem_V; 差 = (δ_j−δ_k)·chiColumn χ₂' i (e⟨v⟩) = 0 (step 1)。
+
+### ✅ session 33 cont.² — step (4) landed + steps 5-8 endgame plan 確定 (φ(1)=0 回避)
+- **✅ landed (build-green, axiom-clean)**: `certainType_diff_dade_apply_eq_of_mem_V` (step 4):
+  v∈ticVdiff.V で `(μ_ij−μ_ik)^τ(v) = δ_j(ω_ij^σ(v)−ω_ik^σ(v))`。L↔G plumbing 全 discharge
+  (v∈A₀ via l=1; (w:L)=⟨v,_⟩ via Subtype.ext+coe_ticWEquivSdiffW; (w:L)∈sdiff.V; (4.3.c)×2 + step1)。
+  recipe = tau_toDadeMap_apply_of_mem → ClassFunction.sub_apply → ←hwL → certainType_apply_eq_of_mem_V×2
+  → hwpt (Subtype.ext rfl) → certainTypeOmegaSigma_apply_of_mem_V×2 → certainType_sign_eq → ring。
+- **▶▶ 残 = steps 5-8 (trichotomy endgame, 別 commit ~150-250 行)。設計確定 (再調査不要)**:
+  φ := h.tau.toDadeMap (certainTypeDiffSupported …), ψ := φ − δ_j•(ω_ij^σ − ω_ik^σ) [= certainTypeOmegaSigma×2]。
+  1. **ψ が V で消滅**: step4 (= equality) を `ψ v = 0` 形へ (φ(v) − δ_j(ω_ij^σ(v)−ω_ik^σ(v)) = 0)。
+  2. **‖φ‖²=2**: `h.tau.toDadeIsometryData.isDadeIsometry.inner_eq` (or full_inner_eq pattern) ⟹
+     ⟨φ,φ⟩=⟨μ_ij−μ_ik,μ_ij−μ_ik⟩=2。**要 μ_ij≠μ_ik** ⟹ **conclusion 3 に χ₂≠χ₂' 仮説追加**
+     (textbook 0<j,k<w₂ で j=k なら自明 0=0; (4.1) 列間 distinct で μ_ij≠μ_ik)。φ∈ZIrr via maps_virtualCharacter。
+  3. **f(p,q):=⟨φ,chiFam(p,q)⟩ は ℤ 値** (`inner_mem_ZIrr_int`, φ∈ZIrr ∧ chiFam∈ZIrr) ∧ **∑f²≤‖φ‖²=2**
+     (Bessel, chiFam 正規直交) ⟹ **|supp f|≤2**。[Bessel/「norm² n ⟹ ≤n nonzero」補題 = 要発掘 or 自作;
+     `ncard_inner_chiFam_ne_zero_le_one` [S05:1460, norm1→≤1] の norm2 一般化]。
+  4. **sigmaCoeff(ψ)(p,q) = f(p,q) − δ_j([pq=P_ij]−[pq=P_ik])** (ω_ij^σ=chiFam(P_ij), via sigma_omega +
+     omegaProdEquiv.symm 同定; P_ij=(w1char i 系の tic-index, χ₂); 異列 P_ij≠P_ik [col q_j≠q_k])。
+     ⟹ **NC(ψ)=|supp(sigmaCoeff ψ)| ≤ |supp f|+2 ≤ 4 < 2w₁** (w₁≥3)。
+  5. **trichotomy** `sigmaCoeff_trichotomy hVeq=rfl app=ticVdiffFullDadeApplication hψ hgap hNC`:
+     hgap=w₁+2≤w₂ [要 (W odd ⟹ w₁<w₂) 補題; gap], hNC=NC<2w₁。→ (a)/(b)/(c)。
+  6. **(a)** [∀pq sigmaCoeff=0] ⟹ ⟨ψ,chiFam(P_ij)⟩=⟨ψ,chiFam(P_ik)⟩=0 ⟹ ⟨φ,ω_ij^σ⟩=δ_j, ⟨φ,ω_ik^σ⟩=−δ_j
+     ⟹ **‖ψ‖²= 2 − 2δ_j(δ_j−(−δ_j)) + δ_j²·2 = 2−4+2 = 0 ⟹ ψ=0** (norm 計算; chiFam 正規直交+δ²=1)。
+     **🔑 `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` [S05:1234] は χ=0 でなく χ|V=0 しか出さない ⟹ case(a) には不可。norm 論法が要**。
+  7. **(b)** [列 q₀ 定数 c≠0, w₁≥3 行] ⟹ p≠p_i の ≥w₁−1≥2 行で sigmaCoeff=f=c≠0 (2 個の f 非零) +
+     δ-点の ≥1 個が q₀ 外 (sigmaCoeff=0 ⟹ f=±δ_j≠0, 3 個目) ⟹ |supp f|≥3 >2 矛盾。
+  8. **(c)** [行 i₀ 定数 c≠0, w₂≥5 by gap] ⟹ q∉{q_j,q_k} の w₂−2≥3 列で sigmaCoeff=f=c≠0 ⟹ |supp f|≥3 矛盾。
+- **🔑🔑 φ(1)=0 は不要** (session 30 plan の step5「1 で消滅⟹λ₁−λ₂」は norm 論法で代替; 1∈dadeSupport は
+  H(a) 依存で abstract に否定不可 — 深入り回避)。**`exists_irr_sub_irr_of_inner_self_two` も不要**。
+- **要発掘/自作 補題** (次 session 最初): (i) ‖φ‖²=2 の isometry 経路 (h.tau.…isDadeIsometry.inner_eq の正確名),
+  (ii) |supp f|≤2 (Bessel or norm2→≤2), (iii) w₁<w₂ ⟹ w₁+2≤w₂ (odd gap), (iv) sigmaCoeff(ψ) の f+δ 展開
+  (ω_ij^σ=chiFam(P_ij) 同定 = omegaProdCharTic→sigma_omega→omegaProdEquiv.symm)。
+正本 = 本 session 33。**foundation+step4 DONE。endgame は上記 8 段で確定 (φ(1)=0/λ₁−λ₂ 回避済)。**
+
+### ✅ session 33 cont.³ — endgame INPUT 補題 全 landed (残 = trichotomy assembly のみ)
+**landed (build-green, axiom-clean, AxiomsCheck 登録済)**:
+- `certainType_diff_dade_apply_eq_of_mem_V` (step 4): ψ が V で消滅 (equality 形)。
+- `certainType_diff_dade_inner_self`: **‖φ‖²=2** (要 χ₂≠χ₂'; τ isometry `h.tau.inner_eq` + `columnFamily_mu_ne` (4.1))。
+- `sigmaNC_dade_le_two`: **NC(φ)≤2** (norm-2⟹2 constituents via `mem_ZIrr_inner_self_eq_sum_sq`+
+  `exists_pair_of_sum_sq_eq_two`、φ=ε_α α+ε_β β、各 `ncard_inner_chiFam_ne_zero_le_one`≤1、supp⊆S_α∪S_β)。
+  **gotcha (再調査不要)**: 文字群 index の `Finite` synth が ticVdiff unfold で timeout → proof 冒頭で
+  `haveI : Fintype (W1hat) := Fintype.ofFinite _` ×2 + `haveI : Fintype (prod) := inferInstance` +
+  `haveI : Finite (prod) := Finite.of_fintype _`、union finite は `Set.finite_univ.subset (subset_univ _)`。
+- `certainTypeOmegaSigma_eq_chiFam`: **ω_ij^σ = chiFam(P_ij)** where P_ij=`omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)`
+  (= `sigma_omega` 一発)。⟹ δ-term 位置 P_ij,P_ik 確定。
+
+### ▶▶ 残 = trichotomy assembly (1 セッション規模、設計確定)
+φ:=h.tau.toDadeMap(certainTypeDiffSupported …)、ψ:=φ − δ_j•(certainTypeOmegaSigma χ₂ i − certainTypeOmegaSigma χ₂' i)。
+1. **ψ vanish on V**: step4 (equality) を `ψ v=0` に (`ClassFunction.sub_apply`+`smul_apply`、自明)。
+2. **NC(ψ)≤4**: sigmaCoeff(ψ)(pq)=⟨ψ,chiFam pq⟩ = ⟨φ,chiFam pq⟩ − δ_j([pq=P_ij]−[pq=P_ik])
+   [certainTypeOmegaSigma_eq_chiFam + chiFam 正規直交 `chiFam_spec.2.2.1`]。
+   ⟹ supp(sigmaCoeff ψ) ⊆ supp(sigmaCoeff φ) ∪ {P_ij,P_ik}、NC(ψ)≤NC(φ)+2≤4。
+3. **🔑🔑 ORIENTATION 問題 (残 hard part の核)**: `sigmaCoeff_trichotomy` は **w₁+2≤w₂** (W₁=rows) を要求。
+   だが certain-type に w₁<w₂ は無い (確認済: CertainTypeHypothesis に順序無)。**ただし `coprime_card_W1_card_W2`
+   ⟹ w₁≠w₂、両 odd ⟹ |w₂−w₁|≥2**。⟹ **小さい方を rows に取れば gap 成立** (min+2≤max、max≥5)。
+   - w₁<w₂: `sigmaCoeff_trichotomy` 直接 (rows=Ŵ₁、gap=w₁+2≤w₂、NC<2w₁≥6)。
+   - w₂<w₁: **transposed** — `grid_trichotomy` を a'(q,p)=sigmaCoeff(p,q) に (ι=Ŵ₂,κ=Ŵ₁) で直接適用
+     (separability/NC は転置不変、gap=w₂+2≤w₁)。(b')(c') は (c)(b) に対応。**両 case 要 = 残最大作業**。
+   - 別解: min(w₁,w₂)≥5 なら corollary `sigmaCoeff_eq_zero_of_sigmaNC_lt` (NC<min) で case(a) 直接 ⟹
+     trichotomy 不要。**min=3 の時だけ** trichotomy+orientation 要 (w_smaller=3 を rows)。
+4. **(b)(c) 排除 = |supp f|≥3 矛盾** (f=sigmaCoeff φ、|supp f|≤2): 列定数 c≠0 (rows≥3 行) ⟹ p≠p_i の
+   ≥rows−1≥2 行 pure-f=c + 異列 δ-点≥1 個 off-column (f=±δ_j) ⟹ |supp f|≥3>2。行定数も同様 (cols≥5、cols−2≥3)。
+5. **(a) ⟹ ψ=0**: ⟨ψ,chiFam P_ij⟩=⟨ψ,chiFam P_ik⟩=0 ⟹ ⟨φ,ω_ij^σ⟩=δ_j,⟨φ,ω_ik^σ⟩=−δ_j ⟹
+   ‖ψ‖²=2−2δ_j(δ_j−(−δ_j))+2=0 (chiFam 正規直交+δ²=1) ⟹ ψ=0 (`ClassFunction.inner_self_eq_zero`)。
+6. **最終 statement**: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)` (要 χ₂≠χ₂'; ψ=0 から移項) → (4.9) → case-B → (6.8)。
+
+正本 = 本 session 33 cont.³。**input 補題 全 landed (9 commits)。残 = assembly (orientation 込み trichotomy)、1 セッション。**

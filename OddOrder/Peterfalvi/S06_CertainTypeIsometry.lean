@@ -20,28 +20,154 @@ Under Hypothesis (4.6), fix a row index `i` (`0 ≤ i < w₁`) and two nontrivia
 * the column signs agree, `δ_j = δ_k`;
 * the Dade image is `(μ_{ij} − μ_{ik})^τ = δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.
 
-This file develops the proof in stages (Peterfalvi's eight-step argument).  The present
-commit lands **step (1)**: the sign equality `δ_j = δ_k`, an independent consequence of the
-degree congruence (4.3.d) and `w₁ > 2`.
+This file develops the proof in stages (Peterfalvi's eight-step argument).
 
-## Step (1): `δ_j = δ_k`
+Landed so far:
+* **step (1)** `certainType_sign_eq_of_degree_eq`: the sign equality `δ_j = δ_k`, from the degree
+  congruence (4.3.d) and `w₁ > 2`;
+* **step (2)** `certainType_apply_eq_of_mem_W1`: `μ_{ij} − μ_{ik}` vanishes on `W₁`;
+* **conclusion (1)** `certainType_diff_supp_subset_A0`: `Supp(μ_{ij} − μ_{ik}) ⊆ A₀`;
+* the `σ_G` foundation — `ticVdiff` (the `G`-side `V = W − (W₁ ∪ W₂)` TI-cyclic, on which `σ` runs),
+  the L↔G bridge (`ticWEquivSdiffW`, `omegaProdCharTic`), `certainTypeOmegaSigma` (`ω_{ij}^σ`) and
+  the `τ`-side `certainTypeDiffSupported` / `tau_toDadeMap_apply_of_mem`;
+* **step (4)** `certainType_diff_dade_apply_eq_of_mem_V`: the two sides agree on `V`.
 
-By (4.3.d) (`certainType_degree_modEq`) there are integers `a, b` with
-`μ_{ij}(1) = δ_j + a·w₁` and `μ_{ik}(1) = δ_k + b·w₁`.  The equal-degree hypothesis gives
-`δ_j − δ_k = (b − a)·w₁`, so `w₁ ∣ (δ_j − δ_k)`.  As `δ_j, δ_k ∈ {±1}` we have
-`|δ_j − δ_k| ≤ 2 < 3 ≤ w₁` (`three_le_card_W1`: `W₁ ≠ 1` is of odd order), forcing
-`δ_j − δ_k = 0`.
+Remaining (steps 5-8, the `(3.8)` trichotomy endgame): `ψ := (μ_{ij} − μ_{ik})^τ −
+δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step 4), has `NC(ψ) ≤ 4 < 2w₁`, so the trichotomy
+`sigmaCoeff_trichotomy` applies; cases (b)/(c) are excluded and case (a) forces `ψ = 0`.
 
-Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 30").
+Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 33").
 -/
 
 namespace OddOrder.Peterfalvi.S06
 
 open OddOrder.RepresentationTheory
+open scoped IsMulCommutative
 
 variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+
+/-- The (3.1)-for-`G` TI-cyclic hypothesis on the **smaller** TI set `V = W − (W₁ ∪ W₂)`, the one
+the §5 `σ`-machinery ((3.2)-(3.9)) runs on (the `ω_{ij}`-basis lives in `CF(W, V)`, vanishing on
+`W₁` and `W₂`).  The ambient `h.tic` carries `V = W − W₂` for the Dade isometry `τ`; this shrinks
+the TI set, which stays TI since `W − (W₁ ∪ W₂) ⊆ W − W₂` and `IsTISubset` is antitone in the set
+(`tic.V_ti.subset`).  This is the `G`-side analogue of the `(L, W)`-side `toTICyclicHypothesis`, and
+is what makes `σ_G` (its `sigma`) well-typed: `ticVdiff.V = ticVdiff.Vdiff` by `rfl`. -/
+noncomputable def ticVdiff (h : Hypothesis46 A L) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis G where
+  W := h.tic.W
+  W1 := h.tic.W1
+  W2 := h.tic.W2
+  W1_le_W := h.tic.W1_le_W
+  W2_le_W := h.tic.W2_le_W
+  W1_nontrivial := h.tic.W1_nontrivial
+  W2_nontrivial := h.tic.W2_nontrivial
+  W_sup := h.tic.W_sup
+  W_disjoint := h.tic.W_disjoint
+  W_card_coprime := h.tic.W_card_coprime
+  W_card_odd := h.tic.W_card_odd
+  W_cyclic := h.tic.W_cyclic
+  V := (↑h.tic.W : Set G) \ ((↑h.tic.W1 : Set G) ∪ (↑h.tic.W2 : Set G))
+  V_subset_sharp := fun v hv => by
+    rw [OddOrder.Peterfalvi.S04.mem_sharp]
+    exact ⟨Set.mem_univ v, fun heq => hv.2 (Or.inl (by rw [heq]; exact Subgroup.one_mem h.tic.W1))⟩
+  V_subset_W := fun _ hv => hv.1
+  W_normalizes_V := by
+    intro w v hv
+    haveI := h.tic.isMulCommutative_W
+    have h1 : (⟨v, hv.1⟩ : ↥h.tic.W) * w = w * ⟨v, hv.1⟩ := mul_comm _ _
+    have h2 : (w : G) * v = v * (w : G) := (Subtype.ext_iff.mp h1).symm
+    have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [h2]; exact mul_inv_cancel_right v w
+    rw [h3]; exact hv
+  V_ti := h.tic.V_ti.subset (by
+    rw [h.tic_V]; exact fun _ hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩)
+
+/-- The canonical Dade application driving `σ_G`: the §4 Dade package on `ticVdiff`'s TI set
+`V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so `HConjInvariant` holds
+for free.  Mirror of the `(L, W)`-side `toTICyclicFullDadeApplication`. -/
+noncomputable def ticVdiffFullDadeApplication (h : Hypothesis46 A L)
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)] :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication (ticVdiff h) :=
+  ⟨(ticVdiff h).toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
+/-- `tic.W = (W₁ ⊔ W₂).map (L ↪ G)`: the ambient (3.1)-for-`G` group is the `G`-image of the
+certain-type `W = W₁ ⊔ W₂ ≤ L`.  (Named so the bridge `ticWEquivSdiffW` and its coherence share one
+proof term.) -/
+theorem tic_W_eq_map (h : Hypothesis46 A L) :
+    h.tic.W = (h.W1 ⊔ h.W2).map L.subtype := by
+  rw [← h.tic.W_sup, h.tic_W1, h.tic_W2, ← Subgroup.map_sup]
+
+/-- The bridge isomorphism `tic.W ≃* sdiff.W` — both are `W₁ ⊔ W₂`, one as a subgroup of `G`, the
+other of `L`, identified by the corestriction of `L ↪ G`.  Transports the `sdiff`-side `(L, W)`
+characters (`omegaProdChar`, `chiColumn`) to the `tic`-side `(G, W)` for the `G`-side `σ`. -/
+noncomputable def ticWEquivSdiffW (h : Hypothesis46 A L) :
+    h.tic.W ≃* h.sdiffTICyclicHypothesis.W :=
+  (MulEquiv.subgroupCongr (tic_W_eq_map h)).trans
+    (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).symm
+
+/-- Carrier coherence for the bridge: the underlying `G`-element of `g : tic.W` equals the image of
+its `sdiff.W` partner under `L ↪ G`. -/
+theorem coe_ticWEquivSdiffW (h : Hypothesis46 A L) (g : h.tic.W) :
+    ((ticWEquivSdiffW h g : ↥L) : G) = (g : G) := by
+  -- `equivMapOfInjective` undoes the `.symm` in the bridge, landing back on the `subgroupCongr` cast
+  have key : (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective)
+      (ticWEquivSdiffW h g) = MulEquiv.subgroupCongr (tic_W_eq_map h) g :=
+    (Subgroup.equivMapOfInjective (h.W1 ⊔ h.W2) L.subtype L.subtype_injective).apply_symm_apply _
+  simpa [Subgroup.coe_equivMapOfInjective_apply, MulEquiv.subgroupCongr_apply] using
+    congrArg (fun x : ((h.W1 ⊔ h.W2).map L.subtype) => (x : G)) key
+
+/-- The `tic`-side (`G`) linear character `ω_{ij}` of `W = W₁ ⊔ W₂`, transported from the
+`sdiff`-side `omegaProdChar (w1CharEquiv i) χ₂` along the bridge `ticWEquivSdiffW`.  Its `σ_G`-image
+`h.tic.sigma rfl (ticFullDadeApplication h) (h.tic.omega …)` is the `ω_{ij}^σ ∈ CF(G)` of (4.8)
+conclusion (3). -/
+noncomputable def omegaProdCharTic (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    h.tic.W →* ℂˣ :=
+  (h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂).comp (ticWEquivSdiffW h)
+
+/-- The transported `tic`-side character evaluates as the `sdiff`-side `chiColumn` at the bridge
+partner: `ω_{ij}^{tic}(g) = ω_{ij}(e g) = chiColumn χ₂ i (e g)` (`e = ticWEquivSdiffW`). -/
+theorem omegaProdCharTic_apply (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (g : h.tic.W) :
+    ((omegaProdCharTic h χ₂ i g : ℂˣ) : ℂ)
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) (ticWEquivSdiffW h g) := by
+  rw [omegaProdCharTic, MonoidHom.comp_apply, Hypothesis.chiColumn,
+    h.sdiffTICyclicHypothesis.omega_apply]
+  rfl
+
+/-- The `G`-side `σ`-image `ω_{ij}^σ ∈ CF(G)` of the certain-type column character `ω_{ij}`, built
+from the `ticVdiff` σ-machinery applied to the transported `tic`-side character `omegaProdCharTic`.
+This is the right-hand side ingredient of (4.8) conclusion (3). -/
+noncomputable def certainTypeOmegaSigma (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) : ClassFunction G ℂ :=
+  (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h)
+    ((ticVdiff h).omega (omegaProdCharTic h χ₂ i))
+
+/-- The `σ_G`-image on `V = W − (W₁ ∪ W₂)`: `ω_{ij}^σ(v) = ω_{ij}(v) = chiColumn χ₂ i (e v)`
+(`sigma_apply_of_mem_V` (3.2.c) + `omega_apply` + `omegaProdCharTic_apply`). -/
+theorem certainTypeOmegaSigma_apply_of_mem_V (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    certainTypeOmegaSigma h χ₂ i v
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          (ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩) := by
+  rw [certainTypeOmegaSigma, (ticVdiff h).sigma_apply_of_mem_V rfl _ _ hv,
+    (ticVdiff h).omega_apply]
+  exact omegaProdCharTic_apply h χ₂ i _
+
+/-- The `σ_G`-image `ω_{ij}^σ` is the `χ`-family member at the index `omegaProdEquiv.symm` of the
+transported character: `ω_{ij}^σ = χ_{P_{ij}}` (`sigma_omega`).  This identifies the two `δ`-term
+positions `P_{ij}, P_{ik}` in the `σ`-coefficient grid of (4.8). -/
+theorem certainTypeOmegaSigma_eq_chiFam (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    certainTypeOmegaSigma h χ₂ i = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h)
+      ((ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)) :=
+  (ticVdiff h).sigma_omega rfl (ticVdiffFullDadeApplication h) (omegaProdCharTic h χ₂ i)
 
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
@@ -201,5 +327,170 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
           rw [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hxbot
           exact hx1 hxbot
       exact ⟨L.subtype c, c.2, L.subtype (x * y), hvV, by rw [hz_eq]; simp [map_mul, map_inv]⟩
+
+/-- `μ_{ij} − μ_{ik}` as an element of Peterfalvi's `CF(L, A₀)` (`SupportedClassFunctions` on
+`A₀ = A ∪ V^L`), the domain element fed to the certain-type Dade isometry `τ`.  The support
+condition is exactly conclusion (1) `certainType_diff_supp_subset_A0`. -/
+noncomputable def certainTypeDiffSupported (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+  ⟨((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ), by
+    rw [ClassFunction.mem_supportedSubmodule]
+    intro z hz
+    rw [ClassFunction.mem_support] at hz
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    exact certainType_diff_supp_subset_A0 h hχ₂ hχ₂' i hdeg hz⟩
+
+/-- The certain-type Dade isometry `τ` (= `h.tau`) preserves values on its support `A₀`:
+`τ(α)(a) = α(a)` for every `a ∈ A₀`.  Since `a = a · 1` and `1 ∈ H(a)`, the point `a` lies in its
+own `H`-coset, so the general `map_eq_of_mem_hCoset` applies even though the certain-type `dade0`
+need not have trivial local subgroups. -/
+theorem tau_toDadeMap_apply_of_mem (h : Hypothesis46 A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
+    {a : G} (ha : a ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G)) :
+    h.tau.toDadeMap α a = (α : ClassFunction ↥L ℂ) ⟨a, h.dade0.mem_L ha⟩ :=
+  h.tau.toDadeIsometryData.isDadeMap.map_eq_of_mem_hCoset α ⟨a, ha⟩
+    ⟨1, one_mem _, (mul_one _).symm⟩
+
+/-- **Peterfalvi (4.8), step (4)** (the two sides agree on `V`).  For `v ∈ V = W − (W₁ ∪ W₂)`,
+`(μ_{ij} − μ_{ik})^τ(v) = δ_j·(ω_{ij}^σ(v) − ω_{ik}^σ(v))`.
+
+On `V` both maps are value-preserving: `τ` preserves values on `A₀ ⊇ V^L`
+(`tau_toDadeMap_apply_of_mem`) and `σ_G` on `V` (`certainTypeOmegaSigma_apply_of_mem_V`).  Writing
+`w = e v` for the `sdiff.W` partner of `v` (`ticWEquivSdiffW`), the (4.3.c) value identity gives
+`μ_{ij}(w) = δ_j·ω_{ij}(w)`, `μ_{ik}(w) = δ_k·ω_{ik}(w)`, and `δ_j = δ_k` (step (1)) makes the two
+sides coincide. -/
+theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) v
+      = ((h.columnFamily χ₂).sign : ℂ)
+        * (certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂' i v) := by
+  -- `v ∈ tic.V` (the larger TI set), hence `v ∈ A₀`
+  have hv_ticV : v ∈ h.tic.V := by
+    rw [h.tic_V]; exact ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+  have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
+    Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
+  -- the `sdiff.W` partner `w = e v`, with `(w : L) = ⟨v, _⟩` and `(w : L) ∈ sdiff.V`
+  set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
+  have hwG : ((w : ↥L) : G) = v := coe_ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩
+  have hwL : (w : ↥L) = ⟨v, h.dade0.mem_L hvA0⟩ := Subtype.ext hwG
+  have hwsdiffV : (w : ↥L) ∈ h.sdiffTICyclicHypothesis.V := by
+    refine ⟨w.2, fun hW2 => ?_⟩
+    have hvW2 : v ∈ h.tic.W2 := by
+      rw [h.tic_W2]; exact ⟨(w : ↥L), hW2, hwG⟩
+    exact hv.2 (Or.inr hvW2)
+  -- the point `⟨(w:L), _⟩ : sdiff.W` is `w` itself
+  have hwpt : (⟨(w : ↥L), h.sdiffTICyclicHypothesis.V_subset_W hwsdiffV⟩ :
+      h.sdiffTICyclicHypothesis.W) = w := Subtype.ext rfl
+  rw [tau_toDadeMap_apply_of_mem h _ hvA0]
+  show (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) ⟨v, h.dade0.mem_L hvA0⟩ = _
+  rw [ClassFunction.sub_apply, ← hwL,
+    h.certainType_apply_eq_of_mem_V χ₂ i hwsdiffV,
+    h.certainType_apply_eq_of_mem_V χ₂' i hwsdiffV, hwpt,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂ i hv,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂' i hv,
+    certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg]
+  ring
+
+/-- **Peterfalvi (4.8), step (5) input** (`‖φ‖² = 2`).  For distinct columns `χ₂ ≠ χ₂'`, the Dade
+image `φ = (μ_{ij} − μ_{ik})^τ` is a virtual character of squared norm `2`: `τ` is an isometry
+(`h.tau.inner_eq`), `μ_{ij}, μ_{ik}` are distinct irreducibles (`columnFamily_mu_ne`, (4.1)), so
+`⟨φ, φ⟩ = ⟨μ_{ij} − μ_{ik}, μ_{ij} − μ_{ik}⟩ = 1 + 1 = 2`. -/
+theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    ClassFunction.inner (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg))
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) = 2 := by
+  rw [h.tau.inner_eq]
+  show ClassFunction.inner
+      (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+        - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
+      (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+        - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) = 2
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite,
+    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite, if_pos rfl, if_pos rfl,
+    if_neg (h.columnFamily_mu_ne hχ i i), if_neg (h.columnFamily_mu_ne hχ i i).symm]
+  ring
+
+/-- **Peterfalvi (4.8), step (6) input** (`NC(φ) ≤ 2`).  The Dade image `φ = (μ_{ij} − μ_{ik})^τ`,
+of squared norm `2`, has at most two nonzero `σ`-image coefficients.  By `mem_ZIrr_inner_self_eq_sum_sq`
++ `exists_pair_of_sum_sq_eq_two` it is `ε_α·α + ε_β·β` for two distinct irreducibles `α, β`; each of
+`α, β` has `≤ 1` nonzero inner product against the orthonormal `χ`-family
+(`ncard_inner_chiFam_ne_zero_le_one`), and `Supp(φ-coeffs) ⊆ S_α ∪ S_β`. -/
+theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    (ticVdiff h).sigmaNC rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) ≤ 2 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI hfprod : Fintype (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := inferInstance
+  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+  have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
+    ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
+      ((h.columnFamily χ₂').mu i).mem_ZIrr)
+  have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
+  obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hαZ : α ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨α, hαm⟩ : IrreducibleCharacter G)
+  have hβZ : β ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨β, hβm⟩ : IrreducibleCharacter G)
+  have hα1 : ClassFunction.inner α α = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ⟨α, hαm⟩
+    rwa [if_pos rfl] at this
+  have hβ1 : ClassFunction.inner β β = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ⟨β, hβm⟩
+    rwa [if_pos rfl] at this
+  have hφαβ : φ = (c α : ℂ) • α + (c β : ℂ) • β := by
+    rw [hrepr, hs, Finset.sum_pair hαβ]
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC]
+  refine le_trans (Set.ncard_le_ncard (t :=
+    {pq | ClassFunction.inner α ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0} ∪
+    {pq | ClassFunction.inner β ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0})
+    ?_ (Set.finite_univ.subset (Set.subset_univ _))) (le_trans (Set.ncard_union_le _ _) ?_)
+  · intro pq hpq
+    simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, Set.mem_setOf_eq] at hpq
+    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
+    by_contra hcon
+    push_neg at hcon
+    exact hpq (by rw [hφαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
+  · exact add_le_add
+      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hαZ hα1)
+      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hβZ hβ1)
 
 end OddOrder.Peterfalvi.S06
