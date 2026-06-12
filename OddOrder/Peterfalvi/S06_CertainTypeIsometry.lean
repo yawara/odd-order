@@ -557,4 +557,30 @@ theorem sigmaCoeff_dade_eq_zero_or_one (h : Hypothesis46 A L)
       rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
     · rw [if_neg hαe, if_neg hβe]; left; ring
 
+open scoped Classical in
+/-- The `σ`-coefficient grid of `ψ = φ − δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.  As `ω_{ij}^σ = χ_{P_{ij}}`
+(`certainTypeOmegaSigma_eq_chiFam`) and the `χ`-family is orthonormal, the `δ`-part contributes
+`∓δ_j` exactly at the two grid positions `P_{ij}, P_{ik}`:
+`a(pq) = ⟨φ, χ_{pq}⟩ − δ_j·([P_{ij} = pq] − [P_{ik} = pq])`. -/
+theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (φ : ClassFunction G ℂ)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (φ - (h.columnFamily χ₂).sign •
+          (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq
+      = (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
+        - ((h.columnFamily χ₂).sign : ℂ)
+          * ((if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) = pq then (1 : ℂ) else 0)
+            - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
+                then (1 : ℂ) else 0)) := by
+  simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]
+  rw [certainTypeOmegaSigma_eq_chiFam, certainTypeOmegaSigma_eq_chiFam,
+    ClassFunction.inner_sub_left, ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign,
+    ClassFunction.inner_smul_left, ClassFunction.inner_sub_left,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1]
+
 end OddOrder.Peterfalvi.S06
