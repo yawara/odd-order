@@ -124,7 +124,27 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hMstarNe ((nonabelian_pgroup_isUniquelyMaximal hG hSpg hnab).eq_of_isCoatom_of_le
       (mem_maximalSubgroups.mp h.mem_maximal) (hSMsig.trans (S10.Msigma_le M))
       hMstarCo hSMstar).symm
-  -- steps 4b-9: `C_⁅S,R⁆(R) = 1`, `ℳ(N_G(Q)) = {M*}`, Prop 12.15, `C_{M_α}` contradiction. 🚧
+  -- step 4b: `C_⁅S,R⁆(R) = 1` (coprime FPF on the abelian `S`).
+  have hSne : S ≠ ⊥ := fun hb => hQne (by rw [hb, Subgroup.commutator_bot_left])
+  have hqσ : q ∈ S10.sigma M :=
+    S10.Msigma_isPiGroup M q (mem_primeFactors_of_isPGroup_le hq hSMsig hSne hSpg)
+  have hrq : r ≠ q := fun heq =>
+    h.not_mem_sigma_of_mem_primeFactors hG hr (heq.symm ▸ hqσ)
+  have hcop_SR : Nat.Coprime (Nat.card ↥R) (Nat.card ↥S) :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (S10.sigma M)ᶜ)
+      Nat.card_pos.ne' Nat.card_pos.ne'
+      (fun s hs => h.isPiGroup_sigma_compl hG s (Nat.mem_primeFactors.mpr
+        ⟨(Nat.mem_primeFactors.mp hs).1,
+          (Nat.mem_primeFactors.mp hs).2.1.trans (Subgroup.card_dvd_of_le hRE), Nat.card_pos.ne'⟩))
+      (fun s hs hsc => hsc (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr
+        ⟨(Nat.mem_primeFactors.mp hs).1,
+          (Nat.mem_primeFactors.mp hs).2.1.trans (Subgroup.card_dvd_of_le hSMsig), Nat.card_pos.ne'⟩)))
+  have hRS_norm : R ≤ Subgroup.normalizer (S : Set G) := le_sup_right.trans hSinv
+  have hCQR : ⁅S, R⁆ ⊓ Subgroup.centralizer (R : Set G) = ⊥ :=
+    commutator_inf_centralizer_eq_bot_of_isCommutative
+      (fun a ha b hb => congrArg Subtype.val (hSab.is_comm.comm (⟨a, ha⟩ : ↥S) ⟨b, hb⟩))
+      hRS_norm hcop_SR
+  -- steps 5-9: `ℳ(N_G(Q)) = {M*}`, Prop 12.15, `C_{M_α}` contradiction. 🚧
   sorry
 
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
