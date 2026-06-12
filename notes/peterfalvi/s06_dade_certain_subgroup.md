@@ -2335,3 +2335,59 @@ supp μ_j⊆A∪{1}、差は1で消える)。
 4. **capstone** `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
    (certainTypeSet h k) (supportInSubgroup A L)` (要 k≠1)、5 field 組立。→ S08 case-B。
 **正本=本 session 37 cont.。field 4 核心 DONE; 次 = generated-by-differences Finsupp lemma。**
+
+## 2026-06-13 (session 37 cont.², /loop): 🎉🎉🎉 Peterfalvi (4.9)(b) COMPLETE — certain-type coherence
+
+**`certainType_isCoherent`** (S06_CertainTypeCoherence, capstone `187b5517`, axiom-clean, full build
+3794 + AxiomsCheck OK)。**Theorem (4.9)(b) 完全形式化** — Dade 写像 `τ = dadeIntegralCharacterMap
+h.dade0 h.tau` は certain-type 集合 `𝒯` 上 coherent:
+`S07.IsCoherent τ (certainTypeSet h k) (S04.supportInSubgroup A L)` (要 `k ≠ 1`)、5 field 全証明:
+
+- **field 2 (extension)** = `certainTypeExtension h` (μ_ij ↦ δ_j ω_ij^σ)。
+- **field 3 (isometry)** = `certainTypeExtension_inner_eq` (span_induction₂)。
+- **field 4 (τ-agree)** = `certainTypeExtension_eq_dade_of_mem_zSupportedSpan`:
+  generator `certainTypeExtension_columnDiff_eq_dade` (核心、`IsDadeMap.unique` + (4.8) summed) +
+  生成 `mem_span_columnDiff_of_mem_zSupportedSpan` (sup-decomp `Z[𝒯] ≤ D ⊔ ℤ·μ_k`、1∉A=`h.dade0.ne_one`、
+  μ_k(1)≠0=`irreducibleCharacter_apply_one_eq_pos_natCast`) + `eq_on_zSpan_of_eq_on`。
+- **field 5 (ZIrr)** = `certainTypeExtension_mem_ZIrr` (span_induction + `sigma_mem_ZIrr`)。
+- **field 1 (nonzero)** = `certainType_nonzero`: μ̄_k−μ_k (μ̄_k=μ_{k⁻¹}∈𝒯、`columnSum_inv_apply_one`
+  [複素共役は実次数固定: `map_natCast`]、≠0=`certainType_columnSum_conj_ne`)。
+
+session 37 全体 = **10 commits** (foundation→𝒯+ZIrr→isometry→support infra→field4 infra→generator
+agreement→field4→nonzero+capstone + notes×2)。**§5 (3.x) + §6 (4.1)-(4.9) 全 COMPLETE。**
+
+### ▶▶ 次 = case-B 配線 or (4.10) (session 38 で RECON 要)
+
+**(4.9) は S08 case-B (`sibleySetup_is_coherent` の CertainType branch / S08 sole sorry) の入力。**
+残る選択肢:
+1. **S08 case-B 配線** (本命): certain-type `Hypothesis46` ↔ Sibley setup の接続を精査し、
+   `certainType_isCoherent` を X-chain coherence に注入。**大 glue** (S08 X-nonempty sorry は
+   Frobenius/CertainType case split + per-step data + 合成 ν の構築要; (4.9) は CertainType 側の
+   coherence 供給のみ)。RECON 必須: S08_CoherenceTheorems:59 sorry の構造、何が Hypothesis46 を
+   構成するか、certainType_isCoherent をどの interface に渡すか。
+2. **(4.10)** (`(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`): (4.9) 非依存の
+   補助恒等式。(4.8) generator + grid 拡張で書けそうだが case-B critical path 外の可能性。
+**推奨第一手 = S08 case-B sorry (S08_CoherenceTheorems:46-59) を Read して配線可能性を RECON**。
+**正本=本 session 37 cont.²。(4.9)(b) COMPLETE; 次 = case-B 配線 RECON。**
+
+## 2026-06-13 (session 37 cont.³, /loop): S08 case-B 配線 RECON 結論 + 次 = (4.10)
+
+**RECON 結論: S08 case-B 配線は単発 plug-in でなく §8 (6.8) 大 assembly** (正本=notes/peterfalvi/s08_6_8_assembly_plan.md, 96KB, T0-T11 DAG)。
+- `sibleySetup_is_coherent` (S08_CoherenceTheorems:46) X-nonempty branch sorry (:59) = Frobenius/CertainType
+  case split (`hyp.cases : IsFrobeniusGroup ∨ ∃ cert:CertainTypeHypothesis…`) で X=S−S(Z) coherence を
+  Y=S(H') coherence と §7 engine `coherentUnion_of_glued` で gluing。
+- **Sibley case-B (`cases.inr`) は `cert : S06.CertainTypeHypothesis (sharpImage H) L` + (w₂ prime/W₂⊆[H,H]/
+  Coprime|H||W1|/cert.dade=dade/cert.K=H/cert.W1=W1) を供給 — `Hypothesis46` ではない。** ⟹ (4.9)
+  `certainType_isCoherent` を使うには **Hypothesis46-from-Sibley bridge** (tic/dade0/tau/subH/A_covers の
+  構成、(3.1)-for-W + (4.6.c/d) 確立) が要、substantial。
+- Frobenius path は概ね構築済 (B engine surgery 完, `Xset_commutator_isCoherent…_of_frobenius` +
+  `peterfalvi_66_coherence_of_X_from_dade`)。c2 path は open blocker 多数 (T6 inertia discharge / Y-family
+  construction / c2 inertia / T10 case-B gluing)。**T7 c2 X-char は (4.5)✓ 使用。**
+- ⟹ **case-B は §8 program の大仕事で Lane B 単独 cold engage は overlap/risk。(4.9) は necessary input
+  (供給済) だが gluing machinery が bulk。** 戦略判断 (case-B 大 assembly に commit するか) はユーザー/合流調整向き。
+
+**次 = (4.10)** (§6 最終結果、章完結): `(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`。
+原文「(4.8) と同様」= 同じ V-vanishing+trichotomy 論法 (`sigmaCoeff_trichotomy` 消費)。(4.3.b)
+`σ(ω_ij)=δ_j μ_ij` + (4.8) step-4 engine (`certainType_diff_dade_apply_eq_of_mem_V` 等) を 4-corner
+combination に適用。(4.8) conclusion-3 (`certainType_diff_dade_eq`) の隣接 row+column 版。
+in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 cont.³。次 = (4.10)。**
