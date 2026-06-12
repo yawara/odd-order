@@ -794,6 +794,14 @@ set_option linter.style.longLine false in
 -- `0 ≤ i < w₁` gives `(μ_j − μ_k)^τ = δ_j ∑_i (ω_ij^σ − ω_ik^σ)`, the (4.9)(b) τ-agreement on Z[T,A].
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.tau_toDadeMap_sum
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq
+-- Peterfalvi (4.9) degree bridge: every `μ_ij` in column `j` shares the degree `μ_0j(1)`
+-- (`columnFamily_mu_apply_one_eq`, from `(μ_ij − μ_0j)(1) = 0`), so the column-sum degree equality
+-- `μ_j(1) = μ_k(1)` (`= ∑_i μ_ij(1) = ∑_i μ_ik(1)`) gives the per-row equalities
+-- (`forall_columnFamily_mu_apply_one_eq_of_sum_eq`), restating the summed isometry under the `T`
+-- membership condition (`certainType_diff_dade_sum_eq_of_degree`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_apply_one_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.forall_columnFamily_mu_apply_one_eq_of_sum_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq_of_degree
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the

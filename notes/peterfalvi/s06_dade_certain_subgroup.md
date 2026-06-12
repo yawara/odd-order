@@ -2111,12 +2111,16 @@ isometry で Z[T,A] 上 τ と一致。**(4.9)(b) は (4.8) conclusion 3 を使�
   per-row 仮説 `∀i, μ_ij(1)=μ_ik(1)` で stated (δ_j=δ_k は conclusion 2、列の全 μ_ij は同次数)。
 
 ### ▶▶ 次 = (4.9) 残り (session 34 cont. 以降)
-1. **列次数恒常性 `μ_ij(1) = μ_0j(1)`** (clean small): summed identity を「列次数 μ_j(1)=μ_k(1)」
-   仮説で再述できるようにする橋渡し。μ_ij は χ_j の L への w₁ 個の拡張 ⟹ 全て deg χ_j(1)。
-   (S06_CertainTypeClifford の `chiRestrict`/`induce_restrict_certainType_eq` 周辺に材料)。
+1. ✅ **列次数恒常性 + 橋渡し DONE** (commit `3596eda3`): `columnFamily_mu_apply_one_eq`
+   (μ_ij(1)=μ_0j(1), `columnFamily_difference_apply_one` から) + `forall_columnFamily_mu_apply_one_eq_of_sum_eq`
+   (∑μ_ij(1)=∑μ_ik(1) ⟹ ∀i 同次数; w₁≠0 で cancel) + `certainType_diff_dade_sum_eq_of_degree`
+   (summed isometry を μ_j(1)=μ_k(1) 仮説で再述)。**🔑 罠**: columnFamily は home-file の section
+   variable で `[Fintype ↥(W1⊔W2)] [Invertible (card(W1⊔W2):ℂ)]` を要求 → isometry leaf で明示要
+   (postpone は proof 経由 unify のときだけ効く; hypothesis 型は upfront synth)。S06-namespace 補題は
+   dot 不可 (`columnFamily_mu_apply_one_eq h χ₂`, 位置引数; Hypothesis46-namespace の columnFamily 等は dot 可)。
 2. **(4.9)(a)** 共役 μ̄_j=μ_{j'} (ω̄_ij=ω_{i'j'}, j'≠j; (3.9)+(4.3) で δ 引き出し) + Z[T,L^#]=Z[T,A]
-   ((4.7) 経由)。**hard 寄り** (character conjugation + (3.9))。
-3. **(4.9)(b) full**: isometry Z[T]→Z[Irr G] の写像化 (ω_ij^σ 正規直交で「isometry 明らか」) +
-   Z[T,A] 上 τ 一致 (= summed identity を線型に拡張)。
+   ((4.7) 経由)。**hard 寄り** (character conjugation + (3.9))。要調査: 指標複素共役 API + (3.9) map。
+3. **(4.9)(b) full**: isometry Z[T]→Z[Irr G] の写像化 (ω_ij^σ 正規直交で「isometry 明らか」=
+   `sigma_inner` 系 S05:1310 付近) + Z[T,A] 上 τ 一致 (= summed identity の線型拡張)。
 → (4.9) → S08 case-B (`sibleySetup_is_coherent` の CertainType branch) → (6.8) capstone。
-**正本=本 session 34。(4.9)(b) 核 landed; 次 = 列次数恒常性 or (4.9)(a)。**
+**正本=本 session 34。(4.9)(b) 計算核+次数橋渡し landed; 次 = (4.9)(a) 共役 or (4.9)(b) isometry 性。**
