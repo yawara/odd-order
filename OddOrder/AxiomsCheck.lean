@@ -71,6 +71,7 @@ import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -813,6 +814,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_sum_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_omega_sum_isometry
+-- Peterfalvi (4.9)(a) conjugation foundation: the complex conjugate of a linear character `ω(χ)` is
+-- `ω(χ⁻¹)` (`galoisMap_conj_omega`; values are roots of unity, where `z̄ = z⁻¹`), so the conjugate of
+-- a certain-type σ-image `ω_ij^σ` is the σ-image of the inverse grid character `ω((P_ij)⁻¹)`
+-- (`certainTypeOmegaSigma_conj`, via the (3.9) Galois commutation `sigma_mapRingEquiv_comm`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.galoisMap_conj_omega
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
