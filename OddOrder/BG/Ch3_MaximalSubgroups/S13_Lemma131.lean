@@ -667,4 +667,14 @@ theorem exists_sylow_le_derivedInG_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSi
         hEscard]
     · exact (sylow_le_derived_of_mem_tau3 hG hs hτ3 PE).1.trans (derivedInG_le_derivedInG hs.E_le)
 
+/-- `⁅K, H⁆ ≤ K` whenever `K ⊴ H` (`K.subgroupOf H` normal in `↥H`). Generalises
+`Msigma_commutator_M_le`. -/
+theorem commutator_le_of_subgroupOf_normal {H K : Subgroup G} (hKH : K ≤ H)
+    [(K.subgroupOf H).Normal] : ⁅K, H⁆ ≤ K := by
+  classical
+  have h1 : ⁅K.subgroupOf H, (⊤ : Subgroup ↥H)⁆ ≤ K.subgroupOf H := Subgroup.commutator_le_left _ _
+  have h2 := Subgroup.map_mono (f := H.subtype) h1
+  rwa [Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le hKH,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h2
+
 end OddOrder.BG.Ch3.S13
