@@ -49,6 +49,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary126
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -3978,3 +3979,11 @@ is identified with `M*` via 12.6(f) + Theorem 10.1(b). `tau2_transfer_to_maximal
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_normalSylow_abelianSylow_of_mem_index_card
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.tau2_transfer_to_maximal
+
+/-! ### BG Theorem 12.12 prep: Proposition 3.9 (`S12_Theorem1212`)
+
+Gorenstein 5.3.14: a finite `p`-group (`p` odd) acting coprimely and fixed-point-freely on a
+nontrivial finite group is cyclic. Via an elementary abelian `p²`-subgroup `B` (when not cyclic),
+Isaacs 6.21 forces `⟨C_H(b) | b ∈ B^#⟩ = H`, contradicting fixed-point-freeness. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_coprime_fpf_pgroup_action
