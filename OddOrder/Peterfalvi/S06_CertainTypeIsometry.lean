@@ -398,4 +398,29 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg]
   ring
 
+/-- **Peterfalvi (4.8), step (5) input** (`‖φ‖² = 2`).  For distinct columns `χ₂ ≠ χ₂'`, the Dade
+image `φ = (μ_{ij} − μ_{ik})^τ` is a virtual character of squared norm `2`: `τ` is an isometry
+(`h.tau.inner_eq`), `μ_{ij}, μ_{ik}` are distinct irreducibles (`columnFamily_mu_ne`, (4.1)), so
+`⟨φ, φ⟩ = ⟨μ_{ij} − μ_{ik}, μ_{ij} − μ_{ik}⟩ = 1 + 1 = 2`. -/
+theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    ClassFunction.inner (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg))
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) = 2 := by
+  rw [h.tau.inner_eq]
+  show ClassFunction.inner
+      (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+        - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
+      (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+        - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) = 2
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite,
+    irreducibleCharacter_inner_eq_ite, irreducibleCharacter_inner_eq_ite, if_pos rfl, if_pos rfl,
+    if_neg (h.columnFamily_mu_ne hχ i i), if_neg (h.columnFamily_mu_ne hχ i i).symm]
+  ring
+
 end OddOrder.Peterfalvi.S06
