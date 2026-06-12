@@ -128,15 +128,16 @@ noncomputable def certainTypeSet (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) : Set (ClassFunction ↥L ℂ) :=
   {f | ∃ χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
-    (columnSum h χ₂ : ClassFunction ↥L ℂ) (1 : ↥L)
-      = (columnSum h k : ClassFunction ↥L ℂ) (1 : ↥L) ∧ f = columnSum h χ₂}
+    (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily k).mu i : ClassFunction ↥L ℂ) 1) ∧ f = columnSum h χ₂}
 
-/-- A column character `μ_j` with `χ₂ ≠ 1` and `μ_j(1) = μ_k(1)` lies in `𝒯`. -/
+/-- A column character `μ_j` with `χ₂ ≠ 1` and `μ_j(1) = μ_k(1)` lies in `𝒯`.  The degree condition
+is the column-sum degree equality `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)` (`= μ_j(1) = μ_k(1)`). -/
 theorem columnSum_mem_certainTypeSet (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     {k χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
-    (hdeg : (columnSum h χ₂ : ClassFunction ↥L ℂ) (1 : ↥L)
-      = (columnSum h k : ClassFunction ↥L ℂ) (1 : ↥L)) :
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily k).mu i : ClassFunction ↥L ℂ) 1)) :
     columnSum h χ₂ ∈ certainTypeSet h k :=
   ⟨χ₂, hχ₂, hdeg, rfl⟩
 
@@ -272,5 +273,100 @@ theorem columnSum_support_subset (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   rintro (hA | h1)
   · exact hzA (by rwa [S04.mem_supportInSubgroup])
   · exact hz1 (Set.mem_singleton_iff.mpr (Subtype.ext (Set.mem_singleton_iff.mp h1)))
+
+/-- Evaluation of the column sum at `1`: `μ_j(1) = ∑_i μ_{ij}(1)` (the column degree). -/
+theorem columnSum_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    (columnSum h χ₂ : ClassFunction ↥L ℂ) 1
+      = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1 := by
+  rw [columnSum_def]
+  exact map_sum (AddMonoidHom.mk' (fun φ : ClassFunction ↥L ℂ => φ (1 : ↥L)) (fun _ _ => rfl))
+    (fun i => ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)) Finset.univ
+
+/-- **Column sign equality from equal degree** (Peterfalvi (4.8) step (1), column form).  If two
+certain-type columns have the same degree `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`, their signs coincide
+(reduce to the per-row `(4.8)` sign equality at any row via the degree bridge). -/
+theorem certainType_columnSign_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ}
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
+    (h.columnFamily χ₂).sign = (h.columnFamily χ₂').sign :=
+  certainType_sign_eq_of_degree_eq h χ₂ χ₂' 0
+    (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg 0)
+
+/-- **`Supp(μ_j − μ_k) ⊆ supportInSubgroup A L`** for same-degree certain-type columns.  Both
+`μ_j, μ_k` vanish off `A ∪ {1}` ((4.7) `columnSum_support_subset`); the difference additionally
+vanishes at `1` (equal degree), so its support sits inside the certain subgroup `A`. -/
+theorem columnDiff_support_subset (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
+    (columnSum h χ₂ - columnSum h χ₂').support ⊆ S04.supportInSubgroup A L := by
+  intro z hz
+  rw [ClassFunction.mem_support, ClassFunction.sub_apply] at hz
+  by_contra hzA
+  rw [S04.mem_supportInSubgroup] at hzA
+  by_cases hz1 : z = 1
+  · subst hz1
+    exact hz (by rw [columnSum_apply_one, columnSum_apply_one, hdeg, sub_self])
+  · have hnm : L.subtype z ∉ A ∪ ({1} : Set G) := by
+      rintro (hA | h1)
+      · exact hzA hA
+      · exact hz1 (Subtype.ext (Set.mem_singleton_iff.mp h1))
+    rw [columnSum_apply_eq_zero_of_not_mem h hχ₂ hnm,
+      columnSum_apply_eq_zero_of_not_mem h hχ₂' hnm, sub_zero] at hz
+    exact hz rfl
+
+/-! ### The `τ`-agreement field -/
+
+/-- **Generator-level `τ`-agreement** (Peterfalvi (4.8)/(4.9)): on a certain-type difference
+`μ_j − μ_k` (same degree), the coherent extension `ν` agrees with the Dade map
+`τ = dadeIntegralCharacterMap`.  Both sides equal `δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`:
+
+* RHS: `μ_j − μ_k` is supported on `A ⊆ A₀` (`columnDiff_support_subset`), so
+  `τ(μ_j − μ_k) = h.dade0.dadeMap ⟨·⟩` (`dadeIntegralCharacterMap_apply_of_support`)
+  `= h.tau.toDadeMap ⟨·⟩` (`IsDadeMap.unique`) `= δ_j ∑(ω^σ − ω^σ)`
+  (`certainType_diff_dade_sum_eq`, after identifying `⟨μ_j − μ_k, _⟩ = ∑ certainTypeDiffSupported`);
+* LHS: `ν(μ_j − μ_k) = δ_j ∑ω_{ij}^σ − δ_k ∑ω_{ik}^σ`, and `δ_j = δ_k` (`certainType_columnSign_eq`). -/
+theorem certainTypeExtension_columnDiff_eq_dade (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
+    certainTypeExtension h (columnSum h χ₂ - columnSum h χ₂')
+      = S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - columnSum h χ₂') := by
+  by_cases hχeq : χ₂ = χ₂'
+  · subst hχeq; rw [sub_self, map_zero, map_zero]
+  -- both sides equal `δ_j • ∑_i (ω_{ij}^σ − ω_{ik}^σ)`
+  have hdi := forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg
+  have hsupp : (columnSum h χ₂ - columnSum h χ₂').support ⊆
+      S04.supportInSubgroup
+        (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+    (columnDiff_support_subset h hχ₂ hχ₂' hdeg).trans
+      (S04.supportInSubgroup_mono Set.subset_union_left)
+  have hval : ((∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdi i) :
+        OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+          (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L) :
+        ClassFunction ↥L ℂ)
+      = columnSum h χ₂ - columnSum h χ₂' := by
+    rw [AddSubmonoidClass.coe_finset_sum, columnSum_def, columnSum_def, ← Finset.sum_sub_distrib]
+    rfl
+  have hLHS : certainTypeExtension h (columnSum h χ₂ - columnSum h χ₂')
+      = (h.columnFamily χ₂).sign •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+    rw [map_sub, certainTypeExtension_columnSum, certainTypeExtension_columnSum,
+      ← certainType_columnSign_eq h hdeg, ← smul_sub, ← Finset.sum_sub_distrib]
+  rw [hLHS,
+    S07.dadeIntegralCharacterMap_apply_of_support h.dade0 h.tau hsupp,
+    S04.IsDadeMap.unique (k := ℂ) h.dade0.isDadeMap_dadeMap h.tau.toDadeIsometryData.isDadeMap,
+    ← certainType_diff_dade_sum_eq h hχeq hχ₂ hχ₂' hdi]
+  congr 1
+  exact Subtype.ext hval
 
 end OddOrder.Peterfalvi.S06
