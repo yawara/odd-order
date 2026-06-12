@@ -1977,3 +1977,33 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
 6. **最終 statement**: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)` (要 χ₂≠χ₂'; ψ=0 から移項) → (4.9) → case-B → (6.8)。
 
 正本 = 本 session 33 cont.³。**input 補題 全 landed (9 commits)。残 = assembly (orientation 込み trichotomy)、1 セッション。**
+
+### 🔧 session 33 cont.⁴ — 🚨 exclusion 精査: **|f|≤1 が必須** (|supp f|≤2 では不足)
+**🚨 重要発見 (notes cont.³ の exclusion 設計を訂正)**: trichotomy (b)(c) 排除は |supp f|≤2 だけでは
+**w₂=3 の row case を排除できない**。
+- P_ij=(omegaProdEquiv.symm(omegaProdCharTic χ₂ i)), P_ik=(... χ₂' i)。**P_ij.1=P_ik.1 (同 row, 両方 i)、
+  P_ij.2≠P_ik.2 (異 column, χ₂≠χ₂')**。
+- row i₀=P_ij.1 定数 c≠0, w₂=3: 純f列 1個 + δ列で f(P_ij)=c+δ_j, f(P_ik)=c−δ_j。
+  c=−δ_j なら f(P_ij)=0 だが **f(P_ik)=−2δ_j**。supp f={純f点, P_ik}=2 点 ⟹ |supp f|≤2 と無矛盾 = **排除できない**。
+  ⟹ **|f(pq)|≤1 (f∈{0,±1}) が必要** (f(P_ik)=±2 を弾く)。
+- ⟹ exclusion は **|supp f|≤2 (column case) + |f|≤1 (row w₂=3 case)** の両方を使う。
+  あるいは uniform に **∑f²≤2** (Bessel) でも可 (∑≥3c²+2≥5>2)。**|f|≤1 が最小限**。
+
+### ▶ 残 INPUT 補題 = **`sigmaCoeff_dade_eq_zero_or_one`** (f∈{0,±1})
+証明ルート (cont.⁴ で draft 着手→revert; 設計確定):
+φ=(cα:ℂ)•α+(cβ:ℂ)•β (mem_ZIrr_inner_self_eq_sum_sq+exists_pair_of_sum_sq_eq_two, cα,cβ∈{±1});
+chiFam pq=(ε:ℤ)•ν (exists_zsmul_irreducibleCharacter_of_inner_self_one, ε∈{±1}, ν:IrreducibleCharacter);
+f=⟨φ,chiFam pq⟩=cα·ε·⟨α,ν⟩+cβ·ε·⟨β,ν⟩=cα·ε·[⟨α,_⟩=ν]+cβ·ε·[⟨β,_⟩=ν]。
+α=ν⟹cα·ε∈{±1}; β=ν⟹cβ·ε∈{±1}; else 0 (α≠β で同時不可)。
+**🛑 draft で詰まった点 (次回修正)**:
+  (1) 右 smul lemma 名 = **`OddOrder.RepresentationTheory.inner_smul_right`** (`ClassFunction.inner_smul_right` 不在)。
+  (2) `irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν` の ite 条件は **IrreducibleCharacter 等式 `⟨α,hαm⟩=ν`** で
+      α:CF とは coercion 差 ⟹ by_cases も IrreducibleCharacter 等式で。⟨α,(ν:CF)⟩ rw に coe 整合注意。
+  (3) 最後の `(c:ℂ)=0∨=1∨=-1` 閉じは `rcases hcα<;>rcases hε<;>rw[…]<;>norm_num` で disjunct 自動選択不可 →
+      明示 `left/right` か `decide`不可(ℂ)→ `first|(left;norm_num)|(right;left;norm_num)|(right;right;norm_num)`。
+
+### ▶▶ 残 = assembly (cont.³ の 6 段 + |f|≤1; 1 セッション)
+INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1}**) 揃えば:
+ψ定義→V消失→NC(ψ)≤4→**orientation** (w₁<w₂直接/w₂<w₁ transposed grid_trichotomy)→
+(b)(c)排除 (|supp f|≤2 + |f|≤1, P 同row異col)→(a)⟹‖ψ‖²=0⟹ψ=0→最終 statement (χ₂≠χ₂' 要)。
+正本=本 session 33 cont.⁴。**10 commits landed; 残=f∈{0,±1}+assembly。**
