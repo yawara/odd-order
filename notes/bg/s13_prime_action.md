@@ -106,41 +106,30 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
   証明: by_contra ¬idealPrime → p∉β(M*) (β⟹idealPrime) → setup 再利用 (p∤|K|) →
   hpMstarDeriv (p∈π M*') → hpNderiv (p∈π N': M*'≤K⊔N', |M*'|∣|K|·|N'|, p∤|K| で Euclid) →
   axiom `cor1216(b)` の `p∉π(N')` と矛盾。⚠ setup ~30 行が (b) と重複 (将来 factor 候補)。
-- **step 5 = (a) centralization (NEXT; forward axiom 不要・純 structural ~80 行; 精査 session 2)**:
-  goal = `∀ P ≤ M⊓M*, IsPGroup p P → P ≤ C_G(M_σ∩M*)`。論法 (mmd L3542):
-  `P⊆K_a` (K_a=O_{α(M*)∪{p}}(M*') ⊴ M*, σ(M)'-group) → `[M_σ∩M*,P]⊆M_σ⊓K_a=⊥`。詳細:
-  1. **K_a⊴M***: char in M*'⊴M* (step 2 の hKnorm と同型: `le_normalizer_opiCoreInG_of_le_normalizer`
-     + `S10.le_normalizer_derivedInG`)。
-  **✅ τ₃ Burnside 障害は解消済 (2026-06-12 session 2)**: ユーザー裁可で
-  `sylow_le_derived_of_mem_tau3` (S12_ECore:548) を **de-private 済 (commit `4b92778f`)**。
-  Lane G から cite 可。(a) 残りは純 plumbing。**全補題特定済み — 次セッション即着工可**:
-  1. **K_a⊴M***: char in M*'⊴M* (step 2 hKnorm と同型)。
-  2. **P⊆K_a**: K_a⊆M*' ゆえ要 `P⊆M*'` (subgroup 包含; (c) の cardinality では不足)。
-     - **Sylow p⊆M*'**: **σ(M*)**: `mem_primeFactors_derived_of_not_tau1_tau2` の σ-branch
-       (S⊆M_σ⊆M*', subgroup 版で既存)。**τ₃(M*)**: `exists_subgroupESetup hG hMstar` で E* →
-       Sylow p of E* は Sylow p of M* (p∉σ ⟹ |E*|_p=|M*|_p) → `sylow_le_derived_of_mem_tau3`
-       (now public) で ⊆E*'⊆M*' (`derivedInG_le_derivedInG` S12_Lemma128:55 で E*'⊆M*')。
-     - **任意 P⊆M*'**: M*'⊴M* が Sylow p を含む ⟹ 全 p-subgroup 含む。`IsPGroup.exists_le_sylow`
-       で P≤Q (Sylow)、Q は S と共役 (`Sylow` の `IsPretransitive`/`MulAction.exists_smul_eq`)、
-       S⊆M*'⊴M* ⟹ Q⊆M*' ⟹ P⊆M*'。(or |M*'|_p=|M*|_p ⟹ p∤[M*:M*'] ⟹ P の M*/M*' 像自明。)
-     - **P⊆K_a**: M*'/M*_α nilpotent (`derivedQuotientMbeta_isNilpotent` +
-       `nilpotent_of_surjective`(`QuotientGroup.map id`, Mβ⊆Mα)) ⟹ M*_α·Sylow_p ⊴ M*'
-       (`normal_sup_sylow_of_quotient_nilpotent`, 要 p∉α [p∈α は Sylow⊆M*_α で別途], 又は
-       O_{α∪p}(M*') の normal Hall {α∪p} 性 ⟹ `isPiGroup_le_of_normal_isHallSubgroup` で
-       P({α∪p}-group)≤K_a 一発。要 |M*_α|=|M*'|_α [α-Sylow⊆M_σ⊆M*'] で Hall 性確認)。
-  3. **M_σ⊓K_a=⊥**: `Subgroup.inf_eq_bot_of_coprime` (|M_σ| σ-num, |K_a| {α∪p}⊆σ'-num
-     [α(M*)∩σ(M)=∅ via `S10.disjoint_of_not_conj` swapped, p∉σ(M) via
-     `h.not_mem_sigma_of_mem_primeFactors`])。
-  4. **[M_σ∩M*,P]⊆M_σ⊓K_a=⊥**: ⊆M_σ (`Msigma_commutator_M_le` 流用) ∧ ⊆K_a (P⊆K_a⊴M*) ⟹
-     `commutator_eq_bot_iff_le_centralizer`。
-  推定 ~70-90 行 (plumbing 主; conjugation/quotient の subtype friction が主コスト)。
-- **step 6 = assembly**: (a)(b)(c) を束ねて `pSubgroup_centralizes_of_interaction`
-  (S13_PrimeAction scaffold) を S13_Lemma131 で証明 → scaffold migrate (削除)。
-  hyp: (a)=`not_mem_tau2_of_interaction` の派生不要、(b)=`not_mem_tau2_of_interaction`、
-  (c)=`mem_idealPrime_of_tau1_of_interaction` (要 hpMstar, hpτ1Mstar, hpτ2Mstar[=(b)])。
-  完了後 **AxiomsCheck に island assert** (`#assert_axioms_island pSubgroup_centralizes_of_interaction
-  expecting [cor1216_pRank_normalizer_le_one, cor1216_not_mem_primeFactors_derived_of_tau1]`) +
-  S13_Lemma131 を AxiomsCheck import に追加 (full build)。
+- **step 5 = (a) centralization ✅ COMPLETE (2026-06-12 session 2)**:
+  `pSubgroup_centralizes_Msigma_inf` (**完全 axiom-clean** — forward axiom 不使用,
+  `#print axioms` = 標準3つのみ)。論法 (mmd L3542): `K_a=O_{α(M*)∪{p}}(M*')⊴M*` (uniform char),
+  `P⊆K_a` → `⁅M_σ∩M*,P⁆⊆M_σ⊓K_a=⊥`。新 helper:
+  - `derivedQuotientMalpha_isNilpotent` (keystone): M*'/M*_α = (M*'/M*_β)⧸(M*_α/M*_β) =
+    nilpotent M*'/M*_β の商 ⟹ nilpotent (`quotientQuotientEquivQuotient` + `nilpotent_of_surjective`;
+    `map_surjective_of_surjective` は friction で回避)。Malpha' Normal は instance 引数。
+  - `exists_sylow_le_derivedInG_of_not_tau1_tau2`: ∃ Sylow p of M* ⊆ M*' (σ=M_σ経由,
+    **τ₃=de-private `sylow_le_derived_of_mem_tau3` 経由** E*'⊆M*' + |E*|_p=|M*|_p)。
+  - `sylow_le_opiCoreInG_alpha_p`: S⊆K_a (p∈α は S⊆M*_α⊆K_a [`isPiGroup_le_of_normal_isHallSubgroup`],
+    p∉α は M*_α⊔S⊴M*' [keystone+`normal_sup_sylow`] ⊆K_a)。
+  - `commutator_le_of_subgroupOf_normal`: ⁅K,H⁆≤K (Msigma_commutator_M_le 一般化)。
+  - **P⊆K_a は full Sylow⊆M*' でなく cardinality で**: |K_a|_p=|M*|_p (S⊆K_a) ⟹ p∤[M*:K_a] ⟹
+    P の ↥M*/K_a 像が coprime位数 p-group ⟹ 自明 ⟹ P⊆K_a (Hall 性証明を回避)。
+  - M_σ⊓K_a=⊥: `inf_eq_bot_of_coprime` (`coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl`;
+    α(M*)∩σ(M)=∅ via `disjoint_of_not_conj` swapped, p∉σ(M) via `not_mem_sigma_of_mem_primeFactors`)。
+- **step 6 = assembly ✅ COMPLETE (2026-06-12 session 2)**:
+  `pSubgroup_centralizes_of_interaction` (S13_PrimeAction scaffold) を (a)(b)(c) で組立、
+  sorry 除去 (S13_PrimeAction 実 sorry 11→10)。S13_PrimeAction が S13_Lemma131 を import。
+  `#print axioms` = [propext, cor1216_pRank_normalizer_le_one,
+  cor1216_not_mem_primeFactors_derived_of_tau1]。**AxiomsCheck island 4件 PASS** (full build
+  3645 jobs): (a)=allowed, (b)(c)/full=island。S13_PrimeAction を AxiomsCheck import 追加済。
+  ⟹ **🎉 BG Lemma 13.1 完全証明 (forward axiom conditional)**。次 = **Cor 13.2** (mmd L3548;
+  「follows directly from Lemma 13.1」+ Lemma 12.2(a))。
 
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
