@@ -263,6 +263,39 @@ theorem msigma_centralizer_le_of_invariant_sylow_centralized [Finite G]
     exact ⟨S, le_inf hSN (hcore q hq S hSN hSpg hSinv), hScard⟩
   exact le_inf hNMsig (by rw [← hkey]; exact inf_le_right)
 
+/-- **Coprime FPF disjointness (subgroup form)**: if `A` is abelian, `R ≤ N_G(A)`, and `|R|`, `|A|`
+are coprime, then `⁅A, R⁆ ⊓ C_G(R) = ⊥` (the commutator and the `R`-fixed points meet trivially —
+the coprime decomposition `A = C_A(R) × ⁅A,R⁆`). Translates the abstract
+`Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian` to the conjugation action via the
+`S06` bridges. Reusable (used for `C_{⁅S,R⁆}(R) = 1` in Thm 13.4's per-q core). -/
+theorem commutator_inf_centralizer_eq_bot_of_isCommutative [Finite G] {A R : Subgroup G}
+    (hAcomm : ∀ a ∈ A, ∀ b ∈ A, a * b = b * a) (hRA : R ≤ Subgroup.normalizer (A : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥A)) :
+    ⁅A, R⁆ ⊓ Subgroup.centralizer (R : Set G) = ⊥ := by
+  classical
+  letI : CommGroup ↥A := { (inferInstance : Group ↥A) with
+    mul_comm := fun a b => Subtype.ext (hAcomm a a.2 b b.2) }
+  set φ : ↥R →* MulAut ↥A :=
+    (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hRA) with hφ
+  have hbot : Subgroup.fixedPointsOfMulAut φ ⊓ OddOrder.Isaacs.Ch04.actionCommutator φ = ⊥ :=
+    OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian φ hcop
+  have hmap : ((Subgroup.fixedPointsOfMulAut φ ⊓ OddOrder.Isaacs.Ch04.actionCommutator φ).map
+      A.subtype) = (⊥ : Subgroup G) := by rw [hbot, Subgroup.map_bot]
+  rw [Subgroup.map_inf _ _ A.subtype A.subtype_injective,
+    OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hRA,
+    OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hRA] at hmap
+  -- `hmap : (C_G(R) ⊓ A) ⊓ ⁅A, R⁆ = ⊥`; rewrite to `⁅A, R⁆ ⊓ C_G(R) = ⊥` using `⁅A,R⁆ ≤ A`.
+  have hcomm_le_A : ⁅A, R⁆ ≤ A := by
+    rw [Subgroup.commutator_le]
+    intro a ha r hr
+    have hr' : r * a⁻¹ * r⁻¹ ∈ A :=
+      (Subgroup.mem_normalizer_iff.mp (hRA hr) a⁻¹).mp (A.inv_mem ha)
+    have heq : a * r * a⁻¹ * r⁻¹ = a * (r * a⁻¹ * r⁻¹) := by group
+    rw [commutatorElement_def, heq]
+    exact A.mul_mem ha hr'
+  rw [inf_assoc, inf_eq_right.mpr hcomm_le_A, inf_comm] at hmap
+  exact hmap
+
 /-! ## Corollary 13.2 -/
 
 /-- **BG Corollary 13.2** (mmd L3548): `p ∈ τ₁(M)∪τ₃(M)`, `P` 非自明 `p`-部分群 of `M`,
