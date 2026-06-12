@@ -164,4 +164,24 @@ theorem sigma_chiColumn_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   exact h.toTICyclicHypothesis.sigma_mapRingEquiv_comm rfl h.toTICyclicFullDadeApplication
     Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
 
+/-- **Peterfalvi (4.9)(a), the `L`-character conjugation bridge.**  `δ_j·μ_{ij}̄ = δ_{j'}·μ_{i'j'}`
+at the conjugate index (`i' = rowInv i`, `j' = χ₂⁻¹`).  Apply complex conjugation `mapRingEquiv conj`
+to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `σ_L(ω_{i'j'}) = δ_{j'}·
+μ_{i'j'}` (`sigma_chiColumn_conj` then (4.3.b) again), the right side `δ_j·μ_{ij}̄`
+(`mapRingEquiv_zsmul`, `δ_j ∈ ℤ`).  Since the `μ` are genuine irreducible characters this forces
+`μ_{ij}̄ = μ_{i'j'}` (and `δ_j = δ_{j'}`), the heart of (4.9)(a). -/
+theorem certainType_mu_conj_bridge (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    (h.columnFamily χ₂).sign •
+        ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+          ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      = (h.columnFamily χ₂⁻¹).sign •
+          ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ) := by
+  have e2 := h.sigma_chiColumn_eq_certainType χ₂⁻¹ (rowInv h i)
+  have key := congrArg (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv)
+    (h.sigma_chiColumn_eq_certainType χ₂ i)
+  rw [sigma_chiColumn_conj, e2, ClassFunction.mapRingEquiv_zsmul] at key
+  exact key.symm
+
 end OddOrder.Peterfalvi.S06
