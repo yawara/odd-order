@@ -346,4 +346,52 @@ theorem tau_toDadeMap_apply_of_mem (h : Hypothesis46 A L)
   h.tau.toDadeIsometryData.isDadeMap.map_eq_of_mem_hCoset α ⟨a, ha⟩
     ⟨1, one_mem _, (mul_one _).symm⟩
 
+/-- **Peterfalvi (4.8), step (4)** (the two sides agree on `V`).  For `v ∈ V = W − (W₁ ∪ W₂)`,
+`(μ_{ij} − μ_{ik})^τ(v) = δ_j·(ω_{ij}^σ(v) − ω_{ik}^σ(v))`.
+
+On `V` both maps are value-preserving: `τ` preserves values on `A₀ ⊇ V^L`
+(`tau_toDadeMap_apply_of_mem`) and `σ_G` on `V` (`certainTypeOmegaSigma_apply_of_mem_V`).  Writing
+`w = e v` for the `sdiff.W` partner of `v` (`ticWEquivSdiffW`), the (4.3.c) value identity gives
+`μ_{ij}(w) = δ_j·ω_{ij}(w)`, `μ_{ik}(w) = δ_k·ω_{ik}(w)`, and `δ_j = δ_k` (step (1)) makes the two
+sides coincide. -/
+theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) v
+      = ((h.columnFamily χ₂).sign : ℂ)
+        * (certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂' i v) := by
+  -- `v ∈ tic.V` (the larger TI set), hence `v ∈ A₀`
+  have hv_ticV : v ∈ h.tic.V := by
+    rw [h.tic_V]; exact ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+  have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
+    Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
+  -- the `sdiff.W` partner `w = e v`, with `(w : L) = ⟨v, _⟩` and `(w : L) ∈ sdiff.V`
+  set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
+  have hwG : ((w : ↥L) : G) = v := coe_ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩
+  have hwL : (w : ↥L) = ⟨v, h.dade0.mem_L hvA0⟩ := Subtype.ext hwG
+  have hwsdiffV : (w : ↥L) ∈ h.sdiffTICyclicHypothesis.V := by
+    refine ⟨w.2, fun hW2 => ?_⟩
+    have hvW2 : v ∈ h.tic.W2 := by
+      rw [h.tic_W2]; exact ⟨(w : ↥L), hW2, hwG⟩
+    exact hv.2 (Or.inr hvW2)
+  -- the point `⟨(w:L), _⟩ : sdiff.W` is `w` itself
+  have hwpt : (⟨(w : ↥L), h.sdiffTICyclicHypothesis.V_subset_W hwsdiffV⟩ :
+      h.sdiffTICyclicHypothesis.W) = w := Subtype.ext rfl
+  rw [tau_toDadeMap_apply_of_mem h _ hvA0]
+  show (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) ⟨v, h.dade0.mem_L hvA0⟩ = _
+  rw [ClassFunction.sub_apply, ← hwL,
+    h.certainType_apply_eq_of_mem_V χ₂ i hwsdiffV,
+    h.certainType_apply_eq_of_mem_V χ₂' i hwsdiffV, hwpt,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂ i hv,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂' i hv,
+    certainType_sign_eq_of_degree_eq h χ₂ χ₂' i hdeg]
+  ring
+
 end OddOrder.Peterfalvi.S06
