@@ -106,35 +106,35 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
   証明: by_contra ¬idealPrime → p∉β(M*) (β⟹idealPrime) → setup 再利用 (p∤|K|) →
   hpMstarDeriv (p∈π M*') → hpNderiv (p∈π N': M*'≤K⊔N', |M*'|∣|K|·|N'|, p∤|K| で Euclid) →
   axiom `cor1216(b)` の `p∉π(N')` と矛盾。⚠ setup ~30 行が (b) と重複 (将来 factor 候補)。
-  --- 以下は当初プラン (実装と一部相違; Sylow⊆M*' は不要だった) ---
-  証明構造 = **by_contra**:
-  - `intro hpτ1M` (p∈τ₁(M))。goal `S10.idealPrime p G`。`by_contra hnotideal` (¬idealPrime)。
-  - axiom `cor1216_not_mem_primeFactors_derived_of_tau1 hG h hYne hYpi hpE hnotideal hpτ1M hHY hnc`
-    ⟹ `p ∉ π(N_{M*}(Y)')` (= `p ∉ (card (derivedInG (Mstar ⊓ N_G(Y)))).primeFactors`)。
-  - **structural: `p ∈ π(N_{M*}(Y)')`** で矛盾 (これが (c) の hard core):
-    - `p ∉ β(M*)`: hnotideal + `β(M*)={p∈α(M*) ∧ idealPrime}` ⟹ ¬idealPrime⟹p∉β(M*)。
-    - **|M*'|_p = |M*|_p** (= Sylow p⊆M*'): `p∈σ(M*)∪τ₃(M*)` を partition で得る
-      (`p∈π(M*)`=hpMstar [assembly が供給] ∧ `p∉τ₁(M*)`=hpτ1 [hyp] ∧ `p∉τ₂(M*)`=(b) ⟹
-      σ∪τ₃; 要 τ-partition 補題 `mem_sigma_or_tau…` 探索)。**σ**: Sylow p⊆M*_σ⊆M*'
-      (`Msigma_le_derived` + Sylow⊆M_σ; cf S10_BetaRadical:282 factorization 機構)。**τ₃**:
-      Sylow p of M* = Sylow p of E* (p∉σ ⟹ Sylow が complement E* に, E*=exists_subgroupESetup
-      hG hMst_mem) ⊆ E*'⊆M*' — template = **private `sylow_le_derived_of_mem_tau3`
-      (S12_ECore:548; Burnside 論法, E 専用)**。⚠ private + S12_ECore は Lane F 域 ⟹ de-private
-      不可、S13 側で再証明 (~40 行 Burnside) か hub 経由で de-private 依頼。
-    - **p∣|N'| injection**: M*=K⊔N (step 2 の K=O_{β∪q}(M*'), p∤|K| は (b) で確立, K⊴M*)。
-      `M*/K ≅ N/(N∩K)` (2nd iso, M*=KN) ⟹ `(M*/K)'=M*'K/K` に N' が全射。p∤|K| ゆえ
-      `|M*'K/K|_p=|M*'|_p=|M*|_p>1` ⟹ p∣|M*'K/K| ∣ |N'| ⟹ `p∈π(N')`。
-      (mathlib: `QuotientGroup.quotientInfEquivProdNormalQuotient` / 2nd iso card, derived の像。)
-  - 🔑 **再利用**: (b) の K/N/hpK/hKnorm/hdecomp + helper `pRank_le_of_factorization_card_eq`
-    の片割れ (Sylow card 機構) が流用できる。`hpMstar : p∈π(M*)` を (c) lemma の hyp に追加要。
-- **step 4 着工前**: τ-partition 補題 (`p∈π(M) ⟹ p∈σ∪τ₁∪τ₂∪τ₃`) と σ-prime Sylow⊆M_σ
-  補題を S10/S12 で grep 特定 (S10_BetaRadical:246-293 が Msigma Sylow factorization の現物)。
-- **step 5 = (a) centralization**: `P` p-subgroup of `M∩M*`。`M*'/M*_α` nilpotent ⟹ `M*_α S ⊴ M*`、
-  `P⊆M*_α S`、`M*_α S` は σ(M)'-group [`p∈π(E)` + `σ(M)∩α(M*)=∅` via `S10.disjoint_of_not_conj`
-  (10.12(a))] ⟹ `[M_σ∩M*,P]⊆M*_α S∩M_σ=1`。
-- **step 6 = assembly**: 上記を束ねて `pSubgroup_centralizes_of_interaction` を S13_Lemma131 で証明、
-  S13_PrimeAction の scaffold を削除 (migrate)、AxiomsCheck に island assert
-  `#assert_axioms_island … expecting [cor1216_…]` 追加。
+- **step 5 = (a) centralization (NEXT; forward axiom 不要・純 structural ~80 行; 精査 session 2)**:
+  goal = `∀ P ≤ M⊓M*, IsPGroup p P → P ≤ C_G(M_σ∩M*)`。論法 (mmd L3542):
+  `P⊆K_a` (K_a=O_{α(M*)∪{p}}(M*') ⊴ M*, σ(M)'-group) → `[M_σ∩M*,P]⊆M_σ⊓K_a=⊥`。詳細:
+  1. **K_a⊴M***: char in M*'⊴M* (step 2 の hKnorm と同型: `le_normalizer_opiCoreInG_of_le_normalizer`
+     + `S10.le_normalizer_derivedInG`)。
+  2. **P⊆K_a**: ⚠ **要 `P⊆M*'`** (K_a⊆M*' ゆえ P⊆K_a⟹P⊆M*')。これが (c) と違い **full Sylow⊆M*'
+     を要する** (cardinality でなく subgroup 包含)。**σ(M*)**: Sylow p⊆M_σ⊆M*'
+     (mem_primeFactors_derived の σ-branch を subgroup 版に流用)。**🛑 τ₃(M*)**: Sylow p of M* =
+     Sylow p of E* (p∉σ) ⊆ E*'⊆M*' — template = **private `sylow_le_derived_of_mem_tau3`
+     (S12_ECore:548, E 専用, Burnside 論法 ~40 行)**。**de-private (S12_ECore=Lane F 域→hub 依頼)
+     か S13 で再証明が必要 — これが (a) の唯一の hard 依存**。P⊆M*' 後: M*'/M*_α nilpotent
+     (`derivedQuotientMbeta_isNilpotent` + `nilpotent_of_surjective`(`QuotientGroup.map id`, Mβ⊆Mα)
+     で導出可、確認済) ⟹ M*_α·(Sylow p) ⊴ M*' (`normal_sup_sylow_of_quotient_nilpotent`) ⊆ K_a、
+     K_a は Sylow p を含む normal ⟹ 全 p-subgroup を含む ⟹ P⊆K_a。
+  3. **M_σ⊓K_a=⊥**: coprime (`Subgroup.inf_eq_bot_of_coprime`; |M_σ| σ-num, |K_a| {α∪p}⊆σ'-num
+     [α(M*)∩σ(M)=∅ via `S10.disjoint_of_not_conj` 10.12(a) swapped, p∉σ(M) via
+     `h.not_mem_sigma_of_mem_primeFactors`])。
+  4. **[M_σ∩M*,P]⊆M_σ⊓K_a**: ⊆M_σ (`Msigma_commutator_M_le` 流用) ∧ ⊆K_a (P⊆K_a⊴M*,
+     M_σ∩M*⊆M*, `commutator_le_left`/`commutator_mono`) ⟹ =⊥ ⟹ `commutator_eq_bot_iff_le_centralizer`。
+  🔑 **(a) 着工の判断点**: τ₃ の Sylow⊆M*' (Burnside) が de-private/再証明を要する ⟹ hub に
+  `sylow_le_derived_of_mem_tau3` の de-private (public 化, S12_ECore) を依頼するのが最善
+  (issue 起票 base 8000)。または S13 で Burnside transfer 再証明。
+- **step 6 = assembly**: (a)(b)(c) を束ねて `pSubgroup_centralizes_of_interaction`
+  (S13_PrimeAction scaffold) を S13_Lemma131 で証明 → scaffold migrate (削除)。
+  hyp: (a)=`not_mem_tau2_of_interaction` の派生不要、(b)=`not_mem_tau2_of_interaction`、
+  (c)=`mem_idealPrime_of_tau1_of_interaction` (要 hpMstar, hpτ1Mstar, hpτ2Mstar[=(b)])。
+  完了後 **AxiomsCheck に island assert** (`#assert_axioms_island pSubgroup_centralizes_of_interaction
+  expecting [cor1216_pRank_normalizer_le_one, cor1216_not_mem_primeFactors_derived_of_tau1]`) +
+  S13_Lemma131 を AxiomsCheck import に追加 (full build)。
 
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
