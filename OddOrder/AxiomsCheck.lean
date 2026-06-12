@@ -4319,3 +4319,13 @@ fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|
 `r ∣ |h|`). The reduction for "`E₀ = E₁E₃·∏Z_p` is a Frobenius complement". Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_forall_prime_order
+
+/-! ### BG Theorem 12.12: three-case assembly building blocks (`S12_Theorem1212c`)
+
+`exists_regular_cyclic_of_mem_tau2`: per-prime `Z_p` extraction for `p ∈ τ₂(M)` in the abelian
+Sylow case — a cyclic `p`-subgroup `Z ≤ E`, normalized by `E`, of the same exponent as a Sylow
+`p`-subgroup `S ≤ E`, regular on `M_σ` (wires `exists_elemAb_rank_two_le_E_of_tau2`, the Sylow
+extension, `sylow_chain_of_abelianSylow` giving `S ≤ E`, and the per-prime capstone). Unconditional.
+(`frobenius_factorization_of_regular` / `frobFact_of_abelianSylow` の axiom 登録は Case 3 集約完了後。) -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_regular_cyclic_of_mem_tau2

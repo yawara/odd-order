@@ -36,6 +36,34 @@ open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
+/-- **Per-prime `Z_p` extraction** for the abelian-Sylow case (`p ∈ τ₂(M)`). Combining
+`exists_elemAb_rank_two_le_E_of_tau2`, the Sylow extension `A ≤ S`, the abelianness `habel`, the
+Lemma 12.8(c) chain (`sylow_chain_of_abelianSylow`, giving `S ≤ E`), and the per-prime capstone
+`exists_cyclic_Enormal_regular_of_abelianSylow`, we obtain a cyclic `p`-subgroup `Z ≤ E`,
+normalized by `E`, of the same exponent as a Sylow `p`-subgroup `S ≤ E`, acting regularly on
+`M_σ`. (`Z ⊴ E` follows from `E ≤ N_G(Z)`; the `Z_p` for distinct `p ∈ τ₂(M)` will assemble into
+an internal direct product `∏ Z_p ≤ E`.) -/
+theorem exists_regular_cyclic_of_mem_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M)
+    (habel : ∀ S : Sylow p G, IsMulCommutative ↥(S : Subgroup G))
+    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
+    ∃ Z : Subgroup G, Z ≤ E ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧ IsPGroup p ↥Z ∧
+      E ≤ Subgroup.normalizer (Z : Set G) ∧
+      (∃ S : Sylow p G, (S : Subgroup G) ≤ E ∧
+        Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G)) ∧
+      ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hp
+  obtain ⟨S, hAS⟩ := hA.1.isPGroup.exists_le_sylow
+  have hSab : IsMulCommutative ↥(S : Subgroup G) := habel S
+  have hSE : (S : Subgroup G) ≤ E :=
+    (le_centralizer_of_le_of_le hSab le_rfl hAS).trans (centralizer_le_E_of_tau2 hG h hp hA hAE).1
+  have hSM : (S : Subgroup G) ≤ M := hSE.trans h.E_le
+  obtain ⟨Z, hZS, hZcyc, hZne, hZN, hZexp, hZreg⟩ :=
+    exists_cyclic_Enormal_regular_of_abelianSylow hG h hp hA hAE hAS hSM hSab hreg
+  exact ⟨Z, hZS.trans hSE, hZcyc, hZne, S.isPGroup'.to_le hZS, hZN, ⟨S, hSE, hZexp⟩, hZreg⟩
+
 /-- **BG Theorem 12.12, Case 3** (mmd L3344-3373): in the abelian-Sylow regime, with `τ₂(M)`
 nonempty, the conclusion `FrobFactConclusion M E` holds. Here `A₀ = E₂` (abelian normal Hall
 `τ₂`-subgroup of `E`, by Lemma 12.8(a)), and `E₀ = E₁E₃ · ∏_{p ∈ τ₂} Z_p`, where each `Z_p` is a
