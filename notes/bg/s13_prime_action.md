@@ -91,9 +91,29 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
     (≃* 不変), `pRank_le_of_factorization_card_eq` (上記)。step 4/5 でも使える見込み。
   - **AxiomsCheck island assert は step 6 (assembly) で**: 現状 AxiomsCheck は S13_Lemma131 を
     import せず (per-name `#assert_only_allowed_axioms` のみ) ⟹ full build 緑・gate pass。
-- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)`**: `p∈σ(M*)∪τ₃(M*)` ⟹ Sylow p `S⊆M*'`。`p∉β(M*)` なら
-  `p∈π(N_{M*}(Y)')` → forward axiom `cor1216_not_mem_primeFactors_derived_of_tau1` の対偶。
-  β(M*) 分岐の扱い要精査。
+- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)` (NEXT; 精密プラン 2026-06-12 session 2)**: substantial
+  (~120-150 行)。証明構造 = **by_contra**:
+  - `intro hpτ1M` (p∈τ₁(M))。goal `S10.idealPrime p G`。`by_contra hnotideal` (¬idealPrime)。
+  - axiom `cor1216_not_mem_primeFactors_derived_of_tau1 hG h hYne hYpi hpE hnotideal hpτ1M hHY hnc`
+    ⟹ `p ∉ π(N_{M*}(Y)')` (= `p ∉ (card (derivedInG (Mstar ⊓ N_G(Y)))).primeFactors`)。
+  - **structural: `p ∈ π(N_{M*}(Y)')`** で矛盾 (これが (c) の hard core):
+    - `p ∉ β(M*)`: hnotideal + `β(M*)={p∈α(M*) ∧ idealPrime}` ⟹ ¬idealPrime⟹p∉β(M*)。
+    - **|M*'|_p = |M*|_p** (= Sylow p⊆M*'): `p∈σ(M*)∪τ₃(M*)` を partition で得る
+      (`p∈π(M*)`=hpMstar [assembly が供給] ∧ `p∉τ₁(M*)`=hpτ1 [hyp] ∧ `p∉τ₂(M*)`=(b) ⟹
+      σ∪τ₃; 要 τ-partition 補題 `mem_sigma_or_tau…` 探索)。**σ**: Sylow p⊆M*_σ⊆M*'
+      (`Msigma_le_derived` + Sylow⊆M_σ; cf S10_BetaRadical:282 factorization 機構)。**τ₃**:
+      Sylow p of M* = Sylow p of E* (p∉σ ⟹ Sylow が complement E* に, E*=exists_subgroupESetup
+      hG hMst_mem) ⊆ E*'⊆M*' — template = **private `sylow_le_derived_of_mem_tau3`
+      (S12_ECore:548; Burnside 論法, E 専用)**。⚠ private + S12_ECore は Lane F 域 ⟹ de-private
+      不可、S13 側で再証明 (~40 行 Burnside) か hub 経由で de-private 依頼。
+    - **p∣|N'| injection**: M*=K⊔N (step 2 の K=O_{β∪q}(M*'), p∤|K| は (b) で確立, K⊴M*)。
+      `M*/K ≅ N/(N∩K)` (2nd iso, M*=KN) ⟹ `(M*/K)'=M*'K/K` に N' が全射。p∤|K| ゆえ
+      `|M*'K/K|_p=|M*'|_p=|M*|_p>1` ⟹ p∣|M*'K/K| ∣ |N'| ⟹ `p∈π(N')`。
+      (mathlib: `QuotientGroup.quotientInfEquivProdNormalQuotient` / 2nd iso card, derived の像。)
+  - 🔑 **再利用**: (b) の K/N/hpK/hKnorm/hdecomp + helper `pRank_le_of_factorization_card_eq`
+    の片割れ (Sylow card 機構) が流用できる。`hpMstar : p∈π(M*)` を (c) lemma の hyp に追加要。
+- **step 4 着工前**: τ-partition 補題 (`p∈π(M) ⟹ p∈σ∪τ₁∪τ₂∪τ₃`) と σ-prime Sylow⊆M_σ
+  補題を S10/S12 で grep 特定 (S10_BetaRadical:246-293 が Msigma Sylow factorization の現物)。
 - **step 5 = (a) centralization**: `P` p-subgroup of `M∩M*`。`M*'/M*_α` nilpotent ⟹ `M*_α S ⊴ M*`、
   `P⊆M*_α S`、`M*_α S` は σ(M)'-group [`p∈π(E)` + `σ(M)∩α(M*)=∅` via `S10.disjoint_of_not_conj`
   (10.12(a))] ⟹ `[M_σ∩M*,P]⊆M*_α S∩M_σ=1`。
