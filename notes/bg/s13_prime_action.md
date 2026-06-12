@@ -111,23 +111,29 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
   `P⊆K_a` (K_a=O_{α(M*)∪{p}}(M*') ⊴ M*, σ(M)'-group) → `[M_σ∩M*,P]⊆M_σ⊓K_a=⊥`。詳細:
   1. **K_a⊴M***: char in M*'⊴M* (step 2 の hKnorm と同型: `le_normalizer_opiCoreInG_of_le_normalizer`
      + `S10.le_normalizer_derivedInG`)。
-  2. **P⊆K_a**: ⚠ **要 `P⊆M*'`** (K_a⊆M*' ゆえ P⊆K_a⟹P⊆M*')。これが (c) と違い **full Sylow⊆M*'
-     を要する** (cardinality でなく subgroup 包含)。**σ(M*)**: Sylow p⊆M_σ⊆M*'
-     (mem_primeFactors_derived の σ-branch を subgroup 版に流用)。**🛑 τ₃(M*)**: Sylow p of M* =
-     Sylow p of E* (p∉σ) ⊆ E*'⊆M*' — template = **private `sylow_le_derived_of_mem_tau3`
-     (S12_ECore:548, E 専用, Burnside 論法 ~40 行)**。**de-private (S12_ECore=Lane F 域→hub 依頼)
-     か S13 で再証明が必要 — これが (a) の唯一の hard 依存**。P⊆M*' 後: M*'/M*_α nilpotent
-     (`derivedQuotientMbeta_isNilpotent` + `nilpotent_of_surjective`(`QuotientGroup.map id`, Mβ⊆Mα)
-     で導出可、確認済) ⟹ M*_α·(Sylow p) ⊴ M*' (`normal_sup_sylow_of_quotient_nilpotent`) ⊆ K_a、
-     K_a は Sylow p を含む normal ⟹ 全 p-subgroup を含む ⟹ P⊆K_a。
-  3. **M_σ⊓K_a=⊥**: coprime (`Subgroup.inf_eq_bot_of_coprime`; |M_σ| σ-num, |K_a| {α∪p}⊆σ'-num
-     [α(M*)∩σ(M)=∅ via `S10.disjoint_of_not_conj` 10.12(a) swapped, p∉σ(M) via
+  **✅ τ₃ Burnside 障害は解消済 (2026-06-12 session 2)**: ユーザー裁可で
+  `sylow_le_derived_of_mem_tau3` (S12_ECore:548) を **de-private 済 (commit `4b92778f`)**。
+  Lane G から cite 可。(a) 残りは純 plumbing。**全補題特定済み — 次セッション即着工可**:
+  1. **K_a⊴M***: char in M*'⊴M* (step 2 hKnorm と同型)。
+  2. **P⊆K_a**: K_a⊆M*' ゆえ要 `P⊆M*'` (subgroup 包含; (c) の cardinality では不足)。
+     - **Sylow p⊆M*'**: **σ(M*)**: `mem_primeFactors_derived_of_not_tau1_tau2` の σ-branch
+       (S⊆M_σ⊆M*', subgroup 版で既存)。**τ₃(M*)**: `exists_subgroupESetup hG hMstar` で E* →
+       Sylow p of E* は Sylow p of M* (p∉σ ⟹ |E*|_p=|M*|_p) → `sylow_le_derived_of_mem_tau3`
+       (now public) で ⊆E*'⊆M*' (`derivedInG_le_derivedInG` S12_Lemma128:55 で E*'⊆M*')。
+     - **任意 P⊆M*'**: M*'⊴M* が Sylow p を含む ⟹ 全 p-subgroup 含む。`IsPGroup.exists_le_sylow`
+       で P≤Q (Sylow)、Q は S と共役 (`Sylow` の `IsPretransitive`/`MulAction.exists_smul_eq`)、
+       S⊆M*'⊴M* ⟹ Q⊆M*' ⟹ P⊆M*'。(or |M*'|_p=|M*|_p ⟹ p∤[M*:M*'] ⟹ P の M*/M*' 像自明。)
+     - **P⊆K_a**: M*'/M*_α nilpotent (`derivedQuotientMbeta_isNilpotent` +
+       `nilpotent_of_surjective`(`QuotientGroup.map id`, Mβ⊆Mα)) ⟹ M*_α·Sylow_p ⊴ M*'
+       (`normal_sup_sylow_of_quotient_nilpotent`, 要 p∉α [p∈α は Sylow⊆M*_α で別途], 又は
+       O_{α∪p}(M*') の normal Hall {α∪p} 性 ⟹ `isPiGroup_le_of_normal_isHallSubgroup` で
+       P({α∪p}-group)≤K_a 一発。要 |M*_α|=|M*'|_α [α-Sylow⊆M_σ⊆M*'] で Hall 性確認)。
+  3. **M_σ⊓K_a=⊥**: `Subgroup.inf_eq_bot_of_coprime` (|M_σ| σ-num, |K_a| {α∪p}⊆σ'-num
+     [α(M*)∩σ(M)=∅ via `S10.disjoint_of_not_conj` swapped, p∉σ(M) via
      `h.not_mem_sigma_of_mem_primeFactors`])。
-  4. **[M_σ∩M*,P]⊆M_σ⊓K_a**: ⊆M_σ (`Msigma_commutator_M_le` 流用) ∧ ⊆K_a (P⊆K_a⊴M*,
-     M_σ∩M*⊆M*, `commutator_le_left`/`commutator_mono`) ⟹ =⊥ ⟹ `commutator_eq_bot_iff_le_centralizer`。
-  🔑 **(a) 着工の判断点**: τ₃ の Sylow⊆M*' (Burnside) が de-private/再証明を要する ⟹ hub に
-  `sylow_le_derived_of_mem_tau3` の de-private (public 化, S12_ECore) を依頼するのが最善
-  (issue 起票 base 8000)。または S13 で Burnside transfer 再証明。
+  4. **[M_σ∩M*,P]⊆M_σ⊓K_a=⊥**: ⊆M_σ (`Msigma_commutator_M_le` 流用) ∧ ⊆K_a (P⊆K_a⊴M*) ⟹
+     `commutator_eq_bot_iff_le_centralizer`。
+  推定 ~70-90 行 (plumbing 主; conjugation/quotient の subtype friction が主コスト)。
 - **step 6 = assembly**: (a)(b)(c) を束ねて `pSubgroup_centralizes_of_interaction`
   (S13_PrimeAction scaffold) を S13_Lemma131 で証明 → scaffold migrate (削除)。
   hyp: (a)=`not_mem_tau2_of_interaction` の派生不要、(b)=`not_mem_tau2_of_interaction`、
