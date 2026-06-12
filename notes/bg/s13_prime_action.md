@@ -56,9 +56,24 @@
 ### Lemma 13.1 残 step plan (mmd L3534-3546; scaffold `pSubgroup_centralizes_of_interaction` は
 S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
 
-- **step 2 (Frattini)**: `Y` = Sylow `q` of `M*'`。`M*'/M*_β` nilpotent (`isHall_Mbeta` 4th/quotient) ⟹
-  `M*_β Y ⊴ M*` (nilpotent の Sylow は characteristic) → Frattini (`Sylow.normalizer_sup_eq_top'`) ⟹
-  `M* = N_{M*}(Y)·M*_β`。**未着手**。注意: Frattini は `↥M*` 内 or 適切 normal で。
+- **step 2 (Frattini) — 詳細設計済 (2026-06-12 session 1 末; Mbeta_le_derived 着地)**:
+  deliverable = `∃ Y, IsPGroup q Y ∧ Y Sylow q of M*' ∧ Mstar = K ⊔ (Mstar ⊓ N_G(Y))` where
+  **`K := opiCoreInG (β(M*)∪{q}) (derivedInG M*)` = O_{β∪q}(M*')**。K は p'(p∉β(M*) かつ p≠q)
+  ゆえ step 3 で `[M*:N_{M*}(Y)] ∣ |K|` が p' → Syl_p(M*)⊆N_{M*}(Y) → r_p=2。
+  - 🔑 **M*_β でなく K=O_{β∪q}(M*') を normal subgroup に使う** (M*_β Y は M*' に normal だが M* に
+    normal を出すのが面倒; K は M*' に characteristic ⟹ M*'⊴M* 経由で **K⊴M* が無料**)。
+  - **q∉β(M*)**: σ(M)∩α(M*)=∅ (`S10.disjoint_of_not_conj` 10.12(a), ただし hnc を M*↔M で対称化要)
+    + β⊆α ⟹ q∈σ(M)⟹q∉β(M*)。これが `normal_sup_sylow_of_quotient_nilpotent` の `hNq'`(q∤|M*_β|) を供給。
+  - **手順** (template = `S10_BetaRadical.lean:565-645` の Cor 10.9 機構を縮約):
+    (1) `Mbeta_le_derived` ✅ + 正規性 instance `((Mbeta M*).subgroupOf D).Normal` (S10:571 pattern)。
+    (2) `S10.normal_sup_sylow_of_quotient_nilpotent (derivedQuotientMbeta_isNilpotent …) hNq' Q`
+        (Q:Sylow q ↥D) ⟹ `(M*_β ⊔ Q) ⊴ D`。 (3) `le_opiCoreInG_of_normal_of_isPiSubgroup` ⟹ M*_β Q ≤ K、
+        ∴ Y(=Q_G) ≤ K、Y Sylow q of K (Sylow of D ⊇ K ⊇ Y)。 (4) `K⊴M*` via
+        `normal_subgroupOf_iff_le_normalizer + le_normalizer_opiCoreInG_of_le_normalizer (le_normalizer_derivedInG M*)`
+        (S10:623-625)。 (5) Frattini: `Sylow.ofCard` で Q':Sylow q ↥(K.subgroupOf M*) →
+        `Sylow.normalizer_sup_eq_top Q'` → transport (`subgroupOf_map_subtype`/`subgroupOf_normalizer_eq`)
+        ⟹ `M* = K ⊔ N_{M*}(Y)` (S10:627-645)。
+  - ⚠ **高名前密度・~120 行**。次ターン集中実行。surface 確認済 (Explore 2 回 + S10 template 精読)。
 - **step 3 = (b) `p∉τ₂(M*)`**: τ₂ 仮定下 `r_p(N_{M*}(Y))=2` [`tau2_pRank_eq_two` + `p∉β(M*)`
   (τ₂∩σ=∅⊇β) + `M*_β` が p'-Hall ゆえ Sylow p が `N_{M*}(Y)` に入る] vs `≤1` [forward axiom
   `cor1216_pRank_normalizer_le_one`, `M*∈ℳ(Y)`, `¬idealPrime` from 12.1(g)] の矛盾。**axiom 初使用**。

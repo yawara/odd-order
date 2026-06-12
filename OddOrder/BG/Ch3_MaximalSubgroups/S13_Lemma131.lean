@@ -112,4 +112,12 @@ theorem exists_sigma_prime_dvd_derived_Mstar [Finite G] {M Mstar : Subgroup G}
   · exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd.trans (Subgroup.card_dvd_of_le inf_le_right),
       hcardpos _⟩
 
+/-- `M_β ≤ M'` (= `derivedInG M`): via `M_β ≤ M_σ ≤ M'` (`β(M) ⊆ σ(M)` + `Msigma_le_derived`).
+Reusable; mirrors the `hMβD` step inside `S10.derivedQuotientMbeta_isNilpotent`. -/
+theorem Mbeta_le_derived [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) : S10.Mbeta M ≤ derivedInG M :=
+  le_trans (Subgroup.map_mono (Ch03.oPiCore_mono
+    (fun r hr => S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M hr)) ↥M))
+    (S10.Msigma_le_derived hG hM)
+
 end OddOrder.BG.Ch3.S13
