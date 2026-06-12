@@ -1013,4 +1013,121 @@ theorem certainType_diff_dade_sum_eq_of_degree (h : Hypothesis46 A L)
   certainType_diff_dade_sum_eq h hχ hχ₂ hχ₂'
     (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg)
 
+/-! ### The (4.9)(b) isometry property
+
+Peterfalvi (4.9)(b) asserts that the `Z`-linear map `Z[T] → Z[Irr G]` sending the certain-type
+column character `μ_j = ∑_i μ_{ij}` to `δ_k ∑_i ω_{ij}^σ` is an **isometry** which agrees with `τ`
+on `Z[T, A]`.  The agreement-with-`τ` part is the summed identity `certainType_diff_dade_sum_eq`.
+The isometry part is "clear" (Peterfalvi): both the `σ`-images `ω_{ij}^σ` and the `L`-irreducibles
+`μ_{ij}` are orthonormal across the certain-type grid, so the two column sums `∑_i ω_{ij}^σ` and
+`∑_i μ_{ij}` have the **same** Gram matrix `w₁·δ_{jk}`.  Since the sign `δ_k = ±1` is real and
+`δ_k² = 1`, the `δ_k` factors cancel in `⟨δ_k ∑_i ω_{ij}^σ, δ_k ∑_i ω_{ik}^σ⟩`, so the sign-free
+identity `certainType_omega_sum_isometry` below is exactly the isometry of (4.9)(b). -/
+
+/-- **Grid-index distinctness.**  The transported `tic`-side characters `ω_{ij}^{tic}` are distinct
+across the certain-type grid: `omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i'` iff
+`χ₂ = χ₂'` and `i = i'`.  (`omegaProdChar` is injective in both arguments — `omegaProdChar_inj` —
+and `w1CharEquiv` is an equivalence; the precomposition by the iso `ticWEquivSdiffW` is stripped
+via its surjectivity.)  This generalises `omegaProdCharTic_ne` to differing row indices. -/
+theorem omegaProdCharTic_eq_iff (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i i' : Fin (Nat.card h.W1)) :
+    omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i' ↔ χ₂ = χ₂' ∧ i = i' := by
+  constructor
+  · intro heq
+    have hstrip : h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂
+        = h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i') χ₂' := by
+      refine MonoidHom.ext fun w => ?_
+      obtain ⟨w', rfl⟩ := (ticWEquivSdiffW h).surjective w
+      exact DFunLike.congr_fun heq w'
+    obtain ⟨h1, h2⟩ := h.sdiffTICyclicHypothesis.omegaProdChar_inj hstrip
+    exact ⟨h2, h.w1CharEquiv_injective h1⟩
+  · rintro ⟨rfl, rfl⟩; rfl
+
+open scoped Classical in
+/-- **`σ`-image orthonormality (per element).**  `⟨ω_{ij}^σ, ω_{i'j'}^σ⟩ = δ_{(i,j),(i',j')}`.
+The `σ`-images are `σ(ω(P_{ij}))` with `P_{ij} = omegaProdCharTic h χ₂ i`; `σ` is an isometry
+(`sigma_inner`) and the `ω`-family is orthonormal (`omega_inner_self`/`omega_inner_ne`), so the
+inner product is `1` iff `P_{ij} = P_{i'j'}`, i.e. iff `χ₂ = χ₂'` and `i = i'`
+(`omegaProdCharTic_eq_iff`). -/
+theorem certainTypeOmegaSigma_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i i' : Fin (Nat.card h.W1)) :
+    ClassFunction.inner (certainTypeOmegaSigma h χ₂ i) (certainTypeOmegaSigma h χ₂' i')
+      = if χ₂ = χ₂' ∧ i = i' then 1 else 0 := by
+  simp only [certainTypeOmegaSigma]
+  rw [(ticVdiff h).sigma_inner rfl (ticVdiffFullDadeApplication h)]
+  by_cases hP : omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i'
+  · rw [hP, (ticVdiff h).omega_inner_self,
+      if_pos ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mp hP)]
+  · rw [(ticVdiff h).omega_inner_ne hP,
+      if_neg (fun hcon => hP ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mpr hcon))]
+
+open scoped Classical in
+/-- **`σ`-image column-sum orthonormality.**  `⟨∑_i ω_{ij}^σ, ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}`:
+the column sums of the `σ`-images are orthogonal for distinct columns and have norm² `w₁`
+(the `w₁` orthonormal entries) on the diagonal.  Bilinear expansion + `certainTypeOmegaSigma_inner`. -/
+theorem certainTypeOmegaSigma_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
+      = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  rw [inner_sum_left]
+  simp_rw [inner_sum_right, certainTypeOmegaSigma_inner]
+  by_cases hc : χ₂ = χ₂'
+  · rw [if_pos hc]
+    have hrow : ∀ i : Fin (Nat.card h.W1),
+        (∑ i' : Fin (Nat.card h.W1), if χ₂ = χ₂' ∧ i = i' then (1 : ℂ) else 0) = 1 := by
+      intro i
+      rw [Finset.sum_congr rfl (fun i' _ => if_congr (and_iff_right hc) rfl rfl),
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+    rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul, mul_one]
+  · rw [if_neg hc]
+    exact Finset.sum_eq_zero (fun i _ =>
+      Finset.sum_eq_zero (fun i' _ => if_neg (fun hcon => hc hcon.1)))
+
+open scoped Classical in
+/-- **`L`-irreducible column-sum orthonormality.**  `⟨∑_i μ_{ij}, ∑_i μ_{ij'}⟩ = w₁·δ_{jj'}`:
+the certain-type characters `μ_{ij}` are distinct irreducibles of `L` (`columnFamily.injective`
+within a column, `columnFamily_mu_ne` across columns), so the column sums `μ_j = ∑_i μ_{ij}` are
+orthogonal for distinct columns and have norm² `w₁` on the diagonal. -/
+theorem columnFamily_mu_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+        (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
+      = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  rw [inner_sum_left]
+  simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
+  by_cases hc : χ₂ = χ₂'
+  · subst hc
+    rw [if_pos rfl]
+    have hrow : ∀ i : Fin (Nat.card h.W1),
+        (∑ i' : Fin (Nat.card h.W1),
+          if (h.columnFamily χ₂).mu i = (h.columnFamily χ₂).mu i' then (1 : ℂ) else 0) = 1 := by
+      intro i
+      rw [Finset.sum_congr rfl (fun i' _ =>
+          if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+    rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul, mul_one]
+  · rw [if_neg hc]
+    exact Finset.sum_eq_zero (fun i _ =>
+      Finset.sum_eq_zero (fun i' _ => if_neg (h.columnFamily_mu_ne hc i i')))
+
+/-- **Peterfalvi (4.9)(b), the isometry property.**  The `σ`-image column sums `∑_i ω_{ij}^σ`
+(in `CF(G)`) and the certain-type column sums `μ_j = ∑_i μ_{ij}` (in `CF(L)`) have the **same**
+Gram matrix `w₁·δ_{jj'}` (`certainTypeOmegaSigma_sum_inner` and `columnFamily_mu_sum_inner`).
+Hence the `Z`-linear map `μ_j ↦ δ_k ∑_i ω_{ij}^σ` of (4.9)(b) is an isometry: the sign `δ_k = ±1`
+contributes `δ_k·conj(δ_k) = δ_k² = 1`, so `⟨δ_k ∑_i ω_{ij}^σ, δ_k ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}
+= ⟨μ_j, μ_{j'}⟩`. -/
+theorem certainType_omega_sum_isometry (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
+      = ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+          (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) := by
+  rw [certainTypeOmegaSigma_sum_inner, columnFamily_mu_sum_inner]
+
 end OddOrder.Peterfalvi.S06

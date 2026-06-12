@@ -71,6 +71,7 @@ import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -802,6 +803,23 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_apply_one_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.forall_columnFamily_mu_apply_one_eq_of_sum_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq_of_degree
+-- Peterfalvi (4.9)(b), the isometry property: the σ-image column sums `∑_i ω_ij^σ` (in CF(G)) and
+-- the certain-type column sums `μ_j = ∑_i μ_ij` (in CF(L)) carry the same Gram matrix `w₁·δ_jk`
+-- (`certainTypeOmegaSigma_sum_inner` / `columnFamily_mu_sum_inner`, both via per-element
+-- orthonormality: `certainTypeOmegaSigma_inner` from σ-isometry + ω-orthonormality and grid-index
+-- distinctness `omegaProdCharTic_eq_iff`; the μ-side from `columnFamily` injectivity/cross-column
+-- distinctness).  Hence `μ_j ↦ δ_k ∑_i ω_ij^σ` is an isometry (δ_k² = 1), which is (4.9)(b).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdCharTic_eq_iff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_sum_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_omega_sum_isometry
+-- Peterfalvi (4.9)(a) conjugation foundation: the complex conjugate of a linear character `ω(χ)` is
+-- `ω(χ⁻¹)` (`galoisMap_conj_omega`; values are roots of unity, where `z̄ = z⁻¹`), so the conjugate of
+-- a certain-type σ-image `ω_ij^σ` is the σ-image of the inverse grid character `ω((P_ij)⁻¹)`
+-- (`certainTypeOmegaSigma_conj`, via the (3.9) Galois commutation `sigma_mapRingEquiv_comm`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.galoisMap_conj_omega
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
