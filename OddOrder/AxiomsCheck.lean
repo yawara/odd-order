@@ -68,6 +68,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
+import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
@@ -751,6 +752,13 @@ set_option linter.style.longLine false in
 -- (`chiColumn_apply_of_mem_W1`: the `W₂`-projection `wSnd` is trivial on `W₁`) + step (1).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiColumn_apply_of_mem_W1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_apply_eq_of_mem_W1
+-- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
+-- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
+-- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
+-- conjugation map `(H ⧸ C_H(g)) × C_H(g) → Hg` injective; equal cardinality forces surjectivity.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.coset_conj_into_centralizer_coset
+-- (2.1) applied to `L = K ⋊ W₁`: every `z ∈ L − K` is `L`-conjugate to `x·y` (`x ∈ W₁^#`, `y ∈ W₂`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.mem_compl_conj_into_W
 -- RepresentationTheory ⭐ **KEYSTONE** (Peterfalvi §2 / [Is] Thm 2.8 系): the character of *any*
 -- finite-dim complex representation of a finite group is a virtual character (`∈ ℤ[Irr G]`).
 -- Strong `finrank` induction: Maschke splits a reducible rep into smaller summands whose characters
