@@ -237,4 +237,40 @@ theorem certainTypeExtension_inner_eq (h : Hypothesis46 A L) [NeZero (Nat.card h
         OddOrder.RepresentationTheory.inner_smul_right,
         OddOrder.RepresentationTheory.inner_smul_right, ih]
 
+/-! ### Support of the certain-type column characters (Peterfalvi (4.7)) -/
+
+/-- **`μ_j` vanishes off `A ∪ {1}`** (Peterfalvi (4.7)).  `μ_j = Ind_K^L χ_j` (`(4.5.a)`
+`induce_restrict_certainType_eq`, `chiRestrict = Res_K μ_{0j}`); the induced character vanishes
+outside `A ∪ {1}` for a nontrivial column `χ₂ ≠ 1`
+(`induce_chiRestrict_apply_eq_zero_of_not_mem_union`). -/
+theorem columnSum_apply_eq_zero_of_not_mem (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    {z : ↥L} (hz : (L.subtype z) ∉ A ∪ ({1} : Set G)) :
+    (columnSum h χ₂ : ClassFunction ↥L ℂ) z = 0 := by
+  have hbridge : columnSum h χ₂
+      = ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ) := by
+    rw [columnSum_def, ← h.induce_restrict_certainType_eq χ₂, h.coe_chiRestrict χ₂]
+  rw [hbridge]
+  exact induce_chiRestrict_apply_eq_zero_of_not_mem_union h hχ₂ hz
+
+/-- **`Supp μ_j ⊆ supportInSubgroup A L ∪ {1}`** (Peterfalvi (4.7), set form).  The support of the
+certain-type column character sits inside the certain subgroup `A` together with the identity. -/
+theorem columnSum_support_subset (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    (columnSum h χ₂).support ⊆ S04.supportInSubgroup A L ∪ {1} := by
+  intro z hz
+  rw [ClassFunction.mem_support] at hz
+  by_contra hzn
+  refine hz (columnSum_apply_eq_zero_of_not_mem h hχ₂ ?_)
+  rw [Set.mem_union] at hzn
+  push_neg at hzn
+  obtain ⟨hzA, hz1⟩ := hzn
+  rintro (hA | h1)
+  · exact hzA (by rwa [S04.mem_supportInSubgroup])
+  · exact hz1 (Set.mem_singleton_iff.mpr (Subtype.ext (Set.mem_singleton_iff.mp h1)))
+
 end OddOrder.Peterfalvi.S06
