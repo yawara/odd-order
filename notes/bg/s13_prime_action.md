@@ -45,6 +45,156 @@
 
 → 詳細・署名は **issue 8000** (`issues/8000-s13-blocked-cor1216ab.md`)。
 
+### session 1 進捗 (forward axiom path 採択後)
+
+- **forward axiom インフラ確立** (commit `c8080f87`): 新 leaf `S13_Lemma131.lean` に
+  `cor1216_pRank_normalizer_le_one` (a) / `cor1216_not_mem_primeFactors_derived_of_tau1` (b)
+  を provisional axiom 宣言、root 配線、full build 3792 緑。
+- **Lemma 13.1 step 1 着地** (sorry-free): `Msigma_commutator_M_le` (`⁅M_σ,M⁆≤M_σ`, 再利用可) +
+  `exists_sigma_prime_dvd_derived_Mstar` (mmd L3534: `⁅M_σ∩M*,M∩M*⁆≠1` ⟹ `∃q∈σ(M)∩π(M*')`)。
+
+### Lemma 13.1 残 step plan (mmd L3534-3546; scaffold `pSubgroup_centralizes_of_interaction` は
+S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
+
+- **step 2 (Frattini) ✅ COMPLETE (2026-06-12 session 1, commit `a93636c5`)**:
+  `exists_sylow_frattini_decomp` (sorry-free) = `q∉β(M*) ∧ q∣|M*'| ⟹ ∃ Y, Y≠⊥ ∧ IsPGroup q Y ∧
+  Y≤M*' ∧ Mstar = O_{β(M*)∪{q}}(M*') ⊔ (Mstar ⊓ N_G(Y))`。核 `M*_β Q ◁ D` =
+  `S10.normal_sup_sylow_of_quotient_nilpotent` (D/M*_β nilpotent) → O_{β∪q}(D) に押込 (char in D⊴M*
+  ⟹ K⊴M*)、Frattini = `Sylow.ofCard`+`Sylow.normalizer_sup_eq_top`+subtype transport (S10 Cor 10.9
+  機構縮約)。~100 行・4 build iteration で着地。helper `Mbeta_le_derived` も land。
+  🔑 **M*_β でなく K=O_{β∪q}(M*') を使うのが鍵** (K は M*' に characteristic ⟹ K⊴M* が無料)。
+- **step 3 = (b) `p∉τ₂(M*)` ✅ COMPLETE (2026-06-12 session 2, axiom 初使用)**:
+  `not_mem_tau2_of_interaction` (sorry-free; `#print axioms` = `[propext, Classical.choice,
+  Quot.sound, cor1216_pRank_normalizer_le_one]` — forward axiom のみ, sorryAx 無し)。
+  p∈τ₂(M*) 仮定→矛盾。実装の要:
+  - q∉β(M*): `(S10.disjoint_of_not_conj hG hMstar h.mem_maximal hnc').1.2`
+    (= `alpha Mstar ∩ sigma M = ∅`, hnc' = conjugacy 対称化を inline 2 行) + β⊆α。
+  - **r_p(N_{M*}(Y))=2 は τ₂ witness 不要**: 直接 `tau2_pRank_eq_two hpτ2` (=pRank M*=2) を
+    新 helper `pRank_le_of_factorization_card_eq` (N≤H ∧ v_p|H|=v_p|N| ⟹ pRank H≤pRank N;
+    N の Sylow p を `Sylow.ofCard` で H の Sylow p と同定 → `pRank_sylow_eq`) で N へ transfer。
+    v_p|M*|=v_p|N| は積公式を **↥M* 内**で (`card_HK_mul_card_inf_eq_card_mul_card` +
+    `Subgroup.normal_mul` (KM⊴⟹↑KM·↑NM=↑(KM⊔NM)) + `SetLike.coe_sort_coe`+`Subgroup.card_top`,
+    subgroupOf cards は `subgroupOfEquivOfLe`) → `|M*|·|K⊓N|=|K|·|N|`, 両辺 factorization_p:
+    v_p|K|=v_p|K⊓N|=0 (`p∤|K|`) ⟹ v_p|M*|=v_p|N|。p∤|K| = K {β∪q}-group ∧ p∉β(M*)
+    (τ₂⟹p∉σ⊇β) ∧ p≠q (`h.not_mem_sigma_of_mem_primeFactors` で p∉σ(M), q∈σ(M))。
+  - **r_p(N_{M*}(Y))≤1**: `cor1216_pRank_normalizer_le_one hG h hYne hYpi hpE hpβG hHY hnc`。
+    hpβG=`(isMaximalElementaryAbelian_of_mem_tau2 ... hpτ2 hAM hA).2` (witness A は
+    `exists_mem_elemAbelianOfRank_two_le_of_tau2`, S12_Lemma1211 を新規 import)。
+    hYpi: Y は q-group + q∈σ(M)。hHY: `mem_maximalSubgroupsContaining.mpr ⟨IsCoatom, Y≤M*⟩`。
+    `rw [← hNdef] at hle1` で N に fold して omega。
+  - 🔑 **import 知見**: S12_E の closure は S12_ECore のみ (S12_E は branch-A leaf)。proven §12
+    結果は別 leaf: `exists_mem_elemAbelianOfRank_two_le_of_tau2`=S12_Lemma1211 (branch B, 要 import),
+    `not_conj_symm`=S12_ExceptionalBridge (branch A, inline で回避),
+    `not_mem_sigma_of_mem_primeFactors`=S12_ECore の **`SubgroupESetup` namespace 内**
+    (dot 記法 `h.not_mem_sigma_of_mem_primeFactors hG hpE`)。§13 後続も同様に leaf を選んで import。
+  - 🔑 **新 helper 2 個** (axiom-clean, 再利用可, S13_Lemma131 冒頭): `pRank_eq_of_mulEquiv`
+    (≃* 不変), `pRank_le_of_factorization_card_eq` (上記)。step 4/5 でも使える見込み。
+  - **AxiomsCheck island assert は step 6 (assembly) で**: 現状 AxiomsCheck は S13_Lemma131 を
+    import せず (per-name `#assert_only_allowed_axioms` のみ) ⟹ full build 緑・gate pass。
+- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)` ✅ COMPLETE (2026-06-12 session 2)**:
+  `mem_idealPrime_of_tau1_of_interaction` (sorry-free; `#print axioms` = forward axiom
+  `cor1216_not_mem_primeFactors_derived_of_tau1` のみ + 標準, sorryAx 無し)。
+  🔑 **当初の心配 (Burnside Sylow⊆M*') は不要だった** — injection 論法は `p∈π(M*')` (full
+  Sylow でなく p∣|M*'|) だけでよい。再利用 helper 4 個 (全 axiom-clean):
+  - `derivedInG_le_sup_of_normal` (M*=K⊔N, K⊴M* ⟹ M*'≤K⊔N'; ↥M* 内 quotient `φ=mk' KM` で
+    `map φ commutator(↥M*)=map φ ⁅NM,NM⁆` → `comap_map_eq` → 下降 `map_subtype_commutator`)。
+  - `card_normal_sup_mul_card_inf` ((b) の積公式を一般 sup へ; |K⊔L|·|K⊓L|=|K|·|L|)。
+  - `mem_primeFactors_derived_of_not_tau1_tau2` (`p∈π(M*)∖τ₁∖τ₂ ⟹ p∈π(M*')`: σ は
+    Sylow⊆M_σ⊆M*' [`sigma_subgroup_le_Msigma_of_isHall`+`Msigma_le_derived`]、p∉σ は rank≤2
+    [`mem_alpha_iff`]∧≠2[τ₂]⟹=1∧p∉τ₁⟹p∈π(M*'); `one_le_pRank_of_mem_primeFactors` で rank≥1)。
+  - `pRank_eq_of_mulEquiv` / `pRank_le_of_factorization_card_eq` (step 3 由来)。
+  証明: by_contra ¬idealPrime → p∉β(M*) (β⟹idealPrime) → setup 再利用 (p∤|K|) →
+  hpMstarDeriv (p∈π M*') → hpNderiv (p∈π N': M*'≤K⊔N', |M*'|∣|K|·|N'|, p∤|K| で Euclid) →
+  axiom `cor1216(b)` の `p∉π(N')` と矛盾。⚠ setup ~30 行が (b) と重複 (将来 factor 候補)。
+- **step 5 = (a) centralization ✅ COMPLETE (2026-06-12 session 2)**:
+  `pSubgroup_centralizes_Msigma_inf` (**完全 axiom-clean** — forward axiom 不使用,
+  `#print axioms` = 標準3つのみ)。論法 (mmd L3542): `K_a=O_{α(M*)∪{p}}(M*')⊴M*` (uniform char),
+  `P⊆K_a` → `⁅M_σ∩M*,P⁆⊆M_σ⊓K_a=⊥`。新 helper:
+  - `derivedQuotientMalpha_isNilpotent` (keystone): M*'/M*_α = (M*'/M*_β)⧸(M*_α/M*_β) =
+    nilpotent M*'/M*_β の商 ⟹ nilpotent (`quotientQuotientEquivQuotient` + `nilpotent_of_surjective`;
+    `map_surjective_of_surjective` は friction で回避)。Malpha' Normal は instance 引数。
+  - `exists_sylow_le_derivedInG_of_not_tau1_tau2`: ∃ Sylow p of M* ⊆ M*' (σ=M_σ経由,
+    **τ₃=de-private `sylow_le_derived_of_mem_tau3` 経由** E*'⊆M*' + |E*|_p=|M*|_p)。
+  - `sylow_le_opiCoreInG_alpha_p`: S⊆K_a (p∈α は S⊆M*_α⊆K_a [`isPiGroup_le_of_normal_isHallSubgroup`],
+    p∉α は M*_α⊔S⊴M*' [keystone+`normal_sup_sylow`] ⊆K_a)。
+  - `commutator_le_of_subgroupOf_normal`: ⁅K,H⁆≤K (Msigma_commutator_M_le 一般化)。
+  - **P⊆K_a は full Sylow⊆M*' でなく cardinality で**: |K_a|_p=|M*|_p (S⊆K_a) ⟹ p∤[M*:K_a] ⟹
+    P の ↥M*/K_a 像が coprime位数 p-group ⟹ 自明 ⟹ P⊆K_a (Hall 性証明を回避)。
+  - M_σ⊓K_a=⊥: `inf_eq_bot_of_coprime` (`coprime_card_of_isPiSubgroup_of_isPiSubgroup_compl`;
+    α(M*)∩σ(M)=∅ via `disjoint_of_not_conj` swapped, p∉σ(M) via `not_mem_sigma_of_mem_primeFactors`)。
+- **step 6 = assembly ✅ COMPLETE (2026-06-12 session 2)**:
+  `pSubgroup_centralizes_of_interaction` (S13_PrimeAction scaffold) を (a)(b)(c) で組立、
+  sorry 除去 (S13_PrimeAction 実 sorry 11→10)。S13_PrimeAction が S13_Lemma131 を import。
+  `#print axioms` = [propext, cor1216_pRank_normalizer_le_one,
+  cor1216_not_mem_primeFactors_derived_of_tau1]。**AxiomsCheck island 4件 PASS** (full build
+  3645 jobs): (a)=allowed, (b)(c)/full=island。S13_PrimeAction を AxiomsCheck import 追加済。
+  ⟹ **🎉 BG Lemma 13.1 完全証明 (forward axiom conditional)**。次 = **Cor 13.2** (mmd L3548;
+  「follows directly from Lemma 13.1」+ Lemma 12.2(a))。
+
+### 2026-06-13 Lane G session 3: Cor 13.2 ✅ COMPLETE (新 leaf `S13_Corollary132.lean`)
+
+**`tau13_pSubgroup_centralizes` 完全証明** (sorry-free, axiom = 2 forward `cor1216_*` のみ;
+新規 axiom 0)。S13_PrimeAction scaffold stub を leaf へ移動 (実 sorry 10→9)、S13_PrimeAction が
+leaf を import し再 export。root + AxiomsCheck (island PASS, full build 3793/3646 jobs) に配線。
+
+証明構造 (3 結論を共通 setup 後 `by_cases ⁅M_σ∩M*, M∩M*⁆ = ⊥` で分岐):
+- **非共役** `hnc` = `not_conj_of_mem_tau1_union_tau3_of_normalizer_le` (BG Lem 12.2(b), 既存) を
+  X:=P で適用 — **無料** (conj-invariance/disjointness 自作不要)。
+- **=⊥ 枝**: `commutator_eq_bot_iff_le_centralizer` で M∩M* がそのまま中心化 (向き =
+  `⁅H,K⁆=⊥ ↔ H≤C(K)`、hcomm を `commutator_comm` で swap)。(a)(b) trivial、(c) vacuous。
+- **≠⊥ 枝**: `not_mem_tau2_of_interaction` (13.1b) で `p∉τ₂(M*)`、`prime_mem_sigma_or_tau2`
+  (12.2a) と合わせ `p∈σ(M*)`、`tau1_subset_sigma_compl` で `p∉τ₁(M*)`。
+  - (a) = `pSubgroup_centralizes_Msigma_inf` (13.1a) 直接。
+  - (b) = 新 reusable helper **`le_centralizer_of_forall_prime_isPGroup`**(有限群は素冪部分群で
+    生成 — orderOf の素冪分解 z=y^m / w=y^{r^a} + Bézout `gcd_eq_gcd_ab` で y=w^A·z^B、
+    `Nat.strong_induction_on orderOf`)を K:=Q に適用、各素冪部分群 R に (a) を per-prime 適用
+    (`r∈π(Q)⟹r∉τ₁(M*)` via `IsPiSubgroup`、`r∈π(E)/π(M*)` via `mem_primeFactors_of_isPGroup_le`)。
+  - (c) `p∈β(M*)` = `mem_idealPrime_of_tau1_of_interaction` (13.1c, `idealPrime`) +
+    `p∈α(M*)`: `pRank M* p = pRank G p` via 新 helper **`pRank_eq_of_mem_sigma`**
+    (`isSylow_sylowMap_of_mem_sigma` + `pRank_sylow_eq` + `equivMapOfInjective`)、`idealPrime` の
+    `r_p(G)≥3` を移送。
+- 新 helper 4 (再利用可): `le_centralizer_of_forall_prime_isPGroup` /
+  `mem_primeFactors_of_isPGroup_le` / `mem_primeFactors_E_of_mem_M_of_not_sigma`
+  (|M|=|M_σ||E| + `Msigma_isPiGroup`) / `pRank_eq_of_mem_sigma`。
+- **次 = Cor 13.3** (`cyclicSylow_actsPrime`; mmd L3556): Cor 13.2(a)(b) + `ActsPrimeOn` 定義
+  (S13_PrimeAction 内)。leaf は ActsPrimeOn を要するので S13_PrimeAction を import
+  ⟹ S13_PrimeAction は 13.3 leaf を import 不可 (cycle)、13.3 stub は leaf へ移し root 直 import。
+
+  **⚠ 13.3 は terse corollary に見えて real proof（mmd「this proves (a)」が coprime-action 論法を省略）**:
+  - `ActsPrimeOn` 定義 = element 形 `∀g∈P#, C_{M_σ}(g)=C_{M_σ}(P)`。cyclic P では
+    `ℰ¹(P)={Ω₁(P)}` ゆえ **`C_{M_σ}(Ω₁P) ⊆ C_{M_σ}(P)` に帰着**(両形同値、mmd L3490)。
+  - これは `D:=C_{M_σ}(Ω₁P)` に P を coprime 作用 (p∤|M_σ|) ⟹ `D=C_D(P)·[D,P]`,
+    `C_D(P)=C_{M_σ}(P)`。**crux = `[D,P]=1`**(P-FPF on [D,P])。
+  - Cor 13.2(a) は「N_E(P) の p-部分群が C_{M_σ}(P)=M_σ∩M* を中心化」を与える
+    (C_G(P)⊆N_G(P)⊆M* ゆえ C_{M_σ}(P)⊆M_σ∩M*) が、これだけでは `[D,P]=1`(D は Ω₁P の
+    centralizer で C_{M_σ}(P) より大) に直結しない。P が **E の Sylow** であること + [D,P] の
+    Sylow への Frattini/局所論法が要る。**未解決の path; 次セッションの第一課題**。
+  - coprime 分解 infra: `OddOrder.Isaacs.Ch04.fixedPoints_sup_actionCommutator_eq_top`
+    (抽象 action 形、subgroup 設定への適応要)。
+  - (b) E₃ は mmd 明快: E₃⊆E'⊆M*', π(E₃)⊆π(M*')⊆(τ₁M*)' ⟹ Cor 13.2(b) 直接
+    ((a) より易、先に landing 可)。
+
+### 2026-06-13 Lane G: main 同期 + **de-axiom 完了** (issue 8000 closed)
+
+main 取り込み (merge, 102 commits)。Lane F が issue 0065 で **S12_E に Cor 12.16(a)(b) faithful
+sorry'd statement** を露出済 (`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, commit `e876f29b`, 私の forward axiom と
+**byte-identical drop-in 署名**) と判明 → handshake step 2 実行:
+- S13_Lemma131 の forward axiom 2 本 (`cor1216_*`) を**削除**、cite 先を S12_E の 2 定理へ差し替え
+  (use site 2 箇所、引数 list 不変ゆえ機械的)。
+- AxiomsCheck: cor1216 island 3 本 + Cor 13.2 island を削除。13.1(a)
+  `pSubgroup_centralizes_Msigma_inf` は S12_E Cor 12.16 非依存 (`[propext, Classical.choice,
+  Quot.sound]` clean) ゆえ `#assert_only_allowed_axioms` 維持。
+- footprint: Lemma 13.1(b)(c)/full・Cor 13.2 = `[propext, sorryAx, Classical.choice, Quot.sound]`
+  (sorryAx = S12_E Cor 12.16 由来 = repo 標準 scaffold-sorry)。**新規 axiom 0**。
+- full build 3796 + AxiomsCheck 3782 green。**HOLD 解消** (G の forward axiom 消滅 ⟹ merge ブロッカー無し)。
+- 残: F が S12_E の 2 sorry を §12 cascade で埋めれば §13 全体が自動 unconditional 化 (issue 0065)。
+
+surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
+`S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
+`isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
+`tau2 M={p∉σ ∧ pRank=2}`/`tau2_pRank_eq_two`, `S10.disjoint_of_not_conj` (10.12)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint

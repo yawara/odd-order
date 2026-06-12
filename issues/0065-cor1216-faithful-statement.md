@@ -19,6 +19,13 @@ drop-in 署名から `maximalSubgroupsContaining Y` (Subgroup 引数; 元の `(Y
 **G は main 同期後、forward axiom 2 本をこの 2 定理の cite に置換可能** (de-axiom handshake step 2)。
 本 issue は G の de-axiom + issue 8000 closed まで open のまま。
 
+## ✅ G 側完了 (2026-06-13, Lane G)
+
+main 同期後、G が forward axiom 2 本を削除し cite 先を上記 2 定理へ差し替え (de-axiom 完了)。
+Lemma 13.1・Cor 13.2 とも新規 axiom 0、issue 8000 closed。**残るは F の本体 proof**
+(S12_E の 2 sorry を §12 cascade で埋める) — それで §13 が自動 unconditional 化。F が proof 完了時に
+本 issue を closed へ。
+
 ## 依頼者・経緯
 
 **hub → Lane F への依頼** (2026-06-12, ユーザー指示)。

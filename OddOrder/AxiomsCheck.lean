@@ -60,6 +60,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3722,6 +3723,21 @@ axiom(s):{indentD m!"{missing}"} — remove them from the island"
   else
     throwError m!"axioms island FAILED: `{constName}` has unexpected \
 axiom(s):{indentD m!"{bad.toList}"}"
+
+/-! #### BG §13 Lemma 13.1 / Corollary 13.2 (de-axiom 済, issues 8000/0065)
+
+Lemma 13.1 と Corollary 13.2 は BG Corollary 12.16(a)(b) を本質的に使う。当初は §12 に faithful な
+statement が無く provisional forward axiom (`cor1216_*`) で進めたが、Lane F が S12_E に faithful な
+sorry'd statement (`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, issue 0065) を露出したのを受け、cite 先を
+それらへ差し替えて **de-axiom 済** (2026-06-13)。よって §13 は新規 axiom 0 で repo 標準の
+scaffold-sorry 規約に準拠する: 13.1(b)(c)・full assembly・Cor 13.2 は S12_E Cor 12.16 の sorry に
+bottom-out するため `#assert_*` 対象外 (§12 cascade が proof を埋めれば自動 unconditional 化)。
+13.1(a) のみ S12_E Cor 12.16 に非依存で axiom-clean ゆえ下記で pin する。 -/
+
+-- BG Lemma 13.1(a): every `p`-subgroup of `M ⊓ M*` centralizes `M_σ ⊓ M*`
+-- (S12_E Cor 12.16 に非依存; axiom-clean).
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.pSubgroup_centralizes_Msigma_inf
 
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
