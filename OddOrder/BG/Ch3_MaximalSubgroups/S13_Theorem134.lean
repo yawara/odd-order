@@ -113,7 +113,18 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   have hint : ⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≠ ⊥ := fun hb =>
     hQne (le_bot_iff.mp (hQsub.trans (Subgroup.commutator_mono le_rfl hRMMstar |>.trans hb.le)))
   have hpβ : p ∈ S10.beta Mstar := (hcor132.2.2 hint).2 hp
-  -- steps 4-9: Prop 12.15 / Lemma 12.18 contradiction (M_α structure). 🚧
+  -- `M* ≠ M` (else `M*` is conjugate to `M` via `g = 1`).
+  have hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar :=
+    not_conj_of_mem_tau1_union_tau3_of_normalizer_le hG h.mem_maximal (Or.inl hp) hPM hPne hPp hNP
+  have hMstarNe : Mstar ≠ M := fun heq => hnc ⟨1, by rw [map_one, one_smul]; exact heq.symm⟩
+  -- step 4a: `S` is abelian (Theorem 12.13: a nonabelian `q`-subgroup would be uniquely maximal,
+  -- contradicting `S ≤ M` and `S ≤ M*` with `M ≠ M*`).
+  have hSab : IsMulCommutative ↥S := by
+    by_contra hnab
+    exact hMstarNe ((nonabelian_pgroup_isUniquelyMaximal hG hSpg hnab).eq_of_isCoatom_of_le
+      (mem_maximalSubgroups.mp h.mem_maximal) (hSMsig.trans (S10.Msigma_le M))
+      hMstarCo hSMstar).symm
+  -- steps 4b-9: `C_⁅S,R⁆(R) = 1`, `ℳ(N_G(Q)) = {M*}`, Prop 12.15, `C_{M_α}` contradiction. 🚧
   sorry
 
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
