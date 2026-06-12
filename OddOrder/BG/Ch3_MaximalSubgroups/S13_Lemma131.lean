@@ -453,17 +453,43 @@ theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [← hNdef] at hle1
   omega
 
+/-- **τ-partition** for a prime `p ∈ π(M*)` (`M*` maximal): if `p ∉ τ₁(M*)` and `p ∉ τ₂(M*)`, then
+`p ∈ σ(M*) ∪ τ₃(M*)`. If `p ∉ σ(M*)` then `p ∉ α(M*)` gives `r_p(M*) ≤ 2`, `p ∉ τ₂(M*)` gives
+`r_p(M*) ≠ 2` (so `= 1` since `r_p(M*) ≥ 1`), and `p ∉ τ₁(M*)` then forces `p ∈ π(M*')`, i.e.
+`p ∈ τ₃(M*)`. -/
+theorem mem_sigma_or_tau3_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors)
+    (hpτ1 : p ∉ tau1 Mstar) (hpτ2 : p ∉ tau2 Mstar) :
+    p ∈ S10.sigma Mstar ∨ p ∈ tau3 Mstar := by
+  classical
+  by_cases hpσ : p ∈ S10.sigma Mstar
+  · exact Or.inl hpσ
+  · refine Or.inr ?_
+    have hpα : p ∉ S10.alpha Mstar := fun ha => hpσ (S10.alpha_subset_sigma hG hMstar ha)
+    have hrank_le : pRank ↥Mstar p ≤ 2 := by
+      by_contra hr
+      exact hpα ((S10.mem_alpha_iff Mstar p).mpr ⟨hpMstar, by omega⟩)
+    have hrank_ge : 1 ≤ pRank ↥Mstar p := one_le_pRank_of_mem_primeFactors hpMstar
+    have hrank1 : pRank ↥Mstar p = 1 := by
+      rcases (by omega : pRank ↥Mstar p = 1 ∨ pRank ↥Mstar p = 2) with h1 | h2
+      · exact h1
+      · exact absurd ((mem_tau2_iff Mstar p).mpr ⟨hpσ, h2⟩) hpτ2
+    have hpderiv : p ∈ (Nat.card ↥(derivedInG Mstar)).primeFactors := by
+      by_contra hpND
+      exact hpτ1 ((mem_tau1_iff Mstar p).mpr ⟨hpσ, hpND, hrank1⟩)
+    exact (mem_tau3_iff Mstar p).mpr ⟨hpσ, hpderiv, hrank1⟩
+
 /-- For a prime `p ∈ π(M*)` with `p ∉ τ₁(M*)` and `p ∉ τ₂(M*)` (so `p ∈ σ(M*) ∪ τ₃(M*)`),
-`p ∈ π(M*')`. In the `σ` case a Sylow `p`-subgroup lies in `M*_σ ⊆ M*'`; in the `p ∉ σ` case the
-`p`-rank is `≤ 2` (`p ∉ α(M*)`) and `≠ 2` (`p ∉ τ₂(M*)`), hence `= 1`, so `p ∉ τ₁(M*)` forces
-`p ∈ π(M*')`. -/
+`p ∈ π(M*')`. In the `σ` case a Sylow `p`-subgroup lies in `M*_σ ⊆ M*'`; in the `τ₃` case
+`p ∈ π(M*')` by definition (`tau3_mem_derived_primeFactors`). -/
 theorem mem_primeFactors_derived_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
     {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
     (hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors)
     (hpτ1 : p ∉ tau1 Mstar) (hpτ2 : p ∉ tau2 Mstar) :
     p ∈ (Nat.card ↥(derivedInG Mstar)).primeFactors := by
   classical
-  by_cases hpσ : p ∈ S10.sigma Mstar
+  rcases mem_sigma_or_tau3_of_not_tau1_tau2 hG hMstar hpMstar hpτ1 hpτ2 with hpσ | hτ3
   · obtain ⟨SM⟩ : Nonempty (Sylow p ↥Mstar) := inferInstance
     set S : Subgroup G := (SM : Subgroup ↥Mstar).map Mstar.subtype with hSdef
     have hScard : Nat.card ↥S = p ^ (Nat.card ↥Mstar).factorization p := by
@@ -486,17 +512,7 @@ theorem mem_primeFactors_derived_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSimp
         (Nat.dvd_of_mem_primeFactors hpMstar)).ne'
     exact Nat.mem_primeFactors.mpr ⟨Fact.out, hpS.trans (Subgroup.card_dvd_of_le hS_le_deriv),
       Nat.card_pos.ne'⟩
-  · by_contra hpNotDeriv
-    have hpα : p ∉ S10.alpha Mstar := fun ha => hpσ (S10.alpha_subset_sigma hG hMstar ha)
-    have hrank_le : pRank ↥Mstar p ≤ 2 := by
-      by_contra hr
-      exact hpα ((S10.mem_alpha_iff Mstar p).mpr ⟨hpMstar, by omega⟩)
-    have hrank_ge : 1 ≤ pRank ↥Mstar p := one_le_pRank_of_mem_primeFactors hpMstar
-    have hrank1 : pRank ↥Mstar p = 1 := by
-      rcases (by omega : pRank ↥Mstar p = 1 ∨ pRank ↥Mstar p = 2) with h1 | h2
-      · exact h1
-      · exact absurd ((mem_tau2_iff Mstar p).mpr ⟨hpσ, h2⟩) hpτ2
-    exact hpτ1 ((mem_tau1_iff Mstar p).mpr ⟨hpσ, hpNotDeriv, hrank1⟩)
+  · exact tau3_mem_derived_primeFactors hτ3
 
 /-- **Lemma 13.1, step 4 = conclusion (c)** (mmd L3540): under the Lemma 13.1 hypotheses plus
 `p ∈ τ₁(M)` (and `p ∉ τ₂(M*)`, conclusion (b)), `p ∈ β(G)`. Assume `¬(p ∈ β(G))`. Then
@@ -573,5 +589,56 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
     hHY hnc
   rw [← hNdef] at hax
   exact hax hpNderiv
+
+/-! ## Lemma 13.1 — conclusion (a) (mmd L3542) -/
+
+/-- For `p ∈ π(M*) ∖ τ₁(M*) ∖ τ₂(M*)` (`p ∈ σ(M*) ∪ τ₃(M*)`), there is a Sylow `p`-subgroup `S`
+of `M*` (as a subgroup of `G`) lying in `M*'`. In the `σ` case `S ⊆ M*_σ ⊆ M*'`; in the `τ₃` case
+`S` is a Sylow `p` of the complement `E*` (`p ∉ σ`, so `|E*|_p = |M*|_p`) and `S ⊆ E*' ⊆ M*'`
+(`sylow_le_derived_of_mem_tau3`). -/
+theorem exists_sylow_le_derivedInG_of_not_tau1_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors)
+    (hpτ1 : p ∉ tau1 Mstar) (hpτ2 : p ∉ tau2 Mstar) :
+    ∃ S : Subgroup G, S ≤ Mstar ∧ IsPGroup p ↥S ∧
+      Nat.card ↥S = p ^ (Nat.card ↥Mstar).factorization p ∧ S ≤ derivedInG Mstar := by
+  classical
+  rcases mem_sigma_or_tau3_of_not_tau1_tau2 hG hMstar hpMstar hpτ1 hpτ2 with hpσ | hτ3
+  · -- σ: any Sylow `p` of `M*` lies in `M*_σ ⊆ M*'`.
+    obtain ⟨SM⟩ : Nonempty (Sylow p ↥Mstar) := inferInstance
+    refine ⟨(SM : Subgroup ↥Mstar).map Mstar.subtype, Subgroup.map_subtype_le _,
+      SM.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ _ Mstar.subtype_injective), ?_, ?_⟩
+    · rw [Subgroup.card_map_of_injective Mstar.subtype_injective, Sylow.card_eq_multiplicity SM]
+    · have hSpi : Ch03.Subgroup.IsPiGroup (S10.sigma Mstar)
+          ((SM : Subgroup ↥Mstar).map Mstar.subtype) := by
+        intro r hr
+        rw [Subgroup.card_map_of_injective Mstar.subtype_injective,
+          Sylow.card_eq_multiplicity SM] at hr
+        obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp SM.isPGroup'
+        have hr_prime := Nat.prime_of_mem_primeFactors hr
+        have hrp : r = p := (Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp
+          (hr_prime.dvd_of_dvd_pow (Nat.mem_primeFactors.mp hr).2.1)
+        rw [hrp]; exact hpσ
+      exact (S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hMstar)
+        (Subgroup.map_subtype_le _) hSpi).trans (S10.Msigma_le_derived hG hMstar)
+  · -- τ₃: Sylow `p` of the complement `E*`, via the de-privatized lemma.
+    obtain ⟨Es, E1s, E2s, E3s, hs⟩ := exists_subgroupESetup hG hMstar
+    obtain ⟨PE⟩ : Nonempty (Sylow p ↥Es) := inferInstance
+    have hpσ : p ∉ S10.sigma Mstar := ((mem_tau3_iff Mstar p).mp hτ3).1
+    have hEscard : (Nat.card ↥Es).factorization p = (Nat.card ↥Mstar).factorization p := by
+      have hnorm : ((S10.Msigma Mstar).subgroupOf Mstar).Normal := by
+        rw [S10.Msigma_subgroupOf]; infer_instance
+      have hmul := card_normal_sup_mul_card_inf (S10.Msigma_le Mstar) hs.E_le hnorm
+      rw [hs.E_compl_sup, hs.E_compl_inf, Subgroup.card_bot, mul_one] at hmul
+      have hpMsig : ¬ p ∣ Nat.card ↥(S10.Msigma Mstar) := fun hd =>
+        hpσ (S10.Msigma_isPiGroup Mstar p
+          (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩))
+      rw [hmul, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd hpMsig, zero_add]
+    refine ⟨(PE : Subgroup ↥Es).map Es.subtype, (Subgroup.map_subtype_le _).trans hs.E_le,
+      PE.isPGroup'.of_equiv (Subgroup.equivMapOfInjective _ _ Es.subtype_injective), ?_, ?_⟩
+    · rw [Subgroup.card_map_of_injective Es.subtype_injective, Sylow.card_eq_multiplicity PE,
+        hEscard]
+    · exact (sylow_le_derived_of_mem_tau3 hG hs hτ3 PE).1.trans (derivedInG_le_derivedInG hs.E_le)
 
 end OddOrder.BG.Ch3.S13
