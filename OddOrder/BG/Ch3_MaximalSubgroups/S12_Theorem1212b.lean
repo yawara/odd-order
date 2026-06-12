@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 
 /-!
 # BG §12: Theorem 12.12 — Case 3 (abelian Sylow `p`), building blocks
@@ -244,5 +245,63 @@ theorem isCyclic_quotient_of_conjugation_fpf [Finite G]
   rw [hfpf (a : G) a.2 ha_cent, Subgroup.mem_bot] at hmem
   rw [Subgroup.mem_bot]
   exact Subtype.ext hmem
+
+/-! ## Back-half (Z construction): rank-2 abelian split ⟹ factors cyclic -/
+
+/-- In a finite abelian `p`-group `T` (`p` odd) of `p`-rank `≤ 2`, a subgroup `T₀` disjoint from a
+*nontrivial* subgroup `T₁` is cyclic. If `T₀` were noncyclic it would contain an elementary abelian
+`B₀ ≤ T₀` of order `p²`; with an order-`p` element `y ∈ T₁`, the join `B₀ ⊔ ⟨y⟩` (disjoint since
+`T₀ ⊓ T₁ = ⊥`) is elementary abelian of order `p³`, forcing `pRank T ≥ 3`, a contradiction.
+Used in Theorem 12.12 Case 3 for `S = C_S(X) × [S,X]`: both factors are cyclic since `r(S) = 2`. -/
+theorem isCyclic_of_inf_eq_bot_of_pRank_le_two {T : Type*} [CommGroup T] [Finite T] {p : ℕ}
+    [Fact p.Prime] (hTp : IsPGroup p T) (hodd : Odd p) (hrank : pRank T p ≤ 2)
+    {T₀ T₁ : Subgroup T} (hdisj : T₀ ⊓ T₁ = ⊥) (hT₁ : T₁ ≠ ⊥) :
+    IsCyclic ↥T₀ := by
+  classical
+  by_contra hnc
+  -- noncyclic `T₀` contains an elementary abelian `B₀` of order `p²`.
+  obtain ⟨B₀, hB₀ea, hB₀card⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+      (hTp.to_subgroup T₀) hodd hnc
+  set B : Subgroup T := B₀.map T₀.subtype with hB_def
+  have hBea : B.IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.map T₀.subtype_injective hB₀ea
+  have hBT₀ : B ≤ T₀ := Subgroup.map_subtype_le B₀
+  have hBcard : Nat.card ↥B = p ^ 2 := by
+    rw [hB_def, ← hB₀card]
+    exact Nat.card_congr
+      (Subgroup.equivMapOfInjective B₀ T₀.subtype T₀.subtype_injective).symm.toEquiv
+  -- an order-`p` element `y ∈ T₁`.
+  haveI : Nontrivial ↥T₁ := (Subgroup.nontrivial_iff_ne_bot T₁).mpr hT₁
+  have hp_dvd : p ∣ Nat.card ↥T₁ := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp (hTp.to_subgroup T₁)
+    have h1lt : 1 < Nat.card ↥T₁ := Finite.one_lt_card
+    have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+    rw [hk]; exact dvd_pow_self p hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  set y : T := T₁.subtype x with hy_def
+  have hyT₁ : y ∈ T₁ := x.2
+  have hyord : orderOf y = p := by
+    rw [hy_def, orderOf_injective T₁.subtype T₁.subtype_injective x]; exact hx
+  -- `⟨y⟩` is elementary abelian of order `p`.
+  have hZcard : Nat.card ↥(Subgroup.zpowers y) = p := by rw [Nat.card_zpowers]; exact hyord
+  have hZea : (Subgroup.zpowers y).IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.of_card_prime hZcard
+  have hZT₁ : Subgroup.zpowers y ≤ T₁ := by rw [Subgroup.zpowers_le]; exact hyT₁
+  -- `B ⊓ ⟨y⟩ = ⊥` (both inside the disjoint `T₀`, `T₁`).
+  have hBZ_disj : B ⊓ Subgroup.zpowers y = ⊥ := by
+    rw [← le_bot_iff, ← hdisj]
+    exact le_inf (inf_le_left.trans hBT₀) (inf_le_right.trans hZT₁)
+  -- `B ⊔ ⟨y⟩` is elementary abelian of order `p³`, so `pRank T ≥ 3`.
+  have hcent : B ≤ Subgroup.centralizer (Subgroup.zpowers y : Set T) :=
+    fun b _ => Subgroup.mem_centralizer_iff.mpr (fun g _ => mul_comm g b)
+  have hsupea : (B ⊔ Subgroup.zpowers y).IsElementaryAbelian p :=
+    isElementaryAbelian_sup_of_le_centralizer hBea hZea hcent
+  have hsupcard : Nat.card ↥(B ⊔ Subgroup.zpowers y) = p ^ 3 := by
+    rw [OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal hBZ_disj, hBcard, hZcard]
+    ring
+  have hle := le_pRank (B ⊔ Subgroup.zpowers y) hsupea
+  rw [hsupcard, Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+  omega
 
 end OddOrder.BG.Ch3.S12
