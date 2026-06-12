@@ -2300,3 +2300,38 @@ supp μ_j⊆A∪{1}、差は1で消える)。
 **capstone**: `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
 (certainTypeSet h k) (supportInSubgroup A L)` を 5 field 組立 (要 k≠1)。→ S08 case-B。
 **正本=本 session 37。次 = field 4 の sub-lemma 1「Z[𝒯,A] 生成」から (S06_CertainTypeCoherence に追記)。**
+
+## 2026-06-12 (session 37 cont., /loop): ✅ field 4 core — generator τ-agreement + infra
+
+(S06_CertainTypeCoherence, +4 commits, axiom-clean, build 3601)。field 4 (extends_on_supported)
+の数学的核心を landed:
+
+- **certainTypeSet 次数条件を `∑_i μ_ij(1)` 形に変更** (degree bridge `forall_columnFamily_mu_apply_one_eq_of_sum_eq`
+  の hyp 形に一致; fields 3/5 は次数 component を `_` で無視ゆえ無傷)。
+- **columnSum_apply_one**: `μ_j(1) = ∑_i μ_ij(1)` (eval AddMonoidHom `AddMonoidHom.mk' (fun φ => φ 1) (fun _ _ => rfl)` + map_sum)。
+- **certainType_columnSign_eq**: 列次数等 ⟹ `δ_j = δ_k` ((4.8) step1 列版、`certainType_sign_eq_of_degree_eq` を row 0 で)。
+- **columnDiff_support_subset**: `Supp(μ_j−μ_k) ⊆ supportInSubgroup A L` (両 μ vanish off A∪{1}、差は1で消える)。
+- **✅✅ certainTypeExtension_columnDiff_eq_dade** (field 4 核心): `ν(μ_j−μ_k) = τ(μ_j−μ_k)`、両辺 = `δ_j ∑(ω_ij^σ−ω_ik^σ)`。
+  RHS = `dadeIntegralCharacterMap_apply_of_support` (supp⊆A⊆A₀、`supportInSubgroup_mono Set.subset_union_left`)
+  → `S04.IsDadeMap.unique (k:=ℂ) h.dade0.isDadeMap_dadeMap h.tau.toDadeIsometryData.isDadeMap`
+  (h.dade0.dadeMap = h.tau.toDadeMap) → `certainType_diff_dade_sum_eq h hχeq hχ₂ hχ₂' hdi`
+  (bundled `⟨μ_j−μ_k,_⟩ = ∑ certainTypeDiffSupported` を `congr 1; Subtype.ext hval`、
+  `hval`= `AddSubmonoidClass.coe_finset_sum` + columnSum_def + `rfl`)。χ₂=χ₂' は `sub_self;map_zero` で別処理。
+  LHS = `map_sub` + certainTypeExtension_columnSum×2 + `← certainType_columnSign_eq` + `←smul_sub` + `←Finset.sum_sub_distrib`。
+
+### ▶▶ 次 = field 4 仕上げ → field 1 → capstone (session 38; **Opus 継続**)
+
+1. **「Z[𝒯,A] は μ_j−μ_k で生成」** (残 Finsupp lemma): `φ ∈ zSupportedSpan 𝒯 (supportInSubgroup A L) →
+   φ ∈ span ℤ ((·−columnSum k)''𝒯)`。証明 = `mem_span_set` で `c : CF→₀ℤ` (supp⊆𝒯) →
+   各 m∈𝒯 は m(1)=d (columnSum_apply_one + 𝒯 次数条件、d=μ_k(1)≠0) → **φ(1)=0** (supp⊆supportInSubgroup A L,
+   **1∉A** = `h.dade0.ne_one` 経由 [a∈A₀→a≠1, A⊆A₀]) → ∑c(m)=0 → φ=∑c(m)(m−μ_k)∈span T。
+   `Finsupp.sum` の (1) 評価が要 (`columnSum_apply_one` の eval-hom 流用)。
+2. **field 4 = `certainTypeExtension_eq_dade_of_mem_zSupportedSpan`**: `S07.eq_on_zSpan_of_eq_on`
+   (T=差集合; T 上一致 = generator agreement、span 帰属 = 1.の lemma)。
+3. **field 1 (nonzero)**: witness `columnSum k⁻¹ − columnSum k`。∈ zSupportedSpan: 両端∈𝒯
+   (μ̄_k=μ_{k⁻¹}=`certainType_columnSum_conj`、k⁻¹≠1[k≠1]、次数等 [複素共役は次数保存: μ_{k⁻¹}(1)=conj(μ_k(1))=μ_k(1) ∵ 指標次数は実]、
+   supp⊆supportInSubgroup A L = `columnDiff_support_subset h (k⁻¹≠1) (k≠1) (deg)`)。≠0 = `certainType_columnSum_conj_ne`。
+   ⚠ 次数等の「∑μ_{i,k⁻¹}(1) = ∑μ_{i,k}(1)」: 複素共役の次数保存を sum 形で要証明。
+4. **capstone** `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
+   (certainTypeSet h k) (supportInSubgroup A L)` (要 k≠1)、5 field 組立。→ S08 case-B。
+**正本=本 session 37 cont.。field 4 核心 DONE; 次 = generated-by-differences Finsupp lemma。**
