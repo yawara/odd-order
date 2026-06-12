@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 
 /-!
 # BG §13: Lemma 13.1 (異 maximal `M*` との `p`-相互作用)
@@ -70,6 +71,41 @@ axiom cor1216_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSim
     (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
     p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors
 
+/-! ## `pRank` transfer helpers (reusable) -/
+
+/-- `p`-rank is invariant under group isomorphism. -/
+theorem pRank_eq_of_mulEquiv {A B : Type*} [Group A] [Finite A] [Group B] [Finite B]
+    {p : ℕ} (e : A ≃* B) : pRank A p = pRank B p :=
+  le_antisymm (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
+    (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective)
+
+/-- If `N ≤ H` are subgroups whose orders have the same `p`-adic valuation (equivalently, `N`
+contains a Sylow `p`-subgroup of `H`), then `pRank ↥H p ≤ pRank ↥N p`. A Sylow `p`-subgroup of
+`N` then has order `p ^ v_p(|H|)`, so it is a Sylow `p`-subgroup of `H`, and `pRank` is realised
+on Sylow subgroups (`pRank_sylow_eq`). Reusable. -/
+theorem pRank_le_of_factorization_card_eq [Finite G] {p : ℕ} [Fact p.Prime]
+    {N H : Subgroup G} (hNH : N ≤ H)
+    (hfact : (Nat.card ↥H).factorization p = (Nat.card ↥N).factorization p) :
+    pRank ↥H p ≤ pRank ↥N p := by
+  classical
+  obtain ⟨Q⟩ : Nonempty (Sylow p ↥N) := inferInstance
+  set Pn : Subgroup G := (Q : Subgroup ↥N).map N.subtype with hPndef
+  have hPnN : Pn ≤ N := Subgroup.map_subtype_le _
+  have hPnH : Pn ≤ H := hPnN.trans hNH
+  have hPncard : Nat.card ↥Pn = p ^ (Nat.card ↥N).factorization p := by
+    rw [hPndef, Subgroup.card_map_of_injective N.subtype_injective]
+    exact Sylow.card_eq_multiplicity Q
+  have hPnHcard : Nat.card ↥(Pn.subgroupOf H) = p ^ (Nat.card ↥H).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPnH).toEquiv, hPncard, hfact]
+  set S : Sylow p ↥H := Sylow.ofCard (Pn.subgroupOf H) hPnHcard with hSdef
+  calc pRank ↥H p
+      = pRank ↥(S : Subgroup ↥H) p := (pRank_sylow_eq S).symm
+    _ = pRank ↥(Pn.subgroupOf H) p := by rw [hSdef, Sylow.coe_ofCard]
+    _ = pRank ↥Pn p := pRank_eq_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hPnH)
+    _ = pRank ↥(Pn.subgroupOf N) p :=
+        (pRank_eq_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hPnN)).symm
+    _ ≤ pRank ↥N p := pRank_mono_of_le (Pn.subgroupOf N)
+
 /-! ## Lemma 13.1 — structural steps (mmd L3534-3546) -/
 
 /-- `⁅M_σ, M⁆ ≤ M_σ`: the radical `M_σ` is normal in `M`. (Reusable; via the normality of
@@ -117,7 +153,7 @@ Reusable; mirrors the `hMβD` step inside `S10.derivedQuotientMbeta_isNilpotent`
 theorem Mbeta_le_derived [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) : S10.Mbeta M ≤ derivedInG M :=
   le_trans (Subgroup.map_mono (Ch03.oPiCore_mono
-    (fun r hr => S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M hr)) ↥M))
+    (fun _r hr => S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M hr)) ↥M))
     (S10.Msigma_le_derived hG hM)
 
 /-- **Lemma 13.1, step 2** (mmd L3534): for `q ∉ β(M*)` dividing `|M*'|`, there is a Sylow
@@ -233,3 +269,121 @@ theorem exists_sylow_frattini_decomp [Finite G] (hG : IsMinimalSimpleOdd G)
     ← MonoidHom.range_eq_map, Subgroup.range_subtype, inf_eq_left.mpr (hKD.trans hDM),
     inf_comm, sup_comm] at hmap
   exact hmap.symm
+
+/-- **Lemma 13.1, step 3 = conclusion (b)** (mmd L3538): under the Lemma 13.1 hypotheses,
+`p ∉ τ₂(M*)`. Assume `p ∈ τ₂(M*)`. Step 1 gives `q ∈ σ(M) ∩ π(M*')`; step 2 the Frattini
+decomposition `M* = K ⊔ N_{M*}(Y)` with `K = O_{β(M*)∪{q}}(M*') ⊴ M*` and `Y` a Sylow `q` of
+`M*'`. Since `p ∉ β(M*)` (`τ₂ ∩ σ = ∅ ⊇ β`) and `p ≠ q` (`p ∈ π(E)`, `q ∈ σ(M)`,
+`π(E) ∩ σ(M) = ∅`), the `{β(M*)∪{q}}`-group `K` has order prime to `p`, so `[M* : N_{M*}(Y)]`
+is prime to `p` and `r_p(N_{M*}(Y)) = r_p(M*) = 2`. But Lemma 12.1(g) gives `p ∉ β(G)`, so
+Corollary 12.16(a) forces `r_p(N_{M*}(Y)) ≤ 1` — a contradiction. First use of the forward
+axiom `cor1216_pRank_normalizer_le_one`. -/
+theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)
+    (hpE : p ∈ (Nat.card ↥E).primeFactors)
+    (hcomm : ⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≠ ⊥)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) :
+    p ∉ tau2 Mstar := by
+  classical
+  intro hpτ2
+  -- step 1: a prime `q ∈ σ(M) ∩ π(M*')`.
+  obtain ⟨q, hqp, hqσ, hqπ⟩ := exists_sigma_prime_dvd_derived_Mstar hcomm
+  haveI : Fact q.Prime := ⟨hqp⟩
+  -- conjugacy is symmetric (inlined `not_conj_symm`).
+  have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
+    rintro ⟨g, hg⟩
+    exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  -- `q ∉ β(M*)` from `σ(M) ∩ α(M*) = ∅` (Lemma 10.12(a), swapped) + `β ⊆ α`.
+  have hqα : q ∉ S10.alpha Mstar := fun ha =>
+    Set.eq_empty_iff_forall_notMem.mp
+      ((S10.disjoint_of_not_conj hG hMstar h.mem_maximal hnc').1.2) q ⟨ha, hqσ⟩
+  have hqβ : q ∉ S10.beta Mstar := fun hb => hqα (S10.beta_subset_alpha Mstar hb)
+  -- step 2: Frattini decomposition `M* = K ⊔ N`, `Y` a Sylow `q` of `M*'`.
+  obtain ⟨Y, hYne, hYq, hYD, hdecomp⟩ :=
+    exists_sylow_frattini_decomp hG hMstar hqβ (Nat.dvd_of_mem_primeFactors hqπ)
+  have hDM : derivedInG Mstar ≤ Mstar := Subgroup.map_subtype_le _
+  set K : Subgroup G := opiCoreInG (S10.beta Mstar ∪ {q}) (derivedInG Mstar) with hKdef
+  set N : Subgroup G := Mstar ⊓ Subgroup.normalizer (Y : Set G) with hNdef
+  have hKD : K ≤ derivedInG Mstar := Subgroup.map_subtype_le _
+  have hKM : K ≤ Mstar := hKD.trans hDM
+  have hNM : N ≤ Mstar := inf_le_left
+  -- `K ⊴ M*` (characteristic in `M*' ⊴ M*`).
+  haveI hKnorm : (K.subgroupOf Mstar).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hKM).mpr
+      (le_normalizer_opiCoreInG_of_le_normalizer (S10.beta Mstar ∪ {q})
+        (S10.le_normalizer_derivedInG Mstar))
+  -- `p ∤ |K|`: `p ∉ β(M*)` (`τ₂ ∩ σ = ∅ ⊇ β`) and `p ≠ q` (`π(E) ∩ σ(M) = ∅`).
+  have hpσMstar : p ∉ S10.sigma Mstar := ((mem_tau2_iff Mstar p).mp hpτ2).1
+  have hpβMstar : p ∉ S10.beta Mstar := fun hb =>
+    hpσMstar (S10.alpha_subset_sigma hG hMstar (S10.beta_subset_alpha Mstar hb))
+  have hpq : p ≠ q := fun he => (h.not_mem_sigma_of_mem_primeFactors hG hpE) (he ▸ hqσ)
+  have hpK : ¬ p ∣ Nat.card ↥K := by
+    intro hdvd
+    have hmem : p ∈ (Nat.card ↥K).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩
+    rcases isPiSubgroup_opiCoreInG (S10.beta Mstar ∪ {q}) (derivedInG Mstar) p hmem with hβ | hq'
+    · exact hpβMstar hβ
+    · exact hpq (Set.mem_singleton_iff.mp hq')
+  -- product formula in `↥M*`: `|M*| · |K ⊓ N| = |K| · |N|`.
+  have hsupTop : K.subgroupOf Mstar ⊔ N.subgroupOf Mstar = ⊤ := by
+    apply Subgroup.map_injective Mstar.subtype_injective
+    rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hKM, inf_eq_left.mpr hNM, ← hdecomp,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have eTop : Nat.card ↥(↑(K.subgroupOf Mstar) * ↑(N.subgroupOf Mstar) : Set ↥Mstar)
+            = Nat.card ↥Mstar := by
+    rw [(Subgroup.normal_mul (K.subgroupOf Mstar) (N.subgroupOf Mstar)).symm, hsupTop,
+      SetLike.coe_sort_coe, Subgroup.card_top]
+  have hcardId : Nat.card ↥Mstar * Nat.card ↥(K ⊓ N) = Nat.card ↥K * Nat.card ↥N := by
+    have hform := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+      (K.subgroupOf Mstar) (N.subgroupOf Mstar)
+    have e2 : Nat.card ↥(K.subgroupOf Mstar) = Nat.card ↥K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    have e3 : Nat.card ↥(N.subgroupOf Mstar) = Nat.card ↥N :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNM).toEquiv
+    have e4 : Nat.card ↥(K.subgroupOf Mstar ⊓ N.subgroupOf Mstar) = Nat.card ↥(K ⊓ N) := by
+      have hinf : K.subgroupOf Mstar ⊓ N.subgroupOf Mstar = (K ⊓ N).subgroupOf Mstar :=
+        (Subgroup.comap_inf K N Mstar.subtype).symm
+      rw [hinf]
+      exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_trans inf_le_left hKM)).toEquiv
+    rw [eTop, e4, e2, e3] at hform
+    exact hform
+  -- `v_p(|M*|) = v_p(|N|)` (since `v_p(|K|) = v_p(|K ⊓ N|) = 0`).
+  have hfact : (Nat.card ↥Mstar).factorization p = (Nat.card ↥N).factorization p := by
+    have happ : (Nat.card ↥Mstar).factorization p + (Nat.card ↥(K ⊓ N)).factorization p
+              = (Nat.card ↥K).factorization p + (Nat.card ↥N).factorization p := by
+      have hcong := congrArg (fun n => n.factorization p) hcardId
+      simpa only [Nat.factorization_mul (Nat.card_pos (α := ↥Mstar)).ne' Nat.card_pos.ne',
+        Nat.factorization_mul (Nat.card_pos (α := ↥K)).ne' Nat.card_pos.ne',
+        Finsupp.add_apply] using hcong
+    have hfK0 : (Nat.card ↥K).factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd hpK
+    have hfKN0 : (Nat.card ↥(K ⊓ N)).factorization p = 0 :=
+      Nat.factorization_eq_zero_of_not_dvd
+        (fun hd => hpK (hd.trans (Subgroup.card_dvd_of_le inf_le_left)))
+    omega
+  -- `2 ≤ r_p(N_{M*}(Y))`.
+  have h2N : 2 ≤ pRank ↥N p := by
+    have hr2 : pRank ↥Mstar p = 2 := tau2_pRank_eq_two hpτ2
+    have hle := pRank_le_of_factorization_card_eq hNM hfact
+    omega
+  -- `p ∉ β(G)` (Lemma 12.1(g)).
+  obtain ⟨A, hA, hAM⟩ := exists_mem_elemAbelianOfRank_two_le_of_tau2 (Fact.out : p.Prime) hpτ2
+  have hpβG : ¬ S10.idealPrime p G :=
+    (isMaximalElementaryAbelian_of_mem_tau2 hG hMstar (Fact.out : p.Prime) hpτ2 hAM hA).2
+  -- Corollary 12.16(a): `r_p(N_{M*}(Y)) ≤ 1` (forward axiom).
+  have hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y := by
+    intro r hr
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hYq
+    have hr_prime := Nat.prime_of_mem_primeFactors hr
+    have hrq : r = q := (Nat.prime_dvd_prime_iff_eq hr_prime hqp).mp
+      (hr_prime.dvd_of_dvd_pow (hk ▸ Nat.dvd_of_mem_primeFactors hr))
+    rw [hrq]; exact hqσ
+  have hYM : Y ≤ Mstar := hYD.trans hDM
+  have hHY : Mstar ∈ maximalSubgroupsContaining Y :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar, hYM⟩
+  have hle1 := cor1216_pRank_normalizer_le_one hG h hYne hYpi hpE hpβG hHY hnc
+  rw [← hNdef] at hle1
+  omega
+
+end OddOrder.BG.Ch3.S13

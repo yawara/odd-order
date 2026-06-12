@@ -63,18 +63,34 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
   ⟹ K⊴M*)、Frattini = `Sylow.ofCard`+`Sylow.normalizer_sup_eq_top`+subtype transport (S10 Cor 10.9
   機構縮約)。~100 行・4 build iteration で着地。helper `Mbeta_le_derived` も land。
   🔑 **M*_β でなく K=O_{β∪q}(M*') を使うのが鍵** (K は M*' に characteristic ⟹ K⊴M* が無料)。
-- **step 3 = (b) `p∉τ₂(M*)` (NEXT, axiom 初使用)**: p∈τ₂(M*) 仮定→矛盾。
-  - `exists_sylow_frattini_decomp` (step 2) で Y + `M* = K ⊔ N_{M*}(Y)`, K=O_{β∪q}(M*')。
-    q∉β(M*) は σ(M)∩α(M*)=∅ (`S10.disjoint_of_not_conj` 10.12(a), hnc を M*↔M 対称化) + β⊆α。
-  - **r_p(N_{M*}(Y))=2**: K は {β∪q}-group, p∉β(M*)(τ₂∩σ=∅⊇β)∧p≠q(p∈σ',q∈σ) ⟹ p∤|K|。
-    `[M*:N] = |K|/|K⊓N| ∣ |K|` (K⊴M*, product formula) ⟹ p∤[M*:N] ⟹ |N|_p=|M*|_p ⟹
-    Syl_p(N)=Syl_p(M*) ⟹ `pRank N = pRank M* = 2` (`tau2_pRank_eq_two`)。⚠ rank 論法 ~40-60 行
-    (pRank が Sylow p で決まる事実 = `pRank` def 精査要; `pRank_mono_of_le` で ≤2)。
-  - **r_p(N_{M*}(Y))≤1**: forward axiom `cor1216_pRank_normalizer_le_one` を H=M* で適用。要 hyp:
-    Y≠⊥(✅step2)、Y は σ(M)-subgroup (`IsPiSubgroup (σ M) Y`: q∈σ(M)[step1] + Y は q-group), p∈π(E),
-    `¬idealPrime p G`(=p∉β(G), 12.1(g) `isMaximalElementaryAbelian_of_mem_tau2` 2nd 連言), M*∈ℳ(Y)
-    (Y≤M*'≤M*, M* maximal), M* non-conj M。⟹ 2≤1 矛盾。
-  - 完了後 **AxiomsCheck に island assert** + S13_Lemma131 を AxiomsCheck import に追加。
+- **step 3 = (b) `p∉τ₂(M*)` ✅ COMPLETE (2026-06-12 session 2, axiom 初使用)**:
+  `not_mem_tau2_of_interaction` (sorry-free; `#print axioms` = `[propext, Classical.choice,
+  Quot.sound, cor1216_pRank_normalizer_le_one]` — forward axiom のみ, sorryAx 無し)。
+  p∈τ₂(M*) 仮定→矛盾。実装の要:
+  - q∉β(M*): `(S10.disjoint_of_not_conj hG hMstar h.mem_maximal hnc').1.2`
+    (= `alpha Mstar ∩ sigma M = ∅`, hnc' = conjugacy 対称化を inline 2 行) + β⊆α。
+  - **r_p(N_{M*}(Y))=2 は τ₂ witness 不要**: 直接 `tau2_pRank_eq_two hpτ2` (=pRank M*=2) を
+    新 helper `pRank_le_of_factorization_card_eq` (N≤H ∧ v_p|H|=v_p|N| ⟹ pRank H≤pRank N;
+    N の Sylow p を `Sylow.ofCard` で H の Sylow p と同定 → `pRank_sylow_eq`) で N へ transfer。
+    v_p|M*|=v_p|N| は積公式を **↥M* 内**で (`card_HK_mul_card_inf_eq_card_mul_card` +
+    `Subgroup.normal_mul` (KM⊴⟹↑KM·↑NM=↑(KM⊔NM)) + `SetLike.coe_sort_coe`+`Subgroup.card_top`,
+    subgroupOf cards は `subgroupOfEquivOfLe`) → `|M*|·|K⊓N|=|K|·|N|`, 両辺 factorization_p:
+    v_p|K|=v_p|K⊓N|=0 (`p∤|K|`) ⟹ v_p|M*|=v_p|N|。p∤|K| = K {β∪q}-group ∧ p∉β(M*)
+    (τ₂⟹p∉σ⊇β) ∧ p≠q (`h.not_mem_sigma_of_mem_primeFactors` で p∉σ(M), q∈σ(M))。
+  - **r_p(N_{M*}(Y))≤1**: `cor1216_pRank_normalizer_le_one hG h hYne hYpi hpE hpβG hHY hnc`。
+    hpβG=`(isMaximalElementaryAbelian_of_mem_tau2 ... hpτ2 hAM hA).2` (witness A は
+    `exists_mem_elemAbelianOfRank_two_le_of_tau2`, S12_Lemma1211 を新規 import)。
+    hYpi: Y は q-group + q∈σ(M)。hHY: `mem_maximalSubgroupsContaining.mpr ⟨IsCoatom, Y≤M*⟩`。
+    `rw [← hNdef] at hle1` で N に fold して omega。
+  - 🔑 **import 知見**: S12_E の closure は S12_ECore のみ (S12_E は branch-A leaf)。proven §12
+    結果は別 leaf: `exists_mem_elemAbelianOfRank_two_le_of_tau2`=S12_Lemma1211 (branch B, 要 import),
+    `not_conj_symm`=S12_ExceptionalBridge (branch A, inline で回避),
+    `not_mem_sigma_of_mem_primeFactors`=S12_ECore の **`SubgroupESetup` namespace 内**
+    (dot 記法 `h.not_mem_sigma_of_mem_primeFactors hG hpE`)。§13 後続も同様に leaf を選んで import。
+  - 🔑 **新 helper 2 個** (axiom-clean, 再利用可, S13_Lemma131 冒頭): `pRank_eq_of_mulEquiv`
+    (≃* 不変), `pRank_le_of_factorization_card_eq` (上記)。step 4/5 でも使える見込み。
+  - **AxiomsCheck island assert は step 6 (assembly) で**: 現状 AxiomsCheck は S13_Lemma131 を
+    import せず (per-name `#assert_only_allowed_axioms` のみ) ⟹ full build 緑・gate pass。
 - **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)`**: `p∈σ(M*)∪τ₃(M*)` ⟹ Sylow p `S⊆M*'`。`p∉β(M*)` なら
   `p∈π(N_{M*}(Y)')` → forward axiom `cor1216_not_mem_primeFactors_derived_of_tau1` の対偶。
   β(M*) 分岐の扱い要精査。
