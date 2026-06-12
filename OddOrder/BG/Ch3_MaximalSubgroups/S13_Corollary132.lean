@@ -140,6 +140,43 @@ theorem eq_of_le_of_forall_full_prime_pow [Finite G] {H C : Subgroup G} (hCH : C
       (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv, heq])
   exact le_antisymm hCH (Subgroup.subgroupOf_eq_top.mp hsub)
 
+/-- **Coprime `A`-invariant Sylow existence (subgroup form)**: if `A ≤ N_G(N)`, `|A|` and `|N|`
+are coprime, and `A` or `N` is solvable, then for every prime `q`, `N` has an `A`-invariant
+Sylow `q`-subgroup `S` (`S ≤ N`, `IsPGroup q S`, `A ≤ N_G(S)`, `|S| = q ^ v_q(|N|)`).
+Encapsulates the `MulDistribMulAction`/`φ`-action boilerplate around
+`Isaacs.Ch04.exists_aInvariant_sylow` (Isaacs Thm 3.23(a)); reusable for §13 coprime arguments. -/
+theorem exists_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) (q : ℕ) [Fact q.Prime] :
+    ∃ S : Subgroup G, S ≤ N ∧ IsPGroup q ↥S ∧ A ≤ Subgroup.normalizer (S : Set G) ∧
+      Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), (N.subtype ((φ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hφ_inv_coe : ∀ (a : ↥A) (x : ↥N),
+      (N.subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * (N.subtype x) * (↑a) := by
+    intro a x; rw [← map_inv]; simpa using hφ_coe a⁻¹ x
+  obtain ⟨S', hS'inv⟩ := OddOrder.Isaacs.Ch04.exists_aInvariant_sylow (φ := φ) hcop hSolv q
+  set S : Subgroup G := (S' : Subgroup ↥N).map N.subtype with hSdef
+  refine ⟨S, Subgroup.map_subtype_le _,
+    S'.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective), ?_, ?_⟩
+  · intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨x, hxS, rfl⟩
+      exact ⟨(φ ⟨a, ha⟩) x, hS'inv.smul_mem ⟨a, ha⟩ hxS, hφ_coe ⟨a, ha⟩ x⟩
+    · rintro ⟨x, hxS, hx⟩
+      refine ⟨((φ ⟨a, ha⟩)⁻¹) x, hS'inv.inv_smul_mem ⟨a, ha⟩ hxS, ?_⟩
+      rw [hφ_inv_coe ⟨a, ha⟩ x, hx]
+      change a⁻¹ * (a * y * a⁻¹) * a = y
+      group
+  · rw [hSdef, Subgroup.card_map_of_injective N.subtype_injective, S'.card_eq_multiplicity]
+
 /-- A nonidentity `r`-subgroup `R` of `H` forces `r ∈ π(H)`. -/
 theorem mem_primeFactors_of_isPGroup_le [Finite G] {r : ℕ} (hr : r.Prime)
     {R H : Subgroup G} (hRH : R ≤ H) (hRne : R ≠ ⊥) (hRr : IsPGroup r ↥R) :
