@@ -16,9 +16,16 @@
   session-only cron は /model 以外 (ユーザー interrupt?) でも死ぬ模様 — **ユーザー対話のたびに
   CronList で生存確認するのを標準動作とする**。durable 化 (CronCreate durable:true =
   scheduled_tasks.json 永続) は別セッション起動の副作用があるためユーザー判断待ち。
-- **hub 凍結窓タスク (ユーザー裁可)**: S10_HallStructure (2290 行) / S10_BetaRadical (3004 行) の
-  prefix-split を実施する (0063/0064 は完了済み — S10_LocalLemmas→1158 行+Core,
-  S05_NarrowPGroups→4 ファイル chain で消滅、を実地確認済み。下の旧記述は stale)。
+- **hub 凍結窓タスク ✅ 完了 (2026-06-12)**: S10_HallStructure → Core(1373)+本体(952)、
+  S10_BetaRadical → Core(1177)+Global(563)+本体(1321) の prefix-split 実施
+  (module 名不変・下流 import 不変、root closure は chain 経由)。BetaRadical 側は cross-file
+  化した 3 補題を public 化+改名 (`exists_sylow_subgroupOf_of_le` /
+  `conj_smul_eq_self_of_mem_setNormalizer` / `isUniquelyMaximal_of_le_of_lt_top` — 元名は
+  他ファイルの private 複製と衝突 [LocalLemmasCore で実衝突を build が検出])。
+  ⚠ 知見: 同名 private 複製が repo に多数 (例 `mem_normalizer_of_conj_smul_eq` 系 17 ファイル) —
+  de-private 時は **必ず全 hit を truncation なしで** 確認し、衝突時は trio 内改名が正手。
+  grep の部分文字列偽陽性 (`…_of_le_inf_…`/`…_eq_self`) にも注意 (`\b` 境界で照合)。
+  (0063/0064 は完了済みを実地確認 — 下の旧記述は stale)。
 
 ## 旧現況 (2026-06-12 午前, 参考)
 
