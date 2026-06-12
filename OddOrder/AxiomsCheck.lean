@@ -4354,3 +4354,16 @@ Theorem 12.12 in the abelian-Sylow case — `A₀ = E₂` is abelian normal with
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isPiSubgroup_le_of_normal_isHall
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_partA_of_abelianSylow
+
+/-! `⨆_{p ∈ T} Z_p` internal direct product (for the `E₀ = ∏ Z_p` aggregation, part (b)):
+`le_normalizer_finsetSup` (`H` normalizes each `Z p` ⟹ normalizes `T.sup Z`),
+`card_finsetSup_eq_prod` (`|T.sup Z| = ∏ |Z p|` for a `Finset` of primes, `Z p` a normalized
+`p`-group — via `card_sup_eq_mul_of_le_normalizer_of_disjoint` + coprimality),
+`mem_Z_of_orderOf_prime_mem` (an element of `T.sup Z` of prime order `r ∈ T` lies in `Z r`, by the
+`r'`-cofactor quotient-order argument). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.le_normalizer_finsetSup
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.card_finsetSup_eq_prod
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_Z_of_orderOf_prime_mem
