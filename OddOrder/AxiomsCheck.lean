@@ -4186,3 +4186,25 @@ and `E` normalizes `F(E)`, so `E ≤ N_G(F(E)) ≤ N_G(S)`. Lets the Sylow `q`-s
 inside `N_G(S)` for the front-half rank argument. Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_sylow_of_abelianSylow
+
+/-! ### BG Proposition 1.6(e): `Ω₁`-centralizing coprime action is trivial (`S12_Theorem1212b`)
+
+`centralizer_le_of_omega1_le_centralizer`: an abelian `p`-group `S` with a coprime operator
+`Q ≤ N_G(S)` that centralizes `Ω₁(S)` is centralized by `Q` entirely. Via the coprime split
+`S = C_S(Q) × [S, Q]` (`fitting_coprime_abelian_decomp`): a nontrivial `[S, Q]` would contain an
+order-`p` element of `Ω₁(S) ⊆ C_S(Q)`, contradicting `C_S(Q) ⊓ [S, Q] = 1`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_of_omega1_le_centralizer
+
+/-! ### BG Theorem 12.12: Case 3 front-half — the `r_q = 2` side (`S12_Theorem1212b`)
+
+`sylow_eq_of_le_normalizer`: two Sylow `p`-subgroups, one normalizing the other, coincide (`P`
+is the unique Sylow `p` of `N_G(P)`).
+`pRank_normalizer_eq_two_of_index_card`: in the abelian-Sylow regime, `q ∣ [E : C_E(A)]` and
+`q ∣ |C_E(A)|` force `r_q(N_G(S)) = 2`. Lemma 12.11(c) gives `M* ∈ ℳ(N_G(A))` with `q ∈ τ₂(M*)`
+and a Sylow `p`-subgroup `P` of `G` normal in `M*`; `S ≤ N_G(S) = N_G(A) ≤ M* ≤ N_G(P)` and
+`S = P` make `M* = N_G(S)`, so `pRank (N_G(S)) q = pRank M* q = 2`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_eq_of_le_normalizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_normalizer_eq_two_of_index_card
