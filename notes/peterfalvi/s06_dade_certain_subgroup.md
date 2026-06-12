@@ -2215,3 +2215,34 @@ sigma_mapRingEquiv_comm`)。**explicit `[Fintype toTICyclic.W]` 等の binder �
    on Z[𝒯] + 等長 (`certainType_omega_sum_isometry` lift) + τ一致 (`certainType_diff_dade_sum_eq_of_degree`
    lift) + nonzero (step 4) + ZIrr codomain。**重い** (IntegralCharacterMap/zSpan/zSupportedSpan 機構)。
 → (4.9) → S08 case-B → (6.8)。**正本=本 session 36。(4.9)(a) μ-bridge DONE; 次 = step 1 (μ_ij̄=μ_{i'j'})。**
+
+## 2026-06-12 (session 36 cont., /goal "Bレーン完遂"): ✅ (4.9)(a) 共役チェーン完結 — `μ̄_k ≠ μ_k`
+
+session 36 から継続 (`/goal` で完遂モード)。(4.9)(a) の共役論法を **nonvanishing 入力 `μ̄_k ≠ μ_k` まで完結** (S06_CertainTypeConjugation, 全 axiom-clean):
+
+- **commit `aa61a690`** `certainType_mu_conj_eq`: **`μ_ij̄ = μ_{i'j'}`** (per-element)。bridge を μ_{i'j'}
+  と内積 → δ_j⟨μ_ij̄,μ_{i'j'}⟩=δ_{j'}≠0 → 既約同士の内積 0/1 ゆえ 1 → 一致。**🔑 罠: `inner_smul_left`
+  は無印だと mathlib InnerProductSpace 版 (共役付き) に解決 → `ClassFunction.inner_smul_left` 明示必須**。
+  zsmul→ℂsmul 変換は `← Int.cast_smul_eq_zsmul ℂ <sign> <classfn>` と **3 引数明示** (無印は stacking 暴走)。
+- **commit `70312fb0`** `certainType_columnSum_conj`: **`μ̄_j = μ_{j'}`** (列和)。`mapRingEquivLinear`+`map_sum`
+  で和分配、各項 `certainType_mu_conj_eq`、行 reindex `rowInvEquiv` (= `rowInv` involution
+  `rowInv_rowInv`)。
+- **commit `fb5a98a6`** capstone `μ̄_k ≠ μ_k`:
+  - `column_inv_ne_self`: **χ₂⁻¹≠χ₂** (χ₂≠1)。char group `(W₂.subgroupOf W)→*ℂˣ` 奇数位数
+    (`card_charGroup_W2`=|W₂|, `W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)`) ⟹ 対合なし
+    (χ₂²=1→orderOf∣2 ∧ odd→1; `Nat.dvd_prime Nat.prime_two`+`absurd (_▸_) (by decide)`)。
+  - `certainType_columnSum_conj_ne`: **`μ̄_k≠μ_k`**。μ̄_k=μ_{χ₂⁻¹} (columnSum_conj) ⊥ μ_χ₂
+    (`columnFamily_mu_sum_inner` if_neg) ⟹ ⟨μ̄_k,μ_k⟩=0≠w₁。
+
+### ▶▶ 次 = `Z[𝒯,L^#]=Z[𝒯,A]` + **IsCoherent packaging** (本命の残り; 重い)
+
+`S07.IsCoherent τ 𝒯 A` の 5 field 構成が S08 case-B への橋。手持ち材料:
+- **field 3 (等長 on zSpan 𝒯)** ← `certainType_omega_sum_isometry` (生成元 Gram 行列)を zSpan へ lift。
+- **field 4 (τ一致 on zSupportedSpan 𝒯 A)** ← `certainType_diff_dade_sum_eq_of_degree` を lift。
+- **field 1 (nonzero)** ← **`certainType_columnSum_conj_ne` (μ̄_k≠μ_k) = 本 session で完成**; μ̄_k−μ_k∈Z[𝒯,A]
+  の supportedness は (4.7)(Supp μ_j⊆A∪{1}) + 次数零。
+- **field 2 (extension : IntegralCharacterMap)** + **field 5 (ZIrr codomain)** = extension map 構成。
+要調査: `zSpan`/`zSupportedSpan`/`IntegralCharacterMap` の API (S07_Coherence)、IsCoherent 構成 helper の
+有無。**第一手 = S07 の zSpan/zSupportedSpan/IntegralCharacterMap を Read 通読**してから extension map を
+`Basis.constr` 級で構成 (μ_j ↦ δ_k ∑_i ω_ij^σ) → 5 field を埋める。
+**正本=本 session 36 cont.。(4.9)(a) 共役完結; 次 = IsCoherent packaging (S07 機構 Read から)。**
