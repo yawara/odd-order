@@ -2369,3 +2369,25 @@ agreement→field4→nonzero+capstone + notes×2)。**§5 (3.x) + §6 (4.1)-(4.9
    補助恒等式。(4.8) generator + grid 拡張で書けそうだが case-B critical path 外の可能性。
 **推奨第一手 = S08 case-B sorry (S08_CoherenceTheorems:46-59) を Read して配線可能性を RECON**。
 **正本=本 session 37 cont.²。(4.9)(b) COMPLETE; 次 = case-B 配線 RECON。**
+
+## 2026-06-13 (session 37 cont.³, /loop): S08 case-B 配線 RECON 結論 + 次 = (4.10)
+
+**RECON 結論: S08 case-B 配線は単発 plug-in でなく §8 (6.8) 大 assembly** (正本=notes/peterfalvi/s08_6_8_assembly_plan.md, 96KB, T0-T11 DAG)。
+- `sibleySetup_is_coherent` (S08_CoherenceTheorems:46) X-nonempty branch sorry (:59) = Frobenius/CertainType
+  case split (`hyp.cases : IsFrobeniusGroup ∨ ∃ cert:CertainTypeHypothesis…`) で X=S−S(Z) coherence を
+  Y=S(H') coherence と §7 engine `coherentUnion_of_glued` で gluing。
+- **Sibley case-B (`cases.inr`) は `cert : S06.CertainTypeHypothesis (sharpImage H) L` + (w₂ prime/W₂⊆[H,H]/
+  Coprime|H||W1|/cert.dade=dade/cert.K=H/cert.W1=W1) を供給 — `Hypothesis46` ではない。** ⟹ (4.9)
+  `certainType_isCoherent` を使うには **Hypothesis46-from-Sibley bridge** (tic/dade0/tau/subH/A_covers の
+  構成、(3.1)-for-W + (4.6.c/d) 確立) が要、substantial。
+- Frobenius path は概ね構築済 (B engine surgery 完, `Xset_commutator_isCoherent…_of_frobenius` +
+  `peterfalvi_66_coherence_of_X_from_dade`)。c2 path は open blocker 多数 (T6 inertia discharge / Y-family
+  construction / c2 inertia / T10 case-B gluing)。**T7 c2 X-char は (4.5)✓ 使用。**
+- ⟹ **case-B は §8 program の大仕事で Lane B 単独 cold engage は overlap/risk。(4.9) は necessary input
+  (供給済) だが gluing machinery が bulk。** 戦略判断 (case-B 大 assembly に commit するか) はユーザー/合流調整向き。
+
+**次 = (4.10)** (§6 最終結果、章完結): `(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`。
+原文「(4.8) と同様」= 同じ V-vanishing+trichotomy 論法 (`sigmaCoeff_trichotomy` 消費)。(4.3.b)
+`σ(ω_ij)=δ_j μ_ij` + (4.8) step-4 engine (`certainType_diff_dade_apply_eq_of_mem_V` 等) を 4-corner
+combination に適用。(4.8) conclusion-3 (`certainType_diff_dade_eq`) の隣接 row+column 版。
+in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 cont.³。次 = (4.10)。**
