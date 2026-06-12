@@ -845,6 +845,12 @@ set_option linter.style.longLine false in
 -- `μ_j = ∑_i μ_ij` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}` (`j' = χ₂⁻¹`).  mapRingEquiv conj is
 -- additive, each `μ_ij̄ = μ_{i'j'}`, and `i ↦ rowInv i` is a permutation (`rowInvEquiv`, involution).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_columnSum_conj
+-- (4.9)(a) the conjugate column is a new certain-type character: `χ₂⁻¹ ≠ χ₂` (`column_inv_ne_self`,
+-- the column character group has odd order `= |W₂|`, no involutions), so `μ̄_k = μ_{k'}` is orthogonal
+-- to `μ_k` (`columnFamily_mu_sum_inner`), whence `μ̄_k ≠ μ_k` (`certainType_columnSum_conj_ne`) — the
+-- nonvanishing `0 ≠ μ̄_k − μ_k ∈ Z[T,A]` input to the (4.9)(a) coherence.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.column_inv_ne_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_columnSum_conj_ne
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
