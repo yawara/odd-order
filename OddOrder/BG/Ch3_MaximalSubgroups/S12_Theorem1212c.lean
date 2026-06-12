@@ -386,9 +386,11 @@ regularly on `M_σ` (`exists_cyclic_Enormal_regular_of_abelianSylow`).
 `habel` provides that every Sylow `p`-subgroup of `G` (for `p ∈ τ₂(M)` dividing `|E|`) is abelian;
 `hτ2` witnesses the nonemptiness of `τ₂(M) ∩ π(E)`.
 
-**TODO** (Lane F): the `τ₂`-product aggregation `E₀` together with `exp(E₀) = exp(E)` and the
-regularity of `E₀` (via `inf_centralizer_eq_bot_of_forall_prime_order`, reducing to prime-order
-elements: those of `τ₁ ∪ τ₃`-order use `hreg`, those of `τ₂`-order lie in the relevant `Z_p`). -/
+`E₀ = ZZ ⊔ K`, where `ZZ` (`exists_tau2_product`) is the `τ₂`-product (regular, realizing the
+`τ₂`-part of `exp E`) and `K` is a Hall `τ₂(M)'`-subgroup of `E` (realizing the `τ₂'`-part). The
+regularity of `E₀` reduces (`inf_centralizer_eq_bot_of_forall_prime_order`) to prime-order `a`:
+a `τ₂`-element lies in `ZZ` (its image in `E₀/ZZ`, a `τ₂'`-group, is trivial) hence is regular,
+while a `(τ₁∪τ₃)`-element uses `hreg`. -/
 theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     (hτ2 : ∃ p ∈ (Nat.card ↥E).primeFactors, p ∈ tau2 M)
@@ -397,7 +399,114 @@ theorem frobFact_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
     (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
       S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
     FrobFactConclusion M E := by
-  sorry
+  classical
+  obtain ⟨ZZ, hZZE, hZZne, hZZN, hZZpi, hZZreg, hZZexp⟩ := exists_tau2_product hG h hτ2 habel hreg
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  -- `K` = a Hall `τ₂(M)'`-subgroup of `E`.
+  obtain ⟨K', hK'hall⟩ := Ch03.hall_E_exists (G := ↥E) ((tau2 M)ᶜ)
+  set K : Subgroup G := K'.map E.subtype with hKdef
+  have hKE : K ≤ E := Subgroup.map_subtype_le _
+  have hKcard : Nat.card ↥K = Nat.card ↥K' :=
+    Subgroup.card_map_of_injective E.subtype_injective
+  have hKpi : ∀ p ∈ (Nat.card ↥K).primeFactors, p ∉ tau2 M := by
+    intro p hp; rw [hKcard] at hp; exact hK'hall.1 p hp
+  -- `ZZ ⊓ K = ⊥` by coprimality (`ZZ` a `τ₂`-group, `K` a `τ₂'`-group).
+  have hcop : Nat.Coprime (Nat.card ↥ZZ) (Nat.card ↥K) :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl Nat.card_pos.ne' Nat.card_pos.ne' hZZpi hKpi
+  have hZZKdisj : ZZ ⊓ K = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  -- `E₀ = ZZ ⊔ K`.
+  set E₀ : Subgroup G := ZZ ⊔ K with hE₀def
+  have hE₀E : E₀ ≤ E := sup_le hZZE hKE
+  have hKNZZ : K ≤ Subgroup.normalizer (ZZ : Set G) := hKE.trans hZZN
+  have hE₀card : Nat.card ↥E₀ = Nat.card ↥ZZ * Nat.card ↥K := by
+    rw [hE₀def, sup_comm,
+      card_sup_eq_mul_of_le_normalizer_of_disjoint hKNZZ (by rw [inf_comm]; exact hZZKdisj),
+      Nat.mul_comm]
+  have hZZE₀ : ZZ ≤ E₀ := le_sup_left
+  have hE₀NZZ : E₀ ≤ Subgroup.normalizer (ZZ : Set G) := hE₀E.trans hZZN
+  haveI : (ZZ.subgroupOf E₀).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hZZE₀).mpr hE₀NZZ
+  have hE₀ne : E₀ ≠ ⊥ := fun hbot => hZZne (le_bot_iff.mp (hbot ▸ hZZE₀))
+  -- **Part (b) regularity**: every nonidentity element of `E₀` is regular on `M_σ`.
+  have hE₀reg : ∀ a ∈ E₀, a ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({a} : Set G) = ⊥ := by
+    refine inf_centralizer_eq_bot_of_forall_prime_order ?_
+    intro a haE₀ harp
+    have hane : a ≠ 1 := fun hc => by rw [hc, orderOf_one] at harp; exact harp.ne_one rfl
+    have haE : a ∈ E := hE₀E haE₀
+    by_cases hrτ2 : orderOf a ∈ tau2 M
+    · -- `a`'s image in `E₀ / ZZ` (a `τ₂'`-group) is trivial, so `a ∈ ZZ`.
+      have hquotcard : Nat.card (↥E₀ ⧸ ZZ.subgroupOf E₀) = Nat.card ↥K := by
+        have hlag := Subgroup.card_eq_card_quotient_mul_card_subgroup (ZZ.subgroupOf E₀)
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZZE₀).toEquiv, hE₀card] at hlag
+        exact Nat.eq_of_mul_eq_mul_right Nat.card_pos (hlag.symm.trans (Nat.mul_comm _ _))
+      set a' : ↥E₀ := ⟨a, haE₀⟩ with ha'
+      have hcopK : Nat.Coprime (orderOf a) (Nat.card ↥K) :=
+        (Nat.Prime.coprime_iff_not_dvd harp).mpr fun hd =>
+          hKpi (orderOf a) (Nat.mem_primeFactors.mpr ⟨harp, hd, Nat.card_pos.ne'⟩) hrτ2
+      have hone : orderOf (QuotientGroup.mk' (ZZ.subgroupOf E₀) a') = 1 := by
+        have hdr : orderOf (QuotientGroup.mk' (ZZ.subgroupOf E₀) a') ∣ orderOf a :=
+          ((Subgroup.orderOf_coe a').symm ▸ orderOf_map_dvd (QuotientGroup.mk' _) a')
+        have hdK : orderOf (QuotientGroup.mk' (ZZ.subgroupOf E₀) a') ∣ Nat.card ↥K :=
+          hquotcard ▸ orderOf_dvd_natCard _
+        exact Nat.dvd_one.mp (hcopK ▸ Nat.dvd_gcd hdr hdK)
+      have haZZ : a ∈ ZZ :=
+        Subgroup.mem_subgroupOf.mp (QuotientGroup.eq_one_iff _ |>.mp (orderOf_eq_one_iff.mp hone))
+      exact hZZreg a haZZ hane
+    · -- `orderOf a ∈ τ₁(M) ∪ τ₃(M)`: `hreg` applies directly.
+      refine hreg a haE hane fun s hs => ?_
+      rw [harp.primeFactors, Finset.mem_singleton] at hs
+      subst hs
+      have hsE : orderOf a ∈ (Nat.card ↥E).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨harp, E.orderOf_dvd_natCard haE, Nat.card_pos.ne'⟩
+      rcases h.mem_tau_union_of_mem_primeFactors hG hsE with (h1 | h2) | h3
+      · exact Or.inl h1
+      · exact absurd h2 hrτ2
+      · exact Or.inr h3
+  -- **Part (b) exponent**: `exp(E₀) = exp(E)`.
+  have hexp : Monoid.exponent ↥E₀ = Monoid.exponent ↥E := by
+    refine exponent_eq_of_forall_factorization_le hE₀E fun r hrp => ?_
+    haveI : Fact r.Prime := ⟨hrp⟩
+    by_cases hrτ2 : r ∈ tau2 M
+    · -- `τ₂`-part realized inside `ZZ`.
+      obtain ⟨g, hg⟩ := hrp.exists_orderOf_eq_pow_factorization_exponent ↥ZZ
+      refine ⟨Subgroup.inclusion hZZE₀ g, ?_⟩
+      rw [orderOf_injective (Subgroup.inclusion hZZE₀) (Subgroup.inclusion_injective _) g, hg,
+        Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, Nat.Prime.factorization_self hrp,
+        mul_one]
+      exact hZZexp r hrτ2
+    · -- `τ₂'`-part realized inside `K ⊇ Sylow_r(E)`.
+      have hKr : (Nat.card ↥K).factorization r = (Nat.card ↥E).factorization r := by
+        have hmul := Subgroup.card_mul_index K'
+        have hidx : (K'.index).factorization r = 0 := by
+          rw [Nat.factorization_eq_zero_iff]
+          exact Or.inr (Or.inl fun hd => hK'hall.2 r
+            (Nat.mem_primeFactors.mpr ⟨hrp, hd, Subgroup.index_ne_zero_of_finite⟩) hrτ2)
+        have := congrArg (fun n => n.factorization r) hmul
+        simp only [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidx, add_zero] at this
+        rw [hKcard]; exact this
+      set P : Sylow r ↥K := default with hP
+      have hPcard : Nat.card ↥((P : Subgroup ↥K).map K.subtype) =
+          r ^ (Nat.card ↥E).factorization r := by
+        rw [Subgroup.card_map_of_injective K.subtype_injective, P.card_eq_multiplicity, hKr]
+      have hPE : (P : Subgroup ↥K).map K.subtype ≤ E := (Subgroup.map_subtype_le _).trans hKE
+      have hPcard' : Nat.card ↥(((P : Subgroup ↥K).map K.subtype).subgroupOf E) =
+          r ^ (Nat.card ↥E).factorization r := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPE).toEquiv, hPcard]
+      have h1 := factorization_exponent_le_of_sylow hPE hPcard'
+      obtain ⟨g, hg⟩ := hrp.exists_orderOf_eq_pow_factorization_exponent
+        ↥((P : Subgroup ↥K).map K.subtype)
+      have hPE₀ : (P : Subgroup ↥K).map K.subtype ≤ E₀ :=
+        (Subgroup.map_subtype_le _).trans le_sup_right
+      refine ⟨Subgroup.inclusion hPE₀ g, ?_⟩
+      rw [orderOf_injective (Subgroup.inclusion hPE₀) (Subgroup.inclusion_injective _) g, hg,
+        Nat.factorization_pow, Finsupp.smul_apply, smul_eq_mul, Nat.Prime.factorization_self hrp,
+        mul_one]
+      exact h1
+  -- **Part (a)** and assembly.
+  obtain ⟨A₀, hA₀⟩ := frobFact_partA_of_abelianSylow hG h hτ2 habel hreg
+  exact ⟨⟨A₀, hA₀⟩, E₀, hE₀E, hexp, isFrobeniusGroup_of_regular hG h hE₀E hE₀ne hE₀reg⟩
 
 /-- **BG Theorem 12.12** (mmd L3336): suppose `C_{M_σ}(e) = 1` for every
 `(τ₁(M) ∪ τ₃(M))`-element `e ∈ E#`. Then
