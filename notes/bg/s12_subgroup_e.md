@@ -206,10 +206,13 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
 
 **BG 引数 (L3358-3370) の formalization map**:
 1. q∈π(E/C_E(S)) を取る (C_E(S)≠E ⟹ [E:C_E(S)]>1 ⟹ ∃ prime; mechanical)。
-2. Q=Syl_q(N_G(S)), Q₁=Syl_q(E)⊆Q。**⚠ 開問 (a): Q₁⊆N_G(S) の根拠** — E と N_G(S) の関係要確認
-   (E≤N_G(S)? or Q₁ が N_G(S) 内に共役化? BG は「Q⊇Q₁=Syl_q(E)」と暗黙に Q₁⊆N_G(S) を使う)。
+2. Q=Syl_q(N_G(S)), Q₁=Syl_q(E)⊆Q。**✅ 開問 (a) 解決 (session 9, commit c5b04ed7)**:
+   `E_le_normalizer_sylow_of_abelianSylow` で **E≤N_G(S)** (sylow_chain で S≤F(E) → S=Syl_p(nilpotent
+   F(E)) char → E normalizes F(E) ⟹ E≤N_G(F(E))≤N_G(S))。ゆえ Q₁=Syl_q(E)⊆E⊆N_G(S)。
 3. C_S(Q₁)⊊S ⟹ Prop1.6(e) ⟹ Q₁⊄C_E(A) ⟹ **Cor12.10(c)** ⟹ q∈τ₁(M), Q₁ cyclic。
-   **⚠ 開問 (b): Cor12.10(c) の repo 形** (S12_Corollary1210 に明示 theorem 不明瞭、要特定)。
+   **🔶 開問 (b) 部分解決**: repo の `nilpotent_sigmaComplement_abelian` (S12_Corollary1210:158) の
+   (c) 連言 = 「π(E/C_E(A))⊆τ₁(M)」。Q₁⊄C_E(A)⟹q∈π(E/C_E(A))⟹q∈τ₁、q∈τ₁⟹Syl_q cyclic (rank1)。
+   threading (Prop1.6(e) + (c)連言 + τ₁⟹cyclic) は要実装だが pieces 揃った。
 4. C_G(S)⊆E ⟹ Q₀=C_Q(S)⊊Q₁ (Q₀⊆Q₁ は C_Q(S)≤Q₁=Syl_q(E)、⊊ は Q₁⊄C_E(A)⟹Q₁⊄C_G(S))。
 5. **by_contra: Q/Q₀ regular on S** (∀x∈Q∖C_G(S), S⊓C_G(x)=⊥) ⟹ **φ̄ wrapper
    `isCyclic_quotient_of_conjugation_fpf` ✅** ⟹ IsCyclic(Q⧸C_Q(S))。
