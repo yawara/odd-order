@@ -296,6 +296,16 @@ theorem commutator_inf_centralizer_eq_bot_of_isCommutative [Finite G] {A R : Sub
   rw [inf_assoc, inf_eq_right.mpr hcomm_le_A, inf_comm] at hmap
   exact hmap
 
+/-- **Three-subgroups consequence**: if `⁅A, S⁆ ≤ A` (`S` normalizes `A`) and `⁅A, R⁆ = ⊥`
+(`R` centralizes `A`), then `⁅⁅S, R⁆, A⁆ = ⊥` (`⁅S, R⁆` centralizes `A`). Used in Thm 13.4 step 8:
+`Q = ⁅S, R⁆` centralizes `C_{M_α}(R)`, giving `C_{M_α}(R) = C_{M_α}(RQ)`. Reusable. -/
+theorem commutator_commutator_eq_bot_of_le_of_commutator_bot {A S R : Subgroup G}
+    (hSA : ⁅A, S⁆ ≤ A) (hAR : ⁅A, R⁆ = ⊥) :
+    ⁅⁅S, R⁆, A⁆ = ⊥ := by
+  refine Subgroup.commutator_commutator_eq_bot_of_rotate ?_ ?_
+  · rw [Subgroup.commutator_comm R A, hAR, Subgroup.commutator_bot_left]
+  · exact le_bot_iff.mp ((Subgroup.commutator_mono hSA le_rfl).trans hAR.le)
+
 /-! ## Corollary 13.2 -/
 
 /-- **BG Corollary 13.2** (mmd L3548): `p ∈ τ₁(M)∪τ₃(M)`, `P` 非自明 `p`-部分群 of `M`,
