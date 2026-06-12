@@ -276,6 +276,107 @@ theorem frobFact_partA_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
   have : (⟨y, hyE⟩ : ↥E) ∈ (E₂).subgroupOf E := hle (Subgroup.mem_subgroupOf.mpr hy)
   exact Subgroup.mem_subgroupOf.mp this
 
+/-- **The `τ₂`-product `ZZ = ∏_{p ∈ τ₂(M)} Z_p`** for the abelian-Sylow case. Choosing for each
+prime `p ∈ τ₂(M) ∩ π(E)` a regular cyclic `Z_p` (`exists_regular_cyclic_of_mem_tau2`), their join
+`ZZ` is: `≤ E`, nontrivial, normalized by `E`, a `τ₂(M)`-group, **regular on `M_σ`** (every
+nonidentity element — by `inf_centralizer_eq_bot_of_forall_prime_order` reducing to prime order,
+then `mem_Z_of_orderOf_prime_mem` placing it in some regular `Z_r`), and it realizes the `τ₂`-part
+of `exp(E)` (`v_r(exp E) ≤ v_r(exp ZZ)` for `r ∈ τ₂(M)`, since `exp(Z_r) = exp(Sylow_r E)` divides
+`exp ZZ`). -/
+theorem exists_tau2_product [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hτ2 : ∃ p ∈ (Nat.card ↥E).primeFactors, p ∈ tau2 M)
+    (habel : ∀ q, q ∈ (Nat.card ↥E).primeFactors → q ∈ tau2 M →
+      ∀ S : Sylow q G, IsMulCommutative ↥(S : Subgroup G))
+    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
+    ∃ ZZ : Subgroup G, ZZ ≤ E ∧ ZZ ≠ ⊥ ∧ E ≤ Subgroup.normalizer (ZZ : Set G) ∧
+      Ch03.Subgroup.IsPiGroup (tau2 M) ZZ ∧
+      (∀ a ∈ ZZ, a ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({a} : Set G) = ⊥) ∧
+      (∀ r ∈ tau2 M,
+        (Monoid.exponent ↥E).factorization r ≤ (Monoid.exponent ↥ZZ).factorization r) := by
+  classical
+  set T : Finset ℕ := (Nat.card ↥E).primeFactors.filter (· ∈ tau2 M) with hTdef
+  have hTp : ∀ p ∈ T, p.Prime := fun p hp =>
+    Nat.prime_of_mem_primeFactors (Finset.mem_filter.mp hp).1
+  have hTτ2 : ∀ p ∈ T, p ∈ tau2 M := fun p hp => (Finset.mem_filter.mp hp).2
+  have hTpf : ∀ p ∈ T, p ∈ (Nat.card ↥E).primeFactors := fun p hp => (Finset.mem_filter.mp hp).1
+  have hex : ∀ p ∈ T, ∃ Z : Subgroup G, Z ≤ E ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧ IsPGroup p ↥Z ∧
+      E ≤ Subgroup.normalizer (Z : Set G) ∧
+      (∃ S : Sylow p G, (S : Subgroup G) ≤ E ∧
+        Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G)) ∧
+      ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+    intro p hp
+    haveI : Fact p.Prime := ⟨hTp p hp⟩
+    exact exists_regular_cyclic_of_mem_tau2 hG h (hTτ2 p hp) (habel p (hTpf p hp) (hTτ2 p hp)) hreg
+  choose! Zf hZfE hZfcyc hZfne hZfpg hZfN hZfSyl hZfreg using hex
+  set ZZ : Subgroup G := T.sup Zf with hZZdef
+  have hZZE : ZZ ≤ E := Finset.sup_le hZfE
+  have hZZN : E ≤ Subgroup.normalizer (ZZ : Set G) := le_normalizer_finsetSup T Zf hZfN
+  obtain ⟨p₀, hp₀E, hp₀τ2⟩ := hτ2
+  have hp₀T : p₀ ∈ T := by rw [hTdef, Finset.mem_filter]; exact ⟨hp₀E, hp₀τ2⟩
+  have hZZne : ZZ ≠ ⊥ := fun hbot => hZfne p₀ hp₀T (le_bot_iff.mp (hbot ▸ Finset.le_sup hp₀T))
+  have hZZcard : Nat.card ↥ZZ = ∏ p ∈ T, Nat.card ↥(Zf p) :=
+    card_finsetSup_eq_prod T Zf hTp hZfE hZfN hZfpg
+  -- the prime divisors of `|ZZ|` are exactly the primes of `T`, all in `τ₂(M)`.
+  have hprimeT : ∀ {q : ℕ}, q.Prime → q ∣ Nat.card ↥ZZ → q ∈ T := by
+    intro q hqp hqd
+    rw [hZZcard] at hqd
+    obtain ⟨p, hpT, hqdp⟩ := (Nat.Prime.prime hqp).exists_mem_finset_dvd hqd
+    haveI : Fact p.Prime := ⟨hTp p hpT⟩
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZfpg p hpT)
+    rw [hk] at hqdp
+    rwa [(Nat.prime_dvd_prime_iff_eq hqp (hTp p hpT)).mp (hqp.dvd_of_dvd_pow hqdp)]
+  have hZZpi : Ch03.Subgroup.IsPiGroup (tau2 M) ZZ := by
+    intro q hq
+    obtain ⟨hqp, hqd, _⟩ := Nat.mem_primeFactors.mp hq
+    exact hTτ2 _ (hprimeT hqp hqd)
+  have hZZreg : ∀ a ∈ ZZ, a ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({a} : Set G) = ⊥ := by
+    refine inf_centralizer_eq_bot_of_forall_prime_order ?_
+    intro a haZZ harp
+    have hrdvd : orderOf a ∣ Nat.card ↥ZZ := ZZ.orderOf_dvd_natCard haZZ
+    have hrT : orderOf a ∈ T := hprimeT harp hrdvd
+    have haZf : a ∈ Zf (orderOf a) :=
+      mem_Z_of_orderOf_prime_mem T Zf hTp hZfE hZfN hZfpg hrT haZZ rfl
+    exact hZfreg (orderOf a) hrT a haZf
+      (fun hc => by rw [hc, orderOf_one] at harp; exact harp.ne_one rfl)
+  refine ⟨ZZ, hZZE, hZZne, hZZN, hZZpi, hZZreg, ?_⟩
+  intro r hrτ2
+  by_cases hrp : r.Prime
+  · by_cases hrE : r ∈ (Nat.card ↥E).primeFactors
+    · have hrT : r ∈ T := by rw [hTdef, Finset.mem_filter]; exact ⟨hrE, hrτ2⟩
+      haveI : Fact r.Prime := ⟨hrp⟩
+      obtain ⟨S, hSE, hexpZS⟩ := hZfSyl r hrT
+      have hScard : Nat.card ↥((S : Subgroup G).subgroupOf E) =
+          r ^ (Nat.card ↥E).factorization r := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSE).toEquiv, S.card_eq_multiplicity]
+        congr 1
+        refine Nat.le_antisymm ?_
+          ((Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+            (Subgroup.card_subgroup_dvd_card E) r)
+        rw [← Nat.Prime.pow_dvd_iff_le_factorization hrp Nat.card_pos.ne', ← S.card_eq_multiplicity]
+        exact Subgroup.card_dvd_of_le hSE
+      have h1 := factorization_exponent_le_of_sylow hSE hScard
+      have hexp_ne : Monoid.exponent ↥ZZ ≠ 0 := fun hz =>
+        Nat.card_pos.ne' (Nat.eq_zero_of_zero_dvd (hz ▸ Group.exponent_dvd_nat_card))
+      have hexpZ_ne : Monoid.exponent ↥(Zf r) ≠ 0 := fun hz =>
+        Nat.card_pos.ne' (Nat.eq_zero_of_zero_dvd (hz ▸ Group.exponent_dvd_nat_card))
+      have hdvd : Monoid.exponent ↥(Zf r) ∣ Monoid.exponent ↥ZZ :=
+        Monoid.exponent_dvd_of_monoidHom (Subgroup.inclusion (Finset.le_sup hrT))
+          (Subgroup.inclusion_injective _)
+      calc (Monoid.exponent ↥E).factorization r
+          ≤ (Monoid.exponent ↥(S : Subgroup G)).factorization r := h1
+        _ = (Monoid.exponent ↥(Zf r)).factorization r := by rw [hexpZS]
+        _ ≤ (Monoid.exponent ↥ZZ).factorization r :=
+            (Finsupp.le_def.mp ((Nat.factorization_le_iff_dvd hexpZ_ne hexp_ne).mpr hdvd)) r
+    · have hr0 : (Monoid.exponent ↥E).factorization r = 0 := by
+        rw [Nat.factorization_eq_zero_iff]
+        refine Or.inr (Or.inl fun hdvd => hrE ?_)
+        exact Nat.mem_primeFactors.mpr ⟨hrp, hdvd.trans Group.exponent_dvd_nat_card,
+          Nat.card_pos.ne'⟩
+      omega
+  · rw [Nat.factorization_eq_zero_of_not_prime _ hrp]; omega
+
 /-- **BG Theorem 12.12, Case 3** (mmd L3344-3373): in the abelian-Sylow regime, with `τ₂(M)`
 nonempty, the conclusion `FrobFactConclusion M E` holds. Here `A₀ = E₂` (abelian normal Hall
 `τ₂`-subgroup of `E`, by Lemma 12.8(a)), and `E₀ = E₁E₃ · ∏_{p ∈ τ₂} Z_p`, where each `Z_p` is a
