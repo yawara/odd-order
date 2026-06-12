@@ -2124,3 +2124,52 @@ isometry で Z[T,A] 上 τ と一致。**(4.9)(b) は (4.8) conclusion 3 を使�
    `sigma_inner` 系 S05:1310 付近) + Z[T,A] 上 τ 一致 (= summed identity の線型拡張)。
 → (4.9) → S08 case-B (`sibleySetup_is_coherent` の CertainType branch) → (6.8) capstone。
 **正本=本 session 34。(4.9)(b) 計算核+次数橋渡し landed; 次 = (4.9)(a) 共役 or (4.9)(b) isometry 性。**
+
+## 2026-06-12 (session 35, /loop): ✅ (4.9)(b) isometry 性 COMPLETE + (4.9)(a)/IsCoherent 精密 scope
+
+**commit `6c2d555b`** (S06_CertainTypeIsometry, axiom-clean, full build 3791, AxiomsCheck 5 件登録)。
+(4.9)(b) の **isometry 性**(σ 像と μ 列和が同 Gram 行列 `w₁·δ_jk`)を完全形式化:
+
+- **`omegaProdCharTic_eq_iff`**: grid-index 判定 `ω_ij^{tic}=ω_{i'j'}^{tic} ↔ χ₂=χ₂' ∧ i=i'`
+  (`omegaProdChar_inj`+`w1CharEquiv` injective+`ticWEquivSdiffW` 全射で comp strip)。
+  `omegaProdCharTic_ne` を i≠i' へ一般化。
+- **`certainTypeOmegaSigma_inner`**: per-element σ 像直交 `⟨ω_ij^σ,ω_{i'j'}^σ⟩=δ`。
+  **🔑 経路 = `sigma_inner`(σ 等長, S05:985)+`omega_inner_self`/`omega_inner_ne`** で chiFam 不要。
+  `certainTypeOmegaSigma = σ(ω(omegaProdCharTic))` を `simp only [certainTypeOmegaSigma]` で開いて
+  sigma_inner 適用 → ⟨ω(P),ω(P')⟩ → omegaProdCharTic_eq_iff。
+- **`certainTypeOmegaSigma_sum_inner`** / **`columnFamily_mu_sum_inner`**: σ-side / μ-side(L 上)の
+  列和直交 = `if χ₂=χ₂' then (w₁:ℂ) else 0`。bilinear 展開(`inner_sum_left`/`inner_sum_right`)+
+  per-element + `Finset.sum_ite_eq`。μ-side は S06_CertainTypeClifford:813 テンプレ
+  (`irreducibleCharacter_inner_eq_ite`+`columnFamily.injective`+`columnFamily_mu_ne`)。
+- **`certainType_omega_sum_isometry`** (capstone): `⟨∑ω_ij^σ,∑ω_il^σ⟩=⟨∑μ_ij,∑μ_il⟩`
+  (両辺 `if χ₂=χ₂' then w₁ else 0`)。δ_k=±1 で δ_k² 相殺ゆえ符号なしで写像の等長性そのもの。
+- **罠**: statement の `if χ₂=χ₂'` は MonoidHom 等値非可決定 → `open scoped Classical in` を
+  **docstring の前**に置く(後ろは parse error; 既存 561/693/764 と同形)。
+
+**🔑 IsCoherent インターフェース確定** (`S07.IsCoherent τ S A`, S07_Coherence:1557; 下流 S08 case-B が
+要求する型)。5 フィールド: `nonzero`(∃φ∈Z[S,A] φ≠0) / `extension`(IntegralCharacterMap) /
+`extension_inner_eq`(Z[S]=zSpan 上等長) / `extends_on_supported`(Z[S,A]=zSupportedSpan 上 τ 一致) /
+`extension_mem_ZIrr`(Z[S]→ZIrr)。⟹ **(4.9)(b) の私の identity は field 3(等長)/field 4(τ一致)の
+「生成元上」版**; 残りは ① extension map を Z[𝒯] 上 packaging(`Basis.constr` 級)→ ② 生成元等式を
+zSpan へ lift → ③ nonzero(=(4.9)(a))→ ④ ZIrr codomain。
+
+### ▶▶ 次 = (4.9)(a) 共役 + IsCoherent packaging (session 36 以降; **scope 済**)
+
+**(4.9)(a) の確定チェーン** (full scope 済, 新規基礎インフラ要):
+1. **複素共役 RingEquiv** `ℂ ≃+* ℂ`: mathlib `Complex.conjAe.toRingEquiv`(要 build 確認; Pf 内に既存
+   使用なし)。
+2. **character 共役 = 逆指標** `galoisMap (conj) (omega ξ) = omega ξ⁻¹` (ext + omega_apply 値計算;
+   `galoisMap_apply_apply` S05/GaloisCharacter:384)。⟹ ω̄_ij = ω(omegaProdChar χ₁⁻¹ χ₂⁻¹) = grid (i',j')。
+3. **grid index 写像** (i,j)↦(i',j'): χ₁↦χ₁⁻¹(w1CharEquiv 経由 i'), χ₂↦χ₂⁻¹(列 j'); **j'≠j は |W| 奇**
+   (χ₂≠χ₂⁻¹ ⟺ χ₂²≠1 ⟺ ord χ₂ 奇 ∧ χ₂≠1); j' は i 非依存。
+4. **(3.9)+(4.3) bridge** μ̄_ij = μ_{i'j'}: `sigma_mapRingEquiv_comm`(S05:1589, σ が Galois 可換)を
+   u=conj で適用 ⟹ `conj(ω_ij^σ)=ω̄_ij^σ=ω_{i'j'}^σ`; (4.3.b) σ(ω_ij)=δ_j μ_ij で δ_j μ̄_ij=δ_{j'}μ_{i'j'}
+   ⟹ μ̄_ij=μ_{i'j'} (δ=±1)。
+5. **μ̄_j=μ_{j'}≠μ_j** (i で和) ⟹ μ̄_k∈𝒯 ∧ μ̄_k≠μ_k ⟹ **nonzero**(μ̄_k−μ_k∈Z[𝒯,A] 非零)。
+   **Z[𝒯,L^#]=Z[𝒯,A]** は (4.7)(Supp μ_j⊆A∪{1}) + 次数零(virtual char が 1 で消える)。
+
+**判断**: (4.9)(a) は新規 API(conj RingEquiv, character 共役, grid index 写像)を要し 1 commit 超。
+IsCoherent packaging(extension map on Z[𝒯])も同様。両者で **§6 残りの主作業**。Opus 継続可
+(Galois は (3.9) で既 landed = 利用のみ; full (3.8) 級の新規 grid 組合せ論は不要)。
+**第一 leaf 候補 = `S06_CertainTypeConjugation.lean`**(2 → 3 → 4 → 5 の順; nonzero まで)。
+**正本=本 session 35。(4.9)(b) 完全 DONE; 次 = (4.9)(a) チェーン step 1-2 から。**
