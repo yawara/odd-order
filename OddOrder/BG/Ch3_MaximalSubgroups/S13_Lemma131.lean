@@ -590,14 +590,33 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
   rw [← hNdef] at hax
   exact hax hpNderiv
 
-/-! ## Lemma 13.1 — conclusion (a) (mmd L3542) — remaining (K_a construction)
+/-! ## Lemma 13.1 — conclusion (a) (mmd L3542) -/
 
-The remaining `(a)` steps (`P ⊆ K_a = O_{α(M*)∪{p}}(M*') ⊴ M*` a `σ(M)'`-group, then
-`[M_σ∩M*, P] ⊆ M_σ ⊓ K_a = ⊥`) require `M*'/M*_α` nilpotent
-(from `S10.derivedQuotientMbeta_isNilpotent` + `nilpotent_of_surjective` over the projection
-`M*'/M*_β ↠ M*'/M*_α`; the `QuotientGroup.map_surjective_of_surjective` wiring needs care) and the
-case split `p ∈ α(M*)` / `p ∉ α(M*)` for `S ⊆ K_a`. See `notes/bg/s13_prime_action.md`
-"step 5 = (a)". The Sylow input `exists_sylow_le_derivedInG_of_not_tau1_tau2` (below) is ready. -/
+/-- `M*'/M*_α` is nilpotent: it is `(M*'/M*_β) ⧸ (M*_α/M*_β)`, a quotient of the nilpotent
+`M*'/M*_β` (`derivedQuotientMbeta_isNilpotent`, `M*_β ≤ M*_α`). Via the third isomorphism
+`quotientQuotientEquivQuotient` + `nilpotent_of_surjective`. -/
+theorem derivedQuotientMalpha_isNilpotent [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    [((S10.Malpha M).subgroupOf (derivedInG M)).Normal] :
+    Group.IsNilpotent (↥(derivedInG M) ⧸ (S10.Malpha M).subgroupOf (derivedInG M)) := by
+  classical
+  have hMβD : S10.Mbeta M ≤ derivedInG M := Mbeta_le_derived hG hM
+  have hMle : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  haveI hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
+      (hMle.trans (le_normalizer_opiCoreInG (S10.beta M) M))
+  haveI := S10.derivedQuotientMbeta_isNilpotent hG hM
+  have hsub : (S10.Mbeta M).subgroupOf (derivedInG M) ≤
+      (S10.Malpha M).subgroupOf (derivedInG M) :=
+    Subgroup.subgroupOf_mono _ (Subgroup.map_mono (Ch03.oPiCore_mono (S10.beta_subset_alpha M) ↥M))
+  haveI : Group.IsNilpotent
+      ((↥(derivedInG M) ⧸ (S10.Mbeta M).subgroupOf (derivedInG M)) ⧸
+        ((S10.Malpha M).subgroupOf (derivedInG M)).map
+          (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf (derivedInG M)))) :=
+    nilpotent_of_surjective (QuotientGroup.mk' _) (QuotientGroup.mk'_surjective _)
+  exact nilpotent_of_surjective
+    (QuotientGroup.quotientQuotientEquivQuotient _ _ hsub).toMonoidHom
+    (QuotientGroup.quotientQuotientEquivQuotient _ _ hsub).surjective
 
 /-- For `p ∈ π(M*) ∖ τ₁(M*) ∖ τ₂(M*)` (`p ∈ σ(M*) ∪ τ₃(M*)`), there is a Sylow `p`-subgroup `S`
 of `M*` (as a subgroup of `G`) lying in `M*'`. In the `σ` case `S ⊆ M*_σ ⊆ M*'`; in the `τ₃` case
