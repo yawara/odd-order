@@ -67,6 +67,115 @@ theorem isPiSubgroup_le_of_normal_isHall [Finite G] {π : Set ℕ} {H N : Subgro
   have hx_sup : x ∈ (H ⊔ N : Subgroup G) := Subgroup.mem_sup_right hx
   rwa [h_sup_eq] at hx_sup
 
+/-! ### `⨆_{p ∈ T} Z_p` as an internal direct product (`Z_p` a normal `p`-group)
+
+For a finite family of subgroups `Z p` (`p` ranging over a `Finset` of primes `T`), each a
+`p`-group normalized by a common `H ≥ Z p`, the join `T.sup Z` is the internal direct product:
+`|T.sup Z| = ∏ |Z p|`, and every element of prime order `r ∈ T` lies in `Z r`. This is the
+combinatorial heart of `frobFact_of_abelianSylow`, where the `Z_p` are the per-prime regular cyclic
+subgroups and `H = E`. -/
+
+/-- If `H` normalizes each `Z p` (`p ∈ T`), it normalizes their join `T.sup Z`. -/
+theorem le_normalizer_finsetSup [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z : ℕ → Subgroup G)
+    (h : ∀ p ∈ T, H ≤ Subgroup.normalizer (Z p : Set G)) :
+    H ≤ Subgroup.normalizer ((T.sup Z : Subgroup G) : Set G) := by
+  classical
+  induction T using Finset.induction with
+  | empty =>
+    rw [Finset.sup_empty]
+    intro x _
+    apply Subgroup.mem_normalizer_fintype
+    intro n hn
+    rw [Subgroup.coe_bot, Set.mem_singleton_iff] at hn ⊢
+    subst hn; group
+  | insert q T' hq ih =>
+    rw [Finset.sup_insert]
+    refine (le_inf (h q (Finset.mem_insert_self q T'))
+      (ih (fun p hp => h p (Finset.mem_insert_of_mem hp)))).trans ?_
+    exact Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _
+
+/-- **Internal direct product, cardinality**: for a `Finset` `T` of primes and `Z p` a `p`-group
+normalized by `H ≥ Z p`, `|T.sup Z| = ∏_{p ∈ T} |Z p|`. By `Finset.induction`, splitting off one
+prime `q`: `Z q` normalizes (via `H`) the rest `T'.sup Z`, and their orders are coprime
+(`|Z q|` a `q`-power, `|T'.sup Z| = ∏` a product of `p`-powers with `p ≠ q`), so
+`card_sup_eq_mul_of_le_normalizer_of_disjoint` applies. -/
+theorem card_finsetSup_eq_prod [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z : ℕ → Subgroup G)
+    (hTp : ∀ p ∈ T, p.Prime) (hZH : ∀ p ∈ T, Z p ≤ H)
+    (hZnorm : ∀ p ∈ T, H ≤ Subgroup.normalizer (Z p : Set G))
+    (hZpg : ∀ p ∈ T, IsPGroup p ↥(Z p)) :
+    Nat.card ↥(T.sup Z) = ∏ p ∈ T, Nat.card ↥(Z p) := by
+  classical
+  induction T using Finset.induction with
+  | empty => simp
+  | insert q T' hq ih =>
+    have hqmem : q ∈ insert q T' := Finset.mem_insert_self q T'
+    have hsubT' : ∀ {p}, p ∈ T' → p ∈ insert q T' := fun hp => Finset.mem_insert_of_mem hp
+    haveI : Fact q.Prime := ⟨hTp q hqmem⟩
+    have hcardT' : Nat.card ↥(T'.sup Z) = ∏ p ∈ T', Nat.card ↥(Z p) :=
+      ih (fun p hp => hTp p (hsubT' hp)) (fun p hp => hZH p (hsubT' hp))
+        (fun p hp => hZnorm p (hsubT' hp)) (fun p hp => hZpg p (hsubT' hp))
+    -- `Z q` normalizes the join of the rest.
+    have hqN : Z q ≤ Subgroup.normalizer ((T'.sup Z : Subgroup G) : Set G) :=
+      (hZH q hqmem).trans (le_normalizer_finsetSup T' Z (fun p hp => hZnorm p (hsubT' hp)))
+    -- coprimality of orders.
+    obtain ⟨m, hm⟩ := (IsPGroup.iff_card).mp (hZpg q hqmem)
+    have hcop : Nat.Coprime (Nat.card ↥(Z q)) (Nat.card ↥(T'.sup Z : Subgroup G)) := by
+      rw [hm, hcardT']
+      refine Nat.Coprime.pow_left _ (Nat.Coprime.prod_right fun p hp => ?_)
+      haveI : Fact p.Prime := ⟨hTp p (hsubT' hp)⟩
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZpg p (hsubT' hp))
+      rw [hk]
+      exact Nat.Coprime.pow_right _
+        ((Nat.coprime_primes (hTp q hqmem) (hTp p (hsubT' hp))).mpr (fun he => hq (he ▸ hp)))
+    have hdisj : Z q ⊓ (T'.sup Z : Subgroup G) = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+    rw [Finset.sup_insert, card_sup_eq_mul_of_le_normalizer_of_disjoint hqN hdisj, hcardT',
+      Finset.prod_insert hq]
+
+/-- **Internal direct product, components**: an element `a ∈ T.sup Z` of prime order `r ∈ T` lies
+in `Z r`. Indeed `Z r ⊴ T.sup Z` (normalized via `H`), and `[T.sup Z : Z r] = ∏_{p ≠ r} |Z p|` is
+coprime to `r` (cardinality `card_finsetSup_eq_prod`), so the image of `a` in the quotient has
+order dividing both `r` and an `r'`-number, hence is trivial: `a ∈ Z r`. -/
+theorem mem_Z_of_orderOf_prime_mem [Finite G] {H : Subgroup G} (T : Finset ℕ) (Z : ℕ → Subgroup G)
+    (hTp : ∀ p ∈ T, p.Prime) (hZH : ∀ p ∈ T, Z p ≤ H)
+    (hZnorm : ∀ p ∈ T, H ≤ Subgroup.normalizer (Z p : Set G))
+    (hZpg : ∀ p ∈ T, IsPGroup p ↥(Z p))
+    {r : ℕ} (hr : r ∈ T) {a : G} (ha : a ∈ T.sup Z) (har : orderOf a = r) :
+    a ∈ Z r := by
+  classical
+  haveI : Fact r.Prime := ⟨hTp r hr⟩
+  have hZrle : Z r ≤ T.sup Z := Finset.le_sup hr
+  have hnorm : (T.sup Z : Subgroup G) ≤ Subgroup.normalizer (Z r : Set G) :=
+    (Finset.sup_le hZH).trans (hZnorm r hr)
+  set K' : Subgroup ↥(T.sup Z) := (Z r).subgroupOf (T.sup Z) with hK'
+  haveI : K'.Normal := (Subgroup.normal_subgroupOf_iff_le_normalizer hZrle).mpr hnorm
+  set a' : ↥(T.sup Z) := ⟨a, ha⟩ with ha'
+  have hord_a' : orderOf a' = r := (Subgroup.orderOf_coe a').symm.trans har
+  -- `[T.sup Z : Z r] = ∏_{p ∈ T.erase r} |Z p|`, coprime to `r`.
+  have hcofactor : Nat.card (↥(T.sup Z) ⧸ K') = ∏ p ∈ T.erase r, Nat.card ↥(Z p) := by
+    have hK'card : Nat.card ↥K' = Nat.card ↥(Z r) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZrle).toEquiv
+    have hlag := Subgroup.card_eq_card_quotient_mul_card_subgroup K'
+    rw [hK'card, card_finsetSup_eq_prod T Z hTp hZH hZnorm hZpg,
+      ← Finset.mul_prod_erase T (fun p => Nat.card ↥(Z p)) hr, mul_comm] at hlag
+    exact (Nat.eq_of_mul_eq_mul_right Nat.card_pos hlag.symm)
+  have hcop : Nat.Coprime r (∏ p ∈ T.erase r, Nat.card ↥(Z p)) := by
+    refine Nat.Coprime.prod_right fun p hp => ?_
+    have hpT : p ∈ T := Finset.mem_of_mem_erase hp
+    haveI : Fact p.Prime := ⟨hTp p hpT⟩
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hZpg p hpT)
+    rw [hk]
+    exact Nat.Coprime.pow_right _
+      ((Nat.coprime_primes (hTp r hr) (hTp p hpT)).mpr (Finset.ne_of_mem_erase hp).symm)
+  -- the image of `a` in the quotient is trivial.
+  have hdvdr : orderOf (QuotientGroup.mk' K' a') ∣ r :=
+    hord_a' ▸ orderOf_map_dvd (QuotientGroup.mk' K') a'
+  have hdvdc : orderOf (QuotientGroup.mk' K' a') ∣ ∏ p ∈ T.erase r, Nat.card ↥(Z p) :=
+    hcofactor ▸ orderOf_dvd_natCard _
+  have hone : orderOf (QuotientGroup.mk' K' a') = 1 :=
+    Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvdr hdvdc)
+  have : a' ∈ K' := QuotientGroup.eq_one_iff _ |>.mp (orderOf_eq_one_iff.mp hone)
+  exact Subgroup.mem_subgroupOf.mp this
+
 /-- **Per-prime `Z_p` extraction** for the abelian-Sylow case (`p ∈ τ₂(M)`). Combining
 `exists_elemAb_rank_two_le_E_of_tau2`, the Sylow extension `A ≤ S`, the abelianness `habel`, the
 Lemma 12.8(c) chain (`sylow_chain_of_abelianSylow`, giving `S ≤ E`), and the per-prime capstone
