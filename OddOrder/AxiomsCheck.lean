@@ -72,6 +72,7 @@ import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
@@ -773,6 +774,84 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_inner_self
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaNC_dade_le_two
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam
+-- Peterfalvi (4.8), step (7) input: the σ-coefficients of φ lie in `{0, ±1}` (norm-2 ⟹ two
+-- constituents `ε_α·α + ε_β·β`, each χ_{pq} matching at most one).  The `|·| ≤ 1` bound (beyond
+-- NC ≤ 2) excludes the `w₂ = 3` row case in the trichotomy endgame.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaCoeff_dade_eq_zero_or_one
+-- Peterfalvi (4.8), assembly: the σ-coefficient grid of `ψ = φ − δ_j(ω_ij^σ − ω_ik^σ)` is
+-- `⟨φ, χ_pq⟩ − δ_j([P_ij = pq] − [P_ik = pq])` (the δ-part hits exactly the two positions P_ij, P_ik).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaCoeff_psi_eq
+-- Peterfalvi (4.8), conclusion (3) from trichotomy case (a): if every σ-coefficient of ψ vanishes
+-- then ψ = 0, i.e. (μ_ij − μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ).  ⟨ψ,ω_ij^σ⟩=0 pins ⟨φ,ω_ij^σ⟩=δ_j,
+-- ⟨φ,ω_ik^σ⟩=−δ_j; then ‖ψ‖² = ⟨ψ,φ⟩ = 2 − 2 = 0 by positive-definiteness.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq_of_all_sigmaCoeff_zero
+-- Peterfalvi (4.8), conclusion (3) — the FT-critical isometry identity:
+-- (μ_ij − μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ).  ψ vanishes on V (step 4) ⟹ separable σ-grid with
+-- NC ≤ 4 < 2·min(w₁,w₂); the (3.8) trichotomy (in the orientation given by coprimality of w₁,w₂)
+-- leaves only all-zero (constant column/row excluded by grid_no_constant_column/row), whence ψ = 0.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq
+-- Peterfalvi (4.9)(b), summed isometry: the Dade map is additive over finite sums of supported
+-- class functions (`tau_toDadeMap_sum`, via the (2.5) uniqueness `IsDadeMap.unique` reducing the
+-- abstract `τ` to the genuine `ℂ`-linear `dadeLinearMap`); summing (4.8) conclusion 3 over the rows
+-- `0 ≤ i < w₁` gives `(μ_j − μ_k)^τ = δ_j ∑_i (ω_ij^σ − ω_ik^σ)`, the (4.9)(b) τ-agreement on Z[T,A].
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.tau_toDadeMap_sum
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq
+-- Peterfalvi (4.9) degree bridge: every `μ_ij` in column `j` shares the degree `μ_0j(1)`
+-- (`columnFamily_mu_apply_one_eq`, from `(μ_ij − μ_0j)(1) = 0`), so the column-sum degree equality
+-- `μ_j(1) = μ_k(1)` (`= ∑_i μ_ij(1) = ∑_i μ_ik(1)`) gives the per-row equalities
+-- (`forall_columnFamily_mu_apply_one_eq_of_sum_eq`), restating the summed isometry under the `T`
+-- membership condition (`certainType_diff_dade_sum_eq_of_degree`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_apply_one_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.forall_columnFamily_mu_apply_one_eq_of_sum_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_sum_eq_of_degree
+-- Peterfalvi (4.9)(b), the isometry property: the σ-image column sums `∑_i ω_ij^σ` (in CF(G)) and
+-- the certain-type column sums `μ_j = ∑_i μ_ij` (in CF(L)) carry the same Gram matrix `w₁·δ_jk`
+-- (`certainTypeOmegaSigma_sum_inner` / `columnFamily_mu_sum_inner`, both via per-element
+-- orthonormality: `certainTypeOmegaSigma_inner` from σ-isometry + ω-orthonormality and grid-index
+-- distinctness `omegaProdCharTic_eq_iff`; the μ-side from `columnFamily` injectivity/cross-column
+-- distinctness).  Hence `μ_j ↦ δ_k ∑_i ω_ij^σ` is an isometry (δ_k² = 1), which is (4.9)(b).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdCharTic_eq_iff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_sum_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_omega_sum_isometry
+-- Peterfalvi (4.9)(a) conjugation foundation: the complex conjugate of a linear character `ω(χ)` is
+-- `ω(χ⁻¹)` (`galoisMap_conj_omega`; values are roots of unity, where `z̄ = z⁻¹`), so the conjugate of
+-- a certain-type σ-image `ω_ij^σ` is the σ-image of the inverse grid character `ω((P_ij)⁻¹)`
+-- (`certainTypeOmegaSigma_conj`, via the (3.9) Galois commutation `sigma_mapRingEquiv_comm`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.galoisMap_conj_omega
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj
+-- (4.9)(a) grid-index conjugation: the inverse grid character is the grid character at the conjugate
+-- index (`omegaProdChar_inv` coordinatewise, `omegaProdCharTic_inv` with column `χ₂⁻¹`, row `rowInv`),
+-- so the conjugate of a σ-image is the σ-image at the conjugate index `(ω_ij^σ)̄ = ω_{i'j'}^σ`
+-- (`certainTypeOmegaSigma_conj_eq`).  This is the σ-side of Peterfalvi's `ω̄_ij = ω_{i'j'}`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdChar_inv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdCharTic_inv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj_eq
+-- (4.9)(a) L-side conjugation closure: the column source character conjugates to the conjugate-index
+-- character (`chiColumn_conj`: χ_{ij}̄ = χ_{i'j'}), and the L-side σ-isometry `σ_L` intertwines it
+-- (`sigma_chiColumn_conj`: σ_L(ω_ij)̄ = σ_L(ω_{i'j'})).  With (4.3.b) `sigma_chiColumn_eq_certainType`
+-- (σ_L(ω_ij) = δ_j μ_ij) this gives the L-character bridge δ_j μ_ij̄ = δ_{j'} μ_{i'j'} of (4.9)(a).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiColumn_conj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigma_chiColumn_conj
+-- (4.9)(a) the L-character conjugation bridge δ_j·μ_{ij}̄ = δ_{j'}·μ_{i'j'} (`certainType_mu_conj_bridge`):
+-- complex conjugation of (4.3.b) `σ_L(ω_{ij}) = δ_j·μ_{ij}`, using `sigma_chiColumn_conj` + (4.3.b) on
+-- the left and `mapRingEquiv_zsmul` on the right (δ_j ∈ ℤ).  The heart of (4.9)(a).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_mu_conj_bridge
+-- (4.9)(a) `μ_ij̄ = μ_{i'j'}` (`certainType_mu_conj_eq`): pairing the bridge δ_j·μ_ij̄ = δ_{j'}·μ_{i'j'}
+-- with μ_{i'j'} gives δ_j·⟨μ_ij̄, μ_{i'j'}⟩ = δ_{j'} ≠ 0, so the (0/1) inner product of the two
+-- irreducibles is 1, forcing equality.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_mu_conj_eq
+-- (4.9)(a) `μ̄_j = μ_{j'}` (`certainType_columnSum_conj`): the conjugate of the column sum
+-- `μ_j = ∑_i μ_ij` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}` (`j' = χ₂⁻¹`).  mapRingEquiv conj is
+-- additive, each `μ_ij̄ = μ_{i'j'}`, and `i ↦ rowInv i` is a permutation (`rowInvEquiv`, involution).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_columnSum_conj
+-- (4.9)(a) the conjugate column is a new certain-type character: `χ₂⁻¹ ≠ χ₂` (`column_inv_ne_self`,
+-- the column character group has odd order `= |W₂|`, no involutions), so `μ̄_k = μ_{k'}` is orthogonal
+-- to `μ_k` (`columnFamily_mu_sum_inner`), whence `μ̄_k ≠ μ_k` (`certainType_columnSum_conj_ne`) — the
+-- nonvanishing `0 ≠ μ̄_k − μ_k ∈ Z[T,A]` input to the (4.9)(a) coherence.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.column_inv_ne_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_columnSum_conj_ne
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
@@ -4091,3 +4170,180 @@ forces `N_G(L) ⊆ M ⊇ N_G(S)`, contradiction). Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_maximal_in_M_of_le
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_line_eq_bot_of_invariant
+
+/-! ### BG Theorem 12.12: Case 3 cyclic-`Z` regularity bridge (`S12_Theorem1212b`)
+
+`line_le_zpowers_in_cyclic`: in a finite cyclic `p`-group the order-`p` subgroup is the unique
+minimal one, contained in `⟨a⟩` for every `a ≠ 1` (generator + `orderOf_pow` gcd + Bézout).
+`inf_centralizer_eq_bot_of_line_le_cyclic`: transfers `N ⊓ C_G(L) = 1` (for a line `L ≤ Z`,
+`Z` cyclic) to `N ⊓ C_G(a) = 1` for all `a ∈ Z#`, since `L ≤ ⟨a⟩` gives `C_G(a) ≤ C_G(L)`.
+This connects the key fact to the per-element Frobenius regularity. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_zpowers_in_cyclic
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_line_le_cyclic
+
+/-! ### BG Theorem 12.12: Case 3 φ̄ quotient action wrapper (`S12_Theorem1212b`)
+
+`conjActionHom_ker`: the kernel of the conjugation action `Q →* MulAut S` (`Q ≤ N_G(S)`) is
+`C_Q(S) = C_G(S) ⊓ Q`, via `Subgroup.normalizerMonoidHom_ker`.
+`isCyclic_quotient_of_conjugation_fpf`: a `q`-group `Q ≤ N_G(S)` acting on a `p`-group `S ≠ 1`
+(`p ≠ q`) fixed-point-freely outside its kernel `C_Q(S)` has cyclic quotient `Q ⧸ C_Q(S)`;
+the lifted action is FPF, so Proposition 3.9 (`isCyclic_of_coprime_fpf_pgroup_action`) applies.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.conjActionHom_ker
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_quotient_of_conjugation_fpf
+
+/-! ### BG Theorem 12.12: Case 3 back-half — rank-2 abelian split ⟹ factors cyclic
+(`S12_Theorem1212b`)
+
+`isCyclic_of_inf_eq_bot_of_pRank_le_two`: in a finite abelian `p`-group `T` (`p` odd) of
+`p`-rank `≤ 2`, a subgroup `T₀` disjoint from a nontrivial `T₁` is cyclic (else `T₀ ⊇ B₀`
+elem-ab order `p²`, with `y ∈ T₁` order `p` the join `B₀ ⊔ ⟨y⟩` is elem-ab order `p³`, so
+`pRank T ≥ 3`). For `S = C_S(X) × [S,X]` in Case 3: both factors cyclic since `r(S) = 2`.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_inf_eq_bot_of_pRank_le_two
+
+/-! ### BG Theorem 12.12: Case 3 back-half — exponent of internal product (`S12_Theorem1212b`)
+
+`exponent_eq_of_sup_eq_top_of_exponent_dvd`: in a finite abelian `T = T₀ ⊔ T₁ = ⊤`, if
+`exp(T₁) ∣ exp(T₀)` then `exp(T) = exp(T₀)` (each `g = a·b` factors, `ord g ∣ lcm(ord a, ord b)
+∣ exp T₀`). For `Z` = the larger cyclic factor of `S = C_S(X) × [S,X]`: `exp(Z) = exp(S)`.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_sup_eq_top_of_exponent_dvd
+
+/-! ### BG Theorem 12.12: Case 3 back-half — invariant cyclic `Z` acts regularly (`S12_Theorem1212b`)
+
+`inf_centralizer_eq_bot_of_invariant_cyclic`: an `N_G(S)`-invariant nonidentity cyclic `Z ≤ S`
+has `M_σ ⊓ C_G(z) = 1` for every `z ∈ Z#`. Its order-`p` subgroup `L = Ω₁(Z)` is a line
+(`|Ω₁(Z)| = p` via cyclic exponent), `N_G(S)`-invariant (`Ω₁` characteristic in `Z`), so the key
+fact `inf_centralizer_line_eq_bot_of_invariant` gives `M_σ ⊓ C_G(L) = 1` and the cyclic bridge
+`inf_centralizer_eq_bot_of_line_le_cyclic` spreads it to all of `Z#`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_invariant_cyclic
+
+/-! ### BG Theorem 12.12: Case 3 back-half — the `Z`-construction assembly (`S12_Theorem1212b`)
+
+`isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two` / `exponent_eq_of_le_of_sup_eq_of_exponent_dvd`:
+`subgroupOf` casts of the two abstract back-half primitives to subgroups of `G` inside an abelian
+Sylow `S`.
+`exists_invariant_cyclic_sameExponent_regular`: in the abelian-Sylow regime, `X ≤ N_G(S)`
+(coprime to `S`) with `1 ⊊ C_S(X) ⊊ S` yields a cyclic `N_G(S)`-invariant `Z ≤ S` with
+`exp(Z) = exp(S)` acting regularly on `M_σ`. `S = C_S(X) × [S,X]` (`fitting_coprime_abelian_-`
+`decomp`), both factors cyclic (`r(S) = 2`) and invariant (Lemma 12.8(f)); `Z` is the larger.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_le_of_sup_eq_of_exponent_dvd
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_invariant_cyclic_sameExponent_regular
+
+/-! ### BG Theorem 12.12: Case 3 front-half — `Ω₁`-rank reasoning (`S12_Theorem1212b`)
+
+`omega_le_of_ne_bot_in_cyclic`: in a finite cyclic `q`-group the order-`q` subgroup `Ω₁` lies in
+every nontrivial subgroup (`|Ω₁| = q` + `line_le_zpowers_in_cyclic`).
+`pRank_le_one_of_cyclic_quotient`: the `r(Q) = 1` side of the Case 3 rank contradiction — a finite
+`q`-group `Q` with cyclic quotient `Q ⧸ Q₀` and `Q₀ ⊊ Q₁ ≤ Q` (`Q₁` cyclic) has `pRank Q q ≤ 1`,
+since `Ω₁(Q) ≤ Q₁` (via `Ω₁(Q ⧸ Q₀) ≤ Q₁ ⧸ Q₀`) and every elem-ab `B ≤ Ω₁(Q) ≤ Q₁` is cyclic
+of order `≤ q`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.omega_le_of_ne_bot_in_cyclic
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_le_one_of_cyclic_quotient
+
+/-! ### BG Theorem 12.12: Case 3 front-half setup — `E ≤ N_G(S)` (`S12_Theorem1212b`)
+
+`E_le_normalizer_sylow_of_abelianSylow`: in the abelian-Sylow regime `E ≤ N_G(S)`. `S ≤ F(E)`
+(Sylow chain), `S` is the Sylow `p`-subgroup of the nilpotent `F(E)` hence characteristic in it,
+and `E` normalizes `F(E)`, so `E ≤ N_G(F(E)) ≤ N_G(S)`. Lets the Sylow `q`-subgroups of `E` sit
+inside `N_G(S)` for the front-half rank argument. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.E_le_normalizer_sylow_of_abelianSylow
+
+/-! ### BG Proposition 1.6(e): `Ω₁`-centralizing coprime action is trivial (`S12_Theorem1212b`)
+
+`centralizer_le_of_omega1_le_centralizer`: an abelian `p`-group `S` with a coprime operator
+`Q ≤ N_G(S)` that centralizes `Ω₁(S)` is centralized by `Q` entirely. Via the coprime split
+`S = C_S(Q) × [S, Q]` (`fitting_coprime_abelian_decomp`): a nontrivial `[S, Q]` would contain an
+order-`p` element of `Ω₁(S) ⊆ C_S(Q)`, contradicting `C_S(Q) ⊓ [S, Q] = 1`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_le_of_omega1_le_centralizer
+
+/-! ### BG Theorem 12.12: Case 3 front-half — the `r_q = 2` side (`S12_Theorem1212b`)
+
+`sylow_eq_of_le_normalizer`: two Sylow `p`-subgroups, one normalizing the other, coincide (`P`
+is the unique Sylow `p` of `N_G(P)`).
+`pRank_normalizer_eq_two_of_index_card`: in the abelian-Sylow regime, `q ∣ [E : C_E(A)]` and
+`q ∣ |C_E(A)|` force `r_q(N_G(S)) = 2`. Lemma 12.11(c) gives `M* ∈ ℳ(N_G(A))` with `q ∈ τ₂(M*)`
+and a Sylow `p`-subgroup `P` of `G` normal in `M*`; `S ≤ N_G(S) = N_G(A) ≤ M* ≤ N_G(P)` and
+`S = P` make `M* = N_G(S)`, so `pRank (N_G(S)) q = pRank M* q = 2`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_eq_of_le_normalizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_normalizer_eq_two_of_index_card
+
+/-! ### Prime divides index of normal subgroup missing a Sylow (`S12_Theorem1212b`)
+
+`prime_dvd_index_of_sylow_not_le_of_normal`: if `H ⊴ K` does not contain the Sylow `q`-subgroup
+`P`, then `q ∣ [K : H]` (the image of `P` in `K ⧸ H` is a nontrivial `q`-group). Front-half
+setup tool: feeds `q ∈ π(E/C_E(A))` from `Q₁ ⊄ C_E(A)` with `C_E(A) ⊴ E`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.prime_dvd_index_of_sylow_not_le_of_normal
+
+/-! ### BG Theorem 12.12: Case 3 front-half — setup + `X` existence (`S12_Theorem1212b`)
+
+`exists_sylow_tau1_cyclic_notCentralizing`: in the abelian-Sylow regime with the regularity
+hypothesis, `C_E(S) ≠ E` yields a prime `q ≠ p` and a cyclic Sylow `q`-subgroup `Q₁` of `E` with
+`q ∈ τ₁(M)`, `Q₁ ⊄ C(S)`, and `q ∈ π(E/C_E(A)) ∩ π(C_E(A))` (the data for the `r_q = 2` lemma).
+`exists_partial_centralizer_of_abelianSylow`: hence some `X ≤ N_G(S)` has `1 ⊊ C_S(X) ⊊ S` —
+otherwise `Q ⧸ C_Q(S)` is cyclic (`pRank Q q ≤ 1`) yet `pRank Q q = r_q(N_G(S)) = 2`. Feeds the
+`Z`-construction `exists_invariant_cyclic_sameExponent_regular`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_sylow_tau1_cyclic_notCentralizing
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_partial_centralizer_of_abelianSylow
+
+/-! ### Agemo of an abelian group is the set of `pⁿ`-th powers (`S12_Theorem1212b`)
+
+`agemo_eq_range_powMonoidHom` / `mem_agemo_iff_of_comm`: in a commutative group `℧ⁿ(H)` equals
+the range of the `pⁿ`-th power map, so `x ∈ ℧ⁿ(H) ↔ ∃ y, x = y^(pⁿ)`. Tool for the Case 3
+`C_E(S) = E` branch (`Z = ⟨s⟩` with `Ωₐ₋₁(S) = ⟨s^{p^{a-1}}⟩` the good line). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.agemo_eq_range_powMonoidHom
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_agemo_iff_of_comm
+
+/-! ### BG Theorem 12.12: Case 3 — the `C_E(S) = E` branch (`S12_Theorem1212b`)
+
+`exists_generator_of_card_prime`: a subgroup of order `p` is `⟨w⟩` for any nonidentity `w`.
+`exists_cyclic_Enormal_regular_of_CES_eq`: in the abelian-Sylow regime with the regularity
+hypothesis, `C_E(S) = E` yields a cyclic `Z ≤ S` of exponent `exp(S)`, normalized by `E`, acting
+regularly on `M_σ`. Built from a good line `L = ⟨w⟩ ≤ ℧^{a-1}(S)` (`℧^{a-1}(S) = A` → Theorem
+12.5(f); else `℧^{a-1}(S)` is a characteristic line via the key fact) with `w = s^{p^{a-1}}`,
+`Z = ⟨s⟩`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_generator_of_card_prime
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_CES_eq
+
+/-! ### BG Theorem 12.12: Case 3 per-prime `Z`-construction (both branches) (`S12_Theorem1212b`)
+
+`exists_cyclic_Enormal_regular_of_abelianSylow`: in the abelian-Sylow regime with the regularity
+hypothesis, `S` has a cyclic `Z ≤ S` of exponent `exp(S)`, normalized by `E`, regular on `M_σ`.
+Splits on `C_E(S) = E`: `= E` uses the agemo construction; `≠ E` produces `X` (front-half) then the
+invariant `Z` (back-half). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_abelianSylow
+
+/-! ### Frobenius complement: prime-order regularity propagates (`S12_Theorem1212b`)
+
+`inf_centralizer_eq_bot_of_forall_prime_order`: if every prime-order element of `H` acts
+fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|/r})` for a prime
+`r ∣ |h|`). The reduction for "`E₀ = E₁E₃·∏Z_p` is a Frobenius complement". Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_forall_prime_order

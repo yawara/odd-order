@@ -1977,3 +1977,361 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
 6. **最終 statement**: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)` (要 χ₂≠χ₂'; ψ=0 から移項) → (4.9) → case-B → (6.8)。
 
 正本 = 本 session 33 cont.³。**input 補題 全 landed (9 commits)。残 = assembly (orientation 込み trichotomy)、1 セッション。**
+
+### 🔧 session 33 cont.⁴ — 🚨 exclusion 精査: **|f|≤1 が必須** (|supp f|≤2 では不足)
+**🚨 重要発見 (notes cont.³ の exclusion 設計を訂正)**: trichotomy (b)(c) 排除は |supp f|≤2 だけでは
+**w₂=3 の row case を排除できない**。
+- P_ij=(omegaProdEquiv.symm(omegaProdCharTic χ₂ i)), P_ik=(... χ₂' i)。**P_ij.1=P_ik.1 (同 row, 両方 i)、
+  P_ij.2≠P_ik.2 (異 column, χ₂≠χ₂')**。
+- row i₀=P_ij.1 定数 c≠0, w₂=3: 純f列 1個 + δ列で f(P_ij)=c+δ_j, f(P_ik)=c−δ_j。
+  c=−δ_j なら f(P_ij)=0 だが **f(P_ik)=−2δ_j**。supp f={純f点, P_ik}=2 点 ⟹ |supp f|≤2 と無矛盾 = **排除できない**。
+  ⟹ **|f(pq)|≤1 (f∈{0,±1}) が必要** (f(P_ik)=±2 を弾く)。
+- ⟹ exclusion は **|supp f|≤2 (column case) + |f|≤1 (row w₂=3 case)** の両方を使う。
+  あるいは uniform に **∑f²≤2** (Bessel) でも可 (∑≥3c²+2≥5>2)。**|f|≤1 が最小限**。
+
+### ▶ 残 INPUT 補題 = **`sigmaCoeff_dade_eq_zero_or_one`** (f∈{0,±1})
+証明ルート (cont.⁴ で draft 着手→revert; 設計確定):
+φ=(cα:ℂ)•α+(cβ:ℂ)•β (mem_ZIrr_inner_self_eq_sum_sq+exists_pair_of_sum_sq_eq_two, cα,cβ∈{±1});
+chiFam pq=(ε:ℤ)•ν (exists_zsmul_irreducibleCharacter_of_inner_self_one, ε∈{±1}, ν:IrreducibleCharacter);
+f=⟨φ,chiFam pq⟩=cα·ε·⟨α,ν⟩+cβ·ε·⟨β,ν⟩=cα·ε·[⟨α,_⟩=ν]+cβ·ε·[⟨β,_⟩=ν]。
+α=ν⟹cα·ε∈{±1}; β=ν⟹cβ·ε∈{±1}; else 0 (α≠β で同時不可)。
+**🛑 draft で詰まった点 (次回修正)**:
+  (1) 右 smul lemma 名 = **`OddOrder.RepresentationTheory.inner_smul_right`** (`ClassFunction.inner_smul_right` 不在)。
+  (2) `irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν` の ite 条件は **IrreducibleCharacter 等式 `⟨α,hαm⟩=ν`** で
+      α:CF とは coercion 差 ⟹ by_cases も IrreducibleCharacter 等式で。⟨α,(ν:CF)⟩ rw に coe 整合注意。
+  (3) 最後の `(c:ℂ)=0∨=1∨=-1` 閉じは `rcases hcα<;>rcases hε<;>rw[…]<;>norm_num` で disjunct 自動選択不可 →
+      明示 `left/right` か `decide`不可(ℂ)→ `first|(left;norm_num)|(right;left;norm_num)|(right;right;norm_num)`。
+
+### ▶▶ 残 = assembly (cont.³ の 6 段 + |f|≤1; 1 セッション)
+INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1}**) 揃えば:
+ψ定義→V消失→NC(ψ)≤4→**orientation** (w₁<w₂直接/w₂<w₁ transposed grid_trichotomy)→
+(b)(c)排除 (|supp f|≤2 + |f|≤1, P 同row異col)→(a)⟹‖ψ‖²=0⟹ψ=0→最終 statement (χ₂≠χ₂' 要)。
+正本=本 session 33 cont.⁴。**10 commits landed; 残=f∈{0,±1}+assembly。**
+
+### ✅ session 33 cont.⁵ — f∈{0,±1} landed (`sigmaCoeff_dade_eq_zero_or_one`) = **全 INPUT 完了**
+- **landed (build-green, axiom-clean, AxiomsCheck 登録)**: `sigmaCoeff_dade_eq_zero_or_one`
+  (⟨φ,chiFam pq⟩∈{0,±1})。draft snag 解決済: **inner は left 線形・right 共役線形**
+  (`OddOrder.RepresentationTheory.inner_smul_right` が `star ↑ε` を出す → `star_intCast` 要)、
+  ite の CF↔IrreducibleCharacter coe は **型注釈 `have hαν : ... := irreducibleCharacter_inner_eq_ite ⟨α,hαm⟩ ν`**
+  で吸収、disjunct 閉じは `rcases<;>rw<;>norm_num`。
+- **🎉 (4.8) conclusion 3 の INPUT 補題 全 landed** (step4 / ‖φ‖²=2 / NC(φ)≤2 / ω_ij^σ=chiFam(P_ij) / f∈{0,±1})。
+  12 commits landed this session。
+- **▶▶ 残 = assembly のみ** (1 theorem, ~180 行, helper 分割推奨):
+  (1) `sigmaCoeff_psi_eq`: a(pq):=sigmaCoeff(ψ)(pq) = f(pq) − δ_j([pq=P_ij]−[pq=P_ik])
+      [certainTypeOmegaSigma_eq_chiFam + chiFam 正規直交; ψ:=φ−δ_j(certainTypeOmegaSigma χ₂ i−…χ₂' i)]。
+  (2) ψ vanish on V [step4 移項], a separable [sigmaCoeff_add_eq], NC(ψ)≤4 [supp a⊆supp f∪{P_ij,P_ik}, NC(φ)≤2]。
+  (3) orientation: w₁≠w₂(coprime)・|Δ|≥2(odd) ⟹ 小さい方 rows。w₁<w₂=直接 grid_trichotomy(Ŵ₁,Ŵ₂)、
+      w₂<w₁=transposed(Ŵ₂,Ŵ₁, a'(q,p)=a(p,q))。両者 (all-0)∨(row)∨(column) を出す。
+  (4) exclusion: column(w₁≥3)=|supp f|≤2 矛盾; row(w₂≥5 or w₂=3)=|supp f|≤2 **+ f∈{0,±1}**
+      (w₂=3,c=−δ_j で f(P_ik)=−2δ_j を弾く)。**P_ij.1=P_ik.1(同row,both i), P_ij.2≠P_ik.2(異col,χ₂≠χ₂')** 要証明。
+  (5) (a)⟹ a(P_ij)=a(P_ik)=0 ⟹ f(P_ij)=δ_j,f(P_ik)=−δ_j ⟹ ‖ψ‖²=2−2δ_j·2δ_j+2=0 ⟹ ψ=0。
+  (6) 最終 `certainType_diff_dade_eq` (χ₂≠χ₂' 仮説付): (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)。→ (4.9)→case-B→(6.8)。
+正本=本 session 33 cont.⁵。**全 INPUT landed (12 commits); 残=assembly 1 unit。**
+
+### ✅ session 33 cont.⁶ (/loop) — `sigmaCoeff_psi_eq` landed; 残=orientation+exclusion+conclude
+- **landed** (commit 68021c0a, full build 3787 + AxiomsCheck): `sigmaCoeff_psi_eq` (general φ):
+  a(pq)=sigmaCoeff(ψ)(pq) = ⟨φ,chiFam pq⟩ − δ_j·([P_ij=pq]−[P_ik=pq]), P_ij=omegaProdEquiv.symm(omegaProdCharTic χ₂ i)。
+  gotcha: `if`に `open scoped Classical in` (docstring の**前**)、columnFamily に `[Fintype ↥(W1⊔W2)]`+`[Invertible …]` 要。
+- **▶ 残 = final theorem `certainType_diff_dade_eq`** (1 unit, 最難 = exclusion):
+  - skeleton: set φ=h.tau.toDadeMap(certainTypeDiffSupported…), ψ=φ−δ_j•(certainTypeOmegaSigma χ₂ i−…χ₂' i);
+    ψ vanish on V [step4 移項 + ClassFunction.zsmul_apply]; a:=sigmaCoeff(ψ) separable [sigmaCoeff_add_eq];
+    a(pq)=sigmaCoeff_psi_eq。
+  - **all a=0** (orientation): w₁≠w₂(coprime, card_charGroup_subgroupOf で Ŵ card=w)、|Δ|≥2(odd) ⟹
+    w₁<w₂=`sigmaCoeff_trichotomy` 直接; w₂<w₁=`grid_trichotomy` transposed (ι=Ŵ₂,κ=Ŵ₁, a'(q,p)=a(p,q))。
+    両者 (all-0)∨(column)∨(row)。
+  - **exclusion** (要 component-structure 補題): **P_ij.1=P_ik.1 (同 Ŵ₁, both i), P_ij.2≠P_ik.2 (異 Ŵ₂, χ₂≠χ₂')**
+    [omegaProdEquiv.symm∘omegaProdCharTic の (Ŵ₁,Ŵ₂) 分解 = (w1charEquiv i 対応, χ₂ 対応); tic omegaProdEquiv ↔
+    transported char の compatibility 補題 ~40行 要]。
+    column j₀ const c≠0: {δ-rows in col}={P_ij.1}(1個, 同row) ⟹ Ŵ₁∖{P_ij.1} の ≥w₁−1≥2 行で g=sigmaCoeff(φ)=c≠0
+    + off-col δ(≥1, 異col) で g=±δ_j≠0 ⟹ |supp g|≥3 > 2 矛盾 [sigmaNC_dade_le_two]。
+    row i₀ const: w₂≥5 なら w₂−2≥3 pure-g; w₂=3 (transposed orientation) は **f∈{0,±1}** で f(P_ik)=±2 弾く。
+  - **conclude**: all a=0 ⟹ a(P_ij)=0 ⟹ sigmaCoeff(φ)(P_ij)=s, a(P_ik)=0 ⟹ sigmaCoeff(φ)(P_ik)=−s ⟹
+    ⟨φ,ωij⟩=s,⟨φ,ωik⟩=−s ⟹ ‖ψ‖²=2−2s·2s+2·s²=0 ⟹ ψ=0 [`eq_zero_of_inner_self_re_eq_zero`, ZIrrFourier:189]。
+  - 最終: (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ) (χ₂≠χ₂' 仮説)。→ (4.9)→case-B→(6.8)。
+正本=本 cont.⁶。**残=final theorem (orientation+exclusion+conclude); component-structure 補題が最初の sub-step。**
+
+### 🔧 session 33 cont.⁷ (/loop) — assembly ~90% : conclude + distinctness landed; 残 = exclusion
+- **landed this loop** (4 commits): `sigmaCoeff_psi_eq` (a(pq)=g(pq)−s([P_ij=pq]−[P_ik=pq])),
+  `omegaProdCharTic_ne`/`omegaProdEquiv_symm_omegaProdCharTic_ne` (P_ij≠P_ik),
+  **`certainType_diff_dade_eq_of_all_sigmaCoeff_zero`** (case (a) ⟹ conclusion 3 = ψ=0 via ‖ψ‖²=0)。
+  + helper `exists_two_ne_ne` (fintype card≥3, 2 distinct ≠ d) landed (uncommitted→commit予定)。
+- **▶ 残 = exclusion `hnocol`/`hnorow` + orientation + final** (設計確定, ~150行):
+  - **hnocol** (¬∃ 列 j₀ c≠0 定数): rintro ⟨j₀,c,hc,hcol,hoff⟩; g:=sigmaCoeff(φ); hexp=sigmaCoeff_psi_eq;
+    hsupp2: {pq|g≠0}.ncard≤2 (=sigmaNC_dade_le_two, sigmaNC unfold); hg01 (sigmaCoeff_dade_eq_zero_or_one)。
+    by_cases hboth: P_ij.2=j₀ ∧ P_ik.2=j₀:
+    - **both**: hcol@P_ij.1, P_ik.1 → g(P_ij)=c+s, g(P_ik)=c−s; hsum:g(P_ij)+g(P_ik)=2c, hdiff:..=2s;
+      `rcases hg01 P_ij<;>hg01 P_ik<;>sign_eq<;>rw<;>first|exact hc(by linear_combination (-1/2)*hsum)|norm_num at hdiff`
+      (g diff=2s=±2 ⟹ {1,−1} ⟹ sum=0 ⟹ c=0 矛盾)。
+    - **¬both**: by_cases P_ij.2=j₀, P_ik.2=j₀ (3 combo, (T,T)=absurd hboth):
+      (T,F)P_off=P_ik,d=P_ij.1; (F,T)P_off=P_ij,d=P_ik.1; (F,F)P_off=P_ij,d=P_ij.1。
+      exists_two_ne_ne (card Ŵ₁=w₁≥3 via card_charGroup_subgroupOf+three_le_card) d → r₁,r₂≠d distinct;
+      witnesses {(r₁,j₀),(r₂,j₀),P_off} ⊆ {pq|g≠0} (g(r,j₀)=c≠0 [hcol+hexp+(r,j₀)∉{P_ij,P_ik}],
+      g(P_off)=±s≠0 [hoff+hexp]); 3 distinct (r₁≠r₂, P_off.2≠j₀) → ncard≥3 (ncard_eq_three+ncard_le_ncard) 矛盾 hsupp2。
+  - **hnorow** = hnocol の転置 (行 i₀, w₂≥3, P_ij.1/P_ik.1=i₀ で同 row 判定; 同構造)。
+  - **all-zero + orientation**: card(tic.W1)≠card(tic.W2) (coprime+both≥3⟹≠), |Δ|≥2 (odd);
+    w₁<w₂: `sigmaCoeff_trichotomy (ticVdiff h) rfl app hψV hgap hNC` → (a)∨(b)∨(c); kill b=hnocol,c=hnorow。
+    w₂<w₁: `grid_trichotomy` on a'(q,p)=sigmaCoeff(ψ)(p,q) over (Ŵ₂,Ŵ₁), gap w₂+2≤w₁; (b')=row→hnorow,(c')=col→hnocol。
+    hψV (step4 移項), hNC: sigmaNC(ψ)≤4 (supp⊆supp(φ)∪{P_ij,P_ik}) < 2·min(w)≥6。
+  - **final `certainType_diff_dade_eq`** = `apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero; [all-zero]`。
+正本=本 cont.⁷。**conclude+distinctness landed; 残=hnocol/hnorow/orientation/final (設計完備)。**
+
+## 2026-06-12 (session 33 cont.⁸, /loop): 🎉🎉🎉 (4.8) conclusion 3 COMPLETE — (4.8) 全結論 DONE
+**`certainType_diff_dade_eq` landed (commit 07908c46, full build 3787 + AxiomsCheck, axiom-clean)**:
+`(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ)` (要 χ₂≠χ₂'; FT-critical isometry 恒等式)。
+- 組立: `apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero` → ∀pq sigmaCoeff(ψ)=0 を:
+  hψV (step4 移項) + hadd (sigmaCoeff_add_eq 3.7) + hNC4 (≤4, supp⊆supp G∪{P_ij,P_ik}) +
+  orientation (w₁≠w₂ coprime+odd ⟹ w₁+2≤w₂ ∨ w₂+2≤w₁) で `grid_trichotomy` (direct on a / transposed on aᵀ) →
+  (b)(c) を `grid_no_constant_column`/`grid_no_constant_row` で排除 → 全0。
+- **abstract exclusion** (汎用 ι,κ): `grid_no_constant_column` (both-in-col⟹c=0 [g(P_ij)=c+s,g(P_ik)=c−s,
+  diff=2s=±2⟹{1,−1}⟹c=0] / ¬both⟹≥3 supp g 矛盾) + `grid_no_constant_row` (swap corollary)。helper `exists_two_ne_ne`。
+- gotchas (再調査不要): grid_trichotomy は `Nat.card` (not Fintype.card)・要 `import S05_GridTrichotomy`;
+  inner は left-linear/right-conj (`inner_smul_right`=star ↑ε, `star_intCast`); `open scoped Classical in` は
+  docstring の**前**; Prod.swap if 同定は `Prod.fst_swap/snd_swap+tauto`; defeq (ticVdiff.W1=tic.W1) は `exact` で。
+- **🎉 §6 (4.8) 全結論 (1)(2)(3) 完成** (sessions 30-33)。conclusion 3 は本 session の /loop で foundation→
+  step4→inputs(‖φ‖²=2,NC≤2,ω=chiFam,f∈{0,±1})→assembly を 13+ commits で完走。
+
+### ▶▶ 次 = (4.9) (Theorem (4.9), notes 上記 session 30 の (4.9) 転記参照)
+(4.9)(a): μ_j∈T⟹μ̄_j∈T∧μ̄_j≠μ_j; 0≠Z[T,L^#]=Z[T,A]。 (b): Z[T]→Z[Irr G], μ_j↦δ_k∑_iω_ij^σ は
+isometry で Z[T,A] 上 τ と一致。**(4.9)(b) は (4.8) conclusion 3 を使う** ((μ_j−μ_k)^τ=∑_i(μ_ij−μ_ik)^τ=
+δ_k∑_i(ω_ij^σ−ω_ik^σ))。⟹ (4.8) 完成で (4.9) unblocked。→ (4.9) → S08 case-B → (6.8)。
+正本=本 cont.⁸。**(4.8) DONE; 次 = (4.9)。**
+
+## 2026-06-12 (session 34, /loop): ✅ (4.9)(b) summed isometry landed (computational core)
+
+**commit `8603fe8c`** (S06_CertainTypeIsometry, axiom-clean, AxiomsCheck 登録, full build 3771)。
+(4.9)(b) の計算核 = 「列差 μ_j−μ_k を τ で送ると δ_j ∑_i(ω_ij^σ−ω_ik^σ)」を landed:
+
+- **`tau_toDadeMap_sum`**: 「τ (= h.tau.toDadeMap) は有限和に対し加法的」 = τ(∑α_i)=∑ τ(α_i)。
+  **🔑 手法**: 抽象 `FullDadeIsometryData` の map は `IsDadeMap.unique` で構成版 `h.dade0.dadeMap`
+  と一致 (両者 IsDadeMap h.dade0; 後者 = `Hypothesis.isDadeMap_dadeMap`)、構成版は本物の ℂ-linear
+  `dadeLinearMap` (`dadeLinearMap_apply` rfl) ⟹ `map_sum`。ClassFunction に `sum_apply` 不要で済む。
+  → **(4.9)(b) full / (4.10) でも τ-linearity が要るとき再利用可**。
+- **`certainType_diff_dade_sum_eq`**: `τ(∑_i certainTypeDiffSupported_i) = δ_j • ∑_i(ω_ij^σ−ω_ik^σ)`。
+  proof = `rw [tau_toDadeMap_sum, Finset.smul_sum]` → `Finset.sum_congr rfl (conclusion 3)` の 2 行。
+  per-row 仮説 `∀i, μ_ij(1)=μ_ik(1)` で stated (δ_j=δ_k は conclusion 2、列の全 μ_ij は同次数)。
+
+### ▶▶ 次 = (4.9) 残り (session 34 cont. 以降)
+1. ✅ **列次数恒常性 + 橋渡し DONE** (commit `3596eda3`): `columnFamily_mu_apply_one_eq`
+   (μ_ij(1)=μ_0j(1), `columnFamily_difference_apply_one` から) + `forall_columnFamily_mu_apply_one_eq_of_sum_eq`
+   (∑μ_ij(1)=∑μ_ik(1) ⟹ ∀i 同次数; w₁≠0 で cancel) + `certainType_diff_dade_sum_eq_of_degree`
+   (summed isometry を μ_j(1)=μ_k(1) 仮説で再述)。**🔑 罠**: columnFamily は home-file の section
+   variable で `[Fintype ↥(W1⊔W2)] [Invertible (card(W1⊔W2):ℂ)]` を要求 → isometry leaf で明示要
+   (postpone は proof 経由 unify のときだけ効く; hypothesis 型は upfront synth)。S06-namespace 補題は
+   dot 不可 (`columnFamily_mu_apply_one_eq h χ₂`, 位置引数; Hypothesis46-namespace の columnFamily 等は dot 可)。
+2. **(4.9)(a)** 共役 μ̄_j=μ_{j'} (ω̄_ij=ω_{i'j'}, j'≠j; (3.9)+(4.3) で δ 引き出し) + Z[T,L^#]=Z[T,A]
+   ((4.7) 経由)。**hard 寄り** (character conjugation + (3.9))。要調査: 指標複素共役 API + (3.9) map。
+3. **(4.9)(b) full**: isometry Z[T]→Z[Irr G] の写像化 (ω_ij^σ 正規直交で「isometry 明らか」=
+   `sigma_inner` 系 S05:1310 付近) + Z[T,A] 上 τ 一致 (= summed identity の線型拡張)。
+→ (4.9) → S08 case-B (`sibleySetup_is_coherent` の CertainType branch) → (6.8) capstone。
+**正本=本 session 34。(4.9)(b) 計算核+次数橋渡し landed; 次 = (4.9)(a) 共役 or (4.9)(b) isometry 性。**
+
+## 2026-06-12 (session 35, /loop): ✅ (4.9)(b) isometry 性 COMPLETE + (4.9)(a)/IsCoherent 精密 scope
+
+**commit `6c2d555b`** (S06_CertainTypeIsometry, axiom-clean, full build 3791, AxiomsCheck 5 件登録)。
+(4.9)(b) の **isometry 性**(σ 像と μ 列和が同 Gram 行列 `w₁·δ_jk`)を完全形式化:
+
+- **`omegaProdCharTic_eq_iff`**: grid-index 判定 `ω_ij^{tic}=ω_{i'j'}^{tic} ↔ χ₂=χ₂' ∧ i=i'`
+  (`omegaProdChar_inj`+`w1CharEquiv` injective+`ticWEquivSdiffW` 全射で comp strip)。
+  `omegaProdCharTic_ne` を i≠i' へ一般化。
+- **`certainTypeOmegaSigma_inner`**: per-element σ 像直交 `⟨ω_ij^σ,ω_{i'j'}^σ⟩=δ`。
+  **🔑 経路 = `sigma_inner`(σ 等長, S05:985)+`omega_inner_self`/`omega_inner_ne`** で chiFam 不要。
+  `certainTypeOmegaSigma = σ(ω(omegaProdCharTic))` を `simp only [certainTypeOmegaSigma]` で開いて
+  sigma_inner 適用 → ⟨ω(P),ω(P')⟩ → omegaProdCharTic_eq_iff。
+- **`certainTypeOmegaSigma_sum_inner`** / **`columnFamily_mu_sum_inner`**: σ-side / μ-side(L 上)の
+  列和直交 = `if χ₂=χ₂' then (w₁:ℂ) else 0`。bilinear 展開(`inner_sum_left`/`inner_sum_right`)+
+  per-element + `Finset.sum_ite_eq`。μ-side は S06_CertainTypeClifford:813 テンプレ
+  (`irreducibleCharacter_inner_eq_ite`+`columnFamily.injective`+`columnFamily_mu_ne`)。
+- **`certainType_omega_sum_isometry`** (capstone): `⟨∑ω_ij^σ,∑ω_il^σ⟩=⟨∑μ_ij,∑μ_il⟩`
+  (両辺 `if χ₂=χ₂' then w₁ else 0`)。δ_k=±1 で δ_k² 相殺ゆえ符号なしで写像の等長性そのもの。
+- **罠**: statement の `if χ₂=χ₂'` は MonoidHom 等値非可決定 → `open scoped Classical in` を
+  **docstring の前**に置く(後ろは parse error; 既存 561/693/764 と同形)。
+
+**🔑 IsCoherent インターフェース確定** (`S07.IsCoherent τ S A`, S07_Coherence:1557; 下流 S08 case-B が
+要求する型)。5 フィールド: `nonzero`(∃φ∈Z[S,A] φ≠0) / `extension`(IntegralCharacterMap) /
+`extension_inner_eq`(Z[S]=zSpan 上等長) / `extends_on_supported`(Z[S,A]=zSupportedSpan 上 τ 一致) /
+`extension_mem_ZIrr`(Z[S]→ZIrr)。⟹ **(4.9)(b) の私の identity は field 3(等長)/field 4(τ一致)の
+「生成元上」版**; 残りは ① extension map を Z[𝒯] 上 packaging(`Basis.constr` 級)→ ② 生成元等式を
+zSpan へ lift → ③ nonzero(=(4.9)(a))→ ④ ZIrr codomain。
+
+### ▶▶ 次 = (4.9)(a) 共役 + IsCoherent packaging (session 36 以降; **scope 済**)
+
+**(4.9)(a) の確定チェーン** (full scope 済, 新規基礎インフラ要):
+1. **複素共役 RingEquiv** `ℂ ≃+* ℂ`: mathlib `Complex.conjAe.toRingEquiv`(要 build 確認; Pf 内に既存
+   使用なし)。
+2. **character 共役 = 逆指標** `galoisMap (conj) (omega ξ) = omega ξ⁻¹` (ext + omega_apply 値計算;
+   `galoisMap_apply_apply` S05/GaloisCharacter:384)。⟹ ω̄_ij = ω(omegaProdChar χ₁⁻¹ χ₂⁻¹) = grid (i',j')。
+3. **grid index 写像** (i,j)↦(i',j'): χ₁↦χ₁⁻¹(w1CharEquiv 経由 i'), χ₂↦χ₂⁻¹(列 j'); **j'≠j は |W| 奇**
+   (χ₂≠χ₂⁻¹ ⟺ χ₂²≠1 ⟺ ord χ₂ 奇 ∧ χ₂≠1); j' は i 非依存。
+4. **(3.9)+(4.3) bridge** μ̄_ij = μ_{i'j'}: `sigma_mapRingEquiv_comm`(S05:1589, σ が Galois 可換)を
+   u=conj で適用 ⟹ `conj(ω_ij^σ)=ω̄_ij^σ=ω_{i'j'}^σ`; (4.3.b) σ(ω_ij)=δ_j μ_ij で δ_j μ̄_ij=δ_{j'}μ_{i'j'}
+   ⟹ μ̄_ij=μ_{i'j'} (δ=±1)。
+5. **μ̄_j=μ_{j'}≠μ_j** (i で和) ⟹ μ̄_k∈𝒯 ∧ μ̄_k≠μ_k ⟹ **nonzero**(μ̄_k−μ_k∈Z[𝒯,A] 非零)。
+   **Z[𝒯,L^#]=Z[𝒯,A]** は (4.7)(Supp μ_j⊆A∪{1}) + 次数零(virtual char が 1 で消える)。
+
+**判断**: (4.9)(a) は新規 API(conj RingEquiv, character 共役, grid index 写像)を要し 1 commit 超。
+IsCoherent packaging(extension map on Z[𝒯])も同様。両者で **§6 残りの主作業**。Opus 継続可
+(Galois は (3.9) で既 landed = 利用のみ; full (3.8) 級の新規 grid 組合せ論は不要)。
+**第一 leaf 候補 = `S06_CertainTypeConjugation.lean`**(2 → 3 → 4 → 5 の順; nonzero まで)。
+**正本=本 session 35。(4.9)(b) 完全 DONE; 次 = (4.9)(a) チェーン step 1-2 から。**
+
+## 2026-06-12 (session 36, /loop): ✅ (4.9)(a) 共役インフラ — μ-bridge `δ_j μ̄_ij = δ_{j'} μ_{i'j'}` 到達
+
+新 leaf **`S06_CertainTypeConjugation.lean`** (5 commits, 全 axiom-clean, full build 3792)。(4.9)(a)
+の共役論法を σ-side + L-side 両方で構築し、**核心の μ-character bridge まで landed**:
+
+- **commit `b14c19a5`** 共役 foundation: `galoisMap_conj_omega` (複素共役 = 逆指標 `galoisMap conj
+  (ω χ) = ω χ⁻¹`; 値は 1 の冪根ゆえ `Complex.norm_eq_one_of_pow_eq_one`+`Complex.inv_eq_conj`;
+  **conj RingEquiv = `Complex.conjAe.toRingEquiv`**) + `certainTypeOmegaSigma_conj` (G-side σ_G の
+  共役 = σ_G(ω P⁻¹), via `sigma_mapRingEquiv_comm` (3.9))。**`galoisMap_conj_omega` は general
+  (任意 TICyclicHypothesis) で σ_G/σ_L 両方に再利用**。
+- **commit `902c2533`** grid-index 共役: `omegaProdChar_inv` (ω(χ₁,χ₂)⁻¹=ω(χ₁⁻¹,χ₂⁻¹), ℂˣ 可換) +
+  `rowInv`/`w1CharEquiv_rowInv` (行反転 index, w1CharEquiv (rowInv i)=(w1CharEquiv i)⁻¹) +
+  `omegaProdCharTic_inv` + `certainTypeOmegaSigma_conj_eq` (**(ω_ij^σ)̄ = ω_{i'j'}^σ**, σ-side 閉包)。
+- **commit `02011962`** L-side 閉包: `chiColumn_conj` (χ_ij̄=χ_{i'j'}; chiColumn=ω(omegaProdChar)
+  ゆえ general lemma 再利用) + `sigma_chiColumn_conj` (**σ_L(ω_ij)̄ = σ_L(ω_{i'j'})**)。
+- **commit `7b7ea8ff`** ✅ **μ-bridge** `certainType_mu_conj_bridge`: **`δ_j • μ_ij̄ = δ_{j'} •
+  μ_{i'j'}`** = (4.3.b) `sigma_chiColumn_eq_certainType` に `mapRingEquiv conj` 適用
+  (左=`sigma_chiColumn_conj`+4.3.b再適用、右=`ClassFunction.mapRingEquiv_zsmul` [sign∈ℤ])。
+
+**🔑 W-整合の罠 (session 36 で 3 回踏んだ; 再調査不要)**: `(ticVdiff h).W` vs `h.tic.W`、
+`toTICyclicHypothesis.W` vs `sdiffTICyclicHypothesis.W` は defeq だが非 syntactic → `rw`/`simp only`
+の pattern matching が黙って失敗 (「did not find pattern」/「unused simp arg」)。**回避 = term-mode
+`congrArg`+`exact`(defeq) か、goal 側を `← lemma` で書き換えてから `exact`**(sigma_chiColumn_conj が
+好例: goal は sdiff ascription で chiColumn_conj に一致 → `rw [← chiColumn_conj]` → `exact
+sigma_mapRingEquiv_comm`)。**explicit `[Fintype toTICyclic.W]` 等の binder は canonical (W1⊔W2 由来)
+と diamond → 宣言せず `[Fintype ↥(W1⊔W2)]` のみ供給**。hom 逆 `f⁻¹ a` は defeq `(f a)⁻¹` だが
+`MonoidHom.inv_apply` simp が発火しないことあり → `congrArg`+引数等式で defeq 閉じ。
+
+### ▶▶ 次 = (4.9)(a) 残り → nonzero → IsCoherent (session 37 以降; **Opus 継続**)
+1. **`μ_ij̄ = μ_{i'j'}`** (bridge から): `δ_j • μ_ij̄ = δ_{j'} • μ_{i'j'}` の両辺を `1` で評価 →
+   μ_ij̄(1)=μ_ij(1)>0、μ_{i'j'}(1)>0 ゆえ δ_j δ_{j'}=1 ⟹ **δ_j=δ_{j'}** ⟹ μ_ij̄=μ_{i'j'}
+   (「指標は別の指標の −1 倍になれない」; 次数正値 or inner)。
+2. **`μ̄_j = μ_{j'}`**: μ_j=∑_i μ_ij ([[certainTypeDiffSupported]] の和構造) ⟹ μ̄_j=∑_i μ_ij̄=
+   ∑_i μ_{i'j'}=μ_{j'} (i↦rowInv i は行の全単射)。
+3. **`μ_{j'} ≠ μ_j`**: j'=χ₂⁻¹≠χ₂ (|W| 奇 ⟹ χ₂²≠1 ∨ χ₂=1; χ₂≠1 前提) ⟹ `chiRestrict_injective`
+   で μ_{χ₂⁻¹}≠μ_{χ₂}。
+4. **nonzero**: μ̄_k−μ_k≠0 ∈ Z[𝒯,A]。**Z[𝒯,L^#]=Z[𝒯,A]** は (4.7)(Supp μ_j⊆A∪{1})+次数零。
+5. **IsCoherent packaging** (`S07.IsCoherent τ 𝒯 A`, 5 fields; session 35 ノート参照): extension map
+   on Z[𝒯] + 等長 (`certainType_omega_sum_isometry` lift) + τ一致 (`certainType_diff_dade_sum_eq_of_degree`
+   lift) + nonzero (step 4) + ZIrr codomain。**重い** (IntegralCharacterMap/zSpan/zSupportedSpan 機構)。
+→ (4.9) → S08 case-B → (6.8)。**正本=本 session 36。(4.9)(a) μ-bridge DONE; 次 = step 1 (μ_ij̄=μ_{i'j'})。**
+
+## 2026-06-12 (session 36 cont., /goal "Bレーン完遂"): ✅ (4.9)(a) 共役チェーン完結 — `μ̄_k ≠ μ_k`
+
+session 36 から継続 (`/goal` で完遂モード)。(4.9)(a) の共役論法を **nonvanishing 入力 `μ̄_k ≠ μ_k` まで完結** (S06_CertainTypeConjugation, 全 axiom-clean):
+
+- **commit `aa61a690`** `certainType_mu_conj_eq`: **`μ_ij̄ = μ_{i'j'}`** (per-element)。bridge を μ_{i'j'}
+  と内積 → δ_j⟨μ_ij̄,μ_{i'j'}⟩=δ_{j'}≠0 → 既約同士の内積 0/1 ゆえ 1 → 一致。**🔑 罠: `inner_smul_left`
+  は無印だと mathlib InnerProductSpace 版 (共役付き) に解決 → `ClassFunction.inner_smul_left` 明示必須**。
+  zsmul→ℂsmul 変換は `← Int.cast_smul_eq_zsmul ℂ <sign> <classfn>` と **3 引数明示** (無印は stacking 暴走)。
+- **commit `70312fb0`** `certainType_columnSum_conj`: **`μ̄_j = μ_{j'}`** (列和)。`mapRingEquivLinear`+`map_sum`
+  で和分配、各項 `certainType_mu_conj_eq`、行 reindex `rowInvEquiv` (= `rowInv` involution
+  `rowInv_rowInv`)。
+- **commit `fb5a98a6`** capstone `μ̄_k ≠ μ_k`:
+  - `column_inv_ne_self`: **χ₂⁻¹≠χ₂** (χ₂≠1)。char group `(W₂.subgroupOf W)→*ℂˣ` 奇数位数
+    (`card_charGroup_W2`=|W₂|, `W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)`) ⟹ 対合なし
+    (χ₂²=1→orderOf∣2 ∧ odd→1; `Nat.dvd_prime Nat.prime_two`+`absurd (_▸_) (by decide)`)。
+  - `certainType_columnSum_conj_ne`: **`μ̄_k≠μ_k`**。μ̄_k=μ_{χ₂⁻¹} (columnSum_conj) ⊥ μ_χ₂
+    (`columnFamily_mu_sum_inner` if_neg) ⟹ ⟨μ̄_k,μ_k⟩=0≠w₁。
+
+### ▶▶ 次 = `Z[𝒯,L^#]=Z[𝒯,A]` + **IsCoherent packaging** (本命の残り; 重い)
+
+`S07.IsCoherent τ 𝒯 A` の 5 field 構成が S08 case-B への橋。手持ち材料:
+- **field 3 (等長 on zSpan 𝒯)** ← `certainType_omega_sum_isometry` (生成元 Gram 行列)を zSpan へ lift。
+- **field 4 (τ一致 on zSupportedSpan 𝒯 A)** ← `certainType_diff_dade_sum_eq_of_degree` を lift。
+- **field 1 (nonzero)** ← **`certainType_columnSum_conj_ne` (μ̄_k≠μ_k) = 本 session で完成**; μ̄_k−μ_k∈Z[𝒯,A]
+  の supportedness は (4.7)(Supp μ_j⊆A∪{1}) + 次数零。
+- **field 2 (extension : IntegralCharacterMap)** + **field 5 (ZIrr codomain)** = extension map 構成。
+要調査: `zSpan`/`zSupportedSpan`/`IntegralCharacterMap` の API (S07_Coherence)、IsCoherent 構成 helper の
+有無。**第一手 = S07 の zSpan/zSupportedSpan/IntegralCharacterMap を Read 通読**してから extension map を
+`Basis.constr` 級で構成 (μ_j ↦ δ_k ∑_i ω_ij^σ) → 5 field を埋める。
+**正本=本 session 36 cont.。(4.9)(a) 共役完結; 次 = IsCoherent packaging (S07 機構 Read から)。**
+
+## 2026-06-12 (session 37, /loop): ✅ IsCoherent packaging — extension map ν + fields 2/3/5 (of 5)
+
+新 leaf **`S06_CertainTypeCoherence.lean`** (3 commits, 全 axiom-clean, full build 3794)。Peterfalvi
+(4.9)(b) の coherent extension `ν : CF(↥L) → CF(G)` を構成し、`S07.IsCoherent τ 𝒯 A` の 5 field の
+うち **field 2 (extension)・field 3 (isometry)・field 5 (ZIrr)** を landed。
+
+### 確定した型・構成 (再調査不要)
+
+- **(4.9) の 𝒯 = 列和の集合** (per-element ではない): `𝒯 = {μ_j | 0<j<w₂, μ_j(1)=μ_k(1)}`。
+  repo: `certainTypeSet h k := {f | ∃ χ₂≠1, columnSum h χ₂ (1) = columnSum h k (1) ∧ f = columnSum h χ₂}`。
+  `columnSum h χ₂ := ∑ i, (h.columnFamily χ₂).mu i` (= μ_j)。
+- **extension map** `certainTypeExtension h : S07.IntegralCharacterMap ↥L G` = `Irr(↥L)` 基底上
+  `μ_ij ↦ δ_j ω_ij^σ` (他 irr ↦ 0)、`(S05.irreducibleCharacterBasis).constr ℂ ... |>.restrictScalars ℤ`。
+  基底 rule の well-defined は **`columnFamily_mu_injective`** (大域 `(χ₂,i)↦μ_ij` 単射) が核。
+  eval: `certainTypeExtension_mu` (`ν μ_ij = δ_j ω_ij^σ`)、`certainTypeExtension_columnSum`
+  (`ν μ_j = δ_j ∑_i ω_ij^σ`)。**罠: `open scoped Classical in` は docstring の前**。
+- **field 5 (ZIrr)**: `certainTypeOmegaSigma_mem_ZIrr` (= `sigma_mem_ZIrr` + omega の `.mem_ZIrr`) →
+  `certainTypeExtension_mem_ZIrr` (span_induction、ZIrr は ℤ-submodule)。
+- **field 3 (isometry)**: generator `certainTypeExtension_columnSum_inner` (`⟨ν μ_j,ν μ_l⟩=⟨μ_j,μ_l⟩`,
+  **無条件** — 対角で δ_j²=1、非対角は Gram=0 が符号吸収; `certainType_omega_sum_isometry` +
+  `columnFamily_mu_sum_inner` + zsmul→ℂsmul は `← Int.cast_smul_eq_zsmul ℂ sign cf`) → full
+  `certainTypeExtension_inner_eq` (**`Submodule.span_induction₂`** 一発、8 case = mem_mem/zero_*/add_*/smul_*;
+  双線型は `ClassFunction.inner_{add,smul}_{left,right}`、smul は ℂ-cast 変換)。
+
+### 🔑 残り field 4 (agreement) + field 1 (nonzero) + capstone — τ 型が確定 (再調査不要)
+
+**IsCoherent.τ = `S07.dadeIntegralCharacterMap h.dade0 h.tau : IntegralCharacterMap ↥L G`** (大域版)。
+`h.tau.toDadeMap` は bundled `SupportedClassFunctions A₀ L → CF(G)` で **IntegralCharacterMap ではない**;
+`dadeIntegralCharacterMap` が `LinearMap.exists_extend` で大域化したもの (S07:5233)。
+- **`dadeIntegralCharacterMap_apply_of_support`** (S07:5243): `supp φ ⊆ supportInSubgroup A₀ L ⟹
+  dadeICM φ = h.dade0.dadeMap ⟨φ, _⟩` ← これで `certainType_diff_dade_sum_eq` (toDadeMap 版) に接続。
+- **A vs A₀ の罠**: `h.dade0 : S04.Hypothesis G A₀ L`, `A₀ = A ∪ V^L` (Hypothesis46.dade0; tic.V 由来)。
+  (4.9) の `Z[𝒯,A]` は **certain subgroup A** だが A ⊆ A₀ ゆえ supp⊆A → supp⊆A₀ で Dade 適用可。
+  IsCoherent.A は `supportInSubgroup A L` を採る見込み (S09 の pattern; 要最終確認)。
+
+**field 4 plan** (`extends_on_supported : ∀ φ∈zSupportedSpan 𝒯 A, ν φ = τ φ`):
+1. **「Z[𝒯,A] は μ_j−μ_k で生成」**: φ∈zSpan 𝒯 ∧ supp⊆A ⟹ φ∈span ℤ {μ_j−μ_k}。証明 = φ=∑c_μ μ
+   (mem_span)、supp⊆A⟹φ(1)=0 (1∉A)、全 μ_j 同次数 d ⟹ d·∑c_μ=0 ⟹ ∑c_μ=0 ⟹ φ=∑c_μ(μ_j−μ_k)。
+   [Finsupp/mem_span_finset 要; これが残 hard sub-lemma]
+2. **generator 一致** `ν(μ_j−μ_k) = τ(μ_j−μ_k)`: τ側 = `certainType_diff_dade_sum_eq` (要 δ_j=δ_k =
+   (4.8) sign-eq、μ_j,μ_k∈𝒯 で同次数ゆえ成立) で `δ_j ∑(ω_ij^σ−ω_ik^σ)`; ν側 = `ν μ_j − ν μ_k =
+   δ_j ∑ω_ij^σ − δ_k ∑ω_ik^σ`; δ_j=δ_k で一致。**`certainTypeDiffSupported` の underlying = μ_ij−μ_ik**
+   なので `∑_i certainTypeDiffSupported = μ_j − μ_k = columnSum χ₂ − columnSum χ₂'` の bundling 接続が要。
+3. **span へ拡張**: `S07.eq_on_zSpan_of_eq_on` (ℤ-linear 2写像が生成集合一致→span一致)。
+
+**field 1 (nonzero)**: witness `μ̄_k − μ_k = columnSum k⁻¹ − columnSum k`。≠0 = `certainType_columnSum_conj_ne`
+(済)。∈ zSupportedSpan 𝒯 A: 両端 ∈ 𝒯 (μ̄_k=μ_{k'}, k'=k⁻¹≠k、`certainType_columnSum_conj`+`column_inv_ne_self`、
+同次数 = 複素共役は次数保存) ∧ supp⊆A ((4.7) `induce_chiRestrict_apply_eq_zero_of_not_mem_union` で
+supp μ_j⊆A∪{1}、差は1で消える)。
+
+**capstone**: `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
+(certainTypeSet h k) (supportInSubgroup A L)` を 5 field 組立 (要 k≠1)。→ S08 case-B。
+**正本=本 session 37。次 = field 4 の sub-lemma 1「Z[𝒯,A] 生成」から (S06_CertainTypeCoherence に追記)。**
+
+## 2026-06-12 (session 37 cont., /loop): ✅ field 4 core — generator τ-agreement + infra
+
+(S06_CertainTypeCoherence, +4 commits, axiom-clean, build 3601)。field 4 (extends_on_supported)
+の数学的核心を landed:
+
+- **certainTypeSet 次数条件を `∑_i μ_ij(1)` 形に変更** (degree bridge `forall_columnFamily_mu_apply_one_eq_of_sum_eq`
+  の hyp 形に一致; fields 3/5 は次数 component を `_` で無視ゆえ無傷)。
+- **columnSum_apply_one**: `μ_j(1) = ∑_i μ_ij(1)` (eval AddMonoidHom `AddMonoidHom.mk' (fun φ => φ 1) (fun _ _ => rfl)` + map_sum)。
+- **certainType_columnSign_eq**: 列次数等 ⟹ `δ_j = δ_k` ((4.8) step1 列版、`certainType_sign_eq_of_degree_eq` を row 0 で)。
+- **columnDiff_support_subset**: `Supp(μ_j−μ_k) ⊆ supportInSubgroup A L` (両 μ vanish off A∪{1}、差は1で消える)。
+- **✅✅ certainTypeExtension_columnDiff_eq_dade** (field 4 核心): `ν(μ_j−μ_k) = τ(μ_j−μ_k)`、両辺 = `δ_j ∑(ω_ij^σ−ω_ik^σ)`。
+  RHS = `dadeIntegralCharacterMap_apply_of_support` (supp⊆A⊆A₀、`supportInSubgroup_mono Set.subset_union_left`)
+  → `S04.IsDadeMap.unique (k:=ℂ) h.dade0.isDadeMap_dadeMap h.tau.toDadeIsometryData.isDadeMap`
+  (h.dade0.dadeMap = h.tau.toDadeMap) → `certainType_diff_dade_sum_eq h hχeq hχ₂ hχ₂' hdi`
+  (bundled `⟨μ_j−μ_k,_⟩ = ∑ certainTypeDiffSupported` を `congr 1; Subtype.ext hval`、
+  `hval`= `AddSubmonoidClass.coe_finset_sum` + columnSum_def + `rfl`)。χ₂=χ₂' は `sub_self;map_zero` で別処理。
+  LHS = `map_sub` + certainTypeExtension_columnSum×2 + `← certainType_columnSign_eq` + `←smul_sub` + `←Finset.sum_sub_distrib`。
+
+### ▶▶ 次 = field 4 仕上げ → field 1 → capstone (session 38; **Opus 継続**)
+
+1. **「Z[𝒯,A] は μ_j−μ_k で生成」** (残 Finsupp lemma): `φ ∈ zSupportedSpan 𝒯 (supportInSubgroup A L) →
+   φ ∈ span ℤ ((·−columnSum k)''𝒯)`。証明 = `mem_span_set` で `c : CF→₀ℤ` (supp⊆𝒯) →
+   各 m∈𝒯 は m(1)=d (columnSum_apply_one + 𝒯 次数条件、d=μ_k(1)≠0) → **φ(1)=0** (supp⊆supportInSubgroup A L,
+   **1∉A** = `h.dade0.ne_one` 経由 [a∈A₀→a≠1, A⊆A₀]) → ∑c(m)=0 → φ=∑c(m)(m−μ_k)∈span T。
+   `Finsupp.sum` の (1) 評価が要 (`columnSum_apply_one` の eval-hom 流用)。
+2. **field 4 = `certainTypeExtension_eq_dade_of_mem_zSupportedSpan`**: `S07.eq_on_zSpan_of_eq_on`
+   (T=差集合; T 上一致 = generator agreement、span 帰属 = 1.の lemma)。
+3. **field 1 (nonzero)**: witness `columnSum k⁻¹ − columnSum k`。∈ zSupportedSpan: 両端∈𝒯
+   (μ̄_k=μ_{k⁻¹}=`certainType_columnSum_conj`、k⁻¹≠1[k≠1]、次数等 [複素共役は次数保存: μ_{k⁻¹}(1)=conj(μ_k(1))=μ_k(1) ∵ 指標次数は実]、
+   supp⊆supportInSubgroup A L = `columnDiff_support_subset h (k⁻¹≠1) (k≠1) (deg)`)。≠0 = `certainType_columnSum_conj_ne`。
+   ⚠ 次数等の「∑μ_{i,k⁻¹}(1) = ∑μ_{i,k}(1)」: 複素共役の次数保存を sum 形で要証明。
+4. **capstone** `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
+   (certainTypeSet h k) (supportInSubgroup A L)` (要 k≠1)、5 field 組立。→ S08 case-B。
+**正本=本 session 37 cont.。field 4 核心 DONE; 次 = generated-by-differences Finsupp lemma。**

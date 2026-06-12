@@ -130,12 +130,15 @@ import OddOrder.Peterfalvi.S06_CertainTypeClifford
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
+import OddOrder.Peterfalvi.S06_CertainTypeConjugation
+import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceCore
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S10_BGInterface
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S13_MaximalIII_IV

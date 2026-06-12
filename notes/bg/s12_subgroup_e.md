@@ -1,6 +1,134 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
-## 🟡 2026-06-12 (Lane F session 8, Opus 4.8): **Thm 12.12 — Case 1 + Case 2 完了、Case 3 残**
+## 🟢 2026-06-12 (Lane F session 12, Opus 4.8): **Thm 12.12 Case 3 per-prime Z-construction COMPLETE**
+
+Case 3 の per-prime Z-construction を**両枝とも完全実装**(front-half `353c9d9d`, agemo
+`bda45cbe`, C_E(S)=E `debde8a5`, 統合 `0cc8d6de`)。capstone =
+**`exists_cyclic_Enormal_regular_of_abelianSylow`** (S12_Theorem1212b.lean): abelianSylow regime +
+正則仮定 ⟹ ∃ cyclic Z≤S, exp(Z)=exp(S), E≤N_G(Z), regular。C_E(S)=E で場合分け統合。
+全 axiom-clean、full build 3775。**Case 3 の数学的核心が完結。**
+
+### ▶ 残り = τ₂ 集約 → frobFact_of_abelianSylow → 3-case (12.12 完成まで)
+- **frobFact_of_abelianSylow**: A₀=E₂ で (a)。(b) E₀=E₁⊔E₃⊔(⊔_{p∈τ₂}Z_p)。各 p∈τ₂ で
+  A_p∈ℰ_p²(E)(Cor 12.6(a))+S_p abelian(Thm 12.7(a))から
+  `exists_cyclic_Enormal_regular_of_abelianSylow`。exp(E₀)=exp(E)。
+  M_σE₀ Frobenius = `isFrobeniusGroup_of_regular`(既存)に E₀ regular を渡す。
+  **E₀ regular の鍵 = 「prime-order 元 FPF ⟹ 全非単位元 FPF」**(a∈E₀#, prime power a^m で
+  C_{M_σ}(a)⊆C_{M_σ}(a^m); r∈τ₂ なら Z_r 共役[M_σ⊴M], r∈τ₁∪τ₃ なら hreg)。
+  **⚠ Frobenius-complement 理論 ~150 行 = 最難 wiring。**
+- **3-case**(frobenius_factorization_of_regular scaffold S12_E:438): τ₂=∅→Case1;
+  else ∃nonab Syl→Case2 / else→frobFact_of_abelianSylow。
+
+### ▶ 残 sorry (§12 完遂): 12.12(上記)/ 12.13 / 12.14 / 12.16(a)(b)。独立 hard 定理群。
+
+## 🟢 2026-06-12 (Lane F session 10, Opus 4.8): **Thm 12.12 Case 3 front-half — 開問 c (r_q=2) 解決**
+
+front-half (C_E(S)≠E 枝, X 存在) の **真のボトルネック「Lemma 12.11(c) yields r_q(N_G(S))=2」
+(session 9 で開問 c=未解決) を完全解決・コミット** (commit `443dd824`)。全 unconditional・
+axiom-clean、AxiomsCheck 4 本、full build 3775。新規 4 結果は `S12_Theorem1212b.lean`:
+
+- **`pRank_normalizer_eq_two_of_index_card`** (開問 c, 核心): abelianSylow regime で
+  `q ∈ π[E:C_E(A)]` (hqi) かつ `q ∈ π|C_E(A)|` (hqc) ⟹ **`pRank(N_G(S)) q = 2`**。
+  **🔑 鍵の発見**: 12.11(c) (`tau2_transfer_to_maximal …2.2 q hqi hqc`) は `q∈τ₂(M*)` ∧
+  `∃P:Sylow p G, M*≤N_G(P)` を与える (M*∈ℳ(N_G(A)))。session 9 が詰まった「M* の
+  abelian Syl_q が N_G(S) 内に来る根拠」は **不要**だった。正しい論法 = **S=P ⟹ M*=N_G(S)**:
+  `S ≤ N_G(S) =(12.8(d)) N_G(A) ≤ M* ≤ N_G(P)` で S,P 両 Sylow p ⟹ `sylow_eq_of_le_normalizer`
+  で S=P ⟹ M*≤N_G(S)、N_G(S)≤M* と合わせ M*=N_G(S) ⟹ `pRank(N_G(S))q = pRank M* q = 2`
+  (`tau2_pRank_eq_two`)。「abelian Syl_q」条項は rank には不要 (τ₂ 定義が pRank=2 を直接供給)。
+- **`sylow_eq_of_le_normalizer`** (汎用): S≤N_G(P), 両 Sylow p ⟹ S=P (P は N_G(P) の正規=
+  一意 Sylow, `Sylow.unique_of_normal`+`Subgroup.normal_in_normalizer`+subtype/subgroupOf 往復)。
+- **`centralizer_le_of_omega1_le_centralizer`** (BG Prop 1.6(e)): abelian p-群 S で coprime Q が
+  Ω₁(S) 中心化 ⟹ S 全体中心化 (`fitting_coprime_abelian_decomp`、[S,Q]≠1 の order-p 元 ∈
+  Ω₁⊆C_S(Q) が C_S(Q)⊓[S,Q]=⊥ に矛盾)。対偶で開問 b の Q₁⊄C_E(A) を出す。
+- **`prime_dvd_index_of_sylow_not_le_of_normal`** (汎用): H⊴K で Sylow q P⊄H ⟹ q∣[K:H]
+  (P の K⧸H 像が非自明 q-群)。開問 b の hqi 供給 (C_E(A)⊴E が normality を供給, Cor 12.10(c))。
+
+### ▶ front-half 残り (= 次セッション、precise plan)
+
+**(1) 開問 b = setup lemma** (hqi/hqc + q∈τ₁ + Q₁ cyclic + C_S(Q₁)⊊S を供給):
+- `A = Ω₁(S)` = `(omega1_eq_of_tau2 hG h.mem_maximal hp hA (hAE.trans h.E_le) S.isPGroup' hAS
+  hSM (sylow_maximal_in_M_of_le hSM)).1` → A=(Omega ↥S p 1).map S.subtype。
+- **q 選択**: hCES (`C(S)⊓E≠E`) で `(C(S)⊓E).subgroupOf E ≠ ⊤` (subgroupOf_eq_top↔E≤C(S)⊓E↔
+  E≤C(S)) → index≠1 → `Nat.exists_prime_and_dvd` で q + `Q₁':Sylow q ↥E`、
+  `sylow_not_le_of_prime_dvd_index Q₁' (q∣index)` ⟹ Q₁'⊄(C(S)⊓E).subgroupOf E ⟹
+  Q₁:=Q₁'.map E.subtype ⊄ C(S) ⟹ **C_S(Q₁)⊊S** (¬(S≤C(Q₁)))。
+- **q≠p**: q=p なら Q₁=Syl_p(E)=S (|E|_p=|G|_p ∵ p∉σ, S⊆E)、C_S(S)=S 矛盾。
+- **hqi**: C_S(Q₁)⊊S =¬(S≤C(Q₁)) →(Prop1.6(e)対偶)¬(A≤C(Q₁)) →(`le_centralizer_swap`)
+  ¬(Q₁≤C(A)) ⟹ ¬(Q₁'≤(E⊓C(A)).subgroupOf E) ⟹ (C_E(A)⊴E via Cor12.10(c)第2連言
+  `E≤N((E⊓C(A)))` → `prime_dvd_index_of_sylow_not_le_of_normal`) q∣((E⊓C(A)).subgroupOf E).index
+  → hqi。
+- **q∈τ₁(M)**: `(nilpotent_sigmaComplement_abelian hG h).2.2.1 p _ hp A hA hAE).2.2 q hqi`。
+- **Q₁ cyclic**: q∈τ₁ ⟹ pRank Q₁ q≤pRank M q=1 (`tau1_pRank_eq_one`+`pRank_le_of_injective`)
+  → `S10.isCyclic_of_pRank_le_one`。
+- **hqc** (🔑 Q₁ と decouple): 別 line `X':=Ω₁(Syl_q(E₁))` を使う (E₁=τ₁-Hall ⟹ q∈τ₁ で
+  Syl_q(E₁)=Syl_q(E) cyclic、Ω₁ order q、X'≤E₁)。M_σ⊓C(X')=⊥ (X' は τ₁-元、hreg)。
+  `central_line_of_abelianSylow X' ⟨q,_,hX'∈ℰ¹⟩ hX'≤E₁ hCX'` ⟹ E≤C(X') ⟹ X'≤E⊓C(A)=C_E(A)
+  (X'≤E、A≤E≤C(X')⟹X'≤C(A)) ⟹ q=|X'|∣|C_E(A)| → hqc。
+
+**(2) assembly** (`exists_partial_centralizer_of_abelianSylow`): 目標 = back-half consumer
+`exists_invariant_cyclic_sameExponent_regular` が要する `∃X:Subgroup G, X≤N_G(S) ∧
+Coprime(|S|,|X|) ∧ S⊓C(X)≠⊥ ∧ S⊓C(X)≠S`。
+- **型設計**: Q:=`(Q':Sylow q ↥(N_G(S))).map subtype : Subgroup G` (⊇Q₁ を選ぶ:
+  Q₁'≤N_G(S) を `IsPGroup.exists_le_sylow` で ↥(N_G(S)) 内 Sylow に延長)。Q≤N_G(S),
+  IsPGroup q ↥Q, `pRank ↥Q q = pRank ↥Q' q = pRank ↥(N_G(S)) q` (`pRank_sylow_eq` Q' + map-iso
+  `pRank_le_of_injective` 両向き)。
+- **by_contra** (¬goal): `push_neg` → ∀X≤N_G(S), ¬(Coprime∧S⊓C(X)≠⊥∧≠S)。x∈Q∖C_G(S) に
+  X=⟨x⟩ 適用 (Coprime は q-群/p-群、S⊓C(⟨x⟩)=S⊓C({x})、≠S ∵ x∉C_G(S)) ⟹
+  S⊓C({x})=⊥ ⟹ **regular** (φ̄ wrapper hfpf)。
+- φ̄ `isCyclic_quotient_of_conjugation_fpf` ⟹ IsCyclic(↥Q⧸(conjActionHom hQN).ker)。
+- step6 `pRank_le_one_of_cyclic_quotient` (Q:=↥Q, Q₀:=ker=`conjActionHom_ker`=C_G(S).subgroupOf Q,
+  Q₁:=Q₁(Sylow q of E).subgroupOf Q [cyclic], Q₀<Q₁ ∵ C_Q(S)⊊Q₁ [Q₁⊄C_G(S) ∵ C_S(Q₁)⊊S])
+  ⟹ pRank ↥Q q ≤ 1。
+- rank=2 lemma `pRank_normalizer_eq_two_of_index_card` + pRank_sylow_eq ⟹ pRank ↥Q q = 2。矛盾。
+- **⚠ 注意点**: Q₀=C_Q(S)⊊Q₁ の証明 (Q₁⊄C_G(S): C_S(Q₁)⊊S ⟹ ∃ 非中心化 ∴ Q₁⊄C_G(S));
+  Q₁≤Q の subgroupOf 化; X (back-half へ) は by_contra で得る存在子。
+- 完成後 → `frobFact_of_abelianSylow` で C_E(S)=E 枝 (generic rank-2 分解 S=Y×Z) と統合 →
+  Z_p 集約 E₀=E₁E₃·∏Z_p → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular`。
+
+## 🟢 2026-06-12 (Lane F session 11, Opus 4.8): **Thm 12.12 Case 3 front-half COMPLETE + C_E(S)=E plan**
+
+front-half (C_E(S)≠E 枝) を**完全実装・コミット** (`353c9d9d`): `exists_sylow_tau1_cyclic_notCentralizing`
+(開問 b) + `exists_partial_centralizer_of_abelianSylow` (assembly)。これで C_E(S)≠E 枝が
+back-half に X を供給し完結。AxiomsCheck 全登録、full build 3775。**残 = C_E(S)=E 枝 +
+τ₂ 集約 + 3-case 統合**(全て 12.12 内)。
+
+### ▶ C_E(S)=E 枝の **streamlined 構成** (Y×Z 分解を回避する recon 進展)
+
+BG は S=Y×Z (rank-2 cyclic 分解) を使うが、**agemo ℧^{a-1}(S) 経由で Y×Z を回避できる**:
+目標 = `∃ Z cyclic ≤S, exp(Z)=exp(S), E≤N_G(Z), ∀z∈Z#, M_σ⊓C(z)=⊥`。
+- `Monoid.exists_orderOf_eq_exponent` で max-order s₀∈↥S (ord=exp(S)=p^a)。
+- ℧ := (Agemo ↥S p (a-1)).map S.subtype。**agemo helpers landed** (`mem_agemo_iff_of_comm`:
+  abelian で x∈℧⟺∃y,x=y^(p^n); `agemo_eq_range_powMonoidHom`)。℧⊆Ω₁(S)=A (∵(x^{p^{a-1}})^p=1)、
+  ℧≠⊥ (s₀^{p^{a-1}}≠1)、℧ char in ↥S → N_G(S)-不変 (AppB.normalizer_le_normalizer_map_of_characteristic)。
+- **good line L** (C_{M_σ}(L)=1) を ℧ 内に取る (dichotomy `rcases eq_or_lt (℧≤A)`):
+  - ℧=A (rank 2, homocyclic): **12.5(f)** (`exists_distinct_conj_lines` 系, S12_Theorem125:202)
+    で A₁⊆A=℧ good。
+  - ℧⊊A: ℧ は line (proper nontrivial ≤ rank-2 elem-ab A) → char → 不変 → **key fact**
+    (`inf_centralizer_line_eq_bot_of_invariant`) で C_{M_σ}(℧)=1。L=℧。
+- gen w of L ⊆℧ → `mem_agemo_iff_of_comm` で w=s^{p^{a-1}} (↥S 内), ord(s)=p^a (s^{p^{a-1}}=w≠1)。
+  Z=⟨↑s⟩。exp(Z)=ord(↑s)=p^a=exp(S)。Ω₁(Z)=⟨↑s^{p^{a-1}}⟩=⟨w⟩=L。
+  regular: z∈Z# → Ω₁(Z)=L≤⟨z⟩ → C_{M_σ}(z)≤C_{M_σ}(L)=1。E≤N_G(Z): hCES (E≤C(S)) で E が ↑s 中心化。
+- **要 sub-facts**: `IsPGroup⟹exp=p^a` (exp∣card=p^n, `Nat.dvd_prime_pow`); a≥1 (S≠⊥);
+  rank-2 elem-ab の proper nontrivial 部分群 = line (order p); Ω₁(⟨s⟩)=⟨s^{ord/p}⟩。
+
+### ▶ τ₂ 集約 (C_E(S)=E/≠E 統合後) → `frobFact_of_abelianSylow` → 3-case
+
+各 p∈τ₂ で per-p Z_p (上記 2 枝統合 `exists_cyclic_Enormal_regular_of_abelianSylow`)。
+E₀ = E₁⊔E₃⊔(⊔_{p∈τ₂} Z_p)。**集約は finite τ₂ 上の product** — exp(E₀)=exp(E) と
+M_σE₀ Frobenius (各 Z_p regular ⟹ E₀ regular on M_σ; `isFrobeniusGroup_of_regular` 既存)。
+A₀=E₂ で (a)。3-case (`frobenius_factorization_of_regular` scaffold S12_E:438):
+τ₂=∅ → Case1 (`frobFact_of_regular_all`); nonab Syl → Case2 (`frobFact_of_nonabelianSylow`);
+ab Syl → Case3 (`frobFact_of_abelianSylow`)。**いずれも S12_Theorem1212.lean に Case1/2 完成済**。
+
+### ▶ 残 sorry (S12_E, §12 完遂に必要)
+
+1. **12.12** `frobenius_factorization_of_regular` (上記 Case3 残で完成)。
+2. **12.13** `nonabelian_pgroup_isUniquelyMaximal` (非可換 p-部分群 ∈ 𝒰)。
+3. **12.14** `maximalContaining_centralizer_eq_singleton` (σ-case 一意性, Prop 12.4 経由)。
+4. **12.16(a)** `sigma_subgroup_conj_into_Msigma`; **12.16(b)**。
+これらは独立な hard 定理群 (各 ~100-300 行)。**§12 完遂は multi-session 規模**。
+
+## 🟢 2026-06-12 (Lane F session 10, Opus 4.8): **Thm 12.12 Case 3 front-half — 開問 c (r_q=2) 解決**
 
 新 leaf `S12_Theorem1212.lean` (~510 行)。Thm 12.12 (Frobenius 因子分解、大物) を 3 ケースに分解。
 **Case 1 (τ₂=∅) + Case 2 (Sylow p 非可換) 完成**、共通インフラ + exponent 機構も完成。
@@ -143,13 +271,107 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   を直接使用 (`omega1_eq_of_tau2` の `A=(Omega ↥S p 1).map S.subtype` + `Omega.mem_of_pow_eq_one`;
   `IsElementaryAbelian.pow_eq_one` で line 元の `g^p=1`; `p^1` は simp)。N_G(S)⊄M =
   `normalizer_sylow_le_normalizer_elemAb ….2`。**この lemma が両枝共通の payoff 接続点。**
-  → (2) **cyclic-Z 正則性 bridge** (次): cyclic Z で `M_σ⊓C(Ω₁(Z))=⊥ ⟹ ∀a∈Z#,M_σ⊓C(a)=⊥`
-  (Ω₁(Z)≤⟨a⟩=cyclic 最小部分群 + `centralizer_le` + `centralizer_zpowers_eq_singleton`)。
-  ⚠ friction = cyclic 部分群の order-による包含 (|Ω₁|=p ∣ |⟨a⟩| ⟹ 包含) — cyclic 構造の小補題要。
-  → (3) **C_E(S)≠E 主枝** (coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + φ̄ quotient
-  作用 Prop3.9 矛盾で X 存在 + 12.8(f) で S₀,S₁⊴N_G(S) + isCyclic_of_pRank_le_one + key fact +
-  bridge) → (4) C_E(S)=E 枝 (要 (i) generic 分解) → (5) Z_p 集約 + E₀ → (6) `frobFact_of_abelianSylow`
-  → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。
+  → (2) ✅ **cyclic-Z 正則性 bridge COMPLETE** (commit b84f8ffc): `line_le_zpowers_in_cyclic`
+  (cyclic p-群で order-p 部分群は一意最小 L≤⟨a⟩; generator+`orderOf_pow` gcd+Bézout
+  [`Int.gcd_eq_gcd_ab`/`zpow_eq_zpow_iff_modEq`/`Int.modEq_iff_dvd`]; mathlib に cyclic 包含直接形
+  なし→自前) + `inf_centralizer_eq_bot_of_line_le_cyclic` (`N⊓C(L)=⊥`→`∀a∈Z#,N⊓C(a)=⊥`;
+  `centralizer_zpowers_eq_singleton`+`centralizer_le`; ↥Z→G transport=`map_subgroupOf_eq_of_le`+
+  `MonoidHom.map_zpowers`)。**key fact↔per-element 正則性の接続完成。S12_Theorem1212b に 4 補題。**
+  → (3) ✅ **φ̄ quotient 作用 wrapper COMPLETE** (commit 5783a7d4, session 9): S12_Theorem1212b に
+  3 部品 — `conjActionHom` (共役 hom ↥Q→*MulAut↥S = normalizerMonoidHom S を inclusion で comp) +
+  `conjActionHom_ker` (kernel=C_Q(S)=C_G(S)⊓Q, normalizerMonoidHom_ker 経由) +
+  `isCyclic_quotient_of_conjugation_fpf` (FPF ∀x∈Q∖C_G(S),S⊓C_G(x)=⊥ ⟹ IsCyclic(↥Q⧸ker);
+  lifted φ̄=`QuotientGroup.kerLift`, `actionFixedBy φ̄ (mk a)=C_S(a)`, Prop 3.9 適用; coprime=q^m⊥p^n
+  via `coprime_primes`+`Coprime.pow m n`; `(φ̄ a s).val=a·s·a⁻¹` は defeq で `congrArg Subtype.val`)。
+  axiom-clean, AxiomsCheck 2 本。
+
+**▶▶ C_E(S)≠E 主枝の残り (= 次の frontier、BG L3358-3373 完訳済)**。論理は 2 半:
+
+- **front half = X 存在 (rank 矛盾, BG L3363-3370)**: q∈π(E/C_E(S)), Q=Syl_q(N_G(S))⊇Q₁=Syl_q(E)。
+  C_S(Q₁)⊊S ⟹ Prop1.6(e) ⟹ Q₁⊄C_E(A) ⟹ Cor12.10(c) ⟹ q∈τ₁(M), Q₁ cyclic。C_G(S)⊆E ⟹
+  Q₀=C_Q(S)⊊Q₁。**by_contra: Q/Q₀ が S に regular (FPF)** ⟹ φ̄ wrapper で IsCyclic(Q/Q₀) ⟹
+  Ω₁(Q/Q₀)⊆Q₁/Q₀ ⟹ Ω₁(Q)⊆Q₁ ⟹ r_q(N_G(S))=r(Q)=1 (Q₁ cyclic)。一方 12.8(e) で Ω₁(Q₁) が A
+  中心化 ⟹ 12.11(c) で r_q(N_G(S))=2。矛盾 ⟹ ∃X≤Q, 1⊊C_S(X)⊊S。**⚠ この rank 部分が hard**:
+  Ω₁(Q)/Ω₁(Q/Q₀) の rank 連動 + 12.11(c) の r_q=2 抽出 (12.11(c) は「q∈τ₂(M*), Syl_p⊴M*,
+  abelian Syl_q」止まりで「r_q=2」は派生 — sig 精査要)。
+- **back half = Z 構成 (BG L3371-3373)**: X から S₀=C_S(X), S₁=[S,X], **coprime 分解
+  `fitting_coprime_abelian_decomp`** (X≤N_G(S), coprime(|S|,|X|)) で S₀⊓S₁=⊥ ∧ S₀⊔S₁=S。
+  両 nontrivial (S₀≠1 from 1⊊C_S(X); S₁=[S,X]≠1 from C_S(X)⊊S)。**両 cyclic**: `isCyclic_of_pRank_le_one`
+  に pRank S₀≤1 / pRank S₁≤1 要。**🔑 pRank 加法性は mathlib/repo に無い** → 代替ルート確定:
+  pRank S₀≥2 なら B₀(elem-ab,p²)⊆S₀ + y(order p)∈S₁ で **B₀⊔⟨y⟩ が elem-ab order p³**
+  (`isElementaryAbelian_sup_of_le_centralizer` [S12_ExceptionalBridge:717, S abelian で中心化条件自明] +
+  disjoint card |B₀⊔⟨y⟩|=p³) ⟹ `le_pRank` で pRank S≥3 vs pRank S=2 矛盾 ⟹ pRank S₀≤1。同 S₁。
+  **✅ friction 解消 (disjoint card)**: `OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal`
+  (`X⊓T=⊥ ⟹ |X⊔T|=|X|·|T|`, 片方 normal 要 — abelian S 内で自明)。**🔑 完全 template =
+  `S04f_Blackburn.lean:1924-1937`** (T:order p², X:order p, disjoint → |T⊔X|=p³ →
+  `isElementaryAbelian_sup_of_le_centralizer` で elem-ab → 用済; これを ↥S 型内で S₀,S₁ にミラー)。
+  ⚠ 型注意: `le_pRank (A:Subgroup ↥S)` は `pRank ↥S p`、`isCyclic_of_pRank_le_one` は `pRank ↥S₀ p`
+  — Subgroup G / ↥S / ↥S₀ 境界の cast が実装の主作業。
+  **✅✅ back-half 抽象 primitive 2 件 DONE (session 9, commits e872900c / bd01dfe8, 両 axiom-clean)**:
+  - `isCyclic_of_inf_eq_bot_of_pRank_le_two` (T:CommGroup 有限 p-群, pRank T≤2, T₀⊓T₁=⊥, T₁≠⊥ ⟹
+    IsCyclic ↥T₀): elem-ab order p³ ルートを抽象化。S₀,S₁ 両方に適用 (T:=↥S, T₀/T₁ swap)。
+  - `exponent_eq_of_sup_eq_top_of_exponent_dvd` (T₀⊔T₁=⊤, exp T₁∣exp T₀ ⟹ exp T=exp T₀):
+    Z=大きい方で exp(Z)=exp(S)。card 大 ⟹ exp 大 (cyclic p-群) ⟹ exp(小)∣exp(大) を供給。
+  - **✅ `inf_centralizer_eq_bot_of_invariant_cyclic` (3rd primitive, commit ba168e91)**: N_G(S)-不変
+    nonidentity cyclic Z≤S ⟹ ∀z∈Z#, Mσ⊓C_G(z)=1。L=Ω₁(Z)=`(Omega ↥Z p 1).map Z.subtype` を
+    line 化 (|Ω₁|=p via `Omega.exponent_eq_of_class_le_two`+`IsCyclic.exponent_eq_card`; 不変性
+    via `AppB.normalizer_le_normalizer_map_of_characteristic` [Ω₁ char]) → key fact + bridge。
+    Odd p = `hG.odd.of_dvd_nat`。**Z-regular payoff 完成。**
+  **✅✅✅ Z 構成 assembly COMPLETE (session 9, commit 8ff6b506) — Case 3 back-half 完結**:
+  `exists_invariant_cyclic_sameExponent_regular` (abelianSylow regime で X≤N_G(S) coprime +
+  1⊊C_S(X)⊊S ⟹ ∃ cyclic N_G(S)-不変 Z≤S, exp(Z)=exp(S), regular)。`fitting_coprime_abelian_decomp`
+  (P:=↑S,K:=X) で S₀=C(X)⊓↑S/S₁=⁅↑S,X⁆ → both-cyclic ×2 (cast wrapper
+  `isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two`) + 12.8(f) で ⊴N_G(S) → Z=大 (card) → exp
+  (cast `exponent_eq_of_le_of_sup_eq_of_exponent_dvd`) + Z-regular。**🔑 知見: `open scoped
+  IsMulCommutative` で `[IsMulCommutative ↥S]`→`CommGroup ↥S` 自動; pRank ↥S≤2 =
+  `pRank_le_of_injective (inclusion hSM)` + tau2_pRank_eq_two; decomp(C⊓↑S) vs 12.8(f)(↑S⊓C) は
+  inf_comm; card 大⟹exp 大 = IsCyclic.exponent_eq_card + pow_dvd_pow。** assembly は namespace
+  修正のみで一発通過。
+## ▶▶ front-half (X 存在 rank 矛盾) 実装プラン (session 9 末, 精密 recon 済 — BG L3358-3370)
+
+**目標**: abelianSylow regime + C_E(S)≠E ⟹ ∃ X≤Q, 1⊊C_S(X)⊊S。これが back-half
+`exists_invariant_cyclic_sameExponent_regular` に X を供給し C_E(S)≠E 枝完成。
+
+**BG 引数 (L3358-3370) の formalization map**:
+1. q∈π(E/C_E(S)) を取る (C_E(S)≠E ⟹ [E:C_E(S)]>1 ⟹ ∃ prime; mechanical)。
+2. Q=Syl_q(N_G(S)), Q₁=Syl_q(E)⊆Q。**✅ 開問 (a) 解決 (session 9, commit c5b04ed7)**:
+   `E_le_normalizer_sylow_of_abelianSylow` で **E≤N_G(S)** (sylow_chain で S≤F(E) → S=Syl_p(nilpotent
+   F(E)) char → E normalizes F(E) ⟹ E≤N_G(F(E))≤N_G(S))。ゆえ Q₁=Syl_q(E)⊆E⊆N_G(S)。
+3. C_S(Q₁)⊊S ⟹ Prop1.6(e) ⟹ Q₁⊄C_E(A) ⟹ **Cor12.10(c)** ⟹ q∈τ₁(M), Q₁ cyclic。
+   **🔶 開問 (b) 部分解決**: repo の `nilpotent_sigmaComplement_abelian` (S12_Corollary1210:158) の
+   (c) 連言 = 「π(E/C_E(A))⊆τ₁(M)」。Q₁⊄C_E(A)⟹q∈π(E/C_E(A))⟹q∈τ₁、q∈τ₁⟹Syl_q cyclic (rank1)。
+   threading (Prop1.6(e) + (c)連言 + τ₁⟹cyclic) は要実装だが pieces 揃った。
+4. C_G(S)⊆E ⟹ Q₀=C_Q(S)⊊Q₁ (Q₀⊆Q₁ は C_Q(S)≤Q₁=Syl_q(E)、⊊ は Q₁⊄C_E(A)⟹Q₁⊄C_G(S))。
+5. **by_contra: Q/Q₀ regular on S** (∀x∈Q∖C_G(S), S⊓C_G(x)=⊥) ⟹ **φ̄ wrapper
+   `isCyclic_quotient_of_conjugation_fpf` ✅** ⟹ IsCyclic(Q⧸C_Q(S))。
+6. **r(Q)=1 側 (= 新規 abstract lemma 推奨, 自己完結)**: IsCyclic(Q⧸Q₀) ∧ Q₀⊊Q₁≤Q (q-群) ⟹
+   Ω₁(Q)⊆Q₁ ⟹ (Q₁ cyclic) pRank Q q≤1。**証明**: Ω₁(Q/Q₀)⊆Q₁/Q₀ (Q₁/Q₀ は cyclic Q/Q₀ の
+   nontrivial 部分群 ⟹ unique min 含む, `line_le_zpowers_in_cyclic` 系) → g∈Ω₁(Q) は ḡ^q=1 ⟹
+   ḡ∈Ω₁(Q/Q₀)⊆Q₁/Q₀ ⟹ g∈Q₁·Q₀=Q₁ → elem-ab⊆Ω₁(Q)⊆Q₁ で pRank Q=pRank Ω₁(Q)≤pRank Q₁≤1。
+   ~50 行、Omega quotient + preimage 機構。**← 最初の committable 一手 (abstract, BG 非依存)。**
+7. **r_q=2 側 (= hard core, BG 依存)**: 12.8(e) で Ω₁(Q₁) が A 中心化 ⟹ q∈π(E/C_E(A))∩π(C_E(A))
+   ⟹ **`tau2_transfer_to_maximal` (=12.11(a-c), 第3連言)** で q∈τ₂(M*), M* に abelian Syl_q(G)。
+   q∈τ₂(M*)⟹r_q(M*)=2。**⚠ 開問 (c) = 真の hard core: r_q(M*)=2 ⟹ r_q(N_G(S))=2 の接続** —
+   M* の abelian Syl_q(G) が N_G(S) 内に来る根拠が要 (BG は「Lemma 12.11(c) yields
+   r_q(N_G(S))=2」と圧縮)。`pRank_eq_two_of_normalizer_le` [S10] は maximal 用で N_G(S) 直結せず。
+   12.8(e) の repo 形 `central_line_of_abelianSylow` は「X∈ℰ¹+regular⟹X≤E∧E中心化X」で
+   「Ω₁(Q₁)中心化A」とは別命題 — 12.8(e) の正しい形を S12_Lemma128d で要再特定。
+8. 6 と 7 で pRank Q q ≤1 vs =2 矛盾 ⟹ X 存在。
+
+**推奨 build 順**: **✅ (6) Ω₁-rank abstract lemma 着地 (session 9, commit 8672fd5c)** —
+`omega_le_of_ne_bot_in_cyclic` + `pRank_le_one_of_cyclic_quotient` (IsCyclic(Q⧸Q₀)∧Q₀⊊Q₁⟹
+pRank Q≤1; Ω₁(Q)≤Q₁ を `Subgroup.comap_map_eq_self`+omega-helper で、elem-ab≤Ω₁ は
+`IsElementaryAbelian.pow_eq_one`+`Omega.mem_of_pow_eq_one`、|B|≤q は cyclic exponent)。一発に
+近く通過 (修正 2: `h0lt1.ne`+`le_antisymm` / `≤` 型付け)。→ 次 = (a)(b) 開問解決
+(E/N_G(S), Cor12.10(c) 特定) で setup → (c) hard core (12.8(e) 正形 + r_q=2 接続) を BG 精読で
+攻略 → 統合 (r(Q)=1 [✅] + φ̄ wrapper [✅] + r_q=2 [c] で by_contra)。**(c) が front-half の真の
+ボトルネック (BG 圧縮された rank 接続)。**
+
+**残 (front-half 後)**: C_E(S)=E 枝 (generic rank-2 分解 S=Y×Z — mathlib
+`AddCommGroup.equiv_directSum_zmod_of_finite` 在だが rank2→2 cyclic 部分群への翻訳は別 sub;
+|Y|=|Z| case は Ω₁(Z)=任意 A₁ の制御要) → Z_p 集約 E₀=E₁E₃·∏Z_p → `frobFact_of_abelianSylow`
+→ 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。
+**⚠ Case 3 残りは hard core 複数 (front-half (c) + =E generic decomp) — multi-session 見込み。**
 
 ## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
 

@@ -13,13 +13,34 @@
 | **B** | `b-peterfalvi` | Pf §6: (4.8) assembly → (4.9) → S08 case-B → (6.8) | Opus 4.8 (1M) | ✅ 対象 |
 | **F** | `bg-s12` | BG §12 完結: 12.12 Case 3 → 12.13→12.16 → 12.4(a)系。完了で STOP (§14 は再判断) | Opus 4.8 (1M) | ✅ 対象 |
 | **G** | `bg-s13` | BG §13 Prime Action (13.1→13.10; §12 未証明分は S12_E scaffold statement 引用 = 新規 axiom なし) | Opus 4.8 (1M) | ✅ 対象 |
+| **H** | `pf-s10` | Pf §10–13 maximal-subgroup 構造 (§10 interface = BG A–E/I–II / §11–13 実指標論)。AUDIT-first | Opus 4.8 (1M) | ✅ 対象 |
 
 **G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
 (2) G の §12 依存は sorry'd statement の引用で賄う — **新規 `axiom` 宣言が G から来たら従来どおり
 abort+ユーザー承認**。(3) `notes/bg/s13_prime_action.md` は G 所有 (F は触らない)。
-(4) issue base: B=1000 / F=7000 / **G=8000**。
-マージ順 = **F → G → B** (F が S12_E の sorry を proof に置換し、G が同 statement を引用するため
-F 先行が自然; ただし git 上は独立で順序は形式的)。
+(4) issue base: B=1000 / F=7000 / **G=8000** / **H=2000**。
+マージ順 = **F → G → B → H** (独立レーンゆえ順序は形式的)。
+
+**H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
+(`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
+に gate されるため、H が interface を **新規 forward axiom 化する commit は従来どおり
+abort+ユーザー承認** (G の issue 8000 と同型; H の issue base = 2000)。(3)
+`notes/peterfalvi/s10_13_maximal_structure.md` は H 所有。
+
+**📌 一時例外 (issue 8001, 2026-06-12): G の S12_ECore de-private を許容合流**。
+G の履歴に `chore(s12): de-private sylow_le_derived_of_mem_tau3` (commit `4b92778f`, S12_ECore.lean
+5 行, **user裁可 issue 8001**) が含まれる。G が de-axiom 後にマージする際、上記「G が S12_E 系を
+編集 → abort」ゲートがこれに hit するが、**この de-private のみなら例外的に合流許可**
+(`git diff main..bg-s13 -- '*S12_E*'` の差分が `private` 削除 + cite 1 箇所のみなら OK)。
+それ以外の S12_E/S12_ECore 内容変更が混じれば通常どおり abort。
+
+**📌 一時例外 (issue 0065, 2026-06-12): F の cor12.16 statement +2 sorry を許容合流**。
+hub→F 依頼で F が S12_E に BG Cor 12.16(a)(b) の **faithful statement 2 個を sorry'd で追加**する
+(`sigma_subgroup_pRank_normalizer_le_one` + `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`)。
+これは G の forward axiom `cor1216×2` を de-axiom するための健全化ゆえ、**通常の sorry 増=abort の
+例外として +2 を許容してマージする**。判定: F の commit message に「issue 0065」があり、増えた sorry が
+上記 2 statement のみなら合格。それ以外の sorry 増は通常どおり abort。完了後 G が de-axiom すれば
+forward axiom が消え G の HOLD も解除 (issue 0065 のハンドシェイク参照)。
 
 **E (`bg-local`) は 2026-06-11 退役** — 任務完遂 (Lem 10.4(b) de-axiom / Lem 10.13 / Thm 11.5 /
 Cor 11.6 / **Thm 11.7 = §11 完結**)。全量 main 合流 (merge `77ab5173`) を検証の上 worktree・

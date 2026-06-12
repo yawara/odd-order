@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
+import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
 # Peterfalvi (4.8): equal-degree certain-type differences are σ-isometric
@@ -492,5 +493,641 @@ theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
   · exact add_le_add
       ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hαZ hα1)
       ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hβZ hβ1)
+
+/-- **Peterfalvi (4.8), step (7) input** (the `σ`-coefficients of `φ` lie in `{0, ±1}`).  Writing
+`φ = ε_α·α + ε_β·β` (norm-2 ⟹ two constituents) and `χ_{pq} = ε·ν` (norm-1 classifier), the
+coefficient `⟨φ, χ_{pq}⟩` is `ε_α·ε` if `ν = α`, `ε_β·ε` if `ν = β`, and `0` otherwise (`α ≠ β`).
+This `|·| ≤ 1` bound (beyond `NC ≤ 2`) is what excludes the `w₂ = 3` row case in the trichotomy
+endgame, where a coefficient would otherwise be `±2`. -/
+theorem sigmaCoeff_dade_eq_zero_or_one (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 0 ∨
+      (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 1 ∨
+      (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = -1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+  have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
+    ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
+      ((h.columnFamily χ₂').mu i).mem_ZIrr)
+  have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
+  obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  obtain ⟨ε, ν, hε, hν⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one
+    (((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.1 pq)
+    (by rw [((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl])
+  -- the two irreducible inner products (type ascription absorbs the `CF ↔ IrreducibleCharacter` coe)
+  have hαν : ClassFunction.inner α (ν : ClassFunction G ℂ)
+      = if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ν
+  have hβν : ClassFunction.inner β (ν : ClassFunction G ℂ)
+      = if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ν
+  have hf : (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
+      = (c α : ℂ) * ((ε : ℂ) * (if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0))
+        + (c β : ℂ) * ((ε : ℂ) * (if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0)) := by
+    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, hrepr, hs, Finset.sum_pair hαβ, hν,
+      ← Int.cast_smul_eq_zsmul ℂ ε, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hαν, hβν]
+  rw [hf]
+  by_cases hαe : (⟨α, hαm⟩ : IrreducibleCharacter G) = ν
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · exact absurd (Subtype.ext_iff.mp (hαe.trans hβe.symm)) hαβ
+    · rw [if_pos hαe, if_neg hβe]
+      simp only [mul_one, mul_zero, add_zero]
+      rcases hcα with hcα | hcα <;> rcases hε with hε | hε <;> rw [hcα, hε] <;> norm_num
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · rw [if_neg hαe, if_pos hβe]
+      simp only [mul_one, mul_zero, add_zero, zero_add]
+      rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
+    · rw [if_neg hαe, if_neg hβe]; left; ring
+
+open scoped Classical in
+/-- The `σ`-coefficient grid of `ψ = φ − δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.  As `ω_{ij}^σ = χ_{P_{ij}}`
+(`certainTypeOmegaSigma_eq_chiFam`) and the `χ`-family is orthonormal, the `δ`-part contributes
+`∓δ_j` exactly at the two grid positions `P_{ij}, P_{ik}`:
+`a(pq) = ⟨φ, χ_{pq}⟩ − δ_j·([P_{ij} = pq] − [P_{ik} = pq])`. -/
+theorem sigmaCoeff_psi_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) (φ : ClassFunction G ℂ)
+    (pq : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) :
+    (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (φ - (h.columnFamily χ₂).sign •
+          (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq
+      = (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
+        - ((h.columnFamily χ₂).sign : ℂ)
+          * ((if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) = pq then (1 : ℂ) else 0)
+            - (if (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) = pq
+                then (1 : ℂ) else 0)) := by
+  simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff]
+  rw [certainTypeOmegaSigma_eq_chiFam, certainTypeOmegaSigma_eq_chiFam,
+    ClassFunction.inner_sub_left, ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign,
+    ClassFunction.inner_smul_left, ClassFunction.inner_sub_left,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+    ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1]
+
+/-- For distinct columns `χ₂ ≠ χ₂'`, the transported `tic`-side characters are distinct:
+`omegaProdCharTic` is injective in the column.  (Precompose-cancel the bridge iso `e`, then
+`omegaProdChar_inj`.) -/
+theorem omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    omegaProdCharTic h χ₂ i ≠ omegaProdCharTic h χ₂' i := by
+  intro heq
+  refine hχ (h.sdiffTICyclicHypothesis.omegaProdChar_inj (χ₁ := h.w1CharEquiv i)
+    (χ₁' := h.w1CharEquiv i) (MonoidHom.ext fun w => ?_)).2
+  obtain ⟨w', rfl⟩ := (ticWEquivSdiffW h).surjective w
+  exact DFunLike.congr_fun heq w'
+
+/-- The two `σ`-image grid indices are distinct: `P_{ij} ≠ P_{ik}` for `χ₂ ≠ χ₂'`
+(`omegaProdEquiv.symm` is injective and `omegaProdCharTic` is column-injective). -/
+theorem omegaProdEquiv_symm_omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂') (i : Fin (Nat.card h.W1)) :
+    (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)
+      ≠ (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) :=
+  fun heq => omegaProdCharTic_ne h hχ i ((ticVdiff h).omegaProdEquiv.symm.injective heq)
+
+/-- **Peterfalvi (4.8), conclusion (3) from case (a).**  If every `σ`-coefficient of
+`ψ = (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes, then `ψ = 0`, i.e.
+`(μ_{ij} − μ_{ik})^τ = δ_j(ω_{ij}^σ − ω_{ik}^σ)`.
+
+`⟨ψ, ω_{ij}^σ⟩ = ⟨ψ, χ_{P_{ij}}⟩ = 0` (hypothesis) and the (4.8.1)-expansion `sigmaCoeff_psi_eq`
+pin `⟨φ, ω_{ij}^σ⟩ = δ_j`, `⟨φ, ω_{ik}^σ⟩ = −δ_j` (with `P_{ij} ≠ P_{ik}`); then
+`‖ψ‖² = ⟨ψ, φ⟩ = ‖φ‖² − δ_j·2δ_j = 2 − 2 = 0` (`‖φ‖² = 2`, `χ`-orthonormality), so `ψ = 0`. -/
+theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    (hall : ∀ pq, (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+          - (h.columnFamily χ₂).sign •
+            (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq = 0) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  classical
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set ωij := certainTypeOmegaSigma h χ₂ i with hωij
+  set ωik := certainTypeOmegaSigma h χ₂' i with hωik
+  set s : ℤ := (h.columnFamily χ₂).sign with hsdef
+  set ψ := φ - s • (ωij - ωik) with hψ
+  set Pij := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) with hPij
+  set Pik := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) with hPik
+  have hPne : Pij ≠ Pik := omegaProdEquiv_symm_omegaProdCharTic_ne h hχ i
+  have hωijeq : ωij = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) Pij :=
+    certainTypeOmegaSigma_eq_chiFam h χ₂ i
+  have hωikeq : ωik = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) Pik :=
+    certainTypeOmegaSigma_eq_chiFam h χ₂' i
+  -- `⟨φ, ω_ij^σ⟩ = s`, `⟨φ, ω_ik^σ⟩ = −s` from `hall` + the expansion
+  have hcij : ClassFunction.inner φ ωij = (s : ℂ) := by
+    have he := hall Pij
+    rw [sigmaCoeff_psi_eq, if_pos rfl, if_neg (Ne.symm hPne)] at he
+    rw [hωijeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pij = _
+    linear_combination he
+  have hcik : ClassFunction.inner φ ωik = -(s : ℂ) := by
+    have he := hall Pik
+    rw [sigmaCoeff_psi_eq, if_neg hPne, if_pos rfl] at he
+    rw [hωikeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pik = _
+    linear_combination he
+  -- orthonormality of `ω_ij^σ, ω_ik^σ` and `‖φ‖² = 2`
+  have hnorm : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  have hii : ClassFunction.inner ωij ωij = 1 := by
+    rw [hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+  have hkk : ClassFunction.inner ωik ωik = 1 := by
+    rw [hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+  have hik : ClassFunction.inner ωij ωik = 0 := by
+    rw [hωijeq, hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      if_neg hPne]
+  have hki : ClassFunction.inner ωik ωij = 0 := by
+    rw [hωikeq, hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      if_neg (Ne.symm hPne)]
+  -- conjugate-symmetric partners `⟨ω_ij^σ, φ⟩ = s`, `⟨ω_ik^σ, φ⟩ = −s`
+  have hcji : ClassFunction.inner ωij φ = (s : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcij, star_intCast]
+  have hcki : ClassFunction.inner ωik φ = -(s : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcik, star_neg, star_intCast]
+  -- `s² = 1`
+  have hsq : (s : ℂ) * (s : ℂ) = 1 := by
+    rcases (h.columnFamily χ₂).sign_eq with hsv | hsv <;> rw [hsdef, hsv] <;> norm_num
+  -- `⟨ψ, ψ⟩ = 0`
+  have hself : ClassFunction.inner ψ ψ = 0 := by
+    rw [hψ]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ← Int.cast_smul_eq_zsmul ℂ s, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hnorm, hcij, hcik, hcji, hcki, hii, hkk,
+      hik, hki, star_intCast]
+    linear_combination (-2 : ℂ) * hsq
+  have := eq_zero_of_inner_self_re_eq_zero (G := G) (φ := ψ) (by rw [hself]; simp)
+  rw [hψ, sub_eq_zero] at this
+  exact this
+
+/-- Two distinct elements of a fintype of card `≥ 3`, both different from a given `d`. -/
+private theorem exists_two_ne_ne {α : Type*} [Fintype α] (h3 : 3 ≤ Fintype.card α) (d : α) :
+    ∃ a b : α, a ≠ b ∧ a ≠ d ∧ b ≠ d := by
+  classical
+  have hcard : 2 ≤ ({d}ᶜ : Finset α).card := by
+    rw [Finset.card_compl, Finset.card_singleton]; omega
+  obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp (by omega : 1 < ({d}ᶜ : Finset α).card)
+  exact ⟨a, b, hab, by simpa using ha, by simpa using hb⟩
+
+open scoped Classical in
+/-- **The abstract `(b)/(c)` exclusion.**  A separable-grid `a = G − δ-part` cannot have a constant
+nonzero full column.  Here `G` has at most two nonzero entries, all in `{0, ±1}`; the `δ`-part is
+`s·([P = ·] − [Q = ·])` (`s = ±1`, `P ≠ Q`).  If `a(·, j₀) ≡ c ≠ 0` and `a` vanishes off column
+`j₀`, then either both `P, Q` lie in column `j₀` — forcing `G P = c + s`, `G Q = c − s`, which with
+`G P, G Q ∈ {0, ±1}` and `G P − G Q = 2s = ±2` gives `c = 0` (contradiction) — or at most one does,
+yielding three distinct nonzero `G`-entries (two non-`δ` column rows since `|ι| ≥ 3`, plus one
+off-column `δ`-point), contradicting `|Supp G| ≤ 2`.  Used for both `(b)` and `(c)` (the latter via
+the transposed grid). -/
+private theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (h3 : 3 ≤ Fintype.card ι) (G : ι × κ → ℂ)
+    (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
+    (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
+    (ha : ∀ x, a x = G x - s * ((if P = x then (1 : ℂ) else 0) - (if Q = x then (1 : ℂ) else 0)))
+    {j₀ : κ} {c : ℂ} (hc : c ≠ 0) (hcol : ∀ i, a (i, j₀) = c)
+    (hoff : ∀ i j, j ≠ j₀ → a (i, j) = 0) : False := by
+  classical
+  haveI : Finite (ι × κ) := inferInstance
+  by_cases hboth : P.2 = j₀ ∧ Q.2 = j₀
+  · -- both `P, Q` in column `j₀`: `G P = c + s`, `G Q = c − s` force `c = 0`
+    obtain ⟨hPj, hQj⟩ := hboth
+    have hGP : G P = c + s := by
+      have hP : a P = c := by have h := hcol P.1; rwa [← hPj] at h
+      have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ)] at this; rw [hP] at this
+      linear_combination -this
+    have hGQ : G Q = c - s := by
+      have hQ : a Q = c := by have h := hcol Q.1; rwa [← hQj] at h
+      have := ha Q; rw [if_neg hPQ, if_pos rfl] at this; rw [hQ] at this
+      linear_combination -this
+    have hsum : G P + G Q = 2 * c := by linear_combination hGP + hGQ
+    have hdiff : G P - G Q = 2 * s := by linear_combination hGP - hGQ
+    rcases hG01 P with hp | hp | hp <;> rcases hG01 Q with hq | hq | hq <;>
+      rcases hs with hsv | hsv <;> rw [hp, hq] at hsum hdiff <;> rw [hsv] at hdiff <;>
+      first
+      | exact hc (by linear_combination (-1 / 2 : ℂ) * hsum)
+      | norm_num at hdiff
+  · -- at most one of `P, Q` in column `j₀`: exhibit three distinct nonzero `G`-entries
+    obtain ⟨Off, d, hOffmem, hOffj, hnonδ⟩ :
+        ∃ (Off : ι × κ) (d : ι), G Off ≠ 0 ∧ Off.2 ≠ j₀ ∧
+          ∀ r, r ≠ d → (r, j₀) ≠ P ∧ (r, j₀) ≠ Q := by
+      by_cases hPj : P.2 = j₀
+      · have hQj : Q.2 ≠ j₀ := fun hQj => hboth ⟨hPj, hQj⟩
+        have hGQ : G Q = -s := by
+          have h0 : a Q = 0 := hoff Q.1 Q.2 hQj
+          have := ha Q; rw [if_neg hPQ, if_pos rfl, h0] at this; linear_combination -this
+        refine ⟨Q, P.1, by rw [hGQ]; rcases hs with h | h <;> simp [h], hQj, fun r hr => ?_⟩
+        exact ⟨fun hrP => hr (congrArg Prod.fst hrP), fun hrQ => hQj (congrArg Prod.snd hrQ).symm⟩
+      · have hGP : G P = s := by
+          have h0 : a P = 0 := hoff P.1 P.2 hPj
+          have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ), h0] at this; linear_combination -this
+        refine ⟨P, Q.1, by rw [hGP]; rcases hs with h | h <;> simp [h], hPj, fun r hr => ?_⟩
+        exact ⟨fun hrP => hPj (congrArg Prod.snd hrP).symm, fun hrQ => hr (congrArg Prod.fst hrQ)⟩
+    obtain ⟨r₁, r₂, hr12, hr1d, hr2d⟩ := exists_two_ne_ne h3 d
+    have hG1 : G (r₁, j₀) ≠ 0 := by
+      have := hcol r₁; rw [ha, if_neg (Ne.symm (hnonδ r₁ hr1d).1),
+        if_neg (Ne.symm (hnonδ r₁ hr1d).2)] at this; rw [show G (r₁, j₀) = c by linear_combination this]
+      exact hc
+    have hG2' : G (r₂, j₀) ≠ 0 := by
+      have := hcol r₂; rw [ha, if_neg (Ne.symm (hnonδ r₂ hr2d).1),
+        if_neg (Ne.symm (hnonδ r₂ hr2d).2)] at this; rw [show G (r₂, j₀) = c by linear_combination this]
+      exact hc
+    have hsub : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)) ⊆ {x | G x ≠ 0} := by
+      intro x hx; rcases hx with rfl | rfl | rfl
+      exacts [hG1, hG2', hOffmem]
+    have hcard3 : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)).ncard = 3 := by
+      rw [Set.ncard_eq_three]
+      exact ⟨_, _, _, by simp [hr12], fun h => hOffj (congrArg Prod.snd h.symm),
+        fun h => hOffj (congrArg Prod.snd h.symm), rfl⟩
+    have := Set.ncard_le_ncard hsub (Set.toFinite _)
+    rw [hcard3] at this; omega
+
+open scoped Classical in
+/-- The row analogue of `grid_no_constant_column` (no constant nonzero full row), obtained by
+applying the column statement to the transposed grid. -/
+private theorem grid_no_constant_row {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (h3 : 3 ≤ Fintype.card κ) (G : ι × κ → ℂ)
+    (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
+    (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
+    (ha : ∀ x, a x = G x - s * ((if P = x then (1 : ℂ) else 0) - (if Q = x then (1 : ℂ) else 0)))
+    {i₀ : ι} {c : ℂ} (hc : c ≠ 0) (hrow : ∀ j, a (i₀, j) = c)
+    (hoff : ∀ i j, i ≠ i₀ → a (i, j) = 0) : False := by
+  have hswapG : {x : κ × ι | G (x.2, x.1) ≠ 0}.ncard ≤ 2 :=
+    le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
+      (Prod.swap_injective.injOn) (Set.toFinite _)) hG2
+  have hflip : ∀ (R : ι × κ) (y : κ × ι), (Prod.swap R = y) ↔ (R = (y.2, y.1)) := fun R y => by
+    rw [Prod.ext_iff, Prod.ext_iff, Prod.fst_swap, Prod.snd_swap]; tauto
+  refine grid_no_constant_column h3 (fun x => G (x.2, x.1)) hswapG (fun x => hG01 _)
+    (Prod.swap P) (Prod.swap Q) (fun he => hPQ (Prod.swap_injective he)) hs
+    (fun x => a (x.2, x.1)) (fun x => ?_) hc (fun j => hrow j) (fun j i hi => hoff i j hi)
+  simp only [ha, hflip]
+
+/-- **Peterfalvi (4.8), conclusion (3)** (the FT-critical isometry identity).  For nontrivial
+distinct columns `χ₂ ≠ χ₂'` and equal degree `μ_{ij}(1) = μ_{ik}(1)`, the Dade image is
+`(μ_{ij} − μ_{ik})^τ = δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.
+
+`ψ := (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step (4)), so its `σ`-coefficient
+grid is additively separable (3.7) with `NC(ψ) ≤ 4 < 2·min(w₁, w₂)`.  As `w₁, w₂` are coprime odd
+(`≥ 3`), one of `w₁ + 2 ≤ w₂`, `w₂ + 2 ≤ w₁` holds; the (3.8) trichotomy `grid_trichotomy` (in that
+orientation) leaves all-zero, a constant column, or a constant row.  The latter two are impossible
+(`grid_no_constant_column` on the grid resp. its transpose), so all `σ`-coefficients vanish and
+`certainType_diff_dade_eq_of_all_sigmaCoeff_zero` gives `ψ = 0`. -/
+theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
+  apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero h hχ hχ₂ hχ₂' i hdeg
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set ψ := φ - (h.columnFamily χ₂).sign •
+    (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) with hψ
+  set a : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+      ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ :=
+    fun pq => (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) ψ pq with ha
+  set G : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+      ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ :=
+    fun pq => (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq with hG
+  set Pij := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) with hPij
+  set Pik := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) with hPik
+  have hPne : Pij ≠ Pik := omegaProdEquiv_symm_omegaProdCharTic_ne h hχ i
+  have hae : ∀ pq, a pq = G pq - ((h.columnFamily χ₂).sign : ℂ)
+      * ((if Pij = pq then (1 : ℂ) else 0) - (if Pik = pq then (1 : ℂ) else 0)) :=
+    fun pq => sigmaCoeff_psi_eq h χ₂ χ₂' i φ pq
+  have hG2 : {x | G x ≠ 0}.ncard ≤ 2 := sigmaNC_dade_le_two h hχ hχ₂ hχ₂' i hdeg
+  have hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1 :=
+    fun x => sigmaCoeff_dade_eq_zero_or_one h hχ hχ₂ hχ₂' i hdeg x
+  have hs : ((h.columnFamily χ₂).sign : ℂ) = 1 ∨ ((h.columnFamily χ₂).sign : ℂ) = -1 := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  -- ψ vanishes on V (step 4)
+  have hψV : ∀ v ∈ (ticVdiff h).V, ψ v = 0 := by
+    intro v hv
+    rw [hψ, ClassFunction.sub_apply, ClassFunction.zsmul_apply, ClassFunction.sub_apply,
+      certainType_diff_dade_apply_eq_of_mem_V h hχ₂ hχ₂' i hdeg hv, zsmul_eq_mul]
+    push_cast; ring
+  -- additive separability of `a` (3.7)
+  have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
+    fun p p' q q' => (ticVdiff h).sigmaCoeff_add_eq rfl (ticVdiffFullDadeApplication h) hψV p p' q q'
+  -- `NC(ψ) ≤ 4`
+  have hNC4 : {x | a x ≠ 0}.ncard ≤ 4 := by
+    have hsub : {x | a x ≠ 0} ⊆ {x | G x ≠ 0} ∪ {Pij, Pik} := by
+      intro x hx
+      by_contra hcon
+      simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+        not_or, not_not] at hcon
+      exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
+    have hbpair : ({Pij, Pik} : Set _).ncard ≤ 2 :=
+      (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
+    calc {x | a x ≠ 0}.ncard ≤ ({x | G x ≠ 0} ∪ {Pij, Pik}).ncard :=
+          Set.ncard_le_ncard hsub (Set.finite_univ.subset (Set.subset_univ _))
+      _ ≤ {x | G x ≠ 0}.ncard + ({Pij, Pik} : Set _).ncard := Set.ncard_union_le _ _
+      _ ≤ 2 + 2 := add_le_add hG2 hbpair
+      _ = 4 := rfl
+  -- card facts: `card Ŵ₁ = w₁`, `card Ŵ₂ = w₂`, both `≥ 3`, coprime, odd ⟹ a gap holds
+  have hcard1 : Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) = Nat.card h.tic.W1 :=
+    (ticVdiff h).card_charGroup_subgroupOf (ticVdiff h).W1_le_W
+  have hcard2 : Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) = Nat.card h.tic.W2 :=
+    (ticVdiff h).card_charGroup_subgroupOf (ticVdiff h).W2_le_W
+  have h3w1 : 3 ≤ Nat.card h.tic.W1 := h.tic.three_le_card_W1
+  have h3w2 : 3 ≤ Nat.card h.tic.W2 := h.tic.three_le_card_W2
+  have hodd1 : Odd (Nat.card h.tic.W1) :=
+    h.tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le h.tic.W1_le_W)
+  have hodd2 : Odd (Nat.card h.tic.W2) :=
+    h.tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le h.tic.W2_le_W)
+  have hcop : Nat.Coprime (Nat.card h.tic.W1) (Nat.card h.tic.W2) := h.tic.W_card_coprime
+  have hwne : Nat.card h.tic.W1 ≠ Nat.card h.tic.W2 := by
+    intro he; rw [he, Nat.Coprime, Nat.gcd_self] at hcop; omega
+  -- orientation: put the smaller character group as the trichotomy's rows
+  rcases lt_or_gt_of_ne hwne with hlt | hgt
+  · -- `w₁ < w₂`: gap `card Ŵ₁ + 2 ≤ card Ŵ₂`, run `grid_trichotomy` on `a`
+    have hgap : Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) + 2
+        ≤ Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1, hcard2]; obtain ⟨k1, hk1⟩ := hodd1; obtain ⟨k2, hk2⟩ := hodd2; omega
+    have hNClt : {x | a x ≠ 0}.ncard
+        < 2 * Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1]; omega
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy a hadd hgap hNClt with hz | ⟨j₀, c, hc, h1, h2⟩ | ⟨i₀, c, hc, h1, h2⟩
+    · exact hz
+    · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+        hc h1 h2).elim
+    · exact (grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+        hc h1 h2).elim
+  · -- `w₂ < w₁`: transpose the grid so `Ŵ₂` is the rows
+    set aT : ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ := fun x => a (x.2, x.1) with haT
+    have hgap : Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) + 2
+        ≤ Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1, hcard2]; obtain ⟨k1, hk1⟩ := hodd1; obtain ⟨k2, hk2⟩ := hodd2; omega
+    have haddT : ∀ q q' p p', aT (q, p) + aT (q', p') = aT (q, p') + aT (q', p) :=
+      fun q q' p p' => by simp only [haT]; linear_combination hadd p p' q q'
+    have hNCltT : {x | aT x ≠ 0}.ncard
+        < 2 * Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      have h4 : {x | aT x ≠ 0}.ncard ≤ 4 :=
+        le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
+          (Prod.swap_injective.injOn) (Set.toFinite _)) hNC4
+      rw [hcard2]; omega
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy aT haddT hgap hNCltT with hz | ⟨p₀, c, hc, h1, h2⟩ | ⟨q₀, c, hc, h1, h2⟩
+    · intro pq; exact hz (pq.2, pq.1)
+    · exact (grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+        hc (fun q => h1 q) (fun i j hi => h2 j i hi)).elim
+    · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+        hc (fun p => h1 p) (fun i j hj => h2 j i hj)).elim
+
+/-! ### Peterfalvi (4.9)(b): the summed isometry identity
+
+The column character `μ_j = ∑_{0 ≤ i < w₁} μ_{ij}` (`induce_restrict_certainType_eq`), so the
+difference `μ_j − μ_k = ∑_i (μ_{ij} − μ_{ik})` is supported on `A₀` (each summand is, by (4.8)
+conclusion 1).  Summing the per-row isometry (4.8) conclusion 3 (`certainType_diff_dade_eq`) over
+`i` gives the **summed isometry** `(μ_j − μ_k)^τ = δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`: the computation
+showing the (4.9)(b) map `μ_j ↦ δ_k ∑_i ω_{ij}^σ` agrees with the Dade isometry `τ` on the
+augmentation differences `μ_j − μ_k` that span `Z[T, A]`. -/
+
+/-- The certain-type Dade isometry `τ` (= `h.tau`) is additive over finite sums of supported class
+functions.  The abstract `h.tau.toDadeMap` agrees with the *constructed* Dade map
+`h.dade0.dadeMap` by the Peterfalvi (2.5) uniqueness `IsDadeMap.unique`, and the latter is the
+genuine `ℂ`-linear `dadeLinearMap`, hence commutes with `∑`. -/
+theorem tau_toDadeMap_sum (h : Hypothesis46 A L) {ι : Type*} (s : Finset ι)
+    (α : ι → OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L) :
+    h.tau.toDadeMap (∑ i ∈ s, α i) = ∑ i ∈ s, h.tau.toDadeMap (α i) := by
+  have hkey : h.tau.toDadeMap = h.dade0.dadeMap (k := ℂ) :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.unique
+      h.tau.toDadeIsometryData.isDadeMap h.dade0.isDadeMap_dadeMap
+  rw [hkey]
+  simpa only [OddOrder.Peterfalvi.S04.Hypothesis.dadeLinearMap_apply]
+    using map_sum (h.dade0.dadeLinearMap (k := ℂ)) α s
+
+/-- **Peterfalvi (4.9)(b), the summed isometry identity.**  Summing the per-row isometry (4.8)
+conclusion 3 (`certainType_diff_dade_eq`) over `0 ≤ i < w₁`:
+`(μ_j − μ_k)^τ = δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`, where `μ_j − μ_k = ∑_i (μ_{ij} − μ_{ik})` is
+`∑ i, certainTypeDiffSupported`.  Together with `δ_j = δ_k` (conclusion 2) this is the (4.9)(b)
+agreement of the column map with `τ` on `Z[T, A]`.  Stated with the per-row degree equalities
+`μ_{ij}(1) = μ_{ik}(1)` (which, since every `μ_{ij}` in column `j` has degree `μ_{0j}(1)`, follow
+from the column-degree equality `μ_j(1) = μ_k(1)`). -/
+theorem certainType_diff_dade_sum_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+                = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdeg i))
+      = (h.columnFamily χ₂).sign •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  rw [tau_toDadeMap_sum, Finset.smul_sum]
+  exact Finset.sum_congr rfl fun i _ => certainType_diff_dade_eq h hχ hχ₂ hχ₂' i (hdeg i)
+
+/-! ### Column-degree constancy and the (4.9) degree bridge
+
+In the certain-type column `j` every `μ_{ij}` restricts to the same irreducible `χ_j` of `K`, so
+they share the degree `μ_{0j}(1)` — this is exactly `columnFamily_difference_apply_one`
+(`(μ_{ij} − μ_{0j})(1) = 0`).  Consequently the column-sum degree equality `μ_j(1) = μ_k(1)`
+(i.e. `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`, since `μ_j = ∑_i μ_{ij}`) is equivalent to the per-row
+equalities `μ_{ij}(1) = μ_{ik}(1)`, which is the form consumed by the summed isometry.  This is the
+bridge from the set `T = {μ_j | μ_j(1) = μ_k(1)}` of Peterfalvi (4.9) to (4.8)/(4.9)(b). -/
+
+/-- **Column-degree constancy.**  Every `μ_{ij}` in column `j` has degree `μ_{0j}(1)`
+(`columnFamily_difference_apply_one`: `(μ_{ij} − μ_{0j})(1) = 0`). -/
+theorem columnFamily_mu_apply_one_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
+  have h0 := h.columnFamily_difference_apply_one χ₂ i
+  simp only [SignedIrreducibleDifferenceFamily.difference_apply_one,
+    SignedIrreducibleDifferenceFamily.classFunction_apply] at h0
+  exact sub_eq_zero.mp h0
+
+/-- **The (4.9) degree bridge.**  The column-sum degree equality `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`
+(= `μ_j(1) = μ_k(1)` since `μ_j = ∑_i μ_{ij}`) gives the per-row equalities `μ_{ij}(1) = μ_{ik}(1)`:
+each column is degree-constant (`columnFamily_mu_apply_one_eq`), so both sums are `w₁` times the
+anchor degree, and `w₁ ≠ 0` cancels. -/
+theorem forall_columnFamily_mu_apply_one_eq_of_sum_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+        = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1 := by
+  have ej : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
+    rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂ i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  have ek : ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂').mu 0 : ClassFunction ↥L ℂ) 1 := by
+    rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂' i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [ej, ek] at hdeg
+  have hw1 : (Nat.card h.W1 : ℂ) ≠ 0 := by exact_mod_cast (NeZero.ne (Nat.card h.W1))
+  have hcol0 := mul_left_cancel₀ hw1 hdeg
+  intro i
+  rw [columnFamily_mu_apply_one_eq h χ₂ i, columnFamily_mu_apply_one_eq h χ₂' i, hcol0]
+
+/-- **Peterfalvi (4.9)(b), summed isometry under the column-degree hypothesis.**  The summed
+isometry `certainType_diff_dade_sum_eq` restated with the column-sum degree equality
+`μ_j(1) = μ_k(1)` (the membership condition for `T`), the per-row equalities supplied by the
+degree bridge `forall_columnFamily_mu_apply_one_eq_of_sum_eq`. -/
+theorem certainType_diff_dade_sum_eq_of_degree (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i
+        (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg i))
+      = (h.columnFamily χ₂).sign •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) :=
+  certainType_diff_dade_sum_eq h hχ hχ₂ hχ₂'
+    (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg)
+
+/-! ### The (4.9)(b) isometry property
+
+Peterfalvi (4.9)(b) asserts that the `Z`-linear map `Z[T] → Z[Irr G]` sending the certain-type
+column character `μ_j = ∑_i μ_{ij}` to `δ_k ∑_i ω_{ij}^σ` is an **isometry** which agrees with `τ`
+on `Z[T, A]`.  The agreement-with-`τ` part is the summed identity `certainType_diff_dade_sum_eq`.
+The isometry part is "clear" (Peterfalvi): both the `σ`-images `ω_{ij}^σ` and the `L`-irreducibles
+`μ_{ij}` are orthonormal across the certain-type grid, so the two column sums `∑_i ω_{ij}^σ` and
+`∑_i μ_{ij}` have the **same** Gram matrix `w₁·δ_{jk}`.  Since the sign `δ_k = ±1` is real and
+`δ_k² = 1`, the `δ_k` factors cancel in `⟨δ_k ∑_i ω_{ij}^σ, δ_k ∑_i ω_{ik}^σ⟩`, so the sign-free
+identity `certainType_omega_sum_isometry` below is exactly the isometry of (4.9)(b). -/
+
+/-- **Grid-index distinctness.**  The transported `tic`-side characters `ω_{ij}^{tic}` are distinct
+across the certain-type grid: `omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i'` iff
+`χ₂ = χ₂'` and `i = i'`.  (`omegaProdChar` is injective in both arguments — `omegaProdChar_inj` —
+and `w1CharEquiv` is an equivalence; the precomposition by the iso `ticWEquivSdiffW` is stripped
+via its surjectivity.)  This generalises `omegaProdCharTic_ne` to differing row indices. -/
+theorem omegaProdCharTic_eq_iff (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i i' : Fin (Nat.card h.W1)) :
+    omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i' ↔ χ₂ = χ₂' ∧ i = i' := by
+  constructor
+  · intro heq
+    have hstrip : h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂
+        = h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i') χ₂' := by
+      refine MonoidHom.ext fun w => ?_
+      obtain ⟨w', rfl⟩ := (ticWEquivSdiffW h).surjective w
+      exact DFunLike.congr_fun heq w'
+    obtain ⟨h1, h2⟩ := h.sdiffTICyclicHypothesis.omegaProdChar_inj hstrip
+    exact ⟨h2, h.w1CharEquiv_injective h1⟩
+  · rintro ⟨rfl, rfl⟩; rfl
+
+open scoped Classical in
+/-- **`σ`-image orthonormality (per element).**  `⟨ω_{ij}^σ, ω_{i'j'}^σ⟩ = δ_{(i,j),(i',j')}`.
+The `σ`-images are `σ(ω(P_{ij}))` with `P_{ij} = omegaProdCharTic h χ₂ i`; `σ` is an isometry
+(`sigma_inner`) and the `ω`-family is orthonormal (`omega_inner_self`/`omega_inner_ne`), so the
+inner product is `1` iff `P_{ij} = P_{i'j'}`, i.e. iff `χ₂ = χ₂'` and `i = i'`
+(`omegaProdCharTic_eq_iff`). -/
+theorem certainTypeOmegaSigma_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i i' : Fin (Nat.card h.W1)) :
+    ClassFunction.inner (certainTypeOmegaSigma h χ₂ i) (certainTypeOmegaSigma h χ₂' i')
+      = if χ₂ = χ₂' ∧ i = i' then 1 else 0 := by
+  simp only [certainTypeOmegaSigma]
+  rw [(ticVdiff h).sigma_inner rfl (ticVdiffFullDadeApplication h)]
+  by_cases hP : omegaProdCharTic h χ₂ i = omegaProdCharTic h χ₂' i'
+  · rw [hP, (ticVdiff h).omega_inner_self,
+      if_pos ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mp hP)]
+  · rw [(ticVdiff h).omega_inner_ne hP,
+      if_neg (fun hcon => hP ((omegaProdCharTic_eq_iff h χ₂ χ₂' i i').mpr hcon))]
+
+open scoped Classical in
+/-- **`σ`-image column-sum orthonormality.**  `⟨∑_i ω_{ij}^σ, ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}`:
+the column sums of the `σ`-images are orthogonal for distinct columns and have norm² `w₁`
+(the `w₁` orthonormal entries) on the diagonal.  Bilinear expansion + `certainTypeOmegaSigma_inner`. -/
+theorem certainTypeOmegaSigma_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
+      = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  rw [inner_sum_left]
+  simp_rw [inner_sum_right, certainTypeOmegaSigma_inner]
+  by_cases hc : χ₂ = χ₂'
+  · rw [if_pos hc]
+    have hrow : ∀ i : Fin (Nat.card h.W1),
+        (∑ i' : Fin (Nat.card h.W1), if χ₂ = χ₂' ∧ i = i' then (1 : ℂ) else 0) = 1 := by
+      intro i
+      rw [Finset.sum_congr rfl (fun i' _ => if_congr (and_iff_right hc) rfl rfl),
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+    rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul, mul_one]
+  · rw [if_neg hc]
+    exact Finset.sum_eq_zero (fun i _ =>
+      Finset.sum_eq_zero (fun i' _ => if_neg (fun hcon => hc hcon.1)))
+
+open scoped Classical in
+/-- **`L`-irreducible column-sum orthonormality.**  `⟨∑_i μ_{ij}, ∑_i μ_{ij'}⟩ = w₁·δ_{jj'}`:
+the certain-type characters `μ_{ij}` are distinct irreducibles of `L` (`columnFamily.injective`
+within a column, `columnFamily_mu_ne` across columns), so the column sums `μ_j = ∑_i μ_{ij}` are
+orthogonal for distinct columns and have norm² `w₁` on the diagonal. -/
+theorem columnFamily_mu_sum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+        (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ))
+      = if χ₂ = χ₂' then (Nat.card h.W1 : ℂ) else 0 := by
+  rw [inner_sum_left]
+  simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
+  by_cases hc : χ₂ = χ₂'
+  · subst hc
+    rw [if_pos rfl]
+    have hrow : ∀ i : Fin (Nat.card h.W1),
+        (∑ i' : Fin (Nat.card h.W1),
+          if (h.columnFamily χ₂).mu i = (h.columnFamily χ₂).mu i' then (1 : ℂ) else 0) = 1 := by
+      intro i
+      rw [Finset.sum_congr rfl (fun i' _ =>
+          if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
+        Finset.sum_ite_eq Finset.univ i (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ i)]
+    rw [Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+      Fintype.card_fin, nsmul_eq_mul, mul_one]
+  · rw [if_neg hc]
+    exact Finset.sum_eq_zero (fun i _ =>
+      Finset.sum_eq_zero (fun i' _ => if_neg (h.columnFamily_mu_ne hc i i')))
+
+/-- **Peterfalvi (4.9)(b), the isometry property.**  The `σ`-image column sums `∑_i ω_{ij}^σ`
+(in `CF(G)`) and the certain-type column sums `μ_j = ∑_i μ_{ij}` (in `CF(L)`) have the **same**
+Gram matrix `w₁·δ_{jj'}` (`certainTypeOmegaSigma_sum_inner` and `columnFamily_mu_sum_inner`).
+Hence the `Z`-linear map `μ_j ↦ δ_k ∑_i ω_{ij}^σ` of (4.9)(b) is an isometry: the sign `δ_k = ±1`
+contributes `δ_k·conj(δ_k) = δ_k² = 1`, so `⟨δ_k ∑_i ω_{ij}^σ, δ_k ∑_i ω_{ij'}^σ⟩ = w₁·δ_{jj'}
+= ⟨μ_j, μ_{j'}⟩`. -/
+theorem certainType_omega_sum_isometry (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (∑ i, certainTypeOmegaSigma h χ₂ i) (∑ i, certainTypeOmegaSigma h χ₂' i)
+      = ClassFunction.inner (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+          (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) := by
+  rw [certainTypeOmegaSigma_sum_inner, columnFamily_mu_sum_inner]
 
 end OddOrder.Peterfalvi.S06
