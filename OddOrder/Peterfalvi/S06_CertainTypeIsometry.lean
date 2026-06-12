@@ -423,4 +423,64 @@ theorem certainType_diff_dade_inner_self (h : Hypothesis46 A L)
     if_neg (h.columnFamily_mu_ne hχ i i), if_neg (h.columnFamily_mu_ne hχ i i).symm]
   ring
 
+/-- **Peterfalvi (4.8), step (6) input** (`NC(φ) ≤ 2`).  The Dade image `φ = (μ_{ij} − μ_{ik})^τ`,
+of squared norm `2`, has at most two nonzero `σ`-image coefficients.  By `mem_ZIrr_inner_self_eq_sum_sq`
++ `exists_pair_of_sum_sq_eq_two` it is `ε_α·α + ε_β·β` for two distinct irreducibles `α, β`; each of
+`α, β` has `≤ 1` nonzero inner product against the orthonormal `χ`-family
+(`ncard_inner_chiFam_ne_zero_le_one`), and `Supp(φ-coeffs) ⊆ S_α ∪ S_β`. -/
+theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    (ticVdiff h).sigmaNC rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) ≤ 2 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI hfprod : Fintype (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := inferInstance
+  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
+  have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
+    ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
+      ((h.columnFamily χ₂').mu i).mem_ZIrr)
+  have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
+  obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hαZ : α ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨α, hαm⟩ : IrreducibleCharacter G)
+  have hβZ : β ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨β, hβm⟩ : IrreducibleCharacter G)
+  have hα1 : ClassFunction.inner α α = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ⟨α, hαm⟩
+    rwa [if_pos rfl] at this
+  have hβ1 : ClassFunction.inner β β = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ⟨β, hβm⟩
+    rwa [if_pos rfl] at this
+  have hφαβ : φ = (c α : ℂ) • α + (c β : ℂ) • β := by
+    rw [hrepr, hs, Finset.sum_pair hαβ]
+  rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC]
+  refine le_trans (Set.ncard_le_ncard (t :=
+    {pq | ClassFunction.inner α ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0} ∪
+    {pq | ClassFunction.inner β ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0})
+    ?_ (Set.finite_univ.subset (Set.subset_univ _))) (le_trans (Set.ncard_union_le _ _) ?_)
+  · intro pq hpq
+    simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, Set.mem_setOf_eq] at hpq
+    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
+    by_contra hcon
+    push_neg at hcon
+    exact hpq (by rw [hφαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
+  · exact add_le_add
+      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hαZ hα1)
+      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hβZ hβ1)
+
 end OddOrder.Peterfalvi.S06
