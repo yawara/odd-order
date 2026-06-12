@@ -1,11 +1,34 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
-## 🟡 2026-06-12 (Lane F session 8, Opus 4.8): **Thm 12.12 着手 — 部品 4 本 landed、Case 1 完了、Case 2/3 残**
+## 🟡 2026-06-12 (Lane F session 8, Opus 4.8): **Thm 12.12 — Case 1 + Case 2 完了、Case 3 残**
 
-新 leaf `S12_Theorem1212.lean`。Thm 12.12 (Frobenius 因子分解、大物) を 3 ケースに分解し、
-共通インフラ + Case 1 を完成。**全 unconditional・axiom-clean、AxiomsCheck 4 本登録、commit 4 本**
-(Prop 3.9 / packaging+Case1 / exponent reduction)。S12_E の 12.12 scaffold は**未充足のまま**
-(assembly は Case 2/3 完成後 — 実 sorry 5 不変)。
+新 leaf `S12_Theorem1212.lean` (~510 行)。Thm 12.12 (Frobenius 因子分解、大物) を 3 ケースに分解。
+**Case 1 (τ₂=∅) + Case 2 (Sylow p 非可換) 完成**、共通インフラ + exponent 機構も完成。
+**全 unconditional・axiom-clean、AxiomsCheck 10 本登録**。S12_E の 12.12 scaffold は**未充足のまま**
+(`frobenius_factorization_of_regular` の assembly は Case 3 完成後 — 実 sorry 5 不変)。
+
+### ✅✅ session 8 cont. (commit fd2ee0bd): **Case 2 (nonabelian Sylow) COMPLETE**
+
+capstone `frobFact_of_nonabelianSylow` (axiom-clean)。12.7 サブ定理 (canonical line +
+補群) を組み立て `FrobFactConclusion M E` を返す。新規部品 (全 public・再利用可):
+- **`eq_sup_inf_of_le_normalizer`** (Dedekind): `E₀≤N(A₀)`, `A₀≤H≤A₀⊔E₀` ⟹ `H = A₀⊔(H⊓E₀)`。
+  `Subgroup.coe_mul_of_left_le_normalizer_right` で集合積に落とし element-wise (card 不要)。
+- **`inf_centralizer_bot_symm`** (bridge): `(∀x∈N#,K⊓C(x)=⊥) → (∀a∈K#,N⊓C(a)=⊥)`。
+- **`factorization_exponent_le_of_sylow`** (fact A): Sylow p が exp の p-part を担う
+  (max-p-order 元を `Sylow` 共役 `MulAction.exists_smul_eq` で E₂ へ移送、`Subgroup.orderOf_mk`)。
+- **`exists_orderOf_eq_rpow_in_complement`** (r≠p): `IsComplement'.QuotientMulEquiv` で
+  max-r-order 元を E₀ へ (核 `⟨g⟩⊓A₀.subgroupOf E=⊥` は `inf_eq_bot_of_coprime`、位数保存は
+  `orderOf_map_dvd`+`ker_mk'`)。**set でなく `QuotientGroup.mk'` を明示** (set は rw で zeta 展開
+  暴走 → motive 不正)。
+- **`exists_factorization_le_at_prime`** (r=p): 可換 `E₂ = A₀ × C` (C=E₂⊓E₀) で
+  `exp E₂ ∣ lcm(exp A₀,exp C)` (`Monoid.exponent_dvd` の ∀g 形 + `Commute.orderOf_mul_dvd_lcm`;
+  **`MonoidHom.noncommCoprod` は import 外**ゆえ hom でなく直接)、`ν_p(exp A₀)≤1≤ν_p(exp C)`
+  (C nontrivial p-群) + fact A で C≤E₀ の exp 元が p-part 実現。
+- assembly: (a) `E⊓C(x)=A₀` = Dedekind + `E₀⊓C(x)=⊥` (`primeFactors_centralizer_le_tau1`
+  12.7(e) + Cauchy + hreg)。(b) bridge → `isFrobeniusGroup_of_regular`。
+- 地雷: `MulEquiv.orderOf_eq` 連鎖は rw でなく `.trans` (subgroupOf 依存型で motive 不正);
+  `Fact.out` は複数 Fact 在で `(Fact.out : p.Prime)` 明示要; `orderOf_coe`/`orderOf_mk` は
+  `Subgroup.` 名前空間; `exists_prime_orderOf_dvd_card'` (primed=Nat.card)。
 
 ### ✅ landed (この session)
 
