@@ -179,4 +179,62 @@ theorem certainTypeExtension_mem_ZIrr (h : Hypothesis46 A L) [NeZero (Nat.card h
   | add x y _ _ ihx ihy => rw [map_add]; exact Submodule.add_mem _ ihx ihy
   | smul a x _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ a ih
 
+/-! ### The isometry field -/
+
+/-- **Generator-level isometry**: `⟨ν(μ_j), ν(μ_l)⟩ = ⟨μ_j, μ_l⟩`.  Pulling out the signs gives
+`δ_j δ_l ⟨∑ω_{ij}^σ, ∑ω_{il}^σ⟩ = δ_j δ_l ⟨μ_j, μ_l⟩` (`certainType_omega_sum_isometry`).  When
+`χ₂ = χ₂'` the two signs coincide and `δ_j² = 1`; when `χ₂ ≠ χ₂'` the Gram entry
+`⟨μ_j, μ_l⟩ = 0` (`columnFamily_mu_sum_inner`) absorbs the signs.  No degree hypothesis is needed. -/
+theorem certainTypeExtension_columnSum_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.inner (certainTypeExtension h (columnSum h χ₂))
+        (certainTypeExtension h (columnSum h χ₂'))
+      = ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂') := by
+  rw [certainTypeExtension_columnSum, certainTypeExtension_columnSum,
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂).sign (∑ i, certainTypeOmegaSigma h χ₂ i),
+    ← Int.cast_smul_eq_zsmul ℂ (h.columnFamily χ₂').sign (∑ i, certainTypeOmegaSigma h χ₂' i),
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_intCast,
+    certainType_omega_sum_isometry, columnSum_def, columnSum_def, columnFamily_mu_sum_inner]
+  by_cases hχ : χ₂ = χ₂'
+  · subst hχ
+    rw [if_pos rfl]
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> push_cast <;> ring
+  · rw [if_neg hχ, mul_zero, mul_zero]
+
+/-- **Peterfalvi (4.9)(b), isometry (`IsCoherent.extension_inner_eq`)**: `ν` preserves the inner
+product on `Z[𝒯]`.  By `span_induction₂` over both arguments: generators `μ_j, μ_l ∈ 𝒯` are handled
+by `certainTypeExtension_columnSum_inner`; the additive/`ℤ•` cases use bilinearity of `⟨·,·⟩` and
+`ℤ`-linearity of `ν`. -/
+theorem certainTypeExtension_inner_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    {φ ψ : ClassFunction ↥L ℂ} (hφ : φ ∈ S07.zSpan (certainTypeSet h k))
+    (hψ : ψ ∈ S07.zSpan (certainTypeSet h k)) :
+    ClassFunction.inner (certainTypeExtension h φ) (certainTypeExtension h ψ)
+      = ClassFunction.inner φ ψ := by
+  rw [S07.zSpan] at hφ hψ
+  induction hφ, hψ using Submodule.span_induction₂ with
+  | mem_mem u v hu hv =>
+      obtain ⟨χ₂, _, _, rfl⟩ := hu
+      obtain ⟨χ₂', _, _, rfl⟩ := hv
+      exact certainTypeExtension_columnSum_inner h χ₂ χ₂'
+  | zero_left v hv => rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
+  | zero_right u hu => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
+  | add_left u₁ u₂ v hu₁ hu₂ hv ih₁ ih₂ =>
+      rw [map_add, ClassFunction.inner_add_left, ClassFunction.inner_add_left, ih₁, ih₂]
+  | add_right u v₁ v₂ hu hv₁ hv₂ ih₁ ih₂ =>
+      rw [map_add, ClassFunction.inner_add_right, ClassFunction.inner_add_right, ih₁, ih₂]
+  | smul_left r u v hu hv ih =>
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ r (certainTypeExtension h u),
+        ← Int.cast_smul_eq_zsmul ℂ r u,
+        ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, ih]
+  | smul_right r u v hu hv ih =>
+      rw [map_zsmul, ← Int.cast_smul_eq_zsmul ℂ r (certainTypeExtension h v),
+        ← Int.cast_smul_eq_zsmul ℂ r v,
+        OddOrder.RepresentationTheory.inner_smul_right,
+        OddOrder.RepresentationTheory.inner_smul_right, ih]
+
 end OddOrder.Peterfalvi.S06
