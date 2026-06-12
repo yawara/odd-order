@@ -98,6 +98,16 @@ noncomputable def rowInv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     h.w1CharEquiv (rowInv h i) = (h.w1CharEquiv i)⁻¹ :=
   h.w1CharEquiv.apply_symm_apply _
 
+/-- `rowInv` is an **involution** (`(w1CharEquiv i)⁻¹` inverts), hence a permutation of the rows. -/
+theorem rowInv_rowInv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
+    rowInv h (rowInv h i) = i := by
+  simp only [rowInv, Equiv.apply_symm_apply, inv_inv, Equiv.symm_apply_apply]
+
+/-- The row-inversion **permutation** `i ↦ rowInv i` (an involution). -/
+noncomputable def rowInvEquiv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] :
+    Fin (Nat.card h.W1) ≃ Fin (Nat.card h.W1) :=
+  Function.Involutive.toPerm (rowInv h) (rowInv_rowInv h)
+
 /-- **The inverse grid character is a grid character at the conjugate index.**
 `(P_{ij})⁻¹ = P_{i'j'}` with column `j' = χ₂⁻¹` and row `i' = rowInv i`
 (`w1CharEquiv i' = (w1CharEquiv i)⁻¹`).  `omegaProdCharTic` is a composition of `omegaProdChar`
@@ -207,5 +217,25 @@ theorem certainType_mu_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     if_pos rfl, mul_zero, mul_one] at hI
   exact absurd hI.symm (by
     rcases (h.columnFamily χ₂⁻¹).sign_eq with he | he <;> rw [he] <;> norm_num)
+
+/-- **Peterfalvi (4.9)(a), `μ̄_j = μ_{j'}`** (column-sum form).  The complex conjugate of the
+certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}`
+(`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`
+(`certainType_mu_conj_eq`), and the row reindexing `i ↦ rowInv i` is a permutation (`rowInvEquiv`). -/
+theorem certainType_columnSum_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ))
+      = ∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) := by
+  rw [← ClassFunction.mapRingEquivLinear_apply, map_sum]
+  simp only [ClassFunction.mapRingEquivLinear_apply]
+  have hterm : ∀ i, ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+      ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      = ((h.columnFamily χ₂⁻¹).mu (rowInv h i) : ClassFunction ↥L ℂ) := fun i => by
+    rw [← IrreducibleCharacter.galoisMap_apply_coe, certainType_mu_conj_eq]
+  rw [Finset.sum_congr rfl (fun i _ => hterm i)]
+  exact Equiv.sum_comp (rowInvEquiv h)
+    (fun i => ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ))
 
 end OddOrder.Peterfalvi.S06

@@ -841,6 +841,10 @@ set_option linter.style.longLine false in
 -- with μ_{i'j'} gives δ_j·⟨μ_ij̄, μ_{i'j'}⟩ = δ_{j'} ≠ 0, so the (0/1) inner product of the two
 -- irreducibles is 1, forcing equality.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_mu_conj_eq
+-- (4.9)(a) `μ̄_j = μ_{j'}` (`certainType_columnSum_conj`): the conjugate of the column sum
+-- `μ_j = ∑_i μ_ij` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}` (`j' = χ₂⁻¹`).  mapRingEquiv conj is
+-- additive, each `μ_ij̄ = μ_{i'j'}`, and `i ↦ rowInv i` is a permutation (`rowInvEquiv`, involution).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_columnSum_conj
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
