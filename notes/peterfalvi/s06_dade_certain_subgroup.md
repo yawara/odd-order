@@ -2074,3 +2074,24 @@ INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1
     hψV (step4 移項), hNC: sigmaNC(ψ)≤4 (supp⊆supp(φ)∪{P_ij,P_ik}) < 2·min(w)≥6。
   - **final `certainType_diff_dade_eq`** = `apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero; [all-zero]`。
 正本=本 cont.⁷。**conclude+distinctness landed; 残=hnocol/hnorow/orientation/final (設計完備)。**
+
+## 2026-06-12 (session 33 cont.⁸, /loop): 🎉🎉🎉 (4.8) conclusion 3 COMPLETE — (4.8) 全結論 DONE
+**`certainType_diff_dade_eq` landed (commit 07908c46, full build 3787 + AxiomsCheck, axiom-clean)**:
+`(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ)` (要 χ₂≠χ₂'; FT-critical isometry 恒等式)。
+- 組立: `apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero` → ∀pq sigmaCoeff(ψ)=0 を:
+  hψV (step4 移項) + hadd (sigmaCoeff_add_eq 3.7) + hNC4 (≤4, supp⊆supp G∪{P_ij,P_ik}) +
+  orientation (w₁≠w₂ coprime+odd ⟹ w₁+2≤w₂ ∨ w₂+2≤w₁) で `grid_trichotomy` (direct on a / transposed on aᵀ) →
+  (b)(c) を `grid_no_constant_column`/`grid_no_constant_row` で排除 → 全0。
+- **abstract exclusion** (汎用 ι,κ): `grid_no_constant_column` (both-in-col⟹c=0 [g(P_ij)=c+s,g(P_ik)=c−s,
+  diff=2s=±2⟹{1,−1}⟹c=0] / ¬both⟹≥3 supp g 矛盾) + `grid_no_constant_row` (swap corollary)。helper `exists_two_ne_ne`。
+- gotchas (再調査不要): grid_trichotomy は `Nat.card` (not Fintype.card)・要 `import S05_GridTrichotomy`;
+  inner は left-linear/right-conj (`inner_smul_right`=star ↑ε, `star_intCast`); `open scoped Classical in` は
+  docstring の**前**; Prod.swap if 同定は `Prod.fst_swap/snd_swap+tauto`; defeq (ticVdiff.W1=tic.W1) は `exact` で。
+- **🎉 §6 (4.8) 全結論 (1)(2)(3) 完成** (sessions 30-33)。conclusion 3 は本 session の /loop で foundation→
+  step4→inputs(‖φ‖²=2,NC≤2,ω=chiFam,f∈{0,±1})→assembly を 13+ commits で完走。
+
+### ▶▶ 次 = (4.9) (Theorem (4.9), notes 上記 session 30 の (4.9) 転記参照)
+(4.9)(a): μ_j∈T⟹μ̄_j∈T∧μ̄_j≠μ_j; 0≠Z[T,L^#]=Z[T,A]。 (b): Z[T]→Z[Irr G], μ_j↦δ_k∑_iω_ij^σ は
+isometry で Z[T,A] 上 τ と一致。**(4.9)(b) は (4.8) conclusion 3 を使う** ((μ_j−μ_k)^τ=∑_i(μ_ij−μ_ik)^τ=
+δ_k∑_i(ω_ij^σ−ω_ik^σ))。⟹ (4.8) 完成で (4.9) unblocked。→ (4.9) → S08 case-B → (6.8)。
+正本=本 cont.⁸。**(4.8) DONE; 次 = (4.9)。**
