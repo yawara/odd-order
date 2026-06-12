@@ -525,6 +525,59 @@ theorem E_le_normalizer_sylow_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOd
     fun e he => Ch2.S08.mem_normalizer_fittingInG_of_mem he
   exact hE_NFE.trans hNFE_le
 
+/-- **BG Proposition 1.6(e)** (mmd L424): if `S` is an abelian `p`-group, `Q` acts coprimely
+on `S` (`Q ≤ N_G(S)`), and `Q` centralizes `Ω₁(S)` (all elements of `S` of order dividing `p`),
+then `Q` centralizes `S`. Via the coprime decomposition `S = C_S(Q) × [S, Q]`
+(`fitting_coprime_abelian_decomp`): if `[S, Q] ≠ 1` it is a nontrivial `p`-subgroup of `S`, so
+it contains an order-`p` element, which lies in `Ω₁(S) ⊆ C_S(Q)`, contradicting
+`C_S(Q) ⊓ [S, Q] = 1`. -/
+theorem centralizer_le_of_omega1_le_centralizer [Finite G] {S Q : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hSab : IsMulCommutative ↥S) (hSp : IsPGroup p ↥S)
+    (hQN : Q ≤ Subgroup.normalizer (S : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥S) (Nat.card ↥Q))
+    (hO : (Omega ↥S p 1).map S.subtype ≤ Subgroup.centralizer (Q : Set G)) :
+    (S : Subgroup G) ≤ Subgroup.centralizer (Q : Set G) := by
+  classical
+  obtain ⟨hdisj, hsup⟩ :=
+    OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := S) (K := Q) hQN hcop
+  -- It suffices to show `[S, Q] = ⊥`, for then `S = C_S(Q) ⊆ C(Q)`.
+  have hcomm_le_S : (⁅(S : Subgroup G), Q⁆ : Subgroup G) ≤ S := le_sup_right.trans (le_of_eq hsup)
+  have hcomm_bot : (⁅(S : Subgroup G), Q⁆ : Subgroup G) = ⊥ := by
+    by_contra hne
+    haveI : Nontrivial ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hne
+    have hcomm_pg : IsPGroup p ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) := hSp.to_le hcomm_le_S
+    -- a nonidentity order-`p` element of `[S, Q]`
+    have hpdvd : p ∣ Nat.card ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) := by
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp hcomm_pg
+      have h1lt : 1 < Nat.card ↥(⁅(S : Subgroup G), Q⁆ : Subgroup G) := Finite.one_lt_card
+      have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+      rw [hk]; exact dvd_pow_self p hk0
+    obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card' p hpdvd
+    set x : G := (y : G) with hxdef
+    have hxC : x ∈ (⁅(S : Subgroup G), Q⁆ : Subgroup G) := y.2
+    have hyne : y ≠ 1 := by
+      intro h; rw [h, orderOf_one] at hy; exact (Fact.out : p.Prime).ne_one hy.symm
+    have hxne : x ≠ 1 := by rw [hxdef, Ne, OneMemClass.coe_eq_one]; exact hyne
+    have hyp : y ^ p = 1 := by rw [← hy]; exact pow_orderOf_eq_one y
+    have hxp : x ^ p = 1 := by
+      rw [hxdef, ← SubmonoidClass.coe_pow, hyp, OneMemClass.coe_one]
+    have hxS : x ∈ (S : Subgroup G) := hcomm_le_S hxC
+    have hsubpow : (⟨x, hxS⟩ : ↥(S : Subgroup G)) ^ p = 1 := by
+      apply Subtype.ext; rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]; exact hxp
+    -- `x ∈ Ω₁(S)`, hence `x ∈ C(Q)`.
+    have hxOmega : x ∈ (Omega ↥S p 1).map S.subtype :=
+      ⟨⟨x, hxS⟩, Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hsubpow), rfl⟩
+    have hxCQ : x ∈ Subgroup.centralizer (Q : Set G) := hO hxOmega
+    -- `x ∈ (C(Q) ⊓ S) ⊓ [S, Q] = ⊥`.
+    have : x ∈ ((Subgroup.centralizer (Q : Set G) ⊓ S) ⊓ ⁅(S : Subgroup G), Q⁆ : Subgroup G) :=
+      Subgroup.mem_inf.mpr ⟨Subgroup.mem_inf.mpr ⟨hxCQ, hxS⟩, hxC⟩
+    rw [hdisj, Subgroup.mem_bot] at this
+    exact hxne this
+  rw [hcomm_bot, sup_bot_eq] at hsup
+  calc (S : Subgroup G) = Subgroup.centralizer (Q : Set G) ⊓ S := hsup.symm
+    _ ≤ Subgroup.centralizer (Q : Set G) := inf_le_left
+
 /-! ## Front-half (X existence): `Ω₁`-rank reasoning -/
 
 /-- In a finite cyclic `q`-group `C` (`q` odd), the order-`q` subgroup `Ω₁(C)` is contained in
@@ -601,5 +654,78 @@ theorem pRank_le_one_of_cyclic_quotient {Q : Type*} [Group Q] [Finite Q] {q : �
   have hlt2 : Nat.log q (Nat.card ↥B) < 2 :=
     Nat.log_lt_of_lt_pow' two_ne_zero (lt_of_le_of_lt hBle hq2)
   omega
+
+/-! ## Front-half (X existence): the `r_q = 2` side -/
+
+/-- Two Sylow `p`-subgroups, one normalizing the other, coincide: if `S ≤ N_G(P)` with `P`, `S`
+both Sylow `p`-subgroups of `G`, then `S = P`. Indeed `P` is a normal (hence unique) Sylow
+`p`-subgroup of `N_G(P)`, so the `p`-subgroup `S ≤ N_G(P)` lands inside it, and equal orders
+force equality. -/
+theorem sylow_eq_of_le_normalizer {p : ℕ} [Fact p.Prime] [Finite G]
+    (P S : Sylow p G) (hSle : (S : Subgroup G) ≤ Subgroup.normalizer ((P : Subgroup G) : Set G)) :
+    (S : Subgroup G) = (P : Subgroup G) := by
+  classical
+  have hPN : (P : Subgroup G) ≤ Subgroup.normalizer ((P : Subgroup G) : Set G) :=
+    Subgroup.le_normalizer
+  haveI : Unique (Sylow p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
+    Sylow.unique_of_normal (P.subtype hPN) (by
+      rw [Sylow.coe_subtype]; exact Subgroup.normal_in_normalizer)
+  have heq : S.subtype hSle = P.subtype hPN := Subsingleton.elim _ _
+  have hcoe : (S : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))
+      = (P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G)) := by
+    have h : ((S.subtype hSle : Sylow p ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))) :
+          Subgroup ↥(Subgroup.normalizer ((P : Subgroup G) : Set G)))
+        = (P.subtype hPN : Subgroup ↥(Subgroup.normalizer ((P : Subgroup G) : Set G))) := by
+      rw [heq]
+    rwa [Sylow.coe_subtype, Sylow.coe_subtype] at h
+  calc (S : Subgroup G)
+      = Subgroup.map (Subgroup.normalizer ((P : Subgroup G) : Set G)).subtype
+          ((S : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))) :=
+        (Subgroup.map_subgroupOf_eq_of_le hSle).symm
+    _ = Subgroup.map (Subgroup.normalizer ((P : Subgroup G) : Set G)).subtype
+          ((P : Subgroup G).subgroupOf (Subgroup.normalizer ((P : Subgroup G) : Set G))) := by
+        rw [hcoe]
+    _ = (P : Subgroup G) := Subgroup.map_subgroupOf_eq_of_le hPN
+
+/-- **Theorem 12.12, Case 3, the `r_q = 2` side** (BG L3364): in the abelian-Sylow regime, if
+`q ∣ [E : C_E(A)]` and `q ∣ |C_E(A)|`, then `r_q(N_G(S)) = 2`. By Lemma 12.11(c) the maximal
+`M* ∈ ℳ(N_G(A))` has `q ∈ τ₂(M*)` and contains a Sylow `p`-subgroup `P` of `G` normal in `M*`.
+Since `S ≤ N_G(S) = N_G(A) ≤ M* ≤ N_G(P)` and both `S, P` are Sylow `p`-subgroups, `S = P`, hence
+`M* ≤ N_G(S)`; with `N_G(S) ≤ M*` this gives `M* = N_G(S)`, so
+`pRank (N_G(S)) q = pRank M* q = 2`. -/
+theorem pRank_normalizer_eq_two_of_index_card [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSab : IsMulCommutative ↥(S : Subgroup G))
+    {q : ℕ}
+    (hqi : q ∈ (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors)
+    (hqc : q ∈ (Nat.card ↥(E ⊓ Subgroup.centralizer (A : Set G))).primeFactors) :
+    pRank ↥(Subgroup.normalizer ((S : Subgroup G) : Set G)) q = 2 := by
+  classical
+  have hAM : A ≤ M := hAE.trans h.E_le
+  have hAne : A ≠ ⊥ := by
+    intro hbot; have hcard := hA.2
+    rw [hbot, Subgroup.card_bot] at hcard
+    exact (Nat.one_lt_pow two_ne_zero (Fact.out : p.Prime).one_lt).ne' hcard.symm
+  -- `N_G(A) = N_G(S)` (Lemma 12.8(d)).
+  have hNAS : Subgroup.normalizer (A : Set G) = Subgroup.normalizer ((S : Subgroup G) : Set G) :=
+    (normalizer_chain_of_abelianSylow hG h hp hA hAE hAS hSab).1
+  -- choose `M* ∈ ℳ(N_G(A))`.
+  obtain ⟨Mstar, hco, hle⟩ := (eq_top_or_exists_le_coatom _).resolve_left
+    (normalizer_lt_top_of_le_of_ne_bot hG h.mem_maximal hAM hAne).ne
+  have hMstar_mem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (A : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨hco, hle⟩
+  -- Lemma 12.11(c).
+  obtain ⟨hqτ₂, ⟨P, hP_norm⟩, -⟩ :=
+    (tau2_transfer_to_maximal hG h hp hA hAE hMstar_mem).2.2 q hqi hqc
+  -- `S ≤ M* ≤ N_G(P)`, so `S = P`.
+  have hSMstar : (S : Subgroup G) ≤ Mstar :=
+    (hNAS ▸ (Subgroup.le_normalizer : (S : Subgroup G) ≤ _)).trans hle
+  have hSeqP : (S : Subgroup G) = (P : Subgroup G) :=
+    sylow_eq_of_le_normalizer P S (hSMstar.trans hP_norm)
+  -- `M* = N_G(S)`.
+  have hMstar_eq : Mstar = Subgroup.normalizer ((S : Subgroup G) : Set G) :=
+    le_antisymm (by rw [hSeqP]; exact hP_norm) (hNAS ▸ hle)
+  rw [← hMstar_eq]; exact tau2_pRank_eq_two hqτ₂
 
 end OddOrder.BG.Ch3.S12
