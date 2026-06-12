@@ -50,4 +50,19 @@ theorem fourcorner_signedDiff_eq_induce (h : Hypothesis46 A L) [NeZero (Nat.card
   simp only [← h.sdiffTICyclicHypothesis.induceLinear_apply]
   rw [← map_sub]
 
+/-- **Pointwise value of the grid character** `ω_{ij}(w) = (w1CharEquiv i)(wFst w)·χ₂(wSnd w)`.
+The `change` step unfolds `omegaProdChar` definitionally — bypassing the `sdiff`/`h` `1`-type
+mismatch that defeats `simp` on `(1 : _ →* ℂˣ)(x)`; `Units.val_mul` splits the product.  This is
+the value tool for the (4.10) support proof (`Supp(four-corner) ⊂ V`). -/
+theorem chiColumn_apply_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    (w : ↥h.sdiffTICyclicHypothesis.W) :
+    (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) w
+      = ((h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w) : ℂ)
+        * (χ₂ (h.sdiffTICyclicHypothesis.wSnd w) : ℂ) := by
+  rw [Hypothesis.chiColumn, h.sdiffTICyclicHypothesis.omega_apply]
+  change (((h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w)
+      * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) : ℂˣ) : ℂ) = _
+  rw [Units.val_mul]
+
 end OddOrder.Peterfalvi.S06

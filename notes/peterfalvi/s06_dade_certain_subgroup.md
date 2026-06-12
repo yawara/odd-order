@@ -2423,3 +2423,54 @@ in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 con
 (c) value-on-V (mirror 4.8 step-4, `sigma_eq_tau` for RHS) → (d) off-V^G vanishing 両辺 → (e) assembly
 (`ClassFunction.ext` + V^G class-fn 論法)。**~3-5 commits, §4 Dade-support 機構の deep dive だが trichotomy 不要**。
 **正本=本 session 37 cont.⁴。次 = (4.10) piece (a) から coding。**
+
+## 2026-06-13 (session 37 cont.⁵, /loop): (4.10) piece (a) landed; piece (b1) STOP — W-coord `1` 罠
+
+✅ **piece (a) `fourcorner_signedDiff_eq_induce`** landed (`fa5a578e`, S06_CertainTypeFourCorner, axiom-clean,
+full build 3795): `δ_j(μ_ij−μ_0j) − δ_0(μ_i0−μ_00) = Ind_W^L(sdiff 4-corner)` via columnFamily_spec +
+`h.isometryDifferenceImage_induceZ` (← **Hypothesis method, dot 修飾必須**) + induceLinear/map_sub
+(induce_sub 無)。
+
+🛑 **piece (b1) `chiColumn 4-corner = alphaCF` STOP (~8 試行、真の W-coord 罠)**: 目標
+`(chiColumn χ₂ i − chiColumn χ₂ 0 − (chiColumn 1 i − chiColumn 1 0)) = sdiff.alphaCF (w1CharEquiv i) χ₂`。
+pointwise (alphaCF_apply+omega_apply+omegaProdChar+ring) も omega-combination (abel) も**同じ箇所で詰む**:
+**`(1 : M →* ℂˣ)(x) = 1` の simp が発火しない** (`MonoidHom.one_apply` も `MonoidHom.one_comp` も unused、
+full simp も不可)。**根本原因**: chiColumn の χ₂=1 列 / w1CharEquiv 0=1 行で出る `1` の domain は
+`h.W2.subgroupOf (h.W1⊔h.W2)` 系だが、適用先 arg は `sdiff.W2sub` 系 — **defeq だが非 syntactic** ゆえ
+one_apply/one_comp の単一化が失敗 (sdiff vs h の W-coord 罠、memory 既出)。goal は `↑(1(wSnd w))`/
+`↑(1(wFst w))` が atom 残留で ring 不可 (これらが 1 になれば閉じる: 両辺 (1−a)(1−b))。
+
+### ▶▶ 次 = (4.10) piece (b) 別ルート (session 38; W-coord 回避)
+1. **`1`型整合の workaround**: (a) chiColumn 1-列の `1` を `change`/`convert` で sdiff 型に揃える、
+   (b) `omegaProdChar_one_left/right/one` を CF レベルで先に適用し pointwise の `(1)(x)` を回避
+   (omega(1) は line 666 (S05_TICyclic) パターンで one_apply 可)、(c) chiColumn の coe を ascription。
+2. **alphaCF 経由を捨てる別 support 証明**: sdiff 4-corner が sdiff.V 上 support を直接
+   (W₁∪W₂ で消失、`alphaCF_eq_zero_of_mem_W1/W2_subgroupOf` 流の omega 値計算)。
+3. piece (b) 完了後: (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁵。(4.10) piece (a) DONE; piece (b1) は W-coord `1` 罠で STOP、別ルート要。**
+
+## 2026-06-13 (session 37 cont.⁶, /loop): (4.10) — W-coord `1` 解決、chiColumn_apply_eq landed; alphaCF-match は coercion 残留 → route 2 へ
+
+✅ **W-coord `1` 罠 解決済**: `MonoidHom.one_apply` が `(1: _→*ℂˣ)(x)` で発火しないのは sdiff/h の `1`-domain
+非 syntactic ゆえ。**fix = `change` で omegaProdChar を defeq 展開 + explicit-domain `hone : (1:(h.W2.subgroupOf
+(h.W1⊔h.W2))→*ℂˣ)(wSnd w)=1 := MonoidHom.one_apply _`**。
+✅ **`chiColumn_apply_eq` landed** (`f83d9bc4`, build 3598, axiom-clean): `ω_ij(w)=↑((w1Eq i)(wFst w))·↑(χ₂(wSnd w))`
+(chiColumn unfold + omega_apply + `change`(omegaProdChar 展開) + Units.val_mul)。**(4.10) support の value 道具**。
+
+🛑 **`chiColumn_fourcorner_eq_alphaCF` (piece b1) は coercion 残留で STOP** (~14 試行): pointwise で
+hone1/hone2+chiColumn_apply_eq 適用後、goal は **表示上 `1−X+XY−Y = 1−X+XY−Y` (完全一致表示) なのに
+ring/rfl/push_cast/norm_cast/set 全滅**。原因 = LHS の atom (chiColumn_apply_eq 由来) と RHS の atom
+(alphaCF_apply 由来) が **表示同一だが別 term** (coercion instance か elaboration 差)。**2 lemma の coercion 不整合**。
+
+### ▶▶ 次 = (4.10) piece (b) **route 2 (alphaCF 回避)** (session 38)
+alphaCF-match を捨て、**`Supp(sdiff 4-corner) ⊂ sdiff.V` を直接** (vanish on W₁∪W₂, **全て chiColumn_apply_eq
+由来ゆえ coercion 不整合なし**):
+- w∈W₂ (`wFst w = 1` by `wFst_eq_one_of_mem_W2`): 各 chiColumn = ↑(1)·↑(χ(wSnd w))=↑(χ(wSnd w))、4-corner=0。
+- w∈W₁ (`wSnd w = 1` by `wSnd_eq_one_of_mem_W1`): 対称、4-corner=0。
+- `(w1Eq i)(1)=1`/`χ₂(1)=1` は `map_one`。`supportedSubmodule` 帰属で Supp⊂sdiff.V。
+- 必要なら fourcorner_signedDiff_eq_induce(piece a)で `signedDiff 4-corner = Ind(sdiff 4-corner)` →
+  `Supp(Ind) ⊂ (sdiff.V)^L ⊂ A₀` (induce support + sdiff.V⊂tic.V)。
+- **代替 (もし coercion を直したい)**: pp.all で LHS/RHS atom 差を特定 → chiColumn_apply_eq の coercion を
+  alphaCF_apply と一致させる。だが route 2 が安全。
+→ piece (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁶。chiColumn_apply_eq DONE; alphaCF-match は coercion で STOP、route 2 推奨。**
