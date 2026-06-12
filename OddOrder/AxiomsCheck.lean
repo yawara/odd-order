@@ -782,6 +782,11 @@ set_option linter.style.longLine false in
 -- then ψ = 0, i.e. (μ_ij − μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ).  ⟨ψ,ω_ij^σ⟩=0 pins ⟨φ,ω_ij^σ⟩=δ_j,
 -- ⟨φ,ω_ik^σ⟩=−δ_j; then ‖ψ‖² = ⟨ψ,φ⟩ = 2 − 2 = 0 by positive-definiteness.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq_of_all_sigmaCoeff_zero
+-- Peterfalvi (4.8), conclusion (3) — the FT-critical isometry identity:
+-- (μ_ij − μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ).  ψ vanishes on V (step 4) ⟹ separable σ-grid with
+-- NC ≤ 4 < 2·min(w₁,w₂); the (3.8) trichotomy (in the orientation given by coprimality of w₁,w₂)
+-- leaves only all-zero (constant column/row excluded by grid_no_constant_column/row), whence ψ = 0.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the

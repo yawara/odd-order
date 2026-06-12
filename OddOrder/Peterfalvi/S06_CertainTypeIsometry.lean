@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
+import OddOrder.Peterfalvi.S05_GridTrichotomy
 
 /-!
 # Peterfalvi (4.8): equal-degree certain-type differences are σ-isometric
@@ -759,5 +760,146 @@ private theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Fintype κ
         fun h => hOffj (congrArg Prod.snd h.symm), rfl⟩
     have := Set.ncard_le_ncard hsub (Set.toFinite _)
     rw [hcard3] at this; omega
+
+open scoped Classical in
+/-- The row analogue of `grid_no_constant_column` (no constant nonzero full row), obtained by
+applying the column statement to the transposed grid. -/
+private theorem grid_no_constant_row {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (h3 : 3 ≤ Fintype.card κ) (G : ι × κ → ℂ)
+    (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
+    (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
+    (ha : ∀ x, a x = G x - s * ((if P = x then (1 : ℂ) else 0) - (if Q = x then (1 : ℂ) else 0)))
+    {i₀ : ι} {c : ℂ} (hc : c ≠ 0) (hrow : ∀ j, a (i₀, j) = c)
+    (hoff : ∀ i j, i ≠ i₀ → a (i, j) = 0) : False := by
+  have hswapG : {x : κ × ι | G (x.2, x.1) ≠ 0}.ncard ≤ 2 :=
+    le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
+      (Prod.swap_injective.injOn) (Set.toFinite _)) hG2
+  have hflip : ∀ (R : ι × κ) (y : κ × ι), (Prod.swap R = y) ↔ (R = (y.2, y.1)) := fun R y => by
+    rw [Prod.ext_iff, Prod.ext_iff, Prod.fst_swap, Prod.snd_swap]; tauto
+  refine grid_no_constant_column h3 (fun x => G (x.2, x.1)) hswapG (fun x => hG01 _)
+    (Prod.swap P) (Prod.swap Q) (fun he => hPQ (Prod.swap_injective he)) hs
+    (fun x => a (x.2, x.1)) (fun x => ?_) hc (fun j => hrow j) (fun j i hi => hoff i j hi)
+  simp only [ha, hflip]
+
+/-- **Peterfalvi (4.8), conclusion (3)** (the FT-critical isometry identity).  For nontrivial
+distinct columns `χ₂ ≠ χ₂'` and equal degree `μ_{ij}(1) = μ_{ik}(1)`, the Dade image is
+`(μ_{ij} − μ_{ik})^τ = δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.
+
+`ψ := (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step (4)), so its `σ`-coefficient
+grid is additively separable (3.7) with `NC(ψ) ≤ 4 < 2·min(w₁, w₂)`.  As `w₁, w₂` are coprime odd
+(`≥ 3`), one of `w₁ + 2 ≤ w₂`, `w₂ + 2 ≤ w₁` holds; the (3.8) trichotomy `grid_trichotomy` (in that
+orientation) leaves all-zero, a constant column, or a constant row.  The latter two are impossible
+(`grid_no_constant_column` on the grid resp. its transpose), so all `σ`-coefficients vanish and
+`certainType_diff_dade_eq_of_all_sigmaCoeff_zero` gives `ψ = 0`. -/
+theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
+  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
+  apply certainType_diff_dade_eq_of_all_sigmaCoeff_zero h hχ hχ₂ hχ₂' i hdeg
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set ψ := φ - (h.columnFamily χ₂).sign •
+    (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) with hψ
+  set a : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+      ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ :=
+    fun pq => (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) ψ pq with ha
+  set G : ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+      ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ :=
+    fun pq => (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq with hG
+  set Pij := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) with hPij
+  set Pik := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) with hPik
+  have hPne : Pij ≠ Pik := omegaProdEquiv_symm_omegaProdCharTic_ne h hχ i
+  have hae : ∀ pq, a pq = G pq - ((h.columnFamily χ₂).sign : ℂ)
+      * ((if Pij = pq then (1 : ℂ) else 0) - (if Pik = pq then (1 : ℂ) else 0)) :=
+    fun pq => sigmaCoeff_psi_eq h χ₂ χ₂' i φ pq
+  have hG2 : {x | G x ≠ 0}.ncard ≤ 2 := sigmaNC_dade_le_two h hχ hχ₂ hχ₂' i hdeg
+  have hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1 :=
+    fun x => sigmaCoeff_dade_eq_zero_or_one h hχ hχ₂ hχ₂' i hdeg x
+  have hs : ((h.columnFamily χ₂).sign : ℂ) = 1 ∨ ((h.columnFamily χ₂).sign : ℂ) = -1 := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  -- ψ vanishes on V (step 4)
+  have hψV : ∀ v ∈ (ticVdiff h).V, ψ v = 0 := by
+    intro v hv
+    rw [hψ, ClassFunction.sub_apply, ClassFunction.zsmul_apply, ClassFunction.sub_apply,
+      certainType_diff_dade_apply_eq_of_mem_V h hχ₂ hχ₂' i hdeg hv, zsmul_eq_mul]
+    push_cast; ring
+  -- additive separability of `a` (3.7)
+  have hadd : ∀ p p' q q', a (p, q) + a (p', q') = a (p, q') + a (p', q) :=
+    fun p p' q q' => (ticVdiff h).sigmaCoeff_add_eq rfl (ticVdiffFullDadeApplication h) hψV p p' q q'
+  -- `NC(ψ) ≤ 4`
+  have hNC4 : {x | a x ≠ 0}.ncard ≤ 4 := by
+    have hsub : {x | a x ≠ 0} ⊆ {x | G x ≠ 0} ∪ {Pij, Pik} := by
+      intro x hx
+      by_contra hcon
+      simp only [Set.mem_union, Set.mem_setOf_eq, Set.mem_insert_iff, Set.mem_singleton_iff,
+        not_or, not_not] at hcon
+      exact hx (by rw [hae x, hcon.1, if_neg (Ne.symm hcon.2.1), if_neg (Ne.symm hcon.2.2)]; ring)
+    have hbpair : ({Pij, Pik} : Set _).ncard ≤ 2 :=
+      (Set.ncard_insert_le _ _).trans (by rw [Set.ncard_singleton])
+    calc {x | a x ≠ 0}.ncard ≤ ({x | G x ≠ 0} ∪ {Pij, Pik}).ncard :=
+          Set.ncard_le_ncard hsub (Set.finite_univ.subset (Set.subset_univ _))
+      _ ≤ {x | G x ≠ 0}.ncard + ({Pij, Pik} : Set _).ncard := Set.ncard_union_le _ _
+      _ ≤ 2 + 2 := add_le_add hG2 hbpair
+      _ = 4 := rfl
+  -- card facts: `card Ŵ₁ = w₁`, `card Ŵ₂ = w₂`, both `≥ 3`, coprime, odd ⟹ a gap holds
+  have hcard1 : Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) = Nat.card h.tic.W1 :=
+    (ticVdiff h).card_charGroup_subgroupOf (ticVdiff h).W1_le_W
+  have hcard2 : Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) = Nat.card h.tic.W2 :=
+    (ticVdiff h).card_charGroup_subgroupOf (ticVdiff h).W2_le_W
+  have h3w1 : 3 ≤ Nat.card h.tic.W1 := h.tic.three_le_card_W1
+  have h3w2 : 3 ≤ Nat.card h.tic.W2 := h.tic.three_le_card_W2
+  have hodd1 : Odd (Nat.card h.tic.W1) :=
+    h.tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le h.tic.W1_le_W)
+  have hodd2 : Odd (Nat.card h.tic.W2) :=
+    h.tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le h.tic.W2_le_W)
+  have hcop : Nat.Coprime (Nat.card h.tic.W1) (Nat.card h.tic.W2) := h.tic.W_card_coprime
+  have hwne : Nat.card h.tic.W1 ≠ Nat.card h.tic.W2 := by
+    intro he; rw [he, Nat.Coprime, Nat.gcd_self] at hcop; omega
+  -- orientation: put the smaller character group as the trichotomy's rows
+  rcases lt_or_gt_of_ne hwne with hlt | hgt
+  · -- `w₁ < w₂`: gap `card Ŵ₁ + 2 ≤ card Ŵ₂`, run `grid_trichotomy` on `a`
+    have hgap : Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) + 2
+        ≤ Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1, hcard2]; obtain ⟨k1, hk1⟩ := hodd1; obtain ⟨k2, hk2⟩ := hodd2; omega
+    have hNClt : {x | a x ≠ 0}.ncard
+        < 2 * Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1]; omega
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy a hadd hgap hNClt with hz | ⟨j₀, c, hc, h1, h2⟩ | ⟨i₀, c, hc, h1, h2⟩
+    · exact hz
+    · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+        hc h1 h2).elim
+    · exact (grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+        hc h1 h2).elim
+  · -- `w₂ < w₁`: transpose the grid so `Ŵ₂` is the rows
+    set aT : ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) ×
+        ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) → ℂ := fun x => a (x.2, x.1) with haT
+    have hgap : Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) + 2
+        ≤ Nat.card ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      rw [hcard1, hcard2]; obtain ⟨k1, hk1⟩ := hodd1; obtain ⟨k2, hk2⟩ := hodd2; omega
+    have haddT : ∀ q q' p p', aT (q, p) + aT (q', p') = aT (q, p') + aT (q', p) :=
+      fun q q' p p' => by simp only [haT]; linear_combination hadd p p' q q'
+    have hNCltT : {x | aT x ≠ 0}.ncard
+        < 2 * Nat.card ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := by
+      have h4 : {x | aT x ≠ 0}.ncard ≤ 4 :=
+        le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
+          (Prod.swap_injective.injOn) (Set.toFinite _)) hNC4
+      rw [hcard2]; omega
+    rcases OddOrder.Peterfalvi.S05.grid_trichotomy aT haddT hgap hNCltT with hz | ⟨p₀, c, hc, h1, h2⟩ | ⟨q₀, c, hc, h1, h2⟩
+    · intro pq; exact hz (pq.2, pq.1)
+    · exact (grid_no_constant_row (by rw [← Nat.card_eq_fintype_card, hcard2]; exact h3w2) G hG2 hG01 Pij Pik hPne hs a hae
+        hc (fun q => h1 q) (fun i j hi => h2 j i hi)).elim
+    · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
+        hc (fun p => h1 p) (fun i j hj => h2 j i hj)).elim
 
 end OddOrder.Peterfalvi.S06
