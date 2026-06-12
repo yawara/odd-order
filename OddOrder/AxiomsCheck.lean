@@ -779,6 +779,10 @@ set_option linter.style.longLine false in
 -- Peterfalvi (4.8), assembly: the σ-coefficient grid of `ψ = φ − δ_j(ω_ij^σ − ω_ik^σ)` is
 -- `⟨φ, χ_pq⟩ − δ_j([P_ij = pq] − [P_ik = pq])` (the δ-part hits exactly the two positions P_ij, P_ik).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaCoeff_psi_eq
+-- Peterfalvi (4.8), conclusion (3) from trichotomy case (a): if every σ-coefficient of ψ vanishes
+-- then ψ = 0, i.e. (μ_ij − μ_ik)^τ = δ_j(ω_ij^σ − ω_ik^σ).  ⟨ψ,ω_ij^σ⟩=0 pins ⟨φ,ω_ij^σ⟩=δ_j,
+-- ⟨φ,ω_ik^σ⟩=−δ_j; then ‖ψ‖² = ⟨ψ,φ⟩ = 2 − 2 = 0 by positive-definiteness.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_eq_of_all_sigmaCoeff_zero
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
