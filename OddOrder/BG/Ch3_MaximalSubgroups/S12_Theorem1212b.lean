@@ -492,6 +492,39 @@ theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalS
         (hexpdvd hS₁cyc hS₀cyc hS₁S hS₀S hle)
     · exact inf_centralizer_eq_bot_of_invariant_cyclic hG h hp hA hAE hAS hSM hS₁S hS₁ne hS₁inv
 
+/-! ## Front-half (X existence): setup -/
+
+/-- **Theorem 12.12, Case 3 setup**: in the abelian-Sylow regime `E ≤ N_G(S)`. By the Sylow chain
+(`sylow_chain_of_abelianSylow`) `S ≤ F(E)`, and `S` is the Sylow `p`-subgroup of the nilpotent
+`F(E)`, hence normal and characteristic in `F(E)`; since `E` normalizes its Fitting subgroup,
+`E ≤ N_G(F(E)) ≤ N_G(S)`. In particular every Sylow subgroup of `E` lies in `N_G(S)`. -/
+theorem E_le_normalizer_sylow_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSab : IsMulCommutative ↥(S : Subgroup G)) :
+    E ≤ Subgroup.normalizer ((S : Subgroup G) : Set G) := by
+  classical
+  have hchain := sylow_chain_of_abelianSylow hG h hp hA hAE hAS hSab
+  have hSFE : (S : Subgroup G) ≤ Ch2.S08.fittingInG E := hchain.1.trans hchain.2.1
+  haveI : Group.IsNilpotent ↥(Ch2.S08.fittingInG E) := Ch2.S08.fittingInG_isNilpotent E
+  set SF : Sylow p ↥(Ch2.S08.fittingInG E) := S.subtype hSFE with hSFdef
+  have hSF_norm : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Normal := by
+    have htfae := (isNilpotent_of_finite_tfae (G := ↥(Ch2.S08.fittingInG E))).out 0 3
+    exact htfae.mp inferInstance p ⟨Fact.out⟩ SF
+  haveI : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).Characteristic :=
+    Sylow.characteristic_of_normal SF hSF_norm
+  have hmap : (SF : Subgroup ↥(Ch2.S08.fittingInG E)).map (Ch2.S08.fittingInG E).subtype
+      = (S : Subgroup G) := by
+    rw [hSFdef, Sylow.coe_subtype, Subgroup.map_subgroupOf_eq_of_le hSFE]
+  have hNFE_le : Subgroup.normalizer ((Ch2.S08.fittingInG E : Subgroup G) : Set G) ≤
+      Subgroup.normalizer ((S : Subgroup G) : Set G) := by
+    have hchar := OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+      (K := Ch2.S08.fittingInG E) (W := (SF : Subgroup ↥(Ch2.S08.fittingInG E)))
+    rwa [hmap] at hchar
+  have hE_NFE : E ≤ Subgroup.normalizer ((Ch2.S08.fittingInG E : Subgroup G) : Set G) :=
+    fun e he => Ch2.S08.mem_normalizer_fittingInG_of_mem he
+  exact hE_NFE.trans hNFE_le
+
 /-! ## Front-half (X existence): `Ω₁`-rank reasoning -/
 
 /-- In a finite cyclic `q`-group `C` (`q` odd), the order-`q` subgroup `Ω₁(C)` is contained in
