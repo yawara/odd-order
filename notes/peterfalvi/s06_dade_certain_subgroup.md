@@ -2391,3 +2391,35 @@ agreement→field4→nonzero+capstone + notes×2)。**§5 (3.x) + §6 (4.1)-(4.9
 `σ(ω_ij)=δ_j μ_ij` + (4.8) step-4 engine (`certainType_diff_dade_apply_eq_of_mem_V` 等) を 4-corner
 combination に適用。(4.8) conclusion-3 (`certainType_diff_dade_eq`) の隣接 row+column 版。
 in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 cont.³。次 = (4.10)。**
+
+## 2026-06-13 (session 37 cont.⁴, /loop): (4.10) code-ready plan (ユーザー裁可: (4.10) で §6 完結)
+
+ユーザーが「(4.10) で §6 完結」を選択。RECON 完了、code-ready 計画:
+
+**(4.10) statement**: `(δ_j μ_ij − δ_j μ_0j − μ_i0 + μ_00)^τ = ω_ij^σ − ω_0j^σ − ω_i0^σ + ω_00^σ`
+(0≤i<w₁, 0≤j<w₂; τ=h.tau.toDadeMap, σ=certainTypeOmegaSigma)。
+
+**🔑 確定した reduction (再調査不要)**:
+- **W-side 4-corner α = alphaCF**: `alphaCF_eq_omega_combination` (S05_TICyclic:659) =
+  `(ticVdiff h).alphaCF χ₁ χ₂ = ω(1) − ω(χ₁∘wFst) − ω(χ₂∘wSnd) + ω((χ₁∘wFst)·(χ₂∘wSnd))`
+  = 1_W − ω_i0 − ω_0j + ω_ij。**Supp α ⊂ V** = `alphaCF_mem_supportedSubmodule` (S05_TICyclic:511, (3.4))。
+- **RHS = σ_G(α)**: `certainTypeOmegaSigma = (ticVdiff h).sigma rfl app (omega …)`、4-corner は
+  σ の線形性 + `alphaCF_eq_omega_combination` で `(ticVdiff h).sigma rfl app (alphaCF)`。
+- **🔑 `sigma_eq_tau` (S05_SigmaIsometry:1098)**: `hyp.sigma hVeq app (α:CF) = app.tau.toDadeMap α`
+  for `α : SupportedOnV ℂ hyp` ⟹ **σ_G(alphaCF) = (ticVdiff h).tau.toDadeMap (alphaCF-on-V)**。
+- **LHS = h.tau.toDadeMap (Ind_W^L alphaCF)**: β = δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00 = Ind_W^L alphaCF。
+  via (1.4) image `columnFamily_spec`/`isometryDifferenceImage_induceZ` (`Ind(ω_ij−ω_0j)=δ_j(μ_ij−μ_0j)`)
+  + col-0 (χ₂=1, δ_0=1 by (4.4))。
+
+**⟹ (4.10) = Dade-induction compatibility `h.tau.toDadeMap (Ind_W^L α) = (ticVdiff h).tau.toDadeMap α`**
+(α ∈ CF(W,V))。両辺 class function on G、V-vanishing 論法で証明 ((4.8) step-4
+`certainType_diff_dade_apply_eq_of_mem_V` の pattern):
+- v∈V: 両辺 = value (h.tau: `tau_toDadeMap_apply_of_mem` on A₀⊇V^L; ticVdiff.tau: V-value)。
+- g∉V^G: 両辺 vanish (h.tau: `map_eq_zero_of_not_mem_dadeSupport`, β supp⊂V^L⟹dade image supp⊂V^G;
+  ticVdiff.tau(α): α supp⊂V⟹ image supp⊂V^G)。
+- assembly: class-function invariance で V→V^G、それ以外 0。
+
+**piece 順**: (a) `β = Ind_W^L alphaCF` (1.4 image, col-0 δ_0=1) → (b) Supp β⊂A₀ (supported β 構成) →
+(c) value-on-V (mirror 4.8 step-4, `sigma_eq_tau` for RHS) → (d) off-V^G vanishing 両辺 → (e) assembly
+(`ClassFunction.ext` + V^G class-fn 論法)。**~3-5 commits, §4 Dade-support 機構の deep dive だが trichotomy 不要**。
+**正本=本 session 37 cont.⁴。次 = (4.10) piece (a) から coding。**
