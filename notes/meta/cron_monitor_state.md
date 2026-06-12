@@ -7,9 +7,19 @@
 
 - **新セッション開始時、前セッションの session-only cron は消滅していた** (CronList = "No scheduled jobs.")。
   session-only cron は Claude セッション終了で死ぬので、**セッションが切れたら必ず再作成が要る**。
-- **session-only cron 再作成成功**: job `11a96c38` (`2,17,32,47 * * * *`, 15分, F→B 自動合流 +
-  MERGE_HEAD ガード内蔵 + 合流時 push)。CronCreate は今回も出力を返し登録確認済み。
-  (旧 job: `297aecb0` → `d87f439a` → `a8824a71` は全てセッション終了で失効。現役は `11a96c38` のみ)
+- **現役 session-only cron = `a637e8ce`** (`2,17,32,47 * * * *`, 15分, F→B 自動合流 +
+  MERGE_HEAD ガード内蔵 + 合流時 push)。CronList で 1 本のみ確認済み。
+  (歴代 job: `297aecb0` → `d87f439a` → `a8824a71` → `11a96c38` → **`a637e8ce`**。前 4 つは失効)
+- **🚨 GOTCHA: `/model` 切替で session-only cron が消える (2026-06-12 15:xx 実害)**: `11a96c38` は
+  多数 tick を正常発火していたが、ユーザーが `/model` を 2 往復 (Fable5⇄Opus) した直後に CronList が
+  **空** ("No scheduled jobs.", output drop ではない) を返した。session-only cron は in-memory ゆえ
+  `/model` のセッション再初期化でクリアされる。**対策: `/model` 切替後は必ず CronList で生存確認し、
+  消えていれば即再作成**。気づかず放置すると監視が無音停止する。`11a96c38` → `a637e8ce` で再作成済み。
+- **⚠ コンパクト化で監視自身が混乱しうる**: 2026-06-12 15:xx、コンパクト化で可視文脈が `d4d712f8`
+  までに縮み、その後 (06-12 11:xx) の自分のマージ群 (Cor 12.10〜Thm 12.12, Pf (4.8)/(2.1)) と cron
+  `11a96c38` が「見覚えのない別セッションの仕事」に見え、並行セッションを誤疑した。**教訓: HEAD が
+  自分の可視履歴より先でも、まず「自分のコンパクト済み作業」を第一候補に**。git reflog の連続 merge は
+  単一監視の足跡。並行を疑う前にユーザーに確認。
 - **durable (scheduled-tasks) は未登録**: `list_scheduled_tasks` = 空。cloud 実行で worktree アクセス
   不明の懸念が未解消ゆえ当面 session-only で回す。真の away (セッション終了) 耐性が要るならユーザー判断で durable 化。
 - **この tick の合流実績 (2026-06-12 初回)**: F (bg-s12) 2 commits (Cor 12.10 COMPLETE + 新 leaf
