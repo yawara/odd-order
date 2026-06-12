@@ -50,6 +50,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4036,3 +4037,14 @@ via the canonical line `A₀` (Theorem 12.7) and its complement `E₀`. Uncondit
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_factorization_le_at_prime
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_nonabelianSylow
+
+/-! ### BG Theorem 12.12: Case 3 (abelian Sylow `p`) building blocks (`S12_Theorem1212b`)
+
+`sylow_maximal_in_M_of_le`: a Sylow `p`-subgroup of `G` inside `M` is also Sylow in `M`.
+`inf_centralizer_line_eq_bot_of_invariant` (key fact, BG L3345-3347): since `N_G(S) ⊄ M`, an
+`N_G(S)`-invariant line `L ≤ S` has `C_{M_σ}(L) = 1` (`L ≤ Ω₁(S) = A`, then Corollary 12.6(c)
+forces `N_G(L) ⊆ M ⊇ N_G(S)`, contradiction). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_maximal_in_M_of_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_line_eq_bot_of_invariant

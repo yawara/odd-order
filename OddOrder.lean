@@ -99,6 +99,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
