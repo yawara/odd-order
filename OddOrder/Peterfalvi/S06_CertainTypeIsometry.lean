@@ -902,4 +902,49 @@ theorem certainType_diff_dade_eq (h : Hypothesis46 A L)
     · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1) G hG2 hG01 Pij Pik hPne hs a hae
         hc (fun p => h1 p) (fun i j hj => h2 j i hj)).elim
 
+/-! ### Peterfalvi (4.9)(b): the summed isometry identity
+
+The column character `μ_j = ∑_{0 ≤ i < w₁} μ_{ij}` (`induce_restrict_certainType_eq`), so the
+difference `μ_j − μ_k = ∑_i (μ_{ij} − μ_{ik})` is supported on `A₀` (each summand is, by (4.8)
+conclusion 1).  Summing the per-row isometry (4.8) conclusion 3 (`certainType_diff_dade_eq`) over
+`i` gives the **summed isometry** `(μ_j − μ_k)^τ = δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`: the computation
+showing the (4.9)(b) map `μ_j ↦ δ_k ∑_i ω_{ij}^σ` agrees with the Dade isometry `τ` on the
+augmentation differences `μ_j − μ_k` that span `Z[T, A]`. -/
+
+/-- The certain-type Dade isometry `τ` (= `h.tau`) is additive over finite sums of supported class
+functions.  The abstract `h.tau.toDadeMap` agrees with the *constructed* Dade map
+`h.dade0.dadeMap` by the Peterfalvi (2.5) uniqueness `IsDadeMap.unique`, and the latter is the
+genuine `ℂ`-linear `dadeLinearMap`, hence commutes with `∑`. -/
+theorem tau_toDadeMap_sum (h : Hypothesis46 A L) {ι : Type*} (s : Finset ι)
+    (α : ι → OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L) :
+    h.tau.toDadeMap (∑ i ∈ s, α i) = ∑ i ∈ s, h.tau.toDadeMap (α i) := by
+  have hkey : h.tau.toDadeMap = h.dade0.dadeMap (k := ℂ) :=
+    OddOrder.Peterfalvi.S04.IsDadeMap.unique
+      h.tau.toDadeIsometryData.isDadeMap h.dade0.isDadeMap_dadeMap
+  rw [hkey]
+  simpa only [OddOrder.Peterfalvi.S04.Hypothesis.dadeLinearMap_apply]
+    using map_sum (h.dade0.dadeLinearMap (k := ℂ)) α s
+
+/-- **Peterfalvi (4.9)(b), the summed isometry identity.**  Summing the per-row isometry (4.8)
+conclusion 3 (`certainType_diff_dade_eq`) over `0 ≤ i < w₁`:
+`(μ_j − μ_k)^τ = δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`, where `μ_j − μ_k = ∑_i (μ_{ij} − μ_{ik})` is
+`∑ i, certainTypeDiffSupported`.  Together with `δ_j = δ_k` (conclusion 2) this is the (4.9)(b)
+agreement of the column map with `τ` on `Z[T, A]`.  Stated with the per-row degree equalities
+`μ_{ij}(1) = μ_{ik}(1)` (which, since every `μ_{ij}` in column `j` has degree `μ_{0j}(1)`, follow
+from the column-degree equality `μ_j(1) = μ_k(1)`). -/
+theorem certainType_diff_dade_sum_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+                = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdeg i))
+      = (h.columnFamily χ₂).sign •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  rw [tau_toDadeMap_sum, Finset.smul_sum]
+  exact Finset.sum_congr rfl fun i _ => certainType_diff_dade_eq h hχ hχ₂ hχ₂' i (hdeg i)
+
 end OddOrder.Peterfalvi.S06
