@@ -144,8 +144,14 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   `IsElementaryAbelian.pow_eq_one` で line 元の `g^p=1`; `p^1` は simp)。N_G(S)⊄M =
   `normalizer_sylow_le_normalizer_elemAb ….2`。**この lemma が両枝共通の payoff 接続点。**
   → (2) **cyclic-Z 正則性 bridge** (次): cyclic Z で `M_σ⊓C(Ω₁(Z))=⊥ ⟹ ∀a∈Z#,M_σ⊓C(a)=⊥`
-  (Ω₁(Z)≤⟨a⟩=cyclic 最小部分群 + `centralizer_le` + `centralizer_zpowers_eq_singleton`)。
-  ⚠ friction = cyclic 部分群の order-による包含 (|Ω₁|=p ∣ |⟨a⟩| ⟹ 包含) — cyclic 構造の小補題要。
+  (Ω₁(Z)≤⟨a⟩=cyclic 最小部分群 + `Subgroup.centralizer_le` + `centralizer_zpowers_eq_singleton`)。
+  ⚠ **friction 精査済 (mathlib に「cyclic で card 整除⟹包含」直接形なし)**: core = 補題
+  `line_le_zpowers_in_cyclic` (cyclic p-群 C, L≤C order p, a≠1 ⟹ L≤⟨a⟩) を generator 算術で
+  自前構築 (~30-40 行)。**利用可ツール**: `IsCyclic.exists_generator`, `orderOf_eq_card_of_forall_mem_zpowers`,
+  `orderOf_pow` (ord(g^n)=ord g/gcd), `Subgroup.le_zpowers_iff` (H≤⟨g⟩↔∃n,H=⟨g^n⟩、Cyclic/Basic:296),
+  `mem_zpowers_pow_iff` (g∈⟨g^k⟩↔gcd(k,ord g)=1)。**方針**: 元 x∈L (ord x∣p) を g^s と書き、
+  a=g^k、ord x=p⟹gcd(N,s)=p^{m-1}、a≠1⟹gcd(N,k)=p^i (i<m)、p^i∣p^{m-1}∣s ⟹ x∈⟨a⟩ (gcd(N,k)∣s)。
+  abstract cyclic group `C` で書いて ↥Z へ適用 (ambient G 回避)。
   → (3) **C_E(S)≠E 主枝** (coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + φ̄ quotient
   作用 Prop3.9 矛盾で X 存在 + 12.8(f) で S₀,S₁⊴N_G(S) + isCyclic_of_pRank_le_one + key fact +
   bridge) → (4) C_E(S)=E 枝 (要 (i) generic 分解) → (5) Z_p 集約 + E₀ → (6) `frobFact_of_abelianSylow`
