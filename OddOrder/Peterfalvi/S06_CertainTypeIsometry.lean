@@ -603,4 +603,81 @@ theorem omegaProdEquiv_symm_omegaProdCharTic_ne (h : Hypothesis46 A L) [NeZero (
       ≠ (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) :=
   fun heq => omegaProdCharTic_ne h hχ i ((ticVdiff h).omegaProdEquiv.symm.injective heq)
 
+/-- **Peterfalvi (4.8), conclusion (3) from case (a).**  If every `σ`-coefficient of
+`ψ = (μ_{ij} − μ_{ik})^τ − δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes, then `ψ = 0`, i.e.
+`(μ_{ij} − μ_{ik})^τ = δ_j(ω_{ij}^σ − ω_{ik}^σ)`.
+
+`⟨ψ, ω_{ij}^σ⟩ = ⟨ψ, χ_{P_{ij}}⟩ = 0` (hypothesis) and the (4.8.1)-expansion `sigmaCoeff_psi_eq`
+pin `⟨φ, ω_{ij}^σ⟩ = δ_j`, `⟨φ, ω_{ik}^σ⟩ = −δ_j` (with `P_{ij} ≠ P_{ik}`); then
+`‖ψ‖² = ⟨ψ, φ⟩ = ‖φ‖² − δ_j·2δ_j = 2 − 2 = 0` (`‖φ‖² = 2`, `χ`-orthonormality), so `ψ = 0`. -/
+theorem certainType_diff_dade_eq_of_all_sigmaCoeff_zero (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+    (hall : ∀ pq, (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
+        (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+          - (h.columnFamily χ₂).sign •
+            (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i)) pq = 0) :
+    h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)
+      = (h.columnFamily χ₂).sign • (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  classical
+  set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφ
+  set ωij := certainTypeOmegaSigma h χ₂ i with hωij
+  set ωik := certainTypeOmegaSigma h χ₂' i with hωik
+  set s : ℤ := (h.columnFamily χ₂).sign with hsdef
+  set ψ := φ - s • (ωij - ωik) with hψ
+  set Pij := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i) with hPij
+  set Pik := (ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂' i) with hPik
+  have hPne : Pij ≠ Pik := omegaProdEquiv_symm_omegaProdCharTic_ne h hχ i
+  have hωijeq : ωij = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) Pij :=
+    certainTypeOmegaSigma_eq_chiFam h χ₂ i
+  have hωikeq : ωik = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) Pik :=
+    certainTypeOmegaSigma_eq_chiFam h χ₂' i
+  -- `⟨φ, ω_ij^σ⟩ = s`, `⟨φ, ω_ik^σ⟩ = −s` from `hall` + the expansion
+  have hcij : ClassFunction.inner φ ωij = (s : ℂ) := by
+    have he := hall Pij
+    rw [sigmaCoeff_psi_eq, if_pos rfl, if_neg (Ne.symm hPne)] at he
+    rw [hωijeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pij = _
+    linear_combination he
+  have hcik : ClassFunction.inner φ ωik = -(s : ℂ) := by
+    have he := hall Pik
+    rw [sigmaCoeff_psi_eq, if_neg hPne, if_pos rfl] at he
+    rw [hωikeq]; show (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ Pik = _
+    linear_combination he
+  -- orthonormality of `ω_ij^σ, ω_ik^σ` and `‖φ‖² = 2`
+  have hnorm : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
+  have hii : ClassFunction.inner ωij ωij = 1 := by
+    rw [hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+  have hkk : ClassFunction.inner ωik ωik = 1 := by
+    rw [hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl]
+  have hik : ClassFunction.inner ωij ωik = 0 := by
+    rw [hωijeq, hωikeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      if_neg hPne]
+  have hki : ClassFunction.inner ωik ωij = 0 := by
+    rw [hωikeq, hωijeq, ((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1,
+      if_neg (Ne.symm hPne)]
+  -- conjugate-symmetric partners `⟨ω_ij^σ, φ⟩ = s`, `⟨ω_ik^σ, φ⟩ = −s`
+  have hcji : ClassFunction.inner ωij φ = (s : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcij, star_intCast]
+  have hcki : ClassFunction.inner ωik φ = -(s : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcik, star_neg, star_intCast]
+  -- `s² = 1`
+  have hsq : (s : ℂ) * (s : ℂ) = 1 := by
+    rcases (h.columnFamily χ₂).sign_eq with hsv | hsv <;> rw [hsdef, hsv] <;> norm_num
+  -- `⟨ψ, ψ⟩ = 0`
+  have hself : ClassFunction.inner ψ ψ = 0 := by
+    rw [hψ]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ← Int.cast_smul_eq_zsmul ℂ s, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hnorm, hcij, hcik, hcji, hcki, hii, hkk,
+      hik, hki, star_intCast]
+    linear_combination (-2 : ℂ) * hsq
+  have := eq_zero_of_inner_self_re_eq_zero (G := G) (φ := ψ) (by rw [hself]; simp)
+  rw [hψ, sub_eq_zero] at this
+  exact this
+
 end OddOrder.Peterfalvi.S06
