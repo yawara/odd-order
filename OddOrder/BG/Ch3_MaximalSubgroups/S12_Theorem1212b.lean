@@ -23,6 +23,7 @@ namespace OddOrder.BG.Ch3.S12
 
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
+open OddOrder.Isaacs.Ch06
 open scoped Pointwise
 
 variable {G : Type*} [Group G]
@@ -86,5 +87,162 @@ theorem inf_centralizer_line_eq_bot_of_invariant [Finite G] (hG : IsMinimalSimpl
     rw [hsingle, Set.mem_singleton_iff] at hmem
     exact hmem ▸ hle
   exact hNS_not_le (hLinv.trans hNL_le_M)
+
+/-! ## Cyclic `p`-group: the order-`p` subgroup is the unique minimal one -/
+
+/-- In a finite cyclic `p`-group, a subgroup `L` of order `p` is contained in `⟨a⟩` for every
+nonidentity `a` (it is the unique minimal subgroup `Ω₁`). Working in a generator `g`: writing
+`a = g^k`, `x = g^s` for `x ∈ L`, one has `gcd(N,k)·ord(a) = N = gcd(N,s)·p`, so `p ∣ ord(a)`
+(`a` a nonidentity `p`-element) gives `gcd(N,k) ∣ gcd(N,s) ∣ s`, whence `x = g^s ∈ ⟨g^k⟩ = ⟨a⟩`
+by Bézout. -/
+theorem line_le_zpowers_in_cyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {p : ℕ} [Fact p.Prime] (hCp : IsPGroup p C) {L : Subgroup C} (hLcard : Nat.card ↥L = p)
+    {a : C} (ha1 : a ≠ 1) : L ≤ Subgroup.zpowers a := by
+  classical
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
+  obtain ⟨ka, hka⟩ : ∃ ka : ℕ, g ^ ka = a :=
+    (Submonoid.mem_powers_iff a g).mp (mem_powers_iff_mem_zpowers.mpr (hg a))
+  -- `p ∣ orderOf a` (a nonidentity `p`-element).
+  have hpa : p ∣ orderOf a := by
+    obtain ⟨n, hn⟩ := hCp a
+    obtain ⟨i, _, hi⟩ := (Nat.dvd_prime_pow Fact.out).mp (orderOf_dvd_of_pow_eq_one hn)
+    rcases Nat.eq_zero_or_pos i with rfl | hipos
+    · rw [pow_zero] at hi; exact absurd (orderOf_eq_one_iff.mp hi) ha1
+    · rw [hi]; exact dvd_pow_self p hipos.ne'
+  intro x hxL
+  rcases eq_or_ne x 1 with rfl | hx1
+  · exact one_mem _
+  obtain ⟨sx, hsx⟩ : ∃ sx : ℕ, g ^ sx = x :=
+    (Submonoid.mem_powers_iff x g).mp (mem_powers_iff_mem_zpowers.mpr (hg x))
+  -- `orderOf x = p`.
+  have hxord : orderOf x = p := by
+    have h1 : orderOf x ∣ p := by
+      have h2 : orderOf (⟨x, hxL⟩ : ↥L) ∣ Nat.card ↥L := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk, hLcard] at h2
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hx1
+    · exact h
+  -- `gcd(N,ka) ∣ sx`, where `N = orderOf g`.
+  have hga : Nat.gcd (orderOf g) ka ∣ orderOf g := Nat.gcd_dvd_left _ _
+  have hgs : Nat.gcd (orderOf g) sx ∣ orderOf g := Nat.gcd_dvd_left _ _
+  have ea : Nat.gcd (orderOf g) ka * orderOf a = orderOf g := by
+    rw [← hka, orderOf_pow]; exact Nat.mul_div_cancel' hga
+  have ex : Nat.gcd (orderOf g) sx * p = orderOf g := by
+    rw [← hxord, ← hsx, orderOf_pow]; exact Nat.mul_div_cancel' hgs
+  obtain ⟨t, ht⟩ := hpa
+  have hcancel : Nat.gcd (orderOf g) ka * t = Nat.gcd (orderOf g) sx := by
+    have heq : Nat.gcd (orderOf g) ka * t * p = Nat.gcd (orderOf g) sx * p := by
+      rw [mul_assoc, mul_comm t p, ← ht, ea, ex]
+    exact Nat.eq_of_mul_eq_mul_right (Fact.out : p.Prime).pos heq
+  have hdvd : Nat.gcd (orderOf g) ka ∣ sx := by
+    have h1 : Nat.gcd (orderOf g) ka ∣ Nat.gcd (orderOf g) sx := ⟨t, hcancel.symm⟩
+    exact dvd_trans h1 (Nat.gcd_dvd_right (orderOf g) sx)
+  -- `x = g^sx ∈ ⟨g^ka⟩ = ⟨a⟩` via Bézout.
+  rw [← hsx, ← hka, Subgroup.mem_zpowers_iff]
+  obtain ⟨w, hw⟩ := hdvd
+  refine ⟨Int.gcdA ka (orderOf g) * w, ?_⟩
+  have hbez : (Nat.gcd ka (orderOf g) : ℤ)
+      = (ka : ℤ) * Int.gcdA ka (orderOf g) + (orderOf g : ℤ) * Int.gcdB ka (orderOf g) :=
+    Int.gcd_eq_gcd_ab ka (orderOf g)
+  rw [← zpow_natCast g ka, ← zpow_mul, ← zpow_natCast g sx, zpow_eq_zpow_iff_modEq,
+    Int.modEq_iff_dvd]
+  have hrw : (sx : ℤ) - (ka : ℤ) * (Int.gcdA ka (orderOf g) * w)
+      = (orderOf g : ℤ) * (Int.gcdB ka (orderOf g) * w) := by
+    have hsxz : (sx : ℤ) = (Nat.gcd ka (orderOf g) : ℤ) * (w : ℤ) := by
+      rw [Nat.gcd_comm]; exact_mod_cast hw
+    rw [hsxz, hbez]; ring
+  rw [hrw]
+  exact dvd_mul_right _ _
+
+/-- **Regularity transfer from the line to the whole cyclic group**: if `N` meets the centralizer
+of an order-`p` line `L ≤ Z` (cyclic `p`-group) trivially, then it meets `C_G(a)` trivially for
+every `a ∈ Z#`. Each such `a` has `L ≤ ⟨a⟩` (unique minimal subgroup), so `C_G(a) ≤ C_G(L)`. -/
+theorem inf_centralizer_eq_bot_of_line_le_cyclic [Finite G] {Z L N : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hZp : IsPGroup p ↥Z) [IsCyclic ↥Z] (hLZ : L ≤ Z) (hLcard : Nat.card ↥L = p)
+    (hNL : N ⊓ Subgroup.centralizer (L : Set G) = ⊥) :
+    ∀ a ∈ Z, a ≠ 1 → N ⊓ Subgroup.centralizer ({a} : Set G) = ⊥ := by
+  intro a ha ha1
+  -- `L ≤ ⟨a⟩` via the unique-minimal-subgroup lemma, transported from `↥Z` to `G`.
+  have hLza : L ≤ Subgroup.zpowers a := by
+    have hcard' : Nat.card ↥(L.subgroupOf Z) = p := by
+      rw [← hLcard]; exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLZ).toEquiv
+    have hane : (⟨a, ha⟩ : ↥Z) ≠ 1 := by
+      intro hcon; exact ha1 (by simpa using congrArg Subtype.val hcon)
+    have key := line_le_zpowers_in_cyclic (C := ↥Z) hZp hcard' hane
+    have h1 := Subgroup.map_mono (f := Z.subtype) key
+    rwa [Subgroup.map_subgroupOf_eq_of_le hLZ, MonoidHom.map_zpowers] at h1
+  -- `C_G(a) = C_G(⟨a⟩) ≤ C_G(L)`.
+  have hCle : Subgroup.centralizer ({a} : Set G) ≤ Subgroup.centralizer (L : Set G) := by
+    rw [← centralizer_zpowers_eq_singleton]
+    exact Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLza)
+  rw [← le_bot_iff, ← hNL]
+  exact le_inf inf_le_left (inf_le_right.trans hCle)
+
+/-! ## φ̄ quotient action: a `q`-group `Q ≤ N_G(S)` acting FPF mod `C_Q(S)` on `S` ⟹ cyclic -/
+
+/-- The conjugation action homomorphism `↥Q →* MulAut ↥S` of a subgroup `Q ≤ N_G(S)` on `S`
+(restriction of `Subgroup.normalizerMonoidHom S` along `Q ↪ N_G(S)`). -/
+def conjActionHom {S Q : Subgroup G} (hQN : Q ≤ Subgroup.normalizer (S : Set G)) :
+    ↥Q →* MulAut ↥S :=
+  (Subgroup.normalizerMonoidHom S).comp (Subgroup.inclusion hQN)
+
+/-- The kernel of the conjugation action `conjActionHom` is `C_Q(S) = C_G(S) ⊓ Q`
+(the elements of `Q` centralizing `S`), via `Subgroup.normalizerMonoidHom_ker`. -/
+theorem conjActionHom_ker {S Q : Subgroup G} (hQN : Q ≤ Subgroup.normalizer (S : Set G)) :
+    (conjActionHom hQN).ker = (Subgroup.centralizer (S : Set G)).subgroupOf Q := by
+  ext a
+  simp only [conjActionHom, MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.mem_subgroupOf]
+  rw [← MonoidHom.mem_ker, Subgroup.normalizerMonoidHom_ker, Subgroup.mem_subgroupOf]
+  rfl
+
+/-- **φ̄ quotient action wrapper** (Theorem 12.12, Case 3 main branch, BG L3360-3366): a `q`-group
+`Q ≤ N_G(S)` acting on the (`p`-group, `p ≠ q`) `S ≠ 1` by conjugation, fixed-point-freely outside
+its kernel `C_Q(S)` — i.e. every `x ∈ Q` with `x ∉ C_G(S)` has `S ⊓ C_G(x) = 1` — has cyclic
+quotient `Q ⧸ C_Q(S)`. The lifted conjugation hom `φ̄ : Q ⧸ ker → MulAut S` is fixed-point-free
+(its `actionFixedBy` of a nonidentity coset is `C_S(x) = 1`), so Proposition 3.9
+(`isCyclic_of_coprime_fpf_pgroup_action`) applies. -/
+theorem isCyclic_quotient_of_conjugation_fpf [Finite G]
+    {S Q : Subgroup G} {p q : ℕ} [Fact p.Prime] [Fact q.Prime]
+    (hQN : Q ≤ Subgroup.normalizer (S : Set G))
+    (hSp : IsPGroup p ↥S) (hQq : IsPGroup q ↥Q) (hSne : S ≠ ⊥)
+    (hq_odd : Odd q) (hpq : p ≠ q)
+    (hfpf : ∀ x ∈ Q, x ∉ Subgroup.centralizer (S : Set G) →
+      (S : Subgroup G) ⊓ Subgroup.centralizer ({x} : Set G) = ⊥) :
+    IsCyclic (↥Q ⧸ (conjActionHom hQN).ker) := by
+  classical
+  haveI : Nontrivial ↥S := (Subgroup.nontrivial_iff_ne_bot S).mpr hSne
+  haveI hRq : IsPGroup q (↥Q ⧸ (conjActionHom hQN).ker) := hQq.to_quotient _
+  -- coprimality of `|Q/ker|` (a `q`-power) and `|S|` (a `p`-power), `p ≠ q`.
+  obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := q)).mp hRq
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp hSp
+  have hcop : Nat.Coprime (Nat.card (↥Q ⧸ (conjActionHom hQN).ker)) (Nat.card ↥S) := by
+    rw [hm, hn]
+    exact ((Nat.coprime_primes (Fact.out : q.Prime) (Fact.out : p.Prime)).mpr
+      (Ne.symm hpq)).pow m n
+  -- apply Proposition 3.9 to the lifted conjugation hom.
+  refine isCyclic_of_coprime_fpf_pgroup_action hRq hq_odd hcop
+    (QuotientGroup.kerLift (conjActionHom hQN)) ?_
+  intro ā hā
+  obtain ⟨a, rfl⟩ := QuotientGroup.mk_surjective ā
+  -- `a ∉ ker`, i.e. `(a:G) ∉ C_G(S)`.
+  have ha_ker : a ∉ (conjActionHom hQN).ker := fun hmem =>
+    hā ((QuotientGroup.eq_one_iff a).mpr hmem)
+  have ha_cent : (a : G) ∉ Subgroup.centralizer (S : Set G) := by
+    rw [conjActionHom_ker, Subgroup.mem_subgroupOf] at ha_ker; exact ha_ker
+  -- the fixed subgroup of the coset `mk a` is `⊥` (regularity of `x` on `S`).
+  rw [eq_bot_iff]
+  intro s hs
+  rw [mem_actionFixedBy, QuotientGroup.kerLift_mk] at hs
+  have hsval : (a : G) * (s : G) * (a : G)⁻¹ = (s : G) := congrArg Subtype.val hs
+  have hcomm : (a : G) * (s : G) = (s : G) * (a : G) := mul_inv_eq_iff_eq_mul.mp hsval
+  have hmem : (s : G) ∈ (S : Subgroup G) ⊓ Subgroup.centralizer ({(a : G)} : Set G) := by
+    rw [Subgroup.mem_inf]
+    refine ⟨s.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    exact hcomm
+  rw [hfpf (a : G) a.2 ha_cent, Subgroup.mem_bot] at hmem
+  rw [Subgroup.mem_bot]
+  exact Subtype.ext hmem
 
 end OddOrder.BG.Ch3.S12

@@ -143,9 +143,19 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   を直接使用 (`omega1_eq_of_tau2` の `A=(Omega ↥S p 1).map S.subtype` + `Omega.mem_of_pow_eq_one`;
   `IsElementaryAbelian.pow_eq_one` で line 元の `g^p=1`; `p^1` は simp)。N_G(S)⊄M =
   `normalizer_sylow_le_normalizer_elemAb ….2`。**この lemma が両枝共通の payoff 接続点。**
-  → (2) **cyclic-Z 正則性 bridge** (次): cyclic Z で `M_σ⊓C(Ω₁(Z))=⊥ ⟹ ∀a∈Z#,M_σ⊓C(a)=⊥`
-  (Ω₁(Z)≤⟨a⟩=cyclic 最小部分群 + `centralizer_le` + `centralizer_zpowers_eq_singleton`)。
-  ⚠ friction = cyclic 部分群の order-による包含 (|Ω₁|=p ∣ |⟨a⟩| ⟹ 包含) — cyclic 構造の小補題要。
+  → (2) ✅ **cyclic-Z 正則性 bridge COMPLETE** (commit b84f8ffc): `line_le_zpowers_in_cyclic`
+  (cyclic p-群で order-p 部分群は一意最小 L≤⟨a⟩; generator+`orderOf_pow` gcd+Bézout
+  [`Int.gcd_eq_gcd_ab`/`zpow_eq_zpow_iff_modEq`/`Int.modEq_iff_dvd`]; mathlib に cyclic 包含直接形
+  なし→自前) + `inf_centralizer_eq_bot_of_line_le_cyclic` (`N⊓C(L)=⊥`→`∀a∈Z#,N⊓C(a)=⊥`;
+  `centralizer_zpowers_eq_singleton`+`centralizer_le`; ↥Z→G transport=`map_subgroupOf_eq_of_le`+
+  `MonoidHom.map_zpowers`)。**key fact↔per-element 正則性の接続完成。S12_Theorem1212b に 4 補題。**
+  → (3) **C_E(S)≠E 主枝** (次): まず **φ̄ quotient 作用 wrapper** (~60 行) = Q≤N_G(S) (q-群) の
+  共役 `Subgroup.normalizerMonoidHom S : N(S)→MulAut S` を `inclusion` で Q へ comp →
+  `QuotientGroup.lift` で φ̄:Q/Q₀→MulAut S (Q₀=`normalizerMonoidHom_ker`=C_Q(S)) → regular
+  (∀x∈Q∖C(S), S⊓C(x)=⊥; `actionFixedBy φ̄ (mk x)={s|φ̄ s=s}=C_S(x)`) で Prop 3.9 適用 →
+  IsCyclic(Q/Q₀)。次に rank 矛盾 (Ω₁⊆Q₁ cyclic で r_q=1 vs 12.11(c) r_q=2) で X 存在 →
+  coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + `isCyclic_of_pRank_le_one` +
+  12.8(f) で ⊴N_G(S) + key fact + bridge で Z=大きい方 regular。
   → (3) **C_E(S)≠E 主枝** (coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + φ̄ quotient
   作用 Prop3.9 矛盾で X 存在 + 12.8(f) で S₀,S₁⊴N_G(S) + isCyclic_of_pRank_le_one + key fact +
   bridge) → (4) C_E(S)=E 枝 (要 (i) generic 分解) → (5) Z_p 集約 + E₀ → (6) `frobFact_of_abelianSylow`
