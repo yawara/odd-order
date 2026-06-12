@@ -126,4 +126,42 @@ theorem certainTypeOmegaSigma_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h
     (fun c => (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h) ((ticVdiff h).omega c))
     (omegaProdCharTic_inv h χ₂ i)
 
+/-! ### The `L`-side conjugation closure (for the μ-bridge)
+
+The (4.9)(a) bridge to the `L`-characters `μ_{ij}` runs through the **`L`-side** σ-isometry `σ_L`
+(`toTICyclicHypothesis.sigma`), via Theorem (4.3.b) `sigma_chiColumn_eq_certainType`:
+`σ_L(ω_{ij}) = δ_j μ_{ij}` (`ω_{ij} = chiColumn χ₂ i`).  The same conjugation closure as on the
+`G`-side holds for `σ_L`: `chiColumn` is `ω(omegaProdChar (w1CharEquiv i) χ₂)`, so conjugation sends
+it to the conjugate-index grid character, and `σ_L` intertwines the Galois action. -/
+
+/-- **Conjugation of a column source character.**  `χ_{ij}̄ = χ_{i'j'}` at the conjugate index
+(`ω_{ij} = chiColumn χ₂ i`): the Galois action of complex conjugation sends `ω(χ₁, χ₂)` to
+`ω(χ₁⁻¹, χ₂⁻¹) = ω(w1CharEquiv (rowInv i), χ₂⁻¹)`, i.e. `chiColumn χ₂⁻¹ (rowInv i)`. -/
+theorem chiColumn_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
+      = h.chiColumn χ₂⁻¹ (rowInv h i) := by
+  haveI : Fintype ↥h.sdiffTICyclicHypothesis.W := Fintype.ofFinite _
+  rw [Hypothesis.chiColumn, Hypothesis.chiColumn, galoisMap_conj_omega, omegaProdChar_inv]
+  exact congrArg
+    (fun c => h.sdiffTICyclicHypothesis.omega (h.sdiffTICyclicHypothesis.omegaProdChar c χ₂⁻¹))
+    (w1CharEquiv_rowInv h i).symm
+
+/-- **`L`-side σ conjugation closure** (the (4.9)(a) bridge ingredient).  The complex conjugate of
+the `L`-side σ-image `σ_L(ω_{ij})` is `σ_L(ω_{i'j'})` at the conjugate grid index.  Combines the
+(3.9) commutation `sigma_mapRingEquiv_comm` for `toTICyclicHypothesis` with `chiColumn_conj`.
+Together with (4.3.b) `sigma_chiColumn_eq_certainType` (`σ_L(ω_{ij}) = δ_j μ_{ij}`) this yields the
+`L`-character conjugation `δ_j μ_{ij}̄ = δ_{j'} μ_{i'j'}`. -/
+theorem sigma_chiColumn_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+        (h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+          (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
+      = h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+          (h.chiColumn χ₂⁻¹ (rowInv h i) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
+  rw [← chiColumn_conj]
+  exact h.toTICyclicHypothesis.sigma_mapRingEquiv_comm rfl h.toTICyclicFullDadeApplication
+    Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
+
 end OddOrder.Peterfalvi.S06

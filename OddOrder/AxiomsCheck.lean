@@ -827,6 +827,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdChar_inv
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.omegaProdCharTic_inv
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_conj_eq
+-- (4.9)(a) L-side conjugation closure: the column source character conjugates to the conjugate-index
+-- character (`chiColumn_conj`: χ_{ij}̄ = χ_{i'j'}), and the L-side σ-isometry `σ_L` intertwines it
+-- (`sigma_chiColumn_conj`: σ_L(ω_ij)̄ = σ_L(ω_{i'j'})).  With (4.3.b) `sigma_chiColumn_eq_certainType`
+-- (σ_L(ω_ij) = δ_j μ_ij) this gives the L-character bridge δ_j μ_ij̄ = δ_{j'} μ_{i'j'} of (4.9)(a).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.chiColumn_conj
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigma_chiColumn_conj
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
