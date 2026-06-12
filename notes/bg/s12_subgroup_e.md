@@ -137,10 +137,19 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
     (それ自体が小サブプロジェクト)。**C_E(S)≠E 枝は coprime 分解で回避できるので、まず主枝を実装**。
   - **(v) quotient 作用 φ̄:Q/Q₀→MulAut S** (Prop3.9 適用): Q→MulAut S (共役、Q≤N_G(S)) の核
     =C_Q(S)=Q₀、`QuotientGroup.lift` で injective 化。要構成 (~20 行)。
-- **着手順** (推奨): (1) **key fact** lemma (N_G(S)-不変 cyclic ⟹ C_{M_σ}(Ω₁)=1) を leaf に立てる
-  (clean, 再利用可) → (2) **C_E(S)≠E 主枝** (coprime 分解 + Prop3.9 quotient + 矛盾) → (3)
-  C_E(S)=E 枝 (要 (i) 構築 or 回避) → (4) Z_p 集約 + E₀=E₁E₃∏Z_p の exponent/regular → (5)
-  最終 assembly `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。新 leaf `S12_Theorem1212b.lean` 推奨 (現 leaf 510 行)。
+- **着手順**: (1) ✅ **key fact COMPLETE** (commit 5359320d、新 leaf `S12_Theorem1212b.lean`):
+  `inf_centralizer_line_eq_bot_of_invariant` (N_G(S)-不変 line L≤S ⟹ C_{M_σ}(L)=1) +
+  `sylow_maximal_in_M_of_le` (G の Syl-p ⊆ M は M の Syl-p)。**Omega bridge 不要** — `Omega`
+  を直接使用 (`omega1_eq_of_tau2` の `A=(Omega ↥S p 1).map S.subtype` + `Omega.mem_of_pow_eq_one`;
+  `IsElementaryAbelian.pow_eq_one` で line 元の `g^p=1`; `p^1` は simp)。N_G(S)⊄M =
+  `normalizer_sylow_le_normalizer_elemAb ….2`。**この lemma が両枝共通の payoff 接続点。**
+  → (2) **cyclic-Z 正則性 bridge** (次): cyclic Z で `M_σ⊓C(Ω₁(Z))=⊥ ⟹ ∀a∈Z#,M_σ⊓C(a)=⊥`
+  (Ω₁(Z)≤⟨a⟩=cyclic 最小部分群 + `centralizer_le` + `centralizer_zpowers_eq_singleton`)。
+  ⚠ friction = cyclic 部分群の order-による包含 (|Ω₁|=p ∣ |⟨a⟩| ⟹ 包含) — cyclic 構造の小補題要。
+  → (3) **C_E(S)≠E 主枝** (coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + φ̄ quotient
+  作用 Prop3.9 矛盾で X 存在 + 12.8(f) で S₀,S₁⊴N_G(S) + isCyclic_of_pRank_le_one + key fact +
+  bridge) → (4) C_E(S)=E 枝 (要 (i) generic 分解) → (5) Z_p 集約 + E₀ → (6) `frobFact_of_abelianSylow`
+  → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。
 
 ## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
 
