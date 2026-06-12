@@ -26,6 +26,7 @@ open OddOrder.GroupTheory
 open OddOrder.Isaacs
 open OddOrder.Isaacs.Ch06
 open scoped Pointwise
+open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
@@ -326,5 +327,169 @@ theorem exponent_eq_of_sup_eq_top_of_exponent_dvd {T : Type*} [CommGroup T] [Fin
   · have h := Monoid.order_dvd_exponent (⟨b, hb⟩ : ↥T₁)
     rw [Subgroup.orderOf_mk] at h
     exact h.trans hexp
+
+/-- Cast of `isCyclic_of_inf_eq_bot_of_pRank_le_two` to two subgroups `S₀, S₁` of `G` sitting
+inside an abelian `p`-group `S` of `p`-rank `≤ 2`: if `S₀ ⊓ S₁ = ⊥` and `S₁ ≠ ⊥`, then `S₀` is
+cyclic. (Works inside the ambient type `↥S`, using `subgroupOf` and `subgroupOfEquivOfLe`.) -/
+theorem isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two {S S₀ S₁ : Subgroup G} {p : ℕ}
+    [Fact p.Prime] [Finite G] [IsMulCommutative ↥S] (hSp : IsPGroup p ↥S) (hodd : Odd p)
+    (hrank : pRank ↥S p ≤ 2) (hS₀S : S₀ ≤ S) (hS₁S : S₁ ≤ S)
+    (hdisj : S₀ ⊓ S₁ = ⊥) (hS₁ne : S₁ ≠ ⊥) : IsCyclic ↥S₀ := by
+  have key : IsCyclic ↥(S₀.subgroupOf S) := by
+    refine isCyclic_of_inf_eq_bot_of_pRank_le_two hSp hodd hrank
+      (T₀ := S₀.subgroupOf S) (T₁ := S₁.subgroupOf S) ?_ ?_
+    · refine le_bot_iff.mp ?_
+      intro x hx
+      rw [Subgroup.mem_inf] at hx
+      have hmem : (x : G) ∈ S₀ ⊓ S₁ :=
+        ⟨Subgroup.mem_subgroupOf.mp hx.1, Subgroup.mem_subgroupOf.mp hx.2⟩
+      rw [hdisj, Subgroup.mem_bot] at hmem
+      exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+    · exact fun heq =>
+        hS₁ne (disjoint_self.mp ((Subgroup.subgroupOf_eq_bot.mp heq).mono_right hS₁S))
+  exact isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hS₀S).surjective
+
+/-- Cast of `exponent_eq_of_sup_eq_top_of_exponent_dvd` to subgroups `S₀, S₁ ≤ S` of `G` with
+`S₀ ⊔ S₁ = S`: if `exp(S₁) ∣ exp(S₀)` then `exp(S₀) = exp(S)`. -/
+theorem exponent_eq_of_le_of_sup_eq_of_exponent_dvd {S S₀ S₁ : Subgroup G} [IsMulCommutative ↥S]
+    [Finite G] (hS₀S : S₀ ≤ S) (hS₁S : S₁ ≤ S) (hsup : S₀ ⊔ S₁ = S)
+    (hexp : Monoid.exponent ↥S₁ ∣ Monoid.exponent ↥S₀) :
+    Monoid.exponent ↥S₀ = Monoid.exponent ↥S := by
+  have e₀ : Monoid.exponent ↥(S₀.subgroupOf S) = Monoid.exponent ↥S₀ :=
+    Monoid.exponent_eq_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hS₀S)
+  have e₁ : Monoid.exponent ↥(S₁.subgroupOf S) = Monoid.exponent ↥S₁ :=
+    Monoid.exponent_eq_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hS₁S)
+  have htop : S₀.subgroupOf S ⊔ S₁.subgroupOf S = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hS₀S hS₁S, hsup, Subgroup.subgroupOf_self]
+  have key := exponent_eq_of_sup_eq_top_of_exponent_dvd htop (by rw [e₀, e₁]; exact hexp)
+  rw [e₀] at key
+  exact key.symm
+
+/-! ## Back-half: an `N_G(S)`-invariant cyclic `Z ≤ S` acts regularly on `M_σ` -/
+
+/-- **Theorem 12.12, Case 3, the per-`Z` payoff** (BG L3354-3357): every `N_G(S)`-invariant
+nonidentity cyclic subgroup `Z ≤ S` satisfies `C_{M_σ}(z) = 1` for all `z ∈ Z#`. Its order-`p`
+subgroup `L = Ω₁(Z)` is a line (`Ω₁` of cyclic `Z` has order `p` since `↥Z` is abelian of class
+`≤ 2`), is `N_G(S)`-invariant (characteristic in `Z`, via `normalizer_le_normalizer_map_of_-`
+`characteristic`), so the key fact gives `M_σ ⊓ C_G(L) = 1`, and the cyclic bridge spreads this
+to every `z ∈ Z#`. -/
+theorem inf_centralizer_eq_bot_of_invariant_cyclic [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    {Z : Subgroup G} [IsCyclic ↥Z] (hZS : Z ≤ (S : Subgroup G)) (hZne : Z ≠ ⊥)
+    (hZinv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (Z : Set G)) :
+    ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  classical
+  have hodd : Odd p := hG.odd.of_dvd_nat
+    (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
+  have hZp : IsPGroup p ↥Z := S.isPGroup'.to_le hZS
+  haveI : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot Z).mpr hZne
+  -- `↥Z` is abelian (cyclic), so class `≤ 2`.
+  have hcl : _root_.commutator ↥Z ≤ Subgroup.center ↥Z := by rw [commutator_eq_bot]; exact bot_le
+  -- a `p`-torsion element makes `Ω₁(↥Z)` nontrivial.
+  have hpZ : p ∣ Nat.card ↥Z := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp hZp
+    have h1lt : 1 < Nat.card ↥Z := Finite.one_lt_card
+    have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+    rw [hk]; exact dvd_pow_self p hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpZ
+  have hxne : x ≠ 1 := by
+    intro hx1; rw [hx1, orderOf_one] at hx; exact absurd hx.symm (Fact.out : p.Prime).ne_one
+  have hxO : x ∈ Omega ↥Z p 1 :=
+    Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx ▸ pow_orderOf_eq_one x)
+  haveI hOnt : Nontrivial ↥(Omega ↥Z p 1) := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hbot; rw [hbot, Subgroup.mem_bot] at hxO; exact hxne hxO
+  have hOcard : Nat.card ↥(Omega ↥Z p 1) = p := by
+    rw [← IsCyclic.exponent_eq_card]; exact Omega.exponent_eq_of_class_le_two hodd hcl
+  -- `L = Ω₁(Z)` as a subgroup of `G`: a line `≤ Z ≤ S`, `N_G(S)`-invariant.
+  set L : Subgroup G := (Omega ↥Z p 1).map Z.subtype with hL_def
+  have hLcard : Nat.card ↥L = p := by
+    rw [hL_def, Subgroup.card_map_of_injective Z.subtype_injective]; exact hOcard
+  have hLZ : L ≤ Z := hL_def ▸ Subgroup.map_subtype_le _
+  have hLS : L ≤ (S : Subgroup G) := hLZ.trans hZS
+  have hL1 : L ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hLcard, by rw [hLcard, pow_one]⟩
+  have hLinv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (L : Set G) := by
+    rw [hL_def]
+    exact hZinv.trans AppB.normalizer_le_normalizer_map_of_characteristic
+  have hkey := inf_centralizer_line_eq_bot_of_invariant hG h hp hA hAE hAS hSM hL1 hLS hLinv
+  exact inf_centralizer_eq_bot_of_line_le_cyclic hZp hLZ hLcard hkey
+
+/-- **Theorem 12.12, Case 3, the `Z`-construction** (BG L3367-3373): in the abelian-Sylow regime,
+a subgroup `X ≤ N_G(S)` (coprime to `S`) with `1 ⊊ C_S(X) ⊊ S` produces the required cyclic
+subgroup `Z`. Indeed `S = S₀ × S₁` with `S₀ = C_S(X)`, `S₁ = [S, X]`
+(`fitting_coprime_abelian_decomp`), both cyclic (rank 2) and `N_G(S)`-invariant (Lemma 12.8(f)).
+Taking `Z` to be the larger of `S₀, S₁` (by order) gives a cyclic `N_G(S)`-invariant `Z ≤ S` of
+the same exponent as `S` (the larger cyclic `p`-factor absorbs the exponent) acting regularly on
+`M_σ` (`inf_centralizer_eq_bot_of_invariant_cyclic`). -/
+theorem exists_invariant_cyclic_sameExponent_regular [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    (hSab : IsMulCommutative ↥(S : Subgroup G))
+    {X : Subgroup G} (hXN : X ≤ Subgroup.normalizer ((S : Subgroup G) : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥(S : Subgroup G)) (Nat.card ↥X))
+    (hS0ne : (S : Subgroup G) ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    (hSltS : (S : Subgroup G) ⊓ Subgroup.centralizer (X : Set G) ≠ (S : Subgroup G)) :
+    ∃ Z : Subgroup G, Z ≤ (S : Subgroup G) ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧
+      Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (Z : Set G) ∧
+      Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
+      ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  classical
+  haveI := hSab
+  have hodd : Odd p := hG.odd.of_dvd_nat
+    (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
+  have hSp : IsPGroup p ↥(S : Subgroup G) := S.isPGroup'
+  have hrank : pRank ↥(S : Subgroup G) p ≤ 2 :=
+    (pRank_le_of_injective (Subgroup.inclusion_injective hSM)).trans (le_of_eq (tau2_pRank_eq_two hp))
+  -- decomposition `S = S₀ × S₁`, `S₀ = C_S(X)`, `S₁ = [S, X]`.
+  obtain ⟨hdisj, hsup⟩ :=
+    OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := (S : Subgroup G)) (K := X) hXN hcop
+  set S₀ : Subgroup G := Subgroup.centralizer (X : Set G) ⊓ (S : Subgroup G) with hS₀def
+  set S₁ : Subgroup G := ⁅(S : Subgroup G), X⁆ with hS₁def
+  have hS₀S : S₀ ≤ (S : Subgroup G) := inf_le_right
+  have hS₁S : S₁ ≤ (S : Subgroup G) := hsup ▸ le_sup_right
+  -- both factors nontrivial.
+  have hS₀ne : S₀ ≠ ⊥ := by rw [hS₀def, inf_comm]; exact hS0ne
+  have hS₁ne : S₁ ≠ ⊥ := fun hbot => hSltS (by
+    rw [inf_comm, ← hS₀def, ← hsup, hbot, sup_bot_eq])
+  -- both factors cyclic (rank 2).
+  have hS₀cyc : IsCyclic ↥S₀ :=
+    isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two hSp hodd hrank hS₀S hS₁S hdisj hS₁ne
+  have hS₁cyc : IsCyclic ↥S₁ :=
+    isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two hSp hodd hrank hS₁S hS₀S
+      (by rw [inf_comm]; exact hdisj) hS₀ne
+  -- both factors `N_G(S)`-invariant (Lemma 12.8(f)).
+  obtain ⟨h128f0, h128f1⟩ := relative_normality_of_abelianSylow hG h hp hA hAE hAS hSab X hXN
+  have hS₀inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₀ : Set G) := by
+    rw [hS₀def, inf_comm]; exact h128f0
+  have hS₁inv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ Subgroup.normalizer (S₁ : Set G) :=
+    h128f1
+  -- exponent divisibility from the `p`-power orders.
+  haveI := hS₀cyc; haveI := hS₁cyc
+  have hexpdvd : ∀ {T₀ T₁ : Subgroup G}, IsCyclic ↥T₀ → IsCyclic ↥T₁ → T₀ ≤ (S : Subgroup G) →
+      T₁ ≤ (S : Subgroup G) → Nat.card ↥T₁ ≤ Nat.card ↥T₀ →
+      Monoid.exponent ↥T₁ ∣ Monoid.exponent ↥T₀ := by
+    intro T₀ T₁ hc0 hc1 h0 h1 hle
+    haveI := hc0; haveI := hc1
+    rw [IsCyclic.exponent_eq_card, IsCyclic.exponent_eq_card]
+    obtain ⟨a, ha⟩ := (IsPGroup.iff_card (p := p)).mp (hSp.to_le h0)
+    obtain ⟨b, hb⟩ := (IsPGroup.iff_card (p := p)).mp (hSp.to_le h1)
+    rw [ha, hb]; rw [ha, hb] at hle
+    exact pow_dvd_pow p ((Nat.pow_le_pow_iff_right (Fact.out : p.Prime).one_lt).mp hle)
+  -- `Z` = the larger factor.
+  rcases le_total (Nat.card ↥S₁) (Nat.card ↥S₀) with hle | hle
+  · refine ⟨S₀, hS₀S, hS₀cyc, hS₀ne, hS₀inv, ?_, ?_⟩
+    · exact exponent_eq_of_le_of_sup_eq_of_exponent_dvd hS₀S hS₁S hsup
+        (hexpdvd hS₀cyc hS₁cyc hS₀S hS₁S hle)
+    · exact inf_centralizer_eq_bot_of_invariant_cyclic hG h hp hA hAE hAS hSM hS₀S hS₀ne hS₀inv
+  · refine ⟨S₁, hS₁S, hS₁cyc, hS₁ne, hS₁inv, ?_, ?_⟩
+    · exact exponent_eq_of_le_of_sup_eq_of_exponent_dvd hS₁S hS₀S (sup_comm S₀ S₁ ▸ hsup)
+        (hexpdvd hS₁cyc hS₀cyc hS₁S hS₀S hle)
+    · exact inf_centralizer_eq_bot_of_invariant_cyclic hG h hp hA hAE hAS hSM hS₁S hS₁ne hS₁inv
 
 end OddOrder.BG.Ch3.S12

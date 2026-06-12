@@ -184,11 +184,26 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
     IsCyclic ↥T₀): elem-ab order p³ ルートを抽象化。S₀,S₁ 両方に適用 (T:=↥S, T₀/T₁ swap)。
   - `exponent_eq_of_sup_eq_top_of_exponent_dvd` (T₀⊔T₁=⊤, exp T₁∣exp T₀ ⟹ exp T=exp T₀):
     Z=大きい方で exp(Z)=exp(S)。card 大 ⟹ exp 大 (cyclic p-群) ⟹ exp(小)∣exp(大) を供給。
-  **残 = §12 固有 assembly** (要 abelianSylow setup load): 12.8(f)
-  `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) + `fitting_coprime_abelian_decomp` で
-  S=S₀×S₁ + 上記 2 primitive (型 cast ↥S) + key fact `inf_centralizer_line_eq_bot_of_invariant`
-  (Ω₁(Z)) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic` で regular → Z 構成補題
-  (X を仮定に取る)。**その後 front-half (X 存在 rank 矛盾、hard) を別途**。
+  - **✅ `inf_centralizer_eq_bot_of_invariant_cyclic` (3rd primitive, commit ba168e91)**: N_G(S)-不変
+    nonidentity cyclic Z≤S ⟹ ∀z∈Z#, Mσ⊓C_G(z)=1。L=Ω₁(Z)=`(Omega ↥Z p 1).map Z.subtype` を
+    line 化 (|Ω₁|=p via `Omega.exponent_eq_of_class_le_two`+`IsCyclic.exponent_eq_card`; 不変性
+    via `AppB.normalizer_le_normalizer_map_of_characteristic` [Ω₁ char]) → key fact + bridge。
+    Odd p = `hG.odd.of_dvd_nat`。**Z-regular payoff 完成。**
+  **✅✅✅ Z 構成 assembly COMPLETE (session 9, commit 8ff6b506) — Case 3 back-half 完結**:
+  `exists_invariant_cyclic_sameExponent_regular` (abelianSylow regime で X≤N_G(S) coprime +
+  1⊊C_S(X)⊊S ⟹ ∃ cyclic N_G(S)-不変 Z≤S, exp(Z)=exp(S), regular)。`fitting_coprime_abelian_decomp`
+  (P:=↑S,K:=X) で S₀=C(X)⊓↑S/S₁=⁅↑S,X⁆ → both-cyclic ×2 (cast wrapper
+  `isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two`) + 12.8(f) で ⊴N_G(S) → Z=大 (card) → exp
+  (cast `exponent_eq_of_le_of_sup_eq_of_exponent_dvd`) + Z-regular。**🔑 知見: `open scoped
+  IsMulCommutative` で `[IsMulCommutative ↥S]`→`CommGroup ↥S` 自動; pRank ↥S≤2 =
+  `pRank_le_of_injective (inclusion hSM)` + tau2_pRank_eq_two; decomp(C⊓↑S) vs 12.8(f)(↑S⊓C) は
+  inf_comm; card 大⟹exp 大 = IsCyclic.exponent_eq_card + pow_dvd_pow。** assembly は namespace
+  修正のみで一発通過。
+  **残 = front-half (X 存在 rank 矛盾, BG L3363-3370, hard)**: q∈π(E/C_E(S)), Q=Syl_q(N_G(S))⊇Q₁=
+  Syl_q(E) → Prop1.6(e)+Cor12.10(c) で q∈τ₁/Q₁ cyclic → by_contra(Q/Q₀ regular)→φ̄ wrapper で
+  IsCyclic(Q/Q₀)→Ω₁ で r_q=1 vs 12.8(e)+12.11(c) r_q=2 矛盾 → X 存在。⚠ rank 部分(12.11(c) の
+  r_q=2 抽出, Ω₁(Q/Q₀)⊆Q₁/Q₀⟹Ω₁(Q)⊆Q₁)が hard — 要精査。**その後 C_E(S)=E 枝 + frobFact_of_-
+  abelianSylow + 3 ケース統合。**
   → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
   + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
   `frobenius_factorization_of_regular` 充足。
