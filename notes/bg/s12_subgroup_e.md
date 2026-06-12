@@ -1,5 +1,41 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢 2026-06-13 (Lane F session 13, Opus 4.8): **Thm 12.12 三ケース組立 — Case 1/2 完了・Case 3 隔離**
+
+新 leaf `S12_Theorem1212c.lean` を切り、`frobenius_factorization_of_regular` (12.12 本体) を
+**S12_E scaffold から移植・3 ケースに分解して証明**。`frobenius_factorization_of_regular` の結論型は
+`FrobFactConclusion M E` (= S12_E の inline 連言と defeq)。ケース選択子 = 「`|E|` を割る `τ₂`-素数で
+**非可換 Sylow** をもつものが存在するか」(`by_cases hnonab : ∃ p ∈ (Nat.card ↥E).primeFactors, p ∈ τ₂ ∧ ∃ S:Sylow p G, ¬可換`):
+
+- **Case 2** (非可換 Sylow): `frobFact_of_nonabelianSylow` (既存) に直結。**完了**。
+- **Case 1** (`τ₂ ∩ π(E) = ∅`): `frobFact_of_regular_all` (既存) に `hregAll` を供給。導出 =
+  `e∈E#` の各素因数 `r ∈ primeFactors(ord e) ⊆ π(E)` を `mem_tau_union_of_mem_primeFactors` で
+  `τ₁∪τ₂∪τ₃` に入れ、`r∉τ₂` (Case 1 仮定) から `τ₁∪τ₃` を結論。`E≠⊥` は `h.E_ne_bot hG`。**完了**。
+- **Case 3** (可換 Sylow, `τ₂≠∅`): 新 sorried `frobFact_of_abelianSylow` に隔離 (= **残務**)。
+
+**🔑 素数性の自動化**: ケース分けを「`p ∈ (Nat.card ↥E).primeFactors`」で行うことで `Nat.prime_of_mem_primeFactors`
+が `Fact p.Prime` を無料供給 (τ₂-素数は `p∉σ⟹p∤|M_σ|` + `pRank=2⟹p∣|M|` で必ず `|E|` を割る)。
+**🔑 `orderOf e ∣ |E|`** = `E.orderOf_dvd_natCard heE` (subtype 不要)。
+
+S12_E:475 の sorried `frobenius_factorization_of_regular` は除去 → pointer comment。net 0 sorry
+(S12_E 7→6 real + 新 leaf +1)。full build 3795 緑・AxiomsCheck OK。
+
+### ▶ 残務: `frobFact_of_abelianSylow` (S12_Theorem1212c.lean:51, τ₂-集約)
+
+`A₀ = E₂` (Lemma 12.8(a): abelian normal Hall τ₂); `E₀ = E₁E₃·∏_{p∈τ₂}Z_p`。各 `p∈τ₂`:
+`A_p∈ℰ²_p(E)` (`exists_elemAb_rank_two_le_E_of_tau2`) → `S_p:=A_p` を含む Sylow p of G → **可換 (habel)**
+→ Lemma 12.8(c) 鎖 `S ⊆ N_G(S)' ⊆ F(E) ⊆ C_G(S) ⊆ E` で **`S_p ≤ E` (hSM 自動)** →
+per-prime capstone `exists_cyclic_Enormal_regular_of_abelianSylow` で **`Z_p ≤ S_p ≤ E`** cyclic,
+`E ≤ N_G(Z_p)`, `exp(Z_p)=exp(S_p)`, regular。
+- **exp(E₀)=exp(E)**: `exponent_eq_of_forall_factorization_le` (S12_Theorem1212:90) で素数別に realize
+  (`exists_factorization_le_at_prime`/`factorization_exponent_le_of_sylow` を流用; r∈τ₁→E₁, r∈τ₃→E₃,
+  r∈τ₂→Z_r)。
+- **E₀ regular**: `inf_centralizer_eq_bot_of_forall_prime_order` (S12_Theorem1212b:1215) で prime-order に還元。
+  order `r∈τ₁∪τ₃` → `hreg` 直接; **order `r∈τ₂` → `a∈Z_r`** が要 (⚠ **未解決の核心**: `E₀∩(Sylow_r)=Z_r`
+  すなわち `E₁⊔E₃` が `τ₂'` であることが要る。Schur-Zassenhaus 補群 / E₂⊴E の Hall 構造で詰める)。
+- **τ₂ 上の有限 product**: `T := (Nat.card ↥E).primeFactors.filter (·∈τ₂ M)` 上の `Finset.sup` + per-p
+  選択 (Classical.choose)。`Z_p ≤ E₂` (τ₂-Hall) ゆえ ∏ は E₂ 内 abelian 直積。
+
 ## 🟢 2026-06-12 (Lane F session 12, Opus 4.8): **Thm 12.12 Case 3 per-prime Z-construction COMPLETE**
 
 Case 3 の per-prime Z-construction を**両枝とも完全実装**(front-half `353c9d9d`, agemo
