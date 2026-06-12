@@ -2027,3 +2027,25 @@ INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1
   (5) (a)⟹ a(P_ij)=a(P_ik)=0 ⟹ f(P_ij)=δ_j,f(P_ik)=−δ_j ⟹ ‖ψ‖²=2−2δ_j·2δ_j+2=0 ⟹ ψ=0。
   (6) 最終 `certainType_diff_dade_eq` (χ₂≠χ₂' 仮説付): (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)。→ (4.9)→case-B→(6.8)。
 正本=本 session 33 cont.⁵。**全 INPUT landed (12 commits); 残=assembly 1 unit。**
+
+### ✅ session 33 cont.⁶ (/loop) — `sigmaCoeff_psi_eq` landed; 残=orientation+exclusion+conclude
+- **landed** (commit 68021c0a, full build 3787 + AxiomsCheck): `sigmaCoeff_psi_eq` (general φ):
+  a(pq)=sigmaCoeff(ψ)(pq) = ⟨φ,chiFam pq⟩ − δ_j·([P_ij=pq]−[P_ik=pq]), P_ij=omegaProdEquiv.symm(omegaProdCharTic χ₂ i)。
+  gotcha: `if`に `open scoped Classical in` (docstring の**前**)、columnFamily に `[Fintype ↥(W1⊔W2)]`+`[Invertible …]` 要。
+- **▶ 残 = final theorem `certainType_diff_dade_eq`** (1 unit, 最難 = exclusion):
+  - skeleton: set φ=h.tau.toDadeMap(certainTypeDiffSupported…), ψ=φ−δ_j•(certainTypeOmegaSigma χ₂ i−…χ₂' i);
+    ψ vanish on V [step4 移項 + ClassFunction.zsmul_apply]; a:=sigmaCoeff(ψ) separable [sigmaCoeff_add_eq];
+    a(pq)=sigmaCoeff_psi_eq。
+  - **all a=0** (orientation): w₁≠w₂(coprime, card_charGroup_subgroupOf で Ŵ card=w)、|Δ|≥2(odd) ⟹
+    w₁<w₂=`sigmaCoeff_trichotomy` 直接; w₂<w₁=`grid_trichotomy` transposed (ι=Ŵ₂,κ=Ŵ₁, a'(q,p)=a(p,q))。
+    両者 (all-0)∨(column)∨(row)。
+  - **exclusion** (要 component-structure 補題): **P_ij.1=P_ik.1 (同 Ŵ₁, both i), P_ij.2≠P_ik.2 (異 Ŵ₂, χ₂≠χ₂')**
+    [omegaProdEquiv.symm∘omegaProdCharTic の (Ŵ₁,Ŵ₂) 分解 = (w1charEquiv i 対応, χ₂ 対応); tic omegaProdEquiv ↔
+    transported char の compatibility 補題 ~40行 要]。
+    column j₀ const c≠0: {δ-rows in col}={P_ij.1}(1個, 同row) ⟹ Ŵ₁∖{P_ij.1} の ≥w₁−1≥2 行で g=sigmaCoeff(φ)=c≠0
+    + off-col δ(≥1, 異col) で g=±δ_j≠0 ⟹ |supp g|≥3 > 2 矛盾 [sigmaNC_dade_le_two]。
+    row i₀ const: w₂≥5 なら w₂−2≥3 pure-g; w₂=3 (transposed orientation) は **f∈{0,±1}** で f(P_ik)=±2 弾く。
+  - **conclude**: all a=0 ⟹ a(P_ij)=0 ⟹ sigmaCoeff(φ)(P_ij)=s, a(P_ik)=0 ⟹ sigmaCoeff(φ)(P_ik)=−s ⟹
+    ⟨φ,ωij⟩=s,⟨φ,ωik⟩=−s ⟹ ‖ψ‖²=2−2s·2s+2·s²=0 ⟹ ψ=0 [`eq_zero_of_inner_self_re_eq_zero`, ZIrrFourier:189]。
+  - 最終: (μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ) (χ₂≠χ₂' 仮説)。→ (4.9)→case-B→(6.8)。
+正本=本 cont.⁶。**残=final theorem (orientation+exclusion+conclude); component-structure 補題が最初の sub-step。**
