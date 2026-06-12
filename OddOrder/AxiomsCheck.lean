@@ -50,6 +50,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary129
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4014,3 +4015,36 @@ Isaacs 6.21 forces `⟨C_H(b) | b ∈ B^#⟩ = H`, contradicting fixed-point-fre
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_regular_all
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_forall_factorization_le
+
+/-! ### BG Theorem 12.12: Case 2 (nonabelian Sylow `p`) (`S12_Theorem1212`)
+
+Shared infrastructure (`eq_sup_inf_of_le_normalizer` = Dedekind decomposition under a normalizer
+condition; `inf_centralizer_bot_symm` = symmetry of centralizer-disjointness) and the exponent
+machinery (`factorization_exponent_le_of_sylow` = the `p`-part of `exp E` lives in a Sylow;
+`exists_orderOf_eq_rpow_in_complement` / `exists_factorization_le_at_prime` realise the `r`-part
+of `exp E` inside the complement `E₀` for `r ≠ p` resp. `r = p`). The capstone
+`frobFact_of_nonabelianSylow` assembles `FrobFactConclusion M E` for the nonabelian-Sylow case
+via the canonical line `A₀` (Theorem 12.7) and its complement `E₀`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.eq_sup_inf_of_le_normalizer
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_bot_symm
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.factorization_exponent_le_of_sylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_orderOf_eq_rpow_in_complement
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_factorization_le_at_prime
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_nonabelianSylow
+
+/-! ### BG Theorem 12.12: Case 3 (abelian Sylow `p`) building blocks (`S12_Theorem1212b`)
+
+`sylow_maximal_in_M_of_le`: a Sylow `p`-subgroup of `G` inside `M` is also Sylow in `M`.
+`inf_centralizer_line_eq_bot_of_invariant` (key fact, BG L3345-3347): since `N_G(S) ⊄ M`, an
+`N_G(S)`-invariant line `L ≤ S` has `C_{M_σ}(L) = 1` (`L ≤ Ω₁(S) = A`, then Corollary 12.6(c)
+forces `N_G(L) ⊆ M ⊇ N_G(S)`, contradiction). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_maximal_in_M_of_le
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_line_eq_bot_of_invariant
