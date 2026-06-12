@@ -4226,3 +4226,11 @@ and a Sylow `p`-subgroup `P` of `G` normal in `M*`; `S ≤ N_G(S) = N_G(A) ≤ M
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_eq_of_le_normalizer
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.pRank_normalizer_eq_two_of_index_card
+
+/-! ### Prime divides index of normal subgroup missing a Sylow (`S12_Theorem1212b`)
+
+`prime_dvd_index_of_sylow_not_le_of_normal`: if `H ⊴ K` does not contain the Sylow `q`-subgroup
+`P`, then `q ∣ [K : H]` (the image of `P` in `K ⧸ H` is a nontrivial `q`-group). Front-half
+setup tool: feeds `q ∈ π(E/C_E(A))` from `Q₁ ⊄ C_E(A)` with `C_E(A) ⊴ E`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.prime_dvd_index_of_sylow_not_le_of_normal
