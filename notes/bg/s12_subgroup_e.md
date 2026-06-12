@@ -178,12 +178,17 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   `S04f_Blackburn.lean:1924-1937`** (T:order p², X:order p, disjoint → |T⊔X|=p³ →
   `isElementaryAbelian_sup_of_le_centralizer` で elem-ab → 用済; これを ↥S 型内で S₀,S₁ にミラー)。
   ⚠ 型注意: `le_pRank (A:Subgroup ↥S)` は `pRank ↥S p`、`isCyclic_of_pRank_le_one` は `pRank ↥S₀ p`
-  — Subgroup G / ↥S / ↥S₀ 境界の cast が実装の主作業。両 cyclic 後: 12.8(f)
-  `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) → Z=大きい方 (|S₀|≥|S₁| ? S₀ : S₁) →
-  exp(Z)=exp(S) (S=S₀×S₁ 両 cyclic p-群 ⟹ exp=lcm=max order=|Z|) → key fact
-  `inf_centralizer_line_eq_bot_of_invariant` (Ω₁(Z) on) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic`
-  で ∀z∈Z#, Mσ⊓C(z)=⊥ (regular)。**back half は確認済 API 主体 — 先に着手推奨** (X を仮定に取り
-  step6-7 を補題化、front half の X 存在は別途)。
+  — Subgroup G / ↥S / ↥S₀ 境界の cast が実装の主作業。
+  **✅✅ back-half 抽象 primitive 2 件 DONE (session 9, commits e872900c / bd01dfe8, 両 axiom-clean)**:
+  - `isCyclic_of_inf_eq_bot_of_pRank_le_two` (T:CommGroup 有限 p-群, pRank T≤2, T₀⊓T₁=⊥, T₁≠⊥ ⟹
+    IsCyclic ↥T₀): elem-ab order p³ ルートを抽象化。S₀,S₁ 両方に適用 (T:=↥S, T₀/T₁ swap)。
+  - `exponent_eq_of_sup_eq_top_of_exponent_dvd` (T₀⊔T₁=⊤, exp T₁∣exp T₀ ⟹ exp T=exp T₀):
+    Z=大きい方で exp(Z)=exp(S)。card 大 ⟹ exp 大 (cyclic p-群) ⟹ exp(小)∣exp(大) を供給。
+  **残 = §12 固有 assembly** (要 abelianSylow setup load): 12.8(f)
+  `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) + `fitting_coprime_abelian_decomp` で
+  S=S₀×S₁ + 上記 2 primitive (型 cast ↥S) + key fact `inf_centralizer_line_eq_bot_of_invariant`
+  (Ω₁(Z)) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic` で regular → Z 構成補題
+  (X を仮定に取る)。**その後 front-half (X 存在 rank 矛盾、hard) を別途**。
   → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
   + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
   `frobenius_factorization_of_regular` 充足。
