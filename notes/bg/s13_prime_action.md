@@ -283,6 +283,24 @@ centralizer_le_centralizer_of_tau1 (outer reduction + per_q で proof)。build �
 derivation を要する深い部分。outer reduction まで完成・committed ゆえ、ここは focused task。
 **次: N_G(Q)⊆M* の導出 (§12 σ-uniqueness) を最初に攻める。**
 
+### 2026-06-13 Lane G (loop): ℳ(N_G(Q))={M*} 省略を解明 + per-q core 深度評価
+
+**ℳ(N_G(Q))={M*} の正体 = Lem 12.18(a) の入れ子 contradiction** (原文「to get」の真意):
+ℳ(N_G(Q))≠{M*} と仮定 → Lem 12.18(a) を (r,R,M*) role-swap で適用 → C_{M*_α}(RQ)=1。
+だが p∈β(M*)⊆α(M*) ゆえ P⊆M*_α、かつ `1⊂P⊆C_{M*_σ}(RQ)` から P⊆C_{M*_α}(RQ)≠1 → P=1 矛盾。
+∴ ℳ(N_G(Q))={M*}。**要 sub-facts: M*_α≠1, q∉α(M*), P⊆M*_α, C_Q(R)=1**(各々 §12 依存)。
+
+**per-q core 深度評価 (重要)**: steps 4-9 は **~150-200 行の入れ子 contradiction**で、各 sub-step が
+それ自体 §12 の深い導出:
+- **S abelian** = Thm 12.13 (`S12_E:48`「非可換 p-群 ⟹ 𝒰」, sorry'd) の 𝒰-machinery 経由 (S∈𝒰 排除)。
+- **C_Q(R)=1** = abelian S への R coprime 作用の FPF (`[S,R]⊓C_S(R)=⊥`; repo に既製無し→要構築)。
+- **ℳ(N_G(Q))={M*}** = 上記 Lem 12.18 入れ子 contradiction (~40-60 行)。
+- **Prop 12.15** 適用 (X=Q, M*) → q∈σ(M*) → (d)。
+- **C_{M_α}(P)⊆C_{M_α}(R)** 包含 = Lem 12.18(a) (C_{M_α}(P)≠1, C_{M_α}(PQ)=1) + rank-1/cyclic 論法。
+- step 8 three-subgroups, step 9 Lem 12.18 (r,R 版) 矛盾。
+⟹ Lem 12.18 を **3 回** (M*-role で ℳ 導出, M-role で包含 ×2)、Prop 12.15・Thm 12.13・three-subgroups。
+**outer reduction まで committed; per-q core は focused task (多数の §12 sorry'd scaffold cite + 新 FPF 補題)。**
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
