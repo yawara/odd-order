@@ -2246,3 +2246,57 @@ session 36 から継続 (`/goal` で完遂モード)。(4.9)(a) の共役論法�
 有無。**第一手 = S07 の zSpan/zSupportedSpan/IntegralCharacterMap を Read 通読**してから extension map を
 `Basis.constr` 級で構成 (μ_j ↦ δ_k ∑_i ω_ij^σ) → 5 field を埋める。
 **正本=本 session 36 cont.。(4.9)(a) 共役完結; 次 = IsCoherent packaging (S07 機構 Read から)。**
+
+## 2026-06-12 (session 37, /loop): ✅ IsCoherent packaging — extension map ν + fields 2/3/5 (of 5)
+
+新 leaf **`S06_CertainTypeCoherence.lean`** (3 commits, 全 axiom-clean, full build 3794)。Peterfalvi
+(4.9)(b) の coherent extension `ν : CF(↥L) → CF(G)` を構成し、`S07.IsCoherent τ 𝒯 A` の 5 field の
+うち **field 2 (extension)・field 3 (isometry)・field 5 (ZIrr)** を landed。
+
+### 確定した型・構成 (再調査不要)
+
+- **(4.9) の 𝒯 = 列和の集合** (per-element ではない): `𝒯 = {μ_j | 0<j<w₂, μ_j(1)=μ_k(1)}`。
+  repo: `certainTypeSet h k := {f | ∃ χ₂≠1, columnSum h χ₂ (1) = columnSum h k (1) ∧ f = columnSum h χ₂}`。
+  `columnSum h χ₂ := ∑ i, (h.columnFamily χ₂).mu i` (= μ_j)。
+- **extension map** `certainTypeExtension h : S07.IntegralCharacterMap ↥L G` = `Irr(↥L)` 基底上
+  `μ_ij ↦ δ_j ω_ij^σ` (他 irr ↦ 0)、`(S05.irreducibleCharacterBasis).constr ℂ ... |>.restrictScalars ℤ`。
+  基底 rule の well-defined は **`columnFamily_mu_injective`** (大域 `(χ₂,i)↦μ_ij` 単射) が核。
+  eval: `certainTypeExtension_mu` (`ν μ_ij = δ_j ω_ij^σ`)、`certainTypeExtension_columnSum`
+  (`ν μ_j = δ_j ∑_i ω_ij^σ`)。**罠: `open scoped Classical in` は docstring の前**。
+- **field 5 (ZIrr)**: `certainTypeOmegaSigma_mem_ZIrr` (= `sigma_mem_ZIrr` + omega の `.mem_ZIrr`) →
+  `certainTypeExtension_mem_ZIrr` (span_induction、ZIrr は ℤ-submodule)。
+- **field 3 (isometry)**: generator `certainTypeExtension_columnSum_inner` (`⟨ν μ_j,ν μ_l⟩=⟨μ_j,μ_l⟩`,
+  **無条件** — 対角で δ_j²=1、非対角は Gram=0 が符号吸収; `certainType_omega_sum_isometry` +
+  `columnFamily_mu_sum_inner` + zsmul→ℂsmul は `← Int.cast_smul_eq_zsmul ℂ sign cf`) → full
+  `certainTypeExtension_inner_eq` (**`Submodule.span_induction₂`** 一発、8 case = mem_mem/zero_*/add_*/smul_*;
+  双線型は `ClassFunction.inner_{add,smul}_{left,right}`、smul は ℂ-cast 変換)。
+
+### 🔑 残り field 4 (agreement) + field 1 (nonzero) + capstone — τ 型が確定 (再調査不要)
+
+**IsCoherent.τ = `S07.dadeIntegralCharacterMap h.dade0 h.tau : IntegralCharacterMap ↥L G`** (大域版)。
+`h.tau.toDadeMap` は bundled `SupportedClassFunctions A₀ L → CF(G)` で **IntegralCharacterMap ではない**;
+`dadeIntegralCharacterMap` が `LinearMap.exists_extend` で大域化したもの (S07:5233)。
+- **`dadeIntegralCharacterMap_apply_of_support`** (S07:5243): `supp φ ⊆ supportInSubgroup A₀ L ⟹
+  dadeICM φ = h.dade0.dadeMap ⟨φ, _⟩` ← これで `certainType_diff_dade_sum_eq` (toDadeMap 版) に接続。
+- **A vs A₀ の罠**: `h.dade0 : S04.Hypothesis G A₀ L`, `A₀ = A ∪ V^L` (Hypothesis46.dade0; tic.V 由来)。
+  (4.9) の `Z[𝒯,A]` は **certain subgroup A** だが A ⊆ A₀ ゆえ supp⊆A → supp⊆A₀ で Dade 適用可。
+  IsCoherent.A は `supportInSubgroup A L` を採る見込み (S09 の pattern; 要最終確認)。
+
+**field 4 plan** (`extends_on_supported : ∀ φ∈zSupportedSpan 𝒯 A, ν φ = τ φ`):
+1. **「Z[𝒯,A] は μ_j−μ_k で生成」**: φ∈zSpan 𝒯 ∧ supp⊆A ⟹ φ∈span ℤ {μ_j−μ_k}。証明 = φ=∑c_μ μ
+   (mem_span)、supp⊆A⟹φ(1)=0 (1∉A)、全 μ_j 同次数 d ⟹ d·∑c_μ=0 ⟹ ∑c_μ=0 ⟹ φ=∑c_μ(μ_j−μ_k)。
+   [Finsupp/mem_span_finset 要; これが残 hard sub-lemma]
+2. **generator 一致** `ν(μ_j−μ_k) = τ(μ_j−μ_k)`: τ側 = `certainType_diff_dade_sum_eq` (要 δ_j=δ_k =
+   (4.8) sign-eq、μ_j,μ_k∈𝒯 で同次数ゆえ成立) で `δ_j ∑(ω_ij^σ−ω_ik^σ)`; ν側 = `ν μ_j − ν μ_k =
+   δ_j ∑ω_ij^σ − δ_k ∑ω_ik^σ`; δ_j=δ_k で一致。**`certainTypeDiffSupported` の underlying = μ_ij−μ_ik**
+   なので `∑_i certainTypeDiffSupported = μ_j − μ_k = columnSum χ₂ − columnSum χ₂'` の bundling 接続が要。
+3. **span へ拡張**: `S07.eq_on_zSpan_of_eq_on` (ℤ-linear 2写像が生成集合一致→span一致)。
+
+**field 1 (nonzero)**: witness `μ̄_k − μ_k = columnSum k⁻¹ − columnSum k`。≠0 = `certainType_columnSum_conj_ne`
+(済)。∈ zSupportedSpan 𝒯 A: 両端 ∈ 𝒯 (μ̄_k=μ_{k'}, k'=k⁻¹≠k、`certainType_columnSum_conj`+`column_inv_ne_self`、
+同次数 = 複素共役は次数保存) ∧ supp⊆A ((4.7) `induce_chiRestrict_apply_eq_zero_of_not_mem_union` で
+supp μ_j⊆A∪{1}、差は1で消える)。
+
+**capstone**: `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
+(certainTypeSet h k) (supportInSubgroup A L)` を 5 field 組立 (要 k≠1)。→ S08 case-B。
+**正本=本 session 37。次 = field 4 の sub-lemma 1「Z[𝒯,A] 生成」から (S06_CertainTypeCoherence に追記)。**
