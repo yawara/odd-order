@@ -4261,3 +4261,11 @@ Splits on `C_E(S) = E`: `= E` uses the agemo construction; `≠ E` produces `X` 
 invariant `Z` (back-half). Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_abelianSylow
+
+/-! ### Frobenius complement: prime-order regularity propagates (`S12_Theorem1212b`)
+
+`inf_centralizer_eq_bot_of_forall_prime_order`: if every prime-order element of `H` acts
+fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|/r})` for a prime
+`r ∣ |h|`). The reduction for "`E₀ = E₁E₃·∏Z_p` is a Frobenius complement". Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_forall_prime_order

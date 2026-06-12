@@ -1207,4 +1207,29 @@ theorem exists_cyclic_Enormal_regular_of_abelianSylow [Finite G] (hG : IsMinimal
       E_le_normalizer_sylow_of_abelianSylow hG h hp hA hAE hAS hSab
     exact ⟨Z, hZS, hZcyc, hZne, hENS.trans hZNinv, hZexp, hZreg⟩
 
+/-! ## Frobenius complement: prime-order regularity propagates to all elements -/
+
+/-- If every prime-order element of `H` acts fixed-point-freely on `N` (`N ⊓ C(h) = ⊥`), then so
+does every nonidentity element. (For `h ∈ H#`, a prime-order power `h^(|h|/r)` is fixed-point-free
+and `C(h) ⊆ C(h^(|h|/r))`.) The reduction underlying "`E₀` is a Frobenius complement". -/
+theorem inf_centralizer_eq_bot_of_forall_prime_order [Finite G] {H N : Subgroup G}
+    (hpr : ∀ h ∈ H, (orderOf h).Prime → N ⊓ Subgroup.centralizer ({h} : Set G) = ⊥) :
+    ∀ h ∈ H, h ≠ 1 → N ⊓ Subgroup.centralizer ({h} : Set G) = ⊥ := by
+  intro h hhH hne
+  have hn : orderOf h ≠ 0 := (orderOf_pos h).ne'
+  have hn1 : orderOf h ≠ 1 := fun hc => hne (orderOf_eq_one_iff.mp hc)
+  obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hn1
+  have hk_ord : orderOf (h ^ (orderOf h / r)) = r := orderOf_pow_orderOf_div hn hr_dvd
+  have hk_good : N ⊓ Subgroup.centralizer ({h ^ (orderOf h / r)} : Set G) = ⊥ :=
+    hpr (h ^ (orderOf h / r)) (H.pow_mem hhH _) (by rw [hk_ord]; exact hr_prime)
+  have hCsub : Subgroup.centralizer ({h} : Set G) ≤
+      Subgroup.centralizer ({h ^ (orderOf h / r)} : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff] at hx ⊢
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    exact (Commute.pow_left (hx h rfl) _)
+  rw [eq_bot_iff, ← hk_good]
+  exact inf_le_inf_left N hCsub
+
 end OddOrder.BG.Ch3.S12
