@@ -728,4 +728,32 @@ theorem pRank_normalizer_eq_two_of_index_card [Finite G] (hG : IsMinimalSimpleOd
     le_antisymm (by rw [hSeqP]; exact hP_norm) (hNAS ▸ hle)
   rw [← hMstar_eq]; exact tau2_pRank_eq_two hqτ₂
 
+/-! ## Front-half (X existence): setup (`開問 b`) -/
+
+/-- If `H` is a normal subgroup not containing the Sylow `q`-subgroup `P`, then `q ∣ [K : H]`.
+(The image of `P` in `K ⧸ H` is a `q`-subgroup whose order divides `[K : H]`; if `q ∤ [K : H]`
+this order is `1`, forcing `P ≤ H`.) -/
+theorem prime_dvd_index_of_sylow_not_le_of_normal {K : Type*} [Group K] [Finite K] {q : ℕ}
+    [Fact q.Prime] (P : Sylow q K) {H : Subgroup K} [H.Normal] (hPH : ¬ (P : Subgroup K) ≤ H) :
+    q ∣ H.index := by
+  classical
+  by_contra hq
+  apply hPH
+  intro x hxP
+  have hPg : IsPGroup q ↥((P : Subgroup K).map (QuotientGroup.mk' H)) :=
+    P.isPGroup'.map (QuotientGroup.mk' H)
+  have hdvd : Nat.card ↥((P : Subgroup K).map (QuotientGroup.mk' H)) ∣ H.index := by
+    rw [Subgroup.index_eq_card]; exact Subgroup.card_subgroup_dvd_card _
+  have hcard1 : Nat.card ↥((P : Subgroup K).map (QuotientGroup.mk' H)) = 1 := by
+    obtain ⟨k, hk⟩ := hPg.exists_card_eq
+    rcases Nat.eq_zero_or_pos k with rfl | hk0
+    · rwa [pow_zero] at hk
+    · exact absurd ((dvd_pow_self q hk0.ne').trans (hk ▸ hdvd)) hq
+  have hmaptriv : (P : Subgroup K).map (QuotientGroup.mk' H) = ⊥ := Subgroup.card_eq_one.mp hcard1
+  have hx1 : (QuotientGroup.mk' H) x = 1 := by
+    have hmem : (QuotientGroup.mk' H) x ∈ (P : Subgroup K).map (QuotientGroup.mk' H) :=
+      Subgroup.mem_map_of_mem _ hxP
+    rw [hmaptriv, Subgroup.mem_bot] at hmem; exact hmem
+  rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hx1
+
 end OddOrder.BG.Ch3.S12
