@@ -174,6 +174,22 @@ leaf を import し再 export。root + AxiomsCheck (island PASS, full build 3793
   - (b) E₃ は mmd 明快: E₃⊆E'⊆M*', π(E₃)⊆π(M*')⊆(τ₁M*)' ⟹ Cor 13.2(b) 直接
     ((a) より易、先に landing 可)。
 
+### 2026-06-13 Lane G: main 同期 + **de-axiom 完了** (issue 8000 closed)
+
+main 取り込み (merge, 102 commits)。Lane F が issue 0065 で **S12_E に Cor 12.16(a)(b) faithful
+sorry'd statement** を露出済 (`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, commit `e876f29b`, 私の forward axiom と
+**byte-identical drop-in 署名**) と判明 → handshake step 2 実行:
+- S13_Lemma131 の forward axiom 2 本 (`cor1216_*`) を**削除**、cite 先を S12_E の 2 定理へ差し替え
+  (use site 2 箇所、引数 list 不変ゆえ機械的)。
+- AxiomsCheck: cor1216 island 3 本 + Cor 13.2 island を削除。13.1(a)
+  `pSubgroup_centralizes_Msigma_inf` は S12_E Cor 12.16 非依存 (`[propext, Classical.choice,
+  Quot.sound]` clean) ゆえ `#assert_only_allowed_axioms` 維持。
+- footprint: Lemma 13.1(b)(c)/full・Cor 13.2 = `[propext, sorryAx, Classical.choice, Quot.sound]`
+  (sorryAx = S12_E Cor 12.16 由来 = repo 標準 scaffold-sorry)。**新規 axiom 0**。
+- full build 3796 + AxiomsCheck 3782 green。**HOLD 解消** (G の forward axiom 消滅 ⟹ merge ブロッカー無し)。
+- 残: F が S12_E の 2 sorry を §12 cascade で埋めれば §13 全体が自動 unconditional 化 (issue 0065)。
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),

@@ -17,19 +17,21 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 §13 は **Lemma 13.1 を根とする DAG** (Cor 13.2 が「follows directly from Lemma 13.1」、以降全結果が
 13.2/13.4 経由)。本 leaf がその根。
 
-## ⚠ Forward axioms: BG Corollary 12.16(a)(b) (issue 8000)
+## BG Corollary 12.16(a)(b) 依存 (de-axiom 済, issue 8000/0065)
 
-着工前 STATEMENT AUDIT (2026-06-12, Lane G session 1) で、Lemma 13.1 が要する **BG Cor 12.16(a)(b)**
-(rank bound `r_p(N_H(Y)) ≤ 1` / π-bound `p∈τ₁(M) ⟹ p∉π(N_H(Y)')`) が repo に未露出と判明
-(`S12_E.lean:64` `sigma_subgroup_conj_into_Msigma` は前置節「Y conj into M_σ」のみで誤ラベル)。
+Lemma 13.1 は **BG Cor 12.16(a)(b)** (rank bound `r_p(N_H(Y)) ≤ 1` / π-bound
+`p∈τ₁(M) ⟹ p∉π(N_H(Y)')`) を本質的に使う。これらは §12 の結果で、Lane F が S12_E に faithful な
+sorry'd statement (`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, issue 0065) として露出済み。
 
-ユーザー裁可 (2026-06-12) のもと、両者を下記 **provisional forward axiom** として宣言し、その上で
-§13 を実証明する。Lane F が S12_E 側に faithful な statement (drop-in 署名は issue 8000) を入れ次第、
-本 axiom は de-axiom され、cite 先を S12_E へ差し替える。本 axiom を使う §13 定理は
-`AxiomsCheck.lean` の `#assert_axioms_island … expecting [cor1216_…]` で pin する。
+当初 (2026-06-12 Lane G session 1) は両者が repo に未露出だったため provisional forward axiom
+で進めたが、F の statement 着地 (2026-06-12, commit `e876f29b`) を受けて **de-axiom 済**
+(2026-06-13): cite 先を S12_E の上記 2 定理へ差し替え、forward axiom は削除。これにより §13 は
+新規 axiom 0 となり、§12 cascade が S12_E の proof を埋めた時点で自動的に unconditional 化する
+(repo 標準の scaffold-sorry 規約に準拠)。
 
-→ 詳細・解消パス: `issues/8000-s13-blocked-cor1216ab.md`,
-  `notes/bg/s13_prime_action.md`「2026-06-12 Lane G session 1」。
+→ 詳細: `issues/8000-s13-blocked-cor1216ab.md`, `issues/0065-cor1216-faithful-statement.md`,
+  `notes/bg/s13_prime_action.md`。
 -/
 
 namespace OddOrder.BG.Ch3.S13
@@ -40,36 +42,6 @@ open OddOrder.BG.Ch3.S12
 open scoped Pointwise
 
 variable {G : Type*} [Group G]
-
-/-! ## Forward axioms — BG Corollary 12.16(a)(b) (provisional; issue 8000) -/
-
-/-- **[FORWARD AXIOM] BG Corollary 12.16(a)** (mmd L3453-3456): for a nonidentity `σ(M)`-subgroup
-`Y` of `G`, a prime `p ∈ π(E) ∩ β(G)'`, and a maximal subgroup `H ∈ ℳ(Y)` not conjugate to `M`,
-the `p`-rank of `N_H(Y) = H ⊓ N_G(Y)` is at most `1`.
-
-**Provisional** (user-approved 2026-06-12, issue 8000): de-axiom when Lane F exposes the faithful
-statement in `S12_E`. -/
-axiom cor1216_pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
-    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
-    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
-    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
-    pRank ↥(H ⊓ Subgroup.normalizer (Y : Set G)) p ≤ 1
-
-/-- **[FORWARD AXIOM] BG Corollary 12.16(b)** (mmd L3453, 3456): same setting, and additionally
-`p ∈ τ₁(M)`; then `p` does not divide `|N_H(Y)'|`, i.e. `p ∉ π(N_H(Y)')`.
-
-**Provisional** (user-approved 2026-06-12, issue 8000): de-axiom when Lane F exposes the faithful
-statement in `S12_E`. -/
-axiom cor1216_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
-    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
-    (hpτ1 : p ∈ tau1 M)
-    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
-    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
-    p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors
 
 /-! ## `pRank` transfer helpers (reusable) -/
 
@@ -343,8 +315,8 @@ decomposition `M* = K ⊔ N_{M*}(Y)` with `K = O_{β(M*)∪{q}}(M*') ⊴ M*` and
 `M*'`. Since `p ∉ β(M*)` (`τ₂ ∩ σ = ∅ ⊇ β`) and `p ≠ q` (`p ∈ π(E)`, `q ∈ σ(M)`,
 `π(E) ∩ σ(M) = ∅`), the `{β(M*)∪{q}}`-group `K` has order prime to `p`, so `[M* : N_{M*}(Y)]`
 is prime to `p` and `r_p(N_{M*}(Y)) = r_p(M*) = 2`. But Lemma 12.1(g) gives `p ∉ β(G)`, so
-Corollary 12.16(a) forces `r_p(N_{M*}(Y)) ≤ 1` — a contradiction. First use of the forward
-axiom `cor1216_pRank_normalizer_le_one`. -/
+Corollary 12.16(a) forces `r_p(N_{M*}(Y)) ≤ 1` — a contradiction. Cites the S12_E sorry'd
+statement `sigma_subgroup_pRank_normalizer_le_one`. -/
 theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
     {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)
@@ -438,7 +410,7 @@ theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨A, hA, hAM⟩ := exists_mem_elemAbelianOfRank_two_le_of_tau2 (Fact.out : p.Prime) hpτ2
   have hpβG : ¬ S10.idealPrime p G :=
     (isMaximalElementaryAbelian_of_mem_tau2 hG hMstar (Fact.out : p.Prime) hpτ2 hAM hA).2
-  -- Corollary 12.16(a): `r_p(N_{M*}(Y)) ≤ 1` (forward axiom).
+  -- Corollary 12.16(a): `r_p(N_{M*}(Y)) ≤ 1` (S12_E `sigma_subgroup_pRank_normalizer_le_one`).
   have hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y := by
     intro r hr
     obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hYq
@@ -449,7 +421,7 @@ theorem not_mem_tau2_of_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
   have hYM : Y ≤ Mstar := hYD.trans hDM
   have hHY : Mstar ∈ maximalSubgroupsContaining Y :=
     mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar, hYM⟩
-  have hle1 := cor1216_pRank_normalizer_le_one hG h hYne hYpi hpE hpβG hHY hnc
+  have hle1 := sigma_subgroup_pRank_normalizer_le_one hG h hYne hYpi hpE hpβG hHY hnc
   rw [← hNdef] at hle1
   omega
 
@@ -585,7 +557,7 @@ theorem mem_idealPrime_of_tau1_of_interaction [Finite G] (hG : IsMinimalSimpleOd
     exact Nat.mem_primeFactors.mpr
       ⟨Fact.out, ((Nat.Prime.dvd_mul Fact.out).mp hpMul).resolve_left hpK, Nat.card_pos.ne'⟩
   -- Corollary 12.16(b): `p ∉ π(N')`.
-  have hax := cor1216_not_mem_primeFactors_derived_of_tau1 hG h hYne hYpi hpE hnotideal hpτ1M
+  have hax := sigma_subgroup_not_mem_primeFactors_derived_of_tau1 hG h hYne hYpi hpE hnotideal hpτ1M
     hHY hnc
   rw [← hNdef] at hax
   exact hax hpNderiv
