@@ -458,21 +458,10 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
 
 /-! **BG Lemma 12.11** は `S12_Lemma1211.lean` に移動した (`tau2_transfer_to_maximal`)。 -/
 
-/-- **BG Theorem 12.12** (mmd L3306): すべての `(τ₁(M)∪τ₃(M))`-元 `e ∈ E#` で `C_{M_σ}(e)=1`
-なら (a) `E` は abelian normal `A₀` を含み `∀ x ∈ M_σ#, C_E(x) ⊆ A₀`;
-(b) `E` は `E` と同 exponent の `E₀` を含み `E₀M_σ` は kernel `M_σ` の Frobenius 群。 -/
-theorem frobenius_factorization_of_regular [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
-      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
-    (∃ A₀ : Subgroup G, A₀ ≤ E ∧ IsMulCommutative ↥A₀ ∧
-      E ≤ Subgroup.normalizer ((A₀ : Subgroup G) : Set G) ∧
-      ∀ x ∈ S10.Msigma M, x ≠ 1 → E ⊓ Subgroup.centralizer ({x} : Set G) ≤ A₀) ∧
-    (∃ E₀ : Subgroup G, E₀ ≤ E ∧ Monoid.exponent ↥E₀ = Monoid.exponent ↥E ∧
-      Ch06.IsFrobeniusGroup ↥(S10.Msigma M ⊔ E₀)
-        ((S10.Msigma M).subgroupOf (S10.Msigma M ⊔ E₀))
-        (E₀.subgroupOf (S10.Msigma M ⊔ E₀))) := by
-  sorry
+/-! **BG Theorem 12.12** (`frobenius_factorization_of_regular`) は `S12_Theorem1212c.lean` に
+移動した。3 ケース組立 (Case 1 `τ₂=∅` / Case 2 非可換 Sylow / Case 3 可換 Sylow) のうち
+Case 1・Case 2 は完了、Case 3 (`frobFact_of_abelianSylow`, τ₂-集約) が残務。
+結論型は `FrobFactConclusion M E` (`S12_Theorem1212.lean`、本ファイルの inline 連言と defeq)。 -/
 
 /-! ## §12 σ(M) の埋め込みと一意性 (mmd L3385-3479) -/
 
