@@ -184,11 +184,18 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
     IsCyclic ↥T₀): elem-ab order p³ ルートを抽象化。S₀,S₁ 両方に適用 (T:=↥S, T₀/T₁ swap)。
   - `exponent_eq_of_sup_eq_top_of_exponent_dvd` (T₀⊔T₁=⊤, exp T₁∣exp T₀ ⟹ exp T=exp T₀):
     Z=大きい方で exp(Z)=exp(S)。card 大 ⟹ exp 大 (cyclic p-群) ⟹ exp(小)∣exp(大) を供給。
-  **残 = §12 固有 assembly** (要 abelianSylow setup load): 12.8(f)
-  `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) + `fitting_coprime_abelian_decomp` で
-  S=S₀×S₁ + 上記 2 primitive (型 cast ↥S) + key fact `inf_centralizer_line_eq_bot_of_invariant`
-  (Ω₁(Z)) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic` で regular → Z 構成補題
-  (X を仮定に取る)。**その後 front-half (X 存在 rank 矛盾、hard) を別途**。
+  - **✅ `inf_centralizer_eq_bot_of_invariant_cyclic` (3rd primitive, commit ba168e91)**: N_G(S)-不変
+    nonidentity cyclic Z≤S ⟹ ∀z∈Z#, Mσ⊓C_G(z)=1。L=Ω₁(Z)=`(Omega ↥Z p 1).map Z.subtype` を
+    line 化 (|Ω₁|=p via `Omega.exponent_eq_of_class_le_two`+`IsCyclic.exponent_eq_card`; 不変性
+    via `AppB.normalizer_le_normalizer_map_of_characteristic` [Ω₁ char]) → key fact + bridge。
+    Odd p = `hG.odd.of_dvd_nat`。**Z-regular payoff 完成。**
+  **残 = §12 固有 Z 構成 assembly** (要 abelianSylow Lemma 12.8 setup の hypothesis 構造 load):
+  X≤Q (1⊊C_S(X)⊊S) を仮定 → `fitting_coprime_abelian_decomp` (P:=S, K:=X, coprime |S|⊥|X|) で
+  S₀=C_G(X)⊓S, S₁=[S,X], S₀⊓S₁=⊥ ∧ S₀⊔S₁=S → 両 nontrivial → both-cyclic ×2 (↥S 型に cast:
+  Sᵢ.subgroupOf S, pRank ↥S≤2 要) → 12.8(f) `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S)
+  → Z=大きい方 (by card) cyclic 不変 → exp lemma で exp(Z)=exp(S) → Z-regular で regular。
+  **⚠ 型 juggling (G↔↥S, both-cyclic/exp は CommGroup ↥S 上)が主作業。pRank ↥S≤2 は
+  pRank ↥M=2 (`tau2_pRank_eq_two`) からの単調性で。** **その後 front-half (X 存在 rank 矛盾、hard)。**
   → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
   + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
   `frobenius_factorization_of_regular` 充足。
