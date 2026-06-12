@@ -149,17 +149,40 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   なし→自前) + `inf_centralizer_eq_bot_of_line_le_cyclic` (`N⊓C(L)=⊥`→`∀a∈Z#,N⊓C(a)=⊥`;
   `centralizer_zpowers_eq_singleton`+`centralizer_le`; ↥Z→G transport=`map_subgroupOf_eq_of_le`+
   `MonoidHom.map_zpowers`)。**key fact↔per-element 正則性の接続完成。S12_Theorem1212b に 4 補題。**
-  → (3) **C_E(S)≠E 主枝** (次): まず **φ̄ quotient 作用 wrapper** (~60 行) = Q≤N_G(S) (q-群) の
-  共役 `Subgroup.normalizerMonoidHom S : N(S)→MulAut S` を `inclusion` で Q へ comp →
-  `QuotientGroup.lift` で φ̄:Q/Q₀→MulAut S (Q₀=`normalizerMonoidHom_ker`=C_Q(S)) → regular
-  (∀x∈Q∖C(S), S⊓C(x)=⊥; `actionFixedBy φ̄ (mk x)={s|φ̄ s=s}=C_S(x)`) で Prop 3.9 適用 →
-  IsCyclic(Q/Q₀)。次に rank 矛盾 (Ω₁⊆Q₁ cyclic で r_q=1 vs 12.11(c) r_q=2) で X 存在 →
-  coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + `isCyclic_of_pRank_le_one` +
-  12.8(f) で ⊴N_G(S) + key fact + bridge で Z=大きい方 regular。
-  → (3) **C_E(S)≠E 主枝** (coprime 分解 `fitting_coprime_abelian_decomp` で S=S₀×S₁ + φ̄ quotient
-  作用 Prop3.9 矛盾で X 存在 + 12.8(f) で S₀,S₁⊴N_G(S) + isCyclic_of_pRank_le_one + key fact +
-  bridge) → (4) C_E(S)=E 枝 (要 (i) generic 分解) → (5) Z_p 集約 + E₀ → (6) `frobFact_of_abelianSylow`
-  → 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。
+  → (3) ✅ **φ̄ quotient 作用 wrapper COMPLETE** (commit 5783a7d4, session 9): S12_Theorem1212b に
+  3 部品 — `conjActionHom` (共役 hom ↥Q→*MulAut↥S = normalizerMonoidHom S を inclusion で comp) +
+  `conjActionHom_ker` (kernel=C_Q(S)=C_G(S)⊓Q, normalizerMonoidHom_ker 経由) +
+  `isCyclic_quotient_of_conjugation_fpf` (FPF ∀x∈Q∖C_G(S),S⊓C_G(x)=⊥ ⟹ IsCyclic(↥Q⧸ker);
+  lifted φ̄=`QuotientGroup.kerLift`, `actionFixedBy φ̄ (mk a)=C_S(a)`, Prop 3.9 適用; coprime=q^m⊥p^n
+  via `coprime_primes`+`Coprime.pow m n`; `(φ̄ a s).val=a·s·a⁻¹` は defeq で `congrArg Subtype.val`)。
+  axiom-clean, AxiomsCheck 2 本。
+
+**▶▶ C_E(S)≠E 主枝の残り (= 次の frontier、BG L3358-3373 完訳済)**。論理は 2 半:
+
+- **front half = X 存在 (rank 矛盾, BG L3363-3370)**: q∈π(E/C_E(S)), Q=Syl_q(N_G(S))⊇Q₁=Syl_q(E)。
+  C_S(Q₁)⊊S ⟹ Prop1.6(e) ⟹ Q₁⊄C_E(A) ⟹ Cor12.10(c) ⟹ q∈τ₁(M), Q₁ cyclic。C_G(S)⊆E ⟹
+  Q₀=C_Q(S)⊊Q₁。**by_contra: Q/Q₀ が S に regular (FPF)** ⟹ φ̄ wrapper で IsCyclic(Q/Q₀) ⟹
+  Ω₁(Q/Q₀)⊆Q₁/Q₀ ⟹ Ω₁(Q)⊆Q₁ ⟹ r_q(N_G(S))=r(Q)=1 (Q₁ cyclic)。一方 12.8(e) で Ω₁(Q₁) が A
+  中心化 ⟹ 12.11(c) で r_q(N_G(S))=2。矛盾 ⟹ ∃X≤Q, 1⊊C_S(X)⊊S。**⚠ この rank 部分が hard**:
+  Ω₁(Q)/Ω₁(Q/Q₀) の rank 連動 + 12.11(c) の r_q=2 抽出 (12.11(c) は「q∈τ₂(M*), Syl_p⊴M*,
+  abelian Syl_q」止まりで「r_q=2」は派生 — sig 精査要)。
+- **back half = Z 構成 (BG L3371-3373)**: X から S₀=C_S(X), S₁=[S,X], **coprime 分解
+  `fitting_coprime_abelian_decomp`** (X≤N_G(S), coprime(|S|,|X|)) で S₀⊓S₁=⊥ ∧ S₀⊔S₁=S。
+  両 nontrivial (S₀≠1 from 1⊊C_S(X); S₁=[S,X]≠1 from C_S(X)⊊S)。**両 cyclic**: `isCyclic_of_pRank_le_one`
+  に pRank S₀≤1 / pRank S₁≤1 要。**🔑 pRank 加法性は mathlib/repo に無い** → 代替ルート確定:
+  pRank S₀≥2 なら B₀(elem-ab,p²)⊆S₀ + y(order p)∈S₁ で **B₀⊔⟨y⟩ が elem-ab order p³**
+  (`isElementaryAbelian_sup_of_le_centralizer` [S12_ExceptionalBridge:717, S abelian で中心化条件自明] +
+  disjoint card |B₀⊔⟨y⟩|=p³) ⟹ `le_pRank` で pRank S≥3 vs pRank S=2 矛盾 ⟹ pRank S₀≤1。同 S₁。
+  **friction = disjoint 部分群積の card** (`B₀⊓⟨y⟩=⊥ ⟹ |B₀⊔⟨y⟩|=|B₀|·|⟨y⟩|` の mathlib 名未確定 —
+  card_sup_eq / Schur-Zassenhaus 系 / index_mul_card を要調査)。両 cyclic 後: 12.8(f)
+  `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S) → Z=大きい方 (|S₀|≥|S₁| ? S₀ : S₁) →
+  exp(Z)=exp(S) (S=S₀×S₁ 両 cyclic p-群 ⟹ exp=lcm=max order=|Z|) → key fact
+  `inf_centralizer_line_eq_bot_of_invariant` (Ω₁(Z) on) + bridge `inf_centralizer_eq_bot_of_line_le_cyclic`
+  で ∀z∈Z#, Mσ⊓C(z)=⊥ (regular)。**back half は確認済 API 主体 — 先に着手推奨** (X を仮定に取り
+  step6-7 を補題化、front half の X 存在は別途)。
+  → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
+  + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
+  `frobenius_factorization_of_regular` 充足。
 
 ## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
 
