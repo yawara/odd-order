@@ -1806,3 +1806,44 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
 - chiColumn unfold は外側 namespace から `rw [Hypothesis.chiColumn]` (修飾要)。
 
 正本 = 本 session 31。**step(1)(2) landed。(4.8) の真 blocker = (2.1) [未形式化、conclusion 1/3 双方の前提]。**
+
+## 2026-06-12 (session 32, b-peterfalvi, Opus 4.8 1M): ✅✅ (2.1) + (4.8) conclusion (1) landed
+
+### ✅ (2.1) coprime-coset structure lemma (commit 60bb0b8a, new leaf S06_CertainTypeStructure)
+- 🔑 **CORRECTION to session 31**: Peterfalvi (2.1) は L−K-specific でなく **一般の coprime-coset 補題**:
+  「g normalizes H, gcd(o(g),|H|)=1 ⟹ Hg の各元は C_H(g)·g の元に H-共役」. issue 1003 title は誤称.
+- `coset_conj_into_centralizer_coset`: self-contained 証明 (SZ-conjugacy **不使用**). 一様 Bézout 指数 e
+  (e≡1 mod o(g), e≡0 mod |H|; `Nat.chineseRemainder`) で collapse `(w·g)^e=g` (w∈C_H(g)) → 共役写像
+  `(H⧸C_H(g))×C_H(g)→Hg` 単射 → |dom|=|H|=|Hg| (Lagrange) で全射 (`Set.eq_of_subset_of_ncard_le`).
+- application `Hypothesis.mem_compl_conj_into_W`: z∈L−K ⟹ ∃c,x∈W₁^#,y∈W₂, c⁻¹zc=x·y (C_K(x)=W₂).
+- 記録: SZ-conjugacy は in-repo `OddOrder/Mathlib/SchurZassenhausConj.lean` に sorry-free で在 (今回不使用).
+
+### 🔑🔑 CRITICAL: V = W−W₂ (NOT W−(W₁∪W₂)) — session 31 の読み訂正
+- Peterfalvi (4.3.a): 「W−W₂ is a TI-subset of L, Hypothesis (3.1) holds」⟹ (3.1) の V = **W−W₂**.
+- (4.6.b) G-level (3.1) も同じ V=W−W₂. ⟹ A₀=A∪V^L の V も W−W₂.
+- ⟹ (4.8) conclusion 1: z∈L−K → xW₂ に共役、xW₂⊆W−W₂=V (x≠1) ⟹ z∈V^L. **step(2) [W₁-vanish] 不要**
+  (xW₂ 全体が V に入る; x∈W₁^# も V に入る). step(2) は conclusion 3 の ψ-vanishing 用に残る.
+
+### ✅ (4.8) conclusion (1) `certainType_diff_supp_subset_A0` (commit 22223004, S06_CertainTypeIsometry)
+- Supp(μ_ij−μ_ik)⊆A₀. cases: z=1 vacuous (equal degree); z∈K→A (μ|_K=χ via `restrict_certainType_eq`
+  +`coe_chiRestrict`, (4.7) `chiRestrict_apply_eq_zero_of_not_mem_union` で A∪{1} 外消失); z∈L−K→V^L.
+- **新 field `Hypothesis46.tic_V : tic.V = ↑tic.W \ ↑tic.W2`** 追加 (faithful to (4.3.a)/(4.6.b);
+  Hypothesis46 は **producer 無し** [S08 で未使用] ゆえ field 追加は無害). tic.W=(W₁⊔W₂).map subtype は
+  導出 (W_sup+tic_W1/W2+map_sup).
+- 🔑 V-bridge (再調査不要): L.subtype(xy)∈tic.V via tic.W membership (xy∈W₁⊔W₂) + ∉tic.W2 (xy∉W₂ ⟸ x≠1).
+- gotcha: chiRestrict/coe_chiRestrict/restrict_certainType_eq は inner `namespace Hypothesis` ⟹ h:Hypothesis46
+  には **dot 経由** `h.coe_chiRestrict`/`h.restrict_certainType_eq` (extends 連鎖で coerce). bare 不可.
+  対して `chiRestrict_apply_eq_zero_of_not_mem_union` 等は S06 直下 (h 明示) ⟹ `foo h …`.
+
+### ▶▶ 残: (4.8) conclusion (3) [FT-critical isometry 恒等式] = steps (4)-(8)
+- conclusion 2 (δ_j=δ_k) = step(1) `certainType_sign_eq_of_degree_eq` (session 31) で **DONE**.
+  ⟹ **(4.8) は 2/3 完了** (conclusion 1 ✅ + conclusion 2 ✅; 残 conclusion 3).
+- conclusion 3: `(μ_ij−μ_ik)^τ = δ_j(ω_ij^σ−ω_ik^σ)`. **conclusion 1 で Supp⊆A₀ ⟹ τ (h.tau) に渡せる**
+  (`full_map_eq_of_mem_V` の `SupportedOnV` 入力が conclusion 1 で供給可能に).
+  - step(4) ψ:=(μ_ij−μ_ik)^τ−δ_j(ω_ij^σ−ω_ik^σ) が V で消滅 (full_map_eq_of_mem_V+(3.2.c)+(4.3.c)+step(2)).
+  - step(5) τ isometry + (μ_ij−μ_ik)^τ(1)=0 ⟹ ∃λ₁,λ₂∈Irr(G), ψ=λ₁−λ₂−δ_j(ω_ij^σ−ω_ik^σ).
+  - step(6)-(8): NC(ψ)≤4<2inf(w₁,w₂), (3.8) cases(b)(c) 排除 (ψ の ω^σ 係数は 2列 j,k に ±δ_j のみ),
+    (3.8)⟹ψ⊥ω_ij^σ,ω_ik^σ ⟹ ψ=0.
+  - **要 full (3.8) trichotomy `sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41)** = LAUNCH flagged hard part
+    (Fable 5 候補). step(7) counting 設計は session 30 cont. に確定済.
+- → (4.9) → S08 case-B → (6.8). 正本=本 session 32. **issue 1003 は CLOSED (条件達成).**

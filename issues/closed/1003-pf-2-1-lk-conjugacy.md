@@ -56,3 +56,17 @@ xW₂ の W₁-部分 (=x) では step(2) [vanish on W₁] で値 0 ⟹ z の共
 - OddOrder/Peterfalvi/S06_DadeIsometryCertain.lean (`Hypothesis`/`CertainTypeHypothesis` 構造, centralizer_eq_sup)
 - OddOrder/Peterfalvi/S06_CertainHypothesis46.lean (A₀ = A∪V^L, tic 二層)
 - commits 268d0940 (step1), 26e92857 (step2)
+
+## 解決 (2026-06-12, session 32)
+
+**完了**: (2.1) を Lean 補題として証明 + conclusion 1 がそれを用いて閉じた (sorry-free, axiom-clean).
+
+- (2.1) = 一般の coprime-coset 補題 (title「L−K conjugacy」は誤称; L−K はその §6 application).
+  `S06.coset_conj_into_centralizer_coset` + `Hypothesis.mem_compl_conj_into_W`
+  (new leaf `S06_CertainTypeStructure.lean`, commit `60bb0b8a`). self-contained Bézout+counting.
+- conclusion 1 `S06.certainType_diff_supp_subset_A0` (commit `22223004`): `Supp(μ_ij−μ_ik) ⊆ A₀`.
+  新 field `Hypothesis46.tic_V`(= V=W−W₂)を追加して V-bridge を実装.
+- 🔑 副産物: V=W−W₂ (session 31 の W−(W₁∪W₂) は誤読) ⟹ conclusion 1 は step(2) 不要.
+
+残 (別 issue/session): (4.8) conclusion 3 [τ-image 恒等式, 要 (3.8) full trichotomy].
+詳細 = notes/peterfalvi/s06_dade_certain_subgroup.md「session 32」.
