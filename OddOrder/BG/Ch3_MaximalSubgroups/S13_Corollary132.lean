@@ -115,6 +115,31 @@ theorem le_centralizer_of_forall_prime_isPGroup [Finite G] {K C : Subgroup G}
       rw [hyeq]
       exact Subgroup.mul_mem _ (Subgroup.zpow_mem _ hwC _) (Subgroup.zpow_mem _ hzC _)
 
+/-- **Order argument**: if `C ≤ H` (finite) and for every prime `q` some subgroup `S ≤ C` has
+the full `q`-part of `|H|` as its order (`|S| = q ^ v_q(|H|)`, i.e. `S` is a Sylow `q` of `H`
+lying in `C`), then `C = H`. The `S` witness that `|C|` carries the full `q`-part of `|H|` for
+every `q`, so `|H| ∣ |C|`, and `C ≤ H` gives `|C| ∣ |H|`, hence equality. Reusable for
+coprime-action "invariant Sylows generate" arguments. -/
+theorem eq_of_le_of_forall_full_prime_pow [Finite G] {H C : Subgroup G} (hCH : C ≤ H)
+    (hS : ∀ q : ℕ, q.Prime → ∃ S : Subgroup G, S ≤ C ∧
+      Nat.card ↥S = q ^ (Nat.card ↥H).factorization q) : C = H := by
+  have hdvd : Nat.card ↥H ∣ Nat.card ↥C := by
+    rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne']
+    intro q
+    by_cases hq : q.Prime
+    · haveI : Fact q.Prime := ⟨hq⟩
+      obtain ⟨S, hSC, hScard⟩ := hS q hq
+      have hpow : q ^ (Nat.card ↥H).factorization q ∣ Nat.card ↥C :=
+        hScard ▸ Subgroup.card_dvd_of_le hSC
+      exact (Nat.Prime.pow_dvd_iff_le_factorization hq Nat.card_pos.ne').mp hpow
+    · rw [Nat.factorization_eq_zero_of_non_prime _ hq]; exact Nat.zero_le _
+  have heq : Nat.card ↥C = Nat.card ↥H :=
+    Nat.dvd_antisymm (Subgroup.card_dvd_of_le hCH) hdvd
+  have hsub : C.subgroupOf H = ⊤ :=
+    Subgroup.eq_top_of_card_eq _
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCH).toEquiv, heq])
+  exact le_antisymm hCH (Subgroup.subgroupOf_eq_top.mp hsub)
+
 /-- A nonidentity `r`-subgroup `R` of `H` forces `r ∈ π(H)`. -/
 theorem mem_primeFactors_of_isPGroup_le [Finite G] {r : ℕ} (hr : r.Prime)
     {R H : Subgroup G} (hRH : R ≤ H) (hRne : R ≠ ⊥) (hRr : IsPGroup r ↥R) :
