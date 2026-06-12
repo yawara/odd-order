@@ -38,6 +38,15 @@ repo に **Cor 12.16(a)/(b) の statement が存在しない** (grep 確認済)�
 無い**。新規 forward axiom 禁止・S12_E 編集禁止・実 sorry 増加禁止のため、Lane G 単独では
 unblock 不能。→ LAUNCH.md「§12 側に補題が欲しくなったら issue 起票 + hub に依頼」に従い起票。
 
+## 解消方針 (2026-06-12 ユーザー裁可: **forward axiom で即着工**)
+
+`S13_Lemma131.lean` に Cor 12.16(a)(b) を **provisional forward axiom** として宣言
+(`cor1216_pRank_normalizer_le_one` / `cor1216_not_mem_primeFactors_derived_of_tau1`、
+user-approved 2026-06-12)。G はこれを cite して §13 を実証明する。**Lane F が S12_E に
+faithful な statement (下記「提案署名」) を入れ次第、本 axiom を de-axiom し cite 先を
+S12_E へ差し替える** (この issue は de-axiom 完了で closed)。本 axiom を使う §13 定理は
+`AxiomsCheck.lean` の `#assert_axioms_island … expecting [cor1216_…]` で pin する。
+
 ## やること
 
 - [ ] S12_E (または §12 leaf) に **BG Cor 12.16(a)/(b) の faithful な statement を追加** (proof は
