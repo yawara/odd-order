@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
 
 /-!
 # BG §13: Prime Action
@@ -168,16 +169,8 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     ActsPrimeOn (S10.Msigma M) E₃ := by
   sorry
 
-/-- **BG Theorem 13.4** (mmd L3538): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
-なら `C_{M_σ}(P) ⊆ C_{M_σ}(R)`。(prime action 解析の主ステップ。) -/
-theorem centralizer_le_centralizer_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
-    [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)
-    {P R : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hPE : P ≤ E)
-    (hR : R ∈ elemAbelianOfRank G r 1) (hRC : R ≤ E ⊓ Subgroup.centralizer (P : Set G)) :
-    S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
-      S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) := by
-  sorry
+-- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
+-- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
 
 /-- **BG Theorem 13.5** (mmd L3570): `E₁ ≠ 1` なら `E₁` は `M_σ` に prime 作用。 -/
 theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)

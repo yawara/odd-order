@@ -217,9 +217,89 @@ mmd 証明 (L3580-3597) の構造:
 deps 確認済: Lem 12.18 = `tau1_Malpha_interaction` (a 結論 = `M_α⊓C(P)≠⊥ ∧ M_α⊓C(P⊔Q)=⊥`,
 hyp: q≠p, p∈τ₁(M), P∈ℰ_p¹, P-inv q-grp Q, C_Q(P)=⊥, ℳ(N_G(Q))≠{M}, M_α≠⊥, q∉α(M))。
 Thm 12.13 = M_σ の Sylow abelian (要 exact 名特定; S12_Lemma128 `sylow_isMulCommutative_*` 周辺)。
-~200-300 行・multi-iteration。leaf = `S13_Theorem134.lean` 予定 (Cor 13.2 + S12_Lemma1218 import)。
-**次 iteration: outer reduction の coprime invariant-Sylow generation helper を確認/構築 → step 1
-(Cor 13.2 適用) から着手。** ⚠ ℳ(N_G(Q))≠{M} の出所 (Lem 12.2(a) 経由?) を step で要確認。
+
+### 2026-06-13 Lane G (loop): Thm 13.4 — **outer reduction COMPLETE**, per-q core 着手
+
+**✅ 進捗 (4 commit)**: reusable infra 3 + outer reduction:
+- `eq_of_le_of_forall_full_prime_pow` (4c3e2bdb): order 論法 (各素数の full Sylow⊆C ⟹ C=H)。
+- `exists_aInvariant_sylow_subgroup` (b2ddd441): coprime A-不変 Sylow 存在 (subgroup 形, φ-action
+  boilerplate を `Isaacs.Ch04.exists_aInvariant_sylow` で encapsulate)。
+- `msigma_centralizer_le_of_invariant_sylow_centralized` (6e6d7f92): **outer reduction** —
+  R が C_{M_σ}(P) の全 (P⊔R)-不変 Sylow を中心化 ⟹ C_{M_σ}(P)⊆C_{M_σ}(R)。⟹ **13.4 を per-q core
+  に還元**。coprimality は P⊔R≤E (σ' 群; 当初の commuting-subgroup 補題は不要と判明)。
+  hAN は `le_normalizer_inf`+`normalizer_le_normalizer_centralizer` (S12_Lemma1218)。
+
+**残: per-q core** (`hcore` の中身): q∈σ(M), S=(P⊔R)-不変 Sylow q of C_{M_σ}(P) で **[S,R]=1**。
+mmd L3576-3597 精読で確定した構造 (Q:=[S,R]≠1 と仮定して矛盾):
+1. M*∈ℳ(N_G(P)) (M*≠M; p∈τ₁(M) ゆえ非共役)。`1⊂Q=[S,R]⊆[M_σ∩M*,R]`。
+   - R≤E∩M* (R≤E, R≤C(P)⊆N_G(P)⊆M*)。
+2. **Cor 13.2(b)** で `r∈τ₁(M*)`: もし r∉τ₁(M*) なら R は τ₁(M*)'-部分群 ⟹ 13.2(b) で R が
+   M_σ∩M* を中心化 ⟹ [M_σ∩M*,R]=1 ⟹ Q=1 矛盾。∴ r∈τ₁(M*)。
+3. **Cor 13.2(c)** で `p∈β(M*)`: [M_σ∩M*,M∩M*]⊇[M_σ∩M*,R]⊇Q≠1 (R⊆M∩M*) ⟹ 13.2(c) +
+   p∈τ₁(M) ⟹ p∈β(M*)。
+4. `1⊂P⊆ M∩M*_σ` (P が C_{M*_σ}(RQ) に; ⚠ mmd は `M_{\tilde p}` = Nougat 誤抽出、**M*_σ と推定**、
+   要 PDF 確認)。S=C_S(R)×Q (S abelian by **Thm 12.13** + R coprime 作用)。
+5. **Lem 12.18(a)** を (r,R,M*)↦(p,P,M) role-swap で適用 → `ℳ(N_G(Q))={M*}`。
+6. **Prop 12.15** (`sigma_subgroup_maximal_interaction`, S12_E:484, sorry'd scaffold・cite 可) を
+   X=Q, M* で: (e) は `1⊂P⊆M∩M*_σ` で排除 (P⊆M*_σ⊓(M∩M*)=⊥ 矛盾) ⟹ **Lem 10.12(a) で q∈σ(M*)**;
+   (d) で `M_α≠1` かつ `r∈π(E)∩τ₁(M*)⊆τ₁(M)` (τ₁(M*)⊆τ₁(M)∪α(M), r∈π(E)⟹r∉α(M))。
+7. `[S,R]≠1 ⟹ q∉α(M)`、よって Lem 12.18(a) を 2 回 (p,P と r,R) →
+   `C_{M_α}(P)⊆C_{M_α}(R)` と `C_{M_α}(R)⊆C_{M_α}(P)` ⟹ `C_{M_α}(P)=C_{M_α}(R)`。
+8. これは S で正規化 (S⊆C_M(P)) ⟹ Q=[S,R] で中心化 → `C_{M_α}(R)=C_{M_α}(RQ)`。
+9. **矛盾**: ℳ(N_G(Q))≠{M} ⟹ Lem 12.18(a) が `C_{M_α}(R)≠C_{M_α}(RQ)` (C_{M_α}⊓C(R)≠⊥ かつ
+   C_{M_α}⊓C(R⊔Q)=⊥)。∎
+
+cite 先 (一部 sorry'd scaffold ゆえ §13 は sorryAx 経由・repo 標準): Cor 13.2 ✅,
+Prop 12.15 `sigma_subgroup_maximal_interaction` (sorry'd), Lem 12.18 `tau1_Malpha_interaction` ✅,
+Lem 10.12(a) `S10.disjoint_of_not_conj` 系, Thm 12.13 (要特定)。
+**次 iteration: per-q core skeleton を WIP leaf に (step 1-3 = Cor 13.2 は concrete に proof,
+step 4-9 = Prop 12.15/Lem 12.18 部は sorry で構造化) → 順次充足。**
+
+### 2026-06-13 Lane G (loop): per-q core skeleton 着地 (WIP) + **PDF 精読で proof 確定**
+
+**WIP leaf S13_Theorem134**: per_q_centralizes (setup + step 2-3 proven, step 4-9 sorry) +
+centralizer_le_centralizer_of_tau1 (outer reduction + per_q で proof)。build 緑 (sorry 1)。
+- step 2 (r∈τ₁M*) = Cor 13.2(b) 対偶 (R が τ₁M*'-部分群なら M_σ∩M* 中心化 → [S,R]=1 矛盾)。✅ proven。
+- step 3 (p∈β(M*)) = Cor 13.2(c) ([M_σ∩M*,M∩M*]⊇[S,R]≠1)。✅ proven。
+- M* = `eq_top_or_exists_le_coatom` (N_G(P)≠⊤ via P 非正規)。setup ✅。
+
+**📖 PDF 精読 (book p.94-99 = PDF 107-112; offset +13) — Prop 12.15 / Lem 12.18 / Thm 13.4 exact**:
+- **M_p̃ = M*_σ** 確定: `1⊂P⊆C_{M*_σ}(RQ)`。
+- **Prop 12.15** (book p.94, `sigma_subgroup_maximal_interaction` S12_E:484, sorry'd): X=Q, M* で
+  (e) 排除 (P⊆M∩M*_σ) → (Lem 10.12(a)) q∈σ(M*) → (d) M_α≠1, τ₁(M*)⊆τ₁(M)∪α(M)。
+- **Lem 12.18** (book p.96, `tau1_Malpha_interaction`): (a) M_α≠1∧q∉α(M) ⟹ C_{M_α}(P)≠1∧C_{M_α}(PQ)=1。
+- **⚠ 2 つの BG proof 省略 (OCR でなく原文の "we can conclude"/"to get")**:
+  1. **`ℳ(N_G(Q))={M*}`**: 原文「apply Lem 12.18(a) ... to get ℳ(N_G(Q))={M*}」だが **Lem 12.18(a)
+     の結論は C_{M_α} であって ℳ ではない** → 原文の shorthand。実質要るのは **N_G(Q)⊆M***
+     (⟹ M*∈ℳ(N_G(Q))-{M} で Prop 12.15 適用可、かつ ℳ(N_G(Q))≠{M} で step 9 の Lem 12.18 可)。
+     導出は §12 の σ-uniqueness 系を要する見込み (Q=[S,R]⊆M*_σ, q∈σ(M*))。**要 §12 study**。
+  2. **`C_{M_α}(P)⊆C_{M_α}(R)` と逆**: 原文「Since [S,R]≠1 yields q∉α(M), we can conclude」。
+     q∉α(M) で Lem 12.18(a) (C_{M_α}(P)≠1, C_{M_α}(PQ)=1; rank≤1 cyclic) は出るが、**包含 itself は
+     さらに rank-1/cyclic + FPF 論法を要する** (原文 elide)。**要 derivation**。
+- step 8: C_{M_α}(P)=C_{M_α}(R) は S で正規化 (S⊆C_M(P)) + Q=[S,R] で中心化 (three-subgroups:
+  [A,R]=1 [A=C_{M_α}(R)⊆C(R)], [A,S]⊆A [S 正規化], ⟹ [Q,A]=[[S,R],A]=1) → C_{M_α}(R)=C_{M_α}(RQ)。
+- step 9: Lem 12.18(a) (r,R 版) で C_{M_α}(R)≠1, C_{M_α}(RQ)=M_α⊓C(R⊔Q)=1 ⟹ ≠ → 矛盾。
+**評価**: per-q core は ~100-150 行・2 つの BG 省略 (ℳ(N_G(Q))={M*} の N_G(Q)⊆M* / C_{M_α} 包含) の
+derivation を要する深い部分。outer reduction まで完成・committed ゆえ、ここは focused task。
+**次: N_G(Q)⊆M* の導出 (§12 σ-uniqueness) を最初に攻める。**
+
+### 2026-06-13 Lane G (loop): ℳ(N_G(Q))={M*} 省略を解明 + per-q core 深度評価
+
+**ℳ(N_G(Q))={M*} の正体 = Lem 12.18(a) の入れ子 contradiction** (原文「to get」の真意):
+ℳ(N_G(Q))≠{M*} と仮定 → Lem 12.18(a) を (r,R,M*) role-swap で適用 → C_{M*_α}(RQ)=1。
+だが p∈β(M*)⊆α(M*) ゆえ P⊆M*_α、かつ `1⊂P⊆C_{M*_σ}(RQ)` から P⊆C_{M*_α}(RQ)≠1 → P=1 矛盾。
+∴ ℳ(N_G(Q))={M*}。**要 sub-facts: M*_α≠1, q∉α(M*), P⊆M*_α, C_Q(R)=1**(各々 §12 依存)。
+
+**per-q core 深度評価 (重要)**: steps 4-9 は **~150-200 行の入れ子 contradiction**で、各 sub-step が
+それ自体 §12 の深い導出:
+- **S abelian** = Thm 12.13 (`S12_E:48`「非可換 p-群 ⟹ 𝒰」, sorry'd) の 𝒰-machinery 経由 (S∈𝒰 排除)。
+- **C_Q(R)=1** = abelian S への R coprime 作用の FPF (`[S,R]⊓C_S(R)=⊥`; repo に既製無し→要構築)。
+- **ℳ(N_G(Q))={M*}** = 上記 Lem 12.18 入れ子 contradiction (~40-60 行)。
+- **Prop 12.15** 適用 (X=Q, M*) → q∈σ(M*) → (d)。
+- **C_{M_α}(P)⊆C_{M_α}(R)** 包含 = Lem 12.18(a) (C_{M_α}(P)≠1, C_{M_α}(PQ)=1) + rank-1/cyclic 論法。
+- step 8 three-subgroups, step 9 Lem 12.18 (r,R 版) 矛盾。
+⟹ Lem 12.18 を **3 回** (M*-role で ℳ 導出, M-role で包含 ×2)、Prop 12.15・Thm 12.13・three-subgroups。
+**outer reduction まで committed; per-q core は focused task (多数の §12 sorry'd scaffold cite + 新 FPF 補題)。**
 
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
