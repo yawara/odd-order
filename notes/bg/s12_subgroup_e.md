@@ -189,13 +189,21 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
     line 化 (|Ω₁|=p via `Omega.exponent_eq_of_class_le_two`+`IsCyclic.exponent_eq_card`; 不変性
     via `AppB.normalizer_le_normalizer_map_of_characteristic` [Ω₁ char]) → key fact + bridge。
     Odd p = `hG.odd.of_dvd_nat`。**Z-regular payoff 完成。**
-  **残 = §12 固有 Z 構成 assembly** (要 abelianSylow Lemma 12.8 setup の hypothesis 構造 load):
-  X≤Q (1⊊C_S(X)⊊S) を仮定 → `fitting_coprime_abelian_decomp` (P:=S, K:=X, coprime |S|⊥|X|) で
-  S₀=C_G(X)⊓S, S₁=[S,X], S₀⊓S₁=⊥ ∧ S₀⊔S₁=S → 両 nontrivial → both-cyclic ×2 (↥S 型に cast:
-  Sᵢ.subgroupOf S, pRank ↥S≤2 要) → 12.8(f) `relative_normality_of_abelianSylow` で S₀,S₁⊴N_G(S)
-  → Z=大きい方 (by card) cyclic 不変 → exp lemma で exp(Z)=exp(S) → Z-regular で regular。
-  **⚠ 型 juggling (G↔↥S, both-cyclic/exp は CommGroup ↥S 上)が主作業。pRank ↥S≤2 は
-  pRank ↥M=2 (`tau2_pRank_eq_two`) からの単調性で。** **その後 front-half (X 存在 rank 矛盾、hard)。**
+  **✅✅✅ Z 構成 assembly COMPLETE (session 9, commit 8ff6b506) — Case 3 back-half 完結**:
+  `exists_invariant_cyclic_sameExponent_regular` (abelianSylow regime で X≤N_G(S) coprime +
+  1⊊C_S(X)⊊S ⟹ ∃ cyclic N_G(S)-不変 Z≤S, exp(Z)=exp(S), regular)。`fitting_coprime_abelian_decomp`
+  (P:=↑S,K:=X) で S₀=C(X)⊓↑S/S₁=⁅↑S,X⁆ → both-cyclic ×2 (cast wrapper
+  `isCyclic_of_le_of_inf_eq_bot_of_pRank_le_two`) + 12.8(f) で ⊴N_G(S) → Z=大 (card) → exp
+  (cast `exponent_eq_of_le_of_sup_eq_of_exponent_dvd`) + Z-regular。**🔑 知見: `open scoped
+  IsMulCommutative` で `[IsMulCommutative ↥S]`→`CommGroup ↥S` 自動; pRank ↥S≤2 =
+  `pRank_le_of_injective (inclusion hSM)` + tau2_pRank_eq_two; decomp(C⊓↑S) vs 12.8(f)(↑S⊓C) は
+  inf_comm; card 大⟹exp 大 = IsCyclic.exponent_eq_card + pow_dvd_pow。** assembly は namespace
+  修正のみで一発通過。
+  **残 = front-half (X 存在 rank 矛盾, BG L3363-3370, hard)**: q∈π(E/C_E(S)), Q=Syl_q(N_G(S))⊇Q₁=
+  Syl_q(E) → Prop1.6(e)+Cor12.10(c) で q∈τ₁/Q₁ cyclic → by_contra(Q/Q₀ regular)→φ̄ wrapper で
+  IsCyclic(Q/Q₀)→Ω₁ で r_q=1 vs 12.8(e)+12.11(c) r_q=2 矛盾 → X 存在。⚠ rank 部分(12.11(c) の
+  r_q=2 抽出, Ω₁(Q/Q₀)⊆Q₁/Q₀⟹Ω₁(Q)⊆Q₁)が hard — 要精査。**その後 C_E(S)=E 枝 + frobFact_of_-
+  abelianSylow + 3 ケース統合。**
   → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
   + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
   `frobenius_factorization_of_regular` 充足。
