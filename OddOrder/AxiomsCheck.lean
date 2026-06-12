@@ -4093,3 +4093,13 @@ Unconditional. -/
 Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exponent_eq_of_sup_eq_top_of_exponent_dvd
+
+/-! ### BG Theorem 12.12: Case 3 back-half — invariant cyclic `Z` acts regularly (`S12_Theorem1212b`)
+
+`inf_centralizer_eq_bot_of_invariant_cyclic`: an `N_G(S)`-invariant nonidentity cyclic `Z ≤ S`
+has `M_σ ⊓ C_G(z) = 1` for every `z ∈ Z#`. Its order-`p` subgroup `L = Ω₁(Z)` is a line
+(`|Ω₁(Z)| = p` via cyclic exponent), `N_G(S)`-invariant (`Ω₁` characteristic in `Z`), so the key
+fact `inf_centralizer_line_eq_bot_of_invariant` gives `M_σ ⊓ C_G(L) = 1` and the cyclic bridge
+`inf_centralizer_eq_bot_of_line_le_cyclic` spreads it to all of `Z#`. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_invariant_cyclic

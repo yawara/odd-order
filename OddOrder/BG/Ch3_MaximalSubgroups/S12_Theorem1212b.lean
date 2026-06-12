@@ -327,4 +327,58 @@ theorem exponent_eq_of_sup_eq_top_of_exponent_dvd {T : Type*} [CommGroup T] [Fin
     rw [Subgroup.orderOf_mk] at h
     exact h.trans hexp
 
+/-! ## Back-half: an `N_G(S)`-invariant cyclic `Z ≤ S` acts regularly on `M_σ` -/
+
+/-- **Theorem 12.12, Case 3, the per-`Z` payoff** (BG L3354-3357): every `N_G(S)`-invariant
+nonidentity cyclic subgroup `Z ≤ S` satisfies `C_{M_σ}(z) = 1` for all `z ∈ Z#`. Its order-`p`
+subgroup `L = Ω₁(Z)` is a line (`Ω₁` of cyclic `Z` has order `p` since `↥Z` is abelian of class
+`≤ 2`), is `N_G(S)`-invariant (characteristic in `Z`, via `normalizer_le_normalizer_map_of_-`
+`characteristic`), so the key fact gives `M_σ ⊓ C_G(L) = 1`, and the cyclic bridge spreads this
+to every `z ∈ Z#`. -/
+theorem inf_centralizer_eq_bot_of_invariant_cyclic [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    {Z : Subgroup G} [IsCyclic ↥Z] (hZS : Z ≤ (S : Subgroup G)) (hZne : Z ≠ ⊥)
+    (hZinv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (Z : Set G)) :
+    ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  classical
+  have hodd : Odd p := hG.odd.of_dvd_nat
+    (dvd_trans (hA.2 ▸ dvd_pow_self p (two_ne_zero)) (Subgroup.card_subgroup_dvd_card A))
+  have hZp : IsPGroup p ↥Z := S.isPGroup'.to_le hZS
+  haveI : Nontrivial ↥Z := (Subgroup.nontrivial_iff_ne_bot Z).mpr hZne
+  -- `↥Z` is abelian (cyclic), so class `≤ 2`.
+  have hcl : _root_.commutator ↥Z ≤ Subgroup.center ↥Z := by rw [commutator_eq_bot]; exact bot_le
+  -- a `p`-torsion element makes `Ω₁(↥Z)` nontrivial.
+  have hpZ : p ∣ Nat.card ↥Z := by
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp hZp
+    have h1lt : 1 < Nat.card ↥Z := Finite.one_lt_card
+    have hk0 : k ≠ 0 := by rintro rfl; rw [pow_zero] at hk; omega
+    rw [hk]; exact dvd_pow_self p hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpZ
+  have hxne : x ≠ 1 := by
+    intro hx1; rw [hx1, orderOf_one] at hx; exact absurd hx.symm (Fact.out : p.Prime).ne_one
+  have hxO : x ∈ Omega ↥Z p 1 :=
+    Omega.mem_of_pow_eq_one (by rw [pow_one]; exact hx ▸ pow_orderOf_eq_one x)
+  haveI hOnt : Nontrivial ↥(Omega ↥Z p 1) := by
+    rw [Subgroup.nontrivial_iff_ne_bot]
+    intro hbot; rw [hbot, Subgroup.mem_bot] at hxO; exact hxne hxO
+  have hOcard : Nat.card ↥(Omega ↥Z p 1) = p := by
+    rw [← IsCyclic.exponent_eq_card]; exact Omega.exponent_eq_of_class_le_two hodd hcl
+  -- `L = Ω₁(Z)` as a subgroup of `G`: a line `≤ Z ≤ S`, `N_G(S)`-invariant.
+  set L : Subgroup G := (Omega ↥Z p 1).map Z.subtype with hL_def
+  have hLcard : Nat.card ↥L = p := by
+    rw [hL_def, Subgroup.card_map_of_injective Z.subtype_injective]; exact hOcard
+  have hLZ : L ≤ Z := hL_def ▸ Subgroup.map_subtype_le _
+  have hLS : L ≤ (S : Subgroup G) := hLZ.trans hZS
+  have hL1 : L ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hLcard, by rw [hLcard, pow_one]⟩
+  have hLinv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤
+      Subgroup.normalizer (L : Set G) := by
+    rw [hL_def]
+    exact hZinv.trans AppB.normalizer_le_normalizer_map_of_characteristic
+  have hkey := inf_centralizer_line_eq_bot_of_invariant hG h hp hA hAE hAS hSM hL1 hLS hLinv
+  exact inf_centralizer_eq_bot_of_line_le_cyclic hZp hLZ hLcard hkey
+
 end OddOrder.BG.Ch3.S12
