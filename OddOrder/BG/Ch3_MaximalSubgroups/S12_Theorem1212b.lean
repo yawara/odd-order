@@ -1180,3 +1180,31 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
   · -- regularity, via the back-half line-to-cyclic lemma.
     exact inf_centralizer_eq_bot_of_line_le_cyclic (S.isPGroup'.to_le hZS) hLZ
       (by rw [Nat.card_zpowers, hwG_ord]) hwG_good
+
+/-- **Theorem 12.12, Case 3, per-prime `Z`-construction** (both branches): in the abelian-Sylow
+regime with the regularity hypothesis, `S` has a cyclic subgroup `Z` of exponent `exp(S)`,
+normalized by `E`, acting regularly on `M_σ`. (Splits on `C_E(S) = E`: the `= E` branch uses the
+agemo construction, the `≠ E` branch produces `X` (front-half) then the invariant `Z` (back-half).
+In both cases `E ≤ N_G(Z)`.) -/
+theorem exists_cyclic_Enormal_regular_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    (hSab : IsMulCommutative ↥(S : Subgroup G))
+    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
+    ∃ Z : Subgroup G, Z ≤ (S : Subgroup G) ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧
+      E ≤ Subgroup.normalizer (Z : Set G) ∧
+      Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
+      ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  by_cases hCES : Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E = E
+  · exact exists_cyclic_Enormal_regular_of_CES_eq hG h hp hA hAE hAS hSM hSab hreg hCES
+  · obtain ⟨X, hXN, hcop, hne, hltS⟩ :=
+      exists_partial_centralizer_of_abelianSylow hG h hp hA hAE hAS hSM hSab hreg hCES
+    obtain ⟨Z, hZS, hZcyc, hZne, hZNinv, hZexp, hZreg⟩ :=
+      exists_invariant_cyclic_sameExponent_regular hG h hp hA hAE hAS hSM hSab hXN hcop hne hltS
+    have hENS : E ≤ Subgroup.normalizer ((S : Subgroup G) : Set G) :=
+      E_le_normalizer_sylow_of_abelianSylow hG h hp hA hAE hAS hSab
+    exact ⟨Z, hZS, hZcyc, hZne, hENS.trans hZNinv, hZexp, hZreg⟩
+
+end OddOrder.BG.Ch3.S12

@@ -4252,3 +4252,12 @@ regularly on `M_σ`. Built from a good line `L = ⟨w⟩ ≤ ℧^{a-1}(S)` (`℧
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_generator_of_card_prime
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_CES_eq
+
+/-! ### BG Theorem 12.12: Case 3 per-prime `Z`-construction (both branches) (`S12_Theorem1212b`)
+
+`exists_cyclic_Enormal_regular_of_abelianSylow`: in the abelian-Sylow regime with the regularity
+hypothesis, `S` has a cyclic `Z ≤ S` of exponent `exp(S)`, normalized by `E`, regular on `M_σ`.
+Splits on `C_E(S) = E`: `= E` uses the agemo construction; `≠ E` produces `X` (front-half) then the
+invariant `Z` (back-half). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_cyclic_Enormal_regular_of_abelianSylow
