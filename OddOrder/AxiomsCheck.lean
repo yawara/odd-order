@@ -4048,3 +4048,15 @@ forces `N_G(L) ⊆ M ⊇ N_G(S)`, contradiction). Unconditional. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sylow_maximal_in_M_of_le
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_line_eq_bot_of_invariant
+
+/-! ### BG Theorem 12.12: Case 3 cyclic-`Z` regularity bridge (`S12_Theorem1212b`)
+
+`line_le_zpowers_in_cyclic`: in a finite cyclic `p`-group the order-`p` subgroup is the unique
+minimal one, contained in `⟨a⟩` for every `a ≠ 1` (generator + `orderOf_pow` gcd + Bézout).
+`inf_centralizer_eq_bot_of_line_le_cyclic`: transfers `N ⊓ C_G(L) = 1` (for a line `L ≤ Z`,
+`Z` cyclic) to `N ⊓ C_G(a) = 1` for all `a ∈ Z#`, since `L ≤ ⟨a⟩` gives `C_G(a) ≤ C_G(L)`.
+This connects the key fact to the per-element Frobenius regularity. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_zpowers_in_cyclic
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_line_le_cyclic

@@ -87,4 +87,94 @@ theorem inf_centralizer_line_eq_bot_of_invariant [Finite G] (hG : IsMinimalSimpl
     exact hmem ▸ hle
   exact hNS_not_le (hLinv.trans hNL_le_M)
 
+/-! ## Cyclic `p`-group: the order-`p` subgroup is the unique minimal one -/
+
+/-- In a finite cyclic `p`-group, a subgroup `L` of order `p` is contained in `⟨a⟩` for every
+nonidentity `a` (it is the unique minimal subgroup `Ω₁`). Working in a generator `g`: writing
+`a = g^k`, `x = g^s` for `x ∈ L`, one has `gcd(N,k)·ord(a) = N = gcd(N,s)·p`, so `p ∣ ord(a)`
+(`a` a nonidentity `p`-element) gives `gcd(N,k) ∣ gcd(N,s) ∣ s`, whence `x = g^s ∈ ⟨g^k⟩ = ⟨a⟩`
+by Bézout. -/
+theorem line_le_zpowers_in_cyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {p : ℕ} [Fact p.Prime] (hCp : IsPGroup p C) {L : Subgroup C} (hLcard : Nat.card ↥L = p)
+    {a : C} (ha1 : a ≠ 1) : L ≤ Subgroup.zpowers a := by
+  classical
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
+  obtain ⟨ka, hka⟩ : ∃ ka : ℕ, g ^ ka = a :=
+    (Submonoid.mem_powers_iff a g).mp (mem_powers_iff_mem_zpowers.mpr (hg a))
+  -- `p ∣ orderOf a` (a nonidentity `p`-element).
+  have hpa : p ∣ orderOf a := by
+    obtain ⟨n, hn⟩ := hCp a
+    obtain ⟨i, _, hi⟩ := (Nat.dvd_prime_pow Fact.out).mp (orderOf_dvd_of_pow_eq_one hn)
+    rcases Nat.eq_zero_or_pos i with rfl | hipos
+    · rw [pow_zero] at hi; exact absurd (orderOf_eq_one_iff.mp hi) ha1
+    · rw [hi]; exact dvd_pow_self p hipos.ne'
+  intro x hxL
+  rcases eq_or_ne x 1 with rfl | hx1
+  · exact one_mem _
+  obtain ⟨sx, hsx⟩ : ∃ sx : ℕ, g ^ sx = x :=
+    (Submonoid.mem_powers_iff x g).mp (mem_powers_iff_mem_zpowers.mpr (hg x))
+  -- `orderOf x = p`.
+  have hxord : orderOf x = p := by
+    have h1 : orderOf x ∣ p := by
+      have h2 : orderOf (⟨x, hxL⟩ : ↥L) ∣ Nat.card ↥L := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk, hLcard] at h2
+    rcases (Fact.out : p.Prime).eq_one_or_self_of_dvd _ h1 with h | h
+    · exact absurd (orderOf_eq_one_iff.mp h) hx1
+    · exact h
+  -- `gcd(N,ka) ∣ sx`, where `N = orderOf g`.
+  have hga : Nat.gcd (orderOf g) ka ∣ orderOf g := Nat.gcd_dvd_left _ _
+  have hgs : Nat.gcd (orderOf g) sx ∣ orderOf g := Nat.gcd_dvd_left _ _
+  have ea : Nat.gcd (orderOf g) ka * orderOf a = orderOf g := by
+    rw [← hka, orderOf_pow]; exact Nat.mul_div_cancel' hga
+  have ex : Nat.gcd (orderOf g) sx * p = orderOf g := by
+    rw [← hxord, ← hsx, orderOf_pow]; exact Nat.mul_div_cancel' hgs
+  obtain ⟨t, ht⟩ := hpa
+  have hcancel : Nat.gcd (orderOf g) ka * t = Nat.gcd (orderOf g) sx := by
+    have heq : Nat.gcd (orderOf g) ka * t * p = Nat.gcd (orderOf g) sx * p := by
+      rw [mul_assoc, mul_comm t p, ← ht, ea, ex]
+    exact Nat.eq_of_mul_eq_mul_right (Fact.out : p.Prime).pos heq
+  have hdvd : Nat.gcd (orderOf g) ka ∣ sx := by
+    have h1 : Nat.gcd (orderOf g) ka ∣ Nat.gcd (orderOf g) sx := ⟨t, hcancel.symm⟩
+    exact dvd_trans h1 (Nat.gcd_dvd_right (orderOf g) sx)
+  -- `x = g^sx ∈ ⟨g^ka⟩ = ⟨a⟩` via Bézout.
+  rw [← hsx, ← hka, Subgroup.mem_zpowers_iff]
+  obtain ⟨w, hw⟩ := hdvd
+  refine ⟨Int.gcdA ka (orderOf g) * w, ?_⟩
+  have hbez : (Nat.gcd ka (orderOf g) : ℤ)
+      = (ka : ℤ) * Int.gcdA ka (orderOf g) + (orderOf g : ℤ) * Int.gcdB ka (orderOf g) :=
+    Int.gcd_eq_gcd_ab ka (orderOf g)
+  rw [← zpow_natCast g ka, ← zpow_mul, ← zpow_natCast g sx, zpow_eq_zpow_iff_modEq,
+    Int.modEq_iff_dvd]
+  have hrw : (sx : ℤ) - (ka : ℤ) * (Int.gcdA ka (orderOf g) * w)
+      = (orderOf g : ℤ) * (Int.gcdB ka (orderOf g) * w) := by
+    have hsxz : (sx : ℤ) = (Nat.gcd ka (orderOf g) : ℤ) * (w : ℤ) := by
+      rw [Nat.gcd_comm]; exact_mod_cast hw
+    rw [hsxz, hbez]; ring
+  rw [hrw]
+  exact dvd_mul_right _ _
+
+/-- **Regularity transfer from the line to the whole cyclic group**: if `N` meets the centralizer
+of an order-`p` line `L ≤ Z` (cyclic `p`-group) trivially, then it meets `C_G(a)` trivially for
+every `a ∈ Z#`. Each such `a` has `L ≤ ⟨a⟩` (unique minimal subgroup), so `C_G(a) ≤ C_G(L)`. -/
+theorem inf_centralizer_eq_bot_of_line_le_cyclic [Finite G] {Z L N : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hZp : IsPGroup p ↥Z) [IsCyclic ↥Z] (hLZ : L ≤ Z) (hLcard : Nat.card ↥L = p)
+    (hNL : N ⊓ Subgroup.centralizer (L : Set G) = ⊥) :
+    ∀ a ∈ Z, a ≠ 1 → N ⊓ Subgroup.centralizer ({a} : Set G) = ⊥ := by
+  intro a ha ha1
+  -- `L ≤ ⟨a⟩` via the unique-minimal-subgroup lemma, transported from `↥Z` to `G`.
+  have hLza : L ≤ Subgroup.zpowers a := by
+    have hcard' : Nat.card ↥(L.subgroupOf Z) = p := by
+      rw [← hLcard]; exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLZ).toEquiv
+    have hane : (⟨a, ha⟩ : ↥Z) ≠ 1 := by
+      intro hcon; exact ha1 (by simpa using congrArg Subtype.val hcon)
+    have key := line_le_zpowers_in_cyclic (C := ↥Z) hZp hcard' hane
+    have h1 := Subgroup.map_mono (f := Z.subtype) key
+    rwa [Subgroup.map_subgroupOf_eq_of_le hLZ, MonoidHom.map_zpowers] at h1
+  -- `C_G(a) = C_G(⟨a⟩) ≤ C_G(L)`.
+  have hCle : Subgroup.centralizer ({a} : Set G) ≤ Subgroup.centralizer (L : Set G) := by
+    rw [← centralizer_zpowers_eq_singleton]
+    exact Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hLza)
+  rw [← le_bot_iff, ← hNL]
+  exact le_inf inf_le_left (inf_le_right.trans hCle)
+
 end OddOrder.BG.Ch3.S12
