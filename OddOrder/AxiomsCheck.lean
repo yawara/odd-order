@@ -4351,3 +4351,10 @@ Theorem 12.12 in the abelian-Sylow case — `A₀ = E₂` is abelian normal with
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.card_finsetSup_eq_prod
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_Z_of_orderOf_prime_mem
+
+/-! `exists_tau2_product`: the `τ₂`-product `ZZ = ∏_{p ∈ τ₂(M) ∩ π(E)} Z_p` for the abelian-Sylow
+case — `≤ E`, nontrivial, `E`-normalized, a `τ₂(M)`-group, fully regular on `M_σ`, realizing the
+`τ₂`-part of `exp(E)`. Bundles the per-prime choice (`exists_regular_cyclic_of_mem_tau2`) with the
+direct-product lemmas (`card_finsetSup_eq_prod` / `mem_Z_of_orderOf_prime_mem`). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_tau2_product
