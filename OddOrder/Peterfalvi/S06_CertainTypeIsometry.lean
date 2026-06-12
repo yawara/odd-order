@@ -159,6 +159,16 @@ theorem certainTypeOmegaSigma_apply_of_mem_V (h : Hypothesis46 A L) [NeZero (Nat
     (ticVdiff h).omega_apply]
   exact omegaProdCharTic_apply h χ₂ i _
 
+/-- The `σ_G`-image `ω_{ij}^σ` is the `χ`-family member at the index `omegaProdEquiv.symm` of the
+transported character: `ω_{ij}^σ = χ_{P_{ij}}` (`sigma_omega`).  This identifies the two `δ`-term
+positions `P_{ij}, P_{ik}` in the `σ`-coefficient grid of (4.8). -/
+theorem certainTypeOmegaSigma_eq_chiFam (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    certainTypeOmegaSigma h χ₂ i = (ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h)
+      ((ticVdiff h).omegaProdEquiv.symm (omegaProdCharTic h χ₂ i)) :=
+  (ticVdiff h).sigma_omega rfl (ticVdiffFullDadeApplication h) (omegaProdCharTic h χ₂ i)
+
 /-- **Peterfalvi (4.8), step (1)** (the sign equality `δ_j = δ_k`).  Fix a row `i` and two
 columns `χ₂, χ₂'`.  If the certain-type characters `μ_{ij}` and `μ_{ik}` have equal degree at
 `1`, then the two column signs coincide.

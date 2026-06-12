@@ -765,6 +765,12 @@ set_option linter.style.longLine false in
 -- Peterfalvi (4.8), step (4): the two sides agree on `V` (`(μ_{ij} − μ_{ik})^τ(v) =
 -- δ_j(ω_{ij}^σ(v) − ω_{ik}^σ(v))` for `v ∈ V`), the `hψ` input to the (3.8) trichotomy endgame.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_apply_eq_of_mem_V
+-- Peterfalvi (4.8), steps (5)/(6) inputs to the (3.8) trichotomy endgame: `‖φ‖² = 2` (τ isometry +
+-- (4.1) distinctness), `NC(φ) ≤ 2` (norm-2 ⟹ two constituents, each `≤ 1` against the χ-family),
+-- and `ω_{ij}^σ = χ_{P_{ij}}` (the σ-image is a χ-family member, identifying the δ-term positions).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainType_diff_dade_inner_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.sigmaNC_dade_le_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam
 -- Peterfalvi (2.1): the coprime-coset structure lemma.  `g` normalizes `H` with `(o(g), |H|) = 1`
 -- ⟹ every element of `Hg` is `H`-conjugate to an element of `C_H(g)·g`.  Proof: a uniform Bézout
 -- exponent `e` (`≡1 mod o(g)`, `≡0 mod |H|`) collapses `(w·g)^e = g` for `w ∈ C_H(g)`, making the
