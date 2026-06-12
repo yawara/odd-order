@@ -2095,3 +2095,28 @@ INPUT 全 (step4, ‖φ‖²=2, NC(φ)≤2, ω_ij^σ=chiFam(P_ij), **+f∈{0,±1
 isometry で Z[T,A] 上 τ と一致。**(4.9)(b) は (4.8) conclusion 3 を使う** ((μ_j−μ_k)^τ=∑_i(μ_ij−μ_ik)^τ=
 δ_k∑_i(ω_ij^σ−ω_ik^σ))。⟹ (4.8) 完成で (4.9) unblocked。→ (4.9) → S08 case-B → (6.8)。
 正本=本 cont.⁸。**(4.8) DONE; 次 = (4.9)。**
+
+## 2026-06-12 (session 34, /loop): ✅ (4.9)(b) summed isometry landed (computational core)
+
+**commit `8603fe8c`** (S06_CertainTypeIsometry, axiom-clean, AxiomsCheck 登録, full build 3771)。
+(4.9)(b) の計算核 = 「列差 μ_j−μ_k を τ で送ると δ_j ∑_i(ω_ij^σ−ω_ik^σ)」を landed:
+
+- **`tau_toDadeMap_sum`**: 「τ (= h.tau.toDadeMap) は有限和に対し加法的」 = τ(∑α_i)=∑ τ(α_i)。
+  **🔑 手法**: 抽象 `FullDadeIsometryData` の map は `IsDadeMap.unique` で構成版 `h.dade0.dadeMap`
+  と一致 (両者 IsDadeMap h.dade0; 後者 = `Hypothesis.isDadeMap_dadeMap`)、構成版は本物の ℂ-linear
+  `dadeLinearMap` (`dadeLinearMap_apply` rfl) ⟹ `map_sum`。ClassFunction に `sum_apply` 不要で済む。
+  → **(4.9)(b) full / (4.10) でも τ-linearity が要るとき再利用可**。
+- **`certainType_diff_dade_sum_eq`**: `τ(∑_i certainTypeDiffSupported_i) = δ_j • ∑_i(ω_ij^σ−ω_ik^σ)`。
+  proof = `rw [tau_toDadeMap_sum, Finset.smul_sum]` → `Finset.sum_congr rfl (conclusion 3)` の 2 行。
+  per-row 仮説 `∀i, μ_ij(1)=μ_ik(1)` で stated (δ_j=δ_k は conclusion 2、列の全 μ_ij は同次数)。
+
+### ▶▶ 次 = (4.9) 残り (session 34 cont. 以降)
+1. **列次数恒常性 `μ_ij(1) = μ_0j(1)`** (clean small): summed identity を「列次数 μ_j(1)=μ_k(1)」
+   仮説で再述できるようにする橋渡し。μ_ij は χ_j の L への w₁ 個の拡張 ⟹ 全て deg χ_j(1)。
+   (S06_CertainTypeClifford の `chiRestrict`/`induce_restrict_certainType_eq` 周辺に材料)。
+2. **(4.9)(a)** 共役 μ̄_j=μ_{j'} (ω̄_ij=ω_{i'j'}, j'≠j; (3.9)+(4.3) で δ 引き出し) + Z[T,L^#]=Z[T,A]
+   ((4.7) 経由)。**hard 寄り** (character conjugation + (3.9))。
+3. **(4.9)(b) full**: isometry Z[T]→Z[Irr G] の写像化 (ω_ij^σ 正規直交で「isometry 明らか」) +
+   Z[T,A] 上 τ 一致 (= summed identity を線型に拡張)。
+→ (4.9) → S08 case-B (`sibleySetup_is_coherent` の CertainType branch) → (6.8) capstone。
+**正本=本 session 34。(4.9)(b) 核 landed; 次 = 列次数恒常性 or (4.9)(a)。**
