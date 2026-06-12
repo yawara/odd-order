@@ -91,8 +91,23 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
     (≃* 不変), `pRank_le_of_factorization_card_eq` (上記)。step 4/5 でも使える見込み。
   - **AxiomsCheck island assert は step 6 (assembly) で**: 現状 AxiomsCheck は S13_Lemma131 を
     import せず (per-name `#assert_only_allowed_axioms` のみ) ⟹ full build 緑・gate pass。
-- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)` (NEXT; 精密プラン 2026-06-12 session 2)**: substantial
-  (~120-150 行)。証明構造 = **by_contra**:
+- **step 4 = (c) `p∈τ₁(M)⟹p∈β(G)` ✅ COMPLETE (2026-06-12 session 2)**:
+  `mem_idealPrime_of_tau1_of_interaction` (sorry-free; `#print axioms` = forward axiom
+  `cor1216_not_mem_primeFactors_derived_of_tau1` のみ + 標準, sorryAx 無し)。
+  🔑 **当初の心配 (Burnside Sylow⊆M*') は不要だった** — injection 論法は `p∈π(M*')` (full
+  Sylow でなく p∣|M*'|) だけでよい。再利用 helper 4 個 (全 axiom-clean):
+  - `derivedInG_le_sup_of_normal` (M*=K⊔N, K⊴M* ⟹ M*'≤K⊔N'; ↥M* 内 quotient `φ=mk' KM` で
+    `map φ commutator(↥M*)=map φ ⁅NM,NM⁆` → `comap_map_eq` → 下降 `map_subtype_commutator`)。
+  - `card_normal_sup_mul_card_inf` ((b) の積公式を一般 sup へ; |K⊔L|·|K⊓L|=|K|·|L|)。
+  - `mem_primeFactors_derived_of_not_tau1_tau2` (`p∈π(M*)∖τ₁∖τ₂ ⟹ p∈π(M*')`: σ は
+    Sylow⊆M_σ⊆M*' [`sigma_subgroup_le_Msigma_of_isHall`+`Msigma_le_derived`]、p∉σ は rank≤2
+    [`mem_alpha_iff`]∧≠2[τ₂]⟹=1∧p∉τ₁⟹p∈π(M*'); `one_le_pRank_of_mem_primeFactors` で rank≥1)。
+  - `pRank_eq_of_mulEquiv` / `pRank_le_of_factorization_card_eq` (step 3 由来)。
+  証明: by_contra ¬idealPrime → p∉β(M*) (β⟹idealPrime) → setup 再利用 (p∤|K|) →
+  hpMstarDeriv (p∈π M*') → hpNderiv (p∈π N': M*'≤K⊔N', |M*'|∣|K|·|N'|, p∤|K| で Euclid) →
+  axiom `cor1216(b)` の `p∉π(N')` と矛盾。⚠ setup ~30 行が (b) と重複 (将来 factor 候補)。
+  --- 以下は当初プラン (実装と一部相違; Sylow⊆M*' は不要だった) ---
+  証明構造 = **by_contra**:
   - `intro hpτ1M` (p∈τ₁(M))。goal `S10.idealPrime p G`。`by_contra hnotideal` (¬idealPrime)。
   - axiom `cor1216_not_mem_primeFactors_derived_of_tau1 hG h hYne hYpi hpE hnotideal hpτ1M hHY hnc`
     ⟹ `p ∉ π(N_{M*}(Y)')` (= `p ∉ (card (derivedInG (Mstar ⊓ N_G(Y)))).primeFactors`)。
