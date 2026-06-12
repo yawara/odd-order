@@ -258,4 +258,36 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
           exact hx1 hxbot
       exact ⟨L.subtype c, c.2, L.subtype (x * y), hvV, by rw [hz_eq]; simp [map_mul, map_inv]⟩
 
+/-- `μ_{ij} − μ_{ik}` as an element of Peterfalvi's `CF(L, A₀)` (`SupportedClassFunctions` on
+`A₀ = A ∪ V^L`), the domain element fed to the certain-type Dade isometry `τ`.  The support
+condition is exactly conclusion (1) `certainType_diff_supp_subset_A0`. -/
+noncomputable def certainTypeDiffSupported (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (i : Fin (Nat.card h.W1))
+    (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+  ⟨((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ), by
+    rw [ClassFunction.mem_supportedSubmodule]
+    intro z hz
+    rw [ClassFunction.mem_support] at hz
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    exact certainType_diff_supp_subset_A0 h hχ₂ hχ₂' i hdeg hz⟩
+
+/-- The certain-type Dade isometry `τ` (= `h.tau`) preserves values on its support `A₀`:
+`τ(α)(a) = α(a)` for every `a ∈ A₀`.  Since `a = a · 1` and `1 ∈ H(a)`, the point `a` lies in its
+own `H`-coset, so the general `map_eq_of_mem_hCoset` applies even though the certain-type `dade0`
+need not have trivial local subgroups. -/
+theorem tau_toDadeMap_apply_of_mem (h : Hypothesis46 A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
+    {a : G} (ha : a ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G)) :
+    h.tau.toDadeMap α a = (α : ClassFunction ↥L ℂ) ⟨a, h.dade0.mem_L ha⟩ :=
+  h.tau.toDadeIsometryData.isDadeMap.map_eq_of_mem_hCoset α ⟨a, ha⟩
+    ⟨1, one_mem _, (mul_one _).symm⟩
+
 end OddOrder.Peterfalvi.S06
