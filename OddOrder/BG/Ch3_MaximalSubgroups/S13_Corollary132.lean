@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 
 /-!
 # BG §13: Corollary 13.2 (`τ₁(M) ∪ τ₃(M)`-specialization of Lemma 13.1)
@@ -210,6 +211,57 @@ theorem pRank_eq_of_mem_sigma [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prim
   rw [← pRank_sylow_eq P, ← pRank_sylow_eq S, hS]
   exact pRank_eq_of_mulEquiv
     (Subgroup.equivMapOfInjective (P : Subgroup ↥M) M.subtype M.subtype_injective)
+
+/-- **Theorem 13.4 outer reduction**: if `R` centralizes (i.e. lies in the centralizer of) every
+`(P ⊔ R)`-invariant Sylow subgroup `S` of `C_{M_σ}(P)`, then `C_{M_σ}(P) ⊆ C_{M_σ}(R)`. Reduces
+Thm 13.4 to the per-prime core: `C_{M_σ}(P)` is "generated" by such Sylows (order argument
+`eq_of_le_of_forall_full_prime_pow` applied to `C_{M_σ}(P) ⊓ C_G(R)`), each constructed by
+`exists_aInvariant_sylow_subgroup` (`P ⊔ R ≤ E` is a `σ(M)'`-group, coprime to `C_{M_σ}(P) ≤ M_σ`). -/
+theorem msigma_centralizer_le_of_invariant_sylow_centralized [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {P R : Subgroup G} (hPE : P ≤ E)
+    (hRC : R ≤ E ⊓ Subgroup.centralizer (P : Set G))
+    (hcore : ∀ q : ℕ, q.Prime → ∀ S : Subgroup G,
+      S ≤ S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) → IsPGroup q ↥S →
+      (P ⊔ R) ≤ Subgroup.normalizer (S : Set G) → S ≤ Subgroup.centralizer (R : Set G)) :
+    S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
+      S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) := by
+  classical
+  set N : Subgroup G := S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) with hNdef
+  have hRE : R ≤ E := hRC.trans inf_le_left
+  have hRCP : R ≤ Subgroup.centralizer (P : Set G) := hRC.trans inf_le_right
+  have hMle : M ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG (S10.sigma M) M
+  -- `P ⊔ R ≤ E` is a `σ(M)'`-group; `N ≤ M_σ` is a `σ(M)`-group ⟹ coprime orders.
+  have hPRE : P ⊔ R ≤ E := sup_le hPE hRE
+  have hNMsig : N ≤ S10.Msigma M := inf_le_left
+  have hAN : (P ⊔ R) ≤ Subgroup.normalizer (N : Set G) := by
+    rw [hNdef]
+    refine le_normalizer_inf (sup_le ((hPE.trans h.E_le).trans hMle)
+      ((hRE.trans h.E_le).trans hMle)) (sup_le ?_ (hRCP.trans Subgroup.le_normalizer))
+    exact Subgroup.le_normalizer.trans (normalizer_le_normalizer_centralizer P)
+  have hcop : Nat.Coprime (Nat.card ↥(P ⊔ R)) (Nat.card ↥N) := by
+    refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (S10.sigma M)ᶜ)
+      Nat.card_pos.ne' Nat.card_pos.ne' ?_ ?_
+    · exact fun q hq => h.isPiGroup_sigma_compl hG q
+        (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
+          (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hPRE), Nat.card_pos.ne'⟩)
+    · exact fun q hq hqc => hqc (S10.Msigma_isPiGroup M q
+        (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
+          (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hNMsig), Nat.card_pos.ne'⟩))
+  have hNM : N ≤ M := hNMsig.trans (S10.Msigma_le M)
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hNM).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hNM).surjective
+  -- order argument: every prime `q` admits an invariant Sylow `q` of `N` inside `N ⊓ C_G(R)`.
+  have hkey : N ⊓ Subgroup.centralizer (R : Set G) = N := by
+    refine eq_of_le_of_forall_full_prime_pow inf_le_left (fun q hq => ?_)
+    haveI : Fact q.Prime := ⟨hq⟩
+    obtain ⟨S, hSN, hSpg, hSinv, hScard⟩ :=
+      exists_aInvariant_sylow_subgroup hAN hcop (Or.inr hNsolv) q
+    exact ⟨S, le_inf hSN (hcore q hq S hSN hSpg hSinv), hScard⟩
+  exact le_inf hNMsig (by rw [← hkey]; exact inf_le_right)
 
 /-! ## Corollary 13.2 -/
 
