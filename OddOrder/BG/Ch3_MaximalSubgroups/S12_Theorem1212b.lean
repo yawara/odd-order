@@ -756,4 +756,246 @@ theorem prime_dvd_index_of_sylow_not_le_of_normal {K : Type*} [Group K] [Finite 
     rw [hmaptriv, Subgroup.mem_bot] at hmem; exact hmem
   rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hx1
 
+/-- **Theorem 12.12, Case 3 front-half setup** (BG L3359-3361): in the abelian-Sylow regime with
+the regularity hypothesis, if `C_E(S) ≠ E` then there is a prime `q ≠ p` and a Sylow
+`q`-subgroup `Q₁` of `E` that is cyclic, lies in `τ₁(M)`, does **not** centralize `S`, and with
+`q ∈ π(E/C_E(A)) ∩ π(C_E(A))`. (`q ∈ π(E/C_E(S))`, Prop 1.6(e) gives `Q₁ ⊄ C_E(A)`, Cor 12.10(c)
+gives `q ∈ τ₁(M)` and `Q₁` cyclic, and a central `q`-line in `E₁` gives `q ∣ |C_E(A)|`.) -/
+theorem exists_sylow_tau1_cyclic_notCentralizing [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    (hSab : IsMulCommutative ↥(S : Subgroup G))
+    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥)
+    (hCES : Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E ≠ E) :
+    ∃ q : ℕ, ∃ Q₁ : Subgroup G, q.Prime ∧ q ≠ p ∧ IsPGroup q ↥Q₁ ∧ Q₁ ≤ E ∧
+      (∀ R : Subgroup G, Q₁ ≤ R → R ≤ E → IsPGroup q ↥R → R = Q₁) ∧
+      IsCyclic ↥Q₁ ∧
+      ¬ ((Q₁ : Subgroup G) ≤ Subgroup.centralizer ((S : Subgroup G) : Set G)) ∧
+      q ∈ (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors ∧
+      q ∈ (Nat.card ↥(E ⊓ Subgroup.centralizer (A : Set G))).primeFactors := by
+  classical
+  have hAM : A ≤ M := hAE.trans h.E_le
+  -- `S ≤ E` and `A = Ω₁(S)`.
+  have hSE : (S : Subgroup G) ≤ E :=
+    (le_centralizer_of_le_of_le hSab le_rfl hAS).trans (centralizer_le_E_of_tau2 hG h hp hA hAE).1
+  have hAom : A = (Omega ↥(S : Subgroup G) p 1).map (S : Subgroup G).subtype :=
+    (omega1_eq_of_tau2 hG h.mem_maximal hp hA hAM S.isPGroup' hAS hSM
+      (sylow_maximal_in_M_of_le hSM)).1
+  -- `C_E(A) ⊴ E` (Corollary 12.10(c)).
+  have hCEAnorm : E ≤ Subgroup.normalizer ((E ⊓ Subgroup.centralizer (A : Set G) : Subgroup G) : Set G) :=
+    ((nilpotent_sigmaComplement_abelian hG h).2.2.1 p (Fact.out : p.Prime) hp A hA hAE).2.1
+  haveI hCEA_norm : ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_left).mpr hCEAnorm
+  -- choose `q ∈ π(E/C_E(S))` and a Sylow `q`-subgroup `Q₁` of `E`.
+  have hHne : (Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E).subgroupOf E ≠ ⊤ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_top]; intro hle; exact hCES (le_antisymm inf_le_right hle)
+  obtain ⟨q, hq_prime, hq_dvd⟩ := Nat.exists_prime_and_dvd
+    (fun hi => hHne (Subgroup.index_eq_one.mp hi))
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  obtain ⟨Q₁'⟩ : Nonempty (Sylow q ↥E) := inferInstance
+  set Q₁ : Subgroup G := (Q₁' : Subgroup ↥E).map E.subtype with hQ₁def
+  have hQ₁E : Q₁ ≤ E := by rw [hQ₁def]; exact Subgroup.map_subtype_le _
+  have hQ₁pg : IsPGroup q ↥Q₁ := by rw [hQ₁def]; exact Q₁'.isPGroup'.map E.subtype
+  -- `Q₁` is a Sylow `q`-subgroup of `E`.
+  have hQ₁maxE : ∀ R : Subgroup G, Q₁ ≤ R → R ≤ E → IsPGroup q ↥R → R = Q₁ := by
+    intro R hQ₁R hRE hRpg
+    have hRsubpg : IsPGroup q ↥(R.subgroupOf E) := by
+      apply (IsPGroup.iff_card).mpr
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hRpg
+      exact ⟨k, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRE).toEquiv, hk]⟩
+    have hQ₁'R : Q₁' ≤ R.subgroupOf E :=
+      Subgroup.map_le_iff_le_comap.mp (by rw [← hQ₁def]; exact hQ₁R)
+    have heq : R.subgroupOf E = (Q₁' : Subgroup ↥E) := Q₁'.3 hRsubpg hQ₁'R
+    calc R = (R.subgroupOf E).map E.subtype := (Subgroup.map_subgroupOf_eq_of_le hRE).symm
+      _ = Q₁ := by rw [heq, hQ₁def]
+  -- `Q₁ ⊄ C(S)`, i.e. `C_S(Q₁) ⊊ S`.
+  have hQ₁ncS : ¬ ((Q₁ : Subgroup G) ≤ Subgroup.centralizer ((S : Subgroup G) : Set G)) := by
+    have hnle : ¬ (Q₁' ≤ (Subgroup.centralizer ((S:Subgroup G):Set G) ⊓ E).subgroupOf E) :=
+      sylow_not_le_of_prime_dvd_index Q₁' hq_dvd
+    intro hcon
+    exact hnle (Subgroup.map_le_iff_le_comap.mp (by rw [← hQ₁def]; exact le_inf hcon hQ₁E))
+  -- `q ≠ p` (a Sylow `p` of `E`, namely `S`, lies in `C_E(S)`).
+  have hqp : q ≠ p := by
+    rintro rfl
+    have hSsub : (S.subtype hSE : Subgroup ↥E) ≤
+        (Subgroup.centralizer ((S:Subgroup G):Set G) ⊓ E).subgroupOf E := by
+      rw [Sylow.coe_subtype]
+      exact Subgroup.comap_mono (le_inf (le_centralizer_of_le_of_le hSab le_rfl le_rfl) hSE)
+    exact sylow_not_le_of_prime_dvd_index (S.subtype hSE) hq_dvd hSsub
+  -- `Q₁ ⊄ C_E(A)` (Prop 1.6(e) contrapositive), hence `q ∣ [E : C_E(A)]` (`C_E(A) ⊴ E`).
+  have hQ₁NS : (Q₁ : Subgroup G) ≤ Subgroup.normalizer ((S : Subgroup G) : Set G) :=
+    hQ₁E.trans (E_le_normalizer_sylow_of_abelianSylow hG h hp hA hAE hAS hSab)
+  have hcopSQ₁ : Nat.Coprime (Nat.card ↥(S : Subgroup G)) (Nat.card ↥Q₁) := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp S.isPGroup'
+    obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := q)).mp hQ₁pg
+    rw [hn, hm]
+    exact ((Nat.coprime_primes (Fact.out : p.Prime) hq_prime).mpr (Ne.symm hqp)).pow n m
+  have hQ₁ncA : ¬ ((Q₁ : Subgroup G) ≤ Subgroup.centralizer (A : Set G)) := by
+    intro hcon
+    refine hQ₁ncS (le_centralizer_swap ?_)
+    exact centralizer_le_of_omega1_le_centralizer hSab S.isPGroup' hQ₁NS hcopSQ₁
+      (hAom ▸ le_centralizer_swap hcon)
+  have hQ₁'ncA : ¬ (Q₁' ≤ (E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E) := by
+    intro hcon
+    have hmap : Q₁ ≤ E ⊓ Subgroup.centralizer (A : Set G) := by
+      rw [hQ₁def]; exact Subgroup.map_le_iff_le_comap.mpr hcon
+    exact hQ₁ncA (hmap.trans inf_le_right)
+  have hqidvd : q ∣ ((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index :=
+    prime_dvd_index_of_sylow_not_le_of_normal Q₁' hQ₁'ncA
+  have hqi : q ∈ (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hq_prime, hqidvd, Subgroup.index_ne_zero_of_finite⟩
+  -- `q ∈ τ₁(M)` (Cor 12.10(c)), and `Q₁` cyclic.
+  have hqτ₁ : q ∈ tau1 M :=
+    ((nilpotent_sigmaComplement_abelian hG h).2.2.1 p (Fact.out : p.Prime) hp A hA hAE).2.2 q hqi
+  have hqodd : Odd q := hG.odd.of_dvd_nat
+    ((hqidvd.trans (Subgroup.index_dvd_card _)).trans (Subgroup.card_subgroup_dvd_card E))
+  have hQ₁cyc : IsCyclic ↥Q₁ := by
+    refine S10.isCyclic_of_pRank_le_one hQ₁pg hqodd ?_
+    have h1 : pRank ↥Q₁ q ≤ pRank ↥M q :=
+      pRank_le_of_injective (f := Subgroup.inclusion (hQ₁E.trans h.E_le))
+        (Subgroup.inclusion_injective _)
+    rwa [tau1_pRank_eq_one hqτ₁] at h1
+  -- `q ∣ |C_E(A)|` via a central `τ₁`-line `X'` in `E₁` (Lemma 12.8(e)).
+  have hqcard_E : q ∣ Nat.card ↥E := hqidvd.trans (Subgroup.index_dvd_card _)
+  have hq_notidx : ¬ q ∣ (E₁.subgroupOf E).index := fun hd =>
+    (h.E₁_hall.index_no_pi q
+      (Nat.mem_primeFactors.mpr ⟨hq_prime, hd, Subgroup.index_ne_zero_of_finite⟩)) hqτ₁
+  have hqE₁ : q ∣ Nat.card ↥E₁ := by
+    have hcard := Subgroup.card_mul_index (E₁.subgroupOf E)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv] at hcard
+    rcases (hq_prime.dvd_mul).mp (hcard ▸ hqcard_E) with h' | h'
+    · exact h'
+    · exact absurd h' hq_notidx
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' q hqE₁
+  have hg'E₁ : (g : G) ∈ E₁ := g.2
+  have hg'ord : orderOf (g : G) = q := by
+    rw [← hg]; exact orderOf_injective E₁.subtype E₁.subtype_injective g
+  have hg'ne : (g : G) ≠ 1 := by
+    intro h1; rw [h1, orderOf_one] at hg'ord; exact hq_prime.ne_one hg'ord.symm
+  set X' : Subgroup G := Subgroup.zpowers (g : G) with hX'def
+  have hX'E₁ : X' ≤ E₁ := by rw [hX'def, Subgroup.zpowers_le]; exact hg'E₁
+  have hX'card : Nat.card ↥X' = q := by rw [hX'def, Nat.card_zpowers, hg'ord]
+  have hX'mem : X' ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hX'card, by rw [pow_one]; exact hX'card⟩
+  have hMσCX' : S10.Msigma M ⊓ Subgroup.centralizer (X' : Set G) = ⊥ := by
+    rw [hX'def, centralizer_zpowers_eq_singleton]
+    refine hreg (g : G) (h.E₁_le hg'E₁) hg'ne (fun r hr => ?_)
+    rw [hg'ord, hq_prime.primeFactors, Finset.mem_singleton] at hr
+    rw [hr]; exact Set.mem_union_left _ hqτ₁
+  obtain ⟨-, hEcent⟩ := central_line_of_abelianSylow hG h hp hA hAE hAS hSab X'
+    ⟨q, hq_prime, hX'mem⟩ hX'E₁ hMσCX'
+  have hX'CEA : X' ≤ E ⊓ Subgroup.centralizer (A : Set G) :=
+    le_inf (hX'E₁.trans h.E₁_le) (le_centralizer_swap (hAE.trans hEcent))
+  have hqc : q ∈ (Nat.card ↥(E ⊓ Subgroup.centralizer (A : Set G))).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hq_prime, hX'card ▸ Subgroup.card_dvd_of_le hX'CEA, Nat.card_pos.ne'⟩
+  exact ⟨q, Q₁, hq_prime, hqp, hQ₁pg, hQ₁E, hQ₁maxE, hQ₁cyc, hQ₁ncS, hqi, hqc⟩
+
+/-- **Theorem 12.12, Case 3 front-half** (BG L3359-3370): in the abelian-Sylow regime with the
+regularity hypothesis, if `C_E(S) ≠ E` then some `X ≤ N_G(S)` (a `q`-subgroup) has
+`1 ⊊ C_S(X) ⊊ S`. If not, the Sylow `q`-subgroup `Q` of `N_G(S)` containing `Q₁` would act
+regularly on `S` modulo `C_Q(S)`, making `Q ⧸ C_Q(S)` cyclic and `pRank Q q ≤ 1`; but
+`pRank Q q = r_q(N_G(S)) = 2`, a contradiction. This `X` feeds
+`exists_invariant_cyclic_sameExponent_regular`. -/
+theorem exists_partial_centralizer_of_abelianSylow [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    (hSab : IsMulCommutative ↥(S : Subgroup G))
+    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥)
+    (hCES : Subgroup.centralizer ((S : Subgroup G) : Set G) ⊓ E ≠ E) :
+    ∃ X : Subgroup G, X ≤ Subgroup.normalizer ((S : Subgroup G) : Set G) ∧
+      Nat.Coprime (Nat.card ↥(S : Subgroup G)) (Nat.card ↥X) ∧
+      (S : Subgroup G) ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ ∧
+      (S : Subgroup G) ⊓ Subgroup.centralizer (X : Set G) ≠ (S : Subgroup G) := by
+  classical
+  obtain ⟨q, Q₁, hq_prime, hqp, hQ₁pg, hQ₁E, hQ₁maxE, hQ₁cyc, hQ₁ncS, hqi, hqc⟩ :=
+    exists_sylow_tau1_cyclic_notCentralizing hG h hp hA hAE hAS hSM hSab hreg hCES
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hpG : p ∣ Nat.card G :=
+    (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A)
+  have hqodd : Odd q := hG.odd.of_dvd_nat
+    ((Nat.dvd_of_mem_primeFactors hqc).trans (Subgroup.card_subgroup_dvd_card _))
+  have hSne : (S : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card S hpG
+  have hCSE : Subgroup.centralizer ((S : Subgroup G) : Set G) ≤ E :=
+    (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAS)).trans
+      (centralizer_le_E_of_tau2 hG h hp hA hAE).1
+  set NS : Subgroup G := Subgroup.normalizer ((S : Subgroup G) : Set G) with hNSdef
+  have hENS : E ≤ NS := E_le_normalizer_sylow_of_abelianSylow hG h hp hA hAE hAS hSab
+  have hQ₁NS : Q₁ ≤ NS := hQ₁E.trans hENS
+  -- a Sylow `q`-subgroup `Q` of `N_G(S)` containing `Q₁`.
+  have hQ₁subNS_pg : IsPGroup q ↥(Q₁.subgroupOf NS) := by
+    apply (IsPGroup.iff_card).mpr
+    obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp hQ₁pg
+    exact ⟨k, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ₁NS).toEquiv, hk]⟩
+  obtain ⟨Q', hQ₁Q'⟩ := hQ₁subNS_pg.exists_le_sylow
+  set Q : Subgroup G := (Q' : Subgroup ↥NS).map NS.subtype with hQdef
+  have hQNS : Q ≤ NS := by rw [hQdef]; exact Subgroup.map_subtype_le _
+  have hQpg : IsPGroup q ↥Q := by rw [hQdef]; exact Q'.isPGroup'.map NS.subtype
+  have hQ₁Q : Q₁ ≤ Q := by
+    rw [hQdef, ← Subgroup.map_subgroupOf_eq_of_le hQ₁NS]; exact Subgroup.map_mono hQ₁Q'
+  -- `pRank Q q = 2` (Sylow of `N_G(S)`, the `r_q = 2` lemma).
+  have hpR2 : pRank ↥Q q = 2 := by
+    have e := Subgroup.equivMapOfInjective (Q' : Subgroup ↥NS) NS.subtype NS.subtype_injective
+    have hmapeq : pRank ↥Q q = pRank ↥(Q' : Subgroup ↥NS) q :=
+      le_antisymm (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective)
+        (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
+    rw [hmapeq, pRank_sylow_eq Q']
+    exact pRank_normalizer_eq_two_of_index_card hG h hp hA hAE hAS hSab hqi hqc
+  -- `E ⊓ Q = Q₁` (`Q₁` is the Sylow `q` of `E` inside `Q`).
+  have hEQ : E ⊓ Q = Q₁ :=
+    hQ₁maxE (E ⊓ Q) (le_inf hQ₁E hQ₁Q) inf_le_left (hQpg.to_le inf_le_right)
+  by_contra hcon
+  push_neg at hcon
+  -- regularity of `Q` on `S` modulo `C_G(S)`.
+  have hreg' : ∀ x ∈ Q, x ∉ Subgroup.centralizer ((S : Subgroup G) : Set G) →
+      (S : Subgroup G) ⊓ Subgroup.centralizer ({x} : Set G) = ⊥ := by
+    intro x hxQ hxnc
+    by_contra hne
+    have hxNS : Subgroup.zpowers x ≤ NS := Subgroup.zpowers_le.mpr (hQNS hxQ)
+    have hcopx : Nat.Coprime (Nat.card ↥(S : Subgroup G)) (Nat.card ↥(Subgroup.zpowers x)) := by
+      obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp S.isPGroup'
+      obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := q)).mp
+        (hQpg.to_le (Subgroup.zpowers_le.mpr hxQ))
+      rw [hn, hm]
+      exact ((Nat.coprime_primes (Fact.out : p.Prime) hq_prime).mpr (Ne.symm hqp)).pow n m
+    have hSC : (S : Subgroup G) ⊓ Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)
+        = (S : Subgroup G) :=
+      hcon (Subgroup.zpowers x) hxNS hcopx
+        (by rw [centralizer_zpowers_eq_singleton]; exact hne)
+    rw [centralizer_zpowers_eq_singleton] at hSC
+    apply hxnc
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    exact (Subgroup.mem_centralizer_iff.mp (hSC.ge hs).2 x (Set.mem_singleton x)).symm
+  -- `Q ⧸ C_Q(S)` cyclic (Prop 3.9 via the φ̄ wrapper).
+  have hcyc : IsCyclic (↥Q ⧸ (conjActionHom hQNS).ker) :=
+    isCyclic_quotient_of_conjugation_fpf hQNS S.isPGroup' hQpg hSne hqodd (Ne.symm hqp) hreg'
+  -- `C_Q(S) ⊊ Q₁` inside `Q`.
+  have hker_lt : (conjActionHom hQNS).ker < Q₁.subgroupOf Q := by
+    rw [conjActionHom_ker]
+    refine lt_of_le_of_ne ?_ ?_
+    · intro y hy
+      have hyC : (y : G) ∈ Subgroup.centralizer ((S : Subgroup G) : Set G) :=
+        (Subgroup.mem_subgroupOf).mp hy
+      have hyQ₁ : (y : G) ∈ Q₁ := by
+        have hmem : (y : G) ∈ E ⊓ Q := ⟨hCSE hyC, y.2⟩
+        rwa [hEQ] at hmem
+      exact (Subgroup.mem_subgroupOf).mpr hyQ₁
+    · intro heq
+      apply hQ₁ncS
+      intro x hxQ₁
+      have hxmem : (⟨x, hQ₁Q hxQ₁⟩ : ↥Q) ∈ Q₁.subgroupOf Q :=
+        (Subgroup.mem_subgroupOf).mpr hxQ₁
+      rw [← heq, Subgroup.mem_subgroupOf] at hxmem
+      exact hxmem
+  have hQ₁subQ_cyc : IsCyclic ↥(Q₁.subgroupOf Q) :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hQ₁Q).symm.surjective
+  have hpR1 : pRank ↥Q q ≤ 1 :=
+    pRank_le_one_of_cyclic_quotient hQpg hqodd hcyc hker_lt hQ₁subQ_cyc
+  rw [hpR2] at hpR1
+  omega
+
 end OddOrder.BG.Ch3.S12
