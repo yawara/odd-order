@@ -20,19 +20,23 @@ Under Hypothesis (4.6), fix a row index `i` (`0 ≤ i < w₁`) and two nontrivia
 * the column signs agree, `δ_j = δ_k`;
 * the Dade image is `(μ_{ij} − μ_{ik})^τ = δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.
 
-This file develops the proof in stages (Peterfalvi's eight-step argument).  The present
-commit lands **step (1)**: the sign equality `δ_j = δ_k`, an independent consequence of the
-degree congruence (4.3.d) and `w₁ > 2`.
+This file develops the proof in stages (Peterfalvi's eight-step argument).
 
-## Step (1): `δ_j = δ_k`
+Landed so far:
+* **step (1)** `certainType_sign_eq_of_degree_eq`: the sign equality `δ_j = δ_k`, from the degree
+  congruence (4.3.d) and `w₁ > 2`;
+* **step (2)** `certainType_apply_eq_of_mem_W1`: `μ_{ij} − μ_{ik}` vanishes on `W₁`;
+* **conclusion (1)** `certainType_diff_supp_subset_A0`: `Supp(μ_{ij} − μ_{ik}) ⊆ A₀`;
+* the `σ_G` foundation — `ticVdiff` (the `G`-side `V = W − (W₁ ∪ W₂)` TI-cyclic, on which `σ` runs),
+  the L↔G bridge (`ticWEquivSdiffW`, `omegaProdCharTic`), `certainTypeOmegaSigma` (`ω_{ij}^σ`) and
+  the `τ`-side `certainTypeDiffSupported` / `tau_toDadeMap_apply_of_mem`;
+* **step (4)** `certainType_diff_dade_apply_eq_of_mem_V`: the two sides agree on `V`.
 
-By (4.3.d) (`certainType_degree_modEq`) there are integers `a, b` with
-`μ_{ij}(1) = δ_j + a·w₁` and `μ_{ik}(1) = δ_k + b·w₁`.  The equal-degree hypothesis gives
-`δ_j − δ_k = (b − a)·w₁`, so `w₁ ∣ (δ_j − δ_k)`.  As `δ_j, δ_k ∈ {±1}` we have
-`|δ_j − δ_k| ≤ 2 < 3 ≤ w₁` (`three_le_card_W1`: `W₁ ≠ 1` is of odd order), forcing
-`δ_j − δ_k = 0`.
+Remaining (steps 5-8, the `(3.8)` trichotomy endgame): `ψ := (μ_{ij} − μ_{ik})^τ −
+δ_j(ω_{ij}^σ − ω_{ik}^σ)` vanishes on `V` (step 4), has `NC(ψ) ≤ 4 < 2w₁`, so the trichotomy
+`sigmaCoeff_trichotomy` applies; cases (b)/(c) are excluded and case (a) forces `ψ = 0`.
 
-Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 30").
+Reference note: `notes/peterfalvi/s06_dade_certain_subgroup.md` ("session 33").
 -/
 
 namespace OddOrder.Peterfalvi.S06

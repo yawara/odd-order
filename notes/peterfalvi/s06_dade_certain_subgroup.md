@@ -1910,3 +1910,36 @@ session 30 cont.² の段階表「step(1)→statement→(3)(4)→…」は **2 �
   ⊆ sdiff.V=W∖W₂ ゆえ (4.3.c) 適用可。(A) τ値 = tau_toDadeMap_apply_of_mem (要 v∈A₀ = `Or.inr ⟨1,_,v,hv',by group⟩`
   + e⟨v⟩↔⟨v,mem_L⟩ 同一視 via coe_ticWEquivSdiffW+subtype_injective) → (4.3.c)×2; (B) ω値 =
   certainTypeOmegaSigma_apply_of_mem_V; 差 = (δ_j−δ_k)·chiColumn χ₂' i (e⟨v⟩) = 0 (step 1)。
+
+### ✅ session 33 cont.² — step (4) landed + steps 5-8 endgame plan 確定 (φ(1)=0 回避)
+- **✅ landed (build-green, axiom-clean)**: `certainType_diff_dade_apply_eq_of_mem_V` (step 4):
+  v∈ticVdiff.V で `(μ_ij−μ_ik)^τ(v) = δ_j(ω_ij^σ(v)−ω_ik^σ(v))`。L↔G plumbing 全 discharge
+  (v∈A₀ via l=1; (w:L)=⟨v,_⟩ via Subtype.ext+coe_ticWEquivSdiffW; (w:L)∈sdiff.V; (4.3.c)×2 + step1)。
+  recipe = tau_toDadeMap_apply_of_mem → ClassFunction.sub_apply → ←hwL → certainType_apply_eq_of_mem_V×2
+  → hwpt (Subtype.ext rfl) → certainTypeOmegaSigma_apply_of_mem_V×2 → certainType_sign_eq → ring。
+- **▶▶ 残 = steps 5-8 (trichotomy endgame, 別 commit ~150-250 行)。設計確定 (再調査不要)**:
+  φ := h.tau.toDadeMap (certainTypeDiffSupported …), ψ := φ − δ_j•(ω_ij^σ − ω_ik^σ) [= certainTypeOmegaSigma×2]。
+  1. **ψ が V で消滅**: step4 (= equality) を `ψ v = 0` 形へ (φ(v) − δ_j(ω_ij^σ(v)−ω_ik^σ(v)) = 0)。
+  2. **‖φ‖²=2**: `h.tau.toDadeIsometryData.isDadeIsometry.inner_eq` (or full_inner_eq pattern) ⟹
+     ⟨φ,φ⟩=⟨μ_ij−μ_ik,μ_ij−μ_ik⟩=2。**要 μ_ij≠μ_ik** ⟹ **conclusion 3 に χ₂≠χ₂' 仮説追加**
+     (textbook 0<j,k<w₂ で j=k なら自明 0=0; (4.1) 列間 distinct で μ_ij≠μ_ik)。φ∈ZIrr via maps_virtualCharacter。
+  3. **f(p,q):=⟨φ,chiFam(p,q)⟩ は ℤ 値** (`inner_mem_ZIrr_int`, φ∈ZIrr ∧ chiFam∈ZIrr) ∧ **∑f²≤‖φ‖²=2**
+     (Bessel, chiFam 正規直交) ⟹ **|supp f|≤2**。[Bessel/「norm² n ⟹ ≤n nonzero」補題 = 要発掘 or 自作;
+     `ncard_inner_chiFam_ne_zero_le_one` [S05:1460, norm1→≤1] の norm2 一般化]。
+  4. **sigmaCoeff(ψ)(p,q) = f(p,q) − δ_j([pq=P_ij]−[pq=P_ik])** (ω_ij^σ=chiFam(P_ij), via sigma_omega +
+     omegaProdEquiv.symm 同定; P_ij=(w1char i 系の tic-index, χ₂); 異列 P_ij≠P_ik [col q_j≠q_k])。
+     ⟹ **NC(ψ)=|supp(sigmaCoeff ψ)| ≤ |supp f|+2 ≤ 4 < 2w₁** (w₁≥3)。
+  5. **trichotomy** `sigmaCoeff_trichotomy hVeq=rfl app=ticVdiffFullDadeApplication hψ hgap hNC`:
+     hgap=w₁+2≤w₂ [要 (W odd ⟹ w₁<w₂) 補題; gap], hNC=NC<2w₁。→ (a)/(b)/(c)。
+  6. **(a)** [∀pq sigmaCoeff=0] ⟹ ⟨ψ,chiFam(P_ij)⟩=⟨ψ,chiFam(P_ik)⟩=0 ⟹ ⟨φ,ω_ij^σ⟩=δ_j, ⟨φ,ω_ik^σ⟩=−δ_j
+     ⟹ **‖ψ‖²= 2 − 2δ_j(δ_j−(−δ_j)) + δ_j²·2 = 2−4+2 = 0 ⟹ ψ=0** (norm 計算; chiFam 正規直交+δ²=1)。
+     **🔑 `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` [S05:1234] は χ=0 でなく χ|V=0 しか出さない ⟹ case(a) には不可。norm 論法が要**。
+  7. **(b)** [列 q₀ 定数 c≠0, w₁≥3 行] ⟹ p≠p_i の ≥w₁−1≥2 行で sigmaCoeff=f=c≠0 (2 個の f 非零) +
+     δ-点の ≥1 個が q₀ 外 (sigmaCoeff=0 ⟹ f=±δ_j≠0, 3 個目) ⟹ |supp f|≥3 >2 矛盾。
+  8. **(c)** [行 i₀ 定数 c≠0, w₂≥5 by gap] ⟹ q∉{q_j,q_k} の w₂−2≥3 列で sigmaCoeff=f=c≠0 ⟹ |supp f|≥3 矛盾。
+- **🔑🔑 φ(1)=0 は不要** (session 30 plan の step5「1 で消滅⟹λ₁−λ₂」は norm 論法で代替; 1∈dadeSupport は
+  H(a) 依存で abstract に否定不可 — 深入り回避)。**`exists_irr_sub_irr_of_inner_self_two` も不要**。
+- **要発掘/自作 補題** (次 session 最初): (i) ‖φ‖²=2 の isometry 経路 (h.tau.…isDadeIsometry.inner_eq の正確名),
+  (ii) |supp f|≤2 (Bessel or norm2→≤2), (iii) w₁<w₂ ⟹ w₁+2≤w₂ (odd gap), (iv) sigmaCoeff(ψ) の f+δ 展開
+  (ω_ij^σ=chiFam(P_ij) 同定 = omegaProdCharTic→sigma_omega→omegaProdEquiv.symm)。
+正本 = 本 session 33。**foundation+step4 DONE。endgame は上記 8 段で確定 (φ(1)=0/λ₁−λ₂ 回避済)。**
