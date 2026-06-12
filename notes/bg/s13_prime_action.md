@@ -190,6 +190,37 @@ sorry'd statement** を露出済 (`sigma_subgroup_pRank_normalizer_le_one` /
 - full build 3796 + AxiomsCheck 3782 green。**HOLD 解消** (G の forward axiom 消滅 ⟹ merge ブロッカー無し)。
 - 残: F が S12_E の 2 sorry を §12 cascade で埋めれば §13 全体が自動 unconditional 化 (issue 0065)。
 
+### 2026-06-13 Lane G: Thm 13.4 着手 (proof plan; loop)
+
+**13.4 = §13 の "main step" (unblocked: Cor 13.2 ✅ + Lem 12.18 + Thm 12.13)。13.3 の
+prime-action criterion とは独立**(13.5 が両者を要するが、13.4←13.3 ではない)。
+
+statement (scaffold `S13_PrimeAction.centralizer_le_centralizer_of_tau1`):
+`p∈τ₁(M), P∈ℰ_p¹(E), r∈π(E), R∈ℰ_r¹(C_E(P)) ⟹ C_{M_σ}(P) ⊆ C_{M_σ}(R)`
+(`M_σ⊓C(P) ≤ M_σ⊓C(R)`)。
+
+mmd 証明 (L3580-3597) の構造:
+- **outer**: C_{M_σ}(P)⊆C_{M_σ}(R) ⟺ R が C_{M_σ}(P) を中心化。C_{M_σ}(P) は σ(M)-群ゆえ
+  PR-不変 Sylow q (q∈σ(M)) で生成 (PR=P×R abelian, R≤C_E(P))。各 σ-Sylow S を R が中心化
+  すれば従う。**要 coprime-action invariant-Sylow generation** (infra: `AInvariantPiSubgroups`
+  の `hInvariantStar`)。
+- **per-q (核)**: S = PR-不変 Sylow q of C_{M_σ}(P)。`[S,R]=1` を示す。仮定 Q:=[S,R]≠1:
+  1. M*∈ℳ(N_G(P))。`1⊂Q=[S,R]⊆[M_σ∩M*,R]` ⟹ **Cor 13.2** で `p∈β(M*)`, `r∈τ₁(M*)`。
+  2. `1⊂P⊆C_{M_α(M*)}(RQ)`、`S=C_S(R)×Q` (S abelian by **Thm 12.13**)。
+  3. **Lem 12.18(a)** (`tau1_Malpha_interaction`, S12_Lemma1218:1029) を (r,R,M*)↦(p,P,M) で適用 →
+     `C_{M_α}(P)⊆C_{M_α}(R)`; r∈τ₁(M) で逆向き ⟹ `C_{M_α}(P)=C_{M_α}(R)`。
+     (注: ここ M_α は M_α(M*)? mmd 表記曖昧、要精読 L3585-3592。)
+  4. C_{M_α}(P)=C_{M_α}(R) は S で正規化 (S⊆C_M(P)) ⟹ Q=[S,R] で中心化 ⟹ `C_{M_α}(R)=C_{M_α}(RQ)`。
+  5. ℳ(N_G(Q))≠{M} ⟹ **Lem 12.18(a)** が `C_{M_α}(R)≠C_{M_α}(RQ)` (= C_{M_α}⊓C(R)≠⊥ かつ
+     C_{M_α}⊓C(R⊔Q)=⊥) ⟹ 矛盾。
+
+deps 確認済: Lem 12.18 = `tau1_Malpha_interaction` (a 結論 = `M_α⊓C(P)≠⊥ ∧ M_α⊓C(P⊔Q)=⊥`,
+hyp: q≠p, p∈τ₁(M), P∈ℰ_p¹, P-inv q-grp Q, C_Q(P)=⊥, ℳ(N_G(Q))≠{M}, M_α≠⊥, q∉α(M))。
+Thm 12.13 = M_σ の Sylow abelian (要 exact 名特定; S12_Lemma128 `sylow_isMulCommutative_*` 周辺)。
+~200-300 行・multi-iteration。leaf = `S13_Theorem134.lean` 予定 (Cor 13.2 + S12_Lemma1218 import)。
+**次 iteration: outer reduction の coprime invariant-Sylow generation helper を確認/構築 → step 1
+(Cor 13.2 適用) から着手。** ⚠ ℳ(N_G(Q))≠{M} の出所 (Lem 12.2(a) 経由?) を step で要確認。
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
