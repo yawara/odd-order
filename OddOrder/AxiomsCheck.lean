@@ -4060,3 +4060,16 @@ This connects the key fact to the per-element Frobenius regularity. Unconditiona
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.line_le_zpowers_in_cyclic
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_line_le_cyclic
+
+/-! ### BG Theorem 12.12: Case 3 φ̄ quotient action wrapper (`S12_Theorem1212b`)
+
+`conjActionHom_ker`: the kernel of the conjugation action `Q →* MulAut S` (`Q ≤ N_G(S)`) is
+`C_Q(S) = C_G(S) ⊓ Q`, via `Subgroup.normalizerMonoidHom_ker`.
+`isCyclic_quotient_of_conjugation_fpf`: a `q`-group `Q ≤ N_G(S)` acting on a `p`-group `S ≠ 1`
+(`p ≠ q`) fixed-point-freely outside its kernel `C_Q(S)` has cyclic quotient `Q ⧸ C_Q(S)`;
+the lifted action is FPF, so Proposition 3.9 (`isCyclic_of_coprime_fpf_pgroup_action`) applies.
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.conjActionHom_ker
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_quotient_of_conjugation_fpf
