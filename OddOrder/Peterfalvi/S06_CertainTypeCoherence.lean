@@ -456,4 +456,63 @@ theorem certainTypeExtension_eq_dade_of_mem_zSupportedSpan (h : Hypothesis46 A L
   rintro _ ⟨f, ⟨χ₂, hχ₂, hdeg, rfl⟩, rfl⟩
   exact certainTypeExtension_columnDiff_eq_dade h hχ₂ hk hdeg
 
+/-! ### The nonzero field and the `IsCoherent` capstone -/
+
+/-- **Degree of the conjugate column** `μ_{k⁻¹}(1) = μ_k(1)`.  The conjugate column character is the
+complex conjugate `μ_{k⁻¹} = mapRingEquiv conj μ_k` (`certainType_columnSum_conj`), and the degree
+`μ_k(1) = ∑_i μ_{ik}(1)` is a sum of positive integers, hence fixed by complex conjugation. -/
+theorem columnSum_inv_apply_one (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    (∑ i, ((h.columnFamily k⁻¹).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily k).mu i : ClassFunction ↥L ℂ) 1) := by
+  rw [← columnSum_apply_one, ← columnSum_apply_one]
+  have h1 : columnSum h k⁻¹
+      = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (columnSum h k) := by
+    rw [columnSum_def, columnSum_def, ← certainType_columnSum_conj]
+  rw [h1, ClassFunction.mapRingEquiv_apply, columnSum_apply_one, map_sum]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily k).mu i)
+  rw [hd, map_natCast]
+
+/-- **Peterfalvi (4.9)(a)/(b), nonzero (`IsCoherent.nonzero`)**: `μ̄_k − μ_k` is a nonzero element of
+`Z[𝒯, A]`.  Both `μ̄_k = μ_{k⁻¹}` and `μ_k` lie in `𝒯` (`k⁻¹ ≠ 1`, same degree by
+`columnSum_inv_apply_one`); the difference is `A`-supported (`columnDiff_support_subset`) and nonzero
+(`certainType_columnSum_conj_ne`, `μ̄_k ≠ μ_k`). -/
+theorem certainType_nonzero (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hk : k ≠ 1) :
+    ∃ φ : ClassFunction ↥L ℂ,
+      φ ∈ S07.zSupportedSpan (certainTypeSet h k) (S04.supportInSubgroup A L) ∧ φ ≠ 0 := by
+  have hk_inv : k⁻¹ ≠ 1 := fun heq => hk (inv_eq_one.mp heq)
+  refine ⟨columnSum h k⁻¹ - columnSum h k, ⟨?_, ?_⟩, ?_⟩
+  · exact Submodule.sub_mem _
+      (Submodule.subset_span (columnSum_mem_certainTypeSet h hk_inv (columnSum_inv_apply_one h k)))
+      (Submodule.subset_span (columnSum_mem_certainTypeSet h hk rfl))
+  · exact columnDiff_support_subset h hk_inv hk (columnSum_inv_apply_one h k)
+  · rw [sub_ne_zero]
+    intro heq
+    refine certainType_columnSum_conj_ne h hk ?_
+    rw [certainType_columnSum_conj, ← columnSum_def, ← columnSum_def]
+    exact heq
+
+/-- **Peterfalvi Theorem (4.9)(b) — the certain-type coherence.**  The Dade map
+`τ = dadeIntegralCharacterMap h.dade0 h.tau` is *coherent* on the certain-type set
+`𝒯 = {μ_j | μ_j(1) = μ_k(1)}`: the global `ℤ`-linear extension `ν = certainTypeExtension h`
+(`μ_{ij} ↦ δ_j ω_{ij}^σ`) is an isometry on `Z[𝒯]` agreeing with `τ` on `Z[𝒯, A]` and landing in
+`ℤ[Irr G]`, and `Z[𝒯, A] ≠ 0`.  This is the (4.9) input the §8 case-B coherence capstone consumes. -/
+noncomputable def certainType_isCoherent (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {k : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hk : k ≠ 1) :
+    S07.IsCoherent (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+      (certainTypeSet h k) (S04.supportInSubgroup A L) where
+  nonzero := certainType_nonzero h hk
+  extension := certainTypeExtension h
+  extension_inner_eq := fun _ _ hφ hψ => certainTypeExtension_inner_eq h k hφ hψ
+  extends_on_supported := fun _ hφ => certainTypeExtension_eq_dade_of_mem_zSupportedSpan h hk hφ
+  extension_mem_ZIrr := fun _ hφ => certainTypeExtension_mem_ZIrr h k hφ
+
 end OddOrder.Peterfalvi.S06
