@@ -199,14 +199,43 @@ A₀=E₂ (12.8(a))。(a) C_E(x)≤E₂。(b) 各 p∈τ₂ で cyclic Z_p⊴E (
   `pRank_le_of_injective (inclusion hSM)` + tau2_pRank_eq_two; decomp(C⊓↑S) vs 12.8(f)(↑S⊓C) は
   inf_comm; card 大⟹exp 大 = IsCyclic.exponent_eq_card + pow_dvd_pow。** assembly は namespace
   修正のみで一発通過。
-  **残 = front-half (X 存在 rank 矛盾, BG L3363-3370, hard)**: q∈π(E/C_E(S)), Q=Syl_q(N_G(S))⊇Q₁=
-  Syl_q(E) → Prop1.6(e)+Cor12.10(c) で q∈τ₁/Q₁ cyclic → by_contra(Q/Q₀ regular)→φ̄ wrapper で
-  IsCyclic(Q/Q₀)→Ω₁ で r_q=1 vs 12.8(e)+12.11(c) r_q=2 矛盾 → X 存在。⚠ rank 部分(12.11(c) の
-  r_q=2 抽出, Ω₁(Q/Q₀)⊆Q₁/Q₀⟹Ω₁(Q)⊆Q₁)が hard — 要精査。**その後 C_E(S)=E 枝 + frobFact_of_-
-  abelianSylow + 3 ケース統合。**
-  → (4) C_E(S)=E 枝 (要 (i) generic rank-2 分解 S=Y×Z — mathlib 直接形なし、別サブ) → (5) Z_p 集約
-  + E₀=E₁E₃·∏Z_p → (6) `frobFact_of_abelianSylow` → 3 ケース統合で S12_E scaffold
-  `frobenius_factorization_of_regular` 充足。
+## ▶▶ front-half (X 存在 rank 矛盾) 実装プラン (session 9 末, 精密 recon 済 — BG L3358-3370)
+
+**目標**: abelianSylow regime + C_E(S)≠E ⟹ ∃ X≤Q, 1⊊C_S(X)⊊S。これが back-half
+`exists_invariant_cyclic_sameExponent_regular` に X を供給し C_E(S)≠E 枝完成。
+
+**BG 引数 (L3358-3370) の formalization map**:
+1. q∈π(E/C_E(S)) を取る (C_E(S)≠E ⟹ [E:C_E(S)]>1 ⟹ ∃ prime; mechanical)。
+2. Q=Syl_q(N_G(S)), Q₁=Syl_q(E)⊆Q。**⚠ 開問 (a): Q₁⊆N_G(S) の根拠** — E と N_G(S) の関係要確認
+   (E≤N_G(S)? or Q₁ が N_G(S) 内に共役化? BG は「Q⊇Q₁=Syl_q(E)」と暗黙に Q₁⊆N_G(S) を使う)。
+3. C_S(Q₁)⊊S ⟹ Prop1.6(e) ⟹ Q₁⊄C_E(A) ⟹ **Cor12.10(c)** ⟹ q∈τ₁(M), Q₁ cyclic。
+   **⚠ 開問 (b): Cor12.10(c) の repo 形** (S12_Corollary1210 に明示 theorem 不明瞭、要特定)。
+4. C_G(S)⊆E ⟹ Q₀=C_Q(S)⊊Q₁ (Q₀⊆Q₁ は C_Q(S)≤Q₁=Syl_q(E)、⊊ は Q₁⊄C_E(A)⟹Q₁⊄C_G(S))。
+5. **by_contra: Q/Q₀ regular on S** (∀x∈Q∖C_G(S), S⊓C_G(x)=⊥) ⟹ **φ̄ wrapper
+   `isCyclic_quotient_of_conjugation_fpf` ✅** ⟹ IsCyclic(Q⧸C_Q(S))。
+6. **r(Q)=1 側 (= 新規 abstract lemma 推奨, 自己完結)**: IsCyclic(Q⧸Q₀) ∧ Q₀⊊Q₁≤Q (q-群) ⟹
+   Ω₁(Q)⊆Q₁ ⟹ (Q₁ cyclic) pRank Q q≤1。**証明**: Ω₁(Q/Q₀)⊆Q₁/Q₀ (Q₁/Q₀ は cyclic Q/Q₀ の
+   nontrivial 部分群 ⟹ unique min 含む, `line_le_zpowers_in_cyclic` 系) → g∈Ω₁(Q) は ḡ^q=1 ⟹
+   ḡ∈Ω₁(Q/Q₀)⊆Q₁/Q₀ ⟹ g∈Q₁·Q₀=Q₁ → elem-ab⊆Ω₁(Q)⊆Q₁ で pRank Q=pRank Ω₁(Q)≤pRank Q₁≤1。
+   ~50 行、Omega quotient + preimage 機構。**← 最初の committable 一手 (abstract, BG 非依存)。**
+7. **r_q=2 側 (= hard core, BG 依存)**: 12.8(e) で Ω₁(Q₁) が A 中心化 ⟹ q∈π(E/C_E(A))∩π(C_E(A))
+   ⟹ **`tau2_transfer_to_maximal` (=12.11(a-c), 第3連言)** で q∈τ₂(M*), M* に abelian Syl_q(G)。
+   q∈τ₂(M*)⟹r_q(M*)=2。**⚠ 開問 (c) = 真の hard core: r_q(M*)=2 ⟹ r_q(N_G(S))=2 の接続** —
+   M* の abelian Syl_q(G) が N_G(S) 内に来る根拠が要 (BG は「Lemma 12.11(c) yields
+   r_q(N_G(S))=2」と圧縮)。`pRank_eq_two_of_normalizer_le` [S10] は maximal 用で N_G(S) 直結せず。
+   12.8(e) の repo 形 `central_line_of_abelianSylow` は「X∈ℰ¹+regular⟹X≤E∧E中心化X」で
+   「Ω₁(Q₁)中心化A」とは別命題 — 12.8(e) の正しい形を S12_Lemma128d で要再特定。
+8. 6 と 7 で pRank Q q ≤1 vs =2 矛盾 ⟹ X 存在。
+
+**推奨 build 順**: (6) Ω₁-rank abstract lemma を先に着地 (自己完結・テスト可) → (a)(b) 開問解決
+(E/N_G(S), Cor12.10(c) 特定) で setup → (c) hard core (12.8(e) 正形 + r_q=2 接続) を BG 精読で
+攻略 → 統合。**(c) が front-half の真のボトルネック (BG 圧縮された rank 接続)。**
+
+**残 (front-half 後)**: C_E(S)=E 枝 (generic rank-2 分解 S=Y×Z — mathlib
+`AddCommGroup.equiv_directSum_zmod_of_finite` 在だが rank2→2 cyclic 部分群への翻訳は別 sub;
+|Y|=|Z| case は Ω₁(Z)=任意 A₁ の制御要) → Z_p 集約 E₀=E₁E₃·∏Z_p → `frobFact_of_abelianSylow`
+→ 3 ケース統合で S12_E scaffold `frobenius_factorization_of_regular` 充足。
+**⚠ Case 3 残りは hard core 複数 (front-half (c) + =E generic decomp) — multi-session 見込み。**
 
 ## ✅ 2026-06-11 (Lane F session 3, Fable 5): **Lemma 12.3 COMPLETE — cascade 根の解除**
 
