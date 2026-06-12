@@ -3987,3 +3987,15 @@ nontrivial finite group is cyclic. Via an elementary abelian `p²`-subgroup `B` 
 Isaacs 6.21 forces `⟨C_H(b) | b ∈ B^#⟩ = H`, contradicting fixed-point-freeness. Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isCyclic_of_coprime_fpf_pgroup_action
+
+/-! ### BG Theorem 12.12: Frobenius packaging + case `τ₂(M) = ∅` (`S12_Theorem1212`)
+
+`isFrobeniusGroup_of_regular`: a nontrivial complement `E₀ ≤ E` acting regularly on `M_σ`
+(`M_σ ⊓ C_G(a) = 1` for `a ∈ E₀#`) makes `M_σ E₀` a Frobenius group with kernel `M_σ`
+(`M_σ ⊴ M`, `M_σ ⊓ E₀ = 1` from the `SubgroupESetup`, `M_σ ≠ 1` by Theorem 10.2(e)).
+`frobFact_of_regular_all`: when `E = E₁E₃` (the regularity covers all of `E`), `A₀ = 1` and
+`E₀ = E` discharge both conclusions. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isFrobeniusGroup_of_regular
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_regular_all
