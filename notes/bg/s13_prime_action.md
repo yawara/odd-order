@@ -131,6 +131,35 @@ S13_PrimeAction に sorry'd で残置、全 step 着地で migrate)
   ⟹ **🎉 BG Lemma 13.1 完全証明 (forward axiom conditional)**。次 = **Cor 13.2** (mmd L3548;
   「follows directly from Lemma 13.1」+ Lemma 12.2(a))。
 
+### 2026-06-13 Lane G session 3: Cor 13.2 ✅ COMPLETE (新 leaf `S13_Corollary132.lean`)
+
+**`tau13_pSubgroup_centralizes` 完全証明** (sorry-free, axiom = 2 forward `cor1216_*` のみ;
+新規 axiom 0)。S13_PrimeAction scaffold stub を leaf へ移動 (実 sorry 10→9)、S13_PrimeAction が
+leaf を import し再 export。root + AxiomsCheck (island PASS, full build 3793/3646 jobs) に配線。
+
+証明構造 (3 結論を共通 setup 後 `by_cases ⁅M_σ∩M*, M∩M*⁆ = ⊥` で分岐):
+- **非共役** `hnc` = `not_conj_of_mem_tau1_union_tau3_of_normalizer_le` (BG Lem 12.2(b), 既存) を
+  X:=P で適用 — **無料** (conj-invariance/disjointness 自作不要)。
+- **=⊥ 枝**: `commutator_eq_bot_iff_le_centralizer` で M∩M* がそのまま中心化 (向き =
+  `⁅H,K⁆=⊥ ↔ H≤C(K)`、hcomm を `commutator_comm` で swap)。(a)(b) trivial、(c) vacuous。
+- **≠⊥ 枝**: `not_mem_tau2_of_interaction` (13.1b) で `p∉τ₂(M*)`、`prime_mem_sigma_or_tau2`
+  (12.2a) と合わせ `p∈σ(M*)`、`tau1_subset_sigma_compl` で `p∉τ₁(M*)`。
+  - (a) = `pSubgroup_centralizes_Msigma_inf` (13.1a) 直接。
+  - (b) = 新 reusable helper **`le_centralizer_of_forall_prime_isPGroup`**(有限群は素冪部分群で
+    生成 — orderOf の素冪分解 z=y^m / w=y^{r^a} + Bézout `gcd_eq_gcd_ab` で y=w^A·z^B、
+    `Nat.strong_induction_on orderOf`)を K:=Q に適用、各素冪部分群 R に (a) を per-prime 適用
+    (`r∈π(Q)⟹r∉τ₁(M*)` via `IsPiSubgroup`、`r∈π(E)/π(M*)` via `mem_primeFactors_of_isPGroup_le`)。
+  - (c) `p∈β(M*)` = `mem_idealPrime_of_tau1_of_interaction` (13.1c, `idealPrime`) +
+    `p∈α(M*)`: `pRank M* p = pRank G p` via 新 helper **`pRank_eq_of_mem_sigma`**
+    (`isSylow_sylowMap_of_mem_sigma` + `pRank_sylow_eq` + `equivMapOfInjective`)、`idealPrime` の
+    `r_p(G)≥3` を移送。
+- 新 helper 4 (再利用可): `le_centralizer_of_forall_prime_isPGroup` /
+  `mem_primeFactors_of_isPGroup_le` / `mem_primeFactors_E_of_mem_M_of_not_sigma`
+  (|M|=|M_σ||E| + `Msigma_isPiGroup`) / `pRank_eq_of_mem_sigma`。
+- **次 = Cor 13.3** (`cyclicSylow_actsPrime`; mmd L3556): Cor 13.2(a)(b) + `ActsPrimeOn` 定義
+  (S13_PrimeAction 内)。leaf は ActsPrimeOn を要するので S13_PrimeAction を import
+  ⟹ S13_PrimeAction は 13.3 leaf を import 不可 (cycle)、13.3 stub は leaf へ移し root 直 import。
+
 surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathlib),
 `S10.Msigma_isPiGroup`/`Msigma_le_derived`, `Sylow.normalizer_sup_eq_top'`, `pRank_mono_of_le`,
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),

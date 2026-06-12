@@ -3666,6 +3666,12 @@ Lane F adds them to §12, de-axiomatize and migrate these to `#assert_only_allow
   expecting [OddOrder.BG.Ch3.S13.cor1216_pRank_normalizer_le_one,
     OddOrder.BG.Ch3.S13.cor1216_not_mem_primeFactors_derived_of_tau1]
 
+-- BG Corollary 13.2 (`tau13_pSubgroup_centralizes`): the `τ₁(M) ∪ τ₃(M)`-specialization of
+-- Lemma 13.1, conditional on Corollary 12.16(a)(b).
+#assert_axioms_island OddOrder.BG.Ch3.S13.tau13_pSubgroup_centralizes
+  expecting [OddOrder.BG.Ch3.S13.cor1216_pRank_normalizer_le_one,
+    OddOrder.BG.Ch3.S13.cor1216_not_mem_primeFactors_derived_of_tau1]
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.
