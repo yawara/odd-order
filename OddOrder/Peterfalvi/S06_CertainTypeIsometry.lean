@@ -947,4 +947,70 @@ theorem certainType_diff_dade_sum_eq (h : Hypothesis46 A L)
   rw [tau_toDadeMap_sum, Finset.smul_sum]
   exact Finset.sum_congr rfl fun i _ => certainType_diff_dade_eq h hχ hχ₂ hχ₂' i (hdeg i)
 
+/-! ### Column-degree constancy and the (4.9) degree bridge
+
+In the certain-type column `j` every `μ_{ij}` restricts to the same irreducible `χ_j` of `K`, so
+they share the degree `μ_{0j}(1)` — this is exactly `columnFamily_difference_apply_one`
+(`(μ_{ij} − μ_{0j})(1) = 0`).  Consequently the column-sum degree equality `μ_j(1) = μ_k(1)`
+(i.e. `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`, since `μ_j = ∑_i μ_{ij}`) is equivalent to the per-row
+equalities `μ_{ij}(1) = μ_{ik}(1)`, which is the form consumed by the summed isometry.  This is the
+bridge from the set `T = {μ_j | μ_j(1) = μ_k(1)}` of Peterfalvi (4.9) to (4.8)/(4.9)(b). -/
+
+/-- **Column-degree constancy.**  Every `μ_{ij}` in column `j` has degree `μ_{0j}(1)`
+(`columnFamily_difference_apply_one`: `(μ_{ij} − μ_{0j})(1) = 0`). -/
+theorem columnFamily_mu_apply_one_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
+  have h0 := h.columnFamily_difference_apply_one χ₂ i
+  simp only [SignedIrreducibleDifferenceFamily.difference_apply_one,
+    SignedIrreducibleDifferenceFamily.classFunction_apply] at h0
+  exact sub_eq_zero.mp h0
+
+/-- **The (4.9) degree bridge.**  The column-sum degree equality `∑_i μ_{ij}(1) = ∑_i μ_{ik}(1)`
+(= `μ_j(1) = μ_k(1)` since `μ_j = ∑_i μ_{ij}`) gives the per-row equalities `μ_{ij}(1) = μ_{ik}(1)`:
+each column is degree-constant (`columnFamily_mu_apply_one_eq`), so both sums are `w₁` times the
+anchor degree, and `w₁ ≠ 0` cancels. -/
+theorem forall_columnFamily_mu_apply_one_eq_of_sum_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+    (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    ∀ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+        = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1 := by
+  have ej : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) 1 := by
+    rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂ i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  have ek : ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card h.W1 : ℂ) * ((h.columnFamily χ₂').mu 0 : ClassFunction ↥L ℂ) 1 := by
+    rw [Finset.sum_congr rfl (fun i _ => columnFamily_mu_apply_one_eq h χ₂' i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+  rw [ej, ek] at hdeg
+  have hw1 : (Nat.card h.W1 : ℂ) ≠ 0 := by exact_mod_cast (NeZero.ne (Nat.card h.W1))
+  have hcol0 := mul_left_cancel₀ hw1 hdeg
+  intro i
+  rw [columnFamily_mu_apply_one_eq h χ₂ i, columnFamily_mu_apply_one_eq h χ₂' i, hcol0]
+
+/-- **Peterfalvi (4.9)(b), summed isometry under the column-degree hypothesis.**  The summed
+isometry `certainType_diff_dade_sum_eq` restated with the column-sum degree equality
+`μ_j(1) = μ_k(1)` (the membership condition for `T`), the per-row equalities supplied by the
+degree bridge `forall_columnFamily_mu_apply_one_eq_of_sum_eq`. -/
+theorem certainType_diff_dade_sum_eq_of_degree (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ : χ₂ ≠ χ₂')
+    (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+          = ∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
+    h.tau.toDadeMap (∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i
+        (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg i))
+      = (h.columnFamily χ₂).sign •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) :=
+  certainType_diff_dade_sum_eq h hχ hχ₂ hχ₂'
+    (forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg)
+
 end OddOrder.Peterfalvi.S06
