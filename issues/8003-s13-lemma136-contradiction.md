@@ -80,10 +80,29 @@ Sylow を構成してよい点が鍵だが、X は固定で動かせない。
 > **問**: X⊆S⊆C_{M_σ}(E') となる E-invariant Sylow q-部分群 S を取れる理由を精密に再構成せよ。
 > 特に X は E'-invariant (or E-invariant) か? でなければ X はどう E'-中心化 Sylow に入るのか?
 
+## Session 2026-06-14 cont.: step-6 gap + (13.1) 解決
+
+**(13.1) 解決**: "contrary to (13.1)" の (13.1) = 冒頭 reduction display「q∉β(M) and X⊄M_σ'」。
+∴ 最終矛盾は self-contained: A 中心化 X ⟹ X≤C_{M_σ}(A)=⊥ ⟹ X=⊥、X⊄M_σ' (=X≠⊥) と矛盾。
+新規 dependency 不要。
+
+**🔴 step-6 gap**: 「A=A₀×[A,E₁] centralizes X」。A₀=C_A(E₁) は Thm 13.4 (P=E₁, R=line of A₀⊆C_E(E₁))
+で X 中心化。だが **[A,E₁]⊆A** (E₁ は A を正規化、∴ [A,E₁]⊆A、E₁ でない)、かつ [A,E₁] の line は
+E₁ を中心化しない (動かされる部分) ので **Thm 13.4 が効かない**。なぜ [A,E₁] が X を中心化するか不明。
+three-subgroups ([E₁,X,A]=1 は [X,E₁]=1 から従うが [X,A,E₁]=1 が未証明) では閉じず。
+
+**→ ChatGPT 再構成依頼プロンプト (step 6)**:
+> BG Lemma 13.6 の証明末尾: "Theorem 13.4 shows that A₀=C_A(E₁) centralizes X. Thus A=A₀×[A,E₁]
+> centralizes X, contrary to (13.1)." ここで A∈ℰ_p²(E) (p∈τ₂), A◁E, E₁ は τ₁ cyclic で A に coprime
+> 作用、X∈ℰ_q¹(C_{M_σ}(E₁)) (∴ [X,E₁]=1)。A₀=C_A(E₁) が X を中心化するのは Thm 13.4 で分かる。
+> **問**: なぜ [A,E₁] (⊆A の moved part) も X を中心化するのか? Thm 13.4 は [A,E₁] の line には
+> 効かない (E₁ 非中心化) はず。A 全体が X を中心化する精密な理由を再構成せよ。
+
 ## 完了条件
 
 `maximalContaining_eq_singleton_of_E1` が sorry-free + build-green + axiom-clean。
 13.6 完成で AxiomsCheck 登録 + hub 連絡 (下流 13.9-13.13 解禁)。
+**現状: step-2 + step-6 の 2 つの reconstruction gap で gated (ChatGPT 再構成待ち)。**
 
 ## 参照
 
