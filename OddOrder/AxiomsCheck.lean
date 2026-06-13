@@ -4440,6 +4440,16 @@ Theorem 12.13). Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1214.maximalContaining_centralizer_eq_singleton
 
+/-! **BG Corollary 12.14, faithful form** (`S12_Corollary1214`,
+`maximalContaining_centralizer_and_someSylow_eq_singleton`): strengthens the above to also conclude
+`ℳ(S₀) = {M}` for some Sylow `p`-subgroup `S₀ ⊇ X` of `M_σ`, matching the textbook
+`ℳ(C_G(X)) = ℳ(P) = {M}`. Same witness `U`: it satisfies `U ≤ S₀` in every branch
+(`P₁ ≤ S₀`, resp. `C_P(X) ≤ S₀`), so threading `U ≤ S₀` through the unified engine yields the second
+conjunct. Needed by BG Lemma 13.6 (issue 8002). Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch3.S12.Cor1214.maximalContaining_centralizer_and_someSylow_eq_singleton
+
 /-! **BG Corollary 12.16** (`S12_Corollary1216`, σ-subgroup ↔ maximal interaction, `q`-group form):
 for a nonidentity `q`-group `Y` (`q ∈ σ(M)`), every `p ∈ π(E) ∩ β(G)'`, and every `H ∈ ℳ(Y)` not
 conjugate to `M`: (a) `r_p(N_H(Y)) ≤ 1` (`pRank_normalizer_le_one`); (b) if `p ∈ τ₁(M)` then
