@@ -471,7 +471,126 @@ theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
     (hR : R ∈ elemAbelianOfRank G r 1) (hRE3 : R ≤ E₃)
     (hRcP : R ≤ Subgroup.centralizer (P : Set G))
     (hlt : fixedBy (S10.Msigma M) E₁ < fixedBy (S10.Msigma M) E₃) : False := by
-  sorry
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact r.Prime := ⟨hr⟩
+  have hE1ne : E₁ ≠ ⊥ := fun hb =>
+    (ne_bot_of_mem_elemAbelianOfRank_one hP) (le_bot_iff.mp (hPE1.trans hb.le))
+  have hRne : R ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hR
+  have hE1prime : ActsPrimeOn (S10.Msigma M) E₁ := E1_actsPrime hG h hE1ne
+  have hE3prime : ActsPrimeOn (S10.Msigma M) E₃ := (cyclicSylow_actsPrime hG h).2
+  -- connect `hlt` to `P`, `R`.
+  have hPeq : fixedBy (S10.Msigma M) P = fixedBy (S10.Msigma M) E₁ :=
+    fixedBy_eq_of_elemAbelian_one hp hE1prime hP hPE1
+  have hReq : fixedBy (S10.Msigma M) R = fixedBy (S10.Msigma M) E₃ :=
+    fixedBy_eq_of_elemAbelian_one hr hE3prime hR hRE3
+  have hlt' : fixedBy (S10.Msigma M) P < fixedBy (S10.Msigma M) R := by rw [hPeq, hReq]; exact hlt
+  have hCRne : fixedBy (S10.Msigma M) R ≠ ⊥ := (lt_of_le_of_lt bot_le hlt').ne'
+  -- (a) `E = E₁ ⊔ E₃`.
+  obtain ⟨⟨r_elt, hr_eltR⟩, hr_eltne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hRne
+  have hr_elt1 : r_elt ≠ 1 := fun hc => hr_eltne (Subtype.ext (by simpa using hc))
+  have hCre : S10.Msigma M ⊓ Subgroup.centralizer ({r_elt} : Set G) ≠ ⊥ := by
+    refine fun hb => hCRne (le_bot_iff.mp ?_)
+    rw [fixedBy_def, ← hb]
+    exact inf_le_inf_left _ (Subgroup.centralizer_le (by
+      intro u hu; rw [Set.mem_singleton_iff] at hu; subst hu; exact hr_eltR))
+  have hEsup : E = E₁ ⊔ E₃ := E_eq_sup_of_E3_centralizer hG h (hRE3 hr_eltR) hr_elt1 hCre
+  -- (b) `R ⊲ E`, extract `M* ∈ ℳ(N_G(R))`, `E ⊆ M*`.
+  have hENR : E ≤ Subgroup.normalizer (R : Set G) := E_le_normalizer_of_le_E3 hG h hRE3
+  have hRM : R ≤ M := hRE3.trans h.E3_le_M
+  have hNRne : Subgroup.normalizer (R : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : R.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal R inferInstance with hb | ht
+    · exact hRne hb
+    · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hRM))
+  obtain ⟨Mstar, hMstarCo, hNRM⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (R : Set G))).resolve_left hNRne
+  have hMstarMem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨hMstarCo, hNRM⟩
+  have hMstarMax : Mstar ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMstarCo
+  have hEMstar : E ≤ Mstar := hENR.trans hNRM
+  have hrτ3 : r ∈ tau3 M := by
+    have hc3 : Nat.card (E₃.subgroupOf E) = Nat.card E₃ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+    refine h.E₃_hall.1 r (hc3 ▸ Nat.mem_primeFactors.mpr ⟨hr, ?_, Nat.card_pos.ne'⟩)
+    have hdvd : Nat.card R ∣ Nat.card E₃ := Subgroup.card_dvd_of_le hRE3
+    rwa [show Nat.card R = r by rw [← pow_one r]; exact hR.2] at hdvd
+  have hRr : IsPGroup r ↥R := IsPGroup.of_card (by rw [hR.2, pow_one])
+  have hCor132 := tau13_pSubgroup_centralizes hG h (Or.inr hrτ3) hRM hRne hRr hMstarMem
+  -- (c) `C_{E₁}(M_σ ⊓ M*) = ⊥`.
+  have hcommRP : ⁅fixedBy (S10.Msigma M) R, P⁆ ≠ ⊥ := by
+    intro hb
+    have hle : fixedBy (S10.Msigma M) R ≤ Subgroup.centralizer (P : Set G) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hb
+    have hcontra : fixedBy (S10.Msigma M) R ≤ fixedBy (S10.Msigma M) P :=
+      le_inf (by rw [fixedBy_def]; exact inf_le_left) hle
+    exact absurd (le_antisymm hlt'.le hcontra) (ne_of_lt hlt')
+  have hCRsub : fixedBy (S10.Msigma M) R ≤ S10.Msigma M ⊓ Mstar :=
+    le_inf (by rw [fixedBy_def]; exact inf_le_left)
+      (by rw [fixedBy_def]
+          exact inf_le_right.trans ((Subgroup.centralizer_le_normalizer (R : Set G)).trans hNRM))
+  have hcomm2 : ⁅(S10.Msigma M ⊓ Mstar : Subgroup G), E₁⁆ ≠ ⊥ := fun hb =>
+    hcommRP (le_bot_iff.mp ((Subgroup.commutator_mono hCRsub hPE1).trans hb.le))
+  have hCE1 : E₁ ⊓ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) = ⊥ :=
+    actsPrimeOn_inf_centralizer_eq_bot hE1prime inf_le_left hcomm2
+  -- (d) `π(E₁) ⊆ τ₁(M*)`.
+  have hπ : ∀ s ∈ (Nat.card ↥E₁).primeFactors, s ∈ tau1 Mstar := by
+    intro s hs
+    by_contra hsτ1
+    have hs_prime := Nat.prime_of_mem_primeFactors hs
+    haveI : Fact s.Prime := ⟨hs_prime⟩
+    haveI : Fintype ↥E₁ := Fintype.ofFinite _
+    obtain ⟨a, ha⟩ := exists_prime_orderOf_dvd_card (G := ↥E₁) s
+      (by rw [← Nat.card_eq_fintype_card]; exact (Nat.mem_primeFactors.mp hs).2.1)
+    have hxE1 : (a : G) ∈ E₁ := a.2
+    have hxord : orderOf (a : G) = s := by rw [Subgroup.orderOf_coe]; exact ha
+    have hxne : (a : G) ≠ 1 := by
+      intro hc; apply hs_prime.ne_one; rw [← hxord, hc, orderOf_one]
+    have hzxEM : Subgroup.zpowers (a : G) ≤ E ⊓ Mstar :=
+      le_inf (Subgroup.zpowers_le.mpr (h.E₁_le hxE1))
+        (Subgroup.zpowers_le.mpr (hEMstar (h.E₁_le hxE1)))
+    have hzxpi : Subgroup.IsPiSubgroup ((tau1 Mstar)ᶜ) (Subgroup.zpowers (a : G)) := by
+      intro t ht
+      rw [Nat.card_zpowers, hxord, hs_prime.primeFactors, Finset.mem_singleton] at ht
+      rw [ht]; exact hsτ1
+    have hzxC := hCor132.2.1 (Subgroup.zpowers (a : G)) hzxEM hzxpi
+    have hxbot : Subgroup.zpowers (a : G) ≤
+        E₁ ⊓ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) :=
+      le_inf (Subgroup.zpowers_le.mpr hxE1) hzxC
+    rw [hCE1] at hxbot
+    exact hxne (Subgroup.zpowers_eq_bot.mp (le_bot_iff.mp hxbot))
+  -- (e) `R ⊆ M*_σ`.
+  have hE1MM : E₁ ≤ M ⊓ Mstar := le_inf h.E1_le_M (h.E₁_le.trans hEMstar)
+  have hcomm3 : ⁅(S10.Msigma M ⊓ Mstar : Subgroup G), M ⊓ Mstar⁆ ≠ ⊥ := fun hb =>
+    hcomm2 (le_bot_iff.mp ((Subgroup.commutator_mono le_rfl hE1MM).trans hb.le))
+  have hrσMstar : r ∈ S10.sigma Mstar := (hCor132.2.2 hcomm3).1
+  have hRMstar : R ≤ Mstar := hRE3.trans (h.E₃_le.trans hEMstar)
+  have hRpiσ : Ch03.Subgroup.IsPiGroup (S10.sigma Mstar) R := by
+    intro t ht
+    rw [show Nat.card ↥R = r by rw [← pow_one r]; exact hR.2, hr.primeFactors,
+      Finset.mem_singleton] at ht
+    rw [ht]; exact hrσMstar
+  have hRMsig : R ≤ S10.Msigma Mstar :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hMstarMax) hRMstar hRpiσ
+  -- (f) `E₁` centralizes `R`.
+  have hE1cR : E₁ ≤ Subgroup.centralizer (R : Set G) :=
+    E1_centralizes_R_of_hall_tau1 hG hMstarMax hE1ne (h.E₁_le.trans hEMstar) hπ hp hP hPE1 hRMsig hRcP
+  -- (g) `E₃` centralizes `R`, hence `E` does, contradiction with `C_G(E) ⊓ E₃ = ⊥`.
+  have hE3cR : E₃ ≤ Subgroup.centralizer (R : Set G) := by
+    haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
+    letI : CommGroup ↥E₃ := IsCyclic.commGroup
+    intro e he
+    rw [Subgroup.mem_centralizer_iff]
+    intro u hu
+    exact Subtype.ext_iff.mp (mul_comm (⟨u, hRE3 hu⟩ : ↥E₃) ⟨e, he⟩)
+  have hEcR : E ≤ Subgroup.centralizer (R : Set G) := hEsup ▸ sup_le hE1cR hE3cR
+  have hRcE : R ≤ Subgroup.centralizer (E : Set G) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+      (by rw [Subgroup.commutator_comm]; exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hEcR)
+  have hRbot : R ≤ Subgroup.centralizer (E : Set G) ⊓ E₃ := le_inf hRcE hRE3
+  rw [(subgroupE_basic hG h).2.2.2.2.2.1] at hRbot
+  exact hRne (le_bot_iff.mp hRbot)
 
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
