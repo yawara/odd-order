@@ -36,6 +36,7 @@ being *proved*, not merely stated.  See
 namespace OddOrder.Peterfalvi.S10Interface
 
 open OddOrder.GroupTheory
+open OddOrder.Isaacs
 
 variable {G : Type*} [Group G]
 
@@ -53,5 +54,34 @@ theorem maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II [Finite G]
     maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
   (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.2.2.2.2.mpr
     (hType.imp_right Or.inl)
+
+/-! ## Hall structure of `M_F` (the `(8.11)` first conjunct, types I/II) -/
+
+/-- A `π`-Hall subgroup is also a Hall subgroup for the prime factors of its own
+order.  (General lemma: `IsHallSubgroup` only constrains the order's primes to lie
+in `π` and the index's primes to avoid `π`; shrinking `π` to `π(|H|)` keeps both.) -/
+theorem isHall_primeFactors {π : Set ℕ} {H : Subgroup G}
+    (h : Ch03.IsHallSubgroup π H) :
+    Ch03.IsHallSubgroup (↑(Nat.card ↥H).primeFactors) H := by
+  refine ⟨fun p hp => Finset.mem_coe.mpr hp, fun p hp hp' => ?_⟩
+  exact h.2 p hp (h.1 p (Finset.mem_coe.mp hp'))
+
+/-- **Shared-notation form of Peterfalvi (8.11), first conjunct, types I/II**:
+`M_F` (`maxNilpotentNormalHall`) is a Hall subgroup of `G` for the primes dividing
+its order.  Proof: for type I/II, `M_F = M_σ` (Proposition 16.1) and `M_σ` is the
+σ-Hall subgroup (BG Theorem 10.2, `Msigma_isHall`), which is Hall for its own
+prime factors by `isHall_primeFactors`.  No new axiom (cites the still-`sorry`
+Proposition 16.1; the §10 Hall structure is already proved).
+
+The full (8.11) additionally needs the type III/IV case, where `M_s = M'` and `M_F`
+is a *proper* Hall subgroup of `M_σ`; that requires the (still `sorry`) BG §14--§15
+structure and is therefore deferred. -/
+theorem maxNilpotentNormalHall_isHall_of_typeI_or_II [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) :
+    Ch03.IsHallSubgroup (↑(Nat.card ↥(maxNilpotentNormalHall M)).primeFactors)
+      (maxNilpotentNormalHall M) := by
+  rw [maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hM hType]
+  exact isHall_primeFactors (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM)
 
 end OddOrder.Peterfalvi.S10Interface
