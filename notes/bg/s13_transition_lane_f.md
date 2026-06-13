@@ -116,4 +116,14 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
   witness 抽出 API (`zpowers _ ∈ elemAbelianOfRank`) 確認済。
-  次 = equal-case helper (Sylow 共役 + D 正規化) → 13.7 body (step1/2/5 配線) → 13.7 完成 → 13.8。
+- 2026-06-14 (Lane F, /loop 続き): **equal-case crux 完成** — helper 計 4 本 landed:
+  `le_normalizer_fixedBy` + **`actsPrimeOn_sup_of_eq_centralizer`** (13.7 equal case)。
+  Sylow 不要、Peterfalvi (2.1) `exists_mem_centralizer_conj` で coset collapse → c=1 forcing。
+  `coe_mul_of_right_le_normalizer_left` で product 分解、`SemiconjBy.orderOf_eq` で共役 ord 不変。
+  次 = **13.7 body 組立**: step 1 (witness 抽出, `¬ActsRegularlyOn E₃ E₁` → P,R) + step 2
+  (Thm 13.4 `centralizer_le_centralizer_of_tau1` → C_N(E₁)≤C_N(E₃)) + step 5 (背理法で ¬strict,
+  H1 `actsPrimeOn_inf_centralizer_eq_bot` + Cor 13.2(b)(c) `tau13_pSubgroup_centralizes` +
+  Thm 13.5 を M* に + Lem 12.1 C_{E₃}(E)=1 + Cor 12.6(d) τ₂ empty) ⟹ C_N(E₁)=C_N(E₃) →
+  `actsPrimeOn_sup_of_eq_centralizer` で 13.7 完成。その後 13.8。
+  ⚠ helper の hcop は `Nat.Coprime (Nat.card E₁) (Nat.card E₃)` 形 — body で SubgroupESetup から
+  E₁/E₃ の位数互素を出す (τ₁ vs τ₃ disjoint + Hall)。
