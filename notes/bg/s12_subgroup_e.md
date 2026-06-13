@@ -17,10 +17,37 @@ reduction (`exists_expPExtraspecial_le_of_two_maximals`: P→Sylow G→r≤2→Q
 `exists_conj_smul_zpowers_eq_of_expPExtraspecial`(型) + `..._le`(G-element) + `exists_conj_smul_eq_of_lines_of_expPExtraspecial`(G-subgroup) (line-共役 3 段) /
 `eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (ℳ-矛盾エンジン)。
 
-**残 = piece 5 本体のみ** (`maximalContaining_normalizer_center_ne_of_two_maximals` の sorry):
-K=C_{M_α}(Z) への Q/Z 作用に `cocyclicFixedByClosure_eq_top_of_not_isCyclic` (Prop 1.16) を instantiate
-→ K=⟨C_K(Ā)⟩、各 C_K(A_Y)⊆M⋆ (12.4a) ⟹ K⊆M⋆ → Cor10.9b(M=(M∩M⋆)M_α, α=β) + Lem6.5b
-(coprime は p∉α 済) ⟹ N_M(Z)⊆M⋆ ⟹ ℳ(N_G(Z))≠{M}。**crux = quotient-action `↥Q⧸Z→*MulAut↥K` 構成**。
+**残 = piece 5 内の唯一 sorry = `hK : C_{M_α}(Z)⊆M⋆`** (A の cocyclic core; C+B は実証済)。
+C (ℳ-矛盾) + B (Lem6.5b: N_M(Z)⊆M⋆ from hK; ↥M 内 normalizer_eq_centralizerK_mul_normalizerU +
+Cor10.9b で hKU + p∉α で coprime) は **DONE** (commit d4cf9fc5 / f7f1d384)。
+
+### ▶ A = hK (C_{M_α}(Z)⊆M⋆) 実装レシピ (cocyclic quotient-action, ~120 行 all-or-nothing, 最難)
+template = `S12_ExceptionalBridge.le_of_forall_line_inf_centralizer_le` (769-851; 部分群 A 版・
+**quotient でないので直接流用不可**: rank-1 line で Y=Z 問題。Q/Z の line のみ A_Y rank-2 で 12.4a 可)。
+- K := centralizer Z ⊓ M_α。**(1) Q≤N_G(K)**: Q normalize Z (Z=Z(Q) の像) ⟹ normalize centralizer Z;
+  Q≤M, M_α⊴M ⟹ normalize M_α ⟹ K。**(2) Z centralize K** (K=C_{M_α}(Z) は定義上 Z 中心化)。
+- **φ 構成**: `act : MulDistribMulAction ↥Q ↥K := MulDistribMulAction.compHom (M:=↥(N_G K)) ↥K (inclusion hQK)`;
+  `ψ := MulDistribMulAction.toMulAut ↥Q ↥K : ↥Q→*MulAut↥K`; `center↥Q ≤ ψ.ker` ((2) より z conj 自明);
+  `φ := QuotientGroup.lift (center↥Q) ψ hker : (↥Q⧸center↥Q)→*MulAut↥K`。
+- coprime `|Q/Z|=p²` vs `p∤|K|` (K≤M_α, p∉α 済); noncyclic Q/Z ((ℤ/p)², extraspecial commutator=center)。
+  ⟹ `cocyclicFixedByClosure φ = ⊤` (Prop 1.16)。
+- `closure_le` で各 generator g (∀y∈Y, φ y g=g, (Q/Z)/Y cyclic) → ↑g が preimage A_Y (= Y の ↥Q 内 preimage
+  を map; Z≤A_Y) を中心化 → **A_Y∈ℰ²(Q)** (Y line ⟹ |A_Y|=p²; Y=⊤ ⟹ A_Y=Q⊇rank2) → 12.4a
+  (`centralizer_le_of_elemAb_rank_two` を M⋆ に) で ↑g∈M⋆ ⟹ K⊆M⋆。
+- **✅ template + API 確定 (session 17 study)**: φ-construction template = **`S10_LocalCriteria:161-209`**
+  (`MulDistribMulAction.compHom (M:=↥(N_G(Malpha M))) ↥(Malpha M) (inclusion hX_norm_Ma)` +
+  `toMulAut` + `hφ_coe`/`hφ_inv_coe`; X が M_α に conj 作用)。これを K=C_{M_α}(Z) 版に + `QuotientGroup.lift`。
+  cocyclic template = **`le_of_forall_line_inf_centralizer_le:785-846`** (closure_le + 各 line case)。
+  確定 API: `le_normalizer_map_subtype_of_normal` (Q≤N_G(Z) from center↥Q normal),
+  `le_normalizer_opiCoreInG (alpha M) M` (M≤N_G(M_α)), `centralizer_conj_smul` +
+  `mem_normalizer_of_conj_smul_eq_self` + `Subgroup.smul_inf` (hQK idiom = S12_Corollary1210:309-312),
+  `QuotientGroup.lift N φ HN`, `commGroupOfCyclicCenterQuotient`/`cyclic_center_quotient_of_card_eq_prime_sq`
+  (PGroup.lean:358-371; Q/Z noncyclic via Q nonabelian), `Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl`
+  (coprime, S10_LocalCriteria:158)。**A-frame は ~80 行 all-or-(1-sorry): clean prefix は commit 不可
+  (全中間結果が最終 sorry に feed) ゆえ generator→M⋆ (12.4a) のみ sorry 化した full A-frame を一括で書く。**
+- **incremental commit 可**: φ+cocyclic+closure-reduction を frame とし generator→M⋆ (12.4a 部) を sorry 化
+  → net sorry=1 維持で A-frame 先行 commit、その後 generator core。
+**crux = quotient-action φ 構成 + line↔rank-2 A_Y 対応。multi-iteration 見込み。**
 
 ## 🟢 2026-06-13 (Lane F session 15, Opus 4.8): **Thm 12.13 hard-core 着手 — 還元補題・extraspecial 共役・ℳ-矛盾エンジン**
 
