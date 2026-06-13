@@ -242,6 +242,36 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial {Q : Type*} [Group Q] [F
   exact ⟨q, (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hbmem)
     (le_of_eq (hcardL.trans hcardR.symm))).symm⟩
 
+/-- **`G`-level Heisenberg line-conjugacy** (transport of
+`exists_conj_smul_zpowers_eq_of_expPExtraspecial` to subgroups of `G`): for `a, b ∈ Q` (exp-`p`
+extraspecial), with `a, b ∉ Z(Q)` and `b ∈ ⟨a⟩ ⊔ Z(Q)`, there is `g ∈ Q` with `g⟨a⟩g⁻¹ = ⟨b⟩`.
+Lift `a, b` to `↥Q`, apply the type-level lemma, and transport the conjugacy back along `Q.subtype`. -/
+theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q) {a b : G} (haQ : a ∈ Q) (hbQ : b ∈ Q)
+    (ha : a ∉ (Subgroup.center ↥Q).map Q.subtype) (hb : b ∉ (Subgroup.center ↥Q).map Q.subtype)
+    (hmem : b ∈ Subgroup.zpowers a ⊔ (Subgroup.center ↥Q).map Q.subtype) :
+    ∃ g ∈ Q, MulAut.conj g • Subgroup.zpowers a = Subgroup.zpowers b := by
+  classical
+  have hanc : (⟨a, haQ⟩ : ↥Q) ∉ Subgroup.center ↥Q :=
+    fun h => ha (Subgroup.mem_map_of_mem Q.subtype h)
+  have hbnc : (⟨b, hbQ⟩ : ↥Q) ∉ Subgroup.center ↥Q :=
+    fun h => hb (Subgroup.mem_map_of_mem Q.subtype h)
+  have hmem' : (⟨b, hbQ⟩ : ↥Q) ∈ Subgroup.zpowers (⟨a, haQ⟩ : ↥Q) ⊔ Subgroup.center ↥Q := by
+    rw [← Subgroup.mem_map_iff_mem Q.subtype_injective, Subgroup.map_sup, MonoidHom.map_zpowers]
+    exact hmem
+  obtain ⟨q, hq⟩ := exists_conj_smul_zpowers_eq_of_expPExtraspecial hQ_es hanc hbnc hmem'
+  refine ⟨Q.subtype q, q.2, ?_⟩
+  have hmsc : (MulAut.conj q • Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype
+      = MulAut.conj (Q.subtype q) • (Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype := by
+    rw [mulAut_smul_eq_map, mulAut_smul_eq_map, Subgroup.map_map, Subgroup.map_map]; congr 1
+  have ha_map : (Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype = Subgroup.zpowers a := by
+    rw [MonoidHom.map_zpowers]; rfl
+  have hb_map : (Subgroup.zpowers (⟨b, hbQ⟩ : ↥Q)).map Q.subtype = Subgroup.zpowers b := by
+    rw [MonoidHom.map_zpowers]; rfl
+  have h2 := congrArg (Subgroup.map Q.subtype) hq
+  rw [hmsc, ha_map, hb_map] at h2
+  exact h2
+
 /-- **`ℳ(N_G(·))`-uniqueness blocks `M`-conjugacy**: if `A₀⋆ = g • A₀` (conjugation by some
 `g ∈ M`), `ℳ(N_G(A₀)) = {M}`, and `ℳ(N_G(A₀⋆)) = {M⋆}`, then `M = M⋆`.
 
@@ -380,6 +410,108 @@ theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMin
   by_contra h
   push_neg at h
   exact hα (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM h).2.1
+
+/-- **An exp-`p` extraspecial `Q ≤ G` contains `A ∈ ℰ²_p(G)`** (the `A ∈ ℰ²(Q)` of BG 12.13,
+mmd L3391): `Q` is a non-cyclic `p`-group (`[Q,Q] = Z(Q) ≠ 1`), so it has an elementary abelian
+subgroup of order `p²` (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`), whose image
+in `G` is the required `A` (`elemAbelianOfRank G p 2` asks only `IsElementaryAbelian ∧ |A| = p²`). -/
+theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {Q : Subgroup G}
+    (hQ : IsExpPExtraspecial p ↥Q) :
+    ∃ A : Subgroup G, A ≤ Q ∧ A ∈ elemAbelianOfRank G p 2 := by
+  classical
+  have hpp : p.Prime := Fact.out
+  have hpG : p ∣ Nat.card G :=
+    (hQ.isExtraspecial.center_card ▸
+      Subgroup.card_subgroup_dvd_card (Subgroup.center ↥Q)).trans
+      (Subgroup.card_subgroup_dvd_card Q)
+  have hodd : Odd p := hG.odd.of_dvd_nat hpG
+  -- `Q` is non-cyclic: cyclic ⟹ abelian ⟹ `[Q,Q]=⊥`, but `[Q,Q]=Z(Q)` has order `p`.
+  have hQnc : ¬ IsCyclic ↥Q := by
+    intro hcyc
+    haveI := hcyc
+    have hcomm : IsMulCommutative ↥Q :=
+      IsMulCommutative.of_comm (IsCyclic.commGroup (α := ↥Q)).mul_comm
+    have hbot : Subgroup.center ↥Q = ⊥ := by
+      rw [← hQ.isExtraspecial.commutator_eq_center, commutator_eq_bot_iff]; exact hcomm
+    have h1 : Nat.card ↥(Subgroup.center ↥Q) = 1 := by rw [hbot]; exact Subgroup.card_bot
+    rw [hQ.isExtraspecial.center_card] at h1
+    exact hpp.one_lt.ne' h1
+  obtain ⟨E, hEea, hEcard⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+      hQ.isExtraspecial.isPGroup hodd hQnc
+  refine ⟨E.map Q.subtype, Subgroup.map_subtype_le _, mem_elemAbelianOfRank.mpr ⟨?_, ?_⟩⟩
+  · exact hEea.map Q.subtype_injective
+  · rw [Subgroup.card_map_of_injective Q.subtype_injective, hEcard]
+
+/-- **`Z(Q) ≤ A` for `A ∈ ℰ²(Q)`** in an exp-`p` extraspecial `Q` of order `p³` (mmd L3391/L3397,
+so that `Z` is a line of `A` and `ℰ¹(A) − {Z}` is meaningful). For `z ∈ Z(Q)`: either `z = 1 ∈ A`,
+or `⟨z⟩` has order `p` (`z^p = 1`), is elementary abelian, and centralizes `A`, so `A ⊔ ⟨z⟩` is
+elementary abelian and `≤ Q`. It cannot be all of `Q` (`Q` is nonabelian), so by `|Q| = p³` it has
+order `≤ p² = |A|`; with `A ≤ A ⊔ ⟨z⟩` this forces `A ⊔ ⟨z⟩ = A`, i.e. `z ∈ A`. -/
+theorem center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial [Finite G]
+    {p : ℕ} [Fact p.Prime] {Q A : Subgroup G} (hQ : IsExpPExtraspecial p ↥Q)
+    (hQcard : Nat.card ↥Q = p ^ 3) (hA : A ∈ elemAbelianOfRank G p 2) (hAQ : A ≤ Q) :
+    (Subgroup.center ↥Q).map Q.subtype ≤ A := by
+  classical
+  have hpp : p.Prime := Fact.out
+  obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hA
+  have hQnab : ¬ IsMulCommutative ↥Q := by
+    intro hc
+    have hbot : Subgroup.center ↥Q = ⊥ := by
+      rw [← hQ.isExtraspecial.commutator_eq_center, commutator_eq_bot_iff]; exact hc
+    have h1 : Nat.card ↥(Subgroup.center ↥Q) = 1 := by rw [hbot]; exact Subgroup.card_bot
+    rw [hQ.isExtraspecial.center_card] at h1
+    exact hpp.one_lt.ne' h1
+  intro z hz
+  rcases eq_or_ne z 1 with rfl | hz1
+  · exact one_mem A
+  have hzQ : z ∈ Q := by
+    rw [Subgroup.mem_map] at hz; obtain ⟨z', _, rfl⟩ := hz; exact z'.2
+  have hzp : z ^ p = 1 := by
+    rw [Subgroup.mem_map] at hz; obtain ⟨z', _, heq⟩ := hz
+    rw [← heq, ← map_pow, hQ.pow_eq_one z', map_one]
+  have horderz : orderOf z = p :=
+    ((Nat.dvd_prime hpp).mp (orderOf_dvd_of_pow_eq_one hzp)).resolve_left
+      (fun h => hz1 (orderOf_eq_one_iff.mp h))
+  have hzcard : Nat.card ↥(Subgroup.zpowers z) = p := by rw [Nat.card_zpowers, horderz]
+  have hzea : (Subgroup.zpowers z).IsElementaryAbelian p :=
+    OddOrder.BG.Ch1.S05.isElementaryAbelian_of_card_prime hzcard
+  -- `A` centralizes `⟨z⟩` (`z ∈ Z(Q)` commutes with `A ≤ Q`).
+  have hAcent : A ≤ Subgroup.centralizer (Subgroup.zpowers z : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp hx
+    have hcza : Commute z a := by
+      rw [Subgroup.mem_map] at hz
+      obtain ⟨z', hz', heq⟩ := hz
+      have h2 := congrArg (Subgroup.subtype Q) (Subgroup.mem_center_iff.mp hz' ⟨a, hAQ ha⟩)
+      rw [map_mul, map_mul, heq] at h2
+      exact h2.symm
+    exact hcza.zpow_left m
+  have hsupea : (A ⊔ Subgroup.zpowers z).IsElementaryAbelian p :=
+    hAea.sup_of_le_centralizer hzea hAcent
+  have hsup_le : A ⊔ Subgroup.zpowers z ≤ Q :=
+    sup_le hAQ (by rw [Subgroup.zpowers_le]; exact hzQ)
+  have hne : A ⊔ Subgroup.zpowers z ≠ Q := by
+    intro heq
+    rw [heq] at hsupea
+    exact hQnab (IsMulCommutative.of_comm hsupea.1)
+  have hcard_dvd : Nat.card ↥(A ⊔ Subgroup.zpowers z) ∣ p ^ 3 :=
+    hQcard ▸ Subgroup.card_dvd_of_le hsup_le
+  have hcard_ne : Nat.card ↥(A ⊔ Subgroup.zpowers z) ≠ p ^ 3 := fun hc =>
+    hne (Subgroup.eq_of_le_of_card_ge hsup_le (le_of_eq (hQcard.trans hc.symm)))
+  have hcard_le : Nat.card ↥(A ⊔ Subgroup.zpowers z) ≤ p ^ 2 := by
+    obtain ⟨j, hj3, hj⟩ := (Nat.dvd_prime_pow hpp).mp hcard_dvd
+    rw [hj] at hcard_ne ⊢
+    refine Nat.pow_le_pow_right hpp.pos ?_
+    by_contra h
+    exact hcard_ne (by rw [show j = 3 from by omega])
+  have heqA : A ⊔ Subgroup.zpowers z = A :=
+    (Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [hAcard]; exact hcard_le)).symm
+  have hle : Subgroup.zpowers z ≤ A := heqA ▸ le_sup_right
+  exact hle (Subgroup.mem_zpowers z)
 
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/

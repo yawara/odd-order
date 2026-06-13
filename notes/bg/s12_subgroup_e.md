@@ -76,11 +76,14 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
   - ✅ **richer reduction DONE (session 15)**: `exists_expPExtraspecial_le_of_two_maximals` を拡張し
     `∃ (S:Sylow p G)(Q), N_G(S)≤M∩M⋆ ∧ rank(S)≤2 ∧ Q≤M∩M⋆ ∧ IsExpPExtraspecial p Q ∧ |Q|=p³` を返す
     (Malpha_ne_bot/notMem_alpha に S・rank2 を供給可)。
-  - **次: A∈ℰ²(Q) 構成補題** `exists_elemAbelianOfRank_two...`: a∈Q∖Z で A=⟨a⟩⊔Z_G (Z_G=center↥Q の像),
-    `|A|=p²` + `IsMaximalElementaryAbelian p A` + `Z_G≤A`。**maximality は pRank G p≤2 から**:
-    F elem ab ⊇A ⟹ `log p|F|≤pRank G p≤2` (`IsElementaryAbelian.log_card_le_pRank`+`pRank_sylow_eq`で
-    pRank G p=pRank S p≤rank S≤2) ⟹ `|F|≤p²=|A|` ⟹ F=A (`eq_of_le_of_card_ge`)。
-    pRank G p≤2 は richer reduction の rank(S)≤2 から (補題化 or inline)。
+  - ✅ **A∈ℰ²(Q) 存在 DONE (session 15)** `exists_elemAbelianOfRank_two_le_of_expPExtraspecial`:
+    **🔑訂正: `A∈elemAbelianOfRank G p 2` は `IsElementaryAbelian p A ∧ |A|=p²` のみ (maximality 不要!)**
+    (`IsMaximalElementaryAbelian` は別物=`ℰ*`/idealPrime 用)。`mem_elemAbelianOfRank.mpr ⟨elem, card⟩`。
+    Q 非可換⟹非cyclic⟹`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (Ch1.S04, odd 要) で
+    p²-elem-ab E≤↥Q→`E.map Q.subtype`。**pRank≤2 不要だった** (over-engineering 撤回)。
+  - **残: Z(Q)≤A** (assembly の line-共役で `a₀*∈⟨a₀⟩⊔Z`⟹`A=⟨a₀⟩⊔Z` に要)。
+    self-centralizing 経由: `|Q|=p³`, `|A|=p²` ⟹ `C_Q(A)` (=centralizer A⊓Q) の位数∈{p²,p³};
+    =p³ なら C_Q(A)=Q⟹A≤Z(Q) (|A|≤p 矛盾)⟹=p²=|A|⟹C_Q(A)=A⟹Z(Q)⊆C_Q(A)=A。~20 行・次 iter。
   - **line-共役の ↥Q↔G transport**: A₀,A₀⋆ (12.4b より ∈ℰ¹(A), ≤A≤Q) を ↥Q 内の zpowers に持ち上げ
     `exists_conj_smul_zpowers_eq_of_expPExtraspecial` 適用→ q∈↥Q→ G で conj、engine へ。
   推奨: 次 iter で A∈ℰ²(Q) 構成 → piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)
