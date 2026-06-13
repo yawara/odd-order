@@ -820,3 +820,50 @@ infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。
 - **c2**: Hypothesis46-from-Sibley bridge (subH/A_covers/tic 構築) + glue。
 両 branch 必須 (sorry 全消)。**各 multi-session、incremental-easy piece 無し** ⟹ case-B は sustained 多セッション grind。
 **判断: ユーザーに scope 確認 (case-B grind commit vs (4.10) milestone 区切り)。正本=本 cont.⁵。**
+
+## 2026-06-13 (session 38 cont.⁶, /loop): stale-note 訂正 + 正直な進捗 flag (空転)
+
+**🔧 stale 訂正**: 旧 Agent 分析の「B4 m≥2 未解決」「(6.5) DAG 欠落」は**少なくとも B4 は解決済**:
+`two_le_Yset_ncard` (S08_CoherenceCore:4893) は**証明済 sorry-free** (`two_le_ncard_of_conjugate_closed_of_noReal`
++ Yset closure/no-real)、`coherentYset` 稼働。⟹ **Y-coherence は B4-blocked ではない (済)**。
+S08_CoherenceCore 全体 sorry-free (唯一の sorry = S08_CoherenceTheorems:59 X-nonempty branch)。
+
+**case-B X-nonempty sorry の真の残り** (infra は Y-coh/capstone glue/X-coh constructor/両 hXirr 全 built):
+- **Frobenius**: hstepData (`PairUnionBaseAnchorCommonIndexPrimePowerStepData`, ~30-field 不可分構造,
+  prime-power 次数 = **H p-群要**; SibleyDadeHypothesis.H は NILPOTENT のみ ⟹ p-群還元 (6.5) が前提) + glue。
+- **c2**: Hypothesis46-from-Sibley bridge (Hypothesis46 全 field 構築, (6.5)-independent だが不可分大構造) + glue。
+- 両 branch とも**大・不可分構造 (sorry scaffold 不可) + deep sub-pieces** ⟹ 60s-loop-grind に不適。
+
+**⚠ 正直な進捗 flag (thumbs-down)**: case-B は RECON ~5 tick で **net-0 code** (冗長 hXirr 1 revert)。
+infra は揃うが残りは focused 多セッション構築要 (loop-grind 不向き)。(4.10) は完成・full build+AxiomsCheck 緑。
+**判断はユーザーへ**: (4.10) 区切り / c2-bridge を地道 loop grind / (6.5) reduction 専念。正本=本 cont.⁶。
+
+## 2026-06-13 (session 39, /loop, user=「Bレーンを進める。難所を回避しない」): c2-bridge grind 着手 — `tic` lift infra landed
+
+ユーザー裁可 = **c2-bridge を地道 grind** (難所回避禁止)。RECON 空転を断ち切り**実コード landed** (net-0 脱却)。
+
+### ✅ landed: `TICyclicHypothesis.mapOfInjective` (S05_TICyclic:84, build-green + axiom-clean [propext/choice/Quot のみ])
+一般 lemma: 単射 `φ : H →* G` に沿って `TICyclicHypothesis H` を `TICyclicHypothesis G` へ transfer。
+14 field 中 **13 = 機械的 transfer** (W-block: `map_mono`/`map_eq_bot_iff`+`ker_eq_bot_iff`/`map_sup`/
+`disjoint_def`+`mem_map`/`card_map_of_injective`/`equivMapOfInjective`+`isCyclic_of_surjective`、
+V-block: sharp は `map_one`+inj、`mem_map_of_mem`、`W_normalizes_V` は `map_mul`/`map_inv`)。
+**残 1 field = `V_ti` を仮説 `hVti : IsTISubset (φ '' V) (W.map φ)` として取る** = c2 bridge の真の障害を 1 点に隔離。
+
+### 🎯 確定した真の障害 (深掘り RECON、cont.⁶ より精密):
+- **c2 `tic` の核心 = G-level `V_ti` (= W−W₂ が **G** で TI)**。これは (4.6.b)。
+  **(4.3.a) の L-level `toTICyclicHypothesis` (TI in ↥L) からは transfer 不可** — `IsTISubset` は
+  ambient を上げると条件が強くなる (G 全体を走る g が conj を起こしうる; `IsTISubset` 定義
+  TISubset.lean:72 参照)。`CertainTypeHypothesis` は `Hypothesis ↥L` (L-level W-data) + `dade : S04.Hypothesis G A L`
+  のみ保持、G-level TI-cyclic は**未保有**。⟹ G-level V_ti は新規構成 ((4.6.b) 本体)。
+- **Frobenius `hstepData` の核心 = prime-power 次数** (`hθχ:θχ=p^mχ` 等, structure 8743 確認)。
+  deg(Ind θ)=|W₁|·θ(1); θ(1)=p^m は **H が p-群のとき**のみ。`H_nilpotent` だけでは不足 ⟹ **(6.5) p-群還元が前提**。
+
+### ▶ 次の一手 (c2 grind 継続、推奨順):
+1. **c2 bridge の easy field を landable lemma 化**: `subH:=K:=H` で `A_covers` (A=sharpImage H, K=H ⟹
+   x∈C_H(hh), x≠1 ⟹ x∈H# = A、ほぼ自明)、`subH_le_K`/`W2_le_subH` (W₂⊆[H,H]⊆H)。
+2. **G-level V_ti = (4.6.b)** 本体: W=(W₁⊔W₂).map L.subtype が G で TI。W cyclic Hall の TI 性。←真の hard core。
+   `mapOfInjective` が他 13 field を吸収済 ⟹ これだけ供給すれば `tic` 完成。
+3. `dade0`/`tau` = A₀=A∪V^L への Dade datum 拡張。
+→ `tic`+`A_covers`+`dade0`+`tau` で `Hypothesis46`-from-cert bridge → `certainType_isCoherent` →
+   `certainTypeSet=Xset` 同定 + `dadeIntegralCharacterMap=hyp.tau` 同定 → glue。
+**正本=本 session 39。`mapOfInjective` は再利用可能 (Frobenius branch でも W-lift に使える可能性)。**
