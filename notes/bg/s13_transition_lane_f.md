@@ -127,3 +127,25 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
   `actsPrimeOn_sup_of_eq_centralizer` で 13.7 完成。その後 13.8。
   ⚠ helper の hcop は `Nat.Coprime (Nat.card E₁) (Nat.card E₃)` 形 — body で SubgroupESetup から
   E₁/E₃ の位数互素を出す (τ₁ vs τ₃ disjoint + Hall)。
+- 2026-06-14 (Lane F, /loop 続き²): **step 1 完成** — `exists_elemAbelian_centralizing_of_not_regular`
+  (helper 計 5 本)。`actsRegularlyOn_iff`+push_neg で witness、local `key` で素数べき部分群、
+  `pow_mem` は SetLike-implicit (`Subgroup.pow_mem` は H explicit)。残 = **13.7 body**:
+  - **prereq**: `hnorm := h.E₁_le.trans (h.E3_normal hG)` (E3_normal: `E ≤ normalizer ↑E₃`),
+    `hN3`: E₃≤E≤M≤normalizer(Msigma M) [M≤normalizer は S10_LocalLemmasCore:500 の構成
+    `rw[Msigma]; exact le_normalizer_opiCoreInG (sigma M) M` を再現 or 公開補題探す],
+    **`hcop` (E₁/E₃ card 互素) は未確認 TODO** — τ₁∩τ₃=∅ + Hall から導出 (要 τ disjoint 補題)。
+  - **step 2**: `centralizer_le_centralizer_of_tau1` (Thm 13.4, S13_Theorem134) → C_N(P)≤C_N(R)。
+    prime action `E1_actsPrime`/`cyclicSylow_actsPrime.2` で C_N(P)=C_N(E₁), C_N(R)=C_N(E₃)
+    (P=zpowers, C(zpowers gen)=C({gen})) → C_N(E₁)≤C_N(E₃)。
+  - **step 5** (¬strict, `eq_of_le_of_not_lt` で hD 完成。最大の塊 ~70行):
+    `intro hlt` (fixedBy E₁ < fixedBy E₃) → False。
+    (a) R cyclic で C_{M_σ}(R)=C_{M_σ}(r_elt)≠⊥ + `elemAb_normal_in_E_of_tau2` の component
+       `∀x∈E₃#, M_σ⊓C{x}=⊥` の対偶 → τ₂(M) empty → E₂=⊥ → E=E₁⊔E₃ (要 E=E123 補題)。
+    (b) `exists_subgroupESetup hG hM*mem` で M*∈𝓜(N_G(R)) の SubgroupESetup。E⊆M*、
+       `[C_N(R),P]⊆[M_σ⊓M*,E₁]` 非自明 (strict から P が C_N(R) 非中心化)。
+    (c) `actsPrimeOn_inf_centralizer_eq_bot` (H1) → C_{E₁}(M_σ⊓M*)=⊥。
+    (d) `tau13_pSubgroup_centralizes .2.1` (Cor 13.2b, P:=R, r∈τ₃M) → π(E₁)⊆τ₁(M*)。
+    (e) `.2.2` (Cor 13.2c) → r∈σ(M*) → R⊆M*_σ。
+    (f) E₁≤E₁*(Hall τ₁M*), `E1_actsPrime` on M* → E₁* prime on M*_σ、P⊆C_{E₁*}(R) → E₁ が R 中心化。
+    (g) E=E₁⊔E₃ + E₁,E₃ が R 中心化 → R⊆C_G(E)。`subgroupE_basic` の `centralizer E⊓E₃=⊥`
+       (=C_{E₃}(E)=1) と R≤E₃,R≠⊥ で矛盾。
