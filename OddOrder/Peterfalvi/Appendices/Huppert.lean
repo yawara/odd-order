@@ -32,10 +32,16 @@ group-theoretic content of Appendix B on top of that endpoint:
 * `pGroup_cyclic_fixedPointFree` — the Lemma, and
 * `fitting_cyclic_fixedPointFree` — Proposition 1.
 
-The remaining `sorry`s are exactly the two structural reductions: the
-constant-stabilizer ⟹ fixed-point-free argument of parts (1)--(2) of the Lemma
-(Clifford decomposition + the irreducible case, p. 136), and the Fitting-subgroup
-structure of Proposition 1.
+Proposition 1 is now fully assembled from the per-prime step: `F(D)` is cyclic
+(`isCyclic_fitting_of_forall_opCore_isCyclic`), fixed-point-free
+(`fitting_fpf_of_transitive`), and `D' ≤ F(D)` for solvable `D`
+(`commutator_le_fitting_of_isCyclic_fitting`).
+
+The single remaining `sorry` is the heart of the Lemma: the *irreducible,
+non-cyclic* case of the constant-stabilizer ⟹ fixed-point-free argument
+(Schur over `𝔽_q` + the normal type-`(p,p)` subgroup, p. 136).  Everything
+else — the reducible/Maschke reduction, the abelian-irreducible case, and the
+whole of Proposition 1 — is unconditional.
 -/
 
 namespace OddOrder.Peterfalvi.Appendices.Huppert
@@ -774,7 +780,7 @@ open OddOrder.Isaacs.Ch01 OddOrder.BG.Ch3.S10 in
 `F(D)` is nilpotent (`fitting.isNilpotent`), each Sylow of `F(D)` is its unique normal one and
 equals an `O_p(D)` (`= ⨅` of Sylows), so `F(D)` is a nilpotent `Z`-group, hence cyclic. -/
 theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
-    (h : ∀ p : ℕ, IsCyclic ↥(opCore p D)) :
+    (h : ∀ p : ℕ, p.Prime → IsCyclic ↥(opCore p D)) :
     IsCyclic ↥(fitting D) := by
   haveI : _root_.IsZGroup ↥(fitting D) := by
     rw [_root_.isZGroup_iff]
@@ -802,14 +808,64 @@ theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
         _ = (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype := by rw [hSP]
     have heq : (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype = opCore p D :=
       le_antisymm hmap_le hop_le
-    haveI : IsCyclic ↥((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) := heq ▸ h p
+    haveI : IsCyclic ↥((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) := heq ▸ h p hp
     exact isCyclic_of_surjective _
       (Subgroup.equivMapOfInjective (↑P) (fitting D).subtype
         (fitting D).subtype_injective).symm.surjective
   infer_instance
 
-/-- **Peterfalvi Appendix B, Proposition 1**: let `D` have odd order and act
-faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
+open OddOrder.Isaacs.Ch01 in
+/-- **Peterfalvi Appendix B, Proposition 1 — `F(D)` fixed-point-free**: under the hypotheses
+of Proposition 1, every nontrivial element of the Fitting subgroup acts without fixed points on
+`E`.  For `f ∈ F(D)^#`, pick a prime `p ∣ |f|` and the order-`p` power `g = f ^ (|f| / p)`; then
+`g ∈ O_p(F(D))`, hence `g ∈ O_p(D)` (`opCore_fitting_map_subtype_eq`), the per-prime step gives
+`C_E(g) = ⊥`, and `C_E(f) ≤ C_E(g)` (a point fixed by `f` is fixed by every power of `f`). -/
+theorem fitting_fpf_of_transitive [Finite D] [Finite E] {q : ℕ}
+    (hq : q.Prime) (hqE : q ∣ Nat.card E) [Nontrivial E] (hE : IsElementaryAbelian q E)
+    (hD_odd : Odd (Nat.card D)) (φ : D →* MulAut E) (hfaithful : Function.Injective φ)
+    (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ d : D, (φ d) a = b) :
+    ∀ x : D, x ∈ fitting D → x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  have hmono : ∀ (a : D) (n : ℕ), actionFixedBy φ a ≤ actionFixedBy φ (a ^ n) := by
+    intro a n e he
+    rw [mem_actionFixedBy] at he ⊢
+    rw [map_pow]
+    induction n with
+    | zero => simp
+    | succ k ih => rw [pow_succ']; show (φ a) ((φ a ^ k) e) = e; rw [ih, he]
+  intro f hfF hf1
+  haveI : Fact q.Prime := ⟨hq⟩
+  set f' : ↥(fitting D) := ⟨f, hfF⟩ with hf'def
+  have hf'1 : f' ≠ 1 := by rw [hf'def, ne_eq, Subgroup.mk_eq_one]; exact hf1
+  have hord_ne : orderOf f' ≠ 1 := fun h => hf'1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hord_ne
+  haveI : Fact p.Prime := ⟨hp⟩
+  set g' : ↥(fitting D) := f' ^ (orderOf f' / p) with hg'def
+  have hord_pos : 0 < orderOf f' := orderOf_pos f'
+  have hdvd2 : (orderOf f' / p) ∣ orderOf f' := Nat.div_dvd_of_dvd hpd
+  have hk_ne : orderOf f' / p ≠ 0 := (Nat.div_pos (Nat.le_of_dvd hord_pos hpd) hp.pos).ne'
+  have hg'ord : orderOf g' = p := by
+    rw [hg'def, orderOf_pow_of_dvd hk_ne hdvd2, Nat.div_div_self hpd hord_pos.ne']
+  have hg'1 : g' ≠ 1 := by
+    intro h; rw [h, orderOf_one] at hg'ord; exact hp.ne_one hg'ord.symm
+  have hg'pg : IsPGroup p (Subgroup.zpowers g') :=
+    IsPGroup.of_card (by rw [Nat.card_zpowers, hg'ord, pow_one])
+  obtain ⟨S, hgS⟩ := IsPGroup.exists_le_sylow hg'pg
+  haveI := Sylow.unique_of_normal S (Sylow.normal_of_isNilpotent S)
+  have hg'op : g' ∈ opCore p ↥(fitting D) :=
+    mem_opCore.mpr fun P => (Subsingleton.elim P S) ▸ hgS (Subgroup.mem_zpowers g')
+  have hgD : (g' : D) ∈ opCore p D := by
+    rw [← opCore_fitting_map_subtype_eq p]; exact ⟨g', hg'op, rfl⟩
+  have hper := opCore_isCyclic_and_fpf_of_transitive hq hqE hE hD_odd φ hfaithful htrans hp
+  have hgD_ne : (g' : D) ≠ 1 := by rw [Ne, OneMemClass.coe_eq_one]; exact hg'1
+  have hgne : (⟨(g' : D), hgD⟩ : ↥(opCore p D)) ≠ 1 := by
+    rw [Ne, Subgroup.mk_eq_one]; exact hgD_ne
+  have hgfpf : actionFixedBy φ (g' : D) = ⊥ := hper.2 ⟨(g' : D), hgD⟩ hgne
+  have hgpow : (g' : D) = f ^ (orderOf f' / p) := by rw [hg'def]; rfl
+  rw [eq_bot_iff, ← hgfpf, hgpow]
+  exact hmono f (orderOf f' / p)
+
+/-- **Peterfalvi Appendix B, Proposition 1**: let `D` be a solvable group of odd order
+acting faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
 `D / F(D)` is abelian (equivalently `D' ≤ F(D)`).
 
@@ -819,14 +875,28 @@ and the Lemma makes `O_p(F)` cyclic and fixed-point-free; `F = ∏_p O_p(F)` is 
 cyclic and fixed-point-free; finally `C_D(F) = F` (Feit–Thompson + Fitting, `D`
 solvable of odd order) gives `D/F ↪ Aut(F)`, abelian since `F` is cyclic. -/
 theorem fitting_cyclic_fixedPointFree
-    [Finite D] [Finite E] {q : ℕ} (hq : q.Prime) [Nontrivial E]
+    [Finite D] [Finite E] [IsSolvable D] {q : ℕ} (hq : q.Prime) [Nontrivial E]
     (hD_odd : Odd (Nat.card D)) (hE : IsElementaryAbelian q E)
     (φ : D →* MulAut E) (hfaithful : Function.Injective φ)
     (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ g : D, (φ g) a = b) :
     IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D) ∧
       (∀ x ∈ OddOrder.Isaacs.Ch01.fitting D, x ≠ 1 → actionFixedBy φ x = ⊥) ∧
       commutator D ≤ OddOrder.Isaacs.Ch01.fitting D := by
-  sorry
+  haveI : Fact q.Prime := ⟨hq⟩
+  have hqE : q ∣ Nat.card E := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
+    have hn0 : n ≠ 0 := by
+      rintro rfl
+      rw [pow_zero] at hn
+      have h1 : 1 < Nat.card E := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+      omega
+    exact hn ▸ dvd_pow_self q hn0
+  have hcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D) :=
+    isCyclic_fitting_of_forall_opCore_isCyclic
+      (fun p hp =>
+        (opCore_isCyclic_and_fpf_of_transitive hq hqE hE hD_odd φ hfaithful htrans hp).1)
+  exact ⟨hcyc, fitting_fpf_of_transitive hq hqE hE hD_odd φ hfaithful htrans,
+    commutator_le_fitting_of_isCyclic_fitting hcyc⟩
 
 end Proposition1
 
