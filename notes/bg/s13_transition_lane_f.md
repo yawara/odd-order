@@ -172,3 +172,24 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
   - **r∈σ(M*) → R≤M*_σ**: `opiCoreInG_singleton_le_Msigma_of_mem_sigma` 系 (S10_HallStructure:744)。
   - **E₁ ⊆ Hall τ₁(M*)**: π(E₁)⊆τ₁M* + E₁≤M* → Hall に埋め込む (`exists_conj_smul_le_hallPiece` 系?)。
   これらが揃えば (a)-(g) を直線的に書ける。1-2 iteration 見込み。
+- 2026-06-14 (Lane F, /loop 続き⁵): **step 5 を committable sub-lemma へ分解開始** (2 本 landed):
+  - **(a) `E_eq_sup_of_E3_centralizer`**: x∈E₃#,C_{M_σ}(x)≠1 ⟹ E=E₁⊔E₃ (`SubgroupESetup.eq_sup` +
+    τ₂ empty via `exists_elemAb_rank_two_le_E_of_tau2` + `elemAb_normal_in_E_of_tau2 .2.2.2.1`)。
+  - **(b 補助) `E_le_normalizer_of_le_E3`**: R≤E₃ ⟹ E≤N_G(R) (`characteristic_of_subgroup_of_isCyclic`
+    + `mem_normalizer_map_subtype_of_characteristic`; S13_PrimeAction:324-331 の zpowers 版を一般化)。
+  ### 残 M*-core (strict_config 本体、steps b-g)
+  M* 抽出 = S13_PrimeAction:333-347 を mirror (normalizer≠⊤ via simple+maximal + coatom +
+  `maximalSubgroupsContaining`; E⊆M* = `E_le_normalizer_of_le_E3` ∘ hNxM)。
+  - **step c** (H1): [C_{M_σ}(R),P]≠⊥ (strict から P が C_{M_σ}(R) 非中心化) ⊆ [M_σ⊓M*,E₁]
+    (C_{M_σ}(R)⊆M_σ⊓M*) ⟹ `actsPrimeOn_inf_centralizer_eq_bot` で C_{E₁}(M_σ⊓M*)=⊥。
+  - **step d** (Cor 13.2(b)): `tau13_pSubgroup_centralizes hG h (hp:r∈τ₃M) hRM hRne hRp hMstarMem |>.2.1`
+    で π(E₁)⊆τ₁M*。
+  - **step e** (R⊆M*_σ): r∈σ(M*) (Cor 13.2(c) `.2.2`) + **`sigma_subgroup_le_Msigma_of_isHall`**
+    (`Msigma_isHall hG hM*`, R≤M*, R は σ(M*)-群) ⟹ R≤M*_σ。✅handle 確定。
+  - **🔑 step f** (E₁ が R 中心化、最難): E₁ を含む Hall τ₁(M*) `E₁*` が M*_σ に prime 作用
+    (Thm 13.5 を M* の setup に + **prime action の M*-共役不変性** が要 — step 4 同様の難所)。
+    P≤E₁≤E₁*, R⊆M*_σ, P が R 中心化 ⟹ `fixedBy_eq` (C_{M*_σ}(P)=C_{M*_σ}(E₁*)) で E₁* (ゆえ E₁) が R 中心化。
+    ⚠ ActsPrimeOn の共役不変補題が未整備 → 次イテレーションで要対応 (新 helper か exists_subgroupESetup
+    の E₁* に E₁ を合わせ込む)。
+  - **step g**: E=E₁⊔E₃ ((a)) + E₁,E₃ が R 中心化 ⟹ R⊆C_G(E₁⊔E₃)=C_G(E) (centralizer_sup)、
+    `subgroupE_basic` の C_G(E)⊓E₃=⊥ + R≤E₃,R≠⊥ で矛盾。
