@@ -34,8 +34,17 @@ template = `S12_ExceptionalBridge.le_of_forall_line_inf_centralizer_le` (769-851
 - `closure_le` で各 generator g (∀y∈Y, φ y g=g, (Q/Z)/Y cyclic) → ↑g が preimage A_Y (= Y の ↥Q 内 preimage
   を map; Z≤A_Y) を中心化 → **A_Y∈ℰ²(Q)** (Y line ⟹ |A_Y|=p²; Y=⊤ ⟹ A_Y=Q⊇rank2) → 12.4a
   (`centralizer_le_of_elemAb_rank_two` を M⋆ に) で ↑g∈M⋆ ⟹ K⊆M⋆。
-- **要 API 探索**: `MulDistribMulAction.toMulAut`/`.compHom`, `QuotientGroup.lift`/`.ker`, M_α の G-normal,
-  conj が centralizer を normalize, preimage (QuotientGroup.lift の Y↔↥Q subgroup)。
+- **✅ template + API 確定 (session 17 study)**: φ-construction template = **`S10_LocalCriteria:161-209`**
+  (`MulDistribMulAction.compHom (M:=↥(N_G(Malpha M))) ↥(Malpha M) (inclusion hX_norm_Ma)` +
+  `toMulAut` + `hφ_coe`/`hφ_inv_coe`; X が M_α に conj 作用)。これを K=C_{M_α}(Z) 版に + `QuotientGroup.lift`。
+  cocyclic template = **`le_of_forall_line_inf_centralizer_le:785-846`** (closure_le + 各 line case)。
+  確定 API: `le_normalizer_map_subtype_of_normal` (Q≤N_G(Z) from center↥Q normal),
+  `le_normalizer_opiCoreInG (alpha M) M` (M≤N_G(M_α)), `centralizer_conj_smul` +
+  `mem_normalizer_of_conj_smul_eq_self` + `Subgroup.smul_inf` (hQK idiom = S12_Corollary1210:309-312),
+  `QuotientGroup.lift N φ HN`, `commGroupOfCyclicCenterQuotient`/`cyclic_center_quotient_of_card_eq_prime_sq`
+  (PGroup.lean:358-371; Q/Z noncyclic via Q nonabelian), `Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl`
+  (coprime, S10_LocalCriteria:158)。**A-frame は ~80 行 all-or-(1-sorry): clean prefix は commit 不可
+  (全中間結果が最終 sorry に feed) ゆえ generator→M⋆ (12.4a) のみ sorry 化した full A-frame を一括で書く。**
 - **incremental commit 可**: φ+cocyclic+closure-reduction を frame とし generator→M⋆ (12.4a 部) を sorry 化
   → net sorry=1 維持で A-frame 先行 commit、その後 generator core。
 **crux = quotient-action φ 構成 + line↔rank-2 A_Y 対応。multi-iteration 見込み。**
