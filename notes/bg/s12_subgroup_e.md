@@ -2261,3 +2261,37 @@ BG §12 "The Subgroup E" は **局所解析の中核** で、M の complement E 
 (r_p(N_H(Y))≤1) / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (p∈τ₁(M)⟹p∉π(N_H(Y)'))。
 **12.16 が Lane G を gate** ⟹ 次の優先。完了で §12 STOP。
 
+---
+
+## session 22 (2026-06-13, Lane F): Cor 12.16 COMPLETE (新 leaf S12_Corollary1216)
+
+**✅✅✅ BG Cor 12.16(a)(b) 完全証明** — sorry-free・axiom-clean (AxiomsCheck 登録、各 3 axioms
+全 allowlist; full build 3802 jobs / AxiomsCheck 3787 jobs green)。**新 downstream leaf
+`S12_Corollary1216`** (namespace `S12.Cor1216`)、commits `6ddd4646`(leaf 完成)/`58045d80`(配線)。
+
+**🔑 なぜ downstream leaf か (architecture)**: 12.16 の証明は Prop 12.15 (`S12_Proposition1215`)
+を要するが、後者は S12_E を推移 import (Theorem125→ExceptionalBridge→…→Lemma1218→S12_E) ゆえ
+S12_E から 12.15 を import 不可 (循環)。Thm 12.13 / Prop 12.15 と同じく downstream leaf 化で解決
+(ユーザー裁可 Option 1, 2026-06-13)。
+
+**🔑 q-group 特化決定 (HUB / Lane G 要対応)**: BG の Y は一般 σ(M)-部分群だが、**Lane G の
+S13_Lemma131 は Y を q-群 (`IsPGroup q Y`) として供給** (S13:416)。よって leaf の 2 補題は
+`(hYq : IsPGroup q Y) (hqσ : q∈σM)` 引数 (旧 S12_E の `hYpi : IsPiSubgroup (σM) Y` でなく) で q-群
+特化形を証明 ⟹ char-subgroup 抽出 (Fitting) を回避し簡潔。一般形 (hYpi) は char q-subgroup
+wrapper として将来追加可 (deferred)。**HUB は merge 時に Lane G の cite を S12_E sorry'd →
+`S12.Cor1216.pRank_normalizer_le_one` / `…not_mem_primeFactors_derived_of_tau1` へ re-point;
+引数を hYpi → hYq + hqσ へ差替 (G は hYq を保持済ゆえ供給可)。byte-identical でない点に注意**。
+
+**証明構造** (両補題共通): conjugation `Y` を `M_σ` へ G-共役 (rank/deriv 共役不変で transport) →
+core (`Y⊆M_σ` 仮定) で case split:
+- Case 1 (`N_G(Y)⊆M`): direct (rank-2 A≤M / deriv N≤M')。
+- Case 2 (`N_G(Y)⊄M`): 共有 helper `exists_Mstar_factorization` (M*∈ℳ(N_G(Y)), M*=(M∩M*)K,
+  K=M*_β/σ p'-群 [Prop 12.15(d)/(e) + (12.3)]) → (a) 新 rank-2 B∈ℰ_p²(M∩M*) [pRank coprime-index]
+  + Thm 12.5(e); (b) `deriv N ≤ deriv M* ≤ (M∩M*)'⊔K` p' [crux `commutator_le_commutator_sup_normal`]。
+replicate helper: rank-2 抽出 / not_dvd_index / pRank_eq / pRank_eq_of_mulEquiv / crux /
+derivedInG_mono / card_derivedInG_conj (|deriv(g•K)|=|deriv K| via pointwise_smul_def+map_commutator)。
+
+**§12 残 frontier**: S12_E に **12.14** (`maximalContaining_centralizer_eq_singleton`) 1 件のみ
+(NOT G-cited; BG 証明 ~10 行で Thm 12.13 + §5 narrow + §10 使用)。12.14 完了で **§12 STOP**。
+(S12_E の sorry'd 12.16 forward-decl 3 件は HUB re-point 後に削除可; conj_into_Msigma は実証明済。)
+
