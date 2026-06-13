@@ -242,6 +242,36 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial {Q : Type*} [Group Q] [F
   exact ⟨q, (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hbmem)
     (le_of_eq (hcardL.trans hcardR.symm))).symm⟩
 
+/-- **`G`-level Heisenberg line-conjugacy** (transport of
+`exists_conj_smul_zpowers_eq_of_expPExtraspecial` to subgroups of `G`): for `a, b ∈ Q` (exp-`p`
+extraspecial), with `a, b ∉ Z(Q)` and `b ∈ ⟨a⟩ ⊔ Z(Q)`, there is `g ∈ Q` with `g⟨a⟩g⁻¹ = ⟨b⟩`.
+Lift `a, b` to `↥Q`, apply the type-level lemma, and transport the conjugacy back along `Q.subtype`. -/
+theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial_le [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q) {a b : G} (haQ : a ∈ Q) (hbQ : b ∈ Q)
+    (ha : a ∉ (Subgroup.center ↥Q).map Q.subtype) (hb : b ∉ (Subgroup.center ↥Q).map Q.subtype)
+    (hmem : b ∈ Subgroup.zpowers a ⊔ (Subgroup.center ↥Q).map Q.subtype) :
+    ∃ g ∈ Q, MulAut.conj g • Subgroup.zpowers a = Subgroup.zpowers b := by
+  classical
+  have hanc : (⟨a, haQ⟩ : ↥Q) ∉ Subgroup.center ↥Q :=
+    fun h => ha (Subgroup.mem_map_of_mem Q.subtype h)
+  have hbnc : (⟨b, hbQ⟩ : ↥Q) ∉ Subgroup.center ↥Q :=
+    fun h => hb (Subgroup.mem_map_of_mem Q.subtype h)
+  have hmem' : (⟨b, hbQ⟩ : ↥Q) ∈ Subgroup.zpowers (⟨a, haQ⟩ : ↥Q) ⊔ Subgroup.center ↥Q := by
+    rw [← Subgroup.mem_map_iff_mem Q.subtype_injective, Subgroup.map_sup, MonoidHom.map_zpowers]
+    exact hmem
+  obtain ⟨q, hq⟩ := exists_conj_smul_zpowers_eq_of_expPExtraspecial hQ_es hanc hbnc hmem'
+  refine ⟨Q.subtype q, q.2, ?_⟩
+  have hmsc : (MulAut.conj q • Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype
+      = MulAut.conj (Q.subtype q) • (Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype := by
+    rw [mulAut_smul_eq_map, mulAut_smul_eq_map, Subgroup.map_map, Subgroup.map_map]; congr 1
+  have ha_map : (Subgroup.zpowers (⟨a, haQ⟩ : ↥Q)).map Q.subtype = Subgroup.zpowers a := by
+    rw [MonoidHom.map_zpowers]; rfl
+  have hb_map : (Subgroup.zpowers (⟨b, hbQ⟩ : ↥Q)).map Q.subtype = Subgroup.zpowers b := by
+    rw [MonoidHom.map_zpowers]; rfl
+  have h2 := congrArg (Subgroup.map Q.subtype) hq
+  rw [hmsc, ha_map, hb_map] at h2
+  exact h2
+
 /-- **`ℳ(N_G(·))`-uniqueness blocks `M`-conjugacy**: if `A₀⋆ = g • A₀` (conjugation by some
 `g ∈ M`), `ℳ(N_G(A₀)) = {M}`, and `ℳ(N_G(A₀⋆)) = {M⋆}`, then `M = M⋆`.
 
