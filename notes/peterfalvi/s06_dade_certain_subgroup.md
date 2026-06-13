@@ -2604,3 +2604,41 @@ or 新 field/補題)。これが (4.10) 完成の最後の hard core。
    β(v)=α(v) は toTIC Dade value on V or (4.3.c)+δ²+δ_0=1] → (e) `ClassFunction.ext` g∈V^G/∉ case split。
 3. RHS=ticVdiff.sigma(α_G)=`Ind_W^G(α_G)` [sigma_eq_tau]、off V^G 消失は `full_map_eq_zero...V` (ticVdiff) で clean。
 **hard core ×1 = (d) の C_G(v)⊆L gap。FT 経路外。正本=本 session 38 cont.²。**
+
+## 2026-06-13 (session 38 cont.³, /loop): 🎉🎉🎉 (4.10) COMPLETE — §6 four-corner Dade identity DONE
+
+**`fourCorner_dade_eq` landed sorry-free + axiom-clean (leaf build 3598)**:
+`(δ_j μ_{ij} − δ_j μ_{0j} − μ_{i0} + μ_{00})^τ = ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ + ω_{00}^σ`.
+
+### 全 piece chain (commits 6e807abb → 785bd1d3, S06_CertainTypeFourCorner.lean):
+- **piece (a)** `fourcorner_signedDiff_eq_induce`: β = Ind_W^L α (既存; (1.4) image + (4.4)).
+- **piece (b)** `chiColumn_fourcorner_mem_supportedSubmodule`: α ∈ CF(W, W−(W₁∪W₂)) [pointwise vanish
+  on W₁ (column-diff cancels via chiColumn_apply_of_mem_W1) and W₂ (新 `chiColumn_apply_of_mem_W2`)]
+  + carrier `chiFourCornerOnV` (SupportedOnV toTIC) + `chiFourCornerOnV_coe`.
+- **L-side packaging**: `coe_mem_A0_of_mem_conjugatesOfSet_toTICV` (bridge conj_L(V)⊆A₀) +
+  `signedDiff_fourcorner_eq_toTICDade` (β = toTIC Dade(carrier) via tau_eq_induce) +
+  `fourCornerDiffSupported` (β ∈ CF(L,A₀), h.tau の入力).
+- **crux (d)** `fourCornerDade_eq_zero_of_not_mem_conjugatesV` (off-V^G vanishing, book の hand-wave 部):
+  `centralizer_le_L_of_mem_ticVdiffV` (C_G(v)⊆L from IsTISubset V_ti — 鍵 unblock) +
+  `H_eq_bot_of_centralizer_le` (S04 一般: C_G(a)⊆L ⟹ H(a)=⊥ via centralizer_eq_sup/disjoint) +
+  `coe_mem_ticVdiffV_of_mem_toTICV` + `centralizer_le_L_of_mem_conj_toTICV` (共役閉包) →
+  dadeValue base-point case analysis (β supp⊆V^L → H(a)=⊥ → h=1 → g conj a ∈ V^G).
+- **G-side support** `omegaTic_fourcorner_mem_supportedSubmodule`: α_G ∈ SupportedOnV ticVdiff
+  (piece b を bridge omegaProdCharTic_apply で transport).
+- **crux (c)** `fourCornerDade_apply_eq_of_mem_V`: V 上一致 (両辺=sdiff-four-corner(bridge v); route B
+  = β=σ_L(α) ゆえ δ²/δ₀ sign 不要; mirror 4.8 step-4).
+- **capstone** `fourCorner_dade_eq`: ClassFunction.ext g; g∈V^G→conj_eq+( c); g∉V^G→(d)+RHS=σ(α_G)=τ(γ)
+  vanish (map_sub + sigma_eq_tau + full_map_eq_zero).
+
+### 🔑 再調査不要の知見:
+- A₀ の V = tic.V = **W−W₂** (larger); book の (3.4)/value-vanishing の V = **W−(W₁∪W₂)** (smaller,
+  ticVdiff.V/toTIC.V)。strong support (smaller) が正しい (C_G(v)=W⊂L が要)。
+- **C_G(v)⊆L for v∈V は IsTISubset から直接** (c centralizes v → c·v·c⁻¹=v∈V → c∈W⊆L)。
+- SupportedOnV coe lemma は自分の hypothesis の .W へ ascribe (defeq は Eq 内 rfl)。
+- chiColumn_apply_of_mem_W1/W2, chiFourCornerOnV, centralizer_le_L_of_mem_* は S06 namespace で
+  h 明示引数 → dot 記法不可。sigma は LinearMap (map_sub 可)。
+
+### ▶▶ §6 (4.x) 全 COMPLETE。次 = B レーン戦略判断 (case-B §8 大 assembly は user/合流調整向き)
+§6 character-theory ((3.x)σ + (4.1)-(4.10)) 完了。残る §6 統合 = **case-B → S08 (6.8)** = §8 large
+assembly (s08_6_8_assembly_plan.md T0-T11 DAG; 単独 cold-engage は overlap/risk と既 RECON 済)。
+**正本=本 session 38 cont.³。(4.10) DONE。**
