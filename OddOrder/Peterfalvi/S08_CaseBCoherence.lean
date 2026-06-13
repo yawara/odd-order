@@ -770,4 +770,28 @@ theorem SibleyDadeHypothesis.inner_tau_alpha_dvd_index
   · rw [hrecip, hφRes, hη₁Res]; push_cast; ring
   · exact dvd_sub hdvdm (dvd_mul_right ((W2.subgroupOf H).index : ℤ) b')
 
+/-- **(6.8.2.2) norm preservation `‖α^τ‖² = ‖α‖²`** for `α = Ind^L_{W₂}φ − c·η₁` (`α(1) = 0`).  Since
+`Supp(α) ⊆ H^#` (`support_indW2_sub_smul_subset_sharpImage`), the Dade isometry on the supported
+singleton `{α}` (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) gives
+`⟨α^τ, α^τ⟩ = ⟨α, α⟩`.  This is the source of the norm bound `‖α^τ‖² = ‖α‖² = |L:Z| + |H:Z|²` in the
+(6.8.2.2) trichotomy endgame (Peterfalvi (1.5.b)). -/
+theorem SibleyDadeHypothesis.inner_self_tau_indW2_sub_smul
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Invertible (Nat.card ↥W2 : ℂ)]
+    (φ : ClassFunction ↥W2 ℂ) {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (c : ℂ)
+    (h1 : ClassFunction.induce W2 φ (1 : ↥L) = c * η₁ (1 : ↥L)) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 φ - c • η₁))
+        (hyp.tau (ClassFunction.induce W2 φ - c • η₁))
+      = ClassFunction.inner (ClassFunction.induce W2 φ - c • η₁)
+        (ClassFunction.induce W2 φ - c • η₁) := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hsupp : (ClassFunction.induce W2 φ - c • η₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ c h1
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj
+    (S := {ClassFunction.induce W2 φ - c • η₁})
+    (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
+    (Submodule.subset_span rfl) (Submodule.subset_span rfl)
+
 end OddOrder.Peterfalvi.S08
