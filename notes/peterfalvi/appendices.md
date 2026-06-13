@@ -128,10 +128,20 @@ conjugation Equiv で). sorry 不変 (2→2)。
 - `commutator_le_fitting_of_isCyclic_fitting` (D solvable + F cyclic ⟹ commutator≤F) [既存]
 - `opCore_isCyclic_and_fpf_of_transitive` (per-prime: O_p(D) cyclic+FPF; Lemma を cite ゆえ explicit
   sorry 無だが Lemma の sorry に transitive 依存) [s15]
-**Prop 1 残**: (a) F=∏O_p → F cyclic (per-prime + `fitting=⨆opCore` + nilpotent; ⚠ IsZGroup 経由 or
-  ∏-cyclic、API 未確認) + F FPF (各 O_p FPF + ∏ 構造) → fitting_cyclic_fixedPointFree の 1,2 連言;
-  (b) commutator≤F は `commutator_le_fitting_of_isCyclic_fitting` (要 `[IsSolvable D]` 追加 = FT 帰結)。
-  ⟹ Prop 1 を組めば explicit sorry 2→1 (Lemma 非cyclic のみ残)。
+**Prop 1 残** (s16 で F-cyclic の blocker を精査):
+- **(a) F cyclic = gate**. 経路: `[Finite][IsZGroup ↥(fitting D)][IsNilpotent ↥(fitting D)] → IsCyclic`
+  (mathlib ZGroup:127; `fitting.isNilpotent` instance 在)。IsZGroup ↥F = ∀ Sylow P of ↥F, IsCyclic ↑P。
+  F nilpotent ⟹ 各 Sylow 一意 (`Sylow.normal_of_isNilpotent`+`characteristic_of_normal`)、かつ
+  `opCore p ↥F = ⨅ Sylow = ↑P` (`opCore_le`+`normal_pgroup_le_opCore`、`opCore=⨅Sylows`)。⚠ **fiddly chain**:
+  per-prime は `IsCyclic ↥(opCore p D)` を与えるが、IsZGroup ↥F が要るのは `IsCyclic ↑(Sylow p ↥F)` =
+  `IsCyclic ↥(opCore p ↥F)`。**`opCore p D ↔ opCore p ↥(fitting D)` の subgroup-of-subgroup 同定**が要
+  (両者 = 最大 normal p-subgroup、fitting char in D ゆえ等しいはずだが map/subgroupOf で証明要)。
+  IsCyclic transfer は `isCyclic_of_surjective _ (Subgroup.equivMapOfInjective P f hf).symm.surjective`
+  (ZGroup.lean:71 pattern)。~40 行・複数 uncertain step。**次 session で grind**。
+  - 代替: per-prime を `opCore p ↥(fitting D)` 版で作り直す (bridge は inclusion 経由で煩雑) → 不採用見込み。
+- **(b) F FPF**: 各 O_p FPF + F=∏O_p の ∏ 分解 (f∈F^#, f_p∈⟨f⟩ で C_E(f)⊆C_E(f_p)=⊥)。F cyclic 後なら容易化。
+- **(c) commutator≤F**: `commutator_le_fitting_of_isCyclic_fitting` (要 `[IsSolvable D]` 追加 = FT 帰結) + (a)。
+- ⟹ (a) が gate。組めば explicit sorry 2→1 (Lemma 非cyclic のみ残)。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
