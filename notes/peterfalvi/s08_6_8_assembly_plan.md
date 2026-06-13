@@ -1386,3 +1386,24 @@ hub に分割依頼。S08_CaseBCoherence は現状 §3 helper + (6.8.2.1)〜(6.8
 - **構造的 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): capstone wiring 時に Hypothesis46/certain-type から discharge。
 **正本=本 session 40 cont.⁸。honest 評価**: (6.8.2.2) decomposition (m≥3) は完成。capstone は τ₂ assembly +
 §7 glue + 構造 discharge が残る marathon。steady brick で進行 (空転なし)、但し capstone は依然 distant。
+
+## 2026-06-14 (session 40 cont.⁹, /loop): 🎉 m=2 relabel landed (uniform Y-witness); file 1387行
+
+**✅ landed (build-green + axiom-clean, first-try)**:
+18. **`exists_Ycoherence_hgood_caseB` (e2ec420f)** = m=2 relabel folded in → **uniform Y-coherence
+    witness cY with ⟨α^τ, cY.extension η₁⟩ = −|H:Z|** (両 m≥3/m=2)。`exists_Ycoherence_hgood_of_frobenius`
+    (S08_CoherenceCore:11555) ミラー。m=2: `coherentEqualDegree_swap_neg` (§7 generic) で η₁↦−η₂^{τ₁}、
+    ⟨α^τ,η₂^{τ₁}⟩=|H:Z| (cross-term+agreement) ⟹ ⟨α^τ, cY' η₁⟩=−|H:Z|。eqRec transport 込みで first-try。
+    → **(6.8.2.2) の "good value" production は m 全域で完成**。
+
+### 📏 ⚠ S08_CaseBCoherence.lean = 1387 行 → 次 phase は新 leaf 必須。
+**次 leaf = `S08_CaseBCoherence2.lean`** (import S08_CaseBCoherence) で:
+- **general X-structure** (cY : IsCoherent param 版、`orthogonal_normOne_tau_scaledDiff_add_extension_general`
+  ミラー): coherentYset hardcode を cY param 化 (cY.extends_on_supported で agreement inline)。
+- **crux / α^τ = X − |H:Z|·cY η₁** (general cY): `exists_Ycoherence_hgood_caseB` の cY を消費。
+- **(6.8.2.3)** (χ∈X 版, [Is]2.27) + **τ₂ assembly** (Frobenius `crux_of_third_anchor`/`coherentXunionYset
+  _...glued`/`Xset_isCoherent` の case-B 版 = 大アーキテクチャ)。
+
+### ⚠ 構造的 cluster (capstone wiring 時): FPF/W₂⊆Z(↥L)/C_H(w)=W₂ ← Hypothesis46/certain-type。
+**正本=本 session 40 cont.⁹。honest**: (6.8.2.2) good-value production 完成 (m 全域)。残=assembly (general
+X-structure→crux→τ₂→glue) + 構造 discharge = marathon だが character-theoretic content は (6.8.2.2) 完了間近。
