@@ -108,4 +108,77 @@ theorem SibleyDadeHypothesis.Yset_mapRingEquiv_mem (hyp : SibleyDadeHypothesis G
   have hh : χ h = 1 := hinj (key.trans (map_one _).symm)
   simpa using hh
 
+/-- **(6.8.2.1) input — `hZA`.**  Every nontrivial element of `⁅H, H⁆` maps into `H^# = sharpImage H`.
+Since `⁅H, H⁆ ≤ H`, a nontrivial `z ∈ ⁅H, H⁆` lands in `H` with `(z : G) ≠ 1`. -/
+theorem SibleyDadeHypothesis.coe_mem_sharpImage_of_mem_commutator
+    (hyp : SibleyDadeHypothesis G L H) {z : ↥L} (hz : z ∈ ⁅H, H⁆) (hz1 : z ≠ 1) :
+    (L.subtype z) ∈ sharpImage H := by
+  have hzH : z ∈ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]
+      intro p hp q hq
+      rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem hp hq) (H.inv_mem hp)) (H.inv_mem hq)
+    exact hle hz
+  refine ⟨Subgroup.mem_map_of_mem L.subtype hzH, ?_⟩
+  simp only [Set.mem_singleton_iff]
+  intro hc
+  exact hz1 (by simpa using hc)
+
+/-- **(6.8.2.1) input — `hηx`.**  A `Y = S(H')` character is constant on `⁅H, H⁆`: `η z = η 1`
+for `z ∈ ⁅H, H⁆`.  Indeed `η = Ind_H^L (linear χ)`, and for `z ∈ ⁅H, H⁆ ⊆ H` (with `H ◁ L`) every
+conjugate `g⁻¹zg` lies in `⁅H, H⁆` (normal in `L`), on which the linear source `χ` is trivial
+(`ℂˣ` abelian ⟹ `⁅H,H⁆ ≤ ker χ`); so every `induceTerm` is `1` and `η z = |L:H| = |W₁| = η 1`. -/
+theorem SibleyDadeHypothesis.Yset_apply_eq_apply_one_of_mem_commutator
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z : ↥L} (hz : z ∈ ⁅H, H⁆) : η z = η 1 := by
+  obtain ⟨χ, _hχ_ne, rfl⟩ := hyp.exists_linear_source_of_mem_Yset hη
+  rw [hyp.induce_apply_one_eq_card_W1_of_degree_one _ (linearIrreducibleCharacter_apply_one χ),
+    ClassFunction.induce_apply]
+  -- ⅟|H| * ∑ g, induceTerm H (linear χ) g z = |W₁|
+  have hcomm_normal : (⁅H, H⁆ : Subgroup ↥L).Normal :=
+    Subgroup.commutator_normal H H
+  have hterm : ∀ g : ↥L,
+      ClassFunction.induceTerm H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ) g z = 1 := by
+    intro g
+    have hgcomm : g⁻¹ * z * g ∈ ⁅H, H⁆ := by
+      have := hcomm_normal.conj_mem z hz g⁻¹
+      simpa [mul_assoc] using this
+    have hgH : g⁻¹ * z * g ∈ H := by
+      have hle : ⁅H, H⁆ ≤ H := by
+        rw [Subgroup.commutator_le]
+        intro p hp q hq
+        rw [commutatorElement_def]
+        exact H.mul_mem (H.mul_mem (H.mul_mem hp hq) (H.inv_mem hp)) (H.inv_mem hq)
+      exact hle hgcomm
+    rw [ClassFunction.induceTerm_of_mem _ hgH, linearIrreducibleCharacter_apply]
+    -- `χ ⟨g⁻¹zg, hgH⟩ = 1`: the element lies in the commutator of `↥H`, killed by the abelian `χ`.
+    have hmap : (commutator ↥H).map H.subtype = ⁅H, H⁆ := by
+      rw [commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map,
+        Subgroup.range_subtype]
+    have hmem : (⟨g⁻¹ * z * g, hgH⟩ : ↥H) ∈ commutator ↥H := by
+      have hin : (g⁻¹ * z * g : ↥L) ∈ (commutator ↥H).map H.subtype := by
+        rw [hmap]; exact hgcomm
+      obtain ⟨w, hw, hweq⟩ := Subgroup.mem_map.mp hin
+      have hweq' : w = (⟨g⁻¹ * z * g, hgH⟩ : ↥H) := Subtype.ext hweq
+      rwa [hweq'] at hw
+    have hker : χ (⟨g⁻¹ * z * g, hgH⟩ : ↥H) = 1 := by
+      have hbot : commutator ℂˣ = ⊥ := by
+        rw [commutator_def, Subgroup.commutator_eq_bot_iff_le_centralizer]
+        intro x _
+        exact Subgroup.mem_centralizer_iff.mpr (fun y _ => mul_comm y x)
+      have hle : (commutator ↥H).map χ ≤ commutator ℂˣ := by
+        rw [commutator_def, Subgroup.map_commutator]
+        exact Subgroup.commutator_mono le_top le_top
+      rw [hbot] at hle
+      exact Subgroup.mem_bot.mp (hle (Subgroup.mem_map_of_mem χ hmem))
+    rw [hker, Units.val_one]
+  rw [Finset.sum_congr rfl (fun g _ => hterm g), Finset.sum_const, Finset.card_univ,
+    nsmul_eq_mul, mul_one, ← Nat.card_eq_fintype_card]
+  have hLcard : (Nat.card ↥L : ℂ) = (Nat.card ↥hyp.W1 : ℂ) * (Nat.card ↥H : ℂ) := by
+    rw [← hyp.index_H_eq_card_W1, ← Nat.cast_mul, Subgroup.index_mul_card]
+  rw [hLcard, mul_comm (Nat.card ↥hyp.W1 : ℂ) (Nat.card ↥H : ℂ), ← mul_assoc,
+    invOf_mul_self, one_mul]
+
 end OddOrder.Peterfalvi.S08

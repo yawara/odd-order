@@ -966,3 +966,27 @@ keystone `mapRingEquiv_induce`。**正本=本 session 39 cont.²。**
 3. **hspan** (Yset span support 条件) — Yset 元は H 上 supported ゆえ。
 4. → `extension_constant_on_sharp_of_prime` を組んで **(6.8.2.1)-for-c2-case-B** 完成 (η^{τ₁} const on W₂^#)。
 → (6.8.2.2) [(6.7)合同] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.³。**
+
+## 2026-06-13 (session 39 cont.⁴, /loop): hZA + hηx landed (S08_CaseBCoherence)
+
+**✅ landed (build-green + axiom-clean, full build 3802)**: (6.8.2.1)-for-c2-case-B の discharge 2 件:
+- **`SibleyDadeHypothesis.coe_mem_sharpImage_of_mem_commutator` = `hZA`**: z∈⁅H,H⁆, z≠1 ⟹ (z:G)∈sharpImage H
+  (⁅H,H⁆≤H via `Subgroup.commutator_le`+`commutatorElement_def`)。
+- **`SibleyDadeHypothesis.Yset_apply_eq_apply_one_of_mem_commutator` = `hηx`** (η const on ⁅H,H⁆):
+  η=Ind(linear χ), z∈⁅H,H⁆⊆H◁L ⟹ 全 conj g⁻¹zg∈⁅H,H⁆ (normal)、χ は ⁅H,H⁆ で trivial
+  (commutator ↥H ↦ commutator ℂˣ=⊥ via `map_commutator`+`commutator_eq_bot_iff_le_centralizer`;
+  ⁅H,H⁆↔commutator ↥H は `(commutator ↥H).map H.subtype = ⁅H,H⁆`)、各 induceTerm=1 ⟹
+  η z = ⅟|H|·|L| = |W₁| = η 1 (`index_mul_card`+`index_H_eq_card_W1`+`invOf_mul_self`)。
+
+### (6.8.2.1)-for-case-B discharge: 残 hspan のみ (ほぼ free)
+🎯 **`hspan` は `zSpan_S_support_subset_of_apply_one_eq_zero` (S08_CoherenceCore:5775) からほぼ自動**:
+それは S 版 (φ∈zSpan S, φ(1)=0 ⟹ supp⊆supportInSubgroup(sharpImage H)L)。Yset⊆S (`Yset_subset_S`)
+⟹ zSpan Yset⊆zSpan S ⟹ Yset 版が span monotone で従う。
+
+### ▶ 次の一手:
+1. **hspan-for-Yset** (zSpan_S 版 + Yset⊆S、ほぼ free)。
+2. **(6.8.2.1)-for-case-B assembly**: `extension_constant_on_sharp_of_prime` を coherentYset@W₂ に適用
+   (hyp.cases から case-B data 抽出: h46/W₂ prime; hSirr=isIrreducibleCharacter_of_mem_Yset,
+   hlat=coherentYset.extension_mem_ZIrr, hpair=two_le_Yset_ncard wiring)。
+   ⟹ `coherentYset.extension η` は W₂^# 上定数 = **Peterfalvi (6.8.2.1)** 完成。
+3. → (6.8.2.2) [(6.7)合同 peterfalvi_67] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁴。**
