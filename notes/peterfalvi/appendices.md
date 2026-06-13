@@ -184,6 +184,26 @@ conjugation Equiv で). sorry 不変 (2→2)。
 - [ ] file が sorry-free 化したら keystone+bridge を AxiomsCheck の **新 Appendices section** に登録
       (LAUNCH rule #4; 現状 file に 2 sorry 残ゆえ未登録; 完成済 3 本は #print axioms で clean 確認済)。
 
+### ✅ session 4 (2026-06-14): Lemma 非cyclic 判定 + Appendix I **Prop 2** 発見 → 攻略順 改訂
+- **Lemma 非cyclic sorry の真ボトルネック = [H] III.7.5 = Gorenstein 5.4.10** (non-cyclic odd p-group ⟹
+  normal type-(p,p))。Peterfalvi p.135-136 原文確認: Schur ([Is]1.5) で End_{𝔽_q[P]}(E)=有限体 ⟹ Z(P) cyclic
+  ⟹ `Ω₁(Z(P))` 位数 p ⟹ repo の available `…_of_prime_sq_dvd_card_omega1Center` (abelian-center) は **不適用**,
+  まさに S04 ≈L911 で deferred な cyclic-center case。**→ issue 2004 で BG lane に委譲** (S04 は所有権外)。
+  Huppert.lean の sorry comment に精密化記録済。**この sorry は当面 park** (off-critical-path Part II)。
+- **🆕 Appendix I に Proposition 2 が在る** (p.136, PDF 画像で全文復元 — mmd は MISSING_PAGE, 既存 note も
+  Prop2 を見落としていた)。**現状 Huppert.lean に未形式化**。statement:
+  > U が elem-ab E (order pⁿ) に faithful 作用, T⊴U cyclic normal が E に **irreducible** 作用。
+  > **(a)** F=𝔽_p[T]⊆End(E) は pⁿ 元の体, E は F 上 1 次元。**(b)** U は semilinear; s∈E^# で C_U(s)≅Aut(F) の部分群。
+  - 証明 (p.136): (a) Schur で F₁=End_T(E)=有限 division ring, T 可換ゆえ F=𝔽_p[T]⊆F₁ は可換部分環=体;
+    E は既約 F-加群=F 上 1 次元 ⟹ |F|=|E|。(b) u∈U は加法的自己同型, σ(λ): u(λs)=σ(λ)u(s) が体自己同型
+    (U が E⋊T に作用するので σ(λμ)=σ(λ)σ(μ)), u semilinear; C_U(s)→Aut(F) が群同型。
+  - **🔑 Gorenstein 不要・Schur のみ ⟹ 非cyclic sorry より遥かに tractable**。mathlib `IsSimpleModule`/Schur
+    (End=division ring) + 有限可換 domain=体 + 体上既約=1次元。`IsElementaryAbelian.zmodModule` (PRank.lean:87)。
+  - **🔗 Appendix C (NearFields) Prop 2 は "Appendix I, Prop 2" を引く ⟹ Prop 2 は Appendix C の前提**。
+    かつ Prop 2(a) の Schur 部品 (End=体 ⟹ Z 部分が cyclic) は **Lemma 非cyclic の Z(P) cyclic 部分も再利用可**。
+- **改訂 攻略順**: **Prop 2 (Huppert.lean, 次の主目標, tractable)** → Appendix C/D → Lemma 非cyclic (issue 2004 待ち)。
+  既存 scaffold: `NearFields.lean`/`Suzuki2Groups.lean`/`FeitSibley.lean`/`Suzuki.lean` (各 ~2.5-5.6k, opaque, 要 audit)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
