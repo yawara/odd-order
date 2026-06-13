@@ -160,14 +160,49 @@ section Proposition1
 
 variable {D E : Type*} [Group D] [Group E]
 
+/-- **Peterfalvi Appendix B, Proposition 1 bridge**: if `D` acts transitively on
+`E^#` and `N ⊴ D`, then the `N`-point-stabilizers `N_a`, `N_b` of any two
+nonidentity points have the same order — they are conjugate in `D` (`N_b = d N_a
+d⁻¹` for any `d` with `d·a = b`, using normality of `N`).
+
+This is exactly Peterfalvi's "`P_a` and `P_b` are conjugate in `D`" step (p. 136),
+which supplies the constant point-stabilizer hypothesis of the Lemma for the
+characteristic subgroups `N = O_p(F(D))`. -/
+theorem card_pointStabilizer_comp_eq_of_normal_of_transitive
+    (φ : D →* MulAut E) {N : Subgroup D} (hN : N.Normal)
+    (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ d : D, (φ d) a = b)
+    {a b : E} (ha : a ≠ 1) (hb : b ≠ 1) :
+    Nat.card ↥(pointStabilizer (φ.comp N.subtype) a) =
+      Nat.card ↥(pointStabilizer (φ.comp N.subtype) b) := by
+  obtain ⟨d, hd⟩ := htrans a b ha hb
+  have happ : ∀ (g h : D) (e : E), (φ (g * h)) e = (φ g) ((φ h) e) := fun g h e => by
+    rw [map_mul]; rfl
+  have hinv : ∀ (g : D) (e : E), (φ g⁻¹) e = (φ g).symm e := fun g e => by
+    rw [map_inv]; rfl
+  have hsymm : (φ d).symm b = a := by rw [← hd]; exact (φ d).symm_apply_apply a
+  -- conjugation by `d` (resp. `d⁻¹`) carries the `a`-stabilizer to the `b`-stabilizer.
+  have hfix : ∀ x : D, (φ x) a = a → (φ (d * x * d⁻¹)) b = b := by
+    intro x hx; rw [happ, happ, hinv, hsymm, hx, hd]
+  have hfix' : ∀ y : D, (φ y) b = b → (φ (d⁻¹ * y * d)) a = a := by
+    intro y hy; rw [happ, happ, hd, hy, hinv, ← hd]; exact (φ d).symm_apply_apply a
+  refine Nat.card_congr ⟨fun s => ⟨⟨d * (s.1 : D) * d⁻¹, hN.conj_mem _ s.1.2 d⟩,
+      mem_pointStabilizer.mpr (hfix _ (mem_pointStabilizer.mp s.2))⟩,
+    fun t => ⟨⟨d⁻¹ * (t.1 : D) * d, hN.conj_mem' _ t.1.2 d⟩,
+      mem_pointStabilizer.mpr (hfix' _ (mem_pointStabilizer.mp t.2))⟩,
+    fun s => ?_, fun t => ?_⟩
+  · apply Subtype.ext; apply Subtype.ext; show d⁻¹ * (d * (s.1 : D) * d⁻¹) * d = (s.1 : D); group
+  · apply Subtype.ext; apply Subtype.ext; show d * (d⁻¹ * (t.1 : D) * d) * d⁻¹ = (t.1 : D); group
+
 /-- **Peterfalvi Appendix B, Proposition 1**: let `D` have odd order and act
 faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
 `D / F(D)` is abelian (equivalently `D' ≤ F(D)`).
 
-The point-stabilizer orders are constant under a transitive action, so each Sylow
-subgroup of `D` is cyclic and fixed-point-free by the Lemma; the structure of
-`F(D)` and the abelian quotient then follow (p. 136). -/
+Proof (p. 136): for each odd prime `p`, `P = O_p(F(D)) ⊴ D`, so transitivity gives
+constant point-stabilizer order (`card_pointStabilizer_comp_eq_of_normal_of_transitive`)
+and the Lemma makes `O_p(F)` cyclic and fixed-point-free; `F = ∏_p O_p(F)` is then
+cyclic and fixed-point-free; finally `C_D(F) = F` (Feit–Thompson + Fitting, `D`
+solvable of odd order) gives `D/F ↪ Aut(F)`, abelian since `F` is cyclic. -/
 theorem fitting_cyclic_fixedPointFree
     [Finite D] [Finite E] {q : ℕ} (hq : q.Prime) [Nontrivial E]
     (hD_odd : Odd (Nat.card D)) (hE : IsElementaryAbelian q E)

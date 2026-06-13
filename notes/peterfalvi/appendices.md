@@ -49,12 +49,31 @@
 
 `pointStabilizer φ a := (stabilizer (MulAut E) a).comap φ` (faithful な `P_a`)。
 
+### session 2 (2026-06-14): p.136 復元 + Prop 1 bridge
+
+**✅ mmd p.136 MISSING_PAGE 復元** (PDF 画像読み, [[nougat-missing-page-recovery]]):
+- **Lemma part (2) 末尾**: P 既約・非 cyclic 仮定 → R⊴P type-(p,p), Schur で End(E)=有限体 → Z(P) cyclic →
+  |R∩Z(P)|=p, P は R の他の位数 p 部分群 {T_i} を置換, `C_E(R∩Z(P))=0`, `E_i:=C_E(T_i)`,
+  `E=⊕E_i` (直和は帰納法; t∈T_k は E_i=C_E(T_i) を中心化 → R=⟨T_k,T_i⟩ 中心化 → x_i=0) を P が置換
+  → part (1) で P cyclic, 矛盾。
+- **Prop 1 証明**: 各奇素数 p で `P=O_p(F)⊴D`, D transitive on E^# → `P_a,P_b` は D-共役 (∵ d·a=b, P正規) →
+  定 stabilizer → Lemma で O_p(F) cyclic+FPF。`F=∏_p O_p(F)` → F cyclic+FPF。`C_D(F)=F`
+  (Feit-Thompson+Fitting [H]III.4.2, D 可解) → `D/F ↪ Aut(F)` cyclic ゆえ abelian。
+
+**✅ bridge lemma landed** (complete, axiom-clean): `card_pointStabilizer_comp_eq_of_normal_of_transitive`
+= Prop 1 の「P_a,P_b 共役」step (N⊴D + transitive ⟹ N-stabilizer 位数一定; 共役 `N_b=dN_ad⁻¹` を
+conjugation Equiv で). sorry 不変 (2→2)。
+
 ### 残 TODO (Appendix B)
-- [ ] **part (1)-(2) reduction** = Lemma の sorry。⚠ **mmd p.136 が MISSING_PAGE** (06.0 の (2) 結論欠落)
-      → PDF 画像読みで復元要 ([[nougat-missing-page-recovery]])。part (1) 分解ケースは復元済テキストで可。
-- [ ] **Prop 1** = transitive ⟹ 定 stabilizer ⟹ 各 Sylow に Lemma 適用 ⟹ F(D) 構造。
-- [ ] file が sorry-free 化したら keystone 2 本を AxiomsCheck の **新 Appendices section** に登録
-      (LAUNCH rule #4; 現状は file に 2 sorry 残ゆえ未登録)。
+- [ ] **part (1) imprimitive case** (`E=⊕Eᵢ` r≥2 を P が置換 + 定 stabilizer ⟹ FPF): swap補題(済)+
+      `P_{a+b}=P_a∩P_b`(直和一意性) で実証明可。⚠ vector-space/DirectSum setup (E を F_q-加群 via
+      `IsElementaryAbelian.zmodModule`, 部分空間の P-置換) が要 = 中規模。
+- [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
+      (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
+- [ ] **Prop 1 残**: bridge は済。残 = `F=∏O_p`(nilpotent 分解) + O_p cyclic⟹F cyclic + `C_D(F)=F`
+      (D 可解; repo に `Ch01` Fitting API 在) + `D/F↪Aut(F)`。各々中規模。
+- [ ] file が sorry-free 化したら keystone+bridge を AxiomsCheck の **新 Appendices section** に登録
+      (LAUNCH rule #4; 現状 file に 2 sorry 残ゆえ未登録; 完成済 3 本は #print axioms で clean 確認済)。
 
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
