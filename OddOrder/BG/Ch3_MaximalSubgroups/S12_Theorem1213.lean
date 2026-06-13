@@ -601,7 +601,22 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
     (hQcard : Nat.card ↥Q = p ^ 3) (hQ_le : Q ≤ M ⊓ Mstar) :
     maximalSubgroupsContaining
         (Subgroup.normalizer (((Subgroup.center ↥Q).map Q.subtype) : Set G)) ≠ {M} := by
-  sorry
+  set Z : Subgroup G := (Subgroup.center ↥Q).map Q.subtype with hZdef
+  -- **Analytic core**: `N_M(Z) ⊆ M⋆`. `Q/Z` acts on `K = C_{M_α}(Z)`; Proposition 1.16 +
+  -- Proposition 12.4(a) give `K ⊆ M⋆`, then `M = (M ∩ M⋆)M_α` (Cor 10.9(b)) + Lemma 6.5(b)
+  -- (coprimality `p ∉ α(M)` from `r(S) ≤ 2`) give `N_M(Z) ⊆ M⋆`.
+  have hNMZ : Subgroup.normalizer (Z : Set G) ⊓ M ≤ Mstar := by
+    sorry
+  -- If `ℳ(N_G(Z)) = {M}`, then `N_G(Z) ≤ M`, so `N_G(Z) = N_M(Z) ⊆ M⋆`, forcing `M⋆ = M`.
+  intro hsing
+  have hMmem : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (Z : Set G)) := by
+    rw [hsing]; exact Set.mem_singleton_iff.mpr rfl
+  have hNZM : Subgroup.normalizer (Z : Set G) ≤ M := (mem_maximalSubgroupsContaining.mp hMmem).2
+  have hNZMstar : Subgroup.normalizer (Z : Set G) ≤ Mstar := fun x hx => hNMZ ⟨hx, hNZM hx⟩
+  have hMstarmem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Z : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar, hNZMstar⟩
+  rw [hsing, Set.mem_singleton_iff] at hMstarmem
+  exact hMne hMstarmem.symm
 
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
