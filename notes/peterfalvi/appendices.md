@@ -72,9 +72,14 @@ conjugation Equiv で). sorry 不変 (2→2)。
       の disjoint だけ (E_σi ⊓ (E_i⊔E_j⊔E_σj)=⊥ via `(hind k).mono_right` + `disjoint_def`; pair
       kill は s·t=1∧disjoint⟹両 triv)。⚠ 技法: `letI:CommGroup E:={Group with mul_comm:=hcomm}` +
       AC 並べ替え `simp only [mul_assoc,mul_comm,mul_left_comm]` (group は comm 非対応)。scratch 開発→統合。
-- [ ] **part (1) 残**: key step を使い「定 stabilizer ⟹ FPF」へ組立 (P_{a·b}=P_a⊓P_b ⟸ key step、
-      定 stab で P_a=P_b、P_a が全 S_i 中心化 ⟹ P_a=1 faithful)。+ part (2) で `E=⊕C_E(T_i)` を構成し
-      key step 適用。**imprimitive 分解 `E=⊕Eᵢ` の存在 (Maschke/Clifford) が残 setup**。
+- [x] **part (1) stabilizer 組立** ✅ (session 5, 3 lemmas complete/axiom-clean):
+      `pointStabilizer_mul_eq_inf_of_components` (P_{a·b}=P_a⊓P_b ⟸ key step + map_mul) /
+      `mul_ne_one_of_components` (a·b≠1 ⟸ disjoint) / `pointStabilizer_eq_of_components_of_constant`
+      (定 stab ⟹ P_a=P_b; `Subgroup.eq_of_le_of_card_ge` で P_a⊓P_b=P_a 両向き)。
+- [ ] **part (1) 残 (FPF 結論)**: ある S_{i₀}^# の a₀ で P_{a₀}=⊥ を示す (x∈P_{a₀} は P_a=P_b 経由で
+      全 S_k を pointwise 固定 ⟹ actionFixedBy=⊤ ⟹ φx=1 ⟹ x=1 faithful) → 定 stab で全 a に伝播
+      (|P_a|=|P_{a₀}|=1)。⚠ 要 ≥2 nontrivial summands + index juggling。FPF↔pointStab=⊥ bridge も。
+- [ ] **imprimitive 分解 `E=⊕Eᵢ` 存在 (Maschke/Clifford)** + part (2) `E=⊕C_E(T_i)` + Schur。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
 - [x] **Prop 1 abelian-quotient step** ✅ `commutator_le_fitting_of_isCyclic_fitting` (complete, axiom-clean,

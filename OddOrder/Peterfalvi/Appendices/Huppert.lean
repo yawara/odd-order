@@ -166,6 +166,59 @@ theorem fixes_components_of_permutes_indep
     exact ha1 (Subgroup.disjoint_def.mp (hind.pairwiseDisjoint hij) ha (hcontra ▸ hb))
   · exact absurd (hi.trans hj.symm) hσ_ne
 
+/-- `P_{a*b} = P_a ⊓ P_b` for components `a ∈ S i`, `b ∈ S j` (`i ≠ j`) of a
+permuted independent family (part (1): `P_{a+b} = P_a ∩ P_b`, p. 135). -/
+theorem pointStabilizer_mul_eq_inf_of_components
+    {ι : Type*} {S : ι → Subgroup E} (hindep : iSupIndep S) (hcomm : ∀ y z : E, y * z = z * y)
+    (φ : P →* MulAut E) (perm : P → Equiv.Perm ι)
+    (hperm : ∀ (x : P) (k : ι), (S k).map (φ x).toMonoidHom = S (perm x k))
+    (hPodd : ∀ x : P, Odd (orderOf x))
+    {i j : ι} (hij : i ≠ j) {a b : E} (ha : a ∈ S i) (hb : b ∈ S j) (ha1 : a ≠ 1) (hb1 : b ≠ 1) :
+    pointStabilizer φ (a * b) = pointStabilizer φ a ⊓ pointStabilizer φ b := by
+  ext x
+  simp only [mem_pointStabilizer, Subgroup.mem_inf]
+  constructor
+  · intro hx
+    exact fixes_components_of_permutes_indep hindep hcomm φ perm hperm (hPodd x) hij ha hb ha1 hb1
+      hx
+  · rintro ⟨hxa, hxb⟩
+    rw [map_mul, hxa, hxb]
+
+/-- `a * b ≠ 1` for nontrivial components in distinct members of an independent family. -/
+theorem mul_ne_one_of_components
+    {ι : Type*} {S : ι → Subgroup E} (hindep : iSupIndep S)
+    {i j : ι} (hij : i ≠ j) {a b : E} (ha : a ∈ S i) (hb : b ∈ S j) (ha1 : a ≠ 1) :
+    a * b ≠ 1 := by
+  intro h
+  exact ha1 (Subgroup.disjoint_def.mp (hindep.pairwiseDisjoint hij) ha
+    (mul_eq_one_iff_eq_inv.mp h ▸ inv_mem hb))
+
+/-- **Peterfalvi Appendix B, Lemma, part (1)**: a constant point-stabilizer order forces
+equal point stabilizers `P_a = P_b` for components in distinct members of the permuted
+independent family (p. 135: `P_a = P_b`). -/
+theorem pointStabilizer_eq_of_components_of_constant [Finite P]
+    {ι : Type*} {S : ι → Subgroup E} (hindep : iSupIndep S) (hcomm : ∀ y z : E, y * z = z * y)
+    (φ : P →* MulAut E) (perm : P → Equiv.Perm ι)
+    (hperm : ∀ (x : P) (k : ι), (S k).map (φ x).toMonoidHom = S (perm x k))
+    (hPodd : ∀ x : P, Odd (orderOf x))
+    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+      Nat.card (pointStabilizer φ a) = Nat.card (pointStabilizer φ b))
+    {i j : ι} (hij : i ≠ j) {a b : E} (ha : a ∈ S i) (hb : b ∈ S j) (ha1 : a ≠ 1) (hb1 : b ≠ 1) :
+    pointStabilizer φ a = pointStabilizer φ b := by
+  have hab1 : a * b ≠ 1 := mul_ne_one_of_components hindep hij ha hb ha1
+  have hba1 : b * a ≠ 1 := mul_ne_one_of_components hindep (Ne.symm hij) hb ha hb1
+  have hinfab := pointStabilizer_mul_eq_inf_of_components hindep hcomm φ perm hperm hPodd
+    hij ha hb ha1 hb1
+  have hinfba := pointStabilizer_mul_eq_inf_of_components hindep hcomm φ perm hperm hPodd
+    (Ne.symm hij) hb ha hb1 ha1
+  have hPa : pointStabilizer φ a ⊓ pointStabilizer φ b = pointStabilizer φ a := by
+    apply Subgroup.eq_of_le_of_card_ge inf_le_left
+    rw [← hinfab]; exact (hconst (a * b) a hab1 ha1).ge
+  have hPb : pointStabilizer φ b ⊓ pointStabilizer φ a = pointStabilizer φ b := by
+    apply Subgroup.eq_of_le_of_card_ge inf_le_left
+    rw [← hinfba]; exact (hconst (b * a) b hba1 hb1).ge
+  exact le_antisymm (hPa ▸ inf_le_right) (hPb ▸ inf_le_right)
+
 /-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.
