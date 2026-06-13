@@ -115,9 +115,23 @@ conjugation Equiv で). sorry 不変 (2→2)。
       `IsCyclic.commGroup`、hirr 変換は `isAInvariant_iff_smul_mem.mpr`)、irreducible-非cyclic=**唯一の sorry**。
       `(hqp : q≠p)` を仮説追加 (hcop/hqE 導出)、hPodd は `orderOf x ∣ p^m` odd から。**Lemma を section
       Maschke 直後に移動** (fpf_of_reducible 前方参照回避)。⟹ **Lemma の sorry は irreducible-非cyclic のみ**。
-- [ ] **唯一残る real math = part(2) 非cyclic**: P 既約・非cyclic → R⊴P type-(p,p)
+- [ ] **唯一残る real math = part(2) 非cyclic** (Lemma の sorry): P 既約・非cyclic → R⊴P type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + Schur over F_q (`IsSimpleModule.End`)
       → `E=⊕C_E(T_i)` (r=p≥2 P-permuted) → part(1)(`fpf_of_constant_stabilizer_of_permuted_decomp`)。最難。
+
+### Prop 1 assembly 進捗 (sessions 13-15)
+完成済 building block (全 axiom-clean):
+- `isAInvariant_eq_bot_or_top_of_transitive` (transitive on E^# ⟹ irreducible) [s13]
+- `normal_isPGroup_eq_bot_of_faithful_irreducible` (faithful+irreducible ⟹ no normal q-subgroup
+  ⟹ q∤|F|) [s14]
+- `card_pointStabilizer_comp_eq_of_normal_of_transitive` (bridge: 定 stabilizer) [既存]
+- `commutator_le_fitting_of_isCyclic_fitting` (D solvable + F cyclic ⟹ commutator≤F) [既存]
+- `opCore_isCyclic_and_fpf_of_transitive` (per-prime: O_p(D) cyclic+FPF; Lemma を cite ゆえ explicit
+  sorry 無だが Lemma の sorry に transitive 依存) [s15]
+**Prop 1 残**: (a) F=∏O_p → F cyclic (per-prime + `fitting=⨆opCore` + nilpotent; ⚠ IsZGroup 経由 or
+  ∏-cyclic、API 未確認) + F FPF (各 O_p FPF + ∏ 構造) → fitting_cyclic_fixedPointFree の 1,2 連言;
+  (b) commutator≤F は `commutator_le_fitting_of_isCyclic_fitting` (要 `[IsSolvable D]` 追加 = FT 帰結)。
+  ⟹ Prop 1 を組めば explicit sorry 2→1 (Lemma 非cyclic のみ残)。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
