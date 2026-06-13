@@ -143,6 +143,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceCore
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_BGInterface

@@ -899,3 +899,468 @@ structure が供給) へ移動 — **教科書と同じ配置**。`mapOfInjectiv
    (η₁^{τ₁} 定数 on Z# 等)。これは genuine だが tractable (構成不能でない)。
 3. → X-coh w.r.t. hyp.tau → 既存 capstone glue (`coherentS_..._generator_mixed_inner`) で Y-coh と合流。
 **正本=本 session 39 cont.。難所の root cause を特定し faithful 化で解除 (回避でなく是正)。**
+
+## 2026-06-13 (session 39 cont.², /loop): case-B coherence の**正確な inventory** (旧 framing 訂正) + 新 leaf 着手
+
+**🔧 旧 framing 訂正 (重要)**: 「c2 X-coh = `certainType_isCoherent` (4.9) + certainTypeSet=Xset 同定」は
+**oversimplification/誤り**。`certainTypeSet` = {列和 μ_j 同次数} = (4.9) の 𝒯 で、Sibley Xset = {Ind_H^L θ}
+とは別パラメータ化。教科書 **(6.8.2)** の case-B coherence は**自己完結の別論法** (mmd 04.8 L178-224):
+- **(6.8.2.1)** η^{τ₁} は Z^# 上定数 [(1.9) Galois + (5.9.a) + Z⊆ker η]。
+- **(6.8.2.2)** (6.7)-合同 inner-product 公式 [reg-char 分解 + |H| mod]。
+- **(6.8.2.3)** X-側 (χ−aη₁)^τ 分解 [[Is]2.27, Z⊆Z(H)]。
+- τ₂ 組立。
+⟹ `certainType_isCoherent` は (4.9) として (6.8.2.3) 等で**部分利用**されうるが、case-B coherence の
+直接 producer ではない。**Don't re-grind「certainType_isCoherent=c2 X-coh 直結」**。
+
+**🔍 実 inventory (S08_CoherenceCore, 直接 grep; notes は信頼不可と判明)**: case-B は **central-Zc
+program** (Zc=`centralCommutator`=Z(H).map⊓[H,H]) として実装、**Frobenius + c2-caseA variant が大半 built**:
+- `Xset_centralCommutator_isCoherent_of_{frobenius,c2_caseA}` (9290/9325) / `_of_irreducible_X` (9112)。
+- `restrict_extension_Yset_const_on_centralCommutator_of_frobenius` (9820) = **(6.8.2.1) for Frobenius** (Zc, degree-value route)。
+- `coherentXunionYset_centralCommutator_of_himg_ortho` (9854) = X∪Y coh shell、**残=`himg_ortho`** (b≡c≡0 mod a, L3(3b))。
+- 全 `_of_frobenius` は `[IsPGroup p ↥H]` を**仮説 thread** ⟹ (6.5) p-群還元は capstone caller の義務。
+- **frontier = c2-math-case-B variant (Z=W₂ central prime) + himg_ortho + (6.5) + capstone 配線。**
+
+**🎯 重要 infra 発見 (notes 未記載)**: **(6.8.2.1) は一般形で既存** =
+`OddOrder.Peterfalvi.S07.IsCoherent.extension_constant_on_sharp_of_prime` (S07_CoherenceGalois:424、
+Z prime 要)。case-B は w₂ prime ゆえ適用可。かつ **`hyp.tau = dadeIntegralCharacterMap hyp.dade …`**
+(S08:3459 abbrev) ゆえ一般 lemma が `hyp.coherentYset` に直接適用可。
+- discharge 要件: hSirr (✅`isIrreducibleCharacter_of_mem_Yset` 4652)、hpair (✅`two_le_Yset_ncard`)、
+  hZp (✅case-B w₂ prime)、hZA (W₂⊆[H,H]⊆H ⟹ W₂^#⊆H^#=sharpImage H、易)、
+  hlat (✅coherentYset.extension_mem_ZIrr)、**hSu (Yset Galois-closed)**、**hspan (support)**、**hηx (η const on W₂)**。
+
+### ✅ landed (新 leaf `S08_CaseBCoherence.lean`, build-green+axiom-clean, full build 3802): keystone 補題
+`OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_induce` (一般): `σ(Ind_H^G θ) = Ind_H^G(σθ)`
+(σ:ℂ≃+*ℂ)。σ は ring hom で ⅟|H| (∈ℚ, `map_natCast`/`map_inv₀`) を固定 + induceTerm に termwise。
+⟹ **Yset Galois-closure (hSu) の engine** (各 Ind_H^L(linear χ) ↦ Ind_H^L(linear(σ∘χ)))。
+新 leaf は c2-case-B coherence の蓄積先 (root closure 配線済 OddOrder.lean:144)。
+
+### ▶ 次の一手 (新 leaf で積む、推奨順):
+1. **hSu = Yset Galois-closure**: `mapRingEquiv_induce` + linear-char Galois (σ∘χ linear≠1) + `mem_Yset_iff_exists_linear_source`。
+2. **hηx = η const on W₂** (case-B): η=Ind(linear θ), θ trivial on [H,H]⊇W₂, W₂⊆Z(H) ⟹ Ind 値計算 η(w)=η(1)。
+3. **hspan** (support 条件) + **hZA** (易) → これで `extension_constant_on_sharp_of_prime` を coherentYset@W₂ に適用 = **(6.8.2.1)-for-c2-case-B** landed。
+4. → (6.8.2.2) [(6.7)合同, peterfalvi_67 既存] → (6.8.2.3) → τ₂ 組立。‖ himg_ortho (Frobenius 側、別途)。
+
+**⚠ 正直評価**: case-B coherence は sustained-expert 多セッション仕事 (各 step に sub-lemma 群)。loop-tick
+では incremental brick を積む方針。本 session 39 全体: faithful cases fix (cont.) + 正確 inventory (cont.²) +
+keystone `mapRingEquiv_induce`。**正本=本 session 39 cont.²。**
+
+## 2026-06-13 (session 39 cont.³, /loop): hSu = Yset Galois-closure landed (S08_CaseBCoherence)
+
+**✅ landed (build-green + axiom-clean, full build 3802)**: (6.8.2.1)-for-c2-case-B の discharge を 2 補題前進。
+- **`ClassFunction.mapRingEquiv_linearIrreducibleCharacter`** (一般): `σ(linear χ) = linear((Units.map σ)∘χ)`
+  (`mapRingEquiv_apply`+`linearIrreducibleCharacter_apply`+`Units.coe_map`、`rfl`)。
+- **`SibleyDadeHypothesis.Yset_mapRingEquiv_mem` = `hSu`** (Yset Galois-closed): η=Ind(linear χ)∈Y ⟹
+  σ(η)=Ind(linear((Units.map σ)∘χ))∈Y (`mapRingEquiv_induce`+上記 linear twist+`induce_linearIrreducibleCharacter_mem_Yset`;
+  χ'≠1 は `Units.map_injective σ.injective`)。
+
+### `extension_constant_on_sharp_of_prime` 適用に向けた discharge 状況 (coherentYset @ Z=W₂, case B):
+- ✅ hτ (coherentYset)、✅ hSirr (`isIrreducibleCharacter_of_mem_Yset`)、✅ hpair (`two_le_Yset_ncard`)、
+  ✅ hZp (w₂ prime)、✅ hlat (coherentYset.extension_mem_ZIrr)、✅ **hSu (本 session)**、✅ hA' (le_refl)。
+- 🔴 残 2: **hZA** (W₂^#⊆sharpImage H、W₂⊆[H,H]⊆H ゆえ易) + **hspan** (φ∈zSpan Yset, φ(1)=0 ⟹ supp⊆A')
+  + **hηx** (η const on W₂; η=Ind(linear θ), θ trivial on [H,H]⊇W₂, W₂⊆Z(H) ゆえ Ind 値計算)。
+  ※ hx/hy は適用時の W₂ 元 (case-B context で供給)。
+
+### ▶ 次の一手 (S08_CaseBCoherence で積む):
+1. **hZA** (易、case-B W₂≤[H,H] から) — 次の brick。
+2. **hηx** (η const on W₂) — Ind 値計算 (W₂ central + θ trivial on [H,H])。
+3. **hspan** (Yset span support 条件) — Yset 元は H 上 supported ゆえ。
+4. → `extension_constant_on_sharp_of_prime` を組んで **(6.8.2.1)-for-c2-case-B** 完成 (η^{τ₁} const on W₂^#)。
+→ (6.8.2.2) [(6.7)合同] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.³。**
+
+## 2026-06-13 (session 39 cont.⁴, /loop): hZA + hηx landed (S08_CaseBCoherence)
+
+**✅ landed (build-green + axiom-clean, full build 3802)**: (6.8.2.1)-for-c2-case-B の discharge 2 件:
+- **`SibleyDadeHypothesis.coe_mem_sharpImage_of_mem_commutator` = `hZA`**: z∈⁅H,H⁆, z≠1 ⟹ (z:G)∈sharpImage H
+  (⁅H,H⁆≤H via `Subgroup.commutator_le`+`commutatorElement_def`)。
+- **`SibleyDadeHypothesis.Yset_apply_eq_apply_one_of_mem_commutator` = `hηx`** (η const on ⁅H,H⁆):
+  η=Ind(linear χ), z∈⁅H,H⁆⊆H◁L ⟹ 全 conj g⁻¹zg∈⁅H,H⁆ (normal)、χ は ⁅H,H⁆ で trivial
+  (commutator ↥H ↦ commutator ℂˣ=⊥ via `map_commutator`+`commutator_eq_bot_iff_le_centralizer`;
+  ⁅H,H⁆↔commutator ↥H は `(commutator ↥H).map H.subtype = ⁅H,H⁆`)、各 induceTerm=1 ⟹
+  η z = ⅟|H|·|L| = |W₁| = η 1 (`index_mul_card`+`index_H_eq_card_W1`+`invOf_mul_self`)。
+
+### (6.8.2.1)-for-case-B discharge: 残 hspan のみ (ほぼ free)
+🎯 **`hspan` は `zSpan_S_support_subset_of_apply_one_eq_zero` (S08_CoherenceCore:5775) からほぼ自動**:
+それは S 版 (φ∈zSpan S, φ(1)=0 ⟹ supp⊆supportInSubgroup(sharpImage H)L)。Yset⊆S (`Yset_subset_S`)
+⟹ zSpan Yset⊆zSpan S ⟹ Yset 版が span monotone で従う。
+
+### ▶ 次の一手:
+1. **hspan-for-Yset** (zSpan_S 版 + Yset⊆S、ほぼ free)。
+2. **(6.8.2.1)-for-case-B assembly**: `extension_constant_on_sharp_of_prime` を coherentYset@W₂ に適用
+   (hyp.cases から case-B data 抽出: h46/W₂ prime; hSirr=isIrreducibleCharacter_of_mem_Yset,
+   hlat=coherentYset.extension_mem_ZIrr, hpair=two_le_Yset_ncard wiring)。
+   ⟹ `coherentYset.extension η` は W₂^# 上定数 = **Peterfalvi (6.8.2.1)** 完成。
+3. → (6.8.2.2) [(6.7)合同 peterfalvi_67] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁴。**
+
+## 2026-06-13 (session 39 cont.⁵, /loop): 🎉 Peterfalvi (6.8.2.1) for case B COMPLETE
+
+**✅✅ milestone landed (build-green + axiom-clean, full build)**: case-B coherence の**第一 sub-step 完成**:
+`SibleyDadeHypothesis.coherentYset_extension_const_on_W2` (S08_CaseBCoherence): W₂ prime ∧ W₂⊆⁅H,H⁆,
+η∈Yset, x,y∈W₂^# ⟹ `coherentYset.extension η (y:G) = coherentYset.extension η (x:G)` (η^{τ₁} は W₂^# 上定数)。
+`S07.IsCoherent.extension_constant_on_sharp_of_prime` に全 hyp 供給して組立:
+- hSirr=`isIrreducibleCharacter_of_mem_Yset`、hSu=`Yset_mapRingEquiv_mem`、hlat=`extension_mem_ZIrr`+`subset_span`、
+  hpair=`Set.exists_ne_of_one_lt_ncard`(`two_le_Yset_ncard`)、hZp=hprime、hZA=`coe_mem_sharpImage_of_mem_commutator`、
+  hηx=`Yset_apply_eq_apply_one_of_mem_commutator`、hspan=`zSpan_S_support_subset_of_apply_one_eq_zero`(span_mono Yset⊆S)。
+- gotcha: lemma は **S07_CoherenceGalois** 在 (import 追加要); dot-notation 不可 → 完全修飾名で hτ 明示引数。
+
+### ▶ 次の一手 = Peterfalvi (6.8.2.2) (mmd 04.8 L186-206):
+φ∈Irr Z (Z=W₂), φ≠1 ⟹ `(Ind_Z^L φ − |H:Z|η₁)^τ = X − |H:Z|Y` (X⊥Y^{τ₁}, Y=η₁^{τ₁} or m=2 で −η₂^{τ₁})。
+証明骨子: α:=Ind_Z^L φ − |H:Z|η₁ は Supp⊆H^# → reciprocity `⟨α^τ,ψ⟩=⟨α,Res_L ψ⟩`、(6.8.2.1) で
+Res_Z ψ = aρ_Z+b1_Z、(6.7) `peterfalvi_67` で b≡ψ(1) mod |H| ⟹ ⟨α^τ,ψ⟩≡0 mod |H:Z|、norm 評価
+‖α^τ‖²=‖α‖²<2|H:Z|² で (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}。**(6.7) machinery (peterfalvi_67_centralCommutator,
+reg-char sumNonInflatedDegreeMulChar) は既 landed; reciprocity inner_dadeIntegralCharacterMap_eq_inner_restrict も既存。**
+→ (6.8.2.3) → τ₂ assembly。**正本=本 session 39 cont.⁵。**
+
+## 2026-06-13 (session 39 cont.⁶, /loop): (6.8.2.2) 着手 — α-support step landed
+
+**✅ landed (build-green + axiom-clean)**: (6.8.2.2) の「Supp(α)⊆H^#」step (α=Ind_{W₂}^L φ − c·η₁):
+- 一般 **`ClassFunction.support_induce_subset_of_le_normal`** (H'≤N, N◁G ⟹ supp(Ind_{H'}^G θ)⊆N;
+  `support_induce_subset_of_normal` の非正規 source 一般化、`induceTerm_of_not_mem`+`Normal.conj_mem`)。
+- **`SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage`**: W₂≤H, α(1)=0 (=Ind_{W₂}φ(1)=c·η₁(1))
+  ⟹ supp(Ind_{W₂}φ − c·η₁)⊆supportInSubgroup(sharpImage H)L (両 piece H-supported + α(1)=0 で 1 除去)。
+  ※ c (=|H:W₂|) は α(1)=0 仮説で defer (index 計算回避)。
+
+### ⚠ (6.8.2.2) 残ステップ + prerequisite gap:
+(6.8.2.2) 本体 = `(Ind_Z^L φ − |H:Z|η₁)^τ = X − |H:Z|Y` (X⊥Y^{τ₁})。残:
+1. **reciprocity** `⟨α^τ,ψ⟩=⟨α,Res_L ψ⟩` (✅ `inner_tau_eq_inner_restrict` + α-support 本 session)。
+2. 🔴 **reg-char 分解** `Res_Z ψ = aρ_Z + b1_Z` — **ρ_Z (regular character) が repo に無い** (要新規 def/補題)。
+   ψ=η^{τ₁} は (6.8.2.1) `coherentYset_extension_const_on_W2` で Z^# 上定数 ⟹ Res_Z ψ は Z^# 上定数
+   ⟹ aρ_Z+b1_Z 形。**ρ_Z 構築 + 「Z^# 上定数 ⟹ aρ+b1」が次の主 prerequisite。**
+3. **(6.7) 合同** b≡ψ(1) mod |H| (✅ `peterfalvi_67_centralCommutator`)。
+4. **norm endgame** ‖α^τ‖²=‖α‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}。
+
+### ▶ 次の一手: **ρ_Z (regular character) + 「class fn on Z const on Z^# = aρ_Z+b1_Z」**
+これが (6.8.2.2) reg-char step の前提。汎用 (任意有限群 Z)。→ then (6.8.2.2) assembly。
+**正本=本 session 39 cont.⁶。** **進捗 honest 評価: case-B coherence は (6.8.2.1)✅→(6.8.2.2)[multi-tick,
+ρ_Z 要]→(6.8.2.3)→τ₂→capstone→(6.5) の長い grind。steady brick/tick で進行中 (空転なし)。**
+
+## 2026-06-13 (session 39 cont.⁷, /loop): (6.8.2.2) reciprocity step landed
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.inner_tau_indW2_sub_smul_eq`:
+α=Ind_{W₂}φ−c·η₁ (α(1)=0), ψ∈CF G ⟹ `⟨α^τ,ψ⟩ = ⟨φ,Res_{W₂}Res_L ψ⟩ − c·⟨η₁,Res_L ψ⟩`
+(= (6.8.2.2) の `⟨α,Res_L ψ⟩ = ⟨φ,Res_Z ψ⟩ − |H:Z|⟨η₁,Res_L ψ⟩`)。
+`inner_tau_eq_inner_restrict` (α-support 経由) + `inner_sub_left`/`inner_smul_left` +
+Frobenius reciprocity `inner_induce_eq_inner_restrict`。**gotcha**: `inner φ (...)`/`induce W₂` の
+inner は ↥W₂ 上 ⟹ `[Fintype ↥W2]` を**binder** に要 (statement elaboration は proof の haveI より先)。
+
+### (6.8.2.2) 残: reg-char 分解 (ρ_Z) + 合同 + norm
+1. ✅ reciprocity (本 session)。
+2. 🔴 **reg-char 分解 (ρ_Z) — 次の主 prerequisite**: ψ const on Z^# ((6.8.2.1)) ⟹ Res_Z ψ=aρ_Z+b1_Z、
+   a=⟨φ,Res_Z ψ⟩∈ℤ、ψ(1)=a|Z|+b。**鍵関係 `ψ(1)−ψ(z) = |Z|·⟨φ,Res_Z ψ⟩` (z∈Z^#, φ∈Irr Z, φ≠1)**。
+   ρ_Z は repo に無いが `column_orthogonality_diagonal`/`_not_conjugate` (ColumnOrthogonality.lean) が道具。
+   ρ_Z を直接 `fun g => if g=1 then |Z| else 0` で def + ext で分解、or 鍵関係を column-orth で直接。
+3. (6.7) `peterfalvi_67_centralCommutator` で b≡ψ(1) mod |H| ⟹ a|Z|≡0 mod |H| ⟹ **a≡0 mod |H:Z|**。
+4. ⟹ ⟨α^τ,ψ⟩ = a − |H:Z|⟨η₁,Res ψ⟩ ≡ 0 mod |H:Z| + norm endgame ((x−1)²+(m−1)x²≤1)。
+
+**▶ 次の一手 = reg-char 分解 (鍵関係 ψ(1)−ψ(z)=|Z|⟨φ,Res ψ⟩ via column orthogonality)。正本=本 session 39 cont.⁷。**
+
+## 2026-06-13 (session 39 cont.⁸, /loop): (6.8.2.2) reg-char relation landed (ρ_Z 不要)
+
+**✅ landed (build-green + axiom-clean)** — ρ_Z を陽に作らず inner-product 直接計算で:
+- **`sum_apply_eq_zero_of_ne_trivial`** (一般): φ≠trivial irr ⟹ ∑_{g∈Γ} φ(g)=0
+  (orthonormality `irreducibleCharacter_inner` ⟨φ,1⟩=0 + trivial char 値1)。
+- **`apply_one_sub_apply_eq_card_mul_inner`** (一般, = (6.8.2.2) reg-char core): φ linear (φ(1)=1) nontrivial,
+  f const on Γ^# ⟹ **`f(1) − f(z) = |Γ|·⟨f, φ⟩`** (z≠1)。`Res_Z ψ = a ρ_Z + b 1_Z`, a=⟨Res ψ,φ⟩,
+  ψ(1)−ψ(z)=a|Z| の実質。innerSum split (`Finset.add_sum_erase` at 1) + ∑φ=0 + f-const + `classical` (erase 要 DecidableEq)。
+
+### (6.8.2.2) 残: (6.7) 合同統合 + norm endgame
+1. ✅ α-support, ✅ reciprocity (⟨α^τ,ψ⟩=⟨φ,Res ψ⟩−c⟨η₁,Res ψ⟩), ✅ reg-char relation (本 session)。
+2. 🔴 **統合**: a:=⟨Res_{W₂}Res_L ψ, φ⟩∈ℤ (φ linear ∈ Irr W₂)、ψ(1)−ψ(z)=|W₂|·a (reg-char relation)、
+   (6.7) `peterfalvi_67_centralCommutator`: ψ(1)≡ψ(z) mod |H| ⟹ |W₂|a≡0 mod |H|=|H:W₂||W₂| ⟹ **a≡0 mod |H:W₂|**。
+   ⟹ ⟨α^τ,ψ⟩ = a − |H:W₂|⟨η₁,Resψ⟩ ≡ 0 mod |H:W₂|。**conjugate 注意: ⟨φ,Resψ⟩ vs ⟨Resψ,φ⟩ (a 実整数で一致)。**
+3. 🔴 **norm endgame**: ‖α^τ‖²=‖α‖²<2|H:W₂|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}, m=2 if x=1。
+→ (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁸。**
+
+## 2026-06-13 (session 39 cont.⁹, /loop): c2 H-Sylow (coprimality-only) landed — (6.7) への前提
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.sylow_map_subtype_of_coprime`:
+H p-群 + `Nat.Coprime (card H) (card W1)` ⟹ ∃ Q∈Syl_p(G), Q=H.map L.subtype。
+**🔑 発見: `sylow_map_subtype_of_frobenius` は hF を coprimality 取得 (`coprime_card_kernel_complement`) に
+1 箇所しか使わない** ⟹ coprimality を直接取れば Frobenius でも c2 でも動く一般版。c2 case の `cases` 側
+条件 hcop がそれを供給。(dedupe 候補: S08_CoherenceCore の Frobenius 版はこれへ delegate 可。)
+
+### これで c2 (6.7) が組める: 残 (6.8.2.2) endgame
+1. ✅ α-support, reciprocity, reg-char relation, **c2 H-Sylow (本 session)**。
+2. 🔴 **c2 (6.7)**: `peterfalvi_67_centralCommutator` の c2 版 — `peterfalvi_67_of_odd` (SylowTICongruence:140) を
+   Q:=Ĥ (sylow_map_subtype_of_coprime), W₂⊆H# (coe_mem_sharpImage_of_mem_commutator) で適用。
+   ψ=η^{τ₁} は virtual char ⟹ irreducible constituents に (6.7) 適用 + 合成 (or ZIrr 版)。
+   結果: ψ(z)≡ψ(1) [ALGMOD |H|] for z∈W₂#。
+3. 🔴 **統合**: reg-char relation ψ(1)−ψ(z)=|W₂|·a (a=⟨Res ψ,φ⟩∈ℤ) + (6.7) |W₂|a≡0 mod |H| ⟹ a≡0 mod |H:W₂|
+   (ALGMOD→ℤ 整除 bridge 要)。⟹ ⟨α^τ,ψ⟩≡0 mod |H:W₂|。
+4. 🔴 **norm endgame**。
+→ (6.8.2.2) → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁹。**
+
+## 2026-06-13 (session 39 cont.¹⁰, /loop): η^{τ₁}=±irr landed; norm-1-ZIrr 既存判明
+
+**🔧 既存判明 (grep 不足の反省)**: norm-1 ZIrr 分類は**既存** — `exists_single_of_sum_sq_eq_one`
+(InducedIrreducible:322) + `exists_zsmul_irreducibleCharacter_of_inner_self_one` (398, docstring に
+「Peterfalvi (5.9.a) normalization step」明記)。自作 2 補題は重複 → revert。**再調査不要: norm-1 ZIrr=±irr は既存。**
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.coherentYset_extension_eq_zsmul_irreducible`:
+η∈Yset ⟹ ∃ ε=±1, ξ∈Irr G, `coherentYset.extension η = ε • ξ`。η irr (⟨η,η⟩=1 via bundled
+`irreducibleCharacter_inner`) + coherence norm 保存 (`extension_inner_eq`) + ZIrr (`extension_mem_ZIrr`)
+⟹ η^{τ₁} norm-1 ⟹ ±irr (`exists_zsmul_irreducibleCharacter_of_inner_self_one`)。
+**⟹ ψ=η^{τ₁} の (6.7) は単一既約 ξ に帰着** (ξ は η^{τ₁} の W₂^#-定数性を sign 込みで継承)。
+
+### (6.8.2.2) 残: c2 (6.7) for ξ + 統合 + norm
+1. ✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, **η^{τ₁}=±irr (本 session)**。
+2. 🔴 **c2 (6.7) for irreducible ξ**: `peterfalvi_67_of_odd` (SylowTICongruence:140) を Q:=Ĥ
+   (`sylow_map_subtype_of_coprime`), Z:=W₂, ξ const on W₂# で適用。
+   **hconst の第2項 = centralizer-card 定数性 |N_G(Ĥ)⊓C_G(w)| const on W₂#** が要 — c2 では
+   W₂⊆Z(H) (case B) ⟹ C_L(w)=H⋊C_{W₁}(w); W₁ の W₂ 上作用の定数性が鍵 (certain-type 構造、要精査)。
+   Frobenius は `inf_centralizer_centralCommutator_map` で供給; c2 W₂ 版は新規。
+3. 🔴 ALGMOD→ℤ 整除 + 統合 (a≡0 mod |H:W₂|) + norm endgame。
+**▶ 次 = centralizer-card 定数性 on W₂# (c2) or その精査。正本=本 session 39 cont.¹⁰。**
+
+## 2026-06-14 (session 39 cont.¹¹, /loop): centralizer-card 定数性 core landed (W₂ 中心性経由)
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.inf_centralizer_eq_of_mem_center`:
+w∈Z(↥L) ⟹ `(L:Subgroup G) ⊓ C_G((w:G)) = L`。**case B で W₂⊆Z(↥L)** (math-B 条件 W₂⊆Z(H) + W=W₁⊔W₂ cyclic
+⟹ W₂ も W₁ と可換 ⟹ W₂ 中心) ゆえ、W₂# 上 centralizer-card = |L| 定数 = `peterfalvi_67_of_odd` hconst
+第2項。Frobenius `inf_centralizer_centralCommutator_map` (=H) の case-B 類似 (=L、より単純)。
+
+### (6.8.2.2) 残: c2 (6.7) 組立 + 統合 + norm
+1. ✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, η^{τ₁}=±irr, **centralizer-card core (本 session)**。
+2. 🔴 **W₂⊆Z(↥L) 導出** (case B): math-B 条件 W₂⊆Z(H) [dichotomy `eq_bot_or_eq_of_le_of_card_prime` on Z(H)∩W₂、
+   W₂ prime] + W₁,W₂ 可換 (W cyclic) ⟹ W₂⊆Z(↥L)。**要: case-B 分岐の W₂⊆Z(H) を hypothesis 化 or 導出。**
+3. 🔴 **c2 (6.7) 組立**: `peterfalvi_67_of_odd` (P:=Ĥ via sylow_map_subtype_of_coprime, Z:=W₂,
+   ξ const on W₂#, hconst = [ξ const (要、ξ は η^{τ₁}=±ξ の W₂#-定数性継承) ∧ centralizer-card (本 session)])
+   → ξ(z)≡ξ(1) [ALGMOD |H|] → η^{τ₁}(z)≡η^{τ₁}(1) (ε 倍)。
+4. 🔴 ALGMOD→ℤ 整除 (a≡0 mod |H:W₂|) + 統合 + norm endgame。
+**▶ 次 = W₂⊆Z(↥L) 導出 (case-B) or c2 (6.7) 組立 (hconst の ξ-const 部分精査)。正本=本 session 39 cont.¹¹。**
+
+## 2026-06-14 (session 39 cont.¹², /loop): 逆 ALGMOD→ℤ bridge landed + warning cleanup
+
+**✅ landed (build-green + axiom-clean)**: `dvd_of_intCast_algMod`: (j:ℂ)≡(k:ℂ)[ALGMOD n] (j,k,n:ℤ, n≠0)
+⟹ n∣(j−k) in ℤ。`cong_def` で (j−k)/n が alg-int ⟹ rational ゆえ整数 (`isIntegral_rat_imp_int`
+ClassSumAlgebra) ⟹ n∣(j−k)。**🔑 (6.7) の ALGMOD|H| を rational-integer 差 ψ(1)−ψ(z)=|W₂|·a に適用 →
+|H|∣|W₂|·a (整除) の変換。gotcha: `set q:ℚ` で single Rat.cast に保つ (← のため; 分配されると
+isIntegral_rat_imp_int が unify せず)。`open scoped OddOrder.AlgInt` で [ALGMOD] 記法。**
++ warning cleanup (unused hyp→_hyp ×2, unused smul_eq_mul simp arg ×2; long-line は残置=cosmetic)。
+
+### (6.8.2.2) 残: c2 (6.7) 組立 + 統合 + norm
+✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, η^{τ₁}=±irr, centralizer-card core, **逆 ALGMOD bridge (本 session)**。
+🔴 残: (1) **W₂⊆Z(↥L) 導出** (case-B: W₂⊆Z(H)+W cyclic); (2) **c2 (6.7) 組立** =
+`peterfalvi_67_of_odd` を ξ (η^{τ₁}=±ξ の rep 版、要 IrreducibleCharacter→Representation bridge),
+P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core)] で適用 → ξ(z)≡ξ(1) [ALGMOD|H|];
+(3) **統合**: reg-char (ψ(1)−ψ(z)=|W₂|a) + 逆 bridge (本 session) ⟹ |H|∣|W₂|a ⟹ a≡0 mod |H:W₂| ⟹
+⟨α^τ,ψ⟩≡0 mod |H:W₂|; (4) **norm endgame**。
+**▶ 次 = IrreducibleCharacter→Representation bridge (c2 (6.7) 組立用) or W₂⊆Z(↥L) 導出。正本=本 session 39 cont.¹²。**
+
+## 2026-06-14 (session 40, /loop): case-B (6.7) machinery + 統合 core 完成 (3 commits)
+
+**✅✅✅ landed (build-green + axiom-clean, S08_CaseBCoherence)** — (6.8.2.2) の (6.7) 鎖を一気に 3 brick:
+
+1. **`peterfalvi_67_central` (74a0f0b1)** = case-(B) (6.7) adapter (Frobenius `peterfalvi_67_centralCommutator`
+   の central-Z 版)。abstract `Z ≤ H` central in ↥L (`Z ≤ Subgroup.center ↥L`) + irreducible ρ const on
+   (Z.map L.subtype)^# ⟹ `ρ.character z ≡ ρ.character 1 [ALGMOD |H|]`。`peterfalvi_67_of_odd` の全構造仮説を
+   P:=Ĥ (`sylow_map_subtype_of_coprime`)・Z:=Z.map L.subtype で discharge: hZnormal (central⇒normal inline),
+   hPz (Ĥ≤L≤C_G(z) since z central), hconst centralizer-card (両辺=|L| via `inf_centralizer_eq_of_mem_center`)。
+   **Sylow は `cases` の coprimality のみ使用 (Frobenius 非依存)。**
+
+2. **`restrict_extension_Yset_charValue_cong_caseB` (a1c7b699)** = consumer (Frobenius
+   `restrict_extension_Yset_charValue_cong_of_frobenius` ミラー)。η^{τ₁}=ε•ξ
+   (`coherentYset_extension_eq_zsmul_irreducible`) → **ξ=ρ.character は `ξ.isIrreducible` で既存**
+   (🔧 「bridge を作る」は grep 不足の誤認; IrreducibleCharacter→Representation は既存) → (6.8.2.1) constancy
+   `coherentYset_extension_const_on_W2` を ρ.character へ transfer (ε cancel) → adapter →
+   `Res^G_L(η^{τ₁})(z) ≡ Res^G_L(η^{τ₁})(1) [ALGMOD |H|]` for z∈W₂^#。**`W₂ ⊆ Z(↥L)` は hypothesis (deferred)。**
+
+3. **`card_H_dvd_card_W2_mul_regCharCoeff` (7b875b23)** = 統合 core。φ linear nontrivial ∈ Irr W₂,
+   a=⟨Res_{W₂}Res_L ψ, φ⟩=m∈ℤ ⟹ **`|H| ∣ |W₂|·m`**。z₀∈W₂^# (prime⇒nontrivial) で f=Res_{W₂}Res_L ψ
+   const on W₂^# (`coherentYset_extension_const_on_W2`) → reg-char `apply_one_sub_apply_eq_card_mul_inner`
+   で f(1)−f(z₀)=|W₂|·m → (6.7) consumer で f(z₀)≡f(1) → f(1)−f(z₀)≡0 → 差が ℤ 値 |W₂|·m ⟹
+   `dvd_of_intCast_algMod` で |H|∣|W₂|·m。gotcha: `set f` 下で `simpa using restrict_apply` は
+   `this→True` に潰れる → term-mode `:= restrict_apply ...` (W₂.subtype 1 ≡ 1 defeq) で hf1/hfz。
+
+### ⚠ (6.8.2.2) 残 (司令塔/次 loop 向け):
+1. **|W₂| cancel**: `|H| ∣ |W₂|·m` + `|H| = (W₂.subgroupOf H).index · |W₂|` (`index_mul_card` +
+   `card_subgroupOf` + `inf_eq_left.mpr hW2H`) ⟹ `(W₂.subgroupOf H).index ∣ m` (`mul_dvd_mul_iff_left`, |W₂|>0)。
+2. **⟨α^τ,ψ⟩ ≡ 0 mod |H:W₂|** (ψ∈𝒴^{τ₁})**: reciprocity `inner_tau_indW2_sub_smul_eq`
+   (⟨α^τ,ψ⟩=⟨φ,Res_{W₂}Res_L ψ⟩−c⟨η₁,Res_L ψ⟩, c=|H:W₂|, α(1)=0 要) + ⟨φ,Res ψ⟩=conj(m)=m (整数) +
+   |H:W₂|∣m (step1) + ⟨η₁,Res ψ⟩∈ℤ (`mem_ZIrr_inner_int`) ⟹ ⟨α^τ,ψ⟩ = m − |H:W₂|·(ℤ) ∈ |H:W₂|ℤ。
+   ※ α^τ∈ZIrr G & ψ∈ZIrr G で ⟨α^τ,ψ⟩∈ℤ (`inner_mem_ZIrr_int`) — 整数値の divisibility として述べる。
+3. **j>1 の値**: ⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩ = ⟨α, η_j−η_1⟩ = |H:Z| (reciprocity + Y-degree |W₁|)。
+4. **α^τ 分解**: α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (step2,3 から)。
+5. **norm**: ‖α^τ‖²=‖α‖²=|L:Z|+|H:Z|² (Pf (1.5.b)), |L:Z|=|W₁||H:Z|<|H:Z|² (W₁ FPF on H/Z) ⟹
+   ‖α^τ‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0, or x=1∧m=2。⟹ **(6.8.2.2) 完成** → (6.8.2.3) → τ₂。
+- **W₂⊆Z(↥L) 導出 (deferred 仮説)**: math-B `W₂⊆Z(H)` (`eq_bot_or_eq_of_le_of_card_prime` on Z(H)⊓W₂,
+  prime) + W cyclic (W₁,W₂⊆W abelian) ⟹ W₂⊆Z(↥L)。Hypothesis46 の W cyclic structure 要精査。
+**正本=本 session 40。** 進捗良好 (空転なし, steady brick/tick)。
+
+## 2026-06-14 (session 40 cont., /loop): (6.8.2.2) step 1 完成 — ⟨α^τ,ψ⟩≡0 mod |H:W₂| (2 commits)
+
+**✅✅ landed (build-green + axiom-clean)** — (6.8.2.2) の第一主ステップ完了:
+
+4. **`index_W2_dvd_regCharCoeff` (c8930ded)** = |W₂| cancel。`card_H_dvd...` (|H|∣|W₂|m) +
+   |H|=|W₂|·[H:W₂] (`index_mul_card` on W₂.subgroupOf H + `subgroupOfEquivOfLe` で card 同一視 +
+   `relIndex` defeq subgroupOf.index) + `mul_dvd_mul_iff_left` (|W₂|≠0) ⟹ `(W₂.subgroupOf H).index ∣ m`
+   (= 教科書 a≡0 mod |H:Z|)。
+5. **`inner_tau_alpha_dvd_index` (b75a06da)** = **⟨α^τ,ψ⟩ ∈ ℤ ∧ |H:W₂| ∣ it** (ψ=η'^{τ₁}∈𝒴^{τ₁})。
+   - **c=|H:W₂| を直接計算** (hypothesis 化不要): Ind_{W₂}φ(1)=[L:W₂]·φ(1)=[H:W₂]·|W₁|=|H:W₂|·η₁(1)
+     (`induce_apply_one`+`relIndex_mul_index`+`index_H_eq_card_W1`+`Yset_apply_one`)。
+   - reciprocity `inner_tau_indW2_sub_smul_eq` で ⟨α^τ,ψ⟩=⟨φ,Res_{W₂}Res_L ψ⟩−|H:W₂|·⟨η₁,Res_L ψ⟩。
+   - ⟨φ,Res⟩=star⟨Res,φ⟩=m (`inner_conj_symm`+`mem_ZIrr_inner_int`, m整数), |H:W₂|∣m (step4);
+     ⟨η₁,Res_L ψ⟩=b'∈ℤ (flip)。⟹ ⟨α^τ,ψ⟩=m−|H:W₂|·b', |H:W₂|∣it。
+   - gotchas: `inner_conj_symm` は mathlib `_root_.inner_conj_symm` と ambiguous→`OddOrder.RepresentationTheory.`
+     完全修飾; `restrict_mem_ZIrr`→`ClassFunction.restrict_mem_ZIrr`; `[Fintype ↥W2]` は型に出ない
+     (inner は G 上のみ)→ binder 削除 + `haveI := Fintype.ofFinite _` (sibling lemmas は型に W₂-inner があり要)。
+
+### ⚠ (6.8.2.2) 残 (decomposition + norm cluster, 次 loop):
+6. **j>1 の値**: ⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩ = ⟨α, η_j−η_1⟩ = |H:Z| (reciprocity `inner_tau_eq_inner_restrict`
+   + Y inner: Res_L(η_k^{τ₁}) と η_j の inner; η^{τ₁} coherence の等長性使用)。←要 Y-coherence inner API 精査。
+7. **α^τ 分解**: step5+6 から α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (x∈ℤ)。
+   ← 𝒴^{τ₁} 正規直交基底への射影分解。
+8. **norm endgame**: ‖α^τ‖²=‖α‖² (τ 等長, Pf (1.5.b)/(2.x)) =|L:Z|+|H:Z|², |L:Z|=|W₁||H:Z|<|H:Z|²
+   (W₁ FPF on H/Z≠1) ⟹ ‖α^τ‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0, or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。
+   ← ‖α‖² 計算 (Ind norm + η₁ norm + cross term) + W₁-FPF-on-H/Z の |L:Z|=|W₁||H:Z| が要点。
+→ (6.8.2.3) → τ₂ → (6.8) capstone。**正本=本 session 40 cont.。** 全 brick build-green+axiom-clean, 空転なし。
+
+## 2026-06-14 (session 40 cont.², /loop): decomposition+norm 基盤 2 brick + 構造解明
+
+**🔑 構造解明 (再調査不要)**: (6.8.1) Frobenius case が (6.8.2.2) と**構造平行**で直接テンプレ:
+- `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius` (S08_CoherenceCore:10462) = step6 cross-term テンプレ。
+- `inner_self_tau_scaledDiff_of_frobenius` (:10524) = step8 norm テンプレ。
+- **Dade isometry** = `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj (S:={...}) (hsupp) (mem)(mem)` ⟹ ⟨τφ,τψ⟩=⟨φ,ψ⟩ (φ,ψ supported on `supportInSubgroup (sharpImage H) L`)。**`hyp.tau` は defeq `dadeIntegralCharacterMap hyp.dade (fullDadeIsometryData hconj)`** ゆえ `exact` 一発。
+- **coherence agreement** = `S07.IsCoherent.extends_on_supported`: β∈zSupportedSpan Yset A ⟹ extension β = tau β (A=supportInSubgroup, NOT L^#)。**Y-diff η_j−η_1 は supported** (`sMember_diffSupport_of_charValue_eq`, η_j(1)=η_1(1)=|W₁|)。
+- **η∈Y は W₂ 上定数** = `Yset_apply_eq_apply_one_of_mem_commutator` (W₂⊆⁅H,H⁆) ⟹ Res_{W₂}η_j=Res_{W₂}η_1。
+
+**✅✅ landed (build-green + axiom-clean)**:
+6. **`inner_self_tau_indW2_sub_smul` (57c4ccc8)** = **‖α^τ‖²=‖α‖²** (α=Ind_{W₂}φ−c•η₁, α(1)=0)。
+   `support_indW2_sub_smul_subset_sharpImage` + Dade isometry on {α} singleton。`exact` 一発。
+7. **`inner_induce_W2_Yset_diff_eq_zero` (4dde3faa)** = **⟨Ind_{W₂}φ, η'−η⟩=0** (Res_{W₂}η'=Res_{W₂}η, η const on W₂)。
+   reciprocity `inner_induce_eq_inner_restrict` + restrict 等価。
+
+### ⚠ (6.8.2.2) 残 (次 loop):
+- **step6 full** `⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩=|H:Z|`: agreement [(η_j^{τ₁}−η_1^{τ₁})=extension(η_j−η_1)=tau(η_j−η_1),
+  extension の map_sub 線型 + extends_on_supported] + isometry [dadeICM_inner_eq on {α, η_j−η_1}] +
+  source [本 session ⟨Ind φ,η_j−η_1⟩=0 ∧ ⟨η₁,η_j−η_1⟩=−1 (Y orthonormal)] ⟹ ⟨α,η_j−η_1⟩=0−|H:Z|(−1)=|H:Z|。
+- **step7 分解**: α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (step1 ≡0 mod |H:Z| + step6 から
+  𝒴^{τ₁} 正規直交基底への射影)。
+- **step8 norm endgame**: ‖α‖²=‖Ind_{W₂}φ‖²−2|H:Z|Re⟨Ind φ,η₁⟩+|H:Z|²‖η₁‖²。⟨Ind φ,η₁⟩=⟨φ,Res η₁⟩=
+  |W₁|⟨φ,1⟩=0 (φ nontrivial), ‖η₁‖²=1, ‖Ind_{W₂}φ‖²=⟨φ,Res Ind φ⟩=|I_L(φ):W₂|=|L:W₂| (要 I_L(φ)=L, Pf(1.5.b)) ⟹
+  ‖α‖²=|L:W₂|+|H:W₂|²。|L:W₂|=|W₁||H:W₂|<|H:W₂|² (W₁ FPF on H/Z, |W₁|<|H:W₂|) ⟹ ‖α^τ‖²<2|H:W₂|² ⟹
+  (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。← ‖Ind φ‖²=|L:W₂| (Mackey/inertia) と FPF が要点。
+→ (6.8.2.3) → τ₂ → capstone。**正本=本 session 40 cont.²。** 全 brick green+axiom-clean、空転なし。
+
+## 2026-06-14 (session 40 cont.³, /loop): cross-term + agreement + inertia=⊤ (3 brick)
+
+**✅✅✅ landed (build-green + axiom-clean)**:
+8. **`inner_tau_indW2_sub_smul_tau_Yset_diff` (9eb006cf)** = step6 cross-term `⟨α^τ, (η'−η₁)^τ⟩ = c`
+   (Dade isometry on {α, η'−η₁} + source `inner_induce_W2_Yset_diff_eq_zero` + Y-orthonormal)。
+   **inner は arg1 線型** (`inner_smul_left` = `c * ⟨⟩`, NOT star c) → 値は c。
+9. **`coherentYset_extension_Yset_diff_eq_tau` (44d38256)** = agreement `η'^{τ₁}−η₁^{τ₁} = (η'−η₁)^τ`
+   (`extends_on_supported` + `map_sub` + zSupportedSpan membership)。cross-term を extension 形へ変換。
+10. **`inertia_eq_top_of_le_center` (339e848c)** = central W₂ ⟹ `inertia φ = ⊤` (conjBy 自明、`mem_center_iff`)。
+    一般補題 (hyp 不要、`omit [Fintype G][Fintype ↥L][Invertible G][Invertible ↥L]`)。
+
+**⚠ 過程ミス (記録)**: warning cleanup で `omit … in` を docstring の後ろに置き build-red commit (917fc62d)→follow-up 3 件で復旧。教訓=build 緑確認と commit を別 bash step に ([[feedback-verify-build-before-commit]])。
+
+### ⚠ (6.8.2.2) 残 (次 loop):
+- **‖Ind_{W₂}φ‖² = |L:W₂|**: `card_mul_inner_self_induce_eq_card_inertia` (|W₂|·‖Ind φ‖²=|inertia|) +
+  `inertia_eq_top_of_le_center` (=⊤, card=|L|) + |W₂| 除算 ⟹ ‖Ind φ‖²=|L|/|W₂|=|L:W₂|。φ:IrreducibleCharacter W₂ 要。
+- **‖α‖² = |L:W₂| + |H:W₂|²**: ‖Ind φ − c•η₁‖² 展開。⟨Ind φ,η₁⟩=⟨φ,Res η₁⟩=|W₁|⟨φ,1⟩=0 (φ nontrivial; Res η₁=|W₁|·1 既証
+  `inner_induce_W2_Yset_diff_eq_zero` の中身), ‖η₁‖²=1, c=|H:W₂|。
+- **|L:W₂| < |H:W₂|²** = |W₁|<|H:W₂| (W₁ FPF on H/Z; case-B 構造要精査) → ‖α^τ‖²<2|H:W₂|²。
+- **step7 分解** (α^τ を 𝒴^{τ₁} 正規直交基底へ射影) + **step8 quadratic** ((x−1)²+(m−1)x²≤1 ⟹ x∈{0,1})。
+→ (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 40 cont.³。**
+
+## 2026-06-14 (session 40 cont.⁴, /loop): norm-source 完成 (3 brick) — ‖α^τ‖²=|L:W₂|+c·c̄
+
+**✅✅✅ landed (build-green + axiom-clean, 各 commit 前に別 step で緑検証)**:
+11. **`inner_self_induce_eq_index_of_le_center` (6045d392)** = **‖Ind_{W₂}φ‖²=|L:W₂|=W₂.index** (central W₂)。
+    `card_mul_inner_self_induce_eq_card_inertia` (|W₂|·‖Ind φ‖²=|inertia|) + `inertia_eq_top_of_le_center`
+    (=⊤, `Subgroup.card_top`=|L|) + `card_mul_index` (|L|=|W₂|·index) + `mul_left_cancel₀`。
+    ⚠ `card_mul_inner_self_induce_eq_card_inertia` は `[Invertible (Nat.card ↥W2:ℂ)]` 要 (instance 失敗が whnf timeout 誘発)。
+12. **`inner_induce_W2_Yset_eq_zero` (5a7d6a69)** = **⟨Ind_{W₂}φ, η⟩=0** (φ nontrivial)。reciprocity +
+    Res_{W₂}η=const|W₁| (η const on ⁅H,H⁆⊇W₂) + ∑_w φ(w)=0 (`sum_apply_eq_zero_of_ne_trivial`)。
+13. **`inner_self_indW2_sub_smul_eq` (64b3a78c)** = **‖α‖²=W₂.index + c·star c** (α=Ind φ−c•η₁)。
+    展開 + ‖Ind φ‖²=index + ⟨Ind φ,η₁⟩=0 (+conj) + ‖η₁‖²=1。c=(|H:W₂|:ℂ) で c·c̄=|H:W₂|² ⟹ |L:Z|+|H:Z|²。
+
+### 📋 norm endgame 材料 全 landed:
+- ‖α^τ‖²=‖α‖² (`inner_self_tau_indW2_sub_smul`) ∘ ‖α‖²=W₂.index+c·c̄ (`inner_self_indW2_sub_smul_eq`)
+  ⟹ **‖α^τ‖² = W₂.index + c·star c**。
+- step1: ⟨α^τ,ψ⟩∈ℤ ∧ |H:W₂|∣it (`inner_tau_alpha_dvd_index`)。
+- step6: ⟨α^τ,(η'−η₁)^τ⟩=c (`inner_tau_indW2_sub_smul_tau_Yset_diff`) + agreement (`coherentYset_extension_Yset_diff_eq_tau`)。
+
+### ⚠ (6.8.2.2) 残 = 最終 assembly (次 loop; ここからが構造的ハードコア):
+- **FPF bound `|W₁| < |H:W₂|`** ⟹ W₂.index=|L:W₂|=|W₁|·|H:W₂|<|H:W₂|² ⟹ ‖α^τ‖²<2|H:W₂|²。
+  ← case-B (c2) 構造: W₁ acts FPF on H/W₂ (C_H(w)=W₂ for w∈W₁#)。Hypothesis46/certain-type 要精査。
+- **step7 分解**: α^τ を 𝒴^{τ₁} 正規直交基底へ射影 → α^τ = X − c·η_1^{τ₁} + x·c·∑_j η_j^{τ₁}, X⊥𝒴^{τ₁}
+  (step1 ≡0 mod c + step6 差=c から係数決定)。← 射影論法 (Frobenius (6.8.1) に類似テンプレ有?要調査)。
+- **step8 quadratic**: ‖α^τ‖²=‖X‖²+c²(x−1)²+(m−1)x²c² <2c² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2。
+- **最終 statement** `α^τ = X − |H:Z|η_1^{τ₁}` (b=0 reduction) → (6.8.2.3) → τ₂。
+**正本=本 session 40 cont.⁴。** norm-source 完結、残=射影分解+FPF+quadratic。空転なし。
+
+## 2026-06-14 (session 40 cont.⁵, /loop): variant trichotomy landed; decomposition recipe確定
+
+**✅ landed (build-green + axiom-clean)**:
+14. **`eq_zero_or_edge_of_dvd_of_normLt` (cbf69fc6)** = quadratic trichotomy `< 2a²` 変種
+    (`eq_zero_or_edge_of_dvd_of_normBound` の `≤1+a²` を `<2a²` に; case-B norm |L:Z|+a²<2a² 用)。pure ℤ。
+
+### 🔑 decomposition assembly recipe (Brick C, 次 loop = full focus 一気に):
+**テンプレ = `coeff_eq_neg_or_edge_of_frobenius` (S08_CoherenceCore:10639-10780) を逐行ミラー**、ingredient 差替:
+- step3 bb: `dvd_inner_tau_scaledDiff_extension...frobenius` → **`inner_tau_alpha_dvd_index` (η':=η₁)**
+  ⟹ `∃ bb, ⟨α^τ, extension η₁⟩=bb ∧ index∣bb`。
+- hcoeff (⟨α^τ,extension η⟩=bb or bb+c): `inner_tau_scaledDiff_tau_Yset_diff...frobenius` →
+  **`inner_tau_indW2_sub_smul_tau_Yset_diff` (=c) + `coherentYset_extension_Yset_diff_eq_tau` (agreement)**。
+  η≠η₁ 枝: htaud = agreement.symm, hconst = cross-term, `inner_sub_right` で ⟨α^τ,ext η⟩=bb+c。
+- Bessel: **`sum_sq_le_inner_self_re horth (α^τ) hβval`** (S08_CoherenceCore:150) — そのまま。
+  horth/hEinj/hβval/hsum は Frobenius と同形 (Yset_finite.toFinset.image extension, hYon, hEinj)。
+- norm_re: `inner_self_tau_scaledDiff...frobenius` (=1+a²) → **`inner_self_tau_indW2_sub_smul` ∘
+  `inner_self_indW2_sub_smul_eq`** ⟹ ‖α^τ‖²=W₂.index + c·star c。c=(index:ℂ) real ⟹ star c=c ⟹ =W₂.index+c²。
+  `.re` 取り: (W₂.index + c²).re = W₂.index+c² (実)。⚠ c=((W₂.subgroupOf H).index:ℂ), star c=c via `Complex.star_ofNat`/`star_natCast`。
+- trichotomy: `eq_zero_or_edge_of_dvd_of_normBound` (≤1+a²) → **`eq_zero_or_edge_of_dvd_of_normLt` (<2a²)**。
+  hsum: bb²+(m−1)(bb+c)² ≤ W₂.index+c² (Bessel)。**要 FPF bound W₂.index<c²** ⟹ <2c² ⟹ apply variant
+  (a=c=(W₂.subgroupOf H).index, b=bb+c, m=Yset.ncard)。⟹ bb=−c ∨ (m=2∧bb=0)。
+- 結論: `⟨α^τ, extension η₁⟩ = −c ∨ (Yset.ncard=2 ∧ ⟨α^τ,extension η₁⟩=0)` (= Frobenius と同形)。
+
+### ⚠ 残 (Brick C と並行 or 後):
+- **Brick B = FPF bound `W₂.index < |H:W₂|²`** (= |W₁|<|H:W₂|): case-B C_H(w)=W₂ (w∈W₁#) ⟹ W₁ FPF on H/W₂ ⟹
+  |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂|。**Brick C は FPF を hypothesis で受けて defer 推奨** (W₂⊆Z(↥L) と同パターン)。
+  Hypothesis46/certain-type の C_H(w)=W₂ + FPF-order-divides 要調査。
+- Brick C 後: 最終 (6.8.2.2) statement (b=0 reduction, m=2 swap) → (6.8.2.3) → τ₂。
+**正本=本 session 40 cont.⁵。全 ingredient 在庫確認済 (Bessel/Yset_finite/two_le_Yset_ncard/variant)。空転なし。**
+
+## 2026-06-14 (session 40 cont.⁶, /loop): 🎉 coefficient dichotomy COMPLETE (Brick C, first-try build)
+
+**✅✅✅ MILESTONE landed (build-green + axiom-clean, 初回 build 一発)**:
+15. **`coeff_eq_neg_or_edge_caseB` (b487fab8)** = **(6.8.2.2) coefficient dichotomy**
+    `⟨α^τ, η₁^{τ₁}⟩ = −|H:Z| ∨ (|Y|=2 ∧ =0)` (α=Ind_{W₂}φ−|H:Z|η₁)。
+    `coeff_eq_neg_or_edge_of_frobenius` (S08_CoherenceCore:10639) を逐行ミラー、ingredient 全差替成功:
+    inner_tau_alpha_dvd_index (bb) / inner_tau_indW2_sub_smul_tau_Yset_diff + coherentYset_extension_Yset_diff_eq_tau
+    (hcoeff) / sum_sq_le_inner_self_re (Bessel) / inner_self_tau_indW2_sub_smul∘inner_self_indW2_sub_smul_eq
+    (norm |L:Z|+|H:Z|²) / eq_zero_or_edge_of_dvd_of_normLt (trichotomy)。
+    **deferred hypotheses: hc2 (2≤|H:Z|), hFPF (|L:Z|<|H:Z|²)** = W₁-FPF-on-H/W₂ inputs。
+    → **(6.8.2.2) の inner-product/norm/dichotomy 解析は全完了**。残=構造的 input + 最終 X-structure。
+
+### ⚠ (6.8.2.2) 残 = 構造的 input + 最終 statement (次 loop):
+- **Brick B = FPF bound `hc2`/`hFPF`** (deferred): case-B (c2) で C_H(w)=W₂ (w∈W₁#) ⟹ W₁ acts FPF on H/W₂
+  (H/W₂≠1) ⟹ |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|=|W₁||H:W₂|<|H:W₂|² (=hFPF), 2≤|H:W₂| (=hc2)。
+  **要調査**: Hypothesis46/certain-type の C_H(w)=W₂ field + FPF-order-divides (Frobenius 群 |kernel|≡1 mod |compl|?
+  Isaacs Ch06 IsFrobeniusGroup or coprime action の `card_eq_...` 系)。|L:W₂|=|W₁||H:W₂| は relIndex_mul_index。
+- **X-structure (step 4)** = `coeff_eq_neg_or_edge_of_frobenius` 後の Frobenius step-4 (S08_CoherenceCore:10774
+  `...X-structure...`) を case-B でミラー: bb=−|H:Z| branch で X:=α^τ+|H:Z|η₁^{τ₁} ⊥ 𝒴^{τ₁}, ‖X‖²=‖Ind φ‖²/...,
+  X∈ZIrr ⟹ α^τ=X−|H:Z|η₁^{τ₁}。→ (6.8.2.3) → τ₂ assembly → (6.8.2) capstone。
+**正本=本 session 40 cont.⁶。** 🎉 dichotomy は (6.8.2.2) 最大の技術的山場、first-try で landed。空転なし。
+
+## 2026-06-14 (session 40 cont.⁷, /loop): good-case X-structure landed; FPF deferred (deep)
+
+**✅ landed (build-green + axiom-clean)**:
+16. **`orthogonal_tau_indW2_add_extension_caseB` (b1cdc2d5)** = (6.8.2.2) good-case X-structure。
+    `orthogonal_normOne_tau_scaledDiff_add_extension` (S08_CoherenceCore:10786) ミラー (norm 落とし)。
+    hgood (⟨α^τ,η₁^{τ₁}⟩=−|H:Z|) ⟹ X:=α^τ+|H:Z|η₁^{τ₁} ⊥ 𝒴^{τ₁} ∧ X∈ZIrr G ⟹ α^τ=X−|H:Z|η₁^{τ₁}。
+    Ind_{W₂}φ∈ZIrr=`induce_mem_ZIrr`+`IsIrreducibleCharacter.mem_ZIrr φ.2`; α^τ∈ZIrr=`dadeIntegralCharacterMap_mem_ZIrr_of_supported`。
+    gotcha: `classical` 要 (if-Decidable); `if_neg (Ne.symm hee)` (`.symm` は ¬-arrow に projection 不可)。
+
+### 🔭 FPF bound (hc2/hFPF) discharge = 深い構造 (調査結果, defer 継続):
+- 必要: case-B `CertainTypeHypothesis.centralizer_W2` (C_L(x)⊓K=W₂, x∈W₁#) → W₁ acts FPF on H/W₂ →
+  `IsFrobeniusGroup` 化 → `card_kernel_modEq_one` (Isaacs Ch06 FrobeniusGroup:274, |kernel|≡1 mod |compl|)
+  ⟹ |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|=|W₁||H:W₂|<|H:W₂|² (=hFPF), |H:W₂|≥2 (=hc2)。
+- **generic W2 と certain-type W₂ の接続**: 私の lemma 群は generic W2 (hW2comm/hW2cen 仮説)。case-B 適用時
+  W2=h46.W2。FPF は h46.W2 専用 ⟹ **discharge は capstone wiring 時 (Hypothesis46 構造完備の場所)**。
+  faithful (textbook も case-B 仮説下で (6.8.2.2) 証明)。**今は defer 継続が正しい**。
+
+### ⚠ (6.8.2.2) 残 (character-theoretic, 次 loop tractable):
+- **m=2 swap case** (bb=0 branch): η₁^{τ₁}↔−η₂^{τ₁} 入替で good-case に帰着 (textbook L: "second case reduces")。
+- **(6.8.2.2) 最終 statement** = dichotomy + X-structure (両 branch) を `α^τ = X − |H:Z|Y` 形に組立。
+- → **(6.8.2.3)** (χ∈X 版, [Is]2.27) → **τ₂ assembly** (6.8.2 proof) → capstone case-B branch。
+**正本=本 session 40 cont.⁷。** (6.8.2.2) decomposition は good-case 完成。残=m=2 case + (6.8.2.3) + τ₂ + FPF(capstone時)。
