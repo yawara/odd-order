@@ -169,6 +169,122 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
   rw [← hc]
   simp [map_mul, map_inv]
 
+/-- **(4.10) off-`V^G` foundation**: a point of `V = W − (W₁ ∪ W₂)` is self-centralizing into `L`,
+`C_G(v) ⊆ L`.  This is the book's "for `x ∈ V`, `C_G(x) = W ⊂ L`": any `c` centralizing `v ∈ V`
+conjugates `v` back into `V`, so by the TI property `V_ti` of (3.1) (`IsTISubset V W`) `c ∈ W`, and
+`W = tic.W = (W₁ ⊔ W₂).map L.subtype ⊆ L`.  This forces the certain-type local subgroup `H(a) = ⊥`
+on `V^L` (via `centralizer_eq_sup`/`centralizer_disjoint`), the structural fact behind
+`β^τ` vanishing off `V^G`. -/
+theorem centralizer_le_L_of_mem_ticVdiffV (h : Hypothesis46 A L) {v : G}
+    (hv : v ∈ (ticVdiff h).V) :
+    Subgroup.centralizer ({v} : Set G) ≤ L := by
+  intro c hc
+  have hcomm : c * v = v * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+  have hconj : c * v * c⁻¹ = v := by rw [hcomm]; group
+  have hcW : c ∈ (ticVdiff h).W := (ticVdiff h).V_ti c ⟨v, hv, by rw [hconj]; exact hv⟩
+  exact le_trans (tic_W_eq_map h).le (Subgroup.map_subtype_le _) hcW
+
+/-- The L-side `V = W − (W₁ ∪ W₂)` maps (under `L ↪ G`) into the G-side `ticVdiff.V`: both are
+`W − (W₁ ∪ W₂)`, identified by `tic_W_eq_map`/`tic_W1`/`tic_W2` and `L.subtype` injectivity. -/
+theorem coe_mem_ticVdiffV_of_mem_toTICV (h : Hypothesis46 A L) {v : ↥L}
+    (hv : v ∈ h.toTICyclicHypothesis.V) :
+    (L.subtype v) ∈ (ticVdiff h).V := by
+  have hVdef : h.toTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
+  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hv
+  obtain ⟨hvW, hvnW1, hvnW2⟩ := hv
+  refine ⟨?_, ?_⟩
+  · rw [tic_W_eq_map h]
+    exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
+  · rw [Set.mem_union, not_or, h.tic_W1, h.tic_W2]
+    refine ⟨fun hmem => ?_, fun hmem => ?_⟩
+    · obtain ⟨w, hwW1, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW1 (L.subtype_injective hweq ▸ hwW1)
+    · obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
+
+/-- Conjugation closure of `centralizer_le_L_of_mem_ticVdiffV`: a point `L`-conjugate (inside `L`)
+to a point of `V` is still self-centralizing into `L`, `C_G(w) ⊆ L`.  If `c` centralizes
+`w = l·v·l⁻¹` then `l⁻¹·c·l` centralizes `v`, hence lies in `L` (the base case), so
+`c = l·(l⁻¹cl)·l⁻¹ ∈ L`.  Used for the `Supp β ⊆ V^L` base points of (4.10) off-`V^G`. -/
+theorem centralizer_le_L_of_mem_conj_toTICV (h : Hypothesis46 A L) {w : ↥L}
+    (hw : w ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V) :
+    Subgroup.centralizer ({L.subtype w} : Set G) ≤ L := by
+  obtain ⟨v, hvV, hconjv⟩ := Group.mem_conjugatesOfSet_iff.mp hw
+  obtain ⟨l, hl⟩ := isConj_iff.mp hconjv
+  intro c hc
+  have hcw : c * L.subtype w = L.subtype w * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+  have hwG : L.subtype w = L.subtype l * L.subtype v * (L.subtype l)⁻¹ := by
+    rw [← hl]; simp [map_mul, map_inv]
+  have hc' : (L.subtype l)⁻¹ * c * L.subtype l ∈ Subgroup.centralizer ({L.subtype v} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hvG : L.subtype v = (L.subtype l)⁻¹ * L.subtype w * L.subtype l := by rw [hwG]; group
+    rw [hvG]
+    calc (L.subtype l)⁻¹ * c * L.subtype l * ((L.subtype l)⁻¹ * L.subtype w * L.subtype l)
+        = (L.subtype l)⁻¹ * (c * L.subtype w) * L.subtype l := by group
+      _ = (L.subtype l)⁻¹ * (L.subtype w * c) * L.subtype l := by rw [hcw]
+      _ = (L.subtype l)⁻¹ * L.subtype w * L.subtype l
+            * ((L.subtype l)⁻¹ * c * L.subtype l) := by group
+  have hc'L : (L.subtype l)⁻¹ * c * L.subtype l ∈ L :=
+    centralizer_le_L_of_mem_ticVdiffV h (coe_mem_ticVdiffV_of_mem_toTICV h hvV) hc'
+  have hceq : c = L.subtype l * ((L.subtype l)⁻¹ * c * L.subtype l) * (L.subtype l)⁻¹ := by group
+  rw [hceq]
+  exact L.mul_mem (L.mul_mem l.2 hc'L) (L.inv_mem l.2)
+
+/-- **A §4 Dade-hypothesis fact**: if `C_G(a) ⊆ L` then the local subgroup `H(a) = ⊥`.  By (2.2)
+`C_G(a) = H(a) ⊔ C_L(a)` (`centralizer_eq_sup`) with `H(a) ⊓ C_L(a) = ⊥` (`centralizer_disjoint`);
+when `C_G(a) ⊆ L` the join factor `H(a)` already centralizes `a` inside `L`, so `H(a) ≤ C_L(a)`,
+and a subgroup disjoint from one it is contained in is trivial. -/
+theorem _root_.OddOrder.Peterfalvi.S04.Hypothesis.H_eq_bot_of_centralizer_le
+    {G : Type*} [Group G] [Fintype G] {A₀ : Set G} {L : Subgroup G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A₀ L) (a : {a : G // a ∈ A₀})
+    (hCL : Subgroup.centralizer ({a.1} : Set G) ≤ L) :
+    hyp.H a = ⊥ := by
+  have hHcent : hyp.H a ≤ Subgroup.centralizer ({a.1} : Set G) :=
+    le_sup_left.trans_eq (hyp.centralizer_eq_sup a).symm
+  have hle : hyp.H a ≤ OddOrder.Peterfalvi.S04.centralizerIn L a.1 := fun x hx =>
+    OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
+      ⟨hCL (hHcent hx), Subgroup.mem_centralizer_singleton_iff.mp (hHcent hx)⟩
+  exact (inf_eq_left.mpr hle).symm.trans (disjoint_iff.mp (hyp.centralizer_disjoint a))
+
+/-- **(4.10), the L-side four-corner is the toTICyclic Dade image of the carrier.**
+`β = δ_j(μ_{ij} − μ_{0j}) − (μ_{i0} − μ_{00}) = Ind_W^L α` (piece (a)), and the toTICyclic Dade map
+of `(L, W − (W₁ ∪ W₂))` *is* `Ind_W^L` (`tau_eq_induce`); since `↑(chiFourCornerOnV) = α` and
+`sdiff.W = toTICyclicHypothesis.W` definitionally, the two agree.  Expressing `β` as a Dade image
+controls its support (off `V^L`) via `full_map_eq_zero_of_not_mem_conjugatesOfSet_V`. -/
+theorem signedDiff_fourcorner_eq_toTICDade (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    (h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i
+      = h.toTICyclicFullDadeApplication.tau.toDadeMap (chiFourCornerOnV h χ₂ i) := by
+  rw [fourcorner_signedDiff_eq_induce h χ₂ i]
+  exact (h.toTICyclicHypothesis.tau_eq_induce
+    h.toTICyclicFullDadeApplication.tau.toDadeIsometryData (chiFourCornerOnV h χ₂ i)).symm
+
+/-- **(4.10), the L-side four-corner `β` packaged in `CF(L, A₀)`.**  `β = Ind_W^L α` is the Dade
+image of the `V`-supported carrier (`signedDiff_fourcorner_eq_toTICDade`), so it vanishes off
+`conjugatesOfSet(V)` (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V`); every point of
+`conjugatesOfSet(V)` maps into `A₀` (`coe_mem_A0_of_mem_conjugatesOfSet_toTICV`).  This is the
+domain element fed to the certain-type Dade isometry `τ = h.tau` in (4.10). -/
+noncomputable def fourCornerDiffSupported (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+  ⟨(h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i, by
+    rw [ClassFunction.mem_supportedSubmodule]
+    intro z hz
+    rw [ClassFunction.mem_support] at hz
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    apply coe_mem_A0_of_mem_conjugatesOfSet_toTICV h
+    by_contra hc
+    apply hz
+    rw [signedDiff_fourcorner_eq_toTICDade h χ₂ i]
+    exact h.toTICyclicHypothesis.full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+      h.toTICyclicFullDadeApplication (chiFourCornerOnV h χ₂ i) hc⟩
+
 /-- The underlying class function of `chiFourCornerOnV` is the four-corner itself: bundling adds
 no content, so the coercion is definitional.  (The coercion lands on `toTICyclicHypothesis.W`,
 which is `sdiff.W` definitionally; this `rfl` records that downstream rewrites are sound.) -/
