@@ -284,7 +284,10 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
     (hPnab : ¬ IsMulCommutative ↥P) (hM : M ∈ maximalSubgroups G)
     (hMstar : Mstar ∈ maximalSubgroups G) (hMne : M ≠ Mstar)
     (hPM : P ≤ M) (hPMstar : P ≤ Mstar) :
-    ∃ Q : Subgroup G, Q ≤ M ⊓ Mstar ∧ IsExpPExtraspecial p ↥Q ∧ Nat.card ↥Q = p ^ 3 := by
+    ∃ (S : Sylow p G) (Q : Subgroup G),
+      Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar ∧
+      rank ↥(S : Subgroup G) ≤ 2 ∧ Q ≤ M ⊓ Mstar ∧
+      IsExpPExtraspecial p ↥Q ∧ Nat.card ↥Q = p ^ 3 := by
   classical
   set K : Subgroup G := M ⊓ Mstar with hK
   have hPK : P ≤ K := le_inf hPM hPMstar
@@ -321,7 +324,8 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
   -- `S` nonabelian, so Cor 10.7(b) gives the extraspecial `Q`.
   rcases (S10.sylow_structure hG S).2.1 hrank2 with habel | ⟨Q, _, hQ_le, _, hQ_es, hQ_card, _, _, _⟩
   · exact absurd habel (by rw [hS]; exact hPbar_nab)
-  · exact ⟨Q, hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
+  · exact ⟨S, Q, by rw [hS]; exact hN, hrank2,
+      hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
 
 /-- **`M_α ≠ 1`** (BG 12.13, mmd L3395): if a Sylow `p`-subgroup `S` of `G` has `N_G(S) ⊆ M ∩ M⋆`
 for distinct maximals `M ≠ M⋆`, then `M_α ≠ 1`.

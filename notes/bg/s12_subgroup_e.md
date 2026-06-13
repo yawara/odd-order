@@ -72,12 +72,19 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
   (A_Y=Y の Q 内 preimage ∈ℰ²(Q), 12.4(a)=`centralizer_le_of_elemAb_rank_two` を M⋆ に; Y=Q/Z は
   C_K(Q)⊆C_K(line))。⟹ K⊆M⋆ → Lem 6.5(b) で N_M(Z)⊆M⋆ → ℳ(N_G(Z))≠{M}。**(1) の quotient-action
   MonoidHom 構成が型重く 1-2 iter。**
-- **主定理組立 (piece 5 後 or piece5-sorry で先行可)**: ⚠ `Sg` (G-Sylow) を要す (Malpha_ne_bot/notMem_alpha 用)。
-  現 `exists_expPExtraspecial_le_of_two_maximals` は Q のみ返す → **richer reduction (Sg+rank≤2+Q 一括) 版**を
-  足すか主定理で inline 再導出。+ **A∈ℰ²(Q) 構成** (a∉Z で ⟨a⟩⊔Z, elemAbelianOfRank G p 2) +
-  **line-共役の ↥Q↔G transport** (A₀,A₀⋆ を ↥Q の zpowers 経由で G-subgroup 化) が要。
-  推奨: 次 iter で **piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)** で合成検証 +
-  piece5 隔離、その後 piece5 本体。
+- **主定理組立 (piece 5 後 or piece5-sorry で先行可)**: 
+  - ✅ **richer reduction DONE (session 15)**: `exists_expPExtraspecial_le_of_two_maximals` を拡張し
+    `∃ (S:Sylow p G)(Q), N_G(S)≤M∩M⋆ ∧ rank(S)≤2 ∧ Q≤M∩M⋆ ∧ IsExpPExtraspecial p Q ∧ |Q|=p³` を返す
+    (Malpha_ne_bot/notMem_alpha に S・rank2 を供給可)。
+  - **次: A∈ℰ²(Q) 構成補題** `exists_elemAbelianOfRank_two...`: a∈Q∖Z で A=⟨a⟩⊔Z_G (Z_G=center↥Q の像),
+    `|A|=p²` + `IsMaximalElementaryAbelian p A` + `Z_G≤A`。**maximality は pRank G p≤2 から**:
+    F elem ab ⊇A ⟹ `log p|F|≤pRank G p≤2` (`IsElementaryAbelian.log_card_le_pRank`+`pRank_sylow_eq`で
+    pRank G p=pRank S p≤rank S≤2) ⟹ `|F|≤p²=|A|` ⟹ F=A (`eq_of_le_of_card_ge`)。
+    pRank G p≤2 は richer reduction の rank(S)≤2 から (補題化 or inline)。
+  - **line-共役の ↥Q↔G transport**: A₀,A₀⋆ (12.4b より ∈ℰ¹(A), ≤A≤Q) を ↥Q 内の zpowers に持ち上げ
+    `exists_conj_smul_zpowers_eq_of_expPExtraspecial` 適用→ q∈↥Q→ G で conj、engine へ。
+  推奨: 次 iter で A∈ℰ²(Q) 構成 → piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)
+  で合成検証 + piece5 隔離、その後 piece5 本体。
 
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 
