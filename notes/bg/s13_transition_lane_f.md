@@ -149,3 +149,11 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
     (f) E₁≤E₁*(Hall τ₁M*), `E1_actsPrime` on M* → E₁* prime on M*_σ、P⊆C_{E₁*}(R) → E₁ が R 中心化。
     (g) E=E₁⊔E₃ + E₁,E₃ が R 中心化 → R⊆C_G(E)。`subgroupE_basic` の `centralizer E⊓E₃=⊥`
        (=C_{E₃}(E)=1) と R≤E₃,R≠⊥ で矛盾。
+- 2026-06-14 (Lane F, /loop 続き³): **13.7 body prereqs + step 1/2 完成** (helper 計 6 本)。
+  + `fixedBy_eq_of_elemAbelian_one` (C_N(P)=C_N(X), prime action)。step 1 helper に primality 出力追加。
+  body 確定パターン: hcop=τ₁∩τ₃=∅ (`not_mem_tau3_of_mem_tau1`) + Hall `.1` + `subgroupOfEquivOfLe`
+  card; hnorm=`h.E₁_le.trans (h.E3_normal hG)`; hN3=`(h.E₃_le.trans h.E_le).trans
+  (by rw[S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma M) M)`; step2=`fixedBy_eq` ×2 +
+  `centralizer_le_centralizer_of_tau1`; dichotomy=`rcases lt_or_eq_of_le hle`。
+  **残 = step 5 のみ** (`exfalso` 後の内側 sorry 1 個; hlt : fixedBy E₁ < fixedBy E₃ から False)。
+  step 5 の詳細手順 (a)-(g) は上記マップ参照。次イテレーションで step 5 を書いて 13.7 完成。
