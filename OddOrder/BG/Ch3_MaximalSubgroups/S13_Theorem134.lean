@@ -257,9 +257,38 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   obtain ⟨hCR_ne, hCRQ_bot⟩ :=
     (tau1_Malpha_interaction hG h.mem_maximal hrq.symm hrτ1M hR (hRE.trans h.E_le) hQM hQne hQq
       hRNQ hCQR hMNQne).1 hMαne hqαM
-  -- step 7 (2nd BG gap): `C_{M_α}(P) = C_{M_α}(R)` (rank-≤1 / cyclic argument; BG elides). 🚧
+  -- step 7 (2nd BG gap, original derivation): `C_{M_α}(P) = C_{M_α}(R)`. BG elides the rank-≤1 /
+  -- Thompson / Thm 3.7 argument; built incrementally. Framework: both centralizers have rank ≤ 1.
   have hCeq : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)
-      = S10.Malpha M ⊓ Subgroup.centralizer (R : Set G) := sorry
+      = S10.Malpha M ⊓ Subgroup.centralizer (R : Set G) := by
+    -- `P`, `R` are `α(M)'`-subgroups (`p, r ∈ τ₁(M) ⟹ p, r ∉ σ(M) ⊇ α(M)`).
+    have hpnotσ : p ∉ S10.sigma M := hp.1
+    have hPpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ P := by
+      intro s hs
+      obtain ⟨n, hn⟩ := hPp.exists_card_eq
+      rw [hn, Nat.mem_primeFactors] at hs
+      rw [Set.mem_compl_iff,
+        (Nat.prime_dvd_prime_iff_eq hs.1 Fact.out).mp (hs.1.dvd_of_dvd_pow hs.2.1)]
+      exact fun ha => hpnotσ (S10.alpha_subset_sigma hG h.mem_maximal ha)
+    have hRpi : Subgroup.IsPiSubgroup (S10.alpha M)ᶜ R := by
+      intro s hs
+      obtain ⟨n, hn⟩ := hRr.exists_card_eq
+      rw [hn, Nat.mem_primeFactors] at hs
+      rw [Set.mem_compl_iff,
+        (Nat.prime_dvd_prime_iff_eq hs.1 Fact.out).mp (hs.1.dvd_of_dvd_pow hs.2.1)]
+      exact fun ha => h.not_mem_sigma_of_mem_primeFactors hG hr (S10.alpha_subset_sigma hG
+        h.mem_maximal ha)
+    -- `(12.6)`-style rank bounds (rank lemma + `ℳ(N_G(·)) ≠ {M}` for `τ₁` primes).
+    have hrankP : rank ↥(Subgroup.centralizer (P : Set G) ⊓ S10.Malpha M) ≤ 1 :=
+      rank_centralizer_Malpha_le_one_of_not_uniqueMaximal hG h.mem_maximal hPM hPne hPpi
+        (maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1 hG h.mem_maximal hp hPM
+          hPne hPp)
+    have hrankR : rank ↥(Subgroup.centralizer (R : Set G) ⊓ S10.Malpha M) ≤ 1 :=
+      rank_centralizer_Malpha_le_one_of_not_uniqueMaximal hG h.mem_maximal (hRE.trans h.E_le) hRne
+        hRpi (maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1 hG h.mem_maximal hrτ1M
+          (hRE.trans h.E_le) hRne hRr)
+    -- 🚧 remaining: Thompson critical + Thm 3.7 FPF argument for the equality.
+    sorry
   -- step 8: `A := C_{M_α}(P)` is `S`-invariant (`S ⊆ C(P)`, `M_α ⊴ M`) and `⊆ C(R)` (`= C_{M_α}(R)`),
   -- so by three-subgroups it is centralized by `Q = ⁅S, R⁆`.
   have hMNMα : M ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
