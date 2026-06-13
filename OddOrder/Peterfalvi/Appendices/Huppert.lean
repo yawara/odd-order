@@ -43,6 +43,8 @@ namespace OddOrder.Peterfalvi.Appendices.Huppert
 open OddOrder.GroupTheory
 open OddOrder.Isaacs.Ch06
 open OddOrder.BG.Ch3.S12
+open OddOrder.Isaacs.Ch03
+open OddOrder.BG.Ch1_Preliminary
 
 section Lemma
 
@@ -424,6 +426,87 @@ theorem pGroup_cyclic_fixedPointFree
   exact ⟨isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian hq hP hp_odd hE φ hfpf, hfpf⟩
 
 end Lemma
+
+section Maschke
+
+variable {E : Type*} [Group E] [Finite E] {P : Type*} [Group P] [Finite P]
+
+/-- **Operator Maschke for an elementary abelian group**: a coprime `MulAut`-action of `P`
+on an elementary abelian `q`-group `E` splits any `P`-invariant subgroup off via a
+`P`-invariant complement.  This is the module-Maschke input for the Lemma's reducible
+case (`fpf_of_constant_stabilizer_of_invariant_compl`): a proper nonzero `P`-invariant
+subgroup gives a `P`-invariant complement `E = U ⊕ W`. -/
+theorem exists_aInvariant_complement_of_elementaryAbelian
+    {q : ℕ} [Fact q.Prime] (hqE : q ∣ Nat.card E) {φ : P →* MulAut E}
+    (hcop : Nat.Coprime (Nat.card P) (Nat.card E)) (hE : IsElementaryAbelian q E)
+    {U : Subgroup E} (hUinv : IsAInvariant φ U) :
+    ∃ W : Subgroup E, IsAInvariant φ W ∧ U ⊓ W = ⊥ ∧ U ⊔ W = ⊤ := by
+  classical
+  haveI hEcomm : IsMulCommutative E := IsMulCommutative.of_comm hE.comm
+  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hE.comm }
+  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  have hqsmul : ∀ x : Additive E, (q : ℕ) • x = 0 := by
+    intro x; apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]; exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod q) (Additive E) := AddCommGroup.zmodModule hqsmul
+  haveI : NeZero ((Nat.card P : ZMod q)) := neZero_natCast_zmod_of_coprime hcop hqE
+  set ρ : Representation (ZMod q) P (Additive E) := (mulAutToEnd E q).comp φ with hρ_def
+  have key_rho : ∀ (a : P) (v : Additive E),
+      Additive.toMul (ρ a v) = (φ a) (Additive.toMul v) := fun _ _ => rfl
+  set pU := AddSubgroup.toZModSubmodule (n := q) (Subgroup.toAddSubgroup U) with hpU_def
+  have hmem_pU : ∀ v : Additive E, v ∈ pU ↔ Additive.toMul v ∈ U := by
+    intro v
+    simp only [hpU_def, AddSubgroup.mem_toZModSubmodule, Additive.mem_toAddSubgroup]
+  have hpU_invt : pU ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    intro v hv
+    rw [hmem_pU] at hv ⊢
+    rw [key_rho]
+    exact hUinv.smul_mem a hv
+  have hpU_sub : ∀ (a : P) ⦃v : Additive E⦄, v ∈ pU → ρ a v ∈ pU := by
+    intro a v hv
+    have hmem := ρ.mem_invtSubmodule.mp hpU_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem v hv
+  obtain ⟨qcSub, hcompl⟩ :=
+    ComplementedLattice.exists_isCompl (⟨pU, hpU_sub⟩ : Subrepresentation ρ)
+  set qc : Submodule (ZMod q) (Additive E) := qcSub.toSubmodule with hqc_def
+  have hqc_invt : qc ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    exact fun v hv => qcSub.apply_mem_toSubmodule a hv
+  have hinf : pU ⊓ qc = ⊥ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+    simpa [Subrepresentation.toSubmodule_inf] using h
+  have hsup : pU ⊔ qc = ⊤ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
+    simpa [Subrepresentation.toSubmodule_sup] using h
+  let Φ : Submodule (ZMod q) (Additive E) ≃o Subgroup E :=
+    (AddSubgroup.toZModSubmodule (n := q)).symm.trans AddSubgroup.toSubgroup'
+  set W : Subgroup E := Φ qc with hW_def
+  have hΦpU : Φ pU = U := by
+    have h1 : (AddSubgroup.toZModSubmodule (n := q)).symm pU = Subgroup.toAddSubgroup U := by
+      rw [hpU_def, OrderIso.symm_apply_apply]
+    simp only [Φ, OrderIso.trans_apply, h1]
+    exact Subgroup.toAddSubgroup.symm_apply_apply U
+  have hmem_W : ∀ h : E, h ∈ W ↔ (Additive.ofMul h) ∈ qc := by
+    intro h
+    rw [hW_def]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
+  have hW_inv : IsAInvariant φ W := by
+    rw [isAInvariant_iff_smul_mem]
+    intro a h hh
+    rw [hmem_W] at hh ⊢
+    have hmem := ρ.mem_invtSubmodule.mp hqc_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem _ hh
+  refine ⟨W, hW_inv, ?_, ?_⟩
+  · have h := congrArg Φ hinf; rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
+  · have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
+
+end Maschke
 
 section Proposition1
 

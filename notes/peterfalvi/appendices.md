@@ -95,8 +95,19 @@ conjugation Equiv で). sorry 不変 (2→2)。
       axiom-clean, session 8): `IsCompl U W` + 両 nontrivial + 両 P-invariant ⟹ FPF。**🔑 重要発見:
       part(1) は perm=id (P-invariant 各 summand) でも成立** → reconstruction gap は無い (imprimitivity
       不要)。Maschke complement (P-invariant U⊕W=⊤) を `Bool` 2-family + `iSupIndep_pair` で part(1) に投入。
-- [ ] **Maschke bridge (φ→分解)** — session 9 偵察で**実装経路 2 案を確定**(どちらも中規模 ~50-80 行,
-      instance 重め; 次 session で scratch 実行):
+- [x] **Maschke bridge ✅ 完成** (`exists_aInvariant_complement_of_elementaryAbelian`, complete,
+      axiom-clean, session 10): coprime `φ:P→*MulAut E` + elem-abelian E + `IsAInvariant φ U`
+      ⟹ ∃ P-invariant complement W (`U⊓W=⊥`, `U⊔W=⊤`)。**案 B (direct) で着地** — OperatorMaschke 本体
+      (L186-254) を E に直接 mirror、quotient 層を除去。`mulAutToEnd E q` (公開) でρ構成 →
+      `AddSubgroup.toZModSubmodule`+`invtSubmodule` で U → submodule → `ComplementedLattice.exists_isCompl`
+      (Maschke; `neZero_natCast_zmod_of_coprime` で NeZero) → `Φ` order-iso で Subgroup E に戻す。
+      ⚠ instance 知見: `CommGroup E` は infer 不可 → `{ (inferInstance:Group E) with mul_comm:=hE.comm }`
+      で構成; `mulAutToEnd`/`neZero_…` は `OddOrder.BG.Ch1_Preliminary` 公開、Huppert 閉包に在 (import 不要,
+      open のみ)。Huppert に `open Isaacs.Ch03`+`open BG.Ch1_Preliminary` 追加。
+- [ ] **reducible case 組立 (次)**: 「∃ proper nonzero P-invariant U」⟹ Maschke で W → `IsCompl U W`
+      (W≠⊥ は U≠⊤ から) → `fpf_of_constant_stabilizer_of_invariant_compl` → FPF。これで Lemma の
+      **reducible 分岐完了**。残 = part(2) 非cyclic (Schur) + Lemma case-split assembly。
+- (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
      要: `IsAInvariant φ U` (= my hUinv 形を IsAInvariant に変換), `Omega (E⧸⊥) q 1 = ⊤` (E⧸⊥ elem-ab),
