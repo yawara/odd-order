@@ -87,6 +87,25 @@ g∈E₁# と h∈C_{E₃}(g)# を取り、Cauchy (`exists_prime_orderOf_dvd_car
 依存はすべて landed (Uniqueness/Thm 10.1(b)/10.2/Lem 12.18/Prop 10.14(d)/Lem 10.12/Thm 13.4)。
 Hall (β∪β)-部分群 + F(H) の素因子取りが mathlib API 探索ポイント。
 
+### 13.8 handle map (2026-06-14 Lane F, 13.7 完成後の調査)
+- Uniqueness (9.6): `Ch2.uniquenessTheorem` (S09_Uniqueness:47)。
+- Thm 10.2 (M'/M_α nilpotent): `S10.derived_quotient_Malpha_le_fitting` 系 (S10_HallStructure:154+)。
+- Lemma 12.18: `S12.tau1_Malpha_centralizer_PQ_eq_bot` (C_{M_α}(PQ)=1, S12_Lemma1218:410) +
+  `tau1_Malpha_centralizer_P_ne_bot` (C_{M_α}(P)≠1, S12_E:760) + `tau1_Malpha_interaction` (main, :1025)。
+- Prop 10.14(d): `S10.normalizer_le_of_nontrivial_beta_subgroup` (S10_BetaRadicalGlobal:294)。
+- Lemma 10.12: `S10.disjoint_of_not_conj` (M_α∩M*_α=1 等, S10_LocalLemmasCore:1200)。
+- Thm 13.4: `S13.centralizer_le_centralizer_of_tau1`。
+- Fitting: `Ch01.fitting`; Hall existence: `Ch03.hall_E_exists`。
+- ⚠ **未特定**: Thm 10.1(b) (conjugacy M=M^g for step 3) — S10 のどこか。step 3 (Hall (β∪β)-sub
+  of C_G(P) + F(H) + O_s + Thm 10.1(b)) が最難で要組立。
+
+### ⚠ 状況 (2026-06-14, ユーザー判断用)
+13.7 完成 (major milestone)。13.8 は ~150 行・step 3 が 13.7 step 5 級の deep grind。
+**downstream value は当面低い**: 13.9-13.11 は Lane G の 13.6 待ち (Lane G は step-2/6 gap で停滞中,
+issue 8003, ChatGPT 再構成中)、§14 は §13 全体待ち。13.8 自体は 13.6 非依存ゆえ Lane F で grind 可
+だが、完成しても 13.6 landing まで下流は動かない。"advance Lane F" 継続として 13.8 を grind 予定
+(難所回避せず) — ただしユーザーが Lane F 再配置を望む場合の判断材料として記録。
+
 ## equal-case helper の実装戦略 (refined)
 
 step 4 を一般 helper として切る:
