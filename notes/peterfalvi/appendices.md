@@ -115,9 +115,49 @@ conjugation Equiv で). sorry 不変 (2→2)。
       `IsCyclic.commGroup`、hirr 変換は `isAInvariant_iff_smul_mem.mpr`)、irreducible-非cyclic=**唯一の sorry**。
       `(hqp : q≠p)` を仮説追加 (hcop/hqE 導出)、hPodd は `orderOf x ∣ p^m` odd から。**Lemma を section
       Maschke 直後に移動** (fpf_of_reducible 前方参照回避)。⟹ **Lemma の sorry は irreducible-非cyclic のみ**。
-- [ ] **唯一残る real math = part(2) 非cyclic**: P 既約・非cyclic → R⊴P type-(p,p)
+- [ ] **唯一残る real math = part(2) 非cyclic** (Lemma の sorry): P 既約・非cyclic → R⊴P type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + Schur over F_q (`IsSimpleModule.End`)
       → `E=⊕C_E(T_i)` (r=p≥2 P-permuted) → part(1)(`fpf_of_constant_stabilizer_of_permuted_decomp`)。最難。
+
+### Prop 1 assembly 進捗 (sessions 13-15)
+完成済 building block (全 axiom-clean):
+- `isAInvariant_eq_bot_or_top_of_transitive` (transitive on E^# ⟹ irreducible) [s13]
+- `normal_isPGroup_eq_bot_of_faithful_irreducible` (faithful+irreducible ⟹ no normal q-subgroup
+  ⟹ q∤|F|) [s14]
+- `card_pointStabilizer_comp_eq_of_normal_of_transitive` (bridge: 定 stabilizer) [既存]
+- `commutator_le_fitting_of_isCyclic_fitting` (D solvable + F cyclic ⟹ commutator≤F) [既存]
+- `opCore_isCyclic_and_fpf_of_transitive` (per-prime: O_p(D) cyclic+FPF; Lemma を cite ゆえ explicit
+  sorry 無だが Lemma の sorry に transitive 依存) [s15]
+**Prop 1 残** (s16 で F-cyclic の blocker を精査):
+- **(a) F cyclic = gate**. 経路: `[Finite][IsZGroup ↥(fitting D)][IsNilpotent ↥(fitting D)] → IsCyclic`
+  (mathlib ZGroup:127; `fitting.isNilpotent` instance 在)。IsZGroup ↥F = ∀ Sylow P of ↥F, IsCyclic ↑P。
+  F nilpotent ⟹ 各 Sylow 一意 (`Sylow.normal_of_isNilpotent`+`characteristic_of_normal`)、かつ
+  `opCore p ↥F = ⨅ Sylow = ↑P` (`opCore_le`+`normal_pgroup_le_opCore`、`opCore=⨅Sylows`)。⚠ **fiddly chain**:
+  per-prime は `IsCyclic ↥(opCore p D)` を与えるが、IsZGroup ↥F が要るのは `IsCyclic ↑(Sylow p ↥F)` =
+  `IsCyclic ↥(opCore p ↥F)`。**`opCore p D ↔ opCore p ↥(fitting D)` の subgroup-of-subgroup 同定**が要
+  (両者 = 最大 normal p-subgroup、fitting char in D ゆえ等しいはずだが map/subgroupOf で証明要)。
+  IsCyclic transfer は `isCyclic_of_surjective _ (Subgroup.equivMapOfInjective P f hf).symm.surjective`
+  (ZGroup.lean:71 pattern)。~40 行・複数 uncertain step。**次 session で grind**。
+  - 代替: per-prime を `opCore p ↥(fitting D)` 版で作り直す (bridge は inclusion 経由で煩雑) → 不採用見込み。
+- **(b) F FPF**: 各 O_p FPF + F=∏O_p の ∏ 分解 (f∈F^#, f_p∈⟨f⟩ で C_E(f)⊆C_E(f_p)=⊥)。F cyclic 後なら容易化。
+- **(c) commutator≤F**: `commutator_le_fitting_of_isCyclic_fitting` (要 `[IsSolvable D]` 追加 = FT 帰結) + (a)。
+- ⟹ (a) が gate。組めば explicit sorry 2→1 (Lemma 非cyclic のみ残)。
+
+### ✅ session 3 (2026-06-14): Prop 1 完全 assembled — explicit sorry 2→1
+- **(a) F cyclic = DONE**: `opCore p D ↔ opCore p ↥(fitting D)` の subgroup-of-subgroup 同定を
+  `opCore_fitting_map_subtype_eq` (`(opCore p ↥F).map subtype = opCore p D`; ≤ は char→normal-map +
+  `normal_pgroup_le_opCore`、≥ は `subgroupOf`+`map_subgroupOf_eq_of_le`) で解決 → blocker 消滅。
+  `isCyclic_fitting_of_forall_opCore_isCyclic` は F nilpotent⟹各 Sylow=O_p(↥F) (一意) を `IsZGroup ↥F` に
+  し mathlib `[IsZGroup][IsNilpotent]⟹IsCyclic`。**仮説は prime のみ** (`∀ p, p.Prime → IsCyclic ↥(opCore p D)`;
+  証明が p を prime でしか使わない)。
+- **(b) F FPF = DONE** `fitting_fpf_of_transitive`: f∈F^# で prime p|orderOf f、g=f^(|f|/p) は order p →
+  `g∈O_p(↥F)` (zpowers≤ 一意 Sylow) → `(g:D)∈O_p(D)` (= opCore_fitting_map_subtype_eq) → per-prime FPF で
+  C_E(g)=⊥、`C_E(f)⊆C_E(g)` (mono helper: fixed by f ⟹ fixed by f^n)。⟹ C_E(f)=⊥。
+- **(c) commutator≤F = DONE** (既 session 3 の `commutator_le_fitting_of_isCyclic_fitting`)。
+- **assembly** `fitting_cyclic_fixedPointFree`: `[IsSolvable D]` 追加 (FT 帰結, C_D(F)≤F に必須) + `q∣|E|` を
+  `hE.isPGroup`+`IsPGroup.iff_card`+nontrivial で導出 → ⟨hcyc, F-FPF, commutator⟩。axiom-clean modulo Lemma sorry。
+- **⟹ Huppert.lean の explicit sorry = 1 本** (`pGroup_cyclic_fixedPointFree` の irreducible-非cyclic case のみ)。
+  full build 3802 jobs ~10s, AxiomsCheck OK。**残 frontier = Lemma 非cyclic case (Schur over F_q + type-(p,p))** 一点。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
