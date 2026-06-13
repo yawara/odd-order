@@ -65,4 +65,39 @@ theorem chiColumn_apply_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
       * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) : ℂˣ) : ℂ) = _
   rw [Units.val_mul]
 
+/-- **(4.10), piece (b): the `W`-side four-corner is supported on `V = W − W₂`.**
+The four-corner `ω_{ij} − ω_{0j} − (ω_{i0} − ω_{00})` is the difference of the two column
+differences `ω_{·j} − ω_{0j}` (column `χ₂`) and `ω_{·0} − ω_{00}` (column `1`), each of which is
+the `SupportedOnV` element `omegaColumnDiff` of (4.3.b): it vanishes on `W₂`, where the
+`W₁`-character factor `(w1CharEquiv i)(wFst w)` is killed, so the row difference dies.  The
+support submodule `CF(W, W − W₂)` is closed under subtraction (`Submodule.sub_mem`), so the
+four-corner lies in it too — no pointwise computation, sidestepping the `chiColumn`/`alphaCF`
+coercion mismatch of the direct route. -/
+theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)))
+      ∈ ClassFunction.supportedSubmodule
+          (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+            h.sdiffTICyclicHypothesis.W) := by
+  -- the four-corner is `↑(ω_{·j} − ω_{0j}) − ↑(ω_{·0} − ω_{00})`, a difference of two
+  -- `omegaColumnDiff` carriers; `chiColumn = omega ∘ omegaProdChar` makes the match definitional.
+  have key : (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
+      = (↑(h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂) :
+            ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (↑(h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) 1) :
+            ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
+    rw [h.omegaColumnDiff_coe, h.omegaColumnDiff_coe]
+    rfl
+  rw [key]
+  exact Submodule.sub_mem _
+    (h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂).2
+    (h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) 1).2
+
 end OddOrder.Peterfalvi.S06
