@@ -53,16 +53,22 @@ S13 で sorried) に推移依存。
 forward axiom (hub/ユーザー承認制) を入れない限り着手不能。`LAUNCH.md` の「S13_* は編集禁止
 (cite のみ)」も効く。
 
-## 次手の選択肢 (ユーザー裁可待ち)
+## 決定 (2026-06-14, ユーザー裁可) — **§14 PAUSE**
 
-- **(A) §14 を pause、Lane G の §13 完成を待つ**。14.1 は merge 済。Lane F は別タスクへ。
-  推奨理由: §14 の hard part (14.6 counting / 14.7 duality) は §13 全体に乗るので、§13 が
-  axiom-clean になってから §14 を載せる方が faithful 検証が楽。
-- **(B) forward-axiom scaffold-cite**。13.5–13.13 を Lane-F-local に axiom 化 (13.12/13.13 含む)
-  + sorried 13.5–13.11 を cite して、Prop 14.2 → … → 14.7/14.10 の counting 本体を形式化。
-  §13 完成時に de-axiom で unconditional 化。**新規 axiom はユーザー承認必須**。高労力・高構造価値、
-  ただし結果は当面 not-axiom-clean。
-- **(C) Lane G と調整** して 13.12/13.13 を G が先に追加 (S13 は G 領域)。
+ユーザー裁可: **§14 を pause、Lemma 14.1 で区切る**。Lane G が §13 (13.5–13.13) を完成させて
+から、axiom-clean な土台の上で §14 を再開する。forward-axiom scaffold-cite は採らない
+(§14 の hard part 14.6/14.7 を未証明 §13 axiom の塔に載せるのを避け、faithful 検証を容易に保つ)。
+
+**§14 再開の前提条件 (Lane G の §13)**:
+- sorried 13.5 / 13.6 / 13.7 / 13.8 / 13.9 / 13.10 / 13.11 の discharge
+- **未記述の Lemma 13.12 / 13.13 の追加** (statement = 上記「ブロッカーの正体」、証明依存も明記済)
+
+これらが揃えば §14 再開時は **Prop 14.2 → Cor 14.3 → Thm 14.4 → Lemma 14.5/14.6 →
+Thm 14.7 → Cor 14.9/14.10 → Cor 14.12/Lemma 14.13** の順で実証明できる (依存マップ参照)。
+Lemma 14.6 (missing-page 組合せ論) と Thm 14.7 の counting 不等式
+(|𝒞_G(Ẑ)| > ½|G|, mmd L4031–4045) が hard core。
+
+(検討した代替案: (B) forward-axiom scaffold-cite / (C) Lane F を §13 へ再配置 — 不採用。)
 
 ## Lemma 14.1 の faithful 化メモ (再利用)
 
