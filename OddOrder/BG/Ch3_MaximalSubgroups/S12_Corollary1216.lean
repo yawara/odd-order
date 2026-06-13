@@ -129,6 +129,19 @@ private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
     show derivedInG K = ⁅(K : Subgroup G), K⁆ from Subgroup.map_subtype_commutator K]
   exact Subgroup.commutator_mono hHK hHK
 
+/-- The order of `(g • K)'` equals that of `K'` (conjugation is `G`-card-preserving:
+`derivedInG (g • K) = (derivedInG K).map (conj g)`). -/
+private theorem card_derivedInG_conj (g : G) (K : Subgroup G) :
+    Nat.card ↥(derivedInG (MulAut.conj g • K)) = Nat.card ↥(derivedInG K) := by
+  have hmapeq : derivedInG (MulAut.conj g • K) = MulAut.conj g • derivedInG K := by
+    have e1 : derivedInG (MulAut.conj g • K)
+        = ⁅(MulAut.conj g • K : Subgroup G), MulAut.conj g • K⁆ := Subgroup.map_subtype_commutator _
+    have e2 : derivedInG K = ⁅(K : Subgroup G), K⁆ := Subgroup.map_subtype_commutator _
+    rw [e1, e2]
+    simp only [Subgroup.pointwise_smul_def, Subgroup.map_commutator]
+  rw [hmapeq]
+  exact Subgroup.card_map_of_injective (MulAut.conj g).injective
+
 /-- **Derived subgroup of a product**: `K = A·N` (`N ⊴ K`) ⟹ `K' ≤ A' ⊔ N`. (Replicated from
 S12_Proposition1215; the d.2/P5 crux.) -/
 private theorem commutator_le_commutator_sup_normal {K : Type*} [Group K]
@@ -429,12 +442,65 @@ private theorem not_mem_primeFactors_derived_of_tau1_core [Finite G] (hG : IsMin
 /-- **BG Corollary 12.16(b)** (mmd L3453, 3456): `p ∈ τ₁(M)` ⟹ `p ∉ π(N_H(Y)')`. 実証明版。 -/
 theorem not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) {q : ℕ} [Fact q.Prime] (hYq : IsPGroup q ↥Y)
+    (hqσ : q ∈ S10.sigma M)
     {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
     (hpτ1 : p ∈ tau1 M)
     {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
     (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
     p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
-  sorry
+  -- Step 1: conjugate `Y` into `M_σ` (same as 12.16(a)).
+  obtain ⟨g, hgY⟩ : ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
+    obtain ⟨_, P, _⟩ := (S10.mem_sigma_iff M q).mp hqσ
+    obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+    have hPpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) ((P : Subgroup ↥M).map M.subtype) := by
+      intro s hs
+      have hs_dvd : s ∣ Nat.card ↥((P : Subgroup ↥M).map M.subtype) :=
+        (Nat.mem_primeFactors.mp hs).2.1
+      rw [Subgroup.card_map_of_injective M.subtype_injective] at hs_dvd
+      obtain ⟨n, hn⟩ := (P.2).exists_card_eq
+      rw [hn] at hs_dvd
+      rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) Fact.out).mp
+        ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hs_dvd)]
+    have hPMσ : (P : Subgroup ↥M).map M.subtype ≤ S10.Msigma M :=
+      S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG h.mem_maximal)
+        (Subgroup.map_subtype_le _) hPpi
+    obtain ⟨Q, hYQ⟩ := hYq.exists_le_sylow
+    obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G SG Q
+    refine ⟨g⁻¹, le_trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYQ) ?_⟩
+    have hQconj : MulAut.conj g⁻¹ • (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+      have hQ : (Q : Subgroup G) = MulAut.conj g • (SG : Subgroup G) := by
+        rw [← hg]; exact Sylow.coe_subgroup_smul
+      rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
+    rw [hQconj]; exact hPMσ
+  -- Step 2: apply the core to `(Y' = g•Y ⊆ M_σ, H' = g•H)`, transport via `|deriv(g•K)| = |deriv K|`.
+  have hY'ne : MulAut.conj g • Y ≠ ⊥ := by
+    intro hb
+    have hc : Nat.card ↥(MulAut.conj g • Y) = Nat.card ↥Y :=
+      Subgroup.card_map_of_injective (MulAut.conj g).injective
+    rw [hb, Subgroup.card_bot] at hc
+    exact hYne (Subgroup.card_eq_one.mp hc.symm)
+  have hY'q : IsPGroup q ↥(MulAut.conj g • Y) :=
+    hYq.of_equiv (Subgroup.equivMapOfInjective Y (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective)
+  have hH'mem : MulAut.conj g • H ∈ maximalSubgroupsContaining (MulAut.conj g • Y) :=
+    mem_maximalSubgroupsContaining.mpr
+      ⟨isCoatom_conj_smul (mem_maximalSubgroups.mp (mem_maximalSubgroupsContaining.mp hHY).1),
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (mem_maximalSubgroupsContaining.mp hHY).2⟩
+  have hH'nc : ¬ ∃ g' : G, MulAut.conj g' • M = MulAut.conj g • H := by
+    rintro ⟨g', hg'⟩
+    exact hHnc ⟨g⁻¹ * g', by
+      rw [map_mul, mul_smul, hg', ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hcore := not_mem_primeFactors_derived_of_tau1_core hG h hY'ne hY'q hqσ hgY hpE hpβ hpτ1
+    hH'mem hH'nc
+  have hnorm : MulAut.conj g • Subgroup.normalizer (Y : Set G)
+      = Subgroup.normalizer ((MulAut.conj g • Y : Subgroup G) : Set G) :=
+    Subgroup.map_normalizer_eq_of_bijective Y (MulAut.conj g).bijective
+  have hcardeq : Nat.card ↥(derivedInG ((MulAut.conj g • H) ⊓
+        Subgroup.normalizer ((MulAut.conj g • Y : Subgroup G) : Set G)))
+      = Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G))) := by
+    rw [← hnorm, ← Subgroup.smul_inf]
+    exact card_derivedInG_conj g (H ⊓ Subgroup.normalizer (Y : Set G))
+  rwa [← hcardeq]
 
 end OddOrder.BG.Ch3.S12.Cor1216
