@@ -335,6 +335,27 @@ surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathli
 - **step 8** three-subgroups (`commutator_commutator_eq_bot_of_le_of_commutator_bot` 済) → C_{M_α}(R)=C_{M_α}(RQ)。
 - **step 9** Lem 12.18(a) (on M) → C_{M_α}(R)≠C_{M_α}(RQ) 矛盾 (要 `ℳ(N_G(Q))≠{M}` = hMNQstar+M*≠M)。
 
+### 2026-06-13 Lane G (loop): Thm 13.4 per-q **steps 6 + 8-9 COMPLETE → 単一 sorry に還元**
+
+**✅ 大躍進**: per_q_centralizes の 9-step 矛盾が **step 7 の単一等式に還元** (build 緑, 残 sorry 1)。
+- **step 6** (前 commit `bab4d04b`): Prop 12.15 (X=Q) → q∈σ(M*), τ₁(M*)⊆τ₁(M)∪α(M), M_α≠⊥, q∉α(M)。
+  新 helper `exists_maximal_pSubgroup_le_of_le` (Q≤H を H の極大 q-部分群へ; axiom-clean)。
+- **steps 8-9** (本 commit): 矛盾を実装・閉じた。
+  - r∈τ₁(M) = hτ1sub + r∉α(M) (h.not_mem_sigma_of_mem_primeFactors)。
+  - Lem 12.18(a) on (r,R,q,Q) [C_Q(R)=1=hCQR ✓] → C_{M_α}(R)≠1 (hCR_ne), C_{M_α}(RQ)=1 (hCRQ_bot)。
+  - **A:=M_α⊓C(P)**: S-不変 (S⊆C(P)⊆N(C(P)) [le_normalizer] + M_α⊴M [le_normalizer_opiCoreInG] → le_normalizer_inf),
+    A⊆C(R) (=hCeq), 三部分群 (`commutator_commutator_eq_bot_of_le_of_commutator_bot`) → A⊆C(Q)。
+  - A⊆M_α⊓C(R⊔Q)=⊥ (R⊔Q≤C(A) を sup_le+対称化, centralizer_sup_eq 不要) だが A=M_α⊓C(R)≠⊥ → 矛盾。
+
+**🎯 唯一の残 sorry = step 7**: `hCeq : M_α⊓C(P) = M_α⊓C(R)` (S13_Theorem134.lean per_q 内)。
+これは BG が "we can conclude" で省略する rank-≤1/cyclic 論法 (2nd BG gap)。**次 iteration の単一標的**。
+- **入手済ツール**: `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` (S12_E:510, P が α' かつ ℳ(N_G(P))≠{M} で
+  rank(C(P)⊓M_α)≤1)、`eq_of_card_eq_of_le_of_isCyclic` (S12_Lemma1218:77, 巡回内 同位数 prime 部分群 = 一意)。
+- **P 側 rank≤1 適用可**: p∈τ₁⟹p∉α (P が α'); M*≠M∈ℳ(N_G(P)) ⟹ ℳ(N_G(P))≠{M}。⟹ C_{M_α}(P) 巡回。
+- **R 側**: Lem 12.18(a) on (r,R) で C_{M_α}(R)≠1, C_{M_α}(RQ)=1 (Q が C_{M_α}(R) に FPF 作用)。
+- **要 derivation**: 両 cyclic + FPF/coprime で等式。BG 原文 Lem 12.18 証明 (Thm 1.13/3.7/12.5-12.7) が範型。
+  ⚠ 包含の正確な機序は未確定 — 次 iteration で BG Lem 12.18 証明を精読し移植 or rank+card 経路を構築。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint

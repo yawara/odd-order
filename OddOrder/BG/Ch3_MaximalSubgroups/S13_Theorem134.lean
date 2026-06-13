@@ -68,9 +68,9 @@ theorem exists_maximal_pSubgroup_le_of_le {q : ℕ} [Fact q.Prime] [Finite G]
 `C_{M_σ}(P)`, `R` centralizes `S` (i.e. `⁅S, R⁆ = ⊥`). Assume `Q := ⁅S, R⁆ ≠ ⊥`; then via
 Cor 13.2(b)(c) `r ∈ τ₁(M*)` and `p ∈ β(M*)` for `M* ∈ ℳ(N_G(P))`, and Prop 12.15 / Lemma 12.18
 yield `C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)` against `ℳ(N_G(Q)) ≠ {M}` — contradiction.
-**🚧 WIP**: setup + Cor 13.2 + step 4 (`S` abelian, FPF) + step 5 (`ℳ(N_G(Q)) = {M*}`, Lemma 12.18(a)
-role-swap) + **step 6** (Prop 12.15 `X=Q` → `q ∈ σ(M*)`, `τ₁(M*) ⊆ τ₁(M)∪α(M)`, `q ∉ α(M)`);
-steps 7-9 (`C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)` + Lemma 12.18(a) contradiction) `sorry`. -/
+**🚧 WIP**: steps 1-6 + **steps 8-9** (three-subgroups + Lemma 12.18(a) on `(r,R,q,Q)` contradiction)
+all proven; the whole 9-step contradiction now reduces to the **single equality** `C_{M_α}(P) = C_{M_α}(R)`
+(step 7, the rank-≤1 / cyclic argument that BG elides) which is the sole remaining `sorry`. -/
 theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
     [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)
@@ -242,9 +242,55 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   have hqαM : q ∉ S10.alpha M := fun ha =>
     Set.eq_empty_iff_forall_notMem.mp
       ((S10.disjoint_of_not_conj hG h.mem_maximal hMstarMax hnc).1.2) q ⟨ha, hqσstar⟩
-  -- steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` (Lem 12.18(a) ×2 with `q ∉ α(M)`, `r ∈ τ₁(M)`) →
-  -- `= C_{M_α}(RQ)` (three-subgroups) → Lemma 12.18(a) (on `M`) contradiction (`ℳ(N_G(Q)) ≠ {M}`). 🚧
-  sorry
+  -- ===== steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` → three-subgroups → Lemma 12.18(a) contradiction =====
+  -- `r ∈ τ₁(M)`: `τ₁(M*) ⊆ τ₁(M) ∪ α(M)`, `r ∈ π(E) ⟹ r ∉ σ(M) ⊇ α(M)`.
+  have hrτ1M : r ∈ tau1 M := by
+    rcases hτ1sub hrτ1 with h1 | h1
+    · exact h1
+    · exact absurd (S10.alpha_subset_sigma hG h.mem_maximal h1)
+        (h.not_mem_sigma_of_mem_primeFactors hG hr)
+  -- `ℳ(N_G(Q)) ≠ {M}` (since `M* ≠ M`).
+  have hMNQne :
+      maximalSubgroupsContaining (Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G)) ≠ {M} := by
+    rw [hMNQstar]; intro heq; exact hMstarNe (Set.singleton_injective heq)
+  -- Lemma 12.18(a) on `(r, R, q, Q)`: `C_{M_α}(R) ≠ 1` and `C_{M_α}(RQ) = 1`.
+  obtain ⟨hCR_ne, hCRQ_bot⟩ :=
+    (tau1_Malpha_interaction hG h.mem_maximal hrq.symm hrτ1M hR (hRE.trans h.E_le) hQM hQne hQq
+      hRNQ hCQR hMNQne).1 hMαne hqαM
+  -- step 7 (2nd BG gap): `C_{M_α}(P) = C_{M_α}(R)` (rank-≤1 / cyclic argument; BG elides). 🚧
+  have hCeq : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)
+      = S10.Malpha M ⊓ Subgroup.centralizer (R : Set G) := sorry
+  -- step 8: `A := C_{M_α}(P)` is `S`-invariant (`S ⊆ C(P)`, `M_α ⊴ M`) and `⊆ C(R)` (`= C_{M_α}(R)`),
+  -- so by three-subgroups it is centralized by `Q = ⁅S, R⁆`.
+  have hMNMα : M ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG (S10.alpha M) M
+  have hSNA : S ≤ Subgroup.normalizer
+      ((S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) : Subgroup G) : Set G) :=
+    le_normalizer_inf ((hSMsig.trans (S10.Msigma_le M)).trans hMNMα)
+      (hSCP.trans Subgroup.le_normalizer)
+  have hAleCR : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)
+      ≤ Subgroup.centralizer (R : Set G) := by rw [hCeq]; exact inf_le_right
+  have hAcQ : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)
+      ≤ Subgroup.centralizer ((⁅S, R⁆ : Subgroup G) : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm]
+    refine commutator_commutator_eq_bot_of_le_of_commutator_bot
+      (Ch04.commutator_le_of_le_normalizer hSNA) ?_
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer]; exact hAleCR
+  -- step 9: `A ⊆ M_α ⊓ C(R ⊔ Q) = ⊥`, but `A = C_{M_α}(R) ≠ ⊥`. Contradiction.
+  have hRQcA : (R ⊔ ⁅S, R⁆ : Subgroup G) ≤ Subgroup.centralizer
+      ((S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) : Subgroup G) : Set G) := by
+    refine sup_le ?_ ?_ <;>
+      rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
+        Subgroup.commutator_eq_bot_iff_le_centralizer]
+    · exact hAleCR
+    · exact hAcQ
+  have hAbot : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)
+      ≤ S10.Malpha M ⊓ Subgroup.centralizer ((R ⊔ ⁅S, R⁆ : Subgroup G) : Set G) := by
+    refine le_inf inf_le_left ?_
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
+      Subgroup.commutator_eq_bot_iff_le_centralizer]; exact hRQcA
+  rw [hCRQ_bot, le_bot_iff, hCeq] at hAbot
+  exact hCR_ne hAbot
 
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
 なら `C_{M_σ}(P) ⊆ C_{M_σ}(R)`。outer reduction `msigma_centralizer_le_of_invariant_sylow_centralized`
