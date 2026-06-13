@@ -1185,3 +1185,31 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 - **W₂⊆Z(↥L) 導出 (deferred 仮説)**: math-B `W₂⊆Z(H)` (`eq_bot_or_eq_of_le_of_card_prime` on Z(H)⊓W₂,
   prime) + W cyclic (W₁,W₂⊆W abelian) ⟹ W₂⊆Z(↥L)。Hypothesis46 の W cyclic structure 要精査。
 **正本=本 session 40。** 進捗良好 (空転なし, steady brick/tick)。
+
+## 2026-06-14 (session 40 cont., /loop): (6.8.2.2) step 1 完成 — ⟨α^τ,ψ⟩≡0 mod |H:W₂| (2 commits)
+
+**✅✅ landed (build-green + axiom-clean)** — (6.8.2.2) の第一主ステップ完了:
+
+4. **`index_W2_dvd_regCharCoeff` (c8930ded)** = |W₂| cancel。`card_H_dvd...` (|H|∣|W₂|m) +
+   |H|=|W₂|·[H:W₂] (`index_mul_card` on W₂.subgroupOf H + `subgroupOfEquivOfLe` で card 同一視 +
+   `relIndex` defeq subgroupOf.index) + `mul_dvd_mul_iff_left` (|W₂|≠0) ⟹ `(W₂.subgroupOf H).index ∣ m`
+   (= 教科書 a≡0 mod |H:Z|)。
+5. **`inner_tau_alpha_dvd_index` (b75a06da)** = **⟨α^τ,ψ⟩ ∈ ℤ ∧ |H:W₂| ∣ it** (ψ=η'^{τ₁}∈𝒴^{τ₁})。
+   - **c=|H:W₂| を直接計算** (hypothesis 化不要): Ind_{W₂}φ(1)=[L:W₂]·φ(1)=[H:W₂]·|W₁|=|H:W₂|·η₁(1)
+     (`induce_apply_one`+`relIndex_mul_index`+`index_H_eq_card_W1`+`Yset_apply_one`)。
+   - reciprocity `inner_tau_indW2_sub_smul_eq` で ⟨α^τ,ψ⟩=⟨φ,Res_{W₂}Res_L ψ⟩−|H:W₂|·⟨η₁,Res_L ψ⟩。
+   - ⟨φ,Res⟩=star⟨Res,φ⟩=m (`inner_conj_symm`+`mem_ZIrr_inner_int`, m整数), |H:W₂|∣m (step4);
+     ⟨η₁,Res_L ψ⟩=b'∈ℤ (flip)。⟹ ⟨α^τ,ψ⟩=m−|H:W₂|·b', |H:W₂|∣it。
+   - gotchas: `inner_conj_symm` は mathlib `_root_.inner_conj_symm` と ambiguous→`OddOrder.RepresentationTheory.`
+     完全修飾; `restrict_mem_ZIrr`→`ClassFunction.restrict_mem_ZIrr`; `[Fintype ↥W2]` は型に出ない
+     (inner は G 上のみ)→ binder 削除 + `haveI := Fintype.ofFinite _` (sibling lemmas は型に W₂-inner があり要)。
+
+### ⚠ (6.8.2.2) 残 (decomposition + norm cluster, 次 loop):
+6. **j>1 の値**: ⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩ = ⟨α, η_j−η_1⟩ = |H:Z| (reciprocity `inner_tau_eq_inner_restrict`
+   + Y inner: Res_L(η_k^{τ₁}) と η_j の inner; η^{τ₁} coherence の等長性使用)。←要 Y-coherence inner API 精査。
+7. **α^τ 分解**: step5+6 から α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (x∈ℤ)。
+   ← 𝒴^{τ₁} 正規直交基底への射影分解。
+8. **norm endgame**: ‖α^τ‖²=‖α‖² (τ 等長, Pf (1.5.b)/(2.x)) =|L:Z|+|H:Z|², |L:Z|=|W₁||H:Z|<|H:Z|²
+   (W₁ FPF on H/Z≠1) ⟹ ‖α^τ‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0, or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。
+   ← ‖α‖² 計算 (Ind norm + η₁ norm + cross term) + W₁-FPF-on-H/Z の |L:Z|=|W₁||H:Z| が要点。
+→ (6.8.2.3) → τ₂ → (6.8) capstone。**正本=本 session 40 cont.。** 全 brick build-green+axiom-clean, 空転なし。
