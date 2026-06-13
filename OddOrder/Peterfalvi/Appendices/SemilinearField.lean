@@ -39,7 +39,7 @@ open scoped Classical
 
 section Prop2Core
 
-variable {k : Type*} [Field k] [Finite k] {T : Type*} [CommGroup T] [Finite T]
+variable {k : Type*} [CommRing k] {T : Type*} [CommGroup T] [Finite T]
   {M : Type*} [AddCommGroup M] [Module (MonoidAlgebra k T) M] [Finite M]
 
 /-- `End_{k[T]}(M)` is finite (it injects into the finite function space `M → M`). -/
