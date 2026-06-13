@@ -914,4 +914,27 @@ theorem inertia_eq_top_of_le_center
     exact mul_inv_cancel_right _ _
   exact congrArg (⇑φ) (Subtype.ext hval)
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **Norm of an induced character from a central subgroup: `‖Ind^L_{W₂}φ‖² = |L:W₂|`** for `φ` an
+irreducible (linear) character of `W₂ ≤ Z(↥L)`.  By `card_mul_inner_self_induce_eq_card_inertia`,
+`|W₂|·‖Ind^L_{W₂}φ‖² = |I_{↥L}(φ)|`, and `I_{↥L}(φ) = ⊤` (`inertia_eq_top_of_le_center`), so the
+right side is `|↥L|`; cancelling `|W₂|` and using `|↥L| = |W₂|·[L:W₂]` (`card_mul_index`) gives
+`‖Ind φ‖² = [L:W₂] = W₂.index`.
+
+This is the `|I_L(φ):Z| = |L:Z|` term of the (6.8.2.2) norm `‖α‖² = |L:Z| + |H:Z|²`. -/
+theorem inner_self_induce_eq_index_of_le_center
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    (φ : IrreducibleCharacter ↥W2) :
+    ClassFunction.inner (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ))
+        (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) = (W2.index : ℂ) := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hcard := card_mul_inner_self_induce_eq_card_inertia φ
+  rw [inertia_eq_top_of_le_center hW2cen (φ : ClassFunction ↥W2 ℂ), Subgroup.card_top] at hcard
+  have hLeq : (Nat.card ↥L : ℂ) = (Nat.card ↥W2 : ℂ) * (W2.index : ℂ) := by
+    rw [← Subgroup.card_mul_index W2]; push_cast; ring
+  rw [hLeq] at hcard
+  have hW2ne : (Nat.card ↥W2 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  exact mul_left_cancel₀ hW2ne hcard
+
 end OddOrder.Peterfalvi.S08
