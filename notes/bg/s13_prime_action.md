@@ -586,6 +586,27 @@ Thompson/Thm 3.7 の非自明再構成、または P-Q 中心化を回避する�
 - **推奨**: step 7 は documented sorry で温存 → **§13 構造 (Thm 13.5/Lemma 13.6/13.7…) を sorry'd 13.4 引用で積む**
   (option B; build-green structural progress, step 7 完成で自動 unconditional 化)。step 7 は dedicated research session 行き。
 
+### 2026-06-13 Lane G (同 session): pivot → **Theorem 13.5 の証明設計確定** (次ターン実装; ready-to-build)
+
+step 7 impasse 確定を受け option B へ pivot。**Theorem 13.5 (E₁≠1 ⟹ E₁ acts prime on M_σ)** の clean 証明を設計
+(mmd L3600 「E₁ cyclic ⟹ Cor 13.3 + Thm 13.4」)。新 leaf `S13_Theorem135.lean` 予定 (import: S13_PrimeAction
+[ActsPrimeOn/cyclicSylow_actsPrime] + S13_Theorem134 [centralizer_le_centralizer_of_tau1])。
+
+**設計 (K := fixedBy (M_σ) E₁ を universal target に)**: `ActsPrimeOn (M_σ) E₁` = ∀g∈E₁#, fixedByElement g = K。
+⊇ は `fixedBy_le_fixedByElement` で free。⊆ は `M_σ⊓C(g) ≤ C(E₁)` を示す:
+1. **cross-prime 補題 (crux)**: ∀ 素数 p,p' ∈ π(E₁), `fixedBy (M_σ) P_p = fixedBy (M_σ) P_{p'}` (P_p=Sylow p of E₁
+   =Sylow p of E [E₂E₃ coprime])。導出 = Cor 13.3(a) で `fixedBy P_p = fixedByElement (Ω₁P_p の生成元)`
+   (prime action) + **Thm 13.4** を (Ω₁P_p ∈ ℰ_p¹(E), Ω₁P_{p'} ∈ ℰ_{p'}¹(C_E(Ω₁P_p)) [E₁ abelian]) で適用 ⟹
+   `C_{M_σ}(Ω₁P_p) ⊆ C_{M_σ}(Ω₁P_{p'})`、両 prime ∈ τ₁ ゆえ対称で =。
+2. `fixedBy E₁ = ⋂_{p'} fixedBy P_{p'} = K` (E₁=∏ Sylows, C(E₁)=⋂C(P_{p'}); 全 fixedBy P_{p'} 相等)。
+3. g∈E₁#: ⟨g⟩=∏_{p|ord g}⟨g_p⟩ ⟹ `fixedByElement g = ⋂_{p|ord g} fixedByElement g_p = ⋂ fixedBy P_p = K`
+   (Cor 13.3(a) で各 g_p∈P_p#)。
+
+**実装注意**: fiddly = (a) E₁ の Sylow p を取り cyclic/maximal-in-E を示し cyclicSylow_actsPrime 適用、(b) Ω₁(P_p) ∈
+elemAbelianOfRank G p 1 (= ℰ_p¹) 構成、(c) ⟨g⟩=∏⟨g_p⟩ CRT と C(∏)=⋂C。~200-300 行・all-or-nothing (sorry 不可)。
+**この session は step 7 を exhaustive head-on (facts A/B/C rigorous + 遮断完全 map, commit a43dbc1e/9b924c31/54c2b33f)、
+13.5 は設計まで。次ターン = 13.5 実装。**
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
