@@ -402,6 +402,26 @@ scope が当初見積りより重いと判明 (要再判断):
 Cor 13.3 (cyclic Sylow & E₃ prime action) は **unblocked** (13.2 済) で productive。
 ⟹ ユーザー再判断: step 7 続行 vs Cor 13.3 へ pivot (step 7 は後日 dedicated)。
 
+### 2026-06-13 Lane G (loop): **step 7 hard-stop → Cor 13.3 へ pivot** (ユーザー裁可)
+
+ユーザー裁可で step 7 は documented sorry で温存 (rank framework `5f36ecdb` まで landed;
+hCeq の Thompson/Thm 3.7 climax = BG-elided original derivation で dedicated session 行き)。
+loop は **Cor 13.3** へ pivot。
+
+**Cor 13.3(a) 証明確定** (clean, tractable — scaffold `cyclicSylow_actsPrime` in S13_PrimeAction):
+P = E の cyclic Sylow p (p∉τ₂)。g∈P# について C_{M_σ}(g)=C_{M_σ}(P) を示す:
+- ⊇ は自明 (g∈P ⟹ C(P)⊆C(g))。
+- ⊆: M*∈ℳ(N_G(⟨g⟩)) を取る。P abelian ∋ g ⟹ P⊆C(g)⊆N(⟨g⟩)⊆M* ⟹ P≤M⊓M*。
+  **Cor 13.2(a)** (tau13_pSubgroup_centralizes.1, ⟨g⟩ & M*) で P が M_σ⊓M* を中心化。
+  C(g)⊆M* ⟹ C_{M_σ}(g)=M_σ⊓C(g)⊆M_σ⊓M* ⟹ P が C_{M_σ}(g) を中心化 ⟹ C_{M_σ}(g)⊆C(P);
+  かつ ⊆M_σ ⟹ ⊆C_{M_σ}(P)。∎
+- **要 sub-fact**: `p∈τ₁∪τ₃` (Cor 13.2 の仮定)。`mem_tau_union_of_mem_primeFactors` (S12_ECore:295)
+  で p∈τ₁∪τ₂∪τ₃; τ₂ 排除は cyclic Sylow (rank1) vs τ₂⟹pRank_M=2 (`tau2_pRank_eq_two`)。
+  ⚠ **要: Sylow-p-of-E が pRank_M(p) を捕捉** (p∈σ' ⟹ Sylow_p E = Sylow_p M) — 次 iteration で確認/構築。
+
+**Cor 13.3(b)** (E₃ prime): Cor 13.2(b) + E₃⊆E'⊆M*' ⟹ π(E₃)⊆τ₁(M*)' (Lemma 12.1: E₃ cyclic normal ⊆E')。
+→ Cor 13.2(b) で E₃ が C_{M_σ}(P) 中心化。**次 iteration**。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
