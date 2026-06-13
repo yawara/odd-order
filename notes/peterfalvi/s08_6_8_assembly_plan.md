@@ -1341,3 +1341,26 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
   `...X-structure...`) を case-B でミラー: bb=−|H:Z| branch で X:=α^τ+|H:Z|η₁^{τ₁} ⊥ 𝒴^{τ₁}, ‖X‖²=‖Ind φ‖²/...,
   X∈ZIrr ⟹ α^τ=X−|H:Z|η₁^{τ₁}。→ (6.8.2.3) → τ₂ assembly → (6.8.2) capstone。
 **正本=本 session 40 cont.⁶。** 🎉 dichotomy は (6.8.2.2) 最大の技術的山場、first-try で landed。空転なし。
+
+## 2026-06-14 (session 40 cont.⁷, /loop): good-case X-structure landed; FPF deferred (deep)
+
+**✅ landed (build-green + axiom-clean)**:
+16. **`orthogonal_tau_indW2_add_extension_caseB` (b1cdc2d5)** = (6.8.2.2) good-case X-structure。
+    `orthogonal_normOne_tau_scaledDiff_add_extension` (S08_CoherenceCore:10786) ミラー (norm 落とし)。
+    hgood (⟨α^τ,η₁^{τ₁}⟩=−|H:Z|) ⟹ X:=α^τ+|H:Z|η₁^{τ₁} ⊥ 𝒴^{τ₁} ∧ X∈ZIrr G ⟹ α^τ=X−|H:Z|η₁^{τ₁}。
+    Ind_{W₂}φ∈ZIrr=`induce_mem_ZIrr`+`IsIrreducibleCharacter.mem_ZIrr φ.2`; α^τ∈ZIrr=`dadeIntegralCharacterMap_mem_ZIrr_of_supported`。
+    gotcha: `classical` 要 (if-Decidable); `if_neg (Ne.symm hee)` (`.symm` は ¬-arrow に projection 不可)。
+
+### 🔭 FPF bound (hc2/hFPF) discharge = 深い構造 (調査結果, defer 継続):
+- 必要: case-B `CertainTypeHypothesis.centralizer_W2` (C_L(x)⊓K=W₂, x∈W₁#) → W₁ acts FPF on H/W₂ →
+  `IsFrobeniusGroup` 化 → `card_kernel_modEq_one` (Isaacs Ch06 FrobeniusGroup:274, |kernel|≡1 mod |compl|)
+  ⟹ |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|=|W₁||H:W₂|<|H:W₂|² (=hFPF), |H:W₂|≥2 (=hc2)。
+- **generic W2 と certain-type W₂ の接続**: 私の lemma 群は generic W2 (hW2comm/hW2cen 仮説)。case-B 適用時
+  W2=h46.W2。FPF は h46.W2 専用 ⟹ **discharge は capstone wiring 時 (Hypothesis46 構造完備の場所)**。
+  faithful (textbook も case-B 仮説下で (6.8.2.2) 証明)。**今は defer 継続が正しい**。
+
+### ⚠ (6.8.2.2) 残 (character-theoretic, 次 loop tractable):
+- **m=2 swap case** (bb=0 branch): η₁^{τ₁}↔−η₂^{τ₁} 入替で good-case に帰着 (textbook L: "second case reduces")。
+- **(6.8.2.2) 最終 statement** = dichotomy + X-structure (両 branch) を `α^τ = X − |H:Z|Y` 形に組立。
+- → **(6.8.2.3)** (χ∈X 版, [Is]2.27) → **τ₂ assembly** (6.8.2 proof) → capstone case-B branch。
+**正本=本 session 40 cont.⁷。** (6.8.2.2) decomposition は good-case 完成。残=m=2 case + (6.8.2.3) + τ₂ + FPF(capstone時)。
