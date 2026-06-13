@@ -1,5 +1,61 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢 2026-06-13 (Lane F session 15, Opus 4.8): **Thm 12.13 hard-core 着手 — 還元補題・extraspecial 共役・ℳ-矛盾エンジン**
+
+Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal` (leaf `S12_Theorem1213.lean`) の hard core は
+背理法 + 非共役矛盾。これまでに landed (build 緑・axiom-clean):
+- `mem_sigma_normalizer_le_of_two_maximals` (還元: Cor 12.10(a)(d) → `p∈σ(M)` ∧ `N_G(P)≤M`)。
+- `exists_conj_eq_center_mul_of_expPExtraspecial` (共役の半分: a₀∉Z, z∈Z ⟹ ∃q, q a₀ q⁻¹ = z·a₀。
+  φ:q↦⁅q,a₀⁆ が Z への全射準同型)。
+- **NEW** `eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (**ℳ-矛盾エンジン** = 最終矛盾の後半):
+  `A₀⋆ = g•A₀` (g∈M), `ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}` ⟹ `M=M⋆`。
+  共役は `N_G(·)` と可換 (`normalizer_conj_smul`)・coatom 保存 (`isCoatom_conj_smul`)・g∈M で M 固定
+  (`conj_smul_eq_self_of_mem_normalizer`)。すべて既存 helper (S12_ExceptionalBridge / S12_Corollary129 /
+  AInvariantPiSubgroups) で組める ⟹ 新 import 不要。
+
+### ▶ 12.13 hard core 残り decomposition (この順, BG mmd L3379–3397 精読済)
+
+**証明骨格** (背理法 `P` が distinct maximal `M,M⋆` に): WLOG `P` = Sylow p of `M∩M⋆` (⟹ Sylow p of G);
+Uniqueness で `r(P)=2`; Cor 10.7(b) `sylow_structure` で extraspecial `Q⊆P` (|Q|=p³, exp p),
+`Z=Z(Q)=Q'` 位数 p; Q/Z が `K=C_{M_α}(Z)` に作用, Prop 1.16 + Prop 12.4(a) で `K⊆M⋆`;
+Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(N_G(Z))≠{M}` ∧ `M_α≠1`
+(M_α=1 なら M=M∩M⋆⟹M⊆M⋆⟹M=M⋆ 矛盾)。最後に 12.4(b) **対偶** (M_α≠1) を M, M⋆ 両方に適用し
+`A₀,A₀⋆∈ℰ¹(A)−{Z}` (`ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}`) を取る。`A₀,A₀⋆` は Q 内非中心 line で
+**Q-共役** ⟹ エンジンで `M=M⋆` 矛盾。
+
+**残ピース (leaf に追加予定)**:
+1. ~~**line-共役** `exists_conj_smul_zpowers_eq_of_expPExtraspecial`~~ **✅ DONE (session 15)** —
+   type-level, sorry-free・axiom-clean。`b∈⟨a⟩⊔Z`(`mem_sup_of_normal_right` で `b=aⁱ·z`)⟹
+   `∃q, q•⟨a⟩=⟨b⟩`。ZMod p 体で `j:=i⁻¹.val`, center 位数 p で `z^p=1`, `exists_conj_eq_center_mul`
+   を `z^j∈Z` に適用→`(z^j a)ⁱ=z·aⁱ=b∈q•⟨a⟩`→両辺位数 p で等号。
+   **デバッグ知見** (再利用): `Nat.card (φ•H)` は `(φ•H : Subgroup Q)` 型注釈必須 (Nat.card が Type 期待で
+   `•` が誤 elaborate); `Subgroup.equivMapOfInjective` は `≃*` ゆえ `Nat.card_congr` には `.toEquiv`;
+   `Subgroup.eq_of_le_of_card_ge` (not `_le`; `[Finite K]` (hle:H≤K) (Nat.card K≤Nat.card H):H=K);
+   `Commute z a` は `(mem_center_iff.mp hz a).symm` を中間 `have` に (Eq 経由 dot は `Eq.zpow_left` 解決失敗);
+   `zpow_mem hz j` (root, K 暗黙; `Subgroup.zpow_mem` は引数順違い)。
+2. ~~**還元チェーン**~~ **✅ DONE (session 15)** — 2 補題で landed (sorry-free・axiom-clean):
+   - `exists_sylow_eq_map_of_normalizer_le` (R-a): `Sylow p of K (≤G)` で `N_G(P̄)≤K` ⟹ `P̄` は G の Sylow p。
+     S10.isSylow_sylowMap_of_mem_sigma の非 σ 一般化 (同証明; private `lt_inf_normalizer_of_lt_of_isPGroup`
+     を leaf に複製)。
+   - `exists_expPExtraspecial_le_of_two_maximals` (還元本体): 非可換 P が distinct max M≠M⋆ に
+     ⟹ `∃Q≤M∩M⋆, IsExpPExtraspecial p Q ∧ |Q|=p³`。P を M∩M⋆ の Sylow に拡大→R-a で G-Sylow→
+     **r(S)≤2** (by_contra r≥3 ⟹ `Ch2.S09.uniquenessTheorem hG hSlt (by omega) (Or.inl ⟨3≤r⟩)` で
+     IsUniquelyMaximal S, `huniq.2.unique` で M=M⋆ 矛盾) → S 非可換で `S10.sylow_structure …2.1 hrank2`
+     の abelian 枝を排し extraspecial Q。
+   **🔑 flagged gap 解消**: Uniqueness の hr3 は「P Sylow rank2」でなく **by_contra (r≥3) 分岐内で Or.inl** で供給
+   (BG「Uniqueness で r(P)≤2」は対偶。`uniquenessTheorem` 署名はそのまま使える)。
+3. **K⊆M⋆**: Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`, Q/Z noncyclic rank2 が
+   K に coprime 作用) の各 generator `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two`
+   を M⋆ に適用, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。**coprimality** `(|Q/Z|,|K|)=1` の確立が要 (K=C_{M_α}(Z), M_α は
+   α-Hall, p∈σ−α なので p∤|M_α|?)。
+4. **N_M(Z)⊆M⋆ + M_α≠1**: Cor 10.9(b) (`M=(M∩M⋆)M_α`) + Lem 6.5(b)
+   (`normalizer_eq_centralizerK_mul_normalizerU`)。M_α≠1 は M≠M⋆ から。
+5. **12.4(b) 対偶 適用 ×2 + 組立**: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` の対偶
+   (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} から。エンジンへ。
+
+**⚠ 注意点**: (2) Uniqueness の hr3 条項供給と (3) coprimality が要精査の gap。(1)(エンジン) は独立で確定。
+multi-session 見込み (BG で最も配線が多い σ-side keystone)。各ピースを leaf に順次追加, 1,500 行で分割。
+
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 
 **BG Theorem 12.12 (Frobenius 因子分解) を完全形式化**(`frobenius_factorization_of_regular`,
