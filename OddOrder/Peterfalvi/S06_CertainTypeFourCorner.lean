@@ -65,14 +65,35 @@ theorem chiColumn_apply_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
       * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) : ℂˣ) : ℂ) = _
   rw [Units.val_mul]
 
-/-- **(4.10), piece (b): the `W`-side four-corner is supported on `V = W − W₂`.**
-The four-corner `ω_{ij} − ω_{0j} − (ω_{i0} − ω_{00})` is the difference of the two column
-differences `ω_{·j} − ω_{0j}` (column `χ₂`) and `ω_{·0} − ω_{00}` (column `1`), each of which is
-the `SupportedOnV` element `omegaColumnDiff` of (4.3.b): it vanishes on `W₂`, where the
-`W₁`-character factor `(w1CharEquiv i)(wFst w)` is killed, so the row difference dies.  The
-support submodule `CF(W, W − W₂)` is closed under subtraction (`Submodule.sub_mem`), so the
-four-corner lies in it too — no pointwise computation, sidestepping the `chiColumn`/`alphaCF`
-coercion mismatch of the direct route. -/
+/-- On `W₂`, the column character `ω_{ij} = chiColumn χ₂ i` is independent of the row `i`:
+`wFst` kills `W₂` (`wFst_eq_one_of_mem_W2`), so the `W₁`-character factor `(w1CharEquiv i)(wFst w)`
+collapses to `1` and `ω_{ij}(w) = χ₂(wSnd w)` for every row.  The `W₂` companion of
+`chiColumn_apply_of_mem_W1`. -/
+theorem chiColumn_apply_of_mem_W2 (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {w : ↥h.sdiffTICyclicHypothesis.W}
+    (hw : w ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W) :
+    (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) w
+      = (χ₂ (h.sdiffTICyclicHypothesis.wSnd w) : ℂ) := by
+  have hχ : (h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w) = 1 := by
+    rw [h.sdiffTICyclicHypothesis.wFst_eq_one_of_mem_W2 hw]; exact map_one _
+  have h1 : h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv i) χ₂ w
+      = (h.w1CharEquiv i) (h.sdiffTICyclicHypothesis.wFst w)
+        * χ₂ (h.sdiffTICyclicHypothesis.wSnd w) := rfl
+  rw [Hypothesis.chiColumn, h.sdiffTICyclicHypothesis.omega_apply, h1, hχ, one_mul]
+
+/-- **(4.10), piece (b): the `W`-side four-corner is supported on `V = W − (W₁ ∪ W₂)`.**
+The four-corner `ω_{ij} − ω_{0j} − (ω_{i0} − ω_{00})` vanishes off `V` because it dies on both
+`W₁` and `W₂`:
+* on `W₂` (`chiColumn_apply_of_mem_W2`) every `ω` collapses to its `χ₂`-value, independent of the
+  row, so `ω_{ij} − ω_{0j} = 0` and `ω_{i0} − ω_{00} = 0`;
+* on `W₁` (`chiColumn_apply_of_mem_W1`) every `ω` collapses to its `W₁`-character value,
+  independent of the column, so `ω_{ij} − ω_{i0} = 0` and `ω_{0j} − ω_{00} = 0` (the four-corner
+  rearranges to a cancelling pair).
+
+This is the strong support `CF(W, W − (W₁ ∪ W₂)) = SupportedOnV ℂ toTICyclicHypothesis` that the
+induced four-corner `Ind_W^L(·)` (piece (a)) needs for `Supp ⊆ V^L ⊆ A₀`, sidestepping the
+`chiColumn`/`alphaCF` coercion mismatch of the direct `= alphaCF` route. -/
 theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
     [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
@@ -81,23 +102,85 @@ theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
         - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
           - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)))
       ∈ ClassFunction.supportedSubmodule
-          (OddOrder.Peterfalvi.S04.supportInSubgroup h.sdiffTICyclicHypothesis.V
+          (OddOrder.Peterfalvi.S04.supportInSubgroup h.toTICyclicHypothesis.V
             h.sdiffTICyclicHypothesis.W) := by
-  -- the four-corner is `↑(ω_{·j} − ω_{0j}) − ↑(ω_{·0} − ω_{00})`, a difference of two
-  -- `omegaColumnDiff` carriers; `chiColumn = omega ∘ omegaProdChar` makes the match definitional.
-  have key : (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro w hw
+  rw [ClassFunction.mem_support] at hw
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  -- `toTICyclicHypothesis.V = ↑(W₁ ⊔ W₂) ∖ (↑W₁ ∪ ↑W₂)`
+  have hVdef : h.toTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
+  rw [hVdef, Set.mem_diff, Set.mem_union, not_or]
+  refine ⟨w.2, fun h1 => hw ?_, fun h2 => hw ?_⟩
+  · -- `(w : L) ∈ W₁`: column difference cancels (row-only dependence)
+    have hwmem : w ∈ h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
+      Subgroup.mem_subgroupOf.mpr h1
+    simp only [ClassFunction.sub_apply, chiColumn_apply_of_mem_W1 h χ₂ i hwmem,
+      chiColumn_apply_of_mem_W1 h χ₂ 0 hwmem, chiColumn_apply_of_mem_W1 h 1 i hwmem,
+      chiColumn_apply_of_mem_W1 h 1 0 hwmem]
+    ring
+  · -- `(w : L) ∈ W₂`: row difference cancels (column-only dependence)
+    have hwmem : w ∈ h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W :=
+      Subgroup.mem_subgroupOf.mpr h2
+    simp only [ClassFunction.sub_apply, chiColumn_apply_of_mem_W2 h χ₂ i hwmem,
+      chiColumn_apply_of_mem_W2 h χ₂ 0 hwmem, chiColumn_apply_of_mem_W2 h 1 i hwmem,
+      chiColumn_apply_of_mem_W2 h 1 0 hwmem]
+    ring
+
+/-- **(4.10), piece (b), packaged**: the `W`-side four-corner as an element of
+`CF(W, W − (W₁ ∪ W₂)) = SupportedOnV ℂ toTICyclicHypothesis`, the carrier fed to the L-side
+induction `Ind_W^L` (its `toTICyclic` Dade map).  This bundles the membership
+`chiColumn_fourcorner_mem_supportedSubmodule` as a subtype element
+(`sdiff.W = toTICyclicHypothesis.W` definitionally). -/
+noncomputable def chiFourCornerOnV (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ h.toTICyclicHypothesis :=
+  ⟨(h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)),
+   chiColumn_fourcorner_mem_supportedSubmodule h χ₂ i⟩
+
+/-- **(4.10) L-side support bridge**: an `L`-conjugate of a point of `V = W − (W₁ ∪ W₂)` lands in
+`A₀ = A ∪ {l·v·l⁻¹ | l ∈ L, v ∈ tic.V}`.  Since `V ⊆ W − W₂` maps (via `L ↪ G`) into
+`tic.V = ↑W \ ↑W₂` (`tic_W_eq_map` for the `W`-part, `L.subtype` injectivity for the `∉ W₂` part),
+every such conjugate has the required `A₀` form.  This is the group-theory core of
+`Supp(Ind_W^L α) ⊆ V^L ⊆ A₀`, the L-side packaging that feeds the certain-type Dade map `h.tau`. -/
+theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
+    {z : ↥L} (hz : z ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V) :
+    (L.subtype z) ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G) := by
+  obtain ⟨v, hvV, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hz
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  have hVdef : h.toTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
+  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hvV
+  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hvV
+  have hvtic : (L.subtype v) ∈ h.tic.V := by
+    rw [h.tic_V, Set.mem_diff]
+    refine ⟨?_, ?_⟩
+    · rw [tic_W_eq_map h]
+      exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
+    · rw [h.tic_W2]
+      rintro hmem
+      obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
+  refine Or.inr ⟨L.subtype c, c.2, L.subtype v, hvtic, ?_⟩
+  rw [← hc]
+  simp [map_mul, map_inv]
+
+/-- The underlying class function of `chiFourCornerOnV` is the four-corner itself: bundling adds
+no content, so the coercion is definitional.  (The coercion lands on `toTICyclicHypothesis.W`,
+which is `sdiff.W` definitionally; this `rfl` records that downstream rewrites are sound.) -/
+theorem chiFourCornerOnV_coe (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((chiFourCornerOnV h χ₂ i :
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ h.toTICyclicHypothesis) :
+        ClassFunction h.toTICyclicHypothesis.W ℂ)
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
         - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
         - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
-          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
-      = (↑(h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂) :
-            ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
-        - (↑(h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) 1) :
-            ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
-    rw [h.omegaColumnDiff_coe, h.omegaColumnDiff_coe]
-    rfl
-  rw [key]
-  exact Submodule.sub_mem _
-    (h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) χ₂).2
-    (h.omegaColumnDiff (h.w1CharEquiv i) (h.w1CharEquiv 0) 1).2
+          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) :=
+  rfl
 
 end OddOrder.Peterfalvi.S06
