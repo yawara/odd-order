@@ -361,6 +361,22 @@ theorem notMem_alpha_of_rank_sylow_le_two [Finite G] {M : Subgroup G} {p : ℕ} 
     _ ≤ 2 := hrank2
   omega
 
+/-- **Proposition 12.4(b), contrapositive form**: for `A ∈ ℰ²_p(M)` with `A ≤ M`, if `M_α ≠ 1`
+then some line `A₀ ∈ ℰ¹(A)` has `ℳ(N_G(A₀)) = {M}`.
+
+This is the negation of the hypothesis of `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`
+(whose conclusion includes `M_α = 1`): if every line had `ℳ(N_G(·)) ≠ {M}`, then `M_α = 1`. In
+BG 12.13 (where `M_α ≠ 1` holds by `Malpha_ne_bot_of_sylow_normalizer_le`) this produces the
+distinguished line `A₀` realizing `M`. -/
+theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) (hα : S10.Malpha M ≠ ⊥) :
+    ∃ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A ∧
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) = {M} := by
+  by_contra h
+  push_neg at h
+  exact hα (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM h).2.1
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)

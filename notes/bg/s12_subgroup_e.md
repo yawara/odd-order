@@ -57,15 +57,27 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
    Z≤M∩M⋆, coprime) で `N_M(Z)=C_{M_α}(Z)·N_{M∩M⋆}(Z)⊆M⋆` ⟹ **ℳ(N_G(Z))≠{M}** (∵ N_M(Z)⊆M⋆≠M)。
    **⚠ 最難所**: Prop 1.16 の `cocyclicFixedByClosure` を K=C_{M_α}(Z) 上の Q/Z 作用に instantiate +
    `C_K(A/Z)=C_K(A)` (Z 中心化ゆえ quotient fixed = ambient fixed) + ℰ¹(Q/Z)↔ℰ²(Q) の対応。
-6. **12.4(b) 対偶 適用 ×2 + 組立** [piece 5 後は mechanical]: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`
-   の対偶 (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} (piece 5) から。M⋆ 側も同様。
-   line-共役 + engine (back-end 済) で M=M⋆ 矛盾。
+6. **12.4(b) 対偶 ✅ DONE (session 15)** `exists_line_maximalContaining_eq_of_Malpha_ne_bot`:
+   A∈ℰ²(M), A≤M, M_α≠⊥ ⟹ ∃A₀∈ℰ¹(A), A₀≤A, ℳ(N_G(A₀))={M} (push_neg + 12.4(b))。
+   組立: A₀≠Z は ℳ(N_G(Z))≠{M} (piece 5) から。M⋆ 側も同様 → line-共役 + engine で M=M⋆ 矛盾。
 
-**⚠ 注意点**: piece 2 (reduction)・3 (M_α≠1)・4 (coprimality) ✅; back-end (line-conj+engine) ✅。
-**残 = piece 5 (K⊆M⋆, Prop 1.16 instantiation = 最難所) + piece 6 (12.4b 適用組立)**。
-⚠ piece 6 は `Sg` (G-Sylow) を要する: 主定理組立時に R-a を呼び `Sg`+`N_G(Sg)≤M∩M⋆`+`rank≤2`+Q を
-一括取得して各補題 (Malpha_ne_bot, notMem_alpha, piece5) に供給する設計
-(現 `exists_expPExtraspecial_le_of_two_maximals` は Q のみ返す → 組立時に richer 版か inline 再導出)。
+**⚠ 注意点 (session 15 末)**: ✅ piece 2 (reduction)・3 (M_α≠1)・4 (coprimality)・6前半 (12.4b 対偶);
+✅ back-end (line-conj+engine)。**残 hard = piece 5 (K⊆M⋆)** + 主定理組立。
+- **piece 5 = K⊆M⋆ assessment (最難所, multi-iter 見込み)**: `le_centralizer_of_forall_line` (12.4b の
+  Prop 1.16 engine) は **「W≤C(A) (centralizer)」結論で 12.13 の「K≤M⋆ (maximal 包含)」には流用不可**。
+  raw `cocyclicFixedByClosure_eq_top_of_not_isCyclic` を **A':=Q/Z (=↥Q⧸Z), G':=↥K** で instantiate 要:
+  (1) **作用 `φ:(↥Q⧸Z) →* MulAut ↥K` の構成 = crux** (Q は K=C_{M_α}(Z) を正規化 [Q≤M, M_α⊴M, Z normalize];
+  Z は K を中心化ゆえ作用は Q/Z を経由)。(2) coprime (`p∤|K|`, p∉α 済) + noncyclic (Q/Z≅(ℤ/p)²)。
+  (3) `cocyclicFixedByClosure=⊤` ⟹ K=⟨C_K(Y)|Y≤Q/Z,(Q/Z)/Y cyclic⟩。(4) 各 `C_K(Y)⊆C_G(A_Y)⊆M⋆`
+  (A_Y=Y の Q 内 preimage ∈ℰ²(Q), 12.4(a)=`centralizer_le_of_elemAb_rank_two` を M⋆ に; Y=Q/Z は
+  C_K(Q)⊆C_K(line))。⟹ K⊆M⋆ → Lem 6.5(b) で N_M(Z)⊆M⋆ → ℳ(N_G(Z))≠{M}。**(1) の quotient-action
+  MonoidHom 構成が型重く 1-2 iter。**
+- **主定理組立 (piece 5 後 or piece5-sorry で先行可)**: ⚠ `Sg` (G-Sylow) を要す (Malpha_ne_bot/notMem_alpha 用)。
+  現 `exists_expPExtraspecial_le_of_two_maximals` は Q のみ返す → **richer reduction (Sg+rank≤2+Q 一括) 版**を
+  足すか主定理で inline 再導出。+ **A∈ℰ²(Q) 構成** (a∉Z で ⟨a⟩⊔Z, elemAbelianOfRank G p 2) +
+  **line-共役の ↥Q↔G transport** (A₀,A₀⋆ を ↥Q の zpowers 経由で G-subgroup 化) が要。
+  推奨: 次 iter で **piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)** で合成検証 +
+  piece5 隔離、その後 piece5 本体。
 
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 
