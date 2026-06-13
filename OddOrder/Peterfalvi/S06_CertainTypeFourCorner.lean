@@ -128,4 +128,32 @@ theorem chiColumn_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
       chiColumn_apply_of_mem_W2 h 1 0 hwmem]
     ring
 
+/-- **(4.10), piece (b), packaged**: the `W`-side four-corner as an element of
+`CF(W, W − (W₁ ∪ W₂)) = SupportedOnV ℂ toTICyclicHypothesis`, the carrier fed to the L-side
+induction `Ind_W^L` (its `toTICyclic` Dade map).  This bundles the membership
+`chiColumn_fourcorner_mem_supportedSubmodule` as a subtype element
+(`sdiff.W = toTICyclicHypothesis.W` definitionally). -/
+noncomputable def chiFourCornerOnV (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ h.toTICyclicHypothesis :=
+  ⟨(h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)),
+   chiColumn_fourcorner_mem_supportedSubmodule h χ₂ i⟩
+
+/-- The underlying class function of `chiFourCornerOnV` is the four-corner itself: bundling adds
+no content, so the coercion is definitional.  (The coercion lands on `toTICyclicHypothesis.W`,
+which is `sdiff.W` definitionally; this `rfl` records that downstream rewrites are sound.) -/
+theorem chiFourCornerOnV_coe (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ((chiFourCornerOnV h χ₂ i :
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ h.toTICyclicHypothesis) :
+        ClassFunction h.toTICyclicHypothesis.W ℂ)
+      = (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) :=
+  rfl
+
 end OddOrder.Peterfalvi.S06
