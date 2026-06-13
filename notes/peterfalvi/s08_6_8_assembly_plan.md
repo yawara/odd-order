@@ -1213,3 +1213,30 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
    (W₁ FPF on H/Z≠1) ⟹ ‖α^τ‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0, or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。
    ← ‖α‖² 計算 (Ind norm + η₁ norm + cross term) + W₁-FPF-on-H/Z の |L:Z|=|W₁||H:Z| が要点。
 → (6.8.2.3) → τ₂ → (6.8) capstone。**正本=本 session 40 cont.。** 全 brick build-green+axiom-clean, 空転なし。
+
+## 2026-06-14 (session 40 cont.², /loop): decomposition+norm 基盤 2 brick + 構造解明
+
+**🔑 構造解明 (再調査不要)**: (6.8.1) Frobenius case が (6.8.2.2) と**構造平行**で直接テンプレ:
+- `inner_tau_scaledDiff_tau_Yset_diff_of_frobenius` (S08_CoherenceCore:10462) = step6 cross-term テンプレ。
+- `inner_self_tau_scaledDiff_of_frobenius` (:10524) = step8 norm テンプレ。
+- **Dade isometry** = `S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj (S:={...}) (hsupp) (mem)(mem)` ⟹ ⟨τφ,τψ⟩=⟨φ,ψ⟩ (φ,ψ supported on `supportInSubgroup (sharpImage H) L`)。**`hyp.tau` は defeq `dadeIntegralCharacterMap hyp.dade (fullDadeIsometryData hconj)`** ゆえ `exact` 一発。
+- **coherence agreement** = `S07.IsCoherent.extends_on_supported`: β∈zSupportedSpan Yset A ⟹ extension β = tau β (A=supportInSubgroup, NOT L^#)。**Y-diff η_j−η_1 は supported** (`sMember_diffSupport_of_charValue_eq`, η_j(1)=η_1(1)=|W₁|)。
+- **η∈Y は W₂ 上定数** = `Yset_apply_eq_apply_one_of_mem_commutator` (W₂⊆⁅H,H⁆) ⟹ Res_{W₂}η_j=Res_{W₂}η_1。
+
+**✅✅ landed (build-green + axiom-clean)**:
+6. **`inner_self_tau_indW2_sub_smul` (57c4ccc8)** = **‖α^τ‖²=‖α‖²** (α=Ind_{W₂}φ−c•η₁, α(1)=0)。
+   `support_indW2_sub_smul_subset_sharpImage` + Dade isometry on {α} singleton。`exact` 一発。
+7. **`inner_induce_W2_Yset_diff_eq_zero` (4dde3faa)** = **⟨Ind_{W₂}φ, η'−η⟩=0** (Res_{W₂}η'=Res_{W₂}η, η const on W₂)。
+   reciprocity `inner_induce_eq_inner_restrict` + restrict 等価。
+
+### ⚠ (6.8.2.2) 残 (次 loop):
+- **step6 full** `⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩=|H:Z|`: agreement [(η_j^{τ₁}−η_1^{τ₁})=extension(η_j−η_1)=tau(η_j−η_1),
+  extension の map_sub 線型 + extends_on_supported] + isometry [dadeICM_inner_eq on {α, η_j−η_1}] +
+  source [本 session ⟨Ind φ,η_j−η_1⟩=0 ∧ ⟨η₁,η_j−η_1⟩=−1 (Y orthonormal)] ⟹ ⟨α,η_j−η_1⟩=0−|H:Z|(−1)=|H:Z|。
+- **step7 分解**: α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (step1 ≡0 mod |H:Z| + step6 から
+  𝒴^{τ₁} 正規直交基底への射影)。
+- **step8 norm endgame**: ‖α‖²=‖Ind_{W₂}φ‖²−2|H:Z|Re⟨Ind φ,η₁⟩+|H:Z|²‖η₁‖²。⟨Ind φ,η₁⟩=⟨φ,Res η₁⟩=
+  |W₁|⟨φ,1⟩=0 (φ nontrivial), ‖η₁‖²=1, ‖Ind_{W₂}φ‖²=⟨φ,Res Ind φ⟩=|I_L(φ):W₂|=|L:W₂| (要 I_L(φ)=L, Pf(1.5.b)) ⟹
+  ‖α‖²=|L:W₂|+|H:W₂|²。|L:W₂|=|W₁||H:W₂|<|H:W₂|² (W₁ FPF on H/Z, |W₁|<|H:W₂|) ⟹ ‖α^τ‖²<2|H:W₂|² ⟹
+  (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。← ‖Ind φ‖²=|L:W₂| (Mackey/inertia) と FPF が要点。
+→ (6.8.2.3) → τ₂ → capstone。**正本=本 session 40 cont.²。** 全 brick green+axiom-clean、空転なし。
