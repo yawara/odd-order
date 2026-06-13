@@ -521,6 +521,47 @@ R'=Sylow⟹p-群⟹巡回) で処理しており、A 全体の cyclic 性は使�
   (scaffold-cite, structural progress; step 7 完成で自動 unconditional 化)。**この session は ④ の調査で head-on を遂行**;
   build/sorry 不変 (notes-only)。
 
+### 2026-06-13 Lane G (dedicated session 続き): ソース読解 (head-on 継続) → **per-Sylow cyclic trick で step 7 を大幅構造化** (正本)
+
+ユーザー裁可で BG Ch3 coprime 構造定理 (Thm 3.6/3.7/3.8/3.9/3.10) + Gorenstein を読解。直接の inclusion 補題は
+無いが、**BG Theorem 1.11 (Ω₁-rigidity, repo formalize 済 `S01c_Omega1Rigidity.lean`) が p-群限定**である点が鍵で、
+**per-Sylow では C_{R'}(P) が cyclic** ((非 nilpotent M_α 全体では失敗した) cyclic Aut-abelian trick が復活)。
+これで step 7 の attack が一変。**以下が新しい正本。前項④の「shortcut 棄却」は per-Sylow で覆る。**
+
+**🔑 per-Sylow cyclic Aut-abelian trick (rigorous・Lean-able)**:
+各 `r'∈α(M)` で **PRS-不変 Sylow r' `R'` of M_α** を取る (存在: `SPR = S⋊PR` は {p,q,r}-群で M_α [α-群] と
+coprime [p,q,r∉α] ⟹ coprime-action で SPR-不変 Sylow 存在; PR が S を正規化 [`hSinv`] ゆえ SPR が群)。
+`C_{R'}(P)` は **cyclic** (`isCyclic_of_pRank_le_one`: R' は r'-群 ∧ rank≤1 ∧ r' odd)。S,R は R' と P を正規化
+⟹ `C_{R'}(P)≤C(P)∩R'` を正規化、Aut(cyclic)=abelian ⟹ **`Q=[S,R]` が `C_{R'}(P)` を中心化**。
+
+**この trick から導かれる rigorous facts (全て Lean 構成可)**:
+- **(A) Q が `C_{M_α}(P)` を中心化** (= Lean の `hAcQ`, **hCeq 不要で直接導出可**): `C_{M_α}(P)` は自身の Sylow
+  `C_{R'}(P)` で生成 (有限群 = ⟨Sylows⟩; coprime-action で C_{M_α}(P) の Sylow r' = C_{R'}(P))、各を Q が中心化 ⟹ 全体中心化。
+- **(B) `C_{M_α}(PR)=⊥`** (= R が `C_{M_α}(P)` に FPF, かつ P が `C_{M_α}(R)` に FPF): (A) で `C_{M_α}(P)⊆C(Q)` ⟹
+  `C_{M_α}(P)∩C(R) ⊆ M_α∩C(R)∩C(Q) = C_{M_α}(RQ) = ⊥` (`hCRQ_bot`)。
+- **(C) `C_{M_α}(R)` は cyclic**: (B) で P が `C_{M_α}(R)≠⊥` に FPF ⟹ Thm 3.7 (`isNilpotent_of_normalizing_primeOrder_fixedPointFree`)
+  で nilpotent ⟹ rank≤1 ∧ odd ⟹ cyclic。
+
+**🛑 残る hard core (closure) = inclusion 自体は (A)(B) と「両立して FALSE」**: (A)(B) は **R が C_{M_α}(P) に FPF /
+P が C_{M_α}(R) に FPF** を与え、これは BG の inclusion (`C_{M_α}(P)⊆C(R)` 等) と逆 ⟹ BG の inclusion/等式は
+偽仮定 Q≠1 下の「偽の派生」。**genuine な closure は S-非対称性で阻まれる**: 「Q が C_{M_α}(P) 中心化」(A) を
+C_{M_α}(R) へ移送するには S が C_{M_α}(R)=M_α∩C(R) を正規化する必要があるが **S⊄N(R)** (S は P 経由で定義され R 用の
+対称物が無い)。BG は等式でこれを回避。
+- **closure の見立て (次の hard core)**: C_{M_α}(R)≠⊥ cyclic の素因子 r''∈α(M) で Sylow R'' (rank≥3) を取り、
+  P が C_{R''}(R)≠⊥ (cyclic) に FPF + rank≥3 構造から **Thompson R''_1 (`exists_charSubgroup_exponent_not_centralized`)
+  + Thm 3.7** で矛盾を出す (PQ_eq_bot 範型の ~hard core)。これが BG「we can conclude」の実体と推定。
+- **⟹ step 7 の改訂 attack (4 step)**: (1) per-Sylow cyclic trick → fact (A)(B) [Lean-able, ~中規模] →
+  (2) fact (C) cyclic [Thm 3.7] → (3) **Thompson closure on rank-≥3 R''** [hard core, ~PQ_eq_bot scale] →
+  (4) 矛盾。**(1)(2)(4) は機械的、(3) が唯一の真の難所**。
+
+**ツール確定** (全 repo 在): Thm 1.11 `actsTrivially_of_fixes_omega1_centralizer`/`...` (S01c_Omega1Rigidity),
+`isCyclic_of_pRank_le_one` (S10_LocalCriteria), Thm 3.7 `isNilpotent_of_normalizing_primeOrder_fixedPointFree`
+(S03c), `exists_charSubgroup_exponent_not_centralized` (Thompson 1.13), `exists_invariant_sylow_Malpha_rank_three`
+(S12_E), `card_eq_prime_of_le_exponent_prime`/`eq_of_card_eq_of_le_of_isCyclic` (S12_Lemma1218)。
+**評価**: 「totally elided」から「(A)(B)(C) rigorous + 単一 Thompson closure」へ前進。次セッションは (1)(2) を land
+(fact A=hAcQ を hCeq 非依存で証明し既存 step 8-9 を一部組換え) → (3) Thompson closure に集中。**この session は head-on で
+math を大幅前進** (build/sorry 不変, notes-only)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
