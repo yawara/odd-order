@@ -163,4 +163,31 @@ theorem SibleyDadeHypothesis.exists_decomposition_caseB
       + ((W2.subgroupOf H).index : ℂ) • cY.extension η₁, horth, hXZ, ?_⟩
   abel
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **(6.8) case-(B) structural discharge: `W₂ ⊆ Z(↥L)`.**  In the (4.2)/certain-type structure
+`L = K ⋊ W₁` (with `W₂ ≤ K`), if `W₂` *centralizes `K`* (the math-(B) condition `W₂ ⊆ Z(K) = Z(H)`,
+the `Z(H) ∩ W₂ = W₂` branch of `eq_bot_or_eq_of_le_of_card_prime`), then `W₂` is central in `↥L`.
+Indeed `W₂` also centralizes `W₁` (`Hypothesis.commute_of_mem_W1_of_mem_W2`), and every `g ∈ ↥L`
+factors as `g = k·w₁` (`K ⋊ W₁` complement), so `g·w = k·w₁·w = k·w·w₁ = w·k·w₁ = w·g` for `w ∈ W₂`.
+
+This discharges the `W₂ ≤ Z(↥L)` hypothesis (`hW2cen`) of the (6.8.2.2) case-(B) lemmas, supplied at
+capstone wiring from the `cases` `Hypothesis46` and the math-(B) sub-case. -/
+theorem certainType_W2_le_center (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
+    (hW2cenK : h.W2 ≤ Subgroup.centralizer (↑h.K : Set ↥L)) :
+    h.W2 ≤ Subgroup.center ↥L := by
+  intro w hw
+  rw [Subgroup.mem_center_iff]
+  intro g
+  obtain ⟨⟨k, w₁⟩, hkw0⟩ := h.isComplement.surjective g
+  have hkw : (k : ↥L) * (w₁ : ↥L) = g := hkw0
+  have hck : (k : ↥L) * w = w * (k : ↥L) :=
+    Subgroup.mem_centralizer_iff.mp (hW2cenK hw) (k : ↥L) k.2
+  have hcw1 : (w₁ : ↥L) * w = w * (w₁ : ↥L) :=
+    (h.commute_of_mem_W1_of_mem_W2 w₁.2 hw).eq
+  calc g * w
+      = (k : ↥L) * (w₁ : ↥L) * w := by rw [← hkw]
+    _ = (k : ↥L) * (w * (w₁ : ↥L)) := by rw [mul_assoc, hcw1]
+    _ = w * ((k : ↥L) * (w₁ : ↥L)) := by rw [← mul_assoc, hck, mul_assoc]
+    _ = w * g := by rw [hkw]
+
 end OddOrder.Peterfalvi.S08
