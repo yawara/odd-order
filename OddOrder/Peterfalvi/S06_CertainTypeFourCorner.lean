@@ -184,6 +184,53 @@ theorem centralizer_le_L_of_mem_ticVdiffV (h : Hypothesis46 A L) {v : G}
   have hcW : c ∈ (ticVdiff h).W := (ticVdiff h).V_ti c ⟨v, hv, by rw [hconj]; exact hv⟩
   exact le_trans (tic_W_eq_map h).le (Subgroup.map_subtype_le _) hcW
 
+/-- The L-side `V = W − (W₁ ∪ W₂)` maps (under `L ↪ G`) into the G-side `ticVdiff.V`: both are
+`W − (W₁ ∪ W₂)`, identified by `tic_W_eq_map`/`tic_W1`/`tic_W2` and `L.subtype` injectivity. -/
+theorem coe_mem_ticVdiffV_of_mem_toTICV (h : Hypothesis46 A L) {v : ↥L}
+    (hv : v ∈ h.toTICyclicHypothesis.V) :
+    (L.subtype v) ∈ (ticVdiff h).V := by
+  have hVdef : h.toTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
+  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hv
+  obtain ⟨hvW, hvnW1, hvnW2⟩ := hv
+  refine ⟨?_, ?_⟩
+  · rw [tic_W_eq_map h]
+    exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
+  · rw [Set.mem_union, not_or, h.tic_W1, h.tic_W2]
+    refine ⟨fun hmem => ?_, fun hmem => ?_⟩
+    · obtain ⟨w, hwW1, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW1 (L.subtype_injective hweq ▸ hwW1)
+    · obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
+
+/-- Conjugation closure of `centralizer_le_L_of_mem_ticVdiffV`: a point `L`-conjugate (inside `L`)
+to a point of `V` is still self-centralizing into `L`, `C_G(w) ⊆ L`.  If `c` centralizes
+`w = l·v·l⁻¹` then `l⁻¹·c·l` centralizes `v`, hence lies in `L` (the base case), so
+`c = l·(l⁻¹cl)·l⁻¹ ∈ L`.  Used for the `Supp β ⊆ V^L` base points of (4.10) off-`V^G`. -/
+theorem centralizer_le_L_of_mem_conj_toTICV (h : Hypothesis46 A L) {w : ↥L}
+    (hw : w ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V) :
+    Subgroup.centralizer ({L.subtype w} : Set G) ≤ L := by
+  obtain ⟨v, hvV, hconjv⟩ := Group.mem_conjugatesOfSet_iff.mp hw
+  obtain ⟨l, hl⟩ := isConj_iff.mp hconjv
+  intro c hc
+  have hcw : c * L.subtype w = L.subtype w * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+  have hwG : L.subtype w = L.subtype l * L.subtype v * (L.subtype l)⁻¹ := by
+    rw [← hl]; simp [map_mul, map_inv]
+  have hc' : (L.subtype l)⁻¹ * c * L.subtype l ∈ Subgroup.centralizer ({L.subtype v} : Set G) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hvG : L.subtype v = (L.subtype l)⁻¹ * L.subtype w * L.subtype l := by rw [hwG]; group
+    rw [hvG]
+    calc (L.subtype l)⁻¹ * c * L.subtype l * ((L.subtype l)⁻¹ * L.subtype w * L.subtype l)
+        = (L.subtype l)⁻¹ * (c * L.subtype w) * L.subtype l := by group
+      _ = (L.subtype l)⁻¹ * (L.subtype w * c) * L.subtype l := by rw [hcw]
+      _ = (L.subtype l)⁻¹ * L.subtype w * L.subtype l
+            * ((L.subtype l)⁻¹ * c * L.subtype l) := by group
+  have hc'L : (L.subtype l)⁻¹ * c * L.subtype l ∈ L :=
+    centralizer_le_L_of_mem_ticVdiffV h (coe_mem_ticVdiffV_of_mem_toTICV h hvV) hc'
+  have hceq : c = L.subtype l * ((L.subtype l)⁻¹ * c * L.subtype l) * (L.subtype l)⁻¹ := by group
+  rw [hceq]
+  exact L.mul_mem (L.mul_mem l.2 hc'L) (L.inv_mem l.2)
+
 /-- **A §4 Dade-hypothesis fact**: if `C_G(a) ⊆ L` then the local subgroup `H(a) = ⊥`.  By (2.2)
 `C_G(a) = H(a) ⊔ C_L(a)` (`centralizer_eq_sup`) with `H(a) ⊓ C_L(a) = ⊥` (`centralizer_disjoint`);
 when `C_G(a) ⊆ L` the join factor `H(a)` already centralizes `a` inside `L`, so `H(a) ≤ C_L(a)`,
