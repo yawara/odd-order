@@ -532,4 +532,65 @@ theorem SibleyDadeHypothesis.peterfalvi_67_central (hyp : SibleyDadeHypothesis G
     hz hz1 hPz hconst
   rwa [hcard] at key
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.2.2) case-(B) (6.7)-congruence for `η^{τ₁}`** (mmd 04.8 L186 →).  For `η ∈ Y` and
+`z ∈ W₂^#`, `Res^G_L(η^{τ₁})(z) ≡ Res^G_L(η^{τ₁})(1) (mod |H|)`.  Wires the case-(B) (6.7) adapter
+`peterfalvi_67_central` to `η^{τ₁}`: write `η^{τ₁} = ε•ξ` (`ε = ±1`, `ξ` irreducible from norm `1`,
+`coherentYset_extension_eq_zsmul_irreducible`); unpack `ξ = ρ.character` (`ρ` irreducible,
+`ξ.isIrreducible`).  The const-on-`W₂^#` of `η^{τ₁}` (`coherentYset_extension_const_on_W2`,
+(6.8.2.1)) transfers to `ρ.character` (cancel `ε`), feeding the adapter to get
+`ξ(z) ≡ ξ(1) (mod |H|)`; scale by `ε` (`Cong.smul_left`) for `η^{τ₁}(z) ≡ η^{τ₁}(1)`.
+
+`W₂` is prime, `W₂ ⊆ ⁅H,H⁆` (the `cases` (c2) side conditions) and central in `↥L`
+(`W₂ ⊆ Z(↥L)`, the math-(B) `W₂ ⊆ Z(H)` with `W` cyclic — deferred to the caller). -/
+theorem SibleyDadeHypothesis.restrict_extension_Yset_charValue_cong_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {z : ↥L} (hz : z ∈ W2) (hz1 : z ≠ 1) :
+    (ClassFunction.restrict L (hyp.coherentYset.extension η)) z
+      ≡ (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+        [ALGMOD (Nat.card ↥H : ℤ)] := by
+  classical
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]
+      intro a ha b hb
+      rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  obtain ⟨ε, ξ, hε, hηtε⟩ := hyp.coherentYset_extension_eq_zsmul_irreducible hη
+  have hεne : (ε : ℂ) ≠ 0 := by rcases hε with rfl | rfl <;> norm_num
+  have hεint : IsIntegral ℤ (ε : ℂ) := by
+    simpa using (isIntegral_algebraMap (R := ℤ) (A := ℂ) (x := ε))
+  have hsmul : ∀ g : G,
+      (hyp.coherentYset.extension η) g = (ε : ℂ) * ((ξ : ClassFunction G ℂ) g) := by
+    intro g
+    rw [hηtε, ← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ), ClassFunction.smul_apply]
+  obtain ⟨V, _, _, _, ρ, hρ, hξρ⟩ := ξ.isIrreducible
+  haveI : ρ.IsIrreducible := hρ
+  have hzGmem : (L.subtype z) ∈ W2.map L.subtype :=
+    Subgroup.mem_map.mpr ⟨z, hz, rfl⟩
+  have hzG1 : (L.subtype z) ≠ 1 := fun h => hz1 (L.subtype_injective (by simpa using h))
+  have hψconst : ∀ w ∈ W2.map L.subtype, w ≠ 1 →
+      ρ.character w = ρ.character (L.subtype z) := by
+    intro w hw hw1
+    obtain ⟨w₀, hw₀, rfl⟩ := Subgroup.mem_map.mp hw
+    have hw₀1 : w₀ ≠ 1 := fun h => hw1 (by rw [h]; simp)
+    have hRw : (hyp.coherentYset.extension η) (L.subtype w₀)
+        = (hyp.coherentYset.extension η) (L.subtype z) :=
+      hyp.coherentYset_extension_const_on_W2 hprime hW2comm hη hz hz1 hw₀ hw₀1
+    rw [← congrFun hξρ (L.subtype w₀), ← congrFun hξρ (L.subtype z)]
+    apply mul_left_cancel₀ hεne
+    rw [← hsmul (L.subtype w₀), ← hsmul (L.subtype z)]
+    exact hRw
+  have hcong := hyp.peterfalvi_67_central hcop hp hHp hW2H hW2cen ρ hzGmem hzG1 hψconst
+  rw [← congrFun hξρ (L.subtype z), ← congrFun hξρ 1] at hcong
+  have hcong2 := hcong.smul_left hεint
+  simp only [← hsmul] at hcong2
+  exact hcong2
+
 end OddOrder.Peterfalvi.S08
