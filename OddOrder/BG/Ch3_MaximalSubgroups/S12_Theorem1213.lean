@@ -32,6 +32,61 @@ open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
+/-- The nilpotent normalizer condition inside a `p`-group `S`: a proper subgroup `X < S` is
+strictly contained in `N_G(X) ⊓ S`. (File-local; same statement as the private helper in
+`S10_HallStructureCore`, replicated here for the BG 12.13 Sylow reduction.) -/
+private theorem lt_inf_normalizer_of_lt_of_isPGroup [Finite G] {p : ℕ} [Fact p.Prime]
+    {X S : Subgroup G} (hXS : X < S) (hS : IsPGroup p ↥S) :
+    X < Subgroup.normalizer X ⊓ S := by
+  haveI : Group.IsNilpotent ↥S := hS.isNilpotent
+  have hNC : NormalizerCondition ↥S := normalizerCondition_of_isNilpotent (G := ↥S)
+  have hsub_lt : X.subgroupOf S < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    rw [Subgroup.subgroupOf_eq_top] at htop
+    exact hXS.ne (le_antisymm hXS.le htop)
+  obtain ⟨t, ht_norm, ht_not⟩ := SetLike.exists_of_lt (hNC _ hsub_lt)
+  rw [← Subgroup.subgroupOf_normalizer_eq hXS.le, Subgroup.mem_subgroupOf] at ht_norm
+  rw [Subgroup.mem_subgroupOf] at ht_not
+  refine lt_of_le_of_ne (le_inf Subgroup.le_normalizer hXS.le) (fun heq => ht_not ?_)
+  exact heq ▸ Subgroup.mem_inf.mpr ⟨ht_norm, t.2⟩
+
+/-- **BG 12.13 reduction step**: a Sylow `p`-subgroup `P` of a subgroup `K ≤ G`, whose image
+`P̄ := P.map K.subtype` has `N_G(P̄) ≤ K`, is (as `P̄`) a Sylow `p`-subgroup of `G`.
+
+Non-`σ` analogue of `S10.isSylow_sylowMap_of_mem_sigma` (same proof): take a Sylow `S ⊇ P̄` of `G`;
+if `P̄ < S`, then `N_G(P̄) ⊓ S` is a `p`-subgroup of `K` (by `N_G(P̄) ≤ K`) strictly above `P̄`
+(nilpotent normalizer condition in `S`), contradicting that `P` is Sylow in `↥K`. Used to enlarge
+the nonabelian `P` to a Sylow `p`-subgroup of `G` inside `M ∩ M⋆`. -/
+theorem exists_sylow_eq_map_of_normalizer_le [Finite G] {K : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (P : Sylow p ↥K)
+    (hN : Subgroup.normalizer (((P : Subgroup ↥K).map K.subtype) : Set G) ≤ K) :
+    ∃ S : Sylow p G, (S : Subgroup G) = (P : Subgroup ↥K).map K.subtype := by
+  set Pbar : Subgroup G := (P : Subgroup ↥K).map K.subtype with hPbar
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    P.2.of_equiv (Subgroup.equivMapOfInjective _ _ K.subtype_injective)
+  have hPbar_subOf : Pbar.subgroupOf K = (P : Subgroup ↥K) := by
+    rw [hPbar, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective K.subtype_injective]
+  obtain ⟨S, hPS⟩ := hPbar_pg.exists_le_sylow
+  refine ⟨S, ?_⟩
+  by_contra hne
+  have hlt : Pbar < (S : Subgroup G) := lt_of_le_of_ne hPS (Ne.symm hne)
+  have hgrow : Pbar < Subgroup.normalizer Pbar ⊓ (S : Subgroup G) :=
+    lt_inf_normalizer_of_lt_of_isPGroup hlt S.2
+  set Y : Subgroup G := Subgroup.normalizer Pbar ⊓ (S : Subgroup G) with hY
+  have hYK : Y ≤ K := le_trans inf_le_left hN
+  have hYpg : IsPGroup p ↥Y :=
+    S.2.of_injective (Subgroup.inclusion inf_le_right) (Subgroup.inclusion_injective _)
+  have hPle : (P : Subgroup ↥K) ≤ Y.subgroupOf K :=
+    hPbar_subOf ▸ Subgroup.comap_mono (f := K.subtype) hgrow.le
+  have hYsubK_pg : IsPGroup p ↥(Y.subgroupOf K) :=
+    hYpg.of_equiv (Subgroup.subgroupOfEquivOfLe hYK).symm
+  have hYeq : Y.subgroupOf K = (P : Subgroup ↥K) := P.3 hYsubK_pg hPle
+  have hYP : Y = Pbar := by
+    have := congrArg (Subgroup.map K.subtype) hYeq
+    rwa [Subgroup.map_subgroupOf_eq_of_le hYK, ← hPbar] at this
+  exact absurd hYP hgrow.ne'
+
 /-- A nonabelian `p`-subgroup `P` contained in two distinct maximal subgroups `M`, `M*` of `G`
 satisfies `p ∈ σ(M) ∩ σ(M*)` and `N_G(P) ⊆ M ∩ M*` (Corollary 12.10(a),(d)). The membership
 `p ∈ σ(M)` is the contrapositive of 12.10(a): a `σ(M)'`-`p`-subgroup is nilpotent, hence abelian.
