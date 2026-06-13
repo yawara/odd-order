@@ -97,6 +97,47 @@ theorem ClassFunction.support_induce_subset_of_le_normal {G : Type*} [Group G] [
     rw [ClassFunction.induceTerm_of_not_mem _ hnotmem]
   rw [Finset.sum_eq_zero (fun x _ => hterm x), mul_zero]
 
+/-- **The sum of a nontrivial irreducible character over the group is zero.**  By orthonormality
+`⟨φ, 1⟩ = 0` for `φ ≠ 1`, and `⟨φ, 1⟩ = |Γ|⁻¹ ∑_g φ(g)` (the trivial character is constant `1`). -/
+theorem sum_apply_eq_zero_of_ne_trivial {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {φ : IrreducibleCharacter Γ}
+    (hφ : φ ≠ trivialIrreducibleCharacter Γ) :
+    ∑ g : Γ, (φ : ClassFunction Γ ℂ) g = 0 := by
+  have h := irreducibleCharacter_inner φ (trivialIrreducibleCharacter Γ)
+  rw [if_neg hφ, ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum] at h
+  simp only [IrreducibleCharacter.coe_trivialIrreducibleCharacter, trivialClassFunction_apply,
+    star_one, mul_one] at h
+  have hS : (Nat.card Γ : ℂ) * (⅟(Nat.card Γ : ℂ) * ∑ g : Γ, (φ : ClassFunction Γ ℂ) g) = 0 := by
+    rw [h, mul_zero]
+  rwa [← mul_assoc, mul_invOf_self, one_mul] at hS
+
+/-- **Regular-character decomposition value (Peterfalvi (6.8.2.2) core relation).**  If `f` is a
+class function constant on `Γ^#` and `φ` is a nontrivial *linear* irreducible character
+(`φ(1) = 1`), then `f(1) − f(z) = |Γ|·⟨f, φ⟩` for any `z ≠ 1`.  This is the substance of
+`Res_Z ψ = a·ρ_Z + b·1_Z` with `a = ⟨Res_Z ψ, φ⟩`, `ψ(1) − ψ(z) = a·|Z|`, computed directly from
+the inner product via `∑_g φ(g) = 0` (`sum_apply_eq_zero_of_ne_trivial`) and the `Γ^#`-constancy. -/
+theorem apply_one_sub_apply_eq_card_mul_inner {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {φ : IrreducibleCharacter Γ}
+    (hφ1 : (φ : ClassFunction Γ ℂ) 1 = 1) (hφ : φ ≠ trivialIrreducibleCharacter Γ)
+    (f : ClassFunction Γ ℂ) {z : Γ} (hconst : ∀ a : Γ, a ≠ 1 → f a = f z) :
+    f 1 - f z = (Nat.card Γ : ℂ) * ClassFunction.inner f (φ : ClassFunction Γ ℂ) := by
+  classical
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum, ← mul_assoc,
+    mul_invOf_self, one_mul,
+    ← Finset.add_sum_erase Finset.univ (fun g => f g * star ((φ : ClassFunction Γ ℂ) g))
+      (Finset.mem_univ (1 : Γ)),
+    hφ1, star_one, mul_one]
+  have hstar : ∑ g ∈ Finset.univ.erase (1 : Γ), star ((φ : ClassFunction Γ ℂ) g) = -1 := by
+    have h0 : ∑ g : Γ, star ((φ : ClassFunction Γ ℂ) g) = 0 := by
+      rw [← star_sum, sum_apply_eq_zero_of_ne_trivial hφ, star_zero]
+    rw [← Finset.add_sum_erase Finset.univ (fun g => star ((φ : ClassFunction Γ ℂ) g))
+        (Finset.mem_univ (1 : Γ)), hφ1, star_one] at h0
+    linear_combination h0
+  have hsum : ∑ g ∈ Finset.univ.erase (1 : Γ), (f g * star ((φ : ClassFunction Γ ℂ) g)) = -f z := by
+    rw [Finset.sum_congr rfl (fun g hg => by rw [hconst g (Finset.ne_of_mem_erase hg)]),
+      ← Finset.mul_sum, hstar, mul_neg, mul_one]
+  rw [hsum]; ring
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08

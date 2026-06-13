@@ -1052,3 +1052,20 @@ inner は ↥W₂ 上 ⟹ `[Fintype ↥W2]` を**binder** に要 (statement elab
 4. ⟹ ⟨α^τ,ψ⟩ = a − |H:Z|⟨η₁,Res ψ⟩ ≡ 0 mod |H:Z| + norm endgame ((x−1)²+(m−1)x²≤1)。
 
 **▶ 次の一手 = reg-char 分解 (鍵関係 ψ(1)−ψ(z)=|Z|⟨φ,Res ψ⟩ via column orthogonality)。正本=本 session 39 cont.⁷。**
+
+## 2026-06-13 (session 39 cont.⁸, /loop): (6.8.2.2) reg-char relation landed (ρ_Z 不要)
+
+**✅ landed (build-green + axiom-clean)** — ρ_Z を陽に作らず inner-product 直接計算で:
+- **`sum_apply_eq_zero_of_ne_trivial`** (一般): φ≠trivial irr ⟹ ∑_{g∈Γ} φ(g)=0
+  (orthonormality `irreducibleCharacter_inner` ⟨φ,1⟩=0 + trivial char 値1)。
+- **`apply_one_sub_apply_eq_card_mul_inner`** (一般, = (6.8.2.2) reg-char core): φ linear (φ(1)=1) nontrivial,
+  f const on Γ^# ⟹ **`f(1) − f(z) = |Γ|·⟨f, φ⟩`** (z≠1)。`Res_Z ψ = a ρ_Z + b 1_Z`, a=⟨Res ψ,φ⟩,
+  ψ(1)−ψ(z)=a|Z| の実質。innerSum split (`Finset.add_sum_erase` at 1) + ∑φ=0 + f-const + `classical` (erase 要 DecidableEq)。
+
+### (6.8.2.2) 残: (6.7) 合同統合 + norm endgame
+1. ✅ α-support, ✅ reciprocity (⟨α^τ,ψ⟩=⟨φ,Res ψ⟩−c⟨η₁,Res ψ⟩), ✅ reg-char relation (本 session)。
+2. 🔴 **統合**: a:=⟨Res_{W₂}Res_L ψ, φ⟩∈ℤ (φ linear ∈ Irr W₂)、ψ(1)−ψ(z)=|W₂|·a (reg-char relation)、
+   (6.7) `peterfalvi_67_centralCommutator`: ψ(1)≡ψ(z) mod |H| ⟹ |W₂|a≡0 mod |H|=|H:W₂||W₂| ⟹ **a≡0 mod |H:W₂|**。
+   ⟹ ⟨α^τ,ψ⟩ = a − |H:W₂|⟨η₁,Resψ⟩ ≡ 0 mod |H:W₂|。**conjugate 注意: ⟨φ,Resψ⟩ vs ⟨Resψ,φ⟩ (a 実整数で一致)。**
+3. 🔴 **norm endgame**: ‖α^τ‖²=‖α‖²<2|H:W₂|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}, m=2 if x=1。
+→ (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁸。**
