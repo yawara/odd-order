@@ -962,4 +962,36 @@ theorem SibleyDadeHypothesis.inner_induce_W2_Yset_eq_zero
   simp only [hconst]
   rw [← Finset.sum_mul, sum_apply_eq_zero_of_ne_trivial hφ, zero_mul, mul_zero]
 
+/-- **(6.8.2.2) source norm `‖α‖² = |L:W₂| + c·c̄`** for `α = Ind^L_{W₂}φ − c·η₁` (`φ` nontrivial
+linear, `η₁ ∈ Y`, `W₂ ≤ Z(↥L)`).  Expanding the inner product and using `‖Ind_{W₂}φ‖² = |L:W₂|`
+(`inner_self_induce_eq_index_of_le_center`), the vanishing cross terms `⟨Ind_{W₂}φ, η₁⟩ = 0`
+(`inner_induce_W2_Yset_eq_zero`, and its conjugate), and `‖η₁‖² = 1` (irreducibility):
+`‖α‖² = |L:W₂| + c·c̄`.
+
+For the assembly coefficient `c = (|H:W₂| : ℂ)` (real), `c·c̄ = |H:W₂|²`, giving Peterfalvi's
+`‖α‖² = |L:Z| + |H:Z|²`.  Combined with `inner_self_tau_indW2_sub_smul` (`‖α^τ‖² = ‖α‖²`), this is the
+norm input to the (6.8.2.2) trichotomy. -/
+theorem SibleyDadeHypothesis.inner_self_indW2_sub_smul_eq
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hW2comm : W2 ≤ ⁅H, H⁆) (hW2cen : W2 ≤ Subgroup.center ↥L)
+    (φ : IrreducibleCharacter ↥W2) (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (c : ℂ) :
+    ClassFunction.inner (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) - c • η₁)
+        (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) - c • η₁)
+      = (W2.index : ℂ) + c * star c := by
+  have hIndnorm := inner_self_induce_eq_index_of_le_center hW2cen φ
+  have hcross := hyp.inner_induce_W2_Yset_eq_zero hW2comm φ hφ hη₁
+  have hcross' : ClassFunction.inner η₁ (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hcross, star_zero]
+  have hη₁n : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η₁, hyp.isIrreducibleCharacter_of_mem_Yset hη₁⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁, hyp.isIrreducibleCharacter_of_mem_Yset hη₁⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+  rw [hIndnorm, hcross, hcross', hη₁n]
+  ring
+
 end OddOrder.Peterfalvi.S08
