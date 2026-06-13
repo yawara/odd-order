@@ -706,6 +706,50 @@ theorem commutator_le_fitting_of_isCyclic_fitting
   -- `hap : (x : D) = g * x * g⁻¹`
   exact (mul_inv_eq_iff_eq_mul.mp hap.symm).symm
 
+/-- **Peterfalvi Appendix B, Proposition 1 — per-prime `O_p` step**: under the hypotheses
+of Proposition 1, each `p`-core `O_p(D) = opCore p D` is cyclic and acts without fixed points
+on `E`.  For `O_p = ⊥` this is trivial; otherwise `p` is odd (`p ∣ |D|` odd) and `p ≠ q`
+(no nontrivial normal `q`-subgroup), the conjugate-stabilizer bridge gives the constant
+point-stabilizer order, and the Lemma applies. -/
+theorem opCore_isCyclic_and_fpf_of_transitive
+    [Finite D] [Finite E] {q : ℕ} (hq : q.Prime) (hqE : q ∣ Nat.card E) [Nontrivial E]
+    (hE : IsElementaryAbelian q E) (hD_odd : Odd (Nat.card D))
+    (φ : D →* MulAut E) (hfaithful : Function.Injective φ)
+    (htrans : ∀ a b : E, a ≠ 1 → b ≠ 1 → ∃ d : D, (φ d) a = b)
+    {p : ℕ} (hp : p.Prime) :
+    IsCyclic ↥(OddOrder.Isaacs.Ch01.opCore p D) ∧
+      ∀ x : ↥(OddOrder.Isaacs.Ch01.opCore p D), x ≠ 1 →
+        actionFixedBy (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype) x = ⊥ := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  rcases eq_or_ne (OddOrder.Isaacs.Ch01.opCore p D) ⊥ with hbot | hbot
+  · exact ⟨by rw [hbot]; exact isCyclic_of_subsingleton,
+      fun x hx => absurd (Subtype.ext (Subgroup.mem_bot.mp (hbot ▸ x.2))) hx⟩
+  · have hirr : ∀ U : Subgroup E, IsAInvariant φ U → U = ⊥ ∨ U = ⊤ :=
+      fun _ hU => isAInvariant_eq_bot_or_top_of_transitive φ htrans hU
+    have hqp : q ≠ p := by
+      rintro rfl
+      exact hbot (normal_isPGroup_eq_bot_of_faithful_irreducible hqE φ hfaithful hirr
+        (OddOrder.Isaacs.Ch01.opCore.normal q D) (OddOrder.Isaacs.Ch01.opCore_isPGroup q D))
+    have hpdvd : p ∣ Nat.card D := by
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_card (p := p)).mp (OddOrder.Isaacs.Ch01.opCore_isPGroup p D)
+      have hk0 : k ≠ 0 := by
+        rintro rfl; rw [pow_zero] at hk
+        exact hbot (Subgroup.eq_bot_of_card_eq _ hk)
+      exact (hk ▸ dvd_pow_self p hk0).trans (Subgroup.card_subgroup_dvd_card _)
+    have hpodd : Odd p := by
+      rcases hp.eq_two_or_odd' with rfl | hpodd
+      · exfalso; rw [Nat.odd_iff] at hD_odd; omega
+      · exact hpodd
+    have hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+        Nat.card ↥(pointStabilizer (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype) a) =
+          Nat.card ↥(pointStabilizer (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype) b) :=
+      fun a b ha hb => card_pointStabilizer_comp_eq_of_normal_of_transitive φ
+        (OddOrder.Isaacs.Ch01.opCore.normal p D) htrans ha hb
+    exact pGroup_cyclic_fixedPointFree hq hqp (OddOrder.Isaacs.Ch01.opCore_isPGroup p D) hpodd hE
+      (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype)
+      (hfaithful.comp (Subgroup.subtype_injective _)) hconst
+
 /-- **Peterfalvi Appendix B, Proposition 1**: let `D` have odd order and act
 faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
