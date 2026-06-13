@@ -44,17 +44,47 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
      の abelian 枝を排し extraspecial Q。
    **🔑 flagged gap 解消**: Uniqueness の hr3 は「P Sylow rank2」でなく **by_contra (r≥3) 分岐内で Or.inl** で供給
    (BG「Uniqueness で r(P)≤2」は対偶。`uniquenessTheorem` 署名はそのまま使える)。
-3. **K⊆M⋆**: Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`, Q/Z noncyclic rank2 が
-   K に coprime 作用) の各 generator `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two`
-   を M⋆ に適用, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。**coprimality** `(|Q/Z|,|K|)=1` の確立が要 (K=C_{M_α}(Z), M_α は
-   α-Hall, p∈σ−α なので p∤|M_α|?)。
-4. **N_M(Z)⊆M⋆ + M_α≠1**: Cor 10.9(b) (`M=(M∩M⋆)M_α`) + Lem 6.5(b)
-   (`normalizer_eq_centralizerK_mul_normalizerU`)。M_α≠1 は M≠M⋆ から。
-5. **12.4(b) 対偶 適用 ×2 + 組立**: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` の対偶
-   (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} から。エンジンへ。
+3. ~~**M_α≠1**~~ **✅ DONE (session 15)** `Malpha_ne_bot_of_sylow_normalizer_le`: Sylow p of G で
+   `N_G(S)≤M∩M⋆` ⟹ M_α≠1。Cor 10.9(b) = `S10.beta_factorization_of_sylow_normalizer_in_intersection`
+   (`M=(M⋆∩M)⊔M_β ∧ α=β`) で M_α=M_β; M_β=⊥ なら M=M∩M⋆≤M⋆=M⋆ 矛盾。
+4. ~~**coprimality `p∉α(M)`**~~ **✅ DONE (session 15)** `notMem_alpha_of_rank_sylow_le_two`:
+   `rank(S)≤2` ⟹ `p∉α(M)` (∵ `pRank_p(M)≤pRank_p(G)=pRank_p(S)≤rank(S)≤2<3`)。
+   ⟹ `p∉β(M)` ⟹ `p∤|M_α|` (Lem 6.5(b) の coprime)。**coprimality gap 解消**。
+5. **🔶 残 hard piece = K⊆M⋆**: K=C_{M_α}(Z)。Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`,
+   Q/Z noncyclic rank2 が K に coprime 作用 [coprime は p∉α で OK]) で K=⟨C_K(Ā)|Ā∈ℰ¹(Q/Z)⟩、
+   各 `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two` を M⋆ に, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。
+   ⟹ K⊆M⋆。次に Lem 6.5(b) (`normalizer_eq_centralizerK_mul_normalizerU`, M=(M∩M⋆)⊔M_α, M_α⊴M,
+   Z≤M∩M⋆, coprime) で `N_M(Z)=C_{M_α}(Z)·N_{M∩M⋆}(Z)⊆M⋆` ⟹ **ℳ(N_G(Z))≠{M}** (∵ N_M(Z)⊆M⋆≠M)。
+   **⚠ 最難所**: Prop 1.16 の `cocyclicFixedByClosure` を K=C_{M_α}(Z) 上の Q/Z 作用に instantiate +
+   `C_K(A/Z)=C_K(A)` (Z 中心化ゆえ quotient fixed = ambient fixed) + ℰ¹(Q/Z)↔ℰ²(Q) の対応。
+6. **12.4(b) 対偶 ✅ DONE (session 15)** `exists_line_maximalContaining_eq_of_Malpha_ne_bot`:
+   A∈ℰ²(M), A≤M, M_α≠⊥ ⟹ ∃A₀∈ℰ¹(A), A₀≤A, ℳ(N_G(A₀))={M} (push_neg + 12.4(b))。
+   組立: A₀≠Z は ℳ(N_G(Z))≠{M} (piece 5) から。M⋆ 側も同様 → line-共役 + engine で M=M⋆ 矛盾。
 
-**⚠ 注意点**: (2) Uniqueness の hr3 条項供給と (3) coprimality が要精査の gap。(1)(エンジン) は独立で確定。
-multi-session 見込み (BG で最も配線が多い σ-side keystone)。各ピースを leaf に順次追加, 1,500 行で分割。
+**⚠ 注意点 (session 15 末)**: ✅ piece 2 (reduction)・3 (M_α≠1)・4 (coprimality)・6前半 (12.4b 対偶);
+✅ back-end (line-conj+engine)。**残 hard = piece 5 (K⊆M⋆)** + 主定理組立。
+- **piece 5 = K⊆M⋆ assessment (最難所, multi-iter 見込み)**: `le_centralizer_of_forall_line` (12.4b の
+  Prop 1.16 engine) は **「W≤C(A) (centralizer)」結論で 12.13 の「K≤M⋆ (maximal 包含)」には流用不可**。
+  raw `cocyclicFixedByClosure_eq_top_of_not_isCyclic` を **A':=Q/Z (=↥Q⧸Z), G':=↥K** で instantiate 要:
+  (1) **作用 `φ:(↥Q⧸Z) →* MulAut ↥K` の構成 = crux** (Q は K=C_{M_α}(Z) を正規化 [Q≤M, M_α⊴M, Z normalize];
+  Z は K を中心化ゆえ作用は Q/Z を経由)。(2) coprime (`p∤|K|`, p∉α 済) + noncyclic (Q/Z≅(ℤ/p)²)。
+  (3) `cocyclicFixedByClosure=⊤` ⟹ K=⟨C_K(Y)|Y≤Q/Z,(Q/Z)/Y cyclic⟩。(4) 各 `C_K(Y)⊆C_G(A_Y)⊆M⋆`
+  (A_Y=Y の Q 内 preimage ∈ℰ²(Q), 12.4(a)=`centralizer_le_of_elemAb_rank_two` を M⋆ に; Y=Q/Z は
+  C_K(Q)⊆C_K(line))。⟹ K⊆M⋆ → Lem 6.5(b) で N_M(Z)⊆M⋆ → ℳ(N_G(Z))≠{M}。**(1) の quotient-action
+  MonoidHom 構成が型重く 1-2 iter。**
+- **主定理組立 (piece 5 後 or piece5-sorry で先行可)**: 
+  - ✅ **richer reduction DONE (session 15)**: `exists_expPExtraspecial_le_of_two_maximals` を拡張し
+    `∃ (S:Sylow p G)(Q), N_G(S)≤M∩M⋆ ∧ rank(S)≤2 ∧ Q≤M∩M⋆ ∧ IsExpPExtraspecial p Q ∧ |Q|=p³` を返す
+    (Malpha_ne_bot/notMem_alpha に S・rank2 を供給可)。
+  - **次: A∈ℰ²(Q) 構成補題** `exists_elemAbelianOfRank_two...`: a∈Q∖Z で A=⟨a⟩⊔Z_G (Z_G=center↥Q の像),
+    `|A|=p²` + `IsMaximalElementaryAbelian p A` + `Z_G≤A`。**maximality は pRank G p≤2 から**:
+    F elem ab ⊇A ⟹ `log p|F|≤pRank G p≤2` (`IsElementaryAbelian.log_card_le_pRank`+`pRank_sylow_eq`で
+    pRank G p=pRank S p≤rank S≤2) ⟹ `|F|≤p²=|A|` ⟹ F=A (`eq_of_le_of_card_ge`)。
+    pRank G p≤2 は richer reduction の rank(S)≤2 から (補題化 or inline)。
+  - **line-共役の ↥Q↔G transport**: A₀,A₀⋆ (12.4b より ∈ℰ¹(A), ≤A≤Q) を ↥Q 内の zpowers に持ち上げ
+    `exists_conj_smul_zpowers_eq_of_expPExtraspecial` 適用→ q∈↥Q→ G で conj、engine へ。
+  推奨: 次 iter で A∈ℰ²(Q) 構成 → piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)
+  で合成検証 + piece5 隔離、その後 piece5 本体。
 
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 

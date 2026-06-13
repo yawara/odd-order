@@ -284,7 +284,10 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
     (hPnab : ¬ IsMulCommutative ↥P) (hM : M ∈ maximalSubgroups G)
     (hMstar : Mstar ∈ maximalSubgroups G) (hMne : M ≠ Mstar)
     (hPM : P ≤ M) (hPMstar : P ≤ Mstar) :
-    ∃ Q : Subgroup G, Q ≤ M ⊓ Mstar ∧ IsExpPExtraspecial p ↥Q ∧ Nat.card ↥Q = p ^ 3 := by
+    ∃ (S : Sylow p G) (Q : Subgroup G),
+      Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar ∧
+      rank ↥(S : Subgroup G) ≤ 2 ∧ Q ≤ M ⊓ Mstar ∧
+      IsExpPExtraspecial p ↥Q ∧ Nat.card ↥Q = p ^ 3 := by
   classical
   set K : Subgroup G := M ⊓ Mstar with hK
   have hPK : P ≤ K := le_inf hPM hPMstar
@@ -321,7 +324,62 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
   -- `S` nonabelian, so Cor 10.7(b) gives the extraspecial `Q`.
   rcases (S10.sylow_structure hG S).2.1 hrank2 with habel | ⟨Q, _, hQ_le, _, hQ_es, hQ_card, _, _, _⟩
   · exact absurd habel (by rw [hS]; exact hPbar_nab)
-  · exact ⟨Q, hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
+  · exact ⟨S, Q, by rw [hS]; exact hN, hrank2,
+      hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
+
+/-- **`M_α ≠ 1`** (BG 12.13, mmd L3395): if a Sylow `p`-subgroup `S` of `G` has `N_G(S) ⊆ M ∩ M⋆`
+for distinct maximals `M ≠ M⋆`, then `M_α ≠ 1`.
+
+Corollary 10.9(b) (`beta_factorization_of_sylow_normalizer_in_intersection`) gives
+`M = (M⋆ ∩ M) ⊔ M_β` and `α(M) = β(M)`, so `M_α = M_β`; were `M_β = 1`, then `M = M⋆ ∩ M ≤ M⋆`
+would force `M = M⋆` (both coatoms), contradiction. -/
+theorem Malpha_ne_bot_of_sylow_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hMne : M ≠ Mstar) {p : ℕ} [Fact p.Prime] (S : Sylow p G)
+    (hN : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar) :
+    S10.Malpha M ≠ ⊥ := by
+  obtain ⟨hfact, hab⟩ := S10.beta_factorization_of_sylow_normalizer_in_intersection hG hM hMstar
+    (Ne.symm hMne) S (by rw [inf_comm]; exact hN)
+  have hαβ : S10.Malpha M = S10.Mbeta M := by simp only [S10.Malpha, S10.Mbeta, hab]
+  rw [hαβ]
+  intro hbot
+  rw [hbot, sup_bot_eq] at hfact
+  have hMle : M ≤ Mstar := by rw [hfact]; exact inf_le_left
+  rcases lt_or_eq_of_le hMle with hlt | heq
+  · exact (mem_maximalSubgroups.mp hMstar).1 ((mem_maximalSubgroups.mp hM).2 Mstar hlt)
+  · exact hMne heq
+
+/-- **`p ∉ α(M)`** when a Sylow `p`-subgroup of `G` has rank `≤ 2`: since `α(M) = {p ∈ π(M) |
+r_p(M) ≥ 3}` and `r_p(M) = pRank_p(M) ≤ pRank_p(G) = pRank_p(S) ≤ rank(S) ≤ 2`. In BG 12.13 this
+supplies the coprimality `p ∤ |M_α|` (`M_α` is an `α(M)`-group) needed for the Lemma 6.5(b)
+factorization of `N_M(Z)`. -/
+theorem notMem_alpha_of_rank_sylow_le_two [Finite G] {M : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (S : Sylow p G) (hrank2 : rank ↥(S : Subgroup G) ≤ 2) :
+    p ∉ S10.alpha M := by
+  intro hp
+  have h3 : 3 ≤ pRank ↥M p := ((S10.mem_alpha_iff M p).mp hp).2
+  have hle : pRank ↥M p ≤ 2 := calc
+    pRank ↥M p ≤ pRank G p := pRank_mono_of_le M
+    _ = pRank ↥(S : Subgroup G) p := (pRank_sylow_eq S).symm
+    _ ≤ rank ↥(S : Subgroup G) := pRank_le_rank p
+    _ ≤ 2 := hrank2
+  omega
+
+/-- **Proposition 12.4(b), contrapositive form**: for `A ∈ ℰ²_p(M)` with `A ≤ M`, if `M_α ≠ 1`
+then some line `A₀ ∈ ℰ¹(A)` has `ℳ(N_G(A₀)) = {M}`.
+
+This is the negation of the hypothesis of `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`
+(whose conclusion includes `M_α = 1`): if every line had `ℳ(N_G(·)) ≠ {M}`, then `M_α = 1`. In
+BG 12.13 (where `M_α ≠ 1` holds by `Malpha_ne_bot_of_sylow_normalizer_le`) this produces the
+distinguished line `A₀` realizing `M`. -/
+theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] {A : Subgroup G}
+    (hA : A ∈ elemAbelianOfRank G p 2) (hAM : A ≤ M) (hα : S10.Malpha M ≠ ⊥) :
+    ∃ A₀ ∈ elemAbelianOfRank G p 1, A₀ ≤ A ∧
+      maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) = {M} := by
+  by_contra h
+  push_neg at h
+  exact hα (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM h).2.1
 
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
