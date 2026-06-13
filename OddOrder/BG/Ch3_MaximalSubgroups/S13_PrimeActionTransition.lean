@@ -321,6 +321,27 @@ theorem fixedBy_eq_of_elemAbelian_one [Finite G] {N X P : Subgroup G} {s : ℕ} 
   calc fixedBy N P = fixedByElement N g := by rw [hPg, fixedBy_def, fixedByElement_def, hzC]
     _ = fixedBy N X := hX g (hPX hgP) hg1
 
+/-- **Lemma 13.7 step 5(a)**: もし `x ∈ E₃#` で `C_{M_σ}(x) ≠ 1` なら `τ₂(M)` は空、
+よって `E₂ = ⊥`、`E = E₁ ⊔ E₃`。`τ₂(M) ≠ ∅` ⟹ `∃ p∈τ₂(M), A∈ℰ_p²(E)` ⟹ Cor 12.6(d) で
+`E₃` は `M_σ` に regular 作用 ⟹ `C_{M_σ}(x)=1` で矛盾。 -/
+theorem E_eq_sup_of_E3_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {x : G} (hxE3 : x ∈ E₃) (hxne : x ≠ 1)
+    (hxC : S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥) :
+    E = E₁ ⊔ E₃ := by
+  have hE2 : E₂ = ⊥ := by
+    by_contra hE2ne
+    obtain ⟨p, hp_prime, hpdvd⟩ :=
+      (Nat.card E₂).exists_prime_and_dvd (fun hc => hE2ne (Subgroup.card_eq_one.mp hc))
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hc2 : Nat.card (E₂.subgroupOf E) = Nat.card E₂ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
+    have hpτ2 : p ∈ tau2 M :=
+      h.E₂_hall.1 p (hc2 ▸ Nat.mem_primeFactors.mpr ⟨hp_prime, hpdvd, Nat.card_pos.ne'⟩)
+    obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hpτ2
+    exact hxC ((elemAb_normal_in_E_of_tau2 hG h hpτ2 hA hAE).2.2.2.1 x hxE3 hxne)
+  rw [h.eq_sup hG, hE2, sup_bot_eq]
+
 /-- **BG Lemma 13.7, step 5** (strict case impossible): with `P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)`,
 `R ≤ C(P)`, the strict containment `C_{M_σ}(E₁) ⊊ C_{M_σ}(E₃)` is contradictory.
 
