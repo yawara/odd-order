@@ -110,10 +110,14 @@ conjugation Equiv で). sorry 不変 (2→2)。
       `conv` (smul_mem/inv_smul_mem + `MulAut.apply_inv_self`)。一発 build。
 - [ ] **part(2) 非cyclic (最後の hard piece)**: P 既約・非cyclic → R⊴P type-(p,p) + Schur over F_q
       (`IsSimpleModule.End` field) → `E=⊕C_E(T_i)` (r=p≥2 P-permuted) → part(1) で FPF。
-- [ ] **Lemma case-split assembly**: `pGroup_cyclic_fixedPointFree` を case split (irreducible↔reducible)
-      → reducible は `fpf_of_reducible`、irreducible-cyclic は `fpf_of_abelian_of_irreducible`、
-      irreducible-非cyclic は上記 sorry。⚠ 要 coprime `q≠p` を Lemma 仮説に追加 (現状無; degenerate
-      q=p は P trivial 強制ゆえ faithful)。これで Lemma の sorry を **非cyclic のみに局所化**。
+- [x] **Lemma case-split assembly ✅** (session 12): `pGroup_cyclic_fixedPointFree` を case split で再構築
+      → reducible=`fpf_of_reducible`、irreducible-cyclic=`fpf_of_abelian_of_irreducible`(P abelian は
+      `IsCyclic.commGroup`、hirr 変換は `isAInvariant_iff_smul_mem.mpr`)、irreducible-非cyclic=**唯一の sorry**。
+      `(hqp : q≠p)` を仮説追加 (hcop/hqE 導出)、hPodd は `orderOf x ∣ p^m` odd から。**Lemma を section
+      Maschke 直後に移動** (fpf_of_reducible 前方参照回避)。⟹ **Lemma の sorry は irreducible-非cyclic のみ**。
+- [ ] **唯一残る real math = part(2) 非cyclic**: P 既約・非cyclic → R⊴P type-(p,p)
+      (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + Schur over F_q (`IsSimpleModule.End`)
+      → `E=⊕C_E(T_i)` (r=p≥2 P-permuted) → part(1)(`fpf_of_constant_stabilizer_of_permuted_decomp`)。最難。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。

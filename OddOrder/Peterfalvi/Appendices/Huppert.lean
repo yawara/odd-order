@@ -404,27 +404,6 @@ theorem isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian
       exact ((Nat.coprime_primes Fact.out hq).mpr (Ne.symm hqp)).pow m n
     exact isCyclic_of_coprime_fpf_pgroup_action hP hp_odd hcop φ hfpf
 
-/-- **Peterfalvi Appendix B, Lemma**: let `p ≠ 2` be prime and let the `p`-group
-`P` act faithfully on the elementary abelian `q`-group `E`.  If `|P_a|` is the same
-for every `a ∈ E^#`, then `P` is cyclic and acts without fixed points on `E`.
-
-The fixed-point-free conclusion is parts (1)--(2) of Peterfalvi's proof (the
-Clifford decomposition `E = E₁ ⊕ ⋯ ⊕ Eᵣ` argument together with the irreducible
-case via Schur's Lemma, p. 136); cyclicity then follows from
-`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`. -/
-theorem pGroup_cyclic_fixedPointFree
-    [Finite P] [Finite E] {p q : ℕ} [Fact p.Prime] (hq : q.Prime) [Nontrivial E]
-    (hP : IsPGroup p P) (hp_odd : Odd p) (hE : IsElementaryAbelian q E)
-    (φ : P →* MulAut E) (hfaithful : Function.Injective φ)
-    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
-      Nat.card ↥(pointStabilizer φ a) = Nat.card ↥(pointStabilizer φ b)) :
-    IsCyclic P ∧ ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
-  have hfpf : ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
-    -- parts (1)–(2) of the proof: constant point-stabilizer order forces a
-    -- fixed-point-free action (Clifford decomposition + the irreducible case).
-    sorry
-  exact ⟨isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian hq hP hp_odd hE φ hfpf, hfpf⟩
-
 end Lemma
 
 section Maschke
@@ -532,6 +511,57 @@ theorem fpf_of_reducible
       exact ⟨(φ x)⁻¹ u, hV.inv_smul_mem x hu, MulAut.apply_inv_self E (φ x) u⟩
   exact fpf_of_constant_stabilizer_of_invariant_compl hE.comm φ hfaithful hcompl hUbot hWbot
     (conv hUinv) (conv hWinv) hPodd hconst
+
+/-- **Peterfalvi Appendix B, Lemma**: let `p ≠ 2` be prime, `q ≠ p`, and let the `p`-group
+`P` act faithfully on the elementary abelian `q`-group `E`.  If `|P_a|` is the same for every
+`a ∈ E^#`, then `P` is cyclic and acts without fixed points on `E`.
+
+Case split (p. 135--136): if `P` acts reducibly, `fpf_of_reducible` (Maschke + part (1));
+if irreducibly and `P` is cyclic, `fpf_of_abelian_of_irreducible` (part (2) cyclic case); the
+remaining irreducible non-cyclic case (Schur's Lemma ⟹ `E = ⊕ C_E(Tᵢ)` ⟹ part (1)) is the
+sole remaining gap.  Cyclicity then follows from
+`isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian`.
+
+(`q ≠ p` is a hypothesis; for nontrivial `P` it is forced by the other hypotheses — `q = p`
+would make `P` act on the `p`-group `E` with a nonzero common fixed point, which the constant
+stabilizer order propagates to all of `E^#`, contradicting faithfulness.) -/
+theorem pGroup_cyclic_fixedPointFree
+    {p q : ℕ} [Fact p.Prime] (hq : q.Prime) (hqp : q ≠ p) [Nontrivial E]
+    (hP : IsPGroup p P) (hp_odd : Odd p) (hE : IsElementaryAbelian q E)
+    (φ : P →* MulAut E) (hfaithful : Function.Injective φ)
+    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+      Nat.card ↥(pointStabilizer φ a) = Nat.card ↥(pointStabilizer φ b)) :
+    IsCyclic P ∧ ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  have hqE : q ∣ Nat.card E := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
+    have hn0 : n ≠ 0 := by
+      rintro rfl; simp only [pow_zero] at hn
+      exact absurd hn (by have := Finite.one_lt_card (α := E); omega)
+    exact hn ▸ dvd_pow_self q hn0
+  have hcop : Nat.Coprime (Nat.card P) (Nat.card E) := by
+    obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := p)).mp hP
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hE.isPGroup
+    rw [hm, hn]; exact ((Nat.coprime_primes Fact.out hq).mpr (Ne.symm hqp)).pow m n
+  have hPodd : ∀ x : P, Odd (orderOf x) := by
+    intro x
+    obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := p)).mp hP
+    have h2pm : Nat.Coprime 2 (p ^ m) := Nat.coprime_two_left.mpr hp_odd.pow
+    exact Nat.coprime_two_left.mp (h2pm.coprime_dvd_right (hm ▸ orderOf_dvd_natCard x))
+  have hfpf : ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+    by_cases hirr : ∀ U : Subgroup E, IsAInvariant φ U → U = ⊥ ∨ U = ⊤
+    · by_cases hcyc : IsCyclic P
+      · haveI := hcyc
+        letI : CommGroup P := IsCyclic.commGroup
+        refine fpf_of_abelian_of_irreducible φ hfaithful (fun x y => mul_comm x y) ?_
+        intro H hH
+        exact hirr H (isAInvariant_iff_smul_mem.mpr hH)
+      · -- irreducible non-cyclic: Schur's Lemma ⟹ E = ⊕ C_E(Tᵢ) ⟹ part (1). (p. 136)
+        sorry
+    · push_neg at hirr
+      obtain ⟨U, hUinv, hUbot, hUtop⟩ := hirr
+      exact fpf_of_reducible hqE hcop hE φ hfaithful hPodd hconst hUinv hUbot hUtop
+  exact ⟨isCyclic_of_faithful_fpf_pgroup_on_elementaryAbelian hq hP hp_odd hE φ hfpf, hfpf⟩
 
 end Maschke
 
