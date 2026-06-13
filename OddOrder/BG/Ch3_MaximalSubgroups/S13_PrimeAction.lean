@@ -296,8 +296,101 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     exact actsPrimeOn_Msigma_of_mem_tau13 hG h
       (mem_tau1_union_tau3_of_isCyclic_sylow_E hG h hPE hPp hPcyc hPne hPmax)
       (hPE.trans h.E_le) inferInstance hPp
-  · -- (b) `E₃` acts in a prime manner on `M_σ`. 🚧
-    sorry
+  · -- (b) `E₃` acts in a prime manner on `M_σ`.
+    haveI hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+    intro g hgE3 hg1
+    refine le_antisymm ?_ (fixedBy_le_fixedByElement hgE3)
+    -- pick a prime `p ∣ ord(g)` and the order-`p` element `x := g ^ (ord g / p) ∈ ⟨g⟩ ⊆ E₃`.
+    have hord1 : orderOf g ≠ 1 := fun hh => hg1 (orderOf_eq_one_iff.mp hh)
+    obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hord1
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    set x : G := g ^ (orderOf g / p) with hx_def
+    have hxE3 : x ∈ E₃ := pow_mem hgE3 _
+    have hxp1 : x ^ p = 1 := by
+      rw [hx_def, ← pow_mul, Nat.div_mul_cancel hp_dvd, pow_orderOf_eq_one]
+    have hx1 : x ≠ 1 := by
+      intro hh
+      have hdvd := orderOf_dvd_of_pow_eq_one hh
+      have hpos : 0 < orderOf g / p :=
+        Nat.div_pos (Nat.le_of_dvd (orderOf_pos g) hp_dvd) hp_prime.pos
+      have hlt : orderOf g / p < orderOf g :=
+        Nat.div_lt_self (orderOf_pos g) hp_prime.one_lt
+      exact absurd (Nat.le_of_dvd hpos hdvd) (by omega)
+    have hx_ord : orderOf x = p := by
+      rcases (Nat.dvd_prime hp_prime).mp (orderOf_dvd_of_pow_eq_one hxp1) with hh | hh
+      · exact absurd (orderOf_eq_one_iff.mp hh) hx1
+      · exact hh
+    -- `⟨x⟩` is characteristic in cyclic `E₃`, hence `E`-normal.
+    have hZle : Subgroup.zpowers x ≤ E₃ := Subgroup.zpowers_le.mpr hxE3
+    haveI : ((Subgroup.zpowers x).subgroupOf E₃).Characteristic :=
+      Ch04.characteristic_of_subgroup_of_isCyclic _
+    have hENx : E ≤ Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+      intro e he
+      have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := E₃)
+        (C := (Subgroup.zpowers x).subgroupOf E₃) (h.E3_normal hG he)
+      rwa [Subgroup.map_subgroupOf_eq_of_le hZle] at hmem
+    -- `M* ∈ ℳ(N_G(⟨x⟩))`, so `E ⊆ M*` and `E₃ ⊆ E' ⊆ M*'`.
+    have hxne : Subgroup.zpowers x ≠ ⊥ := by rw [Ne, Subgroup.zpowers_eq_bot]; exact hx1
+    have hxM : Subgroup.zpowers x ≤ M := hZle.trans h.E3_le_M
+    have hNxne : Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G) ≠ ⊤ := by
+      intro htop
+      haveI : (Subgroup.zpowers x).Normal := Subgroup.normalizer_eq_top_iff.mp htop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers x) inferInstance with hb | ht
+      · exact hxne hb
+      · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hxM))
+    obtain ⟨Mstar, hMstarCo, hNxM⟩ :=
+      (eq_top_or_exists_le_coatom
+        (Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G))).resolve_left hNxne
+    have hMstarMem : Mstar ∈ maximalSubgroupsContaining
+        (Subgroup.normalizer ((Subgroup.zpowers x : Subgroup G) : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨hMstarCo, hNxM⟩
+    have hEMstar : E ≤ Mstar := hENx.trans hNxM
+    -- `p ∈ τ₃(M)`; `IsPiSubgroup (τ₁ M*)ᶜ E₃`.
+    have hpπE3 : p ∈ (Nat.card ↥E₃).primeFactors := by
+      refine Nat.mem_primeFactors.mpr ⟨hp_prime, ?_, Nat.card_pos.ne'⟩
+      have hzc : Nat.card ↥(Subgroup.zpowers x) = p := by rw [Nat.card_zpowers, hx_ord]
+      rw [← hzc]; exact Subgroup.card_dvd_of_le hZle
+    have hpτ3 : p ∈ tau3 M := h.isPiGroup_tau3 p hpπE3
+    have hE3M'star : E₃ ≤ derivedInG Mstar :=
+      (h.E3_le_derived hG).trans (derivedInG_le_derivedInG hEMstar)
+    have hE3pi : Subgroup.IsPiSubgroup ((tau1 Mstar)ᶜ) E₃ := by
+      intro q hq
+      rw [Set.mem_compl_iff, mem_tau1_iff]
+      rintro ⟨_, hqM', _⟩
+      exact hqM' (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hq).1,
+        (Nat.mem_primeFactors.mp hq).2.1.trans (Subgroup.card_dvd_of_le hE3M'star), Nat.card_pos.ne'⟩)
+    -- Corollary 13.2(b): `E₃` centralizes `M_σ ⊓ M*`.
+    have hxp : IsPGroup p ↥(Subgroup.zpowers x) :=
+      IsPGroup.of_card (by rw [Nat.card_zpowers, hx_ord, pow_one])
+    have hE3cent : E₃ ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) :=
+      (tau13_pSubgroup_centralizes hG h (Or.inr hpτ3) hxM hxne hxp hMstarMem).2.1 E₃
+        (le_inf h.E₃_le (h.E₃_le.trans hEMstar)) hE3pi
+    have hMMcE3 : (S10.Msigma M ⊓ Mstar : Subgroup G) ≤ Subgroup.centralizer (E₃ : Set G) := by
+      rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm]
+      exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hE3cent
+    -- `C({x}) ⊆ N(⟨x⟩) ⊆ M*`, and `C({g}) ⊆ C({x})` (since `x ∈ ⟨g⟩`).
+    have hCx_Mstar : Subgroup.centralizer ({x} : Set G) ≤ Mstar := by
+      refine le_trans ?_ ((Subgroup.centralizer_le_normalizer _).trans hNxM)
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff] at hy ⊢
+      intro z hz
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      have hc : Commute y x := (hy x rfl).symm
+      exact ((hc.zpow_right k).eq).symm
+    have hCgCx : Subgroup.centralizer ({g} : Set G) ≤ Subgroup.centralizer ({x} : Set G) := by
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff] at hy ⊢
+      intro z hz
+      rw [Set.mem_singleton_iff] at hz; subst hz
+      have hc : Commute y g := (hy g rfl).symm
+      exact ((hc.pow_right (orderOf g / p)).eq).symm
+    -- assemble: `M_σ ⊓ C(g) ≤ M_σ ⊓ C(x) ≤ M_σ ⊓ M* ≤ C(E₃)`.
+    rw [fixedByElement_def, fixedBy_def]
+    refine le_inf inf_le_left ?_
+    calc S10.Msigma M ⊓ Subgroup.centralizer ({g} : Set G)
+        ≤ S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) := inf_le_inf_left _ hCgCx
+      _ ≤ S10.Msigma M ⊓ Mstar := inf_le_inf_left _ hCx_Mstar
+      _ ≤ Subgroup.centralizer (E₃ : Set G) := hMMcE3
 
 -- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
 -- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
