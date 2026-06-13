@@ -1364,3 +1364,25 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 - **(6.8.2.2) 最終 statement** = dichotomy + X-structure (両 branch) を `α^τ = X − |H:Z|Y` 形に組立。
 - → **(6.8.2.3)** (χ∈X 版, [Is]2.27) → **τ₂ assembly** (6.8.2 proof) → capstone case-B branch。
 **正本=本 session 40 cont.⁷。** (6.8.2.2) decomposition は good-case 完成。残=m=2 case + (6.8.2.3) + τ₂ + FPF(capstone時)。
+
+## 2026-06-14 (session 40 cont.⁸, /loop): m≥3 good-case wrapper; hub merged b-peterfalvi (28 commits)
+
+**🔀 hub 合流確認**: main `34c91f5e Merge 'b-peterfalvi' (Pf §6): (6.8.2) case B coherence — 新 leaf
+S08_CaseBCoherence (28 commits)`。ff-merge で main 取込 (BG §12/§13, Pf §10-13 も同期)。
+
+**✅ landed (build-green + axiom-clean)**:
+17. **`inner_tau_indW2_extension_Yset_eq_neg_caseB` (e6d17c8f)** = |Y|≥3 で good case (relabel 不要)。
+    `inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius` (S08_CoherenceCore:11246) ミラー。
+    dichotomy rcases + edge(m=2) を hm3 で omega 排除。⟹ |Y|≥3 で α^τ=X−|H:Z|η₁^{τ₁} 無条件。
+
+### 📏 ⚠ S08_CaseBCoherence.lean = 1300 行 (分割閾値 1500 接近)。
+次の主結果 (6.8.2.3 等) は**新 leaf** を切るか、frozen 部分 (3.x ヘルパー〜(6.8.2.2) ingredient) を
+hub に分割依頼。S08_CaseBCoherence は現状 §3 helper + (6.8.2.1)〜(6.8.2.2) decomposition の混在。
+
+### ⚠ (6.8.2.2)/(6.8.2) 残:
+- **m=2 relabel case** (η₁^{τ₁}↔−η₂^{τ₁}): Frobenius S08_CoherenceCore:11550+ をミラー (intricate)。
+- **(6.8.2.3)** (χ∈X 版) → **τ₂ assembly** (Frobenius `crux_of_third_anchor`/`coherentXunionYset_...glued`
+  /`Xset_isCoherent` の case-B 版 = 大アーキテクチャ)。
+- **構造的 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): capstone wiring 時に Hypothesis46/certain-type から discharge。
+**正本=本 session 40 cont.⁸。honest 評価**: (6.8.2.2) decomposition (m≥3) は完成。capstone は τ₂ assembly +
+§7 glue + 構造 discharge が残る marathon。steady brick で進行 (空転なし)、但し capstone は依然 distant。
