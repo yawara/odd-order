@@ -751,6 +751,24 @@ theorem opCore_isCyclic_and_fpf_of_transitive
       (hfaithful.comp (Subgroup.subtype_injective _)) hconst
 
 open OddOrder.Isaacs.Ch01 OddOrder.BG.Ch3.S10 in
+/-- The `p`-core of `F(D)` maps onto the `p`-core of `D`: `O_p(F(D)) = O_p(D)` (both are the
+largest normal `p`-subgroup, and `F(D)` is characteristic in `D`).  Bridges per-prime facts
+about `O_p(D)` to Sylow/`p`-element facts inside the (nilpotent) Fitting subgroup. -/
+theorem opCore_fitting_map_subtype_eq [Finite D] (p : ℕ) [Fact p.Prime] :
+    (opCore p ↥(fitting D)).map (fitting D).subtype = opCore p D := by
+  apply le_antisymm
+  · haveI : ((opCore p ↥(fitting D)).map (fitting D).subtype).Normal :=
+      normal_map_subtype_of_characteristic (opCore.characteristic p ↥(fitting D))
+    exact normal_pgroup_le_opCore ((opCore_isPGroup p ↥(fitting D)).map (fitting D).subtype)
+  · have hofit : opCore p D ≤ fitting D := opCore_le_fitting ⟨p, Fact.out⟩ D
+    haveI : ((opCore p D).subgroupOf (fitting D)).Normal := Subgroup.normal_subgroupOf
+    have hle : (opCore p D).subgroupOf (fitting D) ≤ opCore p ↥(fitting D) :=
+      normal_pgroup_le_opCore ((opCore_isPGroup p D).comap_subtype)
+    calc opCore p D = ((opCore p D).subgroupOf (fitting D)).map (fitting D).subtype :=
+          (Subgroup.map_subgroupOf_eq_of_le hofit).symm
+      _ ≤ (opCore p ↥(fitting D)).map (fitting D).subtype := Subgroup.map_mono hle
+
+open OddOrder.Isaacs.Ch01 OddOrder.BG.Ch3.S10 in
 /-- **Peterfalvi Appendix B, Proposition 1 — `F(D)` cyclic from cyclic `p`-cores**: if every
 `p`-core `O_p(D)` is cyclic, then the Fitting subgroup `F(D)` is cyclic.  Pure group theory:
 `F(D)` is nilpotent (`fitting.isNilpotent`), each Sylow of `F(D)` is its unique normal one and
