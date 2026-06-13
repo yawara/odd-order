@@ -585,6 +585,64 @@ theorem isAInvariant_eq_bot_or_top_of_transitive
       obtain ⟨g, hg⟩ := htrans a b ha1 hb1
       exact hg ▸ hU.smul_mem g haU
 
+/-- **Peterfalvi Appendix B, Proposition 1 — no normal `q`-subgroup**: a faithful irreducible
+action of `D` on the elementary abelian `q`-group `E` admits no nontrivial normal `q`-subgroup.
+(So for `D` acting transitively on `E^#`, `q ∤ |F(D)|`, i.e. every Fitting prime is `≠ q`.)
+The fixed subgroup `C_E(N)` is `D`-invariant (normality) and nonzero (the `q`-group `N` acts on
+the `q`-group `E`), so by irreducibility `C_E(N) = E`, forcing `N ≤ ker φ = ⊥` (faithfulness). -/
+theorem normal_isPGroup_eq_bot_of_faithful_irreducible
+    [Finite E] {q : ℕ} [Fact q.Prime] (hqE : q ∣ Nat.card E)
+    (φ : D →* MulAut E) (hfaithful : Function.Injective φ)
+    (hirr : ∀ U : Subgroup E, IsAInvariant φ U → U = ⊥ ∨ U = ⊤)
+    {N : Subgroup D} (hNnorm : N.Normal) (hNq : IsPGroup q ↥N) :
+    N = ⊥ := by
+  have hCinv : IsAInvariant φ (actionFixedPoints φ N) := by
+    rw [isAInvariant_iff_smul_mem]
+    intro d e he n
+    rw [mem_actionFixedPoints] at he
+    have hmem : d⁻¹ * (n : D) * d ∈ N := by
+      have h := hNnorm.conj_mem (n : D) n.2 d⁻¹; simpa using h
+    calc (φ (n : D)) ((φ d) e)
+        = (φ ((n : D) * d)) e := by rw [map_mul]; rfl
+      _ = (φ (d * (d⁻¹ * (n : D) * d))) e := by
+          rw [show (n : D) * d = d * (d⁻¹ * (n : D) * d) by group]
+      _ = (φ d) ((φ (d⁻¹ * (n : D) * d)) e) := by rw [map_mul]; rfl
+      _ = (φ d) e := by rw [he ⟨d⁻¹ * (n : D) * d, hmem⟩]
+  have hCne : actionFixedPoints φ N ≠ ⊥ := by
+    letI : MulAction ↥N E := MulAction.compHom E (φ.comp N.subtype)
+    have hsmul : ∀ (n : ↥N) (e : E), n • e = (φ (n : D)) e := fun _ _ => rfl
+    have hmod := hNq.card_modEq_card_fixedPoints E
+    have hpfix : q ∣ Nat.card (MulAction.fixedPoints ↥N E) :=
+      (Nat.modEq_zero_iff_dvd).mp (hmod.symm.trans ((Nat.modEq_zero_iff_dvd).mpr hqE))
+    haveI : Nonempty (MulAction.fixedPoints ↥N E) :=
+      ⟨⟨1, fun n => by rw [hsmul]; exact map_one _⟩⟩
+    have hpos : 0 < Nat.card (MulAction.fixedPoints ↥N E) := Nat.card_pos
+    have hgt1 : 1 < Nat.card (MulAction.fixedPoints ↥N E) :=
+      lt_of_lt_of_le one_lt_two ((Fact.out : q.Prime).two_le.trans (Nat.le_of_dvd hpos hpfix))
+    haveI : Nontrivial (MulAction.fixedPoints ↥N E) := Finite.one_lt_card_iff_nontrivial.mp hgt1
+    obtain ⟨a, b, hab⟩ := exists_pair_ne (↥(MulAction.fixedPoints ↥N E))
+    have key : ∀ c : ↥(MulAction.fixedPoints ↥N E), (c : E) ≠ 1 → actionFixedPoints φ N ≠ ⊥ := by
+      intro c hc hbot
+      have hcmem : (c : E) ∈ actionFixedPoints φ N := by
+        rw [mem_actionFixedPoints]; intro n
+        have := c.property n; rwa [hsmul] at this
+      rw [hbot, Subgroup.mem_bot] at hcmem
+      exact hc hcmem
+    rcases eq_or_ne (a : E) 1 with ha1 | ha1
+    · exact key b (fun hb1 => hab (Subtype.ext (ha1.trans hb1.symm)))
+    · exact key a ha1
+  rcases hirr _ hCinv with h | h
+  · exact (hCne h).elim
+  · rw [eq_bot_iff]
+    intro n hn
+    rw [Subgroup.mem_bot]
+    have hφn1 : φ n = 1 := by
+      ext e
+      have he : e ∈ actionFixedPoints φ N := by rw [h]; exact Subgroup.mem_top e
+      rw [mem_actionFixedPoints] at he
+      simpa using he ⟨n, hn⟩
+    exact hfaithful (hφn1.trans (map_one φ).symm)
+
 /-- **Peterfalvi Appendix B, Proposition 1 bridge**: if `D` acts transitively on
 `E^#` and `N ⊴ D`, then the `N`-point-stabilizers `N_a`, `N_b` of any two
 nonidentity points have the same order — they are conjugate in `D` (`N_b = d N_a
