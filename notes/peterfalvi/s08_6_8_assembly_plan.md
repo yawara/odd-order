@@ -1582,3 +1582,31 @@ reducible χ_i の R(μ_j) (`OrthonormalCharacterImageFamily`) として接続�
 3. **(6.8.2.3) per-χ**: (5.4.a/b) + R(χ_i) + pinning。
 4. **X-coherence (reducible 込み)** + **X∪Y glue** → `sibleySetup_is_coherent` case-B branch。
 **正本=本 cont.¹⁵。これは大規模 assembly (複数イテレーション); crux=(4.9)→§7 bridge。次=brick 1 (集約関係)。**
+
+## 2026-06-14 (session 40 cont.¹⁶, /loop): 🗺 case-B coherence アーキテクチャ確定 (mirror-Frobenius) + crux feasible
+
+cont.¹⁵ の PLAN を精査確定。case-B X∪Y coherence = **Frobenius assembly
+`coherentXunionYset_centralCommutator_of_glued_of_frobenius` (S08_CoherenceCore:1316, ~30行) を mirror**。
+本体は §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq` への clean call:
+X-coherence + Y-coherence (`coherentYset` 済) + ν (glue map, param) + hagreeX/Y + 直交性 + hmixed + hgen。
+
+### 🔑 case-B が Frobenius と違う 4 点 (= 残 brick):
+- **(A) Dade-data 一致 [crux, feasible]**: (4.9) `certainType_isCoherent` は `dadeIntegralCharacterMap
+  h.dade0 h.tau` (Hypothesis46) で、`hyp.tau` (SibleyDade) と別 datum。だが **両者 H#-supported 上で一致**
+  — `dadeIntegralCharacterMap_apply_of_support` で両方 dadeMap=Ind_L^G に帰着 (μ_j は `columnSum_support_subset`
+  で H#∪{1} 上 support, `dade_H_eq_bot`)。⟹ feasible (both=Ind)。
+- **(B) case-B X-coherence [substantive, 大]**: X = S−S(W₂) = X_irr ∪ {μ_j} (cont.¹⁴: μ_j は reducible で X に在)。
+  X_irr=既約 (6.6 reuse), {μ_j}=`certainTypeSet`=(4.9) `certainType_isCoherent`。両者を §7 `coherentUnion_of_glued`
+  で glue (要 (A) で hyp.tau へ transport)。**これが最大の新規ピース。**
+- **(C) X⊥Y 直交 (reducible-aware)**: Frobenius は `inner_eq_zero_of_mem_span_of_disjoint_irreducible` (X 既約前提)。
+  case-B は μ_j=Σ_i μ_{ij} (各既約∈X) ⊥ η_k (∈Y) を μ_{ij}∉Y から。要 reducible 対応版。
+- **(D) hmixed (=(6.8.2.3)) + glue**: ν が ⟨x,y⟩ 保存 (x∈X[reducible 含む], y∈Y)。τ-isometry on supported + (A)(B)。
+
+### ⚠ brick 1 (`inner_induce_self_eq_index_of_le_center`, Σaᵢ²=|H:Z|) の位置付け:
+教科書 (6.8.2.3) の R(χ_i) pinning 用だったが、**mirror-glue 経路では off-path の可能性**。true lemma で害なし、
+(6.8.2.3) を per-χ で行う場合は再利用可ゆえ残置。アーキテクチャ未確定で先に建てた反省。
+
+### ▶ 次手 = brick (B) case-B X-coherence の構築開始 ((A) support-agreement を補題化 → (4.9) を hyp.tau へ
+transport → X_irr と glue)。**正直な評価: case-B coherence は大規模 multi-session assembly。crux は全て
+feasible と確認済 (構造的ブロッカー無し)、残りは intricate な interface 接続を brick ごとに積む段階。**
+**正本=本 cont.¹⁶ (アーキテクチャ確定版; ¹⁵ の不確定を解消)。**
