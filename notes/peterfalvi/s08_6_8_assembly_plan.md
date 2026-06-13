@@ -899,3 +899,47 @@ structure が供給) へ移動 — **教科書と同じ配置**。`mapOfInjectiv
    (η₁^{τ₁} 定数 on Z# 等)。これは genuine だが tractable (構成不能でない)。
 3. → X-coh w.r.t. hyp.tau → 既存 capstone glue (`coherentS_..._generator_mixed_inner`) で Y-coh と合流。
 **正本=本 session 39 cont.。難所の root cause を特定し faithful 化で解除 (回避でなく是正)。**
+
+## 2026-06-13 (session 39 cont.², /loop): case-B coherence の**正確な inventory** (旧 framing 訂正) + 新 leaf 着手
+
+**🔧 旧 framing 訂正 (重要)**: 「c2 X-coh = `certainType_isCoherent` (4.9) + certainTypeSet=Xset 同定」は
+**oversimplification/誤り**。`certainTypeSet` = {列和 μ_j 同次数} = (4.9) の 𝒯 で、Sibley Xset = {Ind_H^L θ}
+とは別パラメータ化。教科書 **(6.8.2)** の case-B coherence は**自己完結の別論法** (mmd 04.8 L178-224):
+- **(6.8.2.1)** η^{τ₁} は Z^# 上定数 [(1.9) Galois + (5.9.a) + Z⊆ker η]。
+- **(6.8.2.2)** (6.7)-合同 inner-product 公式 [reg-char 分解 + |H| mod]。
+- **(6.8.2.3)** X-側 (χ−aη₁)^τ 分解 [[Is]2.27, Z⊆Z(H)]。
+- τ₂ 組立。
+⟹ `certainType_isCoherent` は (4.9) として (6.8.2.3) 等で**部分利用**されうるが、case-B coherence の
+直接 producer ではない。**Don't re-grind「certainType_isCoherent=c2 X-coh 直結」**。
+
+**🔍 実 inventory (S08_CoherenceCore, 直接 grep; notes は信頼不可と判明)**: case-B は **central-Zc
+program** (Zc=`centralCommutator`=Z(H).map⊓[H,H]) として実装、**Frobenius + c2-caseA variant が大半 built**:
+- `Xset_centralCommutator_isCoherent_of_{frobenius,c2_caseA}` (9290/9325) / `_of_irreducible_X` (9112)。
+- `restrict_extension_Yset_const_on_centralCommutator_of_frobenius` (9820) = **(6.8.2.1) for Frobenius** (Zc, degree-value route)。
+- `coherentXunionYset_centralCommutator_of_himg_ortho` (9854) = X∪Y coh shell、**残=`himg_ortho`** (b≡c≡0 mod a, L3(3b))。
+- 全 `_of_frobenius` は `[IsPGroup p ↥H]` を**仮説 thread** ⟹ (6.5) p-群還元は capstone caller の義務。
+- **frontier = c2-math-case-B variant (Z=W₂ central prime) + himg_ortho + (6.5) + capstone 配線。**
+
+**🎯 重要 infra 発見 (notes 未記載)**: **(6.8.2.1) は一般形で既存** =
+`OddOrder.Peterfalvi.S07.IsCoherent.extension_constant_on_sharp_of_prime` (S07_CoherenceGalois:424、
+Z prime 要)。case-B は w₂ prime ゆえ適用可。かつ **`hyp.tau = dadeIntegralCharacterMap hyp.dade …`**
+(S08:3459 abbrev) ゆえ一般 lemma が `hyp.coherentYset` に直接適用可。
+- discharge 要件: hSirr (✅`isIrreducibleCharacter_of_mem_Yset` 4652)、hpair (✅`two_le_Yset_ncard`)、
+  hZp (✅case-B w₂ prime)、hZA (W₂⊆[H,H]⊆H ⟹ W₂^#⊆H^#=sharpImage H、易)、
+  hlat (✅coherentYset.extension_mem_ZIrr)、**hSu (Yset Galois-closed)**、**hspan (support)**、**hηx (η const on W₂)**。
+
+### ✅ landed (新 leaf `S08_CaseBCoherence.lean`, build-green+axiom-clean, full build 3802): keystone 補題
+`OddOrder.RepresentationTheory.ClassFunction.mapRingEquiv_induce` (一般): `σ(Ind_H^G θ) = Ind_H^G(σθ)`
+(σ:ℂ≃+*ℂ)。σ は ring hom で ⅟|H| (∈ℚ, `map_natCast`/`map_inv₀`) を固定 + induceTerm に termwise。
+⟹ **Yset Galois-closure (hSu) の engine** (各 Ind_H^L(linear χ) ↦ Ind_H^L(linear(σ∘χ)))。
+新 leaf は c2-case-B coherence の蓄積先 (root closure 配線済 OddOrder.lean:144)。
+
+### ▶ 次の一手 (新 leaf で積む、推奨順):
+1. **hSu = Yset Galois-closure**: `mapRingEquiv_induce` + linear-char Galois (σ∘χ linear≠1) + `mem_Yset_iff_exists_linear_source`。
+2. **hηx = η const on W₂** (case-B): η=Ind(linear θ), θ trivial on [H,H]⊇W₂, W₂⊆Z(H) ⟹ Ind 値計算 η(w)=η(1)。
+3. **hspan** (support 条件) + **hZA** (易) → これで `extension_constant_on_sharp_of_prime` を coherentYset@W₂ に適用 = **(6.8.2.1)-for-c2-case-B** landed。
+4. → (6.8.2.2) [(6.7)合同, peterfalvi_67 既存] → (6.8.2.3) → τ₂ 組立。‖ himg_ortho (Frobenius 側、別途)。
+
+**⚠ 正直評価**: case-B coherence は sustained-expert 多セッション仕事 (各 step に sub-lemma 群)。loop-tick
+では incremental brick を積む方針。本 session 39 全体: faithful cases fix (cont.) + 正確 inventory (cont.²) +
+keystone `mapRingEquiv_induce`。**正本=本 session 39 cont.²。**
