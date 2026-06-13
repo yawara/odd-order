@@ -562,6 +562,30 @@ C_{M_α}(R) へ移送するには S が C_{M_α}(R)=M_α∩C(R) を正規化す�
 (fact A=hAcQ を hCeq 非依存で証明し既存 step 8-9 を一部組換え) → (3) Thompson closure に集中。**この session は head-on で
 math を大幅前進** (build/sorry 不変, notes-only)。
 
+### 2026-06-13 Lane G (同 session, closure 精密検証): 🛑 **(3) Thompson closure は遮断 — 上の楽観評価を訂正** (definitive)
+
+fact (A) 着工前に closure (step 3) が通るか精査 → **遮断と確定**。上の「(3) Thompson closure on R''」は誤りで、
+genuine な impasse。理由 (全て検証済):
+- **新 Thm 3.7 矛盾が構成不能**: PQ_eq_bot 型の矛盾は「prime-order 群が非 nilpotent な `Q·R''_1` 等に FPF 作用
+  ⟹ Thm 3.7 で nilpotent ⟹ 矛盾」。ここで使える FPF は (i) **P-FPF**: `C_Q(P)=Q≠1` (P が Q を中心化) ゆえ
+  `C_{Q·R''_1}(P)=1` が**破れ Thm 3.7 適用不可** / (ii) **R-FPF**: `C_Q(R)=1` ✓ だが**既に (r,R) の 12.18(a)
+  適用で消費済** (= `C_{M_α}(RQ)=⊥` を産出) ⟹ 新たな矛盾源にならない。⟹ **新 Thompson 矛盾の起点が無い**。
+- **cyclic trick も R 側は不可 (S-非対称性が絶対)**: `C_{M_α}(R)` (cyclic) を正規化する群は `P` / `R` / `C_S(R)` のみで、
+  これら**相互の commutator は全て 1** (`[P,R]=1`, `[P,C_S(R)]=1` [P が S 中心化], `[R,C_S(R)]=1`) ⟹ `Q=[S,R]` を
+  commutator として産めない。S 全体は `C(R)` を正規化しない (`Q⊄N(C(R))`)。
+- **facts (A)(B)(C) は self-consistent** (P が `C_{M_α}(R)≠⊥` cyclic に FPF 作用は矛盾でない) ⟹ **単体で False を産まない**。
+  ⟹ hCeq (`C_{M_α}(P)=C_{M_α}(R)`) は **(B) `C_{M_α}(PR)=⊥` + `hCR_ne` の下で False に同値**ゆえ、closure (=False 導出)
+  と equi-difficulty (hCeq は doomed でなく closure と同値; 現 Lean 構造は維持で可だが closure を要す)。
+
+**🔴 definitive 所見**: step 7 closure = BG が "we can conclude" で省く inclusion で、**標準 coprime-action machinery
+(BG Ch3 全 + Gorenstein + 在 repo 機構) では構成不能**な genuine gap。BG 固有の省略論法は本 session 精査の範囲
+(Thm 1.13/3.6/3.7/3.8/3.9/3.10, Prop 1.10/1.16, Thm 1.8/1.11) に**現れず**、original derivation (恐らく未記述 config への
+Thompson/Thm 3.7 の非自明再構成、または P-Q 中心化を回避する別経路) を要する。**~数 session 規模の research-level task。**
+- **landed 資産**: facts (A)(B)(C) の rigorous な math 確立 (再利用可技法 = per-Sylow cyclic trick) + hCeq=closure 同値性
+  + 遮断構造の完全 map。**未 land** (Lean): fact (A) の formalize は ~200 行で closure を閉じない (技法検証のみ) ゆえ保留。
+- **推奨**: step 7 は documented sorry で温存 → **§13 構造 (Thm 13.5/Lemma 13.6/13.7…) を sorry'd 13.4 引用で積む**
+  (option B; build-green structural progress, step 7 完成で自動 unconditional 化)。step 7 は dedicated research session 行き。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
