@@ -239,7 +239,7 @@ theorem actsPrimeOn_sup_of_eq_centralizer [Finite G] {N E₁ E₃ : Subgroup G}
 `Commute g h` から `R ≤ C(P)`。 -/
 theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : Subgroup G}
     (hreg : ¬ ActsRegularlyOn E₃ E₁) :
-    ∃ p r : ℕ, ∃ P R : Subgroup G,
+    ∃ p r : ℕ, p.Prime ∧ r.Prime ∧ ∃ P R : Subgroup G,
       P ∈ elemAbelianOfRank G p 1 ∧ P ≤ E₁ ∧
       R ∈ elemAbelianOfRank G r 1 ∧ R ≤ E₃ ∧
       R ≤ Subgroup.centralizer (P : Set G) := by
@@ -255,7 +255,7 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
     rw [Subgroup.mem_centralizer_iff] at heC; exact heC g (Set.mem_singleton g)
   -- order-`s` cyclic subgroup of `⟨x⟩` inside `K`, for any `x ∈ K#`.
   have key : ∀ {K : Subgroup G} (x : G), x ∈ K → x ≠ 1 →
-      ∃ s : ℕ, ∃ Q : Subgroup G,
+      ∃ s : ℕ, s.Prime ∧ ∃ Q : Subgroup G,
         Q ∈ elemAbelianOfRank G s 1 ∧ Q ≤ K ∧ Q ≤ Subgroup.zpowers x := by
     intro K x hxK hx
     have hord1 : orderOf x ≠ 1 := fun hc => hx (orderOf_eq_one_iff.mp hc)
@@ -269,13 +269,13 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
     have hyord : orderOf y = s := by
       rw [hy, orderOf_pow' x hd0, Nat.gcd_eq_right hdvd, hd, Nat.div_div_self hsdvd hord0]
     have hycard : Nat.card (Subgroup.zpowers y) = s := by rw [Nat.card_zpowers, hyord]
-    refine ⟨s, Subgroup.zpowers y, ?_, ?_, ?_⟩
+    refine ⟨s, hs, Subgroup.zpowers y, ?_, ?_, ?_⟩
     · exact ⟨Subgroup.IsElementaryAbelian.of_card_prime hycard, by rw [pow_one]; exact hycard⟩
     · rw [Subgroup.zpowers_le, hy]; exact K.pow_mem hxK d
     · rw [Subgroup.zpowers_le, hy]; exact pow_mem (Subgroup.mem_zpowers x) d
-  obtain ⟨p, P, hP, hPE1, hPg⟩ := key g hgE1 hgne
-  obtain ⟨r, R, hR, hRE3, hRhe⟩ := key he heE3 he1
-  refine ⟨p, r, P, R, hP, hPE1, hR, hRE3, ?_⟩
+  obtain ⟨p, hp, P, hP, hPE1, hPg⟩ := key g hgE1 hgne
+  obtain ⟨r, hr, R, hR, hRE3, hRhe⟩ := key he heE3 he1
+  refine ⟨p, r, hp, hr, P, R, hP, hPE1, hR, hRE3, ?_⟩
   have hzz : Subgroup.zpowers he ≤ Subgroup.centralizer (Subgroup.zpowers g : Set G) := by
     rw [Subgroup.zpowers_le, Subgroup.mem_centralizer_iff]
     intro u hu
@@ -283,6 +283,43 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
     obtain ⟨k, rfl⟩ := hu
     exact (hghe.zpow_left k).eq
   exact hRhe.trans (hzz.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPg)))
+
+/-- `P ∈ ℰ_s¹(X)` (`P ≤ X`, `s` 素数) + `ActsPrimeOn N X` ⟹ `C_N(P) = C_N(X)`
+(`fixedBy N P = fixedBy N X`)。`P` は素数位数ゆえ生成元 `g∈P#` で `P=⟨g⟩`、
+`C_N(P)=C_N(g)=C_N(X)` (prime action)。13.7 body の step 2/5 で `C_N(P)=C_N(E₁)` 等に使う。 -/
+theorem fixedBy_eq_of_elemAbelian_one {N X P : Subgroup G} {s : ℕ} (hs : s.Prime)
+    (hX : ActsPrimeOn N X) (hP : P ∈ elemAbelianOfRank G s 1) (hPX : P ≤ X) :
+    fixedBy N P = fixedBy N X := by
+  haveI : Fact s.Prime := ⟨hs⟩
+  have hPcard : Nat.card P = s := by rw [← pow_one s]; exact hP.2
+  have hPne : P ≠ ⊥ := by
+    intro hb; rw [hb, Subgroup.card_bot] at hPcard; exact hs.one_lt.ne' hPcard.symm
+  obtain ⟨⟨g, hgP⟩, hgne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hPne
+  have hg1 : g ≠ 1 := fun hc => hgne (Subtype.ext (by simpa using hc))
+  have hog : orderOf g = s := by
+    have hdvd : orderOf g ∣ Nat.card P := by
+      have h := orderOf_dvd_natCard (⟨g, hgP⟩ : P); rwa [← Subgroup.orderOf_coe] at h
+    rw [hPcard] at hdvd
+    rcases hs.eq_one_or_self_of_dvd _ hdvd with h1 | h2
+    · exact absurd (orderOf_eq_one_iff.mp h1) hg1
+    · exact h2
+  have hPg : P = Subgroup.zpowers g :=
+    (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hgP)
+      (by rw [Nat.card_zpowers, hog]; exact hPcard.le)).symm
+  have hzC : Subgroup.centralizer (Subgroup.zpowers g : Set G)
+      = Subgroup.centralizer ({g} : Set G) := by
+    apply le_antisymm
+    · exact Subgroup.centralizer_le (by
+        intro u hu; rw [Set.mem_singleton_iff] at hu; rw [hu]; exact Subgroup.mem_zpowers g)
+    · intro w hw
+      rw [Subgroup.mem_centralizer_iff] at hw ⊢
+      intro u hu
+      rw [SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hu
+      obtain ⟨k, rfl⟩ := hu
+      have hc : Commute g w := hw g (Set.mem_singleton g)
+      exact (hc.zpow_left k).eq
+  calc fixedBy N P = fixedByElement N g := by rw [hPg, fixedBy_def, fixedByElement_def, hzC]
+    _ = fixedBy N X := hX g (hPX hgP) hg1
 
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
@@ -292,7 +329,57 @@ theorem E1E3_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE1 : E₁ ≠ ⊥)
     (hreg : ¬ ActsRegularlyOn E₃ E₁) :
     ActsPrimeOn (S10.Msigma M) (E₁ ⊔ E₃) := by
-  sorry
+  have hE1prime : ActsPrimeOn (S10.Msigma M) E₁ := E1_actsPrime hG h hE1
+  have hE3prime : ActsPrimeOn (S10.Msigma M) E₃ := (cyclicSylow_actsPrime hG h).2
+  -- `E₁`, `E₃` have coprime orders (τ₁ vs τ₃ disjoint, Hall subgroups).
+  have hcop : Nat.Coprime (Nat.card E₁) (Nat.card E₃) := by
+    by_contra hnc
+    obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+    have hsN : s.Prime := hs
+    have hsE1 : s ∈ (Nat.card E₁).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hsN, hsm, Nat.card_pos.ne'⟩
+    have hsE3 : s ∈ (Nat.card E₃).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hsN, hsn, Nat.card_pos.ne'⟩
+    have hc1 : Nat.card (E₁.subgroupOf E) = Nat.card E₁ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+    have hc3 : Nat.card (E₃.subgroupOf E) = Nat.card E₃ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+    exact not_mem_tau3_of_mem_tau1 (h.E₁_hall.1 s (hc1 ▸ hsE1)) (h.E₃_hall.1 s (hc3 ▸ hsE3))
+  have hnorm : E₁ ≤ Subgroup.normalizer (E₃ : Set G) := h.E₁_le.trans (h.E3_normal hG)
+  have hN3 : E₃ ≤ Subgroup.normalizer (S10.Msigma M : Set G) :=
+    (h.E₃_le.trans h.E_le).trans
+      (by rw [S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hD : fixedBy (S10.Msigma M) E₁ = fixedBy (S10.Msigma M) E₃ := by
+    -- step 1: extract `P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)` with `R ≤ C(P)`.
+    obtain ⟨p, r, hp, hr, P, R, hP, hPE1, hR, hRE3, hRcP⟩ :=
+      exists_elemAbelian_centralizing_of_not_regular hreg
+    haveI : Fact p.Prime := ⟨hp⟩
+    haveI : Fact r.Prime := ⟨hr⟩
+    have hPcardp : Nat.card P = p := by rw [← pow_one p]; exact hP.2
+    have hRcardr : Nat.card R = r := by rw [← pow_one r]; exact hR.2
+    have hc1 : Nat.card (E₁.subgroupOf E) = Nat.card E₁ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+    have hpτ1 : p ∈ tau1 M := by
+      have hpdvd : p ∣ Nat.card E₁ := hPcardp ▸ Subgroup.card_dvd_of_le hPE1
+      exact h.E₁_hall.1 p (hc1 ▸ Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩)
+    have hrπE : r ∈ (Nat.card E).primeFactors := by
+      have hrdvd : r ∣ Nat.card E := hRcardr ▸ Subgroup.card_dvd_of_le (hRE3.trans h.E₃_le)
+      exact Nat.mem_primeFactors.mpr ⟨hr, hrdvd, Nat.card_pos.ne'⟩
+    -- step 2: `C_N(E₁) = C_N(P) ≤ C_N(R) = C_N(E₃)` (Theorem 13.4 + prime actions).
+    have hPeq : fixedBy (S10.Msigma M) P = fixedBy (S10.Msigma M) E₁ :=
+      fixedBy_eq_of_elemAbelian_one hp hE1prime hP hPE1
+    have hReq : fixedBy (S10.Msigma M) R = fixedBy (S10.Msigma M) E₃ :=
+      fixedBy_eq_of_elemAbelian_one hr hE3prime hR hRE3
+    have hle : fixedBy (S10.Msigma M) E₁ ≤ fixedBy (S10.Msigma M) E₃ := by
+      rw [← hPeq, ← hReq, fixedBy_def, fixedBy_def]
+      exact centralizer_le_centralizer_of_tau1 hG h hpτ1 hrπE hP (hPE1.trans h.E₁_le) hR
+        (le_inf (hRE3.trans h.E₃_le) hRcP)
+    -- step 5: rule out the strict containment.
+    rcases lt_or_eq_of_le hle with hlt | heq
+    · exfalso
+      sorry
+    · exact heq
+  exact actsPrimeOn_sup_of_eq_centralizer hE1prime hE3prime hcop hnorm hN3 hD
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
