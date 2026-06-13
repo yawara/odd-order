@@ -341,4 +341,64 @@ theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
   push_cast
   nlinarith [hpos, hlt]
 
+/-- **Norm of a character induced from a central subgroup** (a (6.8.2.3) ingredient).  If `N` is a
+central subgroup of a finite group `M` and `φ ∈ Irr N` (necessarily linear), then
+`‖Ind^M_N φ‖² = |M : N|`.  Indeed `N ⊴ M` (central), conjugation acts trivially on `N`, so the Mackey
+restriction `|N|·Res_N(Ind^M_N φ) = ∑_{x∈M} φ^{x⁻¹} = |M|·φ` collapses; Frobenius reciprocity
+`⟨Ind φ, Ind φ⟩ = ⟨φ, Res(Ind φ)⟩` then gives `|N|·‖Ind φ‖² = |M|`, i.e. `‖Ind φ‖² = |M:N|`.
+
+This is the `∑ aᵢ² = |H : Z|` step of Peterfalvi (6.8.2.3) (`Z = W₂ ⊆ Z(H)`, applied with `M = ↥H`,
+`N = W₂.subgroupOf H`): the squared multiplicities of `Ind^H_Z φ` sum to `‖Ind^H_Z φ‖² = |H : Z|`. -/
+theorem inner_induce_self_eq_index_of_le_center
+    {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
+    {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    (hN : N ≤ Subgroup.center M)
+    {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ClassFunction.inner (ClassFunction.induce N φ) (ClassFunction.induce N φ)
+      = (N.index : ℂ) := by
+  classical
+  haveI hNnorm : N.Normal := by
+    constructor
+    intro n hn g
+    have hc : g * n = n * g := (Subgroup.mem_center_iff.mp (hN hn)) g
+    have : g * n * g⁻¹ = n := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+    rw [this]; exact hn
+  -- conjugation acts trivially on the central `N`.
+  have hconjtriv : ∀ x : M, ClassFunction.conjBy x⁻¹ φ = φ := by
+    intro x
+    ext h
+    rw [ClassFunction.conjBy_apply]
+    have hheq : x⁻¹ * (h : M) * (x⁻¹)⁻¹ = (h : M) := by
+      have hcomm : x⁻¹ * (h : M) = (h : M) * x⁻¹ :=
+        Subgroup.mem_center_iff.mp (hN h.2) x⁻¹
+      rw [hcomm, mul_assoc, mul_inv_cancel, mul_one]
+    exact congrArg (fun y : ↥N => φ y) (Subtype.ext hheq)
+  -- Mackey: `|N|·Res(Ind φ) = ∑_x φ^{x⁻¹} = |M|·φ`.
+  have hmackey : (Nat.card ↥N : ℂ) • ClassFunction.restrict N (ClassFunction.induce N φ)
+      = (Nat.card M : ℂ) • φ := by
+    rw [card_smul_restrict_induce]
+    simp only [hconjtriv]
+    rw [Finset.sum_const, Finset.card_univ, ← Nat.cast_smul_eq_nsmul ℂ, Nat.card_eq_fintype_card]
+  -- Frobenius reciprocity + the Mackey collapse give `|N|·‖Ind φ‖² = |M|`.
+  have hfrob : ClassFunction.inner (ClassFunction.induce N φ) (ClassFunction.induce N φ)
+      = ClassFunction.inner φ (ClassFunction.restrict N (ClassFunction.induce N φ)) :=
+    ClassFunction.inner_induce_eq_inner_restrict N φ (ClassFunction.induce N φ)
+  have hself : ClassFunction.inner φ φ = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨φ, hφ⟩ : IrreducibleCharacter ↥N) ⟨φ, hφ⟩
+    simpa using this
+  haveI : Nonempty ↥N := ⟨1⟩
+  have hstep : (Nat.card ↥N : ℂ) *
+      ClassFunction.inner φ (ClassFunction.restrict N (ClassFunction.induce N φ))
+      = (Nat.card M : ℂ) := by
+    have h := congrArg (ClassFunction.inner φ) hmackey
+    rw [OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast, star_natCast, hself,
+      mul_one] at h
+    exact h
+  have hcardN : (Nat.card ↥N : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hcardeq : (Nat.card ↥N : ℂ) * (N.index : ℂ) = (Nat.card M : ℂ) := by
+    rw [← Nat.cast_mul, Subgroup.card_mul_index N]
+  rw [← hfrob, ← hcardeq] at hstep
+  exact mul_left_cancel₀ hcardN hstep
+
 end OddOrder.Peterfalvi.S08
