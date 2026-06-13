@@ -452,4 +452,84 @@ theorem SibleyDadeHypothesis.inf_centralizer_eq_of_mem_center
   have h := congrArg L.subtype (hwc ⟨g, hg⟩)
   simpa using h
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.2.2) case-(B) (6.7) adapter.**  The case-(B) analogue of
+`peterfalvi_67_centralCommutator`: when `Z ≤ H` is a subgroup that is *central in `↥L`*
+(`Z ≤ Z(↥L)` — in (6.8.2.2) this is `Z = W₂` under the math-(B) condition `W₂ ⊆ Z(H)` with `W`
+cyclic), the (6.7) congruence
+
+`ρ.character z ≡ ρ.character 1  (mod |H|)`
+
+holds for `z ∈ Z^#` and any irreducible `ρ` whose character is constant on
+`Z^# = (Z.map L.subtype)^#` (the only character-theoretic input, deferred to the caller — in
+(6.8.2.2) it is `η₁^{τ₁}`).
+
+The structural hypotheses of `peterfalvi_67_of_odd` are discharged at `P := Ĥ = H.map L.subtype`
+(Sylow in `G` by `sylow_map_subtype_of_coprime`, with `N_G(Ĥ) = L` by `normalizer_map_subtype_eq`)
+and `Z := Z.map L.subtype`: `hZP` (`Z ≤ H`), `hZnormal` (central ⇒ normal), `hti`/`hodd`
+(`H^#` TI / `|L|` odd), `hPz` (`Ĥ ≤ L ≤ C_G(z)` since `z` is central), and the `|C_L(·)|`-constancy
+clause of `hconst` (both sides `= |L|` by `inf_centralizer_eq_of_mem_center`).  The modulus
+`|Ĥ| = |H|` via `card_map_of_injective`.  This is the (6.8)(c2) coprimality-only analogue of the
+(6.8.1) Frobenius adapter; the Sylow is supplied by the `cases` side condition `gcd(|H|,|W₁|) = 1`. -/
+theorem SibleyDadeHypothesis.peterfalvi_67_central (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {Z : Subgroup ↥L} (hZH : Z ≤ H) (hZcen : Z ≤ Subgroup.center ↥L)
+    {V : Type*} [AddCommGroup V] [Module ℂ V] [FiniteDimensional ℂ V]
+    (ρ : Representation ℂ G V) [ρ.IsIrreducible]
+    {z : G} (hz : z ∈ Z.map L.subtype) (hz1 : z ≠ 1)
+    (hψconst : ∀ w ∈ Z.map L.subtype, w ≠ 1 → ρ.character w = ρ.character z) :
+    ρ.character z ≡ ρ.character 1 [ALGMOD (Nat.card ↥H : ℤ)] := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  classical
+  obtain ⟨Q, hQeq⟩ := hyp.sylow_map_subtype_of_coprime hcop hp hHp
+  have hNorm : Subgroup.normalizer ((Q : Subgroup G) : Set G) = L := by
+    rw [hQeq]; exact hyp.normalizer_map_subtype_eq
+  have hcard : Nat.card (Q : Subgroup G) = Nat.card ↥H := by
+    rw [hQeq]; exact Subgroup.card_map_of_injective L.subtype_injective
+  -- `Z` is normal in `↥L`: central subgroups are normal.
+  have hZnorm : Z.Normal := ⟨fun n hn g => by
+    have hc : g * n = n * g := (Subgroup.mem_center_iff.mp (hZcen hn)) g
+    have hgn : g * n * g⁻¹ = n := by rw [hc]; exact mul_inv_cancel_right n g
+    rw [hgn]; exact hn⟩
+  -- structural hypotheses of `peterfalvi_67_of_odd`
+  have hZP : Z.map L.subtype ≤ (Q : Subgroup G) := by
+    rw [hQeq]; exact Subgroup.map_mono hZH
+  have hZnormal : ((Z.map L.subtype).subgroupOf
+      (Subgroup.normalizer ((Q : Subgroup G) : Set G))).Normal := by
+    rw [hNorm,
+      show (Z.map L.subtype).subgroupOf L = Z from
+        Subgroup.comap_map_eq_self_of_injective L.subtype_injective _]
+    exact hZnorm
+  have hti : OddOrder.GroupTheory.IsTISubset (((Q : Subgroup G) : Set G) \ {1})
+      (Subgroup.normalizer ((Q : Subgroup G) : Set G)) := by
+    rw [hNorm, show ((Q : Subgroup G) : Set G) \ {1} = sharpImage H by rw [hQeq]; rfl]
+    exact hyp.H_sharp_ti
+  have hodd : Odd (Nat.card (Subgroup.normalizer ((Q : Subgroup G) : Set G))) := by
+    rw [hNorm]; exact hyp.card_L_odd
+  obtain ⟨z₀, hz₀Z, hz₀eq⟩ := Subgroup.mem_map.mp hz
+  have hz₀z : (z₀ : G) = z := hz₀eq
+  have hPz : (Q : Subgroup G) ≤ Subgroup.centralizer ({z} : Set G) := by
+    have hbz : (L : Subgroup G) ⊓ Subgroup.centralizer ({(z₀ : G)} : Set G) = L :=
+      hyp.inf_centralizer_eq_of_mem_center (hZcen hz₀Z)
+    rw [hz₀z] at hbz
+    calc (Q : Subgroup G) ≤ L := by rw [hQeq]; exact Subgroup.map_subtype_le H
+      _ ≤ Subgroup.centralizer ({z} : Set G) := inf_eq_left.mp hbz
+  have hconst : ∀ ⦃w : G⦄, w ∈ Z.map L.subtype → w ≠ 1 →
+      ρ.character w = ρ.character z ∧
+        Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({w} : Set G)) =
+          Nat.card ↥(Subgroup.normalizer ((Q : Subgroup G) : Set G) ⊓
+            Subgroup.centralizer ({z} : Set G)) := by
+    intro w hw hw1
+    refine ⟨hψconst w hw hw1, ?_⟩
+    obtain ⟨w₀, hw₀Z, hw₀eq⟩ := Subgroup.mem_map.mp hw
+    have hw₀w : (w₀ : G) = w := hw₀eq
+    rw [hNorm, ← hw₀w, ← hz₀z,
+      hyp.inf_centralizer_eq_of_mem_center (hZcen hw₀Z),
+      hyp.inf_centralizer_eq_of_mem_center (hZcen hz₀Z)]
+  have key := OddOrder.RepresentationTheory.peterfalvi_67_of_odd ρ Q hZP hZnormal hti hodd
+    hz hz1 hPz hconst
+  rwa [hcard] at key
+
 end OddOrder.Peterfalvi.S08
