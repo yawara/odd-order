@@ -401,4 +401,29 @@ theorem inner_induce_self_eq_index_of_le_center
   rw [← hfrob, ← hcardeq] at hstep
   exact mul_left_cancel₀ hcardN hstep
 
+/-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
+`IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
+`ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
+referring to the ambient map) is re-routed through the agreement.
+
+This is the (6.8) case-(B) bridge mechanism: the certain-type coherence `certainType_isCoherent`
+(Peterfalvi (4.9)) is stated for `dadeIntegralCharacterMap h.dade0 h.tau`, while the §8 assembly needs
+a coherence for the Sibley–Dade `hyp.tau`; both Dade maps coincide with `Ind_L^G` on the
+`H^#`-supported lattice (`dadeIntegralCharacterMap_apply_of_support` + `dade_H_eq_bot`), so the
+agreement hypothesis is supplied at capstone wiring. -/
+def _root_.OddOrder.Peterfalvi.S07.IsCoherent.congrMap
+    {M N : Type*} [Group M] [Group N] [Fintype M] [Fintype N]
+    [Invertible (Nat.card M : ℂ)] [Invertible (Nat.card N : ℂ)]
+    {τ₁ τ₂ : OddOrder.Peterfalvi.S07.IntegralCharacterMap M N}
+    {S : Set (ClassFunction M ℂ)} {A : Set M}
+    (c : OddOrder.Peterfalvi.S07.IsCoherent τ₁ S A)
+    (h : ∀ φ : ClassFunction M ℂ,
+      φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := M) S A → τ₁ φ = τ₂ φ) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ₂ S A where
+  nonzero := c.nonzero
+  extension := c.extension
+  extension_inner_eq := c.extension_inner_eq
+  extends_on_supported := fun φ hφ => (c.extends_on_supported φ hφ).trans (h φ hφ)
+  extension_mem_ZIrr := c.extension_mem_ZIrr
+
 end OddOrder.Peterfalvi.S08
