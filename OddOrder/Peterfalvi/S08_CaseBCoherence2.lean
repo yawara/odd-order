@@ -426,4 +426,32 @@ def _root_.OddOrder.Peterfalvi.S07.IsCoherent.congrMap
   extends_on_supported := fun φ hφ => (c.extends_on_supported φ hφ).trans (h φ hφ)
   extension_mem_ZIrr := c.extension_mem_ZIrr
 
+/-- **Span orthogonality from pairwise-orthogonal generators.**  If every `χ ∈ X` is orthogonal to
+every `η ∈ Y`, then every element of `ℤ[X]` is orthogonal to every element of `ℤ[Y]` — a pure
+`ℤ`-bilinearity fact (`Submodule.span_induction`).
+
+This generalizes `inner_eq_zero_of_mem_span_of_disjoint_irreducible` (which derives the pairwise
+orthogonality from distinct-irreducible) so it applies in case (B), where `X = S − S(W₂)` contains the
+**reducible** column characters `μ_j = ∑ᵢ μ_{ij}`: `⟨μ_j, η⟩ = ∑ᵢ ⟨μ_{ij}, η⟩ = 0` (each grid
+character `μ_{ij} ∈ X` is a distinct irreducible from `η ∈ Y = S(H')`), supplied as the `hpair`
+hypothesis at the case-(B) `X ∪ Y` glue. -/
+theorem inner_eq_zero_of_mem_span_of_pairwise_orthogonal
+    {Γ : Type*} [Group Γ] [Fintype Γ] [Invertible (Nat.card Γ : ℂ)]
+    {X Y : Set (ClassFunction Γ ℂ)}
+    (hpair : ∀ χ ∈ X, ∀ η ∈ Y, ClassFunction.inner χ η = 0) :
+    ∀ u ∈ Submodule.span ℤ X, ∀ v ∈ Submodule.span ℤ Y,
+      ClassFunction.inner u v = 0 := by
+  intro u hu
+  induction hu using Submodule.span_induction with
+  | mem χ hχ =>
+      intro v hv
+      exact OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan
+        (fun η hη => hpair χ hχ η hη) hv
+  | zero => intro v _hv; exact ClassFunction.inner_zero_left v
+  | add x y _hx _hy ihx ihy =>
+      intro v hv; rw [ClassFunction.inner_add_left, ihx v hv, ihy v hv, zero_add]
+  | smul a x _hx ih =>
+      intro v hv
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih v hv, mul_zero]
+
 end OddOrder.Peterfalvi.S08
