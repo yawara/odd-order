@@ -457,6 +457,23 @@ ActsPrimeOn def は **per-element** (∀g∈E₃#, C_{M_σ}(g)=C_{M_σ}(E₃))�
 - **⚠ landscape**: (b) 後、§13 残 (13.5/13.6/13.7/…) は **Thm 13.4 (step 7) gate** ゆえ lane は step-7 壁に再到達。
   (b) が最後の cleanly-unblocked §13 結果。
 
+### 2026-06-13 Lane G (loop): Cor 13.3(b) **clean route 確定** (B1/B2 不要、単一証明 ~60行)
+
+**🎯 改良 plan** (B1+B2 より大幅 simple、全 lemma 特定済): per-element ∀g∈E₃#, C_{M_σ}(g)=C_{M_σ}(E₃):
+- ⊇ 自明 (`fixedBy_le_fixedByElement`)。
+- ⊆: p := order(g) の素因数, **x := g^(orderOf g / p)** (order p, x∈⟨g⟩⊆E₃, x≠1)。
+  **P:=⟨x⟩=zpowers x** は E-normal: ⟨x⟩.subgroupOf E₃ は ↥E₃ cyclic (`E3_isCyclic`) の部分群ゆえ
+  **characteristic** (`characteristic_of_subgroup_of_isCyclic`, Isaacs/Ch04/ForwardFromCh02:403, public);
+  E⊆N_G(E₃) (E₃◁E, `E3_normal`) + char lift bridge (`mem_normalizer_map_subtype_of_characteristic`,
+  S03f_Prelim:366) ⟹ E⊆N_G(⟨x⟩)。
+  M*∈ℳ(N_G(⟨x⟩)) (N_G(⟨x⟩)≠⊤)。E⊆N_G(⟨x⟩)⊆M*。E₃⊆E'=derivedInG E (`E3_le_derived hG`) ⊆M*'
+  (E⊆M* ゆえ derivedInG_mono) ⟹ π(E₃)⊆π(M*') ⟹ q∉τ₁(M*) (τ₁ def ∉π(M*')) ⟹ `IsPiSubgroup (τ₁ M*)ᶜ E₃`。
+  E₃⊆E⊓M*。**Cor 13.2(b)** (`tau13_pSubgroup_centralizes hG h (Or.inr hpτ3) hxM hxne hxp hMstar |>.2.1 E₃ … `)
+  ⟹ E₃⊆C(M_σ⊓M*)。C_{M_σ}(x)⊆M_σ⊓M* (C({x})⊆N(⟨x⟩)⊆M*)。⟹ E₃ が C_{M_σ}(x) 中心化
+  ⟹ C_{M_σ}(x)⊆C_{M_σ}(E₃)。C_{M_σ}(g)⊆C_{M_σ}(x) (x∈⟨g⟩, C(g)⊆C(x)) ⟹ C_{M_σ}(g)⊆C_{M_σ}(E₃)。
+- p∈τ₃(M): x order p, p∈π(E₃) (x∈E₃), E₃ は τ₃-π-group (`isPiGroup_tau3`) ⟹ p∈τ₃。
+- **次 iteration で build** (全 lemma teed up; fiddly = order 算術 x + char-normalizer bridge subtype)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
