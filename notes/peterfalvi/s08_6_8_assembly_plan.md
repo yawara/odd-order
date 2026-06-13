@@ -1407,3 +1407,26 @@ hub に分割依頼。S08_CaseBCoherence は現状 §3 helper + (6.8.2.1)〜(6.8
 ### ⚠ 構造的 cluster (capstone wiring 時): FPF/W₂⊆Z(↥L)/C_H(w)=W₂ ← Hypothesis46/certain-type。
 **正本=本 session 40 cont.⁹。honest**: (6.8.2.2) good-value production 完成 (m 全域)。残=assembly (general
 X-structure→crux→τ₂→glue) + 構造 discharge = marathon だが character-theoretic content は (6.8.2.2) 完了間近。
+
+## 2026-06-14 (session 40 cont.¹⁰, /loop): 🎉 (6.8.2.2) COMPLETE — packaged decomposition (new leaf)
+
+**✅✅ landed (build-green + axiom-clean, both first-try; 新 leaf S08_CaseBCoherence2)**:
+19. **`orthogonal_tau_indW2_add_extension_general_caseB` (16c3d108)** = general X-structure (cY param)。
+    `orthogonal_normOne_tau_scaledDiff_add_extension_general` ミラー、cY.extends_on_supported で agreement inline。
+20. **`exists_decomposition_caseB` (6aabacc2)** = **(6.8.2.2) packaged decomposition**
+    `∃ cY X, α^τ = X − |H:Z|·cY.extension η₁ ∧ X⊥𝒴 ∧ X∈ZIrr`。`exists_Ycoherence_hgood_caseB` (uniform
+    good value) + general X-structure を結合。**τ₂ assembly が消費する (6.8.2.2) の最終出力。Y:=cY.extension η₁。**
+    → **🎉 (6.8.2.2) character-theoretic content 完全完成 (m 全域、m=2 relabel 込み)。**
+
+### 🗂 ファイル構成 (現在):
+- `S08_CaseBCoherence.lean` (1387行, frozen): §3 helpers + (6.8.2.1) + (6.8.2.2) ingredients + good-value production。
+- `S08_CaseBCoherence2.lean` (新, active): general X-structure + packaged decomposition。assembly phase 継続先。
+
+### ⚠ 残 = τ₂ assembly architecture (大) + 構造 discharge:
+- **(6.8.2.3)** (χ∈X 版, [Is] Lemma 2.27): X-side `(χ−aη₁)^τ = X₁ − aY` 分解。Frobenius `crux_of_third_anchor`
+  系の X-side。
+- **τ₂ assembly** (Pf (6.8.2) proof): Z-linear map τ₂ on Z[X∪Y], coincides with τ on Z[X∪Y,L^#], η₁^{τ₂}=Y。
+  Frobenius `coherentXunionYset_...glued_withDiagonal` / `Xset_isCoherent` の case-B 版 = **数百行アーキテクチャ**。
+- **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
+- **構造 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): Hypothesis46/certain-type から、capstone wiring 時。
+**正本=本 session 40 cont.¹⁰。20 bricks landed across loop。(6.8.2.2) 完成は milestone。残=τ₂ marathon。**
