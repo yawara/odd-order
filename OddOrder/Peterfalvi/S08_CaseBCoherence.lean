@@ -819,4 +819,58 @@ theorem SibleyDadeHypothesis.inner_induce_W2_Yset_diff_eq_zero
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_induce_eq_inner_restrict,
     ClassFunction.inner_induce_eq_inner_restrict, hRes, sub_self]
 
+/-- **(6.8.2.2) cross-term `⟨α^τ, (η' − η₁)^τ⟩ = c`** for `α = Ind^L_{W₂}φ − c·η₁` and `η', η₁ ∈ Y`,
+`η' ≠ η₁`.  By the Dade isometry on the supported pair `{α, η' − η₁}`
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`; both supported on `H^#` via
+`support_indW2_sub_smul_subset_sharpImage` / `sMember_diffSupport_of_charValue_eq`) it reduces to the
+source inner product `⟨α, η' − η₁⟩`, which expands to
+`⟨Ind_{W₂}φ, η' − η₁⟩ − c·⟨η₁, η' − η₁⟩ = 0 − c·(0 − 1) = c` using the source orthogonality
+`inner_induce_W2_Yset_diff_eq_zero` and the `Y`-orthonormality (the inner product is linear in its
+first argument).
+
+This is the (6.8.2.2) `j > 1` value `⟨α^τ, η_j^{τ₁} − η_1^{τ₁}⟩ = |H:Z|` in `τ`-form (the coherence
+agreement `extension = τ` on the supported lattice converts `(η' − η₁)^τ` to `η'^{τ₁} − η₁^{τ₁}`),
+with `c = (|H:W₂| : ℂ)`. -/
+theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_tau_Yset_diff
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) (hW2comm : W2 ≤ ⁅H, H⁆)
+    [Invertible (Nat.card ↥W2 : ℂ)]
+    (φ : ClassFunction ↥W2 ℂ) {η₁ η' : ClassFunction ↥L ℂ}
+    (hη₁ : η₁ ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) (hne : η' ≠ η₁) (c : ℂ)
+    (h1 : ClassFunction.induce W2 φ (1 : ↥L) = c * η₁ (1 : ↥L)) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 φ - c • η₁))
+        (hyp.tau (η' - η₁)) = c := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  classical
+  have hYirr : ∀ ψ ∈ hyp.Yset, IsIrreducibleCharacter ψ :=
+    fun ψ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  have hYon : ∀ ψ ψ' : ClassFunction ↥L ℂ, ψ ∈ hyp.Yset → ψ' ∈ hyp.Yset →
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    have h := irreducibleCharacter_inner_eq_ite (⟨ψ, hYirr ψ hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hYirr ψ' hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hsuppα : (ClassFunction.induce W2 φ - c • η₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ c h1
+  have hsuppY : (η' - η₁).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη₁)
+      ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη₁).symm)
+  have hiso := OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dade hyp.hconj
+    (S := ({ClassFunction.induce W2 φ - c • η₁, η' - η₁} : Set (ClassFunction ↥L ℂ)))
+    (by intro s hs
+        simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+        rcases hs with rfl | rfl
+        · exact hsuppα
+        · exact hsuppY)
+    (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  rw [hiso, ClassFunction.inner_sub_left,
+    hyp.inner_induce_W2_Yset_diff_eq_zero hW2comm φ hη₁ hη',
+    ClassFunction.inner_smul_left, ClassFunction.inner_sub_right,
+    hYon η₁ η' hη₁ hη', hYon η₁ η₁ hη₁ hη₁, if_neg (Ne.symm hne), if_pos rfl]
+  ring
+
 end OddOrder.Peterfalvi.S08
