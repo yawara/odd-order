@@ -169,6 +169,44 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
   rw [← hc]
   simp [map_mul, map_inv]
 
+/-- **(4.10), the L-side four-corner is the toTICyclic Dade image of the carrier.**
+`β = δ_j(μ_{ij} − μ_{0j}) − (μ_{i0} − μ_{00}) = Ind_W^L α` (piece (a)), and the toTICyclic Dade map
+of `(L, W − (W₁ ∪ W₂))` *is* `Ind_W^L` (`tau_eq_induce`); since `↑(chiFourCornerOnV) = α` and
+`sdiff.W = toTICyclicHypothesis.W` definitionally, the two agree.  Expressing `β` as a Dade image
+controls its support (off `V^L`) via `full_map_eq_zero_of_not_mem_conjugatesOfSet_V`. -/
+theorem signedDiff_fourcorner_eq_toTICDade (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    (h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i
+      = h.toTICyclicFullDadeApplication.tau.toDadeMap (chiFourCornerOnV h χ₂ i) := by
+  rw [fourcorner_signedDiff_eq_induce h χ₂ i]
+  exact (h.toTICyclicHypothesis.tau_eq_induce
+    h.toTICyclicFullDadeApplication.tau.toDadeIsometryData (chiFourCornerOnV h χ₂ i)).symm
+
+/-- **(4.10), the L-side four-corner `β` packaged in `CF(L, A₀)`.**  `β = Ind_W^L α` is the Dade
+image of the `V`-supported carrier (`signedDiff_fourcorner_eq_toTICDade`), so it vanishes off
+`conjugatesOfSet(V)` (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V`); every point of
+`conjugatesOfSet(V)` maps into `A₀` (`coe_mem_A0_of_mem_conjugatesOfSet_toTICV`).  This is the
+domain element fed to the certain-type Dade isometry `τ = h.tau` in (4.10). -/
+noncomputable def fourCornerDiffSupported (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
+      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+  ⟨(h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i, by
+    rw [ClassFunction.mem_supportedSubmodule]
+    intro z hz
+    rw [ClassFunction.mem_support] at hz
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    apply coe_mem_A0_of_mem_conjugatesOfSet_toTICV h
+    by_contra hc
+    apply hz
+    rw [signedDiff_fourcorner_eq_toTICDade h χ₂ i]
+    exact h.toTICyclicHypothesis.full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+      h.toTICyclicFullDadeApplication (chiFourCornerOnV h χ₂ i) hc⟩
+
 /-- The underlying class function of `chiFourCornerOnV` is the four-corner itself: bundling adds
 no content, so the coercion is definitional.  (The coercion lands on `toTICyclicHypothesis.W`,
 which is `sdiff.W` definitionally; this `rfl` records that downstream rewrites are sound.) -/
