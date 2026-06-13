@@ -4,6 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.GroupTheory.CoprimeConjugacy
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG §13 (cont.): 相互制約と transition (Lemma 13.7–13.13)
@@ -138,6 +140,96 @@ theorem le_normalizer_fixedBy {N X : Subgroup G} (hXN : X ≤ Subgroup.normalize
         _ = (z * w * z⁻¹) * (z * e * z⁻¹) := hcomm
         _ = z * (w * e) * z⁻¹ := by group
     exact mul_left_cancel (mul_right_cancel hkey)
+
+/-- **prime action の join (equal case)**: `E₁`, `E₃` がともに `N` に prime 作用し、
+互いに素な位数を持ち、`E₁` が `E₃` を正規化し、両者が `N` を正規化し、かつ
+`C_N(E₁) = C_N(E₃)` (`= D`) なら、`E₁ ⊔ E₃` も `N` に prime 作用する。
+
+BG Lemma 13.7 の equal case。素数位数 `x∈(E₁⊔E₃)#` を `x = b·a` (`b∈E₃`, `a∈E₁`) に分解。
+`a=1` なら `x∈E₃` で済む。`a≠1` なら Peterfalvi (2.1) `exists_mem_centralizer_conj` で coset
+`E₃·a` を `C_{E₃}(a)·a` に collapse — `x` は `c·a` (`c∈C_{E₃}(a)`) に `E₃`-共役。位数が素数ゆえ
+`ord(x)=ord(c)·ord(a)` (commute+coprime) から `ord(c)=1`, すなわち `c=1`、つまり `x` は `a∈E₁#`
+に共役。あとは `C_N(x)=D` を共役 (E₃ 元) で押し戻す (`le_normalizer_fixedBy` + `hD` で E₃ 経由)。 -/
+theorem actsPrimeOn_sup_of_eq_centralizer [Finite G] {N E₁ E₃ : Subgroup G}
+    (hE1 : ActsPrimeOn N E₁) (hE3 : ActsPrimeOn N E₃)
+    (hcop : Nat.Coprime (Nat.card E₁) (Nat.card E₃))
+    (hnorm : E₁ ≤ Subgroup.normalizer E₃)
+    (hN3 : E₃ ≤ Subgroup.normalizer N)
+    (hD : fixedBy N E₁ = fixedBy N E₃) :
+    ActsPrimeOn N (E₁ ⊔ E₃) := by
+  have hHD : fixedBy N (E₁ ⊔ E₃) = fixedBy N E₁ := by
+    have h1 : fixedBy N (E₁ ⊔ E₃) = fixedBy N E₁ ⊓ fixedBy N E₃ := by
+      rw [fixedBy_def, fixedBy_def, fixedBy_def, Subgroup.centralizer_sup, inf_inf_distrib_left]
+    rw [h1, ← hD, inf_idem]
+  have hE3normD : E₃ ≤ Subgroup.normalizer (fixedBy N E₃) := le_normalizer_fixedBy hN3
+  apply actsPrimeOn_of_prime_order_le
+  intro x hxH hxprime
+  rw [hHD]
+  have hxne : x ≠ 1 := by rintro rfl; rw [orderOf_one] at hxprime; exact hxprime.ne_one rfl
+  -- decompose `x = b * a`, `b ∈ E₃`, `a ∈ E₁`
+  have hxset : (x : G) ∈ (E₃ : Set G) * (E₁ : Set G) := by
+    have hcoe : (↑(E₁ ⊔ E₃) : Set G) = (E₃ : Set G) * (E₁ : Set G) := by
+      rw [sup_comm]; exact Subgroup.coe_mul_of_right_le_normalizer_left E₃ E₁ hnorm
+    rw [← hcoe]; exact hxH
+  obtain ⟨b, hb, a, ha, hba⟩ := Set.mem_mul.mp hxset
+  rw [SetLike.mem_coe] at hb ha
+  by_cases ha1 : a = 1
+  · -- `x = b ∈ E₃`
+    have hxE3 : x ∈ E₃ := by rw [← hba, ha1, mul_one]; exact hb
+    exact le_of_eq (by rw [hE3 x hxE3 hxne, hD])
+  · -- `a ≠ 1`: collapse the coset `E₃·a` via (2.1) and force `c = 1`
+    have hordvd : orderOf a ∣ Nat.card E₁ := by
+      have h := orderOf_dvd_natCard (⟨a, ha⟩ : E₁); rwa [← Subgroup.orderOf_coe] at h
+    have hcop_a : Nat.Coprime (orderOf a) (Nat.card E₃) := hcop.coprime_dvd_left hordvd
+    have hnorm_a : ∀ y ∈ E₃, a * y * a⁻¹ ∈ E₃ := fun y hy =>
+      (Subgroup.mem_normalizer_iff.mp (hnorm ha) y).mp hy
+    obtain ⟨c, hcE3C, x', hx'E3, hconj⟩ :=
+      OddOrder.GroupTheory.exists_mem_centralizer_conj hcop_a hnorm_a hb
+    rw [hba] at hconj
+    obtain ⟨hcE3, hcCa⟩ := Subgroup.mem_inf.mp hcE3C
+    have hca : Commute c a := by
+      rw [Subgroup.mem_centralizer_iff] at hcCa
+      exact (hcCa a (Set.mem_singleton a)).symm
+    have hcordvd : orderOf c ∣ Nat.card E₃ := by
+      have h := orderOf_dvd_natCard (⟨c, hcE3⟩ : E₃); rwa [← Subgroup.orderOf_coe] at h
+    have hcop_ca : Nat.Coprime (orderOf c) (orderOf a) :=
+      (hcop.symm.coprime_dvd_left hcordvd).coprime_dvd_right hordvd
+    have hordca : orderOf (c * a) = orderOf c * orderOf a :=
+      hca.orderOf_mul_eq_mul_orderOf_of_coprime hcop_ca
+    have hsc : SemiconjBy x' x (c * a) := by
+      show x' * x = (c * a) * x'
+      rw [← hconj]; group
+    have hordeq : orderOf x = orderOf (c * a) := SemiconjBy.orderOf_eq x' hsc
+    have hordane : orderOf a ≠ 1 := fun h => ha1 (orderOf_eq_one_iff.mp h)
+    have hc1 : c = 1 := by
+      have hp : (orderOf c * orderOf a).Prime := by rw [← hordca, ← hordeq]; exact hxprime
+      rcases Nat.prime_mul_iff.mp hp with ⟨_, ha0⟩ | ⟨_, hc0⟩
+      · exact absurd ha0 hordane
+      · exact orderOf_eq_one_iff.mp hc0
+    rw [hc1, one_mul] at hconj
+    have hfa : fixedByElement N a = fixedBy N E₁ := hE1 a ha ha1
+    intro y hy
+    rw [fixedByElement_def, Subgroup.mem_inf, Subgroup.mem_centralizer_iff] at hy
+    obtain ⟨hyN, hyC⟩ := hy
+    have hyx : x * y = y * x := hyC x (Set.mem_singleton x)
+    have hwN : x' * y * x'⁻¹ ∈ N := (Subgroup.mem_normalizer_iff.mp (hN3 hx'E3) y).mp hyN
+    have hwa : a * (x' * y * x'⁻¹) = (x' * y * x'⁻¹) * a := by
+      rw [← hconj]
+      calc x' * x * x'⁻¹ * (x' * y * x'⁻¹) = x' * (x * y) * x'⁻¹ := by group
+        _ = x' * (y * x) * x'⁻¹ := by rw [hyx]
+        _ = (x' * y * x'⁻¹) * (x' * x * x'⁻¹) := by group
+    have hw_fix : x' * y * x'⁻¹ ∈ fixedBy N E₁ := by
+      rw [← hfa, fixedByElement_def]
+      exact Subgroup.mem_inf.mpr ⟨hwN, Subgroup.mem_centralizer_iff.mpr (by
+        intro u hu; rw [Set.mem_singleton_iff] at hu; subst hu; exact hwa)⟩
+    rw [hD]
+    rw [hD] at hw_fix
+    have hgoal : x'⁻¹ * (x' * y * x'⁻¹) * x' ∈ fixedBy N E₃ := by
+      have hnn := hE3normD (inv_mem hx'E3)
+      rw [Subgroup.mem_normalizer_iff] at hnn
+      simpa using (hnn (x' * y * x'⁻¹)).mp hw_fix
+    have hyeq : x'⁻¹ * (x' * y * x'⁻¹) * x' = y := by group
+    rwa [hyeq] at hgoal
 
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
