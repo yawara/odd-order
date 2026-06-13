@@ -1,5 +1,53 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢 2026-06-13 (Lane F session 15, Opus 4.8): **Thm 12.13 hard-core 着手 — 還元補題・extraspecial 共役・ℳ-矛盾エンジン**
+
+Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal` (leaf `S12_Theorem1213.lean`) の hard core は
+背理法 + 非共役矛盾。これまでに landed (build 緑・axiom-clean):
+- `mem_sigma_normalizer_le_of_two_maximals` (還元: Cor 12.10(a)(d) → `p∈σ(M)` ∧ `N_G(P)≤M`)。
+- `exists_conj_eq_center_mul_of_expPExtraspecial` (共役の半分: a₀∉Z, z∈Z ⟹ ∃q, q a₀ q⁻¹ = z·a₀。
+  φ:q↦⁅q,a₀⁆ が Z への全射準同型)。
+- **NEW** `eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (**ℳ-矛盾エンジン** = 最終矛盾の後半):
+  `A₀⋆ = g•A₀` (g∈M), `ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}` ⟹ `M=M⋆`。
+  共役は `N_G(·)` と可換 (`normalizer_conj_smul`)・coatom 保存 (`isCoatom_conj_smul`)・g∈M で M 固定
+  (`conj_smul_eq_self_of_mem_normalizer`)。すべて既存 helper (S12_ExceptionalBridge / S12_Corollary129 /
+  AInvariantPiSubgroups) で組める ⟹ 新 import 不要。
+
+### ▶ 12.13 hard core 残り decomposition (この順, BG mmd L3379–3397 精読済)
+
+**証明骨格** (背理法 `P` が distinct maximal `M,M⋆` に): WLOG `P` = Sylow p of `M∩M⋆` (⟹ Sylow p of G);
+Uniqueness で `r(P)=2`; Cor 10.7(b) `sylow_structure` で extraspecial `Q⊆P` (|Q|=p³, exp p),
+`Z=Z(Q)=Q'` 位数 p; Q/Z が `K=C_{M_α}(Z)` に作用, Prop 1.16 + Prop 12.4(a) で `K⊆M⋆`;
+Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(N_G(Z))≠{M}` ∧ `M_α≠1`
+(M_α=1 なら M=M∩M⋆⟹M⊆M⋆⟹M=M⋆ 矛盾)。最後に 12.4(b) **対偶** (M_α≠1) を M, M⋆ 両方に適用し
+`A₀,A₀⋆∈ℰ¹(A)−{Z}` (`ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}`) を取る。`A₀,A₀⋆` は Q 内非中心 line で
+**Q-共役** ⟹ エンジンで `M=M⋆` 矛盾。
+
+**残ピース (leaf に追加予定)**:
+1. **line-共役** `exists_conj_smul_zpowers_eq_of_expPExtraspecial` (type-level, 設計完了・API 検証済,
+   次イテレーションで実装): `hQ:IsExpPExtraspecial p Q`, `a∉Z`, `b∉Z`, `b∈⟨a⟩⊔Z` ⟹ `∃q, q•⟨a⟩=⟨b⟩`。
+   **proof**: `mem_sup_of_normal_right` で `b=aⁱ·z` (z∈Z); `aⁱ∉Z`⟹`p∤i`; ZMod p (体) で `j:=i⁻¹.val`,
+   `i·j≡1 (mod p)`; center 位数 p で `z^p=1` (`pow_card_eq_one'`+`center_card`); `exists_conj_eq_center_mul`
+   を `z^j∈Z` に適用し `q a q⁻¹=z^j a`; `(z^j a)ⁱ=z^{ji}aⁱ=z·aⁱ=b` (z^{ji}=z via i·j=1+pm, z^p=1);
+   `b=q aⁱ q⁻¹∈q•⟨a⟩`; 両辺位数 p (`Nat.card_zpowers`+`map_injective`) で `⟨b⟩=q•⟨a⟩`。
+   API: `MonoidHom.map_zpowers`, `Subgroup.mem_sup_of_normal_right`, `zpow_mul`, `Commute.mul_zpow`,
+   `ZMod.intCast_zmod_eq_zero_iff_dvd`, `Subgroup.eq_of_le_of_card_le`。
+2. **還元チェーン** `P→Sylow(M∩M⋆)→Sylow G→r(P)=2→Q extraspecial`: `uniquenessTheorem`
+   (hr3 は `r(C_M(P))≥3`? 要確認 — P Sylow rank2 で hr2=2 は満たすが hr3 条項の供給が gap。
+   ⚠ BG は別経路: P Sylow of G + p odd noncyclic ⟹ Uniqueness で `r(P)≤2`。repo の `uniquenessTheorem`
+   署名と BG の Uniqueness の対応を精査。`sylow_structure` part(b) は `rank P ≤ 2` 前提で extraspecial 供給)。
+3. **K⊆M⋆**: Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`, Q/Z noncyclic rank2 が
+   K に coprime 作用) の各 generator `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two`
+   を M⋆ に適用, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。**coprimality** `(|Q/Z|,|K|)=1` の確立が要 (K=C_{M_α}(Z), M_α は
+   α-Hall, p∈σ−α なので p∤|M_α|?)。
+4. **N_M(Z)⊆M⋆ + M_α≠1**: Cor 10.9(b) (`M=(M∩M⋆)M_α`) + Lem 6.5(b)
+   (`normalizer_eq_centralizerK_mul_normalizerU`)。M_α≠1 は M≠M⋆ から。
+5. **12.4(b) 対偶 適用 ×2 + 組立**: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` の対偶
+   (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} から。エンジンへ。
+
+**⚠ 注意点**: (2) Uniqueness の hr3 条項供給と (3) coprimality が要精査の gap。(1)(エンジン) は独立で確定。
+multi-session 見込み (BG で最も配線が多い σ-side keystone)。各ピースを leaf に順次追加, 1,500 行で分割。
+
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 
 **BG Theorem 12.12 (Frobenius 因子分解) を完全形式化**(`frobenius_factorization_of_regular`,

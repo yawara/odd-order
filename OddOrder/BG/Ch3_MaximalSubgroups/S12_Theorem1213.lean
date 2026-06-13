@@ -113,6 +113,35 @@ theorem exists_conj_eq_center_mul_of_expPExtraspecial {Q : Type*} [Group Q] [Fin
   rw [commutatorElement_def] at hqz
   exact mul_inv_eq_iff_eq_mul.mp hqz
 
+/-- **`ℳ(N_G(·))`-uniqueness blocks `M`-conjugacy**: if `A₀⋆ = g • A₀` (conjugation by some
+`g ∈ M`), `ℳ(N_G(A₀)) = {M}`, and `ℳ(N_G(A₀⋆)) = {M⋆}`, then `M = M⋆`.
+
+Conjugation by `g` commutes with `N_G(·)` (`normalizer_conj_smul`) and preserves coatomicity
+(`isCoatom_conj_smul`), so `g • M` is a maximal subgroup containing `N_G(A₀⋆)`, hence the unique
+such, namely `M⋆`; but `g ∈ M` fixes `M` (`conj_smul_eq_self_of_mem_normalizer`), whence `M = M⋆`.
+This is the engine of the final contradiction in BG 12.13: `A₀` and `A₀⋆` are `Q`-conjugate, yet
+their `ℳ(N_G(·))` are the distinct singletons `{M}` and `{M⋆}`. -/
+theorem eq_of_conj_of_maximalContaining_normalizer_eq_singleton
+    {A₀ A₀star M Mstar : Subgroup G} {g : G} (hgM : g ∈ M)
+    (hconj : MulAut.conj g • A₀ = A₀star)
+    (hM : maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) = {M})
+    (hMstar : maximalSubgroupsContaining (Subgroup.normalizer (A₀star : Set G)) = {Mstar}) :
+    M = Mstar := by
+  -- `M ∈ ℳ(N_G(A₀))`, so `IsCoatom M` and `N_G(A₀) ≤ M`.
+  have hMmem : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (A₀ : Set G)) := by
+    rw [hM]; exact Set.mem_singleton_iff.mpr rfl
+  obtain ⟨hMcoat, hMle⟩ := mem_maximalSubgroupsContaining.mp hMmem
+  -- `g • M` is a coatom containing `N_G(A₀⋆)`, hence lies in `ℳ(N_G(A₀⋆)) = {M⋆}`.
+  have hle' : Subgroup.normalizer (A₀star : Set G) ≤ MulAut.conj g • M := by
+    rw [← hconj, ← normalizer_conj_smul]
+    exact conj_smul_mono _ hMle
+  have hmem' : MulAut.conj g • M
+      ∈ maximalSubgroupsContaining (Subgroup.normalizer (A₀star : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨isCoatom_conj_smul hMcoat, hle'⟩
+  rw [hMstar, Set.mem_singleton_iff] at hmem'
+  -- `g ∈ M` fixes `M` under conjugation, so `M = M⋆`.
+  rwa [conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hgM)] at hmem'
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
