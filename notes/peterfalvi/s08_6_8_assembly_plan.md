@@ -763,3 +763,60 @@ chain: DadeChainStep(差分-support) → advance(fromDade_X) → step2 → step1
 Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。commits 50bf9f0/5dda578。
 **T8 の真の blocker (htau1_mem0/個別 support, 2 loop が STOP) 解消済**。残=T7 char data + DadeChainStep
 実 instance + T9-T11 glue。
+
+## 2026-06-13 (session 38 cont.⁴, /loop, user=「現状 RECON + 着手計画」): case-B 現状再精査 + 着手計画
+
+**(4.10) 完成後の S08 sole sorry (`sibleySetup_is_coherent` X-nonempty branch, S08_CoherenceTheorems:59) 再 RECON。**
+旧 RECON (session 37 cont.³「open blocker 多数」) より**大幅に良い状態** — 以下が全部 BUILT 判明:
+
+### ✅ BUILT (旧 RECON で未認識だった完成部品):
+- **capstone glue** `coherentS_of_Xset_commutator_Yset_glued_of_irreducible_X_generator_mixed_inner`
+  (S08_CoherenceCore:5026): `hXirr` + `hX` (X-coh) + `ν` + `hagreeX/Y` (generator-level) + `hmixed`
+  (generator cross-inner) + `hgen` (span gen) → **`hyp.CoherenceTarget` を直接生成**。最終組立は完成。
+- §7 engine `coherentUnion_of_glued` (+変種) / Y-coh `coherentYset` / Frobenius X-coh engine (T8
+  `peterfalvi_66_coherence_of_X_from_dade` 差分-support 化済) — 全 DONE。
+- **c2 X-coh `certainType_isCoherent`** (S06_CertainTypeCoherence:505, =(4.9)(b)): `(h:Hypothesis46)(hk:k≠1)
+  → IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau) (certainTypeSet h k) (supportInSubgroup A L)`. DONE。
+- Frobenius consumer `indChainDecomposition_of_frobenius_pairUnionBaseAnchor...` (S08_CoherenceTheorems:339)
+  も CoherenceTarget を内部構成 (glue data 与えれば)。
+
+### 🔴 残 (sorry filling, `hyp.cases` で c1/c2 分岐):
+- **shared glue** (両 case 要, 構造的): `hXirr` (Xset 既約) / `hgen` (Xset∪Yset span gen) / `ν` (合成 ext) /
+  `hmixed` (cross-inner)。部分支援あり (`inner_span_Xset_Yset_eq_zero_of_irreducible_X` 既在)。
+- **Frobenius (c1)**: `hstepData` = `PairUnionBaseAnchorCommonIndexPrimePowerStepData` (S08_CoherenceCore:8743,
+  ~30 field の per-step 素冪次数データ; idx/p/m₁/mχ/mmem… = Ind from Frobenius kernel の次数の素冪構造、
+  (6.6)) を構成 = **T7 char-theory 本体 (genuine, 中〜大)**。→ `Xset_commutator..._of_frobenius hF hXne hstepData`
+  を hX に渡し `coherentS_..._generator_mixed_inner` で組立。
+- **CertainType (c2)**: **Hypothesis46-from-Sibley bridge** = SibleyDadeHypothesis + cert
+  (CertainTypeHypothesis + |W₂|素/W₂⊆[H,H]/coprime|H||W1|) から (4.6) Hypothesis46 を構成
+  (subH / A_covers (4.6.d 被覆) / tic TI-cyclic on G / dade0=dade / tau / …) = **大 (A_covers/tic 検証が本体)**。
+  → certainType_isCoherent → certainTypeSet=Xset 同定 → glue。
+
+### ▶ 着手計画 (build-green incremental, 推奨順):
+1. **shared glue helpers** (最低リスク, 両 case 基盤): hXirr / hgen / ν+hmixed の構成パターン確立。
+2. **Frobenius branch 完遂** (c2 より tractable): hstepData (T7) 構成 → `coherentS_..._generator_mixed_inner`
+   で c1 case discharge。**ただし sorry 全消には c2 も要** (1 sorry → 分岐後も両 branch 実証明必須、
+   scaffold 分割は不可 [[scaffold-sorry-free-not-done]])。
+3. **c2 branch**: Hypothesis46-from-Sibley bridge (大) → certainType_isCoherent → glue。
+4. **wire `hyp.cases`**。
+**effort: Frobenius=中大 (T7), c2=大 (bridge)。複数セッション。FT 経路 (§9 (7.10) card_G0_lower_bound) の入力。**
+**正本=本 session 38 cont.⁴。capstone glue + 両 X-coh constructor + Y-coh + engine 全 BUILT; 残=T7 stepData + c2 bridge + shared glue。**
+
+## 2026-06-13 (session 38 cont.⁵, /loop): case-B RECON 訂正 — Frobenius producer + 両 hXirr 既存
+
+**訂正**: cont.⁴ で「shared glue hXirr 要」としたが**誤り** — 既存:
+- `isIrreducibleCharacter_of_mem_Xset_of_frobenius` (S08_CoherenceCore:5067, Frobenius hXirr)
+- `isIrreducibleCharacter_of_mem_Xset_caseA` (5275, c2 case-A hXirr)
+- **Frobenius CoherenceTarget producer `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+  (10057)**: `hF + hXne + hstepData + ν + hagreeX + hagreeY + hmixed + hgen → CoherenceTarget`
+  (hXirr は内部 discharge)。⟹ Frobenius branch = この def 1 呼び出し + (hstepData, ν, hagreeX/Y, hmixed, hgen) 構成。
+(自作 `Xset_irreducible_of_frobenius` は冗長判明 → reverted。教訓: 部品 build 前に既存 lemma を grep。)
+
+### ⚠ 正味進捗評価 (honest): case-B は RECON 3 tick で net-0 code (redundant 1 個 revert)。
+infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。残は**大 piece のみ**:
+- **Frobenius**: `hstepData` (PairUnionBaseAnchorCommonIndexPrimePowerStepData, ~30 field, (6.6) 素冪次数
+  解析 = deg(Indθ)=|W₁|θ(1), θ(1)=p^m for p-group H) = **不可分の大構造 (incremental landable でない)**。
+  + glue (ν/hagreeX/hagreeY/hmixed/hgen)。
+- **c2**: Hypothesis46-from-Sibley bridge (subH/A_covers/tic 構築) + glue。
+両 branch 必須 (sorry 全消)。**各 multi-session、incremental-easy piece 無し** ⟹ case-B は sustained 多セッション grind。
+**判断: ユーザーに scope 確認 (case-B grind commit vs (4.10) milestone 区切り)。正本=本 cont.⁵。**
