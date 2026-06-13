@@ -1145,3 +1145,43 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 (3) **統合**: reg-char (ψ(1)−ψ(z)=|W₂|a) + 逆 bridge (本 session) ⟹ |H|∣|W₂|a ⟹ a≡0 mod |H:W₂| ⟹
 ⟨α^τ,ψ⟩≡0 mod |H:W₂|; (4) **norm endgame**。
 **▶ 次 = IrreducibleCharacter→Representation bridge (c2 (6.7) 組立用) or W₂⊆Z(↥L) 導出。正本=本 session 39 cont.¹²。**
+
+## 2026-06-14 (session 40, /loop): case-B (6.7) machinery + 統合 core 完成 (3 commits)
+
+**✅✅✅ landed (build-green + axiom-clean, S08_CaseBCoherence)** — (6.8.2.2) の (6.7) 鎖を一気に 3 brick:
+
+1. **`peterfalvi_67_central` (74a0f0b1)** = case-(B) (6.7) adapter (Frobenius `peterfalvi_67_centralCommutator`
+   の central-Z 版)。abstract `Z ≤ H` central in ↥L (`Z ≤ Subgroup.center ↥L`) + irreducible ρ const on
+   (Z.map L.subtype)^# ⟹ `ρ.character z ≡ ρ.character 1 [ALGMOD |H|]`。`peterfalvi_67_of_odd` の全構造仮説を
+   P:=Ĥ (`sylow_map_subtype_of_coprime`)・Z:=Z.map L.subtype で discharge: hZnormal (central⇒normal inline),
+   hPz (Ĥ≤L≤C_G(z) since z central), hconst centralizer-card (両辺=|L| via `inf_centralizer_eq_of_mem_center`)。
+   **Sylow は `cases` の coprimality のみ使用 (Frobenius 非依存)。**
+
+2. **`restrict_extension_Yset_charValue_cong_caseB` (a1c7b699)** = consumer (Frobenius
+   `restrict_extension_Yset_charValue_cong_of_frobenius` ミラー)。η^{τ₁}=ε•ξ
+   (`coherentYset_extension_eq_zsmul_irreducible`) → **ξ=ρ.character は `ξ.isIrreducible` で既存**
+   (🔧 「bridge を作る」は grep 不足の誤認; IrreducibleCharacter→Representation は既存) → (6.8.2.1) constancy
+   `coherentYset_extension_const_on_W2` を ρ.character へ transfer (ε cancel) → adapter →
+   `Res^G_L(η^{τ₁})(z) ≡ Res^G_L(η^{τ₁})(1) [ALGMOD |H|]` for z∈W₂^#。**`W₂ ⊆ Z(↥L)` は hypothesis (deferred)。**
+
+3. **`card_H_dvd_card_W2_mul_regCharCoeff` (7b875b23)** = 統合 core。φ linear nontrivial ∈ Irr W₂,
+   a=⟨Res_{W₂}Res_L ψ, φ⟩=m∈ℤ ⟹ **`|H| ∣ |W₂|·m`**。z₀∈W₂^# (prime⇒nontrivial) で f=Res_{W₂}Res_L ψ
+   const on W₂^# (`coherentYset_extension_const_on_W2`) → reg-char `apply_one_sub_apply_eq_card_mul_inner`
+   で f(1)−f(z₀)=|W₂|·m → (6.7) consumer で f(z₀)≡f(1) → f(1)−f(z₀)≡0 → 差が ℤ 値 |W₂|·m ⟹
+   `dvd_of_intCast_algMod` で |H|∣|W₂|·m。gotcha: `set f` 下で `simpa using restrict_apply` は
+   `this→True` に潰れる → term-mode `:= restrict_apply ...` (W₂.subtype 1 ≡ 1 defeq) で hf1/hfz。
+
+### ⚠ (6.8.2.2) 残 (司令塔/次 loop 向け):
+1. **|W₂| cancel**: `|H| ∣ |W₂|·m` + `|H| = (W₂.subgroupOf H).index · |W₂|` (`index_mul_card` +
+   `card_subgroupOf` + `inf_eq_left.mpr hW2H`) ⟹ `(W₂.subgroupOf H).index ∣ m` (`mul_dvd_mul_iff_left`, |W₂|>0)。
+2. **⟨α^τ,ψ⟩ ≡ 0 mod |H:W₂|** (ψ∈𝒴^{τ₁})**: reciprocity `inner_tau_indW2_sub_smul_eq`
+   (⟨α^τ,ψ⟩=⟨φ,Res_{W₂}Res_L ψ⟩−c⟨η₁,Res_L ψ⟩, c=|H:W₂|, α(1)=0 要) + ⟨φ,Res ψ⟩=conj(m)=m (整数) +
+   |H:W₂|∣m (step1) + ⟨η₁,Res ψ⟩∈ℤ (`mem_ZIrr_inner_int`) ⟹ ⟨α^τ,ψ⟩ = m − |H:W₂|·(ℤ) ∈ |H:W₂|ℤ。
+   ※ α^τ∈ZIrr G & ψ∈ZIrr G で ⟨α^τ,ψ⟩∈ℤ (`inner_mem_ZIrr_int`) — 整数値の divisibility として述べる。
+3. **j>1 の値**: ⟨α^τ, η_j^{τ₁}−η_1^{τ₁}⟩ = ⟨α, η_j−η_1⟩ = |H:Z| (reciprocity + Y-degree |W₁|)。
+4. **α^τ 分解**: α^τ = X − |H:Z|η_1^{τ₁} + x|H:Z|∑_j η_j^{τ₁}, X⊥𝒴^{τ₁} (step2,3 から)。
+5. **norm**: ‖α^τ‖²=‖α‖²=|L:Z|+|H:Z|² (Pf (1.5.b)), |L:Z|=|W₁||H:Z|<|H:Z|² (W₁ FPF on H/Z) ⟹
+   ‖α^τ‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0, or x=1∧m=2。⟹ **(6.8.2.2) 完成** → (6.8.2.3) → τ₂。
+- **W₂⊆Z(↥L) 導出 (deferred 仮説)**: math-B `W₂⊆Z(H)` (`eq_bot_or_eq_of_le_of_card_prime` on Z(H)⊓W₂,
+  prime) + W cyclic (W₁,W₂⊆W abelian) ⟹ W₂⊆Z(↥L)。Hypothesis46 の W cyclic structure 要精査。
+**正本=本 session 40。** 進捗良好 (空転なし, steady brick/tick)。
