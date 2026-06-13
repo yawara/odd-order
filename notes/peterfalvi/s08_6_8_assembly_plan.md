@@ -1088,3 +1088,25 @@ H p-群 + `Nat.Coprime (card H) (card W1)` ⟹ ∃ Q∈Syl_p(G), Q=H.map L.subty
    (ALGMOD→ℤ 整除 bridge 要)。⟹ ⟨α^τ,ψ⟩≡0 mod |H:W₂|。
 4. 🔴 **norm endgame**。
 → (6.8.2.2) → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁹。**
+
+## 2026-06-13 (session 39 cont.¹⁰, /loop): η^{τ₁}=±irr landed; norm-1-ZIrr 既存判明
+
+**🔧 既存判明 (grep 不足の反省)**: norm-1 ZIrr 分類は**既存** — `exists_single_of_sum_sq_eq_one`
+(InducedIrreducible:322) + `exists_zsmul_irreducibleCharacter_of_inner_self_one` (398, docstring に
+「Peterfalvi (5.9.a) normalization step」明記)。自作 2 補題は重複 → revert。**再調査不要: norm-1 ZIrr=±irr は既存。**
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.coherentYset_extension_eq_zsmul_irreducible`:
+η∈Yset ⟹ ∃ ε=±1, ξ∈Irr G, `coherentYset.extension η = ε • ξ`。η irr (⟨η,η⟩=1 via bundled
+`irreducibleCharacter_inner`) + coherence norm 保存 (`extension_inner_eq`) + ZIrr (`extension_mem_ZIrr`)
+⟹ η^{τ₁} norm-1 ⟹ ±irr (`exists_zsmul_irreducibleCharacter_of_inner_self_one`)。
+**⟹ ψ=η^{τ₁} の (6.7) は単一既約 ξ に帰着** (ξ は η^{τ₁} の W₂^#-定数性を sign 込みで継承)。
+
+### (6.8.2.2) 残: c2 (6.7) for ξ + 統合 + norm
+1. ✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, **η^{τ₁}=±irr (本 session)**。
+2. 🔴 **c2 (6.7) for irreducible ξ**: `peterfalvi_67_of_odd` (SylowTICongruence:140) を Q:=Ĥ
+   (`sylow_map_subtype_of_coprime`), Z:=W₂, ξ const on W₂# で適用。
+   **hconst の第2項 = centralizer-card 定数性 |N_G(Ĥ)⊓C_G(w)| const on W₂#** が要 — c2 では
+   W₂⊆Z(H) (case B) ⟹ C_L(w)=H⋊C_{W₁}(w); W₁ の W₂ 上作用の定数性が鍵 (certain-type 構造、要精査)。
+   Frobenius は `inf_centralizer_centralCommutator_map` で供給; c2 W₂ 版は新規。
+3. 🔴 ALGMOD→ℤ 整除 + 統合 (a≡0 mod |H:W₂|) + norm endgame。
+**▶ 次 = centralizer-card 定数性 on W₂# (c2) or その精査。正本=本 session 39 cont.¹⁰。**

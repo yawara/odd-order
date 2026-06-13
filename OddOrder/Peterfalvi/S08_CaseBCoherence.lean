@@ -386,4 +386,31 @@ theorem SibleyDadeHypothesis.sylow_map_subtype_of_coprime
     hpsub _ hQLp (Subgroup.mem_comap.mpr (by exact hx.2))
   exact Subgroup.mem_map.mpr ⟨⟨x, hxL⟩, hx'H, rfl⟩
 
+/-- **The `Y`-coherence image of an `η ∈ Y` is `±` an irreducible character of `G`.**  Since `η` is
+irreducible (`isIrreducibleCharacter_of_mem_Yset`, so `⟨η,η⟩ = 1`) and the coherence extension is
+norm-preserving on `Z[Y]` (`extension_inner_eq`) with image in `ZIrr G` (`extension_mem_ZIrr`), the
+image `η^{τ₁}` has squared norm `1`, hence equals `ε·ξ` for `ε = ±1` and `ξ ∈ Irr G`
+(`exists_zsmul_irreducibleCharacter_of_inner_self_one`, Peterfalvi (5.9.a)).
+
+This is the reduction that lets the (6.7) congruence for the *virtual* character `η^{τ₁}` be read
+off the single irreducible `ξ` (which inherits `η^{τ₁}`'s `W₂^#`-constancy up to sign), in
+Peterfalvi (6.8.2.2). -/
+theorem SibleyDadeHypothesis.coherentYset_extension_eq_zsmul_irreducible
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+        hyp.coherentYset.extension η = ε • (ξ : ClassFunction G ℂ) := by
+  have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  have hηnorm : ClassFunction.inner η η = 1 := by
+    have h := irreducibleCharacter_inner (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hηspan : η ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Yset := Submodule.subset_span hη
+  have hextnorm : ClassFunction.inner (hyp.coherentYset.extension η)
+      (hyp.coherentYset.extension η) = 1 := by
+    rw [hyp.coherentYset.extension_inner_eq η η hηspan hηspan, hηnorm]
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one
+    (hyp.coherentYset.extension_mem_ZIrr η hηspan) hextnorm
+
 end OddOrder.Peterfalvi.S08
