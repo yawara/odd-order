@@ -207,3 +207,19 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
     5. P∈ℰ_p¹(E₁), P が R 中心化, R⊆M*_σ ⟹ `fixedBy_eq` で R⊆C_{M*_σ}(P)=C_{M*_σ}(E₁) ⟹ E₁ が R 中心化。
   - ⚠ conj-inv の pointwise-smul (`MulAut.conj g • X`, `mem_pointwise_smul_iff_inv_smul_mem`) が fiddly。
     次イテレーションの最初の標的。これが landing すれば step f → strict_config → 13.7 完全完成。
+- 2026-06-14 (Lane F, /loop 続き⁷): **🎉 step f 完成 `E1_centralizes_R_of_hall_tau1`** (conjugation crux)。
+  conj-inv を回避 — R・P を M* の setup frame へ共役。`exists_conj_smul_le_hallPiece` で w•E₁≤E₁*、
+  P 生成元の共役 z∈E₁*# が w•R 中心化、E1_actsPrime + prime 作用で E₁* が w•R 中心化、共役戻し。
+  fiddle 知見: `Ch03.Subgroup.IsPiGroup` (namespace)、`Subgroup.smul_mem_pointwise_smul_iff.mpr`、
+  `(MulAut.conj w).injective` で z≠1、`hwMsig` は `le_normalizer_opiCoreInG`、commute は calc+group。
+  **⚠ leaf build の errcount grep が再び stale-green に騙された** (rm .olean + tail で真の error 確認必須)。
+  ### 残 = strict_config 本体の組立のみ (sub-lemma 出揃った)
+  - M* 抽出: S13_PrimeAction:333-347 mirror (R≠⊥, E≤N_G(R)=`E_le_normalizer_of_le_E3`, coatom)。
+  - step c: `actsPrimeOn_inf_centralizer_eq_bot` (H1) で C_{E₁}(M_σ⊓M*)=⊥
+    ([C_{M_σ}(R),P]≠⊥ ← strict; ⊆[M_σ⊓M*,E₁])。
+  - step d: `tau13_pSubgroup_centralizes .2.1` (Cor 13.2b) → π(E₁)⊆τ₁M*。
+  - step e: `.2.2` (Cor 13.2c) → r∈σ(M*); `sigma_subgroup_le_Msigma_of_isHall` → R⊆M*_σ。
+  - step f: **`E1_centralizes_R_of_hall_tau1`** で E₁ が R 中心化。✅
+  - step g: `E_eq_sup_of_E3_centralizer` (5a, E=E₁⊔E₃) + E₁,E₃ が R 中心化 → R⊆C_G(E) →
+    `subgroupE_basic` の C_G(E)⊓E₃=⊥ + R≠⊥ で False。
+  これらを strict_config の `by` に組めば 13.7 完全完成。次イテレーションの標的。
