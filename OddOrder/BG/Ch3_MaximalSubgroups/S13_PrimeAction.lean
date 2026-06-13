@@ -159,6 +159,63 @@ theorem pSubgroup_centralizes_of_interaction [Finite G] (hG : IsMinimalSimpleOdd
 -- **BG Corollary 13.2** (`tau13_pSubgroup_centralizes`) は leaf
 -- `S13_Corollary132.lean` で完全証明済 (上で import)。本ファイルからは再 export される。
 
+/-- **Core of BG Corollary 13.3(a)**: an abelian `p`-subgroup `P ≤ M` with `p ∈ τ₁(M) ∪ τ₃(M)`
+acts in a prime manner on `M_σ`. For `g ∈ P#`, pick `M* ∈ ℳ(N_G(⟨g⟩))`; then `P ≤ M ⊓ M*`
+(`P` abelian centralizes `g`), so Corollary 13.2(a) makes `P` centralize `M_σ ⊓ M*`, while
+`C_{M_σ}(g) ≤ M_σ ⊓ M*` (since `C(g) ⊆ M*`); hence `C_{M_σ}(g) = C_{M_σ}(P)`. -/
+theorem actsPrimeOn_Msigma_of_mem_tau13 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau1 M ∪ tau3 M) {P : Subgroup G} (hPM : P ≤ M) (hPab : IsMulCommutative ↥P)
+    (hPp : IsPGroup p ↥P) : ActsPrimeOn (S10.Msigma M) P := by
+  classical
+  intro g hgP hg1
+  have hMcoatom : IsCoatom M := mem_maximalSubgroups.mp h.mem_maximal
+  -- `Z := ⟨g⟩`, a nontrivial `p`-subgroup of `M`.
+  have hZle : Subgroup.zpowers g ≤ P := by rw [Subgroup.zpowers_le]; exact hgP
+  have hZM : Subgroup.zpowers g ≤ M := hZle.trans hPM
+  have hZne : Subgroup.zpowers g ≠ ⊥ := fun hb => hg1 (Subgroup.zpowers_eq_bot.mp hb)
+  have hZp : IsPGroup p ↥(Subgroup.zpowers g) := hPp.to_le hZle
+  -- `N_G(Z) ≠ ⊤`, so some coatom `M*` lies above it.
+  have hNZne : Subgroup.normalizer (Subgroup.zpowers g : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : (Subgroup.zpowers g).Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.zpowers g) inferInstance with hb | ht
+    · exact hZne hb
+    · exact hMcoatom.1 (top_le_iff.mp (ht ▸ hZM))
+  obtain ⟨Mstar, hMstarCo, hNZM⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (Subgroup.zpowers g : Set G))).resolve_left
+      hNZne
+  have hMstarMem : Mstar ∈
+      maximalSubgroupsContaining (Subgroup.normalizer (Subgroup.zpowers g : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨hMstarCo, hNZM⟩
+  -- `C({g}) ≤ C(Z) ≤ N(Z) ≤ M*` (centralizing `g` ⟹ centralizing `⟨g⟩`).
+  have hCg_CZ : Subgroup.centralizer ({g} : Set G)
+      ≤ Subgroup.centralizer (Subgroup.zpowers g : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff] at hx ⊢
+    intro z hz
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    have hcomm : Commute x g := (hx g rfl).symm
+    exact ((hcomm.zpow_right k).eq).symm
+  have hCg_Mstar : Subgroup.centralizer ({g} : Set G) ≤ Mstar :=
+    hCg_CZ.trans ((Subgroup.centralizer_le_normalizer _).trans hNZM)
+  -- `P ≤ M ⊓ M*` (P abelian ∋ g, so `P ≤ C(P) ≤ C(Z) ≤ N(Z) ≤ M*`).
+  have hPCZ : P ≤ Subgroup.centralizer (Subgroup.zpowers g : Set G) :=
+    (Subgroup.le_centralizer_iff_isMulCommutative.mpr hPab).trans
+      (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hZle))
+  have hPMstar : P ≤ Mstar :=
+    hPCZ.trans ((Subgroup.centralizer_le_normalizer _).trans hNZM)
+  -- Corollary 13.2(a): `P` centralizes `M_σ ⊓ M*`.
+  have hPcent : P ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) :=
+    (tau13_pSubgroup_centralizes hG h hp hZM hZne hZp hMstarMem).1 P (le_inf hPM hPMstar) hPp
+  have hMMcP : (S10.Msigma M ⊓ Mstar : Subgroup G) ≤ Subgroup.centralizer (P : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm]
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hPcent
+  -- conclude: `M_σ ⊓ C(g) ≤ M_σ ⊓ M* ≤ C(P)`, so `C_{M_σ}(g) = C_{M_σ}(P)`.
+  refine le_antisymm ?_ (fixedBy_le_fixedByElement hgP)
+  rw [fixedByElement_def, fixedBy_def]
+  exact le_inf inf_le_left ((inf_le_inf_left _ hCg_Mstar).trans hMMcP)
+
 /-- **BG Corollary 13.3** (mmd L3526): (a) `E` の非自明 cyclic Sylow 部分群は `M_σ` に prime 作用;
 (b) `E₃` は `M_σ` に prime 作用。 -/
 theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
