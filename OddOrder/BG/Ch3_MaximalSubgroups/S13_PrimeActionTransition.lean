@@ -321,6 +321,28 @@ theorem fixedBy_eq_of_elemAbelian_one {N X P : Subgroup G} {s : ℕ} (hs : s.Pri
   calc fixedBy N P = fixedByElement N g := by rw [hPg, fixedBy_def, fixedByElement_def, hzC]
     _ = fixedBy N X := hX g (hPX hgP) hg1
 
+/-- **BG Lemma 13.7, step 5** (strict case impossible): with `P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)`,
+`R ≤ C(P)`, the strict containment `C_{M_σ}(E₁) ⊊ C_{M_σ}(E₃)` is contradictory.
+
+証明 (a)-(g)、mmd L3640-3658:
+(a) `1⊂R⊂E₃`, `C_{M_σ}(R)≠1` ⟹ Cor 12.6(d) で `τ₂(M)` empty ⟹ `E = E₁ ⊔ E₃`。
+(b) `R ⊲ E`、`M* ∈ 𝓜(N_G(R))`、`E ⊆ M*`、`1⊂[C_{M_σ}(R),P] ⊆ [M_σ⊓M*, E₁]`。
+(c) (13.2) ⟹ `C_{E₁}(M_σ⊓M*)=1` (helper `actsPrimeOn_inf_centralizer_eq_bot`)。
+(d) Cor 13.2(b) ⟹ `π(E₁) ⊆ τ₁(M*)`。
+(e) Cor 13.2(c) ⟹ `R ⊆ M*_σ`。
+(f) `E₁ ⊆ E₁*` (Hall `τ₁(M*)`)、Thm 13.5 を M* に ⟹ `E₁` が `R` を中心化。
+(g) `E=E₁E₃` + `E₁,E₃` が `R` 中心化 ⟹ `R⊆Z(E)`、`C_{E₃}(E)=1` (Lem 12.1) と矛盾。
+
+詳細 = `notes/bg/s13_transition_lane_f.md`。 -/
+theorem strict_centralizer_config_false [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
+    (hp : p.Prime) (hr : r.Prime) {P R : Subgroup G}
+    (hP : P ∈ elemAbelianOfRank G p 1) (hPE1 : P ≤ E₁)
+    (hR : R ∈ elemAbelianOfRank G r 1) (hRE3 : R ≤ E₃)
+    (hRcP : R ≤ Subgroup.centralizer (P : Set G))
+    (hlt : fixedBy (S10.Msigma M) E₁ < fixedBy (S10.Msigma M) E₃) : False := by
+  sorry
+
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
 /-- **BG Lemma 13.7** (mmd L3596): `E₁≠1` かつ `E₁` が `E₃` に regular 作用しないなら、`E₁E₃` は
@@ -376,8 +398,7 @@ theorem E1E3_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
         (le_inf (hRE3.trans h.E₃_le) hRcP)
     -- step 5: rule out the strict containment.
     rcases lt_or_eq_of_le hle with hlt | heq
-    · exfalso
-      sorry
+    · exact (strict_centralizer_config_false hG h hp hr hP hPE1 hR hRE3 hRcP hlt).elim
     · exact heq
   exact actsPrimeOn_sup_of_eq_centralizer hE1prime hE3prime hcop hnorm hN3 hD
 
