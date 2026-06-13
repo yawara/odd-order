@@ -105,6 +105,40 @@ theorem actsPrimeOn_of_prime_order_le [Finite G] {N X : Subgroup G}
     exact (hgy.pow_left d).eq
   exact hgx.trans (hpr x hxX (by rw [hxord]; exact hp))
 
+/-- `X` が `N` を正規化するなら、`X` は `C_N(X) = fixedBy N X = N ⊓ C(X)` も正規化する。
+`X` は `N` も `X`(自分自身)も正規化するので、`C(X)` も保つ。Lemma 13.7 equal case で
+`x'∈E₃` が `D = C_N(E₃)` を共役で保つために使う。 -/
+theorem le_normalizer_fixedBy {N X : Subgroup G} (hXN : X ≤ Subgroup.normalizer N) :
+    X ≤ Subgroup.normalizer (fixedBy N X) := by
+  intro z hz
+  have hzNX : z ∈ Subgroup.normalizer X := Subgroup.le_normalizer hz
+  have hzN : z ∈ Subgroup.normalizer N := hXN hz
+  rw [Subgroup.mem_normalizer_iff]
+  intro w
+  rw [fixedBy_def, Subgroup.mem_inf, Subgroup.mem_inf, Subgroup.mem_centralizer_iff,
+    Subgroup.mem_centralizer_iff]
+  have hNpart : w ∈ N ↔ z * w * z⁻¹ ∈ N := Subgroup.mem_normalizer_iff.mp hzN w
+  constructor
+  · rintro ⟨hwN, hwC⟩
+    refine ⟨hNpart.mp hwN, ?_⟩
+    intro e he
+    have hez : z⁻¹ * e * z ∈ X := by
+      simpa using (Subgroup.mem_normalizer_iff.mp (inv_mem hzNX) e).mp he
+    have hcomm := hwC _ hez
+    calc e * (z * w * z⁻¹) = z * ((z⁻¹ * e * z) * w) * z⁻¹ := by group
+      _ = z * (w * (z⁻¹ * e * z)) * z⁻¹ := by rw [hcomm]
+      _ = (z * w * z⁻¹) * e := by group
+  · rintro ⟨hwN, hwC⟩
+    refine ⟨hNpart.mpr hwN, ?_⟩
+    intro e he
+    have hez : z * e * z⁻¹ ∈ X := (Subgroup.mem_normalizer_iff.mp hzNX e).mp he
+    have hcomm := hwC _ hez
+    have hkey : z * (e * w) * z⁻¹ = z * (w * e) * z⁻¹ := by
+      calc z * (e * w) * z⁻¹ = (z * e * z⁻¹) * (z * w * z⁻¹) := by group
+        _ = (z * w * z⁻¹) * (z * e * z⁻¹) := hcomm
+        _ = z * (w * e) * z⁻¹ := by group
+    exact mul_left_cancel (mul_right_cancel hkey)
+
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
 /-- **BG Lemma 13.7** (mmd L3596): `E₁≠1` かつ `E₁` が `E₃` に regular 作用しないなら、`E₁E₃` は
