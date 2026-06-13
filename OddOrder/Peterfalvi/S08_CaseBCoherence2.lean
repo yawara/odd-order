@@ -454,4 +454,35 @@ theorem inner_eq_zero_of_mem_span_of_pairwise_orthogonal
       intro v hv
       rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih v hv, mul_zero]
 
+/-- **Restrict-invariance of the Dade integral character map on the smaller supported lattice.**
+If `A₁ ⊆ A` (with `A₁` `L`-invariant), then on `CF(L, A₁)` the integral character map of the
+restricted Dade datum `(hyp.restrict, dade.restrict)` agrees with that of `(hyp, dade)`: both reduce
+(via `dadeIntegralCharacterMap_apply_of_support`) to `hyp.dadeMap`, related by Peterfalvi (2.11)
+(`Hypothesis.dadeMap_restrict_apply`).
+
+This is the (6.8) case-(B) `map-agreement` core: Peterfalvi (4.9)'s certain-type coherence
+`certainType_isCoherent` uses the *enlarged* datum `dade0` on `A₀ = A ∪ V^L`, while `hyp.tau` is the
+base datum on `A = H^#`; the `μ_j`-differences are `A`-supported, so once the wiring identifies
+`dade0.restrict A` with the base datum, this lemma + `IsCoherent.congrMap` transport the certain-type
+coherence onto `hyp.tau`. -/
+theorem dadeIntegralCharacterMap_restrict_eq_of_support
+    {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {A A₁ : Set G} (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
+    (dade : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp)
+    (hA₁A : A₁ ⊆ A)
+    (hA₁norm : ∀ (l : ↥L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    {φ : ClassFunction ↥L ℂ}
+    (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ L) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hyp.restrict hA₁A hA₁norm)
+        (dade.restrict hA₁A hA₁norm) φ
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp dade φ := by
+  have hφA : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
+    hφ.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+        (hyp.restrict hA₁A hA₁norm) (dade.restrict hA₁A hA₁norm) hφ,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp dade hφA,
+      OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_restrict_apply hyp hA₁A hA₁norm]
+  rfl
+
 end OddOrder.Peterfalvi.S08
