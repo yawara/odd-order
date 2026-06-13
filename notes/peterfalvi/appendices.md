@@ -95,11 +95,19 @@ conjugation Equiv で). sorry 不変 (2→2)。
       axiom-clean, session 8): `IsCompl U W` + 両 nontrivial + 両 P-invariant ⟹ FPF。**🔑 重要発見:
       part(1) は perm=id (P-invariant 各 summand) でも成立** → reconstruction gap は無い (imprimitivity
       不要)。Maschke complement (P-invariant U⊕W=⊤) を `Bool` 2-family + `iSupIndep_pair` で part(1) に投入。
-- [ ] **Maschke bridge (φ→分解)**: 残 = reducible 時に P-invariant complement を *構成*。mathlib
-      `Maschke.exists_isCompl` (`Submodule k[G] V`) 在 → φ:P→*MulAut E を `Representation (ZMod q) P
-      (Additive E)` 化 (linearity は `IsElementaryAbelian.mulAutEquivGeneralLinearGroup`/`zmodModule` 在) →
-      `.asModule` で k[P]-module → exists_isCompl → Submodule を Subgroup E に戻し invariant 確認。
-      ⚠ Additive E + zmodModule の instance 管理が fiddly (中規模)。
+- [ ] **Maschke bridge (φ→分解)** — session 9 偵察で**実装経路 2 案を確定**(どちらも中規模 ~50-80 行,
+      instance 重め; 次 session で scratch 実行):
+   - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
+     を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
+     要: `IsAInvariant φ U` (= my hUinv 形を IsAInvariant に変換), `Omega (E⧸⊥) q 1 = ⊤` (E⧸⊥ elem-ab),
+     `Subgroup.map_inf`/`map_sup`/injective(`mk'⊥` ker=⊥)で `X⊓U=⊥`/`X⊔U=⊤` に翻訳, `IsCompl.of…`。
+   - **案 B (direct)**: OperatorMaschke 本体 (L186-258) を S/Ω₁ 抜きで E に直接 mirror。
+     `MulDistribMulAction.compHom E φ` → `ElementaryAbelianRepresentation` で `Representation (ZMod q) P
+     (Additive E)` → `AddSubgroup.toZModSubmodule`+`ρ.invtSubmodule` で U を invtSubmodule 化 →
+     `MonoidAlgebra.Submodule.exists_isCompl` → `Representation.mapSubmodule` 逆で Subgroup E に戻す。
+   - **完成すれば**: `fpf_of_constant_stabilizer_of_invariant_compl` に投入 → Lemma の **reducible ケース完了**。
+- ⚠ **session 9 は偵察のみ (Lean commit 無し)**; 11 補題・part(1)完投済で group-theoretic core は完成、
+   残 2 piece (Maschke bridge + part(2)非cyclic Schur) は heavy rep-theory infra。off-critical-path。
 - ⟹ **Lemma sorry 解消 = reducible 分解存在 + part(2) 非cyclic の 2 つの heavy rep-theory が gate**。
       part(1)+part(2)cyclic の FPF producer は完備。mathlib `Representation`/`IsSimpleModule`/Maschke 調査要。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
