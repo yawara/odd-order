@@ -1,5 +1,32 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅✅✅✅ 2026-06-13 (Lane F session 17, Opus 4.8): **Thm 12.13 完全 COMPLETE — sorry-free・axiom-clean (σ-side keystone 確定)**
+
+**piece 5 (`maximalContaining_normalizer_center_ne_of_two_maximals`) 内の唯一の sorry
+= `hK : C_{M_α}(Z)⊆M⋆` の per-generator 12.4(a) ステップを充足 → 12.13 全体が sorry-free に。**
+commit `5e9087f3`。`#print axioms nonabelian_pgroup_isUniquelyMaximal`
+= `[propext, Classical.choice, Quot.sound]` (sorryAx 無し)。AxiomsCheck 登録済 (assert 2→3)。
+leaf 914 行 (<1500)。full build 緑 + assert 通過。
+
+**A-frame (cocyclic 閉包還元) の generator core の決着手順** (session 16 の skeleton を完成):
+- 生成元 g (∀y∈Y, φ y g=g, (Q/Z)/Y cyclic) に対し `A_Y := (Y.comap mk').map Q.subtype`
+  (Y の ↥Q 内 preimage, Z≤A_Y)。`↑g ∈ C_G(A_Y)`: 各 x∈A_Y を `mk' yb` 経由で取り
+  `hfix` を `mk'_apply→lift_mk'` で展開、`hψ_coe`+`mul_inv_eq_iff_eq_mul` で ↑g·x=x·↑g。
+- `Y≠⊥` (else Q/Z cyclic 矛盾, **`isCyclic_iff_exists_zpowers_eq_top.mpr ⟨a,hYa⟩`**):
+  `Nontrivial ↥Y` (`nontrivial_iff_ne_bot`) + `exists_ne (1:↥Y)` で a'∈A_Y∖Z を抽出。
+- `A := ⟨a'⟩⊔Z ∈ ℰ²(Q)` (再利用 helper **`zpowers_sup_center_mem_elemAbelianOfRank_two`**
+  = card 議論を共有化), `A≤Q≤M⋆`, `↑g∈C_G(A_Y)≤C_G(A)` ⟹ 12.4(a)
+  `centralizer_le_of_elemAb_rank_two` で ↑g∈M⋆。
+- **API 地雷**: `lift` 展開は `mk'_apply` を先に (`mk' yb`≠`mk yb` syntactically);
+  `exists_mem_ne_one_of_ne_bot` は mathlib に無い→`nontrivial_iff_ne_bot`+`exists_ne`;
+  `zpowers a=⊤⟹IsCyclic` は `rw` でなく `isCyclic_iff_exists_zpowers_eq_top.mpr`。
+
+**§12 残 sorry = 5 (全て S12_E、12.13 経路外)**: 12.14 (`maximalContaining_centralizer_eq_singleton`) /
+12.16(a) ×2 (`sigma_subgroup_conj_into_Msigma` + `sigma_subgroup_pRank_normalizer_le_one`) /
+12.16(b) (`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`) / 12.15
+(`sigma_subgroup_maximal_interaction`)。**12.15/12.16 は §13-14 gate (Lane G が scaffold 引用)**。
+▶ 次 = 12.14 or 12.15/12.16 (優先度高: G unconditional 化に直結)。BG mmd L3369-3479 recon 要。
+
 ## ✅✅✅ 2026-06-13 (Lane F session 16, Opus 4.8): **Thm 12.13 主定理 wire COMPLETE — piece 5 のみ残**
 
 **`nonabelian_pgroup_isUniquelyMaximal` (12.13 本体) を全 ingredient から組立完了** (S12_Theorem1213, 660 行)。
