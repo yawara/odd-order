@@ -42,16 +42,22 @@ section Prop2Core
 variable {k : Type*} [CommRing k] {T : Type*} [CommGroup T] [Finite T]
   {M : Type*} [AddCommGroup M] [Module (MonoidAlgebra k T) M] [Finite M]
 
-/-- `End_{k[T]}(M)` is finite (it injects into the finite function space `M → M`). -/
-instance : Finite (Module.End (MonoidAlgebra k T) M) :=
+/-- `End_{k[T]}(M)` is finite (it injects into the finite function space `M → M`).
+
+⚠ Deliberately **not** a global instance: an unconstrained `Finite (Module.End (MonoidAlgebra k T) M)`
+instance interferes with `Representation.asModule` `Module`-synthesis when `[IsIrreducible ρ]` is in
+scope (the Schur→Wedderburn chain pulls it into unrelated searches).  Provided locally via `haveI`
+in the theorems that need the field structure. -/
+theorem finite_end : Finite (Module.End (MonoidAlgebra k T) M) :=
   Finite.of_injective _ DFunLike.coe_injective
 
 variable [IsSimpleModule (MonoidAlgebra k T) M]
 
 /-- **Schur + Wedderburn**: the endomorphism ring of a finite simple `k[T]`-module is a field.
 (Schur makes it a division ring, `Module.End` instance; finite division rings are fields,
-`littleWedderburn`.)  The instance is also found automatically; this names it. -/
-noncomputable def endField : Field (Module.End (MonoidAlgebra k T) M) := inferInstance
+`littleWedderburn`.) -/
+noncomputable def endField : Field (Module.End (MonoidAlgebra k T) M) :=
+  haveI := finite_end (k := k) (T := T) (M := M); inferInstance
 
 /-- `M` is simple as a module over `D = End_{k[T]}(M)`.
 
@@ -83,12 +89,14 @@ theorem isSimpleModule_end :
 /-- `M` is `1`-dimensional over the field `D = End_{k[T]}(M)` (`isSimpleModule_end` + the
 classification of simple modules over a division ring). -/
 theorem finrank_end_eq_one :
-    Module.finrank (Module.End (MonoidAlgebra k T) M) M = 1 :=
-  isSimpleModule_iff_finrank_eq_one.mp isSimpleModule_end
+    Module.finrank (Module.End (MonoidAlgebra k T) M) M = 1 := by
+  haveI := finite_end (k := k) (T := T) (M := M)
+  exact isSimpleModule_iff_finrank_eq_one.mp isSimpleModule_end
 
 /-- `|End_{k[T]}(M)| = |M|`: as `M` is a `1`-dimensional `D`-space, `|M| = |D|¹`. -/
 theorem natCard_end_eq :
     Nat.card (Module.End (MonoidAlgebra k T) M) = Nat.card M := by
+  haveI := finite_end (k := k) (T := T) (M := M)
   haveI : Fintype M := Fintype.ofFinite M
   haveI : Fintype (Module.End (MonoidAlgebra k T) M) := Fintype.ofFinite _
   have h : Fintype.card M =
