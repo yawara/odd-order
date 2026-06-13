@@ -1610,3 +1610,26 @@ X-coherence + Y-coherence (`coherentYset` 済) + ν (glue map, param) + hagreeX/
 transport → X_irr と glue)。**正直な評価: case-B coherence は大規模 multi-session assembly。crux は全て
 feasible と確認済 (構造的ブロッカー無し)、残りは intricate な interface 接続を brick ごとに積む段階。**
 **正本=本 cont.¹⁶ (アーキテクチャ確定版; ¹⁵ の不確定を解消)。**
+
+## 2026-06-14 (session 40 cont.¹⁷, /loop): ✅ feasibility 完成 — 全ツール確認、残=wiring assembly。機構 brick (A)(C) landed
+
+cont.¹⁶ で残した crux「(4.9) は enlarged `h46.dade0` (A₀=A∪Vᴸ) の map で coherence、hyp.tau は base
+`h46.dade`(=hyp.dade, A) の map」の解決法を確認:
+- **§4 `Hypothesis.restrict` (S04:329) + `dadeMap_restrict` (S04:3641)** = enlargement 互換性ツール
+  (A₁⊆A の datum 制限 + 制限 map は A₁-supported で原 map と一致)。`cases` は `h46.dade = dade` を与える
+  (S08_CoherenceCorePart1:3324) ので、dade0 を A に restrict した map ↔ hyp.tau の橋は §4 restrict で。
+
+### ✅ landed (iter 5-6, 機構 brick):
+- **brick (A) `S07.IsCoherent.congrMap`** (commit 30c74961): coherence を supported 上一致する別 map へ transport。
+- **brick (C) `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`** (commit 10c99216): reducible-aware X⊥Y。
+- (foundations: `exists_decomposition_caseB` (6.8.2.2)、`certainType_index_bounds` (FPF)、`certainType_W2_le_center`、
+  brick 1 `inner_induce_self_eq_index`、(4.9) `certainType_isCoherent`、(6.6)、§7 `coherentUnion_of_glued`)。
+
+### ✅ 構造的ブロッカー無しを最終確認。残 = wiring assembly (大、multi-level、要 full case-B context):
+1. **map-agreement** (§4 restrict で dade0-map↔hyp.tau on A-supported) → congrMap で (4.9) {μ_j}-coh を hyp.tau へ。
+2. **X-coherence glue**: X_irr-coh (6.6 reuse) + {μ_j}-coh (1.) を §7 coherentUnion で glue (要 X_irr⊥{μ_j} mixed-inner)。
+3. **X∪Y glue**: X-coh + Y-coh (coherentYset) を coherentUnion_of_glued_of_generator_mixed_inner_eq で
+   (brick C で reducible X⊥Y、ν=(6.8.2.3) mixed-inner)。
+4. **CoherenceTarget 変換** → capstone `sibleySetup_is_coherent` の X-nonempty/CertainType 分岐。
+**honest 状況: 基礎機構は完成、残りは full case-B hypothesis context での multi-level wiring assembly (大)。
+unblocked だが per-iteration は wiring piece 単位で、capstone 完遂は distant。正本=本 cont.¹⁷。**
