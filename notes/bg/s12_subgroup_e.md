@@ -44,17 +44,28 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
      の abelian 枝を排し extraspecial Q。
    **🔑 flagged gap 解消**: Uniqueness の hr3 は「P Sylow rank2」でなく **by_contra (r≥3) 分岐内で Or.inl** で供給
    (BG「Uniqueness で r(P)≤2」は対偶。`uniquenessTheorem` 署名はそのまま使える)。
-3. **K⊆M⋆**: Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`, Q/Z noncyclic rank2 が
-   K に coprime 作用) の各 generator `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two`
-   を M⋆ に適用, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。**coprimality** `(|Q/Z|,|K|)=1` の確立が要 (K=C_{M_α}(Z), M_α は
-   α-Hall, p∈σ−α なので p∤|M_α|?)。
-4. **N_M(Z)⊆M⋆ + M_α≠1**: Cor 10.9(b) (`M=(M∩M⋆)M_α`) + Lem 6.5(b)
-   (`normalizer_eq_centralizerK_mul_normalizerU`)。M_α≠1 は M≠M⋆ から。
-5. **12.4(b) 対偶 適用 ×2 + 組立**: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` の対偶
-   (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} から。エンジンへ。
+3. ~~**M_α≠1**~~ **✅ DONE (session 15)** `Malpha_ne_bot_of_sylow_normalizer_le`: Sylow p of G で
+   `N_G(S)≤M∩M⋆` ⟹ M_α≠1。Cor 10.9(b) = `S10.beta_factorization_of_sylow_normalizer_in_intersection`
+   (`M=(M⋆∩M)⊔M_β ∧ α=β`) で M_α=M_β; M_β=⊥ なら M=M∩M⋆≤M⋆=M⋆ 矛盾。
+4. ~~**coprimality `p∉α(M)`**~~ **✅ DONE (session 15)** `notMem_alpha_of_rank_sylow_le_two`:
+   `rank(S)≤2` ⟹ `p∉α(M)` (∵ `pRank_p(M)≤pRank_p(G)=pRank_p(S)≤rank(S)≤2<3`)。
+   ⟹ `p∉β(M)` ⟹ `p∤|M_α|` (Lem 6.5(b) の coprime)。**coprimality gap 解消**。
+5. **🔶 残 hard piece = K⊆M⋆**: K=C_{M_α}(Z)。Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`,
+   Q/Z noncyclic rank2 が K に coprime 作用 [coprime は p∉α で OK]) で K=⟨C_K(Ā)|Ā∈ℰ¹(Q/Z)⟩、
+   各 `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two` を M⋆ に, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。
+   ⟹ K⊆M⋆。次に Lem 6.5(b) (`normalizer_eq_centralizerK_mul_normalizerU`, M=(M∩M⋆)⊔M_α, M_α⊴M,
+   Z≤M∩M⋆, coprime) で `N_M(Z)=C_{M_α}(Z)·N_{M∩M⋆}(Z)⊆M⋆` ⟹ **ℳ(N_G(Z))≠{M}** (∵ N_M(Z)⊆M⋆≠M)。
+   **⚠ 最難所**: Prop 1.16 の `cocyclicFixedByClosure` を K=C_{M_α}(Z) 上の Q/Z 作用に instantiate +
+   `C_K(A/Z)=C_K(A)` (Z 中心化ゆえ quotient fixed = ambient fixed) + ℰ¹(Q/Z)↔ℰ²(Q) の対応。
+6. **12.4(b) 対偶 適用 ×2 + 組立** [piece 5 後は mechanical]: `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne`
+   の対偶 (M_α≠1 ⟹ ∃A₀∈ℰ¹(A), ℳ(N_G(A₀))={M})。A₀≠Z は ℳ(N_G(Z))≠{M} (piece 5) から。M⋆ 側も同様。
+   line-共役 + engine (back-end 済) で M=M⋆ 矛盾。
 
-**⚠ 注意点**: (2) Uniqueness の hr3 条項供給と (3) coprimality が要精査の gap。(1)(エンジン) は独立で確定。
-multi-session 見込み (BG で最も配線が多い σ-side keystone)。各ピースを leaf に順次追加, 1,500 行で分割。
+**⚠ 注意点**: piece 2 (reduction)・3 (M_α≠1)・4 (coprimality) ✅; back-end (line-conj+engine) ✅。
+**残 = piece 5 (K⊆M⋆, Prop 1.16 instantiation = 最難所) + piece 6 (12.4b 適用組立)**。
+⚠ piece 6 は `Sg` (G-Sylow) を要する: 主定理組立時に R-a を呼び `Sg`+`N_G(Sg)≤M∩M⋆`+`rank≤2`+Q を
+一括取得して各補題 (Malpha_ne_bot, notMem_alpha, piece5) に供給する設計
+(現 `exists_expPExtraspecial_le_of_two_maximals` は Q のみ返す → 組立時に richer 版か inline 再導出)。
 
 ## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
 
