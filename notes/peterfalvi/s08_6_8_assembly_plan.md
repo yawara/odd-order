@@ -990,3 +990,22 @@ keystone `mapRingEquiv_induce`。**正本=本 session 39 cont.²。**
    hlat=coherentYset.extension_mem_ZIrr, hpair=two_le_Yset_ncard wiring)。
    ⟹ `coherentYset.extension η` は W₂^# 上定数 = **Peterfalvi (6.8.2.1)** 完成。
 3. → (6.8.2.2) [(6.7)合同 peterfalvi_67] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁴。**
+
+## 2026-06-13 (session 39 cont.⁵, /loop): 🎉 Peterfalvi (6.8.2.1) for case B COMPLETE
+
+**✅✅ milestone landed (build-green + axiom-clean, full build)**: case-B coherence の**第一 sub-step 完成**:
+`SibleyDadeHypothesis.coherentYset_extension_const_on_W2` (S08_CaseBCoherence): W₂ prime ∧ W₂⊆⁅H,H⁆,
+η∈Yset, x,y∈W₂^# ⟹ `coherentYset.extension η (y:G) = coherentYset.extension η (x:G)` (η^{τ₁} は W₂^# 上定数)。
+`S07.IsCoherent.extension_constant_on_sharp_of_prime` に全 hyp 供給して組立:
+- hSirr=`isIrreducibleCharacter_of_mem_Yset`、hSu=`Yset_mapRingEquiv_mem`、hlat=`extension_mem_ZIrr`+`subset_span`、
+  hpair=`Set.exists_ne_of_one_lt_ncard`(`two_le_Yset_ncard`)、hZp=hprime、hZA=`coe_mem_sharpImage_of_mem_commutator`、
+  hηx=`Yset_apply_eq_apply_one_of_mem_commutator`、hspan=`zSpan_S_support_subset_of_apply_one_eq_zero`(span_mono Yset⊆S)。
+- gotcha: lemma は **S07_CoherenceGalois** 在 (import 追加要); dot-notation 不可 → 完全修飾名で hτ 明示引数。
+
+### ▶ 次の一手 = Peterfalvi (6.8.2.2) (mmd 04.8 L186-206):
+φ∈Irr Z (Z=W₂), φ≠1 ⟹ `(Ind_Z^L φ − |H:Z|η₁)^τ = X − |H:Z|Y` (X⊥Y^{τ₁}, Y=η₁^{τ₁} or m=2 で −η₂^{τ₁})。
+証明骨子: α:=Ind_Z^L φ − |H:Z|η₁ は Supp⊆H^# → reciprocity `⟨α^τ,ψ⟩=⟨α,Res_L ψ⟩`、(6.8.2.1) で
+Res_Z ψ = aρ_Z+b1_Z、(6.7) `peterfalvi_67` で b≡ψ(1) mod |H| ⟹ ⟨α^τ,ψ⟩≡0 mod |H:Z|、norm 評価
+‖α^τ‖²=‖α‖²<2|H:Z|² で (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}。**(6.7) machinery (peterfalvi_67_centralCommutator,
+reg-char sumNonInflatedDegreeMulChar) は既 landed; reciprocity inner_dadeIntegralCharacterMap_eq_inner_restrict も既存。**
+→ (6.8.2.3) → τ₂ assembly。**正本=本 session 39 cont.⁵。**

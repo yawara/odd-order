@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_CoherenceCore
+import OddOrder.Peterfalvi.S07_CoherenceGalois
 
 /-!
 # Peterfalvi §8: Case (B) coherence (`X ∪ Y` is coherent in case (B))
@@ -180,5 +181,39 @@ theorem SibleyDadeHypothesis.Yset_apply_eq_apply_one_of_mem_commutator
     rw [← hyp.index_H_eq_card_W1, ← Nat.cast_mul, Subgroup.index_mul_card]
   rw [hLcard, mul_comm (Nat.card ↥hyp.W1 : ℂ) (Nat.card ↥H : ℂ), ← mul_assoc,
     invOf_mul_self, one_mul]
+
+/-- **Peterfalvi (6.8.2.1), case (B):** the `Y = S(H')`-coherence extension is constant on `W₂^#`.
+For `η ∈ Y` and `x, y ∈ W₂^#` (with `W₂` of prime order and `W₂ ⊆ ⁅H, H⁆`),
+`η^{τ₁}(y) = η^{τ₁}(x)`.
+
+Assembled from the general `S07.IsCoherent.extension_constant_on_sharp_of_prime`: `W₂` prime is
+`hZp`; `hSu` (`Yset_mapRingEquiv_mem`), `hZA` (`coe_mem_sharpImage_of_mem_commutator` via
+`W₂ ⊆ ⁅H,H⁆`), `hηx` (`Yset_apply_eq_apply_one_of_mem_commutator`) are the case-(B) discharges;
+`hSirr`/`hlat`/`hpair` come from the `Y`-coherence structure (`isIrreducibleCharacter_of_mem_Yset`,
+`extension_mem_ZIrr`, `two_le_Yset_ncard`); `hspan` from `zSpan_S_support_subset_of_apply_one_eq_zero`
+(via `Y ⊆ S`). -/
+theorem SibleyDadeHypothesis.coherentYset_extension_const_on_W2
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} (hprime : (Nat.card W2).Prime) (hW2 : W2 ≤ ⁅H, H⁆)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    {x y : ↥L} (hx : x ∈ W2) (hx1 : x ≠ 1) (hy : y ∈ W2) (hy1 : y ≠ 1) :
+    hyp.coherentYset.extension η (y : G) = hyp.coherentYset.extension η (x : G) := by
+  have hspan : ∀ φ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Yset, φ 1 = 0 →
+      φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    fun φ hφ h1 =>
+      hyp.zSpan_S_support_subset_of_apply_one_eq_zero
+        ((Submodule.span_mono hyp.Yset_subset_S) hφ) h1
+  exact OddOrder.Peterfalvi.S07.IsCoherent.extension_constant_on_sharp_of_prime
+    hyp.coherentYset
+    (le_refl _)
+    (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ)
+    hspan
+    (fun σ φ hφ => hyp.Yset_mapRingEquiv_mem σ hφ)
+    (fun φ hφ => hyp.coherentYset.extension_mem_ZIrr φ (Submodule.subset_span hφ))
+    hη
+    (Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega) η)
+    hprime
+    (fun z hz hz1 => hyp.coe_mem_sharpImage_of_mem_commutator (hW2 hz) hz1)
+    hx hx1 (hyp.Yset_apply_eq_apply_one_of_mem_commutator hη (hW2 hx)) hy hy1
 
 end OddOrder.Peterfalvi.S08
