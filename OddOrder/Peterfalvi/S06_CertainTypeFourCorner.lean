@@ -142,6 +142,33 @@ noncomputable def chiFourCornerOnV (h : Hypothesis46 A L) [NeZero (Nat.card h.W1
         - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)),
    chiColumn_fourcorner_mem_supportedSubmodule h χ₂ i⟩
 
+/-- **(4.10) L-side support bridge**: an `L`-conjugate of a point of `V = W − (W₁ ∪ W₂)` lands in
+`A₀ = A ∪ {l·v·l⁻¹ | l ∈ L, v ∈ tic.V}`.  Since `V ⊆ W − W₂` maps (via `L ↪ G`) into
+`tic.V = ↑W \ ↑W₂` (`tic_W_eq_map` for the `W`-part, `L.subtype` injectivity for the `∉ W₂` part),
+every such conjugate has the required `A₀` form.  This is the group-theory core of
+`Supp(Ind_W^L α) ⊆ V^L ⊆ A₀`, the L-side packaging that feeds the certain-type Dade map `h.tau`. -/
+theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
+    {z : ↥L} (hz : z ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V) :
+    (L.subtype z) ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G) := by
+  obtain ⟨v, hvV, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hz
+  obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+  have hVdef : h.toTICyclicHypothesis.V
+      = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
+  rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hvV
+  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hvV
+  have hvtic : (L.subtype v) ∈ h.tic.V := by
+    rw [h.tic_V, Set.mem_diff]
+    refine ⟨?_, ?_⟩
+    · rw [tic_W_eq_map h]
+      exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
+    · rw [h.tic_W2]
+      rintro hmem
+      obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+      exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
+  refine Or.inr ⟨L.subtype c, c.2, L.subtype v, hvtic, ?_⟩
+  rw [← hc]
+  simp [map_mul, map_inv]
+
 /-- The underlying class function of `chiFourCornerOnV` is the four-corner itself: bundling adds
 no content, so the coercion is definitional.  (The coercion lands on `toTICyclicHypothesis.W`,
 which is `sdiff.W` definitionally; this `rfl` records that downstream rewrites are sound.) -/
