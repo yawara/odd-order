@@ -2224,3 +2224,40 @@ BG §12 "The Subgroup E" は **局所解析の中核** で、M の complement E 
 *出典: BG local-analysis.mmd L3023–3483, PDF pp.83–96*  
 *参考: BG §10 (M_α, M_σ), §11 (Exceptional), §13 (Prime Action), App.C (Peterfalvi)*
 
+---
+
+## session 21 (2026-06-13, Lane F): Prop 12.15 COMPLETE + d.2 の素数限定決定
+
+**✅✅✅ BG Prop 12.15 (`sigma_subgroup_maximal_interaction`) 完全証明** — sorry-free・axiom-clean
+(AxiomsCheck 登録済、3 axioms 全 allowlist)。新 leaf `S12_Proposition1215.lean`、commit `6d696a0a`。
+全 5 結論 (a)-(e)。Thm 12.13 (前 session) と並ぶ §12 keystone で、§13-14 を gate していた。
+
+**🔑 d.2 (τ₁-transfer) の素数限定決定 (重要・Lane G / 後続は再検討不要)**:
+- 結論 `tau1 M⋆ ⊆ tau1 M ∪ α M` を `∀ r, r.Prime → r∈tau1 M⋆ → r∈tau1 M ∪ α M` に**素数限定**した。
+- 理由: BG 原文 (local-analysis.mmd L3059, L2647) で **τᵢ(M) も α/β/σ も `{p∈π(M)|…}` = 素数の集合**
+  (「π(M) は σ⊔τ₁⊔τ₂⊔τ₃ の disjoint union」)。BG の `r_p` は素数のみ定義 (L1363)。
+- repo の `tau1` 定義は BG の `p∈π(M)` 条件を落とし `pRank`-based で **ℕ 上を走る**ため、合成数 r
+  (例 9: `IsElementaryAbelian 9` は素数性不要ゆえ ℤ/9 が該当、pRank=1 可) も τ₁(M⋆) に入りうる
+  (formalization artifact)。その合成数 r では r∉α(M) (α⊆素数) かつ shared-Sylow 論法 (Sylow=素数専用)
+  が効かず、**文字通りの集合包含は破れうる (偽の可能性)**。素数限定は **BG 忠実かつ lossless**。
+- ⚠ 12.15 は他から未 cite だったので statement 変更は安全 (S12_E 旧 decl は sorry のまま放置されていた)。
+
+**証明の 3 段** (r 素数, r∉α(M) の場合に r∈τ₁(M) を示す):
+- **P5** `r∉π(M')`: `commutator_le_commutator_sup_normal` (K=A·N, N⊴K ⟹ K'≤A'·N) を ↥M で適用
+  + (M∩M⋆)≤M⋆ の derived-mono + `card_HK_mul_card_inf` 割り算 + `Mbeta_isPiGroup`。
+- **P6** `r∉σM`: `mem_sigma_iff` の Sylow-r → `IsPiGroup σM` → `sigma_subgroup_le_Msigma_of_isHall`
+  → M_σ ≤ M' (`Msigma_le_derived`)、P5 と矛盾。
+- **pRank M r=1**: shared Sylow `R=Syl_r(M∩M⋆)=Syl_r(M)=Syl_r(M⋆)`。`r∤[M:M∩M⋆]`/`r∤[M⋆:M∩M⋆]`
+  を M_β/M⋆_β diamond (`not_dvd_index_of_sup_top_normal`) で出し、`pRank_eq_of_le_of_not_dvd_index`
+  (`Sylow.ofCard` で R を両 Sylow に realize) で `pRank M r = pRank(M∩M⋆) r = pRank M⋆ r = 1`。
+
+**再利用可能な汎用 helper (§13+ で有用)**:
+- `commutator_le_commutator_sup_normal {K}(A N)[N.Normal](A⊔N=⊤) : commutator K ≤ ⁅A,A⁆⊔N`
+- `not_dvd_index_of_sup_top_normal {K'}(A N)[N.Normal](A⊔N=⊤)(r∤|N|) : r∤A.index`
+- `pRank_eq_of_le_of_not_dvd_index {H K}(H≤K)(r∤[K:H])[Fact r.Prime] : pRank H r = pRank K r`
+
+**§12 残 frontier** (S12_E に 5 sorry): 12.14 (`maximalContaining_centralizer_eq_singleton`),
+12.16 = `sigma_subgroup_conj_into_Msigma` (Y を M_σ へ共役) / `sigma_subgroup_pRank_normalizer_le_one`
+(r_p(N_H(Y))≤1) / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (p∈τ₁(M)⟹p∉π(N_H(Y)'))。
+**12.16 が Lane G を gate** ⟹ 次の優先。完了で §12 STOP。
+
