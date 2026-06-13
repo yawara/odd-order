@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 
 /-!
 # BG §13: Theorem 13.4 (the main step — `C_{M_σ}(P) ⊆ C_{M_σ}(R)`)
@@ -245,7 +247,7 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
   -- ===== steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` → three-subgroups → Lemma 12.18(a) contradiction =====
   -- `r ∈ τ₁(M)`: `τ₁(M*) ⊆ τ₁(M) ∪ α(M)`, `r ∈ π(E) ⟹ r ∉ σ(M) ⊇ α(M)`.
   have hrτ1M : r ∈ tau1 M := by
-    rcases hτ1sub hrτ1 with h1 | h1
+    rcases hτ1sub r Fact.out hrτ1 with h1 | h1
     · exact h1
     · exact absurd (S10.alpha_subset_sigma hG h.mem_maximal h1)
         (h.not_mem_sigma_of_mem_primeFactors hG hr)
