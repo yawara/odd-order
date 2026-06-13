@@ -197,9 +197,34 @@ type predicates**」。しかし `theoremB/C/E` は仮説・support-set とも *
 shared-notation wrapper/bridge を足す(BG spine 編集)」の**設計・所有権判断**を伴う。
 **独断で結合させない → ユーザー裁可待ち。**(8.8) 以降の自動 wiring は gap 解消後。
 
-### 残 TODO
+### 6. consumption-layer 構築済み(`S10_BGInterface.lean`, 2026-06-12〜13)
 
-- [x] S10 docstring stale 訂正(commit 6de1edea)。 [x] (8.8) wiring。
-- [ ] **interface gap の設計裁可**(S10↔BG notation 結合方針)→ 確定後 T1 着手。
-- [ ] (8.2.a) の BG Prop 3.9 が main 在否を確認(T3; 不在なら issue base 2000 → 承認)。
-- [ ] T2 = BG §14-15 の support-set 構造 landing 待ち(Lane F/G/spine 進捗連動)。
+interface gap の設計裁可 = **Lane-H 所有 wrapper file 方式**(ユーザー裁可)。以下を実証明(axiom 0、
+sorry は BG Prop16.1 へ局所化のみ):
+
+- `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`(MF=Msigma, Prop16.1 cite)
+- `isTypeI_iff_isTypeF` / `isTypeII_iff_isTypeP2`(type 辞書, Prop16.1 cite — §14/§16 の結論
+  `IsTypeF/P2` を shared `IsTypeI/II` へ翻訳; wiring (8.13)/(8.16) で確実に要る)
+- `isHall_primeFactors`(一般: π-Hall ⟹ π(|H|)-Hall)
+- `maxNilpotentNormalHall_isHall_of_typeI_or_II`(= **(8.11) 第1連言の type I/II 部**)
+- **`A1_eq_sigmaSharp_of_typeI_or_II`**(= support-set bridge `A1 M tau = M_σ#`, type I/II)
+  — ⚠ §5 表の「A1↔ASet 等式不在」を訂正: **A1↔sigmaSharp(=M_σ#)は I/II で証明可**。
+  不在なのは `A0Set/ASet = hatMsigma ∩/∖ …`(別構造)の bridge。
+- `isUniquelyMaximal_of_maximalSubgroupsContaining_eq_singleton`(maximality bridge, 一般)
+- S13 (11.8.5) `orthogonality_coefficient_zero` close(carrier field; S13 sorry 9→8)
+
+### 7. 残 TODO / 頭打ちの正確な所在(2026-06-13)
+
+**§14/§15 を実地調査**(全 proved 補題を grep): §14=11 / §15=9 sorry、**主結果は全て sorried** で
+shape も BG-internal(`kappa`/`piSet`/`tau2`/`IsTypeF/P2`/`hatMsigma`)。S10 の (8.11)-(8.18) は
+**universally-typed・multi-branch** で、上記 bridge により **type I/II の部分**は wiring 可能だが、
+- III/IV 部(`M_s=M'≠M_σ`)・`A0Set/ASet` 部 = §14/§15 の sorried 構造に bottom-out、
+- 全 branch を要する 1 定理ゆえ**部分 wiring では closure しない**。
+
+⟹ **clean な consumption-layer foundation は概ね構築完了**。これ以上の §10-13 foundation は
+(a) thin wrapper(規約違反)、(b) §14/§15-gated 定理の部分片(speculative)、(c) type V(空)拡張、
+のいずれかで**逓減**。実質的な S10 closure の唯一のレバー = **BG §14/§15 が *proved* になること**
+(BG spine = Lane F/G の下流; Lane H scope 外)。
+- [ ] T2/(8.11)III-IV/(8.13)(8.16)-full = BG §14-15 landing 待ち。
+- [ ] (8.2.a) BG Prop 3.9 在否(T3; 未確認、優先度低)。
+- [ ] §14/§15 が landing したら本 bridge 群で S10 を一気に wiring。
