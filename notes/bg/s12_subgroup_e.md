@@ -1,5 +1,40 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢🚧 2026-06-13 (Lane F session 19, Opus 4.8): **Prop 12.15 = 8/11 parts COMPLETE; e.2/e.3b に E⊇S 構造 gap**
+
+session 18 から進展: **(d.1)(d.3a)(d.3b)(e.3a) 追加 landed** (計 8/11: a,b,c,e.1,d.1,d.3a,d.3b,e.3a)。
+build 緑、実 sorry = **d.2 / e.2 / e.3b の 3 個**。leaf WIP 未 commit (root/AxiomsCheck 未配線 — 完成まで)。
+
+**新 landed の手法**:
+- (d.1/d.3a/d.3b): `S` を `Sylow q G` term 化 (`S.subgroupOf Mstar`→`exists_le_sylow`→`isSylow_sylowMap_of_mem_sigma`→(c) で同定) → Cor 10.9(b) (`beta_factorization_of_sylow_normalizer_in_intersection`) ×2 + `Malpha_ne_bot_of_sylow_normalizer_le` 再利用 + `simp [Malpha,Mbeta,hab]` bridge。
+- (e.3a): A∈ℰ²(S) を構成 (`S`を`Sylow q ↥M*`化[(c) maximality]→`pRank_sylow_eq`+`tau2_pRank_eq_two`で pRank=2→新 helper `exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank`) → `Msigma_nilpotent_of_tau2` conjunct-5 (N=M∈ℳ(A))。新 helper 2 個 + S10 `normalizer_sylow_map_le_of_mem_sigma` **de-private**。
+
+**🚧 e.2/e.3b の BLOCKER (要判断)**: Cor 12.6(a)(b) (`elemAb_normal_in_E_of_tau2`/`centralizer_le_E_of_tau2`)
+は全て **`A ≤ E`** (E = setup の M*_σ-補群) を要求。だが e.2/e.3b の A は **`A ≤ M` も同時に**要る
+(`N_G(A)⊆M` を Cor 12.10(d)+`q∈σ(M)` で出すため)。`exists_subgroupESetup` は **`E ⊇ S` を保証せず**、
+A を E に conj 押込 (S12_Lemma1211:370 idiom, `w∈M*`) すると `A ≤ M` が壊れる。
+⟹ **新 infra 必要**: `SubgroupESetup M* E …` with `E ⊇ S` (param. setup 構成、または setup の
+conj-stability + 補群の Hall 共役性)。~50-100 行の sub-project。**12.16 は 12.15(e) 依存ゆえ最終的に要**。
+**推奨**: (i) まず d.2 (τ₁ transfer、E-setup 非依存・独立) を landing → 9/11; (ii) その後 E⊇S infra を
+別 leaf で形式化 → e.2/e.3b。または user に「E⊇S infra を作る価値があるか / 既知 shortcut あるか」確認。
+
+## 🟢 2026-06-13 (Lane F session 18, Opus 4.8): **Prop 12.15 実装中 — (a)(b)(c)(e.1) COMPLETE, (d)/(e.2-3) 残**
+
+新 leaf `S12_Proposition1215.lean` (downstream, S12_E より下流; S12_E の 12.15 は削除済 = 移動)。
+**build 緑, 実 sorry = (d) + (e.2) + (e.3a) + (e.3b) の 4 個** (a/b/c/e.1 landed)。
+WIP 未 commit (12.15 完成時に S10 de-private + S12_E relocation と束ねて 1 commit)。
+
+**landed**:
+- (a) `not_conj_of_mem_sigma_of_normalizer_le` (Lemma 12.2(b)) 一発。
+- (b) N_G(S)⊆M: noncyclic = Cor 12.10(d) (`exists_subgroupESetup hG hM` → `nilpotent_sigmaComplement_abelian` `.2.2.2.1`); cyclic = X char S (新 helper `cyclic_subgroup_eq_of_card_eq` [S10_BetaRadicalGlobal から複製] + `AppB.normalizer_le_normalizer_map_of_characteristic`) で N_G(S)⊆N_G(X)⊆M*、+ T=Syl_q(M)⊇S → p-group normalizer 条件 (新 helper `eq_of_isPGroup_of_normalizer_inf_eq` = `normalizerCondition_of_isNilpotent`+`subgroupOf_normalizer_eq`+`inf_subgroupOf_left`) で S=T → **de-private した `S10.normalizer_sylow_map_le_of_mem_sigma`** で N_G(S)⊆M。
+- (c): (b) と同じ helper `eq_of_isPGroup_of_normalizer_inf_eq` 再利用。
+- (e.1) q∈τ₂(M*): `prime_mem_sigma_or_tau2` (12.2a) `.resolve_left hqns`。
+
+**残 (d)/(e.2-3) construction path (pin 済)**:
+- **(d) q∈σ(M*)** [L3443-51]: 要 `S : Sylow q G`。MY S = Syl_q(M∩M*)=Syl_q(M*); q∈σ(M*) ⟹ image=Syl_q(G) (`isSylow_sylowMap_of_mem_sigma` S10_HallStructureCore:1213; `S.subgroupOf Mstar`→`Sylow q ↥M*` を (c) maximality で)。N_G(S)⊆M⊓M* (b + q∈σ(M*)⟹⊆M*) → `Malpha_ne_bot_of_sylow_normalizer_le` (S12_Theorem1213 再利用)=d.3b、`beta_factorization_of_sylow_normalizer_in_intersection` (10.9b) ×2 = d.1 + d.3a (`simp only [S10.Malpha,S10.Mbeta,hab]`)。d.2 (τ₁ transfer) は別。
+- **(e.2/e.3)** [L3429-41]: `exists_subgroupESetup hG hMstar` で E*、A∈ℰ²(S)、Thm 12.5(e)+Cor 12.6(a) (M*_σ∩M=1・A⊴E*)、Cor 12.10(d) (E*⊆N_G(A)⊆M ⟹ M∩M*=E*=e.3)、Cor 10.9(a) (p>q∧q>p 矛盾=e.2)。
+- ⚠ **cross-lane flag 健在**: 12.16×2 を S13 (Lane G) が cite ⟹ 12.16 着地時 S13 re-point 要。12.15 完成後に判断を仰ぐ。
+
 ## ✅✅✅✅ 2026-06-13 (Lane F session 17, Opus 4.8): **Thm 12.13 完全 COMPLETE — sorry-free・axiom-clean (σ-side keystone 確定)**
 
 **piece 5 (`maximalContaining_normalizer_center_ne_of_two_maximals`) 内の唯一の sorry
