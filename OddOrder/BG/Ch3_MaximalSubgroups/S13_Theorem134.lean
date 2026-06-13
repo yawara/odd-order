@@ -38,12 +38,39 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-- Extend a `q`-subgroup `Q ≤ H` to a maximal `q`-subgroup `S` of `H` (a Sylow `q` of `↥H`,
+pulled back to `G`). Supplies the `S` and Sylow-maximality hypotheses of Proposition 12.15. -/
+theorem exists_maximal_pSubgroup_le_of_le {q : ℕ} [Fact q.Prime] [Finite G]
+    {Q H : Subgroup G} (hQH : Q ≤ H) (hQq : IsPGroup q ↥Q) :
+    ∃ S : Subgroup G, S ≤ H ∧ IsPGroup q ↥S ∧ Q ≤ S ∧
+      ∀ T : Subgroup G, T ≤ H → IsPGroup q ↥T → S ≤ T → S = T := by
+  -- `Q.subgroupOf H` is a `q`-group inside `↥H`; extend to a Sylow `P` of `↥H`.
+  have hpg : IsPGroup q ↥(Q.subgroupOf H) := by
+    obtain ⟨n, hn⟩ := hQq.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQH).toEquiv]; exact hn)
+  obtain ⟨P, hP⟩ := hpg.exists_le_sylow
+  refine ⟨(P : Subgroup ↥H).map H.subtype, Subgroup.map_subtype_le _, P.isPGroup'.map _, ?_, ?_⟩
+  · rw [← Subgroup.map_subgroupOf_eq_of_le hQH]; exact Subgroup.map_mono hP
+  · intro T hTH hTq hST
+    have hTHpg : IsPGroup q ↥(T.subgroupOf H) := by
+      obtain ⟨n, hn⟩ := hTq.exists_card_eq
+      exact IsPGroup.of_card
+        (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hTH).toEquiv]; exact hn)
+    have hPT : (P : Subgroup ↥H) ≤ T.subgroupOf H := Subgroup.map_le_iff_le_comap.mp hST
+    have e : (P : Subgroup ↥H) = T.subgroupOf H := by
+      have hm := P.is_maximal' hTHpg hPT
+      first | exact hm | exact hm.symm
+    rw [e]
+    exact Subgroup.map_subgroupOf_eq_of_le hTH
+
 /-- **Thm 13.4 per-q core** (mmd L3576-3597): for a `(P ⊔ R)`-invariant `q`-subgroup `S` of
 `C_{M_σ}(P)`, `R` centralizes `S` (i.e. `⁅S, R⁆ = ⊥`). Assume `Q := ⁅S, R⁆ ≠ ⊥`; then via
 Cor 13.2(b)(c) `r ∈ τ₁(M*)` and `p ∈ β(M*)` for `M* ∈ ℳ(N_G(P))`, and Prop 12.15 / Lemma 12.18
 yield `C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)` against `ℳ(N_G(Q)) ≠ {M}` — contradiction.
-**🚧 WIP**: setup + Cor 13.2 steps + step 4 (`S` abelian, FPF) + **step 5** (`ℳ(N_G(Q)) = {M*}`
-via Lemma 12.18(a) role-swap); steps 6-9 (Prop 12.15 / Lemma 12.18 contradiction) `sorry`. -/
+**🚧 WIP**: setup + Cor 13.2 + step 4 (`S` abelian, FPF) + step 5 (`ℳ(N_G(Q)) = {M*}`, Lemma 12.18(a)
+role-swap) + **step 6** (Prop 12.15 `X=Q` → `q ∈ σ(M*)`, `τ₁(M*) ⊆ τ₁(M)∪α(M)`, `q ∉ α(M)`);
+steps 7-9 (`C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)` + Lemma 12.18(a) contradiction) `sorry`. -/
 theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
     [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)
@@ -184,8 +211,39 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
       (tau1_Malpha_interaction hG hMstarMax hrq.symm hrτ1 hR hRMstar hQMstar hQne hQq hRNQ hCQR
         hne).1 hMαstar_ne hqαstar
     exact hPne (le_bot_iff.mp (hCRQ ▸ le_inf hPMα hPcRQ))
-  -- steps 6-9: Prop 12.15 (`X = Q`) → `q ∈ σ(M*)`; `C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)`;
-  -- Lemma 12.18(a) (on `M`) contradiction since `ℳ(N_G(Q)) ≠ {M}`. 🚧
+  -- ===== step 6: Prop 12.15 (`X = Q`) → `q ∈ σ(M*)`, `τ₁(M*) ⊆ τ₁(M) ∪ α(M)`, `M_α ≠ ⊥` =====
+  have hQM : (⁅S, R⁆ : Subgroup G) ≤ M := hQS.trans (hSMsig.trans (S10.Msigma_le M))
+  obtain ⟨S', hS'le, hS'q, hQS', hS'max⟩ :=
+    exists_maximal_pSubgroup_le_of_le (le_inf hQM hQMstar) hQq
+  have hMstarMem :
+      Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G)) := by
+    rw [hMNQstar]; rfl
+  have hprop := sigma_subgroup_maximal_interaction hG h.mem_maximal hqσ hQM hQne hQq
+    hMstarMem hMstarNe hS'le hQS' hS'q hS'max
+  -- `P ≤ M*_σ` (since `p ∈ β(M*) ⊆ σ(M*)`), used to exclude case (e).
+  have hpσstar : p ∈ S10.sigma Mstar := S10.alpha_subset_sigma hG hMstarMax hpαstar
+  have hPσ : Ch03.Subgroup.IsPiGroup (S10.sigma Mstar) P := by
+    intro s hs
+    obtain ⟨n, hn⟩ := hPp.exists_card_eq
+    rw [hn, Nat.mem_primeFactors] at hs
+    exact ((Nat.prime_dvd_prime_iff_eq hs.1 Fact.out).mp (hs.1.dvd_of_dvd_pow hs.2.1)) ▸ hpσstar
+  have hPMσstar : P ≤ S10.Msigma Mstar :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hMstarMax) hPMstar hPσ
+  -- case (e) `q ∉ σ(M*)` is impossible: `1 ⊂ P ⊆ M*_σ ⊓ (M ⊓ M*) = ⊥`.
+  have hqσstar : q ∈ S10.sigma Mstar := by
+    by_contra hqns
+    have he := hprop.2.2.2.2 hqns
+    have hPbot : P ≤ S10.Msigma Mstar ⊓ (M ⊓ Mstar) := le_inf hPMσstar (le_inf hPM hPMstar)
+    rw [he.2.2.1] at hPbot
+    exact hPne (le_bot_iff.mp hPbot)
+  -- Prop 12.15(d): `τ₁(M*) ⊆ τ₁(M) ∪ α(M)` and `M_α ≠ ⊥`.
+  obtain ⟨_, hτ1sub, _, hMαne⟩ := hprop.2.2.2.1 hqσstar
+  -- `q ∉ α(M)`: Lemma 10.12(a) gives `α(M) ∩ σ(M*) = ∅` and `q ∈ σ(M*)`.
+  have hqαM : q ∉ S10.alpha M := fun ha =>
+    Set.eq_empty_iff_forall_notMem.mp
+      ((S10.disjoint_of_not_conj hG h.mem_maximal hMstarMax hnc).1.2) q ⟨ha, hqσstar⟩
+  -- steps 7-9: `C_{M_α}(P) = C_{M_α}(R)` (Lem 12.18(a) ×2 with `q ∉ α(M)`, `r ∈ τ₁(M)`) →
+  -- `= C_{M_α}(RQ)` (three-subgroups) → Lemma 12.18(a) (on `M`) contradiction (`ℳ(N_G(Q)) ≠ {M}`). 🚧
   sorry
 
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
