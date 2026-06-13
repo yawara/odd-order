@@ -317,6 +317,30 @@ theorem fpf_of_abelian_of_irreducible
     have he : e ∈ actionFixedBy φ x := by rw [h]; exact Subgroup.mem_top e
     simpa using mem_actionFixedBy.mp he
 
+/-- **Peterfalvi Appendix B, Lemma, part (1) — reducible case**: part (1) applied to a
+`P`-invariant complement `E = U ⊕ W` (both nontrivial), via the trivial permutation of
+the two summands.  A Maschke complement of a proper nonzero `P`-submodule feeds this. -/
+theorem fpf_of_constant_stabilizer_of_invariant_compl [Finite P]
+    (hcomm : ∀ y z : E, y * z = z * y)
+    (φ : P →* MulAut E) (hfaithful : Function.Injective φ)
+    {U W : Subgroup E} (hcompl : IsCompl U W) (hU : U ≠ ⊥) (hW : W ≠ ⊥)
+    (hUinv : ∀ x : P, U.map (φ x).toMonoidHom = U)
+    (hWinv : ∀ x : P, W.map (φ x).toMonoidHom = W)
+    (hPodd : ∀ x : P, Odd (orderOf x))
+    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+      Nat.card (pointStabilizer φ a) = Nat.card (pointStabilizer φ b)) :
+    ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  refine fpf_of_constant_stabilizer_of_permuted_decomp (S := fun b : Bool => cond b U W)
+    ?_ ?_ hcomm φ hfaithful (fun _ => Equiv.refl Bool) ?_ hPodd hconst ?_
+  · exact (iSupIndep_pair (i := true) (j := false) (by decide) (by decide)).mpr hcompl.disjoint
+  · rw [iSup_bool_eq]
+    exact hcompl.sup_eq_top
+  · intro x k
+    cases k
+    · exact hWinv x
+    · exact hUinv x
+  · exact ⟨true, false, by decide, hU, hW⟩
+
 /-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.

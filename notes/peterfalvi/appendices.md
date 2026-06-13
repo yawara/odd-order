@@ -91,7 +91,15 @@ conjugation Equiv で). sorry 不変 (2→2)。
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + Schur over F_q (`IsSimpleModule.End`)
       → `E=⊕C_E(T_i)` (r=p≥2, P-permuted) → part (1) で FPF → keystone で cyclic、非cyclic と矛盾
       (∴ 既約⟹cyclic⟹part(2)cyclic)。
-- [ ] **reducible case の分解存在 (Maschke/Clifford)**: coprime ⟹ E 半単純 → P-permuted 分解 → part(1)。
+- [x] **reducible case の wrapper** ✅ `fpf_of_constant_stabilizer_of_invariant_compl` (complete,
+      axiom-clean, session 8): `IsCompl U W` + 両 nontrivial + 両 P-invariant ⟹ FPF。**🔑 重要発見:
+      part(1) は perm=id (P-invariant 各 summand) でも成立** → reconstruction gap は無い (imprimitivity
+      不要)。Maschke complement (P-invariant U⊕W=⊤) を `Bool` 2-family + `iSupIndep_pair` で part(1) に投入。
+- [ ] **Maschke bridge (φ→分解)**: 残 = reducible 時に P-invariant complement を *構成*。mathlib
+      `Maschke.exists_isCompl` (`Submodule k[G] V`) 在 → φ:P→*MulAut E を `Representation (ZMod q) P
+      (Additive E)` 化 (linearity は `IsElementaryAbelian.mulAutEquivGeneralLinearGroup`/`zmodModule` 在) →
+      `.asModule` で k[P]-module → exists_isCompl → Submodule を Subgroup E に戻し invariant 確認。
+      ⚠ Additive E + zmodModule の instance 管理が fiddly (中規模)。
 - ⟹ **Lemma sorry 解消 = reducible 分解存在 + part(2) 非cyclic の 2 つの heavy rep-theory が gate**。
       part(1)+part(2)cyclic の FPF producer は完備。mathlib `Representation`/`IsSimpleModule`/Maschke 調査要。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
