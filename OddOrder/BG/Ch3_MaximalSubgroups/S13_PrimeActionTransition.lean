@@ -107,6 +107,17 @@ theorem actsPrimeOn_of_prime_order_le [Finite G] {N X : Subgroup G}
     exact (hgy.pow_left d).eq
   exact hgx.trans (hpr x hxX (by rw [hxord]; exact hp))
 
+/-- **prime action は acting 部分群について anti-monotone**: `X` が `N` に prime 作用し
+`X' ≤ X` なら `X'` も `N` に prime 作用する。`g∈X'#` で `C_N(g)=C_N(X)` (X prime)、
+`C_N(X) ≤ C_N(X')` (X'≤X、centralizer は antitone)、`C_N(X')≤C_N(g)` (g∈X') で挟む。
+13.7 step 5(f) で `E₁ ≤ (Hall τ₁(M*))` の prime 作用を `E₁` へ落とすのに使う。 -/
+theorem ActsPrimeOn.of_le_right {N X X' : Subgroup G} (h : ActsPrimeOn N X) (hX' : X' ≤ X) :
+    ActsPrimeOn N X' := by
+  intro g hg hg1
+  refine le_antisymm ?_ (fixedBy_le_fixedByElement hg)
+  rw [h g (hX' hg) hg1, fixedBy_def, fixedBy_def]
+  exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hX'))
+
 /-- `X` が `N` を正規化するなら、`X` は `C_N(X) = fixedBy N X = N ⊓ C(X)` も正規化する。
 `X` は `N` も `X`(自分自身)も正規化するので、`C(X)` も保つ。Lemma 13.7 equal case で
 `x'∈E₃` が `D = C_N(E₃)` を共役で保つために使う。 -/
