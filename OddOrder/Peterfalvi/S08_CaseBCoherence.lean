@@ -794,4 +794,29 @@ theorem SibleyDadeHypothesis.inner_self_tau_indW2_sub_smul
     (by intro s hs; rw [Set.mem_singleton_iff] at hs; rw [hs]; exact hsupp)
     (Submodule.subset_span rfl) (Submodule.subset_span rfl)
 
+/-- **(6.8.2.2) source cross-term `⟨Ind_{W₂}φ, η' − η⟩ = 0`** for `η, η' ∈ Y`.  Every `η ∈ Y` is
+constant on `⁅H,H⁆ ⊇ W₂` (`Yset_apply_eq_apply_one_of_mem_commutator`) with value `η(1) = |W₁|`
+(`Yset_apply_one`), so `Res^L_{W₂}η' = Res^L_{W₂}η` (both the constant `|W₁|` on `W₂`).  Frobenius
+reciprocity `inner_induce_eq_inner_restrict` then gives
+`⟨Ind_{W₂}φ, η'⟩ = ⟨φ, Res_{W₂}η'⟩ = ⟨φ, Res_{W₂}η⟩ = ⟨Ind_{W₂}φ, η⟩`, hence the difference is `0`.
+
+This is the source half of the (6.8.2.2) cross-term `⟨α^τ, η_j^{τ₁} − η_1^{τ₁}⟩ = |H:Z|`: with
+`⟨η₁, η_j − η_1⟩ = −1` it gives `⟨α, η_j − η_1⟩ = |H:Z|`. -/
+theorem SibleyDadeHypothesis.inner_induce_W2_Yset_diff_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [Invertible (Nat.card ↥W2 : ℂ)] (hW2comm : W2 ≤ ⁅H, H⁆)
+    (φ : ClassFunction ↥W2 ℂ) {η η' : ClassFunction ↥L ℂ}
+    (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) :
+    ClassFunction.inner (ClassFunction.induce W2 φ) (η' - η) = 0 := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hRes : ClassFunction.restrict W2 η' = ClassFunction.restrict W2 η := by
+    ext w
+    have hmem : (↑w : ↥L) ∈ ⁅H, H⁆ := hW2comm (SetLike.coe_mem w)
+    simp only [ClassFunction.restrict_apply]
+    rw [hyp.Yset_apply_eq_apply_one_of_mem_commutator hη' hmem,
+      hyp.Yset_apply_eq_apply_one_of_mem_commutator hη hmem,
+      hyp.Yset_apply_one hη', hyp.Yset_apply_one hη]
+  rw [ClassFunction.inner_sub_right, ClassFunction.inner_induce_eq_inner_restrict,
+    ClassFunction.inner_induce_eq_inner_restrict, hRes, sub_self]
+
 end OddOrder.Peterfalvi.S08
