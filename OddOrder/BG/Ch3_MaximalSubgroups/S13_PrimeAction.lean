@@ -283,11 +283,21 @@ theorem mem_tau1_union_tau3_of_isCyclic_sylow_E [Finite G] (hG : IsMinimalSimple
 (b) `E₃` は `M_σ` に prime 作用。 -/
 theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) :
-    (∀ p : ℕ, ∀ P : Subgroup G, P ≤ E → IsPGroup p ↥P → IsCyclic ↥P → P ≠ ⊥ →
+    (∀ p : ℕ, p.Prime → ∀ P : Subgroup G, P ≤ E → IsPGroup p ↥P → IsCyclic ↥P → P ≠ ⊥ →
       (∀ T : Subgroup G, T ≤ E → IsPGroup p ↥T → P ≤ T → P = T) →
       ActsPrimeOn (S10.Msigma M) P) ∧
     ActsPrimeOn (S10.Msigma M) E₃ := by
-  sorry
+  refine ⟨fun p hp_prime P hPE hPp hPcyc hPne hPmax => ?_, ?_⟩
+  · -- (a): cyclic Sylow `P` has `p ∈ τ₁ ∪ τ₃`, then the core lemma applies (`P` abelian).
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    haveI := hPcyc
+    letI : CommGroup ↥P := IsCyclic.commGroup
+    haveI : IsMulCommutative ↥P := ⟨⟨mul_comm⟩⟩
+    exact actsPrimeOn_Msigma_of_mem_tau13 hG h
+      (mem_tau1_union_tau3_of_isCyclic_sylow_E hG h hPE hPp hPcyc hPne hPmax)
+      (hPE.trans h.E_le) inferInstance hPp
+  · -- (b) `E₃` acts in a prime manner on `M_σ`. 🚧
+    sorry
 
 -- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
 -- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
