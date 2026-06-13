@@ -616,7 +616,78 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
         hQ_es.isExtraspecial.center_card]
     -- **`C_{M_α}(Z) ⊆ M⋆`** — the `cocyclicFixedByClosure`/`Q/Z`-on-`K` analytic core (Prop 1.16 + 12.4a).
     have hK : Subgroup.centralizer (Z : Set G) ⊓ S10.Malpha M ≤ Mstar := by
-      sorry
+      classical
+      set K : Subgroup G := Subgroup.centralizer (Z : Set G) ⊓ S10.Malpha M with hKdef
+      -- (1) `Q` normalizes `K = C_{M_α}(Z)` (it normalizes `Z` and `M_α`).
+      have hQ_norm_Z : Q ≤ Subgroup.normalizer (Z : Set G) := by
+        rw [hZdef]; exact le_normalizer_map_subtype_of_normal inferInstance
+      have hQ_norm_Mα : Q ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
+        (hQ_le.trans inf_le_left).trans (le_normalizer_opiCoreInG (S10.alpha M) M)
+      have hQK : Q ≤ Subgroup.normalizer (K : Set G) := by
+        intro q hq
+        refine mem_normalizer_of_conj_smul_eq_self ?_
+        rw [hKdef, Subgroup.smul_inf, centralizer_conj_smul,
+          conj_smul_eq_self_of_mem_normalizer (hQ_norm_Z hq),
+          conj_smul_eq_self_of_mem_normalizer (hQ_norm_Mα hq)]
+      -- (2) conjugation action of `Q` on `K`, factoring through `Q/Z(Q)`.
+      letI act : MulDistribMulAction ↥Q ↥K :=
+        MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (K : Set G))) ↥K
+          (Subgroup.inclusion hQK)
+      set ψ : ↥Q →* MulAut ↥K := MulDistribMulAction.toMulAut ↥Q ↥K with hψ
+      have hψ_coe : ∀ (a : ↥Q) (x : ↥K),
+          (K.subtype ((ψ a) x)) = (↑a) * (K.subtype x) * (↑a)⁻¹ := fun _ _ => rfl
+      have hker : Subgroup.center ↥Q ≤ ψ.ker := by
+        intro z hz
+        rw [MonoidHom.mem_ker]
+        apply MulEquiv.ext; intro x; apply Subtype.ext
+        have hzZ : (z : G) ∈ (Z : Set G) := by
+          rw [hZdef]; exact Subgroup.mem_map_of_mem _ hz
+        have hcomm : (z : G) * (x : G) = (x : G) * (z : G) :=
+          (Subgroup.mem_centralizer_iff.mp (Subgroup.mem_inf.mp x.2).1) (z : G) hzZ
+        calc K.subtype ((ψ z) x) = (z : G) * (x : G) * (z : G)⁻¹ := hψ_coe z x
+          _ = (x : G) := by rw [hcomm]; group
+      set φ : (↥Q ⧸ Subgroup.center ↥Q) →* MulAut ↥K := QuotientGroup.lift _ ψ hker with hφ
+      -- (3) `Q/Z(Q)` is noncyclic abelian acting coprimely on `K` ⟹ `cocyclicFixedByClosure φ = ⊤`.
+      haveI hQZcomm : IsMulCommutative (↥Q ⧸ Subgroup.center ↥Q) := by
+        refine ⟨⟨fun a b => ?_⟩⟩
+        obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
+        obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective b
+        rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul, QuotientGroup.eq]
+        have hc : (x * y)⁻¹ * (y * x) = ⁅y⁻¹, x⁻¹⁆ := by
+          rw [commutatorElement_def]; group
+        rw [hc, ← hQ_es.isExtraspecial.commutator_eq_center]
+        exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+      have hcop : Nat.Coprime (Nat.card (↥Q ⧸ Subgroup.center ↥Q)) (Nat.card ↥K) := by
+        have hQZpg : IsPGroup p (↥Q ⧸ Subgroup.center ↥Q) :=
+          hQ_es.isExtraspecial.isPGroup.to_quotient _
+        obtain ⟨k, hk⟩ := hQZpg.exists_card_eq
+        rw [hk]
+        refine Nat.Coprime.pow_left k ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr fun hpK => ?_)
+        exact (notMem_alpha_of_rank_sylow_le_two S hrank) (S10.Malpha_isPiGroup M p
+          (Nat.mem_primeFactors.mpr ⟨Fact.out,
+            hpK.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
+      have hNC : ¬ IsCyclic (↥Q ⧸ Subgroup.center ↥Q) := by
+        intro hcyc
+        haveI := hcyc
+        have hcomm_Q : ∀ a b : ↥Q, a * b = b * a :=
+          commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center ↥Q))
+            (QuotientGroup.ker_mk' _).le
+        haveI : IsMulCommutative ↥Q := ⟨⟨hcomm_Q⟩⟩
+        have hbot : commutator ↥Q = ⊥ := commutator_eq_bot ↥Q
+        rw [hQ_es.isExtraspecial.commutator_eq_center] at hbot
+        have h1 : Nat.card ↥(Subgroup.center ↥Q) = 1 := by rw [hbot]; exact Subgroup.card_bot
+        rw [hQ_es.isExtraspecial.center_card] at h1
+        exact (Fact.out : p.Prime).one_lt.ne' h1
+      have hgen := OddOrder.BG.Ch1.S01.cocyclicFixedByClosure_eq_top_of_not_isCyclic φ hcop hNC
+      -- (4) each cocyclic generator `g` is centralized (in `G`) by a rank-2 `A_Y ∈ ℰ²(Q)`,
+      --     so `↑g ∈ C_G(A_Y) ⊆ M⋆` by Proposition 12.4(a).
+      have hle : OddOrder.BG.Ch1.S01.cocyclicFixedByClosure φ ≤ Mstar.comap K.subtype := by
+        refine (Subgroup.closure_le _).mpr ?_
+        rintro g ⟨Y, ⟨a, hYa⟩, hfix⟩
+        rw [SetLike.mem_coe, Subgroup.mem_comap]
+        sorry
+      intro x hx
+      exact Subgroup.mem_comap.mp (hle (hgen ▸ Subgroup.mem_top (⟨x, hx⟩ : ↥K)))
     -- Corollary 10.9(b): `M = (M ∩ M⋆) ⊔ M_α` (using `α(M) = β(M)`).
     obtain ⟨hfact, hab⟩ := S10.beta_factorization_of_sylow_normalizer_in_intersection hG hM hMstar
       (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S)
