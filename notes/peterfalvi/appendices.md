@@ -83,8 +83,17 @@ conjugation Equiv で). sorry 不変 (2→2)。
       は `rfl` だと i₀ 消える → `hki` 保持 + `hki ▸ hsk`。**Appendix B Lemma part (1) は完投**。
 - [ ] **imprimitive 分解 `E=⊕Eᵢ` 存在 (Maschke/Clifford)**: 既約でない coprime 加群 → P-置換される
       isotypic/imprimitive 分解。これと part (1) で Lemma の reducible ケース。**残 setup の本丸**。
-- [ ] **part (2) (既約ケース)**: P 既約 → cyclic なら直接 FPF; 非 cyclic なら R⊴P type-(p,p) + Schur
-      (`IsSimpleModule.End`) + `E=⊕C_E(T_i)` → part (1)。Schur over F_q の materialize 要。
+- [x] **part (2) cyclic case** ✅ `fpf_of_abelian_of_irreducible` (complete, axiom-clean [propext/Quot
+      のみ!], session 7): abelian + faithful + irreducible ⟹ FPF。x≠1 で C_E(x)=actionFixedBy φ x は
+      P-invariant (可換) かつ ≠E (faithful) ⟹ ⊥ (irreducible)。群論のみ・Schur 不要。一発 build 通過。
+      ⚠ MulAut mul app は `rw [map_mul]; rfl` で comp 展開。
+- [ ] **part (2) 非 cyclic case (hard rep-theory)**: P 既約・非 cyclic → R⊴P type-(p,p)
+      (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + Schur over F_q (`IsSimpleModule.End`)
+      → `E=⊕C_E(T_i)` (r=p≥2, P-permuted) → part (1) で FPF → keystone で cyclic、非cyclic と矛盾
+      (∴ 既約⟹cyclic⟹part(2)cyclic)。
+- [ ] **reducible case の分解存在 (Maschke/Clifford)**: coprime ⟹ E 半単純 → P-permuted 分解 → part(1)。
+- ⟹ **Lemma sorry 解消 = reducible 分解存在 + part(2) 非cyclic の 2 つの heavy rep-theory が gate**。
+      part(1)+part(2)cyclic の FPF producer は完備。mathlib `Representation`/`IsSimpleModule`/Maschke 調査要。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
 - [x] **Prop 1 abelian-quotient step** ✅ `commutator_le_fitting_of_isCyclic_fitting` (complete, axiom-clean,

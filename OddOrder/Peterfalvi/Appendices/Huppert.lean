@@ -290,6 +290,33 @@ theorem fpf_of_constant_stabilizer_of_permuted_decomp [Finite P]
   rw [hPa_bot, Subgroup.mem_bot] at hxa
   exact hx1 hxa
 
+/-- **Peterfalvi Appendix B, Lemma, part (2), cyclic case**: an abelian group acting
+faithfully and irreducibly on `E` acts fixed-point-freely (p. 135: "Suppose that `P`
+is cyclic.  Then ... `C_E(x) = 0` and so `P` acts without fixed points").  For `x ≠ 1`
+the fixed subgroup `C_E(x) = actionFixedBy φ x` is `P`-invariant (commutativity) and
+`≠ E` (faithfulness), hence `= ⊥` by irreducibility. -/
+theorem fpf_of_abelian_of_irreducible
+    (φ : P →* MulAut E) (hfaithful : Function.Injective φ) (hPab : ∀ x y : P, x * y = y * x)
+    (hirr : ∀ H : Subgroup E, (∀ (y : P) (e : E), e ∈ H → φ y e ∈ H) → H = ⊥ ∨ H = ⊤) :
+    ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  intro x hx1
+  have hinv : ∀ (y : P) (e : E), e ∈ actionFixedBy φ x → φ y e ∈ actionFixedBy φ x := by
+    intro y e he
+    rw [mem_actionFixedBy] at he ⊢
+    have e1 : (φ (x * y)) e = (φ x) ((φ y) e) := by rw [map_mul]; rfl
+    have e2 : (φ (y * x)) e = (φ y) ((φ x) e) := by rw [map_mul]; rfl
+    have hcomm_act : (φ x) ((φ y) e) = (φ y) ((φ x) e) := by rw [← e1, ← e2, hPab x y]
+    rw [hcomm_act, he]
+  rcases hirr _ hinv with h | h
+  · exact h
+  · exfalso
+    apply hx1
+    apply hfaithful
+    rw [map_one]
+    ext e
+    have he : e ∈ actionFixedBy φ x := by rw [h]; exact Subgroup.mem_top e
+    simpa using mem_actionFixedBy.mp he
+
 /-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.
