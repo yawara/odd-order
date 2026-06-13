@@ -169,6 +169,21 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
   rw [← hc]
   simp [map_mul, map_inv]
 
+/-- **(4.10) off-`V^G` foundation**: a point of `V = W − (W₁ ∪ W₂)` is self-centralizing into `L`,
+`C_G(v) ⊆ L`.  This is the book's "for `x ∈ V`, `C_G(x) = W ⊂ L`": any `c` centralizing `v ∈ V`
+conjugates `v` back into `V`, so by the TI property `V_ti` of (3.1) (`IsTISubset V W`) `c ∈ W`, and
+`W = tic.W = (W₁ ⊔ W₂).map L.subtype ⊆ L`.  This forces the certain-type local subgroup `H(a) = ⊥`
+on `V^L` (via `centralizer_eq_sup`/`centralizer_disjoint`), the structural fact behind
+`β^τ` vanishing off `V^G`. -/
+theorem centralizer_le_L_of_mem_ticVdiffV (h : Hypothesis46 A L) {v : G}
+    (hv : v ∈ (ticVdiff h).V) :
+    Subgroup.centralizer ({v} : Set G) ≤ L := by
+  intro c hc
+  have hcomm : c * v = v * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+  have hconj : c * v * c⁻¹ = v := by rw [hcomm]; group
+  have hcW : c ∈ (ticVdiff h).W := (ticVdiff h).V_ti c ⟨v, hv, by rw [hconj]; exact hv⟩
+  exact le_trans (tic_W_eq_map h).le (Subgroup.map_subtype_le _) hcW
+
 /-- **(4.10), the L-side four-corner is the toTICyclic Dade image of the carrier.**
 `β = δ_j(μ_{ij} − μ_{0j}) − (μ_{i0} − μ_{00}) = Ind_W^L α` (piece (a)), and the toTICyclic Dade map
 of `(L, W − (W₁ ∪ W₂))` *is* `Ind_W^L` (`tau_eq_induce`); since `↑(chiFourCornerOnV) = α` and
