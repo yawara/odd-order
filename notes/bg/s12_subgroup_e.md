@@ -2393,3 +2393,27 @@ r≤2 の **steps 1-3 (narrow scaffolding) 実装済・ビルド green** (`hnoti
 S=P₁⊔P₂ を `Subgroup.coe_mul_of_left_le_normalizer_right` で積に分解→commutator element 計算
 (`⁅ab,cd⁆=⁅a,c⁆` for b,d∈P₂ central)→`⁅S,S⁆=⁅P₁,P₁⁆=Z(P₁)`(`IsExtraspecial.commutator_eq_center`)。
 leaf は引き続き未コミット保持。
+
+**✅✅✅ COMPLETE (session 23 cont., 2026-06-14)**: **BG Cor 12.14 完全証明** — `S12_Corollary1214.lean`
+の `S12.Cor1214.maximalContaining_centralizer_eq_singleton` が **sorry-free・axiom-clean**
+(full build 3803 jobs green / AxiomsCheck OK = 3 axioms 全 allowlist)。root + AxiomsCheck 配線済、
+S12_E:53 forward-decl 削除(comment pointer 化)⟹ **§12 実 sorry 3→2**(残 = S12_E:78/91 の
+Cor 12.16(a)(b) 一般 hYpi forward-decl のみ = HUB/Lane G re-point 調整事項、Lane F の証明作業外)。
+
+全 6 step が予定通り着地:統一エンジン `eq_singleton_of_uniquelyMaximal_le`(`of_le_of_lt_top`+
+`eq_of_isCoatom_of_le`)+ setup(X⊆M_σ⊆Sylow S、共役不要)+ `C_G(X)<⊤`(center=⊥)+
+**r(C_P(X))≥3**: witness=C_P(X) 自身(`pRank_le_rank`+Uniqueness Thm)+
+**r(C_P(X))≤2**: ¬ideal(Cor 5.4 narrow)→ p∉β(M)→ X⊆M_σ'→ **X⊆S'**(10.8c: 商 ↥M_σ/K で
+`MonoidHom.map_commutator`+手動 Dedekind `mem_sup_of_normal_right`)→ rank S≤2(narrow+Thm 5.3(d)
+の `S⊓R'=⊥` × X⊆S'≠⊥ 矛盾)→ 中心積 Cor 10.7(b)(公開 `sylow_structure.2.1`)→ witness=P₁
+(extraspecial nonabelian、`⁅S,S⁆=⁅P₁,P₁⁆=Z(P₁)⊆C_G(P₁)` を中心積分解 `coe_mul_of_left_le_normalizer_right`
++ central-commutator 簡約 keyA/keyB で、`IsExtraspecial.commutator_eq_center`)→ Thm 12.13。
+
+**再利用知見**: (1) narrow を実 Sylow に適用するテンプレ = `S10_LocalLemmas:430-590` + bridge
+`centralizer_subgroupOf_inf_eq`(leaf に複製)。(2) `pRank_eq_zero_of_isPGroup_of_ne_prime` /
+`derivedInG_eq_commutator` は S09/S10 で private → leaf に複製。(3) 中心積 commutator 分配律は
+mathlib/CentralProduct に無く、`Subgroup.coe_mul_of_left_le_normalizer_right` で `↑S=↑P₁*↑P₂` 分解
+→ `⁅ab,cd⁆=⁅a,b⁆`(central a₂,b₂ を keyA/keyB で落とす)で自作。(4) `⁅H,K⁆≤K` は K 正規要 →
+自己交換子 `⁅S,S⁆≤S` は `commutator_le.mpr` で。(5) 要素 commutator は `open scoped commutatorElement`。
+
+**▶ Lane F §12 = 完了(STOP)**。次任務(§14 想定)はユーザー/HUB が再判断。leaf は本 commit で tracked 化。
