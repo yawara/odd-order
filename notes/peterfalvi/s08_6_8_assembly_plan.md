@@ -1127,3 +1127,21 @@ w∈Z(↥L) ⟹ `(L:Subgroup G) ⊓ C_G((w:G)) = L`。**case B で W₂⊆Z(↥L
    → ξ(z)≡ξ(1) [ALGMOD |H|] → η^{τ₁}(z)≡η^{τ₁}(1) (ε 倍)。
 4. 🔴 ALGMOD→ℤ 整除 (a≡0 mod |H:W₂|) + 統合 + norm endgame。
 **▶ 次 = W₂⊆Z(↥L) 導出 (case-B) or c2 (6.7) 組立 (hconst の ξ-const 部分精査)。正本=本 session 39 cont.¹¹。**
+
+## 2026-06-14 (session 39 cont.¹², /loop): 逆 ALGMOD→ℤ bridge landed + warning cleanup
+
+**✅ landed (build-green + axiom-clean)**: `dvd_of_intCast_algMod`: (j:ℂ)≡(k:ℂ)[ALGMOD n] (j,k,n:ℤ, n≠0)
+⟹ n∣(j−k) in ℤ。`cong_def` で (j−k)/n が alg-int ⟹ rational ゆえ整数 (`isIntegral_rat_imp_int`
+ClassSumAlgebra) ⟹ n∣(j−k)。**🔑 (6.7) の ALGMOD|H| を rational-integer 差 ψ(1)−ψ(z)=|W₂|·a に適用 →
+|H|∣|W₂|·a (整除) の変換。gotcha: `set q:ℚ` で single Rat.cast に保つ (← のため; 分配されると
+isIntegral_rat_imp_int が unify せず)。`open scoped OddOrder.AlgInt` で [ALGMOD] 記法。**
++ warning cleanup (unused hyp→_hyp ×2, unused smul_eq_mul simp arg ×2; long-line は残置=cosmetic)。
+
+### (6.8.2.2) 残: c2 (6.7) 組立 + 統合 + norm
+✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, η^{τ₁}=±irr, centralizer-card core, **逆 ALGMOD bridge (本 session)**。
+🔴 残: (1) **W₂⊆Z(↥L) 導出** (case-B: W₂⊆Z(H)+W cyclic); (2) **c2 (6.7) 組立** =
+`peterfalvi_67_of_odd` を ξ (η^{τ₁}=±ξ の rep 版、要 IrreducibleCharacter→Representation bridge),
+P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core)] で適用 → ξ(z)≡ξ(1) [ALGMOD|H|];
+(3) **統合**: reg-char (ψ(1)−ψ(z)=|W₂|a) + 逆 bridge (本 session) ⟹ |H|∣|W₂|a ⟹ a≡0 mod |H:W₂| ⟹
+⟨α^τ,ψ⟩≡0 mod |H:W₂|; (4) **norm endgame**。
+**▶ 次 = IrreducibleCharacter→Representation bridge (c2 (6.7) 組立用) or W₂⊆Z(↥L) 導出。正本=本 session 39 cont.¹²。**

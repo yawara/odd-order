@@ -31,6 +31,7 @@ Reference note: `notes/peterfalvi/s08_6_8_assembly_plan.md` ("session 39 cont.²
 namespace OddOrder.RepresentationTheory
 
 open ClassFunction
+open scoped OddOrder.AlgInt
 
 variable {G : Type*} [Group G]
 
@@ -111,6 +112,28 @@ theorem sum_apply_eq_zero_of_ne_trivial {Γ : Type*} [Group Γ] [Fintype Γ]
     rw [h, mul_zero]
   rwa [← mul_assoc, mul_invOf_self, one_mul] at hS
 
+/-- **Reverse of `Cong.of_int`: an algebraic-integer congruence between rational integers is an
+ordinary `ℤ`-divisibility.**  If `(j : ℂ) ≡ (k : ℂ) [ALGMOD n]` with `j, k, n : ℤ` and `n ≠ 0`, then
+`n ∣ j - k` in `ℤ`.  By `cong_def` the quotient `(j - k)/n` is an algebraic integer; being rational,
+it is an ordinary integer (`isIntegral_rat_imp_int`), so `n ∣ j - k`.
+
+This converts the (6.7) `ALGMOD |H|` congruence (applied to the rational-integer difference
+`ψ(1) − ψ(z) = |W₂|·a`) into the divisibility `|H| ∣ |W₂|·a` of Peterfalvi (6.8.2.2). -/
+theorem dvd_of_intCast_algMod {n j k : ℤ} (hn : (n : ℂ) ≠ 0)
+    (h : (j : ℂ) ≡ (k : ℂ) [ALGMOD n]) : n ∣ j - k := by
+  rw [OddOrder.AlgInt.cong_def] at h
+  set q : ℚ := ((j : ℚ) - (k : ℚ)) / (n : ℚ) with hqdef
+  have hqcast : (q : ℂ) = ((j : ℂ) - (k : ℂ)) / (n : ℂ) := by rw [hqdef]; push_cast; ring
+  rw [← hqcast] at h
+  obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.isIntegral_rat_imp_int h
+  have hn0 : n ≠ 0 := Int.cast_ne_zero.mp hn
+  have hnℚ : (n : ℚ) ≠ 0 := Int.cast_ne_zero.mpr hn0
+  have hqm : q = (m : ℚ) := by exact_mod_cast hm
+  rw [hqdef, div_eq_iff hnℚ] at hqm
+  refine ⟨m, ?_⟩
+  have hQ : ((j - k : ℤ) : ℚ) = ((n * m : ℤ) : ℚ) := by push_cast; linear_combination hqm
+  exact_mod_cast hQ
+
 /-- **Regular-character decomposition value (Peterfalvi (6.8.2.2) core relation).**  If `f` is a
 class function constant on `Γ^#` and `φ` is a nontrivial *linear* irreducible character
 (`φ(1) = 1`), then `f(1) − f(z) = |Γ|·⟨f, φ⟩` for any `z ≠ 1`.  This is the substance of
@@ -177,7 +200,7 @@ theorem SibleyDadeHypothesis.Yset_mapRingEquiv_mem (hyp : SibleyDadeHypothesis G
 /-- **(6.8.2.1) input — `hZA`.**  Every nontrivial element of `⁅H, H⁆` maps into `H^# = sharpImage H`.
 Since `⁅H, H⁆ ≤ H`, a nontrivial `z ∈ ⁅H, H⁆` lands in `H` with `(z : G) ≠ 1`. -/
 theorem SibleyDadeHypothesis.coe_mem_sharpImage_of_mem_commutator
-    (hyp : SibleyDadeHypothesis G L H) {z : ↥L} (hz : z ∈ ⁅H, H⁆) (hz1 : z ≠ 1) :
+    (_hyp : SibleyDadeHypothesis G L H) {z : ↥L} (hz : z ∈ ⁅H, H⁆) (hz1 : z ≠ 1) :
     (L.subtype z) ∈ sharpImage H := by
   have hzH : z ∈ H := by
     have hle : ⁅H, H⁆ ≤ H := by
@@ -309,12 +332,12 @@ theorem SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage
       by_contra h; exact hxnotH (hindW2 (ClassFunction.mem_support.mpr h))
     have h2' : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)) x = 0 := by
       by_contra h; exact hxnotH (hη₁supp (ClassFunction.mem_support.mpr h))
-    exact hx (by simp only [ClassFunction.sub_apply, ClassFunction.smul_apply, smul_eq_mul,
+    exact hx (by simp only [ClassFunction.sub_apply, ClassFunction.smul_apply,
       h1', h2', mul_zero, sub_zero])
   have hxne : x ≠ 1 := by
     intro hx1
     refine hx ?_
-    simp only [hx1, ClassFunction.sub_apply, ClassFunction.smul_apply, smul_eq_mul, h1, sub_self]
+    simp only [hx1, ClassFunction.sub_apply, ClassFunction.smul_apply, h1, sub_self]
   change (x : G) ∈ sharpImage H
   exact ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, fun hx1G => hxne (Subtype.ext hx1G)⟩
 
@@ -420,7 +443,7 @@ theorem SibleyDadeHypothesis.coherentYset_extension_eq_zsmul_irreducible
 (`|N_G(Ĥ) ⊓ C_G(w)| = |L|` for all `w ∈ W₂^#`) — the second half of `peterfalvi_67_of_odd`'s
 `hconst`, the analogue of the Frobenius `inf_centralizer_centralCommutator_map`. -/
 theorem SibleyDadeHypothesis.inf_centralizer_eq_of_mem_center
-    (hyp : SibleyDadeHypothesis G L H) {w : ↥L} (hwc : w ∈ Subgroup.center ↥L) :
+    (_hyp : SibleyDadeHypothesis G L H) {w : ↥L} (hwc : w ∈ Subgroup.center ↥L) :
     (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = L := by
   rw [inf_eq_left]
   intro g hg
