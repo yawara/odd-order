@@ -73,6 +73,48 @@ private theorem exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank [Finite G] {
       Subgroup.card_map_of_injective B.subtype_injective]
     exact hK_card
 
+/-- If `A ⊔ N = ⊤` with `N ⊴` and `r ∤ |N|`, then `r ∤ [⊤:A]`. (Replicated from S12_Proposition1215.) -/
+private theorem not_dvd_index_of_sup_top_normal {K' : Type*} [Group K'] [Finite K'] {r : ℕ}
+    {A N : Subgroup K'} [N.Normal] (htop : A ⊔ N = ⊤) (hrN : ¬ r ∣ Nat.card ↥N) :
+    ¬ r ∣ A.index := by
+  have hform := Subgroup.card_HK_mul_card_inf_eq_card_mul_card A N
+  rw [show (↑A * ↑N : Set K') = ↑(A ⊔ N : Subgroup K') from (Subgroup.mul_normal A N).symm] at hform
+  have hsup_dvd : Nat.card ↥(A ⊔ N : Subgroup K') ∣ Nat.card ↥A * Nat.card ↥N := ⟨_, hform.symm⟩
+  rw [htop, Nat.card_congr (Subgroup.topEquiv).toEquiv] at hsup_dvd
+  have hidx_dvd : A.index ∣ Nat.card ↥N := by
+    have h2 : Nat.card ↥A * A.index ∣ Nat.card ↥A * Nat.card ↥N := by
+      rw [A.card_mul_index]; exact hsup_dvd
+    exact (Nat.mul_dvd_mul_iff_left (Nat.card_pos)).mp h2
+  exact fun h => hrN (h.trans hidx_dvd)
+
+/-- `pRank` is preserved by a subgroup of `r`-coprime index (`r` prime). (Replicated from
+S12_Proposition1215.) -/
+private theorem pRank_eq_of_le_of_not_dvd_index {G : Type*} [Group G] [Finite G] {r : ℕ}
+    [Fact r.Prime] {H K : Subgroup G} (hHK : H ≤ K)
+    (hidx : ¬ r ∣ (H.subgroupOf K).index) : pRank ↥H r = pRank ↥K r := by
+  obtain ⟨R⟩ : Nonempty (Sylow r ↥H) := inferInstance
+  set Rincl : Subgroup ↥K := (R : Subgroup ↥H).map (Subgroup.inclusion hHK) with hRincl
+  have hcardRincl : Nat.card ↥Rincl = r ^ (Nat.card ↥K).factorization r := by
+    have hidxcard : Nat.card ↥H * (H.subgroupOf K).index = Nat.card ↥K := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv]
+      exact (H.subgroupOf K).card_mul_index
+    have hidx_ne : (H.subgroupOf K).index ≠ 0 := by
+      intro h; rw [h, mul_zero] at hidxcard; exact (Nat.card_pos).ne' hidxcard.symm
+    have hfact : (Nat.card ↥K).factorization r = (Nat.card ↥H).factorization r := by
+      rw [← hidxcard, Nat.factorization_mul (Nat.card_pos).ne' hidx_ne, Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
+    rw [hRincl, Subgroup.card_map_of_injective (Subgroup.inclusion_injective hHK),
+      R.card_eq_multiplicity, hfact]
+  have eR : ↥(R : Subgroup ↥H) ≃* ↥Rincl :=
+    hRincl ▸ Subgroup.equivMapOfInjective _ (Subgroup.inclusion hHK)
+      (Subgroup.inclusion_injective hHK)
+  have hSylK : pRank ↥Rincl r = pRank ↥K r := by
+    have h := pRank_sylow_eq (Sylow.ofCard Rincl hcardRincl)
+    rwa [Sylow.coe_ofCard] at h
+  rw [← pRank_sylow_eq R, ← hSylK]
+  exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
+    (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
+
 /-- **Core of 12.16(a)** with the extra hypothesis `Y ⊆ M_σ` (the conjugated setup). If
 `r_p(N_H(Y)) ≥ 2`, a rank-2 `A ∈ ℰ_p²(N_H(Y))` (after moving into `M`) makes `p ∈ τ₂(M)`, and
 Thm 12.5(e) gives `M_σ ∩ H* = ⊥` for a maximal `H* ⊇ A` (`≠ M`) — but `1 ⊂ Y ⊆ M_σ ∩ H*`. -/
@@ -152,9 +194,49 @@ private theorem pRank_normalizer_le_one_core [Finite G] (hG : IsMinimalSimpleOdd
     -- Prop 12.15: `M*` not conjugate to `M`, plus the `(M ∩ M*)`-factorization (d)/(e).
     have h1215 := sigma_subgroup_maximal_interaction hG hM hqσ hYM_le hYne hYq hMstarMem hMstarne
       hSle hYS hSq hSmax
-    -- TODO: from `h1215`, get `M* = (M ∩ M*)K`, `K` a `p'`-group; conjugate `A` into `M ∩ M* ⊆ M`;
-    -- then `hcontra (A^h) … Mstar`.
-    sorry
+    -- `M* = (M ∩ M*)K` with `K = M*_β` (if `q ∈ σ(M*)`) or `K = M*_σ` (if `q ∉ σ(M*)`), `K ⊴ M*`,
+    -- and `K` a `p'`-group: `M*_β`-primes ⊆ `β(M*)` and `p ∉ β(M*)` (`¬idealPrime p`); for `M*_σ`,
+    -- `p ∈ π(M) ∩ σ(M*) ⊆ β(M*)` by (12.3), contradiction.
+    obtain ⟨K, hKnorm, hMstarFact, hpK⟩ :
+        ∃ K : Subgroup G, (K.subgroupOf Mstar).Normal ∧ Mstar = (M ⊓ Mstar) ⊔ K ∧
+          ¬ p ∣ Nat.card ↥K := by
+      by_cases hqσMstar : q ∈ S10.sigma Mstar
+      · refine ⟨S10.Mbeta Mstar, by rw [S10.Mbeta_subgroupOf]; infer_instance,
+          (h1215.2.2.2.1 hqσMstar).1, fun hdvd => hpβ ?_⟩
+        exact ((S10.mem_beta_iff Mstar p).mp (S10.Mbeta_isPiGroup Mstar p
+          (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))).2
+      · refine ⟨S10.Msigma Mstar, by rw [S10.Msigma_subgroupOf]; infer_instance, ?_,
+          fun hdvd => hpβ ?_⟩
+        · rw [sup_comm]; exact (h1215.2.2.2.2 hqσMstar).2.2.2.symm
+        · have hp_πM : p ∈ (Nat.card ↥M).primeFactors :=
+            Nat.primeFactors_mono (Subgroup.card_dvd_of_le h.E_le) Nat.card_pos.ne' hpE
+          have hp_σMstar : p ∈ S10.sigma Mstar := S10.Msigma_isPiGroup Mstar p
+            (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+          exact ((S10.mem_beta_iff Mstar p).mp ((h1215.2.2.2.2 hqσMstar).2.1 p hp_πM hp_σMstar)).2
+    -- `[M* : M ∩ M*] ∣ |K|` is `p'`, so `pRank(M ∩ M*) p = pRank(M*) p ≥ 2` (`A ≤ M*` rank-2); thus
+    -- `M ∩ M*` contains a rank-2 `B ∈ ℰ_p²`, and `hcontra B … M*` (with `M* ≠ M`, `Y ≤ M*`) closes.
+    have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
+    have hidx : ¬ p ∣ ((M ⊓ Mstar).subgroupOf Mstar).index := by
+      haveI := hKnorm
+      have htop : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
+      exact not_dvd_index_of_sup_top_normal htop
+        (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKle).toEquiv]; exact hpK)
+    have hAMstar : A ≤ Mstar := hANY.trans hMstar_ge
+    have hpRankMstar : 2 ≤ pRank ↥Mstar p := by
+      have hAsubMstar : (A.subgroupOf Mstar).IsElementaryAbelian p :=
+        IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAMstar).symm
+          (mem_elemAbelianOfRank.mp hAea).1
+      have hle := le_pRank (A.subgroupOf Mstar) hAsubMstar
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAMstar).toEquiv,
+        (mem_elemAbelianOfRank.mp hAea).2, Nat.log_pow (Fact.out : p.Prime).one_lt] at hle
+    have hpRankMM : 2 ≤ pRank ↥(M ⊓ Mstar) p := by
+      rw [pRank_eq_of_le_of_not_dvd_index inf_le_right hidx]; exact hpRankMstar
+    obtain ⟨B, hBea, hBMM⟩ :=
+      exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank (Fact.out : p.Prime) hpRankMM
+    exact hcontra B hBea (hBMM.trans inf_le_left) Mstar
+      (mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hBMM.trans inf_le_right⟩)
+      hMstarne (Subgroup.le_normalizer.trans hMstar_ge)
 
 /-- **BG Corollary 12.16(a)** (mmd L3453-3456), **`q`-group specialization**: for a nonidentity
 `q`-group `Y` with `q ∈ σ(M)`, `r_p(N_H(Y)) ≤ 1`. This is what Lane G needs (S13_Lemma131 supplies
