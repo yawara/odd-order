@@ -63,7 +63,11 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
     (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y) :
     ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
-  sorry
+  -- `M_σ = O_{σ(M)}(M)` is the *normal* Hall `σ(M)`-subgroup of `M`, so it contains every
+  -- `σ(M)`-subgroup of `M` outright (no conjugation needed: take `g = 1`).
+  refine ⟨1, M.one_mem, ?_⟩
+  simp only [map_one, one_smul]
+  exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hYM hYpi
 
 /-- **BG Corollary 12.16(a)** (mmd L3453-3456): `Y` を `G` の非自明 `σ(M)`-部分群、
 `p ∈ π(E) ∩ β(G)'`、`H ∈ ℳ(Y)` を `M` と非共役な極大部分群とすると `r_p(N_H(Y)) ≤ 1`。
@@ -461,31 +465,9 @@ Case 1・Case 2 は完了、Case 3 (`frobFact_of_abelianSylow`, τ₂-集約) �
 
 /-! ## §12 σ(M) の埋め込みと一意性 (mmd L3385-3479) -/
 
-/-- **BG Proposition 12.15** (mmd L3387): `q ∈ σ(M)`, `X` を `M` の非自明 `q`-部分群、
-`M* ∈ ℳ(N_G(X)) - {M}`、`S` を `X` を含む `M ∩ M*` の Sylow `q`-部分群とすると
-(a) `M*` は `M` と非共役; (b) `N_G(S) ⊆ M`; (c) `S` は `M*` の Sylow `q`;
-(d) `q ∈ σ(M*)` なら `M*=(M∩M*)M*_β`, `τ₁(M*)⊆τ₁(M)∪α(M)`, `M_β=M_α≠1`;
-(e) `q ∉ σ(M*)` なら `q ∈ τ₂(M*)`, `π(M)∩σ(M*)⊆β(M*)`, `M∩M*` は `M*_σ` の補群。 -/
-theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
-    (hq : q ∈ S10.sigma M) {X : Subgroup G} (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXq : IsPGroup q ↥X)
-    {Mstar : Subgroup G}
-    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)))
-    (hMstarne : Mstar ≠ M) {S : Subgroup G} (hSle : S ≤ M ⊓ Mstar) (hXS : X ≤ S)
-    (hSq : IsPGroup q ↥S)
-    (hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T) :
-    (¬ ∃ g : G, MulAut.conj g • M = Mstar) ∧
-    Subgroup.normalizer (S : Set G) ≤ M ∧
-    (∀ T : Subgroup G, T ≤ Mstar → IsPGroup q ↥T → S ≤ T → S = T) ∧
-    (q ∈ S10.sigma Mstar →
-      Mstar = (M ⊓ Mstar) ⊔ S10.Mbeta Mstar ∧
-      tau1 Mstar ⊆ tau1 M ∪ S10.alpha M ∧
-      S10.Mbeta M = S10.Malpha M ∧ S10.Malpha M ≠ ⊥) ∧
-    (q ∉ S10.sigma Mstar →
-      q ∈ tau2 Mstar ∧
-      (∀ r ∈ (Nat.card ↥M).primeFactors, r ∈ S10.sigma Mstar → r ∈ S10.beta Mstar) ∧
-      S10.Msigma Mstar ⊓ (M ⊓ Mstar) = ⊥ ∧ S10.Msigma Mstar ⊔ (M ⊓ Mstar) = Mstar) := by
-  sorry
+/-! **BG Proposition 12.15** (`sigma_subgroup_maximal_interaction`) は `S12_Proposition1215.lean`
+に移動した(証明は Thm 12.5(e) / Cor 12.6 / Cor 12.10(d) / Lemma 12.2(a)(b) / Cor 10.9 を要し、
+それらの leaf は S12_E より downstream ゆえ in-place 証明不可; 12.13 と同型に downstream leaf へ)。 -/
 
 /-- For an `α(M)'`-subgroup `X` of `M` (`X ≠ 1`) with `ℳ(N_G(X)) ≠ {M}`, the centralizer
 `C_{M_α}(X)` has rank `≤ 1`. Contrapositive of Lemma 10.3: rank `≥ 2` would make `C_M(X)`

@@ -53,6 +53,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4409,3 +4410,15 @@ each generator centralized by a rank-2 `A ∈ ℰ²(Q)` hence inside `M⋆` by 1
 `M, M⋆`, contradicting line-conjugacy + ℳ-uniqueness. Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.nonabelian_pgroup_isUniquelyMaximal
+
+/-! **BG Proposition 12.15** (`S12_Proposition1215`, σ-prime ↔ maximal interaction): for `q ∈ σ(M)`,
+a nonidentity `q`-subgroup `X ⊆ M`, and `M⋆ ∈ ℳ(N_G(X)) − {M}`, with `S = Syl_q(M ∩ M⋆) ⊇ X`,
+the five conclusions (`sigma_subgroup_maximal_interaction`): (a) `M⋆` not `G`-conjugate to `M`;
+(b) `N_G(S) ⊆ M`; (c) `S` is the unique Sylow-`q` of `G` in `M⋆`; (d) if `q ∈ σ(M⋆)` then the
+`M⋆=(M∩M⋆)M⋆_β` factorization, the prime-guarded τ₁-transfer `∀ r prime, r∈τ₁(M⋆) → r∈τ₁(M)∪α(M)`
+(shared Sylow `Syl_r(M∩M⋆)` of both `M`, `M⋆` via the `M_β`/`M⋆_β` diamonds), and `M_β=M_α≠1`;
+(e) if `q ∉ σ(M⋆)` then `q∈τ₂(M⋆)`, `π(M)∩σ(M⋆)⊆β(M⋆)`, and `M∩M⋆` is an `M⋆_σ`-complement.
+The τ₁ inclusion is prime-restricted (BG's `τᵢ ⊆ π(M)` are sets of primes; the repo's `pRank`-based
+`tau1` ranges over `ℕ`). Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_maximal_interaction
