@@ -2417,3 +2417,32 @@ mathlib/CentralProduct に無く、`Subgroup.coe_mul_of_left_le_normalizer_right
 自己交換子 `⁅S,S⁆≤S` は `commutator_le.mpr` で。(5) 要素 commutator は `open scoped commutatorElement`。
 
 **▶ Lane F §12 = 完了(STOP)**。次任務(§14 想定)はユーザー/HUB が再判断。leaf は本 commit で tracked 化。
+
+---
+
+## session 23 cont.² (2026-06-14, Lane F): Cor 12.16 一般形 → §13 de-axiom 完了 (2 sorry discharge)
+
+**HUB 指示の訂正対応**: §12 残 2 sorry (S12_E の Cor 12.16(a)(b) 一般 hYpi forward-decl) は
+「HUB/Lane G 調整事項」でなく **Lane F の配線タスク**だった。`S13_Lemma131:424/560`
+(bg-s12 tree 内、main merge 経由で存在) が `S12.sigma_subgroup_pRank_normalizer_le_one` /
+`…not_mem_primeFactors_derived_of_tau1` を一般形で cite しており、bg-s12 build で load-bearing。
+
+**✅✅✅ 2 sorry discharge 完了** (full build 3803 green, AxiomsCheck OK 両一般形 3 axioms 全 allowlist):
+- **一般 σ(M)-subgroup 形を `S12_Corollary1216` の `namespace …S12` に PROVEN 実装** —
+  `sigma_subgroup_pRank_normalizer_le_one` / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`。
+  q-group 形 (`Cor1216.pRank_normalizer_le_one` 等) へ **characteristic `q`-subgroup `O_q(Y)`** で reduce:
+  helper `exists_char_qSubgroup` (Y solvable [< ⊤] nontrivial ⟹ `F(Y)≠⊥` [`Ch01.fitting_ne_bot_of_solvable_nontrivial`]
+  ⟹ ∃ q∈primeFactors|F(Y)|, `O_q(F(Y))≠⊥` [`opiCoreInG_singleton_fittingInG_ne_bot_of_mem_primeFactors`]
+  `≤ O_q(Y)` [`opiCoreInG_fittingInG_le_opiCoreInG`]; `O_q(↥Y)` characteristic [`oPiCore.characteristic` instance]
+  ⟹ `N_G(Y) ≤ N_G(O_q(Y))` [`AppB.normalizer_le_normalizer_map_of_characteristic`]; q∈σM [hYpi q | |F(Y)| | |Y|])。
+  (a) は q-group 形を `O_q(Y)` に適用 + `pRank_le_of_injective` で `H⊓N(Y)≤H⊓N(O_q(Y))` lift;
+  (b) は `derivedInG_mono` + `card_dvd` で primeFactors 包含 lift。
+- **S12_E の forward-decl 2件削除** (comment pointer 化) ⟹ §12 **完全 sorry-free**。
+- **`S13_Lemma131` の import を `S12_E`→`S12_Corollary1216` に差替** ⟹ cite (`open …S12` で unqualified)
+  が新一般形 (proven) に解決 ⟹ §13 Lemma 13.1 / Cor 13.2 の Cor 12.16 依存が **unconditional 化**
+  (S13_Lemma131/S13_Corollary132 build green; §13 の残 sorry は S13_PrimeAction/S13_Theorem134 の
+  Lane G 別件で本件無関係)。AxiomsCheck の §13 de-axiom コメント更新 + 一般形2件 assert 追加。
+
+**▶ Lane F §12 = 完全完了** (12.1-12.18 + Thm 12.12 + 12.13/12.14/12.15/12.16 すべて sorry-free)。
+次任務 (§14 想定) はユーザー/HUB 再判断。再利用知見: solvable subgroup の char q-subgroup = `O_q(Y)`
+(F(Y) 経由で nontrivial 化, `oPiCore.characteristic` instance, `normalizer_le_normalizer_map_of_characteristic`)。

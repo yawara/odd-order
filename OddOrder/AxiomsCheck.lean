@@ -3730,14 +3730,13 @@ axiom(s):{indentD m!"{bad.toList}"}"
 
 /-! #### BG §13 Lemma 13.1 / Corollary 13.2 (de-axiom 済, issues 8000/0065)
 
-Lemma 13.1 と Corollary 13.2 は BG Corollary 12.16(a)(b) を本質的に使う。当初は §12 に faithful な
-statement が無く provisional forward axiom (`cor1216_*`) で進めたが、Lane F が S12_E に faithful な
-sorry'd statement (`sigma_subgroup_pRank_normalizer_le_one` /
-`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, issue 0065) を露出したのを受け、cite 先を
-それらへ差し替えて **de-axiom 済** (2026-06-13)。よって §13 は新規 axiom 0 で repo 標準の
-scaffold-sorry 規約に準拠する: 13.1(b)(c)・full assembly・Cor 13.2 は S12_E Cor 12.16 の sorry に
-bottom-out するため `#assert_*` 対象外 (§12 cascade が proof を埋めれば自動 unconditional 化)。
-13.1(a) のみ S12_E Cor 12.16 に非依存で axiom-clean ゆえ下記で pin する。 -/
+Lemma 13.1 と Corollary 13.2 は BG Corollary 12.16(a)(b) を本質的に使う。当初は provisional forward
+axiom (`cor1216_*`) → S12_E の sorry'd faithful statement (issue 0065) へ差し替えて de-axiom した。
+**2026-06-14: Lane F が Cor 12.16 の一般 `σ(M)`-subgroup 形を `S12_Corollary1216` に PROVEN で実装**
+(`S12.sigma_subgroup_pRank_normalizer_le_one` / `…not_mem_primeFactors_derived_of_tau1`,
+characteristic `q`-subgroup `O_q(Y)` で `q`-group 形へ reduce; sorry-free・axiom-clean、上で `#assert`
+済)し、`S13_Lemma131` の cite 先を S12_E (sorry'd, 削除済) から本一般形へ差し替えた ⟹ **§13 の
+Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out しない)。13.1(a) `#assert` を下記に維持。 -/
 
 -- BG Lemma 13.1(a): every `p`-subgroup of `M ⊓ M*` centralizes `M_σ ⊓ M*`
 -- (S12_E Cor 12.16 に非依存; axiom-clean).
@@ -4446,3 +4445,11 @@ unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1216.pRank_normalizer_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1216.not_mem_primeFactors_derived_of_tau1
+
+/-! **BG Corollary 12.16** (general `σ(M)`-subgroup form, `S12_Corollary1216`): the `q`-group forms
+above lift to an arbitrary nonidentity `σ(M)`-subgroup `Y` via a characteristic `q`-subgroup
+`O_q(Y)` (`N_G(Y) ≤ N_G(O_q(Y))`, `pRank`/`derivedInG` monotone). These are what `S13_Lemma131` now
+cites (replacing the former S12_E `sorry`'d forward-decls); fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_pRank_normalizer_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_not_mem_primeFactors_derived_of_tau1

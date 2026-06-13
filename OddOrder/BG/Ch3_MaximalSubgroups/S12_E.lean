@@ -64,31 +64,10 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
   simp only [map_one, one_smul]
   exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hYM hYpi
 
-/-- **BG Corollary 12.16(a)** (mmd L3453-3456): `Y` を `G` の非自明 `σ(M)`-部分群、
-`p ∈ π(E) ∩ β(G)'`、`H ∈ ℳ(Y)` を `M` と非共役な極大部分群とすると `r_p(N_H(Y)) ≤ 1`。
-(BG Cor 12.16 の (a) 条項。前置節「`Y` は `M_σ` に共役」は `sigma_subgroup_conj_into_Msigma`。
-本体 proof は §12 cascade で後続。Lane G の forward axiom de-axiom 用 faithful scaffold。) -/
-theorem sigma_subgroup_pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
-    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
-    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
-    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
-    pRank ↥(H ⊓ Subgroup.normalizer (Y : Set G)) p ≤ 1 := by
-  sorry
-
-/-- **BG Corollary 12.16(b)** (mmd L3453, 3456): 同設定で `p ∈ τ₁(M)` なら
-`p ∉ π(N_H(Y)')` (= `p ∤ |(H ⊓ N_G(Y))'|`)。本体 proof は §12 cascade で後続。 -/
-theorem sigma_subgroup_not_mem_primeFactors_derived_of_tau1 [Finite G]
-    (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
-    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
-    (hpτ1 : p ∈ tau1 M)
-    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
-    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
-    p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
-  sorry
+/-! **BG Corollary 12.16(a)(b)** (一般 `σ(M)`-subgroup 形, `sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`) は `S12_Corollary1216.lean` に移動した
+(`q`-group 形を要する downstream leaf; characteristic `q`-subgroup `O_q(Y)` で general へ reduce)。
+S13_Lemma131 はそちらを cite する(import を `S12_Corollary1216` へ)。 -/
 
 /-- **BG Lemma 12.17** (mmd L3448): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
 (原典の `M_σ ∩ M^g` cyclic 評価は後続。) -/

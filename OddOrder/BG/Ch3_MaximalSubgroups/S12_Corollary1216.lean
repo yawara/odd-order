@@ -24,10 +24,11 @@ For a nonidentity `σ(M)`-subgroup `Y` of `G`, every prime `p ∈ π(E) ∩ β(G
 … → S12_Lemma1218 → S12_E)。よって `S12_E` は 12.15 を import できず (循環)、12.16 を S12_E 内で
 in-place 証明できない。Thm 12.13 / Prop 12.15 と同じく **downstream leaf** 化が解。
 
-Lane G の `S13_Lemma131` は S12_E の sorry'd `sigma_subgroup_pRank_normalizer_le_one` /
-`sigma_subgroup_not_mem_primeFactors_derived_of_tau1` を cite 済み。本 leaf の証明完成後、
-**HUB が merge 時に Lane G の cite を本 leaf (`S12.Cor1216.*`) へ re-point** する (de-axiom;
-確立済パターン)。Lane F は lane 規約に従い S13 を編集しない。
+本 leaf 末尾 (`namespace …S12`) に **一般 `σ(M)`-subgroup 形** `sigma_subgroup_pRank_normalizer_le_one`
+/ `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` を証明済 (下記の `q`-group 形へ
+characteristic `q`-subgroup `O_q(Y)` で reduce)。`S13_Lemma131` は旧 `S12_E` の sorry'd forward-decl
+(削除済) でなく本一般形を cite する (import を `S12_Corollary1216` へ) ⟹ §13 Lemma 13.1 の Cor 12.16
+依存は unconditional 化 (2026-06-14, Lane F, de-axiom 完了)。
 
 ## 証明スケッチ (BG L3458-3476)
 
@@ -304,10 +305,9 @@ private theorem pRank_normalizer_le_one_core [Finite G] (hG : IsMinimalSimpleOdd
       hMstarne (Subgroup.le_normalizer.trans hMstar_ge)
 
 /-- **BG Corollary 12.16(a)** (mmd L3453-3456), **`q`-group specialization**: for a nonidentity
-`q`-group `Y` with `q ∈ σ(M)`, `r_p(N_H(Y)) ≤ 1`. This is what Lane G needs (S13_Lemma131 supplies
-`Y` as a `q`-group via `IsPGroup q Y`); the general `σ(M)`-subgroup form of S12_E's forward-decl
-`sigma_subgroup_pRank_normalizer_le_one` reduces to this via a characteristic `q`-subgroup `X ⊆ Y`
-(deferred wrapper). HUB が Lane G の cite を本 lemma へ re-point (G は `hYq`/`hqσ` を保持)。 -/
+`q`-group `Y` with `q ∈ σ(M)`, `r_p(N_H(Y)) ≤ 1`. The general `σ(M)`-subgroup form
+`S12.sigma_subgroup_pRank_normalizer_le_one` (below, in `namespace …S12`) reduces to this via a
+characteristic `q`-subgroup `O_q(Y) ⊆ Y` (`N_G(Y) ≤ N_G(O_q(Y))`); `S13_Lemma131` cites that. -/
 theorem pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {Y : Subgroup G} (hYne : Y ≠ ⊥) {q : ℕ} [Fact q.Prime] (hYq : IsPGroup q ↥Y)
@@ -504,3 +504,92 @@ theorem not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd
   rwa [← hcardeq]
 
 end OddOrder.BG.Ch3.S12.Cor1216
+
+namespace OddOrder.BG.Ch3.S12
+
+open OddOrder.GroupTheory
+open OddOrder.Isaacs
+open scoped Pointwise
+
+variable {G : Type*} [Group G]
+
+/-- **Char `q`-subgroup reduction** for the general `σ(M)`-subgroup form of Cor 12.16: a nonidentity
+`σ(M)`-subgroup `Y < ⊤` has a nonidentity characteristic `q`-subgroup `X = O_q(Y)` (`q ∈ σ(M)`)
+with `N_G(Y) ≤ N_G(X)`. (`Y` solvable ⟹ `F(Y) ≠ ⊥`; `O_q(F(Y)) ≠ ⊥ ⊆ O_q(Y)` for `q ∣ |F(Y)|`;
+`O_q(↥Y)` is characteristic so its normalizer contains `N_G(Y)`.) -/
+private theorem exists_char_qSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Y : Subgroup G} (hYne : Y ≠ ⊥) (hYlt : Y < ⊤)
+    (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y) :
+    ∃ q : ℕ, q.Prime ∧ ∃ X : Subgroup G,
+      X ≤ Y ∧ X ≠ ⊥ ∧ IsPGroup q ↥X ∧ q ∈ S10.sigma M ∧
+        Subgroup.normalizer (Y : Set G) ≤ Subgroup.normalizer (X : Set G) := by
+  haveI : IsSolvable ↥Y := hG.solvable_of_lt_top Y hYlt
+  haveI : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hYne
+  have hFcard_ne : Nat.card ↥(Ch2.S08.fittingInG Y) ≠ 1 := by
+    rw [Ch2.S08.fittingInG, Subgroup.card_map_of_injective Y.subtype_injective]
+    exact fun hc => Ch01.fitting_ne_bot_of_solvable_nontrivial ↥Y (Subgroup.card_eq_one.mp hc)
+  obtain ⟨q, hq_mem⟩ : (Nat.card ↥(Ch2.S08.fittingInG Y)).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr
+      (lt_of_le_of_ne (Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne') (Ne.symm hFcard_ne))
+  have hq_prime : q.Prime := Nat.prime_of_mem_primeFactors hq_mem
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hOqFne : opiCoreInG ({q} : Set ℕ) (Ch2.S08.fittingInG Y) ≠ ⊥ :=
+    Ch2.S08.opiCoreInG_singleton_fittingInG_ne_bot_of_mem_primeFactors hq_mem
+  have hOqYne : opiCoreInG ({q} : Set ℕ) Y ≠ ⊥ := fun hbot =>
+    hOqFne (le_bot_iff.mp (hbot ▸ Ch2.S08.opiCoreInG_fittingInG_le_opiCoreInG {q} Y))
+  have hqσ : q ∈ S10.sigma M := hYpi q (Nat.mem_primeFactors.mpr
+    ⟨hq_prime, (Nat.dvd_of_mem_primeFactors hq_mem).trans
+      (Subgroup.card_dvd_of_le (Ch2.S08.fittingInG_le Y)), Nat.card_pos.ne'⟩)
+  refine ⟨q, hq_prime, opiCoreInG ({q} : Set ℕ) Y, opiCoreInG_le _ _, hOqYne,
+    isPGroup_opiCoreInG_singleton Y, hqσ, ?_⟩
+  exact OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+    (K := Y) (W := Ch03.oPiCore {q} ↥Y)
+
+/-- **BG Corollary 12.16(a)** (general `σ(M)`-subgroup form, mmd L3453-3456): for a nonidentity
+`σ(M)`-subgroup `Y`, every `p ∈ π(E) ∩ β(G)'`, and every `H ∈ ℳ(Y)` not conjugate to `M`,
+`r_p(N_H(Y)) ≤ 1`. Reduces to the `q`-group form `Cor1216.pRank_normalizer_le_one` via a
+characteristic `q`-subgroup `X ⊆ Y` (`N_G(Y) ≤ N_G(X)`, `pRank` monotone). -/
+theorem sigma_subgroup_pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
+    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    pRank ↥(H ⊓ Subgroup.normalizer (Y : Set G)) p ≤ 1 := by
+  have hHco : IsCoatom H := (mem_maximalSubgroupsContaining.mp hHY).1
+  have hYH : Y ≤ H := (mem_maximalSubgroupsContaining.mp hHY).2
+  have hYlt : Y < ⊤ := lt_of_le_of_lt hYH hHco.lt_top
+  obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hHX : H ∈ maximalSubgroupsContaining X :=
+    mem_maximalSubgroupsContaining.mpr ⟨hHco, hXY.trans hYH⟩
+  have hcore := Cor1216.pRank_normalizer_le_one hG h hXne hXq hqσ hpE hpβ hHX hHnc
+  exact le_trans (pRank_le_of_injective
+    (f := Subgroup.inclusion (inf_le_inf_left H hNYX)) (Subgroup.inclusion_injective _)) hcore
+
+/-- **BG Corollary 12.16(b)** (general `σ(M)`-subgroup form): same setup, if `p ∈ τ₁(M)` then
+`p ∉ π(N_H(Y)')`. Reduces to `Cor1216.not_mem_primeFactors_derived_of_tau1` via the same
+characteristic `q`-subgroup (`derivedInG` monotone). -/
+theorem sigma_subgroup_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    (hpτ1 : p ∈ tau1 M)
+    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
+    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
+  have hHco : IsCoatom H := (mem_maximalSubgroupsContaining.mp hHY).1
+  have hYH : Y ≤ H := (mem_maximalSubgroupsContaining.mp hHY).2
+  have hYlt : Y < ⊤ := lt_of_le_of_lt hYH hHco.lt_top
+  obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hHX : H ∈ maximalSubgroupsContaining X :=
+    mem_maximalSubgroupsContaining.mpr ⟨hHco, hXY.trans hYH⟩
+  have hcore := Cor1216.not_mem_primeFactors_derived_of_tau1 hG h hXne hXq hqσ hpE hpβ hpτ1 hHX hHnc
+  intro hp_mem
+  apply hcore
+  rw [Nat.mem_primeFactors] at hp_mem ⊢
+  exact ⟨hp_mem.1, hp_mem.2.1.trans (Subgroup.card_dvd_of_le
+    (Cor1216.derivedInG_mono (inf_le_inf_left H hNYX))), Nat.card_pos.ne'⟩
+
+end OddOrder.BG.Ch3.S12
