@@ -893,7 +893,7 @@ theorem SibleyDadeHypothesis.coherentYset_extension_Yset_diff_eq_tau
   rw [← map_sub]
   exact hyp.coherentYset.extends_on_supported (η' - η₁) hmem
 
-omit [Fintype G] [Fintype ↥L] in
+omit [Fintype G] [Fintype ↥L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
 /-- **Inertia of a class function on a central subgroup is everything.**  If `W₂ ≤ Z(↥L)` (so `W₂` is
 normal), conjugation by any `g ∈ ↥L` fixes each `w ∈ W₂` (`g·w·g⁻¹ = w`, centrality), hence
 `conjBy g φ = φ` for every class function `φ` of `W₂`, i.e. `I_{↥L}(φ) = ⊤`.
