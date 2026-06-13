@@ -1,5 +1,29 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢🟢 2026-06-13 (Lane F session 20, Opus 4.8): **Prop 12.15 = 9/11 — E⊇S infra COMPLETE + e.3b landed; 残 d.2/e.2**
+
+session 19 の E⊇S gap を **infra で解消**し e.3b 着地。**build 緑、実 sorry = d.2 / e.2 の 2 個**(9/11)。
+
+**新規 infra (S12_Proposition1215 内, sorry-free)**:
+- `subgroupESetup_of_complement (hM)(hE_le)(hcompl_inf)(hcompl_sup) : ∃E₁E₂E₃, SubgroupESetup M E …`
+  — `exists_subgroupESetup` の Hall-pieces 組立を「与えられた補群 E」でパラメタ化(複製)。
+- `exists_subgroupESetup_with_le (hM)(hAM:A≤M)(hA_pi:A は σ(M)'-群) : ∃E…, setup ∧ A≤E`
+  — `Ch03.hall_D` で σ'-Hall H⊇A.subgroupOf M 取得 → 補群 props(hcompl_inf=coprime,
+  hcompl_sup=`|H|=N.index` を σ/σ' index-part の coprime + dvd-antisymm で)→ `subgroupESetup_of_complement`。
+  ⚠ 教訓: **一般群の部分群束は modular でない**(`IsModularLattice (Subgroup C)` は **CommGroup 限定**)
+  → Dedekind は **正規部分群版を手で**(M_σ⊴ 経由, S12_Corollary126 と同型)。helper 2 (`pRank_eq_of_mulEquiv`
+  / `exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank`) も追加。S10 `normalizer_sylow_map_le_of_mem_sigma` de-private 済。
+- **e.3b** (`M*_σ⊔(M∩M*)=M*`): A∈ℰ²(S) に with_le で E*⊇A → E*≤N_G(A)⊆M (12.6(a)`elemAb_normal_in_E_of_tau2`.1.1
+  + 12.10(d)) → M∩M*=E* (正規 Dedekind + hMsM) → `E_compl_sup`。e.3a/hMsM/setup は refine 前に hoist 済。
+
+**残 2 (各 BG sub-argument が不明瞭・要精読)**:
+- **e.2** (`π(M)∩σ(M*)⊆β(M*)`): Cor 10.9(a)(1) (`beta_complement_centralizes`, S10_BetaRadical:241) の対偶で
+  Fact1「A は Syl_r(M*_σ) 非中心化」⟹ r>q は **clear**。だが Fact2「no Syl_r(M) centralizes Syl_q(M_σ)」⟹ q>r
+  が "C_G(A) `r'`-group" からどう出るか不明瞭(in-file コメントに詳細)。
+- **d.2** (`τ₁(M*)⊆τ₁(M)∪α(M)`): factorization M=(M∩M*)M_α / M*=(M∩M*)M*_α は有(h109_M/h109_star)。
+  τ₁=`{r∉σ ∧ r∉π(M') ∧ pRank=1}`。`r∉σ(M)` の sub-step が defs から非自明(session 19 参照)。
+▶ 次: e.2 Fact2 / d.2 r∉σ(M) の BG 精読。WIP 未 commit(S10 de-private + S12_E relocation + 新 leaf)。
+
 ## 🟢🚧 2026-06-13 (Lane F session 19, Opus 4.8): **Prop 12.15 = 8/11 parts COMPLETE; e.2/e.3b に E⊇S 構造 gap**
 
 session 18 から進展: **(d.1)(d.3a)(d.3b)(e.3a) 追加 landed** (計 8/11: a,b,c,e.1,d.1,d.3a,d.3b,e.3a)。
