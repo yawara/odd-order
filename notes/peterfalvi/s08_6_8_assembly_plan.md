@@ -943,3 +943,26 @@ Z prime 要)。case-B は w₂ prime ゆえ適用可。かつ **`hyp.tau = dadeI
 **⚠ 正直評価**: case-B coherence は sustained-expert 多セッション仕事 (各 step に sub-lemma 群)。loop-tick
 では incremental brick を積む方針。本 session 39 全体: faithful cases fix (cont.) + 正確 inventory (cont.²) +
 keystone `mapRingEquiv_induce`。**正本=本 session 39 cont.²。**
+
+## 2026-06-13 (session 39 cont.³, /loop): hSu = Yset Galois-closure landed (S08_CaseBCoherence)
+
+**✅ landed (build-green + axiom-clean, full build 3802)**: (6.8.2.1)-for-c2-case-B の discharge を 2 補題前進。
+- **`ClassFunction.mapRingEquiv_linearIrreducibleCharacter`** (一般): `σ(linear χ) = linear((Units.map σ)∘χ)`
+  (`mapRingEquiv_apply`+`linearIrreducibleCharacter_apply`+`Units.coe_map`、`rfl`)。
+- **`SibleyDadeHypothesis.Yset_mapRingEquiv_mem` = `hSu`** (Yset Galois-closed): η=Ind(linear χ)∈Y ⟹
+  σ(η)=Ind(linear((Units.map σ)∘χ))∈Y (`mapRingEquiv_induce`+上記 linear twist+`induce_linearIrreducibleCharacter_mem_Yset`;
+  χ'≠1 は `Units.map_injective σ.injective`)。
+
+### `extension_constant_on_sharp_of_prime` 適用に向けた discharge 状況 (coherentYset @ Z=W₂, case B):
+- ✅ hτ (coherentYset)、✅ hSirr (`isIrreducibleCharacter_of_mem_Yset`)、✅ hpair (`two_le_Yset_ncard`)、
+  ✅ hZp (w₂ prime)、✅ hlat (coherentYset.extension_mem_ZIrr)、✅ **hSu (本 session)**、✅ hA' (le_refl)。
+- 🔴 残 2: **hZA** (W₂^#⊆sharpImage H、W₂⊆[H,H]⊆H ゆえ易) + **hspan** (φ∈zSpan Yset, φ(1)=0 ⟹ supp⊆A')
+  + **hηx** (η const on W₂; η=Ind(linear θ), θ trivial on [H,H]⊇W₂, W₂⊆Z(H) ゆえ Ind 値計算)。
+  ※ hx/hy は適用時の W₂ 元 (case-B context で供給)。
+
+### ▶ 次の一手 (S08_CaseBCoherence で積む):
+1. **hZA** (易、case-B W₂≤[H,H] から) — 次の brick。
+2. **hηx** (η const on W₂) — Ind 値計算 (W₂ central + θ trivial on [H,H])。
+3. **hspan** (Yset span support 条件) — Yset 元は H 上 supported ゆえ。
+4. → `extension_constant_on_sharp_of_prime` を組んで **(6.8.2.1)-for-c2-case-B** 完成 (η^{τ₁} const on W₂^#)。
+→ (6.8.2.2) [(6.7)合同] → (6.8.2.3) → τ₂。**正本=本 session 39 cont.³。**

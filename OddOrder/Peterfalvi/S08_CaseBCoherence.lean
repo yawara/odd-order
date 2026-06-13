@@ -57,4 +57,55 @@ theorem ClassFunction.mapRingEquiv_induce {H : Subgroup G} [Fintype G]
   · rw [induceTerm_of_mem _ hx, induceTerm_of_mem _ hx, mapRingEquiv_apply]
   · rw [induceTerm_of_not_mem _ hx, induceTerm_of_not_mem _ hx, map_zero]
 
+/-- **Galois twist of a linear character.**  For `σ : ℂ ≃+* ℂ` and a linear character
+`χ : H →* ℂˣ`, the `σ`-image of the class function `linearIrreducibleCharacter χ` is again a linear
+character, namely the one of the `σ`-twisted units homomorphism `(Units.map σ) ∘ χ`.  This is the
+linear-character case of the Galois-twist `character_galoisTwist` (`σ ∘ χ_ρ`), specialized so it
+feeds `mapRingEquiv_induce` directly. -/
+theorem ClassFunction.mapRingEquiv_linearIrreducibleCharacter {H : Type*} [Group H]
+    (σ : ℂ ≃+* ℂ) (χ : H →* ℂˣ) :
+    mapRingEquiv σ (linearIrreducibleCharacter χ : ClassFunction H ℂ)
+      = (linearIrreducibleCharacter ((Units.map (σ.toRingHom.toMonoidHom)).comp χ) :
+          ClassFunction H ℂ) := by
+  ext h
+  rw [mapRingEquiv_apply, linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply,
+    MonoidHom.comp_apply, Units.coe_map]
+  rfl
+
 end OddOrder.RepresentationTheory
+
+namespace OddOrder.Peterfalvi.S08
+
+open OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
+
+/-- **(6.8.2.1) input — the `Y = S(H')` family is closed under the cyclotomic Galois action.**
+For any `σ : ℂ ≃+* ℂ`, the `σ`-image of an `η ∈ Y` is again in `Y`.  Indeed every `η ∈ Y` is
+`Ind_H^L (linear χ)` with `χ ≠ 1` (`exists_linear_source_of_mem_Yset`); `σ` commutes with induction
+(`mapRingEquiv_induce`) and twists the linear source to `(Units.map σ) ∘ χ`
+(`mapRingEquiv_linearIrreducibleCharacter`), which is still a nontrivial linear character
+(`σ` injective), so the image is `Ind_H^L (linear ((Units.map σ) ∘ χ)) ∈ Y`.
+
+This is the `hSu` hypothesis of `S07.IsCoherent.extension_constant_on_sharp_of_prime`, used to
+establish Peterfalvi (6.8.2.1) (`η^{τ₁}` constant on `Z^#`) for the Sibley `Y`-coherence. -/
+theorem SibleyDadeHypothesis.Yset_mapRingEquiv_mem (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (σ : ℂ ≃+* ℂ) {φ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Yset) :
+    ClassFunction.mapRingEquiv σ φ ∈ hyp.Yset := by
+  obtain ⟨χ, hχ_ne, rfl⟩ := hyp.exists_linear_source_of_mem_Yset hφ
+  rw [ClassFunction.mapRingEquiv_induce, ClassFunction.mapRingEquiv_linearIrreducibleCharacter]
+  refine hyp.induce_linearIrreducibleCharacter_mem_Yset ?_
+  intro hχ'
+  refine hχ_ne ?_
+  have hinj : Function.Injective (Units.map (σ.toRingHom.toMonoidHom : ℂ →* ℂ)) :=
+    Units.map_injective (f := (σ.toRingHom.toMonoidHom : ℂ →* ℂ)) σ.injective
+  ext h
+  have key : Units.map (σ.toRingHom.toMonoidHom : ℂ →* ℂ) (χ h) = 1 := by
+    have h0 := DFunLike.congr_fun hχ' h
+    simpa [MonoidHom.comp_apply] using h0
+  have hh : χ h = 1 := hinj (key.trans (map_one _).symm)
+  simpa using hh
+
+end OddOrder.Peterfalvi.S08
