@@ -395,11 +395,161 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
 -- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
 -- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
 
-/-- **BG Theorem 13.5** (mmd L3570): `E₁ ≠ 1` なら `E₁` は `M_σ` に prime 作用。 -/
+/-- **BG Theorem 13.5** (mmd L3570): `E₁ ≠ 1` なら `E₁` は `M_σ` に prime 作用。
+
+`E₁` is cyclic (Lemma 12.1(d)). The crux is a *cross-prime* fact: for any prime-order element
+`x ∈ E₁`, `C_{M_σ}(x) = C_{M_σ}(E₁)`. `C_{M_σ}(E₁) ⊆ C_{M_σ}(x)` is free; for the reverse,
+`le_centralizer_of_forall_prime_isPGroup` reduces `E₁ ≤ C(C_{M_σ}(x))` to: every prime-power
+subgroup `R ≤ E₁` is centralized by `C_{M_σ}(x)`. Picking an order-`r` element `y ∈ R`,
+Theorem 13.4 (with `⟨x⟩ ∈ ℰ_p¹(E)` and `⟨y⟩ ∈ ℰ_r¹(C_E(⟨x⟩))`, valid since `E₁` is abelian) gives
+`C_{M_σ}(x) ⊆ C_{M_σ}(y) = C_{M_σ}(R)` (last equality is `R`'s prime action, Corollary 13.3(a) core),
+so `C_{M_σ}(x) ≤ C(R)`. A general `g ∈ E₁#` reduces to its prime-power `x = g^{ord g / p}` via
+`C(g) ⊆ C(x)`. No explicit Sylow decomposition of `E₁` is needed: the prime-power induction in
+`le_centralizer_of_forall_prime_isPGroup` carries it. -/
 theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE1 : E₁ ≠ ⊥) :
     ActsPrimeOn (S10.Msigma M) E₁ := by
-  sorry
+  classical
+  haveI hcyc : IsCyclic ↥E₁ := h.E1_isCyclic hG
+  letI : CommGroup ↥E₁ := IsCyclic.commGroup
+  -- `C({z}) = C(⟨z⟩)`: centralizing an element is the same as centralizing the cyclic subgroup.
+  have hcent_zpowers : ∀ z : G,
+      Subgroup.centralizer ({z} : Set G)
+        = Subgroup.centralizer ((Subgroup.zpowers z : Subgroup G) : Set G) := by
+    intro z
+    apply le_antisymm
+    · intro w hw
+      rw [Subgroup.mem_centralizer_iff] at hw ⊢
+      intro u hu
+      obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hu
+      have hcm : Commute z w := hw z rfl
+      exact ((hcm.symm.zpow_right k).eq).symm
+    · exact Subgroup.centralizer_le (by
+        intro u hu; rw [Set.mem_singleton_iff] at hu; rw [hu]; exact Subgroup.mem_zpowers z)
+  -- Elements of `E₁` commute (E₁ abelian).
+  have hE1comm : ∀ a ∈ E₁, ∀ b ∈ E₁, Commute a b := by
+    intro a ha b hb
+    exact Subtype.ext_iff.mp (mul_comm (⟨a, ha⟩ : ↥E₁) ⟨b, hb⟩)
+  -- `⟨z⟩ ∈ ℰ_s¹` for a prime-order element `z`.
+  have hzp_mem : ∀ (s : ℕ) (z : G), s.Prime → orderOf z = s →
+      Subgroup.zpowers z ∈ elemAbelianOfRank G s 1 := by
+    intro s z hs hzord
+    haveI : Fact s.Prime := ⟨hs⟩
+    refine mem_elemAbelianOfRank.mpr ⟨?_, ?_⟩
+    · exact Subgroup.IsElementaryAbelian.of_card_prime (by rw [Nat.card_zpowers]; exact hzord)
+    · rw [pow_one, Nat.card_zpowers]; exact hzord
+  -- Sub-claim A: a prime-order element `x ∈ E₁` has `C_{M_σ}(x) = C_{M_σ}(E₁)`.
+  have key : ∀ (p : ℕ) (x : G), x ∈ E₁ → p.Prime → orderOf x = p →
+      fixedByElement (S10.Msigma M) x = fixedBy (S10.Msigma M) E₁ := by
+    intro p x hxE1 hp hxord
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hxmem : Subgroup.zpowers x ∈ elemAbelianOfRank G p 1 := hzp_mem p x hp hxord
+    have hxE : (Subgroup.zpowers x : Subgroup G) ≤ E :=
+      (Subgroup.zpowers_le.mpr hxE1).trans h.E₁_le
+    have hpπE1 : p ∈ (Nat.card ↥E₁).primeFactors := by
+      refine Nat.mem_primeFactors.mpr ⟨hp, ?_, Nat.card_pos.ne'⟩
+      rw [← hxord, ← Nat.card_zpowers]
+      exact Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hxE1)
+    have hpτ1 : p ∈ tau1 M := h.isPiGroup_tau1 p hpπE1
+    refine le_antisymm ?_ (fixedBy_le_fixedByElement hxE1)
+    -- `C_{M_σ}(x) ≤ C_{M_σ}(E₁)`; reduce to `C_{M_σ}(x) ≤ C(↑E₁)`.
+    rw [fixedBy_def]
+    refine le_inf (by rw [fixedByElement_def]; exact inf_le_left) ?_
+    rw [← Subgroup.le_centralizer_iff]
+    apply le_centralizer_of_forall_prime_isPGroup
+    intro r hr R hRE1 hRr
+    rcases eq_or_ne R ⊥ with rfl | hRne
+    · exact bot_le
+    · haveI : Fact r.Prime := ⟨hr⟩
+      rw [← Subgroup.le_centralizer_iff]
+      -- `R` is abelian (≤ E₁) and nontrivial; extract an order-`r` element `y ∈ R`.
+      haveI hRab : IsMulCommutative ↥R := ⟨⟨fun a b => Subtype.ext (by
+        simp only [Subgroup.coe_mul]; exact hE1comm (a : G) (hRE1 a.2) (b : G) (hRE1 b.2))⟩⟩
+      obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hRne
+      obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp hRr) a
+      have hak0 : k ≠ 0 := by
+        rintro rfl; rw [pow_zero] at hk; exact ha1 (orderOf_eq_one_iff.mp hk)
+      have haR : (a : G) ∈ R := a.2
+      have haord : orderOf (a : G) = r ^ k := by rw [Subgroup.orderOf_coe]; exact hk
+      have hrdvd : r ∣ orderOf (a : G) := by rw [haord]; exact dvd_pow_self r hak0
+      have hyr1 : ((a : G) ^ (orderOf (a : G) / r)) ^ r = 1 := by
+        rw [← pow_mul, Nat.div_mul_cancel hrdvd, pow_orderOf_eq_one]
+      have hy1 : (a : G) ^ (orderOf (a : G) / r) ≠ 1 := by
+        intro hh
+        have hdvd := orderOf_dvd_of_pow_eq_one hh
+        have hpos : 0 < orderOf (a : G) / r :=
+          Nat.div_pos (Nat.le_of_dvd (orderOf_pos _) hrdvd) hr.pos
+        have hlt : orderOf (a : G) / r < orderOf (a : G) :=
+          Nat.div_lt_self (orderOf_pos _) hr.one_lt
+        exact absurd (Nat.le_of_dvd hpos hdvd) (by omega)
+      have hyord : orderOf ((a : G) ^ (orderOf (a : G) / r)) = r := by
+        rcases (Nat.dvd_prime hr).mp (orderOf_dvd_of_pow_eq_one hyr1) with hh | hh
+        · exact absurd (orderOf_eq_one_iff.mp hh) hy1
+        · exact hh
+      have hyR : (a : G) ^ (orderOf (a : G) / r) ∈ R := pow_mem haR _
+      set y : G := (a : G) ^ (orderOf (a : G) / r) with hydef
+      have hyE1 : y ∈ E₁ := hRE1 hyR
+      have hyE : y ∈ E := h.E₁_le hyE1
+      -- `⟨y⟩ ∈ ℰ_r¹`, `r ∈ π(E)`, `r ∈ τ₁(M)`.
+      have hymem : Subgroup.zpowers y ∈ elemAbelianOfRank G r 1 := hzp_mem r y hr hyord
+      have hrπE : r ∈ (Nat.card ↥E).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hr, hyord ▸ E.orderOf_dvd_natCard hyE, Nat.card_pos.ne'⟩
+      have hrτ1 : r ∈ tau1 M :=
+        h.isPiGroup_tau1 r (Nat.mem_primeFactors.mpr
+          ⟨hr, hyord ▸ E₁.orderOf_dvd_natCard hyE1, Nat.card_pos.ne'⟩)
+      -- `⟨y⟩ ≤ E ⊓ C(↑⟨x⟩)` (y commutes with x).
+      have hyRC : (Subgroup.zpowers y : Subgroup G) ≤
+          E ⊓ Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+        refine le_inf ((Subgroup.zpowers_le.mpr hyE1).trans h.E₁_le) ?_
+        rw [Subgroup.zpowers_le, Subgroup.mem_centralizer_iff]
+        intro u hu
+        obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp hu
+        exact ((hE1comm x hxE1 y hyE1).zpow_left j).eq
+      -- Theorem 13.4 and the prime action of `R`.
+      have hT134 := centralizer_le_centralizer_of_tau1 hG h hpτ1 hrπE hxmem hxE hymem hyRC
+      have hRact : ActsPrimeOn (S10.Msigma M) R :=
+        actsPrimeOn_Msigma_of_mem_tau13 hG h (Or.inl hrτ1) (hRE1.trans h.E1_le_M) hRab hRr
+      have hRy : fixedByElement (S10.Msigma M) y = fixedBy (S10.Msigma M) R := hRact y hyR hy1
+      calc fixedByElement (S10.Msigma M) x
+          = S10.Msigma M ⊓ Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+            rw [fixedByElement_def, hcent_zpowers x]
+        _ ≤ S10.Msigma M ⊓ Subgroup.centralizer ((Subgroup.zpowers y : Subgroup G) : Set G) := hT134
+        _ = fixedByElement (S10.Msigma M) y := by rw [fixedByElement_def, hcent_zpowers y]
+        _ = fixedBy (S10.Msigma M) R := hRy
+        _ ≤ Subgroup.centralizer ((R : Subgroup G) : Set G) := by
+            rw [fixedBy_def]; exact inf_le_right
+  -- Main: reduce a general `g ∈ E₁#` to its prime-power part `x = g^{ord g / p}`.
+  intro g hgE1 hg1
+  have hord1 : orderOf g ≠ 1 := fun hh => hg1 (orderOf_eq_one_iff.mp hh)
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hord1
+  have hxp1 : (g ^ (orderOf g / p)) ^ p = 1 := by
+    rw [← pow_mul, Nat.div_mul_cancel hp_dvd, pow_orderOf_eq_one]
+  have hx1 : g ^ (orderOf g / p) ≠ 1 := by
+    intro hh
+    have hdvd := orderOf_dvd_of_pow_eq_one hh
+    have hpos : 0 < orderOf g / p := Nat.div_pos (Nat.le_of_dvd (orderOf_pos g) hp_dvd) hp_prime.pos
+    have hlt : orderOf g / p < orderOf g := Nat.div_lt_self (orderOf_pos g) hp_prime.one_lt
+    exact absurd (Nat.le_of_dvd hpos hdvd) (by omega)
+  have hxord : orderOf (g ^ (orderOf g / p)) = p := by
+    rcases (Nat.dvd_prime hp_prime).mp (orderOf_dvd_of_pow_eq_one hxp1) with hh | hh
+    · exact absurd (orderOf_eq_one_iff.mp hh) hx1
+    · exact hh
+  have hxE1 : g ^ (orderOf g / p) ∈ E₁ := pow_mem hgE1 _
+  -- `C(g) ≤ C(x)` since `x = g^(ord g / p)`.
+  have hCgx : Subgroup.centralizer ({g} : Set G)
+      ≤ Subgroup.centralizer ({g ^ (orderOf g / p)} : Set G) := by
+    intro w hw
+    rw [Subgroup.mem_centralizer_iff] at hw ⊢
+    intro u hu
+    rw [Set.mem_singleton_iff] at hu; subst hu
+    have hcm : Commute g w := hw g rfl
+    exact (hcm.pow_left (orderOf g / p)).eq
+  have hkey := key p (g ^ (orderOf g / p)) hxE1 hp_prime hxord
+  refine le_antisymm ?_ (fixedBy_le_fixedByElement hgE1)
+  calc fixedByElement (S10.Msigma M) g
+      ≤ fixedByElement (S10.Msigma M) (g ^ (orderOf g / p)) := by
+        rw [fixedByElement_def, fixedByElement_def]; exact inf_le_inf_left _ hCgx
+    _ = fixedBy (S10.Msigma M) E₁ := hkey
 
 /-! ## §13 prime action の拡張解析 (mmd L3574-3628) -/
 
