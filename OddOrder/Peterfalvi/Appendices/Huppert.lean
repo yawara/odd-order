@@ -562,7 +562,19 @@ theorem pGroup_cyclic_fixedPointFree
         refine fpf_of_abelian_of_irreducible φ hfaithful (fun x y => mul_comm x y) ?_
         intro H hH
         exact hirr H (isAInvariant_iff_smul_mem.mpr hH)
-      · -- irreducible non-cyclic: Schur's Lemma ⟹ E = ⊕ C_E(Tᵢ) ⟹ part (1). (p. 136)
+      · -- Irreducible non-cyclic case (p. 136).  Peterfalvi's argument:
+        -- [H] III.7.5 gives a *normal* `R ⊴ P` of type `(p,p)`; Schur ([Is] 1.5)
+        -- makes `End_{𝔽_q[P]}(E)` a finite field, so `Z(P)` (in its unit group) is
+        -- cyclic, whence `|R ∩ Z(P)| = p` and `P` transitively permutes the other `p`
+        -- order-`p` subgroups `Tᵢ ≤ R`; `E = ⊕ C_E(Tᵢ)` (coprime `Z_p×Z_p` action) is
+        -- a `P`-permuted decomposition with `≥ 2` parts, so part (1)
+        -- (`fpf_of_constant_stabilizer_of_permuted_decomp`) forces `P` cyclic — contra.
+        -- BLOCKER: the normal type-`(p,p)` step is [H] III.7.5 = Gorenstein 5.4.10.  Schur
+        -- forces `Z(P)` cyclic, so `Ω₁(Z(P))` has order `p` and the repo's available
+        -- `exists_normal_isElementaryAbelian_card_prime_sq_of_prime_sq_dvd_card_omega1Center`
+        -- (abelian-center case) does NOT apply — this is exactly the cyclic-center case
+        -- deferred in `BG/Ch1_Preliminary/S04_PGroupsSmallRank.lean` (≈ line 911).  See
+        -- issue 2004.  Off-FT-critical-path (Appendix B = Peterfalvi Part II).
         sorry
     · push_neg at hirr
       obtain ⟨U, hUinv, hUbot, hUtop⟩ := hirr

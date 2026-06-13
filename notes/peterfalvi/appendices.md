@@ -184,6 +184,114 @@ conjugation Equiv で). sorry 不変 (2→2)。
 - [ ] file が sorry-free 化したら keystone+bridge を AxiomsCheck の **新 Appendices section** に登録
       (LAUNCH rule #4; 現状 file に 2 sorry 残ゆえ未登録; 完成済 3 本は #print axioms で clean 確認済)。
 
+### ✅ session 4 (2026-06-14): Lemma 非cyclic 判定 + Appendix I **Prop 2** 発見 → 攻略順 改訂
+- **Lemma 非cyclic sorry の真ボトルネック = [H] III.7.5 = Gorenstein 5.4.10** (non-cyclic odd p-group ⟹
+  normal type-(p,p))。Peterfalvi p.135-136 原文確認: Schur ([Is]1.5) で End_{𝔽_q[P]}(E)=有限体 ⟹ Z(P) cyclic
+  ⟹ `Ω₁(Z(P))` 位数 p ⟹ repo の available `…_of_prime_sq_dvd_card_omega1Center` (abelian-center) は **不適用**,
+  まさに S04 ≈L911 で deferred な cyclic-center case。**→ issue 2004 で BG lane に委譲** (S04 は所有権外)。
+  Huppert.lean の sorry comment に精密化記録済。**この sorry は当面 park** (off-critical-path Part II)。
+- **🆕 Appendix I に Proposition 2 が在る** (p.136, PDF 画像で全文復元 — mmd は MISSING_PAGE, 既存 note も
+  Prop2 を見落としていた)。**現状 Huppert.lean に未形式化**。statement:
+  > U が elem-ab E (order pⁿ) に faithful 作用, T⊴U cyclic normal が E に **irreducible** 作用。
+  > **(a)** F=𝔽_p[T]⊆End(E) は pⁿ 元の体, E は F 上 1 次元。**(b)** U は semilinear; s∈E^# で C_U(s)≅Aut(F) の部分群。
+  - 証明 (p.136): (a) Schur で F₁=End_T(E)=有限 division ring, T 可換ゆえ F=𝔽_p[T]⊆F₁ は可換部分環=体;
+    E は既約 F-加群=F 上 1 次元 ⟹ |F|=|E|。(b) u∈U は加法的自己同型, σ(λ): u(λs)=σ(λ)u(s) が体自己同型
+    (U が E⋊T に作用するので σ(λμ)=σ(λ)σ(μ)), u semilinear; C_U(s)→Aut(F) が群同型。
+  - **🔑 Gorenstein 不要・Schur のみ ⟹ 非cyclic sorry より遥かに tractable**。mathlib `IsSimpleModule`/Schur
+    (End=division ring) + 有限可換 domain=体 + 体上既約=1次元。`IsElementaryAbelian.zmodModule` (PRank.lean:87)。
+  - **🔗 Appendix C (NearFields) Prop 2 は "Appendix I, Prop 2" を引く ⟹ Prop 2 は Appendix C の前提**。
+    かつ Prop 2(a) の Schur 部品 (End=体 ⟹ Z 部分が cyclic) は **Lemma 非cyclic の Z(P) cyclic 部分も再利用可**。
+- **改訂 攻略順**: **Prop 2 (Huppert.lean, 次の主目標, tractable)** → Appendix C/D → Lemma 非cyclic (issue 2004 待ち)。
+  既存 scaffold: `NearFields.lean`/`Suzuki2Groups.lean`/`FeitSibley.lean`/`Suzuki.lean` (各 ~2.5-5.6k, opaque, 要 audit)。
+
+### ✅ session 5 (2026-06-14): Prop 2 形式化 — 設計確定 + mathlib 部品検証 (probe で実証)
+**目標**: Appendix I Prop 2 を `OddOrder/Peterfalvi/Appendices/SemilinearField.lean` (新 leaf) に。
+**検証済 mathlib 部品** (全て probe build で確認):
+- 作用→表現: `(mulAutToEnd E p).comp ψ : Representation (ZMod p) T (Additive E)` (`mulAutToEnd` =
+  `OddOrder.BG.Ch1_Preliminary`, `OperatorMaschke.lean:140`)。module = `AddCommGroup.zmodModule hpsmul`
+  (hpsmul : ∀ x:Additive E, p•x=0)。
+- 既約⟺単純: `Representation.irreducible_iff_isSimpleModule_asModule ρ : IsIrreducible ρ ↔ IsSimpleModule k[T] ρ.asModule`
+  (mathlib `RepresentationTheory/Irreducible.lean`)。`IsIrreducible ρ = IsSimpleOrder (Subrepresentation ρ)`。
+- Schur: `Mathlib/RingTheory/SimpleModule/Basic.lean:530` `[DecidableEq (End)][IsSimpleModule R M] → DivisionRing (Module.End R M)`。
+- 有限除環=体: `littleWedderburn` (instance, `LittleWedderburn.lean:166`, priority 100, 自動)。
+- 単純⟹1次元: `isSimpleModule_iff_finrank_eq_one {R}[DivisionRing R] : IsSimpleModule R M ↔ finrank R M = 1`
+  (`SimpleModule/Rank.lean:17`)。
+- 1次元⟹|F|=|E|: `FiniteField.pow_finrank_eq_natCard` 系 / `card = (card F)^finrank` (PRank に既出パターン)。
+**🔑 設計 (probe で確定): 抽象 core + bridge の 2 層**:
+- **core** = 抽象 `k[T]`-module 上で述べる: `variable {k}[Field k][Finite k]{T}[CommGroup T][Finite T]
+  {M}[AddCommGroup M][Module (MonoidAlgebra k T) M][Finite M][IsSimpleModule (MonoidAlgebra k T) M]`
+  → `End_{k[T]}(M)` は体 (✅ probe9 で tactic-mode build 通過: `Finite.of_injective _ DFunLike.coe_injective`
+  で End 有限 → littleWedderburn)。残: `finrank (End) M = 1` (M を End 上単純にする or 像 F=𝔽_p[T] 経由) + |·|。
+- **bridge** = multiplicative E + φ から core を起動 (M := ρ.asModule, instances を term-mode で供給)。
+**🛑 GOTCHAS (probe で判明・再調査不要)**:
+  1. `Group+IsMulCommutative→CommGroup` は **scoped instance** (`Defs.lean:1391`) ⟹ `open scoped IsMulCommutative` 必須。
+  2. ρ は `let ρ := ...` で導入 (**`set` は asModule instance 解決を阻害**)。
+  3. **ZMod p の Field-vs-CommSemiring diamond**: `[Fact p.Prime]` が Field-path semiring を強制 →
+     core を `ZMod p` でなく **generic `[Field k]`** で述べ、bridge で `k := ZMod p` 起動 (probe C/D/E で回避確認)。
+  4. **noncomputable `asModule` Module instance は term-mode で解決するが tactic-mode (`letI/haveI := inferInstance`)
+     で失敗** (probe7/8) ⟹ core を **抽象 `[Module (MonoidAlgebra k T) M]`** で述べ asModule を core 内で使わない (probe9 で解決)。
+  5. `Finite ρ.asModule` は `inferInstanceAs (Finite (Additive E))` (asModule は def, 自動 Finite 不発)。
+  6. 定義は `noncomputable` (Module instance が noncomputable)。
+**次 session**: leaf 作成 → core (Field 部 done, finrank=1 を詰める) → bridge → Prop 2(a)、その後 (b) semilinear。
+sorry を増やさない方針ゆえ **core を sorry-free にしてから commit** (中間 sorry leaf は出さない)。
+
+### ✅ session 6 (2026-06-14): Prop 2(a) CORE landed (sorry-free, axiom-clean)
+新 leaf `SemilinearField.lean` (namespace `Appendices.Huppert`, OddOrder.lean Appendices block に import 追加)。
+抽象 core (k 有限体, T 可換, M 有限単純 k[T]-module):
+- `endField` : `End_{k[T]}(M)` は体 (`noncomputable def`, Schur+Wedderburn auto)。
+- `isSimpleModule_end` : M は D=End 上単純 (k[T] 可換ゆえ scalar map `LinearMap.lsmul r ∈ D` →
+  D-submodule = k[T]-submodule → k[T] 単純で ⊥/⊤; `refine { eq_bot_or_eq_top := ... }`, `Submodule.eq_top_iff'`)。
+- `finrank_end_eq_one` : `finrank D M = 1` (`isSimpleModule_iff_finrank_eq_one`)。
+- `natCard_end_eq` : `|D| = |M|` (`Module.card_eq_pow_finrank` は **Fintype.card** ゆえ `Fintype.ofFinite`+`Nat.card_eq_fintype_card`)。
+全て propext/choice/Quot のみ。full build 3807 jobs ~7s, AxiomsCheck OK。
+**次 session = bridge**: 教科書 data `(E elem-ab p-group, φ:U→*MulAut E faithful, T⊴U cyclic irreducible)` から
+core 起動。M := ρ.asModule (ρ=(mulAutToEnd E p).comp φ|_T), instances を term-mode 供給 (gotchas 4 参照),
+`IsSimpleModule k[T] ρ.asModule` を「E が T-irreducible」から `irreducible_iff_isSimpleModule_asModule` で。
+k := ZMod p (Field via Fact)。→ Prop 2(a) 完全形 (F=𝔽_p[T] の体構造 + E 1次元 + |F|=pⁿ)。その後 (b) semilinear/C_U(s)≅Aut(F)。
+
+### ⚠ session 7 (2026-06-14): core 一般化 (CommRing k) 済 + bridge は asModule 詰まり (要別経路)
+- **core 改良 (commit 済)**: `[Field k][Finite k]` → **`[CommRing k]`** に弱化 (End=体 は M 有限のみ依存)。
+  bridge で `k:=ZMod p` 起動時の **ZMod p semiring diamond** (Field-path via Fact vs CommRing-path via zmodModule)
+  を回避するのに必須。leaf sorry-free, full build 3807 jobs ~3s。
+- **🛑 bridge BLOCKED on asModule instance 不安定性** (probe 多数で診断):
+  - `(mulAutToEnd E p).comp ψ : Representation (ZMod p) T (Additive E)` の構築は OK (probe11-13)。
+  - **`Module (MonoidAlgebra (ZMod p) T) ρ.asModule` の synth が arg-position で不安定**:
+    `have h : Module ... := inferInstance` (goal-position) 単独では通る (probe13/15) が、
+    `Module.End ... ρ.asModule` や `IsSimpleModule ... ρ.asModule` を **型に書く (arg-position)** と失敗、
+    かつ後続行があると先行の goal-position synth まで連鎖失敗 (probe14/18/21)。haveI/letI 切替も別の壁
+    (letI zmodModule → `MulOne` stuck; probe20)。`open scoped Classical` も阻害 (除去要)。
+  - `[Representation.IsIrreducible ρ]` を入れると `IsSimpleModule k[T] ρ.asModule` は mathlib instance
+    (Irreducible.lean:53) で auto 化できる (probe18 で hsimp 行は解決) が、`Module.End` 形成は別途失敗。
+  - これは **数学的 gap でなく Lean4/mathlib の noncomputable asModule typeclass-elaboration 摩擦**。
+- **▶ 次 session で試す別経路** (優先順):
+  1. **asModule を使わず `Additive E` に直接 k[T]-module を張る**: `Module.compHom (Additive E)
+     (ρ.asAlgebraHom).toRingHom` で clean type 上の instance を letI。core の M := Additive E。
+     `Module.End (k[T]) (Additive E)` は clean type ゆえ arg-position synth が通る可能性。
+     (注意: 既存 `Module (ZMod p) (Additive E)` と two-scalar; `IsScalarTower` 整合, IsSimpleModule 変換要)。
+  2. core を `ρ : Representation` 直接取りに再構成 (asModule を core 内 1 箇所に閉じ込め)。
+  3. 全 instance を `@natCard_end_eq (ZMod p) _ T _ _ ρ.asModule _ <term> ...` で term-position 明示供給。
+  - downstream (App C / Lemma の Z(P) cyclic) は core を直接使う手も (bridge は便宜 adapter)。
+
+### ✅ session 8 (2026-06-14): bridge plumbing SOLVED (compHom on clean Additive E) + core refactor
+- **🎯 bridge plumbing 解決 (probe29 で実証)**: asModule wrapper を**使わず**、clean type `Additive E` に
+  直接 k[T]-module を張る:
+  ```
+  let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
+  letI : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+    Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom   -- = asModule の中身を Additive E に
+  ```
+  → `Module.End (MonoidAlgebra (ZMod p) T) (Additive E)` が **arg-position で形成可能** (clean type ゆえ
+  asModule の synth 不安定を回避)、`natCard_end_eq (M := Additive E)` 適用 OK、
+  `Nat.card (End) = Nat.card E` (via `Nat.card_congr Additive.toMul`)。**再調査不要: asModule は罠, compHom on Additive E が正解。**
+- **core refactor (commit c83c65a0)**: 過剰な global `instance : Finite (Module.End ...)` は
+  asModule+IsIrreducible synth と干渉 → `theorem finite_end` 化し各定理内 haveI に (防御的)。leaf sorry-free, axiom-clean。
+- **▶ 残り = IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) を群論的既約性から** (compHom 構造上):
+  bridge の唯一 sorry。`IsSimpleOrder (Submodule (k[T]) (Additive E))`: k[T]-submodule N (compHom 構造) は
+  ZMod p-subspace かつ T-stable → ψ-invariant subgroup H (OperatorMaschke の `toZModSubmodule`/`toSubgroup'`
+  対応を流用) → hirr (ψ-inv subgroup は ⊥/⊤) で N=⊥/⊤。Nontrivial は Nontrivial E から。~50-80 行見込み。
+  注意: compHom の k[T]-action は `of t • x = ρ.asAlgebraHom (of t) x = (ψ t) を Additive 上に`。
+- これで Prop 2(a) 完全形 (F=End=𝔽_p[T], E 1次元, |F|=pⁿ) → その後 (b) semilinear/C_U(s)≅Aut(F)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
