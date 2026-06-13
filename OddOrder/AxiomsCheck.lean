@@ -51,6 +51,9 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -59,6 +62,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -3722,6 +3726,21 @@ axiom(s):{indentD m!"{missing}"} — remove them from the island"
     throwError m!"axioms island FAILED: `{constName}` has unexpected \
 axiom(s):{indentD m!"{bad.toList}"}"
 
+/-! #### BG §13 Lemma 13.1 / Corollary 13.2 (de-axiom 済, issues 8000/0065)
+
+Lemma 13.1 と Corollary 13.2 は BG Corollary 12.16(a)(b) を本質的に使う。当初は §12 に faithful な
+statement が無く provisional forward axiom (`cor1216_*`) で進めたが、Lane F が S12_E に faithful な
+sorry'd statement (`sigma_subgroup_pRank_normalizer_le_one` /
+`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`, issue 0065) を露出したのを受け、cite 先を
+それらへ差し替えて **de-axiom 済** (2026-06-13)。よって §13 は新規 axiom 0 で repo 標準の
+scaffold-sorry 規約に準拠する: 13.1(b)(c)・full assembly・Cor 13.2 は S12_E Cor 12.16 の sorry に
+bottom-out するため `#assert_*` 対象外 (§12 cascade が proof を埋めれば自動 unconditional 化)。
+13.1(a) のみ S12_E Cor 12.16 に非依存で axiom-clean ゆえ下記で pin する。 -/
+
+-- BG Lemma 13.1(a): every `p`-subgroup of `M ⊓ M*` centralizes `M_σ ⊓ M*`
+-- (S12_E Cor 12.16 に非依存; axiom-clean).
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.pSubgroup_centralizes_Msigma_inf
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.
@@ -4318,3 +4337,88 @@ fixed-point-freely on `N`, so does every nonidentity element (`C(h) ⊆ C(h^{|h|
 `r ∣ |h|`). The reduction for "`E₀ = E₁E₃·∏Z_p` is a Frobenius complement". Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.inf_centralizer_eq_bot_of_forall_prime_order
+
+/-! ### BG Theorem 12.12: three-case assembly building blocks (`S12_Theorem1212c`)
+
+`exists_regular_cyclic_of_mem_tau2`: per-prime `Z_p` extraction for `p ∈ τ₂(M)` in the abelian
+Sylow case — a cyclic `p`-subgroup `Z ≤ E`, normalized by `E`, of the same exponent as a Sylow
+`p`-subgroup `S ≤ E`, regular on `M_σ` (wires `exists_elemAb_rank_two_le_E_of_tau2`, the Sylow
+extension, `sylow_chain_of_abelianSylow` giving `S ≤ E`, and the per-prime capstone). Unconditional.
+`isPiSubgroup_le_of_normal_isHall`: a `π`-subgroup is contained in any *normal* Hall `π`-subgroup
+(companion to `Subgroup.IsPiGroup.normal_le_hall`). `frobFact_partA_of_abelianSylow`: part (a) of
+Theorem 12.12 in the abelian-Sylow case — `A₀ = E₂` is abelian normal with `C_E(x) ⊆ E₂` for
+`x ∈ M_σ#` (`C_E(x)` is a `τ₂`-group by `hreg`, then in the normal Hall `E₂`). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_regular_cyclic_of_mem_tau2
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.isPiSubgroup_le_of_normal_isHall
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_partA_of_abelianSylow
+
+/-! `⨆_{p ∈ T} Z_p` internal direct product (for the `E₀ = ∏ Z_p` aggregation, part (b)):
+`le_normalizer_finsetSup` (`H` normalizes each `Z p` ⟹ normalizes `T.sup Z`),
+`card_finsetSup_eq_prod` (`|T.sup Z| = ∏ |Z p|` for a `Finset` of primes, `Z p` a normalized
+`p`-group — via `card_sup_eq_mul_of_le_normalizer_of_disjoint` + coprimality),
+`mem_Z_of_orderOf_prime_mem` (an element of `T.sup Z` of prime order `r ∈ T` lies in `Z r`, by the
+`r'`-cofactor quotient-order argument). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.le_normalizer_finsetSup
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.card_finsetSup_eq_prod
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_Z_of_orderOf_prime_mem
+
+/-! `exists_tau2_product`: the `τ₂`-product `ZZ = ∏_{p ∈ τ₂(M) ∩ π(E)} Z_p` for the abelian-Sylow
+case — `≤ E`, nontrivial, `E`-normalized, a `τ₂(M)`-group, fully regular on `M_σ`, realizing the
+`τ₂`-part of `exp(E)`. Bundles the per-prime choice (`exists_regular_cyclic_of_mem_tau2`) with the
+direct-product lemmas (`card_finsetSup_eq_prod` / `mem_Z_of_orderOf_prime_mem`). Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_tau2_product
+
+/-! **BG Theorem 12.12** (`frobenius_factorization_of_regular`, `frobFact_of_abelianSylow`): the
+abelian-Sylow Case 3 aggregation `E₀ = ZZ ⊔ K` (`ZZ` the `τ₂`-product, `K` a Hall `τ₂'`-subgroup)
+realizes `exp(E₀) = exp(E)` and is regular on `M_σ`, so `M_σ E₀` is a Frobenius group; with the
+three-case glue this completes Theorem 12.12. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobFact_of_abelianSylow
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.frobenius_factorization_of_regular
+
+/-! **BG Theorem 12.13** reduction (`S12_Theorem1213`): `mem_sigma_normalizer_le_of_two_maximals`
+— a nonabelian `p`-subgroup `P ≤ M` (maximal) has `p ∈ σ(M)` (Cor 12.10(a) contrapositive: a
+`σ'`-`p`-subgroup is nilpotent hence abelian) and `N_G(P) ⊆ M` (Cor 12.10(d), `P` noncyclic).
+Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_normalizer_le_of_two_maximals
+
+/-! **BG Theorem 12.13** Heisenberg piece (`S12_Theorem1213`):
+`exists_conj_eq_center_mul_of_expPExtraspecial` — in an exponent-`p` extraspecial group, the
+conjugates of a noncentral `a₀` cover its central coset `Z(Q)·a₀`. The map `q ↦ ⁅q,a₀⁆` is a
+homomorphism onto the order-`p` center (commutators central), nontrivial as `a₀ ∉ Z(Q)`, hence
+surjective. The conjugacy half of the 12.13 line-conjugacy argument. Unconditional. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_conj_eq_center_mul_of_expPExtraspecial
+
+/-! **BG Theorem 12.13** (`S12_Theorem1213`, σ-side keystone): a nonabelian `p`-subgroup `P`
+contained in two distinct maximals `M ≠ M⋆` is impossible — equivalently, any maximal `M`
+containing a nonabelian Sylow-type `p`-subgroup is the *unique* maximal subgroup containing it
+(`nonabelian_pgroup_isUniquelyMaximal`). Proof: `P` → Sylow of `M ∩ M⋆` → Sylow of `G` forces
+`r(P) = 2`; Cor 10.7(b) extracts an exponent-`p` extraspecial `Q` (order `p³`); `Q/Z(Q)` acts
+coprimely and noncyclically on `K = C_{Mα}(Z)`, so Prop 1.16 writes `K = ⟨C_K(Ā) | Ā cocyclic⟩`,
+each generator centralized by a rank-2 `A ∈ ℰ²(Q)` hence inside `M⋆` by 12.4(a); with Cor 10.9(b)
++ Lem 6.5(b) this puts `N_M(Z) ⊆ M⋆`, and 12.4(b) produces `A₀, A₀⋆ ∈ ℰ¹(A) − {Z}` realizing
+`M, M⋆`, contradicting line-conjugacy + ℳ-uniqueness. Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.nonabelian_pgroup_isUniquelyMaximal
+
+/-! **BG Proposition 12.15** (`S12_Proposition1215`, σ-prime ↔ maximal interaction): for `q ∈ σ(M)`,
+a nonidentity `q`-subgroup `X ⊆ M`, and `M⋆ ∈ ℳ(N_G(X)) − {M}`, with `S = Syl_q(M ∩ M⋆) ⊇ X`,
+the five conclusions (`sigma_subgroup_maximal_interaction`): (a) `M⋆` not `G`-conjugate to `M`;
+(b) `N_G(S) ⊆ M`; (c) `S` is the unique Sylow-`q` of `G` in `M⋆`; (d) if `q ∈ σ(M⋆)` then the
+`M⋆=(M∩M⋆)M⋆_β` factorization, the prime-guarded τ₁-transfer `∀ r prime, r∈τ₁(M⋆) → r∈τ₁(M)∪α(M)`
+(shared Sylow `Syl_r(M∩M⋆)` of both `M`, `M⋆` via the `M_β`/`M⋆_β` diamonds), and `M_β=M_α≠1`;
+(e) if `q ∉ σ(M⋆)` then `q∈τ₂(M⋆)`, `π(M)∩σ(M⋆)⊆β(M⋆)`, and `M∩M⋆` is an `M⋆_σ`-complement.
+The τ₁ inclusion is prime-restricted (BG's `τᵢ ⊆ π(M)` are sets of primes; the repo's `pRank`-based
+`tau1` ranges over `ℕ`). Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_maximal_interaction

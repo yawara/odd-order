@@ -392,8 +392,8 @@ private theorem map_subtype_conj_smul {M : Subgroup G} (c : ↥M) (K : Subgroup 
 /-- **σ basic fact** (mmd L2655): if `p ∈ σ(M)`, then for *every* Sylow `p`-subgroup `Q` of `M`
 the `G`-normalizer of its image lies in `M`. The definition of `σ(M)` provides one such Sylow `P`;
 every other `Q` is `M`-conjugate to it (`Q = m • P`, `m ∈ M`), and `N_G(·)` is
-conjugation-equivariant. -/
-private theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
+conjugation-equivariant. (De-private で公開 — BG Prop 12.15(b) の cyclic-case `S = Syl_q(M)` で再利用。) -/
+theorem normalizer_sylow_map_le_of_mem_sigma [Finite G]
     {M : Subgroup G} {p : ℕ} [Fact p.Prime] (hp : p ∈ sigma M) (Q : Sylow p ↥M) :
     Subgroup.normalizer (((Q : Subgroup ↥M).map M.subtype : Subgroup G) : Set G) ≤ M := by
   classical

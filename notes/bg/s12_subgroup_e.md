@@ -1,5 +1,341 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## 🟢🟢 2026-06-13 (Lane F session 20, Opus 4.8): **Prop 12.15 = 9/11 — E⊇S infra COMPLETE + e.3b landed; 残 d.2/e.2**
+
+session 19 の E⊇S gap を **infra で解消**し e.3b 着地。**build 緑、実 sorry = d.2 / e.2 の 2 個**(9/11)。
+
+**新規 infra (S12_Proposition1215 内, sorry-free)**:
+- `subgroupESetup_of_complement (hM)(hE_le)(hcompl_inf)(hcompl_sup) : ∃E₁E₂E₃, SubgroupESetup M E …`
+  — `exists_subgroupESetup` の Hall-pieces 組立を「与えられた補群 E」でパラメタ化(複製)。
+- `exists_subgroupESetup_with_le (hM)(hAM:A≤M)(hA_pi:A は σ(M)'-群) : ∃E…, setup ∧ A≤E`
+  — `Ch03.hall_D` で σ'-Hall H⊇A.subgroupOf M 取得 → 補群 props(hcompl_inf=coprime,
+  hcompl_sup=`|H|=N.index` を σ/σ' index-part の coprime + dvd-antisymm で)→ `subgroupESetup_of_complement`。
+  ⚠ 教訓: **一般群の部分群束は modular でない**(`IsModularLattice (Subgroup C)` は **CommGroup 限定**)
+  → Dedekind は **正規部分群版を手で**(M_σ⊴ 経由, S12_Corollary126 と同型)。helper 2 (`pRank_eq_of_mulEquiv`
+  / `exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank`) も追加。S10 `normalizer_sylow_map_le_of_mem_sigma` de-private 済。
+- **e.3b** (`M*_σ⊔(M∩M*)=M*`): A∈ℰ²(S) に with_le で E*⊇A → E*≤N_G(A)⊆M (12.6(a)`elemAb_normal_in_E_of_tau2`.1.1
+  + 12.10(d)) → M∩M*=E* (正規 Dedekind + hMsM) → `E_compl_sup`。e.3a/hMsM/setup は refine 前に hoist 済。
+
+**残 2 (各 BG sub-argument が不明瞭・要精読)**:
+- **e.2** (`π(M)∩σ(M*)⊆β(M*)`): Cor 10.9(a)(1) (`beta_complement_centralizes`, S10_BetaRadical:241) の対偶で
+  Fact1「A は Syl_r(M*_σ) 非中心化」⟹ r>q は **clear**。だが Fact2「no Syl_r(M) centralizes Syl_q(M_σ)」⟹ q>r
+  が "C_G(A) `r'`-group" からどう出るか不明瞭(in-file コメントに詳細)。
+- **d.2** (`τ₁(M*)⊆τ₁(M)∪α(M)`): factorization M=(M∩M*)M_α / M*=(M∩M*)M*_α は有(h109_M/h109_star)。
+  τ₁=`{r∉σ ∧ r∉π(M') ∧ pRank=1}`。`r∉σ(M)` の sub-step が defs から非自明(session 19 参照)。
+▶ 次: e.2 Fact2 / d.2 r∉σ(M) の BG 精読。WIP 未 commit(S10 de-private + S12_E relocation + 新 leaf)。
+
+## 🟢🚧 2026-06-13 (Lane F session 19, Opus 4.8): **Prop 12.15 = 8/11 parts COMPLETE; e.2/e.3b に E⊇S 構造 gap**
+
+session 18 から進展: **(d.1)(d.3a)(d.3b)(e.3a) 追加 landed** (計 8/11: a,b,c,e.1,d.1,d.3a,d.3b,e.3a)。
+build 緑、実 sorry = **d.2 / e.2 / e.3b の 3 個**。leaf WIP 未 commit (root/AxiomsCheck 未配線 — 完成まで)。
+
+**新 landed の手法**:
+- (d.1/d.3a/d.3b): `S` を `Sylow q G` term 化 (`S.subgroupOf Mstar`→`exists_le_sylow`→`isSylow_sylowMap_of_mem_sigma`→(c) で同定) → Cor 10.9(b) (`beta_factorization_of_sylow_normalizer_in_intersection`) ×2 + `Malpha_ne_bot_of_sylow_normalizer_le` 再利用 + `simp [Malpha,Mbeta,hab]` bridge。
+- (e.3a): A∈ℰ²(S) を構成 (`S`を`Sylow q ↥M*`化[(c) maximality]→`pRank_sylow_eq`+`tau2_pRank_eq_two`で pRank=2→新 helper `exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank`) → `Msigma_nilpotent_of_tau2` conjunct-5 (N=M∈ℳ(A))。新 helper 2 個 + S10 `normalizer_sylow_map_le_of_mem_sigma` **de-private**。
+
+**🚧 e.2/e.3b の BLOCKER (要判断)**: Cor 12.6(a)(b) (`elemAb_normal_in_E_of_tau2`/`centralizer_le_E_of_tau2`)
+は全て **`A ≤ E`** (E = setup の M*_σ-補群) を要求。だが e.2/e.3b の A は **`A ≤ M` も同時に**要る
+(`N_G(A)⊆M` を Cor 12.10(d)+`q∈σ(M)` で出すため)。`exists_subgroupESetup` は **`E ⊇ S` を保証せず**、
+A を E に conj 押込 (S12_Lemma1211:370 idiom, `w∈M*`) すると `A ≤ M` が壊れる。
+⟹ **新 infra 必要**: `SubgroupESetup M* E …` with `E ⊇ S` (param. setup 構成、または setup の
+conj-stability + 補群の Hall 共役性)。~50-100 行の sub-project。**12.16 は 12.15(e) 依存ゆえ最終的に要**。
+**推奨**: (i) まず d.2 (τ₁ transfer、E-setup 非依存・独立) を landing → 9/11; (ii) その後 E⊇S infra を
+別 leaf で形式化 → e.2/e.3b。または user に「E⊇S infra を作る価値があるか / 既知 shortcut あるか」確認。
+
+## 🟢 2026-06-13 (Lane F session 18, Opus 4.8): **Prop 12.15 実装中 — (a)(b)(c)(e.1) COMPLETE, (d)/(e.2-3) 残**
+
+新 leaf `S12_Proposition1215.lean` (downstream, S12_E より下流; S12_E の 12.15 は削除済 = 移動)。
+**build 緑, 実 sorry = (d) + (e.2) + (e.3a) + (e.3b) の 4 個** (a/b/c/e.1 landed)。
+WIP 未 commit (12.15 完成時に S10 de-private + S12_E relocation と束ねて 1 commit)。
+
+**landed**:
+- (a) `not_conj_of_mem_sigma_of_normalizer_le` (Lemma 12.2(b)) 一発。
+- (b) N_G(S)⊆M: noncyclic = Cor 12.10(d) (`exists_subgroupESetup hG hM` → `nilpotent_sigmaComplement_abelian` `.2.2.2.1`); cyclic = X char S (新 helper `cyclic_subgroup_eq_of_card_eq` [S10_BetaRadicalGlobal から複製] + `AppB.normalizer_le_normalizer_map_of_characteristic`) で N_G(S)⊆N_G(X)⊆M*、+ T=Syl_q(M)⊇S → p-group normalizer 条件 (新 helper `eq_of_isPGroup_of_normalizer_inf_eq` = `normalizerCondition_of_isNilpotent`+`subgroupOf_normalizer_eq`+`inf_subgroupOf_left`) で S=T → **de-private した `S10.normalizer_sylow_map_le_of_mem_sigma`** で N_G(S)⊆M。
+- (c): (b) と同じ helper `eq_of_isPGroup_of_normalizer_inf_eq` 再利用。
+- (e.1) q∈τ₂(M*): `prime_mem_sigma_or_tau2` (12.2a) `.resolve_left hqns`。
+
+**残 (d)/(e.2-3) construction path (pin 済)**:
+- **(d) q∈σ(M*)** [L3443-51]: 要 `S : Sylow q G`。MY S = Syl_q(M∩M*)=Syl_q(M*); q∈σ(M*) ⟹ image=Syl_q(G) (`isSylow_sylowMap_of_mem_sigma` S10_HallStructureCore:1213; `S.subgroupOf Mstar`→`Sylow q ↥M*` を (c) maximality で)。N_G(S)⊆M⊓M* (b + q∈σ(M*)⟹⊆M*) → `Malpha_ne_bot_of_sylow_normalizer_le` (S12_Theorem1213 再利用)=d.3b、`beta_factorization_of_sylow_normalizer_in_intersection` (10.9b) ×2 = d.1 + d.3a (`simp only [S10.Malpha,S10.Mbeta,hab]`)。d.2 (τ₁ transfer) は別。
+- **(e.2/e.3)** [L3429-41]: `exists_subgroupESetup hG hMstar` で E*、A∈ℰ²(S)、Thm 12.5(e)+Cor 12.6(a) (M*_σ∩M=1・A⊴E*)、Cor 12.10(d) (E*⊆N_G(A)⊆M ⟹ M∩M*=E*=e.3)、Cor 10.9(a) (p>q∧q>p 矛盾=e.2)。
+- ⚠ **cross-lane flag 健在**: 12.16×2 を S13 (Lane G) が cite ⟹ 12.16 着地時 S13 re-point 要。12.15 完成後に判断を仰ぐ。
+
+## ✅✅✅✅ 2026-06-13 (Lane F session 17, Opus 4.8): **Thm 12.13 完全 COMPLETE — sorry-free・axiom-clean (σ-side keystone 確定)**
+
+**piece 5 (`maximalContaining_normalizer_center_ne_of_two_maximals`) 内の唯一の sorry
+= `hK : C_{M_α}(Z)⊆M⋆` の per-generator 12.4(a) ステップを充足 → 12.13 全体が sorry-free に。**
+commit `5e9087f3`。`#print axioms nonabelian_pgroup_isUniquelyMaximal`
+= `[propext, Classical.choice, Quot.sound]` (sorryAx 無し)。AxiomsCheck 登録済 (assert 2→3)。
+leaf 914 行 (<1500)。full build 緑 + assert 通過。
+
+**A-frame (cocyclic 閉包還元) の generator core の決着手順** (session 16 の skeleton を完成):
+- 生成元 g (∀y∈Y, φ y g=g, (Q/Z)/Y cyclic) に対し `A_Y := (Y.comap mk').map Q.subtype`
+  (Y の ↥Q 内 preimage, Z≤A_Y)。`↑g ∈ C_G(A_Y)`: 各 x∈A_Y を `mk' yb` 経由で取り
+  `hfix` を `mk'_apply→lift_mk'` で展開、`hψ_coe`+`mul_inv_eq_iff_eq_mul` で ↑g·x=x·↑g。
+- `Y≠⊥` (else Q/Z cyclic 矛盾, **`isCyclic_iff_exists_zpowers_eq_top.mpr ⟨a,hYa⟩`**):
+  `Nontrivial ↥Y` (`nontrivial_iff_ne_bot`) + `exists_ne (1:↥Y)` で a'∈A_Y∖Z を抽出。
+- `A := ⟨a'⟩⊔Z ∈ ℰ²(Q)` (再利用 helper **`zpowers_sup_center_mem_elemAbelianOfRank_two`**
+  = card 議論を共有化), `A≤Q≤M⋆`, `↑g∈C_G(A_Y)≤C_G(A)` ⟹ 12.4(a)
+  `centralizer_le_of_elemAb_rank_two` で ↑g∈M⋆。
+- **API 地雷**: `lift` 展開は `mk'_apply` を先に (`mk' yb`≠`mk yb` syntactically);
+  `exists_mem_ne_one_of_ne_bot` は mathlib に無い→`nontrivial_iff_ne_bot`+`exists_ne`;
+  `zpowers a=⊤⟹IsCyclic` は `rw` でなく `isCyclic_iff_exists_zpowers_eq_top.mpr`。
+
+**§12 残 sorry = 5 (全て S12_E、12.13 経路外)**: 12.14 (`maximalContaining_centralizer_eq_singleton`) /
+12.16(a) ×2 (`sigma_subgroup_conj_into_Msigma` + `sigma_subgroup_pRank_normalizer_le_one`) /
+12.16(b) (`sigma_subgroup_not_mem_primeFactors_derived_of_tau1`) / 12.15
+(`sigma_subgroup_maximal_interaction`)。**12.15/12.16 は §13-14 gate (Lane G が scaffold 引用)**。
+▶ 次 = 12.14 or 12.15/12.16 (優先度高: G unconditional 化に直結)。BG mmd L3369-3479 recon 要。
+
+## 🔎 2026-06-13 (Lane F session 17 cont., Opus 4.8): **12.15→12.16 recon — placement 確定 + ⚠ cross-lane flag**
+
+12.13 完了後、Lane-G gate (12.15/12.16) の着手 recon。**結論: 12.15 から (12.16 は 12.15 依存)。**
+
+### 🧩 import DAG の事実 (placement 決定打)
+- **S13_Lemma131 が cite する S12_E sorry = ちょうど 2 個**: `sigma_subgroup_pRank_normalizer_le_one`
+  (12.16(a) pt2) + `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (12.16(b))。
+  `maximalContaining_centralizer_eq_singleton` (12.14) / `sigma_subgroup_conj_into_Msigma`
+  (12.16a pt1) / `sigma_subgroup_maximal_interaction` (12.15) は **どこからも未使用**。
+- **dep-leaves (S12_Theorem125 / Corollary126 / Corollary1210 / ExceptionalBridge) はすべて
+  S12_E より DOWNSTREAM**: 連鎖 `S12_ExceptionalBridge → S12_Lemma1218 → S12_E`。
+  ⟹ 12.15/12.16 (12.5(e)/12.6/12.10(d)/12.2(b) を要する) は **S12_E 内 in-place 証明不可**。
+  **downstream leaf 必須** (12.13 と同型)。S12_E は「base + forward-decl(sorry)」ファイル。
+
+### ⚠⚠ CROSS-LANE FLAG (要ユーザー/hub 判断 — 12.16 着地時に顕在化)
+S12_E の sorry'd 12.16×2 は S13 (Lane G) が cite。downstream leaf で証明 → S12_E から **削除** →
+S13 の import を leaf に **re-point** が必要 (同名・同 namespace だが S13 は S12_E しか import せず、
+leaf は S12_E より downstream ゆえ S12_E 経由で透過解決できない)。これは **Lane G の S13 編集**。
+plan のデフォルト「S12_E の sorry を in-place 証明で discharge → G 自動 unconditional」は **本ケースで
+破綻** (downstream dep)。**選択肢**: (1) F が downstream leaf で証明 + S13 import を直接編集
+(1 行追加・低衝突), (2) F は証明のみ + hub が merge 時に S13 re-point + S12_E 削除,
+(3) leaf を distinct 名で証明し S12_E/S13 不変 (G は条件付きのまま; 後で hub が名前 swap)。
+→ **12.15 はこの判断と独立に必要** (12.16 の前提) ゆえ先行。12.16 着地前にユーザー裁可を仰ぐ。
+
+### ▶ 12.15 (`sigma_subgroup_maximal_interaction`) 実装プラン
+- **新 leaf `S12_Proposition1215.lean`** (downstream; import = S12_Theorem125 / S12_Corollary126 /
+  S12_Corollary1210 / S12_ExceptionalBridge — これらが S12_ECore+S10 を推移取込)。
+  statement = S12_E:469-488 と **byte-identical** (将来の swap 用)。証明後 S12_E の 12.15 を削除
+  (未使用ゆえ clean)。root `OddOrder.lean` + AxiomsCheck 両 import 必須。
+- **証明構造 (BG mmd L3417-3451 精読済)**, 5 結論:
+  - **(b) N_G(S)⊆M**: T=Syl_q(M)⊇S。S 非巡回 ⟹ Cor 12.10(d) で N_G(S)⊆M。
+    S 巡回 ⟹ N_G(S)⊆N_G(X)⊆M*、S⊆N_T(S)⊆M∩M*、S=N_T(S)⟹S=T、q∈σ(M) で N_G(S)⊆M。
+  - **(a) M* 非共役**: Lemma 12.2(b) = `not_conj_of_mem_sigma_of_normalizer_le` (S12_ExceptionalBridge:238)。
+  - **(c)**: (b) から (S は M∩M* の Sylow q かつ N_G(S)⊆M ⟹ M* の Sylow q)。
+  - **(e) q∉σ(M*)**: Lemma 12.2(a) `prime_mem_sigma_or_tau2` (S12_ECore) で q∈σ(M*)∪τ₂(M*)、
+    N_G(S)⊄M* ⟹ q∈τ₂(M*)。A∈ℰ²(S), E*=M*_σ の補群⊇A。Thm 12.5(e)+Cor 12.6(a): M*_σ∩M=1, A◁E*。
+    Cor 12.10(d): E*⊆N_G(A)⊆M ⟹ M∩M*=E* (補群)。π(M)∩σ(M*)⊆β(M*): p∈π(M)∩σ(M*)−β(M*) と仮定 →
+    C_G(A)⊆E* (Cor 12.6(b)) は p'-group → A は M*_σ の Syl_p を中心化せず → Cor 10.9(a) で p>q∧q>p 矛盾。
+  - **(d) q∈σ(M*)**: N_G(S)⊆M*、S は G の Sylow q。Cor 10.9(b)
+    (`beta_factorization_of_sylow_normalizer_in_intersection`, S10_BetaRadical:697):
+    M=(M∩M*)M_α, α(M)=β(M)、M* も同様 ⟹ M_α,M*_α≠1。τ₁(M*)⊆τ₁(M)∪α(M):
+    r∈τ₁(M*), R=Syl_r(M∩M*) は M*=(M∩M*)M*_α の Sylow r で normal complement を持つ ⟹ r∉α(M) なら M も同様。
+- **dep 名 (確定分)**: 12.2b=`not_conj_of_mem_sigma_of_normalizer_le`+`not_conj_symm`,
+  12.2a=`prime_mem_sigma_or_tau2`(ECore), 12.1g=ECore:487, 10.9b=
+  `beta_factorization_of_sylow_normalizer_in_intersection`(S10_BetaRadical:697)。
+  **次 iter で pin 要**: 12.10(d) 非巡回 N_G(S)⊆M の正確名 (S12_Corollary1210), 12.5(e), 12.6(a)(b)(f), 10.9(a)。
+
+## ✅✅✅ 2026-06-13 (Lane F session 16, Opus 4.8): **Thm 12.13 主定理 wire COMPLETE — piece 5 のみ残**
+
+**`nonabelian_pgroup_isUniquelyMaximal` (12.13 本体) を全 ingredient から組立完了** (S12_Theorem1213, 660 行)。
+主定理は sorry-free に assemble され、唯一の sorry = piece-5 sub-lemma
+`maximalContaining_normalizer_center_ne_of_two_maximals` (`ℳ(N_G(Z))≠{M}`) のみ
+(`#print axioms nonabelian_pgroup_isUniquelyMaximal` = propext/sorryAx/choice/Quot ⟹ sorry 依存は piece-5 経由のみ)。
+**全 logical wiring 検証済 = 12 ingredient が正しく合成することを確認**。leaf 実 sorry=1 (piece-5 本体)。
+
+**12.13 ingredient (全 axiom-clean, sessions 15-16, 12 commits)**:
+reduction (`exists_expPExtraspecial_le_of_two_maximals`: P→Sylow G→r≤2→Q extraspecial, S・rank 露出) /
+`Malpha_ne_bot_of_sylow_normalizer_le` (M_α≠1, Cor10.9b) / `notMem_alpha_of_rank_sylow_le_two` (p∉α) /
+`exists_elemAbelianOfRank_two_le_of_expPExtraspecial` (A∈ℰ²(Q)) /
+`center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial` (Z≤A) /
+`exists_line_maximalContaining_eq_of_Malpha_ne_bot` (12.4b 対偶) /
+`exists_conj_smul_zpowers_eq_of_expPExtraspecial`(型) + `..._le`(G-element) + `exists_conj_smul_eq_of_lines_of_expPExtraspecial`(G-subgroup) (line-共役 3 段) /
+`eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (ℳ-矛盾エンジン)。
+
+**残 = piece 5 内の唯一 sorry = `hK : C_{M_α}(Z)⊆M⋆`** (A の cocyclic core; C+B は実証済)。
+C (ℳ-矛盾) + B (Lem6.5b: N_M(Z)⊆M⋆ from hK; ↥M 内 normalizer_eq_centralizerK_mul_normalizerU +
+Cor10.9b で hKU + p∉α で coprime) は **DONE** (commit d4cf9fc5 / f7f1d384)。
+
+### ▶ A = hK (C_{M_α}(Z)⊆M⋆) 実装レシピ (cocyclic quotient-action, ~120 行 all-or-nothing, 最難)
+template = `S12_ExceptionalBridge.le_of_forall_line_inf_centralizer_le` (769-851; 部分群 A 版・
+**quotient でないので直接流用不可**: rank-1 line で Y=Z 問題。Q/Z の line のみ A_Y rank-2 で 12.4a 可)。
+- K := centralizer Z ⊓ M_α。**(1) Q≤N_G(K)**: Q normalize Z (Z=Z(Q) の像) ⟹ normalize centralizer Z;
+  Q≤M, M_α⊴M ⟹ normalize M_α ⟹ K。**(2) Z centralize K** (K=C_{M_α}(Z) は定義上 Z 中心化)。
+- **φ 構成**: `act : MulDistribMulAction ↥Q ↥K := MulDistribMulAction.compHom (M:=↥(N_G K)) ↥K (inclusion hQK)`;
+  `ψ := MulDistribMulAction.toMulAut ↥Q ↥K : ↥Q→*MulAut↥K`; `center↥Q ≤ ψ.ker` ((2) より z conj 自明);
+  `φ := QuotientGroup.lift (center↥Q) ψ hker : (↥Q⧸center↥Q)→*MulAut↥K`。
+- coprime `|Q/Z|=p²` vs `p∤|K|` (K≤M_α, p∉α 済); noncyclic Q/Z ((ℤ/p)², extraspecial commutator=center)。
+  ⟹ `cocyclicFixedByClosure φ = ⊤` (Prop 1.16)。
+- `closure_le` で各 generator g (∀y∈Y, φ y g=g, (Q/Z)/Y cyclic) → ↑g が preimage A_Y (= Y の ↥Q 内 preimage
+  を map; Z≤A_Y) を中心化 → **A_Y∈ℰ²(Q)** (Y line ⟹ |A_Y|=p²; Y=⊤ ⟹ A_Y=Q⊇rank2) → 12.4a
+  (`centralizer_le_of_elemAb_rank_two` を M⋆ に) で ↑g∈M⋆ ⟹ K⊆M⋆。
+- **✅ template + API 確定 (session 17 study)**: φ-construction template = **`S10_LocalCriteria:161-209`**
+  (`MulDistribMulAction.compHom (M:=↥(N_G(Malpha M))) ↥(Malpha M) (inclusion hX_norm_Ma)` +
+  `toMulAut` + `hφ_coe`/`hφ_inv_coe`; X が M_α に conj 作用)。これを K=C_{M_α}(Z) 版に + `QuotientGroup.lift`。
+  cocyclic template = **`le_of_forall_line_inf_centralizer_le:785-846`** (closure_le + 各 line case)。
+  確定 API: `le_normalizer_map_subtype_of_normal` (Q≤N_G(Z) from center↥Q normal),
+  `le_normalizer_opiCoreInG (alpha M) M` (M≤N_G(M_α)), `centralizer_conj_smul` +
+  `mem_normalizer_of_conj_smul_eq_self` + `Subgroup.smul_inf` (hQK idiom = S12_Corollary1210:309-312),
+  `QuotientGroup.lift N φ HN`, `commGroupOfCyclicCenterQuotient`/`cyclic_center_quotient_of_card_eq_prime_sq`
+  (PGroup.lean:358-371; Q/Z noncyclic via Q nonabelian), `Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl`
+  (coprime, S10_LocalCriteria:158)。**A-frame は ~80 行 all-or-(1-sorry): clean prefix は commit 不可
+  (全中間結果が最終 sorry に feed) ゆえ generator→M⋆ (12.4a) のみ sorry 化した full A-frame を一括で書く。**
+- **incremental commit 可**: φ+cocyclic+closure-reduction を frame とし generator→M⋆ (12.4a 部) を sorry 化
+  → net sorry=1 維持で A-frame 先行 commit、その後 generator core。
+**crux = quotient-action φ 構成 + line↔rank-2 A_Y 対応。multi-iteration 見込み。**
+
+## 🟢 2026-06-13 (Lane F session 15, Opus 4.8): **Thm 12.13 hard-core 着手 — 還元補題・extraspecial 共役・ℳ-矛盾エンジン**
+
+Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal` (leaf `S12_Theorem1213.lean`) の hard core は
+背理法 + 非共役矛盾。これまでに landed (build 緑・axiom-clean):
+- `mem_sigma_normalizer_le_of_two_maximals` (還元: Cor 12.10(a)(d) → `p∈σ(M)` ∧ `N_G(P)≤M`)。
+- `exists_conj_eq_center_mul_of_expPExtraspecial` (共役の半分: a₀∉Z, z∈Z ⟹ ∃q, q a₀ q⁻¹ = z·a₀。
+  φ:q↦⁅q,a₀⁆ が Z への全射準同型)。
+- **NEW** `eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (**ℳ-矛盾エンジン** = 最終矛盾の後半):
+  `A₀⋆ = g•A₀` (g∈M), `ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}` ⟹ `M=M⋆`。
+  共役は `N_G(·)` と可換 (`normalizer_conj_smul`)・coatom 保存 (`isCoatom_conj_smul`)・g∈M で M 固定
+  (`conj_smul_eq_self_of_mem_normalizer`)。すべて既存 helper (S12_ExceptionalBridge / S12_Corollary129 /
+  AInvariantPiSubgroups) で組める ⟹ 新 import 不要。
+
+### ▶ 12.13 hard core 残り decomposition (この順, BG mmd L3379–3397 精読済)
+
+**証明骨格** (背理法 `P` が distinct maximal `M,M⋆` に): WLOG `P` = Sylow p of `M∩M⋆` (⟹ Sylow p of G);
+Uniqueness で `r(P)=2`; Cor 10.7(b) `sylow_structure` で extraspecial `Q⊆P` (|Q|=p³, exp p),
+`Z=Z(Q)=Q'` 位数 p; Q/Z が `K=C_{M_α}(Z)` に作用, Prop 1.16 + Prop 12.4(a) で `K⊆M⋆`;
+Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(N_G(Z))≠{M}` ∧ `M_α≠1`
+(M_α=1 なら M=M∩M⋆⟹M⊆M⋆⟹M=M⋆ 矛盾)。最後に 12.4(b) **対偶** (M_α≠1) を M, M⋆ 両方に適用し
+`A₀,A₀⋆∈ℰ¹(A)−{Z}` (`ℳ(N_G(A₀))={M}`, `ℳ(N_G(A₀⋆))={M⋆}`) を取る。`A₀,A₀⋆` は Q 内非中心 line で
+**Q-共役** ⟹ エンジンで `M=M⋆` 矛盾。
+
+**残ピース (leaf に追加予定)**:
+1. ~~**line-共役** `exists_conj_smul_zpowers_eq_of_expPExtraspecial`~~ **✅ DONE (session 15)** —
+   type-level, sorry-free・axiom-clean。`b∈⟨a⟩⊔Z`(`mem_sup_of_normal_right` で `b=aⁱ·z`)⟹
+   `∃q, q•⟨a⟩=⟨b⟩`。ZMod p 体で `j:=i⁻¹.val`, center 位数 p で `z^p=1`, `exists_conj_eq_center_mul`
+   を `z^j∈Z` に適用→`(z^j a)ⁱ=z·aⁱ=b∈q•⟨a⟩`→両辺位数 p で等号。
+   **デバッグ知見** (再利用): `Nat.card (φ•H)` は `(φ•H : Subgroup Q)` 型注釈必須 (Nat.card が Type 期待で
+   `•` が誤 elaborate); `Subgroup.equivMapOfInjective` は `≃*` ゆえ `Nat.card_congr` には `.toEquiv`;
+   `Subgroup.eq_of_le_of_card_ge` (not `_le`; `[Finite K]` (hle:H≤K) (Nat.card K≤Nat.card H):H=K);
+   `Commute z a` は `(mem_center_iff.mp hz a).symm` を中間 `have` に (Eq 経由 dot は `Eq.zpow_left` 解決失敗);
+   `zpow_mem hz j` (root, K 暗黙; `Subgroup.zpow_mem` は引数順違い)。
+2. ~~**還元チェーン**~~ **✅ DONE (session 15)** — 2 補題で landed (sorry-free・axiom-clean):
+   - `exists_sylow_eq_map_of_normalizer_le` (R-a): `Sylow p of K (≤G)` で `N_G(P̄)≤K` ⟹ `P̄` は G の Sylow p。
+     S10.isSylow_sylowMap_of_mem_sigma の非 σ 一般化 (同証明; private `lt_inf_normalizer_of_lt_of_isPGroup`
+     を leaf に複製)。
+   - `exists_expPExtraspecial_le_of_two_maximals` (還元本体): 非可換 P が distinct max M≠M⋆ に
+     ⟹ `∃Q≤M∩M⋆, IsExpPExtraspecial p Q ∧ |Q|=p³`。P を M∩M⋆ の Sylow に拡大→R-a で G-Sylow→
+     **r(S)≤2** (by_contra r≥3 ⟹ `Ch2.S09.uniquenessTheorem hG hSlt (by omega) (Or.inl ⟨3≤r⟩)` で
+     IsUniquelyMaximal S, `huniq.2.unique` で M=M⋆ 矛盾) → S 非可換で `S10.sylow_structure …2.1 hrank2`
+     の abelian 枝を排し extraspecial Q。
+   **🔑 flagged gap 解消**: Uniqueness の hr3 は「P Sylow rank2」でなく **by_contra (r≥3) 分岐内で Or.inl** で供給
+   (BG「Uniqueness で r(P)≤2」は対偶。`uniquenessTheorem` 署名はそのまま使える)。
+3. ~~**M_α≠1**~~ **✅ DONE (session 15)** `Malpha_ne_bot_of_sylow_normalizer_le`: Sylow p of G で
+   `N_G(S)≤M∩M⋆` ⟹ M_α≠1。Cor 10.9(b) = `S10.beta_factorization_of_sylow_normalizer_in_intersection`
+   (`M=(M⋆∩M)⊔M_β ∧ α=β`) で M_α=M_β; M_β=⊥ なら M=M∩M⋆≤M⋆=M⋆ 矛盾。
+4. ~~**coprimality `p∉α(M)`**~~ **✅ DONE (session 15)** `notMem_alpha_of_rank_sylow_le_two`:
+   `rank(S)≤2` ⟹ `p∉α(M)` (∵ `pRank_p(M)≤pRank_p(G)=pRank_p(S)≤rank(S)≤2<3`)。
+   ⟹ `p∉β(M)` ⟹ `p∤|M_α|` (Lem 6.5(b) の coprime)。**coprimality gap 解消**。
+5. **🔶 残 hard piece = K⊆M⋆**: K=C_{M_α}(Z)。Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`,
+   Q/Z noncyclic rank2 が K に coprime 作用 [coprime は p∉α で OK]) で K=⟨C_K(Ā)|Ā∈ℰ¹(Q/Z)⟩、
+   各 `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two` を M⋆ に, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。
+   ⟹ K⊆M⋆。次に Lem 6.5(b) (`normalizer_eq_centralizerK_mul_normalizerU`, M=(M∩M⋆)⊔M_α, M_α⊴M,
+   Z≤M∩M⋆, coprime) で `N_M(Z)=C_{M_α}(Z)·N_{M∩M⋆}(Z)⊆M⋆` ⟹ **ℳ(N_G(Z))≠{M}** (∵ N_M(Z)⊆M⋆≠M)。
+   **⚠ 最難所**: Prop 1.16 の `cocyclicFixedByClosure` を K=C_{M_α}(Z) 上の Q/Z 作用に instantiate +
+   `C_K(A/Z)=C_K(A)` (Z 中心化ゆえ quotient fixed = ambient fixed) + ℰ¹(Q/Z)↔ℰ²(Q) の対応。
+6. **12.4(b) 対偶 ✅ DONE (session 15)** `exists_line_maximalContaining_eq_of_Malpha_ne_bot`:
+   A∈ℰ²(M), A≤M, M_α≠⊥ ⟹ ∃A₀∈ℰ¹(A), A₀≤A, ℳ(N_G(A₀))={M} (push_neg + 12.4(b))。
+   組立: A₀≠Z は ℳ(N_G(Z))≠{M} (piece 5) から。M⋆ 側も同様 → line-共役 + engine で M=M⋆ 矛盾。
+
+**⚠ 注意点 (session 15 末)**: ✅ piece 2 (reduction)・3 (M_α≠1)・4 (coprimality)・6前半 (12.4b 対偶);
+✅ back-end (line-conj+engine)。**残 hard = piece 5 (K⊆M⋆)** + 主定理組立。
+- **piece 5 = K⊆M⋆ assessment (最難所, multi-iter 見込み)**: `le_centralizer_of_forall_line` (12.4b の
+  Prop 1.16 engine) は **「W≤C(A) (centralizer)」結論で 12.13 の「K≤M⋆ (maximal 包含)」には流用不可**。
+  raw `cocyclicFixedByClosure_eq_top_of_not_isCyclic` を **A':=Q/Z (=↥Q⧸Z), G':=↥K** で instantiate 要:
+  (1) **作用 `φ:(↥Q⧸Z) →* MulAut ↥K` の構成 = crux** (Q は K=C_{M_α}(Z) を正規化 [Q≤M, M_α⊴M, Z normalize];
+  Z は K を中心化ゆえ作用は Q/Z を経由)。(2) coprime (`p∤|K|`, p∉α 済) + noncyclic (Q/Z≅(ℤ/p)²)。
+  (3) `cocyclicFixedByClosure=⊤` ⟹ K=⟨C_K(Y)|Y≤Q/Z,(Q/Z)/Y cyclic⟩。(4) 各 `C_K(Y)⊆C_G(A_Y)⊆M⋆`
+  (A_Y=Y の Q 内 preimage ∈ℰ²(Q), 12.4(a)=`centralizer_le_of_elemAb_rank_two` を M⋆ に; Y=Q/Z は
+  C_K(Q)⊆C_K(line))。⟹ K⊆M⋆ → Lem 6.5(b) で N_M(Z)⊆M⋆ → ℳ(N_G(Z))≠{M}。**(1) の quotient-action
+  MonoidHom 構成が型重く 1-2 iter。**
+- **主定理組立 (piece 5 後 or piece5-sorry で先行可)**: 
+  - ✅ **richer reduction DONE (session 15)**: `exists_expPExtraspecial_le_of_two_maximals` を拡張し
+    `∃ (S:Sylow p G)(Q), N_G(S)≤M∩M⋆ ∧ rank(S)≤2 ∧ Q≤M∩M⋆ ∧ IsExpPExtraspecial p Q ∧ |Q|=p³` を返す
+    (Malpha_ne_bot/notMem_alpha に S・rank2 を供給可)。
+  - ✅ **A∈ℰ²(Q) 存在 DONE (session 15)** `exists_elemAbelianOfRank_two_le_of_expPExtraspecial`:
+    **🔑訂正: `A∈elemAbelianOfRank G p 2` は `IsElementaryAbelian p A ∧ |A|=p²` のみ (maximality 不要!)**
+    (`IsMaximalElementaryAbelian` は別物=`ℰ*`/idealPrime 用)。`mem_elemAbelianOfRank.mpr ⟨elem, card⟩`。
+    Q 非可換⟹非cyclic⟹`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (Ch1.S04, odd 要) で
+    p²-elem-ab E≤↥Q→`E.map Q.subtype`。**pRank≤2 不要だった** (over-engineering 撤回)。
+  - **残: Z(Q)≤A** (assembly の line-共役で `a₀*∈⟨a₀⟩⊔Z`⟹`A=⟨a₀⟩⊔Z` に要)。
+    self-centralizing 経由: `|Q|=p³`, `|A|=p²` ⟹ `C_Q(A)` (=centralizer A⊓Q) の位数∈{p²,p³};
+    =p³ なら C_Q(A)=Q⟹A≤Z(Q) (|A|≤p 矛盾)⟹=p²=|A|⟹C_Q(A)=A⟹Z(Q)⊆C_Q(A)=A。~20 行・次 iter。
+  - **line-共役の ↥Q↔G transport**: A₀,A₀⋆ (12.4b より ∈ℰ¹(A), ≤A≤Q) を ↥Q 内の zpowers に持ち上げ
+    `exists_conj_smul_zpowers_eq_of_expPExtraspecial` 適用→ q∈↥Q→ G で conj、engine へ。
+  推奨: 次 iter で A∈ℰ²(Q) 構成 → piece5 を sorry'd sub-lemma 化 → 主定理を完全 wire (net sorry 0 維持)
+  で合成検証 + piece5 隔離、その後 piece5 本体。
+
+## ✅✅✅ 2026-06-13 (Lane F session 14, Opus 4.8): **Thm 12.12 COMPLETE — sorry-free・axiom-clean**
+
+**BG Theorem 12.12 (Frobenius 因子分解) を完全形式化**(`frobenius_factorization_of_regular`,
+S12_Theorem1212c, 全 capstone axiom-clean)。3 ケース (τ₂=∅ / 非可換 Sylow / 可換 Sylow) 全実証。
+新 leaf `S12_Theorem1212c.lean` (9 theorem, sorry-free) の構成 (commits 0e0ca590→5fe05044):
+
+1. **3-case glue** `frobenius_factorization_of_regular` (0e0ca590): selector = 「|E| を割る τ₂-素数で
+   非可換 Sylow をもつか」。Case 1 (`frobFact_of_regular_all` + hregAll 導出), Case 2
+   (`frobFact_of_nonabelianSylow`) 即決。素数性は `primeFactors` ケース分けで無料。
+2. **per-prime Z_p** `exists_regular_cyclic_of_mem_tau2` (6d2f3845): wiring。
+3. **part (a)** `frobFact_partA_of_abelianSylow` + 汎用 `isPiSubgroup_le_of_normal_isHall` (f5728ec9):
+   A₀=E₂ + `C_E(x)⊆E₂`。
+4. **piece B 直積** `card_finsetSup_eq_prod` + `mem_Z_of_orderOf_prime_mem` + `le_normalizer_finsetSup`
+   (a89342ad): 「⨆Z_p の素数位数 r 元 ∈ Z_r」。
+5. **τ₂-積バンドル** `exists_tau2_product` (e6ebf144): ZZ=∏Z_p [≤E, ≠⊥, E≤N, IsPiGroup τ₂, 全域 regular,
+   τ₂-exp realize]。`choose!` で族構成。
+6. **Case 3 最終 glue** `frobFact_of_abelianSylow` (5fe05044): K=Hall τ₂'(`hall_E_exists`),
+   E₀=ZZ⊔K, regularity (τ₂→a∈ZZ via E₀/ZZ τ₂' quotient; τ₁∪τ₃→hreg), exp (τ₂→ZZ exp-元;
+   τ₂'→K⊇Sylow_r exp-元), Frobenius (`isFrobeniusGroup_of_regular`)。
+
+**§12 残 sorry = 6** (全て S12_E, 12.12 経路外): 12.13 `nonabelian_pgroup_isUniquelyMaximal` /
+12.14 `maximalContaining_centralizer_eq_singleton` / 12.15 `sigma_subgroup_maximal_interaction` /
+12.16(a) `sigma_subgroup_conj_into_Msigma` + `sigma_subgroup_pRank_normalizer_le_one`[issue 0065 deferred] /
+12.16(b) `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`[issue 0065 deferred]。
+**次 = 12.13/12.14/12.15/12.16(a)pt1 の独立 hard 定理群** (issue 0065 の 12.16 ×2 は proof-deferred scaffold)。
+12.15/12.16 は §13-14 gate (Lane G 引用中)。再利用知見: `Subgroup.orderOf_coe` は `orderOf ↑x` 形のみ rw 可
+→ 直接 `H.orderOf_dvd_natCard hx`; `Finset.induction with | empty | insert` の empty 失敗は insert を
+誤吞 (case 消失に注意); 集合 normalizer の bot は `mem_normalizer_fintype`。
+
+## 🟢 2026-06-13 (Lane F session 13, Opus 4.8): **Thm 12.12 三ケース組立 — Case 1/2 完了・Case 3 隔離**
+
+新 leaf `S12_Theorem1212c.lean` を切り、`frobenius_factorization_of_regular` (12.12 本体) を
+**S12_E scaffold から移植・3 ケースに分解して証明**。`frobenius_factorization_of_regular` の結論型は
+`FrobFactConclusion M E` (= S12_E の inline 連言と defeq)。ケース選択子 = 「`|E|` を割る `τ₂`-素数で
+**非可換 Sylow** をもつものが存在するか」(`by_cases hnonab : ∃ p ∈ (Nat.card ↥E).primeFactors, p ∈ τ₂ ∧ ∃ S:Sylow p G, ¬可換`):
+
+- **Case 2** (非可換 Sylow): `frobFact_of_nonabelianSylow` (既存) に直結。**完了**。
+- **Case 1** (`τ₂ ∩ π(E) = ∅`): `frobFact_of_regular_all` (既存) に `hregAll` を供給。導出 =
+  `e∈E#` の各素因数 `r ∈ primeFactors(ord e) ⊆ π(E)` を `mem_tau_union_of_mem_primeFactors` で
+  `τ₁∪τ₂∪τ₃` に入れ、`r∉τ₂` (Case 1 仮定) から `τ₁∪τ₃` を結論。`E≠⊥` は `h.E_ne_bot hG`。**完了**。
+- **Case 3** (可換 Sylow, `τ₂≠∅`): 新 sorried `frobFact_of_abelianSylow` に隔離 (= **残務**)。
+
+**🔑 素数性の自動化**: ケース分けを「`p ∈ (Nat.card ↥E).primeFactors`」で行うことで `Nat.prime_of_mem_primeFactors`
+が `Fact p.Prime` を無料供給 (τ₂-素数は `p∉σ⟹p∤|M_σ|` + `pRank=2⟹p∣|M|` で必ず `|E|` を割る)。
+**🔑 `orderOf e ∣ |E|`** = `E.orderOf_dvd_natCard heE` (subtype 不要)。
+
+S12_E:475 の sorried `frobenius_factorization_of_regular` は除去 → pointer comment。net 0 sorry
+(S12_E 7→6 real + 新 leaf +1)。full build 3795 緑・AxiomsCheck OK。
+
+### ▶ 残務: `frobFact_of_abelianSylow` (S12_Theorem1212c.lean:51, τ₂-集約)
+
+`A₀ = E₂` (Lemma 12.8(a): abelian normal Hall τ₂); `E₀ = E₁E₃·∏_{p∈τ₂}Z_p`。各 `p∈τ₂`:
+`A_p∈ℰ²_p(E)` (`exists_elemAb_rank_two_le_E_of_tau2`) → `S_p:=A_p` を含む Sylow p of G → **可換 (habel)**
+→ Lemma 12.8(c) 鎖 `S ⊆ N_G(S)' ⊆ F(E) ⊆ C_G(S) ⊆ E` で **`S_p ≤ E` (hSM 自動)** →
+per-prime capstone `exists_cyclic_Enormal_regular_of_abelianSylow` で **`Z_p ≤ S_p ≤ E`** cyclic,
+`E ≤ N_G(Z_p)`, `exp(Z_p)=exp(S_p)`, regular。
+- **exp(E₀)=exp(E)**: `exponent_eq_of_forall_factorization_le` (S12_Theorem1212:90) で素数別に realize
+  (`exists_factorization_le_at_prime`/`factorization_exponent_le_of_sylow` を流用; r∈τ₁→E₁, r∈τ₃→E₃,
+  r∈τ₂→Z_r)。
+- **E₀ regular**: `inf_centralizer_eq_bot_of_forall_prime_order` (S12_Theorem1212b:1215) で prime-order に還元。
+  order `r∈τ₁∪τ₃` → `hreg` 直接; **order `r∈τ₂` → `a∈Z_r`** が要 (⚠ **未解決の核心**: `E₀∩(Sylow_r)=Z_r`
+  すなわち `E₁⊔E₃` が `τ₂'` であることが要る。Schur-Zassenhaus 補群 / E₂⊴E の Hall 構造で詰める)。
+- **τ₂ 上の有限 product**: `T := (Nat.card ↥E).primeFactors.filter (·∈τ₂ M)` 上の `Finset.sup` + per-p
+  選択 (Classical.choose)。`Z_p ≤ E₂` (τ₂-Hall) ゆえ ∏ は E₂ 内 abelian 直積。
+
 ## 🟢 2026-06-12 (Lane F session 12, Opus 4.8): **Thm 12.12 Case 3 per-prime Z-construction COMPLETE**
 
 Case 3 の per-prime Z-construction を**両枝とも完全実装**(front-half `353c9d9d`, agemo
@@ -1887,4 +2223,41 @@ BG §12 "The Subgroup E" は **局所解析の中核** で、M の complement E 
 *作成日: 2026-05-22*  
 *出典: BG local-analysis.mmd L3023–3483, PDF pp.83–96*  
 *参考: BG §10 (M_α, M_σ), §11 (Exceptional), §13 (Prime Action), App.C (Peterfalvi)*
+
+---
+
+## session 21 (2026-06-13, Lane F): Prop 12.15 COMPLETE + d.2 の素数限定決定
+
+**✅✅✅ BG Prop 12.15 (`sigma_subgroup_maximal_interaction`) 完全証明** — sorry-free・axiom-clean
+(AxiomsCheck 登録済、3 axioms 全 allowlist)。新 leaf `S12_Proposition1215.lean`、commit `6d696a0a`。
+全 5 結論 (a)-(e)。Thm 12.13 (前 session) と並ぶ §12 keystone で、§13-14 を gate していた。
+
+**🔑 d.2 (τ₁-transfer) の素数限定決定 (重要・Lane G / 後続は再検討不要)**:
+- 結論 `tau1 M⋆ ⊆ tau1 M ∪ α M` を `∀ r, r.Prime → r∈tau1 M⋆ → r∈tau1 M ∪ α M` に**素数限定**した。
+- 理由: BG 原文 (local-analysis.mmd L3059, L2647) で **τᵢ(M) も α/β/σ も `{p∈π(M)|…}` = 素数の集合**
+  (「π(M) は σ⊔τ₁⊔τ₂⊔τ₃ の disjoint union」)。BG の `r_p` は素数のみ定義 (L1363)。
+- repo の `tau1` 定義は BG の `p∈π(M)` 条件を落とし `pRank`-based で **ℕ 上を走る**ため、合成数 r
+  (例 9: `IsElementaryAbelian 9` は素数性不要ゆえ ℤ/9 が該当、pRank=1 可) も τ₁(M⋆) に入りうる
+  (formalization artifact)。その合成数 r では r∉α(M) (α⊆素数) かつ shared-Sylow 論法 (Sylow=素数専用)
+  が効かず、**文字通りの集合包含は破れうる (偽の可能性)**。素数限定は **BG 忠実かつ lossless**。
+- ⚠ 12.15 は他から未 cite だったので statement 変更は安全 (S12_E 旧 decl は sorry のまま放置されていた)。
+
+**証明の 3 段** (r 素数, r∉α(M) の場合に r∈τ₁(M) を示す):
+- **P5** `r∉π(M')`: `commutator_le_commutator_sup_normal` (K=A·N, N⊴K ⟹ K'≤A'·N) を ↥M で適用
+  + (M∩M⋆)≤M⋆ の derived-mono + `card_HK_mul_card_inf` 割り算 + `Mbeta_isPiGroup`。
+- **P6** `r∉σM`: `mem_sigma_iff` の Sylow-r → `IsPiGroup σM` → `sigma_subgroup_le_Msigma_of_isHall`
+  → M_σ ≤ M' (`Msigma_le_derived`)、P5 と矛盾。
+- **pRank M r=1**: shared Sylow `R=Syl_r(M∩M⋆)=Syl_r(M)=Syl_r(M⋆)`。`r∤[M:M∩M⋆]`/`r∤[M⋆:M∩M⋆]`
+  を M_β/M⋆_β diamond (`not_dvd_index_of_sup_top_normal`) で出し、`pRank_eq_of_le_of_not_dvd_index`
+  (`Sylow.ofCard` で R を両 Sylow に realize) で `pRank M r = pRank(M∩M⋆) r = pRank M⋆ r = 1`。
+
+**再利用可能な汎用 helper (§13+ で有用)**:
+- `commutator_le_commutator_sup_normal {K}(A N)[N.Normal](A⊔N=⊤) : commutator K ≤ ⁅A,A⁆⊔N`
+- `not_dvd_index_of_sup_top_normal {K'}(A N)[N.Normal](A⊔N=⊤)(r∤|N|) : r∤A.index`
+- `pRank_eq_of_le_of_not_dvd_index {H K}(H≤K)(r∤[K:H])[Fact r.Prime] : pRank H r = pRank K r`
+
+**§12 残 frontier** (S12_E に 5 sorry): 12.14 (`maximalContaining_centralizer_eq_singleton`),
+12.16 = `sigma_subgroup_conj_into_Msigma` (Y を M_σ へ共役) / `sigma_subgroup_pRank_normalizer_le_one`
+(r_p(N_H(Y))≤1) / `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (p∈τ₁(M)⟹p∉π(N_H(Y)'))。
+**12.16 が Lane G を gate** ⟹ 次の優先。完了で §12 STOP。
 

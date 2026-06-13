@@ -100,6 +100,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1210
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128d
@@ -107,7 +108,12 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1218
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults

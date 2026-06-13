@@ -45,12 +45,8 @@ variable {G : Type*} [Group G]
 (`centralizer_le_of_elemAb_rank_two` (a) /
 `mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne` (b))。 -/
 
-/-- **BG Theorem 12.13** (mmd L3347): `G` のすべての非可換 `p`-部分群は `𝒰` に属す。 -/
-theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
-    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
-    (hPnab : ¬ IsMulCommutative P) :
-    IsUniquelyMaximal P := by
-  sorry
+/-! **BG Theorem 12.13** (`nonabelian_pgroup_isUniquelyMaximal`) は `S12_Theorem1213.lean` に
+移動した(σ(M)-side の最初の uniqueness 結果; Prop 12.4 から導出)。 -/
 
 /-- **BG Corollary 12.14** (mmd L3369): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
 `X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
@@ -67,6 +63,36 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
     (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y) :
     ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
+  -- `M_σ = O_{σ(M)}(M)` is the *normal* Hall `σ(M)`-subgroup of `M`, so it contains every
+  -- `σ(M)`-subgroup of `M` outright (no conjugation needed: take `g = 1`).
+  refine ⟨1, M.one_mem, ?_⟩
+  simp only [map_one, one_smul]
+  exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hYM hYpi
+
+/-- **BG Corollary 12.16(a)** (mmd L3453-3456): `Y` を `G` の非自明 `σ(M)`-部分群、
+`p ∈ π(E) ∩ β(G)'`、`H ∈ ℳ(Y)` を `M` と非共役な極大部分群とすると `r_p(N_H(Y)) ≤ 1`。
+(BG Cor 12.16 の (a) 条項。前置節「`Y` は `M_σ` に共役」は `sigma_subgroup_conj_into_Msigma`。
+本体 proof は §12 cascade で後続。Lane G の forward axiom de-axiom 用 faithful scaffold。) -/
+theorem sigma_subgroup_pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
+    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    pRank ↥(H ⊓ Subgroup.normalizer (Y : Set G)) p ≤ 1 := by
+  sorry
+
+/-- **BG Corollary 12.16(b)** (mmd L3453, 3456): 同設定で `p ∈ τ₁(M)` なら
+`p ∉ π(N_H(Y)')` (= `p ∤ |(H ⊓ N_G(Y))'|`)。本体 proof は §12 cascade で後続。 -/
+theorem sigma_subgroup_not_mem_primeFactors_derived_of_tau1 [Finite G]
+    (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    (hpτ1 : p ∈ tau1 M)
+    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
+    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
   sorry
 
 /-- **BG Lemma 12.17** (mmd L3448): `C_{M_σ}(E) ⊆ M_σ'` かつ `[M_σ, E] = M_σ`。
@@ -432,49 +458,16 @@ theorem derivedE_centralizes_betaComplement [Finite G] (hG : IsMinimalSimpleOdd 
 
 /-! **BG Lemma 12.11** は `S12_Lemma1211.lean` に移動した (`tau2_transfer_to_maximal`)。 -/
 
-/-- **BG Theorem 12.12** (mmd L3306): すべての `(τ₁(M)∪τ₃(M))`-元 `e ∈ E#` で `C_{M_σ}(e)=1`
-なら (a) `E` は abelian normal `A₀` を含み `∀ x ∈ M_σ#, C_E(x) ⊆ A₀`;
-(b) `E` は `E` と同 exponent の `E₀` を含み `E₀M_σ` は kernel `M_σ` の Frobenius 群。 -/
-theorem frobenius_factorization_of_regular [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    (hreg : ∀ e ∈ E, e ≠ 1 → (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
-      S10.Msigma M ⊓ Subgroup.centralizer ({e} : Set G) = ⊥) :
-    (∃ A₀ : Subgroup G, A₀ ≤ E ∧ IsMulCommutative ↥A₀ ∧
-      E ≤ Subgroup.normalizer ((A₀ : Subgroup G) : Set G) ∧
-      ∀ x ∈ S10.Msigma M, x ≠ 1 → E ⊓ Subgroup.centralizer ({x} : Set G) ≤ A₀) ∧
-    (∃ E₀ : Subgroup G, E₀ ≤ E ∧ Monoid.exponent ↥E₀ = Monoid.exponent ↥E ∧
-      Ch06.IsFrobeniusGroup ↥(S10.Msigma M ⊔ E₀)
-        ((S10.Msigma M).subgroupOf (S10.Msigma M ⊔ E₀))
-        (E₀.subgroupOf (S10.Msigma M ⊔ E₀))) := by
-  sorry
+/-! **BG Theorem 12.12** (`frobenius_factorization_of_regular`) は `S12_Theorem1212c.lean` に
+移動した。3 ケース組立 (Case 1 `τ₂=∅` / Case 2 非可換 Sylow / Case 3 可換 Sylow) のうち
+Case 1・Case 2 は完了、Case 3 (`frobFact_of_abelianSylow`, τ₂-集約) が残務。
+結論型は `FrobFactConclusion M E` (`S12_Theorem1212.lean`、本ファイルの inline 連言と defeq)。 -/
 
 /-! ## §12 σ(M) の埋め込みと一意性 (mmd L3385-3479) -/
 
-/-- **BG Proposition 12.15** (mmd L3387): `q ∈ σ(M)`, `X` を `M` の非自明 `q`-部分群、
-`M* ∈ ℳ(N_G(X)) - {M}`、`S` を `X` を含む `M ∩ M*` の Sylow `q`-部分群とすると
-(a) `M*` は `M` と非共役; (b) `N_G(S) ⊆ M`; (c) `S` は `M*` の Sylow `q`;
-(d) `q ∈ σ(M*)` なら `M*=(M∩M*)M*_β`, `τ₁(M*)⊆τ₁(M)∪α(M)`, `M_β=M_α≠1`;
-(e) `q ∉ σ(M*)` なら `q ∈ τ₂(M*)`, `π(M)∩σ(M*)⊆β(M*)`, `M∩M*` は `M*_σ` の補群。 -/
-theorem sigma_subgroup_maximal_interaction [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
-    (hq : q ∈ S10.sigma M) {X : Subgroup G} (hXM : X ≤ M) (hXne : X ≠ ⊥) (hXq : IsPGroup q ↥X)
-    {Mstar : Subgroup G}
-    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)))
-    (hMstarne : Mstar ≠ M) {S : Subgroup G} (hSle : S ≤ M ⊓ Mstar) (hXS : X ≤ S)
-    (hSq : IsPGroup q ↥S)
-    (hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T) :
-    (¬ ∃ g : G, MulAut.conj g • M = Mstar) ∧
-    Subgroup.normalizer (S : Set G) ≤ M ∧
-    (∀ T : Subgroup G, T ≤ Mstar → IsPGroup q ↥T → S ≤ T → S = T) ∧
-    (q ∈ S10.sigma Mstar →
-      Mstar = (M ⊓ Mstar) ⊔ S10.Mbeta Mstar ∧
-      tau1 Mstar ⊆ tau1 M ∪ S10.alpha M ∧
-      S10.Mbeta M = S10.Malpha M ∧ S10.Malpha M ≠ ⊥) ∧
-    (q ∉ S10.sigma Mstar →
-      q ∈ tau2 Mstar ∧
-      (∀ r ∈ (Nat.card ↥M).primeFactors, r ∈ S10.sigma Mstar → r ∈ S10.beta Mstar) ∧
-      S10.Msigma Mstar ⊓ (M ⊓ Mstar) = ⊥ ∧ S10.Msigma Mstar ⊔ (M ⊓ Mstar) = Mstar) := by
-  sorry
+/-! **BG Proposition 12.15** (`sigma_subgroup_maximal_interaction`) は `S12_Proposition1215.lean`
+に移動した(証明は Thm 12.5(e) / Cor 12.6 / Cor 12.10(d) / Lemma 12.2(a)(b) / Cor 10.9 を要し、
+それらの leaf は S12_E より downstream ゆえ in-place 証明不可; 12.13 と同型に downstream leaf へ)。 -/
 
 /-- For an `α(M)'`-subgroup `X` of `M` (`X ≠ 1`) with `ℳ(N_G(X)) ≠ {M}`, the centralizer
 `C_{M_α}(X)` has rank `≤ 1`. Contrapositive of Lemma 10.3: rank `≥ 2` would make `C_M(X)`

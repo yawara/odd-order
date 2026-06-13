@@ -27,6 +27,13 @@ abort+ユーザー承認**。(3) `notes/bg/s13_prime_action.md` は G 所有 (F 
 abort+ユーザー承認** (G の issue 8000 と同型; H の issue base = 2000)。(3)
 `notes/peterfalvi/s10_13_maximal_structure.md` は H 所有。
 
+**📌 一時例外 (issue 8001, 2026-06-12): G の S12_ECore de-private を許容合流**。
+G の履歴に `chore(s12): de-private sylow_le_derived_of_mem_tau3` (commit `4b92778f`, S12_ECore.lean
+5 行, **user裁可 issue 8001**) が含まれる。G が de-axiom 後にマージする際、上記「G が S12_E 系を
+編集 → abort」ゲートがこれに hit するが、**この de-private のみなら例外的に合流許可**
+(`git diff main..bg-s13 -- '*S12_E*'` の差分が `private` 削除 + cite 1 箇所のみなら OK)。
+それ以外の S12_E/S12_ECore 内容変更が混じれば通常どおり abort。
+
 **📌 一時例外 (issue 0065, 2026-06-12): F の cor12.16 statement +2 sorry を許容合流**。
 hub→F 依頼で F が S12_E に BG Cor 12.16(a)(b) の **faithful statement 2 個を sorry'd で追加**する
 (`sigma_subgroup_pRank_normalizer_le_one` + `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`)。

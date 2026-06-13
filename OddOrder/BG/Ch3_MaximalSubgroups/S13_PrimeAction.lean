@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
 
 /-!
 # BG §13: Prime Action
@@ -147,24 +150,14 @@ theorem pSubgroup_centralizes_of_interaction [Finite G] (hG : IsMinimalSimpleOdd
       P ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G)) ∧
     p ∉ tau2 Mstar ∧
     (p ∈ tau1 M → S10.idealPrime p G) := by
-  sorry
+  have hb : p ∉ tau2 Mstar := not_mem_tau2_of_interaction hG h hMstar hpE hcomm hnc
+  exact ⟨fun P hP hPp =>
+      pSubgroup_centralizes_Msigma_inf hG h hMstar hpE hpMstar hpτ1 hb hnc hP hPp,
+    hb, fun hpτ1M =>
+      mem_idealPrime_of_tau1_of_interaction hG h hMstar hpE hpMstar hpτ1 hb hcomm hnc hpτ1M⟩
 
-/-- **BG Corollary 13.2** (mmd L3518): `p ∈ τ₁(M)∪τ₃(M)`, `P` 非自明 `p`-部分群 of `M`,
-`M* ∈ ℳ(N_G(P))` なら (a) `M∩M*` の全 `p`-部分群が `M_σ∩M*` を中心化; (b) `E∩M*` の全
-`τ₁(M*)'`-部分群が `M_σ∩M*` を中心化; (c) `[M_σ∩M*,M∩M*]≠1` なら `p ∈ σ(M*)`、かつ
-`p ∈ τ₁(M)` なら `p ∈ β(M*)`。 -/
-theorem tau13_pSubgroup_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
-    (hp : p ∈ tau1 M ∪ tau3 M) {P : Subgroup G} (hPM : P ≤ M) (hPne : P ≠ ⊥) (hPp : IsPGroup p ↥P)
-    {Mstar : Subgroup G}
-    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (P : Set G))) :
-    (∀ Q : Subgroup G, Q ≤ M ⊓ Mstar → IsPGroup p ↥Q →
-      Q ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G)) ∧
-    (∀ Q : Subgroup G, Q ≤ E ⊓ Mstar → Subgroup.IsPiSubgroup ((tau1 Mstar)ᶜ) Q →
-      Q ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G)) ∧
-    (⁅S10.Msigma M ⊓ Mstar, M ⊓ Mstar⁆ ≠ ⊥ →
-      p ∈ S10.sigma Mstar ∧ (p ∈ tau1 M → p ∈ S10.beta Mstar)) := by
-  sorry
+-- **BG Corollary 13.2** (`tau13_pSubgroup_centralizes`) は leaf
+-- `S13_Corollary132.lean` で完全証明済 (上で import)。本ファイルからは再 export される。
 
 /-- **BG Corollary 13.3** (mmd L3526): (a) `E` の非自明 cyclic Sylow 部分群は `M_σ` に prime 作用;
 (b) `E₃` は `M_σ` に prime 作用。 -/
@@ -176,16 +169,8 @@ theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     ActsPrimeOn (S10.Msigma M) E₃ := by
   sorry
 
-/-- **BG Theorem 13.4** (mmd L3538): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`
-なら `C_{M_σ}(P) ⊆ C_{M_σ}(R)`。(prime action 解析の主ステップ。) -/
-theorem centralizer_le_centralizer_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
-    [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)
-    {P R : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hPE : P ≤ E)
-    (hR : R ∈ elemAbelianOfRank G r 1) (hRC : R ≤ E ⊓ Subgroup.centralizer (P : Set G)) :
-    S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
-      S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) := by
-  sorry
+-- **BG Theorem 13.4** (`centralizer_le_centralizer_of_tau1`) は leaf `S13_Theorem134.lean` へ
+-- 移動 (上で import)。outer reduction は完全証明、per-q core steps 4-9 は scaffold sorry。
 
 /-- **BG Theorem 13.5** (mmd L3570): `E₁ ≠ 1` なら `E₁` は `M_σ` に prime 作用。 -/
 theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)

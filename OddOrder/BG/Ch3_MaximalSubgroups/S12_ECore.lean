@@ -544,8 +544,11 @@ complement of `P` in `W` (Schur–Zassenhaus). By the cyclic-`P` dichotomy
 (`Sylow.commutator_eq_bot_or_commutator_eq_self`), either `⁅K, P⁆ = ⊥` — then `W = PK`
 centralizes `P`, Burnside yields a normal `p`-complement `N ⊇ E'`, contradicting
 `p ∣ |E'|` (`dvd_card_derived_of_mem_tau3`) — or `⁅K, P⁆ = P`, which forces `P ≤ E'`,
-and Prop 1.6(d) (via the conjugation bridges) gives `C_P(K) = 1`, hence `C_G(E) ⊓ P = ⊥`. -/
-private theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd G)
+and Prop 1.6(d) (via the conjugation bridges) gives `C_P(K) = 1`, hence `C_G(E) ⊓ P = ⊥`.
+
+De-privatized (user-approved 2026-06-12, issue 8001) so BG §13 Lemma 13.1(a) can cite it via the
+`τ₃` complement of an arbitrary maximal `M*`. -/
+theorem sylow_le_derived_of_mem_tau3 [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
     (hp : p ∈ tau3 M) (P : Sylow p ↥E) :
     (P : Subgroup ↥E).map E.subtype ≤ derivedInG E ∧
