@@ -271,6 +271,58 @@ theorem eq_of_conj_of_maximalContaining_normalizer_eq_singleton
   -- `g ∈ M` fixes `M` under conjugation, so `M = M⋆`.
   rwa [conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hgM)] at hmem'
 
+/-- **BG 12.13 reduction**: a nonabelian `p`-subgroup `P` lying in two distinct maximal subgroups
+`M ≠ M⋆` yields a subgroup `Q ⊆ M ∩ M⋆` of order `p³` and exponent `p` (extraspecial).
+
+Enlarge `P` to a Sylow `p`-subgroup `S` of `M ∩ M⋆`; since `N_G(S) ⊆ M ∩ M⋆`
+(`mem_sigma_normalizer_le_of_two_maximals`, `S ⊇ P` still nonabelian), `S` is a Sylow `p`-subgroup
+of `G` (`exists_sylow_eq_map_of_normalizer_le`). If `r(S) ≥ 3` the Uniqueness Theorem forces
+`M = M⋆`; so `r(S) ≤ 2`, and `S` nonabelian, whence Corollary 10.7(b) (`sylow_structure`) provides
+the extraspecial `Q ⊆ S ⊆ M ∩ M⋆`. -/
+theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] {P M Mstar : Subgroup G} (hPp : IsPGroup p ↥P)
+    (hPnab : ¬ IsMulCommutative ↥P) (hM : M ∈ maximalSubgroups G)
+    (hMstar : Mstar ∈ maximalSubgroups G) (hMne : M ≠ Mstar)
+    (hPM : P ≤ M) (hPMstar : P ≤ Mstar) :
+    ∃ Q : Subgroup G, Q ≤ M ⊓ Mstar ∧ IsExpPExtraspecial p ↥Q ∧ Nat.card ↥Q = p ^ 3 := by
+  classical
+  set K : Subgroup G := M ⊓ Mstar with hK
+  have hPK : P ≤ K := le_inf hPM hPMstar
+  -- enlarge `P` to a Sylow `p`-subgroup `Pbar` of `↥K`.
+  have hPsubK_pg : IsPGroup p ↥(P.subgroupOf K) :=
+    hPp.of_equiv (Subgroup.subgroupOfEquivOfLe hPK).symm
+  obtain ⟨SK, hSK⟩ := hPsubK_pg.exists_le_sylow
+  set Pbar : Subgroup G := (SK : Subgroup ↥K).map K.subtype with hPbar
+  have hPbar_pg : IsPGroup p ↥Pbar :=
+    SK.2.of_equiv (Subgroup.equivMapOfInjective _ _ K.subtype_injective)
+  have hP_le_Pbar : P ≤ Pbar := by
+    have h1 : (P.subgroupOf K).map K.subtype ≤ Pbar := Subgroup.map_mono hSK
+    rwa [Subgroup.map_subgroupOf_eq_of_le hPK] at h1
+  have hPbar_nab : ¬ IsMulCommutative ↥Pbar := fun h => hPnab (isMulCommutative_of_le h hP_le_Pbar)
+  have hPbar_le_K : Pbar ≤ K := Subgroup.map_subtype_le _
+  have hPbar_le_M : Pbar ≤ M := hPbar_le_K.trans inf_le_left
+  have hPbar_le_Mstar : Pbar ≤ Mstar := hPbar_le_K.trans inf_le_right
+  -- `N_G(Pbar) ≤ K`.
+  have hN : Subgroup.normalizer (Pbar : Set G) ≤ K := le_inf
+    (mem_sigma_normalizer_le_of_two_maximals hG hPbar_pg hPbar_nab hM hPbar_le_M).2
+    (mem_sigma_normalizer_le_of_two_maximals hG hPbar_pg hPbar_nab hMstar hPbar_le_Mstar).2
+  -- `Pbar` is a Sylow `p`-subgroup of `G`.
+  obtain ⟨S, hS⟩ := exists_sylow_eq_map_of_normalizer_le SK (hPbar ▸ hN)
+  rw [← hPbar] at hS
+  have hSlt : (S : Subgroup G) < ⊤ := by
+    rw [hS, lt_top_iff_ne_top]
+    exact fun htop => hM.1 (top_le_iff.mp (htop ▸ hPbar_le_M))
+  -- `r(S) ≤ 2` (else Uniqueness forces `M = M⋆`).
+  have hrank2 : rank ↥(S : Subgroup G) ≤ 2 := by
+    by_contra hr
+    have huniq := Ch2.S09.uniquenessTheorem hG hSlt (by omega) (Or.inl (by omega : 3 ≤ rank ↥(S : Subgroup G)))
+    exact hMne (huniq.2.unique ⟨hM, by rw [hS]; exact hPbar_le_M⟩
+      ⟨hMstar, by rw [hS]; exact hPbar_le_Mstar⟩)
+  -- `S` nonabelian, so Cor 10.7(b) gives the extraspecial `Q`.
+  rcases (S10.sylow_structure hG S).2.1 hrank2 with habel | ⟨Q, _, hQ_le, _, hQ_es, hQ_card, _, _, _⟩
+  · exact absurd habel (by rw [hS]; exact hPbar_nab)
+  · exact ⟨Q, hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)

@@ -33,10 +33,17 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
    `Subgroup.eq_of_le_of_card_ge` (not `_le`; `[Finite K]` (hle:H≤K) (Nat.card K≤Nat.card H):H=K);
    `Commute z a` は `(mem_center_iff.mp hz a).symm` を中間 `have` に (Eq 経由 dot は `Eq.zpow_left` 解決失敗);
    `zpow_mem hz j` (root, K 暗黙; `Subgroup.zpow_mem` は引数順違い)。
-2. **還元チェーン** `P→Sylow(M∩M⋆)→Sylow G→r(P)=2→Q extraspecial`: `uniquenessTheorem`
-   (hr3 は `r(C_M(P))≥3`? 要確認 — P Sylow rank2 で hr2=2 は満たすが hr3 条項の供給が gap。
-   ⚠ BG は別経路: P Sylow of G + p odd noncyclic ⟹ Uniqueness で `r(P)≤2`。repo の `uniquenessTheorem`
-   署名と BG の Uniqueness の対応を精査。`sylow_structure` part(b) は `rank P ≤ 2` 前提で extraspecial 供給)。
+2. ~~**還元チェーン**~~ **✅ DONE (session 15)** — 2 補題で landed (sorry-free・axiom-clean):
+   - `exists_sylow_eq_map_of_normalizer_le` (R-a): `Sylow p of K (≤G)` で `N_G(P̄)≤K` ⟹ `P̄` は G の Sylow p。
+     S10.isSylow_sylowMap_of_mem_sigma の非 σ 一般化 (同証明; private `lt_inf_normalizer_of_lt_of_isPGroup`
+     を leaf に複製)。
+   - `exists_expPExtraspecial_le_of_two_maximals` (還元本体): 非可換 P が distinct max M≠M⋆ に
+     ⟹ `∃Q≤M∩M⋆, IsExpPExtraspecial p Q ∧ |Q|=p³`。P を M∩M⋆ の Sylow に拡大→R-a で G-Sylow→
+     **r(S)≤2** (by_contra r≥3 ⟹ `Ch2.S09.uniquenessTheorem hG hSlt (by omega) (Or.inl ⟨3≤r⟩)` で
+     IsUniquelyMaximal S, `huniq.2.unique` で M=M⋆ 矛盾) → S 非可換で `S10.sylow_structure …2.1 hrank2`
+     の abelian 枝を排し extraspecial Q。
+   **🔑 flagged gap 解消**: Uniqueness の hr3 は「P Sylow rank2」でなく **by_contra (r≥3) 分岐内で Or.inl** で供給
+   (BG「Uniqueness で r(P)≤2」は対偶。`uniquenessTheorem` 署名はそのまま使える)。
 3. **K⊆M⋆**: Prop 1.16 (`cocyclicFixedByClosure_eq_top_of_not_isCyclic`, Q/Z noncyclic rank2 が
    K に coprime 作用) の各 generator `C_K(A/Z)=C_K(A)⊆M⋆` を 12.4(a) (`centralizer_le_of_elemAb_rank_two`
    を M⋆ に適用, A∈ℰ²(Q)⊆ℰ²_p(M⋆))。**coprimality** `(|Q/Z|,|K|)=1` の確立が要 (K=C_{M_α}(Z), M_α は
