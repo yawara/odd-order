@@ -873,4 +873,24 @@ theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_tau_Yset_diff
     hYon η₁ η' hη₁ hη', hYon η₁ η₁ hη₁ hη₁, if_neg (Ne.symm hne), if_pos rfl]
   ring
 
+/-- **(6.8.2.1) coherence agreement `η'^{τ₁} − η₁^{τ₁} = (η' − η₁)^τ`** for `η₁, η' ∈ Y`.  The
+`Y`-coherence extension `ν = ·^{τ₁}` agrees with the Dade map `τ` on the supported lattice
+`zSupportedSpan Y H^#` (`IsCoherent.extends_on_supported`), and the equal-degree difference
+`η' − η₁` lies there (`zSpan` membership + `sMember_diffSupport_of_charValue_eq` support).  Combined
+with linearity (`map_sub`), `extension η' − extension η₁ = extension (η' − η₁) = τ (η' − η₁)`.
+
+This converts the `τ`-form cross-term `inner_tau_indW2_sub_smul_tau_Yset_diff` into the
+`𝒴^{τ₁}`-extension form used in the (6.8.2.2) decomposition `α^τ = X − |H:Z|η_1^{τ₁} + …`. -/
+theorem SibleyDadeHypothesis.coherentYset_extension_Yset_diff_eq_tau
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η₁ η' : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) :
+    hyp.coherentYset.extension η' - hyp.coherentYset.extension η₁ = hyp.tau (η' - η₁) := by
+  have hmem : (η' - η₁) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨Submodule.sub_mem _ (Submodule.subset_span hη') (Submodule.subset_span hη₁), ?_⟩
+    exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη') (hyp.Yset_subset_S hη₁)
+      ((hyp.Yset_apply_one hη').trans (hyp.Yset_apply_one hη₁).symm)
+  rw [← map_sub]
+  exact hyp.coherentYset.extends_on_supported (η' - η₁) hmem
+
 end OddOrder.Peterfalvi.S08
