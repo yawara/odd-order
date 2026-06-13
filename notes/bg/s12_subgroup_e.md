@@ -1,5 +1,27 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+## ✅✅✅ 2026-06-13 (Lane F session 16, Opus 4.8): **Thm 12.13 主定理 wire COMPLETE — piece 5 のみ残**
+
+**`nonabelian_pgroup_isUniquelyMaximal` (12.13 本体) を全 ingredient から組立完了** (S12_Theorem1213, 660 行)。
+主定理は sorry-free に assemble され、唯一の sorry = piece-5 sub-lemma
+`maximalContaining_normalizer_center_ne_of_two_maximals` (`ℳ(N_G(Z))≠{M}`) のみ
+(`#print axioms nonabelian_pgroup_isUniquelyMaximal` = propext/sorryAx/choice/Quot ⟹ sorry 依存は piece-5 経由のみ)。
+**全 logical wiring 検証済 = 12 ingredient が正しく合成することを確認**。leaf 実 sorry=1 (piece-5 本体)。
+
+**12.13 ingredient (全 axiom-clean, sessions 15-16, 12 commits)**:
+reduction (`exists_expPExtraspecial_le_of_two_maximals`: P→Sylow G→r≤2→Q extraspecial, S・rank 露出) /
+`Malpha_ne_bot_of_sylow_normalizer_le` (M_α≠1, Cor10.9b) / `notMem_alpha_of_rank_sylow_le_two` (p∉α) /
+`exists_elemAbelianOfRank_two_le_of_expPExtraspecial` (A∈ℰ²(Q)) /
+`center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial` (Z≤A) /
+`exists_line_maximalContaining_eq_of_Malpha_ne_bot` (12.4b 対偶) /
+`exists_conj_smul_zpowers_eq_of_expPExtraspecial`(型) + `..._le`(G-element) + `exists_conj_smul_eq_of_lines_of_expPExtraspecial`(G-subgroup) (line-共役 3 段) /
+`eq_of_conj_of_maximalContaining_normalizer_eq_singleton` (ℳ-矛盾エンジン)。
+
+**残 = piece 5 本体のみ** (`maximalContaining_normalizer_center_ne_of_two_maximals` の sorry):
+K=C_{M_α}(Z) への Q/Z 作用に `cocyclicFixedByClosure_eq_top_of_not_isCyclic` (Prop 1.16) を instantiate
+→ K=⟨C_K(Ā)⟩、各 C_K(A_Y)⊆M⋆ (12.4a) ⟹ K⊆M⋆ → Cor10.9b(M=(M∩M⋆)M_α, α=β) + Lem6.5b
+(coprime は p∉α 済) ⟹ N_M(Z)⊆M⋆ ⟹ ℳ(N_G(Z))≠{M}。**crux = quotient-action `↥Q⧸Z→*MulAut↥K` 構成**。
+
 ## 🟢 2026-06-13 (Lane F session 15, Opus 4.8): **Thm 12.13 hard-core 着手 — 還元補題・extraspecial 共役・ℳ-矛盾エンジン**
 
 Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal` (leaf `S12_Theorem1213.lean`) の hard core は

@@ -585,6 +585,24 @@ theorem center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial [Finite G
   have hle : Subgroup.zpowers z ≤ A := heqA ▸ le_sup_right
   exact hle (Subgroup.mem_zpowers z)
 
+/-- **`ℳ(N_G(Z)) ≠ {M}`** (BG 12.13, mmd L3387-3395; `Z = Z(Q)` for the extraspecial `Q ⊆ M ∩ M⋆`).
+`Q/Z` acts on `K = C_{M_α}(Z)`; Proposition 1.16 writes `K = ⟨C_K(Ā) | Ā ∈ ℰ¹(Q/Z)⟩`, and Proposition
+12.4(a) gives `C_K(A) = C_K(Ā) ⊆ M⋆` for the rank-2 `A ⊇ Z`, so `K ⊆ M⋆`. Then `M = (M ∩ M⋆)M_α`
+(Corollary 10.9(b), using `α(M) = β(M)`) and Lemma 6.5(b) give `N_M(Z) ⊆ M⋆`; since `M⋆ ≠ M`, the
+unique maximal over `N_G(Z)` (if any) is not `M`.
+
+**The body is the remaining analytic core of BG 12.13** (the `cocyclicFixedByClosure` instantiation
+for the `Q/Z`-action on `K = C_{M_α}(Z)`); the rest of the theorem is assembled around it. -/
+theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {M Mstar Q : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G) (hMne : M ≠ Mstar)
+    (S : Sylow p G) (hN_S : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar)
+    (hrank : rank ↥(S : Subgroup G) ≤ 2) (hQ_es : IsExpPExtraspecial p ↥Q)
+    (hQcard : Nat.card ↥Q = p ^ 3) (hQ_le : Q ≤ M ⊓ Mstar) :
+    maximalSubgroupsContaining
+        (Subgroup.normalizer (((Subgroup.center ↥Q).map Q.subtype) : Set G)) ≠ {M} := by
+  sorry
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -604,11 +622,39 @@ theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd 
   refine IsUniquelyMaximal.of_unique_maximal hPlt (mem_maximalSubgroups.mpr hMcoatom) hPM ?_
   intro Mstar hMstar hPMstar
   by_contra hne
-  -- `p ∈ σ(M) ∩ σ(M*)` and `N_G(P) ⊆ M ∩ M*`.
-  obtain ⟨hpσM, hNM⟩ := mem_sigma_normalizer_le_of_two_maximals hG hPp hPnab
-    (mem_maximalSubgroups.mpr hMcoatom) hPM
-  obtain ⟨hpσMstar, hNMstar⟩ := mem_sigma_normalizer_le_of_two_maximals hG hPp hPnab hMstar hPMstar
-  -- **Hard core** (Z-action via Prop 1.16 + Prop 12.4, non-conjugacy contradiction).
-  sorry
+  have hMmem : M ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMcoatom
+  have hMne : M ≠ Mstar := fun h => hne h.symm
+  -- enlarge `P` to a Sylow `p`-subgroup `S` of `G` inside `M ∩ M⋆`, with extraspecial `Q ⊆ M ∩ M⋆`.
+  obtain ⟨S, Q, hN_S, hrankS, hQ_le, hQ_es, hQ_card⟩ :=
+    exists_expPExtraspecial_le_of_two_maximals hG hPp hPnab hMmem hMstar hMne hPM hPMstar
+  -- `A ∈ ℰ²(Q)` with `Z(Q) ≤ A`, and `A ⊆ M, M⋆`.
+  obtain ⟨A, hA_le_Q, hA_mem⟩ := exists_elemAbelianOfRank_two_le_of_expPExtraspecial hG hQ_es
+  have hZA : (Subgroup.center ↥Q).map Q.subtype ≤ A :=
+    center_map_le_of_mem_elemAbelianOfRank_two_le_expPExtraspecial hQ_es hQ_card hA_mem hA_le_Q
+  have hA_le_M : A ≤ M := (hA_le_Q.trans hQ_le).trans inf_le_left
+  have hA_le_Mstar : A ≤ Mstar := (hA_le_Q.trans hQ_le).trans inf_le_right
+  -- `M_α ≠ 1` and `M⋆_α ≠ 1`.
+  have hMα : S10.Malpha M ≠ ⊥ :=
+    Malpha_ne_bot_of_sylow_normalizer_le hG hMmem hMstar hMne S hN_S
+  have hMstarα : S10.Malpha Mstar ≠ ⊥ :=
+    Malpha_ne_bot_of_sylow_normalizer_le hG hMstar hMmem (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S)
+  -- distinguished lines `A₀` (realizing `M`) and `A₀⋆` (realizing `M⋆`) via Prop 12.4(b).
+  obtain ⟨A₀, hA₀_mem, hA₀_le_A, hA₀_M⟩ :=
+    exists_line_maximalContaining_eq_of_Malpha_ne_bot hG hMmem hA_mem hA_le_M hMα
+  obtain ⟨A₀star, hA₀star_mem, hA₀star_le_A, hA₀star_Mstar⟩ :=
+    exists_line_maximalContaining_eq_of_Malpha_ne_bot hG hMstar hA_mem hA_le_Mstar hMstarα
+  -- `ℳ(N_G(Z)) ≠ {M}, {M⋆}`, hence `A₀, A₀⋆ ≠ Z`.
+  have hZneM := maximalContaining_normalizer_center_ne_of_two_maximals hG hMmem hMstar hMne S hN_S
+    hrankS hQ_es hQ_card hQ_le
+  have hZneMstar := maximalContaining_normalizer_center_ne_of_two_maximals hG hMstar hMmem
+    (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S) hrankS hQ_es hQ_card (by rw [inf_comm]; exact hQ_le)
+  have hA₀_ne_Z : A₀ ≠ (Subgroup.center ↥Q).map Q.subtype := fun heq => hZneM (heq ▸ hA₀_M)
+  have hA₀star_ne_Z : A₀star ≠ (Subgroup.center ↥Q).map Q.subtype :=
+    fun heq => hZneMstar (heq ▸ hA₀star_Mstar)
+  -- `A₀` and `A₀⋆` are `Q`-conjugate, contradicting the distinct `ℳ(N_G(·))` singletons.
+  obtain ⟨g, hgQ, hg⟩ := exists_conj_smul_eq_of_lines_of_expPExtraspecial hQ_es hZA hA_mem hA_le_Q
+    hA₀_mem hA₀_le_A hA₀_ne_Z hA₀star_mem hA₀star_le_A hA₀star_ne_Z
+  exact hne (eq_of_conj_of_maximalContaining_normalizer_eq_singleton
+    ((hQ_le.trans inf_le_left) hgQ) hg hA₀_M hA₀star_Mstar).symm
 
 end OddOrder.BG.Ch3.S12
