@@ -65,6 +65,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -4453,3 +4454,13 @@ cites (replacing the former S12_E `sorry`'d forward-decls); fully unconditional,
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_pRank_normalizer_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_not_mem_primeFactors_derived_of_tau1
+
+/-! ### BG §14 (`S14_TypePCounting`) -/
+
+/-! **BG Lemma 14.1** (`S14_TypePCounting`): for `M ∈ 𝓜` and a prime
+`p ∈ π(M) - (σ(M) ∪ κ(M))` with `A ∈ ℰ_p^{r_p(M)}(M)`, one has `|A| ≤ p²`,
+`C_{M_σ}(A) = 1`, and `M_σ` is nilpotent.  The `r_p = 2` case is Theorem 12.5(a)(d);
+the `r_p = 1` case uses `p ∉ κ(M)` and the fixed-point-free criterion of Theorem 3.7.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.msigma_structure_of_notMem_sigma_kappa

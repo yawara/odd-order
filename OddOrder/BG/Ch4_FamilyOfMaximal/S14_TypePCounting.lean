@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
@@ -138,17 +141,116 @@ structure SigmaDecompositionData (G : Type*) [Group G] where
 
 /-! ## Lemma 14.1 and Proposition 14.2: local structure of type-P members -/
 
-/-- **BG Lemma 14.1** (mmd L3768): if `M` is not type `P1`, then rank-one
-responses are small, `M_sigma` acts fixed-point-freely on the relevant `A`, and
-`M_sigma` is nilpotent.  This is the clean scaffold form; the proof in BG uses
-§13 prime action and the `E`-analysis of §12. -/
-theorem not_typeP1_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M A : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
-    (hA : A ∈ elemAbelianOfRank G p 1) (hAM : A ≤ M) (hnot : ¬ IsTypeP1 M) :
+/-- **BG Lemma 14.1** (mmd L3811): suppose `M ∈ 𝓜` and `p ∈ π(M) - (σ(M) ∪ κ(M))`.
+Let `A` be an elementary abelian `p`-subgroup of `M` of maximal rank `r_p(M)`
+(realized by `A = Ω₁(S)` for `S ∈ Syl_p(M)`).  Then `|A| ≤ p²`, `C_{M_σ}(A) = 1`,
+and `M_σ` is nilpotent.
+
+BG's hypothesis `M ∉ 𝓜_{𝓟₁}` only guarantees that such a prime `p` exists; once
+`p` is given (`hpπ`, `hpσ`, `hpκ`), it plays no role in the proof, so it is dropped
+here.  The `A = Ω₁(S)` binding is encoded as `A ∈ ℰ_p^{r_p(M)}(M)` (the same
+`Ω`-deferral used in Theorem 12.5), under which `|A| = p^{r_p(M)}`, so the
+cardinality assertion `|A| ≤ p²` is the rank bound `r_p(M) ≤ 2`.
+
+Proof: by the τ-classification `r_p(M) ∈ {1, 2}`.  If `r_p(M) = 2` then `p ∈ τ₂(M)`
+and all three assertions are Theorem 12.5(a)(d).  If `r_p(M) = 1` then
+`p ∈ τ₁(M) ∪ τ₃(M)`; `C_{M_σ}(A) = 1` because `p ∉ κ(M)`, and since `A` has prime
+order it then acts fixed-point-freely on `M_σ`, so `M_σ` is nilpotent by Theorem
+3.7 (`isNilpotent_of_normalizing_primeOrder_fixedPointFree`). -/
+theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpπ : p ∈ piSet M) (hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M) (hpκ : p ∉ kappa M)
+    {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p (pRank ↥M p)) (hAM : A ≤ M) :
     Nat.card ↥A ≤ p ^ 2 ∧
       OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ ∧
       Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
-  sorry
+  classical
+  have hp : p.Prime := Fact.out
+  have hpM : p ∈ (Nat.card ↥M).primeFactors := hpπ
+  -- Rank bounds `1 ≤ r_p(M) ≤ 2` via the §12 `E`-setup.
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+    mem_primeFactors_E_of_mem_M_of_not_sigma hG hsetup hp hpM hpσ
+  have h1r : 1 ≤ pRank ↥M p := one_le_pRank_of_mem_primeFactors hpM
+  have h2r : pRank ↥M p ≤ 2 := hsetup.pRank_M_le_two hG hpE
+  have hcardA : Nat.card ↥A = p ^ pRank ↥M p := hA.2
+  -- (1) `|A| ≤ p²` is the rank bound.
+  have hbound : Nat.card ↥A ≤ p ^ 2 := by
+    rw [hcardA]; exact Nat.pow_le_pow_right hp.one_le h2r
+  refine ⟨hbound, ?_⟩
+  have hrank12 : pRank ↥M p = 1 ∨ pRank ↥M p = 2 := by omega
+  rcases hrank12 with hr1 | hr2
+  · -- `r_p(M) = 1`: `p ∈ τ₁(M) ∪ τ₃(M)`, fixed-point-free action.
+    have hAr1 : A ∈ elemAbelianOfRank G p 1 := by rw [← hr1]; exact hA
+    have hcardp : Nat.card ↥A = p := by rw [hcardA, hr1, pow_one]
+    have hpτ13 : p ∈ tau1 M ∪ tau3 M := by
+      by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+      · exact Or.inr ((mem_tau3_iff M p).mpr ⟨hpσ, hM', hr1⟩)
+      · exact Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, hM', hr1⟩)
+    -- `C_{M_σ}(A) = 1` because `p ∉ κ(M)`.
+    have hC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ := by
+      by_contra hne
+      exact hpκ ⟨hpτ13, A, hAr1, hAM, hne⟩
+    refine ⟨hC, ?_⟩
+    -- `A` is commutative, hence `A ≤ C_G(A)`.
+    have hAcent : A ≤ Subgroup.centralizer (A : Set G) := by
+      intro a ha
+      rw [Subgroup.mem_centralizer_iff]
+      intro b hb
+      have := hA.1.comm (⟨b, hb⟩ : ↥A) (⟨a, ha⟩ : ↥A)
+      exact congrArg (Subtype.val) this
+    -- Hypotheses for Theorem 3.7 (`N = M_σ`, `R = A`).
+    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    haveI : IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ A) :=
+      solvable_of_solvable_injective
+        (Subgroup.inclusion_injective (sup_le (OddOrder.BG.Ch3.S10.Msigma_le M) hAM))
+    have hAnorm : A ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+      hAM.trans (le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
+    have hdisj : Disjoint (OddOrder.BG.Ch3.S10.Msigma M) A := by
+      rw [disjoint_iff]
+      refine le_antisymm ?_ bot_le
+      calc OddOrder.BG.Ch3.S10.Msigma M ⊓ A
+            ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) :=
+              inf_le_inf_left _ hAcent
+        _ = ⊥ := hC
+    have hMσne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+    have hAne : A ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hAr1
+    -- `A` acts fixed-point-freely on `M_σ`: an element fixed by `r ∈ A#` would
+    -- centralize `⟨r⟩ = A` and so lie in `C_{M_σ}(A) = 1`.
+    have hgen : ∀ r ∈ A, r ≠ 1 → A = Subgroup.zpowers r := by
+      intro r hr hr1'
+      have hle : Subgroup.zpowers r ≤ A := Subgroup.zpowers_le.mpr hr
+      have hcardzp : Nat.card ↥(Subgroup.zpowers r) = p := by
+        have hdvd : orderOf r ∣ p := by
+          rw [← hcardp, ← Nat.card_zpowers]; exact Subgroup.card_dvd_of_le hle
+        rw [Nat.card_zpowers]
+        rcases (Nat.dvd_prime hp).mp hdvd with h1 | hpp
+        · exact absurd (orderOf_eq_one_iff.mp h1) hr1'
+        · exact hpp
+      exact (Subgroup.eq_of_le_of_card_ge hle (hcardp.trans hcardzp.symm).le).symm
+    have hFPF : ∀ r ∈ A, r ≠ 1 → ∀ n ∈ OddOrder.BG.Ch3.S10.Msigma M, n ≠ 1 →
+        r * n * r⁻¹ ≠ n := by
+      intro r hr hr1' n hn hn1 heq
+      have hcomm : Commute r n := mul_inv_eq_iff_eq_mul.mp heq
+      have hAr : A = Subgroup.zpowers r := hgen r hr hr1'
+      have hncent : n ∈ Subgroup.centralizer (A : Set G) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro a haA
+        rw [hAr, SetLike.mem_coe, Subgroup.mem_zpowers_iff] at haA
+        obtain ⟨k, rfl⟩ := haA
+        exact hcomm.zpow_left k
+      have hmem : n ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) :=
+        ⟨hn, hncent⟩
+      rw [hC, Subgroup.mem_bot] at hmem
+      exact hn1 hmem
+    exact OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+      hAnorm hdisj hMσne hAne ⟨p, hp, hcardp⟩ hFPF
+  · -- `r_p(M) = 2`: `p ∈ τ₂(M)`; Theorem 12.5(a),(d).
+    have hpτ2 : p ∈ tau2 M := (mem_tau2_iff M p).mpr ⟨hpσ, hr2⟩
+    have hA2 : A ∈ elemAbelianOfRank G p 2 := by rw [← hr2]; exact hA
+    have h125 := Msigma_nilpotent_of_tau2 hG hM hpτ2 hA2 hAM
+    exact ⟨h125.2.2.2.1, h125.1⟩
 
 /-- **BG Proposition 14.2** (mmd L3778): structure of a type-P maximal subgroup.
 
