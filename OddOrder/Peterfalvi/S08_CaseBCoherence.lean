@@ -277,4 +277,24 @@ theorem SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage
   change (x : G) ∈ sharpImage H
   exact ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, fun hx1G => hxne (Subtype.ext hx1G)⟩
 
+/-- **(6.8.2.2) reciprocity step.**  For `α = Ind_{W₂}^L φ − c·η₁` with `α(1) = 0` and any
+`ψ ∈ CF(G)`,
+`⟨α^τ, ψ⟩ = ⟨φ, Res_{W₂} Res_L ψ⟩ − c·⟨η₁, Res_L ψ⟩`.
+This is the move `⟨α^τ, ψ⟩ = ⟨α, Res_L ψ⟩ = ⟨φ, Res_Z ψ⟩ − |H:Z|⟨η₁, Res_L ψ⟩` of Peterfalvi
+(6.8.2.2): the Dade reciprocity `inner_tau_eq_inner_restrict` (valid since `Supp(α) ⊆ H^#`,
+`support_indW2_sub_smul_subset_sharpImage`), additivity (`inner_sub_left`/`inner_smul_left`), and
+Frobenius reciprocity `inner_induce_eq_inner_restrict` for `Ind_{W₂}^L`. -/
+theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_eq
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [Fintype ↥W2] (hW2H : W2 ≤ H) [Invertible (Nat.card ↥W2 : ℂ)]
+    (φ : ClassFunction ↥W2 ℂ) {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (c : ℂ)
+    (h1 : ClassFunction.induce W2 φ (1 : ↥L) = c * η₁ (1 : ↥L)) (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 φ - c • η₁)) ψ
+      = ClassFunction.inner φ (ClassFunction.restrict W2 (ClassFunction.restrict L ψ))
+        - c * ClassFunction.inner η₁ (ClassFunction.restrict L ψ) := by
+  rw [hyp.inner_tau_eq_inner_restrict
+        (hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ c h1) ψ,
+    ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    ClassFunction.inner_induce_eq_inner_restrict]
+
 end OddOrder.Peterfalvi.S08

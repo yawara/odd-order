@@ -1032,3 +1032,23 @@ reg-char sumNonInflatedDegreeMulChar) は既 landed; reciprocity inner_dadeInteg
 これが (6.8.2.2) reg-char step の前提。汎用 (任意有限群 Z)。→ then (6.8.2.2) assembly。
 **正本=本 session 39 cont.⁶。** **進捗 honest 評価: case-B coherence は (6.8.2.1)✅→(6.8.2.2)[multi-tick,
 ρ_Z 要]→(6.8.2.3)→τ₂→capstone→(6.5) の長い grind。steady brick/tick で進行中 (空転なし)。**
+
+## 2026-06-13 (session 39 cont.⁷, /loop): (6.8.2.2) reciprocity step landed
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.inner_tau_indW2_sub_smul_eq`:
+α=Ind_{W₂}φ−c·η₁ (α(1)=0), ψ∈CF G ⟹ `⟨α^τ,ψ⟩ = ⟨φ,Res_{W₂}Res_L ψ⟩ − c·⟨η₁,Res_L ψ⟩`
+(= (6.8.2.2) の `⟨α,Res_L ψ⟩ = ⟨φ,Res_Z ψ⟩ − |H:Z|⟨η₁,Res_L ψ⟩`)。
+`inner_tau_eq_inner_restrict` (α-support 経由) + `inner_sub_left`/`inner_smul_left` +
+Frobenius reciprocity `inner_induce_eq_inner_restrict`。**gotcha**: `inner φ (...)`/`induce W₂` の
+inner は ↥W₂ 上 ⟹ `[Fintype ↥W2]` を**binder** に要 (statement elaboration は proof の haveI より先)。
+
+### (6.8.2.2) 残: reg-char 分解 (ρ_Z) + 合同 + norm
+1. ✅ reciprocity (本 session)。
+2. 🔴 **reg-char 分解 (ρ_Z) — 次の主 prerequisite**: ψ const on Z^# ((6.8.2.1)) ⟹ Res_Z ψ=aρ_Z+b1_Z、
+   a=⟨φ,Res_Z ψ⟩∈ℤ、ψ(1)=a|Z|+b。**鍵関係 `ψ(1)−ψ(z) = |Z|·⟨φ,Res_Z ψ⟩` (z∈Z^#, φ∈Irr Z, φ≠1)**。
+   ρ_Z は repo に無いが `column_orthogonality_diagonal`/`_not_conjugate` (ColumnOrthogonality.lean) が道具。
+   ρ_Z を直接 `fun g => if g=1 then |Z| else 0` で def + ext で分解、or 鍵関係を column-orth で直接。
+3. (6.7) `peterfalvi_67_centralCommutator` で b≡ψ(1) mod |H| ⟹ a|Z|≡0 mod |H| ⟹ **a≡0 mod |H:Z|**。
+4. ⟹ ⟨α^τ,ψ⟩ = a − |H:Z|⟨η₁,Res ψ⟩ ≡ 0 mod |H:Z| + norm endgame ((x−1)²+(m−1)x²≤1)。
+
+**▶ 次の一手 = reg-char 分解 (鍵関係 ψ(1)−ψ(z)=|Z|⟨φ,Res ψ⟩ via column orthogonality)。正本=本 session 39 cont.⁷。**
