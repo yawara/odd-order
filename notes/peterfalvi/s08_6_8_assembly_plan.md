@@ -1430,3 +1430,36 @@ X-structure→crux→τ₂→glue) + 構造 discharge = marathon だが characte
 - **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
 - **構造 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): Hypothesis46/certain-type から、capstone wiring 時。
 **正本=本 session 40 cont.¹⁰。20 bricks landed across loop。(6.8.2.2) 完成は milestone。残=τ₂ marathon。**
+
+## 2026-06-14 (session 40 cont.¹¹, /loop): 🗺 τ₂ assembly architecture 完全 mapping (投資 iteration)
+
+**この iteration = アーキテクチャ投資** (Lean brick なし、残り全 path を確定)。(6.8.2.2) 完成後の
+case-B coherence capstone (`sibleySetup_is_coherent` の case-B branch) への path を精査:
+
+### 🔑 reuse 可能 (generic, 大幅省力):
+- **X-coherence は Z-parametrized generic**: `Xset_centralCommutator_isCoherent_of_irreducible_X`
+  (S08_CoherenceCore:9112) は `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover
+  _of_irreducible_X (Z := ...)` (:9137) に delegate。Z=W₂ で reuse 可。per-step prime-power degree data
+  は case-independent (X-degrees)。**case-B X-coherence = generic reuse + math-B X-irreducibility**。
+- **§7 glue** (`coherentXunionYset_...glued_withDiagonal` / `coherentUnion_of_glued`) generic。
+- **(6.8.2.2) decomposition** = `exists_decomposition_caseB` ✅ (glue の diagonal agreement input)。
+
+### 🔴 構造的 cluster = bottleneck (certain-type/Hypothesis46 接続、deep):
+1. **math-B X-irreducibility** (`isIrreducibleCharacter_of_mem_Xset_c2_caseB`, MISSING): case-A 版
+   `_c2_caseA` (:5314) は `hA: Z(H)⊓W₂.subgroupOf H=⊥` + `centralizer_inf_..._eq_bot_of_c2_caseA` 経由。
+   math-B (W₂⊆Z(H)) は別条件。generic `_caseA` (centralizer 条件 param) の math-B 版要。
+2. **FPF bound** (hc2/hFPF): CertainTypeHypothesis.centralizer_W2 (C_L(w)⊓K=W₂) → W₁ FPF on H/W₂ →
+   `card_kernel_modEq_one` (Isaacs Ch06 FrobeniusGroup:274) ⟹ |W₁|∣|H:W₂|−1 ⟹ |W₁|<|H:W₂|。
+3. **W₂⊆Z(↥L)**: math-B `W₂⊆Z(H)` (`eq_bot_or_eq_of_le_of_card_prime`) + W cyclic ⟹ W₂ central in L。
+- これら 3 つは全て **CertainTypeHypothesis / Hypothesis46 の field から導出** (capstone wiring 時)。
+
+### 🟡 character-theoretic 残 (tractable, my work の χ-version):
+- **(6.8.2.3)** (χ∈X 版 decomposition): `coeff_eq_neg_or_edge_of_frobenius` (χ∈X) の case-B 版。
+  χ single irreducible (‖χ−aη₁‖²=1+a², Frobenius と同形) だが η₁^{τ₁} (6.7) は case-B (W₂)。
+  my (6.8.2.2) ingredients の χ-version (cross-term/divisibility/norm) 要。
+
+### ▶ 次の一手 (honest 優先順位):
+**最 tractable = FPF bound (#2)** か **W₂⊆Z(↥L) (#3)** — どちらも certain-type field から比較的直接。
+math-B X-irred (#1) と (6.8.2.3) は中規模。glue は全部揃ってから。
+**honest 総括**: (6.8.2.2) ✅ milestone。残=構造 cluster (Hypothesis46 接続, deep) + (6.8.2.3) + glue。
+X-coherence reuse で省力化判明。capstone は構造 cluster が gate の marathon。**正本=本 session 40 cont.¹¹。**
