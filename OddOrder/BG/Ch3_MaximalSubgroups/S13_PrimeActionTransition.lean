@@ -39,6 +39,36 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-! ## helper: prime-action ⟹ trivial centralizer -/
+
+/-- **prime-action ⟹ trivial centralizer** (BG §13 の (13.2) 適用パターン): `X` が `N` に
+prime 作用し、`W ≤ N` を `X` が非中心化 (`⁅W, X⁆ ≠ ⊥`) するなら、`W` を中心化する `X` の元は
+自明のみ — `C_X(W) = X ⊓ C_G(W) = 1`。
+
+理由: `x ∈ X#` が `W` を中心化すると、`W ≤ N ⊓ C_G(x) = fixedByElement N x`、prime 作用で
+これは `fixedBy N X = N ⊓ C_G(X)`、ゆえ `W ≤ C_G(X)` すなわち `⁅W, X⁆ = ⊥` で矛盾。
+Lemma 13.7 step 5c (`C_{E₁}(M_σ∩M*)=1`) の核。 -/
+theorem actsPrimeOn_inf_centralizer_eq_bot {N X W : Subgroup G}
+    (h : ActsPrimeOn N X) (hW : W ≤ N) (hcomm : ⁅W, X⁆ ≠ ⊥) :
+    X ⊓ Subgroup.centralizer (W : Set G) = ⊥ := by
+  rw [Subgroup.eq_bot_iff_forall]
+  intro x hx
+  by_contra hxne
+  obtain ⟨hxX, hxC⟩ := Subgroup.mem_inf.mp hx
+  rw [Subgroup.mem_centralizer_iff] at hxC
+  -- `W ≤ C_G(x)`: every `w ∈ W` commutes with `x`.
+  have hWx : W ≤ Subgroup.centralizer ({x} : Set G) := by
+    intro w hw
+    rw [Subgroup.mem_centralizer_iff]
+    rintro y hy
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    exact (hxC w hw).symm
+  -- `W ≤ fixedByElement N x = fixedBy N X` (prime action), hence `W ≤ C_G(X)`.
+  have hWfix : W ≤ fixedByElement N x := by
+    rw [fixedByElement_def]; exact le_inf hW hWx
+  rw [h x hxX hxne, fixedBy_def] at hWfix
+  exact hcomm (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (hWfix.trans inf_le_right))
+
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
 /-- **BG Lemma 13.7** (mmd L3596): `E₁≠1` かつ `E₁` が `E₃` に regular 作用しないなら、`E₁E₃` は
