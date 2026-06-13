@@ -35,6 +35,35 @@ open scoped OddOrder.AlgInt
 
 variable {G : Type*} [Group G]
 
+/-- **Integer trichotomy from divisibility and a strict `< 2a²` norm bound** (Peterfalvi (6.8.2.2)
+quadratic endgame).  The `< 2a²` variant of `eq_zero_or_edge_of_dvd_of_normBound` (which uses the
+`≤ 1 + a²` bound of the Frobenius (6.8.1) case): in case (B) the source norm is `|L:Z| + |H:Z|²`
+with `|L:Z| < |H:Z|²` (the `W₁`-fixed-point-free bound), giving `‖α^τ‖² < 2|H:Z|²`.
+
+Writing `b = a·x` (`a = |H:Z|`), the bound forces `(x−1)² + (m−1)x² < 2`, hence `≤ 1`, so
+`x ∈ {0, 1}` (and `x = 1` needs `m = 2`); `x = −1` is excluded since `4a² + (m−1)a² ≥ 2a²`. -/
+theorem eq_zero_or_edge_of_dvd_of_normLt {a b m : ℤ}
+    (ha : 2 ≤ a) (hm : 2 ≤ m) (hdvd : a ∣ b)
+    (hnorm : (b - a) ^ 2 + (m - 1) * b ^ 2 < 2 * a ^ 2) :
+    b = 0 ∨ (b = a ∧ m = 2) := by
+  obtain ⟨x, rfl⟩ := hdvd
+  have ha0 : (0 : ℤ) < a := by linarith
+  have hb2 : (a * x) ^ 2 < 2 * a ^ 2 := by
+    nlinarith [sq_nonneg (a * x - a), mul_nonneg (by linarith : (0 : ℤ) ≤ m - 2) (sq_nonneg (a * x))]
+  have hx2 : x ^ 2 ≤ 1 := by
+    by_contra h
+    push_neg at h
+    have hx2' : 2 ≤ x ^ 2 := h
+    nlinarith [hb2, mul_pos ha0 ha0, mul_le_mul_of_nonneg_left hx2' (le_of_lt (mul_pos ha0 ha0))]
+  have hxlo : -1 ≤ x := by nlinarith [hx2, sq_nonneg (x + 1)]
+  have hxhi : x ≤ 1 := by nlinarith [hx2, sq_nonneg (x - 1)]
+  interval_cases x
+  · exfalso; nlinarith [hnorm, ha, hm, mul_pos ha0 ha0]
+  · left; ring
+  · right
+    refine ⟨by ring, ?_⟩
+    nlinarith [hnorm, ha, hm, mul_pos ha0 ha0]
+
 /-- **Galois action commutes with induction.**  For a ring automorphism `σ` of `ℂ` (the cyclotomic
 Galois action of Peterfalvi (1.9)) and `θ : ClassFunction ↥H ℂ`,
 `σ(Ind_H^G θ) = Ind_H^G (σθ)`.  Indeed `Ind_H^G θ (g) = |H|⁻¹ ∑_x induceTerm θ x g` and `σ` is a
