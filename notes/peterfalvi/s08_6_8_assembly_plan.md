@@ -1548,3 +1548,37 @@ X-coherence reuse で省力化判明。capstone は構造 cluster が gate の m
 2. **τ₂ assembly** ((6.8.2) proof, L224): Z-linear τ₂ on Z[X∪Y], τ on Z[X∪Y,L^#] と一致、η₁^{τ₂}=Y。
 3. **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
 **正本=本 session 40 cont.¹⁴。#1 は偽ゆえ削除。残=(6.8.2.3)[(4.9) available]+τ₂+glue。次手=(6.8.2.3)。**
+
+## 2026-06-14 (session 40 cont.¹⁵, /loop): 🗺 (6.8.2.3)+τ₂ = case-B X∪Y coherence の concrete PLAN
+
+cont.¹⁴ RECON で #1(X-irred) が偽と確定 ⟹ case-B の残り = **(6.8.2.3) + τ₂ assembly + glue** の大規模
+assembly。教科書 (6.8.2.3) 完全証明 (mmd 04.8 L208-224) + Frobenius テンプレート
+(`coherentXunionYset_centralCommutator_of_glued_of_frobenius` S08_CoherenceCore:1316,
+§7 `coherentUnion_of_glued`) を精読して brick 分解を確定。
+
+### 🔑 全体像 (Frobenius `..._of_frobenius` を mirror、ただし X に reducible μ_j):
+case-B X∪Y coherence = **X-coherence ⊕ Y-coherence を §7 glue**。Frobenius と違い X が reducible を含む:
+- **Y-coherence**: 済 (Y=S(H′), 全 deg|W₁|, (1.1)+(1.4))。
+- **X-coherence (NEW, reducible 含む)**: X = S−S(W₂) = irreducible 部 ∪ reducible μ_j 部 (w₂−1 個)。
+  - irreducible 部: (6.6) reuse (`Xset_..._isCoherent_of_irreducible_X` 系) — ただし X 全体が irreducible
+    でないので、generic を **irreducible sub-family** に適用する形に要調整。
+  - **reducible μ_j 部**: (4.9) `S06.certainType_isCoherent` (`certainTypeSet h k`, S06_CertainTypeCoherence:505)。
+  - 両者を §7 `coherentUnion_of_glued` で glue。
+- **(6.8.2.3) agreement** ((χ−aη₁)^τ = X₁−aY, χ∈X): 各 χ_i に R(χ_i) + (5.4.a)/(5.4.b) (S07_Coherence:1378/1447)
+  + 集約 pinning (b_i=a_i, (6.8.2.2)=`exists_decomposition_caseB` を消費)。irreducible χ_i=§7 R-producer
+  (`dadeOrthonormalCharacterImageFamilyOfDiff`); reducible μ_j=(4.9)。
+- **X∪Y glue**: §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq`、mixed-inner 入力 = (6.8.2.3)。
+
+### 🔴 crux brick = (4.9)→§7 R/coherence bridge:
+`certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau) (certainTypeSet h k) ...`
+を、(a) case-B X-coherence の reducible 部 (`coherentUnion_of_glued` に渡す `IsCoherent`)、(b) (6.8.2.3) の
+reducible χ_i の R(μ_j) (`OrthonormalCharacterImageFamily`) として接続。**dade0/tau の整合 (cert↔hyp bridge
+`cert.K=H` S08_CoherenceCore:1261) と certainTypeSet↔Xset の対応が要精査** = 次の最大の未知。
+
+### 📋 brick 順 (次イテレーションから build):
+1. **集約関係** `Ind^L_{W₂}φ − |H:W₂|η₁ = Σ a_iα_i` + `Σa_i²=|H:W₂|` (= ‖Ind^H_{W₂}φ‖²; 中心部分群
+   への Res∘Ind=|H:W₂|·φ + Frobenius 相互律)。non-wrapper character identity。最自己完結。
+2. **(4.9)→R bridge** (crux): cert↔hyp + certainTypeSet↔(X の reducible μ_j) + dade0↔tau 整合。
+3. **(6.8.2.3) per-χ**: (5.4.a/b) + R(χ_i) + pinning。
+4. **X-coherence (reducible 込み)** + **X∪Y glue** → `sibleySetup_is_coherent` case-B branch。
+**正本=本 cont.¹⁵。これは大規模 assembly (複数イテレーション); crux=(4.9)→§7 bridge。次=brick 1 (集約関係)。**
