@@ -306,6 +306,307 @@ surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathli
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
 `tau2 M={p∉σ ∧ pRank=2}`/`tau2_pRank_eq_two`, `S10.disjoint_of_not_conj` (10.12)。
 
+### 2026-06-13 Lane G (loop): Thm 13.4 per-q **step 5 COMPLETE** (`ℳ(N_G(Q))={M*}`)
+
+**✅ step 5 着地** (`S13_Theorem134.per_q_centralizes`, build 緑 3082 / axiom = sorryAx+標準のみ,
+残 sorry 1 = steps 6-9)。step 4b (FPF `hCQR`) の上に structural prep + 入れ子 contradiction:
+- `hQS:⁅S,R⁆≤S` (`Ch04.commutator_le_of_le_normalizer hRS_norm`), `hQq` (`hSpg.to_le hQS`),
+  `hRNQ:R≤N(Q)` (`Ch04.le_normalizer_of_commutator_le (commutator_mono hQS le_rfl)`),
+  `hPcRQ:P≤C(R⊔Q)` (R⊔Q≤C(P) を sup_le + commutator_comm 対称化)。
+- **q∉α(M*)** = `S10.disjoint_of_not_conj hG hMstarMax h.mem_maximal hnc'` の `.1.2` (alpha M*∩sigma M=∅)
+  + q∈σ(M)。idiom は S13_Lemma131:333-339 と同一 (hnc' は conj 対称性 inline)。
+- **P≤M*_α** = `S10.alpha_subgroup_le_Malpha_of_isHall (Malpha_isHall …) hPMstar hPα`
+  (p∈β(M*)⊆α(M*)); ⟹ `M*_α≠⊥` (P≠⊥ ⊆ M*_α)。
+- **step 5 本体**: `ℳ(N_G(Q))≠{M*}` 仮定 → `tau1_Malpha_interaction` を (r,R,M*)↦(p,P,M) で適用
+  (hqp=hrq.symm) → `.1 hMαstar_ne hqαstar` の第2成分 `M*_α⊓C(R⊔Q)=⊥`; だが P≤M*_α⊓C(R⊔Q), P≠⊥ → 矛盾。
+
+**🔑 重要な設計発見 (次 iteration の step 7 を unblock)**: BG「[S,R]≠1 yields q∉α(M)」は shorthand。
+**q∉α(M) も q∉α(M*) と同じ disjointness (10.12(a))** で出る — ただし向きが逆:
+- q∉α(M*) = `alpha M* ∩ sigma M = ∅` (q∈σ(M) は既知)。【step 5, DONE】
+- q∉α(M) = `alpha M ∩ sigma M* = ∅` (**q∈σ(M*) が要る** = step 6 が Prop 12.15 で供給)。【step 7】
+⟹ step 7 の q∉α(M) は新たな hard work 不要、step 6 の後に `disjoint_of_not_conj hG h.mem_maximal hMstarMax hnc` の `.1.2` で即出る。
+
+**残 steps 6-9 (frontier)**:
+- **step 6** = Prop 12.15 (`sigma_subgroup_maximal_interaction`, X=Q): Sylow S'⊇Q of M⊓M* 構成 +
+  case (e) 排除 (`1⊂P⊆M⊓M*_σ`, P≤M*_σ は p∈σ(M*) [β⊆σ] 経由) → q∈σ(M*) + (d) τ₁(M*)⊆τ₁(M)∪α(M)。
+- **step 7** = q∉α(M) [上記 disjointness] → Lem 12.18(a) ×2 で C_{M_α}(P)=C_{M_α}(R)。
+  ⚠ **2nd BG gap (genuine)**: Lem 12.18(a) は C_{M_α}(P)≠1∧C_{M_α}(PQ)=1 を出すが、**包含 C_{M_α}(P)⊆C_{M_α}(R)
+  itself は rank-1/cyclic 論法を要する** (BG elide; 要 derivation)。
+- **step 8** three-subgroups (`commutator_commutator_eq_bot_of_le_of_commutator_bot` 済) → C_{M_α}(R)=C_{M_α}(RQ)。
+- **step 9** Lem 12.18(a) (on M) → C_{M_α}(R)≠C_{M_α}(RQ) 矛盾 (要 `ℳ(N_G(Q))≠{M}` = hMNQstar+M*≠M)。
+
+### 2026-06-13 Lane G (loop): Thm 13.4 per-q **steps 6 + 8-9 COMPLETE → 単一 sorry に還元**
+
+**✅ 大躍進**: per_q_centralizes の 9-step 矛盾が **step 7 の単一等式に還元** (build 緑, 残 sorry 1)。
+- **step 6** (前 commit `bab4d04b`): Prop 12.15 (X=Q) → q∈σ(M*), τ₁(M*)⊆τ₁(M)∪α(M), M_α≠⊥, q∉α(M)。
+  新 helper `exists_maximal_pSubgroup_le_of_le` (Q≤H を H の極大 q-部分群へ; axiom-clean)。
+- **steps 8-9** (本 commit): 矛盾を実装・閉じた。
+  - r∈τ₁(M) = hτ1sub + r∉α(M) (h.not_mem_sigma_of_mem_primeFactors)。
+  - Lem 12.18(a) on (r,R,q,Q) [C_Q(R)=1=hCQR ✓] → C_{M_α}(R)≠1 (hCR_ne), C_{M_α}(RQ)=1 (hCRQ_bot)。
+  - **A:=M_α⊓C(P)**: S-不変 (S⊆C(P)⊆N(C(P)) [le_normalizer] + M_α⊴M [le_normalizer_opiCoreInG] → le_normalizer_inf),
+    A⊆C(R) (=hCeq), 三部分群 (`commutator_commutator_eq_bot_of_le_of_commutator_bot`) → A⊆C(Q)。
+  - A⊆M_α⊓C(R⊔Q)=⊥ (R⊔Q≤C(A) を sup_le+対称化, centralizer_sup_eq 不要) だが A=M_α⊓C(R)≠⊥ → 矛盾。
+
+**🎯 唯一の残 sorry = step 7**: `hCeq : M_α⊓C(P) = M_α⊓C(R)` (S13_Theorem134.lean per_q 内)。
+これは BG が "we can conclude" で省略する rank-≤1/cyclic 論法 (2nd BG gap)。**次 iteration の単一標的**。
+- **入手済ツール**: `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` (S12_E:510, P が α' かつ ℳ(N_G(P))≠{M} で
+  rank(C(P)⊓M_α)≤1)、`eq_of_card_eq_of_le_of_isCyclic` (S12_Lemma1218:77, 巡回内 同位数 prime 部分群 = 一意)。
+- **P 側 rank≤1 適用可**: p∈τ₁⟹p∉α (P が α'); M*≠M∈ℳ(N_G(P)) ⟹ ℳ(N_G(P))≠{M}。⟹ C_{M_α}(P) 巡回。
+- **R 側**: Lem 12.18(a) on (r,R) で C_{M_α}(R)≠1, C_{M_α}(RQ)=1 (Q が C_{M_α}(R) に FPF 作用)。
+- **要 derivation**: 両 cyclic + FPF/coprime で等式。BG 原文 Lem 12.18 証明 (Thm 1.13/3.7/12.5-12.7) が範型。
+  ⚠ 包含の正確な機序は未確定 — 次 iteration で BG Lem 12.18 証明を精読し移植 or rank+card 経路を構築。
+
+### 2026-06-13 Lane G (loop): step 7 root-cause 精査 — **genuine hard sub-lemma と確定**
+
+**結論**: step 7 `C_{M_α}(P)=C_{M_α}(R)` は BG が "we can conclude" で省く実質的サブ補題で、
+**既存 lemma の系ではない**。loop-quick-win でなく集中的な BG-12.18 流の証明を要する (要判断)。
+
+**確定した事実 (この iteration)**:
+- 両辺 cyclic (rank≤1) は出る: P 側 (p∈τ₁⟹α', `maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1`
+  S12_E で ℳ(N_G(P))≠{M}) と R 側 (r∈τ₁(M)⟹同様) の両方に `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` 適用可。
+- steps 8-9 矛盾は等式を仮定すれば airtight (実装済・compile)。**S が C(R) を正規化しない** (S∤N(R), [S,R]=Q≠1 と
+  q≠r から S⊄N(R)) ため S-不変な C_{M_α}(P) 形が必須 ⟹ 等式は迂回不能。
+
+**棄却した経路 (この iteration の精査)**:
+- **Lem 12.18(a) 直接**: 包含を出さない (C_{M_α}(P)≠1 / C_{M_α}(PQ)=1 のみ)。かつ (p,P) 適用は
+  C_Q(P)=Q≠1 (Q⊆S⊆C(P)) で**仮定 C_Q(P)=1 が破れ不可**。
+- **Cor 13.2(b) / 13.3(b) 流**: 「τ₁(M*)'-部分群が C_{M_α}(P) を中心化」型だが、P も R も **τ₁** (τ₁' でない) ゆえ不適合。
+- **three-subgroups [Z_P,R,S] / [Z_R,P,Q]**: いずれも「S が Z_P=C_{M_α}(P) を中心化 (⁅S,Z_P⁆=1)」or
+  「Q が Z_R を正規化」等の未証明前提に bottom-out。C_{M_σ}(P) の nilpotency があれば S が q'-part Z_P を中心化するが、
+  C_{M_σ}(P) nilpotent は未確認。
+- **elemAb_centralizes_Malpha_meet (Lem 12.3)**: σ-part・rank-2 A 用で τ₁ 中心化包含には非適合。
+
+**推奨アプローチ (次の集中セッション)**: BG Lemma 12.18(a) の repo 証明
+(`tau1_Malpha_centralizer_PQ_eq_bot` + `inf_centralizer_ne_bot_of_not_le_centralizer`, S12_Lemma1218:304-560,
+Thompson critical `exists_charSubgroup_exponent_not_centralized` + Thm 3.7
+`isNilpotent_of_normalizing_primeOrder_fixedPointFree` 使用) を範型に、cyclic 分解 Z_P=C_{Z_P}(R)×[Z_P,R] の
+[Z_P,R]=1 を FPF/Thm 3.7 で示す独立 lemma `centralizer_Malpha_eq_of_commuting_tau1` を切り出して証明。
+~hundreds 行規模の見込み。**step 7 以外の per_q は完成済 (4 commits: steps 4b,5,6,8-9)。**
+
+### 2026-06-13 Lane G (loop): step 7 = **original derivation と判明** (scope 上方修正)
+
+repo の Lem 12.18(a) 証明 (`tau1_Malpha_centralizer_PQ_eq_bot`) の技法を精読した結果、step 7 の
+scope が当初見積りより重いと判明 (要再判断):
+- **cyclic は Sylow level でのみ**: repo は M_α 全体の cyclic でなく、α(M) の素数 ℓ の M_α の
+  Sylow R_ℓ (rank≥3, `exists_invariant_sylow_Malpha_rank_three`) を取り、`isCyclic_of_pRank_le_one`
+  (p-群は pRank≤1⟹cyclic、nilpotent 不要) で R_ℓ⊓C(P) を cyclic 化。**M_α 自体は nilpotent でない**
+  (repo は M'/M_α 商の nilpotency `derivedQuotientMalpha_isNilpotent` のみ; M_α は Hall α で非 nilpotent)。
+- ⟹ 「M_α=M_β nilpotent ⟹ C_{M_α}(P) cyclic ⟹ Aut-abelian で Q が trivial」近道は **前提崩壊で不可**。
+- **P-side は Lem 12.18(a) 適用不能**: 包含に必要な C_{M_α}(P)≠1 は Lem 12.18(a) から出ない
+  (C_Q(P)=Q≠1 で仮定破れ; R を Q 役にしても C_R(P)=R≠1 で破れ)。
+- **🔴 決定的**: BG は包含 itself を "we can conclude" で**完全に省略** ⟹ step 7 は BG proof の port でなく
+  **original derivation** (rank≥3 Sylow + Thompson + Thm 3.7 の機構を未記述 config に再構築)。
+  ~数百行 + 数学的 design が必要で、loop の quick-iteration には不向き。
+
+**現況**: per_q は step 7 単一 sorry に還元済 (steps 4b/5/6/8-9 完成・build緑・axiom-clean)。
+Cor 13.3 (cyclic Sylow & E₃ prime action) は **unblocked** (13.2 済) で productive。
+⟹ ユーザー再判断: step 7 続行 vs Cor 13.3 へ pivot (step 7 は後日 dedicated)。
+
+### 2026-06-13 Lane G (loop): **step 7 hard-stop → Cor 13.3 へ pivot** (ユーザー裁可)
+
+ユーザー裁可で step 7 は documented sorry で温存 (rank framework `5f36ecdb` まで landed;
+hCeq の Thompson/Thm 3.7 climax = BG-elided original derivation で dedicated session 行き)。
+loop は **Cor 13.3** へ pivot。
+
+**Cor 13.3(a) 証明確定** (clean, tractable — scaffold `cyclicSylow_actsPrime` in S13_PrimeAction):
+P = E の cyclic Sylow p (p∉τ₂)。g∈P# について C_{M_σ}(g)=C_{M_σ}(P) を示す:
+- ⊇ は自明 (g∈P ⟹ C(P)⊆C(g))。
+- ⊆: M*∈ℳ(N_G(⟨g⟩)) を取る。P abelian ∋ g ⟹ P⊆C(g)⊆N(⟨g⟩)⊆M* ⟹ P≤M⊓M*。
+  **Cor 13.2(a)** (tau13_pSubgroup_centralizes.1, ⟨g⟩ & M*) で P が M_σ⊓M* を中心化。
+  C(g)⊆M* ⟹ C_{M_σ}(g)=M_σ⊓C(g)⊆M_σ⊓M* ⟹ P が C_{M_σ}(g) を中心化 ⟹ C_{M_σ}(g)⊆C(P);
+  かつ ⊆M_σ ⟹ ⊆C_{M_σ}(P)。∎
+- **要 sub-fact**: `p∈τ₁∪τ₃` (Cor 13.2 の仮定)。`mem_tau_union_of_mem_primeFactors` (S12_ECore:295)
+  で p∈τ₁∪τ₂∪τ₃; τ₂ 排除は cyclic Sylow (rank1) vs τ₂⟹pRank_M=2 (`tau2_pRank_eq_two`)。
+  ⚠ **要: Sylow-p-of-E が pRank_M(p) を捕捉** (p∈σ' ⟹ Sylow_p E = Sylow_p M) — 次 iteration で確認/構築。
+
+**Cor 13.3(b)** (E₃ prime): Cor 13.2(b) + E₃⊆E'⊆M*' ⟹ π(E₃)⊆τ₁(M*)' (Lemma 12.1: E₃ cyclic normal ⊆E')。
+→ Cor 13.2(b) で E₃ が C_{M_σ}(P) 中心化。**次 iteration**。
+
+### 2026-06-13 Lane G (loop): Cor 13.3(a) core landed (`7ae72709`) + τ₂-exclusion 標的確定
+
+**✅ core landed**: `actsPrimeOn_Msigma_of_mem_tau13` (abelian p-部分群 P≤M, p∈τ₁∪τ₃ ⟹ M_σ prime 作用,
+sorry-free body, S13_PrimeAction)。再利用可 (Cor 13.3(a) / Thm 13.5 / Lemma 13.7)。
+
+**🎯 τ₂-exclusion 標的確定** (τ def 精読): `tau1∪tau3 = {p∉σ(M) ∧ pRank ↥M p = 1}`
+(τ₁=∉π(M'), τ₃=∈π(M'); τ₂=pRank=2)。⟹ cyclicSylow_actsPrime(a) の配線 = **`pRank ↥M p = 1` を示す**
+(P cyclic Sylow of E, p∈π(P))。p∉σ は `h.not_mem_sigma_of_mem_primeFactors` ✅; pRank≥1 は Cauchy;
+**残 = pRank ↥M p ≤ 1** (τ₂ 排除)。
+- **route** (~40 行, 次 iteration): P max-p in E ⟹ P.subgroupOf E は Sylow p ↥E (maximality) ⟹ |P|=|E|_p;
+  `card_Msigma_mul_card_E` + p∤|M_σ| (p∈σ') ⟹ |E|_p=|M|_p ⟹ |P|=|M|_p ⟹ P.subgroupOf M は Sylow p ↥M;
+  `pRank_sylow_eq` + IsCyclic ⟹ pRank ↥M p = pRank ↥P ≤ 1。`pRank_M_le_two` (≤2) は既存だが不足、=1 が要る。
+  ⚠ `pRank ↥M p = pRank ↥E p` は repo に無し ⟹ Sylow-E-M card chain を直接構築。subtype Sylow 注意。
+- IsCyclic→IsMulCommutative は `IsCyclic.commGroup` instance + `⟨⟨mul_comm⟩⟩`。
+- **(b) E₃**: 別途 (multi-prime, core 直接適用不可; Cor 13.2(b) + E₃⊆E' 経路)。
+
+### 2026-06-13 Lane G (loop): Cor 13.3(a) COMPLETE (`6c0b15ca`) + (b) plan 確定
+
+**✅ Cor 13.3(a) 完了**: `cyclicSylow_actsPrime`(a) 配線済 (helper `mem_tau1_union_tau3_of_isCyclic_sylow_E`
+[`8263023c`] + core + IsCyclic.commGroup)。残 sorry = (b) のみ。
+
+**🎯 Cor 13.3(b) plan 確定** (E₃ prime on M_σ; intricate ~80 行, 2 sub-lemma + assembly):
+ActsPrimeOn def は **per-element** (∀g∈E₃#, C_{M_σ}(g)=C_{M_σ}(E₃))。core 直接適用不可 (E₃ multi-prime)。
+- **B1** `C_{M_σ}(Sylow_p(E₃)) = C_{M_σ}(E₃)` (各 p∈π(E₃)):
+  P:=Sylow_p(E₃) は E-normal (cyclic E₃ ◁ E [`E3_normal`] の char 部分群) ⟹ E⊆N_G(P)⊆M* (M*∈ℳ(N_G(P)))。
+  E₃⊆E'=derivedInG E [`E3_le_derived hG`] ⊆ M*' (E⊆M* ゆえ) ⟹ π(E₃)⊆π(M*')⊆τ₁(M*)ᶜ (τ₁ def: ∉π(M*'))
+  ⟹ `IsPiSubgroup (τ₁ M* )ᶜ E₃`。E₃⊆E⊓M*。**Cor 13.2(b)** (`tau13_pSubgroup_centralizes …).2.1`)
+  ⟹ E₃ が M_σ⊓M* 中心化。C_{M_σ}(P)⊆M_σ⊓M* (C(P)⊆N(P)⊆M*) ⟹ E₃ が C_{M_σ}(P) 中心化
+  ⟹ C_{M_σ}(P)⊆C_{M_σ}(E₃); 逆は P≤E₃ で自明。
+- **B2** cyclic 分解 `C_{M_σ}(g) = ⊓_{p|ord g} C_{M_σ}(g_p)` (g_p = p-part): 一般 cyclic fact (mathlib CRT/zpowers)。
+- **assembly**: g∈E₃#, g_p∈Sylow_p(E₃)# ⟹ (a) で C_{M_σ}(g_p)=C_{M_σ}(Sylow_p)=C_{M_σ}(E₃) [B1]
+  ⟹ C_{M_σ}(g)=⊓_p C_{M_σ}(E₃)=C_{M_σ}(E₃) [B2]。
+- **⚠ landscape**: (b) 後、§13 残 (13.5/13.6/13.7/…) は **Thm 13.4 (step 7) gate** ゆえ lane は step-7 壁に再到達。
+  (b) が最後の cleanly-unblocked §13 結果。
+
+### 2026-06-13 Lane G (loop): Cor 13.3(b) **clean route 確定** (B1/B2 不要、単一証明 ~60行)
+
+**🎯 改良 plan** (B1+B2 より大幅 simple、全 lemma 特定済): per-element ∀g∈E₃#, C_{M_σ}(g)=C_{M_σ}(E₃):
+- ⊇ 自明 (`fixedBy_le_fixedByElement`)。
+- ⊆: p := order(g) の素因数, **x := g^(orderOf g / p)** (order p, x∈⟨g⟩⊆E₃, x≠1)。
+  **P:=⟨x⟩=zpowers x** は E-normal: ⟨x⟩.subgroupOf E₃ は ↥E₃ cyclic (`E3_isCyclic`) の部分群ゆえ
+  **characteristic** (`characteristic_of_subgroup_of_isCyclic`, Isaacs/Ch04/ForwardFromCh02:403, public);
+  E⊆N_G(E₃) (E₃◁E, `E3_normal`) + char lift bridge (`mem_normalizer_map_subtype_of_characteristic`,
+  S03f_Prelim:366) ⟹ E⊆N_G(⟨x⟩)。
+  M*∈ℳ(N_G(⟨x⟩)) (N_G(⟨x⟩)≠⊤)。E⊆N_G(⟨x⟩)⊆M*。E₃⊆E'=derivedInG E (`E3_le_derived hG`) ⊆M*'
+  (E⊆M* ゆえ derivedInG_mono) ⟹ π(E₃)⊆π(M*') ⟹ q∉τ₁(M*) (τ₁ def ∉π(M*')) ⟹ `IsPiSubgroup (τ₁ M*)ᶜ E₃`。
+  E₃⊆E⊓M*。**Cor 13.2(b)** (`tau13_pSubgroup_centralizes hG h (Or.inr hpτ3) hxM hxne hxp hMstar |>.2.1 E₃ … `)
+  ⟹ E₃⊆C(M_σ⊓M*)。C_{M_σ}(x)⊆M_σ⊓M* (C({x})⊆N(⟨x⟩)⊆M*)。⟹ E₃ が C_{M_σ}(x) 中心化
+  ⟹ C_{M_σ}(x)⊆C_{M_σ}(E₃)。C_{M_σ}(g)⊆C_{M_σ}(x) (x∈⟨g⟩, C(g)⊆C(x)) ⟹ C_{M_σ}(g)⊆C_{M_σ}(E₃)。
+- p∈τ₃(M): x order p, p∈π(E₃) (x∈E₃), E₃ は τ₃-π-group (`isPiGroup_tau3`) ⟹ p∈τ₃。
+- **次 iteration で build** (全 lemma teed up; fiddly = order 算術 x + char-normalizer bridge subtype)。
+
+### 2026-06-13 Lane G (dedicated session): step 7 (hCeq) **深掘り調査** — math 機序を精密化、shortcut 棄却、real path 確定 (ユーザー裁可で head-on)
+
+Cor 13.3 完了後、ユーザー裁可で step 7 (`hCeq : C_{M_α}(P)=C_{M_α}(R)`, S13_Theorem134:262-291 の唯一 sorry) に正面着手。
+BG 13.4 原文 (mmd L3568-3598)・Lemma 12.18 (L3484-3508)・repo の 600 行 `tau1_Malpha_centralizer_PQ_eq_bot`
+(S12_Lemma1218:410-1029) を精読。**結論: genuine な BG-elided original derivation で確定。以下は次セッションの正本。**
+
+**① 矛盾構造の精密化 (steps 8-9 が hCeq から消費するもの)**:
+per_q の最終矛盾は、`A := C_{M_α}(P)` について **(I) inclusion 1 `A ⊆ C(R)`** + **(II) `A ≠ ⊥`** に縮約できる
+(hCeq 等式まるごとは不要)。実際 steps 8-9 (実装済) は:
+S が A を正規化 (`hSNA`, S⊆C(P)) + (I) `A⊆C(R)` ⟹ three-subgroups で `[A,Q]=1` (`hAcQ`) ⟹
+`A ⊆ M_α⊓C(R⊔Q) = C_{M_α}(RQ) = ⊥` (`hCRQ_bot`) ⟹ `A=⊥`。これと (II) `A≠⊥` で矛盾。
+- BG は (II) を **inclusion 2 `C_{M_α}(R) ⊆ A`** から得る (`A ⊇ C_{M_α}(R) ≠ ⊥`, `hCR_ne`)。⟹ 結局 **両 inclusion = 等式**が要。
+- **🔑 three-subgroups が S-正規化を要するため迂回不能**: `[C_{M_α}(R), Q]=1` を直接 three-subgroups で出そうとすると
+  `[[S,R], C_{M_α}(R)]=[Q,C_{M_α}(R)]` に bottom-out して循環。S は `C_{M_α}(R)` を正規化しない (S⊄N(R))。
+  BG は等式で `C_{M_α}(R)` を **S-不変な `C_{M_α}(P)` に swap** してこれを回避する。∴ inclusion 1 は本質的。
+
+**② cyclic Aut-abelian shortcut — 着想と棄却 (再調査不要)**:
+「もし `A=C_{M_α}(P)` が cyclic なら、S,R が A を正規化 (⊆C(P)) ∧ Aut(cyclic)=abelian ⟹ `Q=[S,R]` が A を中心化
+(φ([s,r])=[φ(s),φ(r)]=1 in Aut(A))」という clean な insight を得た。これは正しく、`hAcQ` の three-subgroups を不要化する。
+さらにこれから `C_{M_α}(PR) = A∩C(R) ⊆ C(Q)∩C(R)∩M_α = C_{M_α}(RQ) = ⊥` も従う。
+**🛑 しかし棄却**: A が cyclic と示せない。`isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one` (S12_ECore:461) は
+**`[Group.IsNilpotent H]` を要求**。`M_α = opiCoreInG (alpha M) M` は **Hall α-subgroup で非 nilpotent**
+(notes 既出; M'/M_α のみ nilpotent = `derivedQuotientMalpha_isNilpotent`)。⟹ `rank A ≤ 1` は **A = Z-群** (Sylow 巡回)
+を与えるのみで cyclic でない ⟹ Aut(A) 非可換 ⟹ shortcut 適用不能。**repo PQ_eq_bot も per-Sylow** (C_{R'}(P) は
+R'=Sylow⟹p-群⟹巡回) で処理しており、A 全体の cyclic 性は使っていない。
+
+**③ real path = per-Sylow Theorem 3.7 reconstruction (~数百行, PQ_eq_bot 範型)**:
+各 `r'∈α(M)` と PRS-不変 Sylow r' `R'` of M_α (`exists_invariant_sylow_Malpha_rank_three`) で、
+`C_{R'}(P)/C_{R'}(R)` 巡回 (`isCyclic_of_pRank_le_one`)、Thompson `R'_1` (`exists_charSubgroup_exponent_not_centralized`)
++ Thm 3.7 (`isNilpotent_of_normalizing_primeOrder_fixedPointFree`) + 巡回内一意性
+(`card_eq_prime_of_le_exponent_prime` / `eq_of_card_eq_of_le_of_isCyclic`) で per-Sylow に R-中心化を出し、
+**非 nilpotent M_α 上で assemble** する。これが hard part 2 つ:
+  (a) **inclusion の正確な Thm-3.7 config が未確定**: BG は inclusion 自体を完全省略 ("we can conclude", L3588-3594)。
+      12.18(a) の結論は `C_{M_α}(RQ)=⊥` であって inclusion でない ⟹ inclusion は 12.18(a) の instance でない。
+      BG §12-13 に standalone な「commuting τ₁-元の C_{M_α} 包含」補題も無い (grep 確認済)。
+      ∴ Thompson 配置を**未記述 config に再構成**する必要 (PQ_eq_bot とは別 statement)。
+  (b) **非 nilpotent M_α の assembly**: per-Sylow の R-中心化を全 M_α へ束ねる (C_{M_α}(P) は Sylow の積で書けない)。
+
+**④ 評価と推奨**: notes 既出「original derivation, ~数百行」を**精密に裏付け**た。math 機序 (BG が "we can conclude" で
+飛ばす inclusion の正確な論法) が未確定なまま Lean を書くのは coding-into-void ゆえ不可 (難所回避でなく root-cause 未解決)。
+**残る本質ギャップ = inclusion `C_{M_α}(P)⊆C(R)` の正確な coprime rank-1 論法**。これは恐らく Thompson 1966 / Gorenstein
+の coprime-action「rank-1 centralizer coincidence」型補題を要する (BG が周知として省略)。
+- **推奨次手**: (A) Thompson 1966 / Gorenstein のソースで inclusion の正確な論法を pin → per-Sylow + assembly で formalize
+  (real multi-session 投資), または (B) step 7 は documented sorry で温存し §13 構造 (13.5→13.10) を sorry'd 13.4 引用で積む
+  (scaffold-cite, structural progress; step 7 完成で自動 unconditional 化)。**この session は ④ の調査で head-on を遂行**;
+  build/sorry 不変 (notes-only)。
+
+### 2026-06-13 Lane G (dedicated session 続き): ソース読解 (head-on 継続) → **per-Sylow cyclic trick で step 7 を大幅構造化** (正本)
+
+ユーザー裁可で BG Ch3 coprime 構造定理 (Thm 3.6/3.7/3.8/3.9/3.10) + Gorenstein を読解。直接の inclusion 補題は
+無いが、**BG Theorem 1.11 (Ω₁-rigidity, repo formalize 済 `S01c_Omega1Rigidity.lean`) が p-群限定**である点が鍵で、
+**per-Sylow では C_{R'}(P) が cyclic** ((非 nilpotent M_α 全体では失敗した) cyclic Aut-abelian trick が復活)。
+これで step 7 の attack が一変。**以下が新しい正本。前項④の「shortcut 棄却」は per-Sylow で覆る。**
+
+**🔑 per-Sylow cyclic Aut-abelian trick (rigorous・Lean-able)**:
+各 `r'∈α(M)` で **PRS-不変 Sylow r' `R'` of M_α** を取る (存在: `SPR = S⋊PR` は {p,q,r}-群で M_α [α-群] と
+coprime [p,q,r∉α] ⟹ coprime-action で SPR-不変 Sylow 存在; PR が S を正規化 [`hSinv`] ゆえ SPR が群)。
+`C_{R'}(P)` は **cyclic** (`isCyclic_of_pRank_le_one`: R' は r'-群 ∧ rank≤1 ∧ r' odd)。S,R は R' と P を正規化
+⟹ `C_{R'}(P)≤C(P)∩R'` を正規化、Aut(cyclic)=abelian ⟹ **`Q=[S,R]` が `C_{R'}(P)` を中心化**。
+
+**この trick から導かれる rigorous facts (全て Lean 構成可)**:
+- **(A) Q が `C_{M_α}(P)` を中心化** (= Lean の `hAcQ`, **hCeq 不要で直接導出可**): `C_{M_α}(P)` は自身の Sylow
+  `C_{R'}(P)` で生成 (有限群 = ⟨Sylows⟩; coprime-action で C_{M_α}(P) の Sylow r' = C_{R'}(P))、各を Q が中心化 ⟹ 全体中心化。
+- **(B) `C_{M_α}(PR)=⊥`** (= R が `C_{M_α}(P)` に FPF, かつ P が `C_{M_α}(R)` に FPF): (A) で `C_{M_α}(P)⊆C(Q)` ⟹
+  `C_{M_α}(P)∩C(R) ⊆ M_α∩C(R)∩C(Q) = C_{M_α}(RQ) = ⊥` (`hCRQ_bot`)。
+- **(C) `C_{M_α}(R)` は cyclic**: (B) で P が `C_{M_α}(R)≠⊥` に FPF ⟹ Thm 3.7 (`isNilpotent_of_normalizing_primeOrder_fixedPointFree`)
+  で nilpotent ⟹ rank≤1 ∧ odd ⟹ cyclic。
+
+**🛑 残る hard core (closure) = inclusion 自体は (A)(B) と「両立して FALSE」**: (A)(B) は **R が C_{M_α}(P) に FPF /
+P が C_{M_α}(R) に FPF** を与え、これは BG の inclusion (`C_{M_α}(P)⊆C(R)` 等) と逆 ⟹ BG の inclusion/等式は
+偽仮定 Q≠1 下の「偽の派生」。**genuine な closure は S-非対称性で阻まれる**: 「Q が C_{M_α}(P) 中心化」(A) を
+C_{M_α}(R) へ移送するには S が C_{M_α}(R)=M_α∩C(R) を正規化する必要があるが **S⊄N(R)** (S は P 経由で定義され R 用の
+対称物が無い)。BG は等式でこれを回避。
+- **closure の見立て (次の hard core)**: C_{M_α}(R)≠⊥ cyclic の素因子 r''∈α(M) で Sylow R'' (rank≥3) を取り、
+  P が C_{R''}(R)≠⊥ (cyclic) に FPF + rank≥3 構造から **Thompson R''_1 (`exists_charSubgroup_exponent_not_centralized`)
+  + Thm 3.7** で矛盾を出す (PQ_eq_bot 範型の ~hard core)。これが BG「we can conclude」の実体と推定。
+- **⟹ step 7 の改訂 attack (4 step)**: (1) per-Sylow cyclic trick → fact (A)(B) [Lean-able, ~中規模] →
+  (2) fact (C) cyclic [Thm 3.7] → (3) **Thompson closure on rank-≥3 R''** [hard core, ~PQ_eq_bot scale] →
+  (4) 矛盾。**(1)(2)(4) は機械的、(3) が唯一の真の難所**。
+
+**ツール確定** (全 repo 在): Thm 1.11 `actsTrivially_of_fixes_omega1_centralizer`/`...` (S01c_Omega1Rigidity),
+`isCyclic_of_pRank_le_one` (S10_LocalCriteria), Thm 3.7 `isNilpotent_of_normalizing_primeOrder_fixedPointFree`
+(S03c), `exists_charSubgroup_exponent_not_centralized` (Thompson 1.13), `exists_invariant_sylow_Malpha_rank_three`
+(S12_E), `card_eq_prime_of_le_exponent_prime`/`eq_of_card_eq_of_le_of_isCyclic` (S12_Lemma1218)。
+**評価**: 「totally elided」から「(A)(B)(C) rigorous + 単一 Thompson closure」へ前進。次セッションは (1)(2) を land
+(fact A=hAcQ を hCeq 非依存で証明し既存 step 8-9 を一部組換え) → (3) Thompson closure に集中。**この session は head-on で
+math を大幅前進** (build/sorry 不変, notes-only)。
+
+### 2026-06-13 Lane G (同 session, closure 精密検証): 🛑 **(3) Thompson closure は遮断 — 上の楽観評価を訂正** (definitive)
+
+fact (A) 着工前に closure (step 3) が通るか精査 → **遮断と確定**。上の「(3) Thompson closure on R''」は誤りで、
+genuine な impasse。理由 (全て検証済):
+- **新 Thm 3.7 矛盾が構成不能**: PQ_eq_bot 型の矛盾は「prime-order 群が非 nilpotent な `Q·R''_1` 等に FPF 作用
+  ⟹ Thm 3.7 で nilpotent ⟹ 矛盾」。ここで使える FPF は (i) **P-FPF**: `C_Q(P)=Q≠1` (P が Q を中心化) ゆえ
+  `C_{Q·R''_1}(P)=1` が**破れ Thm 3.7 適用不可** / (ii) **R-FPF**: `C_Q(R)=1` ✓ だが**既に (r,R) の 12.18(a)
+  適用で消費済** (= `C_{M_α}(RQ)=⊥` を産出) ⟹ 新たな矛盾源にならない。⟹ **新 Thompson 矛盾の起点が無い**。
+- **cyclic trick も R 側は不可 (S-非対称性が絶対)**: `C_{M_α}(R)` (cyclic) を正規化する群は `P` / `R` / `C_S(R)` のみで、
+  これら**相互の commutator は全て 1** (`[P,R]=1`, `[P,C_S(R)]=1` [P が S 中心化], `[R,C_S(R)]=1`) ⟹ `Q=[S,R]` を
+  commutator として産めない。S 全体は `C(R)` を正規化しない (`Q⊄N(C(R))`)。
+- **facts (A)(B)(C) は self-consistent** (P が `C_{M_α}(R)≠⊥` cyclic に FPF 作用は矛盾でない) ⟹ **単体で False を産まない**。
+  ⟹ hCeq (`C_{M_α}(P)=C_{M_α}(R)`) は **(B) `C_{M_α}(PR)=⊥` + `hCR_ne` の下で False に同値**ゆえ、closure (=False 導出)
+  と equi-difficulty (hCeq は doomed でなく closure と同値; 現 Lean 構造は維持で可だが closure を要す)。
+
+**🔴 definitive 所見**: step 7 closure = BG が "we can conclude" で省く inclusion で、**標準 coprime-action machinery
+(BG Ch3 全 + Gorenstein + 在 repo 機構) では構成不能**な genuine gap。BG 固有の省略論法は本 session 精査の範囲
+(Thm 1.13/3.6/3.7/3.8/3.9/3.10, Prop 1.10/1.16, Thm 1.8/1.11) に**現れず**、original derivation (恐らく未記述 config への
+Thompson/Thm 3.7 の非自明再構成、または P-Q 中心化を回避する別経路) を要する。**~数 session 規模の research-level task。**
+- **landed 資産**: facts (A)(B)(C) の rigorous な math 確立 (再利用可技法 = per-Sylow cyclic trick) + hCeq=closure 同値性
+  + 遮断構造の完全 map。**未 land** (Lean): fact (A) の formalize は ~200 行で closure を閉じない (技法検証のみ) ゆえ保留。
+- **推奨**: step 7 は documented sorry で温存 → **§13 構造 (Thm 13.5/Lemma 13.6/13.7…) を sorry'd 13.4 引用で積む**
+  (option B; build-green structural progress, step 7 完成で自動 unconditional 化)。step 7 は dedicated research session 行き。
+
+### 2026-06-13 Lane G (同 session): pivot → **Theorem 13.5 の証明設計確定** (次ターン実装; ready-to-build)
+
+step 7 impasse 確定を受け option B へ pivot。**Theorem 13.5 (E₁≠1 ⟹ E₁ acts prime on M_σ)** の clean 証明を設計
+(mmd L3600 「E₁ cyclic ⟹ Cor 13.3 + Thm 13.4」)。新 leaf `S13_Theorem135.lean` 予定 (import: S13_PrimeAction
+[ActsPrimeOn/cyclicSylow_actsPrime] + S13_Theorem134 [centralizer_le_centralizer_of_tau1])。
+
+**設計 (K := fixedBy (M_σ) E₁ を universal target に)**: `ActsPrimeOn (M_σ) E₁` = ∀g∈E₁#, fixedByElement g = K。
+⊇ は `fixedBy_le_fixedByElement` で free。⊆ は `M_σ⊓C(g) ≤ C(E₁)` を示す:
+1. **cross-prime 補題 (crux)**: ∀ 素数 p,p' ∈ π(E₁), `fixedBy (M_σ) P_p = fixedBy (M_σ) P_{p'}` (P_p=Sylow p of E₁
+   =Sylow p of E [E₂E₃ coprime])。導出 = Cor 13.3(a) で `fixedBy P_p = fixedByElement (Ω₁P_p の生成元)`
+   (prime action) + **Thm 13.4** を (Ω₁P_p ∈ ℰ_p¹(E), Ω₁P_{p'} ∈ ℰ_{p'}¹(C_E(Ω₁P_p)) [E₁ abelian]) で適用 ⟹
+   `C_{M_σ}(Ω₁P_p) ⊆ C_{M_σ}(Ω₁P_{p'})`、両 prime ∈ τ₁ ゆえ対称で =。
+2. `fixedBy E₁ = ⋂_{p'} fixedBy P_{p'} = K` (E₁=∏ Sylows, C(E₁)=⋂C(P_{p'}); 全 fixedBy P_{p'} 相等)。
+3. g∈E₁#: ⟨g⟩=∏_{p|ord g}⟨g_p⟩ ⟹ `fixedByElement g = ⋂_{p|ord g} fixedByElement g_p = ⋂ fixedBy P_p = K`
+   (Cor 13.3(a) で各 g_p∈P_p#)。
+
+**実装注意**: fiddly = (a) E₁ の Sylow p を取り cyclic/maximal-in-E を示し cyclicSylow_actsPrime 適用、(b) Ω₁(P_p) ∈
+elemAbelianOfRank G p 1 (= ℰ_p¹) 構成、(c) ⟨g⟩=∏⟨g_p⟩ CRT と C(∏)=⋂C。~200-300 行・all-or-nothing (sorry 不可)。
+**この session は step 7 を exhaustive head-on (facts A/B/C rigorous + 遮断完全 map, commit a43dbc1e/9b924c31/54c2b33f)、
+13.5 は設計まで。次ターン = 13.5 実装。**
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
