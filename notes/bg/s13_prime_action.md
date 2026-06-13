@@ -644,6 +644,49 @@ robust であることを精密に確定:
   research gap**。残る理論的可能性 = R'' (非可換 rank≥3) 上の PR 作用の非自明な表現論/Hall-Higman 型議論、または BG が
   別途持つ未特定 lemma。**dedicated な数学研究を要し、loop/通常実装では不可**と確定。productive 前進は §13 構造 (13.5+)。
 
+### 2026-06-14 Lane G: 🎉🎉🎉 **step 7 GAP SOLVED — ChatGPT の「一様排除」洞察で reconstruction gap が埋まった**
+
+ユーザーが ChatGPT に gap を尋ね、回答を `notes/bg/bg_theorem13_4_gap_verification.md` に配置。**全ステップ検証 → 正しい**。
+私の「impasse」は誤り (新しい議論を探していたが、実際は **BG 自身の前半議論の再適用**だった)。
+
+**🔑 核心 = 一様排除補題 (UniformExclusion)**: BG の 13.4 前半 (`[S,R]≠1 ⟹ q∉α(M)` を M* 経由で導く部分) は
+**素数 q について一様**。すなわち:
+> `a∈τ₁(M), A₀∈ℰ_a¹(E), b∈π(E), B₀∈ℰ_b¹(C_E(A₀)), s∈σ(M)`、T を A₀B₀-不変 Sylow s of C_{M_σ}(A₀) とすると、
+> **`[T,B₀]≠1 ⟹ s∉α(M)`**。
+
+証明 = **私の per_q steps 1-6 を (P,R,q,S)→(A₀,B₀,s,T) に一般化したもの** (s が特定 q であることを一切使わない事を全 step 検証)。
+
+**包含の証明 (alpha_fixed_le_fixed)**: `C_{M_α}(A₀)` の各素因子 ℓ は **ℓ∈α(M)** (M_α が α-群)。ℓ-Sylow B_ℓ は A₀B₀-不変
+Sylow ℓ of C_{M_σ}(A₀) (ℓ∈α ⟹ C_{M_σ}(A₀) の ℓ-部分は M_α 内 ⟹ B_ℓ∈Syl_ℓ(C_{M_σ}(A₀)))。UniformExclusion の対偶
+(ℓ∈α(M) ⟹ `[B_ℓ,B₀]=1`) を各 ℓ に適用 → B₀ が全 Sylow を中心化 → ⟨Sylows⟩=C_{M_α}(A₀) ⟹ **`C_{M_α}(A₀)⊆C_{M_α}(B₀)`**。
+
+**per_q への適用**: hCeq = `le_antisymm (alpha_fixed_le_fixed P R) (alpha_fixed_le_fixed R P)` (対称包含、後者は r∈τ₁(M)
+[hrτ1M 既存] + P∈ℰ_p¹(C_E(R)))。⟹ **hCeq の sorry 除去、steps 8-9 (既存) で閉じ、step 7 完全解決**。
+
+**なぜ見落としたか**: 私の fact (A)(B)(C) は正しく (ChatGPT も確認)、`C_{M_α}(P)∩C_{M_α}(R)=⊥` も真。だが inclusion を
+**新議論**で示そうとして詰まった。実際は inclusion ⟺「各 α-Sylow が R-中心化」⟺「BG の一様排除を各 α-Sylow に適用」。
+
+**形式化プラン**: (1) `uniform_exclusion` (= per_q steps 1-6 を一般化, 結論 `s∉α(M)`); (2) `alpha_fixed_le_fixed`
+(各 α-Sylow に (1) 適用 + Sylow 生成 assembly); (3) per_q の hCeq を (2) で埋める。S13_Theorem134.lean に追加 (~250 行)。
+正本 = `notes/bg/bg_theorem13_4_gap_verification.md` (ChatGPT 回答 + 私の検証)。
+
+### 2026-06-14 Lane G: ✅✅✅ **step 7 IMPLEMENTED — Theorem 13.4 完全証明 (sorry-free)**
+
+上記プランを実装完了 (S13_Theorem134.lean):
+- **`uniform_exclusion`** (新 top-level, ~120 行): per_q steps 1-6 を `(a,A₀,b,B₀,s,T)` に一般化、`⁅T,B₀⁆≠⊥ → s∉α(M)`。
+  first-try build green (steps 1-6 の転記が一発で通った)。
+- **`alpha_fixed_le_fixed`** (新 top-level, ~55 行): outer reduction `msigma_centralizer_le_of_invariant_sylow_centralized`
+  を範型に M_α 版。`eq_of_le_of_forall_full_prime_pow` + `exists_aInvariant_sylow_subgroup` で各 ℓ の B₀-不変 full Sylow
+  に `uniform_exclusion` 対偶 (ℓ∈α(M) ⟹ `[S,B₀]=⊥`) を適用 → `C_{M_α}(A₀)⊆C_{M_α}(B₀)`。first-try build green。
+- **per_q hCeq** = `le_antisymm (alpha_fixed_le_fixed hG h hp hP hPE hr hR hRC) (alpha_fixed_le_fixed hG h hrτ1M hR hRE hpE hP (le_inf hPE hPCR))`
+  (逆向きは `hpE : p∈π(E)` [`mem_primeFactors_of_isPGroup_le`] + `hPCR : P≤C(R)` [commutator 対称])。**sorry 除去**。Thompson 用 rank bounds は不要化で削除。
+- **`#print axioms centralizer_le_centralizer_of_tau1` = `[propext, sorryAx, Classical.choice, Quot.sound]`** —
+  sorryAx は §12 scaffold (Cor 12.16 / Prop 12.15 / Thm 12.13 の S12_E sorry'd statement) 由来のみ、**新規 axiom 0**。
+  ⟹ **Theorem 13.4 は §12-conditional で完全証明** (他の G 結果と同列、Lane F の §12 完成で自動 unconditional 化)。
+- docstring 3 箇所 (WIP / per_q / centralizer_le_centralizer_of_tau1) を ✅COMPLETE に更新。leaf build 3087 green、実 sorry 0。
+- **🎯 §13 frontier 解放**: Thm 13.4 完成で **Thm 13.5 / Lem 13.6 / 13.7 / … の step-7 gate が消滅** — 以降 §13 結果は
+  proof レベルで unblocked (§12 scaffold-cite のみ)。次 = Theorem 13.5 (設計済 [上記] + 13.4 完成で完全に積める)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
