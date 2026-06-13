@@ -42,7 +42,8 @@ variable {G : Type*} [Group G]
 `C_{M_σ}(P)`, `R` centralizes `S` (i.e. `⁅S, R⁆ = ⊥`). Assume `Q := ⁅S, R⁆ ≠ ⊥`; then via
 Cor 13.2(b)(c) `r ∈ τ₁(M*)` and `p ∈ β(M*)` for `M* ∈ ℳ(N_G(P))`, and Prop 12.15 / Lemma 12.18
 yield `C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)` against `ℳ(N_G(Q)) ≠ {M}` — contradiction.
-**🚧 WIP**: setup + Cor 13.2 steps; steps 4-9 (Prop 12.15 / Lemma 12.18 contradiction) `sorry`. -/
+**🚧 WIP**: setup + Cor 13.2 steps + step 4 (`S` abelian, FPF) + **step 5** (`ℳ(N_G(Q)) = {M*}`
+via Lemma 12.18(a) role-swap); steps 6-9 (Prop 12.15 / Lemma 12.18 contradiction) `sorry`. -/
 theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p r : ℕ}
     [Fact p.Prime] [Fact r.Prime] (hp : p ∈ tau1 M) (hr : r ∈ (Nat.card ↥E).primeFactors)
@@ -144,7 +145,47 @@ theorem per_q_centralizes [Finite G] (hG : IsMinimalSimpleOdd G)
     commutator_inf_centralizer_eq_bot_of_isCommutative
       (fun a ha b hb => congrArg Subtype.val (hSab.is_comm.comm (⟨a, ha⟩ : ↥S) ⟨b, hb⟩))
       hRS_norm hcop_SR
-  -- steps 5-9: `ℳ(N_G(Q)) = {M*}`, Prop 12.15, `C_{M_α}` contradiction. 🚧
+  -- ===== structural facts for `Q := ⁅S, R⁆` (step 5 prep) =====
+  -- `Q ≤ S` (`R` normalizes `S`), so `Q` is a `q`-group and `Q ≤ M*`.
+  have hQS : ⁅S, R⁆ ≤ S := Ch04.commutator_le_of_le_normalizer hRS_norm
+  have hQq : IsPGroup q ↥(⁅S, R⁆ : Subgroup G) := hSpg.to_le hQS
+  have hQMstar : (⁅S, R⁆ : Subgroup G) ≤ Mstar := hQS.trans hSMstar
+  -- `R` normalizes `Q` since `⁅Q, R⁆ ≤ ⁅S, R⁆ = Q`.
+  have hRNQ : R ≤ Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G) :=
+    Ch04.le_normalizer_of_commutator_le (Subgroup.commutator_mono hQS le_rfl)
+  -- `P` centralizes `R ⊔ Q` (both `R ≤ C(P)` and `Q ≤ S ≤ C(P)`, then symmetry).
+  have hSCP : S ≤ Subgroup.centralizer (P : Set G) := hSN.trans inf_le_right
+  have hPcRQ : P ≤ Subgroup.centralizer ((R ⊔ ⁅S, R⁆ : Subgroup G) : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm]
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (sup_le hRCP (hQS.trans hSCP))
+  -- `q ∉ α(M*)`: Lemma 10.12(a) gives `σ(M) ∩ α(M*) = ∅` as `M*` is not conjugate to `M`.
+  have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
+    rintro ⟨g, hg⟩
+    exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hqαstar : q ∉ S10.alpha Mstar := fun ha =>
+    Set.eq_empty_iff_forall_notMem.mp
+      ((S10.disjoint_of_not_conj hG hMstarMax h.mem_maximal hnc').1.2) q ⟨ha, hqσ⟩
+  -- `p ∈ α(M*)` (from `p ∈ β(M*)`): `P ≤ M*_α`, hence `M*_α ≠ ⊥`.
+  have hpαstar : p ∈ S10.alpha Mstar := S10.beta_subset_alpha Mstar hpβ
+  have hPα : Ch03.Subgroup.IsPiGroup (S10.alpha Mstar) P := by
+    intro s hs
+    obtain ⟨n, hn⟩ := hPp.exists_card_eq
+    rw [hn, Nat.mem_primeFactors] at hs
+    exact ((Nat.prime_dvd_prime_iff_eq hs.1 Fact.out).mp (hs.1.dvd_of_dvd_pow hs.2.1)) ▸ hpαstar
+  have hPMα : P ≤ S10.Malpha Mstar :=
+    S10.alpha_subgroup_le_Malpha_of_isHall (S10.Malpha_isHall hG hMstarMax) hPMstar hPα
+  have hMαstar_ne : S10.Malpha Mstar ≠ ⊥ := fun hb => hPne (le_bot_iff.mp (hb ▸ hPMα))
+  -- ===== step 5: `ℳ(N_G(Q)) = {M*}` (Lemma 12.18(a) with `(r, R, M*)` for `(p, P, M)`) =====
+  -- If `ℳ(N_G(Q)) ≠ {M*}`, Lemma 12.18(a) forces `M*_α ⊓ C(R ⊔ Q) = ⊥`; but `1 ⊂ P` lies there.
+  have hMNQstar :
+      maximalSubgroupsContaining (Subgroup.normalizer ((⁅S, R⁆ : Subgroup G) : Set G)) = {Mstar} := by
+    by_contra hne
+    obtain ⟨_, hCRQ⟩ :=
+      (tau1_Malpha_interaction hG hMstarMax hrq.symm hrτ1 hR hRMstar hQMstar hQne hQq hRNQ hCQR
+        hne).1 hMαstar_ne hqαstar
+    exact hPne (le_bot_iff.mp (hCRQ ▸ le_inf hPMα hPcRQ))
+  -- steps 6-9: Prop 12.15 (`X = Q`) → `q ∈ σ(M*)`; `C_{M_α}(P) = C_{M_α}(R) = C_{M_α}(RQ)`;
+  -- Lemma 12.18(a) (on `M`) contradiction since `ℳ(N_G(Q)) ≠ {M}`. 🚧
   sorry
 
 /-- **BG Theorem 13.4** (mmd L3576): `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `r ∈ π(E)`, `R ∈ ℰ_r¹(C_E(P))`

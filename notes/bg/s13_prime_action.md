@@ -306,6 +306,35 @@ surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathli
 `isHall_Mbeta` (full bundle: Hall + nilpotent quotient + normal p-complement),
 `tau2 M={p∉σ ∧ pRank=2}`/`tau2_pRank_eq_two`, `S10.disjoint_of_not_conj` (10.12)。
 
+### 2026-06-13 Lane G (loop): Thm 13.4 per-q **step 5 COMPLETE** (`ℳ(N_G(Q))={M*}`)
+
+**✅ step 5 着地** (`S13_Theorem134.per_q_centralizes`, build 緑 3082 / axiom = sorryAx+標準のみ,
+残 sorry 1 = steps 6-9)。step 4b (FPF `hCQR`) の上に structural prep + 入れ子 contradiction:
+- `hQS:⁅S,R⁆≤S` (`Ch04.commutator_le_of_le_normalizer hRS_norm`), `hQq` (`hSpg.to_le hQS`),
+  `hRNQ:R≤N(Q)` (`Ch04.le_normalizer_of_commutator_le (commutator_mono hQS le_rfl)`),
+  `hPcRQ:P≤C(R⊔Q)` (R⊔Q≤C(P) を sup_le + commutator_comm 対称化)。
+- **q∉α(M*)** = `S10.disjoint_of_not_conj hG hMstarMax h.mem_maximal hnc'` の `.1.2` (alpha M*∩sigma M=∅)
+  + q∈σ(M)。idiom は S13_Lemma131:333-339 と同一 (hnc' は conj 対称性 inline)。
+- **P≤M*_α** = `S10.alpha_subgroup_le_Malpha_of_isHall (Malpha_isHall …) hPMstar hPα`
+  (p∈β(M*)⊆α(M*)); ⟹ `M*_α≠⊥` (P≠⊥ ⊆ M*_α)。
+- **step 5 本体**: `ℳ(N_G(Q))≠{M*}` 仮定 → `tau1_Malpha_interaction` を (r,R,M*)↦(p,P,M) で適用
+  (hqp=hrq.symm) → `.1 hMαstar_ne hqαstar` の第2成分 `M*_α⊓C(R⊔Q)=⊥`; だが P≤M*_α⊓C(R⊔Q), P≠⊥ → 矛盾。
+
+**🔑 重要な設計発見 (次 iteration の step 7 を unblock)**: BG「[S,R]≠1 yields q∉α(M)」は shorthand。
+**q∉α(M) も q∉α(M*) と同じ disjointness (10.12(a))** で出る — ただし向きが逆:
+- q∉α(M*) = `alpha M* ∩ sigma M = ∅` (q∈σ(M) は既知)。【step 5, DONE】
+- q∉α(M) = `alpha M ∩ sigma M* = ∅` (**q∈σ(M*) が要る** = step 6 が Prop 12.15 で供給)。【step 7】
+⟹ step 7 の q∉α(M) は新たな hard work 不要、step 6 の後に `disjoint_of_not_conj hG h.mem_maximal hMstarMax hnc` の `.1.2` で即出る。
+
+**残 steps 6-9 (frontier)**:
+- **step 6** = Prop 12.15 (`sigma_subgroup_maximal_interaction`, X=Q): Sylow S'⊇Q of M⊓M* 構成 +
+  case (e) 排除 (`1⊂P⊆M⊓M*_σ`, P≤M*_σ は p∈σ(M*) [β⊆σ] 経由) → q∈σ(M*) + (d) τ₁(M*)⊆τ₁(M)∪α(M)。
+- **step 7** = q∉α(M) [上記 disjointness] → Lem 12.18(a) ×2 で C_{M_α}(P)=C_{M_α}(R)。
+  ⚠ **2nd BG gap (genuine)**: Lem 12.18(a) は C_{M_α}(P)≠1∧C_{M_α}(PQ)=1 を出すが、**包含 C_{M_α}(P)⊆C_{M_α}(R)
+  itself は rank-1/cyclic 論法を要する** (BG elide; 要 derivation)。
+- **step 8** three-subgroups (`commutator_commutator_eq_bot_of_le_of_commutator_bot` 済) → C_{M_α}(R)=C_{M_α}(RQ)。
+- **step 9** Lem 12.18(a) (on M) → C_{M_α}(R)≠C_{M_α}(RQ) 矛盾 (要 `ℳ(N_G(Q))≠{M}` = hMNQstar+M*≠M)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
