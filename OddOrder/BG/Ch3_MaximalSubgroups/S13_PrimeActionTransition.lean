@@ -342,6 +342,18 @@ theorem E_eq_sup_of_E3_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hxC ((elemAb_normal_in_E_of_tau2 hG h hpτ2 hA hAE).2.2.2.1 x hxE3 hxne)
   rw [h.eq_sup hG, hE2, sup_bot_eq]
 
+/-- **Lemma 13.7 step 5(b) 補助**: `R ≤ E₃` なら `E ≤ N_G(R)` (`R ⊲ E`)。`E₃` は cyclic ゆえ
+任意の部分群 `R` は characteristic、`E` は `E₃` を正規化する (Lem 12.1) ので `R` も正規化。 -/
+theorem E_le_normalizer_of_le_E3 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {R : Subgroup G} (hRE3 : R ≤ E₃) : E ≤ Subgroup.normalizer (R : Set G) := by
+  haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  haveI : (R.subgroupOf E₃).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+  intro e he
+  have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := E₃)
+    (C := R.subgroupOf E₃) (h.E3_normal hG he)
+  rwa [Subgroup.map_subgroupOf_eq_of_le hRE3] at hmem
+
 /-- **BG Lemma 13.7, step 5** (strict case impossible): with `P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)`,
 `R ≤ C(P)`, the strict containment `C_{M_σ}(E₁) ⊊ C_{M_σ}(E₃)` is contradictory.
 
