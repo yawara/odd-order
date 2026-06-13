@@ -332,6 +332,92 @@ theorem fixedBy_eq_of_elemAbelian_one [Finite G] {N X P : Subgroup G} {s : ℕ} 
   calc fixedBy N P = fixedByElement N g := by rw [hPg, fixedBy_def, fixedByElement_def, hzC]
     _ = fixedBy N X := hX g (hPX hgP) hg1
 
+/-- **Lemma 13.7 step 5(f)**: `E₁` (cyclic, `π(E₁)⊆τ₁(M*)`, `E₁≤M*`) と `P∈ℰ_p¹(E₁)` で
+`P` が `R⊆M*_σ` を中心化するなら、`E₁` 全体が `R` を中心化する。
+
+Hall 共役で `w•E₁ ≤ E₁*` (M* の Hall τ₁、E1_actsPrime で M*_σ に prime)。`P` の生成元を `w` で
+共役した `z∈E₁*#` は `w•R⊆M*_σ` を中心化 ⟹ prime 作用で `E₁*` 全体が `w•R` を中心化 ⟹
+`w•E₁≤E₁*` が `w•R` を中心化 ⟹ 共役を戻して `E₁` が `R` を中心化。prime-action 共役不変性を
+直接使わず、R・P を M* の setup frame へ共役するのが鍵。 -/
+theorem E1_centralizes_R_of_hall_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {E₁ Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)
+    (hE1ne : E₁ ≠ ⊥) (hE1M : E₁ ≤ Mstar)
+    (hπ : ∀ s ∈ (Nat.card ↥E₁).primeFactors, s ∈ tau1 Mstar)
+    {p : ℕ} (hp : p.Prime) {P R : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPE1 : P ≤ E₁) (hRMsig : R ≤ S10.Msigma Mstar)
+    (hRcP : R ≤ Subgroup.centralizer (P : Set G)) :
+    E₁ ≤ Subgroup.centralizer (R : Set G) := by
+  classical
+  obtain ⟨Es, E1s, E2s, E3s, hs⟩ := exists_subgroupESetup hG hMstar
+  have hE1pi : Ch03.Subgroup.IsPiGroup (tau1 Mstar) (E₁.subgroupOf Mstar) := by
+    intro s hs'
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hE1M).toEquiv] at hs'
+    exact hπ s hs'
+  obtain ⟨w, hwM, hwle⟩ := exists_conj_smul_le_hallPiece hG hs hs.E₁_le hs.E₁_hall
+    (tau1_subset_sigma_compl Mstar) hE1M hE1pi
+  -- element form of `w • E₁ ≤ E₁*`.
+  have hconj : ∀ e ∈ E₁, w * e * w⁻¹ ∈ E1s := by
+    intro e he
+    exact hwle (Subgroup.smul_mem_pointwise_smul_iff.mpr he)
+  -- `M*_σ` is `w`-stable (normal in `M*`, `w ∈ M*`).
+  have hwMsig : ∀ x ∈ S10.Msigma Mstar, w * x * w⁻¹ ∈ S10.Msigma Mstar := by
+    have hMle : Mstar ≤ Subgroup.normalizer (S10.Msigma Mstar : Set G) := by
+      rw [S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma Mstar) Mstar
+    intro x hx
+    exact (Subgroup.mem_normalizer_iff.mp (hMle hwM) x).mp hx
+  -- nontrivial generator `p_elt` of `P` (order `p`).
+  have hPcard : Nat.card P = p := by rw [← pow_one p]; exact hP.2
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hPne : P ≠ ⊥ := by
+    intro hb; rw [hb, Subgroup.card_bot] at hPcard; exact hp.one_lt.ne' hPcard.symm
+  obtain ⟨⟨p_elt, hp_eltP⟩, hp_eltne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hPne
+  have hp_elt1 : p_elt ≠ 1 := fun hc => hp_eltne (Subtype.ext (by simpa using hc))
+  -- `E₁* ≠ ⊥`, prime on `M*_σ`.
+  have hE1sne : E1s ≠ ⊥ := by
+    obtain ⟨⟨e₀, he₀⟩, he₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hE1ne
+    have he₀1 : e₀ ≠ 1 := fun hc => he₀ne (Subtype.ext (by simpa using hc))
+    intro hb
+    have : w * e₀ * w⁻¹ ∈ E1s := hconj e₀ he₀
+    rw [hb, Subgroup.mem_bot] at this
+    exact he₀1 (by simpa using mul_eq_one_iff_eq_inv.mp this)
+  have hE1sprime : ActsPrimeOn (S10.Msigma Mstar) E1s := E1_actsPrime hG hs hE1sne
+  -- `z := w p_elt w⁻¹ ∈ E₁*#`.
+  set z : G := w * p_elt * w⁻¹ with hz
+  have hzE1s : z ∈ E1s := hconj p_elt (hPE1 hp_eltP)
+  have hzne : z ≠ 1 := by
+    rw [hz]; intro hc
+    apply hp_elt1
+    have hcc : MulAut.conj w p_elt = MulAut.conj w 1 := by rw [map_one]; exact hc
+    exact (MulAut.conj w).injective hcc
+  -- `z` centralizes `w • R`, and `w • R ⊆ M*_σ`.
+  have hzfix := hE1sprime z hzE1s hzne
+  have hwRsub : ∀ r ∈ R, w * r * w⁻¹ ∈ fixedByElement (S10.Msigma Mstar) z := by
+    intro r hr
+    rw [fixedByElement_def, Subgroup.mem_inf, Subgroup.mem_centralizer_iff]
+    refine ⟨hwMsig r (hRMsig hr), ?_⟩
+    intro u hu; rw [Set.mem_singleton_iff] at hu; subst hu
+    -- `p_elt` and `r` commute (`r ∈ C(P)`, `p_elt ∈ P`).
+    have hcomm : p_elt * r = r * p_elt :=
+      (Subgroup.mem_centralizer_iff.mp (hRcP hr)) p_elt hp_eltP
+    rw [hz]
+    calc (w * p_elt * w⁻¹) * (w * r * w⁻¹) = w * (p_elt * r) * w⁻¹ := by group
+      _ = w * (r * p_elt) * w⁻¹ := by rw [hcomm]
+      _ = (w * r * w⁻¹) * (w * p_elt * w⁻¹) := by group
+  -- hence `E₁*` centralizes `w • R`; transport back to `E₁` centralizing `R`.
+  intro e he
+  rw [Subgroup.mem_centralizer_iff]
+  intro r hr
+  have hwr_fix : w * r * w⁻¹ ∈ fixedBy (S10.Msigma Mstar) E1s := by rw [← hzfix]; exact hwRsub r hr
+  rw [fixedBy_def, Subgroup.mem_inf, Subgroup.mem_centralizer_iff] at hwr_fix
+  have hcomm := hwr_fix.2 (w * e * w⁻¹) (hconj e he)
+  -- `(wew⁻¹)(wrw⁻¹) = (wrw⁻¹)(wew⁻¹)` ⟹ `er = re` ⟹ `r e = e r`.
+  have : w * (e * r) * w⁻¹ = w * (r * e) * w⁻¹ := by
+    calc w * (e * r) * w⁻¹ = (w * e * w⁻¹) * (w * r * w⁻¹) := by group
+      _ = (w * r * w⁻¹) * (w * e * w⁻¹) := hcomm
+      _ = w * (r * e) * w⁻¹ := by group
+  have her : e * r = r * e := mul_left_cancel (mul_right_cancel this)
+  exact her.symm
+
 /-- **Lemma 13.7 step 5(a)**: もし `x ∈ E₃#` で `C_{M_σ}(x) ≠ 1` なら `τ₂(M)` は空、
 よって `E₂ = ⊥`、`E = E₁ ⊔ E₃`。`τ₂(M) ≠ ∅` ⟹ `∃ p∈τ₂(M), A∈ℰ_p²(E)` ⟹ Cor 12.6(d) で
 `E₃` は `M_σ` に regular 作用 ⟹ `C_{M_σ}(x)=1` で矛盾。 -/
