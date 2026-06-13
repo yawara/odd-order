@@ -121,6 +121,65 @@ private theorem pRank_eq_of_le_of_not_dvd_index {G : Type*} [Group G] [Finite G]
   exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
     (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
 
+/-- **Shared Case-2 setup** for 12.16(a)/(b): if `Y ⊆ M_σ` is a nonidentity `q`-group (`q ∈ σ(M)`)
+with `N_G(Y) ⊄ M`, then there is a maximal `M* ⊇ N_G(Y)`, `M* ≠ M`, with the factorization
+`M* = (M ∩ M*)K` (`K = M*_β`/`M*_σ` via Prop 12.15(d)/(e)), `K ⊴ M*`, and `K` a `p'`-group. -/
+private theorem exists_Mstar_factorization [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) {q : ℕ} [Fact q.Prime] (hYq : IsPGroup q ↥Y)
+    (hqσ : q ∈ S10.sigma M) (hYMσ : Y ≤ S10.Msigma M)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    (hNYM : ¬ Subgroup.normalizer (Y : Set G) ≤ M) :
+    ∃ Mstar K : Subgroup G, Mstar ∈ maximalSubgroups G ∧
+      Subgroup.normalizer (Y : Set G) ≤ Mstar ∧ Mstar ≠ M ∧
+      Mstar = (M ⊓ Mstar) ⊔ K ∧ (K.subgroupOf Mstar).Normal ∧ ¬ p ∣ Nat.card ↥K := by
+  have hM := h.mem_maximal
+  have hYM_le : Y ≤ M := hYMσ.trans (S10.Msigma_le M)
+  obtain ⟨Mstar, hMstar_max, hMstar_ge⟩ :=
+    OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+      hG hM hYne hYM_le
+  have hMstarMem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Y : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hMstar_ge⟩
+  have hMstarne : Mstar ≠ M := fun he => hNYM (he ▸ hMstar_ge)
+  have hYMstar : Y ≤ Mstar := Subgroup.le_normalizer.trans hMstar_ge
+  have hYMM : Y ≤ M ⊓ Mstar := le_inf hYM_le hYMstar
+  have hYsub_pg : IsPGroup q ↥(Y.subgroupOf (M ⊓ Mstar)) :=
+    hYq.of_equiv (Subgroup.subgroupOfEquivOfLe hYMM).symm
+  obtain ⟨Psub, hPsub⟩ := hYsub_pg.exists_le_sylow
+  set S : Subgroup G := (Psub : Subgroup ↥(M ⊓ Mstar)).map (M ⊓ Mstar).subtype with hSdef
+  have hSle : S ≤ M ⊓ Mstar := Subgroup.map_subtype_le _
+  have hSq : IsPGroup q ↥S :=
+    Psub.2.of_equiv (Subgroup.equivMapOfInjective _ _ (M ⊓ Mstar).subtype_injective)
+  have hYS : Y ≤ S := by
+    rw [hSdef, ← Subgroup.map_subgroupOf_eq_of_le hYMM]; exact Subgroup.map_mono hPsub
+  have hPsubeq : S.subgroupOf (M ⊓ Mstar) = Psub := by
+    rw [hSdef]; exact Subgroup.comap_map_eq_self_of_injective (M ⊓ Mstar).subtype_injective _
+  have hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T := by
+    intro T hTle hTq hST
+    have hTsub_pg : IsPGroup q ↥(T.subgroupOf (M ⊓ Mstar)) :=
+      hTq.of_equiv (Subgroup.subgroupOfEquivOfLe hTle).symm
+    have hTeq := Psub.3 hTsub_pg (by rw [← hPsubeq]; exact Subgroup.comap_mono hST)
+    rw [hSdef, ← hTeq, Subgroup.map_subgroupOf_eq_of_le hTle]
+  have h1215 := sigma_subgroup_maximal_interaction hG hM hqσ hYM_le hYne hYq hMstarMem hMstarne
+    hSle hYS hSq hSmax
+  obtain ⟨K, hKnorm, hMstarFact, hpK⟩ :
+      ∃ K : Subgroup G, (K.subgroupOf Mstar).Normal ∧ Mstar = (M ⊓ Mstar) ⊔ K ∧
+        ¬ p ∣ Nat.card ↥K := by
+    by_cases hqσMstar : q ∈ S10.sigma Mstar
+    · refine ⟨S10.Mbeta Mstar, by rw [S10.Mbeta_subgroupOf]; infer_instance,
+        (h1215.2.2.2.1 hqσMstar).1, fun hdvd => hpβ ?_⟩
+      exact ((S10.mem_beta_iff Mstar p).mp (S10.Mbeta_isPiGroup Mstar p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))).2
+    · refine ⟨S10.Msigma Mstar, by rw [S10.Msigma_subgroupOf]; infer_instance, ?_,
+        fun hdvd => hpβ ?_⟩
+      · rw [sup_comm]; exact (h1215.2.2.2.2 hqσMstar).2.2.2.symm
+      · have hp_πM : p ∈ (Nat.card ↥M).primeFactors :=
+          Nat.primeFactors_mono (Subgroup.card_dvd_of_le h.E_le) Nat.card_pos.ne' hpE
+        have hp_σMstar : p ∈ S10.sigma Mstar := S10.Msigma_isPiGroup Mstar p
+          (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+        exact ((S10.mem_beta_iff Mstar p).mp ((h1215.2.2.2.2 hqσMstar).2.1 p hp_πM hp_σMstar)).2
+  exact ⟨Mstar, K, hMstar_max, hMstar_ge, hMstarne, hMstarFact, hKnorm, hpK⟩
+
 /-- **Core of 12.16(a)** with the extra hypothesis `Y ⊆ M_σ` (the conjugated setup). If
 `r_p(N_H(Y)) ≥ 2`, a rank-2 `A ∈ ℰ_p²(N_H(Y))` (after moving into `M`) makes `p ∈ τ₂(M)`, and
 Thm 12.5(e) gives `M_σ ∩ H* = ⊥` for a maximal `H* ⊇ A` (`≠ M`) — but `1 ⊂ Y ⊆ M_σ ∩ H*`. -/
@@ -169,58 +228,10 @@ private theorem pRank_normalizer_le_one_core [Finite G] (hG : IsMinimalSimpleOdd
   · -- **Case 1**: `N_G(Y) ⊆ M`, so `A ≤ N_H(Y) ⊆ M` directly; take `H* = H`, `B = A`.
     exact hcontra A hAea (hANY.trans hNYM) H
       (mem_maximalSubgroupsContaining.mpr ⟨hHmax.1, hAH⟩) hHM hYH
-  · -- **Case 2** (BG L3466-3476): `N_G(Y) ⊄ M`. A maximal `M* ⊇ N_G(Y)` exists; `M* ≠ M`.
-    have hYM_le : Y ≤ M := hYMσ.trans (S10.Msigma_le M)
-    obtain ⟨Mstar, hMstar_max, hMstar_ge⟩ :=
-      OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
-        hG hM hYne hYM_le
-    have hMstarMem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Y : Set G)) :=
-      mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hMstar_ge⟩
-    have hMstarne : Mstar ≠ M := fun he => hNYM (he ▸ hMstar_ge)
-    have hYMstar : Y ≤ Mstar := Subgroup.le_normalizer.trans hMstar_ge
-    have hYMM : Y ≤ M ⊓ Mstar := le_inf hYM_le hYMstar
-    -- Build `S = Syl_q(M ∩ M*) ⊇ Y` (extend `Y` to a Sylow `q` of `↥(M ∩ M*)`, map to `G`).
-    have hYsub_pg : IsPGroup q ↥(Y.subgroupOf (M ⊓ Mstar)) :=
-      hYq.of_equiv (Subgroup.subgroupOfEquivOfLe hYMM).symm
-    obtain ⟨Psub, hPsub⟩ := hYsub_pg.exists_le_sylow
-    set S : Subgroup G := (Psub : Subgroup ↥(M ⊓ Mstar)).map (M ⊓ Mstar).subtype with hSdef
-    have hSle : S ≤ M ⊓ Mstar := Subgroup.map_subtype_le _
-    have hSq : IsPGroup q ↥S :=
-      Psub.2.of_equiv (Subgroup.equivMapOfInjective _ _ (M ⊓ Mstar).subtype_injective)
-    have hYS : Y ≤ S := by
-      rw [hSdef, ← Subgroup.map_subgroupOf_eq_of_le hYMM]; exact Subgroup.map_mono hPsub
-    have hPsubeq : S.subgroupOf (M ⊓ Mstar) = Psub := by
-      rw [hSdef]; exact Subgroup.comap_map_eq_self_of_injective (M ⊓ Mstar).subtype_injective _
-    have hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T := by
-      intro T hTle hTq hST
-      have hTsub_pg : IsPGroup q ↥(T.subgroupOf (M ⊓ Mstar)) :=
-        hTq.of_equiv (Subgroup.subgroupOfEquivOfLe hTle).symm
-      have hTeq := Psub.3 hTsub_pg (by rw [← hPsubeq]; exact Subgroup.comap_mono hST)
-      rw [hSdef, ← hTeq, Subgroup.map_subgroupOf_eq_of_le hTle]
-    -- Prop 12.15: `M*` not conjugate to `M`, plus the `(M ∩ M*)`-factorization (d)/(e).
-    have h1215 := sigma_subgroup_maximal_interaction hG hM hqσ hYM_le hYne hYq hMstarMem hMstarne
-      hSle hYS hSq hSmax
-    -- `M* = (M ∩ M*)K` with `K = M*_β` (if `q ∈ σ(M*)`) or `K = M*_σ` (if `q ∉ σ(M*)`), `K ⊴ M*`,
-    -- and `K` a `p'`-group: `M*_β`-primes ⊆ `β(M*)` and `p ∉ β(M*)` (`¬idealPrime p`); for `M*_σ`,
-    -- `p ∈ π(M) ∩ σ(M*) ⊆ β(M*)` by (12.3), contradiction.
-    obtain ⟨K, hKnorm, hMstarFact, hpK⟩ :
-        ∃ K : Subgroup G, (K.subgroupOf Mstar).Normal ∧ Mstar = (M ⊓ Mstar) ⊔ K ∧
-          ¬ p ∣ Nat.card ↥K := by
-      by_cases hqσMstar : q ∈ S10.sigma Mstar
-      · refine ⟨S10.Mbeta Mstar, by rw [S10.Mbeta_subgroupOf]; infer_instance,
-          (h1215.2.2.2.1 hqσMstar).1, fun hdvd => hpβ ?_⟩
-        exact ((S10.mem_beta_iff Mstar p).mp (S10.Mbeta_isPiGroup Mstar p
-          (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))).2
-      · refine ⟨S10.Msigma Mstar, by rw [S10.Msigma_subgroupOf]; infer_instance, ?_,
-          fun hdvd => hpβ ?_⟩
-        · rw [sup_comm]; exact (h1215.2.2.2.2 hqσMstar).2.2.2.symm
-        · have hp_πM : p ∈ (Nat.card ↥M).primeFactors :=
-            Nat.primeFactors_mono (Subgroup.card_dvd_of_le h.E_le) Nat.card_pos.ne' hpE
-          have hp_σMstar : p ∈ S10.sigma Mstar := S10.Msigma_isPiGroup Mstar p
-            (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
-          exact ((S10.mem_beta_iff Mstar p).mp ((h1215.2.2.2.2 hqσMstar).2.1 p hp_πM hp_σMstar)).2
-    -- `[M* : M ∩ M*] ∣ |K|` is `p'`, so `pRank(M ∩ M*) p = pRank(M*) p ≥ 2` (`A ≤ M*` rank-2); thus
-    -- `M ∩ M*` contains a rank-2 `B ∈ ℰ_p²`, and `hcontra B … M*` (with `M* ≠ M`, `Y ≤ M*`) closes.
+  · -- **Case 2** (BG L3466-3476): `N_G(Y) ⊄ M`. Use the shared `M*`-factorization, then a fresh
+    -- rank-2 `B ∈ ℰ_p²(M ∩ M*)` (`pRank(M ∩ M*) = pRank(M*) ≥ 2`, coprime index) feeds `hcontra`.
+    obtain ⟨Mstar, K, hMstar_max, hMstar_ge, hMstarne, hMstarFact, hKnorm, hpK⟩ :=
+      exists_Mstar_factorization hG h hYne hYq hqσ hYMσ hpE hpβ hNYM
     have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
     have hidx : ¬ p ∣ ((M ⊓ Mstar).subgroupOf Mstar).index := by
       haveI := hKnorm
