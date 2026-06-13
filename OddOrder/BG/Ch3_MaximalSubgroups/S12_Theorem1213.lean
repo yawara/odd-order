@@ -323,6 +323,28 @@ theorem exists_expPExtraspecial_le_of_two_maximals [Finite G] (hG : IsMinimalSim
   · exact absurd habel (by rw [hS]; exact hPbar_nab)
   · exact ⟨Q, hQ_le.trans (by rw [hS]; exact hPbar_le_K), hQ_es, hQ_card⟩
 
+/-- **`M_α ≠ 1`** (BG 12.13, mmd L3395): if a Sylow `p`-subgroup `S` of `G` has `N_G(S) ⊆ M ∩ M⋆`
+for distinct maximals `M ≠ M⋆`, then `M_α ≠ 1`.
+
+Corollary 10.9(b) (`beta_factorization_of_sylow_normalizer_in_intersection`) gives
+`M = (M⋆ ∩ M) ⊔ M_β` and `α(M) = β(M)`, so `M_α = M_β`; were `M_β = 1`, then `M = M⋆ ∩ M ≤ M⋆`
+would force `M = M⋆` (both coatoms), contradiction. -/
+theorem Malpha_ne_bot_of_sylow_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hMne : M ≠ Mstar) {p : ℕ} [Fact p.Prime] (S : Sylow p G)
+    (hN : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M ⊓ Mstar) :
+    S10.Malpha M ≠ ⊥ := by
+  obtain ⟨hfact, hab⟩ := S10.beta_factorization_of_sylow_normalizer_in_intersection hG hM hMstar
+    (Ne.symm hMne) S (by rw [inf_comm]; exact hN)
+  have hαβ : S10.Malpha M = S10.Mbeta M := by simp only [S10.Malpha, S10.Mbeta, hab]
+  rw [hαβ]
+  intro hbot
+  rw [hbot, sup_bot_eq] at hfact
+  have hMle : M ≤ Mstar := by rw [hfact]; exact inf_le_left
+  rcases lt_or_eq_of_le hMle with hlt | heq
+  · exact (mem_maximalSubgroups.mp hMstar).1 ((mem_maximalSubgroups.mp hM).2 Mstar hlt)
+  · exact hMne heq
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
