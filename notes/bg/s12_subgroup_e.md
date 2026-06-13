@@ -2295,3 +2295,48 @@ derivedInG_mono / card_derivedInG_conj (|deriv(g•K)|=|deriv K| via pointwise_s
 (NOT G-cited; BG 証明 ~10 行で Thm 12.13 + §5 narrow + §10 使用)。12.14 完了で **§12 STOP**。
 (S12_E の sorry'd 12.16 forward-decl 3 件は HUB re-point 後に削除可; conj_into_Msigma は実証明済。)
 
+
+---
+
+## session 23 (2026-06-13, Lane F): main 同期 + Cor 12.14 recon (downstream-leaf 化決定)
+
+**main 取込**: `git merge main` クリーン (Peterfalvi のみ、衝突0)、full build 3802 jobs green、
+AxiomsCheck OK (Cor1216.* 含む)。bg-s12 先行3コミット (6ddd4646 leaf 完成 / 58045d80 配線 /
+b9827f69 notes) は未マージ (HUB が次 merge で回収)。
+
+**🔑 Cor 12.14 architecture 決定 (12.13/12.16 と同型)**: S12_E:58 `maximalContaining_centralizer_eq_singleton`
+は **どこからも未引用** (dead forward-decl scaffold)。証明は **Thm 12.13** (`nonabelian_pgroup_isUniquelyMaximal`,
+S12_Theorem1213) を要するが S12_E はそれを循環で import 不可 ⟹ **新 downstream leaf
+`S12_Corollary1214.lean`** に実証明を置き、S12_E:58 を削除 (comment pointer 化)。leaf は
+S12_Corollary1216 と同様 S12_Proposition1215 (→ S12_Theorem1213) を import すれば Thm 12.13 に到達。
+
+**🔑 WLOG 不要を確認**: X は σ(M)-部分群 (p∈σ(M), X≤M, IsPGroup p X) ⟹ `sigma_subgroup_le_Msigma_of_isHall`
+(+ `Msigma_isHall`) で **X ⊆ M_σ 直接**。M_σ の Sylow p `P` が X を含む (Sylow `exists_le`)。共役 transport 不要。
+p∈σ(M) ⟹ Sylow p of M_σ = Sylow p of M = Sylow p of G (`isSylow_sylowMap_of_mem_sigma` 経由で G の Sylow に realize)。
+
+**証明計画 (統一エンジン + 2 branch)**:
+- **統一エンジン** `eq_singleton_of_uniquelyMaximal_le` (高信頼, ~25行): `IsUniquelyMaximal U ∧ U≤C_G(X) ∧
+  U≤M (M coatom) ∧ C_G(X)<⊤ ⟹ ℳ(C_G(X))={M}`。`IsUniquelyMaximal.of_le_of_lt_top` で C_G(X) も
+  uniquely-maximal 化 → `eq_of_isCoatom_of_le` で unique maximal = M → `Set.eq_singleton_iff_unique_mem`。
+  [Finite (Subgroup G) 要 (of_le_of_lt_top)、G Finite から instance]。
+- **C_G(X)<⊤** (中信頼): X≠⊥ + Z(G)=⊥ (minimal simple) ⟹ X⊄Z(G) ⟹ C_G(X)≠⊤。
+- **branch r(C_P(X)) ≥ 3** (witness = rank-3 elem-ab A ⊆ C_P(X)): A は X を centralize (A⊆C_P(X)) ⟹ A≤C_G(X);
+  A≤M (A⊆P⊆M_σ⊆M); `uniquenessTheorem hG (A<⊤) (2≤rank A) (3≤rank A ∨ _)` で IsUniquelyMaximal A。
+  要: pRank≥3 ⟹ elem-ab rank-3 抽出 (S12_Corollary1216 の rank-2 helper を rank-3 へ一般化 or `exists_*`) +
+  rank vs pRank 変換 (elem-ab order p³ ⟹ rank=3)。中信頼。
+- **branch r(C_P(X)) ≤ 2** (witness = P nonabelian, X≤Z(P)) — **hard, 3 sub-args**:
+  1. `p∉idealPrime G` (β(G)): r(P)≤2 なら自明 (ideal は r_p(G)≥3 要); r(P)≥3 なら Cor 5.4
+     (`narrow_iff_exists_card_prime_centralizer_pRank_le_two`) で P narrow ⟹ not ideal。
+     ⟹ `p∉beta M` (beta は ideal 要) ⟹ hcase の β disjunct 消えて **X⊆M_σ' 確定**。
+  2. **X⊆P'** via Lemma 10.8(c) (`derived_msigma_hasNormalPComplement_of_not_mem_beta`): M_σ=N⋊P
+     (N=O_{p'} normal p-complement) ⟹ M_σ'∩P=P' の射影論法 (HasNormalPComplement API 要)。**fiddly**。
+  3. **r(P)≤2**: 背理法 r(P)≥3 ⟹ P narrow (Cor 5.4) ⟹ Thm 5.3(d) (`narrow_centralizer_decomp`) の
+     conjunct `S⊓commutator R=⊥` を S=X で適用 ⟹ X∩P'=⊥、但し X⊆P'≠⊥ ⟹ X=⊥ 矛盾。⟹ r(P)≤2。
+     その後 `sylow_structure` (b) (公開, `(S10.sylow_structure hG P).2.1 hrank`) で P abelian (⟹P'=⊥⟹X=⊥矛盾)
+     or 中心積 P₁*P₂ (P₁ exp-p extraspecial p³, P₂ cyclic, Ω₁P₂=Z(P₁))。後者で **P'=P₁'=Z(P₁)≤Z(P)**
+     (IsCentralProduct/IsExpPExtraspecial API で derived=center 抽出) ⟹ X⊆P'≤Z(P) ⟹ P≤C_G(X), P nonabelian。
+     ⟹ Thm 12.13 で IsUniquelyMaximal P。**中心積→P'≤Z(P) 抽出が最 fiddly**。
+
+**規模/risk**: ~350-450 行。r≤2 branch の (2) normal-p-complement 射影 + (3) 中心積 center 抽出が
+API-fit 未検証で最大 risk。`narrow_centralizer_decomp` の S⊓R'=⊥ conjunct で r(P)≤2 が出る点は確認済。
+**12.14 完成 + S12_E:58 削除で §12 STOP** (S12_E 残 sorry: L83/L96 = 12.16 forward-decl のみ → HUB/Lane G 調整事項)。
