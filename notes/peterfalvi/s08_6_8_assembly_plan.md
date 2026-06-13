@@ -1289,3 +1289,33 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 - **step8 quadratic**: ‖α^τ‖²=‖X‖²+c²(x−1)²+(m−1)x²c² <2c² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2。
 - **最終 statement** `α^τ = X − |H:Z|η_1^{τ₁}` (b=0 reduction) → (6.8.2.3) → τ₂。
 **正本=本 session 40 cont.⁴。** norm-source 完結、残=射影分解+FPF+quadratic。空転なし。
+
+## 2026-06-14 (session 40 cont.⁵, /loop): variant trichotomy landed; decomposition recipe確定
+
+**✅ landed (build-green + axiom-clean)**:
+14. **`eq_zero_or_edge_of_dvd_of_normLt` (cbf69fc6)** = quadratic trichotomy `< 2a²` 変種
+    (`eq_zero_or_edge_of_dvd_of_normBound` の `≤1+a²` を `<2a²` に; case-B norm |L:Z|+a²<2a² 用)。pure ℤ。
+
+### 🔑 decomposition assembly recipe (Brick C, 次 loop = full focus 一気に):
+**テンプレ = `coeff_eq_neg_or_edge_of_frobenius` (S08_CoherenceCore:10639-10780) を逐行ミラー**、ingredient 差替:
+- step3 bb: `dvd_inner_tau_scaledDiff_extension...frobenius` → **`inner_tau_alpha_dvd_index` (η':=η₁)**
+  ⟹ `∃ bb, ⟨α^τ, extension η₁⟩=bb ∧ index∣bb`。
+- hcoeff (⟨α^τ,extension η⟩=bb or bb+c): `inner_tau_scaledDiff_tau_Yset_diff...frobenius` →
+  **`inner_tau_indW2_sub_smul_tau_Yset_diff` (=c) + `coherentYset_extension_Yset_diff_eq_tau` (agreement)**。
+  η≠η₁ 枝: htaud = agreement.symm, hconst = cross-term, `inner_sub_right` で ⟨α^τ,ext η⟩=bb+c。
+- Bessel: **`sum_sq_le_inner_self_re horth (α^τ) hβval`** (S08_CoherenceCore:150) — そのまま。
+  horth/hEinj/hβval/hsum は Frobenius と同形 (Yset_finite.toFinset.image extension, hYon, hEinj)。
+- norm_re: `inner_self_tau_scaledDiff...frobenius` (=1+a²) → **`inner_self_tau_indW2_sub_smul` ∘
+  `inner_self_indW2_sub_smul_eq`** ⟹ ‖α^τ‖²=W₂.index + c·star c。c=(index:ℂ) real ⟹ star c=c ⟹ =W₂.index+c²。
+  `.re` 取り: (W₂.index + c²).re = W₂.index+c² (実)。⚠ c=((W₂.subgroupOf H).index:ℂ), star c=c via `Complex.star_ofNat`/`star_natCast`。
+- trichotomy: `eq_zero_or_edge_of_dvd_of_normBound` (≤1+a²) → **`eq_zero_or_edge_of_dvd_of_normLt` (<2a²)**。
+  hsum: bb²+(m−1)(bb+c)² ≤ W₂.index+c² (Bessel)。**要 FPF bound W₂.index<c²** ⟹ <2c² ⟹ apply variant
+  (a=c=(W₂.subgroupOf H).index, b=bb+c, m=Yset.ncard)。⟹ bb=−c ∨ (m=2∧bb=0)。
+- 結論: `⟨α^τ, extension η₁⟩ = −c ∨ (Yset.ncard=2 ∧ ⟨α^τ,extension η₁⟩=0)` (= Frobenius と同形)。
+
+### ⚠ 残 (Brick C と並行 or 後):
+- **Brick B = FPF bound `W₂.index < |H:W₂|²`** (= |W₁|<|H:W₂|): case-B C_H(w)=W₂ (w∈W₁#) ⟹ W₁ FPF on H/W₂ ⟹
+  |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂|。**Brick C は FPF を hypothesis で受けて defer 推奨** (W₂⊆Z(↥L) と同パターン)。
+  Hypothesis46/certain-type の C_H(w)=W₂ + FPF-order-divides 要調査。
+- Brick C 後: 最終 (6.8.2.2) statement (b=0 reduction, m=2 swap) → (6.8.2.3) → τ₂。
+**正本=本 session 40 cont.⁵。全 ingredient 在庫確認済 (Bessel/Yset_finite/two_le_Yset_ncard/variant)。空転なし。**
