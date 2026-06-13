@@ -1195,4 +1195,79 @@ theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
     have hbeq : bb = 0 := by omega
     rw [hbeq]; norm_num
 
+/-- **(6.8.2.2) good-case `X`-structure** (the case-(B) analogue of the Frobenius
+`orthogonal_normOne_tau_scaledDiff_add_extension`).  In the good case
+`⟨α^τ, η₁^{τ₁}⟩ = −|H:Z|` (the `bb = −|H:Z|` branch of `coeff_eq_neg_or_edge_caseB`), the element
+`X := α^τ + |H:Z|·η₁^{τ₁}` is orthogonal to the whole coherent `Y`-image family `𝒴^{τ₁}` and lies in
+`ℤ[Irr G]`, giving the decomposition `α^τ = X − |H:Z|·η₁^{τ₁}` of Peterfalvi (6.8.2.2).
+
+(Unlike the Frobenius (6.8.1) case, `‖X‖² ≠ 1` — here `‖X‖² = |L:Z|`, since `Ind^L_{W₂}φ` is not a
+single irreducible — so only orthogonality and `ℤ[Irr G]`-membership are asserted.) -/
+theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) (hW2comm : W2 ≤ ⁅H, H⁆)
+    [Invertible (Nat.card ↥W2 : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+      = ((W2.subgroupOf H).index : ℂ) * η₁ 1)
+    (hgood : ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁)
+      = -((W2.subgroupOf H).index : ℂ)) :
+    (∀ η ∈ hyp.Yset,
+        ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+            - ((W2.subgroupOf H).index : ℂ) • η₁)
+          + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁)
+          (hyp.coherentYset.extension η) = 0)
+      ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+          - ((W2.subgroupOf H).index : ℂ) • η₁)
+          + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  classical
+  have hYon : ∀ η η', η ∈ hyp.Yset → η' ∈ hyp.Yset →
+      ClassFunction.inner (hyp.coherentYset.extension η) (hyp.coherentYset.extension η')
+        = if η = η' then (1 : ℂ) else 0 := by
+    intro η η' hη hη'
+    rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
+      (Submodule.subset_span hη')]
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
+      (⟨η', hyp.isIrreducibleCharacter_of_mem_Yset hη'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hcoeff0 : ∀ η ∈ hyp.Yset, η ≠ η₁ →
+      ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η) = 0 := by
+    intro η hη hne
+    have hconst := hyp.inner_tau_indW2_sub_smul_tau_Yset_diff hW2H hW2comm φ hη₁ hη hne
+      ((W2.subgroupOf H).index : ℂ) h1
+    rw [← hyp.coherentYset_extension_Yset_diff_eq_tau hη₁ hη,
+      ClassFunction.inner_sub_right, hgood] at hconst
+    linear_combination hconst
+  have he₁e₁ : ClassFunction.inner (hyp.coherentYset.extension η₁)
+      (hyp.coherentYset.extension η₁) = 1 := by rw [hYon η₁ η₁ hη₁ hη₁, if_pos rfl]
+  refine ⟨?_, ?_⟩
+  · intro η hη
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_smul_left]
+    by_cases hee : η = η₁
+    · subst hee; rw [hgood, he₁e₁]; ring
+    · rw [hcoeff0 η hη hee, hYon η₁ η hη₁ hη, if_neg (Ne.symm hee)]; ring
+  · have hsuppX : (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁).support
+        ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+      hyp.support_indW2_sub_smul_subset_sharpImage hW2H φ hη₁ _ h1
+    have hsrcZ : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁ ∈ ZIrr (↥L) := by
+      rw [Nat.cast_smul_eq_nsmul]
+      exact sub_mem (ClassFunction.induce_mem_ZIrr W2 (IsIrreducibleCharacter.mem_ZIrr φ.2))
+        (nsmul_mem (hyp.isIrreducibleCharacter_of_mem_Yset hη₁).mem_ZIrr (W2.subgroupOf H).index)
+    have hvZ : hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁) ∈ ZIrr G :=
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+        hyp.dade hyp.hconj hsuppX hsrcZ
+    have he₁Z : ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ ∈ ZIrr G := by
+      rw [Nat.cast_smul_eq_nsmul]
+      exact nsmul_mem (hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁))
+        (W2.subgroupOf H).index
+    exact add_mem hvZ he₁Z
+
 end OddOrder.Peterfalvi.S08
