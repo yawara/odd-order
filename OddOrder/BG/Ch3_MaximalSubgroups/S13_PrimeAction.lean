@@ -659,8 +659,12 @@ theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd
     exact ⟨hCG, maximalContaining_eq_singleton_of_maximal_qsubgroup h.mem_maximal
       (S10.Msigma_le M) hSle hSq hSmax hS₀Mσ hS₀q hS₀max hMS₀⟩
   · -- **Contradiction half** (BG L3610-3624): `q ∉ β(M)` and `X ⊄ M_σ'` is impossible.
-    -- Reduce `P = E₁` (Thm 13.5), normalize a Sylow `S ⊆ C_{M_σ}(E')` (Thm 12.13 + Prop 1.5),
-    -- force `E₂ ≠ 1` (Lemma 12.17), then `A ∈ ℰ_p²(E)` centralizes `X` (Thm 13.4), contra (13.1).
+    -- Recipe (deps all pinned) = issue 8003. Steps: (1) `X ⊆ C_{M_σ}(E₁)` (Thm 13.5 prime action);
+    -- (2) `X ⊆ C_{M_σ}(E')` (Lemma 12.19 `derivedE_centralizes_betaComplement` — the mmd's
+    -- "Theorem 12.13" is a mis-citation — + Prop 1.5 coprime normalization); (3) `E₁E' ≠ E`
+    -- (Lemma 12.17 `C_{M_σ}(E) ⊆ M_σ'`, `X ⊄ M_σ'`); (4) `E₂ ≠ 1` (`E₃ ⊆ E'`); (5) `A ∈ ℰ_p²(E)`
+    -- with `A ◁ E` (Cor 12.6a) and `C_{M_σ}(A) = 1` (Thm 12.5d); (6) `A = A₀ × [A,E₁]` centralizes
+    -- `X` (Thm 13.4 per-line + `[A,E₁] ≤ E₁`); (7) `X ≤ M_σ ⊓ C(A) = ⊥`, contra `X ≠ ⊥`.
     exfalso
     sorry
 
