@@ -1270,4 +1270,31 @@ theorem SibleyDadeHypothesis.orthogonal_tau_indW2_add_extension_caseB
         (W2.subgroupOf H).index
     exact add_mem hvZ he₁Z
 
+open scoped Classical in
+/-- **(6.8.2.2) good case for `|Y| ≥ 3`.**  When `m = |Y| ≥ 3`, the edge case (`m = 2`) of
+`coeff_eq_neg_or_edge_caseB` is impossible, so the good value `⟨α^τ, η₁^{τ₁}⟩ = −|H:Z|` holds with no
+relabel.  Combined with `orthogonal_tau_indW2_add_extension_caseB`, this gives the (6.8.2.2)
+decomposition `α^τ = X − |H:Z|·η₁^{τ₁}` (`X ⊥ 𝒴^{τ₁}`, `X ∈ ℤ[Irr G]`) unconditionally for `|Y| ≥ 3`
+(the `m = 2` edge requires the `η₁^{τ₁} ↦ −η₂^{τ₁}` relabel, handled separately). -/
+theorem SibleyDadeHypothesis.inner_tau_indW2_extension_Yset_eq_neg_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    (hc2 : 2 ≤ (W2.subgroupOf H).index)
+    (hFPF : (W2.index : ℤ) < ((W2.subgroupOf H).index : ℤ) ^ 2)
+    (hm3 : 3 ≤ hyp.Yset.ncard) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁)
+      = -((W2.subgroupOf H).index : ℂ) := by
+  rcases hyp.coeff_eq_neg_or_edge_caseB hcop hp hHp hprime hW2comm hW2cen hη₁ φ hφ1 hφ hc2 hFPF with
+    h | ⟨hm2, _⟩
+  · exact h
+  · exfalso; omega
+
 end OddOrder.Peterfalvi.S08
