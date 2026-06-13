@@ -1262,3 +1262,30 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 - **|L:W₂| < |H:W₂|²** = |W₁|<|H:W₂| (W₁ FPF on H/Z; case-B 構造要精査) → ‖α^τ‖²<2|H:W₂|²。
 - **step7 分解** (α^τ を 𝒴^{τ₁} 正規直交基底へ射影) + **step8 quadratic** ((x−1)²+(m−1)x²≤1 ⟹ x∈{0,1})。
 → (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 40 cont.³。**
+
+## 2026-06-14 (session 40 cont.⁴, /loop): norm-source 完成 (3 brick) — ‖α^τ‖²=|L:W₂|+c·c̄
+
+**✅✅✅ landed (build-green + axiom-clean, 各 commit 前に別 step で緑検証)**:
+11. **`inner_self_induce_eq_index_of_le_center` (6045d392)** = **‖Ind_{W₂}φ‖²=|L:W₂|=W₂.index** (central W₂)。
+    `card_mul_inner_self_induce_eq_card_inertia` (|W₂|·‖Ind φ‖²=|inertia|) + `inertia_eq_top_of_le_center`
+    (=⊤, `Subgroup.card_top`=|L|) + `card_mul_index` (|L|=|W₂|·index) + `mul_left_cancel₀`。
+    ⚠ `card_mul_inner_self_induce_eq_card_inertia` は `[Invertible (Nat.card ↥W2:ℂ)]` 要 (instance 失敗が whnf timeout 誘発)。
+12. **`inner_induce_W2_Yset_eq_zero` (5a7d6a69)** = **⟨Ind_{W₂}φ, η⟩=0** (φ nontrivial)。reciprocity +
+    Res_{W₂}η=const|W₁| (η const on ⁅H,H⁆⊇W₂) + ∑_w φ(w)=0 (`sum_apply_eq_zero_of_ne_trivial`)。
+13. **`inner_self_indW2_sub_smul_eq` (64b3a78c)** = **‖α‖²=W₂.index + c·star c** (α=Ind φ−c•η₁)。
+    展開 + ‖Ind φ‖²=index + ⟨Ind φ,η₁⟩=0 (+conj) + ‖η₁‖²=1。c=(|H:W₂|:ℂ) で c·c̄=|H:W₂|² ⟹ |L:Z|+|H:Z|²。
+
+### 📋 norm endgame 材料 全 landed:
+- ‖α^τ‖²=‖α‖² (`inner_self_tau_indW2_sub_smul`) ∘ ‖α‖²=W₂.index+c·c̄ (`inner_self_indW2_sub_smul_eq`)
+  ⟹ **‖α^τ‖² = W₂.index + c·star c**。
+- step1: ⟨α^τ,ψ⟩∈ℤ ∧ |H:W₂|∣it (`inner_tau_alpha_dvd_index`)。
+- step6: ⟨α^τ,(η'−η₁)^τ⟩=c (`inner_tau_indW2_sub_smul_tau_Yset_diff`) + agreement (`coherentYset_extension_Yset_diff_eq_tau`)。
+
+### ⚠ (6.8.2.2) 残 = 最終 assembly (次 loop; ここからが構造的ハードコア):
+- **FPF bound `|W₁| < |H:W₂|`** ⟹ W₂.index=|L:W₂|=|W₁|·|H:W₂|<|H:W₂|² ⟹ ‖α^τ‖²<2|H:W₂|²。
+  ← case-B (c2) 構造: W₁ acts FPF on H/W₂ (C_H(w)=W₂ for w∈W₁#)。Hypothesis46/certain-type 要精査。
+- **step7 分解**: α^τ を 𝒴^{τ₁} 正規直交基底へ射影 → α^τ = X − c·η_1^{τ₁} + x·c·∑_j η_j^{τ₁}, X⊥𝒴^{τ₁}
+  (step1 ≡0 mod c + step6 差=c から係数決定)。← 射影論法 (Frobenius (6.8.1) に類似テンプレ有?要調査)。
+- **step8 quadratic**: ‖α^τ‖²=‖X‖²+c²(x−1)²+(m−1)x²c² <2c² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2。
+- **最終 statement** `α^τ = X − |H:Z|η_1^{τ₁}` (b=0 reduction) → (6.8.2.3) → τ₂。
+**正本=本 session 40 cont.⁴。** norm-source 完結、残=射影分解+FPF+quadratic。空転なし。
