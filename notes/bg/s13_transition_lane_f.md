@@ -193,3 +193,17 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
     の E₁* に E₁ を合わせ込む)。
   - **step g**: E=E₁⊔E₃ ((a)) + E₁,E₃ が R 中心化 ⟹ R⊆C_G(E₁⊔E₃)=C_G(E) (centralizer_sup)、
     `subgroupE_basic` の C_G(E)⊓E₃=⊥ + R≤E₃,R≠⊥ で矛盾。
+- 2026-06-14 (Lane F, /loop 続き⁶): step f を精査。**E1_actsPrime の `key` (S13_PrimeAction:442-520)
+  は Thm 13.4 `centralizer_le_centralizer_of_tau1` を使い、これは `R ≤ E`(setup の補群)を要求** ⟹
+  一般 cyclic K≤M* (K⊄E*) への generalize は不可。step f は **prime-action 共役不変性 + Hall 共役**が必要。
+  - ✅ landed: `ActsPrimeOn.of_le_right` (anti-mono: X prime, X'≤X ⟹ X' prime)。
+  - **step f assembly path** (次イテレーション):
+    1. M*∈𝓜(N_G(R)) の setup (exists_subgroupESetup)、E₁* = Hall τ₁(M*) prime (E1_actsPrime on M*)。
+    2. **Hall 共役**: E₁ は τ₁(M*)-subgroup (π(E₁)⊆τ₁M*) ⟹ `E₁ ≤ w • E₁*` (w∈M*)
+       (`exists_conj_smul_le_hallPiece` / `exists_conj_eq_of_isHall_subgroupOf` 系)。
+    3. **conj-inv** (要 new helper `ActsPrimeOn.conj`: X prime on N, g∈normalizer N ⟹ g•X prime on N;
+       pointwise smul + C_N(gxg⁻¹)=g·C_N(x)·g⁻¹): `w•E₁*` prime on M*_σ。
+    4. `E₁ ≤ w•E₁*` + anti-mono ⟹ E₁ prime on M*_σ。
+    5. P∈ℰ_p¹(E₁), P が R 中心化, R⊆M*_σ ⟹ `fixedBy_eq` で R⊆C_{M*_σ}(P)=C_{M*_σ}(E₁) ⟹ E₁ が R 中心化。
+  - ⚠ conj-inv の pointwise-smul (`MulAut.conj g • X`, `mem_pointwise_smul_iff_inv_smul_mem`) が fiddly。
+    次イテレーションの最初の標的。これが landing すれば step f → strict_config → 13.7 完全完成。
