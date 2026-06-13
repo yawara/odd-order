@@ -63,7 +63,11 @@ theorem sigma_subgroup_conj_into_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Y : Subgroup G} (hYM : Y ≤ M)
     (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y) :
     ∃ g ∈ M, MulAut.conj g • Y ≤ S10.Msigma M := by
-  sorry
+  -- `M_σ = O_{σ(M)}(M)` is the *normal* Hall `σ(M)`-subgroup of `M`, so it contains every
+  -- `σ(M)`-subgroup of `M` outright (no conjugation needed: take `g = 1`).
+  refine ⟨1, M.one_mem, ?_⟩
+  simp only [map_one, one_smul]
+  exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hYM hYpi
 
 /-- **BG Corollary 12.16(a)** (mmd L3453-3456): `Y` を `G` の非自明 `σ(M)`-部分群、
 `p ∈ π(E) ∩ β(G)'`、`H ∈ ℳ(Y)` を `M` と非共役な極大部分群とすると `r_p(N_H(Y)) ≤ 1`。
