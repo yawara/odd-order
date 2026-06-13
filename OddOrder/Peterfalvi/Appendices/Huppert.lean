@@ -72,6 +72,100 @@ theorem smul_eq_of_sq_smul_eq_of_odd_orderOf
   calc g • a = (g ^ 2) ^ m • a := by rw [hm]
     _ = a := MulAction.mem_stabilizer_iff.mp (pow_mem hstab m)
 
+/-- **Peterfalvi Appendix B, Lemma, part (1) key step**: if `φ x` permutes an
+independent family `S` of subgroups of the abelian group `E`, `a ∈ S i`, `b ∈ S j`
+(`i ≠ j`, both nontrivial), `x` has odd order and fixes `a * b`, then `x` fixes both
+`a` and `b`.
+
+This is Peterfalvi's "`ax = a, bx = b`, or `ax = b, bx = a` (impossible since `x`
+has odd order)" dichotomy (p. 135): the components `φ x a ∈ S (perm x i)` and
+`φ x b ∈ S (perm x j)` of `a * b = (φ x a)(φ x b)` are pinned to `S i`, `S j` by
+independence, and the swap is killed by `smul_eq_of_sq_smul_eq_of_odd_orderOf`. -/
+theorem fixes_components_of_permutes_indep
+    {ι : Type*} {S : ι → Subgroup E} (hind : iSupIndep S)
+    (hcomm : ∀ y z : E, y * z = z * y)
+    (φ : P →* MulAut E) (perm : P → Equiv.Perm ι)
+    (hperm : ∀ (x : P) (k : ι), (S k).map (φ x).toMonoidHom = S (perm x k))
+    {x : P} (hodd : Odd (orderOf x))
+    {i j : ι} (hij : i ≠ j) {a b : E} (ha : a ∈ S i) (hb : b ∈ S j)
+    (ha1 : a ≠ 1) (hb1 : b ≠ 1) (hfix : (φ x) (a * b) = a * b) :
+    (φ x) a = a ∧ (φ x) b = b := by
+  letI : CommGroup E := { (inferInstance : Group E) with mul_comm := hcomm }
+  set σi := perm x i with hσi
+  set σj := perm x j with hσj
+  have hσ_ne : σi ≠ σj := fun h => hij ((perm x).injective h)
+  have hxa_mem : (φ x) a ∈ S σi := by
+    have h := Subgroup.mem_map_of_mem (φ x).toMonoidHom ha
+    rwa [hperm x i] at h
+  have hxb_mem : (φ x) b ∈ S σj := by
+    have h := Subgroup.mem_map_of_mem (φ x).toMonoidHom hb
+    rwa [hperm x j] at h
+  have hprod : (φ x) a * (φ x) b = a * b := by rw [← map_mul]; exact hfix
+  have hxa1 : (φ x) a ≠ 1 := fun h => ha1 ((φ x).injective (h.trans (map_one (φ x)).symm))
+  have hxb1 : (φ x) b ≠ 1 := fun h => hb1 ((φ x).injective (h.trans (map_one (φ x)).symm))
+  have hkill : ∀ (c : E) (k l₁ l₂ l₃ : ι), c ∈ S k → c ∈ S l₁ ⊔ S l₂ ⊔ S l₃ →
+      k ≠ l₁ → k ≠ l₂ → k ≠ l₃ → c = 1 := by
+    intro c k l₁ l₂ l₃ hck hcsup hk1 hk2 hk3
+    have hle : S l₁ ⊔ S l₂ ⊔ S l₃ ≤ ⨆ (m) (_ : m ≠ k), S m := by
+      refine sup_le (sup_le ?_ ?_) ?_
+      · exact le_iSup_of_le l₁ (le_iSup_of_le (Ne.symm hk1) le_rfl)
+      · exact le_iSup_of_le l₂ (le_iSup_of_le (Ne.symm hk2) le_rfl)
+      · exact le_iSup_of_le l₃ (le_iSup_of_le (Ne.symm hk3) le_rfl)
+    exact Subgroup.disjoint_def.mp ((hind k).mono_right hle) hck hcsup
+  have hpair : ∀ {p q : ι} {s t : E}, p ≠ q → s ∈ S p → t ∈ S q → s * t = 1 →
+      s = 1 ∧ t = 1 := by
+    intro p q s t hpq hsp htq hst
+    have hdpq : Disjoint (S p) (S q) := hind.pairwiseDisjoint hpq
+    have hs1 : s = 1 :=
+      Subgroup.disjoint_def.mp hdpq hsp ((mul_eq_one_iff_eq_inv.mp hst).symm ▸ inv_mem htq)
+    exact ⟨hs1, by rw [hs1, one_mul] at hst; exact hst⟩
+  have hxa_eq : (φ x) a = a * b * ((φ x) b)⁻¹ := eq_mul_inv_iff_mul_eq.mpr hprod
+  have hxb_eq : (φ x) b = a * b * ((φ x) a)⁻¹ := by
+    rw [mul_comm a b]
+    exact eq_mul_inv_iff_mul_eq.mpr
+      ((mul_comm ((φ x) b) ((φ x) a)).trans (hprod.trans (mul_comm a b)))
+  have hσi_cases : σi = i ∨ σi = j := by
+    by_contra hc; push_neg at hc
+    refine hxa1 (hkill _ σi i j σj hxa_mem ?_ hc.1 hc.2 hσ_ne)
+    rw [hxa_eq]
+    exact mul_mem (mul_mem (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha))
+      (Subgroup.mem_sup_left (Subgroup.mem_sup_right hb)))
+      (Subgroup.mem_sup_right (inv_mem hxb_mem))
+  have hσj_cases : σj = i ∨ σj = j := by
+    by_contra hc; push_neg at hc
+    refine hxb1 (hkill _ σj i j σi hxb_mem ?_ hc.1 hc.2 (Ne.symm hσ_ne))
+    rw [hxb_eq]
+    exact mul_mem (mul_mem (Subgroup.mem_sup_left (Subgroup.mem_sup_left ha))
+      (Subgroup.mem_sup_left (Subgroup.mem_sup_right hb)))
+      (Subgroup.mem_sup_right (inv_mem hxa_mem))
+  have hac : ∀ s t : E, ((φ x) a * s) * ((φ x) b * t) = ((φ x) a * (φ x) b) * (s * t) := by
+    intro s t; simp only [mul_assoc, mul_comm, mul_left_comm]
+  rcases hσi_cases with hi | hi <;> rcases hσj_cases with hj | hj
+  · exact absurd (hi.trans hj.symm) hσ_ne
+  · rw [hi] at hxa_mem; rw [hj] at hxb_mem
+    have huv : ((φ x) a * a⁻¹) * ((φ x) b * b⁻¹) = 1 := by
+      rw [hac, hprod, mul_comm a⁻¹ b⁻¹, ← mul_inv_rev, mul_inv_cancel]
+    obtain ⟨hu, hv⟩ := hpair hij (mul_mem hxa_mem (inv_mem ha)) (mul_mem hxb_mem (inv_mem hb)) huv
+    exact ⟨mul_inv_eq_one.mp hu, mul_inv_eq_one.mp hv⟩
+  · exfalso
+    rw [hi] at hxa_mem; rw [hj] at hxb_mem
+    have huv : ((φ x) a * b⁻¹) * ((φ x) b * a⁻¹) = 1 := by
+      rw [hac, hprod, ← mul_inv_rev, mul_inv_cancel]
+    obtain ⟨hu, hv⟩ :=
+      hpair (Ne.symm hij) (mul_mem hxa_mem (inv_mem hb)) (mul_mem hxb_mem (inv_mem ha)) huv
+    have hfa : (φ x) a = b := mul_inv_eq_one.mp hu
+    have hfb : (φ x) b = a := mul_inv_eq_one.mp hv
+    letI : MulAction P E := MulAction.compHom E φ
+    have hsmul : ∀ (y : P) (g : E), y • g = (φ y) g := fun _ _ => rfl
+    have hsq : x ^ 2 • a = a := by
+      rw [hsmul]
+      have hpow : (φ (x ^ 2)) a = (φ x) ((φ x) a) := by rw [map_pow, sq]; rfl
+      rw [hpow, hfa, hfb]
+    have hcontra := smul_eq_of_sq_smul_eq_of_odd_orderOf hodd hsq
+    rw [hsmul, hfa] at hcontra
+    exact ha1 (Subgroup.disjoint_def.mp (hind.pairwiseDisjoint hij) ha (hcontra ▸ hb))
+  · exact absurd (hi.trans hj.symm) hσ_ne
+
 /-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.

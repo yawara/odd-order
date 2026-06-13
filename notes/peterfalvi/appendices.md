@@ -65,9 +65,16 @@
 conjugation Equiv で). sorry 不変 (2→2)。
 
 ### 残 TODO (Appendix B)
-- [ ] **part (1) imprimitive case** (`E=⊕Eᵢ` r≥2 を P が置換 + 定 stabilizer ⟹ FPF): swap補題(済)+
-      `P_{a+b}=P_a∩P_b`(直和一意性) で実証明可。⚠ vector-space/DirectSum setup (E を F_q-加群 via
-      `IsElementaryAbelian.zmodModule`, 部分空間の P-置換) が要 = 中規模。
+- [x] **part (1) key step** ✅ `fixes_components_of_permutes_indep` (complete, axiom-clean, session 4):
+      φ x が独立族 `S:ι→Subgroup E` (`iSupIndep`) を置換 + a∈S i, b∈S j (i≠j, ≠1) + x 奇位数 +
+      φx(a·b)=a·b ⟹ φx a=a ∧ φx b=b。論文の「ax=a,bx=b or ax=b,bx=a (奇位数で後者不可)」二分法を
+      `iSupIndep`(component pin) + swap補題で完全形式化。**DirectSum/projection 不要** — `iSupIndep`
+      の disjoint だけ (E_σi ⊓ (E_i⊔E_j⊔E_σj)=⊥ via `(hind k).mono_right` + `disjoint_def`; pair
+      kill は s·t=1∧disjoint⟹両 triv)。⚠ 技法: `letI:CommGroup E:={Group with mul_comm:=hcomm}` +
+      AC 並べ替え `simp only [mul_assoc,mul_comm,mul_left_comm]` (group は comm 非対応)。scratch 開発→統合。
+- [ ] **part (1) 残**: key step を使い「定 stabilizer ⟹ FPF」へ組立 (P_{a·b}=P_a⊓P_b ⟸ key step、
+      定 stab で P_a=P_b、P_a が全 S_i 中心化 ⟹ P_a=1 faithful)。+ part (2) で `E=⊕C_E(T_i)` を構成し
+      key step 適用。**imprimitive 分解 `E=⊕Eᵢ` の存在 (Maschke/Clifford) が残 setup**。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
 - [x] **Prop 1 abelian-quotient step** ✅ `commutator_le_fitting_of_isCyclic_fitting` (complete, axiom-clean,
