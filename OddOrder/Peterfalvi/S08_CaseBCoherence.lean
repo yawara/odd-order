@@ -937,4 +937,29 @@ theorem inner_self_induce_eq_index_of_le_center
   have hW2ne : (Nat.card ↥W2 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
   exact mul_left_cancel₀ hW2ne hcard
 
+/-- **(6.8.2.2) single cross-term `⟨Ind_{W₂}φ, η⟩ = 0`** for a *nontrivial* `φ ∈ Irr W₂` and `η ∈ Y`.
+By Frobenius reciprocity `⟨Ind_{W₂}φ, η⟩ = ⟨φ, Res^L_{W₂}η⟩`, and `Res^L_{W₂}η` is the constant `|W₁|`
+on `W₂` (each `η ∈ Y` is constant `η(1) = |W₁|` on `⁅H,H⁆ ⊇ W₂`,
+`Yset_apply_eq_apply_one_of_mem_commutator` + `Yset_apply_one`); the inner product then factors as
+`|W₂|⁻¹·(∑_{w} φ(w))·\overline{|W₁|} = 0` since `∑_w φ(w) = 0` for the nontrivial `φ`
+(`sum_apply_eq_zero_of_ne_trivial`).
+
+This is the cross term of the (6.8.2.2) norm `‖α‖² = ‖Ind_{W₂}φ‖² + |H:Z|²` (`⟨Ind_{W₂}φ, η₁⟩ = 0`). -/
+theorem SibleyDadeHypothesis.inner_induce_W2_Yset_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [Invertible (Nat.card ↥W2 : ℂ)] (hW2comm : W2 ≤ ⁅H, H⁆)
+    (φ : IrreducibleCharacter ↥W2) (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)) η = 0 := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  rw [ClassFunction.inner_induce_eq_inner_restrict,
+    ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum]
+  have hconst : ∀ w : ↥W2, ClassFunction.restrict W2 η w = (Nat.card hyp.W1 : ℂ) := by
+    intro w
+    rw [ClassFunction.restrict_apply,
+      hyp.Yset_apply_eq_apply_one_of_mem_commutator hη (hW2comm (SetLike.coe_mem w)),
+      hyp.Yset_apply_one hη]
+  simp only [hconst]
+  rw [← Finset.sum_mul, sum_apply_eq_zero_of_ne_trivial hφ, zero_mul, mul_zero]
+
 end OddOrder.Peterfalvi.S08
