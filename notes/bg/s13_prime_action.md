@@ -607,6 +607,22 @@ elemAbelianOfRank G p 1 (= ℰ_p¹) 構成、(c) ⟨g⟩=∏⟨g_p⟩ CRT と C(
 **この session は step 7 を exhaustive head-on (facts A/B/C rigorous + 遮断完全 map, commit a43dbc1e/9b924c31/54c2b33f)、
 13.5 は設計まで。次ターン = 13.5 実装。**
 
+### 2026-06-13 Lane G (main 取込後の再調査): step 7 に **新 lead = `C_{M_α}(P) ⊆ M*` 埋め込み**
+
+main 取込 (§12 Cor 12.16(a)(b) proof + 12.13/12.15 proven, build-fix `2d11cc56`) 後、step 7 closure を再調査。
+- **① σ-disjointness 角度は dead end**: `disjoint_of_not_conj` (10.12) の `sigma M ∩ sigma H = ∅` は **part (b) M_σ
+  nilpotent 要求** (S10_LocalLemmasCore:1204)。per_q は M_α≠⊥ ⟹ M_σ 非 nilpotent ゆえ step 6 の `q∈σ(M)∩σ(M*)` は
+  矛盾にならない (無条件版 = Thm 13.9 = 13.4 downstream で循環)。`mem_sigma_inter_sigma_imp.2` は逆に「M_σ 非 nilpotent」を
+  与えるのみ (既知 = M_α≠⊥ と整合)。
+- **② 🆕 新 lead `C_{M_α}(P) ⊆ M*`** (従来解析は M_α(M) 内に閉じ M* 未使用): `C(P)⊆N_G(P)⊆M*` (`hNP`) ⟹
+  **`C_{M_α}(P) = M_α(M)⊓C(P) ⊆ M_α(M)⊓M*`**。`α(M)∩σ(M*)=∅` (10.12a) ⟹ `C_{M_α}(P)` は **σ(M*)'-部分群**
+  (`⊓M*_σ=⊥`)。かつ fact (A) で **Q≤M*_σ が中心化**。⟹ hard-core 対象が M* 構造に埋込まれ「σ(M*)'-群 ∧ M*_σ の Q に
+  中心化」の強制約下。**BG「since q∉α(M), we can conclude」の "q∉α(M)" はこの α(M)∩σ(M*)=∅ disjointness (M* 埋込) の
+  発動と推定** — inclusion 再構成の鍵候補。Cor 12.14 (`ℳ(C_G(σ-subgrp))={M*}`)/Lem 12.17/Cor 12.16 (now proven) と接続可能性。
+- **⚠ 非対称**: `C_{M_α}(R) ⊄ M*` (M*∈ℳ(N_G(R)) でない) — inclusion の向き/S-非対称性の根源、M* 埋込は P 側のみ。
+- **評価**: 新 lead は genuine だが closure には未到達 (M* 側構造定理との接続を要精査)。次の step-7 attack は「②の M* 埋込
+  + Cor 12.14/12.16 (proven) で C_{M_α}(P) の制約を締める」方向。impasse の core は残るが attack surface が一つ増えた。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
