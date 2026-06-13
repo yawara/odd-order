@@ -287,7 +287,7 @@ theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : S
 /-- `P ∈ ℰ_s¹(X)` (`P ≤ X`, `s` 素数) + `ActsPrimeOn N X` ⟹ `C_N(P) = C_N(X)`
 (`fixedBy N P = fixedBy N X`)。`P` は素数位数ゆえ生成元 `g∈P#` で `P=⟨g⟩`、
 `C_N(P)=C_N(g)=C_N(X)` (prime action)。13.7 body の step 2/5 で `C_N(P)=C_N(E₁)` 等に使う。 -/
-theorem fixedBy_eq_of_elemAbelian_one {N X P : Subgroup G} {s : ℕ} (hs : s.Prime)
+theorem fixedBy_eq_of_elemAbelian_one [Finite G] {N X P : Subgroup G} {s : ℕ} (hs : s.Prime)
     (hX : ActsPrimeOn N X) (hP : P ∈ elemAbelianOfRank G s 1) (hPX : P ≤ X) :
     fixedBy N P = fixedBy N X := by
   haveI : Fact s.Prime := ⟨hs⟩
