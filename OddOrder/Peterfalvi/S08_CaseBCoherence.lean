@@ -664,4 +664,43 @@ theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
   have hdvd := dvd_of_intCast_algMod hHne hcong_int
   rwa [sub_zero] at hdvd
 
+/-- **(6.8.2.2) `|H:W₂| ∣ a`** (Peterfalvi (6.8.2.2): "`a ≡ 0 (mod |H:Z|)`").  Cancelling `|W₂|`
+from the integration core `card_H_dvd_card_W2_mul_regCharCoeff` (`|H| ∣ |W₂|·m`) via the index
+factorization `|H| = |H:W₂|·|W₂|` (`index_mul_card` on `W₂.subgroupOf H`, `subgroupOfEquivOfLe`):
+the regular-character coefficient `m = ⟨Res_{W₂} Res_L η^{τ₁}, φ⟩` is divisible by the relative index
+`[H:W₂] = (W₂.subgroupOf H).index`.  This is the textbook's `a ≡ 0 (mod |H:Z|)`. -/
+theorem SibleyDadeHypothesis.index_W2_dvd_regCharCoeff
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2) {m : ℤ}
+    (hm : ClassFunction.inner
+            (ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)))
+            (φ : ClassFunction ↥W2 ℂ) = (m : ℂ)) :
+    ((W2.subgroupOf H).index : ℤ) ∣ m := by
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]
+      intro a ha b hb
+      rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  have hdvd :=
+    hyp.card_H_dvd_card_W2_mul_regCharCoeff hcop hp hHp hprime hW2comm hW2cen hη φ hφ1 hφ hm
+  -- `|H| = |W₂| · |H:W₂|`
+  have hcardeq : (Nat.card ↥H : ℤ) = (Nat.card ↥W2 : ℤ) * ((W2.subgroupOf H).index : ℤ) := by
+    have h1 := Subgroup.index_mul_card (W2.subgroupOf H)
+    have h2 : Nat.card ↥(W2.subgroupOf H) = Nat.card ↥W2 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv
+    rw [h2] at h1
+    rw [← h1]; push_cast; ring
+  rw [hcardeq] at hdvd
+  have hW2ne : (Nat.card ↥W2 : ℤ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  exact (mul_dvd_mul_iff_left hW2ne).mp hdvd
+
 end OddOrder.Peterfalvi.S08
