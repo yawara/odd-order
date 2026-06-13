@@ -1240,3 +1240,25 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
   ‖α‖²=|L:W₂|+|H:W₂|²。|L:W₂|=|W₁||H:W₂|<|H:W₂|² (W₁ FPF on H/Z, |W₁|<|H:W₂|) ⟹ ‖α^τ‖²<2|H:W₂|² ⟹
   (x−1)²+(m−1)x²≤1 ⟹ x=0 or x=1∧m=2 ⟹ **(6.8.2.2) 完成**。← ‖Ind φ‖²=|L:W₂| (Mackey/inertia) と FPF が要点。
 → (6.8.2.3) → τ₂ → capstone。**正本=本 session 40 cont.²。** 全 brick green+axiom-clean、空転なし。
+
+## 2026-06-14 (session 40 cont.³, /loop): cross-term + agreement + inertia=⊤ (3 brick)
+
+**✅✅✅ landed (build-green + axiom-clean)**:
+8. **`inner_tau_indW2_sub_smul_tau_Yset_diff` (9eb006cf)** = step6 cross-term `⟨α^τ, (η'−η₁)^τ⟩ = c`
+   (Dade isometry on {α, η'−η₁} + source `inner_induce_W2_Yset_diff_eq_zero` + Y-orthonormal)。
+   **inner は arg1 線型** (`inner_smul_left` = `c * ⟨⟩`, NOT star c) → 値は c。
+9. **`coherentYset_extension_Yset_diff_eq_tau` (44d38256)** = agreement `η'^{τ₁}−η₁^{τ₁} = (η'−η₁)^τ`
+   (`extends_on_supported` + `map_sub` + zSupportedSpan membership)。cross-term を extension 形へ変換。
+10. **`inertia_eq_top_of_le_center` (339e848c)** = central W₂ ⟹ `inertia φ = ⊤` (conjBy 自明、`mem_center_iff`)。
+    一般補題 (hyp 不要、`omit [Fintype G][Fintype ↥L][Invertible G][Invertible ↥L]`)。
+
+**⚠ 過程ミス (記録)**: warning cleanup で `omit … in` を docstring の後ろに置き build-red commit (917fc62d)→follow-up 3 件で復旧。教訓=build 緑確認と commit を別 bash step に ([[feedback-verify-build-before-commit]])。
+
+### ⚠ (6.8.2.2) 残 (次 loop):
+- **‖Ind_{W₂}φ‖² = |L:W₂|**: `card_mul_inner_self_induce_eq_card_inertia` (|W₂|·‖Ind φ‖²=|inertia|) +
+  `inertia_eq_top_of_le_center` (=⊤, card=|L|) + |W₂| 除算 ⟹ ‖Ind φ‖²=|L|/|W₂|=|L:W₂|。φ:IrreducibleCharacter W₂ 要。
+- **‖α‖² = |L:W₂| + |H:W₂|²**: ‖Ind φ − c•η₁‖² 展開。⟨Ind φ,η₁⟩=⟨φ,Res η₁⟩=|W₁|⟨φ,1⟩=0 (φ nontrivial; Res η₁=|W₁|·1 既証
+  `inner_induce_W2_Yset_diff_eq_zero` の中身), ‖η₁‖²=1, c=|H:W₂|。
+- **|L:W₂| < |H:W₂|²** = |W₁|<|H:W₂| (W₁ FPF on H/Z; case-B 構造要精査) → ‖α^τ‖²<2|H:W₂|²。
+- **step7 分解** (α^τ を 𝒴^{τ₁} 正規直交基底へ射影) + **step8 quadratic** ((x−1)²+(m−1)x²≤1 ⟹ x∈{0,1})。
+→ (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 40 cont.³。**
