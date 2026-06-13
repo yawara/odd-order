@@ -24,14 +24,15 @@ Cor 10.9(b) `M=(M∩M⋆)M_α` + Lem 6.5(b) で `N_M(Z)⊆M⋆`, よって `ℳ(
 **Q-共役** ⟹ エンジンで `M=M⋆` 矛盾。
 
 **残ピース (leaf に追加予定)**:
-1. **line-共役** `exists_conj_smul_zpowers_eq_of_expPExtraspecial` (type-level, 設計完了・API 検証済,
-   次イテレーションで実装): `hQ:IsExpPExtraspecial p Q`, `a∉Z`, `b∉Z`, `b∈⟨a⟩⊔Z` ⟹ `∃q, q•⟨a⟩=⟨b⟩`。
-   **proof**: `mem_sup_of_normal_right` で `b=aⁱ·z` (z∈Z); `aⁱ∉Z`⟹`p∤i`; ZMod p (体) で `j:=i⁻¹.val`,
-   `i·j≡1 (mod p)`; center 位数 p で `z^p=1` (`pow_card_eq_one'`+`center_card`); `exists_conj_eq_center_mul`
-   を `z^j∈Z` に適用し `q a q⁻¹=z^j a`; `(z^j a)ⁱ=z^{ji}aⁱ=z·aⁱ=b` (z^{ji}=z via i·j=1+pm, z^p=1);
-   `b=q aⁱ q⁻¹∈q•⟨a⟩`; 両辺位数 p (`Nat.card_zpowers`+`map_injective`) で `⟨b⟩=q•⟨a⟩`。
-   API: `MonoidHom.map_zpowers`, `Subgroup.mem_sup_of_normal_right`, `zpow_mul`, `Commute.mul_zpow`,
-   `ZMod.intCast_zmod_eq_zero_iff_dvd`, `Subgroup.eq_of_le_of_card_le`。
+1. ~~**line-共役** `exists_conj_smul_zpowers_eq_of_expPExtraspecial`~~ **✅ DONE (session 15)** —
+   type-level, sorry-free・axiom-clean。`b∈⟨a⟩⊔Z`(`mem_sup_of_normal_right` で `b=aⁱ·z`)⟹
+   `∃q, q•⟨a⟩=⟨b⟩`。ZMod p 体で `j:=i⁻¹.val`, center 位数 p で `z^p=1`, `exists_conj_eq_center_mul`
+   を `z^j∈Z` に適用→`(z^j a)ⁱ=z·aⁱ=b∈q•⟨a⟩`→両辺位数 p で等号。
+   **デバッグ知見** (再利用): `Nat.card (φ•H)` は `(φ•H : Subgroup Q)` 型注釈必須 (Nat.card が Type 期待で
+   `•` が誤 elaborate); `Subgroup.equivMapOfInjective` は `≃*` ゆえ `Nat.card_congr` には `.toEquiv`;
+   `Subgroup.eq_of_le_of_card_ge` (not `_le`; `[Finite K]` (hle:H≤K) (Nat.card K≤Nat.card H):H=K);
+   `Commute z a` は `(mem_center_iff.mp hz a).symm` を中間 `have` に (Eq 経由 dot は `Eq.zpow_left` 解決失敗);
+   `zpow_mem hz j` (root, K 暗黙; `Subgroup.zpow_mem` は引数順違い)。
 2. **還元チェーン** `P→Sylow(M∩M⋆)→Sylow G→r(P)=2→Q extraspecial`: `uniquenessTheorem`
    (hr3 は `r(C_M(P))≥3`? 要確認 — P Sylow rank2 で hr2=2 は満たすが hr3 条項の供給が gap。
    ⚠ BG は別経路: P Sylow of G + p odd noncyclic ⟹ Uniqueness で `r(P)≤2`。repo の `uniquenessTheorem`

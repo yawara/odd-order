@@ -113,6 +113,80 @@ theorem exists_conj_eq_center_mul_of_expPExtraspecial {Q : Type*} [Group Q] [Fin
   rw [commutatorElement_def] at hqz
   exact mul_inv_eq_iff_eq_mul.mp hqz
 
+/-- **Non-central lines through a common rank-2 `A` are `Q`-conjugate** in an exp-`p` extraspecial
+group `Q`: if `a ∉ Z(Q)`, `b ∉ Z(Q)`, and `b ∈ ⟨a⟩ ⊔ Z(Q)`, then `⟨b⟩ = q⟨a⟩q⁻¹` for some `q`.
+
+Write `b = aⁱ·z` (`z ∈ Z(Q)`); `aⁱ ∉ Z(Q)` forces `p ∤ i`. Choosing `j := i⁻¹` in the field
+`ZMod p` gives `i·j ≡ 1 (mod p)`, so (using `z^p = 1`) `z^{ij} = z`. Then
+`exists_conj_eq_center_mul_of_expPExtraspecial` provides `q` with `q a q⁻¹ = zʲ·a`, whence
+`q aⁱ q⁻¹ = (zʲa)ⁱ = z·aⁱ = b ∈ q⟨a⟩q⁻¹`; both sides have order `p`, so `⟨b⟩ = q⟨a⟩q⁻¹`.
+This is the structural input to BG 12.13's final contradiction: the two lines `A₀, A₀⋆ ∈ ℰ¹(A)−{Z}`
+are `Q`-conjugate, contradicting `ℳ(N_G(A₀)) = {M} ≠ {M⋆} = ℳ(N_G(A₀⋆))`. -/
+theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial {Q : Type*} [Group Q] [Finite Q] {p : ℕ}
+    [Fact p.Prime] (hQ : IsExpPExtraspecial p Q) {a b : Q} (ha : a ∉ Subgroup.center Q)
+    (hb : b ∉ Subgroup.center Q) (hmem : b ∈ Subgroup.zpowers a ⊔ Subgroup.center Q) :
+    ∃ q : Q, MulAut.conj q • Subgroup.zpowers a = Subgroup.zpowers b := by
+  classical
+  have hp : p.Prime := Fact.out
+  -- `ord a = ord b = p`.
+  have ha1 : a ≠ 1 := fun h => ha (h ▸ one_mem _)
+  have hb1 : b ≠ 1 := fun h => hb (h ▸ one_mem _)
+  have horda : orderOf a = p :=
+    ((Nat.dvd_prime hp).mp (orderOf_dvd_of_pow_eq_one (hQ.pow_eq_one a))).resolve_left
+      (fun h => ha1 (orderOf_eq_one_iff.mp h))
+  have hordb : orderOf b = p :=
+    ((Nat.dvd_prime hp).mp (orderOf_dvd_of_pow_eq_one (hQ.pow_eq_one b))).resolve_left
+      (fun h => hb1 (orderOf_eq_one_iff.mp h))
+  -- `b = aⁱ · z`, `z ∈ Z(Q)`.
+  rw [Subgroup.mem_sup_of_normal_right] at hmem
+  obtain ⟨y, hy, z, hz, hyz⟩ := hmem
+  obtain ⟨i, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+  -- `aⁱ ∉ Z(Q)`, so `p ∤ i`.
+  have haiZ : a ^ i ∉ Subgroup.center Q := fun h => hb (hyz ▸ mul_mem h hz)
+  have hpi : ¬ (p : ℤ) ∣ i := fun ⟨m, hm⟩ => haiZ (by
+    rw [hm, zpow_mul, zpow_natCast, hQ.pow_eq_one, one_zpow]; exact one_mem _)
+  -- `z ^ p = 1` (center has order `p`).
+  have hzp : z ^ p = 1 := by
+    have h1 : (⟨z, hz⟩ : Subgroup.center Q) ^ Nat.card (Subgroup.center Q) = 1 := pow_card_eq_one'
+    rw [hQ.isExtraspecial.center_card] at h1
+    have h2 := congrArg (Subgroup.subtype (Subgroup.center Q)) h1
+    simpa using h2
+  -- choose `j` with `i * j ≡ 1 (mod p)`.
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hi0 : (i : ZMod p) ≠ 0 := fun h => hpi ((ZMod.intCast_zmod_eq_zero_iff_dvd i p).mp h)
+  set j : ℤ := (((i : ZMod p)⁻¹).val : ℤ) with hjdef
+  have hij1 : (p : ℤ) ∣ (i * j - 1) := by
+    rw [← ZMod.intCast_zmod_eq_zero_iff_dvd]
+    push_cast [hjdef, ZMod.natCast_val, ZMod.cast_id]
+    rw [mul_inv_cancel₀ hi0, sub_self]
+  obtain ⟨m, hm⟩ := hij1
+  have hijm : i * j = 1 + (p : ℤ) * m := by linarith
+  -- `z ^ (i*j) = z`.
+  have hzij : z ^ (i * j) = z := by
+    rw [hijm, zpow_add, zpow_one, zpow_mul, zpow_natCast, hzp, one_zpow, mul_one]
+  -- conjugate `a` to `zʲ·a` and raise to the `i`-th power: `q aⁱ q⁻¹ = b`.
+  obtain ⟨q, hq⟩ := exists_conj_eq_center_mul_of_expPExtraspecial hQ ha (zpow_mem hz j)
+  have hca : Commute z a := (Subgroup.mem_center_iff.mp hz a).symm
+  have hcomm : Commute (z ^ j) a := hca.zpow_left j
+  have hconjai : (MulAut.conj q) (a ^ i) = b := by
+    rw [map_zpow, MulAut.conj_apply, hq, hcomm.mul_zpow, ← zpow_mul, mul_comm j i, hzij,
+      (Subgroup.mem_center_iff.mp hz (a ^ i)).symm]
+    exact hyz
+  -- `b ∈ q⟨a⟩q⁻¹` and a cardinality count.
+  have hbmem : b ∈ MulAut.conj q • Subgroup.zpowers a := by
+    rw [mulAut_smul_eq_map]
+    exact ⟨a ^ i, zpow_mem (Subgroup.mem_zpowers a) i, hconjai⟩
+  have hinj : Function.Injective (MulAut.conj q).toMonoidHom := (MulAut.conj q).injective
+  have hcardL : Nat.card (MulAut.conj q • Subgroup.zpowers a : Subgroup Q) = p := by
+    have he : Nat.card (MulAut.conj q • Subgroup.zpowers a : Subgroup Q)
+        = Nat.card (Subgroup.zpowers a) := by
+      rw [mulAut_smul_eq_map]
+      exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ hinj).toEquiv).symm
+    rw [he, Nat.card_zpowers, horda]
+  have hcardR : Nat.card (Subgroup.zpowers b) = p := by rw [Nat.card_zpowers, hordb]
+  exact ⟨q, (Subgroup.eq_of_le_of_card_ge (Subgroup.zpowers_le.mpr hbmem)
+    (le_of_eq (hcardL.trans hcardR.symm))).symm⟩
+
 /-- **`ℳ(N_G(·))`-uniqueness blocks `M`-conjugacy**: if `A₀⋆ = g • A₀` (conjugation by some
 `g ∈ M`), `ℳ(N_G(A₀)) = {M}`, and `ℳ(N_G(A₀⋆)) = {M⋆}`, then `M = M⋆`.
 
