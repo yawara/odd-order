@@ -8,6 +8,20 @@ owner: hub (凍結境界 prefix-split)
 
 # S08_CoherenceCore (11.9k行) 分割 — build-critical 唯一の巨大frontier
 
+## ✅ 完了 (2026-06-14, hub, commit `b7e672de`)
+
+3-way prefix-split 実施: Part1 (3452行) ← Part2 (4662行) ← S08_CoherenceCore (3903行)。
+最大 11,969 → 4,662 行。build 緑 3806・AxiomsCheck OK・実 sorry 149 不変・下流無改変・OddOrder.lean 無改変。
+
+**⚠ 訂正 (重要)**: title の「build-critical」は **誤り**。着手時 RECON で **S08_CoherenceCore は凍結
+(B は case-B を別 leaf S08_CaseBCoherence/2 に分離・Core も上流も非編集)** と判明。**凍結=olean cached
+=非再elaboration ⟹ 分割の build-speed 効果はゼロ** (37s traversal 下限は closure 深さ依存で分割不変)。
+本 split は **size 規約遵守 + 可読性 + 将来 Core が active 化した時の備え**のための hygiene refactor。
+ユーザー裁可で「でかすぎるので」実施 (2026-06-14)。
+
+残: SibleyDade block (Part2 4662 / Core 3903) は単一 namespace ゆえ sub-1500 への更なる分割は
+intra-namespace prefix-split (G/L/H 変数再宣言) 要・優先度低 (必要時に別 issue)。
+
 ## 背景
 
 `OddOrder/Peterfalvi/S08_CoherenceCore.lean = 11,969 行` (1500 行規約の **8 倍**)。
