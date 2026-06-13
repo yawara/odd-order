@@ -4386,7 +4386,7 @@ three-case glue this completes Theorem 12.12. Unconditional. -/
 /-! **BG Theorem 12.13** reduction (`S12_Theorem1213`): `mem_sigma_normalizer_le_of_two_maximals`
 — a nonabelian `p`-subgroup `P ≤ M` (maximal) has `p ∈ σ(M)` (Cor 12.10(a) contrapositive: a
 `σ'`-`p`-subgroup is nilpotent hence abelian) and `N_G(P) ⊆ M` (Cor 12.10(d), `P` noncyclic).
-Unconditional. (`nonabelian_pgroup_isUniquelyMaximal` の本体 proof は σ-side cascade で後続。) -/
+Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.mem_sigma_normalizer_le_of_two_maximals
 
@@ -4397,3 +4397,15 @@ homomorphism onto the order-`p` center (commutators central), nontrivial as `a�
 surjective. The conjugacy half of the 12.13 line-conjugacy argument. Unconditional. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.exists_conj_eq_center_mul_of_expPExtraspecial
+
+/-! **BG Theorem 12.13** (`S12_Theorem1213`, σ-side keystone): a nonabelian `p`-subgroup `P`
+contained in two distinct maximals `M ≠ M⋆` is impossible — equivalently, any maximal `M`
+containing a nonabelian Sylow-type `p`-subgroup is the *unique* maximal subgroup containing it
+(`nonabelian_pgroup_isUniquelyMaximal`). Proof: `P` → Sylow of `M ∩ M⋆` → Sylow of `G` forces
+`r(P) = 2`; Cor 10.7(b) extracts an exponent-`p` extraspecial `Q` (order `p³`); `Q/Z(Q)` acts
+coprimely and noncyclically on `K = C_{Mα}(Z)`, so Prop 1.16 writes `K = ⟨C_K(Ā) | Ā cocyclic⟩`,
+each generator centralized by a rank-2 `A ∈ ℰ²(Q)` hence inside `M⋆` by 12.4(a); with Cor 10.9(b)
++ Lem 6.5(b) this puts `N_M(Z) ⊆ M⋆`, and 12.4(b) produces `A₀, A₀⋆ ∈ ℰ¹(A) − {Z}` realizing
+`M, M⋆`, contradicting line-conjugacy + ℳ-uniqueness. Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.nonabelian_pgroup_isUniquelyMaximal

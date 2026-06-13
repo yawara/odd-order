@@ -516,6 +516,65 @@ theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
   · exact hEea.map Q.subtype_injective
   · rw [Subgroup.card_map_of_injective Q.subtype_injective, hEcard]
 
+/-- **`⟨a⟩ ⊔ Z(Q) ∈ ℰ²(Q)` for `a ∈ Q ∖ Z(Q)`** in an exp-`p` extraspecial `Q` with `pRank_p(G) ≤ 2`:
+`a` has order `p` and centralizes the (central) `Z(Q)`, so `⟨a⟩ ⊔ Z(Q)` is elementary abelian; it
+strictly contains `Z(Q)` (order `p`) and has order `≤ p²` (by `pRank_p(G) ≤ 2`), hence order `p²`. -/
+theorem zpowers_sup_center_mem_elemAbelianOfRank_two [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q) (hpRank : pRank G p ≤ 2)
+    {a : G} (haQ : a ∈ Q) (haZ : a ∉ (Subgroup.center ↥Q).map Q.subtype) :
+    Subgroup.zpowers a ⊔ (Subgroup.center ↥Q).map Q.subtype ∈ elemAbelianOfRank G p 2 := by
+  classical
+  set Z : Subgroup G := (Subgroup.center ↥Q).map Q.subtype with hZdef
+  have hpp : p.Prime := Fact.out
+  have hZcard : Nat.card ↥Z = p := by
+    rw [hZdef, Subgroup.card_map_of_injective Q.subtype_injective, hQ_es.isExtraspecial.center_card]
+  have hap : a ^ p = 1 := by
+    have : a = Q.subtype ⟨a, haQ⟩ := rfl
+    rw [this, ← map_pow, hQ_es.pow_eq_one, map_one]
+  have ha1 : a ≠ 1 := fun h => haZ (h ▸ one_mem _)
+  have horda : orderOf a = p :=
+    ((Nat.dvd_prime hpp).mp (orderOf_dvd_of_pow_eq_one hap)).resolve_left
+      (fun h => ha1 (orderOf_eq_one_iff.mp h))
+  have hzpea : (Subgroup.zpowers a).IsElementaryAbelian p :=
+    OddOrder.BG.Ch1.S05.isElementaryAbelian_of_card_prime (by rw [Nat.card_zpowers, horda])
+  have hZea : Z.IsElementaryAbelian p :=
+    OddOrder.BG.Ch1.S05.isElementaryAbelian_of_card_prime hZcard
+  have hzp_cent : Subgroup.zpowers a ≤ Subgroup.centralizer (Z : Set G) := by
+    rw [Subgroup.zpowers_le, Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [hZdef, SetLike.mem_coe, Subgroup.mem_map] at hz
+    obtain ⟨z', hz', rfl⟩ := hz
+    have h2 := congrArg (Q.subtype) (Subgroup.mem_center_iff.mp hz' ⟨a, haQ⟩)
+    rw [map_mul, map_mul] at h2; exact h2.symm
+  have hAea : (Subgroup.zpowers a ⊔ Z).IsElementaryAbelian p :=
+    hzpea.sup_of_le_centralizer hZea hzp_cent
+  refine mem_elemAbelianOfRank.mpr ⟨hAea, ?_⟩
+  obtain ⟨k, hk⟩ := hAea.isPGroup.exists_card_eq
+  have hub : k ≤ 2 := by
+    have hlog := hAea.log_card_le_pRank.trans (le_trans (pRank_mono_of_le _) hpRank)
+    rwa [hk, Nat.log_pow hpp.one_lt] at hlog
+  have hdvd : p ∣ Nat.card ↥(Subgroup.zpowers a ⊔ Z) :=
+    hZcard ▸ Subgroup.card_dvd_of_le le_sup_right
+  have hne : Nat.card ↥(Subgroup.zpowers a ⊔ Z) ≠ p := by
+    intro hcp
+    have heq : Z = Subgroup.zpowers a ⊔ Z :=
+      Subgroup.eq_of_le_of_card_ge le_sup_right (le_of_eq (hcp.trans hZcard.symm))
+    have ha_in : a ∈ Subgroup.zpowers a ⊔ Z :=
+      (le_sup_left : Subgroup.zpowers a ≤ _) (Subgroup.mem_zpowers a)
+    rw [← heq] at ha_in
+    exact haZ ha_in
+  rw [hk] at hdvd hne ⊢
+  have hlb : 1 ≤ k := by
+    rcases Nat.eq_zero_or_pos k with h | h
+    · rw [h, pow_zero] at hdvd
+      exact absurd (Nat.le_of_dvd one_pos hdvd) (Nat.not_le.mpr hpp.one_lt)
+    · exact h
+  have : k = 2 := by
+    rcases Nat.lt_or_ge k 2 with h | h
+    · exact absurd (by rw [show k = 1 from by omega, pow_one]) hne
+    · omega
+  rw [this]
+
 /-- **`Z(Q) ≤ A` for `A ∈ ℰ²(Q)`** in an exp-`p` extraspecial `Q` of order `p³` (mmd L3391/L3397,
 so that `Z` is a line of `A` and `ℰ¹(A) − {Z}` is meaningful). For `z ∈ Z(Q)`: either `z = 1 ∈ A`,
 or `⟨z⟩` has order `p` (`z^p = 1`), is elementary abelian, and centralizes `A`, so `A ⊔ ⟨z⟩` is
@@ -685,7 +744,58 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
         refine (Subgroup.closure_le _).mpr ?_
         rintro g ⟨Y, ⟨a, hYa⟩, hfix⟩
         rw [SetLike.mem_coe, Subgroup.mem_comap]
-        sorry
+        have hpRank : pRank G p ≤ 2 := by
+          rw [← pRank_sylow_eq S]; exact (pRank_le_rank p).trans hrank
+        -- preimage `A_Y` of `Y` in `Q` (so `Z ≤ A_Y`); `↑g` centralizes it.
+        set A_Y : Subgroup G := (Y.comap (QuotientGroup.mk' (Subgroup.center ↥Q))).map Q.subtype
+          with hAYdef
+        have hA_Y_le_Q : A_Y ≤ Q := Subgroup.map_subtype_le _
+        have hgcent : K.subtype g ∈ Subgroup.centralizer (A_Y : Set G) := by
+          rw [Subgroup.mem_centralizer_iff]
+          intro x hx
+          rw [SetLike.mem_coe, hAYdef, Subgroup.mem_map] at hx
+          obtain ⟨yb, hyb, rfl⟩ := hx
+          have hfixyb := hfix _ (Subgroup.mem_comap.mp hyb)
+          rw [QuotientGroup.mk'_apply, hφ, QuotientGroup.lift_mk'] at hfixyb
+          have h2 := congrArg K.subtype hfixyb
+          rw [hψ_coe, mul_inv_eq_iff_eq_mul] at h2
+          exact h2
+        -- `Y ≠ ⊥` (else `Q/Z` is cyclic), so there is `a' ∈ A_Y ∖ Z`.
+        have hY_ne : Y ≠ ⊥ := by
+          intro hY1
+          rw [hY1, bot_sup_eq] at hYa
+          exact hNC (isCyclic_iff_exists_zpowers_eq_top.mpr ⟨a, hYa⟩)
+        haveI : Nontrivial ↥Y := (Subgroup.nontrivial_iff_ne_bot Y).mpr hY_ne
+        obtain ⟨⟨yb₀, hyb₀Y⟩, hyb₀ne⟩ := exists_ne (1 : ↥Y)
+        have hyb₀1 : yb₀ ≠ 1 := fun h => hyb₀ne (Subtype.ext h)
+        obtain ⟨q₀, rfl⟩ := QuotientGroup.mk_surjective yb₀
+        have ha'AY : Q.subtype q₀ ∈ A_Y := by
+          rw [hAYdef]
+          refine Subgroup.mem_map_of_mem _ ?_
+          rw [Subgroup.mem_comap, QuotientGroup.mk'_apply]; exact hyb₀Y
+        have ha'Z : Q.subtype q₀ ∉ (Subgroup.center ↥Q).map Q.subtype := by
+          rw [Subgroup.mem_map]
+          rintro ⟨z', hz', hz'eq⟩
+          exact hyb₀1 ((QuotientGroup.eq_one_iff q₀).mpr (Q.subtype_injective hz'eq ▸ hz'))
+        have hZ_le_AY : (Subgroup.center ↥Q).map Q.subtype ≤ A_Y := by
+          rw [hAYdef]
+          apply Subgroup.map_mono
+          intro w hw
+          rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff w).mpr hw]
+          exact one_mem Y
+        -- `A := ⟨a'⟩ ⊔ Z ∈ ℰ²(Q)`, `A ≤ A_Y ≤ Q ≤ M⋆`, and `↑g ∈ C_G(A_Y) ≤ C_G(A) ⊆ M⋆`.
+        have hA_mem := zpowers_sup_center_mem_elemAbelianOfRank_two hQ_es hpRank
+          (hA_Y_le_Q ha'AY) ha'Z
+        have hA_le_Mstar : Subgroup.zpowers (Q.subtype q₀) ⊔ (Subgroup.center ↥Q).map Q.subtype
+            ≤ Mstar :=
+          sup_le ((Subgroup.zpowers_le.mpr (hA_Y_le_Q ha'AY)).trans (hQ_le.trans inf_le_right))
+            ((Subgroup.map_subtype_le _).trans (hQ_le.trans inf_le_right))
+        have hgC : K.subtype g ∈ Subgroup.centralizer
+            ((Subgroup.zpowers (Q.subtype q₀) ⊔ (Subgroup.center ↥Q).map Q.subtype :
+              Subgroup G) : Set G) :=
+          Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr
+            (sup_le (Subgroup.zpowers_le.mpr ha'AY) hZ_le_AY)) hgcent
+        exact centralizer_le_of_elemAb_rank_two hG hMstar hA_mem hA_le_Mstar hgC
       intro x hx
       exact Subgroup.mem_comap.mp (hle (hgen ▸ Subgroup.mem_top (⟨x, hx⟩ : ↥K)))
     -- Corollary 10.9(b): `M = (M ∩ M⋆) ⊔ M_α` (using `α(M) = β(M)`).
