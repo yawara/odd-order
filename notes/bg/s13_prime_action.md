@@ -356,6 +356,33 @@ surface map (Explore 2026-06-12): `commutator_mono`/`commutator_le_left` (mathli
 - **要 derivation**: 両 cyclic + FPF/coprime で等式。BG 原文 Lem 12.18 証明 (Thm 1.13/3.7/12.5-12.7) が範型。
   ⚠ 包含の正確な機序は未確定 — 次 iteration で BG Lem 12.18 証明を精読し移植 or rank+card 経路を構築。
 
+### 2026-06-13 Lane G (loop): step 7 root-cause 精査 — **genuine hard sub-lemma と確定**
+
+**結論**: step 7 `C_{M_α}(P)=C_{M_α}(R)` は BG が "we can conclude" で省く実質的サブ補題で、
+**既存 lemma の系ではない**。loop-quick-win でなく集中的な BG-12.18 流の証明を要する (要判断)。
+
+**確定した事実 (この iteration)**:
+- 両辺 cyclic (rank≤1) は出る: P 側 (p∈τ₁⟹α', `maximalSubgroupsContaining_normalizer_ne_singleton_of_mem_tau1`
+  S12_E で ℳ(N_G(P))≠{M}) と R 側 (r∈τ₁(M)⟹同様) の両方に `rank_centralizer_Malpha_le_one_of_not_uniqueMaximal` 適用可。
+- steps 8-9 矛盾は等式を仮定すれば airtight (実装済・compile)。**S が C(R) を正規化しない** (S∤N(R), [S,R]=Q≠1 と
+  q≠r から S⊄N(R)) ため S-不変な C_{M_α}(P) 形が必須 ⟹ 等式は迂回不能。
+
+**棄却した経路 (この iteration の精査)**:
+- **Lem 12.18(a) 直接**: 包含を出さない (C_{M_α}(P)≠1 / C_{M_α}(PQ)=1 のみ)。かつ (p,P) 適用は
+  C_Q(P)=Q≠1 (Q⊆S⊆C(P)) で**仮定 C_Q(P)=1 が破れ不可**。
+- **Cor 13.2(b) / 13.3(b) 流**: 「τ₁(M*)'-部分群が C_{M_α}(P) を中心化」型だが、P も R も **τ₁** (τ₁' でない) ゆえ不適合。
+- **three-subgroups [Z_P,R,S] / [Z_R,P,Q]**: いずれも「S が Z_P=C_{M_α}(P) を中心化 (⁅S,Z_P⁆=1)」or
+  「Q が Z_R を正規化」等の未証明前提に bottom-out。C_{M_σ}(P) の nilpotency があれば S が q'-part Z_P を中心化するが、
+  C_{M_σ}(P) nilpotent は未確認。
+- **elemAb_centralizes_Malpha_meet (Lem 12.3)**: σ-part・rank-2 A 用で τ₁ 中心化包含には非適合。
+
+**推奨アプローチ (次の集中セッション)**: BG Lemma 12.18(a) の repo 証明
+(`tau1_Malpha_centralizer_PQ_eq_bot` + `inf_centralizer_ne_bot_of_not_le_centralizer`, S12_Lemma1218:304-560,
+Thompson critical `exists_charSubgroup_exponent_not_centralized` + Thm 3.7
+`isNilpotent_of_normalizing_primeOrder_fixedPointFree` 使用) を範型に、cyclic 分解 Z_P=C_{Z_P}(R)×[Z_P,R] の
+[Z_P,R]=1 を FPF/Thm 3.7 で示す独立 lemma `centralizer_Malpha_eq_of_commuting_tau1` を切り出して証明。
+~hundreds 行規模の見込み。**step 7 以外の per_q は完成済 (4 commits: steps 4b,5,6,8-9)。**
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
