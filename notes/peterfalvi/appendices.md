@@ -272,6 +272,26 @@ k := ZMod p (Field via Fact)。→ Prop 2(a) 完全形 (F=𝔽_p[T] の体構造
   3. 全 instance を `@natCard_end_eq (ZMod p) _ T _ _ ρ.asModule _ <term> ...` で term-position 明示供給。
   - downstream (App C / Lemma の Z(P) cyclic) は core を直接使う手も (bridge は便宜 adapter)。
 
+### ✅ session 8 (2026-06-14): bridge plumbing SOLVED (compHom on clean Additive E) + core refactor
+- **🎯 bridge plumbing 解決 (probe29 で実証)**: asModule wrapper を**使わず**、clean type `Additive E` に
+  直接 k[T]-module を張る:
+  ```
+  let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
+  letI : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+    Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom   -- = asModule の中身を Additive E に
+  ```
+  → `Module.End (MonoidAlgebra (ZMod p) T) (Additive E)` が **arg-position で形成可能** (clean type ゆえ
+  asModule の synth 不安定を回避)、`natCard_end_eq (M := Additive E)` 適用 OK、
+  `Nat.card (End) = Nat.card E` (via `Nat.card_congr Additive.toMul`)。**再調査不要: asModule は罠, compHom on Additive E が正解。**
+- **core refactor (commit c83c65a0)**: 過剰な global `instance : Finite (Module.End ...)` は
+  asModule+IsIrreducible synth と干渉 → `theorem finite_end` 化し各定理内 haveI に (防御的)。leaf sorry-free, axiom-clean。
+- **▶ 残り = IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) を群論的既約性から** (compHom 構造上):
+  bridge の唯一 sorry。`IsSimpleOrder (Submodule (k[T]) (Additive E))`: k[T]-submodule N (compHom 構造) は
+  ZMod p-subspace かつ T-stable → ψ-invariant subgroup H (OperatorMaschke の `toZModSubmodule`/`toSubgroup'`
+  対応を流用) → hirr (ψ-inv subgroup は ⊥/⊤) で N=⊥/⊤。Nontrivial は Nontrivial E から。~50-80 行見込み。
+  注意: compHom の k[T]-action は `of t • x = ρ.asAlgebraHom (of t) x = (ψ t) を Additive 上に`。
+- これで Prop 2(a) 完全形 (F=End=𝔽_p[T], E 1次元, |F|=pⁿ) → その後 (b) semilinear/C_U(s)≅Aut(F)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
