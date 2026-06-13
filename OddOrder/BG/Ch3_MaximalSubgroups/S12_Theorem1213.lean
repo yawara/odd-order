@@ -606,7 +606,65 @@ theorem maximalContaining_normalizer_center_ne_of_two_maximals [Finite G]
   -- Proposition 12.4(a) give `K ⊆ M⋆`, then `M = (M ∩ M⋆)M_α` (Cor 10.9(b)) + Lemma 6.5(b)
   -- (coprimality `p ∉ α(M)` from `r(S) ≤ 2`) give `N_M(Z) ⊆ M⋆`.
   have hNMZ : Subgroup.normalizer (Z : Set G) ⊓ M ≤ Mstar := by
-    sorry
+    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have hpp : p.Prime := Fact.out
+    have hZ_le_inf : Z ≤ M ⊓ Mstar := (Subgroup.map_subtype_le _).trans hQ_le
+    have hZM : Z ≤ M := hZ_le_inf.trans inf_le_left
+    have hMα_le : S10.Malpha M ≤ M := S10.Malpha_le M
+    have hZcard : Nat.card ↥Z = p := by
+      rw [hZdef, Subgroup.card_map_of_injective Q.subtype_injective,
+        hQ_es.isExtraspecial.center_card]
+    -- **`C_{M_α}(Z) ⊆ M⋆`** — the `cocyclicFixedByClosure`/`Q/Z`-on-`K` analytic core (Prop 1.16 + 12.4a).
+    have hK : Subgroup.centralizer (Z : Set G) ⊓ S10.Malpha M ≤ Mstar := by
+      sorry
+    -- Corollary 10.9(b): `M = (M ∩ M⋆) ⊔ M_α` (using `α(M) = β(M)`).
+    obtain ⟨hfact, hab⟩ := S10.beta_factorization_of_sylow_normalizer_in_intersection hG hM hMstar
+      (Ne.symm hMne) S (by rw [inf_comm]; exact hN_S)
+    have hMαβ : S10.Malpha M = S10.Mbeta M := by simp only [S10.Malpha, S10.Mbeta, hab]
+    have hMsup : S10.Malpha M ⊔ (M ⊓ Mstar) = M := by
+      rw [hMαβ, sup_comm, inf_comm]; exact hfact.symm
+    have hKU : (S10.Malpha M).subgroupOf M ⊔ (M ⊓ Mstar).subgroupOf M = ⊤ := by
+      rw [← Subgroup.subgroupOf_sup hMα_le inf_le_left, hMsup, Subgroup.subgroupOf_self]
+    -- coprimality `(|Z|, |M_α|) = 1` from `p ∉ α(M)`.
+    have hpMα : ¬ p ∣ Nat.card ↥(S10.Malpha M) := fun h =>
+      (notMem_alpha_of_rank_sylow_le_two S hrank)
+        (S10.Malpha_isPiGroup M p (Nat.mem_primeFactors.mpr ⟨hpp, h, Nat.card_pos.ne'⟩))
+    have hcop : Nat.Coprime (Nat.card ↥(Z.subgroupOf M))
+        (Nat.card ↥((S10.Malpha M).subgroupOf M)) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hZM).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMα_le).toEquiv, hZcard]
+      exact (Nat.Prime.coprime_iff_not_dvd hpp).mpr hpMα
+    -- Lemma 6.5(b) inside `↥M`: `N_{↥M}(Z) = C_{M_α}(Z) · N_{M∩M⋆}(Z)`.
+    have hlem := OddOrder.BG.Ch1.S06.normalizer_eq_centralizerK_mul_normalizerU (G := ↥M)
+      (K := (S10.Malpha M).subgroupOf M) (U := (M ⊓ Mstar).subgroupOf M) (H := Z.subgroupOf M)
+      hKU (Subgroup.subgroupOf_mono M hZ_le_inf) hcop
+    intro m hm
+    rw [Subgroup.mem_inf] at hm
+    have hmM : m ∈ M := hm.2
+    have hmbar : (⟨m, hmM⟩ : ↥M) ∈ Subgroup.normalizer (Z.subgroupOf M) := by
+      rw [← Subgroup.subgroupOf_normalizer_eq hZM, Subgroup.mem_subgroupOf]; exact hm.1
+    have hmbarc := SetLike.mem_coe.mpr hmbar
+    rw [hlem] at hmbarc
+    obtain ⟨c, hc, u, hu, hcu⟩ := Set.mem_mul.mp hmbarc
+    -- `↑c ∈ C_{M_α}(Z) ⊆ M⋆`.
+    rw [SetLike.mem_coe, Subgroup.mem_inf] at hc
+    have hcMstar : (M.subtype c) ∈ Mstar := by
+      apply hK
+      refine Subgroup.mem_inf.mpr ⟨?_, Subgroup.mem_subgroupOf.mp hc.2⟩
+      rw [Subgroup.mem_centralizer_iff]
+      intro z hz
+      have hzM : z ∈ M := hZM hz
+      have hcomm := (Subgroup.mem_centralizer_iff.mp hc.1) ⟨z, hzM⟩
+        (Subgroup.mem_subgroupOf.mpr hz)
+      have h2 := congrArg (M.subtype) hcomm
+      rw [map_mul, map_mul] at h2
+      exact h2
+    -- `↑u ∈ M ∩ M⋆ ⊆ M⋆`.
+    rw [SetLike.mem_coe, Subgroup.mem_inf] at hu
+    have huMstar : (M.subtype u) ∈ Mstar :=
+      (Subgroup.mem_inf.mp (Subgroup.mem_subgroupOf.mp hu.2)).2
+    have hmem_star : (M.subtype c) * (M.subtype u) ∈ Mstar := Mstar.mul_mem hcMstar huMstar
+    rwa [← map_mul, hcu] at hmem_star
   -- If `ℳ(N_G(Z)) = {M}`, then `N_G(Z) ≤ M`, so `N_G(Z) = N_M(Z) ⊆ M⋆`, forcing `M⋆ = M`.
   intro hsing
   have hMmem : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (Z : Set G)) := by
