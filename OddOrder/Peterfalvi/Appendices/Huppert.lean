@@ -219,6 +219,77 @@ theorem pointStabilizer_eq_of_components_of_constant [Finite P]
     rw [← hinfba]; exact (hconst (b * a) b hba1 hb1).ge
   exact le_antisymm (hPa ▸ inf_le_right) (hPb ▸ inf_le_right)
 
+/-- **Peterfalvi Appendix B, Lemma, part (1)** (full): a `P`-permuted independent
+family decomposition `E = ⨆ S i` with `≥ 2` nontrivial members, a faithful odd-order
+action, and a constant point-stabilizer order, force the action to be
+fixed-point-free.
+
+Proof (p. 135): for a fixed `a₀ ∈ S i₀^#`, every `x ∈ P_{a₀}` fixes each summand
+pointwise — `P_{a₀} = P_s` for `s ∈ S k^#` (directly if `k ≠ i₀`, else bridged
+through a third summand via `pointStabilizer_eq_of_components_of_constant`) — hence
+fixes `⨆ S i = E`, so `φ x = 1` and `x = 1`; thus `P_{a₀} = ⊥`, and by constancy
+`P_a = ⊥` for every `a ≠ 1`. -/
+theorem fpf_of_constant_stabilizer_of_permuted_decomp [Finite P]
+    {ι : Type*} {S : ι → Subgroup E} (hindep : iSupIndep S) (hsup : ⨆ i, S i = ⊤)
+    (hcomm : ∀ y z : E, y * z = z * y)
+    (φ : P →* MulAut E) (hfaithful : Function.Injective φ)
+    (perm : P → Equiv.Perm ι)
+    (hperm : ∀ (x : P) (k : ι), (S k).map (φ x).toMonoidHom = S (perm x k))
+    (hPodd : ∀ x : P, Odd (orderOf x))
+    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+      Nat.card (pointStabilizer φ a) = Nat.card (pointStabilizer φ b))
+    (htwo : ∃ i₁ i₂ : ι, i₁ ≠ i₂ ∧ S i₁ ≠ ⊥ ∧ S i₂ ≠ ⊥) :
+    ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  have peq : ∀ {i j : ι} {a b : E}, i ≠ j → a ∈ S i → b ∈ S j → a ≠ 1 → b ≠ 1 →
+      pointStabilizer φ a = pointStabilizer φ b :=
+    fun hij ha hb ha1 hb1 =>
+      pointStabilizer_eq_of_components_of_constant hindep hcomm φ perm hperm hPodd hconst
+        hij ha hb ha1 hb1
+  have hother : ∀ k : ι, ∃ m, m ≠ k ∧ S m ≠ ⊥ := by
+    obtain ⟨i₁, i₂, h12, hn1, hn2⟩ := htwo
+    intro k
+    rcases eq_or_ne k i₁ with rfl | hk1
+    · exact ⟨i₂, Ne.symm h12, hn2⟩
+    · exact ⟨i₁, Ne.symm hk1, hn1⟩
+  obtain ⟨i₀, _, _, hi₀nt, _⟩ := htwo
+  obtain ⟨a₀, ha₀, ha₀1⟩ := (S i₀).bot_or_exists_ne_one.resolve_left hi₀nt
+  have hPa0_bot : pointStabilizer φ a₀ = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_bot]
+    have hfix_summand : ∀ (k : ι) (s : E), s ∈ S k → (φ x) s = s := by
+      intro k s hsk
+      rcases eq_or_ne s 1 with rfl | hs1
+      · exact map_one (φ x)
+      · have hPas : pointStabilizer φ a₀ = pointStabilizer φ s := by
+          rcases eq_or_ne k i₀ with hki | hki
+          · have hsk' : s ∈ S i₀ := hki ▸ hsk
+            obtain ⟨m, hmi, hmnt⟩ := hother i₀
+            obtain ⟨c, hcm, hc1⟩ := (S m).bot_or_exists_ne_one.resolve_left hmnt
+            exact (peq (Ne.symm hmi) ha₀ hcm ha₀1 hc1).trans
+              (peq (Ne.symm hmi) hsk' hcm hs1 hc1).symm
+          · exact peq (Ne.symm hki) ha₀ hsk ha₀1 hs1
+        exact mem_pointStabilizer.mp (hPas ▸ hx)
+    have htop : actionFixedBy φ x = ⊤ := by
+      rw [eq_top_iff, ← hsup, iSup_le_iff]
+      intro k s hsk
+      exact mem_actionFixedBy.mpr (hfix_summand k s hsk)
+    have hφx1 : φ x = 1 := by
+      ext e
+      have he : e ∈ actionFixedBy φ x := by rw [htop]; exact Subgroup.mem_top e
+      simpa using mem_actionFixedBy.mp he
+    exact hfaithful (hφx1.trans (map_one φ).symm)
+  intro x hx1
+  rw [eq_bot_iff]
+  intro a ha
+  rw [Subgroup.mem_bot]
+  by_contra ha1
+  have hPa_bot : pointStabilizer φ a = ⊥ :=
+    Subgroup.eq_bot_of_card_eq _ (by rw [hconst a a₀ ha1 ha₀1, hPa0_bot, Subgroup.card_bot])
+  have hxa : x ∈ pointStabilizer φ a := mem_pointStabilizer.mpr (mem_actionFixedBy.mp ha)
+  rw [hPa_bot, Subgroup.mem_bot] at hxa
+  exact hx1 hxa
+
 /-- **Peterfalvi Appendix B, Lemma — cyclic conclusion** for an elementary
 abelian module.  A `p`-group `P` (`p` odd) acting faithfully and fixed-point-freely
 on a nontrivial elementary abelian `q`-group `E` is cyclic.

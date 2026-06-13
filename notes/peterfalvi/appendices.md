@@ -76,10 +76,15 @@ conjugation Equiv で). sorry 不変 (2→2)。
       `pointStabilizer_mul_eq_inf_of_components` (P_{a·b}=P_a⊓P_b ⟸ key step + map_mul) /
       `mul_ne_one_of_components` (a·b≠1 ⟸ disjoint) / `pointStabilizer_eq_of_components_of_constant`
       (定 stab ⟹ P_a=P_b; `Subgroup.eq_of_le_of_card_ge` で P_a⊓P_b=P_a 両向き)。
-- [ ] **part (1) 残 (FPF 結論)**: ある S_{i₀}^# の a₀ で P_{a₀}=⊥ を示す (x∈P_{a₀} は P_a=P_b 経由で
-      全 S_k を pointwise 固定 ⟹ actionFixedBy=⊤ ⟹ φx=1 ⟹ x=1 faithful) → 定 stab で全 a に伝播
-      (|P_a|=|P_{a₀}|=1)。⚠ 要 ≥2 nontrivial summands + index juggling。FPF↔pointStab=⊥ bridge も。
-- [ ] **imprimitive 分解 `E=⊕Eᵢ` 存在 (Maschke/Clifford)** + part (2) `E=⊕C_E(T_i)` + Schur。
+- [x] **part (1) 完成** ✅ `fpf_of_constant_stabilizer_of_permuted_decomp` (complete, axiom-clean,
+      session 6): `iSupIndep S` + `⨆S=⊤` + ≥2 nontrivial summands + faithful + 奇位数 + 定 stabilizer
+      ⟹ FPF (`∀x≠1, actionFixedBy φ x=⊥`)。a₀∈S_{i₀}^# で P_{a₀}=⊥ (x∈P_{a₀} は P_a=P_b 経由で全 S_k
+      pointwise 固定 ⟹ actionFixedBy=⊤ ⟹ φx=1 ⟹ x=1) → 定 stab で全 a 伝播。⚠ subst 方向: `eq_or_ne k i₀`
+      は `rfl` だと i₀ 消える → `hki` 保持 + `hki ▸ hsk`。**Appendix B Lemma part (1) は完投**。
+- [ ] **imprimitive 分解 `E=⊕Eᵢ` 存在 (Maschke/Clifford)**: 既約でない coprime 加群 → P-置換される
+      isotypic/imprimitive 分解。これと part (1) で Lemma の reducible ケース。**残 setup の本丸**。
+- [ ] **part (2) (既約ケース)**: P 既約 → cyclic なら直接 FPF; 非 cyclic なら R⊴P type-(p,p) + Schur
+      (`IsSimpleModule.End`) + `E=⊕C_E(T_i)` → part (1)。Schur over F_q の materialize 要。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
 - [x] **Prop 1 abelian-quotient step** ✅ `commutator_le_fitting_of_isCyclic_fitting` (complete, axiom-clean,
