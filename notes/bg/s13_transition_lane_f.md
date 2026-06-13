@@ -157,3 +157,18 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
   `centralizer_le_centralizer_of_tau1`; dichotomy=`rcases lt_or_eq_of_le hle`。
   **残 = step 5 のみ** (`exfalso` 後の内側 sorry 1 個; hlt : fixedBy E₁ < fixedBy E₃ から False)。
   step 5 の詳細手順 (a)-(g) は上記マップ参照。次イテレーションで step 5 を書いて 13.7 完成。
+- 2026-06-14 (Lane F, /loop 続き⁴): **🎉 13.7 (E1E3_actsPrime) body COMPLETE・sorry-free**。
+  step 5 を named lemma `strict_centralizer_config_false` (docstring に (a)-(g) plan) へ隔離。
+  **残り Lane F の 13.7 work = この 1 lemma の証明のみ** (sorry-neutral)。
+  ### step 5 grind 戦略 (次イテレーション〜)
+  step 5 は BG 13.4 (`S13_Theorem134.lean` の per_q_centralizes / alpha_fixed_le_fixed) の
+  M* 論法を mirror するのが近道 — 共通ツール: `maximalSubgroupsContaining (N_G ·)` 抽出
+  (`actsPrimeOn_Msigma_of_mem_tau13` の coatom パターン)、Cor 13.2 `tau13_pSubgroup_centralizes`、
+  Lem 12.18、`exists_subgroupESetup` (M*用)。**要 handle 調査 (まだ未確定)**:
+  - **R⊲E** (E≤normalizer R): R∈ℰ_r¹(E₃) は cyclic E₃ の唯一の位数 r 部分群 ⟹ char ⟹
+    E≤norm E₃ から E≤norm R。cyclic-unique-subgroup 補題が要。
+  - **τ₂(M) empty → E₂=⊥ → E=E₁⊔E₃** (step a→g 接続): `elemAb_normal_in_E_of_tau2` の
+    component `∀x∈E₃#, M_σ⊓C{x}=⊥` の対偶で「∃p∈τ₂,A∈ℰ_p²」を排除 → E₂=⊥。E=E123 補題 + E₂ Hall。
+  - **r∈σ(M*) → R≤M*_σ**: `opiCoreInG_singleton_le_Msigma_of_mem_sigma` 系 (S10_HallStructure:744)。
+  - **E₁ ⊆ Hall τ₁(M*)**: π(E₁)⊆τ₁M* + E₁≤M* → Hall に埋め込む (`exists_conj_smul_le_hallPiece` 系?)。
+  これらが揃えば (a)-(g) を直線的に書ける。1-2 iteration 見込み。
