@@ -204,6 +204,37 @@ conjugation Equiv で). sorry 不変 (2→2)。
 - **改訂 攻略順**: **Prop 2 (Huppert.lean, 次の主目標, tractable)** → Appendix C/D → Lemma 非cyclic (issue 2004 待ち)。
   既存 scaffold: `NearFields.lean`/`Suzuki2Groups.lean`/`FeitSibley.lean`/`Suzuki.lean` (各 ~2.5-5.6k, opaque, 要 audit)。
 
+### ✅ session 5 (2026-06-14): Prop 2 形式化 — 設計確定 + mathlib 部品検証 (probe で実証)
+**目標**: Appendix I Prop 2 を `OddOrder/Peterfalvi/Appendices/SemilinearField.lean` (新 leaf) に。
+**検証済 mathlib 部品** (全て probe build で確認):
+- 作用→表現: `(mulAutToEnd E p).comp ψ : Representation (ZMod p) T (Additive E)` (`mulAutToEnd` =
+  `OddOrder.BG.Ch1_Preliminary`, `OperatorMaschke.lean:140`)。module = `AddCommGroup.zmodModule hpsmul`
+  (hpsmul : ∀ x:Additive E, p•x=0)。
+- 既約⟺単純: `Representation.irreducible_iff_isSimpleModule_asModule ρ : IsIrreducible ρ ↔ IsSimpleModule k[T] ρ.asModule`
+  (mathlib `RepresentationTheory/Irreducible.lean`)。`IsIrreducible ρ = IsSimpleOrder (Subrepresentation ρ)`。
+- Schur: `Mathlib/RingTheory/SimpleModule/Basic.lean:530` `[DecidableEq (End)][IsSimpleModule R M] → DivisionRing (Module.End R M)`。
+- 有限除環=体: `littleWedderburn` (instance, `LittleWedderburn.lean:166`, priority 100, 自動)。
+- 単純⟹1次元: `isSimpleModule_iff_finrank_eq_one {R}[DivisionRing R] : IsSimpleModule R M ↔ finrank R M = 1`
+  (`SimpleModule/Rank.lean:17`)。
+- 1次元⟹|F|=|E|: `FiniteField.pow_finrank_eq_natCard` 系 / `card = (card F)^finrank` (PRank に既出パターン)。
+**🔑 設計 (probe で確定): 抽象 core + bridge の 2 層**:
+- **core** = 抽象 `k[T]`-module 上で述べる: `variable {k}[Field k][Finite k]{T}[CommGroup T][Finite T]
+  {M}[AddCommGroup M][Module (MonoidAlgebra k T) M][Finite M][IsSimpleModule (MonoidAlgebra k T) M]`
+  → `End_{k[T]}(M)` は体 (✅ probe9 で tactic-mode build 通過: `Finite.of_injective _ DFunLike.coe_injective`
+  で End 有限 → littleWedderburn)。残: `finrank (End) M = 1` (M を End 上単純にする or 像 F=𝔽_p[T] 経由) + |·|。
+- **bridge** = multiplicative E + φ から core を起動 (M := ρ.asModule, instances を term-mode で供給)。
+**🛑 GOTCHAS (probe で判明・再調査不要)**:
+  1. `Group+IsMulCommutative→CommGroup` は **scoped instance** (`Defs.lean:1391`) ⟹ `open scoped IsMulCommutative` 必須。
+  2. ρ は `let ρ := ...` で導入 (**`set` は asModule instance 解決を阻害**)。
+  3. **ZMod p の Field-vs-CommSemiring diamond**: `[Fact p.Prime]` が Field-path semiring を強制 →
+     core を `ZMod p` でなく **generic `[Field k]`** で述べ、bridge で `k := ZMod p` 起動 (probe C/D/E で回避確認)。
+  4. **noncomputable `asModule` Module instance は term-mode で解決するが tactic-mode (`letI/haveI := inferInstance`)
+     で失敗** (probe7/8) ⟹ core を **抽象 `[Module (MonoidAlgebra k T) M]`** で述べ asModule を core 内で使わない (probe9 で解決)。
+  5. `Finite ρ.asModule` は `inferInstanceAs (Finite (Additive E))` (asModule は def, 自動 Finite 不発)。
+  6. 定義は `noncomputable` (Module instance が noncomputable)。
+**次 session**: leaf 作成 → core (Field 部 done, finrank=1 を詰める) → bridge → Prop 2(a)、その後 (b) semilinear。
+sorry を増やさない方針ゆえ **core を sorry-free にしてから commit** (中間 sorry leaf は出さない)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
