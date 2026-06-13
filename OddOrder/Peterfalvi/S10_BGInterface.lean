@@ -55,6 +55,22 @@ theorem maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II [Finite G]
   (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.2.2.2.2.mpr
     (hType.imp_right Or.inl)
 
+/-- **Type dictionary (Prop 16.1)**: Peterfalvi type I = BG type `F`.  Used to
+translate the BG §14--§16 endpoints (whose conclusions are stated with `S14.IsTypeF`)
+into the shared `IsTypeI` predicate that Peterfalvi §10--§13 uses. -/
+theorem isTypeI_iff_isTypeF [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    IsTypeI M ↔ OddOrder.BG.Ch4.S14.IsTypeF M :=
+  (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).1
+
+/-- **Type dictionary (Prop 16.1)**: Peterfalvi type II = BG type `P2`.  The
+companion of `isTypeI_iff_isTypeF` for translating BG endpoints stated with
+`S14.IsTypeP2` (e.g. the type alternatives in Theorem II / Corollary 15.9). -/
+theorem isTypeII_iff_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    IsTypeII M ↔ OddOrder.BG.Ch4.S14.IsTypeP2 M :=
+  (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.1
+
 /-! ## Hall structure of `M_F` (the `(8.11)` first conjunct, types I/II) -/
 
 /-- A `π`-Hall subgroup is also a Hall subgroup for the prime factors of its own
