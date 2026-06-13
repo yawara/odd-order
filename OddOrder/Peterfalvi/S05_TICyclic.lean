@@ -81,6 +81,70 @@ theorem toDadeHypothesis_isTISubset (hyp : TICyclicHypothesis G) :
   (hyp.toDadeHypothesis).isTISubset_of_forall_H_eq_bot
     (fun a => hyp.toDadeHypothesis_H a)
 
+/-- **Transfer a TI-cyclic Hypothesis (3.1) along an injective homomorphism.**
+
+Every *structural* field of `TICyclicHypothesis` is preserved by the image under an injective
+`φ : H →* G`: the `W`-block stays cyclic / coprime / disjoint / odd because `φ` restricts to an
+isomorphism `W ≃* W.map φ` onto its image, and the support `V` keeps its `sharp` / `⊆ W` /
+`W`-normalized shape under `φ`.  The **only** field that does not transfer for free is the
+TI condition `V_ti`: trivial intersection in the ambient group `G` quantifies over *all* of `G`
+(not just the image `φ '' H`), so it is supplied as the hypothesis `hVti`.
+
+This isolates the ambient TI fact — Peterfalvi (4.6.b), the `G`-version of the (4.3.a)
+`(3.1)`-for-`L` setup — as the sole genuine input when lifting the §6 hypothesis
+`CertainTypeHypothesis.toTICyclicHypothesis : TICyclicHypothesis ↥L` to the ambient group `G`
+along `L.subtype`. -/
+noncomputable def mapOfInjective {H G : Type*} [Group H] [Group G] [Fintype H] [Fintype G]
+    (hyp : TICyclicHypothesis H) (φ : H →* G) (hφ : Function.Injective φ)
+    (hVti : OddOrder.GroupTheory.IsTISubset (φ '' hyp.V) (hyp.W.map φ)) :
+    TICyclicHypothesis G where
+  W := hyp.W.map φ
+  W1 := hyp.W1.map φ
+  W2 := hyp.W2.map φ
+  W1_le_W := Subgroup.map_mono hyp.W1_le_W
+  W2_le_W := Subgroup.map_mono hyp.W2_le_W
+  W1_nontrivial := by
+    rw [ne_eq, Subgroup.map_eq_bot_iff, (MonoidHom.ker_eq_bot_iff φ).mpr hφ, le_bot_iff]
+    exact hyp.W1_nontrivial
+  W2_nontrivial := by
+    rw [ne_eq, Subgroup.map_eq_bot_iff, (MonoidHom.ker_eq_bot_iff φ).mpr hφ, le_bot_iff]
+    exact hyp.W2_nontrivial
+  W_sup := by rw [← Subgroup.map_sup, hyp.W_sup]
+  W_disjoint := by
+    rw [Subgroup.disjoint_def]
+    rintro y hy1 hy2
+    obtain ⟨a, ha1, rfl⟩ := Subgroup.mem_map.mp hy1
+    obtain ⟨b, hb2, hba⟩ := Subgroup.mem_map.mp hy2
+    have ha2 : a ∈ hyp.W2 := (hφ hba) ▸ hb2
+    rw [Subgroup.disjoint_def.mp hyp.W_disjoint ha1 ha2, map_one]
+  W_card_coprime := by
+    rw [Subgroup.card_map_of_injective hφ, Subgroup.card_map_of_injective hφ]
+    exact hyp.W_card_coprime
+  W_card_odd := by
+    rw [Subgroup.card_map_of_injective hφ]; exact hyp.W_card_odd
+  W_cyclic := by
+    haveI := hyp.W_cyclic
+    exact isCyclic_of_surjective (hyp.W.equivMapOfInjective φ hφ).toMonoidHom
+      (hyp.W.equivMapOfInjective φ hφ).surjective
+  V := φ '' hyp.V
+  V_subset_sharp := by
+    rintro _ ⟨x, hx, rfl⟩
+    have hxs : x ≠ 1 := by
+      have := hyp.V_subset_sharp hx
+      simpa [OddOrder.Peterfalvi.S04.sharp] using this
+    change φ x ∈ Set.univ \ ({1} : Set G)
+    simp only [Set.mem_diff, Set.mem_univ, Set.mem_singleton_iff, true_and]
+    exact fun hc => hxs (hφ (hc.trans (map_one φ).symm))
+  V_subset_W := by
+    rintro _ ⟨x, hx, rfl⟩
+    exact Subgroup.mem_map_of_mem φ (hyp.V_subset_W hx)
+  W_normalizes_V := by
+    rintro w v ⟨x, hx, rfl⟩
+    obtain ⟨w', hw', hweq⟩ := Subgroup.mem_map.mp w.2
+    refine ⟨w' * x * w'⁻¹, hyp.W_normalizes_V ⟨w', hw'⟩ hx, ?_⟩
+    rw [map_mul, map_mul, map_inv, hweq]
+  V_ti := hVti
+
 /-- The supported class-function space `CF(W,V)` used by (3.2)-(3.5). -/
 abbrev SupportedOnV (k : Type*) [CommRing k] (hyp : TICyclicHypothesis G) :=
   OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) k hyp.V hyp.W

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S06_CertainHypothesis46
 import Mathlib.GroupTheory.Solvable
 import Mathlib.GroupTheory.Nilpotent
 import Mathlib.GroupTheory.Complement
@@ -3295,22 +3296,33 @@ structure SibleyDadeHypothesis (G : Type*) [Group G] [Fintype G] [Invertible (Na
   /-- Peterfalvi (6.8)(c): the configuration is one of two cases.
 
   * **(c1)** `L` is a Frobenius group with kernel `H` and complement `W₁`.
-  * **(c2)** Hypothesis (4.6) holds — encoded by a `S06.CertainTypeHypothesis` on the *same* Dade
-    datum (`cert.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime, `W₂ ⊆ [H,H]`, and
-    the Hall coprimality `gcd(|H|, |W₁|) = 1` (Peterfalvi (4.2.a): `W₁` is a cyclic *Hall* subgroup
-    of `L = H ⋊ W₁`, so its order is coprime to `|H| = [L : W₁]`).  This coprimality is the input to
-    Isaacs (3.28) that lifts a `W₁`-fixed coset of `H/[H,H]` to a `W₁`-fixed element of `H`.
+  * **(c2)** Hypothesis (4.6) holds — encoded **faithfully** by a `S06.Hypothesis46` (the *full*
+    (4.6): the (4.2) structure plus the ambient (3.1) TI-cyclic `tic` for `(G, W)` (4.6.b), the
+    covering `A_covers` (4.6.d), and the enlarged Dade datum `dade0`/`tau` on `A₀ = A ∪ Vᴸ`) on
+    the *same* Dade datum (`h46.dade = dade`) whose kernel is `K = H` — with `w₂ = |W₂|` prime,
+    `W₂ ⊆ [H,H]`, and the Hall coprimality `gcd(|H|, |W₁|) = 1` (Peterfalvi (4.2.a): `W₁` is a
+    cyclic *Hall* subgroup of `L = H ⋊ W₁`, so its order is coprime to `|H| = [L : W₁]`).  This
+    coprimality is the input to Isaacs (3.28) that lifts a `W₁`-fixed coset of `H/[H,H]` to a
+    `W₁`-fixed element of `H`.
 
-  The (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H` (hence `cert.K = H`), and the
-  (4.2)/(6.8) complement is shared (`cert.W1 = W1`, both giving `L = H ⋊ W₁`). With the S06 audit
-  done (`S06.CertainTypeHypothesis` now faithfully encodes (4.2): the false `W₁ ⊔ W₂ = ⊤` removed,
-  and complement / cyclic / `W₂ ≤ K` / `C_K(x) = W₂` / odd-`W` added), this matches textbook
-  (6.8)(c2). -/
+  The (4.6)↔(6.8) renaming sets the (4.6)-kernel `K` to the (6.8) `H` (hence `h46.K = H`), and the
+  (4.2)/(6.8) complement is shared (`h46.W1 = W1`, both giving `L = H ⋊ W₁`).
+
+  **Faithfulness note (2026-06-13):** the textbook (6.8)(c2) literally reads "Hypothesis (4.6)
+  holds" (mmd 04.8 L146), and (4.6) (mmd 04.6 L53-63) includes (4.6.b) "G and W satisfy (3.1)" —
+  i.e. the ambient TI-cyclic on `W − W₂`.  This is *not* derivable from a bare
+  `CertainTypeHypothesis` (which carries only the (4.2) structure on `↥L` plus the §4 Dade datum on
+  `A`): TI in the ambient `G` quantifies over all of `G`, not just `↥L`, so it cannot be lifted from
+  the (4.3.a) TI in `↥L`.  The earlier `cases` encoding used the *weaker* `CertainTypeHypothesis`,
+  which made the c2 X-coherence un-constructible (the impossible "build the ambient TI from
+  nothing").  Strengthening `cases` to `Hypothesis46` restores faithfulness and moves the
+  (4.6)-construction obligation to the `SibleyDadeHypothesis` *producer* (the §9 (7.10) application,
+  where the maximal-subgroup structure supplies it), exactly as the textbook does. -/
   cases :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H W1 ∨
-    ∃ cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L,
-      cert.dade = dade ∧ cert.K = H ∧ cert.W1 = W1 ∧
-        (Nat.card cert.W2).Prime ∧ cert.W2 ≤ ⁅H, H⁆ ∧
+    ∃ h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L,
+      h46.dade = dade ∧ h46.K = H ∧ h46.W1 = W1 ∧
+        (Nat.card h46.W2).Prime ∧ h46.W2 ≤ ⁅H, H⁆ ∧
         Nat.Coprime (Nat.card ↥H) (Nat.card W1)
 
 /-- **(T7-c2 case A, brick ①)** A multiplicative `ℂ`-valued function `f` (e.g. a linear character)
@@ -3861,11 +3873,12 @@ theorem isIrreducibleCharacter_induce_of_degree_one (hyp : SibleyDadeHypothesis 
     IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
   letI : H.Normal := hyp.H_normal
   haveI : Fintype ↥H := Fintype.ofFinite _
-  rcases hyp.cases with hF | ⟨cert, _hdade, hK, hW1, _hprime, hW2, hcop⟩
+  rcases hyp.cases with hF | ⟨h46, _hdade, hK, hW1, _hprime, hW2, hcop⟩
   · exact isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ_ne
   · -- (c2) inertia bridge: `I_L(θ) = H` via the abelian quotient `H/⁅H,H⁆` (Brauer + Isaacs 3.28).
+    -- `cases` now carries the full `Hypothesis46`; project to the underlying `CertainTypeHypothesis`.
     exact isIrreducibleCharacter_induce_of_inertia_eq θ
-      (hyp.inertia_eq_H_of_c2 cert hK hW1 hW2 hcop hθ_one hθ_ne)
+      (hyp.inertia_eq_H_of_c2 h46.toCertainTypeHypothesis hK hW1 hW2 hcop hθ_one hθ_ne)
 
 /-- **(6.8) `Y = S(H')` coherence (engine call from a constructed family).**  Given a family of
 nontrivial linear source characters `χ_j : H →* ℂˣ` indexed by `Fin n` (`n ≥ 2`), pairwise

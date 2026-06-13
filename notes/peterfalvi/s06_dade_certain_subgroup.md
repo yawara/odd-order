@@ -2335,3 +2335,310 @@ supp μ_j⊆A∪{1}、差は1で消える)。
 4. **capstone** `certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau)
    (certainTypeSet h k) (supportInSubgroup A L)` (要 k≠1)、5 field 組立。→ S08 case-B。
 **正本=本 session 37 cont.。field 4 核心 DONE; 次 = generated-by-differences Finsupp lemma。**
+
+## 2026-06-13 (session 37 cont.², /loop): 🎉🎉🎉 Peterfalvi (4.9)(b) COMPLETE — certain-type coherence
+
+**`certainType_isCoherent`** (S06_CertainTypeCoherence, capstone `187b5517`, axiom-clean, full build
+3794 + AxiomsCheck OK)。**Theorem (4.9)(b) 完全形式化** — Dade 写像 `τ = dadeIntegralCharacterMap
+h.dade0 h.tau` は certain-type 集合 `𝒯` 上 coherent:
+`S07.IsCoherent τ (certainTypeSet h k) (S04.supportInSubgroup A L)` (要 `k ≠ 1`)、5 field 全証明:
+
+- **field 2 (extension)** = `certainTypeExtension h` (μ_ij ↦ δ_j ω_ij^σ)。
+- **field 3 (isometry)** = `certainTypeExtension_inner_eq` (span_induction₂)。
+- **field 4 (τ-agree)** = `certainTypeExtension_eq_dade_of_mem_zSupportedSpan`:
+  generator `certainTypeExtension_columnDiff_eq_dade` (核心、`IsDadeMap.unique` + (4.8) summed) +
+  生成 `mem_span_columnDiff_of_mem_zSupportedSpan` (sup-decomp `Z[𝒯] ≤ D ⊔ ℤ·μ_k`、1∉A=`h.dade0.ne_one`、
+  μ_k(1)≠0=`irreducibleCharacter_apply_one_eq_pos_natCast`) + `eq_on_zSpan_of_eq_on`。
+- **field 5 (ZIrr)** = `certainTypeExtension_mem_ZIrr` (span_induction + `sigma_mem_ZIrr`)。
+- **field 1 (nonzero)** = `certainType_nonzero`: μ̄_k−μ_k (μ̄_k=μ_{k⁻¹}∈𝒯、`columnSum_inv_apply_one`
+  [複素共役は実次数固定: `map_natCast`]、≠0=`certainType_columnSum_conj_ne`)。
+
+session 37 全体 = **10 commits** (foundation→𝒯+ZIrr→isometry→support infra→field4 infra→generator
+agreement→field4→nonzero+capstone + notes×2)。**§5 (3.x) + §6 (4.1)-(4.9) 全 COMPLETE。**
+
+### ▶▶ 次 = case-B 配線 or (4.10) (session 38 で RECON 要)
+
+**(4.9) は S08 case-B (`sibleySetup_is_coherent` の CertainType branch / S08 sole sorry) の入力。**
+残る選択肢:
+1. **S08 case-B 配線** (本命): certain-type `Hypothesis46` ↔ Sibley setup の接続を精査し、
+   `certainType_isCoherent` を X-chain coherence に注入。**大 glue** (S08 X-nonempty sorry は
+   Frobenius/CertainType case split + per-step data + 合成 ν の構築要; (4.9) は CertainType 側の
+   coherence 供給のみ)。RECON 必須: S08_CoherenceTheorems:59 sorry の構造、何が Hypothesis46 を
+   構成するか、certainType_isCoherent をどの interface に渡すか。
+2. **(4.10)** (`(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`): (4.9) 非依存の
+   補助恒等式。(4.8) generator + grid 拡張で書けそうだが case-B critical path 外の可能性。
+**推奨第一手 = S08 case-B sorry (S08_CoherenceTheorems:46-59) を Read して配線可能性を RECON**。
+**正本=本 session 37 cont.²。(4.9)(b) COMPLETE; 次 = case-B 配線 RECON。**
+
+## 2026-06-13 (session 37 cont.³, /loop): S08 case-B 配線 RECON 結論 + 次 = (4.10)
+
+**RECON 結論: S08 case-B 配線は単発 plug-in でなく §8 (6.8) 大 assembly** (正本=notes/peterfalvi/s08_6_8_assembly_plan.md, 96KB, T0-T11 DAG)。
+- `sibleySetup_is_coherent` (S08_CoherenceTheorems:46) X-nonempty branch sorry (:59) = Frobenius/CertainType
+  case split (`hyp.cases : IsFrobeniusGroup ∨ ∃ cert:CertainTypeHypothesis…`) で X=S−S(Z) coherence を
+  Y=S(H') coherence と §7 engine `coherentUnion_of_glued` で gluing。
+- **Sibley case-B (`cases.inr`) は `cert : S06.CertainTypeHypothesis (sharpImage H) L` + (w₂ prime/W₂⊆[H,H]/
+  Coprime|H||W1|/cert.dade=dade/cert.K=H/cert.W1=W1) を供給 — `Hypothesis46` ではない。** ⟹ (4.9)
+  `certainType_isCoherent` を使うには **Hypothesis46-from-Sibley bridge** (tic/dade0/tau/subH/A_covers の
+  構成、(3.1)-for-W + (4.6.c/d) 確立) が要、substantial。
+- Frobenius path は概ね構築済 (B engine surgery 完, `Xset_commutator_isCoherent…_of_frobenius` +
+  `peterfalvi_66_coherence_of_X_from_dade`)。c2 path は open blocker 多数 (T6 inertia discharge / Y-family
+  construction / c2 inertia / T10 case-B gluing)。**T7 c2 X-char は (4.5)✓ 使用。**
+- ⟹ **case-B は §8 program の大仕事で Lane B 単独 cold engage は overlap/risk。(4.9) は necessary input
+  (供給済) だが gluing machinery が bulk。** 戦略判断 (case-B 大 assembly に commit するか) はユーザー/合流調整向き。
+
+**次 = (4.10)** (§6 最終結果、章完結): `(δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00)^τ = ω_ij^σ−ω_0j^σ−ω_i0^σ+ω_00^σ`。
+原文「(4.8) と同様」= 同じ V-vanishing+trichotomy 論法 (`sigmaCoeff_trichotomy` 消費)。(4.3.b)
+`σ(ω_ij)=δ_j μ_ij` + (4.8) step-4 engine (`certainType_diff_dade_apply_eq_of_mem_V` 等) を 4-corner
+combination に適用。(4.8) conclusion-3 (`certainType_diff_dade_eq`) の隣接 row+column 版。
+in-lane・(4.8)/(4.9) infra 流用可・§6 完結。**正本=本 session 37 cont.³。次 = (4.10)。**
+
+## 2026-06-13 (session 37 cont.⁴, /loop): (4.10) code-ready plan (ユーザー裁可: (4.10) で §6 完結)
+
+ユーザーが「(4.10) で §6 完結」を選択。RECON 完了、code-ready 計画:
+
+**(4.10) statement**: `(δ_j μ_ij − δ_j μ_0j − μ_i0 + μ_00)^τ = ω_ij^σ − ω_0j^σ − ω_i0^σ + ω_00^σ`
+(0≤i<w₁, 0≤j<w₂; τ=h.tau.toDadeMap, σ=certainTypeOmegaSigma)。
+
+**🔑 確定した reduction (再調査不要)**:
+- **W-side 4-corner α = alphaCF**: `alphaCF_eq_omega_combination` (S05_TICyclic:659) =
+  `(ticVdiff h).alphaCF χ₁ χ₂ = ω(1) − ω(χ₁∘wFst) − ω(χ₂∘wSnd) + ω((χ₁∘wFst)·(χ₂∘wSnd))`
+  = 1_W − ω_i0 − ω_0j + ω_ij。**Supp α ⊂ V** = `alphaCF_mem_supportedSubmodule` (S05_TICyclic:511, (3.4))。
+- **RHS = σ_G(α)**: `certainTypeOmegaSigma = (ticVdiff h).sigma rfl app (omega …)`、4-corner は
+  σ の線形性 + `alphaCF_eq_omega_combination` で `(ticVdiff h).sigma rfl app (alphaCF)`。
+- **🔑 `sigma_eq_tau` (S05_SigmaIsometry:1098)**: `hyp.sigma hVeq app (α:CF) = app.tau.toDadeMap α`
+  for `α : SupportedOnV ℂ hyp` ⟹ **σ_G(alphaCF) = (ticVdiff h).tau.toDadeMap (alphaCF-on-V)**。
+- **LHS = h.tau.toDadeMap (Ind_W^L alphaCF)**: β = δ_j μ_ij−δ_j μ_0j−μ_i0+μ_00 = Ind_W^L alphaCF。
+  via (1.4) image `columnFamily_spec`/`isometryDifferenceImage_induceZ` (`Ind(ω_ij−ω_0j)=δ_j(μ_ij−μ_0j)`)
+  + col-0 (χ₂=1, δ_0=1 by (4.4))。
+
+**⟹ (4.10) = Dade-induction compatibility `h.tau.toDadeMap (Ind_W^L α) = (ticVdiff h).tau.toDadeMap α`**
+(α ∈ CF(W,V))。両辺 class function on G、V-vanishing 論法で証明 ((4.8) step-4
+`certainType_diff_dade_apply_eq_of_mem_V` の pattern):
+- v∈V: 両辺 = value (h.tau: `tau_toDadeMap_apply_of_mem` on A₀⊇V^L; ticVdiff.tau: V-value)。
+- g∉V^G: 両辺 vanish (h.tau: `map_eq_zero_of_not_mem_dadeSupport`, β supp⊂V^L⟹dade image supp⊂V^G;
+  ticVdiff.tau(α): α supp⊂V⟹ image supp⊂V^G)。
+- assembly: class-function invariance で V→V^G、それ以外 0。
+
+**piece 順**: (a) `β = Ind_W^L alphaCF` (1.4 image, col-0 δ_0=1) → (b) Supp β⊂A₀ (supported β 構成) →
+(c) value-on-V (mirror 4.8 step-4, `sigma_eq_tau` for RHS) → (d) off-V^G vanishing 両辺 → (e) assembly
+(`ClassFunction.ext` + V^G class-fn 論法)。**~3-5 commits, §4 Dade-support 機構の deep dive だが trichotomy 不要**。
+**正本=本 session 37 cont.⁴。次 = (4.10) piece (a) から coding。**
+
+## 2026-06-13 (session 37 cont.⁵, /loop): (4.10) piece (a) landed; piece (b1) STOP — W-coord `1` 罠
+
+✅ **piece (a) `fourcorner_signedDiff_eq_induce`** landed (`fa5a578e`, S06_CertainTypeFourCorner, axiom-clean,
+full build 3795): `δ_j(μ_ij−μ_0j) − δ_0(μ_i0−μ_00) = Ind_W^L(sdiff 4-corner)` via columnFamily_spec +
+`h.isometryDifferenceImage_induceZ` (← **Hypothesis method, dot 修飾必須**) + induceLinear/map_sub
+(induce_sub 無)。
+
+🛑 **piece (b1) `chiColumn 4-corner = alphaCF` STOP (~8 試行、真の W-coord 罠)**: 目標
+`(chiColumn χ₂ i − chiColumn χ₂ 0 − (chiColumn 1 i − chiColumn 1 0)) = sdiff.alphaCF (w1CharEquiv i) χ₂`。
+pointwise (alphaCF_apply+omega_apply+omegaProdChar+ring) も omega-combination (abel) も**同じ箇所で詰む**:
+**`(1 : M →* ℂˣ)(x) = 1` の simp が発火しない** (`MonoidHom.one_apply` も `MonoidHom.one_comp` も unused、
+full simp も不可)。**根本原因**: chiColumn の χ₂=1 列 / w1CharEquiv 0=1 行で出る `1` の domain は
+`h.W2.subgroupOf (h.W1⊔h.W2)` 系だが、適用先 arg は `sdiff.W2sub` 系 — **defeq だが非 syntactic** ゆえ
+one_apply/one_comp の単一化が失敗 (sdiff vs h の W-coord 罠、memory 既出)。goal は `↑(1(wSnd w))`/
+`↑(1(wFst w))` が atom 残留で ring 不可 (これらが 1 になれば閉じる: 両辺 (1−a)(1−b))。
+
+### ▶▶ 次 = (4.10) piece (b) 別ルート (session 38; W-coord 回避)
+1. **`1`型整合の workaround**: (a) chiColumn 1-列の `1` を `change`/`convert` で sdiff 型に揃える、
+   (b) `omegaProdChar_one_left/right/one` を CF レベルで先に適用し pointwise の `(1)(x)` を回避
+   (omega(1) は line 666 (S05_TICyclic) パターンで one_apply 可)、(c) chiColumn の coe を ascription。
+2. **alphaCF 経由を捨てる別 support 証明**: sdiff 4-corner が sdiff.V 上 support を直接
+   (W₁∪W₂ で消失、`alphaCF_eq_zero_of_mem_W1/W2_subgroupOf` 流の omega 値計算)。
+3. piece (b) 完了後: (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁵。(4.10) piece (a) DONE; piece (b1) は W-coord `1` 罠で STOP、別ルート要。**
+
+## 2026-06-13 (session 37 cont.⁶, /loop): (4.10) — W-coord `1` 解決、chiColumn_apply_eq landed; alphaCF-match は coercion 残留 → route 2 へ
+
+✅ **W-coord `1` 罠 解決済**: `MonoidHom.one_apply` が `(1: _→*ℂˣ)(x)` で発火しないのは sdiff/h の `1`-domain
+非 syntactic ゆえ。**fix = `change` で omegaProdChar を defeq 展開 + explicit-domain `hone : (1:(h.W2.subgroupOf
+(h.W1⊔h.W2))→*ℂˣ)(wSnd w)=1 := MonoidHom.one_apply _`**。
+✅ **`chiColumn_apply_eq` landed** (`f83d9bc4`, build 3598, axiom-clean): `ω_ij(w)=↑((w1Eq i)(wFst w))·↑(χ₂(wSnd w))`
+(chiColumn unfold + omega_apply + `change`(omegaProdChar 展開) + Units.val_mul)。**(4.10) support の value 道具**。
+
+🛑 **`chiColumn_fourcorner_eq_alphaCF` (piece b1) は coercion 残留で STOP** (~14 試行): pointwise で
+hone1/hone2+chiColumn_apply_eq 適用後、goal は **表示上 `1−X+XY−Y = 1−X+XY−Y` (完全一致表示) なのに
+ring/rfl/push_cast/norm_cast/set 全滅**。原因 = LHS の atom (chiColumn_apply_eq 由来) と RHS の atom
+(alphaCF_apply 由来) が **表示同一だが別 term** (coercion instance か elaboration 差)。**2 lemma の coercion 不整合**。
+
+### ▶▶ 次 = (4.10) piece (b) **route 2 (alphaCF 回避)** (session 38)
+alphaCF-match を捨て、**`Supp(sdiff 4-corner) ⊂ sdiff.V` を直接** (vanish on W₁∪W₂, **全て chiColumn_apply_eq
+由来ゆえ coercion 不整合なし**):
+- w∈W₂ (`wFst w = 1` by `wFst_eq_one_of_mem_W2`): 各 chiColumn = ↑(1)·↑(χ(wSnd w))=↑(χ(wSnd w))、4-corner=0。
+- w∈W₁ (`wSnd w = 1` by `wSnd_eq_one_of_mem_W1`): 対称、4-corner=0。
+- `(w1Eq i)(1)=1`/`χ₂(1)=1` は `map_one`。`supportedSubmodule` 帰属で Supp⊂sdiff.V。
+- 必要なら fourcorner_signedDiff_eq_induce(piece a)で `signedDiff 4-corner = Ind(sdiff 4-corner)` →
+  `Supp(Ind) ⊂ (sdiff.V)^L ⊂ A₀` (induce support + sdiff.V⊂tic.V)。
+- **代替 (もし coercion を直したい)**: pp.all で LHS/RHS atom 差を特定 → chiColumn_apply_eq の coercion を
+  alphaCF_apply と一致させる。だが route 2 が安全。
+→ piece (c) value-on-V (4.8 step-4 ミラー) → (d) off-V^G vanishing → (e) assembly。
+**正本=本 session 37 cont.⁶。chiColumn_apply_eq DONE; alphaCF-match は coercion で STOP、route 2 推奨。**
+
+## 2026-06-13 (session 38, /loop「難所回避せず」): (4.10) piece (b) COMPLETE (route 2 + 強化 + carrier)
+
+**3 commits landed (leaf build 3598 green, axiom-clean, pure leaf=誰も import せず・root 在)**:
+1. `6e807abb` route 2 弱版: four-corner ∈ CF(W, **W−W₂**) via `omegaColumnDiff` 差 + `Submodule.sub_mem`
+   (chiColumn=omega∘omegaProdChar ゆえ omegaColumnDiff_coe へ rfl; coercion 罠なし)。
+2. `56f82435` **強化版** (弱版を置換): four-corner ∈ CF(W, **W−(W₁∪W₂)**) = `SupportedOnV ℂ toTICyclicHypothesis`。
+   弱版 (W−W₂) では下流不足 (Ind_W^L β の Supp⊂V^L⊂A₀ は A₀ の V=tic.V=W−(W₁∪W₂) 小さい方を要求)。
+   four-corner は W₁ でも消える (列差が打ち消す: chiColumn_apply_of_mem_W1 は両列同一 atom)。**新 helper
+   `chiColumn_apply_of_mem_W2`** (W1 版の対) + `alphaCF_mem_supportedSubmodule` ミラー (W₁∧W₂ 両 vanish、
+   各 branch は 4×chiColumn 値 rewrite 後 `ring`、全 atom 同 lemma family ゆえ coercion 衝突なし)。
+3. `91c9b52e` **carrier `chiFourCornerOnV`** : four-corner を `SupportedOnV ℂ toTICyclicHypothesis` subtype
+   element 化 (Ind_W^L が食う pre-induce handle) + `chiFourCornerOnV_coe` (coe=four-corner, rfl)。
+
+### 🔑 defeq 教訓 (再調査不要)
+- **`sdiffTICyclicHypothesis.W` と `toTICyclicHypothesis.W` は両方 `W₁⊔W₂` (toTICyclicHypothesisOfV の
+  `.W:=h.W1⊔h.W2`、V のみ違う) — defeq だが非 syntactic**。chiColumn は sdiff.W 上だが carrier は toTIC.W 上。
+- **SupportedOnV element の coe lemma は「自分の hypothesis の `.W`」へ ascribe せよ** (= toTIC.W、coe の自然
+  出力)。sdiff.W↔toTIC.W defeq は **Eq の中で rfl が処理**、coercion-insertion では処理されない
+  (single/cross ascription `(x:SupportedOnV toTIC):CF sdiff.W` は coe を起動できず失敗)。`omegaColumnDiff_coe`
+  (S06_CertainTypeCharacters:207) が double-ascription 同 hypothesis の手本。
+- chiColumn_apply_of_mem_W1/W2 と chiFourCornerOnV は **S06 namespace で h:Hypothesis46 を明示引数に取る**
+  ⟹ dot 記法 `h.chiColumn_apply_of_mem_W1` 不可、`chiColumn_apply_of_mem_W1 h …` と書く (chiColumn /
+  omegaColumnDiff は Hypothesis namespace ゆえ dot 可、と対照的)。
+
+### ▶▶ 次 = (4.10) piece (c)(d)(e) = Dade-transitivity core (session 39)
+**RECON 完了・全 construction map 判明**。(4.10) は **`h.tau.toDadeMap (Ind_W^L α) = certainTypeOmegaSigma 四隅`**
+(α=four-corner)。(4.8) と違い **trichotomy 不要** — 単一 V-supported α の Dade 写像両立 (V-agreement+off-V vanishing)。
+ただし **(4.8) の overall 構造 (σ-coeff trichotomy) のコピーでは無い**: sigma_eq_tau 経由の新 construction。
+
+**LHS 配管 (piece の前提)**: β=`signedDiff χ₂ i − signedDiff 1 i` = `Ind_W^L(four-corner)` (piece a
+`fourcorner_signedDiff_eq_induce` 既landed)。β∈CF(L,A₀) を要す (h.tau が食う型 `SupportedClassFunctions ℂ A₀ L`、
+A₀=`A∪{l·v·l⁻¹:v∈tic.V}`)。
+- β = toTIC Dade 写像(chiFourCornerOnV) [via `toTICyclicHypothesis.tau_eq_induce` + `toTICyclicFullDadeApplication`
+  既存 S06_CertainTypeCharacters:837]。⟹ β は `conjugatesOfSet(toTIC.V)` off で消失
+  [`TICyclicHypothesis.map_eq_zero_of_not_mem_conjugatesOfSet_V` S05:120]。
+- **bridge `conjugatesOfSet(toTIC.V) ⊂ A₀`**: toTIC.V (⊂L, =W−(W₁∪W₂)) の L-共役は A₀ の `{l·v·l⁻¹:v∈tic.V}`
+  へ。L→G で v↦(v:G)∈tic.V を要す。**(4.8) conclusion-1 `certainType_diff_supp_subset_A0` (S06_CertainTypeIsometry:264-330)
+  の line 303-330 が同 bridge logic (W元→A₀、`hvV:L.subtype(x·y)∈tic.V` 構成) — 流用/ミラー**。
+  defeq 注意: sdiff.W=toTIC.W で induce 形が一致するはず。
+
+**piece (c) value-on-V**: v∈tic.V で両辺=four-corner(v)。LHS=`tau_toDadeMap_apply_of_mem h _ hvA0` (S06_CertainTypeIsometry:356)
+で β(⟨v,_⟩)、(4.3.c) `certainType_apply_eq_of_mem_V` で μ=δ·ω、δ_j²=1 (sign_eq) で χ₂列係数消去・δ_0=1 (4.4
+`certainType_zero_column_anchor`) で 1列。RHS=`certainTypeOmegaSigma_apply_of_mem_V` (S06_CertainTypeIsometry:152)
+で ω^σ(v)=ω(v)。両辺=ω_ij(v)−ω_0j(v)−ω_i0(v)+ω_00(v)。**(4.8) step-4 `certainType_diff_dade_apply_eq_of_mem_V`
+(:372-410) が手本**。
+
+**piece (d) off-V^G vanishing**: LHS=h.tau β off `h.dade.dadeSupport` で消失 [`map_eq_zero_of_not_mem_dadeSupport`
+S06_DadeIsometryCertain:503]。RHS=σ 四隅 = `(ticVdiff h).sigma(G側 four-corner)` [σ 線形]、off conjugatesOfSet(tic.V)
+で消失 [S05:120 の ticVdiff 版]。**RHS の G側 four-corner support (piece b の tic 版) が要る** — omegaProdCharTic
+(tic.W 上) の四隅 ∈ SupportedOnV ticVdiff。bridge ticWEquivSdiffW で sdiff 版から transport か、または tic 側で再証明。
+
+**piece (e) assembly**: 両辺 class fn on G、V^G off で消失 (d)、V で一致 (c)。V^G の元は V の元の共役、class-fn 不変性
+で V-値に帰着、それ以外 0 ⟹ 等しい。**ready-made assembly lemma 無し (4.8 は trichotomy 使用) — 新規構築要**
+(or sigma_eq_tau で RHS=Ind_W^G(G側 four-corner) 化し、両 Ind の transitivity を別に立てる)。
+
+**sigma_eq_tau (S05_SigmaIsometry:1098)**: `hyp.sigma α = app.tau.toDadeMap α = Ind_W^G α` (tau_eq_induce)。
+RHS 簡約に使用。**hard core ではない (機械的だが zoo の defeq friction 多)、~2-4 commits 見込み、FT 経路外**。
+**正本=本 session 38。piece (b) COMPLETE; 次=piece (c) value-on-V から (LHS β∈CF(L,A₀) 配管が前提)。**
+
+## 2026-06-13 (session 38 cont., /loop): (4.10) 教科書証明を精読 — skeleton 確定 + strengthen 根拠訂正
+
+**📖 book proof 読了** (`references/peterfalvi/04.6_...mmd:97`)。正確な論法:
+- α = ω_ij−ω_0j−ω_i0+ω_00 (W側), β = δ_jμ_ij−δ_jμ_0j−μ_i0+μ_00 (L側)。
+- (4.3.b)+(4.4): **β = Ind_W^L α** [= piece a ✓].
+- **(3.4): Supp(α) ⊂ V, ゆえ Supp(β) ⊂ V^L。ここ V = W−(W₁∪W₂)** [(3.4)=alphaCF の V、SMALLER]。
+- **「x∈V で C_G(x)=W⊂L。τ の定義より β^τ(g) = β(g) (g∈V) / 0 (g∉V^G)」**。
+- (4.3.c)+(3.2.c) で β^τ(g)=α^σ(g) ∀g。
+
+**🔧 訂正 (session 38 本文の note は根拠が誤り)**: piece (b) strong 化 (W−(W₁∪W₂)) は**正しい** — ただし
+理由は「A₀ の V」ではない (A₀ の tic.V=**W−W₂**=larger、line 51 確認済ゆえ weak でも A₀ 帰属は足りた)。
+**正しい根拠 = book の (3.4) V = W−(W₁∪W₂) (smaller)** で「C_G(x)=W」が要る。strong 版 = book と一致、必要。
+
+### 🎯 clean Lean skeleton (確定、session 39 で実装)
+**RHS 簡約**: ω^σ 四隅 = σ(ω_ij)−σ(ω_0j)−σ(ω_i0)+σ(ω_00) [σ 線形] = `ticVdiff.sigma(α_G)` [α_G=G側四隅
+∈SupportedOnV ticVdiff] = **`Ind_W^G(α_G)`** [`sigma_eq_tau` S05:1098 + `tau_eq_induce` S05_SignedTripleGrid:288]。
+ticVdiff.sigma は (ticVdiff.V)^G=V^G off で消失 [`full_map_eq_zero_of_not_mem_conjugatesOfSet_V` S05:161]、V で α一致 [sigma_apply_of_mem_V]。
+
+**LHS = h.tau.toDadeMap(β)**, β∈CF(L,A₀) 要 (h.tau の型)。三段:
+- **(c) value-on-V**: g∈V で β^τ(g)=β(⟨g,_⟩) [`tau_toDadeMap_apply_of_mem` S06_CertainTypeIsometry:356,
+  V⊆tic.V⊆A₀]=α(g) [(4.3.c) `certainType_apply_eq_of_mem_V` で μ=δω、δ_j²=1 (sign_eq)、δ_0=1 (4.4)]。
+  (4.8 step-4 :372-410 が手本)。
+- **(d) off-V^G vanishing of β^τ** [🔑 crux]: book は「Supp β⊂V^L + τ 定義」。Lean: β^τ(g)=0 for g∉V^G。
+  h.tau の `map_eq_zero_of_not_mem_dadeSupport` (dadeSupport⊇A-conj ⊉ V^G ゆえ直接不可) では足りぬ。
+  β supported on V^L + hCoset(a)={a} (a∈V で H(a)=1) ⟹ h.tau(β) supported on V^L⊆V^G。要 hCoset/H=1 論法 (intricate)。
+- **(e) assembly**: β^τ, α^σ 両 class fn。ext g; g∈V^G なら共役 v∈V へ class-fn 還元 → β(v)=α(v)=α^σ(v);
+  g∉V^G なら両 0。ready-made uniqueness 無し (`eq_sigma_of_apply_eq_on_V` S05:1518 は norm-1 限定、四隅は非 norm-1)。
+
+**前提 = LHS packaging β∈CF(L,A₀)**: β=`signedDiff χ₂ i − signedDiff 1 i`、Supp⊆A₀。
+最短 = β=`sdiffFullDadeIsometryData.toDadeMap(omegaColumnDiff χ₂ − omegaColumnDiff 1)` [via
+`isometryDifferenceImage_eq_dade` S06_CertainTypeCharacters:362 + Dade 線形] → off conj(sdiff.V=W−W₂) 消失
+[`full_map_eq_zero...V` sdiff] → **bridge `conjugatesOfSet(W−W₂ in L) ⊆ A₀`** (v∈W−W₂→(v:G)∈tic.V、
+(4.8 concl-1 :303-330 の logic 流用; tic_W2=W2.map subtype, L.subtype inj)。
+[別 route: toTIC carrier 経由で W−(W₁∪W₂)、こちらは smaller ゆえ bridge 自明だが induce defeq sdiff.W=toTIC.W 要]。
+**次 = bridge lemma (self-contained 群論) から。crux=(d) off-V^G。~2-3 commits、FT 経路外。**
+
+## 2026-06-13 (session 38 cont.², /loop): (4.10) L-side packaging COMPLETE + (d) crux 機構特定
+
+**landed (2 commits, leaf 3598 green)**:
+- `d396656b` bridge `coe_mem_A0_of_mem_conjugatesOfSet_toTICV`: conj_L(toTIC.V) → A₀ (純群論)。
+- `3f0cf45d` `signedDiff_fourcorner_eq_toTICDade` (β = toTIC Dade(carrier), via piece a +
+  `tau_eq_induce` + FullDadeIsometryData.toDadeMap = .toDadeIsometryData.toDadeMap abbrev defeq) +
+  **`fourCornerDiffSupported : SupportedClassFunctions ℂ A₀ L`** (β∈CF(L,A₀); Supp⊆conj(toTIC.V)→A₀
+  via `full_map_eq_zero_of_not_mem_conjugatesOfSet_V`)。
+
+⟹ **(4.10) の代数前提すべて完成** (β=Indα / α∈CF(W,V)+carrier / β∈CF(L,A₀) / bridge / β=toTIC Dade)。
+
+### 🔴 残 = (c)(d)(e) final assembly。crux = (d) off-V^G vanishing of β^τ
+`β^τ = h.tau.toDadeMap(fourCornerDiffSupported) = h.dade0.dadeMap β` [S06_CertainTypeIsometry:922]。
+`dadeValue β g`: g∈dadeSupport で base point a∈A の β(a)、off で 0 [S04 dadeMapCF:3564, dadeValue_eq /
+dadeValue_of_not_mem_dadeSupport]。
+**(d) `β^τ(g)=0` for g∉V^G** の機構 (book「C_G(x)=W⊂L」の Lean 化):
+- g∉dadeSupport → 0 [自明]。
+- g∈dadeSupport → g conj a·h (a∈A, h∈H(a))、β^τ(g)=β(a)。β(a)≠0 → a∈Supp β⊆conj_L(toTIC.V)⊆V^L。
+- **🔑 H(a)=⊥ for a∈V^L**: S04 Hypothesis の `centralizer_eq_sup` (C_G(a)=H(a)⊔C_L(a)) + `centralizer_disjoint`
+  (H(a)⊓C_L(a)=⊥) ⟹ **C_G(a)⊆L ならば H(a)=⊥**。
+- H(a)=⊥ → hCoset(a)={a} → g conj a → g∈a^G⊆(V^L)^G=V^G。g∉V^G と矛盾。⟹ β(a)=0。
+
+**🟡 残ギャップ = 「C_G(a)⊆L for a∈conj_L(toTIC.V)」(G-side centralizer)**。book=C_G(v)=W for v∈V。
+Lean `centralizer_eq_sup` (S06_DadeIsometryCertain:195) は **C_L(x)=W₁⊔W₂ (L-side のみ)**。**G-side C_G(v)⊆L for
+v∈tic.V/ticVdiff.V が必要 — tic (TICyclicHypothesis G) の TI 構造から導出可か要確認** (V_ti+cyclic+self-cent?
+or 新 field/補題)。これが (4.10) 完成の最後の hard core。
+
+### ▶ 次 (session 39): 
+1. **「C_G(v)⊆L for v∈tic.V」availability 確認** (tic の TI-cyclic 公理から; なければ Hypothesis46 が
+   この compatibility を field で持つか、dade0 経由で出るか精査)。
+2. 出れば (d) を上記機構で構築 → (c) value-on-V [mirror 4.8 step-4 `certainType_diff_dade_apply_eq_of_mem_V`、
+   β(v)=α(v) は toTIC Dade value on V or (4.3.c)+δ²+δ_0=1] → (e) `ClassFunction.ext` g∈V^G/∉ case split。
+3. RHS=ticVdiff.sigma(α_G)=`Ind_W^G(α_G)` [sigma_eq_tau]、off V^G 消失は `full_map_eq_zero...V` (ticVdiff) で clean。
+**hard core ×1 = (d) の C_G(v)⊆L gap。FT 経路外。正本=本 session 38 cont.²。**
+
+## 2026-06-13 (session 38 cont.³, /loop): 🎉🎉🎉 (4.10) COMPLETE — §6 four-corner Dade identity DONE
+
+**`fourCorner_dade_eq` landed sorry-free + axiom-clean (leaf build 3598)**:
+`(δ_j μ_{ij} − δ_j μ_{0j} − μ_{i0} + μ_{00})^τ = ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ + ω_{00}^σ`.
+
+### 全 piece chain (commits 6e807abb → 785bd1d3, S06_CertainTypeFourCorner.lean):
+- **piece (a)** `fourcorner_signedDiff_eq_induce`: β = Ind_W^L α (既存; (1.4) image + (4.4)).
+- **piece (b)** `chiColumn_fourcorner_mem_supportedSubmodule`: α ∈ CF(W, W−(W₁∪W₂)) [pointwise vanish
+  on W₁ (column-diff cancels via chiColumn_apply_of_mem_W1) and W₂ (新 `chiColumn_apply_of_mem_W2`)]
+  + carrier `chiFourCornerOnV` (SupportedOnV toTIC) + `chiFourCornerOnV_coe`.
+- **L-side packaging**: `coe_mem_A0_of_mem_conjugatesOfSet_toTICV` (bridge conj_L(V)⊆A₀) +
+  `signedDiff_fourcorner_eq_toTICDade` (β = toTIC Dade(carrier) via tau_eq_induce) +
+  `fourCornerDiffSupported` (β ∈ CF(L,A₀), h.tau の入力).
+- **crux (d)** `fourCornerDade_eq_zero_of_not_mem_conjugatesV` (off-V^G vanishing, book の hand-wave 部):
+  `centralizer_le_L_of_mem_ticVdiffV` (C_G(v)⊆L from IsTISubset V_ti — 鍵 unblock) +
+  `H_eq_bot_of_centralizer_le` (S04 一般: C_G(a)⊆L ⟹ H(a)=⊥ via centralizer_eq_sup/disjoint) +
+  `coe_mem_ticVdiffV_of_mem_toTICV` + `centralizer_le_L_of_mem_conj_toTICV` (共役閉包) →
+  dadeValue base-point case analysis (β supp⊆V^L → H(a)=⊥ → h=1 → g conj a ∈ V^G).
+- **G-side support** `omegaTic_fourcorner_mem_supportedSubmodule`: α_G ∈ SupportedOnV ticVdiff
+  (piece b を bridge omegaProdCharTic_apply で transport).
+- **crux (c)** `fourCornerDade_apply_eq_of_mem_V`: V 上一致 (両辺=sdiff-four-corner(bridge v); route B
+  = β=σ_L(α) ゆえ δ²/δ₀ sign 不要; mirror 4.8 step-4).
+- **capstone** `fourCorner_dade_eq`: ClassFunction.ext g; g∈V^G→conj_eq+( c); g∉V^G→(d)+RHS=σ(α_G)=τ(γ)
+  vanish (map_sub + sigma_eq_tau + full_map_eq_zero).
+
+### 🔑 再調査不要の知見:
+- A₀ の V = tic.V = **W−W₂** (larger); book の (3.4)/value-vanishing の V = **W−(W₁∪W₂)** (smaller,
+  ticVdiff.V/toTIC.V)。strong support (smaller) が正しい (C_G(v)=W⊂L が要)。
+- **C_G(v)⊆L for v∈V は IsTISubset から直接** (c centralizes v → c·v·c⁻¹=v∈V → c∈W⊆L)。
+- SupportedOnV coe lemma は自分の hypothesis の .W へ ascribe (defeq は Eq 内 rfl)。
+- chiColumn_apply_of_mem_W1/W2, chiFourCornerOnV, centralizer_le_L_of_mem_* は S06 namespace で
+  h 明示引数 → dot 記法不可。sigma は LinearMap (map_sub 可)。
+
+### ▶▶ §6 (4.x) 全 COMPLETE。次 = B レーン戦略判断 (case-B §8 大 assembly は user/合流調整向き)
+§6 character-theory ((3.x)σ + (4.1)-(4.10)) 完了。残る §6 統合 = **case-B → S08 (6.8)** = §8 large
+assembly (s08_6_8_assembly_plan.md T0-T11 DAG; 単独 cold-engage は overlap/risk と既 RECON 済)。
+**正本=本 session 38 cont.³。(4.10) DONE。**
