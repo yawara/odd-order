@@ -73,6 +73,30 @@ theorem ClassFunction.mapRingEquiv_linearIrreducibleCharacter {H : Type*} [Group
     MonoidHom.comp_apply, Units.coe_map]
   rfl
 
+/-- **Induction from a subgroup of a normal subgroup is supported on that normal subgroup.**
+If `H' ≤ N` with `N ◁ G`, then `(Ind_{H'}^G θ).support ⊆ N`: a nonzero value at `g` needs some
+conjugate `x⁻¹gx ∈ H' ⊆ N`, and `N` normal then forces `g ∈ N`.  Generalizes
+`support_induce_subset_of_normal` (the `H' = N` case) to non-normal source subgroups, as needed for
+`Ind_{W₂}^L` with `W₂ ⊆ H ◁ L` in Peterfalvi (6.8.2.2). -/
+theorem ClassFunction.support_induce_subset_of_le_normal {G : Type*} [Group G] [Fintype G]
+    {N H' : Subgroup G} [N.Normal] [Invertible (Nat.card ↥H' : ℂ)]
+    (hH'N : H' ≤ N) (θ : ClassFunction ↥H' ℂ) :
+    (ClassFunction.induce H' θ).support ⊆ (N : Set G) := by
+  intro g hg
+  by_contra hgN
+  apply hg
+  rw [ClassFunction.induce_apply]
+  have hterm : ∀ x : G, ClassFunction.induceTerm H' θ x g = 0 := by
+    intro x
+    have hnotmem : x⁻¹ * g * x ∉ H' := by
+      intro hmem
+      apply hgN
+      have hconj := ‹N.Normal›.conj_mem (x⁻¹ * g * x) (hH'N hmem) x
+      have heq : x * (x⁻¹ * g * x) * x⁻¹ = g := by group
+      rwa [heq] at hconj
+    rw [ClassFunction.induceTerm_of_not_mem _ hnotmem]
+  rw [Finset.sum_eq_zero (fun x _ => hterm x), mul_zero]
+
 end OddOrder.RepresentationTheory
 
 namespace OddOrder.Peterfalvi.S08
@@ -215,5 +239,42 @@ theorem SibleyDadeHypothesis.coherentYset_extension_const_on_W2
     hprime
     (fun z hz hz1 => hyp.coe_mem_sharpImage_of_mem_commutator (hW2 hz) hz1)
     hx hx1 (hyp.Yset_apply_eq_apply_one_of_mem_commutator hη (hW2 hx)) hy hy1
+
+/-- **(6.8.2.2) input — the support of `α = Ind_{W₂}^L φ − c·η₁`.**  When `α` vanishes at `1`
+(the degree-balancing condition `Ind_{W₂}^L φ (1) = c · η₁(1)`, met by `c = [H:W₂]`), the
+difference is supported on `H^# = sharpImage H`: `Ind_{W₂}^L φ` is supported on `H` (since
+`W₂ ⊆ H ◁ L`, `support_induce_subset_of_le_normal`), `η₁ ∈ Y` is supported on `H`
+(`support_induce_subset_of_normal`), and `α 1 = 0` removes the identity.  This is the
+`Supp(α) ⊆ H^#` step of Peterfalvi (6.8.2.2). -/
+theorem SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Invertible (Nat.card ↥W2 : ℂ)]
+    (φ : ClassFunction ↥W2 ℂ) {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (c : ℂ)
+    (h1 : ClassFunction.induce W2 φ (1 : ↥L) = c * η₁ (1 : ↥L)) :
+    (ClassFunction.induce W2 φ - c • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  obtain ⟨χ, _hχne, rfl⟩ := hyp.exists_linear_source_of_mem_Yset hη₁
+  -- both pieces are supported on `H`
+  have hindW2 : (ClassFunction.induce W2 φ).support ⊆ (H : Set ↥L) :=
+    ClassFunction.support_induce_subset_of_le_normal hW2H φ
+  have hη₁supp : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)).support
+      ⊆ (H : Set ↥L) :=
+    ClassFunction.support_induce_subset_of_normal H _
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  have hxH : x ∈ H := by
+    by_contra hxnotH
+    have h1' : ClassFunction.induce W2 φ x = 0 := by
+      by_contra h; exact hxnotH (hindW2 (ClassFunction.mem_support.mpr h))
+    have h2' : (ClassFunction.induce H (linearIrreducibleCharacter χ : ClassFunction ↥H ℂ)) x = 0 := by
+      by_contra h; exact hxnotH (hη₁supp (ClassFunction.mem_support.mpr h))
+    exact hx (by simp only [ClassFunction.sub_apply, ClassFunction.smul_apply, smul_eq_mul,
+      h1', h2', mul_zero, sub_zero])
+  have hxne : x ≠ 1 := by
+    intro hx1
+    refine hx ?_
+    simp only [hx1, ClassFunction.sub_apply, ClassFunction.smul_apply, smul_eq_mul, h1, sub_self]
+  change (x : G) ∈ sharpImage H
+  exact ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, fun hx1G => hxne (Subtype.ext hx1G)⟩
 
 end OddOrder.Peterfalvi.S08

@@ -1009,3 +1009,26 @@ Res_Z ψ = aρ_Z+b1_Z、(6.7) `peterfalvi_67` で b≡ψ(1) mod |H| ⟹ ⟨α^τ
 ‖α^τ‖²=‖α‖²<2|H:Z|² で (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}。**(6.7) machinery (peterfalvi_67_centralCommutator,
 reg-char sumNonInflatedDegreeMulChar) は既 landed; reciprocity inner_dadeIntegralCharacterMap_eq_inner_restrict も既存。**
 → (6.8.2.3) → τ₂ assembly。**正本=本 session 39 cont.⁵。**
+
+## 2026-06-13 (session 39 cont.⁶, /loop): (6.8.2.2) 着手 — α-support step landed
+
+**✅ landed (build-green + axiom-clean)**: (6.8.2.2) の「Supp(α)⊆H^#」step (α=Ind_{W₂}^L φ − c·η₁):
+- 一般 **`ClassFunction.support_induce_subset_of_le_normal`** (H'≤N, N◁G ⟹ supp(Ind_{H'}^G θ)⊆N;
+  `support_induce_subset_of_normal` の非正規 source 一般化、`induceTerm_of_not_mem`+`Normal.conj_mem`)。
+- **`SibleyDadeHypothesis.support_indW2_sub_smul_subset_sharpImage`**: W₂≤H, α(1)=0 (=Ind_{W₂}φ(1)=c·η₁(1))
+  ⟹ supp(Ind_{W₂}φ − c·η₁)⊆supportInSubgroup(sharpImage H)L (両 piece H-supported + α(1)=0 で 1 除去)。
+  ※ c (=|H:W₂|) は α(1)=0 仮説で defer (index 計算回避)。
+
+### ⚠ (6.8.2.2) 残ステップ + prerequisite gap:
+(6.8.2.2) 本体 = `(Ind_Z^L φ − |H:Z|η₁)^τ = X − |H:Z|Y` (X⊥Y^{τ₁})。残:
+1. **reciprocity** `⟨α^τ,ψ⟩=⟨α,Res_L ψ⟩` (✅ `inner_tau_eq_inner_restrict` + α-support 本 session)。
+2. 🔴 **reg-char 分解** `Res_Z ψ = aρ_Z + b1_Z` — **ρ_Z (regular character) が repo に無い** (要新規 def/補題)。
+   ψ=η^{τ₁} は (6.8.2.1) `coherentYset_extension_const_on_W2` で Z^# 上定数 ⟹ Res_Z ψ は Z^# 上定数
+   ⟹ aρ_Z+b1_Z 形。**ρ_Z 構築 + 「Z^# 上定数 ⟹ aρ+b1」が次の主 prerequisite。**
+3. **(6.7) 合同** b≡ψ(1) mod |H| (✅ `peterfalvi_67_centralCommutator`)。
+4. **norm endgame** ‖α^τ‖²=‖α‖²<2|H:Z|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}。
+
+### ▶ 次の一手: **ρ_Z (regular character) + 「class fn on Z const on Z^# = aρ_Z+b1_Z」**
+これが (6.8.2.2) reg-char step の前提。汎用 (任意有限群 Z)。→ then (6.8.2.2) assembly。
+**正本=本 session 39 cont.⁶。** **進捗 honest 評価: case-B coherence は (6.8.2.1)✅→(6.8.2.2)[multi-tick,
+ρ_Z 要]→(6.8.2.3)→τ₂→capstone→(6.5) の長い grind。steady brick/tick で進行中 (空転なし)。**
