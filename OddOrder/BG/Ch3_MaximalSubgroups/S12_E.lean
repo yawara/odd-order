@@ -48,14 +48,9 @@ variable {G : Type*} [Group G]
 /-! **BG Theorem 12.13** (`nonabelian_pgroup_isUniquelyMaximal`) は `S12_Theorem1213.lean` に
 移動した(σ(M)-side の最初の uniqueness 結果; Prop 12.4 から導出)。 -/
 
-/-- **BG Corollary 12.14** (mmd L3369): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`、`p ∈ β(M)` または
-`X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
-theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
-    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXM : X ≤ M)
-    (hcase : p ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)) :
-    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
-  sorry
+/-! **BG Corollary 12.14** (`maximalContaining_centralizer_eq_singleton`) は
+`S12_Corollary1214.lean` に移動した(`ℳ(C_G(X)) = {M}` for central `ℰ_p¹` `X`;
+Theorem 12.13 を要するため downstream leaf 化)。 -/
 
 /-- **BG Corollary 12.16(a)** (mmd L3423): `M` の `σ(M)`-部分群 `Y` は `M_σ` に共役で写せる
 (`∃ g ∈ M, Y^g ⊆ M_σ`)。(原典 (b) の rank/derived 評価は後続。) -/

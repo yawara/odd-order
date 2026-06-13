@@ -54,6 +54,8 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212b
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma128
@@ -4422,3 +4424,25 @@ The τ₁ inclusion is prime-restricted (BG's `τᵢ ⊆ π(M)` are sets of prim
 `tau1` ranges over `ℕ`). Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_maximal_interaction
+
+/-! **BG Corollary 12.14** (`S12_Corollary1214`, `maximalContaining_centralizer_eq_singleton`):
+for `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`, and `p ∈ β(M)` or `X ⊆ M_σ'`, `ℳ(C_G(X)) = {M}`. Proof: `X ⊆ M_σ`
+and a Sylow `p` `S ⊇ X` of `M_σ` (`= Sylow p` of `G`); a uniquely-maximal `U ≤ C_G(X) ∩ M`
+suffices. If `r(C_P(X)) ≥ 3`, take `U = C_P(X)` (Uniqueness Theorem); else `p ∉ idealPrime`,
+`X ⊆ S'` (Lemma 10.8(c) normal-`p`-complement), `r(S) ≤ 2` (Cor 5.4 + Thm 5.3(d)), Cor 10.7(b)
+gives `S = P₁ * P₂` central product with `P₁` extraspecial, and `U = P₁` (nonabelian, `X ⊆ Z(P₁)`,
+Theorem 12.13). Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1214.maximalContaining_centralizer_eq_singleton
+
+/-! **BG Corollary 12.16** (`S12_Corollary1216`, σ-subgroup ↔ maximal interaction, `q`-group form):
+for a nonidentity `q`-group `Y` (`q ∈ σ(M)`), every `p ∈ π(E) ∩ β(G)'`, and every `H ∈ ℳ(Y)` not
+conjugate to `M`: (a) `r_p(N_H(Y)) ≤ 1` (`pRank_normalizer_le_one`); (b) if `p ∈ τ₁(M)` then
+`p ∉ π(N_H(Y)')` (`not_mem_primeFactors_derived_of_tau1`). Proof: conjugate `Y` into `M_σ`, then in
+the core either `N_G(Y) ⊆ M` (direct) or `M* ∈ ℳ(N_G(Y))` with `M* = (M ∩ M*)K` (Prop 12.15(d)/(e),
+`K` a `p'`-group); a rank-2 `A ∈ ℰ_p²` forces `p ∈ τ₂(M)` + Thm 12.5(e) `M_σ ∩ M* = ⊥` (contra (a)),
+and `deriv ≤ (M ∩ M*)'⊔K` is `p'` (for (b)). Lane G (S13_Lemma131) re-points to these. Fully
+unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1216.pRank_normalizer_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1216.not_mem_primeFactors_derived_of_tau1
