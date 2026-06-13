@@ -69,6 +69,42 @@ theorem actsPrimeOn_inf_centralizer_eq_bot {N X W : Subgroup G}
   rw [h x hxX hxne, fixedBy_def] at hWfix
   exact hcomm (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (hWfix.trans inf_le_right))
 
+/-- **prime-order 十分条件 ⟹ prime action** (BG §13 intro の「`C_N(g)=C_N(X)` ⟺
+`C_N(P)⊆C_N(X)` (∀`P∈ℰ¹(X)`)」の easy 方向): `X#` の全 **素数位数**元 `x` で
+`C_N(x) ≤ C_N(X)` (`fixedByElement N x ≤ fixedBy N X`) なら、`X` は `N` に prime 作用する。
+
+任意の `g∈X#` をその素数べき部分 `x = g^{ord g/p}` (`p ∣ ord g` 素数) に落とすと
+`x ∈ X#` は素数位数で `C_N(g) ⊆ C_N(x)` (x は g のべき)。Lemma 13.7 step 4 (equal case) で
+`E₁⊔E₃` の prime 作用を素数位数部分群ごとに検証する土台。 -/
+theorem actsPrimeOn_of_prime_order_le [Finite G] {N X : Subgroup G}
+    (hpr : ∀ x ∈ X, (orderOf x).Prime → fixedByElement N x ≤ fixedBy N X) :
+    ActsPrimeOn N X := by
+  intro g hg hg1
+  refine le_antisymm ?_ (fixedBy_le_fixedByElement hg)
+  have hord1 : orderOf g ≠ 1 := fun hc => hg1 (orderOf_eq_one_iff.mp hc)
+  have hord0 : orderOf g ≠ 0 := (orderOf_pos g).ne'
+  obtain ⟨p, hp, hpdvd⟩ := (orderOf g).exists_prime_and_dvd hord1
+  set d : ℕ := orderOf g / p with hd
+  have hdvd : d ∣ orderOf g := ⟨p, (Nat.div_mul_cancel hpdvd).symm⟩
+  have hd0 : d ≠ 0 := (Nat.div_pos (Nat.le_of_dvd (orderOf_pos g) hpdvd) hp.pos).ne'
+  set x : G := g ^ d with hx
+  have hxord : orderOf x = p := by
+    rw [hx, orderOf_pow' g hd0, Nat.gcd_eq_right hdvd, hd, Nat.div_div_self hpdvd hord0]
+  have hxX : x ∈ X := hx ▸ X.pow_mem hg d
+  -- `C(g) ⊆ C(x)` because `x = g ^ d` is a power of `g`.
+  have hgx : fixedByElement N g ≤ fixedByElement N x := by
+    rw [fixedByElement_def, fixedByElement_def]
+    refine inf_le_inf_left N ?_
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff] at hy ⊢
+    rintro u hu
+    rw [Set.mem_singleton_iff] at hu
+    subst hu
+    have hgy : Commute g y := hy g rfl
+    rw [hx]
+    exact (hgy.pow_left d).eq
+  exact hgx.trans (hpr x hxX (by rw [hxord]; exact hp))
+
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
 /-- **BG Lemma 13.7** (mmd L3596): `E₁≠1` かつ `E₁` が `E₃` に regular 作用しないなら、`E₁E₃` は
