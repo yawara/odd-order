@@ -703,4 +703,71 @@ theorem SibleyDadeHypothesis.index_W2_dvd_regCharCoeff
   have hW2ne : (Nat.card ↥W2 : ℤ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
   exact (mul_dvd_mul_iff_left hW2ne).mp hdvd
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.2.2): `⟨α^τ, ψ⟩` is an integer `≡ 0 (mod |H:W₂|)`** for `ψ = η'^{τ₁} ∈ 𝒴^{τ₁}`.
+With `α = Ind^L_{W₂}φ − |H:W₂|·η₁` (`φ` nontrivial linear, `η₁ ∈ Y` the anchor), the Dade reciprocity
+`inner_tau_indW2_sub_smul_eq` gives `⟨α^τ, ψ⟩ = ⟨φ, Res^L_{W₂} Res^G_L ψ⟩ − |H:W₂|·⟨η₁, Res^G_L ψ⟩`.
+
+The degree relation `c = |H:W₂|` is computed: `Ind_{W₂}φ(1) = [L:W₂]·φ(1) = [H:W₂]·|W₁| = |H:W₂|·η₁(1)`
+(`induce_apply_one` + `relIndex_mul_index` + `index_H_eq_card_W1` + `Yset_apply_one`).  The first inner
+product equals the integer `a = m` (`⟨φ, Res⟩ = star⟨Res, φ⟩ = m`, `inner_conj_symm`, `m` from
+`mem_ZIrr_inner_int`), divisible by `[H:W₂]` (`index_W2_dvd_regCharCoeff`); the second is an integer
+`b'` (`mem_ZIrr_inner_int` + flip).  Hence `⟨α^τ, ψ⟩ = m − [H:W₂]·b'`, an integer divisible by
+`[H:W₂]`. -/
+theorem SibleyDadeHypothesis.inner_tau_alpha_dvd_index
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    {η' : ClassFunction ↥L ℂ} (hη' : η' ∈ hyp.Yset) :
+    ∃ n : ℤ,
+      ClassFunction.inner
+          (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+            - ((W2.subgroupOf H).index : ℂ) • η₁))
+          (hyp.coherentYset.extension η') = (n : ℂ)
+        ∧ ((W2.subgroupOf H).index : ℤ) ∣ n := by
+  classical
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]
+      intro a ha b hb
+      rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  set ψ := hyp.coherentYset.extension η' with hψ
+  -- degree relation `Ind_{W₂}φ(1) = |H:W₂|·η₁(1)`.
+  have h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+      = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+    rw [ClassFunction.induce_apply_one, hφ1, mul_one, hyp.Yset_apply_one hη₁]
+    have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+      (Subgroup.relIndex_mul_index hW2H).symm
+    rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+  have hrecip := hyp.inner_tau_indW2_sub_smul_eq hW2H (φ : ClassFunction ↥W2 ℂ) hη₁
+    ((W2.subgroupOf H).index : ℂ) h1 ψ
+  -- ZIrr chain and the integer `m`.
+  have hψZ : ψ ∈ ZIrr G := hyp.coherentYset.extension_mem_ZIrr η' (Submodule.subset_span hη')
+  have hResLZ : ClassFunction.restrict L ψ ∈ ZIrr ↥L := ClassFunction.restrict_mem_ZIrr L hψZ
+  have hResWZ : ClassFunction.restrict W2 (ClassFunction.restrict L ψ) ∈ ZIrr ↥W2 :=
+    ClassFunction.restrict_mem_ZIrr W2 hResLZ
+  obtain ⟨m, hm⟩ := mem_ZIrr_inner_int φ hResWZ
+  have hφRes : ClassFunction.inner (φ : ClassFunction ↥W2 ℂ)
+      (ClassFunction.restrict W2 (ClassFunction.restrict L ψ)) = (m : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hm]; simp
+  have hdvdm := hyp.index_W2_dvd_regCharCoeff hcop hp hHp hprime hW2comm hW2cen hη' φ hφ1 hφ hm
+  -- the integer `b' = ⟨η₁, Res_L ψ⟩`.
+  have hη₁irr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  obtain ⟨b', hb'⟩ := mem_ZIrr_inner_int (⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L) hResLZ
+  rw [show ((⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L) : ClassFunction ↥L ℂ) = η₁ from rfl] at hb'
+  have hη₁Res : ClassFunction.inner η₁ (ClassFunction.restrict L ψ) = (b' : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hb']; simp
+  refine ⟨m - (W2.subgroupOf H).index * b', ?_, ?_⟩
+  · rw [hrecip, hφRes, hη₁Res]; push_cast; ring
+  · exact dvd_sub hdvdm (dvd_mul_right ((W2.subgroupOf H).index : ℤ) b')
+
 end OddOrder.Peterfalvi.S08
