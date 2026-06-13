@@ -86,9 +86,34 @@ g∈E₁# と h∈C_{E₃}(g)# を取り、Cauchy (`exists_prime_orderOf_dvd_car
 依存はすべて landed (Uniqueness/Thm 10.1(b)/10.2/Lem 12.18/Prop 10.14(d)/Lem 10.12/Thm 13.4)。
 Hall (β∪β)-部分群 + F(H) の素因子取りが mathlib API 探索ポイント。
 
+## equal-case helper の実装戦略 (refined)
+
+step 4 を一般 helper として切る:
+`E₁,E₃ prime on N` + `E₃ ⊲ (E₁⊔E₃)` + coprime orders + **`C_N(E₁)=C_N(E₃)`** ⟹
+`ActsPrimeOn N (E₁⊔E₃)`。
+
+Unit A (`actsPrimeOn_of_prime_order_le`) で素数位数 `x∈(E₁⊔E₃)#` ごとに `C_N(x) ≤ D` を示す
+(`D := C_N(E₁)=C_N(E₃)`, `C_N(E₁⊔E₃)=C_N(E₁)⊓C_N(E₃)=D`):
+- **s∈π(E₃)** (易): x の像が (E₁E₃)/E₃≅E₁ で位数 | gcd(s,|E₁|)=1 ⟹ x∈E₃ ⟹ E₃ prime で C_N(x)=C_N(E₃)=D。
+- **s∈π(E₁)** (難): ⟨x⟩ は E₁E₃ の Sylow s。E₁ ⊇ Sylow s(E₁E₃)。**Sylow 共役**で x^g≤E₁ (g∈E₁E₃)。
+  E₁ prime で C_N(x^g)=C_N(E₁)=D。C_N(x)=C_N(x^g)^{g⁻¹}=D^{g⁻¹}。**D は E₁E₃ で正規化**
+  (E₁ 可換 ⟹ E₁ normalizes E₁ ⟹ C(E₁); E₃ normalizes C_N(E₃)=D; N⊲M で N も保つ) ⟹ D^{g⁻¹}=D。
+  - mathlib: Sylow-in-subgroup は ↥(E₁⊔E₃) で `Sylow` を取るのが要点。共役 = `Sylow.exists_smul_eq`。
+  - 注意: 一般 Hall 共役は不要 (素数 s ゆえ Sylow で足りる)。
+
+⚠ **`C_N(E₁)=C_N(E₃)` の確立**が前提 = 13.7 body の step 2 (`≤`, Thm 13.4) + step 5 (`¬strict`,
+背理法)。だから equal-case helper 単体では 13.7 は閉じない。body 側で C_N(E₁)≤C_N(E₃) と
+¬(strict) を出して `=` にしてから helper を呼ぶ。
+
+step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push して g∈E₁#, h∈E₃⊓C({g}) 非自明、
+`P=zpowers(g^{ord g/p})`, `R=zpowers(h^{ord h/r})` (`zpowers _ ∈ elemAbelianOfRank G _ 1` =
+`⟨IsElementaryAbelian.of_card_prime, by rw[pow_one]; exact card=prime⟩`、card = orderOf =
+`orderOf_eq_prime`)。P≤C(R) は ⟨g⟩,⟨h⟩ commute から。
+
 ## 進捗
 
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
-  式番号 (13.2)(13.3)(13.4) を PDF で確定。step 5c helper
-  `actsPrimeOn_inf_centralizer_eq_bot` を landed (✅ sorry-free)。次 = 13.7 step 4 同値補題 →
-  step 1/5 配線 → 13.7 完成 → 13.8。
+  式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
+  `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
+  witness 抽出 API (`zpowers _ ∈ elemAbelianOfRank`) 確認済。
+  次 = equal-case helper (Sylow 共役 + D 正規化) → 13.7 body (step1/2/5 配線) → 13.7 完成 → 13.8。
