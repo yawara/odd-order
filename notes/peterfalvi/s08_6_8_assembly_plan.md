@@ -1319,3 +1319,25 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
   Hypothesis46/certain-type の C_H(w)=W₂ + FPF-order-divides 要調査。
 - Brick C 後: 最終 (6.8.2.2) statement (b=0 reduction, m=2 swap) → (6.8.2.3) → τ₂。
 **正本=本 session 40 cont.⁵。全 ingredient 在庫確認済 (Bessel/Yset_finite/two_le_Yset_ncard/variant)。空転なし。**
+
+## 2026-06-14 (session 40 cont.⁶, /loop): 🎉 coefficient dichotomy COMPLETE (Brick C, first-try build)
+
+**✅✅✅ MILESTONE landed (build-green + axiom-clean, 初回 build 一発)**:
+15. **`coeff_eq_neg_or_edge_caseB` (b487fab8)** = **(6.8.2.2) coefficient dichotomy**
+    `⟨α^τ, η₁^{τ₁}⟩ = −|H:Z| ∨ (|Y|=2 ∧ =0)` (α=Ind_{W₂}φ−|H:Z|η₁)。
+    `coeff_eq_neg_or_edge_of_frobenius` (S08_CoherenceCore:10639) を逐行ミラー、ingredient 全差替成功:
+    inner_tau_alpha_dvd_index (bb) / inner_tau_indW2_sub_smul_tau_Yset_diff + coherentYset_extension_Yset_diff_eq_tau
+    (hcoeff) / sum_sq_le_inner_self_re (Bessel) / inner_self_tau_indW2_sub_smul∘inner_self_indW2_sub_smul_eq
+    (norm |L:Z|+|H:Z|²) / eq_zero_or_edge_of_dvd_of_normLt (trichotomy)。
+    **deferred hypotheses: hc2 (2≤|H:Z|), hFPF (|L:Z|<|H:Z|²)** = W₁-FPF-on-H/W₂ inputs。
+    → **(6.8.2.2) の inner-product/norm/dichotomy 解析は全完了**。残=構造的 input + 最終 X-structure。
+
+### ⚠ (6.8.2.2) 残 = 構造的 input + 最終 statement (次 loop):
+- **Brick B = FPF bound `hc2`/`hFPF`** (deferred): case-B (c2) で C_H(w)=W₂ (w∈W₁#) ⟹ W₁ acts FPF on H/W₂
+  (H/W₂≠1) ⟹ |W₁| ∣ |H:W₂|−1 ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|=|W₁||H:W₂|<|H:W₂|² (=hFPF), 2≤|H:W₂| (=hc2)。
+  **要調査**: Hypothesis46/certain-type の C_H(w)=W₂ field + FPF-order-divides (Frobenius 群 |kernel|≡1 mod |compl|?
+  Isaacs Ch06 IsFrobeniusGroup or coprime action の `card_eq_...` 系)。|L:W₂|=|W₁||H:W₂| は relIndex_mul_index。
+- **X-structure (step 4)** = `coeff_eq_neg_or_edge_of_frobenius` 後の Frobenius step-4 (S08_CoherenceCore:10774
+  `...X-structure...`) を case-B でミラー: bb=−|H:Z| branch で X:=α^τ+|H:Z|η₁^{τ₁} ⊥ 𝒴^{τ₁}, ‖X‖²=‖Ind φ‖²/...,
+  X∈ZIrr ⟹ α^τ=X−|H:Z|η₁^{τ₁}。→ (6.8.2.3) → τ₂ assembly → (6.8.2) capstone。
+**正本=本 session 40 cont.⁶。** 🎉 dichotomy は (6.8.2.2) 最大の技術的山場、first-try で landed。空転なし。
