@@ -299,4 +299,53 @@ theorem chiFourCornerOnV_coe (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
           - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) :=
   rfl
 
+/-- **(4.10), crux (d): `β^τ` vanishes off `V^G`.**  `β^τ(g) = 0` whenever `g ∉ V^G`
+(`= conjugatesOfSet (ticVdiff h).V`).  This is the book's "`β^τ(g) = 0` if `g ∉ V^G`", a
+consequence of `Supp β ⊆ V^L` and the certain-type Dade map structure.
+
+`β^τ = h.dade0.dadeMap β` (`IsDadeMap.unique`).  Off `dadeSupport` the value is `0`.  On
+`dadeSupport`, `g` is `G`-conjugate to `a·h` with `a ∈ A₀`, `h ∈ H(a)`, and the value is `β(a)`;
+if it is nonzero then `a ∈ Supp β ⊆ V^L`, so `C_G(a) ⊆ L` (`centralizer_le_L_of_mem_conj_toTICV`),
+forcing `H(a) = ⊥` (`H_eq_bot_of_centralizer_le`), hence `h = 1` and `g` is conjugate to `a ∈ V^G`,
+contradicting `g ∉ V^G`. -/
+theorem fourCornerDade_eq_zero_of_not_mem_conjugatesV (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {g : G} (hg : g ∉ Group.conjugatesOfSet (ticVdiff h).V) :
+    h.tau.toDadeMap (fourCornerDiffSupported h χ₂ i) g = 0 := by
+  have hcoe : (fourCornerDiffSupported h χ₂ i :
+        OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ _ L) =
+      h.toTICyclicFullDadeApplication.tau.toDadeMap (chiFourCornerOnV h χ₂ i) :=
+    signedDiff_fourcorner_eq_toTICDade h χ₂ i
+  have hsupp : ∀ z : ↥L,
+      (fourCornerDiffSupported h χ₂ i : ClassFunction ↥L ℂ) z ≠ 0 →
+      z ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V := fun z hz => by
+    by_contra hc
+    exact hz (by
+      rw [hcoe]
+      exact h.toTICyclicHypothesis.full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+        h.toTICyclicFullDadeApplication (chiFourCornerOnV h χ₂ i) hc)
+  rw [show h.tau.toDadeMap = h.dade0.dadeMap (k := ℂ) from
+      OddOrder.Peterfalvi.S04.IsDadeMap.unique h.tau.toDadeIsometryData.isDadeMap
+        h.dade0.isDadeMap_dadeMap, h.dade0.dadeMap_apply]
+  by_cases hgs : g ∈ h.dade0.dadeSupport
+  · obtain ⟨a, hh', hh'mem, hga⟩ := h.dade0.mem_dadeSupport_iff.mp hgs
+    rw [h.dade0.dadeValue_eq _ hh'mem hga]
+    by_contra hne
+    have hac := hsupp _ hne
+    have hHbot := h.dade0.H_eq_bot_of_centralizer_le a
+      (centralizer_le_L_of_mem_conj_toTICV h hac)
+    rw [hHbot, Subgroup.mem_bot] at hh'mem
+    rw [hh'mem, mul_one] at hga
+    apply hg
+    obtain ⟨v, hvV, hconjv⟩ := Group.mem_conjugatesOfSet_iff.mp hac
+    rw [Group.mem_conjugatesOfSet_iff]
+    refine ⟨L.subtype v, coe_mem_ticVdiffV_of_mem_toTICV h hvV, ?_⟩
+    obtain ⟨cc, hcc⟩ := isConj_iff.mp hconjv
+    refine IsConj.trans (isConj_iff.mpr ⟨L.subtype cc, ?_⟩) hga
+    have := congrArg L.subtype hcc
+    simpa [map_mul, map_inv] using this
+  · rw [h.dade0.dadeValue_of_not_mem_dadeSupport _ hgs]
+
 end OddOrder.Peterfalvi.S06
