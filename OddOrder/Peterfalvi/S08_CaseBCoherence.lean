@@ -593,4 +593,75 @@ theorem SibleyDadeHypothesis.restrict_extension_Yset_charValue_cong_caseB
   simp only [← hsmul] at hcong2
   exact hcong2
 
+open scoped OddOrder.AlgInt in
+/-- **(6.8.2.2) integration core: `|H| ∣ |W₂|·a`.**  For `ψ = η^{τ₁}` (`η ∈ Y`) and a nontrivial
+*linear* `φ ∈ Irr W₂`, the regular-character coefficient `a = ⟨Res^L_{W₂} Res^G_L ψ, φ⟩` (an integer
+`m`) satisfies `|H| ∣ |W₂|·m`.
+
+This is the number-theoretic heart of Peterfalvi (6.8.2.2) ("`a ≡ 0 (mod |H:Z|)`"): pick `z₀ ∈ W₂^#`
+(exists since `|W₂|` is prime); `ψ` (hence `Res_{W₂} Res_L ψ =: f`) is constant on `W₂^#`
+(`coherentYset_extension_const_on_W2`), so the regular-character relation
+`apply_one_sub_apply_eq_card_mul_inner` gives `f(1) − f(z₀) = |W₂|·m`; the (6.7) congruence
+`restrict_extension_Yset_charValue_cong_caseB` gives `f(z₀) ≡ f(1) (mod |H|)`, i.e.
+`f(1) − f(z₀) ≡ 0`; since that difference equals the rational integer `|W₂|·m`, the reverse bridge
+`dvd_of_intCast_algMod` yields `|H| ∣ |W₂|·m`.  The caller cancels `|W₂|` (using `|H| = |H:W₂|·|W₂|`)
+for `|H:W₂| ∣ m`. -/
+theorem SibleyDadeHypothesis.card_H_dvd_card_W2_mul_regCharCoeff
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2) {m : ℤ}
+    (hm : ClassFunction.inner
+            (ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)))
+            (φ : ClassFunction ↥W2 ℂ) = (m : ℂ)) :
+    (Nat.card ↥H : ℤ) ∣ (Nat.card ↥W2 : ℤ) * m := by
+  classical
+  set f : ClassFunction ↥W2 ℂ :=
+    ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)) with hfdef
+  -- a witness `z₀ ∈ W₂^#` (`|W₂|` prime ⇒ nontrivial).
+  haveI : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
+  obtain ⟨z₀, hz₀1⟩ := exists_ne (1 : ↥W2)
+  -- `f` is constant on `W₂^#`.
+  have hfconst : ∀ a : ↥W2, a ≠ 1 → f a = f z₀ := by
+    intro a ha
+    have hmemA : (W2.subtype a) ∈ W2 := SetLike.coe_mem a
+    have hmemZ : (W2.subtype z₀) ∈ W2 := SetLike.coe_mem z₀
+    have hA1 : (W2.subtype a) ≠ 1 := fun h => ha (W2.subtype_injective (by simpa using h))
+    have hZ1 : (W2.subtype z₀) ≠ 1 := fun h => hz₀1 (W2.subtype_injective (by simpa using h))
+    have hc := hyp.coherentYset_extension_const_on_W2 hprime hW2comm hη hmemZ hZ1 hmemA hA1
+    simp only [hfdef, ClassFunction.restrict_apply]
+    exact hc
+  -- regular-character relation `f(1) − f(z₀) = |W₂|·m`.
+  have hreg := apply_one_sub_apply_eq_card_mul_inner hφ1 hφ f (z := z₀) hfconst
+  rw [hm] at hreg
+  -- the value identities relating `f` to `Res_L ψ`.
+  have hfz : f z₀ = (ClassFunction.restrict L (hyp.coherentYset.extension η)) (W2.subtype z₀) :=
+    ClassFunction.restrict_apply W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)) z₀
+  have hf1 : f 1 = (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1 :=
+    ClassFunction.restrict_apply W2 (ClassFunction.restrict L (hyp.coherentYset.extension η)) 1
+  have hZ1 : (W2.subtype z₀) ≠ 1 := fun h => hz₀1 (W2.subtype_injective (by simpa using h))
+  -- (6.7) congruence `f(z₀) ≡ f(1) (mod |H|)`.
+  have hcong := hyp.restrict_extension_Yset_charValue_cong_caseB hcop hp hHp hprime hW2comm hW2cen hη
+    (z := W2.subtype z₀) (SetLike.coe_mem z₀) hZ1
+  rw [← hfz, ← hf1] at hcong
+  -- `f(1) − f(z₀) ≡ 0 (mod |H|)`.
+  have hsub : f 1 - f z₀ ≡ 0 [ALGMOD (Nat.card ↥H : ℤ)] := by
+    have h := OddOrder.AlgInt.Cong.sub hcong.symm (OddOrder.AlgInt.Cong.refl (Nat.card ↥H : ℤ) (f z₀))
+    simpa using h
+  rw [hreg] at hsub
+  -- convert to the integer congruence and apply the reverse bridge.
+  have hcong_int : ((Nat.card ↥W2 * m : ℤ) : ℂ) ≡ ((0 : ℤ) : ℂ) [ALGMOD (Nat.card ↥H : ℤ)] := by
+    have heq : ((Nat.card ↥W2 * m : ℤ) : ℂ) = (Nat.card ↥W2 : ℂ) * (m : ℂ) := by push_cast; ring
+    rw [heq]; simpa using hsub
+  have hHne : ((Nat.card ↥H : ℤ) : ℂ) ≠ 0 := by
+    have h1 : (Nat.card ↥H : ℤ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+    exact_mod_cast h1
+  have hdvd := dvd_of_intCast_algMod hHne hcong_int
+  rwa [sub_zero] at hdvd
+
 end OddOrder.Peterfalvi.S08
