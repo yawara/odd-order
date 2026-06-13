@@ -2569,3 +2569,38 @@ ticVdiff.sigma は (ticVdiff.V)^G=V^G off で消失 [`full_map_eq_zero_of_not_me
 (4.8 concl-1 :303-330 の logic 流用; tic_W2=W2.map subtype, L.subtype inj)。
 [別 route: toTIC carrier 経由で W−(W₁∪W₂)、こちらは smaller ゆえ bridge 自明だが induce defeq sdiff.W=toTIC.W 要]。
 **次 = bridge lemma (self-contained 群論) から。crux=(d) off-V^G。~2-3 commits、FT 経路外。**
+
+## 2026-06-13 (session 38 cont.², /loop): (4.10) L-side packaging COMPLETE + (d) crux 機構特定
+
+**landed (2 commits, leaf 3598 green)**:
+- `d396656b` bridge `coe_mem_A0_of_mem_conjugatesOfSet_toTICV`: conj_L(toTIC.V) → A₀ (純群論)。
+- `3f0cf45d` `signedDiff_fourcorner_eq_toTICDade` (β = toTIC Dade(carrier), via piece a +
+  `tau_eq_induce` + FullDadeIsometryData.toDadeMap = .toDadeIsometryData.toDadeMap abbrev defeq) +
+  **`fourCornerDiffSupported : SupportedClassFunctions ℂ A₀ L`** (β∈CF(L,A₀); Supp⊆conj(toTIC.V)→A₀
+  via `full_map_eq_zero_of_not_mem_conjugatesOfSet_V`)。
+
+⟹ **(4.10) の代数前提すべて完成** (β=Indα / α∈CF(W,V)+carrier / β∈CF(L,A₀) / bridge / β=toTIC Dade)。
+
+### 🔴 残 = (c)(d)(e) final assembly。crux = (d) off-V^G vanishing of β^τ
+`β^τ = h.tau.toDadeMap(fourCornerDiffSupported) = h.dade0.dadeMap β` [S06_CertainTypeIsometry:922]。
+`dadeValue β g`: g∈dadeSupport で base point a∈A の β(a)、off で 0 [S04 dadeMapCF:3564, dadeValue_eq /
+dadeValue_of_not_mem_dadeSupport]。
+**(d) `β^τ(g)=0` for g∉V^G** の機構 (book「C_G(x)=W⊂L」の Lean 化):
+- g∉dadeSupport → 0 [自明]。
+- g∈dadeSupport → g conj a·h (a∈A, h∈H(a))、β^τ(g)=β(a)。β(a)≠0 → a∈Supp β⊆conj_L(toTIC.V)⊆V^L。
+- **🔑 H(a)=⊥ for a∈V^L**: S04 Hypothesis の `centralizer_eq_sup` (C_G(a)=H(a)⊔C_L(a)) + `centralizer_disjoint`
+  (H(a)⊓C_L(a)=⊥) ⟹ **C_G(a)⊆L ならば H(a)=⊥**。
+- H(a)=⊥ → hCoset(a)={a} → g conj a → g∈a^G⊆(V^L)^G=V^G。g∉V^G と矛盾。⟹ β(a)=0。
+
+**🟡 残ギャップ = 「C_G(a)⊆L for a∈conj_L(toTIC.V)」(G-side centralizer)**。book=C_G(v)=W for v∈V。
+Lean `centralizer_eq_sup` (S06_DadeIsometryCertain:195) は **C_L(x)=W₁⊔W₂ (L-side のみ)**。**G-side C_G(v)⊆L for
+v∈tic.V/ticVdiff.V が必要 — tic (TICyclicHypothesis G) の TI 構造から導出可か要確認** (V_ti+cyclic+self-cent?
+or 新 field/補題)。これが (4.10) 完成の最後の hard core。
+
+### ▶ 次 (session 39): 
+1. **「C_G(v)⊆L for v∈tic.V」availability 確認** (tic の TI-cyclic 公理から; なければ Hypothesis46 が
+   この compatibility を field で持つか、dade0 経由で出るか精査)。
+2. 出れば (d) を上記機構で構築 → (c) value-on-V [mirror 4.8 step-4 `certainType_diff_dade_apply_eq_of_mem_V`、
+   β(v)=α(v) は toTIC Dade value on V or (4.3.c)+δ²+δ_0=1] → (e) `ClassFunction.ext` g∈V^G/∉ case split。
+3. RHS=ticVdiff.sigma(α_G)=`Ind_W^G(α_G)` [sigma_eq_tau]、off V^G 消失は `full_map_eq_zero...V` (ticVdiff) で clean。
+**hard core ×1 = (d) の C_G(v)⊆L gap。FT 経路外。正本=本 session 38 cont.²。**
