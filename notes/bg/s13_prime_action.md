@@ -687,6 +687,34 @@ Sylow ℓ of C_{M_σ}(A₀) (ℓ∈α ⟹ C_{M_σ}(A₀) の ℓ-部分は M_α 
 - **🎯 §13 frontier 解放**: Thm 13.4 完成で **Thm 13.5 / Lem 13.6 / 13.7 / … の step-7 gate が消滅** — 以降 §13 結果は
   proof レベルで unblocked (§12 scaffold-cite のみ)。次 = Theorem 13.5 (設計済 [上記] + 13.4 完成で完全に積める)。
 
+### 2026-06-14 Lane G: ✅✅✅ Theorem 13.5 COMPLETE — E₁ prime action (sorry-free, **完全 axiom-clean**)
+
+`E1_actsPrime` を S13_PrimeAction に in-place 実装 (実 sorry 7→6)。**`#print axioms` = [propext,
+Classical.choice, Quot.sound] — sorryAx 0**。⟹ main 取込で **Lane F の §12 が完全 PROVEN 化**
+(Prop 12.15 / Thm 12.13 / Cor 12.16 すべて sorry-free) されたため、推移的に **Thm 13.4 / Cor 13.3 /
+Cor 13.2 / Lemma 13.1 もすべて axiom-clean** = §13 (13.1–13.5) は完全 unconditional。AxiomsCheck に
+clean `#assert_only_allowed_axioms` 登録、full build 3788 jobs green (36s)。
+
+**証明構造** (設計どおり、Sylow 分解 API 不要):
+- helper `key` (cross-prime core): order-`p` 元 `x ∈ E₁` で `C_{M_σ}(x) = C_{M_σ}(E₁)`。⊇ free、
+  ⊆ は `le_centralizer_of_forall_prime_isPGroup` (K=E₁) で「各素冪部分群 `R ≤ E₁` が `C_{M_σ}(x)` を
+  中心化」へ還元 → R≠⊥ で order-`r` 元 `y∈R` 取り、**Thm 13.4** (`⟨x⟩∈ℰ_p¹(E)`,
+  `⟨y⟩∈ℰ_r¹(C_E⟨x⟩)`; E₁ abelian で `x,y` 可換) → `C_{M_σ}(x) ⊆ C_{M_σ}(y) = C_{M_σ}(R)`
+  (後者 = R の prime action = `actsPrimeOn_Msigma_of_mem_tau13`, Cor 13.3(a) core)。
+- Main: `g∈E₁#` を素因子 `p` の `x=g^{ord g/p}` (order p) に落とし `C(g)⊆C(x)` + `key`。
+- 補助 helper (theorem 内 have): `hcent_zpowers` (`C({z})=C(⟨z⟩)`), `hE1comm` (E₁ abelian),
+  `hzp_mem` (order-prime 元 → `⟨z⟩∈ℰ¹`, `Subgroup.IsElementaryAbelian.of_card_prime`)。
+- 🔑 **r=p ケースも Thm 13.4 が許容** (`{p r}` 独立, r≠p 制約なし)。`le_centralizer_of_forall_prime_isPGroup`
+  が prime-power induction で「E₁=⊔Sylow」を暗黙に carry ⟹ cyclic→Sylow 明示分解の自作不要。
+- **配置**: S13_PrimeAction 内 in-place (Cor 13.3 と同所)。新 leaf にしない理由 = 下流 stub
+  (13.6/13.7) が 13.5 に依存し leaf 化すると import cycle。AxiomsCheck は既に S13_PrimeAction を
+  import ゆえ配線追加不要。
+
+**次 = Lemma 13.6** (mmd L3574, stub `maximalContaining_eq_singleton_of_E1`): `1⊂P⊆E₁`, `q∈σ(M)`,
+`X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の Sylow `q` とすると `ℳ(C_G(X))=ℳ(S)={M}`。deps = Thm 13.5 ✅ /
+Cor 12.6 / Lem 12.17 / Thm 13.4 ✅。⚠ session-1 audit 既知: Cor 12.14 が `ℳ(S)` (S=Sylow) に要する
+形を `maximalContaining_centralizer_eq_singleton` が脱落 → 13.6 着工時に要確認。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint

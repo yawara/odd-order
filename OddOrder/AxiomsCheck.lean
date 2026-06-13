@@ -3742,6 +3742,11 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- (S12_E Cor 12.16 に非依存; axiom-clean).
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.pSubgroup_centralizes_Msigma_inf
 
+-- BG Theorem 13.5: `E₁ ≠ 1` acts in a prime manner on `M_σ`. Fully unconditional —
+-- Theorem 13.4 and Corollary 13.3 are axiom-clean now that Lane F's §12 (Prop 12.15 /
+-- Thm 12.13 / Cor 12.16) is PROVEN, so `E1_actsPrime` bottoms out at the standard axioms only.
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.E1_actsPrime
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.
