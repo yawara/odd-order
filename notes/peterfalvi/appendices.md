@@ -142,6 +142,22 @@ conjugation Equiv で). sorry 不変 (2→2)。
 - **(b) F FPF**: 各 O_p FPF + F=∏O_p の ∏ 分解 (f∈F^#, f_p∈⟨f⟩ で C_E(f)⊆C_E(f_p)=⊥)。F cyclic 後なら容易化。
 - **(c) commutator≤F**: `commutator_le_fitting_of_isCyclic_fitting` (要 `[IsSolvable D]` 追加 = FT 帰結) + (a)。
 - ⟹ (a) が gate。組めば explicit sorry 2→1 (Lemma 非cyclic のみ残)。
+
+### ✅ session 3 (2026-06-14): Prop 1 完全 assembled — explicit sorry 2→1
+- **(a) F cyclic = DONE**: `opCore p D ↔ opCore p ↥(fitting D)` の subgroup-of-subgroup 同定を
+  `opCore_fitting_map_subtype_eq` (`(opCore p ↥F).map subtype = opCore p D`; ≤ は char→normal-map +
+  `normal_pgroup_le_opCore`、≥ は `subgroupOf`+`map_subgroupOf_eq_of_le`) で解決 → blocker 消滅。
+  `isCyclic_fitting_of_forall_opCore_isCyclic` は F nilpotent⟹各 Sylow=O_p(↥F) (一意) を `IsZGroup ↥F` に
+  し mathlib `[IsZGroup][IsNilpotent]⟹IsCyclic`。**仮説は prime のみ** (`∀ p, p.Prime → IsCyclic ↥(opCore p D)`;
+  証明が p を prime でしか使わない)。
+- **(b) F FPF = DONE** `fitting_fpf_of_transitive`: f∈F^# で prime p|orderOf f、g=f^(|f|/p) は order p →
+  `g∈O_p(↥F)` (zpowers≤ 一意 Sylow) → `(g:D)∈O_p(D)` (= opCore_fitting_map_subtype_eq) → per-prime FPF で
+  C_E(g)=⊥、`C_E(f)⊆C_E(g)` (mono helper: fixed by f ⟹ fixed by f^n)。⟹ C_E(f)=⊥。
+- **(c) commutator≤F = DONE** (既 session 3 の `commutator_le_fitting_of_isCyclic_fitting`)。
+- **assembly** `fitting_cyclic_fixedPointFree`: `[IsSolvable D]` 追加 (FT 帰結, C_D(F)≤F に必須) + `q∣|E|` を
+  `hE.isPGroup`+`IsPGroup.iff_card`+nontrivial で導出 → ⟨hcyc, F-FPF, commutator⟩。axiom-clean modulo Lemma sorry。
+- **⟹ Huppert.lean の explicit sorry = 1 本** (`pGroup_cyclic_fixedPointFree` の irreducible-非cyclic case のみ)。
+  full build 3802 jobs ~10s, AxiomsCheck OK。**残 frontier = Lemma 非cyclic case (Schur over F_q + type-(p,p))** 一点。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
