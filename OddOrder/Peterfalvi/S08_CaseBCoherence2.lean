@@ -190,4 +190,155 @@ theorem certainType_W2_le_center (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
     _ = w * ((k : ↥L) * (w₁ : ↥L)) := by rw [← mul_assoc, hck, mul_assoc]
     _ = w * g := by rw [hkw]
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **(6.8) case-(B) structural discharge: the FPF index bounds `hc2`/`hFPF`.**
+
+In the (4.2)/certain-type structure `L = K ⋊ W₁` with `C_K(x) = W₂` (`x ∈ W₁^#`) and the math-(B)
+condition `W₂ ⊆ Z(K)` (so `W₂` is central, `certainType_W2_le_center`), the quotient `↥L / W₂` is a
+**Frobenius group** with kernel `K/W₂` and complement `W₁W₂/W₂`: the centralizer-meet-kernel
+condition lifts from `C_K(x) = W₂` via coprime action
+(`fixedPoint_lift_of_generator_quotient_fixed`), since a quotient-fixed `c ∈ K` lies in
+`C_L(x) ∩ K = W₂`, so its image is `1`.  Isaacs Lemma 6.1
+(`IsFrobeniusGroup.card_kernel_modEq_one`) then gives `|K : W₂| ≡ 1 (mod |W₁|)`, whence
+`|W₁| < |K : W₂|` (using `W₂ ⊊ K`, i.e. `¬ K ≤ W₂`).
+
+This discharges the deferred FPF inputs of `exists_decomposition_caseB` (with `H := K`, `W2 := W₂`):
+* `hc2 : 2 ≤ |K : W₂|` (from `W₂ ⊊ K`),
+* `hFPF : |L : W₂| < |K : W₂|²` (from `|L : W₂| = |K : W₂| · |W₁|` and `|W₁| < |K : W₂|`). -/
+theorem certainType_index_bounds (h : OddOrder.Peterfalvi.S06.Hypothesis ↥L)
+    (hW2cenK : h.W2 ≤ Subgroup.centralizer (↑h.K : Set ↥L))
+    (hKW2 : ¬ h.K ≤ h.W2) :
+    2 ≤ (h.W2.subgroupOf h.K).index ∧
+    (h.W2.index : ℤ) < ((h.W2.subgroupOf h.K).index : ℤ) ^ 2 := by
+  classical
+  haveI : Finite ↥L := inferInstance
+  haveI : Finite ↥h.K := inferInstance
+  -- `W₂` is central, hence normal in `↥L`.
+  have hW2cen : h.W2 ≤ Subgroup.center ↥L := certainType_W2_le_center h hW2cenK
+  haveI hW2N : h.W2.Normal := ⟨fun w hw g => by
+    have hc : g * w = w * g := Subgroup.mem_center_iff.mp (hW2cen hw) g
+    have hgw : g * w * g⁻¹ = w := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+    rw [hgw]; exact hw⟩
+  haveI hKN : h.K.Normal := h.K_normal
+  set Nk := h.K.map (QuotientGroup.mk' h.W2) with hNk
+  set Aw := h.W1.map (QuotientGroup.mk' h.W2) with hAw
+  -- Frobenius group structure on the quotient `↥L / W₂`.
+  have hC : Subgroup.IsComplement' Nk Aw :=
+    OddOrder.BG.Ch1.S03.quotient_complement_of_normal_le_kernel h.isComplement h.W2_le_K
+  have hNk_ne : Nk ≠ ⊥ :=
+    OddOrder.BG.Ch1.S03.quotient_kernel_map_ne_bot_of_not_le hKW2
+  have hAw_ne : Aw ≠ ⊥ :=
+    OddOrder.BG.Ch1.S03.quotient_complement_map_ne_bot_of_le_kernel h.isComplement h.W2_le_K
+      h.W1_nontrivial
+  haveI hNkN : Nk.Normal := hKN.map (QuotientGroup.mk' h.W2) (QuotientGroup.mk'_surjective h.W2)
+  have hcentral : ∀ x ∈ Aw, x ≠ 1 →
+      Subgroup.centralizer ({x} : Set (↥L ⧸ h.W2)) ⊓ Nk = ⊥ := by
+    intro qx hqxA hqx_ne
+    rw [eq_bot_iff]
+    intro qz hqz
+    rw [Subgroup.mem_inf] at hqz
+    obtain ⟨hqz_cen, hqz_Nk⟩ := hqz
+    obtain ⟨x, hxW1, hxq⟩ := hqxA
+    have hx_ne : x ≠ 1 := by
+      rintro rfl; exact hqx_ne (by rw [← hxq]; simp)
+    obtain ⟨y, hyK, hyq⟩ := hqz_Nk
+    -- the centralizer condition lifts to `mk(x y x⁻¹) = mk y`.
+    have hgen : (QuotientGroup.mk' h.W2) (x * y * x⁻¹) = (QuotientGroup.mk' h.W2) y := by
+      have hcomm : (QuotientGroup.mk' h.W2) x * (QuotientGroup.mk' h.W2) y
+          = (QuotientGroup.mk' h.W2) y * (QuotientGroup.mk' h.W2) x := by
+        have hc := (Subgroup.mem_centralizer_singleton_iff.mp hqz_cen).symm
+        rw [← hxq, ← hyq] at hc; exact hc
+      rw [map_mul, map_mul, map_inv, hcomm, mul_assoc, mul_inv_cancel, mul_one]
+    -- coprime-action fixed-point lift (`zpowers x` is cyclic ⇒ solvable; `(|⟨x⟩|, |K|) = 1`).
+    have hCopx : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥h.K) := by
+      have hle : Subgroup.zpowers x ≤ h.W1 := Subgroup.zpowers_le.mpr hxW1
+      exact Nat.Coprime.coprime_dvd_left (Subgroup.card_dvd_of_le hle) h.card_coprime.symm
+    have hSolv : IsSolvable ↥(Subgroup.zpowers x) ∨ IsSolvable ↥h.K :=
+      Or.inl (isSolvable_of_comm fun a b => by
+        obtain ⟨m, hm⟩ := a.2
+        obtain ⟨n, hn⟩ := b.2
+        apply Subtype.ext
+        simp only [Subgroup.coe_mul, ← hm, ← hn]
+        exact (((Commute.refl x).zpow_zpow m n)))
+    obtain ⟨c, hcK, hcq, hcfix⟩ :=
+      OddOrder.BG.Ch1.S03.fixedPoint_lift_of_generator_quotient_fixed h.W2_le_K hCopx hSolv hyK hgen
+    -- `c` centralizes `x` and lies in `K`, hence `c ∈ C_L(x) ∩ K = W₂`, so `mk c = 1`.
+    have hc_cen : c ∈ Subgroup.centralizer ({x} : Set ↥L) := by
+      apply Subgroup.mem_centralizer_singleton_iff.mpr
+      have hxc : x * c = c * x := by
+        have h2 := congrArg (· * x) hcfix
+        simpa only [mul_assoc, inv_mul_cancel, mul_one] using h2
+      exact hxc.symm
+    have hc_W2 : c ∈ h.W2 := by
+      rw [← h.centralizer_W2 x hxW1 hx_ne]; exact Subgroup.mem_inf.mpr ⟨hc_cen, hcK⟩
+    have hcq1 : (QuotientGroup.mk' h.W2) c = 1 := (QuotientGroup.eq_one_iff c).mpr hc_W2
+    rw [Subgroup.mem_bot, ← hyq, ← hcq, hcq1]
+  have hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L ⧸ h.W2) Nk Aw :=
+    (OddOrder.BG.Ch1.S03.isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot
+      hNkN hC hNk_ne hAw_ne).mpr hcentral
+  have hmod : Nat.card ↥Nk ≡ 1 [MOD Nat.card ↥Aw] := hFrob.card_kernel_modEq_one
+  -- translate the kernel/complement orders to `|K : W₂|` and `|W₁|`.
+  have hcardNk : Nat.card ↥Nk = (h.W2.subgroupOf h.K).index := by
+    have hrange : (QuotientGroup.mk' h.W2 |>.comp h.K.subtype).range = Nk := by
+      ext z
+      simp only [MonoidHom.mem_range, MonoidHom.comp_apply, Subgroup.coe_subtype, hNk,
+        Subgroup.mem_map]
+      constructor
+      · rintro ⟨k, rfl⟩; exact ⟨k, k.2, rfl⟩
+      · rintro ⟨k, hk, rfl⟩; exact ⟨⟨k, hk⟩, rfl⟩
+    have hker : (QuotientGroup.mk' h.W2 |>.comp h.K.subtype).ker = h.W2.subgroupOf h.K := by
+      ext k
+      simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+        Subgroup.mem_subgroupOf, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    rw [← hrange,
+      ← Nat.card_congr (QuotientGroup.quotientKerEquivRange
+        (QuotientGroup.mk' h.W2 |>.comp h.K.subtype)).toEquiv, hker]
+    rfl
+  have hcardAw : Nat.card ↥Aw = Nat.card ↥h.W1 := by
+    have hrange : (QuotientGroup.mk' h.W2 |>.comp h.W1.subtype).range = Aw := by
+      ext z
+      simp only [MonoidHom.mem_range, MonoidHom.comp_apply, Subgroup.coe_subtype, hAw,
+        Subgroup.mem_map]
+      constructor
+      · rintro ⟨w, rfl⟩; exact ⟨w, w.2, rfl⟩
+      · rintro ⟨w, hw, rfl⟩; exact ⟨⟨w, hw⟩, rfl⟩
+    have hker : (QuotientGroup.mk' h.W2 |>.comp h.W1.subtype).ker = (⊥ : Subgroup ↥h.W1) := by
+      ext w
+      simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+        QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff, Subgroup.mem_bot]
+      constructor
+      · intro hwW2
+        exact Subtype.ext (by simpa using Subgroup.disjoint_def.mp h.W_disjoint w.2 hwW2)
+      · rintro rfl; simp
+    rw [← hrange,
+      ← Nat.card_congr (QuotientGroup.quotientKerEquivRange
+        (QuotientGroup.mk' h.W2 |>.comp h.W1.subtype)).toEquiv, hker]
+    exact Nat.card_congr QuotientGroup.quotientBot.toEquiv
+  rw [hcardNk, hcardAw] at hmod
+  -- `|W₁| ∣ |K : W₂| − 1`, and `|K : W₂| ≥ 2`, so `|W₁| < |K : W₂|`.
+  have hd2 : 2 ≤ (h.W2.subgroupOf h.K).index := by
+    rcases Nat.lt_or_ge (h.W2.subgroupOf h.K).index 2 with hlt | hge
+    · exfalso
+      have hne0 : (h.W2.subgroupOf h.K).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+      have h1 : (h.W2.subgroupOf h.K).index = 1 := by omega
+      exact hKW2 (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp h1))
+    · exact hge
+  have hdvd : Nat.card ↥h.W1 ∣ (h.W2.subgroupOf h.K).index - 1 :=
+    (Nat.modEq_iff_dvd' (by omega : (1 : ℕ) ≤ (h.W2.subgroupOf h.K).index)).mp hmod.symm
+  have hw1lt : Nat.card ↥h.W1 < (h.W2.subgroupOf h.K).index := by
+    have := Nat.le_of_dvd (by omega) hdvd; omega
+  refine ⟨hd2, ?_⟩
+  -- `|L : W₂| = |K : W₂| · |W₁|`, then `|K : W₂| · |W₁| < |K : W₂|²`.
+  have hindex : h.W2.index = (h.W2.subgroupOf h.K).index * Nat.card ↥h.W1 := by
+    have h1 : h.W2.relIndex h.K * h.K.index = h.W2.index :=
+      Subgroup.relIndex_mul_index h.W2_le_K
+    have h3 : h.K.index = Nat.card ↥h.W1 := h.isComplement.symm.index_eq_card
+    rw [← h1, h3]; rfl
+  rw [hindex]
+  have hpos : (0 : ℤ) < ((h.W2.subgroupOf h.K).index : ℤ) := by
+    exact_mod_cast (by omega : 0 < (h.W2.subgroupOf h.K).index)
+  have hlt : (Nat.card ↥h.W1 : ℤ) < ((h.W2.subgroupOf h.K).index : ℤ) := by exact_mod_cast hw1lt
+  push_cast
+  nlinarith [hpos, hlt]
+
 end OddOrder.Peterfalvi.S08
