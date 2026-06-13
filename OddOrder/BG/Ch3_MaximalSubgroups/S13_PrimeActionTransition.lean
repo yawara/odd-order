@@ -231,6 +231,59 @@ theorem actsPrimeOn_sup_of_eq_centralizer [Finite G] {N E₁ E₃ : Subgroup G}
     have hyeq : x'⁻¹ * (x' * y * x'⁻¹) * x' = y := by group
     rwa [hyeq] at hgoal
 
+/-- **Lemma 13.7 step 1** (witness 抽出): `E₁` が `E₃` に regular 作用しないなら、素数 `p, r` と
+`P ∈ ℰ_p¹(E₁)`, `R ∈ ℰ_r¹(E₃)` で `R` が `P` を中心化するものが存在する。
+
+`¬regular` から `g∈E₁#` と `h∈E₃#` (`[g,h]=1`) を取り、各々の素数べき部分
+`P = ⟨g^{ord g/p}⟩`, `R = ⟨h^{ord h/r}⟩` (素数位数) を取る。`P ≤ ⟨g⟩`, `R ≤ ⟨h⟩` と
+`Commute g h` から `R ≤ C(P)`。 -/
+theorem exists_elemAbelian_centralizing_of_not_regular [Finite G] {E₁ E₃ : Subgroup G}
+    (hreg : ¬ ActsRegularlyOn E₃ E₁) :
+    ∃ p r : ℕ, ∃ P R : Subgroup G,
+      P ∈ elemAbelianOfRank G p 1 ∧ P ≤ E₁ ∧
+      R ∈ elemAbelianOfRank G r 1 ∧ R ≤ E₃ ∧
+      R ≤ Subgroup.centralizer (P : Set G) := by
+  classical
+  rw [actsRegularlyOn_iff] at hreg
+  simp only [fixedByElement_def] at hreg
+  push_neg at hreg
+  obtain ⟨g, hgE1, hgne, hfix⟩ := hreg
+  obtain ⟨⟨he, he_mem⟩, he_ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hfix
+  obtain ⟨heE3, heC⟩ := Subgroup.mem_inf.mp he_mem
+  have he1 : he ≠ 1 := fun hc => he_ne (Subtype.ext (by simpa using hc))
+  have hghe : Commute g he := by
+    rw [Subgroup.mem_centralizer_iff] at heC; exact heC g (Set.mem_singleton g)
+  -- order-`s` cyclic subgroup of `⟨x⟩` inside `K`, for any `x ∈ K#`.
+  have key : ∀ {K : Subgroup G} (x : G), x ∈ K → x ≠ 1 →
+      ∃ s : ℕ, ∃ Q : Subgroup G,
+        Q ∈ elemAbelianOfRank G s 1 ∧ Q ≤ K ∧ Q ≤ Subgroup.zpowers x := by
+    intro K x hxK hx
+    have hord1 : orderOf x ≠ 1 := fun hc => hx (orderOf_eq_one_iff.mp hc)
+    have hord0 : orderOf x ≠ 0 := (orderOf_pos x).ne'
+    obtain ⟨s, hs, hsdvd⟩ := (orderOf x).exists_prime_and_dvd hord1
+    haveI : Fact s.Prime := ⟨hs⟩
+    set d := orderOf x / s with hd
+    have hdvd : d ∣ orderOf x := ⟨s, (Nat.div_mul_cancel hsdvd).symm⟩
+    have hd0 : d ≠ 0 := (Nat.div_pos (Nat.le_of_dvd (orderOf_pos x) hsdvd) hs.pos).ne'
+    set y := x ^ d with hy
+    have hyord : orderOf y = s := by
+      rw [hy, orderOf_pow' x hd0, Nat.gcd_eq_right hdvd, hd, Nat.div_div_self hsdvd hord0]
+    have hycard : Nat.card (Subgroup.zpowers y) = s := by rw [Nat.card_zpowers, hyord]
+    refine ⟨s, Subgroup.zpowers y, ?_, ?_, ?_⟩
+    · exact ⟨Subgroup.IsElementaryAbelian.of_card_prime hycard, by rw [pow_one]; exact hycard⟩
+    · rw [Subgroup.zpowers_le, hy]; exact K.pow_mem hxK d
+    · rw [Subgroup.zpowers_le, hy]; exact pow_mem (Subgroup.mem_zpowers x) d
+  obtain ⟨p, P, hP, hPE1, hPg⟩ := key g hgE1 hgne
+  obtain ⟨r, R, hR, hRE3, hRhe⟩ := key he heE3 he1
+  refine ⟨p, r, P, R, hP, hPE1, hR, hRE3, ?_⟩
+  have hzz : Subgroup.zpowers he ≤ Subgroup.centralizer (Subgroup.zpowers g : Set G) := by
+    rw [Subgroup.zpowers_le, Subgroup.mem_centralizer_iff]
+    intro u hu
+    rw [SetLike.mem_coe, Subgroup.mem_zpowers_iff] at hu
+    obtain ⟨k, rfl⟩ := hu
+    exact (hghe.zpow_left k).eq
+  exact hRhe.trans (hzz.trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPg)))
+
 /-! ## §13 prime action の拡張解析 (cont., mmd L3596-3628) -/
 
 /-- **BG Lemma 13.7** (mmd L3596): `E₁≠1` かつ `E₁` が `E₃` に regular 作用しないなら、`E₁E₃` は
