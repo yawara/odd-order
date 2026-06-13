@@ -203,6 +203,8 @@ interface gap の設計裁可 = **Lane-H 所有 wrapper file 方式**(ユーザ�
 sorry は BG Prop16.1 へ局所化のみ):
 
 - `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II`(MF=Msigma, Prop16.1 cite)
+- `isTypeI_iff_isTypeF` / `isTypeII_iff_isTypeP2`(type 辞書, Prop16.1 cite — §14/§16 の結論
+  `IsTypeF/P2` を shared `IsTypeI/II` へ翻訳; wiring (8.13)/(8.16) で確実に要る)
 - `isHall_primeFactors`(一般: π-Hall ⟹ π(|H|)-Hall)
 - `maxNilpotentNormalHall_isHall_of_typeI_or_II`(= **(8.11) 第1連言の type I/II 部**)
 - **`A1_eq_sigmaSharp_of_typeI_or_II`**(= support-set bridge `A1 M tau = M_σ#`, type I/II)
