@@ -2382,3 +2382,14 @@ API-fit 未検証で最大 risk。`narrow_centralizer_decomp` の S⊓R'=⊥ con
 分配律無し (`commutator_le` の ∀-形のみ) ⟹ 中心積の `⁅S,S⁆⊆⁅P₁,P₁⁆` は P₂≤Z(S) 経由 quotient or
 element 計算で自作。(4) の 10.8c 射影も `HasNormalPComplement` の quotient iso から組立。
 S04f_Blackburn に中心積-derived 既製補題が無いか先に確認推奨。テンプレ: narrow 適用 = `S10_LocalLemmas.lean:430-590`。
+
+**進捗更新 (session 23 cont., r≤2 steps 1-3 着地)**: leaf に bridge helper `centralizer_subgroupOf_inf_eq` +
+r≤2 の **steps 1-3 (narrow scaffolding) 実装済・ビルド green** (`hnotideal`/`hpβ`/`hXMσ'`)。残 1 sorry =
+**steps 4-6 のみ** (2 from-scratch proof)。step 4 の `S ⊓ Mσ' = S'` は商 `↥Mσ/K` 経由が確定:
+`MonoidHom.map_commutator` で `commutator(↥Mσ/K) = (commutator ↥Mσ).map q = (⁅S,S⁆).map q`
+(S が ↥Mσ/K に全射, K=ker)、`comap_map = ⊔ ker` で `⁅Mσ,Mσ⁆ ≤ ⁅S,S⁆⊔K`、Dedekind + K∩S=⊥ で
+`(⁅S,S⁆⊔K)⊓S = ⁅S,S⁆`。あるいは `focalSubgroupTheorem`(Ch05:1369) + focal=P' under
+`controlsOwnFusion_of_hasNormalPComplement`(Ch05:1684) 経由も可。step 6 中心積 class-2 は
+S=P₁⊔P₂ を `Subgroup.coe_mul_of_left_le_normalizer_right` で積に分解→commutator element 計算
+(`⁅ab,cd⁆=⁅a,c⁆` for b,d∈P₂ central)→`⁅S,S⁆=⁅P₁,P₁⁆=Z(P₁)`(`IsExtraspecial.commutator_eq_center`)。
+leaf は引き続き未コミット保持。
