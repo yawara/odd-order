@@ -801,3 +801,22 @@ Da=decompositionDaFromDadeOfDiff、hY=dade_Y_collapse_of_family(差分弱化)。
 4. **wire `hyp.cases`**。
 **effort: Frobenius=中大 (T7), c2=大 (bridge)。複数セッション。FT 経路 (§9 (7.10) card_G0_lower_bound) の入力。**
 **正本=本 session 38 cont.⁴。capstone glue + 両 X-coh constructor + Y-coh + engine 全 BUILT; 残=T7 stepData + c2 bridge + shared glue。**
+
+## 2026-06-13 (session 38 cont.⁵, /loop): case-B RECON 訂正 — Frobenius producer + 両 hXirr 既存
+
+**訂正**: cont.⁴ で「shared glue hXirr 要」としたが**誤り** — 既存:
+- `isIrreducibleCharacter_of_mem_Xset_of_frobenius` (S08_CoherenceCore:5067, Frobenius hXirr)
+- `isIrreducibleCharacter_of_mem_Xset_caseA` (5275, c2 case-A hXirr)
+- **Frobenius CoherenceTarget producer `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner`
+  (10057)**: `hF + hXne + hstepData + ν + hagreeX + hagreeY + hmixed + hgen → CoherenceTarget`
+  (hXirr は内部 discharge)。⟹ Frobenius branch = この def 1 呼び出し + (hstepData, ν, hagreeX/Y, hmixed, hgen) 構成。
+(自作 `Xset_irreducible_of_frobenius` は冗長判明 → reverted。教訓: 部品 build 前に既存 lemma を grep。)
+
+### ⚠ 正味進捗評価 (honest): case-B は RECON 3 tick で net-0 code (redundant 1 個 revert)。
+infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。残は**大 piece のみ**:
+- **Frobenius**: `hstepData` (PairUnionBaseAnchorCommonIndexPrimePowerStepData, ~30 field, (6.6) 素冪次数
+  解析 = deg(Indθ)=|W₁|θ(1), θ(1)=p^m for p-group H) = **不可分の大構造 (incremental landable でない)**。
+  + glue (ν/hagreeX/hagreeY/hmixed/hgen)。
+- **c2**: Hypothesis46-from-Sibley bridge (subH/A_covers/tic 構築) + glue。
+両 branch 必須 (sorry 全消)。**各 multi-session、incremental-easy piece 無し** ⟹ case-B は sustained 多セッション grind。
+**判断: ユーザーに scope 確認 (case-B grind commit vs (4.10) milestone 区切り)。正本=本 cont.⁵。**
