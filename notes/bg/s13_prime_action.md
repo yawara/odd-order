@@ -623,6 +623,27 @@ main 取込 (§12 Cor 12.16(a)(b) proof + 12.13/12.15 proven, build-fix `2d11cc5
 - **評価**: 新 lead は genuine だが closure には未到達 (M* 側構造定理との接続を要精査)。次の step-7 attack は「②の M* 埋込
   + Cor 12.14/12.16 (proven) で C_{M_α}(P) の制約を締める」方向。impasse の core は残るが attack surface が一つ増えた。
 
+### 2026-06-14 Lane G (M* 埋込の深掘り): 🔴 **closure 未到達を確定、impasse は robust と再確認**
+
+ユーザー指示で M* 埋込 lead を最後まで深掘り。**新たな structural fact を多数得たが closure には至らず**、impasse が
+robust であることを精密に確定:
+- **Cor 12.14** (`maximalContaining_centralizer_eq_singleton`, S12_E:53; X∈ℰ_p¹(M), p∈σ(M), p∈β(M)∨X≤M_σ' ⟹
+  ℳ(C_G(X))={M}) も `C_{M_α}(P)⊆M*` を裏付ける (X≤Q order-q ⟹ C_G(Q)⊆M*) が**新制約ゼロ** (既知の埋込再確認)。
+- **R'' (M_α の rank≥3 Sylow) は非可換** (`exists_invariant_sylow_Malpha_rank_three` は abelian 非保証) ⟹ PR-module
+  表現論分解は clean 適用不可。
+- **🔑 circular 構造を確定**: fact (B) `C_{M_α}(PR)=⊥` の下で **inclusion 1 (`C_{M_α}(P)⊆C(R)`) ⟺ `C_{M_α}(P)=⊥`**
+  (R が C_{M_α}(P) に FPF), かつ **inclusion 2 (`C_{M_α}(R)⊆C(P)`) ⟺ `C_{M_α}(R)=⊥` ⟺ 矛盾そのもの** (Ω₁-rigidity
+  [Thm 1.11 per-Sylow] で「P が C_{M_α}(R) 中心化 ⟺ P が各 z_{r''}=Ω₁(C_{R''}(R)) 固定」に還元、だが fact (B) で
+  `z_{r''}∈C(P)⟹z_{r''}∈C_{R''}(PR)=⊥` ⟹ P は z_{r''} を**動かす** ⟹ inclusion 2 は B の下で FALSE)。
+  ⟹ **inclusion を独立に導出する = 矛盾を導出する**で循環。BG の「since q∉α(M)/r∈τ₁(M), we can conclude」は
+  偽仮定 Q≠1 下でのみ valid な step で、**標準機構での独立再構成路が存在しない**ことを確定。
+- **全 attack 封鎖の根本原因 (3 点)**: (i) Thompson/Thm 3.7 は **P が Q を中心化** (`C_Q(P)=Q≠1`) で全 FPF operator
+  (P/R/S) 封じ [R は (r,R) 12.18(a) で消費済・C_{R''_1}(R)≠⊥ で再利用不可]; (ii) M* 埋込は **α(M)-素数が σ(M*)-制約
+  (Cor 12.14/12.16) と直交** (α(M)∩π(E)=∅ ゆえ Cor 12.16 の π(E)-rank bound が効かない); (iii) cyclic/Ω₁ 還元は循環。
+- **🟥 最終評価**: step 7 = **標準 coprime/local 機構 (BG Ch1-3 + §10-12 proven + Gorenstein) で到達不能な genuine
+  research gap**。残る理論的可能性 = R'' (非可換 rank≥3) 上の PR 作用の非自明な表現論/Hall-Higman 型議論、または BG が
+  別途持つ未特定 lemma。**dedicated な数学研究を要し、loop/通常実装では不可**と確定。productive 前進は §13 構造 (13.5+)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
