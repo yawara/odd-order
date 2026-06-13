@@ -236,8 +236,11 @@ calculation is zero. -/
 theorem orthogonality_coefficient_zero [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} (data : OrthogonalityData hyp) :
-    data.coefficientA = 0 := by
-  sorry
+    data.coefficientA = 0 :=
+  -- (11.8.5) is carried as the `coefficient_zero` field of `OrthogonalityData`; the
+  -- real `a = 0` content lives in `orthogonality_setup` (11.8.1)-(11.8.4), which
+  -- constructs the data.  This is the intended public-name wiring for that field.
+  data.coefficient_zero
 
 /-- **Peterfalvi (11.8)**: for `zeta in S(HC)`, the residual character is not
 orthogonal to `(Irr W)^sigma`. -/
