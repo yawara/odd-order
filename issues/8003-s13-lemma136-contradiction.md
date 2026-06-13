@@ -55,6 +55,31 @@ contradiction 分岐 `¬(q∈β(M) ∨ X⊆M_σ')` = `q∉β(M) ∧ X⊄M_σ'`�
 - step4: `E = E₁⊔E₂⊔E₃` (SubgroupESetup field? E_compl_sup は M_σ⊔E=M のみ); **`E₃ ≤ derivedInG E`**
 - step6: coprime 分解 `A = C_A(E₁) ⊔ [A,E₁]` + `[A,E₁] ≤ E₁` + line 生成の assembly
 
+## Session 2026-06-14: step-2 crux 精査 + 制約
+
+**🔴 merge 制約**: monitor は **sorry 不増**で abort (notes/meta/merge_monitor.md:74)。
+∴ 13.6 は **常に 1 sorry のまま**にし、scaffold (複数 sorry) 不可。step-2/6 を埋めるまで
+13.6 本体は単一 sorry を保持。進捗は **sorry-free standalone helper** か **一括完成**のみ。
+
+**E 構造 (pin 済)**: `E₂₃=E₂⊔E₃` は E で normal (`E23_normal`)、E=E₁×E₂₃ (both normal,
+coprime), E₁ cyclic ⟹ **E' = derivedInG E ⊆ E₂₃**。だが `X⊆C(E₁)` (step1) は
+`X⊆C(E')` を出さない (E'⊆E₂₃ ゆえ E₁ 部分の中心化は無関係)。
+
+**step-2 gap の精密化**: 「by Prop 1.5, we can assume E normalizes S and X⊆S⊆C(E')」。
+my 最良再構成: E'-invariant Hall β' は全て E'-centralized (Prop 1.5(c): E'-inv Hall β' は
+C_{M_σ}(E')-共役 + Lemma 12.19 の W は E'-centralized ⟹ 共役先も)。∴ **X が E'-invariant
+なら** Prop 1.5(b) で X⊆(E'-inv Hall β')⊆C(E') で完了。**しかし X の E'-invariance が非自明**
+(X∈ℰ_q¹(C_{M_σ}(E₁)) は E'-不変とは限らない)。contradiction 分岐ゆえ与 S は捨てて自前の便利な
+Sylow を構成してよい点が鍵だが、X は固定で動かせない。
+
+**→ ChatGPT 再構成依頼プロンプト** ([[feedback-ask-chatgpt-for-elided-gaps]]):
+> Bender–Glauberman *Local Analysis for the Odd Order Theorem*, Lemma 13.6 (p.100) の証明:
+> 「Since q∉β(M), E' centralizes some Sylow q-subgroup of M_σ, and, by Proposition 1.5, we can
+> assume that E normalizes S and that X⊆S⊆C_{M_σ}(E').」ここで X∈ℰ_q¹(C_{M_σ}(E₁)) は固定の
+> 位数 q 部分群、E は M_σ に coprime 作用、E'=[E,E]、E'は Hall β'-部分群 W を中心化 (Lemma 12.19)。
+> **問**: X⊆S⊆C_{M_σ}(E') となる E-invariant Sylow q-部分群 S を取れる理由を精密に再構成せよ。
+> 特に X は E'-invariant (or E-invariant) か? でなければ X はどう E'-中心化 Sylow に入るのか?
+
 ## 完了条件
 
 `maximalContaining_eq_singleton_of_E1` が sorry-free + build-green + axiom-clean。
