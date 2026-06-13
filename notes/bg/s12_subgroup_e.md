@@ -27,6 +27,53 @@ leaf 914 行 (<1500)。full build 緑 + assert 通過。
 (`sigma_subgroup_maximal_interaction`)。**12.15/12.16 は §13-14 gate (Lane G が scaffold 引用)**。
 ▶ 次 = 12.14 or 12.15/12.16 (優先度高: G unconditional 化に直結)。BG mmd L3369-3479 recon 要。
 
+## 🔎 2026-06-13 (Lane F session 17 cont., Opus 4.8): **12.15→12.16 recon — placement 確定 + ⚠ cross-lane flag**
+
+12.13 完了後、Lane-G gate (12.15/12.16) の着手 recon。**結論: 12.15 から (12.16 は 12.15 依存)。**
+
+### 🧩 import DAG の事実 (placement 決定打)
+- **S13_Lemma131 が cite する S12_E sorry = ちょうど 2 個**: `sigma_subgroup_pRank_normalizer_le_one`
+  (12.16(a) pt2) + `sigma_subgroup_not_mem_primeFactors_derived_of_tau1` (12.16(b))。
+  `maximalContaining_centralizer_eq_singleton` (12.14) / `sigma_subgroup_conj_into_Msigma`
+  (12.16a pt1) / `sigma_subgroup_maximal_interaction` (12.15) は **どこからも未使用**。
+- **dep-leaves (S12_Theorem125 / Corollary126 / Corollary1210 / ExceptionalBridge) はすべて
+  S12_E より DOWNSTREAM**: 連鎖 `S12_ExceptionalBridge → S12_Lemma1218 → S12_E`。
+  ⟹ 12.15/12.16 (12.5(e)/12.6/12.10(d)/12.2(b) を要する) は **S12_E 内 in-place 証明不可**。
+  **downstream leaf 必須** (12.13 と同型)。S12_E は「base + forward-decl(sorry)」ファイル。
+
+### ⚠⚠ CROSS-LANE FLAG (要ユーザー/hub 判断 — 12.16 着地時に顕在化)
+S12_E の sorry'd 12.16×2 は S13 (Lane G) が cite。downstream leaf で証明 → S12_E から **削除** →
+S13 の import を leaf に **re-point** が必要 (同名・同 namespace だが S13 は S12_E しか import せず、
+leaf は S12_E より downstream ゆえ S12_E 経由で透過解決できない)。これは **Lane G の S13 編集**。
+plan のデフォルト「S12_E の sorry を in-place 証明で discharge → G 自動 unconditional」は **本ケースで
+破綻** (downstream dep)。**選択肢**: (1) F が downstream leaf で証明 + S13 import を直接編集
+(1 行追加・低衝突), (2) F は証明のみ + hub が merge 時に S13 re-point + S12_E 削除,
+(3) leaf を distinct 名で証明し S12_E/S13 不変 (G は条件付きのまま; 後で hub が名前 swap)。
+→ **12.15 はこの判断と独立に必要** (12.16 の前提) ゆえ先行。12.16 着地前にユーザー裁可を仰ぐ。
+
+### ▶ 12.15 (`sigma_subgroup_maximal_interaction`) 実装プラン
+- **新 leaf `S12_Proposition1215.lean`** (downstream; import = S12_Theorem125 / S12_Corollary126 /
+  S12_Corollary1210 / S12_ExceptionalBridge — これらが S12_ECore+S10 を推移取込)。
+  statement = S12_E:469-488 と **byte-identical** (将来の swap 用)。証明後 S12_E の 12.15 を削除
+  (未使用ゆえ clean)。root `OddOrder.lean` + AxiomsCheck 両 import 必須。
+- **証明構造 (BG mmd L3417-3451 精読済)**, 5 結論:
+  - **(b) N_G(S)⊆M**: T=Syl_q(M)⊇S。S 非巡回 ⟹ Cor 12.10(d) で N_G(S)⊆M。
+    S 巡回 ⟹ N_G(S)⊆N_G(X)⊆M*、S⊆N_T(S)⊆M∩M*、S=N_T(S)⟹S=T、q∈σ(M) で N_G(S)⊆M。
+  - **(a) M* 非共役**: Lemma 12.2(b) = `not_conj_of_mem_sigma_of_normalizer_le` (S12_ExceptionalBridge:238)。
+  - **(c)**: (b) から (S は M∩M* の Sylow q かつ N_G(S)⊆M ⟹ M* の Sylow q)。
+  - **(e) q∉σ(M*)**: Lemma 12.2(a) `prime_mem_sigma_or_tau2` (S12_ECore) で q∈σ(M*)∪τ₂(M*)、
+    N_G(S)⊄M* ⟹ q∈τ₂(M*)。A∈ℰ²(S), E*=M*_σ の補群⊇A。Thm 12.5(e)+Cor 12.6(a): M*_σ∩M=1, A◁E*。
+    Cor 12.10(d): E*⊆N_G(A)⊆M ⟹ M∩M*=E* (補群)。π(M)∩σ(M*)⊆β(M*): p∈π(M)∩σ(M*)−β(M*) と仮定 →
+    C_G(A)⊆E* (Cor 12.6(b)) は p'-group → A は M*_σ の Syl_p を中心化せず → Cor 10.9(a) で p>q∧q>p 矛盾。
+  - **(d) q∈σ(M*)**: N_G(S)⊆M*、S は G の Sylow q。Cor 10.9(b)
+    (`beta_factorization_of_sylow_normalizer_in_intersection`, S10_BetaRadical:697):
+    M=(M∩M*)M_α, α(M)=β(M)、M* も同様 ⟹ M_α,M*_α≠1。τ₁(M*)⊆τ₁(M)∪α(M):
+    r∈τ₁(M*), R=Syl_r(M∩M*) は M*=(M∩M*)M*_α の Sylow r で normal complement を持つ ⟹ r∉α(M) なら M も同様。
+- **dep 名 (確定分)**: 12.2b=`not_conj_of_mem_sigma_of_normalizer_le`+`not_conj_symm`,
+  12.2a=`prime_mem_sigma_or_tau2`(ECore), 12.1g=ECore:487, 10.9b=
+  `beta_factorization_of_sylow_normalizer_in_intersection`(S10_BetaRadical:697)。
+  **次 iter で pin 要**: 12.10(d) 非巡回 N_G(S)⊆M の正確名 (S12_Corollary1210), 12.5(e), 12.6(a)(b)(f), 10.9(a)。
+
 ## ✅✅✅ 2026-06-13 (Lane F session 16, Opus 4.8): **Thm 12.13 主定理 wire COMPLETE — piece 5 のみ残**
 
 **`nonabelian_pgroup_isUniquelyMaximal` (12.13 本体) を全 ingredient から組立完了** (S12_Theorem1213, 660 行)。
