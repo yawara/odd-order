@@ -6,8 +6,9 @@
 
 ## 着手順 (13.6 非依存を先に)
 
-- **13.7 `E1E3_actsPrime`** — 13.6 非依存。**現フロンティア**。
-- **13.8 `forbidden_config_impossible`** — 13.6 非依存。13.7 の次。
+- **13.7 `E1E3_actsPrime`** — ✅ **COMPLETE (2026-06-14, commit 916b471a, sorry-free, full build 緑)**。
+  step 5 を `strict_centralizer_config_false` + sub-lemma 群 (5a/5b/step-f/H1/fixedBy_eq/anti-mono) で完遂。
+- **13.8 `forbidden_config_impossible`** — 13.6 非依存。**現フロンティア**。
 - 13.9 / 13.10 / 13.11 — Lane G の 13.6 landing 後 (13.9=13.6+13.8, 13.10=13.6+13.8, 13.11=13.10+13.7)。
 - 13.12 / 13.13 — 未記述 (statement から)。§14 funnel が直接依存。
 
