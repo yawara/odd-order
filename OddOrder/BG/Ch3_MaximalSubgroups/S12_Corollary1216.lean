@@ -73,6 +73,12 @@ private theorem exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank [Finite G] {
       Subgroup.card_map_of_injective B.subtype_injective]
     exact hK_card
 
+/-- `pRank` is a `MulEquiv` invariant. (Replicated from S12_Proposition1215.) -/
+private theorem pRank_eq_of_mulEquiv {A B : Type*} [Group A] [Finite A] [Group B] [Finite B]
+    {r : ℕ} (e : A ≃* B) : pRank A r = pRank B r :=
+  le_antisymm (pRank_le_of_injective (f := e.toMonoidHom) e.injective)
+    (pRank_le_of_injective (f := e.symm.toMonoidHom) e.symm.injective)
+
 /-- If `A ⊔ N = ⊤` with `N ⊴` and `r ∤ |N|`, then `r ∤ [⊤:A]`. (Replicated from S12_Proposition1215.) -/
 private theorem not_dvd_index_of_sup_top_normal {K' : Type*} [Group K'] [Finite K'] {r : ℕ}
     {A N : Subgroup K'} [N.Normal] (htop : A ⊔ N = ⊤) (hrN : ¬ r ∣ Nat.card ↥N) :
@@ -276,11 +282,36 @@ theorem pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
         rw [← hg]; exact Sylow.coe_subgroup_smul
       rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
     rw [hQconj]; exact hPMσ
-  -- **Step 2** (TODO, BG L3466-3476): reduce to the conjugated setup `Y' = Y^g ⊆ M_σ` (rank is
-  -- conjugation-invariant); apply Prop 12.15 to get `M* = (M ∩ M*)K`, `K` a `p'`-group; a rank-2
-  -- `A ∈ ℰ_p²(N_{M*}(Y'))` lands in `M`, so `p ∈ τ₂(M)`, and Thm 12.5(e) gives `M_σ ∩ M* = ⊥`,
-  -- contradicting `1 ⊂ Y' ⊆ M_σ ∩ M*`.
-  sorry
+  -- **Step 2**: apply the core to the conjugated setup `Y' = g•Y ⊆ M_σ`, `H' = g•H`, then transport
+  -- back (rank is conjugation-invariant; `g•(H ⊓ N_G(Y)) = (g•H) ⊓ N_G(g•Y)`).
+  have hY'ne : MulAut.conj g • Y ≠ ⊥ := by
+    intro h
+    have hc : Nat.card ↥(MulAut.conj g • Y) = Nat.card ↥Y :=
+      Subgroup.card_map_of_injective (MulAut.conj g).injective
+    rw [h, Subgroup.card_bot] at hc
+    exact hYne (Subgroup.card_eq_one.mp hc.symm)
+  have hY'q : IsPGroup q ↥(MulAut.conj g • Y) :=
+    hYq.of_equiv (Subgroup.equivMapOfInjective Y (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective)
+  have hH'mem : MulAut.conj g • H ∈ maximalSubgroupsContaining (MulAut.conj g • Y) :=
+    mem_maximalSubgroupsContaining.mpr
+      ⟨isCoatom_conj_smul (mem_maximalSubgroups.mp (mem_maximalSubgroupsContaining.mp hHY).1),
+        Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (mem_maximalSubgroupsContaining.mp hHY).2⟩
+  have hH'nc : ¬ ∃ g' : G, MulAut.conj g' • M = MulAut.conj g • H := by
+    rintro ⟨g', hg'⟩
+    exact hHnc ⟨g⁻¹ * g', by
+      rw [map_mul, mul_smul, hg', ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hcore := pRank_normalizer_le_one_core hG h hY'ne hY'q hqσ hgY hpE hpβ hH'mem hH'nc
+  have hnorm : MulAut.conj g • Subgroup.normalizer (Y : Set G)
+      = Subgroup.normalizer ((MulAut.conj g • Y : Subgroup G) : Set G) :=
+    Subgroup.map_normalizer_eq_of_bijective Y (MulAut.conj g).bijective
+  have heq : pRank ↥(H ⊓ Subgroup.normalizer (Y : Set G)) p
+      = pRank ↥((MulAut.conj g • H) ⊓
+          Subgroup.normalizer ((MulAut.conj g • Y : Subgroup G) : Set G)) p := by
+    rw [← hnorm, ← Subgroup.smul_inf]
+    exact pRank_eq_of_mulEquiv (Subgroup.equivMapOfInjective _ (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective)
+  rw [heq]; exact hcore
 
 /-- **BG Corollary 12.16(b)** (mmd L3453, 3456): `p ∈ τ₁(M)` ⟹ `p ∉ π(N_H(Y)')`. 実証明版。 -/
 theorem not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
