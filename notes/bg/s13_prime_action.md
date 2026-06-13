@@ -422,6 +422,22 @@ P = E の cyclic Sylow p (p∉τ₂)。g∈P# について C_{M_σ}(g)=C_{M_σ}(
 **Cor 13.3(b)** (E₃ prime): Cor 13.2(b) + E₃⊆E'⊆M*' ⟹ π(E₃)⊆τ₁(M*)' (Lemma 12.1: E₃ cyclic normal ⊆E')。
 → Cor 13.2(b) で E₃ が C_{M_σ}(P) 中心化。**次 iteration**。
 
+### 2026-06-13 Lane G (loop): Cor 13.3(a) core landed (`7ae72709`) + τ₂-exclusion 標的確定
+
+**✅ core landed**: `actsPrimeOn_Msigma_of_mem_tau13` (abelian p-部分群 P≤M, p∈τ₁∪τ₃ ⟹ M_σ prime 作用,
+sorry-free body, S13_PrimeAction)。再利用可 (Cor 13.3(a) / Thm 13.5 / Lemma 13.7)。
+
+**🎯 τ₂-exclusion 標的確定** (τ def 精読): `tau1∪tau3 = {p∉σ(M) ∧ pRank ↥M p = 1}`
+(τ₁=∉π(M'), τ₃=∈π(M'); τ₂=pRank=2)。⟹ cyclicSylow_actsPrime(a) の配線 = **`pRank ↥M p = 1` を示す**
+(P cyclic Sylow of E, p∈π(P))。p∉σ は `h.not_mem_sigma_of_mem_primeFactors` ✅; pRank≥1 は Cauchy;
+**残 = pRank ↥M p ≤ 1** (τ₂ 排除)。
+- **route** (~40 行, 次 iteration): P max-p in E ⟹ P.subgroupOf E は Sylow p ↥E (maximality) ⟹ |P|=|E|_p;
+  `card_Msigma_mul_card_E` + p∤|M_σ| (p∈σ') ⟹ |E|_p=|M|_p ⟹ |P|=|M|_p ⟹ P.subgroupOf M は Sylow p ↥M;
+  `pRank_sylow_eq` + IsCyclic ⟹ pRank ↥M p = pRank ↥P ≤ 1。`pRank_M_le_two` (≤2) は既存だが不足、=1 が要る。
+  ⚠ `pRank ↥M p = pRank ↥E p` は repo に無し ⟹ Sylow-E-M card chain を直接構築。subtype Sylow 注意。
+- IsCyclic→IsMulCommutative は `IsCyclic.commGroup` instance + `⟨⟨mul_comm⟩⟩`。
+- **(b) E₃**: 別途 (multi-prime, core 直接適用不可; Cor 13.2(b) + E₃⊆E' 経路)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
