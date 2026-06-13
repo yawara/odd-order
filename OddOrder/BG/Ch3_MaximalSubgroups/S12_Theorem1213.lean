@@ -381,6 +381,39 @@ theorem exists_line_maximalContaining_eq_of_Malpha_ne_bot [Finite G] (hG : IsMin
   push_neg at h
   exact hα (mem_sigma_and_Malpha_eq_bot_of_forall_normalizer_ne hG hM hA hAM h).2.1
 
+/-- **An exp-`p` extraspecial `Q ≤ G` contains `A ∈ ℰ²_p(G)`** (the `A ∈ ℰ²(Q)` of BG 12.13,
+mmd L3391): `Q` is a non-cyclic `p`-group (`[Q,Q] = Z(Q) ≠ 1`), so it has an elementary abelian
+subgroup of order `p²` (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`), whose image
+in `G` is the required `A` (`elemAbelianOfRank G p 2` asks only `IsElementaryAbelian ∧ |A| = p²`). -/
+theorem exists_elemAbelianOfRank_two_le_of_expPExtraspecial [Finite G]
+    (hG : IsMinimalSimpleOdd G) {p : ℕ} [Fact p.Prime] {Q : Subgroup G}
+    (hQ : IsExpPExtraspecial p ↥Q) :
+    ∃ A : Subgroup G, A ≤ Q ∧ A ∈ elemAbelianOfRank G p 2 := by
+  classical
+  have hpp : p.Prime := Fact.out
+  have hpG : p ∣ Nat.card G :=
+    (hQ.isExtraspecial.center_card ▸
+      Subgroup.card_subgroup_dvd_card (Subgroup.center ↥Q)).trans
+      (Subgroup.card_subgroup_dvd_card Q)
+  have hodd : Odd p := hG.odd.of_dvd_nat hpG
+  -- `Q` is non-cyclic: cyclic ⟹ abelian ⟹ `[Q,Q]=⊥`, but `[Q,Q]=Z(Q)` has order `p`.
+  have hQnc : ¬ IsCyclic ↥Q := by
+    intro hcyc
+    haveI := hcyc
+    have hcomm : IsMulCommutative ↥Q :=
+      IsMulCommutative.of_comm (IsCyclic.commGroup (α := ↥Q)).mul_comm
+    have hbot : Subgroup.center ↥Q = ⊥ := by
+      rw [← hQ.isExtraspecial.commutator_eq_center, commutator_eq_bot_iff]; exact hcomm
+    have h1 : Nat.card ↥(Subgroup.center ↥Q) = 1 := by rw [hbot]; exact Subgroup.card_bot
+    rw [hQ.isExtraspecial.center_card] at h1
+    exact hpp.one_lt.ne' h1
+  obtain ⟨E, hEea, hEcard⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+      hQ.isExtraspecial.isPGroup hodd hQnc
+  refine ⟨E.map Q.subtype, Subgroup.map_subtype_le _, mem_elemAbelianOfRank.mpr ⟨?_, ?_⟩⟩
+  · exact hEea.map Q.subtype_injective
+  · rw [Subgroup.card_map_of_injective Q.subtype_injective, hEcard]
+
 /-- **BG Theorem 12.13** (mmd L3347): every nonabelian `p`-subgroup of `G` (for every prime `p`)
 lies in `𝒰`. -/
 theorem nonabelian_pgroup_isUniquelyMaximal [Finite G] (hG : IsMinimalSimpleOdd G)
