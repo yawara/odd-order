@@ -1512,3 +1512,39 @@ X-coherence reuse で省力化判明。capstone は構造 cluster が gate の m
   条件 param)。math-B (W₂⊆Z(H)) でこの generic に渡す centralizer 入力を作る。inertia 計算。中規模。
 ### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred #1 要) → τ₂ assembly (大) → §7 glue (generic) → capstone。
 **正本=本 session 40 cont.¹³。構造 #3(W₂⊆Z)+#2(FPF bounds) ✅。残=#1 X-irred + (6.8.2.3) + τ₂ + glue。**
+
+## 2026-06-14 (session 40 cont.¹⁴, /loop): 🚨 RECON 訂正 — 「#1 math-B X-irreducibility」は **case B で偽**
+
+**この iteration = RECON (Lean brick なし、roadmap 訂正)**。cont.¹¹–¹³ が残してきた構造 cluster #1
+「math-B X-irreducibility (`isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版, X⊆Irr L)」を
+教科書 (6.8) 精読 (mmd 04.8 L136-224) で精査した結果、**case B では X⊄Irr L であり #1 は数学的に偽**。
+
+### 🔑 教科書 (6.8) の case 構造 (L136-160):
+- case (A): Z = Z(H)∩H′; case (B): **Z = W₂**。X = S − S(Z), Y = S(H′)。
+- (6.8.1) の「X⊆Irr L」証明は **case-A 専用** (「Z∩W₂=1 ゆえ |C_H(x)|=|C_{H/Z}(x)|」を使う)。
+
+### 🚨 case B で X⊄Irr L の証明 (厳密、私の `certainType_index_bounds` に依拠):
+1. **L/W₂ は Frobenius 群** (kernel H/W₂) — `certainType_index_bounds` の `hFrob` で証明済み。
+2. Frobenius 群の S-set (kernel から induce した非自明既約) は **全て既約** (Thm 6.34 = (c1) と同型)。
+3. S(W₂) = {χ∈S | W₂⊆Ker χ} = L/W₂ の S-set ⟹ **S(W₂) は reducible 0 個**。
+4. 一方 S は (4.5)/(c2) で **w₂−1 個の reducible μ_j** を持つ。
+5. ∴ X = S − S(W₂) は w₂−1 個の reducible を**全て**含む ⟹ **X⊄Irr L**。
+   (case A は Z∩W₂=1 ゆえ S(Z) も w₂−1 reducible を持ち X が reducible-free になる; case B は L/W₂ で
+   W₂-defect が消え Frobenius 化するため S(W₂) が reducible 0 になり、対照的に X に全 reducible が残る。)
+- ⚠ repo コメント `S08_CoherenceCorePart2:3346` 「X-irreducibility valid in case B」は**誤り** (旧 plan の残骸)。
+  最近の `exists_decomposition_caseB` (cY witness + norm 経路 = (6.8.2.2) elementary) は X-irred を**使っていない**
+  ので、#1 は実際の case-B 経路では不要 (古い「generic _caseA reuse」plan の遺物)。
+
+### ✅ (4.9) は available — reducible μ_j を扱う機構は完成済:
+- **`S06_CertainTypeCoherence.certainType_isCoherent` (:505) = (4.9)(b) coherent isometry (0-sorry)**、
+  `S06_CertainTypeConjugation` (4.9a, μ̄_j=μ_{j′}) も 0-sorry。これが教科書 (6.8.2.3) の reducible χ_i=μ_j
+  に対する **R(μ_j) certain-type reflection** ((5.3.b) 引用先) を供給する。session-29 RECON と一致。
+
+### ▶▶ 訂正後の case-B 残作業 (構造 cluster は #2(FPF)+#3(W₂⊆Z) で **完了**、#1 は削除):
+1. **(6.8.2.3)** (χ∈X 版 `(χ−aη₁)^τ = X₁ − aY`): 教科書 = [Is]2.27 で χ=Ind^L_Hθ を Ind^L_{W₂}φ に帰着
+   (Z=W₂⊆Z(H))、`Ind^L_Zφ−|H:Z|η₁ = Σa_iα_i` (Σa_i²=|H:Z|)、各 α_i に R(χ_i) ((5.4.a) ‖X_i‖²≥‖χ_i‖²)。
+   **irreducible χ_i = §7 R-producer; reducible χ_i=μ_j = (4.9) `certainType_isCoherent`。** 私の
+   `exists_decomposition_caseB` ((6.8.2.2)) が aggregate side を供給。
+2. **τ₂ assembly** ((6.8.2) proof, L224): Z-linear τ₂ on Z[X∪Y], τ on Z[X∪Y,L^#] と一致、η₁^{τ₂}=Y。
+3. **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
+**正本=本 session 40 cont.¹⁴。#1 は偽ゆえ削除。残=(6.8.2.3)[(4.9) available]+τ₂+glue。次手=(6.8.2.3)。**
