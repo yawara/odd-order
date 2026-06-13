@@ -867,3 +867,35 @@ V-block: sharp は `map_one`+inj、`mem_map_of_mem`、`W_normalizes_V` は `map_
 → `tic`+`A_covers`+`dade0`+`tau` で `Hypothesis46`-from-cert bridge → `certainType_isCoherent` →
    `certainTypeSet=Xset` 同定 + `dadeIntegralCharacterMap=hyp.tau` 同定 → glue。
 **正本=本 session 39。`mapOfInjective` は再利用可能 (Frobenius branch でも W-lift に使える可能性)。**
+
+## 2026-06-13 (session 39 cont., /loop): 🔑🔑 KEY FIX — `cases` を `Hypothesis46` へ強化 (faithfulness gap 是正)
+
+**🔑 決定的発見 (mmd 照合)**: 教科書 **(6.8)(c2)** は literal "**Hypothesis (4.6) holds**" (04.8 mmd L146)。
+そして **(4.6)** (04.6 mmd L53-63) は **(4.6.b) "G and W satisfy (3.1)"** = ambient TI-cyclic (`tic`) を**含む**
++ (4.6.d) A₀=A∪V^L 上の Dade datum (`dade0`/`tau`)。⟹ **(4.6) = repo の `Hypothesis46` そのもの**。
+
+**旧 `cases` の faithfulness gap**: c2 disjunct が **弱い `CertainTypeHypothesis`** ((4.2) 構造 +A 上 dade のみ)
+を供給 → ambient TI-cyclic を**未供給**。session 39 で確定したとおり G-level V_ti は (4.3.a) の ↥L-TI から
+**transfer 不可** ⟹ 旧 cases では c2 X-coh は**構成不能** (「ambient TI を無から作る」= 不可能)。
+**これが過去 ~5 tick 空転の真因** — 教科書が**仮定する**ものを構成しようとしていた。
+
+### ✅ 是正 commit (build-green): `cases` c2 disjunct を `∃ h46 : Hypothesis46, h46.dade=dade ∧ h46.K=H ∧ …` へ
+- `SibleyDadeHypothesis.cases` (S08_CoherenceCore:3309) を `CertainTypeHypothesis` → `Hypothesis46` に強化。
+  side conds (prime/W₂⊆[H,H]/coprime) は不変、`cert.X` → `h46.X` (extends 経由で全 projection 解決)。
+- import `S06_CertainHypothesis46` 追加 (cycle 無: S06→S08 正方向)。
+- 唯一の destructure 消費点 (3864 `isIrreducibleCharacter_induce_of_degree_one`) を
+  `h46.toCertainTypeHypothesis` 射影で adapt (hK/hW1/hW2 は defeq でそのまま通過)。
+- **producer 不在** (SibleyDadeHypothesis は orphaned, 消費のみ) ⟹ 破壊なし; S09 consumer は cases 非 destructure。
+- 全 build + AxiomsCheck 緑 (sorry 不増 = S08_CoherenceTheorems:59 の 1 本のみ、guard 不変)。
+
+### 🎯 これで c2 が**構成可能**に: (4.6)-construction 義務は **producer** (§9 (7.10) application = maximal-subgroup
+structure が供給) へ移動 — **教科書と同じ配置**。`mapOfInjective` (session 39) は今や producer 側
+(eventually (4.3.a) tic を L→G lift し (4.6).tic を作る) の infra と reframe。
+
+### ▶ 次の一手 (c2 X-coh wiring、`Hypothesis46` 在庫前提):
+1. **certainTypeSet h k = hyp.Xset ⁅H,H⁆ 同定** (X の定義照合; certainType の (4.6) 定義 vs Sibley Xset)。
+2. **τ-bridge**: `certainType_isCoherent h46 hk` は A₀-map (`dadeIntegralCharacterMap h46.dade0 h46.tau`) 上の
+   coherence。Sibley capstone は `hyp.tau` (A=H# map) 上を要求。両者を関連付け = (6.8.2)/(6.8.2.3) 内容
+   (η₁^{τ₁} 定数 on Z# 等)。これは genuine だが tractable (構成不能でない)。
+3. → X-coh w.r.t. hyp.tau → 既存 capstone glue (`coherentS_..._generator_mixed_inner`) で Y-coh と合流。
+**正本=本 session 39 cont.。難所の root cause を特定し faithful 化で解除 (回避でなく是正)。**
