@@ -249,6 +249,29 @@ core 起動。M := ρ.asModule (ρ=(mulAutToEnd E p).comp φ|_T), instances を 
 `IsSimpleModule k[T] ρ.asModule` を「E が T-irreducible」から `irreducible_iff_isSimpleModule_asModule` で。
 k := ZMod p (Field via Fact)。→ Prop 2(a) 完全形 (F=𝔽_p[T] の体構造 + E 1次元 + |F|=pⁿ)。その後 (b) semilinear/C_U(s)≅Aut(F)。
 
+### ⚠ session 7 (2026-06-14): core 一般化 (CommRing k) 済 + bridge は asModule 詰まり (要別経路)
+- **core 改良 (commit 済)**: `[Field k][Finite k]` → **`[CommRing k]`** に弱化 (End=体 は M 有限のみ依存)。
+  bridge で `k:=ZMod p` 起動時の **ZMod p semiring diamond** (Field-path via Fact vs CommRing-path via zmodModule)
+  を回避するのに必須。leaf sorry-free, full build 3807 jobs ~3s。
+- **🛑 bridge BLOCKED on asModule instance 不安定性** (probe 多数で診断):
+  - `(mulAutToEnd E p).comp ψ : Representation (ZMod p) T (Additive E)` の構築は OK (probe11-13)。
+  - **`Module (MonoidAlgebra (ZMod p) T) ρ.asModule` の synth が arg-position で不安定**:
+    `have h : Module ... := inferInstance` (goal-position) 単独では通る (probe13/15) が、
+    `Module.End ... ρ.asModule` や `IsSimpleModule ... ρ.asModule` を **型に書く (arg-position)** と失敗、
+    かつ後続行があると先行の goal-position synth まで連鎖失敗 (probe14/18/21)。haveI/letI 切替も別の壁
+    (letI zmodModule → `MulOne` stuck; probe20)。`open scoped Classical` も阻害 (除去要)。
+  - `[Representation.IsIrreducible ρ]` を入れると `IsSimpleModule k[T] ρ.asModule` は mathlib instance
+    (Irreducible.lean:53) で auto 化できる (probe18 で hsimp 行は解決) が、`Module.End` 形成は別途失敗。
+  - これは **数学的 gap でなく Lean4/mathlib の noncomputable asModule typeclass-elaboration 摩擦**。
+- **▶ 次 session で試す別経路** (優先順):
+  1. **asModule を使わず `Additive E` に直接 k[T]-module を張る**: `Module.compHom (Additive E)
+     (ρ.asAlgebraHom).toRingHom` で clean type 上の instance を letI。core の M := Additive E。
+     `Module.End (k[T]) (Additive E)` は clean type ゆえ arg-position synth が通る可能性。
+     (注意: 既存 `Module (ZMod p) (Additive E)` と two-scalar; `IsScalarTower` 整合, IsSimpleModule 変換要)。
+  2. core を `ρ : Representation` 直接取りに再構成 (asModule を core 内 1 箇所に閉じ込め)。
+  3. 全 instance を `@natCard_end_eq (ZMod p) _ T _ _ ρ.asModule _ <term> ...` で term-position 明示供給。
+  - downstream (App C / Lemma の Z(P) cyclic) は core を直接使う手も (bridge は便宜 adapter)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
