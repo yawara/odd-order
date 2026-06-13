@@ -438,6 +438,25 @@ sorry-free body, S13_PrimeAction)。再利用可 (Cor 13.3(a) / Thm 13.5 / Lemma
 - IsCyclic→IsMulCommutative は `IsCyclic.commGroup` instance + `⟨⟨mul_comm⟩⟩`。
 - **(b) E₃**: 別途 (multi-prime, core 直接適用不可; Cor 13.2(b) + E₃⊆E' 経路)。
 
+### 2026-06-13 Lane G (loop): Cor 13.3(a) COMPLETE (`6c0b15ca`) + (b) plan 確定
+
+**✅ Cor 13.3(a) 完了**: `cyclicSylow_actsPrime`(a) 配線済 (helper `mem_tau1_union_tau3_of_isCyclic_sylow_E`
+[`8263023c`] + core + IsCyclic.commGroup)。残 sorry = (b) のみ。
+
+**🎯 Cor 13.3(b) plan 確定** (E₃ prime on M_σ; intricate ~80 行, 2 sub-lemma + assembly):
+ActsPrimeOn def は **per-element** (∀g∈E₃#, C_{M_σ}(g)=C_{M_σ}(E₃))。core 直接適用不可 (E₃ multi-prime)。
+- **B1** `C_{M_σ}(Sylow_p(E₃)) = C_{M_σ}(E₃)` (各 p∈π(E₃)):
+  P:=Sylow_p(E₃) は E-normal (cyclic E₃ ◁ E [`E3_normal`] の char 部分群) ⟹ E⊆N_G(P)⊆M* (M*∈ℳ(N_G(P)))。
+  E₃⊆E'=derivedInG E [`E3_le_derived hG`] ⊆ M*' (E⊆M* ゆえ) ⟹ π(E₃)⊆π(M*')⊆τ₁(M*)ᶜ (τ₁ def: ∉π(M*'))
+  ⟹ `IsPiSubgroup (τ₁ M* )ᶜ E₃`。E₃⊆E⊓M*。**Cor 13.2(b)** (`tau13_pSubgroup_centralizes …).2.1`)
+  ⟹ E₃ が M_σ⊓M* 中心化。C_{M_σ}(P)⊆M_σ⊓M* (C(P)⊆N(P)⊆M*) ⟹ E₃ が C_{M_σ}(P) 中心化
+  ⟹ C_{M_σ}(P)⊆C_{M_σ}(E₃); 逆は P≤E₃ で自明。
+- **B2** cyclic 分解 `C_{M_σ}(g) = ⊓_{p|ord g} C_{M_σ}(g_p)` (g_p = p-part): 一般 cyclic fact (mathlib CRT/zpowers)。
+- **assembly**: g∈E₃#, g_p∈Sylow_p(E₃)# ⟹ (a) で C_{M_σ}(g_p)=C_{M_σ}(Sylow_p)=C_{M_σ}(E₃) [B1]
+  ⟹ C_{M_σ}(g)=⊓_p C_{M_σ}(E₃)=C_{M_σ}(E₃) [B2]。
+- **⚠ landscape**: (b) 後、§13 残 (13.5/13.6/13.7/…) は **Thm 13.4 (step 7) gate** ゆえ lane は step-7 壁に再到達。
+  (b) が最後の cleanly-unblocked §13 結果。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
