@@ -2340,3 +2340,45 @@ p∈σ(M) ⟹ Sylow p of M_σ = Sylow p of M = Sylow p of G (`isSylow_sylowMap_o
 **規模/risk**: ~350-450 行。r≤2 branch の (2) normal-p-complement 射影 + (3) 中心積 center 抽出が
 API-fit 未検証で最大 risk。`narrow_centralizer_decomp` の S⊓R'=⊥ conjunct で r(P)≤2 が出る点は確認済。
 **12.14 完成 + S12_E:58 削除で §12 STOP** (S12_E 残 sorry: L83/L96 = 12.16 forward-decl のみ → HUB/Lane G 調整事項)。
+
+---
+
+## session 23 cont. (2026-06-14, Lane F): Cor 12.14 — engine+r≥3 完成、r≤2 を精密 plan 化
+
+**ユーザー裁可**: 12.14 完全実装 (推奨) を選択 → 新 leaf `S12_Corollary1214.lean` 着手。
+
+**✅ 完成・ビルド green (leaf build OK; ただし root/AxiomsCheck 未配線 = 意図的)**:
+- `eq_singleton_of_uniquelyMaximal_le` (統一エンジン): `IsUniquelyMaximal U ∧ U≤C_G(X) ∧ U≤M ∧ C_G(X)<⊤
+  ⟹ ℳ(C_G(X))={M}` (`of_le_of_lt_top` + `eq_of_isCoatom_of_le` + `Set.eq_singleton_iff_unique_mem`)。
+- 本体 setup: `|X|=p`/`X≠⊥`/`IsPGroup p X` (`mem_elemAbelianOfRank`+`IsElementaryAbelian.isPGroup`);
+  Sylow `S:Sylow p G` with `X≤S≤M` (`isSylow_sylowMap_of_mem_sigma` + `X.subgroupOf M ≤ PM`)。
+- `center G = ⊥` (simple+notSolvable idiom) → `C_G(X)<⊤` (`centralizer_eq_top_iff_subset`)。
+- **r(C_P(X))≥3 branch** (`CPX:=C_G(X)⊓S`, `3 ≤ pRank ↥CPX p`): witness=CPX 自身。
+  `pRank_le_rank` で `3≤rank ↥CPX`、`CPX<⊤` (≤M<⊤)、`Ch2.S09.uniquenessTheorem` で `IsUniquelyMaximal CPX`。
+
+**⚠ WIP: r≤2 branch (`pRank ↥CPX p ≤ 2`) = 残 1 sorry**。leaf は**未コミット**で worktree に保持
+(hub auto-merge への sorry 波及回避; 完成時に net -1 sorry [leaf 0 + S12_E:58 削除] で commit)。
+
+**r≤2 branch 精密 plan (6 step, テンプレ+補題すべて特定済)**:
+1. `p ∉ idealPrime G`: case `pRank ↥S p`。≤2 ⟹ `pRank G p ≤2` (`pRank_sylow_eq S`) ⟹ ¬ideal。
+   ≥3 ⟹ `narrow_iff_exists_card_prime_centralizer_pRank_le_two` で S narrow (X' 経由)
+   ⟹ `narrow_iff_exists_maximalElementaryAbelian_card_prime_sq` で ∃ maximal-elem-ab-p² ⟹ ¬ideal。
+2. `p ∉ beta M` (beta=ideal 要求ゆえ 1 から)。
+3. hcase + 2 ⟹ `X ≤ derivedInG (Msigma M)` (β disjunct 消滅)。
+4. **[from-scratch ~50-70行]** `X ≤ derivedInG S` (=P'): 10.8(c)
+   `derived_msigma_hasNormalPComplement_of_not_mem_beta hG hM hpπ hpβ` の Msigma 側 ⟹
+   `oPiCore_isComplement_of_hasNormalPComplement` (S04g_Thm418, ↥(Msigma M) 内) の quotient 射影で
+   `derivedInG(Msigma M)∩S = S'` (Dedekind: `M_σ'·O = S'·O` mod O_{p'}=O_{p'}(Msigma M))。
+5. `rank ↥S ≤ 2`: 背理法 `pRank ↥S p ≥3` ⟹ S narrow (Cor 5.4) ⟹ `narrow_centralizer_decomp`
+   (X' order p, `centralizer_subgroupOf_inf_eq hXS`+`pRank` iso で hSrank=hle) の conjunct
+   `X' ⊓ commutator ↥S = ⊥`、但し X⊆P'⟹X'≤commutator ↥S (`derivedInG_eq_commutator`)⟹X'≠⊥ 矛盾。
+6. Cor 10.7(b) `(S10.sylow_structure hG S).2.1 (rank≤2)`: abelian (⟹S'=⊥⟹X=⊥矛盾) or 中心積 P₁*P₂。
+   **[from-scratch ~50-80行]** witness=P₁ (extraspecial, nonabelian via `IsExtraspecial` center_card=p<p³):
+   `X ⊆ derivedInG S` + 中心積 class-2 (`⁅S,S⁆ ⊆ centralizer P₁`、`IsExtraspecial.commutator_eq_center`
+   `⁅P₁,P₁⁆=Z(P₁)` + `IsCentralProduct.commutator_eq_bot`/`le_centralizer_*`) ⟹ X⊆centralizer P₁
+   ⟹ P₁≤C_G(X)。Thm 12.13 `nonabelian_pgroup_isUniquelyMaximal` で `IsUniquelyMaximal P₁`。
+
+**from-scratch 2 件の注意**: (4) `CentralProduct.lean` に commutator 補題無し / mathlib に commutator-of-sup
+分配律無し (`commutator_le` の ∀-形のみ) ⟹ 中心積の `⁅S,S⁆⊆⁅P₁,P₁⁆` は P₂≤Z(S) 経由 quotient or
+element 計算で自作。(4) の 10.8c 射影も `HasNormalPComplement` の quotient iso から組立。
+S04f_Blackburn に中心積-derived 既製補題が無いか先に確認推奨。テンプレ: narrow 適用 = `S10_LocalLemmas.lean:430-590`。
