@@ -383,6 +383,25 @@ Thompson critical `exists_charSubgroup_exponent_not_centralized` + Thm 3.7
 [Z_P,R]=1 を FPF/Thm 3.7 で示す独立 lemma `centralizer_Malpha_eq_of_commuting_tau1` を切り出して証明。
 ~hundreds 行規模の見込み。**step 7 以外の per_q は完成済 (4 commits: steps 4b,5,6,8-9)。**
 
+### 2026-06-13 Lane G (loop): step 7 = **original derivation と判明** (scope 上方修正)
+
+repo の Lem 12.18(a) 証明 (`tau1_Malpha_centralizer_PQ_eq_bot`) の技法を精読した結果、step 7 の
+scope が当初見積りより重いと判明 (要再判断):
+- **cyclic は Sylow level でのみ**: repo は M_α 全体の cyclic でなく、α(M) の素数 ℓ の M_α の
+  Sylow R_ℓ (rank≥3, `exists_invariant_sylow_Malpha_rank_three`) を取り、`isCyclic_of_pRank_le_one`
+  (p-群は pRank≤1⟹cyclic、nilpotent 不要) で R_ℓ⊓C(P) を cyclic 化。**M_α 自体は nilpotent でない**
+  (repo は M'/M_α 商の nilpotency `derivedQuotientMalpha_isNilpotent` のみ; M_α は Hall α で非 nilpotent)。
+- ⟹ 「M_α=M_β nilpotent ⟹ C_{M_α}(P) cyclic ⟹ Aut-abelian で Q が trivial」近道は **前提崩壊で不可**。
+- **P-side は Lem 12.18(a) 適用不能**: 包含に必要な C_{M_α}(P)≠1 は Lem 12.18(a) から出ない
+  (C_Q(P)=Q≠1 で仮定破れ; R を Q 役にしても C_R(P)=R≠1 で破れ)。
+- **🔴 決定的**: BG は包含 itself を "we can conclude" で**完全に省略** ⟹ step 7 は BG proof の port でなく
+  **original derivation** (rank≥3 Sylow + Thompson + Thm 3.7 の機構を未記述 config に再構築)。
+  ~数百行 + 数学的 design が必要で、loop の quick-iteration には不向き。
+
+**現況**: per_q は step 7 単一 sorry に還元済 (steps 4b/5/6/8-9 完成・build緑・axiom-clean)。
+Cor 13.3 (cyclic Sylow & E₃ prime action) は **unblocked** (13.2 済) で productive。
+⟹ ユーザー再判断: step 7 続行 vs Cor 13.3 へ pivot (step 7 は後日 dedicated)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
