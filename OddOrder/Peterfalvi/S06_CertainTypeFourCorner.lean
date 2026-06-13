@@ -387,4 +387,45 @@ theorem omegaTic_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
   rw [← coe_ticWEquivSdiffW h g]
   exact coe_mem_ticVdiffV_of_mem_toTICV h hmem
 
+/-- **(4.10), crux (c): the two sides agree on `V`.**  For `v ∈ V = W − (W₁ ∪ W₂)`,
+`β^τ(v) = ω_{ij}^σ(v) − ω_{0j}^σ(v) − ω_{i0}^σ(v) + ω_{00}^σ(v)`.
+
+Both reduce to the `sdiff`-side four-corner at the bridge partner `w = e v`: the LHS because
+`τ` preserves values on `A₀ ⊇ V` (`tau_toDadeMap_apply_of_mem`) and `β = Ind_W^L α = σ_L(α)`
+(`signedDiff_fourcorner_eq_toTICDade` + `sigma_eq_tau`) takes the value `α(w)` on `V`
+(`sigma_apply_of_mem_V`); the RHS by `certainTypeOmegaSigma_apply_of_mem_V`. -/
+theorem fourCornerDade_apply_eq_of_mem_V (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1))
+    {v : G} (hv : v ∈ (ticVdiff h).V) :
+    h.tau.toDadeMap (fourCornerDiffSupported h χ₂ i) v
+      = certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂ 0 v
+        - (certainTypeOmegaSigma h 1 i v - certainTypeOmegaSigma h 1 0 v) := by
+  have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+  have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
+    Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
+  set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
+  have hwG : ((w : ↥L) : G) = v := coe_ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩
+  have hwL : (w : ↥L) = ⟨v, h.dade0.mem_L hvA0⟩ := Subtype.ext hwG
+  have hwtoTICV : (w : ↥L) ∈ h.toTICyclicHypothesis.V := by
+    refine ⟨w.2, fun hmem => ?_⟩
+    rcases hmem with hW1 | hW2
+    · exact hv.2 (Or.inl (by rw [h.tic_W1]; exact ⟨(w : ↥L), hW1, hwG⟩))
+    · exact hv.2 (Or.inr (by rw [h.tic_W2]; exact ⟨(w : ↥L), hW2, hwG⟩))
+  have hβsig : (fourCornerDiffSupported h χ₂ i : ClassFunction ↥L ℂ)
+      = h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+          (chiFourCornerOnV h χ₂ i) :=
+    (signedDiff_fourcorner_eq_toTICDade h χ₂ i).trans
+      (h.toTICyclicHypothesis.sigma_eq_tau rfl h.toTICyclicFullDadeApplication
+        (chiFourCornerOnV h χ₂ i)).symm
+  rw [tau_toDadeMap_apply_of_mem h _ hvA0, hβsig, ← hwL,
+    h.toTICyclicHypothesis.sigma_apply_of_mem_V rfl h.toTICyclicFullDadeApplication _ hwtoTICV,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂ i hv,
+    certainTypeOmegaSigma_apply_of_mem_V h χ₂ 0 hv,
+    certainTypeOmegaSigma_apply_of_mem_V h 1 i hv,
+    certainTypeOmegaSigma_apply_of_mem_V h 1 0 hv]
+  rfl
+
 end OddOrder.Peterfalvi.S06
