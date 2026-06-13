@@ -607,6 +607,86 @@ elemAbelianOfRank G p 1 (= ℰ_p¹) 構成、(c) ⟨g⟩=∏⟨g_p⟩ CRT と C(
 **この session は step 7 を exhaustive head-on (facts A/B/C rigorous + 遮断完全 map, commit a43dbc1e/9b924c31/54c2b33f)、
 13.5 は設計まで。次ターン = 13.5 実装。**
 
+### 2026-06-13 Lane G (main 取込後の再調査): step 7 に **新 lead = `C_{M_α}(P) ⊆ M*` 埋め込み**
+
+main 取込 (§12 Cor 12.16(a)(b) proof + 12.13/12.15 proven, build-fix `2d11cc56`) 後、step 7 closure を再調査。
+- **① σ-disjointness 角度は dead end**: `disjoint_of_not_conj` (10.12) の `sigma M ∩ sigma H = ∅` は **part (b) M_σ
+  nilpotent 要求** (S10_LocalLemmasCore:1204)。per_q は M_α≠⊥ ⟹ M_σ 非 nilpotent ゆえ step 6 の `q∈σ(M)∩σ(M*)` は
+  矛盾にならない (無条件版 = Thm 13.9 = 13.4 downstream で循環)。`mem_sigma_inter_sigma_imp.2` は逆に「M_σ 非 nilpotent」を
+  与えるのみ (既知 = M_α≠⊥ と整合)。
+- **② 🆕 新 lead `C_{M_α}(P) ⊆ M*`** (従来解析は M_α(M) 内に閉じ M* 未使用): `C(P)⊆N_G(P)⊆M*` (`hNP`) ⟹
+  **`C_{M_α}(P) = M_α(M)⊓C(P) ⊆ M_α(M)⊓M*`**。`α(M)∩σ(M*)=∅` (10.12a) ⟹ `C_{M_α}(P)` は **σ(M*)'-部分群**
+  (`⊓M*_σ=⊥`)。かつ fact (A) で **Q≤M*_σ が中心化**。⟹ hard-core 対象が M* 構造に埋込まれ「σ(M*)'-群 ∧ M*_σ の Q に
+  中心化」の強制約下。**BG「since q∉α(M), we can conclude」の "q∉α(M)" はこの α(M)∩σ(M*)=∅ disjointness (M* 埋込) の
+  発動と推定** — inclusion 再構成の鍵候補。Cor 12.14 (`ℳ(C_G(σ-subgrp))={M*}`)/Lem 12.17/Cor 12.16 (now proven) と接続可能性。
+- **⚠ 非対称**: `C_{M_α}(R) ⊄ M*` (M*∈ℳ(N_G(R)) でない) — inclusion の向き/S-非対称性の根源、M* 埋込は P 側のみ。
+- **評価**: 新 lead は genuine だが closure には未到達 (M* 側構造定理との接続を要精査)。次の step-7 attack は「②の M* 埋込
+  + Cor 12.14/12.16 (proven) で C_{M_α}(P) の制約を締める」方向。impasse の core は残るが attack surface が一つ増えた。
+
+### 2026-06-14 Lane G (M* 埋込の深掘り): 🔴 **closure 未到達を確定、impasse は robust と再確認**
+
+ユーザー指示で M* 埋込 lead を最後まで深掘り。**新たな structural fact を多数得たが closure には至らず**、impasse が
+robust であることを精密に確定:
+- **Cor 12.14** (`maximalContaining_centralizer_eq_singleton`, S12_E:53; X∈ℰ_p¹(M), p∈σ(M), p∈β(M)∨X≤M_σ' ⟹
+  ℳ(C_G(X))={M}) も `C_{M_α}(P)⊆M*` を裏付ける (X≤Q order-q ⟹ C_G(Q)⊆M*) が**新制約ゼロ** (既知の埋込再確認)。
+- **R'' (M_α の rank≥3 Sylow) は非可換** (`exists_invariant_sylow_Malpha_rank_three` は abelian 非保証) ⟹ PR-module
+  表現論分解は clean 適用不可。
+- **🔑 circular 構造を確定**: fact (B) `C_{M_α}(PR)=⊥` の下で **inclusion 1 (`C_{M_α}(P)⊆C(R)`) ⟺ `C_{M_α}(P)=⊥`**
+  (R が C_{M_α}(P) に FPF), かつ **inclusion 2 (`C_{M_α}(R)⊆C(P)`) ⟺ `C_{M_α}(R)=⊥` ⟺ 矛盾そのもの** (Ω₁-rigidity
+  [Thm 1.11 per-Sylow] で「P が C_{M_α}(R) 中心化 ⟺ P が各 z_{r''}=Ω₁(C_{R''}(R)) 固定」に還元、だが fact (B) で
+  `z_{r''}∈C(P)⟹z_{r''}∈C_{R''}(PR)=⊥` ⟹ P は z_{r''} を**動かす** ⟹ inclusion 2 は B の下で FALSE)。
+  ⟹ **inclusion を独立に導出する = 矛盾を導出する**で循環。BG の「since q∉α(M)/r∈τ₁(M), we can conclude」は
+  偽仮定 Q≠1 下でのみ valid な step で、**標準機構での独立再構成路が存在しない**ことを確定。
+- **全 attack 封鎖の根本原因 (3 点)**: (i) Thompson/Thm 3.7 は **P が Q を中心化** (`C_Q(P)=Q≠1`) で全 FPF operator
+  (P/R/S) 封じ [R は (r,R) 12.18(a) で消費済・C_{R''_1}(R)≠⊥ で再利用不可]; (ii) M* 埋込は **α(M)-素数が σ(M*)-制約
+  (Cor 12.14/12.16) と直交** (α(M)∩π(E)=∅ ゆえ Cor 12.16 の π(E)-rank bound が効かない); (iii) cyclic/Ω₁ 還元は循環。
+- **🟥 最終評価**: step 7 = **標準 coprime/local 機構 (BG Ch1-3 + §10-12 proven + Gorenstein) で到達不能な genuine
+  research gap**。残る理論的可能性 = R'' (非可換 rank≥3) 上の PR 作用の非自明な表現論/Hall-Higman 型議論、または BG が
+  別途持つ未特定 lemma。**dedicated な数学研究を要し、loop/通常実装では不可**と確定。productive 前進は §13 構造 (13.5+)。
+
+### 2026-06-14 Lane G: 🎉🎉🎉 **step 7 GAP SOLVED — ChatGPT の「一様排除」洞察で reconstruction gap が埋まった**
+
+ユーザーが ChatGPT に gap を尋ね、回答を `notes/bg/bg_theorem13_4_gap_verification.md` に配置。**全ステップ検証 → 正しい**。
+私の「impasse」は誤り (新しい議論を探していたが、実際は **BG 自身の前半議論の再適用**だった)。
+
+**🔑 核心 = 一様排除補題 (UniformExclusion)**: BG の 13.4 前半 (`[S,R]≠1 ⟹ q∉α(M)` を M* 経由で導く部分) は
+**素数 q について一様**。すなわち:
+> `a∈τ₁(M), A₀∈ℰ_a¹(E), b∈π(E), B₀∈ℰ_b¹(C_E(A₀)), s∈σ(M)`、T を A₀B₀-不変 Sylow s of C_{M_σ}(A₀) とすると、
+> **`[T,B₀]≠1 ⟹ s∉α(M)`**。
+
+証明 = **私の per_q steps 1-6 を (P,R,q,S)→(A₀,B₀,s,T) に一般化したもの** (s が特定 q であることを一切使わない事を全 step 検証)。
+
+**包含の証明 (alpha_fixed_le_fixed)**: `C_{M_α}(A₀)` の各素因子 ℓ は **ℓ∈α(M)** (M_α が α-群)。ℓ-Sylow B_ℓ は A₀B₀-不変
+Sylow ℓ of C_{M_σ}(A₀) (ℓ∈α ⟹ C_{M_σ}(A₀) の ℓ-部分は M_α 内 ⟹ B_ℓ∈Syl_ℓ(C_{M_σ}(A₀)))。UniformExclusion の対偶
+(ℓ∈α(M) ⟹ `[B_ℓ,B₀]=1`) を各 ℓ に適用 → B₀ が全 Sylow を中心化 → ⟨Sylows⟩=C_{M_α}(A₀) ⟹ **`C_{M_α}(A₀)⊆C_{M_α}(B₀)`**。
+
+**per_q への適用**: hCeq = `le_antisymm (alpha_fixed_le_fixed P R) (alpha_fixed_le_fixed R P)` (対称包含、後者は r∈τ₁(M)
+[hrτ1M 既存] + P∈ℰ_p¹(C_E(R)))。⟹ **hCeq の sorry 除去、steps 8-9 (既存) で閉じ、step 7 完全解決**。
+
+**なぜ見落としたか**: 私の fact (A)(B)(C) は正しく (ChatGPT も確認)、`C_{M_α}(P)∩C_{M_α}(R)=⊥` も真。だが inclusion を
+**新議論**で示そうとして詰まった。実際は inclusion ⟺「各 α-Sylow が R-中心化」⟺「BG の一様排除を各 α-Sylow に適用」。
+
+**形式化プラン**: (1) `uniform_exclusion` (= per_q steps 1-6 を一般化, 結論 `s∉α(M)`); (2) `alpha_fixed_le_fixed`
+(各 α-Sylow に (1) 適用 + Sylow 生成 assembly); (3) per_q の hCeq を (2) で埋める。S13_Theorem134.lean に追加 (~250 行)。
+正本 = `notes/bg/bg_theorem13_4_gap_verification.md` (ChatGPT 回答 + 私の検証)。
+
+### 2026-06-14 Lane G: ✅✅✅ **step 7 IMPLEMENTED — Theorem 13.4 完全証明 (sorry-free)**
+
+上記プランを実装完了 (S13_Theorem134.lean):
+- **`uniform_exclusion`** (新 top-level, ~120 行): per_q steps 1-6 を `(a,A₀,b,B₀,s,T)` に一般化、`⁅T,B₀⁆≠⊥ → s∉α(M)`。
+  first-try build green (steps 1-6 の転記が一発で通った)。
+- **`alpha_fixed_le_fixed`** (新 top-level, ~55 行): outer reduction `msigma_centralizer_le_of_invariant_sylow_centralized`
+  を範型に M_α 版。`eq_of_le_of_forall_full_prime_pow` + `exists_aInvariant_sylow_subgroup` で各 ℓ の B₀-不変 full Sylow
+  に `uniform_exclusion` 対偶 (ℓ∈α(M) ⟹ `[S,B₀]=⊥`) を適用 → `C_{M_α}(A₀)⊆C_{M_α}(B₀)`。first-try build green。
+- **per_q hCeq** = `le_antisymm (alpha_fixed_le_fixed hG h hp hP hPE hr hR hRC) (alpha_fixed_le_fixed hG h hrτ1M hR hRE hpE hP (le_inf hPE hPCR))`
+  (逆向きは `hpE : p∈π(E)` [`mem_primeFactors_of_isPGroup_le`] + `hPCR : P≤C(R)` [commutator 対称])。**sorry 除去**。Thompson 用 rank bounds は不要化で削除。
+- **`#print axioms centralizer_le_centralizer_of_tau1` = `[propext, sorryAx, Classical.choice, Quot.sound]`** —
+  sorryAx は §12 scaffold (Cor 12.16 / Prop 12.15 / Thm 12.13 の S12_E sorry'd statement) 由来のみ、**新規 axiom 0**。
+  ⟹ **Theorem 13.4 は §12-conditional で完全証明** (他の G 結果と同列、Lane F の §12 完成で自動 unconditional 化)。
+- docstring 3 箇所 (WIP / per_q / centralizer_le_centralizer_of_tau1) を ✅COMPLETE に更新。leaf build 3087 green、実 sorry 0。
+- **🎯 §13 frontier 解放**: Thm 13.4 完成で **Thm 13.5 / Lem 13.6 / 13.7 / … の step-7 gate が消滅** — 以降 §13 結果は
+  proof レベルで unblocked (§12 scaffold-cite のみ)。次 = Theorem 13.5 (設計済 [上記] + 13.4 完成で完全に積める)。
+
 ---
 
 ## 2026-06-02 B7 foundation checkpoint
