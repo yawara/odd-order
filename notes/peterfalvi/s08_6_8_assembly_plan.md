@@ -1463,3 +1463,26 @@ case-B coherence capstone (`sibleySetup_is_coherent` の case-B branch) への p
 math-B X-irred (#1) と (6.8.2.3) は中規模。glue は全部揃ってから。
 **honest 総括**: (6.8.2.2) ✅ milestone。残=構造 cluster (Hypothesis46 接続, deep) + (6.8.2.3) + glue。
 X-coherence reuse で省力化判明。capstone は構造 cluster が gate の marathon。**正本=本 session 40 cont.¹¹。**
+
+## 2026-06-14 (session 40 cont.¹², /loop): 🔓 構造 cluster 着手 — W₂⊆Z(↥L) discharge landed
+
+**🔑 (4.2) Hypothesis 構造判明 (S06_DadeIsometryCertain:67)**: `centralizer_W2` (C_L(w)⊓K=W₂, w∈W₁#)
++ `commute_of_mem_W1_of_mem_W2` (W₂ commutes W₁, theorem 既存) + `isComplement` (L=K⋊W₁) が field/定理。
+⟹ 構造 cluster は思ったより tractable (既存 (4.2) 定理を使う)。
+
+**✅ landed (build-green + axiom-clean)**:
+21. **`certainType_W2_le_center` (ef698712)** = **構造 discharge #3: W₂⊆Z(↥L)**。
+    (4.2) Hypothesis + math-B (W₂ centralizes K = W₂⊆Z(H)) ⟹ W₂ central in L。
+    complement 分解 g=k·w₁ + W₂↔K commute (math-B) + W₂↔W₁ commute (既存定理)。
+    gotcha: `isComplement.surjective` は lambda-form hkw0 → `have hkw : ↑k*↑w₁=g := hkw0` で beta-reduce。
+    **⟹ my (6.8.2.2) lemmas の `hW2cen` deferred hypothesis discharge 可 (capstone wiring 時)。**
+
+### ⚠ 構造 cluster 残 (次 loop):
+- **FPF bound (#2, hc2/hFPF)**: `centralizer_W2` (C_H(w)=W₂) ⟹ W₁ FPF on H/W₂ (C_{H/W₂}(w)=triv) ⟹
+  IsFrobeniusAction/Frobenius group 化 → `card_kernel_modEq_one` (FrobeniusGroup:274, |W₁|∣|H:W₂|−1)
+  ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|<|H:W₂|² (hFPF), 2≤|H:W₂| (hc2)。**Frobenius action 構成が multi-step (要調査
+  IsFrobeniusAction API + card_modEq)**。中規模。
+- **math-B X-irreducibility (#1)**: `isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版 (centralizer
+  条件 param)。inertia 計算。中規模。
+### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred 要) + glue (generic, 全部揃ってから)。
+**正本=本 session 40 cont.¹². 構造 cluster 着手 (W₂⊆Z(L) ✅)。残=FPF + X-irred + 6.8.2.3 + glue。**
