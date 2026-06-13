@@ -235,6 +235,20 @@ conjugation Equiv で). sorry 不変 (2→2)。
 **次 session**: leaf 作成 → core (Field 部 done, finrank=1 を詰める) → bridge → Prop 2(a)、その後 (b) semilinear。
 sorry を増やさない方針ゆえ **core を sorry-free にしてから commit** (中間 sorry leaf は出さない)。
 
+### ✅ session 6 (2026-06-14): Prop 2(a) CORE landed (sorry-free, axiom-clean)
+新 leaf `SemilinearField.lean` (namespace `Appendices.Huppert`, OddOrder.lean Appendices block に import 追加)。
+抽象 core (k 有限体, T 可換, M 有限単純 k[T]-module):
+- `endField` : `End_{k[T]}(M)` は体 (`noncomputable def`, Schur+Wedderburn auto)。
+- `isSimpleModule_end` : M は D=End 上単純 (k[T] 可換ゆえ scalar map `LinearMap.lsmul r ∈ D` →
+  D-submodule = k[T]-submodule → k[T] 単純で ⊥/⊤; `refine { eq_bot_or_eq_top := ... }`, `Submodule.eq_top_iff'`)。
+- `finrank_end_eq_one` : `finrank D M = 1` (`isSimpleModule_iff_finrank_eq_one`)。
+- `natCard_end_eq` : `|D| = |M|` (`Module.card_eq_pow_finrank` は **Fintype.card** ゆえ `Fintype.ofFinite`+`Nat.card_eq_fintype_card`)。
+全て propext/choice/Quot のみ。full build 3807 jobs ~7s, AxiomsCheck OK。
+**次 session = bridge**: 教科書 data `(E elem-ab p-group, φ:U→*MulAut E faithful, T⊴U cyclic irreducible)` から
+core 起動。M := ρ.asModule (ρ=(mulAutToEnd E p).comp φ|_T), instances を term-mode 供給 (gotchas 4 参照),
+`IsSimpleModule k[T] ρ.asModule` を「E が T-irreducible」から `irreducible_iff_isSimpleModule_asModule` で。
+k := ZMod p (Field via Fact)。→ Prop 2(a) 完全形 (F=𝔽_p[T] の体構造 + E 1次元 + |F|=pⁿ)。その後 (b) semilinear/C_U(s)≅Aut(F)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
