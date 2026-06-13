@@ -1023,4 +1023,176 @@ theorem SibleyDadeHypothesis.inner_self_indW2_sub_smul_eq
   rw [hIndnorm, hcross, hcross', hη₁n]
   ring
 
+open scoped Classical in
+/-- **(6.8.2.2) coefficient dichotomy** (the case-(B) analogue of `coeff_eq_neg_or_edge_of_frobenius`).
+For `α = Ind^L_{W₂}φ − |H:Z|·η₁` (`φ` nontrivial linear, `η₁ ∈ Y`), the multiplicity
+`⟨α^τ, η₁^{τ₁}⟩` is either `−|H:Z|` or (when `|Y| = 2`) `0`.
+
+Following Peterfalvi (6.8.2.2): set `bb = ⟨α^τ, η₁^{τ₁}⟩ ∈ ℤ` with `|H:Z| ∣ bb`
+(`inner_tau_alpha_dvd_index`); for `η ≠ η₁`, `⟨α^τ, η^{τ₁}⟩ = bb + |H:Z|` (cross-term
+`inner_tau_indW2_sub_smul_tau_Yset_diff` + agreement `coherentYset_extension_Yset_diff_eq_tau`).
+Bessel's inequality over the orthonormal `𝒴^{τ₁}` (`sum_sq_le_inner_self_re`) with the norm
+`‖α^τ‖² = |L:Z| + |H:Z|²` (`inner_self_tau_indW2_sub_smul` ∘ `inner_self_indW2_sub_smul_eq`) gives
+`bb² + (m−1)(bb+|H:Z|)² ≤ |L:Z| + |H:Z|²`; with the fixed-point-free bound `|L:Z| < |H:Z|²`
+(`hFPF`) this is `< 2|H:Z|²`, and `eq_zero_or_edge_of_dvd_of_normLt` forces `bb ∈ {−|H:Z|, 0}`.
+
+`hc2` (`2 ≤ |H:Z|`) and `hFPF` (`|L:Z| < |H:Z|²`) are the deferred `W₁`-FPF-on-`H/W₂` inputs. -/
+theorem SibleyDadeHypothesis.coeff_eq_neg_or_edge_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    (hc2 : 2 ≤ (W2.subgroupOf H).index)
+    (hFPF : (W2.index : ℤ) < ((W2.subgroupOf H).index : ℤ) ^ 2) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁)
+        = -((W2.subgroupOf H).index : ℂ)
+      ∨ (hyp.Yset.ncard = 2 ∧
+        ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+          - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁) = 0) := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  have h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+      = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+    rw [ClassFunction.induce_apply_one, hφ1, mul_one, hyp.Yset_apply_one hη₁]
+    have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+      (Subgroup.relIndex_mul_index hW2H).symm
+    rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+  obtain ⟨bb, hbb, habb⟩ :=
+    hyp.inner_tau_alpha_dvd_index hcop hp hHp hprime hW2comm hW2cen hη₁ φ hφ1 hφ hη₁
+  have hYon : ∀ ψ ψ' : ClassFunction ↥L ℂ, ψ ∈ hyp.Yset → ψ' ∈ hyp.Yset →
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ ψ' hψ hψ'
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨ψ, hyp.isIrreducibleCharacter_of_mem_Yset hψ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ', hyp.isIrreducibleCharacter_of_mem_Yset hψ'⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hEinj : ∀ η ∈ hyp.Yset, ∀ η' ∈ hyp.Yset,
+      hyp.coherentYset.extension η = hyp.coherentYset.extension η' → η = η' := by
+    intro η hη η' hη' heq
+    by_contra hne
+    have h0 : ClassFunction.inner (hyp.coherentYset.extension η)
+        (hyp.coherentYset.extension η') = 0 := by
+      rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span hη)
+        (Submodule.subset_span hη'), hYon η η' hη hη', if_neg hne]
+    have h1' : ClassFunction.inner (hyp.coherentYset.extension η)
+        (hyp.coherentYset.extension η') = 1 := by
+      rw [heq, hyp.coherentYset.extension_inner_eq η' η' (Submodule.subset_span hη')
+        (Submodule.subset_span hη'), hYon η' η' hη' hη', if_pos rfl]
+    rw [h1'] at h0; exact one_ne_zero h0
+  have hcoeff : ∀ η ∈ hyp.Yset,
+      ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η)
+        = ((if η = η₁ then bb else bb + (W2.subgroupOf H).index : ℤ) : ℂ) := by
+    intro η hη
+    by_cases hee : η = η₁
+    · subst hee; rw [if_pos rfl]; exact hbb
+    · rw [if_neg hee]
+      have hconst := hyp.inner_tau_indW2_sub_smul_tau_Yset_diff hW2H hW2comm φ hη₁ hη hee
+        ((W2.subgroupOf H).index : ℂ) h1
+      rw [← hyp.coherentYset_extension_Yset_diff_eq_tau hη₁ hη,
+        ClassFunction.inner_sub_right, hbb] at hconst
+      push_cast
+      linear_combination hconst
+  have hmemt : ∀ {η}, η ∈ hyp.Yset_finite.toFinset ↔ η ∈ hyp.Yset :=
+    fun {η} => hyp.Yset_finite.mem_toFinset
+  have hEinj_t : ∀ η ∈ hyp.Yset_finite.toFinset, ∀ η' ∈ hyp.Yset_finite.toFinset,
+      hyp.coherentYset.extension η = hyp.coherentYset.extension η' → η = η' :=
+    fun η hη η' hη' => hEinj η (hmemt.mp hη) η' (hmemt.mp hη')
+  have horth : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ∀ ψ' ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+    intro ψ hψ ψ' hψ'
+    rw [Finset.mem_image] at hψ hψ'
+    obtain ⟨η, hη, rfl⟩ := hψ
+    obtain ⟨η', hη', rfl⟩ := hψ'
+    rw [hyp.coherentYset.extension_inner_eq η η' (Submodule.subset_span (hmemt.mp hη))
+      (Submodule.subset_span (hmemt.mp hη')), hYon η η' (hmemt.mp hη) (hmemt.mp hη')]
+    by_cases hee : η = η'
+    · subst hee; simp
+    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η' hη' h))]
+  have hη₁t : η₁ ∈ hyp.Yset_finite.toFinset := hmemt.mpr hη₁
+  have hβval : ∀ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) ψ
+        = ((if ψ = hyp.coherentYset.extension η₁ then bb else bb + (W2.subgroupOf H).index : ℤ) : ℂ) := by
+    intro ψ hψ
+    rw [Finset.mem_image] at hψ
+    obtain ⟨η, hη, rfl⟩ := hψ
+    rw [hcoeff η (hmemt.mp hη)]
+    by_cases hee : η = η₁
+    · subst hee; simp
+    · rw [if_neg hee, if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h))]
+  have hbessel := OddOrder.RepresentationTheory.sum_sq_le_inner_self_re horth
+    (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+      - ((W2.subgroupOf H).index : ℂ) • η₁)) hβval
+  have hnorm_re : (ClassFunction.inner
+      (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁))
+      (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁))).re
+      = ((W2.index + (W2.subgroupOf H).index ^ 2 : ℕ) : ℝ) := by
+    rw [hyp.inner_self_tau_indW2_sub_smul hW2H φ hη₁ ((W2.subgroupOf H).index : ℂ) h1,
+      hyp.inner_self_indW2_sub_smul_eq hW2comm hW2cen φ hφ hη₁ ((W2.subgroupOf H).index : ℂ),
+      show (W2.index : ℂ) + ((W2.subgroupOf H).index : ℂ) * star ((W2.subgroupOf H).index : ℂ)
+          = ((W2.index + (W2.subgroupOf H).index ^ 2 : ℕ) : ℂ) by
+        rw [star_natCast]; push_cast; ring,
+      Complex.natCast_re]
+  rw [hnorm_re] at hbessel
+  have hsum : ∑ ψ ∈ hyp.Yset_finite.toFinset.image hyp.coherentYset.extension,
+      (if ψ = hyp.coherentYset.extension η₁ then bb else bb + (W2.subgroupOf H).index) ^ 2
+      = bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + (W2.subgroupOf H).index) ^ 2 := by
+    rw [Finset.sum_image hEinj_t]
+    have hsplit : ∀ η ∈ hyp.Yset_finite.toFinset,
+        (if hyp.coherentYset.extension η = hyp.coherentYset.extension η₁ then bb
+          else bb + (W2.subgroupOf H).index) ^ 2
+        = if η = η₁ then bb ^ 2 else (bb + (W2.subgroupOf H).index) ^ 2 := by
+      intro η hη
+      by_cases hee : η = η₁
+      · subst hee; simp
+      · rw [if_neg (fun h => hee (hEinj_t η hη η₁ hη₁t h)), if_neg hee]
+    rw [Finset.sum_congr rfl hsplit, ← Finset.add_sum_erase _ _ hη₁t, if_pos rfl]
+    have hcrd : (hyp.Yset_finite.toFinset.erase η₁).card = hyp.Yset.ncard - 1 := by
+      rw [Finset.card_erase_of_mem hη₁t, ← Set.ncard_eq_toFinset_card _ hyp.Yset_finite]
+    have h1le : 1 ≤ hyp.Yset.ncard := by
+      rw [Set.ncard_eq_toFinset_card _ hyp.Yset_finite]; exact Finset.one_le_card.mpr ⟨η₁, hη₁t⟩
+    rw [Finset.sum_congr rfl (fun η hη => if_neg (Finset.ne_of_mem_erase hη)),
+      Finset.sum_const, nsmul_eq_mul, hcrd, Nat.cast_sub h1le, Nat.cast_one]
+  rw [hsum] at hbessel
+  have hnorm_ineq : bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + (W2.subgroupOf H).index) ^ 2
+      ≤ (W2.index : ℤ) + ((W2.subgroupOf H).index : ℤ) ^ 2 := by
+    have hb := hbessel
+    rw [show ((W2.index + (W2.subgroupOf H).index ^ 2 : ℕ) : ℝ)
+        = (((W2.index : ℤ) + ((W2.subgroupOf H).index : ℤ) ^ 2 : ℤ) : ℝ) by push_cast; ring] at hb
+    exact_mod_cast hb
+  have hm2 : (2 : ℤ) ≤ (hyp.Yset.ncard : ℤ) := by exact_mod_cast hyp.two_le_Yset_ncard
+  have hc2' : (2 : ℤ) ≤ ((W2.subgroupOf H).index : ℤ) := by exact_mod_cast hc2
+  have hnorm_lt : ((bb + (W2.subgroupOf H).index) - ((W2.subgroupOf H).index : ℤ)) ^ 2
+      + ((hyp.Yset.ncard : ℤ) - 1) * (bb + (W2.subgroupOf H).index) ^ 2
+      < 2 * ((W2.subgroupOf H).index : ℤ) ^ 2 := by
+    rw [show (bb + ((W2.subgroupOf H).index : ℤ)) - ((W2.subgroupOf H).index : ℤ) = bb by ring]
+    have : bb ^ 2 + ((hyp.Yset.ncard : ℤ) - 1) * (bb + (W2.subgroupOf H).index) ^ 2
+        < 2 * ((W2.subgroupOf H).index : ℤ) ^ 2 := by linarith [hnorm_ineq, hFPF]
+    convert this using 2
+  have hdich := eq_zero_or_edge_of_dvd_of_normLt hc2' hm2 (dvd_add habb (dvd_refl _)) hnorm_lt
+  rcases hdich with h | ⟨h1', h2⟩
+  · left
+    rw [hbb]
+    have hbeq : bb = -((W2.subgroupOf H).index : ℤ) := by omega
+    rw [hbeq]; push_cast; ring
+  · right
+    refine ⟨by exact_mod_cast h2, ?_⟩
+    rw [hbb]
+    have hbeq : bb = 0 := by omega
+    rw [hbeq]; norm_num
+
 end OddOrder.Peterfalvi.S08
