@@ -750,6 +750,46 @@ theorem opCore_isCyclic_and_fpf_of_transitive
       (φ.comp (OddOrder.Isaacs.Ch01.opCore p D).subtype)
       (hfaithful.comp (Subgroup.subtype_injective _)) hconst
 
+open OddOrder.Isaacs.Ch01 OddOrder.BG.Ch3.S10 in
+/-- **Peterfalvi Appendix B, Proposition 1 — `F(D)` cyclic from cyclic `p`-cores**: if every
+`p`-core `O_p(D)` is cyclic, then the Fitting subgroup `F(D)` is cyclic.  Pure group theory:
+`F(D)` is nilpotent (`fitting.isNilpotent`), each Sylow of `F(D)` is its unique normal one and
+equals an `O_p(D)` (`= ⨅` of Sylows), so `F(D)` is a nilpotent `Z`-group, hence cyclic. -/
+theorem isCyclic_fitting_of_forall_opCore_isCyclic [Finite D]
+    (h : ∀ p : ℕ, IsCyclic ↥(opCore p D)) :
+    IsCyclic ↥(fitting D) := by
+  haveI : _root_.IsZGroup ↥(fitting D) := by
+    rw [_root_.isZGroup_iff]
+    intro p hp P
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hPnorm : (↑P : Subgroup ↥(fitting D)).Normal := Sylow.normal_of_isNilpotent P
+    have hPchar : (↑P : Subgroup ↥(fitting D)).Characteristic :=
+      Sylow.characteristic_of_normal P hPnorm
+    haveI hPmap_norm : ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype).Normal :=
+      normal_map_subtype_of_characteristic hPchar
+    have hPmap_pg : IsPGroup p ((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) :=
+      P.isPGroup'.map (fitting D).subtype
+    have hmap_le : (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype ≤ opCore p D :=
+      normal_pgroup_le_opCore hPmap_pg
+    have hop_le : opCore p D ≤ (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype := by
+      have hofit : opCore p D ≤ fitting D := opCore_le_fitting ⟨p, hp⟩ D
+      have hQpg : IsPGroup p ((opCore p D).subgroupOf (fitting D)) :=
+        (opCore_isPGroup p D).comap_subtype
+      obtain ⟨S, hQS⟩ := IsPGroup.exists_le_sylow hQpg
+      haveI := Sylow.unique_of_normal P hPnorm
+      have hSP : S = P := Subsingleton.elim S P
+      calc opCore p D = ((opCore p D).subgroupOf (fitting D)).map (fitting D).subtype :=
+            (Subgroup.map_subgroupOf_eq_of_le hofit).symm
+        _ ≤ (↑S : Subgroup ↥(fitting D)).map (fitting D).subtype := Subgroup.map_mono hQS
+        _ = (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype := by rw [hSP]
+    have heq : (↑P : Subgroup ↥(fitting D)).map (fitting D).subtype = opCore p D :=
+      le_antisymm hmap_le hop_le
+    haveI : IsCyclic ↥((↑P : Subgroup ↥(fitting D)).map (fitting D).subtype) := heq ▸ h p
+    exact isCyclic_of_surjective _
+      (Subgroup.equivMapOfInjective (↑P) (fitting D).subtype
+        (fitting D).subtype_injective).symm.surjective
+  infer_instance
+
 /-- **Peterfalvi Appendix B, Proposition 1**: let `D` have odd order and act
 faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
