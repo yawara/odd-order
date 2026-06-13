@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
@@ -553,6 +554,88 @@ theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## §13 prime action の拡張解析 (mmd L3574-3628) -/
 
+/-! ### Helper: `ℳ`-transfer between conjugate maximal `q`-subgroups
+(`subtype_comp_conj_eq` / `map_subtype_conj_subgroupOf` は
+`OddOrder/Mathlib/SchurZassenhausConj.lean` の private helper の複製。) -/
+
+private theorem subtype_comp_conj_eq {U : Subgroup G} (n' : ↥U) :
+    U.subtype.comp ((MulAut.conj n').toMonoidHom) =
+      ((MulAut.conj (n'.val : G)).toMonoidHom).comp U.subtype := by
+  ext ⟨x, hx⟩; rfl
+
+private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Subgroup G)
+    (hKU : K ≤ U) :
+    ((K.subgroupOf U).map (MulAut.conj n').toMonoidHom).map U.subtype =
+      K.map (MulAut.conj (n'.val : G)).toMonoidHom := by
+  rw [Subgroup.map_map, subtype_comp_conj_eq, ← Subgroup.map_map,
+    Subgroup.map_subgroupOf_eq_of_le hKU]
+
+/-- **ℳ-transfer between maximal `q`-subgroups of `N ≤ M`.** If `S` and `S₀` are both maximal
+`q`-subgroups of `N` (`N ≤ M`, `M` maximal in `G`) and `ℳ(S₀) = {M}`, then `ℳ(S) = {M}`. The two
+are conjugate by some `m ∈ N` (Sylow conjugacy inside `↥N`); since `m ∈ M`, conjugation by `m` fixes
+`M`, so the unique maximal over `S₀` transports to the unique maximal over `S`. Used in Lemma 13.6 to
+pass from the internal Sylow `S₀ ⊇ X` of the faithful Corollary 12.14 to the arbitrary Sylow `S`. -/
+theorem maximalContaining_eq_singleton_of_maximal_qsubgroup [Finite G]
+    {M N S S₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hNM : N ≤ M)
+    {q : ℕ} [Fact q.Prime]
+    (hSN : S ≤ N) (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → S ≤ T → S = T)
+    (hS₀N : S₀ ≤ N) (hS₀q : IsPGroup q ↥S₀)
+    (hS₀max : ∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → S₀ ≤ T → S₀ = T)
+    (hMS₀ : maximalSubgroupsContaining S₀ = {M}) :
+    maximalSubgroupsContaining S = {M} := by
+  classical
+  -- A maximal `q`-subgroup `R ≤ N` is the carrier of a Sylow `q`-subgroup of `↥N`.
+  have key : ∀ R : Subgroup G, R ≤ N → IsPGroup q ↥R →
+      (∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → R ≤ T → R = T) →
+      ∃ P : Sylow q ↥N, (P : Subgroup ↥N) = R.subgroupOf N := by
+    intro R hRN hRq hRmax
+    have hRq' : IsPGroup q ↥(R.subgroupOf N) :=
+      hRq.of_equiv (Subgroup.subgroupOfEquivOfLe hRN).symm
+    obtain ⟨P, hRP⟩ := hRq'.exists_le_sylow
+    refine ⟨P, ?_⟩
+    have hTN : (P : Subgroup ↥N).map N.subtype ≤ N := Subgroup.map_subtype_le _
+    have hTq : IsPGroup q ↥((P : Subgroup ↥N).map N.subtype) :=
+      P.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective)
+    have hRT : R ≤ (P : Subgroup ↥N).map N.subtype := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hRN]
+      exact Subgroup.map_mono hRP
+    have hRTeq : R = (P : Subgroup ↥N).map N.subtype := hRmax _ hTN hTq hRT
+    rw [hRTeq, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective N.subtype_injective]
+  obtain ⟨PS, hPS⟩ := key S hSN hSq hSmax
+  obtain ⟨PS₀, hPS₀⟩ := key S₀ hS₀N hS₀q hS₀max
+  -- Sylow conjugacy inside `↥N`.
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (↥N) PS₀ PS
+  have hgsub : (PS₀ : Subgroup ↥N).map (MulAut.conj g).toMonoidHom = (PS : Subgroup ↥N) := by
+    have h := congr_arg Sylow.toSubgroup hg
+    rwa [Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def] at h
+  set m : G := (g : G) with hm
+  have hmN : m ∈ N := g.2
+  -- Push the conjugation down to `G`: `m S₀ m⁻¹ = S` (`•`-form; `map (conj m).toMonoidHom` is defeq).
+  have hconj : MulAut.conj m • S₀ = S := by
+    have hlhs := map_subtype_conj_subgroupOf g S₀ hS₀N
+    rw [← hPS₀, hgsub, hPS, Subgroup.map_subgroupOf_eq_of_le hSN] at hlhs
+    exact hlhs.symm
+  -- `ℳ(S) = {M}` by transporting `ℳ(S₀) = {M}` along `conj m` (`m ∈ N ≤ M` fixes `M`).
+  rw [Set.eq_singleton_iff_unique_mem]
+  refine ⟨mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hSN.trans hNM⟩, ?_⟩
+  intro N' hN'
+  rw [mem_maximalSubgroupsContaining] at hN'
+  obtain ⟨hN'coat, hSN'⟩ := hN'
+  have hSN'' : MulAut.conj m • S₀ ≤ N' := by rw [hconj]; exact hSN'
+  have hWmem : MulAut.conj m⁻¹ • N' ∈ maximalSubgroupsContaining S₀ := by
+    rw [mem_maximalSubgroupsContaining]
+    refine ⟨isCoatom_conj_smul hN'coat, ?_⟩
+    calc S₀ = MulAut.conj m⁻¹ • (MulAut.conj m • S₀) := by
+              rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ ≤ MulAut.conj m⁻¹ • N' := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hSN''
+  rw [hMS₀, Set.mem_singleton_iff] at hWmem
+  have hN'eq : MulAut.conj m • M = N' := by
+    rw [← hWmem, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  rw [← hN'eq]
+  exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hNM hmN))
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -564,6 +647,21 @@ theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd
     (hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T) :
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
     maximalSubgroupsContaining S = {M} := by
-  sorry
+  classical
+  have hXMσ : X ≤ S10.Msigma M := hXC.trans inf_le_left
+  have hXM : X ≤ M := hXMσ.trans (S10.Msigma_le M)
+  by_cases hcase : q ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)
+  · -- **Reduction half** (BG L3608): Corollary 12.14 (faithful form) supplies both `ℳ(C_G(X)) = {M}`
+    -- and `ℳ(S₀) = {M}` for its internal Sylow `S₀ ⊇ X`; the arbitrary `S` follows by conjugacy.
+    obtain ⟨hCG, S₀, _hXS₀, hS₀Mσ, hS₀q, hS₀max, hMS₀⟩ :=
+      Cor1214.maximalContaining_centralizer_and_someSylow_eq_singleton
+        hG h.mem_maximal hq hX hXM hcase
+    exact ⟨hCG, maximalContaining_eq_singleton_of_maximal_qsubgroup h.mem_maximal
+      (S10.Msigma_le M) hSle hSq hSmax hS₀Mσ hS₀q hS₀max hMS₀⟩
+  · -- **Contradiction half** (BG L3610-3624): `q ∉ β(M)` and `X ⊄ M_σ'` is impossible.
+    -- Reduce `P = E₁` (Thm 13.5), normalize a Sylow `S ⊆ C_{M_σ}(E')` (Thm 12.13 + Prop 1.5),
+    -- force `E₂ ≠ 1` (Lemma 12.17), then `A ∈ ℰ_p²(E)` centralizes `X` (Thm 13.4), contra (13.1).
+    exfalso
+    sorry
 
 end OddOrder.BG.Ch3.S13
