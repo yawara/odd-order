@@ -49,6 +49,7 @@ namespace OddOrder.BG.Ch3.S12.Cor1216
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
 open scoped Pointwise
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -120,6 +121,40 @@ private theorem pRank_eq_of_le_of_not_dvd_index {G : Type*} [Group G] [Finite G]
   rw [← pRank_sylow_eq R, ← hSylK]
   exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
     (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
+
+/-- Monotonicity of the ambient derived subgroup. (Replicated from S09_Lemma95.) -/
+private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
+    derivedInG H ≤ derivedInG K := by
+  rw [show derivedInG H = ⁅(H : Subgroup G), H⁆ from Subgroup.map_subtype_commutator H,
+    show derivedInG K = ⁅(K : Subgroup G), K⁆ from Subgroup.map_subtype_commutator K]
+  exact Subgroup.commutator_mono hHK hHK
+
+/-- **Derived subgroup of a product**: `K = A·N` (`N ⊴ K`) ⟹ `K' ≤ A' ⊔ N`. (Replicated from
+S12_Proposition1215; the d.2/P5 crux.) -/
+private theorem commutator_le_commutator_sup_normal {K : Type*} [Group K]
+    (A N : Subgroup K) [N.Normal] (hAN : A ⊔ N = ⊤) :
+    commutator K ≤ ⁅A, A⁆ ⊔ N := by
+  rw [commutator_def, Subgroup.commutator_le]
+  intro g₁ _ g₂ _
+  have hg₁ : (g₁ : K) ∈ (A : Set K) * (N : Set K) := by
+    rw [← Subgroup.mul_normal, hAN]; exact Subgroup.mem_top _
+  have hg₂ : (g₂ : K) ∈ (A : Set K) * (N : Set K) := by
+    rw [← Subgroup.mul_normal, hAN]; exact Subgroup.mem_top _
+  obtain ⟨a₁, ha₁, n₁, hn₁, rfl⟩ := Set.mem_mul.mp hg₁
+  obtain ⟨a₂, ha₂, n₂, hn₂, rfl⟩ := Set.mem_mul.mp hg₂
+  have hmod : ⁅a₁ * n₁, a₂ * n₂⁆ * ⁅a₁, a₂⁆⁻¹ ∈ N := by
+    rw [← QuotientGroup.eq_one_iff]
+    have hn1 : (QuotientGroup.mk' N) n₁ = 1 := (QuotientGroup.eq_one_iff n₁).mpr hn₁
+    have hn2 : (QuotientGroup.mk' N) n₂ = 1 := (QuotientGroup.eq_one_iff n₂).mpr hn₂
+    have e : (QuotientGroup.mk' N) (⁅a₁ * n₁, a₂ * n₂⁆ * ⁅a₁, a₂⁆⁻¹)
+        = QuotientGroup.mk (⁅a₁ * n₁, a₂ * n₂⁆ * ⁅a₁, a₂⁆⁻¹) := rfl
+    rw [← e, map_mul, map_inv, map_commutatorElement, map_commutatorElement, map_mul, map_mul,
+      hn1, hn2, mul_one, mul_one, mul_inv_cancel]
+  have hcommA : ⁅a₁, a₂⁆ ∈ ⁅A, A⁆ := Subgroup.commutator_mem_commutator ha₁ ha₂
+  have heq : ⁅a₁ * n₁, a₂ * n₂⁆ = (⁅a₁ * n₁, a₂ * n₂⁆ * ⁅a₁, a₂⁆⁻¹) * ⁅a₁, a₂⁆ := by
+    rw [inv_mul_cancel_right]
+  rw [heq]
+  exact Subgroup.mul_mem _ (Subgroup.mem_sup_right hmod) (Subgroup.mem_sup_left hcommA)
 
 /-- **Shared Case-2 setup** for 12.16(a)/(b): if `Y ⊆ M_σ` is a nonidentity `q`-group (`q ∈ σ(M)`)
 with `N_G(Y) ⊄ M`, then there is a maximal `M* ⊇ N_G(Y)`, `M* ≠ M`, with the factorization
@@ -323,6 +358,73 @@ theorem pRank_normalizer_le_one [Finite G] (hG : IsMinimalSimpleOdd G)
     exact pRank_eq_of_mulEquiv (Subgroup.equivMapOfInjective _ (MulAut.conj g).toMonoidHom
       (MulAut.conj g).injective)
   rw [heq]; exact hcore
+
+/-- **Core of 12.16(b)** with `Y ⊆ M_σ`. `N := N_H(Y) ≤ M` (Case 1) or `≤ M*` (Case 2); in either
+case `deriv N` lies in a `p'`-subgroup (`deriv M = M'` is `p'` by `τ₁`; or `deriv M* ≤ (M∩M*)'⊔K`,
+both `p'`), so `p ∉ π(deriv N)`. -/
+private theorem not_mem_primeFactors_derived_of_tau1_core [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) {q : ℕ} [Fact q.Prime] (hYq : IsPGroup q ↥Y)
+    (hqσ : q ∈ S10.sigma M) (hYMσ : Y ≤ S10.Msigma M)
+    {p : ℕ} [Fact p.Prime] (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpβ : ¬ S10.idealPrime p G)
+    (hpτ1 : p ∈ tau1 M)
+    {H : Subgroup G} (hHY : H ∈ maximalSubgroupsContaining Y)
+    (hHnc : ¬ ∃ g : G, MulAut.conj g • M = H) :
+    p ∉ (Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G)))).primeFactors := by
+  have hpM' : p ∉ (Nat.card ↥(derivedInG M)).primeFactors := ((mem_tau1_iff M p).mp hpτ1).2.1
+  intro hpmem
+  have hp_dvd : p ∣ Nat.card ↥(derivedInG (H ⊓ Subgroup.normalizer (Y : Set G))) :=
+    (Nat.mem_primeFactors.mp hpmem).2.1
+  by_cases hNYM : Subgroup.normalizer (Y : Set G) ≤ M
+  · -- Case 1: `N_H(Y) ≤ N_G(Y) ≤ M`, so `deriv N ≤ M'` (a `p'`-group by `τ₁`).
+    exact hpM' (Nat.mem_primeFactors.mpr ⟨Fact.out, hp_dvd.trans
+      (Subgroup.card_dvd_of_le (derivedInG_mono (inf_le_right.trans hNYM))), Nat.card_pos.ne'⟩)
+  · -- Case 2: `M*`, `K`. `deriv N ≤ deriv M* ≤ (M∩M*)' ⊔ K`, both `p'`.
+    obtain ⟨Mstar, K, hMstar_max, hMstar_ge, hMstarne, hMstarFact, hKnorm, hpK⟩ :=
+      exists_Mstar_factorization hG h hYne hYq hqσ hYMσ hpE hpβ hNYM
+    have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
+    have hNMstar : H ⊓ Subgroup.normalizer (Y : Set G) ≤ Mstar := inf_le_right.trans hMstar_ge
+    have hpMstar' : ¬ p ∣ Nat.card ↥(derivedInG Mstar) := by
+      haveI := hKnorm
+      have hAK_top : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
+      have hcrux := commutator_le_commutator_sup_normal ((M ⊓ Mstar).subgroupOf Mstar)
+        (K.subgroupOf Mstar) hAK_top
+      have hpA'' : ¬ p ∣ Nat.card ↥(⁅(M ⊓ Mstar).subgroupOf Mstar,
+          (M ⊓ Mstar).subgroupOf Mstar⁆ : Subgroup ↥Mstar) := by
+        intro hdvd
+        have hmap : (⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ :
+            Subgroup ↥Mstar).map Mstar.subtype = ⁅(M ⊓ Mstar : Subgroup G), M ⊓ Mstar⁆ := by
+          rw [Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le inf_le_right]
+        have hle : (⁅(M ⊓ Mstar : Subgroup G), M ⊓ Mstar⁆) ≤ derivedInG M := by
+          rw [show derivedInG M = ⁅(M : Subgroup G), M⁆ from Subgroup.map_subtype_commutator M]
+          exact Subgroup.commutator_mono inf_le_left inf_le_left
+        rw [← Subgroup.card_map_of_injective Mstar.subtype_injective, hmap] at hdvd
+        exact hpM' (Nat.mem_primeFactors.mpr
+          ⟨Fact.out, hdvd.trans (Subgroup.card_dvd_of_le hle), Nat.card_pos.ne'⟩)
+      have hpK'' : ¬ p ∣ Nat.card ↥(K.subgroupOf Mstar) := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKle).toEquiv]; exact hpK
+      have hsup_dvd : Nat.card ↥(⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ ⊔
+            K.subgroupOf Mstar : Subgroup ↥Mstar)
+          ∣ Nat.card ↥(⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ :
+              Subgroup ↥Mstar) * Nat.card ↥(K.subgroupOf Mstar) := by
+        have hform := Subgroup.card_HK_mul_card_inf_eq_card_mul_card
+          (⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ : Subgroup ↥Mstar)
+          (K.subgroupOf Mstar)
+        rw [show (↑(⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ :
+              Subgroup ↥Mstar) * ↑(K.subgroupOf Mstar) : Set ↥Mstar)
+            = ↑(⁅(M ⊓ Mstar).subgroupOf Mstar, (M ⊓ Mstar).subgroupOf Mstar⁆ ⊔
+                K.subgroupOf Mstar : Subgroup ↥Mstar) from (Subgroup.mul_normal _ _).symm] at hform
+        exact ⟨_, hform.symm⟩
+      intro hdvd
+      have hdvd_comm : p ∣ Nat.card ↥(commutator ↥Mstar) := by
+        rwa [show derivedInG Mstar = (commutator ↥Mstar).map Mstar.subtype from rfl,
+          Subgroup.card_map_of_injective Mstar.subtype_injective] at hdvd
+      rcases (Nat.Prime.dvd_mul Fact.out).mp
+          ((hdvd_comm.trans (Subgroup.card_dvd_of_le hcrux)).trans hsup_dvd) with hh | hh
+      · exact hpA'' hh
+      · exact hpK'' hh
+    exact hpMstar' (hp_dvd.trans (Subgroup.card_dvd_of_le (derivedInG_mono hNMstar)))
 
 /-- **BG Corollary 12.16(b)** (mmd L3453, 3456): `p ∈ τ₁(M)` ⟹ `p ∉ π(N_H(Y)')`. 実証明版。 -/
 theorem not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
