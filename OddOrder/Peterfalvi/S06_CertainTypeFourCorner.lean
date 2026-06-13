@@ -348,4 +348,43 @@ theorem fourCornerDade_eq_zero_of_not_mem_conjugatesV (h : Hypothesis46 A L)
     simpa [map_mul, map_inv] using this
   · rw [h.dade0.dadeValue_of_not_mem_dadeSupport _ hgs]
 
+/-- **(4.10), G-side four-corner support**: the `G`-side four-corner of the `ω_{ij}^{tic}`
+characters lies in `CF(W, V) = SupportedOnV ℂ ticVdiff`.  Via `omegaProdCharTic_apply` the value
+at `g` equals the `sdiff`-side four-corner at the bridge partner `e g`, so the W-side support
+(`chiColumn_fourcorner_mem_supportedSubmodule`) transports: `e g ∈ V` (L-side) gives
+`(g : G) ∈ ticVdiff.V` (`coe_mem_ticVdiffV_of_mem_toTICV`, `coe_ticWEquivSdiffW`).  This is the
+carrier whose `σ` is the RHS of (4.10) — `σ` being a Dade map on it, the RHS vanishes off `V^G`. -/
+theorem omegaTic_fourcorner_mem_supportedSubmodule (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    (((ticVdiff h).omega (omegaProdCharTic h χ₂ i) : ClassFunction (ticVdiff h).W ℂ)
+        - ((ticVdiff h).omega (omegaProdCharTic h χ₂ 0) : ClassFunction (ticVdiff h).W ℂ)
+        - (((ticVdiff h).omega (omegaProdCharTic h 1 i) : ClassFunction (ticVdiff h).W ℂ)
+          - ((ticVdiff h).omega (omegaProdCharTic h 1 0) : ClassFunction (ticVdiff h).W ℂ)))
+      ∈ ClassFunction.supportedSubmodule
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (ticVdiff h).V (ticVdiff h).W) := by
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+  have e : ∀ (χ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (k : Fin (Nat.card h.W1)),
+      ((ticVdiff h).omega (omegaProdCharTic h χ k) : ClassFunction (ticVdiff h).W ℂ) g
+        = (h.chiColumn χ k : ClassFunction h.sdiffTICyclicHypothesis.W ℂ) (ticWEquivSdiffW h g) :=
+    fun χ k => by rw [(ticVdiff h).omega_apply]; exact omegaProdCharTic_apply h χ k g
+  rw [ClassFunction.sub_apply, ClassFunction.sub_apply, ClassFunction.sub_apply, e, e, e, e] at hg
+  have hF := chiColumn_fourcorner_mem_supportedSubmodule h χ₂ i
+  rw [ClassFunction.mem_supportedSubmodule] at hF
+  have hgsupp : ticWEquivSdiffW h g ∈ ClassFunction.support
+      ((h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - ((h.chiColumn 1 i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          - (h.chiColumn 1 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))) := by
+    rw [ClassFunction.mem_support, ClassFunction.sub_apply, ClassFunction.sub_apply,
+      ClassFunction.sub_apply]
+    exact hg
+  have hmem := hF hgsupp
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hmem
+  rw [← coe_ticWEquivSdiffW h g]
+  exact coe_mem_ticVdiffV_of_mem_toTICV h hmem
+
 end OddOrder.Peterfalvi.S06
