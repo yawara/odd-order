@@ -216,6 +216,69 @@ theorem actsPrimeOn_Msigma_of_mem_tau13 [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [fixedByElement_def, fixedBy_def]
   exact le_inf inf_le_left ((inf_le_inf_left _ hCg_Mstar).trans hMMcP)
 
+/-- A nontrivial cyclic Sylow `p`-subgroup `P` of `E` has `p ∈ τ₁(M) ∪ τ₃(M)`: as `P` is a Sylow
+`p` of `E` and `p ∤ |M_σ|` (since `p ∈ π(E) ⊆ σ(M)'`), `P` is a Sylow `p` of `M`, so
+`r_p(M) = r_p(P) ≤ 1`; with `p ∉ σ(M)` this places `p` in `τ₁ ∪ τ₃` (which is `{p ∉ σ(M), r_p(M)=1}`).
+Excludes `τ₂` (which needs `r_p(M)=2`) and supplies the `τ₁ ∪ τ₃` hypothesis of the core lemma. -/
+theorem mem_tau1_union_tau3_of_isCyclic_sylow_E [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    {P : Subgroup G} (hPE : P ≤ E) (hPp : IsPGroup p ↥P) (hPcyc : IsCyclic ↥P) (hPne : P ≠ ⊥)
+    (hPmax : ∀ T : Subgroup G, T ≤ E → IsPGroup p ↥T → P ≤ T → P = T) :
+    p ∈ tau1 M ∪ tau3 M := by
+  classical
+  -- `p ∈ π(P) ⊆ π(E) ⊆ π(M)`.
+  have hpdvdP : p ∣ Nat.card ↥P := by
+    obtain ⟨k, hk⟩ := hPp.exists_card_eq
+    have hk0 : k ≠ 0 := by
+      rintro rfl; rw [pow_zero] at hk; exact hPne (Subgroup.card_eq_one.mp hk)
+    exact hk ▸ dvd_pow_self p hk0
+  have hpdvdE : p ∣ Nat.card ↥E := hpdvdP.trans (Subgroup.card_dvd_of_le hPE)
+  have hpπE : p ∈ (Nat.card ↥E).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdE, Nat.card_pos.ne'⟩
+  have hpσ : p ∉ S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hpπE
+  have hpπM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdE.trans (Subgroup.card_dvd_of_le h.E_le),
+      Nat.card_pos.ne'⟩
+  -- `P.subgroupOf E` is a Sylow `p` of `↥E`, so `|P| = p ^ (|E|).factorization p`.
+  have hPEpg : IsPGroup p ↥(P.subgroupOf E) := by
+    obtain ⟨k, hk⟩ := hPp.exists_card_eq
+    exact IsPGroup.of_card
+      (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPE).toEquiv]; exact hk)
+  obtain ⟨SylE, hSylE⟩ := hPEpg.exists_le_sylow
+  have hPeqSyl : P = (SylE : Subgroup ↥E).map E.subtype := by
+    refine hPmax _ (Subgroup.map_subtype_le _) (SylE.isPGroup'.map E.subtype) ?_
+    rw [← Subgroup.map_subgroupOf_eq_of_le hPE]; exact Subgroup.map_mono hSylE
+  have hPcardEq : Nat.card ↥P = p ^ (Nat.card ↥E).factorization p := by
+    rw [hPeqSyl, Subgroup.card_map_of_injective E.subtype_injective]
+    exact SylE.card_eq_multiplicity
+  -- `|M|.factorization p = |E|.factorization p` (since `p ∤ |M_σ|`).
+  have hpMσ : ¬ p ∣ Nat.card ↥(S10.Msigma M) := fun hd =>
+    hpσ (S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩))
+  have hfactEq : (Nat.card ↥M).factorization p = (Nat.card ↥E).factorization p := by
+    rw [← h.card_Msigma_mul_card_E,
+      Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpMσ, zero_add]
+  -- `P.subgroupOf M` is a Sylow `p` of `↥M`; hence `r_p(M) = r_p(P) ≤ 1`.
+  have hPMcardEq : Nat.card ↥(P.subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hPE.trans h.E_le)).toEquiv, hPcardEq, hfactEq]
+  let SylM : Sylow p ↥M := Sylow.ofCard (P.subgroupOf M) hPMcardEq
+  haveI hcyc : IsCyclic ↥(P.subgroupOf M) :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe (hPE.trans h.E_le)).symm.surjective
+  have hpr : pRank ↥(P.subgroupOf M) p ≤ 1 := by
+    by_contra hc
+    obtain ⟨A, _, hAnc⟩ :=
+      exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank
+        (G := ↥(P.subgroupOf M)) (p := p) (by omega)
+    exact hAnc inferInstance
+  have hpRankM : pRank ↥M p ≤ 1 :=
+    (pRank_sylow_eq SylM).symm.trans_le hpr
+  have hpRank1 : pRank ↥M p = 1 :=
+    le_antisymm hpRankM (one_le_pRank_of_mem_primeFactors hpπM)
+  -- assemble `τ₁ ∪ τ₃`.
+  by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+  · exact Or.inr ((mem_tau3_iff M p).mpr ⟨hpσ, hM', hpRank1⟩)
+  · exact Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, hM', hpRank1⟩)
+
 /-- **BG Corollary 13.3** (mmd L3526): (a) `E` の非自明 cyclic Sylow 部分群は `M_σ` に prime 作用;
 (b) `E₃` は `M_σ` に prime 作用。 -/
 theorem cyclicSylow_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
