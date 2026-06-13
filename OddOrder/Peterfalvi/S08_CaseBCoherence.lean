@@ -899,6 +899,7 @@ normal), conjugation by any `g ∈ ↥L` fixes each `w ∈ W₂` (`g·w·g⁻¹ 
 
 In (6.8.2.2) this gives `‖Ind^L_{W₂}φ‖² = |L:W₂|` via
 `card_mul_inner_self_induce_eq_card_inertia` (`|W₂|·‖Ind φ‖² = |I_L(φ)| = |L|`). -/
+omit [Fintype G] [Fintype ↥L] in
 theorem inertia_eq_top_of_le_center
     {W2 : Subgroup ↥L} [W2.Normal] (hW2cen : W2 ≤ Subgroup.center ↥L)
     (φ : ClassFunction ↥W2 ℂ) :
