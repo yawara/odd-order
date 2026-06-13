@@ -1486,3 +1486,29 @@ X-coherence reuse で省力化判明。capstone は構造 cluster が gate の m
   条件 param)。inertia 計算。中規模。
 ### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred 要) + glue (generic, 全部揃ってから)。
 **正本=本 session 40 cont.¹². 構造 cluster 着手 (W₂⊆Z(L) ✅)。残=FPF + X-irred + 6.8.2.3 + glue。**
+
+## 2026-06-14 (session 40 cont.¹³, /loop): 🔓 構造 cluster #2 解除 — FPF index bounds (hc2/hFPF) landed
+
+**開始時定型**: hub の S08_CoherenceCore 3-way split (issue 0066, b7e672de) を main から取込 (merge
+`b47dfe78`, full build 3807 緑 + AxiomsCheck OK; b-peterfalvi の session-40 frontier とは disjoint)。
+
+**✅ landed (build-green + axiom-clean, commit `9aa66fdd`, S08_CaseBCoherence2)**:
+22. **`certainType_index_bounds` = 構造 discharge #2: FPF index bounds**。
+    (4.2) Hypothesis + math-B (W₂⊆Z(K)) ⟹ **商 ↥L/W₂ が Frobenius 群** (kernel K/W₂, complement
+    W₁W₂/W₂) ⟹ Isaacs Lemma 6.1 `card_kernel_modEq_one` で |K:W₂| ≡ 1 (mod |W₁|) ⟹ |W₁|<|K:W₂|。
+    出力 = `exists_decomposition_caseB` の deferred 2 入力:
+    - `hc2 : 2 ≤ (W₂.subgroupOf K).index` (W₂⊊K = ¬K≤W₂ から)
+    - `hFPF : (W₂.index:ℤ) < ((W₂.subgroupOf K).index:ℤ)^2` (|L:W₂|=|K:W₂|·|W₁| via relIndex_mul_index
+      + index_eq_card; |W₁|<|K:W₂|)。
+    🔑 鍵 API (再調査不要): `OddOrder.BG.Ch1.S03.isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot`
+    (元群が Frobenius でなくても商上に直接構成可、IsFrobeniusGroup 不要)、`fixedPoint_lift_of_generator_quotient_fixed`
+    (IsFrobeniusGroup 不要、hNK+coprime+solvable のみ; solvable は zpowers x cyclic で Or.inl 無料)、
+    centralizer 条件は q̄∈K.map から y∈K 直得ゆえ W₁ abelian 不要。card 変換 = `quotientKerEquivRange`
+    + `quotientBot` + `IsComplement'.symm.index_eq_card`。S08_CaseBCoherence2 は 193→344 行。
+
+### ⚠ 構造 cluster 残 = #1 のみ:
+- **math-B X-irreducibility (`isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版)**: case-A 版
+  `isIrreducibleCharacter_of_mem_Xset_caseA` (S08_CoherenceCorePart2:1860) は FPF-generic (centralizer
+  条件 param)。math-B (W₂⊆Z(H)) でこの generic に渡す centralizer 入力を作る。inertia 計算。中規模。
+### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred #1 要) → τ₂ assembly (大) → §7 glue (generic) → capstone。
+**正本=本 session 40 cont.¹³。構造 #3(W₂⊆Z)+#2(FPF bounds) ✅。残=#1 X-irred + (6.8.2.3) + τ₂ + glue。**
