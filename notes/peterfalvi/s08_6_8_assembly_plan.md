@@ -820,3 +820,20 @@ infra はほぼ全 BUILT (10057 + capstone 5026 + 両 hXirr + Y-coh + engine)。
 - **c2**: Hypothesis46-from-Sibley bridge (subH/A_covers/tic 構築) + glue。
 両 branch 必須 (sorry 全消)。**各 multi-session、incremental-easy piece 無し** ⟹ case-B は sustained 多セッション grind。
 **判断: ユーザーに scope 確認 (case-B grind commit vs (4.10) milestone 区切り)。正本=本 cont.⁵。**
+
+## 2026-06-13 (session 38 cont.⁶, /loop): stale-note 訂正 + 正直な進捗 flag (空転)
+
+**🔧 stale 訂正**: 旧 Agent 分析の「B4 m≥2 未解決」「(6.5) DAG 欠落」は**少なくとも B4 は解決済**:
+`two_le_Yset_ncard` (S08_CoherenceCore:4893) は**証明済 sorry-free** (`two_le_ncard_of_conjugate_closed_of_noReal`
++ Yset closure/no-real)、`coherentYset` 稼働。⟹ **Y-coherence は B4-blocked ではない (済)**。
+S08_CoherenceCore 全体 sorry-free (唯一の sorry = S08_CoherenceTheorems:59 X-nonempty branch)。
+
+**case-B X-nonempty sorry の真の残り** (infra は Y-coh/capstone glue/X-coh constructor/両 hXirr 全 built):
+- **Frobenius**: hstepData (`PairUnionBaseAnchorCommonIndexPrimePowerStepData`, ~30-field 不可分構造,
+  prime-power 次数 = **H p-群要**; SibleyDadeHypothesis.H は NILPOTENT のみ ⟹ p-群還元 (6.5) が前提) + glue。
+- **c2**: Hypothesis46-from-Sibley bridge (Hypothesis46 全 field 構築, (6.5)-independent だが不可分大構造) + glue。
+- 両 branch とも**大・不可分構造 (sorry scaffold 不可) + deep sub-pieces** ⟹ 60s-loop-grind に不適。
+
+**⚠ 正直な進捗 flag (thumbs-down)**: case-B は RECON ~5 tick で **net-0 code** (冗長 hXirr 1 revert)。
+infra は揃うが残りは focused 多セッション構築要 (loop-grind 不向き)。(4.10) は完成・full build+AxiomsCheck 緑。
+**判断はユーザーへ**: (4.10) 区切り / c2-bridge を地道 loop grind / (6.5) reduction 専念。正本=本 cont.⁶。
