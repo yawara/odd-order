@@ -428,4 +428,44 @@ theorem fourCornerDade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     certainTypeOmegaSigma_apply_of_mem_V h 1 0 hv]
   rfl
 
+/-- **Peterfalvi (4.10)** (the four-corner Dade identity).  For `0 ≤ i < w₁` and `0 ≤ j < w₂`,
+`(δ_j μ_{ij} − δ_j μ_{0j} − μ_{i0} + μ_{00})^τ = ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ + ω_{00}^σ`.
+
+Both sides are class functions on `G`.  Off `V^G` both vanish — the LHS by crux (d)
+(`fourCornerDade_eq_zero_of_not_mem_conjugatesV`), the RHS because it is `σ(α_G)` (σ-linearity)
+with `α_G ∈ CF(W, V)` (`omegaTic_fourcorner_mem_supportedSubmodule`), so `σ(α_G) = τ_G(α_G)`
+(`sigma_eq_tau`) vanishes off `V^G` (`full_map_eq_zero_of_not_mem_conjugatesOfSet_V`).  On `V^G`,
+class-function invariance (`conj_eq`) reduces to a point of `V`, where the two agree by crux (c)
+(`fourCornerDade_apply_eq_of_mem_V`). -/
+theorem fourCorner_dade_eq (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    h.tau.toDadeMap (fourCornerDiffSupported h χ₂ i)
+      = certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂ 0
+        - (certainTypeOmegaSigma h 1 i - certainTypeOmegaSigma h 1 0) := by
+  set γ : OddOrder.Peterfalvi.S05.TICyclicHypothesis.SupportedOnV ℂ (ticVdiff h) :=
+    ⟨((ticVdiff h).omega (omegaProdCharTic h χ₂ i) : ClassFunction (ticVdiff h).W ℂ)
+        - ((ticVdiff h).omega (omegaProdCharTic h χ₂ 0) : ClassFunction (ticVdiff h).W ℂ)
+        - (((ticVdiff h).omega (omegaProdCharTic h 1 i) : ClassFunction (ticVdiff h).W ℂ)
+          - ((ticVdiff h).omega (omegaProdCharTic h 1 0) : ClassFunction (ticVdiff h).W ℂ)),
+     omegaTic_fourcorner_mem_supportedSubmodule h χ₂ i⟩ with hγ
+  have hRHSeq : (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂ 0
+        - (certainTypeOmegaSigma h 1 i - certainTypeOmegaSigma h 1 0))
+      = (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h) (↑γ) := by
+    simp only [certainTypeOmegaSigma]
+    rw [← map_sub, ← map_sub, ← map_sub]
+  ext g
+  by_cases hg : g ∈ Group.conjugatesOfSet (ticVdiff h).V
+  · obtain ⟨v, hvV, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hg
+    obtain ⟨x, hx⟩ := isConj_iff.mp hconj
+    rw [← hx, ClassFunction.conj_eq _ v x, ClassFunction.conj_eq _ v x,
+      ClassFunction.sub_apply, ClassFunction.sub_apply, ClassFunction.sub_apply]
+    exact fourCornerDade_apply_eq_of_mem_V h χ₂ i hvV
+  · rw [fourCornerDade_eq_zero_of_not_mem_conjugatesV h χ₂ i hg, hRHSeq,
+      (ticVdiff h).sigma_eq_tau rfl (ticVdiffFullDadeApplication h) γ]
+    exact ((ticVdiff h).full_map_eq_zero_of_not_mem_conjugatesOfSet_V
+      (ticVdiffFullDadeApplication h) γ hg).symm
+
 end OddOrder.Peterfalvi.S06
