@@ -7,6 +7,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadicalCore
 import OddOrder.BG.Ch1_Preliminary.S01b_Prop116
+import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 
 /-!
 # BG §12: Theorem 12.13 — every nonabelian `p`-subgroup of `G` lies in `𝒰`
@@ -271,6 +272,77 @@ theorem exists_conj_smul_zpowers_eq_of_expPExtraspecial_le [Finite G] {p : ℕ} 
   have h2 := congrArg (Subgroup.map Q.subtype) hq
   rw [hmsc, ha_map, hb_map] at h2
   exact h2
+
+/-- **Two non-central lines of a common `A ∈ ℰ²(Q)` are `Q`-conjugate** (subgroup form of the
+Heisenberg line-conjugacy, BG 12.13 final step): for `A ∈ ℰ²(Q)` with `Z(Q) ≤ A` and `A₀, A₀⋆`
+distinct-from-`Z(Q)` lines of `A`, there is `g ∈ Q` with `g A₀ g⁻¹ = A₀⋆`. Pick generators
+`a₀, a₀⋆`; they avoid `Z(Q)` (a line `≠ Z(Q)` meets it trivially), and `A = ⟨a₀⟩ ⊔ Z(Q)` (a `p`-group
+strictly above `Z(Q)` inside the order-`p²` `A`), so `a₀⋆ ∈ ⟨a₀⟩ ⊔ Z(Q)`; apply
+`exists_conj_smul_zpowers_eq_of_expPExtraspecial_le`. -/
+theorem exists_conj_smul_eq_of_lines_of_expPExtraspecial [Finite G] {p : ℕ} [Fact p.Prime]
+    {Q A A₀ A₀star : Subgroup G} (hQ_es : IsExpPExtraspecial p ↥Q)
+    (hZA : (Subgroup.center ↥Q).map Q.subtype ≤ A) (hAmem : A ∈ elemAbelianOfRank G p 2)
+    (hA_le_Q : A ≤ Q) (hA₀mem : A₀ ∈ elemAbelianOfRank G p 1) (hA₀_le : A₀ ≤ A)
+    (hA₀_ne : A₀ ≠ (Subgroup.center ↥Q).map Q.subtype)
+    (hA₀star_mem : A₀star ∈ elemAbelianOfRank G p 1) (hA₀star_le : A₀star ≤ A)
+    (hA₀star_ne : A₀star ≠ (Subgroup.center ↥Q).map Q.subtype) :
+    ∃ g ∈ Q, MulAut.conj g • A₀ = A₀star := by
+  classical
+  have hpp : p.Prime := Fact.out
+  set Z : Subgroup G := (Subgroup.center ↥Q).map Q.subtype with hZdef
+  have hZcard : Nat.card ↥Z = p := by
+    rw [hZdef, Subgroup.card_map_of_injective Q.subtype_injective, hQ_es.isExtraspecial.center_card]
+  obtain ⟨hAea, hAcard⟩ := mem_elemAbelianOfRank.mp hAmem
+  -- generators of the two lines.
+  have getgen : ∀ {R : Subgroup G}, Nat.card ↥R = p → ∃ r : G, r ∈ R ∧ Subgroup.zpowers r = R := by
+    intro R hR
+    haveI : Nontrivial ↥R := Finite.one_lt_card_iff_nontrivial.mp (by rw [hR]; exact hpp.one_lt)
+    obtain ⟨rbar, hrbar⟩ := exists_ne (1 : ↥R)
+    exact ⟨rbar, rbar.2, OddOrder.BG.Ch1.S03d.zpowers_eq_of_prime_card (by rw [hR]; exact hpp)
+      rbar.2 (fun h => hrbar (Subtype.ext h))⟩
+  have hA₀card : Nat.card ↥A₀ = p := by rw [(mem_elemAbelianOfRank.mp hA₀mem).2, pow_one]
+  have hA₀starcard : Nat.card ↥A₀star = p := by rw [(mem_elemAbelianOfRank.mp hA₀star_mem).2, pow_one]
+  obtain ⟨a₀, ha₀A₀, hzpa₀⟩ := getgen hA₀card
+  obtain ⟨a₀s, ha₀sA, hzpa₀s⟩ := getgen hA₀starcard
+  have ha₀Q : a₀ ∈ Q := hA_le_Q (hA₀_le ha₀A₀)
+  have ha₀sQ : a₀s ∈ Q := hA_le_Q (hA₀star_le ha₀sA)
+  -- a line `≠ Z` avoids `Z` (both prime order, so meet `≤` line forces equality).
+  have notZ : ∀ {B : Subgroup G} {b : G}, Nat.card ↥B = p → B ≠ Z → Subgroup.zpowers b = B →
+      b ∈ B → b ∉ Z := by
+    intro B b hBcard hBne hzpb hbB hbZ
+    exact hBne (Subgroup.eq_of_le_of_card_ge (hzpb ▸ Subgroup.zpowers_le.mpr hbZ)
+      (le_of_eq (hZcard.trans hBcard.symm)))
+  have ha₀notZ : a₀ ∉ Z := notZ hA₀card hA₀_ne hzpa₀ ha₀A₀
+  have ha₀snotZ : a₀s ∉ Z := notZ hA₀starcard hA₀star_ne hzpa₀s ha₀sA
+  -- `A = A₀ ⊔ Z`, so `a₀⋆ ∈ ⟨a₀⟩ ⊔ Z`.
+  have hsupA : A₀ ⊔ Z = A := by
+    have hle : A₀ ⊔ Z ≤ A := sup_le hA₀_le hZA
+    have hpg : IsPGroup p ↥(A₀ ⊔ Z) :=
+      hAea.isPGroup.of_injective (Subgroup.inclusion hle) (Subgroup.inclusion_injective hle)
+    obtain ⟨j, hj⟩ := hpg.exists_card_eq
+    have hdvd : p ∣ Nat.card ↥(A₀ ⊔ Z) := hZcard ▸ Subgroup.card_dvd_of_le le_sup_right
+    have hne : Nat.card ↥(A₀ ⊔ Z) ≠ p := by
+      intro hcp
+      have hZeq : Z = A₀ ⊔ Z :=
+        Subgroup.eq_of_le_of_card_ge le_sup_right (le_of_eq (hcp.trans hZcard.symm))
+      exact ha₀notZ (hZeq ▸ (le_sup_left (a := A₀) (hzpa₀ ▸ Subgroup.mem_zpowers a₀)))
+    refine Subgroup.eq_of_le_of_card_ge hle ?_
+    rw [hAcard, hj]
+    refine Nat.pow_le_pow_right hpp.pos ?_
+    rw [hj] at hdvd hne
+    have hj1 : 1 ≤ j := by
+      rcases Nat.eq_zero_or_pos j with h | h
+      · rw [h, pow_zero] at hdvd
+        exact absurd (Nat.le_of_dvd one_pos hdvd) (Nat.not_le.mpr hpp.one_lt)
+      · exact h
+    have hjne1 : j ≠ 1 := fun h => hne (by rw [h, pow_one])
+    omega
+  have hmem : a₀s ∈ Subgroup.zpowers a₀ ⊔ Z := by
+    rw [hzpa₀, hsupA]; exact hA₀star_le ha₀sA
+  obtain ⟨g, hgQ, hg⟩ :=
+    exists_conj_smul_zpowers_eq_of_expPExtraspecial_le hQ_es ha₀Q ha₀sQ ha₀notZ ha₀snotZ hmem
+  refine ⟨g, hgQ, ?_⟩
+  rwa [hzpa₀, hzpa₀s] at hg
 
 /-- **`ℳ(N_G(·))`-uniqueness blocks `M`-conjugacy**: if `A₀⋆ = g • A₀` (conjugation by some
 `g ∈ M`), `ℳ(N_G(A₀)) = {M}`, and `ℳ(N_G(A₀⋆)) = {M⋆}`, then `M = M⋆`.
