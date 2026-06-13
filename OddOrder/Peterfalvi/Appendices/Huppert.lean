@@ -506,6 +506,33 @@ theorem exists_aInvariant_complement_of_elementaryAbelian
   · have h := congrArg Φ hinf; rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
   · have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
 
+/-- **Peterfalvi Appendix B, Lemma — reducible case**: if the faithful coprime odd-order
+action of `P` on the elementary abelian `q`-group `E` admits a proper nonzero `P`-invariant
+subgroup `U`, then a constant point-stabilizer order forces the action to be
+fixed-point-free.  Maschke (`exists_aInvariant_complement_of_elementaryAbelian`) splits off a
+`P`-invariant complement `E = U ⊕ W`, which feeds the invariant-complement form of part (1). -/
+theorem fpf_of_reducible
+    {q : ℕ} [Fact q.Prime] (hqE : q ∣ Nat.card E)
+    (hcop : Nat.Coprime (Nat.card P) (Nat.card E)) (hE : IsElementaryAbelian q E)
+    (φ : P →* MulAut E) (hfaithful : Function.Injective φ)
+    (hPodd : ∀ x : P, Odd (orderOf x))
+    (hconst : ∀ a b : E, a ≠ 1 → b ≠ 1 →
+      Nat.card (pointStabilizer φ a) = Nat.card (pointStabilizer φ b))
+    {U : Subgroup E} (hUinv : IsAInvariant φ U) (hUbot : U ≠ ⊥) (hUtop : U ≠ ⊤) :
+    ∀ x : P, x ≠ 1 → actionFixedBy φ x = ⊥ := by
+  obtain ⟨W, hWinv, hinf, hsup⟩ :=
+    exists_aInvariant_complement_of_elementaryAbelian hqE hcop hE hUinv
+  have hWbot : W ≠ ⊥ := by rintro rfl; rw [sup_bot_eq] at hsup; exact hUtop hsup
+  have hcompl : IsCompl U W := ⟨disjoint_iff.mpr hinf, codisjoint_iff.mpr hsup⟩
+  have conv : ∀ {V : Subgroup E}, IsAInvariant φ V → ∀ x : P, V.map (φ x).toMonoidHom = V := by
+    intro V hV x
+    apply le_antisymm
+    · rintro _ ⟨g, hg, rfl⟩; exact hV.smul_mem x hg
+    · intro u hu
+      exact ⟨(φ x)⁻¹ u, hV.inv_smul_mem x hu, MulAut.apply_inv_self E (φ x) u⟩
+  exact fpf_of_constant_stabilizer_of_invariant_compl hE.comm φ hfaithful hcompl hUbot hWbot
+    (conv hUinv) (conv hWinv) hPodd hconst
+
 end Maschke
 
 section Proposition1

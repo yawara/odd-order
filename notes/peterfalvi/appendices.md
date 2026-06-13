@@ -104,9 +104,16 @@ conjugation Equiv で). sorry 不変 (2→2)。
       ⚠ instance 知見: `CommGroup E` は infer 不可 → `{ (inferInstance:Group E) with mul_comm:=hE.comm }`
       で構成; `mulAutToEnd`/`neZero_…` は `OddOrder.BG.Ch1_Preliminary` 公開、Huppert 閉包に在 (import 不要,
       open のみ)。Huppert に `open Isaacs.Ch03`+`open BG.Ch1_Preliminary` 追加。
-- [ ] **reducible case 組立 (次)**: 「∃ proper nonzero P-invariant U」⟹ Maschke で W → `IsCompl U W`
-      (W≠⊥ は U≠⊤ から) → `fpf_of_constant_stabilizer_of_invariant_compl` → FPF。これで Lemma の
-      **reducible 分岐完了**。残 = part(2) 非cyclic (Schur) + Lemma case-split assembly。
+- [x] **reducible case 組立 ✅** `fpf_of_reducible` (complete, axiom-clean, session 11): ∃ proper
+      nonzero P-invariant U ⟹ Maschke で W → `IsCompl U W` (W≠⊥ は U⊔W=⊤ ∧ U≠⊤ から) →
+      `fpf_of_constant_stabilizer_of_invariant_compl` → FPF。IsAInvariant→`.map`-eq 変換は inline
+      `conv` (smul_mem/inv_smul_mem + `MulAut.apply_inv_self`)。一発 build。
+- [ ] **part(2) 非cyclic (最後の hard piece)**: P 既約・非cyclic → R⊴P type-(p,p) + Schur over F_q
+      (`IsSimpleModule.End` field) → `E=⊕C_E(T_i)` (r=p≥2 P-permuted) → part(1) で FPF。
+- [ ] **Lemma case-split assembly**: `pGroup_cyclic_fixedPointFree` を case split (irreducible↔reducible)
+      → reducible は `fpf_of_reducible`、irreducible-cyclic は `fpf_of_abelian_of_irreducible`、
+      irreducible-非cyclic は上記 sorry。⚠ 要 coprime `q≠p` を Lemma 仮説に追加 (現状無; degenerate
+      q=p は P trivial 強制ゆえ faithful)。これで Lemma の sorry を **非cyclic のみに局所化**。
 - (旧 session 9 偵察メモ) 実装経路 2 案を確定していた (案 B を採用):
    - **案 A (reuse, 推奨初手)**: `OddOrder.BG.Ch1.S04b…OperatorMaschke.exists_aInvariant_complement_in_omega1_quotient`
      を **S=⊥, R=E, p=q, A=P** で適用 → `X.map(mk'⊥) ⊓/⊔ U.map(mk'⊥)` の条件を E⧸⊥≅E で pull back。
