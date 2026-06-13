@@ -70,8 +70,13 @@ conjugation Equiv で). sorry 不変 (2→2)。
       `IsElementaryAbelian.zmodModule`, 部分空間の P-置換) が要 = 中規模。
 - [ ] **part (2) irreducible case**: Schur over F_q (`IsSimpleModule.End`=division ring) + type-(p,p)
       (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) + `E=⊕C_E(T_i)` → part(1)。
-- [ ] **Prop 1 残**: bridge は済。残 = `F=∏O_p`(nilpotent 分解) + O_p cyclic⟹F cyclic + `C_D(F)=F`
-      (D 可解; repo に `Ch01` Fitting API 在) + `D/F↪Aut(F)`。各々中規模。
+- [x] **Prop 1 abelian-quotient step** ✅ `commutator_le_fitting_of_isCyclic_fitting` (complete, axiom-clean,
+      session 3): D 可解 + F(D) cyclic ⟹ `commutator D ≤ F(D)`。citeable 部品で組立:
+      `S01.centralizer_fitting_le_fitting` (C_D(F)≤F, 可解) + `IsCyclic.mulAutMulEquiv`+`commGroupOfInjective`
+      (MulAut F abelian) + `Abelianization.commutator_subset_ker` + `MulAut.conjNormal`(ker=C_D(F))。
+- [ ] **Prop 1 残**: 「F cyclic」= **mathlib `ZGroup.lean:127`** `[IsZGroup G][IsNilpotent G]⟹IsCyclic G`
+      が使える (F nilpotent + 各 Sylow=O_p cyclic[Lemma 依存])。「F FPF」assembly (各 O_p FPF⟹F FPF) +
+      odd⟹solvable (FT 依存) が残。Lemma が最大の gate。
 - [ ] file が sorry-free 化したら keystone+bridge を AxiomsCheck の **新 Appendices section** に登録
       (LAUNCH rule #4; 現状 file に 2 sorry 残ゆえ未登録; 完成済 3 本は #print axioms で clean 確認済)。
 

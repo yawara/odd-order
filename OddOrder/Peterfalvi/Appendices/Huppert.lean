@@ -193,6 +193,36 @@ theorem card_pointStabilizer_comp_eq_of_normal_of_transitive
   · apply Subtype.ext; apply Subtype.ext; show d⁻¹ * (d * (s.1 : D) * d⁻¹) * d = (s.1 : D); group
   · apply Subtype.ext; apply Subtype.ext; show d * (d⁻¹ * (t.1 : D) * d) * d⁻¹ = (t.1 : D); group
 
+/-- **Peterfalvi Appendix B, Proposition 1 — the abelian-quotient step**: for a
+finite solvable group `D` whose Fitting subgroup `F(D)` is cyclic, `D/F(D)` is
+abelian, i.e. `commutator D ≤ F(D)`.
+
+Proof (Peterfalvi p. 136, last paragraph): `D` acts on `F = F(D)` by conjugation
+(`MulAut.conjNormal : D →* MulAut F`) with kernel `C_D(F)`; `MulAut F` is abelian
+because `F` is cyclic, so `commutator D ≤ ker = C_D(F) ≤ F`, the last inclusion
+being self-centralization of the Fitting subgroup in a solvable group
+(`centralizer_fitting_le_fitting`). -/
+theorem commutator_le_fitting_of_isCyclic_fitting
+    [Finite D] [IsSolvable D] (hcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting D)) :
+    commutator D ≤ OddOrder.Isaacs.Ch01.fitting D := by
+  set F : Subgroup D := OddOrder.Isaacs.Ch01.fitting D with hF
+  haveI : F.Normal := OddOrder.Isaacs.Ch01.fitting.normal D
+  haveI : IsCyclic ↥F := hcyc
+  letI : CommGroup (MulAut ↥F) :=
+    (IsCyclic.mulAutMulEquiv (G := ↥F)).toMonoidHom.commGroupOfInjective
+      (IsCyclic.mulAutMulEquiv (G := ↥F)).injective
+  refine (Abelianization.commutator_subset_ker (MulAut.conjNormal (H := F))).trans ?_
+  refine le_trans ?_ (hF ▸ OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting (G := D))
+  intro g hg
+  rw [MonoidHom.mem_ker] at hg
+  rw [Subgroup.mem_centralizer_iff]
+  intro x hxF
+  have hap := MulAut.conjNormal_apply (H := F) g ⟨x, hxF⟩
+  rw [hg] at hap
+  simp only [MulAut.one_apply] at hap
+  -- `hap : (x : D) = g * x * g⁻¹`
+  exact (mul_inv_eq_iff_eq_mul.mp hap.symm).symm
+
 /-- **Peterfalvi Appendix B, Proposition 1**: let `D` have odd order and act
 faithfully on the elementary abelian `q`-group `E`, transitively on `E^#`.  Then
 the Fitting subgroup `F(D)` is cyclic, acts without fixed points on `E`, and
