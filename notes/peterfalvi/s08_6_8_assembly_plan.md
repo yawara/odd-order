@@ -1069,3 +1069,22 @@ inner は ↥W₂ 上 ⟹ `[Fintype ↥W2]` を**binder** に要 (statement elab
    ⟹ ⟨α^τ,ψ⟩ = a − |H:W₂|⟨η₁,Resψ⟩ ≡ 0 mod |H:W₂|。**conjugate 注意: ⟨φ,Resψ⟩ vs ⟨Resψ,φ⟩ (a 実整数で一致)。**
 3. 🔴 **norm endgame**: ‖α^τ‖²=‖α‖²<2|H:W₂|² ⟹ (x−1)²+(m−1)x²≤1 ⟹ x∈{0,1}, m=2 if x=1。
 → (6.8.2.2) 完成 → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁸。**
+
+## 2026-06-13 (session 39 cont.⁹, /loop): c2 H-Sylow (coprimality-only) landed — (6.7) への前提
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.sylow_map_subtype_of_coprime`:
+H p-群 + `Nat.Coprime (card H) (card W1)` ⟹ ∃ Q∈Syl_p(G), Q=H.map L.subtype。
+**🔑 発見: `sylow_map_subtype_of_frobenius` は hF を coprimality 取得 (`coprime_card_kernel_complement`) に
+1 箇所しか使わない** ⟹ coprimality を直接取れば Frobenius でも c2 でも動く一般版。c2 case の `cases` 側
+条件 hcop がそれを供給。(dedupe 候補: S08_CoherenceCore の Frobenius 版はこれへ delegate 可。)
+
+### これで c2 (6.7) が組める: 残 (6.8.2.2) endgame
+1. ✅ α-support, reciprocity, reg-char relation, **c2 H-Sylow (本 session)**。
+2. 🔴 **c2 (6.7)**: `peterfalvi_67_centralCommutator` の c2 版 — `peterfalvi_67_of_odd` (SylowTICongruence:140) を
+   Q:=Ĥ (sylow_map_subtype_of_coprime), W₂⊆H# (coe_mem_sharpImage_of_mem_commutator) で適用。
+   ψ=η^{τ₁} は virtual char ⟹ irreducible constituents に (6.7) 適用 + 合成 (or ZIrr 版)。
+   結果: ψ(z)≡ψ(1) [ALGMOD |H|] for z∈W₂#。
+3. 🔴 **統合**: reg-char relation ψ(1)−ψ(z)=|W₂|·a (a=⟨Res ψ,φ⟩∈ℤ) + (6.7) |W₂|a≡0 mod |H| ⟹ a≡0 mod |H:W₂|
+   (ALGMOD→ℤ 整除 bridge 要)。⟹ ⟨α^τ,ψ⟩≡0 mod |H:W₂|。
+4. 🔴 **norm endgame**。
+→ (6.8.2.2) → (6.8.2.3) → τ₂。**正本=本 session 39 cont.⁹。**
