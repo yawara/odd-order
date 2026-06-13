@@ -413,4 +413,20 @@ theorem SibleyDadeHypothesis.coherentYset_extension_eq_zsmul_irreducible
   exact exists_zsmul_irreducibleCharacter_of_inner_self_one
     (hyp.coherentYset.extension_mem_ZIrr η hηspan) hextnorm
 
+/-- **Centralizer of a central element is everything (in `G`, intersected with `L`).**  If
+`w ∈ Z(↥L)`, then `L ⊓ C_G((w : G)) = L`: every element of `L` commutes with `(w : G)`.  In the
+(6.8)(c2) case-(B), `W₂ ⊆ Z(↥L)` (the math-(B) condition `W₂ ⊆ Z(H)` plus `W = W₁ ⊔ W₂` cyclic, so
+`W₂` also commutes with `W₁`), so this gives the centralizer-card constancy on `W₂^#`
+(`|N_G(Ĥ) ⊓ C_G(w)| = |L|` for all `w ∈ W₂^#`) — the second half of `peterfalvi_67_of_odd`'s
+`hconst`, the analogue of the Frobenius `inf_centralizer_centralCommutator_map`. -/
+theorem SibleyDadeHypothesis.inf_centralizer_eq_of_mem_center
+    (hyp : SibleyDadeHypothesis G L H) {w : ↥L} (hwc : w ∈ Subgroup.center ↥L) :
+    (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = L := by
+  rw [inf_eq_left]
+  intro g hg
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  rw [Subgroup.mem_center_iff] at hwc
+  have h := congrArg L.subtype (hwc ⟨g, hg⟩)
+  simpa using h
+
 end OddOrder.Peterfalvi.S08

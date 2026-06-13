@@ -1110,3 +1110,20 @@ H p-群 + `Nat.Coprime (card H) (card W1)` ⟹ ∃ Q∈Syl_p(G), Q=H.map L.subty
    Frobenius は `inf_centralizer_centralCommutator_map` で供給; c2 W₂ 版は新規。
 3. 🔴 ALGMOD→ℤ 整除 + 統合 (a≡0 mod |H:W₂|) + norm endgame。
 **▶ 次 = centralizer-card 定数性 on W₂# (c2) or その精査。正本=本 session 39 cont.¹⁰。**
+
+## 2026-06-14 (session 39 cont.¹¹, /loop): centralizer-card 定数性 core landed (W₂ 中心性経由)
+
+**✅ landed (build-green + axiom-clean)**: `SibleyDadeHypothesis.inf_centralizer_eq_of_mem_center`:
+w∈Z(↥L) ⟹ `(L:Subgroup G) ⊓ C_G((w:G)) = L`。**case B で W₂⊆Z(↥L)** (math-B 条件 W₂⊆Z(H) + W=W₁⊔W₂ cyclic
+⟹ W₂ も W₁ と可換 ⟹ W₂ 中心) ゆえ、W₂# 上 centralizer-card = |L| 定数 = `peterfalvi_67_of_odd` hconst
+第2項。Frobenius `inf_centralizer_centralCommutator_map` (=H) の case-B 類似 (=L、より単純)。
+
+### (6.8.2.2) 残: c2 (6.7) 組立 + 統合 + norm
+1. ✅ α-support, reciprocity, reg-char relation, c2 H-Sylow, η^{τ₁}=±irr, **centralizer-card core (本 session)**。
+2. 🔴 **W₂⊆Z(↥L) 導出** (case B): math-B 条件 W₂⊆Z(H) [dichotomy `eq_bot_or_eq_of_le_of_card_prime` on Z(H)∩W₂、
+   W₂ prime] + W₁,W₂ 可換 (W cyclic) ⟹ W₂⊆Z(↥L)。**要: case-B 分岐の W₂⊆Z(H) を hypothesis 化 or 導出。**
+3. 🔴 **c2 (6.7) 組立**: `peterfalvi_67_of_odd` (P:=Ĥ via sylow_map_subtype_of_coprime, Z:=W₂,
+   ξ const on W₂#, hconst = [ξ const (要、ξ は η^{τ₁}=±ξ の W₂#-定数性継承) ∧ centralizer-card (本 session)])
+   → ξ(z)≡ξ(1) [ALGMOD |H|] → η^{τ₁}(z)≡η^{τ₁}(1) (ε 倍)。
+4. 🔴 ALGMOD→ℤ 整除 (a≡0 mod |H:W₂|) + 統合 + norm endgame。
+**▶ 次 = W₂⊆Z(↥L) 導出 (case-B) or c2 (6.7) 組立 (hconst の ξ-const 部分精査)。正本=本 session 39 cont.¹¹。**
