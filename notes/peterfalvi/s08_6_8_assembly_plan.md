@@ -1633,3 +1633,26 @@ cont.¹⁶ で残した crux「(4.9) は enlarged `h46.dade0` (A₀=A∪Vᴸ) �
 4. **CoherenceTarget 変換** → capstone `sibleySetup_is_coherent` の X-nonempty/CertainType 分岐。
 **honest 状況: 基礎機構は完成、残りは full case-B hypothesis context での multi-level wiring assembly (大)。
 unblocked だが per-iteration は wiring piece 単位で、capstone 完遂は distant。正本=本 cont.¹⁷。**
+
+## 2026-06-14 (session 40 cont.¹⁸, /loop): ✅ 機構完成 (5 bricks) + 🛑 X-coherence route は要集中設計 (irreducible-X engine 非一般化)
+
+### ✅ landed (iter 5,6,8): case-B coherence の reusable 機構 全完成 (全 axiom-clean):
+- `IsCoherent.congrMap` (30c74961): coherence を supported 上一致 map へ transport。
+- `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` (10c99216): reducible-aware X⊥Y。
+- `dadeIntegralCharacterMap_restrict_eq_of_support` (6cfa8c32): restrict-invariance = map-agreement 核。
+- (+ foundations: exists_decomposition_caseB / certain_index_bounds(FPF) / W2_le_center / brick1 / (4.9) / §7 engine)。
+
+### 🛑 残 X-coherence route の architectural 障害 (本 iter 判明):
+- 既存 irreducible-X engine `Xset_isCoherent_from_adjoinSteps_of_irreducible_X` (S08_CoherenceCorePart2:4232) は
+  **irreducibility に深く依存** (`χs:ℕ→IrreducibleCharacter`, `exists_conjugatePairCover`, conjugate-pair cover,
+  xBaseBlock)。case-B X=S−S(W₂) は reducible μ_j を含む (cont.¹⁴) ので **この engine は再利用不可**。
+- ∴ case-B X-coherence は新規設計が必要: (a) X_irr (既約部) を engine で + {μ_j} を (4.9) で別々に build し §7
+  `coherentUnion_of_glued_withDiagonal` で glue (但し X_irr は clean な `Xset Z` でない問題), or (b) 教科書 uniform
+  R(χ)/(5.4) route (全 χ∈X を R(χ) 経由; reducible μ_j は (4.9)=R(μ_j); §7 (5.4) machinery 接続要)。
+- さらに残: X∪Y glue (withDiagonal, hDτ=(6.8.2.3)) + CoherenceTarget 変換 + dade0/dade wiring fact
+  (Hypothesis46 は dade0↔dade 関係を abstract に持たない=top-level 構築事実、restrict-invariance で map-agreement 化)。
+
+### 🔑 honest 総括: case-B coherence の clean reusable 機構は完成 (5 bricks)。残りは **full case-B context での
+集中 architectural 設計+build** (X-coherence route 決定 + multi-level glue + CoherenceTarget)。60s loop brick 単位
+でなく、full context を保持した dedicated session が適切。**正本=本 cont.¹⁸。次手 = X-coherence route 決定 (uniform R
+vs glue) → 構築。**
