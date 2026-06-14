@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_CaseBCoherence
+import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 
 /-!
 # Peterfalvi §8: Case (B) coherence — the `τ₂` assembly
@@ -519,5 +520,75 @@ noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
   OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
     cX hyp.coherentYset ν hagreeX hagreeY
     (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed D hDτ hgen
+
+/-- **(6.8.2) case-(B) `{μ_j}`-coherence transported to `hyp.tau`.**  The reducible column characters
+`μ_j` (`= certainTypeSet h46 k`, the certain-type set of Peterfalvi (4.9)) are coherent via
+`certainType_isCoherent`, but with respect to the *enlarged* Dade map
+`dadeIntegralCharacterMap h46.dade0 h46.tau` on `A₀ = A ∪ V^L`.  Since the `μ_j`-differences are
+`A`-supported (`A = H^#`), `IsCoherent.congrMap` re-targets that coherence to the Sibley–Dade
+`hyp.tau`, given the map-agreement `hmapagree` on the supported lattice (established at capstone wiring
+from `dadeIntegralCharacterMap_restrict_eq_of_support` + the construction fact `dade0.restrict A`
+agrees with the base Dade datum `hyp.dade`, since `h46.dade = hyp.dade`).
+
+This is the reducible side of the case-(B) `X`-coherence `cX`; glued with the `X_irr`-coherence
+(`xChainCoherent` on the irreducible part) it yields `IsCoherent hyp.tau (Xset W₂)`. -/
+noncomputable def SibleyDadeHypothesis.certainTypeSet_isCoherent_tau
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
+    (hmapagree : ∀ φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  (OddOrder.Peterfalvi.S06.certainType_isCoherent h46 (k := k) hk).congrMap hmapagree
+
+/-- **(6.8.2) case-(B), `μ_j ∈ S`** (cont.²¹ item 2a): the certain-type column character
+`μ_j = columnSum h46 χ₂` (for a nontrivial column `χ₂ ≠ 1`) lies in the Sibley set
+`S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1}`.
+
+With `h46.K = H` (case (c2)): `μ_j = Ind_K^L χ_j` ((4.5.a) `induce_restrict_certainType_eq`,
+`χ_j = Res_K μ_{0j}`), and transporting the source along `h46.K = H` (`induce_congr_of_subgroup_eq`)
+gives `μ_j = Ind_H^L (Res_H μ_{0j})` with `Res_H μ_{0j}` a *nontrivial irreducible* of `H`
+(`certainTypeRestrict_isIrreducible` and `chiRestrict_ne_trivialIrreducibleCharacter`, both
+transported by `rw [hHK]`). -/
+theorem SibleyDadeHypothesis.columnSum_mem_S
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ hyp.S := by
+  -- the source `θ = Res_H μ_{0j} : Irr ↥H`, with irreducibility transported from `↥h46.K`
+  have hirr : IsIrreducibleCharacter
+      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
+    have h := h46.certainTypeRestrict_isIrreducible χ₂
+    rwa [hHK] at h
+  rw [hyp.S_eq]
+  refine ⟨⟨ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ), hirr⟩,
+    ?_, ?_⟩
+  · -- `θ ≠ 1_H`: transport `chiRestrict_ne_trivial` back along `h46.K = H`
+    intro hθtriv
+    refine OddOrder.Peterfalvi.S06.chiRestrict_ne_trivialIrreducibleCharacter h46 hχ₂
+      (Subtype.ext ?_)
+    show ClassFunction.restrict h46.K ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)
+        = trivialClassFunction ↥h46.K
+    have h1 : ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)
+        = trivialClassFunction ↥H := Subtype.ext_iff.mp hθtriv
+    refine ClassFunction.ext (fun g => ?_)
+    have hg : (g : ↥L) ∈ H := hHK.le g.2
+    have hval := congrArg (fun f : ClassFunction ↥H ℂ => f ⟨(g : ↥L), hg⟩) h1
+    simpa using hval
+  · -- `μ_j = Ind_H^L θ`: `(4.5.a)` then transport the induction source along `h46.K = H`
+    rw [OddOrder.Peterfalvi.S06.columnSum_def,
+      ← h46.induce_restrict_certainType_eq χ₂]
+    exact OddOrder.Peterfalvi.S04.Hypothesis.induce_congr_of_subgroup_eq hHK
+      (fun x hx₁ hx₂ => by simp [ClassFunction.restrict_apply])
 
 end OddOrder.Peterfalvi.S08

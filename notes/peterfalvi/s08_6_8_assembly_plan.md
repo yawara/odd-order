@@ -1681,3 +1681,69 @@ vs glue) → 構築。**
 ### 🔑 honest 総括: scaffolding 完成 (6 bricks + X∪Y shell)。cX は **feasible な hard core** で、X_irr の
 (6.6) machinery 適応 + {μ_j} の (4.9)接続 + 分解 + glue の集中 assembly。次手 = cX の piece を順次 build
 ({μ_j}-coh or X_irr-coh の adapt から)。**正本=本 cont.¹⁹。cX feasibility 確定が本 iter の主成果。**
+
+## 2026-06-14 (session 40 cont.²⁰, /loop): cX reducible 側 ({μ_j}-coh) landed; 残 cX content = 深い §6 math (precise hooks)
+
+### ✅ landed (iter 11): **`certainTypeSet_isCoherent_tau`** (94fa65e7) = cX の reducible 側。
+(4.9) `certainType_isCoherent` + `congrMap` で {μ_j}-coh を hyp.tau へ (map-agreement は wiring 供給)。
+S06_CertainTypeCoherence を S08 へ import (cX に必須)。
+
+### 🔴 残 cX content = 3 つの深い §6-internal piece (各々 substantial, precise hooks):
+1. **X_irr-coh** (cX irreducible 側): `xChainCoherent` (generic engine, S08_CoherenceCorePart1:2701) を
+   X_irr := {χ∈Xset W₂ | irreducible} に適用。要 = conjugate-pair cover (`exists_conjugatePairCover`,
+   X_irr は conj-closed+no-real-char で適用可) + base S₀ coherence ((1.1)(1.4)) + **per-step XAdjoinStepInput
+   ((5.6) degree-div data; Xset 専用機構を X_irr へ adapt が hard core)**。
+2. **{μ_j} = certainTypeSet ⊆ Xset W₂** (set 構造): `columnSum h46 χ₂ = induce h46.K (chiRestrict χ₂)`
+   (S06_CertainTypeCoherence:253-255 hbridge) + `chiRestrict χ₂ : IrreducibleCharacter ↥h46.K`
+   (S06_CertainTypeClifford:772) ⟹ columnSum∈S (要 **↥h46.K↔↥H bridge coercion** via h46.K=H) +
+   **¬W₂⊆Ker columnSum** (kernel fact, 要発掘) → `mem_Xset` (Part2:803)。
+3. **(6.8.2.3) ν / mixed-inner** (glue の ν): per-χ τ-decomposition `(χ−aη₁)^τ = X₁−aY` ([Is]2.27 +
+   exists_decomposition_caseB を χ_i で集約)。glue の hmixed/hDτ/ν を供給。
+
+### 🔑 honest 総括: reusable foundation (7 bricks: FPF/brick1/congrMap/pairwise-orth/restrict-invariance/
+X∪Y shell/{μ_j}-coh) 完成。残り cX content (上記 1-3) は **深い (6.8.2) case-B math** で §6 internals に密結合;
+shell の積み増しは scaffold-tower ゆえ避け、genuine content を順次 build (要集中, loop brick より大)。
+次手 = (1) X_irr-coh の cover/base か (2) {μ_j}⊆X membership の bridge から着手。**正本=本 cont.²⁰。**
+
+## 2026-06-14 (session 40 cont.²¹, /loop): item-2 membership 精密分解 — 真の infra-blocker = K↔H cross-group transport; (2b) Clifford-uniq 論法確定
+
+cont.²⁰ item 2 ({μ_j}⊆Xset W₂ membership) を精査。S-membership 核入力を 1 本 landing + 残りの
+構造を完全に確定 (次セッションが transport infra を 1 本建てれば組立可)。
+
+### ✅ landed (iter 12): `chiRestrict_ne_trivialIrreducibleCharacter` (a372410b, S06_CertainTypeSupport, axiom-clean)
+χ_j = Res_K μ_{0j} は χ₂≠1 で**非自明既約** (trivial なら ker=univ⊇H.subgroupOf K が
+`not_subset_characterKernel_chiRestrict` に矛盾)。6 行。`not_subset_…` の直後に配置。
+
+### 🔬 item 2 (`certainTypeSet h46 k ⊆ hyp.Xset h46.W2`) の精密分解:
+`mem_Xset` (Part2:803): φ∈Xset W₂ ↔ φ∈S ∧ φ∉S(W₂)。各 μ_j=`columnSum h46 χ₂`:
+- **(2a) columnSum ∈ hyp.S** (`S_eq`: ∃θ:Irr ↥H, θ≠triv ∧ columnSum=induce H θ):
+  - hbridge (`S06_CertainTypeCoherence`:253): columnSum = induce h46.K (chiRestrict χ₂),
+    `chiRestrict χ₂ : Irr ↥h46.K`。h46.K=H (cases c2)。
+  - θ := chiRestrict χ₂ を **h46.K=H で ↥H へ transport** して供給。θ≠triv = 本 commit を transport。
+- **(2b) columnSum ∉ hyp.SsubFiltration W₂**
+  (¬∃θ:Irr ↥H, θ≠triv ∧ W₂.subgroupOf H⊆ker θ ∧ columnSum=induce H θ):
+  - **Clifford-uniqueness 論法 (確定)**: columnSum=induce H θ ⟹ θ=chiRestrict。
+    Res_H columnSum = ∑_i Res_H μ_{ij} = w₁•chiRestrict
+    (`restrict_certainType_eq` χ₂ i: Res_K μ_{ij}=Res_K μ_{0j}=chiRestrict + columnSum=∑μ_{ij});
+    Frobenius (`inner_induce_eq_inner_restrict`) ⟨θ,Res_H columnSum⟩=⟨induce θ,columnSum⟩
+    =⟨columnSum,columnSum⟩≠0 (columnSum(1)=∑deg>0 ⟹ columnSum≠0 ⟹ ‖·‖²≠0);
+    ⟨θ,w₁•chiRestrict⟩=w₁⟨θ,chiRestrict⟩≠0 ⟹ θ=chiRestrict (両既約)。
+    すると W₂.subgroupOf H⊆ker chiRestrict が `not_subset_characterKernel_chiRestrict` に矛盾。
+
+### 🔴 真の infra-blocker = **↥h46.K ≃ ↥H (`Subgroup.equivOfEq`) に沿った IrreducibleCharacter / induce / 既約性の cross-group transport が未整備**:
+- 既存 transport は**同群内のみ** (`ClassFunction.conjByMulEquiv` = G→G 自己同型)。cross-group
+  ↥K→↥H の ClassFunction precompose-along-MulEquiv + induce-invariance + irreducibility-invariance
+  が repo/mathlib に無い (grep 確認済)。`induce_congr_of_subgroup_eq` (S04:1367) は induce **等式**
+  は与えるが、∃θ:Irr ↥H の **θ 自体**を作れない。
+- ⟹ 次セッションは **まず transport infra を 1 本建てる**:
+  例 `IrreducibleCharacter.mapOfSubgroupEq (hKH:K=H) : IrreducibleCharacter ↥K ≃ IrreducibleCharacter ↥H`
+  + `induce_mapOfSubgroupEq : induce H (mapOfSubgroupEq hKH θ) = induce K θ`
+  + `mapOfSubgroupEq_ne_trivial`。これで (2a)θ構築 + (2b)θ=chiRestrict同定 + chiRestrict_ne_trivial
+  transport が全部通る。
+- **代替案 (要実験)**: θ:=`restrict H μ_{0j}` を直接構築し `rw [hHK]` で既約性 (`certainTypeRestrict_isIrreducible`)
+  / 非自明性を ↥h46.K→↥H 移送。motive = `fun (S:Subgroup ↥L) => IsIrreducibleCharacter (restrict S μ_{0j})`
+  は S が subgroup 引数のみで clean ゆえ dependent rewrite が通る可能性あり (試して可なら infra 不要で最速)。
+
+### 次手 = transport infra (or 代替の rw 実験) → (2a)+(2b) 組立 (`certainTypeSet_subset_Xset` を
+S08_CaseBCoherence2 に) → cX 残 (item 1 X_irr-coh の cover/base + item 3 (6.8.2.3) mixed-inner)。
+**正本=本 cont.²¹。item 2 は構造完全確定、残るは transport infra 1 本の実装。**
