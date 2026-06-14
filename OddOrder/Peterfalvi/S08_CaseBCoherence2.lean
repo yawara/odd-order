@@ -743,6 +743,84 @@ theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card
   rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
     ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
 
+/-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
+bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
+case-(B) instantiation need only discharge the named structural hypotheses.
+
+For per-constituent (5.4) decompositions `Dᵢ : CharacterPsiDecomposition τ χᵢ (aᵢ·η)` (the `χᵢ` the
+constituents of `Ind^L_{W₂}φ`, `η` the norm-`1` `Y`-anchor at source), given:
+* the (6.8.2.2) aggregate `Xagg − n·Y = ∑ᵢ aᵢ·(Dᵢ.X − Dᵢ.Y)` (`tau_sum_smul_image` +
+  `sum_smul_constituent_diff_eq` + `exists_decomposition_caseB`), `∑ aᵢ² = n` (`= |H:Z|`,
+  `sum_inner_restrict_sq_eq_index`), and `‖Y‖² = 1`;
+* the orthogonalities `⟨Dᵢ.X, Y⟩ = 0` (`inner_decomposition_X_extension_member_eq_zero`),
+  `⟨Xagg, Y⟩ = 0`, and the integrality `⟨Dᵢ.Y, Y⟩ = bᵢ ∈ ℤ`;
+the pinning `∑ aᵢbᵢ = n = ∑ aᵢ²` (`sum_coeff_eq_of_aggregate`) with the per-step bound `bᵢ ≤ aᵢ`
+(`inner_Y_coeff_le_of_psi_nsmul`) forces `bᵢ = aᵢ` (`eq_of_sum_mul_eq_sum_sq`), whence
+`aᵢ² = bᵢ² ≤ ‖Dᵢ.Y‖² ≤ ‖aᵢ·η‖² = aᵢ²` gives `‖Dᵢ.Y‖² = aᵢ²` and the Cauchy–Schwarz equality
+`eq_smul_of_inner_self_eq` yields `Dᵢ.Y = aᵢ·Y`. -/
+theorem per_constituent_Y_eq_smul {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {ι : Type*} (s : Finset ι) {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ : ι → ClassFunction ↥L ℂ} {η : ClassFunction ↥L ℂ} {a : ι → ℕ}
+    (D : (i : ι) → OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ (χ i) (a i • η))
+    {Y Xagg : ClassFunction G ℂ} {b : ι → ℤ} {n : ℤ}
+    (hηnorm : ClassFunction.inner η η = 1)
+    (hYY : ClassFunction.inner Y Y = 1)
+    (hXaggorth : ClassFunction.inner Xagg Y = 0)
+    (hagg : Xagg - (n : ℂ) • Y = ∑ i ∈ s, ((a i : ℤ) : ℂ) • ((D i).X - (D i).Y))
+    (hsq : ∑ i ∈ s, ((a i : ℤ)) ^ 2 = n)
+    (hXorth : ∀ i ∈ s, ClassFunction.inner (D i).X Y = 0)
+    (hbi : ∀ i ∈ s, ClassFunction.inner (D i).Y Y = (b i : ℂ))
+    (i : ι) (hi : i ∈ s) (hpos : 0 < a i) :
+    (D i).Y = (a i : ℂ) • Y := by
+  -- Pinning: `∑ aᵢbᵢ = n = ∑ aᵢ²`, with `bᵢ ≤ aᵢ` and `aᵢ ≥ 0`, forces `bᵢ = aᵢ`.
+  have hsumab : ∑ j ∈ s, (a j : ℤ) * b j = n :=
+    sum_coeff_eq_of_aggregate s (fun j => (a j : ℤ)) b (fun j => (D j).X) (fun j => (D j).Y)
+      Xagg Y n hagg hXorth hbi hXaggorth hYY
+  have hbound : ∀ j ∈ s, b j ≤ (a j : ℤ) := fun j hj =>
+    inner_Y_coeff_le_of_psi_nsmul (D j) hηnorm hYY (hbi j hj)
+  have hsumeq : ∑ j ∈ s, (a j : ℤ) * b j = ∑ j ∈ s, (a j : ℤ) * (a j : ℤ) := by
+    rw [hsumab, ← hsq]; exact Finset.sum_congr rfl fun j _ => pow_two (a j : ℤ)
+  have hbeq : b i = (a i : ℤ) :=
+    eq_of_sum_mul_eq_sum_sq s (fun j => (a j : ℤ)) b (fun j _ => Int.natCast_nonneg (a j))
+      hbound hsumeq i hi (show (0 : ℤ) < ((a i : ℕ) : ℤ) by exact_mod_cast hpos)
+  -- `‖Dᵢ.Y‖² = aᵢ²`:  `aᵢ² = bᵢ² ≤ ‖Dᵢ.Y‖² ≤ ‖aᵢ·η‖² = aᵢ²`.
+  have hCS := inner_Y_coeff_sq_le (D i) hYY (hbi i hi)
+  have h562 := (D i).inner_self_Y_re_le_inner_self_psi
+  have hψnorm : (ClassFunction.inner (a i • η : ClassFunction ↥L ℂ) (a i • η)).re
+      = (a i : ℝ) ^ 2 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ (a i) η, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hηnorm, mul_one, star_natCast,
+      Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hψnorm] at h562
+  have hYinorm_re : (ClassFunction.inner (D i).Y (D i).Y).re = (a i : ℝ) ^ 2 := by
+    have hba : (b i : ℝ) = (a i : ℝ) := by exact_mod_cast hbeq
+    rw [hba] at hCS; linarith
+  -- Realness `⟨Dᵢ.Y, Dᵢ.Y⟩ = ((⟨Dᵢ.Y,Dᵢ.Y⟩).re : ℂ)` upgrades the `.re` to a `ℂ`-equation.
+  have hreal : ClassFunction.inner (D i).Y (D i).Y
+      = ((ClassFunction.inner (D i).Y (D i).Y).re : ℂ) := by
+    rw [inner_self_eq_realCast, Complex.ofReal_re]
+  -- Cauchy–Schwarz equality `Dᵢ.Y = aᵢ·Y` (via the `ℤ`-cast scalar, then `Int.cast_natCast`).
+  have key := eq_smul_of_inner_self_eq (v := (D i).Y) (w := Y) (a := (a i : ℤ))
+    (by rw [hbi i hi]; exact_mod_cast hbeq)
+    (by rw [hreal, hYinorm_re]; push_cast; ring) hYY
+  rwa [Int.cast_natCast] at key
+
+/-- **Seam-1 orthogonality `⟨Dᵢ.X, Y⟩ = 0`** (Peterfalvi (6.8.2.3): "`R(χᵢ)` is orthogonal to
+`Y^{τ₁}` by (5.3) and (5.5)").  Since `Dᵢ.X ∈ ℤ[R(χᵢ)]`, orthogonality of `Y` to the image family
+`R(χᵢ)` (the `(5.3)/(5.5)` disjointness, supplied at the case-(B) instantiation — e.g. `Y = ε·ξ` for
+an irreducible `ξ ∉ R(χᵢ)` via `coherentYset_extension_eq_zsmul_irreducible`) propagates to `Dᵢ.X`
+(`inner_X_eq_zero_of_orthogonal_imageSet`), and conjugate symmetry flips the slot.
+
+This is the `hXorth` input of `per_constituent_Y_eq_smul`. -/
+theorem inner_X_Y_eq_zero_of_orthogonal {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) {Y : ClassFunction G ℂ}
+    (hY : ∀ α ∈ D.imageFamily.imageSet, ClassFunction.inner Y α = 0) :
+    ClassFunction.inner D.X Y = 0 := by
+  rw [OddOrder.RepresentationTheory.inner_conj_symm Y D.X,
+    D.inner_X_eq_zero_of_orthogonal_imageSet hY, star_zero]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field

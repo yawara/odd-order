@@ -2315,6 +2315,15 @@ Y.inner D.Y = star (D.Y.inner Y)`)。`inner_smul_right` は `RepresentationTheor
 | `f350e063` | `sum_coeff_eq_of_aggregate` | pinning 入力 **∑aᵢbᵢ=n**: 集約恒等式 `Xagg−n•Y=∑aᵢ•(Xᵢ−Yᵢ)` に ⟨·,Y⟩ (全 X⊥Y, bᵢ=⟨Yᵢ,Y⟩) ⟹ −n=−∑aᵢbᵢ。`inner_sum_left`+`Finset.sum_neg_distrib`+`neg_injective`+exact_mod_cast |
 | `671b4555` | `eq_smul_of_inner_self_eq` | **Yᵢ=aᵢ•Y bridge** (CS-equality⟹parallel): ⟨v,w⟩=a ∧ ‖v‖²=a² ∧ ‖w‖²=1 ⟹ v=a•w (‖v−aw‖²=0 を simp[inner lemmas]+ring → `eq_zero_of_inner_self_re_eq_zero`) |
 | `bc436213` | `tau_sum_smul_image` | 集約 τ-image **τ(∑aᵢαᵢ)=∑aᵢ(Xᵢ−Yᵢ)** (純 ℤ-線形, `IntegralCharacterMap=→ₗ[ℤ]`): map_sum+map_zsmul, ℂ-smul を Int.cast_smul_eq_zsmul で ℤ-action 化 |
+| `ef18ae2a` | **`per_constituent_Y_eq_smul`** | 🎯 **capstone**: 上記 4 brick + (5.4.b) + CS realness を一本化。per-constituent `Dᵢ:CharacterPsiDecomposition τ χᵢ (aᵢ•η)` + hagg + ∑aᵢ²=n + ⟨Dᵢ.X,Y⟩=0/⟨Xagg,Y⟩=0/⟨Dᵢ.Y,Y⟩=bᵢ∈ℤ ⟹ pinning bᵢ=aᵢ ⟹ ‖Dᵢ.Y‖²=aᵢ² ⟹ **Dᵢ.Y=aᵢ•Y**。concrete 側は named 仮説を discharge するだけ (代数再導出不要) |
+| `7ed268cb` | `inner_X_Y_eq_zero_of_orthogonal` | seam-1 **⟨Dᵢ.X,Y⟩=0** wrapper: `∀α∈R(χᵢ),⟨Y,α⟩=0` (= (5.3)/(5.5) disjointness, e.g. Y=ε·ξ∧ξ∉R) ⟹ via `inner_X_eq_zero_of_orthogonal_imageSet`+conj-symm。capstone の `hXorth` 入力そのもの |
+
+### ✅ 原文 (6.8.2.3) 精読確定 (本 session, 04.8 mmd:208-222): **私の framing は原文と完全一致**
+- 原文 `αᵢ^τ=Xᵢ−bᵢY+Zᵢ` (Xᵢ∈ℤ[R(χᵢ)], Zᵢ⊥R(χᵢ)∧⊥Y) ⟺ 私の `Dᵢ.X=Xᵢ`, **`Dᵢ.Y=bᵢY−Zᵢ`**。
+  `⟨Dᵢ.Y,Y⟩=bᵢ` (∵ Zᵢ⊥Y, ‖Y‖²=1) = capstone の bᵢ。capstone 結論 `Dᵢ.Y=aᵢ•Y` = 原文「Zᵢ=0 ⟹ αᵢ^τ=Xᵢ−aᵢY」。
+- 構成子 index = `θᵢ∈Irr H` (Ind^H_Z φ=∑aᵢθᵢ, χᵢ=Ind^L_H θᵢ, aᵢ=θᵢ(1)=⟨φ,Res θᵢ⟩); χ=χ₁=Ind^L_H θ。
+- 集約 `Ind^L_Z φ−|H:Z|η₁=∑aᵢαᵢ` ∧ `∑aᵢ²=|H:Z|` = `sum_smul_constituent_diff_eq` 既存 (θ:Irr H 全体, 非構成子 aθ=0)。
+- seam-1「R(χᵢ)⊥Y^τ₁」= **(5.3)+(5.5)** の帰結 (原文明記)。
 
 ### 🎉🎉 マイルストン: (6.8.2.3) **pinning→image の代数 layer 全完備**。連鎖:
 ```
@@ -2337,11 +2346,30 @@ eq_of_sum_mul_eq_sum_sq → bᵢ=aᵢ
   (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)。pinning が i を束ねる。
 - **τ=Da_i.tau1 は certain-type で literally 同一** (htau1_agrees:=rfl) ⟹ `Da_i.tau1_image` がそのまま `τ(αᵢ)=Xᵢ−Yᵢ`。
 
-### ▶ 残 = **concrete S08 instantiation** (代数は完備、残りは case-B データへの wiring):
-1. **構成子 index s + per-i Da family** 構築 (multiplicities aᵢ=⟨φ∘e,Res θᵢ⟩, χᵢ=Ind^L_H θᵢ)。
-2. **η₁ の member 分解 D'** (case-B 版 `memberExtensionDecomposition`; 既存は irreducible-Dade 専用 ⟹
-   Sibley/cY 版が要; R(η₁) は Y-anchor の image family) → seam 1「⟨Da_i.X,Y⟩=0」を抽象 lemma で discharge。
-3. 集約恒等式 hagg 組立 (tau_sum_smul_image+sum_smul_constituent_diff_eq+exists_decomposition_caseB) → pinning。
-4. (5.4.b)+eq_smul_of_inner_self_eq で per-i Yᵢ=aᵢY → per-χ image → `hmixed` → coherentXunionYset_caseB_of_glued。
-**hard 寄り = 2 (member 分解+R-直交) と 4 (hmixed への最終 wiring)。代数 brick は再利用可能な形で landed。**
-**正本=本 cont.⁴⁰。次=concrete instantiation (まず 2 の η₁ member 分解 = seam 1 unblock、または 1 の構成子 index 設定)。**
+### ▶ 残 = **concrete S08 instantiation** (代数 layer は capstone まで完備; 残りは case-B データへの wiring):
+capstone `per_constituent_Y_eq_smul` が要求する named 仮説を case-B で discharge するだけ:
+1. **構成子 index s + per-i Da family** 構築 (multiplicities aᵢ=⟨φ∘e,Res θᵢ⟩, χᵢ=Ind^L_H θᵢ;
+   既約=`decompositionDaFromDadeOfDiff` / reducible μ_j=`certainTypeDecompositionDa`)。
+2. **hagg 集約恒等式** = `tau_sum_smul_image` (per-i `τ(αᵢ)=Da_i.X−Da_i.Y` from `Da_i.tau1_image`,
+   tau1=τ literally) + `sum_smul_constituent_diff_eq` (∑aᵢαᵢ=Indφ−|H:Z|η₁) +
+   `exists_decomposition_caseB` (τ(Indφ−|H:Z|η₁)=Xagg−|H:Z|•Y)。
+3. **seam-1「⟨Da_i.X, Y⟩=0」** — 🔑 **大幅単純化** (本 cont.⁴⁰ RECON):
+   `coherentYset_extension_eq_zsmul_irreducible` (S08_CaseBCoherence:450) ⟹ **Y=cY.extension η₁=ε•ξ**
+   (ξ = **単一既約** ∈ Irr G, ε=±1)。∴ `⟨Da_i.X, Y⟩ = ε̄·⟨Da_i.X, ξ⟩`、Da_i.X∈ℤ[R(χᵢ)] ⟹
+   **ξ∉R(χᵢ) (image family 非所属) なら distinct-irreducible 直交で 0**。要 = ξ∉R(χᵢ) の disjointness
+   (Y 側 image ξ と X 側 R(χᵢ) は別ソース ⟹ 別既約)。member 分解ルート (`inner_decomposition_X_extension_member_eq_zero`)
+   も可だが zsmul-irreducible 経由が直接的。⟨Xagg,Y⟩=0 は exists_decomposition_caseB が直接供給。
+4. **integrality `⟨Da_i.Y, Y⟩=bᵢ∈ℤ`** = Da_i.Y∈ZIrr (Da_i.X∈ℤ[R]⊆ZIrr ∧ τ-image∈ZIrr) ∧ Y=ε•ξ∈ZIrr
+   ⟹ `inner_mem_ZIrr_int`。
+5. capstone ⟹ per-i `Da_i.Y=aᵢ•Y`。→ per-χ image `(μ_j−a•η₁)^τ=X₁−a•Y` (X₁=Da_{j}.X⊥Y) →
+   **hmixed** `⟨(μ_j)^{τ₂}, Y⟩=⟨μ_j,η⟩=0` → `coherentXunionYset_caseB_of_glued`。
+**hard 寄り = 3 の disjointness ξ∉R(χᵢ) (要 Y-image vs X-R-family 別既約の論証) と 5 の hmixed 最終 wiring。**
+
+### ▶▶ 抽象 toolkit 出尽くし (7 lemma: 5 pinning + tau_sum_smul_image + seam-1 wrapper, 全 axiom-clean)。
+残りは**全て case-B concrete instantiation** (S06/S08, capstone の named 仮説を discharge):
+- **次の concrete brick = per-θ Da family** (各 θ:Irr H, aθ>0 で χθ=Ind^L_H θ の `Dθ:CharacterPsiDecomposition τ (χθ) (aθ•η₁)`)。
+  χθ が既約=`decompositionDaFromDadeOfDiff` / reducible(column μ_j)=`certainTypeDecompositionDa`。要 = ZIrr membership +
+  support 条件 + orthogonality inputs の per-θ 供給 (case-B hypothesis 構造の精査が必要)。
+- 並行 = **disjointness R(χθ)⊥Y** ((5.3)+(5.5); Y=ε·ξ ⟹ ξ∉R(χθ); irreducible 版 `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
+  の case-B/certain-type 類似が要るか精査)。
+**正本=本 cont.⁴⁰。代数 layer 完備。次 tick=per-θ Da family の case-B 構造精査 → 構築。組立は capstone で機械的。**
