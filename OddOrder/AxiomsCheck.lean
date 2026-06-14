@@ -3748,6 +3748,13 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- Thm 12.13 / Cor 12.16) is PROVEN, so `E1_actsPrime` bottoms out at the standard axioms only.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.E1_actsPrime
 
+-- BG Lemma 13.6: `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` a Sylow `q` of `M_σ` ⟹
+-- `ℳ(C_G(X)) = ℳ(S) = {M}`. Reduction branch (`q∈β ∨ X⊆M_σ'`) = faithful Cor 12.14 + `M_σ`-Sylow
+-- conjugacy; contradiction branch (`q∉β ∧ X⊄M_σ'`) = conjugate complement `F` (Prop 1.5 + Lemma
+-- 12.19) with `X⊆C(F')`, then `A∈ℰ_p²(F)` (`p∈τ₂`) centralizes `X` (Thm 13.4 + `⁅A,E₁⁆≤F'`)
+-- contradicting `C_{M_σ}(A)=1`. Fully unconditional (§12 PROVEN), axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.maximalContaining_eq_singleton_of_E1
+
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`
 -- (BG Thm 3.6 + BG Lem 10.4(b)), both de-axiomatized; see that file.

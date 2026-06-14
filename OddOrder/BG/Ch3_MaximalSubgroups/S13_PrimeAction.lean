@@ -1092,8 +1092,38 @@ theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd
     -- "Theorem 12.13" is a mis-citation — + Prop 1.5 coprime normalization); (3) `E₁E' ≠ E`
     -- (Lemma 12.17 `C_{M_σ}(E) ⊆ M_σ'`, `X ⊄ M_σ'`); (4) `E₂ ≠ 1` (`E₃ ⊆ E'`); (5) `A ∈ ℰ_p²(E)`
     -- with `A ◁ E` (Cor 12.6a) and `C_{M_σ}(A) = 1` (Thm 12.5d); (6) `A = A₀ × [A,E₁]` centralizes
-    -- `X` (Thm 13.4 per-line + `[A,E₁] ≤ E₁`); (7) `X ≤ M_σ ⊓ C(A) = ⊥`, contra `X ≠ ⊥`.
+    -- `X` (Thm 13.4 per-line via `E'`); (7) `X ≤ M_σ ⊓ C(A) = ⊥`, contra `X ≠ ⊥`.
     exfalso
-    sorry
+    have hqβ : q ∉ S10.beta M := fun hh => hcase (Or.inl hh)
+    have hXMσ' : ¬ X ≤ derivedInG (S10.Msigma M) := fun hh => hcase (Or.inr hh)
+    have hXne : X ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hX
+    have hXq : IsPGroup q ↥X := (mem_elemAbelianOfRank.mp hX).1.isPGroup
+    have hE1ne : E₁ ≠ ⊥ := fun hb => hPne (le_bot_iff.mp (hb ▸ hPE1))
+    -- (1) `X ≤ M_σ ⊓ C_G(E₁)` (prime action: `C_{M_σ}(P) = C_{M_σ}(E₁)`).
+    have hXmC : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) := by
+      have hfix := fixedBy_eq_of_le_of_ne_bot (E1_actsPrime hG h hE1ne) hPE1 hPne
+      rw [fixedBy_def, fixedBy_def] at hfix
+      exact hfix ▸ hXC
+    -- (2) replace `E` by a conjugate complement `F` (`F₁ = E₁`) with `X ≤ C_G(F')`.
+    obtain ⟨F, F₂, F₃, hFsetup, hXF'⟩ :=
+      exists_conjugate_complement_centralizing hG h hqβ hXq hXMσ (hXmC.trans inf_le_right)
+    -- (3)(4) `F₂ ≠ 1`.
+    have hF2ne := E2_ne_bot_of_centralizer hG hFsetup (hXmC.trans inf_le_left)
+      (hXmC.trans inf_le_right) hXF' hXMσ'
+    -- (5) `p ∈ τ₂(M)`, `A ∈ ℰ_p²(F)` with `A ◁ F` and `C_{M_σ}(A) = 1`.
+    obtain ⟨p, hp_prime, hp_dvd⟩ :=
+      Nat.exists_prime_and_dvd (fun hh => hF2ne (Subgroup.card_eq_one.mp hh))
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hpτ2 : p ∈ tau2 M :=
+      hFsetup.isPiGroup_tau2 p (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, Nat.card_pos.ne'⟩)
+    obtain ⟨A, hA, hAF⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hFsetup hpτ2
+    have hAnorm : F ≤ Subgroup.normalizer (A : Set G) :=
+      (elemAb_normal_in_E_of_tau2 hG hFsetup hpτ2 hA hAF).1.1
+    have hCA : S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ :=
+      (Msigma_nilpotent_of_tau2 hG hFsetup.mem_maximal hpτ2 hA (hAF.trans hFsetup.E_le)).2.2.2.1
+    have hAelem : A.IsElementaryAbelian p := (mem_elemAbelianOfRank.mp hA).1
+    -- (6) `A` centralizes `X`; (7) `X ≤ M_σ ⊓ C_G(A) = 1`, contradicting `X ≠ 1`.
+    have hAX := centralizer_A_le_centralizer hG hFsetup hpτ2 hAF hAnorm hAelem hE1ne hXmC hXF'
+    exact hXne (le_bot_iff.mp (hCA ▸ le_inf hXMσ (Subgroup.le_centralizer_iff.mp hAX)))
 
 end OddOrder.BG.Ch3.S13
