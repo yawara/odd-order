@@ -690,6 +690,53 @@ theorem exists_tau1_line_le_E1 [Finite G]
   exact mem_elemAbelianOfRank.mpr
     ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [pow_one]; exact hPcard⟩
 
+/-- **Lemma 13.6 step 6, `A₀ = C_A(E₁)` part**: if `X ≤ M_σ ⊓ C_G(E₁)`, `A ≤ E` is elementary
+abelian `p` (`p ∈ τ₂`) and `E₁ ≠ 1`, then `A ⊓ C_G(E₁) ≤ C_G(X)`. Per nonidentity `a ∈ A ⊓ C(E₁)`:
+`⟨a⟩ ∈ ℰ_p¹(C_E(P))` for a `τ₁`-line `P ≤ E₁`, so Theorem 13.4 gives `C_{M_σ}(P) ≤ C_{M_σ}(⟨a⟩)`;
+prime action (`C_{M_σ}(P) = C_{M_σ}(E₁) ⊇ X`) then forces `X ≤ C(⟨a⟩)`, i.e. `a ∈ C(X)`. -/
+theorem centralizer_A0_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {A X : Subgroup G}
+    (hAE : A ≤ E) (hAelem : A.IsElementaryAbelian p) (hE1ne : E₁ ≠ ⊥)
+    (hXE1 : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G)) :
+    A ⊓ Subgroup.centralizer (E₁ : Set G) ≤ Subgroup.centralizer (X : Set G) := by
+  classical
+  obtain ⟨ℓ, hℓp, hℓτ1, P, hPmem, hPE1⟩ := exists_tau1_line_le_E1 h hE1ne
+  haveI : Fact ℓ.Prime := ⟨hℓp⟩
+  have hPne : P ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hPmem
+  have hCPeq : S10.Msigma M ⊓ Subgroup.centralizer (P : Set G)
+      = S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) := by
+    have := fixedBy_eq_of_le_of_ne_bot (E1_actsPrime hG h hE1ne) hPE1 hPne
+    rwa [fixedBy_def, fixedBy_def] at this
+  have hXP : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) := hCPeq ▸ hXE1
+  intro a ha
+  obtain ⟨haA, haE1⟩ := Subgroup.mem_inf.mp ha
+  by_cases ha1 : a = 1
+  · subst ha1; exact Subgroup.one_mem _
+  · have hap : a ^ p = 1 := by
+      have h1 := hAelem.pow_eq_one (⟨a, haA⟩ : ↥A)
+      have h2 := congrArg (A.subtype) h1
+      simpa using h2
+    have hordp : orderOf a = p := orderOf_eq_prime hap ha1
+    have hRcard : Nat.card ↥(Subgroup.zpowers a) = p := by rw [Nat.card_zpowers, hordp]
+    have hRmem : Subgroup.zpowers a ∈ elemAbelianOfRank G p 1 :=
+      mem_elemAbelianOfRank.mpr ⟨Subgroup.IsElementaryAbelian.of_card_prime hRcard,
+        by rw [pow_one]; exact hRcard⟩
+    have hRCP : Subgroup.zpowers a ≤ Subgroup.centralizer (P : Set G) :=
+      Subgroup.zpowers_le.mpr
+        (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1) haE1)
+    have hRC : Subgroup.zpowers a ≤ E ⊓ Subgroup.centralizer (P : Set G) :=
+      le_inf (Subgroup.zpowers_le.mpr (hAE haA)) hRCP
+    have hpπE : p ∈ (Nat.card ↥E).primeFactors := by
+      have hoE : orderOf (⟨a, hAE haA⟩ : ↥E) = p := by
+        rw [← hordp]; exact (orderOf_injective E.subtype E.subtype_injective _).symm
+      exact Nat.mem_primeFactors.mpr ⟨Fact.out, hoE ▸ orderOf_dvd_natCard _, Nat.card_pos.ne'⟩
+    have hthm := centralizer_le_centralizer_of_tau1 hG h hℓτ1 hpπE hPmem
+      (hPE1.trans h.E₁_le) hRmem hRC
+    have hXR : X ≤ Subgroup.centralizer ((Subgroup.zpowers a : Subgroup G) : Set G) :=
+      ((hXP.trans hthm).trans inf_le_right)
+    exact (Subgroup.le_centralizer_iff.mp hXR) (Subgroup.mem_zpowers a)
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
