@@ -129,7 +129,8 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         IsMulCommutative ↥U) ∧
       (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
-          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) ∧
+          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+            IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M)) ∧
       IsMulCommutative ↥(centralizerGeneratedBySigma M U) ∧
       (U ≠ ⊥ → ∃ U0 : Subgroup G,
         U0 ≤ U ∧ Monoid.exponent U0 = Monoid.exponent U ∧
