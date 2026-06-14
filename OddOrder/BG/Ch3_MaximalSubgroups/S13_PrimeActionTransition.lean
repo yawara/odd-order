@@ -2865,6 +2865,41 @@ theorem le_derivedInG_E_of_inf_centralizer_eq_bot [Finite G] {E P Q : Subgroup G
   rw [hde]
   exact hQPQ.trans (Subgroup.commutator_mono hPE hQE)
 
+/-- **BG Theorem 13.10, GAP C key step** (Lemma 12.19): for `Q ≤ E'` and a prime `q ∉ β(M)`, the
+`q`-part of `C_{M_σ}(Q) = M_σ ⊓ C_G(Q)` is full, i.e. equals the `q`-part of `M_σ`. By Lemma 12.19
+`E'` centralizes a Hall `β(M)'`-subgroup `W ≤ M_σ`; since `Q ≤ E'`, `W ≤ C_G(Q)`, so
+`W ≤ M_σ ⊓ C_G(Q)`. As `q ∉ β`, `W` has full `q`-part (`v_q(W) = v_q(M_σ)`), and squeezing
+`W ≤ M_σ ⊓ C_G(Q) ≤ M_σ` forces equality. -/
+theorem factorization_inf_centralizer_Q_eq_of_not_beta [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Q : Subgroup G} (hQderived : Q ≤ derivedInG E) {q : ℕ} [Fact q.Prime] (hqβ : q ∉ S10.beta M) :
+    (Nat.card ↥(S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G))).factorization q
+      = (Nat.card ↥(S10.Msigma M)).factorization q := by
+  obtain ⟨W, hWMσ, hWhall, hE'CW⟩ := derivedE_centralizes_betaComplement hG h
+  have hWN : W ≤ S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) :=
+    le_inf hWMσ (Subgroup.le_centralizer_iff.mp (hQderived.trans hE'CW))
+  have hidxne : (W.subgroupOf (S10.Msigma M)).index ≠ 0 := by
+    have hc := Subgroup.card_mul_index (W.subgroupOf (S10.Msigma M))
+    intro h0; rw [h0, mul_zero] at hc; exact Nat.card_pos.ne' hc.symm
+  have hidx0 : ((W.subgroupOf (S10.Msigma M)).index).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hd =>
+      hWhall.2 q (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, hidxne⟩) hqβ)
+  have hcardW : Nat.card ↥(W.subgroupOf (S10.Msigma M)) = Nat.card ↥W :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWMσ).toEquiv
+  have hvW : (Nat.card ↥W).factorization q = (Nat.card ↥(S10.Msigma M)).factorization q := by
+    have hmul := Subgroup.card_mul_index (W.subgroupOf (S10.Msigma M))
+    rw [hcardW] at hmul
+    rw [← hmul, Nat.factorization_mul Nat.card_pos.ne' hidxne, Finsupp.add_apply, hidx0, add_zero]
+  have hle1 : (Nat.card ↥W).factorization q ≤
+      (Nat.card ↥(S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G))).factorization q :=
+    (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+      (Subgroup.card_dvd_of_le hWN) q
+  have hle2 : (Nat.card ↥(S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G))).factorization q ≤
+      (Nat.card ↥(S10.Msigma M)).factorization q :=
+    (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+      (Subgroup.card_dvd_of_le inf_le_left) q
+  omega
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
