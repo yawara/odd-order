@@ -1774,6 +1774,90 @@ noncomputable def columnConstituentDecomposition
   rw [← columnSum_eq_induce_H h46 hHK χ₂]
   exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa h46 hχ₂ hdeg hμη₁supp htau1_mema hχψ hχbarψ
 
+/-- **(6.8.2.3) reducible `R(μ_j)` image family, retargeted to `hyp.tau`.**  The certain-type column
+image family `certainTypeR` is built against the *enlarged* certain-type map
+`τ_enl = dadeIntegralCharacterMap h46.dade0 h46.tau` (the only map whose isometry data supports the
+`σ`-image construction).  Its `imageSet`/`mem_ZIrr`/`orthonormal` are pure facts about the σ-image
+*set* (`R(μ_j) ⊆ ℤ[Irr G]`, orthonormal), independent of the Dade map; only the image equation
+`(μ_j − μ̄_j)^τ = ∑ R(μ_j)` mentions `τ`.
+
+This rebuilds the family against the Sibley–Dade map `hyp.tau`, reusing the three map-independent
+fields and transferring the image equation along the `H^#`-agreement `hmapagree`
+(`(μ_j − μ̄_j)^{hyp.tau} = (μ_j − μ̄_j)^{τ_enl}`, valid since `μ_j − μ̄_j` is `H^#`-supported in case c2
+`K = H` and both maps coincide there).  This puts the column `R(μ_j)` and the irreducible Dade
+families `dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj` in the *same* map `hyp.tau`,
+the single `τ` of the per-`φ` family.  `hmapagree` is supplied at capstone wiring (as for
+`certainTypeSet_isCoherent_tau`). -/
+noncomputable def columnRFamilyTau
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (hmapagree : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)) :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily hyp.tau
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) where
+  imageSet := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet
+  mem_ZIrr := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).mem_ZIrr
+  orthonormal := (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).orthonormal
+  image_eq := by
+    rw [hmapagree]; exact (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).image_eq
+
+/-- **(6.8.2.3) column constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data for a
+reducible column `μ_j = columnSum χ₂` against the Sibley–Dade map `hyp.tau`, built by `ofProjection`
+from the retargeted family `columnRFamilyTau` and `hyp.tau`'s `H^#`-inner-preservation
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`).  This is the column branch
+of the per-`φ` family living in the *same* `τ = hyp.tau` as the irreducible constituents
+(`decompositionDaFromDadeOfDiff hyp.dade hyp.hconj`).  The column differences `μ_j − μ̄_j`,
+`μ_j − a·η₁` are `H^#`-supported (`hSdiff`, case c2 `K = H`); `hmapagree` transfers the family's image
+equation; both are discharged at capstone wiring. -/
+noncomputable def columnDecompositionTau
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hmapagree : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj))
+    (hSdiff : ∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (htau1_mema : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (a • η₁) := by
+  have hχχbar : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj = 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
+      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂).symm]
+  exact OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection
+    (columnRFamilyTau hyp h46 hχ₂ hdeg hmapagree) hyp.tau
+    (fun _φ _ζ hφ hζ =>
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+        hyp.dade hyp.hconj hSdiff hφ hζ)
+    rfl htau1_mema hχψ hχbarψ hχχbar
+
 /-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
 `μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
 irreducible `θ` of `H` with `W₂ ⊆ Ker θ` induces to `μ_j`.
