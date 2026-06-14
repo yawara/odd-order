@@ -505,6 +505,47 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) := by
   sorry
 
+/-- **§14-independent assembly of BG Corollary 15.6** from its §14/§15 inputs taken as
+hypotheses.  This packages the *logic* of Corollary 15.6 (mmd L4232) with no fragile citation of
+the still-`sorry` §14 scaffold: once §14 lands, `typeP_kstar_in_mf` discharges each hypothesis by
+a single citation and applies this skeleton.  Hypothesis provenance (mmd L4434 dependency table):
+
+* `hKne` (`K* ≠ 1`) ← Proposition 14.2(c) (`typeP_structure`, conjunct `Kstar ≠ ⊥`);
+* `hcyc` (`K K*` cyclic) ← Theorem 14.7(d) (`typeP_duality`, conjunct `IsCyclic (K ⊔ Kstar)`);
+* `hKsubMF` (`K* ⊆ M_F`) ← Theorem 15.2(b)(c) (case-split on `M_F = M_σ`);
+* `hcompl`/`hcop` (`M = K M'`, `K ∩ M' = 1`, coprime) ← Theorem 14.7(h) / Lemma 15.1's `K ≠ 1`
+  clause;
+* `hFcyc` (`M_F` cyclic ⟹ `F(M)` cyclic) ← Corollary 15.5 (the consequence its proof of 15.6
+  cites).
+
+The two nontrivial steps are unconditional: `K* ⊆ M''`
+(`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'`) and the `M_F`-not-cyclic
+contradiction (`fittingInAmbient_cyclic_imp_derivedDerived_eq_bot`, giving `M'' = 1`, against
+`K* ⊆ M''` and `K* ≠ 1`). -/
+theorem typeP_kstar_in_mf_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hKne : Kstar ≠ ⊥) (hcyc : IsCyclic ↥(K ⊔ Kstar)) (hKsubMF : Kstar ≤ MF M)
+    (hcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+      (Nat.card ↥(K.subgroupOf M)))
+    (hFcyc : IsCyclic ↥(MF M) → IsCyclic ↥(fittingInAmbient M)) :
+    Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ MF M ∧
+      Kstar ≤ derivedInG (derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI := hcyc
+  -- `K* ⊆ M''`:  the §14-independent conjunct-4 engine.
+  have hKsubdd : Kstar ≤ derivedInG (derivedInG M) := by
+    rw [hKstar]
+    exact Msigma_inf_centralizer_le_derivedDerived_of_isComplement' hG hM hcompl hcop
+  refine ⟨hKne, Subgroup.isCyclic_of_le (le_sup_right : Kstar ≤ K ⊔ Kstar), hKsubMF,
+    hKsubdd, ?_⟩
+  -- `M_F` not cyclic:  else `F(M)` cyclic ⟹ `M'' = 1`, but `K* ⊆ M''` and `K* ≠ 1`.
+  intro hcycMF
+  have hMdd : derivedInG (derivedInG M) = ⊥ :=
+    fittingInAmbient_cyclic_imp_derivedDerived_eq_bot (hFcyc hcycMF)
+  exact hKne (le_bot_iff.mp (hMdd ▸ hKsubdd))
+
 /-- **BG Corollary 15.6** (mmd L4174): for a type-P maximal subgroup, `Kstar` is
 nontrivial cyclic and lies in `M_F`, while `M_F` itself is not cyclic. -/
 theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
