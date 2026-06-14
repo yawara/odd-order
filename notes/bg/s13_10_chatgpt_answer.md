@@ -162,3 +162,23 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
     `isHall_Msigma_Malpha .2` で α-subgroup≤M_α) + Q*⊆C(Q) ⟹ C_{Q*}(P)⊆C_{M_α}(P⊔Q)=1。
   - **D5**: `mem_tau1_Mstar_of_einvariant_sylow` (p∈τ₁M*) + `forbidden_config_impossible` (13.8)。
   ⚠ D3 本体の 12.19 W-factorization が最難。fresh context で。
+
+### 🎉🎉 進捗⁷ (2026-06-15 Lane F /loop, cont.⁶) — Thm 13.10 COMPLETE
+- ✅ `509be28d` D3a (13.5 `Q≤derivedInG E`) + `ae0b50ce` D3b (12.19 W-factorization) +
+  `ddeb3a3c` D4 (`Q*⊓C(P)=⊥` β-dichotomy) + `90df362c` D3 (`N(Q*)⊆M` β-dichotomy) +
+  `289bd623` **13.10 (b) 本体 = Lemma 13.8 で矛盾 → Thm 13.10 (a)(b)(c) 全完成**。
+- full build 緑 3813 / AxiomsCheck OK。**§13 endgame の残り実 sorry は Cor 13.11 のみ**。
+- ⚠ 知見: helper の **未使用 implicit prime `{q}[Fact q.Prime]`** は call site で metavariable 化し
+  `Fact` typeclass resolution を stuck させる(C1/D3/D4 で発生・削除した)。未使用の setup implicit
+  `E E₁ E₂` も `rw` で metavariable 化(C1)。helper は使う変数だけ implicit に。
+
+### Cor 13.11 `E3_not_regular_consequences` 計画 (mmd L3732-3741)
+仮説: E₃≠⊥, ¬ActsRegularlyOn(M_σ,E₃)。結論 (a)E₁≠⊥ ∧ (b)E=E₁⊔E₃ ∧ (c)ActsPrimeOn(M_σ,E) ∧
+(d)∀ X∈ℰ¹(E),X≤E → E≤N(X)。
+- (a)(b): Cor 12.6(d) で τ₂(M) empty → Lemma 12.1 / `SubgroupESetup.eq_sup`(+E₂=⊥) で E=E₁⊔E₃,
+  E₁≠⊥。`E_eq_sup_of_E3_centralizer` 系 (13.7 work) が近い。要 τ₂ empty 補題特定。
+- **E₁ ¬reg on E₃**: 13.10 の対偶 — ¬(E₃ reg on M_σ) ⟹ ¬∃P∈ℰ_p¹(E₁) not-centralizing
+  ⟹ ∀ P centralize E₃ ⟹ E₁ centralizes E₃ ⟹ (E₃≠⊥) E₁ ¬reg on E₃。
+- (c): `E1E3_actsPrime hG h hE1ne (E₁ ¬reg on E₃)` = E₁E₃ prime on M_σ; E=E₁⊔E₃ ((b)) ⟹ E prime。
+- (d): ∀P∈ℰ_p¹(E₁) centralize E₃ + E=E₁⊔E₃ + E₁,E₃ cyclic + E₃◁E ⟹ ℰ¹(E) 正規。要設計。
+⚠ 13.10 の対偶適用に p.Prime 必要(13.10 hP/(c) は p 素数版に修正済)。X∈ℰ¹(E) の p も素数化注意。
