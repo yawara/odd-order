@@ -1232,6 +1232,65 @@ theorem sylow_of_maximal_pSubgroup {H : Type*} [Group H] [Finite H] {q : ℕ} [F
     ∃ S : Sylow q H, (S : Subgroup H) = Q :=
   ⟨⟨Q, hQq, fun hTq hQT => hmax _ hTq hQT⟩, rfl⟩
 
+/-- **Lemma 13.8 head Frattini の正規性核**: `Q` を `M` の Sylow `q`-部分群 (`q∉β(M)`),
+`Q ⊆ M'` とすると `M ≤ N_G(M_β ⊔ Q)` (すなわち `M_β·Q ⊲ M`)。
+
+`M_β·Q ⊲ M'` (`normal_sup_sylow_of_quotient_nilpotent`, `M'/M_β` nilpotent) を取り、
+`m ∈ M` について `Q^m` は `M'` の Sylow `q` ゆえ `M'` 内で `Q` に共役 (`Q^m = Q^c`, `c∈M'`)、
+`Q^c ⊆ (M_β·Q)^c = M_β·Q` (`M_β·Q ⊲ M'`)。商を経由しない char-step。 -/
+theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime] {Q : Subgroup G}
+    (hQq : IsPGroup q ↥Q)
+    (hQmaxM : ∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T)
+    (hqβ : q ∉ S10.beta M) (hQderiv : Q ≤ derivedInG M) :
+    M ≤ Subgroup.normalizer ((S10.Mbeta M ⊔ Q : Subgroup G) : Set G) := by
+  classical
+  have hDM : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `Q.subgroupOf M'` is a Sylow `q` of `↥M'`.
+  have hQDq : IsPGroup q ↥(Q.subgroupOf (derivedInG M)) :=
+    hQq.of_equiv (Subgroup.subgroupOfEquivOfLe hQderiv).symm
+  have hQDmax : ∀ T : Subgroup ↥(derivedInG M), IsPGroup q ↥T →
+      Q.subgroupOf (derivedInG M) ≤ T → T = Q.subgroupOf (derivedInG M) := by
+    intro T hTq hQT
+    have hQT' : Q ≤ T.map (derivedInG M).subtype := by
+      have h : (Q.subgroupOf (derivedInG M)).map (derivedInG M).subtype ≤
+          T.map (derivedInG M).subtype := Subgroup.map_mono hQT
+      rwa [Subgroup.subgroupOf_map_subtype Q (derivedInG M), inf_eq_left.mpr hQderiv] at h
+    have heq := hQmaxM (T.map (derivedInG M).subtype)
+      ((Subgroup.map_subtype_le T).trans hDM)
+      (hTq.of_equiv (Subgroup.equivMapOfInjective T (derivedInG M).subtype
+        (derivedInG M).subtype_injective)) hQT'
+    calc T = (T.map (derivedInG M).subtype).subgroupOf (derivedInG M) :=
+          (Subgroup.comap_map_eq_self_of_injective (derivedInG M).subtype_injective T).symm
+      _ = Q.subgroupOf (derivedInG M) := by rw [← heq]
+  obtain ⟨QD, hQDeq⟩ := sylow_of_maximal_pSubgroup hQDq hQDmax
+  -- `M_β ⊔ Q ⊲ M'`.
+  have hMβD : S10.Mbeta M ≤ derivedInG M := Mbeta_le_derived hG hM
+  haveI hMβnorm : ((S10.Mbeta M).subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMβD).mpr
+      (hDM.trans (le_normalizer_opiCoreInG (S10.beta M) M))
+  have hnilp : Group.IsNilpotent (↥(derivedInG M) ⧸ (S10.Mbeta M).subgroupOf (derivedInG M)) :=
+    S10.derivedQuotientMbeta_isNilpotent hG hM
+  have hNq' : ¬ q ∣ Nat.card ↥((S10.Mbeta M).subgroupOf (derivedInG M)) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMβD).toEquiv]
+    intro hdvd
+    have hqpf : q ∈ (Nat.card ↥(S10.Mbeta M)).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, (Nat.card_pos (α := ↥(S10.Mbeta M))).ne'⟩
+    exact hqβ (S10.Mbeta_isPiGroup M q hqpf)
+  haveI hNorm : ((S10.Mbeta M).subgroupOf (derivedInG M) ⊔
+      (QD : Subgroup ↥(derivedInG M))).Normal :=
+    S10.normal_sup_sylow_of_quotient_nilpotent hnilp hNq' QD
+  -- transport: `(M_β ⊔ Q).subgroupOf M' = M_β.subgroupOf M' ⊔ QD` ⟹ `⊲ ↥M'`.
+  have hQMβsub : (S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M) =
+      (S10.Mbeta M).subgroupOf (derivedInG M) ⊔ (QD : Subgroup ↥(derivedInG M)) := by
+    rw [Subgroup.subgroupOf_sup hMβD hQderiv, hQDeq]
+  haveI hQMβnorm : ((S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M)).Normal := hQMβsub ▸ hNorm
+  -- char-step: `m ∈ M ⟹ conj m • (M_β ⊔ Q) = M_β ⊔ Q`.
+  intro m hm
+  rw [Subgroup.mem_normalizer_iff]
+  -- suffices: `conj m • Q ≤ M_β ⊔ Q` (and symmetric); use Sylow conjugacy in `M'`.
+  sorry
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **Lemma 13.8 GAP 3 capstone (M-oriented)**: 配置 + step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
