@@ -361,3 +361,32 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 - **判断**: 14.2 の深い conjugacy 内部 (両 branch) は loop 25min fragment では API friction で非効率。
   **opening (3fb80769) + 14.7(h) 露出は landing 済**。深い branch proof は **dedicated focused session** か、
   まず membership 版核補題を 1 本完成させてから fragment 駆動が良い。
+- **✅ 核補題 landing (084533cd)**: `Msigma_inf_centralizer_conj_ne_bot` 完成 (membership 版; バグは
+  ≠1 sub-goal の循環 rw、MulAut API は inv_smul_eq_iff/conj_apply で通った)。§13 funnel 全 complete
+  (13.5-13.13, S13 sorry 0) ⟹ 14.2 完成時 unconditional。
+
+### 🗺 case-τ₃ / case-τ₁ branch 詳細プラン (2026-06-15) — dedicated session 向け
+**両 branch とも深い Sylow/Hall/conjugacy machinery を要す (loop fragment 非効率と確認)。** 構造:
+
+**共通の鍵 = κ の ∃→∀ upgrade** (BG L3807): `p∈κ(M) ⟹ ∀P∈ℰ_p¹(M), C_{M_σ}(P)≠1`。
+証明 = p∈κ⊆τ₁∪τ₃ で `r_p(M)=1` → **cyclic Sylow p** (odd, rank 1) → 各 Sylow の order-p 部分群一意 →
+全 ℰ_p¹(M) は M-共役 → 核補題 `Msigma_inf_centralizer_conj_ne_bot` で C 不変 → 全 P で C≠1。
+**要 machinery**: `r_p=1 ⟹ cyclic Sylow` (§12 τ-classification?) + `cyclic Sylow ⟹ order-p subgroup 一意`
++ Sylow 共役。**未特定の repo helper** = ここが最大の friction。
+
+**case-τ₃** (`(kappa M ∩ tau3 M).Nonempty`):
+1. `E₃≠⊥`: p∈τ₃ ⟹ p∣|E| (E=σ'-complement, p∈σ') ⟹ p∣|E₃| (E₃ Hall τ₃) ⟹ ≠⊥。要 E-setup card facts。
+2. `E₃ 非regular on M_σ`: κ∩τ₃ の p の witness P (∃→∀ upgrade で E₃ 内 rank-1 に転送) ⟹ ∃z∈E₃#, C_{M_σ}(z)≠1。
+   **逆向き (E₃ 非reg ⟹ κ∩τ₃) は EASY** (z∈E₃ 直接 κ-witness, 共役不要) — 等価性 lemma 化なら逆向き活用。
+3. `Cor 13.11` (`E3_not_regular_consequences` hG hsetup hE3 hreg) → E=E₁⊔E₃, ActsPrimeOn M_σ E, ∀X∈ℰ¹(E)◁E。
+4. `K=E`: E₂=1 (13.11 の E=E₁⊔E₃ から) ⟹ κ=τ₁∪τ₃=π(M)−σ(M) ⟹ K(Hall κ)=E。要 Hall 一意性。
+5. conjunct 1 (ActsPrimeOn K) = 13.11 の ActsPrimeOn E + K=E。他 conjunct も K=E で。
+
+**case-τ₁** (`¬(kappa M ∩ tau3 M).Nonempty` ⟹ κ⊆τ₁):
+1. `κ=τ₁`: κ⊆τ₁ + (E₁ prime on M_σ by Thm 13.5 `E1_actsPrime`) で τ₁⊆κ。
+2. WLOG `K=E₁`: K(Hall κ=τ₁) と E₁(Hall τ₁ of E) は M-共役 → 核補題等で conclusion 転送。
+3. `K=E₁ regular on U=E₂E₃` (Lem 13.12 `Msigma_centralizer_eq_bot_of_tau1_tau2` + Lem 13.7 `E1E3_actsPrime`)。
+4. `U=[U,K]=E'` abelian (Cor 12.10(b))。conjuncts。
+
+**▶ 推奨**: branch proof は cyclic-Sylow/Hall-共役 helper の特定が要で multi-hour。loop は clean piece
+(opening/核補題/14.7(h)/kappa helpers) を抽出済。**dedicated session で ∃→∀ upgrade を起点に駆動**が効率的。
