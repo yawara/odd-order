@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -98,6 +99,71 @@ theorem isElementaryAbelian_multiplicative [Finite F] [Nontrivial F] :
   apply Multiplicative.toAdd.injective
   rw [toAdd_pow, toAdd_one]
   exact hfx (Multiplicative.toAdd x)
+
+/-- The right-multiplication action of a commutative subgroup `A ⊆ Fˣ` on `(F, +)` (written
+multiplicatively), as a monoid homomorphism into `MulAut (Multiplicative F)`.  Right multiplication
+is additive (`rightMul`); the homomorphism property needs `A` commutative (`hcomm`), since right
+multiplication is otherwise only an anti-homomorphism.  Together with `isElementaryAbelian_multiplicative`
+this is the data fed to Appendix I's `exists_field_semilinear`. -/
+noncomputable def rightMulAction (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) :
+    A →* MulAut (Multiplicative F) where
+  toFun u := (rightMul ((u : Fˣ) : F) (Units.ne_zero _)).toMultiplicative
+  map_one' := by
+    ext x
+    apply Multiplicative.toAdd.injective
+    show Multiplicative.toAdd x * (((1 : A) : Fˣ) : F) = Multiplicative.toAdd x
+    rw [OneMemClass.coe_one, Units.val_one, mul_one]
+  map_mul' u v := by
+    ext x
+    apply Multiplicative.toAdd.injective
+    show Multiplicative.toAdd x * (((u * v : A) : Fˣ) : F)
+      = Multiplicative.toAdd x * (((v : Fˣ) : F)) * (((u : Fˣ) : F))
+    have hc' : ((u : Fˣ) : F) * ((v : Fˣ) : F) = ((v : Fˣ) : F) * ((u : Fˣ) : F) := by
+      rw [← Units.val_mul, ← Units.val_mul, hcomm u v]
+    rw [Subgroup.coe_mul, Units.val_mul, hc', ← mul_assoc]
+
+/-- The action of `rightMulAction` on additive coordinates: `u` sends `x` to `x * (u : F)`. -/
+@[simp] theorem rightMulAction_toAdd (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) (u : A) (x : Multiplicative F) :
+    Multiplicative.toAdd (rightMulAction A hcomm u x) = Multiplicative.toAdd x * ((u : Fˣ) : F) :=
+  rfl
+
+/-- `A ⊆ Fˣ` acts **freely** on `F^#` by right multiplication: a nontrivial element fixes no
+nonzero point (group cancellation in the group-with-zero `F`).  This is the input to the orbit
+counting that shows the index-2 subgroup `A` acts irreducibly. -/
+theorem rightMulAction_eq_self_iff (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) (a : A) (x : Multiplicative F)
+    (hx : x ≠ 1) (hfix : rightMulAction A hcomm a x = x) : a = 1 := by
+  have h1 : Multiplicative.toAdd x * ((a : Fˣ) : F) = Multiplicative.toAdd x := by
+    have h := congrArg Multiplicative.toAdd hfix
+    rwa [rightMulAction_toAdd] at h
+  have hx0 : Multiplicative.toAdd x ≠ 0 := fun h =>
+    hx (Multiplicative.toAdd.injective (h.trans toAdd_one.symm))
+  have hval : ((a : Fˣ) : F) = 1 := mul_left_cancel₀ hx0 (by rw [h1, mul_one])
+  exact OneMemClass.coe_eq_one.mp (Units.val_eq_one.mp hval)
+
+/-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
+Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
+*irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
+over a finite field `K` with `|K| = |F|` (i.e. `F` carries a field structure refining its additive
+group).  Obtained by feeding the near-field data — `isElementaryAbelian_multiplicative` and
+`rightMulAction` — into `exists_field_semilinear`. -/
+theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F] [Nontrivial F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hirr : ∀ U : Subgroup (Multiplicative F),
+      OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U → U = ⊥ ∨ U = ⊤) :
+    ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
+      Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
+  obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact f.Prime := ⟨hf⟩
+  letI : CommGroup A := { (inferInstance : Group A) with
+    mul_comm := fun u v => Subtype.ext (by simpa [Subgroup.coe_mul] using hcomm u v) }
+  obtain ⟨K, hK, hMod, hKfin, hrank, hcard, _⟩ :=
+    OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear (E := Multiplicative F) hE
+      (rightMulAction A hcomm) hirr
+  exact ⟨K, hK, hMod, hKfin, hrank, hcard⟩
 
 end NearFieldBasics
 

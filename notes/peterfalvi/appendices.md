@@ -355,6 +355,30 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
   (3) A irreducible (|F|=2|A|+1 counting 矛盾); (4) σ_y/Aut(K) 解析 → field or F_{r²,2}。複数 session 見込み。
   Prop 1 は FT+Brauer-Suzuki gate (重い, Gorenstein 5.4.10 類似なら issue 化 defer)。
 
+### session 13-14 (2026-06-14): Appendix II — A-action 完成
+- `isElementaryAbelian_multiplicative` (commit 331aae13): (F,+) を Multiplicative F で見て elem-ab
+  (exists_field_semilinear が要する形)。
+- **`rightMulAction`** (commit b24d2e76): 可換部分群 A⊆Fˣ の (F,+) への右乗作用を `A →* MulAut (Multiplicative F)`
+  に。右乗は加法的 (rightMul) だが hom 性に A 可換要 (右乗は一般に anti-hom) → `hcomm` 引数で渡す。
+  🔑 知見: `IsCyclic.commGroup` を haveI すると `*`-diamond で mul_comm の rw が壊れる → 可換性は `hcomm`
+  仮説 (caller が A cyclic から供給) で回避。`rightMulAction_toAdd` (作用は加法座標で x*u)。
+- **▶ 次 = "field structure" 中間結果**: exists_field_semilinear を `E:=Multiplicative F`, `T:=↥A`,
+  `ψ:=rightMulAction A hcomm` で起動。要 irreducibility `hirr` = A-invariant subgroup は ⊥/⊤
+  (Peterfalvi counting: F=F₁⊕F₂ なら A が各 Fᵢ に FPF → |Fᵢ|≥|A|+1, |F|=2|A|+1≥(|A|+1)² 矛盾)。
+  ⟹ (F,+) は体 K 上 1 次元 + A は乗法で作用。これが Prop 2 の前半 (Appendix I work を使う部分)。
+  後半 (σ_y/Aut(K) → field or F_{r²,2} 分類) + Prop 1 (Brauer-Suzuki gate) は重い remaining。
+
+### session 15 (2026-06-14): Appendix II — Prop 2 field-structure 中間結果 (Appendix I 接続)
+- **`nearField_field_structure`** (commit 7e787447): A⊆Fˣ 可換が (F,+) に right-mult で irreducible 作用
+  ⟹ (F,+) は有限体 K 上 1 次元, |K|=|F|。near-field data (isElementaryAbelian_multiplicative + rightMulAction)
+  を exists_field_semilinear に投入。**Appendix C Prop 2 の前半 (Appendix I を使う部分) 完成**。
+  irreducibility は hyp (index-2 counting は別 lemma)。CommGroup ↥A は hcomm から構築 (IsCyclic.commGroup
+  の *-diamond 回避)。NearFields が SemilinearField を import するように。
+- **▶ 次 = irreducibility counting** (hirr 仮説を index-2 から discharge): A index-2 in Fˣ ⟹ A irreducible on (F,+)。
+  要 (1) A FPF on F^# (x*a=x, x≠0 ⟹ a=1 by F^* 群 cancellation), (2) Maschke (|A| coprime |F|; A-inv U に
+  complement), (3) counting: |F_i|≥|A|+1, |F|=2|A|+1≥(|A|+1)² 矛盾。substantial。
+  - その後 σ_y/Aut(K) → field or F_{r²,2} 分類 (最重) + Prop 1 (Brauer-Suzuki gate)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
