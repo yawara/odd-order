@@ -2373,3 +2373,28 @@ capstone `per_constituent_Y_eq_smul` が要求する named 仮説を case-B で 
 - 並行 = **disjointness R(χθ)⊥Y** ((5.3)+(5.5); Y=ε·ξ ⟹ ξ∉R(χθ); irreducible 版 `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`
   の case-B/certain-type 類似が要るか精査)。
 **正本=本 cont.⁴⁰。代数 layer 完備。次 tick=per-θ Da family の case-B 構造精査 → 構築。組立は capstone で機械的。**
+
+## 2026-06-14 (session 40 cont.⁴¹, /loop): 🔎 concrete instantiation の gap 精査 — disjointness が本丸
+
+### 確認した既存資産 (S06):
+- `certainTypeR` = R(μ_j) OrthonormalCharacterImageFamily (S06:639, χ₂≠1, hdeg)。imageSet=`certainTypeRImage` の像
+  (`±δ_j•certainTypeOmegaSigma`)、`(μ_j−μ̄_j)^τ=∑R(μ_j)` = `dadeICM_columnDiff_eq_sum`。
+- `certainTypeRImage_inner` = R(μ_j) **内部**の orthonormality のみ。
+- `certainTypeDecompositionDa` (S06:684) = μ_j 用 Da、Y-anchor inputs (η₁,a,support,ZIrr,⊥) は parameter。
+
+### 🛑 gap 確定: **disjointness `R(μ_j) ⊥ Y^τ₁` の既存サポート無し**
+- (6.8.2.3) 原文「R(χᵢ)⊥Y^τ₁ by (5.3),(5.5)」を分解: Y^τ₁=η₁^τ₁∈ℤ[R(η₁)] ((5.5)) ∧ **R(χᵢ)⊥R(η₁)** ((5.3),
+  source χᵢ⊥η₁ からの image-family 直交) ⟹ R(χᵢ)⊥Y。
+- irreducible 版 = `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (source⊥ ⟹ R⊥R)。
+- **case-B では R(μ_j)=certainTypeR が σ-image 経由の別構成**ゆえ、`⟨certainTypeOmegaSigma h χ₂ i, ξ⟩=0`
+  (ξ=Y-anchor image) を与える既存 lemma 無し (grep 済: certainTypeOmegaSigma_inner は族内部のみ)。
+  ⟹ **certain-type R(μ_j) ⊥ R(η₁) (or ⊥ Y-side ξ) を新規に確立する必要** = concrete instantiation の本丸 gap。
+
+### ▶ 残 concrete instantiation の構造 (capstone は全部 ready, 以下が plumbing):
+1. **disjointness `R(μ_j)⊥Y`** [本丸 gap]: certainType σ-image vs Y-side の直交。source μ_j⊥η₁ (既: hpair) +
+   Dade/σ の直交保存。要新規 infra (certainType 版 (5.3))。**次の主作業**。
+2. per-θ Da family + character setup (Ind^H_Z φ=∑aᵢθᵢ; χθ 既約/reducible 振分)。
+3. aggregate (6.8.2.2) wiring + capstone 適用 → per-χ image → hmixed。
+**評価: 代数 layer (7 lemma+capstone) は完全完成・全 axiom-clean = 本 session の主成果。残りは case-B 固有の
+plumbing で、本丸 = disjointness の新規 infra。これは focused な dedicated 作業 (quick brick でない)。**
+**正本=本 cont.⁴¹。次 tick=disjointness `R(μ_j)⊥Y` の新規 infra 着手 (certainType σ-image vs Y-side 直交)。**
