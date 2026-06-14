@@ -282,3 +282,45 @@ BG §14 全結果 (14.1–14.13) と S14 surface を照合し、**欠けてい�
 14.7✅ / **14.8✅(new)** / 14.9✅(surface; faithful版→§16) / 14.10✅ / **14.11✅(new)** / 14.12✅(faithful) / 14.13✅。
 ⟹ **§16 が直接 cite する 14.2/14.4/14.5/14.7/14.9/14.12 は全て present**、加えて型分類用 14.8 も present。
 G は §14 を sorried cite して §15/§16 を unblock 可能 (§14 proof landing で自動 unconditional 化)。
+
+## 🚧 Prop 14.2 実装プラン (2026-06-15, Lane H) — 13.12/13.13 landing 後の funnel keystone
+
+**unblock 完了** (commit `6409a53e`): F が 13.12/13.13 statements を landing (issue 2006, 私の draft 採用) +
+13.10/13.11 complete (S13_PrimeActionTransition 残 sorry = 13.12/13.13 本体のみ) + ユーザー裁可 scaffold-cite
+ポリシー。さらに 14.2 の WLOG 前提を整備: `kappa_subset_tau1_union_tau3` (S14) + `exists_subgroupESetup_with_le`
+public 化 (S12, K≤E な setup を与える)。⟹ **14.2 を scaffold-cite で書ける状態**。
+
+### ⚠ 署名 subtlety (要修正 — 着手時 first)
+現 `typeP_structure` の `hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)` は **K≤M を強制しない**
+(`K.subgroupOf M` = K⊓M を ↥M 内で見たもの)。BG では K は M の Hall κ-subgroup ⟹ **`(hKM : K ≤ M)` 仮説を
+追加**するか、`K⊓M` で進める。`hU` の U も同様。下流 0 cite ゆえ署名追加は安全。
+
+### 証明アーキテクチャ (BG mmd L3832-3850 → Lean)
+```
+classical
+-- K は σ'-subgroup (Hall κ, κ⊆τ₁∪τ₃⊆σ')
+have hK_pi : IsPiSubgroup (sigma M)ᶜ K := ...  -- IsHallSubgroup→IsPiSubgroup + kappa_subset + tau⊆σ'
+obtain ⟨E,E₁,E₂,E₃, hsetup, hKE, hE_pi⟩ := exists_subgroupESetup_with_le hG hM hKM hK_pi  -- K≤E
+by_cases hτ3 : (kappa M ∩ tau3 M).Nonempty
+· -- E₃≠1 ∧ E₃ non-regular ⟹ Cor 13.11: E₁≠1, E=E₁E₃, ActsPrimeOn M_σ E, ∀X∈ℰ¹(E) ◁E。K=E (U=1)
+· -- κ⊆τ₁ ⟹ κ=τ₁ (E₁ prime, Thm 13.5)。WLOG K=E₁。K regular on U=E₂E₃ (Lem 13.12+13.7)。U=[U,K]=E' abelian (12.10b)
+```
+**conjunct → cite map**:
+| conjunct | cite |
+|---|---|
+| (1) `ActsPrimeOn M_σ K` | case-τ₃: Cor 13.11(c); case-τ₁: Thm 13.5 (`E1_actsPrime`) + WLOG K=E₁ |
+| (2) `Kstar≠⊥` | K prime-not-regular on M_σ ⟹ Lem 13.13 (`mem_sigma_of_tau1_tau3_centralize`)+13.6 |
+| (3) `N_M(X)=K⊔Kstar` (b1) | Lem 13.6 (`maximalContaining_eq_singleton_of_E1`) + 13.13 |
+| (4) `Kstar⊓M^g=⊥` (d) | (c) + Thm 10.1(a) |
+| (5) IsTypeP2⟹σ=β,|K|=q,TI (g) | Lem 14.1 + Thm 3.10(a) + Lem 12.19 + Lem 12.17 |
+
+### ❗ 要 transport machinery (case-τ₁ の WLOG K=E₁)
+K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m∈M)。`ActsPrimeOn` 等を E₁→K へ transport 要:
+- **`ActsPrimeOn` conjugation-invariance** (`ActsPrimeOn M_σ E₁ → ActsPrimeOn M_σ (E₁^m)` for M_σ◁M, m∈M)
+  = `def ActsPrimeOn N X = ∀g∈X#, fixedByElement N g = fixedBy N X` の共役不変性。§13-independent、新規補題。
+- Hall τ₁ subgroup の M 内共役 (`hall_conjugate` / IsHallSubgroup conjugacy)。
+- あるいは `exists_subgroupESetup_with_le` が **E₁=K** を直接与えるよう精査 (K≤E + K Hall τ₁ of E ⟹ E₁=K の取り方)。
+
+### 着手順序 (次セッション)
+1. 署名修正 (K≤M, U≤M 追加)。2. `hK_pi` (K σ'-subgroup) 補題。3. setup 取得 + case split (compile)。
+4. case-τ₃ 分岐 (Cor 13.11 直 cite、WLOG 不要) を先に完成。5. ActsPrimeOn-conj 補題 → case-τ₁。6. conjunct 2-5。

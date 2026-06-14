@@ -128,6 +128,12 @@ theorem not_isTypeP_and_isTypeF {M : Subgroup G} : ¬ (IsTypeP M ∧ IsTypeF M) 
   rintro ⟨hP, hF⟩
   exact (isTypeF_iff_not_isTypeP.mp hF) hP
 
+/-- `κ(M) ⊆ τ₁(M) ∪ τ₃(M)`, directly from the definition of `κ`.  Used in Proposition 14.2:
+a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`), so the §12 `E`-setup
+may be chosen to contain it. -/
+theorem kappa_subset_tau1_union_tau3 {M : Subgroup G} : kappa M ⊆ tau1 M ∪ tau3 M :=
+  fun _ hp => hp.1
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
