@@ -2326,6 +2326,92 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
     hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
 
+/-- In a cyclic `q`-subgroup `Q ≤ G`, the order-`q` subgroup `Q₀` is contained in **every**
+nontrivial subgroup `T ≤ Q` (it is the unique minimal subgroup `Ω₁`). Public replication of the
+`Ω₁`-bookkeeping used in §12 (`S12_Lemma1211`'s private `le_of_ne_bot_of_le_cyclic`). -/
+theorem line_le_of_ne_bot_of_le_cyclic [Finite G] {q : ℕ} [Fact q.Prime]
+    {Q Q₀ T : Subgroup G} (hQcyc : IsCyclic ↥Q) (hQpg : IsPGroup q ↥Q)
+    (hQ₀Q : Q₀ ≤ Q) (hQ₀card : Nat.card ↥Q₀ = q)
+    (hTQ : T ≤ Q) (hTne : T ≠ ⊥) : Q₀ ≤ T := by
+  classical
+  have hTpg : IsPGroup q ↥T := fun t => by
+    obtain ⟨k, hk⟩ := hQpg ⟨(t : G), hTQ t.2⟩
+    exact ⟨k, Subtype.ext (by simpa using congrArg Subtype.val hk)⟩
+  have hqT : q ∣ Nat.card ↥T := by
+    rcases IsPGroup.iff_card.mp hTpg with ⟨k, hkcard⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hkpos
+    · exact absurd (Subgroup.card_eq_one.mp (by simpa using hkcard)) hTne
+    · rw [hkcard]; exact dvd_pow_self q hkpos.ne'
+  obtain ⟨T₀, hT₀card⟩ :=
+    Sylow.exists_subgroup_card_pow_prime (G := ↥T) q (n := 1) (by rwa [pow_one])
+  set T₀' : Subgroup G := T₀.map T.subtype with hT₀'def
+  have hT₀'card : Nat.card ↥T₀' = q := by
+    rw [hT₀'def, Subgroup.card_map_of_injective T.subtype_injective, hT₀card, pow_one]
+  have hT₀'T : T₀' ≤ T := Subgroup.map_subtype_le _
+  have hQ₀eq : Q₀.subgroupOf Q = T₀'.subgroupOf Q := by
+    apply S10.cyclic_subgroup_eq_of_card_eq (C := ↥Q)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ₀Q).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hT₀'T.trans hTQ)).toEquiv,
+      hQ₀card, hT₀'card]
+  have heq : Q₀ = T₀' := by
+    have h1 := congrArg (fun X : Subgroup ↥Q => X.map Q.subtype) hQ₀eq
+    simpa [Subgroup.map_subgroupOf_eq_of_le hQ₀Q,
+      Subgroup.map_subgroupOf_eq_of_le (hT₀'T.trans hTQ)] using h1
+  rw [heq]; exact hT₀'T
+
+/-- **Coprime-action indecomposability for a cyclic `q`-subgroup**: if `Q ≤ G` is a cyclic
+`q`-group, `P` normalizes `Q` with `|P|` coprime to `|Q|`, and `P` does **not** centralize `Q`,
+then `P` acts regularly on `Q`, i.e. `Q ⊓ C_G(P) = 1`. (A cyclic `q`-group is directly
+indecomposable; coprime action gives `Q = C_Q(P) × [Q,P]`, so `C_Q(P) ∈ {1, Q}`, and the line
+`Ω₁(Q)` cannot lie in both `C_Q(P)` and the nontrivial `[Q,P]`.) -/
+theorem inf_centralizer_eq_bot_of_coprime_cyclic [Finite G] {q : ℕ} [Fact q.Prime]
+    {Q P : Subgroup G} (hQcyc : IsCyclic ↥Q) (hQq : IsPGroup q ↥Q)
+    (hPN : P ≤ Subgroup.normalizer (Q : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
+    (hnc : ¬ Q ≤ Subgroup.centralizer (P : Set G)) :
+    Q ⊓ Subgroup.centralizer (P : Set G) = ⊥ := by
+  classical
+  have hQne : Q ≠ ⊥ := fun hb => hnc (hb ▸ bot_le)
+  have hQab : ∀ a ∈ Q, ∀ b ∈ Q, a * b = b * a := by
+    letI : CommGroup ↥Q := IsCyclic.commGroup
+    intro a ha b hb
+    exact Subtype.ext_iff.mp (mul_comm (⟨a, ha⟩ : ↥Q) (⟨b, hb⟩ : ↥Q))
+  have hcomm : ⁅Q, P⁆ ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
+    commutator_inf_centralizer_eq_bot_of_isCommutative hQab hPN hcop
+  have hcommQ : ⁅Q, P⁆ ≤ Q := by
+    rw [Subgroup.commutator_le]
+    intro a ha b hb
+    have hbN : b ∈ Subgroup.normalizer (Q : Set G) := hPN hb
+    have hconj : b * a⁻¹ * b⁻¹ ∈ Q := by
+      have := (Subgroup.mem_normalizer_iff.mp hbN a⁻¹).mp (Q.inv_mem ha)
+      simpa using this
+    rw [commutatorElement_def]
+    have hreg : a * b * a⁻¹ * b⁻¹ = a * (b * a⁻¹ * b⁻¹) := by group
+    rw [hreg]; exact Q.mul_mem ha hconj
+  have hcommne : ⁅Q, P⁆ ≠ ⊥ := fun hb =>
+    hnc (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hb)
+  have hqQ : q ∣ Nat.card ↥Q := by
+    rcases IsPGroup.iff_card.mp hQq with ⟨k, hkcard⟩
+    rcases Nat.eq_zero_or_pos k with rfl | hkpos
+    · exact absurd (Subgroup.card_eq_one.mp (by simpa using hkcard)) hQne
+    · rw [hkcard]; exact dvd_pow_self q hkpos.ne'
+  obtain ⟨Q₀0, hQ₀0card⟩ :=
+    Sylow.exists_subgroup_card_pow_prime (G := ↥Q) q (n := 1) (by rwa [pow_one])
+  set Q₀ : Subgroup G := Q₀0.map Q.subtype with hQ₀def
+  have hQ₀Q : Q₀ ≤ Q := Subgroup.map_subtype_le _
+  have hQ₀card : Nat.card ↥Q₀ = q := by
+    rw [hQ₀def, Subgroup.card_map_of_injective Q.subtype_injective, hQ₀0card, pow_one]
+  by_contra hCne
+  have hL1 : Q₀ ≤ Q ⊓ Subgroup.centralizer (P : Set G) :=
+    line_le_of_ne_bot_of_le_cyclic hQcyc hQq hQ₀Q hQ₀card inf_le_left hCne
+  have hL2 : Q₀ ≤ ⁅Q, P⁆ :=
+    line_le_of_ne_bot_of_le_cyclic hQcyc hQq hQ₀Q hQ₀card hcommQ hcommne
+  have hL2C : Q₀ ≤ ⁅Q, P⁆ ⊓ Subgroup.centralizer (P : Set G) :=
+    le_inf hL2 (hL1.trans inf_le_right)
+  rw [hcomm, le_bot_iff] at hL2C
+  rw [hL2C, Subgroup.card_bot] at hQ₀card
+  exact (Fact.out : q.Prime).one_lt.ne' hQ₀card.symm
+
 /-- **BG Theorem 13.10, structural brick** (gap-free): if `P ∈ ℰ_p¹(E₁)` does not centralize the
 cyclic Hall subgroup `E₃`, then there is a prime `q ∈ τ₃(M)` and a nontrivial `q`-subgroup
 `Q ≤ E₃` on which `P` acts regularly (`Q ⊓ C_G(P) = ⊥`), with `P ≤ N_G(Q)`.
