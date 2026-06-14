@@ -4444,3 +4444,11 @@ group-theoretic data.  Fully unconditional, axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.natCard_end_eq
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_of_irreducible
+
+/-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)+(b)** (`SemilinearField`): the field `F`
+of part (a) together with the semilinearity of part (b) — every `g : MulAut E` normalizing the
+`T`-action (via some `c : T ≃* T`) acts `F`-semilinearly, with field automorphism
+`σ = conjugation by g` on `F = End_{𝔽_p[T]}(E)`.  This is the input Appendix II uses for the
+field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
