@@ -640,6 +640,40 @@ theorem inner_Y_coeff_sq_le {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.car
   have := inner_self_re_nonneg W
   linarith
 
+/-- **Per-step coefficient bound `bᵢ ≤ aᵢ`** (Peterfalvi (6.8.2.3), the integer tail of the
+Cauchy–Schwarz step).  For a (5.4) decomposition `Da : CharacterPsiDecomposition τ χ (a·η)` with
+`η` a norm-`1` vector and `Y` a norm-`1` vector, the integer coefficient `b = ⟨Da.Y, Y⟩` is bounded
+by the multiplicity `a`.
+
+Chaining `inner_Y_coeff_sq_le` (`b² ≤ ‖Da.Y‖²`) with the (5.6.2) opening bound
+`inner_self_Y_re_le_inner_self_psi` (`‖Da.Y‖² ≤ ‖a·η‖² = a²`) gives `b² ≤ a²` over `ℤ`; with
+`a ≥ 0` the integer tail `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a` finishes.  This is the per-constituent input to
+the (6.8.2.3) pinning `eq_of_sum_mul_eq_sum_sq`. -/
+theorem inner_Y_coeff_le_of_psi_nsmul {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ η : ClassFunction ↥L ℂ} {a : ℕ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ (a • η))
+    (hηnorm : ClassFunction.inner η η = 1)
+    {Y : ClassFunction G ℂ} (hYnorm : ClassFunction.inner Y Y = 1)
+    {b : ℤ} (hb : ClassFunction.inner D.Y Y = (b : ℂ)) :
+    b ≤ (a : ℤ) := by
+  -- `‖ψ‖² = ‖a·η‖² = a²` (`η` norm `1`).
+  have hψnorm : (ClassFunction.inner (a • η : ClassFunction ↥L ℂ) (a • η)).re = (a : ℝ) ^ 2 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hηnorm, mul_one, star_natCast,
+      Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  -- `b² ≤ ‖Da.Y‖² ≤ ‖ψ‖² = a²`, over `ℝ` then `ℤ`.
+  have hsq := inner_Y_coeff_sq_le D hYnorm hb
+  have hYle := D.inner_self_Y_re_le_inner_self_psi
+  rw [hψnorm] at hYle
+  have hb2z : b ^ 2 ≤ (a : ℤ) ^ 2 := by exact_mod_cast le_trans hsq hYle
+  -- Integer tail: `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a`.
+  by_contra hcon
+  push_neg at hcon
+  have ha : (0 : ℤ) ≤ (a : ℤ) := Int.natCast_nonneg a
+  nlinarith [mul_nonneg ha (le_of_lt (sub_pos.mpr hcon)),
+    mul_pos (lt_of_le_of_lt ha hcon) (sub_pos.mpr hcon), hb2z]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
