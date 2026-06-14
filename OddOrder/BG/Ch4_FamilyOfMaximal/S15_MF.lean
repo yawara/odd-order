@@ -312,14 +312,17 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (S14.IsTypeF M ∨ S14.IsTypeP1 M))) := by
   sorry
 
-/-- **BG Theorem 15.8** (mmd L4221; Feit--Thompson 1991): in the §14.12 setup,
-nonempty `tau_2(H)` forces `tau_2(M)=empty` and makes `tau_2(N)` a singleton. -/
+/-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
+nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
+
+Faithfulness fix (Lane G): the previous scaffold had a spurious third maximal `N` and concluded
+`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H N K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
-    (hN : N ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    {M H K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hP2 : S14.IsTypeP2 M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hHtau : (tau2 H).Nonempty) :
-    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ tau2 N = {q} := by
+    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
 
 /-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer
