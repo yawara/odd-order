@@ -2454,3 +2454,37 @@ or character setup ([Is]2.27 + Ind 分解)。abstract layer は完成済みゆ�
 4. R(η₁) members = (η₁−η̄₁)^τ の既約構成子 ⟹ ω^σ∉R(η₁) ⟹ ω^σ⊥R(η₁) members ⟹ ω^σ⊥η₁^τ₁=Y。
    (or 直接 Y vanishes on V → `inner_sigma_eq_zero_of_vanishOnV`)。
 **正本=本 cont.⁴³。disjointness は tractable な多段再構成と確定 (深い infra 不要)。option 1 = 正解。次=形式化着手。**
+
+## 2026-06-14 (session 40 cont.⁴⁴, /loop): ✅ route を大幅 clean 化 (zsmul-irreducible で R(η₁) 構成回避) + ピース確認
+
+### 🔧 訂正 (cont.⁴³ の細部): `omega(χ)` は W の**既約指標** (linearIrreducibleCharacter, NOT V-supported)
+⟹ `certainTypeOmegaSigma = sigma(omega)` は **V^G-supported でない** ⟹ disjoint-support 経由 (inner_sigma_eq_zero_of_vanishOnV) は**不可**。**(3.8)/grid_eq_zero 経由が必須**。
+
+### ✅✅ clean route 確定 (R(η₁) 構成不要):
+`coherentYset_extension_eq_zsmul_irreducible` (S08:450) で **Y=cY.extension η₁ = ε·ξ** (ξ 単一既約)、
+同様 cY.extension η̄₁ = ε'·ξ' (ξ' 既約)。η₁ 非実 (5.2.a) ⟹ ξ≠ξ'。
+1. (η₁−η̄₁)^τ = ε·ξ − ε'·ξ' (cY.extends_on_supported + 線形; η̄₁∈Yset は共役閉)。
+2. **anchor**: (η₁−η̄₁)^τ が V 上消失 (η₁−η̄₁ A-supported [(4.7)], τ=Dade map, A^G∩V=∅)。【要 Dade-support ピース確認】
+3. NC((η₁−η̄₁)^τ)≤2 (= ε·ξ−ε'·ξ' の σ-係数は ξ=chiFam or ξ'=chiFam の高々2点)。min(w₁,w₂)≥3 (奇素数 Hall)。
+4. `grid_eq_zero_of_ncard_support_lt` (a:=sigmaCoeff, hadd:=`sigmaCoeff_add_eq`[要 anchor の vanishOnV], hlt:=NC<min)
+   ⟹ ∀pq, ⟨(η₁−η̄₁)^τ, chiFam pq⟩=0。
+5. **整数性抽出**: ε·⟨ξ,chiFam⟩−ε'·⟨ξ',chiFam⟩=0、⟨ξ,chiFam⟩,⟨ξ',chiFam⟩∈ℤ (ZIrr) ∧ |·|≤1 (norm-1, Pythagoras
+   = `inner_Y_coeff_sq_le` 流) ∧ ξ≠ξ' ⟹ ⟨ξ,chiFam⟩=0。
+6. ⟹ ⟨Y, certainTypeOmegaSigma⟩ = ⟨ε·ξ, chiFam⟩ = ε̄·0 = 0 = seam-1 hXorth。
+
+### ✅ ピース status:
+| piece | lemma | status |
+|---|---|---|
+| Y=ε·ξ 単一既約 | `coherentYset_extension_eq_zsmul_irreducible` (S08:450) | ✅ 既存 |
+| (3.7) σ-coeff 加法恒等式 | `sigmaCoeff_add_eq` (要 vanishOnV) | ✅ 既存 (S05) |
+| grid≡0 (NC<min) | `grid_eq_zero_of_ncard_support_lt` (S05:101) | ✅ session 18 landed |
+| 整数性 ⟨ZIrr,ZIrr⟩∈ℤ | `inner_mem_ZIrr_int` | ✅ 既存 |
+| |⟨·,·⟩|≤1 (norm-1) | `inner_Y_coeff_sq_le` 流 (Pythagoras) | ✅ 本 session landed |
+| anchor: A-supported→vanish on V | 【要確認: certain-type Dade の V-support; fourCornerDade_eq_zero_of_not_mem_conjugatesV 周辺】 | ⚠ 未確認 |
+
+### ▶▶ 次 tick の具体ターゲット (堂々巡り回避):
+**sub-lemma 1 = anchor**「η₁∈Yset ⟹ (η₁−η̄₁) の cY/Dade 像が (ticVdiff h).V 上で消失」。
+まず `fourCornerDade_eq_zero_of_not_mem_conjugatesV` + `dadeIntegralCharacterMap_apply_of_support` +
+A^G∩V=∅ で certain-type Dade 像の V-vanishing を確立。これが取れれば残り (NC/grid/整数抽出) は機械的。
+anchor が重い場合は先に sub-lemma 5 (整数性抽出, 純 abstract, certain-type 非依存) を landさせて momentum 維持。
+**正本=本 cont.⁴⁴。clean route 確定。次=anchor (sub-lemma 1) 形式化。**
