@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
@@ -433,6 +434,13 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
 saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
 Theorem 14.7 and Corollary 14.9.
 
+**Proof (2026-06-14):** PROVED, citing only Theorem 13.9 (`sigma_disjoint_of_nonconjugate`,
+currently `sorry` in §13 ⟹ auto-unconditional once Lane F lands it). The `M_σ^#` restriction
+turns out to be a *feature* here: if `g` is conjugate to both `t ∈ M_σ^#` and `s ∈ N_σ^#`, then
+`t` and `s` are conjugate, so `orderOf t = orderOf s`; a prime `p` dividing it lies in `σ(M)`
+(as `M_σ` is a `σ(M)`-group) and in `σ(N)`, contradicting `σ(M) ∩ σ(N) = ∅`. No `R(x)` / `M̃`
+machinery is needed — **13.9 alone suffices**.
+
 **Faithfulness note (2026-06-14):** the Lean surface uses `sigmaConjugacySaturation =
 𝒞_G(M_σ^#)` rather than BG's `𝒞_G(M̃)` (see `sigmaSharp`). Since `M_σ^# ⊆ M̃`, this is a
 **true but weaker** restriction of BG 14.5(b); it does **not** capture the `ℓ_σ = 2` twisted
@@ -443,7 +451,34 @@ theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
     (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
     (hnc : ¬ IsConjugateSubgroup M N) :
     Disjoint (sigmaConjugacySaturation M) (sigmaConjugacySaturation N) := by
-  sorry
+  -- Theorem 13.9: nonconjugate maximal subgroups have disjoint `σ`-sets.
+  have hσ : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma N) :=
+    sigma_disjoint_of_nonconjugate hG hM hN hnc
+  -- Every prime dividing the order of a nonidentity `M_σ`-element lies in `σ(M)`
+  -- (because `M_σ` is a `σ(M)`-group).
+  have bridge : ∀ (L : Subgroup G) (x : G), x ∈ OddOrder.BG.Ch3.S10.Msigma L →
+      ∀ p : ℕ, p.Prime → p ∣ orderOf x → p ∈ OddOrder.BG.Ch3.S10.sigma L := by
+    intro L x hxL p hp hpx
+    have hdvd : orderOf x ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma L) :=
+      (OddOrder.BG.Ch3.S10.Msigma L).orderOf_dvd_natCard hxL
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup L p
+      (Nat.mem_primeFactors.mpr ⟨hp, hpx.trans hdvd, Nat.card_pos.ne'⟩)
+  rw [Set.disjoint_left]
+  rintro g hgM hgN
+  simp only [sigmaConjugacySaturation, sigmaSharp, sharpSubgroup, mem_conjClassSet,
+    Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hgM hgN
+  obtain ⟨t, ⟨htM, ht1⟩, a, hat⟩ := hgM
+  obtain ⟨s, ⟨hsN, _hs1⟩, b, hbs⟩ := hgN
+  -- `t` is conjugate to `s` (both conjugate to `g`), hence has the same order.
+  have heq : a * t * a⁻¹ = b * s * b⁻¹ := hat.trans hbs.symm
+  have hconj : (a⁻¹ * b) * s * (a⁻¹ * b)⁻¹ = t := by
+    have h2 : (a⁻¹ * b) * s * (a⁻¹ * b)⁻¹ = a⁻¹ * (b * s * b⁻¹) * a := by group
+    rw [h2, ← heq]; group
+  have hsc : SemiconjBy (a⁻¹ * b) s t := mul_inv_eq_iff_eq_mul.mp hconj
+  have hts : orderOf t = orderOf s := (SemiconjBy.orderOf_eq (a⁻¹ * b) hsc).symm
+  -- A prime `p ∣ orderOf t` then lies in `σ(M) ∩ σ(N)`, contradicting Theorem 13.9.
+  obtain ⟨p, hp, hpt⟩ := Nat.exists_prime_and_dvd (fun h => ht1 (orderOf_eq_one_iff.mp h))
+  exact Set.disjoint_left.mp hσ (bridge M t htM p hp hpt) (bridge N s hsN p hp (hts ▸ hpt))
 
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
 

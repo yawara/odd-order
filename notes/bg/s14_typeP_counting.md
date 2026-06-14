@@ -20,7 +20,7 @@
 | 14.2 Prop | Lem 12.1, **Cor 13.11**, **Thm 13.5**, **Lem 13.12**, **Lem 13.7**, **Lem 13.13**, **Lem 13.6**, Thm 10.1(a), Cor 12.16, **Lem 14.1**, Thm 3.10(a), Lem 12.19, Lem 12.17 | **gated** |
 | 14.3 Cor | **Prop 14.2(b)(c)**, Lem 14.1, Cor 12.10(e), Lem 12.11(a) | gated (14.2) |
 | 14.4 Thm | **Thm 13.9**, Thm 10.1(b), Prop 12.15, **Cor 14.3**, Cor 12.6 | gated (13.9, 14.3) |
-| 14.5 Lemma | **Thm 14.4**, **Thm 13.9** | gated (14.4) |
+| 14.5 Lemma | **Thm 14.4**, **Thm 13.9** | **Lean M_σ# 版は ✅ 13.9 cite で実証明 (2026-06-14)**; BG 全 (a)(c) は 14.4 gate |
 | 14.6 Lemma | Cor 14.3, Thm 14.4(c)(e), **Thm 13.9** | gated + **hard core** (missing-page 組合せ論) |
 | 14.7 Thm | Prop 14.2, **Thm 13.9**, Cor 14.3, Lem 14.5, **Lem 14.6**, counting 不等式 | gated + hard |
 | 14.9 Cor | Lem 14.5(b), Lem 14.6, Thm 14.7 | gated |
@@ -170,7 +170,21 @@ statement の修正は G に波及しない** (grep 確認済) — ただし**�
   **14.10** OK; **`zTilde`** = Ẑ = Z−(K∪K*) faithful (K⊔K*=K×K*=Z, coprime); 14.1 (done) faithful;
   型分類 API (isTypeP_iff_… 等) faithful。
 
-### 本セッションの修正 (commit) — docstring + 1 statement
+## 🔓 13.9 単独で解禁される §14 結果 (2026-06-14, Lane H)
+
+「13.9 (`sigma_disjoint_of_nonconjugate`) **だけ**が landing したら何ができるか」の精査:
+
+- **✅ Lemma 14.5 = `sigmaConjugacy_disjoint_of_nonconjugate` — 本セッションで実証明済** (13.9 cite)。
+  鍵: Lean の 14.5 は弱い **M_σ# 版** (`sigmaConjugacySaturation = 𝒞_G(M_σ#)`) ゆえ、M̃/R(x) 機構不要で
+  **σ(M)∩σ(N)=∅ (13.9) だけ**で出る。証明 = g が t∈M_σ#・s∈N_σ# 両方の共役なら t~s ⟹ orderOf 一致 ⟹
+  素因子 p∈σ(M)∩σ(N)=∅ 矛盾 (`Msigma_isPiGroup` で M_σ が σ-group, `SemiconjBy.orderOf_eq` で共役不変)。
+  S14 に `S13_PrimeActionTransition` import 追加 (13.9 は upstream PrimeAction でなく Transition 在)。
+  ⟹ F が 13.9 を埋めれば 14.5 は**自動 unconditional**。S14 genuine sorry **9 → 8**。
+- **それ以外は 13.9 単独では不可**: 14.2 は 13.11/13.12/13.13 (13.12 未記述) に直接依存; 14.3→14.13 は
+  全て **14.2 経由** (14.4 も Cor 14.3→14.2)。⟹ 13.9 の次は **13.11 + 13.12/13.13** が揃って初めて 14.2 解禁、
+  そこから funnel 全体が動く。**13.9 単独の戦果は 14.5 一本** (それでも genuine sorry を 1 減らし de-risk)。
+
+### 本セッションの修正 (commit) — docstring + 2 statement (1 除去 + 14.5 実証明)
 - 14.2: false conjunct 除去 (statement); 14.2/14.3/14.4/14.5/14.9/14.12 + `sigmaSharp` docstring を
   BG 逐 conjunct 照合の正確版に。leaf build green (3095 jobs, sorry 警告のみ)。
 - **gated ゆえ未修正 (要 §13 着地 + 設計判断)**: M̃/R(x) 形式化 (→14.5(a)(c)/14.7(e)/14.9 を M̃ で再定式)、
