@@ -2646,6 +2646,43 @@ theorem exists_maximal_over_normalizer_not_conj_of_le_E3 [Finite G] (hG : IsMini
   exact not_conj_of_mem_tau1_union_tau3_of_normalizer_le hG h.mem_maximal
     (Set.mem_union_right _ hq) hQM hQne hQq hNQM
 
+/-- **BG Theorem 13.10, M_α-interaction package** (GAP A endgame): if `P ∈ ℰ_p¹(E₁)` does not
+centralize `E₃`, then `C_{M_α}(P) ≠ 1` and `C_{M_α}(PQ) = 1` for the regular Sylow `q`-subgroup
+`Q ≤ E₃` of `M`. Applies Lemma 12.18 branch 2 (`Q ∈ Syl_q(M)` from the full-Sylow brick, `M* ∈
+ℳ(N_G(Q))` with `M* ≠ M` from the non-conjugacy brick), which outputs `M_α ≠ 1` and the two
+centralizer facts. This feeds (c) (`Malpha_le_Msigma`) and (a) (the non-prime argument). -/
+theorem malpha_centralizer_facts_of_not_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPE1 : P ≤ E₁) (hPnc : ¬ P ≤ Subgroup.centralizer (E₃ : Set G)) :
+    ∃ Q : Subgroup G, Q ≤ E₃ ∧ Q ≠ ⊥ ∧
+      S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
+      S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥ := by
+  classical
+  obtain ⟨q, hqprime, hqτ3, hpq, Q, hQq, hQE3, hQne, hCQ, hPNQ, hQsyl⟩ :=
+    exists_tau3_sylowM_regular_of_not_centralize hG h hP hPE1 hPnc
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
+  have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+  have hpτ1 : p ∈ tau1 M :=
+    h.E₁_hall.1 p (hc1 ▸ Nat.mem_primeFactors.mpr
+      ⟨Fact.out, hPcardp ▸ Subgroup.card_dvd_of_le hPE1, Nat.card_pos.ne'⟩)
+  have hPM : P ≤ M := hPE1.trans (h.E₁_le.trans h.E_le)
+  have hQM : Q ≤ M := hQE3.trans (h.E₃_le.trans h.E_le)
+  obtain ⟨Mstar, hMstarMax, hNQ, hnc⟩ :=
+    exists_maximal_over_normalizer_not_conj_of_le_E3 hG h hqτ3 hQE3 hQne hQq
+  have hMMstar : M ≠ Mstar := fun heq => hnc ⟨1, by rw [heq, map_one, one_smul]⟩
+  have hMNQ : maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) ≠ {M} := by
+    intro hsingle
+    have hMstar_mem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstarMax, hNQ⟩
+    rw [hsingle, Set.mem_singleton_iff] at hMstar_mem
+    exact hMMstar hMstar_mem.symm
+  obtain ⟨_, _, _, hCMαP, hCMαPQ⟩ :=
+    (tau1_Malpha_interaction hG h.mem_maximal hpq hpτ1 hP hPM hQM hQne hQq hPNQ hCQ hMNQ).2 hQsyl
+  exact ⟨Q, hQE3, hQne, hCMαP, hCMαPQ⟩
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
