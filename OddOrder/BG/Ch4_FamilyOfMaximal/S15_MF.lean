@@ -92,6 +92,29 @@ theorem maxNilpotentNormalHall_subgroupOf_normal (M : Subgroup G) :
   (Subgroup.normal_subgroupOf_iff_le_normalizer (maxNilpotentNormalHall_le M)).mpr
     (maxNilpotentNormalHall_le_normalizer M)
 
+/-- **`M_F` is nilpotent** — the §15 well-definedness piece that the defining `sSup` is again
+nilpotent.  Each candidate `N` is nilpotent and normal in `M`, so `N.subgroupOf M ≤ F(↥M)` (the
+Fitting subgroup of `M`); hence `M_F ≤ F(↥M)` embedded in `G` via `M.subtype`, which is nilpotent.
+`§14`-independent, using the repo Fitting API (`OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting`
+/ `fitting.isNilpotent`). -/
+theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
+    Group.IsNilpotent ↥(maxNilpotentNormalHall M) := by
+  have hle : maxNilpotentNormalHall M ≤ (OddOrder.Isaacs.Ch01.fitting (↥M)).map M.subtype := by
+    refine sSup_le fun N hN => ?_
+    obtain ⟨hNM, hNnorm, hNnil, -⟩ := hN
+    haveI := hNnorm
+    haveI := hNnil
+    calc N = (N.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hNM).symm
+      _ ≤ (OddOrder.Isaacs.Ch01.fitting (↥M)).map M.subtype :=
+          Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M)) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting (↥M)).map M.subtype) :=
+    nilpotent_of_mulEquiv
+      (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting (↥M)) M.subtype
+        M.subtype_injective)
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
