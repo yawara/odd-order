@@ -453,3 +453,52 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   - step g: `E_eq_sup_of_E3_centralizer` (5a, E=E₁⊔E₃) + E₁,E₃ が R 中心化 → R⊆C_G(E) →
     `subgroupE_basic` の C_G(E)⊓E₃=⊥ + R≠⊥ で False。
   これらを strict_config の `by` に組めば 13.7 完全完成。次イテレーションの標的。
+
+## 13.9 完成 + 13.10/13.11 計画 (2026-06-15, Lane F /loop)
+
+- **🎉 Thm 13.9 `sigma_disjoint_of_nonconjugate` COMPLETE** (commit `d3b2f891`, full build 緑 3813
+  jobs + AxiomsCheck OK)。非冪零 M_σ 枝を、共通 E-invariant Sylow S + p∈τ₁(M) (E₁≠1) + C_S(P)=1
+  (13.6 = `centralizer_sylow_inf_eq_bot`) + p∈τ₁(M*) (`mem_tau1_Mstar_of_einvariant_sylow`) →
+  `forbidden_config_impossible` (13.8) で矛盾。FT-critical: §14 を解放。
+
+### Thm 13.10 `E1_regular_on_E3_of_noncentralize` 証明マップ (mmd L3702-3730)
+仮説: ∃ P∈ℰ_p¹(E₁), P≤E₁, ¬(P≤C(E₃))。結論: (a) E₁ reg on E₃; (b) E₃ reg on M_σ;
+(c) ∀ そういう P, C_{M_σ}(P)≠1。
+1. **Brick 1 (gap-free, 次の標的)**: ¬(P≤C(E₃)) → ∃ q∈τ₃(M), Q = E-inv Sylow-q of E₃ (cyclic),
+   Q≠⊥, **Q⊓C(P)=⊥** (P regular on Q), P≤N(Q)。核 = coprime+cyclic-q indecomposable ⟹ C_Q(P)∈{1,Q}。
+   道具: `h.E3_isCyclic hG`; `le_centralizer` 対称性 (P≤C(E₃)⟺E₃≤C(P)); Sylow_q char in cyclic E₃
+   ⟹ P-inv; coprime 分解 `commutator_inf_centralizer_eq_bot_of_isCommutative`(S13_Cor132:271)
+   + `le_commutator_of_coprime_inf_centralizer_eq_bot`(S08:1424) + cyclic-q subgroup chain。
+   q∈τ₃: π(E₃)⊆τ₃ via `h.E₃_hall.1`。
+2. Q=[Q,P]⊆E' (Brick 1 の C_Q(P)=⊥ から coprime cover、ただし downstream で必須か要確認)。
+3. M*∈ℳ(N_G(Q)); M*≠M via `not_conj_of_mem_tau1_union_tau3_of_normalizer_le`(S12_ExcBridge:324)
+   ※ q∈τ₃ ⟹ q∉σ (`tau3_subset_sigma_compl`) なので **σ-case 12.2(b) は使えない**。τ₁∪τ₃ 版を使う。
+4. **12.18 `tau1_Malpha_interaction`** で C_{M_α}(P)≠1, C_{M_α}(P⊔Q)=⊥。⚠ **GAP A**: 12.18 の Lean 版は
+   2 分岐 — branch2 は「Q が M の Sylow-q」要求 (13.10 の Q は E₃ の小 Sylow ゆえ不可)、branch1 は
+   **`Malpha M≠⊥` ∧ q∉α(M) を入力に要求**。q∉α ✓(`alpha_subset_sigma`+q∉σ)。だが **`Malpha≠⊥`
+   が非自明**(α={r_p≥3} は空可、`Msigma_ne_bot` は standing だが `Malpha` は別)。教科書は無条件に
+   C_{M_α}(P)≠1 と言うので、Malpha=⊥ ケースの扱い (別ルート or 自動排除) が **reconstruction 必要**。
+5. (c): C_{M_α}(P)≠1 + `Malpha_le_Msigma` ⟹ C_{M_σ}(P)≠1。
+6. (a): 「E₁E₃ not prime on M_σ」(C_{M_α}(P)≠1 だが C_{M_α}(PQ)=1) → **13.7 `E1E3_actsPrime`
+   の対偶** (mt; `hE1` は P≠⊥ から E₁≠⊥)。⚠ **GAP B**: 「C_{M_σ}(P)≠1=C_{M_σ}(E₁E₃)? かつ
+   C_{M_σ}(PQ)…」で not-prime を出す論証の厳密形 (x=P-gen, y=Q-gen 可換 coprime ⟹ ⟨xy⟩=⟨x,y⟩) が要再構成。
+7. (b): 背理法 ¬(E₃ reg on M_σ)。E₃ prime on M_σ (`(cyclicSylow_actsPrime hG h).2`) ⟹
+   C_{M_σ}(E₃)≠1。q*∈π(C_{M_σ}(E₃)), Q* = E-inv Sylow-q* of C_{M_σ}(E₃)=C_{M_σ}(Q)
+   (Q⊆E₃,Q≠1 + prime)。Q centralizes M_σ∩M* (Cor 13.2(a) = `tau13_pSubgroup_centralizes .1`)
+   ⟹ Q* Sylow-q* of M_σ∩M*=M∩M*。**(13.5)+12.19 ⟹ q*∈β(M) ∨ Q* Sylow of M_σ** → Prop 10.14(d)
+   `normalizer_le_of_nontrivial_beta_subgroup` ⟹ N_G(Q*)⊆M。q*∈β: C_{Q*}(P)⊆C_{M_α}(PQ)=1;
+   q*∉β: C_{Q*}(P)=1 via 13.6 (ℳ(Q*)≠{M})。⟹ [M_σ∩M*,P]≠1 ⟹ 13.1(a) p∈τ₁(M*) ⟹
+   **13.8 `forbidden_config_impossible` で矛盾**。⚠ **GAP C**: 13.8 は Q,Q* 両方を M⊓M* の
+   **maximal q-/q*-subgroup** に要求 (`hQmax`/`hQstarmax`)。Q* は Sylow なので OK だが、もう一方
+   (N(·)≤M* 側) に何を入れるか (E₃-Q は maximal でない) が要再構成。13.9 同様 full σ-Sylow S を
+   別途建てる可能性大。「(13.5)」が Thm 13.5 か displayed eq かも要確認。
+
+**結論**: 13.10 は ~200+ 行のメジャー定理。GAP A/B/C は教科書 elision の reconstruction gap
+(自分の誤解でなく定義・12.18 条件性を検証済)。**ChatGPT 再構成 (自己完結プロンプト) が適切** —
+`notes/bg/s13_10_chatgpt_prompt.md` に作成。loop の autonomous 進行は **Brick 1 (gap-free)** を
+先に landing し、reconstruction 到着後に GAP A/B/C を埋める。
+
+### Cor 13.11 `E3_not_regular_consequences` (mmd L3732-3741, 13.10 依存)
+(a)E₁≠1,(b)E=E₁⊔E₃: Cor 12.6(d) τ₂ empty + Lemma 12.1。(d): 13.10(b) 対偶で ∀P∈ℰ_p¹(E₁) が
+E₃ 中心化 (¬reg だから 13.10 の hP が偽) + E₃◁E + E₁,E₃ cyclic ⟹ ℰ¹(E) 正規。(c): E₁ ¬reg on E₃
+⟹ 13.7 で E prime on M_σ。**13.10 完成後に着手**。

@@ -2326,6 +2326,95 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
     hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
 
+/-- **BG Theorem 13.10, structural brick** (gap-free): if `P ∈ ℰ_p¹(E₁)` does not centralize the
+cyclic Hall subgroup `E₃`, then there is a prime `q ∈ τ₃(M)` and a nontrivial `q`-subgroup
+`Q ≤ E₃` on which `P` acts regularly (`Q ⊓ C_G(P) = ⊥`), with `P ≤ N_G(Q)`.
+
+`Q` is an order-`q` subgroup of the commutator `K = ⁅E₃, P⁆ ≤ E₃`, which is nontrivial (else `P`
+would centralize `E₃`) and satisfies `K ⊓ C_G(P) = ⊥` by coprime action on the abelian `E₃`
+(`commutator_inf_centralizer_eq_bot_of_isCommutative`); `q := (Nat.card K).minFac`, and
+`P ≤ N_G(Q)` holds for every `Q ≤ E₃` because `E₃` is cyclic (`E_le_normalizer_of_le_E3`). -/
+theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPE1 : P ≤ E₁) (hPnc : ¬ P ≤ Subgroup.centralizer (E₃ : Set G)) :
+    ∃ q : ℕ, q.Prime ∧ q ∈ tau3 M ∧ ∃ Q : Subgroup G,
+      IsPGroup q ↥Q ∧ Q ≤ E₃ ∧ Q ≠ ⊥ ∧
+      Q ⊓ Subgroup.centralizer (P : Set G) = ⊥ ∧
+      P ≤ Subgroup.normalizer (Q : Set G) := by
+  classical
+  haveI hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
+  -- `P ≤ N_G(E₃)`.
+  have hPN3 : P ≤ Subgroup.normalizer (E₃ : Set G) :=
+    hPE1.trans (h.E₁_le.trans (h.E3_normal hG))
+  have hPE : P ≤ E := hPE1.trans h.E₁_le
+  -- `p ∈ τ₁(M)`.
+  have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+  have hpdvdE1 : p ∣ Nat.card ↥E₁ := hPcardp ▸ Subgroup.card_dvd_of_le hPE1
+  have hpτ1 : p ∈ tau1 M :=
+    h.E₁_hall.1 p (hc1 ▸ Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdE1, Nat.card_pos.ne'⟩)
+  -- `p ∤ |E₃|`: else `p ∈ τ₃(M)`, contradicting `p ∈ τ₁(M)`.
+  have hc3 : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+  have hpndvd : ¬ p ∣ Nat.card ↥E₃ := fun hpd =>
+    not_mem_tau3_of_mem_tau1 hpτ1
+      (h.E₃_hall.1 p (hc3 ▸ Nat.mem_primeFactors.mpr ⟨Fact.out, hpd, Nat.card_pos.ne'⟩))
+  have hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥E₃) := by
+    rw [hPcardp]; exact (Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpndvd
+  -- `E₃` abelian.
+  have hE3ab : ∀ a ∈ E₃, ∀ b ∈ E₃, a * b = b * a := by
+    letI : CommGroup ↥E₃ := IsCyclic.commGroup
+    intro a ha b hb
+    exact Subtype.ext_iff.mp (mul_comm (⟨a, ha⟩ : ↥E₃) (⟨b, hb⟩ : ↥E₃))
+  -- `K = ⁅E₃, P⁆`: regular under `P`, nontrivial, `≤ E₃`.
+  have hKinfC : ⁅E₃, P⁆ ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
+    commutator_inf_centralizer_eq_bot_of_isCommutative hE3ab hPN3 hcop
+  have hKne : ⁅E₃, P⁆ ≠ ⊥ := fun hb =>
+    hPnc (Subgroup.le_centralizer_iff.mpr (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hb))
+  have hKE3 : ⁅E₃, P⁆ ≤ E₃ := by
+    rw [Subgroup.commutator_le]
+    intro a ha b hb
+    have hbN : b ∈ Subgroup.normalizer (E₃ : Set G) := hPN3 hb
+    have hconj : b * a⁻¹ * b⁻¹ ∈ E₃ := by
+      have := (Subgroup.mem_normalizer_iff.mp hbN a⁻¹).mp (E₃.inv_mem ha)
+      simpa using this
+    rw [commutatorElement_def]
+    have hreg : a * b * a⁻¹ * b⁻¹ = a * (b * a⁻¹ * b⁻¹) := by group
+    rw [hreg]
+    exact E₃.mul_mem ha hconj
+  -- pick a prime `q ∣ |K|` and an order-`q` subgroup `Q` of `K`.
+  have hn1 : 1 < Nat.card ↥(⁅E₃, P⁆) :=
+    Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot _).mpr hKne)
+  set q := (Nat.card ↥(⁅E₃, P⁆)).minFac with hq
+  have hqprime : q.Prime := Nat.minFac_prime (by omega)
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  have hqdvd : q ∣ Nat.card ↥(⁅E₃, P⁆) := Nat.minFac_dvd _
+  obtain ⟨Q₀, hQ₀card⟩ :=
+    Sylow.exists_subgroup_card_pow_prime (G := ↥(⁅E₃, P⁆)) q (n := 1) (by rwa [pow_one])
+  refine ⟨q, hqprime, ?_, Q₀.map (⁅E₃, P⁆).subtype, ?_, ?_, ?_, ?_, ?_⟩
+  · -- `q ∈ τ₃(M)`.
+    have hqE3 : q ∣ Nat.card ↥E₃ := hqdvd.trans (Subgroup.card_dvd_of_le hKE3)
+    exact h.E₃_hall.1 q (hc3 ▸ Nat.mem_primeFactors.mpr ⟨hqprime, hqE3, Nat.card_pos.ne'⟩)
+  · -- `IsPGroup q Q` (order `q`).
+    have hQcard : Nat.card ↥(Q₀.map (⁅E₃, P⁆).subtype) = q := by
+      rw [Subgroup.card_map_of_injective (⁅E₃, P⁆).subtype_injective, hQ₀card, pow_one]
+    exact IsPGroup.of_card (by rw [hQcard, pow_one])
+  · -- `Q ≤ E₃`.
+    exact (Subgroup.map_subtype_le _).trans hKE3
+  · -- `Q ≠ ⊥`.
+    have hQcard : Nat.card ↥(Q₀.map (⁅E₃, P⁆).subtype) = q := by
+      rw [Subgroup.card_map_of_injective (⁅E₃, P⁆).subtype_injective, hQ₀card, pow_one]
+    intro hb
+    rw [hb, Subgroup.card_bot] at hQcard
+    exact hqprime.one_lt.ne' hQcard.symm
+  · -- `Q ⊓ C_G(P) = ⊥`.
+    rw [← le_bot_iff, ← hKinfC]
+    exact le_inf (inf_le_left.trans (Subgroup.map_subtype_le _)) inf_le_right
+  · -- `P ≤ N_G(Q)`.
+    exact hPE.trans (E_le_normalizer_of_le_E3 hG h ((Subgroup.map_subtype_le _).trans hKE3))
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
