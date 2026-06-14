@@ -168,11 +168,15 @@ noncomputable def centralizerGeneratedBySigma (M U : Subgroup G) : Subgroup G :=
 
 /-! ## Lemma 15.1: the `U M_sigma` auxiliary structure -/
 
-/-- **BG Lemma 15.1** (mmd L4093): auxiliary structure around the `U`-factor in a
-type-P maximal subgroup.  The quotient assertion `M'/M_sigma` abelian is encoded
-as `M'' <= M_sigma`, avoiding premature quotient API commitments. -/
+/-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
+**arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
+encoded as `M'' <= M_sigma`, avoiding premature quotient API commitments.
+
+Faithfulness fix (Lane G): the previous scaffold added a spurious `IsTypeP M` hypothesis;
+mmd Lemma 15.1 holds for every `M ∈ ℳ` (the `K ≠ 1` clauses are guarded inline), and the
+general form is what Theorem A(2) and Theorem B cite. -/
 theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -254,17 +258,30 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
       H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
   sorry
 
-/-- **BG Corollary 15.5** (mmd L4168): decomposition of `F(M)` when the relevant
-Hall subgroup `H` is fixed.  The direct-product claim is represented by the
-commuting/trivial-intersection package. -/
+/-- **BG Corollary 15.5** (mmd L4225): the decomposition `F(M) = F(M_σ) × Y` with
+`Y = O_{σ(M)'}(F(M))` a cyclic `τ₂(M)`-subgroup, together with `F(M) = C_M(M_F)·M_F`,
+`M'' ⊆ F(M)`, `M_F ⊆ M'`, and `K ≠ 1 → F(M) ⊆ M'`.  Direct products are encoded by the
+commuting/trivial-intersection package.
+
+Faithfulness fix (Lane G): the previous scaffold parametrized an arbitrary `H ≤ M_F` (mmd
+fixes `H = M_F`) and used `M_F(M_σ)` where the textbook has the Fitting subgroup `F(M_σ)`
+(`fittingInAmbient (Msigma M)`); the dropped conjuncts (a)/(b)/(d) are restored.  The `M'/M_F`
+nilpotent clause of (c) is still deferred (quotient API). -/
 theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ≤ MF M) :
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ Y : Subgroup G,
-      IsCyclic ↥Y ∧ Y ≤ fittingInAmbient M ∧
-      fittingInAmbient M = (Subgroup.centralizer (H : Set G) ⊓ M) ⊔ H ∧
-      fittingInAmbient M = (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊔ Y ∧
-      (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊓ Y = ⊥ ∧
-      ⁅MF (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ := by
+      -- (a) `Y = O_{σ(M)'}(F(M))` is a cyclic `τ₂(M)`-subgroup of `F(M)`.
+      IsCyclic ↥Y ∧ (↑(Nat.card ↥Y).primeFactors ⊆ tau2 M) ∧ Y ≤ fittingInAmbient M ∧
+      -- (b) `M'' ⊆ F(M) = C_M(M_F)·M_F = F(M_σ) × Y`.
+      derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
+      fittingInAmbient M = (Subgroup.centralizer (MF M : Set G) ⊓ M) ⊔ MF M ∧
+      fittingInAmbient M = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊔ Y ∧
+      fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊓ Y = ⊥ ∧
+      ⁅fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ ∧
+      -- (c) `M_F ⊆ M'` (the `M'/M_F` nilpotent part is deferred — quotient API).
+      MF M ≤ derivedInG M ∧
+      -- (d) if `K ≠ 1` (i.e. `M` is not of type `F`), then `F(M) ⊆ M'`.
+      (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) := by
   sorry
 
 /-- **BG Corollary 15.6** (mmd L4174): for a type-P maximal subgroup, `Kstar` is
@@ -295,14 +312,17 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (S14.IsTypeF M ∨ S14.IsTypeP1 M))) := by
   sorry
 
-/-- **BG Theorem 15.8** (mmd L4221; Feit--Thompson 1991): in the §14.12 setup,
-nonempty `tau_2(H)` forces `tau_2(M)=empty` and makes `tau_2(N)` a singleton. -/
+/-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
+nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
+
+Faithfulness fix (Lane G): the previous scaffold had a spurious third maximal `N` and concluded
+`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H N K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
-    (hN : N ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    {M H K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hP2 : S14.IsTypeP2 M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hHtau : (tau2 H).Nonempty) :
-    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ tau2 N = {q} := by
+    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
 
 /-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer
