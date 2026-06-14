@@ -6,14 +6,14 @@
 > **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
 > 変化なし/全 abort 時は push しない)。
 
-## レーン (2026-06-12 再編成: B+F+G の 3 レーン体制)
+## レーン (2026-06-14: B+F+G+H、branch = lane-b/f/g/h、FT spine pipeline)
 
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
-| **B** | `b-peterfalvi` | Pf §6: (4.8) assembly → (4.9) → S08 case-B → (6.8) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `bg-s12` | BG §12 完結: 12.12 Case 3 → 12.13→12.16 → 12.4(a)系。完了で STOP (§14 は再判断) | Opus 4.8 (1M) | ✅ 対象 |
-| **G** | `bg-s13` | BG §13 Prime Action (13.1→13.10; §12 未証明分は S12_E scaffold statement 引用 = 新規 axiom なし) | Opus 4.8 (1M) | ✅ 対象 |
-| **H** | `pf-s10` | Pf §10–13 maximal-subgroup 構造 (§10 interface = BG A–E/I–II / §11–13 実指標論)。AUDIT-first | Opus 4.8 (1M) | ✅ 対象 |
+| **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | BG §13 endgame: Thm 13.9→13.10→Cor 13.11 (S13_PrimeActionTransition, 実 sorry 3, ready) | Opus 4.8 (1M) | ✅ 対象 |
+| **G** | `lane-g` | BG §15 M_F + §16 main results (S15_MF/S16_MainResults 各 9 sorry, §14 gate ゆえ §14非依存 faithful-prep) | Opus 4.8 (1M) | ✅ 対象 |
+| **H** | `lane-h` | BG §14 Type-P counting (S14_TypePCounting, 実 sorry 8, §13 gate; §13非依存 sigma_diagnostic/frobenius_type 先行) | Opus 4.8 (1M) | ✅ 対象 |
 
 **G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
 (2) G の §12 依存は sorry'd statement の引用で賄う — **新規 `axiom` 宣言が G から来たら従来どおり
