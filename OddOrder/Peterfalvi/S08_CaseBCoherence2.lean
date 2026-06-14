@@ -806,6 +806,21 @@ theorem per_constituent_Y_eq_smul {L : Subgroup G} [Fintype ↥L] [Invertible (N
     (by rw [hreal, hYinorm_re]; push_cast; ring) hYY
   rwa [Int.cast_natCast] at key
 
+/-- **Seam-1 orthogonality `⟨Dᵢ.X, Y⟩ = 0`** (Peterfalvi (6.8.2.3): "`R(χᵢ)` is orthogonal to
+`Y^{τ₁}` by (5.3) and (5.5)").  Since `Dᵢ.X ∈ ℤ[R(χᵢ)]`, orthogonality of `Y` to the image family
+`R(χᵢ)` (the `(5.3)/(5.5)` disjointness, supplied at the case-(B) instantiation — e.g. `Y = ε·ξ` for
+an irreducible `ξ ∉ R(χᵢ)` via `coherentYset_extension_eq_zsmul_irreducible`) propagates to `Dᵢ.X`
+(`inner_X_eq_zero_of_orthogonal_imageSet`), and conjugate symmetry flips the slot.
+
+This is the `hXorth` input of `per_constituent_Y_eq_smul`. -/
+theorem inner_X_Y_eq_zero_of_orthogonal {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) {Y : ClassFunction G ℂ}
+    (hY : ∀ α ∈ D.imageFamily.imageSet, ClassFunction.inner Y α = 0) :
+    ClassFunction.inner D.X Y = 0 := by
+  rw [OddOrder.RepresentationTheory.inner_conj_symm Y D.X,
+    D.inner_X_eq_zero_of_orthogonal_imageSet hY, star_zero]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
