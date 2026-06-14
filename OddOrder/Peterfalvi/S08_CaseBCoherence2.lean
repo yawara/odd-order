@@ -1316,14 +1316,46 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
     hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η₁.IsReal) hη₁
   exact inner_decomposition_X_coherentYset_extension_eq_zero hyp h46 hHK hη₁ hconj hne D himg
 
-/-- **(6.8.2) case-(B) `X`–`Y` mixed orthogonality for a column `μ_j` — the direct route.**  The
-`(4.9)` certain-type coherent extension of a column sum is `ν(μ_j) = δ_j ∑_i ω_{ij}^σ`
-(`certainTypeExtension_columnSum`), a `ℤ`-combination of `σ`-images; the seam-1 orthogonality
-`⟨η^{τ₁}, ω_{ij}^σ⟩ = 0` (`inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`, with the
-textbook anchor `η' = η̄`) therefore gives `⟨ν(μ_j), η^{τ₁}⟩ = 0` directly — **bypassing the full
-(6.8.2.3) per-constituent pinning** for the column-`Y` mixed-inner input `hmixed` of
-`coherentXunionYset_caseB_of_glued`.  (The certain-type `X`-coherence `cX` extends `μ_j` by exactly
-this `certainTypeExtension`, so this is the `hmixed` value for `x = μ_j`, `y ∈ Y`.) -/
+/-- **(6.8.2) case-(B) `X`–`Y` / `X`–`X_irr` mixed orthogonality for a column `μ_j`, generic form.**
+The `(4.9)` certain-type coherent extension of a column sum is `ν(μ_j) = δ_j ∑_i ω_{ij}^σ`
+(`certainTypeExtension_columnSum`), a `ℤ`-combination of `σ`-images; so for *any* coherence
+`cS : IsCoherent hyp.tau S₁ H^#` and irreducible member `χ ∈ S₁` (with `χ̄ ∈ S₁`, `⟨χ, χ̄⟩ = 0`,
+`χ − χ̄` `H^#`-supported), the generic seam-1 `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`
+gives `⟨ν(μ_j), cS.extension χ⟩ = 0` directly.  This is the **mixed-inner input** of the case-(B)
+`X`-coherence glue, uniformly for `χ ∈ Y` (column–`Y`) *and* an irreducible `χ ∈ X` (column–irreducible).
+**No per-constituent pinning needed.** -/
+theorem inner_certainTypeExtension_columnSum_coherent_extension_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (cS : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ S₁) (hχconj : χ.conj ∈ S₁)
+    (hχirr : IsIrreducibleCharacter χ)
+    (hee : ClassFunction.inner χ χ.conj = 0)
+    (hsupp : (χ - χ.conj).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.certainTypeExtension h46
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
+      (cS.extension χ) = 0 := by
+  have hsum : ClassFunction.inner
+      (∑ i, OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i) (cS.extension χ) = 0 := by
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero (fun i _ => ?_)
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      inner_coherent_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK cS hχ hχconj hχirr
+        hχirr.conj hee hsupp χ₂ i, star_zero]
+  rw [OddOrder.Peterfalvi.S06.certainTypeExtension_columnSum, ← Int.cast_smul_eq_zsmul ℂ,
+    ClassFunction.inner_smul_left, hsum, mul_zero]
+
+/-- **(6.8.2) case-(B) column–`Y` mixed orthogonality** (`Y`-specialization of
+`inner_certainTypeExtension_columnSum_coherent_extension_eq_zero`).  `⟨ν(μ_j), η^{τ₁}⟩ = 0` for
+`η ∈ Y`: the conjugate `η̄ ∈ Y` (`Yset_closedUnderConjugate`), `⟨η, η̄⟩ = 0` and `η − η̄` is
+`H^#`-supported (equal degree).  The column-`Y` `hmixed` input of `coherentXunionYset_caseB_of_glued`. -/
 theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
@@ -1336,19 +1368,19 @@ theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
     ClassFunction.inner (OddOrder.Peterfalvi.S06.certainTypeExtension h46
         (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
       (hyp.coherentYset.extension η) = 0 := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
   have hconj : η.conj ∈ hyp.Yset := hyp.Yset_closedUnderConjugate hη
   have hne : η ≠ η.conj := fun heq =>
     hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η.IsReal) hη
-  have hsum : ClassFunction.inner
-      (∑ i, OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i)
-      (hyp.coherentYset.extension η) = 0 := by
-    rw [inner_sum_left]
-    refine Finset.sum_eq_zero (fun i _ => ?_)
-    rw [OddOrder.RepresentationTheory.inner_conj_symm,
-      inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hconj hne χ₂ i,
-      star_zero]
-  rw [OddOrder.Peterfalvi.S06.certainTypeExtension_columnSum, ← Int.cast_smul_eq_zsmul ℂ,
-    ClassFunction.inner_smul_left, hsum, mul_zero]
+  have hee : ClassFunction.inner η η.conj = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η.conj, hηirr.conj⟩ : IrreducibleCharacter ↥L)
+    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    simpa using h
+  exact inner_certainTypeExtension_columnSum_coherent_extension_eq_zero hyp h46 hHK
+    hyp.coherentYset hη hconj hηirr hee
+    (hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hconj)
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hconj).symm)) χ₂
 
 /-- **(6.8.2.3) per-constituent pinning, certain-type form: `Dᵢ.Y = aᵢ·η₁^{τ₁}`.**  The certain-type
 specialization of `per_constituent_Y_eq_smul`: for a family of `(5.4)` decompositions
