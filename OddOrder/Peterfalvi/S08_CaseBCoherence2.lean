@@ -528,6 +528,36 @@ theorem inner_self_induce_eq_sum_mul_star {M : Type*} [Group M] [Fintype M]
     rw [irreducibleCharacter_inner_eq_ite, if_neg (Ne.symm hne), mul_zero]
   · intro h; exact absurd (Finset.mem_univ θ) h
 
+/-- **(6.8.2.3) aggregate: `∑ aᵢ² = |M : N|`** for a central `N ≤ Z(M)` and an irreducible (linear)
+`φ ∈ Irr N`.  The squared constituent multiplicities `aθ = ⟨φ, Res_N θ⟩` sum to the index:
+`∑_θ aθ² = ∑_θ aθ·\overline{aθ}` (the `aθ` are integer multiplicities, `inner_mem_ZIrr_int`, hence
+real) `= ‖Ind^M_N φ‖²` (`inner_self_induce_eq_sum_mul_star`) `= |M : N|`
+(`inner_induce_self_eq_index_of_le_center`).  This is the `∑ aᵢ² = |H : Z|` term of the
+Peterfalvi (6.8.2.3) `αᵢ = χᵢ − aᵢη₁` aggregate. -/
+theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    (hN : N ≤ Subgroup.center M) {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∑ θ : IrreducibleCharacter M,
+        ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+          * ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+      = (N.index : ℂ) := by
+  have hreal : ∀ θ : IrreducibleCharacter M,
+      ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+        = star (ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))) := by
+    intro θ
+    obtain ⟨m, hm⟩ :=
+      ClassFunction.inner_mem_ZIrr_int hφ.mem_ZIrr (ClassFunction.restrict_mem_ZIrr N θ.2.mem_ZIrr)
+    rw [hm, star_intCast]
+  rw [show (∑ θ : IrreducibleCharacter M,
+        ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+          * ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ)))
+        = ∑ θ : IrreducibleCharacter M,
+          ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+            * star (ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ)))
+      from Finset.sum_congr rfl (fun θ _ => by rw [← hreal θ]),
+    ← inner_self_induce_eq_sum_mul_star]
+  exact inner_induce_self_eq_index_of_le_center hN hφ
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
