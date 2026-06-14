@@ -502,3 +502,33 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
 (a)E₁≠1,(b)E=E₁⊔E₃: Cor 12.6(d) τ₂ empty + Lemma 12.1。(d): 13.10(b) 対偶で ∀P∈ℰ_p¹(E₁) が
 E₃ 中心化 (¬reg だから 13.10 の hP が偽) + E₃◁E + E₁,E₃ cyclic ⟹ ℰ¹(E) 正規。(c): E₁ ¬reg on E₃
 ⟹ 13.7 で E prime on M_σ。**13.10 完成後に着手**。
+
+## 2026-06-15 milestone: §13 spine 13.7–13.11 全 COMPLETE + ファイル4分割 + 13.12/13.13 statement landing
+
+**Cor 13.11 `E3_not_regular_consequences` COMPLETE** (commit `ed38019a`, sorry-free + axiom-clean,
+`#print axioms` = propext/Classical.choice/Quot.sound のみ)。(a)(b)(c) は既述の通り。
+**(d) は ChatGPT 不要で自力解決**（上の「ChatGPT 適切」は (d) には誤り — 私の "research gap"
+誤判定だった。実態: 素数位数部分群は E₁-作用の kernel に強制され normal）。statement は BG の
+`ℰ¹(E)` に忠実に **prime q に制限**（downstream consumer 無し → 安全）。
+- **τ₃** (q∣|E₃|): `le_of_le_sup_of_coprime_card` で X≤E₃ → cyclic E₃◁E で characteristic
+  (`E_le_normalizer_of_le_E3`)。
+- **τ₁** (q∣|E₁|): P₀ = cyclic E₁ の位数 q 部分群が E₃ 中心化 (hAllCent=13.10 対偶)。cyclic 商
+  E/E₃ で X と P₀ の像が一致（位数 q 部分群の一意性 = helper `eq_of_card_eq_prime_of_isCyclic`）
+  ⟹ X⊔E₃ = P₀⊔E₃ =: D。D cyclic (P₀×E₃ = 可換 coprime cyclic, `noncommCoprod` 内部直積)。
+  E normalizes D ⟹ X (cyclic D で char) を E が normalize。
+  - 新 helper（leaf 冒頭）: `eq_of_card_eq_prime_of_isCyclic` / `eq_of_card_eq_prime_of_le_isCyclic`
+    (有限 cyclic 群の位数素数部分群は一意)。新 import: `Mathlib.GroupTheory.NoncommCoprod`。
+
+**ファイル4分割** (commit `893a24e4`, 3209 行 → active leaf 136 行): frozen クラスタを上流へ
+prefix-split — `S13_Lemma137` (642, Lem 13.7+prime-action helpers) / `S13_Lemma138` (1471,
+Lem 13.8) / `S13_Theorem1310` (1041, Thm 13.9 σ-disjoint + 13.10 E₁ regular) / leaf
+`S13_PrimeActionTransition` (Cor 13.11 + frontier 13.12/13.13 + Brick1 helpers, hub)。
+chain: S13_PrimeAction ← 137 ← 138 ← 1310 ← leaf。importer (S14, AxiomsCheck) は leaf 経由で全 re-export。
+
+**Lemma 13.12 / 13.13 statement landed** (commit `f9bc04fd`, proof=sorry, issue 2006):
+`Msigma_centralizer_eq_bot_of_tau1_tau2` / `mem_sigma_of_tau1_tau3_centralize`。H (lane-h §14) が
+Prop 14.2 を assemble するための unblock。draft=H (BG 原文照合), proof=F。
+
+**次 (frontier)**: **Lemma 13.12 proof** (BG L3747: 13.4 + Cor 12.6 + Lem 12.11 + Thm 12.5(e) +
+Lem 13.6) → **Lemma 13.13 proof** (BG L3767: Lem 12.2 + 13.9 + Cor 12.6/12.9(c)/12.10(c) + 13.6
++ Cor 13.11 + 13.12, 順序注意)。両者で §13 endgame 完了 → §14 funnel 完全 unblock。
