@@ -259,3 +259,26 @@ statement の修正は G に波及しない** (grep 確認済) — ただし**�
 1. **現状**: 13.9 landing の戦果 (14.5 green) を回収済。これ以上の §14 proof は 13.11+13.12+13.13 待ち。
 2. 13.12/13.13 landing 後: 上記マップ通り 14.2 assemble → 14.3 (faithful 化済) → 14.4 → … funnel 駆動。
 3. ⚠ 13.12/13.13 は **F 領域** (H は cite のみ)。long-pole 認識を hub/ユーザーに共有 (本セッション)。
+
+## 🧩 §14 signature interface 完成 (2026-06-15, Lane H) — Lane G の §15/§16 unblock 用
+
+ユーザー指示: G が §15/§16 を §14 に対して書けるよう、H の §14 **signature を先に完成** (proof は sorry のまま)。
+BG §14 全結果 (14.1–14.13) と S14 surface を照合し、**欠けていた signature を補完**。full build green (3816 jobs)。
+
+### 追加した signature (faithful, sorry, §14-statable = R(x) 不要)
+- **Cor 14.8 `typeP1_conjugate_and_typeP_twoClasses`** (mmd L4065): 𝓜_{P₁} は全共役 + 𝓜_𝓟 非空なら丁度
+  2 共役類。型分類 (§16 Prop 16.1 / Thm I,II) が要する。Thm 14.7(f)(g) から従う (gated)。
+- **Lem 14.11 `exists_maximal_of_typeF_notMem_fitting`** (mmd L4086): M∈𝓜_F, E=M_σ complement, q∈π(E),
+  Q∈ℰ_q¹(E), Q⊄F(E) ⟹ ∃M* [(q∈τ₂(M*) ∧ 𝓜(C_G(Q))={M*}) ∨ (q∈κ(M*) ∧ M*∈𝓜_{P₁})]。Cor 14.12 が使う。
+  `F(E)` = `OddOrder.BG.Ch2.S08.fittingInG E` (Fitting を G 内 Subgroup で取る版; 再利用メモ)。
+
+### §14 に**追加しなかった** = §16 (Lane G) 領域 (R(x)/M̃ gated)
+- **Lem 14.6 `各 g∈G^# は 2 条件の exactly one`** (mmd L3945): 条件(1)が `g=xx', x'∈R(x)` で **R(x) 必須**
+  ⟹ 14.9 と同じく §14 では循環不可、faithful 版は §16 `tildeM` に対して書く。**issue 2005 に 14.6 も追記**。
+- 14.5(c) (count `|𝒞_G(M̃)|=(|M_σ|−1)|G:M|`) も R(x) 要 ⟹ §16 (Thm E が cite)。
+
+### §14 signature interface の現状 (G が cite 可能な surface)
+14.1✅(proved) / 14.2✅ / 14.3✅(faithful) / 14.4✅(faithful) / 14.5✅(b, proved) / **14.6→§16** /
+14.7✅ / **14.8✅(new)** / 14.9✅(surface; faithful版→§16) / 14.10✅ / **14.11✅(new)** / 14.12✅(faithful) / 14.13✅。
+⟹ **§16 が直接 cite する 14.2/14.4/14.5/14.7/14.9/14.12 は全て present**、加えて型分類用 14.8 も present。
+G は §14 を sorried cite して §15/§16 を unblock 可能 (§14 proof landing で自動 unconditional 化)。
