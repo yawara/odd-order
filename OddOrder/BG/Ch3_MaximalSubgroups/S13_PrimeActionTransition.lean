@@ -2750,6 +2750,28 @@ theorem not_actsPrime_Msigma_of_malpha_facts [Finite G] (hG : IsMinimalSimpleOdd
   rw [heq] at haX
   exact haNY haX
 
+/-- **BG Theorem 13.10, GAP C helper**: if `E₃` acts in a prime manner on `M_σ` (Cor 13.3(b)),
+then `C_{M_σ}(E₃) = C_{M_σ}(Q)` for every nontrivial `Q ≤ E₃`. (`⊆`: pick `g ∈ Q#`; then
+`C_{M_σ}(Q) ≤ C_{M_σ}(g) = C_{M_σ}(E₃)` by prime action. `⊇`: centralizer antitone.) -/
+theorem centralizer_Msigma_eq_of_le_E3_of_actsPrime [Finite G]
+    {M E E₁ E₂ E₃ : Subgroup G} (hprime : ActsPrimeOn (S10.Msigma M) E₃)
+    {Q : Subgroup G} (hQE3 : Q ≤ E₃) (hQne : Q ≠ ⊥) :
+    S10.Msigma M ⊓ Subgroup.centralizer (E₃ : Set G) =
+      S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) := by
+  apply le_antisymm
+  · exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hQE3))
+  · obtain ⟨⟨g, hgQ⟩, hgne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hQne
+    have hg1 : g ≠ 1 := fun hc => hgne (Subtype.ext (by simpa using hc))
+    have hpr := hprime g (hQE3 hgQ) hg1
+    rw [fixedByElement_def, fixedBy_def] at hpr
+    intro a ha
+    obtain ⟨haMσ, haCQ⟩ := Subgroup.mem_inf.mp ha
+    have haCg : a ∈ S10.Msigma M ⊓ Subgroup.centralizer ({g} : Set G) :=
+      Subgroup.mem_inf.mpr ⟨haMσ,
+        Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hgQ) haCQ⟩
+    rw [hpr] at haCg
+    exact haCg
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
