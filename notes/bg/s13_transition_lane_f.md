@@ -186,6 +186,28 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   - **Thm 10.1(b) transitivity** = `IsUniquelyMaximal` (Y uniquely-maximal ⟹ ℳ(Y) 一意): Y=O_t(C_{M_β}(P)),
     Uniqueness Thm (rank) で Y∈𝒰 → M=M^g。MaximalSubgroup.lean の `.existsUnique` + eq 補題。
   - **F(H)/O_s** = `Ch01.fitting` / p-core (opi 系)。⚠ subtype transport (Hall in ↥C_G(P)) が最大の工数。
+- 2026-06-14 (Lane F, /loop 続き⁹): **🎉 13.8 GAP 2.8 collapse 補題 COMPLETE** (commit 65fd4216, full build 緑)。
+  `conj_eq_self_of_sigma_pSubgroup_normalizer_le`: t∈σ(M), Y 非自明 t-部分群 of M, N_G(Y)⊆M, Y≤M^g
+  ⟹ M^g=M。**Thm 10.1(b) = `S10.fusion_control_of_mem_sigma .2.1`** (transitivity; S12_Lemma1211:1087
+  の M*=M** 適用を mirror) + C_G(Y)⊆N_G(Y)⊆M で c∈M が M 固定。
+  ### GAP 2 r-existence 補題 構成計画 (次イテレーション、全 handle 確定)
+  目標: `∃ r, r∈β(M*) ∧ r ∣ |C_M(P)| ∧ r∉σ(M)`。step1 両側 (C_{M_β}(P)≠1, C_{M*_β}(P)≠1) を入力。
+  1. **C_G(P) 可解**: C_G(P)<⊤ (P≠1, simple) → `eq_top_or_exists_le_coatom` で coatom M'⊇C_G(P)
+     → `hG.solvable_of_mem_maximalSubgroups` + `solvable_of_solvable_injective`。
+  2. **Hall θ of C_G(P)**: `Ch03.hall_E_exists (G:=↥C) (beta M ∪ beta Mstar)` → H₀:Subgroup ↥C;
+     G へ `H₀.map C.subtype`。⚠ WLOG「H⊇C_{M_β}(P)」= Hall 共役 (`exists_conj...hallPiece` 系)。
+  3. **conj-into-Msigma** (要 standalone 抽出, `pRank_normalizer_le_one` Step1 を mirror, ~20行):
+     q-群 Y, q∈σ(M) ⟹ ∃g, conj g•Y ≤ M_σ。ingredients = `S10.mem_sigma_iff`/
+     `isSylow_sylowMap_of_mem_sigma`/`sigma_subgroup_le_Msigma_of_isHall`/`hYq.exists_le_sylow`/
+     `MulAction.exists_smul_eq`。X=O_s(H) (s∈β(M)⊆σ(M)) に適用 → X≤M^g。
+  4. **N_G(X)≤M^g, N_G(Y)≤M**: `S10.normalizer_le_of_nontrivial_beta_subgroup` (Prop 10.14d, 要
+     `IsPiSubgroup (beta ·) ·` = `isPiSubgroup_of_isPGroup_of_mem` [S12_ExceptionalBridge:129])。
+     β conj-invariance (`sigma_conj` 類推 or `beta_conj`) で s∈β(M^g)。
+  5. **collapse**: `conj_eq_self_of_sigma_pSubgroup_normalizer_le` (Y, t∈β(M)⊆σ(M), N_G(Y)⊆M,
+     Y≤M^g [←H≤M^g]) ⟹ M^g=M ⟹ H≤M ⟹ H≤C_M(P)。
+  6. **r 抽出**: C_{M*_β}(P)≠1 → ∃r∈β(M*), r∣|C_G(P)|; r∈θ ∧ H Hall θ ⟹ r∣|H|∣|C_M(P)|.
+     r∉σ(M): `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2` (α(M*)∩σ(M)=∅, β⊆α)。
+  ⚠ 最難 = WLOG s∈β(M) (M↔M* 対称化) + H⊇C_{M_β}(P) (Hall 共役) + subtype transport。2-3 iter 見込み。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
