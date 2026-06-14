@@ -721,6 +721,18 @@ theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
   exact hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
     hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
 
+/-- **(6.8.2) case-(B): `W₂` is central in `H`.**  In case (B), `W₂ ⊆ Z(↥L)`
+(`certainType_W2_le_center`), so its trace `W₂.subgroupOf H` lies in `Z(↥H)`: a `W₂`-element
+commutes with all of `↥L`, hence with `↥H`.  This is the [Is] 2.27 hypothesis `Z ≤ Z(G)` (with
+`G = ↥H`, `Z = W₂.subgroupOf H`) for the (6.8.2.3) central restriction `Res^H_{W₂} θ = a·φ`. -/
+theorem subgroupOf_le_center_of_le_center {W2 : Subgroup ↥L}
+    (hW2cen : W2 ≤ Subgroup.center ↥L) :
+    W2.subgroupOf H ≤ Subgroup.center ↥H := by
+  intro x hx
+  rw [Subgroup.mem_subgroupOf] at hx
+  rw [Subgroup.mem_center_iff]
+  exact fun h => Subtype.ext (Subgroup.mem_center_iff.mp (hW2cen hx) (h : ↥L))
+
 /-- **(6.8.2.3) entry point:** every `χ ∈ X(Z)` is induced from a nontrivial irreducible `θ` of `H`
 with `Z ⊄ Ker θ`.
 
@@ -739,5 +751,32 @@ theorem SibleyDadeHypothesis.mem_Xset_exists_inducing
   rw [hyp.S_eq] at hχS
   obtain ⟨θ, hθne, hθind⟩ := hχS
   exact ⟨θ, hθne, fun hker => hχnotZ (hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hker, hθind⟩), hθind⟩
+
+/-- **(6.8.2.3) step 2 ([Is] 2.27 central restriction):** for an irreducible `θ` of `H` whose kernel
+does not contain the central subgroup `Z = W₂.subgroupOf H`, the restriction `Res^H_Z θ` is `θ(1)` times
+a **nontrivial linear** character `φ` of `Z`.
+
+Direct application of `IsIrreducibleCharacter.exists_central_linear_restriction` (Schur central
+scalars).  `φ ≠ 1_Z` follows from `Z ⊄ Ker θ`: were `φ` trivial, `θ(z) = φ(z)·θ(1) = θ(1)` for every
+`z ∈ Z`, i.e. `Z ⊆ Ker θ`.  `φ` is kept over `↥(W₂.subgroupOf H)` here; the identification with a
+character of `↥W₂` (for the (6.8.2.2) `Ind_{W₂}` interface) is a localized transport at that seam. -/
+theorem certainType_central_restriction
+    (θ : IrreducibleCharacter ↥H) {W2 : Subgroup ↥L}
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hker : ¬ ((W2.subgroupOf H : Set ↥H) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ))) :
+    ∃ φ : ClassFunction ↥(W2.subgroupOf H) ℂ, IsIrreducibleCharacter φ ∧
+      φ ≠ trivialClassFunction ↥(W2.subgroupOf H) ∧ φ 1 = 1 ∧
+      ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)
+        = (θ : ClassFunction ↥H ℂ) 1 • φ := by
+  obtain ⟨φ, hφirr, hφ1, hres, hpt⟩ :=
+    θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
+  refine ⟨φ, hφirr, ?_, hφ1, hres⟩
+  intro htriv
+  refine hker (fun z hz => ?_)
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+  have hzval := hpt ⟨z, hz⟩
+  rw [htriv, trivialClassFunction_apply, one_mul] at hzval
+  exact hzval
 
 end OddOrder.Peterfalvi.S08
