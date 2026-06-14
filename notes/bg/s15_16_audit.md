@@ -261,6 +261,23 @@ mmd L4232 の Cor 15.6 証明は `K*⊆M''` に **Thm 14.7(h)** (M=KM', K∩M'=1
 要、§14 gate)。**conjunct 5 の §14非依存余地は無い** (F(M_σ)≠M_F ゆえ MF cyclic から F(M_σ) cyclic は
 従わない; 真に Cor 15.5 b/Thm 15.2 g の decomposition が要る)。
 
+### Cor 15.6 §14非依存 assembly skeleton landing (2026-06-15, `a33d4b6c`)
+
+`typeP_kstar_in_mf_of_inputs` (sorry-free): Cor 15.6 の 5 conjunct を **§14/§15 の事実を仮説に
+取って** 組み立てる skeleton。fragile sorried cite を持たない (robust)。仮説 = hKne/hcyc/hKsubMF/
+hcompl/hcop/hFcyc (各々 typeP_structure/typeP_duality/15.2/Lemma 15.1/Cor 15.5 由来)。非自明
+step = conjunct 4 (conjunct-4 engine) + conjunct 5 矛盾 (M''=1 engine)。conjunct 2 =
+`Subgroup.isCyclic_of_le`。**⟹ §14 着地後の Cor 15.6 (`typeP_kstar_in_mf`) は「各仮説を単一 cite
+で供給 + skeleton 適用」の clean assembly に縮約** (fragile な §14 cite は cascade 時に限定)。
+
+**Cor 15.6 cascade-readiness = MAX (§14非依存に可能な全 groundwork 完了)**:
+engine (conjunct 4) + skeleton (assembly) + Lemma 15.1 露出 (hcompl/hcop 供給) + 既存
+conjunct-5 engine。残る supply-side (U 構成, typeP_structure/duality destructure, 15.2 case-split,
+Cor 15.5 hFcyc) は §14/§15 gated ゆえ cascade 時 (§14 landing 後)。**他の §15/§16 endpoint は
+deeply gated で §14非依存 skeleton の限界効用低 (§16 は §15 経由で landing から遠い)。Lane G の
+§14非依存余地はこれで実質尽きた** ⟹ 次の substantive 進捗は §14 (Lane H, 10 sorry) / §13 (Lane F)
+landing 待ち。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
