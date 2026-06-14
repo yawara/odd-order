@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem1310
+import Mathlib.GroupTheory.NoncommCoprod
 
 /-!
 # BG §13 (cont.): Corollary 13.11 + Lemma 13.12/13.13（active leaf / hub）
@@ -71,7 +72,7 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE3 : E₃ ≠ ⊥)
     (hreg : ¬ ActsRegularlyOn (S10.Msigma M) E₃) :
     E₁ ≠ ⊥ ∧ E = E₁ ⊔ E₃ ∧ ActsPrimeOn (S10.Msigma M) E ∧
-    (∀ q : ℕ, ∀ X : Subgroup G, X ∈ elemAbelianOfRank G q 1 → X ≤ E →
+    (∀ q : ℕ, q.Prime → ∀ X : Subgroup G, X ∈ elemAbelianOfRank G q 1 → X ≤ E →
       E ≤ Subgroup.normalizer (X : Set G)) := by
   classical
   have hE3prime : ActsPrimeOn (S10.Msigma M) E₃ := (cyclicSylow_actsPrime hG h).2
@@ -129,8 +130,166 @@ theorem E3_not_regular_consequences [Finite G] (hG : IsMinimalSimpleOdd G)
   -- (c) `E` acts in a prime manner on `M_σ`.
   have hEprime : ActsPrimeOn (S10.Msigma M) E := hEsup ▸ E1E3_actsPrime hG h hE1ne hE1nreg
   refine ⟨hE1ne, hEsup, hEprime, ?_⟩
-  -- (d) every `X ∈ ℰ¹(E)` is normal in `E`. TODO (reconstruction gap — see notes).
-  sorry
+  -- (d) every prime-order `X ≤ E` is normal in `E`.
+  intro q hqp X hXmem hXE
+  haveI : Fact q.Prime := ⟨hqp⟩
+  have hXcard : Nat.card ↥X = q := by simpa using hXmem.2
+  have hEN3 : E ≤ Subgroup.normalizer ((E₃ : Subgroup G) : Set G) := h.E3_normal hG
+  -- `|E₁|`, `|E₃|` are coprime (`τ₁ ∩ τ₃ = ∅`).
+  have hcop13 : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₃) := by
+    rw [Nat.coprime_iff_gcd_eq_one]
+    by_contra hne
+    obtain ⟨r, hr, hrd⟩ := Nat.exists_prime_and_dvd hne
+    exact not_mem_tau3_of_mem_tau1
+      (h.isPiGroup_tau1 r (Nat.mem_primeFactors.mpr
+        ⟨hr, hrd.trans (Nat.gcd_dvd_left _ _), Nat.card_pos.ne'⟩))
+      (h.isPiGroup_tau3 r (Nat.mem_primeFactors.mpr
+        ⟨hr, hrd.trans (Nat.gcd_dvd_right _ _), Nat.card_pos.ne'⟩))
+  by_cases hqE3 : q ∣ Nat.card ↥E₃
+  · -- τ₃ case: `X ≤ E₃`, characteristic in the cyclic `E₃ ⊴ E`.
+    have hqnE1 : ¬ q ∣ Nat.card ↥E₁ := by
+      intro hd
+      exact hqp.ne_one (Nat.dvd_one.mp (hcop13 ▸ Nat.dvd_gcd hd hqE3))
+    have hcopXE1 : Nat.Coprime (Nat.card ↥X) (Nat.card ↥E₁) :=
+      hXcard ▸ (hqp.coprime_iff_not_dvd.mpr hqnE1)
+    have hXE3 : X ≤ E₃ :=
+      le_of_le_sup_of_coprime_card (h.E₁_le.trans hEN3)
+        (by rw [sup_comm, ← hEsup]; exact hXE) hcopXE1
+    exact E_le_normalizer_of_le_E3 hG h hXE3
+  · -- τ₁ case: `q ∣ |E₁|`; `X` equals the unique order-`q` subgroup of `E₁` modulo `E₃`.
+    haveI : IsCyclic ↥E₁ := h.E1_isCyclic hG
+    haveI : IsCyclic ↥E₃ := h.E3_isCyclic hG
+    have hE1NE3 : E₁ ≤ Subgroup.normalizer (E₃ : Set G) := h.E₁_le.trans (h.E3_normal hG)
+    -- `|E| = |E₁| * |E₃|`, so from `q ∣ |X| ∣ |E|` and `q ∤ |E₃|` we get `q ∣ |E₁|`.
+    have hcardE : Nat.card ↥E = Nat.card ↥E₁ * Nat.card ↥E₃ := by
+      rw [hEsup]
+      exact card_sup_eq_mul_of_le_normalizer_of_disjoint hE1NE3
+        (Subgroup.inf_eq_bot_of_coprime hcop13)
+    have hqE : q ∣ Nat.card ↥E := by
+      have := Subgroup.card_dvd_of_le hXE; rwa [hXcard] at this
+    have hqE1 : q ∣ Nat.card ↥E₁ := by
+      rw [hcardE] at hqE
+      exact (hqp.dvd_mul.mp hqE).resolve_right hqE3
+    -- Build `P₀ = ⟨g⟩` of order `q` inside `E₁`, centralizing `E₃` (Thm 13.10 contrapositive).
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' q hqE1
+    set P₀ : Subgroup G := Subgroup.zpowers (g : G) with hP₀def
+    have hP₀card : Nat.card ↥P₀ = q := by
+      rw [hP₀def, Nat.card_zpowers]
+      exact (orderOf_injective E₁.subtype E₁.subtype_injective g).trans hg
+    have hP₀E1 : P₀ ≤ E₁ := Subgroup.zpowers_le.mpr g.2
+    have hP₀mem : P₀ ∈ elemAbelianOfRank G q 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hP₀card, by rw [hP₀card, pow_one]⟩
+    have hP₀cent : P₀ ≤ Subgroup.centralizer (E₃ : Set G) := hAllCent q hqp P₀ hP₀mem hP₀E1
+    have hP₀E : P₀ ≤ E := hP₀E1.trans h.E₁_le
+    -- `E` normalizes `P₀`: `E₁` does (char in cyclic `E₁`), and `E₃` does (centralizes it).
+    have hE1NP₀ : E₁ ≤ Subgroup.normalizer (P₀ : Set G) := by
+      haveI : (P₀.subgroupOf E₁).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+      intro e he
+      have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := E₁)
+        (C := P₀.subgroupOf E₁) (Subgroup.le_normalizer he)
+      rwa [Subgroup.map_subgroupOf_eq_of_le hP₀E1] at hmem
+    have hE3NP₀ : E₃ ≤ Subgroup.normalizer (P₀ : Set G) := by
+      have hE3cP₀ : E₃ ≤ Subgroup.centralizer (P₀ : Set G) := by
+        intro e he
+        rw [Subgroup.mem_centralizer_iff]
+        intro u hu
+        exact (Subgroup.mem_centralizer_iff.mp (hP₀cent hu) e he).symm
+      exact hE3cP₀.trans (Subgroup.centralizer_le_normalizer _)
+    have hENP₀ : E ≤ Subgroup.normalizer (P₀ : Set G) :=
+      hEsup ▸ sup_le hE1NP₀ hE3NP₀
+    -- `D := P₀ ⊔ E₃` is cyclic (internal direct product of commuting coprime cyclics).
+    set D : Subgroup G := P₀ ⊔ E₃ with hDdef
+    have hcopP₀E3 : Nat.Coprime (Nat.card ↥P₀) (Nat.card ↥E₃) :=
+      hP₀card ▸ (hqp.coprime_iff_not_dvd.mpr hqE3)
+    have hP₀E3bot : P₀ ⊓ E₃ = ⊥ := Subgroup.inf_eq_bot_of_coprime hcopP₀E3
+    have hcomm : ∀ (m : ↥P₀) (n : ↥E₃), Commute (P₀.subtype m) (E₃.subtype n) := by
+      intro m n
+      show (m : G) * (n : G) = (n : G) * (m : G)
+      exact (Subgroup.mem_centralizer_iff.mp (hP₀cent m.2) (n : G) n.2).symm
+    haveI : IsCyclic ↥D := by
+      have hinj : Function.Injective (MonoidHom.noncommCoprod P₀.subtype E₃.subtype hcomm) :=
+        (MonoidHom.noncommCoprod_injective _ _ hcomm).mpr
+          ⟨P₀.subtype_injective, E₃.subtype_injective, by
+            rw [P₀.range_subtype, E₃.range_subtype]; exact disjoint_iff.mpr hP₀E3bot⟩
+      have hrange : (MonoidHom.noncommCoprod P₀.subtype E₃.subtype hcomm).range = D := by
+        rw [MonoidHom.noncommCoprod_range, P₀.range_subtype, E₃.range_subtype, hDdef]
+      have hprodcyc : IsCyclic (↥P₀ × ↥E₃) :=
+        Group.isCyclic_prod_iff.mpr ⟨inferInstance, inferInstance, hcopP₀E3⟩
+      exact (((MonoidHom.ofInjective hinj).trans
+        (MulEquiv.subgroupCongr hrange)).isCyclic).mp hprodcyc
+    -- `E` normalizes `D` (normalizes both `P₀` and `E₃`).
+    have hEND : E ≤ Subgroup.normalizer (D : Set G) := le_normalizer_sup hENP₀ hEN3
+    -- `X ⊔ E₃ = P₀ ⊔ E₃ = D`, via the unique order-`q` subgroup of the cyclic quotient `E/E₃`.
+    haveI hE₃subN : (E₃.subgroupOf E).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer h.E₃_le).mpr hEN3
+    set mk : ↥E →* (↥E ⧸ E₃.subgroupOf E) := QuotientGroup.mk' (E₃.subgroupOf E) with hmkdef
+    -- the quotient `↥E ⧸ E₃.subgroupOf E` is cyclic (surjective image of cyclic `↥E₁`).
+    haveI hQcyc : IsCyclic (↥E ⧸ E₃.subgroupOf E) := by
+      refine isCyclic_of_surjective (mk.comp (Subgroup.inclusion h.E₁_le)) ?_
+      intro y
+      induction y using QuotientGroup.induction_on with
+      | _ e =>
+        have hecoe : (e : G) ∈ (↑(E₁ ⊔ E₃) : Set G) := by
+          rw [← hEsup]; exact e.2
+        rw [Subgroup.coe_mul_of_left_le_normalizer_right E₁ E₃ hE1NE3] at hecoe
+        obtain ⟨a, ha, b, hb, hab⟩ := hecoe
+        rw [SetLike.mem_coe] at ha hb
+        refine ⟨⟨a, ha⟩, ?_⟩
+        rw [MonoidHom.comp_apply]
+        show mk (Subgroup.inclusion h.E₁_le ⟨a, ha⟩) = mk e
+        rw [hmkdef, QuotientGroup.mk'_eq_mk']
+        refine ⟨⟨b, h.E₃_le hb⟩, ?_, ?_⟩
+        · rw [Subgroup.mem_subgroupOf]; exact hb
+        · apply Subtype.ext
+          show a * b = (e : G)
+          exact hab
+    -- both `X` and `P₀` are disjoint from `E₃` (orders coprime), so inject into the quotient.
+    have hcopXE3 : Nat.Coprime (Nat.card ↥X) (Nat.card ↥E₃) :=
+      hXcard ▸ (hqp.coprime_iff_not_dvd.mpr hqE3)
+    have hXE3bot : X ⊓ E₃ = ⊥ := Subgroup.inf_eq_bot_of_coprime hcopXE3
+    -- helper: card of the image of a subgroup `K ≤ E` disjoint from `E₃` equals `|K|`.
+    have hcardmap : ∀ (K : Subgroup G), K ≤ E → K ⊓ E₃ = ⊥ →
+        Nat.card ↥((K.subgroupOf E).map mk) = Nat.card ↥(K.subgroupOf E) := by
+      intro K hKE hKbot
+      have hkerbot : (E₃.subgroupOf E) ⊓ (K.subgroupOf E) = ⊥ := by
+        rw [eq_bot_iff]
+        intro z hz
+        rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hz
+        have : (z : G) ∈ K ⊓ E₃ := Subgroup.mem_inf.mpr ⟨hz.2, hz.1⟩
+        rw [hKbot, Subgroup.mem_bot] at this
+        rw [Subgroup.mem_bot]
+        exact Subtype.ext this
+      have h1 : Nat.card ↥((K.subgroupOf E).map mk) = (E₃.subgroupOf E).relIndex (K.subgroupOf E) := by
+        rw [← Subgroup.relIndex_ker, hmkdef, QuotientGroup.ker_mk']
+      rw [h1, Subgroup.relIndex,
+        Subgroup.subgroupOf_eq_bot.mpr (disjoint_iff.mpr hkerbot), Subgroup.index_bot]
+    have hcardXsub : Nat.card ↥(X.subgroupOf E) = q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXE).toEquiv]; exact hXcard
+    have hcardP₀sub : Nat.card ↥(P₀.subgroupOf E) = q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP₀E).toEquiv]; exact hP₀card
+    have hmapXcard : Nat.card ↥((X.subgroupOf E).map mk) = q := by
+      rw [hcardmap X hXE hXE3bot, hcardXsub]
+    have hmapP₀card : Nat.card ↥((P₀.subgroupOf E).map mk) = q := by
+      rw [hcardmap P₀ hP₀E hP₀E3bot, hcardP₀sub]
+    have hmapeq : (X.subgroupOf E).map mk = (P₀.subgroupOf E).map mk :=
+      eq_of_card_eq_prime_of_isCyclic hqp hmapXcard hmapP₀card
+    -- pull back: `X.subgroupOf E ⊔ ker = P₀.subgroupOf E ⊔ ker`, then map up to `X ⊔ E₃ = P₀ ⊔ E₃`.
+    have hcomapeq := congrArg (Subgroup.comap mk) hmapeq
+    rw [Subgroup.comap_map_eq, Subgroup.comap_map_eq, hmkdef, QuotientGroup.ker_mk'] at hcomapeq
+    have hsupsub : (X ⊔ E₃).subgroupOf E = (P₀ ⊔ E₃).subgroupOf E := by
+      rw [Subgroup.subgroupOf_sup hXE h.E₃_le, Subgroup.subgroupOf_sup hP₀E h.E₃_le]
+      exact hcomapeq
+    have hXsupE3 : X ⊔ E₃ = D := by
+      have := congrArg (Subgroup.map E.subtype) hsupsub
+      rwa [Subgroup.map_subgroupOf_eq_of_le (sup_le hXE h.E₃_le),
+        Subgroup.map_subgroupOf_eq_of_le (sup_le hP₀E h.E₃_le), ← hDdef] at this
+    -- `X ≤ D`, `X` characteristic in cyclic `D`, `E ≤ N(D)` ⟹ `E ≤ N(X)`.
+    have hXD : X ≤ D := hXsupE3 ▸ le_sup_left
+    haveI : (X.subgroupOf D).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+    intro e he
+    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic (W := D)
+      (C := X.subgroupOf D) (hEND he)
+    rwa [Subgroup.map_subgroupOf_eq_of_le hXD] at hmem
 
 /-- **BG Lemma 13.12** (mmd L3745): if `p ∈ τ₁(M)`, `P ∈ ℰ_p¹(E)`, `q ∈ τ₂(M)`, `A ∈ ℰ_q²(E)`,
 and `C_A(P) ≠ 1`, then `C_{M_σ}(P) = 1`.
