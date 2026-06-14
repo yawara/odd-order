@@ -1234,6 +1234,31 @@ theorem sylow_of_maximal_pSubgroup {H : Type*} [Group H] [Finite H] {q : ℕ} [F
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
+/-- **Lemma 13.8 GAP 3 capstone (M-oriented)**: 配置 + step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
+`C_{M_α}(PQ)=1`) + GAP 2 の `r` (`r∈β(M*)`, `r∣|C_M(P)|`, `r∉σ(M)`) から矛盾。
+
+GAP 3 本体: (i) Frattini `M=N_M(Q)M_β` (α=β で M_β 機構)、(ii) coprime で `R⊆N_M(Q)` 位数 `r`
+`P`-中心化、(iii) `PR` を Hall `E` へ共役 + Thm 13.4 で `X=C_{M_α}(P)⊆C_{M_σ}(R)⊆M*`、
+(iv) nilpotent で `[M_α∩M*,Q]⊆M*_α` → `gap3_assembly`。
+
+本体 `forbidden_config_impossible` は GAP 2 の disjunction の各 disjunct に M↔M* を入替えて適用。 -/
+theorem gap3_false_from_r [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hMMstar : M ≠ Mstar) {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M)
+    {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hPMM : P ≤ M ⊓ Mstar)
+    {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQle : Q ≤ M ⊓ Mstar) (hQq : IsPGroup q ↥Q)
+    (hQmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → Q ≤ T → Q = T)
+    (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar)
+    (hαβ : S10.alpha M = S10.beta M)
+    (hCMαP : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥)
+    (hCMαPQ : S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥)
+    {r : ℕ} [Fact r.Prime] (hrβ : r ∈ S10.beta Mstar)
+    (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G))) (hrσ : r ∉ S10.sigma M) :
+    False := by
+  sorry
+
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
 `p∈τ₁(M)∩τ₁(M*)`, `P∈ℰ_p¹(M∩M*)`, `Q,Q*` を `M∩M*` の `P`-不変 Sylow 部分群
 (素数は異なってよい), `C_Q(P)=C_{Q*}(P)=1`, `N_G(Q)⊆M*`, `N_G(Q*)⊆M`。
@@ -1259,7 +1284,31 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar)
     (hNQstar : Subgroup.normalizer (Qstar : Set G) ≤ M) :
     False := by
-  sorry
+  have hMMstar : M ≠ Mstar := fun h => hnc ⟨1, by rw [h, map_one, one_smul]⟩
+  have hP1 : P ≠ ⊥ := by
+    intro hb
+    have hc := (mem_elemAbelianOfRank.mp hP).2
+    rw [hb, Subgroup.card_bot, pow_one] at hc
+    exact (Fact.out : Nat.Prime p).one_lt.ne hc
+  -- step1 (M-side and M*-side).
+  obtain ⟨_, _, hαβ, _, _, hCMαP, hCMαPQ⟩ :=
+    forbidden_config_step1 hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
+  have hPMstar : P ≤ Mstar ⊓ M := by rw [inf_comm]; exact hPM
+  have hQstarle' : Qstar ≤ Mstar ⊓ M := by rw [inf_comm]; exact hQstarle
+  have hQstarmax' : ∀ T : Subgroup G, T ≤ Mstar ⊓ M → IsPGroup qstar ↥T → Qstar ≤ T → Qstar = T := by
+    intro T hT hTq hQT; rw [inf_comm] at hT; exact hQstarmax T hT hTq hQT
+  obtain ⟨_, _, hαβstar, _, _, hCMstarαP, hCMstarαPQ⟩ :=
+    forbidden_config_step1 hG hMstar hM (Ne.symm hMMstar) hpstar hP hPMstar hQstarle' hQstarq
+      hQstarmax' hQstarinv hCQstar hNQstar
+  -- GAP 2: extract `r`.
+  rcases exists_prime_betastar_dvd_or hG hM hMstar hnc hP1 hαβ hαβstar hCMαP hCMstarαP with
+    ⟨r, hrp, hrβ, hrC, hrσ⟩ | ⟨r, hrp, hrβ, hrC, hrσ⟩
+  · haveI : Fact r.Prime := ⟨hrp⟩
+    exact gap3_false_from_r hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
+      hαβ hCMαP hCMαPQ hrβ hrC hrσ
+  · haveI : Fact r.Prime := ⟨hrp⟩
+    exact gap3_false_from_r hG hMstar hM (Ne.symm hMMstar) hpstar hP hPMstar hQstarle' hQstarq
+      hQstarmax' hQstarinv hCQstar hNQstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。 -/
 theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
