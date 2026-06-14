@@ -2250,3 +2250,35 @@ package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ �
 3. per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly (S08, hyp.tau↔certain-type τ は supported 上 map-agreement)。
 **正本=本 cont.³⁷。τ-seam 核心解決。次=μ_j CharacterPsiDecomposition (ofProjection 組立、orthogonality
 inputs + ZIrr membership 供給; S08 で η₁ context)。**
+
+## 2026-06-14 (session 40 cont.³⁸, /loop): ✅ μ_j CharacterPsiDecomposition landed → R(χ) 統合の building blocks 全完備
+
+### ✅ landed (0987d047, axiom-clean 標準3, leaf 3601, **一発 build**):
+**`certainTypeDecompositionDa`** (S06_CertainTypeCoherence): reducible μ_j 用 per-constituent
+`CharacterPsiDecomposition τ (columnSum χ₂) (a•η₁)` (decompositionDaFromDadeOfDiff の reducible 版)。
+`certainTypeR` + `ofProjection` + 前 cont.³⁷ の generic inner-preservation。⟨μ_j,μ̄_j⟩=0 は
+columnSum_conj_eq+columnFamily_mu_sum_inner で内部導出; Y-anchor inputs (μ_j−a•η₁ supported/∈ZIrr,
+μ_j,μ̄_j⊥a•η₁) は parameter (S08 assembly site で供給)。
+
+### 🎉🎉 マイルストン: R(χ) 統合の building blocks 全完備:
+| piece | status |
+|---|---|
+| 既約 χ R(χ) + Da | ✅ dadeOrthonormalCharacterImageFamilyOfDiff + decompositionDaFromDadeOfDiff (既存) |
+| reducible μ_j R(μ_j) + Da | ✅ certainTypeR (cont.³⁶) + certainTypeDecompositionDa (本 cont.³⁸) |
+| τ-seam (generic inner-preservation) | ✅ ..._of_data (cont.³⁷) |
+| (5.4.a) ‖X‖²≥‖χ‖² | ✅ inner_self_chi_re_le_inner_self_X (既存) |
+| pinning ∑aᵢbᵢ=∑aᵢ²⟹bᵢ=aᵢ | ✅ eq_of_sum_mul_eq_sum_sq (cont.³²) |
+| (5.4.b) ‖Y‖²≥‖ψ‖²⟹X=∑E | ✅ norm_eq_and_X_eq_sum_of_norm_Y_ge (既存) |
+| αᵢ aggregate ∑aᵢαᵢ=Ind−\|H:Z\|η₁ | ✅ sum_smul_constituent_diff_eq (cont.³¹) |
+
+### ▶ 残 = (6.8.2.3) per-χ assembly (S08, building blocks の組立):
+⚠ retarget engine (`retarget_isCoherent_of_decomposition*`) は **`⟨χ,χ⟩=1` (既約) 要求** ⟹ reducible μ_j
+不適。reducible per-χ は **手動 (5.4.a)+pinning+(5.4.b)** で:
+1. per-constituent χᵢ で Da (既約/reducible 振り分け) → αᵢ^τ=Xᵢ−Yᵢ (Da.X/Da.Y) → Yᵢ を Y 方向に分解
+   (bᵢ=⟨Yᵢ的, Y⟩, Zᵢ⊥Y) → (5.4.a) で bᵢ²≤aᵢ² ⟹ bᵢ≤aᵢ。
+2. pinning (∑aᵢbᵢ=|H:Z|=∑aᵢ², eq_of_sum_mul_eq_sum_sq) ⟹ bᵢ=aᵢ。
+3. (5.4.b) ⟹ αᵢ^τ=Xᵢ−aᵢY → χ=χ₁ で per-χ `(χ−aη₁)^τ=X₁−aY`。
+4. τ₂ direct assembly (S08; hyp.tau↔certain-type τ は supported map-agreement)。
+**hard seam 残**: Yᵢ の Y 方向分解 (bᵢ 抽出) + (6.8.2.2) の Y 同定 + τ₂ 構成。intricate な S08 統合。
+**正本=本 cont.³⁸。building blocks 全完備 (大マイルストン)。次=(6.8.2.3) per-χ assembly (5.4.a/b+pinning
+を Da から組む; Yᵢ の Y-成分 bᵢ 抽出が次の seam)。**
