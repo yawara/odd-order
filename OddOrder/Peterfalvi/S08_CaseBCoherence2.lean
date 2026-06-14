@@ -402,6 +402,26 @@ theorem inner_induce_self_eq_index_of_le_center
   rw [← hfrob, ← hcardeq] at hstep
   exact mul_left_cancel₀ hcardN hstep
 
+/-- **Constituent decomposition of an induced character** (the `Ind^H_Z φ = ∑ aᵢ θᵢ` step of
+Peterfalvi (6.8.2.3)).  For any class function `φ` of a subgroup `N ≤ M`, the induced character
+expands in the `Irr M` basis with coefficients the Frobenius multiplicities:
+`Ind^M_N φ = ∑_{θ ∈ Irr M} ⟨φ, Res_N θ⟩ • θ`.  Fourier expansion
+(`classFunction_eq_sum_inner_smul`) plus Frobenius reciprocity (`inner_induce_eq_inner_restrict`)
+on each coefficient.
+
+The multiplicities `aᵢ = ⟨φ, Res_N θᵢ⟩` are the `θᵢ(1)` of (6.8.2.3) when `θᵢ` lies over the central
+linear `φ` (`Res_N θᵢ = θᵢ(1)·φ` by [Is] 2.27), and vanish otherwise. -/
+theorem induce_eq_sum_inner_restrict_smul {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    (φ : ClassFunction ↥N ℂ) :
+    ClassFunction.induce N φ
+      = ∑ θ : IrreducibleCharacter M,
+        ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+          • (θ : ClassFunction M ℂ) := by
+  conv_lhs => rw [classFunction_eq_sum_inner_smul (ClassFunction.induce N φ)]
+  exact Finset.sum_congr rfl
+    (fun θ _ => by rw [ClassFunction.inner_induce_eq_inner_restrict])
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
