@@ -2683,6 +2683,73 @@ theorem malpha_centralizer_facts_of_not_centralize [Finite G] (hG : IsMinimalSim
     (tau1_Malpha_interaction hG h.mem_maximal hpq hpτ1 hP hPM hQM hQne hQq hPNQ hCQ hMNQ).2 hQsyl
   exact ⟨Q, hQE3, hQne, hCMαP, hCMαPQ⟩
 
+/-- **BG Theorem 13.10, GAP B** (the non-prime argument): from `C_{M_α}(P) ≠ 1` and
+`C_{M_α}(PQ) = 1` (with `Q ≤ E₃`, `P ≤ E₁`), `E₁E₃` does **not** act in a prime manner on `M_σ`.
+Witness: pick `1 ≠ a ∈ C_{M_α}(P)` (so `a ∈ M_σ`, `a` centralizes `P`); since
+`C_{M_α}(PQ) = 1`, `a` does not centralize `Q`, so there is `y ∈ Q#` with `a ∉ C_G(y)`. Then for
+`x ∈ P#`, `a ∈ C_{M_σ}(x)` but `a ∉ C_{M_σ}(y)`, so `C_{M_σ}(x) ≠ C_{M_σ}(y)` although both
+`x, y ∈ (E₁E₃)#`. (`P` and `Q` need not commute — `P` acts regularly on `Q` — so the naive
+`⟨xy⟩` argument is avoided.) -/
+theorem not_actsPrime_Msigma_of_malpha_facts [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPE1 : P ≤ E₁) {Q : Subgroup G} (hQE3 : Q ≤ E₃)
+    (hCMαP : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥)
+    (hCMαPQ : S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) :
+    ¬ ActsPrimeOn (S10.Msigma M) (E₁ ⊔ E₃) := by
+  classical
+  intro hprime
+  obtain ⟨⟨a, ha_mem⟩, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hCMαP
+  have hane : a ≠ 1 := fun hc => ha1 (Subtype.ext (by simpa using hc))
+  obtain ⟨haMα, haCP⟩ := Subgroup.mem_inf.mp ha_mem
+  have haMσ : a ∈ S10.Msigma M := S10.Malpha_le_Msigma hG h.mem_maximal haMα
+  -- `a ∉ C_G(Q)`, else `a ∈ M_α ⊓ C(PQ) = ⊥`.
+  have haNCQ : a ∉ Subgroup.centralizer (Q : Set G) := by
+    intro haCQ
+    have hPle : (P : Subgroup G) ≤ Subgroup.centralizer ({a} : Set G) := by
+      intro x hx; rw [Subgroup.mem_centralizer_iff]; intro u hu
+      rw [Set.mem_singleton_iff.mp hu]
+      exact (Subgroup.mem_centralizer_iff.mp haCP x hx).symm
+    have hQle : (Q : Subgroup G) ≤ Subgroup.centralizer ({a} : Set G) := by
+      intro x hx; rw [Subgroup.mem_centralizer_iff]; intro u hu
+      rw [Set.mem_singleton_iff.mp hu]
+      exact (Subgroup.mem_centralizer_iff.mp haCQ x hx).symm
+    have haPQ : a ∈ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]; intro g hg
+      exact (Subgroup.mem_centralizer_iff.mp (sup_le hPle hQle hg) a (Set.mem_singleton a)).symm
+    have hmem : a ∈ S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) :=
+      Subgroup.mem_inf.mpr ⟨haMα, haPQ⟩
+    rw [hCMαPQ, Subgroup.mem_bot] at hmem
+    exact hane hmem
+  -- `∃ y ∈ Q#` with `a ∉ C_G(y)`.
+  rw [Subgroup.mem_centralizer_iff] at haNCQ
+  push_neg at haNCQ
+  obtain ⟨y, hyQ, hyne⟩ := haNCQ
+  have hy1 : y ≠ 1 := fun hc => hyne (by rw [hc, one_mul, mul_one])
+  -- `x ∈ P#`.
+  have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
+  have hPne : P ≠ ⊥ := by
+    intro hb; rw [hb, Subgroup.card_bot] at hPcardp
+    exact (Fact.out : p.Prime).one_lt.ne' hPcardp.symm
+  obtain ⟨⟨x, hxP⟩, hxne1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hPne
+  have hx1 : x ≠ 1 := fun hc => hxne1 (Subtype.ext (by simpa using hc))
+  -- prime action: `C_{M_σ}(x) = C_{M_σ}(y)`.
+  have hfx := hprime x ((le_sup_left : E₁ ≤ E₁ ⊔ E₃) (hPE1 hxP)) hx1
+  have hfy := hprime y ((le_sup_right : E₃ ≤ E₁ ⊔ E₃) (hQE3 hyQ)) hy1
+  have heq : fixedByElement (S10.Msigma M) x = fixedByElement (S10.Msigma M) y := hfx.trans hfy.symm
+  -- `a ∈ C_{M_σ}(x)` but `a ∉ C_{M_σ}(y)`.
+  have haX : a ∈ fixedByElement (S10.Msigma M) x := by
+    rw [fixedByElement_def]
+    refine Subgroup.mem_inf.mpr ⟨haMσ, Subgroup.mem_centralizer_iff.mpr ?_⟩
+    intro u hu; rw [Set.mem_singleton_iff.mp hu]
+    exact Subgroup.mem_centralizer_iff.mp haCP x hxP
+  have haNY : a ∉ fixedByElement (S10.Msigma M) y := by
+    rw [fixedByElement_def]; intro hmem
+    obtain ⟨_, haCy⟩ := Subgroup.mem_inf.mp hmem
+    exact hyne (Subgroup.mem_centralizer_iff.mp haCy y (Set.mem_singleton y))
+  rw [heq] at haX
+  exact haNY haX
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
