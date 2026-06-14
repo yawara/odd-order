@@ -2125,6 +2125,16 @@ cont.³² の「(a2) ZIrr-char 一般化」は **原文 §5 精読で誤りと�
 χ=μ_j は R(μ_j) or **`certainType_isCoherent` 直結**のどちらで処理するか。後者なら R(μ_j) package 不要かも
 (certainType coherence が既に μ_j 側を担う)。**この判断を先にしてから R(μ_j) を build する/しないを決める。**
 
+### ⚠ R(μ_j) package を build する場合の seam (cont.³³ で精査、要対処):
+- `certainType_diff_dade_sum_eq` の LHS は **`h.tau.toDadeMap (∑ certainTypeDiffSupported h … i)`**
+  (IntegralCharacterMap でなく toDadeMap; 引数も column-difference family `certainTypeDiffSupported`)。
+  `OrthonormalCharacterImageFamily.image_eq` の `τ (μ_j − μ_j.conj)` 形へ橋渡しが要 (∑certainTypeDiffSupported
+  = μ_j − μ_k? + toDadeMap↔IntegralCharacterMap 接続)。
+- RHS = `(columnFamily χ₂).sign • ∑_i (ω_{χ₂,i}^σ − ω_{χ₂',i}^σ)` (sign=δ_j, χ₂'=共役列 k)。
+- μ_j.conj=μ_{χ₂⁻¹}: `certainType_columnSum_conj`; ω^σ conj=`certainTypeOmegaSigma_conj_eq` (χ₂⁻¹,rowInv i)。
+- orthonormal: `certainTypeOmegaSigma_inner` (⟨ω_{χ₂,i}^σ,ω_{χ₂',i'}^σ⟩=[χ₂=χ₂'∧i=i'])。
+**⟹ seam が複数。`certainType_isCoherent` 直結の方が seam 少ない可能性 → cont.³⁴ で両者比較してから決定。**
+
 ### 📝 honest 進捗評価 (2 ターン RECON):
 cont.³² (pinning landed) 後、本 cont.³³ は **コード未 land の RECON ターン**。だが §5 原文精読で
 cont.³² の (a2) 誤推奨を訂正し、R(χ) 統合の正確な map (既約/μ_j 2 ケース + 既存資産 + 未実装 = R(μ_j)
