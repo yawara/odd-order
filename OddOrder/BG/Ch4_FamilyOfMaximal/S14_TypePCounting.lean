@@ -544,6 +544,21 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
   sorry
 
+/-- **BG Corollary 14.8** (mmd L4065): the type-`P₁` maximal subgroups, if any, are all
+conjugate in `G`; and if the type-`P` family is nonempty it consists of exactly two conjugacy
+classes of maximal subgroups (`M` and its nonconjugate partner `M*` from Theorem 14.7).
+
+Follows directly from Theorem 14.7(f),(g) (gated on §13 via Prop 14.2 / Theorem 14.7). -/
+theorem typeP1_conjugate_and_typeP_twoClasses [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    (∀ M ∈ maximalTypeP1Family G, ∀ N ∈ maximalTypeP1Family G, IsConjugateSubgroup M N) ∧
+    ((maximalTypePFamily G).Nonempty →
+      ∃ M ∈ maximalTypePFamily G, ∃ Mstar ∈ maximalTypePFamily G,
+        ¬ IsConjugateSubgroup M Mstar ∧
+        ∀ H ∈ maximalTypePFamily G,
+          IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
+  sorry
+
 /-- **BG Corollary 14.9** (mmd L3997): `G^#` is the disjoint union of the conjugacy pieces
 `𝒞_G(M̃ᵢ)` over class representatives `Mᵢ ∈ 𝓜` — together with one extra `𝒞_G(Ẑ)` piece when
 `𝓜_𝓟` is nonempty.
@@ -571,6 +586,24 @@ theorem nonidentity_covered_by_sigma_pieces [Finite G]
 theorem exists_sigmaDecomposition_length_le_two [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
+  sorry
+
+/-- **BG Lemma 14.11** (mmd L4086): for `M ∈ 𝓜_F` with `E` a complement of `M_σ` in `M`, a
+prime `q ∈ π(E)`, and `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
+(1) `q ∈ τ₂(M*)` and `𝓜(C_G(Q)) = {M*}`, or (2) `q ∈ κ(M*)` and `M* ∈ 𝓜_{P₁}`.
+
+"Of independent interest" (BG L4084); used here only by Corollary 14.12.  `F(E)` is the Fitting
+subgroup of the complement `E`, taken in `G` via `fittingInG`.  Gated on §13. -/
+theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E Q : Subgroup G} {q : ℕ} (hM : M ∈ maximalSubgroups G) (hF : IsTypeF M)
+    (hE : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))
+    (hq : q ∈ piSet E) (hQ : Q ∈ elemAbelianOfRank G q 1) (hQE : Q ≤ E)
+    (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
+    ∃ Mstar : Subgroup G, Mstar ∈ maximalSubgroups G ∧
+      ((q ∈ tau2 Mstar ∧
+          maximalSubgroupsContaining (Subgroup.centralizer (Q : Set G)) = {Mstar}) ∨
+       (q ∈ kappa Mstar ∧ IsTypeP1 Mstar)) := by
   sorry
 
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in

@@ -22,11 +22,19 @@ twisted 元 (`x x'`, `x'∈R(x)^#`) を取りこぼし **as-is で偽**。faithf
 着地させた際に切り分け (commit `15d57bdb`, notes `notes/bg/s14_typeP_counting.md`
 「✅ Faithful reformulation 着地 (2026-06-15)」)。
 
+> **2026-06-15 追記 — Lemma 14.6 も同枠 (R(x) gated → §16)**: §14 signature interface 完成作業
+> (notes「🧩 §14 signature interface 完成」) で **Lemma 14.6** (mmd L3945, 各 `g∈G^#` は
+> 「`g=xx', ℓ_σ(x)=1, x'∈R(x)`」/「`g=yy', y'` が `κ(M)`-元」の exactly one) も **R(x) 必須**ゆえ §14
+> では循環で書けないと判明。14.6 は 14.9/14.10 の土台 + §16 Thm E が cite ⟹ **14.6 も §16 で `tildeM`/
+> `RData` に対して statement 化すべき**。14.5(c) (count `|𝒞_G(M̃)|=(|M_σ|−1)|G:M|`) も同様 (R(x) 要)。
+
 ## やること
 
-- [ ] §16 (Lane G) で `tildeM`/`RData` に対する faithful な Cor 14.9 を statement 化
+- [ ] §16 (Lane G) で `tildeM`/`RData` に対する faithful な **Cor 14.9** を statement 化
   (`G^#` を `conjClassSet (tildeM Mᵢ (R Mᵢ))` over class reps で disjoint 被覆, `𝓜_𝓟` 非空時は
   `conjClassSet (zTilde K Kstar)` 片を追加)。§16 既存の `RData`/`ConjSharplyTransitiveOn` を再利用。
+- [ ] **Lemma 14.6** (g∈G^# dichotomy) を §16 で `tildeM`/`R(x)` に対して statement 化 (14.9/14.10 の土台)。
+- [ ] **Lemma 14.5(c)** (`|𝒞_G(M̃)|=(|M_σ|−1)|G:M|`) を §16 で statement 化 (Thm E が cite)。
 - [ ] (任意) §14 の `nonidentity_covered_by_sigma_pieces` を §16 の faithful 版へ誘導する
   docstring 追記、または deprecation 方針を hub と決定。
 - [ ] (関連) G が §15/§16 で `sigmaSharp` を M̃ のつもりで使っている箇所 (約 9 refs) を監査し、
