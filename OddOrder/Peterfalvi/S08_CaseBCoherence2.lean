@@ -586,6 +586,30 @@ theorem sum_smul_constituent_diff_eq {M : Type*} [Group M] [Fintype M]
   rw [Finset.sum_sub_distrib, sum_inner_restrict_smul_induce_eq_induce, ← Finset.sum_smul,
     sum_inner_restrict_sq_eq_index hcen hφ']
 
+/-- **(6.8.2.3) pinning** (Peterfalvi (6.8.2.3): `bᵢ = aᵢ` for all `i`).  Given nonnegative integer
+weights `aᵢ ≥ 0` with `bᵢ ≤ aᵢ` and `∑ aᵢbᵢ = ∑ aᵢ²`, every *positive* weight forces `bᵢ = aᵢ`.
+
+This is the final pinning step of (6.8.2.3): from `∑ aᵢbᵢ = |H:Z| = ∑ aᵢ²` (the index, via
+`sum_inner_restrict_sq_eq_index` combined with `(6.8.2.2)` `∑ aᵢαᵢ^τ = X − |H:Z|Y`) and the
+per-constituent bound `bᵢ ≤ aᵢ` ((5.4.a) `‖Xᵢ‖² ≥ ‖χᵢ‖²`), the slackness
+`∑ aᵢ(aᵢ − bᵢ) = ∑ aᵢ² − ∑ aᵢbᵢ = 0` of nonnegative terms forces each `aᵢ(aᵢ − bᵢ) = 0`, hence
+`bᵢ = aᵢ` whenever `aᵢ > 0` (the constituent multiplicities `aᵢ = θᵢ(1) > 0`; the `aᵢ = 0`
+non-constituents drop out of the `αᵢ` aggregate). -/
+theorem eq_of_sum_mul_eq_sum_sq {ι : Type*} (s : Finset ι) (a b : ι → ℤ)
+    (hnonneg : ∀ i ∈ s, 0 ≤ a i) (hab : ∀ i ∈ s, b i ≤ a i)
+    (hsum : ∑ i ∈ s, a i * b i = ∑ i ∈ s, a i * a i) :
+    ∀ i ∈ s, 0 < a i → b i = a i := by
+  have hsum0 : ∑ i ∈ s, a i * (a i - b i) = 0 := by
+    simp_rw [mul_sub]
+    rw [Finset.sum_sub_distrib, hsum, sub_self]
+  have hnn : ∀ i ∈ s, 0 ≤ a i * (a i - b i) := fun i hi =>
+    mul_nonneg (hnonneg i hi) (sub_nonneg.mpr (hab i hi))
+  have hzero := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hsum0
+  intro i hi hpos
+  rcases mul_eq_zero.mp (hzero i hi) with h | h
+  · exact absurd h (ne_of_gt hpos)
+  · linarith [sub_eq_zero.mp h]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
