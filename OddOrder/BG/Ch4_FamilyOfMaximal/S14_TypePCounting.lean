@@ -404,6 +404,22 @@ theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
 
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
 
+/-- **Counting-bound kernel for Theorem 14.7(e)** (BG mmd L3975, the `8/15 > 1/2` step).
+For `k ≥ 3` and `k* ≥ 5`, the saturation density `(1 - 1/k)(1 - 1/k*)` exceeds `1/2`
+(minimised at `(1 - 1/3)(1 - 1/5) = 8/15`).  In Theorem 14.7, `k = |K|` and `k* = |K*|` are
+coprime odd integers `> 1` (so `{k, k*} ⊇ {3, 5}` in the worst case), and
+`|𝒞_G(Ẑ)| = (1 - 1/k)(1 - 1/k*)|G|`; this bound gives `|𝒞_G(Ẑ)| > ½|G|`, forcing every type-P
+maximal subgroup to be conjugate to `M` or `M*`.  Pure arithmetic, independent of §13. -/
+theorem half_lt_one_sub_inv_mul {k l : ℕ} (hk : 3 ≤ k) (hl : 5 ≤ l) :
+    (1 : ℚ) / 2 < (1 - 1 / (k : ℚ)) * (1 - 1 / (l : ℚ)) := by
+  have hk3 : (3 : ℚ) ≤ (k : ℚ) := by exact_mod_cast hk
+  have hl5 : (5 : ℚ) ≤ (l : ℚ) := by exact_mod_cast hl
+  have hik : 1 / (k : ℚ) ≤ 1 / 3 := one_div_le_one_div_of_le (by norm_num) hk3
+  have hil : 1 / (l : ℚ) ≤ 1 / 5 := one_div_le_one_div_of_le (by norm_num) hl5
+  calc (1 : ℚ) / 2 < (2 / 3) * (4 / 5) := by norm_num
+    _ ≤ (1 - 1 / (k : ℚ)) * (1 - 1 / (l : ℚ)) :=
+        mul_le_mul (by linarith) (by linarith) (by norm_num) (by linarith)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
