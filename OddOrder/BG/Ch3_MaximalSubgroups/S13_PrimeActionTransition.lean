@@ -1128,6 +1128,25 @@ theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subg
     Subgroup.card_map_of_injective K.subtype_injective
   rw [h1, h2, fitting_card_eq_of_mulEquiv e]
 
+/-- **Lemma 13.8 head — `Q = [Q,P] ⊆ M' ∩ M*'`**: `P` が `Q` を coprime に作用し `C_Q(P)=1` なら
+`Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`); `P,Q ⊆ M` (resp. `M*`) ゆえ
+`⁅P,Q⁆ ⊆ ⁅M,M⁆ = M'` (resp. `M*'`)。 -/
+theorem pSubgroup_le_derived_inf [Finite G] {M Mstar P Q : Subgroup G}
+    [IsSolvable ↥P] (hPN : P ≤ Subgroup.normalizer (Q : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hPM : P ≤ M) (hQM : Q ≤ M) (hPMs : P ≤ Mstar) (hQMs : Q ≤ Mstar) :
+    Q ≤ derivedInG M ⊓ derivedInG Mstar := by
+  have hQcomm : Q ≤ ⁅P, Q⁆ :=
+    Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot hPN hcop hCQ
+  have hM : ⁅P, Q⁆ ≤ derivedInG M := by
+    have h := Subgroup.commutator_mono hPM hQM
+    rwa [← Subgroup.map_subtype_commutator M] at h
+  have hMs : ⁅P, Q⁆ ≤ derivedInG Mstar := by
+    have h := Subgroup.commutator_mono hPMs hQMs
+    rwa [← Subgroup.map_subtype_commutator Mstar] at h
+  exact le_inf (hQcomm.trans hM) (hQcomm.trans hMs)
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
