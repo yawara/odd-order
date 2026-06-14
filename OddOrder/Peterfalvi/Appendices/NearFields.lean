@@ -413,6 +413,82 @@ theorem nearField_field_structure_of_index_two.{u} {F : Type u} [NearField F] [F
 
 end NearFieldBasics
 
+section TwistedNearField
+
+/-- **Twisting data turning a field into a near-field** (the construction behind `F_{r²,2}`,
+Peterfalvi Appendix C, pp. 137--138).  An order-`≤ 2` ring automorphism `σ` of a field `K` together
+with a multiplicative *sign* character `χ : Kˣ → ℤ/2` that is invariant under `σ`.  The twisted
+multiplication `x ∘ y = σ^{χ(y)}(x) · y` then makes `K` a near-field (in general non-commutative
+multiplicatively, so not a field).  For `F_{r²,2}`: `K = 𝔽_{r²}`, `σ : x ↦ x^r` (the order-`2`
+Frobenius over `𝔽_r`), and `χ` the quadratic character (`0` on squares, `1` on non-squares). -/
+structure TwistData (K : Type*) [Field K] where
+  /-- The twisting automorphism (`x ↦ x^r` for `F_{r²,2}`). -/
+  σ : RingAut K
+  /-- `σ` has order dividing `2`. -/
+  σ_sq : σ ^ 2 = 1
+  /-- The sign character (quadratic character for `F_{r²,2}`). -/
+  χ : Kˣ →* Multiplicative (ZMod 2)
+  /-- `χ` is `σ`-invariant (automorphisms preserve squares). -/
+  χ_σ : ∀ y : Kˣ, χ (Units.map (σ : K →* K) y) = χ y
+
+namespace TwistData
+
+variable {K : Type*} [Field K] (d : TwistData K)
+
+open scoped Classical in
+/-- The twisting exponent of `y`: `0` for `0` and for `χ`-even `y`, `1` for `χ`-odd `y`. -/
+noncomputable def twExp (y : K) : ZMod 2 :=
+  if h : y = 0 then 0 else Multiplicative.toAdd (d.χ (Units.mk0 y h))
+
+/-- The order-`≤ 2` automorphism selected by `e : ℤ/2`: the identity (`e = 0`) or `σ` (`e = 1`). -/
+def twAut (e : ZMod 2) : RingAut K := if e = 0 then 1 else d.σ
+
+/-- The twisted (near-field) multiplication `x ∘ y = σ^{χ(y)}(x) · y`. -/
+noncomputable def twMul (x y : K) : K := d.twAut (d.twExp y) x * y
+
+@[simp] theorem twAut_zero : d.twAut 0 = 1 := by simp [twAut]
+
+@[simp] theorem twAut_one : d.twAut 1 = d.σ := by simp [twAut]
+
+/-- `twAut` turns addition in `ℤ/2` into composition: `twAut (a+b) = twAut a * twAut b`
+(the `a = b = 1` case is where `σ² = 1` is used). -/
+theorem twAut_add (a b : ZMod 2) : d.twAut (a + b) = d.twAut a * d.twAut b := by
+  have hσσ : d.σ * d.σ = 1 := by rw [← pow_two]; exact d.σ_sq
+  have key : ∀ e : ZMod 2, e = 0 ∨ e = 1 := by decide
+  rcases key a with ha | ha <;> rcases key b with hb | hb <;> subst ha <;> subst hb <;>
+    simp only [show (0 : ZMod 2) + 0 = 0 from by decide, show (0 : ZMod 2) + 1 = 1 from by decide,
+      show (1 : ZMod 2) + 0 = 1 from by decide, show (1 : ZMod 2) + 1 = 0 from by decide,
+      twAut_zero, twAut_one, one_mul, mul_one, hσσ]
+
+@[simp] theorem twExp_zero : d.twExp 0 = 0 := by simp [twExp]
+
+@[simp] theorem twExp_one : d.twExp 1 = 0 := by
+  rw [twExp, dif_neg one_ne_zero, show Units.mk0 (1 : K) one_ne_zero = 1 from Units.ext rfl,
+    map_one, toAdd_one]
+
+@[simp] theorem twMul_zero (x : K) : d.twMul x 0 = 0 := by simp [twMul]
+
+@[simp] theorem zero_twMul (y : K) : d.twMul 0 y = 0 := by simp [twMul]
+
+@[simp] theorem twMul_one (x : K) : d.twMul x 1 = x := by simp [twMul]
+
+@[simp] theorem one_twMul (y : K) : d.twMul 1 y = y := by simp [twMul]
+
+/-- The twisted product of two nonzero elements is nonzero. -/
+theorem twMul_ne_zero {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) : d.twMul x y ≠ 0 := by
+  simp only [twMul]
+  refine mul_ne_zero ?_ hy
+  rw [ne_eq, EmbeddingLike.map_eq_zero_iff]
+  exact hx
+
+/-- Right distributivity of the twisted multiplication: `(a + b) ∘ c = a ∘ c + b ∘ c`. -/
+theorem add_twMul (a b c : K) : d.twMul (a + b) c = d.twMul a c + d.twMul b c := by
+  simp [twMul, map_add, add_mul]
+
+end TwistData
+
+end TwistedNearField
+
 variable {G Ω F : Type*} [Group G]
 
 /-- A lightweight carrier for finite near-field structure.  The algebraic laws
