@@ -207,14 +207,15 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
 theorem mf_ne_msigma_typeP1_structure [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     S14.IsTypeP1 M ∧
-      ∃ K Kstar Q Q0 D : Subgroup G, ∃ p q : ℕ,
-        Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) ∧
-        Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ∧
+      ∃ Q Q0 D : Subgroup G, ∃ p q : ℕ,
         p.Prime ∧ q.Prime ∧ Nat.card ↥K = p ∧ Nat.card ↥Kstar = q ∧
         q ∈ S14.piSet (MF M) ∧ q ∈ OddOrder.BG.Ch3.S10.beta M ∧
+        Kstar ≤ MF M ∧
         Q ≤ MF M ∧ M ≤ Subgroup.normalizer (Q : Set G) ∧
         Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
           (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
