@@ -206,7 +206,25 @@ coprime ⟹ C_H(K)⊓H ≤ H'`)。真の唯一の欠落 = **M=KM'** (`IsCompleme
 強化 の 2 つの sorry-neutral 強化を済ませれば、全 conjunct が露出済 cite で証明可能**
 (典型 fragile: typeP_structure/duality/15.2/15.1/15.5 = sorried だが 15.1/15.2/15.5 は mine、
 14.2/14.7 は parametrize-stable)。Thm 14.7(h) 露出待ち (Lane H) は不要に。
-**残 friction = conjunct 4 の Lemma 6.3 ↥M 適用 (subtype + coprime) のみ。** issue 8001 参照。
+**残 friction = conjunct 4 の Lemma 6.3 ↥M 適用 (subtype + coprime) のみ。** issue 8004 参照。
+
+## 10. M_F 包含鎖 M_F ≤ M_σ ≤ M' ≤ M を §14 非依存に landing (2026-06-14, `b212b8d1`/`c64909c2`)
+
+§14 非依存 API をさらに拡充 (section 3 の「Hall well-definedness が hard core」とは別軸):
+
+- **`maxNilpotentNormalHall_le_Msigma` (M_F ≤ M_σ)** — mmd L4116「easy to see that M_F lies in M_σ」、
+  **Theorem A の `MF≤Msigma` 節**。証明 = 候補 N の各素数 p で「N 冪零ゆえ Sylow_p char → M 正規 +
+  N Hall ゆえ full Sylow → O_p(M)」、M 極大+G 単純で `normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot`
+  により N_G(O_p(M))≤M ⟹ p∈σ(M) ⟹ `IsPiGroup.le_oPiCore` で N≤M_σ。
+  道具: `sylowMap_eq_opiCoreInG_singleton_of_normal` / `opiCoreInG_singleton_ne_bot_of_sylowMap_eq` /
+  `Sylow.ofCard` + `card_eq_multiplicity` + Hall coprime で factorization 一致。
+- **`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` (M_F = M_σ ⟺ M_σ 冪零)** — 上記 (常に) +
+  既存 `Msigma_le_maxNilpotentNormalHall_of_nilpotent` + M_F 常に冪零。**section 3 で「gated Theorem A
+  の M_F≤M_σ と combine」としていたが、M_F≤M_σ が §14 非依存に取れたので iff も完全 §14 非依存に。**
+- **`maxNilpotentNormalHall_le_derived` (M_F ≤ M')** — 上記 + `Msigma_le_derived`。Cor 15.5(c)「H⊆M'」。
+
+⟹ M_F API は ≤M / ⊴ / 冪零 / ≤F(M) / ≤M_σ / ≤M' / iff まで §14 非依存に完備。
+**残る §14 非依存余地は薄い** (M_F char in M は speculative; endpoint 配線は §14 gate ゆえ defer)。
 
 ## 参照
 

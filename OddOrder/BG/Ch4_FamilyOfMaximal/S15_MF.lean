@@ -148,6 +148,84 @@ theorem Msigma_le_maxNilpotentNormalHall_of_nilpotent [Finite G]
       (Nat.mem_primeFactors.mpr ⟨hqp, hqd.trans hdvd, Subgroup.index_ne_zero_of_finite⟩)
       (hHcard q hqπ)
 
+/-- **`M_F ≤ M_σ`** (BG §15, mmd L4116 "it is easy to see ... `M_F` ... lies in `M_σ`").
+Every nilpotent normal Hall subgroup `N` of `M` is a `σ(M)`-group: for a prime `p ∣ |N|`, the
+Sylow `p`-subgroup of `N` is characteristic in `N` (nilpotent) hence normal in `M`, and a full
+Sylow `p`-subgroup of `M` (`N` Hall), so it maps to `O_p(M)`; minimality of `M` and simplicity
+of `G` give `N_G(O_p(M)) ≤ M`, i.e. `p ∈ σ(M)`.  Then `N ≤ O_{σ(M)}(M) = M_σ` by maximality of
+the `σ(M)`-core.  `§14`-independent. -/
+theorem maxNilpotentNormalHall_le_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    maxNilpotentNormalHall M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  refine sSup_le fun N hN => ?_
+  obtain ⟨hNM, hNnorm, hNnil, hNHall⟩ := hN
+  haveI := hNnorm
+  haveI := hNnil
+  set N' : Subgroup ↥M := N.subgroupOf M with hN'def
+  have hcardN' : Nat.card ↥N' = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNM).toEquiv
+  -- `N'` is a `σ(M)`-group: every prime divisor of `|N|` lies in `σ(M)`.
+  have hpi : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M) N' := by
+    intro p hp
+    have hpN : p ∈ (Nat.card ↥N).primeFactors := by rwa [hcardN'] at hp
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨‹Fact p.Prime›.1,
+        (Nat.dvd_of_mem_primeFactors hpN).trans
+          (hcardN' ▸ Subgroup.card_subgroup_dvd_card N'), Nat.card_pos.ne'⟩
+    -- `p ∤ [M : N']` (Hall), so the `p`-part of `|M|` is concentrated in `N'`.
+    have hpidx : ¬ p ∣ N'.index := fun hdvd =>
+      hNHall.2 p (Nat.mem_primeFactors.mpr
+        ⟨‹Fact p.Prime›.1, hdvd, Subgroup.index_ne_zero_of_finite⟩) hpN
+    have hfact : (Nat.card ↥M).factorization p = (Nat.card ↥N').factorization p := by
+      conv_lhs => rw [← Subgroup.card_mul_index N']
+      rw [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hpidx, add_zero]
+    -- The Sylow `p`-subgroup of the nilpotent `N'` is characteristic, hence normal in `M`,
+    -- and (Hall) a full Sylow `p`-subgroup of `M`.
+    obtain ⟨SN⟩ := (inferInstance : Nonempty (Sylow p ↥N'))
+    haveI hSNnorm : (SN : Subgroup ↥N').Normal :=
+      OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent SN
+    haveI hSNchar : (SN : Subgroup ↥N').Characteristic :=
+      Sylow.characteristic_of_normal SN hSNnorm
+    have hScard : Nat.card ↥((SN : Subgroup ↥N').map N'.subtype) =
+        p ^ (Nat.card ↥M).factorization p := by
+      rw [Subgroup.card_map_of_injective N'.subtype_injective, SN.card_eq_multiplicity, hfact]
+    haveI hmapnorm : ((SN : Subgroup ↥N').map N'.subtype).Normal := inferInstance
+    let P : Sylow p ↥M := Sylow.ofCard ((SN : Subgroup ↥N').map N'.subtype) hScard
+    have hPnorm : (P : Subgroup ↥M).Normal := hmapnorm
+    have hPmap : (P : Subgroup ↥M).map M.subtype = OddOrder.GroupTheory.opiCoreInG {p} M :=
+      OddOrder.BG.Ch3.S10.sylowMap_eq_opiCoreInG_singleton_of_normal P hPnorm
+    have hPne : OddOrder.GroupTheory.opiCoreInG {p} M ≠ ⊥ :=
+      OddOrder.BG.Ch3.S10.opiCoreInG_singleton_ne_bot_of_sylowMap_eq hpM P hPmap
+    rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+    refine ⟨hpM, P, ?_⟩
+    rw [hPmap]
+    exact OddOrder.BG.Ch2.S09.normalizer_opiCoreInG_singleton_le_maximal_of_ne_bot hG hM hPne
+  calc N = N'.map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hNM).symm
+    _ ≤ (OddOrder.Isaacs.Ch03.oPiCore (OddOrder.BG.Ch3.S10.sigma M) ↥M).map M.subtype :=
+        Subgroup.map_mono hpi.le_oPiCore
+    _ = OddOrder.BG.Ch3.S10.Msigma M := rfl
+
+/-- **`M_F = M_σ ⟺ M_σ` is nilpotent** (`§14`-independent).  Forward: `M_F` is always nilpotent
+(`maxNilpotentNormalHall_isNilpotent`).  Backward: `maxNilpotentNormalHall_le_Msigma` (always)
+and `Msigma_le_maxNilpotentNormalHall_of_nilpotent` give equality by antisymmetry. -/
+theorem maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M ↔
+      Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+  refine ⟨fun h => h ▸ maxNilpotentNormalHall_isNilpotent M, fun hnil => ?_⟩
+  exact le_antisymm (maxNilpotentNormalHall_le_Msigma hG hM)
+    (Msigma_le_maxNilpotentNormalHall_of_nilpotent hG hM hnil)
+
+/-- **`M_F ≤ M'`** (the `H ⊆ M'` part of BG Corollary 15.5(c), `H = M_F`): the containment chain
+`M_F ≤ M_σ ≤ M' ≤ M` via `maxNilpotentNormalHall_le_Msigma` and `Msigma_le_derived`.
+`§14`-independent.  (The `M'/M_F` nilpotency of 15.5(c) remains deferred — quotient API.) -/
+theorem maxNilpotentNormalHall_le_derived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    maxNilpotentNormalHall M ≤ derivedInG M :=
+  (maxNilpotentNormalHall_le_Msigma hG hM).trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
