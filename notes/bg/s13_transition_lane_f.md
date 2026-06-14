@@ -96,8 +96,12 @@ Hall (β∪β)-部分群 + F(H) の素因子取りが mathlib API 探索ポイ�
 - Lemma 10.12: `S10.disjoint_of_not_conj` (M_α∩M*_α=1 等, S10_LocalLemmasCore:1200)。
 - Thm 13.4: `S13.centralizer_le_centralizer_of_tau1`。
 - Fitting: `Ch01.fitting`; Hall existence: `Ch03.hall_E_exists`。
-- ⚠ **未特定**: Thm 10.1(b) (conjugacy M=M^g for step 3) — S10 のどこか。step 3 (Hall (β∪β)-sub
-  of C_G(P) + F(H) + O_s + Thm 10.1(b)) が最難で要組立。
+- ✅ **Thm 10.1(b) 特定 (2026-06-14)**: 機構は **`IsUniquelyMaximal`** (`OddOrder.GroupTheory.
+  MaximalSubgroup`)。`IsUniquelyMaximal.existsUnique` (∃! maximal ⊇ Y) + line-139 の eq 補題
+  (`IsUniquelyMaximal H → IsCoatom M → H≤M → M = uniqueMaximalSubgroup`)。Y uniquely-maximal
+  + Y≤M + Y≤M^g ⟹ M=M^g。Y の uniquely-maximal は Uniqueness Thm (rank≥2 + (rank≥3 ∨
+  r(C_G(Y))≥3)) で出す。⟹ 13.8 の全 handle 特定完了。step 3 の組立は ChatGPT 再構成待ち
+  (`s13_8_chatgpt_prompt.md`)。
 
 ### ⚠ 状況 (2026-06-14, ユーザー判断用)
 13.7 完成 (major milestone)。13.8 は ~150 行・step 3 が 13.7 step 5 級の deep grind。
