@@ -80,8 +80,13 @@ X⊆C_{M_α}(PQ)=1 (Lem 12.18)。X=C_{M_α}(P)≠1 と矛盾。∎
 | Thm 13.4 (3b-5) | `S13.centralizer_le_centralizer_of_tau1` | P^m,R^m∈E 要 |
 | 中心化子の共役移送 (3b-5) | `C_N(P^m)=C_N(P)^m` (N⊴, m∈M) | 手書き or `Subgroup.centralizer` conj lemma |
 | [D,Q]≤D (D Q-不変) (3c-3) | `Subgroup.commutator_le` + normalizer | |
-| nilpotent で q⊥q' 可換 (3c-5) | **要特定/構築** | 有限 nilpotent = ΠSylow; 相異素数 Sylow 可換。mathlib `IsNilpotent` + Sylow 直積 |
-| coprime commutator [D,Q,Q]=[D,Q] (3c-6) | **要特定** BG Prop 1.6(b) | repo Ch04 coprime 系 or 構築 |
+| nilpotent で q⊥q' 可換 (3c-5) | ✅ **`S10.commute_of_coprime_orderOf_of_isNilpotent`** (S10_LocalLemmasCore:679) | element-level (位数互素 ⟹ commute)。⁅L̄,Q̄⁆=⊥ は element-wise。**使用例 = S12_Lemma1218:349/970** (同パターン: nilpotent 商で coprime 像が可換) を mirror |
+| coprime commutator [D,Q,Q]=[D,Q] (3c-6) | ✅ **`OperatorQuotientAction.commutator_commutator_right_eq`** (:308; BG Prop 1.6(b)) | ⚠ `H.Normal` (ambient) 要 ⟹ **ambient を DQ にして H=D⊴DQ で適用**し G へ移送 (commutator は intrinsic) |
 
-⚠ 残工数: (3c-5) の「nilpotent で q/q' 可換」と (3c-6) の coprime `[D,Q,Q]=[D,Q]` の handle 特定が次の調査点。
-他は handle 確定。(3a) は事前プラン通り `coprime_fixedPoints_quotient`。
+✅ **全 handle 確定 — 13.8 は完全に formalize 可能**。
+- (3a): `coprime_fixedPoints_quotient_of_coprime_normal` (事前プラン通り)。inner-action setup は S03c_Thm37 が例。
+- (3b): `centralizer_le_centralizer_of_tau1` + `hall_D`/`hall_C` (PR→E 共役) + SubgroupESetup の E。
+- (3c): `commute_of_coprime_orderOf_of_isNilpotent` (S12_Lemma1218 に使用例) + `commutator_commutator_right_eq` (ambient DQ)。
+
+次イテレーション標的: 形式化を開始。難所 (3c) は handle が揃い使用例もある。
+(3b) の SubgroupESetup の E への P,R 同時共役 (PR≤E) が最も組立工数大か。
