@@ -928,6 +928,50 @@ theorem sigmaNC_le_two_of_inner_chiFam
             hyp hVeq app hξ'Z hξ'1
     _ = 2 := rfl
 
+/-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
+and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
+`⟨c·ξ, ω^σ⟩ = 0` for every `σ`-image `ω^σ = chiFam pq`.  Chains the four disjointness bricks:
+`sigmaNC_le_two_of_inner_chiFam` (`NC ≤ 2`) → `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`
+(`grid_eq_zero`, all `σ`-coefficients vanish since `2 < min(w₁, w₂)`) →
+`inner_eq_zero_of_smul_sub_smul_orthogonal` (extract `⟨ξ, ω^σ⟩ = 0` from `⟨c·ξ − c'·ξ', ω^σ⟩ = 0`,
+integrality `⟨ξ, ω^σ⟩ ∈ ℤ`).
+
+This is Peterfalvi (5.3.b) for the certain-type column families: with `c·ξ = Y = cY.extension η₁`
+and `c·ξ − c'·ξ' = (η₁ − η̄₁)^τ`, it gives `⟨Y, certainTypeOmegaSigma⟩ = 0`, the seam-1 `hXorth`
+input of the capstone `per_constituent_Y_eq_smul`.  Only the anchor `(η₁ − η̄₁)^τ` vanishes on `V`
+(the structural `V ∩ dadeSupport = ∅`) remains to be supplied. -/
+theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ξ ξ' : ClassFunction G ℂ} (hξZ : ξ ∈ ZIrr G) (hξ1 : ClassFunction.inner ξ ξ = 1)
+    (hξ'Z : ξ' ∈ ZIrr G) (hξ'1 : ClassFunction.inner ξ' ξ' = 1)
+    (hξξ' : ClassFunction.inner ξ ξ' = 0)
+    {c c' : ℂ} (hc : c ≠ 0)
+    (hvanish : ∀ v ∈ hyp.V, (c • ξ - c' • ξ') v = 0)
+    (hmin : 2 < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    ClassFunction.inner (c • ξ) (hyp.chiFam hVeq app pq) = 0 := by
+  -- `NC(ψ) ≤ 2` where `ψ = c•ξ − c'•ξ'`.
+  have hNC : hyp.sigmaNC hVeq app (c • ξ - c' • ξ') ≤ 2 := by
+    refine sigmaNC_le_two_of_inner_chiFam hyp hVeq app hξZ hξ1 hξ'Z hξ'1 (fun pq' hpq' => ?_)
+    by_contra hcon
+    push_neg at hcon
+    refine hpq' ?_
+    change ClassFunction.inner (c • ξ - c' • ξ') (hyp.chiFam hVeq app pq') = 0
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+      hcon.1, hcon.2, mul_zero, mul_zero, sub_zero]
+  -- All `σ`-coefficients vanish (`grid_eq_zero`, `NC < min`).
+  have hpsi : ClassFunction.inner (c • ξ - c' • ξ') (hyp.chiFam hVeq app pq) = 0 :=
+    sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt hyp hVeq app hvanish (lt_of_le_of_lt hNC hmin) pq
+  -- Extract `⟨ξ, chiFam pq⟩ = 0`, then `⟨c•ξ, chiFam pq⟩ = 0`.
+  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hξZ ((hyp.chiFam_spec hVeq app).2.1 pq)
+  have hθ : ClassFunction.inner (hyp.chiFam hVeq app pq) (hyp.chiFam hVeq app pq) = 1 := by
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  rw [ClassFunction.inner_smul_left,
+    inner_eq_zero_of_smul_sub_smul_orthogonal hξ1 hθ hξξ' hm hc hpsi, mul_zero]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
