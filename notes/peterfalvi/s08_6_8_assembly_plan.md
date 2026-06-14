@@ -2488,3 +2488,22 @@ or character setup ([Is]2.27 + Ind 分解)。abstract layer は完成済みゆ�
 A^G∩V=∅ で certain-type Dade 像の V-vanishing を確立。これが取れれば残り (NC/grid/整数抽出) は機械的。
 anchor が重い場合は先に sub-lemma 5 (整数性抽出, 純 abstract, certain-type 非依存) を landさせて momentum 維持。
 **正本=本 cont.⁴⁴。clean route 確定。次=anchor (sub-lemma 1) 形式化。**
+
+## 2026-06-14 (session 40 cont.⁴⁵, /loop): ✅✅ disjointness の "downstream" 2 brick landed (building 転換)
+
+### ✅ landed (S08_CaseBCoherence2, 全 axiom-clean 標準3, leaf 3625):
+| commit | lemma | 役割 |
+|---|---|---|
+| `547a14b1` | `inner_intCast_sq_le` | `inner_Y_coeff_sq_le` を一般化 (任意 u,w): ⟨u,w⟩=b∈ℤ ∧ ‖w‖²=1 ⟹ b²≤‖u‖²。整数性 |b|≤1 の基盤。呼び出し2箇所更新 (no-wrapper) |
+| `05650497` | **`inner_eq_zero_of_smul_sub_smul_orthogonal`** | **sub-lemma 5 (extraction core)**: ξ,ξ' 正規直交 + θ norm-1 + ⟨ξ,θ⟩∈ℤ + c·ξ−c'·ξ'⊥θ (c≠0) ⟹ ⟨ξ,θ⟩=0。`inner_intCast_sq_le`(|·|≤1) + `eq_smul_of_inner_self_eq`(±1⟹ξ=±θ) で。純・certain-type 非依存 |
+
+### ▶ disjointness 残ピース (downstream 完成、残り upstream):
+- ✅ **sub-lemma 5 (extraction)** = 上記。「(η₁−η̄₁)^τ=ε·ξ−ε'·ξ' ⊥ chiFam」⟹「⟨ξ,chiFam⟩=0」を変換。
+- ⚠ **sub-lemma 1 (anchor)** = 「(η₁−η̄₁)^τ が (ticVdiff h).V 上消失」: Sibley tau 像 (A-supported) vs ticVdiff V の
+  構造的 disjointness。**未確認の残ハード piece** (cont.⁴⁴ 確認: 既存 lemma 直接無し)。
+- ⚠ **assembly**: Y=ε·ξ (coherentYset_extension_eq_zsmul_irreducible) + ξ≠ξ' (η₁ 非実) +
+  (η₁−η̄₁)^τ=ε·ξ−ε'·ξ' (extends_on_supported) + NC≤2 + grid_eq_zero(要 anchor) + extraction → ⟨Y,certainTypeOmegaSigma⟩=0
+  → seam-1 hXorth。さらに **map-juggling** (capstone τ=certain-type dade0/h.tau vs Y=Sibley cY.ext;
+  hXorth は ⟨(D i).X, Y⟩ で D i.X∈ℤ[σ-images]、Y は抽象 G-function ゆえ map 差は OK だが sigmaCoeff 接続に注意)。
+**正本=本 cont.⁴⁵。extraction core landed。次=anchor (sub-lemma 1) の Sibley-V disjointness 構造調査 → 形式化。
+anchor が deep なら assembly の other pieces (Y=ε·ξ setup, NC≤2) を先に land。**
