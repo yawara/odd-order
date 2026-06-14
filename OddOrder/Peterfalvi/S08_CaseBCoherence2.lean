@@ -610,30 +610,31 @@ theorem eq_of_sum_mul_eq_sum_sq {ι : Type*} (s : Finset ι) (a b : ι → ℤ)
   · exact absurd h (ne_of_gt hpos)
   · linarith [sub_eq_zero.mp h]
 
-/-- **Cauchy–Schwarz for the `Y`-coefficient of a (5.4) decomposition** (the (6.8.2.3) per-step
-bound `bᵢ² ≤ ‖Y‖²`).  For a `CharacterPsiDecomposition` `D` and a norm-`1` vector `Y`, the integer
-coefficient `b = ⟨D.Y, Y⟩` satisfies `b² ≤ ‖D.Y‖²`.  Pythagoras against the orthogonal split
-`D.Y = b·Y + (D.Y − b·Y)` (the complement `W` is orthogonal to `Y`, since `b` is real:
-`⟨Y, W⟩ = \overline{⟨D.Y, Y⟩} − \overline{b} = 0`), with `‖W‖² ≥ 0` (`inner_self_re_nonneg`). -/
-theorem inner_Y_coeff_sq_le {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
-    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
-    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ)
-    {Y : ClassFunction G ℂ} (hYnorm : ClassFunction.inner Y Y = 1)
-    {b : ℤ} (hb : ClassFunction.inner D.Y Y = (b : ℂ)) :
-    (b : ℝ) ^ 2 ≤ (ClassFunction.inner D.Y D.Y).re := by
-  set W := D.Y - (b : ℂ) • Y with hWdef
-  have hYW : ClassFunction.inner Y W = 0 := by
+/-- **Cauchy–Schwarz against a norm-`1` vector** (integer-coefficient form).  If `⟨u, w⟩ = b ∈ ℤ`
+and `‖w‖² = 1`, then `b² ≤ ‖u‖²`.  Pythagoras against the orthogonal split `u = b·w + (u − b·w)`
+(the complement `W` is orthogonal to `w`, since `b` is real: `⟨w, W⟩ = \overline{⟨u, w⟩} − \overline{b}
+= 0`), with `‖W‖² ≥ 0` (`inner_self_re_nonneg`).
+
+Specializes (with `u = D.Y`, `w = Y`) to the (6.8.2.3) per-step bound `bᵢ² ≤ ‖D.Y‖²`
+(`inner_Y_coeff_le_of_psi_nsmul`), and (with `‖u‖² = 1`) gives the integrality bound `|b| ≤ 1` used
+in the orthogonality extraction for the disjointness `R(μ_j) ⊥ Y`. -/
+theorem inner_intCast_sq_le {u w : ClassFunction G ℂ}
+    (hw : ClassFunction.inner w w = 1)
+    {b : ℤ} (hb : ClassFunction.inner u w = (b : ℂ)) :
+    (b : ℝ) ^ 2 ≤ (ClassFunction.inner u u).re := by
+  set W := u - (b : ℂ) • w with hWdef
+  have hwW : ClassFunction.inner w W = 0 := by
     rw [hWdef, ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
-      hYnorm, mul_one, OddOrder.RepresentationTheory.inner_conj_symm D.Y Y, hb, star_intCast,
+      hw, mul_one, OddOrder.RepresentationTheory.inner_conj_symm u w, hb, star_intCast,
       sub_self]
-  have hWY : ClassFunction.inner W Y = 0 := by
-    rw [hWdef, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hb, hYnorm, mul_one,
+  have hWw : ClassFunction.inner W w = 0 := by
+    rw [hWdef, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hb, hw, mul_one,
       sub_self]
-  have hexpand : ClassFunction.inner D.Y D.Y = (b : ℂ) * (b : ℂ) + ClassFunction.inner W W := by
-    conv_lhs => rw [show D.Y = (b : ℂ) • Y + W by rw [hWdef]; abel]
+  have hexpand : ClassFunction.inner u u = (b : ℂ) * (b : ℂ) + ClassFunction.inner W W := by
+    conv_lhs => rw [show u = (b : ℂ) • w + W by rw [hWdef]; abel]
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
-      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hYnorm, hYW,
-      hWY, mul_one, mul_zero, star_intCast, add_zero, zero_add]
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hw, hwW,
+      hWw, mul_one, mul_zero, star_intCast, add_zero, zero_add]
   rw [hexpand, Complex.add_re,
     show ((b : ℂ) * (b : ℂ)).re = (b : ℝ) ^ 2 by
       rw [Complex.mul_re, Complex.intCast_re, Complex.intCast_im]; ring]
@@ -645,7 +646,7 @@ Cauchy–Schwarz step).  For a (5.4) decomposition `Da : CharacterPsiDecompositi
 `η` a norm-`1` vector and `Y` a norm-`1` vector, the integer coefficient `b = ⟨Da.Y, Y⟩` is bounded
 by the multiplicity `a`.
 
-Chaining `inner_Y_coeff_sq_le` (`b² ≤ ‖Da.Y‖²`) with the (5.6.2) opening bound
+Chaining `inner_intCast_sq_le` (`b² ≤ ‖Da.Y‖²`) with the (5.6.2) opening bound
 `inner_self_Y_re_le_inner_self_psi` (`‖Da.Y‖² ≤ ‖a·η‖² = a²`) gives `b² ≤ a²` over `ℤ`; with
 `a ≥ 0` the integer tail `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a` finishes.  This is the per-constituent input to
 the (6.8.2.3) pinning `eq_of_sum_mul_eq_sum_sq`. -/
@@ -663,7 +664,7 @@ theorem inner_Y_coeff_le_of_psi_nsmul {L : Subgroup G} [Fintype ↥L] [Invertibl
       Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
     ring
   -- `b² ≤ ‖Da.Y‖² ≤ ‖ψ‖² = a²`, over `ℝ` then `ℤ`.
-  have hsq := inner_Y_coeff_sq_le D hYnorm hb
+  have hsq := inner_intCast_sq_le hYnorm hb
   have hYle := D.inner_self_Y_re_le_inner_self_psi
   rw [hψnorm] at hYle
   have hb2z : b ^ 2 ≤ (a : ℤ) ^ 2 := by exact_mod_cast le_trans hsq hYle
@@ -784,7 +785,7 @@ theorem per_constituent_Y_eq_smul {L : Subgroup G} [Fintype ↥L] [Invertible (N
     eq_of_sum_mul_eq_sum_sq s (fun j => (a j : ℤ)) b (fun j _ => Int.natCast_nonneg (a j))
       hbound hsumeq i hi (show (0 : ℤ) < ((a i : ℕ) : ℤ) by exact_mod_cast hpos)
   -- `‖Dᵢ.Y‖² = aᵢ²`:  `aᵢ² = bᵢ² ≤ ‖Dᵢ.Y‖² ≤ ‖aᵢ·η‖² = aᵢ²`.
-  have hCS := inner_Y_coeff_sq_le (D i) hYY (hbi i hi)
+  have hCS := inner_intCast_sq_le hYY (hbi i hi)
   have h562 := (D i).inner_self_Y_re_le_inner_self_psi
   have hψnorm : (ClassFunction.inner (a i • η : ClassFunction ↥L ℂ) (a i • η)).re
       = (a i : ℝ) ^ 2 := by
