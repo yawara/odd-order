@@ -184,6 +184,55 @@ theorem card_eq_of_index_two (A : Subgroup Fˣ) [Finite F] (hidx : A.index = 2) 
   have hpos : 0 < Nat.card F := Nat.card_pos
   omega
 
+/-- **Free-orbit counting bound** (the engine behind irreducibility in Appendix C, Proposition 2).
+If a commutative subgroup `A ⊆ Fˣ` acts on `(F, +)` by right multiplication and `U` is a nontrivial
+`A`-invariant subgroup, then `|A| + 1 ≤ |U|`.  Indeed `A` acts *freely* on `U ∖ {1}`
+(`rightMulAction_eq_self_iff`), so `|A| ∣ |U| - 1` (`card_group_dvd_card_of_free`); as `U ≠ ⊥` the
+quotient `|U| - 1` is positive, whence `|A| ≤ |U| - 1`.  Applied to both an invariant subgroup and
+its complement, this drives the `(|A|+1)² > 2|A|+1` contradiction. -/
+theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    {U : Subgroup (Multiplicative F)}
+    (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) (hU : U ≠ ⊥) :
+    Nat.card A + 1 ≤ Nat.card U := by
+  classical
+  letI : MulDistribMulAction A (Multiplicative F) :=
+    MulDistribMulAction.compHom _ (rightMulAction A hcomm)
+  -- the `A`-stable set `U ∖ {1}` as a `SubMulAction`.
+  let sma : SubMulAction A (Multiplicative F) :=
+    { carrier := {x | x ∈ U ∧ x ≠ 1}
+      smul_mem' := fun a {x} hx => by
+        refine ⟨hUinv.smul_mem a hx.1, fun h => hx.2 ?_⟩
+        exact (rightMulAction A hcomm a).injective (by rw [map_one]; exact h) }
+  -- `A` acts freely on `U ∖ {1}`.
+  have hfree : ∀ b : sma, MulAction.stabilizer A b = ⊥ := by
+    intro b
+    have hb : (b : Multiplicative F) ∈ U ∧ (b : Multiplicative F) ≠ 1 := b.2
+    rw [eq_bot_iff]
+    intro a ha
+    rw [MulAction.mem_stabilizer_iff] at ha
+    have hval : (rightMulAction A hcomm a) (b : Multiplicative F) = (b : Multiplicative F) :=
+      congrArg Subtype.val ha
+    exact Subgroup.mem_bot.mpr (rightMulAction_eq_self_iff A hcomm a _ hb.2 hval)
+  have hdvd : Nat.card A ∣ Nat.card sma := card_group_dvd_card_of_free hfree
+  -- `|U ∖ {1}| + 1 = |U|`.
+  have e : (sma : Type _) ≃ {y : U // y ≠ 1} :=
+    { toFun := fun x => ⟨⟨x.1, x.2.1⟩, fun h => x.2.2 (Subtype.ext_iff.mp h)⟩
+      invFun := fun y => ⟨y.1.1, y.1.2, fun h => y.2 (Subtype.ext h)⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  have hcard : Nat.card sma + 1 = Nat.card U := by
+    rw [Nat.card_congr e, ← Finite.card_option]
+    exact Nat.card_congr (Equiv.optionSubtypeNe (1 : U))
+  -- `|U ∖ {1}| > 0` since `U ≠ ⊥`.
+  have hpos : 0 < Nat.card sma := by
+    obtain ⟨a, ha⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hU
+    haveI : Nonempty sma := ⟨⟨a.1, a.2, fun h => ha (Subtype.ext h)⟩⟩
+    exact Nat.card_pos
+  have hle : Nat.card A ≤ Nat.card sma := Nat.le_of_dvd hpos hdvd
+  omega
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
