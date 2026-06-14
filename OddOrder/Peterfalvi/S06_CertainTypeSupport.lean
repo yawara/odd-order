@@ -277,6 +277,25 @@ theorem not_subset_characterKernel_chiRestrict
   have hkW2 := Subgroup.mem_subgroupOf.mp hk
   exact Subgroup.mem_subgroupOf.mpr (h.W2_le_subH hkW2)
 
+/-- **`χ_j ≠ 1_K`** (Peterfalvi (4.7), nontriviality of the certain-type restriction): for a
+nontrivial column `χ₂ ≠ 1`, the irreducible restriction `χ_j = Res_K μ_{0j}` is **not** the trivial
+character of `K`.  Were it trivial, its kernel would be all of `↥K`, in particular containing
+`H.subgroupOf K`, contradicting `not_subset_characterKernel_chiRestrict`.
+
+This is the `S`-membership input for the (6.8) case-(B) `X`-coherence: it certifies that the column
+character `μ_j = Ind_K^L χ_j` is induced from a *nontrivial* irreducible of `K = H`, hence lies in
+the Sibley set `S = {Ind_H^L θ | θ ≠ 1}`. -/
+theorem chiRestrict_ne_trivialIrreducibleCharacter
+    (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    h.chiRestrict χ₂ ≠ trivialIrreducibleCharacter ↥h.K := by
+  intro htriv
+  refine not_subset_characterKernel_chiRestrict h hχ₂ ?_
+  rw [htriv, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+    S03.characterKernel_trivialClassFunction]
+  exact Set.subset_univ _
+
 /-- **Peterfalvi (4.7), `j ≥ 1` support**: `Supp χ_j ⊆ A ∪ {1}` for a nontrivial column
 `χ₂ ≠ 1`. -/
 theorem chiRestrict_apply_eq_zero_of_not_mem_union
