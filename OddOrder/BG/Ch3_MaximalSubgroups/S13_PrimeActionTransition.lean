@@ -2027,6 +2027,27 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
+/-- `q ∈ σ(M)` なら `M_σ` の `q`-part は `M` のそれに等しい: `M_σ` は `M` の Hall `σ(M)`-部分群
+(`Msigma_subgroupOf_isHall`) なので `q ∈ σ(M)` は指数を割らず、`v_q(|M|) = v_q(|M_σ|)`。
+⟹ `M_σ` の Sylow `q`-部分群は `M` (そして `G`) の Sylow `q`-部分群。 -/
+theorem factorization_Msigma_eq_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} (hqσ : q ∈ S10.sigma M) :
+    (Nat.card ↥(S10.Msigma M)).factorization q = (Nat.card ↥M).factorization q := by
+  have hqprime : q.Prime := Nat.prime_of_mem_primeFactors ((S10.mem_sigma_iff M q).mp hqσ).1
+  have hHall := S10.Msigma_subgroupOf_isHall hG hM
+  have hcardMσ : Nat.card ↥((S10.Msigma M).subgroupOf M) = Nat.card ↥(S10.Msigma M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).toEquiv
+  have hidx_ne : ((S10.Msigma M).subgroupOf M).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcard_ne : Nat.card ↥((S10.Msigma M).subgroupOf M) ≠ 0 := Nat.card_pos.ne'
+  have hqidx : ¬ q ∣ ((S10.Msigma M).subgroupOf M).index := fun hd =>
+    hHall.2 q (Nat.mem_primeFactors.mpr ⟨hqprime, hd, hidx_ne⟩) hqσ
+  have hmul := Subgroup.card_mul_index ((S10.Msigma M).subgroupOf M)
+  calc (Nat.card ↥(S10.Msigma M)).factorization q
+      = (Nat.card ↥((S10.Msigma M).subgroupOf M)).factorization q := by rw [hcardMσ]
+    _ = (Nat.card ↥M).factorization q := by
+        rw [← hmul, Nat.factorization_mul hcard_ne hidx_ne, Finsupp.add_apply,
+          Nat.factorization_eq_zero_of_not_dvd hqidx, add_zero]
+
 /-- フル `q`-part を持つ `q`-部分群は極大 `q`-部分群: `S ≤ N`, `|S| = q^{v_q(|N|)}` で `S ≤ T ≤ N`
 が `q`-群なら `S = T` (`|T| = q^k ∣ |N| ⟹ k ≤ v_q(|N|) ⟹ |T| ≤ |S|`, `S ≤ T` と合わせて等しい)。 -/
 theorem eq_of_le_of_isPGroup_card_eq_factorization [Finite G] {q : ℕ} [Fact q.Prime]
