@@ -892,6 +892,34 @@ theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have ha : a ∈ Subgroup.center G := hc ▸ Subgroup.mem_top a
     exact (Subgroup.mem_center_iff.mp ha b).symm
 
+/-- **`C_G(P)` の Hall `θ`-部分群で指定 `θ`-部分群 `U` を含むもの** (`P ≠ 1`): 可解群の Hall
+D-定理 (`Ch03.hall_D`) を `↥C_G(P)` に適用。Lemma 13.8 GAP 2 で `H ⊇ C_{M_β}(P)` (M 側) /
+`H ⊇ C_{M*_β}(P)` (M* 側) を取るのに使う。 -/
+theorem exists_hall_theta_ge [Finite G] (hG : IsMinimalSimpleOdd G) {P : Subgroup G} (hP : P ≠ ⊥)
+    {θ : Set ℕ} {U : Subgroup G} (hUC : U ≤ Subgroup.centralizer (P : Set G))
+    (hUθ : Subgroup.IsPiSubgroup θ U) :
+    ∃ H : Subgroup G, H ≤ Subgroup.centralizer (P : Set G) ∧
+      Ch03.IsHallSubgroup θ (H.subgroupOf (Subgroup.centralizer (P : Set G))) ∧ U ≤ H := by
+  haveI : IsSolvable ↥(Subgroup.centralizer (P : Set G)) := centralizer_isSolvable_of_ne_bot hG hP
+  have hcond : ∀ q ∈ (Nat.card ↥(U.subgroupOf (Subgroup.centralizer (P : Set G)))).primeFactors,
+      q ∈ θ := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUC).toEquiv] at hq
+    exact hUθ q hq
+  obtain ⟨H₀, hH₀hall, hUH₀⟩ :=
+    Ch03.hall_D (G := ↥(Subgroup.centralizer (P : Set G))) (π := θ)
+      (U := U.subgroupOf (Subgroup.centralizer (P : Set G))) hcond
+  refine ⟨H₀.map (Subgroup.centralizer (P : Set G)).subtype, Subgroup.map_subtype_le _, ?_, ?_⟩
+  · have heq : (H₀.map (Subgroup.centralizer (P : Set G)).subtype).subgroupOf
+        (Subgroup.centralizer (P : Set G)) = H₀ :=
+      Subgroup.comap_map_eq_self_of_injective
+        (Subgroup.centralizer (P : Set G)).subtype_injective H₀
+    rw [heq]; exact hH₀hall
+  · intro x hxU
+    have hxC : x ∈ Subgroup.centralizer (P : Set G) := hUC hxU
+    rw [Subgroup.mem_map]
+    exact ⟨⟨x, hxC⟩, hUH₀ (Subgroup.mem_subgroupOf.mpr hxU), rfl⟩
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
