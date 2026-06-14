@@ -2250,7 +2250,81 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   intro q hq
   rw [Set.mem_inter_iff] at hq
   obtain ⟨hqM, hqMstar⟩ := hq
-  sorry
+  haveI hqfact : Fact q.Prime :=
+    ⟨Nat.prime_of_mem_primeFactors ((S10.mem_sigma_iff M q).mp hqM).1⟩
+  -- `S` = an `E`-invariant Sylow `q`-subgroup of `M_σ`; it is a Sylow `q` of `G`, maximal, `≠ 1`.
+  obtain ⟨S, hSMσ, hSq, hSEnorm, hScard⟩ := exists_einvariant_sylow_Msigma hG h q
+  have hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T :=
+    fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
+  have hScardG : Nat.card ↥S = q ^ (Nat.card G).factorization q := by
+    rw [hScard, factorization_Msigma_eq_of_mem_sigma hG hM hqM, factorization_M_eq_G_of_mem_sigma hqM]
+  have hvpos : 0 < (Nat.card ↥(S10.Msigma M)).factorization q := by
+    rw [factorization_Msigma_eq_of_mem_sigma hG hM hqM]
+    obtain ⟨_, hqdvdM, hMne⟩ := Nat.mem_primeFactors.mp ((S10.mem_sigma_iff M q).mp hqM).1
+    exact hqfact.out.factorization_pos_of_dvd hMne hqdvdM
+  have hSne : S ≠ ⊥ := by
+    intro hb
+    have h1 : Nat.card ↥S = 1 := by rw [hb]; exact Subgroup.card_bot
+    rw [hScard, Nat.pow_eq_one] at h1
+    rcases h1 with h1 | h0
+    · exact hqfact.out.ne_one h1
+    · omega
+  have hSinf_M : S ≤ M := hSMσ.trans (S10.Msigma_le M)
+  have hNSM : Subgroup.normalizer (S : Set G) ≤ M :=
+    normalizer_einvariant_sylow_le hG hM hqM hSMσ hScard
+  -- WLOG: conjugate `M*` to `Mstar' = conj g • M*` with `S ≤ Mstar'`, `N_G(S) ⊆ Mstar'`.
+  obtain ⟨g, hSMstar', hNSMstar'⟩ := exists_conj_Mstar_normalizer_le hqMstar hScardG
+  set Mstar' : Subgroup G := MulAut.conj g • Mstar with hMstar'def
+  have hMstar'mem : Mstar' ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr (isCoatom_conj_smul (mem_maximalSubgroups.mp hMstar))
+  have hnc' : ¬ ∃ gg : G, MulAut.conj gg • M = Mstar' := by
+    rintro ⟨gg, hgg⟩
+    refine hnc ⟨g⁻¹ * gg, ?_⟩
+    rw [hMstar'def] at hgg
+    rw [map_mul, mul_smul, hgg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hMstar'ne : Mstar' ≠ M := fun heq => hnc' ⟨1, by rw [map_one, one_smul, heq]⟩
+  -- `p ∈ τ₁(M)` (from `E₁ ≠ 1`) and `P = ⟨x⟩ ∈ ℰ_p¹(E₁)`.
+  have hE1card1 : Nat.card ↥E₁ ≠ 1 :=
+    (Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot E₁).mpr hE1ne)).ne'
+  obtain ⟨p, hpprime, hpdvd⟩ := (Nat.card ↥E₁).exists_prime_and_dvd hE1card1
+  haveI : Fact p.Prime := ⟨hpprime⟩
+  have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+  have hpτ1 : p ∈ tau1 M :=
+    h.E₁_hall.1 p (by rw [hc1]; exact Nat.mem_primeFactors.mpr ⟨hpprime, hpdvd, Nat.card_pos.ne'⟩)
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpdvd
+  have hPcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by
+    rw [Nat.card_zpowers]
+    exact (orderOf_injective E₁.subtype E₁.subtype_injective x).trans hx
+  have hPmem : (Subgroup.zpowers (x : G)) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
+  have hPE1 : (Subgroup.zpowers (x : G)) ≤ E₁ := Subgroup.zpowers_le.mpr x.2
+  have hP1ne : (Subgroup.zpowers (x : G)) ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hPmem
+  have hPp : IsPGroup p ↥(Subgroup.zpowers (x : G)) := (mem_elemAbelianOfRank.mp hPmem).1.isPGroup
+  have hPE : (Subgroup.zpowers (x : G)) ≤ E := hPE1.trans h.E₁_le
+  have hPinv : (Subgroup.zpowers (x : G)) ≤ Subgroup.normalizer (S : Set G) := hPE.trans hSEnorm
+  have hPM : (Subgroup.zpowers (x : G)) ≤ M := hPE.trans h.E_le
+  have hPMstar' : (Subgroup.zpowers (x : G)) ≤ Mstar' := hPinv.trans hNSMstar'
+  have hPMM' : (Subgroup.zpowers (x : G)) ≤ M ⊓ Mstar' := le_inf hPM hPMstar'
+  -- `C_S(P) = 1` (Lemma 13.6 via `ℳ(S) = {M}`).
+  have hCSP : S ⊓ Subgroup.centralizer ((Subgroup.zpowers (x : G)) : Set G) = ⊥ :=
+    centralizer_sylow_inf_eq_bot hG h hqM hPE1 hP1ne hSMσ hSq hSmax hMstar'mem hMstar'ne hSMstar'
+  -- `S` is a maximal `q`-subgroup of `M ⊓ Mstar'` (it is a Sylow `q` of `G`).
+  have hScardTop : Nat.card ↥S = q ^ (Nat.card ↥(⊤ : Subgroup G)).factorization q := by
+    rw [hScardG, Subgroup.card_top]
+  have hQmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar' → IsPGroup q ↥T → S ≤ T → S = T :=
+    fun T _ hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScardTop le_top hTq hST
+  have hSinf : S ≤ M ⊓ Mstar' := le_inf hSinf_M hSMstar'
+  -- `p ∈ τ₁(Mstar')`.
+  have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpprime, hpdvd.trans (Subgroup.card_dvd_of_le h.E₁_le), Nat.card_pos.ne'⟩
+  have hpMstar : p ∈ (Nat.card ↥Mstar').primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpprime, hPcard ▸ Subgroup.card_dvd_of_le hPMstar', Nat.card_pos.ne'⟩
+  have hpτ1star : p ∈ tau1 Mstar' :=
+    mem_tau1_Mstar_of_einvariant_sylow hG h hMstar'mem hnc' hpE hpMstar hPMM' hPp hSMσ hSMstar' hSne hCSP
+  -- Lemma 13.8 with `Q = Q* = S` yields the contradiction.
+  exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
+    hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
 
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
