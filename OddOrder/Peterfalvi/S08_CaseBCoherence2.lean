@@ -721,6 +721,35 @@ theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
   exact hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
     hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
 
+/-- **Restriction of an induced character back to a central subgroup.**  For `Z ≤ Z(Γ)`,
+`Res_Z (Ind_Z^Γ φ) = |Γ : Z| • φ`: by the Mackey formula `|Z| • Res_Z (Ind_Z φ) = ∑_{x ∈ Γ} φ^{x⁻¹}`
+(`card_smul_restrict_induce`), and `φ^{x⁻¹} = φ` for every `x` since `Z` is central (conjugation
+fixes `Z` pointwise), so the right side is `|Γ| • φ = |Z|·|Γ:Z| • φ`; cancelling `|Z|` gives the
+claim.  This is the `∑ aᵢ² = |H : Z|` input of Peterfalvi (6.8.2.3) (via
+`‖Ind_Z^H φ‖² = ⟨φ, Res_Z Ind_Z^H φ⟩ = |H : Z|`). -/
+theorem restrict_induce_eq_index_smul_of_le_center {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {Z : Subgroup Γ} [Invertible (Nat.card ↥Z : ℂ)]
+    (hZ : Z ≤ Subgroup.center Γ) (φ : ClassFunction ↥Z ℂ) :
+    ClassFunction.restrict Z (ClassFunction.induce Z φ) = (Z.index : ℂ) • φ := by
+  haveI hZn : Z.Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have hgn : g * n * g⁻¹ = n := by rw [Subgroup.mem_center_iff.mp (hZ hn) g]; group
+    rw [hgn]; exact hn
+  have hconj : ∀ x : Γ, ClassFunction.conjBy x⁻¹ φ = φ := by
+    intro x; ext z
+    rw [ClassFunction.conjBy_apply]
+    refine congrArg φ (Subtype.ext ?_)
+    show x⁻¹ * (z : Γ) * (x⁻¹)⁻¹ = (z : Γ)
+    rw [inv_inv, Subgroup.mem_center_iff.mp (hZ z.2) x⁻¹]; group
+  have hcardZ : (Nat.card ↥Z : ℂ) ≠ 0 := Invertible.ne_zero _
+  have hkey := card_smul_restrict_induce (H := Z) φ
+  simp only [hconj, Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card] at hkey
+  -- hkey : (|Z| : ℂ) • restrict = |Γ| • φ  (ℕ-smul on the right)
+  have hRHS : (Nat.card Γ) • φ = (Nat.card ↥Z : ℂ) • ((Z.index : ℂ) • φ) := by
+    rw [← mul_smul, ← Nat.cast_mul, Subgroup.card_mul_index, Nat.cast_smul_eq_nsmul]
+  rw [hRHS] at hkey
+  exact smul_right_injective (ClassFunction ↥Z ℂ) hcardZ hkey
+
 /-- **(6.8.2) case-(B): `W₂` is central in `H`.**  In case (B), `W₂ ⊆ Z(↥L)`
 (`certainType_W2_le_center`), so its trace `W₂.subgroupOf H` lies in `Z(↥H)`: a `W₂`-element
 commutes with all of `↥L`, hence with `↥H`.  This is the [Is] 2.27 hypothesis `Z ≤ Z(G)` (with
