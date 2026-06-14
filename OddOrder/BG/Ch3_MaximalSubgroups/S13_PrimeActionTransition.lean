@@ -1067,6 +1067,44 @@ theorem gap3_assembly [Finite G] {M Mstar Q P : Subgroup G} (hQM : Q ≤ M)
     exact le_inf inf_le_right hXCQ
   exact hXne (le_bot_iff.mp (hCMαPQ ▸ le_inf inf_le_left hXCPQ))
 
+/-! ## helper: Fitting の同型不変性 (Lemma 13.8 dispatch — Hall 共役の F-primes 一致) -/
+
+/-- **`p`-core の像 ≤ `p`-core** (群同型 `e`): `(O_p(A)).map e ≤ O_p(B)`。像は正規 `p`-部分群
+ゆえ `normal_pgroup_le_opCore`。 -/
+theorem opCore_map_le_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
+    (Ch01.opCore p A).map e.toMonoidHom ≤ Ch01.opCore p B := by
+  haveI : ((Ch01.opCore p A).map e.toMonoidHom).Normal :=
+    (Ch01.opCore.normal p A).map e.toMonoidHom e.surjective
+  exact Ch01.normal_pgroup_le_opCore
+    ((Ch01.opCore_isPGroup p A).of_equiv
+      (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective))
+
+/-- **`p`-core は群同型で保たれる**: `e : A ≃* B` なら `(O_p(A)).map e = O_p(B)`。 -/
+theorem opCore_map_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
+    (Ch01.opCore p A).map e.toMonoidHom = Ch01.opCore p B := by
+  refine le_antisymm (opCore_map_le_of_mulEquiv e) ?_
+  have h2 := opCore_map_le_of_mulEquiv (p := p) e.symm
+  have hid : e.toMonoidHom.comp e.symm.toMonoidHom = MonoidHom.id B := by ext x; simp
+  calc Ch01.opCore p B
+      = (Ch01.opCore p B).map (MonoidHom.id B) := (Subgroup.map_id _).symm
+    _ = ((Ch01.opCore p B).map e.symm.toMonoidHom).map e.toMonoidHom := by
+        rw [← hid, Subgroup.map_map]
+    _ ≤ (Ch01.opCore p A).map e.toMonoidHom := Subgroup.map_mono h2
+
+/-- **Fitting 部分群の位数は群同型で不変**: `e : A ≃* B` なら `|F(A)| = |F(B)|`。
+`F = ⨆ O_p` を `opCore_map_of_mulEquiv` + `map_iSup` で写し、`card_map_of_injective`。 -/
+theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    (e : A ≃* B) : Nat.card ↥(Ch01.fitting A) = Nat.card ↥(Ch01.fitting B) := by
+  have hmap : (Ch01.fitting A).map e.toMonoidHom = Ch01.fitting B := by
+    unfold Ch01.fitting
+    rw [Subgroup.map_iSup]
+    refine iSup_congr (fun p => ?_)
+    haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+    exact opCore_map_of_mulEquiv e
+  rw [← hmap, Subgroup.card_map_of_injective e.injective]
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
