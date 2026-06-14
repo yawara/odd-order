@@ -190,3 +190,30 @@ statement の修正は G に波及しない** (grep 確認済) — ただし**�
 - **gated ゆえ未修正 (要 §13 着地 + 設計判断)**: M̃/R(x) 形式化 (→14.5(a)(c)/14.7(e)/14.9 を M̃ で再定式)、
   14.3 再定式化、14.12 仮説 tighten、14.4 headline 復元 vs §16 cite。**M̃ 形式化が §14→§15/§16 の
   faithfulness の要** ⟹ hub/G と要調整 (`sigmaSharp` 共有のため)。
+
+## ✅ Faithful reformulation 着地 (2026-06-15, Lane H)
+
+§13 gate 待ちの holding-pattern として、上記「gated ゆえ未修正」のうち **§13 非依存 + §14 内で完結する 3 件**
+を BG 原文 (mmd L3852/L3869/L4107) 逐条照合で faithful 化 (statement のみ; proof は §13 gate 継続で sorry 維持)。
+3 定理とも **下流 0 cite** (grep 確認) ゆえ安全。full build green (3813 jobs, AxiomsCheck OK)。S14 実 sorry **8 で不変**。
+
+- **14.3 `sigma_diagnostic`** (garbled → faithful): `x ↔ x'` 取り違え修正 (旧 branch 1 は `x'∈M_σ` という不能を主張)、
+  欠落していた「x' が x を中心化」仮説 (`hx'cent`) + `x'≠1` 追加、結論を BG 通り
+  `(π⟨x'⟩⊆κ(M) ∧ C_G(x)⊆M) ∨ (π⟨x'⟩⊆τ₂(M) ∧ ℓ_σ(x')=1 ∧ 𝓜(C_G(x'))={M})` に。
+  `ℓ_σ(x')` は `D : SigmaDecompositionData` の `D.length x'=1` で carry (14.4/14.13 と同 convention、新 D 引数追加)。
+  `𝓜(C_G(x'))={M}` = `maximalSubgroupsContaining (centralizer {x'}) = {M}`。
+- **14.4 `sigmaLength_one_centralizer_structure`** (over-claim 除去): N/型構造を **`1 < (𝓜_σ x).ncard` で guard**
+  (single-max 時は R(x)=1・N(x) 無し ⟹ 旧無条件主張は過剰)。`R(x)=C_{N_σ}(x)=M_σ(N)⊓C_G(x)` を具体化 (part a)、
+  `∃! N` (一意)、parts (a)(c)(d)(e)(f) を `∀ M∈𝓜_σ(x)` 込みで記録。
+  **§16 へ defer**: headline「R(x) は C_G(x) で normal・𝓜_σ(x) に **sharply transitive**」+ part (b) は
+  §16 `RData`/`ConjSharplyTransitiveOn`/Thm D に verbatim 保持 ⟹ 証明時に §16 cite (§14→§16 import は循環ゆえ restate せず)。
+- **14.12 `typeP2_neighbor_is_typeF`** (仮説 tighten): 旧「任意 U≤M, R≤U, R≠⊥」→ BG 通り
+  `U` = Prop 14.2(a) の **abelian Hall (κ(M)∪σ(M))'-factor** (`hU`+`hUab`)、`R` = U の **Sylow r-subgroup**
+  (`IsHallSubgroup {r}`, `r∈π(U)`)。結論は faithful partial 維持 (H∈𝓜_F, U⊆H_σ, M⊓H=U⊔K; 残条項 defer)。
+
+**§14 で faithful 化できなかった残**:
+- **14.9 `nonidentity_covered_by_sigma_pieces`**: faithful 化に BG `M̃` が必須だが `M̃`=§16 `tildeM M R`
+  (R carrier 付き) に既存 ⟹ §16 が §14 を import するため §14 側で `M̃` 参照は **循環で不可**。
+  faithful 版 (M̃ 被覆) は §16 領域 (Lane G) で書くべき。現 §14 surface は docstring で「as-is で証明するな」と警告済 (不変)。
+- 14.2/14.7: 多部分定理の TRUE partial surface (false 無し)、reformulation 不要。`Subgroup.IsCommutative` は
+  mathlib に無く `∀ a∈U,∀ b∈U, a*b=b*a` で可換性を表現 (再利用メモ)。
