@@ -500,7 +500,14 @@ commuting/trivial-intersection package.
 Faithfulness fix (Lane G): the previous scaffold parametrized an arbitrary `H ≤ M_F` (mmd
 fixes `H = M_F`) and used `M_F(M_σ)` where the textbook has the Fitting subgroup `F(M_σ)`
 (`fittingInAmbient (Msigma M)`); the dropped conjuncts (a)/(b)/(d) are restored.  The `M'/M_F`
-nilpotent clause of (c) is still deferred (quotient API). -/
+nilpotent clause of (c) is still deferred (quotient API).
+
+`M_F` cyclic ⟹ `F(M)` cyclic exposure (Lane G 2026-06-15): the final conjunct records the
+derived consequence that Corollary 15.6's proof cites ("if `M_F` is cyclic, then `F(M)` is
+cyclic by Corollary 15.5").  It follows from (a)/(b): when `M_σ` is nilpotent, `F(M_σ) = M_σ =
+M_F` (`fittingInAmbient_eq_self_of_isNilpotent`), so `F(M) = M_F × Y` is a product of coprime
+cyclic factors (`isCyclic_prod_iff`); otherwise `M_F` is non-cyclic (Theorem 15.2) and the
+implication is vacuous.  This supplies the `hFcyc` hypothesis of `typeP_kstar_in_mf_of_inputs`. -/
 theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ Y : Subgroup G,
@@ -515,7 +522,11 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- (c) `M_F ⊆ M'` (the `M'/M_F` nilpotent part is deferred — quotient API).
       MF M ≤ derivedInG M ∧
       -- (d) if `K ≠ 1` (i.e. `M` is not of type `F`), then `F(M) ⊆ M'`.
-      (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) := by
+      (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) ∧
+      -- The derived consequence Corollary 15.6's proof cites ("`F(M)` is cyclic by Cor 15.5"):
+      -- via the `F(M) = F(M_σ) × Y` decomposition (both factors cyclic, coprime orders when
+      -- `M_σ` is nilpotent so `F(M_σ) = M_σ = M_F`; otherwise `M_F` is non-cyclic, vacuous).
+      (IsCyclic ↥(MF M) → IsCyclic ↥(fittingInAmbient M)) := by
   sorry
 
 /-- **§14-independent assembly of BG Corollary 15.6** from its §14/§15 inputs taken as
