@@ -2027,6 +2027,20 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
+/-- フル `q`-part を持つ `q`-部分群は極大 `q`-部分群: `S ≤ N`, `|S| = q^{v_q(|N|)}` で `S ≤ T ≤ N`
+が `q`-群なら `S = T` (`|T| = q^k ∣ |N| ⟹ k ≤ v_q(|N|) ⟹ |T| ≤ |S|`, `S ≤ T` と合わせて等しい)。 -/
+theorem eq_of_le_of_isPGroup_card_eq_factorization [Finite G] {q : ℕ} [Fact q.Prime]
+    {N S T : Subgroup G} (hScard : Nat.card ↥S = q ^ (Nat.card ↥N).factorization q)
+    (hTN : T ≤ N) (hTq : IsPGroup q ↥T) (hST : S ≤ T) : S = T := by
+  obtain ⟨k, hk⟩ := hTq.exists_card_eq
+  have hN0 : Nat.card ↥N ≠ 0 := Nat.card_pos.ne'
+  have hdvd : q ^ k ∣ Nat.card ↥N := by rw [← hk]; exact Subgroup.card_dvd_of_le hTN
+  have hkle : k ≤ (Nat.card ↥N).factorization q :=
+    (Nat.Prime.pow_dvd_iff_le_factorization (Fact.out : q.Prime) hN0).mp hdvd
+  have hTleS : Nat.card ↥T ≤ Nat.card ↥S := by
+    rw [hk, hScard]; exact Nat.pow_le_pow_right (Fact.out : q.Prime).pos hkle
+  exact Subgroup.eq_of_le_of_card_ge hST hTleS
+
 /-- **`E`-不変 Sylow `q`-部分群の存在** (BG Lemma 13.9 step 1 で使用): `SubgroupESetup` の補群
 `E` は `M_σ` を coprime に正規化する (`E` は `σ(M)'`-群、`M_σ` は `σ(M)`-群) ので、各素数 `q` に
 対し `E`-不変な `M_σ` の Sylow `q`-部分群 `S` (`|S| = q^{v_q(|M_σ|)}`) が取れる。 -/
