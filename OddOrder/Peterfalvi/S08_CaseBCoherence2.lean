@@ -1212,6 +1212,32 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero
   obtain ⟨p, rfl⟩ := himg α hα
   exact inner_coherentYset_extension_certainTypeRImage_eq_zero hyp h46 hHK hη hη' hne χ₂ χ₂' p
 
+/-- **(6.8.2.3) seam-1, capstone-facing form: `⟨D.X, η₁^{τ₁}⟩ = 0` from `η₁ ∈ Y` alone.**
+Specializes `inner_decomposition_X_coherentYset_extension_eq_zero` to the textbook choice of the
+distinct second anchor `η' = η̄₁` (the complex conjugate): `η̄₁ ∈ Y` (`Yset_closedUnderConjugate`)
+and `η₁ ≠ η̄₁` since `Y` has no real characters (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): an
+odd-order group has no nontrivial real irreducible).  So the `hXorth` `⟨D.X, η₁^{τ₁}⟩ = 0` needs only
+`η₁ ∈ Y` — the second anchor is internalized.  This is the exact `hXorth` the capstone supplies to
+`per_constituent_Y_eq_smul` for `Y = η₁^{τ₁}`. -/
+theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ)
+    (himg : ∀ α ∈ D.imageFamily.imageSet,
+      ∃ p, OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂' p = α) :
+    ClassFunction.inner D.X (hyp.coherentYset.extension η₁) = 0 := by
+  have hconj : η₁.conj ∈ hyp.Yset := hyp.Yset_closedUnderConjugate hη₁
+  have hne : η₁ ≠ η₁.conj := fun heq =>
+    hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η₁.IsReal) hη₁
+  exact inner_decomposition_X_coherentYset_extension_eq_zero hyp h46 hHK hη₁ hconj hne D himg
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
