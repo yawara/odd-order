@@ -1934,6 +1934,44 @@ theorem per_phi_anchored_image
     exact h
   rw [h1, hY]
 
+/-- **(6.8.2.3) column constituent decomposition for `hyp.tau`, `Ind^L_H`-form.**  The
+family-ready column branch: `columnDecompositionTau` (whose `χ`-component is `columnSum χ₂`) recast to
+the `Ind^L_H θ`-form `induce H (Res_H μ_{0j})` via the (4.5.a) transport `columnSum_eq_induce_H`
+(`h46.K = H`).  This matches the per-`φ` family's `χ`-component `induce H i.val` (the column index
+`θ = ⟨Res_H μ_{0j}, _⟩`), so it slots directly into the dispatch alongside
+`irreducibleDecompositionTau`. -/
+noncomputable def columnConstituentDecompositionTau
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hmapagree : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj))
+    (hSdiff : ∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (htau1_mema : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+      (ClassFunction.induce H
+        (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)))
+      (a • η₁) := by
+  rw [← columnSum_eq_induce_H h46 hHK χ₂]
+  exact columnDecompositionTau hyp h46 hχ₂ hdeg hmapagree hSdiff htau1_mema hχψ hχbarψ
+
 /-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
 `μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
 irreducible `θ` of `H` with `W₂ ⊆ Ker θ` induces to `μ_j`.
