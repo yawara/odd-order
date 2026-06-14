@@ -2777,3 +2777,19 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 3. **per-χ anchored 公式**: `per_constituent_Y_eq_smul` (dispatch hXorth) + `image_eq_of_decomposition` で `(μ_j−a_jη₁)^τ=X_j−a_jY₀` & 既約版。
 4. → HYBRID union (cX_col ∪ (cY+X_irr)) の diagonal data に投入。
 **正本=本 session 41 cont.⁷ 続。family 構築マップ確定 (mixed + 部分型 index)。次=部分型 aggregate brick。**
+
+### cont.⁷ 続²: 🔑 map-reconciliation 確定 (family が単一 τ=hyp.tau を満たす方法) + index 基盤 landed
+**landed (build-green, axiom-clean)**: `sum_eq_sum_pos_weight_subtype` (a02144a5, 部分型再添字) + `exists_inner_restrict_natCast`/`constituentWeight`/`_spec`/`_pos_iff` (74aee2fb, ℕ-weight 基盤; weight=⟨φ,Res θ⟩ via Clifford `restrictionMultiplicity_natCast`)。
+
+**🔑 map-reconciliation**: `hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` (abbrev, S08_CoherenceCorePart2:31)。
+- **irreducible branch = `decompositionDaFromDadeOfDiff hyp.dade hyp.hconj`** が `CharacterPsiDecomposition hyp.tau (Ind θ) (a•η₁)` を**直接**生成 (retarget 不要!)。per-θ 仮説 (non-real/diff-supports/ZIrr/orthog) は case-A 機構 (`Xset_..._isCoherent_of_irreducible_X`/`DadeChainStep` field 構成) を再利用。
+- **column branch**: `certainTypeDecompositionDa` は enlarged map `dadeIntegralCharacterMap h.dade0 h.tau` 用。hyp.tau 版は `CharacterPsiDecomposition.ofProjection (certainTypeR h46 χ₂ hdeg) hyp.tau (inner-preservation = dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj) …` で再構成。⚠ 要検証: column diff (μ_j−μ̄_j, μ_j−aη₁) が **H^#-supported** (hyp.tau の定義域) か。case c2 (hHK: h46.K=H) なら μ_j=Ind_H^L χ_j で H-supported のはず (certainTypeDecompositionDa の A₀=A∪V は K⊊H 一般版ゆえの保守)。
+
+### ▶▶ 精緻化した brick 順 (column/irreducible 両分解 → dispatch → aggregate → pinning):
+1. **column decomp (hyp.tau 版)**: ofProjection 再構成。← 次。⚠ H^#-support 検証。
+2. **irreducible decomp**: `decompositionDaFromDadeOfDiff hyp.dade hyp.hconj` 直接 (新 lemma 不要、per-θ 仮説 discharge を case-B 文脈で)。
+3. **dispatch family** `(i:{θ//0<aθ}) → CharacterPsiDecomposition hyp.tau (Ind i.val) (aθ•η₁)`: `by_cases ∃χ₂, chiRestrict χ₂=θ` (dichotomy `exists_eq_certainType_or_induce`) で column/irreducible 分岐。aθ=constituentWeight 整合。
+4. **subtype aggregate** hagg/hsq: `sum_smul_constituent_diff_eq`+`sum_inner_restrict_sq_eq_index` を `sum_eq_sum_pos_weight_subtype` で部分型へ、weight を constituentWeight_spec で整合、`aggregate_eq_sum_of_constituent` で hagg。
+5. **pinning → anchored 公式**: `per_constituent_Y_eq_smul` (dispatch hXorth) + `image_eq_of_decomposition`。
+6. **HYBRID union**: cX_col ∪ (cY+X_irr)、diagonal に anchored 公式投入。
+**正本=本 session 41 cont.⁷ 続²。map-reconciliation 確定 (irred 直接/column ofProjection)。index 基盤 2 brick landed。次=column decomp (hyp.tau) brick。**

@@ -780,6 +780,47 @@ theorem sum_eq_sum_pos_weight_subtype {ι M : Type*} [Fintype ι] [AddCommMonoid
   exact (Finset.sum_filter_of_ne
     (fun i _ hne => Nat.pos_of_ne_zero (fun h0 => hne (hf i h0)))).symm
 
+/-- **(6.8.2.3) constituent weight as a natural number.**  For an irreducible `φ` of a subgroup
+`N ≤ M` and an irreducible character `θ` of `M`, the multiplicity `⟨φ, Res^M_N θ⟩` is a natural
+number (Clifford [Is] Thm 6.5, `restrictionMultiplicity_natCast`): a nonnegative integer, repackaged
+for the `φ`-first inner-product slot used by the (6.8.2.3) constituent aggregate
+`sum_smul_constituent_diff_eq` (which weights `αθ = Ind^M_H θ − aθ·η₁` by `aθ = ⟨φ, Res θ⟩`).  This is
+the source of the natural-number weight `a : ι → ℕ` consumed by the pinning `per_constituent_Y_eq_smul`. -/
+theorem exists_inner_restrict_natCast {M : Type*} [Group M] [Finite M] {N : Subgroup M}
+    [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) (θ : IrreducibleCharacter M) :
+    ∃ k : ℕ, ClassFunction.inner φ
+      (ClassFunction.restrict N (θ : ClassFunction M ℂ)) = (k : ℂ) := by
+  obtain ⟨k, hk⟩ := ClassFunction.restrictionMultiplicity_natCast N θ.2 hφ
+  exact ⟨k, by rw [OddOrder.RepresentationTheory.inner_conj_symm,
+    ← ClassFunction.restrictionMultiplicity_def, hk, star_natCast]⟩
+
+/-- **(6.8.2.3) constituent weight** `aθ = ⟨φ, Res^M_N θ⟩ : ℕ` (the Clifford multiplicity of `φ`
+in `Res^M_N θ`).  The natural-number weight indexing the (6.8.2.3) `αθ`-aggregate and consumed by
+the pinning `per_constituent_Y_eq_smul`.  The defining `ℂ`-equation is `constituentWeight_spec`. -/
+noncomputable def constituentWeight {M : Type*} [Group M] [Finite M] {N : Subgroup M}
+    [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) (θ : IrreducibleCharacter M) : ℕ :=
+  (exists_inner_restrict_natCast hφ θ).choose
+
+/-- The defining equation of `constituentWeight`: `⟨φ, Res^M_N θ⟩ = (aθ : ℂ)`. -/
+theorem constituentWeight_spec {M : Type*} [Group M] [Finite M] {N : Subgroup M}
+    [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) (θ : IrreducibleCharacter M) :
+    ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+      = (constituentWeight hφ θ : ℂ) :=
+  (exists_inner_restrict_natCast hφ θ).choose_spec
+
+/-- A constituent has positive weight iff `φ` actually occurs in `Res^M_N θ` (i.e. `θ` "lies over"
+`φ`).  This is the membership test for the positive-weight subtype `{θ // 0 < aθ}` (the per-`φ`
+decomposition family index, `sum_eq_sum_pos_weight_subtype`). -/
+theorem constituentWeight_pos_iff {M : Type*} [Group M] [Finite M] {N : Subgroup M}
+    [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    {φ : ClassFunction ↥N ℂ} (hφ : IsIrreducibleCharacter φ) (θ : IrreducibleCharacter M) :
+    0 < constituentWeight hφ θ ↔
+      ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ)) ≠ 0 := by
+  rw [constituentWeight_spec hφ θ, ne_eq, Nat.cast_eq_zero, ← ne_eq, ← Nat.pos_iff_ne_zero]
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
