@@ -753,6 +753,34 @@ theorem subgroup_coprime_decomposition [Finite G] {A E₁ : Subgroup G}
     ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
   exact hmap.symm
 
+/-- **Lemma 13.6 step 6, full `A` part**: with `X ≤ M_σ ⊓ C(E₁)` and `X ≤ C(E')`, a normal
+elementary abelian `p`-subgroup `A ≤ E` (`p ∈ τ₂`, `E₁ ≠ 1`) centralizes `X`. Decompose
+`A = C_A(E₁) ⊔ ⁅A,E₁⁆` (Prop 1.6, coprime since `p ∈ τ₂`, `π(E₁) ⊆ τ₁`); `C_A(E₁) ≤ C(X)` by
+`centralizer_A0_le_centralizer`, and `⁅A,E₁⁆ ≤ ⁅E,E⁆ = E' ≤ C(X)`. -/
+theorem centralizer_A_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau2 M) {A X : Subgroup G}
+    (hAE : A ≤ E) (hAnorm : E ≤ Subgroup.normalizer (A : Set G)) (hAelem : A.IsElementaryAbelian p)
+    (hE1ne : E₁ ≠ ⊥) (hXE1 : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G))
+    (hXE' : X ≤ Subgroup.centralizer (derivedInG E : Set G)) :
+    A ≤ Subgroup.centralizer (X : Set G) := by
+  have hpndvd : ¬ p ∣ Nat.card ↥E₁ := by
+    intro hdvd
+    have hpτ1 := h.isPiGroup_tau1 p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+    exact absurd ((((mem_tau1_iff M p).mp hpτ1).2.2).symm.trans ((mem_tau2_iff M p).mp hp).2)
+      (by norm_num)
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥A) := by
+    obtain ⟨k, hk⟩ := hAelem.isPGroup.exists_card_eq
+    rw [hk]
+    exact (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpndvd)).pow_right k
+  rw [subgroup_coprime_decomposition (h.E₁_le.trans hAnorm) hcop
+    (Or.inr (isSolvable_of_comm hAelem.comm))]
+  refine sup_le ?_ ?_
+  · rw [inf_comm]; exact centralizer_A0_le_centralizer hG h hAE hAelem hE1ne hXE1
+  · calc ⁅A, E₁⁆ ≤ ⁅E, E⁆ := Subgroup.commutator_mono hAE h.E₁_le
+      _ = derivedInG E := (Subgroup.map_subtype_commutator E).symm
+      _ ≤ Subgroup.centralizer (X : Set G) := Subgroup.le_centralizer_iff.mp hXE'
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
