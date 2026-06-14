@@ -744,6 +744,25 @@ theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card
   rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
     ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
 
+/-- **(6.8.2.2)→(6.8.2.3) aggregate `hagg` builder.**  Assembles the `hagg` input of
+`per_constituent_Y_eq_smul` from the three (6.8.2.2) pieces: the image decomposition
+`τ β = Xagg − n·Y` (`exists_decomposition_caseB`, `β = Ind^L_{W₂}φ − |H:Z|·η₁`, `n = |H:Z|`), the
+constituent sum `β = ∑ aᵢ·αᵢ` (`sum_smul_constituent_diff_eq`), and the per-constituent images
+`τ(αᵢ) = Xᵢ − Yᵢ` (each `CharacterPsiDecomposition.tau1_image`, with `τ₁ = τ` for the certain-type
+`certainTypeDecompositionDa`).  Rewriting `Xagg − n·Y = τ β = τ(∑ aᵢαᵢ) = ∑ aᵢ(Xᵢ − Yᵢ)` via
+`tau_sum_smul_image` gives the aggregate `Xagg − n·Y = ∑ aᵢ·(Xᵢ − Yᵢ)`. -/
+theorem aggregate_eq_sum_of_constituent {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)]
+    {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
+    (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
+    {β : ClassFunction ↥L ℂ} {Xagg Y : ClassFunction G ℂ} {n : ℤ}
+    (hmemimg : ∀ i ∈ s, τ (α i) = Xv i - Yv i)
+    (hconstit : β = ∑ i ∈ s, (a i : ℂ) • α i)
+    (hdecomp : τ β = Xagg - (n : ℂ) • Y) :
+    Xagg - (n : ℂ) • Y = ∑ i ∈ s, (a i : ℂ) • (Xv i - Yv i) := by
+  rw [← hdecomp, hconstit]
+  exact tau_sum_smul_image s τ α Xv Yv a hmemimg
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
@@ -1237,6 +1256,52 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
   have hne : η₁ ≠ η₁.conj := fun heq =>
     hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η₁.IsReal) hη₁
   exact inner_decomposition_X_coherentYset_extension_eq_zero hyp h46 hHK hη₁ hconj hne D himg
+
+/-- **(6.8.2.3) per-constituent pinning, certain-type form: `Dᵢ.Y = aᵢ·η₁^{τ₁}`.**  The certain-type
+specialization of `per_constituent_Y_eq_smul`: for a family of `(5.4)` decompositions
+`D : ι → CharacterPsiDecomposition τ (χ i) (aᵢ·η₁)` whose image families are covered by the reducible
+`R(μ_j)` sets (`himg`), the (6.8.2.2) aggregate (`hagg`/`hsq`/`hXaggorth`) plus the per-step coefficient
+data (`hbi`) pin each `Dᵢ.Y = aᵢ·η₁^{τ₁}` (`η₁^{τ₁} = coherentYset.extension η₁`).
+
+The three structural inputs of `per_constituent_Y_eq_smul` are discharged internally: `hηnorm`
+(`η₁` irreducible, `Y ⊆ Irr L`), `hYY` (the `Y`-coherence isometry `extension_inner_eq`), and the
+seam-1 `hXorth` (`inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset`, needing only
+`η₁ ∈ Y`).  Only the (6.8.2.2)-aggregate data remains for the capstone. -/
+theorem certainType_per_constituent_Y_eq_smul
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {ι : Type*} (s : Finset ι) {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ : ι → ClassFunction ↥L ℂ} {a : ι → ℕ}
+    (D : (i : ι) → OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ (χ i) (a i • η₁))
+    {χ₂ χ₂' : ι → (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (himg : ∀ i ∈ s, ∀ α ∈ (D i).imageFamily.imageSet,
+      ∃ p, OddOrder.Peterfalvi.S06.certainTypeRImage h46 (χ₂ i) (χ₂' i) p = α)
+    {Xagg : ClassFunction G ℂ} {b : ι → ℤ} {n : ℤ}
+    (hXaggorth : ClassFunction.inner Xagg (hyp.coherentYset.extension η₁) = 0)
+    (hagg : Xagg - (n : ℂ) • hyp.coherentYset.extension η₁
+      = ∑ i ∈ s, ((a i : ℤ) : ℂ) • ((D i).X - (D i).Y))
+    (hsq : ∑ i ∈ s, ((a i : ℤ)) ^ 2 = n)
+    (hbi : ∀ i ∈ s, ClassFunction.inner (D i).Y (hyp.coherentYset.extension η₁) = (b i : ℂ))
+    (i : ι) (hi : i ∈ s) (hpos : 0 < a i) :
+    (D i).Y = (a i : ℂ) • hyp.coherentYset.extension η₁ := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηnorm : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L) (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hYY : ClassFunction.inner (hyp.coherentYset.extension η₁)
+      (hyp.coherentYset.extension η₁) = 1 := by
+    rw [hyp.coherentYset.extension_inner_eq η₁ η₁
+      (Submodule.subset_span hη₁) (Submodule.subset_span hη₁)]
+    exact hηnorm
+  exact per_constituent_Y_eq_smul s D hηnorm hYY hXaggorth hagg hsq
+    (fun j hj => inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
+      hyp h46 hHK hη₁ (D j) (himg j hj)) hbi i hi hpos
 
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
