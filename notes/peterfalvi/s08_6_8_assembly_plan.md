@@ -2630,3 +2630,52 @@ inner_X_Y_eq_zero_of_orthogonal Da (fun α hα => by
 **▶▶ 次 (推奨手順)**: (i) family member 単体 = certainTypeDecompositionDa を induce H θ 形に rw する補題 (`columnSum_eq_induce_H` 経由) → (ii) hagg 組立 (3 ピース連結, 重み cast) → (iii) total-family の指数化 (subtype or dummy) → (iv) certainType_per_constituent 適用で (6.8.2.3) 結論 `(μ_j−aη₁)^τ=Dθ.X−aη₁^{τ₁}`。**(A)(B) が hard、Clifford 対応 (θ↔χ₂) が要精査。**
 **正本=本 session 41 cont.³。per_constituent 特化 landed。family 構築 = 大ピース (total-family/重み/Clifford対応)。full build 3813。**
 **🚩 状況: (6.8.2.3) 直交性・hXorth・pinning は完成。残 per_constituent family + cX + capstone glue は大規模 assembly。Opus 継続中だが family 構築は dedicated focus 向き。**
+
+## 2026-06-15 (session 41 cont.⁴, /loop→ChatGPT 相談): 🚨 family 構造の重要訂正 — constituents は「列+既約」の混合
+
+ChatGPT (odd-order project chat) に Clifford 対応を相談 → **検証 OK** (教科書 mmd 04.6/04.7/04.8 引用 + repo 既存補題と整合)。**私の「constituents = 全て列 μ_j」仮定は誤りだった。**
+
+### 🔑 訂正された family 構造 (ChatGPT, 検証済):
+`Ind_{W₂}^L φ` (φ∈Irr W₂, φ≠1) の構成要素 = **列 μ_j (可約) と既約誘導指標 Ind_H^L θ の混合**:
+- **(4.5) dichotomy** (repo: (4.5.b) exhaustion `Irr(L)={μ_{ij}}∪{Ind_H^L θ}`, S06_CertainTypeClifford:18 で言及):
+  - θ = X_j (=Res_H μ_{0j}, 列源) ⟹ I_L(θ)⊋H ⟹ Ind_H^L θ = μ_j (**可約列**, =∑_i μ_{ij})。
+  - θ ≠ 全 X_j ⟹ I_L(θ)=H ⟹ Ind_H^L θ ∈ **Irr L** (既約誘導)。
+- ∴ X = S−S(Z) は **列 μ_j と既約 Ind_H^L θ の両方**を含む。
+- 重み: a_θ=θ(1) (over φ; `inner_central_restrict_eq_apply_one` 済), ∑_{θ over φ} a_θ²=|H:Z| (`sum_inner_restrict_sq_eq_index` 済、= Ind_Z^H φ(1)=|H:Z|)。
+
+### 🔧 corrected family 構築 = **per-θ dispatch**:
+| θ の種別 | decomposition | hXorth (⟨D.X, η₁^{τ₁}⟩=0) |
+|---|---|---|
+| 列 (θ=X_j) | `certainTypeDecompositionDa` (R(μ_j)=σ-images) | **私の disjointness 機構** (hard, 完成: `inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset`) |
+| 既約 (θ≠X_j) | `decompositionDaFromDadeOfDiff` (S07:5567, R(χ)={χ^{τ₁},χ̄^{τ₁}}) | **isometry で容易**: ⟨η₁^{τ₁},χ^{τ₁}⟩=⟨η₁,χ⟩=0 (X⊥Y 既約直交) |
+
+**∴ 私の `certainType_per_constituent_Y_eq_smul` (himg=全 R(μ_j) 前提) は列-only 部分問題用で、混合 family には直接適用不可。** 正しくは **汎用 `per_constituent_Y_eq_smul` に per-member dispatch で hXorth を供給**。
+
+### ▶▶ corrected 次手順:
+1. **既約 hXorth** (容易): irreducible χ=Ind_H^L θ∈X で ⟨D.X, coherentYset.extension η₁⟩=0 を isometry (extension_inner_eq + X⊥Y irreducibleCharacter_inner_eq_ite) で。`dadeOrthonormalCharacterImageFamilyOfDiff` の imageSet={χ^{τ₁},χ̄^{τ₁}} に対し。
+2. **per-θ dispatch family**: index = subtype I_φ={θ∈Irr H: Res_Z θ=θ(1)φ} (zero-support 排除); per θ で (4.5.b) により列/既約を場合分けし decomposition+hXorth を供給。
+3. **aggregate**: `sum_smul_constituent_diff_eq` (Irr H 上) を I_φ に制限 (a_θ=0 drop) → `aggregate_eq_sum_of_constituent` で hagg。
+4. **per_constituent_Y_eq_smul** (汎用) で pin → (6.8.2.3) per-χ 結論。
+**🔑 私の session の disjointness/anchor 機構は「列の hard case」用で正しく必要。既約は容易。dispatch + I_φ subtype indexing が残り。**
+**正本=本 session 41 cont.⁴。ChatGPT 相談で family 構造訂正 (混合 dispatch)。Opus 継続。**
+
+### ✅ 既約 hXorth は **既存** (cont.⁴ 追補, 検証済):
+`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero` (S08_CoherenceCorePart1:1721) =
+`⟨(decompositionDaFromDadeOfDiff hyp hconj χ …).X, hS₁.extension chi1⟩ = 0` for 既約 χ (X-member),
+S₁-member chi1。`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal` (family 直交 producer,
+S08CP1:~1683) + `memberExtensionDecomposition` + `inner_decomposition_X_extension_member_eq_zero`。
+**⟹ certain-type 既約 member は S₁=Yset, chi1=η₁ で instantiate するだけ (hypothesis-discharge は要るが新証明不要)。**
+
+### 🎯 両 hXorth ケース完備:
+| member | decomposition | hXorth | status |
+|---|---|---|---|
+| 列 μ_j | `certainTypeDecompositionDa` | `inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset` | ✅ 本 session (hard, disjointness) |
+| 既約 Ind_H^L θ | `decompositionDaFromDadeOfDiff` | `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero` | ✅ 既存 (case-A 機構) |
+
+### ▶▶ 残り = **dispatch + glue assembly** (新規構造作業):
+1. **per-θ dispatch family** over I_φ={θ∈Irr H over φ}: (4.5.b) で θ=X_j (列) / θ≠X_j (既約) を場合分け、各々 decomposition+hXorth 供給。
+2. **aggregate** restriction to I_φ (sum_smul_constituent_diff_eq from Irr H) + ∑a²=|H:Z| → hagg。
+3. **per_constituent_Y_eq_smul** (汎用) で pin → (6.8.2.3) per-χ。
+4. → cX (case-B X-coherence: 列-coherence `certainTypeSet_isCoherent_tau` + 既約-X-coherence を §7 engine で glue) → `coherentXunionYset_caseB_of_glued` → capstone。
+**残作業の本体 = dispatch family の構築 + case-B X-coherence glue (大規模だが hXorth/decomposition 部品は全て揃った)。**
+**正本=本 session 41 cont.⁴ 追補。既約 hXorth 既存確認。次=dispatch family 構築。**
