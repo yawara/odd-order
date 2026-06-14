@@ -146,3 +146,19 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
      両 C(P)=⊥; N(Q)≤M*, N(Q*)≤M; P≤N(Q),N(Q*))。13.9 endgame の `forbidden_config_impossible`
      呼び出しが template (但し 13.9 は Q=Q*=S、ここは別 Q,Q*)。
   ⚠ D3/D4 が最難 (12.19/13.6 dichotomy)。fresh context 推奨。
+
+### 進捗⁶ (2026-06-15 Lane F /loop, cont.⁵) — D2 完了
+- ✅ `8e6e35d6` D2 `sylow_Msigma_Mstar_maximal_in_inf` (Q* maximal q*-subgroup of M∩M*;
+  σ-subgroup ≤ M_σ 経由で Dedekind 回避)。GAP C は construction(C1/C2/D1)+ maximality(D2)完了。
+- **残り = D3 (N(Q*)⊆M) / D4 (C_{Q*}(P)=⊥) / D5 (13.8 assembly)**:
+  - **D3a 前提 (13.5) `Q ≤ derivedInG E`**: `le_commutator_of_coprime_inf_centralizer_eq_bot`
+    (S08:1424, B=P[solvable],Y=Q,P≤N(Q),coprime,Q⊓C(P)=⊥ ⟹ Q≤⁅P,Q⁆) + ⁅P,Q⁆≤⁅E,E⁆=derivedInG E
+    (P,Q≤E, commutator mono)。clean brick 候補。
+  - **D3 本体 (q*∉β枝)**: 12.19 `derivedE_centralizes_betaComplement` → W (Hall β' of M_σ, E'⊆C(W));
+    Q≤E' ⟹ Q⊆C(W) ⟹ W⊆C(Q), W⊆M_σ ⟹ W⊆M_σ∩M*(=C_{M_σ}(Q)); q*∉β ⟹ W の q*-part full
+    ⟹ v_q*(M_σ∩M*)=v_q*(M_σ) ⟹ Q* full Sylow of M_σ ⟹ (q*∈σ,M_σ Hall) Q* Sylow of M ⟹
+    σ-def で N(Q*)⊆M。(q*∈β枝): `normalizer_le_of_nontrivial_beta_subgroup` (Prop10.14d)。
+  - **D4**: q*∉β: Q* σ-subgroup, ℳ(Q*)≠{M} ⟹ Lemma 13.6。q*∈β: Q*≤M_α (要 M_α Hall α =
+    `isHall_Msigma_Malpha .2` で α-subgroup≤M_α) + Q*⊆C(Q) ⟹ C_{Q*}(P)⊆C_{M_α}(P⊔Q)=1。
+  - **D5**: `mem_tau1_Mstar_of_einvariant_sylow` (p∈τ₁M*) + `forbidden_config_impossible` (13.8)。
+  ⚠ D3 本体の 12.19 W-factorization が最難。fresh context で。
