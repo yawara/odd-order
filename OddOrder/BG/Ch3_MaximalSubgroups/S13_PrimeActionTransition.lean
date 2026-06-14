@@ -987,6 +987,49 @@ theorem exists_prime_betastar_dvd_of_hall_le [Finite G] (hG : IsMinimalSimpleOdd
     simpa using hmem
   exact ⟨r, hrp, hrβstar, hrMC, hrσ⟩
 
+/-- **Lemma 13.8 GAP 2 (M-oriented 全体)**: `H ⊇ Y₀ = C_{M_β}(P)` を `C_G(P)` の Hall
+`(β(M)∪β(M*))`-部分群、`s ∈ β(M) ∩ π(F(H))`, `Y₀*` = `C_{M*_β}(P)` を非自明 `β(M*)`-部分群
+とすると、ある素数 `r ∈ β(M*)` が `|C_M(P)|` を割り `r ∉ σ(M)`。
+
+`Y = O_t(Y₀)` (`t ∈ π(F(Y₀)) ⊆ β(M)`) を bridge に `hall_le_of_fitting_prime` で `H ≤ M`、
+`exists_prime_betastar_dvd_of_hall_le` で `r` を抽出。本体 `forbidden_config_impossible` は
+`s ∈ π(F(H))` が `β(M)` / `β(M*)` どちらに落ちるかで本補題を向きを変えて適用する (WLOG)。 -/
+theorem oriented_r_existence [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M) {P H : Subgroup G}
+    (hHC : H ≤ Subgroup.centralizer (P : Set G))
+    (hHhall : Ch03.IsHallSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (H.subgroupOf (Subgroup.centralizer (P : Set G))))
+    {s : ℕ} [Fact s.Prime] (hsβ : s ∈ S10.beta M)
+    (hsF : s ∈ (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors)
+    {Y₀ : Subgroup G} (hY₀ne : Y₀ ≠ ⊥) (hY₀M : Y₀ ≤ M) (hY₀H : Y₀ ≤ H)
+    (hY₀β : Subgroup.IsPiSubgroup (S10.beta M) Y₀)
+    {Y₀star : Subgroup G} (hY₀starne : Y₀star ≠ ⊥)
+    (hY₀starC : Y₀star ≤ Subgroup.centralizer (P : Set G))
+    (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
+    ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
+      r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hY₀solv : IsSolvable ↥Y₀ :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hY₀M)
+  obtain ⟨t, htF⟩ := exists_mem_primeFactors_fittingInG hY₀solv hY₀ne
+  haveI : Fact t.Prime := ⟨Nat.prime_of_mem_primeFactors htF⟩
+  have htβ : t ∈ S10.beta M := by
+    apply hY₀β
+    have hdvd : t ∣ Nat.card ↥Y₀ :=
+      (Nat.mem_primeFactors.mp htF).2.1.trans
+        (Subgroup.card_dvd_of_le (Ch2.S08.fittingInG_le Y₀))
+    exact Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors htF, hdvd, Nat.card_pos.ne'⟩
+  have hYne : opiCoreInG ({t} : Set ℕ) Y₀ ≠ ⊥ :=
+    Ch2.S08.opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG htF
+  have hYt : IsPGroup t ↥(opiCoreInG ({t} : Set ℕ) Y₀) :=
+    isPGroup_of_isPiSubgroup_singleton (isPiSubgroup_opiCoreInG _ _)
+  have hYY₀ : opiCoreInG ({t} : Set ℕ) Y₀ ≤ Y₀ := opiCoreInG_le _ _
+  have hHM : H ≤ M :=
+    hall_le_of_fitting_prime hG hM hsβ hsF htβ hYne hYt (hYY₀.trans hY₀M) (hYY₀.trans hY₀H)
+  exact exists_prime_betastar_dvd_of_hall_le hG hM hMstar hnc' hHC hHM hHhall
+    hY₀starne hY₀starC hY₀starβ
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
