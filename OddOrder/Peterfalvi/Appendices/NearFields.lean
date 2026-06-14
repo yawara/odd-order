@@ -19,6 +19,22 @@ Suzuki theorem and records the special Zassenhaus classification needed there.
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 -- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
+/-- **A finite group acting freely on a finite type divides its cardinality**: if every stabilizer
+is trivial, then `|G| ∣ |α|` (each orbit has size `|G|`, and the orbits partition `α`).  General
+group-action fact (could live in `Mathlib.GroupTheory.GroupAction`); used here for the orbit
+counting `|A| ∣ |U| - 1` in Appendix C, Proposition 2. -/
+theorem card_group_dvd_card_of_free {G β : Type*} [Group G] [MulAction G β]
+    [Finite G] [Finite β] (hfree : ∀ b : β, MulAction.stabilizer G b = ⊥) :
+    Nat.card G ∣ Nat.card β := by
+  classical
+  haveI : Fintype (MulAction.orbitRel.Quotient G β) := Fintype.ofFinite _
+  rw [Nat.card_congr (MulAction.selfEquivSigmaOrbits G β), Nat.card_sigma]
+  refine Finset.dvd_sum fun ω _ => ?_
+  have hc : Nat.card (MulAction.orbit G ω.out) = Nat.card G := by
+    rw [Nat.card_congr (MulAction.orbitEquivQuotientStabilizer G ω.out), hfree ω.out,
+      ← Subgroup.index_eq_card, Subgroup.index_bot]
+  exact ⟨1, by rw [hc, mul_one]⟩
+
 /-- A **(right) near-field** (Peterfalvi, Appendix C, p. 137): a set `F` with `+` and `·` such that
 `(F, +)` is a commutative group, `(F, ·)` is a group with zero — i.e. `(F ∖ {0}, ·)` is a group —
 and the **right** distributive law `(a + b) c = a c + b c` holds.  (Left distributivity and
