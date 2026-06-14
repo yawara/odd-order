@@ -289,8 +289,11 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
-/-- **BG Proposition 16.1** (mmd L4352): the §14--§15 local families are exactly
-the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi. -/
+/-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
+the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
+Six clauses = mmd (a)-(f): (a) Type I ⟺ `M ∈ ℳ_𝓕`, (b) Type II ⟺ `M ∈ ℳ_𝓟₂`,
+(c) Type III/IV ⟺ `M ∈ ℳ_𝓟₁ ∧ M_F ≠ M_σ`, (d) Type V ⟺ `M ∈ ℳ_𝓟₁ ∧ M_F = M_σ`,
+(e) `M' = U M_σ ⟺ M` not Type I, (f) `M_F = M_σ ⟺ M` Type I/II/V. -/
 theorem proposition_type_classification [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) :
@@ -332,7 +335,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
               S14.IsConjugateSubgroup M T) := by
   sorry
 
-/-- **BG Theorem II** (mmd L4416): `A(M)` and `A_0(M)` are tamely embedded.  This
+/-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  This
 is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
 theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
