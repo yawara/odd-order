@@ -2415,6 +2415,31 @@ theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinim
   · -- `P ≤ N_G(Q)`.
     exact hPE.trans (E_le_normalizer_of_le_E3 hG h ((Subgroup.map_subtype_le _).trans hKE3))
 
+/-- **BG Theorem 13.10, M*-extraction brick** (gap-free): for `q ∈ τ₃(M)` and a nontrivial
+`q`-subgroup `Q ≤ E₃`, there is a maximal subgroup `M* ⊇ N_G(Q)` that is not conjugate to `M`
+in `G` (hence `M* ≠ M`). This is the `M* ∈ ℳ(N_G(Q))` step of Thm 13.10's proof: `N_G(Q) ≠ G`
+(else `Q ◁ G`, impossible in the simple `G` with `Q ≠ 1, ≠ G`), so a maximal `M*` lies over it,
+and non-conjugacy is `not_conj_of_mem_tau1_union_tau3_of_normalizer_le` (`q ∈ τ₃ ⊆ τ₁ ∪ τ₃`). -/
+theorem exists_maximal_over_normalizer_not_conj_of_le_E3 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {q : ℕ} [Fact q.Prime] (hq : q ∈ tau3 M) {Q : Subgroup G}
+    (hQE3 : Q ≤ E₃) (hQne : Q ≠ ⊥) (hQq : IsPGroup q ↥Q) :
+    ∃ Mstar : Subgroup G, Mstar ∈ maximalSubgroups G ∧
+      Subgroup.normalizer (Q : Set G) ≤ Mstar ∧
+      ¬ ∃ g : G, MulAut.conj g • M = Mstar := by
+  have hQM : Q ≤ M := hQE3.trans (h.E₃_le.trans h.E_le)
+  have hNQne : Subgroup.normalizer (Q : Set G) ≠ ⊤ := by
+    intro htop
+    haveI : Q.Normal := Subgroup.normalizer_eq_top_iff.mp htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q inferInstance with hb | ht
+    · exact hQne hb
+    · exact (mem_maximalSubgroups.mp h.mem_maximal).1 (top_le_iff.mp (ht ▸ hQM))
+  obtain ⟨Mstar, hMstarCo, hNQM⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.normalizer (Q : Set G))).resolve_left hNQne
+  refine ⟨Mstar, mem_maximalSubgroups.mpr hMstarCo, hNQM, ?_⟩
+  exact not_conj_of_mem_tau1_union_tau3_of_normalizer_le hG h.mem_maximal
+    (Set.mem_union_right _ hq) hQM hQne hQq hNQM
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
