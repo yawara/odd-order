@@ -129,7 +129,8 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         IsMulCommutative ↥U) ∧
       (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
-          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) ∧
+          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+            IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M)) ∧
       IsMulCommutative ↥(centralizerGeneratedBySigma M U) ∧
       (U ≠ ⊥ → ∃ U0 : Subgroup G,
         U0 ≤ U ∧ Monoid.exponent U0 = Monoid.exponent U ∧
@@ -165,16 +166,22 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         derivedInG (derivedInG M) ≤ fittingInAmbient M := by
   sorry
 
-/-- **BG Corollary 15.3** (mmd L4154): centralizer and conjugacy control for Hall
-subgroups in the `M_F` analysis. -/
+/-- **BG Corollary 15.3** (mmd L4204): for a nonidentity Hall subgroup `H` of `M_σ`,
+(a) `C_M(H) = C_{M_σ}(H)·X` with `X` a cyclic `τ₂(M)`-subgroup, and (b) any two elements
+of `H` conjugate in `G` are already conjugate in `N_M(H)` (`N_M(H)`-fusion control).
+
+Faithfulness fix (Lane G 2026-06-14): the previous scaffold here stated an unrelated
+centralizer-escape claim (`C_G(X) ≤ M ∨ …`), not the `C_M(H)`/fusion content the docstring
+("centralizer and conjugacy control") names; restated to mmd L4204. Uncited, sorry-neutral. -/
 theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H X : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (MF M)))
-    (hX : X ≤ H) (hXne : X ≠ ⊥) :
-    Subgroup.centralizer (X : Set G) ≤ M ∨
-      ∃ N : Subgroup G,
-        N ∈ maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) ∧
-          (S14.IsTypeF N ∨ S14.IsTypeP2 N) := by
+    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hHne : H ≠ ⊥) :
+    (∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X) ∧
+    (∀ x ∈ H, ∀ y ∈ H, (∃ g : G, y = g * x * g⁻¹) →
+      ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
 /-- **BG Corollary 15.4** (mmd L4161): nilpotent Hall subgroups embed into the

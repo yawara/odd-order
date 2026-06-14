@@ -164,7 +164,7 @@ theorem theoremC_paired_structure [Finite G]
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M)) :
     IsMulCommutative ↥U ∧ ¬ Subgroup.normalizer (U : Set G) ≤ M ∧
-      Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ S15.MF M ∧
+      Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ S15.MF M ∧ ¬ IsCyclic ↥(S15.MF M) ∧
       derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
       Kstar ≤ derivedInG (derivedInG M) ∧
       (∃! Mstar : Subgroup G,
@@ -286,7 +286,7 @@ theorem proposition_type_classification [Finite G]
 
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
-/-- **BG Theorem I** (mmd L4402): nilpotent Hall conjugacy and the global maximal
+/-- **BG Theorem I** (mmd L4526): nilpotent Hall conjugacy and the global maximal
 subgroup dichotomy used by Peterfalvi (8.8). -/
 theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
@@ -314,7 +314,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (∀ x ∈ X, ∀ y ∈ X,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
       let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
-      D ⊆ X ∧
+      -- BG Thm II: `D ⊆ A(M)` (not merely `D ⊆ X`); a genuine claim when `X = A_0(M)`.
+      D ⊆ ASet M U ∧
         ∀ x : G, x ∈ D →
           ∃! N : Subgroup G,
             N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
