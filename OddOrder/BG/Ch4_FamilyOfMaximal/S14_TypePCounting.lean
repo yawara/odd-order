@@ -546,11 +546,18 @@ theorem half_lt_one_sub_inv_mul {k l : ℕ} (hk : 3 ≤ k) (hl : 5 ≤ l) :
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
 `Mstar`.  The two Hall factors `K` and `Kstar` form a cyclic subgroup `Z`,
 `Z_tilde` is a TI-set, one of the two partners is type `P2`, and every type-P
-maximal subgroup is conjugate to one of the pair. -/
+maximal subgroup is conjugate to one of the pair.
+
+**Part (h)** (BG 14.7(8), exposed 2026-06-15 for Lane G §15 — issue 8006): `M' = [M,M]` is a
+complement of `K` in `M` (`M = K M'`, `K ∩ M' = 1`), with `|M'|`, `|K|` coprime.  BG Cor 15.6
+(mmd L4232) and Lemma 15.1 cite this directly; it is surfaced as the two leading conjuncts so
+`§15` can apply it without re-deriving κ/τ prime-handling. -/
 theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧
+    Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) ∧
     ∃! Mstar : Subgroup G,
       Mstar ∈ maximalSubgroups G ∧ IsTypeP Mstar ∧ ¬ IsConjugateSubgroup M Mstar ∧
       Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar) ∧

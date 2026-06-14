@@ -52,3 +52,15 @@ re-derive すべきでない。
   Lemma 15.1 K≠⊥ 節の `IsComplement'`+coprime 露出、Cor 15.5 の hFcyc 露出 (`08e7dc5c`)。
 - mmd: `references/bg/local-analysis.mmd` Cor 15.6=L4228 (証明 L4232)、Thm 14.7=L3890。
 - gap 分析: `notes/bg/s15_16_audit.md` §9（Cor 15.6 cite map）。
+
+## ✅ 完了 (2026-06-15, Lane H)
+
+`typeP_duality` (Thm 14.7) の結論に **(h)** を 2 leading conjunct で露出済 (commit 後述):
+```
+Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧
+Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) ∧
+∃! Mstar, …
+```
+G は `(typeP_duality …).1` (IsComplement') / `.2.1` (Coprime) で直接 cite 可能。proof は Thm 14.7
+本体の sorry に gated (14.7 landing で自動 unconditional)。full build green (3817 jobs)。
+下流 0 cite だったので restructure は安全。
