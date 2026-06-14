@@ -109,4 +109,78 @@ theorem natCard_end_eq :
 
 end Prop2Core
 
+section Prop2Bridge
+
+open OddOrder.GroupTheory OddOrder.BG.Ch1_Preliminary OddOrder.Isaacs.Ch03
+
+/-- **Peterfalvi, Appendix I, Proposition 2(a)** (textbook form).  Let the commutative group `T`
+act on the elementary abelian `p`-group `E`, *irreducibly* (every `T`-invariant subgroup of `E`
+is `⊥` or `⊤`).  Then there is a finite field `F` acting on `E` (written additively) over which
+`E` is a `1`-dimensional vector space, and `|F| = |E|` (so `F ≅ 𝔽_{pⁿ}` where `|E| = pⁿ`).
+
+Concretely `F = 𝔽_p[T] = End_{𝔽_p[T]}(E)`.  The proof builds the `𝔽_p[T]`-module structure on
+`Additive E` directly via `Module.compHom` (avoiding the `Representation.asModule` wrapper, whose
+`Module` instance is fragile in argument position), translates `T`-invariant subgroups to
+`𝔽_p[T]`-submodules to get `IsSimpleModule`, and applies the abstract core. -/
+theorem exists_field_of_irreducible.{u} {p : ℕ} [Fact p.Prime] {E : Type u} [CommGroup E]
+    [Finite E] [Nontrivial E] (hE : IsElementaryAbelian p E) {T : Type*} [CommGroup T] [Finite T]
+    (ψ : T →* MulAut E)
+    (hirr : ∀ U : Subgroup E, IsAInvariant ψ U → U = ⊥ ∨ U = ⊤) :
+    ∃ (F : Type u) (_ : Field F) (_ : Module F (Additive E)) (_ : Finite F),
+      Module.finrank F (Additive E) = 1 ∧ Nat.card F = Nat.card E := by
+  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  let ρ : Representation (ZMod p) T (Additive E) := (mulAutToEnd E p).comp ψ
+  letI instKT : Module (MonoidAlgebra (ZMod p) T) (Additive E) :=
+    Module.compHom (Additive E) ρ.asAlgebraHom.toRingHom
+  have key : ∀ (t : T) (x : Additive E),
+      (MonoidAlgebra.of (ZMod p) T t) • x = Additive.ofMul ((ψ t) (Additive.toMul x)) := by
+    intro t x
+    rw [show (MonoidAlgebra.of (ZMod p) T t) • x
+          = ρ.asAlgebraHom (MonoidAlgebra.of (ZMod p) T t) x from rfl,
+        Representation.asAlgebraHom_of]
+    rfl
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) T) (Additive E) := by
+    haveI : Nontrivial (Additive E) := inferInstanceAs (Nontrivial (Additive E))
+    refine { eq_bot_or_eq_top := fun N => ?_ }
+    let H : Subgroup E :=
+      { carrier := {e : E | Additive.ofMul e ∈ N}
+        one_mem' := by show Additive.ofMul (1 : E) ∈ N; rw [ofMul_one]; exact N.zero_mem
+        mul_mem' := fun {a b} ha hb => by
+          show Additive.ofMul (a * b) ∈ N
+          rw [ofMul_mul]; exact N.add_mem ha hb
+        inv_mem' := fun {a} ha => by
+          show Additive.ofMul a⁻¹ ∈ N
+          rw [ofMul_inv]; exact N.neg_mem ha }
+    have hHinv : IsAInvariant ψ H := by
+      rw [isAInvariant_iff_smul_mem]
+      intro t a ha
+      show Additive.ofMul ((ψ t) a) ∈ N
+      have hmem : (MonoidAlgebra.of (ZMod p) T t) • (Additive.ofMul a) ∈ N :=
+        N.smul_mem _ (show Additive.ofMul a ∈ N from ha)
+      rw [key t (Additive.ofMul a)] at hmem
+      exact hmem
+    rcases hirr H hHinv with h | h
+    · left
+      rw [Submodule.eq_bot_iff]
+      intro x hx
+      have hxH : Additive.toMul x ∈ H := hx
+      rw [h, Subgroup.mem_bot] at hxH
+      show Additive.ofMul (Additive.toMul x) = 0
+      rw [hxH, ofMul_one]
+    · right
+      rw [Submodule.eq_top_iff']
+      intro x
+      exact (by rw [h]; exact Subgroup.mem_top _ : Additive.toMul x ∈ H)
+  refine ⟨Module.End (MonoidAlgebra (ZMod p) T) (Additive E),
+    endField, Module.End.applyModule, finite_end, finrank_end_eq_one, ?_⟩
+  exact natCard_end_eq.trans (Nat.card_congr Additive.toMul)
+
+end Prop2Bridge
+
 end OddOrder.Peterfalvi.Appendices.Huppert

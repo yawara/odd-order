@@ -87,6 +87,7 @@ import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -4479,3 +4480,23 @@ the `r_p = 1` case uses `p ∉ κ(M)` and the fixed-point-free criterion of Theo
 Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.msigma_structure_of_notMem_sigma_kappa
+/-! # Peterfalvi Appendices (Lane H)
+
+Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
+(`OddOrder/Peterfalvi/Appendices/`).  Only fully unconditional, axiom-clean declarations are
+registered here; results still conditional on an open `sorry` (e.g. Appendix I's Lemma
+non-cyclic case, deferred to Gorenstein 5.4.10 / issue 2004) are intentionally absent. -/
+
+/-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
+group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
+`F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract
+core (`End_{k[T]}(M)` is a field, `M` is `1`-dimensional, `|End| = |M|`) plus the bridge from the
+group-theoretic data.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.isSimpleModule_end
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.finrank_end_eq_one
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.natCard_end_eq
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_of_irreducible
