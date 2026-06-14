@@ -73,3 +73,17 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
     `eq_of_le_of_isPGroup_card_eq_factorization` (13.9 brick) で Q maximal q-subgroup of M。
 - 手順: 全 Sylow brick (Q∈Syl_q(M)+C_Q(P)=⊥) → 12.18 branch-2 → M_α≠1 等 → (c) +
   GAP B not-prime → (a) → GAP C → (b) → 13.11。
+
+### 進捗² (2026-06-15 Lane F /loop, cont.)
+- ✅ commit `5dd5b286`: `factorization_M_eq_E3_of_mem_tau3` (GAP A の A.2)。
+- ✅ commit `7e8766ed`: `exists_tau3_sylowM_regular_of_not_centralize` (GAP A 完了 —
+  Q∈Syl_q(M) かつ C_Q(P)=⊥; full build 緑 3813)。⟹ **12.18 branch-2 への入口が揃った**。
+- **次 = (c)+(a)**: full-Sylow brick の Q で M* 抽出 (`exists_maximal_over_normalizer_not_conj_of_le_E3`)
+  → `tau1_Malpha_interaction` branch-2 で `M_α≠1 ∧ C_{M_α}(P)≠1 ∧ C_{M_α}(P⊔Q)=1`。
+  - (c): `C_{M_α}(P)≠1` + `Malpha_le_Msigma` ⟹ `S10.Msigma M ⊓ C(P) ≠ ⊥`。
+  - GAP B not-prime → (a): `a∈C_{M_α}(P), a≠1` (a∈M_σ, a が P 中心化)。`C_{M_α}(P⊔Q)=1` ⟹ ∃y∈Q#,
+    a∉C(y)。x∈P#: a∈C_{M_σ}(x)。a∉C_{M_σ}(y)。x,y∈(E₁⊔E₃)# で fixedByElement 不一致 ⟹
+    ¬ActsPrimeOn M_σ (E₁⊔E₃)。`E1E3_actsPrime` の対偶 (mt) + E₁≠⊥ (P≠⊥) ⟹ (a)。
+  - 12.18 の正確な引数 = `tau1_Malpha_interaction hG h.mem_maximal hqp hpτ1 hP hPM hQM hQne hQq hQinv hCQP hMNQ |>.2 hQsyl`
+    (branch-2、`.2` + `hQsyl`=Q maximal q-subgroup of M)。hMNQ = M* 抽出から `≠{M}`。
+- 次々 = (b) GAP C (Q*, 13.8) → 13.11。

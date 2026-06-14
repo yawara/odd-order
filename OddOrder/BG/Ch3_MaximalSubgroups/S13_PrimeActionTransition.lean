@@ -2326,6 +2326,36 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
     hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
 
+/-- **BG Theorem 13.10, GAP A factorization** (the "Q ∈ Syl_q(M)" hidden step): for `q ∈ τ₃(M)`,
+the `q`-part of `|M|` equals the `q`-part of `|E₃|`. Hence the Sylow `q`-subgroup of `E₃` is a
+Sylow `q`-subgroup of `M`. Proof: `|M| = |M_σ|·|E|` (`card_Msigma_mul_card_E`), `q ∤ |M_σ|`
+(`M_σ` is a `σ(M)`-group and `q ∉ σ(M)` since `τ₃ ∩ σ = ∅`), and `q ∤ [E:E₃]` (`E₃` is a Hall
+`τ₃(M)`-subgroup of `E`, so its index is a `τ₃'`-number), so `|E|_q = |E₃|_q`. -/
+theorem factorization_M_eq_E3_of_mem_tau3 [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} (hqprime : q.Prime) (hq : q ∈ tau3 M) :
+    (Nat.card ↥M).factorization q = (Nat.card ↥E₃).factorization q := by
+  have hqσ : q ∉ S10.sigma M := tau3_subset_sigma_compl M hq
+  have hMσpi : Subgroup.IsPiSubgroup (S10.sigma M) (S10.Msigma M) :=
+    isPiSubgroup_opiCoreInG _ _
+  have hMσ0 : (Nat.card ↥(S10.Msigma M)).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+      hqσ (hMσpi q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩)))
+  have hME : Nat.card ↥(S10.Msigma M) * Nat.card ↥E = Nat.card ↥M := card_Msigma_mul_card_E h
+  have hEE3 : Nat.card ↥E₃ * (E₃.subgroupOf E).index = Nat.card ↥E := by
+    have hc := Subgroup.card_mul_index (E₃.subgroupOf E)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv] at hc
+  have hidxne : (E₃.subgroupOf E).index ≠ 0 := by
+    intro h0; rw [h0, mul_zero] at hEE3; exact Nat.card_pos.ne' hEE3.symm
+  have hidx0 : ((E₃.subgroupOf E).index).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+      h.E₃_hall.2 q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, hidxne⟩) hq)
+  have hstep1 : (Nat.card ↥M).factorization q = (Nat.card ↥E).factorization q := by
+    rw [← hME, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+      hMσ0, zero_add]
+  have hstep2 : (Nat.card ↥E).factorization q = (Nat.card ↥E₃).factorization q := by
+    rw [← hEE3, Nat.factorization_mul Nat.card_pos.ne' hidxne, Finsupp.add_apply, hidx0, add_zero]
+  rw [hstep1, hstep2]
+
 /-- In a cyclic `q`-subgroup `Q ≤ G`, the order-`q` subgroup `Q₀` is contained in **every**
 nontrivial subgroup `T ≤ Q` (it is the unique minimal subgroup `Ω₁`). Public replication of the
 `Ω₁`-bookkeeping used in §12 (`S12_Lemma1211`'s private `le_of_ne_bot_of_le_cyclic`). -/
@@ -2500,6 +2530,96 @@ theorem exists_tau3_regular_qsubgroup_of_not_centralize [Finite G] (hG : IsMinim
     exact le_inf (inf_le_left.trans (Subgroup.map_subtype_le _)) inf_le_right
   · -- `P ≤ N_G(Q)`.
     exact hPE.trans (E_le_normalizer_of_le_E3 hG h ((Subgroup.map_subtype_le _).trans hKE3))
+
+/-- **BG Theorem 13.10, full-Sylow brick** (GAP A): if `P ∈ ℰ_p¹(E₁)` does not centralize the
+cyclic Hall subgroup `E₃`, then there is a prime `q ∈ τ₃(M)` (`q ≠ p`) and a **Sylow `q`-subgroup
+`Q` of `M`** with `Q ≤ E₃`, `Q ⊓ C_G(P) = ⊥` (P acts regularly), and `P ≤ N_G(Q)`.
+
+`Q` is the full Sylow `q`-subgroup of `E₃`; it is a Sylow `q`-subgroup of `M` by
+`factorization_M_eq_E3_of_mem_tau3` (so Lemma 12.18 branch 2 fires). Regularity comes from the
+rank-1 datum (`exists_tau3_regular_qsubgroup_of_not_centralize`) and coprime indecomposability
+(`inf_centralizer_eq_bot_of_coprime_cyclic`): the order-`q` line `Q' ≤ Q` is not centralized by
+`P`, so neither is `Q`, hence `C_Q(P) = 1`. -/
+theorem exists_tau3_sylowM_regular_of_not_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPE1 : P ≤ E₁) (hPnc : ¬ P ≤ Subgroup.centralizer (E₃ : Set G)) :
+    ∃ q : ℕ, q.Prime ∧ q ∈ tau3 M ∧ q ≠ p ∧ ∃ Q : Subgroup G,
+      IsPGroup q ↥Q ∧ Q ≤ E₃ ∧ Q ≠ ⊥ ∧
+      Q ⊓ Subgroup.centralizer (P : Set G) = ⊥ ∧
+      P ≤ Subgroup.normalizer (Q : Set G) ∧
+      (∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T) := by
+  classical
+  haveI hE3cyc : IsCyclic ↥E₃ := h.E3_isCyclic hG
+  obtain ⟨q, hqprime, hqτ3, Q', hQ'p, hQ'E3, hQ'ne, hQ'C, hQ'N⟩ :=
+    exists_tau3_regular_qsubgroup_of_not_centralize hG h hP hPE1 hPnc
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  -- `p ∈ τ₁(M)`, hence `q ≠ p`.
+  have hPcardp : Nat.card ↥P = p := by rw [← pow_one p]; exact hP.2
+  have hc1 : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv
+  have hpτ1 : p ∈ tau1 M :=
+    h.E₁_hall.1 p (hc1 ▸ Nat.mem_primeFactors.mpr
+      ⟨Fact.out, hPcardp ▸ Subgroup.card_dvd_of_le hPE1, Nat.card_pos.ne'⟩)
+  have hpq : q ≠ p := fun heq => not_mem_tau3_of_mem_tau1 hpτ1 (heq ▸ hqτ3)
+  -- full Sylow `q`-subgroup of `↥E₃`.
+  letI : CommGroup ↥E₃ := IsCyclic.commGroup
+  obtain ⟨S₃⟩ : Nonempty (Sylow q ↥E₃) := inferInstance
+  haveI : (S₃ : Subgroup ↥E₃).Normal := Subgroup.normal_of_comm _
+  haveI : Unique (Sylow q ↥E₃) := S₃.unique_of_normal inferInstance
+  set Q : Subgroup G := (S₃ : Subgroup ↥E₃).map E₃.subtype with hQdef
+  have hQE3 : Q ≤ E₃ := Subgroup.map_subtype_le _
+  have hQcardE3 : Nat.card ↥Q = q ^ (Nat.card ↥E₃).factorization q := by
+    rw [hQdef, Subgroup.card_map_of_injective E₃.subtype_injective, S₃.card_eq_multiplicity]
+  have hQcardM : Nat.card ↥Q = q ^ (Nat.card ↥M).factorization q := by
+    rw [hQcardE3, factorization_M_eq_E3_of_mem_tau3 h hqprime hqτ3]
+  have hQp : IsPGroup q ↥Q := IsPGroup.iff_card.mpr ⟨_, hQcardE3⟩
+  haveI hQcyc : IsCyclic ↥Q :=
+    isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hQE3).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hQE3).surjective
+  -- `Q' ≤ Q` (the rank-1 line lies in the unique Sylow `q`-subgroup of `E₃`).
+  have hQ'Q : Q' ≤ Q := by
+    have hQ'pg : IsPGroup q ↥(Q'.subgroupOf E₃) := by
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hQ'p
+      exact IsPGroup.iff_card.mpr
+        ⟨k, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ'E3).toEquiv, hk]⟩
+    obtain ⟨S', hS'⟩ := hQ'pg.exists_le_sylow
+    have hle : Q'.subgroupOf E₃ ≤ (S₃ : Subgroup ↥E₃) := (Subsingleton.elim S' S₃) ▸ hS'
+    calc Q' = (Q'.subgroupOf E₃).map E₃.subtype :=
+          (Subgroup.map_subgroupOf_eq_of_le hQ'E3).symm
+      _ ≤ (S₃ : Subgroup ↥E₃).map E₃.subtype := Subgroup.map_mono hle
+      _ = Q := rfl
+  -- `¬ (Q ≤ C(P))`, then coprime indecomposability gives `C_Q(P) = ⊥`.
+  have hQnc : ¬ Q ≤ Subgroup.centralizer (P : Set G) := by
+    intro hQC
+    apply hQ'ne
+    have heq : Q' ⊓ Subgroup.centralizer (P : Set G) = Q' := inf_eq_left.mpr (hQ'Q.trans hQC)
+    rw [hQ'C] at heq
+    exact heq.symm
+  have hPNQ : P ≤ Subgroup.normalizer (Q : Set G) :=
+    (hPE1.trans h.E₁_le).trans (E_le_normalizer_of_le_E3 hG h hQE3)
+  have hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) := by
+    rw [hPcardp, hQcardE3]
+    exact ((Nat.coprime_primes Fact.out hqprime).mpr hpq.symm).pow_right _
+  have hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥ :=
+    inf_centralizer_eq_bot_of_coprime_cyclic hQcyc hQp hPNQ hcop hQnc
+  have hqdvdE3 : q ∣ Nat.card ↥E₃ := by
+    have hqQ' : q ∣ Nat.card ↥Q' := by
+      obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hQ'p
+      rcases Nat.eq_zero_or_pos k with rfl | hkpos
+      · rw [pow_zero] at hk; exact absurd (Subgroup.card_eq_one.mp hk) hQ'ne
+      · rw [hk]; exact dvd_pow_self q hkpos.ne'
+    exact hqQ'.trans (Subgroup.card_dvd_of_le hQ'E3)
+  have hQne : Q ≠ ⊥ := by
+    intro hb
+    rw [hb, Subgroup.card_bot] at hQcardE3
+    have hv : (Nat.card ↥E₃).factorization q ≠ 0 :=
+      (Nat.Prime.factorization_pos_of_dvd hqprime Nat.card_pos.ne' hqdvdE3).ne'
+    rcases Nat.pow_eq_one.mp hQcardE3.symm with h1 | h0
+    · exact hqprime.ne_one h1
+    · exact hv h0
+  refine ⟨q, hqprime, hqτ3, hpq, Q, hQp, hQE3, hQne, hCQ, hPNQ, ?_⟩
+  exact fun T hTM hTq hQT => eq_of_le_of_isPGroup_card_eq_factorization hQcardM hTM hTq hQT
 
 /-- **BG Theorem 13.10, M*-extraction brick** (gap-free): for `q ∈ τ₃(M)` and a nontrivial
 `q`-subgroup `Q ≤ E₃`, there is a maximal subgroup `M* ⊇ N_G(Q)` that is not conjugate to `M`
