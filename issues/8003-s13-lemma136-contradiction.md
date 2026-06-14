@@ -98,11 +98,32 @@ three-subgroups ([E₁,X,A]=1 は [X,E₁]=1 から従うが [X,A,E₁]=1 が未
 > **問**: なぜ [A,E₁] (⊆A の moved part) も X を中心化するのか? Thm 13.4 は [A,E₁] の line には
 > 効かない (E₁ 非中心化) はず。A 全体が X を中心化する精密な理由を再構成せよ。
 
+## ✅ 2026-06-14: 両 gap RESOLVED (ChatGPT 再構成、私が検証済)
+
+正本 = `notes/bg/bg_lemma_13_6_step2_verification.md` / `bg-lemma-13-6-step6-verification.md`。
+
+**step-2 解決**: 「we can assume X⊆S⊆C(E')」は **補群 E を C_{M_σ}(E₁)-共役 Ẽ=E^{c⁻¹} に
+取り替える WLOG** (c∈C_{M_σ}(E₁) ゆえ Ẽ₁=E₁ 不変、固定 X≤C_{M_σ}(E₁) 保たれる)。X 自身は
+E₁-不変のみ。手順: (a) S₀=E-不変 Sylow q of C_{M_σ}(E') [Prop1.5a] → (b) X⊆S₁=E₁-不変
+Sylow q [Prop1.5b] → (c) ∃c∈C_{M_σ}(E₁), S₁^c=S₀ [Prop1.5c] → E→E^{c⁻¹} 改名。
+
+**step-6 解決**: [A,E₁] が X を中心化するのは **Thm 13.4 でなく** `[A,E₁]≤[E,E]=E'≤C(X)`
+(step-2 の X≤C_{M_σ}(E') を使う!)。∴ step6 は step2 に依存 (単独再構成不能だった理由)。
+A₀=C_A(E₁) は Thm 13.4 per-line。A=A₀⊔[A,E₁] (Prop1.6 分解) ⟹ A≤C(X) ⟹ X≤M_σ⊓C(A)=⊥ 矛盾。
+
+## 形式化プラン (infra, sorry-不増 ゆえ全 helper sorry-free public、13.6 は最終 1 edit で 1→0)
+
+- ✓ Prop1.5(a) subgroup-form = `S13_Corollary132.exists_aInvariant_sylow_subgroup`
+- [ ] Prop1.5(b)(c) subgroup-form (Isaacs Ch04 φ-form を `MulDistribMulAction.toMulAut` で
+      translate、exists_aInvariant_sylow_subgroup のパターン踏襲)
+- [ ] Prop1.6(d) subgroup-form: A=C_A(E₁)⊔[A,E₁] (`fixedPoints_sup_actionCommutator_eq_top`)
+- [ ] SubgroupESetup-conjugation lemma (E→E^{c⁻¹}, c∈M_σ; M_σ◁M 保存、c∈C(E₁) で E₁ 不変)
+- [ ] step-1 (X≤C(E₁) via E1_actsPrime)、step-6 tail、最終 assembly
+
 ## 完了条件
 
 `maximalContaining_eq_singleton_of_E1` が sorry-free + build-green + axiom-clean。
 13.6 完成で AxiomsCheck 登録 + hub 連絡 (下流 13.9-13.13 解禁)。
-**現状: step-2 + step-6 の 2 つの reconstruction gap で gated (ChatGPT 再構成待ち)。**
 
 ## 参照
 
