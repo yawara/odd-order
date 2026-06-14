@@ -76,6 +76,17 @@ theorem sigmaSharp_subset_hatMsigma (M : Subgroup G) :
   exact Subgroup.mem_inf.mpr ⟨hxMσ, Subgroup.mem_centralizer_iff.mpr
     (fun h hh => by rw [Set.mem_singleton_iff] at hh; subst hh; rfl)⟩
 
+/-- `1 ∈ \widehat{M_σ}` whenever `M_σ ≠ 1`: the identity is centralized by everything, so
+`M_σ ⊓ C_G(1) = M_σ ≠ 1`.  Used by Theorem B(3) (`U_0 ∩ hatMsigma = {1}`).  `§14`-independent. -/
+theorem one_mem_hatMsigma_of_Msigma_ne_bot {M : Subgroup G}
+    (h : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥) : (1 : G) ∈ hatMsigma M := by
+  refine ⟨Subgroup.one_mem M, ?_⟩
+  have hC : Subgroup.centralizer ({1} : Set G) = ⊤ :=
+    eq_top_iff.mpr fun g _ => Subgroup.mem_centralizer_iff.mpr
+      fun h hh => by rw [Set.mem_singleton_iff] at hh; subst hh; simp
+  rw [hC, inf_top_eq]
+  exact h
+
 /-- BG Theorem E notation: `A(M) = hat M_sigma ∩ U M_sigma`. -/
 def ASet (M U : Subgroup G) : Set G :=
   hatMsigma M ∩ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G)
