@@ -315,6 +315,33 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
     だが M_β core に変更; r=q を避けるため M_β core 必須 [O_{β∪{q}} は q 含むので r=q で破綻])。
   - 次: Frattini `M=N_M(Q)M_β` を上記で grind → GAP3 (ii)/(iii)/(iv) → 配線。(iv) のみ ChatGPT 候補。
     🔶 13.8 は大規模 (17 blocks 完成, 残 ~6-9 iter)。GAP 3 ChatGPT (Frattini-args+ii/iii/iv) が来れば加速。
+- 2026-06-14 (Lane F, /loop 続き¹⁹〜²⁰): head Frattini 完成 + **🎉🎉 13.8 を 2 kernel に分解、本体 sorry-free**。
+  - `QMbeta_sup_normal_in_M` + `M_eq_normalizer_sup_Mbeta` (head Frattini `M=N_M(Q)M_β`, sorry-free) landed。
+  - **`gap3_false_from_r` + `forbidden_config_impossible` を sorry-free に配線** (commit 5eafbba6):
+    - gap3_false_from_r 署名を `M≠Mstar` → 非共役 `¬∃g,conj g•M=Mstar` (Lem 10.12 で M_α∩M*_α=⊥ 用)。
+    - body: head facts (Q 極大 q-sub / Q=[Q,P]⊆M'∩M*' / q∉β / Frattini) → 2 kernel → `gap3_assembly`。
+      hXQ = commutator_mono (X⊆M_α∩M* via (ii)+(iii)) ∘ (iv); hMαMstarα = M_α⊓M*_σ=⊥ (10.12)+Malpha_le_Msigma。
+    - forbidden_config: GAP2 disjunction を M-side=hnc / M*-side=hnc' (共役対称) で両側適用。
+  - **残 13.8 = 2 named kernel のみ** (BG が "because…" で省略する genuine elision):
+    - `gap3_centralizer_Malpha_P_le_Mstar` (ii)+(iii): `C_{M_α}(P) ⊆ M*`。ChatGPT 3a/3b。
+    - `gap3_commutator_inf_le_Malpha_star` (iv): `⁅M_α∩M*, Q⁆ ⊆ M*_α`。ChatGPT 3c (genuine 不確実)。
+  - clean full build 緑 (3807 jobs, AxiomsCheck 込, 3.3s)。
+  ### 🔑 (ii) R-existence は grindable と確定 — coprime cover tool 発見
+  mathlib/repo に coprime-cover `C_{G/N}(A)=C_G(A)N/N` は無いが、その土台 **`Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal`** (ForwardFromCh03:794, Isaacs Cor 3.28) が存在:
+  `φ:A→*MulAut G`, `N⊴G` A-不変, `Coprime |A| |N|`, `IsSolvable A∨N`, A-fixed coset `ḡ` ⟹
+  `∃c, (∀a,φ a c=c) [c∈C_G(A)] ∧ c≡g mod N`。**(ii) への適用パス** (要 ~1-2 iter):
+  1. Cauchy: `r∣|C_M(P)|` ⟹ `∃y∈C_M(P)`, `orderOf y=r`。
+  2. `M=N_M(Q)M_α` ⟹ `y=h·a` (h∈N_M(Q), a∈M_α)。`hK∈H/K` (H=N_M(Q), K=N_M(Q)∩M_α=H∩M_α⊴H) は
+     P-fixed (`pyp⁻¹=y` [y∈C_M(P)], pap⁻¹∈M_α ⟹ php⁻¹h⁻¹∈N_M(Q)∩M_α=K)。coprime: p∤|M_α|⊇|K|。
+  3. φ = P の N_M(Q) 上 inner conj 作用 (P≤N_M(Q))。`coprime_fixedPoints_quotient_of_coprime_normal`
+     (A=P, G=↥N_M(Q), N=K) ⟹ `∃c∈C_{N_M(Q)}(P)`, `cK=hK`。
+  4. `orderOf(hK)=r` (H/K→M/M_α 単射 [2nd iso] + `orderOf(yM_α)=r` [r∤|M_α|]) ⟹ `r∣orderOf c` ⟹
+     `R=⟨c^(orderOf c/r)⟩` (order r, ≤C_{N_M(Q)}(P)=N_M(Q)∩C(P))。
+  ⚠ fiddly: φ:P→MulAut(↥N_M(Q)) の inner-action 設定 + IsAInvariant + coset/order bookkeeping。
+  - **(iii)** = R⊆N_G(Q)⊆M* (hNQ) + N_G(R)⊆M* (Prop 10.14d) + Thm 13.4 (`centralizer_le_centralizer_of_tau1`,
+    要 PR を Hall E へ M-共役) で C_{M_σ}(P)⊆C_{M_σ}(R)⊆M*; C_{M_α}(P)⊆C_{M_σ}(P)。
+  - **(iv)** = nilpotent quotient commutator。genuine elision (ChatGPT 3c) — 自力試行 → 詰まれば依頼。
+  - 次: (ii) を上記パスで grind (coprime_fixedPoints_quotient 適用)。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。

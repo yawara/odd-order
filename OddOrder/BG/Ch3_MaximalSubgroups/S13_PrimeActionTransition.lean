@@ -1390,6 +1390,37 @@ theorem M_eq_normalizer_sup_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G) {M : Su
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
+/-- **Lemma 13.8 GAP 3 elision (iv)** (mmd L3690): `⁅M_α ∩ M*, Q⁆ ⊆ M*_α`。
+BG の理由: `Q ⊆ M*'`、`M*'/M*_α` は nilpotent (Thm 10.2)、`M_α ∩ M*` は `Q`-不変な `q'`-部分群
+(`q ∉ α(M) ⟹ q ∤ |M_α|`)。nilpotent quotient + coprime で commutator が radical へ落ちる。
+
+これは BG が "because …" で省略する genuine elision (ChatGPT 再構成プロンプト 3c)。 -/
+theorem gap3_commutator_inf_le_Malpha_star [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQM : Q ≤ M) (hQMstar : Q ≤ Mstar)
+    (hQq : IsPGroup q ↥Q) (hqα : q ∉ S10.alpha M) (hQderivStar : Q ≤ derivedInG Mstar) :
+    ⁅S10.Malpha M ⊓ Mstar, Q⁆ ≤ S10.Malpha Mstar := by
+  sorry
+
+/-- **Lemma 13.8 GAP 3 elision (ii)+(iii)** (mmd L3686): `C_{M_α}(P) ⊆ M*`。
+BG の理由: `M = N_M(Q) M_α` と `r ∣ |C_M(P)|`, `r ∉ σ(M)` から `P`-中心化された位数 `r` の
+`R ⊆ N_M(Q)` が存在 (coprime action; (ii))、`R ⊆ N_G(Q) ⊆ M*` かつ `N_G(R) ⊆ M*` (Prop 10.14d)。
+`PR` は `M` 内で `E` の可換部分群に共役ゆえ Thm 13.4 で
+`1 ⊂ X = C_{M_σ}(P) ⊆ C_{M_σ}(R) ⊆ C_G(R) ⊆ N_G(R) ⊆ M*` (iii)。`X = C_{M_α}(P) ⊆ C_{M_σ}(P)`。
+
+genuine elision (ChatGPT 再構成プロンプト 3a/3b)。 -/
+theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M) {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1)
+    (hPM : P ≤ M) {Q : Subgroup G} (hQM : Q ≤ M)
+    (hQinv : P ≤ Subgroup.normalizer (Q : Set G)) (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar)
+    (hαβ : S10.alpha M = S10.beta M)
+    (hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M)
+    {r : ℕ} [Fact r.Prime] (hrβ : r ∈ S10.beta Mstar)
+    (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G))) (hrσ : r ∉ S10.sigma M) :
+    S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Mstar := by
+  sorry
+
 /-- **Lemma 13.8 GAP 3 capstone (M-oriented)**: 配置 + step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
 `C_{M_α}(PQ)=1`) + GAP 2 の `r` (`r∈β(M*)`, `r∣|C_M(P)|`, `r∉σ(M)`) から矛盾。
 
@@ -1400,20 +1431,65 @@ GAP 3 本体: (i) Frattini `M=N_M(Q)M_β` (α=β で M_β 機構)、(ii) coprime
 本体 `forbidden_config_impossible` は GAP 2 の disjunction の各 disjunct に M↔M* を入替えて適用。 -/
 theorem gap3_false_from_r [Finite G] (hG : IsMinimalSimpleOdd G)
     {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
-    (hMMstar : M ≠ Mstar) {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) {p : ℕ} [Fact p.Prime] (hp : p ∈ tau1 M)
     {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hPMM : P ≤ M ⊓ Mstar)
     {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQle : Q ≤ M ⊓ Mstar) (hQq : IsPGroup q ↥Q)
     (hQmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → Q ≤ T → Q = T)
     (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
     (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
     (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar)
-    (hαβ : S10.alpha M = S10.beta M)
+    (hqp : q ≠ p) (hqα : q ∉ S10.alpha M) (hαβ : S10.alpha M = S10.beta M)
     (hCMαP : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥)
     (hCMαPQ : S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥)
     {r : ℕ} [Fact r.Prime] (hrβ : r ∈ S10.beta Mstar)
     (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G))) (hrσ : r ∉ S10.sigma M) :
     False := by
-  sorry
+  classical
+  have hPM : P ≤ M := hPMM.trans inf_le_left
+  have hPMstar : P ≤ Mstar := hPMM.trans inf_le_right
+  have hQM : Q ≤ M := hQle.trans inf_le_left
+  have hQMstar : Q ≤ Mstar := hQle.trans inf_le_right
+  obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
+  have hPp : IsPGroup p ↥P := hPea.isPGroup
+  haveI : IsSolvable ↥P := isSolvable_of_comm hPea.comm
+  -- `Q` is a maximal `q`-subgroup of `M` (GAP 1.3).
+  have hQmaxM : ∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T := by
+    intro T hTM hTq hQT
+    by_contra hne
+    have hlt : Q < T := lt_of_le_of_ne hQT hne
+    have hgrow := lt_inf_normalizer_of_lt_of_pgroup hTq hlt
+    have hNT_le : T ⊓ Subgroup.normalizer (Q : Set G) ≤ M ⊓ Mstar :=
+      le_inf (inf_le_left.trans hTM) (inf_le_right.trans hNQ)
+    exact hgrow.ne (hQmax _ hNT_le (hTq.to_le inf_le_left) hgrow.le)
+  -- `Q = [Q,P] ⊆ M' ∩ M*'`.
+  have hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q) :=
+    IsPGroup.coprime_card_of_ne p q (Ne.symm hqp) P Q hPp hQq
+  have hQderiv : Q ≤ derivedInG M ⊓ derivedInG Mstar :=
+    pSubgroup_le_derived_inf hQinv hcop hCQ hPM hQM hPMstar hQMstar
+  have hqβ : q ∉ S10.beta M := fun h => hqα (hαβ.symm ▸ h)
+  -- `M = N_M(Q) · M_β` (head Frattini).
+  have hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M :=
+    M_eq_normalizer_sup_Mbeta hG hM hQM hQq hQmaxM hqβ (hQderiv.trans inf_le_left)
+  -- (ii)+(iii): `X = C_{M_α}(P) ⊆ M*`.
+  have hXMstar : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Mstar :=
+    gap3_centralizer_Malpha_P_le_Mstar hG hM hMstar hp hP hPM hQM hQinv hNQ hαβ hFrat hrβ hrC hrσ
+  -- `X ⊆ M_α ∩ M*`.
+  have hXinf : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ S10.Malpha M ⊓ Mstar :=
+    le_inf inf_le_left hXMstar
+  -- (iv): `⁅M_α ∩ M*, Q⁆ ⊆ M*_α`.
+  have hivQ : ⁅S10.Malpha M ⊓ Mstar, Q⁆ ≤ S10.Malpha Mstar :=
+    gap3_commutator_inf_le_Malpha_star hG hM hMstar hQM hQMstar hQq hqα (hQderiv.trans inf_le_right)
+  -- `⁅X, Q⁆ ⊆ M*_α`.
+  have hXQ : ⁅S10.Malpha M ⊓ Subgroup.centralizer (P : Set G), Q⁆ ≤ S10.Malpha Mstar :=
+    (Subgroup.commutator_mono hXinf le_rfl).trans hivQ
+  -- `M_α ∩ M*_α = ⊥` (Lemma 10.12, via `M_α ⊓ M*_σ = ⊥`).
+  have hMαMstarα : S10.Malpha M ⊓ S10.Malpha Mstar = ⊥ := by
+    have h1 : S10.Malpha M ⊓ S10.Msigma Mstar = ⊥ :=
+      (S10.disjoint_of_not_conj hG hM hMstar hnc).1.1
+    have h2 : S10.Malpha M ⊓ S10.Malpha Mstar ≤ S10.Malpha M ⊓ S10.Msigma Mstar :=
+      inf_le_inf_left _ (S10.Malpha_le_Msigma hG hMstar)
+    exact le_bot_iff.mp (h1 ▸ h2)
+  exact gap3_assembly hQM hCMαP hXQ hMαMstarα hCMαPQ
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
 `p∈τ₁(M)∩τ₁(M*)`, `P∈ℰ_p¹(M∩M*)`, `Q,Q*` を `M∩M*` の `P`-不変 Sylow 部分群
@@ -1447,25 +1523,29 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     rw [hb, Subgroup.card_bot, pow_one] at hc
     exact (Fact.out : Nat.Prime p).one_lt.ne hc
   -- step1 (M-side and M*-side).
-  obtain ⟨_, _, hαβ, _, _, hCMαP, hCMαPQ⟩ :=
+  obtain ⟨hqp, _, hαβ, _, hqα, hCMαP, hCMαPQ⟩ :=
     forbidden_config_step1 hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ
       hNQ
   have hPMstar : P ≤ Mstar ⊓ M := by rw [inf_comm]; exact hPM
   have hQstarle' : Qstar ≤ Mstar ⊓ M := by rw [inf_comm]; exact hQstarle
   have hQstarmax' : ∀ T : Subgroup G, T ≤ Mstar ⊓ M → IsPGroup qstar ↥T → Qstar ≤ T → Qstar = T := by
     intro T hT hTq hQT; rw [inf_comm] at hT; exact hQstarmax T hT hTq hQT
-  obtain ⟨_, _, hαβstar, _, _, hCMstarαP, hCMstarαPQ⟩ :=
+  obtain ⟨hqpstar, _, hαβstar, _, hqαstar, hCMstarαP, hCMstarαPQ⟩ :=
     forbidden_config_step1 hG hMstar hM (Ne.symm hMMstar) hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar
+  -- `nc` symmetry for the M*-oriented branch.
+  have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
+    rintro ⟨g, hg⟩
+    exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
   -- GAP 2: extract `r`.
   rcases exists_prime_betastar_dvd_or hG hM hMstar hnc hP1 hαβ hαβstar hCMαP hCMstarαP with
     ⟨r, hrp, hrβ, hrC, hrσ⟩ | ⟨r, hrp, hrβ, hrC, hrσ⟩
   · haveI : Fact r.Prime := ⟨hrp⟩
-    exact gap3_false_from_r hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
-      hαβ hCMαP hCMαPQ hrβ hrC hrσ
+    exact gap3_false_from_r hG hM hMstar hnc hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
+      hqp hqα hαβ hCMαP hCMαPQ hrβ hrC hrσ
   · haveI : Fact r.Prime := ⟨hrp⟩
-    exact gap3_false_from_r hG hMstar hM (Ne.symm hMMstar) hpstar hP hPMstar hQstarle' hQstarq
-      hQstarmax' hQstarinv hCQstar hNQstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
+    exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
+      hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。 -/
 theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
