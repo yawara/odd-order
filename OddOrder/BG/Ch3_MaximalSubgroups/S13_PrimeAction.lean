@@ -650,6 +650,28 @@ theorem maximalContaining_eq_singleton_of_maximal_qsubgroup [Finite G]
   rw [← hN'eq]
   exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hNM hmN))
 
+/-- **Lemma 13.6 contradiction half, steps 3–4**: if `X ≤ M_σ` centralizes both `E₁` and `E'`
+but `X ⊄ M_σ'`, then `E₂ ≠ 1`. Step 3: `E₁ ⊔ E' = E` would give `X ≤ C_{M_σ}(E) ⊆ M_σ'`
+(Lemma 12.17), contra `X ⊄ M_σ'`. Step 4: `E₂ = 1` gives `E = E₁ ⊔ E₃ ≤ E₁ ⊔ E'` (`E₃ ≤ E'`),
+forcing `E₁ ⊔ E' = E`. -/
+theorem E2_ne_bot_of_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {X : Subgroup G}
+    (hXMσ : X ≤ S10.Msigma M) (hXE1 : X ≤ Subgroup.centralizer (E₁ : Set G))
+    (hXE' : X ≤ Subgroup.centralizer (derivedInG E : Set G))
+    (hXMσ' : ¬ (X ≤ derivedInG (S10.Msigma M))) :
+    E₂ ≠ ⊥ := by
+  have hsup_ne : E₁ ⊔ derivedInG E ≠ E := by
+    intro hEeq
+    have hEcx : E ≤ Subgroup.centralizer (X : Set G) :=
+      hEeq ▸ sup_le (Subgroup.le_centralizer_iff.mp hXE1) (Subgroup.le_centralizer_iff.mp hXE')
+    exact hXMσ' (le_trans (le_inf (Subgroup.le_centralizer_iff.mp hEcx) hXMσ)
+      (Msigma_E_relations hG h).1)
+  intro hE2bot
+  refine hsup_ne (le_antisymm (sup_le h.E₁_le (Subgroup.map_subtype_le _)) ?_)
+  calc E = E₁ ⊔ E₂ ⊔ E₃ := h.eq_sup hG
+    _ = E₁ ⊔ E₃ := by rw [hE2bot, sup_bot_eq]
+    _ ≤ E₁ ⊔ derivedInG E := sup_le_sup_left (h.E3_le_derived hG) E₁
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
