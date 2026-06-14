@@ -158,6 +158,16 @@ theorem card_coprime (A : Subgroup Fˣ) [Finite F] :
     exact Nat.coprime_add_self_right.mpr (Nat.coprime_one_right m)
   exact Nat.Coprime.coprime_dvd_left h1 (hcop (Nat.card F) Nat.card_pos)
 
+/-- If `A ⊆ Fˣ` has index `2`, then `|F| = 2|A| + 1` (`|A| · index = |Fˣ| = |F| - 1`).  This is the
+cardinality identity behind the `(|A|+1)² > 2|A|+1` contradiction proving `A` acts irreducibly. -/
+theorem card_eq_of_index_two (A : Subgroup Fˣ) [Finite F] (hidx : A.index = 2) :
+    Nat.card F = 2 * Nat.card A + 1 := by
+  haveI : Nonempty F := ⟨0⟩
+  have h := Subgroup.card_mul_index A
+  rw [hidx, Nat.card_units] at h
+  have hpos : 0 < Nat.card F := Nat.card_pos
+  omega
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
