@@ -183,6 +183,50 @@ theorem Msigma_inf_centralizer_conj_ne_bot {M P : Subgroup G} {m : G} (hmM : m �
     have hconj : m * x * m⁻¹ = m * 1 * m⁻¹ := by rw [hxe]; group
     exact mul_left_cancel (mul_right_cancel hconj)
 
+open OddOrder.BG.Ch3.S13 in
+/-- In a §12 `E`-setup, a prime `p ∈ κ(M) ∩ τ₃(M)` forces `E₃ ≠ 1` and makes `E₃` act
+non-regularly on `M_σ`: the `κ`-witness `P ∈ ℰ_p¹(M)` (with `C_{M_σ}(P) ≠ 1`) is `M`-conjugate
+into the Hall `τ₃`-piece `E₃` (`exists_conj_smul_le_hallPiece`), and `M_σ`-centralizer
+nontriviality transports along the conjugacy (`Msigma_inf_centralizer_conj_ne_bot`).  This is
+the entry to BG Proposition 14.2's `κ ∩ τ₃ ≠ ∅` case (which then invokes Corollary 13.11). -/
+theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} (hp : p.Prime) (hpκ : p ∈ kappa M) (hpτ3 : p ∈ tau3 M) :
+    E₃ ≠ ⊥ ∧ ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃ := by
+  obtain ⟨_, P, hPelem, hPM, hPC⟩ := hpκ
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+  have hPpi : Ch03.Subgroup.IsPiGroup (tau3 M) (P.subgroupOf M) := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPM).toEquiv, hPcard,
+      hp.primeFactors, Finset.mem_singleton] at hq
+    exact hq ▸ hpτ3
+  have hπσ : tau3 M ⊆ (OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    fun q hq => ((mem_tau3_iff M q).mp hq).1
+  obtain ⟨w, hwM, hwle⟩ :=
+    exists_conj_smul_le_hallPiece hG h h.E₃_le h.E₃_hall hπσ hPM hPpi
+  have hPwC : OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer ((MulAut.conj w • P : Subgroup G) : Set G) ≠ ⊥ :=
+    Msigma_inf_centralizer_conj_ne_bot hwM hPC
+  have hPwne : (MulAut.conj w • P : Subgroup G) ≠ ⊥ :=
+    ne_bot_of_mem_elemAbelianOfRank_one (conj_smul_mem_elemAbelianOfRank w hPelem)
+  obtain ⟨⟨z, hzPw⟩, hz1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hPwne
+  have hz1' : z ≠ 1 := fun hc => hz1 (Subtype.ext hc)
+  have hzE3 : z ∈ E₃ := hwle hzPw
+  refine ⟨fun hE3bot => hz1' (Subgroup.mem_bot.mp (hE3bot ▸ hzE3)), ?_⟩
+  intro hreg
+  have hzfix := hreg z hzE3 hz1'
+  rw [fixedByElement] at hzfix
+  apply hPwC
+  rw [eq_bot_iff, ← hzfix]
+  refine inf_le_inf_left _ ?_
+  intro a ha
+  rw [Subgroup.mem_centralizer_iff] at ha ⊢
+  intro g hg
+  rw [Set.mem_singleton_iff] at hg
+  rw [hg]
+  exact ha z hzPw
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
@@ -457,7 +501,15 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hKM hK_pi
   -- BG splits on whether `κ(M) ∩ τ₃(M) = ∅` (i.e. `E₃ ≠ 1` and `E₃` non-regular vs `κ ⊆ τ₁`).
   by_cases hτ3 : (kappa M ∩ tau3 M).Nonempty
-  · -- Case `κ(M) ∩ τ₃(M) ≠ ∅`: Corollary 13.11 gives `E = E₁E₃`, `E` prime on `M_σ`, `K = E`.
+  · -- Case `κ(M) ∩ τ₃(M) ≠ ∅`: `E₃` acts non-regularly on `M_σ` (the `κ`-witness conjugates
+    -- into `E₃`), so Corollary 13.11 gives `E = E₁ ⊔ E₃`, `E` prime on `M_σ`, and every
+    -- `X ∈ ℰ¹(E)` normal in `E`; then `K = E`, and the conjuncts follow.
+    obtain ⟨p, hpmem⟩ := hτ3
+    rw [Set.mem_inter_iff] at hpmem
+    obtain ⟨hpκ, hpτ3⟩ := hpmem
+    have hp : p.Prime := Nat.prime_of_mem_primeFactors ((mem_tau3_iff M p).mp hpτ3).2.1
+    obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
+    obtain ⟨hE1ne, hEeq, hEprime, hEnorm⟩ := E3_not_regular_consequences hG hsetup hE3ne hreg
     sorry
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
     sorry
