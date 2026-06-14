@@ -822,6 +822,112 @@ theorem inner_X_Y_eq_zero_of_orthogonal {L : Subgroup G} [Fintype ↥L] [Inverti
   rw [OddOrder.RepresentationTheory.inner_conj_symm Y D.X,
     D.inner_X_eq_zero_of_orthogonal_imageSet hY, star_zero]
 
+/-- **Orthogonality extraction from a two-irreducible difference** (the (6.8.2.3) disjointness
+core).  If `ξ`, `ξ'` are orthonormal (`‖ξ‖² = 1`, `⟨ξ, ξ'⟩ = 0`), `θ` is a norm-`1` vector with
+`⟨ξ, θ⟩ ∈ ℤ`, and `c·ξ − c'·ξ' ⊥ θ` for `c ≠ 0`, then `⟨ξ, θ⟩ = 0`.
+
+This is the extraction step of the disjointness `R(μ_j) ⊥ Y`: writing `Y = ε·ξ` (`ξ` the `Y`-anchor
+irreducible image, `coherentYset_extension_eq_zsmul_irreducible`) so that
+`(η₁ − η̄₁)^τ = ε·ξ − ε'·ξ'` is orthogonal to every `σ`-image `θ = ω^σ` (by (3.8) /
+`grid_eq_zero_of_ncard_support_lt`, since `NC ≤ 2 < min(w₁, w₂)`), the integrality bound
+`|⟨ξ, θ⟩| ≤ 1` (`inner_intCast_sq_le`) forces `⟨ξ, θ⟩ = 0`: otherwise `⟨ξ, θ⟩ = ±1` makes
+`ξ = ±θ` (Cauchy–Schwarz equality `eq_smul_of_inner_self_eq`), so `⟨ξ', θ⟩ = 0` (from `⟨ξ, ξ'⟩ = 0`)
+and the orthogonality collapses to `c·⟨ξ, θ⟩ = 0`, contradicting `c ≠ 0`. -/
+theorem inner_eq_zero_of_smul_sub_smul_orthogonal {ξ ξ' θ : ClassFunction G ℂ}
+    (hξ : ClassFunction.inner ξ ξ = 1) (hθ : ClassFunction.inner θ θ = 1)
+    (hξξ' : ClassFunction.inner ξ ξ' = 0)
+    {m : ℤ} (hm : ClassFunction.inner ξ θ = (m : ℂ))
+    {c c' : ℂ} (hc : c ≠ 0)
+    (horth : ClassFunction.inner (c • ξ - c' • ξ') θ = 0) :
+    ClassFunction.inner ξ θ = 0 := by
+  rw [hm]
+  by_contra hne
+  have hmne : m ≠ 0 := fun h => hne (by rw [h]; simp)
+  -- `|m| ≤ 1` from the norm-`1` Cauchy–Schwarz bound, hence `m = ±1`.
+  have hmsqz : m ^ 2 ≤ 1 := by
+    have h := inner_intCast_sq_le hθ hm
+    rw [hξ, Complex.one_re] at h
+    exact_mod_cast h
+  have hlo : -1 ≤ m := by nlinarith [sq_nonneg (m + 1)]
+  have hhi : m ≤ 1 := by nlinarith [sq_nonneg (m - 1)]
+  have hmsq1 : (m : ℂ) ^ 2 = 1 := by interval_cases m <;> simp_all
+  -- `‖ξ‖² = (m:ℂ)²`, so `ξ = (m:ℂ)·θ` by the equality case of Cauchy–Schwarz.
+  have hξeq : ξ = (m : ℂ) • θ := eq_smul_of_inner_self_eq hm (by rw [hξ, hmsq1]) hθ
+  -- `⟨ξ, ξ'⟩ = (m:ℂ)·⟨θ, ξ'⟩ = 0` with `(m:ℂ) ≠ 0` ⟹ `⟨ξ', θ⟩ = 0`.
+  rw [hξeq, ClassFunction.inner_smul_left] at hξξ'
+  have hξ'θ : ClassFunction.inner ξ' θ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm θ ξ',
+      (mul_eq_zero.mp hξξ').resolve_left hne, star_zero]
+  -- `horth` collapses to `c·(m:ℂ) = 0`, contradicting `c ≠ 0`, `(m:ℂ) ≠ 0`.
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+    hξ'θ, mul_zero, sub_zero, hm] at horth
+  exact (mul_ne_zero hc hne) horth
+
+/-- **`σ`-coefficient vanishing from a small support** (the (3.2.d)/(3.8) "all coefficients zero"
+case, via `grid_eq_zero_of_ncard_support_lt`).  For `ψ` vanishing on `V` with `NC(ψ) < min(w₁, w₂)`,
+every `σ`-image coefficient `sigmaCoeff ψ = ⟨ψ, ω^σ⟩` vanishes: the (3.7) additive identity
+`sigmaCoeff_add_eq` (from `ψ` vanishing on `V`) makes the coefficient grid additively separable, so a
+support smaller than `min(w₁, w₂)` forces it identically zero.
+
+This is the (6.8.2.3) disjointness driver: applied to `ψ = (η₁ − η̄₁)^τ` (vanishing on `V` since
+`η₁ − η̄₁` is `A`-supported, with `NC ≤ 2 < min(w₁, w₂)` as a difference of two irreducibles), it
+gives `(η₁ − η̄₁)^τ ⊥ Im σ`, feeding the extraction `inner_eq_zero_of_smul_sub_smul_orthogonal`.
+The simpler `grid_eq_zero_of_ncard_support_lt` (no `w₁ + 2 ≤ w₂` gap) suffices here, unlike the full
+trichotomy `sigmaCoeff_trichotomy`. -/
+theorem sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (hNC : hyp.sigmaNC hVeq app ψ < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.sigmaCoeff hVeq app ψ pq = 0 := by
+  refine OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
+    (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
+    (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
+  rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+  exact hNC
+
+/-- **`NC ≤ 2` for a two-irreducible difference** (the (6.8.2.3) `NC((η₁ − η̄₁)^τ) ≤ 2` bound).  If
+every nonzero `σ`-coefficient of `ψ` forces a nonzero inner product with one of two norm-`1` virtual
+characters `ξ`, `ξ' ∈ ±Irr(G)` (the case `ψ = c·ξ − c'·ξ'`), then `NC(ψ) ≤ 2`: by (3.9)(a)
+(`ncard_inner_chiFam_ne_zero_le_one`) each of `ξ`, `ξ'` has at most one nonzero `σ`-coefficient, and
+the support of `ψ` lies in their union.  With `min(w₁, w₂) ≥ 3` (odd-order Hall), this feeds the
+`grid_eq_zero` driver `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`. -/
+theorem sigmaNC_le_two_of_inner_chiFam
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ξ ξ' : ClassFunction G ℂ} (hξZ : ξ ∈ ZIrr G) (hξ1 : ClassFunction.inner ξ ξ = 1)
+    (hξ'Z : ξ' ∈ ZIrr G) (hξ'1 : ClassFunction.inner ξ' ξ' = 1)
+    {ψ : ClassFunction G ℂ}
+    (hψsupp : ∀ pq, hyp.sigmaCoeff hVeq app ψ pq ≠ 0 →
+      ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0 ∨
+        ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0) :
+    hyp.sigmaNC hVeq app ψ ≤ 2 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have hsub : {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0} ⊆
+      {pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0} ∪
+        {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0} :=
+    fun pq hpq => hψsupp pq hpq
+  calc hyp.sigmaNC hVeq app ψ
+      = {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard := rfl
+    _ ≤ ({pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0} ∪
+          {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0}).ncard :=
+        Set.ncard_le_ncard hsub (Set.toFinite _)
+    _ ≤ {pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0}.ncard +
+          {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0}.ncard := Set.ncard_union_le _ _
+    _ ≤ 1 + 1 := by
+        gcongr
+        · exact OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_inner_chiFam_ne_zero_le_one
+            hyp hVeq app hξZ hξ1
+        · exact OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_inner_chiFam_ne_zero_le_one
+            hyp hVeq app hξ'Z hξ'1
+    _ = 2 := rfl
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field

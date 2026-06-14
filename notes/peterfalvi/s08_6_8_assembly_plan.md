@@ -2488,3 +2488,46 @@ or character setup ([Is]2.27 + Ind 分解)。abstract layer は完成済みゆ�
 A^G∩V=∅ で certain-type Dade 像の V-vanishing を確立。これが取れれば残り (NC/grid/整数抽出) は機械的。
 anchor が重い場合は先に sub-lemma 5 (整数性抽出, 純 abstract, certain-type 非依存) を landさせて momentum 維持。
 **正本=本 cont.⁴⁴。clean route 確定。次=anchor (sub-lemma 1) 形式化。**
+
+## 2026-06-14 (session 40 cont.⁴⁵, /loop): ✅✅ disjointness の "downstream" 2 brick landed (building 転換)
+
+### ✅ landed (S08_CaseBCoherence2, 全 axiom-clean 標準3, leaf 3625):
+| commit | lemma | 役割 |
+|---|---|---|
+| `547a14b1` | `inner_intCast_sq_le` | `inner_Y_coeff_sq_le` を一般化 (任意 u,w): ⟨u,w⟩=b∈ℤ ∧ ‖w‖²=1 ⟹ b²≤‖u‖²。整数性 |b|≤1 の基盤。呼び出し2箇所更新 (no-wrapper) |
+| `05650497` | **`inner_eq_zero_of_smul_sub_smul_orthogonal`** | **sub-lemma 5 (extraction core)**: ξ,ξ' 正規直交 + θ norm-1 + ⟨ξ,θ⟩∈ℤ + c·ξ−c'·ξ'⊥θ (c≠0) ⟹ ⟨ξ,θ⟩=0。`inner_intCast_sq_le`(|·|≤1) + `eq_smul_of_inner_self_eq`(±1⟹ξ=±θ) で。純・certain-type 非依存 |
+
+### ▶ disjointness 残ピース (downstream 完成、残り upstream):
+- ✅ **sub-lemma 5 (extraction)** = 上記。「(η₁−η̄₁)^τ=ε·ξ−ε'·ξ' ⊥ chiFam」⟹「⟨ξ,chiFam⟩=0」を変換。
+- ⚠ **sub-lemma 1 (anchor)** = 「(η₁−η̄₁)^τ が (ticVdiff h).V 上消失」: Sibley tau 像 (A-supported) vs ticVdiff V の
+  構造的 disjointness。**未確認の残ハード piece** (cont.⁴⁴ 確認: 既存 lemma 直接無し)。
+- ⚠ **assembly**: Y=ε·ξ (coherentYset_extension_eq_zsmul_irreducible) + ξ≠ξ' (η₁ 非実) +
+  (η₁−η̄₁)^τ=ε·ξ−ε'·ξ' (extends_on_supported) + NC≤2 + grid_eq_zero(要 anchor) + extraction → ⟨Y,certainTypeOmegaSigma⟩=0
+  → seam-1 hXorth。さらに **map-juggling** (capstone τ=certain-type dade0/h.tau vs Y=Sibley cY.ext;
+  hXorth は ⟨(D i).X, Y⟩ で D i.X∈ℤ[σ-images]、Y は抽象 G-function ゆえ map 差は OK だが sigmaCoeff 接続に注意)。
+**正本=本 cont.⁴⁵。extraction core landed。次=anchor (sub-lemma 1) の Sibley-V disjointness 構造調査 → 形式化。
+anchor が deep なら assembly の other pieces (Y=ε·ξ setup, NC≤2) を先に land。**
+
+## 2026-06-14 (session 40 cont.⁴⁶, /loop): ✅ grid driver landed (3rd disjointness brick) + anchor の深さ確認
+
+### ✅ landed (`6e223bc4`, axiom-clean, leaf 3625):
+**`sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`** (S08): ψ vanishOnV + NC<min(w₁,w₂) ⟹ ∀pq sigmaCoeff=0。
+`grid_eq_zero_of_ncard_support_lt` + `sigmaCoeff_add_eq`(3.7) + `card_charGroup_subgroupOf`。
+full trichotomy 不要 (corollary で足る)。**gotcha**: `FullDadeApplication` = `S05.TICyclicHypothesis.FullDadeApplication`,
+`grid_eq_zero_of_ncard_support_lt` = `S05.` 直下 (TICyclicHypothesis 名前空間でない)。
+
+### disjointness ピース status:
+| piece | lemma | status |
+|---|---|---|
+| extraction core | `inner_eq_zero_of_smul_sub_smul_orthogonal` | ✅ `05650497` |
+| CS bound \|inner\|≤1 | `inner_intCast_sq_le` | ✅ `547a14b1` |
+| **grid driver** (vanishOnV+NC<min⟹全0) | `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt` | ✅ `6e223bc4` |
+| NC≤2 (2-irreducible) | — | ⚠ tractable (sigmaCoeff≠0 のみ ξ or ξ'=±chiFam ⟹ ≤2 点) |
+| **anchor** (η₁−η̄₁)^τ vanishOnV | — | 🛑 deep 構造: (ticVdiff h).V ∩ conjugatesOfSet(sharpImage H)=∅ (V=W-exceptional vs H^#-conj) 既存無し |
+| assembly (sigmaCoeff↔certainTypeOmegaSigma + Y=ε·ξ + 上記) | — | ⚠ multi-step |
+
+### 🛑 anchor 確認 (cont.⁴⁶): V^L⊆A₀=A∪V^L (`coe_mem_A0_of_mem_conjugatesOfSet_toTICV`), V は A と別成分。
+anchor「hyp.tau(A-supported) が V 上消失」= V∩conjugatesOfSet(H^#)=∅ (構造的, V=Hall W-exceptional は H-conj と
+別素数構造で交わらない)。`centralizer_le_L_of_mem_ticVdiffV` (v∈V⟹C_G(v)⊆L, H(a)=⊥ on V) が基盤候補だが
+"A-supported→vanishOnV" 直接 lemma 無し。**anchor = 残る本丸 deep 構造 piece**。
+**正本=本 cont.⁴⁶。grid driver landed。次=NC≤2 (tractable, land) → anchor 構造 (deep, V∩H^#-conj=∅) → assembly。**
