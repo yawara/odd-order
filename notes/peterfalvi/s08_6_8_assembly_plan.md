@@ -1747,3 +1747,36 @@ cont.²⁰ item 2 ({μ_j}⊆Xset W₂ membership) を精査。S-membership 核�
 ### 次手 = transport infra (or 代替の rw 実験) → (2a)+(2b) 組立 (`certainTypeSet_subset_Xset` を
 S08_CaseBCoherence2 に) → cX 残 (item 1 X_irr-coh の cover/base + item 3 (6.8.2.3) mixed-inner)。
 **正本=本 cont.²¹。item 2 は構造完全確定、残るは transport infra 1 本の実装。**
+
+## 2026-06-14 (session 40 cont.²², /loop): ✅ item 2a (μ_j∈S) landed — K↔H transport は infra 不要 (rw[hHK] で安価); 残 = 2b Clifford-uniq
+
+cont.²¹ で「transport infra 1 本要」と判定したが、**実験で否定**: K↔H cross-group transport は
+専用 infra 不要、既存ツールで安価に通った。
+
+### ✅ landed (iter 13-14):
+- `chiRestrict_ne_trivialIrreducibleCharacter` (a372410b, S06_CertainTypeSupport): χ_j 非自明 (=2a 核入力)。
+- **`SibleyDadeHypothesis.columnSum_mem_S`** (56ef5f0c, S08_CaseBCoherence2): **μ_j ∈ hyp.S (item 2a 完了)**。
+
+### 🔑 K↔H transport は安価 (cont.²¹ の infra-blocker 判定は誤り):
+- **既約性**: `have h := h46.certainTypeRestrict_isIrreducible χ₂; rwa [hHK] at h` — `rw [hHK]` が
+  `IsIrreducibleCharacter (restrict h46.K μ)` → `(restrict H μ)` を**そのまま通す** (motive=fun S↦Prop で OK)。
+- **induction**: `induce_congr_of_subgroup_eq` (= `…S04.Hypothesis.induce_congr_of_subgroup_eq`,
+  full name 注意) で `induce h46.K (restrict h46.K μ) = induce H (restrict H μ)` (値一致は
+  `simp [restrict_apply]`)。
+- **非自明性**: `rw [← hHK] at h1` は **motive 不成立で失敗** (equation 型 CF↥H が S 依存)。代わりに
+  `ClassFunction.ext` + 各点 `congrArg (f ↦ f ⟨↑g,hg⟩) h1` + `simpa` で値レベル transport。
+  membership transport は `hHK.le g.2` (`▸` は motive 曖昧で失敗)。
+- θ:Irr ↥H は `⟨restrict H μ_{0j}, hirr⟩` を anonymous constructor で直接供給 (set 不要、.1 は rfl)。
+
+### ▶▶ 残 item 2 = **2b `columnSum ∉ hyp.SsubFiltration W₂`** (Clifford-uniqueness):
+φ∈S(W₂) ⟹ ∃θ:Irr↥H, θ≠triv ∧ W₂.subgroupOf H⊆ker θ ∧ columnSum=induce H θ。矛盾を:
+1. **Res_H columnSum = w₁•(restrict H μ_{0j})**: columnSum=∑_i μ_{ij} ⟹ Res_H=∑_i restrict H μ_{ij};
+   各 restrict H μ_{ij}=restrict H μ_{0j} (`restrict_certainType_eq` χ₂ i は K 版 → 各点 ext で H 版へ)。
+2. **Frobenius** (`inner_induce_eq_inner_restrict`): ⟨θ,Res_H columnSum⟩=⟨induce H θ,columnSum⟩
+   =⟨columnSum,columnSum⟩≠0 (columnSum(1)=∑deg>0 ⟹ inner_self≠0)。
+3. ⟨θ,w₁•restrict H μ_{0j}⟩=w₁⟨θ,restrict H μ_{0j}⟩≠0 ⟹ θ=restrict-H-版 (両既約, `irreducibleCharacter_inner_eq_ite`)。
+4. すると W₂.subgroupOf H⊆ker(restrict H μ_{0j}) を各点 ext で K 版へ transport ⟹
+   W₂.subgroupOf h46.K⊆ker chiRestrict が `not_subset_characterKernel_chiRestrict` に矛盾。
+→ 2b 完了で **`certainTypeSet_subset_Xset` assembly** (各 μ_j=columnSum を 2a∧2b で mem_Xset) →
+cX の残 (item 1 X_irr-coh + item 3 mixed-inner)。
+**正本=本 cont.²². item 2a 完了; 2b は上記 4 段 (中規模); transport 安価が判明し item 2 全体が現実的。**
