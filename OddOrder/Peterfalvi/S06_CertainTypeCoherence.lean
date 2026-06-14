@@ -515,4 +515,56 @@ noncomputable def certainType_isCoherent (h : Hypothesis46 A L) [NeZero (Nat.car
   extends_on_supported := fun _ hφ => certainTypeExtension_eq_dade_of_mem_zSupportedSpan h hk hφ
   extension_mem_ZIrr := fun _ hφ => certainTypeExtension_mem_ZIrr h k hφ
 
+/-! ### The reducible `R(μ_j)` family (Peterfalvi (5.3.b) / (4.9))
+
+For a **reducible** certain-type character `μ_j` (column `j = χ₂`), Hypothesis (5.2.d) holds with
+the orthonormal set `R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ | 0 ≤ i < w₁}` (Peterfalvi (5.3.b), via
+Theorem (4.9)), where `δ_j = (columnFamily χ₂).sign` and `k`-column `= χ₂'` is the conjugate column
+`μ̄_j = μ_k`.  This is the reducible counterpart of the two-element Dade `R(χ)` used for irreducible
+`χ ∈ 𝒳`; both feed the (6.8.2.3) per-constituent `R(χᵢ)` decomposition. -/
+
+/-- **R(μ_j) member family** (Peterfalvi (5.3.b)).  Indexed by `Bool × Fin w₁`:
+`(false, i) ↦ δ_j ω_{ij}^σ`, `(true, i) ↦ −δ_j ω_{ik}^σ` (sign `δ_j = (columnFamily χ₂).sign`,
+columns `j = χ₂`, `k = χ₂'`).  Its image is the orthonormal set `R(μ_j)` of Hypothesis (5.2.d)
+(orthonormality: `certainTypeRImage_inner`; the `(μ_j − μ̄_j)^τ = ∑ R(μ_j)` image equation is
+`certainType_diff_dade_sum_eq`). -/
+noncomputable def certainTypeRImage (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    Bool × Fin (Nat.card h.W1) → ClassFunction G ℂ
+  | (false, i) => ((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ i
+  | (true, i) => (-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂' i
+
+/-- **Orthonormality of `R(μ_j)`** (Peterfalvi (5.2.d) for the reducible `μ_j`).  The signed
+`σ`-image family `certainTypeRImage` is orthonormal: `⟨R(μ_j) p, R(μ_j) q⟩ = δ_{p,q}`.  The sign
+`δ_j = ±1` (`sign_eq`) gives `δ_j · \overline{δ_j} = 1`, and `certainTypeOmegaSigma_inner` supplies
+the grid orthonormality `⟨ω_{χ₂,i}^σ, ω_{χ₂',i'}^σ⟩ = [χ₂ = χ₂' ∧ i = i']`; the two halves
+(`χ₂ ≠ χ₂'`) are cross-orthogonal. -/
+theorem certainTypeRImage_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (p q : Bool × Fin (Nat.card h.W1)) :
+    ClassFunction.inner (certainTypeRImage h χ₂ χ₂' p) (certainTypeRImage h χ₂ χ₂' q)
+      = if p = q then (1 : ℂ) else 0 := by
+  have hδstar : star ((h.columnFamily χ₂).sign : ℂ) = ((h.columnFamily χ₂).sign : ℂ) := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  have hδsq : ((h.columnFamily χ₂).sign : ℂ) * ((h.columnFamily χ₂).sign : ℂ) = 1 := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  obtain ⟨bp, ip⟩ := p
+  obtain ⟨bq, iq⟩ := q
+  cases bp <;> cases bq <;>
+    simp only [certainTypeRImage, ClassFunction.inner_smul_left,
+      RepresentationTheory.inner_smul_right, certainTypeOmegaSigma_inner, hδstar, star_neg,
+      mul_neg, neg_mul, neg_neg, Prod.mk.injEq, reduceCtorEq, false_and, true_and, ↓reduceIte]
+  · -- (false,false): δ·(δ·[ip=iq]) = [ip=iq]
+    rw [← mul_assoc, hδsq, one_mul]
+  · -- (false,true): χ₂ ≠ χ₂' ⟹ 0
+    rw [if_neg (fun hcon => hne hcon.1)]; ring
+  · -- (true,false): χ₂' ≠ χ₂ ⟹ 0
+    rw [if_neg (fun hcon => hne hcon.1.symm)]; ring
+  · -- (true,true): δ·(δ·[ip=iq]) = [ip=iq]
+    rw [← mul_assoc, hδsq, one_mul]
+
 end OddOrder.Peterfalvi.S06
