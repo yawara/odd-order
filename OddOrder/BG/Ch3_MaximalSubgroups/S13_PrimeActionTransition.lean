@@ -37,7 +37,7 @@ namespace OddOrder.BG.Ch3.S13
 open OddOrder.GroupTheory
 open OddOrder.Isaacs
 open OddOrder.BG.Ch3.S12
-open scoped Pointwise
+open scoped Pointwise commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -1390,6 +1390,106 @@ theorem M_eq_normalizer_sup_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G) {M : Su
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
+/-- **coprime commutator 恒等式の `Q`-invariant 版** (BG Prop 1.6(b) を `D` 非正規へ一般化):
+`Q` が `D` を正規化し、`D ⊔ Q` が可解、`|D|,|Q|` 互素なら `⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆`。
+`D` は `G` で正規でなくてよい — ambient `D ⊔ Q` (ここで `D ⊴ D⊔Q`) で
+`OperatorQuotientAction.commutator_commutator_right_eq` を適用し `D⊔Q ↪ G` で戻す。 -/
+theorem commutator_commutator_right_eq_of_le_normalizer [Finite G] {D Q : Subgroup G}
+    (hsolv : IsSolvable ↥(D ⊔ Q)) (hQD : Q ≤ Subgroup.normalizer (D : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) :
+    ⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆ := by
+  set DQ : Subgroup G := D ⊔ Q with hDQdef
+  have hD_le : D ≤ DQ := le_sup_left
+  have hQ_le : Q ≤ DQ := le_sup_right
+  have hDQnorm : DQ ≤ Subgroup.normalizer (D : Set G) := sup_le Subgroup.le_normalizer hQD
+  haveI : IsSolvable ↥DQ := hsolv
+  haveI : (D.subgroupOf DQ).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hDQnorm
+  have hcop' : Nat.Coprime (Nat.card ↥(D.subgroupOf DQ)) (Nat.card ↥(Q.subgroupOf DQ)) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv]
+    exact hcop
+  have h2 := OddOrder.BG.Ch1.OperatorQuotientAction.commutator_commutator_right_eq
+    (D.subgroupOf DQ) (Q.subgroupOf DQ) hcop'
+  have hDmap : (D.subgroupOf DQ).map DQ.subtype = D := by
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hD_le]
+  have hQmap : (Q.subgroupOf DQ).map DQ.subtype = Q := by
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hQ_le]
+  have h3 := congrArg (Subgroup.map DQ.subtype) h2
+  simp only [Subgroup.map_commutator] at h3
+  rw [hDmap, hQmap] at h3
+  exact h3
+
+/-- **nilpotent 商で coprime 部分群の commutator は `M*_α` へ** (Lemma 13.8 (iv) の核):
+`A, B ≤ M*'` で `|A|, |B|` 互素なら `⁅A, B⁆ ≤ M*_α`。`M*'/M*_α` nilpotent (Thm 10.2,
+`derived_quotient_Malpha_le_fitting`) より `↥M*/M*_α` の Fitting は冪零で、`A,B` の像は coprime
+位数ゆえ可換 (`commute_of_coprime_orderOf_of_isNilpotent`)、よって `⁅A,B⁆` は `mk'` の核 `M*_α`。 -/
+theorem commutator_le_Malpha_of_coprime_le_derived [Finite G] (hG : IsMinimalSimpleOdd G)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) {A B : Subgroup G}
+    (hA : A ≤ derivedInG Mstar) (hB : B ≤ derivedInG Mstar)
+    (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥B)) :
+    ⁅A, B⁆ ≤ S10.Malpha Mstar := by
+  classical
+  have hder_le : derivedInG Mstar ≤ Mstar := Subgroup.map_subtype_le _
+  set N : Subgroup ↥Mstar := (S10.Malpha Mstar).subgroupOf Mstar with hNdef
+  haveI : N.Normal := S10.Malpha_subgroupOf_normal Mstar
+  set π : ↥Mstar →* (↥Mstar ⧸ N) := QuotientGroup.mk' N with hπdef
+  have hsurj : Function.Surjective π := QuotientGroup.mk'_surjective N
+  have hcommmap : (commutator ↥Mstar).map π = commutator (↥Mstar ⧸ N) := by
+    rw [commutator_def, commutator_def, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective π hsurj]
+  have hcomm_fit : commutator (↥Mstar ⧸ N) ≤ Ch01.fitting (↥Mstar ⧸ N) :=
+    S10.derived_quotient_Malpha_le_fitting hG hMstar
+  rw [Subgroup.commutator_le]
+  intro a ha b hb
+  have haM : a ∈ Mstar := hder_le (hA ha)
+  have hbM : b ∈ Mstar := hder_le (hB hb)
+  have haC : (⟨a, haM⟩ : ↥Mstar) ∈ commutator ↥Mstar := by
+    have h := hA ha
+    rw [derivedInG, Subgroup.mem_map] at h
+    obtain ⟨y, hy, hya⟩ := h
+    have hye : y = (⟨a, haM⟩ : ↥Mstar) := Subtype.ext hya
+    rwa [hye] at hy
+  have hbC : (⟨b, hbM⟩ : ↥Mstar) ∈ commutator ↥Mstar := by
+    have h := hB hb
+    rw [derivedInG, Subgroup.mem_map] at h
+    obtain ⟨y, hy, hyb⟩ := h
+    have hye : y = (⟨b, hbM⟩ : ↥Mstar) := Subtype.ext hyb
+    rwa [hye] at hy
+  have haF : π ⟨a, haM⟩ ∈ Ch01.fitting (↥Mstar ⧸ N) :=
+    hcomm_fit (hcommmap ▸ Subgroup.mem_map_of_mem π haC)
+  have hbF : π ⟨b, hbM⟩ ∈ Ch01.fitting (↥Mstar ⧸ N) :=
+    hcomm_fit (hcommmap ▸ Subgroup.mem_map_of_mem π hbC)
+  have hord_a : orderOf (π ⟨a, haM⟩) ∣ Nat.card ↥A := by
+    refine (orderOf_map_dvd π _).trans ?_
+    rw [Subgroup.orderOf_mk]
+    have := orderOf_dvd_natCard (⟨a, ha⟩ : ↥A)
+    rwa [Subgroup.orderOf_mk] at this
+  have hord_b : orderOf (π ⟨b, hbM⟩) ∣ Nat.card ↥B := by
+    refine (orderOf_map_dvd π _).trans ?_
+    rw [Subgroup.orderOf_mk]
+    have := orderOf_dvd_natCard (⟨b, hb⟩ : ↥B)
+    rwa [Subgroup.orderOf_mk] at this
+  have hcop_ord : Nat.Coprime (orderOf (π ⟨a, haM⟩)) (orderOf (π ⟨b, hbM⟩)) :=
+    (hcop.coprime_dvd_left hord_a).coprime_dvd_right hord_b
+  have hcommF : Commute (π ⟨a, haM⟩) (π ⟨b, hbM⟩) := by
+    have hcop' : Nat.Coprime
+        (orderOf (⟨π ⟨a, haM⟩, haF⟩ : ↥(Ch01.fitting (↥Mstar ⧸ N))))
+        (orderOf (⟨π ⟨b, hbM⟩, hbF⟩ : ↥(Ch01.fitting (↥Mstar ⧸ N)))) := by
+      rw [Subgroup.orderOf_mk, Subgroup.orderOf_mk]; exact hcop_ord
+    have hc := S10.commute_of_coprime_orderOf_of_isNilpotent
+      (L := ↥(Ch01.fitting (↥Mstar ⧸ N))) hcop'
+    exact hc.map (Ch01.fitting (↥Mstar ⧸ N)).subtype
+  have hker : π ⁅(⟨a, haM⟩ : ↥Mstar), (⟨b, hbM⟩ : ↥Mstar)⁆ = 1 := by
+    rw [map_commutatorElement]
+    exact commutatorElement_eq_one_iff_commute.mpr hcommF
+  have hker_eq : π.ker = N := QuotientGroup.ker_mk' N
+  have hmemN : ⁅(⟨a, haM⟩ : ↥Mstar), (⟨b, hbM⟩ : ↥Mstar)⁆ ∈ N :=
+    hker_eq ▸ (MonoidHom.mem_ker.mpr hker)
+  rw [hNdef, Subgroup.mem_subgroupOf] at hmemN
+  have hcoe : ((⁅(⟨a, haM⟩ : ↥Mstar), (⟨b, hbM⟩ : ↥Mstar)⁆ : ↥Mstar) : G) = ⁅a, b⁆ := by
+    simp [commutatorElement_def]
+  rwa [hcoe] at hmemN
+
 /-- **Lemma 13.8 GAP 3 elision (iv)** (mmd L3690): `⁅M_α ∩ M*, Q⁆ ⊆ M*_α`。
 BG の理由: `Q ⊆ M*'`、`M*'/M*_α` は nilpotent (Thm 10.2)、`M_α ∩ M*` は `Q`-不変な `q'`-部分群
 (`q ∉ α(M) ⟹ q ∤ |M_α|`)。nilpotent quotient + coprime で commutator が radical へ落ちる。
@@ -1400,7 +1500,70 @@ theorem gap3_commutator_inf_le_Malpha_star [Finite G] (hG : IsMinimalSimpleOdd G
     {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQM : Q ≤ M) (hQMstar : Q ≤ Mstar)
     (hQq : IsPGroup q ↥Q) (hqα : q ∉ S10.alpha M) (hQderivStar : Q ≤ derivedInG Mstar) :
     ⁅S10.Malpha M ⊓ Mstar, Q⁆ ≤ S10.Malpha Mstar := by
-  sorry
+  classical
+  set D : Subgroup G := S10.Malpha M ⊓ Mstar with hDdef
+  have hD_Mα : D ≤ S10.Malpha M := inf_le_left
+  have hD_Mstar : D ≤ Mstar := inf_le_right
+  -- `M` normalizes `M_α`.
+  have hMnorm_Mα : M ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (S10.Malpha_le M)).mp
+      (S10.Malpha_subgroupOf_normal M)
+  -- `D = M_α ∩ M*` is `Q`-invariant.
+  have hQD : Q ≤ Subgroup.normalizer (D : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro h
+    have hgMα := hMnorm_Mα (hQM hg)
+    have hgMs := Subgroup.le_normalizer (hQMstar hg)
+    rw [hDdef]
+    simp only [Subgroup.mem_inf]
+    constructor
+    · rintro ⟨h1, h2⟩
+      exact ⟨(Subgroup.mem_normalizer_iff.mp hgMα h).mp h1,
+        (Subgroup.mem_normalizer_iff.mp hgMs h).mp h2⟩
+    · rintro ⟨h1, h2⟩
+      exact ⟨(Subgroup.mem_normalizer_iff.mp hgMα h).mpr h1,
+        (Subgroup.mem_normalizer_iff.mp hgMs h).mpr h2⟩
+  -- `q ∤ |D|` (since `D ≤ M_α`, an `α(M)`-group, and `q ∉ α(M)`).
+  have hq_nd_D : ¬ (q ∣ Nat.card ↥D) := by
+    intro hdvd
+    have hdvdMα : q ∣ Nat.card ↥(S10.Malpha M) := hdvd.trans (Subgroup.card_dvd_of_le hD_Mα)
+    exact hqα (S10.Malpha_isPiGroup M q
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvdMα, Nat.card_pos.ne'⟩))
+  -- coprime `|D|, |Q|`.
+  have hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q) := by
+    obtain ⟨k, hk⟩ := hQq.exists_card_eq
+    rw [hk]
+    exact (((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hq_nd_D).symm).pow_right k
+  -- `D ⊔ Q ≤ M*` is solvable.
+  have hDQ_le : D ⊔ Q ≤ Mstar := sup_le hD_Mstar hQMstar
+  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstar
+  haveI : IsSolvable ↥(D ⊔ Q) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hDQ_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hDQ_le).surjective
+  -- coprime identity `⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆`.
+  have hid : ⁅⁅D, Q⁆, Q⁆ = ⁅D, Q⁆ :=
+    commutator_commutator_right_eq_of_le_normalizer ‹IsSolvable ↥(D ⊔ Q)› hQD hcopDQ
+  -- `⁅D, Q⁆ ≤ M*'` (since `D, Q ≤ M*`).
+  have heqder : derivedInG Mstar = ⁅(Mstar : Subgroup G), Mstar⁆ :=
+    Subgroup.map_subtype_commutator Mstar
+  have hL_der : ⁅D, Q⁆ ≤ derivedInG Mstar := by
+    rw [heqder]; exact Subgroup.commutator_mono hD_Mstar hQMstar
+  -- `⁅D, Q⁆ ≤ D` (`Q`-invariance), so coprime `|⁅D,Q⁆|, |Q|`.
+  have hLD : ⁅D, Q⁆ ≤ D := by
+    rw [Subgroup.commutator_le]
+    intro x hx y hy
+    have hyx : y * x⁻¹ * y⁻¹ ∈ D :=
+      (Subgroup.mem_normalizer_iff.mp (hQD hy) x⁻¹).mp (D.inv_mem hx)
+    rw [commutatorElement_def]
+    have he : x * y * x⁻¹ * y⁻¹ = x * (y * x⁻¹ * y⁻¹) := by group
+    rw [he]; exact D.mul_mem hx hyx
+  have hcopLQ : Nat.Coprime (Nat.card ↥(⁅D, Q⁆)) (Nat.card ↥Q) :=
+    hcopDQ.coprime_dvd_left (Subgroup.card_dvd_of_le hLD)
+  -- (iv) core: `⁅⁅D, Q⁆, Q⁆ ≤ M*_α`.
+  have h2 : ⁅⁅D, Q⁆, Q⁆ ≤ S10.Malpha Mstar :=
+    commutator_le_Malpha_of_coprime_le_derived hG hMstar hL_der hQderivStar hcopLQ
+  rw [← hid]; exact h2
 
 /-- **Lemma 13.8 GAP 3 elision (ii)+(iii)** (mmd L3686): `C_{M_α}(P) ⊆ M*`。
 BG の理由: `M = N_M(Q) M_α` と `r ∣ |C_M(P)|`, `r ∉ σ(M)` から `P`-中心化された位数 `r` の
