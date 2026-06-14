@@ -2047,11 +2047,42 @@ theorem exists_einvariant_sylow_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
       (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr ⟨hsp, hsMσ, Nat.card_pos.ne'⟩))
   exact exists_aInvariant_sylow_subgroup hEnorm hcop (Or.inl ‹IsSolvable ↥E›) q
 
-/-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。 -/
+/-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。
+
+証明は `M_σ` の冪零性で場合分け: `M_σ` 冪零なら Lemma 10.12 (`disjoint_of_not_conj` の冪零条項)
+が直接与える (これは BG が Cor 12.6(f) = `τ₂≠∅` 経由で出すルートを `Msigma_nilpotent_of_tau2`
+の対偶で吸収したもの)。`M_σ` 非冪零なら `Msigma_nilpotent_of_tau2` (Thm 12.5) の対偶で `E₂=⊥`、
+Lemma 12.1(c) で `E₁≠⊥`、よって `τ₁(M)≠∅`; `q∈σ(M)∩σ(M*)` を仮定して `E`-不変 Sylow `S`、
+Lemma 13.6 で `C_S(P)=1`、Lemma 13.1(a) で `p∈τ₁(M*)`、Lemma 13.8 (`Q=Q*=S`) で矛盾。 -/
 theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Mstar : Subgroup G}
     (hMstar : Mstar ∈ maximalSubgroups G) (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) :
     Disjoint (S10.sigma M) (S10.sigma Mstar) := by
+  classical
+  -- Nilpotent `M_σ` ⟹ `σ`-disjointness directly (Lemma 10.12).
+  by_cases hnil : Group.IsNilpotent ↥(S10.Msigma M)
+  · rw [Set.disjoint_iff_inter_eq_empty]
+    exact ((S10.disjoint_of_not_conj hG hM hMstar hnc).2 hnil).2
+  -- Otherwise `τ₂(M)` carries no prime (Theorem 12.5 ⟹ `M_σ` nilpotent), so `E₂ = 1`.
+  obtain ⟨E, E₁, E₂, E₃, h⟩ := exists_subgroupESetup hG hM
+  have hE2bot : E₂ = ⊥ := by
+    by_contra hE2ne
+    have hcard1 : Nat.card ↥E₂ ≠ 1 :=
+      (Finite.one_lt_card_iff_nontrivial.mpr ((Subgroup.nontrivial_iff_ne_bot E₂).mpr hE2ne)).ne'
+    obtain ⟨p, hpprime, hpdvd⟩ := (Nat.card ↥E₂).exists_prime_and_dvd hcard1
+    haveI : Fact p.Prime := ⟨hpprime⟩
+    have hc2 : Nat.card ↥(E₂.subgroupOf E) = Nat.card ↥E₂ :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
+    have hpτ2 : p ∈ tau2 M :=
+      h.E₂_hall.1 p (by rw [hc2]; exact Nat.mem_primeFactors.mpr ⟨hpprime, hpdvd, Nat.card_pos.ne'⟩)
+    obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hpτ2
+    exact hnil (Msigma_nilpotent_of_tau2 hG hM hpτ2 hA (hAE.trans h.E_le)).1
+  have hE1ne : E₁ ≠ ⊥ := SubgroupESetup.E1_ne_bot_of_E2_eq_bot hG h hE2bot
+  -- `q ∈ σ(M) ∩ σ(M*)` now yields a contradiction (Lemma 13.6 + 13.8 with `Q = Q* = S`).
+  rw [Set.disjoint_iff_inter_eq_empty, Set.eq_empty_iff_forall_notMem]
+  intro q hq
+  rw [Set.mem_inter_iff] at hq
+  obtain ⟨hqM, hqMstar⟩ := hq
   sorry
 
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
