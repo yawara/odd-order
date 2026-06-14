@@ -2756,16 +2756,39 @@ theorem not_actsPrime_Msigma_of_malpha_facts [Finite G] (hG : IsMinimalSimpleOdd
 
 §10 gates visible for proof-fill: `S10.normalizer_le_of_nontrivial_beta_subgroup`
 (Prop 10.14(d)) supplies `N_G(Q*)⊆M` in the `q*∈β(M)` branch; the remaining branch uses
-`σ(M)` by definition. Lemma 12.18 / Lemma 12.19 carry the Cor 10.9 β-complement input. -/
+`σ(M)` by definition. Lemma 12.18 / Lemma 12.19 carry the Cor 10.9 β-complement input.
+
+`p` is required prime (`ℰ_p¹` is BG's rank-1 *elementary abelian* family with `p` prime; the
+Lean `elemAbelianOfRank` predicate alone does not force it, e.g. `ℤ/p²`). -/
 theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
-    (hP : ∃ p : ℕ, ∃ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 ∧ P ≤ E₁ ∧
+    (hP : ∃ p : ℕ, p.Prime ∧ ∃ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 ∧ P ≤ E₁ ∧
       ¬ (P ≤ Subgroup.centralizer (E₃ : Set G))) :
     ActsRegularlyOn E₃ E₁ ∧ ActsRegularlyOn (S10.Msigma M) E₃ ∧
-    (∀ p : ℕ, ∀ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 → P ≤ E₁ →
+    (∀ p : ℕ, p.Prime → ∀ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 → P ≤ E₁ →
       ¬ (P ≤ Subgroup.centralizer (E₃ : Set G)) →
       S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥) := by
-  sorry
+  classical
+  obtain ⟨p, hpprime, P, hPmem, hPE1, hPnc⟩ := hP
+  haveI : Fact p.Prime := ⟨hpprime⟩
+  refine ⟨?_, ?_, ?_⟩
+  · -- (a) `E₁` acts regularly on `E₃`: `E₁E₃` not prime on `M_σ` (GAP B) ⟹ Lemma 13.7 contrapositive.
+    obtain ⟨Q, hQE3, hQne, hCMαP, hCMαPQ⟩ :=
+      malpha_centralizer_facts_of_not_centralize hG h hPmem hPE1 hPnc
+    have hnotprime := not_actsPrime_Msigma_of_malpha_facts hG h hPmem hPE1 hQE3 hCMαP hCMαPQ
+    have hE1ne : E₁ ≠ ⊥ := fun hb =>
+      ne_bot_of_mem_elemAbelianOfRank_one hPmem (le_bot_iff.mp (hb ▸ hPE1))
+    exact not_not.mp (mt (E1E3_actsPrime hG h hE1ne) hnotprime)
+  · -- (b) `E₃` acts regularly on `M_σ` (GAP C — Lemma 13.8 endgame). TODO next iteration.
+    sorry
+  · -- (c) `C_{M_σ}(P) ≠ 1` for every such `P`: from `C_{M_α}(P) ≠ 1` and `M_α ≤ M_σ`.
+    intro p' hp'prime P' hP'mem hP'E1 hP'nc
+    haveI : Fact p'.Prime := ⟨hp'prime⟩
+    obtain ⟨_, _, _, hCMαP', _⟩ :=
+      malpha_centralizer_facts_of_not_centralize hG h hP'mem hP'E1 hP'nc
+    intro hbot
+    exact hCMαP' (le_bot_iff.mp (hbot ▸
+      inf_le_inf_right (Subgroup.centralizer (P' : Set G)) (S10.Malpha_le_Msigma hG h.mem_maximal)))
 
 /-- **BG Corollary 13.11** (mmd L3696; 結論は PDF p.103 から画像読みで復元): `E₃≠1` かつ `E₃` が
 `M_σ` に regular 作用しないなら (a) `E₁≠1`; (b) `E=E₁E₃`; (c) `E` は `M_σ` に prime 作用;
