@@ -763,6 +763,23 @@ theorem aggregate_eq_sum_of_constituent {L : Subgroup G} [Fintype ↥L]
   rw [← hdecomp, hconstit]
   exact tau_sum_smul_image s τ α Xv Yv a hmemimg
 
+/-- **Reindex a finite sum to the positive-weight subtype.**  Terms with zero weight (`a i = 0`)
+drop out, so a sum over all of `ι` equals the sum over the subtype `{i // 0 < a i}`.
+
+This restricts the (6.8.2.3) constituent aggregate — indexed by *all* of `Irr H`, with the
+zero-multiplicity constituents `Ind^L_H θ` (`aθ = ⟨φ, Res_{W₂}θ⟩ = 0`) contributing nothing — to the
+positive-multiplicity constituents `{θ // 0 < aθ}`.  The restriction is forced: `Ind^L_H θ` has
+degree `≠ 0`, so it is *not* `H^#`-supported and admits **no** `CharacterPsiDecomposition` with the
+zero anchor `0 • η₁`; the per-`φ` decomposition family can only be defined on the positive-weight
+subtype. -/
+theorem sum_eq_sum_pos_weight_subtype {ι M : Type*} [Fintype ι] [AddCommMonoid M]
+    (a : ι → ℕ) (f : ι → M) (hf : ∀ i, a i = 0 → f i = 0) :
+    ∑ i : ι, f i = ∑ i : {i : ι // 0 < a i}, f i.val := by
+  classical
+  rw [← Finset.sum_subtype (Finset.univ.filter (fun i => 0 < a i)) (fun x => by simp) f]
+  exact (Finset.sum_filter_of_ne
+    (fun i _ hne => Nat.pos_of_ne_zero (fun h0 => hne (hf i h0)))).symm
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
