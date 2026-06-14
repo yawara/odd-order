@@ -863,6 +863,32 @@ theorem inner_eq_zero_of_smul_sub_smul_orthogonal {ξ ξ' θ : ClassFunction G �
     hξ'θ, mul_zero, sub_zero, hm] at horth
   exact (mul_ne_zero hc hne) horth
 
+/-- **`σ`-coefficient vanishing from a small support** (the (3.2.d)/(3.8) "all coefficients zero"
+case, via `grid_eq_zero_of_ncard_support_lt`).  For `ψ` vanishing on `V` with `NC(ψ) < min(w₁, w₂)`,
+every `σ`-image coefficient `sigmaCoeff ψ = ⟨ψ, ω^σ⟩` vanishes: the (3.7) additive identity
+`sigmaCoeff_add_eq` (from `ψ` vanishing on `V`) makes the coefficient grid additively separable, so a
+support smaller than `min(w₁, w₂)` forces it identically zero.
+
+This is the (6.8.2.3) disjointness driver: applied to `ψ = (η₁ − η̄₁)^τ` (vanishing on `V` since
+`η₁ − η̄₁` is `A`-supported, with `NC ≤ 2 < min(w₁, w₂)` as a difference of two irreducibles), it
+gives `(η₁ − η̄₁)^τ ⊥ Im σ`, feeding the extraction `inner_eq_zero_of_smul_sub_smul_orthogonal`.
+The simpler `grid_eq_zero_of_ncard_support_lt` (no `w₁ + 2 ≤ w₂` gap) suffices here, unlike the full
+trichotomy `sigmaCoeff_trichotomy`. -/
+theorem sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ψ : ClassFunction G ℂ} (hψ : ∀ v ∈ hyp.V, ψ v = 0)
+    (hNC : hyp.sigmaNC hVeq app ψ < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.sigmaCoeff hVeq app ψ pq = 0 := by
+  refine OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
+    (fun pq => hyp.sigmaCoeff hVeq app ψ pq)
+    (fun p p' q q' => hyp.sigmaCoeff_add_eq hVeq app hψ p p' q q') ?_ pq
+  rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+  exact hNC
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
