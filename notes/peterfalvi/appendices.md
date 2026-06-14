@@ -341,6 +341,20 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
   NearFields.lean は opaque scaffold (2 sorry) → faithful 化 + Prop 1 (FT+Brauer-Suzuki gate) / Prop 2 (体構成
   F_{r²,2} + exists_field_semilinear 接続) を精査。Prop 1 は重い infra gate ⟹ Prop 2 から着手が現実的。
 
+### session 12 (2026-06-14): Appendix II (NearFields) 着手 — faithful 構造 + 基礎
+- gate 確認: main は Lane G が BG §13 (13.6) 中。**BG §14/15/16 未到達** ⟹ H の §10-13 critical-path gate
+  は firmly down, Appendices 継続が正。
+- **faithful `NearField` class** (commit 786d7d72): `AddCommGroup + GroupWithZero + right_distrib`
+  (opaque FiniteNearField を置換予定)。GroupWithZero で mult API (mul_inv_cancel₀ 等) 無料継承。
+- **near-field basics** (commit 0bd60d48): `rightMul` (a≠0 で右乗 = 加法自己同型, right_distrib+可逆) /
+  `addOrderOf_eq_of_ne_zero` (F^* が F^# に right-mult で推移 ⟹ 非零元の加法位数一定) /
+  **`exists_prime_char`** (∃ prime f, ∀x, f•x=0 = (F,+) elem-ab; 共通位数の約数論で素数性)。全 proven, sorry 増無し。
+- **▶ 次 = Prop 2 本体**: F near-field, A=Fˣ の cyclic index-2 部分群。
+  (1) A は (F,+) に rightMul で作用; (2) `exists_prime_char` で (F,+) elem-ab → **exists_field_semilinear**
+  適用準備 (E := Multiplicative F で IsElementaryAbelian f 化, A-action を MulAut (Multiplicative F) 化);
+  (3) A irreducible (|F|=2|A|+1 counting 矛盾); (4) σ_y/Aut(K) 解析 → field or F_{r²,2}。複数 session 見込み。
+  Prop 1 は FT+Brauer-Suzuki gate (重い, Gorenstein 5.4.10 類似なら issue 化 defer)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
