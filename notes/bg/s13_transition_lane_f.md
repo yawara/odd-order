@@ -241,6 +241,25 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   - **main**: H 構成 → s∈π(F(H))⊆β(M)∪β(M*); s∈β(M): (B'-M)+(GAP3-M); s∈β(M*): (B'-M*)+(GAP3-M*)。
   - landed building blocks: step1 / normalizer-growth / collapse / conj-into-Msigma / **hall_le (核)**。
   - 次: BG 本文 (mmd ~L3640) で GAP 3 steps 5-6 を精読し自力再構成可否を判断 → (B') か GAP 3 を執筆。
+- 2026-06-14 (Lane F, /loop 続き¹²): BG 本文 (mmd L3660-3690) で 13.8 全証明精読 + `centralizer_isSolvable_of_ne_bot`
+  landed (commit 59f534fa, B' の基礎)。**GAP 3 (steps 5-6) は reconstruction-gap (BG が lemma 名明示)**。
+  ### 🔑 GAP 3 (最終矛盾) の 4 elision (BG L3686-3690, lemma 名付き — research-gap でない)
+  X := C_{M_α}(P) (≠1 from step1, ⊆M_α⊆M_σ, P 中心化) を矛盾に追い込む:
+  - **(i) `M=N_M(Q)M_α`** (L3674, GAP 3 前): QM_α⊲M + M'/M_α nilpotent (Thm 10.2) の Frattini。
+    Q=[Q,P]⊆M'∩M*' (Q Sylow of M, C_Q(P)=1)。Thm 10.2 = `S10.derived_quotient_Malpha...`。
+  - **(ii) ∃R⊆N_M(Q) 位数 r, [R,P]=1** (L3686): M=N_M(Q)M_α + r∈π(C_M(P)) + r∉σ(M)⊇π(M_α)
+    (r∤|M_α|) → r-part は N_M(Q) 側; coprime action (p≠r) で P-不変 → R⊆C_{N_M(Q)}(P)。
+  - **(iii) `PR を E の可換部分群へ M-共役`** (L3686): PR=P×R ({p,r}-群, [R,P]=1 で可換), p∈τ₁⊆σ',
+    r∉σ ⟹ σ'-群 → Hall E (σ'-Hall) へ M-共役。⟹ Thm 13.4 適用可 → C_{M_σ}(P)⊆C_{M_σ}(R)。
+  - **(iv) `[M_α∩M*,Q]⊆M*_α`** (L3690): M_α∩M* は q'-群 (q∉α ⟹ q∤|M_α|), Q-不変; Q⊆M*',
+    M*'/M*_α nilpotent + coprime ⟹ commutator ⊆ M*_α。
+  矛盾組立: X⊆C_{M_σ}(R)⊆N_G(R)⊆M* (R⊆M*, Prop10.14d N_G(R)⊆M*) ∧ X⊆M_α ⟹ X⊆M_α∩M*;
+  [X,Q]⊆M*_α (iv) ∧ [X,Q]⊆M_α ∧ M_α∩M*_α=1 (Lem10.12) ⟹ [X,Q]=1 ⟹ X⊆C_{M_α}(PQ)=1 (step1) 矛盾。
+  - **(B') r-existence dispatch**: H 構成 → s∈π(F(H)); s∈β(M) なら hall_le→H≤M→r∈β(M*)|C_M(P);
+    s∈β(M*) なら hall_le(M:=M*)→H≤M*→r∈β(M)|C_{M*}(P)。GAP3 は対称ゆえ両 disjunct を処理。
+  building blocks (7): step1/normalizer-growth/collapse/conj-into-Msigma/hall_le/**centralizer_solvable**。
+  - 次: (B') r-existence_or_swapped (Hall θ 構成 + F(H) prime + hall_le + r 抽出) を執筆。GAP 3 は
+    その後 (4 elision を BG 本文 + repo lemma で自力再構成; 詰まれば ChatGPT に該当 elision のみ依頼)。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
