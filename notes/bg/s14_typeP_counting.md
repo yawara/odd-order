@@ -324,3 +324,24 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 ### 着手順序 (次セッション)
 1. 署名修正 (K≤M, U≤M 追加)。2. `hK_pi` (K σ'-subgroup) 補題。3. setup 取得 + case split (compile)。
 4. case-τ₃ 分岐 (Cor 13.11 直 cite、WLOG 不要) を先に完成。5. ActsPrimeOn-conj 補題 → case-τ₁。6. conjunct 2-5。
+
+### 進捗 (2026-06-15 loop): opening COMPLETE + 核補題の特定
+- **✅ 1-3 着地** (commit `3fb80769`): 署名に K≤M 追加 + `kappa_subset_sigmaCompl` + `hK_pi` +
+  `exists_subgroupESetup_with_le` で setup 取得 + κ∩τ₃ case split が compile。残 = 2 branch sorry。
+- **✅ 14.7(h) 露出** (commit `1243d4c6`, issue 8006): G の §15 cascade unblock。
+- **F status (同期済)**: **Lemma 13.12 proof COMPLETE** (`c3860c52`, sorry-free)。13.13 のみ残 sorry。
+  ⚠ **F が 13.12/13.13 に `[Fact p.Prime]` (13.12 は `[Fact q.Prime]` も) 追加** (tau1/tau2 が
+  pRank ベースで素数性を含まないため)。**14.2 case-τ₁ から cite 時は τ-prime の Fact 供給要** (π(...) 由来)。
+- **🔑 両 branch の共通核 = `C_{M_σ}(P)` の M-共役不変性** (`Msigma M ⊓ C(P^m) ≠ ⊥ ↔ … ⊓ C(P) ≠ ⊥`,
+  m∈M): κ の ∃→∀ upgrade (BG L3807「all such P conjugate」) + case-τ₃ の E₃-非regular 導出
+  (κ-witness を E₃ へ) + case-τ₁ の WLOG K=E₁ の全てに要る。**API map**: `smul_inf` (Pointwise:513) ✓ /
+  `le_normalizer_opiCoreInG (sigma M) M` (M≤N(M_σ)) ✓ / `MulAut.conj m • M_σ = M_σ` (m∈N, MulAut版
+  normalizer-fixes 要特定) / `centralizer (conj m • P) = conj m • centralizer P` (要特定) /
+  `conj m • X = ⊥ ↔ X=⊥`。**pin 済 API**: `conj_smul_eq_self_of_mem_normalizer` (GroupTheory/
+  AInvariantPiSubgroups:120, m∈N→conj m•H=H) / `centralizer_map_conj` (S03f_Prelim:818,
+  `centralizer(K.map conj g)=（centralizer K).map conj g`) / `le_normalizer_opiCoreInG (sigma M) M`
+  (M≤N(M_σ)) / `Subgroup.smul_inf` (Pointwise:513) / bot は injectivity (`conj m⁻¹•(conj m•X)=X`)。
+  **⚠ form bridge**: `centralizer_map_conj` は `.map (conj g).toMonoidHom` 形、`smul_inf` は `•` 形 →
+  `MulAut.conj m • P = P.map (conj m).toMonoidHom` の bridge (rfl か要 `pointwise_smul` 補題) で統一要。
+  次イテレーションで `Msigma_inf_centralizer_conj_ne_bot` を建てる → 両 branch tractable に。
+- **8004/8005 = G 領域** (H 非該当); 8004(i) は 14.7(h) 露出で迂回不要に。
