@@ -85,6 +85,7 @@ import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.NearFields
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -4452,3 +4453,23 @@ of part (a) together with the semilinearity of part (b) — every `g : MulAut E`
 field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
+
+/-! **Peterfalvi, Appendix II (Near-Fields), Proposition 2 — irreducibility/counting + field
+structure** (`NearFields`).  The orbit-counting engine (`add_one_le_card_of_aInvariant_ne_bot`: an
+`A`-invariant `U ≠ ⊥` has `|A| + 1 ≤ |U|`), the elementary-abelian Maschke split
+(`exists_aInvariant_complement_of_elementaryAbelian`), their assembly
+(`rightMulAction_irreducible_of_index_two`: a commutative index-`2` subgroup `A ⊆ Fˣ` acts
+irreducibly on `(F, +)`), and the resulting unconditional field structure
+(`nearField_field_structure_of_index_two`).  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.add_one_le_card_of_aInvariant_ne_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_aInvariant_complement_of_elementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.rightMulAction_irreducible_of_index_two
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.nearField_field_structure_of_index_two

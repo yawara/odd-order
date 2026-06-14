@@ -348,6 +348,69 @@ theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F] [Non
       (rightMulAction A hcomm) hirr
   exact ⟨K, hK, hMod, hKfin, hrank, hcard⟩
 
+/-- **Index-two subgroups act irreducibly** (Peterfalvi Appendix C, Proposition 2, counting step).
+A commutative subgroup `A ⊆ Fˣ` of **index `2`** acts *irreducibly* on `(F, +)` by right
+multiplication: the only `A`-invariant subgroups of `(F, +)` are `⊥` and `⊤`.  If a proper
+nontrivial invariant `U` existed, the free action of `A` on `U ∖ {1}` and on its Maschke complement
+`W ∖ {1}` would force `|U|, |W| ≥ |A| + 1`, whence `|F| = |U|·|W| ≥ (|A|+1)² > 2|A|+1 = |F|`. -/
+theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finite F] [Nontrivial F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hidx : A.index = 2) (U : Subgroup (Multiplicative F))
+    (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) :
+    U = ⊥ ∨ U = ⊤ := by
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨hU_ne_bot, hU_ne_top⟩ := hcon
+  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  -- elementary abelian data + coprimality of `|A|` with `|F|`, plus `f ∣ |F|`.
+  obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact f.Prime := ⟨hf⟩
+  have hMF : Nat.card (Multiplicative F) = Nat.card F := rfl
+  have hcop : Nat.Coprime (Nat.card A) (Nat.card (Multiplicative F)) := by
+    rw [hMF]; exact card_coprime A
+  have hfE : f ∣ Nat.card (Multiplicative F) := by
+    obtain ⟨x, hx⟩ := exists_ne (1 : Multiplicative F)
+    have hord : orderOf x = f := by
+      rcases (Nat.dvd_prime hf).mp (orderOf_dvd_of_pow_eq_one (hE.pow_eq_one x)) with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hx
+      · exact h
+    rw [← hord]; exact orderOf_dvd_natCard x
+  -- `|U| ≥ |A| + 1`.
+  have hU_ge : Nat.card A + 1 ≤ Nat.card U :=
+    add_one_le_card_of_aInvariant_ne_bot A hcomm hUinv hU_ne_bot
+  -- `A`-invariant Maschke complement `W`; `W ≠ ⊥` since `U ≠ ⊤`, so `|W| ≥ |A| + 1`.
+  obtain ⟨W, hWinv, hUW⟩ :=
+    exists_aInvariant_complement_of_elementaryAbelian hE hcop hfE hUinv
+  have hW_ne_bot : W ≠ ⊥ := fun hW0 =>
+    hU_ne_top (by have := hUW.sup_eq_top; rwa [hW0, sup_bot_eq] at this)
+  have hW_ge : Nat.card A + 1 ≤ Nat.card W :=
+    add_one_le_card_of_aInvariant_ne_bot A hcomm hWinv hW_ne_bot
+  -- `|F| = |U| · |W|` from the (lattice) complement, since `(F, +)` is abelian.
+  have hcompl' : Subgroup.IsComplement' U W :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hUW.disjoint
+      (by rw [← Subgroup.mul_normal, hUW.sup_eq_top, Subgroup.coe_top])
+  have hprod : Nat.card U * Nat.card W = Nat.card F := by rw [← hMF]; exact hcompl'.card_mul
+  -- `(|A|+1)² ≤ |U|·|W| = |F| = 2|A|+1` with `|A| ≥ 1` is contradictory.
+  have hFcard : Nat.card F = 2 * Nat.card A + 1 := card_eq_of_index_two A hidx
+  have hApos : 0 < Nat.card A := Nat.card_pos
+  have hge : (Nat.card A + 1) * (Nat.card A + 1) ≤ Nat.card U * Nat.card W :=
+    Nat.mul_le_mul hU_ge hW_ge
+  nlinarith [hge, hprod, hFcard, hApos]
+
+/-- **Unconditional near-field field structure for an index-`2` subgroup** (Peterfalvi Appendix C,
+Proposition 2, field-structure half).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field has
+index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K` with `|K| = |F|`.
+Combines the index-`2` irreducibility (`rightMulAction_irreducible_of_index_two`) with
+`nearField_field_structure`, discharging the irreducibility hypothesis. -/
+theorem nearField_field_structure_of_index_two.{u} {F : Type u} [NearField F] [Finite F]
+    [Nontrivial F] (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hidx : A.index = 2) :
+    ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
+      Module.finrank K F = 1 ∧ Nat.card K = Nat.card F :=
+  nearField_field_structure A hcomm (rightMulAction_irreducible_of_index_two A hcomm hidx)
+
 end NearFieldBasics
 
 variable {G Ω F : Type*} [Group G]
