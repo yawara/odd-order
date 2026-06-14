@@ -143,6 +143,46 @@ theorem kappa_subset_sigmaCompl {M : Subgroup G} : kappa M ⊆ (OddOrder.BG.Ch3.
   · exact ((mem_tau1_iff M p).mp h).1
   · exact ((mem_tau3_iff M p).mp h).1
 
+/-- **`M`-conjugacy invariance of the `κ`-witness condition**: for `m ∈ M`, since `M_σ ◁ M`,
+conjugation by `m` carries `M_σ ⊓ C_G(P)` to `M_σ ⊓ C_G(P^m)`, so `C_{M_σ}(P) ≠ 1` implies
+`C_{M_σ}(P^m) ≠ 1`.  Used in Proposition 14.2 to transport the `κ(M)`-witness across
+`M`-conjugacy (the `∃ → ∀` upgrade of BG L3807 and the WLOG `K = E₁`). -/
+theorem Msigma_inf_centralizer_conj_ne_bot {M P : Subgroup G} {m : G} (hmM : m ∈ M)
+    (h : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer ((MulAut.conj m • P : Subgroup G) : Set G) ≠ ⊥ := by
+  have hmN : m ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+    le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hmM
+  obtain ⟨⟨x, hxmem⟩, hx1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp h
+  rw [Subgroup.mem_inf] at hxmem
+  obtain ⟨hxMσ, hxC⟩ := hxmem
+  rw [Subgroup.ne_bot_iff_exists_ne_one]
+  refine ⟨⟨m * x * m⁻¹, Subgroup.mem_inf.mpr
+    ⟨(Subgroup.mem_normalizer_iff.mp hmN x).mp hxMσ, ?_⟩⟩, ?_⟩
+  · -- `m x m⁻¹` centralizes `P^m`: write `y ∈ P^m` as `y = m (m⁻¹ y m) m⁻¹` with `m⁻¹ y m ∈ P`,
+    -- which `x` centralizes.
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    rw [SetLike.mem_coe, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy
+    have hyval : (MulAut.conj m)⁻¹ • y = m⁻¹ * y * m := by
+      rw [inv_smul_eq_iff]
+      show y = MulAut.conj m (m⁻¹ * y * m)
+      rw [MulAut.conj_apply]; group
+    rw [hyval] at hy
+    have hcomm : (m⁻¹ * y * m) * x = x * (m⁻¹ * y * m) :=
+      (Subgroup.mem_centralizer_iff.mp hxC) _ hy
+    calc y * (m * x * m⁻¹)
+        = m * ((m⁻¹ * y * m) * x) * m⁻¹ := by group
+      _ = m * (x * (m⁻¹ * y * m)) * m⁻¹ := by rw [hcomm]
+      _ = (m * x * m⁻¹) * y := by group
+  · -- `m x m⁻¹ ≠ 1` since `x ≠ 1`.
+    intro hc
+    apply hx1
+    have hxe : m * x * m⁻¹ = 1 := by simpa using congrArg Subtype.val hc
+    refine Subtype.ext ?_
+    have hconj : m * x * m⁻¹ = m * 1 * m⁻¹ := by rw [hxe]; group
+    exact mul_left_cancel (mul_right_cancel hconj)
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
