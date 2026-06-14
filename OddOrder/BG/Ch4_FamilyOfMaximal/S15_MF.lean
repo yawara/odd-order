@@ -152,6 +152,82 @@ theorem Msigma_le_maxNilpotentNormalHall_of_nilpotent [Finite G]
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
 
+/-! ### The Aut-abelian core (`§14`-independent, reusable)
+
+The next two lemmas package the elementary fact behind the "`M_F` not cyclic" half of
+Corollary 15.6: if a normal subgroup `N ⊴ H` is **cyclic**, then `Aut(N)` is abelian, so the
+conjugation map `H → Aut(N)` (kernel `C_H(N)`) sends `H'` to `1`, i.e. `H' ≤ C_H(N)`.
+Specialised to `N = F(M)` and combined with the self-centralizing property of the Fitting
+subgroup (`centralizer_fitting_le_fitting`), `F(M)` cyclic forces `M'' = 1`. -/
+
+/-- The conjugation action commutator of `H` on itself is the ordinary derived subgroup:
+`actionCommutator (MulAut.conj) = commutator H`.  (Both are the closure of the commutator
+elements `g * (a g⁻¹ a⁻¹) = ⁅g, a⁆`.) -/
+private theorem actionCommutator_conj_eq_commutator {H : Type*} [Group H] :
+    OddOrder.Isaacs.Ch04.actionCommutator (MulAut.conj : H →* MulAut H) = commutator H := by
+  rw [commutator_eq_closure]
+  unfold OddOrder.Isaacs.Ch04.actionCommutator
+  congr 1
+  ext x
+  simp only [Set.mem_setOf_eq, commutatorSet_def]
+  constructor
+  · rintro ⟨g, a, rfl⟩
+    exact ⟨g, a, by rw [commutatorElement_def, MulAut.conj_apply]; group⟩
+  · rintro ⟨g₁, g₂, rfl⟩
+    exact ⟨g₁, g₂, by rw [commutatorElement_def, MulAut.conj_apply]; group⟩
+
+open OddOrder.BG.Ch1.OperatorQuotientAction in
+/-- **Aut-abelian core**: if `N ⊴ H` is cyclic, then `H' ≤ C_H(N)`.  Conjugation gives a
+homomorphism `H → Aut(↥N)` with kernel `C_H(N)`; `↥N` cyclic makes `Aut(↥N)` abelian, so the
+derived subgroup `H'` lands in the kernel.  Reuses the BG Thm 4.12 machinery
+(`actionCommutator_le_centralizer_of_isCyclic_isAInvariant`) with `φ = MulAut.conj`. -/
+theorem commutator_le_centralizer_of_normal_isCyclic {H : Type*} [Group H]
+    {N : Subgroup H} [IsCyclic ↥N] (hN : N.Normal) :
+    commutator H ≤ Subgroup.centralizer (N : Set H) := by
+  have hinv : OddOrder.Isaacs.Ch03.IsAInvariant (MulAut.conj : H →* MulAut H) N := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a g hg
+    rw [MulAut.conj_apply]
+    exact hN.conj_mem g hg a
+  have h := actionCommutator_le_centralizer_of_isCyclic_isAInvariant
+    (φ := (MulAut.conj : H →* MulAut H)) (S := N) hN hinv
+  rwa [actionCommutator_conj_eq_commutator] at h
+
+/-- **BG §15, `F(M)` cyclic ⟹ `M'' = 1`** (`§14`-independent).  If the ambient Fitting subgroup
+`F(M)` is cyclic then `M' ≤ C_M(F(M)) ≤ F(M)` (Aut-abelian core + Fitting self-centralizing),
+so `M'` is abelian and `M'' = 1`.  This is the engine of Corollary 15.6's "`M_F` not cyclic"
+clause. -/
+theorem fittingInAmbient_cyclic_imp_derivedDerived_eq_bot [Finite G] {M : Subgroup G}
+    [IsSolvable ↥M] (hcyc : IsCyclic ↥(fittingInAmbient M)) :
+    derivedInG (derivedInG M) = ⊥ := by
+  -- `fitting ↥M` is cyclic (transport of `hcyc` along `fittingInAmbient M ≅ fitting ↥M`)
+  haveI hfitcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting ↥M) := by
+    have e : ↥(OddOrder.Isaacs.Ch01.fitting ↥M) ≃* ↥(fittingInAmbient M) :=
+      Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M) M.subtype M.subtype_injective
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  -- `commutator ↥M ≤ centralizer (fitting ↥M) ≤ fitting ↥M`
+  have hcomm_le : commutator ↥M ≤ OddOrder.Isaacs.Ch01.fitting ↥M :=
+    (commutator_le_centralizer_of_normal_isCyclic
+      (inferInstance : (OddOrder.Isaacs.Ch01.fitting ↥M).Normal)).trans
+      OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting
+  -- push to the ambient group: `M' = ⁅M, M⁆ ≤ F(M)`
+  have hderiv_le : derivedInG M ≤ fittingInAmbient M := Subgroup.map_mono hcomm_le
+  -- `F(M)` cyclic ⟹ abelian ⟹ `F(M) ≤ C_G(F(M))`
+  have hself : (fittingInAmbient M : Subgroup G) ≤ Subgroup.centralizer (fittingInAmbient M) := by
+    haveI := hcyc
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have h : (⟨y, hy⟩ : ↥(fittingInAmbient M)) * ⟨x, hx⟩ = ⟨x, hx⟩ * ⟨y, hy⟩ := mul_comm' _ _
+    calc y * x = ↑((⟨y, hy⟩ : ↥(fittingInAmbient M)) * ⟨x, hx⟩) := by rw [Subgroup.coe_mul]
+      _ = ↑((⟨x, hx⟩ : ↥(fittingInAmbient M)) * ⟨y, hy⟩) := by rw [h]
+      _ = x * y := by rw [Subgroup.coe_mul]
+  -- `M'' = ⁅M', M'⁆ ≤ ⁅F(M), F(M)⁆ = 1`
+  rw [show derivedInG (derivedInG M) = ⁅derivedInG M, derivedInG M⁆ from
+        Subgroup.map_subtype_commutator (derivedInG M)]
+  refine le_bot_iff.mp (le_trans (Subgroup.commutator_mono hderiv_le hderiv_le) ?_)
+  exact le_of_eq (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hself)
+
 /-- The nonidentity part of the ambient Fitting subgroup of `M`. -/
 def fittingSharp (M : Subgroup G) : Set G :=
   sharpSubgroup (fittingInAmbient M)
