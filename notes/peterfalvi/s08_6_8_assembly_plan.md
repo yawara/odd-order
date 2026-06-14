@@ -2507,3 +2507,27 @@ anchor が重い場合は先に sub-lemma 5 (整数性抽出, 純 abstract, cert
   hXorth は ⟨(D i).X, Y⟩ で D i.X∈ℤ[σ-images]、Y は抽象 G-function ゆえ map 差は OK だが sigmaCoeff 接続に注意)。
 **正本=本 cont.⁴⁵。extraction core landed。次=anchor (sub-lemma 1) の Sibley-V disjointness 構造調査 → 形式化。
 anchor が deep なら assembly の other pieces (Y=ε·ξ setup, NC≤2) を先に land。**
+
+## 2026-06-14 (session 40 cont.⁴⁶, /loop): ✅ grid driver landed (3rd disjointness brick) + anchor の深さ確認
+
+### ✅ landed (`6e223bc4`, axiom-clean, leaf 3625):
+**`sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`** (S08): ψ vanishOnV + NC<min(w₁,w₂) ⟹ ∀pq sigmaCoeff=0。
+`grid_eq_zero_of_ncard_support_lt` + `sigmaCoeff_add_eq`(3.7) + `card_charGroup_subgroupOf`。
+full trichotomy 不要 (corollary で足る)。**gotcha**: `FullDadeApplication` = `S05.TICyclicHypothesis.FullDadeApplication`,
+`grid_eq_zero_of_ncard_support_lt` = `S05.` 直下 (TICyclicHypothesis 名前空間でない)。
+
+### disjointness ピース status:
+| piece | lemma | status |
+|---|---|---|
+| extraction core | `inner_eq_zero_of_smul_sub_smul_orthogonal` | ✅ `05650497` |
+| CS bound \|inner\|≤1 | `inner_intCast_sq_le` | ✅ `547a14b1` |
+| **grid driver** (vanishOnV+NC<min⟹全0) | `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt` | ✅ `6e223bc4` |
+| NC≤2 (2-irreducible) | — | ⚠ tractable (sigmaCoeff≠0 のみ ξ or ξ'=±chiFam ⟹ ≤2 点) |
+| **anchor** (η₁−η̄₁)^τ vanishOnV | — | 🛑 deep 構造: (ticVdiff h).V ∩ conjugatesOfSet(sharpImage H)=∅ (V=W-exceptional vs H^#-conj) 既存無し |
+| assembly (sigmaCoeff↔certainTypeOmegaSigma + Y=ε·ξ + 上記) | — | ⚠ multi-step |
+
+### 🛑 anchor 確認 (cont.⁴⁶): V^L⊆A₀=A∪V^L (`coe_mem_A0_of_mem_conjugatesOfSet_toTICV`), V は A と別成分。
+anchor「hyp.tau(A-supported) が V 上消失」= V∩conjugatesOfSet(H^#)=∅ (構造的, V=Hall W-exceptional は H-conj と
+別素数構造で交わらない)。`centralizer_le_L_of_mem_ticVdiffV` (v∈V⟹C_G(v)⊆L, H(a)=⊥ on V) が基盤候補だが
+"A-supported→vanishOnV" 直接 lemma 無し。**anchor = 残る本丸 deep 構造 piece**。
+**正本=本 cont.⁴⁶。grid driver landed。次=NC≤2 (tractable, land) → anchor 構造 (deep, V∩H^#-conj=∅) → assembly。**
