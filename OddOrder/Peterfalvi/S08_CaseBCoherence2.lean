@@ -1120,6 +1120,26 @@ theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
   rw [ClassFunction.inner_smul_left,
     inner_eq_zero_of_smul_sub_smul_orthogonal hξ1 hθ hξξ' hm hc hpsi, mul_zero]
 
+/-- **Coherent image of an irreducible member is `±` an irreducible (generic form).**  Generalizes
+`coherentYset_extension_eq_zsmul_irreducible` to any coherence `cS : IsCoherent τ S₁ A`: an
+irreducible member `η ∈ S₁` has `cS.extension η = ε·ξ` for `ε = ±1`, `ξ ∈ Irr G` (the image is
+norm-`1` in `ZIrr G`, `exists_zsmul_irreducibleCharacter_of_inner_self_one`, Peterfalvi (5.9.a)). -/
+theorem coherent_extension_eq_zsmul_irreducible
+    {S₁ : Set (ClassFunction ↥L ℂ)} {A : Set ↥L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    (cS : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A)
+    {η : ClassFunction ↥L ℂ} (hirr : IsIrreducibleCharacter η) (hη : η ∈ S₁) :
+    ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧ cS.extension η = ε • (ξ : ClassFunction G ℂ) := by
+  have hηnorm : ClassFunction.inner η η = 1 := by
+    have h := irreducibleCharacter_inner (⟨η, hirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hirr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hηspan : η ∈ OddOrder.Peterfalvi.S07.zSpan S₁ := Submodule.subset_span hη
+  have hextnorm : ClassFunction.inner (cS.extension η) (cS.extension η) = 1 := by
+    rw [cS.extension_inner_eq η η hηspan hηspan, hηnorm]
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan) hextnorm
+
 /-- **(6.8.2.3) seam-1 orthogonality `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For two distinct `Y`-coherence
 anchors `η ≠ η' ∈ Y`, the image `η^{τ₁} = coherentYset.extension η` is orthogonal to every
 certain-type `σ`-image `ω_{ij}^σ = certainTypeOmegaSigma h46 χ₂ i`.
