@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.Appendices.Suzuki
+import OddOrder.Peterfalvi.Appendices.SemilinearField
 
 /-!
 # Peterfalvi Appendix C: On Near-Fields
@@ -127,6 +128,28 @@ noncomputable def rightMulAction (A : Subgroup Fˣ)
     (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) (u : A) (x : Multiplicative F) :
     Multiplicative.toAdd (rightMulAction A hcomm u x) = Multiplicative.toAdd x * ((u : Fˣ) : F) :=
   rfl
+
+/-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
+Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
+*irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
+over a finite field `K` with `|K| = |F|` (i.e. `F` carries a field structure refining its additive
+group).  Obtained by feeding the near-field data — `isElementaryAbelian_multiplicative` and
+`rightMulAction` — into `exists_field_semilinear`. -/
+theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F] [Nontrivial F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hirr : ∀ U : Subgroup (Multiplicative F),
+      OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U → U = ⊥ ∨ U = ⊤) :
+    ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
+      Module.finrank K F = 1 ∧ Nat.card K = Nat.card F := by
+  obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact f.Prime := ⟨hf⟩
+  letI : CommGroup A := { (inferInstance : Group A) with
+    mul_comm := fun u v => Subtype.ext (by simpa [Subgroup.coe_mul] using hcomm u v) }
+  obtain ⟨K, hK, hMod, hKfin, hrank, hcard, _⟩ :=
+    OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear (E := Multiplicative F) hE
+      (rightMulAction A hcomm) hirr
+  exact ⟨K, hK, hMod, hKfin, hrank, hcard⟩
 
 end NearFieldBasics
 
