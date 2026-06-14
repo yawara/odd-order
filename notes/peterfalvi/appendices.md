@@ -306,6 +306,24 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
   (b) は (a) の F に対する semilinear 写像論 (σ(λ): u(λs)=σ(λ)u(s) が体自己同型)。その後 Appendix C へ。
   あるいは Appendix C は Prop2(a) で十分かもしれない (要精査) → C へ進む選択肢も。
 
+### session 10 (2026-06-14): Prop 2(a) AxiomsCheck 登録済 + C/D/E audit + Prop 2(b) path 確定
+- **Prop 2(a) → AxiomsCheck 登録済** (commit a4e9bab7, LAUNCH rule 4): AxiomsCheck.lean 末尾 Appendices section に
+  isSimpleModule_end/finrank_end_eq_one/natCard_end_eq/exists_field_of_irreducible (全 propext/choice/Quot)。
+- **C/D/E/A audit**: 全て opaque-Prop scaffold (structure Hypothesis + theorem w/ sorry, 67-158 行)。
+  NearFields 2 / Suzuki2Groups 4 / FeitSibley 3 / Suzuki 5 sorry。**easy win 無し** — どれも未構築の
+  research-level infra (FT+Brauer-Suzuki, 体構成, coherence 等) に bottom-out。⟹ Appendix I を続けるのが最善。
+- **🎯 Prop 2(b) path 確定 (mathlib API 検証済, 実装は次 session)**:
+  - **`LinearEquiv.conjRingEquiv (e : M₁ ≃ₛₗ[σ] M₂) : End R₁ M₁ ≃+* End R₂ M₂`** (Equiv/Basic.lean:571) が核 —
+    semilinear equiv から End 環の ring iso。σ_u : F ≃+* F が直接得られる。
+  - **`MonoidAlgebra.domCongr R A (c : T ≃* T) : A[T] ≃ₐ[R] A[T]`** (Basic.lean:304) で τ_u を c から構成。
+  - **clean 抽象 formulation (U/Subgroup を回避)**: (a) の setup + `(u : MulAut E) (c : T ≃* T)
+    (hc : ∀ t, ψ (c t) = u * ψ t * u⁻¹)` ["u が ψ(T) を c 経由で正規化"]。
+    → φ(u)=`MulEquiv.toAdditive u` を `Additive E ≃ₛₗ[τ_u] Additive E` (τ_u=domCongr c) として構成
+    → conjRingEquiv で σ_u : F ≃+* F (field auto)。U/T⊴U は c=conj-by-u の薄い wrapper。
+  - **hard part = semilinear equiv の map_smul'** (∀ r∈k[T], `u(r•x)=τ_u(r)•u(x)`): of-t case は bridge key
+    + hc で出るが、全 r へは MonoidAlgebra induction/generating-set 要。~100-150 行見込み, 1-2 session。
+  - その後 C_U(s)≅Aut(F) → Appendix C へ (C の Prop2 が σ_y にこれを使う)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
