@@ -2093,6 +2093,47 @@ theorem mem_tau1_Mstar_of_einvariant_sylow [Finite G] (hG : IsMinimalSimpleOdd G
     exact (Subgroup.mem_centralizer_iff.mp (hcent hx) s (hSinf hs)).symm
   exact hSne (by rw [← hCSP]; exact le_antisymm (le_inf le_rfl hScP) inf_le_left)
 
+/-- **Thm 13.9 tail: `C_S(P)=1`** (BG: "By Lemma 13.6, `C_S(P)=1`"): `q∈σ(M)`, `P ≤ E₁` 非自明,
+`S` が `M_σ` の極大 `q`-部分群で `S ≤ M*` (`M* ≠ M` maximal) のとき `S ⊓ C(P) = 1`。
+
+`S ⊓ C(P) ≠ 1` と仮定すると `ℰ_q¹` 部分群 `X ≤ S ⊓ C(P) ≤ M_σ ⊓ C(P)` が取れ、Lemma 13.6
+(`maximalContaining_eq_singleton_of_E1`) の第2結論で `ℳ(S) = {M}`。しかし `S ≤ M*` ゆえ
+`M* ∈ ℳ(S) = {M}`、すなわち `M* = M` で `M* ≠ M` に矛盾。 -/
+theorem centralizer_sylow_inf_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {q : ℕ} [Fact q.Prime] (hqσ : q ∈ S10.sigma M)
+    {P : Subgroup G} (hPE1 : P ≤ E₁) (hPne : P ≠ ⊥)
+    {S : Subgroup G} (hSle : S ≤ S10.Msigma M) (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) (hMne : Mstar ≠ M)
+    (hSMstar : S ≤ Mstar) :
+    S ⊓ Subgroup.centralizer (P : Set G) = ⊥ := by
+  by_contra hne
+  set C : Subgroup G := S ⊓ Subgroup.centralizer (P : Set G) with hC
+  have hCq : IsPGroup q ↥C := hSq.to_le inf_le_left
+  have hCnt : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hne
+  obtain ⟨k, hk⟩ := hCq.exists_card_eq
+  have hk0 : k ≠ 0 := by
+    rintro rfl; rw [pow_zero] at hk
+    exact absurd hk (Finite.one_lt_card_iff_nontrivial.mpr hCnt).ne'
+  have hqdvd : q ∣ Nat.card ↥C := by rw [hk]; exact dvd_pow_self q hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' q hqdvd
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = q := by
+    rw [Nat.card_zpowers]
+    exact (orderOf_injective C.subtype C.subtype_injective x).trans hx
+  have hXmem : (Subgroup.zpowers (x : G)) ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXC : (Subgroup.zpowers (x : G)) ≤ S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) := by
+    refine Subgroup.zpowers_le.mpr ?_
+    have hxC : (x : G) ∈ S ⊓ Subgroup.centralizer (P : Set G) := x.2
+    rw [Subgroup.mem_inf] at hxC ⊢
+    exact ⟨hSle hxC.1, hxC.2⟩
+  have hMS := (maximalContaining_eq_singleton_of_E1 hG h hqσ hPE1 hPne hXmem hXC hSle hSq hSmax).2
+  have hMem : Mstar ∈ maximalSubgroupsContaining S :=
+    mem_maximalSubgroupsContaining.mpr ⟨hMstar, hSMstar⟩
+  rw [hMS, Set.mem_singleton_iff] at hMem
+  exact hMne hMem
+
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。
 
 証明は `M_σ` の冪零性で場合分け: `M_σ` 冪零なら Lemma 10.12 (`disjoint_of_not_conj` の冪零条項)
