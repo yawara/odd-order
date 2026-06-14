@@ -134,6 +134,15 @@ may be chosen to contain it. -/
 theorem kappa_subset_tau1_union_tau3 {M : Subgroup G} : kappa M ⊆ tau1 M ∪ tau3 M :=
   fun _ hp => hp.1
 
+/-- `κ(M) ⊆ σ(M)'`: a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`).
+This lets Proposition 14.2 feed a Hall `κ(M)`-subgroup `K` to `exists_subgroupESetup_with_le`
+to obtain an `E`-setup with `K ≤ E`. -/
+theorem kappa_subset_sigmaCompl {M : Subgroup G} : kappa M ⊆ (OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+  intro p hp
+  rcases kappa_subset_tau1_union_tau3 hp with h | h
+  · exact ((mem_tau1_iff M p).mp h).1
+  · exact ((mem_tau3_iff M p).mp h).1
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
@@ -383,7 +392,7 @@ not one of BG's seven parts and is false in general (`K = C_q` acting on a Heise
 `M_σ = p^{1+2}` by `a ↦ aʳ, b ↦ b, c ↦ cʳ` gives `K* = ⟨b⟩`, which is **not** normal in
 `M_σ` since `a b a⁻¹ = bc ∉ ⟨b⟩`). -/
 theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -397,7 +406,21 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧
           IsTISubset (sigmaSharp M) (Subgroup.normalizer
             ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G))) := by
-  sorry
+  classical
+  -- `K` is a `σ(M)'`-subgroup (a Hall `κ(M)`-subgroup, and `κ(M) ⊆ σ(M)'`).
+  have hK_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := by
+    intro p hp
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hp
+    exact kappa_subset_sigmaCompl (hK.1 p hp)
+  -- Choose a §12 `E`-setup whose `M_σ`-complement `E` contains `K` (BG: "take `E ⊇ K`").
+  obtain ⟨E, E₁, E₂, E₃, hsetup, hKE, hE_pi⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hKM hK_pi
+  -- BG splits on whether `κ(M) ∩ τ₃(M) = ∅` (i.e. `E₃ ≠ 1` and `E₃` non-regular vs `κ ⊆ τ₁`).
+  by_cases hτ3 : (kappa M ∩ tau3 M).Nonempty
+  · -- Case `κ(M) ∩ τ₃(M) ≠ ∅`: Corollary 13.11 gives `E = E₁E₃`, `E` prime on `M_σ`, `K = E`.
+    sorry
+  · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
+    sorry
 
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
