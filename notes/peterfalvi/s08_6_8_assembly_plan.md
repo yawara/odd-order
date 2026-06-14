@@ -2556,3 +2556,25 @@ anchor = V∩conjugatesOfSet(H^#)=∅ は **TI 還元不要**。位数論法が 
 → hXorth → `per_constituent_Y_eq_smul` → case-B X-coherence (`coherentXunionYset_caseB_of_glued`) → capstone `sibleySetup_is_coherent` X-nonempty branch (S08_CoherenceTheorems:59 sorry)。
 **要発掘: (4) ξ≠ξ' (η非実→image distinct)、(3) η₁=Ind θ 抽出、hmin (奇素数 Hall ⟹ w₁,w₂≥3 だが 2<min 要確認)。**
 **正本=本 session 41。anchor 完成。次=assembly seam-1。Opus 継続。**
+
+### ✅✅✅ session 41 cont. (/loop): seam-1 完成 — (6.8.2.3) disjointness/直交性の全数学内容 DONE
+| commit | lemma | 役割 |
+|---|---|---|
+| `4d182ec9` | `coherentYset_extension_diff_apply_eq_zero_of_mem_ticVdiffV` | anchor Y-image 形: η,η'∈Y で extension η − extension η' が V 上消失 (extends_on_supported + anchor)。全 Y 元 degree=|W₁| ゆえ Supp(η−η')⊆H^# (`sMember_diffSupport_of_charValue_eq`) |
+| `66362a01` | **`inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`** | **seam-1 直交性**: η≠η'∈Y で ⟨extension η, certainTypeOmegaSigma h46 χ₂ i⟩=0。η^{τ₁}=ε•ξ/η'^{τ₁}=ε'•ξ' (`coherentYset_extension_eq_zsmul_irreducible`)、⟨ξ,ξ'⟩=0 (isometry+⟨η,η'⟩=0 [`irreducibleCharacter_inner_eq_ite`])、ε•ξ−ε'•ξ' V上消失 (Y-image anchor)、machine + `certainTypeOmegaSigma_eq_chiFam`。**🔑 (4) ξ≠ξ' 別証不要 — ⟨ξ,ξ'⟩=0 を isometry+共役で直接抽出 (zsmul→ℂ-smul: `Int.cast_smul_eq_zsmul`, `inner_smul_left/right`, `star_intCast`)** |
+| `70841fe0` | **`inner_coherentYset_extension_certainTypeRImage_eq_zero`** | **seam-1 R(μ_j) 形**: ⟨extension η, certainTypeRImage h46 χ₂ χ₂' p⟩=0。R(μ_j)各元=符号付き certainTypeOmegaSigma ⟹ seam-1×2 (χ₂/χ₂', cases Bool)。これが hXorth の全材料 |
+
+### 🎯 (6.8.2.3) disjointness COMPLETE。次 = per_constituent 適用 + case-B X-coherence + capstone glue
+**hXorth (`⟨Da.X, Y⟩=0`) は capstone で one-liner 化可能 (確認済)**:
+`(certainTypeDecompositionDa …).imageFamily = certainTypeR h hχ₂ hdeg` (`ofProjection` が imageFamily 保存, S07:1199) ⟹ `.imageFamily.imageSet = univ.image (certainTypeRImage h χ₂ χ₂⁻¹)`。
+```
+inner_X_Y_eq_zero_of_orthogonal Da (fun α hα => by
+  obtain ⟨p,_,rfl⟩ := Finset.mem_image.mp hα
+  exact inner_coherentYset_extension_certainTypeRImage_eq_zero hyp h46 hHK hη hη' hne χ₂ χ₂⁻¹ p)
+```
+**▶▶ 次の大ステップ (capstone X-nonempty branch, S08_CoherenceTheorems:59 sorry)**:
+1. **per_constituent 適用**: `per_constituent_Y_eq_smul` に D(family)/hagg((6.8.2.2) aggregate, cont.³⁰-³¹ 済?)/hsq(∑aᵢ²=n)/hXorth(上記)/hbi/hYY を供給 ⟹ Dᵢ.Y=aᵢ•Y ⟹ (6.8.2.3) 結論 `(χ−aη₁)^τ=X₁−aY`。
+2. **case-B X-coherence** (`coherentXunionYset_caseB_of_glued`): cX (= certainTypeSet_isCoherent_tau + X_irr glue)/ν/hagree/hpair/hmixed/D/hgen 供給。
+3. **capstone glue**: hyp.cases (Frobenius/CertainType 分割) + ν 構成 + Y-coherence と glue。
+**要: η̄₁∈Y 共役閉包 (capstone で η'=η̄₁ 用; `induce_linearIrreducibleCharacter_mem_Yset` + 共役 linear χ⁻¹≠1)。または \|Y\|≥2 で任意の η'≠η₁。**
+**正本=本 session 41 cont。(6.8.2.3) 全直交性 DONE (7 commits)。次=per_constituent 適用。full build 3813 green。Opus 継続。**
