@@ -306,6 +306,62 @@ theorem fittingInAmbient_cyclic_imp_derivedDerived_eq_bot [Finite G] {M : Subgro
   refine le_bot_iff.mp (le_trans (Subgroup.commutator_mono hderiv_le hderiv_le) ?_)
   exact le_of_eq (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hself)
 
+/-- **§14-independent engine for BG Corollary 15.6's `K* ⊆ M''` clause.**  Given the type-`P`
+complement structure `M = K M'` with `K ∩ M' = 1` (BG Theorem 14.7(h), here as the relative-
+complement hypothesis `hcompl` inside `↥M`) and the coprimality of `|M'|` and `|K|`, Lemma 6.3
+(`centralizer_inf_le_derivedInG_of_isComplement'`, proved) yields `C_{M'}(K) ⊆ M''`; since
+`K* = C_{M_σ}(K) = M_σ ⊓ C_G(K) ⊆ C_{M'}(K)` (because `M_σ ⊆ M'`), this gives `K* ⊆ M''`.
+
+The complement/coprimality data are the only `§14` inputs; everything else is unconditional, so
+Corollary 15.6 reduces its `K* ⊆ M''` clause to a single citation once Theorem 14.7(h) (or the
+`IsComplement' (derivedInG M) K` strengthening of Lemma 15.1) lands.  Mirrors the Lemma 6.3
+transport in `S12_E.Msigma_E_relations`, with `M'` in place of `M_σ` and `K` in place of `E`. -/
+theorem Msigma_inf_centralizer_le_derivedDerived_of_isComplement' [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+      (Nat.card ↥(K.subgroupOf M))) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≤
+      derivedInG (derivedInG M) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMσ_le_deriv : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M :=
+    OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+  have hderivM : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `H := (derivedInG M).subgroupOf M = commutator ↥M`, normal in `↥M`.
+  have hid : (derivedInG M).subgroupOf M = commutator ↥M :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+  haveI hHnorm : ((derivedInG M).subgroupOf M).Normal := by rw [hid]; infer_instance
+  have hH_le : (derivedInG M).subgroupOf M ≤ commutator ↥M := le_of_eq hid
+  -- Lemma 6.3 inside `↥M`:  `C_{↥M}(K') ⊓ H ≤ derivedInG H`.
+  have h632 := OddOrder.BG.Ch1.S06.centralizer_inf_le_derivedInG_of_isComplement'
+    (G := ↥M) hcompl hH_le hcop
+  -- Transport identity:  `(derivedInG H).map M.subtype = derivedInG (derivedInG M)`.
+  have hderiv_transport :
+      (derivedInG ((derivedInG M).subgroupOf M)).map M.subtype =
+        derivedInG (derivedInG M) := by
+    rw [show derivedInG ((derivedInG M).subgroupOf M)
+          = ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆
+          from Subgroup.map_subtype_commutator _,
+      Subgroup.map_commutator, Subgroup.map_subgroupOf_eq_of_le hderivM,
+      show ⁅(derivedInG M : Subgroup G), derivedInG M⁆ = derivedInG (derivedInG M)
+          from (Subgroup.map_subtype_commutator _).symm]
+  -- Pointwise: every `x ∈ M_σ ⊓ C_G(K)` lands in `derivedInG (derivedInG M)`.
+  intro x hx
+  obtain ⟨hxMσ, hxC⟩ := hx
+  have hxM : x ∈ M := hMσM hxMσ
+  have hxmem : (⟨x, hxM⟩ : ↥M) ∈
+      Subgroup.centralizer ((K.subgroupOf M : Subgroup ↥M) : Set ↥M)
+        ⊓ (derivedInG M).subgroupOf M := by
+    refine ⟨Subgroup.mem_centralizer_iff.mpr ?_, ?_⟩
+    · intro k' hk'
+      have hkK : ((k' : ↥M) : G) ∈ K := Subgroup.mem_subgroupOf.mp hk'
+      exact Subtype.ext (Subgroup.mem_centralizer_iff.mp hxC (k' : G) hkK)
+    · exact Subgroup.mem_subgroupOf.mpr (hMσ_le_deriv hxMσ)
+  have hmapped := Subgroup.mem_map_of_mem M.subtype (h632 hxmem)
+  rwa [hderiv_transport] at hmapped
+
 /-- The nonidentity part of the ambient Fitting subgroup of `M`. -/
 def fittingSharp (M : Subgroup G) : Set G :=
   sharpSubgroup (fittingInAmbient M)
@@ -328,7 +384,14 @@ encoded as `M'' <= M_sigma`, avoiding premature quotient API commitments.
 
 Faithfulness fix (Lane G): the previous scaffold added a spurious `IsTypeP M` hypothesis;
 mmd Lemma 15.1 holds for every `M ∈ ℳ` (the `K ≠ 1` clauses are guarded inline), and the
-general form is what Theorem A(2) and Theorem B cite. -/
+general form is what Theorem A(2) and Theorem B cite.
+
+`K ≠ 1` exposure (Lane G): the `K ≠ ⊥` clause now also records `M = K M'` as the relative
+complement `IsComplement' (M'.subgroupOf M) (K.subgroupOf M)` together with the `(|M'|, |K|)`
+coprimality — both are mmd 15.1(a)+(b) (`M = KUM_σ`, `K ≠ 1 → M' = UM_σ`, with `|K|` a
+`κ(M)`-number and `|M'|` a `κ(M)'`-number).  This supplies exactly the hypotheses of
+`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` (the §14-independent `K* ⊆ M''`
+engine), so Corollary 15.6's `K* ⊆ M''` clause becomes a single citation once §14 lands. -/
 theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -340,7 +403,10 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
       derivedInG (derivedInG M) ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
       (K ≠ ⊥ → derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
-        IsMulCommutative ↥U) ∧
+        IsMulCommutative ↥U ∧
+        Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧
+        Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+          (Nat.card ↥(K.subgroupOf M))) ∧
       (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
           maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
