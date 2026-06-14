@@ -18,6 +18,21 @@ Suzuki theorem and records the special Zassenhaus classification needed there.
 namespace OddOrder.Peterfalvi.Appendices.NearFields
 -- scaffold opaque-Prop convention: see notes/meta/scaffold_opaque_prop_convention.md
 
+/-- A **(right) near-field** (Peterfalvi, Appendix C, p. 137): a set `F` with `+` and `·` such that
+`(F, +)` is a commutative group, `(F, ·)` is a group with zero — i.e. `(F ∖ {0}, ·)` is a group —
+and the **right** distributive law `(a + b) c = a c + b c` holds.  (Left distributivity and
+`·`-commutativity may fail; a field is the special case where both also hold.)
+
+Modeled as `AddCommGroup F` + `GroupWithZero F` + right distributivity, so the full multiplicative
+group-with-zero API (`mul_inv_cancel₀`, `zero_mul`, `mul_zero`, `zero_ne_one`, …) is inherited. -/
+class NearField (F : Type*) extends AddCommGroup F, GroupWithZero F where
+  /-- The right distributive law `(a + b) * c = a * c + b * c`. -/
+  protected right_distrib : ∀ a b c : F, (a + b) * c = a * c + b * c
+
+/-- The right distributive law in a near-field. -/
+theorem NearField.add_mul {F : Type*} [NearField F] (a b c : F) :
+    (a + b) * c = a * c + b * c := NearField.right_distrib a b c
+
 variable {G Ω F : Type*} [Group G]
 
 /-- A lightweight carrier for finite near-field structure.  The algebraic laws
