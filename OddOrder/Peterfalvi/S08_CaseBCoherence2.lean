@@ -640,6 +640,69 @@ theorem inner_Y_coeff_sq_le {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.car
   have := inner_self_re_nonneg W
   linarith
 
+/-- **Per-step coefficient bound `bᵢ ≤ aᵢ`** (Peterfalvi (6.8.2.3), the integer tail of the
+Cauchy–Schwarz step).  For a (5.4) decomposition `Da : CharacterPsiDecomposition τ χ (a·η)` with
+`η` a norm-`1` vector and `Y` a norm-`1` vector, the integer coefficient `b = ⟨Da.Y, Y⟩` is bounded
+by the multiplicity `a`.
+
+Chaining `inner_Y_coeff_sq_le` (`b² ≤ ‖Da.Y‖²`) with the (5.6.2) opening bound
+`inner_self_Y_re_le_inner_self_psi` (`‖Da.Y‖² ≤ ‖a·η‖² = a²`) gives `b² ≤ a²` over `ℤ`; with
+`a ≥ 0` the integer tail `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a` finishes.  This is the per-constituent input to
+the (6.8.2.3) pinning `eq_of_sum_mul_eq_sum_sq`. -/
+theorem inner_Y_coeff_le_of_psi_nsmul {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ η : ClassFunction ↥L ℂ} {a : ℕ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ (a • η))
+    (hηnorm : ClassFunction.inner η η = 1)
+    {Y : ClassFunction G ℂ} (hYnorm : ClassFunction.inner Y Y = 1)
+    {b : ℤ} (hb : ClassFunction.inner D.Y Y = (b : ℂ)) :
+    b ≤ (a : ℤ) := by
+  -- `‖ψ‖² = ‖a·η‖² = a²` (`η` norm `1`).
+  have hψnorm : (ClassFunction.inner (a • η : ClassFunction ↥L ℂ) (a • η)).re = (a : ℝ) ^ 2 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a η, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hηnorm, mul_one, star_natCast,
+      Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  -- `b² ≤ ‖Da.Y‖² ≤ ‖ψ‖² = a²`, over `ℝ` then `ℤ`.
+  have hsq := inner_Y_coeff_sq_le D hYnorm hb
+  have hYle := D.inner_self_Y_re_le_inner_self_psi
+  rw [hψnorm] at hYle
+  have hb2z : b ^ 2 ≤ (a : ℤ) ^ 2 := by exact_mod_cast le_trans hsq hYle
+  -- Integer tail: `b² ≤ a² ∧ 0 ≤ a ⟹ b ≤ a`.
+  by_contra hcon
+  push_neg at hcon
+  have ha : (0 : ℤ) ≤ (a : ℤ) := Int.natCast_nonneg a
+  nlinarith [mul_nonneg ha (le_of_lt (sub_pos.mpr hcon)),
+    mul_pos (lt_of_le_of_lt ha hcon) (sub_pos.mpr hcon), hb2z]
+
+/-- **(6.8.2.3) pinning input `∑ aᵢbᵢ = n`.**  Taking the inner product against the `Y`-anchor of
+the (6.8.2.2) aggregate identity `Xagg − n·Y = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)` (each `αᵢ^τ = Xᵢ − Yᵢ` a
+per-constituent (5.4) image, `bᵢ = ⟨Yᵢ, Y⟩`): the `X`-sides are orthogonal to `Y`
+(`⟨Xagg,Y⟩ = 0`, `⟨Xᵢ,Y⟩ = 0`), so `⟨LHS,Y⟩ = −n` and `⟨RHS,Y⟩ = −∑ aᵢbᵢ`, forcing `∑ aᵢbᵢ = n`.
+With `∑ aᵢ² = |H:Z| = n` (`sum_inner_restrict_sq_eq_index`) and the per-step bound `bᵢ ≤ aᵢ`
+(`inner_Y_coeff_le_of_psi_nsmul`), this is the `hsum` input to the pinning
+`eq_of_sum_mul_eq_sum_sq`. -/
+theorem sum_coeff_eq_of_aggregate {ι : Type*} (s : Finset ι) (a b : ι → ℤ)
+    (X Yv : ι → ClassFunction G ℂ) (Xagg Y : ClassFunction G ℂ) (n : ℤ)
+    (hagg : Xagg - (n : ℂ) • Y = ∑ i ∈ s, (a i : ℂ) • (X i - Yv i))
+    (hXorth : ∀ i ∈ s, ClassFunction.inner (X i) Y = 0)
+    (hb : ∀ i ∈ s, ClassFunction.inner (Yv i) Y = (b i : ℂ))
+    (hXaggorth : ClassFunction.inner Xagg Y = 0)
+    (hYY : ClassFunction.inner Y Y = 1) :
+    ∑ i ∈ s, a i * b i = n := by
+  have key : ClassFunction.inner (Xagg - (n : ℂ) • Y) Y
+      = ClassFunction.inner (∑ i ∈ s, (a i : ℂ) • (X i - Yv i)) Y := by rw [hagg]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hXaggorth, hYY, mul_one,
+    zero_sub, inner_sum_left] at key
+  -- `⟨LHS,Y⟩ = −n`; each `RHS` term `⟨aᵢ•(Xᵢ−Yᵢ), Y⟩ = −aᵢbᵢ`.
+  have hterm : ∑ i ∈ s, ClassFunction.inner ((a i : ℂ) • (X i - Yv i)) Y
+      = ∑ i ∈ s, -((a i : ℂ) * (b i : ℂ)) :=
+    Finset.sum_congr rfl fun i hi => by
+      rw [ClassFunction.inner_smul_left, ClassFunction.inner_sub_left, hXorth i hi, hb i hi]; ring
+  rw [hterm, Finset.sum_neg_distrib] at key
+  -- `key : −n = −∑ aᵢbᵢ` over `ℂ`; cancel the sign and descend to `ℤ`.
+  have hcast : (n : ℂ) = ∑ i ∈ s, (a i : ℂ) * (b i : ℂ) := neg_injective key
+  exact_mod_cast hcast.symm
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
