@@ -771,6 +771,38 @@ theorem conj_eq_self_of_sigma_pSubgroup_normalizer_le [Finite G] (hG : IsMinimal
   rw [hceq, conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (M.inv_mem hcM))] at e1
   exact e1.symm
 
+/-- **`σ(M)`-prime の `q`-部分群は `M_σ` へ共役** (BG Theorem 10.2 の帰結): `q ∈ σ(M)`, `Y` を
+`q`-群とすると、ある `g` で `Y^g ⊆ M_σ`。`M_σ` が `G` の Sylow `q`-部分群を含む
+(`isSylow_sylowMap_of_mem_sigma`) ことと Sylow 共役による。Lemma 13.8 GAP 2.5
+(`X = O_s(H)` を `M^g` へ入れる) の核。`S12_Corollary1216.pRank_normalizer_le_one` Step 1
+のインライン論法を `hM` 直接版に切り出したもの。 -/
+theorem exists_conj_smul_le_Msigma_of_pSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (hqσ : q ∈ S10.sigma M) {Y : Subgroup G} (hYq : IsPGroup q ↥Y) :
+    ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
+  obtain ⟨_, P, _⟩ := (S10.mem_sigma_iff M q).mp hqσ
+  obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+  have hPpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) ((P : Subgroup ↥M).map M.subtype) := by
+    intro s hs
+    have hs_dvd : s ∣ Nat.card ↥((P : Subgroup ↥M).map M.subtype) :=
+      (Nat.mem_primeFactors.mp hs).2.1
+    rw [Subgroup.card_map_of_injective M.subtype_injective] at hs_dvd
+    obtain ⟨n, hn⟩ := (P.2).exists_card_eq
+    rw [hn] at hs_dvd
+    rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) Fact.out).mp
+      ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hs_dvd)]
+  have hPMσ : (P : Subgroup ↥M).map M.subtype ≤ S10.Msigma M :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM)
+      (Subgroup.map_subtype_le _) hPpi
+  obtain ⟨Q, hYQ⟩ := hYq.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G SG Q
+  refine ⟨g⁻¹, le_trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYQ) ?_⟩
+  have hQconj : MulAut.conj g⁻¹ • (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+    have hQ : (Q : Subgroup G) = MulAut.conj g • (SG : Subgroup G) := by
+      rw [← hg]; exact Sylow.coe_subgroup_smul
+    rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
+  rw [hQconj]; exact hPMσ
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
