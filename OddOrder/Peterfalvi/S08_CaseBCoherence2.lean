@@ -721,4 +721,23 @@ theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
   exact hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
     hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
 
+/-- **(6.8.2.3) entry point:** every `χ ∈ X(Z)` is induced from a nontrivial irreducible `θ` of `H`
+with `Z ⊄ Ker θ`.
+
+Peterfalvi (6.8.2.3) opens "Let `χ = Ind_H^L θ` where `θ ∈ Irr H` with `Z ⊄ Ker θ`."  Since
+`χ ∈ X(Z) = S − S(Z)`: `χ ∈ S` gives `χ = Ind_H^L θ` with `θ ≠ 1` (`S_eq`); and were
+`Z ⊆ Ker θ`, that same `θ` would witness `χ ∈ S(Z)` (`mem_SsubFiltration`), contradicting
+`χ ∉ S(Z)`.  Route-agnostic (no case split, any `Z : Subgroup ↥L`). -/
+theorem SibleyDadeHypothesis.mem_Xset_exists_inducing
+    (hyp : SibleyDadeHypothesis G L H) {Z : Subgroup ↥L}
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset Z) :
+    ∃ θ : IrreducibleCharacter ↥H, θ ≠ trivialIrreducibleCharacter ↥H ∧
+      ¬ ((Z.subgroupOf H : Set ↥H) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥H ℂ)) ∧
+      χ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) := by
+  obtain ⟨hχS, hχnotZ⟩ := hyp.mem_Xset.mp hχ
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, hθne, hθind⟩ := hχS
+  exact ⟨θ, hθne, fun hker => hχnotZ (hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hker, hθind⟩), hθind⟩
+
 end OddOrder.Peterfalvi.S08

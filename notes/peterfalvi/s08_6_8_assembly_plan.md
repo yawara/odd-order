@@ -1811,3 +1811,86 @@ cX の残 (item 1 X_irr-coh + item 3 mixed-inner)。
 cX → `coherentXunionYset_caseB_of_glued` (cont.¹⁹ shell) → capstone case-B branch。
 **正本=本 cont.²³. item 2 完了 (2 iter); 残 item 1/3 は深く要集中。次=item 1 の set 分解 reverse
 (`Xset W₂ ⊆ X_irr ∪ certainTypeSet`, (4.5b) exhaustion) から着手が自然 (item 1 の前段、tractable)。**
+
+## 2026-06-14 (session 40 cont.²⁴, /loop): 🚨🚨 ARCHITECTURE RECON — 教科書 (6.8.2) は **直接 τ₂ 構成** (anchor η₁∈Y); 「standalone case-B X-coherence (cX) + glue」plan は教科書と乖離 → item 1 (X_irr-coh) は不要/誤方向
+
+cont.²³ で「次=item 1 (X_irr-coh) の set 分解」と書いたが、着手前に **mmd 04.8 L178-224 ((6.8.2) 全証明) を精読**して
+重大な方針乖離を発見。cont.¹⁴-²³ の glue route (cX を別途構築して §7 で glue) は**教科書の証明構造と異なる**。
+
+### 🔑 教科書 (6.8.2) case-B の実際の証明構造 (mmd 04.8 L224 "Proof of (6.8.2)"):
+> τ₂ := Z[X∪Y]→Z[Irr G] の Z-linear map で、Z[X∪Y,L^#] 上 τ と一致、かつ **η₁^{τ₂}=Y** (Y=η₁^{τ₁}, m=2 で −η₂^{τ₁})。
+> (6.8.2.3) で ⟨(χ−aη₁)^τ, η₁^{τ₂}⟩=⟨χ−aη₁,η₁⟩ (χ∈X, a=χ(1)/η₁(1))。η∈Y も同様。
+> ⟹ τ₂ は Z[X∪Y,L^#]∪{η₁} (= Z[X∪Y] を生成) 上で内積保存 ⟹ X∪Y coherent。
+
+つまり: **τ₂ は X∪Y 全体に直接定義** (χ−aη₁ は supported ゆえ χ=(χ−aη₁)+aη₁ で生成; τ₂(χ)=τ(χ−aη₁)+aY=X₁)。
+**standalone な「X だけの coherence (cX)」は構築しない** — (6.8.2.3) の χ-分解は **η₁∈Y を anchor**に使うので、
+X-coherence は Y から切り離せない。case (A) は X⊂Irr L で X-内部 anchor の (6.6) が効く (L160) が、**case (B) は
+X が reducible μ_j を含み X-内部 chain が崩れるため、教科書は Y-anchor の直接 τ₂ に切り替えている**。
+
+### 🛑 ⟹ cont.¹⁹/²⁰ の plan (cX = X_irr-coh ∪ {μ_j}-coh を §7 glue) は誤方向:
+- `coherentXunionYset_caseB_of_glued` (cont.¹⁹ shell) は **cX (standalone X-coherence) を入力に要求**するが、
+  case-B では cX は教科書の対象でなく、構築には Y-anchor η₁ が要る (循環)。cont.¹⁸ が「irreducible-X engine
+  再利用不可」「case-B X-coherence は新規設計が必要」で詰まったのは**この乖離が原因** (square peg/round hole)。
+- item 1 (X_irr-coh via xChainCoherent) は **不要**。xChainCoherent は IrreducibleCharacter pair を足すので
+  reducible μ_j を足せず、かつ X-内部 base を要求 (Y-anchor でない)。
+- 副次: certainTypeSet の degree 条件 (equal-degree のみ) も問題で、Xset∖certainTypeSet は all-irreducible でない
+  (異 degree の reducible μ_j が残る) — これも glue route が破綻する別証左。
+
+### ✅ 正しい route = **直接 τ₂** (教科書通り):
+1. **(6.8.2.1)** η^{τ₁} が Z^# 上定数 — 要確認 (landed?)。
+2. **(6.8.2.2)** `Ind_Z^L φ − |H:Z|η₁ = X − |H:Z|Y` の aggregate — `exists_decomposition_caseB`
+   (S08_CaseBCoherence2:126) で landed (cont.¹⁴)。
+3. **(6.8.2.3)** per-χ: χ=Ind_H θ (Z⊄Ker θ), [Is]2.27 で Res_Z θ=aφ, Ind_H^Z φ=∑aᵢθᵢ, 各 χᵢ=Ind_H θᵢ
+   (**irreducible**) に R(χᵢ) ((5.3)(5.4.a)(5.4.b)(5.5), §7 R-producer `dadeOrthonormalCharacterImageFamily`),
+   (6.8.2.2) で bᵢ=aᵢ pin ⟹ αᵢ^τ=Xᵢ−aᵢY ⟹ (χ−aη₁)^τ=X₁−aY。**これが本丸 (item 3 相当だが主役)**。
+4. **Proof of (6.8.2)**: τ₂ を Z[X∪Y] に直接定義 (supported=τ, η₁↦Y) + (6.8.2.3) で isometry 検証。
+   §7 ツール候補 = `retarget_isCoherent_of_decomposition*` (S07:3737+; S₁-coherence + per-χ
+   `himg: τ(χ−a·chi1)=D.X−a·extension chi1` で {χ,χ̄} を追加) を **base=Y-coherence** から X 上反復、
+   または whole-lattice τ₂ を `coherentUnion_of_glued` 系へ ν=τ₂ で渡す (cX 不要の variant 要精査)。
+
+### ⚠ 未確定 (next iteration / 要ユーザー判断):
+- `coherentXunionYset_caseB_of_glued` shell (cX 要求) は **置換** すべきか、cX を retarget で構築して延命するか。
+- reducible μ_j を τ₂ で扱う具体 (retarget は irreducible 単位; μ_j は whole-lattice τ₂ で一括 or certainTypeSet
+  block で別処理)。**certainTypeSet machinery (item 2, {μ_j}-coh) は直接 route では off-path の可能性大**
+  (true facts ではある)。
+**正本=本 cont.²⁴ (ARCHITECTURE 再評価)。次=直接 τ₂ route ((6.8.2.3) per-χ R(χ) 分解) へ pivot。
+item 1 は build しない。要ユーザー確認: glue shell 廃棄 vs 延命。**
+
+## 2026-06-14 (session 40 cont.²⁵, /loop): ✅ 直接-τ₂ route の building blocks 全確認 + Z=W₂ 確定 + (6.8.2.3) entry landed
+
+cont.²⁴ pivot を受け、直接-τ₂ route の前提を全検証。**全 building block が repo に存在** ⟹ route は実行可能で、
+foundational pieces は **brick-friendly** (dedicated session 不要、loop で steady に積める)。
+
+### ✅ 確定事実 (mmd 04.8 L150-160 精読):
+- **case (B): Z = W₂** (textbook "Set Z=W₂ in case (B)")。⟹ **item 2 (`Xset h46.W2`) は正しい Z を target 済**
+  (cont.²³ の懸念は杞憂)。X=S−S(W₂), Y=S(H′)=S(⁅H,H⁆) (m 個, 各 deg|W₁|, 既約)。
+- capstone は `Xset ⁅H,H⁆` で split (Z=H′); (6.8.2) は Z=W₂ ⟹ Xset W₂⊆Xset H′ (W₂⊆H′)。両者の差は
+  (6.8.3) layer (S coherent への拡張) ⟹ capstone wiring は (6.8.2) の downstream (後続課題)。
+
+### ✅ building blocks (全 landed/available):
+- **[Is]2.27** = `OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction`
+  (Res_Z θ = θ(1)·φ, φ linear, Z≤Z(G); AxiomsCheck:2025 登録済)。
+- **(6.8.2.2)** = `exists_decomposition_caseB` (S08_CaseBCoherence2:126, landed): `(Ind_Z^L φ−|H:Z|η₁)^τ
+  = X−|H:Z|·cY.ext(η₁)`, X⊥cY(Y), X∈ZIrr。
+- **(6.8.2.1)** = `IsCoherent.extension_constant_on_sharp_of_prime` (AxiomsCheck:2018 付近, landed)。
+- **R(χ) machinery** = §7 `dadeOrthonormalCharacterImageFamily` (S07:5387) + (5.4.a/b) (S07:1378/1447)。
+- **IsCoherent 直接 constructor** = structure (S07:1557): `extension`(ν=τ₂) + `extension_inner_eq`(isometry)
+  + `extends_on_supported`(=τ on Z[S,A]) + `extension_mem_ZIrr`。⟹ τ₂ を明示構成して 4 fields を埋める。
+
+### 📋 (6.8.2.3) per-χ 分解の sub-DAG (`(χ−aη₁)^τ = X₁−aY`, χ∈Xset W₂):
+1. ✅ **entry** `mem_Xset_exists_inducing` (ce87acc0, landed): χ=Ind_H θ, θ≠1, W₂⊄Ker θ。
+2. **[Is]2.27 適用**: Res_{W₂} θ = a·φ (φ∈Irr W₂, φ≠1, a=θ(1))。`exists_central_linear_restriction`
+   (W₂⊆Z(H) は case-B; `certainType_W2_le_center`/`W2_le_center` 系)。← 次の brick。
+3. **Ind_H^{W₂} φ = ∑aᵢθᵢ** (θᵢ∈Irr H distinct, Res θᵢ=aᵢφ, θᵢ(1)=aᵢ, θ=θ₁): Clifford/character。
+4. **αᵢ=χᵢ−aᵢη₁ (χᵢ=Ind_H θᵢ), Supp αᵢ⊆H^#, ∑aᵢαᵢ=Ind_{W₂}^L φ−|H:W₂|η₁, ∑aᵢ²=|H:W₂|**: (6.8.2.2) と接続。
+5. **R(χᵢ)⊥Y^{τ₁}** ((5.3)(5.5))。
+6. **αᵢ^τ=Xᵢ−bᵢY+Zᵢ** (Xᵢ∈Z[R(χᵢ)]) + **(5.4.a) ‖Xᵢ‖²≥‖χᵢ‖² ⟹ bᵢ≤aᵢ**。
+7. **pin bᵢ=aᵢ** ((6.8.2.2): ∑aᵢbᵢ=|H:W₂|=∑aᵢ²)。
+8. **(5.4.b) αᵢ^τ=Xᵢ−aᵢY** ⟹ χ=χ₁ で `(χ−aη₁)^τ=X₁−aY`。【本丸 = steps 5-8 の R(χ) 統合】
+### 📋 τ₂ assembly: `IsCoherent τ (Xset W₂ ∪ Yset) (supportInSubgroup H^# L)` を直接 constructor で:
+ν=τ₂ (supported=τ, η₁↦Y=cY.ext η₁, χ↦X₁(χ) [(6.8.2.3)]) + isometry (generator 上, (6.8.2.3)+cY) +
+ZIrr (X₁,Y∈ZIrr)。reducible μ_j も χ∈X として (6.8.2.3) で一律処理 (whole-lattice, 反復 retarget 不要)。
+
+**正本=本 cont.²⁵。route 実行可能・brick-friendly 確認。entry landed。次 brick = step 2 ([Is]2.27 で
+Res_{W₂} θ = a·φ)。item 1 (X_irr-coh) は廃棄確定 (教科書非対応)。glue shell は (6.8.2.3) 完成後に
+置換判断 (cX 不要ゆえ最終的に未使用化見込み)。**
