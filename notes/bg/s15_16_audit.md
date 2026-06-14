@@ -109,6 +109,30 @@ deferred としている。そのうち **containment と M-正規性は §14 �
 (c)(d) 追加 + MF(M_σ)=F(M_σ) を別途確認 / Lemma 15.1 の `IsTypeP` 仮説除去（要 type-F 整合確認）。
 **Thm 15.2 一般鎖は新 theorem 不可（monitor gate）ゆえ Theorem A 経由で足りると判断、修正不要**。
 
+## 6. 監査完了 — Thm A/D/E + Cor 15.4/15.9 (2026-06-14 追加)
+
+§16 Thm A statement = mmd L4362、§15 Cor 15.9 = L4298 を照合し残り全 endpoint を監査完了。
+
+- **Thm A** `theoremA_maximal_structure` — ⚠→**✅ A(3) バグ修正** (`33de10f2`): 旧 scaffold は
+  `U⊔M_σ ≤ N(U⊔M_σ)`（任意部分群が自身を正規化する**自明命題**）を述べていた → mmd A(3)
+  `UM_σ ⊴ M` すなわち `M ≤ N(U⊔M_σ)` に修正（Cor 15.3 / Thm II と同型の triviality バグ）。
+  **残る脱落** (proof-time 復元): A(3) `U⊴UK` / A(5) directness `K⊓K*=1` (× を ⊔ で表現) /
+  A(6) `1⊂M_F`・`M'⊂M`・`M'/M_F nilpotent` / A(7) `F(M)=C_M(M_F)M_F`・`K≠1→F(M)⊆M'`。
+- **Thm D** `theoremD_msigma_conjugacy_and_centralizers` — ✅ **概ね faithful** (D(1)-(4) 捕捉;
+  RData で D(3)(4) 構造化)。軽微脱落: D(2) の `M_σ∩M^g = M_σ∩M_σ^g` 等式（cyclic 性は保持）。
+- **Thm E** `theoremE_sigma_partition_and_counting` — ✅ **概ね faithful** (E(1) 濃度 / E(2) σ
+  disjoint / E(3) covering; `hR`/`hRreps` で RData pin 済ゆえ "arbitrary R" 落とし穴回避)。
+- **Cor 15.4** `nilpotent_hall_embeds_in_mf` — ⚠→**✅ 修正** (`b58b5367`, → `_in_msigma`): Hall 仮説
+  脱落 + 結論 `H≤M_F` 過剰主張 → Hall 仮説復元 + `H≤M_σ` 化（mmd は M_σ; H は M で正規とは限らず
+  M_F は従わない）。
+- **Cor 15.9** `centralizer_escape_final_local` — ⚠ **(a)(b) faithful, (c) lossy**: scaffold (c) は
+  `x`/`N_G(⟨x⟩)≤E⊓N` だが mmd は `x_r`(r-part)/`N_E(⟨x_r⟩)⊆E∩N`、かつ `|E∩N|=|N/N'|` 脱落。
+  proof-time に精密化（intricate ゆえ defer）。
+
+⟹ **§15/§16 全 18 endpoint 監査完了**。検出した triviality/over-claim バグ 3 件 (Cor 15.3 /
+Thm A(3) / Cor 15.4) は修正済、Thm II/C/I dichotomy + Cor 15.5/15.9(c) の intricate 脱落は
+proof-time 復元。§14 非依存 API (M_F well-definedness + 通知 notation) は本セッションで完備。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。

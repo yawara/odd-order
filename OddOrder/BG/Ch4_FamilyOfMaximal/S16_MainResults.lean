@@ -149,8 +149,9 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
       IsCyclic ↥K ∧
       M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
-      U ⊔ OddOrder.BG.Ch3.S10.Msigma M ≤
-        Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      -- BG Thm A(3): `UM_σ ⊴ M`, i.e. `M` normalizes `UM_σ` (was a trivial self-normalizing
+      -- `UM_σ ≤ N(UM_σ)`; faithfulness fix, Lane G).
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
       (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
       Kstar ≠ ⊥ ∧
       (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧

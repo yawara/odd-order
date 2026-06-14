@@ -240,12 +240,18 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
-/-- **BG Corollary 15.4** (mmd L4161): nilpotent Hall subgroups embed into the
-`M_F` side of a suitable maximal subgroup. -/
-theorem nilpotent_hall_embeds_in_mf [Finite G]
+/-- **BG Corollary 15.4** (mmd L4215): a nonidentity nilpotent **Hall** subgroup `H` of `G`
+can be embedded in `M_σ` for a suitable maximal subgroup `M` (`H ⊆ M_σ`).
+
+Faithfulness fix (Lane G): the previous scaffold dropped the **Hall** hypothesis (mmd requires
+`H` Hall of `G`) and over-claimed `H ≤ M_F` — the proof only gives `H ⊆ M_σ` (the textbook
+conclusion), and `H ⊆ M_F` does not follow (`H` need not be normal in `M`). -/
+theorem nilpotent_hall_embeds_in_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H : Subgroup G}
-    (hHnil : Group.IsNilpotent ↥H) (hHne : H ≠ ⊥) :
-    ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining H ∧ H ≤ MF M := by
+    (hHnil : Group.IsNilpotent ↥H) (hHne : H ≠ ⊥)
+    (hHall : Ch03.IsHallSubgroup (S14.piSet H) H) :
+    ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining H ∧
+      H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
   sorry
 
 /-- **BG Corollary 15.5** (mmd L4168): decomposition of `F(M)` when the relevant
