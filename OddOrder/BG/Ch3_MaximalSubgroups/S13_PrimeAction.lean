@@ -923,6 +923,74 @@ theorem aInvariant_pSubgroup_le_aInvariant_sylow_subgroup [Finite G] {A N : Subg
       _ ≤ (S' : Subgroup ↥N).map N.subtype := Subgroup.map_mono hPS'
   · rw [hSdef, Subgroup.card_map_of_injective N.subtype_injective, S'.card_eq_multiplicity]
 
+/-- **Lemma 13.6 step 2, the `E'`-centralized Sylow.** For `q ∉ β(M)`, there is an `E₁`-invariant
+Sylow `q`-subgroup `S₀` of `M_σ` contained in `C_G(E')`. (Lemma 12.19 gives a Hall `β'`-subgroup
+`W ⊆ C_{M_σ}(E')` with full `q`-part since `q ∈ β'`, so `|C_{M_σ}(E')|_q = |M_σ|_q`; then
+`exists_aInvariant_sylow_subgroup` for `E₁` acting on `C_{M_σ}(E')`.) -/
+theorem exists_E1inv_sylow_centralizing_derivedE [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime]
+    (hqβ : q ∉ S10.beta M) :
+    ∃ S₀ : Subgroup G, S₀ ≤ S10.Msigma M ∧ IsPGroup q ↥S₀ ∧
+      E₁ ≤ Subgroup.normalizer (S₀ : Set G) ∧
+      S₀ ≤ Subgroup.centralizer (derivedInG E : Set G) ∧
+      Nat.card ↥S₀ = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+  classical
+  obtain ⟨W, hWMσ, hWhall, hE'CW⟩ := derivedE_centralizes_betaComplement hG h
+  set N : Subgroup G := S10.Msigma M ⊓ Subgroup.centralizer (derivedInG E : Set G) with hNdef
+  have hWN : W ≤ N := le_inf hWMσ (Subgroup.le_centralizer_iff.mp hE'CW)
+  have hNMσ : N ≤ S10.Msigma M := inf_le_left
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).surjective
+  -- `E₁ ≤ N_G(N)`: `E₁` normalizes `M_σ` and `E'`, hence `C_G(E')` and `N`.
+  have hE1NMσ : E₁ ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E1_le_M.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hE1NCE' : E₁ ≤ Subgroup.normalizer ((Subgroup.centralizer (derivedInG E : Set G)) : Set G) :=
+    (h.E₁_le.trans (S10.le_normalizer_derivedInG E)).trans
+      (normalizer_le_normalizer_centralizer (derivedInG E))
+  have hE1NN : E₁ ≤ Subgroup.normalizer (N : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    rw [hNdef]
+    simp only [Subgroup.mem_inf]
+    rw [Subgroup.mem_normalizer_iff.mp (hE1NMσ hg) x,
+      Subgroup.mem_normalizer_iff.mp (hE1NCE' hg) x]
+  -- coprime `(|E₁|, |N|)`.
+  have hcop_MσE : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥E) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at h1
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥N) :=
+    (hcop_MσE.symm.coprime_dvd_left (Subgroup.card_dvd_of_le h.E₁_le)).coprime_dvd_right
+      (Subgroup.card_dvd_of_le hNMσ)
+  obtain ⟨S₀, hS₀N, hS₀q, hS₀inv, hS₀card⟩ :=
+    exists_aInvariant_sylow_subgroup hE1NN hcop (Or.inr hNsolv) q
+  -- `|N|_q = |M_σ|_q` (squeeze `W ≤ N ≤ M_σ`, `W` Hall `β'`, `q ∈ β'`).
+  have hfactW : (Nat.card ↥(S10.Msigma M)).factorization q = (Nat.card ↥W).factorization q := by
+    have hqidx : q ∉ ((W.subgroupOf (S10.Msigma M)).index).primeFactors :=
+      fun hh => hWhall.2 q hh hqβ
+    have hcardeq : Nat.card ↥(S10.Msigma M)
+        = Nat.card ↥W * (W.subgroupOf (S10.Msigma M)).index := by
+      rw [← Subgroup.card_mul_index (W.subgroupOf (S10.Msigma M)),
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWMσ).toEquiv]
+    rw [hcardeq, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd
+        (fun hd => hqidx (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)),
+      add_zero]
+  have hcardN : (Nat.card ↥N).factorization q = (Nat.card ↥(S10.Msigma M)).factorization q := by
+    have h1 : (Nat.card ↥W).factorization q ≤ (Nat.card ↥N).factorization q :=
+      (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+        (Subgroup.card_dvd_of_le hWN) q
+    have h2 : (Nat.card ↥N).factorization q ≤ (Nat.card ↥(S10.Msigma M)).factorization q :=
+      (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+        (Subgroup.card_dvd_of_le hNMσ) q
+    exact le_antisymm h2 (hfactW.trans_le h1)
+  exact ⟨S₀, hS₀N.trans hNMσ, hS₀q, hS₀inv, hS₀N.trans inf_le_right, by rw [hS₀card, hcardN]⟩
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
