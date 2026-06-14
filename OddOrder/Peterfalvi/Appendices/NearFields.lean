@@ -485,6 +485,55 @@ theorem twMul_ne_zero {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) : d.twMul x y ≠ 
 theorem add_twMul (a b c : K) : d.twMul (a + b) c = d.twMul a c + d.twMul b c := by
   simp [twMul, map_add, add_mul]
 
+/-- Composing the twist automorphisms adds their exponents: `twAut a (twAut b x) = twAut (a+b) x`. -/
+theorem twAut_twAut (a b : ZMod 2) (x : K) : d.twAut a (d.twAut b x) = d.twAut (a + b) x := by
+  rw [twAut_add]; rfl
+
+/-- `twExp` is multiplicative on nonzero elements: `twExp (y·z) = twExp y + twExp z`. -/
+theorem twExp_mul {y z : K} (hy : y ≠ 0) (hz : z ≠ 0) :
+    d.twExp (y * z) = d.twExp y + d.twExp z := by
+  have hyz : y * z ≠ 0 := mul_ne_zero hy hz
+  rw [twExp, dif_neg hyz, twExp, dif_neg hy, twExp, dif_neg hz,
+    show Units.mk0 (y * z) hyz = Units.mk0 y hy * Units.mk0 z hz from Units.ext rfl,
+    map_mul, toAdd_mul]
+
+/-- `twExp` is `σ`-invariant on nonzero elements: `twExp (σ y) = twExp y`. -/
+theorem twExp_σ {y : K} (hy : y ≠ 0) : d.twExp (d.σ y) = d.twExp y := by
+  have hσy : d.σ y ≠ 0 := by rw [ne_eq, EmbeddingLike.map_eq_zero_iff]; exact hy
+  rw [twExp, dif_neg hσy, twExp, dif_neg hy,
+    show Units.mk0 (d.σ y) hσy = Units.map (d.σ : K →* K) (Units.mk0 y hy) from Units.ext rfl,
+    d.χ_σ]
+
+/-- `twExp` is invariant under every twist automorphism on nonzero elements. -/
+theorem twExp_twAut {y : K} (hy : y ≠ 0) (e : ZMod 2) :
+    d.twExp (d.twAut e y) = d.twExp y := by
+  rcases (by decide : ∀ x : ZMod 2, x = 0 ∨ x = 1) e with he | he <;> subst he
+  · rw [twAut_zero]; rfl
+  · rw [twAut_one]; exact d.twExp_σ hy
+
+/-- The twist exponent of a twisted product (of nonzero elements) adds: a key step for
+associativity. -/
+theorem twExp_twMul {y z : K} (hy : y ≠ 0) (hz : z ≠ 0) :
+    d.twExp (d.twMul y z) = d.twExp y + d.twExp z := by
+  have h1 : d.twAut (d.twExp z) y ≠ 0 := by rw [ne_eq, EmbeddingLike.map_eq_zero_iff]; exact hy
+  rw [twMul, d.twExp_mul h1 hz, d.twExp_twAut hy]
+
+/-- Associativity of the twisted multiplication: `(x ∘ y) ∘ z = x ∘ (y ∘ z)`. -/
+theorem twMul_assoc (x y z : K) : d.twMul (d.twMul x y) z = d.twMul x (d.twMul y z) := by
+  rcases eq_or_ne x 0 with hx | hx
+  · subst hx; simp
+  rcases eq_or_ne y 0 with hy | hy
+  · subst hy; simp
+  rcases eq_or_ne z 0 with hz | hz
+  · subst hz; simp
+  have key : d.twExp (d.twMul y z) = d.twExp y + d.twExp z := d.twExp_twMul hy hz
+  change d.twAut (d.twExp z) (d.twMul x y) * z
+     = d.twAut (d.twExp (d.twMul y z)) x * d.twMul y z
+  rw [key]
+  change d.twAut (d.twExp z) (d.twAut (d.twExp y) x * y) * z
+     = d.twAut (d.twExp y + d.twExp z) x * (d.twAut (d.twExp z) y * z)
+  rw [map_mul, twAut_twAut, mul_assoc, add_comm (d.twExp z) (d.twExp y)]
+
 end TwistData
 
 end TwistedNearField
