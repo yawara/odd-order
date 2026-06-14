@@ -892,6 +892,144 @@ theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
     have ha : a ∈ Subgroup.center G := hc ▸ Subgroup.mem_top a
     exact (Subgroup.mem_center_iff.mp ha b).symm
 
+/-- **`C_G(P)` の Hall `θ`-部分群で指定 `θ`-部分群 `U` を含むもの** (`P ≠ 1`): 可解群の Hall
+D-定理 (`Ch03.hall_D`) を `↥C_G(P)` に適用。Lemma 13.8 GAP 2 で `H ⊇ C_{M_β}(P)` (M 側) /
+`H ⊇ C_{M*_β}(P)` (M* 側) を取るのに使う。 -/
+theorem exists_hall_theta_ge [Finite G] (hG : IsMinimalSimpleOdd G) {P : Subgroup G} (hP : P ≠ ⊥)
+    {θ : Set ℕ} {U : Subgroup G} (hUC : U ≤ Subgroup.centralizer (P : Set G))
+    (hUθ : Subgroup.IsPiSubgroup θ U) :
+    ∃ H : Subgroup G, H ≤ Subgroup.centralizer (P : Set G) ∧
+      Ch03.IsHallSubgroup θ (H.subgroupOf (Subgroup.centralizer (P : Set G))) ∧ U ≤ H := by
+  haveI : IsSolvable ↥(Subgroup.centralizer (P : Set G)) := centralizer_isSolvable_of_ne_bot hG hP
+  have hcond : ∀ q ∈ (Nat.card ↥(U.subgroupOf (Subgroup.centralizer (P : Set G)))).primeFactors,
+      q ∈ θ := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUC).toEquiv] at hq
+    exact hUθ q hq
+  obtain ⟨H₀, hH₀hall, hUH₀⟩ :=
+    Ch03.hall_D (G := ↥(Subgroup.centralizer (P : Set G))) (π := θ)
+      (U := U.subgroupOf (Subgroup.centralizer (P : Set G))) hcond
+  refine ⟨H₀.map (Subgroup.centralizer (P : Set G)).subtype, Subgroup.map_subtype_le _, ?_, ?_⟩
+  · have heq : (H₀.map (Subgroup.centralizer (P : Set G)).subtype).subgroupOf
+        (Subgroup.centralizer (P : Set G)) = H₀ :=
+      Subgroup.comap_map_eq_self_of_injective
+        (Subgroup.centralizer (P : Set G)).subtype_injective H₀
+    rw [heq]; exact hH₀hall
+  · intro x hxU
+    have hxC : x ∈ Subgroup.centralizer (P : Set G) := hUC hxU
+    rw [Subgroup.mem_map]
+    exact ⟨⟨x, hxC⟩, hUH₀ (Subgroup.mem_subgroupOf.mpr hxU), rfl⟩
+
+/-- **非自明可解部分群の Fitting には素数がある**: `H ≠ 1` が可解なら `F(H) ≠ 1`
+(`fitting_ne_bot_of_solvable_nontrivial`) ゆえ `|F(H)|` を割る素数が存在。Lemma 13.8 GAP 2 で
+`s ∈ π(F(H))` (X = O_s(H) 用) と `t ∈ π(F(C_{M_β}(P)))` (Y = O_t 用) を取るのに使う。 -/
+theorem exists_mem_primeFactors_fittingInG [Finite G] {H : Subgroup G}
+    (hHsolv : IsSolvable ↥H) (hH : H ≠ ⊥) :
+    ∃ s : ℕ, s ∈ (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors := by
+  haveI := hHsolv
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hH
+  have hFne : Ch01.fitting ↥H ≠ ⊥ := Ch01.fitting_ne_bot_of_solvable_nontrivial ↥H
+  haveI : Nontrivial ↥(Ch01.fitting ↥H) := (Subgroup.nontrivial_iff_ne_bot _).mpr hFne
+  have hcard : Nat.card ↥(Ch2.S08.fittingInG H) = Nat.card ↥(Ch01.fitting ↥H) :=
+    Subgroup.card_map_of_injective H.subtype_injective
+  have hgt : 1 < Nat.card ↥(Ch2.S08.fittingInG H) := by
+    rw [hcard]; exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+  obtain ⟨s, hsp, hsd⟩ := (Nat.card ↥(Ch2.S08.fittingInG H)).exists_prime_and_dvd (by omega)
+  exact ⟨s, Nat.mem_primeFactors.mpr ⟨hsp, hsd, Nat.card_pos.ne'⟩⟩
+
+/-- **Lemma 13.8 GAP 2 の `r` 抽出** (`H ≤ M` 確立後): `H` を `C_G(P)` の Hall
+`(β(M)∪β(M*))`-部分群で `H ≤ M`, `Y₀* = C_{M*_β}(P)` を `C_G(P)` の非自明 `β(M*)`-部分群と
+すると、ある素数 `r ∈ β(M*)` が `|C_M(P)|` を割り `r ∉ σ(M)`。
+
+`r ∈ π(Y₀*) ⊆ β(M*)` を取る; `r ∈ θ` かつ `H` Hall θ ゆえ `r ∤ [C:H]` (`index_no_pi`)、
+`|C| = |H|·[C:H]` で `r ∣ |H| ∣ |C_M(P)|`。`r ∉ σ(M)` は Lemma 10.12(a)
+(`disjoint_of_not_conj`, `α(M*)∩σ(M)=∅`)。 -/
+theorem exists_prime_betastar_dvd_of_hall_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M) {P H : Subgroup G}
+    (hHC : H ≤ Subgroup.centralizer (P : Set G)) (hHM : H ≤ M)
+    (hHhall : Ch03.IsHallSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (H.subgroupOf (Subgroup.centralizer (P : Set G))))
+    {Y₀star : Subgroup G} (hY₀starne : Y₀star ≠ ⊥)
+    (hY₀starC : Y₀star ≤ Subgroup.centralizer (P : Set G))
+    (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
+    ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
+      r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
+  haveI : Nontrivial ↥Y₀star := (Subgroup.nontrivial_iff_ne_bot _).mpr hY₀starne
+  obtain ⟨r, hrp, hrd⟩ := (Nat.card ↥Y₀star).exists_prime_and_dvd
+    (by have := Finite.one_lt_card_iff_nontrivial.mpr ‹Nontrivial ↥Y₀star›; omega)
+  have hrβstar : r ∈ S10.beta Mstar :=
+    hY₀starβ r (Nat.mem_primeFactors.mpr ⟨hrp, hrd, Nat.card_pos.ne'⟩)
+  have hrC : r ∣ Nat.card ↥(Subgroup.centralizer (P : Set G)) :=
+    hrd.trans (Subgroup.card_dvd_of_le hY₀starC)
+  -- `r ∤ [C:H]` because `r ∈ θ` and `H` is a Hall θ-subgroup.
+  have hr_ndvd_idx : ¬ r ∣ (H.subgroupOf (Subgroup.centralizer (P : Set G))).index := by
+    intro hdvd
+    exact (hHhall.index_no_pi r
+      (Nat.mem_primeFactors.mpr ⟨hrp, hdvd, Subgroup.index_ne_zero_of_finite⟩)) (Or.inr hrβstar)
+  -- `|C| = |H| · [C:H]`, so `r ∣ |H|`.
+  have hcardeq : Nat.card ↥(H.subgroupOf (Subgroup.centralizer (P : Set G))) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHC).toEquiv
+  have hlag : Nat.card ↥H * (H.subgroupOf (Subgroup.centralizer (P : Set G))).index =
+      Nat.card ↥(Subgroup.centralizer (P : Set G)) := by
+    rw [← hcardeq]; exact Subgroup.card_mul_index _
+  have hrH : r ∣ Nat.card ↥H := by
+    rw [← hlag] at hrC
+    exact (hrp.dvd_mul.mp hrC).resolve_right hr_ndvd_idx
+  have hrMC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) :=
+    hrH.trans (Subgroup.card_dvd_of_le (le_inf hHM hHC))
+  have hrσ : r ∉ S10.sigma M := by
+    intro hrσM
+    have hdisj := (S10.disjoint_of_not_conj hG hMstar hM hnc').1.2
+    have hmem : r ∈ S10.alpha Mstar ∩ S10.sigma M :=
+      ⟨S10.beta_subset_alpha Mstar hrβstar, hrσM⟩
+    rw [hdisj] at hmem
+    simpa using hmem
+  exact ⟨r, hrp, hrβstar, hrMC, hrσ⟩
+
+/-- **Lemma 13.8 GAP 2 (M-oriented 全体)**: `H ⊇ Y₀ = C_{M_β}(P)` を `C_G(P)` の Hall
+`(β(M)∪β(M*))`-部分群、`s ∈ β(M) ∩ π(F(H))`, `Y₀*` = `C_{M*_β}(P)` を非自明 `β(M*)`-部分群
+とすると、ある素数 `r ∈ β(M*)` が `|C_M(P)|` を割り `r ∉ σ(M)`。
+
+`Y = O_t(Y₀)` (`t ∈ π(F(Y₀)) ⊆ β(M)`) を bridge に `hall_le_of_fitting_prime` で `H ≤ M`、
+`exists_prime_betastar_dvd_of_hall_le` で `r` を抽出。本体 `forbidden_config_impossible` は
+`s ∈ π(F(H))` が `β(M)` / `β(M*)` どちらに落ちるかで本補題を向きを変えて適用する (WLOG)。 -/
+theorem oriented_r_existence [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M) {P H : Subgroup G}
+    (hHC : H ≤ Subgroup.centralizer (P : Set G))
+    (hHhall : Ch03.IsHallSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (H.subgroupOf (Subgroup.centralizer (P : Set G))))
+    {s : ℕ} [Fact s.Prime] (hsβ : s ∈ S10.beta M)
+    (hsF : s ∈ (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors)
+    {Y₀ : Subgroup G} (hY₀ne : Y₀ ≠ ⊥) (hY₀M : Y₀ ≤ M) (hY₀H : Y₀ ≤ H)
+    (hY₀β : Subgroup.IsPiSubgroup (S10.beta M) Y₀)
+    {Y₀star : Subgroup G} (hY₀starne : Y₀star ≠ ⊥)
+    (hY₀starC : Y₀star ≤ Subgroup.centralizer (P : Set G))
+    (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
+    ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
+      r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hY₀solv : IsSolvable ↥Y₀ :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hY₀M)
+  obtain ⟨t, htF⟩ := exists_mem_primeFactors_fittingInG hY₀solv hY₀ne
+  haveI : Fact t.Prime := ⟨Nat.prime_of_mem_primeFactors htF⟩
+  have htβ : t ∈ S10.beta M := by
+    apply hY₀β
+    have hdvd : t ∣ Nat.card ↥Y₀ :=
+      (Nat.mem_primeFactors.mp htF).2.1.trans
+        (Subgroup.card_dvd_of_le (Ch2.S08.fittingInG_le Y₀))
+    exact Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors htF, hdvd, Nat.card_pos.ne'⟩
+  have hYne : opiCoreInG ({t} : Set ℕ) Y₀ ≠ ⊥ :=
+    Ch2.S08.opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG htF
+  have hYt : IsPGroup t ↥(opiCoreInG ({t} : Set ℕ) Y₀) :=
+    isPGroup_of_isPiSubgroup_singleton (isPiSubgroup_opiCoreInG _ _)
+  have hYY₀ : opiCoreInG ({t} : Set ℕ) Y₀ ≤ Y₀ := opiCoreInG_le _ _
+  have hHM : H ≤ M :=
+    hall_le_of_fitting_prime hG hM hsβ hsF htβ hYne hYt (hYY₀.trans hY₀M) (hYY₀.trans hY₀H)
+  exact exists_prime_betastar_dvd_of_hall_le hG hM hMstar hnc' hHC hHM hHhall
+    hY₀starne hY₀starC hY₀starβ
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
