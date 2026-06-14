@@ -937,6 +937,56 @@ theorem exists_mem_primeFactors_fittingInG [Finite G] {H : Subgroup G}
   obtain ⟨s, hsp, hsd⟩ := (Nat.card ↥(Ch2.S08.fittingInG H)).exists_prime_and_dvd (by omega)
   exact ⟨s, Nat.mem_primeFactors.mpr ⟨hsp, hsd, Nat.card_pos.ne'⟩⟩
 
+/-- **Lemma 13.8 GAP 2 の `r` 抽出** (`H ≤ M` 確立後): `H` を `C_G(P)` の Hall
+`(β(M)∪β(M*))`-部分群で `H ≤ M`, `Y₀* = C_{M*_β}(P)` を `C_G(P)` の非自明 `β(M*)`-部分群と
+すると、ある素数 `r ∈ β(M*)` が `|C_M(P)|` を割り `r ∉ σ(M)`。
+
+`r ∈ π(Y₀*) ⊆ β(M*)` を取る; `r ∈ θ` かつ `H` Hall θ ゆえ `r ∤ [C:H]` (`index_no_pi`)、
+`|C| = |H|·[C:H]` で `r ∣ |H| ∣ |C_M(P)|`。`r ∉ σ(M)` は Lemma 10.12(a)
+(`disjoint_of_not_conj`, `α(M*)∩σ(M)=∅`)。 -/
+theorem exists_prime_betastar_dvd_of_hall_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M) {P H : Subgroup G}
+    (hHC : H ≤ Subgroup.centralizer (P : Set G)) (hHM : H ≤ M)
+    (hHhall : Ch03.IsHallSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (H.subgroupOf (Subgroup.centralizer (P : Set G))))
+    {Y₀star : Subgroup G} (hY₀starne : Y₀star ≠ ⊥)
+    (hY₀starC : Y₀star ≤ Subgroup.centralizer (P : Set G))
+    (hY₀starβ : Subgroup.IsPiSubgroup (S10.beta Mstar) Y₀star) :
+    ∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
+      r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M := by
+  haveI : Nontrivial ↥Y₀star := (Subgroup.nontrivial_iff_ne_bot _).mpr hY₀starne
+  obtain ⟨r, hrp, hrd⟩ := (Nat.card ↥Y₀star).exists_prime_and_dvd
+    (by have := Finite.one_lt_card_iff_nontrivial.mpr ‹Nontrivial ↥Y₀star›; omega)
+  have hrβstar : r ∈ S10.beta Mstar :=
+    hY₀starβ r (Nat.mem_primeFactors.mpr ⟨hrp, hrd, Nat.card_pos.ne'⟩)
+  have hrC : r ∣ Nat.card ↥(Subgroup.centralizer (P : Set G)) :=
+    hrd.trans (Subgroup.card_dvd_of_le hY₀starC)
+  -- `r ∤ [C:H]` because `r ∈ θ` and `H` is a Hall θ-subgroup.
+  have hr_ndvd_idx : ¬ r ∣ (H.subgroupOf (Subgroup.centralizer (P : Set G))).index := by
+    intro hdvd
+    exact (hHhall.index_no_pi r
+      (Nat.mem_primeFactors.mpr ⟨hrp, hdvd, Subgroup.index_ne_zero_of_finite⟩)) (Or.inr hrβstar)
+  -- `|C| = |H| · [C:H]`, so `r ∣ |H|`.
+  have hcardeq : Nat.card ↥(H.subgroupOf (Subgroup.centralizer (P : Set G))) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHC).toEquiv
+  have hlag : Nat.card ↥H * (H.subgroupOf (Subgroup.centralizer (P : Set G))).index =
+      Nat.card ↥(Subgroup.centralizer (P : Set G)) := by
+    rw [← hcardeq]; exact Subgroup.card_mul_index _
+  have hrH : r ∣ Nat.card ↥H := by
+    rw [← hlag] at hrC
+    exact (hrp.dvd_mul.mp hrC).resolve_right hr_ndvd_idx
+  have hrMC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) :=
+    hrH.trans (Subgroup.card_dvd_of_le (le_inf hHM hHC))
+  have hrσ : r ∉ S10.sigma M := by
+    intro hrσM
+    have hdisj := (S10.disjoint_of_not_conj hG hMstar hM hnc').1.2
+    have hmem : r ∈ S10.alpha Mstar ∩ S10.sigma M :=
+      ⟨S10.beta_subset_alpha Mstar hrβstar, hrσM⟩
+    rw [hdisj] at hmem
+    simpa using hmem
+  exact ⟨r, hrp, hrβstar, hrMC, hrσ⟩
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
