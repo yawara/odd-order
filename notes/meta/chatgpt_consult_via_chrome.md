@@ -65,20 +65,32 @@ el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true,
 - 戻り値の `editorLen`/`head`/`tail` で全文が入ったか検証する (ProseMirror が段落区切りを足すので
   editorLen は targetLen より少し大きくなるのが正常; head/tail 一致を確認)。
 
-### 3. 送信前に目視 → 送信
+### 3. 送信前に目視 → 送信 ★座標は paste 後に取り直す★
 
-`computer{action:"screenshot"}` で composer に全文が入り送信ボタン (右下の上矢印) が有効なのを確認 →
-そのボタンを `computer{action:"left_click", coordinate:[…]}` でクリック。座標は screenshot から読む
-(lane-b 実測では 1502×818 window で概ね `[1172, 765]`、ただし window サイズ依存なので毎回確認)。
-Enter キー送信でも可だが、ボタンクリックの方が誤爆しにくい。
+**重要 (lane-f 2026-06-15 実測)**: 長文 paste 後は composer が縦に伸びて**送信ボタンが下へ動く**。
+paste **前**の screenshot 座標を使い回すと空白をクリックして送信されない。手順:
+1. paste 後に `computer{action:"screenshot", tabId}` を**取り直す**。
+2. 右下の上矢印 (送信ボタン、`Pro 拡張` の右隣) を `computer{action:"left_click", coordinate:[…], tabId}` でクリック
+   (1456×840 window で実測 `[1137, 789]`。window/composer 高さ依存ゆえ毎回 screenshot から読む)。
+3. **送信できたか必ず JS で検証** (クリック成功 ≠ 送信成功): `msgCount` が +1、`composerEmpty===true`、
+   `isGenerating===true` を確認 (下記スニペット)。未送信なら座標を直して再クリック。
+```js
+(() => { const t=[...document.querySelectorAll('[data-message-author-role]')];
+  const el=document.querySelector('#prompt-textarea')||document.querySelector('div[contenteditable="true"]');
+  return { msgCount:t.length, composerEmpty: el? el.innerText.trim().length===0 : 'no-el',
+    isGenerating: !!document.querySelector('button[data-testid="stop-button"]')||!!document.querySelector('[data-testid="stop-streaming-button"]'),
+    lastRole: t.at(-1)?.getAttribute('data-message-author-role') }; })()
+```
+Enter キー送信でも可だが、ボタンクリック + JS 検証の方が誤爆しにくい。
 
-### 4. 回答を待つ → 読む
+### 4. 回答を待つ → ★text で読む★ (screenshot で読まない)
 
-- ChatGPT **Pro の推論は遅い** (lane-b 実測で思考 **12分超**)。外部生成はハーネスが完了を検知できない
-  ので、`ScheduleWakeup{delaySeconds:~720}` で自分でポーリングする (/loop 文脈なら prompt に
-  `/loop <元の指示>` を渡して再入)。
-- 完了後 `get_page_text{tabId}` で回答全文を取得 (article 本文を優先抽出してくれる)。screenshot より
-  テキスト取得の方が長文回答に向く。
+- ChatGPT **Pro の推論は遅い** (実測 **12〜19分**)。外部生成はハーネスが完了を検知できないので
+  `ScheduleWakeup` で自分でポーリング (/loop 文脈なら prompt に `/loop <指示>` を渡して再入)。13.10 が
+  18m42s だった例から、初回 ~900s → まだ `isGenerating` なら ~300s 刻みで再ポーリングが効率的。
+- **回答は必ず `get_page_text{tabId}` の text で読む** (ユーザー明示 2026-06-15)。screenshot は冒頭しか
+  見えず長文回答に不適。`get_page_text` は article 本文を優先抽出するので最新 assistant turn を全文取れる。
+  完了判定は §3 の JS (`isGenerating===false` かつ最後が assistant) で先に確認してから読む。
 - **回答は鵜呑みにせず全 step 厳密検証**してから形式化 (memory の方針通り)。
 
 ## tier の注意 (なぜ拡張 MCP を使うか)
@@ -93,5 +105,17 @@ OS レベルの `mcp__computer-use__*` では Chrome は tier **"read"** (クリ
 2. composer は textarea でなく ProseMirror contenteditable → 長文は JS 合成 paste で入れる。
 3. `type` で改行入り長文は途中送信の危険 (Enter=送信)。
 4. `javascript_tool` はトップレベル await 非対応 → 同期 or async IIFE。
-5. 送信ボタン座標は window サイズ依存 → 毎回 screenshot で確認。
-6. Pro は思考 10分超もある → ScheduleWakeup でポーリング、get_page_text で回収。
+5. 送信ボタン座標は window/composer 高さ依存 + **paste 後にボタンが下へ動く** → paste **後**に
+   screenshot を取り直してから click。送信は JS (`msgCount`/`composerEmpty`/`isGenerating`) で検証。
+6. Pro は思考 12〜19分 → ScheduleWakeup でポーリング、**回答は `get_page_text` の text で読む** (screenshot 不可)。
+7. **`javascript_tool` / `computer` は `tabId` 必須** (忘れると `InputValidationError: tabId Required`)。
+8. **base64 にしない** (lane-f 2026-06-15 のミス)。本文は template literal に**直接**入れる — ただし
+   本文から **backtick / `${` / `\`** を除いておく (プロンプトは最初から backtick-free で書く; markdown の
+   `\*` escape も外す)。これで unicode (σ τ ℰ ◁ 等) もそのまま忠実に paste される。
+
+## ✅ 確認済レシピ (2026-06-15 lane-f が B method を再現・skill 化候補)
+
+ToolSearch (記述キーワード) → `tabs_context_mcp{createIfEmpty:false}` で ChatGPT tab の tabId 取得 →
+プロンプトを backtick-free で用意 (`notes/.../*_chatgpt_prompt.md` 保存) → §2 の合成 paste JS (tabId 付き、
+template literal 直接) → JS で `editorLen≈targetLen`+head/tail 検証 → §3 で paste 後 screenshot → 送信ボタン
+click → JS で送信検証 → `ScheduleWakeup`(~900s) ポーリング → §4 `get_page_text` で text 回収 → 厳密検証 → Lean 化。
