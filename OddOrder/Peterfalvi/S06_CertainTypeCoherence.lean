@@ -567,4 +567,32 @@ theorem certainTypeRImage_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   · -- (true,true): δ·(δ·[ip=iq]) = [ip=iq]
     rw [← mul_assoc, hδsq, one_mul]
 
+/-- `R(μ_j)` is injective on `Bool × Fin w₁` (distinct orthonormal vectors are distinct): a
+corollary of `certainTypeRImage_inner`, since `R p = R q` would force `⟨R p, R q⟩ = 1 ≠ 0`. -/
+theorem certainTypeRImage_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂') :
+    Function.Injective (certainTypeRImage h χ₂ χ₂') := by
+  intro p q hpq
+  by_contra hpqne
+  have h0 := certainTypeRImage_inner h hne p q
+  rw [if_neg hpqne, hpq, certainTypeRImage_inner h hne, if_pos rfl] at h0
+  exact one_ne_zero h0
+
+/-- The sum of the `R(μ_j)` family over `Bool × Fin w₁` is `δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`, the
+right-hand side of the (4.9) summed isometry `certainType_diff_dade_sum_eq`.  This is the image-side
+of the `(μ_j − μ̄_j)^τ = ∑_{α ∈ R(μ_j)} α` equation (the left half being the column difference). -/
+theorem certainTypeRImage_sum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ∑ p : Bool × Fin (Nat.card h.W1), certainTypeRImage h χ₂ χ₂' p
+      = ((h.columnFamily χ₂).sign : ℂ) •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  rw [Fintype.sum_prod_type, Fintype.sum_bool, Finset.smul_sum]
+  simp only [certainTypeRImage, neg_smul, smul_sub]
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by abel)
+
 end OddOrder.Peterfalvi.S06
