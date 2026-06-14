@@ -2225,3 +2225,28 @@ package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ �
 3. (5.4.b) αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY` (6.8.2.3 本体) → τ₂ direct assembly (S08)。
 **正本=本 cont.³⁶。R(μ_j) producer 完成 (重要マイルストン)。次=S08 case-B per-constituent assembly
 (S06 R-producer 群を (6.8.2.3) で組む; τ vs hyp.tau の整合 + Y-coherence τ₁ 供給が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁷, /loop): ✅ τ-seam の核心解決 — generic inner-preservation landed
+
+### 精査 (τ-seam の正体): per-constituent CharacterPsiDecomposition (`ofProjection`) は
+{χ−χ̄, χ−aη₁} 上の inner-preservation を要するが、η₁∉certainTypeSet ゆえ `certainTypeExtension_inner_eq`
+(certainTypeSet 内部) では不足。**汎用 `dadeIntegralCharacterMap_inner_eq_on_supported_span` は
+`hconj` を要求**し、certain-type τ=`dadeICM h.dade0 h.tau` の `h.tau` は **generic FullDadeIsometryData
+(hconj 無し, Hypothesis46 の field)** ゆえ直接適用不可。← これが τ-seam の核心。
+
+### ✅ landed (5fee74e5, axiom-clean 標準3, **full build 3813/108s** ← S07 touch で全 Pf 鎖再 elab):
+**`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data`** (S07, 既存 lemma 直後):
+任意 `dade : FullDadeIsometryData hyp` で inner-preservation 成立 (hconj 不要)。証明 =
+`apply_of_support` (lift=hyp.dadeMap) + `IsDadeMap.unique hyp.isDadeMap_dadeMap dade.toDadeIsometryData.isDadeMap`
+(hyp.dadeMap=dade.toDadeMap) + `FullDadeIsometryData.inner_eq` (dade 自身の isometry, S04:3821 hconj 不要)。
+**⟹ certain-type τ で ofProjection が使える。** ⚠ **S07 (upstream) touch は ~108s**; 以後 S06/S08 は ~8s。
+
+### ▶ 残 per-constituent assembly (S06/S08, この inner-preservation を使う):
+1. **μ_j 用 CharacterPsiDecomposition** = `certainTypeR` (R(μ_j)) + `ofProjection` (τ=dadeICM h.dade0 h.tau,
+   inner-preservation=本 cont.³⁷ generic 版, htau1_mema=τ(μ_j−aη₁)∈ZIrr, orthogonalities
+   ⟨μ_j,η₁⟩=0 [X⊥Y] / ⟨μ_k,η₁⟩=0 / ⟨μ_j,μ_k⟩=0 [columnFamily_mu_sum_inner])。
+   irreducible χ 用は `decompositionDaFromDadeOfDiff` 既存。
+2. αᵢ^τ=Xᵢ−bᵢY+Zᵢ + (5.4.a) bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq) → bᵢ=aᵢ → (5.4.b)。
+3. per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly (S08, hyp.tau↔certain-type τ は supported 上 map-agreement)。
+**正本=本 cont.³⁷。τ-seam 核心解決。次=μ_j CharacterPsiDecomposition (ofProjection 組立、orthogonality
+inputs + ZIrr membership 供給; S08 で η₁ context)。**
