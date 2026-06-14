@@ -2578,3 +2578,25 @@ inner_X_Y_eq_zero_of_orthogonal Da (fun α hα => by
 3. **capstone glue**: hyp.cases (Frobenius/CertainType 分割) + ν 構成 + Y-coherence と glue。
 **要: η̄₁∈Y 共役閉包 (capstone で η'=η̄₁ 用; `induce_linearIrreducibleCharacter_mem_Yset` + 共役 linear χ⁻¹≠1)。または \|Y\|≥2 で任意の η'≠η₁。**
 **正本=本 session 41 cont。(6.8.2.3) 全直交性 DONE (7 commits)。次=per_constituent 適用。full build 3813 green。Opus 継続。**
+
+### ✅ session 41 cont.² (/loop): hXorth が capstone-ready 形に完成 (2 commits)
+| commit | lemma | 役割 |
+|---|---|---|
+| `a88c3a5f` | `inner_decomposition_X_coherentYset_extension_eq_zero` | hXorth (generic D + coverage himg): `⟨D.X, η^{τ₁}⟩=0` (η≠η')。coverage 形 `∀ α∈imageSet, ∃ p, certainTypeRImage…p=α` で DecidableEq 回避 |
+| `ca7f5fe8` | **`inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset`** | **hXorth capstone 形 (η₁∈Y のみ)**: distinct η'=η̄₁ を内部化。`Yset_closedUnderConjugate` (η̄₁∈Y) + `Yset_hasNoRealCharacters` (η₁≠η̄₁, (5.2.a))。**enabler 全既存確認** |
+
+### 🔑 distinct η' の enabler は全既存 (再調査不要):
+- `Yset_closedUnderConjugate : ClosedUnderConjugate hyp.Yset` (S08_CoherenceCorePart2:1447) — η.conj∈Y
+- `Yset_hasNoRealCharacters` (:1421) + `HasNoRealCharacters.not_mem_of_isReal` (S03:82) — η≠η.conj
+- `two_le_Yset_ncard` (:1478) — |Y|≥2 も既存
+⟹ **hXorth は η₁∈Y だけで供給可能。capstone は他の per_constituent 入力 (family/aggregate) のみ残す。**
+
+### ▶▶ 次 = per_constituent 適用 ((6.8.2.3) 結論 `(μ_j−aη₁)^τ=X₁−aY`):
+`per_constituent_Y_eq_smul` の入力:
+- **D (family)**: constituent θ∈Irr H で χθ=induce H θ、Dθ=各 (5.4) 分解 (`certainTypeDecompositionDa` は columnSum 用; θ-family は要精査 — μ_j 列 vs 一般 θ の対応)。
+- **hagg**: `tau_sum_smul_image` + `sum_smul_constituent_diff_eq` (∑aθαθ=Ind φ−|H:Z|η₁, S08:566 証明済) + `exists_decomposition_caseB` (S08:126, τ(Ind φ−|H:Z|η₁)=Xagg−|H:Z|Y)。
+- **hsq**: ∑aθ²=n=|H:Z| (`sum_inner_restrict_sq_eq_index`, S08:537)。
+- **hXorth**: ✅ 上記 capstone 形。
+- **hbi/hYY/hXaggorth**: 整数性 + norm-1 + Xagg⊥Y (exists_decomposition_caseB の horth)。
+**🔬 要精査: constituent family の θ-indexing (induce H θ が X(μ_j) か Y か, 各 Dθ の構成)。これが per_constituent assembly の核。**
+**正本=本 session 41 cont.²。hXorth 完成 (capstone-ready)。次=per_constituent family/aggregate 集約。full build 3813。Opus 継続。**
