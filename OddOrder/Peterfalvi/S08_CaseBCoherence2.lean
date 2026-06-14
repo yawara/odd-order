@@ -1858,6 +1858,37 @@ noncomputable def columnDecompositionTau
         hyp.dade hyp.hconj hSdiff hφ hζ)
     rfl htau1_mema hχψ hχbarψ hχχbar
 
+/-- **(6.8.2.3) irreducible constituent decomposition for `hyp.tau`.**  The (5.4) decomposition data
+for an irreducible induced constituent `Ind^L_H θ` (non-column `θ`), via `decompositionDaFromDadeOfDiff`
+for the Sibley–Dade datum `hyp.dade` (which carries `hyp.hconj : HConjInvariant`).  Since
+`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`, this lands
+directly in `hyp.tau` — the *same* map as the column decompositions (`columnDecompositionTau`), so
+both branches feed one per-`φ` family.  The per-`θ` orthonormality/support/`ZIrr` hypotheses are
+discharged at the family (from the §5 X-member machinery, as in the case-A chain). -/
+noncomputable def irreducibleDecompositionTau
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (θ : IrreducibleCharacter ↥H)
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hreal : ¬ ClassFunction.IsReal (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    (hdiffsupp : ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+        - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hdiffasupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (htau1_mema : hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁) ∈ ZIrr G)
+    (hχaχ1 : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbaraχ1 : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχχbar' : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+      (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (a • η₁) :=
+  OddOrder.Peterfalvi.S07.decompositionDaFromDadeOfDiff hyp.dade hyp.hconj
+    ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ hreal hdiffsupp hdiffasupp htau1_mema
+    hχaχ1 hχbaraχ1 hχχbar'
+
 /-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
 `μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
 irreducible `θ` of `H` with `W₂ ⊆ Ker θ` induces to `μ_j`.
