@@ -260,6 +260,18 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   building blocks (7): step1/normalizer-growth/collapse/conj-into-Msigma/hall_le/**centralizer_solvable**。
   - 次: (B') r-existence_or_swapped (Hall θ 構成 + F(H) prime + hall_le + r 抽出) を執筆。GAP 3 は
     その後 (4 elision を BG 本文 + repo lemma で自力再構成; 詰まれば ChatGPT に該当 elision のみ依頼)。
+- 2026-06-14 (Lane F, /loop 続き¹³): **🎉🎉🎉 GAP 2 (M-oriented) 完成 — 計 11 building blocks**。
+  3 補題 landed (commits 42b4c551/8877eceb/6524fa30): `exists_mem_primeFactors_fittingInG` (F(H)≠1→素数),
+  `exists_prime_betastar_dvd_of_hall_le` (H≤M 後 r 抽出, Hall index 算術), `oriented_r_existence`
+  (M-oriented GAP 2 全体)。+ `centralizer_isSolvable_of_ne_bot` + `exists_hall_theta_ge` (前 iter)。
+  ### 残り 13.8 (assembly のみ — building blocks 出揃い)
+  - **GAP 3 (oriented, symmetric)**: r∈β(M*)∣|C_M(P)|, r∉σ(M) + config → False。4 elision:
+    (i) Frattini M=N_M(Q)M_α, (ii) coprime R⊆N_M(Q), (iii) σ'-群 PR を Hall E へ共役 [Thm 13.4 適用],
+    (iv) nilpotent [M_α∩M*,Q]⊆M*_α。X=C_{M_α}(P)≠1 を C_{M_α}(PQ)=1 と矛盾。**次の標的**。
+  - **main dispatch**: H⊇C_{M_β}(P) 構成 (`exists_hall_theta_ge`) → s∈π(F(H)) (`exists_mem_primeFactors_fittingInG`);
+    s∈β(M): `oriented_r_existence`(M,M*)+GAP3(M,M*); s∈β(M*): H*⊇C_{M*_β}(P) + Hall 共役 (`hall_C`)
+    で s∈π(F(H*)) 移送 → `oriented_r_existence`(M*,M)+GAP3(M*,M)。⚠ Hall 共役 + Fitting card 不変が要。
+  - **配線**: step1 両側 + C_{M_α}(P)≠1 を Y₀ に渡す (β(M)-group via Malpha_isPiGroup+α=β)。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
