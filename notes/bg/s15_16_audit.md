@@ -172,6 +172,42 @@ friction: U 構成 / M=KM' source / contradiction の Aut-abelian step。他 end
 cite map が mmd schematic (L4424-4449) から作れる。**実行は focused session が効率的**
 (60s loop では各 endpoint multi-iteration uncommittable WIP)。
 
+## 9. Aut-abelian core landed + Cor 15.6 friction の解消状況 (2026-06-14, `dd10d84d`)
+
+§14 非依存の **Aut-abelian core を S15_MF に landing** (sorry-free, axiom-clean) — Cor 15.6
+conjunct 5 (`¬IsCyclic MF`) のエンジン:
+
+- `actionCommutator_conj_eq_commutator` (private): `actionCommutator (MulAut.conj) = commutator H`。
+- `commutator_le_centralizer_of_normal_isCyclic` (一般・再利用可): N⊴H cyclic ⟹ H' ≤ C_H(N)。
+  BG Thm 4.12 機構 `actionCommutator_le_centralizer_of_isCyclic_isAInvariant` (φ=MulAut.conj) 再利用。
+- `fittingInAmbient_cyclic_imp_derivedDerived_eq_bot`: **F(M) cyclic ⟹ M''=⊥** (M'≤C_M(F(M))≤F(M),
+  F(M) abelian)。`centralizer_fitting_le_fitting` (S01) + 上記 core。
+
+**Cor 15.6 cite map の friction を全点精査して更新** (section 8 の「要 source 確認」を解決):
+
+| conjunct | source | 状態 |
+|---|---|---|
+| `Kstar≠⊥` | `typeP_structure` conjunct 3 (U は `Ch03.hall_E_exists (G:=↥M)` + `map M.subtype` で構成、`exists_hallAlphaSubgroup_isHallInG` がパターン) | ✅ 露出済 (sorried §14, stable) |
+| `IsCyclic Kstar` | `typeP_duality` の `IsCyclic(K⊔Kstar)` + `isCyclic_of_surjective`/subgroup-of-cyclic | ✅ 露出済 (sorried §14, stable) |
+| `Kstar≤MF` | case-split: MF=Msigma (inf_le) ∨ MF≠Msigma (`mf_ne_msigma_typeP1_structure` 露出済 `Kstar≤MF`) | ✅ (sorried, mine) |
+| `Kstar≤M''` | Lemma 6.3 第2結論 `centralizer_inf_le_derivedInG_of_isComplement'` (**proved**, S06_Additional:396) ＋ M=KM' | ⚠ **M=KM' が §14 Thm 14.7(h) に未露出** |
+| `¬IsCyclic MF` | `fittingInAmbient_cyclic_imp_derivedDerived_eq_bot` (proved) ＋ 「MF cyclic⟹F(M) cyclic」(Cor 15.5、要露出) | ✅ engine proved; Cor 15.5 強化要 |
+
+**🔑 ボトルネック更新**: section 8 は Lemma 6.3 を「要 source 確認」としたが **第2結論
+`centralizer_inf_le_derivedInG_of_isComplement'` は proved**(`H⊴G normal Hall 補群 K, H≤G',
+coprime ⟹ C_H(K)⊓H ≤ H'`)。真の唯一の欠落 = **M=KM'** (`IsComplement' (derivedInG M) K`):
+- §14 `typeP_duality` (Thm 14.7) は (h)「M=KM', K∩M'=1」を **露出していない** (statement に無し)。
+- **迂回路**: mmd Lemma 15.1(a)「UM_σ⊴M=KUM_σ」+ (b)「K≠1⟹M'=UM_σ」⟹ M=K·M'、|K| κ-数 /
+  |M'|=|UM_σ| κ'-数 ⟹ K∩M'=1。**MY `typeP_auxiliary_structure` (Lemma 15.1) に
+  `IsComplement' (derivedInG M) K` を sorry-neutral 強化すれば §14 非依存に M=KM' を供給可能**
+  (Lemma 6.3 適用は ↥M 内: H=M'.subgroupOf M, coprime(|M'|,|K|) 要、subtype juggling)。
+
+⟹ **Cor 15.6 は (i) Lemma 15.1 に IsComplement' 強化 + (ii) Cor 15.5 に「MF cyclic⟹F(M) cyclic」
+強化 の 2 つの sorry-neutral 強化を済ませれば、全 conjunct が露出済 cite で証明可能**
+(典型 fragile: typeP_structure/duality/15.2/15.1/15.5 = sorried だが 15.1/15.2/15.5 は mine、
+14.2/14.7 は parametrize-stable)。Thm 14.7(h) 露出待ち (Lane H) は不要に。
+**残 friction = conjunct 4 の Lemma 6.3 ↥M 適用 (subtype + coprime) のみ。** issue 8001 参照。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
