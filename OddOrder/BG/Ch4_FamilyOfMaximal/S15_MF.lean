@@ -258,17 +258,30 @@ theorem nilpotent_hall_embeds_in_msigma [Finite G]
       H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
   sorry
 
-/-- **BG Corollary 15.5** (mmd L4168): decomposition of `F(M)` when the relevant
-Hall subgroup `H` is fixed.  The direct-product claim is represented by the
-commuting/trivial-intersection package. -/
+/-- **BG Corollary 15.5** (mmd L4225): the decomposition `F(M) = F(M_σ) × Y` with
+`Y = O_{σ(M)'}(F(M))` a cyclic `τ₂(M)`-subgroup, together with `F(M) = C_M(M_F)·M_F`,
+`M'' ⊆ F(M)`, `M_F ⊆ M'`, and `K ≠ 1 → F(M) ⊆ M'`.  Direct products are encoded by the
+commuting/trivial-intersection package.
+
+Faithfulness fix (Lane G): the previous scaffold parametrized an arbitrary `H ≤ M_F` (mmd
+fixes `H = M_F`) and used `M_F(M_σ)` where the textbook has the Fitting subgroup `F(M_σ)`
+(`fittingInAmbient (Msigma M)`); the dropped conjuncts (a)/(b)/(d) are restored.  The `M'/M_F`
+nilpotent clause of (c) is still deferred (quotient API). -/
 theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ≤ MF M) :
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ Y : Subgroup G,
-      IsCyclic ↥Y ∧ Y ≤ fittingInAmbient M ∧
-      fittingInAmbient M = (Subgroup.centralizer (H : Set G) ⊓ M) ⊔ H ∧
-      fittingInAmbient M = (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊔ Y ∧
-      (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊓ Y = ⊥ ∧
-      ⁅MF (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ := by
+      -- (a) `Y = O_{σ(M)'}(F(M))` is a cyclic `τ₂(M)`-subgroup of `F(M)`.
+      IsCyclic ↥Y ∧ (↑(Nat.card ↥Y).primeFactors ⊆ tau2 M) ∧ Y ≤ fittingInAmbient M ∧
+      -- (b) `M'' ⊆ F(M) = C_M(M_F)·M_F = F(M_σ) × Y`.
+      derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
+      fittingInAmbient M = (Subgroup.centralizer (MF M : Set G) ⊓ M) ⊔ MF M ∧
+      fittingInAmbient M = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊔ Y ∧
+      fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊓ Y = ⊥ ∧
+      ⁅fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ ∧
+      -- (c) `M_F ⊆ M'` (the `M'/M_F` nilpotent part is deferred — quotient API).
+      MF M ≤ derivedInG M ∧
+      -- (d) if `K ≠ 1` (i.e. `M` is not of type `F`), then `F(M) ⊆ M'`.
+      (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) := by
   sorry
 
 /-- **BG Corollary 15.6** (mmd L4174): for a type-P maximal subgroup, `Kstar` is
