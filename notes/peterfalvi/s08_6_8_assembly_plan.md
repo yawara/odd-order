@@ -2762,3 +2762,18 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 3. **cX_irr** (X_irr coherence, chain ミラー)。
 これらは A/B どの union topology でも要る。**まず (1) per-φ family を組む** (機構は consult 1 で完成、family 供給のみ)。
 **正本=本 session 41 cont.⁷ 訂正。pure Route B 不可 (列 norm≠1)、HYBRID 確定。不可避コア = per-φ anchored 公式。次=per-φ family 構築。**
+
+### cont.⁷ 続: per-φ family 構築マップ (engine/aggregate 完成済を確認、残り = family instantiation)
+**完成済 (consult 1)**: pinning engine `per_constituent_Y_eq_smul` (S08:781, 汎用 — hXorth を per-i で取る) + 列ラッパー `certainType_per_constituent_Y_eq_smul` (S08:1395, himg=certainTypeRImage の **column-only**) + anchored 像 `image_eq_of_decomposition` (Y-collapse → `(χ−aη₁)^τ=X−aY₀`) + aggregate source: `sum_smul_constituent_diff_eq` (S08:566, ∑_{θ:Irr H} aθ•(Ind θ−aθη₁)=Ind_K^M φ−|K:H|η₁) / `sum_inner_restrict_sq_eq_index` (S08:537, ∑aθ²=index) / `tau_sum_smul_image`+`aggregate_eq_sum_of_constituent` (S08:737/754) / `exists_decomposition_caseB` (S08:126)。
+**family building blocks**: 列 = `certainTypeDecompositionDa` (S06:684, `CharacterPsiDecomposition (dadeMap h.dade0 h.tau) (columnSum χ₂) (a•η₁)`; 注: τ は enlarged certain-type Dade map ⟹ `IsCoherent.congrMap` S08:1441 で hyp.tau へ retarget) / 既約 = `decompositionDaFromDadeOfDiff` (S07:5567) / dichotomy = `exists_eq_certainType_or_induce` (S06_Clifford:938, θ=χ_j→Ind=μ_j 列 / else 既約)。
+
+**🔑 mixed family 確定 + 部分型 index (2 つの非自明点)**:
+1. **mixed 確定**: 固定 φ に対し I_φ={θ:Irr H | aθ=⟨φ,Res θ⟩>0} は χ_j (→列 μ_j reducible) と non-χ_j (→既約 Ind θ) を**両方含む** (dichotomy より)。⟹ column-only `certainType_per_constituent_Y_eq_smul` では不足、汎用 `per_constituent_Y_eq_smul` を **dispatch hXorth** (列=seam-1 列 orth / 既約=`inner_decompositionDaFromDadeOfDiff_X_…`) で直接呼ぶ。
+2. **部分型 index**: `Ind θ` は degree≠0 で **non-supported** ⟹ aθ=0 の θ に `CharacterPsiDecomposition τ (Ind θ) 0` は**存在しない**。∴ family の index は全 Irr H 不可、**ι = 部分型 `{θ:Irr H // aθ>0}`** (全 aθ>0、2-way dispatch)。aggregate/∑aθ² は aθ=0 項脱落で univ:Irr H → 部分型へ再添字 (`Finset.sum_subset`/`sum_attach`)。
+
+### ▶▶ 次の具体ステップ (順に landable):
+1. **部分型 aggregate**: `sum_smul_constituent_diff_eq`+`sum_inner_restrict_sq_eq_index` を ι={θ//aθ>0} へ再添字 (hagg/hsq の部分型版)。← 自己完結 brick、まずこれ。
+2. **dispatched family** `D : (θ:ι) → CharacterPsiDecomposition hyp.tau (Ind θ) (aθ•η₁)`: θ=χ_j → certainTypeDecompositionDa (congrMap で hyp.tau 化) / else → decompositionDaFromDadeOfDiff。
+3. **per-χ anchored 公式**: `per_constituent_Y_eq_smul` (dispatch hXorth) + `image_eq_of_decomposition` で `(μ_j−a_jη₁)^τ=X_j−a_jY₀` & 既約版。
+4. → HYBRID union (cX_col ∪ (cY+X_irr)) の diagonal data に投入。
+**正本=本 session 41 cont.⁷ 続。family 構築マップ確定 (mixed + 部分型 index)。次=部分型 aggregate brick。**
