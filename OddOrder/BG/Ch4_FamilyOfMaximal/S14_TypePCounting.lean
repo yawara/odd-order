@@ -192,6 +192,28 @@ def sigmaConjugacySaturation (M : Subgroup G) : Set G :=
 def IsConjugateSubgroup (M N : Subgroup G) : Prop :=
   ∃ g : G, MulAut.conj g • M = N
 
+/-- Subgroup conjugacy is reflexive (conjugate by `1`). -/
+@[refl] theorem IsConjugateSubgroup.refl (M : Subgroup G) : IsConjugateSubgroup M M :=
+  ⟨1, by rw [map_one, one_smul]⟩
+
+/-- Subgroup conjugacy is symmetric (conjugate back by `g⁻¹`). -/
+theorem IsConjugateSubgroup.symm {M N : Subgroup G} (h : IsConjugateSubgroup M N) :
+    IsConjugateSubgroup N M := by
+  obtain ⟨g, hg⟩ := h
+  exact ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+
+/-- Subgroup conjugacy is transitive (compose the conjugators). -/
+theorem IsConjugateSubgroup.trans {M N P : Subgroup G} (h₁ : IsConjugateSubgroup M N)
+    (h₂ : IsConjugateSubgroup N P) : IsConjugateSubgroup M P := by
+  obtain ⟨g, hg⟩ := h₁
+  obtain ⟨g', hg'⟩ := h₂
+  exact ⟨g' * g, by rw [map_mul, mul_smul, hg, hg']⟩
+
+/-- Subgroup conjugacy is an equivalence relation.  (`¬ IsConjugateSubgroup` hypotheses and the
+conjugacy conclusions throughout §14 — Theorem 14.7, Lemma 14.5, Corollary 14.9 — rely on these.) -/
+theorem isConjugateSubgroup_equivalence : Equivalence (IsConjugateSubgroup (G := G)) :=
+  ⟨IsConjugateSubgroup.refl, IsConjugateSubgroup.symm, IsConjugateSubgroup.trans⟩
+
 /-- `Z_tilde = Z - (K union K*)` in Theorem 14.7. -/
 def zTilde (K Kstar : Subgroup G) : Set G :=
   ((K ⊔ Kstar : Subgroup G) : Set G) \ ((K : Set G) ∪ (Kstar : Set G))
