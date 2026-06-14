@@ -2827,3 +2827,14 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 3. **irreducible 分解 (hyp.tau)**: decompositionDaFromDadeOfDiff hyp.dade hyp.hconj 薄ラッパー。
 4. dispatch family + hagg/hbi + pinning + HYBRID union。
 **正本=本 session 41 cont.⁷ 続⁴。τ_enl 不可 (irreducible は hconj 必須)、hyp.tau 統一 forced。column は R-family rebuild。次=columnRFamilyTau。**
+
+### cont.⁷ 続⁵: per-φ family foundation 完成 + 全体組立 scope 確定 (HYBRID, standalone cX 不要)
+**landed (build-green, all axiom-clean)**: `sum_eq_sum_pos_weight_subtype`/`constituentWeight`(一式)/`sum_smul_constituent_diff_pos_weight_subtype` (index/weight/source-aggregate) + `columnRFamilyTau`+`columnDecompositionTau` (column branch hyp.tau) + `irreducibleDecompositionTau` (irreducible branch hyp.tau) + **`per_phi_anchored_image`** (anchored 公式 assembly skeleton: family D 仮説化で `(χᵢ−aᵢη₁)^{hyp.tau}=(D i).X−aᵢY₀` を pinning+tau1_image で sorry-free)。⟹ **(6.8.2.3) core は family 仮説化で完成**、残 gap = family 構築 (D)。
+
+**🎯 全体組立 scope 確定 (HYBRID; standalone cX 不要)**: shell `coherentXunionYset_caseB_of_glued` は cX (full X-coherence) を要すが、それは作らず Route-B 寄りの HYBRID:
+1. **dispatch family D** (capstone 級): `{θ:Irr H//0<aθ}` で column (`columnSum_eq_induce_H ▸ columnDecompositionTau`) / irreducible (`irreducibleDecompositionTau`) 分岐。K=H transport は `rw [hHK]` で可 (columnSum_mem_S が実証)。per-θ 仮説 discharge が bulk。→ `per_phi_anchored_image` に投入 → anchored 公式。
+2. **X_irr を cY に chain-adjoin**: `retarget_isCoherent_of_supportedDecomposition` (S07:4031, 既存) で既約 X-member を 1 ペアずつ cY に adjoin (anchored 公式=供給する supported decomposition)。→ coherence of Y∪X_irr。**standalone cX_irr 不要**。
+3. **columns を §7 union で結合**: (Y∪X_irr)-coherence と cX_col (`certainTypeSet_isCoherent_tau`) を union engine で結合。diagonal=column anchored 公式、cross-orth=mixed-inner toolkit (cont.⁶)。
+4. **capstone** (`sibleySetup_is_coherent` X-nonempty, S08_CoherenceTheorems:59)。
+**realistic scope: 大 (dispatch capstone 級 + 2 段 glue)、多ターン。foundation は landed。次=dispatch family (rw [hHK] transport)。**
+**正本=本 session 41 cont.⁷ 続⁵。per-φ foundation 完成 (7 bricks)。組立=HYBRID (chain-adjoin X_irr + union columns, cX 不要)。次=dispatch family。**
