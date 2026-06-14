@@ -2170,3 +2170,28 @@ package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ �
 3. ⟹ R(μ_j) producer 完成 → per-constituent decomposition (irreducible は `decompositionDaFromDadeOfDiff`
    既存; reducible は R(μ_j) + `ofProjection`) → (5.4.a)+pinning[済]+(5.4.b) → τ₂。
 **正本=本 cont.³⁴。orthonormal core landed (BUILD でループ脱出)。次=imageSet packaging (1.) → image_eq bridge (2.)。**
+
+## 2026-06-14 (session 40 cont.³⁵, /loop 再開): ✅ R(μ_j) producer の infra + image_eq 数学内容 全 landed
+
+### ✅ landed (a7634003 + e75ded15, axiom-clean 標準3, leaf 3601):
+- **`certainTypeRImage_injective`** (a7634003): 署名族は単射 (orthonormality の系)。imageSet=Finset.image
+  の orthonormal field + sum_image に必要。
+- **`certainTypeRImage_sum`** (a7634003): `∑_p R(μ_j) p = δ_j ∑_i(ω_{ij}^σ−ω_{ik}^σ)`
+  (= certainType_diff_dade_sum_eq の RHS)。Fintype.sum_prod_type+sum_bool+smul_sum+abel。
+- **`dadeICM_columnDiff_eq_sum`** (e75ded15, image_eq 数学内容): `dadeICM(μ_j−μ_k)=∑_p R(μ_j) p`。
+  🔑 **既存 `certainTypeExtension_columnDiff_eq_dade` (S06:335) が dade-seam (dadeICM↔toDadeMap) を
+  既に解決済み**だったのを利用 (dadeIntegralCharacterMap_apply_of_support+IsDadeMap.unique+
+  certainType_diff_dade_sum_eq)。+ certainTypeExtension_columnSum + certainTypeRImage_sum +
+  ℤ/ℂ-smul 橋渡し `Int.cast_smul_eq_zsmul`。**⟹ image_eq の hard seam は全消化。**
+
+### ▶ 残 = R(μ_j) producer struct (`OrthonormalCharacterImageFamily (dadeICM h.dade0 h.tau) (columnSum χ₂)`):
+パラメータ χ₂, χ₂' (+ χ₂≠1, χ₂'≠1, hdeg, **conj 同定 `(columnSum χ₂).conj = columnSum χ₂'`**)。
+- `imageSet := Finset.univ.image (certainTypeRImage h χ₂ χ₂')`。
+- `mem_ZIrr`: α=±δ•ω ∈ ZIrr (`Int.cast_smul_eq_zsmul`+`Submodule.zsmul_mem`+`certainTypeOmegaSigma_mem_ZIrr`)。
+- `orthonormal`: `certainTypeRImage_inner` + `certainTypeRImage_injective` (Finset.mem_image 抽出 → α=β↔p=q)。
+- `image_eq`: `rw[conj同定]; rw[Finset.sum_image injective]; exact dadeICM_columnDiff_eq_sum`。
+- **conj 同定** = `(columnSum χ₂).conj = columnSum χ₂'`: `certainType_columnSum_conj` (χ₂'=χ₂⁻¹) +
+  `ClassFunction.conj` vs `mapRingEquiv conjAe` の一致確認 (要精査; これが最後の seam)。
+→ producer 完成後: per-constituent (irreducible=`decompositionDaFromDadeOfDiff` / reducible=R(μ_j)+`ofProjection`)
+→ (5.4.a)+pinning[済]+(5.4.b) → τ₂ assembly。
+**正本=本 cont.³⁵。image_eq 数学内容 完成。次=producer struct 4-field 組立 (conj 同定が最後の seam)。**
