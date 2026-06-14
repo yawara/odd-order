@@ -57,3 +57,19 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
 3. **(a)+(c)**: 12.18 branch-2 (Q∈Syl_q(M)) ⟹ M_α≠1, C_{M_α}(P)≠1, C_{M_α}(PQ)=1。
    (c)=M_α≤M_σ。(a)=GAP B not-prime + 13.7 対偶。
 4. **(b)**: GAP C endgame (Q*, 13.8)。⚠ q*∈β枝の Q*≤M_α を要精査。
+
+### 進捗 (2026-06-15 Lane F /loop, このセッション)
+- ✅ commit `a978a3dd`: cyclic helpers `line_le_of_ne_bot_of_le_cyclic` +
+  `inf_centralizer_eq_bot_of_coprime_cyclic` (indecomposability)。
+- **次イテレーションの起点 = GAP A の A.2 (Q∈Syl_q(M)) factorization**。ツール確定:
+  - `card_Msigma_mul_card_E h : |M_σ|·|E| = |M|` (S12_ECore:243)。
+  - `q∤|M_σ|` (q∉σ): M_σ factorization パターン = S10_BetaRadical:282-293 / 327-332
+    (`(card Msigma).factorization q` 経由)。q∉σ→q∉π(M_σ)。要 helper or inline。
+  - `(card E).factorization q = (card E₃).factorization q` (E₃ Hall τ₃, q∈τ₃):
+    Hall factorization。`h.E₃_hall` + subgroupOf card。S12_E:175 パターン。
+  - ⟹ `(card M).factorization q = (card E₃).factorization q`。
+  - full Sylow Q := `(Sylow q ↥E₃).map E₃.subtype`; `card Q = q^(v_q|E₃|)`;
+    rank-1 Brick 1 の Q'(order q)≤Q + `inf_centralizer_eq_bot_of_coprime_cyclic` で C_Q(P)=⊥;
+    `eq_of_le_of_isPGroup_card_eq_factorization` (13.9 brick) で Q maximal q-subgroup of M。
+- 手順: 全 Sylow brick (Q∈Syl_q(M)+C_Q(P)=⊥) → 12.18 branch-2 → M_α≠1 等 → (c) +
+  GAP B not-prime → (a) → GAP C → (b) → 13.11。
