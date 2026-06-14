@@ -2697,3 +2697,25 @@ case-B X-coherence の `coherentXunionYset_caseB_of_glued` が要求する **hmi
 3. `coherentXunionYset_caseB_of_glued` で X∪Y → capstone。
 **🔑 per_constituent saga は不要と判明。seam-1 が列-Y の鍵。残り = X-internal glue (列∪既約 cross-orth) + §7 union 配線。**
 **正本=本 session 41 cont.⁵。列-Y hmixed seam-1 直接 landed。次=列↔既約 cross-orth + X-coherence glue。**
+
+## 2026-06-15 (session 41 cont.⁶, /loop): ✅✅ mixed-inner toolkit 完成 (generic 化, 列-Y/列-既約 統一)
+
+### ✅ landed (3 commits, axiom-clean, full build 3813):
+| commit | lemma | 役割 |
+|---|---|---|
+| `a20ec426` | `coherent_extension_eq_zsmul_irreducible` | 任意 coherence cS の既約 member 像 = ε·ξ (Y版の一般化) |
+| `4cfe81d5` | **`inner_coherent_extension_certainTypeOmegaSigma_eq_zero`** | **generic seam-1**: 任意 cS + 既約 η,η' (⟨η,η'⟩=0, η−η' H^#-supp) で cS.extension η ⊥ certainTypeOmegaSigma。Y seam-1 は特殊化に refactor |
+| `b224ba0f` | **`inner_certainTypeExtension_columnSum_coherent_extension_eq_zero`** | **generic 列 mixed-inner**: ⟨ν(μ_j), cS.extension χ⟩=0 for 任意 cS + 既約 χ。列-Y と列-既約 両方の hmixed 入力を統一。column-Y は特殊化に refactor |
+
+### 🎯 mixed-inner toolkit 完成 — case-B X∪Y glue の直交性入力は全て揃った:
+- **列-Y / 列-既約 mixed inner**: ✅ `inner_certainTypeExtension_columnSum_coherent_extension_eq_zero` (cS=coherentYset or cX_irr)。
+- **既約-Y mixed inner**: ✅ `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero` (既存)。
+- **既約-既約 (X_irr 内部)**: 既存 §5/§7 (distinct irreducible images orthogonal)。
+
+### ▶▶ 残り = **§7 coherence-engine 配線** (bulk, 数学は済・engineering):
+1. **cX_irr**: 非列 X-member (既約 Ind_H^L θ) の coherence (`Xset_centralCommutator_isCoherent_of_irreducible_X` 流を X_irr 部分に)。
+2. **cX = cX_col ∪ cX_irr** glue: §7 union engine (`coherentUnion_of_glued...`) に ν/agreements/mixed-inner(上記 toolkit)/diagonal/generation 供給。
+3. **X∪Y glue**: `coherentXunionYset_caseB_of_glued` (定義済) に cX + ν + hmixed(toolkit)+ hgen + D。
+4. **capstone** (`sibleySetup_is_coherent` X-nonempty branch, S08_CoherenceTheorems:59): hyp.cases 場合分け (Frobenius=既存 / CertainType=case-B 上記) + 全 glue。
+**🔑 直交性/mixed-inner は全完成。残りは §7 union engine の ν/diagonal/generation 配線 (大規模 engineering, case-A `_of_frobenius` をミラー)。**
+**正本=本 session 41 cont.⁶。mixed-inner toolkit 完成。次=cX_irr + §7 union glue 配線。**
