@@ -5324,6 +5324,31 @@ theorem dadeIntegralCharacterMap_inner_eq_on_supported_span
       S04.SupportedClassFunctions (G := G) ℂ A L)
   rwa [hyp.dadeIsometryData_toDadeMap hconj] at hiso
 
+/-- **Inner-product preservation for the Dade base map, from any isometry datum.**  Generalises
+`dadeIntegralCharacterMap_inner_eq_on_supported_span`: the lift preserves inner products on the
+supported span for **any** `FullDadeIsometryData dade` — not only `hyp.fullDadeIsometryData hconj`.
+On the supported subspace the lift agrees with `hyp.dadeMap`, and `hyp.dadeMap = dade.toDadeMap`
+by Dade-map uniqueness (`IsDadeMap.unique`), so the isometry `dade.inner_eq` applies.  This is what
+the certain-type Dade `h.tau` (a generic `FullDadeIsometryData`, with no `HConjInvariant`) needs to
+feed the (6.8.2.3) per-constituent `CharacterPsiDecomposition` via `ofProjection`. -/
+theorem dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data
+    (hyp : S04.Hypothesis G A L) (dade : S04.FullDadeIsometryData (G := G) hyp)
+    {S : Set (ClassFunction (↥L) ℂ)}
+    (hS : ∀ s ∈ S, s.support ⊆ supportInSubgroup A L)
+    {φ ζ : ClassFunction (↥L) ℂ}
+    (hφ : φ ∈ zSpan (L := ↥L) S) (hζ : ζ ∈ zSpan (L := ↥L) S) :
+    ClassFunction.inner (dadeIntegralCharacterMap hyp dade φ)
+        (dadeIntegralCharacterMap hyp dade ζ) = ClassFunction.inner φ ζ := by
+  have hφsupp : φ.support ⊆ supportInSubgroup A L :=
+    support_subset_of_mem_zSpan_of_supported hS hφ
+  have hζsupp : ζ.support ⊆ supportInSubgroup A L :=
+    support_subset_of_mem_zSpan_of_supported hS hζ
+  rw [dadeIntegralCharacterMap_apply_of_support hyp dade hφsupp,
+    dadeIntegralCharacterMap_apply_of_support hyp dade hζsupp,
+    show hyp.dadeMap (k := ℂ) = dade.toDadeMap from
+      S04.IsDadeMap.unique hyp.isDadeMap_dadeMap dade.toDadeIsometryData.isDadeMap]
+  exact dade.inner_eq _ _
+
 /-- **The Dade base map sends supported virtual characters to virtual characters of `G`.**
 
 For a supported class function `φ` (`φ.support ⊆ supportInSubgroup A L`, i.e. `φ ∈ CF(L,A)`) that is

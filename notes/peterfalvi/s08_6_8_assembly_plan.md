@@ -2225,3 +2225,83 @@ package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ �
 3. (5.4.b) αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY` (6.8.2.3 本体) → τ₂ direct assembly (S08)。
 **正本=本 cont.³⁶。R(μ_j) producer 完成 (重要マイルストン)。次=S08 case-B per-constituent assembly
 (S06 R-producer 群を (6.8.2.3) で組む; τ vs hyp.tau の整合 + Y-coherence τ₁ 供給が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁷, /loop): ✅ τ-seam の核心解決 — generic inner-preservation landed
+
+### 精査 (τ-seam の正体): per-constituent CharacterPsiDecomposition (`ofProjection`) は
+{χ−χ̄, χ−aη₁} 上の inner-preservation を要するが、η₁∉certainTypeSet ゆえ `certainTypeExtension_inner_eq`
+(certainTypeSet 内部) では不足。**汎用 `dadeIntegralCharacterMap_inner_eq_on_supported_span` は
+`hconj` を要求**し、certain-type τ=`dadeICM h.dade0 h.tau` の `h.tau` は **generic FullDadeIsometryData
+(hconj 無し, Hypothesis46 の field)** ゆえ直接適用不可。← これが τ-seam の核心。
+
+### ✅ landed (5fee74e5, axiom-clean 標準3, **full build 3813/108s** ← S07 touch で全 Pf 鎖再 elab):
+**`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data`** (S07, 既存 lemma 直後):
+任意 `dade : FullDadeIsometryData hyp` で inner-preservation 成立 (hconj 不要)。証明 =
+`apply_of_support` (lift=hyp.dadeMap) + `IsDadeMap.unique hyp.isDadeMap_dadeMap dade.toDadeIsometryData.isDadeMap`
+(hyp.dadeMap=dade.toDadeMap) + `FullDadeIsometryData.inner_eq` (dade 自身の isometry, S04:3821 hconj 不要)。
+**⟹ certain-type τ で ofProjection が使える。** ⚠ **S07 (upstream) touch は ~108s**; 以後 S06/S08 は ~8s。
+
+### ▶ 残 per-constituent assembly (S06/S08, この inner-preservation を使う):
+1. **μ_j 用 CharacterPsiDecomposition** = `certainTypeR` (R(μ_j)) + `ofProjection` (τ=dadeICM h.dade0 h.tau,
+   inner-preservation=本 cont.³⁷ generic 版, htau1_mema=τ(μ_j−aη₁)∈ZIrr, orthogonalities
+   ⟨μ_j,η₁⟩=0 [X⊥Y] / ⟨μ_k,η₁⟩=0 / ⟨μ_j,μ_k⟩=0 [columnFamily_mu_sum_inner])。
+   irreducible χ 用は `decompositionDaFromDadeOfDiff` 既存。
+2. αᵢ^τ=Xᵢ−bᵢY+Zᵢ + (5.4.a) bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq) → bᵢ=aᵢ → (5.4.b)。
+3. per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly (S08, hyp.tau↔certain-type τ は supported 上 map-agreement)。
+**正本=本 cont.³⁷。τ-seam 核心解決。次=μ_j CharacterPsiDecomposition (ofProjection 組立、orthogonality
+inputs + ZIrr membership 供給; S08 で η₁ context)。**
+
+## 2026-06-14 (session 40 cont.³⁸, /loop): ✅ μ_j CharacterPsiDecomposition landed → R(χ) 統合の building blocks 全完備
+
+### ✅ landed (0987d047, axiom-clean 標準3, leaf 3601, **一発 build**):
+**`certainTypeDecompositionDa`** (S06_CertainTypeCoherence): reducible μ_j 用 per-constituent
+`CharacterPsiDecomposition τ (columnSum χ₂) (a•η₁)` (decompositionDaFromDadeOfDiff の reducible 版)。
+`certainTypeR` + `ofProjection` + 前 cont.³⁷ の generic inner-preservation。⟨μ_j,μ̄_j⟩=0 は
+columnSum_conj_eq+columnFamily_mu_sum_inner で内部導出; Y-anchor inputs (μ_j−a•η₁ supported/∈ZIrr,
+μ_j,μ̄_j⊥a•η₁) は parameter (S08 assembly site で供給)。
+
+### 🎉🎉 マイルストン: R(χ) 統合の building blocks 全完備:
+| piece | status |
+|---|---|
+| 既約 χ R(χ) + Da | ✅ dadeOrthonormalCharacterImageFamilyOfDiff + decompositionDaFromDadeOfDiff (既存) |
+| reducible μ_j R(μ_j) + Da | ✅ certainTypeR (cont.³⁶) + certainTypeDecompositionDa (本 cont.³⁸) |
+| τ-seam (generic inner-preservation) | ✅ ..._of_data (cont.³⁷) |
+| (5.4.a) ‖X‖²≥‖χ‖² | ✅ inner_self_chi_re_le_inner_self_X (既存) |
+| pinning ∑aᵢbᵢ=∑aᵢ²⟹bᵢ=aᵢ | ✅ eq_of_sum_mul_eq_sum_sq (cont.³²) |
+| (5.4.b) ‖Y‖²≥‖ψ‖²⟹X=∑E | ✅ norm_eq_and_X_eq_sum_of_norm_Y_ge (既存) |
+| αᵢ aggregate ∑aᵢαᵢ=Ind−\|H:Z\|η₁ | ✅ sum_smul_constituent_diff_eq (cont.³¹) |
+
+### ▶ 残 = (6.8.2.3) per-χ assembly (S08, building blocks の組立):
+⚠ retarget engine (`retarget_isCoherent_of_decomposition*`) は **`⟨χ,χ⟩=1` (既約) 要求** ⟹ reducible μ_j
+不適。reducible per-χ は **手動 (5.4.a)+pinning+(5.4.b)** で:
+1. per-constituent χᵢ で Da (既約/reducible 振り分け) → αᵢ^τ=Xᵢ−Yᵢ (Da.X/Da.Y) → Yᵢ を Y 方向に分解
+   (bᵢ=⟨Yᵢ的, Y⟩, Zᵢ⊥Y) → (5.4.a) で bᵢ²≤aᵢ² ⟹ bᵢ≤aᵢ。
+2. pinning (∑aᵢbᵢ=|H:Z|=∑aᵢ², eq_of_sum_mul_eq_sum_sq) ⟹ bᵢ=aᵢ。
+3. (5.4.b) ⟹ αᵢ^τ=Xᵢ−aᵢY → χ=χ₁ で per-χ `(χ−aη₁)^τ=X₁−aY`。
+4. τ₂ direct assembly (S08; hyp.tau↔certain-type τ は supported map-agreement)。
+**hard seam 残**: Yᵢ の Y 方向分解 (bᵢ 抽出) + (6.8.2.2) の Y 同定 + τ₂ 構成。intricate な S08 統合。
+**正本=本 cont.³⁸。building blocks 全完備 (大マイルストン)。次=(6.8.2.3) per-χ assembly (5.4.a/b+pinning
+を Da から組む; Yᵢ の Y-成分 bᵢ 抽出が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁹, /loop すぐ再開): ✅ per-constituent bound の核心 (CS-via-Pythagoras) landed
+
+### 精査: per-χ assembly の bᵢ bound は CS が要だが ClassFunction.inner に CS/正定値は未整備 →
+正定値 `inner_self_re_nonneg` (ZIrrFourier:177) は**有**。⟹ bᵢ²≤‖Da.Y‖² を **explicit Pythagoras**
+(Da.Y=bᵢ•Y+W, Y⊥W) で証明可 (一般 CS 不要)。
+
+### ✅ landed (52257101, axiom-clean 標準3, leaf 3625):
+**`inner_Y_coeff_sq_le`** (S08_CaseBCoherence2): `b=⟨D.Y,Y⟩` (整数, norm-1 Y) ⟹ `(b:ℝ)²≤‖D.Y‖².re`。
+Pythagoras: D.Y=b•Y+W, ⟨Y,W⟩=⟨W,Y⟩=0 (b 実数 ∵ inner_conj_symm+star_intCast), ‖D.Y‖²=b²+‖W‖²≥b²
+(inner_self_re_nonneg)。gotcha: **`inner_conj_symm φ ψ` の subject は第2引数** (`inner_conj_symm D.Y Y :
+Y.inner D.Y = star (D.Y.inner Y)`)。`inner_smul_right` は `RepresentationTheory.` 修飾要。
+
+### ▶ 残 per-constituent bound + per-χ assembly:
+1. **bᵢ≤aᵢ** (follow-up, 易): inner_Y_coeff_sq_le + (5.6.2)`inner_self_Y_re_le_inner_self_psi`
+   (‖Da.Y‖²≤‖ψ‖²=a², ψ=a•η₁) ⟹ bᵢ²≤aᵢ² → 整数 bᵢ≤aᵢ (b²≤a² ∧ a≥0 ⟹ b≤a の整数 tail)。
+2. per-χ assembly: 各構成子で Da (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)
+   → αᵢ^τ=Da.X−Da.Y, bᵢ=⟨Da.Y,Y⟩, (1.) で bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq, ∑aᵢbᵢ=|H:Z|=∑aᵢ²)
+   ⟹ bᵢ=aᵢ → (5.4.b)`norm_eq_and_X_eq_sum_of_norm_Y_ge` ⟹ αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY`。
+3. τ₂ direct assembly (S08)。
+**hard seam 残**: bᵢ=⟨Da.Y,Y⟩ と Da.Y の関係 (Da.X⊥Y? Da.Y=αᵢ^τ−Da.X), pinning への ∑ 接続, (5.4.b)
+適用, τ₂。intricate な S08 統合だが building blocks + CS core 揃い。
+**正本=本 cont.³⁹。CS core landed。次=bᵢ≤aᵢ follow-up (整数 tail) → per-χ assembly (pinning 接続)。**
