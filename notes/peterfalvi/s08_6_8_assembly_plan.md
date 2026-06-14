@@ -2282,3 +2282,26 @@ columnSum_conj_eq+columnFamily_mu_sum_inner で内部導出; Y-anchor inputs (μ
 **hard seam 残**: Yᵢ の Y 方向分解 (bᵢ 抽出) + (6.8.2.2) の Y 同定 + τ₂ 構成。intricate な S08 統合。
 **正本=本 cont.³⁸。building blocks 全完備 (大マイルストン)。次=(6.8.2.3) per-χ assembly (5.4.a/b+pinning
 を Da から組む; Yᵢ の Y-成分 bᵢ 抽出が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁹, /loop すぐ再開): ✅ per-constituent bound の核心 (CS-via-Pythagoras) landed
+
+### 精査: per-χ assembly の bᵢ bound は CS が要だが ClassFunction.inner に CS/正定値は未整備 →
+正定値 `inner_self_re_nonneg` (ZIrrFourier:177) は**有**。⟹ bᵢ²≤‖Da.Y‖² を **explicit Pythagoras**
+(Da.Y=bᵢ•Y+W, Y⊥W) で証明可 (一般 CS 不要)。
+
+### ✅ landed (52257101, axiom-clean 標準3, leaf 3625):
+**`inner_Y_coeff_sq_le`** (S08_CaseBCoherence2): `b=⟨D.Y,Y⟩` (整数, norm-1 Y) ⟹ `(b:ℝ)²≤‖D.Y‖².re`。
+Pythagoras: D.Y=b•Y+W, ⟨Y,W⟩=⟨W,Y⟩=0 (b 実数 ∵ inner_conj_symm+star_intCast), ‖D.Y‖²=b²+‖W‖²≥b²
+(inner_self_re_nonneg)。gotcha: **`inner_conj_symm φ ψ` の subject は第2引数** (`inner_conj_symm D.Y Y :
+Y.inner D.Y = star (D.Y.inner Y)`)。`inner_smul_right` は `RepresentationTheory.` 修飾要。
+
+### ▶ 残 per-constituent bound + per-χ assembly:
+1. **bᵢ≤aᵢ** (follow-up, 易): inner_Y_coeff_sq_le + (5.6.2)`inner_self_Y_re_le_inner_self_psi`
+   (‖Da.Y‖²≤‖ψ‖²=a², ψ=a•η₁) ⟹ bᵢ²≤aᵢ² → 整数 bᵢ≤aᵢ (b²≤a² ∧ a≥0 ⟹ b≤a の整数 tail)。
+2. per-χ assembly: 各構成子で Da (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)
+   → αᵢ^τ=Da.X−Da.Y, bᵢ=⟨Da.Y,Y⟩, (1.) で bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq, ∑aᵢbᵢ=|H:Z|=∑aᵢ²)
+   ⟹ bᵢ=aᵢ → (5.4.b)`norm_eq_and_X_eq_sum_of_norm_Y_ge` ⟹ αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY`。
+3. τ₂ direct assembly (S08)。
+**hard seam 残**: bᵢ=⟨Da.Y,Y⟩ と Da.Y の関係 (Da.X⊥Y? Da.Y=αᵢ^τ−Da.X), pinning への ∑ 接続, (5.4.b)
+適用, τ₂。intricate な S08 統合だが building blocks + CS core 揃い。
+**正本=本 cont.³⁹。CS core landed。次=bᵢ≤aᵢ follow-up (整数 tail) → per-χ assembly (pinning 接続)。**
