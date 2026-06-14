@@ -2772,6 +2772,26 @@ theorem centralizer_Msigma_eq_of_le_E3_of_actsPrime [Finite G]
     rw [hpr] at haCg
     exact haCg
 
+/-- **BG Theorem 13.10, GAP C helper**: for the regular Sylow `Q` (`q ∈ τ₃(M)`, `Q ≤ E`,
+`N_G(Q) ≤ M*`), `M_σ ∩ M* = C_{M_σ}(Q)`. (`⊇`: `C_{M_σ}(Q) ≤ N_G(Q) ≤ M*`. `⊆`: Cor 13.2(a)
+shows `Q` centralizes `M_σ ∩ M*`, i.e. `M_σ ∩ M* ≤ C_G(Q)`.) -/
+theorem inf_Msigma_Mstar_eq_centralizer_Q [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {q : ℕ} [Fact q.Prime] (hqτ3 : q ∈ tau3 M)
+    {Q : Subgroup G} (hQE : Q ≤ E) (hQne : Q ≠ ⊥) (hQq : IsPGroup q ↥Q)
+    {Mstar : Subgroup G}
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G))) :
+    S10.Msigma M ⊓ Mstar = S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) := by
+  have hQM : Q ≤ M := hQE.trans h.E_le
+  obtain ⟨hMstarCo, hNQM⟩ := mem_maximalSubgroupsContaining.mp hMstar
+  have hcor : Q ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) :=
+    (tau13_pSubgroup_centralizes hG h (Set.mem_union_right _ hqτ3) hQM hQne hQq hMstar).1 Q
+      (le_inf hQM (Subgroup.le_normalizer.trans hNQM)) hQq
+  apply le_antisymm
+  · exact le_inf inf_le_left (Subgroup.le_centralizer_iff.mp hcor)
+  · exact le_inf inf_le_left
+      (inf_le_right.trans ((Subgroup.centralizer_le_normalizer _).trans hNQM))
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
