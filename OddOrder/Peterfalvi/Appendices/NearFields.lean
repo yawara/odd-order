@@ -143,6 +143,21 @@ theorem rightMulAction_eq_self_iff (A : Subgroup Fˣ)
   have hval : ((a : Fˣ) : F) = 1 := mul_left_cancel₀ hx0 (by rw [h1, mul_one])
   exact OneMemClass.coe_eq_one.mp (Units.val_eq_one.mp hval)
 
+/-- Any subgroup `A ⊆ Fˣ` has order coprime to `|F|`: `|A| ∣ |Fˣ| = |F| - 1` (Lagrange), and
+consecutive integers are coprime.  This is the coprimality hypothesis needed for Maschke's theorem
+when splitting an `A`-invariant subgroup of `(F, +)`. -/
+theorem card_coprime (A : Subgroup Fˣ) [Finite F] :
+    Nat.Coprime (Nat.card A) (Nat.card F) := by
+  haveI : Nonempty F := ⟨0⟩
+  have h1 : Nat.card A ∣ Nat.card Fˣ := Subgroup.card_subgroup_dvd_card A
+  rw [Nat.card_units] at h1
+  have hcop : ∀ n : ℕ, 0 < n → Nat.Coprime (n - 1) n := by
+    intro n hn
+    obtain ⟨m, rfl⟩ : ∃ m, n = m + 1 := ⟨n - 1, by omega⟩
+    rw [Nat.add_sub_cancel, Nat.add_comm]
+    exact Nat.coprime_add_self_right.mpr (Nat.coprime_one_right m)
+  exact Nat.Coprime.coprime_dvd_left h1 (hcop (Nat.card F) Nat.card_pos)
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
