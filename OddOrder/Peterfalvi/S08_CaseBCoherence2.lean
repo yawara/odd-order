@@ -474,6 +474,41 @@ theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (
     ClassFunction.inner_induce_eq_inner_restrict, hres χ, inner_compHom_of_mulEquiv,
     ClassFunction.inner_induce_eq_inner_restrict, sub_self]
 
+/-- **Induction commutes with a `ℂ`-linear combination over a `Finset`** (the binary `induce_add` /
+`induce_smul` extended to `Ind_H (∑ cᵢ • fᵢ) = ∑ cᵢ • Ind_H fᵢ`). -/
+theorem induce_finset_sum_smul {G : Type*} [Group G] [Fintype G] {H : Subgroup G}
+    [Invertible (Nat.card H : ℂ)] {ι : Type*} (s : Finset ι) (c : ι → ℂ)
+    (f : ι → ClassFunction ↥H ℂ) :
+    ClassFunction.induce H (∑ i ∈ s, c i • f i)
+      = ∑ i ∈ s, c i • ClassFunction.induce H (f i) := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp [ClassFunction.induce]
+  | @insert a s ha ih =>
+    rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.induce_add,
+      ClassFunction.induce_smul, ih]
+
+/-- **(6.8.2.3) aggregate, the `∑ aᵢχᵢ = Ind^L_{W₂} φ` half.**  Summing the constituent characters
+`χθ = Ind^M_H θ` weighted by the multiplicities `aθ = ⟨φ∘e, Res_{K.subgroupOf H} θ⟩` of the
+decomposition `Ind^H_{K.subgroupOf H}(φ∘e) = ∑ aθ·θ` recovers `Ind^M_K φ` in one step:
+`∑_θ aθ • Ind^M_H θ = Ind^M_K φ`.  Combine the constituent decomposition
+(`induce_eq_sum_inner_restrict_smul`), `ℂ`-linearity of `Ind_H` (`induce_finset_sum_smul`), and
+induction in stages (`induce_induce_subgroupOf`). -/
+theorem sum_inner_restrict_smul_induce_eq_induce {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (φ : ClassFunction ↥K ℂ) :
+    ∑ θ : IrreducibleCharacter ↥H,
+        ClassFunction.inner
+            (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ)
+            (ClassFunction.restrict (K.subgroupOf H) (θ : ClassFunction ↥H ℂ))
+          • ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      = ClassFunction.induce K φ := by
+  rw [← induce_finset_sum_smul, ← induce_eq_sum_inner_restrict_smul]
+  exact induce_induce_subgroupOf hKH φ
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
