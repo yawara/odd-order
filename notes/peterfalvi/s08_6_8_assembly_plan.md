@@ -2600,3 +2600,33 @@ inner_X_Y_eq_zero_of_orthogonal Da (fun α hα => by
 - **hbi/hYY/hXaggorth**: 整数性 + norm-1 + Xagg⊥Y (exists_decomposition_caseB の horth)。
 **🔬 要精査: constituent family の θ-indexing (induce H θ が X(μ_j) か Y か, 各 Dθ の構成)。これが per_constituent assembly の核。**
 **正本=本 session 41 cont.²。hXorth 完成 (capstone-ready)。次=per_constituent family/aggregate 集約。full build 3813。Opus 継続。**
+
+## 2026-06-15 (session 41 cont.³, /loop): ✅ certainType_per_constituent 特化 landed + 🔬 family 構築 RECON
+
+### ✅ landed (`3c324961`, axiom-clean):
+`certainType_per_constituent_Y_eq_smul` — `per_constituent_Y_eq_smul` の certain-type 特化。
+**3 構造入力 (hXorth/hηnorm/hYY) を内部 discharge**: hXorth=`inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset` (η₁∈Y のみ)、hηnorm=η₁ 既約、hYY=`extension_inner_eq`。残入力 = family D + (6.8.2.2) aggregate (hagg/hsq/hbi/hXaggorth)。
+
+### 🔬 per_constituent family 構築 RECON (次の核・大ピース):
+**per_constituent inputs 状態**:
+| 入力 | 状態 |
+|---|---|
+| hXorth (`⟨Dθ.X, η₁^{τ₁}⟩=0`) | ✅ certainType_per_constituent 内で discharge |
+| hηnorm / hYY | ✅ 同上 |
+| hsq (∑aθ²=n=\|H:Z\|) | ✅ `sum_inner_restrict_sq_eq_index` (S08:537) |
+| **family D** | 🔬 下記 (核) |
+| **hagg** (Xagg−n·Y=∑aθ(Dθ.X−Dθ.Y)) | 🔬 下記 |
+| hbi (⟨Dθ.Y, η₁^{τ₁}⟩∈ℤ) | ⚠ Dθ.Y∈ZIrr 要 (派生; X_mem_ZIrr は別構造) |
+
+**🔑 family D 構造解析**:
+1. **constituents = X-characters (μ_j 列) のみ**: induce W₂ φ (φ∈Irr W₂, φ≠1) の構成要素 χ は ⟨Res_{W₂} χ, φ⟩≠0。Y=S(H') は W₂⊆[H,H]=H' 上自明 ⟹ Res_{W₂}(Y元)=自明 ⟹ φ≠1 は現れない。**∴ Y-char は constituent でない、X(μ_j)のみ**。
+2. **family member = certainTypeDecompositionDa** (S06:684): μ_j=columnSum χ₂、`columnSum_eq_induce_H` (S08:1168) で =induce H (Res_H μ_{0j})。**tau1=τ** (ofProjection に `dadeIntegralCharacterMap h.dade0 h.tau` を tau1 として渡す S06:713 ⟹ `tau1_image : τ(αθ)=Dθ.X−Dθ.Y` が aggregate-ready)。imageFamily=certainTypeR ⟹ himg coverage OK。
+3. **hagg 組立**: `sum_smul_constituent_diff_eq` (S08:566, ∑aθαθ=induce W₂ φ−|H:Z|η₁) に τ 適用 → `tau_sum_smul_image` (τ(∑aθαθ)=∑aθ(Xθ−Yθ), 要 τ(αθ)=Xθ−Yθ=tau1_image) → LHS=`exists_decomposition_caseB` (τ(induce W₂ φ−|H:Z|η₁)=Xagg−|H:Z|Y)。⟹ Xagg−|H:Z|Y=∑aθ(Dθ.X−Dθ.Y)。
+4. **🛑 2 つの構築課題**:
+   - **(A) total family**: per_constituent の D は ι 上 total。ι=Irr H なら aθ=0 の θ にも Dθ 要 (項は drop するが型上要)。**対策案**: ι を constituent subtype `{θ // aθ>0}` に絞る (sum_smul_constituent_diff_eq は univ 上ゆえ `Finset.sum_subset` で aθ=0 除外要)、または aθ=0 用 dummy decomposition。
+   - **(B) 重み型**: per_constituent は a:ι→ℕ、sum_smul_constituent_diff_eq の重みは ℂ-inner ⟨φ∘e,Res θ⟩ (=mult, 自然数)。`(aθ:ℂ)`=inner の cast 整合要。
+5. **θ↔χ₂ 対応**: induce H θ=columnSum χ₂ の θ↔χ₂ 写像。Clifford 対応 (φ∈Irr W₂ ↔ 列 χ₂)。
+
+**▶▶ 次 (推奨手順)**: (i) family member 単体 = certainTypeDecompositionDa を induce H θ 形に rw する補題 (`columnSum_eq_induce_H` 経由) → (ii) hagg 組立 (3 ピース連結, 重み cast) → (iii) total-family の指数化 (subtype or dummy) → (iv) certainType_per_constituent 適用で (6.8.2.3) 結論 `(μ_j−aη₁)^τ=Dθ.X−aη₁^{τ₁}`。**(A)(B) が hard、Clifford 対応 (θ↔χ₂) が要精査。**
+**正本=本 session 41 cont.³。per_constituent 特化 landed。family 構築 = 大ピース (total-family/重み/Clifford対応)。full build 3813。**
+**🚩 状況: (6.8.2.3) 直交性・hXorth・pinning は完成。残 per_constituent family + cX + capstone glue は大規模 assembly。Opus 継続中だが family 構築は dedicated focus 向き。**
