@@ -66,17 +66,20 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
      - それ以外・内容が絡む衝突 = `git merge --abort` で**報告**（自動解決しない）
    - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。
    - **`.lean` を含む場合 — sorry 先行チェックで build 短絡**: build は重い (~3800 jobs) ので**先に**
-     `bin/count-sorry` を取る。マージ前から増えていれば下記ゲートの ⚠ 手順で
-     真の tactic sorry か判定し、**真の sorry 増なら build せず即 `git merge --abort`**(build が通っても sorry
-     ゲートで落ちるため無駄)。増えていなければ `lake build OddOrder OddOrder.AxiomsCheck`(background, 完了待ち)へ。
+     `bin/count-sorry` を取る。増えていれば `git diff --cached` で **regression か scaffold か**判定し、
+     **regression（証明済→sorry）or 新規 axiom なら build せず即 `git merge --abort`**。
+     scaffold（新 decl statement）or 不増なら `lake build OddOrder OddOrder.AxiomsCheck`(background, 完了待ち)へ。
    - **合格条件**（全て満たす）:
      - build exit 0 かつ最終行 "Build completed successfully (N jobs)"
      - AxiomsCheck OK（`#assert_only_allowed_axioms` 由来のエラーなし）
-     - `bin/count-sorry` がマージ前**以下**（増えていない。main は既に ~141 の scaffold sorry を持つので絶対数でなく増分で判定）
-       - ⚠ count-sorry は systematic な prose 偽陽性（sorry-free / sorryAx / `sorry'd` / backtick 引用）を
-         除外済ゆえ、増分はほぼ真の tactic sorry。残差 +5（AxiomsCheck.lean 等の block-comment 内 prose）は
-         安定ゆえ delta には無害。疑わしい増分は `git diff --cached` で新規箇所を確認、または build 警告
-         `uses .sorry.` で確定。真の sorry 増のみ不合格。
+     - **sorry ポリシー（2026-06-15 改定: scaffold 許可, ユーザー裁可）**: `bin/count-sorry` の増加を即不合格にしない。
+       hold するのは (a) **regression**（既存の証明済 decl が `sorry` に退化）と (b) **新規 axiom** のみ。
+       **新 decl の faithful scaffold statement 追加（`theorem/lemma … := sorry`）は許可**（§13→§14→§16 interface-building の正常進行）。
+       - 判定: count 増加時は `git diff --cached -- '*.lean' | grep -E '^[+-].*sorry'` を確認。
+         追加 `+… sorry` が同 hunk の追加 `+theorem/+lemma`（=新 decl）に属すれば scaffold ⟹ **ALLOW**。
+         既存 decl の proof が `+sorry` に置換（新 decl 行が伴わない）なら regression ⟹ **HOLD+報告**。
+       - count-sorry は prose 偽陽性（sorry-free / sorryAx / `sorry'd` / backtick 引用）を除外済（残差 +5 は安定 prose）。
+         絶対数 ground truth は build 警告 `uses .sorry.`。
    - 合格 → `git commit`:
      `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾
      `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
