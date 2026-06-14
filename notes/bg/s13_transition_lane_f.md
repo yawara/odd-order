@@ -532,3 +532,44 @@ Prop 14.2 を assemble するための unblock。draft=H (BG 原文照合), proo
 **次 (frontier)**: **Lemma 13.12 proof** (BG L3747: 13.4 + Cor 12.6 + Lem 12.11 + Thm 12.5(e) +
 Lem 13.6) → **Lemma 13.13 proof** (BG L3767: Lem 12.2 + 13.9 + Cor 12.6/12.9(c)/12.10(c) + 13.6
 + Cor 13.11 + 13.12, 順序注意)。両者で §13 endgame 完了 → §14 funnel 完全 unblock。
+
+### Lemma 13.12 / 13.13 proof 再構成 (BG L3745-3780, recon for focused session)
+
+**重要: 両者は focused 多段証明** (M\*-setup 構築 + τ-piece 配置 + BG 省略 WLOG)。60s loop brick 向きでなく、
+sustained session + 省略ステップは ChatGPT 相談 ([[feedback-ask-chatgpt-for-elided-gaps]], 私が Chrome で投入可)
+が適切。**deps 全 landed**、`exists_subgroupESetup hG hMstar` で M\* の setup 取得可。
+
+**統一前提 (両 statement に追加要)**: `[Fact p.Prime]` (13.12 は `[Fact q.Prime]` も)。repo の
+`tau1/tau2/tau3` は pRank ベースで素数性を含まない (`S12_ECore` L51-60) ので、deps (12.5/12.6/12.11/13.4/13.6
+は全て `[Fact _.Prime]` を取る) を呼ぶには Fact が要る。`P∈ℰ_p¹(E)` からは |P|=p だが p 合成数を排除できない
+(ℤ/4 が IsElementaryAbelian 4)。⟹ statement に instance 引数追加 (H draft 改; Prop14.2 caller が供給, issue 2006 に注記要)。
+
+**dep accessor map** (verified signatures):
+- Thm 13.4 = `S13.centralizer_le_centralizer_of_tau1 hG h hp hr hP hPE hR hRC` (`S13_Theorem134`): `C_{M_σ}(P)⊆C_{M_σ}(R)`.
+- Lem 13.6 = `S13.maximalContaining_eq_singleton_of_E1 hG h hq hPE1 hPne hX hXC hSle hSq hSmax` (`S13_PrimeAction`):
+  `ℳ(C_G(X))={M} ∧ ℳ(S)={M}`. **要 P≤E₁**.
+- Cor 12.6 = `S12.elemAb_normal_in_E_of_tau2 hG h hp hA hAE` (`S12_Corollary126`); 分解 `.1.1`=A◁E,
+  `.1.2`=ℰ_p¹(E)=ℰ¹(A), `.2.2.1`=(c) `X∈ℰ¹(A),C_{M_σ}(X)≠1⟹ℳ(C_G(X))={M}`, `.2.2.2.2.1`=(e) `x∈C_{E₁}(A)#⟹C_{M_σ}(x)=1`.
+- Lem 12.11 = `S12.tau2_transfer_to_maximal hG h hp hA hAE hMstar`; `.1`=(a) τ₂(M)⊆σ(M\*)−β(M\*), `.2.1`=(b) π(E/C_E(A))⊆τ₁(M\*)∪τ₂(M\*).
+- Thm 12.5 = `S12.Msigma_nilpotent_of_tau2 hG hM hp hA hAM` (`S12_Theorem125`); `.2.2.2.2.1`=(e) `∀M\*∈ℳ(A),M\*≠M⟹M_σ⊓M\*=⊥`.
+- M\*-setup = `S12.exists_subgroupESetup hG hMstar : ∃ E E₁ E₂ E₃, SubgroupESetup M\* …`; piece 指定版 `exists_subgroupESetup_with_le` (S12_Proposition1215).
+
+**13.12 (`Msigma_centralizer_eq_bot_of_tau1_tau2`)** BG L3747 — 背理法 (C_{M_σ}(P)≠1 と仮定):
+1. Cor 12.6(a): A◁E. **🔶 Cor 12.6(e): P⊄C_E(A)** (省略: P≤C_E(A)⟹P≤E₁∩C(A) なら 12.6(e) で C_{M_σ}(P)=1 矛盾 —
+   ただし **P≤E₁ の WLOG が要**, 12.6(e) が C_{E₁}(A) 限定ゆえ; 要再構成/ChatGPT)。
+2. Y=C_A(P): A=ℰ_q² 上 P-不変、P⊄C_E(A)⟹Y⊊A、hyp C_A(P)≠1 ⟹ **|Y|=q** (coprime p≠q action on rank-2)。
+3. Thm 13.4: 1⊂C_{M_σ}(P)⊆C_{M_σ}(Y) (r=q, R=Y∈ℰ_q¹(C_E(P)))。
+4. Cor 12.6(c): ℳ(C_G(Y))={M} (Y∈ℰ¹(A), C_{M_σ}(Y)≠1)。
+5. M\*∈ℳ(N_G(A)): Lem 12.11(a) ⟹ q∈σ(M\*); 12.11(b) ⟹ p∈τ₁(M\*)∪τ₂(M\*)。
+6. **case p∈τ₂(M\*)**: M\*-setup + A\*∈ℰ_p²(E\*)⊇P ⟹ Cor 12.6(c)/M\* ⟹ ℳ(C_G(P))={M\*} (∵1⊂C_A(P)⊆C_{M\*_σ}(P))
+   ⟹ 1⊂C_G(P)⊓M_σ⊆M\*⊓M_σ、Thm 12.5(e) (M\*∈ℳ(A),≠M) と矛盾。
+7. **case p∈τ₁(M\*)**: P≤E₁\*、Y∈ℰ_q¹(C_{M\*_σ}(P)) ⟹ Lem 13.6/M\* ⟹ ℳ(C_G(Y))={M\*}、step4 と矛盾。
+
+**13.13 (`mem_sigma_of_tau1_tau3_centralize`)** BG L3767 — さらに intricate (13.12 を使う):
+Lem 12.2 で p∈σ(M\*)∪τ₂(M\*); p∈τ₂(M\*) を背理法。q∈π(C_{M_σ}(P)),Q∈ℰ_q¹; Thm 13.9 ⟹ q∉σ(M\*);
+M\*-complement E\*⊇PQ (`exists_subgroupESetup_with_le`), A∈ℰ_p²(E\*) (Cor12.6a, P⊆A); **🔶「P∈E₁ or E₃」WLOG**
+(P⊆E₃ なら Cor 13.11(a)(c) で C_{M_σ}(P)=C_{M_σ}(E₁)); Lem 13.6 ⟹ C_G(Q)⊆M ⟹ A⊄C_{E\*}(Q) (r_p(M)=1);
+Cor 12.10(c) ⟹ q∈τ₁(M\*) + P=C_A(Q); Lem 13.12/M\* ⟹ C_{M\*_σ}(Q)=1; Cor 12.9(c) ⟹ N_G(P)⊄M\*、M\*∈ℳ(N_G(P)) と矛盾。
+
+**🔶 = BG 省略 (reconstruction/ChatGPT 候補)**: 13.12 step1 の P≤E₁ WLOG + 13.13 の P∈E₁/E₃ WLOG。
+これらは 13.6 の原文 2 省略 (G が ChatGPT で突破 [[feedback-ask-chatgpt-for-elided-gaps]]) と同種。
