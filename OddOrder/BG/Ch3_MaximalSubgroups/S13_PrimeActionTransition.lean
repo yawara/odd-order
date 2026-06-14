@@ -1030,6 +1030,43 @@ theorem oriented_r_existence [Finite G] (hG : IsMinimalSimpleOdd G)
   exact exists_prime_betastar_dvd_of_hall_le hG hM hMstar hnc' hHC hHM hHhall
     hY₀starne hY₀starC hY₀starβ
 
+/-- **Lemma 13.8 GAP 3 の最終矛盾 (assembly)**: `X = C_{M_α}(P) ≠ 1` で `⁅X, Q⁆ ≤ M*_α`
+(GAP 3 の elision (iv) の出力)、`M_α ⊓ M*_α = 1` (Lemma 10.12), `C_{M_α}(PQ) = 1`
+(Lemma 12.18, step1 punchline) とすると矛盾。
+
+`⁅X,Q⁆ ≤ M_α` (X ≤ M_α が `M` で正規) かつ `≤ M*_α` ゆえ `⁅X,Q⁆ = 1` (M_α∩M*_α=1)、よって
+`X ≤ C(Q)`; `X ≤ C(P)` (定義) と合わせ `X ≤ C(P⊔Q)`、`X ≤ M_α ⊓ C(PQ) = 1`、`X ≠ 1` に反す。 -/
+theorem gap3_assembly [Finite G] {M Mstar Q P : Subgroup G} (hQM : Q ≤ M)
+    (hXne : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥)
+    (hXQ : ⁅S10.Malpha M ⊓ Subgroup.centralizer (P : Set G), Q⁆ ≤ S10.Malpha Mstar)
+    (hMαMstarα : S10.Malpha M ⊓ S10.Malpha Mstar = ⊥)
+    (hCMαPQ : S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥) :
+    False := by
+  have hMnorm : M ≤ Subgroup.normalizer ((S10.Malpha M : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (S10.Malpha_le M)).mp
+      (S10.Malpha_subgroupOf_normal M)
+  have hXQ_Mα : ⁅S10.Malpha M ⊓ Subgroup.centralizer (P : Set G), Q⁆ ≤ S10.Malpha M := by
+    rw [Subgroup.commutator_le]
+    intro a ha m hm
+    have haMα : a ∈ S10.Malpha M := (Subgroup.mem_inf.mp ha).1
+    have hmnorm := hMnorm (hQM hm)
+    have h1 : m * a⁻¹ * m⁻¹ ∈ S10.Malpha M :=
+      (Subgroup.mem_normalizer_iff.mp hmnorm a⁻¹).mp ((S10.Malpha M).inv_mem haMα)
+    rw [commutatorElement_def]
+    have heq : a * m * a⁻¹ * m⁻¹ = a * (m * a⁻¹ * m⁻¹) := by group
+    rw [heq]
+    exact (S10.Malpha M).mul_mem haMα h1
+  have hXQ_bot : ⁅S10.Malpha M ⊓ Subgroup.centralizer (P : Set G), Q⁆ = ⊥ :=
+    le_bot_iff.mp (hMαMstarα ▸ le_inf hXQ_Mα hXQ)
+  have hXCQ : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤
+      Subgroup.centralizer (Q : Set G) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp hXQ_bot
+  have hXCPQ : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤
+      Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) := by
+    rw [Subgroup.centralizer_sup]
+    exact le_inf inf_le_right hXCQ
+  exact hXne (le_bot_iff.mp (hCMαPQ ▸ le_inf inf_le_left hXCPQ))
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
