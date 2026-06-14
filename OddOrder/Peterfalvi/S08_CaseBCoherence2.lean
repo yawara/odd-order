@@ -928,6 +928,134 @@ theorem sigmaNC_le_two_of_inner_chiFam
             hyp hVeq app hξ'Z hξ'1
     _ = 2 := rfl
 
+/-- **(6.8.2.3) anchor, group-theoretic core: `V` avoids the `G`-conjugates of `K`-elements.**
+A point `v` of the `(ticVdiff h)`-exceptional set `V = W − (W₁ ∪ W₂)` is never `G`-conjugate to an
+element of the kernel `K = h.K` (viewed in `G` via `L ↪ G`).
+
+Indeed, write `v = ↑w` with `w = x·y ∈ W₁ × W₂` (`exists_mul_of_mem_sup`); since `v ∉ W₂` the
+`W₁`-component `x ≠ 1`, and `x = w ^ n` (`exists_zpow_proj`) gives `orderOf x ∣ orderOf w = orderOf v`.
+If `v` were `G`-conjugate to `↑k` (`k ∈ K`) then `orderOf v = orderOf k ∣ |K|` (conjugation preserves
+order), so `orderOf x ∣ gcd(|K|, |W₁|) = 1` (`card_coprime`), forcing `x = 1` — a contradiction.
+
+This is the structural disjointness `V ∩ (K^#)^G = ∅` powering the anchor: since
+`Supp(η₁ − η̄₁) ⊆ H^# ⊆ K^#` and `(η₁ − η̄₁)^τ` is a Dade image (vanishing off `conjugatesOfSet H^#`),
+it vanishes on `V`. -/
+theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h).V) :
+    v ∉ Group.conjugatesOfSet ((h.K.map L.subtype : Subgroup G) : Set G) := by
+  intro hconj
+  -- `v` is `G`-conjugate to `a = ↑k` with `k ∈ K`
+  obtain ⟨a, haK, hav⟩ := Group.mem_conjugatesOfSet_iff.mp hconj
+  obtain ⟨k, hkK, hka⟩ := Subgroup.mem_map.mp haK
+  -- `orderOf a = orderOf v` (conjugation preserves order)
+  obtain ⟨c, hc⟩ := isConj_iff.mp hav
+  have hsemi : SemiconjBy c a v := by
+    show c * a = v * c
+    rw [← hc]; group
+  have hav_ord : orderOf a = orderOf v := SemiconjBy.orderOf_eq c hsemi
+  -- `orderOf a = orderOf k ∣ |K|`
+  have hak : a = ((k : ↥L) : G) := hka.symm
+  have hoak : orderOf a = orderOf k := by rw [hak]; exact Subgroup.orderOf_coe k
+  have hok_dvd : orderOf k ∣ Nat.card ↥h.K := by
+    rw [← Subgroup.orderOf_mk (H := h.K) k hkK]; exact orderOf_dvd_natCard _
+  -- `v ∈ tic.W`, `v ∉ tic.W2`
+  have hvmem : v ∈ (↑h.tic.W : Set G) \ ((↑h.tic.W1 : Set G) ∪ ↑h.tic.W2) := hv
+  have hvW : v ∈ h.tic.W := hvmem.1
+  rw [OddOrder.Peterfalvi.S06.tic_W_eq_map h] at hvW
+  obtain ⟨w, hwW12, hwv⟩ := Subgroup.mem_map.mp hvW
+  -- `v ∉ tic.W2 ⟹ w ∉ W₂`
+  have hvnW2 : v ∉ h.tic.W2 := fun hc => hvmem.2 (Or.inr hc)
+  have hwnW2 : w ∉ h.W2 := by
+    intro hwW2
+    exact hvnW2 (h.tic_W2 ▸ Subgroup.mem_map.mpr ⟨w, hwW2, hwv⟩)
+  -- decompose `w = x·y` with `x ∈ W₁`, `y ∈ W₂`; `w ∉ W₂` forces `x ≠ 1`
+  obtain ⟨x, hxW1, y, hyW2, hxy⟩ := h.exists_mul_of_mem_sup hwW12
+  have hx1 : x ≠ 1 := by
+    intro hx
+    exact hwnW2 (by rw [← hxy, hx, one_mul]; exact hyW2)
+  -- `x = w ^ n`, so `orderOf x ∣ orderOf w = orderOf v`
+  obtain ⟨n, hn⟩ := h.exists_zpow_proj
+  have hxwn : w ^ n = x := by rw [← hxy]; exact hn x hxW1 y hyW2
+  have hox_dvd_ow : orderOf x ∣ orderOf w :=
+    orderOf_dvd_of_mem_zpowers (Subgroup.mem_zpowers_iff.mpr ⟨n, hxwn⟩)
+  have how_ov : orderOf w = orderOf v := by rw [← hwv]; exact (Subgroup.orderOf_coe w).symm
+  -- `orderOf x ∣ |K|` and `orderOf x ∣ |W₁|`, coprime ⟹ `x = 1`, contradiction
+  have how_K : orderOf w ∣ Nat.card ↥h.K := by
+    rw [how_ov, ← hav_ord, hoak]; exact hok_dvd
+  have hox_K : orderOf x ∣ Nat.card ↥h.K := hox_dvd_ow.trans how_K
+  have hox_W1 : orderOf x ∣ Nat.card ↥h.W1 := by
+    rw [← Subgroup.orderOf_mk (H := h.W1) x hxW1]; exact orderOf_dvd_natCard _
+  exact hx1 (orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_coprimes h.card_coprime hox_K hox_W1))
+
+/-- **(6.8.2.3) anchor: the Dade image of an `H^#`-supported function vanishes on `V`.**
+For `α` supported on `H^# = sharpImage H`, the Sibley Dade image `α^τ = hyp.tau α` vanishes on the
+`(ticVdiff h46)`-exceptional set `V`.  Since `α^τ = dadeIntegralCharacterMap hyp.dade …` is a genuine
+Dade image, it vanishes off `conjugatesOfSet H^#` (`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`
+via `dade_H_eq_bot`); and `V` is disjoint from `conjugatesOfSet H^# ⊆ conjugatesOfSet (K^G)` by
+`ticVdiffV_not_mem_conjugatesOfSet_K` (using `h46.K = H`, so `H^# ⊆ K^G`).  This is the **anchor**
+`hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV`: with `α = η₁ − η̄₁`
+(`Supp ⊆ H^#`, Peterfalvi (4.7)) it gives that `(η₁ − η̄₁)^τ` vanishes on `V`. -/
+theorem tau_apply_eq_zero_of_mem_ticVdiffV
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V) :
+    (hyp.tau α) v = 0 := by
+  rw [SibleyDadeHypothesis.tau, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+    hyp.dade _ hαsupp]
+  refine OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    hyp.dade.isDadeMap_dadeMap hyp.dade_H_eq_bot _ ?_
+  intro hvconj
+  have hbridge : sharpImage H ⊆ ((h46.K.map L.subtype : Subgroup G) : Set G) := by
+    rw [hHK]; exact Set.diff_subset
+  exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
+
+/-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
+and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
+`⟨c·ξ, ω^σ⟩ = 0` for every `σ`-image `ω^σ = chiFam pq`.  Chains the four disjointness bricks:
+`sigmaNC_le_two_of_inner_chiFam` (`NC ≤ 2`) → `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`
+(`grid_eq_zero`, all `σ`-coefficients vanish since `2 < min(w₁, w₂)`) →
+`inner_eq_zero_of_smul_sub_smul_orthogonal` (extract `⟨ξ, ω^σ⟩ = 0` from `⟨c·ξ − c'·ξ', ω^σ⟩ = 0`,
+integrality `⟨ξ, ω^σ⟩ ∈ ℤ`).
+
+This is Peterfalvi (5.3.b) for the certain-type column families: with `c·ξ = Y = cY.extension η₁`
+and `c·ξ − c'·ξ' = (η₁ − η̄₁)^τ`, it gives `⟨Y, certainTypeOmegaSigma⟩ = 0`, the seam-1 `hXorth`
+input of the capstone `per_constituent_Y_eq_smul`.  Only the anchor `(η₁ − η̄₁)^τ` vanishes on `V`
+(the structural `V ∩ dadeSupport = ∅`) remains to be supplied. -/
+theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ξ ξ' : ClassFunction G ℂ} (hξZ : ξ ∈ ZIrr G) (hξ1 : ClassFunction.inner ξ ξ = 1)
+    (hξ'Z : ξ' ∈ ZIrr G) (hξ'1 : ClassFunction.inner ξ' ξ' = 1)
+    (hξξ' : ClassFunction.inner ξ ξ' = 0)
+    {c c' : ℂ} (hc : c ≠ 0)
+    (hvanish : ∀ v ∈ hyp.V, (c • ξ - c' • ξ') v = 0)
+    (hmin : 2 < min (Nat.card hyp.W1) (Nat.card hyp.W2))
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    ClassFunction.inner (c • ξ) (hyp.chiFam hVeq app pq) = 0 := by
+  -- `NC(ψ) ≤ 2` where `ψ = c•ξ − c'•ξ'`.
+  have hNC : hyp.sigmaNC hVeq app (c • ξ - c' • ξ') ≤ 2 := by
+    refine sigmaNC_le_two_of_inner_chiFam hyp hVeq app hξZ hξ1 hξ'Z hξ'1 (fun pq' hpq' => ?_)
+    by_contra hcon
+    push_neg at hcon
+    refine hpq' ?_
+    change ClassFunction.inner (c • ξ - c' • ξ') (hyp.chiFam hVeq app pq') = 0
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+      hcon.1, hcon.2, mul_zero, mul_zero, sub_zero]
+  -- All `σ`-coefficients vanish (`grid_eq_zero`, `NC < min`).
+  have hpsi : ClassFunction.inner (c • ξ - c' • ξ') (hyp.chiFam hVeq app pq) = 0 :=
+    sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt hyp hVeq app hvanish (lt_of_le_of_lt hNC hmin) pq
+  -- Extract `⟨ξ, chiFam pq⟩ = 0`, then `⟨c•ξ, chiFam pq⟩ = 0`.
+  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hξZ ((hyp.chiFam_spec hVeq app).2.1 pq)
+  have hθ : ClassFunction.inner (hyp.chiFam hVeq app pq) (hyp.chiFam hVeq app pq) = 1 := by
+    rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  rw [ClassFunction.inner_smul_left,
+    inner_eq_zero_of_smul_sub_smul_orthogonal hξ1 hθ hξξ' hm hc hpsi, mul_zero]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
