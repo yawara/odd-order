@@ -821,6 +821,38 @@ theorem constituentWeight_pos_iff {M : Type*} [Group M] [Finite M] {N : Subgroup
       ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ)) ≠ 0 := by
   rw [constituentWeight_spec hφ θ, ne_eq, Nat.cast_eq_zero, ← ne_eq, ← Nat.pos_iff_ne_zero]
 
+/-- **(6.8.2.3) constituent aggregate over the positive-weight subtype.**  The `αθ`-aggregate
+`sum_smul_constituent_diff_eq` (indexed by all of `Irr H`, with weight `aθ = ⟨φ, Res θ⟩` written as
+the `ℂ`-valued multiplicity) reindexed to the positive-weight subtype `{θ // 0 < aθ}` with the weight
+in natural-number form `constituentWeight`:
+`Ind^M_K φ − |H:K|·η₁ = ∑_{θ : 0 < aθ} aθ·(Ind^M_H θ − aθ·η₁)`.
+
+This is the `hconstit` source aggregate for the per-`φ` pinning: the index matches the per-`φ`
+decomposition family `{θ // 0 < aθ}`, and the weight is the `ℕ` consumed by
+`per_constituent_Y_eq_smul` (the `ℂ`-coefficient `⟨φ, Res θ⟩` is `(constituentWeight … : ℂ)` by
+`constituentWeight_spec`; the `aθ = 0` constituents drop out by `sum_eq_sum_pos_weight_subtype`). -/
+theorem sum_smul_constituent_diff_pos_weight_subtype {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
+    (φ : ClassFunction ↥K ℂ)
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ))
+    (η₁ : ClassFunction M ℂ) :
+    ClassFunction.induce K φ - ((K.subgroupOf H).index : ℂ) • η₁
+      = ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+          (constituentWeight hφ' i.val : ℂ) •
+            (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
+              - (constituentWeight hφ' i.val : ℂ) • η₁) := by
+  rw [← sum_smul_constituent_diff_eq hKH hcen φ hφ' η₁]
+  simp only [constituentWeight_spec hφ']
+  exact sum_eq_sum_pos_weight_subtype (constituentWeight hφ')
+    (fun θ => (constituentWeight hφ' θ : ℂ) • (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      - (constituentWeight hφ' θ : ℂ) • η₁)) (fun θ hθ => by
+        simp only [hθ, Nat.cast_zero, zero_smul])
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
@@ -1706,6 +1738,41 @@ theorem restrict_H_certainType_eq
   have hval := congrArg (fun f : ClassFunction ↥h46.K ℂ => f ⟨(g : ↥L), hgK⟩)
     (h46.restrict_certainType_eq χ₂ i)
   simpa using hval
+
+/-- **(6.8.2.3) column constituent decomposition (`Ind^L_H`-form).**  The (5.4) decomposition data
+for a reducible column constituent `μ_j`, recast from `certainTypeDecompositionDa` (whose
+`χ`-component is `columnSum χ₂`) to the `Ind^L_H`-form `induce H (Res_H μ_{0j})` via the (4.5.a)
+transport `columnSum_eq_induce_H` (`h46.K = H`).  This puts the column decompositions in the same
+`Ind^L_H θ`-indexed shape as the irreducible constituents
+(`decompositionDaFromDadeOfDiff h46.dade0 h46.dade0.hconj`), so a single per-`φ` family
+(`{θ : Irr H // 0 < aθ}`) feeds `per_constituent_Y_eq_smul` against the one map
+`τ = dadeIntegralCharacterMap h46.dade0 h46.tau` (which ignores its isometry-data argument). -/
+noncomputable def columnConstituentDecomposition
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hμη₁supp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (sharpImage H ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h46.tic.V, g = l * v * l⁻¹}) L)
+    (htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau)
+      (ClassFunction.induce H
+        (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)))
+      (a • η₁) := by
+  rw [← columnSum_eq_induce_H h46 hHK χ₂]
+  exact OddOrder.Peterfalvi.S06.certainTypeDecompositionDa h46 hχ₂ hdeg hμη₁supp htau1_mema hχψ hχbarψ
 
 /-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
 `μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
