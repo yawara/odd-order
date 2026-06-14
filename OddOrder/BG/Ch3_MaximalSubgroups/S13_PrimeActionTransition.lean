@@ -803,6 +803,71 @@ theorem exists_conj_smul_le_Msigma_of_pSubgroup [Finite G] (hG : IsMinimalSimple
     rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
   rw [hQconj]; exact hPMσ
 
+/-- **Lemma 13.8 GAP 2 の核 (H ≤ M, M-side, 向き付き)**: `s ∈ β(M)` が `F(H)` を割り、`Y` を
+`M ∩ H` の非自明 `β(M)`-部分群 (`t`-群, `t ∈ β(M)`) とすると `H ≤ M`。
+
+`X = O_s(H)` は `H` に characteristic (`H ≤ N_G(X)`) な `s`-群。`s ∈ β(M) ⊆ σ(M)` ゆえ
+`exists_conj_smul_le_Msigma_of_pSubgroup` で `X^a ⊆ M_σ ⊆ M`; その `X' = X^a` に Prop 10.14(d)
+を `M` 側で適用 (`N_G(X') ⊆ M`) し、共役で戻すと `H ⊆ M^{a⁻¹}`。一方 `Y ⊆ M ∩ M^{a⁻¹}` で
+`conj_eq_self_of_sigma_pSubgroup_normalizer_le` (collapse) により `M^{a⁻¹} = M`、ゆえ `H ⊆ M`。
+
+(`Y` は呼出側で `Y = O_t(C_{M_β}(P))` を渡す。β の共役不変性を要しないのが要点。) -/
+theorem hall_le_of_fitting_prime [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {s : ℕ} [Fact s.Prime]
+    (hsβ : s ∈ S10.beta M) {H : Subgroup G}
+    (hsF : s ∈ (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors)
+    {t : ℕ} [Fact t.Prime] (htβ : t ∈ S10.beta M) {Y : Subgroup G}
+    (hYne : Y ≠ ⊥) (hYt : IsPGroup t ↥Y) (hYM : Y ≤ M) (hYH : Y ≤ H) :
+    H ≤ M := by
+  -- `X = O_s(H)`: nonidentity `s`-group, characteristic in `H`.
+  have hXne : opiCoreInG ({s} : Set ℕ) H ≠ ⊥ :=
+    Ch2.S08.opiCoreInG_singleton_ne_bot_of_mem_primeFactors_fittingInG hsF
+  have hHNX : H ≤ Subgroup.normalizer ((opiCoreInG ({s} : Set ℕ) H : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG _ _
+  have hXs : IsPGroup s ↥(opiCoreInG ({s} : Set ℕ) H) :=
+    isPGroup_of_isPiSubgroup_singleton (isPiSubgroup_opiCoreInG _ _)
+  have hsσ : s ∈ S10.sigma M := S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M hsβ)
+  -- conjugate `X` into `M_σ`.
+  obtain ⟨a, haX⟩ := exists_conj_smul_le_Msigma_of_pSubgroup hG hM hsσ hXs
+  have hX'M : MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H) ≤ M := haX.trans (S10.Msigma_le M)
+  have hX'ne : MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H) ≠ ⊥ := by
+    intro hb
+    apply hXne
+    have h := congrArg (fun K => MulAut.conj a⁻¹ • K) hb
+    simpa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, Subgroup.smul_bot] using h
+  have hX's : IsPGroup s ↥(MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H)) :=
+    hXs.of_equiv (Subgroup.equivMapOfInjective _ (MulAut.conj a).toMonoidHom
+      (MulAut.conj a).injective)
+  have hNX'M : Subgroup.normalizer
+      ((MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H) : Subgroup G) : Set G) ≤ M :=
+    S10.normalizer_le_of_nontrivial_beta_subgroup hG hM hX'M hX'ne
+      (isPiSubgroup_of_isPGroup_of_mem hX's hsβ)
+  -- `conj a • H ≤ N_G(X') ≤ M`, hence `H ≤ M^{a⁻¹}`.
+  have hconjH : MulAut.conj a • H ≤ M := by
+    have h1 : MulAut.conj a • H ≤
+        MulAut.conj a • Subgroup.normalizer ((opiCoreInG ({s} : Set ℕ) H : Subgroup G) : Set G) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hHNX
+    have hnorm : MulAut.conj a •
+          Subgroup.normalizer ((opiCoreInG ({s} : Set ℕ) H : Subgroup G) : Set G)
+        = Subgroup.normalizer
+          ((MulAut.conj a • (opiCoreInG ({s} : Set ℕ) H) : Subgroup G) : Set G) :=
+      Subgroup.map_normalizer_eq_of_bijective _ (MulAut.conj a).bijective
+    rw [hnorm] at h1
+    exact h1.trans hNX'M
+  have hHg : H ≤ MulAut.conj a⁻¹ • M := by
+    have hid : MulAut.conj a⁻¹ • (MulAut.conj a • H) = H := by
+      rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    calc H = MulAut.conj a⁻¹ • (MulAut.conj a • H) := hid.symm
+      _ ≤ MulAut.conj a⁻¹ • M := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hconjH
+  -- collapse with `Y`.
+  have htσ : t ∈ S10.sigma M := S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M htβ)
+  have hNY : Subgroup.normalizer (Y : Set G) ≤ M :=
+    S10.normalizer_le_of_nontrivial_beta_subgroup hG hM hYM hYne
+      (isPiSubgroup_of_isPGroup_of_mem hYt htβ)
+  have hcollapse : MulAut.conj a⁻¹ • M = M :=
+    conj_eq_self_of_sigma_pSubgroup_normalizer_le hG hM htσ hYne hYt hNY hYM (hYH.trans hHg)
+  rwa [hcollapse] at hHg
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),

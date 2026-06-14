@@ -208,6 +208,23 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   6. **r 抽出**: C_{M*_β}(P)≠1 → ∃r∈β(M*), r∣|C_G(P)|; r∈θ ∧ H Hall θ ⟹ r∣|H|∣|C_M(P)|.
      r∉σ(M): `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2` (α(M*)∩σ(M)=∅, β⊆α)。
   ⚠ 最難 = WLOG s∈β(M) (M↔M* 対称化) + H⊇C_{M_β}(P) (Hall 共役) + subtype transport。2-3 iter 見込み。
+- 2026-06-14 (Lane F, /loop 続き¹⁰): **🎉 conj-into-Msigma 補題 COMPLETE** (commit, full build 緑)。
+  `exists_conj_smul_le_Msigma_of_pSubgroup`: q∈σ(M), q-群 Y ⟹ ∃g, Y^g⊆M_σ。GAP 2.5 の核。
+  - ✅ **13.6 は Lane G で進行中** (main: 09a53a44 infra, c6580a9a gaps RESOLVED; S13_PrimeAction:558 は
+    まだ sorry だが近い) ⟹ 13.8 完成は **間もなく high-value 化** (13.6+13.8→13.9-13.11 解禁)。継続が正。
+  ### 🔑 GAP 2 精密アーキテクチャ確定 (hall_D で WLOG 簡略化)
+  - **`hall_D [Finite][IsSolvable] {π}{U} (∀q∈π(U), q∈π) : ∃H, IsHallSubgroup π H ∧ U≤H`** (Ch03 Main:1486)
+    ⟹ ↥C で U=C_{M_β}(P).subgroupOf C に適用すれば「H⊇C_{M_β}(P)」が一発 (Hall 共役不要)。
+  - **核 (A) `hall_le_of_fitting_prime_mem_beta` (H≤M, 向き付き s∈β(M), M 側のみ・M* 不要)** [GAP2 steps4-8]:
+    入力 = M maximal, s∈β(M), H Hall θ of C_G(P) with C_{M_β}(P)≤H ∧ C_{M_β}(P)≠1 ∧ s∈π(F(H))。
+    X=O_s(H) (char in H→H≤N_G(X); s-群; s∈σ(M)→`exists_conj_smul_le_Msigma_of_pSubgroup`→X≤M^g;
+    Prop10.14d→N_G(X)≤M^g; ⟹ H≤M^g)。Y=O_t(C_{M_β}(P)) (t∈π(F(C_{M_β}P))⊆β(M), Y≤M∩M^g, N_G(Y)≤M,
+    t∈σ(M)) → **collapse** `conj_eq_self_of_sigma_pSubgroup_normalizer_le` → M^g=M → H≤M。
+    **次イテレーションの標的**。要 handle: O_s=opiCore char+nontrivial-from-F-prime, F(H) prime, O_t。
+  - **(B) main dispatch**: 汎用 H 構成 → s∈π(F(H))⊆β(M)∪β(M*); s∈β(M) なら (A)+GAP3(M,M*);
+    s∈β(M*) なら (A)(M:=M*)+GAP3(M*,M) [M↔M* 対称]。⟹ GAP3 も対称 helper 化要。
+  - **r 抽出** (H≤M 後): C_{M*_β}(P)≠1→∃r∈β(M*), r∣|C_G(P)|; r∈θ∧H Hall θ→r∣|H|∣|C_M(P)|; r∉σ(M)
+    via `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2`。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
