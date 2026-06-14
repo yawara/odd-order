@@ -991,6 +991,79 @@ theorem exists_E1inv_sylow_centralizing_derivedE [Finite G] (hG : IsMinimalSimpl
     exact le_antisymm h2 (hfactW.trans_le h1)
   exact ⟨S₀, hS₀N.trans hNMσ, hS₀q, hS₀inv, hS₀N.trans inf_le_right, by rw [hS₀card, hcardN]⟩
 
+private theorem smul_centralizer_conj (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.centralizer (H : Set G)
+      = Subgroup.centralizer ((MulAut.conj g • H : Subgroup G) : Set G) :=
+  Subgroup.map_centralizer_eq_of_bijective (H : Set G) (MulAut.conj g).toMonoidHom
+    (MulAut.conj g).bijective
+
+private theorem smul_derivedInG_conj (g : G) (E : Subgroup G) :
+    derivedInG (MulAut.conj g • E) = MulAut.conj g • derivedInG E := by
+  have e1 : derivedInG (MulAut.conj g • E) = ⁅MulAut.conj g • E, MulAut.conj g • E⁆ :=
+    Subgroup.map_subtype_commutator _
+  have e2 : MulAut.conj g • derivedInG E = ⁅MulAut.conj g • E, MulAut.conj g • E⁆ := by
+    have he : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
+    rw [he, Subgroup.pointwise_smul_def, Subgroup.map_commutator]
+    rfl
+  rw [e1, e2]
+
+/-- **Lemma 13.6 step 2 (the WLOG).** With `X ≤ M_σ ⊓ C_G(E₁)` a `q`-subgroup, `q ∉ β(M)`, there is
+a conjugate complement `F = E^{c⁻¹}` (`c ∈ C_{M_σ}(E₁)`, so its `τ₁`-Hall is again `E₁`) with
+`X ≤ C_G(F')`. (S₀ = E₁-invariant Sylow `q ⊆ C(E')`; `X ⊆ S₁` an E₁-invariant Sylow; `1.5(c)`
+conjugates `S₁` to `S₀` by `c ∈ C_{M_σ}(E₁)`; then `X = (X^c)^{c⁻¹} ⊆ (S₀)^{c⁻¹} ⊆ C(F')`.) -/
+theorem exists_conjugate_complement_centralizing [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime]
+    (hqβ : q ∉ S10.beta M) {X : Subgroup G} (hXq : IsPGroup q ↥X) (hXMσ : X ≤ S10.Msigma M)
+    (hXE1 : X ≤ Subgroup.centralizer (E₁ : Set G)) :
+    ∃ F F₂ F₃ : Subgroup G, SubgroupESetup M F E₁ F₂ F₃ ∧
+      X ≤ Subgroup.centralizer (derivedInG F : Set G) := by
+  classical
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hMσsolv : IsSolvable ↥(S10.Msigma M) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hMσM).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hMσM).surjective
+  have hE1NMσ : E₁ ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E1_le_M.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hcop_MσE : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥E) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at h1
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥(S10.Msigma M)) :=
+    hcop_MσE.symm.coprime_dvd_left (Subgroup.card_dvd_of_le h.E₁_le)
+  obtain ⟨S₀, hS₀Mσ, _hS₀q, hS₀inv, hS₀CE', hS₀card⟩ :=
+    exists_E1inv_sylow_centralizing_derivedE hG h hqβ
+  have hXNX : E₁ ≤ Subgroup.normalizer (X : Set G) :=
+    (Subgroup.le_centralizer_iff.mp hXE1).trans (Subgroup.centralizer_le_normalizer _)
+  obtain ⟨S₁, hS₁Mσ, _hS₁q, hS₁inv, hXS₁, hS₁card⟩ :=
+    aInvariant_pSubgroup_le_aInvariant_sylow_subgroup hE1NMσ hcop (Or.inr hMσsolv) hXMσ hXq hXNX
+  have hcardS₀ : Nat.card ↥(S₀.subgroupOf (S10.Msigma M))
+      = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS₀Mσ).toEquiv]; exact hS₀card
+  have hcardS₁ : Nat.card ↥(S₁.subgroupOf (S10.Msigma M))
+      = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS₁Mσ).toEquiv]; exact hS₁card
+  obtain ⟨c, hcMσ, hcCE1, hcConj⟩ := aInvariant_sylow_conj_subgroup hE1NMσ hcop (Or.inr hMσsolv)
+    hS₁Mσ hcardS₁ hS₁inv hS₀Mσ hcardS₀ hS₀inv
+  -- `F = conj c⁻¹ • E`; its `E₁`-slot is fixed since `c⁻¹ ∈ C(E₁) ≤ N(E₁)`.
+  have hc1 : MulAut.conj c⁻¹ • E₁ = E₁ :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.centralizer_le_normalizer _ (inv_mem hcCE1))
+  refine ⟨MulAut.conj c⁻¹ • E, MulAut.conj c⁻¹ • E₂, MulAut.conj c⁻¹ • E₃,
+    hc1 ▸ SubgroupESetup.conj' h (inv_mem (hMσM hcMσ)), ?_⟩
+  -- `X ≤ C(F')`.  `conj c • X ⊆ conj c • S₁ = S₀ ⊆ C(E')`, then conjugate back by `c⁻¹`.
+  have hcXCE' : MulAut.conj c • X ≤ Subgroup.centralizer (derivedInG E : Set G) :=
+    ((conj_smul_mono _ hXS₁).trans (le_of_eq hcConj)).trans hS₀CE'
+  have hE'cX : derivedInG E ≤ Subgroup.centralizer ((MulAut.conj c • X : Subgroup G) : Set G) :=
+    Subgroup.le_centralizer_iff.mp hcXCE'
+  rw [smul_derivedInG_conj, Subgroup.le_centralizer_iff]
+  -- `conj c⁻¹ • derivedInG E ≤ conj c⁻¹ • C(conj c • X) = C(X)`.
+  calc MulAut.conj c⁻¹ • derivedInG E
+      ≤ MulAut.conj c⁻¹ • Subgroup.centralizer ((MulAut.conj c • X : Subgroup G) : Set G) :=
+        conj_smul_mono _ hE'cX
+    _ = Subgroup.centralizer (X : Set G) := by
+        rw [smul_centralizer_conj, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
