@@ -379,6 +379,19 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
   complement), (3) counting: |F_i|≥|A|+1, |F|=2|A|+1≥(|A|+1)² 矛盾。substantial。
   - その後 σ_y/Aut(K) → field or F_{r²,2} 分類 (最重) + Prop 1 (Brauer-Suzuki gate)。
 
+### session 16-19 (2026-06-14): Appendix II Prop 2 — irreducibility counting の補題群
+counting (A index-2 ⊆ Fˣ ⟹ A irreducible on (F,+)) の部品を順次 (全 proven, sorry 増無し):
+- `rightMulAction_eq_self_iff` (free action: 非自明元は非零固定点無し, GroupWithZero cancel)
+- `card_coprime` (|A| ⊥ |F|: |A|∣|Fˣ|=|F|-1 Lagrange + 連続整数互素)
+- `card_eq_of_index_two` (|F|=2|A|+1: card_mul_index + card_units)
+- **`card_group_dvd_card_of_free`** (一般補題: free finite action ⟹ |G|∣|α|; selfEquivSigmaOrbits +
+  orbit-stabilizer + index_bot; mathlib 昇格候補)。
+- **▶ 残 (irreducibility 完成まで ~2 session)**: (1) ↥A の U^# (=↥U\{1}) への MulAction setup + free →
+  card_group_dvd_card_of_free で |A|∣|U|-1 → |U|≥|A|+1; (2) Maschke (exists_aInvariant_complement_of_elementaryAbelian
+  + card_coprime) で complement W; (3) IsComplement card で |F|=|U||W|; (4) arithmetic
+  ((|A|+1)²>2|A|+1=|F| 矛盾)。⟹ nearField_field_structure を index-2 で unconditional 化。
+  その後 σ_y/Aut(K) → field or F_{r²,2} 分類 (重い・F_{r²,2} 構成は loop 完遂困難の可能性)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
