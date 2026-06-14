@@ -345,3 +345,19 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
   `MulAut.conj m • P = P.map (conj m).toMonoidHom` の bridge (rfl か要 `pointwise_smul` 補題) で統一要。
   次イテレーションで `Msigma_inf_centralizer_conj_ne_bot` を建てる → 両 branch tractable に。
 - **8004/8005 = G 領域** (H 非該当); 8004(i) は 14.7(h) 露出で迂回不要に。
+
+### ⚠ 核補題 `Msigma_inf_centralizer_conj_ne_bot` の friction (2026-06-15 loop, attempt 1 → revert)
+**両アプローチとも pointwise-conjugation の form friction で loop fragment 内では未完。dedicated pass 推奨。**
+- **pointwise approach (blocked)**: `hcentconj : centralizer(↑(conj m•P)) = conj m • centralizer P` を
+  `rw [pointwise_smul_def, pointwise_smul_def, S03f.centralizer_map_conj]` で狙うが、`pointwise_smul_def` は
+  `S.map (toMonoidEnd _ _ a)` 形、`centralizer_map_conj` は `K.map (conj g).toMonoidHom` 形で **syntactic 不一致**
+  (defeq だが rw 不可)。`toMonoidEnd (MulAut G) G (conj m) = (conj m).toMonoidHom` の bridge 補題が要る。
+- **membership approach (推奨・API 特定済)**: `Subgroup.ne_bot_iff_exists_ne_one.mp h` で x∈M_σ⊓C(P), x≠1 を取り、
+  `m*x*m⁻¹` が M_σ⊓C(conj m•P) の非自明元と示す。3 sub-goal:
+  (1) `m*x*m⁻¹∈M_σ`: `(Subgroup.mem_normalizer_iff.mp hmN x).mp hxMσ` (hmN=`le_normalizer_opiCoreInG (sigma M) M hmM`)。
+  (2) `m*x*m⁻¹∈C(conj m•P)`: `mem_centralizer_iff` → y∈↑(conj m•P) を
+  `Subgroup.mem_pointwise_smul_iff_inv_smul_mem` で m⁻¹*y*m∈P に落とし、hxC で x が中心化 → group 代数で
+  `(m*x*m⁻¹)*y=y*(m*x*m⁻¹)`。(3) `m*x*m⁻¹≠1`: x≠1 + conj 単射。残 friction = (2) の group 代数 + (3)。
+- **判断**: 14.2 の深い conjugacy 内部 (両 branch) は loop 25min fragment では API friction で非効率。
+  **opening (3fb80769) + 14.7(h) 露出は landing 済**。深い branch proof は **dedicated focused session** か、
+  まず membership 版核補題を 1 本完成させてから fragment 駆動が良い。
