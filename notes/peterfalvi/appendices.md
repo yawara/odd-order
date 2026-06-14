@@ -392,6 +392,32 @@ counting (A index-2 ⊆ Fˣ ⟹ A irreducible on (F,+)) の部品を順次 (全 
   ((|A|+1)²>2|A|+1=|F| 矛盾)。⟹ nearField_field_structure を index-2 で unconditional 化。
   その後 σ_y/Aut(K) → field or F_{r²,2} 分類 (重い・F_{r²,2} 構成は loop 完遂困難の可能性)。
 
+### ✅✅✅ session 20 (2026-06-14): Appendix II Prop 2 — irreducibility/counting COMPLETE (3 commits)
+session 16-19 の残 4 ステップを 1 ループで完遂 (全 sorry-free・axiom-clean・AxiomsCheck 登録済):
+- **`add_one_le_card_of_aInvariant_ne_bot`** (8a734e8a): A-不変 U≠⊥ ⟹ |A|+1≤|U|。`MulDistribMulAction.compHom`
+  で ↥A を Multiplicative F に作用させ、`SubMulAction` carrier `{x|x∈U∧x≠1}` (=U∖{1}) 上で free
+  (`rightMulAction_eq_self_iff`→stabilizer=⊥) → `card_group_dvd_card_of_free` で |A|∣|U∖{1}|。
+  |U∖{1}|+1=|U| は `Equiv.optionSubtypeNe`+`Finite.card_option`。U≠⊥ で正値性 → `Nat.le_of_dvd`+omega。
+  🔑 知見: 部分群-vs-SubMulAction の二重 coe で `OneMemClass.coe_eq_one` の SetLike 推論が誤爆 →
+  `Subtype.ext`/`Subtype.ext_iff` を直接使い `(1:↥U).val ≡ 1` defeq に委ねる。
+- **`exists_aInvariant_complement_of_elementaryAbelian`** (3df0d60d): elem-ab p-group E, φ:A→*MulAut E,
+  (|A|,|E|) coprime, p∣|E| ⟹ A-不変 U に A-不変 complement W (IsCompl U W)。**BG の
+  `exists_aInvariant_complement_in_omega1_quotient` を Ω₁/quotient 層抜きで E 直接に再構成**
+  (`mulAutToEnd`/`neZero_natCast_zmod_of_coprime`/`ComplementedLattice.exists_isCompl`/toZModSubmodule
+  /toSubgroup' を流用)。SemilinearField が OperatorMaschke を import 済 ⟹ NearFields closure に到達可。
+- **`rightMulAction_irreducible_of_index_two`** (df2d5876): A index-2 ⟹ ∀ A-不変 U, U=⊥∨U=⊤。
+  上 2 engine 組立: U proper nontrivial ⟹ |U|,|W|≥|A|+1 (W≠⊥ ∵ U≠⊤), |F|=|U|·|W| (`IsComplement'.card_mul`
+  via `isComplement'_of_disjoint_and_mul_eq_univ`+`← Subgroup.mul_normal`+`coe_top`; Mult F abelian で
+  W.Normal auto) ≥(|A|+1)²>2|A|+1=|F| を nlinarith。f∣|F| は非単位元の order=f (Nat.dvd_prime)。
+- **`nearField_field_structure_of_index_two`** (df2d5876): 上で hirr を discharge → index-2 から
+  **field structure 半 (F は K 上 1 次元, |K|=|F|) を unconditional 化**。
+- full build 3807 jobs 〜6s, AxiomsCheck 4 件 OK (propext/choice/Quot)。NearFields 実 sorry は依然 2
+  (opaque scaffold: rankOne_affine_nearField=Prop 1 / cyclic_index_two_nearField_classification=Prop 2 全体)。
+- **▶ 次 = Prop 2 後半 (分類)**: σ_y/Aut(K) 解析で「field or 例外 near-field F_{r²,2}」を確定し
+  scaffold `cyclic_index_two_nearField_classification` を faithful 化。F_{r²,2} の明示構成が最重
+  (loop 完遂困難の可能性大 — ここは hub に重さを flag 済の領域)。代替で C/D/E/A の他 appendix audit も可。
+  Prop 1 (`rankOne_affine_nearField`) は FT+Brauer-Suzuki gate (重い・後回し)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
