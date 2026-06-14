@@ -434,13 +434,21 @@ session 16-19 の残 4 ステップを 1 ループで完遂 (全 sorry-free・ax
   (2) **ZMod 2 の if-条件は fin_cases だと `0=0` が eq_self で潰れない (リテラル不一致)** → `rcases (show e=0∨e=1 by decide)`
   + subst で literal 化し `show (1:ZMod2)+1=0 from by decide` で書換える; (3) RingEquiv の ≠0 保存は
   `rw [ne_eq, EmbeddingLike.map_eq_zero_iff]`; (4) `simp +decide` は reduceIte に効くが上記リテラル不一致は別問題。
-- **▶ 残ステージ** (each 完全 lemma で commit, sorry 増やさない):
-  - **Stage 2 (assoc)**: twExp_mul/twExp_σ/twExp_twAut/twExp_twMul (χ の乗法性 + χ∘σ=χ) → twMul_assoc
-    (非零は twAut_twAut [= twAut a(twAut b x)=twAut(a+b)x, **RingAut mul の適用方向を要確認**] + add_comm; 零は absorb)。
-  - **Stage 3 (instance)**: twInv 明示 + GroupWithZero + 右分配 ⟹ `NearField` instance on K (TwistData から)。
-  - **Stage 4 (F_{r²,2})**: K=𝔽_{r²} (GaloisField/Finite 体で [K:𝔽_r]=2), σ=Frobenius^? (x↦x^r, σ²=1),
-    χ=quadraticChar で TwistData を実体化 → 例外 near-field 確定。‖ classification skeleton (σ hom + field 方向)。
-  - 注: scaffold `cyclic_index_two_nearField_classification` の faithful 化は Stage 4 + skeleton 後。
+- **✅ Stage 2 COMPLETE (commit 6a9c1f3e)**: twAut_twAut (RingAut mul = 合成, `(f*g)x=f(g x)` rfl)
+  + twExp_mul/twExp_σ/twExp_twAut/twExp_twMul + **twMul_assoc** (非零は twAut_twAut+add_comm; 零は absorb)。
+- **✅ Stage 3 COMPLETE (commit 9830f746)**: twExp_inv (χ(y⁻¹)=χ(y) in ℤ/2; `-a=a` by decide) + twMul_twInv
+  (明示逆元、有限cancel不要) ⟹ **`Twisted d` (型シノニム = K) に `NearField` instance** (型シノニム上 AddCommGroup
+  は inferInstanceAs、GroupWithZero は twisted; exists_pair_ne は `(zero_ne_one : (0:K)≠1)` で defeq cast)。
+  ⟹ **抽象 twisted near-field 完成** (F_{r²,2} の engine)。full build 3807, axiom 増無し、scaffold sorry 2 不変。
+- **▶ 残 (H 再配置前の中断点; 抽象 engine は完成済)**:
+  - **Stage 4 (F_{r²,2} 実体化)**: K=𝔽_{r²} (GaloisField/Finite 体で [K:𝔽_r]=2), σ=Frobenius (x↦x^r, σ²=1),
+    χ=quadraticChar で `TwistData K` を実体化 → `Twisted` で例外 near-field を得る。
+  - **classification skeleton**: σ_y:F⋆→Aut(K) hom (ker⊇A) + 「ker=F⋆ ⟹ F は体」方向。これは
+    nearField_field_structure に「∘ と両立する K の乗法 (y∈A で x∘y=xy)」を露出する強化が前提 (現状 K=End… は
+    finrank/|·| のみ露出)。⟹ scaffold `cyclic_index_two_nearField_classification` の faithful 化はこの後。
+  - 注 (2026-06-14 中断): ユーザー判断で **H レーンは FT 本線に繋がらない** (appendices=Part II off-critical-path)
+    ため一旦中断、H の振り分けを変更予定。NearFields の到達点 = ① index-2 irreducibility+field structure 無条件化
+    (session 20)、② 抽象 twisted near-field NearField instance (session 21, Stage1-3)。残は Stage 4 + skeleton。
 
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
