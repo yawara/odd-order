@@ -65,6 +65,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
+import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -3747,6 +3748,12 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- Theorem 13.4 and Corollary 13.3 are axiom-clean now that Lane F's §12 (Prop 12.15 /
 -- Thm 12.13 / Cor 12.16) is PROVEN, so `E1_actsPrime` bottoms out at the standard axioms only.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.E1_actsPrime
+
+-- BG Lemma 13.8: the forbidden configuration (`M*` non-conjugate to `M`, `p ∈ τ₁(M)∩τ₁(M*)`,
+-- `P`-invariant Sylow `Q, Q*` with `C_Q(P)=C_{Q*}(P)=1` and `N_G(Q)⊆M*`, `N_G(Q*)⊆M`) is
+-- impossible. GAP 3 (coprime quotient cover → `R` of order `r` → Theorem 13.4 conjugated to the
+-- Hall complement `E` → nilpotent `M*'/M*_α` collapse) is fully unconditional and axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.forbidden_config_impossible
 
 -- BG §10 (β-radical spine): Theorem 10.6 (every proper subgroup has `p`-length one).
 -- Originally wired against two forward axioms of `S10_ForwardFromKeystone`

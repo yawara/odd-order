@@ -99,3 +99,26 @@ quotient には `haveI : N.Normal := S10.Malpha_subgroupOf_normal Mstar` が要 
 
 次イテレーション標的: 形式化を開始。難所 (3c) は handle が揃い使用例もある。
 (3b) の SubgroupESetup の E への P,R 同時共役 (PR≤E) が最も組立工数大か。
+
+### ✅✅✅ Lemma 13.8 COMPLETE (2026-06-14, Lane F)
+GAP 3 (3a)/(3b)/(3c) 全形式化完了 ⟹ `forbidden_config_impossible` (Lemma 13.8 本体) +
+`gap3_false_from_r` (assembly) すべて sorry-free・**axiom-clean** (`#print axioms` =
+`[propext, Classical.choice, Quot.sound]` のみ; `forbidden_config_impossible` を
+AxiomsCheck に登録)。full build 3807 jobs 緑。
+
+- **(3a)** `exists_order_r_le_normalizer_centralizer` (commit `68d490b9`): coprime quotient cover
+  で得た P-fixed 代表 `c∈C_{N_M(Q)}(P)` を商 `↥M ⧸ (M_β).subgroupOf M` で `c≡y (mod M_β)` ⟹
+  `r∣orderOf c` (`orderOf_map_dvd` + `r∤|M_β|` で r-part 生存)、Cauchy で `R=⟨order-r power⟩`。
+- **(3b)** `gap3_centralizer_Malpha_P_le_Mstar`: (3a) で `R` → Prop 10.14(d) で `N_G(R)⊆M*`
+  → 新 helper **`centralizer_msigma_le_of_commute_tau1`** (= "Thm 13.4 の E 外への共役拡張")
+  → chain `M_α⊓C(P)≤M_σ⊓C(P)≤M_σ⊓C(R)≤C(R)≤N_G(R)≤M*`。
+- **共役拡張 helper の核**: `exists_conj_smul_le_hallPiece` (PR を Hall σ'-補群 E へ M-共役;
+  π=σ(M)ᶜ, F=E, hF=`IsHallSubgroup σᶜ (E.subgroupOf E=⊤)` を `SubgroupESetup.isPiGroup_sigma_compl`
+  から構成) → 共役対に `centralizer_le_centralizer_of_tau1` → `M_σ⊴M` の共役同変性
+  (`centralizer_conj_smul` + `Subgroup.smul_inf` + `conj_smul_eq_self_of_mem_normalizer`) で戻す。
+- **`isPiGroup_sup_of_le_centralizer`** (private): 可換 σ'-対 P,R の join も σ'-群
+  (`↥(P⊔R)` 内で両者正規 ⟹ `IsPiGroup.sup_of_normal`)。p≠r 不要。
+- 🔑 知見: `isPiGroup_sigma_compl` は `SubgroupESetup` namespace 内 (`SubgroupESetup.` 接頭辞要)。
+  subtype 元 `⟨y,h⟩` の `orderOf_injective` は `.symm` 要 (goal LHS が subtype 側)。
+
+⟹ **§13 下流 leaf の 13.7 + 13.8 完了**。残 = 13.9/13.10/13.11 (Lane G の 13.6 landing 待ち)。

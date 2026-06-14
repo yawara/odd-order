@@ -1738,6 +1738,120 @@ theorem exists_order_r_le_normalizer_centralizer [Finite G]
   · rw [Subgroup.zpowers_le]
     exact (Subgroup.zpowers_le.mpr hcC) hz_mem
 
+/-- 可換 (`R ≤ C(P)`) な `π`-部分群 `P, R` の join `P ⊔ R` も `π`-部分群。
+可換性から `P, R` は互いに正規化するので `↥(P⊔R)` 内では両者とも正規になり、
+`IsPiGroup.sup_of_normal` が適用できる。 -/
+private theorem isPiGroup_sup_of_le_centralizer [Finite G] {π : Set ℕ} {P R : Subgroup G}
+    (hP : Ch03.Subgroup.IsPiGroup π P) (hR : Ch03.Subgroup.IsPiGroup π R)
+    (hcomm : R ≤ Subgroup.centralizer (P : Set G)) :
+    Ch03.Subgroup.IsPiGroup π (P ⊔ R) := by
+  have hPcR : P ≤ Subgroup.centralizer (R : Set G) := fun x hx =>
+    Subgroup.mem_centralizer_iff.mpr fun y hy =>
+      (Subgroup.mem_centralizer_iff.mp (hcomm hy) x hx).symm
+  have hPle : P ≤ P ⊔ R := le_sup_left
+  have hRle : R ≤ P ⊔ R := le_sup_right
+  haveI : (P.subgroupOf (P ⊔ R)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer
+      (sup_le Subgroup.le_normalizer (hcomm.trans (Subgroup.centralizer_le_normalizer _)))
+  haveI : (R.subgroupOf (P ⊔ R)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer
+      (sup_le (hPcR.trans (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer)
+  have hPpi : Ch03.Subgroup.IsPiGroup π (P.subgroupOf (P ⊔ R)) := by
+    intro s hs
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPle).toEquiv] at hs
+    exact hP s hs
+  have hRpi : Ch03.Subgroup.IsPiGroup π (R.subgroupOf (P ⊔ R)) := by
+    intro s hs
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRle).toEquiv] at hs
+    exact hR s hs
+  have hsup := Ch03.Subgroup.IsPiGroup.sup_of_normal hPpi hRpi
+  rw [← Subgroup.subgroupOf_sup hPle hRle, Subgroup.subgroupOf_self] at hsup
+  intro s hs
+  apply hsup
+  rwa [Nat.card_congr (Subgroup.topEquiv (G := ↥(P ⊔ R))).toEquiv]
+
+/-- **Theorem 13.4 の `E` 外への共役拡張**: `P, R ≤ M` が可換 (`R ≤ C(P)`),
+`P ∈ ℰ_p¹` (`p ∈ τ₁(M)`), `R ∈ ℰ_r¹` (`r ∉ σ(M)`) なら `C_{M_σ}(P) ⊆ C_{M_σ}(R)`。
+
+BG Lemma 13.8 の "`PR` is conjugate in `M` to an abelian subgroup of `E`, Theorem 13.4 yields …"。
+証明: `PR`（`σ(M)'`-部分群）を Hall 補群 `E` へ `M`-共役 (`exists_conj_smul_le_hallPiece`)、
+共役した対に Thm 13.4 を適用、`M_σ ⊴ M` の共役同変性で戻す。 -/
+theorem centralizer_msigma_le_of_commute_tau1 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p r : ℕ} [Fact p.Prime] [Fact r.Prime]
+    (hp : p ∈ tau1 M) (hrσ : r ∉ S10.sigma M)
+    {P R : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hR : R ∈ elemAbelianOfRank G r 1)
+    (hPM : P ≤ M) (hRM : R ≤ M) (hcomm : R ≤ Subgroup.centralizer (P : Set G)) :
+    S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≤
+      S10.Msigma M ⊓ Subgroup.centralizer (R : Set G) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨-, hPcardp⟩ := mem_elemAbelianOfRank.mp hP
+  obtain ⟨-, hRcardr⟩ := mem_elemAbelianOfRank.mp hR
+  have hPcardp' : Nat.card ↥P = p := by rw [← pow_one p]; exact hPcardp
+  have hRcardr' : Nat.card ↥R = r := by rw [← pow_one r]; exact hRcardr
+  -- `E` and its `σ'`-Hall structure (`⊤` is a Hall `σ(M)'`-subgroup of `E`).
+  obtain ⟨E, E₁, E₂, E₃, hE⟩ := exists_subgroupESetup hG hM
+  have hEhall : Ch03.IsHallSubgroup (S10.sigma M)ᶜ (E.subgroupOf E) := by
+    rw [Subgroup.subgroupOf_self]
+    refine ⟨fun s hs => ?_, fun s hs => ?_⟩
+    · apply SubgroupESetup.isPiGroup_sigma_compl hG hE
+      rwa [Nat.card_congr (Subgroup.topEquiv (G := ↥E)).toEquiv] at hs
+    · rw [Subgroup.index_top, Nat.primeFactors_one] at hs
+      simp at hs
+  -- `P ⊔ R` is a `σ(M)'`-subgroup of `M`.
+  have hp_sigma : p ∈ (S10.sigma M)ᶜ := tau1_subset_sigma_compl M hp
+  have hP_pi : Ch03.Subgroup.IsPiGroup (S10.sigma M)ᶜ P := by
+    intro s hs
+    rw [hPcardp', (Fact.out : p.Prime).primeFactors, Finset.mem_singleton] at hs
+    exact hs ▸ hp_sigma
+  have hR_pi : Ch03.Subgroup.IsPiGroup (S10.sigma M)ᶜ R := by
+    intro s hs
+    rw [hRcardr', (Fact.out : r.Prime).primeFactors, Finset.mem_singleton] at hs
+    exact hs ▸ (Set.mem_compl_iff _ _).mpr hrσ
+  have hPRpi : Ch03.Subgroup.IsPiGroup (S10.sigma M)ᶜ ((P ⊔ R).subgroupOf M) := by
+    intro s hs
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hPM hRM)).toEquiv] at hs
+    exact isPiGroup_sup_of_le_centralizer hP_pi hR_pi hcomm s hs
+  -- conjugate `P ⊔ R` into `E` by some `w ∈ M`.
+  obtain ⟨w, hwM, hwle⟩ :=
+    exists_conj_smul_le_hallPiece hG hE le_rfl hEhall (subset_refl _) (sup_le hPM hRM) hPRpi
+  have hPwE : (MulAut.conj w • P : Subgroup G) ≤ E :=
+    (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr le_sup_left).trans hwle
+  have hRwE : (MulAut.conj w • R : Subgroup G) ≤ E :=
+    (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr le_sup_right).trans hwle
+  -- conjugated data for Theorem 13.4.
+  have hPw_mem : (MulAut.conj w • P : Subgroup G) ∈ elemAbelianOfRank G p 1 :=
+    conj_smul_mem_elemAbelianOfRank w hP
+  have hRw_mem : (MulAut.conj w • R : Subgroup G) ∈ elemAbelianOfRank G r 1 :=
+    conj_smul_mem_elemAbelianOfRank w hR
+  have hRw_comm : (MulAut.conj w • R : Subgroup G) ≤
+      Subgroup.centralizer ((MulAut.conj w • P : Subgroup G) : Set G) := by
+    rw [← centralizer_conj_smul]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hcomm
+  have hr_pf : r ∈ (Nat.card ↥E).primeFactors := by
+    have hRw_card : Nat.card ↥(MulAut.conj w • R : Subgroup G) = r := by
+      rw [← pow_one r]; exact (mem_elemAbelianOfRank.mp hRw_mem).2
+    refine Nat.mem_primeFactors.mpr ⟨Fact.out, ?_, Nat.card_pos.ne'⟩
+    rw [← hRw_card]; exact Subgroup.card_dvd_of_le hRwE
+  -- Theorem 13.4 on the conjugated pair.
+  have hT134 : S10.Msigma M ⊓ Subgroup.centralizer ((MulAut.conj w • P : Subgroup G) : Set G) ≤
+      S10.Msigma M ⊓ Subgroup.centralizer ((MulAut.conj w • R : Subgroup G) : Set G) :=
+    centralizer_le_centralizer_of_tau1 hG hE hp hr_pf hPw_mem hPwE hRw_mem (le_inf hRwE hRw_comm)
+  -- transfer back by `conj w⁻¹` (`M_σ` is `M`-invariant).
+  have hMnorm : M ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) := by
+    rw [S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma M) M
+  have hMσfix : MulAut.conj w⁻¹ • S10.Msigma M = S10.Msigma M :=
+    conj_smul_eq_self_of_mem_normalizer (hMnorm (M.inv_mem hwM))
+  have hPback : MulAut.conj w⁻¹ • (MulAut.conj w • P) = P := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hRback : MulAut.conj w⁻¹ • (MulAut.conj w • R) = R := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have key := (Subgroup.pointwise_smul_le_pointwise_smul_iff
+    (a := MulAut.conj w⁻¹)).mpr hT134
+  rw [Subgroup.smul_inf, Subgroup.smul_inf, hMσfix, centralizer_conj_smul,
+    centralizer_conj_smul, hPback, hRback] at key
+  exact key
+
 /-- **Lemma 13.8 GAP 3 elision (ii)+(iii)** (mmd L3686): `C_{M_α}(P) ⊆ M*`。
 BG の理由: `M = N_M(Q) M_α` と `r ∣ |C_M(P)|`, `r ∉ σ(M)` から `P`-中心化された位数 `r` の
 `R ⊆ N_M(Q)` が存在 (coprime action; (ii))、`R ⊆ N_G(Q) ⊆ M*` かつ `N_G(R) ⊆ M*` (Prop 10.14d)。
@@ -1755,7 +1869,37 @@ theorem gap3_centralizer_Malpha_P_le_Mstar [Finite G] (hG : IsMinimalSimpleOdd G
     {r : ℕ} [Fact r.Prime] (hrβ : r ∈ S10.beta Mstar)
     (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G))) (hrσ : r ∉ S10.sigma M) :
     S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Mstar := by
-  sorry
+  classical
+  obtain ⟨hPea, -⟩ := mem_elemAbelianOfRank.mp hP
+  have hPp : IsPGroup p ↥P := hPea.isPGroup
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `p, r ∉ σ(M)`, hence `∉ β(M)`, hence `∤ |M_β|`.
+  have hpσ : p ∉ S10.sigma M := tau1_subset_sigma_compl M hp
+  have hp_nMβ : ¬ p ∣ Nat.card ↥(S10.Mbeta M) := fun hpd =>
+    hpσ (S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M
+      (S10.Mbeta_isPiGroup M p (Nat.mem_primeFactors.mpr ⟨Fact.out, hpd, Nat.card_pos.ne'⟩))))
+  have hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M) := fun hrd =>
+    hrσ (S10.alpha_subset_sigma hG hM (S10.beta_subset_alpha M
+      (S10.Mbeta_isPiGroup M r (Nat.mem_primeFactors.mpr ⟨Fact.out, hrd, Nat.card_pos.ne'⟩))))
+  -- (ii): an order-`r` subgroup `R ≤ N_M(Q)` centralized by `P` (coprime action).
+  obtain ⟨R, hRcard, hRNQ, hRC⟩ :=
+    exists_order_r_le_normalizer_centralizer hPp hPM hQinv hFrat hp_nMβ hrC hr_nMβ ‹IsSolvable ↥M›
+  have hRM : R ≤ M := hRNQ.trans inf_le_left
+  have hRMstar : R ≤ Mstar := (hRNQ.trans inf_le_right).trans hNQ
+  have hRne : R ≠ ⊥ := by
+    intro hb; rw [hb, Subgroup.card_bot] at hRcard
+    exact (Fact.out : r.Prime).one_lt.ne hRcard
+  have hRr : IsPGroup r ↥R := IsPGroup.of_card (by rw [hRcard, pow_one])
+  have hRmem : R ∈ elemAbelianOfRank G r 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hRcard, by rw [hRcard, pow_one]⟩
+  -- (iii) `N_G(R) ⊆ M*` (Prop 10.14(d): `R` a nonidentity `β(M*)`-subgroup of `M*`).
+  have hNGR : Subgroup.normalizer (R : Set G) ≤ Mstar :=
+    S10.normalizer_le_of_nontrivial_beta_subgroup hG hMstar hRMstar hRne
+      (isPiSubgroup_of_isPGroup_of_mem hRr hrβ)
+  -- (iii) chain: `M_α ⊓ C(P) ≤ M_σ ⊓ C(P) ≤ M_σ ⊓ C(R) ≤ C(R) ≤ N_G(R) ≤ M*`.
+  have h134 := centralizer_msigma_le_of_commute_tau1 hG hM hp hrσ hP hRmem hPM hRM hRC
+  exact (inf_le_inf_right (Subgroup.centralizer (P : Set G)) (S10.Malpha_le_Msigma hG hM)).trans
+    (h134.trans (inf_le_right.trans ((Subgroup.centralizer_le_normalizer _).trans hNGR)))
 
 /-- **Lemma 13.8 GAP 3 capstone (M-oriented)**: 配置 + step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
 `C_{M_α}(PQ)=1`) + GAP 2 の `r` (`r∈β(M*)`, `r∣|C_M(P)|`, `r∉σ(M)`) から矛盾。
