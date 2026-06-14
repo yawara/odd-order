@@ -2048,6 +2048,18 @@ theorem factorization_Msigma_eq_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd
         rw [← hmul, Nat.factorization_mul hcard_ne hidx_ne, Finsupp.add_apply,
           Nat.factorization_eq_zero_of_not_dvd hqidx, add_zero]
 
+/-- `q ∈ σ(M)` なら `M` の `q`-part は `G` のそれに等しい: `q∈σ(M)` の Sylow `q` of `M` は
+`G` の Sylow `q` (`isSylow_sylowMap_of_mem_sigma`)、ゆえ `q^{v_q(|M|)} = q^{v_q(|G|)}`。 -/
+theorem factorization_M_eq_G_of_mem_sigma [Finite G] {M : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hqσ : q ∈ S10.sigma M) :
+    (Nat.card ↥M).factorization q = (Nat.card G).factorization q := by
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow q ↥M))
+  obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+  have e1 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card ↥M).factorization q := by
+    rw [hSG, Subgroup.card_map_of_injective M.subtype_injective]; exact P.card_eq_multiplicity
+  have e2 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card G).factorization q := SG.card_eq_multiplicity
+  exact Nat.pow_right_injective (Fact.out : q.Prime).two_le (e1.symm.trans e2)
+
 /-- **σ-Sylow uniqueness for `M_σ`-Sylows** (Prop 10.14-flavoured): `q ∈ σ(M)`, `S ≤ M_σ` with
 `|S| = q^{v_q(|M_σ|)}` (a Sylow `q` of `M_σ`) ⟹ `N_G(S) ⊆ M`. `S.subgroupOf M` is a Sylow `q` of
 `M` (card `= q^{v_q(|M|)}` by the `v_q` equality), and `normalizer_sylow_map_le_of_mem_sigma`
