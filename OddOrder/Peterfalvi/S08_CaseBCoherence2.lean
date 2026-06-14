@@ -422,6 +422,26 @@ theorem induce_eq_sum_inner_restrict_smul {M : Type*} [Group M] [Fintype M]
   exact Finset.sum_congr rfl
     (fun θ _ => by rw [ClassFunction.inner_induce_eq_inner_restrict])
 
+/-- **The class-function inner product is preserved by pullback along a group isomorphism.**  For a
+`MulEquiv e : H ≃* G` and `a, b ∈ CF(G)`, `⟨a ∘ e, b ∘ e⟩_H = ⟨a, b⟩_G`: reindexing the inner sum
+`∑_{h ∈ H} a(e h)·\overline{b(e h)} = ∑_{g ∈ G} a(g)·\overline{b(g)}` along the bijection `e` (and
+`|H| = |G|`).  A transport tool for the (6.8.2.3) induction-transitivity seam `W₂ ≅ W₂.subgroupOf H`. -/
+theorem inner_compHom_of_mulEquiv {G' H' : Type*} [Group G'] [Group H'] [Fintype G'] [Fintype H']
+    [Invertible (Nat.card G' : ℂ)] [Invertible (Nat.card H' : ℂ)]
+    (e : H' ≃* G') (a b : ClassFunction G' ℂ) :
+    ClassFunction.inner (ClassFunction.compHom e.toMonoidHom a)
+        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.inner a b := by
+  have hcard : (Nat.card H' : ℂ) = (Nat.card G' : ℂ) := by rw [Nat.card_congr e.toEquiv]
+  have hsum : (∑ h : H', (ClassFunction.compHom e.toMonoidHom a) h *
+        star ((ClassFunction.compHom e.toMonoidHom b) h))
+      = ∑ g : G', a g * star (b g) := by
+    simp only [ClassFunction.compHom_apply]
+    exact Equiv.sum_comp e.toEquiv (fun g => a g * star (b g))
+  have hinv : ⅟(Nat.card H' : ℂ) = ⅟(Nat.card G' : ℂ) :=
+    invOf_eq_right_inv (by rw [hcard, mul_invOf_self])
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.innerSum, ClassFunction.innerSum, hsum, hinv]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
