@@ -821,6 +821,38 @@ theorem constituentWeight_pos_iff {M : Type*} [Group M] [Finite M] {N : Subgroup
       ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ)) ≠ 0 := by
   rw [constituentWeight_spec hφ θ, ne_eq, Nat.cast_eq_zero, ← ne_eq, ← Nat.pos_iff_ne_zero]
 
+/-- **(6.8.2.3) constituent aggregate over the positive-weight subtype.**  The `αθ`-aggregate
+`sum_smul_constituent_diff_eq` (indexed by all of `Irr H`, with weight `aθ = ⟨φ, Res θ⟩` written as
+the `ℂ`-valued multiplicity) reindexed to the positive-weight subtype `{θ // 0 < aθ}` with the weight
+in natural-number form `constituentWeight`:
+`Ind^M_K φ − |H:K|·η₁ = ∑_{θ : 0 < aθ} aθ·(Ind^M_H θ − aθ·η₁)`.
+
+This is the `hconstit` source aggregate for the per-`φ` pinning: the index matches the per-`φ`
+decomposition family `{θ // 0 < aθ}`, and the weight is the `ℕ` consumed by
+`per_constituent_Y_eq_smul` (the `ℂ`-coefficient `⟨φ, Res θ⟩` is `(constituentWeight … : ℂ)` by
+`constituentWeight_spec`; the `aθ = 0` constituents drop out by `sum_eq_sum_pos_weight_subtype`). -/
+theorem sum_smul_constituent_diff_pos_weight_subtype {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
+    (φ : ClassFunction ↥K ℂ)
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ))
+    (η₁ : ClassFunction M ℂ) :
+    ClassFunction.induce K φ - ((K.subgroupOf H).index : ℂ) • η₁
+      = ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+          (constituentWeight hφ' i.val : ℂ) •
+            (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
+              - (constituentWeight hφ' i.val : ℂ) • η₁) := by
+  rw [← sum_smul_constituent_diff_eq hKH hcen φ hφ' η₁]
+  simp only [constituentWeight_spec hφ']
+  exact sum_eq_sum_pos_weight_subtype (constituentWeight hφ')
+    (fun θ => (constituentWeight hφ' θ : ℂ) • (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      - (constituentWeight hφ' θ : ℂ) • η₁)) (fun θ hθ => by
+        simp only [hθ, Nat.cast_zero, zero_smul])
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
