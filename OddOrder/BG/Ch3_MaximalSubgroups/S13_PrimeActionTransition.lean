@@ -1105,6 +1105,29 @@ theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A]
     exact opCore_map_of_mulEquiv e
   rw [← hmap, Subgroup.card_map_of_injective e.injective]
 
+/-- **共役 Hall 部分群の `F`-素因子は一致** (Lemma 13.8 dispatch の核): `C` 可解で `H, K` が
+`C` の Hall `θ`-部分群 (相対) なら `π(F(H)) = π(F(K))`。`hall_C` で `H, K` は `C` 内共役、
+`fitting_card_eq_of_mulEquiv` で `|F(H)| = |F(K)|`。
+
+13.8 main: `s ∈ π(F(H))` (`H ⊇ C_{M_β}(P)`) を `π(F(H*))` (`H* ⊇ C_{M*_β}(P)`) へ移送し
+WLOG `s ∈ β(M)` / `β(M*)` の向き切替を可能にする。 -/
+theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subgroup G}
+    [IsSolvable ↥C] {θ : Set ℕ} (hHC : H ≤ C) (hKC : K ≤ C)
+    (hH : Ch03.IsHallSubgroup θ (H.subgroupOf C)) (hK : Ch03.IsHallSubgroup θ (K.subgroupOf C)) :
+    (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors
+      = (Nat.card ↥(Ch2.S08.fittingInG K)).primeFactors := by
+  obtain ⟨c, hc⟩ := Ch03.hall_C hH hK
+  have ehk : ↥(H.subgroupOf C) ≃* ↥(K.subgroupOf C) := by
+    rw [← hc]
+    exact Subgroup.equivMapOfInjective _ (MulAut.conj c).toMonoidHom (MulAut.conj c).injective
+  have e : ↥H ≃* ↥K :=
+    (Subgroup.subgroupOfEquivOfLe hHC).symm.trans (ehk.trans (Subgroup.subgroupOfEquivOfLe hKC))
+  have h1 : Nat.card ↥(Ch2.S08.fittingInG H) = Nat.card ↥(Ch01.fitting ↥H) :=
+    Subgroup.card_map_of_injective H.subtype_injective
+  have h2 : Nat.card ↥(Ch2.S08.fittingInG K) = Nat.card ↥(Ch01.fitting ↥K) :=
+    Subgroup.card_map_of_injective K.subtype_injective
+  rw [h1, h2, fitting_card_eq_of_mulEquiv e]
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
