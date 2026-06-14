@@ -651,6 +651,158 @@ theorem E1E3_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
     · exact heq
   exact actsPrimeOn_sup_of_eq_centralizer hE1prime hE3prime hcop hnorm hN3 hD
 
+/-! ## helper: 有限 `q`-群の normalizer-growth (Lemma 13.8 GAP 1.3) -/
+
+/-- **有限 `q`-群の normalizer-growth**: `T` が有限 `q`-群で `Q < T` なら、`Q` はその
+`T` 内 normalizer `T ⊓ N_G(Q)` に真に含まれる。冪零群の normalizer condition の帰結
+(`normalizerCondition_of_isNilpotent`)。
+
+Lemma 13.8 GAP 1.3 の核 — 「`M ∩ M*` の極大 `q`-部分群 `Q` で `N_G(Q) ⊆ M*` なら `Q` は
+`M` の極大 `q`-部分群」を示すのに使う: `Q < T ≤ M` を仮定すると `T ⊓ N_G(Q) ⊆ M ⊓ M*` の
+`q`-部分群が `Q` を真に含み、極大性に反する。 -/
+theorem lt_inf_normalizer_of_lt_of_pgroup [Finite G] {q : ℕ} [Fact q.Prime]
+    {Q T : Subgroup G} (hTq : IsPGroup q ↥T) (hQT : Q < T) :
+    Q < T ⊓ Subgroup.normalizer (Q : Set G) := by
+  have hQTle : Q ≤ T := hQT.le
+  have hne_top : Q.subgroupOf T ≠ ⊤ := fun htop =>
+    hQT.ne (le_antisymm hQTle (Subgroup.subgroupOf_eq_top.mp htop))
+  haveI : Group.IsNilpotent ↥T := IsPGroup.isNilpotent hTq
+  have hNC : NormalizerCondition ↥T := normalizerCondition_of_isNilpotent
+  have hgrow := hNC (Q.subgroupOf T) (lt_top_iff_ne_top.mpr hne_top)
+  rw [← Subgroup.subgroupOf_normalizer_eq hQTle] at hgrow
+  refine lt_of_le_of_ne (le_inf hQTle Subgroup.le_normalizer) (fun heq => hgrow.ne ?_)
+  conv_lhs => rw [heq]
+  rw [Subgroup.inf_subgroupOf_left]
+
+/-! ## Lemma 13.8 step 1 — config から Lemma 12.18(b) 出力へ (GAP 1) -/
+
+/-- **Lemma 13.8 GAP 1** (`M`-side engine): 13.8 の配置 (片側) から Lemma 12.18(b) の出力を導く。
+`M ∩ M*` の極大 `q`-部分群 `Q` (`P`-不変, `C_Q(P)=1`, `N_G(Q) ⊆ M*`, `M ≠ M*`) について:
+
+* `q ≠ p` (GAP 1.2 — `q=p` なら `P ≤ P⊔Q = Q`, `P ≤ C_Q(P)=1` で矛盾),
+* `Q ≠ 1` (GAP 1.1 — `Q=1` なら `N_G(Q)=G ⊆ M*` で `M*` が極大に反する),
+* `Q` は `M` の極大 `q`-部分群 (GAP 1.3 — `lt_inf_normalizer_of_lt_of_pgroup` + `N_G(Q) ⊆ M*`),
+* `ℳ(N_G(Q)) ≠ {M}` (`M* ∈ ℳ(N_G(Q))`, `M* ≠ M`)
+
+を経由して Lemma 12.18(b) (`tau1_Malpha_interaction`) を適用し
+`α(M)=β(M) ∧ M_α≠1 ∧ q∉α(M) ∧ C_{M_α}(P)≠1 ∧ C_{M_α}(PQ)=1` を得る。
+`M*`-side は `M ↔ M*`, `Q ↔ Q*` を入れ替えて同じ補題を再適用する。 -/
+theorem forbidden_config_step1 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hMMstar : M ≠ Mstar) {p q : ℕ} [Fact p.Prime] [Fact q.Prime] (hp : p ∈ tau1 M)
+    {P : Subgroup G} (hP : P ∈ elemAbelianOfRank G p 1) (hPMM : P ≤ M ⊓ Mstar)
+    {Q : Subgroup G} (hQle : Q ≤ M ⊓ Mstar) (hQq : IsPGroup q ↥Q)
+    (hQmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → Q ≤ T → Q = T)
+    (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hNQ : Subgroup.normalizer (Q : Set G) ≤ Mstar) :
+    q ≠ p ∧ Q ≠ ⊥ ∧
+    S10.alpha M = S10.beta M ∧ S10.Malpha M ≠ ⊥ ∧ q ∉ S10.alpha M ∧
+    S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥ ∧
+    S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥ := by
+  obtain ⟨hPea, hPcard1⟩ := mem_elemAbelianOfRank.mp hP
+  have hPp : IsPGroup p ↥P := hPea.isPGroup
+  have hPcard : Nat.card ↥P = p := by rw [hPcard1, pow_one]
+  have hPM : P ≤ M := hPMM.trans inf_le_left
+  have hQM : Q ≤ M := hQle.trans inf_le_left
+  -- GAP 1.1: `Q ≠ 1`.
+  have hQne : Q ≠ ⊥ := by
+    rintro rfl
+    have htop : Subgroup.normalizer ((⊥ : Subgroup G) : Set G) = ⊤ :=
+      Subgroup.normalizer_eq_top_iff.mpr inferInstance
+    rw [htop, top_le_iff] at hNQ
+    exact (mem_maximalSubgroups.mp hMstar).1 hNQ
+  -- GAP 1.2: `q ≠ p`.
+  have hP_le_cP : P ≤ Subgroup.centralizer (P : Set G) :=
+    Subgroup.le_centralizer_iff_isMulCommutative.mpr ⟨⟨hPea.comm⟩⟩
+  have hqp : q ≠ p := by
+    rintro rfl
+    have hPQp : IsPGroup q ↥(P ⊔ Q : Subgroup G) :=
+      IsPGroup.to_sup_of_normal_right' hPp hQq hQinv
+    have hQeq : Q = (P ⊔ Q : Subgroup G) := hQmax _ (sup_le hPMM hQle) hPQp le_sup_right
+    have hP_le_Q : P ≤ Q := le_sup_left.trans hQeq.ge
+    have hP_bot : P ≤ ⊥ := hCQ ▸ le_inf hP_le_Q hP_le_cP
+    rw [le_bot_iff] at hP_bot
+    rw [hP_bot, Subgroup.card_bot] at hPcard
+    exact (Fact.out : Nat.Prime q).one_lt.ne hPcard
+  -- GAP 1.3: `Q` is a maximal `q`-subgroup of `M`.
+  have hQsyl : ∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T := by
+    intro T hTM hTq hQT
+    by_contra hne
+    have hlt : Q < T := lt_of_le_of_ne hQT hne
+    have hgrow := lt_inf_normalizer_of_lt_of_pgroup hTq hlt
+    have hNT_le : T ⊓ Subgroup.normalizer (Q : Set G) ≤ M ⊓ Mstar :=
+      le_inf (inf_le_left.trans hTM) (inf_le_right.trans hNQ)
+    have hNT_q : IsPGroup q ↥(T ⊓ Subgroup.normalizer (Q : Set G)) := hTq.to_le inf_le_left
+    exact hgrow.ne (hQmax _ hNT_le hNT_q hgrow.le)
+  -- `ℳ(N_G(Q)) ≠ {M}` (since `M* ∈ ℳ(N_G(Q))` and `M* ≠ M`).
+  have hMNQ : maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) ≠ {M} := by
+    intro hsingle
+    have hMstar_mem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Q : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar, hNQ⟩
+    rw [hsingle, Set.mem_singleton_iff] at hMstar_mem
+    exact hMMstar hMstar_mem.symm
+  -- apply Lemma 12.18(b).
+  obtain ⟨hαβ, hMαne, hqα, hCMαP, hCMαPQ⟩ :=
+    (tau1_Malpha_interaction hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQ hMNQ).2 hQsyl
+  exact ⟨hqp, hQne, hαβ, hMαne, hqα, hCMαP, hCMαPQ⟩
+
+/-! ## Lemma 13.8 step 3 — GAP 2 (Hall θ + Theorem 10.1(b) collapse) -/
+
+/-- **Theorem 10.1(b) collapse** (Lemma 13.8 GAP 2.8 の核): `t ∈ σ(M)`, `Y` を `M` の非自明
+`t`-部分群で `N_G(Y) ⊆ M` とすると、`Y` を含む任意の極大共役 `M^g` は `M` に等しい。
+
+`C_G(Y)` が `{M^u ∣ Y ≤ M^u}` に推移作用する (Theorem 10.1(b) =
+`S10.fusion_control_of_mem_sigma .2.1`) ことから `∃ c ∈ C_G(Y)`, `M^g = M^c`; さらに
+`C_G(Y) ⊆ N_G(Y) ⊆ M` ゆえ `c ∈ M` が `M` を固定し `M^g = M`。 -/
+theorem conj_eq_self_of_sigma_pSubgroup_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {t : ℕ} [Fact t.Prime]
+    (htσ : t ∈ S10.sigma M) {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYt : IsPGroup t ↥Y)
+    (hNY : Subgroup.normalizer (Y : Set G) ≤ M) {g : G}
+    (hYM : Y ≤ M) (hYg : Y ≤ MulAut.conj g • M) :
+    MulAut.conj g • M = M := by
+  have hY1 : Y ≤ MulAut.conj (1 : G) • M := by rw [map_one, one_smul]; exact hYM
+  obtain ⟨c, hcC, hceq⟩ :=
+    (S10.fusion_control_of_mem_sigma hG hM htσ hYne hYt).2.1 g 1 hYg hY1
+  rw [map_one, one_smul] at hceq
+  have hcM : c ∈ M := hNY ((Subgroup.centralizer_le_normalizer (Y : Set G)) hcC)
+  have e1 : MulAut.conj c⁻¹ • (MulAut.conj c • (MulAut.conj g • M)) = MulAut.conj g • M := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  rw [hceq, conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (M.inv_mem hcM))] at e1
+  exact e1.symm
+
+/-- **`σ(M)`-prime の `q`-部分群は `M_σ` へ共役** (BG Theorem 10.2 の帰結): `q ∈ σ(M)`, `Y` を
+`q`-群とすると、ある `g` で `Y^g ⊆ M_σ`。`M_σ` が `G` の Sylow `q`-部分群を含む
+(`isSylow_sylowMap_of_mem_sigma`) ことと Sylow 共役による。Lemma 13.8 GAP 2.5
+(`X = O_s(H)` を `M^g` へ入れる) の核。`S12_Corollary1216.pRank_normalizer_le_one` Step 1
+のインライン論法を `hM` 直接版に切り出したもの。 -/
+theorem exists_conj_smul_le_Msigma_of_pSubgroup [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (hqσ : q ∈ S10.sigma M) {Y : Subgroup G} (hYq : IsPGroup q ↥Y) :
+    ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
+  obtain ⟨_, P, _⟩ := (S10.mem_sigma_iff M q).mp hqσ
+  obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+  have hPpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) ((P : Subgroup ↥M).map M.subtype) := by
+    intro s hs
+    have hs_dvd : s ∣ Nat.card ↥((P : Subgroup ↥M).map M.subtype) :=
+      (Nat.mem_primeFactors.mp hs).2.1
+    rw [Subgroup.card_map_of_injective M.subtype_injective] at hs_dvd
+    obtain ⟨n, hn⟩ := (P.2).exists_card_eq
+    rw [hn] at hs_dvd
+    rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) Fact.out).mp
+      ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hs_dvd)]
+  have hPMσ : (P : Subgroup ↥M).map M.subtype ≤ S10.Msigma M :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM)
+      (Subgroup.map_subtype_le _) hPpi
+  obtain ⟨Q, hYQ⟩ := hYq.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G SG Q
+  refine ⟨g⁻¹, le_trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYQ) ?_⟩
+  have hQconj : MulAut.conj g⁻¹ • (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+    have hQ : (Q : Subgroup G) = MulAut.conj g • (SG : Subgroup G) := by
+      rw [← hg]; exact Sylow.coe_subgroup_smul
+    rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
+  rw [hQconj]; exact hPMσ
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),

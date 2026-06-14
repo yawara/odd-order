@@ -134,8 +134,80 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
 `⟨IsElementaryAbelian.of_card_prime, by rw[pow_one]; exact card=prime⟩`、card = orderOf =
 `orderOf_eq_prime`)。P≤C(R) は ⟨g⟩,⟨h⟩ commute から。
 
+## 13.8 ChatGPT 再構成 検証結果 + 形式化計画 (2026-06-14)
+
+ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ; **GAP 3 [steps 5-6] 未収録**)。
+**厳密検証済: GAP 1 / GAP 2 とも健全**。ChatGPT の good catch:
+- GAP 1: 「Q が M の Sylow」は Uniqueness 不要 (p-群 normalizer-growth + (5) で直接)。Uniqueness は q∉α(M) 用。
+- GAP 2: Cor 12.16 (α-部分群→M_α へ共役)、Thm 10.1(b)=C_G(Y) transitivity、Lem 10.12(a) を **役割入替** で r∉σ(M)。
+### 🔑 12.18(b) で GAP 1.4 (Uniqueness) は不要に
+`tau1_Malpha_interaction` の **第 2 連言** (S12_Lemma1218:1039-1042): 仮定
+`∀T≤M, IsPGroup q T, Q≤T → Q=T` (Q が M の極大 q-部分群 = Sylow) から直接
+`q∉α(M) ∧ α(M)=β(M) ∧ M_α⊓C(P)≠⊥ ∧ M_α⊓C(P⊔Q)=⊥`。
+⟹ GAP 1 は 1.1 (Q≠1) + 1.2 (q≠p) + 1.3 (Q 極大 q-sub of M, normalizer-growth) のみ。
+**step 6 の punchline `C_{M_α}(PQ)=1` も 12.18(b) から無料**。
+### 形式化計画 (sub-lemma 分解)
+- `step1` (M側): config → 12.18(b) outputs。1.3 = normalizer-growth (`lt_normalizer_inf_sylow_of_lt`
+  Isaacs Ch07:91、or NormalizerCondition of nilpotent q-group) + (5)。M* 側は対称に再適用。
+- `step3` (GAP 2): Hall θ=β(M)∪β(M*) of C_G(P) → r∈β(M*)∩π(C_M(P)), r∉σ(M)。
+  handles: Hall 存在/共役 (Prop 1.5)、Cor 12.16、`IsUniquelyMaximal`/Thm 10.1(b) transitivity、
+  Prop 10.14(d) `normalizer_le_of_nontrivial_beta_subgroup`、Lem 10.12 `disjoint_of_not_conj`、
+  F(H)=`Ch01.fitting`、O_s = `S10.opiCoreInG`?。⚠ Thm 10.1(b) の transitivity form を repo で要特定。
+- `step5/6` (GAP 3, **要追加再構成 or 自力**): R⊆N_M(Q) order r P-centralized + Thm 13.4
+  `centralizer_le_centralizer_of_tau1` → X⊆C_{M_σ}(P)⊆C_{M_σ}(R)⊆M*; [X,Q]=1 (M_α∩M*_α=1) →
+  X⊆C_{M_α}(PQ)=1 (12.18(b)) 矛盾。
+
 ## 進捗
 
+- 2026-06-14 (Lane F, /loop 続き⁸): **🎉 13.8 GAP 1 (Uniqueness step) COMPLETE** (commit c7fb4c19, full build 緑 3807)。
+  - `lt_inf_normalizer_of_lt_of_pgroup` (標準補題): 有限 q-群 T で Q<T ⟹ Q<T⊓N_G(Q)。
+    `normalizerCondition_of_isNilpotent`+`IsPGroup.isNilpotent`+`subgroupOf_normalizer_eq`。
+    ⚠ `Group.IsNilpotent` 修飾必須 (`IsNilpotent` 単体は環の冪零元 → `Zero (Type)` エラー)。
+  - `forbidden_config_step1` (M-side engine, M↔M*/Q↔Q* 対称再利用可): config → 12.18(b) 出力
+    `α=β ∧ M_α≠1 ∧ q∉α ∧ C_{M_α}(P)≠1 ∧ C_{M_α}(PQ)=1`。GAP 1.1 (Q≠1: `normalizer_eq_top_iff`+
+    coatom), 1.2 (q≠p: `to_sup_of_normal_right'` で P⊔Q が p-群→hQmax で Q=P⊔Q→P≤C_Q(P)=⊥),
+    1.3 (`lt_inf_normalizer_of_lt_of_pgroup`+hQmax), ℳ(N_G(Q))≠{M} (`mem_maximalSubgroupsContaining`)。
+  - **残 = GAP 2 (Hall θ=β(M)∪β(M*) of C_G(P) → r∈β(M*)∩π(H), r|C_M(P), r∉σ(M))**
+    + GAP 3 (steps 5-6: R⊆N_M(Q) order r → Thm 13.4 → X⊆C_{M_σ}(P)⊆C_{M_σ}(R)⊆M*;
+    [X,Q]=1 (M_α∩M*_α=1) → X⊆C_{M_α}(PQ)=1 矛盾) + 本体配線。
+  - **⚠ GAP 3 は ChatGPT 回答 (bg-lemma-13-8-elided-steps.md) 未収録** — 次イテレーションで
+    GAP 2 を進めつつ、GAP 3 は s13_8_chatgpt_prompt.md の該当部を再依頼 or 自力再構成。
+  - 次標的: GAP 2 の Hall θ-部分群存在/共役 (Prop 1.5) + Cor 12.16 + Thm 10.1(b) transitivity
+    (`IsUniquelyMaximal`) + Prop 10.14(d) + Lem 10.12(a) の repo handle 特定。
+  ### GAP 2 handle scout (2026-06-14)
+  - **r∉σ(M)** (GAP 2.11): `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2 : alpha M* ∩ sigma M = ∅`
+    (roles 入替: 第1=M*, 第2=M; hnc'=¬∃g,conj g•M*=M を hnc から共役対称で導出)。
+    `r∈α(M*)` (←β(M*)⊆α(M*)) かつ `r∈σ(M)` を `∈ ∅` に落として矛盾。
+  - **Hall**: `Isaacs.Ch03.hall_E_exists [Finite ·] [IsSolvable ·] (π) : ∃ H, IsHallSubgroup π H`
+    (Ch03 Main:837)。C_G(P) の Hall θ-部分群は ↥(C_G(P)) に適用 (solvable: 真部分群)→transport。
+    π-membership: `IsHallSubgroup.primeFactors_card_subset` (Main:585) 等。
+  - **Cor 12.16(a) q-group specialization** = `S12_Corollary1216` line 307 (要署名精読: 非自明
+    q-群 Y⊆? が M_α へ共役)。X=O_s(H) は s∈β(M)⊆α(M) の s-群ゆえ適用可。
+  - **Thm 10.1(b) transitivity** = `IsUniquelyMaximal` (Y uniquely-maximal ⟹ ℳ(Y) 一意): Y=O_t(C_{M_β}(P)),
+    Uniqueness Thm (rank) で Y∈𝒰 → M=M^g。MaximalSubgroup.lean の `.existsUnique` + eq 補題。
+  - **F(H)/O_s** = `Ch01.fitting` / p-core (opi 系)。⚠ subtype transport (Hall in ↥C_G(P)) が最大の工数。
+- 2026-06-14 (Lane F, /loop 続き⁹): **🎉 13.8 GAP 2.8 collapse 補題 COMPLETE** (commit 65fd4216, full build 緑)。
+  `conj_eq_self_of_sigma_pSubgroup_normalizer_le`: t∈σ(M), Y 非自明 t-部分群 of M, N_G(Y)⊆M, Y≤M^g
+  ⟹ M^g=M。**Thm 10.1(b) = `S10.fusion_control_of_mem_sigma .2.1`** (transitivity; S12_Lemma1211:1087
+  の M*=M** 適用を mirror) + C_G(Y)⊆N_G(Y)⊆M で c∈M が M 固定。
+  ### GAP 2 r-existence 補題 構成計画 (次イテレーション、全 handle 確定)
+  目標: `∃ r, r∈β(M*) ∧ r ∣ |C_M(P)| ∧ r∉σ(M)`。step1 両側 (C_{M_β}(P)≠1, C_{M*_β}(P)≠1) を入力。
+  1. **C_G(P) 可解**: C_G(P)<⊤ (P≠1, simple) → `eq_top_or_exists_le_coatom` で coatom M'⊇C_G(P)
+     → `hG.solvable_of_mem_maximalSubgroups` + `solvable_of_solvable_injective`。
+  2. **Hall θ of C_G(P)**: `Ch03.hall_E_exists (G:=↥C) (beta M ∪ beta Mstar)` → H₀:Subgroup ↥C;
+     G へ `H₀.map C.subtype`。⚠ WLOG「H⊇C_{M_β}(P)」= Hall 共役 (`exists_conj...hallPiece` 系)。
+  3. **conj-into-Msigma** (要 standalone 抽出, `pRank_normalizer_le_one` Step1 を mirror, ~20行):
+     q-群 Y, q∈σ(M) ⟹ ∃g, conj g•Y ≤ M_σ。ingredients = `S10.mem_sigma_iff`/
+     `isSylow_sylowMap_of_mem_sigma`/`sigma_subgroup_le_Msigma_of_isHall`/`hYq.exists_le_sylow`/
+     `MulAction.exists_smul_eq`。X=O_s(H) (s∈β(M)⊆σ(M)) に適用 → X≤M^g。
+  4. **N_G(X)≤M^g, N_G(Y)≤M**: `S10.normalizer_le_of_nontrivial_beta_subgroup` (Prop 10.14d, 要
+     `IsPiSubgroup (beta ·) ·` = `isPiSubgroup_of_isPGroup_of_mem` [S12_ExceptionalBridge:129])。
+     β conj-invariance (`sigma_conj` 類推 or `beta_conj`) で s∈β(M^g)。
+  5. **collapse**: `conj_eq_self_of_sigma_pSubgroup_normalizer_le` (Y, t∈β(M)⊆σ(M), N_G(Y)⊆M,
+     Y≤M^g [←H≤M^g]) ⟹ M^g=M ⟹ H≤M ⟹ H≤C_M(P)。
+  6. **r 抽出**: C_{M*_β}(P)≠1 → ∃r∈β(M*), r∣|C_G(P)|; r∈θ ∧ H Hall θ ⟹ r∣|H|∣|C_M(P)|.
+     r∉σ(M): `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2` (α(M*)∩σ(M)=∅, β⊆α)。
+  ⚠ 最難 = WLOG s∈β(M) (M↔M* 対称化) + H⊇C_{M_β}(P) (Hall 共役) + subtype transport。2-3 iter 見込み。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
