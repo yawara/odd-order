@@ -272,6 +272,21 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
     s∈β(M): `oriented_r_existence`(M,M*)+GAP3(M,M*); s∈β(M*): H*⊇C_{M*_β}(P) + Hall 共役 (`hall_C`)
     で s∈π(F(H*)) 移送 → `oriented_r_existence`(M*,M)+GAP3(M*,M)。⚠ Hall 共役 + Fitting card 不変が要。
   - **配線**: step1 両側 + C_{M_α}(P)≠1 を Y₀ に渡す (β(M)-group via Malpha_isPiGroup+α=β)。
+- 2026-06-14 (Lane F, /loop 続き¹⁴): **🎉 gap3_assembly (GAP 3 最終矛盾) landed (12 blocks)**。
+  ### 🛑 残り 13.8 は「genuine elision + 非自明 machinery」のみ — quick win 無し (inflection)
+  調査結果:
+  - **GAP 3 head/elisions = genuine textbook elision + handle 欠如**:
+    - coprime `[Q,P]=Q` (Q⊆M'∩M*') — repo に直接 handle 無し (Ch04 operator-group 形のみ)。
+    - Frattini `M=N_M(Q)M_α` — `Sylow.normalizer_sup_eq_top` はあるが QM_α⊲M (Thm 10.2 + nilpotent
+      normal Sylow + subtype) の sub-elision 付き。
+    - (iii) PR を Hall E へ共役 + Thm 13.4 / (iv) `[M_α∩M*,Q]⊆M*_α` (M*'/M*_α 経由) = 行間。
+    ⟹ **ユーザー手法 (ChatGPT 再構成) を使う。プロンプト `s13_8_chatgpt_prompt.md` の GAP 3 (3a/3b/3c)
+    は精密に既存** (head/iii/iv カバー)。ユーザーが GAP 1+2 のみ返答 → **GAP 3 part 未実行**。要依頼。
+  - **dispatch (WLOG s∈β(M)/β(M*))**: `hall_C` (Hall 共役) はあるが、`fittingInG` の同型不変性
+    (π(F(H))=π(F(H*))) が repo に無く要構築 (Fitting functoriality under MulEquiv + card)。
+    elision でなく純粋形式化ゆえ並行で自力構築可。
+  - **方針**: GAP 3 elisions は ChatGPT 回答待ち (依頼済) → 検証後 formalize。並行で dispatch の
+    Fitting-functoriality-under-conj helper を自力構築。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
