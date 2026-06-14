@@ -2793,3 +2793,22 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 5. **pinning → anchored 公式**: `per_constituent_Y_eq_smul` (dispatch hXorth) + `image_eq_of_decomposition`。
 6. **HYBRID union**: cX_col ∪ (cY+X_irr)、diagonal に anchored 公式投入。
 **正本=本 session 41 cont.⁷ 続²。map-reconciliation 確定 (irred 直接/column ofProjection)。index 基盤 2 brick landed。次=column decomp (hyp.tau) brick。**
+
+### cont.⁷ 続³: 🎯🎯 map 問題 DISSOLVED — `dadeIntegralCharacterMap` は data 引数無視 ⟹ family は τ_enl で統一
+**🔑 決定的発見**: `dadeIntegralCharacterMap (hyp) (_dade : FullDadeIsometryData)` の **data 引数は body で未使用** (`_dade`、定義は `Classical.choose (LinearMap.exists_extend hyp.dadeLinearMap)` で hyp のみ依存; S07:5233-5236)。⟹ **`dadeIntegralCharacterMap h46.dade0 h46.tau = dadeIntegralCharacterMap h46.dade0 (任意 data)` が defeq**。
+
+**∴ 続² の「column を hyp.tau 版へ retarget」は不要** (certainTypeR の image family が τ_enl=`dadeIntegralCharacterMap h46.dade0 h46.tau` に型付けゆえ retarget 不能だったが、data 無視で問題消滅)。`certainTypeColumnDecompositionTau` 試作は revert。正しい構図:
+- **family の単一 τ = τ_enl = `dadeIntegralCharacterMap h46.dade0 h46.tau`** (enlarged certain-type map)。
+- **columns = `certainTypeDecompositionDa`** (τ_enl、**既存**! 新規不要)。
+- **irreducibles = `decompositionDaFromDadeOfDiff h46.dade0 h46.dade0.hconj`** (data 無視ゆえ `CharacterPsiDecomposition τ_enl` を生成、defeq; **既存**!)。両 branch の image family が同一 τ_enl に型付け。
+- **aggregate transfer**: `exists_decomposition_caseB` は hyp.tau(Ind_{W₂}φ−nη₁)=X−nY₀。pinning は τ_enl 版を要する ⟹ τ_enl(Ind_{W₂}φ−nη₁)=hyp.tau(同) を **H^# 一致** (両 map とも H^#-supported 上 Dade map に一致; `dadeIntegralCharacterMap_apply_of_support` + h46.dade=hyp.dade) で transfer。Ind_{W₂}φ−nη₁ は H^#-supported。
+- **source aggregate** (`sum_smul_constituent_diff_pos_weight_subtype`, landed) は char-level (τ 非依存) ゆえそのまま。
+- seam-1 orthogonality / Y₀=coherentYset.ext η₁ は ZIrr 元の inner ゆえ map 非依存、`certainType_per_constituent_Y_eq_smul` の generic τ にそのまま。
+
+### ▶▶ 残り brick (map 問題消滅で大幅単純化):
+1. **aggregate transfer** hyp.tau→τ_enl (H^# 一致)。← 自己完結 brick。
+2. **dispatch family** `(i:{θ//0<aθ}) → CharacterPsiDecomposition τ_enl (Ind i.val) (aθ•η₁)`: `by_cases ∃χ₂, chiRestrict χ₂=θ` で certainTypeDecompositionDa / decompositionDaFromDadeOfDiff 分岐。両既存ゆえ各 branch は instantiate のみ (per-θ 仮説 discharge)。
+3. **hagg** (`aggregate_eq_sum_of_constituent` + family + transferred aggregate + source aggregate) + **hbi** (⟨Dᵢ.Y,Y₀⟩=bᵢ∈ℤ via inner_mem_ZIrr_int)。
+4. **pinning** (`per_constituent_Y_eq_smul`) + `image_eq_of_decomposition` → anchored 公式。
+5. **HYBRID union**。
+**正本=本 session 41 cont.⁷ 続³。map 問題 dissolved (data 無視→τ_enl 統一)。両分解とも既存。次=aggregate transfer + dispatch family。**
