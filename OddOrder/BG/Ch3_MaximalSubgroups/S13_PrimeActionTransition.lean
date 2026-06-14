@@ -2326,6 +2326,36 @@ theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
   exact forbidden_config_impossible hG hM hMstar'mem hnc' hpτ1 hpτ1star hPmem hPMM'
     hSinf hSq hQmax hSinf hSq hQmax hPinv hPinv hCSP hCSP hNSMstar' hNSM
 
+/-- **BG Theorem 13.10, GAP A factorization** (the "Q ∈ Syl_q(M)" hidden step): for `q ∈ τ₃(M)`,
+the `q`-part of `|M|` equals the `q`-part of `|E₃|`. Hence the Sylow `q`-subgroup of `E₃` is a
+Sylow `q`-subgroup of `M`. Proof: `|M| = |M_σ|·|E|` (`card_Msigma_mul_card_E`), `q ∤ |M_σ|`
+(`M_σ` is a `σ(M)`-group and `q ∉ σ(M)` since `τ₃ ∩ σ = ∅`), and `q ∤ [E:E₃]` (`E₃` is a Hall
+`τ₃(M)`-subgroup of `E`, so its index is a `τ₃'`-number), so `|E|_q = |E₃|_q`. -/
+theorem factorization_M_eq_E3_of_mem_tau3 [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} (hqprime : q.Prime) (hq : q ∈ tau3 M) :
+    (Nat.card ↥M).factorization q = (Nat.card ↥E₃).factorization q := by
+  have hqσ : q ∉ S10.sigma M := tau3_subset_sigma_compl M hq
+  have hMσpi : Subgroup.IsPiSubgroup (S10.sigma M) (S10.Msigma M) :=
+    isPiSubgroup_opiCoreInG _ _
+  have hMσ0 : (Nat.card ↥(S10.Msigma M)).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+      hqσ (hMσpi q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩)))
+  have hME : Nat.card ↥(S10.Msigma M) * Nat.card ↥E = Nat.card ↥M := card_Msigma_mul_card_E h
+  have hEE3 : Nat.card ↥E₃ * (E₃.subgroupOf E).index = Nat.card ↥E := by
+    have hc := Subgroup.card_mul_index (E₃.subgroupOf E)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv] at hc
+  have hidxne : (E₃.subgroupOf E).index ≠ 0 := by
+    intro h0; rw [h0, mul_zero] at hEE3; exact Nat.card_pos.ne' hEE3.symm
+  have hidx0 : ((E₃.subgroupOf E).index).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+      h.E₃_hall.2 q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, hidxne⟩) hq)
+  have hstep1 : (Nat.card ↥M).factorization q = (Nat.card ↥E).factorization q := by
+    rw [← hME, Nat.factorization_mul Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.add_apply,
+      hMσ0, zero_add]
+  have hstep2 : (Nat.card ↥E).factorization q = (Nat.card ↥E₃).factorization q := by
+    rw [← hEE3, Nat.factorization_mul Nat.card_pos.ne' hidxne, Finsupp.add_apply, hidx0, add_zero]
+  rw [hstep1, hstep2]
+
 /-- In a cyclic `q`-subgroup `Q ≤ G`, the order-`q` subgroup `Q₀` is contained in **every**
 nontrivial subgroup `T ≤ Q` (it is the unique minimal subgroup `Ω₁`). Public replication of the
 `Ω₁`-bookkeeping used in §12 (`S12_Lemma1211`'s private `le_of_ne_bot_of_le_cyclic`). -/
