@@ -63,6 +63,13 @@ Expand the entire paragraph from "Let `H` be a Hall `(β(M) ∪ β(M*))`-subgrou
 (2c) Justify the chain `M^g ⊇ N_G(X) ⊇ H ⊇ Y` and `M ⊇ N_G(Y) ⊇ C_G(Y)`, and how Theorem 10.1(b) with `Y ⊆ M ∩ M^g` gives `M^g = M^h`, `h ∈ C_G(Y) ⊆ M`, hence `M = M^g ⊇ H`.
 (2d) Why does `β(M*) ∩ π(H) ≠ ∅` (so that `r` exists)? And why does `r ∈ π(H)` imply `r` divides `|C_M(P)|` (now that `H ⊆ M` and `H ⊆ C_G(P)`)?
 
-Please answer GAP 1 and GAP 2 separately, each as a numbered rigorous argument citing the exact results used.
+## GAP 3 — steps 5–6 (final extraction and contradiction)
+
+Expand the last two paragraphs:
+(3a) "Since `M = N_M(Q) M_α` and `r ∈ π(C_M(P))`, some subgroup `R ⊆ N_M(Q)` of order `r` is centralized by `P`." Why does such an `R` exist? (How do `M = N_M(Q) M_α`, `r ∈ π(C_M(P))`, and `r ∉ σ(M)` combine — presumably a coprime-action / `P`-invariant Hall argument inside `N_M(Q)` — to produce a `P`-centralized subgroup of order `r` inside `N_M(Q)`?)
+(3b) "Now, since `PR` is conjugate in `M` to an abelian subgroup of `E`, Theorem 13.4 yields `1 ⊂ X ⊆ C_{M_σ}(P) ⊆ C_{M_σ}(R) ⊆ M*`." Why is `PR` (with `R` centralized by `P`, so `⟨P,R⟩` abelian) conjugate in `M` to a subgroup of the complement `E`? And why is the resulting `C_{M_σ}(P)` nonidentity (`1 ⊂ X`)? And why `C_{M_σ}(R) ⊆ M*` (because `R ⊆ ... ⊆ M*` and `C_{M_σ}(R) ⊆ C_G(R) ⊆ N_G(R) ⊆ M*`)?
+(3c) "`[X,Q] ⊆ [M_α ∩ M*, Q] ⊆ M*_α` because `Q ⊆ M*'`, `M*'/M*_α` is nilpotent and `M_α ∩ M*` is a `Q`-invariant `q'`-subgroup of `M*`." Expand: why `X ⊆ M_α ∩ M*` (so that `[X,Q] ⊆ [M_α ∩ M*, Q]`)? Why does the nilpotence of `M*'/M*_α` together with `M_α ∩ M*` being a `Q`-invariant `q'`-subgroup give `[M_α ∩ M*, Q] ⊆ M*_α`? Then `[X,Q] ⊆ M_α`, `M_α ∩ M*_α = 1` ⟹ `[X,Q]=1`, so `X ⊆ C_{M_α}(PQ)`, contradicting `C_{M_α}(PQ)=1` (Lemma 12.18). Confirm each link.
+
+Please answer GAP 1, GAP 2, and GAP 3 separately, each as a numbered rigorous argument citing the exact results used. Where a step is a standard coprime-action or Hall-subgroup fact, name it precisely (e.g. "coprime action: `A`-invariant Hall subgroup exists and `C_{[B]}(A)` covers `C_{B/[B,A]}(A)`", etc.).
 
 ---- END ----
