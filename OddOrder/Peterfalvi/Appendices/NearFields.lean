@@ -534,7 +534,53 @@ theorem twMul_assoc (x y z : K) : d.twMul (d.twMul x y) z = d.twMul x (d.twMul y
      = d.twAut (d.twExp y + d.twExp z) x * (d.twAut (d.twExp z) y * z)
   rw [map_mul, twAut_twAut, mul_assoc, add_comm (d.twExp z) (d.twExp y)]
 
+/-- The twist exponent is inversion-invariant on nonzero elements (`χ(y⁻¹) = χ(y)` in `ℤ/2`). -/
+theorem twExp_inv {y : K} (hy : y ≠ 0) : d.twExp y⁻¹ = d.twExp y := by
+  have hy' : y⁻¹ ≠ 0 := inv_ne_zero hy
+  rw [twExp, dif_neg hy', twExp, dif_neg hy,
+    show Units.mk0 y⁻¹ hy' = (Units.mk0 y hy)⁻¹ from Units.ext rfl, map_inv, toAdd_inv]
+  exact (by decide : ∀ a : ZMod 2, -a = a) _
+
+/-- The explicit twisted inverse `y⁻¹∘ = σ^{χ(y)}(y⁻¹)` is a right inverse (no finite-cancellation
+needed): `y ∘ σ^{χ(y)}(y⁻¹) = 1`. -/
+theorem twMul_twInv {y : K} (hy : y ≠ 0) : d.twMul y (d.twAut (d.twExp y) y⁻¹) = 1 := by
+  have hy' : y⁻¹ ≠ 0 := inv_ne_zero hy
+  change d.twAut (d.twExp (d.twAut (d.twExp y) y⁻¹)) y * d.twAut (d.twExp y) y⁻¹ = 1
+  rw [d.twExp_twAut hy', d.twExp_inv hy, ← map_mul, mul_inv_cancel₀ hy, map_one]
+
 end TwistData
+
+/-- The near-field carried by twisting data `d`: the additive group of the field `K` equipped with
+the twisted multiplication `x ∘ y = σ^{χ(y)}(x) · y`.  A type synonym for `K` so the twisted
+multiplication does not clash with the field multiplication.  This is the abstract form of the
+exceptional near-field `F_{r²,2}` (Peterfalvi, Appendix C). -/
+def Twisted {K : Type*} [Field K] (_ : TwistData K) : Type _ := K
+
+namespace Twisted
+
+variable {K : Type*} [Field K] {d : TwistData K}
+
+instance : AddCommGroup (Twisted d) := inferInstanceAs (AddCommGroup K)
+
+/-- `Twisted d` is a near-field under the twisted multiplication. -/
+noncomputable instance : NearField (Twisted d) :=
+  { (inferInstance : AddCommGroup (Twisted d)) with
+    mul := d.twMul
+    one := (1 : K)
+    inv := fun y => d.twAut (d.twExp y) y⁻¹
+    mul_assoc := d.twMul_assoc
+    one_mul := d.one_twMul
+    mul_one := d.twMul_one
+    zero_mul := d.zero_twMul
+    mul_zero := d.twMul_zero
+    inv_zero := by
+      show d.twAut (d.twExp (0 : K)) (0 : K)⁻¹ = (0 : K)
+      simp
+    mul_inv_cancel := fun a ha => d.twMul_twInv ha
+    exists_pair_ne := ⟨(0 : K), (1 : K), (zero_ne_one : (0 : K) ≠ 1)⟩
+    right_distrib := d.add_twMul }
+
+end Twisted
 
 end TwistedNearField
 
