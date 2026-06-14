@@ -1345,6 +1345,49 @@ theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgr
     (Nat.card_congr (Subgroup.equivMapOfInjective (S10.Mbeta M ⊔ Q)
       (MulAut.conj m).toMonoidHom (MulAut.conj m).injective).symm.toEquiv).ge
 
+/-- **Lemma 13.8 head Frattini 結論** `M = N_M(Q) · M_β`: `Q` を `M` の Sylow `q`-部分群
+(`q∉β(M)`), `Q ⊆ M'` とすると `M = (M ⊓ N_G(Q)) ⊔ M_β`。`M_β ⊔ Q ⊲ M`
+(`QMbeta_sup_normal_in_M`) と `Q` が `M_β ⊔ Q` の Sylow `q` であることから Frattini argument
+(`Sylow.normalizer_sup_eq_top`)。 -/
+theorem M_eq_normalizer_sup_Mbeta [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQM : Q ≤ M)
+    (hQq : IsPGroup q ↥Q)
+    (hQmaxM : ∀ T : Subgroup G, T ≤ M → IsPGroup q ↥T → Q ≤ T → Q = T)
+    (hqβ : q ∉ S10.beta M) (hQderiv : Q ≤ derivedInG M) :
+    M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M := by
+  have hMβM : S10.Mbeta M ≤ M := S10.Mbeta_le M
+  have hMβQM : S10.Mbeta M ⊔ Q ≤ M := sup_le hMβM hQM
+  haveI hNorm : ((S10.Mbeta M ⊔ Q).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMβQM).mpr
+      (QMbeta_sup_normal_in_M hG hM hQq hQmaxM hqβ hQderiv)
+  -- `Q.subgroupOf M` is a Sylow `q` of `↥M`.
+  have hQMmax : ∀ T : Subgroup ↥M, IsPGroup q ↥T → Q.subgroupOf M ≤ T → T = Q.subgroupOf M := by
+    intro T hTq hQT
+    have hQT' : Q ≤ T.map M.subtype := by
+      have h : (Q.subgroupOf M).map M.subtype ≤ T.map M.subtype := Subgroup.map_mono hQT
+      rwa [Subgroup.subgroupOf_map_subtype Q M, inf_eq_left.mpr hQM] at h
+    have heq := hQmaxM (T.map M.subtype) (Subgroup.map_subtype_le T)
+      (hTq.of_equiv (Subgroup.equivMapOfInjective T M.subtype M.subtype_injective)) hQT'
+    calc T = (T.map M.subtype).subgroupOf M :=
+          (Subgroup.comap_map_eq_self_of_injective M.subtype_injective T).symm
+      _ = Q.subgroupOf M := by rw [← heq]
+  obtain ⟨QMs, hQMseq⟩ :=
+    sylow_of_maximal_pSubgroup (hQq.of_equiv (Subgroup.subgroupOfEquivOfLe hQM).symm) hQMmax
+  have hPN : (QMs : Subgroup ↥M) ≤ (S10.Mbeta M ⊔ Q).subgroupOf M := by
+    rw [hQMseq]; exact Subgroup.subgroupOf_mono M le_sup_right
+  have hFrattini := Sylow.normalizer_sup_eq_top' QMs hPN
+  rw [← Sylow.coe_coe, hQMseq, ← Subgroup.subgroupOf_normalizer_eq hQM] at hFrattini
+  have hmap := congrArg (Subgroup.map M.subtype) hFrattini
+  rw [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype, inf_eq_left.mpr hMβQM] at hmap
+  -- hmap : (N_G(Q) ⊓ M) ⊔ (M_β ⊔ Q) = M
+  have hQA : Q ≤ M ⊓ Subgroup.normalizer (Q : Set G) := le_inf hQM Subgroup.le_normalizer
+  have hlat : Subgroup.normalizer (Q : Set G) ⊓ M ⊔ (S10.Mbeta M ⊔ Q)
+      = M ⊓ Subgroup.normalizer (Q : Set G) ⊔ S10.Mbeta M := by
+    rw [inf_comm, sup_comm (S10.Mbeta M) Q, ← sup_assoc, sup_eq_left.mpr hQA]
+  rw [hlat] at hmap
+  exact hmap.symm
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **Lemma 13.8 GAP 3 capstone (M-oriented)**: 配置 + step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
@@ -1405,7 +1448,8 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (Fact.out : Nat.Prime p).one_lt.ne hc
   -- step1 (M-side and M*-side).
   obtain ⟨_, _, hαβ, _, _, hCMαP, hCMαPQ⟩ :=
-    forbidden_config_step1 hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ hNQ
+    forbidden_config_step1 hG hM hMstar hMMstar hp hP hPM hQle hQq hQmax hQinv hCQ
+      hNQ
   have hPMstar : P ≤ Mstar ⊓ M := by rw [inf_comm]; exact hPM
   have hQstarle' : Qstar ≤ Mstar ⊓ M := by rw [inf_comm]; exact hQstarle
   have hQstarmax' : ∀ T : Subgroup G, T ≤ Mstar ⊓ M → IsPGroup qstar ↥T → Qstar ≤ T → Qstar = T := by
