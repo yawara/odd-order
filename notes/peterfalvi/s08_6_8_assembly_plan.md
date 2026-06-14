@@ -1894,3 +1894,25 @@ ZIrr (X₁,Y∈ZIrr)。reducible μ_j も χ∈X として (6.8.2.3) で一律�
 **正本=本 cont.²⁵。route 実行可能・brick-friendly 確認。entry landed。次 brick = step 2 ([Is]2.27 で
 Res_{W₂} θ = a·φ)。item 1 (X_irr-coh) は廃棄確定 (教科書非対応)。glue shell は (6.8.2.3) 完成後に
 置換判断 (cX 不要ゆえ最終的に未使用化見込み)。**
+
+## 2026-06-14 (session 40 cont.²⁶, /loop): (6.8.2.3) clean-brick phase 完了 (steps 1-2 + 2 infra); 残=rep-theory infra 一から + R(χ) core ⟹ work の性質が変化、ユーザーに判断仰ぐ
+
+### ✅ landed (clean bricks, 全 axiom-clean・full build 3807):
+- step 1 `mem_Xset_exists_inducing` (ce87acc0)。
+- `subgroupOf_le_center_of_le_center` (W₂.subgroupOf H ⊆ Z(↥H), ecdcef2f)。
+- step 2 `certainType_central_restriction` (Res^H_{W₂} θ = θ(1)·φ, [Is]2.27, ecdcef2f)。
+- `restrict_induce_eq_index_smul_of_le_center` (Res_Z(Ind_Z φ)=|Γ:Z|•φ central, 6fa6daf2; ∑aᵢ²=|H:Z| 入力)。
+
+### 🛑 残 (6.8.2.3) は work の性質が変化 — clean brick でなく一から rep-theory infra:
+- **step 3 残: induction transitivity `Ind_H(Ind_{Z}^H ψ) = Ind_Z^L φ`** — repo に無し。custom `induce`
+  (= ⅟|H|•∑ induceTerm, InducedCharacter:262) の **二重和 coset 論法を一から** + Z.subgroupOf H ≅ Z
+  transport。mathlib 級 infra。
+- **step 3 残: character 分解 `Ind_Z^H φ = ∑aᵢθᵢ` (aᵢ=θᵢ(1))** — constituent 構造 (Clifford.lean の
+  liesOver/restrictionMultiplicity 利用可だが、"character=∑⟨·,θ⟩θ" 分解 + aᵢ=θᵢ(1) 計算の組立は中規模)。
+- **steps 5-8: R(χ) 統合** (本丸, 未着手) — §7 R-producer + (5.4.a/b) + bᵢ=aᵢ pinning。intricate。
+- φ-presentation seams (W₂.subgroupOf H ↔ ↥W2, (6.8.2.2) の Ind_W2 接続) も複数。
+
+### 🔑 honest 評価: clean-brick phase (steps 1-2 + 2 infra) は完了。残りは **一から rep-theory infra
+構築 (induction transitivity 等) + R(χ) intricate 統合**の大規模 focused effort で、60s loop brick より
+**dedicated session 向き**。FT 最短経路外 (full-Pf scope)。⟹ ユーザーに継続 vs 保留を判断仰ぐ (cont.²⁶)。
+**正本=本 cont.²⁶。**
