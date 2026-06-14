@@ -2719,3 +2719,46 @@ case-B X-coherence の `coherentXunionYset_caseB_of_glued` が要求する **hmi
 4. **capstone** (`sibleySetup_is_coherent` X-nonempty branch, S08_CoherenceTheorems:59): hyp.cases 場合分け (Frobenius=既存 / CertainType=case-B 上記) + 全 glue。
 **🔑 直交性/mixed-inner は全完成。残りは §7 union engine の ν/diagonal/generation 配線 (大規模 engineering, case-A `_of_frobenius` をミラー)。**
 **正本=本 session 41 cont.⁶。mixed-inner toolkit 完成。次=cX_irr + §7 union glue 配線。**
+
+## 2026-06-15 (session 41 cont.⁷, /loop): 🎯🎯🎯 ARCHITECTURE 確定 = Route B (direct anchored τ₂)
+
+### ChatGPT architecture 相談 (思考 9m40s, 検証済) の verdict:
+教科書 (6.8.2) は **単一 Z-線形写像 τ₂ : Z[X∪Y] → Z[Irr G] を η₁ anchor で直接定義** (τ₂=τ on supported lattice, η₁^{τ₂}=Y₀)。standalone X-coherence を先に作って glue する Route A では**ない**。anchor η₁ = 各 χ∈X を degree-zero supported 元 `χ − a_χ·η₁` (a_χ=χ(1)/η₁(1)) に変換し Dade 等長の定義域へ落とす device。
+
+### 🔑 Lean レベルでも Route B が厳密に軽いと確認 (cont.⁶ Route A 計画を撤回):
+- `coherentXunionYset_caseB_of_glued` (S08:1526) は §7 union engine 呼び出しの **Route A 型 shell** で **完全な `cX : IsCoherent hyp.tau (Xset W2)` を要求**。
+- その glue は ν が supported lattice 上 τ と一致 (`D`/`hDτ`/`hgen`) を要求 → `μ_j − a_j η₁` 型 supported 元での一致 = **まさに per-χ anchored 公式 `(μ_j−a_jη₁)^τ = X_j−a_jY₀`**。
+- ⟹ **anchored 公式は Route A でも回避不能** (ChatGPT「orthogonality ν(μ_j)⊥Y^{τ₁} は pinning を代替しない」が的中)。Route A は per-χ 公式に加え **cX 構築 + X-internal glue を純オーバーヘッドで上乗せ**。
+- ⟹ **Route B (cX を作らない) が厳密に軽い。** mixed-inner toolkit (cont.⁶) は無駄でなく、anchored 公式の `X_χ ⊥ Y^{τ₁}` 部分の入力として活きる (必要だが不十分)。
+
+### cont.²⁴ の「異次数 reducible column」懸念は case B では杞憂 (ChatGPT 訂正):
+w₂=|W₂| が素数 → W₂ 非自明線形指標は全 Galois 共役 → 非零列 μ_j (j≠0) は**全て同次数の単一 certain-type 族** (type II/III/IV で「reducible μ_j は p−1 個・全て次数 qu」と本が記録、と整合)。raw (4.9) を w₂-prime 外で使う時だけの問題だった。
+
+### Route B の clean な top-level target (= ChatGPT §5 skeleton):
+> **anchored bridge extension lemma**: X, Y_set 互いに直交; Y_set coherent (ext τ₁); η₁∈Y_set (Y₀=η₁^{τ₁}); 各 χ∈X に `(χ−a_χη₁)^τ = X_χ − a_χY₀` (a_χ=χ(1)/η₁(1)) かつ `X_χ ⊥ Y_set^{τ₁}` ⟹ τ₂(η)=τ₁(η), τ₂(χ)=X_χ で **X∪Y_set coherent**。
+
+per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_φ={θ∈IrrH:Res_{W₂}θ=θ(1)φ}`、`a_θ=θ(1)`、`α_θ=Ind_H^Lθ − a_θη₁`。`∑_θ a_θα_θ = Ind^L_{W₂}φ − |H:W₂|η₁` (aggregate=`exists_decomposition_caseB`) + `∑_θ a_θ²=|H:W₂|` で pinning `b_θ=a_θ` (consult 1 の `per_constituent_Y_eq_smul` 機構)。family は column (θ=X_j→μ_j) と irreducible (θ→Ind_H^Lθ∈IrrL) の**両方を含む** (dispatch)。
+
+### ▶▶ Route B 実装計画 (consult 1 の pinning 機構 + cont.⁶ toolkit を再利用):
+1. **per-φ family**: `I_φ`-indexed、column/irreducible dispatch の `(i:ι)→CharacterPsiDecomposition τ (χ i) (a i•η₁)`。reducible→`certainTypeDecompositionDa`、irreducible→既約 machinery。
+2. **pinning → per-χ 公式**: `per_constituent_Y_eq_smul` + `aggregate_eq_sum_of_constituent` (両既存) で `(χ−a_χη₁)^τ = X_χ−a_χY₀`。`X_χ⊥Y^{τ₁}` は mixed-inner toolkit。
+3. **direct extension lemma**: §7 に「単一 cY + anchored images で X∪Y へ adjoin」直接拡張があるか調査中 (無ければ新規構築; union engine は 2 coherence 要なので Route B 不適)。
+4. **capstone** (`sibleySetup_is_coherent` X-nonempty, S08_CoherenceTheorems:59): hyp.cases (Frobenius=既存 / CertainType=上記 Route B)。
+**🔑 Route A (cX+§7 union glue) 撤回。Route B (direct anchored τ₂) 確定。per-χ 公式は不可避ゆえ cX オーバーヘッドを切る。次=§7 direct-extension 補題の有無調査 + per-φ family。**
+**正本=本 session 41 cont.⁷。architecture=Route B 確定 (ChatGPT 相談 + Lean 署名突合)。**
+
+### ⚠️ cont.⁷ 訂正 (§7 adjoin 補題の署名精査後): pure Route B は不可、**HYBRID が正**
+§7 の adjoin 一族 (`retarget_isCoherent_of_supportedDecomposition` S07:4031, `..._and_memberFamily` 4126, `retarget_isCoherent_fromDade_X` 6177, `DadeChainStep` 6262) は**全て `⟨χ,χ⟩=1` (norm-1, 既約型 {χ,χ̄} 正規直交) を要求**。**reducible column μ_j は `⟨μ_j,μ_j⟩ = w₁ ≠ 1` ゆえ chain で cY に直接 adjoin できない。** ⟹ columns は certain-type σ (`certainTypeSet_isCoherent_tau` = cX_col、μ_j↦∑ω^σ) で**別 coherence object として**拡張するしかなく、**cX_col と既約側の union は Lean 上不可避**。pure「単一 τ₂ 直接」は全 inner-product (列-列含む) を一から再証明する重作業ゆえ非現実的。
+
+**∴ 正しい Lean topology = HYBRID** (ChatGPT の per-φ pinning と equal-degree 訂正を活かしつつ union を残す):
+- **cX_col** = `certainTypeSet_isCoherent_tau` (columns, 既存)。equal-degree 訂正で全 reducible X-member を被覆。
+- **cX_irr** = X_irr (非列既約 member) の coherence。chain (`retarget_isCoherent_fromDade_X` ミラー) を seed または cY base で。← 要構築。
+- **union**: cX_col と (cY + X_irr) を §7 union engine で結合 (`coherentXunionYset_caseB_of_glued` shell 流用可)。cross-orth = mixed-inner toolkit (cont.⁶)。
+- **diagonal/hgen の anchored data**: 列の `μ_j − a_jη₁` supported 元で `ν(μ_j−a_jη₁)=τ(...)` を要求 = **per-χ anchored 公式 `(μ_j−a_jη₁)^τ = (列σ像) − a_jY₀`**。これが (6.8.2.3) の核で **全 route 共通・不可避**。per-φ pinning (`per_constituent_Y_eq_smul` 既存) + per-φ family (要構築) で得る。
+
+### 🎯 route 非依存の不可避コア (ここから着手):
+1. **per-φ family + pinning → anchored 公式** `(μ_j−a_jη₁)^τ = X_j−a_jY₀` (列) & 既約版。← (6.8.2.3) の核、全 route 共通。
+2. **equal-degree split fact**: case B (w₂ 素数) で X_red = certainTypeSet ∧ X_irr 全既約 (column/irr 分割が clean)。
+3. **cX_irr** (X_irr coherence, chain ミラー)。
+これらは A/B どの union topology でも要る。**まず (1) per-φ family を組む** (機構は consult 1 で完成、family 供給のみ)。
+**正本=本 session 41 cont.⁷ 訂正。pure Route B 不可 (列 norm≠1)、HYBRID 確定。不可避コア = per-φ anchored 公式。次=per-φ family 構築。**
