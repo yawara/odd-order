@@ -822,6 +822,47 @@ theorem inner_X_Y_eq_zero_of_orthogonal {L : Subgroup G} [Fintype ↥L] [Inverti
   rw [OddOrder.RepresentationTheory.inner_conj_symm Y D.X,
     D.inner_X_eq_zero_of_orthogonal_imageSet hY, star_zero]
 
+/-- **Orthogonality extraction from a two-irreducible difference** (the (6.8.2.3) disjointness
+core).  If `ξ`, `ξ'` are orthonormal (`‖ξ‖² = 1`, `⟨ξ, ξ'⟩ = 0`), `θ` is a norm-`1` vector with
+`⟨ξ, θ⟩ ∈ ℤ`, and `c·ξ − c'·ξ' ⊥ θ` for `c ≠ 0`, then `⟨ξ, θ⟩ = 0`.
+
+This is the extraction step of the disjointness `R(μ_j) ⊥ Y`: writing `Y = ε·ξ` (`ξ` the `Y`-anchor
+irreducible image, `coherentYset_extension_eq_zsmul_irreducible`) so that
+`(η₁ − η̄₁)^τ = ε·ξ − ε'·ξ'` is orthogonal to every `σ`-image `θ = ω^σ` (by (3.8) /
+`grid_eq_zero_of_ncard_support_lt`, since `NC ≤ 2 < min(w₁, w₂)`), the integrality bound
+`|⟨ξ, θ⟩| ≤ 1` (`inner_intCast_sq_le`) forces `⟨ξ, θ⟩ = 0`: otherwise `⟨ξ, θ⟩ = ±1` makes
+`ξ = ±θ` (Cauchy–Schwarz equality `eq_smul_of_inner_self_eq`), so `⟨ξ', θ⟩ = 0` (from `⟨ξ, ξ'⟩ = 0`)
+and the orthogonality collapses to `c·⟨ξ, θ⟩ = 0`, contradicting `c ≠ 0`. -/
+theorem inner_eq_zero_of_smul_sub_smul_orthogonal {ξ ξ' θ : ClassFunction G ℂ}
+    (hξ : ClassFunction.inner ξ ξ = 1) (hθ : ClassFunction.inner θ θ = 1)
+    (hξξ' : ClassFunction.inner ξ ξ' = 0)
+    {m : ℤ} (hm : ClassFunction.inner ξ θ = (m : ℂ))
+    {c c' : ℂ} (hc : c ≠ 0)
+    (horth : ClassFunction.inner (c • ξ - c' • ξ') θ = 0) :
+    ClassFunction.inner ξ θ = 0 := by
+  rw [hm]
+  by_contra hne
+  have hmne : m ≠ 0 := fun h => hne (by rw [h]; simp)
+  -- `|m| ≤ 1` from the norm-`1` Cauchy–Schwarz bound, hence `m = ±1`.
+  have hmsqz : m ^ 2 ≤ 1 := by
+    have h := inner_intCast_sq_le hθ hm
+    rw [hξ, Complex.one_re] at h
+    exact_mod_cast h
+  have hlo : -1 ≤ m := by nlinarith [sq_nonneg (m + 1)]
+  have hhi : m ≤ 1 := by nlinarith [sq_nonneg (m - 1)]
+  have hmsq1 : (m : ℂ) ^ 2 = 1 := by interval_cases m <;> simp_all
+  -- `‖ξ‖² = (m:ℂ)²`, so `ξ = (m:ℂ)·θ` by the equality case of Cauchy–Schwarz.
+  have hξeq : ξ = (m : ℂ) • θ := eq_smul_of_inner_self_eq hm (by rw [hξ, hmsq1]) hθ
+  -- `⟨ξ, ξ'⟩ = (m:ℂ)·⟨θ, ξ'⟩ = 0` with `(m:ℂ) ≠ 0` ⟹ `⟨ξ', θ⟩ = 0`.
+  rw [hξeq, ClassFunction.inner_smul_left] at hξξ'
+  have hξ'θ : ClassFunction.inner ξ' θ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm θ ξ',
+      (mul_eq_zero.mp hξξ').resolve_left hne, star_zero]
+  -- `horth` collapses to `c·(m:ℂ) = 0`, contradicting `c ≠ 0`, `(m:ℂ) ≠ 0`.
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, ClassFunction.inner_smul_left,
+    hξ'θ, mul_zero, sub_zero, hm] at horth
+  exact (mul_ne_zero hc hne) horth
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
