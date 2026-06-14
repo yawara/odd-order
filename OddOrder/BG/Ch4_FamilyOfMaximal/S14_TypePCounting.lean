@@ -93,6 +93,40 @@ def IsTypeP2 (M : Subgroup G) : Prop :=
 def IsTypeF (M : Subgroup G) : Prop :=
   kappa M = ∅
 
+/-! ### Type classification: basic relations
+
+These hold for any group purely from the definitions (no §13 input).  They record the
+`M_F = ¬M_P` complementarity and the `M_P = M_P1 ⊔ M_P2` partition that §§15--16 use when
+casing on the type of a maximal subgroup. -/
+
+theorem isTypeP_of_isTypeP1 {M : Subgroup G} (h : IsTypeP1 M) : IsTypeP M := h.1
+
+theorem isTypeP_of_isTypeP2 {M : Subgroup G} (h : IsTypeP2 M) : IsTypeP M := h.1
+
+/-- The type-`P` maximal subgroups split as the (disjoint) union of `M_P1` and `M_P2`. -/
+theorem isTypeP_iff_isTypeP1_or_isTypeP2 {M : Subgroup G} :
+    IsTypeP M ↔ IsTypeP1 M ∨ IsTypeP2 M := by
+  constructor
+  · intro hP
+    by_cases h : kappa M = sigmaComplementPrimes M
+    · exact Or.inl ⟨hP, h⟩
+    · exact Or.inr ⟨hP, h⟩
+  · rintro (h | h) <;> exact h.1
+
+/-- `M_P1` and `M_P2` are disjoint: `kappa(M)` cannot both equal and differ from `π(M)∖σ(M)`. -/
+theorem not_isTypeP1_and_isTypeP2 {M : Subgroup G} : ¬ (IsTypeP1 M ∧ IsTypeP2 M) := by
+  rintro ⟨⟨_, h1⟩, _, h2⟩
+  exact h2 h1
+
+/-- `M_F` (Frobenius type) is exactly the complement of `M_P` (type `P`). -/
+theorem isTypeF_iff_not_isTypeP {M : Subgroup G} : IsTypeF M ↔ ¬ IsTypeP M := by
+  simp only [IsTypeF, IsTypeP, Set.not_nonempty_iff_eq_empty]
+
+/-- A maximal subgroup is not simultaneously type `P` and Frobenius type. -/
+theorem not_isTypeP_and_isTypeF {M : Subgroup G} : ¬ (IsTypeP M ∧ IsTypeF M) := by
+  rintro ⟨hP, hF⟩
+  exact (isTypeF_iff_not_isTypeP.mp hF) hP
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
@@ -108,6 +142,39 @@ def maximalTypeP2Family (G : Type*) [Group G] : Set (Subgroup G) :=
 /-- The family `M_F` of Frobenius-type maximal subgroups. -/
 def maximalTypeFFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeF M}
+
+/-- Family form of the type-`P` partition: `M_P = M_P1 ∪ M_P2`. -/
+theorem maximalTypePFamily_eq_union :
+    maximalTypePFamily G = maximalTypeP1Family G ∪ maximalTypeP2Family G := by
+  ext M
+  simp only [maximalTypePFamily, maximalTypeP1Family, maximalTypeP2Family, Set.mem_setOf_eq,
+    Set.mem_union]
+  constructor
+  · rintro ⟨hM, hP⟩
+    rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with h | h
+    · exact Or.inl ⟨hM, h⟩
+    · exact Or.inr ⟨hM, h⟩
+  · rintro (⟨hM, h⟩ | ⟨hM, h⟩)
+    · exact ⟨hM, isTypeP_of_isTypeP1 h⟩
+    · exact ⟨hM, isTypeP_of_isTypeP2 h⟩
+
+/-- Family form: `M_P1` and `M_P2` are disjoint. -/
+theorem maximalTypeP1Family_disjoint_typeP2Family :
+    Disjoint (maximalTypeP1Family G) (maximalTypeP2Family G) := by
+  rw [Set.disjoint_left]
+  rintro M ⟨_, h1⟩ ⟨_, h2⟩
+  exact not_isTypeP1_and_isTypeP2 ⟨h1, h2⟩
+
+/-- Family form: `M_F` is the complement of `M_P` within the maximal subgroups. -/
+theorem maximalTypeFFamily_eq_diff :
+    maximalTypeFFamily G = maximalSubgroups G \ maximalTypePFamily G := by
+  ext M
+  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_setOf_eq, Set.mem_diff, not_and]
+  constructor
+  · rintro ⟨hM, hF⟩
+    exact ⟨hM, fun _ => isTypeF_iff_not_isTypeP.mp hF⟩
+  · rintro ⟨hM, hnP⟩
+    exact ⟨hM, isTypeF_iff_not_isTypeP.mpr (hnP hM)⟩
 
 /-- BG `M_sigma(x)`: maximal subgroups whose `M_sigma` contains the element `x`. -/
 def maximalSigmaSubgroupsOfElement (x : G) : Set (Subgroup G) :=
