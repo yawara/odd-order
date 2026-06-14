@@ -591,4 +591,134 @@ theorem SibleyDadeHypothesis.columnSum_mem_S
     exact OddOrder.Peterfalvi.S04.Hypothesis.induce_congr_of_subgroup_eq hHK
       (fun x hx₁ hx₂ => by simp [ClassFunction.restrict_apply])
 
+/-- **(6.8.2) case-(B), `μ_j = Ind_H^L (Res_H μ_{0j})`.**  The transported form of (4.5.a)
+`induce_restrict_certainType_eq`: with `h46.K = H`, the column character `μ_j = columnSum h46 χ₂`
+is induced from `H` of the source `Res_H μ_{0j}` (the H-presentation of `χ_j`).  Reuses the
+`induce_congr_of_subgroup_eq` transport of `columnSum_mem_S`. -/
+theorem columnSum_eq_induce_H
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+      = ClassFunction.induce H
+        (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, ← h46.induce_restrict_certainType_eq χ₂]
+  exact OddOrder.Peterfalvi.S04.Hypothesis.induce_congr_of_subgroup_eq hHK
+    (fun x hx₁ hx₂ => by simp [ClassFunction.restrict_apply])
+
+/-- **(6.8.2) case-(B), `Res_H μ_{ij} = Res_H μ_{0j}`.**  The H-presentation of (4.8) step 1
+`restrict_certainType_eq` (`Res_K μ_{ij} = Res_K μ_{0j} = χ_j`), transported pointwise along
+`h46.K = H`. -/
+theorem restrict_H_certainType_eq
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    ClassFunction.restrict H ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      = ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) := by
+  refine ClassFunction.ext (fun g => ?_)
+  have hgK : (g : ↥L) ∈ h46.K := hHK.ge g.2
+  have hval := congrArg (fun f : ClassFunction ↥h46.K ℂ => f ⟨(g : ↥L), hgK⟩)
+    (h46.restrict_certainType_eq χ₂ i)
+  simpa using hval
+
+/-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
+`μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
+irreducible `θ` of `H` with `W₂ ⊆ Ker θ` induces to `μ_j`.
+
+**Clifford-uniqueness.**  Any `θ` with `Ind_H^L θ = μ_j` is forced to be `Res_H μ_{0j}`: writing
+`ψ = Res_H μ_{0j}` (irreducible, `μ_j = Ind_H^L ψ`), Frobenius reciprocity term-by-term over
+`μ_j = ∑_i μ_{ij}` (with `Res_H μ_{ij} = ψ`) gives `∑_i ⟨θ, ψ⟩ = ⟨μ_j, μ_j⟩ = ∑_i ⟨ψ, ψ⟩`, so
+`w₁·⟨θ, ψ⟩ = w₁·1` and `⟨θ, ψ⟩ = 1 ≠ 0`, whence `θ = ψ` (both irreducible).  But then `W₂ ⊆ Ker ψ`,
+contradicting (4.7) `not_subset_characterKernel_chiRestrict_of_ne_one`. -/
+theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∉ hyp.SsubFiltration h46.W2 := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  set ψ : ClassFunction ↥H ℂ :=
+    ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) with hψdef
+  have hψirr : IsIrreducibleCharacter ψ := by
+    have h := h46.certainTypeRestrict_isIrreducible χ₂
+    rwa [hHK] at h
+  set ψirr : IrreducibleCharacter ↥H := ⟨ψ, hψirr⟩ with hψirrdef
+  intro hmem
+  rw [hyp.mem_SsubFiltration] at hmem
+  obtain ⟨θ, hθne, hθker, hθind⟩ := hmem
+  -- `μ_j = Ind_H^L ψ` in `ψ`-form.
+  have hcind : ClassFunction.induce H ψ = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ := by
+    rw [hψdef]; exact (columnSum_eq_induce_H h46 hHK χ₂).symm
+  -- Per-term Frobenius: for any source `φ`, `⟨Ind_H φ, μ_j⟩ = ∑_i ⟨φ, ψ⟩`.
+  have key : ∀ φ : ClassFunction ↥H ℂ,
+      ClassFunction.inner (ClassFunction.induce H φ) (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+        = ∑ _i : Fin (Nat.card h46.W1), ClassFunction.inner φ ψ := by
+    intro φ
+    rw [OddOrder.Peterfalvi.S06.columnSum_def, inner_sum_right]
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [ClassFunction.inner_induce_eq_inner_restrict, restrict_H_certainType_eq h46 hHK χ₂ i,
+      ← hψdef]
+  -- `⟨μ_j, μ_j⟩` computed two ways, via `θ` and via `ψ`.
+  have hθeq : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+        = ∑ _i : Fin (Nat.card h46.W1), ClassFunction.inner (θ : ClassFunction ↥H ℂ) ψ := by
+    have hk := key (θ : ClassFunction ↥H ℂ); rwa [← hθind] at hk
+  have hψeq : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+        = ∑ _i : Fin (Nat.card h46.W1), ClassFunction.inner ψ ψ := by
+    have hk := key ψ; rwa [hcind] at hk
+  -- `w₁·⟨θ, ψ⟩ = w₁·⟨ψ, ψ⟩`, cancel `w₁ ≠ 0`, then `⟨θ, ψ⟩ = ⟨ψ, ψ⟩ = 1 ≠ 0`.
+  have hsum : (Nat.card h46.W1 : ℂ) * ClassFunction.inner (θ : ClassFunction ↥H ℂ) ψ
+      = (Nat.card h46.W1 : ℂ) * ClassFunction.inner ψ ψ := by
+    have h := hθeq.symm.trans hψeq
+    simpa [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul] using h
+  have hw1 : (Nat.card h46.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr (NeZero.ne _)
+  have hinner : ClassFunction.inner (θ : ClassFunction ↥H ℂ) ψ = ClassFunction.inner ψ ψ :=
+    mul_left_cancel₀ hw1 hsum
+  -- `⟨θ, ψirr⟩ = ⟨ψ, ψ⟩ = ⟨ψirr, ψirr⟩ = 1 ≠ 0`, so `θ = ψirr`.
+  have hθeqψ : θ = ψirr := by
+    by_contra hc
+    have e0 : ClassFunction.inner (θ : ClassFunction ↥H ℂ) (ψirr : ClassFunction ↥H ℂ) = 0 := by
+      rw [irreducibleCharacter_inner_eq_ite, if_neg hc]
+    have e1 : ClassFunction.inner (ψirr : ClassFunction ↥H ℂ) (ψirr : ClassFunction ↥H ℂ) = 1 := by
+      rw [irreducibleCharacter_inner_eq_ite, if_pos rfl]
+    rw [show (ψirr : ClassFunction ↥H ℂ) = ψ from rfl] at e0 e1
+    rw [hinner] at e0
+    exact zero_ne_one (e0.symm.trans e1)
+  -- contradiction: `W₂ ⊆ Ker ψ = Ker(Res_K μ_{0j}) = Ker χ_j`
+  rw [hθeqψ] at hθker
+  refine OddOrder.Peterfalvi.S06.Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
+    h46.toCertainTypeHypothesis.toHypothesis hχ₂ (fun x hx => ?_)
+  have hxW2 : (x : ↥L) ∈ h46.W2 := Subgroup.mem_subgroupOf.mp hx
+  have hxH : (x : ↥L) ∈ H := hHK.le x.2
+  have hxker : (⟨(x : ↥L), hxH⟩ : ↥H)
+      ∈ OddOrder.Peterfalvi.S03.characterKernel (ψirr : ClassFunction ↥H ℂ) :=
+    hθker (Subgroup.mem_subgroupOf.mpr hxW2)
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def] at hxker
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+  simp only [show (ψirr : ClassFunction ↥H ℂ) = ψ from rfl, hψdef,
+    OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict, ClassFunction.restrict_apply,
+    OneMemClass.coe_one] at hxker ⊢
+  exact hxker
+
+/-- **(6.8.2) case-(B), `𝒯 ⊆ X(W₂)`** (cont.²² item 2): the certain-type set `𝒯 = {μ_j}` of
+Peterfalvi (4.9) is contained in the (6.8) set `X(W₂) = S − S(W₂)`.  Each `μ_j = columnSum h46 χ₂`
+(`χ₂ ≠ 1`) lies in `S` (`columnSum_mem_S`, item 2a) but not in `S(W₂)`
+(`columnSum_notMem_SsubFiltration`, item 2b), hence in `X(W₂)`. -/
+theorem SibleyDadeHypothesis.certainTypeSet_subset_Xset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    OddOrder.Peterfalvi.S06.certainTypeSet h46 k ⊆ hyp.Xset h46.W2 := by
+  rintro φ ⟨χ₂, hχ₂, _, rfl⟩
+  exact hyp.mem_Xset.mpr ⟨hyp.columnSum_mem_S h46 hHK hχ₂,
+    hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂⟩
+
 end OddOrder.Peterfalvi.S08
