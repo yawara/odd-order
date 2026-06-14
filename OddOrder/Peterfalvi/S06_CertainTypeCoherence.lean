@@ -595,4 +595,24 @@ theorem certainTypeRImage_sum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl (fun i _ => by abel)
 
+/-- **The (5.2.d) image equation for `R(μ_j)`** (Peterfalvi (5.3.b) / (4.9)(b)): the Dade image of
+the column difference `μ_j − μ_k` is the sum of the `R(μ_j)` family,
+`(μ_j − μ_k)^τ = ∑_{p} R(μ_j) p`.  Combines the (4.9) summed isometry — packaged as
+`certainTypeExtension_columnDiff_eq_dade` (which discharges the `dadeIntegralCharacterMap` /
+`toDadeMap` seam) and `certainTypeExtension_columnSum` — with `certainTypeRImage_sum`; the sign
+equality `certainType_columnSign_eq` (degrees match) identifies `δ_j = δ_k`. -/
+theorem dadeICM_columnDiff_eq_sum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
+    S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - columnSum h χ₂')
+      = ∑ p : Bool × Fin (Nat.card h.W1), certainTypeRImage h χ₂ χ₂' p := by
+  rw [← certainTypeExtension_columnDiff_eq_dade h hχ₂ hχ₂' hdeg, certainTypeRImage_sum,
+    map_sub, certainTypeExtension_columnSum, certainTypeExtension_columnSum,
+    ← certainType_columnSign_eq h hdeg, ← smul_sub, ← Finset.sum_sub_distrib]
+  exact (Int.cast_smul_eq_zsmul ℂ _ _).symm
+
 end OddOrder.Peterfalvi.S06
