@@ -174,6 +174,18 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
     GAP 2 を進めつつ、GAP 3 は s13_8_chatgpt_prompt.md の該当部を再依頼 or 自力再構成。
   - 次標的: GAP 2 の Hall θ-部分群存在/共役 (Prop 1.5) + Cor 12.16 + Thm 10.1(b) transitivity
     (`IsUniquelyMaximal`) + Prop 10.14(d) + Lem 10.12(a) の repo handle 特定。
+  ### GAP 2 handle scout (2026-06-14)
+  - **r∉σ(M)** (GAP 2.11): `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2 : alpha M* ∩ sigma M = ∅`
+    (roles 入替: 第1=M*, 第2=M; hnc'=¬∃g,conj g•M*=M を hnc から共役対称で導出)。
+    `r∈α(M*)` (←β(M*)⊆α(M*)) かつ `r∈σ(M)` を `∈ ∅` に落として矛盾。
+  - **Hall**: `Isaacs.Ch03.hall_E_exists [Finite ·] [IsSolvable ·] (π) : ∃ H, IsHallSubgroup π H`
+    (Ch03 Main:837)。C_G(P) の Hall θ-部分群は ↥(C_G(P)) に適用 (solvable: 真部分群)→transport。
+    π-membership: `IsHallSubgroup.primeFactors_card_subset` (Main:585) 等。
+  - **Cor 12.16(a) q-group specialization** = `S12_Corollary1216` line 307 (要署名精読: 非自明
+    q-群 Y⊆? が M_α へ共役)。X=O_s(H) は s∈β(M)⊆α(M) の s-群ゆえ適用可。
+  - **Thm 10.1(b) transitivity** = `IsUniquelyMaximal` (Y uniquely-maximal ⟹ ℳ(Y) 一意): Y=O_t(C_{M_β}(P)),
+    Uniqueness Thm (rank) で Y∈𝒰 → M=M^g。MaximalSubgroup.lean の `.existsUnique` + eq 補題。
+  - **F(H)/O_s** = `Ch01.fitting` / p-core (opi 系)。⚠ subtype transport (Hall in ↥C_G(P)) が最大の工数。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
