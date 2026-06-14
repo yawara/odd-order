@@ -1855,3 +1855,42 @@ X が reducible μ_j を含み X-内部 chain が崩れるため、教科書は 
   (true facts ではある)。
 **正本=本 cont.²⁴ (ARCHITECTURE 再評価)。次=直接 τ₂ route ((6.8.2.3) per-χ R(χ) 分解) へ pivot。
 item 1 は build しない。要ユーザー確認: glue shell 廃棄 vs 延命。**
+
+## 2026-06-14 (session 40 cont.²⁵, /loop): ✅ 直接-τ₂ route の building blocks 全確認 + Z=W₂ 確定 + (6.8.2.3) entry landed
+
+cont.²⁴ pivot を受け、直接-τ₂ route の前提を全検証。**全 building block が repo に存在** ⟹ route は実行可能で、
+foundational pieces は **brick-friendly** (dedicated session 不要、loop で steady に積める)。
+
+### ✅ 確定事実 (mmd 04.8 L150-160 精読):
+- **case (B): Z = W₂** (textbook "Set Z=W₂ in case (B)")。⟹ **item 2 (`Xset h46.W2`) は正しい Z を target 済**
+  (cont.²³ の懸念は杞憂)。X=S−S(W₂), Y=S(H′)=S(⁅H,H⁆) (m 個, 各 deg|W₁|, 既約)。
+- capstone は `Xset ⁅H,H⁆` で split (Z=H′); (6.8.2) は Z=W₂ ⟹ Xset W₂⊆Xset H′ (W₂⊆H′)。両者の差は
+  (6.8.3) layer (S coherent への拡張) ⟹ capstone wiring は (6.8.2) の downstream (後続課題)。
+
+### ✅ building blocks (全 landed/available):
+- **[Is]2.27** = `OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction`
+  (Res_Z θ = θ(1)·φ, φ linear, Z≤Z(G); AxiomsCheck:2025 登録済)。
+- **(6.8.2.2)** = `exists_decomposition_caseB` (S08_CaseBCoherence2:126, landed): `(Ind_Z^L φ−|H:Z|η₁)^τ
+  = X−|H:Z|·cY.ext(η₁)`, X⊥cY(Y), X∈ZIrr。
+- **(6.8.2.1)** = `IsCoherent.extension_constant_on_sharp_of_prime` (AxiomsCheck:2018 付近, landed)。
+- **R(χ) machinery** = §7 `dadeOrthonormalCharacterImageFamily` (S07:5387) + (5.4.a/b) (S07:1378/1447)。
+- **IsCoherent 直接 constructor** = structure (S07:1557): `extension`(ν=τ₂) + `extension_inner_eq`(isometry)
+  + `extends_on_supported`(=τ on Z[S,A]) + `extension_mem_ZIrr`。⟹ τ₂ を明示構成して 4 fields を埋める。
+
+### 📋 (6.8.2.3) per-χ 分解の sub-DAG (`(χ−aη₁)^τ = X₁−aY`, χ∈Xset W₂):
+1. ✅ **entry** `mem_Xset_exists_inducing` (ce87acc0, landed): χ=Ind_H θ, θ≠1, W₂⊄Ker θ。
+2. **[Is]2.27 適用**: Res_{W₂} θ = a·φ (φ∈Irr W₂, φ≠1, a=θ(1))。`exists_central_linear_restriction`
+   (W₂⊆Z(H) は case-B; `certainType_W2_le_center`/`W2_le_center` 系)。← 次の brick。
+3. **Ind_H^{W₂} φ = ∑aᵢθᵢ** (θᵢ∈Irr H distinct, Res θᵢ=aᵢφ, θᵢ(1)=aᵢ, θ=θ₁): Clifford/character。
+4. **αᵢ=χᵢ−aᵢη₁ (χᵢ=Ind_H θᵢ), Supp αᵢ⊆H^#, ∑aᵢαᵢ=Ind_{W₂}^L φ−|H:W₂|η₁, ∑aᵢ²=|H:W₂|**: (6.8.2.2) と接続。
+5. **R(χᵢ)⊥Y^{τ₁}** ((5.3)(5.5))。
+6. **αᵢ^τ=Xᵢ−bᵢY+Zᵢ** (Xᵢ∈Z[R(χᵢ)]) + **(5.4.a) ‖Xᵢ‖²≥‖χᵢ‖² ⟹ bᵢ≤aᵢ**。
+7. **pin bᵢ=aᵢ** ((6.8.2.2): ∑aᵢbᵢ=|H:W₂|=∑aᵢ²)。
+8. **(5.4.b) αᵢ^τ=Xᵢ−aᵢY** ⟹ χ=χ₁ で `(χ−aη₁)^τ=X₁−aY`。【本丸 = steps 5-8 の R(χ) 統合】
+### 📋 τ₂ assembly: `IsCoherent τ (Xset W₂ ∪ Yset) (supportInSubgroup H^# L)` を直接 constructor で:
+ν=τ₂ (supported=τ, η₁↦Y=cY.ext η₁, χ↦X₁(χ) [(6.8.2.3)]) + isometry (generator 上, (6.8.2.3)+cY) +
+ZIrr (X₁,Y∈ZIrr)。reducible μ_j も χ∈X として (6.8.2.3) で一律処理 (whole-lattice, 反復 retarget 不要)。
+
+**正本=本 cont.²⁵。route 実行可能・brick-friendly 確認。entry landed。次 brick = step 2 ([Is]2.27 で
+Res_{W₂} θ = a·φ)。item 1 (X_irr-coh) は廃棄確定 (教科書非対応)。glue shell は (6.8.2.3) 完成後に
+置換判断 (cX 不要ゆえ最終的に未使用化見込み)。**
