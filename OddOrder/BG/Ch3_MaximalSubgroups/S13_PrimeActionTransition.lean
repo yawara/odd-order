@@ -3102,6 +3102,42 @@ theorem E1_regular_on_E3_of_noncentralize [Finite G] (hG : IsMinimalSimpleOdd G)
     exact hCMαP' (le_bot_iff.mp (hbot ▸
       inf_le_inf_right (Subgroup.centralizer (P' : Set G)) (S10.Malpha_le_Msigma hG h.mem_maximal)))
 
+/-- In a finite cyclic group, a subgroup of prime order is unique: two subgroups of the same
+prime order `q` coincide. (`H ⊔ K` is elementary abelian of exponent `q` and cyclic, hence of
+order dividing `q`, forcing `H = H ⊔ K = K`.) Used for BG Cor 13.11(d). -/
+theorem eq_of_card_eq_prime_of_isCyclic {A : Type*} [Group A] [Finite A] [IsCyclic A]
+    {q : ℕ} (hq : q.Prime) {H K : Subgroup A}
+    (hH : Nat.card ↥H = q) (hK : Nat.card ↥K = q) : H = K := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  letI : CommGroup A := IsCyclic.commGroup
+  have hHel : H.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hH
+  have hKel : K.IsElementaryAbelian q := Subgroup.IsElementaryAbelian.of_card_prime hK
+  have hcent : H ≤ Subgroup.centralizer (K : Set A) := fun x _ =>
+    Subgroup.mem_centralizer_iff.mpr (fun y _ => mul_comm y x)
+  have hsupel : (H ⊔ K).IsElementaryAbelian q := hHel.sup_of_le_centralizer hKel hcent
+  haveI : IsCyclic ↥(H ⊔ K) := inferInstance
+  have hexp : Monoid.exponent ↥(H ⊔ K) ∣ q :=
+    Monoid.exponent_dvd_of_forall_pow_eq_one (fun x => hsupel.2 x)
+  have hcarddvd : Nat.card ↥(H ⊔ K) ∣ q := by rwa [IsCyclic.exponent_eq_card] at hexp
+  have hcardle : Nat.card ↥(H ⊔ K) ≤ q := Nat.le_of_dvd hq.pos hcarddvd
+  have hHK : H = H ⊔ K := Subgroup.eq_of_le_of_card_ge le_sup_left (by rw [hH]; exact hcardle)
+  have hKK : K = H ⊔ K := Subgroup.eq_of_le_of_card_ge le_sup_right (by rw [hK]; exact hcardle)
+  exact hHK.trans hKK.symm
+
+/-- `G`-level form of `eq_of_card_eq_prime_of_isCyclic`: two order-`q` subgroups of `G` both
+contained in a cyclic subgroup `A` coincide. -/
+theorem eq_of_card_eq_prime_of_le_isCyclic {A : Subgroup G} [Finite ↥A] (hAcyc : IsCyclic ↥A)
+    {q : ℕ} (hq : q.Prime) {H K : Subgroup G} (hHA : H ≤ A) (hKA : K ≤ A)
+    (hH : Nat.card ↥H = q) (hK : Nat.card ↥K = q) : H = K := by
+  haveI := hAcyc
+  have hH' : Nat.card ↥(H.subgroupOf A) = q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHA).toEquiv]; exact hH
+  have hK' : Nat.card ↥(K.subgroupOf A) = q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKA).toEquiv]; exact hK
+  have hEq : H.subgroupOf A = K.subgroupOf A := eq_of_card_eq_prime_of_isCyclic hq hH' hK'
+  have hmap := congrArg (Subgroup.map A.subtype) hEq
+  rwa [Subgroup.map_subgroupOf_eq_of_le hHA, Subgroup.map_subgroupOf_eq_of_le hKA] at hmap
+
 /-- **BG Corollary 13.11** (mmd L3696; 結論は PDF p.103 から画像読みで復元): `E₃≠1` かつ `E₃` が
 `M_σ` に regular 作用しないなら (a) `E₁≠1`; (b) `E=E₁E₃`; (c) `E` は `M_σ` に prime 作用;
 (d) すべての `X∈ℰ¹(E)` は `E` で正規。 -/
