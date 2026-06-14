@@ -558,6 +558,34 @@ theorem sum_inner_restrict_sq_eq_index {M : Type*} [Group M] [Fintype M]
     ← inner_self_induce_eq_sum_mul_star]
   exact inner_induce_self_eq_index_of_le_center hN hφ
 
+/-- **(6.8.2.3) `αᵢ` aggregate** (Peterfalvi (6.8.2.3): `∑ aᵢαᵢ = Ind^L_{W₂} φ − |H:Z|·η₁`).  Summing
+the differences `αθ = χθ − aθ·η₁` (`χθ = Ind^M_H θ`, `aθ = ⟨φ∘e, Res_{K.subgroupOf H} θ⟩`) weighted by
+`aθ` recovers `Ind^M_K φ − |H:K|·η₁`.  Mechanical combination of the two aggregate halves:
+`∑ aθ·χθ = Ind^M_K φ` (`sum_inner_restrict_smul_induce_eq_induce`) and `∑ aθ² = |H:K|`
+(`sum_inner_restrict_sq_eq_index`, the index `|↥H : K.subgroupOf H| = |H:K|`). -/
+theorem sum_smul_constituent_diff_eq {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
+    (φ : ClassFunction ↥K ℂ)
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ))
+    (η₁ : ClassFunction M ℂ) :
+    ∑ θ : IrreducibleCharacter ↥H,
+        ClassFunction.inner
+            (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ)
+            (ClassFunction.restrict (K.subgroupOf H) (θ : ClassFunction ↥H ℂ))
+          • (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+              - ClassFunction.inner
+                  (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ)
+                  (ClassFunction.restrict (K.subgroupOf H) (θ : ClassFunction ↥H ℂ)) • η₁)
+      = ClassFunction.induce K φ - ((K.subgroupOf H).index : ℂ) • η₁ := by
+  simp_rw [smul_sub, smul_smul]
+  rw [Finset.sum_sub_distrib, sum_inner_restrict_smul_induce_eq_induce, ← Finset.sum_smul,
+    sum_inner_restrict_sq_eq_index hcen hφ']
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
