@@ -1988,3 +1988,24 @@ API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §
 2. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4.a/b))。本丸。
 3. **per-χ statement + τ₂ direct assembly** (IsCoherent 直接 constructor)。
 **正本=本 cont.²⁹。infra 完成は重要マイルストン。次=αᵢ aggregate (1.)。FT 並行スパイン (sorry 当面不変)。**
+
+## 2026-06-14 (session 40 cont.³⁰, /loop): ✅ αᵢ aggregate 両半 landed; 残 = combination + R(χ) 統合 (本丸)
+
+### ✅ landed (3 iter, 全 axiom-clean, full build 3807):
+- `induce_finset_sum_smul` (Ind_H Finset 線形性) + **`sum_inner_restrict_smul_induce_eq_induce`**
+  (f281ba5c, aggregate 前半 `∑aᵢχᵢ=Ind^M_K φ` = 分解+線形性+transitivity, 2 行)。
+- **`inner_self_induce_eq_sum_mul_star`** (cde453e1, Parseval `‖Ind φ‖²=∑aθ·conj aθ`)。
+- **`sum_inner_restrict_sq_eq_index`** (83ec0b32, aggregate η₁係数 `∑aᵢ²=|M:N|` = reality(aθ∈ℤ via
+  inner_mem_ZIrr_int)+Parseval+norm)。
+
+### 🎉 αᵢ aggregate 両半完成 (∑aᵢχᵢ=Ind_K φ + ∑aᵢ²=|M:N|):
+残 aggregate = **combination** `∑aᵢαᵢ = ∑aᵢχᵢ − (∑aᵢ²)η₁ = Ind^L_{W₂}φ − |H:Z|η₁` (両半を機械的に結合)。
+
+### ▶ 残 (6.8.2.3) = R(χ) 統合 (steps 4-8, **本丸・未着手**):
+4. **R(χᵢ)⊥Y** ((5.3)(5.5)) + αᵢ^τ=Xᵢ−bᵢY+Zᵢ (Xᵢ∈Z[R(χᵢ)])。§7 `OrthonormalCharacterImageFamily`。
+5. **(5.4.a) ‖Xᵢ‖²≥‖χᵢ‖² ⟹ bᵢ≤aᵢ**。
+6. **pinning** ((6.8.2.2) `exists_decomposition_caseB` で ∑aᵢαᵢ^τ=X−|H:Z|Y; ∑aᵢbᵢ=|H:Z|=∑aᵢ² ⟹ bᵢ=aᵢ)。
+7. **(5.4.b) αᵢ^τ=Xᵢ−aᵢY** ⟹ χ=χ₁ で per-χ `(χ−aη₁)^τ=X₁−aY`。
+8. **τ₂ direct assembly** (IsCoherent 直接 constructor)。
+**正本=本 cont.³⁰。aggregate 両半完成。次=combination (機械的) → R(χ) 統合 (本丸, §7 R-producer 精査要)。
+infra 出揃いで assembly は steady だが R(χ) 統合は intricate。FT 並行スパイン。**
