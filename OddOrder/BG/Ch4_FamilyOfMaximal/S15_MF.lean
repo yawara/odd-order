@@ -230,6 +230,19 @@ theorem maxNilpotentNormalHall_le_derived [Finite G]
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
 
+/-- **`F(H) = H` for a nilpotent subgroup `H`** (`§14`-independent, reusable): the Fitting
+subgroup of a nilpotent group is the whole group (`fitting ↥H = ⊤`), so its ambient realization
+`fittingInAmbient H` is just `H`.  Used by Corollary 15.5 (the `M_F = M_σ` case, where `M_σ` is
+nilpotent so `F(M_σ) = M_σ = M_F`) and the `M_F` cyclic ⟹ `F(M)` cyclic step of Corollary 15.6. -/
+theorem fittingInAmbient_eq_self_of_isNilpotent [Finite G] {H : Subgroup G}
+    [Group.IsNilpotent ↥H] : fittingInAmbient H = H := by
+  haveI : Group.IsNilpotent ↥(⊤ : Subgroup ↥H) :=
+    nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+  have htop : OddOrder.Isaacs.Ch01.fitting ↥H = ⊤ :=
+    top_le_iff.mp OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  show (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype = H
+  rw [htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
 /-! ### The Aut-abelian core (`§14`-independent, reusable)
 
 The next two lemmas package the elementary fact behind the "`M_F` not cyclic" half of
