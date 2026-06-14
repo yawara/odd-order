@@ -418,6 +418,30 @@ session 16-19 の残 4 ステップを 1 ループで完遂 (全 sorry-free・ax
   (loop 完遂困難の可能性大 — ここは hub に重さを flag 済の領域)。代替で C/D/E/A の他 appendix audit も可。
   Prop 1 (`rankOne_affine_nearField`) は FT+Brauer-Suzuki gate (重い・後回し)。
 
+### session 21 (2026-06-14): Appendix II Prop 2 分類 — F_{r²,2} を抽象「twisted near-field」で着手
+分類後半 (σ_y/Aut(K) → field or F_{r²,2}) のうち **F_{r²,2} の構成**に着手。論文 (pp.137-138) を精読し
+設計確定 (next session は再設計不要):
+- **App C Prop 2 全体の道筋** (07.0_..._On_Near-Fields.mmd): (1) A irreducible【済 = rightMulAction_irreducible_of_index_two】
+  → (2) Appendix I Prop2 で「∘ と両立する体構造 K」+ y∈A で x∘y=xy → (3) y∈F⋆ で x∘y=x^{σ_y}·y (σ_y∈Aut K 半線形)
+  → (4) y↦σ_y は F⋆→Aut(K) hom, ker⊇A → (5) ker=F⋆ なら **F は体**; さもなくば y∈F⋆−A で σ_y 位数2
+  → K=𝔽_{r²}, x^{σ_y}=x^r, **F≅F_{r²,2}**, |Z(F⋆)|=r−1。
+- **F_{r²,2} 構成の抽象化 (commit d9f4d3fc)**: 論文の x∘y=(y平方?xy:x^r y) を **`TwistData K`** で抽象化
+  = (σ:RingAut K, σ²=1, χ:Kˣ→*Mult(ZMod2) σ不変)。`x ∘ y = σ^{χ(y)}(x)·y`。**有限体/Frobenius/quadraticChar の
+  plumbing 不要** (それは F_{r²,2} instantiation で後付け); near-field 公理は (σ²=1, χ hom, χ∘σ=χ) のみで出る。
+  **逆元は明示**: y⁻¹_∘ = σ^{χ(y)}(y⁻¹) (χ(y⁻¹)=χ(y) in ZMod2, σ^k(y)σ^k(y⁻¹)=σ^k(1)=1) ⟹ 有限cancel→group 補題不要。
+  twAut e := if e=0 then 1 else σ (`.val`/σ^n を避け twAut_add が綺麗)。
+- **🔑 Lean 知見 (再調査不要)**: (1) twExp は `open scoped Classical in` で Decidable(y=0) 供給;
+  (2) **ZMod 2 の if-条件は fin_cases だと `0=0` が eq_self で潰れない (リテラル不一致)** → `rcases (show e=0∨e=1 by decide)`
+  + subst で literal 化し `show (1:ZMod2)+1=0 from by decide` で書換える; (3) RingEquiv の ≠0 保存は
+  `rw [ne_eq, EmbeddingLike.map_eq_zero_iff]`; (4) `simp +decide` は reduceIte に効くが上記リテラル不一致は別問題。
+- **▶ 残ステージ** (each 完全 lemma で commit, sorry 増やさない):
+  - **Stage 2 (assoc)**: twExp_mul/twExp_σ/twExp_twAut/twExp_twMul (χ の乗法性 + χ∘σ=χ) → twMul_assoc
+    (非零は twAut_twAut [= twAut a(twAut b x)=twAut(a+b)x, **RingAut mul の適用方向を要確認**] + add_comm; 零は absorb)。
+  - **Stage 3 (instance)**: twInv 明示 + GroupWithZero + 右分配 ⟹ `NearField` instance on K (TwistData から)。
+  - **Stage 4 (F_{r²,2})**: K=𝔽_{r²} (GaloisField/Finite 体で [K:𝔽_r]=2), σ=Frobenius^? (x↦x^r, σ²=1),
+    χ=quadraticChar で TwistData を実体化 → 例外 near-field 確定。‖ classification skeleton (σ hom + field 方向)。
+  - 注: scaffold `cyclic_index_two_nearField_classification` の faithful 化は Stage 4 + skeleton 後。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
