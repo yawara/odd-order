@@ -159,6 +159,21 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
 
 ## 進捗
 
+- 2026-06-14 (Lane F, /loop 続き⁸): **🎉 13.8 GAP 1 (Uniqueness step) COMPLETE** (commit c7fb4c19, full build 緑 3807)。
+  - `lt_inf_normalizer_of_lt_of_pgroup` (標準補題): 有限 q-群 T で Q<T ⟹ Q<T⊓N_G(Q)。
+    `normalizerCondition_of_isNilpotent`+`IsPGroup.isNilpotent`+`subgroupOf_normalizer_eq`。
+    ⚠ `Group.IsNilpotent` 修飾必須 (`IsNilpotent` 単体は環の冪零元 → `Zero (Type)` エラー)。
+  - `forbidden_config_step1` (M-side engine, M↔M*/Q↔Q* 対称再利用可): config → 12.18(b) 出力
+    `α=β ∧ M_α≠1 ∧ q∉α ∧ C_{M_α}(P)≠1 ∧ C_{M_α}(PQ)=1`。GAP 1.1 (Q≠1: `normalizer_eq_top_iff`+
+    coatom), 1.2 (q≠p: `to_sup_of_normal_right'` で P⊔Q が p-群→hQmax で Q=P⊔Q→P≤C_Q(P)=⊥),
+    1.3 (`lt_inf_normalizer_of_lt_of_pgroup`+hQmax), ℳ(N_G(Q))≠{M} (`mem_maximalSubgroupsContaining`)。
+  - **残 = GAP 2 (Hall θ=β(M)∪β(M*) of C_G(P) → r∈β(M*)∩π(H), r|C_M(P), r∉σ(M))**
+    + GAP 3 (steps 5-6: R⊆N_M(Q) order r → Thm 13.4 → X⊆C_{M_σ}(P)⊆C_{M_σ}(R)⊆M*;
+    [X,Q]=1 (M_α∩M*_α=1) → X⊆C_{M_α}(PQ)=1 矛盾) + 本体配線。
+  - **⚠ GAP 3 は ChatGPT 回答 (bg-lemma-13-8-elided-steps.md) 未収録** — 次イテレーションで
+    GAP 2 を進めつつ、GAP 3 は s13_8_chatgpt_prompt.md の該当部を再依頼 or 自力再構成。
+  - 次標的: GAP 2 の Hall θ-部分群存在/共役 (Prop 1.5) + Cor 12.16 + Thm 10.1(b) transitivity
+    (`IsUniquelyMaximal`) + Prop 10.14(d) + Lem 10.12(a) の repo handle 特定。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
