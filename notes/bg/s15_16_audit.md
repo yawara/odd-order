@@ -278,6 +278,48 @@ deeply gated で §14非依存 skeleton の限界効用低 (§16 は §15 経由
 §14非依存余地はこれで実質尽きた** ⟹ 次の substantive 進捗は §14 (Lane H, 10 sorry) / §13 (Lane F)
 landing 待ち。
 
+## 12. FT-critical §16 faithful 精査 + 復元プラン (2026-06-15, `fdd8798a`)
+
+FT-critical spine (Prop 16.1 → Thm I → Thm II → Peterfalvi interface → S16.Hypothesis → FT) の
+§16 endpoint を mmd 直接照合。**docstring 行参照のみ修正** (statement 不変・consumer 非破壊)。
+substantive な lossy 復元は **ユーザー裁可 (2026-06-15) で defer**(speculative encoding を避け、
+Pf consumer 出現時に実需要に合わせる)。本 section が復元プランの正本。
+
+### 12.1 §16 → Peterfalvi consumer マップ (干渉の所在)
+
+| §16 endpoint | consumer (Pf, **私の編集対象外**, build closure 内) | 消費形状 (壊すと full build 赤・直せない) |
+|---|---|---|
+| `proposition_type_classification` (Prop 16.1) | `S10_BGInterface` (`a7278d39`) | `.1` (=(a)) / `.2.1` (=(b)) / `.2.2.2.2.2.mpr` (=(f)) |
+| `theoremI_…dichotomy` (Thm I) | `S10_MinimalSimpleStructure` (8.8, `6de1edea`) | `.2` を `⟨S,T,_W1,_W2,_W, hS,hT,hST,_hW,_hWcyc, hSnonI,hTnonI,hII,hcov⟩` で rcases (5 binder + 9 conjunct; **W データ _W1/_W2/_W/_hW/_hWcyc は discard**, 使用は hS/hT/hST/hSnonI/hTnonI/hII/hcov) |
+| `theoremII_tame_embedding` (Thm II) | **未 cite** (theoremA-E/C/aSets も未 cite) | — (自由に復元可) |
+
+### 12.2 忠実性 verdict (mmd 直接照合)
+
+- **Prop 16.1** (mmd L4478): ✅ **faithful** — 6句 (a)-(f) 完全一致。docstring 行参照を L4352→L4478 修正 + 句注記追加。**変更不要**。
+- **Thm I** (mmd L4526): ⚠ lossy。落ちている = (1) `W=W₁×W₂` cyclic の **normalizer-V 性質**「N_G(W₀)=W ∀ nonempty W₀⊆W−W₁−W₂」+ `W_i≠1`、(2) `S=W₁S'`, `T=W₂T'`, `S'∩W₁=1`, `T'∩W₂=1`, `S∩T=W`。**条件(5)「S,T とも II-V型」= `IsTypeNonI` (=¬TypeI=II-V) で既に捕捉済 (audit の「(5)脱落」は誤り)**。docstring 行参照は既に L4526 (正)。
+- **Thm II** (mmd L4548): ⚠ lossy。落ちている = **(Tii) supporting-subgroup system** (D≠∅ ⟹ ∃ M₁..Mₙ of Type I/II, H_i=M_{iF}⊆M_i', (a)-(e)) + **(Tiii)** (∃ M_i Type II ⟹ M Frobenius/cyclic complement, M_F not TI)。現状は (Ti)+`D⊆A(M)`+`|𝓜(C_G(x))|=1`(∃! N + TypeI/II) のみ。docstring 行参照を L4416→L4548 修正。
+
+### 12.3 復元プラン (Pf consumer 出現時に実行)
+
+**Thm I (W-tame-embedding 構造)** — トリガー: Pf が (8.8) 超えで W=W₁×W₂ を消費し始めるとき。
+- mmd (1)(2) を復元。**clean 復元 (各句を別 conjunct) は (8.8) の tuple 形状 (5 binder+9 conjunct) を変え rcases を壊す** → (8.8) 同時更新が必須 (Pf レーン協調) か、shape-preserving folding (discard される `_hW`/`_hWcyc` slot に normalizer-V/W_i≠1/S=W₁S' を畳み込む — hacky だが (8.8) 不変)。
+- (1) normalizer-V: `∀ W₀ : Set G, W₀ ⊆ (↑W \ ↑W₁ \ ↑W₂) → W₀.Nonempty → Subgroup.normalizer W₀ = ↑W` (W₀ は**集合**、部分群でない点に注意)。`W₁≠⊥ ∧ W₂≠⊥`。
+- (2) S=W₁S': `∃ S' T', S=W₁⊔S' ∧ T=W₂⊔T' ∧ S'⊓W₁=⊥ ∧ T'⊓W₂=⊥ ∧ S⊓T=W` (新 binder S' T' は top-level に出すと (8.8) 破壊 → 既存 conjunct 内に nest)。
+
+**Thm II ((Tii)/(Tiii))** — トリガー: Pf (8.12)/(8.13) が tame-embedding を消費し始めるとき (現在 gated・未形式化 ⟹ encoding を実需要に合わせる)。
+- (Tii): `D.Nonempty → ∃ (n:ℕ) (Mfam Kfam : Fin n → Subgroup G), (∀i, Mfam i∈max ∧ (IsTypeI∨IsTypeII)) ∧ (∀i, MF(Mfam i)≤derivedInG(Mfam i)) ∧ (a)..(e)`。
+  - (a) `∀ i j, i≠j → Nat.Coprime (card (MF(Mfam i))) (card (MF(Mfam j)))`
+  - (b) `∀ i, IsComplement' ((MF(Mfam i)).subgroupOf (Mfam i)) ((M⊓Mfam i).subgroupOf (Mfam i)) ∧ M⊓MF(Mfam i)=⊥`
+  - (c) `∀ i, ∀ x∈X, x≠1 → Nat.Coprime (card (MF(Mfam i))) (card (centralizer{x}⊓M))`
+  - (d) `∀ i, (A0Set (Mfam i) (Kfam i) \ ↑(MF(Mfam i))).Nonempty ∧ IsTISubset (A0Set (Mfam i) (Kfam i) \ ↑(MF(Mfam i))) (Mfam i)` — **per-M_i K_i が要 (A0Set は K 依存)** → Kfam を family data に含める。
+  - (e) `∀ x∈D, ∃ y∈D, (∃g, y=g*x*g⁻¹) ∧ ∃ i, centralizer{y} = (centralizer{y}⊓MF(Mfam i)) ⊔ (centralizer{y}⊓M) ∧ centralizer{y}≤Mfam i` — **「C_{H_i}(y)C_M(y)」の積を ⊔ で表すのは over-approx** (要 complement/product 条件; モデル化判断は Pf 消費形に合わせる)。
+- (Tiii): `(∃ i, IsTypeII (Mfam i)) → ∃ comp, IsFrobeniusGroup ↥M ((Msigma M).subgroupOf M) comp ∧ IsCyclic comp ∧ ¬ IsTISubset (sharpSubgroup (MF M)) (Subgroup.normalizer ↑(MF M))` (Frobenius kernel = M_σ?/complement cyclic; モデル化要確認)。
+- **monitor gate**: 全て既存 sorry (Thm I/II) の結論強化 = sorry-neutral (新 sorry'd theorem 追加でない) ゆえ可。各復元後 **full build (S10_BGInterface/S10_MinimalSimpleStructure 含む) で consumer 非破壊を検証**。
+
+### 12.4 現状の sufficiency
+
+現 lossy statement は **現 consumer ((8.8), S10_BGInterface) には十分** (落ちた W データ / (Tii)/(Tiii) は現 consumer が消費しない)。lossy-ness が block するのは **deeper Pf** (§10-13 character theory, 現在 BG §14-15 gate で停止中)。⟹ defer は安全 (現 spine を block しない)。**deferred 復元タスク = issue 8005** (トリガー条件 + 復元手順を記載)。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
