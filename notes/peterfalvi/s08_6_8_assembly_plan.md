@@ -2086,3 +2086,57 @@ per-constituent 組立 + 接続が残る。要集中。次=per-constituent decom
 5. (5.4.b) `αᵢ^τ=Xᵢ−aᵢY` → per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly。
 **正本=本 cont.³²。pinning 算術核 landed; item (a) は (a2) ZIrr-char R-producer 一般化が次の本丸 brick
 (既約性証明を回避でき構成同一)。要集中。**
+
+## 2026-06-14 (session 40 cont.³³, /loop): 🚨 cont.³² 訂正 — R(χ) は §5 (5.2.d) で **χ 既約⟺2-element / χ=μ_j⟺(4.9)族** の 2 ケース; (a2) 一般化は誤り
+
+cont.³² の「(a2) ZIrr-char 一般化」は **原文 §5 精読で誤りと判明**。R(χ) は ‖(χ−χ̄)^τ‖²=|R(χ)| ゆえ
+χ の既約性で本質的に形が変わる (任意 ZIrr-char へ一様一般化は不可)。原文 (5.2.d)/(5.3) の正確な構造:
+
+### 🔑 原文 §5 (04.7) の決定的構造:
+- **(5.2.d)** = R(χ) は仮説 (χ∈S に対し (χ−χ̄)^τ=∑_{α∈R(χ)}α, R(χ) orthonormal ⊂ ℤ[Irr G])。
+  ‖(χ−χ̄)^τ‖²=‖χ−χ̄‖²=2‖χ‖² ゆえ |R(χ)|=2‖χ‖²。
+- **(5.3.a)**: S⊆Irr L ⟹ Hyp (5.2) 成立 (各 χ 既約 ⟹ ‖χ‖²=1 ⟹ |R(χ)|=2)。
+- **(5.3.b)** [case-B の鍵]: Hyp (4.6) 下、S⊆{Ind_K θ : H⊄Ker θ} ⟹ Hyp (5.2) 成立。R(χ) は
+  **χ 既約なら 2-element (as in a)、χ reducible なら χ=μ_j (0<j<w₂) で R(μ_j)=
+  {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ | 0≤i<w₁}** (μ̄_j=μ_k, **Theorem (4.9)** より)。
+- ⟹ **case-B の S は既約 χ と reducible μ_j 両方を含む** (X⊂Irr L は **case-A のみ**; cont.²⁴/前ノートの
+  「X が reducible μ_j を含む」は case-B では**正しい**, 私の cont.³² の「X⊂Irr L」断定が誤りだった)。
+- `isIrreducibleCharacter_of_mem_Xset_caseA` (S08CCP2:1860) は FPF (`W₁ FPF on Z`) を要するが
+  **case-B は W₂⊆Z(L) (`certainType_W2_le_center`) ゆえ W₁ は W₂ を中心化 (FPF 不成立)** ⟹ case-B X に
+  は適用不可 (case-A 専用)。∴ case-B X-member は既約とは限らない (μ_j を含む)。
+
+### ✅ 既存資産 (survey 済):
+- **抽象 R(χ)** = `OrthonormalCharacterImageFamily τ χ` (任意 χ:ClassFunction; S07:766)。
+- **既約 χ 用 producer** = `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472) +
+  per-step `decompositionDaFromDadeOfDiff` (S07:5542, `CharacterPsiDecomposition τ χ (a•chi1)` を直接生成)。
+- **reducible μ_j coherence** = `certainType_isCoherent` (S06_CertainTypeCoherence:505, (4.9)(b) を
+  `IsCoherent τ certainTypeSet A` として完成) → `certainTypeSet_isCoherent_tau` (S08CB2:719, hyp.tau へ転送)。
+- **R(μ_j) image_eq** = **`certainType_diff_dade_sum_eq`** (S06CTI:936, landed): (μ_j−μ_k)^τ=δ_j∑_i(ω_ij^σ−ω_ik^σ)。
+- μ̄_j=μ_{j'}: `certainType_columnSum_conj` (S06CTC); ω^σ conj: `certainTypeOmegaSigma_conj` (S06CTConj:64)。
+- **🛑 未実装 = reducible R(μ_j) を `OrthonormalCharacterImageFamily τ μ_j` として package** (item c)。
+
+### ▶ 次の具体 brick (確定, cont.³⁴ で BUILD): **reducible R(μ_j) producer**
+`OrthonormalCharacterImageFamily (certainType τ) μ_j` を (4.9) データから構成:
+- imageSet = {δ_j•ω_{ij}^σ, −δ_j•ω_{ik}^σ | 0≤i<w₁} (Finset, k: μ̄_j=μ_k)。
+- mem_ZIrr: 各 ±σ-image ∈ ZIrr (`certainTypeOmegaSigma_mem_ZIrr` S06CTC:146)。
+- orthonormal: σ-image Gram (`columnFamily_mu_sum_inner` 系) + δ_j²=1。
+- image_eq: (μ_j−μ_j.conj)^τ=∑α ⟸ `certainType_diff_dade_sum_eq` + `certainType_columnSum_conj`。
+**⚠ アーキ判断 (cont.³⁴ 冒頭で決定)**: (6.8.2.3) per-χ (χ−aη₁)^τ=X₁−aY を、χ 既約は Dade-R(χ)、
+χ=μ_j は R(μ_j) or **`certainType_isCoherent` 直結**のどちらで処理するか。後者なら R(μ_j) package 不要かも
+(certainType coherence が既に μ_j 側を担う)。**この判断を先にしてから R(μ_j) を build する/しないを決める。**
+
+### ⚠ R(μ_j) package を build する場合の seam (cont.³³ で精査、要対処):
+- `certainType_diff_dade_sum_eq` の LHS は **`h.tau.toDadeMap (∑ certainTypeDiffSupported h … i)`**
+  (IntegralCharacterMap でなく toDadeMap; 引数も column-difference family `certainTypeDiffSupported`)。
+  `OrthonormalCharacterImageFamily.image_eq` の `τ (μ_j − μ_j.conj)` 形へ橋渡しが要 (∑certainTypeDiffSupported
+  = μ_j − μ_k? + toDadeMap↔IntegralCharacterMap 接続)。
+- RHS = `(columnFamily χ₂).sign • ∑_i (ω_{χ₂,i}^σ − ω_{χ₂',i}^σ)` (sign=δ_j, χ₂'=共役列 k)。
+- μ_j.conj=μ_{χ₂⁻¹}: `certainType_columnSum_conj`; ω^σ conj=`certainTypeOmegaSigma_conj_eq` (χ₂⁻¹,rowInv i)。
+- orthonormal: `certainTypeOmegaSigma_inner` (⟨ω_{χ₂,i}^σ,ω_{χ₂',i'}^σ⟩=[χ₂=χ₂'∧i=i'])。
+**⟹ seam が複数。`certainType_isCoherent` 直結の方が seam 少ない可能性 → cont.³⁴ で両者比較してから決定。**
+
+### 📝 honest 進捗評価 (2 ターン RECON):
+cont.³² (pinning landed) 後、本 cont.³³ は **コード未 land の RECON ターン**。だが §5 原文精読で
+cont.³² の (a2) 誤推奨を訂正し、R(χ) 統合の正確な map (既約/μ_j 2 ケース + 既存資産 + 未実装 = R(μ_j)
+package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ → BUILD (RECON ループを断つ)。**
+**正本=本 cont.³³。(a2) は廃棄。次=アーキ判断 (R(μ_j) package vs certainType_isCoherent 直結) → build。**
