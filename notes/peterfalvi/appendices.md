@@ -368,6 +368,17 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
   ⟹ (F,+) は体 K 上 1 次元 + A は乗法で作用。これが Prop 2 の前半 (Appendix I work を使う部分)。
   後半 (σ_y/Aut(K) → field or F_{r²,2} 分類) + Prop 1 (Brauer-Suzuki gate) は重い remaining。
 
+### session 15 (2026-06-14): Appendix II — Prop 2 field-structure 中間結果 (Appendix I 接続)
+- **`nearField_field_structure`** (commit 7e787447): A⊆Fˣ 可換が (F,+) に right-mult で irreducible 作用
+  ⟹ (F,+) は有限体 K 上 1 次元, |K|=|F|。near-field data (isElementaryAbelian_multiplicative + rightMulAction)
+  を exists_field_semilinear に投入。**Appendix C Prop 2 の前半 (Appendix I を使う部分) 完成**。
+  irreducibility は hyp (index-2 counting は別 lemma)。CommGroup ↥A は hcomm から構築 (IsCyclic.commGroup
+  の *-diamond 回避)。NearFields が SemilinearField を import するように。
+- **▶ 次 = irreducibility counting** (hirr 仮説を index-2 から discharge): A index-2 in Fˣ ⟹ A irreducible on (F,+)。
+  要 (1) A FPF on F^# (x*a=x, x≠0 ⟹ a=1 by F^* 群 cancellation), (2) Maschke (|A| coprime |F|; A-inv U に
+  complement), (3) counting: |F_i|≥|A|+1, |F|=2|A|+1≥(|A|+1)² 矛盾。substantial。
+  - その後 σ_y/Aut(K) → field or F_{r²,2} 分類 (最重) + Prop 1 (Brauer-Suzuki gate)。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
