@@ -747,6 +747,30 @@ theorem forbidden_config_step1 [Finite G] (hG : IsMinimalSimpleOdd G)
     (tau1_Malpha_interaction hG hM hqp hp hP hPM hQM hQne hQq hQinv hCQ hMNQ).2 hQsyl
   exact ⟨hqp, hQne, hαβ, hMαne, hqα, hCMαP, hCMαPQ⟩
 
+/-! ## Lemma 13.8 step 3 — GAP 2 (Hall θ + Theorem 10.1(b) collapse) -/
+
+/-- **Theorem 10.1(b) collapse** (Lemma 13.8 GAP 2.8 の核): `t ∈ σ(M)`, `Y` を `M` の非自明
+`t`-部分群で `N_G(Y) ⊆ M` とすると、`Y` を含む任意の極大共役 `M^g` は `M` に等しい。
+
+`C_G(Y)` が `{M^u ∣ Y ≤ M^u}` に推移作用する (Theorem 10.1(b) =
+`S10.fusion_control_of_mem_sigma .2.1`) ことから `∃ c ∈ C_G(Y)`, `M^g = M^c`; さらに
+`C_G(Y) ⊆ N_G(Y) ⊆ M` ゆえ `c ∈ M` が `M` を固定し `M^g = M`。 -/
+theorem conj_eq_self_of_sigma_pSubgroup_normalizer_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {t : ℕ} [Fact t.Prime]
+    (htσ : t ∈ S10.sigma M) {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYt : IsPGroup t ↥Y)
+    (hNY : Subgroup.normalizer (Y : Set G) ≤ M) {g : G}
+    (hYM : Y ≤ M) (hYg : Y ≤ MulAut.conj g • M) :
+    MulAut.conj g • M = M := by
+  have hY1 : Y ≤ MulAut.conj (1 : G) • M := by rw [map_one, one_smul]; exact hYM
+  obtain ⟨c, hcC, hceq⟩ :=
+    (S10.fusion_control_of_mem_sigma hG hM htσ hYne hYt).2.1 g 1 hYg hY1
+  rw [map_one, one_smul] at hceq
+  have hcM : c ∈ M := hNY ((Subgroup.centralizer_le_normalizer (Y : Set G)) hcC)
+  have e1 : MulAut.conj c⁻¹ • (MulAut.conj c • (MulAut.conj g • M)) = MulAut.conj g • M := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  rw [hceq, conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (M.inv_mem hcM))] at e1
+  exact e1.symm
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
