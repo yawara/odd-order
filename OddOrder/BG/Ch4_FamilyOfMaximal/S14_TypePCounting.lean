@@ -223,6 +223,16 @@ conjugacy conclusions throughout §14 — Theorem 14.7, Lemma 14.5, Corollary 14
 theorem isConjugateSubgroup_equivalence : Equivalence (IsConjugateSubgroup (G := G)) :=
   ⟨IsConjugateSubgroup.refl, IsConjugateSubgroup.symm, IsConjugateSubgroup.trans⟩
 
+/-- A conjugate of a maximal subgroup is maximal: `IsConjugateSubgroup` preserves
+`maximalSubgroups`.  The type-`P` conjugacy arguments of Theorem 14.7 and Corollary 14.8 move
+maximal subgroups around by conjugation, so they need maximality to be conjugacy-stable. -/
+theorem mem_maximalSubgroups_of_isConjugateSubgroup {M N : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (h : IsConjugateSubgroup M N) :
+    N ∈ maximalSubgroups G := by
+  obtain ⟨g, rfl⟩ := h
+  exact mem_maximalSubgroups.mpr
+    (OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hM))
+
 /-- `Z_tilde = Z - (K union K*)` in Theorem 14.7. -/
 def zTilde (K Kstar : Subgroup G) : Set G :=
   ((K ⊔ Kstar : Subgroup G) : Set G) \ ((K : Set G) ∪ (Kstar : Set G))
