@@ -324,6 +324,23 @@ T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E
     + hc で出るが、全 r へは MonoidAlgebra induction/generating-set 要。~100-150 行見込み, 1-2 session。
   - その後 C_U(s)≅Aut(F) → Appendix C へ (C の Prop2 が σ_y にこれを使う)。
 
+### ✅✅✅ session 11 (2026-06-14): Prop 2(b) COMPLETE ⟹ Appendix I Prop 2 全形式化
+`exists_field_semilinear` (SemilinearField.lean, commit b33c6efc, AxiomsCheck 登録済): (a) の体 F +
+(b) semilinearity — g:MulAut E が T-action を正規化 (ψ(c t)=g·ψt·g⁻¹, c:T≃*T) ⟹ g は F 上 semilinear,
+σ=conjugation by g on F=End_{𝔽_p[T]}(E)。`∀ g c hc, ∃ σ:F≃+*F, ∀ a x, g(a•x)=σ(a)•g(x)` (F 共有)。
+- 核: (1) k[T]-semilinearity `uLin(r•x)=τ(r)•uLin x` (τ=`MonoidAlgebra.domCongr c`) を
+  **`MonoidAlgebra.induction_on`** で (of-t case は `g·ψt=ψ(c t)·g` = hc + mulAutToEnd monoid-hom);
+  (2) σ = **`LinearEquiv.conjRingEquiv`** of τ-semilinear equiv (**`RingHomInvPair.of_ringEquiv`** で InvPair);
+  (3) F-semilinearity は `conjRingEquiv_apply`。
+- 🔑 知見 (再調査不要): semilinear ≃ₛₗ[τRing] は `RingHomInvPair.of_ringEquiv τRing` ×2 で InvPair 供給;
+  conclusion は `MulEquiv.toAdditive g` だが proof は uLin (両 coe defeq → `show uLin (a•x)=...` で橋渡し);
+  `Module.End.mul_apply`/`Module.End.smul_def`/`conjRingEquiv_apply_apply`。
+- full build 3807 jobs ~6.3s, axiom-clean。**Appendix I (Huppert) = Prop 1 ✅ + Prop 2(a)(b) ✅ + Lemma 1 sorry
+  (Gorenstein 5.4.10, issue 2004 で defer)**。
+- **▶ 次 = Appendix II (NearFields)**: Prop 2 が "Appendix I Prop 2" を引く (σ_y に exists_field_semilinear)。
+  NearFields.lean は opaque scaffold (2 sorry) → faithful 化 + Prop 1 (FT+Brauer-Suzuki gate) / Prop 2 (体構成
+  F_{r²,2} + exists_field_semilinear 接続) を精査。Prop 1 は重い infra gate ⟹ Prop 2 から着手が現実的。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
