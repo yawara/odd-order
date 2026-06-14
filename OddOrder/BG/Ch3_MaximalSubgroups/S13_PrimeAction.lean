@@ -876,6 +876,53 @@ theorem aInvariant_sylow_conj_subgroup [Finite G] {A N : Subgroup G}
     rw [← hSn, hgsub, hTn, Subgroup.map_subgroupOf_eq_of_le hTN] at hlhs
     rw [Subgroup.pointwise_smul_def]; exact hlhs.symm
 
+/-- **Proposition 1.5(b), subgroup form**: an `A`-invariant `q`-subgroup `P ≤ N` (`A ≤ N_G(N)`,
+coprime, one side solvable) is contained in an `A`-invariant Sylow `q`-subgroup of `N`. -/
+theorem aInvariant_pSubgroup_le_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) {q : ℕ} [Fact q.Prime]
+    {P : Subgroup G} (hPN : P ≤ N) (hPq : IsPGroup q ↥P)
+    (hPinv : A ≤ Subgroup.normalizer (P : Set G)) :
+    ∃ S : Subgroup G, S ≤ N ∧ IsPGroup q ↥S ∧ A ≤ Subgroup.normalizer (S : Set G) ∧ P ≤ S ∧
+      Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), (N.subtype ((φ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hφ_inv_coe : ∀ (a : ↥A) (x : ↥N),
+      (N.subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * (N.subtype x) * (↑a) := by
+    intro a x; rw [← map_inv]; simpa using hφ_coe a⁻¹ x
+  have hPinv' : Ch03.IsAInvariant φ (P.subgroupOf N) := by
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    show N.subtype ((φ a) x) ∈ P
+    rw [hφ_coe a x]
+    exact (Subgroup.mem_normalizer_iff.mp (hPinv a.2) (N.subtype x)).mp hx
+  have hPqN : IsPGroup q ↥(P.subgroupOf N) := hPq.of_equiv (Subgroup.subgroupOfEquivOfLe hPN).symm
+  obtain ⟨S', hS'inv, hPS'⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow hcop hSolv hPqN hPinv'
+  set S : Subgroup G := (S' : Subgroup ↥N).map N.subtype with hSdef
+  refine ⟨S, Subgroup.map_subtype_le _,
+    S'.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective), ?_, ?_, ?_⟩
+  · intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨x, hxS, rfl⟩
+      exact ⟨(φ ⟨a, ha⟩) x, hS'inv.smul_mem ⟨a, ha⟩ hxS, hφ_coe ⟨a, ha⟩ x⟩
+    · rintro ⟨x, hxS, hx⟩
+      refine ⟨((φ ⟨a, ha⟩)⁻¹) x, hS'inv.inv_smul_mem ⟨a, ha⟩ hxS, ?_⟩
+      rw [hφ_inv_coe ⟨a, ha⟩ x, hx]
+      change a⁻¹ * (a * y * a⁻¹) * a = y
+      group
+  · rw [hSdef]
+    calc P = (P.subgroupOf N).map N.subtype := (Subgroup.map_subgroupOf_eq_of_le hPN).symm
+      _ ≤ (S' : Subgroup ↥N).map N.subtype := Subgroup.map_mono hPS'
+  · rw [hSdef, Subgroup.card_map_of_injective N.subtype_injective, S'.card_eq_multiplicity]
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
