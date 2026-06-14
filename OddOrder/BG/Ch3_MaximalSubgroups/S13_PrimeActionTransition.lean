@@ -1067,6 +1067,86 @@ theorem gap3_assembly [Finite G] {M Mstar Q P : Subgroup G} (hQM : Q ≤ M)
     exact le_inf inf_le_right hXCQ
   exact hXne (le_bot_iff.mp (hCMαPQ ▸ le_inf inf_le_left hXCPQ))
 
+/-! ## helper: Fitting の同型不変性 (Lemma 13.8 dispatch — Hall 共役の F-primes 一致) -/
+
+/-- **`p`-core の像 ≤ `p`-core** (群同型 `e`): `(O_p(A)).map e ≤ O_p(B)`。像は正規 `p`-部分群
+ゆえ `normal_pgroup_le_opCore`。 -/
+theorem opCore_map_le_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
+    (Ch01.opCore p A).map e.toMonoidHom ≤ Ch01.opCore p B := by
+  haveI : ((Ch01.opCore p A).map e.toMonoidHom).Normal :=
+    (Ch01.opCore.normal p A).map e.toMonoidHom e.surjective
+  exact Ch01.normal_pgroup_le_opCore
+    ((Ch01.opCore_isPGroup p A).of_equiv
+      (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective))
+
+/-- **`p`-core は群同型で保たれる**: `e : A ≃* B` なら `(O_p(A)).map e = O_p(B)`。 -/
+theorem opCore_map_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    {p : ℕ} [Fact p.Prime] (e : A ≃* B) :
+    (Ch01.opCore p A).map e.toMonoidHom = Ch01.opCore p B := by
+  refine le_antisymm (opCore_map_le_of_mulEquiv e) ?_
+  have h2 := opCore_map_le_of_mulEquiv (p := p) e.symm
+  have hid : e.toMonoidHom.comp e.symm.toMonoidHom = MonoidHom.id B := by ext x; simp
+  calc Ch01.opCore p B
+      = (Ch01.opCore p B).map (MonoidHom.id B) := (Subgroup.map_id _).symm
+    _ = ((Ch01.opCore p B).map e.symm.toMonoidHom).map e.toMonoidHom := by
+        rw [← hid, Subgroup.map_map]
+    _ ≤ (Ch01.opCore p A).map e.toMonoidHom := Subgroup.map_mono h2
+
+/-- **Fitting 部分群の位数は群同型で不変**: `e : A ≃* B` なら `|F(A)| = |F(B)|`。
+`F = ⨆ O_p` を `opCore_map_of_mulEquiv` + `map_iSup` で写し、`card_map_of_injective`。 -/
+theorem fitting_card_eq_of_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    (e : A ≃* B) : Nat.card ↥(Ch01.fitting A) = Nat.card ↥(Ch01.fitting B) := by
+  have hmap : (Ch01.fitting A).map e.toMonoidHom = Ch01.fitting B := by
+    unfold Ch01.fitting
+    rw [Subgroup.map_iSup]
+    refine iSup_congr (fun p => ?_)
+    haveI : Fact (p : ℕ).Prime := ⟨p.2⟩
+    exact opCore_map_of_mulEquiv e
+  rw [← hmap, Subgroup.card_map_of_injective e.injective]
+
+/-- **共役 Hall 部分群の `F`-素因子は一致** (Lemma 13.8 dispatch の核): `C` 可解で `H, K` が
+`C` の Hall `θ`-部分群 (相対) なら `π(F(H)) = π(F(K))`。`hall_C` で `H, K` は `C` 内共役、
+`fitting_card_eq_of_mulEquiv` で `|F(H)| = |F(K)|`。
+
+13.8 main: `s ∈ π(F(H))` (`H ⊇ C_{M_β}(P)`) を `π(F(H*))` (`H* ⊇ C_{M*_β}(P)`) へ移送し
+WLOG `s ∈ β(M)` / `β(M*)` の向き切替を可能にする。 -/
+theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subgroup G}
+    [IsSolvable ↥C] {θ : Set ℕ} (hHC : H ≤ C) (hKC : K ≤ C)
+    (hH : Ch03.IsHallSubgroup θ (H.subgroupOf C)) (hK : Ch03.IsHallSubgroup θ (K.subgroupOf C)) :
+    (Nat.card ↥(Ch2.S08.fittingInG H)).primeFactors
+      = (Nat.card ↥(Ch2.S08.fittingInG K)).primeFactors := by
+  obtain ⟨c, hc⟩ := Ch03.hall_C hH hK
+  have ehk : ↥(H.subgroupOf C) ≃* ↥(K.subgroupOf C) := by
+    rw [← hc]
+    exact Subgroup.equivMapOfInjective _ (MulAut.conj c).toMonoidHom (MulAut.conj c).injective
+  have e : ↥H ≃* ↥K :=
+    (Subgroup.subgroupOfEquivOfLe hHC).symm.trans (ehk.trans (Subgroup.subgroupOfEquivOfLe hKC))
+  have h1 : Nat.card ↥(Ch2.S08.fittingInG H) = Nat.card ↥(Ch01.fitting ↥H) :=
+    Subgroup.card_map_of_injective H.subtype_injective
+  have h2 : Nat.card ↥(Ch2.S08.fittingInG K) = Nat.card ↥(Ch01.fitting ↥K) :=
+    Subgroup.card_map_of_injective K.subtype_injective
+  rw [h1, h2, fitting_card_eq_of_mulEquiv e]
+
+/-- **Lemma 13.8 head — `Q = [Q,P] ⊆ M' ∩ M*'`**: `P` が `Q` を coprime に作用し `C_Q(P)=1` なら
+`Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`); `P,Q ⊆ M` (resp. `M*`) ゆえ
+`⁅P,Q⁆ ⊆ ⁅M,M⁆ = M'` (resp. `M*'`)。 -/
+theorem pSubgroup_le_derived_inf [Finite G] {M Mstar P Q : Subgroup G}
+    [IsSolvable ↥P] (hPN : P ≤ Subgroup.normalizer (Q : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥)
+    (hPM : P ≤ M) (hQM : Q ≤ M) (hPMs : P ≤ Mstar) (hQMs : Q ≤ Mstar) :
+    Q ≤ derivedInG M ⊓ derivedInG Mstar := by
+  have hQcomm : Q ≤ ⁅P, Q⁆ :=
+    Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot hPN hcop hCQ
+  have hM : ⁅P, Q⁆ ≤ derivedInG M := by
+    have h := Subgroup.commutator_mono hPM hQM
+    rwa [← Subgroup.map_subtype_commutator M] at h
+  have hMs : ⁅P, Q⁆ ≤ derivedInG Mstar := by
+    have h := Subgroup.commutator_mono hPMs hQMs
+    rwa [← Subgroup.map_subtype_commutator Mstar] at h
+  exact le_inf (hQcomm.trans hM) (hQcomm.trans hMs)
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),

@@ -287,6 +287,18 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
     elision でなく純粋形式化ゆえ並行で自力構築可。
   - **方針**: GAP 3 elisions は ChatGPT 回答待ち (依頼済) → 検証後 formalize。並行で dispatch の
     Fitting-functoriality-under-conj helper を自力構築。
+- 2026-06-14 (Lane F, /loop 続き¹⁵): **dispatch 基盤 3 補題 landed (15 blocks)**:
+  `opCore_map_le_of_mulEquiv`/`opCore_map_of_mulEquiv`/`fitting_card_eq_of_mulEquiv` (Fitting 同型不変性,
+  汎用) + `fittingInG_primeFactors_eq_of_isHall_subgroupOf` (Hall 共役→同 F-primes, dispatch 核)。
+  ### 🔑 訂正: head は grindable (ChatGPT 待ち不要、(iv) のみ genuine)
+  - **head `Q=[Q,P]⊆M'∩M*'`**: `Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot`
+    (S08:1424; B≤N(Y), coprime, Y⊓C(B)=⊥ → Y≤⁅B,Y⁆) で Q≤⁅P,Q⁆; ⁅P,Q⁆≤⁅M,M⁆=derivedInG M。✅
+  - **head Frattini `M=N_M(Q)M_α`**: `S13_Lemma131.exists_sylow_frattini_decomp` (:204) が同型の
+    Frattini 分解 (M=opiCoreInG(β∪{q})(M')⊔(M⊓N_G(Y))) を既に提供。同パターンで導出可。✅(要 adapt)
+  - **(ii) R-existence / (iii) PR→E+Thm13.4**: grindable (coprime action / Hall 共役 + Thm 13.4)。
+  - **(iv) `[M_α∩M*,Q]⊆M*_α`**: 唯一 genuine な不確実点 (M*'/M*_α 経由の議論)。impasse なら ChatGPT。
+  - **改訂方針**: head + (ii) + (iii) は自力 grind (handle 判明)。(iv) は試行 → 詰まれば ChatGPT。
+    GAP 3 ChatGPT 回答が来れば iii/iv 一括検証。次イテレーション = head `Q=[Q,P]⊆M'∩M*'` を landing。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
