@@ -2027,6 +2027,58 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
+/-- `q ∈ σ(M)` なら `M_σ` の `q`-part は `M` のそれに等しい: `M_σ` は `M` の Hall `σ(M)`-部分群
+(`Msigma_subgroupOf_isHall`) なので `q ∈ σ(M)` は指数を割らず、`v_q(|M|) = v_q(|M_σ|)`。
+⟹ `M_σ` の Sylow `q`-部分群は `M` (そして `G`) の Sylow `q`-部分群。 -/
+theorem factorization_Msigma_eq_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} (hqσ : q ∈ S10.sigma M) :
+    (Nat.card ↥(S10.Msigma M)).factorization q = (Nat.card ↥M).factorization q := by
+  have hqprime : q.Prime := Nat.prime_of_mem_primeFactors ((S10.mem_sigma_iff M q).mp hqσ).1
+  have hHall := S10.Msigma_subgroupOf_isHall hG hM
+  have hcardMσ : Nat.card ↥((S10.Msigma M).subgroupOf M) = Nat.card ↥(S10.Msigma M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (S10.Msigma_le M)).toEquiv
+  have hidx_ne : ((S10.Msigma M).subgroupOf M).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+  have hcard_ne : Nat.card ↥((S10.Msigma M).subgroupOf M) ≠ 0 := Nat.card_pos.ne'
+  have hqidx : ¬ q ∣ ((S10.Msigma M).subgroupOf M).index := fun hd =>
+    hHall.2 q (Nat.mem_primeFactors.mpr ⟨hqprime, hd, hidx_ne⟩) hqσ
+  have hmul := Subgroup.card_mul_index ((S10.Msigma M).subgroupOf M)
+  calc (Nat.card ↥(S10.Msigma M)).factorization q
+      = (Nat.card ↥((S10.Msigma M).subgroupOf M)).factorization q := by rw [hcardMσ]
+    _ = (Nat.card ↥M).factorization q := by
+        rw [← hmul, Nat.factorization_mul hcard_ne hidx_ne, Finsupp.add_apply,
+          Nat.factorization_eq_zero_of_not_dvd hqidx, add_zero]
+
+/-- `q ∈ σ(M)` なら `M` の `q`-part は `G` のそれに等しい: `q∈σ(M)` の Sylow `q` of `M` は
+`G` の Sylow `q` (`isSylow_sylowMap_of_mem_sigma`)、ゆえ `q^{v_q(|M|)} = q^{v_q(|G|)}`。 -/
+theorem factorization_M_eq_G_of_mem_sigma [Finite G] {M : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hqσ : q ∈ S10.sigma M) :
+    (Nat.card ↥M).factorization q = (Nat.card G).factorization q := by
+  obtain ⟨P⟩ := (inferInstance : Nonempty (Sylow q ↥M))
+  obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+  have e1 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card ↥M).factorization q := by
+    rw [hSG, Subgroup.card_map_of_injective M.subtype_injective]; exact P.card_eq_multiplicity
+  have e2 : Nat.card ↥(SG : Subgroup G) = q ^ (Nat.card G).factorization q := SG.card_eq_multiplicity
+  exact Nat.pow_right_injective (Fact.out : q.Prime).two_le (e1.symm.trans e2)
+
+/-- **σ-Sylow uniqueness for `M_σ`-Sylows** (Prop 10.14-flavoured): `q ∈ σ(M)`, `S ≤ M_σ` with
+`|S| = q^{v_q(|M_σ|)}` (a Sylow `q` of `M_σ`) ⟹ `N_G(S) ⊆ M`. `S.subgroupOf M` is a Sylow `q` of
+`M` (card `= q^{v_q(|M|)}` by the `v_q` equality), and `normalizer_sylow_map_le_of_mem_sigma`
+(no normalizer growth out of `M` for `σ`-Sylows) gives `N_G(S) ⊆ M`. -/
+theorem normalizer_einvariant_sylow_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime] (hqσ : q ∈ S10.sigma M)
+    {S : Subgroup G} (hSMσ : S ≤ S10.Msigma M)
+    (hScard : Nat.card ↥S = q ^ (Nat.card ↥(S10.Msigma M)).factorization q) :
+    Subgroup.normalizer (S : Set G) ≤ M := by
+  have hSM : S ≤ M := hSMσ.trans (S10.Msigma_le M)
+  have hcardSM : Nat.card ↥(S.subgroupOf M) = q ^ (Nat.card ↥M).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSM).toEquiv, hScard,
+      factorization_Msigma_eq_of_mem_sigma hG hM hqσ]
+  set PM : Sylow q ↥M := Sylow.ofCard (S.subgroupOf M) hcardSM with hPMdef
+  have hmap : (PM : Subgroup ↥M).map M.subtype = S := by
+    rw [Sylow.coe_ofCard, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hSM]
+  rw [← hmap]
+  exact S10.normalizer_sylow_map_le_of_mem_sigma hqσ PM
+
 /-- フル `q`-part を持つ `q`-部分群は極大 `q`-部分群: `S ≤ N`, `|S| = q^{v_q(|N|)}` で `S ≤ T ≤ N`
 が `q`-群なら `S = T` (`|T| = q^k ∣ |N| ⟹ k ≤ v_q(|N|) ⟹ |T| ≤ |S|`, `S ≤ T` と合わせて等しい)。 -/
 theorem eq_of_le_of_isPGroup_card_eq_factorization [Finite G] {q : ℕ} [Fact q.Prime]
@@ -2092,6 +2144,47 @@ theorem mem_tau1_Mstar_of_einvariant_sylow [Finite G] (hG : IsMinimalSimpleOdd G
     intro x hx
     exact (Subgroup.mem_centralizer_iff.mp (hcent hx) s (hSinf hs)).symm
   exact hSne (by rw [← hCSP]; exact le_antisymm (le_inf le_rfl hScP) inf_le_left)
+
+/-- **Thm 13.9 tail: `C_S(P)=1`** (BG: "By Lemma 13.6, `C_S(P)=1`"): `q∈σ(M)`, `P ≤ E₁` 非自明,
+`S` が `M_σ` の極大 `q`-部分群で `S ≤ M*` (`M* ≠ M` maximal) のとき `S ⊓ C(P) = 1`。
+
+`S ⊓ C(P) ≠ 1` と仮定すると `ℰ_q¹` 部分群 `X ≤ S ⊓ C(P) ≤ M_σ ⊓ C(P)` が取れ、Lemma 13.6
+(`maximalContaining_eq_singleton_of_E1`) の第2結論で `ℳ(S) = {M}`。しかし `S ≤ M*` ゆえ
+`M* ∈ ℳ(S) = {M}`、すなわち `M* = M` で `M* ≠ M` に矛盾。 -/
+theorem centralizer_sylow_inf_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {q : ℕ} [Fact q.Prime] (hqσ : q ∈ S10.sigma M)
+    {P : Subgroup G} (hPE1 : P ≤ E₁) (hPne : P ≠ ⊥)
+    {S : Subgroup G} (hSle : S ≤ S10.Msigma M) (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G) (hMne : Mstar ≠ M)
+    (hSMstar : S ≤ Mstar) :
+    S ⊓ Subgroup.centralizer (P : Set G) = ⊥ := by
+  by_contra hne
+  set C : Subgroup G := S ⊓ Subgroup.centralizer (P : Set G) with hC
+  have hCq : IsPGroup q ↥C := hSq.to_le inf_le_left
+  have hCnt : Nontrivial ↥C := (Subgroup.nontrivial_iff_ne_bot C).mpr hne
+  obtain ⟨k, hk⟩ := hCq.exists_card_eq
+  have hk0 : k ≠ 0 := by
+    rintro rfl; rw [pow_zero] at hk
+    exact absurd hk (Finite.one_lt_card_iff_nontrivial.mpr hCnt).ne'
+  have hqdvd : q ∣ Nat.card ↥C := by rw [hk]; exact dvd_pow_self q hk0
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' q hqdvd
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = q := by
+    rw [Nat.card_zpowers]
+    exact (orderOf_injective C.subtype C.subtype_injective x).trans hx
+  have hXmem : (Subgroup.zpowers (x : G)) ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXC : (Subgroup.zpowers (x : G)) ≤ S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) := by
+    refine Subgroup.zpowers_le.mpr ?_
+    have hxC : (x : G) ∈ S ⊓ Subgroup.centralizer (P : Set G) := x.2
+    rw [Subgroup.mem_inf] at hxC ⊢
+    exact ⟨hSle hxC.1, hxC.2⟩
+  have hMS := (maximalContaining_eq_singleton_of_E1 hG h hqσ hPE1 hPne hXmem hXC hSle hSq hSmax).2
+  have hMem : Mstar ∈ maximalSubgroupsContaining S :=
+    mem_maximalSubgroupsContaining.mpr ⟨hMstar, hSMstar⟩
+  rw [hMS, Set.mem_singleton_iff] at hMem
+  exact hMne hMem
 
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。
 
