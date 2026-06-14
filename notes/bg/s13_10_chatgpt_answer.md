@@ -124,3 +124,41 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
   Q*∈Syl_q*(M∩M*) → step5 (12.19 dichotomy → N(Q*)⊆M) → step6 (C_{Q*}(P)=1) →
   13.1(a) p∈τ₁(M*) → 13.8 `forbidden_config_impossible` (Q,Q* 両 maximal q-/q*-subgroup of M⊓M*)。
   ⚠ 最難 sub-step: Q*∈Syl_q*(M∩M*) の factorization, step5 dichotomy, step6 q*∈β枝 Q*≤M_α。
+
+### 進捗⁵ (2026-06-15 Lane F /loop, cont.⁴) — GAP C construction bricks 完了
+- ✅ `8a7888c0` C1 + `4359f48a` C2 + `35993790` D1
+  (`exists_Einvariant_sylow_inf_Msigma_Mstar`: E-inv Sylow-q* of M_σ∩M*, card=q*^(v_q*|M_σ∩M*|))。
+- **残り = GAP C analytical core (D2–D5)**, 13.10 内 `· -- (b)` の sorry を埋める:
+  - **D2 `Q*∈Syl_q*(M∩M*)`**: v_q*(|M∩M*|)=v_q*(|M_σ∩M*|)。M∩M*=(M_σ∩M*)E (Dedekind, E≤M*);
+    q*∈π(M_σ)⊆σ, E は σ'-群 ⟹ q*-part は M_σ∩M* から。`eq_of_le_of_isPGroup_card_eq_factorization`。
+    (factorization_M_eq_E3 brick と同型の論法。Dedekind = `Subgroup.sup_inf_...`?要確認)
+  - **D3 `N(Q*)⊆M`**: (13.5)[Q=[Q,P]⊆E', C_Q(P)=⊥ から coprime cover] + 12.19
+    (`derivedE_centralizes_betaComplement`: E' が M_σ の Hall β'-部分群 W 中心化) ⟹
+    q*∈β ∨ Q* Syl(M_σ)。q*∈β: `normalizer_le_of_nontrivial_beta_subgroup` (Prop10.14d)。
+    q*∉β: Q* Syl(M_σ) (W に Q* が入る, precedent `exists_E1inv_sylow_centralizing_derivedE` 同型)
+    → q*∈σ, M_σ Hall σ ⟹ Q* Syl(M) → σ-def で N(S)⊆M, 共役 → N(Q*)⊆M。
+  - **D4 `C_{Q*}(P)=⊥`**: q*∈β: Q*≤M_α (β⊆α; ⚠ Sylow-q* of M_σ が α-core か要精査) + Q* cent Q
+    ⟹ C_{Q*}(P)≤C_{M_α}(P)∩C_{M_α}(Q)=C_{M_α}(P⊔Q)=1 (12.18 package の hCMαPQ)。
+    q*∉β: Q* σ-subgroup, ℳ(Q*)≠{M} (Q*≤M*≠M) ⟹ Lemma 13.6 (`centralizer_sylow_inf_eq_bot`系
+    or maximalContaining_eq_singleton 系) ⟹ C_{Q*}(P)=⊥。
+  - **D5 assembly**: 13.1(a) `mem_tau1_Mstar_of_einvariant_sylow` で p∈τ₁(M*) → 13.8
+    `forbidden_config_impossible` (Q: hQsyl で maximal q of M⊓M*; Q*: D2 で maximal q* of M⊓M*;
+     両 C(P)=⊥; N(Q)≤M*, N(Q*)≤M; P≤N(Q),N(Q*))。13.9 endgame の `forbidden_config_impossible`
+     呼び出しが template (但し 13.9 は Q=Q*=S、ここは別 Q,Q*)。
+  ⚠ D3/D4 が最難 (12.19/13.6 dichotomy)。fresh context 推奨。
+
+### 進捗⁶ (2026-06-15 Lane F /loop, cont.⁵) — D2 完了
+- ✅ `8e6e35d6` D2 `sylow_Msigma_Mstar_maximal_in_inf` (Q* maximal q*-subgroup of M∩M*;
+  σ-subgroup ≤ M_σ 経由で Dedekind 回避)。GAP C は construction(C1/C2/D1)+ maximality(D2)完了。
+- **残り = D3 (N(Q*)⊆M) / D4 (C_{Q*}(P)=⊥) / D5 (13.8 assembly)**:
+  - **D3a 前提 (13.5) `Q ≤ derivedInG E`**: `le_commutator_of_coprime_inf_centralizer_eq_bot`
+    (S08:1424, B=P[solvable],Y=Q,P≤N(Q),coprime,Q⊓C(P)=⊥ ⟹ Q≤⁅P,Q⁆) + ⁅P,Q⁆≤⁅E,E⁆=derivedInG E
+    (P,Q≤E, commutator mono)。clean brick 候補。
+  - **D3 本体 (q*∉β枝)**: 12.19 `derivedE_centralizes_betaComplement` → W (Hall β' of M_σ, E'⊆C(W));
+    Q≤E' ⟹ Q⊆C(W) ⟹ W⊆C(Q), W⊆M_σ ⟹ W⊆M_σ∩M*(=C_{M_σ}(Q)); q*∉β ⟹ W の q*-part full
+    ⟹ v_q*(M_σ∩M*)=v_q*(M_σ) ⟹ Q* full Sylow of M_σ ⟹ (q*∈σ,M_σ Hall) Q* Sylow of M ⟹
+    σ-def で N(Q*)⊆M。(q*∈β枝): `normalizer_le_of_nontrivial_beta_subgroup` (Prop10.14d)。
+  - **D4**: q*∉β: Q* σ-subgroup, ℳ(Q*)≠{M} ⟹ Lemma 13.6。q*∈β: Q*≤M_α (要 M_α Hall α =
+    `isHall_Msigma_Malpha .2` で α-subgroup≤M_α) + Q*⊆C(Q) ⟹ C_{Q*}(P)⊆C_{M_α}(P⊔Q)=1。
+  - **D5**: `mem_tau1_Mstar_of_einvariant_sylow` (p∈τ₁M*) + `forbidden_config_impossible` (13.8)。
+  ⚠ D3 本体の 12.19 W-factorization が最難。fresh context で。
