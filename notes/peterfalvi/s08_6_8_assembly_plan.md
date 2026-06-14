@@ -1916,3 +1916,29 @@ Res_{W₂} θ = a·φ)。item 1 (X_irr-coh) は廃棄確定 (教科書非対応)
 構築 (induction transitivity 等) + R(χ) intricate 統合**の大規模 focused effort で、60s loop brick より
 **dedicated session 向き**。FT 最短経路外 (full-Pf scope)。⟹ ユーザーに継続 vs 保留を判断仰ぐ (cont.²⁶)。
 **正本=本 cont.²⁶。**
+
+## 2026-06-14 (session 40 cont.²⁷, /loop): 🔧 訂正 — (6.8.2.3) norm/setup は既存; 私が重複構築→削除; genuine gap = decomposition+R(χ)+assembly。+ FT 接続の位置づけ確認 (ユーザー)
+
+### ⚠ survey-before-build 失敗の訂正:
+- **(6.8.2.1)+(6.8.2.2) は完成済** (S08_CaseBCoherence.lean: η^{τ₁}定数, 全 norm/cross-term/divisibility/
+  trichotomy; `exists_decomposition_caseB` = (6.8.2.2) capstone)。
+- **(6.8.2.3) の `∑aᵢ²=|H:Z|` norm も既存** = `inner_induce_self_eq_index_of_le_center` (S08_CaseBCoherence2:353,
+  Mackey+conjBy-central+Frobenius, M=↥H/N=W₂.subgroupOf H)。
+- 私は cont.²⁵-²⁶ でこの norm を**重複構築**してしまった (既存 case-B ファイル精査不足) → 重複 2本削除 (cb308e77)。
+- **genuine 新規 (keep)**: entry `mem_Xset_exists_inducing` (ce87acc0) + central-in-H
+  `subgroupOf_le_center_of_le_center` + step 2 `certainType_central_restriction` (ecdcef2f)。
+  (central-in-H は line-353 norm の `hN:N≤center` を `certainType_W2_le_center` から供給する bridge ゆえ有用。)
+
+### ▶ genuine な残 (6.8.2.3) gap (既存に無し, grep 確認):
+1. **character 分解** `Ind_Z^H φ = ∑aᵢθᵢ` (θᵢ∈Irr H, aᵢ=θᵢ(1)=mult, θ=θ₁): Clifford constituent
+   (`Clifford.lean` liesOver/restrictionMultiplicity 利用) + [Is]2.27 per θᵢ。
+2. **induction transitivity** `Ind_H(Ind_Z^H φ) = Ind_Z^L φ`: custom induce の二重和 (未整備)。
+3. **αᵢ aggregate** `∑aᵢαᵢ = Ind_Z^L φ − |H:Z|η₁` (αᵢ=χᵢ−aᵢη₁, χᵢ=Ind_H θᵢ): 1.+2.+norm(353) で。
+4. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (steps 5-8, §7 R-producer + (5.4.a/b))。本丸。
+5. **per-χ statement** `(χ−aη₁)^τ=X₁−aY` + **τ₂ direct assembly** (IsCoherent 直接 constructor S07:1557)。
+
+### 📌 FT 接続 (ユーザー確認, 2026-06-14): case-B (6.8) は **FT 並行スパイン** (Pf §11 が将来 §7 coherence
+API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §16 gate で着手不能**、実 FT ボトルネックは
+**BG §13-16** (Lane F/G)。ユーザーは状況理解の上で **Pf §6-§8 coherence API 継続**を選択 (FT sorry は当面
+減らないが Pf 完成に必要)。⟹ Lane B は case-B (6.8.2.3) genuine gap (上記 1-5) を継続。
+**正本=本 cont.²⁷。次=既存 infra 精査の上 genuine gap (character 分解 from 1.) を構築。重複回避必須。**
