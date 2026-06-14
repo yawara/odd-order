@@ -88,6 +88,8 @@ import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
+import OddOrder.Peterfalvi.Appendices.SemilinearField
+import OddOrder.Peterfalvi.Appendices.NearFields
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -3749,6 +3751,13 @@ Cor 12.16 依存は完全に unconditional 化** (もはや sorry に bottom-out
 -- Thm 12.13 / Cor 12.16) is PROVEN, so `E1_actsPrime` bottoms out at the standard axioms only.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.E1_actsPrime
 
+-- BG Lemma 13.6: `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` a Sylow `q` of `M_σ` ⟹
+-- `ℳ(C_G(X)) = ℳ(S) = {M}`. Reduction branch (`q∈β ∨ X⊆M_σ'`) = faithful Cor 12.14 + `M_σ`-Sylow
+-- conjugacy; contradiction branch (`q∉β ∧ X⊄M_σ'`) = conjugate complement `F` (Prop 1.5 + Lemma
+-- 12.19) with `X⊆C(F')`, then `A∈ℰ_p²(F)` (`p∈τ₂`) centralizes `X` (Thm 13.4 + `⁅A,E₁⁆≤F'`)
+-- contradicting `C_{M_σ}(A)=1`. Fully unconditional (§12 PROVEN), axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.maximalContaining_eq_singleton_of_E1
+
 -- BG Lemma 13.8: the forbidden configuration (`M*` non-conjugate to `M`, `p ∈ τ₁(M)∩τ₁(M*)`,
 -- `P`-invariant Sylow `Q, Q*` with `C_Q(P)=C_{Q*}(P)=1` and `N_G(Q)⊆M*`, `N_G(Q*)⊆M`) is
 -- impossible. GAP 3 (coprime quotient cover → `R` of order `r` → Theorem 13.4 conjugated to the
@@ -4447,6 +4456,16 @@ Theorem 12.13). Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Cor1214.maximalContaining_centralizer_eq_singleton
 
+/-! **BG Corollary 12.14, faithful form** (`S12_Corollary1214`,
+`maximalContaining_centralizer_and_someSylow_eq_singleton`): strengthens the above to also conclude
+`ℳ(S₀) = {M}` for some Sylow `p`-subgroup `S₀ ⊇ X` of `M_σ`, matching the textbook
+`ℳ(C_G(X)) = ℳ(P) = {M}`. Same witness `U`: it satisfies `U ≤ S₀` in every branch
+(`P₁ ≤ S₀`, resp. `C_P(X) ≤ S₀`), so threading `U ≤ S₀` through the unified engine yields the second
+conjunct. Needed by BG Lemma 13.6 (issue 8002). Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch3.S12.Cor1214.maximalContaining_centralizer_and_someSylow_eq_singleton
+
 /-! **BG Corollary 12.16** (`S12_Corollary1216`, σ-subgroup ↔ maximal interaction, `q`-group form):
 for a nonidentity `q`-group `Y` (`q ∈ σ(M)`), every `p ∈ π(E) ∩ β(G)'`, and every `H ∈ ℳ(Y)` not
 conjugate to `M`: (a) `r_p(N_H(Y)) ≤ 1` (`pRank_normalizer_le_one`); (b) if `p ∈ τ₁(M)` then
@@ -4476,3 +4495,51 @@ the `r_p = 1` case uses `p ∉ κ(M)` and the fixed-point-free criterion of Theo
 Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.msigma_structure_of_notMem_sigma_kappa
+/-! # Peterfalvi Appendices (Lane H)
+
+Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
+(`OddOrder/Peterfalvi/Appendices/`).  Only fully unconditional, axiom-clean declarations are
+registered here; results still conditional on an open `sorry` (e.g. Appendix I's Lemma
+non-cyclic case, deferred to Gorenstein 5.4.10 / issue 2004) are intentionally absent. -/
+
+/-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)** (`SemilinearField`): a commutative
+group `T` acting irreducibly on an elementary abelian `p`-group `E` yields a finite field
+`F = 𝔽_p[T] = End_{𝔽_p[T]}(E)` over which `E` is `1`-dimensional, with `|F| = |E|`.  The abstract
+core (`End_{k[T]}(M)` is a field, `M` is `1`-dimensional, `|End| = |M|`) plus the bridge from the
+group-theoretic data.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.isSimpleModule_end
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.finrank_end_eq_one
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.natCard_end_eq
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_of_irreducible
+
+/-! **Peterfalvi, Appendix I (Huppert), Proposition 2(a)+(b)** (`SemilinearField`): the field `F`
+of part (a) together with the semilinearity of part (b) — every `g : MulAut E` normalizing the
+`T`-action (via some `c : T ≃* T`) acts `F`-semilinearly, with field automorphism
+`σ = conjugation by g` on `F = End_{𝔽_p[T]}(E)`.  This is the input Appendix II uses for the
+field automorphisms `σ_y`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear
+
+/-! **Peterfalvi, Appendix II (Near-Fields), Proposition 2 — irreducibility/counting + field
+structure** (`NearFields`).  The orbit-counting engine (`add_one_le_card_of_aInvariant_ne_bot`: an
+`A`-invariant `U ≠ ⊥` has `|A| + 1 ≤ |U|`), the elementary-abelian Maschke split
+(`exists_aInvariant_complement_of_elementaryAbelian`), their assembly
+(`rightMulAction_irreducible_of_index_two`: a commutative index-`2` subgroup `A ⊆ Fˣ` acts
+irreducibly on `(F, +)`), and the resulting unconditional field structure
+(`nearField_field_structure_of_index_two`).  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.add_one_le_card_of_aInvariant_ne_bot
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.exists_aInvariant_complement_of_elementaryAbelian
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.rightMulAction_irreducible_of_index_two
+
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.Appendices.NearFields.nearField_field_structure_of_index_two

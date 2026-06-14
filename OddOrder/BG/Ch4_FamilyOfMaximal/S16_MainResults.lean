@@ -62,6 +62,31 @@ def hatMsigma (M : Subgroup G) : Set G :=
   {a | a ∈ M ∧ OddOrder.BG.Ch3.S10.Msigma M ⊓
     Subgroup.centralizer ({a} : Set G) ≠ ⊥}
 
+/-- `M_σ# ⊆ \widehat{M_σ}`: every nonidentity element `x` of `M_σ` lies in `hatMsigma M`,
+since `x ∈ M_σ ≤ M` and `x` centralizes itself, so `1 ≠ x ∈ M_σ ⊓ C_G(x)`.  `§14`-independent
+building block for Theorems B/E (`A(M) = hatMsigma ∩ …`). -/
+theorem sigmaSharp_subset_hatMsigma (M : Subgroup G) :
+    S14.sigmaSharp M ⊆ hatMsigma M := by
+  intro x hx
+  simp only [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at hx
+  obtain ⟨hxMσ, hx1⟩ := hx
+  refine ⟨OddOrder.BG.Ch3.S10.Msigma_le M hxMσ, fun hbot => hx1 (Subgroup.mem_bot.mp ?_)⟩
+  rw [← hbot]
+  exact Subgroup.mem_inf.mpr ⟨hxMσ, Subgroup.mem_centralizer_iff.mpr
+    (fun h hh => by rw [Set.mem_singleton_iff] at hh; subst hh; rfl)⟩
+
+/-- `1 ∈ \widehat{M_σ}` whenever `M_σ ≠ 1`: the identity is centralized by everything, so
+`M_σ ⊓ C_G(1) = M_σ ≠ 1`.  Used by Theorem B(3) (`U_0 ∩ hatMsigma = {1}`).  `§14`-independent. -/
+theorem one_mem_hatMsigma_of_Msigma_ne_bot {M : Subgroup G}
+    (h : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥) : (1 : G) ∈ hatMsigma M := by
+  refine ⟨Subgroup.one_mem M, ?_⟩
+  have hC : Subgroup.centralizer ({1} : Set G) = ⊤ :=
+    eq_top_iff.mpr fun g _ => Subgroup.mem_centralizer_iff.mpr
+      fun h hh => by rw [Set.mem_singleton_iff] at hh; subst hh; simp
+  rw [hC, inf_top_eq]
+  exact h
+
 /-- BG Theorem E notation: `A(M) = hat M_sigma ∩ U M_sigma`. -/
 def ASet (M U : Subgroup G) : Set G :=
   hatMsigma M ∩ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G)
@@ -124,8 +149,9 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
       IsCyclic ↥K ∧
       M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
-      U ⊔ OddOrder.BG.Ch3.S10.Msigma M ≤
-        Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      -- BG Thm A(3): `UM_σ ⊴ M`, i.e. `M` normalizes `UM_σ` (was a trivial self-normalizing
+      -- `UM_σ ≤ N(UM_σ)`; faithfulness fix, Lane G).
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
       (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
       Kstar ≠ ⊥ ∧
       (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
@@ -164,7 +190,7 @@ theorem theoremC_paired_structure [Finite G]
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M)) :
     IsMulCommutative ↥U ∧ ¬ Subgroup.normalizer (U : Set G) ≤ M ∧
-      Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ S15.MF M ∧
+      Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ S15.MF M ∧ ¬ IsCyclic ↥(S15.MF M) ∧
       derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
       Kstar ≤ derivedInG (derivedInG M) ∧
       (∃! Mstar : Subgroup G,
@@ -286,7 +312,7 @@ theorem proposition_type_classification [Finite G]
 
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
-/-- **BG Theorem I** (mmd L4402): nilpotent Hall conjugacy and the global maximal
+/-- **BG Theorem I** (mmd L4526): nilpotent Hall conjugacy and the global maximal
 subgroup dichotomy used by Peterfalvi (8.8). -/
 theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
@@ -314,7 +340,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (∀ x ∈ X, ∀ y ∈ X,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
       let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
-      D ⊆ X ∧
+      -- BG Thm II: `D ⊆ A(M)` (not merely `D ⊆ X`); a genuine claim when `X = A_0(M)`.
+      D ⊆ ASet M U ∧
         ∀ x : G, x ∈ D →
           ∃! N : Subgroup G,
             N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧

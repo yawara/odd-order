@@ -93,6 +93,40 @@ def IsTypeP2 (M : Subgroup G) : Prop :=
 def IsTypeF (M : Subgroup G) : Prop :=
   kappa M = ∅
 
+/-! ### Type classification: basic relations
+
+These hold for any group purely from the definitions (no §13 input).  They record the
+`M_F = ¬M_P` complementarity and the `M_P = M_P1 ⊔ M_P2` partition that §§15--16 use when
+casing on the type of a maximal subgroup. -/
+
+theorem isTypeP_of_isTypeP1 {M : Subgroup G} (h : IsTypeP1 M) : IsTypeP M := h.1
+
+theorem isTypeP_of_isTypeP2 {M : Subgroup G} (h : IsTypeP2 M) : IsTypeP M := h.1
+
+/-- The type-`P` maximal subgroups split as the (disjoint) union of `M_P1` and `M_P2`. -/
+theorem isTypeP_iff_isTypeP1_or_isTypeP2 {M : Subgroup G} :
+    IsTypeP M ↔ IsTypeP1 M ∨ IsTypeP2 M := by
+  constructor
+  · intro hP
+    by_cases h : kappa M = sigmaComplementPrimes M
+    · exact Or.inl ⟨hP, h⟩
+    · exact Or.inr ⟨hP, h⟩
+  · rintro (h | h) <;> exact h.1
+
+/-- `M_P1` and `M_P2` are disjoint: `kappa(M)` cannot both equal and differ from `π(M)∖σ(M)`. -/
+theorem not_isTypeP1_and_isTypeP2 {M : Subgroup G} : ¬ (IsTypeP1 M ∧ IsTypeP2 M) := by
+  rintro ⟨⟨_, h1⟩, _, h2⟩
+  exact h2 h1
+
+/-- `M_F` (Frobenius type) is exactly the complement of `M_P` (type `P`). -/
+theorem isTypeF_iff_not_isTypeP {M : Subgroup G} : IsTypeF M ↔ ¬ IsTypeP M := by
+  simp only [IsTypeF, IsTypeP, Set.not_nonempty_iff_eq_empty]
+
+/-- A maximal subgroup is not simultaneously type `P` and Frobenius type. -/
+theorem not_isTypeP_and_isTypeF {M : Subgroup G} : ¬ (IsTypeP M ∧ IsTypeF M) := by
+  rintro ⟨hP, hF⟩
+  exact (isTypeF_iff_not_isTypeP.mp hF) hP
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
@@ -109,11 +143,52 @@ def maximalTypeP2Family (G : Type*) [Group G] : Set (Subgroup G) :=
 def maximalTypeFFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeF M}
 
+/-- Family form of the type-`P` partition: `M_P = M_P1 ∪ M_P2`. -/
+theorem maximalTypePFamily_eq_union :
+    maximalTypePFamily G = maximalTypeP1Family G ∪ maximalTypeP2Family G := by
+  ext M
+  simp only [maximalTypePFamily, maximalTypeP1Family, maximalTypeP2Family, Set.mem_setOf_eq,
+    Set.mem_union]
+  constructor
+  · rintro ⟨hM, hP⟩
+    rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with h | h
+    · exact Or.inl ⟨hM, h⟩
+    · exact Or.inr ⟨hM, h⟩
+  · rintro (⟨hM, h⟩ | ⟨hM, h⟩)
+    · exact ⟨hM, isTypeP_of_isTypeP1 h⟩
+    · exact ⟨hM, isTypeP_of_isTypeP2 h⟩
+
+/-- Family form: `M_P1` and `M_P2` are disjoint. -/
+theorem maximalTypeP1Family_disjoint_typeP2Family :
+    Disjoint (maximalTypeP1Family G) (maximalTypeP2Family G) := by
+  rw [Set.disjoint_left]
+  rintro M ⟨_, h1⟩ ⟨_, h2⟩
+  exact not_isTypeP1_and_isTypeP2 ⟨h1, h2⟩
+
+/-- Family form: `M_F` is the complement of `M_P` within the maximal subgroups. -/
+theorem maximalTypeFFamily_eq_diff :
+    maximalTypeFFamily G = maximalSubgroups G \ maximalTypePFamily G := by
+  ext M
+  simp only [maximalTypeFFamily, maximalTypePFamily, Set.mem_setOf_eq, Set.mem_diff, not_and]
+  constructor
+  · rintro ⟨hM, hF⟩
+    exact ⟨hM, fun _ => isTypeF_iff_not_isTypeP.mp hF⟩
+  · rintro ⟨hM, hnP⟩
+    exact ⟨hM, isTypeF_iff_not_isTypeP.mpr (hnP hM)⟩
+
 /-- BG `M_sigma(x)`: maximal subgroups whose `M_sigma` contains the element `x`. -/
 def maximalSigmaSubgroupsOfElement (x : G) : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ x ∈ OddOrder.BG.Ch3.S10.Msigma M}
 
-/-- `M_tilde` in BG §14: the nonidentity part of `M_sigma`. -/
+/-- The nonidentity part `M_σ^#` of `M_σ` (`= sharpSubgroup M_σ`).
+
+**Naming caveat (2026-06-14):** BG's `M̃` — used in Lemma 14.5(c), Theorem 14.7(e), and the
+Corollary 14.9 covering — is the *larger* set `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, where `R(x)`
+is the normal Hall subgroup of `C_G(x)` from Theorem 14.4 (it adjoins the `ℓ_σ = 2` "twisted"
+elements). `R(x)` and hence `M̃` are **not yet formalized** (gated on Theorem 14.4 ⟸ §13), so
+this `sigmaSharp` is only the `ℓ_σ = 1` core `M_σ^#`, a strict under-approximation of `M̃`.
+Any downstream use (§15/§16, Corollary 14.9) that intends BG's `M̃` must switch to the
+eventual `M̃` once `R(x)` is available. See `notes/bg/s14_typeP_counting.md`. -/
 def sigmaSharp (M : Subgroup G) : Set G :=
   sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
 
@@ -124,6 +199,28 @@ def sigmaConjugacySaturation (M : Subgroup G) : Set G :=
 /-- Subgroup conjugacy in the ambient group. -/
 def IsConjugateSubgroup (M N : Subgroup G) : Prop :=
   ∃ g : G, MulAut.conj g • M = N
+
+/-- Subgroup conjugacy is reflexive (conjugate by `1`). -/
+@[refl] theorem IsConjugateSubgroup.refl (M : Subgroup G) : IsConjugateSubgroup M M :=
+  ⟨1, by rw [map_one, one_smul]⟩
+
+/-- Subgroup conjugacy is symmetric (conjugate back by `g⁻¹`). -/
+theorem IsConjugateSubgroup.symm {M N : Subgroup G} (h : IsConjugateSubgroup M N) :
+    IsConjugateSubgroup N M := by
+  obtain ⟨g, hg⟩ := h
+  exact ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+
+/-- Subgroup conjugacy is transitive (compose the conjugators). -/
+theorem IsConjugateSubgroup.trans {M N P : Subgroup G} (h₁ : IsConjugateSubgroup M N)
+    (h₂ : IsConjugateSubgroup N P) : IsConjugateSubgroup M P := by
+  obtain ⟨g, hg⟩ := h₁
+  obtain ⟨g', hg'⟩ := h₂
+  exact ⟨g' * g, by rw [map_mul, mul_smul, hg, hg']⟩
+
+/-- Subgroup conjugacy is an equivalence relation.  (`¬ IsConjugateSubgroup` hypotheses and the
+conjugacy conclusions throughout §14 — Theorem 14.7, Lemma 14.5, Corollary 14.9 — rely on these.) -/
+theorem isConjugateSubgroup_equivalence : Equivalence (IsConjugateSubgroup (G := G)) :=
+  ⟨IsConjugateSubgroup.refl, IsConjugateSubgroup.symm, IsConjugateSubgroup.trans⟩
 
 /-- `Z_tilde = Z - (K union K*)` in Theorem 14.7. -/
 def zTilde (K Kstar : Subgroup G) : Set G :=
@@ -252,11 +349,22 @@ theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
     have h125 := Msigma_nilpotent_of_tau2 hG hM hpτ2 hA2 hAM
     exact ⟨h125.2.2.2.1, h125.1⟩
 
-/-- **BG Proposition 14.2** (mmd L3778): structure of a type-P maximal subgroup.
+/-- **BG Proposition 14.2** (mmd L3778): structure of a type-`P` maximal subgroup
+("nearly everything proved in §13" about `M ∈ 𝓜_𝓟`).
 
-`K` is a Hall `kappa(M)`-subgroup, `Kstar = C_{M_sigma}(K)`, and `U` is the Hall
-`(kappa(M) ∪ sigma(M))'`-subgroup occurring in the normal-complement statement.
-The seven parts are bundled in a downstream-friendly form. -/
+`K` = Hall `κ(M)`-subgroup of `M`, `K* = C_{M_σ}(K)`, `U` = Hall `(κ(M) ∪ σ(M))'`-subgroup.
+BG states seven parts (a)–(g); this Lean surface is a **faithful partial** capturing the
+prime action `(a)`, `K* ≠ 1` `(c)`, the normalizer identity `N_M(X) = K × K*` `(b1)`, the
+`(d)` disjointness `K* ∩ M^g = 1` for `g ∉ M`, and the type-`P₂` consequences `(g)`
+(`σ = β`, `|K|` prime, `M_σ` a `TI`-subgroup). Deferred to proof time (gated on §13): the
+`(a)` regular action on `U` / normal complement `U M_σ`, part `(b2)`, the second half of
+`(c)`, the `(d)` clause `K ∩ K^g = 1`, parts `(e)`, `(f)`, and `M_σ` nilpotent in `(g)`.
+See `notes/bg/s14_typeP_counting.md` for the full part-map.
+
+**Faithfulness note (2026-06-14):** a spurious `M_σ ≤ N_G(K*)` conjunct was removed — it is
+not one of BG's seven parts and is false in general (`K = C_q` acting on a Heisenberg
+`M_σ = p^{1+2}` by `a ↦ aʳ, b ↦ b, c ↦ cʳ` gives `K* = ⟨b⟩`, which is **not** normal in
+`M_σ` since `a b a⁻¹ = bc ∉ ⟨b⟩`). -/
 theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
@@ -264,7 +372,6 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M)) :
     ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K ∧
-      OddOrder.BG.Ch3.S10.Msigma M ≤ Subgroup.normalizer (Kstar : Set G) ∧
       Kstar ≠ ⊥ ∧
       (∀ X : Subgroup G, X ≤ K → X ≠ ⊥ →
         Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar) ∧
@@ -275,9 +382,17 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G))) := by
   sorry
 
-/-- **BG Corollary 14.3** (mmd L3809): diagnostic consequences for `x ∈ M_sigma#`
-and a `sigma(M)'`-element `x'`.  The conclusion records the two alternatives
-used later: membership in `kappa(M)` or entry into the `tau_2(M)` branch. -/
+/-- **BG Corollary 14.3** (mmd L3809): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element
+`x'` of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
+`ℓ_σ(x') = 1`, and `𝓜(C_G(x')) = {M}`.
+
+**Faithfulness note (2026-06-14):** the current Lean surface diverges from BG and needs
+reformulation at proof time (gated on §13). (i) The hypothesis `x' ∈ M` should be
+`x' ∈ C_M(x)` (BG requires `x'` to centralize `x`); the centralizing clause is missing.
+(ii) Branch (1)'s body asserts `x' ∈ M_σ ⊓ C_G(x)`, but `x'` is a nonidentity `σ(M)'`-element
+and so cannot lie in the `σ(M)`-group `M_σ` — this looks like an `x ↔ x'` transposition of
+BG's `x ∈ C_{M_σ}(K)` (i.e. `x ∈ M_σ ⊓ C_G(x')`), and it also drops `C_G(x) ⊆ M`.
+(iii) Branch (2) drops `ℓ_σ(x') = 1` and `𝓜(C_G(x')) = {M}`. See `notes/bg/s14_typeP_counting.md`. -/
 theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x x' : G}
     (hx : x ∈ sigmaSharp M) (hx' : x' ∈ M) (hx'sigma : ∀ p ∈ piSet (Subgroup.closure {x'}),
@@ -289,9 +404,20 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Theorem 14.4 and Lemma 14.5: sigma-length one centralizers -/
 
-/-- **BG Theorem 14.4** (mmd L3826): if `ell_sigma(x)=1`, then `C_G(x)` has a
-normal Hall subgroup `R(x)` and a distinguished maximal subgroup `N(x)`; in the
-multi-maximal case `N(x)` lies in `M_F ∪ M_P2`. -/
+/-- **BG Theorem 14.4** (mmd L3826, D. Sibley for part (f)): if `𝓜_σ(x)` is nonempty, then
+`C_G(x)` has a **normal Hall subgroup `R(x)` that acts sharply transitively on `𝓜_σ(x)`**;
+furthermore, if `|𝓜_σ(x)| > 1` then `C_G(x)` lies in a unique `N = N(x) ∈ 𝓜` with
+(a) `R(x) = C_{N_σ}(x) ⊋ 1`, (b) `C_G(x) = C_{M∩N}(x) R(x)`, (c) `π(⟨x⟩) ⊆ τ₂(N) ⊆ σ(M)`,
+(d) `π(M) ∩ σ(N) ⊆ β(N)`, (e) `M ∩ N` complements `N_σ` in `N`, and (f) `N ∈ 𝓜_F ∪ 𝓜_{P₂}`.
+
+**Faithfulness note (2026-06-14):** this Lean surface is a partial that captures only that
+some maximal `N` admits a Hall `σ(N)`-subgroup `R ≤ C_G(x)` with `N ∈ 𝓜_F ∪ 𝓜_{P₂}`. It
+**drops** the headline (`R(x)` normal in `C_G(x)`, sharply transitive on `𝓜_σ(x)`) and parts
+(a)–(e), and — more importantly — it **drops the `|𝓜_σ(x)| > 1` guard** on part (f): as
+written it asserts the type-`F/P₂` existence even in the single-maximal case, which BG does
+not give (there `R(x) = 1` and no `N(x)` structure). The full headline is preserved in §16
+Theorem D (`RData` / `ConjSharplyTransitiveOn`); decide at proof time (gated on §13) whether
+to restate it here or cite §16. See `notes/bg/s14_typeP_counting.md`. -/
 theorem sigmaLength_one_centralizer_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
     {x : G} (hx : x ≠ 1) (hlen : D.length x = 1) :
@@ -303,9 +429,15 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
         (IsTypeF N ∨ IsTypeP2 N) := by
   sorry
 
-/-- **BG Lemma 14.5** (mmd L3875): conjugacy saturations of `M_tilde` are
-disjoint for nonconjugate maximal subgroups.  This is one of the counting
-separation lemmas leading to Theorem 14.7 and Corollary 14.9. -/
+/-- **BG Lemma 14.5(b)** (mmd L3875): for nonconjugate maximal `M`, `N`, the conjugacy
+saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
+Theorem 14.7 and Corollary 14.9.
+
+**Faithfulness note (2026-06-14):** the Lean surface uses `sigmaConjugacySaturation =
+𝒞_G(M_σ^#)` rather than BG's `𝒞_G(M̃)` (see `sigmaSharp`). Since `M_σ^# ⊆ M̃`, this is a
+**true but weaker** restriction of BG 14.5(b); it does **not** capture the `ℓ_σ = 2` twisted
+elements of `M̃`. Lemma 14.5(a) (`x R(x)` disjoint from `y R(y)`) and (c) (the count
+`|𝒞_G(M̃)| = (|M_σ| − 1)|G:M|`) are not stated here (need `R(x)`, gated on §13). -/
 theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M N : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
@@ -314,6 +446,22 @@ theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
   sorry
 
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
+
+/-- **Counting-bound kernel for Theorem 14.7(e)** (BG mmd L3975, the `8/15 > 1/2` step).
+For `k ≥ 3` and `k* ≥ 5`, the saturation density `(1 - 1/k)(1 - 1/k*)` exceeds `1/2`
+(minimised at `(1 - 1/3)(1 - 1/5) = 8/15`).  In Theorem 14.7, `k = |K|` and `k* = |K*|` are
+coprime odd integers `> 1` (so `{k, k*} ⊇ {3, 5}` in the worst case), and
+`|𝒞_G(Ẑ)| = (1 - 1/k)(1 - 1/k*)|G|`; this bound gives `|𝒞_G(Ẑ)| > ½|G|`, forcing every type-P
+maximal subgroup to be conjugate to `M` or `M*`.  Pure arithmetic, independent of §13. -/
+theorem half_lt_one_sub_inv_mul {k l : ℕ} (hk : 3 ≤ k) (hl : 5 ≤ l) :
+    (1 : ℚ) / 2 < (1 - 1 / (k : ℚ)) * (1 - 1 / (l : ℚ)) := by
+  have hk3 : (3 : ℚ) ≤ (k : ℚ) := by exact_mod_cast hk
+  have hl5 : (5 : ℚ) ≤ (l : ℚ) := by exact_mod_cast hl
+  have hik : 1 / (k : ℚ) ≤ 1 / 3 := one_div_le_one_div_of_le (by norm_num) hk3
+  have hil : 1 / (l : ℚ) ≤ 1 / 5 := one_div_le_one_div_of_le (by norm_num) hl5
+  calc (1 : ℚ) / 2 < (2 / 3) * (4 / 5) := by norm_num
+    _ ≤ (1 - 1 / (k : ℚ)) * (1 - 1 / (l : ℚ)) :=
+        mul_le_mul (by linarith) (by linarith) (by norm_num) (by linarith)
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
@@ -334,9 +482,16 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
   sorry
 
-/-- **BG Corollary 14.9** (mmd L3997): the nonidentity elements of `G` are
-covered by the type-F `M_tilde` conjugacy pieces, with one extra `Z_tilde` piece
-when the type-P family is nonempty. -/
+/-- **BG Corollary 14.9** (mmd L3997): `G^#` is the disjoint union of the conjugacy pieces
+`𝒞_G(M̃ᵢ)` over class representatives `Mᵢ ∈ 𝓜` — together with one extra `𝒞_G(Ẑ)` piece when
+`𝓜_𝓟` is nonempty.
+
+**Faithfulness note (2026-06-14):** the Lean surface covers by `sigmaConjugacySaturation =
+𝒞_G(M_σ^#)` instead of BG's `𝒞_G(M̃)` (see `sigmaSharp`). Because `M_σ^# ⊊ M̃`, covering `G^#`
+by the *smaller* pieces is **stronger than — and false relative to — BG**: the `ℓ_σ = 2`
+twisted elements `x x'` (`x' ∈ R(x)^#`) lie in some `𝒞_G(M̃ᵢ)` but in no `𝒞_G(M_σ^#ⱼ)`, so the
+covering fails for them. A faithful statement needs the (gated) `M̃`; do not prove this
+surface as-is. See `notes/bg/s14_typeP_counting.md`. -/
 theorem nonidentity_covered_by_sigma_pieces [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (∀ x : G, x ≠ 1 → ∃ M : Subgroup G,
@@ -356,11 +511,18 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
     ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
   sorry
 
-/-- **BG Corollary 14.12** (mmd L4035): if `M` is type `P2`, then the maximal
-subgroup attached to a Sylow subgroup of the `U`-factor lies in the Frobenius
-family `M_F`, and intersections with the type-P dual pair have the prescribed
-shape.  The exact Sylow-`r` and dual-pair data are deferred, but the intersection
-uses the BG `U K` factor rather than the chosen subgroup `R ≤ U`. -/
+/-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
+Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
+abelian `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ⊆ H_σ`, `M ∩ H = U K`, `N_H(U) ⊄ M`,
+`K ⊆ F(H ∩ M*)`, and `H ∩ M*` complements `H_σ` in `H`.
+
+**Faithfulness note (2026-06-14):** the Lean surface captures `H ∈ 𝓜_F`, `U ⊆ H_σ`, and
+`M ∩ H = U ⊔ K`, and defers `N_H(U) ⊄ M`, `K ⊆ F(H ∩ M*)`, the complement clause, and the
+dual-pair data (gated on §13). **Its hypotheses are too weak**: it takes an arbitrary
+`U ≤ M`, `R ≤ U` with `R ≠ ⊥`, whereas BG needs `U` to be the specific Hall `(κ ∪ σ)'`-factor
+of Proposition 14.2(a) and `R` to be a *Sylow* subgroup of that `U`. The conclusion does not
+hold for arbitrary `U`, `R`; tighten the hypotheses at proof time. See
+`notes/bg/s14_typeP_counting.md`. -/
 theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U R : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))

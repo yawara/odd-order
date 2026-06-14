@@ -55,6 +55,22 @@ theorem maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II [Finite G]
   (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.2.2.2.2.mpr
     (hType.imp_right Or.inl)
 
+/-- **Type dictionary (Prop 16.1)**: Peterfalvi type I = BG type `F`.  Used to
+translate the BG §14--§16 endpoints (whose conclusions are stated with `S14.IsTypeF`)
+into the shared `IsTypeI` predicate that Peterfalvi §10--§13 uses. -/
+theorem isTypeI_iff_isTypeF [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    IsTypeI M ↔ OddOrder.BG.Ch4.S14.IsTypeF M :=
+  (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).1
+
+/-- **Type dictionary (Prop 16.1)**: Peterfalvi type II = BG type `P2`.  The
+companion of `isTypeI_iff_isTypeF` for translating BG endpoints stated with
+`S14.IsTypeP2` (e.g. the type alternatives in Theorem II / Corollary 15.9). -/
+theorem isTypeII_iff_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    IsTypeII M ↔ OddOrder.BG.Ch4.S14.IsTypeP2 M :=
+  (OddOrder.BG.Ch4.S16.proposition_type_classification hG hM).2.1
+
 /-! ## Hall structure of `M_F` (the `(8.11)` first conjunct, types I/II) -/
 
 /-- A `π`-Hall subgroup is also a Hall subgroup for the prime factors of its own
@@ -83,5 +99,43 @@ theorem maxNilpotentNormalHall_isHall_of_typeI_or_II [Finite G]
       (maxNilpotentNormalHall M) := by
   rw [maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hM hType]
   exact isHall_primeFactors (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM)
+
+/-! ## Support-set and maximality bridges -/
+
+/-- **Support-set bridge (types I/II)**: Peterfalvi's `A_1(M) = M_s#` coincides with
+BG's `\widetilde M = M_σ#` (`sigmaSharp`).  For types I/II, `M_s = M_F = M_σ`
+(Proposition 16.1), so both are the `sharpSubgroup` of the same `M_F = M_σ`.
+
+This is a genuine support-set equality — but a special one: the larger support sets
+`A(M)`/`A_0(M)` (built from BG's `hatMsigma = {a ∈ M | M_σ ⊓ C(a) ≠ 1}`) are *not*
+of this `sharpSubgroup` form, so they have no analogous bridge and stay gated on the
+(still `sorry`) BG §14--§15 structure. -/
+theorem A1_eq_sigmaSharp_of_typeI_or_II [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M)
+    {tau : PeterfalviType} (htau : tau = PeterfalviType.I ∨ tau = PeterfalviType.II) :
+    A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  have hmain : mainSubgroup M tau = maxNilpotentNormalHall M := by
+    rcases htau with h | h <;> subst h <;> rfl
+  change sharpSubgroup (mainSubgroup M tau) = sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
+  rw [hmain, maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hM hType]
+
+/-- **Maximality bridge**: a proper subgroup whose family of containing maximal
+subgroups is a singleton `{M}` is uniquely maximal.  Converts the BG-style endpoint
+`maximalSubgroupsContaining H = {M}` (the conclusion shape of BG Theorem B's
+centralizer clause and Theorem II) into Peterfalvi's `IsUniquelyMaximal H`, as needed
+by (8.12)/(8.13). -/
+theorem isUniquelyMaximal_of_maximalSubgroupsContaining_eq_singleton {H M : Subgroup G}
+    (h : maximalSubgroupsContaining H = {M}) (hlt : H < ⊤) :
+    IsUniquelyMaximal H := by
+  have hMmem : M ∈ maximalSubgroupsContaining H := by
+    rw [h]; exact Set.mem_singleton_iff.mpr rfl
+  rw [mem_maximalSubgroupsContaining] at hMmem
+  refine IsUniquelyMaximal.of_unique_maximal hlt
+    (mem_maximalSubgroups.mpr hMmem.1) hMmem.2 (fun N hN hHN => ?_)
+  have hNmem : N ∈ maximalSubgroupsContaining H :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hN, hHN⟩
+  rw [h] at hNmem
+  exact Set.mem_singleton_iff.mp hNmem
 
 end OddOrder.Peterfalvi.S10Interface

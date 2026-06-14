@@ -1364,3 +1364,984 @@ P:=Ĥ, Z:=W₂, hconst=[ξ const on W₂# ∧ centralizer-card (本 session core
 - **(6.8.2.2) 最終 statement** = dichotomy + X-structure (両 branch) を `α^τ = X − |H:Z|Y` 形に組立。
 - → **(6.8.2.3)** (χ∈X 版, [Is]2.27) → **τ₂ assembly** (6.8.2 proof) → capstone case-B branch。
 **正本=本 session 40 cont.⁷。** (6.8.2.2) decomposition は good-case 完成。残=m=2 case + (6.8.2.3) + τ₂ + FPF(capstone時)。
+
+## 2026-06-14 (session 40 cont.⁸, /loop): m≥3 good-case wrapper; hub merged b-peterfalvi (28 commits)
+
+**🔀 hub 合流確認**: main `34c91f5e Merge 'b-peterfalvi' (Pf §6): (6.8.2) case B coherence — 新 leaf
+S08_CaseBCoherence (28 commits)`。ff-merge で main 取込 (BG §12/§13, Pf §10-13 も同期)。
+
+**✅ landed (build-green + axiom-clean)**:
+17. **`inner_tau_indW2_extension_Yset_eq_neg_caseB` (e6d17c8f)** = |Y|≥3 で good case (relabel 不要)。
+    `inner_tau_scaledDiff_extension_Yset_eq_neg_of_frobenius` (S08_CoherenceCore:11246) ミラー。
+    dichotomy rcases + edge(m=2) を hm3 で omega 排除。⟹ |Y|≥3 で α^τ=X−|H:Z|η₁^{τ₁} 無条件。
+
+### 📏 ⚠ S08_CaseBCoherence.lean = 1300 行 (分割閾値 1500 接近)。
+次の主結果 (6.8.2.3 等) は**新 leaf** を切るか、frozen 部分 (3.x ヘルパー〜(6.8.2.2) ingredient) を
+hub に分割依頼。S08_CaseBCoherence は現状 §3 helper + (6.8.2.1)〜(6.8.2.2) decomposition の混在。
+
+### ⚠ (6.8.2.2)/(6.8.2) 残:
+- **m=2 relabel case** (η₁^{τ₁}↔−η₂^{τ₁}): Frobenius S08_CoherenceCore:11550+ をミラー (intricate)。
+- **(6.8.2.3)** (χ∈X 版) → **τ₂ assembly** (Frobenius `crux_of_third_anchor`/`coherentXunionYset_...glued`
+  /`Xset_isCoherent` の case-B 版 = 大アーキテクチャ)。
+- **構造的 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): capstone wiring 時に Hypothesis46/certain-type から discharge。
+**正本=本 session 40 cont.⁸。honest 評価**: (6.8.2.2) decomposition (m≥3) は完成。capstone は τ₂ assembly +
+§7 glue + 構造 discharge が残る marathon。steady brick で進行 (空転なし)、但し capstone は依然 distant。
+
+## 2026-06-14 (session 40 cont.⁹, /loop): 🎉 m=2 relabel landed (uniform Y-witness); file 1387行
+
+**✅ landed (build-green + axiom-clean, first-try)**:
+18. **`exists_Ycoherence_hgood_caseB` (e2ec420f)** = m=2 relabel folded in → **uniform Y-coherence
+    witness cY with ⟨α^τ, cY.extension η₁⟩ = −|H:Z|** (両 m≥3/m=2)。`exists_Ycoherence_hgood_of_frobenius`
+    (S08_CoherenceCore:11555) ミラー。m=2: `coherentEqualDegree_swap_neg` (§7 generic) で η₁↦−η₂^{τ₁}、
+    ⟨α^τ,η₂^{τ₁}⟩=|H:Z| (cross-term+agreement) ⟹ ⟨α^τ, cY' η₁⟩=−|H:Z|。eqRec transport 込みで first-try。
+    → **(6.8.2.2) の "good value" production は m 全域で完成**。
+
+### 📏 ⚠ S08_CaseBCoherence.lean = 1387 行 → 次 phase は新 leaf 必須。
+**次 leaf = `S08_CaseBCoherence2.lean`** (import S08_CaseBCoherence) で:
+- **general X-structure** (cY : IsCoherent param 版、`orthogonal_normOne_tau_scaledDiff_add_extension_general`
+  ミラー): coherentYset hardcode を cY param 化 (cY.extends_on_supported で agreement inline)。
+- **crux / α^τ = X − |H:Z|·cY η₁** (general cY): `exists_Ycoherence_hgood_caseB` の cY を消費。
+- **(6.8.2.3)** (χ∈X 版, [Is]2.27) + **τ₂ assembly** (Frobenius `crux_of_third_anchor`/`coherentXunionYset
+  _...glued`/`Xset_isCoherent` の case-B 版 = 大アーキテクチャ)。
+
+### ⚠ 構造的 cluster (capstone wiring 時): FPF/W₂⊆Z(↥L)/C_H(w)=W₂ ← Hypothesis46/certain-type。
+**正本=本 session 40 cont.⁹。honest**: (6.8.2.2) good-value production 完成 (m 全域)。残=assembly (general
+X-structure→crux→τ₂→glue) + 構造 discharge = marathon だが character-theoretic content は (6.8.2.2) 完了間近。
+
+## 2026-06-14 (session 40 cont.¹⁰, /loop): 🎉 (6.8.2.2) COMPLETE — packaged decomposition (new leaf)
+
+**✅✅ landed (build-green + axiom-clean, both first-try; 新 leaf S08_CaseBCoherence2)**:
+19. **`orthogonal_tau_indW2_add_extension_general_caseB` (16c3d108)** = general X-structure (cY param)。
+    `orthogonal_normOne_tau_scaledDiff_add_extension_general` ミラー、cY.extends_on_supported で agreement inline。
+20. **`exists_decomposition_caseB` (6aabacc2)** = **(6.8.2.2) packaged decomposition**
+    `∃ cY X, α^τ = X − |H:Z|·cY.extension η₁ ∧ X⊥𝒴 ∧ X∈ZIrr`。`exists_Ycoherence_hgood_caseB` (uniform
+    good value) + general X-structure を結合。**τ₂ assembly が消費する (6.8.2.2) の最終出力。Y:=cY.extension η₁。**
+    → **🎉 (6.8.2.2) character-theoretic content 完全完成 (m 全域、m=2 relabel 込み)。**
+
+### 🗂 ファイル構成 (現在):
+- `S08_CaseBCoherence.lean` (1387行, frozen): §3 helpers + (6.8.2.1) + (6.8.2.2) ingredients + good-value production。
+- `S08_CaseBCoherence2.lean` (新, active): general X-structure + packaged decomposition。assembly phase 継続先。
+
+### ⚠ 残 = τ₂ assembly architecture (大) + 構造 discharge:
+- **(6.8.2.3)** (χ∈X 版, [Is] Lemma 2.27): X-side `(χ−aη₁)^τ = X₁ − aY` 分解。Frobenius `crux_of_third_anchor`
+  系の X-side。
+- **τ₂ assembly** (Pf (6.8.2) proof): Z-linear map τ₂ on Z[X∪Y], coincides with τ on Z[X∪Y,L^#], η₁^{τ₂}=Y。
+  Frobenius `coherentXunionYset_...glued_withDiagonal` / `Xset_isCoherent` の case-B 版 = **数百行アーキテクチャ**。
+- **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
+- **構造 cluster** (FPF/W₂⊆Z(↥L)/C_H(w)=W₂): Hypothesis46/certain-type から、capstone wiring 時。
+**正本=本 session 40 cont.¹⁰。20 bricks landed across loop。(6.8.2.2) 完成は milestone。残=τ₂ marathon。**
+
+## 2026-06-14 (session 40 cont.¹¹, /loop): 🗺 τ₂ assembly architecture 完全 mapping (投資 iteration)
+
+**この iteration = アーキテクチャ投資** (Lean brick なし、残り全 path を確定)。(6.8.2.2) 完成後の
+case-B coherence capstone (`sibleySetup_is_coherent` の case-B branch) への path を精査:
+
+### 🔑 reuse 可能 (generic, 大幅省力):
+- **X-coherence は Z-parametrized generic**: `Xset_centralCommutator_isCoherent_of_irreducible_X`
+  (S08_CoherenceCore:9112) は `Xset_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_withCover
+  _of_irreducible_X (Z := ...)` (:9137) に delegate。Z=W₂ で reuse 可。per-step prime-power degree data
+  は case-independent (X-degrees)。**case-B X-coherence = generic reuse + math-B X-irreducibility**。
+- **§7 glue** (`coherentXunionYset_...glued_withDiagonal` / `coherentUnion_of_glued`) generic。
+- **(6.8.2.2) decomposition** = `exists_decomposition_caseB` ✅ (glue の diagonal agreement input)。
+
+### 🔴 構造的 cluster = bottleneck (certain-type/Hypothesis46 接続、deep):
+1. **math-B X-irreducibility** (`isIrreducibleCharacter_of_mem_Xset_c2_caseB`, MISSING): case-A 版
+   `_c2_caseA` (:5314) は `hA: Z(H)⊓W₂.subgroupOf H=⊥` + `centralizer_inf_..._eq_bot_of_c2_caseA` 経由。
+   math-B (W₂⊆Z(H)) は別条件。generic `_caseA` (centralizer 条件 param) の math-B 版要。
+2. **FPF bound** (hc2/hFPF): CertainTypeHypothesis.centralizer_W2 (C_L(w)⊓K=W₂) → W₁ FPF on H/W₂ →
+   `card_kernel_modEq_one` (Isaacs Ch06 FrobeniusGroup:274) ⟹ |W₁|∣|H:W₂|−1 ⟹ |W₁|<|H:W₂|。
+3. **W₂⊆Z(↥L)**: math-B `W₂⊆Z(H)` (`eq_bot_or_eq_of_le_of_card_prime`) + W cyclic ⟹ W₂ central in L。
+- これら 3 つは全て **CertainTypeHypothesis / Hypothesis46 の field から導出** (capstone wiring 時)。
+
+### 🟡 character-theoretic 残 (tractable, my work の χ-version):
+- **(6.8.2.3)** (χ∈X 版 decomposition): `coeff_eq_neg_or_edge_of_frobenius` (χ∈X) の case-B 版。
+  χ single irreducible (‖χ−aη₁‖²=1+a², Frobenius と同形) だが η₁^{τ₁} (6.7) は case-B (W₂)。
+  my (6.8.2.2) ingredients の χ-version (cross-term/divisibility/norm) 要。
+
+### ▶ 次の一手 (honest 優先順位):
+**最 tractable = FPF bound (#2)** か **W₂⊆Z(↥L) (#3)** — どちらも certain-type field から比較的直接。
+math-B X-irred (#1) と (6.8.2.3) は中規模。glue は全部揃ってから。
+**honest 総括**: (6.8.2.2) ✅ milestone。残=構造 cluster (Hypothesis46 接続, deep) + (6.8.2.3) + glue。
+X-coherence reuse で省力化判明。capstone は構造 cluster が gate の marathon。**正本=本 session 40 cont.¹¹。**
+
+## 2026-06-14 (session 40 cont.¹², /loop): 🔓 構造 cluster 着手 — W₂⊆Z(↥L) discharge landed
+
+**🔑 (4.2) Hypothesis 構造判明 (S06_DadeIsometryCertain:67)**: `centralizer_W2` (C_L(w)⊓K=W₂, w∈W₁#)
++ `commute_of_mem_W1_of_mem_W2` (W₂ commutes W₁, theorem 既存) + `isComplement` (L=K⋊W₁) が field/定理。
+⟹ 構造 cluster は思ったより tractable (既存 (4.2) 定理を使う)。
+
+**✅ landed (build-green + axiom-clean)**:
+21. **`certainType_W2_le_center` (ef698712)** = **構造 discharge #3: W₂⊆Z(↥L)**。
+    (4.2) Hypothesis + math-B (W₂ centralizes K = W₂⊆Z(H)) ⟹ W₂ central in L。
+    complement 分解 g=k·w₁ + W₂↔K commute (math-B) + W₂↔W₁ commute (既存定理)。
+    gotcha: `isComplement.surjective` は lambda-form hkw0 → `have hkw : ↑k*↑w₁=g := hkw0` で beta-reduce。
+    **⟹ my (6.8.2.2) lemmas の `hW2cen` deferred hypothesis discharge 可 (capstone wiring 時)。**
+
+### ⚠ 構造 cluster 残 (次 loop):
+- **FPF bound (#2, hc2/hFPF)**: `centralizer_W2` (C_H(w)=W₂) ⟹ W₁ FPF on H/W₂ (C_{H/W₂}(w)=triv) ⟹
+  IsFrobeniusAction/Frobenius group 化 → `card_kernel_modEq_one` (FrobeniusGroup:274, |W₁|∣|H:W₂|−1)
+  ⟹ |W₁|<|H:W₂| ⟹ |L:W₂|<|H:W₂|² (hFPF), 2≤|H:W₂| (hc2)。**Frobenius action 構成が multi-step (要調査
+  IsFrobeniusAction API + card_modEq)**。中規模。
+- **math-B X-irreducibility (#1)**: `isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版 (centralizer
+  条件 param)。inertia 計算。中規模。
+### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred 要) + glue (generic, 全部揃ってから)。
+**正本=本 session 40 cont.¹². 構造 cluster 着手 (W₂⊆Z(L) ✅)。残=FPF + X-irred + 6.8.2.3 + glue。**
+
+## 2026-06-14 (session 40 cont.¹³, /loop): 🔓 構造 cluster #2 解除 — FPF index bounds (hc2/hFPF) landed
+
+**開始時定型**: hub の S08_CoherenceCore 3-way split (issue 0066, b7e672de) を main から取込 (merge
+`b47dfe78`, full build 3807 緑 + AxiomsCheck OK; b-peterfalvi の session-40 frontier とは disjoint)。
+
+**✅ landed (build-green + axiom-clean, commit `9aa66fdd`, S08_CaseBCoherence2)**:
+22. **`certainType_index_bounds` = 構造 discharge #2: FPF index bounds**。
+    (4.2) Hypothesis + math-B (W₂⊆Z(K)) ⟹ **商 ↥L/W₂ が Frobenius 群** (kernel K/W₂, complement
+    W₁W₂/W₂) ⟹ Isaacs Lemma 6.1 `card_kernel_modEq_one` で |K:W₂| ≡ 1 (mod |W₁|) ⟹ |W₁|<|K:W₂|。
+    出力 = `exists_decomposition_caseB` の deferred 2 入力:
+    - `hc2 : 2 ≤ (W₂.subgroupOf K).index` (W₂⊊K = ¬K≤W₂ から)
+    - `hFPF : (W₂.index:ℤ) < ((W₂.subgroupOf K).index:ℤ)^2` (|L:W₂|=|K:W₂|·|W₁| via relIndex_mul_index
+      + index_eq_card; |W₁|<|K:W₂|)。
+    🔑 鍵 API (再調査不要): `OddOrder.BG.Ch1.S03.isFrobeniusGroup_iff_complement_centralizer_inf_kernel_eq_bot`
+    (元群が Frobenius でなくても商上に直接構成可、IsFrobeniusGroup 不要)、`fixedPoint_lift_of_generator_quotient_fixed`
+    (IsFrobeniusGroup 不要、hNK+coprime+solvable のみ; solvable は zpowers x cyclic で Or.inl 無料)、
+    centralizer 条件は q̄∈K.map から y∈K 直得ゆえ W₁ abelian 不要。card 変換 = `quotientKerEquivRange`
+    + `quotientBot` + `IsComplement'.symm.index_eq_card`。S08_CaseBCoherence2 は 193→344 行。
+
+### ⚠ 構造 cluster 残 = #1 のみ:
+- **math-B X-irreducibility (`isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版)**: case-A 版
+  `isIrreducibleCharacter_of_mem_Xset_caseA` (S08_CoherenceCorePart2:1860) は FPF-generic (centralizer
+  条件 param)。math-B (W₂⊆Z(H)) でこの generic に渡す centralizer 入力を作る。inertia 計算。中規模。
+### 🟡 character-theoretic 残: (6.8.2.3) (χ∈X, X-irred #1 要) → τ₂ assembly (大) → §7 glue (generic) → capstone。
+**正本=本 session 40 cont.¹³。構造 #3(W₂⊆Z)+#2(FPF bounds) ✅。残=#1 X-irred + (6.8.2.3) + τ₂ + glue。**
+
+## 2026-06-14 (session 40 cont.¹⁴, /loop): 🚨 RECON 訂正 — 「#1 math-B X-irreducibility」は **case B で偽**
+
+**この iteration = RECON (Lean brick なし、roadmap 訂正)**。cont.¹¹–¹³ が残してきた構造 cluster #1
+「math-B X-irreducibility (`isIrreducibleCharacter_of_mem_Xset_caseA` の math-B 版, X⊆Irr L)」を
+教科書 (6.8) 精読 (mmd 04.8 L136-224) で精査した結果、**case B では X⊄Irr L であり #1 は数学的に偽**。
+
+### 🔑 教科書 (6.8) の case 構造 (L136-160):
+- case (A): Z = Z(H)∩H′; case (B): **Z = W₂**。X = S − S(Z), Y = S(H′)。
+- (6.8.1) の「X⊆Irr L」証明は **case-A 専用** (「Z∩W₂=1 ゆえ |C_H(x)|=|C_{H/Z}(x)|」を使う)。
+
+### 🚨 case B で X⊄Irr L の証明 (厳密、私の `certainType_index_bounds` に依拠):
+1. **L/W₂ は Frobenius 群** (kernel H/W₂) — `certainType_index_bounds` の `hFrob` で証明済み。
+2. Frobenius 群の S-set (kernel から induce した非自明既約) は **全て既約** (Thm 6.34 = (c1) と同型)。
+3. S(W₂) = {χ∈S | W₂⊆Ker χ} = L/W₂ の S-set ⟹ **S(W₂) は reducible 0 個**。
+4. 一方 S は (4.5)/(c2) で **w₂−1 個の reducible μ_j** を持つ。
+5. ∴ X = S − S(W₂) は w₂−1 個の reducible を**全て**含む ⟹ **X⊄Irr L**。
+   (case A は Z∩W₂=1 ゆえ S(Z) も w₂−1 reducible を持ち X が reducible-free になる; case B は L/W₂ で
+   W₂-defect が消え Frobenius 化するため S(W₂) が reducible 0 になり、対照的に X に全 reducible が残る。)
+- ⚠ repo コメント `S08_CoherenceCorePart2:3346` 「X-irreducibility valid in case B」は**誤り** (旧 plan の残骸)。
+  最近の `exists_decomposition_caseB` (cY witness + norm 経路 = (6.8.2.2) elementary) は X-irred を**使っていない**
+  ので、#1 は実際の case-B 経路では不要 (古い「generic _caseA reuse」plan の遺物)。
+
+### ✅ (4.9) は available — reducible μ_j を扱う機構は完成済:
+- **`S06_CertainTypeCoherence.certainType_isCoherent` (:505) = (4.9)(b) coherent isometry (0-sorry)**、
+  `S06_CertainTypeConjugation` (4.9a, μ̄_j=μ_{j′}) も 0-sorry。これが教科書 (6.8.2.3) の reducible χ_i=μ_j
+  に対する **R(μ_j) certain-type reflection** ((5.3.b) 引用先) を供給する。session-29 RECON と一致。
+
+### ▶▶ 訂正後の case-B 残作業 (構造 cluster は #2(FPF)+#3(W₂⊆Z) で **完了**、#1 は削除):
+1. **(6.8.2.3)** (χ∈X 版 `(χ−aη₁)^τ = X₁ − aY`): 教科書 = [Is]2.27 で χ=Ind^L_Hθ を Ind^L_{W₂}φ に帰着
+   (Z=W₂⊆Z(H))、`Ind^L_Zφ−|H:Z|η₁ = Σa_iα_i` (Σa_i²=|H:Z|)、各 α_i に R(χ_i) ((5.4.a) ‖X_i‖²≥‖χ_i‖²)。
+   **irreducible χ_i = §7 R-producer; reducible χ_i=μ_j = (4.9) `certainType_isCoherent`。** 私の
+   `exists_decomposition_caseB` ((6.8.2.2)) が aggregate side を供給。
+2. **τ₂ assembly** ((6.8.2) proof, L224): Z-linear τ₂ on Z[X∪Y], τ on Z[X∪Y,L^#] と一致、η₁^{τ₂}=Y。
+3. **§7 glue + capstone** (`sibleySetup_is_coherent` の case-B branch)。
+**正本=本 session 40 cont.¹⁴。#1 は偽ゆえ削除。残=(6.8.2.3)[(4.9) available]+τ₂+glue。次手=(6.8.2.3)。**
+
+## 2026-06-14 (session 40 cont.¹⁵, /loop): 🗺 (6.8.2.3)+τ₂ = case-B X∪Y coherence の concrete PLAN
+
+cont.¹⁴ RECON で #1(X-irred) が偽と確定 ⟹ case-B の残り = **(6.8.2.3) + τ₂ assembly + glue** の大規模
+assembly。教科書 (6.8.2.3) 完全証明 (mmd 04.8 L208-224) + Frobenius テンプレート
+(`coherentXunionYset_centralCommutator_of_glued_of_frobenius` S08_CoherenceCore:1316,
+§7 `coherentUnion_of_glued`) を精読して brick 分解を確定。
+
+### 🔑 全体像 (Frobenius `..._of_frobenius` を mirror、ただし X に reducible μ_j):
+case-B X∪Y coherence = **X-coherence ⊕ Y-coherence を §7 glue**。Frobenius と違い X が reducible を含む:
+- **Y-coherence**: 済 (Y=S(H′), 全 deg|W₁|, (1.1)+(1.4))。
+- **X-coherence (NEW, reducible 含む)**: X = S−S(W₂) = irreducible 部 ∪ reducible μ_j 部 (w₂−1 個)。
+  - irreducible 部: (6.6) reuse (`Xset_..._isCoherent_of_irreducible_X` 系) — ただし X 全体が irreducible
+    でないので、generic を **irreducible sub-family** に適用する形に要調整。
+  - **reducible μ_j 部**: (4.9) `S06.certainType_isCoherent` (`certainTypeSet h k`, S06_CertainTypeCoherence:505)。
+  - 両者を §7 `coherentUnion_of_glued` で glue。
+- **(6.8.2.3) agreement** ((χ−aη₁)^τ = X₁−aY, χ∈X): 各 χ_i に R(χ_i) + (5.4.a)/(5.4.b) (S07_Coherence:1378/1447)
+  + 集約 pinning (b_i=a_i, (6.8.2.2)=`exists_decomposition_caseB` を消費)。irreducible χ_i=§7 R-producer
+  (`dadeOrthonormalCharacterImageFamilyOfDiff`); reducible μ_j=(4.9)。
+- **X∪Y glue**: §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq`、mixed-inner 入力 = (6.8.2.3)。
+
+### 🔴 crux brick = (4.9)→§7 R/coherence bridge:
+`certainType_isCoherent : S07.IsCoherent (dadeIntegralCharacterMap h.dade0 h.tau) (certainTypeSet h k) ...`
+を、(a) case-B X-coherence の reducible 部 (`coherentUnion_of_glued` に渡す `IsCoherent`)、(b) (6.8.2.3) の
+reducible χ_i の R(μ_j) (`OrthonormalCharacterImageFamily`) として接続。**dade0/tau の整合 (cert↔hyp bridge
+`cert.K=H` S08_CoherenceCore:1261) と certainTypeSet↔Xset の対応が要精査** = 次の最大の未知。
+
+### 📋 brick 順 (次イテレーションから build):
+1. **集約関係** `Ind^L_{W₂}φ − |H:W₂|η₁ = Σ a_iα_i` + `Σa_i²=|H:W₂|` (= ‖Ind^H_{W₂}φ‖²; 中心部分群
+   への Res∘Ind=|H:W₂|·φ + Frobenius 相互律)。non-wrapper character identity。最自己完結。
+2. **(4.9)→R bridge** (crux): cert↔hyp + certainTypeSet↔(X の reducible μ_j) + dade0↔tau 整合。
+3. **(6.8.2.3) per-χ**: (5.4.a/b) + R(χ_i) + pinning。
+4. **X-coherence (reducible 込み)** + **X∪Y glue** → `sibleySetup_is_coherent` case-B branch。
+**正本=本 cont.¹⁵。これは大規模 assembly (複数イテレーション); crux=(4.9)→§7 bridge。次=brick 1 (集約関係)。**
+
+## 2026-06-14 (session 40 cont.¹⁶, /loop): 🗺 case-B coherence アーキテクチャ確定 (mirror-Frobenius) + crux feasible
+
+cont.¹⁵ の PLAN を精査確定。case-B X∪Y coherence = **Frobenius assembly
+`coherentXunionYset_centralCommutator_of_glued_of_frobenius` (S08_CoherenceCore:1316, ~30行) を mirror**。
+本体は §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq` への clean call:
+X-coherence + Y-coherence (`coherentYset` 済) + ν (glue map, param) + hagreeX/Y + 直交性 + hmixed + hgen。
+
+### 🔑 case-B が Frobenius と違う 4 点 (= 残 brick):
+- **(A) Dade-data 一致 [crux, feasible]**: (4.9) `certainType_isCoherent` は `dadeIntegralCharacterMap
+  h.dade0 h.tau` (Hypothesis46) で、`hyp.tau` (SibleyDade) と別 datum。だが **両者 H#-supported 上で一致**
+  — `dadeIntegralCharacterMap_apply_of_support` で両方 dadeMap=Ind_L^G に帰着 (μ_j は `columnSum_support_subset`
+  で H#∪{1} 上 support, `dade_H_eq_bot`)。⟹ feasible (both=Ind)。
+- **(B) case-B X-coherence [substantive, 大]**: X = S−S(W₂) = X_irr ∪ {μ_j} (cont.¹⁴: μ_j は reducible で X に在)。
+  X_irr=既約 (6.6 reuse), {μ_j}=`certainTypeSet`=(4.9) `certainType_isCoherent`。両者を §7 `coherentUnion_of_glued`
+  で glue (要 (A) で hyp.tau へ transport)。**これが最大の新規ピース。**
+- **(C) X⊥Y 直交 (reducible-aware)**: Frobenius は `inner_eq_zero_of_mem_span_of_disjoint_irreducible` (X 既約前提)。
+  case-B は μ_j=Σ_i μ_{ij} (各既約∈X) ⊥ η_k (∈Y) を μ_{ij}∉Y から。要 reducible 対応版。
+- **(D) hmixed (=(6.8.2.3)) + glue**: ν が ⟨x,y⟩ 保存 (x∈X[reducible 含む], y∈Y)。τ-isometry on supported + (A)(B)。
+
+### ⚠ brick 1 (`inner_induce_self_eq_index_of_le_center`, Σaᵢ²=|H:Z|) の位置付け:
+教科書 (6.8.2.3) の R(χ_i) pinning 用だったが、**mirror-glue 経路では off-path の可能性**。true lemma で害なし、
+(6.8.2.3) を per-χ で行う場合は再利用可ゆえ残置。アーキテクチャ未確定で先に建てた反省。
+
+### ▶ 次手 = brick (B) case-B X-coherence の構築開始 ((A) support-agreement を補題化 → (4.9) を hyp.tau へ
+transport → X_irr と glue)。**正直な評価: case-B coherence は大規模 multi-session assembly。crux は全て
+feasible と確認済 (構造的ブロッカー無し)、残りは intricate な interface 接続を brick ごとに積む段階。**
+**正本=本 cont.¹⁶ (アーキテクチャ確定版; ¹⁵ の不確定を解消)。**
+
+## 2026-06-14 (session 40 cont.¹⁷, /loop): ✅ feasibility 完成 — 全ツール確認、残=wiring assembly。機構 brick (A)(C) landed
+
+cont.¹⁶ で残した crux「(4.9) は enlarged `h46.dade0` (A₀=A∪Vᴸ) の map で coherence、hyp.tau は base
+`h46.dade`(=hyp.dade, A) の map」の解決法を確認:
+- **§4 `Hypothesis.restrict` (S04:329) + `dadeMap_restrict` (S04:3641)** = enlargement 互換性ツール
+  (A₁⊆A の datum 制限 + 制限 map は A₁-supported で原 map と一致)。`cases` は `h46.dade = dade` を与える
+  (S08_CoherenceCorePart1:3324) ので、dade0 を A に restrict した map ↔ hyp.tau の橋は §4 restrict で。
+
+### ✅ landed (iter 5-6, 機構 brick):
+- **brick (A) `S07.IsCoherent.congrMap`** (commit 30c74961): coherence を supported 上一致する別 map へ transport。
+- **brick (C) `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`** (commit 10c99216): reducible-aware X⊥Y。
+- (foundations: `exists_decomposition_caseB` (6.8.2.2)、`certainType_index_bounds` (FPF)、`certainType_W2_le_center`、
+  brick 1 `inner_induce_self_eq_index`、(4.9) `certainType_isCoherent`、(6.6)、§7 `coherentUnion_of_glued`)。
+
+### ✅ 構造的ブロッカー無しを最終確認。残 = wiring assembly (大、multi-level、要 full case-B context):
+1. **map-agreement** (§4 restrict で dade0-map↔hyp.tau on A-supported) → congrMap で (4.9) {μ_j}-coh を hyp.tau へ。
+2. **X-coherence glue**: X_irr-coh (6.6 reuse) + {μ_j}-coh (1.) を §7 coherentUnion で glue (要 X_irr⊥{μ_j} mixed-inner)。
+3. **X∪Y glue**: X-coh + Y-coh (coherentYset) を coherentUnion_of_glued_of_generator_mixed_inner_eq で
+   (brick C で reducible X⊥Y、ν=(6.8.2.3) mixed-inner)。
+4. **CoherenceTarget 変換** → capstone `sibleySetup_is_coherent` の X-nonempty/CertainType 分岐。
+**honest 状況: 基礎機構は完成、残りは full case-B hypothesis context での multi-level wiring assembly (大)。
+unblocked だが per-iteration は wiring piece 単位で、capstone 完遂は distant。正本=本 cont.¹⁷。**
+
+## 2026-06-14 (session 40 cont.¹⁸, /loop): ✅ 機構完成 (5 bricks) + 🛑 X-coherence route は要集中設計 (irreducible-X engine 非一般化)
+
+### ✅ landed (iter 5,6,8): case-B coherence の reusable 機構 全完成 (全 axiom-clean):
+- `IsCoherent.congrMap` (30c74961): coherence を supported 上一致 map へ transport。
+- `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` (10c99216): reducible-aware X⊥Y。
+- `dadeIntegralCharacterMap_restrict_eq_of_support` (6cfa8c32): restrict-invariance = map-agreement 核。
+- (+ foundations: exists_decomposition_caseB / certain_index_bounds(FPF) / W2_le_center / brick1 / (4.9) / §7 engine)。
+
+### 🛑 残 X-coherence route の architectural 障害 (本 iter 判明):
+- 既存 irreducible-X engine `Xset_isCoherent_from_adjoinSteps_of_irreducible_X` (S08_CoherenceCorePart2:4232) は
+  **irreducibility に深く依存** (`χs:ℕ→IrreducibleCharacter`, `exists_conjugatePairCover`, conjugate-pair cover,
+  xBaseBlock)。case-B X=S−S(W₂) は reducible μ_j を含む (cont.¹⁴) ので **この engine は再利用不可**。
+- ∴ case-B X-coherence は新規設計が必要: (a) X_irr (既約部) を engine で + {μ_j} を (4.9) で別々に build し §7
+  `coherentUnion_of_glued_withDiagonal` で glue (但し X_irr は clean な `Xset Z` でない問題), or (b) 教科書 uniform
+  R(χ)/(5.4) route (全 χ∈X を R(χ) 経由; reducible μ_j は (4.9)=R(μ_j); §7 (5.4) machinery 接続要)。
+- さらに残: X∪Y glue (withDiagonal, hDτ=(6.8.2.3)) + CoherenceTarget 変換 + dade0/dade wiring fact
+  (Hypothesis46 は dade0↔dade 関係を abstract に持たない=top-level 構築事実、restrict-invariance で map-agreement 化)。
+
+### 🔑 honest 総括: case-B coherence の clean reusable 機構は完成 (5 bricks)。残りは **full case-B context での
+集中 architectural 設計+build** (X-coherence route 決定 + multi-level glue + CoherenceTarget)。60s loop brick 単位
+でなく、full context を保持した dedicated session が適切。**正本=本 cont.¹⁸。次手 = X-coherence route 決定 (uniform R
+vs glue) → 構築。**
+
+## 2026-06-14 (session 40 cont.¹⁹, /loop): ✅ cX feasibility 解決 (xChainCoherent generic) + X∪Y shell landed
+
+### ✅ landed (iter 9-10): X∪Y assembly shell + ユーザー裁可で継続
+- **`coherentXunionYset_caseB_of_glued`** (8f451fd8): case-B X∪Y coherence (Frobenius 版の case-B mirror)。
+  §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` + **brick C** (reducible-aware 直交性)。
+  hoisted = cX(X-coh) + ν(τ₂) + hmixed((6.8.2.3)) + D/hDτ(cross-diagonal) [全 capstone-wiring inputs]。
+
+### ✅ cX (case-B X-coherence on Xset W₂, hard core) は feasible と確認:
+- 最大の未解決 = 「Xset W₂ は reducible μ_j を含むので既存 irreducible-X engine 不可」だったが、
+  **内部 engine `xChainCoherent` (S08_CoherenceCorePart1:2701) は generic な既約集合 X を取る** (Xset 専用でない;
+  `{X S₀ : Set}` + conjugate-pair cover `pair/χs` + base coherence + per-step inputs)。
+- X_irr (= Xset W₂ の既約部 = X−{μ_j}) は **conj-closed** (W₂ 中心ゆえ Xset W₂ conj-closed; μ̄_j=μ_{j'} (4.9a)
+  ゆえ {μ_j} conj-closed; 差も conj-closed) + odd-order ゆえ no-real-char ⟹ **xChainCoherent 適用可**。
+- ∴ **cX 構築プラン (feasible, 構造的ブロッカー無し)**:
+  1. **X_irr-coh**: `xChainCoherent` on X_irr (conjugate-pair cover + base S₀ + per-step (5.6)/degree-div inputs
+     = (6.6) machinery を X_irr へ適応; 既存は Xset 専用ゆえ adapt 要)。
+  2. **{μ_j}-coh**: (4.9) `certainType_isCoherent` (h46) + `congrMap` (map-agreement = restrict-invariance +
+     wiring fact dade0.restrict=hyp.dade)。instance plumbing 要 (NeZero/Fintype/Invertible ×6)。
+  3. **Xset W₂ = X_irr ∪ {μ_j}** 集合分解 (要 columnSum=μ_j∈X + W₂⊄Ker; cert↔hyp bridge h46.K=H)。
+  4. **glue** (1)+(2) via §7 `coherentUnion_of_glued` (mixed-inner X_irr↔μ_j) → cX。
+
+### 🔑 honest 総括: scaffolding 完成 (6 bricks + X∪Y shell)。cX は **feasible な hard core** で、X_irr の
+(6.6) machinery 適応 + {μ_j} の (4.9)接続 + 分解 + glue の集中 assembly。次手 = cX の piece を順次 build
+({μ_j}-coh or X_irr-coh の adapt から)。**正本=本 cont.¹⁹。cX feasibility 確定が本 iter の主成果。**
+
+## 2026-06-14 (session 40 cont.²⁰, /loop): cX reducible 側 ({μ_j}-coh) landed; 残 cX content = 深い §6 math (precise hooks)
+
+### ✅ landed (iter 11): **`certainTypeSet_isCoherent_tau`** (94fa65e7) = cX の reducible 側。
+(4.9) `certainType_isCoherent` + `congrMap` で {μ_j}-coh を hyp.tau へ (map-agreement は wiring 供給)。
+S06_CertainTypeCoherence を S08 へ import (cX に必須)。
+
+### 🔴 残 cX content = 3 つの深い §6-internal piece (各々 substantial, precise hooks):
+1. **X_irr-coh** (cX irreducible 側): `xChainCoherent` (generic engine, S08_CoherenceCorePart1:2701) を
+   X_irr := {χ∈Xset W₂ | irreducible} に適用。要 = conjugate-pair cover (`exists_conjugatePairCover`,
+   X_irr は conj-closed+no-real-char で適用可) + base S₀ coherence ((1.1)(1.4)) + **per-step XAdjoinStepInput
+   ((5.6) degree-div data; Xset 専用機構を X_irr へ adapt が hard core)**。
+2. **{μ_j} = certainTypeSet ⊆ Xset W₂** (set 構造): `columnSum h46 χ₂ = induce h46.K (chiRestrict χ₂)`
+   (S06_CertainTypeCoherence:253-255 hbridge) + `chiRestrict χ₂ : IrreducibleCharacter ↥h46.K`
+   (S06_CertainTypeClifford:772) ⟹ columnSum∈S (要 **↥h46.K↔↥H bridge coercion** via h46.K=H) +
+   **¬W₂⊆Ker columnSum** (kernel fact, 要発掘) → `mem_Xset` (Part2:803)。
+3. **(6.8.2.3) ν / mixed-inner** (glue の ν): per-χ τ-decomposition `(χ−aη₁)^τ = X₁−aY` ([Is]2.27 +
+   exists_decomposition_caseB を χ_i で集約)。glue の hmixed/hDτ/ν を供給。
+
+### 🔑 honest 総括: reusable foundation (7 bricks: FPF/brick1/congrMap/pairwise-orth/restrict-invariance/
+X∪Y shell/{μ_j}-coh) 完成。残り cX content (上記 1-3) は **深い (6.8.2) case-B math** で §6 internals に密結合;
+shell の積み増しは scaffold-tower ゆえ避け、genuine content を順次 build (要集中, loop brick より大)。
+次手 = (1) X_irr-coh の cover/base か (2) {μ_j}⊆X membership の bridge から着手。**正本=本 cont.²⁰。**
+
+## 2026-06-14 (session 40 cont.²¹, /loop): item-2 membership 精密分解 — 真の infra-blocker = K↔H cross-group transport; (2b) Clifford-uniq 論法確定
+
+cont.²⁰ item 2 ({μ_j}⊆Xset W₂ membership) を精査。S-membership 核入力を 1 本 landing + 残りの
+構造を完全に確定 (次セッションが transport infra を 1 本建てれば組立可)。
+
+### ✅ landed (iter 12): `chiRestrict_ne_trivialIrreducibleCharacter` (a372410b, S06_CertainTypeSupport, axiom-clean)
+χ_j = Res_K μ_{0j} は χ₂≠1 で**非自明既約** (trivial なら ker=univ⊇H.subgroupOf K が
+`not_subset_characterKernel_chiRestrict` に矛盾)。6 行。`not_subset_…` の直後に配置。
+
+### 🔬 item 2 (`certainTypeSet h46 k ⊆ hyp.Xset h46.W2`) の精密分解:
+`mem_Xset` (Part2:803): φ∈Xset W₂ ↔ φ∈S ∧ φ∉S(W₂)。各 μ_j=`columnSum h46 χ₂`:
+- **(2a) columnSum ∈ hyp.S** (`S_eq`: ∃θ:Irr ↥H, θ≠triv ∧ columnSum=induce H θ):
+  - hbridge (`S06_CertainTypeCoherence`:253): columnSum = induce h46.K (chiRestrict χ₂),
+    `chiRestrict χ₂ : Irr ↥h46.K`。h46.K=H (cases c2)。
+  - θ := chiRestrict χ₂ を **h46.K=H で ↥H へ transport** して供給。θ≠triv = 本 commit を transport。
+- **(2b) columnSum ∉ hyp.SsubFiltration W₂**
+  (¬∃θ:Irr ↥H, θ≠triv ∧ W₂.subgroupOf H⊆ker θ ∧ columnSum=induce H θ):
+  - **Clifford-uniqueness 論法 (確定)**: columnSum=induce H θ ⟹ θ=chiRestrict。
+    Res_H columnSum = ∑_i Res_H μ_{ij} = w₁•chiRestrict
+    (`restrict_certainType_eq` χ₂ i: Res_K μ_{ij}=Res_K μ_{0j}=chiRestrict + columnSum=∑μ_{ij});
+    Frobenius (`inner_induce_eq_inner_restrict`) ⟨θ,Res_H columnSum⟩=⟨induce θ,columnSum⟩
+    =⟨columnSum,columnSum⟩≠0 (columnSum(1)=∑deg>0 ⟹ columnSum≠0 ⟹ ‖·‖²≠0);
+    ⟨θ,w₁•chiRestrict⟩=w₁⟨θ,chiRestrict⟩≠0 ⟹ θ=chiRestrict (両既約)。
+    すると W₂.subgroupOf H⊆ker chiRestrict が `not_subset_characterKernel_chiRestrict` に矛盾。
+
+### 🔴 真の infra-blocker = **↥h46.K ≃ ↥H (`Subgroup.equivOfEq`) に沿った IrreducibleCharacter / induce / 既約性の cross-group transport が未整備**:
+- 既存 transport は**同群内のみ** (`ClassFunction.conjByMulEquiv` = G→G 自己同型)。cross-group
+  ↥K→↥H の ClassFunction precompose-along-MulEquiv + induce-invariance + irreducibility-invariance
+  が repo/mathlib に無い (grep 確認済)。`induce_congr_of_subgroup_eq` (S04:1367) は induce **等式**
+  は与えるが、∃θ:Irr ↥H の **θ 自体**を作れない。
+- ⟹ 次セッションは **まず transport infra を 1 本建てる**:
+  例 `IrreducibleCharacter.mapOfSubgroupEq (hKH:K=H) : IrreducibleCharacter ↥K ≃ IrreducibleCharacter ↥H`
+  + `induce_mapOfSubgroupEq : induce H (mapOfSubgroupEq hKH θ) = induce K θ`
+  + `mapOfSubgroupEq_ne_trivial`。これで (2a)θ構築 + (2b)θ=chiRestrict同定 + chiRestrict_ne_trivial
+  transport が全部通る。
+- **代替案 (要実験)**: θ:=`restrict H μ_{0j}` を直接構築し `rw [hHK]` で既約性 (`certainTypeRestrict_isIrreducible`)
+  / 非自明性を ↥h46.K→↥H 移送。motive = `fun (S:Subgroup ↥L) => IsIrreducibleCharacter (restrict S μ_{0j})`
+  は S が subgroup 引数のみで clean ゆえ dependent rewrite が通る可能性あり (試して可なら infra 不要で最速)。
+
+### 次手 = transport infra (or 代替の rw 実験) → (2a)+(2b) 組立 (`certainTypeSet_subset_Xset` を
+S08_CaseBCoherence2 に) → cX 残 (item 1 X_irr-coh の cover/base + item 3 (6.8.2.3) mixed-inner)。
+**正本=本 cont.²¹。item 2 は構造完全確定、残るは transport infra 1 本の実装。**
+
+## 2026-06-14 (session 40 cont.²², /loop): ✅ item 2a (μ_j∈S) landed — K↔H transport は infra 不要 (rw[hHK] で安価); 残 = 2b Clifford-uniq
+
+cont.²¹ で「transport infra 1 本要」と判定したが、**実験で否定**: K↔H cross-group transport は
+専用 infra 不要、既存ツールで安価に通った。
+
+### ✅ landed (iter 13-14):
+- `chiRestrict_ne_trivialIrreducibleCharacter` (a372410b, S06_CertainTypeSupport): χ_j 非自明 (=2a 核入力)。
+- **`SibleyDadeHypothesis.columnSum_mem_S`** (56ef5f0c, S08_CaseBCoherence2): **μ_j ∈ hyp.S (item 2a 完了)**。
+
+### 🔑 K↔H transport は安価 (cont.²¹ の infra-blocker 判定は誤り):
+- **既約性**: `have h := h46.certainTypeRestrict_isIrreducible χ₂; rwa [hHK] at h` — `rw [hHK]` が
+  `IsIrreducibleCharacter (restrict h46.K μ)` → `(restrict H μ)` を**そのまま通す** (motive=fun S↦Prop で OK)。
+- **induction**: `induce_congr_of_subgroup_eq` (= `…S04.Hypothesis.induce_congr_of_subgroup_eq`,
+  full name 注意) で `induce h46.K (restrict h46.K μ) = induce H (restrict H μ)` (値一致は
+  `simp [restrict_apply]`)。
+- **非自明性**: `rw [← hHK] at h1` は **motive 不成立で失敗** (equation 型 CF↥H が S 依存)。代わりに
+  `ClassFunction.ext` + 各点 `congrArg (f ↦ f ⟨↑g,hg⟩) h1` + `simpa` で値レベル transport。
+  membership transport は `hHK.le g.2` (`▸` は motive 曖昧で失敗)。
+- θ:Irr ↥H は `⟨restrict H μ_{0j}, hirr⟩` を anonymous constructor で直接供給 (set 不要、.1 は rfl)。
+
+### ▶▶ 残 item 2 = **2b `columnSum ∉ hyp.SsubFiltration W₂`** (Clifford-uniqueness):
+φ∈S(W₂) ⟹ ∃θ:Irr↥H, θ≠triv ∧ W₂.subgroupOf H⊆ker θ ∧ columnSum=induce H θ。矛盾を:
+1. **Res_H columnSum = w₁•(restrict H μ_{0j})**: columnSum=∑_i μ_{ij} ⟹ Res_H=∑_i restrict H μ_{ij};
+   各 restrict H μ_{ij}=restrict H μ_{0j} (`restrict_certainType_eq` χ₂ i は K 版 → 各点 ext で H 版へ)。
+2. **Frobenius** (`inner_induce_eq_inner_restrict`): ⟨θ,Res_H columnSum⟩=⟨induce H θ,columnSum⟩
+   =⟨columnSum,columnSum⟩≠0 (columnSum(1)=∑deg>0 ⟹ inner_self≠0)。
+3. ⟨θ,w₁•restrict H μ_{0j}⟩=w₁⟨θ,restrict H μ_{0j}⟩≠0 ⟹ θ=restrict-H-版 (両既約, `irreducibleCharacter_inner_eq_ite`)。
+4. すると W₂.subgroupOf H⊆ker(restrict H μ_{0j}) を各点 ext で K 版へ transport ⟹
+   W₂.subgroupOf h46.K⊆ker chiRestrict が `not_subset_characterKernel_chiRestrict` に矛盾。
+→ 2b 完了で **`certainTypeSet_subset_Xset` assembly** (各 μ_j=columnSum を 2a∧2b で mem_Xset) →
+cX の残 (item 1 X_irr-coh + item 3 mixed-inner)。
+**正本=本 cont.²². item 2a 完了; 2b は上記 4 段 (中規模); transport 安価が判明し item 2 全体が現実的。**
+
+## 2026-06-14 (session 40 cont.²³, /loop): ✅✅ item 2 COMPLETE (`certainTypeSet ⊆ Xset W₂`); 残 cX = item 1 (X_irr-coh) + item 3 (mixed-inner)
+
+### ✅✅ landed (iter 15, commit e9252215, S08_CaseBCoherence2, 全 axiom-clean, full build 3807):
+4 補題で **item 2 (𝒯 ⊆ X(W₂)) 完了**:
+- `columnSum_eq_induce_H` — μ_j = Ind_H^L(Res_H μ_{0j}) (transported (4.5.a))。
+- `restrict_H_certainType_eq` — Res_H μ_{ij}=Res_H μ_{0j} ((4.8)step1 の H 版)。
+- **`columnSum_notMem_SsubFiltration`** (2b) — μ_j∉S(W₂), Clifford-uniqueness:
+  **double-Frobenius** で ⟨μ_j,μ_j⟩ を相殺 (μ_j≠0/正定値 補題 不要が鍵)。各 inducing θ で
+  w₁⟨θ,ψ⟩=⟨μ_j,μ_j⟩=w₁⟨ψ,ψ⟩ ⟹ ⟨θ,ψ⟩=⟨ψ,ψ⟩≠0 ⟹ θ=ψ ⟹ W₂⊆Ker ψ が (4.7) に矛盾。
+- **`certainTypeSet_subset_Xset`** (assembly) — 𝒯⊆X(W₂), `mem_Xset ⟨2a,2b⟩`。
+
+### 🔑 2b 実装の知見 (再利用):
+- `classical` を proof 冒頭に (ite の `Decidable (θ=ψirr)` 用)。
+- θ=ψirr は `if`-rw 連鎖でなく e0(⟨θ,ψirr⟩=0)/e1(⟨ψirr,ψirr⟩=1)+`rw[show ↑ψirr=ψ from rfl]`+
+  `rw[hinner]`+`zero_ne_one` で (ψ vs ↑ψirr の syntactic mismatch 回避)。
+- `inner_induce_eq_inner_restrict` (Frobenius) は `ClassFunction.` prefix。
+- 最終 kernel transport: `Hypothesis.coe_chiRestrict`+`restrict_apply`+`OneMemClass.coe_one` を
+  `simp only ... at hxker ⊢` で両辺正規化 → `exact hxker`。
+
+### ▶▶ 残 cX content = 2 piece (cont.²⁰ item 1, 3; ともに深い §6 math):
+1. **item 1 X_irr-coh** (cX irreducible 側, **最難**): `xChainCoherent` (generic engine,
+   S08_CoherenceCorePart1:2701) を X_irr:={χ∈Xset W₂|irreducible} に適用。conjugate-pair cover
+   (X_irr conj-closed+no-real-char で可) + base S₀ ((1.1)(1.4)) + **per-step XAdjoinStepInput
+   ((5.6) degree-div; Xset 専用機構を X_irr へ adapt が hard core)**。
+   + **Xset W₂ = X_irr ⊔ certainTypeSet 分解の reverse** (Xset の reducible 元は全て μ_j; (4.5b) exhaustion)。
+2. **item 3 (6.8.2.3) mixed-inner**: per-χ τ-decomposition `(χ−aη₁)^τ=X₁−aY`。glue の hmixed/hDτ/ν 供給。
+→ glue: X_irr-coh + {μ_j}-coh (`certainTypeSet_isCoherent_tau` cont.²⁰) を §7 coherentUnion →
+cX → `coherentXunionYset_caseB_of_glued` (cont.¹⁹ shell) → capstone case-B branch。
+**正本=本 cont.²³. item 2 完了 (2 iter); 残 item 1/3 は深く要集中。次=item 1 の set 分解 reverse
+(`Xset W₂ ⊆ X_irr ∪ certainTypeSet`, (4.5b) exhaustion) から着手が自然 (item 1 の前段、tractable)。**
+
+## 2026-06-14 (session 40 cont.²⁴, /loop): 🚨🚨 ARCHITECTURE RECON — 教科書 (6.8.2) は **直接 τ₂ 構成** (anchor η₁∈Y); 「standalone case-B X-coherence (cX) + glue」plan は教科書と乖離 → item 1 (X_irr-coh) は不要/誤方向
+
+cont.²³ で「次=item 1 (X_irr-coh) の set 分解」と書いたが、着手前に **mmd 04.8 L178-224 ((6.8.2) 全証明) を精読**して
+重大な方針乖離を発見。cont.¹⁴-²³ の glue route (cX を別途構築して §7 で glue) は**教科書の証明構造と異なる**。
+
+### 🔑 教科書 (6.8.2) case-B の実際の証明構造 (mmd 04.8 L224 "Proof of (6.8.2)"):
+> τ₂ := Z[X∪Y]→Z[Irr G] の Z-linear map で、Z[X∪Y,L^#] 上 τ と一致、かつ **η₁^{τ₂}=Y** (Y=η₁^{τ₁}, m=2 で −η₂^{τ₁})。
+> (6.8.2.3) で ⟨(χ−aη₁)^τ, η₁^{τ₂}⟩=⟨χ−aη₁,η₁⟩ (χ∈X, a=χ(1)/η₁(1))。η∈Y も同様。
+> ⟹ τ₂ は Z[X∪Y,L^#]∪{η₁} (= Z[X∪Y] を生成) 上で内積保存 ⟹ X∪Y coherent。
+
+つまり: **τ₂ は X∪Y 全体に直接定義** (χ−aη₁ は supported ゆえ χ=(χ−aη₁)+aη₁ で生成; τ₂(χ)=τ(χ−aη₁)+aY=X₁)。
+**standalone な「X だけの coherence (cX)」は構築しない** — (6.8.2.3) の χ-分解は **η₁∈Y を anchor**に使うので、
+X-coherence は Y から切り離せない。case (A) は X⊂Irr L で X-内部 anchor の (6.6) が効く (L160) が、**case (B) は
+X が reducible μ_j を含み X-内部 chain が崩れるため、教科書は Y-anchor の直接 τ₂ に切り替えている**。
+
+### 🛑 ⟹ cont.¹⁹/²⁰ の plan (cX = X_irr-coh ∪ {μ_j}-coh を §7 glue) は誤方向:
+- `coherentXunionYset_caseB_of_glued` (cont.¹⁹ shell) は **cX (standalone X-coherence) を入力に要求**するが、
+  case-B では cX は教科書の対象でなく、構築には Y-anchor η₁ が要る (循環)。cont.¹⁸ が「irreducible-X engine
+  再利用不可」「case-B X-coherence は新規設計が必要」で詰まったのは**この乖離が原因** (square peg/round hole)。
+- item 1 (X_irr-coh via xChainCoherent) は **不要**。xChainCoherent は IrreducibleCharacter pair を足すので
+  reducible μ_j を足せず、かつ X-内部 base を要求 (Y-anchor でない)。
+- 副次: certainTypeSet の degree 条件 (equal-degree のみ) も問題で、Xset∖certainTypeSet は all-irreducible でない
+  (異 degree の reducible μ_j が残る) — これも glue route が破綻する別証左。
+
+### ✅ 正しい route = **直接 τ₂** (教科書通り):
+1. **(6.8.2.1)** η^{τ₁} が Z^# 上定数 — 要確認 (landed?)。
+2. **(6.8.2.2)** `Ind_Z^L φ − |H:Z|η₁ = X − |H:Z|Y` の aggregate — `exists_decomposition_caseB`
+   (S08_CaseBCoherence2:126) で landed (cont.¹⁴)。
+3. **(6.8.2.3)** per-χ: χ=Ind_H θ (Z⊄Ker θ), [Is]2.27 で Res_Z θ=aφ, Ind_H^Z φ=∑aᵢθᵢ, 各 χᵢ=Ind_H θᵢ
+   (**irreducible**) に R(χᵢ) ((5.3)(5.4.a)(5.4.b)(5.5), §7 R-producer `dadeOrthonormalCharacterImageFamily`),
+   (6.8.2.2) で bᵢ=aᵢ pin ⟹ αᵢ^τ=Xᵢ−aᵢY ⟹ (χ−aη₁)^τ=X₁−aY。**これが本丸 (item 3 相当だが主役)**。
+4. **Proof of (6.8.2)**: τ₂ を Z[X∪Y] に直接定義 (supported=τ, η₁↦Y) + (6.8.2.3) で isometry 検証。
+   §7 ツール候補 = `retarget_isCoherent_of_decomposition*` (S07:3737+; S₁-coherence + per-χ
+   `himg: τ(χ−a·chi1)=D.X−a·extension chi1` で {χ,χ̄} を追加) を **base=Y-coherence** から X 上反復、
+   または whole-lattice τ₂ を `coherentUnion_of_glued` 系へ ν=τ₂ で渡す (cX 不要の variant 要精査)。
+
+### ⚠ 未確定 (next iteration / 要ユーザー判断):
+- `coherentXunionYset_caseB_of_glued` shell (cX 要求) は **置換** すべきか、cX を retarget で構築して延命するか。
+- reducible μ_j を τ₂ で扱う具体 (retarget は irreducible 単位; μ_j は whole-lattice τ₂ で一括 or certainTypeSet
+  block で別処理)。**certainTypeSet machinery (item 2, {μ_j}-coh) は直接 route では off-path の可能性大**
+  (true facts ではある)。
+**正本=本 cont.²⁴ (ARCHITECTURE 再評価)。次=直接 τ₂ route ((6.8.2.3) per-χ R(χ) 分解) へ pivot。
+item 1 は build しない。要ユーザー確認: glue shell 廃棄 vs 延命。**
+
+## 2026-06-14 (session 40 cont.²⁵, /loop): ✅ 直接-τ₂ route の building blocks 全確認 + Z=W₂ 確定 + (6.8.2.3) entry landed
+
+cont.²⁴ pivot を受け、直接-τ₂ route の前提を全検証。**全 building block が repo に存在** ⟹ route は実行可能で、
+foundational pieces は **brick-friendly** (dedicated session 不要、loop で steady に積める)。
+
+### ✅ 確定事実 (mmd 04.8 L150-160 精読):
+- **case (B): Z = W₂** (textbook "Set Z=W₂ in case (B)")。⟹ **item 2 (`Xset h46.W2`) は正しい Z を target 済**
+  (cont.²³ の懸念は杞憂)。X=S−S(W₂), Y=S(H′)=S(⁅H,H⁆) (m 個, 各 deg|W₁|, 既約)。
+- capstone は `Xset ⁅H,H⁆` で split (Z=H′); (6.8.2) は Z=W₂ ⟹ Xset W₂⊆Xset H′ (W₂⊆H′)。両者の差は
+  (6.8.3) layer (S coherent への拡張) ⟹ capstone wiring は (6.8.2) の downstream (後続課題)。
+
+### ✅ building blocks (全 landed/available):
+- **[Is]2.27** = `OddOrder.RepresentationTheory.IsIrreducibleCharacter.exists_central_linear_restriction`
+  (Res_Z θ = θ(1)·φ, φ linear, Z≤Z(G); AxiomsCheck:2025 登録済)。
+- **(6.8.2.2)** = `exists_decomposition_caseB` (S08_CaseBCoherence2:126, landed): `(Ind_Z^L φ−|H:Z|η₁)^τ
+  = X−|H:Z|·cY.ext(η₁)`, X⊥cY(Y), X∈ZIrr。
+- **(6.8.2.1)** = `IsCoherent.extension_constant_on_sharp_of_prime` (AxiomsCheck:2018 付近, landed)。
+- **R(χ) machinery** = §7 `dadeOrthonormalCharacterImageFamily` (S07:5387) + (5.4.a/b) (S07:1378/1447)。
+- **IsCoherent 直接 constructor** = structure (S07:1557): `extension`(ν=τ₂) + `extension_inner_eq`(isometry)
+  + `extends_on_supported`(=τ on Z[S,A]) + `extension_mem_ZIrr`。⟹ τ₂ を明示構成して 4 fields を埋める。
+
+### 📋 (6.8.2.3) per-χ 分解の sub-DAG (`(χ−aη₁)^τ = X₁−aY`, χ∈Xset W₂):
+1. ✅ **entry** `mem_Xset_exists_inducing` (ce87acc0, landed): χ=Ind_H θ, θ≠1, W₂⊄Ker θ。
+2. **[Is]2.27 適用**: Res_{W₂} θ = a·φ (φ∈Irr W₂, φ≠1, a=θ(1))。`exists_central_linear_restriction`
+   (W₂⊆Z(H) は case-B; `certainType_W2_le_center`/`W2_le_center` 系)。← 次の brick。
+3. **Ind_H^{W₂} φ = ∑aᵢθᵢ** (θᵢ∈Irr H distinct, Res θᵢ=aᵢφ, θᵢ(1)=aᵢ, θ=θ₁): Clifford/character。
+4. **αᵢ=χᵢ−aᵢη₁ (χᵢ=Ind_H θᵢ), Supp αᵢ⊆H^#, ∑aᵢαᵢ=Ind_{W₂}^L φ−|H:W₂|η₁, ∑aᵢ²=|H:W₂|**: (6.8.2.2) と接続。
+5. **R(χᵢ)⊥Y^{τ₁}** ((5.3)(5.5))。
+6. **αᵢ^τ=Xᵢ−bᵢY+Zᵢ** (Xᵢ∈Z[R(χᵢ)]) + **(5.4.a) ‖Xᵢ‖²≥‖χᵢ‖² ⟹ bᵢ≤aᵢ**。
+7. **pin bᵢ=aᵢ** ((6.8.2.2): ∑aᵢbᵢ=|H:W₂|=∑aᵢ²)。
+8. **(5.4.b) αᵢ^τ=Xᵢ−aᵢY** ⟹ χ=χ₁ で `(χ−aη₁)^τ=X₁−aY`。【本丸 = steps 5-8 の R(χ) 統合】
+### 📋 τ₂ assembly: `IsCoherent τ (Xset W₂ ∪ Yset) (supportInSubgroup H^# L)` を直接 constructor で:
+ν=τ₂ (supported=τ, η₁↦Y=cY.ext η₁, χ↦X₁(χ) [(6.8.2.3)]) + isometry (generator 上, (6.8.2.3)+cY) +
+ZIrr (X₁,Y∈ZIrr)。reducible μ_j も χ∈X として (6.8.2.3) で一律処理 (whole-lattice, 反復 retarget 不要)。
+
+**正本=本 cont.²⁵。route 実行可能・brick-friendly 確認。entry landed。次 brick = step 2 ([Is]2.27 で
+Res_{W₂} θ = a·φ)。item 1 (X_irr-coh) は廃棄確定 (教科書非対応)。glue shell は (6.8.2.3) 完成後に
+置換判断 (cX 不要ゆえ最終的に未使用化見込み)。**
+
+## 2026-06-14 (session 40 cont.²⁶, /loop): (6.8.2.3) clean-brick phase 完了 (steps 1-2 + 2 infra); 残=rep-theory infra 一から + R(χ) core ⟹ work の性質が変化、ユーザーに判断仰ぐ
+
+### ✅ landed (clean bricks, 全 axiom-clean・full build 3807):
+- step 1 `mem_Xset_exists_inducing` (ce87acc0)。
+- `subgroupOf_le_center_of_le_center` (W₂.subgroupOf H ⊆ Z(↥H), ecdcef2f)。
+- step 2 `certainType_central_restriction` (Res^H_{W₂} θ = θ(1)·φ, [Is]2.27, ecdcef2f)。
+- `restrict_induce_eq_index_smul_of_le_center` (Res_Z(Ind_Z φ)=|Γ:Z|•φ central, 6fa6daf2; ∑aᵢ²=|H:Z| 入力)。
+
+### 🛑 残 (6.8.2.3) は work の性質が変化 — clean brick でなく一から rep-theory infra:
+- **step 3 残: induction transitivity `Ind_H(Ind_{Z}^H ψ) = Ind_Z^L φ`** — repo に無し。custom `induce`
+  (= ⅟|H|•∑ induceTerm, InducedCharacter:262) の **二重和 coset 論法を一から** + Z.subgroupOf H ≅ Z
+  transport。mathlib 級 infra。
+- **step 3 残: character 分解 `Ind_Z^H φ = ∑aᵢθᵢ` (aᵢ=θᵢ(1))** — constituent 構造 (Clifford.lean の
+  liesOver/restrictionMultiplicity 利用可だが、"character=∑⟨·,θ⟩θ" 分解 + aᵢ=θᵢ(1) 計算の組立は中規模)。
+- **steps 5-8: R(χ) 統合** (本丸, 未着手) — §7 R-producer + (5.4.a/b) + bᵢ=aᵢ pinning。intricate。
+- φ-presentation seams (W₂.subgroupOf H ↔ ↥W2, (6.8.2.2) の Ind_W2 接続) も複数。
+
+### 🔑 honest 評価: clean-brick phase (steps 1-2 + 2 infra) は完了。残りは **一から rep-theory infra
+構築 (induction transitivity 等) + R(χ) intricate 統合**の大規模 focused effort で、60s loop brick より
+**dedicated session 向き**。FT 最短経路外 (full-Pf scope)。⟹ ユーザーに継続 vs 保留を判断仰ぐ (cont.²⁶)。
+**正本=本 cont.²⁶。**
+
+## 2026-06-14 (session 40 cont.²⁷, /loop): 🔧 訂正 — (6.8.2.3) norm/setup は既存; 私が重複構築→削除; genuine gap = decomposition+R(χ)+assembly。+ FT 接続の位置づけ確認 (ユーザー)
+
+### ⚠ survey-before-build 失敗の訂正:
+- **(6.8.2.1)+(6.8.2.2) は完成済** (S08_CaseBCoherence.lean: η^{τ₁}定数, 全 norm/cross-term/divisibility/
+  trichotomy; `exists_decomposition_caseB` = (6.8.2.2) capstone)。
+- **(6.8.2.3) の `∑aᵢ²=|H:Z|` norm も既存** = `inner_induce_self_eq_index_of_le_center` (S08_CaseBCoherence2:353,
+  Mackey+conjBy-central+Frobenius, M=↥H/N=W₂.subgroupOf H)。
+- 私は cont.²⁵-²⁶ でこの norm を**重複構築**してしまった (既存 case-B ファイル精査不足) → 重複 2本削除 (cb308e77)。
+- **genuine 新規 (keep)**: entry `mem_Xset_exists_inducing` (ce87acc0) + central-in-H
+  `subgroupOf_le_center_of_le_center` + step 2 `certainType_central_restriction` (ecdcef2f)。
+  (central-in-H は line-353 norm の `hN:N≤center` を `certainType_W2_le_center` から供給する bridge ゆえ有用。)
+
+### ▶ genuine な残 (6.8.2.3) gap (既存に無し, grep 確認):
+1. **character 分解** `Ind_Z^H φ = ∑aᵢθᵢ` (θᵢ∈Irr H, aᵢ=θᵢ(1)=mult, θ=θ₁): Clifford constituent
+   (`Clifford.lean` liesOver/restrictionMultiplicity 利用) + [Is]2.27 per θᵢ。
+2. **induction transitivity** `Ind_H(Ind_Z^H φ) = Ind_Z^L φ`: custom induce の二重和 (未整備)。
+3. **αᵢ aggregate** `∑aᵢαᵢ = Ind_Z^L φ − |H:Z|η₁` (αᵢ=χᵢ−aᵢη₁, χᵢ=Ind_H θᵢ): 1.+2.+norm(353) で。
+4. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (steps 5-8, §7 R-producer + (5.4.a/b))。本丸。
+5. **per-χ statement** `(χ−aη₁)^τ=X₁−aY` + **τ₂ direct assembly** (IsCoherent 直接 constructor S07:1557)。
+
+### 📌 FT 接続 (ユーザー確認, 2026-06-14): case-B (6.8) は **FT 並行スパイン** (Pf §11 が将来 §7 coherence
+API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §16 gate で着手不能**、実 FT ボトルネックは
+**BG §13-16** (Lane F/G)。ユーザーは状況理解の上で **Pf §6-§8 coherence API 継続**を選択 (FT sorry は当面
+減らないが Pf 完成に必要)。⟹ Lane B は case-B (6.8.2.3) genuine gap (上記 1-5) を継続。
+**正本=本 cont.²⁷。次=既存 infra 精査の上 genuine gap (character 分解 from 1.) を構築。重複回避必須。**
+
+## 2026-06-14 (session 40 cont.²⁸, /loop): 🔄 re-calibration — (6.8.2.3) infra は大半既存 (cont.²⁶ の「from-scratch mathlib infra」は悲観過ぎ); 分解 lemma landed
+
+### 精査で判明 (cont.²⁶ の評価訂正): (6.8.2.3) の building block は**大半既存**:
+- **Fourier 展開** `classFunction_eq_sum_inner_smul` (S08_CoherenceCorePart1:87) = `χ=∑_θ⟨χ,θ⟩•θ`。
+- **∑aᵢ²=|H:Z| norm** `inner_induce_self_eq_index_of_le_center` (S08_CaseBCoherence2:353)。
+- **Clifford** `restrictionMultiplicity`/`liesOver`/`IsRestrictionConstituent` (Clifford.lean)。
+- **§7 R(χ)** `OrthonormalCharacterImageFamily` (S07:766) + (5.4) `inner_self_of_mem`/`Orthogonal`。
+- **(6.8.2.2) 一式** (norm/cross-term/divisibility/trichotomy, exists_decomposition_caseB)。
+⟹ (6.8.2.3) は「from-scratch infra」でなく**既存機構の assembly + induction transitivity 1本**。
+
+### ✅ landed (iter, 6b3aede9): **`induce_eq_sum_inner_restrict_smul`** = `Ind^M_N φ = ∑_θ⟨φ,Res_N θ⟩•θ`
+(Fourier + Frobenius)。新規確認済 (重複なし)。(6.8.2.3) の `Ind^H_Z φ=∑aᵢθᵢ` 分解 (coeff=mult)。
+
+### ▶ 残 (6.8.2.3) genuine gap (assembly 主体):
+1. **coeff→degree**: `⟨φ,Res_N θ⟩ = θ(1)·[θ over φ]` ([Is]2.27 per θ; θ over central linear φ ⟹ Res=θ(1)φ)。← 次, 最 tractable。
+2. **induction transitivity** `Ind_H(Ind_{W₂.subgroupOf H}^H φ) = Ind_{W₂}^L φ` (custom induce 二重和, 唯一の from-scratch infra)。
+3. **αᵢ aggregate** `∑aᵢαᵢ = Ind_{W₂}^L φ − |H:Z|η₁` (1+2+norm)。
+4. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4))。本丸。
+5. **per-χ statement + τ₂ direct assembly**。
+**正本=本 cont.²⁸。(6.8.2.3) は再評価で tractable 化 (infra 大半既存)。次=coeff→degree (1.)。重複回避に survey 必須 (本 session で 3 回 duplicate 回避)。**
+
+## 2026-06-14 (session 40 cont.²⁹, /loop): ✅✅ (6.8.2.3) infra 完成 — induction transitivity landed (Frobenius 経路で clean); 残=aggregate + R(χ)
+
+### ✅ landed (2 iter, 全 axiom-clean, full build 3807):
+- **`inner_compHom_of_mulEquiv`** (97a73357): 群同型 e に沿った inner 保存 `⟨a∘e,b∘e⟩=⟨a,b⟩` (transport 部品)。
+- **`induce_induce_subgroupOf`** (1e93c83e): **induction transitivity** `Ind^M_H(Ind^H_{K.subgroupOf H} ψ∘e)=Ind^M_K ψ`
+  (K≤H≤M)。**Frobenius 経路で ~25 行**: `classFunction_eq_zero_of_orthogonal` + double Frobenius +
+  restriction-transport (`Res_{K.subgroupOf H}(Res_H χ)=(Res_K χ)∘e`, M-value defeq で `congr 1`) +
+  inner_compHom。⚠ cont.²⁶ の「from-scratch mathlib 二重和 infra」は**過大評価**だった (raw 二重和 不要)。
+
+### 🎉 (6.8.2.3) infra 完成 — 残りは assembly のみ:
+| piece | status |
+|---|---|
+| 分解 `Ind_Z^H φ=∑_θ⟨φ,Res_Z θ⟩•θ` | ✅ `induce_eq_sum_inner_restrict_smul` (6b3aede9) |
+| transitivity `Ind_H∘Ind_Z=Ind_Z` | ✅ `induce_induce_subgroupOf` (1e93c83e) |
+| ∑aᵢ²=\|H:Z\| norm | ✅ `inner_induce_self_eq_index_of_le_center` (:353, 既存) |
+| Frobenius/completeness/R(χ) | ✅ 既存 |
+| linearity `induce_add/smul` | ✅ 既存 |
+
+### ▶ 残 (6.8.2.3) = assembly (infra 出揃い):
+1. **αᵢ aggregate** `∑aᵢαᵢ = Ind_{W₂}^L φ − |H:Z|η₁`: 分解 → Ind_H linearity (induce_add/smul) →
+   transitivity → `∑aᵢχᵢ=Ind_{W₂}^L φ`; ∑aᵢ²=|H:Z| (norm+Parseval `inner_self_eq_sum_sq_of_repr`)。
+2. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4.a/b))。本丸。
+3. **per-χ statement + τ₂ direct assembly** (IsCoherent 直接 constructor)。
+**正本=本 cont.²⁹。infra 完成は重要マイルストン。次=αᵢ aggregate (1.)。FT 並行スパイン (sorry 当面不変)。**
+
+## 2026-06-14 (session 40 cont.³⁰, /loop): ✅ αᵢ aggregate 両半 landed; 残 = combination + R(χ) 統合 (本丸)
+
+### ✅ landed (3 iter, 全 axiom-clean, full build 3807):
+- `induce_finset_sum_smul` (Ind_H Finset 線形性) + **`sum_inner_restrict_smul_induce_eq_induce`**
+  (f281ba5c, aggregate 前半 `∑aᵢχᵢ=Ind^M_K φ` = 分解+線形性+transitivity, 2 行)。
+- **`inner_self_induce_eq_sum_mul_star`** (cde453e1, Parseval `‖Ind φ‖²=∑aθ·conj aθ`)。
+- **`sum_inner_restrict_sq_eq_index`** (83ec0b32, aggregate η₁係数 `∑aᵢ²=|M:N|` = reality(aθ∈ℤ via
+  inner_mem_ZIrr_int)+Parseval+norm)。
+
+### 🎉 αᵢ aggregate 両半完成 (∑aᵢχᵢ=Ind_K φ + ∑aᵢ²=|M:N|):
+残 aggregate = **combination** `∑aᵢαᵢ = ∑aᵢχᵢ − (∑aᵢ²)η₁ = Ind^L_{W₂}φ − |H:Z|η₁` (両半を機械的に結合)。
+
+### ▶ 残 (6.8.2.3) = R(χ) 統合 (steps 4-8, **本丸・未着手**):
+4. **R(χᵢ)⊥Y** ((5.3)(5.5)) + αᵢ^τ=Xᵢ−bᵢY+Zᵢ (Xᵢ∈Z[R(χᵢ)])。§7 `OrthonormalCharacterImageFamily`。
+5. **(5.4.a) ‖Xᵢ‖²≥‖χᵢ‖² ⟹ bᵢ≤aᵢ**。
+6. **pinning** ((6.8.2.2) `exists_decomposition_caseB` で ∑aᵢαᵢ^τ=X−|H:Z|Y; ∑aᵢbᵢ=|H:Z|=∑aᵢ² ⟹ bᵢ=aᵢ)。
+7. **(5.4.b) αᵢ^τ=Xᵢ−aᵢY** ⟹ χ=χ₁ で per-χ `(χ−aη₁)^τ=X₁−aY`。
+8. **τ₂ direct assembly** (IsCoherent 直接 constructor)。
+**正本=本 cont.³⁰。aggregate 両半完成。次=combination (機械的) → R(χ) 統合 (本丸, §7 R-producer 精査要)。
+infra 出揃いで assembly は steady だが R(χ) 統合は intricate。FT 並行スパイン。**
+
+## 2026-06-14 (session 40 cont.³¹, /loop): ✅ αᵢ aggregate 完成 (combination landed); R(χ) 統合 = 本丸の §7 interface 精査
+
+### ✅ landed (95d1bee1): **`sum_smul_constituent_diff_eq`** = full αᵢ aggregate
+`∑aᵢαᵢ = Ind^L_{W₂}φ − |H:Z|η₁` (両半の機械的結合 smul_sub+sum_sub_distrib, one-shot)。
+⟹ **(6.8.2.3) の infra + αᵢ aggregate 完全完成** (cont.²⁶〜³¹ で ~12 lemma landed, 全 axiom-clean)。
+
+### 🔬 R(χ) 統合 (steps 4-8, 本丸) の §7 interface 精査:
+- **R(χ) = `OrthonormalCharacterImageFamily τ χ`** (S07:766): orthonormal ⊂ ZIrr, `τ(χ−χ̄)=∑R(χ)`。
+  producer = `dadeOrthonormalCharacterImageFamily` (S07:5387, irreducible χ から)。
+- **(5.4) = `CharacterPsiDecomposition τ χ ψ`** (S07:1356-1469): X−bY+Z 分解 + bounds。
+  - (5.4.a) `inner_self_chi_re_le_inner_self_X` (:1382): ‖χ‖²_re ≤ ‖X‖²。
+  - (5.4.b) `norm_eq_and_X_eq_sum_of_norm_Y_ge` (:1469): ‖Y‖²≥‖ψ‖² ⟹ 等号 + X=∑R(χ)。
+- **🔑 `retarget_isCoherent_of_decomposition` (S07:3737)**: CharacterPsiDecomposition + himg
+  (`τ(χ−a•chi1)=D.X−a•ext chi1` = (6.8.2.3) 形) で **{χ,χ̄} を coherent set に追加** — **(5.4)+pinning を
+  内部化**。⟹ 直接-τ₂ は Y-coherence base から **retarget を X 共役対で反復**が筋。
+
+### 🛑 R(χ) 統合の難所 (本丸):
+1. **reducible μ_j**: retarget は irreducible 対のみ ⟹ μ_j=∑μ_{ij} は直接追加不可。whole-lattice τ₂ で
+   一括 or μ_j を constituent (6.8.2.3) 経由で別処理 (cont.¹⁴ の reducible-aware)。
+2. **himg per χ** = (6.8.2.3) `(χ−aη₁)^τ=X₁−aY`: αᵢ aggregate (済) + R(χᵢ) per-constituent + pinning
+   ((6.8.2.2) `exists_decomposition_caseB` で ∑aᵢαᵢ^τ=X−|H:Z|Y; ∑aᵢbᵢ=∑aᵢ²=|H:Z| ⟹ bᵢ=aᵢ)。
+3. **αᵢ の ψ=η₁ (Y-anchor)** と §7 CharacterPsiDecomposition (χ,ψ pair) の interface 整合。
+**honest: R(χ) 統合は §7 (5.4)/retarget 機構との深い integration で intricate な本丸。aggregate まで
+の準備は完了。次=retarget interface の himg 供給 (αᵢ^τ decomposition) の構築。要集中。**
+**正本=本 cont.³¹。aggregate 完成 (重要マイルストン)。R(χ) 統合 = 深い §7-integration の本丸が残る。**
+
+### 🔑 R(χ) 統合の具体 producer path (cont.³¹ 末, 精査結果):
+- **`CharacterPsiDecomposition.ofProjection`** (S07:1185): R(χ) (imageFamily) + τ₁ + (htau1_inner_eq /
+  htau1_agrees / htau1_mem `τ₁(χ−ψ)∈ZIrr` / 3 orthogonalities) から **X/Y/coeff/X_eq/Y_orthogonal を
+  projection で自動構築** (`exists_intProjection_of_orthonormal_ZIrr`)。残 primitive = R(χ) extractor + τ₁。
+- **`CharacterPsiDecomposition.decompositionPair`** (S07:1237): 同 χ・同 τ₁ で (D₀, Da) pair を構築
+  (retarget_isCoherent_of_decompositions の τ₁-agreement が rfl)。ψ=0 と ψ=a•chi1。
+- **`retarget_isCoherent_of_extensionImage`** (S08_CoherenceCorePart1:1980): case-A/(6.6) engine、
+  これが {χ,χ̄} を coherent set に追加 ((5.4)+pinning 内部化)。
+- **R(χ) producer** = `dadeOrthonormalCharacterImageFamily` (S07:5387) / `…OfDiff` (S08:1681)。
+⟹ (6.8.2.3) R(χ) 統合 = per-constituent χᵢ で decompositionPair (R(χᵢ)+τ₁+facts) → retarget。
+**残 deep 作業**: (a) χᵢ=Ind_H θᵢ が irreducible か (R(χᵢ) producer の前提) の精査, (b) τ₁=Y-coherence
+isometry の供給, (c) reducible μ_j の whole-lattice 処理, (d) aggregate→pinning 接続。
+**= 深い §7 assembly の本丸; machinery は出揃い (ofProjection/decompositionPair/retarget/R-producer),
+per-constituent 組立 + 接続が残る。要集中。次=per-constituent decompositionPair の inputs 供給。**
+
+## 2026-06-14 (session 40 cont.³², /loop): ✅ pinning (item d 算術核) landed + 🔬 item (a) 精査結果 = (5.4) は χ 既約性不要
+
+### ✅ landed (7409f2e9, axiom-clean 標準3, leaf build 3625):
+**`eq_of_sum_mul_eq_sum_sq`** (S08_CaseBCoherence2, aggregate 直後) = (6.8.2.3) pinning の算術核:
+`(∀i∈s, 0≤aᵢ) ∧ (∀i∈s, bᵢ≤aᵢ) ∧ ∑aᵢbᵢ=∑aᵢ² ⟹ ∀i∈s, 0<aᵢ→bᵢ=aᵢ`。証明 = slackness
+`∑aᵢ(aᵢ−bᵢ)=0` (各項≥0) → `Finset.sum_eq_zero_iff_of_nonneg` で per-term `aᵢ(aᵢ−bᵢ)=0`
+→ `mul_eq_zero`+`aᵢ>0` で `bᵢ=aᵢ`。**純粋ℤ算術で R(χ) machinery から完全 decoupled** ⟹ steps 5-8
+の中で唯一独立に landable な load-bearing brick を先取り (item d / step 7 算術部)。caller は
+ℂ→ℤ 抽出 (`inner_mem_ZIrr_int`) 後にこれを適用する。
+
+### 🔬 item (a) 精査結果 (原文 04.8 L208-224 + §7 machinery 精読): **(5.4) は χ 既約性を要求しない**
+- Peterfalvi (6.8.2.3) は χᵢ=Ind_H θᵢ の**既約性を明示しない** (case-A (6.8.1) L76 は "χ∈Irr L" 明示だが
+  case-B (6.8.2) は X が reducible μ_j を含むので χᵢ も reducible でありうる)。不等式
+  `bᵢ²≤‖χᵢ‖²+aᵢ²−‖Xᵢ‖²≤aᵢ²` は (5.4.a) `‖Xᵢ‖²≥‖χᵢ‖²` だけで動き、‖χᵢ‖²=1 (既約) は**不要**。
+- §7 `CharacterPsiDecomposition`/(5.4.a)`inner_self_chi_re_le_inner_self_X`/(5.4.b)
+  `norm_eq_and_X_eq_sum_of_norm_Y_ge` は**抽象 `OrthonormalCharacterImageFamily τ χ` 上で動く**
+  (keystone `inner_self_chi_eq_sum_coeff` は image family の `image_eq`+τ₁ のみ使用、既約性 unused)。
+- ⟹ **唯一既約性が入るのは producer `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472) の
+  `χ:IrreducibleCharacter` 型付け** (conjPairFamily+`(fam i).mem_ZIrr` 経由)。だが `mem_ZIrr` は
+  **任意の指標で成立** (character ∈ ℤ≥0·Irr ⊂ ZIrr) ゆえ、構成 (Dade isometry on supported diff
+  `χ̄ᵢ−χᵢ`) は reducible χᵢ でも通る。obstruction は型 (conjPairFamily/keystone が IrreducibleCharacter
+  入力) のみ。diff-supportedness (`χ̄ᵢ−χᵢ` が 1 で消え H^# 上 supported) は χᵢ=Ind_H θᵢ なら無条件成立。
+
+### ▶ R(χ) 統合 残ステップ (依存順、cont.³¹ items を精査後に再構成):
+1. **R(χᵢ) producer の決着 (item a)**: 二択 — (a1) case-B で χᵢ=Ind_H θᵢ が既約と証明 (Clifford
+   I_L(θᵢ)=H; reducible μ_j との整合要確認) / (a2) **ZIrr-character 版 R-producer を新設**
+   (`dadeOrthonormalCharacterImageFamilyOfDiff` の χ を IrreducibleCharacter→「χ∈ZIrr かつ character」
+   へ一般化; conjPairFamily を char-pair 版に, keystone は mem_ZIrr で OK)。**(a2) が筋が良い** (既約性を
+   証明する迂回が不要; 構成は同一)。← **次の本丸 brick**。
+2. **τ₁ 供給 (item b)** = Y-coherence isometry。
+3. per-constituent `CharacterPsiDecomposition` (R(χᵢ)+τ₁) → (5.4.a) `bᵢ≤aᵢ`。
+4. **pinning ✅ (本 cont.³²)** ∑aᵢbᵢ=∑aᵢ²=|H:Z| ⟹ bᵢ=aᵢ。
+5. (5.4.b) `αᵢ^τ=Xᵢ−aᵢY` → per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly。
+**正本=本 cont.³²。pinning 算術核 landed; item (a) は (a2) ZIrr-char R-producer 一般化が次の本丸 brick
+(既約性証明を回避でき構成同一)。要集中。**
+
+## 2026-06-14 (session 40 cont.³³, /loop): 🚨 cont.³² 訂正 — R(χ) は §5 (5.2.d) で **χ 既約⟺2-element / χ=μ_j⟺(4.9)族** の 2 ケース; (a2) 一般化は誤り
+
+cont.³² の「(a2) ZIrr-char 一般化」は **原文 §5 精読で誤りと判明**。R(χ) は ‖(χ−χ̄)^τ‖²=|R(χ)| ゆえ
+χ の既約性で本質的に形が変わる (任意 ZIrr-char へ一様一般化は不可)。原文 (5.2.d)/(5.3) の正確な構造:
+
+### 🔑 原文 §5 (04.7) の決定的構造:
+- **(5.2.d)** = R(χ) は仮説 (χ∈S に対し (χ−χ̄)^τ=∑_{α∈R(χ)}α, R(χ) orthonormal ⊂ ℤ[Irr G])。
+  ‖(χ−χ̄)^τ‖²=‖χ−χ̄‖²=2‖χ‖² ゆえ |R(χ)|=2‖χ‖²。
+- **(5.3.a)**: S⊆Irr L ⟹ Hyp (5.2) 成立 (各 χ 既約 ⟹ ‖χ‖²=1 ⟹ |R(χ)|=2)。
+- **(5.3.b)** [case-B の鍵]: Hyp (4.6) 下、S⊆{Ind_K θ : H⊄Ker θ} ⟹ Hyp (5.2) 成立。R(χ) は
+  **χ 既約なら 2-element (as in a)、χ reducible なら χ=μ_j (0<j<w₂) で R(μ_j)=
+  {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ | 0≤i<w₁}** (μ̄_j=μ_k, **Theorem (4.9)** より)。
+- ⟹ **case-B の S は既約 χ と reducible μ_j 両方を含む** (X⊂Irr L は **case-A のみ**; cont.²⁴/前ノートの
+  「X が reducible μ_j を含む」は case-B では**正しい**, 私の cont.³² の「X⊂Irr L」断定が誤りだった)。
+- `isIrreducibleCharacter_of_mem_Xset_caseA` (S08CCP2:1860) は FPF (`W₁ FPF on Z`) を要するが
+  **case-B は W₂⊆Z(L) (`certainType_W2_le_center`) ゆえ W₁ は W₂ を中心化 (FPF 不成立)** ⟹ case-B X に
+  は適用不可 (case-A 専用)。∴ case-B X-member は既約とは限らない (μ_j を含む)。
+
+### ✅ 既存資産 (survey 済):
+- **抽象 R(χ)** = `OrthonormalCharacterImageFamily τ χ` (任意 χ:ClassFunction; S07:766)。
+- **既約 χ 用 producer** = `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472) +
+  per-step `decompositionDaFromDadeOfDiff` (S07:5542, `CharacterPsiDecomposition τ χ (a•chi1)` を直接生成)。
+- **reducible μ_j coherence** = `certainType_isCoherent` (S06_CertainTypeCoherence:505, (4.9)(b) を
+  `IsCoherent τ certainTypeSet A` として完成) → `certainTypeSet_isCoherent_tau` (S08CB2:719, hyp.tau へ転送)。
+- **R(μ_j) image_eq** = **`certainType_diff_dade_sum_eq`** (S06CTI:936, landed): (μ_j−μ_k)^τ=δ_j∑_i(ω_ij^σ−ω_ik^σ)。
+- μ̄_j=μ_{j'}: `certainType_columnSum_conj` (S06CTC); ω^σ conj: `certainTypeOmegaSigma_conj` (S06CTConj:64)。
+- **🛑 未実装 = reducible R(μ_j) を `OrthonormalCharacterImageFamily τ μ_j` として package** (item c)。
+
+### ▶ 次の具体 brick (確定, cont.³⁴ で BUILD): **reducible R(μ_j) producer**
+`OrthonormalCharacterImageFamily (certainType τ) μ_j` を (4.9) データから構成:
+- imageSet = {δ_j•ω_{ij}^σ, −δ_j•ω_{ik}^σ | 0≤i<w₁} (Finset, k: μ̄_j=μ_k)。
+- mem_ZIrr: 各 ±σ-image ∈ ZIrr (`certainTypeOmegaSigma_mem_ZIrr` S06CTC:146)。
+- orthonormal: σ-image Gram (`columnFamily_mu_sum_inner` 系) + δ_j²=1。
+- image_eq: (μ_j−μ_j.conj)^τ=∑α ⟸ `certainType_diff_dade_sum_eq` + `certainType_columnSum_conj`。
+**⚠ アーキ判断 (cont.³⁴ 冒頭で決定)**: (6.8.2.3) per-χ (χ−aη₁)^τ=X₁−aY を、χ 既約は Dade-R(χ)、
+χ=μ_j は R(μ_j) or **`certainType_isCoherent` 直結**のどちらで処理するか。後者なら R(μ_j) package 不要かも
+(certainType coherence が既に μ_j 側を担う)。**この判断を先にしてから R(μ_j) を build する/しないを決める。**
+
+### ⚠ R(μ_j) package を build する場合の seam (cont.³³ で精査、要対処):
+- `certainType_diff_dade_sum_eq` の LHS は **`h.tau.toDadeMap (∑ certainTypeDiffSupported h … i)`**
+  (IntegralCharacterMap でなく toDadeMap; 引数も column-difference family `certainTypeDiffSupported`)。
+  `OrthonormalCharacterImageFamily.image_eq` の `τ (μ_j − μ_j.conj)` 形へ橋渡しが要 (∑certainTypeDiffSupported
+  = μ_j − μ_k? + toDadeMap↔IntegralCharacterMap 接続)。
+- RHS = `(columnFamily χ₂).sign • ∑_i (ω_{χ₂,i}^σ − ω_{χ₂',i}^σ)` (sign=δ_j, χ₂'=共役列 k)。
+- μ_j.conj=μ_{χ₂⁻¹}: `certainType_columnSum_conj`; ω^σ conj=`certainTypeOmegaSigma_conj_eq` (χ₂⁻¹,rowInv i)。
+- orthonormal: `certainTypeOmegaSigma_inner` (⟨ω_{χ₂,i}^σ,ω_{χ₂',i'}^σ⟩=[χ₂=χ₂'∧i=i'])。
+**⟹ seam が複数。`certainType_isCoherent` 直結の方が seam 少ない可能性 → cont.³⁴ で両者比較してから決定。**
+
+### 📝 honest 進捗評価 (2 ターン RECON):
+cont.³² (pinning landed) 後、本 cont.³³ は **コード未 land の RECON ターン**。だが §5 原文精読で
+cont.³² の (a2) 誤推奨を訂正し、R(χ) 統合の正確な map (既約/μ_j 2 ケース + 既存資産 + 未実装 = R(μ_j)
+package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ → BUILD (RECON ループを断つ)。**
+**正本=本 cont.³³。(a2) は廃棄。次=アーキ判断 (R(μ_j) package vs certainType_isCoherent 直結) → build。**
+
+## 2026-06-14 (session 40 cont.³⁴, /loop): ✅ reducible R(μ_j) の orthonormal core landed (BUILD)
+
+### アーキ判断 (確定): **R(μ_j) package を build する**
+(6.8.2.3) per-χ `(χ−aη₁)^τ=X₁−aY` は X₁⊥Y を要し、`certainType_isCoherent` (μ_j 内部 coherence、Y 非言及)
+単独では出ない。τ₂ 直接 assembly は per-constituent R(χᵢ) 分解 (irreducible: Dade R / reducible: R(μ_j))
+を要し、R(μ_j) は `OrthonormalCharacterImageFamily` として必要。⟹ build。
+
+### ✅ landed (f5c38fe3, axiom-clean 標準3, full build 3813/8.4s):
+**`certainTypeRImage` + `certainTypeRImage_inner`** (S06_CertainTypeCoherence 末尾):
+- `certainTypeRImage h χ₂ χ₂' : Bool × Fin w₁ → CF G` = R(μ_j) member family
+  (`(false,i)↦δ_j ω_{ij}^σ`, `(true,i)↦−δ_j ω_{ik}^σ`; match-def)。
+- `certainTypeRImage_inner` (χ₂≠χ₂'): `⟨R p, R q⟩ = [p=q]` (orthonormality)。証明 = `certainTypeOmegaSigma_inner`
+  (grid 直交) + sign=±1 (`sign_eq` ⟹ δ·δ̄=1, δ²=1) + 4-case (対角 ←mul_assoc+hδsq, 非対角 χ₂≠χ₂'⟹0)。
+- **R(μ_j) の orthonormal core (全 seam から decoupled な reusable piece)**。gotchas: `inner_smul_right`
+  は `RepresentationTheory.` 修飾必須 (mathlib `_root_.inner_smul_right` と曖昧); `↓reduceIte` で
+  `if False` を RHS 簡約; match-def で `cases bp` の ite 簡約が clean。
+
+### ▶ 残 R(μ_j) producer (`OrthonormalCharacterImageFamily (dadeICM h.dade0 h.tau) μ_j`):
+1. **imageSet** = `Finset.univ.image (certainTypeRImage h χ₂ χ₂')` (Bool×Fin w₁ 上)。injective は
+   orthonormality の系 (f p=f q ⟹ ⟨f p,f q⟩=1≠0 ⟹ p=q)。`orthonormal` field = `certainTypeRImage_inner`
+   + Finset.image membership (α=β ↔ index 一致)。`mem_ZIrr` = `certainTypeOmegaSigma_mem_ZIrr` + neg。
+2. **image_eq** (seam): `dadeICM h.dade0 h.tau (μ_j − μ_j.conj) = ∑_{α∈imageSet} α`。bridge =
+   (a) μ_j−μ_j.conj supported ⟹ dadeICM=toDadeMap (`dadeIntegralCharacterMap_apply_of_support`),
+   (b) `certainType_diff_dade_sum_eq` (toDadeMap (∑certainTypeDiffSupported)=sign•∑(ω−ω')),
+   (c) ∑certainTypeDiffSupported = μ_j−μ_k (Finset, columnSum=∑_i μ_{ij}),
+   (d) μ_k=μ_j.conj (`certainType_columnSum_conj`), (e) sign•∑(ω−ω')=∑_{α}α (imageSet 展開)。
+3. ⟹ R(μ_j) producer 完成 → per-constituent decomposition (irreducible は `decompositionDaFromDadeOfDiff`
+   既存; reducible は R(μ_j) + `ofProjection`) → (5.4.a)+pinning[済]+(5.4.b) → τ₂。
+**正本=本 cont.³⁴。orthonormal core landed (BUILD でループ脱出)。次=imageSet packaging (1.) → image_eq bridge (2.)。**
+
+## 2026-06-14 (session 40 cont.³⁵, /loop 再開): ✅ R(μ_j) producer の infra + image_eq 数学内容 全 landed
+
+### ✅ landed (a7634003 + e75ded15, axiom-clean 標準3, leaf 3601):
+- **`certainTypeRImage_injective`** (a7634003): 署名族は単射 (orthonormality の系)。imageSet=Finset.image
+  の orthonormal field + sum_image に必要。
+- **`certainTypeRImage_sum`** (a7634003): `∑_p R(μ_j) p = δ_j ∑_i(ω_{ij}^σ−ω_{ik}^σ)`
+  (= certainType_diff_dade_sum_eq の RHS)。Fintype.sum_prod_type+sum_bool+smul_sum+abel。
+- **`dadeICM_columnDiff_eq_sum`** (e75ded15, image_eq 数学内容): `dadeICM(μ_j−μ_k)=∑_p R(μ_j) p`。
+  🔑 **既存 `certainTypeExtension_columnDiff_eq_dade` (S06:335) が dade-seam (dadeICM↔toDadeMap) を
+  既に解決済み**だったのを利用 (dadeIntegralCharacterMap_apply_of_support+IsDadeMap.unique+
+  certainType_diff_dade_sum_eq)。+ certainTypeExtension_columnSum + certainTypeRImage_sum +
+  ℤ/ℂ-smul 橋渡し `Int.cast_smul_eq_zsmul`。**⟹ image_eq の hard seam は全消化。**
+
+### ▶ 残 = R(μ_j) producer struct (`OrthonormalCharacterImageFamily (dadeICM h.dade0 h.tau) (columnSum χ₂)`):
+パラメータ χ₂, χ₂' (+ χ₂≠1, χ₂'≠1, hdeg, **conj 同定 `(columnSum χ₂).conj = columnSum χ₂'`**)。
+- `imageSet := Finset.univ.image (certainTypeRImage h χ₂ χ₂')`。
+- `mem_ZIrr`: α=±δ•ω ∈ ZIrr (`Int.cast_smul_eq_zsmul`+`Submodule.zsmul_mem`+`certainTypeOmegaSigma_mem_ZIrr`)。
+- `orthonormal`: `certainTypeRImage_inner` + `certainTypeRImage_injective` (Finset.mem_image 抽出 → α=β↔p=q)。
+- `image_eq`: `rw[conj同定]; rw[Finset.sum_image injective]; exact dadeICM_columnDiff_eq_sum`。
+- **conj 同定** = `(columnSum χ₂).conj = columnSum χ₂'`: `certainType_columnSum_conj` (χ₂'=χ₂⁻¹) +
+  `ClassFunction.conj` vs `mapRingEquiv conjAe` の一致確認 (要精査; これが最後の seam)。
+→ producer 完成後: per-constituent (irreducible=`decompositionDaFromDadeOfDiff` / reducible=R(μ_j)+`ofProjection`)
+→ (5.4.a)+pinning[済]+(5.4.b) → τ₂ assembly。
+**正本=本 cont.³⁵。image_eq 数学内容 完成。次=producer struct 4-field 組立 (conj 同定が最後の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁶, /loop): ✅✅✅ reducible R(μ_j) producer COMPLETE (item c 解決)
+
+### ✅ landed (72798461, axiom-clean 標準3, leaf 3601):
+- **`columnSum_conj_eq`**: `(μ_j)‾ = μ_{j⁻¹}` (`ClassFunction.conj` 形の (4.9)(a))。
+  🔑 **star = conjAe は defeq** (`rfl` で閉じる; certainType_columnSum_conj の mapRingEquiv 形と接続)。
+- **`certainTypeR`** = **reducible R(μ_j) `OrthonormalCharacterImageFamily`** 完成 (全 4-field):
+  imageSet=Finset.image certainTypeRImage / mem_ZIrr (Int.cast_smul_eq_zsmul+Submodule.smul_mem+neg_mem) /
+  orthonormal (certainTypeRImage_inner+_injective, by_cases on indices で if-instance 不一致回避) /
+  image_eq (columnSum_conj_eq+Finset.sum_image+dadeICM_columnDiff_eq_sum)。
+  パラメータ = χ₂≠1 + hdeg (`∑μ_{χ₂,i}(1)=∑μ_{χ₂⁻¹,i}(1)`)。
+- **gotchas**: `open scoped Classical in` は **docstring の前**に置く (DecidableEq (ClassFunction G ℂ) を
+  Finset.image に供給; docstring と def の間に置くと "unexpected token open")。orthonormal の if-instance
+  不一致 (Classical vs Prod.decEq) は `.eq_iff` rw でなく `by_cases hpq` で回避。
+
+### 🎉 マイルストン: R(χ) 統合の両 producer 完備:
+- **既約 χ ∈ X**: `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472, 既存) + per-step
+  `decompositionDaFromDadeOfDiff` (S07:5542)。
+- **reducible μ_j ∈ X**: `certainTypeR` (本日完成) + `ofProjection`。
+- **(5.4.a)** `inner_self_chi_re_le_inner_self_X` (済) / **pinning** `eq_of_sum_mul_eq_sum_sq` (cont.³²) /
+  **(5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge` (済)。
+
+### ▶ 残 R(χ) 統合 = S08 case-B 側の per-constituent assembly (S06→S08 接続):
+1. per-constituent χᵢ (Ind_H θᵢ, θᵢ=Ind_Z^H φ 構成子) を irreducible/μ_j 判定 → R(χᵢ) 供給
+   (既約=dade producer / reducible=certainTypeR) → CharacterPsiDecomposition (decompositionDaFromDadeOfDiff
+   or ofProjection)。
+2. αᵢ^τ=Xᵢ−bᵢY+Zᵢ + (5.4.a) bᵢ≤aᵢ → pinning (∑aᵢbᵢ=∑aᵢ²=|H:Z|, eq_of_sum_mul_eq_sum_sq) → bᵢ=aᵢ。
+3. (5.4.b) αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY` (6.8.2.3 本体) → τ₂ direct assembly (S08)。
+**正本=本 cont.³⁶。R(μ_j) producer 完成 (重要マイルストン)。次=S08 case-B per-constituent assembly
+(S06 R-producer 群を (6.8.2.3) で組む; τ vs hyp.tau の整合 + Y-coherence τ₁ 供給が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁷, /loop): ✅ τ-seam の核心解決 — generic inner-preservation landed
+
+### 精査 (τ-seam の正体): per-constituent CharacterPsiDecomposition (`ofProjection`) は
+{χ−χ̄, χ−aη₁} 上の inner-preservation を要するが、η₁∉certainTypeSet ゆえ `certainTypeExtension_inner_eq`
+(certainTypeSet 内部) では不足。**汎用 `dadeIntegralCharacterMap_inner_eq_on_supported_span` は
+`hconj` を要求**し、certain-type τ=`dadeICM h.dade0 h.tau` の `h.tau` は **generic FullDadeIsometryData
+(hconj 無し, Hypothesis46 の field)** ゆえ直接適用不可。← これが τ-seam の核心。
+
+### ✅ landed (5fee74e5, axiom-clean 標準3, **full build 3813/108s** ← S07 touch で全 Pf 鎖再 elab):
+**`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data`** (S07, 既存 lemma 直後):
+任意 `dade : FullDadeIsometryData hyp` で inner-preservation 成立 (hconj 不要)。証明 =
+`apply_of_support` (lift=hyp.dadeMap) + `IsDadeMap.unique hyp.isDadeMap_dadeMap dade.toDadeIsometryData.isDadeMap`
+(hyp.dadeMap=dade.toDadeMap) + `FullDadeIsometryData.inner_eq` (dade 自身の isometry, S04:3821 hconj 不要)。
+**⟹ certain-type τ で ofProjection が使える。** ⚠ **S07 (upstream) touch は ~108s**; 以後 S06/S08 は ~8s。
+
+### ▶ 残 per-constituent assembly (S06/S08, この inner-preservation を使う):
+1. **μ_j 用 CharacterPsiDecomposition** = `certainTypeR` (R(μ_j)) + `ofProjection` (τ=dadeICM h.dade0 h.tau,
+   inner-preservation=本 cont.³⁷ generic 版, htau1_mema=τ(μ_j−aη₁)∈ZIrr, orthogonalities
+   ⟨μ_j,η₁⟩=0 [X⊥Y] / ⟨μ_k,η₁⟩=0 / ⟨μ_j,μ_k⟩=0 [columnFamily_mu_sum_inner])。
+   irreducible χ 用は `decompositionDaFromDadeOfDiff` 既存。
+2. αᵢ^τ=Xᵢ−bᵢY+Zᵢ + (5.4.a) bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq) → bᵢ=aᵢ → (5.4.b)。
+3. per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly (S08, hyp.tau↔certain-type τ は supported 上 map-agreement)。
+**正本=本 cont.³⁷。τ-seam 核心解決。次=μ_j CharacterPsiDecomposition (ofProjection 組立、orthogonality
+inputs + ZIrr membership 供給; S08 で η₁ context)。**
+
+## 2026-06-14 (session 40 cont.³⁸, /loop): ✅ μ_j CharacterPsiDecomposition landed → R(χ) 統合の building blocks 全完備
+
+### ✅ landed (0987d047, axiom-clean 標準3, leaf 3601, **一発 build**):
+**`certainTypeDecompositionDa`** (S06_CertainTypeCoherence): reducible μ_j 用 per-constituent
+`CharacterPsiDecomposition τ (columnSum χ₂) (a•η₁)` (decompositionDaFromDadeOfDiff の reducible 版)。
+`certainTypeR` + `ofProjection` + 前 cont.³⁷ の generic inner-preservation。⟨μ_j,μ̄_j⟩=0 は
+columnSum_conj_eq+columnFamily_mu_sum_inner で内部導出; Y-anchor inputs (μ_j−a•η₁ supported/∈ZIrr,
+μ_j,μ̄_j⊥a•η₁) は parameter (S08 assembly site で供給)。
+
+### 🎉🎉 マイルストン: R(χ) 統合の building blocks 全完備:
+| piece | status |
+|---|---|
+| 既約 χ R(χ) + Da | ✅ dadeOrthonormalCharacterImageFamilyOfDiff + decompositionDaFromDadeOfDiff (既存) |
+| reducible μ_j R(μ_j) + Da | ✅ certainTypeR (cont.³⁶) + certainTypeDecompositionDa (本 cont.³⁸) |
+| τ-seam (generic inner-preservation) | ✅ ..._of_data (cont.³⁷) |
+| (5.4.a) ‖X‖²≥‖χ‖² | ✅ inner_self_chi_re_le_inner_self_X (既存) |
+| pinning ∑aᵢbᵢ=∑aᵢ²⟹bᵢ=aᵢ | ✅ eq_of_sum_mul_eq_sum_sq (cont.³²) |
+| (5.4.b) ‖Y‖²≥‖ψ‖²⟹X=∑E | ✅ norm_eq_and_X_eq_sum_of_norm_Y_ge (既存) |
+| αᵢ aggregate ∑aᵢαᵢ=Ind−\|H:Z\|η₁ | ✅ sum_smul_constituent_diff_eq (cont.³¹) |
+
+### ▶ 残 = (6.8.2.3) per-χ assembly (S08, building blocks の組立):
+⚠ retarget engine (`retarget_isCoherent_of_decomposition*`) は **`⟨χ,χ⟩=1` (既約) 要求** ⟹ reducible μ_j
+不適。reducible per-χ は **手動 (5.4.a)+pinning+(5.4.b)** で:
+1. per-constituent χᵢ で Da (既約/reducible 振り分け) → αᵢ^τ=Xᵢ−Yᵢ (Da.X/Da.Y) → Yᵢ を Y 方向に分解
+   (bᵢ=⟨Yᵢ的, Y⟩, Zᵢ⊥Y) → (5.4.a) で bᵢ²≤aᵢ² ⟹ bᵢ≤aᵢ。
+2. pinning (∑aᵢbᵢ=|H:Z|=∑aᵢ², eq_of_sum_mul_eq_sum_sq) ⟹ bᵢ=aᵢ。
+3. (5.4.b) ⟹ αᵢ^τ=Xᵢ−aᵢY → χ=χ₁ で per-χ `(χ−aη₁)^τ=X₁−aY`。
+4. τ₂ direct assembly (S08; hyp.tau↔certain-type τ は supported map-agreement)。
+**hard seam 残**: Yᵢ の Y 方向分解 (bᵢ 抽出) + (6.8.2.2) の Y 同定 + τ₂ 構成。intricate な S08 統合。
+**正本=本 cont.³⁸。building blocks 全完備 (大マイルストン)。次=(6.8.2.3) per-χ assembly (5.4.a/b+pinning
+を Da から組む; Yᵢ の Y-成分 bᵢ 抽出が次の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁹, /loop すぐ再開): ✅ per-constituent bound の核心 (CS-via-Pythagoras) landed
+
+### 精査: per-χ assembly の bᵢ bound は CS が要だが ClassFunction.inner に CS/正定値は未整備 →
+正定値 `inner_self_re_nonneg` (ZIrrFourier:177) は**有**。⟹ bᵢ²≤‖Da.Y‖² を **explicit Pythagoras**
+(Da.Y=bᵢ•Y+W, Y⊥W) で証明可 (一般 CS 不要)。
+
+### ✅ landed (52257101, axiom-clean 標準3, leaf 3625):
+**`inner_Y_coeff_sq_le`** (S08_CaseBCoherence2): `b=⟨D.Y,Y⟩` (整数, norm-1 Y) ⟹ `(b:ℝ)²≤‖D.Y‖².re`。
+Pythagoras: D.Y=b•Y+W, ⟨Y,W⟩=⟨W,Y⟩=0 (b 実数 ∵ inner_conj_symm+star_intCast), ‖D.Y‖²=b²+‖W‖²≥b²
+(inner_self_re_nonneg)。gotcha: **`inner_conj_symm φ ψ` の subject は第2引数** (`inner_conj_symm D.Y Y :
+Y.inner D.Y = star (D.Y.inner Y)`)。`inner_smul_right` は `RepresentationTheory.` 修飾要。
+
+### ▶ 残 per-constituent bound + per-χ assembly:
+1. **bᵢ≤aᵢ** (follow-up, 易): inner_Y_coeff_sq_le + (5.6.2)`inner_self_Y_re_le_inner_self_psi`
+   (‖Da.Y‖²≤‖ψ‖²=a², ψ=a•η₁) ⟹ bᵢ²≤aᵢ² → 整数 bᵢ≤aᵢ (b²≤a² ∧ a≥0 ⟹ b≤a の整数 tail)。
+2. per-χ assembly: 各構成子で Da (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)
+   → αᵢ^τ=Da.X−Da.Y, bᵢ=⟨Da.Y,Y⟩, (1.) で bᵢ≤aᵢ → pinning (eq_of_sum_mul_eq_sum_sq, ∑aᵢbᵢ=|H:Z|=∑aᵢ²)
+   ⟹ bᵢ=aᵢ → (5.4.b)`norm_eq_and_X_eq_sum_of_norm_Y_ge` ⟹ αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY`。
+3. τ₂ direct assembly (S08)。
+**hard seam 残**: bᵢ=⟨Da.Y,Y⟩ と Da.Y の関係 (Da.X⊥Y? Da.Y=αᵢ^τ−Da.X), pinning への ∑ 接続, (5.4.b)
+適用, τ₂。intricate な S08 統合だが building blocks + CS core 揃い。
+**正本=本 cont.³⁹。CS core landed。次=bᵢ≤aᵢ follow-up (整数 tail) → per-χ assembly (pinning 接続)。**
+
+## 2026-06-14 (session 40 cont.⁴⁰, /loop): ✅✅ (6.8.2.2)→(6.8.2.3) **代数 toolkit 完備** (4 commits)
+
+### ✅ landed (S08_CaseBCoherence2, 全 axiom-clean 標準3, leaf 3625):
+| commit | lemma | 内容 |
+|---|---|---|
+| `dffa9e35` | `inner_Y_coeff_le_of_psi_nsmul` | per-step bound **bᵢ≤aᵢ** = CS core `inner_Y_coeff_sq_le` (b²≤‖Da.Y‖²) + (5.6.2)`inner_self_Y_re_le_inner_self_psi` (‖Da.Y‖²≤‖a•η‖²=a²) + 整数 tail (by_contra+nlinarith, ψ=`a•η` nsmul a:ℕ, η norm-1) |
+| `f350e063` | `sum_coeff_eq_of_aggregate` | pinning 入力 **∑aᵢbᵢ=n**: 集約恒等式 `Xagg−n•Y=∑aᵢ•(Xᵢ−Yᵢ)` に ⟨·,Y⟩ (全 X⊥Y, bᵢ=⟨Yᵢ,Y⟩) ⟹ −n=−∑aᵢbᵢ。`inner_sum_left`+`Finset.sum_neg_distrib`+`neg_injective`+exact_mod_cast |
+| `671b4555` | `eq_smul_of_inner_self_eq` | **Yᵢ=aᵢ•Y bridge** (CS-equality⟹parallel): ⟨v,w⟩=a ∧ ‖v‖²=a² ∧ ‖w‖²=1 ⟹ v=a•w (‖v−aw‖²=0 を simp[inner lemmas]+ring → `eq_zero_of_inner_self_re_eq_zero`) |
+| `bc436213` | `tau_sum_smul_image` | 集約 τ-image **τ(∑aᵢαᵢ)=∑aᵢ(Xᵢ−Yᵢ)** (純 ℤ-線形, `IntegralCharacterMap=→ₗ[ℤ]`): map_sum+map_zsmul, ℂ-smul を Int.cast_smul_eq_zsmul で ℤ-action 化 |
+
+### 🎉🎉 マイルストン: (6.8.2.3) **pinning→image の代数 layer 全完備**。連鎖:
+```
+tau_sum_smul_image + sum_smul_constituent_diff_eq(∑aᵢαᵢ=Indφ−n•η₁) + exists_decomposition_caseB(τ(…)=Xagg−n•Y)
+   → hagg : Xagg−n•Y = ∑aᵢ(Xᵢ−Yᵢ)
+sum_coeff_eq_of_aggregate(hagg + ⟨Xᵢ,Y⟩=0 + bᵢ=⟨Yᵢ,Y⟩ + ⟨Xagg,Y⟩=0 + ‖Y‖²=1) → ∑aᵢbᵢ=n
+sum_inner_restrict_sq_eq_index → ∑aᵢ²=n;  inner_Y_coeff_le_of_psi_nsmul → bᵢ≤aᵢ
+eq_of_sum_mul_eq_sum_sq → bᵢ=aᵢ
+(5.4.b)norm_eq_and_X_eq_sum_of_norm_Y_ge(‖Yᵢ‖²=aᵢ²) + eq_smul_of_inner_self_eq → Yᵢ=aᵢ•Y ∧ Xᵢ=∑_E α
+   → per-i αᵢ^τ=Xᵢ−aᵢ•Y → per-χ (χ−a•η₁)^τ=X₁−a•Y
+```
+
+### 🔑 RECON 確定 (本 session の構造把握):
+- **(6.8.2.3) = `hmixed` obligation** (`coherentXunionYset_caseB_of_glued` の field): `⟨ν μ_j, ν η⟩=⟨μ_j,η⟩`
+  (=0 ∵ μ_j⊥η)。per-χ image `(χ−a•η₁)^τ=X₁−a•Y` (X₁⊥Y) が `⟨(μ_j)^{τ₂},Y⟩` 計算の核。
+- **seam 1「⟨Da_i.X,Y⟩=0」は新 hard math 不要** = 既存**抽象** `inner_decomposition_X_extension_member_eq_zero`
+  (S08_CoherenceCorePart1:1546, `{τ:IntegralCharacterMap L G}` 汎用) で discharge 可能。要 input =
+  η₁ の **member 分解 D'** (ψ=0, `D'.tau1 η₁=cY.extension η₁`) + **R(η₁)⊥R(μ_j)** (imageFamily.Orthogonal)。
+- **per-constituent framing が正**: i = `Ind^H_{W₂}φ` の既約構成子 θᵢ (一部 reducible μ_j)。各 χᵢ に Da_i
+  (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)。pinning が i を束ねる。
+- **τ=Da_i.tau1 は certain-type で literally 同一** (htau1_agrees:=rfl) ⟹ `Da_i.tau1_image` がそのまま `τ(αᵢ)=Xᵢ−Yᵢ`。
+
+### ▶ 残 = **concrete S08 instantiation** (代数は完備、残りは case-B データへの wiring):
+1. **構成子 index s + per-i Da family** 構築 (multiplicities aᵢ=⟨φ∘e,Res θᵢ⟩, χᵢ=Ind^L_H θᵢ)。
+2. **η₁ の member 分解 D'** (case-B 版 `memberExtensionDecomposition`; 既存は irreducible-Dade 専用 ⟹
+   Sibley/cY 版が要; R(η₁) は Y-anchor の image family) → seam 1「⟨Da_i.X,Y⟩=0」を抽象 lemma で discharge。
+3. 集約恒等式 hagg 組立 (tau_sum_smul_image+sum_smul_constituent_diff_eq+exists_decomposition_caseB) → pinning。
+4. (5.4.b)+eq_smul_of_inner_self_eq で per-i Yᵢ=aᵢY → per-χ image → `hmixed` → coherentXunionYset_caseB_of_glued。
+**hard 寄り = 2 (member 分解+R-直交) と 4 (hmixed への最終 wiring)。代数 brick は再利用可能な形で landed。**
+**正本=本 cont.⁴⁰。次=concrete instantiation (まず 2 の η₁ member 分解 = seam 1 unblock、または 1 の構成子 index 設定)。**

@@ -45,12 +45,12 @@ variable {G : Type*} [Group G]
 `ℳ(C_G(X)) = {M}`。`IsUniquelyMaximal.of_le_of_lt_top` で `C_G(X)` 自身を uniquely-maximal 化し、
 その unique maximal が `M` と一致することを `eq_of_isCoatom_of_le` で示す。 -/
 private theorem eq_singleton_of_uniquelyMaximal_le [Finite G]
-    {X U M : Subgroup G} (hU : IsUniquelyMaximal U)
-    (hUC : U ≤ Subgroup.centralizer (X : Set G)) (hUM : U ≤ M) (hM : IsCoatom M)
-    (hClt : Subgroup.centralizer (X : Set G) < ⊤) :
-    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
+    {Y U M : Subgroup G} (hU : IsUniquelyMaximal U)
+    (hUC : U ≤ Y) (hUM : U ≤ M) (hM : IsCoatom M)
+    (hClt : Y < ⊤) :
+    maximalSubgroupsContaining Y = {M} := by
   classical
-  have hCU : IsUniquelyMaximal (Subgroup.centralizer (X : Set G)) :=
+  have hCU : IsUniquelyMaximal Y :=
     hU.of_le_of_lt_top hUC hClt
   obtain ⟨hM₀co, hCM₀⟩ := hCU.uniqueMaximalSubgroup_spec
   have hUM₀ : U ≤ hCU.uniqueMaximalSubgroup := hUC.trans hCM₀
@@ -107,13 +107,19 @@ private theorem pRank_eq_zero_of_isPGroup_of_ne_prime {H : Type*} [Group H] [Fin
       (hq.dvd_of_dvd_pow (ha ▸ hb ▸ dvd_pow_self q hbpos.ne')))
   simp [hcard_one]
 
-/-- **BG Corollary 12.14** (mmd L3399): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`, `p ∈ β(M)` または
-`X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。 -/
-theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
+/-- **BG Corollary 12.14, faithful form** (mmd L3399–3401): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`,
+`p ∈ β(M)` または `X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}` かつ、`M_σ` の *ある* Sylow `p`-部分群
+`S₀ ⊇ X` について `ℳ(S₀) = {M}`。原典の `ℳ(C_G(X)) = ℳ(P) = {M}` の両 conjunct を供給する
+(統一エンジンの witness `U` が全ケースで `U ≤ S₀` を満たすことを利用; issue 8002)。 -/
+theorem maximalContaining_centralizer_and_someSylow_eq_singleton [Finite G]
+    (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
     {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXM : X ≤ M)
     (hcase : p ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)) :
-    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
+    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+      ∃ S₀ : Subgroup G, X ≤ S₀ ∧ S₀ ≤ S10.Msigma M ∧ IsPGroup p ↥S₀ ∧
+        (∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup p ↥T → S₀ ≤ T → S₀ = T) ∧
+        maximalSubgroupsContaining S₀ = {M} := by
   classical
   -- `|X| = p`, `X ≠ ⊥`, `X` is a `p`-group.
   have hXEA : X.IsElementaryAbelian p := (mem_elemAbelianOfRank.mp hX).1
@@ -146,11 +152,30 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
       SetLike.coe_subset_coe.mp (Subgroup.centralizer_eq_top_iff_subset.mp htop)
     rw [hcenter_bot, le_bot_iff] at hXcenter
     exact hXne hXcenter
-  -- **Reduce to: a uniquely-maximal `U ≤ C_G(X)` with `U ≤ M`.**
+  -- `S ≤ M_σ` (hoisted out of the rank case split: needed for the exposed Sylow `S₀`).
+  have hp_prime : p.Prime := Fact.out
+  have hSpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) (S : Subgroup G) := by
+    intro s hs
+    obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
+    have hsd := (Nat.mem_primeFactors.mp hs).2.1
+    rw [hn] at hsd
+    rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) hp_prime).mp
+      ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hsd)]
+  have hSMσ : (S : Subgroup G) ≤ S10.Msigma M :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hSM hSpi
+  -- **Reduce to: a uniquely-maximal `U ≤ C_G(X)` with `U ≤ S` and `U ≤ M`.** The same witness
+  -- supplies both `ℳ(C_G(X)) = {M}` (via `U ≤ C_G(X)`) and `ℳ(S) = {M}` (via `U ≤ S`).
   suffices hU : ∃ U : Subgroup G, IsUniquelyMaximal U ∧
-      U ≤ Subgroup.centralizer (X : Set G) ∧ U ≤ M by
-    obtain ⟨U, hUmax, hUC, hUM⟩ := hU
-    exact eq_singleton_of_uniquelyMaximal_le hUmax hUC hUM (mem_maximalSubgroups.mp hM) hClt
+      U ≤ Subgroup.centralizer (X : Set G) ∧ U ≤ (S : Subgroup G) ∧ U ≤ M by
+    obtain ⟨U, hUmax, hUC, hUS, hUM⟩ := hU
+    have hcoat : IsCoatom M := mem_maximalSubgroups.mp hM
+    have hS₀lt : (S : Subgroup G) < ⊤ := lt_of_le_of_lt hSM hcoat.lt_top
+    refine ⟨eq_singleton_of_uniquelyMaximal_le hUmax hUC hUM hcoat hClt,
+      (S : Subgroup G), hXS, hSMσ, S.isPGroup', ?_,
+      eq_singleton_of_uniquelyMaximal_le hUmax hUS hUM hcoat hS₀lt⟩
+    -- `S` is a Sylow `p`-subgroup of `G` inside `M_σ`, hence maximal among `p`-subgroups of `M_σ`.
+    intro T _hTMσ hTpg hST
+    exact (S.3 hTpg hST).symm
   -- **Case split** on `r(C_P(X))` where `C_P(X) = C_G(X) ⊓ S`.
   set CPX : Subgroup G := Subgroup.centralizer (X : Set G) ⊓ (S : Subgroup G) with hCPX
   rcases Nat.lt_or_ge (pRank ↥CPX p) 3 with hlt | hge
@@ -196,16 +221,7 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
     -- **Step 3**: the `p ∈ β(M)` disjunct of `hcase` dies, leaving `X ⊆ M_σ'`.
     have hXMσ' : X ≤ derivedInG (S10.Msigma M) := hcase.resolve_left hpβ
     have hpπ : p ∈ (Nat.card ↥M).primeFactors := ((S10.mem_sigma_iff M p).mp hp).1
-    -- `S ≤ M_σ` (`S` is a `σ(M)`-subgroup of `M`).
-    have hSpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) (S : Subgroup G) := by
-      intro s hs
-      obtain ⟨n, hn⟩ := S.isPGroup'.exists_card_eq
-      have hsd := (Nat.mem_primeFactors.mp hs).2.1
-      rw [hn] at hsd
-      rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) hp_prime).mp
-        ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hsd)]
-    have hSMσ : (S : Subgroup G) ≤ S10.Msigma M :=
-      S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM) hSM hSpi
+    -- (`hSMσ : S ≤ M_σ` is hoisted above the rank case split.)
     -- **Step 4**: `X ⊆ S'` (`= P'`). Lemma 10.8(c): `M_σ` has a normal `p`-complement `K`;
     -- `S` is a Sylow `p` of `↥M_σ`. Project `↥M_σ ↠ ↥M_σ ⧸ K`: `commutator ↥M_σ ≤ ⁅S,S⁆ ⊔ K`,
     -- then Dedekind (`K ⊓ S = ⊥`) gives `(commutator ↥M_σ) ⊓ S ≤ ⁅S,S⁆`.
@@ -313,8 +329,8 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
       have hXbot : X = ⊥ :=
         le_bot_iff.mp (hXP'.trans (by rw [derivedInG_eq_commutator, hcommbot]))
       exact hXne hXbot
-    · -- central-product case: witness `P₁`.
-      refine ⟨P₁, ?_, ?_, hP₁S.trans hSM⟩
+    · -- central-product case: witness `P₁` (`P₁ ≤ S`, so it also feeds `ℳ(S) = {M}`).
+      refine ⟨P₁, ?_, ?_, hP₁S, hP₁S.trans hSM⟩
       · -- `IsUniquelyMaximal P₁` (Theorem 12.13: `P₁` is a nonabelian `p`-group).
         have hP₁nab : ¬ IsMulCommutative ↥(P₁ : Subgroup G) := by
           intro hcomm
@@ -387,12 +403,22 @@ theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSim
         rw [Subgroup.mem_centralizer_iff]
         intro x hx
         exact (Subgroup.mem_centralizer_iff.mp (hcent (hXP' hx)) a ha).symm
-  · -- `r(C_P(X)) ≥ 3`: `C_P(X)` itself is uniquely maximal by the Uniqueness Theorem.
-    refine ⟨CPX, ?_, inf_le_left, inf_le_right.trans hSM⟩
+  · -- `r(C_P(X)) ≥ 3`: `C_P(X) = C_G(X) ⊓ S` itself is uniquely maximal by the Uniqueness Theorem
+    -- (`CPX ≤ S` via `inf_le_right`, so it also feeds `ℳ(S) = {M}`).
+    refine ⟨CPX, ?_, inf_le_left, inf_le_right, inf_le_right.trans hSM⟩
     have hrank3 : 3 ≤ rank ↥CPX := le_trans hge (pRank_le_rank p)
     have hrank2 : 2 ≤ rank ↥CPX := by omega
     have hCPXlt : CPX < ⊤ :=
       lt_of_le_of_lt (inf_le_right.trans hSM) (mem_maximalSubgroups.mp hM).lt_top
     exact OddOrder.BG.Ch2.S09.uniquenessTheorem hG hCPXlt hrank2 (Or.inl hrank3)
+
+/-- **BG Corollary 12.14** (mmd L3399): `p ∈ σ(M)`, `X ∈ ℰ_p¹(M)`, `p ∈ β(M)` または
+`X ⊆ M_σ'` なら `ℳ(C_G(X)) = {M}`。`…and_someSylow…` の第 1 projection。 -/
+theorem maximalContaining_centralizer_eq_singleton [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (hp : p ∈ S10.sigma M)
+    {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXM : X ≤ M)
+    (hcase : p ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)) :
+    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} :=
+  (maximalContaining_centralizer_and_someSylow_eq_singleton hG hM hp hX hXM hcase).1
 
 end OddOrder.BG.Ch3.S12.Cor1214

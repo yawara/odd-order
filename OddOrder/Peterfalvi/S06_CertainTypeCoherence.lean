@@ -515,4 +515,205 @@ noncomputable def certainType_isCoherent (h : Hypothesis46 A L) [NeZero (Nat.car
   extends_on_supported := fun _ hφ => certainTypeExtension_eq_dade_of_mem_zSupportedSpan h hk hφ
   extension_mem_ZIrr := fun _ hφ => certainTypeExtension_mem_ZIrr h k hφ
 
+/-! ### The reducible `R(μ_j)` family (Peterfalvi (5.3.b) / (4.9))
+
+For a **reducible** certain-type character `μ_j` (column `j = χ₂`), Hypothesis (5.2.d) holds with
+the orthonormal set `R(μ_j) = {δ_j ω_{ij}^σ, −δ_j ω_{ik}^σ | 0 ≤ i < w₁}` (Peterfalvi (5.3.b), via
+Theorem (4.9)), where `δ_j = (columnFamily χ₂).sign` and `k`-column `= χ₂'` is the conjugate column
+`μ̄_j = μ_k`.  This is the reducible counterpart of the two-element Dade `R(χ)` used for irreducible
+`χ ∈ 𝒳`; both feed the (6.8.2.3) per-constituent `R(χᵢ)` decomposition. -/
+
+/-- **R(μ_j) member family** (Peterfalvi (5.3.b)).  Indexed by `Bool × Fin w₁`:
+`(false, i) ↦ δ_j ω_{ij}^σ`, `(true, i) ↦ −δ_j ω_{ik}^σ` (sign `δ_j = (columnFamily χ₂).sign`,
+columns `j = χ₂`, `k = χ₂'`).  Its image is the orthonormal set `R(μ_j)` of Hypothesis (5.2.d)
+(orthonormality: `certainTypeRImage_inner`; the `(μ_j − μ̄_j)^τ = ∑ R(μ_j)` image equation is
+`certainType_diff_dade_sum_eq`). -/
+noncomputable def certainTypeRImage (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    Bool × Fin (Nat.card h.W1) → ClassFunction G ℂ
+  | (false, i) => ((h.columnFamily χ₂).sign : ℂ) • certainTypeOmegaSigma h χ₂ i
+  | (true, i) => (-((h.columnFamily χ₂).sign : ℂ)) • certainTypeOmegaSigma h χ₂' i
+
+/-- **Orthonormality of `R(μ_j)`** (Peterfalvi (5.2.d) for the reducible `μ_j`).  The signed
+`σ`-image family `certainTypeRImage` is orthonormal: `⟨R(μ_j) p, R(μ_j) q⟩ = δ_{p,q}`.  The sign
+`δ_j = ±1` (`sign_eq`) gives `δ_j · \overline{δ_j} = 1`, and `certainTypeOmegaSigma_inner` supplies
+the grid orthonormality `⟨ω_{χ₂,i}^σ, ω_{χ₂',i'}^σ⟩ = [χ₂ = χ₂' ∧ i = i']`; the two halves
+(`χ₂ ≠ χ₂'`) are cross-orthogonal. -/
+theorem certainTypeRImage_inner (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂')
+    (p q : Bool × Fin (Nat.card h.W1)) :
+    ClassFunction.inner (certainTypeRImage h χ₂ χ₂' p) (certainTypeRImage h χ₂ χ₂' q)
+      = if p = q then (1 : ℂ) else 0 := by
+  have hδstar : star ((h.columnFamily χ₂).sign : ℂ) = ((h.columnFamily χ₂).sign : ℂ) := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  have hδsq : ((h.columnFamily χ₂).sign : ℂ) * ((h.columnFamily χ₂).sign : ℂ) = 1 := by
+    rcases (h.columnFamily χ₂).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  obtain ⟨bp, ip⟩ := p
+  obtain ⟨bq, iq⟩ := q
+  cases bp <;> cases bq <;>
+    simp only [certainTypeRImage, ClassFunction.inner_smul_left,
+      RepresentationTheory.inner_smul_right, certainTypeOmegaSigma_inner, hδstar, star_neg,
+      mul_neg, neg_mul, neg_neg, Prod.mk.injEq, reduceCtorEq, false_and, true_and, ↓reduceIte]
+  · -- (false,false): δ·(δ·[ip=iq]) = [ip=iq]
+    rw [← mul_assoc, hδsq, one_mul]
+  · -- (false,true): χ₂ ≠ χ₂' ⟹ 0
+    rw [if_neg (fun hcon => hne hcon.1)]; ring
+  · -- (true,false): χ₂' ≠ χ₂ ⟹ 0
+    rw [if_neg (fun hcon => hne hcon.1.symm)]; ring
+  · -- (true,true): δ·(δ·[ip=iq]) = [ip=iq]
+    rw [← mul_assoc, hδsq, one_mul]
+
+/-- `R(μ_j)` is injective on `Bool × Fin w₁` (distinct orthonormal vectors are distinct): a
+corollary of `certainTypeRImage_inner`, since `R p = R q` would force `⟨R p, R q⟩ = 1 ≠ 0`. -/
+theorem certainTypeRImage_injective (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂') :
+    Function.Injective (certainTypeRImage h χ₂ χ₂') := by
+  intro p q hpq
+  by_contra hpqne
+  have h0 := certainTypeRImage_inner h hne p q
+  rw [if_neg hpqne, hpq, certainTypeRImage_inner h hne, if_pos rfl] at h0
+  exact one_ne_zero h0
+
+/-- The sum of the `R(μ_j)` family over `Bool × Fin w₁` is `δ_j ∑_i (ω_{ij}^σ − ω_{ik}^σ)`, the
+right-hand side of the (4.9) summed isometry `certainType_diff_dade_sum_eq`.  This is the image-side
+of the `(μ_j − μ̄_j)^τ = ∑_{α ∈ R(μ_j)} α` equation (the left half being the column difference). -/
+theorem certainTypeRImage_sum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    (χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ∑ p : Bool × Fin (Nat.card h.W1), certainTypeRImage h χ₂ χ₂' p
+      = ((h.columnFamily χ₂).sign : ℂ) •
+          ∑ i, (certainTypeOmegaSigma h χ₂ i - certainTypeOmegaSigma h χ₂' i) := by
+  rw [Fintype.sum_prod_type, Fintype.sum_bool, Finset.smul_sum]
+  simp only [certainTypeRImage, neg_smul, smul_sub]
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by abel)
+
+/-- **The (5.2.d) image equation for `R(μ_j)`** (Peterfalvi (5.3.b) / (4.9)(b)): the Dade image of
+the column difference `μ_j − μ_k` is the sum of the `R(μ_j)` family,
+`(μ_j − μ_k)^τ = ∑_{p} R(μ_j) p`.  Combines the (4.9) summed isometry — packaged as
+`certainTypeExtension_columnDiff_eq_dade` (which discharges the `dadeIntegralCharacterMap` /
+`toDadeMap` seam) and `certainTypeExtension_columnSum` — with `certainTypeRImage_sum`; the sign
+equality `certainType_columnSign_eq` (degrees match) identifies `δ_j = δ_k`. -/
+theorem dadeICM_columnDiff_eq_sum (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)) :
+    S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - columnSum h χ₂')
+      = ∑ p : Bool × Fin (Nat.card h.W1), certainTypeRImage h χ₂ χ₂' p := by
+  rw [← certainTypeExtension_columnDiff_eq_dade h hχ₂ hχ₂' hdeg, certainTypeRImage_sum,
+    map_sub, certainTypeExtension_columnSum, certainTypeExtension_columnSum,
+    ← certainType_columnSign_eq h hdeg, ← smul_sub, ← Finset.sum_sub_distrib]
+  exact (Int.cast_smul_eq_zsmul ℂ _ _).symm
+
+/-- **The conjugate of a column character is the inverse column** (`ClassFunction.conj` form of
+`certainType_columnSum_conj`): `(μ_j)‾ = μ_{j⁻¹}`.  Bridges `ClassFunction.conj` (pointwise `star`)
+to the `mapRingEquiv Complex.conjAe` form proved in (4.9)(a). -/
+theorem columnSum_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    (columnSum h χ₂).conj = columnSum h χ₂⁻¹ := by
+  rw [columnSum_def, columnSum_def, ← certainType_columnSum_conj h χ₂]
+  ext g
+  rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
+  rfl
+
+open scoped Classical in
+/-- **The reducible `R(μ_j)` image family** (Peterfalvi (5.2.d) via (5.3.b) / (4.9)).  For a
+nontrivial column `χ₂ ≠ 1`, the certain-type column character `μ_j = columnSum χ₂` carries the
+orthonormal difference-image family `R(μ_j)` of Hypothesis (5.2.d): the signed `σ`-images
+`certainTypeRImage h χ₂ χ₂⁻¹` (with `μ̄_j = μ_{χ₂⁻¹}`), orthonormal (`certainTypeRImage_inner`,
+`certainTypeRImage_injective`) and satisfying `(μ_j − μ̄_j)^τ = ∑ R(μ_j)`
+(`dadeICM_columnDiff_eq_sum` through `columnSum_conj_eq`).  This is the reducible counterpart of
+`dadeOrthonormalCharacterImageFamilyOfDiff` (irreducible `χ`), feeding the (6.8.2.3) per-constituent
+`R(χᵢ)` decomposition. -/
+noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1)) :
+    S07.OrthonormalCharacterImageFamily (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+      (columnSum h χ₂) where
+  imageSet := Finset.univ.image (certainTypeRImage h χ₂ χ₂⁻¹)
+  mem_ZIrr := by
+    intro α hα
+    rw [Finset.mem_image] at hα
+    obtain ⟨⟨b, i⟩, _, rfl⟩ := hα
+    cases b
+    · simp only [certainTypeRImage]
+      rw [Int.cast_smul_eq_zsmul]
+      exact (ZIrr G).smul_mem _ (certainTypeOmegaSigma_mem_ZIrr h χ₂ i)
+    · simp only [certainTypeRImage]
+      rw [neg_smul, Int.cast_smul_eq_zsmul]
+      exact neg_mem ((ZIrr G).smul_mem _ (certainTypeOmegaSigma_mem_ZIrr h χ₂⁻¹ i))
+  orthonormal := by
+    intro α hα β hβ
+    rw [Finset.mem_image] at hα hβ
+    obtain ⟨p, _, rfl⟩ := hα
+    obtain ⟨q, _, rfl⟩ := hβ
+    rw [certainTypeRImage_inner h (column_inv_ne_self h hχ₂).symm]
+    by_cases hpq : p = q
+    · subst hpq; simp
+    · rw [if_neg hpq, if_neg (fun he =>
+        hpq (certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm he))]
+  image_eq := by
+    rw [columnSum_conj_eq, Finset.sum_image
+      (fun p _ q _ hpq => certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm hpq)]
+    exact dadeICM_columnDiff_eq_sum h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
+
+/-- **Per-constituent `CharacterPsiDecomposition` for a reducible certain-type member `μ_j`**
+(Peterfalvi (6.8.2.3), reducible case).  The analogue of `decompositionDaFromDadeOfDiff`
+(irreducible `χ`) for a reducible column character `μ_j = columnSum χ₂`: it uses the reducible
+`R(μ_j)` family `certainTypeR` and the generic isometry
+`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data` (the certain-type Dade `h.tau` carries
+no `HConjInvariant`).  Given the `Y`-anchor `η₁` with `μ_j − a·η₁` supported on `A₀`,
+`(μ_j − a·η₁)^τ ∈ ℤ[Irr G]`, and the orthogonalities `μ_j, μ̄_j ⊥ a·η₁`, it produces the (5.4)
+decomposition `Da : CharacterPsiDecomposition τ μ_j (a·η₁)` (with `μ̄_j = μ_{χ₂⁻¹}` cross-orthogonal
+to `μ_j` by `columnFamily_mu_sum_inner`). -/
+noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hμη₁supp : (columnSum h χ₂ - a • η₁).support ⊆
+      S04.supportInSubgroup (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
+    (htau1_mema : S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (columnSum h χ₂) (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (columnSum h χ₂).conj (a • η₁ : ClassFunction ↥L ℂ) = 0) :
+    S07.CharacterPsiDecomposition (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+      (columnSum h χ₂) (a • η₁) := by
+  have hSdiff : ∀ s ∈ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - a • η₁} :
+      Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ S04.supportInSubgroup
+        (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [columnSum_conj_eq]
+      exact (columnDiff_support_subset h hχ₂ (inv_ne_one.mpr hχ₂) hdeg).trans
+        (S04.supportInSubgroup_mono Set.subset_union_left)
+    · exact hμη₁supp
+  have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
+    rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
+      if_neg (column_inv_ne_self h hχ₂).symm]
+  exact S07.CharacterPsiDecomposition.ofProjection (certainTypeR h hχ₂ hdeg)
+    (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+    (fun φ ζ hφ hζ =>
+      S07.dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data h.dade0 h.tau hSdiff hφ hζ)
+    rfl htau1_mema hχψ hχbarψ hχχbar
+
 end OddOrder.Peterfalvi.S06

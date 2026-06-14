@@ -62,9 +62,171 @@ variable {G : Type*} [Group G]
 noncomputable abbrev MF (M : Subgroup G) : Subgroup G :=
   maxNilpotentNormalHall M
 
+/-- `M_F ≤ M`: basic containment, directly from the `sSup` construction.  (The full
+BG §15 well-definedness — that the `sSup` again has the maximal nilpotent-normal-Hall
+property, in particular that it is Hall — is deferred; this containment is not.) -/
+theorem maxNilpotentNormalHall_le (M : Subgroup G) : maxNilpotentNormalHall M ≤ M :=
+  sSup_le fun _ hN => hN.1
+
+/-- `M` normalizes `M_F` (so `(M_F).subgroupOf M ⊴ M`): the `sSup` of `M`-normal
+candidates is again `M`-normal.  Like `maxNilpotentNormalHall_le`, this is the
+`§14`-independent part of the §15 well-definedness (the Hall maximality is deferred);
+each candidate `N` is fixed by conjugation by `m ∈ M` because `(N.subgroupOf M).Normal`. -/
+theorem maxNilpotentNormalHall_le_normalizer (M : Subgroup G) :
+    M ≤ Subgroup.normalizer (maxNilpotentNormalHall M) := by
+  intro m hm
+  refine mem_normalizer_of_conj_smul_eq_self ?_
+  unfold maxNilpotentNormalHall
+  rw [Subgroup.pointwise_smul_def, (Subgroup.gc_map_comap _).l_sSup, sSup_eq_iSup]
+  refine iSup_congr fun N => iSup_congr fun hN => ?_
+  rw [← Subgroup.pointwise_smul_def]
+  obtain ⟨hNM, hNnorm, -, -⟩ := hN
+  exact conj_smul_eq_self_of_mem_normalizer
+    (((Subgroup.normal_subgroupOf_iff_le_normalizer hNM).mp hNnorm) hm)
+
+/-- `M_F ⊴ M` in the relative sense `(M_F).subgroupOf M`: the directly usable form of
+`maxNilpotentNormalHall_le_normalizer`, matching the normality clause in the defining
+predicate of `M_F`. -/
+theorem maxNilpotentNormalHall_subgroupOf_normal (M : Subgroup G) :
+    ((maxNilpotentNormalHall M).subgroupOf M).Normal :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer (maxNilpotentNormalHall_le M)).mpr
+    (maxNilpotentNormalHall_le_normalizer M)
+
+/-- `M_F ≤ F(M)`: the maximal nilpotent normal Hall subgroup lies inside the Fitting subgroup
+`F(M)` (`OddOrder.BG.Ch2.S08.fittingInG`, defeq `(Ch01.fitting ↥M).map M.subtype`), because each
+candidate `N` is nilpotent and normal in `M` (so `N.subgroupOf M ≤ fitting ↥M`).  `§14`-independent;
+the structural bridge between `M_F` and `F(M)` used throughout §15/§16. -/
+theorem maxNilpotentNormalHall_le_fittingInG [Finite G] (M : Subgroup G) :
+    maxNilpotentNormalHall M ≤ OddOrder.BG.Ch2.S08.fittingInG M := by
+  refine sSup_le fun N hN => ?_
+  obtain ⟨hNM, hNnorm, hNnil, -⟩ := hN
+  haveI := hNnorm
+  haveI := hNnil
+  calc N = (N.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hNM).symm
+    _ ≤ OddOrder.BG.Ch2.S08.fittingInG M :=
+        Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+
+/-- **`M_F` is nilpotent** — the §15 well-definedness piece that the defining `sSup` is again
+nilpotent.  `M_F ≤ F(M)` (`maxNilpotentNormalHall_le_fittingInG`) and `F(M)` is nilpotent
+(image of the nilpotent `fitting ↥M` under the injective `M.subtype`).  `§14`-independent. -/
+theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
+    Group.IsNilpotent ↥(maxNilpotentNormalHall M) := by
+  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M)) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG M) :=
+    nilpotent_of_mulEquiv
+      (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting (↥M)) M.subtype
+        M.subtype_injective)
+  exact nilpotent_of_mulEquiv
+    (Subgroup.subgroupOfEquivOfLe (maxNilpotentNormalHall_le_fittingInG M))
+
+/-- If `M_σ` is nilpotent, then `M_σ ≤ M_F`: `M_σ` is then a nilpotent normal Hall subgroup of
+`M` (normal `σ`-core, `σ`-Hall by `Msigma_isHall`, nilpotent by hypothesis), hence one of the
+candidates in the `sSup` defining `M_F`.  `§14`-independent.  Combined with the (gated)
+`M_F ≤ M_σ` of Theorem A this gives `M_F = M_σ ⟺ M_σ` nilpotent (recall `M_F` is always
+nilpotent, `maxNilpotentNormalHall_isNilpotent`). -/
+theorem Msigma_le_maxNilpotentNormalHall_of_nilpotent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
+    OddOrder.BG.Ch3.S10.Msigma M ≤ maxNilpotentNormalHall M := by
+  haveI := hnil
+  have hle := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hcard : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) =
+      Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
+  apply le_sSup
+  refine ⟨hle, ?_, ?_, ?_⟩
+  · rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle).symm
+  · obtain ⟨hHcard, hHidx⟩ := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+    refine ⟨fun q hq => by rwa [hcard] at hq, fun q hq hqπ => ?_⟩
+    obtain ⟨hqp, hqd, -⟩ := Nat.mem_primeFactors.mp hq
+    have hdvd : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣
+        (OddOrder.BG.Ch3.S10.Msigma M).index :=
+      Subgroup.relIndex_dvd_index_of_le hle
+    exact hHidx q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqd.trans hdvd, Subgroup.index_ne_zero_of_finite⟩)
+      (hHcard q hqπ)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
+
+/-! ### The Aut-abelian core (`§14`-independent, reusable)
+
+The next two lemmas package the elementary fact behind the "`M_F` not cyclic" half of
+Corollary 15.6: if a normal subgroup `N ⊴ H` is **cyclic**, then `Aut(N)` is abelian, so the
+conjugation map `H → Aut(N)` (kernel `C_H(N)`) sends `H'` to `1`, i.e. `H' ≤ C_H(N)`.
+Specialised to `N = F(M)` and combined with the self-centralizing property of the Fitting
+subgroup (`centralizer_fitting_le_fitting`), `F(M)` cyclic forces `M'' = 1`. -/
+
+/-- The conjugation action commutator of `H` on itself is the ordinary derived subgroup:
+`actionCommutator (MulAut.conj) = commutator H`.  (Both are the closure of the commutator
+elements `g * (a g⁻¹ a⁻¹) = ⁅g, a⁆`.) -/
+private theorem actionCommutator_conj_eq_commutator {H : Type*} [Group H] :
+    OddOrder.Isaacs.Ch04.actionCommutator (MulAut.conj : H →* MulAut H) = commutator H := by
+  rw [commutator_eq_closure]
+  unfold OddOrder.Isaacs.Ch04.actionCommutator
+  congr 1
+  ext x
+  simp only [Set.mem_setOf_eq, commutatorSet_def]
+  constructor
+  · rintro ⟨g, a, rfl⟩
+    exact ⟨g, a, by rw [commutatorElement_def, MulAut.conj_apply]; group⟩
+  · rintro ⟨g₁, g₂, rfl⟩
+    exact ⟨g₁, g₂, by rw [commutatorElement_def, MulAut.conj_apply]; group⟩
+
+open OddOrder.BG.Ch1.OperatorQuotientAction in
+/-- **Aut-abelian core**: if `N ⊴ H` is cyclic, then `H' ≤ C_H(N)`.  Conjugation gives a
+homomorphism `H → Aut(↥N)` with kernel `C_H(N)`; `↥N` cyclic makes `Aut(↥N)` abelian, so the
+derived subgroup `H'` lands in the kernel.  Reuses the BG Thm 4.12 machinery
+(`actionCommutator_le_centralizer_of_isCyclic_isAInvariant`) with `φ = MulAut.conj`. -/
+theorem commutator_le_centralizer_of_normal_isCyclic {H : Type*} [Group H]
+    {N : Subgroup H} [IsCyclic ↥N] (hN : N.Normal) :
+    commutator H ≤ Subgroup.centralizer (N : Set H) := by
+  have hinv : OddOrder.Isaacs.Ch03.IsAInvariant (MulAut.conj : H →* MulAut H) N := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a g hg
+    rw [MulAut.conj_apply]
+    exact hN.conj_mem g hg a
+  have h := actionCommutator_le_centralizer_of_isCyclic_isAInvariant
+    (φ := (MulAut.conj : H →* MulAut H)) (S := N) hN hinv
+  rwa [actionCommutator_conj_eq_commutator] at h
+
+/-- **BG §15, `F(M)` cyclic ⟹ `M'' = 1`** (`§14`-independent).  If the ambient Fitting subgroup
+`F(M)` is cyclic then `M' ≤ C_M(F(M)) ≤ F(M)` (Aut-abelian core + Fitting self-centralizing),
+so `M'` is abelian and `M'' = 1`.  This is the engine of Corollary 15.6's "`M_F` not cyclic"
+clause. -/
+theorem fittingInAmbient_cyclic_imp_derivedDerived_eq_bot [Finite G] {M : Subgroup G}
+    [IsSolvable ↥M] (hcyc : IsCyclic ↥(fittingInAmbient M)) :
+    derivedInG (derivedInG M) = ⊥ := by
+  -- `fitting ↥M` is cyclic (transport of `hcyc` along `fittingInAmbient M ≅ fitting ↥M`)
+  haveI hfitcyc : IsCyclic ↥(OddOrder.Isaacs.Ch01.fitting ↥M) := by
+    have e : ↥(OddOrder.Isaacs.Ch01.fitting ↥M) ≃* ↥(fittingInAmbient M) :=
+      Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M) M.subtype M.subtype_injective
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  -- `commutator ↥M ≤ centralizer (fitting ↥M) ≤ fitting ↥M`
+  have hcomm_le : commutator ↥M ≤ OddOrder.Isaacs.Ch01.fitting ↥M :=
+    (commutator_le_centralizer_of_normal_isCyclic
+      (inferInstance : (OddOrder.Isaacs.Ch01.fitting ↥M).Normal)).trans
+      OddOrder.BG.Ch1.S01.centralizer_fitting_le_fitting
+  -- push to the ambient group: `M' = ⁅M, M⁆ ≤ F(M)`
+  have hderiv_le : derivedInG M ≤ fittingInAmbient M := Subgroup.map_mono hcomm_le
+  -- `F(M)` cyclic ⟹ abelian ⟹ `F(M) ≤ C_G(F(M))`
+  have hself : (fittingInAmbient M : Subgroup G) ≤ Subgroup.centralizer (fittingInAmbient M) := by
+    haveI := hcyc
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have h : (⟨y, hy⟩ : ↥(fittingInAmbient M)) * ⟨x, hx⟩ = ⟨x, hx⟩ * ⟨y, hy⟩ := mul_comm' _ _
+    calc y * x = ↑((⟨y, hy⟩ : ↥(fittingInAmbient M)) * ⟨x, hx⟩) := by rw [Subgroup.coe_mul]
+      _ = ↑((⟨x, hx⟩ : ↥(fittingInAmbient M)) * ⟨y, hy⟩) := by rw [h]
+      _ = x * y := by rw [Subgroup.coe_mul]
+  -- `M'' = ⁅M', M'⁆ ≤ ⁅F(M), F(M)⁆ = 1`
+  rw [show derivedInG (derivedInG M) = ⁅derivedInG M, derivedInG M⁆ from
+        Subgroup.map_subtype_commutator (derivedInG M)]
+  refine le_bot_iff.mp (le_trans (Subgroup.commutator_mono hderiv_le hderiv_le) ?_)
+  exact le_of_eq (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hself)
 
 /-- The nonidentity part of the ambient Fitting subgroup of `M`. -/
 def fittingSharp (M : Subgroup G) : Set G :=
@@ -82,11 +244,15 @@ noncomputable def centralizerGeneratedBySigma (M U : Subgroup G) : Subgroup G :=
 
 /-! ## Lemma 15.1: the `U M_sigma` auxiliary structure -/
 
-/-- **BG Lemma 15.1** (mmd L4093): auxiliary structure around the `U`-factor in a
-type-P maximal subgroup.  The quotient assertion `M'/M_sigma` abelian is encoded
-as `M'' <= M_sigma`, avoiding premature quotient API commitments. -/
+/-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
+**arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
+encoded as `M'' <= M_sigma`, avoiding premature quotient API commitments.
+
+Faithfulness fix (Lane G): the previous scaffold added a spurious `IsTypeP M` hypothesis;
+mmd Lemma 15.1 holds for every `M ∈ ℳ` (the `K ≠ 1` clauses are guarded inline), and the
+general form is what Theorem A(2) and Theorem B cite. -/
 theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -99,7 +265,8 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         IsMulCommutative ↥U) ∧
       (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
-          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) ∧
+          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+            IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M)) ∧
       IsMulCommutative ↥(centralizerGeneratedBySigma M U) ∧
       (U ≠ ⊥ → ∃ U0 : Subgroup G,
         U0 ≤ U ∧ Monoid.exponent U0 = Monoid.exponent U ∧
@@ -116,14 +283,15 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
 theorem mf_ne_msigma_typeP1_structure [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     S14.IsTypeP1 M ∧
-      ∃ K Kstar Q Q0 D : Subgroup G, ∃ p q : ℕ,
-        Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) ∧
-        Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ∧
+      ∃ Q Q0 D : Subgroup G, ∃ p q : ℕ,
         p.Prime ∧ q.Prime ∧ Nat.card ↥K = p ∧ Nat.card ↥Kstar = q ∧
         q ∈ S14.piSet (MF M) ∧ q ∈ OddOrder.BG.Ch3.S10.beta M ∧
+        Kstar ≤ MF M ∧
         Q ≤ MF M ∧ M ≤ Subgroup.normalizer (Q : Set G) ∧
         Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
           (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
@@ -135,37 +303,62 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         derivedInG (derivedInG M) ≤ fittingInAmbient M := by
   sorry
 
-/-- **BG Corollary 15.3** (mmd L4154): centralizer and conjugacy control for Hall
-subgroups in the `M_F` analysis. -/
+/-- **BG Corollary 15.3** (mmd L4204): for a nonidentity Hall subgroup `H` of `M_σ`,
+(a) `C_M(H) = C_{M_σ}(H)·X` with `X` a cyclic `τ₂(M)`-subgroup, and (b) any two elements
+of `H` conjugate in `G` are already conjugate in `N_M(H)` (`N_M(H)`-fusion control).
+
+Faithfulness fix (Lane G 2026-06-14): the previous scaffold here stated an unrelated
+centralizer-escape claim (`C_G(X) ≤ M ∨ …`), not the `C_M(H)`/fusion content the docstring
+("centralizer and conjugacy control") names; restated to mmd L4204. Uncited, sorry-neutral. -/
 theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H X : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (MF M)))
-    (hX : X ≤ H) (hXne : X ≠ ⊥) :
-    Subgroup.centralizer (X : Set G) ≤ M ∨
-      ∃ N : Subgroup G,
-        N ∈ maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) ∧
-          (S14.IsTypeF N ∨ S14.IsTypeP2 N) := by
+    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hHne : H ≠ ⊥) :
+    (∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X) ∧
+    (∀ x ∈ H, ∀ y ∈ H, (∃ g : G, y = g * x * g⁻¹) →
+      ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
-/-- **BG Corollary 15.4** (mmd L4161): nilpotent Hall subgroups embed into the
-`M_F` side of a suitable maximal subgroup. -/
-theorem nilpotent_hall_embeds_in_mf [Finite G]
+/-- **BG Corollary 15.4** (mmd L4215): a nonidentity nilpotent **Hall** subgroup `H` of `G`
+can be embedded in `M_σ` for a suitable maximal subgroup `M` (`H ⊆ M_σ`).
+
+Faithfulness fix (Lane G): the previous scaffold dropped the **Hall** hypothesis (mmd requires
+`H` Hall of `G`) and over-claimed `H ≤ M_F` — the proof only gives `H ⊆ M_σ` (the textbook
+conclusion), and `H ⊆ M_F` does not follow (`H` need not be normal in `M`). -/
+theorem nilpotent_hall_embeds_in_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H : Subgroup G}
-    (hHnil : Group.IsNilpotent ↥H) (hHne : H ≠ ⊥) :
-    ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining H ∧ H ≤ MF M := by
+    (hHnil : Group.IsNilpotent ↥H) (hHne : H ≠ ⊥)
+    (hHall : Ch03.IsHallSubgroup (S14.piSet H) H) :
+    ∃ M : Subgroup G, M ∈ maximalSubgroupsContaining H ∧
+      H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
   sorry
 
-/-- **BG Corollary 15.5** (mmd L4168): decomposition of `F(M)` when the relevant
-Hall subgroup `H` is fixed.  The direct-product claim is represented by the
-commuting/trivial-intersection package. -/
+/-- **BG Corollary 15.5** (mmd L4225): the decomposition `F(M) = F(M_σ) × Y` with
+`Y = O_{σ(M)'}(F(M))` a cyclic `τ₂(M)`-subgroup, together with `F(M) = C_M(M_F)·M_F`,
+`M'' ⊆ F(M)`, `M_F ⊆ M'`, and `K ≠ 1 → F(M) ⊆ M'`.  Direct products are encoded by the
+commuting/trivial-intersection package.
+
+Faithfulness fix (Lane G): the previous scaffold parametrized an arbitrary `H ≤ M_F` (mmd
+fixes `H = M_F`) and used `M_F(M_σ)` where the textbook has the Fitting subgroup `F(M_σ)`
+(`fittingInAmbient (Msigma M)`); the dropped conjuncts (a)/(b)/(d) are restored.  The `M'/M_F`
+nilpotent clause of (c) is still deferred (quotient API). -/
 theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ≤ MF M) :
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     ∃ Y : Subgroup G,
-      IsCyclic ↥Y ∧ Y ≤ fittingInAmbient M ∧
-      fittingInAmbient M = (Subgroup.centralizer (H : Set G) ⊓ M) ⊔ H ∧
-      fittingInAmbient M = (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊔ Y ∧
-      (MF (OddOrder.BG.Ch3.S10.Msigma M)) ⊓ Y = ⊥ ∧
-      ⁅MF (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ := by
+      -- (a) `Y = O_{σ(M)'}(F(M))` is a cyclic `τ₂(M)`-subgroup of `F(M)`.
+      IsCyclic ↥Y ∧ (↑(Nat.card ↥Y).primeFactors ⊆ tau2 M) ∧ Y ≤ fittingInAmbient M ∧
+      -- (b) `M'' ⊆ F(M) = C_M(M_F)·M_F = F(M_σ) × Y`.
+      derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
+      fittingInAmbient M = (Subgroup.centralizer (MF M : Set G) ⊓ M) ⊔ MF M ∧
+      fittingInAmbient M = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊔ Y ∧
+      fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ⊓ Y = ⊥ ∧
+      ⁅fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M), Y⁆ = ⊥ ∧
+      -- (c) `M_F ⊆ M'` (the `M'/M_F` nilpotent part is deferred — quotient API).
+      MF M ≤ derivedInG M ∧
+      -- (d) if `K ≠ 1` (i.e. `M` is not of type `F`), then `F(M) ⊆ M'`.
+      (¬ S14.IsTypeF M → fittingInAmbient M ≤ derivedInG M) := by
   sorry
 
 /-- **BG Corollary 15.6** (mmd L4174): for a type-P maximal subgroup, `Kstar` is
@@ -196,14 +389,17 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (S14.IsTypeF M ∨ S14.IsTypeP1 M))) := by
   sorry
 
-/-- **BG Theorem 15.8** (mmd L4221; Feit--Thompson 1991): in the §14.12 setup,
-nonempty `tau_2(H)` forces `tau_2(M)=empty` and makes `tau_2(N)` a singleton. -/
+/-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
+nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
+
+Faithfulness fix (Lane G): the previous scaffold had a spurious third maximal `N` and concluded
+`tau_2(N) = {q}` (mmd: the singleton is `tau_2(H)`) and dropped `q = |K|`. -/
 theorem tau2_transfer_constraint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H N K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
-    (hN : N ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    {M H K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hH : H ∈ maximalSubgroups G)
+    (hP2 : S14.IsTypeP2 M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hHtau : (tau2 H).Nonempty) :
-    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ tau2 N = {q} := by
+    tau2 M = ∅ ∧ ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧ tau2 H = {q} := by
   sorry
 
 /-- **BG Corollary 15.9** (mmd L4240): final local landing point for a centralizer

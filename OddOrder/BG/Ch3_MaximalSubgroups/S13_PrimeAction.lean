@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
@@ -102,6 +103,20 @@ theorem fixedBy_le_fixedByElement {N X : Subgroup G} {g : G} (hg : g ∈ X) :
   intro x hx
   rcases Set.mem_singleton_iff.mp hx with rfl
   exact hg
+
+/-- For a prime action of `E₁` on `N`, a nonidentity subgroup `P ≤ E₁` has the same fixed subgroup
+`C_N(P) = C_N(E₁)` (`fixedBy N P = fixedBy N E₁`). Used in Lemma 13.6 to upgrade `X ≤ C_N(P)` to
+`X ≤ C_N(E₁)`. -/
+theorem fixedBy_eq_of_le_of_ne_bot {N E₁ : Subgroup G} (hprime : ActsPrimeOn N E₁)
+    {P : Subgroup G} (hPE1 : P ≤ E₁) (hPne : P ≠ ⊥) :
+    fixedBy N P = fixedBy N E₁ := by
+  obtain ⟨g, hgP, hg1⟩ : ∃ g ∈ P, g ≠ 1 := by
+    by_contra hcon
+    push_neg at hcon
+    exact hPne (by rw [eq_bot_iff]; intro x hx; rw [Subgroup.mem_bot]; exact hcon x hx)
+  refine le_antisymm ?_ (inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1)))
+  calc fixedBy N P ≤ fixedByElement N g := fixedBy_le_fixedByElement hgP
+    _ = fixedBy N E₁ := hprime g (hPE1 hgP) hg1
 
 theorem ActsRegularlyOn.toActsPrimeOn {N X : Subgroup G} (h : ActsRegularlyOn N X) :
     ActsPrimeOn N X := by
@@ -553,6 +568,502 @@ theorem E1_actsPrime [Finite G] (hG : IsMinimalSimpleOdd G)
 
 /-! ## §13 prime action の拡張解析 (mmd L3574-3628) -/
 
+/-! ### Helper: `ℳ`-transfer between conjugate maximal `q`-subgroups
+(`subtype_comp_conj_eq` / `map_subtype_conj_subgroupOf` は
+`OddOrder/Mathlib/SchurZassenhausConj.lean` の private helper の複製。) -/
+
+private theorem subtype_comp_conj_eq {U : Subgroup G} (n' : ↥U) :
+    U.subtype.comp ((MulAut.conj n').toMonoidHom) =
+      ((MulAut.conj (n'.val : G)).toMonoidHom).comp U.subtype := by
+  ext ⟨x, hx⟩; rfl
+
+private theorem map_subtype_conj_subgroupOf {U : Subgroup G} (n' : ↥U) (K : Subgroup G)
+    (hKU : K ≤ U) :
+    ((K.subgroupOf U).map (MulAut.conj n').toMonoidHom).map U.subtype =
+      K.map (MulAut.conj (n'.val : G)).toMonoidHom := by
+  rw [Subgroup.map_map, subtype_comp_conj_eq, ← Subgroup.map_map,
+    Subgroup.map_subgroupOf_eq_of_le hKU]
+
+/-- **ℳ-transfer between maximal `q`-subgroups of `N ≤ M`.** If `S` and `S₀` are both maximal
+`q`-subgroups of `N` (`N ≤ M`, `M` maximal in `G`) and `ℳ(S₀) = {M}`, then `ℳ(S) = {M}`. The two
+are conjugate by some `m ∈ N` (Sylow conjugacy inside `↥N`); since `m ∈ M`, conjugation by `m` fixes
+`M`, so the unique maximal over `S₀` transports to the unique maximal over `S`. Used in Lemma 13.6 to
+pass from the internal Sylow `S₀ ⊇ X` of the faithful Corollary 12.14 to the arbitrary Sylow `S`. -/
+theorem maximalContaining_eq_singleton_of_maximal_qsubgroup [Finite G]
+    {M N S S₀ : Subgroup G} (hM : M ∈ maximalSubgroups G) (hNM : N ≤ M)
+    {q : ℕ} [Fact q.Prime]
+    (hSN : S ≤ N) (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → S ≤ T → S = T)
+    (hS₀N : S₀ ≤ N) (hS₀q : IsPGroup q ↥S₀)
+    (hS₀max : ∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → S₀ ≤ T → S₀ = T)
+    (hMS₀ : maximalSubgroupsContaining S₀ = {M}) :
+    maximalSubgroupsContaining S = {M} := by
+  classical
+  -- A maximal `q`-subgroup `R ≤ N` is the carrier of a Sylow `q`-subgroup of `↥N`.
+  have key : ∀ R : Subgroup G, R ≤ N → IsPGroup q ↥R →
+      (∀ T : Subgroup G, T ≤ N → IsPGroup q ↥T → R ≤ T → R = T) →
+      ∃ P : Sylow q ↥N, (P : Subgroup ↥N) = R.subgroupOf N := by
+    intro R hRN hRq hRmax
+    have hRq' : IsPGroup q ↥(R.subgroupOf N) :=
+      hRq.of_equiv (Subgroup.subgroupOfEquivOfLe hRN).symm
+    obtain ⟨P, hRP⟩ := hRq'.exists_le_sylow
+    refine ⟨P, ?_⟩
+    have hTN : (P : Subgroup ↥N).map N.subtype ≤ N := Subgroup.map_subtype_le _
+    have hTq : IsPGroup q ↥((P : Subgroup ↥N).map N.subtype) :=
+      P.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective)
+    have hRT : R ≤ (P : Subgroup ↥N).map N.subtype := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hRN]
+      exact Subgroup.map_mono hRP
+    have hRTeq : R = (P : Subgroup ↥N).map N.subtype := hRmax _ hTN hTq hRT
+    rw [hRTeq, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective N.subtype_injective]
+  obtain ⟨PS, hPS⟩ := key S hSN hSq hSmax
+  obtain ⟨PS₀, hPS₀⟩ := key S₀ hS₀N hS₀q hS₀max
+  -- Sylow conjugacy inside `↥N`.
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq (↥N) PS₀ PS
+  have hgsub : (PS₀ : Subgroup ↥N).map (MulAut.conj g).toMonoidHom = (PS : Subgroup ↥N) := by
+    have h := congr_arg Sylow.toSubgroup hg
+    rwa [Sylow.coe_subgroup_smul, Subgroup.pointwise_smul_def] at h
+  set m : G := (g : G) with hm
+  have hmN : m ∈ N := g.2
+  -- Push the conjugation down to `G`: `m S₀ m⁻¹ = S` (`•`-form; `map (conj m).toMonoidHom` is defeq).
+  have hconj : MulAut.conj m • S₀ = S := by
+    have hlhs := map_subtype_conj_subgroupOf g S₀ hS₀N
+    rw [← hPS₀, hgsub, hPS, Subgroup.map_subgroupOf_eq_of_le hSN] at hlhs
+    exact hlhs.symm
+  -- `ℳ(S) = {M}` by transporting `ℳ(S₀) = {M}` along `conj m` (`m ∈ N ≤ M` fixes `M`).
+  rw [Set.eq_singleton_iff_unique_mem]
+  refine ⟨mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hSN.trans hNM⟩, ?_⟩
+  intro N' hN'
+  rw [mem_maximalSubgroupsContaining] at hN'
+  obtain ⟨hN'coat, hSN'⟩ := hN'
+  have hSN'' : MulAut.conj m • S₀ ≤ N' := by rw [hconj]; exact hSN'
+  have hWmem : MulAut.conj m⁻¹ • N' ∈ maximalSubgroupsContaining S₀ := by
+    rw [mem_maximalSubgroupsContaining]
+    refine ⟨isCoatom_conj_smul hN'coat, ?_⟩
+    calc S₀ = MulAut.conj m⁻¹ • (MulAut.conj m • S₀) := by
+              rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ ≤ MulAut.conj m⁻¹ • N' := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hSN''
+  rw [hMS₀, Set.mem_singleton_iff] at hWmem
+  have hN'eq : MulAut.conj m • M = N' := by
+    rw [← hWmem, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  rw [← hN'eq]
+  exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hNM hmN))
+
+/-- **Lemma 13.6 contradiction half, steps 3–4**: if `X ≤ M_σ` centralizes both `E₁` and `E'`
+but `X ⊄ M_σ'`, then `E₂ ≠ 1`. Step 3: `E₁ ⊔ E' = E` would give `X ≤ C_{M_σ}(E) ⊆ M_σ'`
+(Lemma 12.17), contra `X ⊄ M_σ'`. Step 4: `E₂ = 1` gives `E = E₁ ⊔ E₃ ≤ E₁ ⊔ E'` (`E₃ ≤ E'`),
+forcing `E₁ ⊔ E' = E`. -/
+theorem E2_ne_bot_of_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {X : Subgroup G}
+    (hXMσ : X ≤ S10.Msigma M) (hXE1 : X ≤ Subgroup.centralizer (E₁ : Set G))
+    (hXE' : X ≤ Subgroup.centralizer (derivedInG E : Set G))
+    (hXMσ' : ¬ (X ≤ derivedInG (S10.Msigma M))) :
+    E₂ ≠ ⊥ := by
+  have hsup_ne : E₁ ⊔ derivedInG E ≠ E := by
+    intro hEeq
+    have hEcx : E ≤ Subgroup.centralizer (X : Set G) :=
+      hEeq ▸ sup_le (Subgroup.le_centralizer_iff.mp hXE1) (Subgroup.le_centralizer_iff.mp hXE')
+    exact hXMσ' (le_trans (le_inf (Subgroup.le_centralizer_iff.mp hEcx) hXMσ)
+      (Msigma_E_relations hG h).1)
+  intro hE2bot
+  refine hsup_ne (le_antisymm (sup_le h.E₁_le (Subgroup.map_subtype_le _)) ?_)
+  calc E = E₁ ⊔ E₂ ⊔ E₃ := h.eq_sup hG
+    _ = E₁ ⊔ E₃ := by rw [hE2bot, sup_bot_eq]
+    _ ≤ E₁ ⊔ derivedInG E := sup_le_sup_left (h.E3_le_derived hG) E₁
+
+/-- A nontrivial `E₁` (Hall `τ₁`-subgroup of `E`) contains a `τ₁(M)`-line: `∃ ℓ ∈ τ₁(M)` and
+`P ∈ ℰ_ℓ¹(E₁)`. (Cauchy in `↥E₁` plus `π(E₁) ⊆ τ₁(M)`.) Used in Lemma 13.6 step 6 to apply
+Theorem 13.4. -/
+theorem exists_tau1_line_le_E1 [Finite G]
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE1ne : E₁ ≠ ⊥) :
+    ∃ ℓ : ℕ, ℓ.Prime ∧ ℓ ∈ tau1 M ∧ ∃ P : Subgroup G, P ∈ elemAbelianOfRank G ℓ 1 ∧ P ≤ E₁ := by
+  have hcard : Nat.card ↥E₁ ≠ 1 := fun hh => hE1ne (Subgroup.card_eq_one.mp hh)
+  obtain ⟨ℓ, hℓp, hℓdvd⟩ := Nat.exists_prime_and_dvd hcard
+  haveI : Fact ℓ.Prime := ⟨hℓp⟩
+  have hℓτ1 : ℓ ∈ tau1 M :=
+    h.isPiGroup_tau1 ℓ (Nat.mem_primeFactors.mpr ⟨hℓp, hℓdvd, Nat.card_pos.ne'⟩)
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₁) ℓ hℓdvd
+  have hPcard : Nat.card ↥((Subgroup.zpowers x).map E₁.subtype) = ℓ := by
+    rw [Subgroup.card_map_of_injective E₁.subtype_injective, Nat.card_zpowers, hx]
+  refine ⟨ℓ, hℓp, hℓτ1, (Subgroup.zpowers x).map E₁.subtype, ?_, Subgroup.map_subtype_le _⟩
+  exact mem_elemAbelianOfRank.mpr
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [pow_one]; exact hPcard⟩
+
+/-- **Lemma 13.6 step 6, `A₀ = C_A(E₁)` part**: if `X ≤ M_σ ⊓ C_G(E₁)`, `A ≤ E` is elementary
+abelian `p` (`p ∈ τ₂`) and `E₁ ≠ 1`, then `A ⊓ C_G(E₁) ≤ C_G(X)`. Per nonidentity `a ∈ A ⊓ C(E₁)`:
+`⟨a⟩ ∈ ℰ_p¹(C_E(P))` for a `τ₁`-line `P ≤ E₁`, so Theorem 13.4 gives `C_{M_σ}(P) ≤ C_{M_σ}(⟨a⟩)`;
+prime action (`C_{M_σ}(P) = C_{M_σ}(E₁) ⊇ X`) then forces `X ≤ C(⟨a⟩)`, i.e. `a ∈ C(X)`. -/
+theorem centralizer_A0_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {A X : Subgroup G}
+    (hAE : A ≤ E) (hAelem : A.IsElementaryAbelian p) (hE1ne : E₁ ≠ ⊥)
+    (hXE1 : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G)) :
+    A ⊓ Subgroup.centralizer (E₁ : Set G) ≤ Subgroup.centralizer (X : Set G) := by
+  classical
+  obtain ⟨ℓ, hℓp, hℓτ1, P, hPmem, hPE1⟩ := exists_tau1_line_le_E1 h hE1ne
+  haveI : Fact ℓ.Prime := ⟨hℓp⟩
+  have hPne : P ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hPmem
+  have hCPeq : S10.Msigma M ⊓ Subgroup.centralizer (P : Set G)
+      = S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) := by
+    have := fixedBy_eq_of_le_of_ne_bot (E1_actsPrime hG h hE1ne) hPE1 hPne
+    rwa [fixedBy_def, fixedBy_def] at this
+  have hXP : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) := hCPeq ▸ hXE1
+  intro a ha
+  obtain ⟨haA, haE1⟩ := Subgroup.mem_inf.mp ha
+  by_cases ha1 : a = 1
+  · subst ha1; exact Subgroup.one_mem _
+  · have hap : a ^ p = 1 := by
+      have h1 := hAelem.pow_eq_one (⟨a, haA⟩ : ↥A)
+      have h2 := congrArg (A.subtype) h1
+      simpa using h2
+    have hordp : orderOf a = p := orderOf_eq_prime hap ha1
+    have hRcard : Nat.card ↥(Subgroup.zpowers a) = p := by rw [Nat.card_zpowers, hordp]
+    have hRmem : Subgroup.zpowers a ∈ elemAbelianOfRank G p 1 :=
+      mem_elemAbelianOfRank.mpr ⟨Subgroup.IsElementaryAbelian.of_card_prime hRcard,
+        by rw [pow_one]; exact hRcard⟩
+    have hRCP : Subgroup.zpowers a ≤ Subgroup.centralizer (P : Set G) :=
+      Subgroup.zpowers_le.mpr
+        (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hPE1) haE1)
+    have hRC : Subgroup.zpowers a ≤ E ⊓ Subgroup.centralizer (P : Set G) :=
+      le_inf (Subgroup.zpowers_le.mpr (hAE haA)) hRCP
+    have hpπE : p ∈ (Nat.card ↥E).primeFactors := by
+      have hoE : orderOf (⟨a, hAE haA⟩ : ↥E) = p := by
+        rw [← hordp]; exact (orderOf_injective E.subtype E.subtype_injective _).symm
+      exact Nat.mem_primeFactors.mpr ⟨Fact.out, hoE ▸ orderOf_dvd_natCard _, Nat.card_pos.ne'⟩
+    have hthm := centralizer_le_centralizer_of_tau1 hG h hℓτ1 hpπE hPmem
+      (hPE1.trans h.E₁_le) hRmem hRC
+    have hXR : X ≤ Subgroup.centralizer ((Subgroup.zpowers a : Subgroup G) : Set G) :=
+      ((hXP.trans hthm).trans inf_le_right)
+    exact (Subgroup.le_centralizer_iff.mp hXR) (Subgroup.mem_zpowers a)
+
+/-- **Proposition 1.6(d), subgroup form**: for a coprime action of `E₁` on `A` (`E₁ ≤ N_G(A)`,
+coprime orders, one side solvable), `A = C_A(E₁) ⊔ ⁅A, E₁⁆`. (Translation of
+`fixedPoints_sup_actionCommutator_eq_top` via the `conj_map_subtype` bridges.) -/
+theorem subgroup_coprime_decomposition [Finite G] {A E₁ : Subgroup G}
+    (hE1A : E₁ ≤ Subgroup.normalizer (A : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥A))
+    (hSolv : IsSolvable ↥E₁ ∨ IsSolvable ↥A) :
+    A = (Subgroup.centralizer (E₁ : Set G) ⊓ A) ⊔ ⁅A, E₁⁆ := by
+  have hmap := congrArg (Subgroup.map A.subtype)
+    (Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hE1A)) hcop hSolv)
+  rw [Subgroup.map_sup, OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hE1A,
+    OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hE1A,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  exact hmap.symm
+
+/-- **Lemma 13.6 step 6, full `A` part**: with `X ≤ M_σ ⊓ C(E₁)` and `X ≤ C(E')`, a normal
+elementary abelian `p`-subgroup `A ≤ E` (`p ∈ τ₂`, `E₁ ≠ 1`) centralizes `X`. Decompose
+`A = C_A(E₁) ⊔ ⁅A,E₁⁆` (Prop 1.6, coprime since `p ∈ τ₂`, `π(E₁) ⊆ τ₁`); `C_A(E₁) ≤ C(X)` by
+`centralizer_A0_le_centralizer`, and `⁅A,E₁⁆ ≤ ⁅E,E⁆ = E' ≤ C(X)`. -/
+theorem centralizer_A_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] (hp : p ∈ tau2 M) {A X : Subgroup G}
+    (hAE : A ≤ E) (hAnorm : E ≤ Subgroup.normalizer (A : Set G)) (hAelem : A.IsElementaryAbelian p)
+    (hE1ne : E₁ ≠ ⊥) (hXE1 : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G))
+    (hXE' : X ≤ Subgroup.centralizer (derivedInG E : Set G)) :
+    A ≤ Subgroup.centralizer (X : Set G) := by
+  have hpndvd : ¬ p ∣ Nat.card ↥E₁ := by
+    intro hdvd
+    have hpτ1 := h.isPiGroup_tau1 p (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+    exact absurd ((((mem_tau1_iff M p).mp hpτ1).2.2).symm.trans ((mem_tau2_iff M p).mp hp).2)
+      (by norm_num)
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥A) := by
+    obtain ⟨k, hk⟩ := hAelem.isPGroup.exists_card_eq
+    rw [hk]
+    exact (Nat.coprime_comm.mp ((Nat.Prime.coprime_iff_not_dvd Fact.out).mpr hpndvd)).pow_right k
+  rw [subgroup_coprime_decomposition (h.E₁_le.trans hAnorm) hcop
+    (Or.inr (isSolvable_of_comm hAelem.comm))]
+  refine sup_le ?_ ?_
+  · rw [inf_comm]; exact centralizer_A0_le_centralizer hG h hAE hAelem hE1ne hXE1
+  · calc ⁅A, E₁⁆ ≤ ⁅E, E⁆ := Subgroup.commutator_mono hAE h.E₁_le
+      _ = derivedInG E := (Subgroup.map_subtype_commutator E).symm
+      _ ≤ Subgroup.centralizer (X : Set G) := Subgroup.le_centralizer_iff.mp hXE'
+
+/-! ### Conjugating a `SubgroupESetup` by `c ∈ M` (step-2 keystone) -/
+
+private theorem card_conj_smul (g : G) (H : Subgroup G) :
+    Nat.card ↥(MulAut.conj g • H) = Nat.card ↥H :=
+  Subgroup.card_map_of_injective (MulAut.conj g).injective
+
+/-- The Hall property transports under conjugating a `subgroupOf` pair `K ≤ E` by any `c`. -/
+private theorem isHallSubgroup_subgroupOf_conj [Finite G] {π : Set ℕ} {E K : Subgroup G}
+    (hKE : K ≤ E) (c : G) (hHall : Ch03.IsHallSubgroup π (K.subgroupOf E)) :
+    Ch03.IsHallSubgroup π ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E)) := by
+  have hcKE : MulAut.conj c • K ≤ MulAut.conj c • E :=
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKE
+  have hcard : Nat.card ↥((MulAut.conj c • K).subgroupOf (MulAut.conj c • E))
+      = Nat.card ↥(K.subgroupOf E) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hcKE).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKE).toEquiv, card_conj_smul]
+  have hidx : ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E)).index
+      = (K.subgroupOf E).index := by
+    have h1 := Subgroup.card_mul_index (K.subgroupOf E)
+    have h2 := Subgroup.card_mul_index ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E))
+    rw [hcard, card_conj_smul] at h2
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
+  exact ⟨fun p hp => hHall.1 p (hcard ▸ hp), fun p hp => hHall.2 p (hidx ▸ hp)⟩
+
+/-- **Conjugating a `SubgroupESetup` by `c ∈ M`.** Since `M` and `M_σ` are fixed by such
+conjugation, `(MulAut.conj c • E, conj c • E₁, …)` is again a `SubgroupESetup` for `M`. With
+`c ∈ C_G(E₁)` one gets `conj c • E₁ = E₁` (used in Lemma 13.6 step 2). -/
+theorem SubgroupESetup.conj' [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {c : G} (hc : c ∈ M) :
+    SubgroupESetup M (MulAut.conj c • E) (MulAut.conj c • E₁) (MulAut.conj c • E₂)
+      (MulAut.conj c • E₃) := by
+  have hcM : MulAut.conj c • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hc)
+  have hcMσ : MulAut.conj c • S10.Msigma M = S10.Msigma M :=
+    conj_smul_eq_self_of_mem_normalizer (le_normalizer_opiCoreInG (S10.sigma M) M hc)
+  refine ⟨h.mem_maximal, ?_, ?_, ?_,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₁_le,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₂_le,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₃_le,
+    isHallSubgroup_subgroupOf_conj h.E₁_le c h.E₁_hall,
+    isHallSubgroup_subgroupOf_conj h.E₂_le c h.E₂_hall,
+    isHallSubgroup_subgroupOf_conj h.E₃_le c h.E₃_hall, ?_⟩
+  · calc MulAut.conj c • E ≤ MulAut.conj c • M :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E_le
+      _ = M := hcM
+  · rw [← hcMσ, ← Subgroup.smul_inf, h.E_compl_inf, Subgroup.smul_bot]
+  · rw [← hcMσ, ← Subgroup.smul_sup, h.E_compl_sup, hcM]
+  · rw [← Subgroup.smul_sup]
+    exact isHallSubgroup_subgroupOf_conj (sup_le h.E₁_le h.E₂_le) c h.E₁₂_hall
+
+/-! ### Proposition 1.5(b)(c) subgroup forms (`A`-invariant Sylow containment & conjugacy) -/
+
+/-- **Proposition 1.5(c), subgroup form**: two `A`-invariant Sylow `q`-subgroups `S, T` of `N`
+(`A ≤ N_G(N)`, coprime orders, one side solvable) are conjugate by an element of `N ∩ C_G(A)`. -/
+theorem aInvariant_sylow_conj_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) {q : ℕ} [Fact q.Prime]
+    {S T : Subgroup G} (hSN : S ≤ N)
+    (hScard : Nat.card ↥(S.subgroupOf N) = q ^ (Nat.card ↥N).factorization q)
+    (hSinv : A ≤ Subgroup.normalizer (S : Set G)) (hTN : T ≤ N)
+    (hTcard : Nat.card ↥(T.subgroupOf N) = q ^ (Nat.card ↥N).factorization q)
+    (hTinv : A ≤ Subgroup.normalizer (T : Set G)) :
+    ∃ c : G, c ∈ N ∧ c ∈ Subgroup.centralizer (A : Set G) ∧ MulAut.conj c • S = T := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
+    fun _ _ => rfl
+  have htr : ∀ K : Subgroup G, A ≤ Subgroup.normalizer (K : Set G) →
+      Ch03.IsAInvariant φ (K.subgroupOf N) := by
+    intro K hK
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    rw [hφ_coe a x]
+    exact (Subgroup.mem_normalizer_iff.mp (hK a.2) (x : G)).mp hx
+  let Sn : Sylow q ↥N := Sylow.ofCard (S.subgroupOf N) hScard
+  let Tn : Sylow q ↥N := Sylow.ofCard (T.subgroupOf N) hTcard
+  have hSn : (Sn : Subgroup ↥N) = S.subgroupOf N := rfl
+  have hTn : (Tn : Subgroup ↥N) = T.subgroupOf N := rfl
+  obtain ⟨c, hc_fix, hc_conj⟩ := Ch04.aInvariant_sylow_conj hcop hSolv
+    (S := Sn) (T := Tn) (htr S hSinv) (htr T hTinv)
+  refine ⟨(c : G), c.2, ?_, ?_⟩
+  · rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    have h1 : ((φ ⟨g, hg⟩) c : G) = (c : G) := congrArg (fun z : ↥N => (z : G)) (hc_fix ⟨g, hg⟩)
+    rw [hφ_coe ⟨g, hg⟩ c, mul_inv_eq_iff_eq_mul] at h1
+    exact h1
+  · have hgsub : (Sn : Subgroup ↥N).map (MulAut.conj c).toMonoidHom = (Tn : Subgroup ↥N) :=
+      hc_conj
+    have hlhs := map_subtype_conj_subgroupOf c S hSN
+    rw [← hSn, hgsub, hTn, Subgroup.map_subgroupOf_eq_of_le hTN] at hlhs
+    rw [Subgroup.pointwise_smul_def]; exact hlhs.symm
+
+/-- **Proposition 1.5(b), subgroup form**: an `A`-invariant `q`-subgroup `P ≤ N` (`A ≤ N_G(N)`,
+coprime, one side solvable) is contained in an `A`-invariant Sylow `q`-subgroup of `N`. -/
+theorem aInvariant_pSubgroup_le_aInvariant_sylow_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) {q : ℕ} [Fact q.Prime]
+    {P : Subgroup G} (hPN : P ≤ N) (hPq : IsPGroup q ↥P)
+    (hPinv : A ≤ Subgroup.normalizer (P : Set G)) :
+    ∃ S : Subgroup G, S ≤ N ∧ IsPGroup q ↥S ∧ A ≤ Subgroup.normalizer (S : Set G) ∧ P ≤ S ∧
+      Nat.card ↥S = q ^ (Nat.card ↥N).factorization q := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), (N.subtype ((φ a) x)) = (↑a) * (N.subtype x) * (↑a)⁻¹ :=
+    fun _ _ => rfl
+  have hφ_inv_coe : ∀ (a : ↥A) (x : ↥N),
+      (N.subtype (((φ a)⁻¹) x)) = (↑a)⁻¹ * (N.subtype x) * (↑a) := by
+    intro a x; rw [← map_inv]; simpa using hφ_coe a⁻¹ x
+  have hPinv' : Ch03.IsAInvariant φ (P.subgroupOf N) := by
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    show N.subtype ((φ a) x) ∈ P
+    rw [hφ_coe a x]
+    exact (Subgroup.mem_normalizer_iff.mp (hPinv a.2) (N.subtype x)).mp hx
+  have hPqN : IsPGroup q ↥(P.subgroupOf N) := hPq.of_equiv (Subgroup.subgroupOfEquivOfLe hPN).symm
+  obtain ⟨S', hS'inv, hPS'⟩ :=
+    OddOrder.Isaacs.Ch04.aInvariant_pSubgroup_le_aInvariant_sylow hcop hSolv hPqN hPinv'
+  set S : Subgroup G := (S' : Subgroup ↥N).map N.subtype with hSdef
+  refine ⟨S, Subgroup.map_subtype_le _,
+    S'.2.of_equiv (Subgroup.equivMapOfInjective _ _ N.subtype_injective), ?_, ?_, ?_⟩
+  · intro a ha
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    constructor
+    · rintro ⟨x, hxS, rfl⟩
+      exact ⟨(φ ⟨a, ha⟩) x, hS'inv.smul_mem ⟨a, ha⟩ hxS, hφ_coe ⟨a, ha⟩ x⟩
+    · rintro ⟨x, hxS, hx⟩
+      refine ⟨((φ ⟨a, ha⟩)⁻¹) x, hS'inv.inv_smul_mem ⟨a, ha⟩ hxS, ?_⟩
+      rw [hφ_inv_coe ⟨a, ha⟩ x, hx]
+      change a⁻¹ * (a * y * a⁻¹) * a = y
+      group
+  · rw [hSdef]
+    calc P = (P.subgroupOf N).map N.subtype := (Subgroup.map_subgroupOf_eq_of_le hPN).symm
+      _ ≤ (S' : Subgroup ↥N).map N.subtype := Subgroup.map_mono hPS'
+  · rw [hSdef, Subgroup.card_map_of_injective N.subtype_injective, S'.card_eq_multiplicity]
+
+/-- **Lemma 13.6 step 2, the `E'`-centralized Sylow.** For `q ∉ β(M)`, there is an `E₁`-invariant
+Sylow `q`-subgroup `S₀` of `M_σ` contained in `C_G(E')`. (Lemma 12.19 gives a Hall `β'`-subgroup
+`W ⊆ C_{M_σ}(E')` with full `q`-part since `q ∈ β'`, so `|C_{M_σ}(E')|_q = |M_σ|_q`; then
+`exists_aInvariant_sylow_subgroup` for `E₁` acting on `C_{M_σ}(E')`.) -/
+theorem exists_E1inv_sylow_centralizing_derivedE [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime]
+    (hqβ : q ∉ S10.beta M) :
+    ∃ S₀ : Subgroup G, S₀ ≤ S10.Msigma M ∧ IsPGroup q ↥S₀ ∧
+      E₁ ≤ Subgroup.normalizer (S₀ : Set G) ∧
+      S₀ ≤ Subgroup.centralizer (derivedInG E : Set G) ∧
+      Nat.card ↥S₀ = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+  classical
+  obtain ⟨W, hWMσ, hWhall, hE'CW⟩ := derivedE_centralizes_betaComplement hG h
+  set N : Subgroup G := S10.Msigma M ⊓ Subgroup.centralizer (derivedInG E : Set G) with hNdef
+  have hWN : W ≤ N := le_inf hWMσ (Subgroup.le_centralizer_iff.mp hE'CW)
+  have hNMσ : N ≤ S10.Msigma M := inf_le_left
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).surjective
+  -- `E₁ ≤ N_G(N)`: `E₁` normalizes `M_σ` and `E'`, hence `C_G(E')` and `N`.
+  have hE1NMσ : E₁ ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E1_le_M.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hE1NCE' : E₁ ≤ Subgroup.normalizer ((Subgroup.centralizer (derivedInG E : Set G)) : Set G) :=
+    (h.E₁_le.trans (S10.le_normalizer_derivedInG E)).trans
+      (normalizer_le_normalizer_centralizer (derivedInG E))
+  have hE1NN : E₁ ≤ Subgroup.normalizer (N : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    intro x
+    rw [hNdef]
+    simp only [Subgroup.mem_inf]
+    rw [Subgroup.mem_normalizer_iff.mp (hE1NMσ hg) x,
+      Subgroup.mem_normalizer_iff.mp (hE1NCE' hg) x]
+  -- coprime `(|E₁|, |N|)`.
+  have hcop_MσE : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥E) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at h1
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥N) :=
+    (hcop_MσE.symm.coprime_dvd_left (Subgroup.card_dvd_of_le h.E₁_le)).coprime_dvd_right
+      (Subgroup.card_dvd_of_le hNMσ)
+  obtain ⟨S₀, hS₀N, hS₀q, hS₀inv, hS₀card⟩ :=
+    exists_aInvariant_sylow_subgroup hE1NN hcop (Or.inr hNsolv) q
+  -- `|N|_q = |M_σ|_q` (squeeze `W ≤ N ≤ M_σ`, `W` Hall `β'`, `q ∈ β'`).
+  have hfactW : (Nat.card ↥(S10.Msigma M)).factorization q = (Nat.card ↥W).factorization q := by
+    have hqidx : q ∉ ((W.subgroupOf (S10.Msigma M)).index).primeFactors :=
+      fun hh => hWhall.2 q hh hqβ
+    have hcardeq : Nat.card ↥(S10.Msigma M)
+        = Nat.card ↥W * (W.subgroupOf (S10.Msigma M)).index := by
+      rw [← Subgroup.card_mul_index (W.subgroupOf (S10.Msigma M)),
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hWMσ).toEquiv]
+    rw [hcardeq, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+      Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd
+        (fun hd => hqidx (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)),
+      add_zero]
+  have hcardN : (Nat.card ↥N).factorization q = (Nat.card ↥(S10.Msigma M)).factorization q := by
+    have h1 : (Nat.card ↥W).factorization q ≤ (Nat.card ↥N).factorization q :=
+      (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+        (Subgroup.card_dvd_of_le hWN) q
+    have h2 : (Nat.card ↥N).factorization q ≤ (Nat.card ↥(S10.Msigma M)).factorization q :=
+      (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+        (Subgroup.card_dvd_of_le hNMσ) q
+    exact le_antisymm h2 (hfactW.trans_le h1)
+  exact ⟨S₀, hS₀N.trans hNMσ, hS₀q, hS₀inv, hS₀N.trans inf_le_right, by rw [hS₀card, hcardN]⟩
+
+private theorem smul_centralizer_conj (g : G) (H : Subgroup G) :
+    MulAut.conj g • Subgroup.centralizer (H : Set G)
+      = Subgroup.centralizer ((MulAut.conj g • H : Subgroup G) : Set G) :=
+  Subgroup.map_centralizer_eq_of_bijective (H : Set G) (MulAut.conj g).toMonoidHom
+    (MulAut.conj g).bijective
+
+private theorem smul_derivedInG_conj (g : G) (E : Subgroup G) :
+    derivedInG (MulAut.conj g • E) = MulAut.conj g • derivedInG E := by
+  have e1 : derivedInG (MulAut.conj g • E) = ⁅MulAut.conj g • E, MulAut.conj g • E⁆ :=
+    Subgroup.map_subtype_commutator _
+  have e2 : MulAut.conj g • derivedInG E = ⁅MulAut.conj g • E, MulAut.conj g • E⁆ := by
+    have he : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
+    rw [he, Subgroup.pointwise_smul_def, Subgroup.map_commutator]
+    rfl
+  rw [e1, e2]
+
+/-- **Lemma 13.6 step 2 (the WLOG).** With `X ≤ M_σ ⊓ C_G(E₁)` a `q`-subgroup, `q ∉ β(M)`, there is
+a conjugate complement `F = E^{c⁻¹}` (`c ∈ C_{M_σ}(E₁)`, so its `τ₁`-Hall is again `E₁`) with
+`X ≤ C_G(F')`. (S₀ = E₁-invariant Sylow `q ⊆ C(E')`; `X ⊆ S₁` an E₁-invariant Sylow; `1.5(c)`
+conjugates `S₁` to `S₀` by `c ∈ C_{M_σ}(E₁)`; then `X = (X^c)^{c⁻¹} ⊆ (S₀)^{c⁻¹} ⊆ C(F')`.) -/
+theorem exists_conjugate_complement_centralizing [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime]
+    (hqβ : q ∉ S10.beta M) {X : Subgroup G} (hXq : IsPGroup q ↥X) (hXMσ : X ≤ S10.Msigma M)
+    (hXE1 : X ≤ Subgroup.centralizer (E₁ : Set G)) :
+    ∃ F F₂ F₃ : Subgroup G, SubgroupESetup M F E₁ F₂ F₃ ∧
+      X ≤ Subgroup.centralizer (derivedInG F : Set G) := by
+  classical
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hMσsolv : IsSolvable ↥(S10.Msigma M) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hMσM).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hMσM).surjective
+  have hE1NMσ : E₁ ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E1_le_M.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hcop_MσE : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥E) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at h1
+  have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥(S10.Msigma M)) :=
+    hcop_MσE.symm.coprime_dvd_left (Subgroup.card_dvd_of_le h.E₁_le)
+  obtain ⟨S₀, hS₀Mσ, _hS₀q, hS₀inv, hS₀CE', hS₀card⟩ :=
+    exists_E1inv_sylow_centralizing_derivedE hG h hqβ
+  have hXNX : E₁ ≤ Subgroup.normalizer (X : Set G) :=
+    (Subgroup.le_centralizer_iff.mp hXE1).trans (Subgroup.centralizer_le_normalizer _)
+  obtain ⟨S₁, hS₁Mσ, _hS₁q, hS₁inv, hXS₁, hS₁card⟩ :=
+    aInvariant_pSubgroup_le_aInvariant_sylow_subgroup hE1NMσ hcop (Or.inr hMσsolv) hXMσ hXq hXNX
+  have hcardS₀ : Nat.card ↥(S₀.subgroupOf (S10.Msigma M))
+      = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS₀Mσ).toEquiv]; exact hS₀card
+  have hcardS₁ : Nat.card ↥(S₁.subgroupOf (S10.Msigma M))
+      = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hS₁Mσ).toEquiv]; exact hS₁card
+  obtain ⟨c, hcMσ, hcCE1, hcConj⟩ := aInvariant_sylow_conj_subgroup hE1NMσ hcop (Or.inr hMσsolv)
+    hS₁Mσ hcardS₁ hS₁inv hS₀Mσ hcardS₀ hS₀inv
+  -- `F = conj c⁻¹ • E`; its `E₁`-slot is fixed since `c⁻¹ ∈ C(E₁) ≤ N(E₁)`.
+  have hc1 : MulAut.conj c⁻¹ • E₁ = E₁ :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.centralizer_le_normalizer _ (inv_mem hcCE1))
+  refine ⟨MulAut.conj c⁻¹ • E, MulAut.conj c⁻¹ • E₂, MulAut.conj c⁻¹ • E₃,
+    hc1 ▸ SubgroupESetup.conj' h (inv_mem (hMσM hcMσ)), ?_⟩
+  -- `X ≤ C(F')`.  `conj c • X ⊆ conj c • S₁ = S₀ ⊆ C(E')`, then conjugate back by `c⁻¹`.
+  have hcXCE' : MulAut.conj c • X ≤ Subgroup.centralizer (derivedInG E : Set G) :=
+    ((conj_smul_mono _ hXS₁).trans (le_of_eq hcConj)).trans hS₀CE'
+  have hE'cX : derivedInG E ≤ Subgroup.centralizer ((MulAut.conj c • X : Subgroup G) : Set G) :=
+    Subgroup.le_centralizer_iff.mp hcXCE'
+  rw [smul_derivedInG_conj, Subgroup.le_centralizer_iff]
+  -- `conj c⁻¹ • derivedInG E ≤ conj c⁻¹ • C(conj c • X) = C(X)`.
+  calc MulAut.conj c⁻¹ • derivedInG E
+      ≤ MulAut.conj c⁻¹ • Subgroup.centralizer ((MulAut.conj c • X : Subgroup G) : Set G) :=
+        conj_smul_mono _ hE'cX
+    _ = Subgroup.centralizer (X : Set G) := by
+        rw [smul_centralizer_conj, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
@@ -564,6 +1075,55 @@ theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd
     (hSmax : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T) :
     maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
     maximalSubgroupsContaining S = {M} := by
-  sorry
+  classical
+  have hXMσ : X ≤ S10.Msigma M := hXC.trans inf_le_left
+  have hXM : X ≤ M := hXMσ.trans (S10.Msigma_le M)
+  by_cases hcase : q ∈ S10.beta M ∨ X ≤ derivedInG (S10.Msigma M)
+  · -- **Reduction half** (BG L3608): Corollary 12.14 (faithful form) supplies both `ℳ(C_G(X)) = {M}`
+    -- and `ℳ(S₀) = {M}` for its internal Sylow `S₀ ⊇ X`; the arbitrary `S` follows by conjugacy.
+    obtain ⟨hCG, S₀, _hXS₀, hS₀Mσ, hS₀q, hS₀max, hMS₀⟩ :=
+      Cor1214.maximalContaining_centralizer_and_someSylow_eq_singleton
+        hG h.mem_maximal hq hX hXM hcase
+    exact ⟨hCG, maximalContaining_eq_singleton_of_maximal_qsubgroup h.mem_maximal
+      (S10.Msigma_le M) hSle hSq hSmax hS₀Mσ hS₀q hS₀max hMS₀⟩
+  · -- **Contradiction half** (BG L3610-3624): `q ∉ β(M)` and `X ⊄ M_σ'` is impossible.
+    -- Recipe (deps all pinned) = issue 8003. Steps: (1) `X ⊆ C_{M_σ}(E₁)` (Thm 13.5 prime action);
+    -- (2) `X ⊆ C_{M_σ}(E')` (Lemma 12.19 `derivedE_centralizes_betaComplement` — the mmd's
+    -- "Theorem 12.13" is a mis-citation — + Prop 1.5 coprime normalization); (3) `E₁E' ≠ E`
+    -- (Lemma 12.17 `C_{M_σ}(E) ⊆ M_σ'`, `X ⊄ M_σ'`); (4) `E₂ ≠ 1` (`E₃ ⊆ E'`); (5) `A ∈ ℰ_p²(E)`
+    -- with `A ◁ E` (Cor 12.6a) and `C_{M_σ}(A) = 1` (Thm 12.5d); (6) `A = A₀ × [A,E₁]` centralizes
+    -- `X` (Thm 13.4 per-line via `E'`); (7) `X ≤ M_σ ⊓ C(A) = ⊥`, contra `X ≠ ⊥`.
+    exfalso
+    have hqβ : q ∉ S10.beta M := fun hh => hcase (Or.inl hh)
+    have hXMσ' : ¬ X ≤ derivedInG (S10.Msigma M) := fun hh => hcase (Or.inr hh)
+    have hXne : X ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hX
+    have hXq : IsPGroup q ↥X := (mem_elemAbelianOfRank.mp hX).1.isPGroup
+    have hE1ne : E₁ ≠ ⊥ := fun hb => hPne (le_bot_iff.mp (hb ▸ hPE1))
+    -- (1) `X ≤ M_σ ⊓ C_G(E₁)` (prime action: `C_{M_σ}(P) = C_{M_σ}(E₁)`).
+    have hXmC : X ≤ S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) := by
+      have hfix := fixedBy_eq_of_le_of_ne_bot (E1_actsPrime hG h hE1ne) hPE1 hPne
+      rw [fixedBy_def, fixedBy_def] at hfix
+      exact hfix ▸ hXC
+    -- (2) replace `E` by a conjugate complement `F` (`F₁ = E₁`) with `X ≤ C_G(F')`.
+    obtain ⟨F, F₂, F₃, hFsetup, hXF'⟩ :=
+      exists_conjugate_complement_centralizing hG h hqβ hXq hXMσ (hXmC.trans inf_le_right)
+    -- (3)(4) `F₂ ≠ 1`.
+    have hF2ne := E2_ne_bot_of_centralizer hG hFsetup (hXmC.trans inf_le_left)
+      (hXmC.trans inf_le_right) hXF' hXMσ'
+    -- (5) `p ∈ τ₂(M)`, `A ∈ ℰ_p²(F)` with `A ◁ F` and `C_{M_σ}(A) = 1`.
+    obtain ⟨p, hp_prime, hp_dvd⟩ :=
+      Nat.exists_prime_and_dvd (fun hh => hF2ne (Subgroup.card_eq_one.mp hh))
+    haveI : Fact p.Prime := ⟨hp_prime⟩
+    have hpτ2 : p ∈ tau2 M :=
+      hFsetup.isPiGroup_tau2 p (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, Nat.card_pos.ne'⟩)
+    obtain ⟨A, hA, hAF⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hFsetup hpτ2
+    have hAnorm : F ≤ Subgroup.normalizer (A : Set G) :=
+      (elemAb_normal_in_E_of_tau2 hG hFsetup hpτ2 hA hAF).1.1
+    have hCA : S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ :=
+      (Msigma_nilpotent_of_tau2 hG hFsetup.mem_maximal hpτ2 hA (hAF.trans hFsetup.E_le)).2.2.2.1
+    have hAelem : A.IsElementaryAbelian p := (mem_elemAbelianOfRank.mp hA).1
+    -- (6) `A` centralizes `X`; (7) `X ≤ M_σ ⊓ C_G(A) = 1`, contradicting `X ≠ 1`.
+    have hAX := centralizer_A_le_centralizer hG hFsetup hpτ2 hAF hAnorm hAelem hE1ne hXmC hXF'
+    exact hXne (le_bot_iff.mp (hCA ▸ le_inf hXMσ (Subgroup.le_centralizer_iff.mp hAX)))
 
 end OddOrder.BG.Ch3.S13
