@@ -672,4 +672,48 @@ noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
       (fun p _ q _ hpq => certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm hpq)]
     exact dadeICM_columnDiff_eq_sum h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
 
+/-- **Per-constituent `CharacterPsiDecomposition` for a reducible certain-type member `μ_j`**
+(Peterfalvi (6.8.2.3), reducible case).  The analogue of `decompositionDaFromDadeOfDiff`
+(irreducible `χ`) for a reducible column character `μ_j = columnSum χ₂`: it uses the reducible
+`R(μ_j)` family `certainTypeR` and the generic isometry
+`dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data` (the certain-type Dade `h.tau` carries
+no `HConjInvariant`).  Given the `Y`-anchor `η₁` with `μ_j − a·η₁` supported on `A₀`,
+`(μ_j − a·η₁)^τ ∈ ℤ[Irr G]`, and the orthogonalities `μ_j, μ̄_j ⊥ a·η₁`, it produces the (5.4)
+decomposition `Da : CharacterPsiDecomposition τ μ_j (a·η₁)` (with `μ̄_j = μ_{χ₂⁻¹}` cross-orthogonal
+to `μ_j` by `columnFamily_mu_sum_inner`). -/
+noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hμη₁supp : (columnSum h χ₂ - a • η₁).support ⊆
+      S04.supportInSubgroup (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
+    (htau1_mema : S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (columnSum h χ₂) (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (columnSum h χ₂).conj (a • η₁ : ClassFunction ↥L ℂ) = 0) :
+    S07.CharacterPsiDecomposition (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+      (columnSum h χ₂) (a • η₁) := by
+  have hSdiff : ∀ s ∈ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - a • η₁} :
+      Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ S04.supportInSubgroup
+        (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [columnSum_conj_eq]
+      exact (columnDiff_support_subset h hχ₂ (inv_ne_one.mpr hχ₂) hdeg).trans
+        (S04.supportInSubgroup_mono Set.subset_union_left)
+    · exact hμη₁supp
+  have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
+    rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
+      if_neg (column_inv_ne_self h hχ₂).symm]
+  exact S07.CharacterPsiDecomposition.ofProjection (certainTypeR h hχ₂ hdeg)
+    (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+    (fun φ ζ hφ hζ =>
+      S07.dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data h.dade0 h.tau hSdiff hφ hζ)
+    rfl htau1_mema hχψ hχbarψ hχχbar
+
 end OddOrder.Peterfalvi.S06
