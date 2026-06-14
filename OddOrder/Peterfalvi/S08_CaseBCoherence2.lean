@@ -703,6 +703,46 @@ theorem sum_coeff_eq_of_aggregate {ι : Type*} (s : Finset ι) (a b : ι → ℤ
   have hcast : (n : ℂ) = ∑ i ∈ s, (a i : ℂ) * (b i : ℂ) := neg_injective key
   exact_mod_cast hcast.symm
 
+/-- **Cauchy–Schwarz equality ⟹ parallel** (the (6.8.2.3) `Yᵢ = aᵢ·Y` bridge).  For a norm-`1`
+vector `w`, an integer `a`, and a vector `v` with `⟨v, w⟩ = a` and `‖v‖² = a²`, the equality case of
+Cauchy–Schwarz forces `v = a·w`: indeed `‖v − a·w‖² = ‖v‖² − a⟨v,w⟩ − a⟨w,v⟩ + a²‖w‖² = 0`, so the
+positive-definiteness `eq_zero_of_inner_self_re_eq_zero` gives `v − a·w = 0`.
+
+This is the bridge from the (6.8.2.3) pinning `bᵢ = ⟨Yᵢ,Y⟩ = aᵢ` together with `‖Yᵢ‖² = ‖aᵢ·η₁‖² = aᵢ²`
+((5.4.b)) to the per-step image `Yᵢ = aᵢ·Y`, which then assembles the per-`χ` identity
+`(χ − a·η₁)^τ = X₁ − a·Y`. -/
+theorem eq_smul_of_inner_self_eq {v w : ClassFunction G ℂ} {a : ℤ}
+    (hvw : ClassFunction.inner v w = (a : ℂ))
+    (hvv : ClassFunction.inner v v = (a : ℂ) ^ 2)
+    (hww : ClassFunction.inner w w = 1) :
+    v = (a : ℂ) • w := by
+  have hnorm : ClassFunction.inner (v - (a : ℂ) • w) (v - (a : ℂ) • w) = 0 := by
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_conj_symm v w, hvw, hvv, hww, star_intCast]
+    ring
+  have hre : (ClassFunction.inner (v - (a : ℂ) • w) (v - (a : ℂ) • w)).re = 0 := by
+    rw [hnorm]; simp
+  exact sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero hre)
+
+/-- **Aggregate τ-image of integer-weighted constituents** (the (6.8.2.2)→(6.8.2.3) bridge).  For a
+`ℤ`-linear character map `τ` and per-constituent images `τ(αᵢ) = Xᵢ − Yᵢ`, the integer-weighted
+aggregate maps termwise: `τ(∑ᵢ aᵢ·αᵢ) = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)`.  Pure `ℤ`-linearity (`map_sum` +
+`map_zsmul`, with the `(aᵢ : ℂ)`-scalar smul reduced to the `ℤ`-action via `Int.cast_smul_eq_zsmul`).
+
+Combined with `sum_smul_constituent_diff_eq` (`∑ aᵢ·αᵢ = Ind^L_{W₂}φ − |H:Z|·η₁`) and the (6.8.2.2)
+decomposition `exists_decomposition_caseB` (`τ(Ind φ − |H:Z|·η₁) = Xagg − |H:Z|·Y`), this supplies the
+`hagg` input `Xagg − n·Y = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)` of the pinning lemma `sum_coeff_eq_of_aggregate`. -/
+theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
+    (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
+    (himg : ∀ i ∈ s, τ (α i) = Xv i - Yv i) :
+    τ (∑ i ∈ s, (a i : ℂ) • α i) = ∑ i ∈ s, (a i : ℂ) • (Xv i - Yv i) := by
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun i hi => ?_
+  rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
+    ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field

@@ -2305,3 +2305,43 @@ Y.inner D.Y = star (D.Y.inner Y)`)。`inner_smul_right` は `RepresentationTheor
 **hard seam 残**: bᵢ=⟨Da.Y,Y⟩ と Da.Y の関係 (Da.X⊥Y? Da.Y=αᵢ^τ−Da.X), pinning への ∑ 接続, (5.4.b)
 適用, τ₂。intricate な S08 統合だが building blocks + CS core 揃い。
 **正本=本 cont.³⁹。CS core landed。次=bᵢ≤aᵢ follow-up (整数 tail) → per-χ assembly (pinning 接続)。**
+
+## 2026-06-14 (session 40 cont.⁴⁰, /loop): ✅✅ (6.8.2.2)→(6.8.2.3) **代数 toolkit 完備** (4 commits)
+
+### ✅ landed (S08_CaseBCoherence2, 全 axiom-clean 標準3, leaf 3625):
+| commit | lemma | 内容 |
+|---|---|---|
+| `dffa9e35` | `inner_Y_coeff_le_of_psi_nsmul` | per-step bound **bᵢ≤aᵢ** = CS core `inner_Y_coeff_sq_le` (b²≤‖Da.Y‖²) + (5.6.2)`inner_self_Y_re_le_inner_self_psi` (‖Da.Y‖²≤‖a•η‖²=a²) + 整数 tail (by_contra+nlinarith, ψ=`a•η` nsmul a:ℕ, η norm-1) |
+| `f350e063` | `sum_coeff_eq_of_aggregate` | pinning 入力 **∑aᵢbᵢ=n**: 集約恒等式 `Xagg−n•Y=∑aᵢ•(Xᵢ−Yᵢ)` に ⟨·,Y⟩ (全 X⊥Y, bᵢ=⟨Yᵢ,Y⟩) ⟹ −n=−∑aᵢbᵢ。`inner_sum_left`+`Finset.sum_neg_distrib`+`neg_injective`+exact_mod_cast |
+| `671b4555` | `eq_smul_of_inner_self_eq` | **Yᵢ=aᵢ•Y bridge** (CS-equality⟹parallel): ⟨v,w⟩=a ∧ ‖v‖²=a² ∧ ‖w‖²=1 ⟹ v=a•w (‖v−aw‖²=0 を simp[inner lemmas]+ring → `eq_zero_of_inner_self_re_eq_zero`) |
+| `bc436213` | `tau_sum_smul_image` | 集約 τ-image **τ(∑aᵢαᵢ)=∑aᵢ(Xᵢ−Yᵢ)** (純 ℤ-線形, `IntegralCharacterMap=→ₗ[ℤ]`): map_sum+map_zsmul, ℂ-smul を Int.cast_smul_eq_zsmul で ℤ-action 化 |
+
+### 🎉🎉 マイルストン: (6.8.2.3) **pinning→image の代数 layer 全完備**。連鎖:
+```
+tau_sum_smul_image + sum_smul_constituent_diff_eq(∑aᵢαᵢ=Indφ−n•η₁) + exists_decomposition_caseB(τ(…)=Xagg−n•Y)
+   → hagg : Xagg−n•Y = ∑aᵢ(Xᵢ−Yᵢ)
+sum_coeff_eq_of_aggregate(hagg + ⟨Xᵢ,Y⟩=0 + bᵢ=⟨Yᵢ,Y⟩ + ⟨Xagg,Y⟩=0 + ‖Y‖²=1) → ∑aᵢbᵢ=n
+sum_inner_restrict_sq_eq_index → ∑aᵢ²=n;  inner_Y_coeff_le_of_psi_nsmul → bᵢ≤aᵢ
+eq_of_sum_mul_eq_sum_sq → bᵢ=aᵢ
+(5.4.b)norm_eq_and_X_eq_sum_of_norm_Y_ge(‖Yᵢ‖²=aᵢ²) + eq_smul_of_inner_self_eq → Yᵢ=aᵢ•Y ∧ Xᵢ=∑_E α
+   → per-i αᵢ^τ=Xᵢ−aᵢ•Y → per-χ (χ−a•η₁)^τ=X₁−a•Y
+```
+
+### 🔑 RECON 確定 (本 session の構造把握):
+- **(6.8.2.3) = `hmixed` obligation** (`coherentXunionYset_caseB_of_glued` の field): `⟨ν μ_j, ν η⟩=⟨μ_j,η⟩`
+  (=0 ∵ μ_j⊥η)。per-χ image `(χ−a•η₁)^τ=X₁−a•Y` (X₁⊥Y) が `⟨(μ_j)^{τ₂},Y⟩` 計算の核。
+- **seam 1「⟨Da_i.X,Y⟩=0」は新 hard math 不要** = 既存**抽象** `inner_decomposition_X_extension_member_eq_zero`
+  (S08_CoherenceCorePart1:1546, `{τ:IntegralCharacterMap L G}` 汎用) で discharge 可能。要 input =
+  η₁ の **member 分解 D'** (ψ=0, `D'.tau1 η₁=cY.extension η₁`) + **R(η₁)⊥R(μ_j)** (imageFamily.Orthogonal)。
+- **per-constituent framing が正**: i = `Ind^H_{W₂}φ` の既約構成子 θᵢ (一部 reducible μ_j)。各 χᵢ に Da_i
+  (既約=decompositionDaFromDadeOfDiff / reducible=certainTypeDecompositionDa)。pinning が i を束ねる。
+- **τ=Da_i.tau1 は certain-type で literally 同一** (htau1_agrees:=rfl) ⟹ `Da_i.tau1_image` がそのまま `τ(αᵢ)=Xᵢ−Yᵢ`。
+
+### ▶ 残 = **concrete S08 instantiation** (代数は完備、残りは case-B データへの wiring):
+1. **構成子 index s + per-i Da family** 構築 (multiplicities aᵢ=⟨φ∘e,Res θᵢ⟩, χᵢ=Ind^L_H θᵢ)。
+2. **η₁ の member 分解 D'** (case-B 版 `memberExtensionDecomposition`; 既存は irreducible-Dade 専用 ⟹
+   Sibley/cY 版が要; R(η₁) は Y-anchor の image family) → seam 1「⟨Da_i.X,Y⟩=0」を抽象 lemma で discharge。
+3. 集約恒等式 hagg 組立 (tau_sum_smul_image+sum_smul_constituent_diff_eq+exists_decomposition_caseB) → pinning。
+4. (5.4.b)+eq_smul_of_inner_self_eq で per-i Yᵢ=aᵢY → per-χ image → `hmixed` → coherentXunionYset_caseB_of_glued。
+**hard 寄り = 2 (member 分解+R-直交) と 4 (hmixed への最終 wiring)。代数 brick は再利用可能な形で landed。**
+**正本=本 cont.⁴⁰。次=concrete instantiation (まず 2 の η₁ member 分解 = seam 1 unblock、または 1 の構成子 index 設定)。**
