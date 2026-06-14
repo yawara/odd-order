@@ -2195,3 +2195,33 @@ package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ �
 → producer 完成後: per-constituent (irreducible=`decompositionDaFromDadeOfDiff` / reducible=R(μ_j)+`ofProjection`)
 → (5.4.a)+pinning[済]+(5.4.b) → τ₂ assembly。
 **正本=本 cont.³⁵。image_eq 数学内容 完成。次=producer struct 4-field 組立 (conj 同定が最後の seam)。**
+
+## 2026-06-14 (session 40 cont.³⁶, /loop): ✅✅✅ reducible R(μ_j) producer COMPLETE (item c 解決)
+
+### ✅ landed (72798461, axiom-clean 標準3, leaf 3601):
+- **`columnSum_conj_eq`**: `(μ_j)‾ = μ_{j⁻¹}` (`ClassFunction.conj` 形の (4.9)(a))。
+  🔑 **star = conjAe は defeq** (`rfl` で閉じる; certainType_columnSum_conj の mapRingEquiv 形と接続)。
+- **`certainTypeR`** = **reducible R(μ_j) `OrthonormalCharacterImageFamily`** 完成 (全 4-field):
+  imageSet=Finset.image certainTypeRImage / mem_ZIrr (Int.cast_smul_eq_zsmul+Submodule.smul_mem+neg_mem) /
+  orthonormal (certainTypeRImage_inner+_injective, by_cases on indices で if-instance 不一致回避) /
+  image_eq (columnSum_conj_eq+Finset.sum_image+dadeICM_columnDiff_eq_sum)。
+  パラメータ = χ₂≠1 + hdeg (`∑μ_{χ₂,i}(1)=∑μ_{χ₂⁻¹,i}(1)`)。
+- **gotchas**: `open scoped Classical in` は **docstring の前**に置く (DecidableEq (ClassFunction G ℂ) を
+  Finset.image に供給; docstring と def の間に置くと "unexpected token open")。orthonormal の if-instance
+  不一致 (Classical vs Prod.decEq) は `.eq_iff` rw でなく `by_cases hpq` で回避。
+
+### 🎉 マイルストン: R(χ) 統合の両 producer 完備:
+- **既約 χ ∈ X**: `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472, 既存) + per-step
+  `decompositionDaFromDadeOfDiff` (S07:5542)。
+- **reducible μ_j ∈ X**: `certainTypeR` (本日完成) + `ofProjection`。
+- **(5.4.a)** `inner_self_chi_re_le_inner_self_X` (済) / **pinning** `eq_of_sum_mul_eq_sum_sq` (cont.³²) /
+  **(5.4.b)** `norm_eq_and_X_eq_sum_of_norm_Y_ge` (済)。
+
+### ▶ 残 R(χ) 統合 = S08 case-B 側の per-constituent assembly (S06→S08 接続):
+1. per-constituent χᵢ (Ind_H θᵢ, θᵢ=Ind_Z^H φ 構成子) を irreducible/μ_j 判定 → R(χᵢ) 供給
+   (既約=dade producer / reducible=certainTypeR) → CharacterPsiDecomposition (decompositionDaFromDadeOfDiff
+   or ofProjection)。
+2. αᵢ^τ=Xᵢ−bᵢY+Zᵢ + (5.4.a) bᵢ≤aᵢ → pinning (∑aᵢbᵢ=∑aᵢ²=|H:Z|, eq_of_sum_mul_eq_sum_sq) → bᵢ=aᵢ。
+3. (5.4.b) αᵢ^τ=Xᵢ−aᵢY → per-χ `(χ−aη₁)^τ=X₁−aY` (6.8.2.3 本体) → τ₂ direct assembly (S08)。
+**正本=本 cont.³⁶。R(μ_j) producer 完成 (重要マイルストン)。次=S08 case-B per-constituent assembly
+(S06 R-producer 群を (6.8.2.3) で組む; τ vs hyp.tau の整合 + Y-coherence τ₁ 供給が次の seam)。**
