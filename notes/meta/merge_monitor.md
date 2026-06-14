@@ -54,28 +54,29 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
-2. **E → B の順**で（独立レーンゆえ順序は形式的; BG=E を先に固定）、未マージがあれば自動合流:
-   - マージ前の実 sorry 数を記録:
-     `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/ | wc -l`
-     （コメント "sorry-free" 等の誤カウント回避に `(^|[^a-zA-Z-])sorry` を使う — [[memory: grep sorry]]）
+2. **F → G → B → H の順**で（独立レーンゆえ順序は形式的）、未マージがあれば自動合流:
+   - マージ前の実 sorry 数を記録: `bin/count-sorry`
+     （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
+       旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
+       絶対数の ground truth は build 警告 `lake build OddOrder 2>&1 | grep -c 'uses .sorry.'`）
    - `git merge --no-ff --no-commit <branch>`
    - **コンフリクト時**:
      - `AxiomsCheck.lean` / `OddOrder.lean` の**独立追記衝突** = 両ブロック保持で解決して続行
        （A=keystone 系の `#assert_only_allowed_axioms`、B=Peterfalvi 系の同コマンドは別定理ゆえ両方有効）
      - それ以外・内容が絡む衝突 = `git merge --abort` で**報告**（自動解決しない）
    - **staged が全て `notes/` 配下なら build 省略**(Lean 不変ゆえ結果不変)し直接 commit へ。
-   - **`.lean` を含む場合 — sorry 先行チェックで build 短絡**: build は重い (~3600 jobs) ので**先に**
-     `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/ | wc -l` を取る。マージ前から増えていれば下記ゲートの ⚠ 手順で
+   - **`.lean` を含む場合 — sorry 先行チェックで build 短絡**: build は重い (~3800 jobs) ので**先に**
+     `bin/count-sorry` を取る。マージ前から増えていれば下記ゲートの ⚠ 手順で
      真の tactic sorry か判定し、**真の sorry 増なら build せず即 `git merge --abort`**(build が通っても sorry
      ゲートで落ちるため無駄)。増えていなければ `lake build OddOrder OddOrder.AxiomsCheck`(background, 完了待ち)へ。
    - **合格条件**（全て満たす）:
      - build exit 0 かつ最終行 "Build completed successfully (N jobs)"
      - AxiomsCheck OK（`#assert_only_allowed_axioms` 由来のエラーなし）
-     - 実 sorry 数がマージ前**以下**（増えていない。main は既に ~144 の scaffold sorry を持つので絶対数でなく増分で判定）
-       - ⚠ **count 増加でも即 abort しない**: `(^|[^a-zA-Z-])sorry` は docstring の「`(sorry-free`」を
-         直前 `(` ゆえ誤マッチする（偽陽性）。増分があれば `git diff --cached` で新規マッチ箇所を特定し、
-         真の tactic sorry か確認（`grep -nwE 'sorry' <file> | grep -vE 'sorry-(free|ax)'`、コメント/docstring 内なら偽陽性）。
-         真の sorry 増のみ不合格。実例: BG Thm 3.4 keystone landing は「完全証明済 (sorry-free, axiom-clean)」comment で +1 偽陽性が出た。
+     - `bin/count-sorry` がマージ前**以下**（増えていない。main は既に ~141 の scaffold sorry を持つので絶対数でなく増分で判定）
+       - ⚠ count-sorry は systematic な prose 偽陽性（sorry-free / sorryAx / `sorry'd` / backtick 引用）を
+         除外済ゆえ、増分はほぼ真の tactic sorry。残差 +5（AxiomsCheck.lean 等の block-comment 内 prose）は
+         安定ゆえ delta には無害。疑わしい増分は `git diff --cached` で新規箇所を確認、または build 警告
+         `uses .sorry.` で確定。真の sorry 増のみ不合格。
    - 合格 → `git commit`:
      `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾
      `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`

@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+#
+# bin/count-sorry — 実 tactic `sorry` を数える (docstring/コメントの prose 偽陽性を除外)
+#
+# 旧来の `grep -rnE '(^|[^a-zA-Z-])sorry' OddOrder/` は prose を大量に誤検出していた
+# (2026-06-15 実測: 259 hit vs 実 141)。偽陽性源は systematic に:
+#   - `sorry-free`  (証明済の注記)        → 後続 `-` で除外
+#   - `sorry'd`     (口語「sorry を持つ」) → 後続 `'` で除外
+#   - `sorryAx`     (Lean の実 axiom 名)   → 後続 letter で除外
+#   - `` `sorry` `` (backtick 引用の言及)  → 前後 backtick で除外
+# これらを lookbehind/lookahead で落とすと 146(実 141 に対し +5、ほぼ一致)。
+# 残差 +5 は block-comment 内 prose / 複数 sorry を持つ宣言で、いずれも安定 ⟹
+# merge gate の **delta 検出**(マージ前後の差)は prose 追加に騙されず正確。
+#
+# ⚠ 絶対数の ground truth は Lean elaborator の警告:
+#     lake build OddOrder 2>&1 | grep -c 'uses `sorry`'
+#   ただし full(非 incremental)build が要る。本スクリプトはその軽量 proxy。
+#
+# Usage:
+#   bin/count-sorry            # 件数のみ
+#   bin/count-sorry --list     # file:line:text を列挙
+#   bin/count-sorry --help
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PAT='(?<![A-Za-z\x60-])sorry(?![A-Za-z\x27\x60-])'   # \x60=` \x27='
+DIR="OddOrder/"
+
+case "${1:-}" in
+  --help|-h)
+    grep -E '^#' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    exit 0 ;;
+  --list)
+    cd "$ROOT"; grep -rnP "$PAT" "$DIR" ;;
+  "")
+    cd "$ROOT"; grep -rnP "$PAT" "$DIR" | wc -l | tr -d ' ' ;;
+  *)
+    echo "count-sorry: unknown arg '$1' (try --help)" >&2; exit 2 ;;
+esac
