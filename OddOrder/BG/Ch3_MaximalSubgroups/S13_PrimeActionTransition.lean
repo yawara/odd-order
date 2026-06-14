@@ -2900,6 +2900,60 @@ theorem factorization_inf_centralizer_Q_eq_of_not_beta [Finite G] (hG : IsMinima
       (Subgroup.card_dvd_of_le inf_le_left) q
   omega
 
+/-- **BG Theorem 13.10, GAP C step 6** (`C_{Q*}(P) = 1`): the regular-action Sylow `Q*` of
+`M_σ ∩ M*` satisfies `Q* ⊓ C_G(P) = ⊥`. Dichotomy on `q* ∈ β(M)`: if `q* ∉ β`, `Q*` is a full
+Sylow `q*`-subgroup of `M_σ` (by `factorization_inf_centralizer_Q_eq_of_not_beta` and the C2
+equality `M_σ ∩ M* = C_{M_σ}(Q)`), so Lemma 13.6 applies (`centralizer_sylow_inf_eq_bot`); if
+`q* ∈ β ⊆ α`, then `Q* ≤ M_α` (`M_α` Hall `α`) and `Q* ≤ C_G(Q)`, so `C_{Q*}(P) ≤ C_{M_α}(PQ) =
+1`. -/
+theorem centralizer_Qstar_P_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPE1 : P ≤ E₁) (hPne : P ≠ ⊥)
+    {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQderived : Q ≤ derivedInG E)
+    (hCMαPQ : S10.Malpha M ⊓ Subgroup.centralizer ((P ⊔ Q : Subgroup G) : Set G) = ⊥)
+    {Mstar : Subgroup G} (hMstarMax : Mstar ∈ maximalSubgroups G) (hMMstar : M ≠ Mstar)
+    (hMσMstar_eq : S10.Msigma M ⊓ Mstar = S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G))
+    {qs : ℕ} [Fact qs.Prime] (hqsσ : qs ∈ S10.sigma M)
+    {Qstar : Subgroup G} (hQstarMσMstar : Qstar ≤ S10.Msigma M ⊓ Mstar)
+    (hQstarcard : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M ⊓ Mstar)).factorization qs) :
+    Qstar ⊓ Subgroup.centralizer (P : Set G) = ⊥ := by
+  have hQstarMσ : Qstar ≤ S10.Msigma M := hQstarMσMstar.trans inf_le_left
+  by_cases hqsβ : qs ∈ S10.beta M
+  · -- `q* ∈ β`: `Q* ≤ M_α` and `Q* ≤ C_G(Q)`, so `C_{Q*}(P) ≤ C_{M_α}(PQ) = ⊥`.
+    have hQstarpiα : Subgroup.IsPiSubgroup (S10.alpha M) Qstar := by
+      intro r hr
+      obtain ⟨hrp, hrdvd, _⟩ := Nat.mem_primeFactors.mp hr
+      have hrqs : r = qs := (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp
+        (hrp.dvd_of_dvd_pow (hQstarcard ▸ hrdvd))
+      rw [hrqs]; exact S10.beta_subset_alpha M hqsβ
+    have hQstarMα : Qstar ≤ S10.Malpha M :=
+      S10.piSubgroup_le_opiCoreInG_of_isHall (S10.isHall_Msigma_Malpha hG h.mem_maximal).2.1
+        (hQstarMσ.trans (S10.Msigma_le M)) hQstarpiα
+    have hQstarCQ : Qstar ≤ Subgroup.centralizer (Q : Set G) :=
+      le_trans (hMσMstar_eq ▸ hQstarMσMstar) inf_le_right
+    rw [← le_bot_iff, ← hCMαPQ]
+    intro a ha
+    obtain ⟨haQstar, haCP⟩ := Subgroup.mem_inf.mp ha
+    refine Subgroup.mem_inf.mpr ⟨hQstarMα haQstar, ?_⟩
+    have hPle : (P : Subgroup G) ≤ Subgroup.centralizer ({a} : Set G) := by
+      intro x hx; rw [Subgroup.mem_centralizer_iff]; intro u hu
+      rw [Set.mem_singleton_iff.mp hu]
+      exact (Subgroup.mem_centralizer_iff.mp haCP x hx).symm
+    have hQle : (Q : Subgroup G) ≤ Subgroup.centralizer ({a} : Set G) := by
+      intro x hx; rw [Subgroup.mem_centralizer_iff]; intro u hu
+      rw [Set.mem_singleton_iff.mp hu]
+      exact (Subgroup.mem_centralizer_iff.mp (hQstarCQ haQstar) x hx).symm
+    rw [Subgroup.mem_centralizer_iff]; intro g hg
+    exact (Subgroup.mem_centralizer_iff.mp (sup_le hPle hQle hg) a (Set.mem_singleton a)).symm
+  · -- `q* ∉ β`: `Q*` is a full Sylow `q*`-subgroup of `M_σ`, so Lemma 13.6 applies.
+    have hcardMσ : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M)).factorization qs := by
+      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived hqsβ]
+    have hQstarmaxMσ : ∀ T : Subgroup G, T ≤ S10.Msigma M → IsPGroup qs ↥T → Qstar ≤ T → Qstar = T :=
+      fun T hT hTq hQT => eq_of_le_of_isPGroup_card_eq_factorization hcardMσ hT hTq hQT
+    exact centralizer_sylow_inf_eq_bot hG h hqsσ hPE1 hPne hQstarMσ
+      (IsPGroup.iff_card.mpr ⟨_, hcardMσ⟩) hQstarmaxMσ hMstarMax hMMstar.symm
+      (hQstarMσMstar.trans inf_le_right)
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
