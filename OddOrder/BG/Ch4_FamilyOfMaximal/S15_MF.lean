@@ -120,6 +120,34 @@ theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
   exact nilpotent_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe (maxNilpotentNormalHall_le_fittingInG M))
 
+/-- If `M_σ` is nilpotent, then `M_σ ≤ M_F`: `M_σ` is then a nilpotent normal Hall subgroup of
+`M` (normal `σ`-core, `σ`-Hall by `Msigma_isHall`, nilpotent by hypothesis), hence one of the
+candidates in the `sSup` defining `M_F`.  `§14`-independent.  Combined with the (gated)
+`M_F ≤ M_σ` of Theorem A this gives `M_F = M_σ ⟺ M_σ` nilpotent (recall `M_F` is always
+nilpotent, `maxNilpotentNormalHall_isNilpotent`). -/
+theorem Msigma_le_maxNilpotentNormalHall_of_nilpotent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
+    OddOrder.BG.Ch3.S10.Msigma M ≤ maxNilpotentNormalHall M := by
+  haveI := hnil
+  have hle := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hcard : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) =
+      Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv
+  apply le_sSup
+  refine ⟨hle, ?_, ?_, ?_⟩
+  · rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hle).symm
+  · obtain ⟨hHcard, hHidx⟩ := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+    refine ⟨fun q hq => by rwa [hcard] at hq, fun q hq hqπ => ?_⟩
+    obtain ⟨hqp, hqd, -⟩ := Nat.mem_primeFactors.mp hq
+    have hdvd : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣
+        (OddOrder.BG.Ch3.S10.Msigma M).index :=
+      Subgroup.relIndex_dvd_index_of_le hle
+    exact hHidx q
+      (Nat.mem_primeFactors.mpr ⟨hqp, hqd.trans hdvd, Subgroup.index_ne_zero_of_finite⟩)
+      (hHcard q hqπ)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
