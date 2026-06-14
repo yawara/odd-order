@@ -225,6 +225,22 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
     s∈β(M*) なら (A)(M:=M*)+GAP3(M*,M) [M↔M* 対称]。⟹ GAP3 も対称 helper 化要。
   - **r 抽出** (H≤M 後): C_{M*_β}(P)≠1→∃r∈β(M*), r∣|C_G(P)|; r∈θ∧H Hall θ→r∣|H|∣|C_M(P)|; r∉σ(M)
     via `S10.disjoint_of_not_conj hMstar hM hnc' |>.1.2`。
+- 2026-06-14 (Lane F, /loop 続き¹¹): **🎉🎉 13.8 GAP 2 の核 `hall_le_of_fitting_prime` (H≤M) COMPLETE**
+  (commit 3ea53795, full build 緑 3807, アーキ分析が効いて一発)。s∈β(M) が F(H) を割り Y を M∩H の
+  非自明 β(M)-部分群 (t-群) とすると H≤M。X=O_s(H) を M_σ へ共役 → X'=X^a に Prop 10.14(d) を M 側で
+  適用 (β 共役不変性回避) → H≤M^{a⁻¹}, Y で collapse → H≤M。
+  ### 🔑 残り 13.8 アーキテクチャ (WLOG は 13.8 本体レベル)
+  - **(B') oriented r-existence**: s∈β(M) (F(H)-prime) なら r∈β(M*) ∣ |C_M(P)|, r∉σ(M)。[M 側]
+    = C_G(P) 可解 + `hall_D` で H⊇C_{M_β}(P) (θ-Hall) + F(H)≠1 で s 抽出 + `hall_le_of_fitting_prime` +
+    C_{M*_β}(P)≠1 で r∈β(M*)∣|H|∣|C_M(P)| + `disjoint_of_not_conj.1.2` で r∉σ(M)。
+    ⚠ Y=O_t(C_{M_β}(P)): t∈π(F(C_{M_β}P))⊆β(M), Y≠⊥ (fittingInG≠⊥ from nontrivial solvable),
+    Y≤C_{M_β}(P)≤M ∧ ≤H。C_{M_β}(P)=C_{M_α}(P) (α=β from step1), β-group (Malpha_isPiGroup+α=β)。
+  - **GAP 3 oriented (symmetric)**: r∈β(M*)∣|C_M(P)|, r∉σ(M) + step1 outputs → False。[M 側]
+    ⚠ **要 reconstruction** (ChatGPT 未収録): M=N_M(Q)M_α + PR を E の可換部分群へ共役 + Thm 13.4 →
+    X⊆C_{M_σ}(R)⊆M*; [X,Q]=1 (M_α∩M*_α=1) → X⊆C_{M_α}(PQ)=1 矛盾。
+  - **main**: H 構成 → s∈π(F(H))⊆β(M)∪β(M*); s∈β(M): (B'-M)+(GAP3-M); s∈β(M*): (B'-M*)+(GAP3-M*)。
+  - landed building blocks: step1 / normalizer-growth / collapse / conj-into-Msigma / **hall_le (核)**。
+  - 次: BG 本文 (mmd ~L3640) で GAP 3 steps 5-6 を精読し自力再構成可否を判断 → (B') か GAP 3 を執筆。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
