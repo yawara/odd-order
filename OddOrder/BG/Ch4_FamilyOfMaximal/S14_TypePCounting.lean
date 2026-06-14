@@ -383,51 +383,75 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G))) := by
   sorry
 
-/-- **BG Corollary 14.3** (mmd L3809): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element
-`x'` of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
+/-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
+of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
 `ℓ_σ(x') = 1`, and `𝓜(C_G(x')) = {M}`.
 
-**Faithfulness note (2026-06-14):** the current Lean surface diverges from BG and needs
-reformulation at proof time (gated on §13). (i) The hypothesis `x' ∈ M` should be
-`x' ∈ C_M(x)` (BG requires `x'` to centralize `x`); the centralizing clause is missing.
-(ii) Branch (1)'s body asserts `x' ∈ M_σ ⊓ C_G(x)`, but `x'` is a nonidentity `σ(M)'`-element
-and so cannot lie in the `σ(M)`-group `M_σ` — this looks like an `x ↔ x'` transposition of
-BG's `x ∈ C_{M_σ}(K)` (i.e. `x ∈ M_σ ⊓ C_G(x')`), and it also drops `C_G(x) ⊆ M`.
-(iii) Branch (2) drops `ℓ_σ(x') = 1` and `𝓜(C_G(x')) = {M}`. See `notes/bg/s14_typeP_counting.md`. -/
+Proof sketch (gated on §13 via Prop 14.2): a prime `p ∈ π(⟨x'⟩) ∩ τ₂(M)'` lies in
+`τ₁(M) ∪ τ₃(M)`, and `C_{M_σ}(X) ⊇ ⟨x⟩ ≠ 1` for `X ∈ ℰ_p¹(⟨x'⟩)` forces `p ∈ κ(M)`; then
+Lemma 14.1(b) gives `x' ∈ K`, `x ∈ C_{M_σ}(K)`, and Proposition 14.2(c) yields `C_G(x) ⊆ M`
+(branch 1).  Otherwise `x'` is a `τ₂(M)`-element with `C_{M_σ}(x') ≠ 1`, so Corollary 12.10(e)
+gives `𝓜(C_G(x')) = {M}` and Lemma 12.11(a) gives `ℓ_σ(x') = 1` (branch 2).
+
+**Faithfulness (2026-06-15):** reformulated to the verbatim BG statement.  The earlier scaffold
+had an `x ↔ x'` transposition (branch 1's body asserted the impossible `x' ∈ M_σ`), a missing
+`x'`-centralizes-`x` hypothesis, and dropped `C_G(x) ⊆ M`, `ℓ_σ(x')`, and `𝓜(C_G(x'))`.
+`ℓ_σ(x')` is carried by the `SigmaDecompositionData` `D` (`D.length x' = 1`).  Proof deferred
+(gated on §13).  See `notes/bg/s14_typeP_counting.md`. -/
 theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x x' : G}
-    (hx : x ∈ sigmaSharp M) (hx' : x' ∈ M) (hx'sigma : ∀ p ∈ piSet (Subgroup.closure {x'}),
+    (hx : x ∈ sigmaSharp M) (hx'M : x' ∈ M) (hx'1 : x' ≠ 1)
+    (hx'cent : x' ∈ Subgroup.centralizer ({x} : Set G))
+    (hx'sigma : ∀ p ∈ piSet (Subgroup.closure {x'}),
       p ∉ OddOrder.BG.Ch3.S10.sigma M) :
-    (∃ p ∈ kappa M, x' ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓
-      Subgroup.centralizer ({x} : Set G)) ∨
-    (∃ p ∈ tau2 M, x' ∈ Subgroup.centralizer ({x} : Set G)) := by
+    ((∀ p ∈ piSet (Subgroup.closure {x'}), p ∈ kappa M) ∧
+        Subgroup.centralizer ({x} : Set G) ≤ M) ∨
+    ((∀ p ∈ piSet (Subgroup.closure {x'}), p ∈ tau2 M) ∧
+        D.length x' = 1 ∧
+        maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) = {M}) := by
   sorry
 
 /-! ## Theorem 14.4 and Lemma 14.5: sigma-length one centralizers -/
 
-/-- **BG Theorem 14.4** (mmd L3826, D. Sibley for part (f)): if `𝓜_σ(x)` is nonempty, then
-`C_G(x)` has a **normal Hall subgroup `R(x)` that acts sharply transitively on `𝓜_σ(x)`**;
-furthermore, if `|𝓜_σ(x)| > 1` then `C_G(x)` lies in a unique `N = N(x) ∈ 𝓜` with
-(a) `R(x) = C_{N_σ}(x) ⊋ 1`, (b) `C_G(x) = C_{M∩N}(x) R(x)`, (c) `π(⟨x⟩) ⊆ τ₂(N) ⊆ σ(M)`,
-(d) `π(M) ∩ σ(N) ⊆ β(N)`, (e) `M ∩ N` complements `N_σ` in `N`, and (f) `N ∈ 𝓜_F ∪ 𝓜_{P₂}`.
+/-- **BG Theorem 14.4** (mmd L3869, D. Sibley for part (f)): if `x ∈ G^#` and `𝓜_σ(x)` is
+nonempty (equivalently `ℓ_σ(x) = 1`), then `C_G(x)` has a normal Hall subgroup `R(x)` acting
+sharply transitively on `𝓜_σ(x)`.  Furthermore, if `|𝓜_σ(x)| > 1` then `C_G(x)` lies in a
+unique `N = N(x) ∈ 𝓜`, and for every `M ∈ 𝓜_σ(x)`:
+(a) `R(x) = C_{N_σ}(x) ⊋ 1` (a normal Hall `σ(N)`-subgroup of `C_G(x)`),
+(b) `C_G(x) = C_{M∩N}(x) R(x)`,
+(c) `π(⟨x⟩) ⊆ τ₂(N) ⊆ σ(M)`,
+(d) `π(M) ∩ σ(N) ⊆ β(N)`,
+(e) `M ∩ N` complements `N_σ` in `N`, and
+(f) `N ∈ 𝓜_F ∪ 𝓜_{P₂}`.
 
-**Faithfulness note (2026-06-14):** this Lean surface is a partial that captures only that
-some maximal `N` admits a Hall `σ(N)`-subgroup `R ≤ C_G(x)` with `N ∈ 𝓜_F ∪ 𝓜_{P₂}`. It
-**drops** the headline (`R(x)` normal in `C_G(x)`, sharply transitive on `𝓜_σ(x)`) and parts
-(a)–(e), and — more importantly — it **drops the `|𝓜_σ(x)| > 1` guard** on part (f): as
-written it asserts the type-`F/P₂` existence even in the single-maximal case, which BG does
-not give (there `R(x) = 1` and no `N(x)` structure). The full headline is preserved in §16
-Theorem D (`RData` / `ConjSharplyTransitiveOn`); decide at proof time (gated on §13) whether
-to restate it here or cite §16. See `notes/bg/s14_typeP_counting.md`. -/
+**Faithfulness (2026-06-15):** the earlier scaffold's over-claim is fixed — the `N`/type
+structure is now **guarded by `|𝓜_σ(x)| > 1`** (in the single-maximal case `R(x) = 1` and
+there is no `N(x)`, so BG asserts no such structure).  `R(x)` is pinned to its concrete value
+`C_{N_σ}(x) = M_σ(N) ⊓ C_G(x)` (part (a)), `N` is unique (`∃!`), and parts (a),(c),(d),(e),(f)
+are recorded.  **Deferred to §16:** the headline "`R(x)` normal in `C_G(x)` and **sharply
+transitive** on `𝓜_σ(x)`" and part (b) are preserved verbatim in §16 (`RData` /
+`ConjSharplyTransitiveOn`, Theorem D); this surface should cite §16 at proof time rather than
+restating them (importing §16 here would be circular).  Proof gated on §13 (Thm 13.9 + the
+Cor 14.3 funnel).  See `notes/bg/s14_typeP_counting.md`. -/
 theorem sigmaLength_one_centralizer_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
     {x : G} (hx : x ≠ 1) (hlen : D.length x = 1) :
     (maximalSigmaSubgroupsOfElement x).Nonempty ∧
-      ∃ N R : Subgroup G,
-        N ∈ maximalSubgroups G ∧ R ≤ Subgroup.centralizer ({x} : Set G) ∧
-        Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)
-          (R.subgroupOf (Subgroup.centralizer ({x} : Set G))) ∧
-        (IsTypeF N ∨ IsTypeP2 N) := by
+      (1 < (maximalSigmaSubgroupsOfElement x).ncard →
+        ∃! N : Subgroup G, N ∈ maximalSubgroups G ∧
+          Subgroup.centralizer ({x} : Set G) ≤ N ∧
+          OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ ∧
+          Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+            ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+              (Subgroup.centralizer ({x} : Set G))) ∧
+          (∀ p ∈ piSet (Subgroup.closure {x}), p ∈ tau2 N) ∧
+          (IsTypeF N ∨ IsTypeP2 N) ∧
+          ∀ M ∈ maximalSigmaSubgroupsOfElement x,
+            tau2 N ⊆ OddOrder.BG.Ch3.S10.sigma M ∧
+            OddOrder.BG.Ch3.S10.sigma N ∩ piSet M ⊆ OddOrder.BG.Ch3.S10.beta N ∧
+            Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+              ((M ⊓ N).subgroupOf N)) := by
   sorry
 
 /-- **BG Lemma 14.5(b)** (mmd L3875): for nonconjugate maximal `M`, `N`, the conjugacy
@@ -551,17 +575,18 @@ Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`
 abelian `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ⊆ H_σ`, `M ∩ H = U K`, `N_H(U) ⊄ M`,
 `K ⊆ F(H ∩ M*)`, and `H ∩ M*` complements `H_σ` in `H`.
 
-**Faithfulness note (2026-06-14):** the Lean surface captures `H ∈ 𝓜_F`, `U ⊆ H_σ`, and
-`M ∩ H = U ⊔ K`, and defers `N_H(U) ⊄ M`, `K ⊆ F(H ∩ M*)`, the complement clause, and the
-dual-pair data (gated on §13). **Its hypotheses are too weak**: it takes an arbitrary
-`U ≤ M`, `R ≤ U` with `R ≠ ⊥`, whereas BG needs `U` to be the specific Hall `(κ ∪ σ)'`-factor
-of Proposition 14.2(a) and `R` to be a *Sylow* subgroup of that `U`. The conclusion does not
-hold for arbitrary `U`, `R`; tighten the hypotheses at proof time. See
-`notes/bg/s14_typeP_counting.md`. -/
+**Faithfulness (2026-06-15):** the hypotheses are now tightened to BG — `U` is the specific
+abelian Hall `(κ(M) ∪ σ(M))'`-factor of Proposition 14.2(a) and `R` is a *Sylow* `r`-subgroup
+of `U` (`IsHallSubgroup {r}`), not an arbitrary `U ≤ M`, `R ≤ U` with `R ≠ ⊥` (under which the
+conclusion fails).  The conclusion is a faithful partial: it captures `H ∈ 𝓜_F`, `U ⊆ H_σ`,
+and `M ∩ H = U ⊔ K`, and defers `N_H(U) ⊄ M`, `K ⊆ F(H ∩ M*)`, the complement clause, and the
+dual-pair data (gated on §13).  See `notes/bg/s14_typeP_counting.md`. -/
 theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K U R : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    {M K U R : Subgroup G} {r : ℕ} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
-    (hUle : U ≤ M) (hRle : R ≤ U) (hRne : R ≠ ⊥) :
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U)
+    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U)) :
     ∃ H : Subgroup G,
       H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
       IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K := by
