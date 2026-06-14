@@ -299,6 +299,22 @@ ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ;
   - **(iv) `[M_α∩M*,Q]⊆M*_α`**: 唯一 genuine な不確実点 (M*'/M*_α 経由の議論)。impasse なら ChatGPT。
   - **改訂方針**: head + (ii) + (iii) は自力 grind (handle 判明)。(iv) は試行 → 詰まれば ChatGPT。
     GAP 3 ChatGPT 回答が来れば iii/iv 一括検証。次イテレーション = head `Q=[Q,P]⊆M'∩M*'` を landing。
+- 2026-06-14 (Lane F, /loop 続き¹⁶〜¹⁸): head 部分の補題群を landing (計 17 building blocks):
+  `pSubgroup_le_derived_inf` (Q=[Q,P]⊆M'∩M*'), `sylow_of_maximal_pSubgroup` (極大q部分群→Sylow, 汎用)。
+  ### 🔑🔑 unlock: α=β で head Frattini に M_β 機構が使える
+  step1 出力 `α(M)=β(M)` ⟹ `M_α=M_β` ⟹ head `M=N_M(Q)M_α` = `M=N_M(Q)M_β`。M_β 版機構が既存:
+  - **`S10.derivedQuotientMbeta_isNilpotent`** (S10_BetaRadical:414): `IsNilpotent(M'/M_β)`。
+  - **`S10.normal_sup_sylow_of_quotient_nilpotent`** (S10_BetaRadical:458, 汎用 Γ/N): `Γ/N` nilpotent
+    + N⊲Γ + q∤|N| + Q Sylow q of Γ ⟹ `(N⊔Q).Normal`。Γ=↥M', N=M_β.subgroupOf M', Q=Q.subgroupOf M'
+    ⟹ `QM_β⊲M'`。
+  - **char-step `QM_β⊲M' → QM_β⊲M`**: QM_β/M_β = O_q(M'/M_β) (nilpotent の正規 Sylow=char), m∈M は
+    M'/M_β の自己同型を誘導し char を保つ ⟹ M≤N_G(QM_β)。⚠ ~30行の intricate (要 grind)。
+  - **Frattini** `Sylow.normalizer_sup_eq_top` (Γ=↥M, N=QM_β.subgroupOf M, Q Sylow q ↥M via
+    `sylow_of_maximal_pSubgroup`) ⟹ M=N_M(Q)·QM_β=N_M(Q)M_β。transport は S13_Lemma131:296-310 mirror。
+  - **参照実装** = `S13_Lemma131.exists_sylow_frattini_decomp` (:204-310) が同パターン (core=O_{β∪{q}}(M')
+    だが M_β core に変更; r=q を避けるため M_β core 必須 [O_{β∪{q}} は q 含むので r=q で破綻])。
+  - 次: Frattini `M=N_M(Q)M_β` を上記で grind → GAP3 (ii)/(iii)/(iv) → 配線。(iv) のみ ChatGPT 候補。
+    🔶 13.8 は大規模 (17 blocks 完成, 残 ~6-9 iter)。GAP 3 ChatGPT (Frattini-args+ii/iii/iv) が来れば加速。
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
   式番号 (13.2)(13.3)(13.4) を PDF で確定。helper 2 本 landed (✅ sorry-free, leaf 緑):
   `actsPrimeOn_inf_centralizer_eq_bot` (step 5c) + `actsPrimeOn_of_prime_order_le` (step 4 reduction)。
