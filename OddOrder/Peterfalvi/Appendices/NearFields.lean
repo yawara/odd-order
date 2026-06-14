@@ -233,6 +233,99 @@ theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F
   have hle : Nat.card A ≤ Nat.card sma := Nat.le_of_dvd hpos hdvd
   omega
 
+/-- **Maschke's theorem for an elementary abelian operator module** (the splitting step in
+Appendix C, Proposition 2).  Let `A` act on an elementary abelian `p`-group `E` via
+`φ : A →* MulAut E`, with `(|A|, |E|)` coprime and `p ∣ |E|`.  Then every `A`-invariant subgroup
+`U ≤ E` has an `A`-invariant **complement** `W` (`IsCompl U W`, so `E` is the internal direct sum
+`U ⊕ W`).  `Additive E` is an `F_p`-vector space on which `A` acts coprimely, so the representation
+is semisimple (`ComplementedLattice` on `Subrepresentation`) and the submodule for `U` splits; the
+complement is transported back to a subgroup through the order-isomorphisms
+`AddSubgroup.toZModSubmodule` and `AddSubgroup.toSubgroup'`.  (Direct elementary-abelian analogue of
+`OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient`, without the `Ω₁`
+quotient wrapping.) -/
+theorem exists_aInvariant_complement_of_elementaryAbelian
+    {E : Type*} [CommGroup E] [Finite E] {p : ℕ} [Fact p.Prime]
+    (hE : OddOrder.GroupTheory.IsElementaryAbelian p E)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut E}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card E)) (hpE : p ∣ Nat.card E)
+    {U : Subgroup E} (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    ∃ W : Subgroup E, OddOrder.Isaacs.Ch03.IsAInvariant φ W ∧ IsCompl U W := by
+  classical
+  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  -- `Additive E` is a `ZMod p`-module.
+  have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  haveI : NeZero ((Nat.card A : ZMod p)) :=
+    OddOrder.BG.Ch1_Preliminary.neZero_natCast_zmod_of_coprime hcop hpE
+  -- the `F_p[A]`-representation carried by `φ`.
+  set ρ : Representation (ZMod p) A (Additive E) :=
+    (OddOrder.BG.Ch1_Preliminary.mulAutToEnd E p).comp φ with hρ_def
+  have key_rho : ∀ (a : A) (v : Additive E),
+      Additive.toMul (ρ a v) = (φ a) (Additive.toMul v) := fun _ _ => rfl
+  -- `U` as a `ZMod p`-submodule `pU`, and its `ρ`-invariance.
+  set pU := AddSubgroup.toZModSubmodule (n := p) (Subgroup.toAddSubgroup U) with hpU_def
+  have hmem_pU : ∀ v : Additive E, v ∈ pU ↔ Additive.toMul v ∈ U := by
+    intro v
+    simp only [hpU_def, AddSubgroup.mem_toZModSubmodule, Additive.mem_toAddSubgroup]
+  have hpU_invt : pU ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    intro v hv
+    rw [hmem_pU] at hv ⊢
+    rw [key_rho]
+    exact hUinv.smul_mem a hv
+  have hpU_sub : ∀ (a : A) ⦃v : Additive E⦄, v ∈ pU → ρ a v ∈ pU := by
+    intro a v hv
+    have hmem := ρ.mem_invtSubmodule.mp hpU_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem v hv
+  -- Maschke: `pU` has an invariant complement `qc`.
+  obtain ⟨qcSub, hcompl⟩ :=
+    ComplementedLattice.exists_isCompl (⟨pU, hpU_sub⟩ : Subrepresentation ρ)
+  set qc : Submodule (ZMod p) (Additive E) := qcSub.toSubmodule with hqc_def
+  have hqc_invt : qc ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    exact fun v hv => qcSub.apply_mem_toSubmodule a hv
+  have hinf : pU ⊓ qc = ⊥ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+    simpa [Subrepresentation.toSubmodule_inf] using h
+  have hsup : pU ⊔ qc = ⊤ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
+    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- transport `qc` to a subgroup `W` of `E` via the order-iso `Φ`.
+  let Φ : Submodule (ZMod p) (Additive E) ≃o Subgroup E :=
+    (AddSubgroup.toZModSubmodule (n := p)).symm.trans AddSubgroup.toSubgroup'
+  set W : Subgroup E := Φ qc with hW_def
+  have hΦpU : Φ pU = U := by
+    have h1 : (AddSubgroup.toZModSubmodule (n := p)).symm pU = Subgroup.toAddSubgroup U := by
+      rw [hpU_def, OrderIso.symm_apply_apply]
+    simp only [Φ, OrderIso.trans_apply, h1]
+    exact Subgroup.toAddSubgroup.symm_apply_apply U
+  have hmem_W : ∀ h : E, h ∈ W ↔ (Additive.ofMul h) ∈ qc := by
+    intro h
+    rw [hW_def]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
+  have hW_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ W := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a h hh
+    rw [hmem_W] at hh ⊢
+    have hmem := ρ.mem_invtSubmodule.mp hqc_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem _ hh
+  refine ⟨W, hW_inv, ?_, ?_⟩
+  · rw [disjoint_iff]
+    have h := congrArg Φ hinf
+    rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
+  · rw [codisjoint_iff]
+    have h := congrArg Φ hsup
+    rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
