@@ -2954,6 +2954,33 @@ theorem centralizer_Qstar_P_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
       (IsPGroup.iff_card.mpr ⟨_, hcardMσ⟩) hQstarmaxMσ hMstarMax hMMstar.symm
       (hQstarMσMstar.trans inf_le_right)
 
+/-- **BG Theorem 13.10, GAP C step 5** (`N_G(Q*) ⊆ M`): for the regular-action Sylow `Q*` of
+`M_σ ∩ M*`, `N_G(Q*) ⊆ M`. If `q* ∈ β(M)`, `Q*` is a nontrivial `β`-subgroup, so Prop 10.14(d).
+If `q* ∉ β`, `Q*` is a full Sylow `q*`-subgroup of `M_σ` (same factorization argument as step 6),
+so `normalizer_einvariant_sylow_le` (via the definition of `σ(M)`). -/
+theorem normalizer_Qstar_le_M [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {q : ℕ} [Fact q.Prime] {Q : Subgroup G} (hQderived : Q ≤ derivedInG E)
+    {Mstar : Subgroup G}
+    (hMσMstar_eq : S10.Msigma M ⊓ Mstar = S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G))
+    {qs : ℕ} [Fact qs.Prime] (hqsσ : qs ∈ S10.sigma M)
+    {Qstar : Subgroup G} (hQstarMσMstar : Qstar ≤ S10.Msigma M ⊓ Mstar) (hQstarne : Qstar ≠ ⊥)
+    (hQstarcard : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M ⊓ Mstar)).factorization qs) :
+    Subgroup.normalizer (Qstar : Set G) ≤ M := by
+  have hQstarMσ : Qstar ≤ S10.Msigma M := hQstarMσMstar.trans inf_le_left
+  by_cases hqsβ : qs ∈ S10.beta M
+  · have hQstarpiβ : Subgroup.IsPiSubgroup (S10.beta M) Qstar := by
+      intro r hr
+      obtain ⟨hrp, hrdvd, _⟩ := Nat.mem_primeFactors.mp hr
+      have hrqs : r = qs := (Nat.prime_dvd_prime_iff_eq hrp Fact.out).mp
+        (hrp.dvd_of_dvd_pow (hQstarcard ▸ hrdvd))
+      rw [hrqs]; exact hqsβ
+    exact S10.normalizer_le_of_nontrivial_beta_subgroup hG h.mem_maximal
+      (hQstarMσ.trans (S10.Msigma_le M)) hQstarne hQstarpiβ
+  · have hcardMσ : Nat.card ↥Qstar = qs ^ (Nat.card ↥(S10.Msigma M)).factorization qs := by
+      rw [hQstarcard, hMσMstar_eq, factorization_inf_centralizer_Q_eq_of_not_beta hG h hQderived hqsβ]
+    exact normalizer_einvariant_sylow_le hG h.mem_maximal hqsσ hQstarMσ hcardMσ
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
