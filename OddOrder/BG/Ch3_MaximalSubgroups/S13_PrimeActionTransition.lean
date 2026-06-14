@@ -2186,6 +2186,34 @@ theorem centralizer_sylow_inf_eq_bot [Finite G] (hG : IsMinimalSimpleOdd G)
   rw [hMS, Set.mem_singleton_iff] at hMem
   exact hMne hMem
 
+/-- **Thm 13.9 WLOG conjugation**: `S` が `G` の Sylow `q`-部分群 (`|S| = q^{v_q(|G|)}`)、`q∈σ(M*)`
+なら、`M*` のある共役 `conj g • M*` が `S` を含み `N_G(S) ⊆ conj g • M*`。`M*` の Sylow `q` を
+`G` の Sylow `q` `S*` へ写し (`isSylow_sylowMap_of_mem_sigma`、`N_G(S*)⊆M*`)、`S` と `S*` の
+Sylow 共役 (`MulAction.exists_smul_eq`) `conj g • S* = S` を取り、`S*≤M*`・`N_G(S*)⊆M*` を共役。 -/
+theorem exists_conj_Mstar_normalizer_le [Finite G]
+    {Mstar : Subgroup G} {q : ℕ} [Fact q.Prime] (hqσ : q ∈ S10.sigma Mstar)
+    {S : Subgroup G} (hScard : Nat.card ↥S = q ^ (Nat.card G).factorization q) :
+    ∃ g : G, S ≤ MulAut.conj g • Mstar ∧
+      Subgroup.normalizer (S : Set G) ≤ MulAut.conj g • Mstar := by
+  set SG : Sylow q G := Sylow.ofCard S hScard with hSGdef
+  obtain ⟨Pstar⟩ := (inferInstance : Nonempty (Sylow q ↥Mstar))
+  obtain ⟨Sstar, hSstar⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ Pstar
+  have hNSstar : Subgroup.normalizer ((Sstar : Subgroup G) : Set G) ≤ Mstar := by
+    rw [hSstar]; exact S10.normalizer_sylow_map_le_of_mem_sigma hqσ Pstar
+  have hSstarM : (Sstar : Subgroup G) ≤ Mstar := by rw [hSstar]; exact Subgroup.map_subtype_le _
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Sstar SG
+  have hconj : MulAut.conj g • (Sstar : Subgroup G) = S := by
+    have h := congr_arg Sylow.toSubgroup hg
+    rw [Sylow.coe_subgroup_smul, hSGdef, Sylow.coe_ofCard] at h
+    exact h
+  refine ⟨g, ?_, ?_⟩
+  · rw [← hconj]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hSstarM
+  · have hnorm : MulAut.conj g • Subgroup.normalizer ((Sstar : Subgroup G) : Set G)
+        = Subgroup.normalizer ((MulAut.conj g • (Sstar : Subgroup G) : Subgroup G) : Set G) :=
+      Subgroup.map_normalizer_eq_of_bijective _ (MulAut.conj g).bijective
+    rw [← hconj, ← hnorm]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hNSstar
+
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。
 
 証明は `M_σ` の冪零性で場合分け: `M_σ` 冪零なら Lemma 10.12 (`disjoint_of_not_conj` の冪零条項)
