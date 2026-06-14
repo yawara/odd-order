@@ -442,6 +442,38 @@ theorem inner_compHom_of_mulEquiv {G' H' : Type*} [Group G'] [Group H'] [Fintype
   rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
     ClassFunction.innerSum, ClassFunction.innerSum, hsum, hinv]
 
+/-- **Induction in stages** (Peterfalvi (6.8.2.3) `Ind^H(Ind^H_Z φ) = Ind^L_Z φ`).  For nested
+subgroups `K ≤ H ≤ M`, inducing a class function `ψ` of `K` to `M` in one step agrees with inducing
+first to `H` (of `ψ` transported to `K.subgroupOf H`) and then to `M`:
+`Ind^M_H (Ind^H_{K.subgroupOf H} (ψ ∘ e)) = Ind^M_K ψ`, where `e : K.subgroupOf H ≃* K`.
+
+Proved by completeness (`classFunction_eq_zero_of_orthogonal`): for every `χ ∈ Irr M`, double
+Frobenius reciprocity reduces `⟨LHS, χ⟩` to `⟨ψ∘e, Res_{K.subgroupOf H}(Res_H χ)⟩`, the restriction
+`Res_{K.subgroupOf H}(Res_H χ) = (Res_K χ)∘e` is the same `M`-value, and `inner_compHom_of_mulEquiv`
+strips the transport to give `⟨ψ, Res_K χ⟩ = ⟨Ind^M_K ψ, χ⟩` (Frobenius). -/
+theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
+    {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (ψ : ClassFunction ↥K ℂ) :
+    ClassFunction.induce H (ClassFunction.induce (K.subgroupOf H)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom ψ))
+      = ClassFunction.induce K ψ := by
+  set e := Subgroup.subgroupOfEquivOfLe hKH with he
+  have hres : ∀ χ : IrreducibleCharacter M,
+      ClassFunction.restrict (K.subgroupOf H)
+          (ClassFunction.restrict H (χ : ClassFunction M ℂ))
+        = ClassFunction.compHom e.toMonoidHom (ClassFunction.restrict K (χ : ClassFunction M ℂ)) := by
+    intro χ; ext y
+    rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply, ClassFunction.compHom_apply,
+      ClassFunction.restrict_apply]
+    congr 1
+  refine sub_eq_zero.mp (classFunction_eq_zero_of_orthogonal _ (fun χ => ?_))
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_induce_eq_inner_restrict,
+    ClassFunction.inner_induce_eq_inner_restrict, hres χ, inner_compHom_of_mulEquiv,
+    ClassFunction.inner_induce_eq_inner_restrict, sub_self]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
