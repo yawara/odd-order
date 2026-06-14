@@ -744,6 +744,25 @@ theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card
   rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
     ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
 
+/-- **(6.8.2.2)→(6.8.2.3) aggregate `hagg` builder.**  Assembles the `hagg` input of
+`per_constituent_Y_eq_smul` from the three (6.8.2.2) pieces: the image decomposition
+`τ β = Xagg − n·Y` (`exists_decomposition_caseB`, `β = Ind^L_{W₂}φ − |H:Z|·η₁`, `n = |H:Z|`), the
+constituent sum `β = ∑ aᵢ·αᵢ` (`sum_smul_constituent_diff_eq`), and the per-constituent images
+`τ(αᵢ) = Xᵢ − Yᵢ` (each `CharacterPsiDecomposition.tau1_image`, with `τ₁ = τ` for the certain-type
+`certainTypeDecompositionDa`).  Rewriting `Xagg − n·Y = τ β = τ(∑ aᵢαᵢ) = ∑ aᵢ(Xᵢ − Yᵢ)` via
+`tau_sum_smul_image` gives the aggregate `Xagg − n·Y = ∑ aᵢ·(Xᵢ − Yᵢ)`. -/
+theorem aggregate_eq_sum_of_constituent {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)]
+    {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
+    (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
+    {β : ClassFunction ↥L ℂ} {Xagg Y : ClassFunction G ℂ} {n : ℤ}
+    (hmemimg : ∀ i ∈ s, τ (α i) = Xv i - Yv i)
+    (hconstit : β = ∑ i ∈ s, (a i : ℂ) • α i)
+    (hdecomp : τ β = Xagg - (n : ℂ) • Y) :
+    Xagg - (n : ℂ) • Y = ∑ i ∈ s, (a i : ℂ) • (Xv i - Yv i) := by
+  rw [← hdecomp, hconstit]
+  exact tau_sum_smul_image s τ α Xv Yv a hmemimg
+
 /-- **(6.8.2.3) per-constituent pinned image `Yᵢ = aᵢ·Y`.**  The capstone of the (6.8.2.3) per-step
 bound + pinning + Cauchy–Schwarz-equality bridge, packaging the whole `pinning → image` algebra so the
 case-(B) instantiation need only discharge the named structural hypotheses.
