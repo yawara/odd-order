@@ -672,6 +672,24 @@ theorem E2_ne_bot_of_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
     _ = E₁ ⊔ E₃ := by rw [hE2bot, sup_bot_eq]
     _ ≤ E₁ ⊔ derivedInG E := sup_le_sup_left (h.E3_le_derived hG) E₁
 
+/-- A nontrivial `E₁` (Hall `τ₁`-subgroup of `E`) contains a `τ₁(M)`-line: `∃ ℓ ∈ τ₁(M)` and
+`P ∈ ℰ_ℓ¹(E₁)`. (Cauchy in `↥E₁` plus `π(E₁) ⊆ τ₁(M)`.) Used in Lemma 13.6 step 6 to apply
+Theorem 13.4. -/
+theorem exists_tau1_line_le_E1 [Finite G]
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (hE1ne : E₁ ≠ ⊥) :
+    ∃ ℓ : ℕ, ℓ.Prime ∧ ℓ ∈ tau1 M ∧ ∃ P : Subgroup G, P ∈ elemAbelianOfRank G ℓ 1 ∧ P ≤ E₁ := by
+  have hcard : Nat.card ↥E₁ ≠ 1 := fun hh => hE1ne (Subgroup.card_eq_one.mp hh)
+  obtain ⟨ℓ, hℓp, hℓdvd⟩ := Nat.exists_prime_and_dvd hcard
+  haveI : Fact ℓ.Prime := ⟨hℓp⟩
+  have hℓτ1 : ℓ ∈ tau1 M :=
+    h.isPiGroup_tau1 ℓ (Nat.mem_primeFactors.mpr ⟨hℓp, hℓdvd, Nat.card_pos.ne'⟩)
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₁) ℓ hℓdvd
+  have hPcard : Nat.card ↥((Subgroup.zpowers x).map E₁.subtype) = ℓ := by
+    rw [Subgroup.card_map_of_injective E₁.subtype_injective, Nat.card_zpowers, hx]
+  refine ⟨ℓ, hℓp, hℓτ1, (Subgroup.zpowers x).map E₁.subtype, ?_, Subgroup.map_subtype_le _⟩
+  exact mem_elemAbelianOfRank.mpr
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [pow_one]; exact hPcard⟩
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
