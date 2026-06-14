@@ -1942,3 +1942,24 @@ API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §
 **BG §13-16** (Lane F/G)。ユーザーは状況理解の上で **Pf §6-§8 coherence API 継続**を選択 (FT sorry は当面
 減らないが Pf 完成に必要)。⟹ Lane B は case-B (6.8.2.3) genuine gap (上記 1-5) を継続。
 **正本=本 cont.²⁷。次=既存 infra 精査の上 genuine gap (character 分解 from 1.) を構築。重複回避必須。**
+
+## 2026-06-14 (session 40 cont.²⁸, /loop): 🔄 re-calibration — (6.8.2.3) infra は大半既存 (cont.²⁶ の「from-scratch mathlib infra」は悲観過ぎ); 分解 lemma landed
+
+### 精査で判明 (cont.²⁶ の評価訂正): (6.8.2.3) の building block は**大半既存**:
+- **Fourier 展開** `classFunction_eq_sum_inner_smul` (S08_CoherenceCorePart1:87) = `χ=∑_θ⟨χ,θ⟩•θ`。
+- **∑aᵢ²=|H:Z| norm** `inner_induce_self_eq_index_of_le_center` (S08_CaseBCoherence2:353)。
+- **Clifford** `restrictionMultiplicity`/`liesOver`/`IsRestrictionConstituent` (Clifford.lean)。
+- **§7 R(χ)** `OrthonormalCharacterImageFamily` (S07:766) + (5.4) `inner_self_of_mem`/`Orthogonal`。
+- **(6.8.2.2) 一式** (norm/cross-term/divisibility/trichotomy, exists_decomposition_caseB)。
+⟹ (6.8.2.3) は「from-scratch infra」でなく**既存機構の assembly + induction transitivity 1本**。
+
+### ✅ landed (iter, 6b3aede9): **`induce_eq_sum_inner_restrict_smul`** = `Ind^M_N φ = ∑_θ⟨φ,Res_N θ⟩•θ`
+(Fourier + Frobenius)。新規確認済 (重複なし)。(6.8.2.3) の `Ind^H_Z φ=∑aᵢθᵢ` 分解 (coeff=mult)。
+
+### ▶ 残 (6.8.2.3) genuine gap (assembly 主体):
+1. **coeff→degree**: `⟨φ,Res_N θ⟩ = θ(1)·[θ over φ]` ([Is]2.27 per θ; θ over central linear φ ⟹ Res=θ(1)φ)。← 次, 最 tractable。
+2. **induction transitivity** `Ind_H(Ind_{W₂.subgroupOf H}^H φ) = Ind_{W₂}^L φ` (custom induce 二重和, 唯一の from-scratch infra)。
+3. **αᵢ aggregate** `∑aᵢαᵢ = Ind_{W₂}^L φ − |H:Z|η₁` (1+2+norm)。
+4. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4))。本丸。
+5. **per-χ statement + τ₂ direct assembly**。
+**正本=本 cont.²⁸。(6.8.2.3) は再評価で tractable 化 (infra 大半既存)。次=coeff→degree (1.)。重複回避に survey 必須 (本 session で 3 回 duplicate 回避)。**
