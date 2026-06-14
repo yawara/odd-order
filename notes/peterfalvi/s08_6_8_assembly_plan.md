@@ -2398,3 +2398,29 @@ capstone `per_constituent_Y_eq_smul` が要求する named 仮説を case-B で 
 **評価: 代数 layer (7 lemma+capstone) は完全完成・全 axiom-clean = 本 session の主成果。残りは case-B 固有の
 plumbing で、本丸 = disjointness の新規 infra。これは focused な dedicated 作業 (quick brick でない)。**
 **正本=本 cont.⁴¹。次 tick=disjointness `R(μ_j)⊥Y` の新規 infra 着手 (certainType σ-image vs Y-side 直交)。**
+
+## 2026-06-14 (session 40 cont.⁴², /loop): 🛑 disjointness の機構精査 — 2-element machinery 不適、深い gap 確定
+
+### irreducible 版機構 (`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`, S08p1:1681) の精読:
+`R(x).Orthogonal R(χ)` を source 直交から導く経路 =
+`toOrthonormalImage_orthogonal` ∘ `orthogonal_of_signedDifference_inner_eq_zero`
+((5.2.e): `⟨τ(x−x̄),τ(χ−χ̄)⟩=0` ⟹ per-member 直交) ∘ `inner_dadeDiff_conjDifference_eq_zero`
+(Dade 等長: source `⟨x−x̄,χ−χ̄⟩=0` ⟹ image 直交)。
+
+### 🛑 certainType への非適用性 (確定):
+- `orthogonal_of_signedDifference_inner_eq_zero` は **2-element `CharacterDifferenceImage` {μ,ν} 専用**
+  (signed difference が ±符号で 2 member を encode、norm-1 + 差の直交で per-member を pin)。
+- **certainTypeR は `Bool × Fin w₁` = 2w₁-member 族** (σ-image 経由) ⟹ この 2-element 機構が**直接適用不可**。
+  per-member `⟨certainTypeOmegaSigma h χ₂ i, ξ⟩=0` (ξ=Y-anchor 既約) は `∑α=(μ_j−μ̄_j)^τ` の sum-level
+  からは出ない (per-member ≠ sum)。
+- ⟹ **σ-construction の大域直交性** (σ-image 既約 と Y-coherence 既約 が別既約) を新規に要する。
+  これは §5 σ の image 特徴付け (chiFam の source/support) に踏み込む深い infra。
+
+### 📊 honest 評価 (要判断ブロッカー):
+- **本 session の主成果 = (6.8.2.3) 抽象 toolkit (7 lemma + capstone) 完全完成・全 axiom-clean** (大マイルストン)。
+- concrete instantiation の残り 3 piece (character setup / disjointness / hmixed) は**いずれも §5/§6 の
+  sustained な深い作業**で、quick brick でない。特に **disjointness が本丸 deep gap** (上記)。
+- ここ ~3 tick RECON が続き concrete brick が land していない ⟹ 60s loop tick (context reload) は
+  この深い infra 作業に非効率。**dedicated focused session が適切**。
+**正本=本 cont.⁴²。次の主作業 = disjointness の σ-construction 大域直交 infra (深い、§5 chiFam 特徴付け要)
+or character setup ([Is]2.27 + Ind 分解)。abstract layer は完成済みゆえ、これら infra が揃えば組立は capstone で機械的。**
