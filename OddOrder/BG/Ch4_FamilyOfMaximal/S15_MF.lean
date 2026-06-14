@@ -218,6 +218,14 @@ theorem maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent [Finite G]
   exact le_antisymm (maxNilpotentNormalHall_le_Msigma hG hM)
     (Msigma_le_maxNilpotentNormalHall_of_nilpotent hG hM hnil)
 
+/-- **`M_F ≤ M'`** (the `H ⊆ M'` part of BG Corollary 15.5(c), `H = M_F`): the containment chain
+`M_F ≤ M_σ ≤ M' ≤ M` via `maxNilpotentNormalHall_le_Msigma` and `Msigma_le_derived`.
+`§14`-independent.  (The `M'/M_F` nilpotency of 15.5(c) remains deferred — quotient API.) -/
+theorem maxNilpotentNormalHall_le_derived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    maxNilpotentNormalHall M ≤ derivedInG M :=
+  (maxNilpotentNormalHall_le_Msigma hG hM).trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
