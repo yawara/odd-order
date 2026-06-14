@@ -485,4 +485,39 @@ theorem dadeIntegralCharacterMap_restrict_eq_of_support
       OddOrder.Peterfalvi.S04.Hypothesis.dadeMap_restrict_apply hyp hA₁A hA₁norm]
   rfl
 
+/-- **(6.8.2) case-(B) `X ∪ Y` coherence, glued form.**  The case-(B) counterpart of
+`coherentXunionYset_centralCommutator_of_glued_of_frobenius`: glue the case-(B) `X`-coherence `cX`
+(on `X = S − S(W₂)`, which now contains the reducible column characters `μ_j`) with the `Y`-coherence
+`coherentYset` via the §7 diagonal-aware engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`.
+
+The only case-(B) difference from the Frobenius assembly is the **source orthogonality** `X ⊥ Y`:
+since `X` is no longer all-irreducible, it is supplied by `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`
+from the pairwise `⟨x, y⟩ = 0` (`x ∈ X`, `y ∈ Y`) — for `x = μ_j = ∑ᵢ μ_{ij}` this is
+`∑ᵢ ⟨μ_{ij}, η⟩ = 0`.  The combined extension `ν` (the (6.8.2) `τ₂`), its agreements, the mixed inner
+products `hmixed` (the (6.8.2.3) content), and the cross-diagonal set `D`/`hDτ` (with the satisfiable
+generation `hgen`) are supplied at capstone wiring. -/
+noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L}
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset W2, ν x = cX.extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hpair : ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0)
+    (hmixed : ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥L ℂ)) (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset W2 ∪ hyp.Yset)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset W2)
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+        OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+          (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2 ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    cX hyp.coherentYset ν hagreeX hagreeY
+    (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed D hDτ hgen
+
 end OddOrder.Peterfalvi.S08
