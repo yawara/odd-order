@@ -2531,3 +2531,28 @@ anchor「hyp.tau(A-supported) が V 上消失」= V∩conjugatesOfSet(H^#)=∅ (
 別素数構造で交わらない)。`centralizer_le_L_of_mem_ticVdiffV` (v∈V⟹C_G(v)⊆L, H(a)=⊥ on V) が基盤候補だが
 "A-supported→vanishOnV" 直接 lemma 無し。**anchor = 残る本丸 deep 構造 piece**。
 **正本=本 cont.⁴⁶。grid driver landed。次=NC≤2 (tractable, land) → anchor 構造 (deep, V∩H^#-conj=∅) → assembly。**
+
+## 2026-06-15 (session 41, /loop): ✅✅✅ anchor COMPLETE (本丸 deep 構造 piece 解除) — disjointness machine + NC≤2 + anchor 全 landed
+
+### ✅ landed (S08_CaseBCoherence2, 全 axiom-clean 標準3, leaf 3625 / full 3813):
+| commit | lemma | 役割 |
+|---|---|---|
+| `7a62c601`(前session) | `sigmaNC_le_two_of_inner_chiFam` | NC≤2 (2-irreducible difference) — disjointness brick 4 |
+| `357558c1` | `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` | **disjointness machine** (anchor 以外の 4 brick 連結): orthonormal ξ,ξ'∈±Irr(G), c≠0, c·ξ−c'·ξ' が V 上消失 ⟹ ⟨c·ξ, chiFam pq⟩=0 |
+| `efbfd6af` | **`ticVdiffV_not_mem_conjugatesOfSet_K`** | **anchor group-theoretic core**: v∈(ticVdiff h).V ⟹ v∉conjugatesOfSet(K.map L.subtype)。位数論法 (v=↑(x·y)∈W₁×W₂, v∉W₂⟹x≠1, x=w^n⟹orderOf x∣orderOf v, v~↑k⟹orderOf v=orderOf k∣\|K\|, orderOf x∣gcd(\|K\|,\|W₁\|)=1 [card_coprime] ⟹ x=1 矛盾)。鍵 API: `SemiconjBy.orderOf_eq`, `exists_zpow_proj`, `exists_mul_of_mem_sup`, `Nat.eq_one_of_dvd_coprimes`, `Subgroup.orderOf_mk/coe` |
+| `5157bb9d` | **`tau_apply_eq_zero_of_mem_ticVdiffV`** | **anchor 本体**: α supported on H^#=sharpImage H ⟹ hyp.tau α が (ticVdiff h46).V 上消失。`dadeIntegralCharacterMap_apply_of_support`→`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot` (dade_H_eq_bot) + core lemma + `conjugatesOfSet_mono` (sharpImage H=（K.map)\{1}⊆K.map, via h46.K=H)。α=η₁−η̄₁ で (η₁−η̄₁)^τ が V 上消失 = machine の hvanish |
+
+### 🔑 anchor の構造的洞察 (cont.⁴⁶ の「直接 lemma 無し」を解決):
+anchor = V∩conjugatesOfSet(H^#)=∅ は **TI 還元不要**。位数論法が clean: K=H ゆえ orderOf(a∈H^#)∣\|K\|、v∈V は W₁-成分非自明ゆえ orderOf(W₁-part)∣gcd(\|K\|,\|W₁\|)=1 で矛盾。`card_coprime` (Hypothesis46 固有) が効く。`centralizer_le_L_of_mem_ticVdiffV` は不要だった。
+
+### ▶▶ 次 = **assembly** (seam-1 hXorth = ⟨Y, certainTypeOmegaSigma⟩=0)。ルート全特定:
+1. Y = coherentYset.extension η₁ = ε•ξ (`coherentYset_extension_eq_zsmul_irreducible`, ε=±1, ξ∈Irr G)。同様 η̄₁↦ε'•ξ'。
+2. (η₁−η̄₁)^τ = ε•ξ−ε'•ξ' via `coherentYset.extends_on_supported` (η₁−η̄₁∈ℤ[Yset,H^#])。
+3. Supp(η₁−η̄₁)⊆H^#: `support_sub_induce_subset_sharpImage_of_apply_one_eq` (η₁=Ind θ, η̄₁=Ind θ̄ 両 degree \|W₁\|)。
+4. ξ≠ξ': η₁ 非実 (5.2.a ⟹ η₁≠η̄₁) ⟹ extension 経由 ξ≠ξ' [要 lemma 発掘]。
+5. anchor (`tau_apply_eq_zero_of_mem_ticVdiffV`, α=η₁−η̄₁): ε•ξ−ε'•ξ' が (ticVdiff h46).V 上消失。
+6. machine (`inner_smul_chiFam_eq_zero_of_diff_vanishOnV`, hyp=ticVdiff h46, hVeq=rfl, app=ticVdiffFullDadeApplication, hmin: 2<min(w₁,w₂)): ⟨ε•ξ, chiFam pq⟩=0。
+7. `certainTypeOmegaSigma_eq_chiFam`: certainTypeOmegaSigma=chiFam(omegaProdEquiv.symm…) ⟹ ⟨Y, certainTypeOmegaSigma⟩=⟨ε•ξ, chiFam⟩=0。
+→ hXorth → `per_constituent_Y_eq_smul` → case-B X-coherence (`coherentXunionYset_caseB_of_glued`) → capstone `sibleySetup_is_coherent` X-nonempty branch (S08_CoherenceTheorems:59 sorry)。
+**要発掘: (4) ξ≠ξ' (η非実→image distinct)、(3) η₁=Ind θ 抽出、hmin (奇素数 Hall ⟹ w₁,w₂≥3 だが 2<min 要確認)。**
+**正本=本 session 41。anchor 完成。次=assembly seam-1。Opus 継続。**
