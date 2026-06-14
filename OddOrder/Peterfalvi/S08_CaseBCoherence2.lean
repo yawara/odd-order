@@ -988,6 +988,30 @@ theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
     rw [← Subgroup.orderOf_mk (H := h.W1) x hxW1]; exact orderOf_dvd_natCard _
   exact hx1 (orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_coprimes h.card_coprime hox_K hox_W1))
 
+/-- **(6.8.2.3) anchor: the Dade image of an `H^#`-supported function vanishes on `V`.**
+For `α` supported on `H^# = sharpImage H`, the Sibley Dade image `α^τ = hyp.tau α` vanishes on the
+`(ticVdiff h46)`-exceptional set `V`.  Since `α^τ = dadeIntegralCharacterMap hyp.dade …` is a genuine
+Dade image, it vanishes off `conjugatesOfSet H^#` (`map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot`
+via `dade_H_eq_bot`); and `V` is disjoint from `conjugatesOfSet H^# ⊆ conjugatesOfSet (K^G)` by
+`ticVdiffV_not_mem_conjugatesOfSet_K` (using `h46.K = H`, so `H^# ⊆ K^G`).  This is the **anchor**
+`hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV`: with `α = η₁ − η̄₁`
+(`Supp ⊆ H^#`, Peterfalvi (4.7)) it gives that `(η₁ − η̄₁)^τ` vanishes on `V`. -/
+theorem tau_apply_eq_zero_of_mem_ticVdiffV
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    {α : ClassFunction ↥L ℂ}
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V) :
+    (hyp.tau α) v = 0 := by
+  rw [SibleyDadeHypothesis.tau, OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support
+    hyp.dade _ hαsupp]
+  refine OddOrder.Peterfalvi.S04.map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot
+    hyp.dade.isDadeMap_dadeMap hyp.dade_H_eq_bot _ ?_
+  intro hvconj
+  have hbridge : sharpImage H ⊆ ((h46.K.map L.subtype : Subgroup G) : Set G) := by
+    rw [hHK]; exact Set.diff_subset
+  exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
+
 /-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
 and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
 `⟨c·ξ, ω^σ⟩ = 0` for every `σ`-image `ω^σ = chiFam pq`.  Chains the four disjointness bricks:
