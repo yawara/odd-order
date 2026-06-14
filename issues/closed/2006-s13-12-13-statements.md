@@ -22,8 +22,10 @@ OddOrder.BG.Ch3.S13` 直前にそのまま貼れる（名前は F の S13 conven
 
 - [x] 下の 2 statement を `S13_PrimeActionTransition.lean` に追加（`f9bc04fd`）。
 - [x] **Lemma 13.12 proof COMPLETE**（`c3860c52`, sorry-free + axiom-clean）。
-- [ ] Lemma 13.13 proof（13.12 を使う。次の frontier）。
-- [ ] AxiomsCheck 登録（任意; §13 spine は個別未登録だが #print axioms で clean 確認済）。
+- [x] **Lemma 13.13 proof COMPLETE**（`565e5a01`, sorry-free + axiom-clean）。
+- [x] #print axioms で両者 sorryAx 無し確認済（§13 spine は個別 AxiomsCheck 未登録の方針）。
+
+**✅ CLOSED 2026-06-15: §13 endgame 完了 (13.7-13.13 全 sorry-free + axiom-clean)。§14 Prop 14.2 funnel 完全 unblock。**
 
 > ⚠ **H へ (statement 変更)**: deps が `[Fact _.Prime]` を要求し、repo の `tau1/tau2` は pRank ベースで
 > 素数性を含まないため、両 statement に **`[Fact p.Prime]`（13.12 は `[Fact q.Prime]` も）を追加**した。
