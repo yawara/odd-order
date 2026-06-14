@@ -1780,3 +1780,34 @@ cont.²¹ で「transport infra 1 本要」と判定したが、**実験で否�
 → 2b 完了で **`certainTypeSet_subset_Xset` assembly** (各 μ_j=columnSum を 2a∧2b で mem_Xset) →
 cX の残 (item 1 X_irr-coh + item 3 mixed-inner)。
 **正本=本 cont.²². item 2a 完了; 2b は上記 4 段 (中規模); transport 安価が判明し item 2 全体が現実的。**
+
+## 2026-06-14 (session 40 cont.²³, /loop): ✅✅ item 2 COMPLETE (`certainTypeSet ⊆ Xset W₂`); 残 cX = item 1 (X_irr-coh) + item 3 (mixed-inner)
+
+### ✅✅ landed (iter 15, commit e9252215, S08_CaseBCoherence2, 全 axiom-clean, full build 3807):
+4 補題で **item 2 (𝒯 ⊆ X(W₂)) 完了**:
+- `columnSum_eq_induce_H` — μ_j = Ind_H^L(Res_H μ_{0j}) (transported (4.5.a))。
+- `restrict_H_certainType_eq` — Res_H μ_{ij}=Res_H μ_{0j} ((4.8)step1 の H 版)。
+- **`columnSum_notMem_SsubFiltration`** (2b) — μ_j∉S(W₂), Clifford-uniqueness:
+  **double-Frobenius** で ⟨μ_j,μ_j⟩ を相殺 (μ_j≠0/正定値 補題 不要が鍵)。各 inducing θ で
+  w₁⟨θ,ψ⟩=⟨μ_j,μ_j⟩=w₁⟨ψ,ψ⟩ ⟹ ⟨θ,ψ⟩=⟨ψ,ψ⟩≠0 ⟹ θ=ψ ⟹ W₂⊆Ker ψ が (4.7) に矛盾。
+- **`certainTypeSet_subset_Xset`** (assembly) — 𝒯⊆X(W₂), `mem_Xset ⟨2a,2b⟩`。
+
+### 🔑 2b 実装の知見 (再利用):
+- `classical` を proof 冒頭に (ite の `Decidable (θ=ψirr)` 用)。
+- θ=ψirr は `if`-rw 連鎖でなく e0(⟨θ,ψirr⟩=0)/e1(⟨ψirr,ψirr⟩=1)+`rw[show ↑ψirr=ψ from rfl]`+
+  `rw[hinner]`+`zero_ne_one` で (ψ vs ↑ψirr の syntactic mismatch 回避)。
+- `inner_induce_eq_inner_restrict` (Frobenius) は `ClassFunction.` prefix。
+- 最終 kernel transport: `Hypothesis.coe_chiRestrict`+`restrict_apply`+`OneMemClass.coe_one` を
+  `simp only ... at hxker ⊢` で両辺正規化 → `exact hxker`。
+
+### ▶▶ 残 cX content = 2 piece (cont.²⁰ item 1, 3; ともに深い §6 math):
+1. **item 1 X_irr-coh** (cX irreducible 側, **最難**): `xChainCoherent` (generic engine,
+   S08_CoherenceCorePart1:2701) を X_irr:={χ∈Xset W₂|irreducible} に適用。conjugate-pair cover
+   (X_irr conj-closed+no-real-char で可) + base S₀ ((1.1)(1.4)) + **per-step XAdjoinStepInput
+   ((5.6) degree-div; Xset 専用機構を X_irr へ adapt が hard core)**。
+   + **Xset W₂ = X_irr ⊔ certainTypeSet 分解の reverse** (Xset の reducible 元は全て μ_j; (4.5b) exhaustion)。
+2. **item 3 (6.8.2.3) mixed-inner**: per-χ τ-decomposition `(χ−aη₁)^τ=X₁−aY`。glue の hmixed/hDτ/ν 供給。
+→ glue: X_irr-coh + {μ_j}-coh (`certainTypeSet_isCoherent_tau` cont.²⁰) を §7 coherentUnion →
+cX → `coherentXunionYset_caseB_of_glued` (cont.¹⁹ shell) → capstone case-B branch。
+**正本=本 cont.²³. item 2 完了 (2 iter); 残 item 1/3 は深く要集中。次=item 1 の set 分解 reverse
+(`Xset W₂ ⊆ X_irr ∪ certainTypeSet`, (4.5b) exhaustion) から着手が自然 (item 1 の前段、tractable)。**
