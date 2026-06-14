@@ -1012,6 +1012,27 @@ theorem tau_apply_eq_zero_of_mem_ticVdiffV
     rw [hHK]; exact Set.diff_subset
   exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
 
+/-- **(6.8.2.3) anchor, `Y`-extension form: a difference of `Y`-coherence images vanishes on `V`.**
+For `η, η' ∈ Y`, the difference `η^{τ₁} − η'^{τ₁} = coherentYset.extension η − coherentYset.extension η'`
+vanishes on the `(ticVdiff h46)`-exceptional set `V`.  Indeed all members of `Y = S(H')` share the
+degree `|W₁|` (`Yset_apply_one`), so `η − η'` is `H^#`-supported (`sMember_diffSupport_of_charValue_eq`),
+the coherence extension agrees there with the Dade map (`coherentYset_extension_Yset_diff_eq_tau`,
+`= (η − η')^τ`), and `(η − η')^τ` vanishes on `V` by the anchor `tau_apply_eq_zero_of_mem_ticVdiffV`.
+
+This is the `hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` in `Y`-image form:
+taking `η' = η̄` (the complex conjugate, also in `Y`) and `η^{τ₁} = ε·ξ`, `η̄^{τ₁} = ε'·ξ'`
+(`coherentYset_extension_eq_zsmul_irreducible`), it gives that `ε·ξ − ε'·ξ'` vanishes on `V`. -/
+theorem coherentYset_extension_diff_apply_eq_zero_of_mem_ticVdiffV
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset)
+    {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V) :
+    (hyp.coherentYset.extension η - hyp.coherentYset.extension η') v = 0 := by
+  rw [hyp.coherentYset_extension_Yset_diff_eq_tau hη' hη]
+  refine tau_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK ?_ hv
+  exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη')
+    ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη').symm)
+
 /-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
 and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
 `⟨c·ξ, ω^σ⟩ = 0` for every `σ`-image `ω^σ = chiFam pq`.  Chains the four disjointness bricks:
