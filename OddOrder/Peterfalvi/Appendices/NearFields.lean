@@ -129,6 +129,20 @@ noncomputable def rightMulAction (A : Subgroup Fˣ)
     Multiplicative.toAdd (rightMulAction A hcomm u x) = Multiplicative.toAdd x * ((u : Fˣ) : F) :=
   rfl
 
+/-- `A ⊆ Fˣ` acts **freely** on `F^#` by right multiplication: a nontrivial element fixes no
+nonzero point (group cancellation in the group-with-zero `F`).  This is the input to the orbit
+counting that shows the index-2 subgroup `A` acts irreducibly. -/
+theorem rightMulAction_eq_self_iff (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) (a : A) (x : Multiplicative F)
+    (hx : x ≠ 1) (hfix : rightMulAction A hcomm a x = x) : a = 1 := by
+  have h1 : Multiplicative.toAdd x * ((a : Fˣ) : F) = Multiplicative.toAdd x := by
+    have h := congrArg Multiplicative.toAdd hfix
+    rwa [rightMulAction_toAdd] at h
+  have hx0 : Multiplicative.toAdd x ≠ 0 := fun h =>
+    hx (Multiplicative.toAdd.injective (h.trans toAdd_one.symm))
+  have hval : ((a : Fˣ) : F) = 1 := mul_left_cancel₀ hx0 (by rw [h1, mul_one])
+  exact OneMemClass.coe_eq_one.mp (Units.val_eq_one.mp hval)
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
