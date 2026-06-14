@@ -276,8 +276,11 @@ private theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd
 there is a setup whose complement `E` contains `A`. (`Ch03.hall_D`: `A.subgroupOf M` lies in some
 Hall `σ(M)'`-subgroup `H` of `↥M`, which is an `M_σ`-complement; feed it to
 `subgroupESetup_of_complement`.) This is the missing piece for BG 12.15(e), where the rank-2 `A`
-must lie in *both* `M` (for `N_G(A) ⊆ M`) and the `M_σ`-complement (for Cor 12.6). -/
-private theorem exists_subgroupESetup_with_le [Finite G] (hG : IsMinimalSimpleOdd G)
+must lie in *both* `M` (for `N_G(A) ⊆ M`) and the `M_σ`-complement (for Cor 12.6).
+
+Made public (2026-06-15, Lane H): BG §14 Proposition 14.2 needs it for the "choose `E ⊇ K`"
+WLOG step, where `K` is a Hall `κ(M)`-subgroup (a `σ(M)'`-subgroup since `κ ⊆ τ₁ ∪ τ₃`). -/
+theorem exists_subgroupESetup_with_le [Finite G] (hG : IsMinimalSimpleOdd G)
     {M A : Subgroup G} (hM : M ∈ maximalSubgroups G) (hAM : A ≤ M)
     (hA_pi : Subgroup.IsPiSubgroup ((S10.sigma M)ᶜ) A) :
     ∃ E E₁ E₂ E₃ : Subgroup G,
