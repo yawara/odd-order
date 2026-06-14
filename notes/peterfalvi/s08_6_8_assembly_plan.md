@@ -2424,3 +2424,33 @@ plumbing で、本丸 = disjointness の新規 infra。これは focused な ded
   この深い infra 作業に非効率。**dedicated focused session が適切**。
 **正本=本 cont.⁴²。次の主作業 = disjointness の σ-construction 大域直交 infra (深い、§5 chiFam 特徴付け要)
 or character setup ([Is]2.27 + Ind 分解)。abstract layer は完成済みゆえ、これら infra が揃えば組立は capstone で機械的。**
+
+## 2026-06-14 (session 40 cont.⁴³, /loop「ChatGPT 想起」): ✅✅ 訂正 — disjointness は深い gap で**なかった** (reconstruction gap 誤判定)
+
+### 🔑 cont.⁴² の「深い σ infra 要」verdict は **誤判定** (BG 13.4 と同じ reconstruction-gap 誤認)。
+ユーザーの「ChatGPT に聞ける」想起に促され (5.3.b) の**証明本体**を読みに行き、再構成を発見 (ChatGPT 不要、原文に証明あり)。
+
+### (5.3.b) 証明 (04.7 mmd:29) = disjointness の正しい論法:
+> φ∈S∩Irr(L) ⟹ (4.7) で Supp(φ−φ̄)⊆A ⟹ **(φ−φ̄)^τ は V 上で消える** (τ 定義, A∩V=∅) ⟹
+> NC((φ−φ̄)^τ)≤‖φ−φ̄‖²=2 ⟹ **(3.8)** で R(φ)⊥ω^σ (∀ω∈Irr W)、特に ⊥R(μ_j)。
+
+### ✅ 全ツール既存 (新規 infra 不要):
+| piece | lemma | 場所 |
+|---|---|---|
+| (3.8) trichotomy | `sigmaCoeff_trichotomy` / `grid_trichotomy` | S05_SigmaTrichotomy / S05_GridTrichotomy |
+| **NC<min⟹全係数0** (今回はこれで足る) | **`grid_eq_zero_of_ncard_support_lt`** (session 18 landed) | S05_SigmaIsometry:101 |
+| vanish-on-V ⟹ ⊥σ-image | `inner_sigma_eq_zero_of_vanishOnV` | S05_SigmaIsometry:1354 |
+| ⊥chiFam ⟹ vanish-on-V | `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` / `vanishOnV_of_inner_alphaCF` | S05:1234/1144 |
+| R(μ_j)⊆σ-images | `certainTypeRImage` (式27: {±δ ω_{ij}^σ}) | S06 |
+
+### 🔑 簡略化: **full (3.8) trichotomy すら不要**。NC((η₁−η̄₁)^τ)≤2、min(w₁,w₂)≥3 (奇位数, w₁,w₂ は奇素数 Hall)
+⟹ `grid_eq_zero_of_ncard_support_lt` (NC<min⟹全 σ-係数 0) で R(η₁)⊥σ-images が出る。
+
+### ▶ disjointness 形式化レシピ (capstone hXorth `⟨Da_i.X,Y⟩=0` 向け):
+`⟨Y, certainTypeOmegaSigma h χ₂ i⟩=0` (Y=cY.extension η₁, certainTypeOmegaSigma=ω^σ):
+1. η₁∈Yset ⟹ 既約 (`isIrreducibleCharacter_of_mem_Yset`)。
+2. (η₁−η̄₁)^τ が V 上消失 (η₁ A-supported difference, (4.7)+τ 定義)。
+3. NC((η₁−η̄₁)^τ)≤2<min(w₁,w₂) ⟹ `grid_eq_zero_of_ncard_support_lt` ⟹ (η₁−η̄₁)^τ⊥σ-images。
+4. R(η₁) members = (η₁−η̄₁)^τ の既約構成子 ⟹ ω^σ∉R(η₁) ⟹ ω^σ⊥R(η₁) members ⟹ ω^σ⊥η₁^τ₁=Y。
+   (or 直接 Y vanishes on V → `inner_sigma_eq_zero_of_vanishOnV`)。
+**正本=本 cont.⁴³。disjointness は tractable な多段再構成と確定 (深い infra 不要)。option 1 = 正解。次=形式化着手。**
