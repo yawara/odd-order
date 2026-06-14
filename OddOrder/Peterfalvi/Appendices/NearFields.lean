@@ -99,6 +99,35 @@ theorem isElementaryAbelian_multiplicative [Finite F] [Nontrivial F] :
   rw [toAdd_pow, toAdd_one]
   exact hfx (Multiplicative.toAdd x)
 
+/-- The right-multiplication action of a commutative subgroup `A ⊆ Fˣ` on `(F, +)` (written
+multiplicatively), as a monoid homomorphism into `MulAut (Multiplicative F)`.  Right multiplication
+is additive (`rightMul`); the homomorphism property needs `A` commutative (`hcomm`), since right
+multiplication is otherwise only an anti-homomorphism.  Together with `isElementaryAbelian_multiplicative`
+this is the data fed to Appendix I's `exists_field_semilinear`. -/
+noncomputable def rightMulAction (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) :
+    A →* MulAut (Multiplicative F) where
+  toFun u := (rightMul ((u : Fˣ) : F) (Units.ne_zero _)).toMultiplicative
+  map_one' := by
+    ext x
+    apply Multiplicative.toAdd.injective
+    show Multiplicative.toAdd x * (((1 : A) : Fˣ) : F) = Multiplicative.toAdd x
+    rw [OneMemClass.coe_one, Units.val_one, mul_one]
+  map_mul' u v := by
+    ext x
+    apply Multiplicative.toAdd.injective
+    show Multiplicative.toAdd x * (((u * v : A) : Fˣ) : F)
+      = Multiplicative.toAdd x * (((v : Fˣ) : F)) * (((u : Fˣ) : F))
+    have hc' : ((u : Fˣ) : F) * ((v : Fˣ) : F) = ((v : Fˣ) : F) * ((u : Fˣ) : F) := by
+      rw [← Units.val_mul, ← Units.val_mul, hcomm u v]
+    rw [Subgroup.coe_mul, Units.val_mul, hc', ← mul_assoc]
+
+/-- The action of `rightMulAction` on additive coordinates: `u` sends `x` to `x * (u : F)`. -/
+@[simp] theorem rightMulAction_toAdd (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ)) (u : A) (x : Multiplicative F) :
+    Multiplicative.toAdd (rightMulAction A hcomm u x) = Multiplicative.toAdd x * ((u : Fˣ) : F) :=
+  rfl
+
 end NearFieldBasics
 
 variable {G Ω F : Type*} [Group G]
