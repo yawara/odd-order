@@ -1565,6 +1565,179 @@ theorem gap3_commutator_inf_le_Malpha_star [Finite G] (hG : IsMinimalSimpleOdd G
     commutator_le_Malpha_of_coprime_le_derived hG hMstar hL_der hQderivStar hcopLQ
   rw [← hid]; exact h2
 
+/-- **Lemma 13.8 GAP 3 elision (ii)** (mmd L3686): `M = N_M(Q) M_β`, `r ∣ |C_M(P)|`,
+`r ∤ |M_β|`, `P ≤ N_M(Q)` のとき `P`-中心化された位数 `r` の `R ≤ N_M(Q)` が存在。
+
+`C_M(P)` の `r`-元 `y` (Cauchy) を `M = (M⊓N_G(Q))·M_β` で `y = h₀·a₀` 分解し、
+coprime quotient cover (`coprime_fixedPoints_quotient_of_coprime_normal`, `P` の `↥(M⊓N_G(Q))`
+への共役作用 + 正規核 `(M_β).subgroupOf`) で `h₀` を `P`-fixed な `c ∈ C_{N_M(Q)}(P)` へ持ち上げる。
+`c ≡ y (mod M_β)` ゆえ `r ∣ orderOf c`、`R = ⟨c^(orderOf c / r)⟩`。 -/
+theorem exists_order_r_le_normalizer_centralizer [Finite G]
+    {M : Subgroup G} {p : ℕ} [Fact p.Prime] {P : Subgroup G} (hPp : IsPGroup p ↥P)
+    (hPM : P ≤ M) {Q : Subgroup G} (hQinv : P ≤ Subgroup.normalizer (Q : Set G))
+    (hFrat : M = (M ⊓ Subgroup.normalizer (Q : Set G)) ⊔ S10.Mbeta M)
+    (hp_nMβ : ¬ p ∣ Nat.card ↥(S10.Mbeta M)) {r : ℕ} [Fact r.Prime]
+    (hrC : r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)))
+    (hr_nMβ : ¬ r ∣ Nat.card ↥(S10.Mbeta M)) (hsolvM : IsSolvable ↥M) :
+    ∃ R : Subgroup G, Nat.card ↥R = r ∧ R ≤ M ⊓ Subgroup.normalizer (Q : Set G)
+      ∧ R ≤ Subgroup.centralizer (P : Set G) := by
+  classical
+  set H : Subgroup G := M ⊓ Subgroup.normalizer (Q : Set G) with hHdef
+  have hPH : P ≤ H := le_inf hPM hQinv
+  have hH_le_M : H ≤ M := inf_le_left
+  -- `P` acts on `G` by conjugation; `H` and `M_β` are `P`-invariant.
+  set ψ : ↥P →* MulAut G := MulAut.conj.comp P.subtype with hψ
+  have hHinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ H := fun a =>
+    Subgroup.conj_smul_eq_self_of_mem (hPH a.2)
+  have hMnorm_Mβ : M ≤ Subgroup.normalizer ((S10.Mbeta M : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG (S10.beta M) M
+  have hMβinv : OddOrder.Isaacs.Ch03.IsAInvariant ψ (S10.Mbeta M) := fun a =>
+    conj_smul_eq_self_of_mem_normalizer (hMnorm_Mβ (hPM a.2))
+  have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant hHinv.restrict ((S10.Mbeta M).subgroupOf H) :=
+    hHinv.subgroupOf hMβinv
+  haveI : ((S10.Mbeta M).subgroupOf H).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (hH_le_M.trans hMnorm_Mβ)
+  -- coprimeness `(|P|, |(M_β).subgroupOf H|) = 1`.
+  have hN_card : Nat.card ↥((S10.Mbeta M).subgroupOf H) = Nat.card ↥(S10.Mbeta M ⊓ H) := by
+    rw [← Subgroup.subgroupOf_map_subtype, Subgroup.card_map_of_injective H.subtype_injective]
+  have hN_dvd : Nat.card ↥((S10.Mbeta M).subgroupOf H) ∣ Nat.card ↥(S10.Mbeta M) := by
+    rw [hN_card]; exact Subgroup.card_dvd_of_le inf_le_left
+  have hCop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥((S10.Mbeta M).subgroupOf H)) := by
+    obtain ⟨k, hk⟩ := hPp.exists_card_eq
+    rw [hk]
+    refine (((Fact.out : p.Prime).coprime_iff_not_dvd.mpr ?_)).pow_left k
+    exact fun hpd => hp_nMβ (hpd.trans hN_dvd)
+  haveI : IsSolvable ↥P := by haveI := hPp.isNilpotent; infer_instance
+  have hSolv : IsSolvable ↥P ∨ IsSolvable ↥((S10.Mbeta M).subgroupOf H) := Or.inl ‹_›
+  -- Cauchy: an order-`r` element `y ∈ C_M(P)`.
+  obtain ⟨y₀, hy₀⟩ := exists_prime_orderOf_dvd_card' r hrC
+  set y : G := (y₀ : G) with hy
+  have hyMC : y ∈ M ⊓ Subgroup.centralizer (P : Set G) := y₀.2
+  have hyM : y ∈ M := (Subgroup.mem_inf.mp hyMC).1
+  have hyC : y ∈ Subgroup.centralizer (P : Set G) := (Subgroup.mem_inf.mp hyMC).2
+  have hy_ord : orderOf y = r := by
+    rw [hy]
+    exact (orderOf_injective (M ⊓ Subgroup.centralizer (P : Set G)).subtype
+      (M ⊓ Subgroup.centralizer (P : Set G)).subtype_injective y₀).trans hy₀
+  -- decompose `y = h₀ · a₀` with `h₀ ∈ H`, `a₀ ∈ M_β` (using `M_β ⊴ M`, inside `↥M`).
+  haveI : ((S10.Mbeta M).subgroupOf M).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hMnorm_Mβ
+  have hyM' : (⟨y, hyM⟩ : ↥M) ∈ (H.subgroupOf M) ⊔ ((S10.Mbeta M).subgroupOf M) := by
+    rw [← Subgroup.subgroupOf_sup hH_le_M (S10.Mbeta_le M), ← hFrat, Subgroup.subgroupOf_self]
+    exact Subgroup.mem_top _
+  obtain ⟨h', hh', a', ha', hya'⟩ := Subgroup.mem_sup_of_normal_right.mp hyM'
+  have hh₀H : (h' : G) ∈ H := Subgroup.mem_subgroupOf.mp hh'
+  have ha₀ : (a' : G) ∈ S10.Mbeta M := Subgroup.mem_subgroupOf.mp ha'
+  have hya : (h' : G) * (a' : G) = y := by
+    have := congrArg (Subtype.val) hya'
+    simpa using this
+  set h₀ : G := (h' : G) with hh₀eq
+  set a₀ : G := (a' : G) with ha₀eq
+  set g : ↥H := ⟨h₀, hh₀H⟩ with hg
+  -- the coset `g · N` is `P`-fixed.
+  have hgfix : ∀ a : ↥P, ∃ n ∈ (S10.Mbeta M).subgroupOf H, (hHinv.restrict a) g = g * n := by
+    intro a
+    refine ⟨g⁻¹ * (hHinv.restrict a) g, ?_, (mul_inv_cancel_left g _).symm⟩
+    refine Subgroup.mem_subgroupOf.mpr ?_
+    have hval : ((g⁻¹ * (hHinv.restrict a) g : ↥H) : G) = h₀⁻¹ * ((a : G) * h₀ * (a : G)⁻¹) := by
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, hHinv.restrict_apply_val]
+      simp [hg, hψ, MulAut.conj_apply]
+    rw [hval]
+    -- `a · y · a⁻¹ = y` (since `y` centralises `P`).
+    have hcent : (a : G) * (h₀ * a₀) = (h₀ * a₀) * (a : G) := by
+      have := Subgroup.mem_centralizer_iff.mp hyC (a : G) a.2
+      rwa [← hya] at this
+    have hconj_y : (a : G) * (h₀ * a₀) * (a : G)⁻¹ = h₀ * a₀ := by
+      rw [hcent]; group
+    -- `h₀⁻¹ (a h₀ a⁻¹) = a₀ · (a a₀⁻¹ a⁻¹) ∈ M_β`.
+    have heq : h₀⁻¹ * ((a : G) * h₀ * (a : G)⁻¹) = a₀ * ((a : G) * a₀⁻¹ * (a : G)⁻¹) := by
+      have e1 : (a : G) * h₀ * (a : G)⁻¹
+          = ((a : G) * (h₀ * a₀) * (a : G)⁻¹) * ((a : G) * a₀⁻¹ * (a : G)⁻¹) := by group
+      rw [e1, hconj_y]; group
+    rw [heq]
+    refine (S10.Mbeta M).mul_mem ha₀ ?_
+    have hsm := hMβinv.smul_mem a ((S10.Mbeta M).inv_mem ha₀)
+    have : (ψ a) a₀⁻¹ = (a : G) * a₀⁻¹ * (a : G)⁻¹ := by simp [hψ, MulAut.conj_apply]
+    rwa [this] at hsm
+  -- lift to a `P`-fixed representative `c`.
+  obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal hCop hSolv hN_inv hgfix
+  -- `c ∈ C(P)`.
+  have hcC : (c : G) ∈ Subgroup.centralizer (P : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    have hfx := congrArg Subtype.val (hc_fix ⟨x, hx⟩)
+    rw [hHinv.restrict_apply_val] at hfx
+    have hconj : x * (c : G) * x⁻¹ = (c : G) := by
+      simpa only [hψ, MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] using hfx
+    calc x * (c : G) = x * (c : G) * x⁻¹ * x := by group
+      _ = (c : G) * x := by rw [hconj]
+  -- order/`R` construction (c ≡ y mod M_β ⟹ r ∣ orderOf c).
+  have hcM : (c : G) ∈ M := hH_le_M c.2
+  set cM : ↥M := ⟨(c : G), hcM⟩ with hcMdef
+  set yM : ↥M := ⟨y, hyM⟩ with hyMdef
+  -- `r ∣ orderOf c`, proved in the quotient `↥M ⧸ (M_β).subgroupOf M`.
+  have hr_ord : r ∣ orderOf (c : G) := by
+    -- `c ≡ y (mod M_β)`: `c⁻¹ y = n⁻¹ a₀ ∈ M_β`.
+    have hcG : (c : G) = h₀ * (n : G) := by
+      have := congrArg (Subtype.val) hcn
+      simpa [hg] using this
+    have hnMβ : (n : G) ∈ S10.Mbeta M := Subgroup.mem_subgroupOf.mp hn
+    have hcoset : cM⁻¹ * yM ∈ (S10.Mbeta M).subgroupOf M := by
+      rw [Subgroup.mem_subgroupOf]
+      have hval : ((cM⁻¹ * yM : ↥M) : G) = (c : G)⁻¹ * y := by simp [hcMdef, hyMdef]
+      rw [hval, hcG, ← hya]
+      have hgrp : (h₀ * (n : G))⁻¹ * (h₀ * a₀) = (n : G)⁻¹ * a₀ := by group
+      rw [hgrp]
+      exact (S10.Mbeta M).mul_mem ((S10.Mbeta M).inv_mem hnMβ) ha₀
+    have hπ : (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) cM
+        = (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) yM := by
+      rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq]
+      exact hcoset
+    -- `orderOf (π yM) = r` (`r`-part survives since `r ∤ |M_β|`).
+    have hyM_ord : orderOf yM = r := by
+      rw [hyMdef]
+      exact (orderOf_injective M.subtype M.subtype_injective ⟨y, hyM⟩).symm.trans hy_ord
+    have hπy_ne : (QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) yM ≠ 1 := by
+      rw [QuotientGroup.mk'_apply, Ne, QuotientGroup.eq_one_iff]
+      intro hmem
+      have hyβ : y ∈ S10.Mbeta M := by
+        rw [hyMdef] at hmem; exact Subgroup.mem_subgroupOf.mp hmem
+      refine hr_nMβ ?_
+      calc r = orderOf y := hy_ord.symm
+        _ = orderOf (⟨y, hyβ⟩ : ↥(S10.Mbeta M)) :=
+              orderOf_injective (S10.Mbeta M).subtype (S10.Mbeta M).subtype_injective ⟨y, hyβ⟩
+        _ ∣ Nat.card ↥(S10.Mbeta M) := orderOf_dvd_natCard _
+    have hπy_ord : orderOf ((QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) yM) = r := by
+      have hdvd : orderOf ((QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) yM) ∣ r := by
+        rw [← hyM_ord]; exact orderOf_map_dvd _ _
+      rcases (Nat.dvd_prime (Fact.out : r.Prime)).mp hdvd with h1 | hr
+      · exact absurd (orderOf_eq_one_iff.mp h1) hπy_ne
+      · exact hr
+    -- transport to `cM`, then to `(c : G)`.
+    have hπc_ord : orderOf ((QuotientGroup.mk' ((S10.Mbeta M).subgroupOf M)) cM) = r := by
+      rw [hπ]; exact hπy_ord
+    have hr_cM : r ∣ orderOf cM := hπc_ord ▸ orderOf_map_dvd _ _
+    have hconv : orderOf cM = orderOf (c : G) :=
+      (orderOf_injective M.subtype M.subtype_injective cM).symm
+    rwa [hconv] at hr_cM
+  -- Cauchy inside `⟨c⟩`: an order-`r` element `z`, set `R = ⟨z⟩`.
+  have hcard : r ∣ Nat.card ↥(Subgroup.zpowers (c : G)) := by
+    rw [Nat.card_zpowers]; exact hr_ord
+  obtain ⟨z₀, hz₀⟩ := exists_prime_orderOf_dvd_card' r hcard
+  set z : G := (z₀ : G) with hzdef
+  have hz_ord : orderOf z = r := by
+    rw [hzdef]
+    exact (orderOf_injective (Subgroup.zpowers (c : G)).subtype
+      (Subgroup.zpowers (c : G)).subtype_injective z₀).trans hz₀
+  have hz_mem : z ∈ Subgroup.zpowers (c : G) := z₀.2
+  refine ⟨Subgroup.zpowers z, ?_, ?_, ?_⟩
+  · rw [Nat.card_zpowers, hz_ord]
+  · rw [Subgroup.zpowers_le]
+    exact (Subgroup.zpowers_le.mpr c.2) hz_mem
+  · rw [Subgroup.zpowers_le]
+    exact (Subgroup.zpowers_le.mpr hcC) hz_mem
+
 /-- **Lemma 13.8 GAP 3 elision (ii)+(iii)** (mmd L3686): `C_{M_α}(P) ⊆ M*`。
 BG の理由: `M = N_M(Q) M_α` と `r ∣ |C_M(P)|`, `r ∉ σ(M)` から `P`-中心化された位数 `r` の
 `R ⊆ N_M(Q)` が存在 (coprime action; (ii))、`R ⊆ N_G(Q) ⊆ M*` かつ `N_G(R) ⊆ M*` (Prop 10.14d)。
