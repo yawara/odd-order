@@ -134,6 +134,29 @@ step 1 (witness 抽出) は body 内: `¬ActsRegularlyOn E₃ E₁` を push し
 `⟨IsElementaryAbelian.of_card_prime, by rw[pow_one]; exact card=prime⟩`、card = orderOf =
 `orderOf_eq_prime`)。P≤C(R) は ⟨g⟩,⟨h⟩ commute から。
 
+## 13.8 ChatGPT 再構成 検証結果 + 形式化計画 (2026-06-14)
+
+ChatGPT 回答 = `notes/bg/bg-lemma-13-8-elided-steps.md` (GAP 1 + GAP 2 のみ; **GAP 3 [steps 5-6] 未収録**)。
+**厳密検証済: GAP 1 / GAP 2 とも健全**。ChatGPT の good catch:
+- GAP 1: 「Q が M の Sylow」は Uniqueness 不要 (p-群 normalizer-growth + (5) で直接)。Uniqueness は q∉α(M) 用。
+- GAP 2: Cor 12.16 (α-部分群→M_α へ共役)、Thm 10.1(b)=C_G(Y) transitivity、Lem 10.12(a) を **役割入替** で r∉σ(M)。
+### 🔑 12.18(b) で GAP 1.4 (Uniqueness) は不要に
+`tau1_Malpha_interaction` の **第 2 連言** (S12_Lemma1218:1039-1042): 仮定
+`∀T≤M, IsPGroup q T, Q≤T → Q=T` (Q が M の極大 q-部分群 = Sylow) から直接
+`q∉α(M) ∧ α(M)=β(M) ∧ M_α⊓C(P)≠⊥ ∧ M_α⊓C(P⊔Q)=⊥`。
+⟹ GAP 1 は 1.1 (Q≠1) + 1.2 (q≠p) + 1.3 (Q 極大 q-sub of M, normalizer-growth) のみ。
+**step 6 の punchline `C_{M_α}(PQ)=1` も 12.18(b) から無料**。
+### 形式化計画 (sub-lemma 分解)
+- `step1` (M側): config → 12.18(b) outputs。1.3 = normalizer-growth (`lt_normalizer_inf_sylow_of_lt`
+  Isaacs Ch07:91、or NormalizerCondition of nilpotent q-group) + (5)。M* 側は対称に再適用。
+- `step3` (GAP 2): Hall θ=β(M)∪β(M*) of C_G(P) → r∈β(M*)∩π(C_M(P)), r∉σ(M)。
+  handles: Hall 存在/共役 (Prop 1.5)、Cor 12.16、`IsUniquelyMaximal`/Thm 10.1(b) transitivity、
+  Prop 10.14(d) `normalizer_le_of_nontrivial_beta_subgroup`、Lem 10.12 `disjoint_of_not_conj`、
+  F(H)=`Ch01.fitting`、O_s = `S10.opiCoreInG`?。⚠ Thm 10.1(b) の transitivity form を repo で要特定。
+- `step5/6` (GAP 3, **要追加再構成 or 自力**): R⊆N_M(Q) order r P-centralized + Thm 13.4
+  `centralizer_le_centralizer_of_tau1` → X⊆C_{M_σ}(P)⊆C_{M_σ}(R)⊆M*; [X,Q]=1 (M_α∩M*_α=1) →
+  X⊆C_{M_α}(PQ)=1 (12.18(b)) 矛盾。
+
 ## 進捗
 
 - 2026-06-14 (Lane F, /loop): main ff-merge で hub の split (`S13_PrimeActionTransition.lean`) 取込。
