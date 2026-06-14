@@ -737,6 +737,22 @@ theorem centralizer_A0_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
       ((hXP.trans hthm).trans inf_le_right)
     exact (Subgroup.le_centralizer_iff.mp hXR) (Subgroup.mem_zpowers a)
 
+/-- **Proposition 1.6(d), subgroup form**: for a coprime action of `E₁` on `A` (`E₁ ≤ N_G(A)`,
+coprime orders, one side solvable), `A = C_A(E₁) ⊔ ⁅A, E₁⁆`. (Translation of
+`fixedPoints_sup_actionCommutator_eq_top` via the `conj_map_subtype` bridges.) -/
+theorem subgroup_coprime_decomposition [Finite G] {A E₁ : Subgroup G}
+    (hE1A : E₁ ≤ Subgroup.normalizer (A : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥A))
+    (hSolv : IsSolvable ↥E₁ ∨ IsSolvable ↥A) :
+    A = (Subgroup.centralizer (E₁ : Set G) ⊓ A) ⊔ ⁅A, E₁⁆ := by
+  have hmap := congrArg (Subgroup.map A.subtype)
+    (Ch04.fixedPoints_sup_actionCommutator_eq_top
+      (φ := (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hE1A)) hcop hSolv)
+  rw [Subgroup.map_sup, OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hE1A,
+    OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hE1A,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  exact hmap.symm
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
