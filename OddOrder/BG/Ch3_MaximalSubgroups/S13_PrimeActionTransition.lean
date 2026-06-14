@@ -2850,6 +2850,21 @@ theorem sylow_Msigma_Mstar_maximal_in_inf [Finite G] (hG : IsMinimalSimpleOdd G)
   exact eq_of_le_of_isPGroup_card_eq_factorization hQstarcard
     (le_inf hTMσ (hTMM.trans inf_le_right)) hTq hQT
 
+/-- **BG Theorem 13.10, displayed eq (13.5)**: if `P, Q ≤ E` with `P` acting regularly on `Q`
+(`Q ⊓ C_G(P) = ⊥`, coprime, `P ≤ N_G(Q)`, `P` solvable), then `Q = [Q,P] ⊆ E'`. Coprime action
+gives `Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`), and `⁅P,Q⁆ ≤ ⁅E,E⁆ =
+derivedInG E` by monotonicity. -/
+theorem le_derivedInG_E_of_inf_centralizer_eq_bot [Finite G] {E P Q : Subgroup G}
+    (hPE : P ≤ E) (hQE : Q ≤ E) [IsSolvable ↥P]
+    (hPN : P ≤ Subgroup.normalizer (Q : Set G)) (hcop : Nat.Coprime (Nat.card ↥P) (Nat.card ↥Q))
+    (hCQ : Q ⊓ Subgroup.centralizer (P : Set G) = ⊥) :
+    Q ≤ derivedInG E := by
+  have hQPQ : Q ≤ ⁅P, Q⁆ :=
+    Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot hPN hcop hCQ
+  have hde : derivedInG E = ⁅E, E⁆ := Subgroup.map_subtype_commutator E
+  rw [hde]
+  exact hQPQ.trans (Subgroup.commutator_mono hPE hQE)
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
