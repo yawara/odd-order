@@ -14,20 +14,20 @@ BG §14 funnel の keystone **Prop 14.2** は **Lemma 13.12 / 13.13** に直接�
 になっている（解析: `notes/bg/s14_typeP_counting.md`「🟢 Thm 13.9 landed → … funnel prep」）。
 
 Lane H が両 statement を BG 原文（mmd L3745 / L3765）逐条照合で draft し、**S13 context で elaborate
-することを検証済み**（leaf build green → revert）。**proof は F（S13 owner）が記入**。
-名前は F の S13 convention に合わせて改名可。
-
-> **⚠ 2026-06-15 更新（S13 prefix-split 後）**: F が `S13_PrimeActionTransition` を 4 ファイルに分割
-> (`893a24e4`)。**13.9 + 13.10 は `S13_Theorem1310.lean` に移動**（13.11 は hub）。13.12/13.13 の自然な
-> 新居は **`S13_Theorem1310.lean`**（13.9/13.10 の隣、BG でも「τ₂ primes」continuation）か新 leaf。
-> 分割 4 ファイルの opens は同一（`OddOrder.GroupTheory`/`OddOrder.Isaacs`/`OddOrder.BG.Ch3.S12`/scoped）
-> ゆえ draft はどこでも不変に elaborate。**S13_Theorem1310.lean で再検証済み（build green 3094 jobs）**。
+することを検証済み**（S13_PrimeActionTransition に一時挿入 → leaf build green 3092 jobs → revert）。
+**proof は F（S13 owner）が記入**。下の Lean を `S13_PrimeActionTransition.lean` の `end
+OddOrder.BG.Ch3.S13` 直前にそのまま貼れる（名前は F の S13 convention に合わせて改名可）。
 
 ## やること（F = S13 owner）
 
-- [ ] 下の 2 statement を `S13_Theorem1310.lean`（13.9/13.10 の隣）または新 leaf に追加（proof は `sorry` のまま着地でも可）。
-- [ ] proof を記入（依存は各 docstring に明記、すべて landed 済 = 13.4/13.6/13.9/12.x）。
-- [ ] AxiomsCheck 登録（proof 完了時）。
+- [x] 下の 2 statement を `S13_PrimeActionTransition.lean` に追加（`f9bc04fd`）。
+- [x] **Lemma 13.12 proof COMPLETE**（`c3860c52`, sorry-free + axiom-clean）。
+- [ ] Lemma 13.13 proof（13.12 を使う。次の frontier）。
+- [ ] AxiomsCheck 登録（任意; §13 spine は個別未登録だが #print axioms で clean 確認済）。
+
+> ⚠ **H へ (statement 変更)**: deps が `[Fact _.Prime]` を要求し、repo の `tau1/tau2` は pRank ベースで
+> 素数性を含まないため、両 statement に **`[Fact p.Prime]`（13.12 は `[Fact q.Prime]` も）を追加**した。
+> Prop 14.2 から呼ぶ際は τ-prime の `Fact` を供給（π(...) 由来で自明に取れる）。consumer 無しゆえ安全。
 
 ## 検証済 draft（S13 context で build green）
 
@@ -90,6 +90,6 @@ theorem mem_sigma_of_tau1_tau3_centralize [Finite G] (hG : IsMinimalSimpleOdd G)
 ## 参照
 
 - mmd `references/bg/local-analysis.mmd` L3745 (13.12) / L3765 (13.13)
-- `OddOrder/BG/Ch3_MaximalSubgroups/S13_Theorem1310.lean`（13.9/13.10 の隣に追加; prefix-split `893a24e4` 後）
+- `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeActionTransition.lean`（13.10/13.11 の隣に追加）
 - `notes/bg/s14_typeP_counting.md`「ブロッカーの正体」「🟢 Thm 13.9 landed → … funnel prep」
 - 依存先 Prop 14.2 = `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean` `typeP_structure`
