@@ -68,6 +68,30 @@ property, in particular that it is Hall — is deferred; this containment is not
 theorem maxNilpotentNormalHall_le (M : Subgroup G) : maxNilpotentNormalHall M ≤ M :=
   sSup_le fun _ hN => hN.1
 
+/-- `M` normalizes `M_F` (so `(M_F).subgroupOf M ⊴ M`): the `sSup` of `M`-normal
+candidates is again `M`-normal.  Like `maxNilpotentNormalHall_le`, this is the
+`§14`-independent part of the §15 well-definedness (the Hall maximality is deferred);
+each candidate `N` is fixed by conjugation by `m ∈ M` because `(N.subgroupOf M).Normal`. -/
+theorem maxNilpotentNormalHall_le_normalizer (M : Subgroup G) :
+    M ≤ Subgroup.normalizer (maxNilpotentNormalHall M) := by
+  intro m hm
+  refine mem_normalizer_of_conj_smul_eq_self ?_
+  unfold maxNilpotentNormalHall
+  rw [Subgroup.pointwise_smul_def, (Subgroup.gc_map_comap _).l_sSup, sSup_eq_iSup]
+  refine iSup_congr fun N => iSup_congr fun hN => ?_
+  rw [← Subgroup.pointwise_smul_def]
+  obtain ⟨hNM, hNnorm, -, -⟩ := hN
+  exact conj_smul_eq_self_of_mem_normalizer
+    (((Subgroup.normal_subgroupOf_iff_le_normalizer hNM).mp hNnorm) hm)
+
+/-- `M_F ⊴ M` in the relative sense `(M_F).subgroupOf M`: the directly usable form of
+`maxNilpotentNormalHall_le_normalizer`, matching the normality clause in the defining
+predicate of `M_F`. -/
+theorem maxNilpotentNormalHall_subgroupOf_normal (M : Subgroup G) :
+    ((maxNilpotentNormalHall M).subgroupOf M).Normal :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer (maxNilpotentNormalHall_le M)).mpr
+    (maxNilpotentNormalHall_le_normalizer M)
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
