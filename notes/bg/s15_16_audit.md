@@ -226,6 +226,41 @@ coprime ⟹ C_H(K)⊓H ≤ H'`)。真の唯一の欠落 = **M=KM'** (`IsCompleme
 ⟹ M_F API は ≤M / ⊴ / 冪零 / ≤F(M) / ≤M_σ / ≤M' / iff まで §14 非依存に完備。
 **残る §14 非依存余地は薄い** (M_F char in M は speculative; endpoint 配線は §14 gate ゆえ defer)。
 
+## 11. Cor 15.6 conjunct-4 friction 解消 — §14非依存エンジン landing (2026-06-15, `2f7e0c5d`)
+
+section 9 の「残 friction = conjunct 4 の Lemma 6.3 ↥M 適用 (subtype + coprime)」を解消。
+mmd L4232 の Cor 15.6 証明は `K*⊆M''` に **Thm 14.7(h)** (M=KM', K∩M'=1) + **Lemma 6.3** を使う。
+この節の **§14非依存コア**を抽出し sorry-free で landing:
+
+- **`Msigma_inf_centralizer_le_derivedDerived_of_isComplement'`** (S15_MF, sorry-free):
+  仮説 = relative complement `IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M)`
+  (= M=KM' inside ↥M) + `coprime(|M'.subgroupOf M|, |K.subgroupOf M|)`。
+  結論 = `M_σ ⊓ C_G(K) ≤ M''` (= K*⊆M'')。証明 = Lemma 6.3
+  (`centralizer_inf_le_derivedInG_of_isComplement'`, proved) を ↥M 内で H=M'.subgroupOf M に適用
+  → `C_{M'}(K)⊓M' ≤ M''`、K*=M_σ⊓C(K)≤M'⊓C(K) (∵ M_σ≤M')。**S12_E.Msigma_E_relations の
+  Lemma 6.3 transport を M'↔M_σ・K↔E で流用** (`hid: (derivedInG M).subgroupOf M = commutator ↥M`,
+  transport `(derivedInG H).map subtype = M''`, pointwise centralizer の Subtype.ext)。
+
+- **Lemma 15.1 (`typeP_auxiliary_structure`) の K≠⊥ 節に上記エンジンの仮説 2 個を露出**
+  (sorry-neutral、mmd 15.1(a)(b) に忠実): `IsComplement' (M'.subgroupOf M) (K.subgroupOf M)` +
+  coprime。⟹ **Thm 14.7(h) 露出待ち (Lane H) は完全に不要**: Cor 15.6 conjunct 4 は
+  Lemma 15.1 (mine, sorried) → エンジン (proved) の単一 cite に縮約。
+
+**Cor 15.6 の残 friction 更新** (section 9 表の進捗):
+| conjunct | 状態 (2026-06-15) |
+|---|---|
+| `Kstar≠⊥` | typeP_structure conjunct 2 (sorried §14, exposed) |
+| `IsCyclic Kstar` | typeP_duality `IsCyclic(K⊔Kstar)` (sorried §14, exposed) |
+| `Kstar≤MF` | case-split: MF=Msigma (inf_le) ∨ MF≠Msigma (15.2 exposed `Kstar≤MF`) — mine sorried |
+| `Kstar≤M''` (4) | **✅ engine proved**; 仮説は Lemma 15.1 K≠⊥ 節 (mine sorried) から |
+| `¬IsCyclic MF` (5) | engine `fittingInAmbient_cyclic_imp_derivedDerived_eq_bot` proved; **残 = 「MF cyclic⟹F(M) cyclic」** (Cor 15.5, 非自明: F(M)=F(M_σ)×Y 要、F(M_σ) vs M_F は等しくない ⟹ §15 構造依存・§14非依存抽出は不可) |
+
+⟹ **Cor 15.6 の §14非依存に抽出可能な hard part (conjunct 4 の subtype juggling) は完了**。
+残るは (i) §14 cite (typeP_structure/duality, parametrize-stable) の landing 待ち、
+(ii) conjunct 5 の「MF cyclic⟹F(M) cyclic」= Cor 15.5 本体 (§15 構造、Thm 15.2 の type-P1 場合分け
+要、§14 gate)。**conjunct 5 の §14非依存余地は無い** (F(M_σ)≠M_F ゆえ MF cyclic から F(M_σ) cyclic は
+従わない; 真に Cor 15.5 b/Thm 15.2 g の decomposition が要る)。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
