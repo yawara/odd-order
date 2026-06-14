@@ -889,6 +889,45 @@ theorem sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt
   rw [hyp.card_charGroup_subgroupOf hyp.W1_le_W, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
   exact hNC
 
+/-- **`NC ≤ 2` for a two-irreducible difference** (the (6.8.2.3) `NC((η₁ − η̄₁)^τ) ≤ 2` bound).  If
+every nonzero `σ`-coefficient of `ψ` forces a nonzero inner product with one of two norm-`1` virtual
+characters `ξ`, `ξ' ∈ ±Irr(G)` (the case `ψ = c·ξ − c'·ξ'`), then `NC(ψ) ≤ 2`: by (3.9)(a)
+(`ncard_inner_chiFam_ne_zero_le_one`) each of `ξ`, `ξ'` has at most one nonzero `σ`-coefficient, and
+the support of `ψ` lies in their union.  With `min(w₁, w₂) ≥ 3` (odd-order Hall), this feeds the
+`grid_eq_zero` driver `sigmaCoeff_eq_zero_of_vanishOnV_of_ncard_lt`. -/
+theorem sigmaNC_le_two_of_inner_chiFam
+    (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff)
+    (app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication hyp)
+    {ξ ξ' : ClassFunction G ℂ} (hξZ : ξ ∈ ZIrr G) (hξ1 : ClassFunction.inner ξ ξ = 1)
+    (hξ'Z : ξ' ∈ ZIrr G) (hξ'1 : ClassFunction.inner ξ' ξ' = 1)
+    {ψ : ClassFunction G ℂ}
+    (hψsupp : ∀ pq, hyp.sigmaCoeff hVeq app ψ pq ≠ 0 →
+      ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0 ∨
+        ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0) :
+    hyp.sigmaNC hVeq app ψ ≤ 2 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  have hsub : {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0} ⊆
+      {pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0} ∪
+        {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0} :=
+    fun pq hpq => hψsupp pq hpq
+  calc hyp.sigmaNC hVeq app ψ
+      = {pq | hyp.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard := rfl
+    _ ≤ ({pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0} ∪
+          {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0}).ncard :=
+        Set.ncard_le_ncard hsub (Set.toFinite _)
+    _ ≤ {pq | ClassFunction.inner ξ (hyp.chiFam hVeq app pq) ≠ 0}.ncard +
+          {pq | ClassFunction.inner ξ' (hyp.chiFam hVeq app pq) ≠ 0}.ncard := Set.ncard_union_le _ _
+    _ ≤ 1 + 1 := by
+        gcongr
+        · exact OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_inner_chiFam_ne_zero_le_one
+            hyp hVeq app hξZ hξ1
+        · exact OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_inner_chiFam_ne_zero_le_one
+            hyp hVeq app hξ'Z hξ'1
+    _ = 2 := rfl
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
