@@ -928,6 +928,66 @@ theorem sigmaNC_le_two_of_inner_chiFam
             hyp hVeq app hξ'Z hξ'1
     _ = 2 := rfl
 
+/-- **(6.8.2.3) anchor, group-theoretic core: `V` avoids the `G`-conjugates of `K`-elements.**
+A point `v` of the `(ticVdiff h)`-exceptional set `V = W − (W₁ ∪ W₂)` is never `G`-conjugate to an
+element of the kernel `K = h.K` (viewed in `G` via `L ↪ G`).
+
+Indeed, write `v = ↑w` with `w = x·y ∈ W₁ × W₂` (`exists_mul_of_mem_sup`); since `v ∉ W₂` the
+`W₁`-component `x ≠ 1`, and `x = w ^ n` (`exists_zpow_proj`) gives `orderOf x ∣ orderOf w = orderOf v`.
+If `v` were `G`-conjugate to `↑k` (`k ∈ K`) then `orderOf v = orderOf k ∣ |K|` (conjugation preserves
+order), so `orderOf x ∣ gcd(|K|, |W₁|) = 1` (`card_coprime`), forcing `x = 1` — a contradiction.
+
+This is the structural disjointness `V ∩ (K^#)^G = ∅` powering the anchor: since
+`Supp(η₁ − η̄₁) ⊆ H^# ⊆ K^#` and `(η₁ − η̄₁)^τ` is a Dade image (vanishing off `conjugatesOfSet H^#`),
+it vanishes on `V`. -/
+theorem ticVdiffV_not_mem_conjugatesOfSet_K {A : Set G}
+    (h : OddOrder.Peterfalvi.S06.Hypothesis46 A L) {v : G}
+    (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h).V) :
+    v ∉ Group.conjugatesOfSet ((h.K.map L.subtype : Subgroup G) : Set G) := by
+  intro hconj
+  -- `v` is `G`-conjugate to `a = ↑k` with `k ∈ K`
+  obtain ⟨a, haK, hav⟩ := Group.mem_conjugatesOfSet_iff.mp hconj
+  obtain ⟨k, hkK, hka⟩ := Subgroup.mem_map.mp haK
+  -- `orderOf a = orderOf v` (conjugation preserves order)
+  obtain ⟨c, hc⟩ := isConj_iff.mp hav
+  have hsemi : SemiconjBy c a v := by
+    show c * a = v * c
+    rw [← hc]; group
+  have hav_ord : orderOf a = orderOf v := SemiconjBy.orderOf_eq c hsemi
+  -- `orderOf a = orderOf k ∣ |K|`
+  have hak : a = ((k : ↥L) : G) := hka.symm
+  have hoak : orderOf a = orderOf k := by rw [hak]; exact Subgroup.orderOf_coe k
+  have hok_dvd : orderOf k ∣ Nat.card ↥h.K := by
+    rw [← Subgroup.orderOf_mk (H := h.K) k hkK]; exact orderOf_dvd_natCard _
+  -- `v ∈ tic.W`, `v ∉ tic.W2`
+  have hvmem : v ∈ (↑h.tic.W : Set G) \ ((↑h.tic.W1 : Set G) ∪ ↑h.tic.W2) := hv
+  have hvW : v ∈ h.tic.W := hvmem.1
+  rw [OddOrder.Peterfalvi.S06.tic_W_eq_map h] at hvW
+  obtain ⟨w, hwW12, hwv⟩ := Subgroup.mem_map.mp hvW
+  -- `v ∉ tic.W2 ⟹ w ∉ W₂`
+  have hvnW2 : v ∉ h.tic.W2 := fun hc => hvmem.2 (Or.inr hc)
+  have hwnW2 : w ∉ h.W2 := by
+    intro hwW2
+    exact hvnW2 (h.tic_W2 ▸ Subgroup.mem_map.mpr ⟨w, hwW2, hwv⟩)
+  -- decompose `w = x·y` with `x ∈ W₁`, `y ∈ W₂`; `w ∉ W₂` forces `x ≠ 1`
+  obtain ⟨x, hxW1, y, hyW2, hxy⟩ := h.exists_mul_of_mem_sup hwW12
+  have hx1 : x ≠ 1 := by
+    intro hx
+    exact hwnW2 (by rw [← hxy, hx, one_mul]; exact hyW2)
+  -- `x = w ^ n`, so `orderOf x ∣ orderOf w = orderOf v`
+  obtain ⟨n, hn⟩ := h.exists_zpow_proj
+  have hxwn : w ^ n = x := by rw [← hxy]; exact hn x hxW1 y hyW2
+  have hox_dvd_ow : orderOf x ∣ orderOf w :=
+    orderOf_dvd_of_mem_zpowers (Subgroup.mem_zpowers_iff.mpr ⟨n, hxwn⟩)
+  have how_ov : orderOf w = orderOf v := by rw [← hwv]; exact (Subgroup.orderOf_coe w).symm
+  -- `orderOf x ∣ |K|` and `orderOf x ∣ |W₁|`, coprime ⟹ `x = 1`, contradiction
+  have how_K : orderOf w ∣ Nat.card ↥h.K := by
+    rw [how_ov, ← hav_ord, hoak]; exact hok_dvd
+  have hox_K : orderOf x ∣ Nat.card ↥h.K := hox_dvd_ow.trans how_K
+  have hox_W1 : orderOf x ∣ Nat.card ↥h.W1 := by
+    rw [← Subgroup.orderOf_mk (H := h.W1) x hxW1]; exact orderOf_dvd_natCard _
+  exact hx1 (orderOf_eq_one_iff.mp (Nat.eq_one_of_dvd_coprimes h.card_coprime hox_K hox_W1))
+
 /-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
 and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
 `⟨c·ξ, ω^σ⟩ = 0` for every `σ`-image `ω^σ = chiFam pq`.  Chains the four disjointness bricks:
