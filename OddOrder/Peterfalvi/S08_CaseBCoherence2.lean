@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_CaseBCoherence
+import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 
 /-!
 # Peterfalvi §8: Case (B) coherence — the `τ₂` assembly
@@ -519,5 +520,33 @@ noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
   OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
     cX hyp.coherentYset ν hagreeX hagreeY
     (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed D hDτ hgen
+
+/-- **(6.8.2) case-(B) `{μ_j}`-coherence transported to `hyp.tau`.**  The reducible column characters
+`μ_j` (`= certainTypeSet h46 k`, the certain-type set of Peterfalvi (4.9)) are coherent via
+`certainType_isCoherent`, but with respect to the *enlarged* Dade map
+`dadeIntegralCharacterMap h46.dade0 h46.tau` on `A₀ = A ∪ V^L`.  Since the `μ_j`-differences are
+`A`-supported (`A = H^#`), `IsCoherent.congrMap` re-targets that coherence to the Sibley–Dade
+`hyp.tau`, given the map-agreement `hmapagree` on the supported lattice (established at capstone wiring
+from `dadeIntegralCharacterMap_restrict_eq_of_support` + the construction fact `dade0.restrict A`
+agrees with the base Dade datum `hyp.dade`, since `h46.dade = hyp.dade`).
+
+This is the reducible side of the case-(B) `X`-coherence `cX`; glued with the `X_irr`-coherence
+(`xChainCoherent` on the irreducible part) it yields `IsCoherent hyp.tau (Xset W₂)`. -/
+noncomputable def SibleyDadeHypothesis.certainTypeSet_isCoherent_tau
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
+    (hmapagree : ∀ φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  (OddOrder.Peterfalvi.S06.certainType_isCoherent h46 (k := k) hk).congrMap hmapagree
 
 end OddOrder.Peterfalvi.S08
