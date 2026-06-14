@@ -2047,6 +2047,38 @@ theorem exists_einvariant_sylow_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
       (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr ⟨hsp, hsMσ, Nat.card_pos.ne'⟩))
   exact exists_aInvariant_sylow_subgroup hEnorm hcop (Or.inl ‹IsSolvable ↥E›) q
 
+/-- **Thm 13.9 tail の核** (BG: "By Lemma 13.6, `C_S(P)=1`; therefore by Lemma 13.1(a),
+`p∈τ₁(M*)`"): `M*` 非共役, `p∈π(E)∩π(M*)`, `P ≤ M∩M*` が `p`-群, `S ≤ M_σ∩M*` 非自明で
+`C_S(P)=1` (`S ⊓ C(P)=⊥`) のとき `p∈τ₁(M*)`。
+
+`p∉τ₁(M*)` と仮定: `⁅M_σ∩M*, M∩M*⁆` 自明なら `M∩M*` が `M_σ∩M*` を中心化、非自明なら
+Lemma 13.1(b) (`not_mem_tau2_of_interaction`) で `p∉τ₂(M*)`、Lemma 13.1(a)
+(`pSubgroup_centralizes_Msigma_inf`) で `P` が `M_σ∩M*` を中心化。いずれも `S ≤ C(P)`、
+よって `C_S(P)=S=1` で `S≠1` に矛盾。 -/
+theorem mem_tau1_Mstar_of_einvariant_sylow [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Mstar : Subgroup G} (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) {p : ℕ} [Fact p.Prime]
+    (hpE : p ∈ (Nat.card ↥E).primeFactors) (hpMstar : p ∈ (Nat.card ↥Mstar).primeFactors)
+    {P : Subgroup G} (hPM : P ≤ M ⊓ Mstar) (hPp : IsPGroup p ↥P)
+    {S : Subgroup G} (hSMsigma : S ≤ S10.Msigma M) (hSMstar : S ≤ Mstar) (hSne : S ≠ ⊥)
+    (hCSP : S ⊓ Subgroup.centralizer (P : Set G) = ⊥) :
+    p ∈ tau1 Mstar := by
+  by_contra hpτ1
+  have hcent : P ≤ Subgroup.centralizer ((S10.Msigma M ⊓ Mstar : Subgroup G) : Set G) := by
+    by_cases hcomm : ⁅(S10.Msigma M ⊓ Mstar : Subgroup G), (M ⊓ Mstar : Subgroup G)⁆ = ⊥
+    · refine hPM.trans (Subgroup.commutator_eq_bot_iff_le_centralizer.mp ?_)
+      rw [Subgroup.commutator_comm]; exact hcomm
+    · have hpτ2 : p ∉ tau2 Mstar := not_mem_tau2_of_interaction hG h hMstar hpE hcomm hnc
+      exact pSubgroup_centralizes_Msigma_inf hG h hMstar hpE hpMstar hpτ1 hpτ2 hnc hPM hPp
+  have hSinf : S ≤ S10.Msigma M ⊓ Mstar := le_inf hSMsigma hSMstar
+  have hScP : S ≤ Subgroup.centralizer (P : Set G) := by
+    intro s hs
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact (Subgroup.mem_centralizer_iff.mp (hcent hx) s (hSinf hs)).symm
+  exact hSne (by rw [← hCSP]; exact le_antisymm (le_inf le_rfl hScP) inf_le_left)
+
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。
 
 証明は `M_σ` の冪零性で場合分け: `M_σ` 冪零なら Lemma 10.12 (`disjoint_of_not_conj` の冪零条項)
