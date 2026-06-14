@@ -2792,6 +2792,41 @@ theorem inf_Msigma_Mstar_eq_centralizer_Q [Finite G] (hG : IsMinimalSimpleOdd G)
   · exact le_inf inf_le_left
       (inf_le_right.trans ((Subgroup.centralizer_le_normalizer _).trans hNQM))
 
+/-- **BG Theorem 13.10, GAP C helper**: an `E`-invariant Sylow `q`-subgroup `Q*` of `M_σ ∩ M*`
+(for any `M*` with `E ≤ M*`). `E` normalizes `M_σ` and `M*`, hence `M_σ ∩ M*`; `|E|` is coprime to
+`|M_σ ∩ M*|` (it divides `|M_σ|`, coprime to `|E|`), so `exists_aInvariant_sylow_subgroup`
+applies. Mirrors `exists_E1inv_sylow_centralizing_derivedE`. -/
+theorem exists_Einvariant_sylow_inf_Msigma_Mstar [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    {Mstar : Subgroup G} (hEMstar : E ≤ Mstar) (q : ℕ) [Fact q.Prime] :
+    ∃ Qstar : Subgroup G, Qstar ≤ S10.Msigma M ⊓ Mstar ∧ IsPGroup q ↥Qstar ∧
+      E ≤ Subgroup.normalizer (Qstar : Set G) ∧
+      Nat.card ↥Qstar = q ^ (Nat.card ↥(S10.Msigma M ⊓ Mstar)).factorization q := by
+  classical
+  set N : Subgroup G := S10.Msigma M ⊓ Mstar with hNdef
+  have hNMσ : N ≤ S10.Msigma M := inf_le_left
+  have hMσM : S10.Msigma M ≤ M := S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI hNsolv : IsSolvable ↥N :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe (hNMσ.trans hMσM)).surjective
+  have hENMσ : E ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E_le.trans (le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hENMstar : E ≤ Subgroup.normalizer (Mstar : Set G) := hEMstar.trans Subgroup.le_normalizer
+  have hENN : E ≤ Subgroup.normalizer (N : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]; intro x; rw [hNdef]
+    simp only [Subgroup.mem_inf]
+    rw [Subgroup.mem_normalizer_iff.mp (hENMσ hg) x, Subgroup.mem_normalizer_iff.mp (hENMstar hg) x]
+  have hcop_MσE : Nat.Coprime (Nat.card ↥(S10.Msigma M)) (Nat.card ↥E) := by
+    have h1 := (S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv] at h1
+  have hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥N) :=
+    hcop_MσE.symm.coprime_dvd_right (Subgroup.card_dvd_of_le hNMσ)
+  exact exists_aInvariant_sylow_subgroup hENN hcop (Or.inr hNsolv) q
+
 /-- **BG Theorem 13.10** (mmd L3672; 結論は PDF p.102 から画像読みで復元):
 ある `P∈ℰ_p¹(E₁)` が `E₃` を中心化しないなら (a) `E₁` は `E₃` に regular 作用;
 (b) `E₃` は `M_σ` に regular 作用; (c) その `P` について `C_{M_σ}(P) ≠ 1`。
