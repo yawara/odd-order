@@ -1181,6 +1181,37 @@ theorem inner_coherentYset_extension_certainTypeRImage_eq_zero
   · rw [inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hη' hne χ₂' i,
       mul_zero]
 
+/-- **(6.8.2.3) seam-1, decomposition form: `⟨D.X, Y^{τ₁}⟩ = 0` (the `hXorth` for `per_constituent`).**
+For any `(5.4)` decomposition `D` whose image-family members are covered by the reducible `R(μ_j)` set
+(`himg`: every `α ∈ D.imageFamily.imageSet` is some `certainTypeRImage h46 χ₂ χ₂' p`), the
+`R(χᵢ)`-part `D.X ∈ ℤ[R(μ_j)]` is orthogonal to the `Y`-coherence image `η^{τ₁}` (for distinct
+anchors `η ≠ η' ∈ Y`).  This is `inner_X_Y_eq_zero_of_orthogonal` fed by the `R(μ_j)`-member
+orthogonality `inner_coherentYset_extension_certainTypeRImage_eq_zero`.
+
+This is the capstone-ready `hXorth` input of `per_constituent_Y_eq_smul`: the certain-type
+decomposition `certainTypeDecompositionDa` (via `ofProjection (certainTypeR …)`) has
+`imageFamily.imageSet = Finset.univ.image (certainTypeRImage h46 χ₂ χ₂⁻¹)`, so `himg` is discharged at
+the capstone by `Finset.mem_image` (the coverage form avoids a `DecidableEq (ClassFunction G ℂ)`
+obligation here). -/
+theorem inner_decomposition_X_coherentYset_extension_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) (hne : η ≠ η')
+    {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ)
+    (himg : ∀ α ∈ D.imageFamily.imageSet,
+      ∃ p, OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂' p = α) :
+    ClassFunction.inner D.X (hyp.coherentYset.extension η) = 0 := by
+  refine inner_X_Y_eq_zero_of_orthogonal D ?_
+  intro α hα
+  obtain ⟨p, rfl⟩ := himg α hα
+  exact inner_coherentYset_extension_certainTypeRImage_eq_zero hyp h46 hHK hη hη' hne χ₂ χ₂' p
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
