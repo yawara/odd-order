@@ -1963,3 +1963,28 @@ API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §
 4. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4))。本丸。
 5. **per-χ statement + τ₂ direct assembly**。
 **正本=本 cont.²⁸。(6.8.2.3) は再評価で tractable 化 (infra 大半既存)。次=coeff→degree (1.)。重複回避に survey 必須 (本 session で 3 回 duplicate 回避)。**
+
+## 2026-06-14 (session 40 cont.²⁹, /loop): ✅✅ (6.8.2.3) infra 完成 — induction transitivity landed (Frobenius 経路で clean); 残=aggregate + R(χ)
+
+### ✅ landed (2 iter, 全 axiom-clean, full build 3807):
+- **`inner_compHom_of_mulEquiv`** (97a73357): 群同型 e に沿った inner 保存 `⟨a∘e,b∘e⟩=⟨a,b⟩` (transport 部品)。
+- **`induce_induce_subgroupOf`** (1e93c83e): **induction transitivity** `Ind^M_H(Ind^H_{K.subgroupOf H} ψ∘e)=Ind^M_K ψ`
+  (K≤H≤M)。**Frobenius 経路で ~25 行**: `classFunction_eq_zero_of_orthogonal` + double Frobenius +
+  restriction-transport (`Res_{K.subgroupOf H}(Res_H χ)=(Res_K χ)∘e`, M-value defeq で `congr 1`) +
+  inner_compHom。⚠ cont.²⁶ の「from-scratch mathlib 二重和 infra」は**過大評価**だった (raw 二重和 不要)。
+
+### 🎉 (6.8.2.3) infra 完成 — 残りは assembly のみ:
+| piece | status |
+|---|---|
+| 分解 `Ind_Z^H φ=∑_θ⟨φ,Res_Z θ⟩•θ` | ✅ `induce_eq_sum_inner_restrict_smul` (6b3aede9) |
+| transitivity `Ind_H∘Ind_Z=Ind_Z` | ✅ `induce_induce_subgroupOf` (1e93c83e) |
+| ∑aᵢ²=\|H:Z\| norm | ✅ `inner_induce_self_eq_index_of_le_center` (:353, 既存) |
+| Frobenius/completeness/R(χ) | ✅ 既存 |
+| linearity `induce_add/smul` | ✅ 既存 |
+
+### ▶ 残 (6.8.2.3) = assembly (infra 出揃い):
+1. **αᵢ aggregate** `∑aᵢαᵢ = Ind_{W₂}^L φ − |H:Z|η₁`: 分解 → Ind_H linearity (induce_add/smul) →
+   transitivity → `∑aᵢχᵢ=Ind_{W₂}^L φ`; ∑aᵢ²=|H:Z| (norm+Parseval `inner_self_eq_sum_sq_of_repr`)。
+2. **R(χᵢ) 統合 + bᵢ=aᵢ pinning** (§7 OrthonormalCharacterImageFamily + (5.4.a/b))。本丸。
+3. **per-χ statement + τ₂ direct assembly** (IsCoherent 直接 constructor)。
+**正本=本 cont.²⁹。infra 完成は重要マイルストン。次=αᵢ aggregate (1.)。FT 並行スパイン (sorry 当面不変)。**
