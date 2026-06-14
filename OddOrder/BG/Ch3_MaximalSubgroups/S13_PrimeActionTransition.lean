@@ -1285,11 +1285,65 @@ theorem QMbeta_sup_normal_in_M [Finite G] (hG : IsMinimalSimpleOdd G) {M : Subgr
       (S10.Mbeta M).subgroupOf (derivedInG M) ⊔ (QD : Subgroup ↥(derivedInG M)) := by
     rw [Subgroup.subgroupOf_sup hMβD hQderiv, hQDeq]
   haveI hQMβnorm : ((S10.Mbeta M ⊔ Q).subgroupOf (derivedInG M)).Normal := hQMβsub ▸ hNorm
+  -- `|Q| = q ^ v_q(|M'|)` (Q is a Sylow `q` of `↥M'`).
+  have hQcard : Nat.card ↥Q = q ^ (Nat.card ↥(derivedInG M)).factorization q := by
+    rw [← Sylow.card_eq_multiplicity QD, hQDeq,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQderiv).toEquiv]
+  have hMβQM' : S10.Mbeta M ⊔ Q ≤ derivedInG M := sup_le hMβD hQderiv
+  have hM'normMβQ : derivedInG M ≤ Subgroup.normalizer ((S10.Mbeta M ⊔ Q : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMβQM').mp hQMβnorm
   -- char-step: `m ∈ M ⟹ conj m • (M_β ⊔ Q) = M_β ⊔ Q`.
   intro m hm
-  rw [Subgroup.mem_normalizer_iff]
-  -- suffices: `conj m • Q ≤ M_β ⊔ Q` (and symmetric); use Sylow conjugacy in `M'`.
-  sorry
+  apply mem_normalizer_of_conj_smul_eq_self
+  have hmM' : MulAut.conj m • derivedInG M = derivedInG M :=
+    conj_smul_eq_self_of_mem_normalizer (S10.le_normalizer_derivedInG M hm)
+  have hmMβ : MulAut.conj m • S10.Mbeta M = S10.Mbeta M :=
+    conj_smul_eq_self_of_mem_normalizer (le_normalizer_opiCoreInG (S10.beta M) M hm)
+  have hmQ_le : MulAut.conj m • Q ≤ derivedInG M :=
+    hmM' ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hQderiv
+  -- `conj m • Q` is a Sylow `q` of `↥M'`.
+  have hmQcard : Nat.card ↥((MulAut.conj m • Q).subgroupOf (derivedInG M)) =
+      q ^ (Nat.card ↥(derivedInG M)).factorization q := by
+    have e2 : Nat.card ↥(MulAut.conj m • Q) = Nat.card ↥Q :=
+      Nat.card_congr (Subgroup.equivMapOfInjective Q (MulAut.conj m).toMonoidHom
+        (MulAut.conj m).injective).symm.toEquiv
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmQ_le).toEquiv, e2, hQcard]
+  set Qm : Sylow q ↥(derivedInG M) :=
+    Sylow.ofCard ((MulAut.conj m • Q).subgroupOf (derivedInG M)) hmQcard with hQmdef
+  -- Sylow conjugacy in `↥M'`: `c • QD = Qm`.
+  obtain ⟨c, hc⟩ := MulAction.exists_smul_eq ↥(derivedInG M) QD Qm
+  -- transport: `conj ↑c • Q = conj m • Q`.
+  have hmapconj : ∀ (K : Subgroup ↥(derivedInG M)),
+      (MulAut.conj c • K).map (derivedInG M).subtype
+        = MulAut.conj (c : G) • (K.map (derivedInG M).subtype) := by
+    intro K
+    have hcomp : (MulAut.conj (c : G)).toMonoidHom.comp (derivedInG M).subtype
+        = (derivedInG M).subtype.comp (MulAut.conj c).toMonoidHom := by
+      ext x
+      simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+        Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
+    show (K.map (MulAut.conj c).toMonoidHom).map (derivedInG M).subtype
+        = (K.map (derivedInG M).subtype).map (MulAut.conj (c : G)).toMonoidHom
+    rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+  have hcQ : MulAut.conj (c : G) • Q = MulAut.conj m • Q := by
+    have hsmul : MulAut.conj c • Q.subgroupOf (derivedInG M) =
+        (MulAut.conj m • Q).subgroupOf (derivedInG M) := by
+      have h : ((c • QD : Sylow q ↥(derivedInG M)) : Subgroup ↥(derivedInG M))
+          = (Qm : Subgroup ↥(derivedInG M)) := by rw [hc]
+      rwa [Sylow.coe_subgroup_smul, hQDeq, hQmdef, Sylow.coe_ofCard] at h
+    have hmap := congrArg (fun (X : Subgroup ↥(derivedInG M)) => X.map (derivedInG M).subtype) hsmul
+    simpa only [hmapconj, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left hQderiv, inf_of_le_left hmQ_le] using hmap
+  have hcMβQ : MulAut.conj (c : G) • (S10.Mbeta M ⊔ Q) = S10.Mbeta M ⊔ Q :=
+    conj_smul_eq_self_of_mem_normalizer (hM'normMβQ c.2)
+  have hkey : MulAut.conj m • Q ≤ S10.Mbeta M ⊔ Q := by
+    rw [← hcQ, ← hcMβQ]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr le_sup_right
+  have hle : MulAut.conj m • (S10.Mbeta M ⊔ Q) ≤ S10.Mbeta M ⊔ Q := by
+    rw [Subgroup.smul_sup, hmMβ]; exact sup_le le_sup_left hkey
+  exact Subgroup.eq_of_le_of_card_ge hle
+    (Nat.card_congr (Subgroup.equivMapOfInjective (S10.Mbeta M ⊔ Q)
+      (MulAut.conj m).toMonoidHom (MulAut.conj m).injective).symm.toEquiv).ge
 
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
