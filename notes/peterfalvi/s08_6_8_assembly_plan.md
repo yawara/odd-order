@@ -2009,3 +2009,44 @@ API を使う) で FT の一部だが、**FTにつながる Pf §10-16 は BG §
 8. **τ₂ direct assembly** (IsCoherent 直接 constructor)。
 **正本=本 cont.³⁰。aggregate 両半完成。次=combination (機械的) → R(χ) 統合 (本丸, §7 R-producer 精査要)。
 infra 出揃いで assembly は steady だが R(χ) 統合は intricate。FT 並行スパイン。**
+
+## 2026-06-14 (session 40 cont.³¹, /loop): ✅ αᵢ aggregate 完成 (combination landed); R(χ) 統合 = 本丸の §7 interface 精査
+
+### ✅ landed (95d1bee1): **`sum_smul_constituent_diff_eq`** = full αᵢ aggregate
+`∑aᵢαᵢ = Ind^L_{W₂}φ − |H:Z|η₁` (両半の機械的結合 smul_sub+sum_sub_distrib, one-shot)。
+⟹ **(6.8.2.3) の infra + αᵢ aggregate 完全完成** (cont.²⁶〜³¹ で ~12 lemma landed, 全 axiom-clean)。
+
+### 🔬 R(χ) 統合 (steps 4-8, 本丸) の §7 interface 精査:
+- **R(χ) = `OrthonormalCharacterImageFamily τ χ`** (S07:766): orthonormal ⊂ ZIrr, `τ(χ−χ̄)=∑R(χ)`。
+  producer = `dadeOrthonormalCharacterImageFamily` (S07:5387, irreducible χ から)。
+- **(5.4) = `CharacterPsiDecomposition τ χ ψ`** (S07:1356-1469): X−bY+Z 分解 + bounds。
+  - (5.4.a) `inner_self_chi_re_le_inner_self_X` (:1382): ‖χ‖²_re ≤ ‖X‖²。
+  - (5.4.b) `norm_eq_and_X_eq_sum_of_norm_Y_ge` (:1469): ‖Y‖²≥‖ψ‖² ⟹ 等号 + X=∑R(χ)。
+- **🔑 `retarget_isCoherent_of_decomposition` (S07:3737)**: CharacterPsiDecomposition + himg
+  (`τ(χ−a•chi1)=D.X−a•ext chi1` = (6.8.2.3) 形) で **{χ,χ̄} を coherent set に追加** — **(5.4)+pinning を
+  内部化**。⟹ 直接-τ₂ は Y-coherence base から **retarget を X 共役対で反復**が筋。
+
+### 🛑 R(χ) 統合の難所 (本丸):
+1. **reducible μ_j**: retarget は irreducible 対のみ ⟹ μ_j=∑μ_{ij} は直接追加不可。whole-lattice τ₂ で
+   一括 or μ_j を constituent (6.8.2.3) 経由で別処理 (cont.¹⁴ の reducible-aware)。
+2. **himg per χ** = (6.8.2.3) `(χ−aη₁)^τ=X₁−aY`: αᵢ aggregate (済) + R(χᵢ) per-constituent + pinning
+   ((6.8.2.2) `exists_decomposition_caseB` で ∑aᵢαᵢ^τ=X−|H:Z|Y; ∑aᵢbᵢ=∑aᵢ²=|H:Z| ⟹ bᵢ=aᵢ)。
+3. **αᵢ の ψ=η₁ (Y-anchor)** と §7 CharacterPsiDecomposition (χ,ψ pair) の interface 整合。
+**honest: R(χ) 統合は §7 (5.4)/retarget 機構との深い integration で intricate な本丸。aggregate まで
+の準備は完了。次=retarget interface の himg 供給 (αᵢ^τ decomposition) の構築。要集中。**
+**正本=本 cont.³¹。aggregate 完成 (重要マイルストン)。R(χ) 統合 = 深い §7-integration の本丸が残る。**
+
+### 🔑 R(χ) 統合の具体 producer path (cont.³¹ 末, 精査結果):
+- **`CharacterPsiDecomposition.ofProjection`** (S07:1185): R(χ) (imageFamily) + τ₁ + (htau1_inner_eq /
+  htau1_agrees / htau1_mem `τ₁(χ−ψ)∈ZIrr` / 3 orthogonalities) から **X/Y/coeff/X_eq/Y_orthogonal を
+  projection で自動構築** (`exists_intProjection_of_orthonormal_ZIrr`)。残 primitive = R(χ) extractor + τ₁。
+- **`CharacterPsiDecomposition.decompositionPair`** (S07:1237): 同 χ・同 τ₁ で (D₀, Da) pair を構築
+  (retarget_isCoherent_of_decompositions の τ₁-agreement が rfl)。ψ=0 と ψ=a•chi1。
+- **`retarget_isCoherent_of_extensionImage`** (S08_CoherenceCorePart1:1980): case-A/(6.6) engine、
+  これが {χ,χ̄} を coherent set に追加 ((5.4)+pinning 内部化)。
+- **R(χ) producer** = `dadeOrthonormalCharacterImageFamily` (S07:5387) / `…OfDiff` (S08:1681)。
+⟹ (6.8.2.3) R(χ) 統合 = per-constituent χᵢ で decompositionPair (R(χᵢ)+τ₁+facts) → retarget。
+**残 deep 作業**: (a) χᵢ=Ind_H θᵢ が irreducible か (R(χᵢ) producer の前提) の精査, (b) τ₁=Y-coherence
+isometry の供給, (c) reducible μ_j の whole-lattice 処理, (d) aggregate→pinning 接続。
+**= 深い §7 assembly の本丸; machinery は出揃い (ofProjection/decompositionPair/retarget/R-producer),
+per-constituent 組立 + 接続が残る。要集中。次=per-constituent decompositionPair の inputs 供給。**
