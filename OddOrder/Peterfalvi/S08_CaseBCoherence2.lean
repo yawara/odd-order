@@ -1151,6 +1151,36 @@ theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
     (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46) hξZ hξ1 hξ'Z hξ'1 hξξ' hεC hvanish
     hmin _
 
+/-- **(6.8.2.3) seam-1, `R(μ_j)`-family form: `Y^{τ₁} ⊥ R(μ_j)`.**  For distinct `Y`-anchors
+`η ≠ η' ∈ Y`, the image `η^{τ₁}` is orthogonal to every member of the reducible image family
+`R(μ_j) = {±δ_j ω_{ij}^σ}` (`certainTypeRImage`, Peterfalvi (5.2.d)/(5.3.b)).  Each `R(μ_j)`-member is
+a signed `σ`-image `±δ_j · certainTypeOmegaSigma h46 χ₂⁽ʼ⁾ i`, so this is the seam-1 orthogonality
+`inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero` scaled by the sign.
+
+Summed over the family (`inner_X_eq_zero_of_orthogonal_imageSet`) this is the `R(μ_j) ⊥ Y^{τ₁}`
+input `hXorth` of `per_constituent_Y_eq_smul` for the reducible certain-type decomposition
+`certainTypeR`. -/
+theorem inner_coherentYset_extension_certainTypeRImage_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset) (hne : η ≠ η')
+    (χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ)
+    (p : Bool × Fin (Nat.card h46.W1)) :
+    ClassFunction.inner (hyp.coherentYset.extension η)
+      (OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂' p) = 0 := by
+  obtain ⟨b, i⟩ := p
+  cases b <;>
+    simp only [OddOrder.Peterfalvi.S06.certainTypeRImage,
+      OddOrder.RepresentationTheory.inner_smul_right]
+  · rw [inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hη' hne χ₂ i,
+      mul_zero]
+  · rw [inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hη' hne χ₂' i,
+      mul_zero]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
