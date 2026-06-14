@@ -152,6 +152,26 @@ sorried §14 だけでなく **scaffold 自身の構造**が clean citation を�
 fragile 依存回避 + §14 結果の最終形に合わせて cite)。schematic proof の cite→conjunct 対応自体は
 mmd L4424-4449 に在る (B: 12.1d/12.5b→1, 15.1d/e/c→2/3/4/5 等) ので、restructuring 後は機械的。
 
+## 8. endpoint 証明プラン (cite map; restructuring 後の実行用)
+
+restructuring (Thm 15.2 parametrize 済, `43f42629`) で §15 は概ね citable。§14 は Lane H が
+parametrize 済 (Prop 14.2 `typeP_structure` は K/Kstar/U 仮説 + Kstar≠⊥ 露出、Thm 14.7
+`typeP_duality` は IsCyclic(K⊔Kstar) 露出)。endpoint 証明は focused session 向き(各 ~40-50 行)。
+
+**Cor 15.6 (`typeP_kstar_in_mf`) cite map** (full scoping 済):
+- `Kstar≠⊥` ← `typeP_structure hG hM hP hK hKstar hU` の conjunct 3。⚠ U が要る → Hall 存在で構成。
+- `IsCyclic Kstar` ← `typeP_duality` の `IsCyclic(K⊔Kstar)` + `Kstar≤K⊔Kstar` + subgroup-of-cyclic。
+- `Kstar≤MF M` ← case-split: `MF=M_σ` (Kstar=M_σ⊓C(K)≤M_σ=MF) ∨ `MF≠M_σ`
+  (`mf_ne_msigma_typeP1_structure hG hM hne hK hKstar` → 露出済 `Kstar≤MF`)。
+- `Kstar≤M''` ← Lemma 6.3(a) (`S06_Additional:300`) + M=KM' (Thm 14.7(h) — 要 source 確認)。
+- `¬IsCyclic(MF M)` ← contradiction: MF cyclic → F(M) cyclic (Cor 15.5) → M'⊆C_M(F(M))⊆F(M)
+  (`S08.centralizer_fittingInG_inf_le_fittingInG` + Aut(cyclic) abelian) → M''⊆F(M)'=1 →
+  Kstar≤M''=1, contra Kstar≠⊥。
+
+friction: U 構成 / M=KM' source / contradiction の Aut-abelian step。他 endpoint も同様の
+cite map が mmd schematic (L4424-4449) から作れる。**実行は focused session が効率的**
+(60s loop では各 endpoint multi-iteration uncommittable WIP)。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
