@@ -1140,20 +1140,76 @@ theorem coherent_extension_eq_zsmul_irreducible
     rw [cS.extension_inner_eq η η hηspan hηspan, hηnorm]
   exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan) hextnorm
 
-/-- **(6.8.2.3) seam-1 orthogonality `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For two distinct `Y`-coherence
-anchors `η ≠ η' ∈ Y`, the image `η^{τ₁} = coherentYset.extension η` is orthogonal to every
-certain-type `σ`-image `ω_{ij}^σ = certainTypeOmegaSigma h46 χ₂ i`.
+/-- **(6.8.2.3) seam-1 orthogonality, generic coherent form `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For *any*
+coherence `cS : IsCoherent hyp.tau S₁ H^#` and two irreducible members `η, η' ∈ S₁` with `⟨η, η'⟩ = 0`
+and `η − η'` `H^#`-supported, the image `cS.extension η` is orthogonal to every certain-type `σ`-image
+`ω_{ij}^σ = certainTypeOmegaSigma h46 χ₂ i`.
 
-This is the `hXorth` input of `per_constituent_Y_eq_smul` (Peterfalvi (6.8.2.3): "`R(χᵢ)` is
-orthogonal to `Y^{τ₁}`").  Writing `η^{τ₁} = ε·ξ`, `η'^{τ₁} = ε'·ξ'`
-(`coherentYset_extension_eq_zsmul_irreducible`, `ε, ε' = ±1`), the images are orthonormal
-(`⟨ξ, ξ'⟩ = 0` from the `Y`-isometry `extension_inner_eq` + `⟨η, η'⟩ = 0`), and the difference
+Writing `η^{τ₁} = ε·ξ`, `η'^{τ₁} = ε'·ξ'` (`coherent_extension_eq_zsmul_irreducible`), the images are
+orthonormal (`⟨ξ, ξ'⟩ = 0` from `extension_inner_eq` + `⟨η, η'⟩ = 0`), and the difference
 `ε·ξ − ε'·ξ' = η^{τ₁} − η'^{τ₁}` vanishes on `V`
-(`coherentYset_extension_diff_apply_eq_zero_of_mem_ticVdiffV`, the anchor); the disjointness machine
+(`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`, the anchor); the disjointness machine
 `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` then gives `⟨ε·ξ, ω_{ij}^σ⟩ = 0`
-(`ω_{ij}^σ = chiFam P_{ij}` by `certainTypeOmegaSigma_eq_chiFam`).  The textbook takes `η' = η̄`
-(complex conjugate, `≠ η` by non-realness of odd-order irreducibles); the general `η ≠ η'` form is
-proved here, deferring the conjugate-closure of `Y` to the capstone instantiation. -/
+(`ω_{ij}^σ = chiFam P_{ij}`).  Instantiating `η' = η̄` (`⟨η, η̄⟩ = 0`, `η − η̄` `H^#`-supported by equal
+degree) covers both the `Y`-anchor (seam-1) and an irreducible `X`-member (the column–irreducible
+cross-orthogonality of the case-(B) `X`-coherence glue). -/
+theorem inner_coherent_extension_certainTypeOmegaSigma_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (cS : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ S₁) (hη' : η' ∈ S₁)
+    (hηirr : IsIrreducibleCharacter η) (hη'irr : IsIrreducibleCharacter η')
+    (hee : ClassFunction.inner η η' = 0)
+    (hsupp : (η - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    ClassFunction.inner (cS.extension η)
+      (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i) = 0 := by
+  obtain ⟨ε, ξ, hε, hηext⟩ := coherent_extension_eq_zsmul_irreducible cS hηirr hη
+  obtain ⟨ε', ξ', hε', hη'ext⟩ := coherent_extension_eq_zsmul_irreducible cS hη'irr hη'
+  have hεC : (ε : ℂ) ≠ 0 := by rcases hε with h | h <;> simp [h]
+  have hε'C : (ε' : ℂ) ≠ 0 := by rcases hε' with h | h <;> simp [h]
+  have hηextC : cS.extension η = (ε : ℂ) • (ξ : ClassFunction G ℂ) := by
+    rw [hηext, Int.cast_smul_eq_zsmul]
+  have hη'extC : cS.extension η' = (ε' : ℂ) • (ξ' : ClassFunction G ℂ) := by
+    rw [hη'ext, Int.cast_smul_eq_zsmul]
+  have hee0 : ClassFunction.inner (cS.extension η) (cS.extension η') = 0 := by
+    rw [cS.extension_inner_eq η η' (Submodule.subset_span hη) (Submodule.subset_span hη'), hee]
+  have hξξ' : ClassFunction.inner (ξ : ClassFunction G ℂ) (ξ' : ClassFunction G ℂ) = 0 := by
+    rw [hηextC, hη'extC, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, star_intCast] at hee0
+    rcases mul_eq_zero.mp hee0 with h | h
+    · exact absurd h hεC
+    · exact (mul_eq_zero.mp h).resolve_left hε'C
+  have hξZ : (ξ : ClassFunction G ℂ) ∈ ZIrr G := ξ.2.mem_ZIrr
+  have hξ'Z : (ξ' : ClassFunction G ℂ) ∈ ZIrr G := ξ'.2.mem_ZIrr
+  have hξ1 : ClassFunction.inner (ξ : ClassFunction G ℂ) (ξ : ClassFunction G ℂ) = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite ξ ξ; rwa [if_pos rfl] at h
+  have hξ'1 : ClassFunction.inner (ξ' : ClassFunction G ℂ) (ξ' : ClassFunction G ℂ) = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite ξ' ξ'; rwa [if_pos rfl] at h
+  have hvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
+      ((ε : ℂ) • (ξ : ClassFunction G ℂ) - (ε' : ℂ) • (ξ' : ClassFunction G ℂ)) v = 0 := by
+    intro v hv
+    have h := coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK cS hη hη' hsupp hv
+    rwa [hηextC, hη'extC] at h
+  have hmin : 2 < min (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W1)
+      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W2) := by
+    have h1 := (OddOrder.Peterfalvi.S06.ticVdiff h46).three_le_card_W1
+    have h2 := (OddOrder.Peterfalvi.S06.ticVdiff h46).three_le_card_W2
+    omega
+  rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hηextC]
+  exact inner_smul_chiFam_eq_zero_of_diff_vanishOnV (OddOrder.Peterfalvi.S06.ticVdiff h46) rfl
+    (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46) hξZ hξ1 hξ'Z hξ'1 hξξ' hεC hvanish
+    hmin _
+
+/-- **(6.8.2.3) seam-1 orthogonality `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`** (Y-anchor specialization of
+`inner_coherent_extension_certainTypeOmegaSigma_eq_zero`).  For distinct `Y`-anchors `η ≠ η' ∈ Y`,
+`η^{τ₁} = coherentYset.extension η ⊥ ω_{ij}^σ`.  `⟨η, η'⟩ = 0` (distinct `Y`-irreducibles) and
+`η − η'` is `H^#`-supported (equal degree `|W₁|`).  This is the `hXorth` input of
+`per_constituent_Y_eq_smul`. -/
 theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
@@ -1163,56 +1219,15 @@ theorem inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
     ClassFunction.inner (hyp.coherentYset.extension η)
       (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i) = 0 := by
-  -- `η^{τ₁} = ε·ξ`, `η'^{τ₁} = ε'·ξ'` (as `ℂ`-scalar multiples)
-  obtain ⟨ε, ξ, hε, hηext⟩ := hyp.coherentYset_extension_eq_zsmul_irreducible hη
-  obtain ⟨ε', ξ', hε', hη'ext⟩ := hyp.coherentYset_extension_eq_zsmul_irreducible hη'
-  have hεC : (ε : ℂ) ≠ 0 := by rcases hε with h | h <;> simp [h]
-  have hε'C : (ε' : ℂ) ≠ 0 := by rcases hε' with h | h <;> simp [h]
-  have hηextC : hyp.coherentYset.extension η = (ε : ℂ) • (ξ : ClassFunction G ℂ) := by
-    rw [hηext, Int.cast_smul_eq_zsmul]
-  have hη'extC : hyp.coherentYset.extension η' = (ε' : ℂ) • (ξ' : ClassFunction G ℂ) := by
-    rw [hη'ext, Int.cast_smul_eq_zsmul]
-  -- `⟨η^{τ₁}, η'^{τ₁}⟩ = ⟨η, η'⟩ = 0`
-  have hee : ClassFunction.inner (hyp.coherentYset.extension η)
-      (hyp.coherentYset.extension η') = 0 := by
-    rw [hyp.coherentYset.extension_inner_eq η η'
-      (Submodule.subset_span hη) (Submodule.subset_span hη')]
-    have h := irreducibleCharacter_inner_eq_ite
+  refine inner_coherent_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hyp.coherentYset hη hη'
+    (hyp.isIrreducibleCharacter_of_mem_Yset hη) (hyp.isIrreducibleCharacter_of_mem_Yset hη') ?_ ?_ χ₂ i
+  · have h := irreducibleCharacter_inner_eq_ite
       (⟨η, hyp.isIrreducibleCharacter_of_mem_Yset hη⟩ : IrreducibleCharacter ↥L)
       (⟨η', hyp.isIrreducibleCharacter_of_mem_Yset hη'⟩ : IrreducibleCharacter ↥L)
     rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
     simpa using h
-  -- `⟨ξ, ξ'⟩ = 0` (extract from `⟨ε·ξ, ε'·ξ'⟩ = 0`)
-  have hξξ' : ClassFunction.inner (ξ : ClassFunction G ℂ) (ξ' : ClassFunction G ℂ) = 0 := by
-    rw [hηextC, hη'extC, ClassFunction.inner_smul_left,
-      OddOrder.RepresentationTheory.inner_smul_right, star_intCast] at hee
-    rcases mul_eq_zero.mp hee with h | h
-    · exact absurd h hεC
-    · exact (mul_eq_zero.mp h).resolve_left hε'C
-  -- `ξ, ξ'` are norm-`1` members of `ZIrr G`
-  have hξZ : (ξ : ClassFunction G ℂ) ∈ ZIrr G := ξ.2.mem_ZIrr
-  have hξ'Z : (ξ' : ClassFunction G ℂ) ∈ ZIrr G := ξ'.2.mem_ZIrr
-  have hξ1 : ClassFunction.inner (ξ : ClassFunction G ℂ) (ξ : ClassFunction G ℂ) = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite ξ ξ; rwa [if_pos rfl] at h
-  have hξ'1 : ClassFunction.inner (ξ' : ClassFunction G ℂ) (ξ' : ClassFunction G ℂ) = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite ξ' ξ'; rwa [if_pos rfl] at h
-  -- the anchor `ε·ξ − ε'·ξ'` vanishes on `V`
-  have hvanish : ∀ v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V,
-      ((ε : ℂ) • (ξ : ClassFunction G ℂ) - (ε' : ℂ) • (ξ' : ClassFunction G ℂ)) v = 0 := by
-    intro v hv
-    have h := coherentYset_extension_diff_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK hη hη' hv
-    rwa [hηextC, hη'extC] at h
-  -- `2 < min(w₁, w₂)` from `3 ≤ w₁, w₂`
-  have hmin : 2 < min (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W1)
-      (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W2) := by
-    have h1 := (OddOrder.Peterfalvi.S06.ticVdiff h46).three_le_card_W1
-    have h2 := (OddOrder.Peterfalvi.S06.ticVdiff h46).three_le_card_W2
-    omega
-  -- assemble: rewrite `ω_{ij}^σ = chiFam` and apply the disjointness machine
-  rw [OddOrder.Peterfalvi.S06.certainTypeOmegaSigma_eq_chiFam, hηextC]
-  exact inner_smul_chiFam_eq_zero_of_diff_vanishOnV (OddOrder.Peterfalvi.S06.ticVdiff h46) rfl
-    (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46) hξZ hξ1 hξ'Z hξ'1 hξξ' hεC hvanish
-    hmin _
+  · exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη')
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη').symm)
 
 /-- **(6.8.2.3) seam-1, `R(μ_j)`-family form: `Y^{τ₁} ⊥ R(μ_j)`.**  For distinct `Y`-anchors
 `η ≠ η' ∈ Y`, the image `η^{τ₁}` is orthogonal to every member of the reducible image family
