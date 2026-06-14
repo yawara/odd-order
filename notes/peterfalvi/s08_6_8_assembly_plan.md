@@ -2812,3 +2812,18 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 4. **pinning** (`per_constituent_Y_eq_smul`) + `image_eq_of_decomposition` → anchored 公式。
 5. **HYBRID union**。
 **正本=本 session 41 cont.⁷ 続³。map 問題 dissolved (data 無視→τ_enl 統一)。両分解とも既存。次=aggregate transfer + dispatch family。**
+
+### cont.⁷ 続⁴ 訂正: τ_enl 統一は不可 → **hyp.tau 統一が forced** (irreducible R-family は hconj 必須)
+續³ の「τ_enl で両分解既存」は誤り。検証: **h46.dade0 は HConjInvariant を持たない** (`h46.dade0.H a = ⊥` は V-共役 a でのみ成立 [`H_eq_bot_of_centralizer_le`+条件]、uniform でなく `of_forall_H_eq_bot` 不可)。一方 irreducible R-family `dadeOrthonormalCharacterImageFamilyOfDiff` は **hconj 必須** (`_of_data` 変種なし) ⟹ **τ_enl では irreducible 分解を作れない**。columnConstituentDecomposition (b046f41f, τ_enl) は dead-end (harmless・committed、後で supersede)。
+
+**∴ approach (b): 全分解を τ = hyp.tau に統一** (hyp.dade は hyp.hconj あり):
+- **irreducibles** = `decompositionDaFromDadeOfDiff hyp.dade hyp.hconj` (自然に hyp.tau)。
+- **columns** = R-family を hyp.tau 用に **rebuild**: certainTypeR の `imageSet`/`mem_ZIrr`/`orthonormal` (全 map 非依存) を再利用 + `image_eq` を hmapagree で transfer (`(μ_j−μ̄_j)^{hyp.tau} = (μ_j−μ̄_j)^{τ_enl}`、μ_j−μ̄_j は K=H で H^#-supported、両 map H^# 一致)。→ ofProjection で column 分解 (hyp.tau)。hmapagree は capstone 供給 (certainTypeSet_isCoherent_tau と同様)。
+- aggregate (exists_decomposition_caseB) は元々 hyp.tau ゆえ transfer 不要 (續³ の transfer も不要に)。
+
+### ▶▶ 残り brick (approach b 確定):
+1. **columnRFamilyTau**: `OrthonormalCharacterImageFamily hyp.tau (columnSum χ₂)` (certainTypeR 3 field 再利用 + image_eq via hmapagree)。← 次。
+2. **column 分解 (hyp.tau)**: ofProjection columnRFamilyTau。
+3. **irreducible 分解 (hyp.tau)**: decompositionDaFromDadeOfDiff hyp.dade hyp.hconj 薄ラッパー。
+4. dispatch family + hagg/hbi + pinning + HYBRID union。
+**正本=本 session 41 cont.⁷ 続⁴。τ_enl 不可 (irreducible は hconj 必須)、hyp.tau 統一 forced。column は R-family rebuild。次=columnRFamilyTau。**
