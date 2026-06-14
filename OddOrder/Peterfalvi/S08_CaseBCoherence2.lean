@@ -610,14 +610,44 @@ theorem eq_of_sum_mul_eq_sum_sq {ι : Type*} (s : Finset ι) (a b : ι → ℤ)
   · exact absurd h (ne_of_gt hpos)
   · linarith [sub_eq_zero.mp h]
 
+/-- **Cauchy–Schwarz for the `Y`-coefficient of a (5.4) decomposition** (the (6.8.2.3) per-step
+bound `bᵢ² ≤ ‖Y‖²`).  For a `CharacterPsiDecomposition` `D` and a norm-`1` vector `Y`, the integer
+coefficient `b = ⟨D.Y, Y⟩` satisfies `b² ≤ ‖D.Y‖²`.  Pythagoras against the orthogonal split
+`D.Y = b·Y + (D.Y − b·Y)` (the complement `W` is orthogonal to `Y`, since `b` is real:
+`⟨Y, W⟩ = \overline{⟨D.Y, Y⟩} − \overline{b} = 0`), with `‖W‖² ≥ 0` (`inner_self_re_nonneg`). -/
+theorem inner_Y_coeff_sq_le {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ)
+    {Y : ClassFunction G ℂ} (hYnorm : ClassFunction.inner Y Y = 1)
+    {b : ℤ} (hb : ClassFunction.inner D.Y Y = (b : ℂ)) :
+    (b : ℝ) ^ 2 ≤ (ClassFunction.inner D.Y D.Y).re := by
+  set W := D.Y - (b : ℂ) • Y with hWdef
+  have hYW : ClassFunction.inner Y W = 0 := by
+    rw [hWdef, ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right,
+      hYnorm, mul_one, OddOrder.RepresentationTheory.inner_conj_symm D.Y Y, hb, star_intCast,
+      sub_self]
+  have hWY : ClassFunction.inner W Y = 0 := by
+    rw [hWdef, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, hb, hYnorm, mul_one,
+      sub_self]
+  have hexpand : ClassFunction.inner D.Y D.Y = (b : ℂ) * (b : ℂ) + ClassFunction.inner W W := by
+    conv_lhs => rw [show D.Y = (b : ℂ) • Y + W by rw [hWdef]; abel]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, hYnorm, hYW,
+      hWY, mul_one, mul_zero, star_intCast, add_zero, zero_add]
+  rw [hexpand, Complex.add_re,
+    show ((b : ℂ) * (b : ℂ)).re = (b : ℝ) ^ 2 by
+      rw [Complex.mul_re, Complex.intCast_re, Complex.intCast_im]; ring]
+  have := inner_self_re_nonneg W
+  linarith
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
 referring to the ambient map) is re-routed through the agreement.
 
 This is the (6.8) case-(B) bridge mechanism: the certain-type coherence `certainType_isCoherent`
-(Peterfalvi (4.9)) is stated for `dadeIntegralCharacterMap h.dade0 h.tau`, while the §8 assembly needs
-a coherence for the Sibley–Dade `hyp.tau`; both Dade maps coincide with `Ind_L^G` on the
+(Peterfalvi (4.9)) is stated for `dadeIntegralCharacterMap h.dade0 h.tau`, while the §8 assembly
+needs a coherence for the Sibley–Dade `hyp.tau`; both Dade maps coincide with `Ind_L^G` on the
 `H^#`-supported lattice (`dadeIntegralCharacterMap_apply_of_support` + `dade_H_eq_bot`), so the
 agreement hypothesis is supplied at capstone wiring. -/
 def _root_.OddOrder.Peterfalvi.S07.IsCoherent.congrMap
