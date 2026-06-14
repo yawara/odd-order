@@ -88,6 +88,17 @@ theorem exists_prime_char [Finite F] [Nontrivial F] :
   · have hax : addOrderOf x = f := addOrderOf_eq_of_ne_zero x x₀ hx hx₀
     rw [← hax]; exact addOrderOf_nsmul_eq_zero x
 
+/-- The additive group of a finite near-field, viewed multiplicatively, is elementary abelian for
+some prime `f`.  This is the form consumed by Appendix I's `exists_field_semilinear`
+(`OddOrder.GroupTheory.IsElementaryAbelian f (Multiplicative F)`). -/
+theorem isElementaryAbelian_multiplicative [Finite F] [Nontrivial F] :
+    ∃ f : ℕ, f.Prime ∧ OddOrder.GroupTheory.IsElementaryAbelian f (Multiplicative F) := by
+  obtain ⟨f, hf, hfx⟩ := exists_prime_char (F := F)
+  refine ⟨f, hf, fun x y => mul_comm x y, fun x => ?_⟩
+  apply Multiplicative.toAdd.injective
+  rw [toAdd_pow, toAdd_one]
+  exact hfx (Multiplicative.toAdd x)
+
 end NearFieldBasics
 
 variable {G Ω F : Type*} [Group G]
