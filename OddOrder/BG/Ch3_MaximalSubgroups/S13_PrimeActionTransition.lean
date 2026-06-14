@@ -868,6 +868,30 @@ theorem hall_le_of_fitting_prime [Finite G] (hG : IsMinimalSimpleOdd G)
     conj_eq_self_of_sigma_pSubgroup_normalizer_le hG hM htσ hYne hYt hNY hYM (hYH.trans hHg)
   rwa [hcollapse] at hHg
 
+/-- **`C_G(P)` は可解** (`P ≠ 1`): minimal simple `G` の真部分群はすべて可解 (`solvable_of_lt_top`)
+ゆえ、`C_G(P) < ⊤` を示せばよい。`C_G(P) = ⊤` なら `P ≤ Z(G)`; `G` 単純で `Z(G) = ⊥`
+(`Z(G) = ⊤` なら `G` 可換 → 可解、`notSolvable` に反す) ゆえ `P = ⊥`、仮定に反す。
+Lemma 13.8 GAP 2 で `C_G(P)` の Hall θ-部分群を取るのに必要。 -/
+theorem centralizer_isSolvable_of_ne_bot [Finite G] (hG : IsMinimalSimpleOdd G)
+    {P : Subgroup G} (hP : P ≠ ⊥) :
+    IsSolvable ↥(Subgroup.centralizer (P : Set G)) := by
+  apply hG.solvable_of_lt_top
+  rw [lt_top_iff_ne_top]
+  intro htop
+  rcases hG.simple.eq_bot_or_eq_top_of_normal (Subgroup.center G) inferInstance with hc | hc
+  · apply hP
+    rw [eq_bot_iff, ← hc]
+    intro x hx
+    rw [Subgroup.mem_center_iff]
+    intro g
+    have hg : g ∈ Subgroup.centralizer (P : Set G) := htop ▸ Subgroup.mem_top g
+    exact (Subgroup.mem_centralizer_iff.mp hg x hx).symm
+  · apply hG.notSolvable
+    apply isSolvable_of_comm
+    intro a b
+    have ha : a ∈ Subgroup.center G := hc ▸ Subgroup.mem_top a
+    exact (Subgroup.mem_center_iff.mp ha b).symm
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
