@@ -418,6 +418,38 @@ session 16-19 の残 4 ステップを 1 ループで完遂 (全 sorry-free・ax
   (loop 完遂困難の可能性大 — ここは hub に重さを flag 済の領域)。代替で C/D/E/A の他 appendix audit も可。
   Prop 1 (`rankOne_affine_nearField`) は FT+Brauer-Suzuki gate (重い・後回し)。
 
+### session 21 (2026-06-14): Appendix II Prop 2 分類 — F_{r²,2} を抽象「twisted near-field」で着手
+分類後半 (σ_y/Aut(K) → field or F_{r²,2}) のうち **F_{r²,2} の構成**に着手。論文 (pp.137-138) を精読し
+設計確定 (next session は再設計不要):
+- **App C Prop 2 全体の道筋** (07.0_..._On_Near-Fields.mmd): (1) A irreducible【済 = rightMulAction_irreducible_of_index_two】
+  → (2) Appendix I Prop2 で「∘ と両立する体構造 K」+ y∈A で x∘y=xy → (3) y∈F⋆ で x∘y=x^{σ_y}·y (σ_y∈Aut K 半線形)
+  → (4) y↦σ_y は F⋆→Aut(K) hom, ker⊇A → (5) ker=F⋆ なら **F は体**; さもなくば y∈F⋆−A で σ_y 位数2
+  → K=𝔽_{r²}, x^{σ_y}=x^r, **F≅F_{r²,2}**, |Z(F⋆)|=r−1。
+- **F_{r²,2} 構成の抽象化 (commit d9f4d3fc)**: 論文の x∘y=(y平方?xy:x^r y) を **`TwistData K`** で抽象化
+  = (σ:RingAut K, σ²=1, χ:Kˣ→*Mult(ZMod2) σ不変)。`x ∘ y = σ^{χ(y)}(x)·y`。**有限体/Frobenius/quadraticChar の
+  plumbing 不要** (それは F_{r²,2} instantiation で後付け); near-field 公理は (σ²=1, χ hom, χ∘σ=χ) のみで出る。
+  **逆元は明示**: y⁻¹_∘ = σ^{χ(y)}(y⁻¹) (χ(y⁻¹)=χ(y) in ZMod2, σ^k(y)σ^k(y⁻¹)=σ^k(1)=1) ⟹ 有限cancel→group 補題不要。
+  twAut e := if e=0 then 1 else σ (`.val`/σ^n を避け twAut_add が綺麗)。
+- **🔑 Lean 知見 (再調査不要)**: (1) twExp は `open scoped Classical in` で Decidable(y=0) 供給;
+  (2) **ZMod 2 の if-条件は fin_cases だと `0=0` が eq_self で潰れない (リテラル不一致)** → `rcases (show e=0∨e=1 by decide)`
+  + subst で literal 化し `show (1:ZMod2)+1=0 from by decide` で書換える; (3) RingEquiv の ≠0 保存は
+  `rw [ne_eq, EmbeddingLike.map_eq_zero_iff]`; (4) `simp +decide` は reduceIte に効くが上記リテラル不一致は別問題。
+- **✅ Stage 2 COMPLETE (commit 6a9c1f3e)**: twAut_twAut (RingAut mul = 合成, `(f*g)x=f(g x)` rfl)
+  + twExp_mul/twExp_σ/twExp_twAut/twExp_twMul + **twMul_assoc** (非零は twAut_twAut+add_comm; 零は absorb)。
+- **✅ Stage 3 COMPLETE (commit 9830f746)**: twExp_inv (χ(y⁻¹)=χ(y) in ℤ/2; `-a=a` by decide) + twMul_twInv
+  (明示逆元、有限cancel不要) ⟹ **`Twisted d` (型シノニム = K) に `NearField` instance** (型シノニム上 AddCommGroup
+  は inferInstanceAs、GroupWithZero は twisted; exists_pair_ne は `(zero_ne_one : (0:K)≠1)` で defeq cast)。
+  ⟹ **抽象 twisted near-field 完成** (F_{r²,2} の engine)。full build 3807, axiom 増無し、scaffold sorry 2 不変。
+- **▶ 残 (H 再配置前の中断点; 抽象 engine は完成済)**:
+  - **Stage 4 (F_{r²,2} 実体化)**: K=𝔽_{r²} (GaloisField/Finite 体で [K:𝔽_r]=2), σ=Frobenius (x↦x^r, σ²=1),
+    χ=quadraticChar で `TwistData K` を実体化 → `Twisted` で例外 near-field を得る。
+  - **classification skeleton**: σ_y:F⋆→Aut(K) hom (ker⊇A) + 「ker=F⋆ ⟹ F は体」方向。これは
+    nearField_field_structure に「∘ と両立する K の乗法 (y∈A で x∘y=xy)」を露出する強化が前提 (現状 K=End… は
+    finrank/|·| のみ露出)。⟹ scaffold `cyclic_index_two_nearField_classification` の faithful 化はこの後。
+  - 注 (2026-06-14 中断): ユーザー判断で **H レーンは FT 本線に繋がらない** (appendices=Part II off-critical-path)
+    ため一旦中断、H の振り分けを変更予定。NearFields の到達点 = ① index-2 irreducibility+field structure 無条件化
+    (session 20)、② 抽象 twisted near-field NearField instance (session 21, Stage1-3)。残は Stage 4 + skeleton。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。

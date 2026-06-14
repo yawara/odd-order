@@ -413,6 +413,177 @@ theorem nearField_field_structure_of_index_two.{u} {F : Type u} [NearField F] [F
 
 end NearFieldBasics
 
+section TwistedNearField
+
+/-- **Twisting data turning a field into a near-field** (the construction behind `F_{r²,2}`,
+Peterfalvi Appendix C, pp. 137--138).  An order-`≤ 2` ring automorphism `σ` of a field `K` together
+with a multiplicative *sign* character `χ : Kˣ → ℤ/2` that is invariant under `σ`.  The twisted
+multiplication `x ∘ y = σ^{χ(y)}(x) · y` then makes `K` a near-field (in general non-commutative
+multiplicatively, so not a field).  For `F_{r²,2}`: `K = 𝔽_{r²}`, `σ : x ↦ x^r` (the order-`2`
+Frobenius over `𝔽_r`), and `χ` the quadratic character (`0` on squares, `1` on non-squares). -/
+structure TwistData (K : Type*) [Field K] where
+  /-- The twisting automorphism (`x ↦ x^r` for `F_{r²,2}`). -/
+  σ : RingAut K
+  /-- `σ` has order dividing `2`. -/
+  σ_sq : σ ^ 2 = 1
+  /-- The sign character (quadratic character for `F_{r²,2}`). -/
+  χ : Kˣ →* Multiplicative (ZMod 2)
+  /-- `χ` is `σ`-invariant (automorphisms preserve squares). -/
+  χ_σ : ∀ y : Kˣ, χ (Units.map (σ : K →* K) y) = χ y
+
+namespace TwistData
+
+variable {K : Type*} [Field K] (d : TwistData K)
+
+open scoped Classical in
+/-- The twisting exponent of `y`: `0` for `0` and for `χ`-even `y`, `1` for `χ`-odd `y`. -/
+noncomputable def twExp (y : K) : ZMod 2 :=
+  if h : y = 0 then 0 else Multiplicative.toAdd (d.χ (Units.mk0 y h))
+
+/-- The order-`≤ 2` automorphism selected by `e : ℤ/2`: the identity (`e = 0`) or `σ` (`e = 1`). -/
+def twAut (e : ZMod 2) : RingAut K := if e = 0 then 1 else d.σ
+
+/-- The twisted (near-field) multiplication `x ∘ y = σ^{χ(y)}(x) · y`. -/
+noncomputable def twMul (x y : K) : K := d.twAut (d.twExp y) x * y
+
+@[simp] theorem twAut_zero : d.twAut 0 = 1 := by simp [twAut]
+
+@[simp] theorem twAut_one : d.twAut 1 = d.σ := by simp [twAut]
+
+/-- `twAut` turns addition in `ℤ/2` into composition: `twAut (a+b) = twAut a * twAut b`
+(the `a = b = 1` case is where `σ² = 1` is used). -/
+theorem twAut_add (a b : ZMod 2) : d.twAut (a + b) = d.twAut a * d.twAut b := by
+  have hσσ : d.σ * d.σ = 1 := by rw [← pow_two]; exact d.σ_sq
+  have key : ∀ e : ZMod 2, e = 0 ∨ e = 1 := by decide
+  rcases key a with ha | ha <;> rcases key b with hb | hb <;> subst ha <;> subst hb <;>
+    simp only [show (0 : ZMod 2) + 0 = 0 from by decide, show (0 : ZMod 2) + 1 = 1 from by decide,
+      show (1 : ZMod 2) + 0 = 1 from by decide, show (1 : ZMod 2) + 1 = 0 from by decide,
+      twAut_zero, twAut_one, one_mul, mul_one, hσσ]
+
+@[simp] theorem twExp_zero : d.twExp 0 = 0 := by simp [twExp]
+
+@[simp] theorem twExp_one : d.twExp 1 = 0 := by
+  rw [twExp, dif_neg one_ne_zero, show Units.mk0 (1 : K) one_ne_zero = 1 from Units.ext rfl,
+    map_one, toAdd_one]
+
+@[simp] theorem twMul_zero (x : K) : d.twMul x 0 = 0 := by simp [twMul]
+
+@[simp] theorem zero_twMul (y : K) : d.twMul 0 y = 0 := by simp [twMul]
+
+@[simp] theorem twMul_one (x : K) : d.twMul x 1 = x := by simp [twMul]
+
+@[simp] theorem one_twMul (y : K) : d.twMul 1 y = y := by simp [twMul]
+
+/-- The twisted product of two nonzero elements is nonzero. -/
+theorem twMul_ne_zero {x y : K} (hx : x ≠ 0) (hy : y ≠ 0) : d.twMul x y ≠ 0 := by
+  simp only [twMul]
+  refine mul_ne_zero ?_ hy
+  rw [ne_eq, EmbeddingLike.map_eq_zero_iff]
+  exact hx
+
+/-- Right distributivity of the twisted multiplication: `(a + b) ∘ c = a ∘ c + b ∘ c`. -/
+theorem add_twMul (a b c : K) : d.twMul (a + b) c = d.twMul a c + d.twMul b c := by
+  simp [twMul, map_add, add_mul]
+
+/-- Composing the twist automorphisms adds their exponents: `twAut a (twAut b x) = twAut (a+b) x`. -/
+theorem twAut_twAut (a b : ZMod 2) (x : K) : d.twAut a (d.twAut b x) = d.twAut (a + b) x := by
+  rw [twAut_add]; rfl
+
+/-- `twExp` is multiplicative on nonzero elements: `twExp (y·z) = twExp y + twExp z`. -/
+theorem twExp_mul {y z : K} (hy : y ≠ 0) (hz : z ≠ 0) :
+    d.twExp (y * z) = d.twExp y + d.twExp z := by
+  have hyz : y * z ≠ 0 := mul_ne_zero hy hz
+  rw [twExp, dif_neg hyz, twExp, dif_neg hy, twExp, dif_neg hz,
+    show Units.mk0 (y * z) hyz = Units.mk0 y hy * Units.mk0 z hz from Units.ext rfl,
+    map_mul, toAdd_mul]
+
+/-- `twExp` is `σ`-invariant on nonzero elements: `twExp (σ y) = twExp y`. -/
+theorem twExp_σ {y : K} (hy : y ≠ 0) : d.twExp (d.σ y) = d.twExp y := by
+  have hσy : d.σ y ≠ 0 := by rw [ne_eq, EmbeddingLike.map_eq_zero_iff]; exact hy
+  rw [twExp, dif_neg hσy, twExp, dif_neg hy,
+    show Units.mk0 (d.σ y) hσy = Units.map (d.σ : K →* K) (Units.mk0 y hy) from Units.ext rfl,
+    d.χ_σ]
+
+/-- `twExp` is invariant under every twist automorphism on nonzero elements. -/
+theorem twExp_twAut {y : K} (hy : y ≠ 0) (e : ZMod 2) :
+    d.twExp (d.twAut e y) = d.twExp y := by
+  rcases (by decide : ∀ x : ZMod 2, x = 0 ∨ x = 1) e with he | he <;> subst he
+  · rw [twAut_zero]; rfl
+  · rw [twAut_one]; exact d.twExp_σ hy
+
+/-- The twist exponent of a twisted product (of nonzero elements) adds: a key step for
+associativity. -/
+theorem twExp_twMul {y z : K} (hy : y ≠ 0) (hz : z ≠ 0) :
+    d.twExp (d.twMul y z) = d.twExp y + d.twExp z := by
+  have h1 : d.twAut (d.twExp z) y ≠ 0 := by rw [ne_eq, EmbeddingLike.map_eq_zero_iff]; exact hy
+  rw [twMul, d.twExp_mul h1 hz, d.twExp_twAut hy]
+
+/-- Associativity of the twisted multiplication: `(x ∘ y) ∘ z = x ∘ (y ∘ z)`. -/
+theorem twMul_assoc (x y z : K) : d.twMul (d.twMul x y) z = d.twMul x (d.twMul y z) := by
+  rcases eq_or_ne x 0 with hx | hx
+  · subst hx; simp
+  rcases eq_or_ne y 0 with hy | hy
+  · subst hy; simp
+  rcases eq_or_ne z 0 with hz | hz
+  · subst hz; simp
+  have key : d.twExp (d.twMul y z) = d.twExp y + d.twExp z := d.twExp_twMul hy hz
+  change d.twAut (d.twExp z) (d.twMul x y) * z
+     = d.twAut (d.twExp (d.twMul y z)) x * d.twMul y z
+  rw [key]
+  change d.twAut (d.twExp z) (d.twAut (d.twExp y) x * y) * z
+     = d.twAut (d.twExp y + d.twExp z) x * (d.twAut (d.twExp z) y * z)
+  rw [map_mul, twAut_twAut, mul_assoc, add_comm (d.twExp z) (d.twExp y)]
+
+/-- The twist exponent is inversion-invariant on nonzero elements (`χ(y⁻¹) = χ(y)` in `ℤ/2`). -/
+theorem twExp_inv {y : K} (hy : y ≠ 0) : d.twExp y⁻¹ = d.twExp y := by
+  have hy' : y⁻¹ ≠ 0 := inv_ne_zero hy
+  rw [twExp, dif_neg hy', twExp, dif_neg hy,
+    show Units.mk0 y⁻¹ hy' = (Units.mk0 y hy)⁻¹ from Units.ext rfl, map_inv, toAdd_inv]
+  exact (by decide : ∀ a : ZMod 2, -a = a) _
+
+/-- The explicit twisted inverse `y⁻¹∘ = σ^{χ(y)}(y⁻¹)` is a right inverse (no finite-cancellation
+needed): `y ∘ σ^{χ(y)}(y⁻¹) = 1`. -/
+theorem twMul_twInv {y : K} (hy : y ≠ 0) : d.twMul y (d.twAut (d.twExp y) y⁻¹) = 1 := by
+  have hy' : y⁻¹ ≠ 0 := inv_ne_zero hy
+  change d.twAut (d.twExp (d.twAut (d.twExp y) y⁻¹)) y * d.twAut (d.twExp y) y⁻¹ = 1
+  rw [d.twExp_twAut hy', d.twExp_inv hy, ← map_mul, mul_inv_cancel₀ hy, map_one]
+
+end TwistData
+
+/-- The near-field carried by twisting data `d`: the additive group of the field `K` equipped with
+the twisted multiplication `x ∘ y = σ^{χ(y)}(x) · y`.  A type synonym for `K` so the twisted
+multiplication does not clash with the field multiplication.  This is the abstract form of the
+exceptional near-field `F_{r²,2}` (Peterfalvi, Appendix C). -/
+def Twisted {K : Type*} [Field K] (_ : TwistData K) : Type _ := K
+
+namespace Twisted
+
+variable {K : Type*} [Field K] {d : TwistData K}
+
+instance : AddCommGroup (Twisted d) := inferInstanceAs (AddCommGroup K)
+
+/-- `Twisted d` is a near-field under the twisted multiplication. -/
+noncomputable instance : NearField (Twisted d) :=
+  { (inferInstance : AddCommGroup (Twisted d)) with
+    mul := d.twMul
+    one := (1 : K)
+    inv := fun y => d.twAut (d.twExp y) y⁻¹
+    mul_assoc := d.twMul_assoc
+    one_mul := d.one_twMul
+    mul_one := d.twMul_one
+    zero_mul := d.zero_twMul
+    mul_zero := d.twMul_zero
+    inv_zero := by
+      show d.twAut (d.twExp (0 : K)) (0 : K)⁻¹ = (0 : K)
+      simp
+    mul_inv_cancel := fun a ha => d.twMul_twInv ha
+    exists_pair_ne := ⟨(0 : K), (1 : K), (zero_ne_one : (0 : K) ≠ 1)⟩
+    right_distrib := d.add_twMul }
+
+end Twisted
+
+end TwistedNearField
+
 variable {G Ω F : Type*} [Group G]
 
 /-- A lightweight carrier for finite near-field structure.  The algebraic laws
