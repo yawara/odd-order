@@ -292,6 +292,20 @@ k := ZMod p (Field via Fact)。→ Prop 2(a) 完全形 (F=𝔽_p[T] の体構造
   注意: compHom の k[T]-action は `of t • x = ρ.asAlgebraHom (of t) x = (ψ t) を Additive 上に`。
 - これで Prop 2(a) 完全形 (F=End=𝔽_p[T], E 1次元, |F|=pⁿ) → その後 (b) semilinear/C_U(s)≅Aut(F)。
 
+### ✅✅✅ session 9 (2026-06-14): Prop 2(a) COMPLETE (textbook form, sorry-free, axiom-clean)
+`exists_field_of_irreducible` (SemilinearField.lean, Prop2Bridge section, commit 246390e1):
+T 可換が elem-ab p-group E に irreducible 作用 ⟹ `∃ 有限体 F` が E に作用、E は F 上 1 次元、|F|=|E|
+(F = 𝔽_p[T] = End_{𝔽_p[T]}(E))。**4 session 越しの asModule bridge blocker 解除**。
+- bridge 構成: (1) clean type `Additive E` に compHom で k[T]-module (asModule wrapper 回避), (2) key:
+  `(of t)•x = ofMul (ψ t (toMul x))` (`show ... from rfl` + `asAlgebraHom_of` + rfl), (3) IsSimpleModule:
+  k[T]-submodule N → ψ-invariant subgroup `{e | ofMul e ∈ N}` → hirr で ⊥/⊤ (compHom action 経由), (4) core 適用。
+- 🔑 知見 (再調査不要): ∃ の F は `Type u` 明示 (Type _ は universe mismatch); End-apply-module は
+  `Module.End.applyModule` 明示供給; E は `[CommGroup E]` で取る (Additive E instances が statement で解決)。
+- full build 3807 jobs ~3.3s, axiom-clean。
+- **▶ 次 = Prop 2(b)**: U semilinear + s∈E^# で C_U(s) ≅ Aut(F) 部分群。U faithful + T⊴U 必要。
+  (b) は (a) の F に対する semilinear 写像論 (σ(λ): u(λs)=σ(λ)u(s) が体自己同型)。その後 Appendix C へ。
+  あるいは Appendix C は Prop2(a) で十分かもしれない (要精査) → C へ進む選択肢も。
+
 ## 3. 攻略順 (LAUNCH 準拠)
 B → (C/D 並行) → E → A (最難・最後)。各々 opaque→faithful 化 + citeable 部の完全証明。
 C/D/E は citeable shortcut 無 ⟹ faithful-statement + 精密 gap 局所化が現実的着地点。
