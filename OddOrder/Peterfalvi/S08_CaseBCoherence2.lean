@@ -509,6 +509,25 @@ theorem sum_inner_restrict_smul_induce_eq_induce {M : Type*} [Group M] [Fintype 
   rw [← induce_finset_sum_smul, ← induce_eq_sum_inner_restrict_smul]
   exact induce_induce_subgroupOf hKH φ
 
+/-- **Parseval for an induced character** (the `∑ aᵢ² = ‖Ind φ‖²` step of the (6.8.2.3) aggregate).
+`‖Ind^M_N φ‖² = ∑_{θ ∈ Irr M} aθ·\overline{aθ}` where `aθ = ⟨φ, Res_N θ⟩` are the constituent
+multiplicities: expand `Ind^M_N φ = ∑ aθ·θ` (`induce_eq_sum_inner_restrict_smul`) and use
+orthonormality of `Irr M` (`inner_sum_smul_sum` + `irreducibleCharacter_inner_eq_ite`). -/
+theorem inner_self_induce_eq_sum_mul_star {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    (φ : ClassFunction ↥N ℂ) :
+    ClassFunction.inner (ClassFunction.induce N φ) (ClassFunction.induce N φ)
+      = ∑ θ : IrreducibleCharacter M,
+          ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
+          * star (ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))) := by
+  rw [induce_eq_sum_inner_restrict_smul φ, OddOrder.Peterfalvi.S05.inner_sum_smul_sum]
+  refine Finset.sum_congr rfl (fun θ _ => ?_)
+  rw [Finset.sum_eq_single θ]
+  · rw [irreducibleCharacter_inner_eq_ite, if_pos rfl, mul_one]
+  · intro θ' _ hne
+    rw [irreducibleCharacter_inner_eq_ite, if_neg (Ne.symm hne), mul_zero]
+  · intro h; exact absurd (Finset.mem_univ θ) h
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
