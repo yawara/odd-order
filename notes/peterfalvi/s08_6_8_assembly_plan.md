@@ -1656,3 +1656,28 @@ unblocked だが per-iteration は wiring piece 単位で、capstone 完遂は d
 集中 architectural 設計+build** (X-coherence route 決定 + multi-level glue + CoherenceTarget)。60s loop brick 単位
 でなく、full context を保持した dedicated session が適切。**正本=本 cont.¹⁸。次手 = X-coherence route 決定 (uniform R
 vs glue) → 構築。**
+
+## 2026-06-14 (session 40 cont.¹⁹, /loop): ✅ cX feasibility 解決 (xChainCoherent generic) + X∪Y shell landed
+
+### ✅ landed (iter 9-10): X∪Y assembly shell + ユーザー裁可で継続
+- **`coherentXunionYset_caseB_of_glued`** (8f451fd8): case-B X∪Y coherence (Frobenius 版の case-B mirror)。
+  §7 `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` + **brick C** (reducible-aware 直交性)。
+  hoisted = cX(X-coh) + ν(τ₂) + hmixed((6.8.2.3)) + D/hDτ(cross-diagonal) [全 capstone-wiring inputs]。
+
+### ✅ cX (case-B X-coherence on Xset W₂, hard core) は feasible と確認:
+- 最大の未解決 = 「Xset W₂ は reducible μ_j を含むので既存 irreducible-X engine 不可」だったが、
+  **内部 engine `xChainCoherent` (S08_CoherenceCorePart1:2701) は generic な既約集合 X を取る** (Xset 専用でない;
+  `{X S₀ : Set}` + conjugate-pair cover `pair/χs` + base coherence + per-step inputs)。
+- X_irr (= Xset W₂ の既約部 = X−{μ_j}) は **conj-closed** (W₂ 中心ゆえ Xset W₂ conj-closed; μ̄_j=μ_{j'} (4.9a)
+  ゆえ {μ_j} conj-closed; 差も conj-closed) + odd-order ゆえ no-real-char ⟹ **xChainCoherent 適用可**。
+- ∴ **cX 構築プラン (feasible, 構造的ブロッカー無し)**:
+  1. **X_irr-coh**: `xChainCoherent` on X_irr (conjugate-pair cover + base S₀ + per-step (5.6)/degree-div inputs
+     = (6.6) machinery を X_irr へ適応; 既存は Xset 専用ゆえ adapt 要)。
+  2. **{μ_j}-coh**: (4.9) `certainType_isCoherent` (h46) + `congrMap` (map-agreement = restrict-invariance +
+     wiring fact dade0.restrict=hyp.dade)。instance plumbing 要 (NeZero/Fintype/Invertible ×6)。
+  3. **Xset W₂ = X_irr ∪ {μ_j}** 集合分解 (要 columnSum=μ_j∈X + W₂⊄Ker; cert↔hyp bridge h46.K=H)。
+  4. **glue** (1)+(2) via §7 `coherentUnion_of_glued` (mixed-inner X_irr↔μ_j) → cX。
+
+### 🔑 honest 総括: scaffolding 完成 (6 bricks + X∪Y shell)。cX は **feasible な hard core** で、X_irr の
+(6.6) machinery 適応 + {μ_j} の (4.9)接続 + 分解 + glue の集中 assembly。次手 = cX の piece を順次 build
+({μ_j}-coh or X_irr-coh の adapt から)。**正本=本 cont.¹⁹。cX feasibility 確定が本 iter の主成果。**
