@@ -1889,6 +1889,51 @@ noncomputable def irreducibleDecompositionTau
     ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ hreal hdiffsupp hdiffasupp htau1_mema
     hχaχ1 hχbaraχ1 hχχbar'
 
+/-- **(6.8.2.3) per-constituent anchored image, mixed family (assembly skeleton).**  Given the per-`φ`
+decomposition family `D` (one (5.4) decomposition `CharacterPsiDecomposition hyp.tau (χ i) (aᵢ·η₁)`
+per constituent — built by dispatching `columnDecompositionTau` / `irreducibleDecompositionTau`), with
+`(D i).tau1 = hyp.tau` (`htau1`, immediate for both branches), the (6.8.2.2) aggregate
+(`hagg`/`hsq`/`hXaggorth`), and the per-step `R(χᵢ) ⊥ Y₀` / coefficient data (`hXorth`/`hbi`), the
+pinning `per_constituent_Y_eq_smul` forces `(D i).Y = aᵢ·Y₀`, and the decomposition image equation
+`(D i).tau1_image` then gives the **(6.8.2.3) anchored image**
+`(χᵢ − aᵢ·η₁)^{hyp.tau} = (D i).X − aᵢ·Y₀` (`Y₀ = coherentYset.extension η₁`).
+
+This is the route-independent (6.8.2.3) core, parametric in the family `D`; only the family
+construction (the constituent dispatch + per-`θ` hypothesis discharge) remains for the capstone. -/
+theorem per_phi_anchored_image
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {ι : Type*} (s : Finset ι) {χ : ι → ClassFunction ↥L ℂ} {a : ι → ℕ}
+    (D : (i : ι) → OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau (χ i) (a i • η₁))
+    (htau1 : ∀ i, (D i).tau1 = hyp.tau)
+    {Xagg : ClassFunction G ℂ} {b : ι → ℤ} {n : ℤ}
+    (hXaggorth : ClassFunction.inner Xagg (hyp.coherentYset.extension η₁) = 0)
+    (hagg : Xagg - (n : ℂ) • hyp.coherentYset.extension η₁
+      = ∑ i ∈ s, ((a i : ℤ) : ℂ) • ((D i).X - (D i).Y))
+    (hsq : ∑ i ∈ s, ((a i : ℤ)) ^ 2 = n)
+    (hXorth : ∀ i ∈ s, ClassFunction.inner (D i).X (hyp.coherentYset.extension η₁) = 0)
+    (hbi : ∀ i ∈ s,
+      ClassFunction.inner (D i).Y (hyp.coherentYset.extension η₁) = (b i : ℂ))
+    (i : ι) (hi : i ∈ s) (hpos : 0 < a i) :
+    hyp.tau (χ i - a i • η₁)
+      = (D i).X - (a i : ℂ) • hyp.coherentYset.extension η₁ := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηnorm : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L) (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hYY : ClassFunction.inner (hyp.coherentYset.extension η₁)
+      (hyp.coherentYset.extension η₁) = 1 := by
+    rw [hyp.coherentYset.extension_inner_eq η₁ η₁
+      (Submodule.subset_span hη₁) (Submodule.subset_span hη₁)]
+    exact hηnorm
+  have hY := per_constituent_Y_eq_smul s D hηnorm hYY hXaggorth hagg hsq hXorth hbi i hi hpos
+  have h1 : hyp.tau (χ i - a i • η₁) = (D i).X - (D i).Y := by
+    have h := (D i).tau1_image
+    rw [htau1 i] at h
+    exact h
+  rw [h1, hY]
+
 /-- **(6.8.2) case-(B), `μ_j ∉ S(W₂)`** (cont.²² item 2b): the certain-type column character
 `μ_j = columnSum h46 χ₂` (for `χ₂ ≠ 1`) does **not** lie in the filtration `S(W₂)` — no nontrivial
 irreducible `θ` of `H` with `W₂ ⊆ Ker θ` induces to `μ_j`.
