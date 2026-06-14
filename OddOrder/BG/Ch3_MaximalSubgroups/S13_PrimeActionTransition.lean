@@ -2027,6 +2027,26 @@ theorem forbidden_config_impossible [Finite G] (hG : IsMinimalSimpleOdd G)
     exact gap3_false_from_r hG hMstar hM hnc' hpstar hP hPMstar hQstarle' hQstarq
       hQstarmax' hQstarinv hCQstar hNQstar hqpstar hqαstar hαβstar hCMstarαP hCMstarαPQ hrβ hrC hrσ
 
+/-- **`E`-不変 Sylow `q`-部分群の存在** (BG Lemma 13.9 step 1 で使用): `SubgroupESetup` の補群
+`E` は `M_σ` を coprime に正規化する (`E` は `σ(M)'`-群、`M_σ` は `σ(M)`-群) ので、各素数 `q` に
+対し `E`-不変な `M_σ` の Sylow `q`-部分群 `S` (`|S| = q^{v_q(|M_σ|)}`) が取れる。 -/
+theorem exists_einvariant_sylow_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) (q : ℕ) [Fact q.Prime] :
+    ∃ S : Subgroup G, S ≤ S10.Msigma M ∧ IsPGroup q ↥S ∧
+      E ≤ Subgroup.normalizer (S : Set G) ∧
+      Nat.card ↥S = q ^ (Nat.card ↥(S10.Msigma M)).factorization q := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  haveI : IsSolvable ↥E := solvable_of_solvable_injective (Subgroup.inclusion_injective h.E_le)
+  have hEnorm : E ≤ Subgroup.normalizer ((S10.Msigma M : Subgroup G) : Set G) :=
+    h.E_le.trans (by rw [S10.Msigma]; exact le_normalizer_opiCoreInG (S10.sigma M) M)
+  have hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥(S10.Msigma M)) := by
+    by_contra hne
+    obtain ⟨s, hsp, hsE, hsMσ⟩ := Nat.Prime.not_coprime_iff_dvd.mp hne
+    exact (SubgroupESetup.isPiGroup_sigma_compl hG h s
+        (Nat.mem_primeFactors.mpr ⟨hsp, hsE, Nat.card_pos.ne'⟩))
+      (S10.Msigma_isPiGroup M s (Nat.mem_primeFactors.mpr ⟨hsp, hsMσ, Nat.card_pos.ne'⟩))
+  exact exists_aInvariant_sylow_subgroup hEnorm hcop (Or.inl ‹IsSolvable ↥E›) q
+
 /-- **BG Theorem 13.9** (mmd L3662): `M*∈ℳ` が `M` と非共役なら `σ(M)` と `σ(M*)` は disjoint。 -/
 theorem sigma_disjoint_of_nonconjugate [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {Mstar : Subgroup G}
