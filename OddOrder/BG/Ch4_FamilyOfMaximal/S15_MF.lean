@@ -62,6 +62,12 @@ variable {G : Type*} [Group G]
 noncomputable abbrev MF (M : Subgroup G) : Subgroup G :=
   maxNilpotentNormalHall M
 
+/-- `M_F ≤ M`: basic containment, directly from the `sSup` construction.  (The full
+BG §15 well-definedness — that the `sSup` again has the maximal nilpotent-normal-Hall
+property, in particular that it is Hall — is deferred; this containment is not.) -/
+theorem maxNilpotentNormalHall_le (M : Subgroup G) : maxNilpotentNormalHall M ≤ M :=
+  sSup_le fun _ hN => hN.1
+
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
   OddOrder.BG.Ch2.S08.fittingInG M
