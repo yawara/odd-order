@@ -217,3 +217,45 @@ statement の修正は G に波及しない** (grep 確認済) — ただし**�
   faithful 版 (M̃ 被覆) は §16 領域 (Lane G) で書くべき。現 §14 surface は docstring で「as-is で証明するな」と警告済 (不変)。
 - 14.2/14.7: 多部分定理の TRUE partial surface (false 無し)、reformulation 不要。`Subgroup.IsCommutative` は
   mathlib に無く `∀ a∈U,∀ b∈U, a*b=b*a` で可換性を表現 (再利用メモ)。
+
+## 🟢 Thm 13.9 landed → Lemma 14.5 green + Prop 14.2 funnel prep (2026-06-15, Lane H)
+
+**Thm 13.9 (`sigma_disjoint_of_nonconjugate`) が §13 (Lane F) で landed** (S13_PrimeActionTransition
+の残 sorry は @2344=13.10 / @2355=13.11 のみ、13.9@2224 は sorry-free)。⟹ 13.9 を cite して証明済の
+**Lemma 14.5 (`sigmaConjugacy_disjoint_of_nonconjugate`) が自動 unconditional 化**。
+`#print axioms` = `[propext, Classical.choice, Quot.sound]` (sorryAx 無し) を確認 → **AxiomsCheck 登録**
+(commit `b6c02d4f`, 14.1 の隣)。**14.1 に続く 2 つ目の green な §14 結果**。
+
+### §13 各結果の axiom 状態 (#print axioms で実測, 2026-06-15)
+- **axiom-clean (sorryAx 無し)**: 13.5 `E1_actsPrime` / 13.6 `maximalContaining_eq_singleton_of_E1` /
+  13.7 `E1E3_actsPrime` / 13.9 `sigma_disjoint_of_nonconjugate` / `cyclicSylow_actsPrime`。
+- **残 sorry**: 13.10 `E1_regular_on_E3_of_noncentralize` (@2344, 着地間近) / 13.11
+  `E3_not_regular_consequences` (@2355) / S13_PrimeAction @411 (13.4 per-q core の **orphan**, 14.2 path 外) /
+  **13.12 / 13.13 (statement 未記述)**。
+
+### Prop 14.2 依存マップ (mmd L3821-3850 の証明を逐条分解) — 次の §14 keystone
+14.2 が landing すれば 14.3→14.13 funnel 全体が動く。各 part の cite と repo 状態:
+
+| 14.2 part | BG 証明の cite | repo 状態 |
+|---|---|---|
+| setup | Lem 12.1 (E,E₁,E₂,E₃; E₂E₃◁E, E₁ cyclic) | ✅ `exists_subgroupESetup` |
+| (a)(b1) E₃≠1 非regular 分岐 | **Cor 13.11** (`E3_not_regular_consequences`) | ⏳ sorry @2355 |
+| (a)(b1) κ⊆τ₁ 分岐 | **Thm 13.5**✅ + **Lem 13.12**❌ + **Lem 13.7**✅ + Cor 12.10(b)✅ | **13.12 未記述** |
+| (b2)(c) | **Lem 13.13**❌ + **Lem 13.6**✅ | **13.13 未記述** |
+| (d) | (c) + **Thm 10.1(a)**✅ | (c) gate |
+| (e) | (b2) + **Lem 13.6**✅ | (b2) gate |
+| (f) | (d) + Cor 12.16✅ | (d) gate |
+| (g) IsTypeP2 | Lem 14.1✅ + Thm 3.10(a)✅ + Lem 12.19✅ + Lem 12.17✅ | setup(a) gate |
+
+### 結論: §14 funnel の真の gate = **13.11 + 13.12 + 13.13**
+- 非-§13 依存 (§12/§10/§3/14.1) は **全て repo に存在・利用可** ⟹ 13.11/13.12/13.13 が揃えば 14.2 は
+  純 **§13-cite assembly** (新規 §12 等の API 整備は不要)。
+- **13.12 / 13.13 が long pole**: statement 未記述 (F の S13 領域, mmd L3745/L3765 に spec, 上「ブロッカー
+  の正体」参照)。これが無いと 14.2 の**どの part も書けない** (全 part が setup(a)=13.12 経由 or (b2)(c)=13.13 に
+  entangle、部分先行も不可)。
+- 13.10 着地間近 → corollary 13.11 も近い。**13.11 単独では 14.2 不可** (κ⊆τ₁ 分岐が 13.12 gate)。
+
+### H の次手
+1. **現状**: 13.9 landing の戦果 (14.5 green) を回収済。これ以上の §14 proof は 13.11+13.12+13.13 待ち。
+2. 13.12/13.13 landing 後: 上記マップ通り 14.2 assemble → 14.3 (faithful 化済) → 14.4 → … funnel 駆動。
+3. ⚠ 13.12/13.13 は **F 領域** (H は cite のみ)。long-pole 認識を hub/ユーザーに共有 (本セッション)。
