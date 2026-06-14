@@ -781,6 +781,56 @@ theorem centralizer_A_le_centralizer [Finite G] (hG : IsMinimalSimpleOdd G)
       _ = derivedInG E := (Subgroup.map_subtype_commutator E).symm
       _ ≤ Subgroup.centralizer (X : Set G) := Subgroup.le_centralizer_iff.mp hXE'
 
+/-! ### Conjugating a `SubgroupESetup` by `c ∈ M` (step-2 keystone) -/
+
+private theorem card_conj_smul (g : G) (H : Subgroup G) :
+    Nat.card ↥(MulAut.conj g • H) = Nat.card ↥H :=
+  Subgroup.card_map_of_injective (MulAut.conj g).injective
+
+/-- The Hall property transports under conjugating a `subgroupOf` pair `K ≤ E` by any `c`. -/
+private theorem isHallSubgroup_subgroupOf_conj [Finite G] {π : Set ℕ} {E K : Subgroup G}
+    (hKE : K ≤ E) (c : G) (hHall : Ch03.IsHallSubgroup π (K.subgroupOf E)) :
+    Ch03.IsHallSubgroup π ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E)) := by
+  have hcKE : MulAut.conj c • K ≤ MulAut.conj c • E :=
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKE
+  have hcard : Nat.card ↥((MulAut.conj c • K).subgroupOf (MulAut.conj c • E))
+      = Nat.card ↥(K.subgroupOf E) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hcKE).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKE).toEquiv, card_conj_smul]
+  have hidx : ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E)).index
+      = (K.subgroupOf E).index := by
+    have h1 := Subgroup.card_mul_index (K.subgroupOf E)
+    have h2 := Subgroup.card_mul_index ((MulAut.conj c • K).subgroupOf (MulAut.conj c • E))
+    rw [hcard, card_conj_smul] at h2
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h2.trans h1.symm)
+  exact ⟨fun p hp => hHall.1 p (hcard ▸ hp), fun p hp => hHall.2 p (hidx ▸ hp)⟩
+
+/-- **Conjugating a `SubgroupESetup` by `c ∈ M`.** Since `M` and `M_σ` are fixed by such
+conjugation, `(MulAut.conj c • E, conj c • E₁, …)` is again a `SubgroupESetup` for `M`. With
+`c ∈ C_G(E₁)` one gets `conj c • E₁ = E₁` (used in Lemma 13.6 step 2). -/
+theorem SubgroupESetup.conj' [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {c : G} (hc : c ∈ M) :
+    SubgroupESetup M (MulAut.conj c • E) (MulAut.conj c • E₁) (MulAut.conj c • E₂)
+      (MulAut.conj c • E₃) := by
+  have hcM : MulAut.conj c • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hc)
+  have hcMσ : MulAut.conj c • S10.Msigma M = S10.Msigma M :=
+    conj_smul_eq_self_of_mem_normalizer (le_normalizer_opiCoreInG (S10.sigma M) M hc)
+  refine ⟨h.mem_maximal, ?_, ?_, ?_,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₁_le,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₂_le,
+    Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E₃_le,
+    isHallSubgroup_subgroupOf_conj h.E₁_le c h.E₁_hall,
+    isHallSubgroup_subgroupOf_conj h.E₂_le c h.E₂_hall,
+    isHallSubgroup_subgroupOf_conj h.E₃_le c h.E₃_hall, ?_⟩
+  · calc MulAut.conj c • E ≤ MulAut.conj c • M :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h.E_le
+      _ = M := hcM
+  · rw [← hcMσ, ← Subgroup.smul_inf, h.E_compl_inf, Subgroup.smul_bot]
+  · rw [← hcMσ, ← Subgroup.smul_sup, h.E_compl_sup, hcM]
+  · rw [← Subgroup.smul_sup]
+    exact isHallSubgroup_subgroupOf_conj (sup_le h.E₁_le h.E₂_le) c h.E₁₂_hall
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
