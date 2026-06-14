@@ -2048,6 +2048,25 @@ theorem factorization_Msigma_eq_of_mem_sigma [Finite G] (hG : IsMinimalSimpleOdd
         rw [← hmul, Nat.factorization_mul hcard_ne hidx_ne, Finsupp.add_apply,
           Nat.factorization_eq_zero_of_not_dvd hqidx, add_zero]
 
+/-- **σ-Sylow uniqueness for `M_σ`-Sylows** (Prop 10.14-flavoured): `q ∈ σ(M)`, `S ≤ M_σ` with
+`|S| = q^{v_q(|M_σ|)}` (a Sylow `q` of `M_σ`) ⟹ `N_G(S) ⊆ M`. `S.subgroupOf M` is a Sylow `q` of
+`M` (card `= q^{v_q(|M|)}` by the `v_q` equality), and `normalizer_sylow_map_le_of_mem_sigma`
+(no normalizer growth out of `M` for `σ`-Sylows) gives `N_G(S) ⊆ M`. -/
+theorem normalizer_einvariant_sylow_le [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime] (hqσ : q ∈ S10.sigma M)
+    {S : Subgroup G} (hSMσ : S ≤ S10.Msigma M)
+    (hScard : Nat.card ↥S = q ^ (Nat.card ↥(S10.Msigma M)).factorization q) :
+    Subgroup.normalizer (S : Set G) ≤ M := by
+  have hSM : S ≤ M := hSMσ.trans (S10.Msigma_le M)
+  have hcardSM : Nat.card ↥(S.subgroupOf M) = q ^ (Nat.card ↥M).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSM).toEquiv, hScard,
+      factorization_Msigma_eq_of_mem_sigma hG hM hqσ]
+  set PM : Sylow q ↥M := Sylow.ofCard (S.subgroupOf M) hcardSM with hPMdef
+  have hmap : (PM : Subgroup ↥M).map M.subtype = S := by
+    rw [Sylow.coe_ofCard, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hSM]
+  rw [← hmap]
+  exact S10.normalizer_sylow_map_le_of_mem_sigma hqσ PM
+
 /-- フル `q`-part を持つ `q`-部分群は極大 `q`-部分群: `S ≤ N`, `|S| = q^{v_q(|N|)}` で `S ≤ T ≤ N`
 が `q`-群なら `S = T` (`|T| = q^k ∣ |N| ⟹ k ≤ v_q(|N|) ⟹ |T| ≤ |S|`, `S ≤ T` と合わせて等しい)。 -/
 theorem eq_of_le_of_isPGroup_card_eq_factorization [Finite G] {q : ℕ} [Fact q.Prime]
