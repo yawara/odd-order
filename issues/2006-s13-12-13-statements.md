@@ -20,9 +20,14 @@ OddOrder.BG.Ch3.S13` 直前にそのまま貼れる（名前は F の S13 conven
 
 ## やること（F = S13 owner）
 
-- [ ] 下の 2 statement を `S13_PrimeActionTransition.lean` に追加（proof は `sorry` のまま着地でも可）。
-- [ ] proof を記入（依存は各 docstring に明記、すべて landed 済 = 13.4/13.6/13.9/12.x）。
-- [ ] AxiomsCheck 登録（proof 完了時）。
+- [x] 下の 2 statement を `S13_PrimeActionTransition.lean` に追加（`f9bc04fd`）。
+- [x] **Lemma 13.12 proof COMPLETE**（`c3860c52`, sorry-free + axiom-clean）。
+- [ ] Lemma 13.13 proof（13.12 を使う。次の frontier）。
+- [ ] AxiomsCheck 登録（任意; §13 spine は個別未登録だが #print axioms で clean 確認済）。
+
+> ⚠ **H へ (statement 変更)**: deps が `[Fact _.Prime]` を要求し、repo の `tau1/tau2` は pRank ベースで
+> 素数性を含まないため、両 statement に **`[Fact p.Prime]`（13.12 は `[Fact q.Prime]` も）を追加**した。
+> Prop 14.2 から呼ぶ際は τ-prime の `Fact` を供給（π(...) 由来で自明に取れる）。consumer 無しゆえ安全。
 
 ## 検証済 draft（S13 context で build green）
 
