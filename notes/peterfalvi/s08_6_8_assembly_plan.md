@@ -2050,3 +2050,39 @@ infra 出揃いで assembly は steady だが R(χ) 統合は intricate。FT 並
 isometry の供給, (c) reducible μ_j の whole-lattice 処理, (d) aggregate→pinning 接続。
 **= 深い §7 assembly の本丸; machinery は出揃い (ofProjection/decompositionPair/retarget/R-producer),
 per-constituent 組立 + 接続が残る。要集中。次=per-constituent decompositionPair の inputs 供給。**
+
+## 2026-06-14 (session 40 cont.³², /loop): ✅ pinning (item d 算術核) landed + 🔬 item (a) 精査結果 = (5.4) は χ 既約性不要
+
+### ✅ landed (7409f2e9, axiom-clean 標準3, leaf build 3625):
+**`eq_of_sum_mul_eq_sum_sq`** (S08_CaseBCoherence2, aggregate 直後) = (6.8.2.3) pinning の算術核:
+`(∀i∈s, 0≤aᵢ) ∧ (∀i∈s, bᵢ≤aᵢ) ∧ ∑aᵢbᵢ=∑aᵢ² ⟹ ∀i∈s, 0<aᵢ→bᵢ=aᵢ`。証明 = slackness
+`∑aᵢ(aᵢ−bᵢ)=0` (各項≥0) → `Finset.sum_eq_zero_iff_of_nonneg` で per-term `aᵢ(aᵢ−bᵢ)=0`
+→ `mul_eq_zero`+`aᵢ>0` で `bᵢ=aᵢ`。**純粋ℤ算術で R(χ) machinery から完全 decoupled** ⟹ steps 5-8
+の中で唯一独立に landable な load-bearing brick を先取り (item d / step 7 算術部)。caller は
+ℂ→ℤ 抽出 (`inner_mem_ZIrr_int`) 後にこれを適用する。
+
+### 🔬 item (a) 精査結果 (原文 04.8 L208-224 + §7 machinery 精読): **(5.4) は χ 既約性を要求しない**
+- Peterfalvi (6.8.2.3) は χᵢ=Ind_H θᵢ の**既約性を明示しない** (case-A (6.8.1) L76 は "χ∈Irr L" 明示だが
+  case-B (6.8.2) は X が reducible μ_j を含むので χᵢ も reducible でありうる)。不等式
+  `bᵢ²≤‖χᵢ‖²+aᵢ²−‖Xᵢ‖²≤aᵢ²` は (5.4.a) `‖Xᵢ‖²≥‖χᵢ‖²` だけで動き、‖χᵢ‖²=1 (既約) は**不要**。
+- §7 `CharacterPsiDecomposition`/(5.4.a)`inner_self_chi_re_le_inner_self_X`/(5.4.b)
+  `norm_eq_and_X_eq_sum_of_norm_Y_ge` は**抽象 `OrthonormalCharacterImageFamily τ χ` 上で動く**
+  (keystone `inner_self_chi_eq_sum_coeff` は image family の `image_eq`+τ₁ のみ使用、既約性 unused)。
+- ⟹ **唯一既約性が入るのは producer `dadeOrthonormalCharacterImageFamilyOfDiff` (S07:5472) の
+  `χ:IrreducibleCharacter` 型付け** (conjPairFamily+`(fam i).mem_ZIrr` 経由)。だが `mem_ZIrr` は
+  **任意の指標で成立** (character ∈ ℤ≥0·Irr ⊂ ZIrr) ゆえ、構成 (Dade isometry on supported diff
+  `χ̄ᵢ−χᵢ`) は reducible χᵢ でも通る。obstruction は型 (conjPairFamily/keystone が IrreducibleCharacter
+  入力) のみ。diff-supportedness (`χ̄ᵢ−χᵢ` が 1 で消え H^# 上 supported) は χᵢ=Ind_H θᵢ なら無条件成立。
+
+### ▶ R(χ) 統合 残ステップ (依存順、cont.³¹ items を精査後に再構成):
+1. **R(χᵢ) producer の決着 (item a)**: 二択 — (a1) case-B で χᵢ=Ind_H θᵢ が既約と証明 (Clifford
+   I_L(θᵢ)=H; reducible μ_j との整合要確認) / (a2) **ZIrr-character 版 R-producer を新設**
+   (`dadeOrthonormalCharacterImageFamilyOfDiff` の χ を IrreducibleCharacter→「χ∈ZIrr かつ character」
+   へ一般化; conjPairFamily を char-pair 版に, keystone は mem_ZIrr で OK)。**(a2) が筋が良い** (既約性を
+   証明する迂回が不要; 構成は同一)。← **次の本丸 brick**。
+2. **τ₁ 供給 (item b)** = Y-coherence isometry。
+3. per-constituent `CharacterPsiDecomposition` (R(χᵢ)+τ₁) → (5.4.a) `bᵢ≤aᵢ`。
+4. **pinning ✅ (本 cont.³²)** ∑aᵢbᵢ=∑aᵢ²=|H:Z| ⟹ bᵢ=aᵢ。
+5. (5.4.b) `αᵢ^τ=Xᵢ−aᵢY` → per-χ `(χ−aη₁)^τ=X₁−aY` → τ₂ direct assembly。
+**正本=本 cont.³²。pinning 算術核 landed; item (a) は (a2) ZIrr-char R-producer 一般化が次の本丸 brick
+(既約性証明を回避でき構成同一)。要集中。**
