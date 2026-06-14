@@ -104,5 +104,22 @@ H 再配置後の (a) faithful 化 + (b) §13 非依存補題のパス。mmd L37
   - 14.3: 結論を κ/τ₂ メンバシップ split で表現 — BG L3852 の 2-case (π(⟨x'⟩)⊆κ ∧ C_G(x)⊆M / τ₂分岐) と
     厳密一致か証明時に再確認 (C_G(x)⊆M が surface に無い)。
 - **結論**: §14 surface は faithful-as-partial、false 無し、現時点で Lean 修正不要。実証明は §13 gate (pause 継続)。
-- **▶ 次 (gateless で継続可)**: §15/§16 の statement を同様に mmd 照合 (esp. §16 Thm I-II = Pf §10 interface) +
-  §15/§16 の §13 非依存 API があれば追加。§13 着地で 14.4 設計判断 → 本格証明。
+
+### §15/§16 も照合完了 (2026-06-14, a→b→c の (a) 完了)
+- **§15** (mmd L4166–4320): Lemma 15.1 / Thm 15.2 (1⊂M_F⊆M_σ⊆M'⊂M + M_F≠M_σ⟹P1 構造) / Cor 15.3–15.6 /
+  Thm 15.7 (F(M) not TI ⟹ 3-case) / Thm 15.8 (FT) / Cor 15.9 — **全て BG の true surface (false 無し)**、
+  多部分は partial。実証明は §14 経由で §13 gate。
+- **§16** (mmd L4340–4562): Thm A–E + **Prop 16.1** + Thm I, II 照合。
+  - **Prop 16.1 `proposition_type_classification` は faithful**: I↔𝓕, II↔𝓟₂, III∨IV↔(𝓟₁∧M_F≠M_σ),
+    V↔(𝓟₁∧M_F=M_σ), (e)¬I↔M'=UM_σ, (f)M_F=M_σ↔I∨II∨V — BG L4478 と一致。
+  - **🔑 14.4 headline の所在判明**: BG **Theorem D(3)** = 「C_M(x) は C_G(x) の Hall、normal complement R(x)
+    が {M^g|x∈M^g} に sharply transitive」= §16 `RData`/`ConjSharplyTransitiveOn` に存在。
+    ⟹ §14.4 surface が落とした headline は §16 Thm D に保持されており **lost ではない**。
+    §13 着地後の設計判断 = 14.4 を Thm D 経由で cite するか headline を 14.4 に戻すか (機能的には D で足りる)。
+  - **重要 (再調査不要)**: Type I–V は `GroupTheory.MaximalSubgroupType` で **Peterfalvi data (TypeIData 等) ベース定義**
+    ⟹ Prop 16.1 / Thm I,II は BG-taxonomy ↔ Pf-type の実質 bridge であり **§13 非依存に proof 不可** (full §14–16 要)。
+- **(b) §13 非依存 API 評価**: §14 = 型分類 API 着地済 (`8e2f26e1`)。**§15/§16 は §14 のような述語間関係構造を持たず**
+  (FittingIsTI / MF / hatMsigma / RData / piStar はほぼ notation)、clean な §13 非依存 API は無し (trivia のみ)。
+- **▶ 総括 (a→b→c)**: (a) §14–16 surface = 全て faithful・false 無し・Lean 修正不要 (検証完了)。
+  (b) §13 非依存 API = §14 型分類のみ (§15/§16 は無)。 (c) 実証明 = 全て §13 (Lane F/G) gate。
+  ⟹ **H の §13 非依存 runway は実質枯渇**。次の実質前進は §13 着地待ち。
