@@ -106,3 +106,21 @@ ChatGPT (Pro, ~18min thinking) を Chrome MCP 経由で投げた回答。プロ�
   6. C_{Q*}(P)=1 (q*∈β: Q*≤M_α[要精査]+Q* cent Q ⟹ ⊆C_{M_α}(PQ)=1; q*∉β: 13.6 ℳ(Q*)≠{M})。
   7. [M_σ∩M*,P]≠1 ⟹ 13.1(a) p∈τ₁(M*) ⟹ 13.8 `forbidden_config_impossible` (Q,Q* 両 maximal)。
   ⚠ 要 E-invariant Sylow 抽出 + C_{M_σ}(E₃)=C_{M_σ}(Q) + (13.5) Lean 形 + q*∈β枝 Q*≤M_α。最難。
+
+### 進捗⁴ (2026-06-15 Lane F /loop, cont.³) — GAP C preliminaries 完了
+- ✅ `8a7888c0` `centralizer_Msigma_eq_of_le_E3_of_actsPrime` (C1: C_{M_σ}(E₃)=C_{M_σ}(Q), E₃ prime+Q≤E₃≠⊥)。
+- ✅ `4359f48a` `inf_Msigma_Mstar_eq_centralizer_Q` (C2: M_σ∩M*=C_{M_σ}(Q), Cor13.2a+C(Q)≤N(Q)≤M*)。
+  ⟹ **C1+C2: `C_{M_σ}(E₃) = M_σ∩M*`** 確立。
+- 🔑 **真 Lemma 12.19** = `S12_E:269` `**BG Lemma 12.19**` (E' が M_σ の Hall β'-部分群中心化);
+  wrapper = `derivedE_centralizes_betaComplement hG h` (S13_PrimeAction:938 で使用例)。
+  ⚠ 「`beta_complement_normalizer_derived_contains_sylow`」は **Cor 10.9(a)(3)** であって 12.19 ではない。
+- 🔑 **GAP C step 5 の precedent** = `exists_E1inv_sylow_centralizing_derivedE` (S13_PrimeAction:930):
+  q∉β(M) で E₁-inv Sylow-q of M_σ ⊆ C_G(E') を構成 (12.19 + `exists_aInvariant_sylow_subgroup`)。
+  Q* (q*∉β) はこれと同型に「Q* が M_σ の Sylow」を出せる。q*∈β は Prop10.14(d)。
+- **次イテレーション = GAP C coupled core** (13.10 内 `· -- (b)` の sorry を埋める, ~100 行):
+  witness P → full-Sylow brick (q,Q∈Syl_q(M),C_Q(P)=⊥,Q≤E₃,hQsyl) → M*抽出 →
+  ¬reg ⟹ C_{M_σ}(E₃)≠1 (`cyclicSylow_actsPrime hG h |>.2` で E₃ prime) → C1+C2 で =M_σ∩M* →
+  q*∈π, Q*=E-inv Sylow-q* of M_σ∩M* (要 `exists_aInvariant_sylow_subgroup` on M_σ∩M*) →
+  Q*∈Syl_q*(M∩M*) → step5 (12.19 dichotomy → N(Q*)⊆M) → step6 (C_{Q*}(P)=1) →
+  13.1(a) p∈τ₁(M*) → 13.8 `forbidden_config_impossible` (Q,Q* 両 maximal q-/q*-subgroup of M⊓M*)。
+  ⚠ 最難 sub-step: Q*∈Syl_q*(M∩M*) の factorization, step5 dichotomy, step6 q*∈β枝 Q*≤M_α。
