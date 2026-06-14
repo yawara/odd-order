@@ -725,6 +725,24 @@ theorem eq_smul_of_inner_self_eq {v w : ClassFunction G ℂ} {a : ℤ}
     rw [hnorm]; simp
   exact sub_eq_zero.mp (eq_zero_of_inner_self_re_eq_zero hre)
 
+/-- **Aggregate τ-image of integer-weighted constituents** (the (6.8.2.2)→(6.8.2.3) bridge).  For a
+`ℤ`-linear character map `τ` and per-constituent images `τ(αᵢ) = Xᵢ − Yᵢ`, the integer-weighted
+aggregate maps termwise: `τ(∑ᵢ aᵢ·αᵢ) = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)`.  Pure `ℤ`-linearity (`map_sum` +
+`map_zsmul`, with the `(aᵢ : ℂ)`-scalar smul reduced to the `ℤ`-action via `Int.cast_smul_eq_zsmul`).
+
+Combined with `sum_smul_constituent_diff_eq` (`∑ aᵢ·αᵢ = Ind^L_{W₂}φ − |H:Z|·η₁`) and the (6.8.2.2)
+decomposition `exists_decomposition_caseB` (`τ(Ind φ − |H:Z|·η₁) = Xagg − |H:Z|·Y`), this supplies the
+`hagg` input `Xagg − n·Y = ∑ᵢ aᵢ·(Xᵢ − Yᵢ)` of the pinning lemma `sum_coeff_eq_of_aggregate`. -/
+theorem tau_sum_smul_image {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {ι : Type*} (s : Finset ι) (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G)
+    (α : ι → ClassFunction ↥L ℂ) (Xv Yv : ι → ClassFunction G ℂ) (a : ι → ℤ)
+    (himg : ∀ i ∈ s, τ (α i) = Xv i - Yv i) :
+    τ (∑ i ∈ s, (a i : ℂ) • α i) = ∑ i ∈ s, (a i : ℂ) • (Xv i - Yv i) := by
+  rw [map_sum]
+  refine Finset.sum_congr rfl fun i hi => ?_
+  rw [Int.cast_smul_eq_zsmul ℂ (a i) (α i), map_zsmul, himg i hi,
+    ← Int.cast_smul_eq_zsmul ℂ (a i) (Xv i - Yv i)]
+
 /-- **Transport of coherence across maps agreeing on the supported lattice.**  A coherent isometry
 `IsCoherent τ₁ S A` stays coherent for any `τ₂` that agrees with `τ₁` on the supported lattice
 `ℤ[S, A]`: the coherent extension is unchanged, and only `extends_on_supported` (the single field
