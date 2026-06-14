@@ -184,6 +184,148 @@ theorem card_eq_of_index_two (A : Subgroup Fˣ) [Finite F] (hidx : A.index = 2) 
   have hpos : 0 < Nat.card F := Nat.card_pos
   omega
 
+/-- **Free-orbit counting bound** (the engine behind irreducibility in Appendix C, Proposition 2).
+If a commutative subgroup `A ⊆ Fˣ` acts on `(F, +)` by right multiplication and `U` is a nontrivial
+`A`-invariant subgroup, then `|A| + 1 ≤ |U|`.  Indeed `A` acts *freely* on `U ∖ {1}`
+(`rightMulAction_eq_self_iff`), so `|A| ∣ |U| - 1` (`card_group_dvd_card_of_free`); as `U ≠ ⊥` the
+quotient `|U| - 1` is positive, whence `|A| ≤ |U| - 1`.  Applied to both an invariant subgroup and
+its complement, this drives the `(|A|+1)² > 2|A|+1` contradiction. -/
+theorem add_one_le_card_of_aInvariant_ne_bot {F : Type*} [NearField F] [Finite F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    {U : Subgroup (Multiplicative F)}
+    (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) (hU : U ≠ ⊥) :
+    Nat.card A + 1 ≤ Nat.card U := by
+  classical
+  letI : MulDistribMulAction A (Multiplicative F) :=
+    MulDistribMulAction.compHom _ (rightMulAction A hcomm)
+  -- the `A`-stable set `U ∖ {1}` as a `SubMulAction`.
+  let sma : SubMulAction A (Multiplicative F) :=
+    { carrier := {x | x ∈ U ∧ x ≠ 1}
+      smul_mem' := fun a {x} hx => by
+        refine ⟨hUinv.smul_mem a hx.1, fun h => hx.2 ?_⟩
+        exact (rightMulAction A hcomm a).injective (by rw [map_one]; exact h) }
+  -- `A` acts freely on `U ∖ {1}`.
+  have hfree : ∀ b : sma, MulAction.stabilizer A b = ⊥ := by
+    intro b
+    have hb : (b : Multiplicative F) ∈ U ∧ (b : Multiplicative F) ≠ 1 := b.2
+    rw [eq_bot_iff]
+    intro a ha
+    rw [MulAction.mem_stabilizer_iff] at ha
+    have hval : (rightMulAction A hcomm a) (b : Multiplicative F) = (b : Multiplicative F) :=
+      congrArg Subtype.val ha
+    exact Subgroup.mem_bot.mpr (rightMulAction_eq_self_iff A hcomm a _ hb.2 hval)
+  have hdvd : Nat.card A ∣ Nat.card sma := card_group_dvd_card_of_free hfree
+  -- `|U ∖ {1}| + 1 = |U|`.
+  have e : (sma : Type _) ≃ {y : U // y ≠ 1} :=
+    { toFun := fun x => ⟨⟨x.1, x.2.1⟩, fun h => x.2.2 (Subtype.ext_iff.mp h)⟩
+      invFun := fun y => ⟨y.1.1, y.1.2, fun h => y.2 (Subtype.ext h)⟩
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
+  have hcard : Nat.card sma + 1 = Nat.card U := by
+    rw [Nat.card_congr e, ← Finite.card_option]
+    exact Nat.card_congr (Equiv.optionSubtypeNe (1 : U))
+  -- `|U ∖ {1}| > 0` since `U ≠ ⊥`.
+  have hpos : 0 < Nat.card sma := by
+    obtain ⟨a, ha⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hU
+    haveI : Nonempty sma := ⟨⟨a.1, a.2, fun h => ha (Subtype.ext h)⟩⟩
+    exact Nat.card_pos
+  have hle : Nat.card A ≤ Nat.card sma := Nat.le_of_dvd hpos hdvd
+  omega
+
+/-- **Maschke's theorem for an elementary abelian operator module** (the splitting step in
+Appendix C, Proposition 2).  Let `A` act on an elementary abelian `p`-group `E` via
+`φ : A →* MulAut E`, with `(|A|, |E|)` coprime and `p ∣ |E|`.  Then every `A`-invariant subgroup
+`U ≤ E` has an `A`-invariant **complement** `W` (`IsCompl U W`, so `E` is the internal direct sum
+`U ⊕ W`).  `Additive E` is an `F_p`-vector space on which `A` acts coprimely, so the representation
+is semisimple (`ComplementedLattice` on `Subrepresentation`) and the submodule for `U` splits; the
+complement is transported back to a subgroup through the order-isomorphisms
+`AddSubgroup.toZModSubmodule` and `AddSubgroup.toSubgroup'`.  (Direct elementary-abelian analogue of
+`OddOrder.BG.Ch1_Preliminary.exists_aInvariant_complement_in_omega1_quotient`, without the `Ω₁`
+quotient wrapping.) -/
+theorem exists_aInvariant_complement_of_elementaryAbelian
+    {E : Type*} [CommGroup E] [Finite E] {p : ℕ} [Fact p.Prime]
+    (hE : OddOrder.GroupTheory.IsElementaryAbelian p E)
+    {A : Type*} [Group A] [Finite A] {φ : A →* MulAut E}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card E)) (hpE : p ∣ Nat.card E)
+    {U : Subgroup E} (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant φ U) :
+    ∃ W : Subgroup E, OddOrder.Isaacs.Ch03.IsAInvariant φ W ∧ IsCompl U W := by
+  classical
+  haveI hEcomm : IsMulCommutative E := ⟨⟨mul_comm⟩⟩
+  -- `Additive E` is a `ZMod p`-module.
+  have hpsmul : ∀ x : Additive E, (p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact hE.pow_eq_one x.toMul
+  haveI : Module (ZMod p) (Additive E) := AddCommGroup.zmodModule hpsmul
+  haveI : NeZero ((Nat.card A : ZMod p)) :=
+    OddOrder.BG.Ch1_Preliminary.neZero_natCast_zmod_of_coprime hcop hpE
+  -- the `F_p[A]`-representation carried by `φ`.
+  set ρ : Representation (ZMod p) A (Additive E) :=
+    (OddOrder.BG.Ch1_Preliminary.mulAutToEnd E p).comp φ with hρ_def
+  have key_rho : ∀ (a : A) (v : Additive E),
+      Additive.toMul (ρ a v) = (φ a) (Additive.toMul v) := fun _ _ => rfl
+  -- `U` as a `ZMod p`-submodule `pU`, and its `ρ`-invariance.
+  set pU := AddSubgroup.toZModSubmodule (n := p) (Subgroup.toAddSubgroup U) with hpU_def
+  have hmem_pU : ∀ v : Additive E, v ∈ pU ↔ Additive.toMul v ∈ U := by
+    intro v
+    simp only [hpU_def, AddSubgroup.mem_toZModSubmodule, Additive.mem_toAddSubgroup]
+  have hpU_invt : pU ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    intro v hv
+    rw [hmem_pU] at hv ⊢
+    rw [key_rho]
+    exact hUinv.smul_mem a hv
+  have hpU_sub : ∀ (a : A) ⦃v : Additive E⦄, v ∈ pU → ρ a v ∈ pU := by
+    intro a v hv
+    have hmem := ρ.mem_invtSubmodule.mp hpU_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem v hv
+  -- Maschke: `pU` has an invariant complement `qc`.
+  obtain ⟨qcSub, hcompl⟩ :=
+    ComplementedLattice.exists_isCompl (⟨pU, hpU_sub⟩ : Subrepresentation ρ)
+  set qc : Submodule (ZMod p) (Additive E) := qcSub.toSubmodule with hqc_def
+  have hqc_invt : qc ∈ ρ.invtSubmodule := by
+    rw [ρ.mem_invtSubmodule]; intro a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem]
+    exact fun v hv => qcSub.apply_mem_toSubmodule a hv
+  have hinf : pU ⊓ qc = ⊥ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.inf_eq_bot
+    simpa [Subrepresentation.toSubmodule_inf] using h
+  have hsup : pU ⊔ qc = ⊤ := by
+    have h := congrArg Subrepresentation.toSubmodule hcompl.sup_eq_top
+    simpa [Subrepresentation.toSubmodule_sup] using h
+  -- transport `qc` to a subgroup `W` of `E` via the order-iso `Φ`.
+  let Φ : Submodule (ZMod p) (Additive E) ≃o Subgroup E :=
+    (AddSubgroup.toZModSubmodule (n := p)).symm.trans AddSubgroup.toSubgroup'
+  set W : Subgroup E := Φ qc with hW_def
+  have hΦpU : Φ pU = U := by
+    have h1 : (AddSubgroup.toZModSubmodule (n := p)).symm pU = Subgroup.toAddSubgroup U := by
+      rw [hpU_def, OrderIso.symm_apply_apply]
+    simp only [Φ, OrderIso.trans_apply, h1]
+    exact Subgroup.toAddSubgroup.symm_apply_apply U
+  have hmem_W : ∀ h : E, h ∈ W ↔ (Additive.ofMul h) ∈ qc := by
+    intro h
+    rw [hW_def]
+    simp only [Φ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
+  have hW_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ W := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a h hh
+    rw [hmem_W] at hh ⊢
+    have hmem := ρ.mem_invtSubmodule.mp hqc_invt a
+    rw [Module.End.mem_invtSubmodule_iff_forall_mem_of_mem] at hmem
+    exact hmem _ hh
+  refine ⟨W, hW_inv, ?_, ?_⟩
+  · rw [disjoint_iff]
+    have h := congrArg Φ hinf
+    rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
+  · rw [codisjoint_iff]
+    have h := congrArg Φ hsup
+    rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
+
 /-- **Near-field field structure** (the first half of Peterfalvi Appendix C, Proposition 2, via
 Appendix I Proposition 2).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field acts
 *irreducibly* on `(F, +)` by right multiplication, then `(F, +)` is a `1`-dimensional vector space
@@ -205,6 +347,69 @@ theorem nearField_field_structure.{u} {F : Type u} [NearField F] [Finite F] [Non
     OddOrder.Peterfalvi.Appendices.Huppert.exists_field_semilinear (E := Multiplicative F) hE
       (rightMulAction A hcomm) hirr
   exact ⟨K, hK, hMod, hKfin, hrank, hcard⟩
+
+/-- **Index-two subgroups act irreducibly** (Peterfalvi Appendix C, Proposition 2, counting step).
+A commutative subgroup `A ⊆ Fˣ` of **index `2`** acts *irreducibly* on `(F, +)` by right
+multiplication: the only `A`-invariant subgroups of `(F, +)` are `⊥` and `⊤`.  If a proper
+nontrivial invariant `U` existed, the free action of `A` on `U ∖ {1}` and on its Maschke complement
+`W ∖ {1}` would force `|U|, |W| ≥ |A| + 1`, whence `|F| = |U|·|W| ≥ (|A|+1)² > 2|A|+1 = |F|`. -/
+theorem rightMulAction_irreducible_of_index_two {F : Type*} [NearField F] [Finite F] [Nontrivial F]
+    (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hidx : A.index = 2) (U : Subgroup (Multiplicative F))
+    (hUinv : OddOrder.Isaacs.Ch03.IsAInvariant (rightMulAction A hcomm) U) :
+    U = ⊥ ∨ U = ⊤ := by
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨hU_ne_bot, hU_ne_top⟩ := hcon
+  haveI : Nontrivial (Multiplicative F) := inferInstanceAs (Nontrivial F)
+  -- elementary abelian data + coprimality of `|A|` with `|F|`, plus `f ∣ |F|`.
+  obtain ⟨f, hf, hE⟩ := isElementaryAbelian_multiplicative (F := F)
+  haveI : Fact f.Prime := ⟨hf⟩
+  have hMF : Nat.card (Multiplicative F) = Nat.card F := rfl
+  have hcop : Nat.Coprime (Nat.card A) (Nat.card (Multiplicative F)) := by
+    rw [hMF]; exact card_coprime A
+  have hfE : f ∣ Nat.card (Multiplicative F) := by
+    obtain ⟨x, hx⟩ := exists_ne (1 : Multiplicative F)
+    have hord : orderOf x = f := by
+      rcases (Nat.dvd_prime hf).mp (orderOf_dvd_of_pow_eq_one (hE.pow_eq_one x)) with h | h
+      · exact absurd (orderOf_eq_one_iff.mp h) hx
+      · exact h
+    rw [← hord]; exact orderOf_dvd_natCard x
+  -- `|U| ≥ |A| + 1`.
+  have hU_ge : Nat.card A + 1 ≤ Nat.card U :=
+    add_one_le_card_of_aInvariant_ne_bot A hcomm hUinv hU_ne_bot
+  -- `A`-invariant Maschke complement `W`; `W ≠ ⊥` since `U ≠ ⊤`, so `|W| ≥ |A| + 1`.
+  obtain ⟨W, hWinv, hUW⟩ :=
+    exists_aInvariant_complement_of_elementaryAbelian hE hcop hfE hUinv
+  have hW_ne_bot : W ≠ ⊥ := fun hW0 =>
+    hU_ne_top (by have := hUW.sup_eq_top; rwa [hW0, sup_bot_eq] at this)
+  have hW_ge : Nat.card A + 1 ≤ Nat.card W :=
+    add_one_le_card_of_aInvariant_ne_bot A hcomm hWinv hW_ne_bot
+  -- `|F| = |U| · |W|` from the (lattice) complement, since `(F, +)` is abelian.
+  have hcompl' : Subgroup.IsComplement' U W :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hUW.disjoint
+      (by rw [← Subgroup.mul_normal, hUW.sup_eq_top, Subgroup.coe_top])
+  have hprod : Nat.card U * Nat.card W = Nat.card F := by rw [← hMF]; exact hcompl'.card_mul
+  -- `(|A|+1)² ≤ |U|·|W| = |F| = 2|A|+1` with `|A| ≥ 1` is contradictory.
+  have hFcard : Nat.card F = 2 * Nat.card A + 1 := card_eq_of_index_two A hidx
+  have hApos : 0 < Nat.card A := Nat.card_pos
+  have hge : (Nat.card A + 1) * (Nat.card A + 1) ≤ Nat.card U * Nat.card W :=
+    Nat.mul_le_mul hU_ge hW_ge
+  nlinarith [hge, hprod, hFcard, hApos]
+
+/-- **Unconditional near-field field structure for an index-`2` subgroup** (Peterfalvi Appendix C,
+Proposition 2, field-structure half).  If a commutative subgroup `A ⊆ Fˣ` of a finite near-field has
+index `2`, then `(F, +)` is a `1`-dimensional vector space over a finite field `K` with `|K| = |F|`.
+Combines the index-`2` irreducibility (`rightMulAction_irreducible_of_index_two`) with
+`nearField_field_structure`, discharging the irreducibility hypothesis. -/
+theorem nearField_field_structure_of_index_two.{u} {F : Type u} [NearField F] [Finite F]
+    [Nontrivial F] (A : Subgroup Fˣ)
+    (hcomm : ∀ u v : A, (u : Fˣ) * (v : Fˣ) = (v : Fˣ) * (u : Fˣ))
+    (hidx : A.index = 2) :
+    ∃ (K : Type u) (_ : Field K) (_ : Module K F) (_ : Finite K),
+      Module.finrank K F = 1 ∧ Nat.card K = Nat.card F :=
+  nearField_field_structure A hcomm (rightMulAction_irreducible_of_index_two A hcomm hidx)
 
 end NearFieldBasics
 
