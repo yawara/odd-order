@@ -2679,3 +2679,21 @@ S08CP1:~1683) + `memberExtensionDecomposition` + `inner_decomposition_X_extensio
 4. → cX (case-B X-coherence: 列-coherence `certainTypeSet_isCoherent_tau` + 既約-X-coherence を §7 engine で glue) → `coherentXunionYset_caseB_of_glued` → capstone。
 **残作業の本体 = dispatch family の構築 + case-B X-coherence glue (大規模だが hXorth/decomposition 部品は全て揃った)。**
 **正本=本 session 41 cont.⁴ 追補。既約 hXorth 既存確認。次=dispatch family 構築。**
+
+## 2026-06-15 (session 41 cont.⁵, /loop): 🎯🎯 重大簡略化 — 列-Y hmixed は seam-1 直接 (per_constituent family 迂回!)
+
+### ✅ landed (`2ee06edf`, axiom-clean):
+**`inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`**: `⟨ν(μ_j), η^{τ₁}⟩=0`
+(η∈Yset, ν=(4.9) certain-type 拡張)。**鍵 = `certainTypeExtension_columnSum` (S06:117): ν(μ_j)=δ_j ∑_i ω_{ij}^σ** (= certainTypeOmegaSigma の ℤ-結合)。⟹ seam-1 (`inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`, anchor η'=η̄) を inner_sum_left + inner_conj_symm で持ち上げるだけ。
+
+### 🎯 これが意味すること (per_constituent family は列 hmixed に不要):
+case-B X-coherence の `coherentXunionYset_caseB_of_glued` が要求する **hmixed (列-Y: ⟨ν μ_j, ν η⟩=⟨μ_j,η⟩=0)** は、cX が μ_j を `certainTypeExtension` で拡張する限り、**上記 lemma で直接 discharge**。**per_constituent_Y_eq_smul / certainType_per_constituent / aggregate-builder / weight / Clifford 対応 / dispatch family は全て不要だった** (これらは (6.8.2.3) の literal pinning route 用; Lean の subset-glue route では seam-1 で十分)。
+
+### ▶▶ 残り case-B assembly (simpler route 確定):
+1. **case-B X-coherence cX** = glue 列-coherence (`certainTypeSet_isCoherent_tau`, 列 μ_j, ✅) + 既約-X-coherence (`_of_irreducible_X` の non-column part)。
+   - 要: 列↔既約 cross-orthogonality (列の σ-image ⊥ 既約の Dade-image)。← seam-1 類似で easy か要確認 (次の核)。
+   - X = certainTypeSet ∪ X_irr の §7 union glue。
+2. **X∪Y hmixed**: 列-Y=上記 lemma ✅; 既約-Y=`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero` (既存) ✅。
+3. `coherentXunionYset_caseB_of_glued` で X∪Y → capstone。
+**🔑 per_constituent saga は不要と判明。seam-1 が列-Y の鍵。残り = X-internal glue (列∪既約 cross-orth) + §7 union 配線。**
+**正本=本 session 41 cont.⁵。列-Y hmixed seam-1 直接 landed。次=列↔既約 cross-orth + X-coherence glue。**
