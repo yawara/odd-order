@@ -831,6 +831,51 @@ theorem SubgroupESetup.conj' [Finite G] {M E E₁ E₂ E₃ : Subgroup G}
   · rw [← Subgroup.smul_sup]
     exact isHallSubgroup_subgroupOf_conj (sup_le h.E₁_le h.E₂_le) c h.E₁₂_hall
 
+/-! ### Proposition 1.5(b)(c) subgroup forms (`A`-invariant Sylow containment & conjugacy) -/
+
+/-- **Proposition 1.5(c), subgroup form**: two `A`-invariant Sylow `q`-subgroups `S, T` of `N`
+(`A ≤ N_G(N)`, coprime orders, one side solvable) are conjugate by an element of `N ∩ C_G(A)`. -/
+theorem aInvariant_sylow_conj_subgroup [Finite G] {A N : Subgroup G}
+    (hAN : A ≤ Subgroup.normalizer (N : Set G)) (hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥N) {q : ℕ} [Fact q.Prime]
+    {S T : Subgroup G} (hSN : S ≤ N)
+    (hScard : Nat.card ↥(S.subgroupOf N) = q ^ (Nat.card ↥N).factorization q)
+    (hSinv : A ≤ Subgroup.normalizer (S : Set G)) (hTN : T ≤ N)
+    (hTcard : Nat.card ↥(T.subgroupOf N) = q ^ (Nat.card ↥N).factorization q)
+    (hTinv : A ≤ Subgroup.normalizer (T : Set G)) :
+    ∃ c : G, c ∈ N ∧ c ∈ Subgroup.centralizer (A : Set G) ∧ MulAut.conj c • S = T := by
+  classical
+  letI act : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N (Subgroup.inclusion hAN)
+  set φ : ↥A →* MulAut ↥N := MulDistribMulAction.toMulAut ↥A ↥N with hφ
+  have hφ_coe : ∀ (a : ↥A) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
+    fun _ _ => rfl
+  have htr : ∀ K : Subgroup G, A ≤ Subgroup.normalizer (K : Set G) →
+      Ch03.IsAInvariant φ (K.subgroupOf N) := by
+    intro K hK
+    rw [Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    rw [hφ_coe a x]
+    exact (Subgroup.mem_normalizer_iff.mp (hK a.2) (x : G)).mp hx
+  let Sn : Sylow q ↥N := Sylow.ofCard (S.subgroupOf N) hScard
+  let Tn : Sylow q ↥N := Sylow.ofCard (T.subgroupOf N) hTcard
+  have hSn : (Sn : Subgroup ↥N) = S.subgroupOf N := rfl
+  have hTn : (Tn : Subgroup ↥N) = T.subgroupOf N := rfl
+  obtain ⟨c, hc_fix, hc_conj⟩ := Ch04.aInvariant_sylow_conj hcop hSolv
+    (S := Sn) (T := Tn) (htr S hSinv) (htr T hTinv)
+  refine ⟨(c : G), c.2, ?_, ?_⟩
+  · rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    have h1 : ((φ ⟨g, hg⟩) c : G) = (c : G) := congrArg (fun z : ↥N => (z : G)) (hc_fix ⟨g, hg⟩)
+    rw [hφ_coe ⟨g, hg⟩ c, mul_inv_eq_iff_eq_mul] at h1
+    exact h1
+  · have hgsub : (Sn : Subgroup ↥N).map (MulAut.conj c).toMonoidHom = (Tn : Subgroup ↥N) :=
+      hc_conj
+    have hlhs := map_subtype_conj_subgroupOf c S hSN
+    rw [← hSn, hgsub, hTn, Subgroup.map_subgroupOf_eq_of_le hTN] at hlhs
+    rw [Subgroup.pointwise_smul_def]; exact hlhs.symm
+
 /-- **BG Lemma 13.6** (mmd L3574): `1⊂P⊆E₁`, `q∈σ(M)`, `X∈ℰ_q¹(C_{M_σ}(P))`, `S` を `M_σ` の
 Sylow `q`-部分群とすると `ℳ(C_G(X))=ℳ(S)={M}`。 -/
 theorem maximalContaining_eq_singleton_of_E1 [Finite G] (hG : IsMinimalSimpleOdd G)
