@@ -1031,26 +1031,50 @@ theorem tau_apply_eq_zero_of_mem_ticVdiffV
     rw [hHK]; exact Set.diff_subset
   exact ticVdiffV_not_mem_conjugatesOfSet_K h46 hv (Group.conjugatesOfSet_mono hbridge hvconj)
 
-/-- **(6.8.2.3) anchor, `Y`-extension form: a difference of `Y`-coherence images vanishes on `V`.**
-For `η, η' ∈ Y`, the difference `η^{τ₁} − η'^{τ₁} = coherentYset.extension η − coherentYset.extension η'`
-vanishes on the `(ticVdiff h46)`-exceptional set `V`.  Indeed all members of `Y = S(H')` share the
-degree `|W₁|` (`Yset_apply_one`), so `η − η'` is `H^#`-supported (`sMember_diffSupport_of_charValue_eq`),
-the coherence extension agrees there with the Dade map (`coherentYset_extension_Yset_diff_eq_tau`,
-`= (η − η')^τ`), and `(η − η')^τ` vanishes on `V` by the anchor `tau_apply_eq_zero_of_mem_ticVdiffV`.
+/-- **(6.8.2.3) anchor, generic coherent-extension form: a difference of coherent images of two
+`H^#`-supported-difference members vanishes on `V`.**  For *any* coherence `cS : IsCoherent hyp.tau S₁ H^#`
+and members `η, η' ∈ S₁` whose difference `η − η'` is `H^#`-supported, the image difference
+`cS.extension η − cS.extension η'` vanishes on the `(ticVdiff h46)`-exceptional set `V`: the coherent
+extension agrees with the Dade map on the supported lattice (`extends_on_supported`,
+`cS.extension η − cS.extension η' = (η − η')^τ`), and `(η − η')^τ` vanishes on `V` by the anchor
+`tau_apply_eq_zero_of_mem_ticVdiffV`.
 
-This is the `hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` in `Y`-image form:
-taking `η' = η̄` (the complex conjugate, also in `Y`) and `η^{τ₁} = ε·ξ`, `η̄^{τ₁} = ε'·ξ'`
-(`coherentYset_extension_eq_zsmul_irreducible`), it gives that `ε·ξ − ε'·ξ'` vanishes on `V`. -/
+This is the uniform `hvanish` input of `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` for *every*
+certain-type cross-orthogonality: with `η' = η̄` (the conjugate, equal degree so `η − η̄` is
+`H^#`-supported) and `η^{τ₁} = ε·ξ`, it gives `ε·ξ − ε'·ξ'` vanishes on `V` — for `η ∈ Y` (seam-1)
+*and* for an irreducible `η ∈ X` (the column–irreducible cross-orthogonality of the case-(B)
+`X`-coherence glue). -/
+theorem coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (cS : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η η' : ClassFunction ↥L ℂ} (hη : η ∈ S₁) (hη' : η' ∈ S₁)
+    (hsupp : (η - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V) :
+    (cS.extension η - cS.extension η') v = 0 := by
+  have htaud : cS.extension η - cS.extension η' = hyp.tau (η - η') := by
+    rw [← map_sub]
+    exact cS.extends_on_supported (η - η')
+      ⟨Submodule.sub_mem _ (Submodule.subset_span hη) (Submodule.subset_span hη'), hsupp⟩
+  rw [htaud]
+  exact tau_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK hsupp hv
+
+/-- **(6.8.2.3) anchor, `Y`-extension form** (specialization of
+`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV` to `S₁ = Y`).  All members of `Y = S(H')`
+share the degree `|W₁|` (`Yset_apply_one`), so `η − η'` is `H^#`-supported
+(`sMember_diffSupport_of_charValue_eq`).  This is the `hvanish` input of the seam-1 disjointness
+machine with `η' = η̄`, `η^{τ₁} = ε·ξ`. -/
 theorem coherentYset_extension_diff_apply_eq_zero_of_mem_ticVdiffV
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     {η η' : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hη' : η' ∈ hyp.Yset)
     {v : G} (hv : v ∈ (OddOrder.Peterfalvi.S06.ticVdiff h46).V) :
-    (hyp.coherentYset.extension η - hyp.coherentYset.extension η') v = 0 := by
-  rw [hyp.coherentYset_extension_Yset_diff_eq_tau hη' hη]
-  refine tau_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK ?_ hv
-  exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη')
-    ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη').symm)
+    (hyp.coherentYset.extension η - hyp.coherentYset.extension η') v = 0 :=
+  coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV hyp h46 hHK hyp.coherentYset hη hη'
+    (hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη')
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη').symm)) hv
 
 /-- **The (6.8.2.3) disjointness machine** (modulo the anchor).  For orthonormal `ξ`, `ξ' ∈ ±Irr(G)`
 and `c ≠ 0`, if the two-irreducible difference `c·ξ − c'·ξ'` vanishes on `V` (the **anchor**), then
@@ -1095,6 +1119,26 @@ theorem inner_smul_chiFam_eq_zero_of_diff_vanishOnV
     rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   rw [ClassFunction.inner_smul_left,
     inner_eq_zero_of_smul_sub_smul_orthogonal hξ1 hθ hξξ' hm hc hpsi, mul_zero]
+
+/-- **Coherent image of an irreducible member is `±` an irreducible (generic form).**  Generalizes
+`coherentYset_extension_eq_zsmul_irreducible` to any coherence `cS : IsCoherent τ S₁ A`: an
+irreducible member `η ∈ S₁` has `cS.extension η = ε·ξ` for `ε = ±1`, `ξ ∈ Irr G` (the image is
+norm-`1` in `ZIrr G`, `exists_zsmul_irreducibleCharacter_of_inner_self_one`, Peterfalvi (5.9.a)). -/
+theorem coherent_extension_eq_zsmul_irreducible
+    {S₁ : Set (ClassFunction ↥L ℂ)} {A : Set ↥L}
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    (cS : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A)
+    {η : ClassFunction ↥L ℂ} (hirr : IsIrreducibleCharacter η) (hη : η ∈ S₁) :
+    ∃ (ε : ℤ) (ξ : IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧ cS.extension η = ε • (ξ : ClassFunction G ℂ) := by
+  have hηnorm : ClassFunction.inner η η = 1 := by
+    have h := irreducibleCharacter_inner (⟨η, hirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η, hirr⟩ : IrreducibleCharacter ↥L)
+    simpa using h
+  have hηspan : η ∈ OddOrder.Peterfalvi.S07.zSpan S₁ := Submodule.subset_span hη
+  have hextnorm : ClassFunction.inner (cS.extension η) (cS.extension η) = 1 := by
+    rw [cS.extension_inner_eq η η hηspan hηspan, hηnorm]
+  exact exists_zsmul_irreducibleCharacter_of_inner_self_one (cS.extension_mem_ZIrr η hηspan) hextnorm
 
 /-- **(6.8.2.3) seam-1 orthogonality `⟨η^{τ₁}, ω_{ij}^σ⟩ = 0`.**  For two distinct `Y`-coherence
 anchors `η ≠ η' ∈ Y`, the image `η^{τ₁} = coherentYset.extension η` is orthogonal to every
@@ -1256,6 +1300,40 @@ theorem inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset
   have hne : η₁ ≠ η₁.conj := fun heq =>
     hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η₁.IsReal) hη₁
   exact inner_decomposition_X_coherentYset_extension_eq_zero hyp h46 hHK hη₁ hconj hne D himg
+
+/-- **(6.8.2) case-(B) `X`–`Y` mixed orthogonality for a column `μ_j` — the direct route.**  The
+`(4.9)` certain-type coherent extension of a column sum is `ν(μ_j) = δ_j ∑_i ω_{ij}^σ`
+(`certainTypeExtension_columnSum`), a `ℤ`-combination of `σ`-images; the seam-1 orthogonality
+`⟨η^{τ₁}, ω_{ij}^σ⟩ = 0` (`inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`, with the
+textbook anchor `η' = η̄`) therefore gives `⟨ν(μ_j), η^{τ₁}⟩ = 0` directly — **bypassing the full
+(6.8.2.3) per-constituent pinning** for the column-`Y` mixed-inner input `hmixed` of
+`coherentXunionYset_caseB_of_glued`.  (The certain-type `X`-coherence `cX` extends `μ_j` by exactly
+this `certainTypeExtension`, so this is the `hmixed` value for `x = μ_j`, `y ∈ Y`.) -/
+theorem inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.certainTypeExtension h46
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
+      (hyp.coherentYset.extension η) = 0 := by
+  have hconj : η.conj ∈ hyp.Yset := hyp.Yset_closedUnderConjugate hη
+  have hne : η ≠ η.conj := fun heq =>
+    hyp.Yset_hasNoRealCharacters.not_mem_of_isReal (heq.symm : η.IsReal) hη
+  have hsum : ClassFunction.inner
+      (∑ i, OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i)
+      (hyp.coherentYset.extension η) = 0 := by
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero (fun i _ => ?_)
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK hη hconj hne χ₂ i,
+      star_zero]
+  rw [OddOrder.Peterfalvi.S06.certainTypeExtension_columnSum, ← Int.cast_smul_eq_zsmul ℂ,
+    ClassFunction.inner_smul_left, hsum, mul_zero]
 
 /-- **(6.8.2.3) per-constituent pinning, certain-type form: `Dᵢ.Y = aᵢ·η₁^{τ₁}`.**  The certain-type
 specialization of `per_constituent_Y_eq_smul`: for a family of `(5.4)` decompositions
