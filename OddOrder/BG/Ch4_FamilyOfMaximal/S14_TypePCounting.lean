@@ -458,9 +458,12 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
 saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
 Theorem 14.7 and Corollary 14.9.
 
-**Proof (2026-06-14):** PROVED, citing only Theorem 13.9 (`sigma_disjoint_of_nonconjugate`,
-currently `sorry` in §13 ⟹ auto-unconditional once Lane F lands it). The `M_σ^#` restriction
-turns out to be a *feature* here: if `g` is conjugate to both `t ∈ M_σ^#` and `s ∈ N_σ^#`, then
+**Proof (2026-06-14):** PROVED, citing only Theorem 13.9 (`sigma_disjoint_of_nonconjugate`).
+**Now fully unconditional (2026-06-15):** Theorem 13.9 landed in §13 (Lane F), so 14.5 is
+sorry-free and axiom-clean (`#print axioms` = `[propext, Classical.choice, Quot.sound]`;
+registered in `AxiomsCheck`).  It is the first §14 result beyond Lemma 14.1 to go green.
+The `M_σ^#` restriction turns out to be a *feature* here: if `g` is conjugate to both
+`t ∈ M_σ^#` and `s ∈ N_σ^#`, then
 `t` and `s` are conjugate, so `orderOf t = orderOf s`; a prime `p` dividing it lies in `σ(M)`
 (as `M_σ` is a `σ(M)`-group) and in `σ(N)`, contradicting `σ(M) ∩ σ(N) = ∅`. No `R(x)` / `M̃`
 machinery is needed — **13.9 alone suffices**.

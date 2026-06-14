@@ -4495,6 +4495,14 @@ the `r_p = 1` case uses `p ∉ κ(M)` and the fixed-point-free criterion of Theo
 Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.msigma_structure_of_notMem_sigma_kappa
+
+/-! **BG Lemma 14.5(b)** (`S14_TypePCounting`): for nonconjugate maximal `M`, `N`, the
+conjugacy saturations `𝒞_G(M_σ^#)`, `𝒞_G(N_σ^#)` are disjoint.  Proved citing Theorem 13.9
+(`sigma_disjoint_of_nonconjugate`), which landed in §13 (Lane F) on 2026-06-15, so this is now
+fully unconditional and axiom-clean.  (Lean uses the `M_σ^#` restriction of BG's `M̃`, which
+makes 13.9 alone sufficient — no `R(x)` / `M̃` machinery needed.) -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacy_disjoint_of_nonconjugate
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
