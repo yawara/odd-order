@@ -83,3 +83,26 @@ Lemma 14.6 (missing-page 組合せ論) と Thm 14.7 の counting 不等式
 - 再利用技法: `A 可換 (IsElementaryAbelian) → A ≤ centralizer(A)` で Disjoint(M_σ,A) を hC から無料;
   `A = zpowers r` は `card_dvd_of_le` + `eq_of_le_of_card_ge`; FPF は `Commute.zpow_left`
   (hcomm は `Commute r n` 型で宣言、Eq だと dot-notation が Eq.zpow_left に落ちる)。
+
+## Lane H faithfulness 検証 + §13 非依存 API (2026-06-14)
+
+H 再配置後の (a) faithful 化 + (b) §13 非依存補題のパス。mmd L3787–4158 と Lean surface を照合:
+
+- **定義は完全 faithful** (BG L3805): `kappa` = {p∈τ₁∪τ₃ | ∃P∈ℰ_p¹(M), C_{M_σ}(P)≠1}、
+  `IsTypeF`=κ空、`IsTypeP1`=κ=π(M)−σ(M)、`IsTypeP2`=κ≠π(M)−σ(M)。一致。
+- **§13 非依存 API 追加** (commit `8e2f26e1`, sorry-free): 述語版 `isTypeP_iff_isTypeP1_or_isTypeP2` /
+  `not_isTypeP1_and_isTypeP2` / `isTypeF_iff_not_isTypeP` 他 + 族版 `maximalTypePFamily_eq_union` /
+  `…disjoint…` / `maximalTypeFFamily_eq_diff`。⟹ **M_P = M_P1 ⊔ M_P2、M_F = 𝓜 ∖ M_P** (§15/§16 の型場合分け基盤)。
+- **定理 surface (14.2–14.13) は全て BG の TRUE partial consequence** (false なものは無し → Lean 修正不要):
+  - 14.2/14.7/14.12: 多部分定理の部分 surface (true)。14.7(e) の `IsTISubset Ẑ Z` は
+    **faithful** (IsTISubset A L = ∀g,(∃a∈A,gag⁻¹∈A)→g∈L = G 内 TI, 正規化 bound L=Z; BG「Ẑ TI of G, N_G(Ẑ)=Z」と一致)。
+    14.7 は counting 不等式 |𝒞_G(Ẑ)|>½|G| と (a)(h) を surface から省略 (証明時に補完)。
+  - **14.4 が最も divergent**: Lean surface は N(x)+型(f)= (IsTypeF N∨IsTypeP2 N) を束ね、
+    **BG headline「R(x) は C_G(x) の normal Hall で ℳ_σ(x) に sharply transitive」を落としている**。
+    この headline 内容は §16 の `RData`/`ConjSharplyTransitiveOn` + Theorem D に存在。
+    ⟹ §13 着地後に 14.4 を証明する際、headline を 14.4 へ戻すか §16 と相互参照する設計判断が要る (要相談)。
+  - 14.3: 結論を κ/τ₂ メンバシップ split で表現 — BG L3852 の 2-case (π(⟨x'⟩)⊆κ ∧ C_G(x)⊆M / τ₂分岐) と
+    厳密一致か証明時に再確認 (C_G(x)⊆M が surface に無い)。
+- **結論**: §14 surface は faithful-as-partial、false 無し、現時点で Lean 修正不要。実証明は §13 gate (pause 継続)。
+- **▶ 次 (gateless で継続可)**: §15/§16 の statement を同様に mmd 照合 (esp. §16 Thm I-II = Pf §10 interface) +
+  §15/§16 の §13 非依存 API があれば追加。§13 着地で 14.4 設計判断 → 本格証明。
