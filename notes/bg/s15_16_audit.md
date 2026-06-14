@@ -133,6 +133,25 @@ deferred としている。そのうち **containment と M-正規性は §14 �
 Thm A(3) / Cor 15.4) は修正済、Thm II/C/I dichotomy + Cor 15.5/15.9(c) の intricate 脱落は
 proof-time 復元。§14 非依存 API (M_F well-definedness + 通知 notation) は本セッションで完備。
 
+## 7. 証明-readiness 調査 (2026-06-14 — endpoint 証明を阻む構造的要因)
+
+§16 endpoint を sorried cite で証明する試みで判明: **scaffold は現状 proof-ready でない**。
+sorried §14 だけでなく **scaffold 自身の構造**が clean citation を阻む:
+
+- **bundled existential**: Thm 15.2 (`mf_ne_msigma_typeP1_structure`) は全内容を `hne: M_F≠M_σ`
+  gate 下の `∃ K Kstar Q Q0 D p q, …` に束ねる。Cor 15.6 が要する `K*≤M_F` は (i) この existential
+  の `Kstar` が Cor 15.6 の `Kstar` と別物、(ii) `K*≤M_F` が conjunct として露出していない (Q≤M_F +
+  Kstar が q-group からの導出が要る)、(iii) `hne` が Cor 15.6 の仮説に無い、で **抽出不能**。
+- **case-split**: Theorem A は一般 M だが Prop 14.2 (cite 先) は type-P 限定 → type-F 構造を別途要す。
+- **σ-theory**: Cor 15.4 は `N_G(S)⊆M → p∈σ(M) → S⊆M_σ` の subtle な σ 補題を要す (clean cite 無し)。
+- **§12 encoding**: Thm 15.7(d)(e) は E_i 構造、Cor 15.9(c) は x_r (r-part) を要す。
+
+⟹ **endpoint 証明には scaffold の restructuring が前提** (bundled existential を de-bundle して
+中間事実を accessible に、hne-gate を外す、σ/E_i 補題を整備)。これは coherent な focused effort
+(multi-hour) 向きで、60s loop fragment 不適。**F/H が §14 を landing 後**が望ましい (sorried §14 への
+fragile 依存回避 + §14 結果の最終形に合わせて cite)。schematic proof の cite→conjunct 対応自体は
+mmd L4424-4449 に在る (B: 12.1d/12.5b→1, 15.1d/e/c→2/3/4/5 等) ので、restructuring 後は機械的。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
