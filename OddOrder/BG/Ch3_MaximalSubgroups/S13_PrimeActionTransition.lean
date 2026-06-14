@@ -1128,6 +1128,83 @@ theorem fittingInG_primeFactors_eq_of_isHall_subgroupOf [Finite G] {C H K : Subg
     Subgroup.card_map_of_injective K.subtype_injective
   rw [h1, h2, fitting_card_eq_of_mulEquiv e]
 
+/-- **Lemma 13.8 GAP 2 capstone (WLOG dispatch)**: step1 出力 (`α=β`, `C_{M_α}(P)≠1`,
+`C_{M*_α}(P)≠1`) から、`r ∈ β(M*)` が `|C_M(P)|` を割り `r∉σ(M)`、**または** 対称な
+`r ∈ β(M)` が `|C_{M*}(P)|` を割り `r∉σ(M*)`。
+
+`H ⊇ C_{M_β}(P)` を `C_G(P)` の Hall `θ`-部分群 (`θ=β(M)∪β(M*)`) に取り `s∈π(F(H))⊆θ` で場合分け:
+`s∈β(M)` なら `oriented_r_existence`(M,M*); `s∈β(M*)` なら `H*⊇C_{M*_β}(P)` を取り
+`fittingInG_primeFactors_eq` で `s∈π(F(H*))` 移送し `oriented_r_existence`(M*,M)。 -/
+theorem exists_prime_betastar_dvd_or [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMstar : Mstar ∈ maximalSubgroups G)
+    (hnc : ¬ ∃ g : G, MulAut.conj g • M = Mstar) {P : Subgroup G} (hP1 : P ≠ ⊥)
+    (hαβ : S10.alpha M = S10.beta M) (hαβstar : S10.alpha Mstar = S10.beta Mstar)
+    (hCMαP : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥)
+    (hCMstarαP : S10.Malpha Mstar ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥) :
+    (∃ r : ℕ, r.Prime ∧ r ∈ S10.beta Mstar ∧
+      r ∣ Nat.card ↥(M ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma M) ∨
+    (∃ r : ℕ, r.Prime ∧ r ∈ S10.beta M ∧
+      r ∣ Nat.card ↥(Mstar ⊓ Subgroup.centralizer (P : Set G)) ∧ r ∉ S10.sigma Mstar) := by
+  classical
+  haveI : IsSolvable ↥(Subgroup.centralizer (P : Set G)) := centralizer_isSolvable_of_ne_bot hG hP1
+  -- `C_{M_α}(P)` / `C_{M*_α}(P)` は `β`-部分群 (`Malpha_isPiGroup` + `α=β`)。
+  have hbeta : ∀ {N : Subgroup G}, S10.alpha N = S10.beta N →
+      Subgroup.IsPiSubgroup (S10.beta N) (S10.Malpha N ⊓ Subgroup.centralizer (P : Set G)) := by
+    intro N hN p hp
+    have hp' : p ∈ (Nat.card ↥(S10.Malpha N)).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hp).1,
+        (Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.card_dvd_of_le inf_le_left),
+        Nat.card_pos.ne'⟩
+    rw [← hN]; exact S10.Malpha_isPiGroup N p hp'
+  have hYMβ := hbeta hαβ
+  have hYMstarβ := hbeta hαβstar
+  have hYMθ : Subgroup.IsPiSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (S10.Malpha M ⊓ Subgroup.centralizer (P : Set G)) :=
+    fun p hp => Set.mem_union_left _ (hYMβ p hp)
+  have hYMstarθ : Subgroup.IsPiSubgroup (S10.beta M ∪ S10.beta Mstar)
+      (S10.Malpha Mstar ⊓ Subgroup.centralizer (P : Set G)) :=
+    fun p hp => Set.mem_union_right _ (hYMstarβ p hp)
+  have hCMαP_le : S10.Malpha M ⊓ Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (P:Set G) :=
+    inf_le_right
+  have hCMstarαP_le :
+      S10.Malpha Mstar ⊓ Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (P:Set G) :=
+    inf_le_right
+  -- `nc` symmetry: `¬∃g, conj g•Mstar=M`.
+  have hnc' : ¬ ∃ g : G, MulAut.conj g • Mstar = M := by
+    rintro ⟨g, hg⟩
+    exact hnc ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  -- build `H ⊇ C_{M_β}(P)`, Hall `θ`.
+  obtain ⟨H, hHC, hHhall, hYH⟩ :=
+    exists_hall_theta_ge hG hP1 hCMαP_le hYMθ (θ := S10.beta M ∪ S10.beta Mstar)
+  haveI : IsSolvable ↥H :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hHC)
+  have hHne : H ≠ ⊥ := fun h => hCMαP (le_bot_iff.mp (h ▸ hYH))
+  obtain ⟨s, hsF⟩ := exists_mem_primeFactors_fittingInG ‹IsSolvable ↥H› hHne
+  haveI : Fact s.Prime := ⟨Nat.prime_of_mem_primeFactors hsF⟩
+  -- `s ∈ θ` (F(H) ≤ H, H Hall θ).
+  have hsθ : s ∈ S10.beta M ∪ S10.beta Mstar := by
+    have hsH : s ∈ (Nat.card ↥H).primeFactors := by
+      refine Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors hsF, ?_, Nat.card_pos.ne'⟩
+      exact (Nat.mem_primeFactors.mp hsF).2.1.trans
+        (Subgroup.card_dvd_of_le (Ch2.S08.fittingInG_le H))
+    have := hHhall.primeFactors_card_subset s
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHC).toEquiv] at this
+    exact this hsH
+  rcases hsθ with hsM | hsMstar
+  · -- `s ∈ β(M)`: M-side.
+    exact Or.inl (oriented_r_existence hG hM hMstar hnc' hHC hHhall hsM hsF hCMαP
+      (inf_le_left.trans (S10.Malpha_le M)) hYH hYMβ hCMstarαP hCMstarαP_le hYMstarβ)
+  · -- `s ∈ β(M*)`: M*-side. build `H* ⊇ C_{M*_β}(P)`, transport `s ∈ π(F(H*))`.
+    obtain ⟨Hs, hHsC, hHshall, hYHs⟩ :=
+      exists_hall_theta_ge hG hP1 hCMstarαP_le hYMstarθ (θ := S10.beta M ∪ S10.beta Mstar)
+    have hsFs : s ∈ (Nat.card ↥(Ch2.S08.fittingInG Hs)).primeFactors := by
+      rw [← fittingInG_primeFactors_eq_of_isHall_subgroupOf hHC hHsC hHhall hHshall]; exact hsF
+    have hHshall' : Ch03.IsHallSubgroup (S10.beta Mstar ∪ S10.beta M)
+        (Hs.subgroupOf (Subgroup.centralizer (P : Set G))) := by
+      rwa [Set.union_comm] at hHshall
+    exact Or.inr (oriented_r_existence hG hMstar hM hnc hHsC hHshall' hsMstar hsFs hCMstarαP
+      (inf_le_left.trans (S10.Malpha_le Mstar)) hYHs hYMstarβ hCMαP hCMαP_le hYMβ)
+
 /-- **Lemma 13.8 head — `Q = [Q,P] ⊆ M' ∩ M*'`**: `P` が `Q` を coprime に作用し `C_Q(P)=1` なら
 `Q ≤ ⁅P,Q⁆` (`le_commutator_of_coprime_inf_centralizer_eq_bot`); `P,Q ⊆ M` (resp. `M*`) ゆえ
 `⁅P,Q⁆ ⊆ ⁅M,M⁆ = M'` (resp. `M*'`)。 -/
