@@ -168,11 +168,15 @@ noncomputable def centralizerGeneratedBySigma (M U : Subgroup G) : Subgroup G :=
 
 /-! ## Lemma 15.1: the `U M_sigma` auxiliary structure -/
 
-/-- **BG Lemma 15.1** (mmd L4093): auxiliary structure around the `U`-factor in a
-type-P maximal subgroup.  The quotient assertion `M'/M_sigma` abelian is encoded
-as `M'' <= M_sigma`, avoiding premature quotient API commitments. -/
+/-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
+**arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
+encoded as `M'' <= M_sigma`, avoiding premature quotient API commitments.
+
+Faithfulness fix (Lane G): the previous scaffold added a spurious `IsTypeP M` hypothesis;
+mmd Lemma 15.1 holds for every `M ∈ ℳ` (the `K ≠ 1` clauses are guarded inline), and the
+general form is what Theorem A(2) and Theorem B cite. -/
 theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
