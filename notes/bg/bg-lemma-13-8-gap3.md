@@ -83,6 +83,15 @@ X⊆C_{M_α}(PQ)=1 (Lem 12.18)。X=C_{M_α}(P)≠1 と矛盾。∎
 | nilpotent で q⊥q' 可換 (3c-5) | ✅ **`S10.commute_of_coprime_orderOf_of_isNilpotent`** (S10_LocalLemmasCore:679) | element-level (位数互素 ⟹ commute)。⁅L̄,Q̄⁆=⊥ は element-wise。**使用例 = S12_Lemma1218:349/970** (同パターン: nilpotent 商で coprime 像が可換) を mirror |
 | coprime commutator [D,Q,Q]=[D,Q] (3c-6) | ✅ **`OperatorQuotientAction.commutator_commutator_right_eq`** (:308; BG Prop 1.6(b)) | ⚠ `H.Normal` (ambient) 要 ⟹ **ambient を DQ にして H=D⊴DQ で適用**し G へ移送 (commutator は intrinsic) |
 
+### ✅✅ (3c) 完全形式化済 (2026-06-14, commit b3dcd9c1)
+2 reusable helper + kernel すべて sorry-free・full build 緑:
+- `commutator_commutator_right_eq_of_le_normalizer` (Q-invariant coprime 恒等式; ambient D⊔Q)。
+- `commutator_le_Malpha_of_coprime_le_derived` (nilpotent 商で ⁅A,B⁆≤M*_α; A,B≤M*' coprime)。
+- `gap3_commutator_inf_le_Malpha_star` (iv 本体)。
+知見: element commutator `⁅,⁆` は `open scoped commutatorElement` 必須; `orderOf_mk`=`Subgroup.orderOf_mk`;
+quotient には `haveI : N.Normal := S10.Malpha_subgroupOf_normal Mstar` が要 (Group instance synthesis)。
+**残り 13.8 = (3a)+(3b) `gap3_centralizer_Malpha_P_le_Mstar` の 1 kernel のみ**。
+
 ✅ **全 handle 確定 — 13.8 は完全に formalize 可能**。
 - (3a): `coprime_fixedPoints_quotient_of_coprime_normal` (事前プラン通り)。inner-action setup は S03c_Thm37 が例。
 - (3b): `centralizer_le_centralizer_of_tau1` + `hall_D`/`hall_C` (PR→E 共役) + SubgroupESetup の E。
