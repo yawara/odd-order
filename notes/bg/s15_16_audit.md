@@ -88,6 +88,27 @@ deferred としている。そのうち **containment と M-正規性は §14 �
      不要に重い句を足して sorry を膨らませない。
 4. 本格証明は §14（H）/§13（F）landing 後。それまでは 1–3 を回す。
 
+## 5. §15-body 忠実性監査 (mmd L4166–4262, 2026-06-14 追加)
+
+§15 endpoint 全 9 件は **external citation 0**（freely fixable）。⚠ **monitor の sorry-不増 gate**
+ゆえ修正は「既存 sorry の強化/差替え」のみ可、**新 sorry'd theorem の追加は不可**（合流 abort）。
+
+| endpoint | mmd | verdict |
+|---|---|---|
+| `mf_hall_centralizer_control` (Cor 15.3) | L4204 | **✅ FIXED 2026-06-14** — 旧 scaffold は無関係な centralizer-escape 主張 (`C_G(X)≤M ∨ …`) で docstring (「centralizer and conjugacy control」) と不一致だった。mmd 15.3(a) `C_M(H)=C_{M_σ}(H)·X` (X cyclic τ₂) + (b) `N_M(H)`-fusion に restated (uncited, sorry-neutral) |
+| `typeP_kstar_in_mf` (Cor 15.6) | L4228 | ✅ **faithful**（K*≠1 cyclic ⊆ M_F∩M''、M_F 非巡回 — 5 句一致） |
+| `typeP_auxiliary_structure` (Lemma 15.1) | L4166 | ⚠ **narrowed + lossy**: scaffold は `IsTypeP M` 仮説を追加（mmd は **全 M ∈ ℳ**）→ type-F 失う。また 15.1(c) の「X は cyclic τ₂(M)-subgroup」が脱落（M(C_G(X))={M} のみ保持） |
+| `mf_ne_msigma_typeP1_structure` (Thm 15.2) | L4180 | ⚠ **organizational**: mmd 冒頭の一般鎖「1⊂M_F⊆M_σ⊆M'⊂M」が statement に無いが、その事実は **Theorem A に存在**（`MF≤Msigma`, `Msigma≤M'`）。M_F≠M_σ 分岐の 7 bullet は概ね faithful |
+| `fitting_decomposition` (Cor 15.5) | L4219 | ⚠ **lossy + 要検証**: mmd F(M)=F(M_σ)×Y を scaffold は `MF(Msigma M)⊔Y` で表現（**MF(M_σ) vs F(M_σ)** の等式は非自明・要確認）。(a)τ₂/(c)「H⊆M', M'/H nilpotent」/(d)「K≠1→F(M)⊆M'」脱落 |
+| `fitting_not_ti_cases` (Thm 15.7) | L4234 | ⚠ **known-deferred**（docstring 明記）: (d) E₃=1/E₂⊴E/E≅E₁、(e) 詳細 trichotomy（O_p/O_{p'}/exponent/Ω₁(Z(P))）が deferred。mmd の (a)(b)(c) + (e) 概形は捕捉 |
+| `tau2_transfer_constraint` (Thm 15.8) | L4264 | ⚠ 要精査: mmd「q=|K|, q は τ₂(H) 唯一の素数, τ₂(M)=∅」を scaffold は `tau2 M=∅ ∧ ∃q, tau2 N={q}`（**N vs H**、「q=|K|」脱落） |
+| `centralizer_escape_final_local` (Cor 15.9) | L4298 | ⬜ 未精査 |
+| `nilpotent_hall_embeds_in_mf` (Cor 15.4) | L4215 | ⬜ 未精査（mmd: nilpotent Hall H → M を H⊆M_σ に取れる） |
+
+**次の安全な fix（sorry-neutral 強化、優先順）**: Lemma 15.1(c) に「X cyclic ∧ τ₂」追加 / Cor 15.5 に
+(c)(d) 追加 + MF(M_σ)=F(M_σ) を別途確認 / Lemma 15.1 の `IsTypeP` 仮説除去（要 type-F 整合確認）。
+**Thm 15.2 一般鎖は新 theorem 不可（monitor gate）ゆえ Theorem A 経由で足りると判断、修正不要**。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
