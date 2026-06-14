@@ -1147,6 +1147,14 @@ theorem pSubgroup_le_derived_inf [Finite G] {M Mstar P Q : Subgroup G}
     rwa [← Subgroup.map_subtype_commutator Mstar] at h
   exact le_inf (hQcomm.trans hM) (hQcomm.trans hMs)
 
+/-- **極大 `q`-部分群は Sylow `q`-部分群**: `Q` が `H` の `q`-部分群で `q`-部分群について極大なら
+`Q` は Sylow。`Sylow` の `is_maximal'` フィールドで直接構成。 -/
+theorem sylow_of_maximal_pSubgroup {H : Type*} [Group H] [Finite H] {q : ℕ} [Fact q.Prime]
+    {Q : Subgroup H} (hQq : IsPGroup q ↥Q)
+    (hmax : ∀ T : Subgroup H, IsPGroup q ↥T → Q ≤ T → T = Q) :
+    ∃ S : Sylow q H, (S : Subgroup H) = Q :=
+  ⟨⟨Q, hQq, fun hTq hQT => hmax _ hTq hQT⟩, rfl⟩
+
 /-! ## §13 相互制約と transition (mmd L3630-3699) -/
 
 /-- **BG Lemma 13.8** (mmd L3630): 次の配置は不可能 — `M*∈ℳ` (`M`と非共役),
