@@ -2140,3 +2140,33 @@ cont.³² (pinning landed) 後、本 cont.³³ は **コード未 land の RECON
 cont.³² の (a2) 誤推奨を訂正し、R(χ) 統合の正確な map (既約/μ_j 2 ケース + 既存資産 + 未実装 = R(μ_j)
 package) を確定 = 必要な是正。**次ターンはアーキ判断 1 つ → BUILD (RECON ループを断つ)。**
 **正本=本 cont.³³。(a2) は廃棄。次=アーキ判断 (R(μ_j) package vs certainType_isCoherent 直結) → build。**
+
+## 2026-06-14 (session 40 cont.³⁴, /loop): ✅ reducible R(μ_j) の orthonormal core landed (BUILD)
+
+### アーキ判断 (確定): **R(μ_j) package を build する**
+(6.8.2.3) per-χ `(χ−aη₁)^τ=X₁−aY` は X₁⊥Y を要し、`certainType_isCoherent` (μ_j 内部 coherence、Y 非言及)
+単独では出ない。τ₂ 直接 assembly は per-constituent R(χᵢ) 分解 (irreducible: Dade R / reducible: R(μ_j))
+を要し、R(μ_j) は `OrthonormalCharacterImageFamily` として必要。⟹ build。
+
+### ✅ landed (f5c38fe3, axiom-clean 標準3, full build 3813/8.4s):
+**`certainTypeRImage` + `certainTypeRImage_inner`** (S06_CertainTypeCoherence 末尾):
+- `certainTypeRImage h χ₂ χ₂' : Bool × Fin w₁ → CF G` = R(μ_j) member family
+  (`(false,i)↦δ_j ω_{ij}^σ`, `(true,i)↦−δ_j ω_{ik}^σ`; match-def)。
+- `certainTypeRImage_inner` (χ₂≠χ₂'): `⟨R p, R q⟩ = [p=q]` (orthonormality)。証明 = `certainTypeOmegaSigma_inner`
+  (grid 直交) + sign=±1 (`sign_eq` ⟹ δ·δ̄=1, δ²=1) + 4-case (対角 ←mul_assoc+hδsq, 非対角 χ₂≠χ₂'⟹0)。
+- **R(μ_j) の orthonormal core (全 seam から decoupled な reusable piece)**。gotchas: `inner_smul_right`
+  は `RepresentationTheory.` 修飾必須 (mathlib `_root_.inner_smul_right` と曖昧); `↓reduceIte` で
+  `if False` を RHS 簡約; match-def で `cases bp` の ite 簡約が clean。
+
+### ▶ 残 R(μ_j) producer (`OrthonormalCharacterImageFamily (dadeICM h.dade0 h.tau) μ_j`):
+1. **imageSet** = `Finset.univ.image (certainTypeRImage h χ₂ χ₂')` (Bool×Fin w₁ 上)。injective は
+   orthonormality の系 (f p=f q ⟹ ⟨f p,f q⟩=1≠0 ⟹ p=q)。`orthonormal` field = `certainTypeRImage_inner`
+   + Finset.image membership (α=β ↔ index 一致)。`mem_ZIrr` = `certainTypeOmegaSigma_mem_ZIrr` + neg。
+2. **image_eq** (seam): `dadeICM h.dade0 h.tau (μ_j − μ_j.conj) = ∑_{α∈imageSet} α`。bridge =
+   (a) μ_j−μ_j.conj supported ⟹ dadeICM=toDadeMap (`dadeIntegralCharacterMap_apply_of_support`),
+   (b) `certainType_diff_dade_sum_eq` (toDadeMap (∑certainTypeDiffSupported)=sign•∑(ω−ω')),
+   (c) ∑certainTypeDiffSupported = μ_j−μ_k (Finset, columnSum=∑_i μ_{ij}),
+   (d) μ_k=μ_j.conj (`certainType_columnSum_conj`), (e) sign•∑(ω−ω')=∑_{α}α (imageSet 展開)。
+3. ⟹ R(μ_j) producer 完成 → per-constituent decomposition (irreducible は `decompositionDaFromDadeOfDiff`
+   既存; reducible は R(μ_j) + `ofProjection`) → (5.4.a)+pinning[済]+(5.4.b) → τ₂。
+**正本=本 cont.³⁴。orthonormal core landed (BUILD でループ脱出)。次=imageSet packaging (1.) → image_eq bridge (2.)。**
