@@ -545,3 +545,36 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
   は別部分) + Lem 12.17 (repo S12_E:72=`C_{Mσ}(E)⊆M_σ'∧[M_σ,E]=M_σ`、TI 部分と別命題) は**未形式化の可能性** →
   要調査/形式化。IsTypeP2→U≠1 (κ≠σ'∩π(M)⟹E₂'E₃'≠1) も step。
 **⟹ 両者 multi-fragment hard。(b1)=Frobenius 構造、(g)=cite-assembly+gap。focused work 推奨。**
+
+### ✅✅ case-τ₁ (b1) COMPLETE — Frobenius normalizer 論法 (2026-06-15 loop)
+**Prop 14.2 の `typeP_structure` は case-τ₁ (g) **1 本のみ** に縮小** (case-τ₃ 全 5 + case-τ₁ の
+WLOG/(a)/(K\*≠1)/(b1)/(d) 完了)。(b1) は「E₁ が U=E₂E₃ に regular 作用 (E=E₁⋉U Frobenius)」を
+repo machinery の assembly で構成し、Frobenius normalizer 論法で攻略 (sorry-free・axiom-clean、
+`#print axioms` = `[propext, Classical.choice, Quot.sound]`、full build green 3817 jobs ~59s)。
+
+新規 helper (S14、すべて SubgroupESetup パラメトリック・case-τ₁ 専用):
+- `actsRegularlyOn_E3_E1_of_kappa_inf_tau3_empty` (E₁ reg on E₃): κ∩τ₃=∅ で **Lem 13.7 の対偶** —
+  E₁ が E₃ に非regular なら E₁E₃ が M_σ に prime 作用 ⟹ 任意 x∈E₃# で C_{M_σ}(x)=C_{M_σ}(E₁)=K\*≠1
+  ⟹ κ∩τ₃ witness で矛盾。
+- `actsRegularlyOn_E2_E1_of_actsPrime` (E₁ reg on E₂): **Lem 13.12 の対偶** — g∈E₁# が y'∈E₂# (位数
+  q∈τ₂) を中心化すると、E₂ abelian (Cor 12.10b) の q-torsion `omega1OfAbelian E₂ q` が rank-2
+  A∈ℰ_q²(E) で y'∈A ⟹ C_A(⟨g₀⟩)≠1 ⟹ Lem 13.12 で C_{M_σ}(⟨g₀⟩)=1、prime action の K\*≠1 と矛盾。
+- `pRank_eq_of_le_of_not_dvd_index` (S12_Corollary1216 の private 版を S14 に複製) +
+  `exists_elemAb_rank_two_le_E_mem_of_tau2` (r_q(E₂)=r_q(E)=r_q(M)=2 を index-coprime 2 段で、
+  card(Ω₁)=q² を q²∣card ∧ log≤pRank=2 で)。
+- `actsRegularlyOn_E23_E1_of_caseTau1` (E₁ reg on U=E₂E₃): E₃⊴E (12.1b) + E₁≤N(E₂) (12.1e) +
+  E₂⊓E₃=⊥ で u=u₃u₂ 分解 (↥E, mem_sup_of_normal_left)、各因子が g-不変 ⟹ u=1。
+- `normalizer_inf_E_le_E1_of_caseTau1` (N_G(X)⊓E≤E₁): e=u·k 分解 (E₂E₃⊴E)、E₁ abelian で kgk⁻¹=g
+  ⟹ ugu⁻¹=ege⁻¹∈X≤E₁ ⟹ [u,g]∈E₁⊓(E₂E₃)=⊥ ⟹ u∈C_{E₂E₃}(g)=1。
+
+(b1) 本体 assembly: n=a·b (a∈M_σ, b∈E') ⟹ [a,bgb⁻¹]∈M_σ⊓E'=1 ⟹ ngn⁻¹=bgb⁻¹ ⟹ s':=b⁻¹n が g
+中心化 ⟹ s'∈C_{M_σ}(K)=K\* (prime action)、b=n·s'⁻¹∈N_G(X)⊓E'≤K (Helper) ⟹ n=b·s'∈K⊔K\*。
+
+🛑 **残 = case-τ₁ (g) のみ — BG Thm 3.10 + Lem 12.17 TI 形が repo 未形式化で gated**:
+- (g) chain (mmd L3850): U≠1 ⟹ E Frobenius/kernel U → **Lem 14.1**(C_{M_σ}(U)=1, M_σ nilp; repo 14.1
+  は単一 Sylow の Ω₁ 形 ⟹ π(U) の 1 素数を選び A_p≤U で橋渡し可) → **Thm 3.10(a)**(K prime on M_σ ⟹
+  |K| 素数; **repo 未形式化** = solvable Frobenius 群が nilpotent 群に作用する §3 定理) → U=[U,K]=E' →
+  **Lem 12.19**(E' が Hall β' を中心化, ✅) → β=σ → **Lem 12.17**(M_σ∩M_σ^g が β'-group ⟹ TI;
+  **repo 12.17 = `Msigma_E_relations` は C(E)⊓M_σ≤M_σ'∧[M_σ,E]=M_σ のみ、TI 部分は未形式化**)。
+- ⟹ (g) は §3 (Thm 3.10) + §12 (12.17 TI 拡張) の 2 新規形式化に gated。**§14 単独では解禁不可** ⟹
+  hub に報告 + issue 化推奨。case-τ₁ の他 4 conjunct + case-τ₃ 全 5 は完了。
