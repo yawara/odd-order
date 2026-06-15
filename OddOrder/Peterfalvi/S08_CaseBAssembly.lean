@@ -476,6 +476,34 @@ theorem caseB_irr_htau1_mema
     (ClassFunction.induce_mem_ZIrr H (IsIrreducibleCharacter.mem_ZIrr θ.2))
     (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) _)
 
+/-- **(6.8.2.3) irreducible-branch conjugate difference support** (`CaseBIrrBundle` conjunct).
+`(Ind^L_H θ).conj − Ind^L_H θ` is `H^#`-supported, with no irreducibility assumption: both terms are
+supported on `H` (`support_induce_subset_of_normal`, conj preserves support), and the difference
+vanishes at `1` since `(Ind^L_H θ)(1) = |W₁|·θ(1)` is a (real) positive integer fixed by `star`. -/
+theorem caseB_irr_conj_diff_support
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (θ : IrreducibleCharacter ↥H) :
+    ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+        - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  have hsupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆ (H : Set ↥L) :=
+    ClassFunction.support_induce_subset_of_normal H _
+  intro x hx
+  rw [ClassFunction.mem_support, ClassFunction.sub_apply] at hx
+  have hxH : x ∈ H := by
+    by_contra hxnotH
+    have h1 : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) x = 0 := by
+      by_contra h; exact hxnotH (hsupp (ClassFunction.mem_support.mpr h))
+    exact hx (by rw [ClassFunction.conj_apply, h1, star_zero, sub_zero])
+  have hxne : x ≠ 1 := by
+    intro hx1
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    refine hx ?_
+    rw [hx1, ClassFunction.conj_apply, ClassFunction.induce_apply_one, hd]
+    simp [← Nat.cast_mul]
+  change (x : G) ∈ sharpImage H
+  exact ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, fun hx1G => hxne (Subtype.ext hx1G)⟩
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
