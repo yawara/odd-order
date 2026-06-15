@@ -440,4 +440,40 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
     intro a
     rw [quotientMulAutHom_apply_mk', hc a]
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **Converse of step 1** (mmd L1243, the `R₀`-centralizes-`K̄` direction): if `⁅K, R⁆ ⊆ F(K)`
+(`R` centralizes `K̄`), then `R` fixes every element of `K̄ = ↥K / F(K)` (the induced action's
+fixed points are `⊤`).  This is the reverse of `commutator_le_fitting_of_centralizes_fittingQuotient`:
+`⁅K, R⁆ = (actionCommutator φ).map K.subtype ⊆ F(K)` forces `actionCommutator φ ⊆ F(K) = ker`, so
+the induced quotient action commutator is `⊥` (`actionCommutator_quotient_eq_map`), i.e. the action
+on `K̄` is trivial (`actionCommutator_eq_bot_iff_acts_trivially`). -/
+theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
+    {G : Type*} [Group G] [Finite G] {K R : Subgroup G} [K.Normal]
+    (hRK : R ≤ Subgroup.normalizer (K : Set G))
+    (hcomm : ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
+    Subgroup.fixedPointsOfMulAut (quotientMulAutHom
+      (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
+        (H := OddOrder.Isaacs.Ch01.fitting ↥K)
+        ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)))) = ⊤ := by
+  set φ : ↥R →* MulAut ↥K :=
+    (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK) with hφ
+  have hFinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting ↥K) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+  -- `actionCommutator φ ≤ F(K)`, by injectivity of `K.subtype` from `⁅K, R⁆ ⊆ F(K)`.
+  have hac_le : OddOrder.Isaacs.Ch04.actionCommutator φ ≤ OddOrder.Isaacs.Ch01.fitting ↥K := by
+    have h := OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hRK
+    rw [← h] at hcomm
+    exact Subgroup.map_le_map_iff_of_injective K.subtype_injective |>.mp hcomm
+  -- The induced quotient action commutator is `⊥`.
+  have hbot : OddOrder.Isaacs.Ch04.actionCommutator (quotientMulAutHom hFinv) = ⊥ := by
+    rw [OddOrder.Isaacs.Ch04.actionCommutator_quotient_eq_map, Subgroup.map_eq_bot_iff,
+      QuotientGroup.ker_mk']
+    exact hac_le
+  -- Trivial action ⟹ fixed points are `⊤`.
+  rw [Subgroup.eq_top_iff']
+  intro g
+  rw [Subgroup.mem_fixedPointsOfMulAut]
+  intro a
+  exact (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
+
 end OddOrder.BG.Ch1.S03h
