@@ -583,6 +583,40 @@ lemma fourteen_eleven_three (ψ : Character G) (g : G)
 
 ---
 
+## 🛑 2026-06-15 (Lane F) POLE-2 deep-dive: `field_normalizer_structure` は deeply gated — hub re-plan 要請
+
+**結論**: POLE-2 = `field_normalizer_structure` (`S16_NonExistenceG.lean:1965`, FT critical path:
+`AppC.final_contradiction → nonexistence_of_G → field_normalizer_structure`) を non-trap で前進
+させる ungated landable chunk は**存在しない**。LAUNCH (旧 hub 指令) の「(14.x) arithmetic cascade +
+carrier witness が ungated landable」前提は、mmd+code 精査の結果**成立しない**。
+
+### 根拠 (mmd `04.16` + code)
+- **(14.2) は全ケースが (14.7) に funnel**: mmd Conclusion =「By (14.12), (14.16) and (14.7)」。
+  - (14.12) L conj M → H cyclic → U char in H → (14.7);
+  - (14.16) non-conjugate → H=U → U char in H (自明) → (14.7);
+  - U char 直接 → (14.7)。
+  ⟹ `field_normalizer_structure` の実体 = **(14.7) `field_normalizer_of_U_characteristic`** (`:200` sorry)。
+- **(14.7) は深く gated**: mmd 証明 (L43) が (13.2.b)/(14.5)/(14.6)/(9.7)/(13.12)/(13.15) を要する
+  = S13/S15 scaffold (sorried) + PU≅F⋊U* 同型 (P≅GF(p^q) の §14 構造 = `basic_structure` 13.2、S15 sorry)。
+- **arithmetic cascade は既に proven**: `key_inequality_of_caseB_outputs` (`:695`),
+  `norm_error_terms_lt_inv_q` (`:765`, AxiomsCheck 登録), exp/log helper 群 (`:210-300`),
+  `key_ratio_inequality_of_caseB_data` 等 — 残 landable arithmetic 無し (sorried (14.x) は全て
+  構造/character producer: `caseB_for_T/S`, `T_typeII`, `exists_y_L_structure`, `orthogonality_switch`)。
+- **carrier `FieldNormalizerData.cyclotomic_coprime`** (`Core:626`): `cyclotomic_quotient_coprime_of_not_modEq_one`
+  で discharge 可だが `¬ p≡1 [MOD q]` 必要 → `u_final_value` (→ `orthogonality_switch` sorry) に gated。
+- **non-trap skeleton 不可**: POLE-1 と異なり mechanical derivation の余地が無い。dispatch は sorried (14.7)
+  producer を **call** せざるを得ず axiom-clean にならない (= LAUNCH 警告の trap)。axiom-clean 版は
+  結論を hoist = zero value ([[scaffold-sorry-free-not-done]])。
+
+### 状態 / 推奨
+- **POLE-1 は完了** (`sectionSixteenHypothesis_of_inputs` sorry-free + axiom-clean、main 合流済)。
+- **POLE-2 を non-trap で進める唯一の道 = (14.7) の真の核 (PU≅F⋊U* + u=full の §16 構造) に正面着手**だが、
+  §13-15 scaffold + lane B char API に gated で多 session・着地不確実。
+- ⟹ **hub re-plan 要請** (ユーザー裁可 2026-06-15): F を ungated な別 FT-path タスクに再配分、または
+  POLE-2 は §13-15 / lane B landing 後に再開。F は POLE-1 維持のまま待機。
+
+---
+
 *作成: 2026-05-22*
 *スコープ*: Peterfalvi §16 pp.87-92 (184 行, 11 結果 (14.1)-(14.11))
 *形式化先 (予定)**: OddOrder/Peterfalvi/S16_NonExistenceG.lean (1000-1200 行)
