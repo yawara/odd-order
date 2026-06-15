@@ -11,8 +11,8 @@
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
 | **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | **POLE-2 carrier slice** (`S16_NonExistenceG` tail `field_normalizer_structure:6849`, gated-endpoint skeleton + ungated arith cascade); POLE-1 primary 完了 (`a2575ec6`) | Opus 4.8 (1M) | ✅ 対象 |
-| **G** | `lane-g` | BG §15/§16 `_of_inputs` sorry-free skeleton 前倒し (Thm 15.2/Cor 15.3/Thm 15.7 + Thm D; §14 obligation を named residual 化、H の 14.7 着地で自動 unconditional) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | **BG §16 全体所有** (`S16_MainResults` + `S16_NonExistenceG` + `FeitThompson` POLE-1): 即時 = Thm II cite-compress (`theoremII_tame_embedding:526`, issue 8009) → POLE-2 (gated, 再開待ち)。POLE-1 完了 (`a2575ec6`) | Opus 4.8 (1M) | ✅ 対象 |
+| **G** | `lane-g` | **BG §15 専念** (`S15_MF` のみ; §16 は F に移管): `_of_inputs` sorry-free skeleton (Thm 15.2/Thm 15.7 + M_F + Cor 15.x) を §14 obligation named residual 化 | Opus 4.8 (1M) | ✅ 対象 |
 | **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
 
 **G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
@@ -145,6 +145,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-15 (夜²) — §16 集約 re-split (F↔G, ユーザー裁可) + Prop 14.2 COMPLETE**:
+  H が **BG Prop 14.2 `typeP_structure` を sorry-free + axiom-clean で COMPLETE** (`f031f7bc`, (g) discharge,
+  issue 2007 close) = long pole funnel keystone。実 sorry 144→143。次 long-pole gate = Thm 14.7 `typeP_duality`
+  (§16 structure = Mstar ∃!/M̃/Lem 14.6 に cross-lane gated)。
+  - **F の POLE-2 は deeply gated 判明** (F deep-dive: arith cascade 既証明、全 dispatch が sorried producer
+    funnel) → scout で ungated task 精査 → 唯一 = Thm II cite-compress だが G の file (collision)。
+  - **⟹ §16 を F に集約 (ownership re-split, ユーザー裁可)**: **F = BG §16 全体** (`S16_MainResults` +
+    `S16_NonExistenceG` + `FeitThompson` POLE-1)。即時 = Thm II cite-compress (issue 8009, G→F 移管)。
+    POLE-2 は §16 character cascade landing 後に同所有で再開。**G = §15 専念** (`S15_MF` のみ)。
+    G は今後 `S16_MainResults` を触らない (cite のみ)。clean handoff (G の §16 WIP は合流済・残無し)。
 
 - **2026-06-15 (夜) — レーン再配分 (11-agent code-verified review + ユーザー裁可) + S16 prefix-split**:
   全レーン synced + warm (main `b66af8aa`)。再配分レビューで判明・確定:
