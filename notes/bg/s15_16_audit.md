@@ -381,6 +381,54 @@ M_F=sSup{冪零正規 Hall} は正規 join=積 ゆえ各 p∈π(M_F) で full Sy
 の一般元 conjugacy に gate)/ Thm 15.7-15.9(§16-feeder)。** 次は §16-feeder の cite-compress か
 deep core(大commitment)— ユーザー裁可待ち。
 
+## 13. `_of_inputs` skeleton 前倒し — 完了 + 「glue を持つ skeleton は尽きた」結論 (2026-06-15, `1d32a3cd`/`cd29c168`)
+
+LAUNCH (2026-06-15 夜) の「sorry-free `_of_inputs` skeleton pre-positioning」を実行。
+**結論: §15/§16 で genuine §14-非依存 glue を持つ skeleton は Cor 15.3 と Thm D の 2 つのみで、両方
+landing 済。残りは全て passthrough(skeleton 無価値)か deep core(skeleton 化不能)。**
+
+### 13.1 landing した 2 engine + 1 補題(全 sorry-free・axiom-clean)
+
+- **`S15.mf_hall_centralizer_control_of_inputs`** (Cor 15.3, `1d32a3cd`): (a) passthrough +
+  (b) **Frattini fusion glue**(genuine)。仮説 = `ha`(Prop 14.2(b1)(e)+Lem 15.1(c))/
+  `hconj`(Thm 14.4+自己正規化)/`hfratt`(Thm 15.2 の Q + Frattini argument)。核心 glue =
+  H⋬M 枝の交換子論法: `m=n·a`(n∈N_M(H),a∈Q)⟹ `w=axa⁻¹∈H` ∧ `wx⁻¹∈Q` ⟹ `wx⁻¹∈Q∩H=1`
+  ⟹ `y=nxn⁻¹`。**Cor 15.3(b) は §16(`S16:384` Thm I fusion + Thm D(1))が consume = funnel 直結。**
+- **`S15.normalizer_Msigma_eq_self`** (`cd29c168`): **N_G(M_σ)=M**(任意 maximal M)。
+  M_σ=O_{σ(M)}(M)⊴M ⟹ M≤N_G(M_σ); 真の包含 ⟹ N_G(M_σ)=G(極大性)⟹ M_σ⊴G ⟹ M_σ∈{⊥,⊤}
+  (simple、両方除外: `Msigma_ne_bot` / M_σ≤M⊊G)。**再利用可能な §14-非依存 brick。**
+- **`S16.theoremD_..._of_inputs`** (Thm D, `cd29c168`): mmd L4440 が Thm D を **schematic** と明記
+  (D(1)←15.3(b), D(2)←12.17, D(3)(4)←14.4(b)+A(8)+15.9)= upstream の純 assembly。**genuine glue
+  は D(1)**: Cor 15.3(b)[H:=M_σ] の N_G(M_σ)-fusion を `normalizer_Msigma_eq_self` で M-fusion に
+  upgrade。D(2)/D(3)/D(4) は source からそのまま。**Thm II conjunct 3(funnel 終端)を feed。**
+
+### 13.2 残 §15/§16 endpoint の skeleton 適性 verdict(再調査不要)
+
+| endpoint | verdict | 理由 |
+|---|---|---|
+| **Cor 15.3** | ✅ engine landed | Frattini glue(genuine) |
+| **Thm D** | ✅ engine landed | D(1) の N_G(M_σ)=M glue(genuine) |
+| **Thm A/B/C/E** | ❌ skeleton 無価値 | mmd schematic = **各 conjunct が単一 upstream 結果**(A: 10.2b/15.1a/14.2/15.2a等→各句; B: 12.1d/12.5b/15.1→各句; C/E 同様)。glue 0 ⟹ `_of_inputs` は恒等関数 `(h:Concl):Concl:=h` で無意味 |
+| **Thm 15.2** | ❌ deep core | Q₀/Q₁ minimal-normal + Frobenius(Thm 3.10)論法が**証明本体**。§14 入力(Lem14.1/14.7f/14.2a)を仮説化しても残りは §1-§6 の hard math で、skeleton でなく multi-day 形式化 |
+| **Thm 15.7** | ❌ deep core/large | case 解析(H abelian→type F / 非abelian→cond 2/3)+ rank 論法(Cor10.7/Thm2.5)が本体。§10-13 lemma を多数仮説化する必要 + glue は薄い |
+| **Prop 16.1** | ❌ intricate | Type I-V 定義(条件 (Ii)-(Iv)/(T1)-(T7))と §14 family の照合が本体。多数 cite(A5/6/7/8, B1-4, C1/2/3/8/10, D1, 15.7c, 15.2a)+ 定義 unfold で ~50+行。skeleton でなく実証明 |
+| **Thm II** | — defer | (Tii)/(Tiii) lossy 復元は Pf consumer 出現待ち(section 12.3、issue 8005) |
+
+⟹ **Lane G の `_of_inputs` skeleton 余地は Cor 15.3 + Thm D で尽きた。** 次の substantive 進捗は
+(i) §14(Lane H)proof landing 後の **wrapper 配線**(各 endpoint で「§14 cite + skeleton 適用」)、
+(ii) deep core(15.2/15.7)の実証明(§14 + §1-§13 lemma landing 後、multi-day)、
+(iii) deferred §14-非依存 brick。
+
+### 13.3 deferred §14-非依存 brick: Frattini factorization lemma(issue 8010)
+
+Cor 15.3 wrapper の `hfratt` discharge に要る §14-非依存補題(未 landing):
+`Q⊴M, QH⊴M, Q∩H=1, coprime(|Q|,|H|), solvable ⟹ ∀m∈M, ∃n∈N_G(H),a∈Q, m=n·a`。
+証明 = `IsComplement'.exists_conj_of_coprime`(SZ 補群共役, repo 既存)を ↥(Q⊔H) 内で適用
+(H と conj m⁻¹•H は Q の補群 ⟹ Q-共役 q を得て n:=m·q, a:=q⁻¹)。~60-80行の subgroupOf juggling。
+**優先度低**: Cor 15.3 wrapper の真の binding constraint は `hconj`(Thm 14.4 conjugacy、§16 RData に
+deferred)ゆえ、Frattini brick だけ landing しても wrapper は完成しない。§16 RData/Thm 14.4 conjugacy
+が近づいたら building。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
