@@ -675,3 +675,25 @@ branch 2 が Lem 12.11(a)+Cor 12.16+ℓ_σ chain。各 ~60-80 行。** → 14.4 
 - ⟹ **14.3 完成には Hall-D (or Sylow-workaround) が前提**。14.4 も R(x) headline は §16 gate。
   **推奨: Hall-D を Ch03 に形式化してから 14.3 branch 1**(Hall-D は Cor 10.9 等でも要る汎用 lemma)、
   または 14.3 を Hall-D landing 待ちで保留し別 FT-path タスクへ。hub に cross-cutting Hall-D 需要を報告。
+
+### ✅ 14.3 infra COMPLETE — hall_D 発見で branch 1 unblock (2026-06-15, lane-h)
+**🔑 訂正: `Ch03.hall_D` (Isaacs 3C.1 Wielandt, π-subgroup ⊆ Hall π in solvable) は形式化済**
+(`Main.lean:1486`)。前項「Hall-D 未形式化」「Sylow workaround 要」は **stale** — hall_D 直用で branch 1 の
+Hall-containment が unblock。14.3 が要する infra は全 landing:
+- ✅ `exists_isHallSubgroup_kappa_ge` (κ-subgroup ≤ Hall κ of M, hall_D 経由, commit `6263b1d6`)。
+- ✅ `maximalContaining_centralizer_eq_singleton_of_tau2_element` (branch-2 ℳ-piece, `3e702d74`)。
+- ✅ Prop 14.2(c) (typeP_structure 第6 conjunct, `4283fad8`)。
+**残 = 14.3 assembly のみ** (2-branch、各 deep だが infra 揃い):
+- **branch 1** (∃ p₀∈π(⟨x'⟩)∩(τ₁∪τ₃)): X₀=order-p₀ in ⟨x'⟩ (Cauchy) → x∈C_{Mσ}(X₀)≠⊥ → p₀∈κ →
+  `exists_isHallSubgroup_kappa_ge` で K⊇X₀ + U=Hall(κ∪σ)' (hall_E_exists+map) → typeP_structure(K) の
+  (b1)+(c) → **x'∈K** [C_M(x')⊆N_M(X₀)=K⊔Kstar=K×Kstar (K∩Kstar=1 coprime, [K,Kstar]=1 since
+  Kstar=C_{Mσ}(K)); x' σ'-elt の σ'-projection で K-part のみ ⟹ x'∈K; ~20 行 fiddly] →
+  π(⟨x'⟩)⊆π(K)⊆κ; x∈Kstar (=C_{Mσ}(X₀)⊆Mσ⊓(K⊔Kstar)) → X₁=order-p in ⟨x⟩ ∈ℰ¹(Kstar) → (c) →
+  ℳ(C_G(X₁))={M} → C_G(x)⊆C_G(X₁)⊆M。
+- **branch 2** (∀p∈π(⟨x'⟩), p∈τ₂): ℳ-part ✅ (ℳ-piece, C_{Mσ}(x')≠⊥ は x∈Mσ⊓C(x'))。
+  残 **ℓ_σ(x')=1** = `(D.length_one_iff x').mpr ⟨hx'1, hne⟩`, hne=(maximalSigmaSubgroupsOfElement x').Nonempty
+  = ∃M', x'∈M'_σ。chain: q∈π(⟨x'⟩)⊆τ₂(M), A∈ℰ_q²(E), M*∈ℳ(N_G(A)) → Lem 12.11(a)
+  `tau2_prime_mem_sigma_diff_beta` で q∈σ(M*) → ⟨x'⟩ σ(M*)-group → **要 ⟨x'⟩≤M*** (x'∈M だが M* は別)
+  → Cor 12.16 一般形 (σ(M*)-subgroup of G は M*_σ に共役) + σ-core conj-equivariance (`sigma_conj`✅)。
+  **⚠ ℓ_σ が最深** (⟨x'⟩→M* の取り込み + Cor 12.16 一般形 [repo `sigma_subgroup_conj_into_Msigma` は Y≤M* 要])。
+- ⟹ **assembly 2 件 (x'∈K σ'-projection [~20行] + ℓ_σ chain [~40行]) が 14.3 完成の残**。infra は全部 repo 在。
