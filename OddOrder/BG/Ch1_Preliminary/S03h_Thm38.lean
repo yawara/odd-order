@@ -83,4 +83,55 @@ theorem commutator_acts_trivially_via_thm34 {s : ℕ} [Fact s.Prime]
   rw [hρ_apply] at happ
   exact congrArg Additive.toMul happ
 
+open OddOrder.GroupTheory in
+/-- **Coprime (`q ≠ p`) branch of BG Theorem 3.8's chief-factor analysis** (leaf B).  For a
+`G`-chief factor `X/Y` elementary abelian of prime `s`, with `L ⊴ G` centralizing `X/Y` and `R`
+acting fixed-point-freely on `X/Y`, if `G = KR` modulo `L` satisfies the Theorem 3.4 hypotheses
+(`K/L` complements the prime-order `R/L`, coprime orders, `G/L` odd, `s ∤ |G/L|`), then `⁅R, K⁆`
+centralizes `X/Y` (i.e. `⁅R, K⁆ ≤ chiefFactorCentralizer X Y`).  The `q ≠ p` analog of
+`S03c.coprime_kernel_le_chiefFactorCentralizer`, with the Frobenius argument replaced by Theorem
+3.4 (`commutator_acts_trivially_via_thm34`).  Note the conclusion is on `⁅R, K⁆` (not `K`):
+Theorem 3.4 only controls the commutator. -/
+theorem commutator_le_chiefFactorCentralizer_via_thm34
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    [K.Normal] [X.Normal] [Y.Normal] {s : ℕ} [Fact s.Prime]
+    (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
+    {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
+    (hcompl : (K.map (QuotientGroup.mk' L)).IsComplement' (R.map (QuotientGroup.mk' L)))
+    (hHall : Nat.Coprime (Nat.card ↥(K.map (QuotientGroup.mk' L)))
+      (Nat.card ↥(R.map (QuotientGroup.mk' L))))
+    (hRp : ∃ p : ℕ, p.Prime ∧ Nat.card ↥(R.map (QuotientGroup.mk' L)) = p)
+    (hodd : Odd (Nat.card (G ⧸ L)))
+    (hchar : ¬ s ∣ Nat.card (G ⧸ L))
+    (hFPF : letI := S03c.chiefFactorConjAction X Y
+            ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1) :
+    ⁅R, K⁆ ≤ chiefFactorCentralizer X Y := by
+  haveI : NeZero s := ⟨(Fact.out : s.Prime).ne_zero⟩
+  haveI : IsSolvable (G ⧸ L) := solvable_of_surjective (QuotientGroup.mk'_surjective L)
+  haveI : (K.map (QuotientGroup.mk' L)).Normal :=
+    (inferInstance : K.Normal).map (QuotientGroup.mk' L) (QuotientGroup.mk'_surjective L)
+  letI : CommGroup (↥X ⧸ Y.subgroupOf X) :=
+    { (inferInstance : Group (↥X ⧸ Y.subgroupOf X)) with mul_comm := hVelem.comm }
+  letI := hVelem.zmodModule
+  letI := S03c.chiefFactorConjAction X Y
+  have hL : ∀ l : G, l ∈ L → ∀ v : ↥X ⧸ Y.subgroupOf X, l • v = v := by
+    intro l hl v
+    exact (S03c.chiefFactorConjAction_smul_eq_self_iff_mem l).mpr (hLcent hl) v
+  letI := mulDistribMulActionQuotientOfTrivial L hL
+  have hFPF' : ∀ v : ↥X ⧸ Y.subgroupOf X,
+      (∀ r : R.map (QuotientGroup.mk' L), (r : G ⧸ L) • v = v) → v = 1 := by
+    intro v hv
+    refine hFPF v (fun r => ?_)
+    rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (r : G) v]
+    exact hv ⟨QuotientGroup.mk' L (r : G), ⟨r, r.2, rfl⟩⟩
+  have hKtriv := commutator_acts_trivially_via_thm34 hcompl hHall hRp hodd hchar hFPF'
+  intro x hx
+  refine (S03c.chiefFactorConjAction_smul_eq_self_iff_mem x).mp (fun v => ?_)
+  rw [← mulDistribMulActionQuotientOfTrivial_smul_mk hL (x : G) v]
+  have hxmem : QuotientGroup.mk' L x ∈
+      ⁅R.map (QuotientGroup.mk' L), K.map (QuotientGroup.mk' L)⁆ := by
+    rw [← Subgroup.map_commutator]
+    exact Subgroup.mem_map_of_mem _ hx
+  exact hKtriv (QuotientGroup.mk' L x) hxmem v
+
 end OddOrder.BG.Ch1.S03h
