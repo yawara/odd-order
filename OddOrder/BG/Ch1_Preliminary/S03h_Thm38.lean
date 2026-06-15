@@ -563,4 +563,451 @@ theorem fitting_map_eq_of_normal_of_fitting_le
         (Subgroup.subgroupOf_map_subtype _ P).symm
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥P).map P.subtype := Subgroup.map_mono hle
 
+/-- **Complement transport to a sup** (`|RK|`-induction plumbing for BG Theorem 3.8): if `A ⊴ G`
+is disjoint from `B`, then inside `↥(A ⊔ B)` the restricted `A` complements the restricted `B`.
+Used to feed both inductive sub-configurations (`P R` and `K R₀`) to the induction hypothesis. -/
+theorem isComplement'_subgroupOf_sup_of_normal
+    {G : Type*} [Group G] {A B : Subgroup G} [A.Normal] (hAB : Disjoint A B) :
+    (A.subgroupOf (A ⊔ B)).IsComplement' (B.subgroupOf (A ⊔ B)) := by
+  have hAB_bot : A ⊓ B = ⊥ := hAB.eq_bot
+  refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+  · refine disjoint_iff.mpr (eq_bot_iff.mpr (fun x hx => ?_))
+    rw [Subgroup.mem_inf] at hx
+    simp only [Subgroup.mem_subgroupOf] at hx
+    have hmem : (x : G) ∈ A ⊓ B := ⟨hx.1, hx.2⟩
+    rw [hAB_bot, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext (by simpa using hmem)
+  · ext g
+    simp only [Set.mem_mul, Set.mem_univ, iff_true]
+    have hgset : (g : G) ∈ (↑A : Set G) * (↑B : Set G) := by
+      rw [← Subgroup.normal_mul A B]; exact g.2
+    obtain ⟨a, ha, b, hb, hab⟩ := hgset
+    exact ⟨⟨a, (le_sup_left : A ≤ A ⊔ B) ha⟩, Subgroup.mem_subgroupOf.mpr ha,
+      ⟨b, (le_sup_right : B ≤ A ⊔ B) hb⟩, Subgroup.mem_subgroupOf.mpr hb,
+      Subtype.ext (by simpa using hab)⟩
+
+/-- **Sylow extraction** (`|RK|`-induction plumbing for BG Theorem 3.8, mmd L1233): since
+`F(Q) = ⨆_p O_p(Q)` (the Fitting subgroup is the join of the `p`-cores, by definition), if `F(Q)` is
+*not* contained in a subgroup `S`, then some `p`-core `O_p(Q)` is not contained in `S` either.
+(Applied with `Q = K̄`, `S = C_K̄(R)` to find a non-`R`-centralized Sylow of `F(K̄)`.) -/
+theorem exists_opCore_not_le_of_fitting_not_le
+    {Q : Type*} [Group Q] {S : Subgroup Q} (hS : ¬ OddOrder.Isaacs.Ch01.fitting Q ≤ S) :
+    ∃ p : Nat.Primes, ¬ OddOrder.Isaacs.Ch01.opCore (p : ℕ) Q ≤ S := by
+  by_contra h
+  push_neg at h
+  exact hS (iSup_le h)
+
+/-- The image of `F(A)` under an isomorphism `e : A ≃* B` is contained in `F(B)` (one direction of
+`fitting_map_mulEquiv`): the image of the nilpotent normal `F(A)` is nilpotent and normal in `B`. -/
+theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Finite B]
+    (e : A ≃* B) :
+    (OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom ≤ OddOrder.Isaacs.Ch01.fitting B := by
+  haveI : Group.IsNilpotent (OddOrder.Isaacs.Ch01.fitting A) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom) :=
+    nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective _ e.toMonoidHom e.injective)
+  haveI : ((OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom).Normal :=
+    (OddOrder.Isaacs.Ch01.fitting.normal A).map e.toMonoidHom e.surjective
+  exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+
+/-- **Fitting subgroup is preserved by isomorphisms** (`|RK|`-induction plumbing for BG Theorem 3.8):
+`e : A ≃* B` carries `F(A)` onto `F(B)`.  Used to identify the Fitting subgroup of an inductive
+sub-configuration `K'.subgroupOf S` with that of `K'`. -/
+theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
+    (OddOrder.Isaacs.Ch01.fitting A).map e.toMonoidHom = OddOrder.Isaacs.Ch01.fitting B := by
+  haveI : Finite B := Finite.of_equiv A e.toEquiv
+  refine le_antisymm (fitting_map_mulEquiv_le e) (fun y hy => ?_)
+  have hsy : e.symm y ∈ OddOrder.Isaacs.Ch01.fitting A :=
+    fitting_map_mulEquiv_le e.symm (by simpa using Subgroup.mem_map_of_mem e.symm.toMonoidHom hy)
+  simpa using Subgroup.mem_map_of_mem e.toMonoidHom hsy
+
+/-- **`p`-group transfer across `K ↠ K/N`** (`|RK|`-induction plumbing for BG Theorem 3.8): if the
+quotient `↥K / N` is a `p`-group, then so is the image `K · (N·K)/(N·K)` of `K` in `G / (N.map K.subtype)`
+(both are `↥K / N`).  Used to upgrade `K̄ = ↥K / F(K)` being a `p`-group to the form
+`IsPGroup p (K.map (mk' (F(K).map K.subtype)))` required by `commutator_le_fitting_of_reduced`. -/
+theorem isPGroup_map_mk'_subtype_of_isPGroup_quotient {G : Type*} [Group G] {K : Subgroup G}
+    {N : Subgroup ↥K} [N.Normal] [(N.map K.subtype).Normal] {q : ℕ}
+    (hq : IsPGroup q (↥K ⧸ N)) :
+    IsPGroup q (K.map (QuotientGroup.mk' (N.map K.subtype))) := by
+  intro x
+  obtain ⟨g, hgK, hgx⟩ := x.2
+  obtain ⟨n, hn⟩ := hq (QuotientGroup.mk' N ⟨g, hgK⟩)
+  refine ⟨n, ?_⟩
+  have hgN : (⟨g, hgK⟩ : ↥K) ^ q ^ n ∈ N := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply, map_pow]
+    exact hn
+  have hgL : (g : G) ^ q ^ n ∈ N.map K.subtype := by
+    simpa using Subgroup.mem_map_of_mem K.subtype hgN
+  apply Subtype.ext
+  show ((x : G ⧸ N.map K.subtype)) ^ q ^ n = 1
+  rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+  exact hgL
+
+/-- **Conclusion transport from a sub-configuration** (`|RK|`-induction plumbing for BG Theorem 3.8):
+if the induction hypothesis gives `⁅A', B'⁆ ⊆ F(A')` for the restrictions `A' = A.subgroupOf (A⊔B)`,
+`B' = B.subgroupOf (A⊔B)` inside `↥(A⊔B)`, then pushing forward along `↥(A⊔B) ↪ G` yields
+`⁅A, B⁆ ⊆ F(A)` in `G`.  The commutator side uses `map_commutator` + `subgroupOf_map_subtype`; the
+Fitting side uses `map_map` and `fitting_map_mulEquiv` (via `↥A' ≃* ↥A`). -/
+theorem commutator_le_fitting_of_subgroupOf_sup {G : Type*} [Group G] [Finite G]
+    {A B : Subgroup G}
+    (h : ⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆ ≤
+      (OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map (A.subgroupOf (A ⊔ B)).subtype) :
+    ⁅A, B⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := by
+  have hAS : A ≤ A ⊔ B := le_sup_left
+  have hBS : B ≤ A ⊔ B := le_sup_right
+  set e := Subgroup.subgroupOfEquivOfLe hAS with he
+  have hcomp : (A ⊔ B).subtype.comp (A.subgroupOf (A ⊔ B)).subtype =
+      A.subtype.comp e.toMonoidHom := by ext a'; rfl
+  have key : ((OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map
+        (A.subgroupOf (A ⊔ B)).subtype).map (A ⊔ B).subtype =
+      (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := by
+    rw [Subgroup.map_map, hcomp, ← Subgroup.map_map, fitting_map_mulEquiv e]
+  have hcomm : (⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆).map (A ⊔ B).subtype = ⁅A, B⁆ := by
+    rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hAS, inf_eq_left.mpr hBS]
+  calc ⁅A, B⁆ = (⁅A.subgroupOf (A ⊔ B), B.subgroupOf (A ⊔ B)⁆).map (A ⊔ B).subtype := hcomm.symm
+    _ ≤ ((OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf (A ⊔ B))).map
+          (A.subgroupOf (A ⊔ B)).subtype).map (A ⊔ B).subtype := Subgroup.map_mono h
+    _ = (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype := key
+
+/-- **Centralizer in a subgroup, via `subgroupOf`** (`|RK|`-induction plumbing for BG Theorem 3.8):
+the centralizer inside `↥S` of a set `T ⊆ ↥S` is the restriction to `↥S` of the ambient centralizer
+of `T`'s image in `G`.  Lets the induction's conditions (2), (3) — equalities of `C_K(·)`'s — be
+transported between `G` and a sub-configuration `↥(A ⊔ B)`. -/
+theorem centralizer_subgroupOf {G : Type*} [Group G] {S : Subgroup G} (T : Set ↥S) :
+    Subgroup.centralizer T = (Subgroup.centralizer (S.subtype '' T)).subgroupOf S := by
+  ext s
+  rw [Subgroup.mem_centralizer_iff, Subgroup.mem_subgroupOf, Subgroup.mem_centralizer_iff]
+  constructor
+  · rintro hs g ⟨t, ht, rfl⟩
+    simpa only [map_mul] using congrArg (S.subtype) (hs t ht)
+  · intro hs t ht
+    apply Subtype.ext
+    rw [Subgroup.coe_mul, Subgroup.coe_mul]
+    exact hs (S.subtype t) ⟨t, ht, rfl⟩
+
+/-- **Fitting of a sub-configuration, via `subgroupOf`** (`|RK|`-induction plumbing for BG Theorem
+3.8): for `A ≤ S`, the Fitting subgroup of `A.subgroupOf S` (pushed into `↥S`) is the restriction to
+`↥S` of `F(A)` (pushed into `G`).  Lets condition (3) — `C_{F(A)}(·) = ⊥` — transport between `G`
+and `↥S`.  Same `map_map` + `fitting_map_mulEquiv` argument as `commutator_le_fitting_of_subgroupOf_sup`. -/
+theorem fitting_subgroupOf_map_subtype_eq {G : Type*} [Group G] [Finite G] {A S : Subgroup G}
+    (hAS : A ≤ S) :
+    (OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf S)).map (A.subgroupOf S).subtype =
+      ((OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype).subgroupOf S := by
+  apply Subgroup.map_injective S.subtype_injective
+  have hLS : (OddOrder.Isaacs.Ch01.fitting ↥A).map A.subtype ≤ S :=
+    (Subgroup.map_subtype_le _).trans hAS
+  have hcomp : S.subtype.comp (A.subgroupOf S).subtype =
+      A.subtype.comp (Subgroup.subgroupOfEquivOfLe hAS).toMonoidHom := by ext a'; rfl
+  rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hLS, Subgroup.map_map, hcomp,
+    ← Subgroup.map_map, fitting_map_mulEquiv]
+
+/-- **Fitting of a mapped subgroup** (`|RK|`-induction plumbing for BG Theorem 3.8): for
+`P ≤ ↥K`, the Fitting subgroup of `P.map K.subtype` (the image of `P` in `G`) is `F(P)` pushed
+through `K.subtype`.  Combined with `fitting_map_eq_of_normal_of_fitting_le` this identifies
+`F(P_G)` with `F(K)` in step 2. -/
+theorem fitting_map_map_subtype {G : Type*} [Group G] [Finite G] {K : Subgroup G}
+    {P : Subgroup ↥K} :
+    (OddOrder.Isaacs.Ch01.fitting ↥(P.map K.subtype)).map (P.map K.subtype).subtype =
+      ((OddOrder.Isaacs.Ch01.fitting ↥P).map P.subtype).map K.subtype := by
+  have hcomp : (P.map K.subtype).subtype.comp
+      (Subgroup.equivMapOfInjective P K.subtype K.subtype_injective).toMonoidHom =
+      K.subtype.comp P.subtype := by ext a; rfl
+  rw [← fitting_map_mulEquiv (Subgroup.equivMapOfInjective P K.subtype K.subtype_injective),
+    Subgroup.map_map, hcomp, ← Subgroup.map_map]
+
+open scoped commutatorElement in
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **BG Theorem 3.8** (`|RK|`-induction skeleton, mmd L1221-1259).  `G = KR` solvable of odd order,
+`K ⊴ G`, conditions (1) `(|R|, |K|) = 1`, (2) `C_K(x) = C_K(R)` for all `x ∈ R^#`, (3)
+`C_{F(K)}(R) = 1`.  Then `⁅K, R⁆ ⊆ F(K)`.
+
+The induction is on `n = |G|`.  `by_cases` on whether `R` centralizes `F(K̄)` (`K̄ = K/F(K)`):
+- yes ⟹ step 1 (`commutator_le_fitting_of_centralizes_fittingQuotient`, Proposition 1.4);
+- no ⟹ step 2 (`P` = preimage of a non-centralized Sylow `P̄` of `F(K̄)`; if `P ≠ K`, IH on `PR`
+  gives `⁅P, R⁆ ⊆ F(P) = F(K)`, so `R` centralizes `P̄`, contradiction — hence `K̄` is a `p`-group)
+  then step 3 (`R₀ ≤ R` of prime order; if `R₀ ≠ R`, IH on `KR₀` + `commutator_le_fitting_of_…`
+  reductions give the result — hence `R` is prime) then step 4 (`commutator_le_fitting_of_reduced`). -/
+private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSolvable G]
+    (K R : Subgroup G), K.Normal → Odd (Nat.card G) → K.IsComplement' R →
+    Nat.Coprime (Nat.card ↥R) (Nat.card ↥K) →
+    (∀ x ∈ (R : Set G), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K) →
+    Subgroup.centralizer (R : Set G) ⊓
+      (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype = ⊥ →
+    Nat.card G = n →
+    ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro G _ _ _ K R hKnorm hodd hcompl hcop hcond2 hC3 hn
+    haveI := hKnorm
+    have hRK : R ≤ Subgroup.normalizer (K : Set G) := by
+      rw [Subgroup.normalizer_eq_top_iff.mpr hKnorm]; exact le_top
+    by_cases hcent : OddOrder.Isaacs.Ch01.fitting (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) ≤
+        Subgroup.fixedPointsOfMulAut (quotientMulAutHom
+          (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
+            ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK))))
+    · -- Step 1 (mmd L1233): `R` centralizes `F(K̄)`, hence (Prop 1.4) all of `K̄`.
+      exact commutator_le_fitting_of_centralizes_fittingQuotient hRK hcop hcent
+    · -- Steps 2-4 (mmd L1233-1259): `¬hcent`, i.e. `R` does not centralize `F(K̄)`.
+      set L : Subgroup G := (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype with hLdef
+      -- (A) a `p`-core `O_p(K̄)` of `K̄` not centralized by `R` (mmd L1233).
+      obtain ⟨p, hp_not⟩ := exists_opCore_not_le_of_fitting_not_le hcent
+      haveI : Fact ((p : ℕ).Prime) := ⟨p.2⟩
+      -- (B) `P` = preimage of `O_p(K̄)` in `↥K`: characteristic, with `F(K) ≤ P_G ⊴ G`, `P_G ≤ K`.
+      set P : Subgroup ↥K :=
+        (OddOrder.Isaacs.Ch01.opCore (p : ℕ) (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K)).comap
+          (QuotientGroup.mk' (OddOrder.Isaacs.Ch01.fitting ↥K)) with hPdef
+      haveI hPchar : P.Characteristic :=
+        Subgroup.Characteristic.comap_quotient_mk (OddOrder.Isaacs.Ch01.opCore.characteristic _ _)
+      set PG : Subgroup G := P.map K.subtype with hPGdef
+      haveI hPGnorm : PG.Normal := ConjAct.normal_of_characteristic_of_normal
+      have hPGK : PG ≤ K := Subgroup.map_subtype_le _
+      -- (1) `K̄` is a `p`-group (mmd L1235): otherwise IH on `PR` contradicts the choice of `P`.
+      have hKbar : IsPGroup p (K.map (QuotientGroup.mk' L)) := by
+        by_cases hPGeqK : PG = K
+        · -- `P_G = K` ⟹ `P = ⊤` ⟹ `O_p(K̄) = ⊤` ⟹ `K̄` is a `p`-group.
+          haveI : ((OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype).Normal :=
+            ConjAct.normal_of_characteristic_of_normal
+          have hPtop : P = ⊤ := by
+            apply Subgroup.map_injective K.subtype_injective
+            rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+            exact hPGeqK
+          have hoc : OddOrder.Isaacs.Ch01.opCore (p : ℕ)
+              (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) = ⊤ := by
+            rw [Subgroup.eq_top_iff']
+            intro y
+            obtain ⟨z, rfl⟩ :=
+              QuotientGroup.mk'_surjective (OddOrder.Isaacs.Ch01.fitting ↥K) y
+            have hzP : z ∈ P := by rw [hPtop]; exact Subgroup.mem_top z
+            rw [hPdef, Subgroup.mem_comap] at hzP
+            exact hzP
+          have hKbar_pg : IsPGroup p (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) := by
+            have h1 := OddOrder.Isaacs.Ch01.opCore_isPGroup (p : ℕ)
+              (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K)
+            rw [hoc] at h1
+            exact h1.of_equiv Subgroup.topEquiv
+          exact isPGroup_map_mk'_subtype_of_isPGroup_quotient
+            (N := OddOrder.Isaacs.Ch01.fitting ↥K) hKbar_pg
+        · -- `P_G ≠ K` ⟹ IH on `PR` gives `⁅P_G, R⁆ ⊆ F(P_G) = F(K)`, so `R` centralizes `O_p(K̄)`.
+          exfalso
+          haveI hPnorm : P.Normal := inferInstance
+          -- `F(K) ≤ P` (since `O_p(K̄) ∋ 1` pulls back the kernel `F(K)`).
+          have hFP : OddOrder.Isaacs.Ch01.fitting ↥K ≤ P := by
+            rw [hPdef]; intro z hz; rw [Subgroup.mem_comap]
+            have hz1 : (QuotientGroup.mk' (OddOrder.Isaacs.Ch01.fitting ↥K)) z = 1 := by
+              rw [QuotientGroup.mk'_apply]; exact (QuotientGroup.eq_one_iff z).mpr hz
+            rw [hz1]; exact one_mem _
+          -- `F(P_G) = F(K) = L`.
+          have hFPGL : (OddOrder.Isaacs.Ch01.fitting ↥PG).map PG.subtype = L := by
+            rw [hPGdef, fitting_map_map_subtype, fitting_map_eq_of_normal_of_fitting_le hFP, ← hLdef]
+          have hdisjPG : Disjoint PG R := hcompl.disjoint.mono_left hPGK
+          -- IH on `P_G R` (`|P_G ⊔ R| < |G|` since `P_G < K`) ⟹ `⁅P_G, R⁆ ⊆ L`.
+          have hcommPG : ⁅PG, R⁆ ≤ L := by
+            rw [← hFPGL]
+            refine commutator_le_fitting_of_subgroupOf_sup
+              (IH (Nat.card ↥(PG ⊔ R)) ?_ (PG.subgroupOf (PG ⊔ R)) (R.subgroupOf (PG ⊔ R))
+                Subgroup.normal_subgroupOf
+                (Odd.of_dvd_nat hodd (Subgroup.card_subgroup_dvd_card _))
+                (isComplement'_subgroupOf_sup_of_normal hdisjPG) ?_ ?_ ?_ rfl)
+            · -- `|P_G ⊔ R| < |G|` (since `P_G < K`).
+              have hcardlt : Nat.card ↥PG < Nat.card ↥K := by
+                refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hPGK))
+                  (fun heq => hPGeqK ?_)
+                exact Subgroup.eq_of_le_of_card_ge hPGK heq.ge
+              have hScard : Nat.card ↥(PG ⊔ R) = Nat.card ↥PG * Nat.card ↥R := by
+                rw [← (isComplement'_subgroupOf_sup_of_normal hdisjPG).card_mul,
+                  Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : PG ≤ PG ⊔ R)).toEquiv,
+                  Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R ≤ PG ⊔ R)).toEquiv]
+              rw [← hn, hScard, ← hcompl.card_mul]
+              exact mul_lt_mul_of_pos_right hcardlt Nat.card_pos
+            · -- coprime `(|R'|, |P_G'|)`.
+              rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R ≤ PG ⊔ R)).toEquiv,
+                Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : PG ≤ PG ⊔ R)).toEquiv]
+              exact hcop.coprime_dvd_right (Subgroup.card_dvd_of_le hPGK)
+            · -- condition (2) for the `P_G`-configuration (`C_K(x) = C_K(R)`, intersected with `P_G ≤ K`).
+              intro x hx hx1
+              have hxR : (↑x : G) ∈ (R : Set G) := Subgroup.mem_subgroupOf.mp hx
+              have hx1' : (↑x : G) ≠ 1 := mt OneMemClass.coe_eq_one.mp hx1
+              have key : Subgroup.centralizer ({(↑x : G)} : Set G) ⊓ PG =
+                  Subgroup.centralizer (R : Set G) ⊓ PG := by
+                calc Subgroup.centralizer ({(↑x : G)} : Set G) ⊓ PG
+                    = (Subgroup.centralizer ({(↑x : G)} : Set G) ⊓ K) ⊓ PG := by
+                      rw [inf_assoc, inf_eq_right.mpr hPGK]
+                  _ = (Subgroup.centralizer (R : Set G) ⊓ K) ⊓ PG := by rw [hcond2 (↑x) hxR hx1']
+                  _ = Subgroup.centralizer (R : Set G) ⊓ PG := by rw [inf_assoc, inf_eq_right.mpr hPGK]
+              have himg : (PG ⊔ R).subtype ''
+                  ((R.subgroupOf (PG ⊔ R) : Subgroup ↥(PG ⊔ R)) : Set ↥(PG ⊔ R)) = (R : Set G) := by
+                rw [← Subgroup.coe_map, Subgroup.subgroupOf_map_subtype,
+                  inf_eq_left.mpr (le_sup_right : R ≤ PG ⊔ R)]
+              have hdist : ∀ A : Subgroup G,
+                  A.subgroupOf (PG ⊔ R) ⊓ (PG.subgroupOf (PG ⊔ R)) = (A ⊓ PG).subgroupOf (PG ⊔ R) :=
+                fun A => (Subgroup.comap_inf A PG (PG ⊔ R).subtype).symm
+              have hxv : (PG ⊔ R).subtype x = (↑x : G) := rfl
+              rw [centralizer_subgroupOf ({x} : Set ↥(PG ⊔ R)), Set.image_singleton, hxv,
+                centralizer_subgroupOf ((R.subgroupOf (PG ⊔ R) : Subgroup ↥(PG ⊔ R)) :
+                  Set ↥(PG ⊔ R)), himg, hdist (Subgroup.centralizer ({(↑x : G)} : Set G)),
+                hdist (Subgroup.centralizer (R : Set G)), key]
+            · -- condition (3) for the `P_G`-configuration (`C_{F(P_G)}(R) = C_{F(K)}(R) = 1`).
+              have himg : (PG ⊔ R).subtype ''
+                  ((R.subgroupOf (PG ⊔ R) : Subgroup ↥(PG ⊔ R)) : Set ↥(PG ⊔ R)) = (R : Set G) := by
+                rw [← Subgroup.coe_map, Subgroup.subgroupOf_map_subtype,
+                  inf_eq_left.mpr (le_sup_right : R ≤ PG ⊔ R)]
+              have hdistL : (Subgroup.centralizer (R : Set G)).subgroupOf (PG ⊔ R) ⊓
+                  (L.subgroupOf (PG ⊔ R)) =
+                  (Subgroup.centralizer (R : Set G) ⊓ L).subgroupOf (PG ⊔ R) :=
+                (Subgroup.comap_inf _ L (PG ⊔ R).subtype).symm
+              rw [fitting_subgroupOf_map_subtype_eq (le_sup_left : PG ≤ PG ⊔ R), hFPGL,
+                centralizer_subgroupOf ((R.subgroupOf (PG ⊔ R) : Subgroup ↥(PG ⊔ R)) :
+                  Set ↥(PG ⊔ R)), himg, hdistL, hC3, Subgroup.bot_subgroupOf]
+          -- `R` centralizes `O_p(K̄)`, contradicting the choice of `P`.
+          apply hp_not
+          have hsurj := QuotientGroup.mk'_surjective (OddOrder.Isaacs.Ch01.fitting ↥K)
+          have hopcore : P.map (QuotientGroup.mk' (OddOrder.Isaacs.Ch01.fitting ↥K)) =
+              OddOrder.Isaacs.Ch01.opCore (p : ℕ) (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) := by
+            rw [hPdef]; exact Subgroup.map_comap_eq_self_of_surjective hsurj _
+          rw [← hopcore]
+          intro x hx
+          rw [Subgroup.mem_map] at hx
+          obtain ⟨q, hqP, rfl⟩ := hx
+          rw [Subgroup.mem_fixedPointsOfMulAut]
+          intro a
+          rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+            QuotientGroup.eq]
+          set φ : ↥R →* MulAut ↥K :=
+            (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK) with hφ
+          have hphi : (K.subtype (φ a q) : G) = (↑a : G) * K.subtype q * (↑a : G)⁻¹ := rfl
+          have hKsub : (K.subtype ((φ a q)⁻¹ * q) : G) =
+              ⁅(↑a : G), (K.subtype q)⁻¹⁆ := by
+            rw [commutatorElement_def, map_mul, map_inv, hphi]; group
+          have hmemL : (K.subtype ((φ a q)⁻¹ * q) : G) ∈ L := by
+            rw [hKsub, hLdef]
+            apply hcommPG
+            rw [Subgroup.commutator_comm]
+            exact Subgroup.commutator_mem_commutator a.2
+              (PG.inv_mem (Subgroup.mem_map_of_mem K.subtype hqP))
+          exact (Subgroup.mem_map_iff_mem K.subtype_injective).mp hmemL
+      -- (2) Pick `R₀ ≤ R` of prime order (mmd L1237).
+      obtain ⟨R₀, hR₀R, r, hr, hR₀card⟩ :
+          ∃ R₀ : Subgroup G, R₀ ≤ R ∧ ∃ r : ℕ, r.Prime ∧ Nat.card ↥R₀ = r := by
+        -- `R ≠ ⊥` (else the trivial action fixes all of `K̄`, contradicting `hp_not`).
+        have hRne_bot : R ≠ ⊥ := by
+          intro hR0
+          haveI : Subsingleton ↥R := by rw [hR0]; infer_instance
+          refine hp_not (le_trans le_top ?_)
+          rw [top_le_iff, Subgroup.eq_top_iff']
+          intro x
+          rw [Subgroup.mem_fixedPointsOfMulAut]
+          intro a
+          obtain rfl : a = 1 := Subsingleton.elim a 1
+          rw [map_one]; rfl
+        have hRne1 : Nat.card ↥R ≠ 1 := fun h => hRne_bot (Subgroup.card_eq_one.mp h)
+        obtain ⟨r, hr, hrdvd⟩ := Nat.exists_prime_and_dvd hRne1
+        haveI : Fact r.Prime := ⟨hr⟩
+        haveI : Fintype ↥R := Fintype.ofFinite _
+        obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥R) r
+          (by rwa [Nat.card_eq_fintype_card] at hrdvd)
+        refine ⟨(Subgroup.zpowers g).map R.subtype, Subgroup.map_subtype_le _, r, hr, ?_⟩
+        rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ R.subtype R.subtype_injective).toEquiv,
+          Nat.card_zpowers]
+        exact hg
+      by_cases hR₀eq : R₀ = R
+      · -- `R = R₀` has prime order: the reduced case (step 4, mmd L1247-1259).
+        subst hR₀eq
+        exact commutator_le_fitting_of_reduced hodd hcompl hcop.symm ⟨r, hr, hR₀card⟩ hKbar hC3
+      · -- `R₀ ≠ R`: IH on `KR₀` gives `⁅K, R₀⁆ ⊆ F(K)`, then step 3 (mmd L1241-1245).
+        have hR₀K : R₀ ≤ Subgroup.normalizer (K : Set G) := hR₀R.trans hRK
+        have hcop₀ : Nat.Coprime (Nat.card ↥R₀) (Nat.card ↥K) :=
+          hcop.coprime_dvd_left (Subgroup.card_dvd_of_le hR₀R)
+        have hR₀bot : R₀ ≠ ⊥ := fun h => by
+          rw [h, Subgroup.card_bot] at hR₀card; exact absurd hR₀card.symm hr.one_lt.ne'
+        have hCeq := centralizer_inf_eq_of_le_of_cond2 hR₀R hR₀bot hcond2
+        have hcent0 : ⁅K, R₀⁆ ≤ L := by
+          have hdisj : Disjoint K R₀ := hcompl.disjoint.mono_right hR₀R
+          refine commutator_le_fitting_of_subgroupOf_sup
+            (IH (Nat.card ↥(K ⊔ R₀)) ?_ (K.subgroupOf (K ⊔ R₀)) (R₀.subgroupOf (K ⊔ R₀))
+              Subgroup.normal_subgroupOf
+              (Odd.of_dvd_nat hodd (Subgroup.card_subgroup_dvd_card _))
+              (isComplement'_subgroupOf_sup_of_normal hdisj) ?_ ?_ ?_ rfl)
+          · -- `|K ⊔ R₀| < |G|` (since `R₀ < R`).
+            have hcardlt : Nat.card ↥R₀ < Nat.card ↥R := by
+              refine lt_of_le_of_ne (Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hR₀R))
+                (fun heq => hR₀eq ?_)
+              exact Subgroup.eq_of_le_of_card_ge hR₀R heq.ge
+            have hScard : Nat.card ↥(K ⊔ R₀) = Nat.card ↥K * Nat.card ↥R₀ := by
+              rw [← (isComplement'_subgroupOf_sup_of_normal hdisj).card_mul,
+                Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ R₀)).toEquiv,
+                Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R₀ ≤ K ⊔ R₀)).toEquiv]
+            rw [← hn, hScard, ← hcompl.card_mul]
+            exact mul_lt_mul_of_pos_left hcardlt Nat.card_pos
+          · -- coprime `(|R₀'|, |K'|)`.
+            rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R₀ ≤ K ⊔ R₀)).toEquiv,
+              Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ R₀)).toEquiv]
+            exact hcop₀
+          · -- condition (2) for the `R₀`-configuration (transport via `centralizer_subgroupOf`).
+            intro x hx hx1
+            have hxR : (↑x : G) ∈ (R : Set G) := hR₀R (Subgroup.mem_subgroupOf.mp hx)
+            have hx1' : (↑x : G) ≠ 1 := mt OneMemClass.coe_eq_one.mp hx1
+            have key : Subgroup.centralizer ({(↑x : G)} : Set G) ⊓ K =
+                Subgroup.centralizer (R₀ : Set G) ⊓ K := (hcond2 (↑x) hxR hx1').trans hCeq.symm
+            have himg : (K ⊔ R₀).subtype ''
+                ((R₀.subgroupOf (K ⊔ R₀) : Subgroup ↥(K ⊔ R₀)) : Set ↥(K ⊔ R₀)) = (R₀ : Set G) := by
+              rw [← Subgroup.coe_map, Subgroup.subgroupOf_map_subtype,
+                inf_eq_left.mpr (le_sup_right : R₀ ≤ K ⊔ R₀)]
+            have hdist : ∀ A : Subgroup G,
+                A.subgroupOf (K ⊔ R₀) ⊓ (K.subgroupOf (K ⊔ R₀)) = (A ⊓ K).subgroupOf (K ⊔ R₀) :=
+              fun A => (Subgroup.comap_inf A K (K ⊔ R₀).subtype).symm
+            have hxv : (K ⊔ R₀).subtype x = (↑x : G) := rfl
+            rw [centralizer_subgroupOf ({x} : Set ↥(K ⊔ R₀)), Set.image_singleton, hxv,
+              centralizer_subgroupOf
+                ((R₀.subgroupOf (K ⊔ R₀) : Subgroup ↥(K ⊔ R₀)) : Set ↥(K ⊔ R₀)),
+              himg, hdist (Subgroup.centralizer ({(↑x : G)} : Set G)),
+              hdist (Subgroup.centralizer (R₀ : Set G)), key]
+          · -- condition (3) for the `R₀`-configuration: `C_{F(K)}(R₀) = C_{F(K)}(R) = 1`.
+            have hLK : L ≤ K := Subgroup.map_subtype_le _
+            have hC3' : Subgroup.centralizer (R₀ : Set G) ⊓ L = ⊥ := by
+              calc Subgroup.centralizer (R₀ : Set G) ⊓ L
+                  = (Subgroup.centralizer (R₀ : Set G) ⊓ K) ⊓ L := by
+                    rw [inf_assoc, inf_eq_right.mpr hLK]
+                _ = (Subgroup.centralizer (R : Set G) ⊓ K) ⊓ L := by rw [hCeq]
+                _ = Subgroup.centralizer (R : Set G) ⊓ L := by rw [inf_assoc, inf_eq_right.mpr hLK]
+                _ = ⊥ := hC3
+            have himg : (K ⊔ R₀).subtype ''
+                ((R₀.subgroupOf (K ⊔ R₀) : Subgroup ↥(K ⊔ R₀)) : Set ↥(K ⊔ R₀)) = (R₀ : Set G) := by
+              rw [← Subgroup.coe_map, Subgroup.subgroupOf_map_subtype,
+                inf_eq_left.mpr (le_sup_right : R₀ ≤ K ⊔ R₀)]
+            have hdistL : (Subgroup.centralizer (R₀ : Set G)).subgroupOf (K ⊔ R₀) ⊓
+                (L.subgroupOf (K ⊔ R₀)) =
+                (Subgroup.centralizer (R₀ : Set G) ⊓ L).subgroupOf (K ⊔ R₀) :=
+              (Subgroup.comap_inf _ L (K ⊔ R₀).subtype).symm
+            rw [fitting_subgroupOf_map_subtype_eq (le_sup_left : K ≤ K ⊔ R₀), ← hLdef,
+              centralizer_subgroupOf ((R₀.subgroupOf (K ⊔ R₀) : Subgroup ↥(K ⊔ R₀)) :
+                Set ↥(K ⊔ R₀)), himg, hdistL, hC3', Subgroup.bot_subgroupOf]
+        exact commutator_le_fitting_of_sameFixedPoints hRK hR₀K hcop hcop₀ hCeq hcent0
+
+/-- **BG Theorem 3.8** (Bender–Glauberman, LMS LNS 188, p. 17).  Let `G = KR` be a solvable group of
+odd order with `K ⊴ G`, and suppose
+
+1. `(|R|, |K|) = 1`;
+2. `C_K(x) = C_K(R)` for all `x ∈ R^#` (here in the `⊓ K` form `C_G(x) ⊓ K = C_G(R) ⊓ K`); and
+3. `C_{F(K)}(R) = 1`.
+
+Then `⁅K, R⁆ ⊆ F(K)`.
+
+The proof is `thm38_aux` specialised to `n = |G|`.  (Internally: induction on `|RK| = |G|`, reducing
+— via the Fitting quotient `K̄ = K/F(K)` — to `K̄` a `p`-group and `R` of prime order, then a
+chief-factor analysis split by `Theorem 3.4` and `G`-Lemma 2.6.3.) -/
+theorem thm38 {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [hKnorm : K.Normal]
+    (hodd : Odd (Nat.card G)) (hcompl : K.IsComplement' R)
+    (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hcond2 : ∀ x ∈ (R : Set G), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K)
+    (hC3 : Subgroup.centralizer (R : Set G) ⊓
+      (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype = ⊥) :
+    ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype :=
+  thm38_aux (Nat.card G) K R hKnorm hodd hcompl hcop hcond2 hC3 rfl
+
 end OddOrder.BG.Ch1.S03h

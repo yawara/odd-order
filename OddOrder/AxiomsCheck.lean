@@ -41,6 +41,7 @@ import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
 import OddOrder.BG.Ch3_MaximalSubgroups.S10_BetaRadical
@@ -3728,6 +3729,9 @@ set_option linter.style.longLine false in
 -- BG Proposition 3.9 (§3E): an odd `p`-group acting in a Frobenius (fixed-point-free) manner on a
 -- nontrivial finite group is cyclic.  Feeds BG Theorem 3.10 → Proposition 14.2(g) (issue 2007).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isCyclic_of_isPGroup_of_isFrobeniusAction
+-- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
+-- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
 -- BG Theorem 3.6 in the §10 interface form (`S10_ForwardFromKeystone`): the former forward
 -- axiom `pLengthOne_commutator_of_zgroupCentralizer`, de-axiomatized (2026-06-10) to a
 -- convention bridge onto `thm36`.
