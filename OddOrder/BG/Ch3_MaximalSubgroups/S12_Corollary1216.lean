@@ -170,6 +170,43 @@ private theorem commutator_le_commutator_sup_normal {K : Type*} [Group K]
   rw [heq]
   exact Subgroup.mul_mem _ (Subgroup.mem_sup_right hmod) (Subgroup.mem_sup_left hcommA)
 
+/-- **Generic Hall lemma** (Hall E–C–D corollary): in a finite solvable group, a `π`-subgroup `Y`
+is conjugate into any subgroup `H` whose index is a `π'`-number.  Indeed `H` then contains a Hall
+`π`-subgroup `P` of the whole group (its index, dividing `H.index`, is `π'`), all Hall `π`-subgroups
+are conjugate (`hall_C`), and `hall_D` puts `Y` inside one of them, hence inside `P^g ≤ H^g`.
+
+Used in the general `σ(M)`-subgroup form of Cor 12.16(a) to push `Y` into the `M ∩ M*` factor. -/
+private theorem exists_conj_smul_le_of_index_isPiCompl {G' : Type*} [Group G'] [Finite G']
+    [IsSolvable G'] {π : Set ℕ} {H Y : Subgroup G'}
+    (hHidx : ∀ p ∈ H.index.primeFactors, p ∉ π)
+    (hYπ : ∀ p ∈ (Nat.card ↥Y).primeFactors, p ∈ π) :
+    ∃ g : G', MulAut.conj g • Y ≤ H := by
+  obtain ⟨Q, hQhall, hYQ⟩ := Ch03.hall_D hYπ
+  obtain ⟨Pbar, hPbar⟩ := Ch03.hall_E_exists (G := ↥H) π
+  set P : Subgroup G' := Pbar.map H.subtype with hPdef
+  have hPle : P ≤ H := Subgroup.map_subtype_le _
+  have hPcard : Nat.card ↥P = Nat.card ↥Pbar := by
+    rw [hPdef, Subgroup.card_map_of_injective H.subtype_injective]
+  have hsub : P.subgroupOf H = Pbar :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective _
+  have hrel : P.relIndex H = Pbar.index := by rw [Subgroup.relIndex, hsub]
+  have hPhall : Ch03.IsHallSubgroup π P := by
+    refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+    · rw [hPcard] at hp; exact hPbar.1 p hp
+    · have htower : P.relIndex H * H.index = P.index := Subgroup.relIndex_mul_index hPle
+      rw [← htower] at hp
+      have hne1 : P.relIndex H ≠ 0 := by rw [hrel]; exact Subgroup.index_ne_zero_of_finite
+      have hne2 : H.index ≠ 0 := Subgroup.index_ne_zero_of_finite
+      rw [Nat.primeFactors_mul hne1 hne2, Finset.mem_union] at hp
+      rcases hp with h | h
+      · rw [hrel] at h; exact hPbar.2 p h
+      · exact hHidx p h
+  obtain ⟨g, hg⟩ := Ch03.hall_C hQhall hPhall
+  refine ⟨g, le_trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYQ) ?_⟩
+  calc MulAut.conj g • Q = Q.map (MulAut.conj g).toMonoidHom := mulAut_smul_eq_map _ _
+    _ = P := hg
+    _ ≤ H := hPle
+
 /-- **Shared Case-2 setup** for 12.16(a)/(b): if `Y ⊆ M_σ` is a nonidentity `q`-group (`q ∈ σ(M)`)
 with `N_G(Y) ⊄ M`, then there is a maximal `M* ⊇ N_G(Y)`, `M* ≠ M`, with the factorization
 `M* = (M ∩ M*)K` (`K = M*_β`/`M*_σ` via Prop 12.15(d)/(e)), `K ⊴ M*`, and `K` a `p'`-group. -/
@@ -228,6 +265,127 @@ private theorem exists_Mstar_factorization [Finite G] (hG : IsMinimalSimpleOdd G
           (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
         exact ((S10.mem_beta_iff Mstar p).mp ((h1215.2.2.2.2 hqσMstar).2.1 p hp_πM hp_σMstar)).2
   exact ⟨Mstar, K, hMstar_max, hMstar_ge, hMstarne, hMstarFact, hKnorm, hpK⟩
+
+/-- **Case-2 setup, σ-flavour** for the *headline* conjugacy of 12.16(a): same factorization
+`M* = (M ∩ M*)K`, `K ⊴ M*`, but with `K` exhibited as a `σ(M*)`-group (`K = M*_β ⊆ M*_σ` when
+`q ∈ σ(M*)`, or `K = M*_σ` when `q ∈ τ₂(M*)`).  By `σ`-disjointness `K` is then `σ(M)'`, which is
+exactly what the Hall conjugation step needs — in place of the single-prime `¬p∣|K|` returned by
+`exists_Mstar_factorization`.  Needs only `hM` (no `E`-setup, since no `p ∈ π(E)` is involved). -/
+private theorem exists_Mstar_factorization_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) {q : ℕ} [Fact q.Prime] (hYq : IsPGroup q ↥Y)
+    (hqσ : q ∈ S10.sigma M) (hYMσ : Y ≤ S10.Msigma M)
+    (hNYM : ¬ Subgroup.normalizer (Y : Set G) ≤ M) :
+    ∃ Mstar K : Subgroup G, Mstar ∈ maximalSubgroups G ∧
+      Subgroup.normalizer (Y : Set G) ≤ Mstar ∧
+      (¬ ∃ g : G, MulAut.conj g • M = Mstar) ∧ Mstar ≠ M ∧
+      Mstar = (M ⊓ Mstar) ⊔ K ∧ (K.subgroupOf Mstar).Normal ∧
+      (∀ r ∈ (Nat.card ↥K).primeFactors, r ∈ S10.sigma Mstar) := by
+  have hYM_le : Y ≤ M := hYMσ.trans (S10.Msigma_le M)
+  obtain ⟨Mstar, hMstar_max, hMstar_ge⟩ :=
+    OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+      hG hM hYne hYM_le
+  have hMstarMem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (Y : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hMstar_ge⟩
+  have hMstarne : Mstar ≠ M := fun he => hNYM (he ▸ hMstar_ge)
+  have hYMstar : Y ≤ Mstar := Subgroup.le_normalizer.trans hMstar_ge
+  have hYMM : Y ≤ M ⊓ Mstar := le_inf hYM_le hYMstar
+  have hYsub_pg : IsPGroup q ↥(Y.subgroupOf (M ⊓ Mstar)) :=
+    hYq.of_equiv (Subgroup.subgroupOfEquivOfLe hYMM).symm
+  obtain ⟨Psub, hPsub⟩ := hYsub_pg.exists_le_sylow
+  set S : Subgroup G := (Psub : Subgroup ↥(M ⊓ Mstar)).map (M ⊓ Mstar).subtype with hSdef
+  have hSle : S ≤ M ⊓ Mstar := Subgroup.map_subtype_le _
+  have hSq : IsPGroup q ↥S :=
+    Psub.2.of_equiv (Subgroup.equivMapOfInjective _ _ (M ⊓ Mstar).subtype_injective)
+  have hYS : Y ≤ S := by
+    rw [hSdef, ← Subgroup.map_subgroupOf_eq_of_le hYMM]; exact Subgroup.map_mono hPsub
+  have hPsubeq : S.subgroupOf (M ⊓ Mstar) = Psub := by
+    rw [hSdef]; exact Subgroup.comap_map_eq_self_of_injective (M ⊓ Mstar).subtype_injective _
+  have hSmax : ∀ T : Subgroup G, T ≤ M ⊓ Mstar → IsPGroup q ↥T → S ≤ T → S = T := by
+    intro T hTle hTq hST
+    have hTsub_pg : IsPGroup q ↥(T.subgroupOf (M ⊓ Mstar)) :=
+      hTq.of_equiv (Subgroup.subgroupOfEquivOfLe hTle).symm
+    have hTeq := Psub.3 hTsub_pg (by rw [← hPsubeq]; exact Subgroup.comap_mono hST)
+    rw [hSdef, ← hTeq, Subgroup.map_subgroupOf_eq_of_le hTle]
+  have h1215 := sigma_subgroup_maximal_interaction hG hM hqσ hYM_le hYne hYq hMstarMem hMstarne
+    hSle hYS hSq hSmax
+  obtain ⟨K, hKnorm, hMstarFact, hKσ⟩ :
+      ∃ K : Subgroup G, (K.subgroupOf Mstar).Normal ∧ Mstar = (M ⊓ Mstar) ⊔ K ∧
+        (∀ r ∈ (Nat.card ↥K).primeFactors, r ∈ S10.sigma Mstar) := by
+    by_cases hqσMstar : q ∈ S10.sigma Mstar
+    · exact ⟨S10.Mbeta Mstar, by rw [S10.Mbeta_subgroupOf]; infer_instance,
+        (h1215.2.2.2.1 hqσMstar).1,
+        fun r hr => S10.alpha_subset_sigma hG hMstar_max
+          (S10.beta_subset_alpha Mstar (S10.Mbeta_isPiGroup Mstar r hr))⟩
+    · exact ⟨S10.Msigma Mstar, by rw [S10.Msigma_subgroupOf]; infer_instance,
+        by rw [sup_comm]; exact (h1215.2.2.2.2 hqσMstar).2.2.2.symm,
+        fun r hr => S10.Msigma_isPiGroup Mstar r hr⟩
+  exact ⟨Mstar, K, hMstar_max, hMstar_ge, h1215.1, hMstarne, hMstarFact, hKnorm, hKσ⟩
+
+/-- Conjugation inside `↥N` transports to `G` along `N.subtype` (replicated private helper;
+the same statement appears in `S10_HallStructureCore` / `S12_Proposition1215`). -/
+private theorem map_subtype_conj_smul {N : Subgroup G} (c : ↥N) (K : Subgroup ↥N) :
+    (MulAut.conj c • K).map N.subtype = MulAut.conj (c : G) • (K.map N.subtype) := by
+  have hcomp : (MulAut.conj (c : G)).toMonoidHom.comp N.subtype
+      = N.subtype.comp (MulAut.conj c).toMonoidHom := by
+    ext x
+    simp only [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, MulAut.conj_apply,
+      Subgroup.coe_subtype, Subgroup.coe_mul, Subgroup.coe_inv]
+  show (K.map (MulAut.conj c).toMonoidHom).map N.subtype
+      = (K.map N.subtype).map (MulAut.conj (c : G)).toMonoidHom
+  rw [Subgroup.map_map, Subgroup.map_map, hcomp]
+
+/-- **`G`-level Hall conjugation**: with `N` solvable, a `π`-subgroup `Y ≤ N` is conjugate (by an
+element of `N`) into any `H ≤ N` whose relative index `[N : H]` is a `π'`-number.  Runs
+`exists_conj_smul_le_of_index_isPiCompl` inside `↥N` and transports the result back via
+`map_subtype_conj_smul`. -/
+private theorem exists_conj_smul_le_of_relIndex_isPiCompl [Finite G]
+    {N : Subgroup G} [IsSolvable ↥N] {π : Set ℕ} {H Y : Subgroup G}
+    (hHN : H ≤ N) (hYN : Y ≤ N)
+    (hHidx : ∀ p ∈ (H.relIndex N).primeFactors, p ∉ π)
+    (hYπ : ∀ p ∈ (Nat.card ↥Y).primeFactors, p ∈ π) :
+    ∃ g ∈ N, MulAut.conj g • Y ≤ H := by
+  have hHidx' : ∀ p ∈ (H.subgroupOf N).index.primeFactors, p ∉ π := fun p hp => hHidx p hp
+  have hYπ' : ∀ p ∈ (Nat.card ↥(Y.subgroupOf N)).primeFactors, p ∈ π := by
+    intro p hp
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hYN).toEquiv] at hp
+    exact hYπ p hp
+  obtain ⟨gN, hgN⟩ := exists_conj_smul_le_of_index_isPiCompl (G' := ↥N) hHidx' hYπ'
+  refine ⟨(gN : G), gN.2, ?_⟩
+  have hle := Subgroup.map_mono (f := N.subtype) hgN
+  rwa [map_subtype_conj_smul, Subgroup.map_subgroupOf_eq_of_le hYN,
+    Subgroup.map_subgroupOf_eq_of_le hHN] at hle
+
+/-- **`σ(M)`-prime `q`-subgroup of `G` is `G`-conjugate into `M_σ`** (BG Theorem 10.2 corollary;
+`M_σ` contains a Sylow `q` of `G`, then Sylow conjugacy).  Extracted from the inline Step 1 of
+`pRank_normalizer_le_one`; the headline form of 12.16(a) uses it to land its characteristic
+`q`-subgroup `X` inside `M_σ`. -/
+private theorem exists_conj_qSubgroup_le_Msigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {q : ℕ} [Fact q.Prime]
+    (hqσ : q ∈ S10.sigma M) {Y : Subgroup G} (hYq : IsPGroup q ↥Y) :
+    ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
+  obtain ⟨_, P, _⟩ := (S10.mem_sigma_iff M q).mp hqσ
+  obtain ⟨SG, hSG⟩ := S10.isSylow_sylowMap_of_mem_sigma hqσ P
+  have hPpi : Ch03.Subgroup.IsPiGroup (S10.sigma M) ((P : Subgroup ↥M).map M.subtype) := by
+    intro s hs
+    have hs_dvd : s ∣ Nat.card ↥((P : Subgroup ↥M).map M.subtype) :=
+      (Nat.mem_primeFactors.mp hs).2.1
+    rw [Subgroup.card_map_of_injective M.subtype_injective] at hs_dvd
+    obtain ⟨n, hn⟩ := (P.2).exists_card_eq
+    rw [hn] at hs_dvd
+    rwa [(Nat.prime_dvd_prime_iff_eq (Nat.prime_of_mem_primeFactors hs) Fact.out).mp
+      ((Nat.prime_of_mem_primeFactors hs).dvd_of_dvd_pow hs_dvd)]
+  have hPMσ : (P : Subgroup ↥M).map M.subtype ≤ S10.Msigma M :=
+    S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM)
+      (Subgroup.map_subtype_le _) hPpi
+  obtain ⟨Q, hYQ⟩ := hYq.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G SG Q
+  refine ⟨g⁻¹, le_trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hYQ) ?_⟩
+  have hQconj : MulAut.conj g⁻¹ • (Q : Subgroup G) = (P : Subgroup ↥M).map M.subtype := by
+    have hQ : (Q : Subgroup G) = MulAut.conj g • (SG : Subgroup G) := by
+      rw [← hg]; exact Sylow.coe_subgroup_smul
+    rw [hQ, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul, hSG]
+  rw [hQconj]; exact hPMσ
 
 /-- **Core of 12.16(a)** with the extra hypothesis `Y ⊆ M_σ` (the conjugated setup). If
 `r_p(N_H(Y)) ≥ 2`, a rank-2 `A ∈ ℰ_p²(N_H(Y))` (after moving into `M`) makes `p ∈ τ₂(M)`, and
@@ -591,5 +749,95 @@ theorem sigma_subgroup_not_mem_primeFactors_derived_of_tau1 [Finite G] (hG : IsM
   rw [Nat.mem_primeFactors] at hp_mem ⊢
   exact ⟨hp_mem.1, hp_mem.2.1.trans (Subgroup.card_dvd_of_le
     (Cor1216.derivedInG_mono (inf_le_inf_left H hNYX))), Nat.card_pos.ne'⟩
+
+/-- **BG Corollary 12.16(a)**, *headline form* (mmd L3453, L3474): a nonidentity `σ(M)`-subgroup `Y`
+of `G` is conjugate to a subgroup of `M_σ`.  This is BG's foundational `ℓ_σ ≤ 1` tool — "every
+`σ(M)`-element is conjugate to an element of `M_σ`" (mmd L3801).
+
+Proof (BG L3458-3474): take a characteristic `q`-subgroup `X ⊆ Y` (`q ∈ σ(M)`) and conjugate by
+`g₀` so `X^{g₀} ⊆ M_σ`.  Since `X` is characteristic in `Y`, `N_G(Y^{g₀}) ≤ N_G(X^{g₀})`.
+If `N_G(X^{g₀}) ⊆ M` then `Y^{g₀} ⊆ M`, so `Y^{g₀} ⊆ M_σ` because `M_σ` is the normal Hall
+`σ(M)`-subgroup of `M`.  Otherwise `M* ∈ ℳ(N_G(X^{g₀}))` is not conjugate to `M` and Proposition
+12.15 gives `M* = (M ∩ M*)K` with `K = M*_β`/`M*_σ` a `σ(M*)`-group; by `σ`-disjointness `K` is then
+`σ(M)'`, so `[M* : M ∩ M*]` is a `σ(M)'`-number and `hall_D` conjugates the `σ(M)`-subgroup `Y^{g₀}`
+into `M ∩ M* ⊆ M`, hence into `M_σ`.
+
+The `σ`-disjointness input `hσdisj` (BG Cor 12.6(f) / Theorem 13.9) is taken as a hypothesis to
+avoid an import cycle with §13, where the unconditional form `sigma_disjoint_of_nonconjugate` lives;
+callers in §14+ discharge it directly.  `hYlt : Y < ⊤` holds automatically (a `σ(M)`-subgroup is
+proper since `G` is non-solvable) and is required by the characteristic-subgroup reduction. -/
+theorem sigma_subgroup_conj_into_Msigma_general [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {Y : Subgroup G} (hYne : Y ≠ ⊥) (hYlt : Y < ⊤)
+    (hYpi : Subgroup.IsPiSubgroup (S10.sigma M) Y)
+    (hσdisj : ∀ {Mstar : Subgroup G}, Mstar ∈ maximalSubgroups G →
+      (¬ ∃ g : G, MulAut.conj g • M = Mstar) → Disjoint (S10.sigma M) (S10.sigma Mstar)) :
+    ∃ g : G, MulAut.conj g • Y ≤ S10.Msigma M := by
+  classical
+  obtain ⟨q, hq_prime, X, hXY, hXne, hXq, hqσ, hNYX⟩ := exists_char_qSubgroup hG hYne hYlt hYpi
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  obtain ⟨g₀, hg₀X⟩ := Cor1216.exists_conj_qSubgroup_le_Msigma hG hM hqσ hXq
+  -- Reduce to conjugating the already-shifted `g₀ • Y`.
+  suffices h : ∃ g : G, MulAut.conj g • (MulAut.conj g₀ • Y) ≤ S10.Msigma M by
+    obtain ⟨g, hg⟩ := h
+    exact ⟨g * g₀, by rwa [map_mul, mul_smul]⟩
+  have hX₀q : IsPGroup q ↥(MulAut.conj g₀ • X) :=
+    hXq.of_equiv (Subgroup.equivMapOfInjective X (MulAut.conj g₀).toMonoidHom
+      (MulAut.conj g₀).injective)
+  have hX₀ne : MulAut.conj g₀ • X ≠ ⊥ := by
+    intro h
+    have hc : Nat.card ↥(MulAut.conj g₀ • X) = Nat.card ↥X :=
+      Subgroup.card_map_of_injective (MulAut.conj g₀).injective
+    rw [h, Subgroup.card_bot] at hc
+    exact hXne (Subgroup.card_eq_one.mp hc.symm)
+  have hY₀pi : Subgroup.IsPiSubgroup (S10.sigma M) (MulAut.conj g₀ • Y) := by
+    intro p hp
+    rw [mulAut_smul_eq_map, Subgroup.card_map_of_injective (MulAut.conj g₀).injective] at hp
+    exact hYpi p hp
+  have hNY₀X₀ : Subgroup.normalizer ((MulAut.conj g₀ • Y : Subgroup G) : Set G)
+      ≤ Subgroup.normalizer ((MulAut.conj g₀ • X : Subgroup G) : Set G) := by
+    have hnormY : MulAut.conj g₀ • Subgroup.normalizer (Y : Set G)
+        = Subgroup.normalizer ((MulAut.conj g₀ • Y : Subgroup G) : Set G) :=
+      Subgroup.map_normalizer_eq_of_bijective Y (MulAut.conj g₀).bijective
+    have hnormX : MulAut.conj g₀ • Subgroup.normalizer (X : Set G)
+        = Subgroup.normalizer ((MulAut.conj g₀ • X : Subgroup G) : Set G) :=
+      Subgroup.map_normalizer_eq_of_bijective X (MulAut.conj g₀).bijective
+    rw [← hnormY, ← hnormX]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hNYX
+  by_cases hNX₀M : Subgroup.normalizer ((MulAut.conj g₀ • X : Subgroup G) : Set G) ≤ M
+  · -- `N_G(X^{g₀}) ⊆ M`, so `Y^{g₀} ⊆ M`, hence `Y^{g₀} ⊆ M_σ` directly.
+    refine ⟨1, ?_⟩
+    rw [map_one, one_smul]
+    exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM)
+      (le_trans (le_trans Subgroup.le_normalizer hNY₀X₀) hNX₀M) hY₀pi
+  · -- `N_G(X^{g₀}) ⊄ M`: factorize `M* = (M ∩ M*)K`, then `hall_D` pushes `Y^{g₀}` into `M ∩ M*`.
+    obtain ⟨Mstar, K, hMstar_max, hMstar_ge, hnc, hMstarne, hMstarFact, hKnorm, hKσ⟩ :=
+      Cor1216.exists_Mstar_factorization_sigma hG hM hX₀ne hX₀q hqσ hg₀X hNX₀M
+    have hY₀Mstar : MulAut.conj g₀ • Y ≤ Mstar :=
+      le_trans (le_trans Subgroup.le_normalizer hNY₀X₀) hMstar_ge
+    haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstar_max
+    have hidx : ∀ p ∈ ((M ⊓ Mstar).relIndex Mstar).primeFactors, p ∉ S10.sigma M := by
+      intro p hp hpσM
+      have hp_prime : p.Prime := Nat.prime_of_mem_primeFactors hp
+      have hp_dvd : p ∣ ((M ⊓ Mstar).subgroupOf Mstar).index := Nat.dvd_of_mem_primeFactors hp
+      have hpσMstar : p ∉ S10.sigma Mstar := fun hh =>
+        Set.disjoint_left.mp (hσdisj hMstar_max hnc) hpσM hh
+      have hpK : ¬ p ∣ Nat.card ↥K := fun hdvd =>
+        hpσMstar (hKσ p (Nat.mem_primeFactors.mpr ⟨hp_prime, hdvd, Nat.card_pos.ne'⟩))
+      have hKle : K ≤ Mstar := hMstarFact ▸ le_sup_right
+      haveI := hKnorm
+      have htop : (M ⊓ Mstar).subgroupOf Mstar ⊔ K.subgroupOf Mstar = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup inf_le_right hKle, ← hMstarFact, Subgroup.subgroupOf_self]
+      exact Cor1216.not_dvd_index_of_sup_top_normal htop
+        (by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKle).toEquiv]; exact hpK) hp_dvd
+    obtain ⟨g, _, hg⟩ := Cor1216.exists_conj_smul_le_of_relIndex_isPiCompl
+      inf_le_right hY₀Mstar hidx hY₀pi
+    refine ⟨g, ?_⟩
+    have hgπ : Subgroup.IsPiSubgroup (S10.sigma M) (MulAut.conj g • (MulAut.conj g₀ • Y)) := by
+      intro p hp
+      rw [mulAut_smul_eq_map, Subgroup.card_map_of_injective (MulAut.conj g).injective] at hp
+      exact hY₀pi p hp
+    exact S10.sigma_subgroup_le_Msigma_of_isHall (S10.Msigma_isHall hG hM)
+      (le_trans hg inf_le_left) hgπ
 
 end OddOrder.BG.Ch3.S12
