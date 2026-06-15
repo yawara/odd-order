@@ -320,6 +320,53 @@ Pf consumer 出現時に実需要に合わせる)。本 section が復元プラ�
 
 現 lossy statement は **現 consumer ((8.8), S10_BGInterface) には十分** (落ちた W データ / (Tii)/(Tiii) は現 consumer が消費しない)。lossy-ness が block するのは **deeper Pf** (§10-13 character theory, 現在 BG §14-15 gate で停止中)。⟹ defer は安全 (現 spine を block しない)。**deferred 復元タスク = issue 8005** (トリガー条件 + 復元手順を記載)。
 
+## 11. Cor 15.6 `typeP_kstar_in_mf` ✅ COMPLETE (2026-06-15, `34d44c28`, issue 8004 closed)
+
+section 9 の計画(迂回路 = Lemma 15.1 に `IsComplement'` 強化して §14 非依存に M=KM' 供給)は
+**不要になった**。main 同期で **§14 Thm 14.7(h) が `typeP_duality` に露出済**(Lane H `1243d4c6`、
+結論冒頭 `IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧ Coprime …`)なので、
+**直接経路**で配線:
+
+- `hKne` (K*≠⊥) ← `typeP_structure` (Prop 14.2) conjunct 2。U-factor は本体内で
+  `Ch03.hall_E_exists (G:=↥M) ((kappa∪sigma)ᶜ)` + `map M.subtype` + `comap_map_eq_self_of_injective`
+  の subtype roundtrip で生成(`hKM : K ≤ M` を faithful 仮説として追加、caller 無しで安全)。
+- `hcyc`/`hcompl`/`hcop` ← `typeP_duality` (Thm 14.7(d)(h)) を直接 destructure(∃! witness から
+  `IsCyclic(K⊔Kstar)` 抽出、Mstar 非依存)。
+- `hKsubMF` ← `by_cases MF M = Msigma M`(eq: `inf_le_left`、ne: `mf_ne_msigma_typeP1_structure`)。
+- `hFcyc` ← `fitting_decomposition` (Cor 15.5) 末尾 conjunct(`08e7dc5c` で露出済)。
+- 組立 = sorry-free engine `typeP_kstar_in_mf_of_inputs`(conjunct 4 = `Msigma_inf_centralizer_le_
+  derivedDerived_of_isComplement'` で Lemma 6.3 を ↥M 内適用済、§14 非依存)。
+
+⟹ `typeP_kstar_in_mf` の `sorry` 消滅(S15_MF decl-sorry 9→8)。full build green (3817 jobs)、
+AxiomsCheck OK。cite 先(14.2/14.7/15.2/15.5)は sorried だが §14 proof landing で自動 unconditional 化。
+**残 §15 sorry = Lemma 15.1 / Thm 15.2 / Cor 15.3 / Cor 15.4 / Cor 15.5 / Thm 15.7 / Thm 15.8 /
+Cor 15.9(8件)— いずれも multi-hour hard theorem(§14 proof 待ち)。** 次の FT-spine 標的 =
+**Thm I** (`theoremI_…`, Peterfalvi S10:112 が consume)。
+
+## 12. §15 substantive 結果の依存マップ — すべて §14 proof に gate (2026-06-15, mmd 精読)
+
+section 3 の dependency 表(`Cor 15.3 deps = —` 等)は **不正確**。Cor 15.3–15.5 の mmd 証明
+(L4204–4226)を精読した確定結果:
+
+| 結果 | mmd 証明が使う上流 | §14非依存? |
+|---|---|---|
+| **Cor 15.3(a)** `C_M(H)=C_{M_σ}(H)X` | Prop 14.2(b1)(e) [§14] + Lemma 15.1(c) [mine, §14-gated] | ❌ |
+| **Cor 15.3(b)** G-conj→N_M(H)-conj | Thm 14.4 [§14] + Thm 15.2 の Q [mine, §14-gated] + Frattini | ❌ |
+| **Cor 15.4** `H nilp Hall→H⊆M_σ` | Cor 15.3(a) + σ-helper(✅ landed `sylow_le_Msigma_of_normalizer_le`)+ 冪零分解 | ❌(15.3 経由) |
+| **Cor 15.5** Fitting 分解 | Lemma 15.1(a) + Thm 15.2(g) + Cor 15.3(a) | ❌ |
+| **Lemma 15.1 / Thm 15.2** | Prop 14.2 / Thm 14.7 / 12.x [§14/§12] | ❌ |
+
+⟹ **§15 の substantive 結果は 1 つも §14 非依存に閉じない。** 真の上流ゲート = Lane H の §14 proof
+(Prop 14.2 / Thm 14.4 / Thm 14.7 — 現在 sorry、Lane H が Prop 14.2 case-τ₃ を実装中)。Lane G が
+§14非依存にできるのは (i) infrastructure helper(σ-helper / M_F API / 冪零分解 helper)と
+(ii) gated-endpoint skeleton(仮説パラメータ化 assembly、Cor 15.6 が例; `_of_inputs` engine 化)のみ。
+**§14 proof が main に landing したら sync して gated endpoint を unconditional 化するのが最短。**
+
+**Cor 15.4 の §14非依存 assembly 計画**(skeleton 化): S=非自明 Sylow of H → N_G(S) proper(G 単純・
+S≠⊥・S≠G)→ M∈ℳ(N_G(S)) → S⊆M_σ(σ-helper ✅)→ H 冪零ゆえ H=S×R, R≤C_G(S)≤N_G(S)≤M,
+各 H_q は C_M(S) 内の M の Sylow → Cor 15.3(a)[仮説化]で ≤M_σ → 冪零分解 helper で H≤M_σ。
+冪零分解 helper(`isNilpotent_iff_forall_sylow_normal` 経由「H 冪零 ∧ 全 Sylow≤K ⟹ H≤K」)が次の leaf。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。

@@ -478,6 +478,36 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **§15 helper (§14-independent, reusable).**  A nonidentity Sylow `p`-subgroup `S` of `G`
+whose `G`-normalizer lies in a maximal subgroup `M` is contained in `M_σ`.  This is the σ-theory
+content of the first step of BG Corollary 15.4 ("`S ⊆ M_σ`"): `N_G(S) ≤ M` exhibits `S` as a
+Sylow witness for `p ∈ σ(M)` (`mem_sigma_iff`), and `M_σ`, the `σ(M)`-Hall subgroup of `M`
+(`Msigma_isHall`), absorbs the `σ(M)`-subgroup `S` (`sigma_subgroup_le_Msigma_of_isHall`). -/
+theorem sylow_le_Msigma_of_normalizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (S : Sylow p G)
+    (hSne : (S : Subgroup G) ≠ ⊥)
+    (hN : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M) :
+    (S : Subgroup G) ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  have hSM : (S : Subgroup G) ≤ M := le_trans Subgroup.le_normalizer hN
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := (S : Subgroup G))).mp S.isPGroup'
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero, Subgroup.card_eq_one] at hn
+    exact hSne hn
+  have hpdvdM : p ∣ Nat.card ↥M := by
+    have h1 : Nat.card (S : Subgroup G) ∣ Nat.card ↥M := Subgroup.card_dvd_of_le hSM
+    rw [hn] at h1
+    exact (dvd_pow_self p hn0).trans h1
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+    exact ⟨Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdM, Nat.card_pos.ne'⟩,
+      S.subtype hSM, by
+        rw [Sylow.coe_subtype, Subgroup.map_subgroupOf_eq_of_le hSM]; exact hN⟩
+  refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) hSM (fun q hq => ?_)
+  rw [hn, Nat.primeFactors_prime_pow hn0 Fact.out, Finset.mem_singleton] at hq
+  exact hq ▸ hpσ
+
 /-- **BG Corollary 15.4** (mmd L4215): a nonidentity nilpotent **Hall** subgroup `H` of `G`
 can be embedded in `M_σ` for a suitable maximal subgroup `M` (`H ⊆ M_σ`).
 
@@ -574,11 +604,36 @@ theorem typeP_kstar_in_mf_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimple
 nontrivial cyclic and lies in `M_F`, while `M_F` itself is not cyclic. -/
 theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     Kstar ≠ ⊥ ∧ IsCyclic ↥Kstar ∧ Kstar ≤ MF M ∧
       Kstar ≤ derivedInG (derivedInG M) ∧ ¬ IsCyclic ↥(MF M) := by
-  sorry
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `(κ ∪ σ)ᶜ`-subgroup `U` of `M` exists by solvability (Hall's theorem); this is the
+  -- `U`-factor of the type-`P` decomposition `M = K U M_σ` needed to invoke Proposition 14.2.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  -- `K* ≠ 1`:  Proposition 14.2(c) (`typeP_structure`).
+  have hKne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  -- `K K*` cyclic and the `M = K M'` complement / coprime data:  Theorem 14.7(d),(h).
+  obtain ⟨hcompl, hcop, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
+    typeP_duality hG hM hP hK hKstar
+  -- `K* ⊆ M_F`:  Theorem 15.2 when `M_F ≠ M_σ`, else `K* ⊆ M_σ = M_F` directly.
+  have hKsubMF : Kstar ≤ MF M := by
+    by_cases hMF : MF M = OddOrder.BG.Ch3.S10.Msigma M
+    · rw [hKstar, hMF]; exact inf_le_left
+    · obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, hk, _⟩ :=
+        mf_ne_msigma_typeP1_structure hG hM hMF hK hKstar
+      exact hk
+  -- `M_F` cyclic ⟹ `F(M)` cyclic:  Corollary 15.5 (`fitting_decomposition`, last conjunct).
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, _, hFcyc⟩ := fitting_decomposition hG hM
+  exact typeP_kstar_in_mf_of_inputs hG hM hKstar hKne hcyc hKsubMF hcompl hcop hFcyc
 
 /-! ## Theorems 15.7--15.9: TI failure and final local constraints -/
 
