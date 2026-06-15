@@ -697,3 +697,21 @@ Hall-containment が unblock。14.3 が要する infra は全 landing:
   → Cor 12.16 一般形 (σ(M*)-subgroup of G は M*_σ に共役) + σ-core conj-equivariance (`sigma_conj`✅)。
   **⚠ ℓ_σ が最深** (⟨x'⟩→M* の取り込み + Cor 12.16 一般形 [repo `sigma_subgroup_conj_into_Msigma` は Y≤M* 要])。
 - ⟹ **assembly 2 件 (x'∈K σ'-projection [~20行] + ℓ_σ chain [~40行]) が 14.3 完成の残**。infra は全部 repo 在。
+
+### ✅✅ Cor 14.3 branch 1 COMPLETE — 残 ℓ_σ のみ (2026-06-16, lane-h, commit aa001ecf)
+**`sigma_diagnostic` は branch 1 全証明 + branch 2 ℳ-part 完了、残 sorry = branch 2 の ℓ_σ(x')=1 のみ**
+(S14 sorry 数不変 9 — opaque 1 sorry を branch1-proven+branch2-ℳ+局所 ℓ_σ に置換)。
+- branch 1: σ'-prime witness → X₀ → p₀∈κ → `exists_isHallSubgroup_kappa_ge` (hall_D) で Hall κ K⊇X₀ →
+  typeP_structure(K) (b1)/(c) → **K⊔K*=K×K* の σ'/σ-projection** (hdecomp via mem_sup_of_normal_left;
+  x' σ'⟹x'∈K [orderOf 論法: (k·s)^N=1⟹k^N=s^{-N}∈K∩M_σ=⊥]; x∈M_σ⟹x∈K* [K∩M_σ=⊥]) →
+  π(⟨x'⟩)⊆κ + C_G(x)⊆C_G(X₁)⊆M。全 build green。
+- **残 ℓ_σ(x')=1** = `(D.length_one_iff x').mpr ⟨hx'1, hne⟩`, hne=(maximalSigmaSubgroupsOfElement x').Nonempty
+  = **∃M', x'∈M'_σ**。🛑 **要 general Cor 12.16** = 「multi-prime σ(M*)-subgroup of G (cyclic ⟨x'⟩, **NOT ≤M***)
+  → M*_σ 共役」。repo の不足: `sigma_subgroup_conj_into_Msigma` (multi-prime だが Y≤M 要) /
+  `exists_conj_smul_le_Msigma_of_pSubgroup` (Y≤G だが single-prime)。`exists_char_qSubgroup` は char-q 還元のみ
+  (pRank bound 用、conjugation 非露出)。chain: Lem 12.11(a) `tau2_prime_mem_sigma_diff_beta` で
+  τ₂(M)⊆σ(M*) → ⟨x'⟩ σ(M*)-group → **general Cor 12.16** で ∃g, conj g•⟨x'⟩≤M*_σ → x'∈(conj g⁻¹•M*)_σ
+  (要 Msigma conj-equivariance + maximal 保存)。
+- **▶ ℓ_σ の sub-project = general Cor 12.16(a) を建てる** (BG 原文の char-q + Prop 12.15/M*=(M∩M*)K 構造、
+  ~50-80 行、focused session 向き) or `exists_conj_smul_le_Msigma_of_pSubgroup` を multi-prime/cyclic へ拡張。
+  これが ℓ_σ → 14.3 完成 → 14.4 の gate。**14.3 の他は全部済**。
