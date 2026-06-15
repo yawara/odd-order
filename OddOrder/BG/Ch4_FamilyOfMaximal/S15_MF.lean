@@ -478,6 +478,36 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **§15 helper (§14-independent, reusable).**  A nonidentity Sylow `p`-subgroup `S` of `G`
+whose `G`-normalizer lies in a maximal subgroup `M` is contained in `M_σ`.  This is the σ-theory
+content of the first step of BG Corollary 15.4 ("`S ⊆ M_σ`"): `N_G(S) ≤ M` exhibits `S` as a
+Sylow witness for `p ∈ σ(M)` (`mem_sigma_iff`), and `M_σ`, the `σ(M)`-Hall subgroup of `M`
+(`Msigma_isHall`), absorbs the `σ(M)`-subgroup `S` (`sigma_subgroup_le_Msigma_of_isHall`). -/
+theorem sylow_le_Msigma_of_normalizer_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime] (S : Sylow p G)
+    (hSne : (S : Subgroup G) ≠ ⊥)
+    (hN : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤ M) :
+    (S : Subgroup G) ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  have hSM : (S : Subgroup G) ≤ M := le_trans Subgroup.le_normalizer hN
+  obtain ⟨n, hn⟩ := (IsPGroup.iff_card (G := (S : Subgroup G))).mp S.isPGroup'
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero, Subgroup.card_eq_one] at hn
+    exact hSne hn
+  have hpdvdM : p ∣ Nat.card ↥M := by
+    have h1 : Nat.card (S : Subgroup G) ∣ Nat.card ↥M := Subgroup.card_dvd_of_le hSM
+    rw [hn] at h1
+    exact (dvd_pow_self p hn0).trans h1
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+    exact ⟨Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdM, Nat.card_pos.ne'⟩,
+      S.subtype hSM, by
+        rw [Sylow.coe_subtype, Subgroup.map_subgroupOf_eq_of_le hSM]; exact hN⟩
+  refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) hSM (fun q hq => ?_)
+  rw [hn, Nat.primeFactors_prime_pow hn0 Fact.out, Finset.mem_singleton] at hq
+  exact hq ▸ hpσ
+
 /-- **BG Corollary 15.4** (mmd L4215): a nonidentity nilpotent **Hall** subgroup `H` of `G`
 can be embedded in `M_σ` for a suitable maximal subgroup `M` (`H ⊆ M_σ`).
 
