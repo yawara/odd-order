@@ -227,6 +227,117 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
   rw [hg]
   exact ha z hzPw
 
+/-- **Global `M_σ`-fixed point from prime action + a single non-regular point** (BG
+Proposition 14.2, `κ(M) ∩ τ₃(M) ≠ ∅` case): if `E` acts in a prime manner on `M_σ` and some
+`E₃ ≤ E` does not act regularly (a witness `x ∈ E₃#` has `C_{M_σ}(x) ≠ 1`), then prime action
+collapses `C_{M_σ}(x) = C_{M_σ}(E)` for every `x ∈ E#`, so `C_{M_σ}(E) ≠ 1`.
+
+Once `K = E` this is the conjunct `K^* = C_{M_σ}(K) ≠ 1`.  It also drives the `κ(M) ⊇ π(E)`
+step of `K = E`: for each prime `p ∣ |E|`, a rank-one `P ≤ E` of order `p` has, by prime
+action, `C_{M_σ}(P) = C_{M_σ}(E) ≠ 1`, so `p ∈ κ(M)`. -/
+theorem Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular {M E E₃ : Subgroup G}
+    (hEprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E) (hE3le : E₃ ≤ E)
+    (hreg : ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) ≠ ⊥ := by
+  -- A non-regular witness `x ∈ E₃#` with `C_{M_σ}(x) ≠ 1`.
+  have hxex : ∃ x ∈ E₃, x ≠ 1 ∧
+      fixedByElement (OddOrder.BG.Ch3.S10.Msigma M) x ≠ ⊥ := by
+    by_contra hcon
+    push_neg at hcon
+    exact hreg fun x hx hx1 => hcon x hx hx1
+  obtain ⟨x, hxE3, hx1, hxfix⟩ := hxex
+  -- Prime action collapses the `x`-fixed points to the `E`-fixed points.
+  have heq := hEprime x (hE3le hxE3) hx1
+  rw [← fixedBy_def, ← heq]
+  exact hxfix
+
+/-- **Every prime dividing `|E|` lies in `τ₁(M) ∪ τ₃(M)`** in BG Proposition 14.2's
+`κ(M) ∩ τ₃(M) ≠ ∅` case (the effective content of `E₂ = ⊥`): a prime `p ∣ |E|` is a
+`σ(M)'`-prime with `r_p(M) ≤ 2`.  If `r_p(M) = 2` then `p ∈ τ₂(M)`, and Corollary 12.6
+(`elemAb_normal_in_E_of_tau2`, projection on `E₃`) forces `C_{M_σ}(x) = 1` for the `E₃`-witness
+`x`, contradicting `hxC`.  Hence `r_p(M) = 1`, so `p ∈ τ₁(M) ∪ τ₃(M)`.
+
+Together with prime action (`C_{M_σ}(P) = C_{M_σ}(E) ≠ 1` for rank-one `P ≤ E`) this gives
+`π(E) ⊆ κ(M)`, the key to `K = E` in the `κ ∩ τ₃` case. -/
+theorem mem_tau1_union_tau3_of_mem_primeFactors_card_E [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {x : G} (hxE3 : x ∈ E₃) (hxne : x ≠ 1)
+    (hxC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∈ tau1 M ∪ tau3 M := by
+  obtain ⟨hpp, hpdvdE, -⟩ := Nat.mem_primeFactors.mp hp
+  haveI : Fact p.Prime := ⟨hpp⟩
+  have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := h.not_mem_sigma_of_mem_primeFactors hG hp
+  have hr2 : pRank ↥M p ≤ 2 := h.pRank_M_le_two hG hp
+  -- `p ∣ |M|`, so `r_p(M) ≥ 1`.
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr
+      ⟨hpp, hpdvdE.trans (Subgroup.card_dvd_of_le h.E_le), Nat.card_pos.ne'⟩
+  have hr1 : 1 ≤ pRank ↥M p := one_le_pRank_of_mem_primeFactors hpM
+  by_cases hr : pRank ↥M p = 2
+  · -- `r_p(M) = 2 ⟹ p ∈ τ₂`, which makes `E₃` regular and kills the witness.
+    exfalso
+    have hpτ2 : p ∈ tau2 M := (mem_tau2_iff M p).mpr ⟨hpσ, hr⟩
+    obtain ⟨A, hA, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG h hpτ2
+    exact hxC ((elemAb_normal_in_E_of_tau2 hG h hpτ2 hA hAE).2.2.2.1 x hxE3 hxne)
+  · -- `r_p(M) = 1`: `p ∈ τ₃` if `p ∣ |M'|`, else `p ∈ τ₁`.
+    have hr1' : pRank ↥M p = 1 := by omega
+    by_cases hd : p ∈ tau3 M
+    · exact Or.inr hd
+    · refine Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, ?_, hr1'⟩)
+      intro hderiv
+      exact hd ((mem_tau3_iff M p).mpr ⟨hpσ, hderiv, hr1'⟩)
+
+/-- **`π(E) ⊆ κ(M)`** in BG Proposition 14.2's `κ(M) ∩ τ₃(M) ≠ ∅` case: every prime `p ∣ |E|`
+lies in `κ(M)`.  By `mem_tau1_union_tau3_of_mem_primeFactors_card_E`, `p ∈ τ₁(M) ∪ τ₃(M)`; and a
+rank-one `P = ⟨g⟩ ≤ E` of order `p` (Cauchy) has `C_{M_σ}(P) = C_{M_σ}(g) = C_{M_σ}(E) ≠ 1` by
+prime action (using the `E₃`-witness `x`), so `P` certifies `p ∈ κ(M)`.
+
+This is the `K = E` step: with `π(E) ⊆ κ(M)` and the complement index `[M:E] = |M_σ|` coprime to
+`κ(M)`, `E` is a Hall `κ(M)`-subgroup of `M`, hence equals the Hall `κ(M)`-subgroup `K ≤ E`. -/
+theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hEprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E)
+    {x : G} (hxE3 : x ∈ E₃) (hxne : x ≠ 1)
+    (hxC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∈ kappa M := by
+  obtain ⟨hpp, hpdvdE, -⟩ := Nat.mem_primeFactors.mp hp
+  haveI : Fact p.Prime := ⟨hpp⟩
+  have hτ13 : p ∈ tau1 M ∪ tau3 M :=
+    mem_tau1_union_tau3_of_mem_primeFactors_card_E hG h hxE3 hxne hxC hp
+  -- `C_{M_σ}(E) ≠ 1` from the witness `x` and prime action.
+  have hCE : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) ≠ ⊥ := by
+    have heqx := hEprime x (h.E₃_le hxE3) hxne
+    rw [← fixedBy_def, ← heqx]; exact hxC
+  -- A rank-one `P = ⟨g⟩ ≤ E` of order `p`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvdE
+  have hgE : (g : G) ∈ E := g.2
+  have hgord : orderOf (g : G) = p :=
+    (orderOf_injective E.subtype E.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := by
+    intro hc; rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by
+    rw [Nat.card_zpowers]; exact hgord
+  have hPelem : Subgroup.zpowers (g : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
+  have hPM : Subgroup.zpowers (g : G) ≤ M := Subgroup.zpowers_le.mpr (h.E_le hgE)
+  -- `C_{M_σ}(⟨g⟩) = C_{M_σ}(g) = C_{M_σ}(E) ≠ 1`.
+  have heqg := hEprime (g : G) hgE hgne
+  have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff] at hy ⊢
+    intro z hz
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+  have hPC : OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) ≠ ⊥ := by
+    have hne : OddOrder.BG.Ch3.S10.Msigma M ⊓
+        Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ := by
+      rw [← fixedByElement_def, heqg, fixedBy_def]; exact hCE
+    exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+  exact ⟨hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
@@ -510,7 +621,35 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hp : p.Prime := Nat.prime_of_mem_primeFactors ((mem_tau3_iff M p).mp hpτ3).2.1
     obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
     obtain ⟨hE1ne, hEeq, hEprime, hEnorm⟩ := E3_not_regular_consequences hG hsetup hE3ne hreg
-    sorry
+    -- Extract an `E₃`-witness `x` with `C_{M_σ}(x) ≠ 1` from non-regularity.
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon
+      push_neg at hcon
+      exact hreg fun y hy hy1 => hcon y hy hy1
+    -- `π(E) ⊆ κ(M)`, so `E` is a `κ(M)`-subgroup; the Hall `κ(M)`-subgroup `K ≤ E` forces `K = E`.
+    have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
+      intro q hq
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv] at hq
+      exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq
+    have hEdvdK : Nat.card ↥E ∣ Nat.card ↥K := by
+      have hd := hK.card_dvd_of_isPiGroup hEpi
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hd
+    have hKEeq : K = E :=
+      Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
+    refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    · -- (a) prime action: immediate from `K = E` and Corollary 13.11.
+      rw [hKEeq]; exact hEprime
+    · -- `K^* = C_{M_σ}(K) = C_{M_σ}(E) ≠ 1` (prime action + the non-regular witness).
+      rw [hKstar, hKEeq]
+      exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hEprime hsetup.E₃_le hreg
+    · -- (b1) `N_M(X) = K × K^*`.  BG: "clear" from Cor 13.11; needs Lemma 13.13/13.6 wiring.
+      sorry
+    · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`.  Needs Theorem 10.1(a).
+      sorry
+    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  Needs Thm 3.10 / Lem 12.19 / 12.17.
+      sorry
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
     sorry
 
