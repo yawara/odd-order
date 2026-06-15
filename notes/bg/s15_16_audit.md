@@ -343,6 +343,30 @@ AxiomsCheck OK。cite 先(14.2/14.7/15.2/15.5)は sorried だが §14 proof land
 Cor 15.9(8件)— いずれも multi-hour hard theorem(§14 proof 待ち)。** 次の FT-spine 標的 =
 **Thm I** (`theoremI_…`, Peterfalvi S10:112 が consume)。
 
+## 12. §15 substantive 結果の依存マップ — すべて §14 proof に gate (2026-06-15, mmd 精読)
+
+section 3 の dependency 表(`Cor 15.3 deps = —` 等)は **不正確**。Cor 15.3–15.5 の mmd 証明
+(L4204–4226)を精読した確定結果:
+
+| 結果 | mmd 証明が使う上流 | §14非依存? |
+|---|---|---|
+| **Cor 15.3(a)** `C_M(H)=C_{M_σ}(H)X` | Prop 14.2(b1)(e) [§14] + Lemma 15.1(c) [mine, §14-gated] | ❌ |
+| **Cor 15.3(b)** G-conj→N_M(H)-conj | Thm 14.4 [§14] + Thm 15.2 の Q [mine, §14-gated] + Frattini | ❌ |
+| **Cor 15.4** `H nilp Hall→H⊆M_σ` | Cor 15.3(a) + σ-helper(✅ landed `sylow_le_Msigma_of_normalizer_le`)+ 冪零分解 | ❌(15.3 経由) |
+| **Cor 15.5** Fitting 分解 | Lemma 15.1(a) + Thm 15.2(g) + Cor 15.3(a) | ❌ |
+| **Lemma 15.1 / Thm 15.2** | Prop 14.2 / Thm 14.7 / 12.x [§14/§12] | ❌ |
+
+⟹ **§15 の substantive 結果は 1 つも §14 非依存に閉じない。** 真の上流ゲート = Lane H の §14 proof
+(Prop 14.2 / Thm 14.4 / Thm 14.7 — 現在 sorry、Lane H が Prop 14.2 case-τ₃ を実装中)。Lane G が
+§14非依存にできるのは (i) infrastructure helper(σ-helper / M_F API / 冪零分解 helper)と
+(ii) gated-endpoint skeleton(仮説パラメータ化 assembly、Cor 15.6 が例; `_of_inputs` engine 化)のみ。
+**§14 proof が main に landing したら sync して gated endpoint を unconditional 化するのが最短。**
+
+**Cor 15.4 の §14非依存 assembly 計画**(skeleton 化): S=非自明 Sylow of H → N_G(S) proper(G 単純・
+S≠⊥・S≠G)→ M∈ℳ(N_G(S)) → S⊆M_σ(σ-helper ✅)→ H 冪零ゆえ H=S×R, R≤C_G(S)≤N_G(S)≤M,
+各 H_q は C_M(S) 内の M の Sylow → Cor 15.3(a)[仮説化]で ≤M_σ → 冪零分解 helper で H≤M_σ。
+冪零分解 helper(`isNilpotent_iff_forall_sylow_normal` 経由「H 冪零 ∧ 全 Sylow≤K ⟹ H≤K」)が次の leaf。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
