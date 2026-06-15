@@ -3261,3 +3261,17 @@ Lean commit なし。consumer 解析でルート曖昧性を解消し cX 構築�
 
 ### session 43 cont.¹⁹: ✅ `caseB_induce_column_or_irreducible` — cover dichotomy per-θ (commit `69e36299`)
 非自明 θ で `Ind^L_H θ` = column (∃χ₂≠1 columnSum=Ind θ) ∨ irreducible。by_cases + `caseB_irr_induce_isIrreducible`。axiom-clean、leaf green。⟹ cover の per-θ 部品完成。次 = (a) Xset-level cover (hyp.Xset W2 の各 member を Ind θ 化して dichotomy 適用、W₂↔h46.W2 同定要)、(b) column base union (multi-degree `certainTypeSet` 和の coherence)、(c) hstep (XAdjoinStepInput, 既約 adjoin の member-family/degree)。**正本=本 cont.¹⁹。次=Xset-level cover or column base union。Opus 継続。**
+
+### session 43 cont.²⁰: 🧱 cX/X∪Y = heavy T8 確定 + 設計テンション特定 (commit: 本 note のみ)
+Lean commit なし (engine 在庫を exhaustive に確認し残務の本質を確定)。dispatch 層 (hnonlin/hcol/hirr/hirrAnc) + per-step adjoin (`adjoin_irr_nonreal_of_supportedDecomposition`) + cover dichotomy (`caseB_induce_column_or_irreducible`) は完了 (4 Lean commits)。ここから先 = **heavy T8** (multi-session)。
+
+**🔑 設計テンション (要解決、loop-cadence では不向き)**:
+- **教科書 (6.8.2)** = τ₂ を ℤ[X∪Y] 上に**直接**構成 (cX を別途作らない)。τ₂ は supported lattice で τ 一致 + η₁^τ₂=Y、生成集合 {ℤ[X∪Y,L^#]∪{η₁}} 上で内積保存 (per-φ images = (6.8.2.3))。
+- **repo §7 engines** は全て (a) **単一 pair adjoin** (`retarget_isCoherent_of_supportedDecomposition` (4031) / `…_and_memberFamily` (4126)、{χ,χ̄} 一組) か (b) **cX+glue** (`coherentUnion_of_glued*` (4407-4581)、別途 `cX:IsCoherent (Xset W2)` 要)。**教科書 τ₂ (直接 X∪Y) に対応する engine が無い。**
+- ⟹ 2 択: **(I) cX を構築** (repo engines 用) — mixed set ゆえ重い: multi-degree column base (各 `certainTypeSet h46 k` per degree class を union) + 既約 adjoin via xChainCoherent + **hstep (XAdjoinStepInput ~300 LOC、member-family/degree-bound)**。⚠ column の既約 constituent と irr X-member の重複/直交が要精査 (naive orthogonal adjoin が崩れうる)。 **(II) 新 §7 engine** = 教科書 τ₂ (cY + per-φ image family + generator 内積保存 → IsCoherent (X∪Y) 直接、retarget を family 化、~100-150 LOC)。
+- **(II) が教科書整合かつ cX の mixed 複雑性を回避** (η₁ anchor で全 X-member を cY に接続、separate cX 不要) — **推奨**。但し新 engine の正当性証明 (generator が ℤ[X∪Y] を張る + isometry) は要構築。
+
+**▶▶ 次の focused session の第一手**: **(II) τ₂ family engine** を S07 に構築 — `coherentUnion_of_supportedDecompositionFamily` (hS₀:IsCoherent S₀ + family Dχ:per-member supported decomposition anchored in S₀ + 正規直交 + generator-span hyp → IsCoherent (S₀∪T))。retarget の family 一般化。これが (6.8.2) τ₂ = X∪Y coherence を per-φ images から直接与え、cX/multi-degree/hstep を**全て回避**。
+
+**⏱ 正直な status**: endpoint A は heavy T8 + 設計判断点。dispatch/cover 層 (4 commits) 完了。残りは focused multi-turn build (τ₂ family engine 推奨)。loop の per-turn reload で route/engine 再考が嵩んだ — 次は (II) を腰を据えて build。ユーザー裁量: (a) loop 継続で (II) build / (b) 集中 workflow (要 opt-in) / (c) B を signature-pin (endpoint B/C/D/E) へ redirect。
+**正本=本 cont.²⁰。cX/X∪Y=heavy T8、教科書τ₂ vs repo cX+glue の設計テンション特定。推奨=(II) S07 τ₂ family engine 新設。Opus 継続。**
