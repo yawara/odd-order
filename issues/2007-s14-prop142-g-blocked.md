@@ -145,10 +145,14 @@ per-prime 形 (`p∈π(M)−(σ∪κ)`, `A=Ω₁(Syl_p)` で `|A|≤p² ∧ C_{M
 **(g) 配線 6 piece** (BG mmd L3850 確認済, 2026-06-15 着手):
 1. **E Frobenius** (kernel U=E₂E₃, complement K=E₁): ✅ **DONE** `isFrobeniusGroup_E_of_caseTau1`
    (S14, commit 後続) — actsRegularlyOn_E23_E1 で disjoint も conj_frobenius も。
-2. **C_{M_σ}(U)=1**: statement `Msigma_centralizer_E23_eq_bot_of_caseTau1` 確定、proof **subagent 進行中** —
-   Lem 14.1 (`msigma_structure_of_notMem_sigma_kappa`) を p∈π(U) (τ₂ は exists_elemAb_rank_two / τ₃ は
-   Cauchy で ℰ_p¹) に適用 + centralizer 単調。
+2. **C_{M_σ}(U)=1**: ✅ **DONE** `Msigma_centralizer_E23_eq_bot_of_caseTau1` (S14:1311, commit済) —
+   Lem 14.1 を p∈π(U) (τ₂/τ₃ 場合分け) に適用 + centralizer 単調。Lem 14.1 前方参照回避で 14.1 後ろに移動。
 3. **|K|素数**: #1+#2 で `prime_card_complement_of_frobenius_conj` (Thm 3.10(a) ✅) を適用 [assembly]。
+   **🛑 要 U abelian** (Thm 3.10(a) の hUab) = **foundational 残課題**: 経路は U=E' (E' abelian は
+   `nilpotent_sigmaComplement_abelian.2.1.2`) だが **U=E' に [U,K]=U (coprime FPF) の ready lemma 無し**
+   (`actionCommutator_eq_bot_…` は逆向き)。E'≤U は E/U≅E₁ abelian で容易、U≤E' (=[U,K]≤E') が要新補題。
+   他 hyp: M_σ nilp (Lem 14.1 の .2.2) / M_σ≠⊥ / coprime(E,M_σ) / E≤N(M_σ) / M_σ⊔E solvable / ActsPrimeOn
+   (`E1_actsPrime`) = 既存で容易。
 4. **σ=β**: **U=E' を要す** (E/U abelian ⟹ E'≤U; FPF coprime ⟹ U=[U,K]≤E' ⟹ U=E') →
    Lem 12.19 (`derivedE_centralizes_betaComplement` ✅: E'≤C_G(W), W=Hall β' of M_σ) + C_{M_σ}(U)=1
    ⟹ W≤C_{M_σ}(U)=1 ⟹ W=1 ⟹ β'∩π(M_σ)=∅ ⟹ σ⊆β; β⊆σ で σ=β [substantial]。
