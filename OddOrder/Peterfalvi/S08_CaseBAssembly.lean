@@ -415,6 +415,67 @@ theorem caseB_column_degree_match
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
 
+/-- **(6.8.2.3) induced-character degree match** (irreducible-branch form).  For the dispatch weight
+`aθ = constituentWeight hφ' θ` (`0 < aθ`), the induced degree matches the weighted `Y`-anchor:
+`(Ind^L_H θ)(1) = aθ · η₁(1)`.  Same arithmetic as `caseB_column_degree_match`, for the
+induced character directly (no column rewrite). -/
+theorem caseB_induce_degree_match
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) (1 : ↥L)
+      = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
+  rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
+    constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
+  ring
+
+/-- **(6.8.2.3) irreducible-branch anchor difference support** (`CaseBIrrBundle` conjunct).
+`Ind^L_H θ − aθ·η₁` is `H^#`-supported, by `support_indW2_sub_smul_subset_sharpImage` at `H`
+with the degree match `caseB_induce_degree_match`. -/
+theorem caseB_irr_sub_smul_support
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ]
+  exact hyp.support_indW2_sub_smul_subset_sharpImage (le_refl H) _ hη₁
+    (constituentWeight hφ' θ : ℂ) (caseB_induce_degree_match hyp hW2H hcen hφ' hweight hη₁)
+
+/-- **(6.8.2.3) irreducible-branch `ZIrr`-membership** (`CaseBIrrBundle` conjunct).
+`hyp.tau (Ind^L_H θ − aθ·η₁) ∈ ZIrr G`: the argument is `H^#`-supported
+(`caseB_irr_sub_smul_support`) and a virtual character (`induce_mem_ZIrr`, `η₁` irreducible), so the
+Dade map carries it into `ZIrr G` (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`). -/
+theorem caseB_irr_htau1_mema
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
+    hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - constituentWeight hφ' θ • η₁)
+      ∈ ZIrr G := by
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    hyp.dade hyp.hconj (caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁) ?_
+  exact Submodule.sub_mem _
+    (ClassFunction.induce_mem_ZIrr H (IsIrreducibleCharacter.mem_ZIrr θ.2))
+    (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) _)
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
