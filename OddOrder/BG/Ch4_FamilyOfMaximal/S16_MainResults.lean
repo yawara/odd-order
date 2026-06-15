@@ -525,6 +525,9 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
 is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
 theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M))
     {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
     (∀ x ∈ X, ∀ y ∈ X,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
@@ -548,7 +551,40 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   -- It is therefore isolated as a gated input; once it (and the dual-piece `TI` facts) land with
   -- their Hall hypotheses, `D ⊆ A(M)` (conjunct 2) becomes pure citation, as below.
   have hDsub : D ⊆ S14.sigmaSharp M := by
-    sorry
+    intro x hxD
+    obtain ⟨hxX, hx1, hxc⟩ := hxD
+    -- `x ∈ M_σ#`: it suffices to show `x ∈ M_σ` (we already have `x ≠ 1`).
+    simp only [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+      Set.mem_singleton_iff]
+    refine ⟨?_, hx1⟩
+    by_contra hxnMσ
+    -- `x ∉ M_σ`; the coerced form, and the TI piece for `A(M) - M_σ` (Theorem B(5)).
+    have hxnMσ' : x ∉ (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by rwa [SetLike.mem_coe]
+    have hTIB : IsTISubset (ASet M U \ (OddOrder.BG.Ch3.S10.Msigma M : Set G)) M :=
+      (theoremB_U_and_A_tame hG hM hU).2.2.2.2
+    rcases hX with hXA | hXA0
+    · -- `X = A(M)`: `x ∈ A(M) - M_σ`, so `C_G(x) ≤ M` (Theorem B(5)) contradicts `C_G(x) ⊄ M`.
+      exact hxc (hTIB.centralizer_le ⟨hXA ▸ hxX, hxnMσ'⟩)
+    · -- `X = A_0(M)`.
+      have hxA0 : x ∈ A0Set M K := hXA0 ▸ hxX
+      by_cases hxA : x ∈ ASet M U
+      · -- `x ∈ A(M) - M_σ`: Theorem B(5) again.
+        exact hxc (hTIB.centralizer_le ⟨hxA, hxnMσ'⟩)
+      · -- `x ∈ A_0(M) - A(M)`.
+        by_cases hKbot : K = ⊥
+        · -- **Type-F** (`K = ⊥`): `A_0(M) = \widehat{M_σ} ⊆ M = U M_σ` (Theorem A(3)),
+          -- so `x ∈ A(M)`, contradicting `x ∉ A(M)`.
+          refine hxA ⟨hxA0.1, ?_⟩
+          have hxM : x ∈ M := hxA0.1.1
+          have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+            (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+          have hx' : x ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hxM
+          rw [hKbot, bot_sup_eq] at hx'
+          exact hx'
+        · -- `K ≠ ⊥`: TI by Theorem C(9), giving `C_G(x) ≤ M`.
+          obtain ⟨_, _, _, _, _, _, _, _, _, hTIC, _, _⟩ :=
+            theoremC_paired_structure hG hM hKbot hK rfl hU
+          exact hxc (hTIC.centralizer_le ⟨hxA0, hxA⟩)
   -- **`D ⊆ A(M)` (conjunct 2).**  `D ⊆ M_σ#` and `M_σ# ⊆ A(M)`: a nonidentity `x ∈ M_σ` lies in
   -- `\widehat{M_σ}` (`sigmaSharp_subset_hatMsigma`) and in `M_σ ≤ U M_σ`, so `x ∈ A(M)`.
   have hMσsharp_sub_A : S14.sigmaSharp M ⊆ ASet M U := by

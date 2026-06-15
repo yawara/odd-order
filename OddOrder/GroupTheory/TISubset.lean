@@ -101,6 +101,19 @@ theorem subset {A' : Set G} (hA : IsTISubset A L) (hA' : A' ⊆ A) :
     IsTISubset A' L :=
   fun g ⟨a, ha', hga'⟩ => hA g ⟨a, hA' ha', hA' hga'⟩
 
+/-- もし `A` が `L`-bound の TI-subset で `x ∈ A` なら, `x` の `G`-中心化群全体が `L`
+に収まる: `c ∈ C_G(x)` は `x = c x c⁻¹ ∈ A` を固定するので, TI 条件が `c ∈ L` を強制
+する. BG Thm II の "`C_G(x) ⊄ M` ⇒ `x ∈ M_σ`" 論法で使う汎用 infra. -/
+theorem centralizer_le (hA : IsTISubset A L) {x : G} (hx : x ∈ A) :
+    Subgroup.centralizer ({x} : Set G) ≤ L := by
+  intro c hc
+  have hcomm : x * c = c * x :=
+    Subgroup.mem_centralizer_iff.mp hc x (Set.mem_singleton x)
+  have hfix : c * x * c⁻¹ ∈ A := by
+    have hxx : c * x * c⁻¹ = x := by rw [← hcomm, mul_inv_cancel_right]
+    rwa [hxx]
+  exact hA c ⟨x, hx, hfix⟩
+
 end IsTISubset
 
 end OddOrder.GroupTheory
