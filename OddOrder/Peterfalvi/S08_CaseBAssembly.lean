@@ -557,6 +557,33 @@ theorem caseB_irr_induce_isIrreducible
     rw [← hindeq, OddOrder.Peterfalvi.S06.columnSum_def,
       ← h46.induce_restrict_certainType_eq χ₂, ← h46.coe_chiRestrict χ₂, hcontra]
 
+/-- `Ind^L_H θ ≠ 1_L`: its degree is a multiple of `|W₁| > 1` (`W₁ ≠ ⊥`), unlike the
+degree-`1` trivial character. -/
+theorem caseB_induce_ne_trivial
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (θ : IrreducibleCharacter ↥H) :
+    ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥L := by
+  intro h
+  obtain ⟨d, hd0, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have h1 : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L)
+      = trivialClassFunction ↥L (1 : ↥L) := by rw [h]
+  rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hd, trivialClassFunction_apply,
+    ← Nat.cast_mul] at h1
+  have h2 : Nat.card hyp.W1 * d = 1 := by exact_mod_cast h1
+  exact hyp.W1_nontrivial (Subgroup.card_eq_one.mp (Nat.dvd_one.mp ⟨d, h2.symm⟩))
+
+/-- **(6.8.2.3) irreducible-branch non-realness** (`CaseBIrrBundle` conjunct #2).  An irreducible
+`Ind^L_H θ` is non-real: it is nontrivial (`caseB_induce_ne_trivial`) and `L` has odd order
+(`card_L_odd`), so Peterfalvi (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`) applies. -/
+theorem caseB_irr_nonreal
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))) :
+    ¬ ClassFunction.IsReal (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  refine OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+    hyp.card_L_odd (χ := ⟨_, hirr1⟩) (fun htriv => caseB_induce_ne_trivial hyp θ ?_)
+  rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter (G := ↥L), ← htriv]
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
