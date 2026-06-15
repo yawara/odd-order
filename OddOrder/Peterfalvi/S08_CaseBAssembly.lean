@@ -290,6 +290,69 @@ theorem caseB_column_conj_orthogonal_Yset
   rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
   exact caseB_column_orthogonal_Yset hyp h46 hW1 hη₁ χ₂⁻¹ a
 
+/-- **(6.8.2.3) column-anchor difference support.**  Given the degree match at `1`, the column
+difference `columnSum h46 χ₂ − a·η₁` is `H^#`-supported.  A column is induced from `H`
+(`columnSum_eq_induce_H`, case `h46.K = H`), so this is the `Ind − scalar·η₁` support lemma
+`support_indW2_sub_smul_subset_sharpImage` instantiated at the subgroup `H` itself. -/
+theorem caseB_column_sub_smul_support
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (a : ℕ)
+    (h1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L) = (a : ℂ) * η₁ (1 : ↥L)) :
+    (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  rw [columnSum_eq_induce_H h46 hHK, ← Nat.cast_smul_eq_nsmul ℂ]
+  refine hyp.support_indW2_sub_smul_subset_sharpImage (le_refl H) _ hη₁ (a : ℂ) ?_
+  rw [← columnSum_eq_induce_H h46 hHK]; exact h1
+
+/-- **(6.8.2.3) column-branch supports** (the `hSdiff` conjunct of `CaseBColBundle`).  Both running
+difference generators are `H^#`-supported: `columnSum − conj` by `columnDiff_support_subset` (the
+conjugate is the inverse column, equal degree), and `columnSum − a·η₁` by
+`caseB_column_sub_smul_support` (given the degree match `h1`). -/
+theorem caseB_column_hSdiff
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (a : ℕ)
+    (h1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L) = (a : ℂ) * η₁ (1 : ↥L)) :
+    ∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  intro s hs
+  simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+  rcases hs with rfl | rfl
+  · rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+  · exact caseB_column_sub_smul_support hyp h46 hHK hη₁ χ₂ a h1
+
+/-- **(6.8.2.3) column-branch `ZIrr`-membership** (the `htau1_mema` conjunct of `CaseBColBundle`).
+The `hyp.tau`-image of the column difference is a virtual character: the argument
+is `H^#`-supported (`caseB_column_sub_smul_support`, given the degree match) and virtual
+(`columnSum` a sum of irreducibles, `η₁` irreducible), so the Dade map carries it into `ZIrr G`
+(`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, the `(2.6)` integrality of `tau`). -/
+theorem caseB_column_htau1_mema
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (a : ℕ)
+    (h1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L) = (a : ℂ) * η₁ (1 : ↥L)) :
+    hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G := by
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    hyp.dade hyp.hconj (caseB_column_sub_smul_support hyp h46 hHK hη₁ χ₂ a h1) ?_
+  refine Submodule.sub_mem _ ?_
+    (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) a)
+  rw [OddOrder.Peterfalvi.S06.columnSum_def]
+  exact Submodule.sum_mem _ (fun i _ => ((h46.columnFamily χ₂).mu i).mem_ZIrr)
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
