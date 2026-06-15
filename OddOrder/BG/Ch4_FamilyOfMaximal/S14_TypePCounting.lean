@@ -676,8 +676,72 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- (`hEnorm`), and `K^* = C_{M_σ}(K) ≤ C_G(X) ≤ N_G(X)`, `K^* ≤ M_σ ≤ M`.  `⊆` (BG "clear",
       -- needs the `M = M_σ ⋊ E` semidirect structure) is deferred.
       intro p hp X hXrank hXK
+      haveI : Fact p.Prime := ⟨hp⟩
       refine le_antisymm ?_ ?_
-      · sorry
+      · -- ⊆: decompose `n = s·e` (`s ∈ M_σ`, `e ∈ E`) in `↥M`; for `g ∈ X#`, `s·(ege⁻¹)·s⁻¹ =
+        -- ngn⁻¹ ∈ X ≤ E`, so `[s, ege⁻¹] ∈ M_σ ∩ E = 1`, i.e. `s` centralizes `ege⁻¹ ∈ E#`.
+        -- Prime action then gives `s ∈ C_{M_σ}(E) = K*`, and `e ∈ E = K`.
+        intro n hn
+        rw [Subgroup.mem_inf] at hn
+        obtain ⟨hnX, hnM⟩ := hn
+        haveI hMσnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+          rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+        have hsuptop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔ E.subgroupOf M = ⊤ := by
+          rw [← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) hsetup.E_le,
+            hsetup.E_compl_sup, Subgroup.subgroupOf_self]
+        obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_left.mp
+          (hsuptop ▸ Subgroup.mem_top (⟨n, hnM⟩ : ↥M))
+        have hs : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := Subgroup.mem_subgroupOf.mp ha
+        have he : (b : G) ∈ E := Subgroup.mem_subgroupOf.mp hb
+        have hse : (a : G) * (b : G) = n := by
+          have h := congrArg (Subtype.val) hab; simpa using h
+        -- A nonidentity `g ∈ X` and `y' = e g e⁻¹ ∈ E#`.
+        obtain ⟨⟨g, hgX⟩, hg1⟩ :=
+          Subgroup.ne_bot_iff_exists_ne_one.mp (ne_bot_of_mem_elemAbelianOfRank_one hXrank)
+        have hg1' : g ≠ 1 := fun h => hg1 (Subtype.ext h)
+        have hgE : g ∈ E := (hXK.trans hKEeq.le) hgX
+        have hy'E : (b : G) * g * (b : G)⁻¹ ∈ E := E.mul_mem (E.mul_mem he hgE) (E.inv_mem he)
+        have hy'1 : (b : G) * g * (b : G)⁻¹ ≠ 1 := by
+          rw [show (b : G) * g * (b : G)⁻¹ = MulAut.conj (b : G) g from (MulAut.conj_apply _ _).symm]
+          exact fun hc => hg1' ((MulAut.conj (b : G)).map_eq_one_iff.mp hc)
+        -- `s · y' · s⁻¹ = n g n⁻¹ ∈ X ≤ E`.
+        have hsy' : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ = n * g * n⁻¹ := by
+          rw [← hse]; group
+        have hngn : n * g * n⁻¹ ∈ X := (Subgroup.mem_normalizer_iff.mp hnX g).mp hgX
+        -- `[s, y'] ∈ M_σ ∩ E = 1`, so `s` centralizes `y'`.
+        have hsy'E : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ ∈ E :=
+          hsy' ▸ (hXK.trans hKEeq.le) hngn
+        have hy'N : (b : G) * g * (b : G)⁻¹ ∈
+            Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+          le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M (hsetup.E_le hy'E)
+        have hcommMσ : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ *
+            ((b : G) * g * (b : G)⁻¹)⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+          have h1 : ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ * ((b : G) * g * (b : G)⁻¹)⁻¹ ∈
+              OddOrder.BG.Ch3.S10.Msigma M :=
+            (Subgroup.mem_normalizer_iff.mp hy'N (a : G)⁻¹).mp
+              ((OddOrder.BG.Ch3.S10.Msigma M).inv_mem hs)
+          have heq : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ *
+              ((b : G) * g * (b : G)⁻¹)⁻¹ =
+              (a : G) * (((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ *
+                ((b : G) * g * (b : G)⁻¹)⁻¹) := by group
+          rw [heq]; exact (OddOrder.BG.Ch3.S10.Msigma M).mul_mem hs h1
+        have hcomm1 : (a : G) * ((b : G) * g * (b : G)⁻¹) * (a : G)⁻¹ *
+            ((b : G) * g * (b : G)⁻¹)⁻¹ = 1 := by
+          have hmem : _ ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ E :=
+            Subgroup.mem_inf.mpr ⟨hcommMσ, E.mul_mem hsy'E (E.inv_mem hy'E)⟩
+          rw [hsetup.E_compl_inf] at hmem; exact Subgroup.mem_bot.mp hmem
+        -- `s ∈ C_{M_σ}(y') = C_{M_σ}(E) = K*`, `e ∈ E = K`, so `n = s·e ∈ K ⊔ K*`.
+        have hscent : (a : G) ∈ Subgroup.centralizer ({(b : G) * g * (b : G)⁻¹} : Set G) := by
+          rw [Subgroup.mem_centralizer_iff]
+          intro z hz
+          rw [Set.mem_singleton_iff.mp hz]
+          exact (mul_inv_eq_iff_eq_mul.mp (mul_inv_eq_one.mp hcomm1)).symm
+        have hsKstar : (a : G) ∈ Kstar := by
+          rw [hKstar, hKEeq, ← fixedBy_def, ← hEprime _ hy'E hy'1, fixedByElement_def]
+          exact Subgroup.mem_inf.mpr ⟨hs, hscent⟩
+        rw [← hse]
+        exact Subgroup.mul_mem _ (Subgroup.mem_sup_right hsKstar)
+          (Subgroup.mem_sup_left (hKEeq ▸ he))
       · refine sup_le ?_ ?_
         · rw [hKEeq]
           exact le_inf (hEnorm p hp X hXrank (hXK.trans hKEeq.le)) (hKEeq ▸ hKM)
