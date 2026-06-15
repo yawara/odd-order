@@ -700,6 +700,43 @@ theorem caseB_induce_conj_ne_Yset
     rw [mul_one, ← Nat.cast_mul]; exact h1
   exact mul_left_cancel₀ hw hd1
 
+/-- **(6.8.2.3) per-`θ` anchor-vs-constituent orthogonality** (`hirrAnc` of the dispatch).  For a
+positive-weight `θ` whose `Ind^L_H θ` is not a column (irreducible branch), the four inner products of
+`η₁, η̄₁` against the induced character and its conjugate vanish: each is a `Y`-member against a
+distinct irreducible (`inner_Yset_irr_eq_zero`), distinctness from non-linearity `hnonlin`. -/
+theorem caseB_hirrAnc
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hnonlin : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (i.val : ClassFunction ↥H ℂ) 1 ≠ 1) :
+    ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+          OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            ≠ ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) →
+        ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0
+        ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁.conj
+            (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0 := by
+  intro i hnotcol
+  have hθne : (i.val : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
+    hnonlin i (by rw [heq, trivialClassFunction_apply])
+  have h1 := caseB_irr_induce_isIrreducible h46 hHK hθne hnotcol
+  have hconj := hyp.Yset_closedUnderConjugate hη₁
+  refine ⟨inner_Yset_irr_eq_zero hyp hη₁ h1 (caseB_induce_ne_Yset hyp (hnonlin i) hη₁).symm,
+    inner_Yset_irr_eq_zero hyp hη₁ h1.conj (caseB_induce_conj_ne_Yset hyp (hnonlin i) hη₁).symm,
+    inner_Yset_irr_eq_zero hyp hconj h1 (caseB_induce_ne_Yset hyp (hnonlin i) hconj).symm,
+    inner_Yset_irr_eq_zero hyp hconj h1.conj
+      (caseB_induce_conj_ne_Yset hyp (hnonlin i) hconj).symm⟩
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/

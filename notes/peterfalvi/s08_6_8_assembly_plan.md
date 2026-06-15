@@ -3143,3 +3143,17 @@ irr branch 残り conjunct + 完全 constructor:
 3. **(6.8.2.2) aggregate** `hXaggorth`/`hdecomp` (`exists_decomposition_caseB` S08:126)。
 4. → caseB_per_phi_anchored_fromYset per-φ image → HYBRID 組立 (X_irr chain-adjoin + cX_col union) → capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59)。
 **正本=本 session 43 cont.¹¹。両 bundle (hcol+hirr) constructor 完成 (`78e0abbe`)。次=hirrAnc → dispatch family → aggregate → HYBRID → capstone。Opus 継続。**
+
+### session 43 cont.¹²: ✅ 全 per-θ dispatch 入力 (hcol/hirr/hirrAnc) + distinctness 機構完成 (commits `1ba0b967`/`a938c3ec`)
+- **distinctness 機構**: `inner_Yset_irr_eq_zero` (Y-member ⊥ 別既約、η first)、`caseB_induce_ne_Yset`/`caseB_induce_conj_ne_Yset` (`Ind θ ≠ η`/`conj ≠ η` from `θ(1)≠1` degree)。⟹ **`θ(1)≠1` 単一 input が θ≠trivial + 全 ≠η₁ distinctness を出す** (φ≠trivial 不要)。
+- **`caseB_hirrAnc`**: dispatch の hirrAnc (per-θ anchor 4-直交) を `∀i, θ(1)≠1` (hnonlin) から構成。Ind θ 既約(#1) + inner_Yset_irr_eq_zero。⚠ forward-ref 回避で caseB_induce_conj_ne_Yset 後ろに配置 (Python move)。
+
+**⟹ 🎯 caseB_per_phi_anchored_fromYset の 3 per-θ 入力すべて構成可能**: hcol=`caseB_column_bundle`、hirr=`caseB_irr_bundle`、hirrAnc=`caseB_hirrAnc`。残り入力 = (6.8.2.2) aggregate `hXaggorth`/`hdecomp` (`exists_decomposition_caseB` S08CB2:126、存在) + `hnonlin` (∀i, θ(1)≠1)。
+
+**📋 残り capstone への multi-step assembly (§8 case-B 中核、多ターン)**:
+1. **hnonlin** `∀i:{θ//0<weight}, θ(1)≠1`: 中心制限 `Res_{W₂}θ=θ(1)·φ` (φ=source) + φ≠trivial + W₂⊆H' ⟹ θ 非線形。要 φ≠trivial (capstone 文脈 or 中心制限 chain)。
+2. **dispatch family 構築**: hcol/hirr/hirrAnc + aggregate + hnonlin を caseB_per_phi_anchored_fromYset に wiring → per-i anchored image (concrete)。
+3. **HYBRID 組立** (cont.⁷續⁵): per-φ image を diagonal data に、X_irr を cY に `retarget_isCoherent_of_supportedDecomposition` で chain-adjoin + cX_col (`certainTypeSet_isCoherent_tau_canonical`) を §7 union → coherence on Xset。
+4. **cX ∪ cY glue**: `coherentXunionYset_caseB_of_glued` (S08CB2:1616, sorry-free shell)。
+5. **case split + Frobenius**: capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59) で hyp.cases 分岐、Frobenius は既存 discharge、CertainType は h46 から上記組立。
+**正本=本 session 43 cont.¹²。全 per-θ dispatch 入力構成可能 (`a938c3ec`)。残り = hnonlin + family wiring + HYBRID + glue + case split (multi-turn)。infra 完成。Opus 継続。**
