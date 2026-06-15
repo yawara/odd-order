@@ -353,6 +353,68 @@ theorem caseB_column_htau1_mema
   rw [OddOrder.Peterfalvi.S06.columnSum_def]
   exact Submodule.sum_mem _ (fun i _ => ((h46.columnFamily χ₂).mu i).mem_ZIrr)
 
+/-- **(6.8.2.3) weight reconciliation `aθ = θ(1)`.**  When the source `φ` actually occurs in the
+central restriction of `θ` (`0 < constituentWeight`), the multiplicity `aθ = ⟨φ, Res^H_{W₂} θ⟩`
+equals the degree `θ(1)`.  Indeed `W₂` is central in `H`, so `Res^H_{W₂} θ = θ(1)·λ` for a unique
+linear `λ` (Schur, `exists_central_linear_restriction`); then `aθ = θ(1)·⟨φ, λ⟩` with `⟨φ, λ⟩` a
+Kronecker delta (both irreducible), and positivity forces it to be `1`.  This reconciles the
+multiplicity weight with the degree ratio `θ(1) = χθ(1)/|W₁|` of (6.8.2.3). -/
+theorem constituentWeight_eq_apply_one
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Fintype ↥H]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ) :
+    (constituentWeight hφ' θ : ℂ) = (θ : ClassFunction ↥H ℂ) 1 := by
+  obtain ⟨lam, hlamirr, _hlam1, hres, _⟩ :=
+    θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
+  have hspec := constituentWeight_spec hφ' θ
+  rw [hres, OddOrder.RepresentationTheory.inner_smul_right] at hspec
+  obtain ⟨d, _hd0, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  rw [hd, star_natCast] at hspec
+  have hkron := irreducibleCharacter_inner_eq_ite
+    (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ, hφ'⟩ :
+      IrreducibleCharacter ↥(W2.subgroupOf H))
+    (⟨lam, hlamirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
+  by_cases heq : (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ, hφ'⟩ :
+      IrreducibleCharacter ↥(W2.subgroupOf H)) = ⟨lam, hlamirr⟩
+  · rw [if_pos heq] at hkron
+    rw [hkron, mul_one] at hspec
+    rw [hd]; exact hspec.symm
+  · rw [if_neg heq] at hkron
+    rw [hkron, mul_zero] at hspec
+    exact absurd hspec.symm (by exact_mod_cast hweight.ne')
+
+/-- **(6.8.2.3) column-anchor degree match.**  For a column `columnSum h46 χ₂ = Ind^L_H θ` with the
+source occurring in `θ` (`0 < constituentWeight`), the column degree equals the weighted `Y`-anchor
+degree: `columnSum(1) = constituentWeight · η₁(1)`.  Indeed `columnSum(1) = (Ind^L_H θ)(1) =
+|W₁|·θ(1)` (`induce_apply_one`, `index_H_eq_card_W1`), `η₁(1) = |W₁|` (`Yset_apply_one`), and
+`constituentWeight = θ(1)` (`constituentWeight_eq_apply_one`).  This is the `h1` hypothesis that the
+support/`ZIrr` column conjuncts need. -/
+theorem caseB_column_degree_match
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (hcoleq : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+      = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :
+    (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) (1 : ↥L)
+      = (constituentWeight hφ' θ : ℂ) * η₁ (1 : ↥L) := by
+  rw [hcoleq, ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
+    constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
+  ring
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
@@ -478,6 +540,37 @@ abbrev CaseBIrrBundle (hyp : SibleyDadeHypothesis G L H)
         (a • η₁ : ClassFunction ↥L ℂ) = 0)
     ∧ (ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
         (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0)
+
+/-- **(6.8.2.3) full column-branch bundle.**  Assembles the entire `CaseBColBundle` for the dispatch
+weight `aθ = constituentWeight hφ' θ`: all six conjuncts hold.  The two degree-coupled ones (`hSdiff`,
+`htau1_mema`) are supplied with the degree match `caseB_column_degree_match` (needs the source to
+occur in `θ`, `0 < constituentWeight`); the rest are unconditional.  This is the column-branch input
+`hcol` of the mixed per-`φ` dispatch (`caseB_per_phi_anchored_fromYset`). -/
+theorem caseB_column_bundle
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
+    CaseBColBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
+  intro χ₂ hχ₂ hcoleq
+  have h1 := caseB_column_degree_match hyp h46 hW2H hcen hφ' hweight hη₁ hcoleq
+  exact ⟨(OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm,
+    caseB_column_mapagree hyp h46 hχ₂,
+    caseB_column_hSdiff hyp h46 hHK hη₁ hχ₂ (constituentWeight hφ' θ) h1,
+    caseB_column_htau1_mema hyp h46 hHK hη₁ χ₂ (constituentWeight hφ' θ) h1,
+    caseB_column_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ),
+    caseB_column_conj_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ)⟩
 
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
