@@ -107,6 +107,81 @@ theorem dade_H_eq {A : Set G} (hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesi
     Subgroup.mem_subgroupOf.mpr hx
   exact Subgroup.mem_subgroupOf.mp (hle h1)
 
+/-- **Structure extensionality for `S04.Hypothesis` via the data field `H`.**  `H` is the only
+`Type`-valued field of `S04.Hypothesis`; the remaining eight fields are `Prop`s, equal by proof
+irrelevance.  So two hypotheses on the same `(G, A, L)` whose `H`-fields coincide are equal.  This
+is the structural half of the `dade_H_eq` canonicality (the group theory pins `H`, this packages it
+back into a structure equality). -/
+theorem dadeHypothesis_ext_of_H_eq {A : Set G}
+    {p q : OddOrder.Peterfalvi.S04.Hypothesis G A L} (hH : p.H = q.H) : p = q := by
+  cases p with
+  | mk s1 s2 s3 H1 c1 c2 c3 c4 c5 =>
+    cases q with
+    | mk t1 t2 t3 H2 d1 d2 d3 d4 d5 =>
+      subst hH
+      rfl
+
+/-- The integral Dade map `dadeIntegralCharacterMap` ignores its `FullDadeIsometryData` argument:
+its definition extends only `hyp.dadeLinearMap`, so the map is a function of the underlying
+`S04.Hypothesis` alone.  Hence equal hypotheses give the same map, regardless of the (unused)
+isometry data carried alongside. -/
+theorem dadeIntegralCharacterMap_congr_hyp {A : Set G}
+    {hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L} (h : hyp₁ = hyp₂)
+    (d₁ : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp₁)
+    (d₂ : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp₂)
+    (φ : ClassFunction ↥L ℂ) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp₁ d₁ φ
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp₂ d₂ φ := by
+  subst h; rfl
+
+/-- **(6.8.2.3) map-agreement — the `hmapagree` linchpin.**  On every `H^#`-supported `φ`, the
+enlarged `(4.6)` Dade map `dadeIntegralCharacterMap h46.dade0 h46.tau` (on `A₀ = H^# ∪ V^L`)
+agrees with the Sibley–Dade `hyp.tau` (the genuine Dade map on `A = H^#`).
+
+Both sides agree on `CF(L, H^#)` with the Dade map of an `S04.Hypothesis` over `(G, H^#, L)`:
+restricting `h46.dade0` to `H^#` (`dadeIntegralCharacterMap_restrict_eq_of_support`) yields such a
+hypothesis, and by the canonicality `dade_H_eq` it shares its only data field `H` with `hyp.dade`,
+hence equals it (`dadeHypothesis_ext_of_H_eq`); since `dadeIntegralCharacterMap` depends only on
+the hypothesis (`dadeIntegralCharacterMap_congr_hyp`) and `hyp.tau` unfolds to
+`dadeIntegralCharacterMap hyp.dade _`, the two maps agree.  This is the agreement consumed by
+`certainTypeSet_isCoherent_tau`
+to re-target the certain-type column coherence (built against `h46.dade0`) onto `hyp.tau`. -/
+theorem SibleyDadeHypothesis.dade0_map_eq_tau_of_support
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    {φ : ClassFunction ↥L ℂ}
+    (hφ : φ.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ := by
+  have hLemmaD :
+      h46.dade0.restrict Set.subset_union_left hyp.dade.L_normalizes_A = hyp.dade :=
+    dadeHypothesis_ext_of_H_eq
+      (funext fun a => dade_H_eq
+        (h46.dade0.restrict Set.subset_union_left hyp.dade.L_normalizes_A) hyp.dade a)
+  rw [← dadeIntegralCharacterMap_restrict_eq_of_support h46.dade0 h46.tau
+        Set.subset_union_left hyp.dade.L_normalizes_A hφ]
+  exact dadeIntegralCharacterMap_congr_hyp hLemmaD _ _ φ
+
+/-- **(6.8.2) case-(B) certain-type column coherence for `hyp.tau`, `hmapagree` discharged.**  The
+reducible certain-type columns `{μ_j} = certainTypeSet h46 k` are coherent for the genuine
+Sibley–Dade map `hyp.tau` — the unconditional form of `certainTypeSet_isCoherent_tau`, with its
+map-agreement hypothesis supplied by the canonicality `dade0_map_eq_tau_of_support` (each
+`φ ∈ zSupportedSpan` being `H^#`-supported by `support_subset_of_mem_zSupportedSpan`).  This is
+the `cX_col` reducible side of the case-(B) `X`-coherence. -/
+noncomputable def SibleyDadeHypothesis.certainTypeSet_isCoherent_tau_canonical
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
+  hyp.certainTypeSet_isCoherent_tau h46 hk
+    (fun _ hφ => hyp.dade0_map_eq_tau_of_support h46
+      (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ))
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
