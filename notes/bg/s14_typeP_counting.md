@@ -390,3 +390,27 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 
 **▶ 推奨**: branch proof は cyclic-Sylow/Hall-共役 helper の特定が要で multi-hour。loop は clean piece
 (opening/核補題/14.7(h)/kappa helpers) を抽出済。**dedicated session で ∃→∀ upgrade を起点に駆動**が効率的。
+
+### ✅ K=E の正しい根拠を BG 原文で確定 + 土台 helper landing (2026-06-15 loop)
+**`K=E` は BG mmd L3838 が verbatim で "Then K=E" と明示** (case-τ₃)。当初「P1 限定では?」と疑ったが
+**誤り**で、case-τ₃ では常に K=E。**cyclic-Sylow machinery は K=E にも不要**(上記旧プランの「最大の friction」
+は霧消)。正しい chain (原文の "(a) and (b1) are clear" を展開):
+1. **C_{M_σ}(E) ≠ 1**: E prime on M_σ (Cor 13.11) ＋ E₃≤E 非regular ⟹ ∃ x∈E₃#, C_{M_σ}(x)≠1。
+   prime作用で全 g∈E# に `C_{M_σ}(g)=C_{M_σ}(E)` ⟹ C_{M_σ}(E)≠1。
+   **✅ landing 済 (helper `Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular`, S14)**: 引数
+   `(hEprime: ActsPrimeOn (Msigma M) E) (hE3le: E₃≤E) (hreg: ¬ActsRegularlyOn (Msigma M) E₃)` →
+   `Msigma M ⊓ C(E) ≠ ⊥`。証明 = by_contra/push_neg で witness 抽出 + `hEprime x` の等式 + `fixedBy_def`。
+   (これは **Kstar≠1 conjunct そのもの** にもなる: K=E 後 Kstar=C_{M_σ}(K)=C_{M_σ}(E)。)
+2. **π(E) ⊆ κ(M)** (= κ⊇π(E)): 各 p∣|E| につき rank-1 P=⟨g⟩≤E (order p) を取り、prime作用で
+   `C_{M_σ}(P)=C_{M_σ}(g)=C_{M_σ}(E)≠1` ⟹ κ-witness 成立。p∈τ₁∪τ₃ は **E₂=⊥ ⟹ r_p(M)≠2** から
+   (p∣|E|⟹r_p∈{1,2}; E₂=⊥ で τ₂ 排除 ⟹ r_p=1 ⟹ τ₁ or τ₃)。
+3. **E₂=⊥**: hEeq `E=E₁⊔E₃` ＋ E₂ Hall τ₂(M) of E。π(E₁⊔E₃)⊆τ₁∪τ₃ (E_i は τ_i-group) ＋ τ₂ 互いに素
+   ⟹ |E₂| の素因数なし ⟹ E₂=⊥。**(注: Cor 13.11 内部 `hE2:E₂=⊥` は return されないので S14 で再導出要)**。
+4. **E は Hall κ(M) of M**: π(E)⊆κ (step 2) ＋ [M:E]=|M_σ| が σ-number で κ⊆σ' ゆえ κ と互いに素
+   ⟹ `E.subgroupOf M` が Hall κ(M)。
+5. **K=E**: K≤E (setup) ＋ K,E とも Hall κ(M) ⟹ |K|=|E| ⟹ `Subgroup.eq_of_le_of_card_ge` 等で K=E。
+6. **U=1** (原文 "let U=1"): a/b1 の U は trivial。conjunct (a) の "regular on U" は U=⊥ で自明。
+
+**▶ 次 fragment 順**: (3) E₂=⊥ helper → (2) π(E)⊆κ (helper, step1 helper を消費) → (4) E Hall κ →
+(5) K=E。各 build-green の verified step。K=E 後は 5 conjuncts を Cor 13.11 出力 + K=E で組立
+(conjunct1=hEprime+K=E, conjunct2=step1 helper, 他は §13 cite)。**landing 済 = step1 helper のみ; 残 5 step**。

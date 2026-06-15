@@ -227,6 +227,30 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
   rw [hg]
   exact ha z hzPw
 
+/-- **Global `M_σ`-fixed point from prime action + a single non-regular point** (BG
+Proposition 14.2, `κ(M) ∩ τ₃(M) ≠ ∅` case): if `E` acts in a prime manner on `M_σ` and some
+`E₃ ≤ E` does not act regularly (a witness `x ∈ E₃#` has `C_{M_σ}(x) ≠ 1`), then prime action
+collapses `C_{M_σ}(x) = C_{M_σ}(E)` for every `x ∈ E#`, so `C_{M_σ}(E) ≠ 1`.
+
+Once `K = E` this is the conjunct `K^* = C_{M_σ}(K) ≠ 1`.  It also drives the `κ(M) ⊇ π(E)`
+step of `K = E`: for each prime `p ∣ |E|`, a rank-one `P ≤ E` of order `p` has, by prime
+action, `C_{M_σ}(P) = C_{M_σ}(E) ≠ 1`, so `p ∈ κ(M)`. -/
+theorem Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular {M E E₃ : Subgroup G}
+    (hEprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E) (hE3le : E₃ ≤ E)
+    (hreg : ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) ≠ ⊥ := by
+  -- A non-regular witness `x ∈ E₃#` with `C_{M_σ}(x) ≠ 1`.
+  have hxex : ∃ x ∈ E₃, x ≠ 1 ∧
+      fixedByElement (OddOrder.BG.Ch3.S10.Msigma M) x ≠ ⊥ := by
+    by_contra hcon
+    push_neg at hcon
+    exact hreg fun x hx hx1 => hcon x hx hx1
+  obtain ⟨x, hxE3, hx1, hxfix⟩ := hxex
+  -- Prime action collapses the `x`-fixed points to the `E`-fixed points.
+  have heq := hEprime x (hE3le hxE3) hx1
+  rw [← fixedBy_def, ← heq]
+  exact hxfix
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
