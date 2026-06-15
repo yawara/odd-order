@@ -33,11 +33,18 @@ cite するには `K,U` を Hall 因子に pin する必要**がある。
 - [x] **(2) signature fix** — ✅ `hK`(κ-Hall)/`hU`((κ∪σ)ᶜ-Hall) 追加 (`f0b16276`, caller ゼロ非破壊)。
 - [x] **(3) L483 `hDsub`** — ✅✅ **完全 sorry-free** (`f0b16276`): B(5)/C(9)+`centralizer_le` cite、
   **K=⊥ type-F wrinkle も Thm A(3) (`M=K⊔U⊔M_σ`, K=⊥⟹`M=U M_σ`⟹`x∈hatM_σ⊆M⟹x∈A(M)`矛盾) で解決**。
-- [ ] **(4) L497 Conjunct 1 (Ti)** — 残 (heavier、cross-piece TI 分解)。
-- [ ] **(L522 uniqueness)** — genuine gate (BG §9-10)、documented gate のまま。
+- [x] **(4) Conjunct 1 (Ti)** — ✅ **gated-endpoint skeleton 着地** (`29b296de`): 新
+  `theoremII_conjunct1_of_inputs` (sorry-free+axiom-clean) が within-piece logic (M_σ=Thm D(1),
+  各 TI piece=B(5)/C(9)+IsTISubset 定義) を検証、cross-piece exclusion を named hyp `hPieceInv`
+  ("distinct orders across pieces") に局所化。theoremII の Conjunct 1 を配線 (K=⊥ は Thm A(3) で
+  A_0−A(M)=∅ vacuous TI)。⟹ opaque sorry を `hPieceInv` (= **BG Theorem E** prime-structure, gated) に置換。
+- [ ] **(uniqueness)** — 🛑 genuine gate と再確認 (Lane F tick): `|ℳ(C_G(x))|=1` 要。**BG §9
+  `uniquenessTheorem` は rank≥2 + rank-3 条件を要求**し、x∈M_σ# の C_G(x) には rank 条件が無く直接 cite 不可;
+  D(4) の ∃! は full predicate Q 限定。⟹ documented gate のまま。
 
-リポ sorry 144→142、full build 3831 green、AxiomsCheck OK。**hDsub 完了で issue の主目標達成**
-(残 (4)/uniqueness は後続)。
+リポ sorry 142 (skeleton は sorry-free 追加で不変)、full build 3831 green、AxiomsCheck OK。
+**issue 主目標 (hDsub) 達成 + Conjunct 1 skeleton 化。残 = hPieceInv (BG Thm E) + uniqueness (BG §9 rank-gate)、
+両者とも §16 main-result / BG Uniqueness の upstream landing 待ち。**
 
 ## やること (当初プラン)
 

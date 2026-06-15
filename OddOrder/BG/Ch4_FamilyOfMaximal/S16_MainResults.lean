@@ -521,6 +521,52 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
         · exact Or.inl hMI
         · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI))
 
+/-- **Assembly for BG Theorem II (Ti)** (mmd L4546--L4550), as a `sorry`-free,
+axiom-clean *gated-endpoint skeleton*.
+
+The mmd proof decomposes `A_0(M)` into the disjoint pieces `M_σ`, `A(M) - M_σ`,
+and `A_0(M) - A(M)`, observes that cross-piece elements have distinct orders (so
+are never `G`-conjugate), and concludes:
+* within `M_σ`, `G`-conjugacy is `M`-conjugacy by **Theorem D(1)** (`hD1`);
+* within either TI piece (**Theorem B(5)**/`hTI_B`, **Theorem C(9)**/`hTI_C`),
+  `G`-conjugacy forces the conjugator into `M` by the TI condition.
+
+This bundles those three inputs plus the cross-piece exclusion `hPieceInv`
+(`G`-conjugate elements of `X` share `M_σ`- and `A(M)`-membership — the formal
+content of "distinct orders across pieces") and discharges (Ti) with no `sorry`
+of its own.  The remaining gated obligation when this is applied is exactly
+`hPieceInv` (BG Theorem E prime-structure of the pieces). -/
+theorem theoremII_conjunct1_of_inputs {M K U : Subgroup G}
+    (hD1 : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹)
+    (hTI_B : IsTISubset (ASet M U \ (OddOrder.BG.Ch3.S10.Msigma M : Set G)) M)
+    (hTI_C : IsTISubset (A0Set M K \ ASet M U) M)
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K)
+    (hPieceInv : ∀ x ∈ X, ∀ y ∈ X, (∃ g : G, y = g * x * g⁻¹) →
+      (x ∈ OddOrder.BG.Ch3.S10.Msigma M ↔ y ∈ OddOrder.BG.Ch3.S10.Msigma M) ∧
+        (x ∈ ASet M U ↔ y ∈ ASet M U)) :
+    ∀ x ∈ X, ∀ y ∈ X, (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹ := by
+  intro x hxX y hyX hconj
+  obtain ⟨g, hg⟩ := hconj
+  obtain ⟨hMσiff, hAiff⟩ := hPieceInv x hxX y hyX ⟨g, hg⟩
+  by_cases hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M
+  · -- Both in `M_σ`: Theorem D(1).
+    exact hD1 x hxMσ y (hMσiff.mp hxMσ) ⟨g, hg⟩
+  · -- `x ∉ M_σ`, hence `y ∉ M_σ`; `x, y` lie in a common TI piece.
+    have hyMσ : y ∉ OddOrder.BG.Ch3.S10.Msigma M := fun h => hxMσ (hMσiff.mpr h)
+    have hxMσ' : x ∉ (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by rwa [SetLike.mem_coe]
+    have hyMσ' : y ∉ (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by rwa [SetLike.mem_coe]
+    by_cases hxA : x ∈ ASet M U
+    · -- `x, y ∈ A(M) - M_σ` (TI piece, Theorem B(5)): the conjugator lies in `M`.
+      have hyA : y ∈ ASet M U := hAiff.mp hxA
+      exact ⟨g, hTI_B g ⟨x, ⟨hxA, hxMσ'⟩, hg ▸ ⟨hyA, hyMσ'⟩⟩, hg⟩
+    · -- `x ∉ A(M)`: only possible for `X = A_0(M)`.
+      rcases hX with hXA | hXA0
+      · exact absurd (hXA ▸ hxX) hxA
+      · -- `x, y ∈ A_0(M) - A(M)` (TI piece, Theorem C(9)).
+        have hyA : y ∉ ASet M U := fun h => hxA (hAiff.mpr h)
+        exact ⟨g, hTI_C g ⟨x, ⟨hXA0 ▸ hxX, hxA⟩, hg ▸ ⟨hXA0 ▸ hyX, hyA⟩⟩, hg⟩
+
 /-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  This
 is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
 theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -594,10 +640,28 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     exact (le_sup_right : OddOrder.BG.Ch3.S10.Msigma M ≤
       (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G)) hxMσ
   refine ⟨?_, hDsub.trans hMσsharp_sub_A, ?_⟩
-  · -- **Conjunct 1 (Ti) (mmd L4546-L4550).**  Two elements of `X` conjugate in `G` are conjugate
-    -- in `M`.  `X = A_0(M)` decomposes into `M_σ` (Theorem D(1) fusion) and the two `TI` pieces
-    -- (normalizer `M`); cross-piece elements have distinct orders, so are never `G`-conjugate.
-    -- Same gated decomposition as `hDsub`; isolated here.
+  · -- **Conjunct 1 (Ti) (mmd L4546-L4550).**  Assembled from Theorem D(1) (`M_σ` fusion),
+    -- Theorem B(5)/C(9) (the two TI pieces), and the cross-piece exclusion `hPieceInv`, via
+    -- `theoremII_conjunct1_of_inputs`.  Only `hPieceInv` remains gated (BG Theorem E).
+    have hTI_C : IsTISubset (A0Set M K \ ASet M U) M := by
+      by_cases hKbot : K = ⊥
+      · -- `K = ⊥` (type F): `A_0(M) = \widehat{M_σ} ⊆ M = U M_σ` (Thm A(3)), so the diff is empty.
+        intro g hex
+        obtain ⟨z, ⟨hzA0, hznA⟩, _⟩ := hex
+        refine absurd ⟨hzA0.1, ?_⟩ hznA
+        have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+          (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+        have hz' : z ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hzA0.1.1
+        rw [hKbot, bot_sup_eq] at hz'
+        exact hz'
+      · obtain ⟨_, _, _, _, _, _, _, _, _, hTIC, _, _⟩ :=
+          theoremC_paired_structure hG hM hKbot hK rfl hU
+        exact hTIC
+    refine theoremII_conjunct1_of_inputs
+      (theoremD_msigma_conjugacy_and_centralizers hG hM).1
+      ((theoremB_U_and_A_tame hG hM hU).2.2.2.2) hTI_C hX ?_
+    -- `hPieceInv`: `G`-conjugate elements of `X` share `M_σ`- and `A(M)`-membership — the
+    -- "distinct orders across pieces" input of the mmd proof (BG Theorem E), still gated.
     sorry
   · -- **Conjunct 3 (mmd L4552).**  For `x ∈ D ⊆ M_σ#` with `C_G(x) ⊄ M`, Theorem D(4) gives a
     -- unique maximal `N(x) ⊇ C_G(x)` that is of type `F` or `P₂`; Proposition 16.1(a)(b) rewrites
