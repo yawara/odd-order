@@ -62,15 +62,15 @@ variable {G : Type*} [Group G]
 noncomputable abbrev MF (M : Subgroup G) : Subgroup G :=
   maxNilpotentNormalHall M
 
-/-- `M_F ≤ M`: basic containment, directly from the `sSup` construction.  (The full
-BG §15 well-definedness — that the `sSup` again has the maximal nilpotent-normal-Hall
-property, in particular that it is Hall — is deferred; this containment is not.) -/
+/-- `M_F ≤ M`: basic containment, directly from the `sSup` construction.  (The §15
+well-definedness that the `sSup` is again Hall is `maxNilpotentNormalHall_isHall` below; this
+containment is the more elementary half.) -/
 theorem maxNilpotentNormalHall_le (M : Subgroup G) : maxNilpotentNormalHall M ≤ M :=
   sSup_le fun _ hN => hN.1
 
 /-- `M` normalizes `M_F` (so `(M_F).subgroupOf M ⊴ M`): the `sSup` of `M`-normal
-candidates is again `M`-normal.  Like `maxNilpotentNormalHall_le`, this is the
-`§14`-independent part of the §15 well-definedness (the Hall maximality is deferred);
+candidates is again `M`-normal.  Like `maxNilpotentNormalHall_le`, this is part of the
+`§14`-independent §15 well-definedness (the Hall property is `maxNilpotentNormalHall_isHall`);
 each candidate `N` is fixed by conjugation by `m ∈ M` because `(N.subgroupOf M).Normal`. -/
 theorem maxNilpotentNormalHall_le_normalizer (M : Subgroup G) :
     M ≤ Subgroup.normalizer (maxNilpotentNormalHall M) := by
@@ -225,6 +225,114 @@ theorem maxNilpotentNormalHall_le_derived [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     maxNilpotentNormalHall M ≤ derivedInG M :=
   (maxNilpotentNormalHall_le_Msigma hG hM).trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+
+/-- **General helper (§14-independent, reusable).**  In a finite group, the `sSup` of a set `s`
+of normal `π`-subgroups is again a `π`-subgroup.  (Mirrors the `Finset.sup_induction` argument of
+`Ch03.oPiCore.isPiGroup`, but for an arbitrary set rather than the defining family of `oPiCore`.)
+Used for the §15 well-definedness "`M_F` is Hall": the supremum defining `M_F` collapses to a join
+of normal subgroups, whose order has no new prime factors. -/
+theorem isPiGroup_sSup_of_forall_normal {H : Type*} [Group H] [Finite H] (π : Set ℕ)
+    (s : Set (Subgroup H)) (hnorm : ∀ N ∈ s, N.Normal)
+    (hpi : ∀ N ∈ s, Ch03.Subgroup.IsPiGroup π N) :
+    Ch03.Subgroup.IsPiGroup π (sSup s) := by
+  classical
+  haveI hSubF : Fintype {N : Subgroup H // N ∈ s} := Fintype.ofFinite _
+  -- Carry both normality and the `π`-group property through the induction.
+  set q : Subgroup H → Prop := fun K => K.Normal ∧ Ch03.Subgroup.IsPiGroup π K with hq_def
+  suffices hgoal : q (sSup s) by exact hgoal.2
+  -- Rewrite the `sSup` as a `Finset.sup` over the (finite) subtype `{N // N ∈ s}`.
+  have hsup : sSup s =
+      (Finset.univ : Finset {N : Subgroup H // N ∈ s}).sup (fun N => (N.val : Subgroup H)) := by
+    rw [Finset.sup_eq_iSup]
+    simp only [iSup_pos, Finset.mem_univ]
+    rw [← sSup_eq_iSup']
+  rw [hsup]
+  refine Finset.sup_induction (p := q) ?_ ?_ ?_
+  · -- `⊥` is a normal `π`-group (no prime factors).
+    refine ⟨inferInstance, ?_⟩
+    intro r hr
+    simp only [Subgroup.card_bot, Nat.primeFactors_one, Finset.notMem_empty] at hr
+  · -- closure under join of two normal `π`-subgroups.
+    rintro a₁ ⟨ha₁N, ha₁Pi⟩ a₂ ⟨ha₂N, ha₂Pi⟩
+    haveI := ha₁N
+    haveI := ha₂N
+    exact ⟨inferInstance, Ch03.Subgroup.IsPiGroup.sup_of_normal ha₁Pi ha₂Pi⟩
+  · -- each generator is a normal `π`-group by hypothesis.
+    intro b _
+    exact ⟨hnorm b.val b.2, hpi b.val b.2⟩
+
+/-- **BG §15 well-definedness: `M_F` is a Hall subgroup of `M`** (general finite-group fact,
+§14-independent; no minimal-simple hypothesis needed).  `M_F = maxNilpotentNormalHall M` is, as a
+relative subgroup `(M_F).subgroupOf M ⊴ M`, a `π(M_F)`-Hall subgroup of `M`, where
+`π(M_F) = (Nat.card ↥(M_F)).primeFactors`.
+
+Proof: `(M_F).subgroupOf M` is the join (in `↥M`) of the normal subgroups `N.subgroupOf M`
+ranging over the candidates `N` of the `sSup` defining `M_F`; this join has no prime factor beyond
+those of the candidates (`isPiGroup_sSup_of_forall_normal`).  Hence every prime `p ∣ |M_F|` divides
+some candidate `|N₀|`, and that candidate is `π(N₀)`-Hall in `↥M` with `p ∈ π(N₀)`, so
+`p ∤ [M : N₀.subgroupOf M]`; since `N₀.subgroupOf M ≤ (M_F).subgroupOf M`, also `p ∤ [M : M_F]`.
+The index of `(M_F).subgroupOf M` therefore shares no prime with `|M_F|`, i.e. `M_F` is Hall. -/
+theorem maxNilpotentNormalHall_isHall [Finite G] (M : Subgroup G) :
+    Ch03.IsHallSubgroup (Nat.card ↥(maxNilpotentNormalHall M)).primeFactors
+      ((maxNilpotentNormalHall M).subgroupOf M) := by
+  classical
+  set H : Subgroup G := maxNilpotentNormalHall M with hHdef
+  set Hbar : Subgroup ↥M := H.subgroupOf M with hHbar
+  -- The defining set of `M_F`, and its image in `↥M`.
+  set S : Set (Subgroup G) := {N : Subgroup G | N ≤ M ∧ (N.subgroupOf M).Normal ∧
+      Group.IsNilpotent ↥(N.subgroupOf M) ∧
+      Ch03.IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M)} with hSdef
+  have hHsSup : H = sSup S := rfl
+  set T : Set (Subgroup ↥M) := (fun N => N.subgroupOf M) '' S with hTdef
+  -- `card Hbar = card H` (since `H ≤ M`).
+  have hHle : H ≤ M := maxNilpotentNormalHall_le M
+  have hcardHbar : Nat.card ↥Hbar = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHle).toEquiv
+  -- `⨆ x ∈ T, map x = ⨆ N ∈ S, N`, since `map (N.subgroupOf M) = N` for `N ≤ M ∈ S`.
+  have hiSup : (⨆ x ∈ T, x.map M.subtype) = ⨆ N ∈ S, N := by
+    rw [hTdef, iSup_image]
+    refine iSup_congr fun N => iSup_congr fun hN => ?_
+    exact Subgroup.map_subgroupOf_eq_of_le hN.1
+  -- Key identification: `Hbar = sSup T`.
+  have hHbar_eq : Hbar = sSup T := by
+    apply Subgroup.map_injective M.subtype_injective
+    rw [hHbar, Subgroup.map_subgroupOf_eq_of_le hHle, hHsSup,
+      (Subgroup.gc_map_comap M.subtype).l_sSup, hiSup, ← sSup_eq_iSup]
+  -- Every element of `T` is normal in `↥M` and a `Pri`-group, where `Pri` is the set of primes
+  -- occurring in some candidate's order.
+  set Pri : Set ℕ := {p | ∃ N ∈ S, p ∈ (Nat.card ↥N).primeFactors} with hPridef
+  have hTnorm : ∀ x ∈ T, x.Normal := by
+    rintro x ⟨N, hN, rfl⟩; exact hN.2.1
+  have hTpi : ∀ x ∈ T, Ch03.Subgroup.IsPiGroup Pri x := by
+    rintro x ⟨N, hN, rfl⟩
+    intro p hp
+    -- `card (N.subgroupOf M) = card N`, so a prime factor of it is one of `N`.
+    have hcardN : Nat.card ↥(N.subgroupOf M) = Nat.card ↥N :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN.1).toEquiv
+    exact ⟨N, hN, by rwa [hcardN] at hp⟩
+  -- Hence `Hbar` is a `Pri`-group.
+  have hHbarpi : Ch03.Subgroup.IsPiGroup Pri Hbar := by
+    rw [hHbar_eq]; exact isPiGroup_sSup_of_forall_normal Pri T hTnorm hTpi
+  -- Assemble the Hall property.
+  refine ⟨fun p hp => ?_, fun p hp hpπ => ?_⟩
+  · -- Prime factors of `|Hbar| = |H|` are exactly `π(M_F)`.
+    rwa [hcardHbar] at hp
+  · -- `p ∈ π(M_F)` and `p ∣ [M : Hbar]`: derive a contradiction.
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    -- `p ∈ π(M_F)`, so `p ∣ |Hbar|`, so `p ∈ Π`: pick a candidate `N₀` with `p ∣ |N₀|`.
+    have hpHbar : p ∈ (Nat.card ↥Hbar).primeFactors := by
+      rw [hcardHbar]; exact hpπ
+    obtain ⟨N₀, hN₀, hpN₀⟩ := hHbarpi p hpHbar
+    -- `N₀.subgroupOf M` is `π(N₀)`-Hall with `p ∈ π(N₀)`, so `p ∤ [M : N₀.subgroupOf M]`.
+    have hpN₀Hall : ¬ p ∣ (N₀.subgroupOf M).index := by
+      intro hdvd
+      exact hN₀.2.2.2.2 p
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Subgroup.index_ne_zero_of_finite⟩) hpN₀
+    -- `N₀.subgroupOf M ≤ Hbar`, so `[M : Hbar] ∣ [M : N₀.subgroupOf M]`, so `p ∤ [M : Hbar]`.
+    have hN₀_le_H : N₀ ≤ H := hHsSup ▸ le_sSup hN₀
+    have hle : N₀.subgroupOf M ≤ Hbar := by
+      rw [hHbar]; exact Subgroup.subgroupOf_mono M hN₀_le_H
+    exact hpN₀Hall ((Nat.mem_primeFactors.mp hp).2.1.trans (Subgroup.index_dvd_of_le hle))
 
 /-- The Fitting subgroup of `M`, viewed in the ambient group as in BG §8/§15. -/
 noncomputable abbrev fittingInAmbient (M : Subgroup G) : Subgroup G :=
@@ -1462,14 +1570,70 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         rw [hF, hFQ]; exact hsub.trans le_sup_right
       refine le_antisymm ?_ (sup_le hCMF_le_F hMF_le_F)
       -- `⊆` (mmd 15.2(g)): the `σ'`-free, type-`P1` structural step `F(M) ⊆ C_M(M_F)·M_F`.
-      -- This is the single genuinely-resistant containment.  It needs `F(M)`'s Hall-`π(M_F)`
-      -- decomposition `F(M) = M_F × O_{π(M_F)'}(F(M))` (so the `π(M_F)'`-part centralizes `M_F`),
-      -- which in turn requires `M_F` to be the full Hall `π(M_F)`-part of `F(M)`
-      -- (`Oπ(F(M)) = M_F`).  In this codebase the Hall property of `M_F` is part of the deferred
-      -- §15 well-definedness of `maxNilpotentNormalHall` (only `M_F ≤ M`, `M_F ⊴ M`, `M_F` nilpotent
-      -- are available; `M_F` Hall is not), so this direction cannot yet be discharged from the cited
-      -- lemmas.  The reverse containment (`⊇`) above is fully proven from Theorem 15.2(g) (`hFQ`).
-      sorry
+      -- Strategy (general, §14-independent): `M_F` is the full Hall `π(M_F)`-part of `F(M)`, so the
+      -- nilpotent `F(M)` splits as `F(M) = M_F × O_{π(M_F)'}(F(M))`, and the second factor
+      -- centralizes `M_F` (distinct Hall components of a nilpotent group commute).
+      set π : Set ℕ := ↑(Nat.card ↥(MF M)).primeFactors with hπ
+      -- `F ≤ M` and `M ≤ N_G(F)` (`F` is normal in `M`).
+      have hF_le_M : F ≤ M := OddOrder.BG.Ch2.S08.fittingInG_le M
+      have hM_norm_F : M ≤ Subgroup.normalizer (F : Set G) :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch2.S08.fittingInG_le M)).mp
+          (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal M)
+      -- `M_F ≤ O_π(F)`: `M_F ≤ F`, `(M_F).subgroupOf F ⊴ F` (as `F ≤ M ≤ N_G(M_F)`), `M_F` a `π`-group.
+      have hMF_norm_F : (((MF M).subgroupOf F)).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hMF_le_F).mpr
+          (hF_le_M.trans (maxNilpotentNormalHall_le_normalizer M))
+      have hMF_pi : Subgroup.IsPiSubgroup π (MF M) := fun p hp => by
+        rw [hπ]; exact Finset.mem_coe.mpr hp
+      have hMF_le_Oπ : MF M ≤ OddOrder.GroupTheory.opiCoreInG π F :=
+        OddOrder.GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hMF_le_F hMF_norm_F hMF_pi
+      -- `O_π(F) ≤ M_F`: `O_π(F)` is a normal `π`-subgroup of `↥M`, and `M_F` is `π`-Hall in `↥M`.
+      have hOπ_le_F : OddOrder.GroupTheory.opiCoreInG π F ≤ F :=
+        OddOrder.GroupTheory.opiCoreInG_le π F
+      have hOπ_le_M : OddOrder.GroupTheory.opiCoreInG π F ≤ M := hOπ_le_F.trans hF_le_M
+      haveI hObar_norm : ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hOπ_le_M).mpr
+          (OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer π hM_norm_F)
+      have hObar_pi : Ch03.Subgroup.IsPiGroup π ((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M) := by
+        intro p hp
+        have hcardO : Nat.card ↥((OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M) =
+            Nat.card ↥(OddOrder.GroupTheory.opiCoreInG π F) :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hOπ_le_M).toEquiv
+        exact OddOrder.GroupTheory.isPiSubgroup_opiCoreInG π F p (by rwa [hcardO] at hp)
+      have hObar_le_Hbar : (OddOrder.GroupTheory.opiCoreInG π F).subgroupOf M ≤ (MF M).subgroupOf M :=
+        Ch03.Subgroup.IsPiGroup.normal_le_hall hObar_pi (maxNilpotentNormalHall_isHall M)
+      have hMF_le_M : MF M ≤ M := maxNilpotentNormalHall_le M
+      have hOπ_le_MF : OddOrder.GroupTheory.opiCoreInG π F ≤ MF M := by
+        have := Subgroup.map_mono (f := M.subtype) hObar_le_Hbar
+        rwa [Subgroup.map_subgroupOf_eq_of_le hOπ_le_M,
+          Subgroup.map_subgroupOf_eq_of_le hMF_le_M] at this
+      have hOπ_eq_MF : OddOrder.GroupTheory.opiCoreInG π F = MF M :=
+        le_antisymm hOπ_le_MF hMF_le_Oπ
+      -- `F = O_π(F) ⊔ O_{π'}(F) = M_F ⊔ O_{π'}(F)`.
+      have hsplit : OddOrder.GroupTheory.opiCoreInG π F ⊔
+          OddOrder.GroupTheory.opiCoreInG πᶜ F = F :=
+        opiCoreInG_sup_compl_eq_of_isNilpotent π
+      -- `O_{π'}(F)` centralizes `M_F = O_π(F)`, and lies in `M`, so `≤ C_G(M_F) ⊓ M`.
+      have hcomm : ⁅OddOrder.GroupTheory.opiCoreInG π F,
+          OddOrder.GroupTheory.opiCoreInG πᶜ F⁆ = ⊥ :=
+        OddOrder.BG.Ch2.S08.opiCoreInG_commutator_compl_eq_bot π F
+      have hOπ'_cent : OddOrder.GroupTheory.opiCoreInG πᶜ F ≤
+          Subgroup.centralizer (MF M : Set G) := by
+        have hcomm' : ⁅OddOrder.GroupTheory.opiCoreInG πᶜ F,
+            OddOrder.GroupTheory.opiCoreInG π F⁆ = ⊥ := by
+          rw [Subgroup.commutator_comm]; exact hcomm
+        rw [← hOπ_eq_MF]
+        exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm'
+      have hOπ'_le_M : OddOrder.GroupTheory.opiCoreInG πᶜ F ≤ M :=
+        (OddOrder.GroupTheory.opiCoreInG_le πᶜ F).trans hF_le_M
+      have hOπ'_le : OddOrder.GroupTheory.opiCoreInG πᶜ F ≤
+          Subgroup.centralizer (MF M : Set G) ⊓ M := le_inf hOπ'_cent hOπ'_le_M
+      -- Assemble: `F = M_F ⊔ O_{π'}(F) ≤ (C_G(M_F) ⊓ M) ⊔ M_F`.
+      calc F = OddOrder.GroupTheory.opiCoreInG π F ⊔
+                OddOrder.GroupTheory.opiCoreInG πᶜ F := hsplit.symm
+        _ = MF M ⊔ OddOrder.GroupTheory.opiCoreInG πᶜ F := by rw [hOπ_eq_MF]
+        _ ≤ MF M ⊔ (Subgroup.centralizer (MF M : Set G) ⊓ M) := sup_le_sup_left hOπ'_le _
+        _ = (Subgroup.centralizer (MF M : Set G) ⊓ M) ⊔ MF M := sup_comm _ _
     -- Conjunct 10: `¬ TypeF → F(M) ⊆ M'`.  `F(M) ⊆ M_σ = M'` (Theorem 15.2).
     have h10 : ¬ S14.IsTypeF M → F ≤ derivedInG M := fun _ => hFsubMσ.trans hMσderiv.le
     -- Conjunct 11: `M_F` cyclic → `F(M)` cyclic.  Vacuous: `M_F` is non-cyclic (Theorem 15.2).
