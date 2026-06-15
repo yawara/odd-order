@@ -11,7 +11,7 @@
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
 | **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | **BG §16 全体所有** (`S16_MainResults` + `S16_NonExistenceG` + `FeitThompson` POLE-1): 即時 = Thm II cite-compress (`theoremII_tame_embedding:526`, issue 8009) → POLE-2 (gated, 再開待ち)。POLE-1 完了 (`a2575ec6`) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | 🅿 **STANDBY** (§16 ungated runway 枯渇, scout 確認): POLE-1 + Thm II hDsub/Conjunct1 skeleton 完了。再開トリガー = H §14 landing (→S16 Thm A-E/II) / B (6.8)+Pf§10-13 (→POLE-2)。**F=0 は正常 (flag 不要)** | Opus 4.8 (1M) | ✅ 対象 |
 | **G** | `lane-g` | **BG §15 専念** (`S15_MF` のみ; §16 は F に移管): `_of_inputs` sorry-free skeleton (Thm 15.2/Thm 15.7 + M_F + Cor 15.x) を §14 obligation named residual 化 | Opus 4.8 (1M) | ✅ 対象 |
 | **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
 
@@ -145,6 +145,12 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-16 — F STANDBY (ユーザー裁可, 2 scout で code-verified)**: F は §16 集約後 POLE-1 +
+  Thm II hDsub/Conjunct1 skeleton を landing したが、残 §16 はすべて上流 gated (S16 Thm A-E/II = §14/§15、
+  POLE-2 = Pf §10-13 char theory) と確定 → **ungated FT-critical task 無し ⟹ STANDBY**。**merge tick で F=0 は正常、
+  flag しない**。再開トリガー: H が §14 Thm A-E feeder/14.7 を landing (→S16 解禁) / B が (6.8)+Pf §10-13 char API
+  (→POLE-2 解禁)。hub はこれを検出したら F を reactivate。B/G/H は継続活発 (sorry 142, Prop 14.2 完了済)。
 
 - **2026-06-15 (夜²) — §16 集約 re-split (F↔G, ユーザー裁可) + Prop 14.2 COMPLETE**:
   H が **BG Prop 14.2 `typeP_structure` を sorry-free + axiom-clean で COMPLETE** (`f031f7bc`, (g) discharge,

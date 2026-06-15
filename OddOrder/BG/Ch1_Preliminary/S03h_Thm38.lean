@@ -243,4 +243,127 @@ theorem commutator_le_chiefFactorCentralizer_dichotomy_thm38
     exact commutator_le_chiefFactorCentralizer_via_thm34 hVelem hLcent hcompl hHall hRp hodd
       (hchar hsq) hFPF
 
+open OddOrder.GroupTheory in
+/-- **BG Theorem 3.8, reduced case** (step 4 of mmd L1247-1259): if `G = KR` is solvable of odd
+order with `K ⊴ G` complementing the prime-order `R`, `(|K|, |R|) = 1`, the quotient `K/F(K)` is a
+`p`-group, and `C_{F(K)}(R) = 1` (condition (3)), then `⁅K, R⁆ ⊆ F(K)`.
+
+Proof: for every `G`-chief factor `U/V` with `U ⊆ F(K)`, the per-factor dichotomy
+(`commutator_le_chiefFactorCentralizer_dichotomy_thm38`) gives `⁅R, K⁆ ⊆ C_K(U/V)`.  Since `⁅K, R⁆`
+need not be normal in `G`, take `N = ⟨⁅K, R⁆⟩^G` (its normal closure); each `chiefFactorCentralizer`
+is normal in `G` and contains `⁅K, R⁆`, so `N ⊆ chiefFactorCentralizer U V`.  BG Proposition 1.2
+reverse (`S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable`) then gives `N ⊆ F(K)`, whence
+`⁅K, R⁆ ⊆ N ⊆ F(K)`.  `F(K) = (fitting ↥K).map K.subtype`. -/
+theorem commutator_le_fitting_of_reduced
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [K.Normal]
+    (hodd : Odd (Nat.card G))
+    (hcompl : K.IsComplement' R)
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥R))
+    (hRprime : ∃ r : ℕ, r.Prime ∧ Nat.card ↥R = r)
+    {p : ℕ} [Fact p.Prime]
+    (hKbar : IsPGroup p
+      (K.map (QuotientGroup.mk' ((OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype))))
+    (hC3 : Subgroup.centralizer (R : Set G) ⊓
+      (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype = ⊥) :
+    ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
+  set L : Subgroup G := (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype with hLdef
+  haveI hLnorm : L.Normal := ConjAct.normal_of_characteristic_of_normal
+  have hLK : L ≤ K := by rw [hLdef]; exact Subgroup.map_subtype_le _
+  have hRL_disj : Disjoint (R : Subgroup G) L :=
+    hcompl.isCompl.disjoint.symm.mono_right hLK
+  -- The `G/L = (K/L)(R/L)` Theorem 3.4 data (shared across chief factors).
+  have hcompl' : (K.map (QuotientGroup.mk' L)).IsComplement' (R.map (QuotientGroup.mk' L)) :=
+    hcompl.map_mk' hcop L
+  have hHall' : Nat.Coprime (Nat.card ↥(K.map (QuotientGroup.mk' L)))
+      (Nat.card ↥(R.map (QuotientGroup.mk' L))) :=
+    (hcop.coprime_dvd_left (Subgroup.card_map_dvd K (QuotientGroup.mk' L))).coprime_dvd_right
+      (Subgroup.card_map_dvd R (QuotientGroup.mk' L))
+  -- `|R/L| = |R|` (prime): `|R/L|` divides `|R|` and is `≠ 1` (else `R ≤ L`, against `R ⊓ L = ⊥`).
+  have hRcardL : Nat.card ↥(R.map (QuotientGroup.mk' L)) = Nat.card ↥R := by
+    obtain ⟨r, hr, hrcard⟩ := hRprime
+    have hdvd : Nat.card ↥(R.map (QuotientGroup.mk' L)) ∣ Nat.card ↥R :=
+      Subgroup.card_map_dvd R (QuotientGroup.mk' L)
+    rcases (Nat.dvd_prime hr).mp (hrcard ▸ hdvd) with h1 | hr'
+    · exfalso
+      have hRbot : R.map (QuotientGroup.mk' L) = ⊥ := Subgroup.card_eq_one.mp h1
+      have hRL : (R : Subgroup G) ≤ L := by
+        intro x hx
+        have hxm : QuotientGroup.mk' L x ∈ R.map (QuotientGroup.mk' L) :=
+          Subgroup.mem_map_of_mem _ hx
+        rw [hRbot, Subgroup.mem_bot] at hxm
+        rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hxm
+      have hReq : (R : Subgroup G) = ⊥ := by
+        rw [disjoint_iff] at hRL_disj; rwa [inf_of_le_left hRL] at hRL_disj
+      rw [hReq, Subgroup.card_bot] at hrcard
+      exact hr.one_lt.ne' hrcard.symm
+    · rw [hrcard]; exact hr'
+  have hRp' : ∃ r : ℕ, r.Prime ∧ Nat.card ↥(R.map (QuotientGroup.mk' L)) = r := by
+    obtain ⟨r, hr, hrcard⟩ := hRprime; exact ⟨r, hr, hRcardL.trans hrcard⟩
+  have hodd' : Odd (Nat.card (G ⧸ L)) := Odd.of_dvd_nat hodd (Subgroup.card_quotient_dvd_card L)
+  -- `F(K) ≤ F(G)`, hence `F(K)` centralizes every chief factor of `G` (Prop 1.2 forward).
+  have hLfitG : L ≤ OddOrder.Isaacs.Ch01.fitting G :=
+    OddOrder.Isaacs.Ch01.fitting_map_subtype_le_fitting
+  -- `N = ⟨⁅K, R⁆⟩^G`: normal, `≤ K`.
+  set N : Subgroup G := Subgroup.normalClosure ((⁅K, R⁆ : Subgroup G) : Set G) with hNdef
+  haveI hNnorm : N.Normal := Subgroup.normalClosure_normal
+  have hKR_le_K : (⁅K, R⁆ : Subgroup G) ≤ K := by
+    rw [Subgroup.commutator_comm, Subgroup.commutator_le]
+    intro r _ k hk
+    rw [commutatorElement_def]
+    exact K.mul_mem (‹K.Normal›.conj_mem k hk r) (K.inv_mem hk)
+  have hNK : N ≤ K := Subgroup.normalClosure_le_normal hKR_le_K
+  -- `N ≤ F(K)` via Proposition 1.2 reverse: `N` centralizes every chief factor `U/V` with `U ⊆ F(K)`.
+  have hNF : N ≤ L := by
+    refine OddOrder.BG.Ch1.S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable hNK ?_
+    intro U V hVnorm hChief hUF
+    haveI := hChief.normal_top
+    haveI := hChief.normal_bot
+    apply Subgroup.normalClosure_le_normal
+    intro x hx
+    obtain ⟨s, hs, hVelem⟩ := S03c.chiefFactor_isElementaryAbelian hChief
+    haveI : Fact s.Prime := ⟨hs⟩
+    have hUK : U ≤ K := hUF.trans hLK
+    have hLcent : L ≤ OddOrder.GroupTheory.chiefFactorCentralizer U V :=
+      hLfitG.trans (OddOrder.BG.Ch1.S01.fitting_le_chiefFactorCentralizer hChief)
+    have hFPF := chiefFactor_fixedPointFree_of_centralizer_fitting_eq_bot (Y := V) hUF hUK
+      hcop.symm hC3
+    have hchar : s ≠ p → ¬ s ∣ Nat.card (G ⧸ L) := by
+      intro hsp
+      -- `|G/L| = |K/L| · |R/L|`, with `|K/L| = p^n` and `|R/L| = r` prime.
+      have hGL : Nat.card (G ⧸ L) = Nat.card ↥(K.map (QuotientGroup.mk' L)) *
+          Nat.card ↥(R.map (QuotientGroup.mk' L)) := hcompl'.card_mul.symm
+      -- `s ∤ |K/L|` (a `p`-power, `s ≠ p`).
+      obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := p)).mp hKbar
+      have hsK : ¬ s ∣ Nat.card ↥(K.map (QuotientGroup.mk' L)) := by
+        rw [hn]
+        exact (Nat.Prime.coprime_iff_not_dvd hs).mp
+          (((Nat.coprime_primes hs Fact.out).mpr hsp).pow_right n)
+      -- `s ∣ |U/V|` (nontrivial `s`-group), hence `s ∣ |K|`.
+      have hUVnt : 1 < Nat.card (↥U ⧸ V.subgroupOf U) := by
+        have hpos : 0 < Nat.card (↥U ⧸ V.subgroupOf U) := Nat.card_pos
+        have hne1 : Nat.card (↥U ⧸ V.subgroupOf U) ≠ 1 := by
+          rw [← Subgroup.index_eq_card, Ne, Subgroup.index_eq_one, Subgroup.subgroupOf_eq_top]
+          exact fun hUV => hChief.lt.ne (le_antisymm hChief.le hUV)
+        omega
+      have hsUV : s ∣ Nat.card (↥U ⧸ V.subgroupOf U) := by
+        obtain ⟨m, hm⟩ := (IsPGroup.iff_card (p := s)).mp hVelem.isPGroup
+        rw [hm] at hUVnt ⊢
+        exact dvd_pow_self s (by rintro rfl; exact absurd hm.symm (by simpa using hUVnt.ne'))
+      have hsK_dvd : s ∣ Nat.card ↥K :=
+        hsUV.trans ((Subgroup.card_quotient_dvd_card _).trans (Subgroup.card_dvd_of_le hUK))
+      -- `s ∤ |R/L| = r` (else `s = r ∣ |K|`, against `(|K|, |R|) = 1`).
+      have hsR : ¬ s ∣ Nat.card ↥(R.map (QuotientGroup.mk' L)) := by
+        rw [hRcardL]
+        intro hsr
+        have hgcd : s ∣ Nat.gcd (Nat.card ↥K) (Nat.card ↥R) := Nat.dvd_gcd hsK_dvd hsr
+        rw [hcop] at hgcd
+        exact hs.one_lt.ne' (Nat.dvd_one.mp hgcd)
+      rw [hGL]
+      exact fun hd => (hs.prime.dvd_mul.mp hd).elim hsK hsR
+    have hdich := commutator_le_chiefFactorCentralizer_dichotomy_thm38 hChief hVelem hLcent hKbar
+      hcompl' hHall' hRp' hodd' hchar hFPF
+    have hxRK : x ∈ (⁅R, K⁆ : Subgroup G) := by rw [Subgroup.commutator_comm] at hx; exact hx
+    exact hdich hxRK
+  exact fun y hy => hNF (Subgroup.subset_normalClosure hy)
+
 end OddOrder.BG.Ch1.S03h
