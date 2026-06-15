@@ -606,6 +606,48 @@ theorem caseB_irr_conj_inner
   rw [if_neg hne] at hkron
   simpa using hkron
 
+/-- An irreducible character distinct from a `Y`-member is orthogonal to it (both irreducible, so
+the inner product is the Kronecker delta).  The raw `X ⊥ Y` for the irreducible branch. -/
+theorem inner_irr_Yset_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ η₁ : ClassFunction ↥L ℂ} (hφirr : IsIrreducibleCharacter φ)
+    (hη₁ : η₁ ∈ hyp.Yset) (hne : φ ≠ η₁) : ClassFunction.inner φ η₁ = 0 := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hkron := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
+    (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg (fun heq => hne (by
+    simpa using congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq))]
+    at hkron
+  simpa using hkron
+
+/-- **(6.8.2.3) irreducible-branch anchor orthogonality** (`CaseBIrrBundle` conjunct #6).
+The induced character is orthogonal to the weighted `Y`-anchor, given the `X ⊥ Y` distinctness
+`Ind^L_H θ ≠ η₁` (a structural input), via `inner_irr_Yset_eq_zero`. -/
+theorem caseB_irr_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁) (a : ℕ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+    inner_irr_Yset_eq_zero hyp hirr1 hη₁ hne, mul_zero]
+
+/-- **(6.8.2.3) irreducible-branch conjugate anchor orthogonality** (`CaseBIrrBundle` conjunct #7).
+The conjugate induced character is orthogonal to the weighted `Y`-anchor, given
+`(Ind^L_H θ).conj ≠ η₁`: the conjugate is irreducible, so `inner_irr_Yset_eq_zero` applies. -/
+theorem caseB_irr_conj_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hne : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) (a : ℕ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+    inner_irr_Yset_eq_zero hyp hirr1.conj hη₁ hne, mul_zero]
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
