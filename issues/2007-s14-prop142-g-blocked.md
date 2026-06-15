@@ -137,6 +137,18 @@ g∈R# は K に FPF (Frobenius) ⟹ K̂ (指標) に FPF ⟹ 非自明指標を
 - **IsTypeP2 ⟹ U=E₂E₃≠1**: κ≠σ'∩π(M) ⟹ E₂'E₃'≠1 (要 step)。
 ⟹ 新規形式化は **Lem 14.1 (C_{M_σ}(U)=1) + Lem 12.17 TI** の 2 件 + 配線。他は既存補題の assembly。
 
+### 🔑 訂正 (2026-06-15): Lem 14.1 は既存 = `msigma_structure_of_notMem_sigma_kappa` (S14:1073)
+per-prime 形 (`p∈π(M)−(σ∪κ)`, `A=Ω₁(Syl_p)` で `|A|≤p² ∧ C_{M_σ}(A)=⊥ ∧ M_σ nilpotent`) = BG Lem 14.1
+そのもの。⟹ **C_{M_σ}(U)=1 は bridge のみ**: p∈π(U) を 1 つ選び A_p=Ω₁(Syl_p(M))≤U で
+`C_{M_σ}(U) ≤ C_{M_σ}(A_p) = ⊥`。新規は **Lem 12.17 TI (M_σ∩M_σ^g が β'-group) 1 件のみ**の可能性大。
+
+**(g) 配線 5 piece** (BG mmd L3850 確認済):
+1. E Frobenius (kernel U=E₂E₃, complement K=E₁): actsRegularlyOn_E23_E1 ✅ + U⊴E (12.1) + complement。
+2. C_{M_σ}(U)=1: Lem 14.1 (msigma_structure) を p∈π(U) で bridge。
+3. |K|素数: `prime_card_complement_of_frobenius_conj` ✅ (Thm 3.10(a) 完成)。
+4. σ=β: Lem 12.19 (`derivedE_centralizes_betaComplement`) ✅ + C_{M_σ}(U)=1 + β⊆σ。
+5. TI: Lem 12.17 (M_σ∩M_σ^g β'-group [要形式化]) + β=σ ⟹ σ-group ∩ σ'-group = 1。
+
 ## 完了条件
 
 `typeP_structure` が sorry-free + axiom-clean (`#print axioms` = `[propext, Classical.choice, Quot.sound]`)。
