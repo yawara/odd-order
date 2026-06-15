@@ -2898,3 +2898,21 @@ irr branch (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`, S0
 **dispatch 越し**: `charPsiDecomp_eqRec_imageSet` (landed) + `unfold caseB_phi_family caseB_constituentDecomposition; split` で per-branch。
 
 **正本=本 session 42 cont.³。cast helper landed、|Yset|≥2 解決 (two_le_Yset_ncard)。次=hXorth column (toolkit instantiate, partner 4 条件 discharge, precedent S08_CaseBCoherence:310-340) → irr branch → hbi → caseB_phi_family 具体化。**
+
+### session 42 cont.⁴ (lane-b, Opus): ✅✅ (6.8.2.3) wiring COMPLETE — abstract D 解消 (3 commits)
+**✅ landed (全 axiom-clean [propext, Classical.choice, Quot.sound], full build 3822 jobs green):**
+| commit | 結果 | 役割 |
+|---|---|---|
+| `030a2b65` | **`charPsiDecomp_eqRec_X`/`_Y`** + **`psiDecomp_Y_inner_int`** | cast helper の X/Y 版 (tau1/imageSet と同型、`cases h; rfl`) + **route 非依存 hbi**: 任意 (5.4) 分解 D で X⊥Y₀ かつ τ₁-image∈ZIrr かつ Y₀∈ZIrr なら `⟨D.Y,Y₀⟩ = −⟨D.tau1(χ−ψ),Y₀⟩ ∈ ℤ` (`Y=X−τ₁(χ−ψ)` via tau1_image + `inner_sub_left` + `inner_mem_ZIrr_int`)。column/irr 分岐不要の汎用 brick |
+| `fb7d02ba` | **`CaseBColBundle`/`CaseBIrrBundle`** abbrev + dispatch 3 補題 | bundle 抽出 (caseB_constituentDecomposition の inline hcol/hirr と defeq、dispatch 補題で共有) + `caseB_constituentDecomposition_tau1_mem_ZIrr` (hyp.tau(Ind θ−a·η₁)∈ZIrr を branch bundle から; column=witness rw, irr=直接) + `_X_orthogonal` (unfold/split + `charPsiDecomp_eqRec_X` cast + standalone column/irr seam-1; partner η'・per-θ anchor `hirrAnc` は明示仮説) + `_Y_inner_int` (`psiDecomp_Y_inner_int` 経由) |
+| `fe4f53c1` | **`caseB_per_phi_anchored_family`** | **abstract D 解消**: `caseB_per_phi_anchored` を具体 family `caseB_phi_family` に特殊化。D/hXorth/hbi を dispatch 補題で discharge (`b` は `_Y_inner_int` の choice)。各 θ=i.val で `(Ind^L_H θ−aᵢ·η₁)^{hyp.tau} = (caseB_phi_family … i).X − aᵢ·cY.extension η₁` |
+
+**🎯 (6.8.2.3) per-φ anchored image は具体 family 上で完全組立済**。`caseB_per_phi_anchored_family` の残り入力 = **全て genuine §5/§6 content (capstone 側 discharge)**:
+1. **per-θ bundles `hcol`/`hirr`** (`∀ i, CaseBColBundle/CaseBIrrBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val)`): column=certain-type (4.9) reflection の structural data / irr=case-A Dade chain (`DadeChainStep`/`retarget_isCoherent_fromDade_X` field 群)。**bulk の discharge**。
+2. **η₁-anchor data** (`hη₁`/`hη₁irr`/`hrealc1`/`hdiffsuppc1`/`hc1barS1`/`hνZc1`/`hc1c1bar`): Y-anchor η₁ の実既約性・非実・supported conj 差・ZIrr extension。`hνZc1 = cY.extension_mem_ZIrr η₁ (subset_span hη₁)`。
+3. **partner anchor** (`η'`/`hη'Y`/`hη'irr`/`hee`/`hsupp`): η'≠η₁∈Yset、既約、⟨η₁,η'⟩=0、(η₁−η') H^#-supported。抽出=`Set.exists_ne_of_one_lt_ncard (two_le_Yset_ncard) η₁` (precedent S08_CaseBCoherence:331); 4 条件 discharge は Yset-member の既約性/直交/support lemma 要 (precedent S08_CaseBCoherence:310-340)。
+4. **per-θ anchor-vs-constituent** (`hirrAnc i`): irr branch で ⟨η₁,Ind θ⟩=⟨η₁,(Ind θ)conj⟩=⟨η₁conj,Ind θ⟩=⟨η₁conj,(Ind θ)conj⟩=0 (η₁ linear ⊥ 既約 induced)。
+5. **(6.8.2.2) aggregate** (`Xagg`/`hXaggorth`/`hdecomp`): `exists_decomposition_caseB` (S08:126) から。
+
+**▶▶ 次の具体ステップ (順):** (1) **anchor data discharge** (η₁-anchor + partner + hirrAnc — Yset-member の既約性/support の lemma 整備が核; precedent あり) → (2) **per-θ bundles discharge** (column/irr structural、bulk) → (3) **(6.8.2.2) aggregate 接続** (`exists_decomposition_caseB` の wiring; \|Yset\|=2 edge で cY swap 注意 — `per_phi_anchored_image` cY 一般化済) → (4) **HYBRID 組立** (anchored 公式を diagonal data に: cY に X_irr を `retarget_isCoherent_of_supportedDecomposition` で chain-adjoin + cX_col `certainTypeSet_isCoherent_tau` と §7 union) → (5) capstone `sibleySetup_is_coherent`。
+**正本=本 session 42 cont.⁴。(6.8.2.3) 具体 family 上 完全組立 (abstract D 解消)。次=anchor data discharge (Yset-member 既約性/support lemma + partner 抽出, precedent S08_CaseBCoherence:310-340)。**
