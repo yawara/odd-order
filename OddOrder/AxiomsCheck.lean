@@ -66,6 +66,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -4503,6 +4504,20 @@ fully unconditional and axiom-clean.  (Lean uses the `M_σ^#` restriction of BG'
 makes 13.9 alone sufficient — no `R(x)` / `M̃` machinery needed.) -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacy_disjoint_of_nonconjugate
+
+/-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
+`κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
+transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
+(case `κ ⊆ τ₁`: WLOG `K = E₁`); `smul_centralizer_singleton` / `smul_centralizer_subgroup`
+are the element- and subgroup-centralizer conjugation identities it rests on.  Fully
+unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.actsPrimeOn_conj
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.smul_centralizer_singleton
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S13.smul_centralizer_subgroup
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
