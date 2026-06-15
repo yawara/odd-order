@@ -3157,3 +3157,16 @@ irr branch 残り conjunct + 完全 constructor:
 4. **cX ∪ cY glue**: `coherentXunionYset_caseB_of_glued` (S08CB2:1616, sorry-free shell)。
 5. **case split + Frobenius**: capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59) で hyp.cases 分岐、Frobenius は既存 discharge、CertainType は h46 から上記組立。
 **正本=本 session 43 cont.¹²。全 per-θ dispatch 入力構成可能 (`a938c3ec`)。残り = hnonlin + family wiring + HYBRID + glue + case split (multi-turn)。infra 完成。Opus 継続。**
+
+### session 43 cont.¹³: ✅ `caseB_hnonlin` — 最後の dispatch 入力 hnonlin 構成可能 (commit `d8490672`)
+- **`caseB_hnonlin`** (S08_CaseBAssembly, caseB_hirrAnc 直前): `∀ i:{θ//0<weight}, θ(1)≠1` を **2 入力**から構成 — `W₂.subgroupOf H ≤ commutator ↥H` (= CertainType `cert.W2 ≤ ⁅H,H⁆`) + `φ≠trivial` (= X-side selector、compHom-equiv 形)。論法: degree-1 θ は ⁅H,H⁆ 上 trivial ⟹ `Res^H_{W₂}θ=1_{W₂}` ⟹ Clifford weight `⟨φ,Resθ⟩=⟨φ,1⟩=0` (φ≠1 既約の直交) ⟹ `constituentWeight_pos_iff` と矛盾。
+- **支持補題** (LinearCharacter.lean、`apply_commutatorElement…` の直後): `IsIrreducibleCharacter.apply_eq_one_of_mem_commutator_of_apply_one_eq_one` — degree-1 既約指標は **commutator 部分群全体**で trivial (既存「kills commutators」を induced `χ:G→*ℂˣ` (`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`) + `Subgroup.commutator_le` で部分群レベルに持ち上げ; ℂˣ 可換ゆえ `ker χ ⊇ ⁅⊤,⊤⁆`)。reusable な一般事実なので RepresentationTheory に配置。
+- axiom-clean ([propext,Classical.choice,Quot.sound])、full build 3832 jobs + AxiomsCheck green (1m23s; LinearCharacter upstream 触りゆえ大規模再ビルド)。
+
+**⟹ 🎯 caseB_per_phi_anchored_fromYset の per-θ 入力 (hcol/hirr/hirrAnc) を駆動する単一 input `hnonlin` が構成可能に。残り capstone path**:
+1. ✅ ~~hnonlin~~ (本 cont.¹³ = `caseB_hnonlin`)。
+2. **dispatch family 構築** (次): `caseB_column_bundle`(hcol) + `caseB_irr_bundle`(hirr) + `caseB_hirrAnc`(hirrAnc) を `caseB_hnonlin` 由来の hnonlin 付きで `caseB_per_phi_anchored_fromYset` に wiring → per-i anchored image。⚠ **要精査**: 同 theorem の RHS が `(caseB_phi_family hyp h46 hW2H hφ' hcol hirr i).X` を参照 → 内部構成した hcol/hirr が statement に出る (caseB_phi_family の `.X` data 依存)。caseB_phi_family の構造を読んで「hcol/hirr を hyp に取り RHS をその family で書く」か「.X が proof-irrelevant に閉じる」かを決める。
+3. HYBRID 組立 (per-φ image → diagonal data, X_irr chain-adjoin + cX_col §7 union)。
+4. cX∪cY glue (`coherentXunionYset_caseB_of_glued` S08CB2:1616, sorry-free shell)。
+5. case split + Frobenius → capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59)。
+**正本=本 session 43 cont.¹³。hnonlin 構成可能 (`d8490672`)。次=dispatch family wiring (`caseB_phi_family` の `.X` data 依存を精査してから statement 設計)。Opus 継続。**
