@@ -117,4 +117,14 @@ theorem coherent_of_sibleyTarget {L : Subgroup G} [Fintype ↥L]
   letI := w.invH
   nonempty_coherent_of_sibley w.sib w.tau_eq w.S_eq w.A0_eq
 
+/-- Unwrapped form of `coherent_of_sibleyTarget`, returning the `S07.IsCoherent` datum
+directly, for riders phrased as `S07.IsCoherent …` rather than `Nonempty (…)` (e.g. the
+Peterfalvi (9.11) `def coherent_H0C_commutator`).  `sorry`-free. -/
+noncomputable def cohereOfSibleyTarget {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card L : ℂ)] {τ : S07.IntegralCharacterMap ↥L G}
+    {S : Set (ClassFunction ↥L ℂ)} {A0 : Set ↥L} (w : SibleyTarget τ S A0) :
+    S07.IsCoherent τ S A0 :=
+  letI := w.invH
+  coherent_of_sibley w.sib w.tau_eq w.S_eq w.A0_eq
+
 end OddOrder.Peterfalvi.CoherenceWiring
