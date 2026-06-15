@@ -622,7 +622,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (U.subgroupOf M)) :
     ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K ∧
       Kstar ≠ ⊥ ∧
-      (∀ X : Subgroup G, X ≤ K → X ≠ ⊥ →
+      (∀ p : ℕ, p.Prime → ∀ X : Subgroup G, X ∈ elemAbelianOfRank G p 1 → X ≤ K →
         Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar) ∧
       (∀ g : G, g ∉ M → Kstar ⊓ (MulAut.conj g • M) = ⊥) ∧
       (IsTypeP2 M → OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M ∧
@@ -672,8 +672,20 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · -- `K^* = C_{M_σ}(K) = C_{M_σ}(E) ≠ 1` (prime action + the non-regular witness).
       rw [hKstar, hKEeq]
       exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hEprime hsetup.E₃_le hreg
-    · -- (b1) `N_M(X) = K × K^*`.  BG: "clear" from Cor 13.11; needs Lemma 13.13/13.6 wiring.
-      sorry
+    · -- (b1) `N_M(X) = K ⊔ K^*` for rank-one `X ≤ K`.  `⊇`: `K = E ≤ N_G(X)` by Corollary 13.11
+      -- (`hEnorm`), and `K^* = C_{M_σ}(K) ≤ C_G(X) ≤ N_G(X)`, `K^* ≤ M_σ ≤ M`.  `⊆` (BG "clear",
+      -- needs the `M = M_σ ⋊ E` semidirect structure) is deferred.
+      intro p hp X hXrank hXK
+      refine le_antisymm ?_ ?_
+      · sorry
+      · refine sup_le ?_ ?_
+        · rw [hKEeq]
+          exact le_inf (hEnorm p hp X hXrank (hXK.trans hKEeq.le)) (hKEeq ▸ hKM)
+        · rw [hKstar]
+          exact le_inf
+            (inf_le_right.trans ((Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK)).trans
+              (Subgroup.centralizer_le_normalizer _)))
+            (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
     · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`: a rank-one `X ≤ K^* ∩ M^g` has `C_G(X) ⊆ M` by (c),
       -- and `X ≤ M^g` with Theorem 10.1(e) forces `g ∈ M`.
       intro g hgM

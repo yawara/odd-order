@@ -454,3 +454,18 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
 - **case-τ₁**: F の issue-7000 ∃→∀ upgrade leaf 未着地 ⟹ gated。
 
 **⟹ case-τ₃ の core (K=E + 3/5 conjunct) は完了。残 2 conjunct + case-τ₁ は要方針判断 (上記)。**
+
+### ✅✅ faithfulness fix 群 + (g)/(b1) 進捗 (2026-06-15 loop, ユーザー方針「faithfulness を先に」)
+ユーザー裁可で faithfulness を先に整備:
+- **✅ kappa primality 化** (commit `bb844d42`): `kappa` def に `p.Prime` 追加 (BG の κ は素数集合)。tau(§12)
+  不変、S14 内に閉じる。`prime_of_mem_kappa` helper + 全 site 更新。G は kappa を Set cite のみで不変。
+- **✅ (g) COMPLETE** (commit `ba911f75`): kappa primality 化で **κ=sigmaComplementPrimes** が証明可能に
+  ⟹ case-τ₃ は P1 ⟹ `IsTypeP2 M` 矛盾で (g) vacuous 解決。κ⊆: witness P≤M で p|M + tau⊆σ'。
+  ⊇: p∈piSet∖σ ⟹ p|E (card_Msigma_mul_card_E) ⟹ mem_kappa(step2)。
+- **✅ (b1) statement faithful 化 + ⊇ 方向** (commit 後述): goal を BG 通り
+  `∀ p prime, ∀ X∈ℰ_p¹, X≤K → N(X)⊓M=K⊔Kstar` に修正 (旧 `∀X≤K` は over-broad/偽)。
+  **⊇ 証明済**: K=E≤N_G(X) (Cor 13.11 hEnorm) + K*=C_{M_σ}(K)≤C_G(X)≤N_G(X), K*≤M_σ≤M。
+  **⊆ のみ sorry** (BG「clear」だが M=M_σ⋊E semidirect 構造 + N_M(X)=K×K* に要・hard)。
+
+**case-τ₃ 現況: K=E + (a)+(K*≠1)+(d)+(g) 完成、(b1) は statement faithful + ⊇ 済・⊆ のみ sorry。**
+**残 = (b1)-⊆ [M=M_σ⋊E 構造] + case-τ₁ [F issue-7000 gated]。full build green 3817 jobs。**
