@@ -476,4 +476,50 @@ theorem fixedPoints_quotient_eq_top_of_commutator_le_fitting
   intro a
   exact (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **BG Theorem 3.8, step 3** (mmd L1241-1245, the condition-(2) reduction from `R₀` to `R`): if
+`R₀` (normalizing `K`) already centralizes `K̄ = ↥K / F(K)` (`⁅K, R₀⁆ ⊆ F(K)`) and `R₀` has the
+*same fixed points on `K`* as `R` — i.e. `C_G(R₀) ⊓ K = C_G(R) ⊓ K`, which is exactly condition (2)
+`C_K(x) = C_K(R)` for `R₀ = ⟨x⟩` — then `R` itself centralizes `K̄`, i.e. `⁅K, R⁆ ⊆ F(K)`.
+
+Chain: `fixedPoints_quotient_eq_top_of_commutator_le_fitting` turns `⁅K, R₀⁆ ⊆ F(K)` into
+`fixedPoints(R₀ on K̄) = ⊤`; Proposition 1.5(d) (`fixedPointsOfMulAut_quotientMulAutHom_eq_map`)
+rewrites both `R₀`- and `R`-quotient fixed points as push-forwards of the fixed points on `K`;
+condition (2) (`fixedPointsOfMulAut_conj_map_subtype` + injectivity of `K.subtype`) identifies the
+`R₀`- and `R`-fixed points on `K`, transporting `⊤` to the `R`-quotient; finally step 1
+(`commutator_le_fitting_of_centralizes_fittingQuotient`, with `F(K̄) ≤ ⊤` trivial) concludes. -/
+theorem commutator_le_fitting_of_sameFixedPoints
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R R₀ : Subgroup G} [K.Normal]
+    (hRK : R ≤ Subgroup.normalizer (K : Set G))
+    (hR₀K : R₀ ≤ Subgroup.normalizer (K : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hcop₀ : Nat.Coprime (Nat.card ↥R₀) (Nat.card ↥K))
+    (hCeq : Subgroup.centralizer (R₀ : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K)
+    (hcent0 : ⁅K, R₀⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype) :
+    ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
+  have hsolvK : IsSolvable ↥K := inferInstance
+  -- `R₀` fixes all of `K̄` (converse of step 1).
+  have htop0 := fixedPoints_quotient_eq_top_of_commutator_le_fitting hR₀K hcent0
+  -- Proposition 1.5(d) for both `R₀` and `R`: quotient fixed points are push-forwards.
+  have hmap0 := fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hR₀K)) hcop₀ (Or.inr hsolvK)
+    (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (H := OddOrder.Isaacs.Ch01.fitting ↥K)
+      ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hR₀K)))
+  have hmapR := fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)) hcop (Or.inr hsolvK)
+    (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (H := OddOrder.Isaacs.Ch01.fitting ↥K)
+      ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)))
+  -- Condition (2): `R₀`- and `R`-fixed points on `K` coincide.
+  have hconj0 := OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hR₀K
+  have hconjR := OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hRK
+  have hfix_eq : Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hR₀K)) =
+      Subgroup.fixedPointsOfMulAut
+        ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK)) := by
+    apply Subgroup.map_injective K.subtype_injective
+    rw [hconj0, hconjR, hCeq]
+  -- Transport `⊤` from the `R₀`-quotient to the `R`-quotient.
+  rw [hmap0, hfix_eq, ← hmapR] at htop0
+  exact commutator_le_fitting_of_centralizes_fittingQuotient hRK hcop (by rw [htop0]; exact le_top)
+
 end OddOrder.BG.Ch1.S03h
