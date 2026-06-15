@@ -131,6 +131,19 @@ E(残)=§10 hard content（`zeta`(10.2) 等、§12 analysis owner）と、各 co
 owner = HUB 割当）のみ。⟹ HUB は §15（ω/τ₃/η/μ-ν relation）と §12（ω^σ）の wiring を pinned
 signature への cite で割当可能。
 
+### 状態（2026-06-15）— **endpoint A consumer-side wiring ✅ landing**（Lane F）
+A（coherence producer）の **consumer 側 cite 置換** が landing（lane-f commits `5b95fdb8`/`fec51141`）。
+新 engine leaf `OddOrder/Peterfalvi/S10_CoherenceWiring.lean`（sorry-free, root closure）が
+(6.8) `S08.sibleySetup_is_coherent` への bridge を供給:
+- `coherent_of_sibley`（`SibleyDadeHypothesis` + tau/S/A₀ の 3 等式 → `IsCoherent`、(6.8) を subst で cite）
+- `SibleyTarget` carrier + `coherent_of_sibleyTarget`（Nonempty）/ `cohereOfSibleyTarget`（unwrapped）。
+wired riders（各 body は engine cite で **sorry-free**、gap は §14 witness `sibleyTarget_*` に局在）:
+**S15 `S_coherent`(13.2.d)** / **S11 `coherent_H0C_commutator`(9.11)**（→ S12 `typeII_section11_coherence`
+も自動 decouple）/ **S14 `frobenius_typeI_coherent`(12.6)**。⟹ これら rider は **B が (6.8) を埋めれば
+engine 経由で自動 unconditional 化**（decouple 成立）。**残る endpoint-A gap = `sibleyTarget_*`
+producer（§14/§6 構造 obligation）= issue 7001**。standalone な positive-coherence producer は
+これで全 wiring 済（S12 `coherent_S` field は構成箇所が無く対象外、typeV 連言は §12 param 混在で対象外）。
+
 ### 手順（per endpoint）
 1. §3–§9 に faithful signature を pin（sorried 可, build-green + axiom-clean, AxiomsCheck 登録）。
 2. §10–16 の対応 opaque field を、その signature への cite に置換（carrier を実体化）。

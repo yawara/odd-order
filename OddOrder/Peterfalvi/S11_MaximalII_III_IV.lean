@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
+import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.CoprimeAction
 
 /-!
@@ -236,15 +237,32 @@ theorem exceptional_case_frobenius_realization [Finite G]
 
 /-! ## (9.11): coherence for `S(H_0 C')` -/
 
-/-- **Peterfalvi (9.11)**: the set `S(H_0 C')` is coherent for the Dade map
-`τ`.  The eight internal steps (9.11.1)--(9.11.8) are proof structure and will
-be expanded once the §11 character-count lemmas above are proved. -/
+/-- **Structural input for Peterfalvi (9.11) — §14-gated.**
+
+The set `S(H_0 C')` of the type II/III/IV analysis carries the Sibley Dade setup of (6.8)
+realizing `chars.tau / chars.S / chars.H0CprimeSupport` (a `SibleyTarget`).  Exhibiting this
+witness is the maximal-subgroup structure obligation; once it lands, and once lane B supplies
+the (6.8) proof body of `S08.sibleySetup_is_coherent`, `coherent_H0C_commutator` is
+unconditional. -/
+noncomputable def sibleyTarget_H0C [Fintype G]
+    {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) :
+    CoherenceWiring.SibleyTarget chars.tau chars.S chars.H0CprimeSupport := sorry
+
+/-- **Peterfalvi (9.11)**: the set `S(H_0 C')` is coherent for the Dade map `τ`.
+
+Wired to the (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring bridge:
+given the §14 structural witness `sibleyTarget_H0C`, coherence is exactly (6.8).  The eight
+internal steps (9.11.1)--(9.11.8) of Peterfalvi's proof are subsumed by the (6.8) reduction;
+this `def` carries no `sorry` of its own (its gaps are `sibleyTarget_H0C` and (6.8)). -/
 noncomputable def coherent_H0C_commutator [Fintype G]
     {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) :
-    OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport := by
-  sorry
+    OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport :=
+  CoherenceWiring.cohereOfSibleyTarget (sibleyTarget_H0C chars)
 
 end OddOrder.Peterfalvi.S11

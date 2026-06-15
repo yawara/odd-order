@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
+import OddOrder.Peterfalvi.S10_CoherenceWiring
 
 /-!
 # Peterfalvi Section 14: Maximal Subgroups of Type I
@@ -154,16 +155,32 @@ structure TypeIFrobeniusData (M : Subgroup G) where
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
     ↥M (typeI.typeF.H.subgroupOf M) complement
 
+/-- **Structural input for Peterfalvi (12.6) — Frobenius case.**
+
+When `L` is already Frobenius with kernel `H`, the Sibley Dade setup of (6.8) takes its
+case-(c1) (Frobenius) branch, so a `SibleyTarget` for `(τ, S, A)` is available.  Exhibiting it
+is the remaining structural obligation; once it lands, and once lane B supplies the (6.8) proof
+body of `S08.sibleySetup_is_coherent`, `frobenius_typeI_coherent` is unconditional. -/
+noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis L)
+    (_hfrob : ∃ C : Subgroup ↥L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
+    CoherenceWiring.SibleyTarget hyp.tau hyp.Sset hyp.A := sorry
+
 /-- **Peterfalvi (12.6)**: if `L` is already Frobenius with kernel `H`, then the
-family `S` is coherent. -/
+family `S` is coherent.
+
+Wired to the (6.8) capstone through the coherence-wiring bridge: given the Frobenius-case
+structural witness `sibleyTarget_frobI`, coherence is exactly (6.8).  The proof carries no
+`sorry` of its own; its gaps are `sibleyTarget_frobI` (Frobenius structure) and (6.8) (lane B). -/
 theorem frobenius_typeI_coherent [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis L)
     (hfrob : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
-  sorry
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
+  CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob)
 
 /-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with
 kernel equal to `M_F`. -/
