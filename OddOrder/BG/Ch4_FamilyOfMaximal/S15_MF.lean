@@ -845,6 +845,109 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         ¬ IsCyclic ↥(MF M) := by
   sorry
 
+/-- **§14-independent Frattini factorization** (BG Corollary 15.3 proof, mmd L4213 "by the
+Frattini argument").  If `Q ⊴ M`, `QH ⊴ M`, `Q ∩ H = 1`, `|Q|` and `|H|` are coprime, and `M`
+is solvable, then `M = N_M(H)·Q`: every `m ∈ M` factors as `m = n·a` with `n ∈ N_G(H)` and
+`a ∈ Q`.
+
+Proof: inside `L = QH`, both `H` and the conjugate `H^{m⁻¹} = m⁻¹Hm` are complements of the
+normal subgroup `Q` (coprime orders, so `Q` is a normal Hall subgroup of `L`), hence are
+conjugate by some `q ∈ Q` (Schur–Zassenhaus conjugacy, `IsComplement'.exists_conj_of_coprime`):
+`H^q = H^{m⁻¹}`.  Then `mq ∈ N_G(H)` and `m = (mq)·q⁻¹`.
+
+This discharges the `hfratt` hypothesis of `mf_hall_centralizer_control_of_inputs` (Cor 15.3)
+once Theorem 15.2 supplies the normal `q`-subgroup `Q` with `M_σ/Q` nilpotent (issue 8010). -/
+theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
+    (hQM : Q ≤ M) (hHM : H ≤ M)
+    (hQnorm : (Q.subgroupOf M).Normal)
+    (hQHnorm : ((Q ⊔ H).subgroupOf M).Normal)
+    (hdisj : Disjoint Q H)
+    (hcop : Nat.Coprime (Nat.card ↥Q) (Nat.card ↥H))
+    (hsolv : IsSolvable ↥M) :
+    ∀ m ∈ M, ∃ n a : G, n ∈ Subgroup.normalizer (H : Set G) ∧ a ∈ Q ∧ m = n * a := by
+  classical
+  have hQL : Q ≤ Q ⊔ H := le_sup_left
+  have hHL : H ≤ Q ⊔ H := le_sup_right
+  have hLM : Q ⊔ H ≤ M := sup_le hQM hHM
+  have hMNQ : M ≤ Subgroup.normalizer (Q : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mp hQnorm
+  have hMNL : M ≤ Subgroup.normalizer ((Q ⊔ H : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hLM).mp hQHnorm
+  -- `Q ⊴ L` (as a subgroup of `↥(Q ⊔ H)`).
+  haveI hQnL : (Q.subgroupOf (Q ⊔ H)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQL).mpr (le_trans hLM hMNQ)
+  -- `↥(Q ⊔ H)` is solvable, hence so is its quotient by `Q.subgroupOf (Q ⊔ H)`.
+  haveI hLsolv : IsSolvable ↥(Q ⊔ H) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hLM)
+  -- A complement-builder inside `↥(Q ⊔ H)`: a `K ≤ L` with `Q ⊓ K = ⊥` and `Q ⊔ K = Q ⊔ H`
+  -- complements `Q` in `L`.
+  have mk_compl : ∀ K : Subgroup G, K ≤ Q ⊔ H → (Q ⊓ K : Subgroup G) = ⊥ → Q ⊔ K = Q ⊔ H →
+      Subgroup.IsComplement' (Q.subgroupOf (Q ⊔ H)) (K.subgroupOf (Q ⊔ H)) := by
+    intro K hKL hQK hQKL
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [Subgroup.disjoint_def]
+      intro x hxQ hxK
+      rw [Subgroup.mem_subgroupOf] at hxQ hxK
+      have hxQK : (x : G) ∈ Q ⊓ K := ⟨hxQ, hxK⟩
+      rw [hQK, Subgroup.mem_bot] at hxQK
+      exact Subtype.ext hxQK
+    · have hsup : Q.subgroupOf (Q ⊔ H) ⊔ K.subgroupOf (Q ⊔ H) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hQL hKL, hQKL, Subgroup.subgroupOf_self]
+      have := Subgroup.normal_mul (Q.subgroupOf (Q ⊔ H)) (K.subgroupOf (Q ⊔ H))
+      rw [hsup, Subgroup.coe_top] at this
+      exact this.symm
+  intro m hmM
+  have hminvM : m⁻¹ ∈ M := M.inv_mem hmM
+  -- `conj m⁻¹` fixes `Q` and `L` (both normal in `M`, and `m⁻¹ ∈ M`).
+  have hmiQ : MulAut.conj m⁻¹ • Q = Q := conj_smul_eq_self_of_mem_normalizer (hMNQ hminvM)
+  have hmiL : MulAut.conj m⁻¹ • (Q ⊔ H) = Q ⊔ H :=
+    conj_smul_eq_self_of_mem_normalizer (hMNL hminvM)
+  -- `H' := m⁻¹Hm = conj m⁻¹ • H` is a complement of `Q` in `L`.
+  have hH'L : MulAut.conj m⁻¹ • H ≤ Q ⊔ H := by
+    rw [← hmiL]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hHL
+  have hQH'disj : (Q ⊓ MulAut.conj m⁻¹ • H : Subgroup G) = ⊥ := by
+    rw [← hmiQ, ← Subgroup.smul_inf, disjoint_iff.mp hdisj, Subgroup.smul_bot]
+  have hQH'sup : Q ⊔ MulAut.conj m⁻¹ • H = Q ⊔ H := by
+    rw [← hmiQ, ← Subgroup.smul_sup, hmiQ, hmiL]
+  -- The two complements `H` and `H'`.
+  have hcompl_H : Subgroup.IsComplement' (Q.subgroupOf (Q ⊔ H)) (H.subgroupOf (Q ⊔ H)) :=
+    mk_compl H hHL (disjoint_iff.mp hdisj) rfl
+  have hcompl_H' : Subgroup.IsComplement' (Q.subgroupOf (Q ⊔ H))
+      ((MulAut.conj m⁻¹ • H).subgroupOf (Q ⊔ H)) :=
+    mk_compl (MulAut.conj m⁻¹ • H) hH'L hQH'disj hQH'sup
+  -- Coprimality `(|Q.subgroupOf L|, (Q.subgroupOf L).index)`: index `= |H|` by `hcompl_H`.
+  have hcardQ : Nat.card ↥(Q.subgroupOf (Q ⊔ H)) = Nat.card ↥Q :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQL).toEquiv
+  have hcardH : Nat.card ↥(H.subgroupOf (Q ⊔ H)) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
+  have hcop' : Nat.Coprime (Nat.card ↥(Q.subgroupOf (Q ⊔ H)))
+      (Q.subgroupOf (Q ⊔ H)).index := by
+    rw [hcardQ, hcompl_H.symm.index_eq_card, hcardH]; exact hcop
+  -- Schur–Zassenhaus conjugacy: `H` and `H'` are conjugate by some `q' ∈ Q.subgroupOf L`.
+  obtain ⟨q', hq'mem, hq'eq⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop' (Or.inr inferInstance) hcompl_H hcompl_H'
+  -- Lift the conjugacy back to `G` along `L.subtype`: `conj q'.val • H = conj m⁻¹ • H`.
+  set q : G := (q' : G) with hqdef
+  have hqQ : q ∈ Q := Subgroup.mem_subgroupOf.mp hq'mem
+  have hintertwine : (Q ⊔ H).subtype.comp (MulAut.conj q').toMonoidHom =
+      ((MulAut.conj q).toMonoidHom).comp (Q ⊔ H).subtype := by
+    ext x; rfl
+  have hmapH : (H.subgroupOf (Q ⊔ H)).map (Q ⊔ H).subtype = H := by
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hHL]
+  have hmapH' : ((MulAut.conj m⁻¹ • H).subgroupOf (Q ⊔ H)).map (Q ⊔ H).subtype =
+      MulAut.conj m⁻¹ • H := by
+    rw [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype, inf_of_le_right hH'L]
+  have hlift : MulAut.conj q • H = MulAut.conj m⁻¹ • H := by
+    have hlifted := congrArg (·.map (Q ⊔ H).subtype) hq'eq
+    simp only at hlifted
+    rw [Subgroup.map_map, hintertwine, ← Subgroup.map_map, hmapH, hmapH'] at hlifted
+    rw [Subgroup.pointwise_smul_def]
+    exact hlifted
+  -- `n := m·q ∈ N_G(H)`, `a := q⁻¹ ∈ Q`, `m = n·a`.
+  refine ⟨m * q, q⁻¹, ?_, Q.inv_mem hqQ, by group⟩
+  apply mem_normalizer_of_conj_smul_eq_self
+  rw [map_mul, mul_smul, hlift, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+
 /-- **§14-independent assembly engine for BG Corollary 15.3** (mmd L4204).  Packages the
 *logic* of Corollary 15.3 with its `§14`/`§15` inputs taken as named hypotheses, so that once
 those land (Lane H), the wrapper `mf_hall_centralizer_control` discharges each by a single
