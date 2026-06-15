@@ -367,6 +367,8 @@ S≠⊥・S≠G)→ M∈ℳ(N_G(S)) → S⊆M_σ(σ-helper ✅)→ H 冪零ゆ�
 各 H_q は C_M(S) 内の M の Sylow → Cor 15.3(a)[仮説化]で ≤M_σ → 冪零分解 helper で H≤M_σ。
 冪零分解 helper(`isNilpotent_iff_forall_sylow_normal` 経由「H 冪零 ∧ 全 Sylow≤K ⟹ H≤K」)が次の leaf。
 
+**✅ UPDATE 2026-06-15 (`ee1c7d41`): Cor 15.4 COMPLETE.** section 12 の「§15 は 1 つも cite で閉じない」は **Cor 15.6(`34d44c28`)と Cor 15.4(`ee1c7d41`)で部分的に覆った** — 両者とも本体 sorry-free で、cite 先(Cor 15.4 → Cor 15.3a; Cor 15.6 → 14.2/14.7/15.2/15.5)の sorry に gated。Cor 15.4 の reconstruction gap(π(H)⊆σ(M))は ChatGPT Pro 拡張で解決(`s15_4_chatgpt_answer.md`、核心 = Cor 15.3a の X が τ₂ 群なので C_M(S)/C_{M_σ}(S) が τ₂ 群 ⟹ q∉σ Sylow は埋め込みで τ₂ 強制→rank-2 矛盾)。新 helper: `sylow_le_Msigma_of_normalizer_le` / `eq_top_of_forall_sylow_le` / `eq_top...` / `normalizer_eq_self_of_mem_maximalSubgroups` / `sylow_isHall_piSet_subgroupOf_Msigma` / `sylow_le_Msigma_of_le_centralizer_sylow`(KEY)。**残 §15 = Lemma 15.1 / Thm 15.2 / Cor 15.3 / Cor 15.5 / Thm 15.7 / Thm 15.8 / Cor 15.9。** 真の deep core = Lemma 15.1 / Thm 15.2(§14 proof + 構造論)。Cor 15.3/15.5 は cite で閉じられる見込み(行間 gap があれば ChatGPT)。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
