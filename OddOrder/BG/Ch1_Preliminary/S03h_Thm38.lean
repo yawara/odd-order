@@ -203,4 +203,44 @@ theorem chiefFactor_fixedPointFree_of_centralizer_fitting_eq_bot
     rw [QuotientGroup.eq_one_iff, hx_eq]
     exact (Y.subgroupOf X).inv_mem hn
 
+open OddOrder.GroupTheory in
+/-- **Per-factor dichotomy for BG Theorem 3.8** (`thm34`-analog of
+`S03c.kernel_le_chiefFactorCentralizer_dichotomy`).  For a `G`-chief factor `X/Y` (`X ⊆ K`)
+elementary abelian of prime `s`, with `L ⊴ G` centralizing `X/Y`, `K/L` a `q`-group, `R` acting
+fixed-point-freely on `X/Y`, and the `G/L = (K/L)(R/L)` Theorem 3.4 data, the commutator `⁅R, K⁆`
+centralizes `X/Y`.
+
+* `s = q`: `K/L` is an `s`-group, so `S03c.samePrime_kernel_le_chiefFactorCentralizer` gives
+  `K ≤ chiefFactorCentralizer`, hence `⁅R, K⁆ ≤ K ≤ chiefFactorCentralizer`.
+* `s ≠ q`: `commutator_le_chiefFactorCentralizer_via_thm34` (leaf B). -/
+theorem commutator_le_chiefFactorCentralizer_dichotomy_thm38
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R X Y : Subgroup G}
+    [K.Normal] [X.Normal] [Y.Normal] {s q : ℕ} [Fact s.Prime] [Fact q.Prime]
+    (hChief : IsChiefFactor X Y)
+    (hVelem : IsElementaryAbelian s (↥X ⧸ Y.subgroupOf X))
+    {L : Subgroup G} [L.Normal] (hLcent : L ≤ chiefFactorCentralizer X Y)
+    (hKbar : IsPGroup q (K.map (QuotientGroup.mk' L)))
+    (hcompl : (K.map (QuotientGroup.mk' L)).IsComplement' (R.map (QuotientGroup.mk' L)))
+    (hHall : Nat.Coprime (Nat.card ↥(K.map (QuotientGroup.mk' L)))
+      (Nat.card ↥(R.map (QuotientGroup.mk' L))))
+    (hRp : ∃ r : ℕ, r.Prime ∧ Nat.card ↥(R.map (QuotientGroup.mk' L)) = r)
+    (hodd : Odd (Nat.card (G ⧸ L)))
+    (hchar : s ≠ q → ¬ s ∣ Nat.card (G ⧸ L))
+    (hFPF : letI := S03c.chiefFactorConjAction X Y
+            ∀ v : ↥X ⧸ Y.subgroupOf X, (∀ r : R, (r : G) • v = v) → v = 1) :
+    ⁅R, K⁆ ≤ chiefFactorCentralizer X Y := by
+  by_cases hsq : s = q
+  · -- `s = q`: `K` centralizes `X/Y` (same-prime branch), so `⁅R, K⁆ ≤ K ≤ chiefFactorCentralizer`.
+    subst hsq
+    have hKcent := S03c.samePrime_kernel_le_chiefFactorCentralizer hChief hVelem hLcent hKbar
+    have hRKle : ⁅R, K⁆ ≤ K := by
+      rw [Subgroup.commutator_le]
+      intro r _ k hk
+      rw [commutatorElement_def]
+      exact K.mul_mem (‹K.Normal›.conj_mem k hk r) (K.inv_mem hk)
+    exact hRKle.trans hKcent
+  · -- `s ≠ q`: the coprime (Theorem 3.4) branch.
+    exact commutator_le_chiefFactorCentralizer_via_thm34 hVelem hLcent hcompl hHall hRp hodd
+      (hchar hsq) hFPF
+
 end OddOrder.BG.Ch1.S03h
