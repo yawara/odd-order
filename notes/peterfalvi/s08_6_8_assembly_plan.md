@@ -3284,3 +3284,14 @@ cX を xChainCoherent fold で組むには X-member が pairwise orthogonal 要�
 **⟹ cX fold の orthogonality 群は揃った**: column⊥Y (`inner_columnSum_Yset_eq_zero`)、cross-column (`ind_cross_inner_eq_zero`, images)、**irr⊥column (本 commit)**、irr⊥irr (Kronecker)。**cX fold は当初思ったより tractable。**
 **▶ 次: cX fold の残り** = (a) column base coherence (cX_col / certainTypeSet, 単一 k は `certainTypeSet_isCoherent_tau_canonical`; multi-degree は要 union or 単一 class 確認)、(b) **hstep (XAdjoinStepInput)** = 既約 adjoin の member-family+degree-bound (case-A `hstep` の mixed 適応、orthogonality は本群で供給可)、(c) xChainCoherent 組立。次手 = hstep の最小 piece or column base 確認。
 **正本=本 cont.²²。irr⊥column 完成 (`cc0c3aa0`)、orthogonality 群 揃う、cX fold tractable と判明。次=hstep/column base。Opus 継続。**
+
+### session 43 cont.²³: ✅ orthogonality/prefix infra COMPLETE (8 commits) — 残=heavy gates (hstep core / L4)
+cont.¹⁹-²³ で case-B X-fold の orthogonality 層を完成 (5 commits): cover dichotomy (`caseB_induce_column_or_irreducible`), irr⊥column (`caseB_inner_irr_columnSum_eq_zero`), columnSum-cross (`inner_columnSum_cross_eq_zero`), conj⊥column (`caseB_inner_irr_conj_columnSum_eq_zero`), column-base 束 (`caseB_irr_orthogonal_columnBase` = hχ_S1/hχbar_S1 の column 部分)。+ session 前半の dispatch trio + per-step adjoin = **session 43 で計 8 Lean commits**。
+**⟹ cX fold の per-step orthogonality 入力は揃った** (χ/χ̄ ⊥ column base; prior irr pair は Kronecker)。
+**🔴 残る heavy gates (loop-quick-win 無し、focused build 要)**:
+1. **hstep core** = `XAdjoinStepInput` の member-family + (6.6) degree-bound `2a<∑deg²`。(6.6) Cor 2.30 bound は Z-generic (`exists_source_primePow_centralBound_of_mem_Xset`、中心 W₂ で適用可) ⟹ 大半 case-A 流用可。但し member-family が mixed prefix (column+irr) ゆえ case-A `exists_pairUnion_memberFamily_of_irreducible_X` (全既約前提) の適応要。~200-300 LOC。
+2. **column base coherence** = 全 column の coherence。⚠ 未解決: 単一 degree class (= 1 つの `certainTypeSet`、`certainTypeSet_isCoherent_tau_canonical` 直用) か multi-degree (union 要) か — case (c2) の column degree 一様性を (4.9)/(6.8.2) で確認要。
+3. **xChainCoherent 組立** (column base S₀ + irr adjoin) → cX。
+4. **glue** (`coherentXunionYset_caseB_of_glued` 既存) → X∪Y coherence。
+5. **(6.8.3) L4** (X∪Y→S) = case-A `false_of_coherentXunionYset_of_not_coherentS` (CB2:3439) の case-B 適応 (Z=W₂、算術 |H:W₂|≥(2|W₁|+1)²、case-B S-facts)。~100 LOC。
+**▶ 次: hstep core に着手** (case-A member-family 機構を読んで mixed prefix 適応; (6.6) bound は Z-generic で流用)。**正本=本 cont.²³。orthogonality 層完成 (8 commits)。次=hstep core (heavy)。Opus 継続。**
