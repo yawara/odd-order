@@ -112,6 +112,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem127d
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
