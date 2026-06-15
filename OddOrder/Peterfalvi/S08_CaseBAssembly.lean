@@ -695,4 +695,76 @@ theorem caseB_constituentDecomposition_Y_inner_int
     exact caseB_constituentDecomposition_tau1_mem_ZIrr hyp h46 θ hcol hirr
   · exact hνZc1
 
+/-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image — concrete dispatch family.**  The
+specialization of `caseB_per_phi_anchored` to the mixed dispatch family `caseB_phi_family`: the
+abstract decomposition family `D`, its seam-1 orthogonality `hXorth` and integrality `hbi` are all
+resolved (`caseB_phi_family` / `caseB_constituentDecomposition_X_orthogonal` /
+`caseB_constituentDecomposition_Y_inner_int`, the latter's `b` read off by choice).  For each
+constituent `θ = i.val` of `Ind^L_{W₂} φ` (with `aᵢ = ⟨φ, Res^H_{W₂} θ⟩ > 0`):
+`(Ind^L_H θ − aᵢ·η₁)^{hyp.tau} = (caseB_phi_family … i).X − aᵢ·cY.extension η₁`.
+
+The remaining inputs are exactly the genuine §5/§6 content discharged at the capstone: the per-`θ`
+column/irreducible structural bundles `hcol`/`hirr`, the `Y`-anchor `η₁` data (`hη₁` and its real /
+support / conjugate facts), the partner anchor `η' ≠ η₁ ∈ Yset`, the per-`θ` anchor-vs-constituent
+orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp` (`exists_decomposition_caseB`). -/
+theorem caseB_per_phi_anchored_family
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hcol : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBColBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val))
+    (hirr : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBIrrBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val))
+    (hη₁irr : IsIrreducibleCharacter η₁)
+    (hrealc1 : ¬ ClassFunction.IsReal η₁)
+    (hdiffsuppc1 : (η₁.conj - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hc1barS1 : η₁.conj ∈ hyp.Yset)
+    (hνZc1 : cY.extension η₁ ∈ ZIrr G)
+    (hc1c1bar : ClassFunction.inner η₁ η₁.conj = 0)
+    {η' : ClassFunction ↥L ℂ} (hη'Y : η' ∈ hyp.Yset) (hη'irr : IsIrreducibleCharacter η')
+    (hee : ClassFunction.inner η₁ η' = 0)
+    (hsupp : (η₁ - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hirrAnc : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+          OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            ≠ ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) →
+        ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0
+        ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁.conj
+            (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0)
+    {Xagg : ClassFunction G ℂ}
+    (hXaggorth : ClassFunction.inner Xagg (cY.extension η₁) = 0)
+    (hdecomp : hyp.tau (ClassFunction.induce W2 φ - ((W2.subgroupOf H).index : ℂ) • η₁)
+      = Xagg - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁)
+    (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
+    hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) - constituentWeight hφ' i.val • η₁)
+      = (caseB_phi_family hyp h46 hW2H hφ' hcol hirr i).X
+        - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ := by
+  have hX : ∀ j, ClassFunction.inner
+      (caseB_phi_family hyp h46 hW2H hφ' hcol hirr j).X (cY.extension η₁) = 0 :=
+    fun j => caseB_constituentDecomposition_X_orthogonal hyp h46 hHK j.val (hcol j) (hirr j) cY
+      hη₁ hη₁irr hrealc1 hdiffsuppc1 hc1barS1 hνZc1 hc1c1bar hη'Y hη'irr hee hsupp (hirrAnc j)
+  have hY : ∀ j, ∃ n : ℤ, ClassFunction.inner
+      (caseB_phi_family hyp h46 hW2H hφ' hcol hirr j).Y (cY.extension η₁) = (n : ℂ) :=
+    fun j => caseB_constituentDecomposition_Y_inner_int hyp h46 hHK j.val (hcol j) (hirr j) cY
+      hη₁ hη₁irr hrealc1 hdiffsuppc1 hc1barS1 hνZc1 hc1c1bar hη'Y hη'irr hee hsupp (hirrAnc j)
+  exact caseB_per_phi_anchored hyp hW2H hcen hφ' cY hη₁
+    (caseB_phi_family hyp h46 hW2H hφ' hcol hirr)
+    (fun j => caseB_phi_family_tau1 hyp h46 hW2H hφ' j)
+    hXaggorth hdecomp (b := fun j => (hY j).choose) hX (fun j => (hY j).choose_spec) i
+
 end OddOrder.Peterfalvi.S08
