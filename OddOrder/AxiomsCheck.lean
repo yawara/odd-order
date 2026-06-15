@@ -4536,6 +4536,16 @@ cites (replacing the former S12_E `sorry`'d forward-decls); fully unconditional,
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_pRank_normalizer_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_not_mem_primeFactors_derived_of_tau1
 
+/-! **BG Corollary 12.16(a)**, *headline form* (`S12_Corollary1216`,
+`sigma_subgroup_conj_into_Msigma_general`): a nonidentity `σ(M)`-subgroup `Y < ⊤` of `G` is
+`G`-conjugate into `M_σ` (BG's `ℓ_σ ≤ 1` tool, mmd L3801). Proof: a characteristic `q`-subgroup
+`X ⊆ Y` conjugates into `M_σ`; either `N_G(X) ⊆ M` (so `Y ⊆ M ⟹ Y ⊆ M_σ`) or `M* = (M ∩ M*)K`
+(Prop 12.15) with `K` a `σ(M)'`-group, and `hall_D` pushes `Y` into `M ∩ M* ⊆ M`. The
+`σ`-disjointness gate (Theorem 13.9, downstream) is a hypothesis `hσdisj` to avoid an import cycle;
+§14 callers discharge it with `sigma_disjoint_of_nonconjugate`. Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.sigma_subgroup_conj_into_Msigma_general
+
 /-! ### BG §14 (`S14_TypePCounting`) -/
 
 /-! **BG Lemma 14.1** (`S14_TypePCounting`): for `M ∈ 𝓜` and a prime
