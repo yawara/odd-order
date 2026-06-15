@@ -2035,6 +2035,25 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact maximalContaining_centralizer_of_le_Msigma_centralizer_E1 hG h' hKne hXelem
         (hKstar ▸ hXKstar)
 
+/-- **BG Corollary 14.3, branch-2 piece** (mmd L3858): if `x'` is a nonidentity `τ₂(M)`-element
+of `M` with `C_{M_σ}(x') ≠ 1`, then `ℳ(C_G(x')) = {M}`.  This is Corollary 12.10(e)
+(`nilpotent_sigmaComplement_abelian`, fifth conjunct) for an `E`-setup of `M`, with the prime
+set `π(⟨x'⟩)` rewritten as `(orderOf x').primeFactors`. -/
+theorem maximalContaining_centralizer_eq_singleton_of_tau2_element [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x' : G} (hx'M : x' ∈ M) (hx'1 : x' ≠ 1)
+    (hx'τ2 : ∀ p ∈ piSet (Subgroup.closure {x'}), p ∈ tau2 M)
+    (hC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x'} : Set G) ≠ ⊥) :
+    maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) = {M} := by
+  classical
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  have hcard : Nat.card ↥(Subgroup.closure {x'}) = orderOf x' := by
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  exact (nilpotent_sigmaComplement_abelian hG hsetup).2.2.2.2 x' hx'M hx'1
+    (fun r hr => hx'τ2 r (by
+      show r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
+      rw [hcard]; exact hr)) hC
+
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
 `ℓ_σ(x') = 1`, and `𝓜(C_G(x')) = {M}`.
