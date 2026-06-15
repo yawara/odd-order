@@ -82,8 +82,8 @@ provable:
 
 * the maximal pair `S, T`, their types, and the case-(b) trichotomy of (8.8)
   — Pf §14 / BG §16;
-* the cyclic structure `W = W₁W₂`, the Fitting kernels `P, Q`, the complements
-  `U, V`, the primes `p, q` and the counting parameters `u, v, c, d` — §13–§14;
+* the cyclic structure `W = W₁W₂`, the complements `U, V`, the primes `p, q` and
+  the counting parameters `u, v, c, d` — §13–§14;
 * the Dade character grids `ω, μ, ν` with the induction identities (13.1.e), the
   signs `δ, δ'`, and the integral maps `τ_S, τ_T, τ₃` — Pf §3–§9.
 
@@ -96,12 +96,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   W1 : Subgroup G
   W2 : Subgroup G
   W : Subgroup G
-  P : Subgroup G
-  Q : Subgroup G
   U : Subgroup G
   V : Subgroup G
-  C : Subgroup G
-  D : Subgroup G
   S_maximal : S ∈ maximalSubgroups G
   T_maximal : T ∈ maximalSubgroups G
   S_ne_T : S ≠ T
@@ -117,12 +113,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   W1_inf_W2_eq_bot : W1 ⊓ W2 = ⊥
   W1_commutes_W2 : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y
   W_cyclic : IsCyclic ↥W
-  P_eq_SF : P = maxNilpotentNormalHall S
-  Q_eq_TF : Q = maxNilpotentNormalHall T
-  S_deriv_eq_PU : derivedInG S = P ⊔ U
-  T_deriv_eq_QV : derivedInG T = Q ⊔ V
-  C_eq : C = U ⊓ Subgroup.centralizer (P : Set G)
-  D_eq : D = V ⊓ Subgroup.centralizer (Q : Set G)
+  S_deriv_eq_PU : derivedInG S = maxNilpotentNormalHall S ⊔ U
+  T_deriv_eq_QV : derivedInG T = maxNilpotentNormalHall T ⊔ V
   W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
   W2_normalizes_V : W2 ≤ Subgroup.normalizer (V : Set G)
   q : ℕ
@@ -135,8 +127,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   v : ℕ
   c : ℕ
   d : ℕ
-  c_eq_card_C : c = Nat.card ↥C
-  d_eq_card_D : d = Nat.card ↥D
+  c_eq_card_C : c = Nat.card ↥(U ⊓ Subgroup.centralizer (maxNilpotentNormalHall S : Set G))
+  d_eq_card_D : d = Nat.card ↥(V ⊓ Subgroup.centralizer (maxNilpotentNormalHall T : Set G))
   card_U_eq_uc : Nat.card ↥U = u * c
   card_V_eq_vd : Nat.card ↥V = v * d
   Sset : Set (ClassFunction ↥S ℂ)
@@ -174,6 +166,10 @@ without any `sorry`.  Beyond carrying the input fields, it *derives* the fields 
 `Peterfalvi.S15.Hypothesis` that are not independent data:
 
 * `finiteG` from the ambient `[Finite G]`;
+* the Fitting kernels `P := F(S)`, `Q := F(T)` (`maxNilpotentNormalHall`) and the
+  centralizer complements `C := U ∩ C_G(P)`, `D := V ∩ C_G(Q)` definitionally, so
+  `P_eq_SF`, `Q_eq_TF`, `C_eq`, `D_eq` are `rfl` — they are determined by
+  `S, T, U, V`, not separate data;
 * `q_odd`, `p_odd` from `Odd |G|` (subgroup orders divide `|G|`);
 * `eta := τ₃ ∘ ω`, discharging **Peterfalvi (13.1.d)** `η_{ij} = ω_{ij}^{τ₃}`
   definitionally — `η` is the τ₃-image of the `ω`-grid, not separate data;
@@ -181,7 +177,7 @@ without any `sorry`.  Beyond carrying the input fields, it *derives* the fields 
 
 These derivations are why `Section16Inputs` is a *strictly smaller* obligation
 than `Peterfalvi.S16.Hypothesis`: discharging the menu does not require separately
-producing `η`, `m`, or the oddness facts. -/
+producing `P, Q, C, D`, `η`, `m`, or the oddness facts. -/
 noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Finite G]
     (hodd : Odd (Nat.card G)) (inp : Section16Inputs G) :
     Peterfalvi.S16.Hypothesis (G := G) where
@@ -191,12 +187,12 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       W1 := inp.W1
       W2 := inp.W2
       W := inp.W
-      P := inp.P
-      Q := inp.Q
+      P := maxNilpotentNormalHall inp.S
+      Q := maxNilpotentNormalHall inp.T
       U := inp.U
       V := inp.V
-      C := inp.C
-      D := inp.D
+      C := inp.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall inp.S : Set G)
+      D := inp.V ⊓ Subgroup.centralizer (maxNilpotentNormalHall inp.T : Set G)
       S_maximal := inp.S_maximal
       T_maximal := inp.T_maximal
       S_ne_T := inp.S_ne_T
@@ -209,12 +205,12 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       W1_inf_W2_eq_bot := inp.W1_inf_W2_eq_bot
       W1_commutes_W2 := inp.W1_commutes_W2
       W_cyclic := inp.W_cyclic
-      P_eq_SF := inp.P_eq_SF
-      Q_eq_TF := inp.Q_eq_TF
+      P_eq_SF := rfl
+      Q_eq_TF := rfl
       S_deriv_eq_PU := inp.S_deriv_eq_PU
       T_deriv_eq_QV := inp.T_deriv_eq_QV
-      C_eq := inp.C_eq
-      D_eq := inp.D_eq
+      C_eq := rfl
+      D_eq := rfl
       W1_normalizes_U := inp.W1_normalizes_U
       W2_normalizes_V := inp.W2_normalizes_V
       q := inp.q
