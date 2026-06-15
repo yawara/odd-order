@@ -383,6 +383,49 @@ theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
     exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
   exact ⟨hpp, hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
 
+/-- **`π(E₁) ⊆ κ(M)`** in BG Proposition 14.2's `κ(M) ⊆ τ₁(M)` case: every prime `p ∣ |E₁|` lies
+in `κ(M)`.  `p ∈ τ₁(M)` (as `E₁` is Hall `τ₁(M)` of `E`), and a rank-one `P = ⟨g⟩ ≤ E₁` of order
+`p` has `C_{M_σ}(P) = C_{M_σ}(E₁) ≠ 1` by prime action (`hE1prime`) plus `C_{M_σ}(E₁) ≠ 1`
+(`hCE1`, from `E1_not_regular`).  So `E₁` is a `κ(M)`-subgroup; with `[M:E₁]` coprime to `κ(M)`
+this makes `E₁` a Hall `κ(M)`-subgroup, conjugate to `K` (the entry to WLOG `K = E₁`). -/
+theorem mem_kappa_of_mem_primeFactors_card_E1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁)
+    (hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥E₁).primeFactors) : p ∈ kappa M := by
+  obtain ⟨hpp, hpdvdE1, -⟩ := Nat.mem_primeFactors.mp hp
+  haveI : Fact p.Prime := ⟨hpp⟩
+  have hpτ1 : p ∈ tau1 M := h.E₁_hall.1 p (by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv]; exact hp)
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvdE1
+  have hgE1 : (g : G) ∈ E₁ := g.2
+  have hgord : orderOf (g : G) = p :=
+    (orderOf_injective E₁.subtype E₁.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := by
+    intro hc; rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by
+    rw [Nat.card_zpowers]; exact hgord
+  have hPelem : Subgroup.zpowers (g : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
+  have hPM : Subgroup.zpowers (g : G) ≤ M :=
+    Subgroup.zpowers_le.mpr ((h.E₁_le.trans h.E_le) hgE1)
+  have heqg := hE1prime (g : G) hgE1 hgne
+  have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff] at hy ⊢
+    intro z hz
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+  have hPC : OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) ≠ ⊥ := by
+    have hne : OddOrder.BG.Ch3.S10.Msigma M ⊓
+        Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ := by
+      rw [← fixedByElement_def, heqg, fixedBy_def]; exact hCE1
+    exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+  exact ⟨hpp, Or.inl hpτ1, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
+
 /-- **BG Proposition 14.2(c)** for the `κ(M) ∩ τ₃(M) ≠ ∅` case: if `X ∈ ℰ_q¹(G)` lies in
 `K^* = C_{M_σ}(E)` (i.e. `X ≤ M_σ ⊓ C(E)`), then `𝓜(C_G(X)) = {M}`.  Here `q ∣ |M_σ|` forces
 `q ∈ σ(M)`, and `X ≤ M_σ ⊓ C(E₁)` (since `E₁ ≤ E`), so Lemma 13.6
