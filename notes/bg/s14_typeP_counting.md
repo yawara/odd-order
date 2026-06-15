@@ -430,3 +430,42 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
   - case-τ₁: κ=τ₁, WLOG K=E₁ (F の issue-7000 ∃→∀ upgrade leaf 着地後に cite), Lem 13.12/13.7, Cor 12.10(b)。
 - **hub LAUNCH (2026-06-15) と整合**: 「Prop 14.2 = 既存 machinery の assembly」を実証。F の issue-7000 leaf は
   case-τ₁ の WLOG 用 (case-τ₃ は本ループで自己完結)。
+
+### ✅ conjunct (d) COMPLETE + 🛑 残 conjunct の obstacle 確定 (2026-06-15 loop)
+- **✅ (d) `Kstar∩M^g=⊥` landing** (commit `4af679bc`): (c) helper
+  `maximalContaining_centralizer_of_le_Msigma_centralizer_E` + **Theorem 10.1(e)**
+  (`OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma` の `.2.2.2.2`: X≤M ∧ C_G(X)≤M ∧ conj g⁻¹•X≤M ⟹ g⁻¹∈M)。
+  rank-1 X は Cauchy で抽出、X≤M^g ⟹ conj g⁻¹•X≤M は `pointwise_smul_le_pointwise_smul_iff`+smul 合成。
+  ⚠ motive-not-type-correct (w が Kstar 依存) は等式 `hKstarE : Kstar=M_σ⊓C(E)` を作って `▸` で回避。
+- **case-τ₃ 現況**: K=E ✓ / (a) ✓ / (K*≠1) ✓ / (d) ✓。**残 = (b1), (g)**。full build green 3817 jobs。
+
+🛑 **残 conjunct は quick win でない (obstacle 確定、要方針判断)**:
+- **(g) `IsTypeP2 M → …`**: case-τ₃ では M は P1 ゆえ **vacuous のはず**だが、¬P2 = `κ=sigmaComplementPrimes`
+  の証明が **定義的ギャップでブロック**。`kappa`/`tau1`/`tau3` は `p : ℕ` 全体を渡る (素数制限なし)。
+  `pRank M p` 定義 (PRank.lean:374) = `⨆ A:{IsElementaryAbelian p}, log p (card A)` で **素数性を強制しない**
+  (`rank` の docstring が「composite exponents を防ぐため prime に制限」と明記＝pRank 単体は防がない)。
+  ⟹ `p∈τ₁ (pRank=1)` から `p 素数` が出ず、**κ⊆sigmaComplementPrimes (=piSet∖σ, 素数のみ) が形式上未証明**
+  (κ が composite p を含みうる)。**選択肢**: (i) 実 (g) 内容を証明 (Thm 3.10(a)/Lem 12.19/12.17、multi-lemma)、
+  (ii) `kappa`/`tau` 定義に素数性を付加 (faithfulness fix だが下流 lemma 影響大)、(iii) κ-witness が素数を強制する
+  補題を別途証明 (`IsElementaryAbelian p` + nontrivial ⟹ p 素数 が要るが現状未確認)。
+- **(b1) `∀ X≤K, X≠⊥ → N_G(X)⊓M = K⊔Kstar`**: BG (b1) は **`X∈ℰ¹(K)` (rank-1) 限定**だが Lean goal は
+  **∀X≤K (over-broad)** ⟹ **statement faithfulness 要確認** (現 goal が真かBG通り ℰ¹(K) に絞るべきか)。
+  証明自体も hard normalizer 計算 (N_M(X)=K×K*) で Lemma 13.13/13.6 wiring 要。
+- **case-τ₁**: F の issue-7000 ∃→∀ upgrade leaf 未着地 ⟹ gated。
+
+**⟹ case-τ₃ の core (K=E + 3/5 conjunct) は完了。残 2 conjunct + case-τ₁ は要方針判断 (上記)。**
+
+### ✅✅ faithfulness fix 群 + (g)/(b1) 進捗 (2026-06-15 loop, ユーザー方針「faithfulness を先に」)
+ユーザー裁可で faithfulness を先に整備:
+- **✅ kappa primality 化** (commit `bb844d42`): `kappa` def に `p.Prime` 追加 (BG の κ は素数集合)。tau(§12)
+  不変、S14 内に閉じる。`prime_of_mem_kappa` helper + 全 site 更新。G は kappa を Set cite のみで不変。
+- **✅ (g) COMPLETE** (commit `ba911f75`): kappa primality 化で **κ=sigmaComplementPrimes** が証明可能に
+  ⟹ case-τ₃ は P1 ⟹ `IsTypeP2 M` 矛盾で (g) vacuous 解決。κ⊆: witness P≤M で p|M + tau⊆σ'。
+  ⊇: p∈piSet∖σ ⟹ p|E (card_Msigma_mul_card_E) ⟹ mem_kappa(step2)。
+- **✅ (b1) statement faithful 化 + ⊇ 方向** (commit 後述): goal を BG 通り
+  `∀ p prime, ∀ X∈ℰ_p¹, X≤K → N(X)⊓M=K⊔Kstar` に修正 (旧 `∀X≤K` は over-broad/偽)。
+  **⊇ 証明済**: K=E≤N_G(X) (Cor 13.11 hEnorm) + K*=C_{M_σ}(K)≤C_G(X)≤N_G(X), K*≤M_σ≤M。
+  **⊆ のみ sorry** (BG「clear」だが M=M_σ⋊E semidirect 構造 + N_M(X)=K×K* に要・hard)。
+
+**case-τ₃ 現況: K=E + (a)+(K*≠1)+(d)+(g) 完成、(b1) は statement faithful + ⊇ 済・⊆ のみ sorry。**
+**残 = (b1)-⊆ [M=M_σ⋊E 構造] + case-τ₁ [F issue-7000 gated]。full build green 3817 jobs。**

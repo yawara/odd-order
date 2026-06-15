@@ -74,7 +74,7 @@ def sigmaComplementPrimes (M : Subgroup G) : Set ℕ :=
 some rank-one elementary abelian `p`-subgroup has nontrivial centralizer in
 `M_sigma`. -/
 def kappa (M : Subgroup G) : Set ℕ :=
-  {p | p ∈ tau1 M ∪ tau3 M ∧
+  {p | p.Prime ∧ p ∈ tau1 M ∪ tau3 M ∧
     ∃ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 ∧ P ≤ M ∧
       OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥}
 
@@ -132,7 +132,10 @@ theorem not_isTypeP_and_isTypeF {M : Subgroup G} : ¬ (IsTypeP M ∧ IsTypeF M) 
 a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`), so the §12 `E`-setup
 may be chosen to contain it. -/
 theorem kappa_subset_tau1_union_tau3 {M : Subgroup G} : kappa M ⊆ tau1 M ∪ tau3 M :=
-  fun _ hp => hp.1
+  fun _ hp => hp.2.1
+
+/-- Every prime in `κ(M)` is prime (recorded explicitly in the definition). -/
+theorem prime_of_mem_kappa {M : Subgroup G} {p : ℕ} (hp : p ∈ kappa M) : p.Prime := hp.1
 
 /-- `κ(M) ⊆ σ(M)'`: a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`).
 This lets Proposition 14.2 feed a Hall `κ(M)`-subgroup `K` to `exists_subgroupESetup_with_le`
@@ -193,7 +196,7 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {p : ℕ} (hp : p.Prime) (hpκ : p ∈ kappa M) (hpτ3 : p ∈ tau3 M) :
     E₃ ≠ ⊥ ∧ ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃ := by
-  obtain ⟨_, P, hPelem, hPM, hPC⟩ := hpκ
+  obtain ⟨_, _, P, hPelem, hPM, hPC⟩ := hpκ
   haveI : Fact p.Prime := ⟨hp⟩
   have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
   have hPpi : Ch03.Subgroup.IsPiGroup (tau3 M) (P.subgroupOf M) := by
@@ -336,7 +339,7 @@ theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
         Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ := by
       rw [← fixedByElement_def, heqg, fixedBy_def]; exact hCE
     exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
-  exact ⟨hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
+  exact ⟨hpp, hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
 
 /-- **BG Proposition 14.2(c)** for the `κ(M) ∩ τ₃(M) ≠ ∅` case: if `X ∈ ℰ_q¹(G)` lies in
 `K^* = C_{M_σ}(E)` (i.e. `X ≤ M_σ ⊓ C(E)`), then `𝓜(C_G(X)) = {M}`.  Here `q ∣ |M_σ|` forces
@@ -534,7 +537,7 @@ theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
     -- `C_{M_σ}(A) = 1` because `p ∉ κ(M)`.
     have hC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ := by
       by_contra hne
-      exact hpκ ⟨hpτ13, A, hAr1, hAM, hne⟩
+      exact hpκ ⟨hp, hpτ13, A, hAr1, hAM, hne⟩
     refine ⟨hC, ?_⟩
     -- `A` is commutative, hence `A ≤ C_G(A)`.
     have hAcent : A ≤ Subgroup.centralizer (A : Set G) := by
@@ -619,7 +622,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (U.subgroupOf M)) :
     ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K ∧
       Kstar ≠ ⊥ ∧
-      (∀ X : Subgroup G, X ≤ K → X ≠ ⊥ →
+      (∀ p : ℕ, p.Prime → ∀ X : Subgroup G, X ∈ elemAbelianOfRank G p 1 → X ≤ K →
         Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar) ∧
       (∀ g : G, g ∉ M → Kstar ⊓ (MulAut.conj g • M) = ⊥) ∧
       (IsTypeP2 M → OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M ∧
@@ -669,8 +672,20 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     · -- `K^* = C_{M_σ}(K) = C_{M_σ}(E) ≠ 1` (prime action + the non-regular witness).
       rw [hKstar, hKEeq]
       exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hEprime hsetup.E₃_le hreg
-    · -- (b1) `N_M(X) = K × K^*`.  BG: "clear" from Cor 13.11; needs Lemma 13.13/13.6 wiring.
-      sorry
+    · -- (b1) `N_M(X) = K ⊔ K^*` for rank-one `X ≤ K`.  `⊇`: `K = E ≤ N_G(X)` by Corollary 13.11
+      -- (`hEnorm`), and `K^* = C_{M_σ}(K) ≤ C_G(X) ≤ N_G(X)`, `K^* ≤ M_σ ≤ M`.  `⊆` (BG "clear",
+      -- needs the `M = M_σ ⋊ E` semidirect structure) is deferred.
+      intro p hp X hXrank hXK
+      refine le_antisymm ?_ ?_
+      · sorry
+      · refine sup_le ?_ ?_
+        · rw [hKEeq]
+          exact le_inf (hEnorm p hp X hXrank (hXK.trans hKEeq.le)) (hKEeq ▸ hKM)
+        · rw [hKstar]
+          exact le_inf
+            (inf_le_right.trans ((Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK)).trans
+              (Subgroup.centralizer_le_normalizer _)))
+            (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
     · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`: a rank-one `X ≤ K^* ∩ M^g` has `C_G(X) ⊆ M` by (c),
       -- and `X ≤ M^g` with Theorem 10.1(e) forces `g ∈ M`.
       intro g hgM
@@ -715,8 +730,35 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hqσ hXbot hXp).2.2.2.2
           hXM hCM g⁻¹ hconj
       exact hgM (by simpa using M.inv_mem hg')
-    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  Needs Thm 3.10 / Lem 12.19 / 12.17.
-      sorry
+    · -- (g) In the `κ ∩ τ₃` case `K = E`, so `κ(M) = π(M) ∖ σ(M)`, i.e. `M` is type `P₁`;
+      -- this contradicts `IsTypeP2 M` (whose defining clause is `κ(M) ≠ π(M) ∖ σ(M)`).
+      intro hP2
+      refine absurd ?_ hP2.2
+      apply Set.eq_of_subset_of_subset
+      · -- `κ(M) ⊆ π(M) ∖ σ(M)`: each `p ∈ κ` is a prime dividing `|M|` (witness `P ≤ M`) and `∉ σ`.
+        intro p hpκ
+        obtain ⟨hpp, hpτ, P, hPelem, hPM, _⟩ := hpκ
+        have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+        have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+          rcases hpτ with h | h
+          · exact tau1_subset_sigma_compl M h
+          · exact tau3_subset_sigma_compl M h
+        exact ⟨Nat.mem_primeFactors.mpr
+            ⟨hpp, hPcard ▸ Subgroup.card_dvd_of_le hPM, Nat.card_pos.ne'⟩, hpσ⟩
+      · -- `π(M) ∖ σ(M) ⊆ κ(M)`: `p ∣ |M|`, `p ∉ σ` ⟹ `p ∣ |E|` ⟹ `p ∈ κ` (by `mem_kappa…`).
+        intro p hp
+        obtain ⟨hpπ, hpσ⟩ := hp
+        obtain ⟨hpp, hpdvdM, _⟩ := Nat.mem_primeFactors.mp hpπ
+        haveI : Fact p.Prime := ⟨hpp⟩
+        have hpnMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hdvd =>
+          hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+            (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩))
+        have hdvdME : p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥E := by
+          rw [hsetup.card_Msigma_mul_card_E]; exact hpdvdM
+        have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+          Nat.mem_primeFactors.mpr
+            ⟨hpp, (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
+        exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hpE
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
     sorry
 
