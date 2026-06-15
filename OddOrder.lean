@@ -129,6 +129,7 @@ import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SignedTripleGrid
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S05_IntegralSigma
+import OddOrder.Peterfalvi.S05_OmegaGrid
 import OddOrder.Peterfalvi.S05_GridTrichotomy
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain

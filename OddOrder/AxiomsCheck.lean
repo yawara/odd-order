@@ -77,6 +77,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S05_IntegralSigma
+import OddOrder.Peterfalvi.S05_OmegaGrid
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
@@ -3664,6 +3665,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_trivial
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_mem_ZIrr
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply_of_mem_V
+-- FT-path signature bridge (endpoint B, ft_path_policy.md §4): the (3.3) ω-grid indexed by
+-- `Fin |W₁| × Fin |W₂|` with `0 ↦ 1` (= §13 `S15.Hypothesis.omega`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.charBaseEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.charEquiv
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.charEquiv_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaGrid
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaGrid_zero_zero
 -- §5 (3.2.a) full: `σ` agrees with the Dade map `τ = Ind_W^G` on all of `CF(W, V)`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis_apply
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
