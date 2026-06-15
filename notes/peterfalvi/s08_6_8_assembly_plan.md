@@ -2974,3 +2974,29 @@ Lemma C (`dade_H_eq` 等: 同 (G,A,L) の 2 Hypothesis の H-field 一致) の�
 - 仕上げ = Lemma A (`le_of_card_coprime_index`, ✅) 両向き → le_antisymm → subgroupOf_le で G に戻す。
 **規模 = ~60-80 行 (normal instance 構成 + 第2同型 in ↥C + card 計算 + Lemma A 適用)。well-defined だが focused pass 推奨。**
 **正本=本 session 42 cont.⁴ 續⁴。Lemma C tooling 完全特定。実装は ↥C relativize の plumbing が核 (normal instance + 第2同型/積公式)。**
+
+## 2026-06-15 (session 43, lane-b 再開, Opus): ✅✅✅ hmapagree linchpin COMPLETE + cX_col 無条件化 (commit `39c02b6e`)
+
+**Lemma C は cont.⁴ 續⁴ の後すぐ着地済み**だった (`dade_H_eq`, commit `34670c02`; note が実装に遅れていた)。本 session で **linchpin の残り (Lemma D/E + cX_col) を完走**。全 sorry-free + axiom-clean ([propext, Classical.choice, Quot.sound] のみ、`#print axioms` 4 件確認)、full build 3830 jobs green (1.86s incremental)。
+
+### ✅ landed (S08_CaseBAssembly, +75 行):
+| 宣言 | 役割 |
+|---|---|
+| `dadeHypothesis_ext_of_H_eq` | **Lemma D (構造 ext)**: `S04.Hypothesis` の唯一の data field は `H` (他 8 個 Prop) ⟹ H-field 一致なら構造一致。`cases p; cases q; subst hH; rfl` (Prop fields は proof irrelevance=definitional で `rfl` が閉じる) |
+| `dadeIntegralCharacterMap_congr_hyp` | **data 無視 congr**: `dadeIntegralCharacterMap` の def (S07:5233) は第2引数 `_dade` を本体で使わない ⟹ 同 hypothesis なら data 不問で同じ map。`subst h; rfl` |
+| `SibleyDadeHypothesis.dade0_map_eq_tau_of_support` | **Lemma E = hmapagree linchpin**: H^#-supported φ で `dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ`。鎖 = `restrict_eq_of_support` (symm, h46.dade0 を H^# に制限) → Lemma D (`h46.dade0.restrict (sharpImage H) = hyp.dade`, **`dade_H_eq` canonicality で `h46.dade=hyp.dade` 不要**) → `congr_hyp` + `hyp.tau` abbrev unfold |
+| `SibleyDadeHypothesis.certainTypeSet_isCoherent_tau_canonical` | **cX_col 無条件化**: `certainTypeSet_isCoherent_tau` (S08CB2:1651) の `hmapagree` 仮説を Lemma E で discharge (各 φ∈zSupportedSpan は `support_subset_of_mem_zSupportedSpan` で H^#-supported)。⟹ reducible columns {μ_j} の hyp.tau-coherence が**仮説無しで**手に入る |
+
+### 🔑 知見 (再調査不要):
+- **`dade_H_eq` は canonicality ゆえ `h46.dade = hyp.dade` (cases.inr 由来) を一切要しない** — `h46.dade0.restrict (sharpImage H)` と `hyp.dade` は両方 `Hypothesis G (sharpImage H) L` で、H-field は (G,A,L) から決まる (normal Hall complement 一意)。
+- **`dadeIntegralCharacterMap` は data 無視** (cont.⁷ 續³ の知見を S07:5233 def で確認: 本体 = `Classical.choose (LinearMap.exists_extend hyp.dadeLinearMap)` のみ)。
+- A₀ = `sharpImage H ∪ Vᴸ` ⟹ `sharpImage H ⊆ A₀` = `Set.subset_union_left`; restrict の `hA₁_norm` = `hyp.dade.L_normalizes_A` (小さい方の集合の正規化)。
+
+### ▶▶ 次の brick (capstone case-B assembly, cont.⁴ 續² path の残り):
+1. ✅ **cX_col** = `certainTypeSet_isCoherent_tau_canonical` (done)。
+2. **cX_irr** = case-A 機構 `xChainCoherent` (S08CP1:2701) を irreducible X-members 上で。要 per-step `XAdjoinStepInput` (= per-θ irr bundle 相当)。
+3. **cX = cX_col ∪ cX_irr** (union)。
+4. **cX ∪ cY** = `coherentXunionYset_caseB_of_glued` (S08CB2:1616, sorry-free shell)。要 ν / hmixed (= (6.8.2.3) content = `caseB_per_phi_anchored_fromYset` の anchored 公式が供給) / hpair / D / hgen。
+5. capstone `sibleySetup_is_coherent` の `cases.inr` 枝 wiring (S08_CoherenceTheorems:59)。
+**linchpin (hmapagree=map-agreement) は解除済 ⟹ 残りは cX_irr の per-θ bundle discharge と glue の data 供給。**
+**正本=本 session 43。hmapagree linchpin + cX_col 完了 (`39c02b6e`)。次=cX_irr (xChainCoherent over irr X) or glue (coherentXunionYset_caseB_of_glued の ν/hmixed/hpair/D/hgen)。Opus 継続。**
