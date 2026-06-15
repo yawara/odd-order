@@ -2962,6 +2962,13 @@ set_option linter.style.longLine false in
 -- the upstream `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (BG §7–16 + Peterfalvi §10–16).
 #assert_only_allowed_axioms OddOrder.feitThompson_of_noMinimalSimpleOdd
 
+-- Gated-endpoint skeleton for the single upstream obligation: the assembly
+-- `sectionSixteenHypothesis_of_inputs` builds `Peterfalvi.S16.Hypothesis` from an explicit
+-- `Section16Inputs` menu *without* `sorry` (it derives `η = τ₃∘ω`, `m`, oddness, `finiteG`).
+-- The only remaining gap of `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is producing that
+-- menu — i.e. the §7–16 spine.  This assertion locks in that the assembly itself is axiom-clean.
+#assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_inputs
+
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
 -- Peterfalvi §15/§16 standalone cyclotomic and growth arithmetic feeding the

@@ -37,6 +37,9 @@ non-existence of a minimal simple group of odd order.
 namespace OddOrder
 
 open OddOrder.BG
+open OddOrder.GroupTheory
+open OddOrder.RepresentationTheory
+open scoped Pointwise
 
 universe u
 
@@ -51,23 +54,229 @@ theorem noMinimalSimpleOdd_of_section16 {G : Type*} [Group G] [Finite G]
     False :=
   BG.AppC.final_contradiction hG hyp
 
-/-! ## The single remaining upstream obligation -/
+/-! ## The single remaining upstream obligation
+
+The obligation `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is presented as a
+*gated-endpoint skeleton* (see `notes/meta/` and the
+`feedback-gated-endpoint-skeleton-pattern` memo): a `sorry`-free assembly
+`sectionSixteenHypothesis_of_inputs` builds the Section 16 configuration from an
+explicit `Section16Inputs` menu of genuine §7–§16 witnesses, and the single
+residual `sorry` is localized to "construct that menu".  The assembly *derives*
+the fields of `Peterfalvi.S16.Hypothesis` that are not independent data (`η`, `m`,
+the oddness facts, `finiteG`), so the menu is a strictly smaller obligation than
+the raw `Hypothesis`. -/
+
+section
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce
+
+/-- **Named inputs for the Peterfalvi Section 16 configuration** (gated-endpoint
+skeleton).
+
+This bundles the genuine upstream witnesses that the Bender–Glauberman local
+analysis (BG §7–§16) and Peterfalvi's character theory (Peterfalvi §3–§16) must
+construct in order to enter Section 16.  It is `Peterfalvi.S15.Hypothesis`
+together with the standing inequality `q < p` of (14.1), *minus* the fields that
+`sectionSixteenHypothesis_of_inputs` derives mechanically.  Every field below
+therefore names a real §7–§16 obligation, not a repackaging of something already
+provable:
+
+* the maximal pair `S, T`, their types, and the case-(b) trichotomy of (8.8)
+  — Pf §14 / BG §16;
+* the cyclic structure `W = W₁W₂`, the Fitting kernels `P, Q`, the complements
+  `U, V`, the primes `p, q` and the counting parameters `u, v, c, d` — §13–§14;
+* the Dade character grids `ω, μ, ν` with the induction identities (13.1.e), the
+  signs `δ, δ'`, and the integral maps `τ_S, τ_T, τ₃` — Pf §3–§9.
+
+The residual `sorry` of `sectionSixteenHypothesis_of_isMinimalSimpleOdd` is exactly
+"produce a `Section16Inputs G`"; i.e. it localizes the one remaining gap to this
+explicit menu rather than to an opaque `Peterfalvi.S16.Hypothesis`. -/
+structure Section16Inputs (G : Type*) [Group G] [Finite G] where
+  S : Subgroup G
+  T : Subgroup G
+  W1 : Subgroup G
+  W2 : Subgroup G
+  W : Subgroup G
+  P : Subgroup G
+  Q : Subgroup G
+  U : Subgroup G
+  V : Subgroup G
+  C : Subgroup G
+  D : Subgroup G
+  S_maximal : S ∈ maximalSubgroups G
+  T_maximal : T ∈ maximalSubgroups G
+  S_ne_T : S ≠ T
+  S_nonI : IsTypeNonI S
+  T_nonI : IsTypeNonI T
+  one_typeII : IsTypeII S ∨ IsTypeII T
+  theorem88_caseB :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
+        (∃ g : G, MulAut.conj g • M = T)
+  W_eq_inter : W = S ⊓ T
+  W_eq_join : W = W1 ⊔ W2
+  W1_inf_W2_eq_bot : W1 ⊓ W2 = ⊥
+  W1_commutes_W2 : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y
+  W_cyclic : IsCyclic ↥W
+  P_eq_SF : P = maxNilpotentNormalHall S
+  Q_eq_TF : Q = maxNilpotentNormalHall T
+  S_deriv_eq_PU : derivedInG S = P ⊔ U
+  T_deriv_eq_QV : derivedInG T = Q ⊔ V
+  C_eq : C = U ⊓ Subgroup.centralizer (P : Set G)
+  D_eq : D = V ⊓ Subgroup.centralizer (Q : Set G)
+  W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
+  W2_normalizes_V : W2 ≤ Subgroup.normalizer (V : Set G)
+  q : ℕ
+  p : ℕ
+  q_prime : q.Prime
+  p_prime : p.Prime
+  q_eq_card_W1 : q = Nat.card ↥W1
+  p_eq_card_W2 : p = Nat.card ↥W2
+  u : ℕ
+  v : ℕ
+  c : ℕ
+  d : ℕ
+  c_eq_card_C : c = Nat.card ↥C
+  d_eq_card_D : d = Nat.card ↥D
+  card_U_eq_uc : Nat.card ↥U = u * c
+  card_V_eq_vd : Nat.card ↥V = v * d
+  Sset : Set (ClassFunction ↥S ℂ)
+  Tset : Set (ClassFunction ↥T ℂ)
+  A0S : Set ↥S
+  A0T : Set ↥T
+  tauS : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥S G
+  tauT : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥T G
+  omega : Fin q → Fin p → ClassFunction ↥W ℂ
+  mu : Fin q → Fin p → ClassFunction ↥S ℂ
+  nu : Fin q → Fin p → ClassFunction ↥T ℂ
+  delta : Fin p → ℤ
+  deltaPrime : Fin q → ℤ
+  tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥W G
+  mu_definition : ∀ (i : Fin q) (j : Fin p),
+    ClassFunction.induce (W.subgroupOf S)
+        (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe
+            ((le_of_eq W_eq_inter).trans inf_le_left)).toMonoidHom
+          (omega i j - omega ⟨0, q_prime.pos⟩ j))
+      = (delta j : ℂ) • (mu i j - mu ⟨0, q_prime.pos⟩ j)
+  nu_definition : ∀ (i : Fin q) (j : Fin p),
+    ClassFunction.induce (W.subgroupOf T)
+        (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe
+            ((le_of_eq W_eq_inter).trans inf_le_right)).toMonoidHom
+          (omega i j - omega i ⟨0, p_prime.pos⟩))
+      = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, p_prime.pos⟩)
+  q_lt_p : q < p
+
+/-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
+
+Given the `Section16Inputs` witnesses, this builds `Peterfalvi.S16.Hypothesis`
+without any `sorry`.  Beyond carrying the input fields, it *derives* the fields of
+`Peterfalvi.S15.Hypothesis` that are not independent data:
+
+* `finiteG` from the ambient `[Finite G]`;
+* `q_odd`, `p_odd` from `Odd |G|` (subgroup orders divide `|G|`);
+* `eta := τ₃ ∘ ω`, discharging **Peterfalvi (13.1.d)** `η_{ij} = ω_{ij}^{τ₃}`
+  definitionally — `η` is the τ₃-image of the `ω`-grid, not separate data;
+* `m` as the **(13.10)/(13.11)** rational formula in `p, q`, with `m_eq` by `rfl`.
+
+These derivations are why `Section16Inputs` is a *strictly smaller* obligation
+than `Peterfalvi.S16.Hypothesis`: discharging the menu does not require separately
+producing `η`, `m`, or the oddness facts. -/
+noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Finite G]
+    (hodd : Odd (Nat.card G)) (inp : Section16Inputs G) :
+    Peterfalvi.S16.Hypothesis (G := G) where
+  base :=
+    { S := inp.S
+      T := inp.T
+      W1 := inp.W1
+      W2 := inp.W2
+      W := inp.W
+      P := inp.P
+      Q := inp.Q
+      U := inp.U
+      V := inp.V
+      C := inp.C
+      D := inp.D
+      S_maximal := inp.S_maximal
+      T_maximal := inp.T_maximal
+      S_ne_T := inp.S_ne_T
+      S_nonI := inp.S_nonI
+      T_nonI := inp.T_nonI
+      one_typeII := inp.one_typeII
+      theorem88_caseB := inp.theorem88_caseB
+      W_eq_inter := inp.W_eq_inter
+      W_eq_join := inp.W_eq_join
+      W1_inf_W2_eq_bot := inp.W1_inf_W2_eq_bot
+      W1_commutes_W2 := inp.W1_commutes_W2
+      W_cyclic := inp.W_cyclic
+      P_eq_SF := inp.P_eq_SF
+      Q_eq_TF := inp.Q_eq_TF
+      S_deriv_eq_PU := inp.S_deriv_eq_PU
+      T_deriv_eq_QV := inp.T_deriv_eq_QV
+      C_eq := inp.C_eq
+      D_eq := inp.D_eq
+      W1_normalizes_U := inp.W1_normalizes_U
+      W2_normalizes_V := inp.W2_normalizes_V
+      q := inp.q
+      p := inp.p
+      q_prime := inp.q_prime
+      p_prime := inp.p_prime
+      q_odd := by
+        rw [inp.q_eq_card_W1]
+        exact hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card inp.W1)
+      p_odd := by
+        rw [inp.p_eq_card_W2]
+        exact hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card inp.W2)
+      q_eq_card_W1 := inp.q_eq_card_W1
+      p_eq_card_W2 := inp.p_eq_card_W2
+      u := inp.u
+      v := inp.v
+      c := inp.c
+      d := inp.d
+      c_eq_card_C := inp.c_eq_card_C
+      d_eq_card_D := inp.d_eq_card_D
+      card_U_eq_uc := inp.card_U_eq_uc
+      card_V_eq_vd := inp.card_V_eq_vd
+      Sset := inp.Sset
+      Tset := inp.Tset
+      A0S := inp.A0S
+      A0T := inp.A0T
+      tauS := inp.tauS
+      tauT := inp.tauT
+      omega := inp.omega
+      eta := fun i j => inp.tau3 (inp.omega i j)
+      mu := inp.mu
+      nu := inp.nu
+      delta := inp.delta
+      deltaPrime := inp.deltaPrime
+      tau3 := inp.tau3
+      eta_eq_tau_omega := fun _ _ => rfl
+      mu_definition := inp.mu_definition
+      nu_definition := inp.nu_definition
+      m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
+        1 / (((inp.q : ℚ) - 1) * (inp.q : ℚ) ^ inp.p)
+      m_eq := rfl }
+  q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
 order, the Bender–Glauberman local analysis (BG §7–§16) together with Peterfalvi's
-character theory (Peterfalvi §10–§16) constructs the Section 16 field-normalizer
+character theory (Peterfalvi §3–§16) constructs the Section 16 field-normalizer
 configuration of Peterfalvi (14.2).
+
+In gated-endpoint-skeleton form: the `sorry`-free `sectionSixteenHypothesis_of_inputs`
+already performs the assembly, so the only thing missing is a `Section16Inputs G`
+witness — the explicit menu of §7–§16 obligations.  This single `sorry` is what the
+whole remaining project targets.
 
 Everything *downstream* of this point is already formalized:
 `noMinimalSimpleOdd_of_section16` feeds the configuration into BG Appendix C, which
-contradicts the standing inequality `q < p`. So this is the honest top-level
-statement of "all of the local and character analysis remains to be done"; it is
-the only `sorry` reachable from `feitThompson` other than the scaffold obligations
-already inside BG Appendix C / Peterfalvi §16. -/
+contradicts the standing inequality `q < p`. -/
 noncomputable def sectionSixteenHypothesis_of_isMinimalSimpleOdd
     {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) :
     Peterfalvi.S16.Hypothesis (G := G) :=
-  sorry
+  sectionSixteenHypothesis_of_inputs hG.odd (sorry : Section16Inputs G)
+
+end
 
 /-- **No minimal simple group of odd order exists.** Combining the upstream
 construction of the Section 16 configuration
