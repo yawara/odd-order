@@ -320,6 +320,29 @@ Pf consumer 出現時に実需要に合わせる)。本 section が復元プラ�
 
 現 lossy statement は **現 consumer ((8.8), S10_BGInterface) には十分** (落ちた W データ / (Tii)/(Tiii) は現 consumer が消費しない)。lossy-ness が block するのは **deeper Pf** (§10-13 character theory, 現在 BG §14-15 gate で停止中)。⟹ defer は安全 (現 spine を block しない)。**deferred 復元タスク = issue 8005** (トリガー条件 + 復元手順を記載)。
 
+## 11. Cor 15.6 `typeP_kstar_in_mf` ✅ COMPLETE (2026-06-15, `34d44c28`, issue 8004 closed)
+
+section 9 の計画(迂回路 = Lemma 15.1 に `IsComplement'` 強化して §14 非依存に M=KM' 供給)は
+**不要になった**。main 同期で **§14 Thm 14.7(h) が `typeP_duality` に露出済**(Lane H `1243d4c6`、
+結論冒頭 `IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧ Coprime …`)なので、
+**直接経路**で配線:
+
+- `hKne` (K*≠⊥) ← `typeP_structure` (Prop 14.2) conjunct 2。U-factor は本体内で
+  `Ch03.hall_E_exists (G:=↥M) ((kappa∪sigma)ᶜ)` + `map M.subtype` + `comap_map_eq_self_of_injective`
+  の subtype roundtrip で生成(`hKM : K ≤ M` を faithful 仮説として追加、caller 無しで安全)。
+- `hcyc`/`hcompl`/`hcop` ← `typeP_duality` (Thm 14.7(d)(h)) を直接 destructure(∃! witness から
+  `IsCyclic(K⊔Kstar)` 抽出、Mstar 非依存)。
+- `hKsubMF` ← `by_cases MF M = Msigma M`(eq: `inf_le_left`、ne: `mf_ne_msigma_typeP1_structure`)。
+- `hFcyc` ← `fitting_decomposition` (Cor 15.5) 末尾 conjunct(`08e7dc5c` で露出済)。
+- 組立 = sorry-free engine `typeP_kstar_in_mf_of_inputs`(conjunct 4 = `Msigma_inf_centralizer_le_
+  derivedDerived_of_isComplement'` で Lemma 6.3 を ↥M 内適用済、§14 非依存)。
+
+⟹ `typeP_kstar_in_mf` の `sorry` 消滅(S15_MF decl-sorry 9→8)。full build green (3817 jobs)、
+AxiomsCheck OK。cite 先(14.2/14.7/15.2/15.5)は sorried だが §14 proof landing で自動 unconditional 化。
+**残 §15 sorry = Lemma 15.1 / Thm 15.2 / Cor 15.3 / Cor 15.4 / Cor 15.5 / Thm 15.7 / Thm 15.8 /
+Cor 15.9(8件)— いずれも multi-hour hard theorem(§14 proof 待ち)。** 次の FT-spine 標的 =
+**Thm I** (`theoremI_…`, Peterfalvi S10:112 が consume)。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
