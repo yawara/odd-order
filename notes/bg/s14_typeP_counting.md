@@ -390,3 +390,98 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 
 **▶ 推奨**: branch proof は cyclic-Sylow/Hall-共役 helper の特定が要で multi-hour。loop は clean piece
 (opening/核補題/14.7(h)/kappa helpers) を抽出済。**dedicated session で ∃→∀ upgrade を起点に駆動**が効率的。
+
+### ✅ K=E の正しい根拠を BG 原文で確定 + 土台 helper landing (2026-06-15 loop)
+**`K=E` は BG mmd L3838 が verbatim で "Then K=E" と明示** (case-τ₃)。当初「P1 限定では?」と疑ったが
+**誤り**で、case-τ₃ では常に K=E。**cyclic-Sylow machinery は K=E にも不要**(上記旧プランの「最大の friction」
+は霧消)。正しい chain (原文の "(a) and (b1) are clear" を展開):
+1. **C_{M_σ}(E) ≠ 1**: E prime on M_σ (Cor 13.11) ＋ E₃≤E 非regular ⟹ ∃ x∈E₃#, C_{M_σ}(x)≠1。
+   prime作用で全 g∈E# に `C_{M_σ}(g)=C_{M_σ}(E)` ⟹ C_{M_σ}(E)≠1。
+   **✅ landing 済 (helper `Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular`, S14)**: 引数
+   `(hEprime: ActsPrimeOn (Msigma M) E) (hE3le: E₃≤E) (hreg: ¬ActsRegularlyOn (Msigma M) E₃)` →
+   `Msigma M ⊓ C(E) ≠ ⊥`。証明 = by_contra/push_neg で witness 抽出 + `hEprime x` の等式 + `fixedBy_def`。
+   (これは **Kstar≠1 conjunct そのもの** にもなる: K=E 後 Kstar=C_{M_σ}(K)=C_{M_σ}(E)。)
+2. **π(E) ⊆ κ(M)** (= κ⊇π(E)): 各 p∣|E| につき rank-1 P=⟨g⟩≤E (order p) を取り、prime作用で
+   `C_{M_σ}(P)=C_{M_σ}(g)=C_{M_σ}(E)≠1` ⟹ κ-witness 成立。p∈τ₁∪τ₃ は **E₂=⊥ ⟹ r_p(M)≠2** から
+   (p∣|E|⟹r_p∈{1,2}; E₂=⊥ で τ₂ 排除 ⟹ r_p=1 ⟹ τ₁ or τ₃)。
+3. **E₂=⊥**: hEeq `E=E₁⊔E₃` ＋ E₂ Hall τ₂(M) of E。π(E₁⊔E₃)⊆τ₁∪τ₃ (E_i は τ_i-group) ＋ τ₂ 互いに素
+   ⟹ |E₂| の素因数なし ⟹ E₂=⊥。**(注: Cor 13.11 内部 `hE2:E₂=⊥` は return されないので S14 で再導出要)**。
+4. **E は Hall κ(M) of M**: π(E)⊆κ (step 2) ＋ [M:E]=|M_σ| が σ-number で κ⊆σ' ゆえ κ と互いに素
+   ⟹ `E.subgroupOf M` が Hall κ(M)。
+5. **K=E**: K≤E (setup) ＋ K,E とも Hall κ(M) ⟹ |K|=|E| ⟹ `Subgroup.eq_of_le_of_card_ge` 等で K=E。
+6. **U=1** (原文 "let U=1"): a/b1 の U は trivial。conjunct (a) の "regular on U" は U=⊥ で自明。
+
+**▶ 次 fragment 順**: (3) E₂=⊥ helper → (2) π(E)⊆κ (helper, step1 helper を消費) → (4) E Hall κ →
+(5) K=E。各 build-green の verified step。K=E 後は 5 conjuncts を Cor 13.11 出力 + K=E で組立
+(conjunct1=hEprime+K=E, conjunct2=step1 helper, 他は §13 cite)。**landing 済 = step1 helper のみ; 残 5 step**。
+
+### ✅✅ K=E (case-τ₃) COMPLETE + conjunct (a)/(K*≠1) landing (2026-06-15 loop, K=E milestone)
+**case-τ₃ の linchpin `K=E` を verified** (commit 後述)。**E₂=⊥ の明示導出は不要だった** — 当初プランの
+step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs Ch03 Main:1582) で card 経路に短絡**:
+- step2 `mem_kappa_of_mem_primeFactors_card_E` で `π(E)⊆κ(M)` ⟹ `E.subgroupOf M` は `Ch03.Subgroup.IsPiGroup (kappa M)`。
+- `hK.card_dvd_of_isPiGroup hEpi` : `|E.subgroupOf M| ∣ |K.subgroupOf M|` ⟹ (card_congr で) `|E| ∣ |K|`。
+- `K≤E` (setup hKE) ⟹ `|K| ∣ |E|` ⟹ `Nat.dvd_antisymm` で `|E|=|K|` ⟹ `Subgroup.eq_of_le_of_card_ge hKE` で **K=E**。
+- ⟹ **正規性不要・Hall 共役不要・E₂=⊥ 明示不要**。witness x は hreg から by_contra/push_neg で抽出。
+- **conjunct (a)** ActsPrimeOn K = `rw[K=E]; exact hEprime`。**conjunct K*≠1** = `rw[hKstar,K=E]` + step1 helper。
+- **残 = conjunct (b1)/(d)/(g) + case-τ₁** (各 scoped sorry, BG lemma 明記):
+  - (b1) `N_M(X)=K⊔Kstar` (∀X∈ℰ¹(K)): BG「clear」だが Lemma 13.13/13.6 wiring 要。
+  - (d) `Kstar∩M^g=⊥` (g∉M): Theorem 10.1(a)。
+  - (g) TypeP2 ⟹ σ=β/|K|素数/M_σ nilpotent TI: Thm 3.10(a)/Lem 12.19/12.17。
+  - case-τ₁: κ=τ₁, WLOG K=E₁ (F の issue-7000 ∃→∀ upgrade leaf 着地後に cite), Lem 13.12/13.7, Cor 12.10(b)。
+- **hub LAUNCH (2026-06-15) と整合**: 「Prop 14.2 = 既存 machinery の assembly」を実証。F の issue-7000 leaf は
+  case-τ₁ の WLOG 用 (case-τ₃ は本ループで自己完結)。
+
+### ✅ conjunct (d) COMPLETE + 🛑 残 conjunct の obstacle 確定 (2026-06-15 loop)
+- **✅ (d) `Kstar∩M^g=⊥` landing** (commit `4af679bc`): (c) helper
+  `maximalContaining_centralizer_of_le_Msigma_centralizer_E` + **Theorem 10.1(e)**
+  (`OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma` の `.2.2.2.2`: X≤M ∧ C_G(X)≤M ∧ conj g⁻¹•X≤M ⟹ g⁻¹∈M)。
+  rank-1 X は Cauchy で抽出、X≤M^g ⟹ conj g⁻¹•X≤M は `pointwise_smul_le_pointwise_smul_iff`+smul 合成。
+  ⚠ motive-not-type-correct (w が Kstar 依存) は等式 `hKstarE : Kstar=M_σ⊓C(E)` を作って `▸` で回避。
+- **case-τ₃ 現況**: K=E ✓ / (a) ✓ / (K*≠1) ✓ / (d) ✓。**残 = (b1), (g)**。full build green 3817 jobs。
+
+🛑 **残 conjunct は quick win でない (obstacle 確定、要方針判断)**:
+- **(g) `IsTypeP2 M → …`**: case-τ₃ では M は P1 ゆえ **vacuous のはず**だが、¬P2 = `κ=sigmaComplementPrimes`
+  の証明が **定義的ギャップでブロック**。`kappa`/`tau1`/`tau3` は `p : ℕ` 全体を渡る (素数制限なし)。
+  `pRank M p` 定義 (PRank.lean:374) = `⨆ A:{IsElementaryAbelian p}, log p (card A)` で **素数性を強制しない**
+  (`rank` の docstring が「composite exponents を防ぐため prime に制限」と明記＝pRank 単体は防がない)。
+  ⟹ `p∈τ₁ (pRank=1)` から `p 素数` が出ず、**κ⊆sigmaComplementPrimes (=piSet∖σ, 素数のみ) が形式上未証明**
+  (κ が composite p を含みうる)。**選択肢**: (i) 実 (g) 内容を証明 (Thm 3.10(a)/Lem 12.19/12.17、multi-lemma)、
+  (ii) `kappa`/`tau` 定義に素数性を付加 (faithfulness fix だが下流 lemma 影響大)、(iii) κ-witness が素数を強制する
+  補題を別途証明 (`IsElementaryAbelian p` + nontrivial ⟹ p 素数 が要るが現状未確認)。
+- **(b1) `∀ X≤K, X≠⊥ → N_G(X)⊓M = K⊔Kstar`**: BG (b1) は **`X∈ℰ¹(K)` (rank-1) 限定**だが Lean goal は
+  **∀X≤K (over-broad)** ⟹ **statement faithfulness 要確認** (現 goal が真かBG通り ℰ¹(K) に絞るべきか)。
+  証明自体も hard normalizer 計算 (N_M(X)=K×K*) で Lemma 13.13/13.6 wiring 要。
+- **case-τ₁**: F の issue-7000 ∃→∀ upgrade leaf 未着地 ⟹ gated。
+
+**⟹ case-τ₃ の core (K=E + 3/5 conjunct) は完了。残 2 conjunct + case-τ₁ は要方針判断 (上記)。**
+
+### ✅✅ faithfulness fix 群 + (g)/(b1) 進捗 (2026-06-15 loop, ユーザー方針「faithfulness を先に」)
+ユーザー裁可で faithfulness を先に整備:
+- **✅ kappa primality 化** (commit `bb844d42`): `kappa` def に `p.Prime` 追加 (BG の κ は素数集合)。tau(§12)
+  不変、S14 内に閉じる。`prime_of_mem_kappa` helper + 全 site 更新。G は kappa を Set cite のみで不変。
+- **✅ (g) COMPLETE** (commit `ba911f75`): kappa primality 化で **κ=sigmaComplementPrimes** が証明可能に
+  ⟹ case-τ₃ は P1 ⟹ `IsTypeP2 M` 矛盾で (g) vacuous 解決。κ⊆: witness P≤M で p|M + tau⊆σ'。
+  ⊇: p∈piSet∖σ ⟹ p|E (card_Msigma_mul_card_E) ⟹ mem_kappa(step2)。
+- **✅ (b1) statement faithful 化 + ⊇ 方向** (commit 後述): goal を BG 通り
+  `∀ p prime, ∀ X∈ℰ_p¹, X≤K → N(X)⊓M=K⊔Kstar` に修正 (旧 `∀X≤K` は over-broad/偽)。
+  **⊇ 証明済**: K=E≤N_G(X) (Cor 13.11 hEnorm) + K*=C_{M_σ}(K)≤C_G(X)≤N_G(X), K*≤M_σ≤M。
+  **⊆ のみ sorry** (BG「clear」だが M=M_σ⋊E semidirect 構造 + N_M(X)=K×K* に要・hard)。
+
+**case-τ₃ 現況: K=E + (a)+(K*≠1)+(d)+(g) 完成、(b1) は statement faithful + ⊇ 済・⊆ のみ sorry。**
+**残 = (b1)-⊆ [M=M_σ⋊E 構造] + case-τ₁ [F issue-7000 gated]。full build green 3817 jobs。**
+
+### 🎉🎉 case-τ₃ COMPLETE — (b1)-⊆ landing (2026-06-15 loop)
+**Prop 14.2 の case-τ₃ 全 5 conjunct 完全証明** (typeP_structure の sorry は case-τ₁ 1 本のみに)。
+(b1)-⊆ `N_M(X) ≤ K⊔K*` を「難所回避しない」方針で正面突破:
+- **n=s·e 分解**: M_σ は G で非正規 (mem_sup/mem_sup_of_normal は不可) ⟹ **↥M で分解**。
+  `M_σ.subgroupOf M` は ↥M で Normal、`(M_σ⊔E).subgroupOf M = ⊤` (subgroupOf_sup+E_compl_sup+subgroupOf_self)
+  ⟹ `mem_sup_of_normal_left` で ⟨n,hnM⟩=a*b、s:=(a:G)∈M_σ, e:=(b:G)∈E。
+- **交換子**: g∈X#, y':=ege⁻¹∈E#。`s·y'·s⁻¹ = ngn⁻¹ ∈ X≤E` (mem_normalizer_iff)。
+  `[s,y']=s·y'·s⁻¹·y'⁻¹ ∈ M_σ` (M≤N(M_σ), le_normalizer_opiCoreInG) `∩ E ⟹ =1` (E_compl_inf)
+  ⟹ s が y' を中心化。
+- **prime 作用**: `s∈C_{M_σ}(y')=C_{M_σ}(E)=K*` (hEprime y')。e∈E=K ⟹ n=s·e∈K⊔K*。
+- 技法: y'≠1 = `MulAut.conj.map_eq_one_iff`、commute 導出 = `mul_inv_eq_iff_eq_mul∘mul_inv_eq_one`、
+  algebra は `group`。**[Fact p.Prime] を intro 直後に補充** (ne_bot_of_mem_elemAbelianOfRank_one 用)。
+
+**⟹ Prop 14.2 残 = case-τ₁ のみ (F の issue-7000 ∃→∀ upgrade leaf 着地待ち・gated)。**
+**case-τ₃ + faithfulness fix 群で本セッション §14 funnel 入口をほぼ攻略。full build green 3817 jobs。**

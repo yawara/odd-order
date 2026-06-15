@@ -117,6 +117,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Lemma131
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Corollary132
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_Theorem134
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
@@ -146,6 +147,7 @@ import OddOrder.Peterfalvi.S08_CoherenceCore
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBCoherence2
+import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_BGInterface

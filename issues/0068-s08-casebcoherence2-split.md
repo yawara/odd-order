@@ -33,3 +33,16 @@ S08_CaseBCoherence2.lean(と派生 leaf)がいずれも 1,500 行以下、build 
 - 手順: [`notes/meta/merge_monitor.md`](../notes/meta/merge_monitor.md) サイズ watch + 分割メカニズム
 - 同型先行例: issue 0067 (`S13_PrimeActionTransition` 2357 行, Lane F frontier)
 - 検出コミット: `7c55fae1` (Merge 'lane-b' seam-1 orthogonality)
+
+## 2026-06-15 追記 (session 42): トリガー成立 — frontier が新 leaf へ移動
+
+Lane B の active assembly が **新 leaf `S08_CaseBAssembly.lean`** へ移動 (session 42)。
+S08_CaseBCoherence2 は現 **2157 行**(さらに増、cY 一般化 `per_phi_anchored_image` 込み)で
+**frontier 凍結**(B は今後 S08_CaseBCoherence2 へ追記せず、S08_CaseBAssembly で作業)。
+⟹ **分割トリガー成立。hub は prefix-split 実施可**。
+
+凍結境界の候補: 先頭の汎用 helper 群(`inner_compHom_of_mulEquiv` 〜 `per_constituent_Y_eq_smul`
+あたり、行 ~429–924 = 純 ℂ-線形/aggregate/pinning helper、case-B 固有でない)を上流 leaf へ。
+case-B 固有部 (ticVdiff 系・coherent extension・columnDecompositionTau 等 ~1052+) は残置。
+⚠ `per_phi_anchored_image` (cY 一般化済) は S08_CaseBAssembly が import するので、分割後も
+S08_CaseBAssembly の import closure に入ること。
