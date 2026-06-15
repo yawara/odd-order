@@ -3020,3 +3020,12 @@ dispatch family の per-θ bundle (CaseBColBundle 残り 4 conjunct + CaseBIrrBu
 - 残り conjunct: hSdiff#2 (`columnSum−a•η₁` H^#-support, a=次数整合で 1 消失) / htau1_mema (ZIrr) も a/η₁-coupled。
 
 **正本=本 session 43 cont.²。X⊥Y を 2 レベルに分離 (extension=1449 済 / raw=(4.1) 未)。次 foundational = raw grid-char 直交 `⟨μ_{ij},η⟩=0` (原文 (4.1); μ_{ij}≠η∈Yset の構造事実、§4/§6 char theory) → hχψ/hχbarψ → bundle。Opus 継続。**
+
+### session 43 cont.³: ✅✅ raw X⊥Y 直交 (4.1) 構築 — column bundle 4/6 conjunct free (commit `60570744`)
+前 cont.² で特定した crux (`μ_{ij}≠η∈Yset`) を **degree 論法で解決**: grid-char と Yset member は degree で区別される (η(1)=|W₁| ≡ 0, μ_{ij}(1)=δ+a·|W₁| ≡ ±1 mod |W₁|, |W₁|≠1)。
+- `inner_columnFamily_mu_Yset_eq_zero` (per-constituent): `μ_{ij}` は `IrreducibleCharacter` (`SignedIrreducibleDifferenceFamily.mu`), η∈Yset 既約、degree-distinct → irr-Kronecker `irreducibleCharacter_inner_eq_ite`。核 = `certainType_degree_modEq` (μ(1)=sign+w₁·a) + `Yset_apply_one` (η(1)=w₁) + `sign_eq` (±1) + `W1_nontrivial` (w₁≠1)。**要 `hW1 : h46.W1 = hyp.W1`** (cases.inr 由来; capstone が供給)。
+- `inner_columnSum_Yset_eq_zero` (column): `∑ᵢ ⟨μ_{ij},η⟩=0` via `inner_sum_left`。
+- `caseB_column_orthogonal_Yset` (**hχψ**: `⟨columnSum,a•η₁⟩=0`) + `caseB_column_conj_orthogonal_Yset` (**hχbarψ**, via `columnSum_conj_eq`)。`Nat.cast_smul_eq_nsmul`+`inner_smul_right`。
+
+**⟹ CaseBColBundle 6 conjunct中 4 free** (hdeg/hmapagree/hχψ/hχbarψ; 全 `hW1` だけで)。**残り 2 = hSdiff#2** (`columnSum−a•η₁` H^#-support; a=degree整合で 1 消失要 — `columnSum(1)=∑μ(1)` と `a•η₁(1)=a·|W₁|` が一致する a) **+ htau1_mema** (`hyp.tau(columnSum−a•η₁)∈ZIrr`)。両者 dispatch の weight `a=constituentWeight` に結合 (degree-matching) ⟹ dispatch family 構築時に確定。
+**正本=本 session 43 cont.³。raw X⊥Y (4.1) 構築完了 (`60570744`)、column bundle 4/6 free。次=hSdiff#2/htau1_mema (weight-a coupled) or CaseBIrrBundle (irreducible 枝)。Opus 継続。**

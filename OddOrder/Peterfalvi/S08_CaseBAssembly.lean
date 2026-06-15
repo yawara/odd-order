@@ -207,6 +207,89 @@ theorem caseB_column_mapagree
     (OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
       (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm)).symm
 
+/-- **(6.8.2.3) raw `X ⊥ Y`, per certain-type constituent** — Peterfalvi (4.1), source level.
+A grid character of a column is orthogonal to every `Y`-member.  Both are irreducible
+(`SignedIrreducibleDifferenceFamily.mu` is `IrreducibleCharacter`), and distinct *by degree*: a
+`Y`-member has degree `|W₁|` (`Yset_apply_one`) but a grid degree is `≡ ±1 (mod |W₁|)`
+(`certainType_degree_modEq`), with `|W₁| ≠ 1`.  So the inner product vanishes. -/
+theorem inner_columnFamily_mu_Yset_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    ClassFunction.inner ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) η = 0 := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  have hne : ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ≠ η := by
+    intro heq
+    obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
+    rw [heq, hyp.Yset_apply_one hη] at ha
+    have hcard : (Nat.card h46.W1 : ℂ) = (Nat.card hyp.W1 : ℂ) := by rw [hW1]
+    rw [hcard] at ha
+    have hw1 : Nat.card hyp.W1 ≠ 1 := fun h => hyp.W1_nontrivial (Subgroup.card_eq_one.mp h)
+    have hsign : ((h46.columnFamily χ₂).sign : ℂ)
+        = (Nat.card hyp.W1 : ℂ) * (1 - (a : ℂ)) := by linear_combination -ha
+    have hsignZ : (h46.columnFamily χ₂).sign = (Nat.card hyp.W1 : ℤ) * (1 - a) := by
+      exact_mod_cast hsign
+    have hdvd1 : (Nat.card hyp.W1 : ℤ) ∣ 1 := by
+      have hdvd : (Nat.card hyp.W1 : ℤ) ∣ (h46.columnFamily χ₂).sign := ⟨1 - a, hsignZ⟩
+      rcases (h46.columnFamily χ₂).sign_eq with hs | hs
+      · rwa [hs] at hdvd
+      · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
+    exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
+  have hkron := irreducibleCharacter_inner_eq_ite ((h46.columnFamily χ₂).mu i)
+    (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  simpa using hkron
+
+/-- **(6.8.2.3) raw `X ⊥ Y`, column form** — Peterfalvi (4.1).  A whole certain-type column
+(a sum of grid characters) is orthogonal to every `Y`-member, by additivity over the constituents
+(`inner_columnFamily_mu_Yset_eq_zero`).  This is the `hpair` orthogonality of the case-(B) `X ∪ Y`
+glue, restricted to the reducible column side. -/
+theorem inner_columnSum_Yset_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) η = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, inner_sum_left]
+  exact Finset.sum_eq_zero
+    (fun i _ => inner_columnFamily_mu_Yset_eq_zero hyp h46 hW1 hη χ₂ i)
+
+/-- **(6.8.2.3) column-branch orthogonality scalars** (the `hχψ` conjunct of `CaseBColBundle`).
+A column is orthogonal to the weighted `Y`-anchor `a • η₁`: pull the natural scalar out
+(`inner_smul_right`) and apply the raw column orthogonality `inner_columnSum_Yset_eq_zero`. -/
+theorem caseB_column_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (a : ℕ) :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂, mul_zero]
+
+/-- **(6.8.2.3) column-branch orthogonality scalars, conjugate** (the `hχbarψ` conjunct of
+`CaseBColBundle`).  The conjugate column is the inverse column `columnSum h46 χ₂⁻¹`
+(`columnSum_conj_eq`), so it too is orthogonal to the weighted `Y`-anchor by
+`caseB_column_orthogonal_Yset`. -/
+theorem caseB_column_conj_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (a : ℕ) :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+  exact caseB_column_orthogonal_Yset hyp h46 hW1 hη₁ χ₂⁻¹ a
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
