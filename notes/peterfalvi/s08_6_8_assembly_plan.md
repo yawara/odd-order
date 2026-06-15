@@ -3103,3 +3103,19 @@ column 機構を irreducible 枝に流用:
 
 **▶▶ 次**: (1) #1 = `caseB_irr_induce_isIrreducible (θ≠trivial) (hnotcol)` の transport plumbing を組む (ChatGPT で transport incantation を取得も可)。(2) #2 non-real (odd-order no-real-irr; L 全体の補題確認) → #8 (#1+#2)、#6/#7 (Ind θ≠η₁; θ(1)>1 で degree、θ(1)=1 は X/Y disjoint)。(3) caseB_irr_bundle constructor → hirrAnc → dispatch family。
 **正本=本 session 43 cont.⁸。#1 math 完全確定 (chiRestrict 1=trivial → χ₂=1 edge は θ≠trivial で閉)。残り = ↥K↔↥H transport plumbing のみ。Opus 継続。**
+
+### session 43 cont.⁹: ✅✅✅ #1 既約性 GATE CLEAR (`f08c89ba`) — value↔index seam 突破
+`caseB_irr_induce_isIrreducible`: `Ind^L_H θ` 既約 (hnotcol = not-nontrivial-column + θ≠trivial)。transport plumbing 実装:
+- θ:↥H → θK:↥h46.K = `⟨compHom (MulEquiv.subgroupCongr hHK).toMonoidHom θ, compHom_of_surjective e.surjective θ.2⟩` (既約性 transport)。
+- `induce h46.K θK = induce H θ` = `S04.Hypothesis.induce_congr_of_subgroup_eq hHK hθKval`。
+- `induce_isIrreducible_of_forall_chiRestrict_ne`: χ₂≠1 は columnSum 矛盾 (induce_restrict_certainType_eq + coe_chiRestrict + hcontra)、χ₂=1 は chiRestrict 1=trivial (certainType_zero_column_anchor) vs θ≠trivial (e 全射で θ(e k)=1 ⟹ θ=trivial)。
+- 知見: `(θK:CF)` の coe-mk は simp で還元されない → χ₂=1 は **e.surjective で h=e k に分解**して compHom_apply 適用 (e.symm 評価より clean)。
+
+**⟹ irr-branch の gate #1 解除。残り #2/#6/#7/#8 は #1 given で tractable**:
+- #2 non-real: `Ind^L_H θ` 既約(#1) + θ≠trivial + odd-order ⟹ no-real (要 L 全体の no-real-nontrivial-irr 補題確認)。
+- #8 `⟨Ind θ, conj⟩=0`: #1 + #2 (conj 既約 + distinct + irr-Kronecker)。
+- #6/#7 `⟨Ind θ, a•η₁⟩=0`: #1 + `Ind θ ≠ η₁` (θ(1)>1 で degree、θ(1)=1 は X/Y disjoint)。
+
+**⚠ 入力依存**: #1 は `θ≠trivial` を要す (dispatch の 0<constituentWeight + φ'≠trivial から、または capstone 供給)。caseB_irr_bundle constructor で θ≠trivial を input に取る。
+**▶▶ 次**: #2 non-real (odd-order 補題) → #8 → #6/#7 (≠η₁) → `caseB_irr_bundle` constructor (θ≠trivial input) → hirrAnc → (6.8.2.2) aggregate → dispatch family。
+**正本=本 session 43 cont.⁹。#1 既約性 GATE CLEAR (`f08c89ba`, value↔index seam 突破)。次=#2 non-real → #6/#7/#8 → caseB_irr_bundle。Opus 継続。**
