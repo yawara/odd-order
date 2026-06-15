@@ -615,3 +615,18 @@ Lem 12.17 TI は新 leaf `S12_Lemma1217.Msigma_inf_conj_isBetaCompl` で形式�
 - 14.4 → 14.7 `typeP_duality` (§15/§16 が consume する唯一の §14 結果, call sites
   S15_MF:785/795/1976・S16_MainResults:437) → 14.9/14.10/14.12/14.13。
 - Lem 14.6 (missing-page counting) と 14.7 の counting 不等式 (|𝒞_G(Ẑ)|>½|G|) が hard core。
+
+### 📋 §14 funnel post-14.2 assessment (2026-06-15, lane-h) — 次セッション/hub 向け
+Prop 14.2 着地後の funnel 各結果の gating を精査:
+- **14.3 `sigma_diagnostic`**: BG Cor 14.3 (mmd L3852) は branch 1 で **Prop 14.2(c)** =
+  「K*≠1 ∧ ∀X∈ℰ¹(K*), ℳ(C_G(X))={M}」を使う (x∈C_{Mσ}(K)=K* に適用→C_G(x)⊆M)。
+  **現 `typeP_structure` surface は (c) の後半 (ℳ(C_G(X))={M}) を落としている** (conjunct 2 は K*≠1 のみ)。
+  ⟹ 14.3 を埋めるには **Prop 14.2(c) を typeP_structure に追加 or 別 helper 化** が前提。
+  (c) の BG 証明 = 「K prime not regular ⟹ K*≠1; (b2)/(c) は **Lem 13.13 + Lem 13.6** から」(両者 §13 landed)。
+  branch 1 の C_M(X)⊆K×K* は Prop 14.2(b1) (現 surface 在) + C_G(X)≤N_G(X)。branch 2 = Cor 12.10(e) + Lem 12.11(a)。
+- **14.7 `typeP_duality`**: 🛑 **§16 cross-lane gated**。∃! Mstar (dual partner 存在) は global counting
+  (|𝒞_G(Ẑ)|>½|G|, kernel `half_lt_one_sub_inv_mul` 在) + **Lem 14.6 (missing-page, S14 未記述)** に依存し、
+  Lem 14.6 は R(x)/M̃ (§16 `tildeM`、Lane G) 必須 (循環ゆえ §14 で書けない、issue 2005)。§15 は hcyc を
+  Mstar bundle から取る (S15:795) ので部分証明も不可。⟹ **14.7 は §16 R(x)/M̃ landing 後** (Lane G 待ち)。
+- ⟹ H の §14 自力 runway = **Prop 14.2(c) 追加 → 14.3 → 14.4** (14.4 も R(x) headline は §16 だが N(x)/型 surface は §13 cite 可)。
+  14.7 は G の §16 と合流が要る。hub に cross-lane 調整を報告推奨。
