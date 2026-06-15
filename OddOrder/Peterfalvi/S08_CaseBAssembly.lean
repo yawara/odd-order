@@ -182,21 +182,21 @@ noncomputable def SibleyDadeHypothesis.certainTypeSet_isCoherent_tau_canonical
     (fun _ hφ => hyp.dade0_map_eq_tau_of_support h46
       (OddOrder.Peterfalvi.S07.support_subset_of_mem_zSupportedSpan hφ))
 
-/-- **(6.8.2.3) column-branch map-agreement** (the `hmapagree` conjunct of `CaseBColBundle`).  For a
-nontrivial column `χ₂` with equal column degrees `hdeg`, the `hyp.tau`-image of the conjugate
-difference `μ_j − μ̄_j` agrees with its enlarged `(4.6)` Dade image
+/-- **(6.8.2.3) column-branch map-agreement** (the `hmapagree` conjunct of `CaseBColBundle`),
+*unconditional*.  For any nontrivial column `χ₂`, the `hyp.tau`-image of the conjugate column
+difference agrees with its enlarged `(4.6)` Dade image
 `dadeIntegralCharacterMap h46.dade0 h46.tau`.  This is the column-bundle conjunct that was
-*unconstructible* before the canonicality linchpin: the conjugate column `μ̄_j = μ_{j'}`
-(`columnSum_conj_eq`, `j' = χ₂⁻¹`) makes the difference `H^#`-supported
-(`columnDiff_support_subset`), so the map-agreement is exactly `dade0_map_eq_tau_of_support`. -/
+*unconstructible* before the canonicality linchpin: the conjugate column is `μ_{χ₂⁻¹}`
+(`columnSum_conj_eq`) of equal degree (`columnSum_inv_apply_one`), so the difference is
+`H^#`-supported (`columnDiff_support_subset`) and the map-agreement is exactly
+`dade0_map_eq_tau_of_support`.  Both bundle-intrinsic column conjuncts — degree equality and this
+map-agreement — are thus discharged with no side hypotheses. -/
 theorem caseB_column_mapagree
     (hyp : SibleyDadeHypothesis G L H)
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
-    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
-      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1)) :
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
     hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
         - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
       = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
@@ -204,8 +204,8 @@ theorem caseB_column_mapagree
           - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj) := by
   rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
   exact (hyp.dade0_map_eq_tau_of_support h46
-    (OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂
-      (inv_ne_one.mpr hχ₂) hdeg)).symm
+    (OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm)).symm
 
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
