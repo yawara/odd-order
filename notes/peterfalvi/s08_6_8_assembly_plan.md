@@ -3275,3 +3275,6 @@ Lean commit なし (engine 在庫を exhaustive に確認し残務の本質を�
 
 **⏱ 正直な status**: endpoint A は heavy T8 + 設計判断点。dispatch/cover 層 (4 commits) 完了。残りは focused multi-turn build (τ₂ family engine 推奨)。loop の per-turn reload で route/engine 再考が嵩んだ — 次は (II) を腰を据えて build。ユーザー裁量: (a) loop 継続で (II) build / (b) 集中 workflow (要 opt-in) / (c) B を signature-pin (endpoint B/C/D/E) へ redirect。
 **正本=本 cont.²⁰。cX/X∪Y=heavy T8、教科書τ₂ vs repo cX+glue の設計テンション特定。推奨=(II) S07 τ₂ family engine 新設。Opus 継続。**
+
+### session 43 cont.²¹: 🔍 cX fold の orthogonality blocker = μ_{ij}∈X 構造 (commit: 本 note 1 行)
+cX を xChainCoherent fold で組むには X-member が pairwise orthogonal 要。既存: `inner_columnSum_Yset_eq_zero` (column⊥Y, S08CBA:250)、`ind_cross_inner_eq_zero` (cross-column, S06CTChar:448)。**未解決 = 既約 X-member (irr branch Ind θ) ⊥ column か**: ⟨Ind θ, columnSum χ₂⟩=∑⟨Ind θ, μ_{ij}⟩、これが 0 ⟺ Ind θ ≠ 各 grid char μ_{ij}。irr branch は Ind θ≠columnSum (和) しか与えず、Ind θ≠μ_{ij} (個別) は **μ_{ij}∈X か否か**に依存。μ_{ij} は SignedIrreducibleDifferenceFamily の σ-image (certain subgroup 上)、H-induce 個別ではない ⟹ **μ_{ij}∉X が有力 (未証明)**。**▶ 次ターン: μ_{ij}∈X を S06 certain-type 構造で確定 → 確定すれば column⊥irr orthogonality lemma を build (cX fold 解禁)。確定できねば τ₂ engine (option II) か focused 集中 build へ。** dispatch/cover/per-step 層 = 4 commits 完了。endpoint A 残 = heavy cX (この orthogonality + hstep ~300LOC + fold + glue + L4)。
