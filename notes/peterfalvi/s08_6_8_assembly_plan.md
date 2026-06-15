@@ -3119,3 +3119,12 @@ column 機構を irreducible 枝に流用:
 **⚠ 入力依存**: #1 は `θ≠trivial` を要す (dispatch の 0<constituentWeight + φ'≠trivial から、または capstone 供給)。caseB_irr_bundle constructor で θ≠trivial を input に取る。
 **▶▶ 次**: #2 non-real (odd-order 補題) → #8 → #6/#7 (≠η₁) → `caseB_irr_bundle` constructor (θ≠trivial input) → hirrAnc → (6.8.2.2) aggregate → dispatch family。
 **正本=本 session 43 cont.⁹。#1 既約性 GATE CLEAR (`f08c89ba`, value↔index seam 突破)。次=#2 non-real → #6/#7/#8 → caseB_irr_bundle。Opus 継続。**
+
+### session 43 cont.¹⁰: ✅ #2 non-real (`1c52f22f`) — irr branch 5/8
+- `caseB_induce_ne_trivial`: `Ind^L_H θ ≠ 1_L` (degree |W₁|·θ(1)、|W₁|>1 via W1_nontrivial; `Nat.dvd_one` で contra)。
+- `caseB_irr_nonreal` (#2): 既約 Ind θ は non-real。`not_isReal_of_ne_trivial_of_odd_card'` (BrauerPermUncond:233, Peterfalvi (1.1)) + `hyp.card_L_odd` + ne_trivial。
+**⟹ CaseBIrrBundle #1✅#2✅#3✅#4✅#5✅ = 5/8。残り #6/#7/#8**:
+- #8 `⟨Ind θ, (Ind θ).conj⟩=0`: #1 + #2 (conj 既約 `IsIrreducibleCharacter.conj`? + Ind θ≠conj from ¬IsReal + irr-Kronecker)。**clean、次**。
+- #6/#7 `⟨Ind θ, a•η₁⟩=0` / `⟨(Ind θ).conj, a•η₁⟩=0`: 既約 Ind θ ⊥ η₁∈Yset。**`Ind θ ≠ η₁` が要** (θ(1)>1 で degree distinct; θ(1)=1 だと Ind θ∈Yset の可能性 → X/Y disjoint or structural input)。⚠ ≠η₁ が #6/#7 の subtlety。caseB_irr_bundle で `Ind θ≠η₁`/`(Ind θ).conj≠η₁` を structural input に取る (capstone 供給、X-membership 由来) のが robust。
+**▶▶ 次**: #8 (clean) → #6/#7 (≠η₁ input) → `caseB_irr_bundle` constructor (θ≠trivial + ≠η₁ inputs) → hirrAnc → aggregate → dispatch family。
+**正本=本 session 43 cont.¹⁰。#2 done、irr 5/8 (`1c52f22f`)。次=#8 → #6/#7 → caseB_irr_bundle。Opus 継続。**
