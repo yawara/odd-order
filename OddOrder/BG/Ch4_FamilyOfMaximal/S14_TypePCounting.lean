@@ -908,8 +908,46 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           Nat.mem_primeFactors.mpr
             ⟨hpp, (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
         exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hpE
-  · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
-    sorry
+  · -- Case `κ(M) ⊆ τ₁(M)`: `κ = τ₁`, and `K` is `M`-conjugate to `E₁` (both Hall `κ(M)`).
+    -- Conjugate the `E`-setup by `w` (`conj w • E₁ = K`) and read the conjuncts off the new setup
+    -- via the `E₁`-lemmas (Theorem 13.5 etc.), exactly as in case `τ₃` with `E₁` in place of `E`.
+    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
+      (kappa_subset_tau1_union_tau3 hpκ).resolve_right
+        (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
+    obtain ⟨p₀, hp₀κ⟩ := hP
+    -- `E₁ ≠ 1`, non-regular, prime on `M_σ`, `C_{M_σ}(E₁) ≠ 1`.
+    obtain ⟨hE1ne, hE1nonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG hsetup
+      (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+    have hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ := E1_actsPrime hG hsetup hE1ne
+    have hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥ :=
+      Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hE1prime (le_refl E₁) hE1nonreg
+    -- `E₁` is a Hall `κ(M)`-subgroup of `E` (π(E₁) ⊆ κ by coverage; index avoids `κ ⊆ τ₁`).
+    have hE1HallκE : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf E) :=
+      ⟨fun p hp => mem_kappa_of_mem_primeFactors_card_E1 hG hsetup hE1prime hCE1
+          (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv] at hp),
+        fun p hp hpκ => hsetup.E₁_hall.2 p hp (hκτ1 p hpκ)⟩
+    have hE1Hallκ : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf M) :=
+      hallPiece_isHall_in_M hG hsetup hsetup.E₁_le hE1HallκE kappa_subset_sigmaCompl
+    -- WLOG `conj w • E₁ = K`; conjugate the setup so its new `E₁` is `K`.
+    obtain ⟨w, hwM, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv
+      (hsetup.E₁_le.trans hsetup.E_le) hKM hE1Hallκ hK
+    have h' := SubgroupESetup.conj' hsetup hwM
+    rw [hw] at h'
+    -- Read off `K = (h').E₁` facts.
+    obtain ⟨hKne, hKnonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG h'
+      (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+    have hKprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K := E1_actsPrime hG h' hKne
+    refine ⟨hKprime, ?_, ?_, ?_, ?_⟩
+    · -- (K* ≠ 1) `= C_{M_σ}(K) ≠ 1`.
+      rw [hKstar]
+      exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
+    · -- (b1) `N_M(X) = K ⊔ K*` for rank-one `X ≤ K`.
+      sorry
+    · -- (d) `K* ∩ M^g = 1` for `g ∉ M`.
+      sorry
+    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI (real content; Thm 3.10/Lem 12.19/12.17).
+      sorry
 
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
