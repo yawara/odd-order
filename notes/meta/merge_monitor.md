@@ -11,7 +11,7 @@
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
 | **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | **POLE-1 assembly skeleton** (`FeitThompson.lean:70` `sectionSixteenHypothesis`); secondary = POLE-2 carrier slice (`S16_NonExistenceG` tail, split 済) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | **POLE-2 carrier slice** (`S16_NonExistenceG` tail `field_normalizer_structure:6849`, gated-endpoint skeleton + ungated arith cascade); POLE-1 primary 完了 (`a2575ec6`) | Opus 4.8 (1M) | ✅ 対象 |
 | **G** | `lane-g` | BG §15/§16 `_of_inputs` sorry-free skeleton 前倒し (Thm 15.2/Cor 15.3/Thm 15.7 + Thm D; §14 obligation を named residual 化、H の 14.7 着地で自動 unconditional) | Opus 4.8 (1M) | ✅ 対象 |
 | **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
 
