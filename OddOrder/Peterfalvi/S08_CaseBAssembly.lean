@@ -1705,4 +1705,63 @@ theorem caseB_per_phi_anchored_fromYset
     (cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)) hee
     hconj hη₁irr.conj hee hsupp hirrAnc hXaggorth hdecomp i
 
+/-- **(6.8.2) X∪Y fold per-step: adjoin an irreducible non-real `χ` (with `χ̄`) to a coherent set.**
+A thin wrapper over `retarget_isCoherent_of_supportedDecomposition` that discharges its five
+orthonormality hypotheses (`⟨χ,χ⟩ = ⟨χ̄,χ̄⟩ = ⟨χ₁,χ₁⟩ = 1`, `⟨χ,χ̄⟩ = ⟨χ̄,χ⟩ = 0`) from
+irreducibility of `χ`, `χ₁` and non-realness of `χ` (the irreducible Kronecker `if`).
+
+This is the per-step of the case-(B) `X ∪ Y` coherence fold (Peterfalvi (6.8.2), `τ₂` route): the
+anchor `χ₁ = η₁ ∈ 𝒴` and the supported decomposition `Da` is the per-`φ` anchored image
+`caseB_phi_family … i` of an irreducible `X`-member `χ = Ind^L_H θ`.  The remaining `S₁`-dependent
+inputs (prefix orthogonality `hperElem`/`hχ_S1`/`hχbar_S1`, `χ₁ ∈ S₁`, the decomposition
+consistency `htau1_*`/`hY`, and generation `hgen`) are supplied by the chain fold.  (NB: lives in
+this leaf as a case-(B) frontier helper; a candidate to lift to `S07_Coherence` at the
+`S08_CaseBAssembly` split, issue 0070.) -/
+noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {S₁ : Set (ClassFunction ↥L ℂ)} {A : Set ↥L}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent τ S₁ A)
+    {χ chi1 : ClassFunction ↥L ℂ} {a : ℕ}
+    (hχirr : IsIrreducibleCharacter χ) (hχnonreal : ¬ χ.IsReal)
+    (hchi1irr : IsIrreducibleCharacter chi1)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ (a • chi1))
+    (hperElem : ∀ ξ ∈ Submodule.span ℤ S₁, ∀ α ∈ Da.imageFamily.imageSet,
+      ClassFunction.inner (hS₁.extension ξ) α = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    (hchi1 : chi1 ∈ S₁)
+    (htau1_diff : Da.tau1 (χ - a • chi1) = τ (χ - a • chi1))
+    (hY : Da.Y = a • Da.tau1 chi1)
+    (htau1_chi1 : Da.tau1 chi1 = hS₁.extension chi1)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (S₁ ∪ {χ, χ.conj}) A ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁ A
+        ∪ {χ - χ.conj, χ - a • chi1})) :
+    OddOrder.Peterfalvi.S07.IsCoherent τ (S₁ ∪ {χ, χ.conj}) A := by
+  have hχχ : ClassFunction.inner χ χ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+      (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hχbarχbar : ClassFunction.inner χ.conj χ.conj = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
+      (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hne : (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L) ≠ ⟨χ.conj, hχirr.conj⟩ := by
+    intro heq
+    apply hχnonreal
+    have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
+    simpa using h2.symm
+  have hχχbar : ClassFunction.inner χ χ.conj = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+      (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
+    rwa [if_neg hne] at h
+  have hχbarχ : ClassFunction.inner χ.conj χ = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hχχbar, star_zero]
+  have hchi1chi1 : ClassFunction.inner chi1 chi1 = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨chi1, hchi1irr⟩ : IrreducibleCharacter ↥L)
+      (⟨chi1, hchi1irr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  exact OddOrder.Peterfalvi.S07.retarget_isCoherent_of_supportedDecomposition hS₁ Da rfl
+    hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY
+    htau1_chi1 hgen
+
 end OddOrder.Peterfalvi.S08

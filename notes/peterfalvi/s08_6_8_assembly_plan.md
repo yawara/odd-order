@@ -3212,3 +3212,30 @@ Lean commit なし。dispatch トリオ完成後の残務 = **cX 組立 (T8-anal
 
 **▶▶ 次ターン具体第一手 (推奨)**: cX 組立の最小単位から着手。候補 = (a) **gated skeleton**: `coherenceTarget_caseB_of_cX_of_glueData` (cX+ν+D+hgen を hyp に取り CoherenceTarget を産む sorry-free 補題、Frobenius builder を mirror) で wiring を前倒し ([[feedback-gated-endpoint-skeleton-pattern]])、cX/route-to-S を named residual 化。または (b) cX の prerequisite 正規直交補題 (X-member 像どうし / column⊥irr) を個別に。**(a) を推奨** (robust、capstone 構造を確定、cX を孤立 obligation 化)。
 **正本=本 session 43 cont.¹⁵。HYBRID→capstone 完全地図化 (Z=W₂ ルート確定、engine 在庫確認)。次=cX wiring の gated skeleton (`coherenceTarget_caseB_of_cX_of_glueData`) 着手。Opus 継続。**
+
+### session 43 cont.¹⁶: 📖 教科書 (6.8.2)/(6.8.3) 原文照合で残務構造を確定 (commit: 本 note のみ)
+Lean commit なし。`references/peterfalvi/04.8` L156-244 を直読し、cont.¹⁵ の推測を**原文で確定/訂正**。⚠ **残務は heavy core で quick-win 無し**と判明 (正直に記録)。
+
+**原文構造 (04.8 L156-244)**:
+- **(6.8.2) [L224]**: case-B の `X∪Y` coherence は **τ₂ を per-φ images から直接構成** (cX を別途作って glue、ではない)。τ₂: ℤ[X∪Y]→ℤ[Irr G]、τ on ℤ[X∪Y,L^#] 一致 + η₁^τ₂=Y。(6.8.2.3) `(χ−aη₁)^τ=X₁−aY` (= 私の per-φ images) が内積保存を与える。
+- **(6.8.3) [L228-244]**: S coherence。**case (A)/(B) 一様** — break pair S₂={ψ,ψ̄}⊆S, S₁⊇X∪Y coherent だが S₁∪S₂ not、Thm (5.6) で degree bound → 矛盾。**唯一の差 = 最終算術** [L244]: case A `|Z|−1≥2|W₁|` (W₁ FPF on Z); **case B `|H:Z|≥(2|W₁|+1)²`** (W₁ FPF on H/H′ かつ H′/Z)。
+
+**確定した構造的事実**:
+- **X (=Xset W2) は mixed**: 非自明 χ₂ の column μ_j (columnSum, **可約**, W₂⊄ker ゆえ ∈X) + 既約 Ind θ。⟹ retarget (単一既約 pair) は既約 X-member のみ、可約 column は cX_col 集合 coherence。
+- **2 ルート**: (1) **separate cX + glue** (`coherentXunionYset_caseB_of_glued` が要求する cX:IsCoherent (Xset W2) を別途構築 — case-A `Xset_..._of_irreducible_X` は全既約前提ゆえ mixed では流用不可、新規 ~300 LOC)。(2) **incremental adjoin** (cY から retarget で X-member を順次 adjoin、per-φ images = supported decomposition、anchor η₁∈cY=S₁ ✓ — 原文 (6.8.2) τ₂ に一致、より軽い)。可約 column は cX_col を union。**(2) 推奨** (per-φ images を直接使う、原文整合)。
+- **(6.8.3) L4 は case-A `false_of_coherentXunionYset_of_not_coherentS` (CB2:3439) を mirror** だが: (i) Z=W₂、(ii) 算術 = `false_of_w2_break_arith` 新規 (case-A `false_of_centralCommutator_break_arith` CB2:3094 は `2w1≤cZ-1` 前提、case-B は `|H:W₂|≥(2w1+1)²`)、(iii) case-B (5.6) X-sum bound (X が mixed ゆえ case-A `xSum_le_two_psi` と異なる)、(iv) case-B S-facts (S に可約 member)。
+
+**🔴 正直な評価**: 残務 (X∪Y coherence assembly + (6.8.3) L4 + capstone wiring) は **interlocking heavy core、各 ~100-300 LOC、clean quick-win 無し**。dispatch 層 (hnonlin/hcol/hirr/hirrAnc, cont.¹³-¹⁴) は完了。ここからは**大きいビルディングブロック単位**の multi-session push。
+
+**▶▶ 次ターン具体第一手 (確定)**: **Route (2) の第一歩 = 既約 X-member 単一 adjoin**。`retarget_isCoherent_of_supportedDecomposition` (S07:4031) を per-φ image (`caseB_per_phi_anchored_fromYset` の Da) + CaseBIrrBundle 正規直交で instantiate し、cY (or 既adjoin prefix) に {Ind θ, conj} を adjoin する補題。hperElem (prefix 像 ⊥ R(Ind θ)) / hgen の供給を精査。これが fold (xChainCoherent 類似) の per-step。**(cont.¹⁵ の gated-skeleton 推奨は撤回** — glue shell が要求する cX は Route 1 専用で、Route 2 = 原文整合かつ軽い)。
+**正本=本 session 43 cont.¹⁶。原文照合で (6.8.2)=τ₂ direct / (6.8.3)=一様 A/B (算術のみ差) と確定。残務 heavy core (quick-win 無し)。次=Route 2 既約 X-member 単一 adjoin 補題。Opus 継続。**
+
+### session 43 cont.¹⁷: ✅ `adjoin_irr_nonreal_of_supportedDecomposition` — fold per-step (commit `e72771ad`)
+- **`adjoin_irr_nonreal_of_supportedDecomposition`** (S08_CaseBAssembly 末尾、general/leaf-local): `retarget_isCoherent_of_supportedDecomposition` の wrapper。χ 既約 + non-real + chi1 既約 から 5 正規直交 hyp (⟨χ,χ⟩=⟨χ̄,χ̄⟩=⟨χ₁,χ₁⟩=1, ⟨χ,χ̄⟩=⟨χ̄,χ⟩=0) を discharge (irr Kronecker `if`、`caseB_irr_conj_inner` mirror + `inner_conj_symm`)。`noncomputable def` (IsCoherent=Type)。残す S₁-依存入力 = hperElem/hχ_S1/hχbar_S1/chi1∈S₁/htau1_*/hY/hgen は fold caller が供給。axiom-clean、leaf green。⚠ 真の general ゆえ split (0070) で S07 へ lift 候補。
+
+**⟹ X∪Y fold の per-step (orthonormality) 完成。残 fold hard parts (次)**:
+1. **hperElem** (prefix 像 ⊥ `Da.imageFamily.imageSet` = R(Ind θ)): 既約枝 prefix 直交。case-A `pairCover_orthogonal_to_prefix` (CorePart1:2735) は全既約前提 → case-B prefix は column 混在ゆえ要適応 (or column ⊥ irr-R(χ) を別途)。
+2. **column base**: cY ∪ cX_col (`certainTypeSet_isCoherent_tau_canonical`) を §7 union (cross-orthogonality 要) で base coherent set 化 → そこに既約を fold-adjoin。
+3. **htau1_chi1 / hY / hgen**: per-φ image (`caseB_phi_family`) の構造から (Da.tau1=hyp.tau via `caseB_phi_family_tau1`、Da.Y=per_phi の Y 成分)。
+4. **fold 全体**: `xChainCoherent` 類似で base から X-member を順次 adjoin (per-φ image = Da)。
+**正本=本 session 43 cont.¹⁷。fold per-step orthonormality wrapper 完成 (`e72771ad`)。次=fold hard parts (hperElem prefix⊥R(χ) / column base union / htau1-hY-hgen 供給)。Opus 継続。**
