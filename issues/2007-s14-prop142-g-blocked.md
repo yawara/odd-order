@@ -99,14 +99,21 @@ g∈R# は K に FPF (Frobenius) ⟹ K̂ (指標) に FPF ⟹ 非自明指標を
 - [ ] **module core terminal** `prime_card_of_abelian_frobenius_weight` (`S03g_Thm310Module.lean`,
       statement 確定・proof subagent 進行中) — 上記 4 件を support IsInternal で配線 ⟹ abelian K で |R| 素数。
 
-**残 (terminal 着地後)**:
-- [ ] **K-abelian reduction**: K₀ minimal normal ≤K で C_V(K₀)∈{0,V} 二分律 → |G| 帰納で K abelian に還元
-      (V irreducible 要、M₀ minimal normal から)。
-- [ ] **outer**: M nilpotent → minimal G-normal M₀ (elem ab, irreducible) → module 化 (base change F̄ +
-      ZMod r module) → terminal/reduction 呼び出し。abstract `MulDistribMulAction G M` + 具体 conjugation
-      wrapper (`isNilpotent_of_normalizing_primeOrder_fixedPointFree` パターン)。
+- [x] **module core terminal** `prime_card_of_abelian_frobenius_weight` (`S03g_Thm310Module.lean`,
+      commit 7d1b0b52, sorry-free + axiom-clean)。
+
+**🔑 重要 scoping (2026-06-15): K-abelian reduction は (g) には不要** — **U=E₂E₃ は abelian**
+(`S12_Lemma128d:579`「K:=E₂E₃ is abelian」; E₂ abelian=12.8a, E₃ cyclic)。⟹ terminal を直接適用可、
+一般 nonabelian-K reduction (BG Case 2 前半の K₀ 二分律帰納) は **FT 経路では skip**。
+
+**残 (terminal 完成済 → 直接配線)**:
+- [ ] **outer/module化** (帰納なし): M_σ nilpotent → minimal E-normal M₀ (elem ab r-group, irreducible)
+      → hyps を M₀ に制限 → ZMod r module (`OperatorMaschke`) → base change F̄
+      (`BaseChange`: finrank invariants 不変・C_V(K)=0 不変) → `prime_card_of_abelian_frobenius_weight`
+      適用。具体 conjugation wrapper (`isNilpotent_of_normalizing_primeOrder_fixedPointFree` パターン)。
 - [ ] **§12/§14 bridge** (rep-theory と独立、§14 lane 領域): Lem 14.1 Frobenius 形 (C_{M_σ}(U)=1 +
-      M_σ nilp) / Lem 12.17 TI 形 (M_σ∩M_σ^g β'-group ⟹ TI) / σ=β (Lem 12.19 ✅既存) → IsTypeP2⟹U≠1。
+      M_σ nilp) / Lem 12.17 TI 形 (M_σ∩M_σ^g β'-group ⟹ TI) / σ=β (Lem 12.19 ✅既存) / IsTypeP2⟹U≠1 /
+      E=U⋊E₁ Frobenius (U=E₂E₃ kernel, E₁ complement) の構成。
 - [ ] **(g) 配線**: 上記で `typeP_structure` case-τ₁ (g) を埋める。
 
 ## 完了条件
