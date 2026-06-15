@@ -2882,3 +2882,95 @@ anchored 公式 landed ⟹ cont.⁷ 続⁵ の組立計画 (chain-adjoin X_irr t
 hXorth の column seam-1 `⟨cY.ext η₁, ω_ij^σ⟩=0` を精査: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08:1246) は **差 `cY.ext η − cY.ext η'` が tic V 上消失** (`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`) を使うため、**distinct partner η' ∈ Yset (η₁≠η', ⟨η₁,η'⟩=0, η₁−η' は H^#-supported) が必須**。⟹ 単一 η₁ では証明不可。
 **含意**: `caseB_per_phi_anchored` の hXorth 入力 (または family の hXorth 証明) に **partner anchor η' (|Yset|≥2)** を追加要。case-B は |Yset|≥2 が成立するはず (Yset = S(H')-filtration、複数 linear chars) — 要確認 (`exists_Yset_linearRepresentativeFamily` の 2≤n、または \|Yset\|≥2 は別途)。**∴ hXorth 実装時は partner η' を threading する設計に。** irr branch の seam-1 (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`) は partner 不要か要確認。
 **正本=本 session 42 cont.²。hXorth は partner-anchor 要 (設計追加)。次=cast helper + partner-threading hXorth。**
+
+### session 42 cont.³ (lane-b, Opus): ✅ cast helper landed + 🔑 partner-anchor 要件 解決 (|Yset|≥2 既存)
+**✅ landed (`94206d98`, axiom-clean)**: `charPsiDecomp_eqRec_imageSet` (cast helper, brick #1; `charPsiDecomp_eqRec_tau1` の imageSet 版、`cases h; rfl`)。dispatch の column-branch `heq ▸` cast 越しに `imageFamily.imageSet` 不変 (imageSet : Finset(CF G ℂ) は χ 非依存)。
+
+**🔑 cont.² の「partner-anchor |Yset|≥2 要確認」は解決 = 既存**: `hyp.two_le_Yset_ncard` (SibleyDadeHypothesis field, S08_CaseBCoherence:310/331 で使用)。partner 抽出は `Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega) η₁` (precedent: S08_CaseBCoherence:331)。
+
+**▶▶ hXorth column 次手 (recipe 確定)**: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08_CaseBCoherence2:1246) を η=η₁ + partner η' で instantiate。**要 discharge する partner 4 条件**:
+1. `η' ∈ S₁` — `two_le_Yset_ncard` + `exists_ne_of_one_lt_ncard` (η'≠η₁ かつ η'∈Yset)。
+2. `IsIrreducibleCharacter η'` — Yset/S₁ members は既約 (要 lemma: coherence set membership → irreducible)。
+3. `⟨η₁, η'⟩ = 0` — distinct 既約は直交 (`irreducibleCharacter_inner_eq_ite` + η₁≠η')。
+4. `(η₁ − η').support ⊆ supportInSubgroup (sharpImage H) L` — Yset 差の H^#-support 性 (要 lemma)。
+**precedent = S08_CaseBCoherence:310-340** (同 toolkit を別文脈で使用、partner 抽出+4 条件 discharge の実例)。これを読んで column hXorth lemma を組む。
+irr branch (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`, S08CP1) は partner 不要か要確認。
+**dispatch 越し**: `charPsiDecomp_eqRec_imageSet` (landed) + `unfold caseB_phi_family caseB_constituentDecomposition; split` で per-branch。
+
+**正本=本 session 42 cont.³。cast helper landed、|Yset|≥2 解決 (two_le_Yset_ncard)。次=hXorth column (toolkit instantiate, partner 4 条件 discharge, precedent S08_CaseBCoherence:310-340) → irr branch → hbi → caseB_phi_family 具体化。**
+
+### session 42 cont.⁴ (lane-b, Opus): ✅✅ (6.8.2.3) wiring COMPLETE — abstract D 解消 (3 commits)
+**✅ landed (全 axiom-clean [propext, Classical.choice, Quot.sound], full build 3822 jobs green):**
+| commit | 結果 | 役割 |
+|---|---|---|
+| `030a2b65` | **`charPsiDecomp_eqRec_X`/`_Y`** + **`psiDecomp_Y_inner_int`** | cast helper の X/Y 版 (tau1/imageSet と同型、`cases h; rfl`) + **route 非依存 hbi**: 任意 (5.4) 分解 D で X⊥Y₀ かつ τ₁-image∈ZIrr かつ Y₀∈ZIrr なら `⟨D.Y,Y₀⟩ = −⟨D.tau1(χ−ψ),Y₀⟩ ∈ ℤ` (`Y=X−τ₁(χ−ψ)` via tau1_image + `inner_sub_left` + `inner_mem_ZIrr_int`)。column/irr 分岐不要の汎用 brick |
+| `fb7d02ba` | **`CaseBColBundle`/`CaseBIrrBundle`** abbrev + dispatch 3 補題 | bundle 抽出 (caseB_constituentDecomposition の inline hcol/hirr と defeq、dispatch 補題で共有) + `caseB_constituentDecomposition_tau1_mem_ZIrr` (hyp.tau(Ind θ−a·η₁)∈ZIrr を branch bundle から; column=witness rw, irr=直接) + `_X_orthogonal` (unfold/split + `charPsiDecomp_eqRec_X` cast + standalone column/irr seam-1; partner η'・per-θ anchor `hirrAnc` は明示仮説) + `_Y_inner_int` (`psiDecomp_Y_inner_int` 経由) |
+| `fe4f53c1` | **`caseB_per_phi_anchored_family`** | **abstract D 解消**: `caseB_per_phi_anchored` を具体 family `caseB_phi_family` に特殊化。D/hXorth/hbi を dispatch 補題で discharge (`b` は `_Y_inner_int` の choice)。各 θ=i.val で `(Ind^L_H θ−aᵢ·η₁)^{hyp.tau} = (caseB_phi_family … i).X − aᵢ·cY.extension η₁` |
+
+**🎯 (6.8.2.3) per-φ anchored image は具体 family 上で完全組立済**。`caseB_per_phi_anchored_family` の残り入力 = **全て genuine §5/§6 content (capstone 側 discharge)**:
+1. **per-θ bundles `hcol`/`hirr`** (`∀ i, CaseBColBundle/CaseBIrrBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val)`): column=certain-type (4.9) reflection の structural data / irr=case-A Dade chain (`DadeChainStep`/`retarget_isCoherent_fromDade_X` field 群)。**bulk の discharge**。
+2. **η₁-anchor data** (`hη₁`/`hη₁irr`/`hrealc1`/`hdiffsuppc1`/`hc1barS1`/`hνZc1`/`hc1c1bar`): Y-anchor η₁ の実既約性・非実・supported conj 差・ZIrr extension。`hνZc1 = cY.extension_mem_ZIrr η₁ (subset_span hη₁)`。
+3. **partner anchor** (`η'`/`hη'Y`/`hη'irr`/`hee`/`hsupp`): η'≠η₁∈Yset、既約、⟨η₁,η'⟩=0、(η₁−η') H^#-supported。抽出=`Set.exists_ne_of_one_lt_ncard (two_le_Yset_ncard) η₁` (precedent S08_CaseBCoherence:331); 4 条件 discharge は Yset-member の既約性/直交/support lemma 要 (precedent S08_CaseBCoherence:310-340)。
+4. **per-θ anchor-vs-constituent** (`hirrAnc i`): irr branch で ⟨η₁,Ind θ⟩=⟨η₁,(Ind θ)conj⟩=⟨η₁conj,Ind θ⟩=⟨η₁conj,(Ind θ)conj⟩=0 (η₁ linear ⊥ 既約 induced)。
+5. **(6.8.2.2) aggregate** (`Xagg`/`hXaggorth`/`hdecomp`): `exists_decomposition_caseB` (S08:126) から。
+
+**▶▶ 次の具体ステップ (順):** (1) **anchor data discharge** (η₁-anchor + partner + hirrAnc — Yset-member の既約性/support の lemma 整備が核; precedent あり) → (2) **per-θ bundles discharge** (column/irr structural、bulk) → (3) **(6.8.2.2) aggregate 接続** (`exists_decomposition_caseB` の wiring; \|Yset\|=2 edge で cY swap 注意 — `per_phi_anchored_image` cY 一般化済) → (4) **HYBRID 組立** (anchored 公式を diagonal data に: cY に X_irr を `retarget_isCoherent_of_supportedDecomposition` で chain-adjoin + cX_col `certainTypeSet_isCoherent_tau` と §7 union) → (5) capstone `sibleySetup_is_coherent`。
+**正本=本 session 42 cont.⁴。(6.8.2.3) 具体 family 上 完全組立 (abstract D 解消)。次=anchor data discharge (Yset-member 既約性/support lemma + partner 抽出, precedent S08_CaseBCoherence:310-340)。**
+
+### session 42 cont.⁴ 続: ✅ `caseB_per_phi_anchored_fromYset` — Y-anchor data 内製化 (commit `6330ad76`)
+cont.⁴ の `caseB_per_phi_anchored_family` を強化: **η₁-anchor + partner block 全体を `hη₁ : η₁ ∈ Yset` だけから discharge**。partner = **η̄₁ (共役)** の教科書的選択を内製 (既存 `inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset` S08CB2:1390 / `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` S08CB2:1449 と同パターン):
+- η̄₁∈Y = `Yset_closedUnderConjugate`、η₁≠η̄₁ = `Yset_hasNoRealCharacters.not_mem_of_isReal` ((5.2.a) odd⇒no real irr)、⟨η₁,η̄₁⟩=0 = `irreducibleCharacter_inner_eq_ite`+hne、(η₁−η̄₁) H^#-support = `sMember_diffSupport_of_charValue_eq`+`Yset_apply_one` (等次数)。`hη₁irr`=`isIrreducibleCharacter_of_mem_Yset`、`hνZc1`=`extension_mem_ZIrr`。
+
+**⟹ `caseB_per_phi_anchored_fromYset` の残り入力 = genuine §5/§6 hard core のみ (boilerplate anchor 消滅):**
+1. **per-θ bundles `hcol`/`hirr`** (column=(4.9) certain-type structural / irr=case-A Dade chain field) — **bulk**。
+2. **`hirrAnc i`** (per-θ: ⟨η₁,Ind θ⟩ 系 4 直交; η₁∈Yset linear ⊥ irr constituent Ind θ)。
+3. **(6.8.2.2) aggregate `hXaggorth`/`hdecomp`** (`exists_decomposition_caseB` S08:126)。
+
+**▶▶ 次の brick 候補 (contained 順):** (a) **(6.8.2.2) aggregate 接続** = `exists_decomposition_caseB` を fromYset の hXaggorth/hdecomp に wiring (\|Y\|=2 edge で cY swap; `per_phi_anchored_image` は cY 一般化済ゆえ吸収可) → (b) **hirrAnc discharge** (η₁ vs Ind θ 直交; distinct irr or Yset⊥X 構造) → (c) **per-θ bundles** (column/irr structural, bulk) → (d) **HYBRID 組立** (anchored 公式 = diagonal: cY に X_irr chain-adjoin `retarget_isCoherent_of_supportedDecomposition` + cX_col `certainTypeSet_isCoherent_tau` を §7 union) → (e) capstone `sibleySetup_is_coherent`。
+**正本=本 session 42 cont.⁴ 続。fromYset で anchor 内製化完了。次=(6.8.2.2) aggregate 接続 or hirrAnc discharge。**
+
+### session 42 cont.⁴ 続²: 🔑 capstone case-B の正確な frontier map (hmapagree linchpin = dadeMap canonicality)
+fromYset 完成後の (6.8) capstone case-B (`sibleySetup_is_coherent` の X-nonempty / `cases.inr` 枝) を末端まで精査。
+
+**capstone case-B が供給する構造 (`hyp.cases.inr`, S08CP1:3321-3326):**
+`∃ h46 : Hypothesis46 (sharpImage H) L, h46.dade = hyp.dade ∧ h46.K = H ∧ h46.W1 = W1 ∧ (card h46.W2).Prime ∧ h46.W2 ≤ ⁅H,H⁆ ∧ Coprime (card H) (card W1)`。⟹ **h46 + hHK + `h46.dade = hyp.dade` が直接手に入る**。
+
+**assembly の path (capstone case-B branch):**
+1. **cX_col** (reducible columns μ_j) = `certainTypeSet_isCoherent_tau` (S08CB2:1651, **sorry-free shell**) — 要 `hmapagree`。
+2. **cX_irr** (irreducible 部) = case-A 機構 `xChainCoherent` (S08CP1:2701) over irr X-members — 要 per-step `XAdjoinStepInput` (= per-θ bundle 相当)。
+3. **cX = cX_col ∪ cX_irr** (union)。
+4. **cX ∪ cY** = `coherentXunionYset_caseB_of_glued` (S08CB2:1616, **sorry-free shell**) — 要 ν / hmixed / hpair / D / hgen。**hmixed = (6.8.2.3) content = fromYset の anchored 公式が供給**。
+
+**🔑 linchpin = `hmapagree`** (`dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ` on H^#-supported φ; cX_col + column bundle conjunct 2 + 全 map-agreement の gate):
+- h46.dade0 (enlarged, A₀=A∪Vᴸ) と h46.dade (base, A=H^#) は Hypothesis46 の**別フィールド**で、A 上一致は構造に**無い**。`cases.inr` も `h46.dade=hyp.dade` は与えるが `h46.dade0.restrict A ↔ h46.dade` は与えない。
+- **しかし導出可能** (producer-gate 不要): `Hypothesis.dadeMap_restrict` (S04:3641) は `IsDadeMap.unique` (S04:3442) で証明 = **Dade map は一意**。`Hypothesis` の `H : {a//a∈A}→Subgroup G` フィールド (S04:196) は `centralizer_eq_sup`+`_disjoint`+`_coprime` で **C_G(a) 内 C_L(a) の normal Hall complement = Schur-Zassenhaus 一意** ⟹ (G,A,L) から canonical ⟹ 同 (G,A,L) の 2 Hypothesis は同 dadeMap。
+- **導出鎖**: φ A-supported に対し `dadeIntegralCharacterMap h46.dade0 h46.tau φ` =[`dadeIntegralCharacterMap_restrict_eq_of_support` S08CB2:1585]= `dadeIntegralCharacterMap (h46.dade0.restrict A) (h46.tau.restrict A) φ` =[`apply_of_support` S07:5243]= `(h46.dade0.restrict A).dadeMap ⟨φ⟩` =[**H-field 一意性 → IsDadeMap.unique**]= `hyp.dade.dadeMap ⟨φ⟩` =[`apply_of_support` 逆]= `hyp.tau φ`。
+
+**▶▶ 次の brick (linchpin, 推奨 = canonicality 経路、構造改変も producer 影響も無し):**
+**`dadeMap_eq_of_hypothesis` (S04 一般補題)**: 同 (G,A,L) の 2 Hypothesis hyp₁ hyp₂ → `hyp₁.dadeMap = hyp₂.dadeMap`。核 = `hyp₁.H a = hyp₂.H a` (normal Hall complement 一意; Schur-Zassenhaus、要 mathlib `Subgroup.IsComplement`/coprime uniqueness 探索) → dadeSupport 一致 → `IsDadeMap hyp₁ τ ↔ IsDadeMap hyp₂ τ` → `IsDadeMap.unique`。これで `hmapagree` (S08, h46 用 wrapper) → cX_col → assembly が連鎖 unblock。
+**代替** (canonicality が重い場合): `cases.inr` に `h46.dade0.restrict A` の dadeMap が `hyp.dade` と一致する条項を追加 (producer obligation 化、2026-06-13 の CertainTypeHypothesis→Hypothesis46 強化と同型)。ただし `SibleyDadeHypothesis` core 改変ゆえ producer 全更新要 = 重い。
+**正本=本 session 42 cont.⁴ 続²。capstone case-B path 完全 map。linchpin = hmapagree = dadeMap canonicality (H-field Schur-Zassenhaus 一意)。次 = `dadeMap_eq_of_hypothesis` (S04)。**
+
+### session 42 cont.⁴ 續³: ✅ canonicality core `le_of_card_coprime_index` 着地 (commit `be9fc9ec`)
+hmapagree linchpin (cont.⁴ 續²) の**群論核を 1 個 landing**: `le_of_card_coprime_index` (S08_CaseBAssembly, axiom-clean) = 「N normal + |K| coprime to N.index ⟹ K ≤ N」(K の C⧸N 像が位数 |gcd(|K|,[C:N])=1 ⟹ 自明 ⟹ K ≤ ker(mk' N)=N)。mathlib: `card_map_dvd`(H 明示第1引数!)/`card_subgroup_dvd_card`/`map_eq_bot_iff`/`card_eq_one`(Index:473)/`ker_mk'`。
+
+**▶▶ canonicality 残り (linchpin 完成への brick 順, 確定):**
+1. ✅ **Lemma A** `le_of_card_coprime_index` (done)。
+2. **Lemma C = H-field 一意性** `h46.dade0.H (incl a) = hyp.dade.H a` (a∈A): 両者 C_G(a) 内で C_L(a)=`centralizerIn L a` の normal complement (`centralizer_eq_sup`=⊔, `centralizer_disjoint`=⊓⊥, `H_normalized`=normal in C_G(a), `centralizer_coprime`=coprime)。**C_G(a) へ relativize** (`.subgroupOf (Subgroup.centralizer {a})`) して Lemma A を両向き適用 → le_antisymm。要 API: `Subgroup.index_subgroupOf` / [C_G(a):H.subgroupOf]=|C_L(a)| (∵ H⊔C_L=C_G(a) ∧ H⊓C_L=⊥ ⟹ index=|complement|; `Subgroup.relindex`/`card_mul_index` 経由) + |H| coprime |C_L| (centralizer_coprime)。⚠ subgroupOf の index 計算が核。
+3. **Lemma D = Hypothesis ext**: `h46.dade0.restrict A = hyp.dade` を H-field 一致 (Lemma C, 全 a) + restrict.H 補題 (S04:348 `(hyp.restrict).H a = hyp.H (incl a)`) + **構造 ext (H が唯一の data field、他 Prop は proof-irrel)** で。⚠ `S04.Hypothesis.ext` の形 (H funext + Prop 自動) を要確認。
+4. **Lemma E = hmapagree**: φ A-supported に対し `dadeIntegralCharacterMap h46.dade0 h46.tau φ` = (`dadeIntegralCharacterMap_restrict_eq_of_support` S08CB2:1585) = `…(h46.dade0.restrict A)(h46.tau.restrict A) φ` = (Lemma D で Hypothesis 一致 + apply_of_support) = `hyp.tau φ`。⚠ tau (FullDadeIsometryData) 側の restrict 一致も要 (data 引数無視ゆえ dadeIntegralCharacterMap は hyp のみ依存、cont.⁷ 續³ 知見で吸収可)。
+5. → `certainTypeSet_isCoherent_tau` の hmapagree 充足 → **cX_col 完成** → assembly (cX_col∪cX_irr∪cY, cont.⁴ 續² path)。
+
+**正本=本 session 42 cont.⁴ 續³。Lemma A (canonicality 核) landed。次 = Lemma C (H-field 一意性, C_G(a) relativize + Lemma A 両向き)。**
+
+### session 42 cont.⁴ 續⁴: Lemma C tooling 確定 (API archaeology 完了) — ~60-80 行の relativize 証明
+Lemma C (`dade_H_eq` 等: 同 (G,A,L) の 2 Hypothesis の H-field 一致) の必要 API を全特定。**dadeSupport は H-field 依存** (S04:362, hCoset 経由) ⟹ uniqueness は H-field 一致が必須 (shortcut 無し)。
+**tooling (確定):**
+- 核 = ↥C (C=`Subgroup.centralizer {a.1}`) への relativize。各 `hyp.H a`/`Cℓ`(=`centralizerIn L a.1`) を `.subgroupOf C`。
+- **`(hyp.H a).subgroupOf C` の Normal instance in ↥C**: H_normalized (∀c∈C, ∀x∈H a, cxc⁻¹∈H a) から構成。⚠ 手動 (mathlib に `normal_subgroupOf` 直接なし、`normal_subgroupOf_iff` は別物)。
+- **index [↥C : (hyp.H a).subgroupOf C] = |Cℓ|**: 第2同型 `QuotientGroup.quotientInfEquivProdNormalQuotient` (mathlib QuotientGroup/Basic:293, ただし N normal in **whole group** 要 ⟹ ↥C 内で適用) + disjoint(⊓=⊥)/sup(⊔=C=⊤ in ↥C) rewrite + card transport。**または** `Nat.card C = |H a|·|Cℓ|` 積公式 + `card_mul_index`。⚠ **積公式 `card_sup_mul_card_inf` は mathlib に無い** (要自前 or 第2同型)。
+- card 保存 = `Subgroup.subgroupOfEquivOfLe` (Map:294)。index/card = `IsComplement'.index_eq_card`(Complement:634)/`card_mul`(:649) も利用可だが IsComplement' 構成自体が積公式要。
+- coprime = `hyp.centralizer_coprime a a` (= Coprime |H a| |Cℓ|)。
+- 仕上げ = Lemma A (`le_of_card_coprime_index`, ✅) 両向き → le_antisymm → subgroupOf_le で G に戻す。
+**規模 = ~60-80 行 (normal instance 構成 + 第2同型 in ↥C + card 計算 + Lemma A 適用)。well-defined だが focused pass 推奨。**
+**正本=本 session 42 cont.⁴ 續⁴。Lemma C tooling 完全特定。実装は ↥C relativize の plumbing が核 (normal instance + 第2同型/積公式)。**
