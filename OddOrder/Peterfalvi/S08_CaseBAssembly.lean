@@ -1838,4 +1838,32 @@ theorem caseB_inner_irr_columnSum_eq_zero
   rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
   simpa using hkron
 
+omit [Invertible (Nat.card ↥H : ℂ)] in
+/-- **(6.8.2) distinct certain-type columns are orthogonal** — `⟨columnSum h46 χ₂, columnSum h46 χ₂'⟩
+= 0` for `χ₂ ≠ χ₂'`.  By additivity over `columnSum = ∑_i μ_{ij}`, it reduces to the cross-column
+grid orthogonality `⟨μ_{ij}, μ_{i'j'}⟩ = 0` (`columnFamily_cross_products_zero`, Peterfalvi (4.1)),
+read off via the same `i, i' = 0` case split as `columnFamily_mu_ne`.
+
+This is the cross-orthogonality between different certain-type columns the case-(B) `X`-coherence
+needs to assemble the column base across degree classes (columns of distinct `W₂`-duals — in
+particular distinct degrees — are mutually orthogonal). -/
+theorem inner_columnSum_cross_eq_zero
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂') :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
+    inner_sum_left]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [inner_sum_right]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  have hz : (⟨1, h46.one_lt_card_W1⟩ : Fin (Nat.card h46.W1)) ≠ 0 := Fin.ne_of_val_ne (by simp)
+  rcases eq_or_ne i 0 with hi | hi <;> rcases eq_or_ne j 0 with hj | hj
+  · subst hi; subst hj; exact (h46.columnFamily_cross_products_zero hne hz hz).2.2.2
+  · subst hi; exact (h46.columnFamily_cross_products_zero hne hz hj).2.2.1
+  · subst hj; exact (h46.columnFamily_cross_products_zero hne hi hz).2.1
+  · exact (h46.columnFamily_cross_products_zero hne hi hj).1
+
 end OddOrder.Peterfalvi.S08
