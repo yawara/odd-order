@@ -98,6 +98,68 @@ theorem psiDecomp_Y_inner_int {L' G' : Type*} [Group L'] [Group G'] [Fintype L']
   rw [hYeq, ClassFunction.inner_sub_left, hX, hn]
   push_cast; ring
 
+/-- The per-`θ` **column-branch bundle** (mixed dispatch).  For each nontrivial column character
+`χ₂` whose certain-type column `μ_j = columnSum h46 χ₂` equals `Ind^L_H θ`, the structural inputs of
+`columnDecompositionTau`: equal column degrees, the `τ`-image agreement on `μ_j − μ̄_j`, the two
+`H^#`-supports, the `ZIrr`-membership of `(μ_j − a·η₁)^{hyp.tau}`, and the three (5.2.c) orthogonality
+scalars.  Extracted as an abbreviation so the dispatch lemmas share one bundle type with
+`caseB_constituentDecomposition` (definitionally the same `hcol` Prop). -/
+abbrev CaseBColBundle (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    (θ : IrreducibleCharacter ↥H) (η₁ : ClassFunction ↥L ℂ) (a : ℕ) : Prop :=
+  ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+    OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) →
+    (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+        = ∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1)
+    ∧ (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+        = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj))
+    ∧ (∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+          OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁} : Set (ClassFunction ↥L ℂ)),
+        s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    ∧ (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
+    ∧ (ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+        (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    ∧ (ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+        (a • η₁ : ClassFunction ↥L ℂ) = 0)
+
+/-- The per-`θ` **irreducible-branch bundle** (mixed dispatch).  When no nontrivial column equals
+`Ind^L_H θ`, the structural inputs of `irreducibleDecompositionTau` (= `decompositionDaFromDadeOfDiff
+hyp.dade hyp.hconj`): irreducibility, non-realness, the two `H^#`-supports, the `ZIrr`-membership of
+`(Ind^L_H θ − a·η₁)^{hyp.tau}`, and the (5.2.c) orthogonality scalars.  Shared with
+`caseB_constituentDecomposition` (definitionally the same `hirr` Prop). -/
+abbrev CaseBIrrBundle (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    (θ : IrreducibleCharacter ↥H) (η₁ : ClassFunction ↥L ℂ) (a : ℕ) : Prop :=
+  (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) →
+    IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+    ∧ (¬ ClassFunction.IsReal (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    ∧ (((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+          - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    ∧ ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    ∧ (hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁) ∈ ZIrr G)
+    ∧ (ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    ∧ (ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+        (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    ∧ (ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0)
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
@@ -511,5 +573,126 @@ theorem caseB_per_phi_anchored
     (caseB_hagg hyp hW2H hcen hφ' D htau1 hdecomp)
     (sum_constituentWeight_sq_subtype hW2H hcen hφ')
     (fun i _ => hXorth i) (fun i _ => hbi i) i (Finset.mem_univ i) i.2
+
+/-- **(6.8.2.3) the `τ₁`-image of the dispatch is a virtual character.**  For the per-constituent
+dispatch `caseB_constituentDecomposition`, `hyp.tau (Ind^L_H θ − a·η₁) ∈ ZIrr G`, extracted from the
+appropriate branch bundle (`hcol`/`hirr`): on the column branch the witness equation rewrites
+`Ind^L_H θ` to `μ_j = columnSum h46 χ₂` and the column bundle's `ZIrr`-conjunct applies; on the
+irreducible branch the irreducible bundle's `ZIrr`-conjunct applies directly.  This is the `hτmem`
+input of `psiDecomp_Y_inner_int` for the dispatch (via `caseB_constituentDecomposition_tau1`). -/
+theorem caseB_constituentDecomposition_tau1_mem_ZIrr
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ} (θ : IrreducibleCharacter ↥H)
+    (hcol : CaseBColBundle hyp h46 θ η₁ a) (hirr : CaseBIrrBundle hyp h46 θ η₁ a) :
+    hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁) ∈ ZIrr G := by
+  classical
+  by_cases hcase : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+  · obtain ⟨χ₂, hne, heq⟩ := hcase
+    rw [← heq]
+    exact (hcol χ₂ hne heq).2.2.2.1
+  · exact (hirr (fun χ₂ hne heq2 => hcase ⟨χ₂, hne, heq2⟩)).2.2.2.2.1
+
+/-- **(6.8.2.3) seam-1 orthogonality of the dispatch.**  `⟨(caseB_constituentDecomposition …).X,
+cY.extension η₁⟩ = 0`, dispatched per branch through the index cast (`charPsiDecomp_eqRec_X`): on the
+column branch the certain-type seam-1 `columnDecompositionTau_X_orthogonal` (using the partner anchor
+`η' ≠ η₁ ∈ Yset`), on the irreducible branch the Dade family seam-1
+`irreducibleDecompositionTau_X_orthogonal` (using the per-`θ` anchor-vs-constituent orthogonality
+`hirrAnc`).  The partner data and the `η₁`-anchor data are explicit hypotheses (the genuine §5 content
+discharged at the capstone); this lemma is the pure branch plumbing. -/
+theorem caseB_constituentDecomposition_X_orthogonal
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ} (θ : IrreducibleCharacter ↥H)
+    (hcol : CaseBColBundle hyp h46 θ η₁ a) (hirr : CaseBIrrBundle hyp h46 θ η₁ a)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hη₁Y : η₁ ∈ hyp.Yset) (hη₁irr : IsIrreducibleCharacter η₁)
+    (hrealc1 : ¬ ClassFunction.IsReal η₁)
+    (hdiffsuppc1 : (η₁.conj - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hc1barS1 : η₁.conj ∈ hyp.Yset)
+    (hνZc1 : cY.extension η₁ ∈ ZIrr G)
+    (hc1c1bar : ClassFunction.inner η₁ η₁.conj = 0)
+    {η' : ClassFunction ↥L ℂ} (hη'Y : η' ∈ hyp.Yset) (hη'irr : IsIrreducibleCharacter η')
+    (hee : ClassFunction.inner η₁ η' = 0)
+    (hsupp : (η₁ - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hirrAnc : (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) →
+      ClassFunction.inner η₁ (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 0
+      ∧ ClassFunction.inner η₁ (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0
+      ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 0
+      ∧ ClassFunction.inner η₁.conj
+          (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0) :
+    ClassFunction.inner (caseB_constituentDecomposition hyp h46 θ hcol hirr).X
+        (cY.extension η₁) = 0 := by
+  classical
+  unfold caseB_constituentDecomposition
+  split
+  · rw [charPsiDecomp_eqRec_X]
+    exact columnDecompositionTau_X_orthogonal hyp h46 hHK _ _ _ _ _ _ _ cY
+      hη₁Y hη'Y hη₁irr hη'irr hee hsupp
+  · next hneg =>
+    have hncond : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
+      fun χ₂ hne heq2 => hneg ⟨χ₂, hne, heq2⟩
+    obtain ⟨hc1χ, hc1χbar, hc1barχ, hc1barχbar⟩ := hirrAnc hncond
+    exact irreducibleDecompositionTau_X_orthogonal hyp θ _ _ _ _ _ _ _ _ cY hη₁irr
+      hrealc1 hdiffsuppc1 hη₁Y hc1barS1 hνZc1 hc1c1bar hc1χ hc1χbar hc1barχ hc1barχbar
+
+/-- **(6.8.2.3) integrality of the dispatch's orthogonal side.**  `⟨(caseB_constituentDecomposition
+…).Y, cY.extension η₁⟩ ∈ ℤ`, via the route-independent `psiDecomp_Y_inner_int`: the image side is
+`⊥ cY.extension η₁` (`caseB_constituentDecomposition_X_orthogonal`), the `τ₁`-image is a virtual
+character (`caseB_constituentDecomposition_tau1_mem_ZIrr`, read through
+`caseB_constituentDecomposition_tau1`), and the anchor `cY.extension η₁ ∈ ZIrr G` (`hνZc1`).  This is
+the `hbi` of `caseB_per_phi_anchored` for the dispatch family. -/
+theorem caseB_constituentDecomposition_Y_inner_int
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ} (θ : IrreducibleCharacter ↥H)
+    (hcol : CaseBColBundle hyp h46 θ η₁ a) (hirr : CaseBIrrBundle hyp h46 θ η₁ a)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hη₁Y : η₁ ∈ hyp.Yset) (hη₁irr : IsIrreducibleCharacter η₁)
+    (hrealc1 : ¬ ClassFunction.IsReal η₁)
+    (hdiffsuppc1 : (η₁.conj - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hc1barS1 : η₁.conj ∈ hyp.Yset)
+    (hνZc1 : cY.extension η₁ ∈ ZIrr G)
+    (hc1c1bar : ClassFunction.inner η₁ η₁.conj = 0)
+    {η' : ClassFunction ↥L ℂ} (hη'Y : η' ∈ hyp.Yset) (hη'irr : IsIrreducibleCharacter η')
+    (hee : ClassFunction.inner η₁ η' = 0)
+    (hsupp : (η₁ - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hirrAnc : (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) →
+      ClassFunction.inner η₁ (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 0
+      ∧ ClassFunction.inner η₁ (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0
+      ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) = 0
+      ∧ ClassFunction.inner η₁.conj
+          (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0) :
+    ∃ n : ℤ, ClassFunction.inner (caseB_constituentDecomposition hyp h46 θ hcol hirr).Y
+      (cY.extension η₁) = (n : ℂ) := by
+  apply psiDecomp_Y_inner_int (caseB_constituentDecomposition hyp h46 θ hcol hirr)
+  · exact caseB_constituentDecomposition_X_orthogonal hyp h46 hHK θ hcol hirr cY hη₁Y hη₁irr
+      hrealc1 hdiffsuppc1 hc1barS1 hνZc1 hc1c1bar hη'Y hη'irr hee hsupp hirrAnc
+  · rw [caseB_constituentDecomposition_tau1]
+    exact caseB_constituentDecomposition_tau1_mem_ZIrr hyp h46 θ hcol hirr
+  · exact hνZc1
 
 end OddOrder.Peterfalvi.S08
