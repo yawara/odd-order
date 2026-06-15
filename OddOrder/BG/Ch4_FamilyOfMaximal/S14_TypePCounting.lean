@@ -2530,6 +2530,111 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         rw [← hn]; exact hgx.zpow_right n
       exact ((hgv.zpow_right m).symm)
 
+/-- Centralizer of `⟨x⟩` equals centralizer of `{x}` (replicated private helper). -/
+private theorem centralizer_zpowers_eq_singleton' (x : G) :
+    Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)
+      = Subgroup.centralizer ({x} : Set G) := by
+  ext c
+  simp only [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hc y hy
+    rw [Set.mem_singleton_iff] at hy
+    exact hy ▸ hc x (Subgroup.mem_zpowers x)
+  · intro hc y hy
+    obtain ⟨k, rfl⟩ := Subgroup.mem_zpowers_iff.mp hy
+    exact ((show Commute x c from hc x rfl).zpow_left k).eq
+
+/-- **Theorem 14.7 neighbour `κ`-transfer** (BG L3983-3991), step 1b of the §16-independent
+pre-position: in the situation of `typeP_neighbor_embed`, every prime `q ∈ π(K*)` lies in
+`κ(M_i)`.
+
+Proof: take `X* = ⟨x'⟩ ∈ ℰ_q¹(K*)` (Cauchy).  Since `x ∈ X ⊆ M_{iσ}^#` centralizes `x'` (both
+lie in `Z = K × K*` with `[K, K*] = 1`) and `x' ∈ K*` is a `σ(M_i)'`-element (Theorem 13.9 makes
+`σ(M)` disjoint from `σ(M_i)`), Corollary 14.3 (`sigma_diagnostic`) applies to `(M_i, x, x')`.
+Its branch 2 would give `ℳ(C_G(x')) = {M_i}`, contradicting Prop 14.2(c)'s `ℳ(C_G(x')) = {M}`
+(`M ≠ M_i`); so branch 1 holds, giving `q ∈ π(⟨x'⟩) ⊆ κ(M_i)`.  (`sigma_diagnostic`'s `ℓ_σ`
+carrier `D` is supplied by a dummy `SigmaDecompositionData`; only the branch dichotomy and its
+`ℳ(C_G(x'))` clause are used, not `D.length`.) -/
+theorem typeP_neighbor_kappa [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {Mi : Subgroup G} (hMi : Mi ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∀ q ∈ (Nat.card ↥Kstar).primeFactors, q ∈ kappa Mi := by
+  classical
+  obtain ⟨hnc, hZMi, hXMiσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hMi
+  obtain ⟨_, _, _, _, _, hc⟩ := typeP_structure hG hM hP hKM hK hKstar hU
+  have hMiMax : Mi ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hMi).1
+  have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM hMiMax hnc
+  -- A dummy `ℓ_σ` carrier for `sigma_diagnostic`.
+  let D : SigmaDecompositionData G :=
+    { length := fun y => if y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty then 1 else 0
+      length_one_iff := by
+        intro y; by_cases h : y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty <;> simp [h] }
+  -- An element `x ∈ X^#` lands in `M_{iσ}^#`.
+  have hXne : X ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hX
+  haveI : Nontrivial ↥X := (Subgroup.nontrivial_iff_ne_bot X).mpr hXne
+  obtain ⟨xsub, hxsub⟩ := exists_ne (1 : ↥X)
+  have hxX : (xsub : G) ∈ X := xsub.2
+  have hxne : (xsub : G) ≠ 1 := fun h => hxsub (OneMemClass.coe_eq_one.mp h)
+  have hxK : (xsub : G) ∈ K := hXK hxX
+  have hxsharp : (xsub : G) ∈ sigmaSharp Mi := by
+    rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    exact ⟨hXMiσ hxX, hxne⟩
+  intro q hq
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  -- Cauchy: `x' ∈ K*` of order `q`.
+  obtain ⟨x'sub, hx'ord⟩ := exists_prime_orderOf_dvd_card' q
+    (Nat.dvd_of_mem_primeFactors hq : q ∣ Nat.card ↥Kstar)
+  have hx'Kstar : (x'sub : G) ∈ Kstar := x'sub.2
+  have hx'ord' : orderOf (x'sub : G) = q :=
+    (orderOf_injective Kstar.subtype Kstar.subtype_injective x'sub).trans hx'ord
+  have hx'ne : (x'sub : G) ≠ 1 := by
+    intro h; rw [h, orderOf_one] at hx'ord'
+    exact (Nat.prime_of_mem_primeFactors hq).ne_one hx'ord'.symm
+  have hX'card : Nat.card ↥(Subgroup.zpowers (x'sub : G)) = q := by rw [Nat.card_zpowers, hx'ord']
+  have hX'mem : Subgroup.zpowers (x'sub : G) ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hX'card, by rw [hX'card, pow_one]⟩
+  have hX'Kstar : Subgroup.zpowers (x'sub : G) ≤ Kstar := Subgroup.zpowers_le.mpr hx'Kstar
+  have hx'Mi : (x'sub : G) ∈ Mi := hZMi (Subgroup.mem_sup_right hx'Kstar)
+  have hx'CK : (x'sub : G) ∈ Subgroup.centralizer (K : Set G) := by
+    have h2 : (x'sub : G) ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) := by
+      rw [← hKstar]; exact hx'Kstar
+    exact (Subgroup.mem_inf.mp h2).2
+  have hxCx' : (x'sub : G) ∈ Subgroup.centralizer ({(xsub : G)} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro y hy; rw [Set.mem_singleton_iff.mp hy]
+    exact Subgroup.mem_centralizer_iff.mp hx'CK (xsub : G) hxK
+  have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr ⟨Fact.out,
+      (Nat.dvd_of_mem_primeFactors hq).trans (Subgroup.card_dvd_of_le
+        (by rw [hKstar]; exact inf_le_left : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M)),
+      Nat.card_pos.ne'⟩)
+  have hclos' : Subgroup.closure ({(x'sub : G)} : Set G) = Subgroup.zpowers (x'sub : G) :=
+    (Subgroup.zpowers_eq_closure (x'sub : G)).symm
+  have hcardclos : Nat.card ↥(Subgroup.closure ({(x'sub : G)} : Set G)) = q :=
+    (congrArg (fun S : Subgroup G => Nat.card ↥S) hclos').trans hX'card
+  have hx'sigma : ∀ r ∈ piSet (Subgroup.closure {(x'sub : G)}),
+      r ∉ OddOrder.BG.Ch3.S10.sigma Mi := by
+    intro r hr
+    simp only [piSet, hcardclos, Nat.Prime.primeFactors (Nat.prime_of_mem_primeFactors hq),
+      Finset.mem_singleton] at hr
+    rw [hr]; exact Set.disjoint_left.mp hσdisj hqσM
+  rcases sigma_diagnostic hG D hMiMax hxsharp hx'Mi hx'ne hxCx' hx'sigma with
+    ⟨hπκ, _⟩ | ⟨_, _, hℳ⟩
+  · refine hπκ q ?_
+    simp only [piSet, hcardclos, Nat.Prime.primeFactors (Nat.prime_of_mem_primeFactors hq)]
+    exact Finset.mem_singleton_self q
+  · exfalso
+    have hcX' := hc q (Nat.prime_of_mem_primeFactors hq) (Subgroup.zpowers (x'sub : G)) hX'mem
+      hX'Kstar
+    rw [centralizer_zpowers_eq_singleton'] at hcX'
+    rw [hcX'] at hℳ
+    exact hnc ((Set.singleton_eq_singleton_iff.mp hℳ) ▸ IsConjugateSubgroup.refl M)
+
 /-! ## Theorem 14.4 and Lemma 14.5: sigma-length one centralizers -/
 
 /-- **BG Theorem 14.4** (mmd L3869, D. Sibley for part (f)): if `x ∈ G^#` and `𝓜_σ(x)` is

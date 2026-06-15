@@ -4588,6 +4588,14 @@ contains `Z = K ⊔ K*`, and has `X ⊆ M_{iσ}`.  Uses Prop 14.2(b1)/(b2) + `σ
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_embed
 
+/-! **BG Theorem 14.7 neighbour `κ`-transfer** (`S14_TypePCounting`, `typeP_neighbor_kappa`), step 1b
+of the §16-independent pre-position: every prime `q ∈ π(K*)` lies in `κ(M_i)` for a neighbour
+`M_i ∈ ℳ(N_G(X))`.  Proof: Cauchy gives `⟨x'⟩ ∈ ℰ_q¹(K*)`; Cor 14.3 (`sigma_diagnostic`) on
+`(M_i, x, x')` must land in branch 1 (`π(⟨x'⟩) ⊆ κ(M_i)`) since branch 2 would give
+`ℳ(C_G(x')) = {M_i}`, contradicting Prop 14.2(c)'s `{M}` (`M ≠ M_i`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_kappa
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
