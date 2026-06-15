@@ -1230,6 +1230,162 @@ theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
     have h125 := Msigma_nilpotent_of_tau2 hG hM hpτ2 hA2 hAM
     exact ⟨h125.2.2.2.1, h125.1⟩
 
+/-- Helper for `Msigma_centralizer_E23_eq_bot_of_caseTau1`: a maximal-rank elementary abelian
+`p`-subgroup `A ≤ M` satisfying Lemma 14.1's hypotheses (`p ∈ π(M) ∖ (σ(M) ∪ κ(M))`) gives
+`C_{M_σ}(A) = 1` (Lemma 14.1); since `A ≤ U`, centralizer antitonicity lifts this to
+`C_{M_σ}(U) ≤ C_{M_σ}(A) = 1`. -/
+private theorem msigma_centralizer_eq_bot_of_elemAb_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {U A : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hpπ : p ∈ piSet M) (hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M) (hpκ : p ∉ kappa M)
+    (hA : A ∈ elemAbelianOfRank G p (pRank ↥M p)) (hAM : A ≤ M) (hAU : A ≤ U) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (U : Set G) = ⊥ := by
+  have hCA := (msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hA hAM).2.1
+  rw [eq_bot_iff, ← hCA]
+  exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAU))
+
+/-- Helper for `Msigma_centralizer_E23_eq_bot_of_caseTau1`, case `E₃ = ⊥`: for `q ∈ τ₂(M)` and a
+`q`-element `y' ∈ E₂#`, `Ω₁(E₂)` is a rank-two elementary abelian `q`-subgroup *of `E₂`* (not just
+`E`) containing `y'`.  Same as `exists_elemAb_rank_two_le_E_mem_of_tau2` but exposes the stronger
+containment `A ≤ E₂`, which the `U = E₂E₃ = E₂` reduction needs. -/
+private theorem exists_elemAb_rank_two_le_E2_mem_of_tau2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) {q : ℕ} [Fact q.Prime] (hq : q ∈ tau2 M)
+    {y' : G} (hy'E2 : y' ∈ E₂) (hy'q : y' ^ q = 1) (hy'1 : y' ≠ 1) :
+    ∃ A ∈ elemAbelianOfRank G q 2, A ≤ E₂ ∧ y' ∈ A := by
+  classical
+  have hE2comm : IsMulCommutative ↥E₂ := (nilpotent_sigmaComplement_abelian hG h).2.1.1
+  have hcomm : ∀ x ∈ E₂, ∀ y ∈ E₂, x * y = y * x := fun x hx y hy =>
+    congrArg Subtype.val (hE2comm.is_comm.comm ⟨x, hx⟩ ⟨y, hy⟩)
+  set A : Subgroup G := omega1OfAbelian G E₂ q hcomm with hAdef
+  have hAelem : A.IsElementaryAbelian q := omega1OfAbelian_isElementaryAbelian
+  have hAE2 : A ≤ E₂ := omega1OfAbelian_le
+  have hy'A : y' ∈ A := (mem_omega1OfAbelian).mpr ⟨hy'E2, hy'q⟩
+  -- `r_q(E₂) = 2`: two `q`-coprime index steps `E₂ ≤ E ≤ M`, then `r_q(M) = 2`.
+  have hpRankE2 : pRank ↥E₂ q = 2 := by
+    have hr1 : pRank ↥E₂ q = pRank ↥E q :=
+      pRank_eq_of_le_of_not_dvd_index h.E₂_le (fun hdvd =>
+        h.E₂_hall.index_no_pi q (Nat.mem_primeFactors.mpr
+          ⟨Fact.out, hdvd, Subgroup.index_ne_zero_of_finite⟩) hq)
+    have hr2 : pRank ↥E q = pRank ↥M q := by
+      refine pRank_eq_of_le_of_not_dvd_index h.E_le (fun hdvd => ?_)
+      have hqσ : q ∉ OddOrder.BG.Ch3.S10.sigma M := tau2_subset_sigma_compl M hq
+      have hidxeq : (E.subgroupOf M).index = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+        rw [h.isComplement'_subgroupOf.index_eq_card,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+      rw [hidxeq] at hdvd
+      exact hqσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q
+        (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩))
+    rw [hr1, hr2, tau2_pRank_eq_two hq]
+  -- `|A| = q²` from `q² ∣ |A|` (rank ≥ 2) and `log_q |A| ≤ r_q(E₂) = 2`.
+  have hAcard : Nat.card ↥A = q ^ 2 := by
+    have hdvd : q ^ 2 ∣ Nat.card ↥A :=
+      hAdef ▸ pow_dvd_card_omega1OfAbelian_of_pos_le_pRank (by norm_num) hpRankE2.ge
+    have hlog_le : Nat.log q (Nat.card ↥A) ≤ 2 := by
+      have hAsub : (A.subgroupOf E₂).IsElementaryAbelian q :=
+        IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAE2).symm hAelem
+      have hcardeq : Nat.card ↥(A.subgroupOf E₂) = Nat.card ↥A :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAE2).toEquiv
+      have hle := le_pRank (A.subgroupOf E₂) hAsub
+      rwa [hcardeq, hpRankE2] at hle
+    have hcardpow : Nat.card ↥A = q ^ Nat.log q (Nat.card ↥A) := by
+      rw [hAelem.log_card_eq_finrank, hAelem.card_eq_pow_finrank]
+    have h2le : 2 ≤ Nat.log q (Nat.card ↥A) := by
+      rw [hcardpow] at hdvd
+      exact (Nat.pow_dvd_pow_iff_le_right (Fact.out : q.Prime).one_lt).mp hdvd
+    rw [hcardpow]; congr 1; omega
+  exact ⟨A, ⟨hAelem, hAcard⟩, hAE2, hy'A⟩
+
+/-- **`C_{M_σ}(U) = 1`** for `U = E₂E₃` in case `τ₁` (BG Lemma 14.1 bridge).  `U` is a Hall
+`(κ(M) ∪ σ(M))'`-subgroup; picking any prime `p ∈ π(U)` and a maximal-rank elementary abelian
+`p`-subgroup `A ≤ U`, Lemma 14.1 (`msigma_structure_of_notMem_sigma_kappa`) gives `C_{M_σ}(A) = 1`,
+and `C_{M_σ}(U) ≤ C_{M_σ}(A)`.  (In case `τ₁`, `κ(M) ∩ τ₃(M) = ∅` ensures `π(U) ∩ κ(M) = ∅`.)
+This is the `C_{M_σ}(U) = 1` hypothesis Proposition 14.2(g) feeds to Theorem 3.10(a).
+
+Proof: since `U = E₂E₃ ≠ 1`, either `E₃ ≠ 1` or `E₂ ≠ 1`.  If `E₃ ≠ 1`, a prime `p ∣ |E₃|`
+lies in `τ₃(M)` (as `E₃` is Hall `τ₃(M)` of `E`) with `r_p(M) = 1`, and a cyclic `A = ⟨g⟩ ≤ E₃`
+of order `p` is rank-one elementary abelian; `p ∉ κ(M)` because `κ(M) ∩ τ₃(M) = ∅`.  If `E₃ = 1`
+then `U = E₂ ≠ 1`; a prime `q ∣ |E₂|` lies in `τ₂(M)` with `r_q(M) = 2`, and `A = Ω₁(E₂) ≤ E₂`
+is rank-two elementary abelian; `q ∉ κ(M) ⊆ τ₁(M) ∪ τ₃(M)` since `r_q(M) = 2 ≠ 1`.  Either way
+Lemma 14.1 (via `msigma_centralizer_eq_bot_of_elemAb_le`) closes the goal. -/
+theorem Msigma_centralizer_E23_eq_bot_of_caseTau1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty)
+    (hUne : (E₂ ⊔ E₃ : Subgroup G) ≠ ⊥) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) = ⊥ := by
+  classical
+  by_cases hE3 : E₃ = ⊥
+  · -- Case `E₃ = ⊥`: `U = E₂E₃ = E₂ ≠ ⊥`; pick `q ∈ τ₂(M)` and `A = Ω₁(E₂)` of rank two.
+    have hE2 : E₂ ≠ ⊥ := by
+      intro hb; exact hUne (by rw [hb, hE3, bot_sup_eq])
+    have hcard2 : Nat.card ↥E₂ ≠ 1 := fun hc => hE2 (Subgroup.card_eq_one.mp hc)
+    obtain ⟨q, hq, hqdvd⟩ := Nat.exists_prime_and_dvd hcard2
+    haveI : Fact q.Prime := ⟨hq⟩
+    obtain ⟨y', hy'⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₂) q hqdvd
+    have hy'E2 : (y' : G) ∈ E₂ := y'.2
+    have hy'ord : orderOf (y' : G) = q :=
+      (orderOf_injective E₂.subtype E₂.subtype_injective y').trans hy'
+    have hy'q : (y' : G) ^ q = 1 := by rw [← hy'ord]; exact pow_orderOf_eq_one _
+    have hy'1 : (y' : G) ≠ 1 := by
+      intro hc; rw [hc, orderOf_one] at hy'ord; exact hq.ne_one hy'ord.symm
+    -- `q ∈ τ₂(M)`: `q ∣ |E₂|`, and `E₂` is Hall `τ₂(M)` of `E`.
+    have hqE2 : q ∈ (Nat.card ↥E₂).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hq, hqdvd, Nat.card_pos.ne'⟩
+    have hqτ2 : q ∈ tau2 M := by
+      have hc2 : Nat.card ↥(E₂.subgroupOf E) = Nat.card ↥E₂ :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₂_le).toEquiv
+      exact h.E₂_hall.1 q (hc2 ▸ hqE2)
+    -- rank-two `A = Ω₁(E₂) ≤ E₂`.
+    obtain ⟨A, hAmem, hAE2, _⟩ :=
+      exists_elemAb_rank_two_le_E2_mem_of_tau2 hG h hqτ2 hy'E2 hy'q hy'1
+    have hAM : A ≤ M := hAE2.trans (h.E₂_le.trans h.E_le)
+    have hArank : A ∈ elemAbelianOfRank G q (pRank ↥M q) := by
+      rw [tau2_pRank_eq_two hqτ2]; exact hAmem
+    have hpπ : q ∈ piSet M :=
+      Nat.mem_primeFactors.mpr ⟨hq,
+        hqdvd.trans (Subgroup.card_dvd_of_le (h.E₂_le.trans h.E_le)), Nat.card_pos.ne'⟩
+    have hqσ : q ∉ OddOrder.BG.Ch3.S10.sigma M := tau2_subset_sigma_compl M hqτ2
+    -- `q ∉ κ(M) ⊆ τ₁(M) ∪ τ₃(M)`: `r_q(M) = 2`, but `τ₁, τ₃` have `r = 1`.
+    have hqκ : q ∉ kappa M := by
+      intro hqκ
+      have hr2 := tau2_pRank_eq_two hqτ2
+      rcases kappa_subset_tau1_union_tau3 hqκ with hτ1 | hτ3'
+      · have := tau1_pRank_eq_one hτ1; omega
+      · have := tau3_pRank_eq_one hτ3'; omega
+    have hAU : A ≤ (E₂ ⊔ E₃ : Subgroup G) := hAE2.trans le_sup_left
+    exact msigma_centralizer_eq_bot_of_elemAb_le hG h.mem_maximal hpπ hqσ hqκ hArank hAM hAU
+  · -- Case `E₃ ≠ ⊥`: pick `p ∈ τ₃(M)` and a cyclic rank-one `A = ⟨g⟩ ≤ E₃`.
+    have hcard3 : Nat.card ↥E₃ ≠ 1 := fun hc => hE3 (Subgroup.card_eq_one.mp hc)
+    obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard3
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥E₃) p hpdvd
+    have hgE3 : (g : G) ∈ E₃ := g.2
+    have hgord : orderOf (g : G) = p :=
+      (orderOf_injective E₃.subtype E₃.subtype_injective g).trans hg
+    have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by rw [Nat.card_zpowers]; exact hgord
+    have hAE3 : Subgroup.zpowers (g : G) ≤ E₃ := Subgroup.zpowers_le.mpr hgE3
+    have hAr1 : Subgroup.zpowers (g : G) ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
+    -- `p ∈ τ₃(M)`: `p ∣ |E₃|`, and `E₃` is Hall `τ₃(M)` of `E`.
+    have hpE3 : p ∈ (Nat.card ↥E₃).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
+    have hpτ3 : p ∈ tau3 M := by
+      have hc3 : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₃_le).toEquiv
+      exact h.E₃_hall.1 p (hc3 ▸ hpE3)
+    have hAM : Subgroup.zpowers (g : G) ≤ M := hAE3.trans (h.E₃_le.trans h.E_le)
+    have hArank : Subgroup.zpowers (g : G) ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+      rw [tau3_pRank_eq_one hpτ3]; exact hAr1
+    have hpπ : p ∈ piSet M :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpdvd.trans (Subgroup.card_dvd_of_le
+        (h.E₃_le.trans h.E_le)), Nat.card_pos.ne'⟩
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := tau3_subset_sigma_compl M hpτ3
+    -- `p ∉ κ(M)`: `κ(M) ∩ τ₃(M) = ∅` and `p ∈ τ₃(M)`.
+    have hpκ : p ∉ kappa M := fun hpκ => hτ3 ⟨p, hpκ, hpτ3⟩
+    have hAU : Subgroup.zpowers (g : G) ≤ (E₂ ⊔ E₃ : Subgroup G) := hAE3.trans le_sup_right
+    exact msigma_centralizer_eq_bot_of_elemAb_le hG h.mem_maximal hpπ hpσ hpκ hArank hAM hAU
+
 /-- **BG Proposition 14.2** (mmd L3778): structure of a type-`P` maximal subgroup
 ("nearly everything proved in §13" about `M ∈ 𝓜_𝓟`).
 
