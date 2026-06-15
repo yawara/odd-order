@@ -3029,3 +3029,19 @@ dispatch family の per-θ bundle (CaseBColBundle 残り 4 conjunct + CaseBIrrBu
 
 **⟹ CaseBColBundle 6 conjunct中 4 free** (hdeg/hmapagree/hχψ/hχbarψ; 全 `hW1` だけで)。**残り 2 = hSdiff#2** (`columnSum−a•η₁` H^#-support; a=degree整合で 1 消失要 — `columnSum(1)=∑μ(1)` と `a•η₁(1)=a·|W₁|` が一致する a) **+ htau1_mema** (`hyp.tau(columnSum−a•η₁)∈ZIrr`)。両者 dispatch の weight `a=constituentWeight` に結合 (degree-matching) ⟹ dispatch family 構築時に確定。
 **正本=本 session 43 cont.³。raw X⊥Y (4.1) 構築完了 (`60570744`)、column bundle 4/6 free。次=hSdiff#2/htau1_mema (weight-a coupled) or CaseBIrrBundle (irreducible 枝)。Opus 継続。**
+
+### session 43 cont.⁴: ✅✅✅ CaseBColBundle 6/6 conjunct すべて dischargeable (commit `fbcf8e44`) + degree-match の全ピース特定
+**残り 2 conjunct (hSdiff/htau1_mema) を degree-match `h1` 仮説付きで完成**:
+- `caseB_column_sub_smul_support` + `caseB_column_hSdiff` (**hSdiff**): `columnSum−a•η₁` H^#-support。columnSum=Ind^L_H (`columnSum_eq_induce_H`, h46.K=H) ⟹ `support_indW2_sub_smul_subset_sharpImage` を **W2:=H で再利用** (le_refl H)。`columnSum−conj` は columnDiff_support_subset。
+- `caseB_column_htau1_mema` (**htau1_mema**): `hyp.tau(columnSum−a•η₁)∈ZIrr` via `dadeIntegralCharacterMap_mem_ZIrr_of_supported` ((2.6) integrality) + `caseB_column_sub_smul_support` + `Submodule.sub_mem`(columnSum=∑μ.mem_ZIrr / η₁ irreducible mem_ZIrr)。
+
+**⟹ CaseBColBundle 6 conjunct すべて standalone 補題化** (hdeg/hmapagree/hχψ/hχbarψ + hSdiff/htau1_mema)。hSdiff/htau1_mema は **degree-match `h1: columnSum(1)=a·η₁(1)` を仮説に取る** (他は hW1/hHK だけ)。
+
+**🔑 degree-match の全ピース存在 (= weight reconciliation `aθ=θ(1)`)**:
+- `certainType_central_restriction` (S08CB2:2119): W₂⊆Z(H) central ⟹ `Res^H_{W₂}θ = θ(1)·φ` ([Is]2.27, Schur)。kernel 条件 = `0<constituentWeight` (φ が現れる)。
+- `inner_central_restrict_eq_apply_one` (S08CB2:2147): `⟨φ,Res θ⟩ = θ(1)`。
+- `constituentWeight_spec` (S08CB2:806): `⟨φ,Res θ⟩ = constituentWeight`。
+- ⟹ **`constituentWeight = θ(1)`**。degree match = `columnSum(1)=(Ind θ)(1)=|W₁|·θ(1)=constituentWeight·|W₁|=a·η₁(1)` (η₁(1)=|W₁| via Yset_apply_one, columnSum=Ind θ index |W₁|)。
+
+**▶▶ 次 (well-defined)**: (1) `caseB_column_degree_match` (`columnSum χ₂(1)=constituentWeight·η₁(1)` when columnSum=Ind θ; 上記 3 補題 chain + 中心条件) → (2) **`caseB_column_bundle` 完全 constructor** (CaseBColBundle を 6 conjunct から組立、degree-match 内製) → (3) CaseBIrrBundle (irreducible 枝) → (4) dispatch family `hcol`/`hirr` discharge (caseB_per_phi_anchored_fromYset の入力) → (5) X_irr chain-adjoin + cX_col union + capstone。
+**正本=本 session 43 cont.⁴。CaseBColBundle 6/6 dischargeable (`fbcf8e44`)、degree-match 全ピース特定 (constituentWeight=θ(1))。次=caseB_column_degree_match → 完全 bundle constructor。Opus 継続。**
