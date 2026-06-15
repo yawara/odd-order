@@ -497,7 +497,207 @@ noncomputable def centralizerGeneratedBySigma (M U : Subgroup G) : Subgroup G :=
   sSup {C : Subgroup G | ∃ x ∈ sigmaSharp M,
     C = U ⊓ Subgroup.centralizer ({x} : Set G)}
 
+/-! ### Lemma 15.1 helpers -/
+
+/-- **`K ≠ ⊥` for a Hall `κ(M)`-subgroup of `M` forces `IsTypeP M`** (`§14`-independent bridge).
+A nontrivial Hall `κ(M)`-subgroup has a prime divisor, which lies in `κ(M)`; hence `κ(M)` is
+nonempty, i.e. `M` is type `P`.  This converts the `K ≠ ⊥` case split of Lemma 15.1 into the
+`IsTypeP M` hypothesis that the §14 results (`typeP_duality`, `typeP_structure`) require. -/
+theorem isTypeP_of_isHall_kappa_subgroupOf_ne_bot [Finite G] {M K : Subgroup G}
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKne : K.subgroupOf M ≠ ⊥) :
+    S14.IsTypeP M := by
+  have hcard : Nat.card ↥(K.subgroupOf M) ≠ 1 := fun h => hKne (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard
+  exact ⟨p, hK.1 p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩)⟩
+
+/-- **Abstract second-derived containment** (`§14`-independent, reusable): if `N ⊴ H` and the
+derived subgroup of the quotient `H ⧸ N` is abelian, then `⁅H', H'⁆ ≤ N` (the second derived
+subgroup of `H`, as a subgroup of `H`, lies in `N`).  The quotient map `mk'` sends `⁅H', H'⁆`
+onto `(H/N)''`, which is trivial because `(H/N)'` is abelian; hence `⁅H', H'⁆ ≤ ker mk' = N`.
+This is the "(M/M_σ)' abelian ⟹ M'' ≤ M_σ" step of Lemma 15.1(a). -/
+theorem commutator_commutator_le_of_quotient_commutator_commutative {H : Type*} [Group H]
+    {N : Subgroup H} [hN : N.Normal] (hab : IsMulCommutative ↥(commutator (H ⧸ N))) :
+    ⁅commutator H, commutator H⁆ ≤ N := by
+  -- `(H/N)'' = ⁅(H/N)', (H/N)'⁆ = ⊥` since `(H/N)'` is abelian.
+  have hdd_bot : ⁅commutator (H ⧸ N), commutator (H ⧸ N)⁆ = ⊥ := by
+    rw [Subgroup.commutator_eq_bot_iff_le_centralizer]
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have := hab.is_comm.comm (⟨y, hy⟩ : ↥(commutator (H ⧸ N))) ⟨x, hx⟩
+    exact congrArg Subtype.val this
+  -- `(H/N)' = (H').map mk'` and `(H/N)'' = ⁅H', H'⁆.map mk'` (mk' surjective).
+  have hsurj : (QuotientGroup.mk' N).range = ⊤ :=
+    MonoidHom.range_eq_top.mpr (QuotientGroup.mk'_surjective N)
+  have hmap1 : (commutator H).map (QuotientGroup.mk' N) = commutator (H ⧸ N) := by
+    rw [map_commutator_eq, hsurj, _root_.commutator_def]
+  have hmap2 : (⁅commutator H, commutator H⁆).map (QuotientGroup.mk' N) =
+      ⁅commutator (H ⧸ N), commutator (H ⧸ N)⁆ := by
+    rw [Subgroup.map_commutator, hmap1]
+  rw [hdd_bot, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hmap2
+  exact hmap2
+
+/-- **`IsMulCommutative` of a commutator subgroup transports along a `MulEquiv`** (`§14`-
+independent, reusable): if `A ≃* B` and `A'` is abelian, then `B'` is abelian.  The equivalence
+maps `A'` onto `B'`, so `↥A' ≃* ↥B'`. -/
+theorem isMulCommutative_commutator_of_mulEquiv {A B : Type*} [Group A] [Group B] (e : A ≃* B)
+    (hA : IsMulCommutative ↥(commutator A)) : IsMulCommutative ↥(commutator B) := by
+  have hmap : (commutator A).map (e : A →* B) = commutator B := by
+    rw [map_commutator_eq, MonoidHom.range_eq_top.mpr e.surjective, _root_.commutator_def]
+  exact OddOrder.BG.Ch3.S11.isMulCommutative_of_mulEquiv
+    ((MulEquiv.subgroupMap e (commutator A)).trans (MulEquiv.subgroupCongr hmap)) hA
+
+/-- **Lemma 15.1(a), the `M'' ≤ M_σ` conjunct** (`§14`-independent): the second derived subgroup
+of a maximal subgroup `M` is contained in `M_σ`.  Equivalently `(M/M_σ)'` is abelian; this is
+Corollary 12.10(b) (`E' = (M/M_σ)'` abelian via the complement `M = M_σ ⋊ E`).  Proof: pick a
+`SubgroupESetup` complement `E`, get `IsMulCommutative (derivedInG E)` from Cor 12.10(b), transport
+it to `(↥M ⧸ N)'` abelian along `↥M ⧸ N ≃* E` (`IsComplement'.QuotientMulEquiv`), then apply the
+abstract `commutator_commutator_le_of_quotient_commutator_commutative` and push to the ambient. -/
+theorem derivedDerived_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    derivedInG (derivedInG M) ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  -- §12 complement setup and `(M/M_σ)' = E'` abelian (Cor 12.10(b)).
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
+  obtain ⟨_, ⟨_, hE'ab⟩, _⟩ := OddOrder.BG.Ch3.S12.nilpotent_sigmaComplement_abelian hG hsetup
+  set N : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hNdef
+  haveI hNnorm : N.Normal := by rw [hNdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  -- `derivedInG E ≅ commutator ↥E`, so `commutator ↥E` is abelian.
+  have hcommE_ab : IsMulCommutative ↥(commutator ↥E) := by
+    have e : ↥(commutator ↥E) ≃* ↥(derivedInG E) :=
+      Subgroup.equivMapOfInjective (commutator ↥E) E.subtype E.subtype_injective
+    exact OddOrder.BG.Ch3.S11.isMulCommutative_of_mulEquiv e.symm hE'ab
+  -- transport `commutator ↥E` abelian to `commutator (↥M ⧸ N)` abelian via the complement iso.
+  have hquot_ab : IsMulCommutative ↥(commutator (↥M ⧸ N)) := by
+    have hcompl : (E.subgroupOf M).IsComplement' N := hsetup.isComplement'_subgroupOf.symm
+    have e1 : (↥M ⧸ N) ≃* ↥(E.subgroupOf M) := hcompl.QuotientMulEquiv
+    have e2 : ↥(E.subgroupOf M) ≃* ↥E := Subgroup.subgroupOfEquivOfLe hsetup.E_le
+    exact isMulCommutative_commutator_of_mulEquiv (e1.trans e2).symm hcommE_ab
+  -- abstract lemma: `⁅commutator ↥M, commutator ↥M⁆ ≤ N`, then push to the ambient.
+  have hle : ⁅commutator ↥M, commutator ↥M⁆ ≤ N :=
+    commutator_commutator_le_of_quotient_commutator_commutative hquot_ab
+  -- `derivedInG (derivedInG M) = ⁅commutator ↥M, commutator ↥M⁆.map M.subtype`.
+  have hderiv_eq : derivedInG (derivedInG M) =
+      (⁅commutator ↥M, commutator ↥M⁆).map M.subtype := by
+    rw [show derivedInG (derivedInG M) = ⁅derivedInG M, derivedInG M⁆ from
+        Subgroup.map_subtype_commutator (derivedInG M),
+      derivedInG, Subgroup.map_commutator]
+  rw [hderiv_eq]
+  calc (⁅commutator ↥M, commutator ↥M⁆).map M.subtype
+      ≤ N.map M.subtype := Subgroup.map_mono hle
+    _ = OddOrder.BG.Ch3.S10.Msigma M := by
+        rw [hNdef, Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le M)]
+
+/-- **`K = ⊥` forces `κ(M) = ∅`** (`§14`-independent): if the Hall `κ(M)`-subgroup `K ≤ M` of `M`
+is trivial, then `M` has no `κ(M)`-prime, so `κ(M) = ∅`, i.e. `M` is type `F`.  (A `κ(M)`-prime
+would divide `|M|` — `κ(M) ⊆ π(M)` — and the Hall `κ(M)`-subgroup would be nontrivial.) -/
+theorem isTypeF_of_isHall_kappa_eq_bot [Finite G] {M K : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥) :
+    S14.IsTypeF M := by
+  by_contra hF
+  -- `¬ IsTypeF M` means `κ(M) ≠ ∅`, so there is a `κ(M)`-prime `p`.
+  rw [S14.IsTypeF, ← ne_eq, ← Set.nonempty_iff_ne_empty] at hF
+  obtain ⟨p, hp⟩ := hF
+  -- `p ∈ κ(M)`, so `p` is prime with a line `P ∈ ℰ_p¹(G)`, `P ≤ M`, `M_σ ⊓ C_G(P) ≠ 1`.
+  have hpp : p.Prime := hp.1
+  obtain ⟨_, P, hP, hPM, _⟩ := hp.2
+  haveI : Fact p.Prime := ⟨hpp⟩
+  -- `p ∣ |P|` (since `|P| = p`) and `P ≤ M`, so `p ∣ |M|`.
+  have hpdvdP : p ∣ Nat.card ↥P := by
+    obtain ⟨_, hPcard⟩ := hP
+    rw [hPcard, pow_one]
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvdP.trans (Subgroup.card_dvd_of_le hPM), Nat.card_pos.ne'⟩
+  -- `p ∤ [M : K.subgroupOf M]` (Hall), so `p ∣ |K.subgroupOf M|`, contradicting `K = ⊥`.
+  have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hdvd =>
+    hK.2 p (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hp
+  have hpKcard : p ∣ Nat.card ↥(K.subgroupOf M) := by
+    have hsplit : Nat.card ↥(K.subgroupOf M) * (K.subgroupOf M).index = Nat.card ↥M :=
+      Subgroup.card_mul_index _
+    rcases (Nat.Prime.dvd_mul hpp).mp (hsplit ▸ (Nat.dvd_of_mem_primeFactors hpM)) with h | h
+    · exact h
+    · exact absurd h hpidx
+  rw [hKbot, Subgroup.bot_subgroupOf, Subgroup.card_bot] at hpKcard
+  exact (Nat.Prime.one_lt hpp).ne' (Nat.dvd_one.mp hpKcard)
+
+/-- **`K = ⊥ → U` is a `σ(M)'`-complement and `M = U ⊔ M_σ`** (`§14`-independent Hall complement).
+When `κ(M) = ∅` (i.e. `K = ⊥`), `(κ(M) ∪ σ(M))' = σ(M)'`, so `U ≤ M` is a `σ(M)'`-Hall subgroup of
+`M`; it must coincide with the §12 complement `E` (both `σ(M)'`-Hall in `M`, with `U ≤ E`), and
+`M_σ ⊔ E = M`.  Returns the `SubgroupESetup` exhibiting `U` as the complement (`E = U`), which
+also feeds the type-`F` half of Lemma 15.1(d)(e) (Theorem 12.12 with `E := U`). -/
+theorem subgroupESetup_of_isHall_kappa_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∃ E₁ E₂ E₃ : Subgroup G, OddOrder.BG.Ch3.S12.SubgroupESetup M U E₁ E₂ E₃ := by
+  classical
+  set σ := OddOrder.BG.Ch3.S10.sigma M with hσ
+  have hF : S14.IsTypeF M := isTypeF_of_isHall_kappa_eq_bot hKM hK hKbot
+  have hκ : S14.kappa M = ∅ := hF
+  -- `U` is a `σ'`-Hall subgroup of `M`.
+  have hUσ' : Ch03.IsHallSubgroup (σᶜ) (U.subgroupOf M) := by
+    have heq : (S14.kappa M ∪ σ)ᶜ = σᶜ := by rw [hκ, Set.empty_union]
+    rwa [heq] at hU
+  have hU_pi : Subgroup.IsPiSubgroup (σᶜ) U := by
+    intro p hp
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at hp
+    exact hUσ'.1 p hp
+  -- §12 complement `E ⊇ U`, `σ'`-Hall.
+  obtain ⟨E, E₁, E₂, E₃, hsetup, hUE, hE_pi⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hUM hU_pi
+  -- `U = E`:  `E` is a `σ'`-group, `U` is `σ'`-Hall, and `U ≤ E`, so `|E| ∣ |U|` and `|U| ∣ |E|`.
+  have hUEeq : U = E := by
+    have hEpi : Ch03.Subgroup.IsPiGroup (σᶜ) (E.subgroupOf M) := by
+      intro q hq
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv] at hq
+      exact hE_pi q hq
+    have hEdvdU : Nat.card ↥E ∣ Nat.card ↥U := by
+      have hd := hUσ'.card_dvd_of_isPiGroup hEpi
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at hd
+    exact Subgroup.eq_of_le_of_card_ge hUE
+      (Nat.dvd_antisymm hEdvdU (Subgroup.card_dvd_of_le hUE)).le
+  -- transport the `SubgroupESetup` from `E` to `U`.
+  exact ⟨E₁, E₂, E₃, hUEeq ▸ hsetup⟩
+
 /-! ## Lemma 15.1: the `U M_sigma` auxiliary structure -/
+
+/-- **Forward lemma: the `§14`-gated structural content of BG Lemma 15.1** (faithful to mmd L4116,
+proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`sorry` §14 results
+(Proposition 14.2(a)'s normal complement `M = K U M_σ`, Theorem 14.7(d)(h)) and Theorem 12.12:
+
+* `K ≠ ⊥ → M' = U M_σ ∧ U` abelian (mmd 15.1(b), Theorem 14.7(h) + Corollary 12.10(b));
+* mmd 15.1(c): the `C_{M_σ}(X) ≠ 1` ⟹ `𝓜(C_G(X)) = {M}`, `X` cyclic `τ₂` funnel (Corollary 14.3 +
+  Theorem 12.5(d) + Corollary 12.10(b));
+* mmd 15.1(d): `⟨C_U(x) | x ∈ M_σ#⟩` abelian (Theorem 12.12(a) for `K = 1`; `U` abelian for
+  `K ≠ 1`);
+* mmd 15.1(e): the Frobenius subgroup `U₀ M_σ` (Theorem 12.12(b) for `K = 1`; the componentwise
+  construction for `K ≠ 1`).
+
+These are isolated here so that `typeP_auxiliary_structure` discharges conjuncts 3 (`M_σ ≤ M'`) and
+4 (`M'' ≤ M_σ`) with no `sorry` of its own, citing this lemma only for the §14-gated parts.  Once
+§14 (Prop 14.2(a), Thm 14.7(h)) and the Theorem 12.12 `K ≠ 1` Frobenius construction land, this
+forward lemma is the single discharge point. -/
+theorem typeP_auxiliary_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M)) :
+    (K ≠ ⊥ → derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧ IsMulCommutative ↥U) ∧
+      (∀ X : Subgroup G, X ≤ U → X ≠ ⊥ →
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ →
+          maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+            IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M)) ∧
+      IsMulCommutative ↥(centralizerGeneratedBySigma M U) ∧
+      (U ≠ ⊥ → ∃ U0 : Subgroup G,
+        U0 ≤ U ∧ Monoid.exponent U0 = Monoid.exponent U ∧
+          OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+            ↥(U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+            ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
+              (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))
+            (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) := by
+  sorry
 
 /-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
 **arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
@@ -512,9 +712,34 @@ complement `IsComplement' (M'.subgroupOf M) (K.subgroupOf M)` together with the 
 coprimality — both are mmd 15.1(a)+(b) (`M = KUM_σ`, `K ≠ 1 → M' = UM_σ`, with `|K|` a
 `κ(M)`-number and `|M'|` a `κ(M)'`-number).  This supplies exactly the hypotheses of
 `Msigma_inf_centralizer_le_derivedDerived_of_isComplement'` (the §14-independent `K* ⊆ M''`
-engine), so Corollary 15.6's `K* ⊆ M''` clause becomes a single citation once §14 lands. -/
+engine), so Corollary 15.6's `K* ⊆ M''` clause becomes a single citation once §14 lands.
+
+Faithfulness fix (Lane G 2026-06-15): added `hKM : K ≤ M` and `hUM : U ≤ M`.  In BG, `K` and
+`U` are *subgroups of* `M` (Hall `κ(M)`- and `(κ∪σ)'`-subgroups of `M`); without these the
+`κ`/`σ`-prime bookkeeping degenerates (e.g. `K ⊓ M = 1` with `K ≠ 1` makes `K ≠ ⊥ → …` false).
+The sole caller (`fitting_decomposition`) constructs `K = K'.map M.subtype`, `U = U'.map M.subtype`,
+so both containments hold there.
+
+Proof status (Lane G 2026-06-15):
+* **Conjunct 3** (`M_σ ≤ M'`, Thm 10.2(c)) and **conjunct 4** (`M'' ≤ M_σ` via
+  `derivedDerived_le_Msigma`, Cor 12.10(b)) are **sorry-free** (`#print axioms
+  derivedDerived_le_Msigma` = `[propext, Classical.choice, Quot.sound]`), citing no `sorry`.
+* **Conjunct 1** (`U M_σ ⊴ M`): the `K = ⊥` branch is sorry-free
+  (`subgroupESetup_of_isHall_kappa_eq_bot` ⟹ `U M_σ = M`); the `K ≠ ⊥` branch reduces to
+  `M' = U M_σ` (forward lemma).
+* **Conjunct 2** (`K` cyclic): `K = ⊥` sorry-free; `K ≠ ⊥` cites the (sorried) §14 `typeP_duality`
+  (Thm 14.7(d)), with `IsTypeP M` derived from `K ≠ ⊥` (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`).
+* **Conjunct 5** (`K ≠ ⊥` package): `IsComplement'` + coprimality cite the (sorried) §14
+  `typeP_duality` (Thm 14.7(h)); `M' = U M_σ` and `U` abelian come from the forward lemma.
+* **Conjuncts 6** (Cor 14.3 funnel — the `X` cyclic-`τ₂` step needs `X` abelian, which routes
+  through Hall-`τ₂`-conjugacy for `K = ⊥`), **7**, and **8** are gated on the still-`sorry` §14
+  results (Prop 14.2(a) normal complement, Thm 14.7) and Theorem 12.12.
+
+All of the `§14`-structural content is isolated in the single faithful forward lemma
+`typeP_auxiliary_structure_gated`; this theorem itself introduces no `sorry` of its own. -/
 theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -540,7 +765,50 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
             ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
               (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))
             (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) := by
-  sorry
+  classical
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσ
+  -- The §14-gated structural facts (forward lemma).
+  obtain ⟨hM'gated, hX, hCab, hFrob⟩ :=
+    typeP_auxiliary_structure_gated hG hM hKM hUM hK hU
+  -- **Conjunct 5** (`K ≠ ⊥` package): `M' = U M_σ`, `U` abelian (forward), plus the complement /
+  -- coprimality from Theorem 14.7(h) (`typeP_duality`, with `IsTypeP` from `K ≠ ⊥`).
+  have hconj5 : K ≠ ⊥ → derivedInG M = U ⊔ Mσ ∧ IsMulCommutative ↥U ∧
+      Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧
+      Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) := by
+    intro hKne
+    obtain ⟨hM'eq, hUab⟩ := hM'gated hKne
+    -- `IsTypeP M` from `K ≠ ⊥` (`K ≤ M` makes `K.subgroupOf M ≠ ⊥`).
+    have hKofne : K.subgroupOf M ≠ ⊥ := by
+      rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      exact fun hd => hKne (hd.eq_bot_of_le hKM)
+    have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
+    obtain ⟨hcompl, hcop, _⟩ := typeP_duality hG hM hP hK hKstar
+    exact ⟨hM'eq, hUab, hcompl, hcop⟩
+  -- **Conjunct 2** (`K` cyclic).
+  have hconj2 : IsCyclic ↥K := by
+    by_cases hKne : K = ⊥
+    · rw [hKne]; infer_instance
+    · have hKofne : K.subgroupOf M ≠ ⊥ := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hd => hKne (hd.eq_bot_of_le hKM)
+      have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
+      obtain ⟨_, _, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hK hKstar
+      haveI := hcyc
+      exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  -- **Conjunct 1** (`M ≤ N_G(U M_σ)`): `U M_σ = M` (`K = ⊥`) or `= M'` (`K ≠ ⊥`), both normal.
+  have hconj1 : M ≤ Subgroup.normalizer ((U ⊔ Mσ : Subgroup G) : Set G) := by
+    by_cases hKne : K = ⊥
+    · -- `K = ⊥ → U M_σ = M`, so `N_G(U M_σ) = N_G(M) ⊇ M`.
+      obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
+        subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKne hU
+      have hUMσ : U ⊔ Mσ = M := by rw [sup_comm]; exact hsetup.E_compl_sup
+      rw [hUMσ]; exact Subgroup.le_normalizer
+    · -- `K ≠ ⊥ → U M_σ = M'`, and `M ≤ N_G(M')` (`M' ⊴ M`).
+      obtain ⟨hM'eq, _, _, _⟩ := hconj5 hKne
+      rw [← hM'eq]
+      exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M
+  exact ⟨hconj1, hconj2, OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM,
+    derivedDerived_le_Msigma hG hM, hconj5, hX, hCab, hFrob⟩
 
 /-! ## Theorem 15.2: `M_F != M_sigma` forces type `P1` -/
 
@@ -1252,7 +1520,8 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hUof]; exact hU'
   -- Lemma 15.1 conclusion (with `Kstar := M_σ ⊓ C_M(K)`).
   obtain ⟨_, _, _, hMddσ, hKguard, _, _, _⟩ :=
-    typeP_auxiliary_structure hG hM hKHall rfl hUHall
+    typeP_auxiliary_structure hG hM (hK ▸ Subgroup.map_subtype_le K')
+      (hU ▸ Subgroup.map_subtype_le U') hKHall rfl hUHall
   -- Conjunct 4 / 10 helper: `M'' ≤ M_σ` (Lemma 15.1, unconditional).
   have hMdd_Mσ : derivedInG (derivedInG M) ≤ Mσ := hMddσ
   -- ## Case split on whether `M_σ` is nilpotent (`M_F = M_σ`).
