@@ -4579,6 +4579,15 @@ unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S13.smul_centralizer_subgroup
 
+/-! **BG Corollary 14.3** (`S14_TypePCounting`, `sigma_diagnostic`): for `x ∈ M_σ^#` and a
+nonidentity `σ(M)'`-element `x'` of `C_M(x)`, either `π(⟨x'⟩) ⊆ κ(M)` with `C_G(x) ⊆ M`, or
+`π(⟨x'⟩) ⊆ τ₂(M)` with `ℓ_σ(x') = 1` and `𝓜(C_G(x')) = {M}`.  Branch 1 uses Prop 14.2(b1)/(c)
++ Lemma 14.1(b); branch 2's `ℓ_σ = 1` uses Lemma 12.11(a) + the general Corollary 12.16(a)
+(`sigma_subgroup_conj_into_Msigma_general`, discharging its `σ`-disjointness gate with Theorem
+13.9) + `M_σ` conjugation-equivariance.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_diagnostic
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
