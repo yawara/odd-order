@@ -3295,3 +3295,12 @@ cont.¹⁹-²³ で case-B X-fold の orthogonality 層を完成 (5 commits): co
 4. **glue** (`coherentXunionYset_caseB_of_glued` 既存) → X∪Y coherence。
 5. **(6.8.3) L4** (X∪Y→S) = case-A `false_of_coherentXunionYset_of_not_coherentS` (CB2:3439) の case-B 適応 (Z=W₂、算術 |H:W₂|≥(2|W₁|+1)²、case-B S-facts)。~100 LOC。
 **▶ 次: hstep core に着手** (case-A member-family 機構を読んで mixed prefix 適応; (6.6) bound は Z-generic で流用)。**正本=本 cont.²³。orthogonality 層完成 (8 commits)。次=hstep core (heavy)。Opus 継続。**
+
+### session 43 cont.²⁴: ✅ hpair (X⊥Y) — glue input 完成 (commit `a528906c`); 10 commits 累積
+cont.¹⁹-²⁴ で S-level cover (`caseB_S_member_column_or_irreducible`) + X⊥Y (`caseB_Xset_orthogonal_Yset`, glue の hpair) を追加。**session 43 計 10 Lean commits** (dispatch trio + per-step adjoin + cover ×2 + orthogonality ×4 + S-cover + hpair)。
+**glue shell `coherentXunionYset_caseB_of_glued` の入力状況**: hpair ✅ / cY ✅ (coherentYset) / D=per-φ images ✅ (構成可) / **cX ❌ (heavy)** / ν・hagreeX・hmixed (cX 依存) ❌ / hgen (cX 非依存だが intricate span 包含) ❌。
+**🔴 capstone closure は heavy core 待ち** (loop-cadence では不可、focused build 要):
+1. **cX** = `IsCoherent (Xset W2)`: hstep (mixed-prefix member-family、case-A `exists_pairUnion_memberFamily_of_irreducible_X` は全既約前提で流用不可、新規 ~200LOC) + column base ν-union (engine 無、ν 構築要) + xChainCoherent。
+2. **(6.8.3) L4** (X∪Y→S): case-A `false_of_coherentXunionYset_of_not_coherentS` (CB2:3439) の case-B 適応 (Z=W₂、算術 |H:W₂|≥(2|W₁|+1)²、case-B (5.6) bound + S-facts)。~100LOC。最も decomposable か。
+3. **hgen** (X∪Y span 包含、cX 非依存): intricate だが loop で挑戦可。
+**▶ 次**: heavy pieces の decomposability を精査し最も committable な sub-piece を選ぶ (L4 arithmetic core or hgen)。**正本=本 cont.²⁴。prerequisite 層 10 commits 完成、capstone は heavy core (cX/L4) 待ち。Opus 継続。**
