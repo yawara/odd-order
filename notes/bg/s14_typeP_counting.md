@@ -485,3 +485,28 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
 
 **⟹ Prop 14.2 残 = case-τ₁ のみ (F の issue-7000 ∃→∀ upgrade leaf 着地待ち・gated)。**
 **case-τ₃ + faithfulness fix 群で本セッション §14 funnel 入口をほぼ攻略。full build green 3817 jobs。**
+
+### 🟢 case-τ₁ を H が巻き取り — 確認済み machinery + 実行プラン (2026-06-15 ユーザー指令)
+**F が機能停止 ⟹ ユーザー指令で case-τ₁ (旧 issue-7000 support 含む) を H が S14 内で自前実装** (両 LAUNCH 修正済)。
+**全 machinery が repo に存在確認済 (新規 theory 不要、case-τ₃ パターンの再利用)**:
+- `SubgroupESetup.conj'`(S13_PrimeAction:811): `(h)(hc:c∈M) ⟹ SubgroupESetup M (conj c•E)(conj c•E₁)…`。
+  c∈E で WLOG (conj c•E=E は `conj_smul_eq_self_of_mem_normalizer`+`le_normalizer`)。
+- `E1_actsPrime`(S13_PrimeAction:424)=Thm 13.5: `(hG)(h)(hE1ne) ⟹ ActsPrimeOn (Msigma M) E₁`。
+- `exists_conj_smul_le_hallPiece`(S12_Lemma1211:267): π-subgroup を Hall piece へ M-共役 (witness を E₁ へ)。
+- `Ch1.S06.exists_conj_eq_of_isHall_subgroupOf`(S12_Lemma1211:287 使用): Hall 共役 **equality** (K=conj e₀•E₁ 用)。
+- `Msigma_inf_centralizer_conj_ne_bot`(S14:150, 既 landing): witness の C_{Mσ}≠1 を共役で転送。
+- conj-commute: `centralizer_conj_smul`(S12_ExceptionalBridge:273) + `conj_smul_eq_self_of_mem_normalizer` +
+  `Subgroup.smul_inf` ⟹ `M_σ⊓C(conj m•S)=conj m•(M_σ⊓C(S))` (ActsPrimeOn 共役不変性に要、必要なら)。
+
+**実行プラン (methodical, 次フラグメント〜)**:
+1. **κ=τ₁**: κ⊆τ₁ (case hyp ¬(κ∩τ₃) + kappa_subset_tau1_union_tau3)。τ₁⊆κ: κ nonempty の witness P を
+   exists_conj_smul_le_hallPiece で E₁ へ共役 → Msigma_inf_centralizer_conj_ne_bot で C_{Mσ}(E₁)≠1
+   (E₁ non-regular) → 各 p∈τ₁ に prime 作用 (E1_actsPrime) で C_{Mσ}(P)=C_{Mσ}(E₁)≠1 ⟹ p∈κ。
+   (case-τ₃ の E3_not_regular_of_mem_kappa_tau3 + step2 のミラー。)
+2. **WLOG K=E₁**: K Hall τ₁ of E (κ=τ₁) + E₁ Hall τ₁ of E ⟹ ∃e₀∈E, conj e₀•E₁=K
+   (exists_conj_eq_of_isHall) → `hsetup.conj' (e₀∈M)` で新 setup (新 E₁=K, E は conj e₀•E=E に rw)。
+3. **conjuncts** (新 setup で): (a) ActsPrimeOn K=E1_actsPrime + regular on U=E₂E₃ (Lem 13.12+13.7) /
+   (K*≠1)=C_{Mσ}(E₁)≠1 (step1) / (b1) case-τ₃ (b1) のミラー / (d) case-τ₃ (d) のミラー /
+   **(g) ⚠ case-τ₁ では vacuous でない** (κ=τ₁⊊σ'∩π(M) があり得る ⟹ M が P2 可能) ⟹
+   **実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI) を Thm 3.10(a)/Lem 12.19/12.17 で証明要 = hard core**。
+**⟹ case-τ₁ は ~150 行・(g) が hard core。κ=τ₁ から methodical に。case-τ₃ helper を最大限再利用。**
