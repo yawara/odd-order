@@ -34,6 +34,16 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+/-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
+an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
+read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
+theorem charPsiDecomp_eqRec_tau1
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ χ' ψ : ClassFunction ↥L ℂ} (h : χ = χ')
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) :
+    (h ▸ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ' ψ).tau1 = D.tau1 := by
+  cases h; rfl
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
@@ -100,19 +110,40 @@ noncomputable def caseB_constituentDecomposition
   by_cases hcase : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
   · -- column branch: the witness `χ₂` is extracted by choice (the goal is `Type`-valued, so a
-    -- direct `obtain` on the `Prop`-`∃` would be an illegal large elimination)
+    -- direct `obtain` on the `Prop`-`∃` would be an illegal large elimination).  The decomposition
+    -- bundle is consumed by `.1`/`.2.…` projections (not `obtain`/`And.casesOn`) so that the `tau1`
+    -- field reduces through `caseB_constituentDecomposition_tau1`; the index is cast by `heq ▸`.
     have hχ₂ne := hcase.choose_spec.1
     have heq := hcase.choose_spec.2
-    obtain ⟨hdeg, hmapagree, hSdiff, htau1, hχψ, hχbarψ⟩ := hcol _ hχ₂ne heq
-    rw [← heq]
-    exact columnDecompositionTau hyp h46 hχ₂ne hdeg hmapagree hSdiff htau1 hχψ hχbarψ
+    have hb := hcol _ hχ₂ne heq
+    exact heq ▸ columnDecompositionTau hyp h46 hχ₂ne hb.1 hb.2.1 hb.2.2.1 hb.2.2.2.1
+      hb.2.2.2.2.1 hb.2.2.2.2.2
   · -- irreducible branch: no nontrivial column equals `Ind^L_H θ`
     have hnc : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
         OddOrder.Peterfalvi.S06.columnSum h46 χ₂
           ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
       fun χ₂ hne heq2 => hcase ⟨χ₂, hne, heq2⟩
-    obtain ⟨hirr', hreal, hdiffsupp, hdiffasupp, htau1, hχaχ1, hχbaraχ1, hχχbar'⟩ := hirr hnc
-    exact irreducibleDecompositionTau hyp θ hirr' hreal hdiffsupp hdiffasupp htau1
-      hχaχ1 hχbaraχ1 hχχbar'
+    have hb := hirr hnc
+    exact irreducibleDecompositionTau hyp θ hb.1 hb.2.1 hb.2.2.1 hb.2.2.2.1 hb.2.2.2.2.1
+      hb.2.2.2.2.2.1 hb.2.2.2.2.2.2.1 hb.2.2.2.2.2.2.2
+
+/-- The `tau1` field of `caseB_constituentDecomposition` is `hyp.tau`, in both dispatch branches
+(`columnDecompositionTau`/`irreducibleDecompositionTau` both build via `ofProjection … hyp.tau …`,
+and `hyp.tau = dadeIntegralCharacterMap hyp.dade …`).  This is the `htau1` input of
+`per_phi_anchored_image` for the mixed per-`φ` family. -/
+theorem caseB_constituentDecomposition_tau1
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ} (θ : IrreducibleCharacter ↥H)
+    {hcol _hirr} :
+    (caseB_constituentDecomposition (a := a) (η₁ := η₁) hyp h46 θ hcol _hirr).tau1 = hyp.tau := by
+  unfold caseB_constituentDecomposition
+  split
+  · rw [charPsiDecomp_eqRec_tau1]; rfl
+  · rfl
 
 end OddOrder.Peterfalvi.S08
