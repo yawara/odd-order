@@ -106,11 +106,18 @@ g∈R# は K に FPF (Frobenius) ⟹ K̂ (指標) に FPF ⟹ 非自明指標を
 (`S12_Lemma128d:579`「K:=E₂E₃ is abelian」; E₂ abelian=12.8a, E₃ cyclic)。⟹ terminal を直接適用可、
 一般 nonabelian-K reduction (BG Case 2 前半の K₀ 二分律帰納) は **FT 経路では skip**。
 
-**残 (terminal 完成済 → 直接配線)**:
-- [ ] **outer/module化** (帰納なし): M_σ nilpotent → minimal E-normal M₀ (elem ab r-group, irreducible)
-      → hyps を M₀ に制限 → ZMod r module (`OperatorMaschke`) → base change F̄
-      (`BaseChange`: finrank invariants 不変・C_V(K)=0 不変) → `prime_card_of_abelian_frobenius_weight`
-      適用。具体 conjugation wrapper (`isNilpotent_of_normalizing_primeOrder_fixedPointFree` パターン)。
+**残 (terminal 完成済 → 直接配線)** — outer を O1/O2 に分割:
+- [ ] **O1 base-change bridge** `prime_card_of_elemAbelian_mulDistrib` (`S03g_Thm310Module.lean`,
+      statement 確定・**proof subagent 進行中**): elem abelian M + `MulDistribMulAction H M` →
+      `ofDistribMulAction (ZMod p)` → base change F̄=`AlgebraicClosure (ZMod p)`
+      (`finrank_invariants_baseChangeRepresentation` / `invariants_baseChangeRepresentation_eq_bot`)
+      → terminal。
+- [ ] **O2 concrete** (group theory, 自分で): M_σ nilpotent → **minimal normal M₀** (M⊔E 内, ≤M_σ;
+      `exists_isMinimalNormal_le_of_normal` + `solvable_minimal_normal_isElementaryAbelian` で elem ab) →
+      E が M₀ に共役作用 (`conjActionOfNormalizes A N (hAN:A≤N(N))` = MulDistribMulAction ↥A ↥N) →
+      条件 (C_M(U)=1 / ActsPrimeOn / Frobenius / coprime) を M₀ に制限 → O1 適用 ⟹ |E₁| 素数。
+      **infra 全確認済**。最終 concrete 定理 = `prime_card_complement_of_frobenius_actsPrime`
+      (E Frobenius kernel U abelian, complement R=E₁, conj on nilpotent M, C_M(U)=1, ActsPrimeOn M R)。
 - [ ] **§12/§14 bridge** (rep-theory と独立、§14 lane 領域): Lem 14.1 Frobenius 形 (C_{M_σ}(U)=1 +
       M_σ nilp) / Lem 12.17 TI 形 (M_σ∩M_σ^g β'-group ⟹ TI) / σ=β (Lem 12.19 ✅既存) / IsTypeP2⟹U≠1 /
       E=U⋊E₁ Frobenius (U=E₂E₃ kernel, E₁ complement) の構成。
