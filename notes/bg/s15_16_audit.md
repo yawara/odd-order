@@ -506,3 +506,28 @@ section 11 の「§14-非依存余地尽きた」は **statement/skeleton レベ
 - Prop 16.1 本文 + 証明 = L4478–4520（Thm A(8)/B(1-3)/C(2)(8)/15.7(c) 使用 → gated 確認）。
 - Thm I = L4526、Thm II = L4548、tamely imbedded の定義 remark = L4560。
 - Peterfalvi 消費側 = `OddOrder/Peterfalvi/S10_BGInterface.lean`（私の scaffold を既に cite）。
+
+## 2026-06-16 (Lane F): theoremE conjunct 3 (σ-disjointness) を ungated で landing
+
+**`sigma_reps_pairwise_disjoint`** (`S16_MainResults`, commit `7047c92b`, sorry-free + axiom-clean,
+AxiomsCheck 登録済) = BG Theorem E の **conjunct 3** (distinct maximal-subgroup conjugacy-class
+reps `Mᵢ≠Mⱼ` の `σ(Mᵢ)∩σ(Mⱼ)=∅`)。
+
+導出 (hoist でなく実導出): distinct class reps は `hreps` の `∃!` uniqueness で**非共役**
+(両者が `Mᵢ` の class の唯一の rep → `Mᵢ=Mⱼ` 矛盾) → BG **Thm 13.9**
+`OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate` (Lane F 既 landing, sorry-free) を直接適用。
+真の追加仮説は `hrepsMax`(reps は maximal — Thm 13.9 が要求、class 代表系なら自動)のみ。
+
+**⚠ hub STANDBY 評価への訂正**: 2026-06-16 LAUNCH の「F に ungated FT-critical task 無し
+(11-agent review code-verified)」は**不完全**だった — F 自身の §13 landing (Thm 13.9, 2026-06-15) が
+theoremE conjunct 3 を unblock しており、review が cross-reference し損ねていた。**教訓: lane が
+自分の upstream を landing した直後は、その lane の downstream gate を再評価すべき**
+([[feedback-verify-lane-connects-to-goal]] の逆方向: landing が新たに開ける扉)。
+
+**残り §16 は再確認の上 gated** (over-mining せず検証済):
+- theoremE conjunct 1 (counting) = Lem 14.5(c) gate / conjunct 2,5 (covering/π分割) = Cor 14.9 gate。
+- conjunct 4 (tildeM disjointness) = landed 結果なし、M̃ counting machinery (Cor 14.9/Lem 14.5) gate。
+- aSets_support_slice conjunct 1 (zTilde TI) = `S14:2771` = sorried `typeP_duality` (Thm 14.7) の conjunct ⟹ H long pole gate。
+- theoremA-D / Prop 16.1 = §14 (Prop 14.2 は landed だが theoremA-D は更に 14.4/14.5/14.7 + §9-10 uniqueness 要)。
+
+⟹ F は本 conjunct landing 後、再び H (14.5/14.7/14.9) + B (6.8) gate の STANDBY。
