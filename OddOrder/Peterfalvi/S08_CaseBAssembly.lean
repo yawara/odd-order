@@ -1913,4 +1913,29 @@ theorem caseB_inner_irr_conj_columnSum_eq_zero
   rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
   simpa using hkron
 
+/-- **(6.8.2) irreducible `X`-member ⊥ a certain-type column base** — the `χ`/`χ̄ ⊥ S₁` inputs
+(`hχ_S1`/`hχbar_S1`) of the case-(B) `X`-fold per-step, for the part of the prefix `S₁` consisting of
+certain-type columns.  Given that every member of `S₀` is a non-trivial column `columnSum h46 χ₂`,
+the irreducible `Ind^L_H θ` and its conjugate are orthogonal to all of `S₀`, by
+`caseB_inner_irr_columnSum_eq_zero` / `caseB_inner_irr_conj_columnSum_eq_zero`.  (The prefix's
+already-adjoined irreducible pairs are handled separately by the irreducible Kronecker delta.) -/
+theorem caseB_irr_orthogonal_columnBase
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {S₀ : Set (ClassFunction ↥L ℂ)}
+    (hS₀ : ∀ x ∈ S₀, ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      χ₂ ≠ 1 ∧ OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x) :
+    (∀ x ∈ S₀, ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) x = 0) ∧
+      (∀ x ∈ S₀,
+        ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj x = 0) := by
+  refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+  · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
+    exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hirr χ₂
+  · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
+    exact caseB_inner_irr_conj_columnSum_eq_zero hyp h46 hW1 hirr χ₂
+
 end OddOrder.Peterfalvi.S08
