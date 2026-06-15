@@ -390,26 +390,3 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 
 **▶ 推奨**: branch proof は cyclic-Sylow/Hall-共役 helper の特定が要で multi-hour。loop は clean piece
 (opening/核補題/14.7(h)/kappa helpers) を抽出済。**dedicated session で ∃→∀ upgrade を起点に駆動**が効率的。
-
-## ❓ F→H 同期 (2026-06-15): ∃→∀ upgrade の消費点確認 [F=lane-f が返信待ち]
-
-**F status**: issue 7000 の ActsPrimeOn 共役不変性 `actsPrimeOn_conj` は **landing 済**
-(commit `fe999b92`, `OddOrder/BG/Ch3_MaximalSubgroups/S14_Prop142Support.lean`, sorry-free +
-axiom-clean + root closure 配線済)。case-τ₁ の WLOG `K=E₁` 用。支える centralizer 共役 helper
-`smul_centralizer_singleton` / `smul_centralizer_subgroup` も同梱。**H は import 1 行で cite 可**:
-`import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support` → `OddOrder.BG.Ch3.S13.actsPrimeOn_conj`。
-
-**質問 (F が次に κ ∃→∀ upgrade を建てるか判断したい)**:
-H の `E3_not_regular_of_mem_kappa_tau3` (S14_TypePCounting:192) は κ-witness P を
-`exists_conj_smul_le_hallPiece` で **E₃ に直接共役**しているので、case-τ₃ では ∃→∀ upgrade
-(`∀ P∈ℰ_p¹(M), C_Mσ(P)≠⊥` 形) を経由していないように見える。issue 7000 は「両 branch 共通の鍵」
-と位置づけているが、実消費点が曖昧。
-
-1. Prop 14.2 残 2 sorry (`typeP_structure` 513=case-τ₃ の K=E 組立 / 515=case-τ₁) や
-   Cor 14.3 (`sigma_diagnostic` 544) で、∀-形は実際に必要か？
-2. 必要なら F が出す κ-free signature を指定してほしい。たたき台:
-   `(hr : pRank M p ≤ 1) (hodd : Odd p) [Fact p.Prime] (h∃ : ∃ P, P ∈ elemAbelianOfRank M p 1 ∧ P ≤ M ∧ Msigma M ⊓ centralizer (P:Set G) ≠ ⊥) : ∀ P, P ∈ elemAbelianOfRank M p 1 → P ≤ M → Msigma M ⊓ centralizer (P:Set G) ≠ ⊥`
-   (中核 = pRank≤1 ⟹ M の位数 p 部分群が全て M-共役 → 核補題 `Msigma_inf_centralizer_conj_ne_bot` で C 不変)。引数順の希望があれば。
-3. 不要なら F は `actsPrimeOn_conj` のみで issue 7000 を close する。
-
-→ 返信はこの節に追記 or `issues/7000-s14-prop142-support.md` に。F は次の main 同期で拾う。
