@@ -142,12 +142,20 @@ per-prime 形 (`p∈π(M)−(σ∪κ)`, `A=Ω₁(Syl_p)` で `|A|≤p² ∧ C_{M
 そのもの。⟹ **C_{M_σ}(U)=1 は bridge のみ**: p∈π(U) を 1 つ選び A_p=Ω₁(Syl_p(M))≤U で
 `C_{M_σ}(U) ≤ C_{M_σ}(A_p) = ⊥`。新規は **Lem 12.17 TI (M_σ∩M_σ^g が β'-group) 1 件のみ**の可能性大。
 
-**(g) 配線 5 piece** (BG mmd L3850 確認済):
-1. E Frobenius (kernel U=E₂E₃, complement K=E₁): actsRegularlyOn_E23_E1 ✅ + U⊴E (12.1) + complement。
-2. C_{M_σ}(U)=1: Lem 14.1 (msigma_structure) を p∈π(U) で bridge。
-3. |K|素数: `prime_card_complement_of_frobenius_conj` ✅ (Thm 3.10(a) 完成)。
-4. σ=β: Lem 12.19 (`derivedE_centralizes_betaComplement`) ✅ + C_{M_σ}(U)=1 + β⊆σ。
-5. TI: Lem 12.17 (M_σ∩M_σ^g β'-group [要形式化]) + β=σ ⟹ σ-group ∩ σ'-group = 1。
+**(g) 配線 6 piece** (BG mmd L3850 確認済, 2026-06-15 着手):
+1. **E Frobenius** (kernel U=E₂E₃, complement K=E₁): ✅ **DONE** `isFrobeniusGroup_E_of_caseTau1`
+   (S14, commit 後続) — actsRegularlyOn_E23_E1 で disjoint も conj_frobenius も。
+2. **C_{M_σ}(U)=1**: statement `Msigma_centralizer_E23_eq_bot_of_caseTau1` 確定、proof **subagent 進行中** —
+   Lem 14.1 (`msigma_structure_of_notMem_sigma_kappa`) を p∈π(U) (τ₂ は exists_elemAb_rank_two / τ₃ は
+   Cauchy で ℰ_p¹) に適用 + centralizer 単調。
+3. **|K|素数**: #1+#2 で `prime_card_complement_of_frobenius_conj` (Thm 3.10(a) ✅) を適用 [assembly]。
+4. **σ=β**: **U=E' を要す** (E/U abelian ⟹ E'≤U; FPF coprime ⟹ U=[U,K]≤E' ⟹ U=E') →
+   Lem 12.19 (`derivedE_centralizes_betaComplement` ✅: E'≤C_G(W), W=Hall β' of M_σ) + C_{M_σ}(U)=1
+   ⟹ W≤C_{M_σ}(U)=1 ⟹ W=1 ⟹ β'∩π(M_σ)=∅ ⟹ σ⊆β; β⊆σ で σ=β [substantial]。
+5. **TI**: Lem 12.17 (M_σ∩M_σ^g が β'-group, g∈G−M) [**genuinely new §12, 要形式化**] + β=σ ⟹
+   M_σ∩M_σ^g は σ-group ∩ σ'-group = 1 ⟹ M_σ TI [substantial]。
+   ⚠ mmd の Lem 12.17 位置要再確認 (L3448 は Cor 12.16; 12.17 は別位置)。
+6. **(g) sorry 充足**: #3,#4,#5 を typeP_structure case-τ₁ (g) で組む [assembly]。
 
 ## 完了条件
 
