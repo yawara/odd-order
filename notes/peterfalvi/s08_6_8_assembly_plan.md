@@ -3045,3 +3045,16 @@ dispatch family の per-θ bundle (CaseBColBundle 残り 4 conjunct + CaseBIrrBu
 
 **▶▶ 次 (well-defined)**: (1) `caseB_column_degree_match` (`columnSum χ₂(1)=constituentWeight·η₁(1)` when columnSum=Ind θ; 上記 3 補題 chain + 中心条件) → (2) **`caseB_column_bundle` 完全 constructor** (CaseBColBundle を 6 conjunct から組立、degree-match 内製) → (3) CaseBIrrBundle (irreducible 枝) → (4) dispatch family `hcol`/`hirr` discharge (caseB_per_phi_anchored_fromYset の入力) → (5) X_irr chain-adjoin + cX_col union + capstone。
 **正本=本 session 43 cont.⁴。CaseBColBundle 6/6 dischargeable (`fbcf8e44`)、degree-match 全ピース特定 (constituentWeight=θ(1))。次=caseB_column_degree_match → 完全 bundle constructor。Opus 継続。**
+
+### session 43 cont.⁵: ✅✅✅ `caseB_column_bundle` 完全 constructor — column branch `hcol` 構成可能 (commit `7fd14af0`)
+degree-match core + 完全 bundle constructor:
+- `constituentWeight_eq_apply_one`: `0 < constituentWeight` ⟹ `constituentWeight = θ(1)`。W₂ central ⟹ `Res^H_{W₂}θ = θ(1)·λ` (Schur `exists_central_linear_restriction`、kernel 条件不要)、`aθ = θ(1)·⟨φ,λ⟩` で ⟨φ,λ⟩=Kronecker、positivity が δ=1 強制。**一発緑** (casework + irr-Kronecker)。
+- `caseB_column_degree_match`: `columnSum(1) = constituentWeight·η₁(1)`。`induce_apply_one` (`(Ind θ)(1)=H.index·θ(1)`) + `index_H_eq_card_W1` + `Yset_apply_one` (η₁(1)=|W₁|) + constituentWeight=θ(1)。
+- `caseB_column_bundle`: 6 conjunct を degree-match h1 で組立 ⟹ `CaseBColBundle hyp h46 θ η₁ (constituentWeight hφ' θ)`。⚠ CaseBColBundle の def は file 後方 (line 519) ゆえ bundle constructor は CaseBIrrBundle 後ろに配置 (forward ref 回避)。
+
+**⟹ dispatch の column-branch 入力 `hcol` (caseB_per_phi_anchored_fromYset の `hcol : ∀ i, CaseBColBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val)`) が `0<constituentWeight`+中心/Hall data から構成可能。** 残り dispatch 入力:
+1. **CaseBIrrBundle (`hirr`)**: irreducible 枝 (Ind θ が既約のとき)。conjunct 群は CaseBIrrBundle (S08CaseBAssembly:550) — irreducibility/non-realness/supports/ZIrr/直交スカラー。case-A Dade chain ミラー。column と類似だが既約 Ind θ。
+2. **hirrAnc**: per-θ `⟨η₁, Ind θ⟩` 系 4 直交 (η₁∈Yset linear ⊥ 既約 induced)。raw X⊥Y と同型 (degree or distinct-irr)。
+3. **hXaggorth/hdecomp**: (6.8.2.2) aggregate (`exists_decomposition_caseB`)。
+→ これらが揃えば caseB_per_phi_anchored_fromYset 適用 → per-φ image → X_irr chain-adjoin + cX_col union + capstone。
+**正本=本 session 43 cont.⁵。column hcol 完全構成可能 (`7fd14af0`)。次=CaseBIrrBundle (hirr, 既約枝) → hirrAnc → dispatch family。Opus 継続。**
