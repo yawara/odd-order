@@ -3058,3 +3058,22 @@ degree-match core + 完全 bundle constructor:
 3. **hXaggorth/hdecomp**: (6.8.2.2) aggregate (`exists_decomposition_caseB`)。
 → これらが揃えば caseB_per_phi_anchored_fromYset 適用 → per-φ image → X_irr chain-adjoin + cX_col union + capstone。
 **正本=本 session 43 cont.⁵。column hcol 完全構成可能 (`7fd14af0`)。次=CaseBIrrBundle (hirr, 既約枝) → hirrAnc → dispatch family。Opus 継続。**
+
+### session 43 cont.⁶: CaseBIrrBundle (hirr) の精密 mapping — 8 conjunct、既約性 #1 が gating
+CaseBIrrBundle (S08CaseBAssembly:519) は仮説 `(∀ χ₂≠1, columnSum χ₂ ≠ Ind^L_H θ)` (= Ind θ は column でない) の下で 8 conjunct:
+1. **`IsIrreducibleCharacter (Ind^L_H θ)`** ← **gating, value↔index seam**。
+2. `¬ IsReal (Ind^L_H θ)` (non-real)。
+3. `((Ind θ).conj − Ind θ) H^#-support`。
+4. `(Ind θ − a•η₁) H^#-support` ← **column 再利用** (`support_indW2_sub_smul` W2:=H + degree-match)。
+5. `hyp.tau(Ind θ − a•η₁) ∈ ZIrr` ← **column 再利用** (`dadeICM_mem_ZIrr_of_supported`)。
+6. `⟨Ind θ, a•η₁⟩=0` / 7. `⟨(Ind θ).conj, a•η₁⟩=0` ← X⊥Y (Ind θ irreducible ⊥ η₁∈Yset, degree or distinct-irr)。
+8. `⟨Ind θ, (Ind θ).conj⟩=0` ← non-real + irr-Kronecker。
+
+**🔑 #1 既約性の bridge (value↔index)**: machinery は index-level — `induce_isIrreducible_of_forall_chiRestrict_ne` (S06:902, `∀χ₂, chiRestrict χ₂ ≠ θ_K → Ind^L_K θ_K irreducible`) + (4.5.b) `exists_eq_certainType_or_induce` (S06:938)。bundle は value-level (θ:Irr ↥H, Ind^L_H θ)。橋:
+- θ を h46.K=H で θ_K:Irr ↥K に transport。
+- χ₂≠1: `chiRestrict χ₂ = θ_K ⟹ columnSum χ₂ = induce K (chiRestrict χ₂) = induce H θ` (4.5.a `induce_restrict_certainType_eq` + `coe_chiRestrict` + hHK) ⟹ 仮説矛盾。✓
+- ⚠ **χ₂=1 edge**: `induce_isIrreducible_…` は ∀χ₂ (含 1) を要す。`chiRestrict 1 ≠ θ_K` を別途要する (column-1 = principal の構造; θ≠trivial か chiRestrict 1 の特定要)。← **次の精査点**。
+- 또는 `exists_eq_certainType_or_induce` 経由 (Ind θ を μ で割り、column でないゆえ irreducible 枝) の方が χ₂=1 edge を回避できるか要検討。
+
+**▶▶ 次**: (1) #1 既約性 bridge (χ₂=1 edge 解決; induce_isIrreducible 直用 vs exists_eq_certainType_or_induce 経由を精査) → (2) #2/#8 non-real (odd-order no-real-irr; `Yset_hasNoRealCharacters` 類似が L 全体であるか) → (3) #4/#5 support/ZIrr (column 再利用) + #6/#7 X⊥Y (Ind θ irreducible版) → (4) `caseB_irr_bundle` constructor → hirrAnc → dispatch family assembly → capstone。
+**正本=本 session 43 cont.⁶。CaseBIrrBundle mapping 完了、#1 既約性が gating (value↔index seam, χ₂=1 edge)。次=#1 bridge 精査 (induce_isIrreducible 直用 vs (4.5.b) 経由)。Opus 継続。**
