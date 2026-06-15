@@ -2950,3 +2950,15 @@ fromYset 完成後の (6.8) capstone case-B (`sibleySetup_is_coherent` の X-non
 **`dadeMap_eq_of_hypothesis` (S04 一般補題)**: 同 (G,A,L) の 2 Hypothesis hyp₁ hyp₂ → `hyp₁.dadeMap = hyp₂.dadeMap`。核 = `hyp₁.H a = hyp₂.H a` (normal Hall complement 一意; Schur-Zassenhaus、要 mathlib `Subgroup.IsComplement`/coprime uniqueness 探索) → dadeSupport 一致 → `IsDadeMap hyp₁ τ ↔ IsDadeMap hyp₂ τ` → `IsDadeMap.unique`。これで `hmapagree` (S08, h46 用 wrapper) → cX_col → assembly が連鎖 unblock。
 **代替** (canonicality が重い場合): `cases.inr` に `h46.dade0.restrict A` の dadeMap が `hyp.dade` と一致する条項を追加 (producer obligation 化、2026-06-13 の CertainTypeHypothesis→Hypothesis46 強化と同型)。ただし `SibleyDadeHypothesis` core 改変ゆえ producer 全更新要 = 重い。
 **正本=本 session 42 cont.⁴ 続²。capstone case-B path 完全 map。linchpin = hmapagree = dadeMap canonicality (H-field Schur-Zassenhaus 一意)。次 = `dadeMap_eq_of_hypothesis` (S04)。**
+
+### session 42 cont.⁴ 續³: ✅ canonicality core `le_of_card_coprime_index` 着地 (commit `be9fc9ec`)
+hmapagree linchpin (cont.⁴ 續²) の**群論核を 1 個 landing**: `le_of_card_coprime_index` (S08_CaseBAssembly, axiom-clean) = 「N normal + |K| coprime to N.index ⟹ K ≤ N」(K の C⧸N 像が位数 |gcd(|K|,[C:N])=1 ⟹ 自明 ⟹ K ≤ ker(mk' N)=N)。mathlib: `card_map_dvd`(H 明示第1引数!)/`card_subgroup_dvd_card`/`map_eq_bot_iff`/`card_eq_one`(Index:473)/`ker_mk'`。
+
+**▶▶ canonicality 残り (linchpin 完成への brick 順, 確定):**
+1. ✅ **Lemma A** `le_of_card_coprime_index` (done)。
+2. **Lemma C = H-field 一意性** `h46.dade0.H (incl a) = hyp.dade.H a` (a∈A): 両者 C_G(a) 内で C_L(a)=`centralizerIn L a` の normal complement (`centralizer_eq_sup`=⊔, `centralizer_disjoint`=⊓⊥, `H_normalized`=normal in C_G(a), `centralizer_coprime`=coprime)。**C_G(a) へ relativize** (`.subgroupOf (Subgroup.centralizer {a})`) して Lemma A を両向き適用 → le_antisymm。要 API: `Subgroup.index_subgroupOf` / [C_G(a):H.subgroupOf]=|C_L(a)| (∵ H⊔C_L=C_G(a) ∧ H⊓C_L=⊥ ⟹ index=|complement|; `Subgroup.relindex`/`card_mul_index` 経由) + |H| coprime |C_L| (centralizer_coprime)。⚠ subgroupOf の index 計算が核。
+3. **Lemma D = Hypothesis ext**: `h46.dade0.restrict A = hyp.dade` を H-field 一致 (Lemma C, 全 a) + restrict.H 補題 (S04:348 `(hyp.restrict).H a = hyp.H (incl a)`) + **構造 ext (H が唯一の data field、他 Prop は proof-irrel)** で。⚠ `S04.Hypothesis.ext` の形 (H funext + Prop 自動) を要確認。
+4. **Lemma E = hmapagree**: φ A-supported に対し `dadeIntegralCharacterMap h46.dade0 h46.tau φ` = (`dadeIntegralCharacterMap_restrict_eq_of_support` S08CB2:1585) = `…(h46.dade0.restrict A)(h46.tau.restrict A) φ` = (Lemma D で Hypothesis 一致 + apply_of_support) = `hyp.tau φ`。⚠ tau (FullDadeIsometryData) 側の restrict 一致も要 (data 引数無視ゆえ dadeIntegralCharacterMap は hyp のみ依存、cont.⁷ 續³ 知見で吸収可)。
+5. → `certainTypeSet_isCoherent_tau` の hmapagree 充足 → **cX_col 完成** → assembly (cX_col∪cX_irr∪cY, cont.⁴ 續² path)。
+
+**正本=本 session 42 cont.⁴ 續³。Lemma A (canonicality 核) landed。次 = Lemma C (H-field 一意性, C_G(a) relativize + Lemma A 両向き)。**
