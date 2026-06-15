@@ -2862,3 +2862,23 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 anchored 公式 landed ⟹ cont.⁷ 続⁵ の組立計画 (chain-adjoin X_irr to cY + union with cX_col) の diagonal/hgen 入力が供給可能に。残 = (1) per-θ discharge → 具体 D、(2) X_irr chain-adjoin (`retarget_isCoherent_of_supportedDecomposition`)、(3) cX_col union、(4) capstone (`sibleySetup_is_coherent` X-nonempty branch)。
 
 **正本=本 session 42。(6.8.2.3) core landed (abstract D skeleton)。次=per-θ discharge (hcol/hirr → D 具体化, hXorth/hbi)。Opus 継続。**
+
+### session 42 cont.: family 構築子 landed + hXorth/hbi 経路確定
+**✅ landed (`142b86dc`)**: `caseB_phi_family` (D 構築子 = dispatch over subtype) + `caseB_phi_family_tau1`。
+⟹ `caseB_per_phi_anchored` の 4 入力中 **D + htau1 供給可能**。残 = hXorth + hbi。
+
+**▶▶ hXorth/hbi 経路 (精査済、次の実装対象):**
+- **hXorth** `⟨(D i).X, cY.ext η₁⟩=0` = `inner_X_Y_eq_zero_of_orthogonal` (S08:926, `⟨D.X,Y⟩=0` ⟸ `∀α∈D.imageFamily.imageSet, ⟨Y,α⟩=0`) + **per-branch seam-1**:
+  - column: imageSet = `columnRFamilyTau.imageSet` = `certainTypeR.imageSet` = R(μ_j) σ-images。cY.ext η₁ ⊥ それ = cont.⁶ toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (generic cS ⟹ cY 適用可)。
+  - irr: imageSet = `dadeOrthonormalCharacterImageFamilyOfDiff.imageSet`。cY.ext η₁ ⊥ それ = `inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero` (S08CP1, 既存)。
+  - ⚠ dispatch 越し ⟹ **`charPsiDecomp_eqRec_imageSet` cast helper 要** (tau1 同型: column branch の `heq ▸` cast が imageSet を保つ。imageSet : Set(CF G ℂ) は χ 非依存ゆえ `cases h; rfl`)。`unfold caseB_phi_family caseB_constituentDecomposition; split` で per-branch。
+- **hbi** `⟨(D i).Y, cY.ext η₁⟩ = bᵢ∈ℤ` = **hXorth に依存**: tau1_image で `(D i).Y = (D i).X − hyp.tau(Ind θ−aη₁)` ⟹ `⟨(D i).Y, cY.ext η₁⟩ = 0 − ⟨hyp.tau(Ind θ−aη₁), cY.ext η₁⟩` (hXorth)。後者 = htau1_mema (bundle, hyp.tau(Ind θ−aη₁)∈ZIrr) + cY.ext η₁∈ZIrr ⟹ inner_mem_ZIrr_int で ℤ。bᵢ := −(witness)。
+- ⚠ cY.ext η₁ ∈ ZIrr: coherence extension の ZIrr 性 (要確認: `IsCoherent.extension_mem_ZIrr` 類)。
+
+**∴ 次 = (1) `charPsiDecomp_eqRec_imageSet` helper → (2) hXorth per-branch (toolkit cY 適用) → (3) hbi (hXorth + integrality) → (4) caseB_per_phi_anchored を caseB_phi_family で具体化 (abstract D 解消) → (5) per-θ bundle (hcol/hirr) discharge → (6) HYBRID 組立。**
+**正本=本 session 42 cont.。family landed、hXorth/hbi 経路確定。次=hXorth (cast helper + cY-general toolkit)。**
+
+### session 42 cont.²: ⚠ hXorth の partner-anchor 要件 (設計精緻化、未実装)
+hXorth の column seam-1 `⟨cY.ext η₁, ω_ij^σ⟩=0` を精査: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08:1246) は **差 `cY.ext η − cY.ext η'` が tic V 上消失** (`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`) を使うため、**distinct partner η' ∈ Yset (η₁≠η', ⟨η₁,η'⟩=0, η₁−η' は H^#-supported) が必須**。⟹ 単一 η₁ では証明不可。
+**含意**: `caseB_per_phi_anchored` の hXorth 入力 (または family の hXorth 証明) に **partner anchor η' (|Yset|≥2)** を追加要。case-B は |Yset|≥2 が成立するはず (Yset = S(H')-filtration、複数 linear chars) — 要確認 (`exists_Yset_linearRepresentativeFamily` の 2≤n、または \|Yset\|≥2 は別途)。**∴ hXorth 実装時は partner η' を threading する設計に。** irr branch の seam-1 (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`) は partner 不要か要確認。
+**正本=本 session 42 cont.²。hXorth は partner-anchor 要 (設計追加)。次=cast helper + partner-threading hXorth。**
