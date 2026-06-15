@@ -510,3 +510,23 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
    **(g) ⚠ case-τ₁ では vacuous でない** (κ=τ₁⊊σ'∩π(M) があり得る ⟹ M が P2 可能) ⟹
    **実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI) を Thm 3.10(a)/Lem 12.19/12.17 で証明要 = hard core**。
 **⟹ case-τ₁ は ~150 行・(g) が hard core。κ=τ₁ から methodical に。case-τ₃ helper を最大限再利用。**
+
+### ✅ case-τ₁ 進捗 — 基盤 + WLOG + (a)/(K*≠1) (2026-06-15 loop)
+- ✅ `E1_not_regular_of_mem_kappa_tau1` (E3 ミラー) + `mem_kappa_of_mem_primeFactors_card_E1` (coverage)。
+- ✅ **WLOG K=E₁ COMPLETE** (commit `6174fff1`): κ⊆τ₁ (case hyp) + **E₁ Hall κ(M)** (coverage .1 +
+  `hsetup.E₁_hall.2`/κ⊆τ₁ で .2 → `hallPiece_isHall_in_M`) + K Hall κ(M) (hK) →
+  `OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv … : ∃w∈M, conj w•E₁=K` →
+  `SubgroupESetup.conj' hsetup hwM` + `rw[hw]` で新 setup `h'` (E₁'=K)。
+  **🔑 技法: 共役後 h' に E1_* helper 直接適用 (conj-invariance 不要)** — `E1_not_regular_of_mem_kappa_tau1 hG h'`
+  ⟹ K≠⊥/非regular、`E1_actsPrime hG h'` ⟹ (a)、`Msigma_inf_centralizer_E_ne_bot_…` ⟹ (K*≠1)。
+  ⚠ `conj'` は dot 記法不可 (S13 namespace) → `SubgroupESetup.conj' hsetup hwM`。
+- 🔲 **残 case-τ₁ = (b1)/(d)/(g)。case-τ₃ の単純ミラーでない (K=E₁'⊊E' 構造)**:
+  - **(d)**: case-τ₃ (d) は (c)-helper `maximalContaining_centralizer_of_le_Msigma_centralizer_E` が
+    X≤M_σ⊓C(E)[σ'-complement] を要するが、case-τ₁ は X≤Kstar=M_σ⊓C(K)=M_σ⊓C(E₁')。**C(E₁') 版 (c)-helper**
+    (Lemma 13.6 を P=E₁'=K で直適用、X≤M_σ⊓C(E₁) を直接取る変種) を作れば Thm 10.1(e) で同様に。**最も tractable**。
+  - **(b1)**: case-τ₃ (b1)-⊆ は K=E ゆえ y'=ege⁻¹∈E=K で prime 作用可。case-τ₁ は e∈E'⊋K で y'∉K の恐れ
+    ⟹ 直接ミラー不可。**K cyclic (E₁ cyclic) で ⊇ は K≤C(X)≤N(X) から容易**、⊆ は要再設計
+    (M=M_σ⋊E' の K-部分の扱い)。
+  - **(g)**: case-τ₁ では M が P2 可能ゆえ **vacuous でない** ⟹ 実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI、
+    Thm 3.10(a)/Lem 12.19/12.17) = **hard core**。
+**⟹ 次 = (d) [C(E₁') 版 (c)-helper] → (b1) [⊆ 再設計] → (g) [hard]。**
