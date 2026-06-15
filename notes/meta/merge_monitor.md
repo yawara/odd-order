@@ -10,10 +10,10 @@
 
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
-| **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | BG §13 endgame: Thm 13.9→13.10→Cor 13.11 (S13_PrimeActionTransition, 実 sorry 3, ready) | Opus 4.8 (1M) | ✅ 対象 |
-| **G** | `lane-g` | BG §15 M_F + §16 main results (S15_MF/S16_MainResults 各 9 sorry, §14 gate ゆえ §14非依存 faithful-prep) | Opus 4.8 (1M) | ✅ 対象 |
-| **H** | `lane-h` | BG §14 Type-P counting (S14_TypePCounting, 実 sorry 8, §13 gate; §13非依存 sigma_diagnostic/frobenius_type 先行) | Opus 4.8 (1M) | ✅ 対象 |
+| **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | **POLE-1 assembly skeleton** (`FeitThompson.lean:70` `sectionSixteenHypothesis`); secondary = POLE-2 carrier slice (`S16_NonExistenceG` tail, split 済) | Opus 4.8 (1M) | ✅ 対象 |
+| **G** | `lane-g` | BG §15/§16 `_of_inputs` sorry-free skeleton 前倒し (Thm 15.2/Cor 15.3/Thm 15.7 + Thm D; §14 obligation を named residual 化、H の 14.7 着地で自動 unconditional) | Opus 4.8 (1M) | ✅ 対象 |
+| **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
 
 **G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
 (2) G の §12 依存は sorry'd statement の引用で賄う — **新規 `axiom` 宣言が G から来たら従来どおり
@@ -145,6 +145,26 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-15 (夜) — レーン再配分 (11-agent code-verified review + ユーザー裁可) + S16 prefix-split**:
+  全レーン synced + warm (main `b66af8aa`)。再配分レビューで判明・確定:
+  - **✅ Thm 3.10(a) は完了済** (`S03g_Thm310.lean:75` `prime_card_complement_of_frobenius_conj`、
+    Core/Module とも 0 sorry)。「真の long pole = 3.10(a) §3 rep-theory」は **stale**。
+  - 真の binding long pole = **§14 funnel** = Lem 12.17 TI clause → Prop 14.2 (g) `S14:1796` →
+    Thm 14.7 `typeP_duality` `S14:1964` (~2-3.5 session の §12/§14 wiring)。`typeP_duality` は下流
+    (S15_MF:785/795/1976, S16:437) が consume する唯一の §14 定理。
+  - **配分**: H = long pole 単独 (別 lane 投入は S14:1796/S12_E 衝突ゆえ不可)。B = Pf §6 (6.8) 継続。
+    G = §15/§16 `_of_inputs` skeleton 前倒し (cite-compress drift 停止)。F = POLE-1 skeleton
+    (`FeitThompson.lean:70`, hub split 不要) + POLE-2 secondary。
+  - **⚠ S12_E 一時 grant → H**: H が Lem 12.17 TI clause を `S12_E*.lean` に追加する (F が §12 から
+    退いたため実質 unowned)。従来「G/他レーンは S12_E 編集禁止」は維持、**H に限り 12.17 clause 追加を許可**
+    (issue 2007 / base 2000)。それ以外の S12_E 変更は通常どおり abort+承認。
+  - **hub split 実施済**: `S16_NonExistenceG.lean` (6860→1979) を `end FieldNormalizerData` で prefix-split
+    → 凍結 Core `S16_NonExistenceGCore.lean` (4917 行) + F の POLE-2 tail (1979 行)。de-private 1 件
+    (`p_pow_sub_two_lt_q_sq_of_pow_lt_mul_sq`)。merge `b66af8aa`、build 3830 green。
+  - **deferred hub task**: `S14_TypePCounting.lean` (2069 行) split は H が (g) から離れるまで保留 (issue 0069)。
+    `S16_NonExistenceG.lean` tail (1979 行 >1500) は F の coherent frontier ゆえ現状維持。
+  - cron はこの再配分後に再作成 (`/model` 切替で旧 session cron 消滅 [[cron-dies-on-model-switch]])。
 
 - **2026-06-11 (夜) — §11 完結・E 退役・F 再開 (12.18 先行)**: E の最終成果 Thm 11.7
   (`S11_MsigmaANormal.lean` 977 行 leaf) を合流 (merge `77ab5173`, 実 sorry 266→264) し
