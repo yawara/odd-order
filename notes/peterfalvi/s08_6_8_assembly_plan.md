@@ -3258,3 +3258,6 @@ Lean commit なし。consumer 解析でルート曖昧性を解消し cX 構築�
 
 **⏱ 状況メモ (正直)**: dispatch 層 (hnonlin/hcol/hirr/hirrAnc + per-step adjoin) 完了後、frontier は **heavy T8 mixed cX** (multi-session、clean quick-win 無し)。loop の per-turn context reload で route 再考が嵩んだ。次以降は cover→base union→hstep を順次 build (RECON 偏重を脱する)。ユーザーが望めば (a) loop 継続 / (b) 集中 workflow (要 opt-in) / (c) B を signature-pin (endpoint B/C/D/E) へ redirect も可。
 **正本=本 session 43 cont.¹⁸。Route 1 確定 (cX=xChainCoherent+column base, hyp.tau=Dade map)。次=cover dichotomy build。Opus 継続。**
+
+### session 43 cont.¹⁹: ✅ `caseB_induce_column_or_irreducible` — cover dichotomy per-θ (commit `69e36299`)
+非自明 θ で `Ind^L_H θ` = column (∃χ₂≠1 columnSum=Ind θ) ∨ irreducible。by_cases + `caseB_irr_induce_isIrreducible`。axiom-clean、leaf green。⟹ cover の per-θ 部品完成。次 = (a) Xset-level cover (hyp.Xset W2 の各 member を Ind θ 化して dichotomy 適用、W₂↔h46.W2 同定要)、(b) column base union (multi-degree `certainTypeSet` 和の coherence)、(c) hstep (XAdjoinStepInput, 既約 adjoin の member-family/degree)。**正本=本 cont.¹⁹。次=Xset-level cover or column base union。Opus 継続。**
