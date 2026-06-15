@@ -1764,4 +1764,29 @@ noncomputable def adjoin_irr_nonreal_of_supportedDecomposition
     hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hperElem hχ_S1 hχbar_S1 hchi1 htau1_diff hY
     htau1_chi1 hgen
 
+/-- **(6.8.2) X-member dichotomy: column or irreducible.**  For a non-trivial `θ : Irr ↥H`, the
+induced character `Ind^L_H θ` either equals a non-trivial certain-type column `columnSum h46 χ₂`
+(`χ₂ ≠ 1`) — the reducible/column branch — or is itself irreducible — the irreducible branch.
+
+This is the cover dichotomy underlying the case-(B) `X = 𝒳(W₂)` coherence: every `X`-member splits
+into the certain-type column part (coherent as a set, `certainTypeSet_isCoherent_tau_canonical`) or
+the irreducible part (adjoined as a `{χ, χ̄}` pair via `adjoin_irr_nonreal_of_supportedDecomposition`).
+The irreducible branch is `caseB_irr_induce_isIrreducible` (the value↔index seam, settled session 43
+cont.⁹); the column branch is the witnessing `χ₂`. -/
+theorem caseB_induce_column_or_irreducible
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hθne : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H) :
+    (∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      ∨ IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  classical
+  by_cases hc : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+  · exact Or.inl hc
+  · exact Or.inr (caseB_irr_induce_isIrreducible h46 hHK hθne
+      (fun χ₂ hχ₂ heq => hc ⟨χ₂, hχ₂, heq⟩))
+
 end OddOrder.Peterfalvi.S08
