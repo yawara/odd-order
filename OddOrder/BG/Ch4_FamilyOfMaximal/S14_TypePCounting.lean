@@ -2074,6 +2074,49 @@ theorem maximalContaining_centralizer_eq_singleton_of_tau2_element [Finite G]
       show r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
       rw [hcard]; exact hr)) hC
 
+/-- The `σ`-set is conjugation-invariant: `σ(Mᵍ) = σ(M)` (both inclusions from `sigma_conj`;
+non-primes lie in neither set). -/
+private theorem sigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
+    OddOrder.BG.Ch3.S10.sigma (MulAut.conj g • M) = OddOrder.BG.Ch3.S10.sigma M := by
+  ext p
+  by_cases hp : p.Prime
+  · haveI : Fact p.Prime := ⟨hp⟩
+    refine ⟨fun hmem => ?_, fun hmem => OddOrder.BG.Ch3.S10.sigma_conj g hmem⟩
+    have h2 := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hmem
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h2
+  · exact ⟨fun hmem => absurd (Nat.prime_of_mem_primeFactors
+        ((OddOrder.BG.Ch3.S10.mem_sigma_iff _ p).mp hmem).1) hp,
+      fun hmem => absurd (Nat.prime_of_mem_primeFactors
+        ((OddOrder.BG.Ch3.S10.mem_sigma_iff _ p).mp hmem).1) hp⟩
+
+/-- `O_π` (`opiCoreInG`) commutes with conjugation (replicated from the private
+`S07_Transitivity.conj_smul_opiCoreInG`). -/
+private theorem conj_smul_opiCoreInG' [Finite G] (π : Set ℕ) (φ : MulAut G) (H : Subgroup G) :
+    φ • opiCoreInG π H = opiCoreInG π (φ • H) := by
+  have hHmap : H.map (φ : G →* G) = φ • H := (mulAut_smul_eq_map φ H).symm
+  let e : ↥H ≃* ↥(φ • H) :=
+    (Subgroup.equivMapOfInjective H (φ : G →* G) φ.injective).trans
+      (MulEquiv.subgroupCongr hHmap)
+  have hcomp : (φ • H).subtype.comp (e : ↥H →* ↥(φ • H)) = (φ : G →* G).comp H.subtype := by
+    ext x; rfl
+  calc φ • opiCoreInG π H
+      = (opiCoreInG π H).map (φ : G →* G) := mulAut_smul_eq_map φ _
+    _ = ((Ch03.oPiCore π ↥H).map H.subtype).map (φ : G →* G) := rfl
+    _ = (Ch03.oPiCore π ↥H).map ((φ : G →* G).comp H.subtype) := by rw [Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥H).map ((φ • H).subtype.comp (e : ↥H →* ↥(φ • H))) := by rw [hcomp]
+    _ = ((Ch03.oPiCore π ↥H).map (e : ↥H →* ↥(φ • H))).map (φ • H).subtype := by
+        rw [← Subgroup.map_map]
+    _ = (Ch03.oPiCore π ↥(φ • H)).map (φ • H).subtype := by
+        rw [Ch03.oPiCore.map_eq_of_mulEquiv]
+
+/-- `M_σ` is conjugation-equivariant: `(Mᵍ)_σ = (M_σ)ᵍ`.  Used to move an element of `M*_σ` back to
+its conjugate maximal subgroup when witnessing `ℓ_σ = 1`. -/
+private theorem Msigma_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • M)
+      = MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+  simp only [OddOrder.BG.Ch3.S10.Msigma]
+  rw [conj_smul_opiCoreInG', sigma_conj_smul_eq]
+
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
 `ℓ_σ(x') = 1`, and `𝓜(C_G(x')) = {M}`.
@@ -2118,9 +2161,63 @@ theorem sigma_diagnostic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- **Branch 2**: `x'` is a `τ₂(M)`-element.
     refine Or.inr ⟨hτ2, ?_, maximalContaining_centralizer_eq_singleton_of_tau2_element hG hM
       hx'M hx'1 hτ2 hCx'ne⟩
-    -- `ℓ_σ(x') = 1`: `x'` is a `σ(M*)`-element (Lemma 12.11(a)), hence conjugate into `M*_σ`
-    -- (Corollary 12.16), so `𝓜_σ(x')` is nonempty.
-    sorry
+    -- `ℓ_σ(x') = 1`: `x'` is a `σ(M*)`-element (Lemma 12.11(a)), hence `G`-conjugate into `M*_σ`
+    -- (general Corollary 12.16(a)), so `𝓜_σ(x')` is nonempty.
+    refine (D.length_one_iff x').mpr ⟨hx'1, ?_⟩
+    -- `π(⟨x'⟩)` is nonempty (`x' ≠ 1`); pick a prime `q₀ ∈ π(⟨x'⟩) ⊆ τ₂(M)`.
+    have hclosne : Subgroup.closure ({x'} : Set G) ≠ ⊥ := fun hbot =>
+      hx'1 (Subgroup.mem_bot.mp (hbot ▸ Subgroup.subset_closure (Set.mem_singleton x')))
+    obtain ⟨q₀, hq₀mem⟩ : (piSet (Subgroup.closure ({x'} : Set G))).Nonempty :=
+      Nat.nonempty_primeFactors.mpr (lt_of_le_of_ne (Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne')
+        (Ne.symm fun h => hclosne (Subgroup.card_eq_one.mp h)))
+    have hq₀prime : q₀.Prime := Nat.prime_of_mem_primeFactors hq₀mem
+    haveI : Fact q₀.Prime := ⟨hq₀prime⟩
+    have hq₀τ2 : q₀ ∈ tau2 M := hτ2 q₀ hq₀mem
+    -- `E`-setup, a rank-2 `A ∈ ℰ_{q₀}²(E)` (push `ℰ_{q₀}²(M)` into `E₂`), and `M* ∈ ℳ(N_G(A))`.
+    obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+    obtain ⟨A₁, hA₁, hA₁M⟩ := exists_mem_elemAbelianOfRank_two_le_of_tau2 hq₀prime hq₀τ2
+    obtain ⟨w, _, hwle⟩ := exists_conj_smul_le_hallPiece hG hsetup hsetup.E₂_le hsetup.E₂_hall
+      (tau2_subset_sigma_compl M) hA₁M (by
+        intro r hr
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA₁M).toEquiv, hA₁.2,
+          Nat.primeFactors_pow q₀ two_ne_zero, Nat.Prime.primeFactors hq₀prime] at hr
+        rw [Finset.mem_singleton.mp hr]; exact hq₀τ2)
+    have hA : MulAut.conj w • A₁ ∈ elemAbelianOfRank G q₀ 2 := conj_smul_mem_elemAbelianOfRank w hA₁
+    have hAE : MulAut.conj w • A₁ ≤ E := hwle.trans hsetup.E₂_le
+    have hAM : MulAut.conj w • A₁ ≤ M := hAE.trans hsetup.E_le
+    have hAne : MulAut.conj w • A₁ ≠ ⊥ := by
+      intro hbot
+      have hc : Nat.card ↥(MulAut.conj w • A₁) = q₀ ^ 2 := hA.2
+      rw [hbot, Subgroup.card_bot] at hc
+      rcases Nat.pow_eq_one.mp hc.symm with h | h
+      · exact hq₀prime.ne_one h
+      · exact absurd h (by norm_num)
+    obtain ⟨Mstar, hMstar_max, hMstar_ge⟩ :=
+      OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+        hG hM hAne hAM
+    have hMstarMem : Mstar ∈ maximalSubgroupsContaining
+        (Subgroup.normalizer ((MulAut.conj w • A₁ : Subgroup G) : Set G)) :=
+      mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstar_max, hMstar_ge⟩
+    -- Lemma 12.11(a): every prime of `π(⟨x'⟩) ⊆ τ₂(M)` lies in `σ(M*)`.
+    have hx'piMstar : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma Mstar)
+        (Subgroup.closure ({x'} : Set G)) := fun p hp =>
+      (tau2_prime_mem_sigma_diff_beta hG hsetup hq₀τ2 hA hAE hMstarMem
+        (Nat.prime_of_mem_primeFactors hp) (hτ2 p hp)).1
+    -- general Corollary 12.16(a): `⟨x'⟩` is `G`-conjugate into `M*_σ`.
+    have hzplt : Subgroup.closure ({x'} : Set G) < ⊤ :=
+      lt_of_le_of_lt (by rw [hclos, Subgroup.zpowers_le]; exact hx'M)
+        (mem_maximalSubgroups.mp hM).lt_top
+    obtain ⟨g, hg⟩ := sigma_subgroup_conj_into_Msigma_general hG hMstar_max hclosne hzplt hx'piMstar
+      (fun hN hnc => sigma_disjoint_of_nonconjugate hG hMstar_max hN hnc)
+    -- `M' = (M*)^{g⁻¹}` is maximal and contains `x'` in its `σ`-core.
+    refine ⟨MulAut.conj g⁻¹ • Mstar,
+      mem_maximalSubgroups.mpr (isCoatom_conj_smul (mem_maximalSubgroups.mp hMstar_max)), ?_⟩
+    rw [Msigma_conj_smul]
+    have hconj : MulAut.conj g • x' ∈ OddOrder.BG.Ch3.S10.Msigma Mstar :=
+      hg (Subgroup.smul_mem_pointwise_smul x' (MulAut.conj g) (Subgroup.closure ({x'} : Set G))
+        (Subgroup.subset_closure (Set.mem_singleton x')))
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    simpa using hconj
   · -- **Branch 1**: some prime `p₀ ∈ π(⟨x'⟩)` lies in `τ₁(M) ∪ τ₃(M)`.
     left
     push_neg at hτ2
