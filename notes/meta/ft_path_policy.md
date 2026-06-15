@@ -120,7 +120,8 @@ axiom-clean）→ §10–16 の opaque field を **その signature への cite 
 | **C** | (3.2) σ/τ₃ `IntegralCharacterMap ↥W G` | S15 `tau3`:144 + `eta_eq_tau_omega`:146 | S05 `sigma`（proof 在） | ✅ **pinned** = `S05.TICyclicHypothesis.sigmaIntegral`（`S05_IntegralSigma.lean`, 2026-06-15; `sigma.restrictScalars ℤ` + 性質 5 補題, axiom-clean） |
 | **D** | μ/ν 族 + (13.1.e) | S15 `mu`:132 / `nu`:133 | S06 (4.3) certainType（proof 在） | 🟡 **(13.1.e) relation pinned** = `S06.Hypothesis.induce_omegaColumnDiff_mu_diff`（`S06_MuColumnBridge.lean`, explicit δ·(μ_i−μ_0) form, `h : S06.Hypothesis` 引数化）。残 = full Fin-grid `muGrid` + S15 整合（W₂-col→Fin p / charEquiv W₁ / Ind の compHom 形 / W-instance context）は **§10-16 owner 側 wiring**（S06.Hypothesis-for-S が要 = §14 構造ゲート） |
 | **η** | `eta` + (13.1.d) | S15 `eta`:131 / `eta_eq_tau_omega`:146 | B+C 合成 | ✅ **B+C から自動**（`eta := tau3 ∘ omega`, `eta_eq_tau_omega := rfl`; 新規 pin 不要） |
-| **E** | char parameters ζ/ω^σ/α（(4.5.a)/(3.9)） | S12 `CharacterParameters.zeta`:95 / `omegaSigma`:111 / `alpha`:112 | S05/S06 | gate #3, materialize **要** |
+| **E (ω^σ)** | `omegaSigma` の ω^σ = σ(ω) | S12 `omegaSigma`:111 / S15 `eta`:131 | B+C 合成 | ✅ **pinned** = `S05.TICyclicHypothesis.omegaSigmaGrid`（`S05_OmegaSigmaGrid.lean`, σ∘ω + `ω^σ ∈ ZIrr G`, axiom-clean）。`eta` も同一ゆえ (13.1.d) は rfl |
+| **E (残)** | `zeta`(10.2) / `d`,`δ`,`n`(10.3) / `mu`,`alpha` for M + coherent ext | S12 `CharacterParameters` | §10 analysis | ⛔ **§10-gated**（`IsMinimalSimpleOdd` + §10-16 構造に依存、`exists_zeta_degree_w1` 等は genuine §10 hard content = **§3-9 signature gap でない**）→ §12 analysis owner の仕事 |
 
 ### 手順（per endpoint）
 1. §3–§9 に faithful signature を pin（sorried 可, build-green + axiom-clean, AxiomsCheck 登録）。

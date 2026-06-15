@@ -78,6 +78,7 @@ import OddOrder.Peterfalvi.S05_TICyclic
 import OddOrder.Peterfalvi.S05_SigmaIsometry
 import OddOrder.Peterfalvi.S05_IntegralSigma
 import OddOrder.Peterfalvi.S05_OmegaGrid
+import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
 import OddOrder.Peterfalvi.S06_CertainTypeSupport
 import OddOrder.Peterfalvi.S06_CertainTypeStructure
 import OddOrder.Peterfalvi.S06_CertainTypeIsometry
@@ -3673,6 +3674,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.charEquiv_zero
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaGrid
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaGrid_zero_zero
+-- FT-path signature bridge (endpoint E, ft_path_policy.md §4): the ω^σ-grid = σ(ω), the
+-- virtual characters ω_{ij}^σ ∈ ZIrr G (= S12.CharacterParameters.omegaSigma / S15.Hypothesis.eta).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaSigmaGrid
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaSigmaGrid_apply
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaGrid_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaSigmaGrid_mem_ZIrr
 -- FT-path signature bridge (endpoint D, ft_path_policy.md §4): the certain-type μ-column
 -- (13.1.e) induction relation in explicit `δ·(μ_i − μ_0)` form (= §13 `S15.Hypothesis.mu_definition`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.induce_omegaColumnDiff_mu_diff
