@@ -3077,3 +3077,15 @@ CaseBIrrBundle (S08CaseBAssembly:519) は仮説 `(∀ χ₂≠1, columnSum χ₂
 
 **▶▶ 次**: (1) #1 既約性 bridge (χ₂=1 edge 解決; induce_isIrreducible 直用 vs exists_eq_certainType_or_induce 経由を精査) → (2) #2/#8 non-real (odd-order no-real-irr; `Yset_hasNoRealCharacters` 類似が L 全体であるか) → (3) #4/#5 support/ZIrr (column 再利用) + #6/#7 X⊥Y (Ind θ irreducible版) → (4) `caseB_irr_bundle` constructor → hirrAnc → dispatch family assembly → capstone。
 **正本=本 session 43 cont.⁶。CaseBIrrBundle mapping 完了、#1 既約性が gating (value↔index seam, χ₂=1 edge)。次=#1 bridge 精査 (induce_isIrreducible 直用 vs (4.5.b) 経由)。Opus 継続。**
+
+### session 43 cont.⁷: ✅ CaseBIrrBundle の seam-free conjunct #3/#4/#5 完了 (commits `aa536164`/`e956da40`)
+column 機構を irreducible 枝に流用:
+- `caseB_induce_degree_match` (`(Ind θ)(1)=constituentWeight·η₁(1)`) + `caseB_irr_sub_smul_support` (#4) + `caseB_irr_htau1_mema` (#5, `induce_mem_ZIrr`)。
+- `caseB_irr_conj_diff_support` (#3): `(Ind θ).conj − Ind θ` H^#-support。**irreducibility 不要** — 両項 H-support (conj は support 不変) + 1 で消失 (Ind θ(1)=|W₁|θ(1) real, star 固定; `simp [← Nat.cast_mul]`)。
+
+**⟹ CaseBIrrBundle 8 conjunct中 3 (#3/#4/#5) が seam-free standalone。残り 5 はすべて #1 (既約性) に gated**:
+- **#1 `IsIrreducibleCharacter (Ind^L_H θ)`** = **唯一の真の gate**。`induce_isIrreducible_of_forall_chiRestrict_ne` (index-level, ∀χ₂ chiRestrict≠χ_K) を使うには (a) θ:Irr↥H → χ_K:Irr↥K transport (hHK=h46.K=H, subgroup-eq cast)、(b) χ₂≠1: chiRestrict χ₂=χ_K ⟹ columnSum χ₂=Ind θ 矛盾、(c) **χ₂=1 edge**: `chiRestrict_ne_trivial` は χ₂≠1 限定ゆえ chiRestrict 1 vs χ_K を別途。⚠ value↔index seam + transport が core difficulty。
+- #2 non-real / #8 ⟨Ind θ, conj⟩=0: #1 + odd-order no-real-irr。#6/#7 ⟨Ind θ, a•η₁⟩=0: #1 + Ind θ≠η₁ (degree θ(1)>1 or X/Y disjoint; θ(1)=1 で degree collision に注意)。
+
+**▶▶ 次 (#1 を正面から)**: induce_isIrreducible 直用の seam (transport + χ₂=1) を組む。χ₂=1 edge が重い場合は ChatGPT 相談 ([[feedback-ask-chatgpt-for-elided-gaps]], 最強モデル) で cleanest bridge を得る。#1 着地後は #2/#6/#7/#8 → caseB_irr_bundle constructor → hirrAnc → dispatch family。
+**正本=本 session 43 cont.⁷。irr seam-free #3/#4/#5 done (`e956da40`)。残りは #1 既約性 seam が唯一の gate (value↔index transport + χ₂=1 edge)。次=#1 正面 (必要なら ChatGPT)。Opus 継続。**
