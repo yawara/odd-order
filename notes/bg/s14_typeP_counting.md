@@ -630,3 +630,48 @@ Prop 14.2 着地後の funnel 各結果の gating を精査:
   Mstar bundle から取る (S15:795) ので部分証明も不可。⟹ **14.7 は §16 R(x)/M̃ landing 後** (Lane G 待ち)。
 - ⟹ H の §14 自力 runway = **Prop 14.2(c) 追加 → 14.3 → 14.4** (14.4 も R(x) headline は §16 だが N(x)/型 surface は §13 cite 可)。
   14.7 は G の §16 と合流が要る。hub に cross-lane 調整を報告推奨。
+
+### 🔧 Cor 14.3 `sigma_diagnostic` 実装レシピ (2026-06-15, lane-h) — 次セッション向け詳細
+**Prop 14.2(c) 露出済** (`typeP_structure` 第6 conjunct, commit `4283fad8`) ⟹ branch 1 の C_G(x)⊆M が書ける。
+14.3 = 2-branch、各 branch が独立の deep chain (~150 行)。前提 API:
+- `piSet (closure {x'}) = (orderOf x').primeFactors` (closure {x'}=zpowers x', Nat.card_zpowers)。
+- σ'-prime の τ-partition: hx'sigma で全 p∈π(⟨x'⟩) は σ' ⟹ τ₁∪τ₂∪τ₃ (mem_tau_union 系)。
+- `by_cases`: ∃ p₀∈π(⟨x'⟩), p₀∈(τ₂ M)ᶜ (= τ₁∪τ₃) [branch 1] / 全 p∈τ₂ [branch 2]。
+
+**branch 1** (∃ p₀∈π(⟨x'⟩)∩(τ₁∪τ₃)): goal = `π(⟨x'⟩)⊆κ ∧ C_G(x)⊆M`。
+1. X₀:=ℰ_{p₀}¹(⟨x'⟩) (Cauchy で order-p₀, ≤⟨x'⟩≤M)。x centralizes x'⟹centralizes X₀; x∈M_σ ⟹ ⟨x⟩≤C_{M_σ}(X₀)≠1。
+   ⟹ p₀∈κ(M) (κ def: p₀∈τ₁∪τ₃ ∧ ∃P∈ℰ¹, C_{M_σ}(P)≠1)。⟹ M type-P (hP)。
+2. K:=Hall κ(M) of M **⊇ X₀** (要 Hall-containment: M solvable + X₀ κ-subgroup ⟹ `exists_isHallSubgroup_ge`/
+   Hall E定理; repo の Ch03 Hall API 要特定)。U:=Hall (κ∪σ)' of M (同様)。Kstar:=M_σ⊓C(K)。
+3. `typeP_structure hG hM hP hKM hK hKstar hU` で (b1) [N_M(X₀)=K⊔Kstar] と (c) [ℳ(C_G(Y))={M} for Y∈ℰ¹(Kstar)] 取得。
+4. C_M(x')⊆C_M(X₀)⊆N_M(X₀)=K⊔Kstar=K×Kstar (K σ', Kstar σ)。x' σ'-elt ⟹ x'∈K ⟹ π(⟨x'⟩)⊆π(K)=κ (第1連言)。
+5. x∈C_{M_σ}(X₀)⊆M_σ∩(K×Kstar)=Kstar。⟨x⟩∈ℰ¹(Kstar) ⟹ (c): ℳ(C_G(x))={M} ⟹ C_G(x)⊆M (第2連言)。
+
+**branch 2** (全 p∈π(⟨x'⟩)⊆τ₂): goal = `π(⟨x'⟩)⊆τ₂ ∧ ℓ_σ(x')=1 ∧ ℳ(C_G(x'))={M}`。
+1. π(⟨x'⟩)⊆τ₂: branch 仮定。
+2. ℳ(C_G(x'))={M}: x' τ₂-elt, C_{M_σ}(x')⊇⟨x⟩≠1 ⟹ **Cor 12.10(e)** =
+   `(nilpotent_sigmaComplement_abelian hG hsetup).2.2.2.2 x' hx'M hx'1 (π(⟨x'⟩)⊆τ₂) (C_{M_σ}(x')≠1)`。要 E-setup。
+3. ℓ_σ(x')=1 = `(D.length_one_iff x').mpr ⟨hx'1, hne⟩`, hne:`(maximalSigmaSubgroupsOfElement x').Nonempty`
+   = ∃M*, x'∈M*_σ。chain: q∈π(⟨x'⟩)⊆τ₂(M), A∈ℰ_q²(E), M*∈ℳ(N_G(A)) ⟹ **Lem 12.11(a)**
+   `tau2_prime_mem_sigma_diff_beta` で q∈σ(M*) ⟹ ⟨x'⟩ σ(M*)-group ⟹ **Cor 12.16**
+   `sigma_subgroup_conj_into_Msigma` で ∃g∈M*, conj g•⟨x'⟩≤M*_σ ⟹ x'∈(M*^{g⁻¹})_σ
+   (要 σ-core conjugation-equivariance: (conj g•M)_σ = conj g•M_σ ∧ σ(conj g•M)=σ(M))。⟹ M*^{g⁻¹}∈maximalSigmaSubgroupsOfElement x'。
+
+**要特定 API**: (a) Hall κ ⊇ X₀ 存在 (Ch03 solvable Hall containment), (b) σ-core/σ conjugation-equivariance,
+(c) E-setup reconstruction (`exists_subgroupESetup` で M から)。**branch 1 が Prop 14.2 full 適用 (K/U/Kstar 3 producer)、
+branch 2 が Lem 12.11(a)+Cor 12.16+ℓ_σ chain。各 ~60-80 行。** → 14.4 は Cor 14.3 + Thm 13.9 (R(x) headline は §16 defer)。
+
+### ⚠ 14.3 の真の gate = Hall-containment (Hall-D) + branch-2 ℳ-piece landed (2026-06-15, lane-h)
+14.3 着手で判明:
+- **branch 1 は Hall-D (Wielandt: π-subgroup ⊆ Hall π in solvable) に gate** — repo は hall_E/hall_C
+  (存在+共役) のみで **containment 未形式化** (Lane D notes「Cor 10.9 — needs Hall-D, ~250 行」と同じ gap)。
+  branch 1 は K=Hall κ ⊇ X₀ (κ-witness) を要し、これが Hall-D そのもの。Sylow 経由の workaround
+  (X₀≤Syl_{p₀}≤Hall κ) は「Syl_p ⊆ Hall π for p∈π」+ Sylow 共役で可能だが fiddly (~30-40 行) +
+  その後 typeP_structure full 適用 (K/U/Kstar 3 producer) で更に setup 重い。
+- **✅ branch-2 ℳ-piece landed**: `maximalContaining_centralizer_eq_singleton_of_tau2_element`
+  (x' τ₂-elt + C_{M_σ}(x')≠1 ⟹ ℳ(C_G(x'))={M}) = Cor 12.10(e) + E-setup、sorry-free。
+  残 branch 2 = ℓ_σ(x')=1 (Lem 12.11(a)+Cor 12.16+σ-core conj-equivariance `sigma_conj` ✅ で
+  maximalSigmaSubgroupsOfElement 非空)。
+- ⟹ **14.3 完成には Hall-D (or Sylow-workaround) が前提**。14.4 も R(x) headline は §16 gate。
+  **推奨: Hall-D を Ch03 に形式化してから 14.3 branch 1**(Hall-D は Cor 10.9 等でも要る汎用 lemma)、
+  または 14.3 を Hall-D landing 待ちで保留し別 FT-path タスクへ。hub に cross-cutting Hall-D 需要を報告。
