@@ -22,7 +22,9 @@ The answer claims "Thm 15.2(g) gives F(M) ≤ M_F, forcing F(M)=M_F". **This ove
 ## Direct answers (verified): F(M)=C_M(M_F)·M_F (Case I via Cor15.3a HX≤F(M) + reverse; Case II via F(M)=M_F-ish, but really F(M)=F(M_σ) and C_M(F(M))≤F(M)); M''⊆F(M)/M_F⊆M' as above; (d) Y is τ₂, K is τ₂', M/M'≅K ⟹ Y↦triv ⟹ Y≤M', plus F(M_σ)≤M_σ≤M'.
 
 ## Formalization plan
-1. **Strengthen Thm 15.2** (`mf_ne_msigma_typeP1_structure`): add conjunct `fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M` (sorried, faithful).
+1. **Strengthen Thm 15.2** (`mf_ne_msigma_typeP1_structure`): add TWO conjuncts to its conclusion (both sorried/faithful, the sorry covers them — mmd 15.2(f),(g) imply them):
+   - `fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M`  (mmd "F(M) ⊂ M_σ") — for FIX 1.
+   - `¬ IsCyclic ↥(MF M)`  (M_F ⊇ Q̄ elementary abelian order q^p, rank p≥3 ⟹ non-cyclic) — for FIX 2 / conjunct 7, breaking the 15.5↔15.6 circularity cleanly.
 2. Helper lemmas: `O_σ(F(M))=F(M_σ)` (Lemma 1), F nilpotent Hall decomposition (Lemma 2). Check repo for existing `fittingInAmbient` / `opiCoreInG` API.
 3. Case split on `MF M = Msigma M` (= M_σ nilpotent ⟺ Case I).
 4. Case I: Cor 15.3(a) cite + the embedding/decomposition. Case II: strengthened Thm 15.2 ⟹ F(M)⊆M_σ ⟹ Y=1, F(M)=F(M_σ); conjunct 7 via M_F non-cyclic from q^p.
