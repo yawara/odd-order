@@ -2035,6 +2035,55 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact maximalContaining_centralizer_of_le_Msigma_centralizer_E1 hG h' hKne hXelem
         (hKstar ▸ hXKstar)
 
+/-- **BG Proposition 14.2(b2)** (mmd L3829): for a type-`P` `M`, a Hall `κ(M)`-subgroup `K`, and
+`X ∈ ℰ_p¹(K)` with `C_{M_σ}(X) ≠ 1`, every `M* ∈ ℳ(N_G(X))` satisfies `X ⊆ M*_σ`.
+
+This is the clause of Prop 14.2(b) that `typeP_structure` omits — it carries only (b1)
+(`N_M(X) = K × K*`).  The hypothesis `C_{M_σ}(X) ≠ 1` is automatic for `X ∈ ℰ¹(K)` (then
+`C_{M_σ}(X) ⊇ C_{M_σ}(K) = K* ≠ 1`), so callers supply it from `typeP_structure`'s `K* ≠ 1`.
+Theorem 14.7's neighbour analysis (`Z = K×K* ⊆ M_i`, `X_i ⊆ M_{iσ}`) needs this clause.
+
+Proof (BG): `p ∈ κ(M) ⊆ τ₁(M) ∪ τ₃(M)`; Lemma 13.13 (`mem_sigma_of_tau1_tau3_centralize`) gives
+`p ∈ σ(M*)`; since `X ≤ N_G(X) ≤ M*` is a `σ(M*)`-subgroup, `X ⊆ M*_σ`. -/
+theorem typeP_elemAbelian_le_neighbor_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {Mstar : Subgroup G}
+    (hMstar : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    X ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := by
+  classical
+  -- `p ∈ κ(M) ⊆ τ₁(M) ∪ τ₃(M)`.
+  have hpdvd : p ∣ Nat.card ↥X := by
+    rw [(mem_elemAbelianOfRank.mp hX).2]; exact dvd_pow_self p one_ne_zero
+  have hpcardK : p ∈ (Nat.card ↥K).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvd.trans (Subgroup.card_dvd_of_le hXK), Nat.card_pos.ne'⟩
+  have hpκ : p ∈ kappa M := hK.1 p (by
+    rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hpcardK)
+  have hpτ13 : p ∈ tau1 M ∪ tau3 M := kappa_subset_tau1_union_tau3 hpκ
+  -- `K` is a `σ(M)'`-subgroup; get an `E`-setup with `K ≤ E`, so `X ≤ E`.
+  have hK_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := fun q hq =>
+    kappa_subset_sigmaCompl (hK.1 q (by
+      rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hq))
+  obtain ⟨E, E₁, E₂, E₃, hsetup, hKE, _⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hKM hK_pi
+  -- Lemma 13.13: `p ∈ σ(M*)`.
+  have hpσMstar : p ∈ OddOrder.BG.Ch3.S10.sigma Mstar :=
+    OddOrder.BG.Ch3.S13.mem_sigma_of_tau1_tau3_centralize hG hsetup hpτ13 hX (hXK.trans hKE)
+      hCX hMstar
+  -- `X ≤ M*` is a `σ(M*)`-subgroup, hence `X ≤ M*_σ`.
+  have hMstarMax : Mstar ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hMstar).1
+  have hXMstar : X ≤ Mstar :=
+    Subgroup.le_normalizer.trans (mem_maximalSubgroupsContaining.mp hMstar).2
+  refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hMstarMax) hXMstar (fun q hq => ?_)
+  rw [(mem_elemAbelianOfRank.mp hX).2, pow_one, Nat.Prime.primeFactors (Fact.out : p.Prime),
+    Finset.mem_singleton] at hq
+  rwa [hq]
+
 /-- **A `κ(M)`-subgroup of `M` lies in some Hall `κ(M)`-subgroup of `M`** (Hall D / Wielandt,
 `Ch03.hall_D`, applied inside the solvable group `↥M`).  Used by Corollary 14.3 branch 1 to put
 the `κ`-witness `X₀ ≤ ⟨x'⟩` into a Hall `κ`-subgroup `K`, so that Proposition 14.2(b1)/(c) apply. -/
