@@ -3187,3 +3187,28 @@ irr branch 残り conjunct + 完全 constructor:
   4. **case-A テンプレート**: case-A の cX 構築 (`nonempty_coherent_S_caseA_of_frobenius` 周辺) を読んで HYBRID の雛形にする (case-A 完了済ゆえ最良の参照)。
   5. `hperElem` (S₁ image ⊥ R(χ)) の供給元 — seam-1 orthogonality (`columnDecompositionTau_X_orthogonal` 等) が既にあるか。
 **正本=本 session 43 cont.¹⁴。dispatch トリオ完成 (`e011f127`)。次=HYBRID 組立の RECON (Xset W2 構造 + cX_col base + chain-adjoin 順序 + case-A テンプレート)。Opus 継続。**
+
+### session 43 cont.¹⁵: 🔬 HYBRID→capstone landscape を完全 RECON (commit: 本 note のみ)
+Lean commit なし。dispatch トリオ完成後の残務 = **cX 組立 (T8-analog, 最重 node) + capstone wiring** を engine/既存部品レベルで完全に地図化。
+
+**判明した構造 (Z=W₂ ルート、blocker note `s08_6_8_blocker_central_Z.md` で確定済)**:
+- case-B は **Z = W₂** ルート (Cor 2.30 が中心 Z 要求、⁅H,H⁆⊄Z(H) ゆえ ⁅H,H⁆ では degree bound 不成立)。X := `hyp.Xset W2`、Y := `Yset = S(⁅H,H⁆)`。**`Xset W2 ∪ Yset ⊊ S` (filtrationDiff = S(W₂)∖S(⁅H,H⁆) が gap)** — Frobenius の `Xset⁅H,H⁆∪Yset=S` ショートカットは case-B では使えない (意図的に elide)。→S は blocker note 「correct path」。
+- **anchor 解決**: per-φ images (`caseB_per_phi_anchored_fromYset`, η₁-anchored `τ(Ind θ−aη₁)=X−a·cY.ext η₁`) は **glue の diagonal D / extension 値**。cX 自体は X-internal anchor (case-A の `xBaseBlock`) で組む。
+
+**engine 在庫 (確認済)**:
+- `retarget_isCoherent_of_supportedDecomposition` (S07:4031) — **任意 τ** (incl. hyp.tau)、`Da:CharacterPsiDecomposition τ χ (a•chi1)` (= per-φ image) + 正規直交 + `hperElem` + `chi1∈S₁` から `IsCoherent τ (S₁∪{χ,χ̄})`。⚠ chi1 (anchor) ∈ S₁ 要 → 単独で pure-cX には不向き (chi1=η₁∉Xset)。
+- `xChainCoherent` (CorePart1:2701) — Dade map 上の conjugate-pair fold (`coherentOfPairChainCover` + `XAdjoinStepInput.adjoin`)。`XAdjoinStepInput` (CorePart1:2583, ~25 field) = per-step ingredient (orthonormal χ/χ̄ + member-family + degree bound `2a<∑deg²` + S₁⊥)。多くの field は `CaseBIrrBundle` から既に出る。
+- `per_phi_anchored_image` (CB2:1908) — per-φ image family の汎用 producer (`caseB_per_phi_anchored_fromYset` がその case-B 実体)。
+- **base 部品**: `certainTypeSet_isCoherent_tau_canonical` (S08CB:170, **unconditional**, μ_j columns coherence per nontrivial k)。
+- **glue shell**: `coherentXunionYset_caseB_of_glued` (CB2:1616, sorry-free) — cX + ν + agreement/hmixed/D/hgen → `IsCoherent hyp.tau (Xset W2 ∪ Yset)`。
+- **capstone template (Frobenius)**: `coherentS_of_frobenius_pairUnionBaseAnchorCommonIndexPrimePowerData_generator_mixed_inner` (S08CT:388 経由) — Z=⁅H,H⁆ で直接 S。case-B はこの mirror を Z=W₂ で。
+- **set bridge**: `Xset_commutator_eq_Xset_union_filtrationDiff` (CorePart2:877)。
+- **case-A pure-cX テンプレート**: `Xset_centralCommutator_isCoherent_of_irreducible_X` (CoreCore:1046) — 但し **全 X-member 既約**前提 (common-index prime-power degree machinery + xBaseBlock anchor)。case-B は **mixed** (columns μ_j + irreducible Ind θ) ゆえ直接流用不可。
+
+**🔴 残務 (multi-turn、優先順)**:
+1. **cX = `IsCoherent hyp.tau (Xset W2)` 組立** [最重・T8-analog]: columns (certainTypeSet_isCoherent_tau_canonical) を base に、irreducible Ind θ を per-φ images 経由で adjoin。mixed ゆえ case-A builder 流用不可 — 新規 builder か `retarget_isCoherent_of_supportedDecomposition` の反復。
+2. **→S route** (`Xset W2 ∪ Yset ⊊ S` の gap = filtrationDiff): blocker note「correct path」を実装 (Frobenius と異なる)。
+3. **capstone case-split wiring**: `sibleySetup_is_coherent` (S08CT:59) で hyp.cases 分岐 (Frobenius=既存 builder / CertainType=h46+W₂+φ を供給して上記 cX→glue→S)。
+
+**▶▶ 次ターン具体第一手 (推奨)**: cX 組立の最小単位から着手。候補 = (a) **gated skeleton**: `coherenceTarget_caseB_of_cX_of_glueData` (cX+ν+D+hgen を hyp に取り CoherenceTarget を産む sorry-free 補題、Frobenius builder を mirror) で wiring を前倒し ([[feedback-gated-endpoint-skeleton-pattern]])、cX/route-to-S を named residual 化。または (b) cX の prerequisite 正規直交補題 (X-member 像どうし / column⊥irr) を個別に。**(a) を推奨** (robust、capstone 構造を確定、cX を孤立 obligation 化)。
+**正本=本 session 43 cont.¹⁵。HYBRID→capstone 完全地図化 (Z=W₂ ルート確定、engine 在庫確認)。次=cX wiring の gated skeleton (`coherenceTarget_caseB_of_cX_of_glueData`) 着手。Opus 継続。**
