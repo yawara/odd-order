@@ -56,6 +56,48 @@ theorem charPsiDecomp_eqRec_imageSet
       = D.imageFamily.imageSet := by
   cases h; rfl
 
+/-- The `X` image side of a (5.4) decomposition is unchanged when its `χ`-index is transported along
+`χ = χ'` (`X : ClassFunction G ℂ` does not mention `χ`).  Used to read the column-branch `X` through
+the dispatch index cast for the seam-1 orthogonality `⟨X, cY.ext η₁⟩ = 0`. -/
+theorem charPsiDecomp_eqRec_X
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ χ' ψ : ClassFunction ↥L ℂ} (h : χ = χ')
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) :
+    (h ▸ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ' ψ).X = D.X := by
+  cases h; rfl
+
+/-- The `Y` orthogonal side of a (5.4) decomposition is unchanged when its `χ`-index is transported
+along `χ = χ'` (`Y : ClassFunction G ℂ` does not mention `χ`).  Used to read the column-branch `Y`
+through the dispatch index cast for the integrality `⟨Y, cY.ext η₁⟩ ∈ ℤ`. -/
+theorem charPsiDecomp_eqRec_Y
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ χ' ψ : ClassFunction ↥L ℂ} (h : χ = χ')
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) :
+    (h ▸ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ' ψ).Y = D.Y := by
+  cases h; rfl
+
+/-- **(6.8.2.3) integrality of the orthogonal side against a `ZIrr` anchor.**  For any (5.4)
+decomposition `D` with image side `D.X ⊥ Y₀` (`hX`), `τ₁`-image a virtual character
+`D.tau1 (χ − ψ) ∈ ZIrr G` (`hτmem`) and a virtual-character anchor `Y₀ ∈ ZIrr G` (`hY₀`), the
+orthogonal residual pairs integrally with the anchor:
+`⟨D.Y, Y₀⟩ = ⟨D.X, Y₀⟩ − ⟨D.tau1 (χ−ψ), Y₀⟩ = −⟨D.tau1 (χ−ψ), Y₀⟩ ∈ ℤ`.
+This is the route-independent `hbi` of `per_phi_anchored_image` (`Y = X − τ₁(χ−ψ)` from `tau1_image`;
+`⟨τ₁(χ−ψ), Y₀⟩ ∈ ℤ` by `inner_mem_ZIrr_int`). -/
+theorem psiDecomp_Y_inner_int {L' G' : Type*} [Group L'] [Group G'] [Fintype L'] [Fintype G']
+    [Invertible (Nat.card L' : ℂ)] [Invertible (Nat.card G' : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L' G'} {χ ψ : ClassFunction L' ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ)
+    {Y₀ : ClassFunction G' ℂ}
+    (hX : ClassFunction.inner D.X Y₀ = 0)
+    (hτmem : D.tau1 (χ - ψ) ∈ ZIrr G')
+    (hY₀ : Y₀ ∈ ZIrr G') :
+    ∃ n : ℤ, ClassFunction.inner D.Y Y₀ = (n : ℂ) := by
+  obtain ⟨n, hn⟩ := ClassFunction.inner_mem_ZIrr_int hτmem hY₀
+  refine ⟨-n, ?_⟩
+  have hYeq : D.Y = D.X - D.tau1 (χ - ψ) := by rw [D.tau1_image]; abel
+  rw [hYeq, ClassFunction.inner_sub_left, hX, hn]
+  push_cast; ring
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
