@@ -3128,3 +3128,18 @@ column 機構を irreducible 枝に流用:
 - #6/#7 `⟨Ind θ, a•η₁⟩=0` / `⟨(Ind θ).conj, a•η₁⟩=0`: 既約 Ind θ ⊥ η₁∈Yset。**`Ind θ ≠ η₁` が要** (θ(1)>1 で degree distinct; θ(1)=1 だと Ind θ∈Yset の可能性 → X/Y disjoint or structural input)。⚠ ≠η₁ が #6/#7 の subtlety。caseB_irr_bundle で `Ind θ≠η₁`/`(Ind θ).conj≠η₁` を structural input に取る (capstone 供給、X-membership 由来) のが robust。
 **▶▶ 次**: #8 (clean) → #6/#7 (≠η₁ input) → `caseB_irr_bundle` constructor (θ≠trivial + ≠η₁ inputs) → hirrAnc → aggregate → dispatch family。
 **正本=本 session 43 cont.¹⁰。#2 done、irr 5/8 (`1c52f22f`)。次=#8 → #6/#7 → caseB_irr_bundle。Opus 継続。**
+
+### session 43 cont.¹¹: ✅✅✅ 両 dispatch bundle (hcol + hirr) 構成可能 (commits `acca8f2f`/`d511632e`/`78e0abbe`)
+irr branch 残り conjunct + 完全 constructor:
+- #8 `caseB_irr_conj_inner` (`acca8f2f`): ⟨Ind θ, conj⟩=0 (#1+#2、conj 既約 `IsIrreducibleCharacter.conj`、irr-Kronecker; ne は `congrArg coe`+`coe_mk` simp)。
+- #6/#7 `caseB_irr_(conj_)orthogonal_Yset` + helper `inner_irr_Yset_eq_zero` (`d511632e`): ⟨Ind θ, a•η₁⟩=0 / ⟨conj, a•η₁⟩=0、**`Ind θ≠η₁`/`conj≠η₁` を structural input** (X⊥Y distinctness、capstone 供給)。
+- **`caseB_irr_bundle` (`78e0abbe`)**: 全 8 conjunct を組立 → `CaseBIrrBundle hyp h46 θ η₁ (constituentWeight hφ' θ)`。input = θ≠trivial + Ind θ≠η₁ + conj≠η₁ (+ 構造 hyp)。一発緑。
+
+**⟹ 🎯 両 dispatch bundle constructor 完成**: `caseB_column_bundle` (hcol) + `caseB_irr_bundle` (hirr) = `caseB_per_phi_anchored_fromYset` の per-θ 入力。両者とも `0<constituentWeight` + 中心/Hall data + (irr は θ≠trivial/≠η₁ distinctness) から構成可能。
+
+**▶▶ 次 (capstone への残り path)**:
+1. **hirrAnc** (caseB_per_phi_anchored_fromYset の per-θ anchor-vs-constituent 直交 `⟨η₁, Ind θ⟩` 系 4): η₁∈Yset linear ⊥ 既約 Ind θ。`inner_irr_Yset_eq_zero` 類似 (η₁≠Ind θ)。
+2. **dispatch family 構築**: `{θ//0<constituentWeight}` 上で hcol/hirr を dispatch (caseB_constituentDecomposition 値レベル分岐)、caseB_irr_bundle/caseB_column_bundle を供給。θ≠trivial/≠η₁ の structural input を解決 (degree θ(1)>1 ⟹ ≠η₁、or X-membership)。
+3. **(6.8.2.2) aggregate** `hXaggorth`/`hdecomp` (`exists_decomposition_caseB` S08:126)。
+4. → caseB_per_phi_anchored_fromYset per-φ image → HYBRID 組立 (X_irr chain-adjoin + cX_col union) → capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59)。
+**正本=本 session 43 cont.¹¹。両 bundle (hcol+hirr) constructor 完成 (`78e0abbe`)。次=hirrAnc → dispatch family → aggregate → HYBRID → capstone。Opus 継続。**
