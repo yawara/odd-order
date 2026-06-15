@@ -476,6 +476,114 @@ theorem caseB_irr_htau1_mema
     (ClassFunction.induce_mem_ZIrr H (IsIrreducibleCharacter.mem_ZIrr θ.2))
     (nsmul_mem (IsIrreducibleCharacter.mem_ZIrr (hyp.isIrreducibleCharacter_of_mem_Yset hη₁)) _)
 
+/-- **(6.8.2.3) irreducible-branch conjugate difference support** (`CaseBIrrBundle` conjunct).
+`(Ind^L_H θ).conj − Ind^L_H θ` is `H^#`-supported, with no irreducibility assumption: both terms are
+supported on `H` (`support_induce_subset_of_normal`, conj preserves support), and the difference
+vanishes at `1` since `(Ind^L_H θ)(1) = |W₁|·θ(1)` is a (real) positive integer fixed by `star`. -/
+theorem caseB_irr_conj_diff_support
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (θ : IrreducibleCharacter ↥H) :
+    ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+        - ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  have hsupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).support ⊆ (H : Set ↥L) :=
+    ClassFunction.support_induce_subset_of_normal H _
+  intro x hx
+  rw [ClassFunction.mem_support, ClassFunction.sub_apply] at hx
+  have hxH : x ∈ H := by
+    by_contra hxnotH
+    have h1 : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) x = 0 := by
+      by_contra h; exact hxnotH (hsupp (ClassFunction.mem_support.mpr h))
+    exact hx (by rw [ClassFunction.conj_apply, h1, star_zero, sub_zero])
+  have hxne : x ≠ 1 := by
+    intro hx1
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    refine hx ?_
+    rw [hx1, ClassFunction.conj_apply, ClassFunction.induce_apply_one, hd]
+    simp [← Nat.cast_mul]
+  change (x : G) ∈ sharpImage H
+  exact ⟨Subgroup.mem_map.mpr ⟨x, hxH, rfl⟩, fun hx1G => hxne (Subtype.ext hx1G)⟩
+
+/-- **(6.8.2.3) irreducible-branch irreducibility** (`CaseBIrrBundle` conjunct #1, the gate).
+When `Ind^L_H θ` is not a (nontrivial) certain-type column (`hnotcol`) and `θ` is nontrivial, the
+induced character is irreducible.  Transport `θ` to `↥h46.K` (`subgroupCongr` +
+`compHom_of_surjective`), then apply `induce_isIrreducible_of_forall_chiRestrict_ne`: a nontrivial
+column source `chiRestrict χ₂` would give a column equal to the induced character
+(`induce_restrict_certainType_eq`), contradicting `hnotcol`; and `chiRestrict 1` is trivial
+(`certainType_zero_column_anchor`) while the transported `θ` is not. -/
+theorem caseB_irr_induce_isIrreducible
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hθne : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H)
+    (hnotcol : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ≠ ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) :
+    IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  set e : ↥h46.K ≃* ↥H := MulEquiv.subgroupCongr hHK with he
+  set θK : IrreducibleCharacter ↥h46.K :=
+    ⟨ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ),
+      IsIrreducibleCharacter.compHom_of_surjective e.surjective θ.2⟩ with hθK
+  have hθKval : ∀ (x : ↥L) (hx₁ : x ∈ h46.K) (hx₂ : x ∈ H),
+      (θK : ClassFunction ↥h46.K ℂ) ⟨x, hx₁⟩
+        = (θ : ClassFunction ↥H ℂ) ⟨x, hx₂⟩ := by
+    intro x hx₁ hx₂
+    show ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ) ⟨x, hx₁⟩ = _
+    rw [ClassFunction.compHom_apply]
+    rfl
+  have hindeq : ClassFunction.induce h46.K (θK : ClassFunction ↥h46.K ℂ)
+      = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) :=
+    OddOrder.Peterfalvi.S04.Hypothesis.induce_congr_of_subgroup_eq hHK hθKval
+  rw [← hindeq]
+  refine h46.induce_isIrreducible_of_forall_chiRestrict_ne (fun χ₂ hcontra => ?_)
+  by_cases hχ₂1 : χ₂ = 1
+  · -- `χ₂ = 1`: `chiRestrict 1` is trivial, so `θ ∘ e = 1`, hence `θ = 1` (`e` surjective)
+    subst hχ₂1
+    have hcompeq : ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ)
+        = ClassFunction.restrict h46.K (trivialClassFunction ↥L) := by
+      have h0 : (θK : ClassFunction ↥h46.K ℂ)
+          = ClassFunction.restrict h46.K (trivialClassFunction ↥L) := by
+        rw [← hcontra, h46.coe_chiRestrict, (h46.certainType_zero_column_anchor).2]
+      rw [hθK] at h0; exact h0
+    refine hθne (ClassFunction.ext fun h => ?_)
+    obtain ⟨k, rfl⟩ := e.surjective h
+    have hk := congrArg (fun f : ClassFunction ↥h46.K ℂ => f k) hcompeq
+    simp only [ClassFunction.compHom_apply, ClassFunction.restrict_apply,
+      trivialClassFunction_apply, MulEquiv.coe_toMonoidHom] at hk
+    rw [hk, trivialClassFunction_apply]
+  · -- `χ₂ ≠ 1`: `chiRestrict χ₂ = θ_K` forces `columnSum χ₂ = Ind^L_H θ`
+    refine hnotcol χ₂ hχ₂1 ?_
+    rw [← hindeq, OddOrder.Peterfalvi.S06.columnSum_def,
+      ← h46.induce_restrict_certainType_eq χ₂, ← h46.coe_chiRestrict χ₂, hcontra]
+
+/-- `Ind^L_H θ ≠ 1_L`: its degree is a multiple of `|W₁| > 1` (`W₁ ≠ ⊥`), unlike the
+degree-`1` trivial character. -/
+theorem caseB_induce_ne_trivial
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (θ : IrreducibleCharacter ↥H) :
+    ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥L := by
+  intro h
+  obtain ⟨d, hd0, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have h1 : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L)
+      = trivialClassFunction ↥L (1 : ↥L) := by rw [h]
+  rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hd, trivialClassFunction_apply,
+    ← Nat.cast_mul] at h1
+  have h2 : Nat.card hyp.W1 * d = 1 := by exact_mod_cast h1
+  exact hyp.W1_nontrivial (Subgroup.card_eq_one.mp (Nat.dvd_one.mp ⟨d, h2.symm⟩))
+
+/-- **(6.8.2.3) irreducible-branch non-realness** (`CaseBIrrBundle` conjunct #2).  An irreducible
+`Ind^L_H θ` is non-real: it is nontrivial (`caseB_induce_ne_trivial`) and `L` has odd order
+(`card_L_odd`), so Peterfalvi (1.1) (`not_isReal_of_ne_trivial_of_odd_card'`) applies. -/
+theorem caseB_irr_nonreal
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))) :
+    ¬ ClassFunction.IsReal (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) := by
+  refine OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'
+    hyp.card_L_odd (χ := ⟨_, hirr1⟩) (fun htriv => caseB_induce_ne_trivial hyp θ ?_)
+  rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter (G := ↥L), ← htriv]
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/

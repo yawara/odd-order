@@ -3077,3 +3077,54 @@ CaseBIrrBundle (S08CaseBAssembly:519) は仮説 `(∀ χ₂≠1, columnSum χ₂
 
 **▶▶ 次**: (1) #1 既約性 bridge (χ₂=1 edge 解決; induce_isIrreducible 直用 vs exists_eq_certainType_or_induce 経由を精査) → (2) #2/#8 non-real (odd-order no-real-irr; `Yset_hasNoRealCharacters` 類似が L 全体であるか) → (3) #4/#5 support/ZIrr (column 再利用) + #6/#7 X⊥Y (Ind θ irreducible版) → (4) `caseB_irr_bundle` constructor → hirrAnc → dispatch family assembly → capstone。
 **正本=本 session 43 cont.⁶。CaseBIrrBundle mapping 完了、#1 既約性が gating (value↔index seam, χ₂=1 edge)。次=#1 bridge 精査 (induce_isIrreducible 直用 vs (4.5.b) 経由)。Opus 継続。**
+
+### session 43 cont.⁷: ✅ CaseBIrrBundle の seam-free conjunct #3/#4/#5 完了 (commits `aa536164`/`e956da40`)
+column 機構を irreducible 枝に流用:
+- `caseB_induce_degree_match` (`(Ind θ)(1)=constituentWeight·η₁(1)`) + `caseB_irr_sub_smul_support` (#4) + `caseB_irr_htau1_mema` (#5, `induce_mem_ZIrr`)。
+- `caseB_irr_conj_diff_support` (#3): `(Ind θ).conj − Ind θ` H^#-support。**irreducibility 不要** — 両項 H-support (conj は support 不変) + 1 で消失 (Ind θ(1)=|W₁|θ(1) real, star 固定; `simp [← Nat.cast_mul]`)。
+
+**⟹ CaseBIrrBundle 8 conjunct中 3 (#3/#4/#5) が seam-free standalone。残り 5 はすべて #1 (既約性) に gated**:
+- **#1 `IsIrreducibleCharacter (Ind^L_H θ)`** = **唯一の真の gate**。`induce_isIrreducible_of_forall_chiRestrict_ne` (index-level, ∀χ₂ chiRestrict≠χ_K) を使うには (a) θ:Irr↥H → χ_K:Irr↥K transport (hHK=h46.K=H, subgroup-eq cast)、(b) χ₂≠1: chiRestrict χ₂=χ_K ⟹ columnSum χ₂=Ind θ 矛盾、(c) **χ₂=1 edge**: `chiRestrict_ne_trivial` は χ₂≠1 限定ゆえ chiRestrict 1 vs χ_K を別途。⚠ value↔index seam + transport が core difficulty。
+- #2 non-real / #8 ⟨Ind θ, conj⟩=0: #1 + odd-order no-real-irr。#6/#7 ⟨Ind θ, a•η₁⟩=0: #1 + Ind θ≠η₁ (degree θ(1)>1 or X/Y disjoint; θ(1)=1 で degree collision に注意)。
+
+**▶▶ 次 (#1 を正面から)**: induce_isIrreducible 直用の seam (transport + χ₂=1) を組む。χ₂=1 edge が重い場合は ChatGPT 相談 ([[feedback-ask-chatgpt-for-elided-gaps]], 最強モデル) で cleanest bridge を得る。#1 着地後は #2/#6/#7/#8 → caseB_irr_bundle constructor → hirrAnc → dispatch family。
+**正本=本 session 43 cont.⁷。irr seam-free #3/#4/#5 done (`e956da40`)。残りは #1 既約性 seam が唯一の gate (value↔index transport + χ₂=1 edge)。次=#1 正面 (必要なら ChatGPT)。Opus 継続。**
+
+### session 43 cont.⁸: 🎯 #1 既約性の math 完全確定 (χ₂=1 edge 解決) — 残り = ↥K↔↥H transport plumbing
+**χ₂=1 edge を解決**: `(h46.columnFamily 1).mu 0 = trivialClassFunction L` (S06_CertainTypeCharacters:1015, `columnFamily_one_...`) ⟹ `chiRestrict 1 = Res_K((columnFamily 1).mu 0) = Res_K(trivial) = trivial ↥K` (coe_chiRestrict + restrict_trivial)。
+**⟹ #1 の論法確定** (`induce_isIrreducible_of_forall_chiRestrict_ne (∀χ₂, chiRestrict χ₂ ≠ θ_K)`):
+- χ₂≠1: `chiRestrict χ₂ = θ_K ⟹ columnSum χ₂ = induce K (chiRestrict χ₂) = induce H θ` (4.5.a `induce_restrict_certainType_eq` + coe_chiRestrict + hHK transport) ⟹ hnotcol 矛盾。
+- χ₂=1: `chiRestrict 1 = trivial ≠ θ_K` ⟸ **`θ ≠ trivial`** (= structural input)。
+- ⟹ `inertia θ_K = K` ⟹ `induce K θ_K` irreducible ⟹ (induce_congr で) `induce H θ` irreducible。
+
+**残り plumbing (mechanical)**: (a) θ:Irr↥H → θ_K:Irr↥h46.K の transport (hHK : h46.K=H; `hHK ▸`/cast or `compHom (subgroup eq equiv)`)、(b) `induce h46.K θ_K = induce H θ` (`Hypothesis.induce_congr_of_subgroup_eq hHK`、columnSum_mem_S が実例)、(c) chiRestrict χ₂ ≠ θ_K の transport 越し比較。**↥K↔↥H transport が唯一の Lean 難所** (math は完結)。
+
+**`θ ≠ trivial` の出所**: dispatch の `0 < constituentWeight hφ' θ` から (θ=trivial ⟹ Res θ=trivial ⟹ ⟨φ',trivial⟩=0=weight、φ'≠trivial 前提) 導出可、または capstone が供給。⚠ φ'≠trivial が dispatch hypothesis にあるか要確認 (caseB_per_phi_anchored_fromYset の φ 制約)。
+
+**▶▶ 次**: (1) #1 = `caseB_irr_induce_isIrreducible (θ≠trivial) (hnotcol)` の transport plumbing を組む (ChatGPT で transport incantation を取得も可)。(2) #2 non-real (odd-order no-real-irr; L 全体の補題確認) → #8 (#1+#2)、#6/#7 (Ind θ≠η₁; θ(1)>1 で degree、θ(1)=1 は X/Y disjoint)。(3) caseB_irr_bundle constructor → hirrAnc → dispatch family。
+**正本=本 session 43 cont.⁸。#1 math 完全確定 (chiRestrict 1=trivial → χ₂=1 edge は θ≠trivial で閉)。残り = ↥K↔↥H transport plumbing のみ。Opus 継続。**
+
+### session 43 cont.⁹: ✅✅✅ #1 既約性 GATE CLEAR (`f08c89ba`) — value↔index seam 突破
+`caseB_irr_induce_isIrreducible`: `Ind^L_H θ` 既約 (hnotcol = not-nontrivial-column + θ≠trivial)。transport plumbing 実装:
+- θ:↥H → θK:↥h46.K = `⟨compHom (MulEquiv.subgroupCongr hHK).toMonoidHom θ, compHom_of_surjective e.surjective θ.2⟩` (既約性 transport)。
+- `induce h46.K θK = induce H θ` = `S04.Hypothesis.induce_congr_of_subgroup_eq hHK hθKval`。
+- `induce_isIrreducible_of_forall_chiRestrict_ne`: χ₂≠1 は columnSum 矛盾 (induce_restrict_certainType_eq + coe_chiRestrict + hcontra)、χ₂=1 は chiRestrict 1=trivial (certainType_zero_column_anchor) vs θ≠trivial (e 全射で θ(e k)=1 ⟹ θ=trivial)。
+- 知見: `(θK:CF)` の coe-mk は simp で還元されない → χ₂=1 は **e.surjective で h=e k に分解**して compHom_apply 適用 (e.symm 評価より clean)。
+
+**⟹ irr-branch の gate #1 解除。残り #2/#6/#7/#8 は #1 given で tractable**:
+- #2 non-real: `Ind^L_H θ` 既約(#1) + θ≠trivial + odd-order ⟹ no-real (要 L 全体の no-real-nontrivial-irr 補題確認)。
+- #8 `⟨Ind θ, conj⟩=0`: #1 + #2 (conj 既約 + distinct + irr-Kronecker)。
+- #6/#7 `⟨Ind θ, a•η₁⟩=0`: #1 + `Ind θ ≠ η₁` (θ(1)>1 で degree、θ(1)=1 は X/Y disjoint)。
+
+**⚠ 入力依存**: #1 は `θ≠trivial` を要す (dispatch の 0<constituentWeight + φ'≠trivial から、または capstone 供給)。caseB_irr_bundle constructor で θ≠trivial を input に取る。
+**▶▶ 次**: #2 non-real (odd-order 補題) → #8 → #6/#7 (≠η₁) → `caseB_irr_bundle` constructor (θ≠trivial input) → hirrAnc → (6.8.2.2) aggregate → dispatch family。
+**正本=本 session 43 cont.⁹。#1 既約性 GATE CLEAR (`f08c89ba`, value↔index seam 突破)。次=#2 non-real → #6/#7/#8 → caseB_irr_bundle。Opus 継続。**
+
+### session 43 cont.¹⁰: ✅ #2 non-real (`1c52f22f`) — irr branch 5/8
+- `caseB_induce_ne_trivial`: `Ind^L_H θ ≠ 1_L` (degree |W₁|·θ(1)、|W₁|>1 via W1_nontrivial; `Nat.dvd_one` で contra)。
+- `caseB_irr_nonreal` (#2): 既約 Ind θ は non-real。`not_isReal_of_ne_trivial_of_odd_card'` (BrauerPermUncond:233, Peterfalvi (1.1)) + `hyp.card_L_odd` + ne_trivial。
+**⟹ CaseBIrrBundle #1✅#2✅#3✅#4✅#5✅ = 5/8。残り #6/#7/#8**:
+- #8 `⟨Ind θ, (Ind θ).conj⟩=0`: #1 + #2 (conj 既約 `IsIrreducibleCharacter.conj`? + Ind θ≠conj from ¬IsReal + irr-Kronecker)。**clean、次**。
+- #6/#7 `⟨Ind θ, a•η₁⟩=0` / `⟨(Ind θ).conj, a•η₁⟩=0`: 既約 Ind θ ⊥ η₁∈Yset。**`Ind θ ≠ η₁` が要** (θ(1)>1 で degree distinct; θ(1)=1 だと Ind θ∈Yset の可能性 → X/Y disjoint or structural input)。⚠ ≠η₁ が #6/#7 の subtlety。caseB_irr_bundle で `Ind θ≠η₁`/`(Ind θ).conj≠η₁` を structural input に取る (capstone 供給、X-membership 由来) のが robust。
+**▶▶ 次**: #8 (clean) → #6/#7 (≠η₁ input) → `caseB_irr_bundle` constructor (θ≠trivial + ≠η₁ inputs) → hirrAnc → aggregate → dispatch family。
+**正本=本 session 43 cont.¹⁰。#2 done、irr 5/8 (`1c52f22f`)。次=#8 → #6/#7 → caseB_irr_bundle。Opus 継続。**
