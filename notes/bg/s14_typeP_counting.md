@@ -715,3 +715,42 @@ Hall-containment が unblock。14.3 が要する infra は全 landing:
 - **▶ ℓ_σ の sub-project = general Cor 12.16(a) を建てる** (BG 原文の char-q + Prop 12.15/M*=(M∩M*)K 構造、
   ~50-80 行、focused session 向き) or `exists_conj_smul_le_Msigma_of_pSubgroup` を multi-prime/cyclic へ拡張。
   これが ℓ_σ → 14.3 完成 → 14.4 の gate。**14.3 の他は全部済**。
+
+### ✅✅ general Cor 12.16(a) headline COMPLETE — ℓ_σ blocker解除 (2026-06-16, lane-h, commit 24ce5d0f)
+**`S12.sigma_subgroup_conj_into_Msigma_general`** (S12_Corollary1216.lean): 非自明 σ(M)-subgroup
+`Y < ⊤` of G は M_σ へ G-共役 (`∃g, conj g•Y ≤ Msigma M`)。**sorry-free + axiom-clean (AxiomsCheck
+登録済) + full build green (97s, S12 downstream cascade)**。これが notes 前項「▶ ℓ_σ の sub-project =
+general Cor 12.16(a)」の解。BG mmd L3453/L3474 の (a) headline (= L3801「every σ(M)-element is
+conjugate to an element of M_σ」)。
+
+新 helper (Cor1216 namespace, private):
+- `exists_conj_smul_le_of_index_isPiCompl`: generic Hall E-C-D 系 (可解群で π-subgroup は π'-index
+  部分群へ共役)。polymorphic。
+- `exists_conj_smul_le_of_relIndex_isPiCompl`: G-level 版 (可解 N 内、共役元 ∈ N)。↥N→G transfer =
+  `map_subtype_conj_smul` (S10/S12_Prop1215 の private copy)。
+- `exists_Mstar_factorization_sigma`: Prop 12.15 factorization M*=(M⊓M*)⊔K で **K を σ(M*)-group
+  として返す** (σ-disjoint ⟹ σ(M)')。nonconjugacy (h1215.1) も返す。E-setup 不要 (hM のみ)。
+- `exists_conj_qSubgroup_le_Msigma`: Sylow Step-1 抽出 (σ-prime q-group → M_σ)。
+
+**🔑 設計**: σ-disjointness (Thm 13.9 = `sigma_disjoint_of_nonconjugate`, S13 downstream) は import
+cycle 回避のため **hypothesis `hσdisj` でパラメータ化**。§14 caller が discharge (Thm 13.9 は landed)。
+S12 は unowned (F retired)。
+
+### ▶ 残: Cor 14.3 ℓ_σ wiring (S14:2123, branch 2) — 次の作業
+`D.length x' = 1` を `(D.length_one_iff x').mpr ⟨hx'1, hne⟩` で。hne = (maximalSigmaSubgroupsOfElement
+x').Nonempty = ∃ M' max, x'∈M'_σ。chain:
+1. q₀ ∈ π(⟨x'⟩) (x'≠1 ゆえ nonempty)。π(⟨x'⟩)⊆τ₂(M) (hτ2)。
+2. **A ∈ ℰ_{q₀}²(E)**: `exists_mem_elemAbelianOfRank_two_le_of_tau2` は A≤M しか返さない →
+   **push-in to E が要る** (`exists_conj_smul_le_hallPiece` 経由、Lem 12.11 proof line 412 と同型)。
+   ⟹ **要 helper or inline push-in**。
+3. Mstar ∈ ℳ(N_G(A)) (maximalSubgroupsContaining nonempty)。
+4. `tau2_prime_mem_sigma_diff_beta` (Lem 12.11a): ∀ q∈τ₂(M), q∈σ(Mstar)。⟹ π(⟨x'⟩)⊆σ(Mstar)、
+   即ち `IsPiSubgroup (σ Mstar) (zpowers x')`。
+5. `sigma_subgroup_conj_into_Msigma_general hG hMstar_mem hzpne hzplt hx'piMstar
+   (fun h h' => sigma_disjoint_of_nonconjugate hG hMstar_mem h h')` → ∃g, conj g•⟨x'⟩ ≤ Msigma Mstar。
+   (hzplt: zpowers x' < ⊤ — G non-abelian ゆえ cyclic ≠ ⊤。)
+6. **Msigma conj-equivariance** (要 helper, S14): `Msigma (conj g • M) = conj g • Msigma M`
+   (= sigma set conj-invariance [sigma_conj 両方向] + opiCoreInG conjugation
+   [conj_smul_opiCoreInG, S07 private → replicate])。⟹ x' ∈ Msigma (conj g⁻¹•Mstar)。
+7. M' = conj g⁻¹•Mstar maximal (`isCoatom_conj_smul`)。⟹ ⟨M', _, _⟩。
+**要新 helper ×2**: (i) ℰ_q²(E) push-in (step 2)、(ii) Msigma conj-equivariance (step 6)。各 moderate。
