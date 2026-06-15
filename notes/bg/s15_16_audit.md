@@ -367,7 +367,19 @@ S≠⊥・S≠G)→ M∈ℳ(N_G(S)) → S⊆M_σ(σ-helper ✅)→ H 冪零ゆ�
 各 H_q は C_M(S) 内の M の Sylow → Cor 15.3(a)[仮説化]で ≤M_σ → 冪零分解 helper で H≤M_σ。
 冪零分解 helper(`isNilpotent_iff_forall_sylow_normal` 経由「H 冪零 ∧ 全 Sylow≤K ⟹ H≤K」)が次の leaf。
 
-**✅ UPDATE 2026-06-15 (`ee1c7d41`): Cor 15.4 COMPLETE.** section 12 の「§15 は 1 つも cite で閉じない」は **Cor 15.6(`34d44c28`)と Cor 15.4(`ee1c7d41`)で部分的に覆った** — 両者とも本体 sorry-free で、cite 先(Cor 15.4 → Cor 15.3a; Cor 15.6 → 14.2/14.7/15.2/15.5)の sorry に gated。Cor 15.4 の reconstruction gap(π(H)⊆σ(M))は ChatGPT Pro 拡張で解決(`s15_4_chatgpt_answer.md`、核心 = Cor 15.3a の X が τ₂ 群なので C_M(S)/C_{M_σ}(S) が τ₂ 群 ⟹ q∉σ Sylow は埋め込みで τ₂ 強制→rank-2 矛盾)。新 helper: `sylow_le_Msigma_of_normalizer_le` / `eq_top_of_forall_sylow_le` / `eq_top...` / `normalizer_eq_self_of_mem_maximalSubgroups` / `sylow_isHall_piSet_subgroupOf_Msigma` / `sylow_le_Msigma_of_le_centralizer_sylow`(KEY)。**残 §15 = Lemma 15.1 / Thm 15.2 / Cor 15.3 / Cor 15.5 / Thm 15.7 / Thm 15.8 / Cor 15.9。** 真の deep core = Lemma 15.1 / Thm 15.2(§14 proof + 構造論)。Cor 15.3/15.5 は cite で閉じられる見込み(行間 gap があれば ChatGPT)。
+**✅ UPDATE 2026-06-15 (`ee1c7d41`): Cor 15.4 COMPLETE.** section 12 の「§15 は 1 つも cite で閉じない」は **Cor 15.6(`34d44c28`)と Cor 15.4(`ee1c7d41`)で部分的に覆った** — 両者とも本体 sorry-free で、cite 先(Cor 15.4 → Cor 15.3a; Cor 15.6 → 14.2/14.7/15.2/15.5)の sorry に gated。Cor 15.4 の reconstruction gap(π(H)⊆σ(M))は ChatGPT Pro 拡張で解決(`s15_4_chatgpt_answer.md`、核心 = Cor 15.3a の X が τ₂ 群なので C_M(S)/C_{M_σ}(S) が τ₂ 群 ⟹ q∉σ Sylow は埋め込みで τ₂ 強制→rank-2 矛盾)。新 helper: `sylow_le_Msigma_of_normalizer_le` / `eq_top_of_forall_sylow_le` / `eq_top...` / `normalizer_eq_self_of_mem_maximalSubgroups` / `sylow_isHall_piSet_subgroupOf_Msigma` / `sylow_le_Msigma_of_le_centralizer_sylow`(KEY)。**✅ UPDATE 2026-06-15 (`ec348bc3`+`b46f2e29`): Cor 15.5 COMPLETE + M_F Hall landed.** Cor 15.5
+`fitting_decomposition` 本体 sorry-free(cite 先 Lemma15.1/Thm15.2/Cor15.3 にのみ gated)。ChatGPT
+Pro 拡張 reconstruction(`s15_5_chatgpt_answer.md`)+ 手検証の 2 Case-II fixes(FIX1: F(M)⊆M_σ で Y=1;
+FIX2: ¬IsCyclic(MF M) で conjunct 7、循環 15.6 回避)。最後の gate だった conjunct 5 ⊆ は
+**`maxNilpotentNormalHall_isHall`(一般有限群・axiom-clean、新規 foundational)**で解決:
+M_F=sSup{冪零正規 Hall} は正規 join=積 ゆえ各 p∈π(M_F) で full Sylow を含み Hall ⟹ O_{π(M_F)}(F(M))=M_F
+⟹ F(M)=M_F×O_{π'}⟹ F(M)⊆C_M(M_F)·M_F。Thm 15.2 を 3 conjunct 強化(F(M)⊆M_σ / F(M)=Q⊔C_M(Q) /
+¬IsCyclic(MF M)、faithful・sorried)。
+
+**⟹ §15 connective corollary 完了: Cor 15.4 ✅ / Cor 15.5 ✅ / Cor 15.6 ✅(すべて本体 sorry-free)。
+残 §15 = Lemma 15.1 / Thm 15.2(真の deep core, §14 proof + 構造論, multi-day)/ Cor 15.3(§16 Thm D
+の一般元 conjugacy に gate)/ Thm 15.7-15.9(§16-feeder)。** 次は §16-feeder の cite-compress か
+deep core(大commitment)— ユーザー裁可待ち。
 
 ## 参照
 
