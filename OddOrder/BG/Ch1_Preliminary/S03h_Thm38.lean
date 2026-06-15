@@ -541,4 +541,26 @@ theorem centralizer_inf_eq_of_le_of_cond2
           hcond2 (y : G) (hR₀R y.2) (mt OneMemClass.coe_eq_one.mp hy)
   · exact inf_le_inf_right K (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀R))
 
+/-- **BG Theorem 3.8, step 2 algebraic core** (mmd L1235): if `F(H) ≤ P ⊴ H`, then the Fitting
+subgroup of `P` equals that of `H` (both viewed inside `H`): `F(P) = F(H)`.  `F(P) ⊆ F(H)` is
+`fitting_map_subtype_le_fitting` (`F(P) char P ⊴ H` is nilpotent normal); `F(H) ⊆ F(P)` because
+`F(H)` is nilpotent and, being `≤ P` and normal in `H`, restricts to a nilpotent normal subgroup of
+`P` — so `F(H).subgroupOf P ≤ F(P)`, and pushing forward gives `F(H) = F(H) ⊓ P ⊆ F(P)`. -/
+theorem fitting_map_eq_of_normal_of_fitting_le
+    {H : Type*} [Group H] [Finite H] {P : Subgroup H} [P.Normal]
+    (hFP : OddOrder.Isaacs.Ch01.fitting H ≤ P) :
+    (OddOrder.Isaacs.Ch01.fitting ↥P).map P.subtype = OddOrder.Isaacs.Ch01.fitting H := by
+  refine le_antisymm OddOrder.Isaacs.Ch01.fitting_map_subtype_le_fitting ?_
+  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting H) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI : Group.IsNilpotent ↥((OddOrder.Isaacs.Ch01.fitting H).subgroupOf P) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hFP).symm
+  have hle : (OddOrder.Isaacs.Ch01.fitting H).subgroupOf P ≤ OddOrder.Isaacs.Ch01.fitting ↥P :=
+    OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+  calc OddOrder.Isaacs.Ch01.fitting H
+      = OddOrder.Isaacs.Ch01.fitting H ⊓ P := (inf_eq_left.mpr hFP).symm
+    _ = ((OddOrder.Isaacs.Ch01.fitting H).subgroupOf P).map P.subtype :=
+        (Subgroup.subgroupOf_map_subtype _ P).symm
+    _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥P).map P.subtype := Subgroup.map_mono hle
+
 end OddOrder.BG.Ch1.S03h
