@@ -776,3 +776,20 @@ Cor14.8 `typeP1_conjugate_and_typeP_twoClasses`(2583) / `nonidentity_covered_by_
 - **14.12/14.13 は §13 landed (F 完了) で再評価要** — 旧 notes「§13 gate」は §13 完了で解けた可能性。
   次セッション最初の一手 = 14.12/14.13 の dep を grep して unblocked か確認(small win 候補)、その後 14.7
   M* construction skeleton。
+
+### 🔭 14.7 pre-position 開始 (2026-06-16, lane-h, ユーザー裁可) — step 0 = Prop 14.2(b2) DONE
+ユーザー判断: 14.7 の §16-independent machinery (M_i/Z setup) を sorry-free lemma で pre-position
+(typeP_duality 自体は counting (5)(7) = Lane G §16 gated のまま)。**確定: §14 で FT critical path 上は
+14.7 のみ** (他 7 結果 = §15/§16 参照 0)。14.7 の conjuncts (4)(6)(8) も counting 経由ゆえ §16-gated;
+§16-independent = M_i/Z setup (BG L3973-4015) のみ。
+- ✅ **step 0 = Prop 14.2(b2)** `typeP_elemAbelian_le_neighbor_Msigma` (commit 5e02b11b): X∈ℰ¹(K),
+  C_{Mσ}(X)≠1 ⟹ X⊆M*_σ。Lem 13.13 + σ-subgroup→Msigma。**typeP_structure に欠けていた (b1) のみ carry**
+  ⟹ standalone 化。
+- ▶ **step 1 (次)** = neighbor basic lemma: X∈ℰ¹(K), M_i∈ℳ(N_G(X)) ⟹ ¬conj(M,M_i) ∧ K⊔Kstar≤M_i ∧
+  X⊆M_{iσ} ∧ (∀p∈π(Kstar), p∈κ(M_i)) ∧ (∀X*∈ℰ¹(Kstar), N_G(X*)≤M)。deps: Prop 14.2(b1)[conj 3]+(b2)[step0]
+  +(c)[conj 6] / Cor 14.3 (sigma_diagnostic, ✅) / Thm 13.9 (✅)。BG L3977-3991。
+  - ¬conj(M,M_i): π(X)⊆κ(M)⊆σ(M)' ∧ X⊆M_{iσ}⊆σ(M_i) ⟹ もし conj なら σ 一致で矛盾 (or Lem 12.2(b))。
+  - Z⊆M_i: typeP_structure(b1) N_M(X)=K⊔Kstar ≤ M、但し M_i 側は X⊆M_i から K,Kstar⊆? 要精査 (BG「Prop
+    14.2(b)」が Z⊆M_i を直接与える — 実は (b1) は N_M、Z⊆M_i は別。BG 原文再確認要)。
+  - π(K*)⊆κ(M_i): X*∈ℰ¹(K*)、C_{M_iσ}(X*)⊇X⊃1 ⟹ Cor 14.3 branch 1 で π(⟨X*⟩)⊆κ(M_i)。
+- step 2/3 = K_i×K_i*=Z, Z=∏K_i* decomposition (BG L3993-4015)。step 4+ = counting (§16 gated, Lane G)。
