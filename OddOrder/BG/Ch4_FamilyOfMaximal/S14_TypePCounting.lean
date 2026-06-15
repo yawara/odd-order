@@ -74,7 +74,7 @@ def sigmaComplementPrimes (M : Subgroup G) : Set ℕ :=
 some rank-one elementary abelian `p`-subgroup has nontrivial centralizer in
 `M_sigma`. -/
 def kappa (M : Subgroup G) : Set ℕ :=
-  {p | p ∈ tau1 M ∪ tau3 M ∧
+  {p | p.Prime ∧ p ∈ tau1 M ∪ tau3 M ∧
     ∃ P : Subgroup G, P ∈ elemAbelianOfRank G p 1 ∧ P ≤ M ∧
       OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (P : Set G) ≠ ⊥}
 
@@ -132,7 +132,10 @@ theorem not_isTypeP_and_isTypeF {M : Subgroup G} : ¬ (IsTypeP M ∧ IsTypeF M) 
 a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`), so the §12 `E`-setup
 may be chosen to contain it. -/
 theorem kappa_subset_tau1_union_tau3 {M : Subgroup G} : kappa M ⊆ tau1 M ∪ tau3 M :=
-  fun _ hp => hp.1
+  fun _ hp => hp.2.1
+
+/-- Every prime in `κ(M)` is prime (recorded explicitly in the definition). -/
+theorem prime_of_mem_kappa {M : Subgroup G} {p : ℕ} (hp : p ∈ kappa M) : p.Prime := hp.1
 
 /-- `κ(M) ⊆ σ(M)'`: a Hall `κ(M)`-subgroup is a `σ(M)'`-subgroup (since `τ₁, τ₃ ⊆ σ(M)'`).
 This lets Proposition 14.2 feed a Hall `κ(M)`-subgroup `K` to `exists_subgroupESetup_with_le`
@@ -193,7 +196,7 @@ theorem E3_not_regular_of_mem_kappa_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalS
     {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     {p : ℕ} (hp : p.Prime) (hpκ : p ∈ kappa M) (hpτ3 : p ∈ tau3 M) :
     E₃ ≠ ⊥ ∧ ¬ ActsRegularlyOn (OddOrder.BG.Ch3.S10.Msigma M) E₃ := by
-  obtain ⟨_, P, hPelem, hPM, hPC⟩ := hpκ
+  obtain ⟨_, _, P, hPelem, hPM, hPC⟩ := hpκ
   haveI : Fact p.Prime := ⟨hp⟩
   have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
   have hPpi : Ch03.Subgroup.IsPiGroup (tau3 M) (P.subgroupOf M) := by
@@ -336,7 +339,7 @@ theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
         Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ := by
       rw [← fixedByElement_def, heqg, fixedBy_def]; exact hCE
     exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
-  exact ⟨hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
+  exact ⟨hpp, hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
 
 /-- **BG Proposition 14.2(c)** for the `κ(M) ∩ τ₃(M) ≠ ∅` case: if `X ∈ ℰ_q¹(G)` lies in
 `K^* = C_{M_σ}(E)` (i.e. `X ≤ M_σ ⊓ C(E)`), then `𝓜(C_G(X)) = {M}`.  Here `q ∣ |M_σ|` forces
@@ -534,7 +537,7 @@ theorem msigma_structure_of_notMem_sigma_kappa [Finite G]
     -- `C_{M_σ}(A) = 1` because `p ∉ κ(M)`.
     have hC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A : Set G) = ⊥ := by
       by_contra hne
-      exact hpκ ⟨hpτ13, A, hAr1, hAM, hne⟩
+      exact hpκ ⟨hp, hpτ13, A, hAr1, hAM, hne⟩
     refine ⟨hC, ?_⟩
     -- `A` is commutative, hence `A ≤ C_G(A)`.
     have hAcent : A ≤ Subgroup.centralizer (A : Set G) := by
