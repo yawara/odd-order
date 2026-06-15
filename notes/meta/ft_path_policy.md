@@ -117,7 +117,7 @@ axiom-clean）→ §10–16 の opaque field を **その signature への cite 
 |---|---|---|---|---|
 | **A** | maximal 族の coherence producer `Nonempty (S07.IsCoherent …)` | S12 `CharacterParameters.coherent_S`:127 / S15 `S_coherent` / §11–13 coherence riders（~27 sorry） | S08 `sibleySetup_is_coherent`:46 | 🔴 sorry（B (6.8)）。**signature は既に在**＝下流は今すぐ cite 可 |
 | **B** | ω-grid constructor `ω : Fin q→Fin p→CF ↥W` | S15 `omega`:130 / S12 `CharacterParameters` | S05 σ-isometry（`chiFam`/`omegaIrrEquiv`, proof 在） | export signature **無** |
-| **C** | (3.2) σ/τ₃ `IntegralCharacterMap ↥W G` | S15 `tau3`:144 + `eta_eq_tau_omega`:146 | S05 `sigma`（proof 在） | concrete pin **無**（carried placeholder） |
+| **C** | (3.2) σ/τ₃ `IntegralCharacterMap ↥W G` | S15 `tau3`:144 + `eta_eq_tau_omega`:146 | S05 `sigma`（proof 在） | ✅ **pinned** = `S05.TICyclicHypothesis.sigmaIntegral`（`S05_IntegralSigma.lean`, 2026-06-15; `sigma.restrictScalars ℤ` + 性質 5 補題, axiom-clean） |
 | **D** | μ/ν/η 族 constructor（ω から (4.3)/Dade 経由） | S15 `mu`:132 / `nu`:133 / `eta`:131 | S06 (4.3) certainType（proof 在） | constructor signature **無** |
 | **E** | char parameters ζ/ω^σ/α（(4.5.a)/(3.9)） | S12 `CharacterParameters.zeta`:95 / `omegaSigma`:111 / `alpha`:112 | S05/S06 | gate #3, materialize **要** |
 
