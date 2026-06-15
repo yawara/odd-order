@@ -2882,3 +2882,19 @@ anchored 公式 landed ⟹ cont.⁷ 続⁵ の組立計画 (chain-adjoin X_irr t
 hXorth の column seam-1 `⟨cY.ext η₁, ω_ij^σ⟩=0` を精査: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08:1246) は **差 `cY.ext η − cY.ext η'` が tic V 上消失** (`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`) を使うため、**distinct partner η' ∈ Yset (η₁≠η', ⟨η₁,η'⟩=0, η₁−η' は H^#-supported) が必須**。⟹ 単一 η₁ では証明不可。
 **含意**: `caseB_per_phi_anchored` の hXorth 入力 (または family の hXorth 証明) に **partner anchor η' (|Yset|≥2)** を追加要。case-B は |Yset|≥2 が成立するはず (Yset = S(H')-filtration、複数 linear chars) — 要確認 (`exists_Yset_linearRepresentativeFamily` の 2≤n、または \|Yset\|≥2 は別途)。**∴ hXorth 実装時は partner η' を threading する設計に。** irr branch の seam-1 (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`) は partner 不要か要確認。
 **正本=本 session 42 cont.²。hXorth は partner-anchor 要 (設計追加)。次=cast helper + partner-threading hXorth。**
+
+### session 42 cont.³ (lane-b, Opus): ✅ cast helper landed + 🔑 partner-anchor 要件 解決 (|Yset|≥2 既存)
+**✅ landed (`94206d98`, axiom-clean)**: `charPsiDecomp_eqRec_imageSet` (cast helper, brick #1; `charPsiDecomp_eqRec_tau1` の imageSet 版、`cases h; rfl`)。dispatch の column-branch `heq ▸` cast 越しに `imageFamily.imageSet` 不変 (imageSet : Finset(CF G ℂ) は χ 非依存)。
+
+**🔑 cont.² の「partner-anchor |Yset|≥2 要確認」は解決 = 既存**: `hyp.two_le_Yset_ncard` (SibleyDadeHypothesis field, S08_CaseBCoherence:310/331 で使用)。partner 抽出は `Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega) η₁` (precedent: S08_CaseBCoherence:331)。
+
+**▶▶ hXorth column 次手 (recipe 確定)**: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08_CaseBCoherence2:1246) を η=η₁ + partner η' で instantiate。**要 discharge する partner 4 条件**:
+1. `η' ∈ S₁` — `two_le_Yset_ncard` + `exists_ne_of_one_lt_ncard` (η'≠η₁ かつ η'∈Yset)。
+2. `IsIrreducibleCharacter η'` — Yset/S₁ members は既約 (要 lemma: coherence set membership → irreducible)。
+3. `⟨η₁, η'⟩ = 0` — distinct 既約は直交 (`irreducibleCharacter_inner_eq_ite` + η₁≠η')。
+4. `(η₁ − η').support ⊆ supportInSubgroup (sharpImage H) L` — Yset 差の H^#-support 性 (要 lemma)。
+**precedent = S08_CaseBCoherence:310-340** (同 toolkit を別文脈で使用、partner 抽出+4 条件 discharge の実例)。これを読んで column hXorth lemma を組む。
+irr branch (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`, S08CP1) は partner 不要か要確認。
+**dispatch 越し**: `charPsiDecomp_eqRec_imageSet` (landed) + `unfold caseB_phi_family caseB_constituentDecomposition; split` で per-branch。
+
+**正本=本 session 42 cont.³。cast helper landed、|Yset|≥2 解決 (two_le_Yset_ncard)。次=hXorth column (toolkit instantiate, partner 4 条件 discharge, precedent S08_CaseBCoherence:310-340) → irr branch → hbi → caseB_phi_family 具体化。**
