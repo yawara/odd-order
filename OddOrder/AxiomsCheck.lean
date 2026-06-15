@@ -4566,6 +4566,14 @@ Corollary 13.11) and `κ ⊆ τ₁` (`K = E₁`, the Frobenius core via Theorem 
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_structure
 
+/-! **BG Proposition 14.2(b2)** (`S14_TypePCounting`, `typeP_elemAbelian_le_neighbor_Msigma`): the
+clause of Prop 14.2(b) that `typeP_structure` omits — for `X ∈ ℰ_p¹(K)` (`K` Hall `κ(M)`) with
+`C_{M_σ}(X) ≠ 1`, every `M* ∈ ℳ(N_G(X))` has `X ⊆ M*_σ`.  Proof: `p ∈ κ(M) ⊆ τ₁ ∪ τ₃`, Lemma 13.13
+gives `p ∈ σ(M*)`, and `X ≤ M*` is a `σ(M*)`-subgroup.  Pre-positioned for Theorem 14.7's neighbour
+analysis (`Z ⊆ M_i`, `X_i ⊆ M_{iσ}`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_elemAbelian_le_neighbor_Msigma
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
