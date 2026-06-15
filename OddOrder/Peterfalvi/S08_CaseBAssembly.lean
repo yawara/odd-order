@@ -767,4 +767,73 @@ theorem caseB_per_phi_anchored_family
     (fun j => caseB_phi_family_tau1 hyp h46 hW2H hφ' j)
     hXaggorth hdecomp (b := fun j => (hY j).choose) hX (fun j => (hY j).choose_spec) i
 
+/-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image — `Y`-anchor data internalized.**  Strengthens
+`caseB_per_phi_anchored_family` by discharging the entire `η₁`-anchor / partner block from
+`η₁ ∈ Yset` alone, via the textbook choice of partner `η' = η̄₁` (the complex conjugate): `η̄₁ ∈ Y`
+(`Yset_closedUnderConjugate`), `η₁ ≠ η̄₁` (`Yset_hasNoRealCharacters`, Peterfalvi (5.2.a): odd order ⇒
+no nontrivial real irreducible), `⟨η₁, η̄₁⟩ = 0` (distinct irreducibles), and `η₁ − η̄₁` `H^#`-supported
+(equal degree `Yset_apply_one`, `sMember_diffSupport_of_charValue_eq`).  The remaining inputs are the
+genuinely hard §5/§6 content: the per-`θ` column/irreducible bundles `hcol`/`hirr`, the per-`θ`
+anchor-vs-constituent orthogonality `hirrAnc`, and the (6.8.2.2) aggregate `hXaggorth`/`hdecomp`. -/
+theorem caseB_per_phi_anchored_fromYset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hcol : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBColBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val))
+    (hirr : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBIrrBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val))
+    (hirrAnc : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+          OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            ≠ ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) →
+        ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁ (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0
+        ∧ ClassFunction.inner η₁.conj (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) = 0
+        ∧ ClassFunction.inner η₁.conj
+            (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0)
+    {Xagg : ClassFunction G ℂ}
+    (hXaggorth : ClassFunction.inner Xagg (cY.extension η₁) = 0)
+    (hdecomp : hyp.tau (ClassFunction.induce W2 φ - ((W2.subgroupOf H).index : ℂ) • η₁)
+      = Xagg - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁)
+    (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
+    hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) - constituentWeight hφ' i.val • η₁)
+      = (caseB_phi_family hyp h46 hW2H hφ' hcol hirr i).X
+        - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ := by
+  have hη₁irr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hconj : η₁.conj ∈ hyp.Yset := hyp.Yset_closedUnderConjugate hη₁
+  have hrealc1 : ¬ η₁.IsReal :=
+    fun hreal => hyp.Yset_hasNoRealCharacters.not_mem_of_isReal hreal hη₁
+  have hne : η₁ ≠ η₁.conj := fun heq => hrealc1 heq.symm
+  have hee : ClassFunction.inner η₁ η₁.conj = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁.conj, hη₁irr.conj⟩ : IrreducibleCharacter ↥L)
+    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    simpa using h
+  have hval : η₁ (1 : ↥L) = η₁.conj (1 : ↥L) :=
+    (hyp.Yset_apply_one hη₁).trans (hyp.Yset_apply_one hconj).symm
+  have hsupp : (η₁ - η₁.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη₁) (hyp.Yset_subset_S hconj) hval
+  have hdiffsuppc1 : (η₁.conj - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hconj) (hyp.Yset_subset_S hη₁)
+      hval.symm
+  exact caseB_per_phi_anchored_family hyp h46 hHK hW2H hcen hφ' cY hη₁ hcol hirr
+    hη₁irr hrealc1 hdiffsuppc1 hconj
+    (cY.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)) hee
+    hconj hη₁irr.conj hee hsupp hirrAnc hXaggorth hdecomp i
+
 end OddOrder.Peterfalvi.S08
