@@ -315,6 +315,32 @@ theorem proposition_type_classification [Finite G]
 
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
+/-- **§16 helper (general, §14-independent).**  A `π`-Hall subgroup `H` of `G` contained in a
+subgroup `K` is a `π`-Hall subgroup of `K` (no normality needed): the order of `H.subgroupOf K`
+equals `|H|` (so its prime factors are `⊆ π`), and its index `[K : H] = H.relIndex K` divides
+`[G : H]` (so the index prime factors avoid `π`).  Used in Theorem I to turn the global nilpotent
+Hall hypothesis on `H` into the `H.subgroupOf M_σ`-Hall hypothesis that Corollary 15.3(b)
+(`mf_hall_centralizer_control`) consumes, after Corollary 15.4 places `H ≤ M_σ`. -/
+theorem isHallSubgroup_subgroupOf_of_le [Finite G] {π : Set ℕ} {H K : Subgroup G}
+    (hH : Ch03.IsHallSubgroup π H) (hHK : H ≤ K) :
+    Ch03.IsHallSubgroup π (H.subgroupOf K) := by
+  have hcard : Nat.card ↥(H.subgroupOf K) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv
+  refine ⟨?_, ?_⟩
+  · -- `|H.subgroupOf K| = |H|`, so its prime factors are exactly those of `|H| ⊆ π`.
+    intro q hq
+    rw [hcard] at hq
+    exact hH.1 q hq
+  · -- `[K : H] = H.relIndex K ∣ [G : H]`, so its prime factors avoid `π`.
+    intro q hq hqπ
+    have hdvd : (H.subgroupOf K).index ∣ H.index := by
+      have he : (H.subgroupOf K).index = H.relIndex K := rfl
+      rw [he]
+      exact Subgroup.relIndex_dvd_index_of_le hHK
+    rw [Nat.mem_primeFactors] at hq
+    exact hH.2 q (Nat.mem_primeFactors.mpr
+      ⟨hq.1, hq.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩) hqπ
+
 /-- **BG Theorem I** (mmd L4526): nilpotent Hall conjugacy and the global maximal
 subgroup dichotomy used by Peterfalvi (8.8). -/
 theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
@@ -333,7 +359,99 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
           ∀ M : Subgroup G, M ∈ maximalSubgroups G →
             OddOrder.GroupTheory.IsTypeI M ∨ S14.IsConjugateSubgroup M S ∨
               S14.IsConjugateSubgroup M T) := by
-  sorry
+  classical
+  refine ⟨?_, ?_⟩
+  · -- **Theorem I, first assertion** (mmd L4524): nilpotent Hall fusion is `N_G(H)`-controlled.
+    -- "follows directly from Corollaries 15.4 and 15.3(b)".
+    intro H hHnil hHall x hx y hy
+    constructor
+    · -- `→`: `G`-conjugacy of `x, y ∈ H` is already `N_G(H)`-conjugacy.
+      rintro ⟨g, hg⟩
+      by_cases hHne : H = ⊥
+      · -- `H = ⊥`: then `x = y = 1`, witnessed by `n = 1 ∈ N_G(H)`.
+        subst hHne
+        rw [Subgroup.mem_bot] at hx hy
+        exact ⟨1, Subgroup.one_mem _, by rw [hx, hy]; group⟩
+      · -- `H ≠ ⊥`: Corollary 15.4 embeds `H ≤ M_σ` for some `M ∈ ℳ(H)`.
+        obtain ⟨M, hMmem, hHMσ⟩ :=
+          S15.nilpotent_hall_embeds_in_msigma hG hHnil hHne hHall
+        have hM : M ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hMmem).1
+        -- `H ≤ M_σ`, so `H.subgroupOf M_σ` is a `π(H)`-Hall subgroup of `M_σ`.
+        have hHall' : Ch03.IsHallSubgroup (S14.piSet H)
+            (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
+          isHallSubgroup_subgroupOf_of_le hHall hHMσ
+        -- Corollary 15.3(b): `N_M(H)`-fusion control; `N_M(H) ⊆ N_G(H)`.
+        obtain ⟨_, hfusion⟩ := S15.mf_hall_centralizer_control hG hM hHall' hHne
+        exact hfusion x hx y hy ⟨g, hg⟩
+    · -- `←`: `N_G(H)`-conjugacy is in particular `G`-conjugacy.
+      rintro ⟨n, _, hn⟩
+      exact ⟨n, hn⟩
+  · -- **Theorem I, dichotomy** (mmd L4528): every maximal is Type I, or the type-P pair
+    -- `S, T` covers everything.  Proposition 16.1(a) + Theorem C(4)(6)(7) + Theorem 14.7 duality.
+    -- **Bridge: a non-Type-I maximal is type P.**  Proposition 16.1(a) gives `TypeI ⟺ TypeF`,
+    -- and `TypeF ⟺ κ(M) = ∅`, so `¬TypeI` forces `κ(M)` nonempty, i.e. `IsTypeP`.
+    have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+        ¬ OddOrder.GroupTheory.IsTypeI N → S14.IsTypeP N := by
+      intro N hN hnotI
+      have hiff := (proposition_type_classification hG hN).1
+      have hnotF : ¬ S14.IsTypeF N := fun hF => hnotI (hiff.mpr hF)
+      rw [S14.IsTypeP, Set.nonempty_iff_ne_empty]
+      exact fun he => hnotF he
+    -- **Bridge: a type-P maximal is non-Type-I (`II`/`III`/`IV`/`V`).**  Split `κ(M)` against
+    -- `π(M) - σ(M)`: equal ⟹ `P₁` ⟹ Type V (`M_F = M_σ`) or III/IV (`M_F ≠ M_σ`); unequal ⟹
+    -- `P₂` ⟹ Type II.  Uses Proposition 16.1(b)(c)(d).
+    have typeP_imp_nonI : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+        S14.IsTypeP N → OddOrder.GroupTheory.IsTypeNonI N := by
+      intro N hN hP
+      obtain ⟨_, hbII, hcIII_IV, hdV, _, _⟩ := proposition_type_classification hG hN
+      by_cases hk : S14.kappa N = S14.sigmaComplementPrimes N
+      · -- `P₁`: Type III/IV (if `M_F ≠ M_σ`) or Type V (if `M_F = M_σ`).
+        have hP1 : S14.IsTypeP1 N := ⟨hP, hk⟩
+        by_cases hMF : S15.MF N = OddOrder.BG.Ch3.S10.Msigma N
+        · exact Or.inr (Or.inr (Or.inr (hdV.mpr ⟨hP1, hMF⟩)))
+        · rcases hcIII_IV.mpr ⟨hP1, hMF⟩ with hIII | hIV
+          · exact Or.inr (Or.inl hIII)
+          · exact Or.inr (Or.inr (Or.inl hIV))
+      · -- `P₂`: Type II.
+        exact Or.inl (hbII.mpr ⟨hP, hk⟩)
+    -- Case split: either every maximal is Type I, or some `S` is not.
+    by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+        OddOrder.GroupTheory.IsTypeI M
+    · exact Or.inl hall
+    · -- Pick a non-Type-I maximal `S`; it is type P.
+      push_neg at hall
+      obtain ⟨S, hS, hSnotI⟩ := hall
+      have hSP : S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
+      haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+      -- Produce the `κ(S)`-Hall subgroup `K` of `S` (Hall's theorem in the solvable `S`).
+      obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (S14.kappa S)
+      set K : Subgroup G := K'.map S.subtype with hKdef
+      have hKeq : K.subgroupOf S = K' :=
+        Subgroup.comap_map_eq_self_of_injective S.subtype_injective K'
+      have hK : Ch03.IsHallSubgroup (S14.kappa S) (K.subgroupOf S) := by
+        rw [hKeq]; exact hK'
+      set Kstar : Subgroup G :=
+        OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+      -- Theorem 14.7 (`typeP_duality`): the dual pair `S, T := Mstar`, with covering.
+      obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar, _, hcyc, _, hP2disj, hcover⟩, _⟩ :=
+        typeP_duality hG hS hSP hK hKstardef
+      refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_⟩
+      · -- `S ≠ Mstar`: else `S` would be conjugate to itself `= Mstar`, against `¬conj S Mstar`.
+        rintro rfl
+        exact hSnconjMstar (S14.IsConjugateSubgroup.refl S)
+      · -- `IsTypeNonI S`: `S` is type P.
+        exact typeP_imp_nonI S hS hSP
+      · -- `IsTypeNonI Mstar`: `Mstar` is type P.
+        exact typeP_imp_nonI Mstar hMstarMem hMstarP
+      · -- `IsTypeII S ∨ IsTypeII Mstar`: from `IsTypeP2 S ∨ IsTypeP2 Mstar` via Prop 16.1(b).
+        rcases hP2disj with hP2S | hP2M
+        · exact Or.inl ((proposition_type_classification hG hS).2.1.mpr hP2S)
+        · exact Or.inr ((proposition_type_classification hG hMstarMem).2.1.mpr hP2M)
+      · -- Covering: each maximal is Type I, or (being type P) conjugate to `S` or `Mstar`.
+        intro M hM
+        by_cases hMI : OddOrder.GroupTheory.IsTypeI M
+        · exact Or.inl hMI
+        · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI))
 
 /-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  This
 is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
@@ -349,6 +467,58 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
           ∃! N : Subgroup G,
             N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
             (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) := by
-  sorry
+  classical
+  -- Abbreviate the escaping set `D`.
+  set D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M} with hDdef
+  -- **Core gated reduction (mmd L4546-L4548).**  `A_0(M)` is the disjoint union of `M_σ`,
+  -- `A(M) - M_σ`, and `A_0(M) - A(M)`; the latter two are `TI`-subsets of `G` with normalizer
+  -- `M` (Theorem B(5) and Theorem C(9)), so every element of them has its `G`-centralizer inside
+  -- `M`.  Hence an `x ∈ X` with `C_G(x) ⊄ M` must lie in `M_σ`, i.e. `D ⊆ M_σ#`.
+  --
+  -- This step needs the Hall data behind Theorem B(5)/C(9), which the *statement* of Theorem II
+  -- does not carry (its `K`, `U` are free, not pinned to the `(κ ∪ σ)'`-Hall / `κ`-Hall factors).
+  -- It is therefore isolated as a gated input; once it (and the dual-piece `TI` facts) land with
+  -- their Hall hypotheses, `D ⊆ A(M)` (conjunct 2) becomes pure citation, as below.
+  have hDsub : D ⊆ S14.sigmaSharp M := by
+    sorry
+  -- **`D ⊆ A(M)` (conjunct 2).**  `D ⊆ M_σ#` and `M_σ# ⊆ A(M)`: a nonidentity `x ∈ M_σ` lies in
+  -- `\widehat{M_σ}` (`sigmaSharp_subset_hatMsigma`) and in `M_σ ≤ U M_σ`, so `x ∈ A(M)`.
+  have hMσsharp_sub_A : S14.sigmaSharp M ⊆ ASet M U := by
+    intro x hx
+    refine ⟨sigmaSharp_subset_hatMsigma M hx, ?_⟩
+    have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := (Set.mem_diff _).mp hx |>.1
+    exact (le_sup_right : OddOrder.BG.Ch3.S10.Msigma M ≤
+      (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G)) hxMσ
+  refine ⟨?_, hDsub.trans hMσsharp_sub_A, ?_⟩
+  · -- **Conjunct 1 (Ti) (mmd L4546-L4550).**  Two elements of `X` conjugate in `G` are conjugate
+    -- in `M`.  `X = A_0(M)` decomposes into `M_σ` (Theorem D(1) fusion) and the two `TI` pieces
+    -- (normalizer `M`); cross-piece elements have distinct orders, so are never `G`-conjugate.
+    -- Same gated decomposition as `hDsub`; isolated here.
+    sorry
+  · -- **Conjunct 3 (mmd L4552).**  For `x ∈ D ⊆ M_σ#` with `C_G(x) ⊄ M`, Theorem D(4) gives a
+    -- unique maximal `N(x) ⊇ C_G(x)` that is of type `F` or `P₂`; Proposition 16.1(a)(b) rewrites
+    -- this as Type I or Type II.  Existence and the type classification are pure citation; the
+    -- *uniqueness* of the maximal overgroup is the residual gated input (BG §9-§10 Uniqueness).
+    intro x hxD
+    obtain ⟨hxX, hx1, hxc⟩ := hxD
+    have hxMσsharp : x ∈ S14.sigmaSharp M := hDsub ⟨hxX, hx1, hxc⟩
+    -- Theorem D(4): the `∃! N` with the type-`F`/`P₂` data attached to escaping centralizers.
+    obtain ⟨_, _, _, hD4⟩ := theoremD_msigma_conjugacy_and_centralizers hG hM
+    obtain ⟨_R, _hR, N₀, hQN₀, _hQuniq⟩ := hD4 x hxMσsharp hxc
+    -- Unpack what Theorem II needs from the rich Theorem D(4) predicate `Q N₀`.
+    obtain ⟨hN₀mem, _, _, _, hN₀type, _⟩ := hQN₀
+    -- Convert `IsTypeF N₀ ∨ IsTypeP2 N₀` to `IsTypeI N₀ ∨ IsTypeII N₀` (Proposition 16.1(a)(b)).
+    have hN₀ : N₀ ∈ maximalSubgroups G := (mem_maximalSubgroupsContaining.mp hN₀mem).1
+    have htype : OddOrder.GroupTheory.IsTypeI N₀ ∨ OddOrder.GroupTheory.IsTypeII N₀ := by
+      obtain ⟨hIiff, hIIiff, _⟩ := proposition_type_classification hG hN₀
+      rcases hN₀type with hF | hP2
+      · exact Or.inl (hIiff.mpr hF)
+      · exact Or.inr (hIIiff.mpr hP2)
+    refine ⟨N₀, ⟨hN₀mem, htype⟩, ?_⟩
+    -- Uniqueness of the maximal overgroup of `C_G(x)`: the residual gated input.  Theorem D(4)
+    -- gives uniqueness only for its *full* predicate `Q`; pinning the weaker "maximal overgroup,
+    -- Type I/II" to the same `N₀` needs `|ℳ(C_G(x))| = 1` (BG Uniqueness), not citable here.
+    rintro N' ⟨hN'mem, _hN'type⟩
+    sorry
 
 end OddOrder.BG.Ch4.S16
