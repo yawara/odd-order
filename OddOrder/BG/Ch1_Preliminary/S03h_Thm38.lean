@@ -404,4 +404,40 @@ theorem commutator_le_fitting_of_centralizes_fittingQuotient
         (OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hRK).symm
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := Subgroup.map_mono hle
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **BG Proposition 1.5(d), subgroup form** (`C_{G/N}(A) = C_G(A)·N / N`): for a coprime action
+`φ : A → MulAut G` and an `A`-invariant normal `N`, the fixed points of the induced action on
+`G/N` are exactly the image of the fixed points in `G`.  The `⊇` direction is immediate; the `⊆`
+direction is the lifting in `coprime_fixedPoints_quotient` (Proposition 1.5(d), element form). -/
+theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    {G A : Type*} [Group G] [Finite G] [Group A] [Finite A] {φ : A →* MulAut G}
+    (hCop : Nat.Coprime (Nat.card A) (Nat.card G)) (hSolv : IsSolvable A ∨ IsSolvable G)
+    {N : Subgroup G} [N.Normal] (hN : OddOrder.Isaacs.Ch03.IsAInvariant φ N) :
+    Subgroup.fixedPointsOfMulAut (quotientMulAutHom hN) =
+      (Subgroup.fixedPointsOfMulAut φ).map (QuotientGroup.mk' N) := by
+  refine le_antisymm ?_ ?_
+  · intro q hq
+    -- `q` fixed in `G/N` lifts to a fixed `c ≡ q (mod N)` (`coprime_fixedPoints_quotient`).
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hq
+    have hg_fix : ∀ a : A, ∃ n ∈ N, (φ a) g = g * n := by
+      intro a
+      have hga := hq a
+      rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+        QuotientGroup.eq] at hga
+      exact ⟨g⁻¹ * (φ a) g, by simpa using N.inv_mem hga, by group⟩
+    obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
+      OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient hCop hSolv hN hg_fix
+    refine Subgroup.mem_map.mpr ⟨c, Subgroup.mem_fixedPointsOfMulAut.mpr hc_fix, ?_⟩
+    rw [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq, hcn]
+    simpa using N.inv_mem hn
+  · -- image of a fixed point is fixed (immediate).
+    rw [Subgroup.map_le_iff_le_comap]
+    intro c hc
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hc
+    rw [Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    rw [quotientMulAutHom_apply_mk', hc a]
+
 end OddOrder.BG.Ch1.S03h
