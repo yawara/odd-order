@@ -3239,3 +3239,22 @@ Lean commit なし。`references/peterfalvi/04.8` L156-244 を直読し、cont.�
 3. **htau1_chi1 / hY / hgen**: per-φ image (`caseB_phi_family`) の構造から (Da.tau1=hyp.tau via `caseB_phi_family_tau1`、Da.Y=per_phi の Y 成分)。
 4. **fold 全体**: `xChainCoherent` 類似で base から X-member を順次 adjoin (per-φ image = Da)。
 **正本=本 session 43 cont.¹⁷。fold per-step orthonormality wrapper 完成 (`e72771ad`)。次=fold hard parts (hperElem prefix⊥R(χ) / column base union / htau1-hY-hgen 供給)。Opus 継続。**
+
+### session 43 cont.¹⁸: 🧭 ルート決定 — Route 1 (cX X-internal + glue)、cX は xChainCoherent + column base (commit: 本 note のみ)
+Lean commit なし。consumer 解析でルート曖昧性を解消し cX 構築法を確定。⚠ 残務は heavy T8 (multi-session) 継続。
+
+**決定的事実 (consumer + engine 解析)**:
+- **per-φ images は未 consume** = Route 1 の **glue diagonal D** 用 (`caseB_per_phi_anchored_fromYset` の `hdecomp`/`hXaggorth` が glue shell `coherentXunionYset_caseB_of_glued` の D/`hDτ` と一致)。⟹ **Route 1 が intended**: cX (Xset W2 coherence) を別途構築 → cY と glue (D=per-φ images)。cY=`coherentYset` 済、D 構築可 (dispatch trio + `exists_decomposition_caseB` aggregate)。**残 = cX。**
+- **cX は X-internal 構築** (per-φ images は η₁-anchored ゆえ pure-X には非使用)。case-A `Xset_..._withCover_of_irreducible_X` (CorePart2:4294) は **全既約前提** (`hX`) ゆえ mixed には流用不可。
+- **🔑 但し raw `xChainCoherent` (CorePart1:2701) は base `S₀` を一般 coherent 集合に取れる** (全既約不要)。かつ **`hyp.tau` = `dadeIntegralCharacterMap hyp.dade (fullDadeIsometryData hyp.hconj)`** (4294 が hyp.tau 結論で内部 xChainCoherent 呼ぶ ⟹ 一致、map mismatch 無し)。⟹ **mixed cX = xChainCoherent で base S₀=columns (cX_col coherent)、既約 pair を adjoin** で到達可能。
+
+**🔴 cX 構築の残り難所 (次以降)**:
+1. **column base S₀**: columns 全体 (= ⋃ degree-class ごとの `certainTypeSet h46 k`) の coherence。⚠ **multi-degree complication** — columns は degree class で分かれ各 `certainTypeSet k` が coherent (cX_col)、その**和**の coherence が要 (degree class 間 union)。
+2. **cover dichotomy**: `∀ φ ∈ Xset W2, (column ∃χ₂≠1 columnSum=φ) ∨ IsIrreducibleCharacter φ` (dispatch by_cases + `caseB_irr_induce_isIrreducible`)。
+3. **hstep (XAdjoinStepInput, ~300 LOC monolith)**: 既約 X-member ごとの member-family + degree bound `2a<∑deg²`。case-A `hstep` の mixed 適応 (prefix に column 混在 ⟹ `pairCover_orthogonal_to_prefix` 全既約版は不可、column⊥irr 直交を別途)。
+4. xChainCoherent 組立 → cX → glue shell (D=per-φ) → X∪Y coherence → (6.8.3) L4 → CoherenceTarget。
+
+**▶▶ 次ターン具体第一手**: cover dichotomy (#2、set 構造、tractable) を build — `caseB_Xset_member_column_or_irreducible`。dispatch by_cases で column witness or `caseB_irr_induce_isIrreducible` (θ≠trivial は W₂⊄ker θ から)。
+
+**⏱ 状況メモ (正直)**: dispatch 層 (hnonlin/hcol/hirr/hirrAnc + per-step adjoin) 完了後、frontier は **heavy T8 mixed cX** (multi-session、clean quick-win 無し)。loop の per-turn context reload で route 再考が嵩んだ。次以降は cover→base union→hstep を順次 build (RECON 偏重を脱する)。ユーザーが望めば (a) loop 継続 / (b) 集中 workflow (要 opt-in) / (c) B を signature-pin (endpoint B/C/D/E) へ redirect も可。
+**正本=本 session 43 cont.¹⁸。Route 1 確定 (cX=xChainCoherent+column base, hyp.tau=Dade map)。次=cover dichotomy build。Opus 継続。**
