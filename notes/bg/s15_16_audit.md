@@ -419,15 +419,22 @@ landing 済。残りは全て passthrough(skeleton 無価値)か deep core(skele
 (ii) deep core(15.2/15.7)の実証明(§14 + §1-§13 lemma landing 後、multi-day)、
 (iii) deferred §14-非依存 brick。
 
-### 13.3 deferred §14-非依存 brick: Frattini factorization lemma(issue 8010)
+### 13.3 §14-非依存 brick: Frattini factorization lemma ✅ DONE (issue 8010 closed, `cd418cb6`)
 
-Cor 15.3 wrapper の `hfratt` discharge に要る §14-非依存補題(未 landing):
+`S15.frattini_factorization`(sorry-free・axiom-clean)landing:
 `Q⊴M, QH⊴M, Q∩H=1, coprime(|Q|,|H|), solvable ⟹ ∀m∈M, ∃n∈N_G(H),a∈Q, m=n·a`。
 証明 = `IsComplement'.exists_conj_of_coprime`(SZ 補群共役, repo 既存)を ↥(Q⊔H) 内で適用
-(H と conj m⁻¹•H は Q の補群 ⟹ Q-共役 q を得て n:=m·q, a:=q⁻¹)。~60-80行の subgroupOf juggling。
-**優先度低**: Cor 15.3 wrapper の真の binding constraint は `hconj`(Thm 14.4 conjugacy、§16 RData に
-deferred)ゆえ、Frattini brick だけ landing しても wrapper は完成しない。§16 RData/Thm 14.4 conjugacy
-が近づいたら building。
+(H と conj m⁻¹•H は Q の補群 ⟹ Q-共役 q を得て n:=m·q, a:=q⁻¹)。complement は
+`isComplement'_of_disjoint_and_mul_eq_univ`(disjoint=element-chase, mul_eq_univ=`normal_mul`+
+`subgroupOf_sup`+`subgroupOf_self`)、共役の lift-back は `(Q⊔H).subtype` 経由
+(`map_map`+intertwine `ext;rfl`+`map_comap_eq`)。
+
+⟹ Cor 15.3 wrapper の `hfratt` は **Thm 15.2 の Q 供給 + `frattini_factorization` 単一 cite** に
+縮約(§14 landing 後)。**残 binding constraint = `hconj`(Thm 14.4 conjugacy、§16 RData に deferred)**
+ゆえ wrapper 完成は §16 RData / Thm 14.4 待ち。Frattini brick は §14-非依存 groundwork として完済。
+
+⟹ **Lane G の §14-非依存 groundwork は完全に尽きた**(2 engine + N_G(M_σ)=M 補題 + Frattini brick)。
+次の substantive 進捗は §14(Lane H)/ §16 RData(Thm 14.4 conjugacy)landing 待ち。
 
 ## 参照
 
