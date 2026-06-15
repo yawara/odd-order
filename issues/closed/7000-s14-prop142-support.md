@@ -7,6 +7,20 @@ created: 2026-06-15
 
 # §14 Prop 14.2 support leaf: κ ∃→∀ upgrade + ActsPrimeOn 共役不変性 (F→H handshake)
 
+## ✅ 解決 (2026-06-15) — CLOSED
+
+- **ActsPrimeOn 共役不変性 = DONE** (commit `fe999b92`, `OddOrder/BG/Ch3_MaximalSubgroups/S14_Prop142Support.lean`):
+  `actsPrimeOn_conj` + 支える `smul_centralizer_singleton` / `smul_centralizer_subgroup`。
+  sorry-free + axiom-clean (`[propext, Classical.choice, Quot.sound]`) + root closure 配線済
+  (`OddOrder.lean` + AxiomsCheck `#assert_only_allowed_axioms` ×3) + full build green。κ-free ⟹ H が
+  `import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support` 1 行で `OddOrder.BG.Ch3.S13.actsPrimeOn_conj` を cite 可。
+- **κ ∃→∀ upgrade = 不要 (建てない)** — hub が実証コードで確認 (2026-06-15):
+  case-τ₃ は `E3_not_regular_of_mem_kappa_tau3` (S14_TypePCounting:192) が κ-witness P を
+  `exists_conj_smul_le_hallPiece` で E₃ へ直接共役し `Msigma_inf_centralizer_conj_ne_bot` で C_Mσ≠⊥ を transport
+  (∀-形を経由しない); case-τ₁ は `actsPrimeOn_conj` (WLOG K=E₁) で足りる。S14 内の「∃→∀ upgrade」言及は
+  docstring (S14_TypePCounting:149) のみで実使用ゼロ。
+- ⟹ issue 7000 は `actsPrimeOn_conj` + centralizer-conj helpers で **closed**。
+
 ## 背景
 
 BG §14 は **Prop 14.2 を通る funnel**(14.3→14.13 が全部 14.2 経由)で、§15(G)/§16/`sectionSixteenHypothesis`
