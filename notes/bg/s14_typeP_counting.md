@@ -754,3 +754,25 @@ x').Nonempty = ∃ M' max, x'∈M'_σ。chain:
    [conj_smul_opiCoreInG, S07 private → replicate])。⟹ x' ∈ Msigma (conj g⁻¹•Mstar)。
 7. M' = conj g⁻¹•Mstar maximal (`isCoatom_conj_smul`)。⟹ ⟨M', _, _⟩。
 **要新 helper ×2**: (i) ℰ_q²(E) push-in (step 2)、(ii) Msigma conj-equivariance (step 6)。各 moderate。
+
+### ✅✅✅ Cor 14.3 sigma_diagnostic COMPLETE (2026-06-16, lane-h, commit de81606d)
+`sigma_diagnostic` (BG Cor 14.3) は **fully sorry-free + axiom-clean** (AxiomsCheck 登録、full build
+green 65s)。branch-2 ℓ_σ(x')=1 を general Cor 12.16(a) で wire 完了。新 S14 helper: `sigma_conj_smul_eq`
+(σ(Mᵍ)=σ(M)) / `conj_smul_opiCoreInG'` (O_π conj、S07 private replicate) / `Msigma_conj_smul`
+((Mᵍ)_σ=(M_σ)ᵍ)。S14 sorry 9→8。**§16-independent §14 dependency cluster (Prop 14.2 / Cor 14.3 /
+general Cor 12.16(a)) は全完了** — これらは 14.7 の証明が要する piece。
+
+### 📋 残 §14 sorry 8 件の gating 評価 (2026-06-16, lane-h) — 次セッション/hub 向け
+remaining: 14.4 `sigmaLength_one_centralizer_structure`(2461) / **14.7 `typeP_duality`(2563)** /
+Cor14.8 `typeP1_conjugate_and_typeP_twoClasses`(2583) / `nonidentity_covered_by_sigma_pieces`(2603) /
+`exists_sigmaDecomposition_length_le_two`(2617) / `exists_maximal_of_typeF_notMem_fitting`(2628) /
+14.12 `typeP2_neighbor_is_typeF`(2651) / 14.13 `sigmaLength_one_frobenius_type`(2665)。
+- **14.7 = binding long pole**(S15:785/795/1976・S16:437 が consume)。§16-independent = M* construction
+  (conjuncts (1)ℳ(C_G(X))={M*} /(2)K* Hall /(3)K=C_{M*σ}(K*)・κ=τ₁ /(4)Z cyclic /(6)type-P2 /(8)M'
+  complement); **§16-gated = (5) counting |𝒞_G(Ẑ)|>½|G| + (7) global conjugacy**(Lem 14.6 = R(x)/M̃、
+  Lane G §16、issue 2005)。⟹ M* construction (~300-500 行) は今や着手可(Cor 14.3 + general Cor 12.16(a)
+  揃った)、(5)(7) を named residual に残す skeleton 戦略推奨。
+- **14.4 R(x) headline §16-gated**; Cor 14.8 は 14.7 gated; 14.9 covering は M̃ §16 必須。
+- **14.12/14.13 は §13 landed (F 完了) で再評価要** — 旧 notes「§13 gate」は §13 完了で解けた可能性。
+  次セッション最初の一手 = 14.12/14.13 の dep を grep して unblocked か確認(small win 候補)、その後 14.7
+  M* construction skeleton。
