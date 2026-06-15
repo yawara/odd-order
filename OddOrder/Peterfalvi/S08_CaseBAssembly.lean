@@ -584,6 +584,28 @@ theorem caseB_irr_nonreal
     hyp.card_L_odd (χ := ⟨_, hirr1⟩) (fun htriv => caseB_induce_ne_trivial hyp θ ?_)
   rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter (G := ↥L), ← htriv]
 
+/-- **(6.8.2.3) irreducible-branch self-conjugate orthogonality** (`CaseBIrrBundle` conjunct #8).
+`⟨Ind^L_H θ, (Ind^L_H θ).conj⟩ = 0`: both `Ind^L_H θ` (`hirr1`) and its conjugate
+(`IsIrreducibleCharacter.conj`) are irreducible and distinct (non-real, `caseB_irr_nonreal`), so the
+irreducible Kronecker inner product vanishes. -/
+theorem caseB_irr_conj_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0 := by
+  set Φ := ClassFunction.induce H (θ : ClassFunction ↥H ℂ) with hΦ
+  have hnonreal := caseB_irr_nonreal hyp hirr1
+  have hne : (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L) ≠ ⟨Φ.conj, hirr1.conj⟩ := by
+    intro heq
+    apply hnonreal
+    have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
+    simpa using h2.symm
+  have hkron := irreducibleCharacter_inner_eq_ite (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L)
+    (⟨Φ.conj, hirr1.conj⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg hne] at hkron
+  simpa using hkron
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
