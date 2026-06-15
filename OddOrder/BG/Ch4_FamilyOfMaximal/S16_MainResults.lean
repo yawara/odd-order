@@ -306,6 +306,31 @@ theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
                     ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) := by
   sorry
 
+/-- **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (mmd L4370): distinct
+representatives of the conjugacy classes of maximal subgroups have disjoint
+`σ`-sets.  This is the `σ(Mᵢ)` "disjoint union" piece of Theorem E, and it is
+**already unconditional**: distinct class representatives are non-conjugate (forced
+by the `∃!` uniqueness in `hreps` — both `Mᵢ` and `Mⱼ` would be *the* representative
+of `Mᵢ`'s class), so BG Theorem 13.9
+(`OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate`, landed sorry-free) applies
+directly.  `hrepsMax` records that the representatives are themselves maximal
+subgroups (the hypothesis Theorem 13.9 needs); it holds for any genuine set of
+conjugacy-class representatives. -/
+theorem sigma_reps_pairwise_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {reps : Set (Subgroup G)}
+    (hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
+    {Mi Mj : Subgroup G} (hMi : Mi ∈ reps) (hMj : Mj ∈ reps) (hne : Mi ≠ Mj) :
+    OddOrder.BG.Ch3.S10.sigma Mi ∩ OddOrder.BG.Ch3.S10.sigma Mj = ∅ := by
+  rw [← Set.disjoint_iff_inter_eq_empty]
+  refine OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG
+    (hrepsMax Mi hMi) (hrepsMax Mj hMj) ?_
+  intro hconj
+  obtain ⟨Z₀, _, huniq⟩ := hreps Mi (hrepsMax Mi hMi)
+  exact hne ((huniq Mi ⟨hMi, S14.IsConjugateSubgroup.refl Mi⟩).trans
+    (huniq Mj ⟨hMj, hconj⟩).symm)
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a
