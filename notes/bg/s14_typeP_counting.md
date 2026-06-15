@@ -793,3 +793,23 @@ Cor14.8 `typeP1_conjugate_and_typeP_twoClasses`(2583) / `nonidentity_covered_by_
     14.2(b)」が Z⊆M_i を直接与える — 実は (b1) は N_M、Z⊆M_i は別。BG 原文再確認要)。
   - π(K*)⊆κ(M_i): X*∈ℰ¹(K*)、C_{M_iσ}(X*)⊇X⊃1 ⟹ Cor 14.3 branch 1 で π(⟨X*⟩)⊆κ(M_i)。
 - step 2/3 = K_i×K_i*=Z, Z=∏K_i* decomposition (BG L3993-4015)。step 4+ = counting (§16 gated, Lane G)。
+
+### 🔑 訂正 + 発見 (2026-06-16, lane-h): Thm 14.4 (R(x)) は Lane H で provable
+14.7 pre-position step 1b (typeP_neighbor_kappa) 完了後の精査で判明:
+- **`sigmaLength_one_centralizer_structure` (Thm 14.4) の Lean statement は §16-circular 部分
+  (sharply-transitive headline + part (b)) を DROP 済** (docstring 明記)。残る内容 = ∃! N +
+  (a)(c)(d)(e)(f) は **§13-gated**: BG proof (L3880-3904) は Thm 13.9 ✓ / Thm 10.1(b)
+  (=`S10.fusion_control_of_mem_sigma`, repo 在) / Prop 12.15 ✓ / **Cor 14.3 ✓ (完了済)** /
+  Cor 12.6 のみ。§16/Lemma 14.6 に**非依存**。⟹ **14.4 は今 provable**。旧 notes/memory の
+  「14.4 R(x) headline §16-gated」は **DROP された headline 部分のみ**の話で、Lean statement 本体は
+  unblocked。
+- **R(x) = Msigma N ⊓ C_G(x)** は §16 の Lemma 14.6/tildeM が要する foundation。14.4 を Lane H が
+  証明すれば §16 (Lane G) に R(x) を供給できる(但し §16 は現状 parameterized R ゆえ Lane G の wiring 要)。
+- ⟹ **14.4 は M_i/Z setup (sorried machinery) より良い target**: closeable sorry + R(x) foundation。
+  但し大 (~250-350 行, ∃! N + sharply-transitive 周辺の reasoning), Thm 10.1(b) の exact form 要確認。
+
+### ⚠ §16 (Lane G) 停滞 — Lane H の FT 接続が gated
+recent merge log = 全て lane-h 自身の commit (Lane G/F/B の合流無し)。S16_MainResults は parameterized
+`R : G → Subgroup G` + sorry 多数 (R(x)/tildeM/Lemma 14.6 未構築)。⟹ Lane H の §14 machinery
+(Prop 14.2 / Cor 14.3 / gen Cor 12.16(a) / 14.7 steps 0-1b) は揃ったが、**binding result 14.7 は
+§16 counting gated のまま、FT 接続は Lane G の §16 進展待ち**。merge cron 稼働状況も要確認。
