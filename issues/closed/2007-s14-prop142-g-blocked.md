@@ -7,6 +7,28 @@ created: 2026-06-15
 
 # Prop 14.2 case-τ₁ (g): needs BG Thm 3.10(a) + Lem 12.17 TI
 
+## ✅✅ DONE (2026-06-15, lane-h) — Prop 14.2 完全証明
+
+`typeP_structure` は **sorry-free + axiom-clean** (`#print axioms = [propext, Classical.choice,
+Quot.sound]`, commit `f031f7bc`)。case-τ₁ (g) を 3 helper + assembly で実装:
+
+- **Lem 12.17 β'-clause** `Msigma_inf_conj_isBetaCompl` (新 leaf `S12_Lemma1217`, commit `35b06ac8`):
+  g∉M で M_σ∩M^g は β(M)′-group。Thm 10.1(b) で C_G(X)⊄M → Cor 12.14 対偶で p∉β。
+  (Cor 12.14 が S12_Theorem1213→S12_E を推移 import するため S12_E に置けず downstream leaf 化。)
+- **Thm 3.10(a)** `prime_card_complement_of_frobenius_conj` (`S03g_Thm310`, 既存) を適用して |K| 素数。
+- **`E23_ne_bot_of_isTypeP2_caseTau1`**: IsTypeP2 ⟹ E₂E₃≠1 (対偶 = E₂E₃=⊥ ⟹ E=E₁ ⟹ κ=π−σ = P₁ 矛盾)。
+- **`sigma_eq_beta_and_prime_card_E1_of_caseTau1`** (Frobenius core): U=[U,K]≤E'
+  (`le_commutator_of_coprime_inf_centralizer_eq_bot` + Frobenius coprime) → U abelian (E' abelian)
+  → Lem 12.19 で W≤C_{Mσ}(U)=1 → σ=β; Thm 3.10(a) で |K| 素数。
+- **`isTISubset_sigmaSharp_of_sigma_eq_beta`**: σ=β + Lem 12.17 β'-clause ⟹ M_σ^# は TI-subset。
+- 補助: Lem 14.1 bridge helper 2 本を M_σ nilpotent も返すよう augment。
+
+**当初プランの訂正**: U abelian は「E₂E₃ abelian の standalone 証明」でなく **U≤E' + E' abelian (Cor 12.10b)**
+で取得 (Task B が hUab を自動供給)。Lem 12.17 TI は **S12_E でなく新 downstream leaf** (循環回避)。
+
+⟹ **§14 funnel 解禁** (14.3 sigma_diagnostic は Prop 14.2(b)(c) で書ける、以下 14.4→14.7→...)。
+次 = Thm 14.7 `typeP_duality` (§15/§16 が consume する唯一の §14 結果)。
+
 ## 背景
 
 `typeP_structure` (BG Prop 14.2) は 2026-06-15 に case-τ₃ 全 5 + case-τ₁ の

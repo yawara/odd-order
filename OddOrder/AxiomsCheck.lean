@@ -4554,6 +4554,15 @@ makes 13.9 alone sufficient — no `R(x)` / `M̃` machinery needed.) -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacy_disjoint_of_nonconjugate
 
+/-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
+maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
+normalizer identity `N_M(X) = K ⊔ K*`, the `(d)` clause `K* ∩ M^g = 1`, and (for type `P₂`)
+`σ(M) = β(M)`, `|K|` prime, and `M_σ` a TI-subset of `G`.  Both cases `κ ∩ τ₃ ≠ ∅` (`K = E`,
+Corollary 13.11) and `κ ⊆ τ₁` (`K = E₁`, the Frobenius core via Theorem 3.10(a) + Lemma 12.17
++ Lemma 12.19) are discharged.  Sorry-free and axiom-clean — the §14 funnel keystone. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_structure
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

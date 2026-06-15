@@ -7,7 +7,9 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
@@ -1239,8 +1241,10 @@ private theorem msigma_centralizer_eq_bot_of_elemAb_le [Finite G]
     {U A : Subgroup G} {p : ℕ} [Fact p.Prime]
     (hpπ : p ∈ piSet M) (hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M) (hpκ : p ∉ kappa M)
     (hA : A ∈ elemAbelianOfRank G p (pRank ↥M p)) (hAM : A ≤ M) (hAU : A ≤ U) :
-    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (U : Set G) = ⊥ := by
-  have hCA := (msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hA hAM).2.1
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (U : Set G) = ⊥ ∧
+      Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+  obtain ⟨_, hCA, hnilp⟩ := msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hA hAM
+  refine ⟨?_, hnilp⟩
   rw [eq_bot_iff, ← hCA]
   exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAU))
 
@@ -1313,7 +1317,8 @@ theorem Msigma_centralizer_E23_eq_bot_of_caseTau1 [Finite G]
     (h : SubgroupESetup M E E₁ E₂ E₃)
     (hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty)
     (hUne : (E₂ ⊔ E₃ : Subgroup G) ≠ ⊥) :
-    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) = ⊥ := by
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) = ⊥ ∧
+      Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
   classical
   by_cases hE3 : E₃ = ⊥
   · -- Case `E₃ = ⊥`: `U = E₂E₃ = E₂ ≠ ⊥`; pick `q ∈ τ₂(M)` and `A = Ω₁(E₂)` of rank two.
@@ -1385,6 +1390,218 @@ theorem Msigma_centralizer_E23_eq_bot_of_caseTau1 [Finite G]
     have hpκ : p ∉ kappa M := fun hpκ => hτ3 ⟨p, hpκ, hpτ3⟩
     have hAU : Subgroup.zpowers (g : G) ≤ (E₂ ⊔ E₃ : Subgroup G) := hAE3.trans le_sup_right
     exact msigma_centralizer_eq_bot_of_elemAb_le hG h.mem_maximal hpπ hpσ hpκ hArank hAM hAU
+
+/-- **BG Proposition 14.2(g), TI conjunct** (mmd L3850): if `σ(M) = β(M)` then `M_σ^#` is a
+TI-subset of `G` with normalizer-bound `N_G(M_σ)`.  For `g` producing an overlap of `M_σ^#`
+with its `g`-conjugate, either `g ∈ M ≤ N_G(M_σ)`, or `g ∉ M` and Lemma 12.17
+(`Msigma_inf_conj_isBetaCompl`) makes `M_σ ∩ M_σ^g` a `β(M)′ = σ(M)′`-group; being also a
+`σ(M)`-group (`≤ M_σ`) it is trivial, contradicting the nontrivial overlap.  This is the
+TI clause Proposition 14.2(g) concludes from `β(M) = σ(M)`. -/
+theorem isTISubset_sigmaSharp_of_sigma_eq_beta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hσβ : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M) :
+    IsTISubset (sigmaSharp M)
+      (Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G)) := by
+  intro g hov
+  obtain ⟨a, haS, hgaS⟩ := hov
+  simp only [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff,
+    SetLike.mem_coe] at haS hgaS
+  obtain ⟨haMσ, _ha1⟩ := haS
+  obtain ⟨hgaMσ, hga1⟩ := hgaS
+  by_cases hgM : g ∈ M
+  · exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hgM
+  · exfalso
+    -- `g a g⁻¹ ∈ M_σ ∩ (conj g • M_σ)`, nontrivial.
+    have hgaConj : g * a * g⁻¹ ∈ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using haMσ
+    have hmemInf : g * a * g⁻¹ ∈
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M :=
+      Subgroup.mem_inf.mpr ⟨hgaMσ, hgaConj⟩
+    have hcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓
+        MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M) ≠ 1 := fun h =>
+      hga1 (Subgroup.mem_bot.mp ((Subgroup.card_eq_one.mp h) ▸ hmemInf))
+    obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hcard
+    haveI : Fact p.Prime := ⟨hp⟩
+    -- `p ∈ σ(M)` since the intersection is `≤ M_σ`.
+    have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpdvd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
+    -- `p ∉ β(M)` by Lemma 12.17, since the intersection is `≤ M_σ ⊓ M^g`.
+    have hle : OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M ≤
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ MulAut.conj g • M :=
+      inf_le_inf_left _ (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr
+        (OddOrder.BG.Ch3.S10.Msigma_le M))
+    have hpβ := OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl hG hM hgM p
+      (Nat.mem_primeFactors.mpr ⟨hp, hpdvd.trans (Subgroup.card_dvd_of_le hle), Nat.card_pos.ne'⟩)
+    exact hpβ (hσβ ▸ hpσ)
+
+/-- **BG Proposition 14.2(g), Frobenius core** (mmd L3850): in case `κ ⊆ τ₁` with `E₁ = K`
+non-regular prime on `M_σ` and `U = E₂E₃ ≠ 1`, the type-`P₂` conclusions `σ(M) = β(M)` and
+`|K|` prime hold.  `E = E₁ ⋉ U` is a Frobenius group (`isFrobeniusGroup_E_of_caseTau1`) with
+`C_{M_σ}(U) = 1` and `M_σ` nilpotent (`Msigma_centralizer_E23_eq_bot_of_caseTau1`); since `E₁`
+is prime on the nilpotent `M_σ`, Theorem 3.10(a) gives `|E₁|` prime.  Coprime fixed-point-free
+action gives `U = [U, E₁] ≤ E'` (`le_commutator_of_coprime_inf_centralizer_eq_bot`), so `U`
+is abelian (Corollary 12.10(b): `E'` abelian) and, by Lemma 12.19, `U` centralizes a Hall
+`β(M)'`-subgroup `W` of `M_σ`; `W ≤ C_{M_σ}(U) = 1`, so `M_σ` is a `β(M)`-group, forcing
+`σ(M) = β(M)`. -/
+theorem sigma_eq_beta_and_prime_card_E1_of_caseTau1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) (hE1ne : E₁ ≠ ⊥)
+    (hKstar : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
+    (hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty) (hUne : (E₂ ⊔ E₃ : Subgroup G) ≠ ⊥) :
+    OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M ∧
+      ∃ q : ℕ, q.Prime ∧ Nat.card ↥E₁ = q := by
+  classical
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups h.mem_maximal
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hUleE_sup : (E₂ ⊔ E₃ : Subgroup G) ≤ E := sup_le h.E₂_le h.E₃_le
+  -- `E = E₁ ⋉ U` is Frobenius; `C_{M_σ}(U) = 1` and `M_σ` is nilpotent.
+  have hfrob := isFrobeniusGroup_E_of_caseTau1 hG h hE1ne hKstar hτ3 hUne
+  obtain ⟨hCU, hMnilp⟩ := Msigma_centralizer_E23_eq_bot_of_caseTau1 hG h hτ3 hUne
+  -- `M_σ ≠ ⊥`.
+  have hMσne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := fun hb => hKstar (by rw [hb, bot_inf_eq])
+  -- Coprime `|E₁|` and `|U|` (Frobenius kernel/complement).
+  have hcopKU : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥(E₂ ⊔ E₃)) := by
+    have hc := (hfrob.coprime_card_kernel_complement).symm
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E₁_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleE_sup).toEquiv] at hc
+  -- `C_U(E₁) = ⊥` (regular action of `E₁` on `U`).
+  have hCUK : (E₂ ⊔ E₃ : Subgroup G) ⊓ Subgroup.centralizer (E₁ : Set G) = ⊥ := by
+    obtain ⟨⟨g₀, hg₀E1⟩, hg₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hE1ne
+    have hg₀1 : g₀ ≠ 1 := fun hc => hg₀ne (Subtype.ext hc)
+    have hr := actsRegularlyOn_E23_E1_of_caseTau1 hG h hE1ne hKstar hτ3 g₀ hg₀E1 hg₀1
+    rw [fixedByElement_def] at hr
+    rw [eq_bot_iff, ← hr]
+    exact inf_le_inf_left _
+      (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hg₀E1))
+  -- **Task B**: `U = [U, E₁] ≤ E'`.
+  haveI hE1solv : IsSolvable ↥E₁ :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (h.E₁_le.trans h.E_le))
+  have hUleE' : (E₂ ⊔ E₃ : Subgroup G) ≤ derivedInG E := by
+    have hUcomm : (E₂ ⊔ E₃ : Subgroup G) ≤ ⁅E₁, E₂ ⊔ E₃⁆ :=
+      OddOrder.BG.Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot
+        (h.E₁_le.trans (h.E23_normal hG)) hcopKU hCUK
+    have hcomm_le : (⁅E₁, E₂ ⊔ E₃⁆ : Subgroup G) ≤ ⁅E, E⁆ :=
+      Subgroup.commutator_mono h.E₁_le hUleE_sup
+    exact hUcomm.trans (le_of_le_of_eq hcomm_le (Subgroup.map_subtype_commutator E).symm)
+  -- `U` is abelian (`U ≤ E'` and `E'` is abelian by Corollary 12.10(b)).
+  have hE'ab : IsMulCommutative ↥(derivedInG E) := (nilpotent_sigmaComplement_abelian hG h).2.1.2
+  have hUab : ∀ a b : ↥(E₂ ⊔ E₃), (a : G) * (b : G) = (b : G) * (a : G) := fun a b =>
+    congrArg Subtype.val (hE'ab.is_comm.comm ⟨a, hUleE' a.2⟩ ⟨b, hUleE' b.2⟩)
+  -- `E₁` is prime on `M_σ` ⟹ the `hcond3` hypothesis of Theorem 3.10(a).
+  have hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ := E1_actsPrime hG h hE1ne
+  have hcond3 : ∀ x ∈ E₁, x ≠ 1 →
+      OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) =
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) := by
+    intro x hx hx1
+    have := hE1prime x hx hx1
+    rwa [fixedByElement_def, fixedBy_def] at this
+  -- `E ≤ N_G(M_σ)`, coprime `|E|` `|M_σ|`, and `M_σ ⊔ E` solvable.
+  have hEMσ : E ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+    h.E_le.trans (le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
+  have hcopEMσ : Nat.Coprime (Nat.card ↥E) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) := by
+    have h1 := (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG h.mem_maximal).coprime_index
+    rw [h.isComplement'_subgroupOf.symm.index_eq_card] at h1
+    rw [Nat.coprime_comm] at h1
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe h.E_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv] at h1
+  haveI hsolvME : IsSolvable ↥(OddOrder.BG.Ch3.S10.Msigma M ⊔ E) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hMσM h.E_le))
+  -- **Theorem 3.10(a)**: `|E₁|` has prime order.
+  have hKprime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥E₁ = q :=
+    OddOrder.BG.Ch1.S03.prime_card_complement_of_frobenius_conj hsolvME hUleE_sup h.E₁_le hfrob
+      hUab hEMσ hMnilp hMσne hcopEMσ hCU hcond3
+  -- **σ = β**: Lemma 12.19 gives `W` a Hall `β'`-subgroup of `M_σ` with `E' ≤ C_G(W)`; since
+  -- `U ≤ E'` we get `W ≤ C_{M_σ}(U) = 1`, so `M_σ` is a `β(M)`-group, forcing `σ(M) = β(M)`.
+  obtain ⟨W, hWMσ, hWHall, hE'centW⟩ :=
+    OddOrder.BG.Ch3.S12.derivedE_centralizes_betaComplement hG h
+  have hWcentU : W ≤ Subgroup.centralizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) := by
+    intro w hw
+    rw [Subgroup.mem_centralizer_iff]
+    intro u hu
+    exact ((Subgroup.mem_centralizer_iff.mp (hE'centW (hUleE' hu))) w hw).symm
+  have hWbot : W = ⊥ := by
+    have hWle : W ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓
+        Subgroup.centralizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) := le_inf hWMσ hWcentU
+    rw [hCU] at hWle; exact le_bot_iff.mp hWle
+  have hπMσβ : ∀ p ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).primeFactors,
+      p ∈ OddOrder.BG.Ch3.S10.beta M := by
+    intro p hp
+    have hidx : (W.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).index =
+        Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+      rw [hWbot, Subgroup.bot_subgroupOf, Subgroup.index_bot]
+    have hmem := hWHall.2 p (hidx ▸ hp)
+    simp only [Set.mem_compl_iff, not_not] at hmem
+    exact hmem
+  have hσβ : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M := by
+    refine Set.eq_of_subset_of_subset (fun p hp => ?_) (fun p hp =>
+      OddOrder.BG.Ch3.S10.alpha_subset_sigma hG h.mem_maximal
+        (OddOrder.BG.Ch3.S10.beta_subset_alpha M hp))
+    -- `σ ⊆ β`: `p ∈ σ ⟹ p ∣ |M_σ|` (Hall) `⟹ p ∈ β`.
+    refine hπMσβ p ?_
+    obtain ⟨hpπM, _⟩ := (OddOrder.BG.Ch3.S10.mem_sigma_iff M p).mp hp
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors hpπM
+    refine Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩
+    by_contra hndvd
+    have hHall := OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG h.mem_maximal
+    have hcardM := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    have hcardeq : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) =
+        Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv
+    have hpM : p ∣ Nat.card ↥M := (Nat.mem_primeFactors.mp hpπM).2.1
+    rw [← hcardM, hcardeq] at hpM
+    have hpidx : p ∣ ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+      (hpp.dvd_mul.mp hpM).resolve_left hndvd
+    exact hHall.2 p (Nat.mem_primeFactors.mpr
+      ⟨hpp, hpidx, Subgroup.index_ne_zero_of_finite⟩) hp
+  exact ⟨hσβ, hKprime⟩
+
+/-- **BG Proposition 14.2(g), type-`P₂` ⟹ `U ≠ 1`** (mmd L3850, "`M ∈ 𝓜_{𝒫₂}`, i.e. `U ≠ 1`"):
+in case `κ ⊆ τ₁` (so `κ(M) = τ₁(M)`), if `E₂E₃ = 1` then `E = E₁ = K`, hence `κ(M)` equals
+`π(M) ∖ σ(M)` (every `σ(M)'`-prime of `M` divides `|E| = |E₁|` and lies in `κ` by the prime
+action), so `M` is type `P₁`.  The contrapositive: `IsTypeP2 M ⟹ E₂E₃ ≠ 1`. -/
+theorem E23_ne_bot_of_isTypeP2_caseTau1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁)
+    (hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
+    (hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty) (hP2 : IsTypeP2 M) :
+    (E₂ ⊔ E₃ : Subgroup G) ≠ ⊥ := by
+  classical
+  intro hUbot
+  -- `E = E₁` since `E = E₁E₂E₃` and `E₂ = E₃ = ⊥`.
+  have hE2bot : E₂ = ⊥ := le_bot_iff.mp (le_sup_left.trans hUbot.le)
+  have hE3bot : E₃ = ⊥ := le_bot_iff.mp (le_sup_right.trans hUbot.le)
+  have hEeq : E = E₁ := by
+    rw [h.eq_sup hG, hE2bot, hE3bot, sup_bot_eq, sup_bot_eq]
+  -- `κ(M) = π(M) ∖ σ(M)`, contradicting `IsTypeP2 M`.
+  refine absurd ?_ hP2.2
+  apply Set.eq_of_subset_of_subset
+  · -- `κ(M) ⊆ π(M) ∖ σ(M)`.
+    intro p hpκ
+    obtain ⟨hpp, hpτ, P, hPelem, hPM, _⟩ := hpκ
+    have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+      rcases hpτ with hp | hp
+      · exact tau1_subset_sigma_compl M hp
+      · exact tau3_subset_sigma_compl M hp
+    exact ⟨Nat.mem_primeFactors.mpr
+      ⟨hpp, hPcard ▸ Subgroup.card_dvd_of_le hPM, Nat.card_pos.ne'⟩, hpσ⟩
+  · -- `π(M) ∖ σ(M) ⊆ κ(M)`: `p ∣ |M|`, `p ∉ σ` ⟹ `p ∣ |E| = |E₁|` ⟹ `p ∈ κ`.
+    intro p hp
+    obtain ⟨hpπ, hpσ⟩ := hp
+    obtain ⟨hpp, hpdvdM, _⟩ := Nat.mem_primeFactors.mp hpπ
+    haveI : Fact p.Prime := ⟨hpp⟩
+    have hpnMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hdvd =>
+      hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+        (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩))
+    have hdvdME : p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥E := by
+      rw [h.card_Msigma_mul_card_E]; exact hpdvdM
+    have hpE1 : p ∈ (Nat.card ↥E₁).primeFactors :=
+      Nat.mem_primeFactors.mpr
+        ⟨hpp, hEeq ▸ (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
+    exact mem_kappa_of_mem_primeFactors_card_E1 hG h hE1prime hCE1 hpE1
 
 /-- **BG Proposition 14.2** (mmd L3778): structure of a type-`P` maximal subgroup
 ("nearly everything proved in §13" about `M ∈ 𝓜_𝓟`).
@@ -1792,8 +2009,17 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hqσ hXbot hXp).2.2.2.2
           hXM hCM g⁻¹ hconj
       exact hgM (by simpa using M.inv_mem hg')
-    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI (real content; Thm 3.10/Lem 12.19/12.17).
-      sorry
+    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  `IsTypeP2 M` forces
+      -- `U = E₂E₃ ≠ 1` (`E23_ne_bot_of_isTypeP2_caseTau1`); the Frobenius core
+      -- (`sigma_eq_beta_and_prime_card_E1_of_caseTau1`) gives `σ = β` and `|K|` prime via
+      -- Theorem 3.10(a); the TI clause follows from `σ = β` (`isTISubset_sigmaSharp_of_sigma_eq_beta`).
+      intro hP2
+      have hKstar_ne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≠ ⊥ :=
+        Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
+      have hUne := E23_ne_bot_of_isTypeP2_caseTau1 hG h' hKprime hKstar_ne hτ3 hP2
+      obtain ⟨hσβ, q, hq, hqcard⟩ :=
+        sigma_eq_beta_and_prime_card_E1_of_caseTau1 hG h' hKne hKstar_ne hτ3 hUne
+      exact ⟨hσβ, q, hq, hqcard, isTISubset_sigmaSharp_of_sigma_eq_beta hG hM hσβ⟩
 
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
