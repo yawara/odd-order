@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
+import OddOrder.BG.Ch1_Preliminary.S06_Additional
 
 /-!
 # BG Theorem 3.8 — `⁅K, R⁆ ⊆ F(K)` for a coprime action (LMS LNS 188, §3, mmd L1221-1259)
@@ -365,5 +366,42 @@ theorem commutator_le_fitting_of_reduced
     have hxRK : x ∈ (⁅R, K⁆ : Subgroup G) := by rw [Subgroup.commutator_comm] at hx; exact hx
     exact hdich hxRK
   exact fun y hy => hNF (Subgroup.subset_normalClosure hy)
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **BG Theorem 3.8, step 1** (base case of the `|RK|` induction, mmd L1233): if `R` (normalizing
+`K`) centralizes the Fitting subgroup of `K̄ = ↥K / F(K)`, then `R` centralizes `K̄` itself
+(Proposition 1.4), i.e. `⁅K, R⁆ ⊆ F(K)`.
+
+The conjugation action `φ : R → MulAut ↥K` descends to `K̄` (`quotientMulAutHom`); the centralizing
+hypothesis is `F(K̄) ≤ fixedPoints`, so Proposition 1.4
+(`actionCommutator_eq_bot_of_fitting_le_fixedPoints`) makes the action commutator on `K̄` trivial.
+By `actionCommutator_quotient_eq_map` this is the image of `actionCommutator φ`, so
+`actionCommutator φ ≤ F(K)`; finally `actionCommutator_conj_map_subtype` identifies its image under
+`K.subtype` with `⁅K, R⁆`. -/
+theorem commutator_le_fitting_of_centralizes_fittingQuotient
+    {G : Type*} [Group G] [Finite G] [IsSolvable G] {K R : Subgroup G} [K.Normal]
+    (hRK : R ≤ Subgroup.normalizer (K : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hcent : OddOrder.Isaacs.Ch01.fitting (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K) ≤
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom
+        (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic
+          ((Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK))))) :
+    ⁅K, R⁆ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := by
+  set φ : ↥R →* MulAut ↥K :=
+    (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hRK) with hφ
+  have hFinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (OddOrder.Isaacs.Ch01.fitting ↥K) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ
+  have hcopK : Nat.Coprime (Nat.card ↥R)
+      (Nat.card (↥K ⧸ OddOrder.Isaacs.Ch01.fitting ↥K)) :=
+    hcop.coprime_dvd_right (Subgroup.card_quotient_dvd_card _)
+  have hbot : OddOrder.Isaacs.Ch04.actionCommutator (quotientMulAutHom hFinv) = ⊥ :=
+    OddOrder.BG.Ch1.S01.actionCommutator_eq_bot_of_fitting_le_fixedPoints hcopK hcent
+  rw [OddOrder.Isaacs.Ch04.actionCommutator_quotient_eq_map] at hbot
+  have hle : OddOrder.Isaacs.Ch04.actionCommutator φ ≤ OddOrder.Isaacs.Ch01.fitting ↥K := by
+    rw [← QuotientGroup.ker_mk' (OddOrder.Isaacs.Ch01.fitting ↥K)]
+    exact (Subgroup.map_eq_bot_iff _).mp hbot
+  calc ⁅K, R⁆ = (OddOrder.Isaacs.Ch04.actionCommutator φ).map K.subtype :=
+        (OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hRK).symm
+    _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥K).map K.subtype := Subgroup.map_mono hle
 
 end OddOrder.BG.Ch1.S03h
