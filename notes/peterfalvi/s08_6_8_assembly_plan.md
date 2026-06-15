@@ -3170,3 +3170,20 @@ irr branch 残り conjunct + 完全 constructor:
 4. cX∪cY glue (`coherentXunionYset_caseB_of_glued` S08CB2:1616, sorry-free shell)。
 5. case split + Frobenius → capstone `sibleySetup_is_coherent` (S08_CoherenceTheorems:59)。
 **正本=本 session 43 cont.¹³。hnonlin 構成可能 (`d8490672`)。次=dispatch family wiring (`caseB_phi_family` の `.X` data 依存を精査してから statement 設計)。Opus 継続。**
+
+### session 43 cont.¹⁴: ✅ `caseB_hcol` + `caseB_hirr` — dispatch trio 完成 (commit `e011f127`)
+- **`caseB_hcol`** (S08_CaseBAssembly, caseB_irr_bundle 直後): `∀i, CaseBColBundle…` = `fun i => caseB_column_bundle … i.property hη₁`。非線形性 input 不要 (column witness `columnSum χ₂ = Ind^L_H θ` で gate)。要 `hW1 : h46.W1 = hyp.W1`。
+- **`caseB_hirr`**: `∀i, CaseBIrrBundle…` = `fun i => caseB_irr_bundle …`、3 structural input (θ≠1 / Ind θ≠η₁ / conj≠η₁) を単一 `hnonlin` から (`caseB_induce_ne_Yset`/`caseB_induce_conj_ne_Yset` の degree 不一致)。
+- 両者 axiom-clean、leaf build green (**S08_CaseBAssembly は true leaf = 誰も import しない** → full build 不要)。⚠ `[Fintype ↥H]` unusedFintypeInType warning は sibling `caseB_hirrAnc` (L753) と同じ既存パターン (bundle constructor が Fintype 要求ゆえ Finite 化不可、非 fatal)。
+
+**⟹ 🎯 dispatch 入力トリオ (hcol=`caseB_hcol` / hirr=`caseB_hirr` / hirrAnc=`caseB_hirrAnc`) すべて構成可能。`caseB_per_phi_anchored_fromYset` (per-φ anchored image producer, L1546) は構造データ + (W₂⊆⁅H,H⁆, φ≠1)[hnonlin] + hW1 + aggregate(hXaggorth/hdecomp) から完全に feed 可能。**
+
+**📋 残り = 🔴 HYBRID 組立 (step 3、本節の主残務・多ターン) → glue (step 4) → case split (step 5)**:
+- **chain-adjoin engine 判明**: `retarget_isCoherent_of_supportedDecomposition` (S07_Coherence:4031)。入力 = `hS₁ : IsCoherent τ S₁ A` + `Da : CharacterPsiDecomposition τ χ (a•chi1)` (= `caseB_phi_family … i`、χ=Ind θ, a=weight, chi1=η₁∈S₁) + χ/χ̄ 正規直交 (`hχχ` 等) + `hperElem` (S₁ image ⊥ Da.imageFamily.imageSet) + `hgen`。出力 = `IsCoherent τ (S₁∪{χ,χ̄}) A`。⟹ 1 既約 constituent ごとに {Ind θ, conj} を adjoin。
+- **🔬 次ターン RECON (HYBRID 設計の前提)**:
+  1. **Xset W2 の構造** (`hyp.Xset W2` = S−S(W2)) と、cX_col (μ_j columns) + X_irr (既約 Ind θ) がどう Xset を被覆/分割するか (`mem_Xset`)。
+  2. **cX_col** = `certainTypeSet_isCoherent_tau` (S08CB2:1651、`hmapagree` 要) を base coherence にできるか。
+  3. **chain-adjoin の順序**: base = cX_col から X_irr family を fold-adjoin する設計 (`retarget_isCoherent_of_supportedDecomposition` を ∀i で畳む) か、別の base か。
+  4. **case-A テンプレート**: case-A の cX 構築 (`nonempty_coherent_S_caseA_of_frobenius` 周辺) を読んで HYBRID の雛形にする (case-A 完了済ゆえ最良の参照)。
+  5. `hperElem` (S₁ image ⊥ R(χ)) の供給元 — seam-1 orthogonality (`columnDecompositionTau_X_orthogonal` 等) が既にあるか。
+**正本=本 session 43 cont.¹⁴。dispatch トリオ完成 (`e011f127`)。次=HYBRID 組立の RECON (Xset W2 構造 + cX_col base + chain-adjoin 順序 + case-A テンプレート)。Opus 継続。**
