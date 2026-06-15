@@ -2916,3 +2916,15 @@ irr branch (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`, S0
 
 **▶▶ 次の具体ステップ (順):** (1) **anchor data discharge** (η₁-anchor + partner + hirrAnc — Yset-member の既約性/support の lemma 整備が核; precedent あり) → (2) **per-θ bundles discharge** (column/irr structural、bulk) → (3) **(6.8.2.2) aggregate 接続** (`exists_decomposition_caseB` の wiring; \|Yset\|=2 edge で cY swap 注意 — `per_phi_anchored_image` cY 一般化済) → (4) **HYBRID 組立** (anchored 公式を diagonal data に: cY に X_irr を `retarget_isCoherent_of_supportedDecomposition` で chain-adjoin + cX_col `certainTypeSet_isCoherent_tau` と §7 union) → (5) capstone `sibleySetup_is_coherent`。
 **正本=本 session 42 cont.⁴。(6.8.2.3) 具体 family 上 完全組立 (abstract D 解消)。次=anchor data discharge (Yset-member 既約性/support lemma + partner 抽出, precedent S08_CaseBCoherence:310-340)。**
+
+### session 42 cont.⁴ 続: ✅ `caseB_per_phi_anchored_fromYset` — Y-anchor data 内製化 (commit `6330ad76`)
+cont.⁴ の `caseB_per_phi_anchored_family` を強化: **η₁-anchor + partner block 全体を `hη₁ : η₁ ∈ Yset` だけから discharge**。partner = **η̄₁ (共役)** の教科書的選択を内製 (既存 `inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset` S08CB2:1390 / `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` S08CB2:1449 と同パターン):
+- η̄₁∈Y = `Yset_closedUnderConjugate`、η₁≠η̄₁ = `Yset_hasNoRealCharacters.not_mem_of_isReal` ((5.2.a) odd⇒no real irr)、⟨η₁,η̄₁⟩=0 = `irreducibleCharacter_inner_eq_ite`+hne、(η₁−η̄₁) H^#-support = `sMember_diffSupport_of_charValue_eq`+`Yset_apply_one` (等次数)。`hη₁irr`=`isIrreducibleCharacter_of_mem_Yset`、`hνZc1`=`extension_mem_ZIrr`。
+
+**⟹ `caseB_per_phi_anchored_fromYset` の残り入力 = genuine §5/§6 hard core のみ (boilerplate anchor 消滅):**
+1. **per-θ bundles `hcol`/`hirr`** (column=(4.9) certain-type structural / irr=case-A Dade chain field) — **bulk**。
+2. **`hirrAnc i`** (per-θ: ⟨η₁,Ind θ⟩ 系 4 直交; η₁∈Yset linear ⊥ irr constituent Ind θ)。
+3. **(6.8.2.2) aggregate `hXaggorth`/`hdecomp`** (`exists_decomposition_caseB` S08:126)。
+
+**▶▶ 次の brick 候補 (contained 順):** (a) **(6.8.2.2) aggregate 接続** = `exists_decomposition_caseB` を fromYset の hXaggorth/hdecomp に wiring (\|Y\|=2 edge で cY swap; `per_phi_anchored_image` は cY 一般化済ゆえ吸収可) → (b) **hirrAnc discharge** (η₁ vs Ind θ 直交; distinct irr or Yset⊥X 構造) → (c) **per-θ bundles** (column/irr structural, bulk) → (d) **HYBRID 組立** (anchored 公式 = diagonal: cY に X_irr chain-adjoin `retarget_isCoherent_of_supportedDecomposition` + cX_col `certainTypeSet_isCoherent_tau` を §7 union) → (e) capstone `sibleySetup_is_coherent`。
+**正本=本 session 42 cont.⁴ 続。fromYset で anchor 内製化完了。次=(6.8.2.2) aggregate 接続 or hirrAnc discharge。**
