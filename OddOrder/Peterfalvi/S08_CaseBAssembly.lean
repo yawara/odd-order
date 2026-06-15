@@ -700,6 +700,56 @@ theorem caseB_induce_conj_ne_Yset
     rw [mul_one, ← Nat.cast_mul]; exact h1
   exact mul_left_cancel₀ hw hd1
 
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+  [Invertible (Nat.card ↥H : ℂ)] in
+/-- **(6.8.2.3) positive-weight constituents are non-linear** (the single `hnonlin` dispatch input).
+When the central source character `φ` of `W₂ ⊆ ⁅H,H⁆` is **non-trivial**, every constituent `θ`
+of `Res^H_{W₂}` (i.e. every `θ` with positive Clifford weight `⟨φ, Res^H_{W₂} θ⟩ > 0`) has
+degree `> 1`.
+
+Indeed a degree-one `θ` is trivial on the commutator subgroup `⁅H,H⁆ ⊇ W₂.subgroupOf H`
+(`IsIrreducibleCharacter.apply_eq_one_of_mem_commutator_of_apply_one_eq_one`), so
+`Res^H_{W₂} θ = 1_{W₂}` and the weight `⟨φ, Res θ⟩ = ⟨φ, 1⟩ = 0` (orthogonality of the
+non-trivial irreducible `φ` to the trivial one), contradicting `0 < weight`.
+
+This discharges the structural hypothesis `hnonlin` of `caseB_hirrAnc` (and, through `θ ≠ 1` and
+the `Ind θ ≠ η` distinctnesses, of `caseB_irr_bundle`).  The two inputs `W₂ ⊆ ⁅H,H⁆` and `φ ≠ 1`
+are the case-(B) data: `φ` is a non-trivial central character (the `X`-side selector) and
+`W₂ ≤ ⁅H,H⁆` is the CertainType hypothesis `cert.W2 ≤ ⁅H,H⁆`. -/
+theorem caseB_hnonlin [Finite ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hderiv : W2.subgroupOf H ≤ commutator ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    (hφne : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ
+      ≠ trivialClassFunction ↥(W2.subgroupOf H)) :
+    ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (i.val : ClassFunction ↥H ℂ) 1 ≠ 1 := by
+  rintro ⟨θ, hweight⟩ h1
+  -- Degree-one `θ` is trivial on `⁅H,H⁆ ⊇ W₂.subgroupOf H`, so `Res^H_{W₂} θ = 1`.
+  have hrestrict : ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)
+      = trivialClassFunction ↥(W2.subgroupOf H) := by
+    refine ClassFunction.ext fun n => ?_
+    rw [ClassFunction.restrict_apply, trivialClassFunction_apply]
+    exact θ.2.apply_eq_one_of_mem_commutator_of_apply_one_eq_one h1 (hderiv n.2)
+  -- Hence the multiplicity `⟨φ, Res θ⟩ = ⟨φ, 1⟩ = 0` (φ a non-trivial irreducible).
+  have hzero : ClassFunction.inner
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ)
+      (ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)) = 0 := by
+    have hne : (⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ, hφ'⟩
+        : IrreducibleCharacter ↥(W2.subgroupOf H)) ≠ trivialIrreducibleCharacter _ := by
+      intro heq
+      apply hφne
+      have h := congrArg (fun c : IrreducibleCharacter ↥(W2.subgroupOf H) =>
+        (c : ClassFunction ↥(W2.subgroupOf H) ℂ)) heq
+      simpa only [IrreducibleCharacter.coe_mk,
+        IrreducibleCharacter.coe_trivialIrreducibleCharacter] using h
+    rw [hrestrict, ← IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      ← IrreducibleCharacter.coe_mk _ hφ', irreducibleCharacter_inner_eq_ite, if_neg hne]
+  exact (constituentWeight_pos_iff hφ' θ).mp hweight hzero
+
 /-- **(6.8.2.3) per-`θ` anchor-vs-constituent orthogonality** (`hirrAnc` of the dispatch).  For a
 positive-weight `θ` whose `Ind^L_H θ` is not a column (irreducible branch), the four inner products of
 `η₁, η̄₁` against the induced character and its conjugate vanish: each is a `Y`-member against a

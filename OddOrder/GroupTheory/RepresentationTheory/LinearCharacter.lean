@@ -223,4 +223,25 @@ theorem IsIrreducibleCharacter.apply_commutatorElement_eq_one_of_apply_one_eq_on
         = ((φ : G → ℂ) a * (φ : G → ℂ) a⁻¹) * ((φ : G → ℂ) b * (φ : G → ℂ) b⁻¹) := by ring
     _ = 1 := by rw [hainv, hbinv, mul_one]
 
+/-- A degree-one irreducible character is **trivial on the commutator subgroup**: `θ(n) = 1` for
+every `n ∈ commutator G`.
+
+The commutator-element values `θ(⁅a,b⁆) = 1`
+(`apply_commutatorElement_eq_one_of_apply_one_eq_one`) extend to the whole derived subgroup because
+`θ` is induced by a homomorphism `χ : G →* ℂˣ`
+(`exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one`) into the *commutative* group `ℂˣ`,
+whose kernel therefore contains `⁅⊤, ⊤⁆ = commutator G`. -/
+theorem IsIrreducibleCharacter.apply_eq_one_of_mem_commutator_of_apply_one_eq_one
+    {φ : ClassFunction G ℂ} (hφ : IsIrreducibleCharacter φ) (h1 : (φ : G → ℂ) 1 = 1)
+    {n : G} (hn : n ∈ commutator G) : (φ : G → ℂ) n = 1 := by
+  obtain ⟨χ, hχ⟩ := hφ.exists_linearIrreducibleCharacter_eq_of_apply_one_eq_one h1
+  have hker : commutator G ≤ χ.ker := by
+    rw [commutator_def]
+    exact Subgroup.commutator_le.mpr fun a _ b _ => by
+      rw [MonoidHom.mem_ker, map_commutatorElement, commutatorElement_eq_one_iff_commute]
+      exact Commute.all (χ a) (χ b)
+  have hn1 : χ n = 1 := MonoidHom.mem_ker.mp (hker hn)
+  rw [← hχ]
+  simp only [linearIrreducibleCharacter_apply, hn1, Units.val_one]
+
 end OddOrder.RepresentationTheory
