@@ -27,7 +27,19 @@ created: 2026-06-15
 **Thm B(5) / Thm C(9)(repo では Thm C conjunct 10 = `IsTISubset (A0Set M K \ ASet M U) M`) を
 cite するには `K,U` を Hall 因子に pin する必要**がある。
 
-## やること
+## 進捗 (2026-06-15 Lane F)
+
+- [x] **(1) TI ヘルパー** — ✅ `IsTISubset.centralizer_le` 着地 (`cc4c20eb`, axiom-clean `[propext, Quot.sound]`)。共有 file 隔離コミット。
+- [x] **(2) signature fix** — ✅ `hK`(κ-Hall)/`hU`((κ∪σ)ᶜ-Hall) 追加 (`f0b16276`, caller ゼロ非破壊)。
+- [x] **(3) L483 `hDsub`** — ✅✅ **完全 sorry-free** (`f0b16276`): B(5)/C(9)+`centralizer_le` cite、
+  **K=⊥ type-F wrinkle も Thm A(3) (`M=K⊔U⊔M_σ`, K=⊥⟹`M=U M_σ`⟹`x∈hatM_σ⊆M⟹x∈A(M)`矛盾) で解決**。
+- [ ] **(4) L497 Conjunct 1 (Ti)** — 残 (heavier、cross-piece TI 分解)。
+- [ ] **(L522 uniqueness)** — genuine gate (BG §9-10)、documented gate のまま。
+
+リポ sorry 144→142、full build 3831 green、AxiomsCheck OK。**hDsub 完了で issue の主目標達成**
+(残 (4)/uniqueness は後続)。
+
+## やること (当初プラン)
 
 - [ ] **(1) TI ヘルパー (汎用 infra, axiom-clean)**: [TISubset.lean](../OddOrder/GroupTheory/TISubset.lean) の
   `namespace IsTISubset` に追加:
