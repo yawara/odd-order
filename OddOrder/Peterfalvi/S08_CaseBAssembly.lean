@@ -231,6 +231,64 @@ theorem caseB_phi_family_tau1
     (caseB_phi_family hyp h46 hW2H hφ' (η₁ := η₁) hcol _hirr i).tau1 = hyp.tau :=
   caseB_constituentDecomposition_tau1 hyp h46 i.val
 
+/-- **(6.8.2.3) seam-1 orthogonality, column branch.**
+`⟨(columnDecompositionTau …).X, cY.ext η₁⟩ = 0`.  The column decomposition's image side
+`X ∈ ℤ[R(μ_j)]` is orthogonal to the `Y`-anchor extension `cY.extension η₁`: by
+`inner_X_Y_eq_zero_of_orthogonal` it suffices that each member of `R(μ_j) = certainTypeR.imageSet`
+(a signed `±δ_j·ω_{ij}^σ`, `certainTypeRImage`) is `⊥ cY.extension η₁`, which is
+`inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (the certain-type seam-1, generic in the
+coherence `cY`).  The partner anchor `η'` supplies the supported difference `η₁ − η'` the seam-1
+proof needs (the `V`-vanishing of `cY.extension η₁ − cY.extension η'`). -/
+theorem columnDecompositionTau_X_orthogonal
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
+    (hmapagree : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj))
+    (hSdiff : ∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (htau1_mema : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
+    (hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (hχbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η' : ClassFunction ↥L ℂ} (hη₁Y : η₁ ∈ hyp.Yset) (hη'Y : η' ∈ hyp.Yset)
+    (hη₁irr : IsIrreducibleCharacter η₁) (hη'irr : IsIrreducibleCharacter η')
+    (hee : ClassFunction.inner η₁ η' = 0)
+    (hsupp : (η₁ - η').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    ClassFunction.inner
+        (columnDecompositionTau hyp h46 hχ₂ hdeg hmapagree hSdiff htau1_mema hχψ hχbarψ).X
+        (cY.extension η₁) = 0 := by
+  classical
+  apply inner_X_Y_eq_zero_of_orthogonal
+  intro α hα
+  change α ∈ Finset.univ.image (OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂⁻¹) at hα
+  rw [Finset.mem_image] at hα
+  obtain ⟨⟨b, i⟩, _, rfl⟩ := hα
+  cases b
+  · simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+    rw [OddOrder.RepresentationTheory.inner_smul_right,
+      inner_coherent_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK cY hη₁Y hη'Y hη₁irr hη'irr
+        hee hsupp χ₂ i, mul_zero]
+  · simp only [OddOrder.Peterfalvi.S06.certainTypeRImage]
+    rw [OddOrder.RepresentationTheory.inner_smul_right,
+      inner_coherent_extension_certainTypeOmegaSigma_eq_zero hyp h46 hHK cY hη₁Y hη'Y hη₁irr hη'irr
+        hee hsupp χ₂⁻¹ i, mul_zero]
+
 /-- **(6.8.2.3) `hsq` over the positive-weight subtype.**  The Clifford square-sum
 `∑_θ ⟨φ, Res^H_{W₂} θ⟩² = |H : W₂|` (`sum_inner_restrict_sq_eq_index`, `W₂` central in `H`),
 reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constituents drop) and cast to
