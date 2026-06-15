@@ -469,3 +469,19 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
 
 **case-τ₃ 現況: K=E + (a)+(K*≠1)+(d)+(g) 完成、(b1) は statement faithful + ⊇ 済・⊆ のみ sorry。**
 **残 = (b1)-⊆ [M=M_σ⋊E 構造] + case-τ₁ [F issue-7000 gated]。full build green 3817 jobs。**
+
+### 🎉🎉 case-τ₃ COMPLETE — (b1)-⊆ landing (2026-06-15 loop)
+**Prop 14.2 の case-τ₃ 全 5 conjunct 完全証明** (typeP_structure の sorry は case-τ₁ 1 本のみに)。
+(b1)-⊆ `N_M(X) ≤ K⊔K*` を「難所回避しない」方針で正面突破:
+- **n=s·e 分解**: M_σ は G で非正規 (mem_sup/mem_sup_of_normal は不可) ⟹ **↥M で分解**。
+  `M_σ.subgroupOf M` は ↥M で Normal、`(M_σ⊔E).subgroupOf M = ⊤` (subgroupOf_sup+E_compl_sup+subgroupOf_self)
+  ⟹ `mem_sup_of_normal_left` で ⟨n,hnM⟩=a*b、s:=(a:G)∈M_σ, e:=(b:G)∈E。
+- **交換子**: g∈X#, y':=ege⁻¹∈E#。`s·y'·s⁻¹ = ngn⁻¹ ∈ X≤E` (mem_normalizer_iff)。
+  `[s,y']=s·y'·s⁻¹·y'⁻¹ ∈ M_σ` (M≤N(M_σ), le_normalizer_opiCoreInG) `∩ E ⟹ =1` (E_compl_inf)
+  ⟹ s が y' を中心化。
+- **prime 作用**: `s∈C_{M_σ}(y')=C_{M_σ}(E)=K*` (hEprime y')。e∈E=K ⟹ n=s·e∈K⊔K*。
+- 技法: y'≠1 = `MulAut.conj.map_eq_one_iff`、commute 導出 = `mul_inv_eq_iff_eq_mul∘mul_inv_eq_one`、
+  algebra は `group`。**[Fact p.Prime] を intro 直後に補充** (ne_bot_of_mem_elemAbelianOfRank_one 用)。
+
+**⟹ Prop 14.2 残 = case-τ₁ のみ (F の issue-7000 ∃→∀ upgrade leaf 着地待ち・gated)。**
+**case-τ₃ + faithfulness fix 群で本セッション §14 funnel 入口をほぼ攻略。full build green 3817 jobs。**
