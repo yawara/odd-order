@@ -123,6 +123,20 @@ g∈R# は K に FPF (Frobenius) ⟹ K̂ (指標) に FPF ⟹ 非自明指標を
       E=U⋊E₁ Frobenius (U=E₂E₃ kernel, E₁ complement) の構成。
 - [ ] **(g) 配線**: 上記で `typeP_structure` case-τ₁ (g) を埋める。
 
+### (g)-chain piece 棚卸し (2026-06-15 scoping)
+3 conjunct (σ=β / |K|素数 / TI) の供給元:
+- **|K|素数** ← **Thm 3.10(a)** = `prime_card_complement_of_frobenius_conj` (O2 着地で完成)。適用に必要:
+  - **E Frobenius (kernel U=E₂E₃, complement K=E₁)**: `actsRegularlyOn_E23_E1_of_caseTau1` (S14:726, E₁ が
+    E₂E₃ に regular=FPF) ✅ + U⊴E (12.1) + complement 構造 → `IsFrobeniusGroup ↥E ...` を組む。
+  - **U abelian**: E₂E₃ abelian (`S12_Lemma128d:579`) ✅。
+  - **C_{M_σ}(U)=1** = **Lem 14.1** 🛑 新規 (repo `msigma_structure_of_notMem_sigma_kappa` は単一 Sylow Ω₁ 形)。
+  - **M_σ nilpotent** = `Msigma_nilpotent_of_tau2` (Thm 12.5) ✅。
+  - **ActsPrimeOn M_σ K** = `hKprime` (case-τ₁ で既に在) ✅、coprime ✅。
+- **σ=β** ← **Lem 12.19** `derivedE_centralizes_betaComplement` (S12_E:270) ✅ + U=[U,K]=E' (要確認)。
+- **TI** ← **Lem 12.17 TI 形** 🛑 新規 (repo `Msigma_E_relations` (S12_E:74) は C(E)⊓M_σ≤M_σ'∧[M_σ,E]=M_σ のみ)。
+- **IsTypeP2 ⟹ U=E₂E₃≠1**: κ≠σ'∩π(M) ⟹ E₂'E₃'≠1 (要 step)。
+⟹ 新規形式化は **Lem 14.1 (C_{M_σ}(U)=1) + Lem 12.17 TI** の 2 件 + 配線。他は既存補題の assembly。
+
 ## 完了条件
 
 `typeP_structure` が sorry-free + axiom-clean (`#print axioms` = `[propext, Classical.choice, Quot.sound]`)。
