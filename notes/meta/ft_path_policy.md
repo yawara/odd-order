@@ -123,6 +123,14 @@ axiom-clean）→ §10–16 の opaque field を **その signature への cite 
 | **E (ω^σ)** | `omegaSigma` の ω^σ = σ(ω) | S12 `omegaSigma`:111 / S15 `eta`:131 | B+C 合成 | ✅ **pinned** = `S05.TICyclicHypothesis.omegaSigmaGrid`（`S05_OmegaSigmaGrid.lean`, σ∘ω + `ω^σ ∈ ZIrr G`, axiom-clean）。`eta` も同一ゆえ (13.1.d) は rfl |
 | **E (残)** | `zeta`(10.2) / `d`,`δ`,`n`(10.3) / `mu`,`alpha` for M + coherent ext | S12 `CharacterParameters` | §10 analysis | ⛔ **§10-gated**（`IsMinimalSimpleOdd` + §10-16 構造に依存、`exists_zeta_degree_w1` 等は genuine §10 hard content = **§3-9 signature gap でない**）→ §12 analysis owner の仕事 |
 
+### 状態（2026-06-15）— supply 側 signature 先行整備 ✅ 一区切り
+B/C/E(ω^σ) は ungated で **pin 済**（`omegaGrid`/`sigmaIntegral`/`omegaSigmaGrid`、`S05_*Grid.lean`）;
+`eta`/(13.1.d) は B+C から rfl; D は (13.1.e) relation を pin（`induce_omegaColumnDiff_mu_diff`、full
+Fin-grid は owner glue）。**残る §3–9 supply gap は無い** — A の proof=(6.8)（B の deep frontier）と、
+E(残)=§10 hard content（`zeta`(10.2) 等、§12 analysis owner）と、各 consumer 側 cite 置換（§10–16
+owner = HUB 割当）のみ。⟹ HUB は §15（ω/τ₃/η/μ-ν relation）と §12（ω^σ）の wiring を pinned
+signature への cite で割当可能。
+
 ### 手順（per endpoint）
 1. §3–§9 に faithful signature を pin（sorried 可, build-green + axiom-clean, AxiomsCheck 登録）。
 2. §10–16 の対応 opaque field を、その signature への cite に置換（carrier を実体化）。
