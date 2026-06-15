@@ -805,6 +805,40 @@ theorem caseB_column_bundle
     caseB_column_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ),
     caseB_column_conj_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ)⟩
 
+/-- **(6.8.2.3) full irreducible-branch bundle.**  Assembles the entire `CaseBIrrBundle` for the
+dispatch weight `aθ = constituentWeight hφ' θ`.  Given the structural inputs `θ ≠ 1` (for
+irreducibility) and the `X ⊥ Y` distinctnesses of the induced character and its conjugate from the
+anchor, all eight conjuncts are discharged (irreducibility, non-realness, the two supports, `ZIrr`,
+the two anchor orthogonalities, self-conjugate orthogonality).  This is the irreducible-branch input
+`hirr` of the mixed per-`φ` dispatch. -/
+theorem caseB_irr_bundle
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hθne : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H)
+    (hneη : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁)
+    (hneη' : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) :
+    CaseBIrrBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
+  intro hnotcol
+  have h1 := caseB_irr_induce_isIrreducible h46 hHK hθne hnotcol
+  exact ⟨h1, caseB_irr_nonreal hyp h1, caseB_irr_conj_diff_support hyp θ,
+    caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁,
+    caseB_irr_htau1_mema hyp hW2H hcen hφ' hweight hη₁,
+    caseB_irr_orthogonal_Yset hyp h1 hη₁ hneη (constituentWeight hφ' θ),
+    caseB_irr_conj_orthogonal_Yset hyp h1 hη₁ hneη' (constituentWeight hφ' θ),
+    caseB_irr_conj_inner hyp h1⟩
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
