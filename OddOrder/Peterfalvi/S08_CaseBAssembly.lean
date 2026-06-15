@@ -44,6 +44,18 @@ theorem charPsiDecomp_eqRec_tau1
     (h ▸ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ' ψ).tau1 = D.tau1 := by
   cases h; rfl
 
+/-- The `imageFamily.imageSet` of a (5.4) decomposition is unchanged when its `χ`-index is
+transported along `χ = χ'` (`imageSet : Finset (ClassFunction G ℂ)` does not mention `χ`).  Used to
+read off the `X`-image set through the column-branch index cast of the per-constituent dispatch,
+for the seam-1 orthogonality `⟨cY.ext η₁, X-member⟩ = 0`. -/
+theorem charPsiDecomp_eqRec_imageSet
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G}
+    {χ χ' ψ : ClassFunction ↥L ℂ} (h : χ = χ')
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) :
+    (h ▸ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ' ψ).imageFamily.imageSet
+      = D.imageFamily.imageSet := by
+  cases h; rfl
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
