@@ -478,6 +478,20 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **General helper (§14-independent, reusable).**  A subgroup `K` of a finite group that
+contains a full Sylow `p`-subgroup for every prime `p` is the whole group.  (No nilpotency:
+each Sylow's order is the `p`-part of `|G|`, so `K.index` is divisible by no prime and equals `1`.)
+This is the assembly step of BG Corollary 15.4 — once every Sylow subgroup of the nilpotent Hall
+subgroup `H` has been placed inside `M_σ`, this forces `H ⊆ M_σ` (applied inside `↥H`). -/
+theorem eq_top_of_forall_sylow_le {H : Type*} [Group H] [Finite H] {K : Subgroup H}
+    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p H), (P : Subgroup H) ≤ K) : K = ⊤ := by
+  rw [← Subgroup.index_eq_one]
+  by_contra hne
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  haveI := Fact.mk hp
+  obtain ⟨P⟩ : Nonempty (Sylow p H) := inferInstance
+  exact P.not_dvd_index (hpdvd.trans (Subgroup.index_dvd_of_le (h p P)))
+
 /-- **§15 helper (§14-independent, reusable).**  A nonidentity Sylow `p`-subgroup `S` of `G`
 whose `G`-normalizer lies in a maximal subgroup `M` is contained in `M_σ`.  This is the σ-theory
 content of the first step of BG Corollary 15.4 ("`S ⊆ M_σ`"): `N_G(S) ≤ M` exhibits `S` as a
