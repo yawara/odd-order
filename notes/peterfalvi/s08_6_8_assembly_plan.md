@@ -3009,3 +3009,14 @@ Lemma C (`dade_H_eq` 等: 同 (G,A,L) の 2 Hypothesis の H-field 一致) の�
 - #3 hSdiff (μ_j−η₁ 系 support) / #4 htau1_mema (ZIrr) / #5,#6 hχψ/hχbarψ (⟨μ_j, η₁⟩=0 系): **η₁/a-coupled** ⟹ dispatch family の anchor 選択 (caseB_per_phi_anchored_fromYset の η₁=Y-member) に結合。**assembly phase (dispatch family 構築) で η₁/a 確定後に discharge**。
 **⟹ column bundle の bundle-intrinsic 部 (hdeg + hmapagree) は完全解放; 残り 4 conjunct は dispatch family (HYBRID 組立 step 1) と一体 (η₁/a に依存)。**
 **正本=本 session 43 cont.。caseB_column_mapagree unconditional landed (`a044bc3f`)。次=dispatch family 構築 (HYBRID step 1, η₁/a-coupled conjunct を巻き込む本体; caseB_per_phi_anchored_fromYset L917 の per-θ hcol/hirr 入力)。Opus 継続。**
+
+### session 43 cont.²: 残り conjunct = X⊥Y 直交の精密 mapping (原文 (6.8.2.2)/(6.8.2.3) 照合)
+dispatch family の per-θ bundle (CaseBColBundle 残り 4 conjunct + CaseBIrrBundle) を原文 `04.8.mmd` L166-214 と照合。**X⊥Y 直交が 2 レベルに分かれる**:
+- **extension-level** `R(χ_i) ⊥ 𝒴^{τ_1}` = 原文 (5.3)/(5.5) = **既存補題 `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` (S08CB2:1449) で構築済 ✅** (η∈Yset だけから discharge; `caseB_constituentDecomposition_X_orthogonal` が消費)。
+- **raw source-level** `⟨χ_i, η_j⟩=0` = 原文 "**by (4.1)**" (L166: `(η_j−η_1, χ_i−d_iχ_1)=0`)。これが **CaseBColBundle の hχψ/hχbarψ** (`⟨columnSum χ₂, a•η₁⟩=0`) の正体。
+
+**crux = raw `⟨columnSum, η⟩=0` (η∈Yset)**: codebase で `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` (S08CB2:1558) が hpair を取り span へ延ばす engine だが、**hpair 自体 (= `∀ χ∈X, ∀ η∈Y, ⟨χ,η⟩=0`) は "supplied as hpair at the glue" として defer**。columnSum=∑μ_{ij} ⟹ `⟨columnSum,η⟩=∑⟨μ_{ij},η⟩`、各 `⟨μ_{ij},η⟩=δ(μ_{ij}=η)=0` には **grid-char μ_{ij} ≠ η (∈Yset)** が要る (= 原文 (4.1) = certain-type char ⊥ S(H'))。grid-char の S/Xset membership 補題は未構築 → **次の foundational sub-problem**。
+- 利用可能: `disjoint_Xset_Yset` (S08CorePart2:893)、`columnFamily_mu_sum_inner` (μ の Gram 行列, S06)、irr-Kronecker `irreducibleCharacter_inner_eq_ite`。
+- 残り conjunct: hSdiff#2 (`columnSum−a•η₁` H^#-support, a=次数整合で 1 消失) / htau1_mema (ZIrr) も a/η₁-coupled。
+
+**正本=本 session 43 cont.²。X⊥Y を 2 レベルに分離 (extension=1449 済 / raw=(4.1) 未)。次 foundational = raw grid-char 直交 `⟨μ_{ij},η⟩=0` (原文 (4.1); μ_{ij}≠η∈Yset の構造事実、§4/§6 char theory) → hχψ/hχbarψ → bundle。Opus 継続。**
