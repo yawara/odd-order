@@ -31,11 +31,23 @@ BG 原文 (mmd L3850) の chain:
 
 ## やること
 
-- [ ] BG Thm 3.10 (または (a) 部分だけ) を §3 (`OddOrder/BG/Ch1_Preliminary/` or Ch3 §3) に形式化
-      — solvable Frobenius 作用 ⟹ complement prime order。**大物・要 Lane A 相談**。
+- [x] **Prop 3.9 ✅** (`S03g_Thm310.isCyclic_of_isPGroup_of_isFrobeniusAction`, commit `25de8490`):
+      odd p-group の Frobenius 作用 ⟹ cyclic。Gorenstein G 5.3.14 の Isaacs Ch06 等価で攻略。
+- [ ] **BG Thm 3.10(a)** (`|R|` 素数) を `S03g_Thm310.lean` に形式化 — **次の大物 rep-theory**:
+  - statement framing 決定 (abstract `MulDistribMulAction (U⋊K) M_σ` vs concrete 共役 in G;
+    Thm 3.7 `isNilpotent_of_normalizing_primeOrder_fixedPointFree`=S03c の concrete 形が precedent。
+    (g) の適用は共役ゆえ concrete 形が橋渡し楽かも)。
+  - **Case 1** (M に proper G-invariant 正規 M₀): |G|+|M| 帰納、M₀ maximal G-inv + quotient 作用
+    (Prop 1.5(d))。
+  - **Case 2** (M minimal normal = elem ab r-group): **Clifford (G 3.4.1) + G 3.4.3 + Wedderburn 成分
+    分解 V=⊕Wx の dim 数え `dim C_V(P)=|R:P|·dim W`, prime action `dim C_V(P)=dim C_V(R)` ⟹
+    `|R:P|=1` ⟹ |R|=p**。infra = `GroupTheory.RepresentationTheory.CliffordConjugateChar`
+    (S03d/S03e で使用、~2835 行)。**§3B Thm 3.4/3.5 規模の effort**。
+  - (g) は (a) のみ要 ((b)|M|=|C_M(R)|^p / (c) は不要)。R=K=E₁ は cyclic (12.1d) ゆえ Prop 3.9
+    step は (g) では skip 可 (cyclic 前提の specialization でもよい)。
 - [ ] Lem 12.17 の TI 形 (M_σ∩M_σ^g β'-group) を §12 (`S12_E` 付近) に追加。
 - [ ] C_{M_σ}(U)=1 の Lem 14.1 橋渡し helper を S14 に追加 (π(U) 1 素数 → A_p≤U)。
-- [ ] 上 3 つ揃ったら case-τ₁ (g) を埋める (typeP_structure sorry-free 化)。
+- [ ] 上が揃ったら case-τ₁ (g) を埋める (typeP_structure sorry-free 化)。
 
 ## 完了条件
 
