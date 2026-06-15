@@ -4581,6 +4581,13 @@ analysis (`Z ⊆ M_i`, `X_i ⊆ M_{iσ}`).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_elemAbelian_le_neighbor_Msigma
 
+/-! **BG Theorem 14.7 neighbour-embedding** (`S14_TypePCounting`, `typeP_neighbor_embed`), step 1 of
+the §16-independent pre-position: every `M_i ∈ ℳ(N_G(X))` (`X ∈ ℰ¹(K)`) is not conjugate to `M`,
+contains `Z = K ⊔ K*`, and has `X ⊆ M_{iσ}`.  Uses Prop 14.2(b1)/(b2) + `σ`-conjugation-invariance
+(`sigma_conj`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_embed
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

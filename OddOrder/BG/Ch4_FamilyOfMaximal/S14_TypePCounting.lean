@@ -2084,6 +2084,51 @@ theorem typeP_elemAbelian_le_neighbor_Msigma [Finite G]
     Finset.mem_singleton] at hq
   rwa [hq]
 
+/-- **Theorem 14.7 neighbour-embedding** (BG L3977-3982), step 1 of the §16-independent
+pre-position: for a type-`P` `M` with Hall `κ(M)`-subgroup `K`, `K* = C_{M_σ}(K)`, and
+`X ∈ ℰ_p¹(K)` with `C_{M_σ}(X) ≠ 1`, every neighbour `M_i ∈ ℳ(N_G(X))` is **not conjugate to `M`**,
+contains `Z = K ⊔ K*`, and has `X ⊆ M_{iσ}`.
+
+Uses Prop 14.2(b1) [`N_M(X) = K×K*`, so `K ⊔ K* = N_G(X) ⊓ M ≤ N_G(X) ≤ M_i`], Prop 14.2(b2)
+[`X ⊆ M_{iσ}`], and `σ`-conjugation-invariance: `p ∈ π(X) ⊆ κ(M) ⊆ σ(M)'`, but `X ⊆ M_{iσ}` gives
+`p ∈ σ(M_i)`, so `M_i = M^g` would force `p ∈ σ(M^g) = σ(M)`, a contradiction. -/
+theorem typeP_neighbor_embed [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {Mi : Subgroup G} (hMi : Mi ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ¬ IsConjugateSubgroup M Mi ∧ K ⊔ Kstar ≤ Mi ∧ X ≤ OddOrder.BG.Ch3.S10.Msigma Mi := by
+  classical
+  -- `p ∈ κ(M)`.
+  have hpdvd : p ∣ Nat.card ↥X := by
+    rw [(mem_elemAbelianOfRank.mp hX).2]; exact dvd_pow_self p one_ne_zero
+  have hpcardK : p ∈ (Nat.card ↥K).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvd.trans (Subgroup.card_dvd_of_le hXK), Nat.card_pos.ne'⟩
+  have hpκ : p ∈ kappa M := hK.1 p (by
+    rwa [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hpcardK)
+  -- `X ⊆ M_{iσ}` (Prop 14.2(b2)).
+  have hXMiσ : X ≤ OddOrder.BG.Ch3.S10.Msigma Mi :=
+    typeP_elemAbelian_le_neighbor_Msigma hG hM hKM hK hX hXK hCX hMi
+  -- `K ⊔ K* ≤ M_i` (Prop 14.2(b1): `N_G(X) ⊓ M = K ⊔ K*`, and `N_G(X) ≤ M_i`).
+  obtain ⟨_, _, hb1, _, _, _⟩ := typeP_structure hG hM hP hKM hK hKstar hU
+  have hZMi : K ⊔ Kstar ≤ Mi := by
+    rw [← hb1 p Fact.out X hX hXK]
+    exact le_trans inf_le_left (mem_maximalSubgroupsContaining.mp hMi).2
+  refine ⟨?_, hZMi, hXMiσ⟩
+  -- `M_i` not conjugate to `M`: else `σ(M_i) = σ(M)`, but `p ∈ σ(M_i) ∩ κ(M) ⊆ σ(M) ∩ σ(M)'`.
+  rintro ⟨g, hg⟩
+  have hpσMi : p ∈ OddOrder.BG.Ch3.S10.sigma Mi :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mi p (Nat.mem_primeFactors.mpr
+      ⟨Fact.out, hpdvd.trans (Subgroup.card_dvd_of_le hXMiσ), Nat.card_pos.ne'⟩)
+  rw [← hg] at hpσMi
+  have hpσM : p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    have h2 := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hpσMi
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h2
+  exact kappa_subset_sigmaCompl hpκ hpσM
+
 /-- **A `κ(M)`-subgroup of `M` lies in some Hall `κ(M)`-subgroup of `M`** (Hall D / Wielandt,
 `Ch03.hall_D`, applied inside the solvable group `↥M`).  Used by Corollary 14.3 branch 1 to put
 the `κ`-witness `X₀ ≤ ⟨x'⟩` into a Hall `κ`-subgroup `K`, so that Proposition 14.2(b1)/(c) apply. -/
