@@ -1,5 +1,9 @@
 # Feit-Thompson 形式化 マスター実行マップ (2026-05-29)
 
+> ⚠ **scope / policy / 経路・signature 並列化の判断は [`ft_path_policy.md`](ft_path_policy.md) が正本**
+> （2026-06-15〜）。本ファイルは横断スナップショット（履歴）として温存。BG spine の live 状況は
+> memory [[ft-master-roadmap]]。
+
 > **生成**: `ft-master-roadmap` workflow (run `wf_c3f1f84f-929`, 15 agent / 1.89M tok / 13.4 min)。
 > Survey 11 並列 (read-only) → Synthesize 1 → Verify 3 adversarial。
 > スクリプト: `~/.claude/projects/.../workflows/scripts/ft-master-roadmap-wf_c3f1f84f-929.js` (再実行可)。

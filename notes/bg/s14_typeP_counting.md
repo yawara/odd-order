@@ -485,3 +485,96 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
 
 **⟹ Prop 14.2 残 = case-τ₁ のみ (F の issue-7000 ∃→∀ upgrade leaf 着地待ち・gated)。**
 **case-τ₃ + faithfulness fix 群で本セッション §14 funnel 入口をほぼ攻略。full build green 3817 jobs。**
+
+### 🟢 case-τ₁ を H が巻き取り — 確認済み machinery + 実行プラン (2026-06-15 ユーザー指令)
+**F が機能停止 ⟹ ユーザー指令で case-τ₁ (旧 issue-7000 support 含む) を H が S14 内で自前実装** (両 LAUNCH 修正済)。
+**全 machinery が repo に存在確認済 (新規 theory 不要、case-τ₃ パターンの再利用)**:
+- `SubgroupESetup.conj'`(S13_PrimeAction:811): `(h)(hc:c∈M) ⟹ SubgroupESetup M (conj c•E)(conj c•E₁)…`。
+  c∈E で WLOG (conj c•E=E は `conj_smul_eq_self_of_mem_normalizer`+`le_normalizer`)。
+- `E1_actsPrime`(S13_PrimeAction:424)=Thm 13.5: `(hG)(h)(hE1ne) ⟹ ActsPrimeOn (Msigma M) E₁`。
+- `exists_conj_smul_le_hallPiece`(S12_Lemma1211:267): π-subgroup を Hall piece へ M-共役 (witness を E₁ へ)。
+- `Ch1.S06.exists_conj_eq_of_isHall_subgroupOf`(S12_Lemma1211:287 使用): Hall 共役 **equality** (K=conj e₀•E₁ 用)。
+- `Msigma_inf_centralizer_conj_ne_bot`(S14:150, 既 landing): witness の C_{Mσ}≠1 を共役で転送。
+- conj-commute: `centralizer_conj_smul`(S12_ExceptionalBridge:273) + `conj_smul_eq_self_of_mem_normalizer` +
+  `Subgroup.smul_inf` ⟹ `M_σ⊓C(conj m•S)=conj m•(M_σ⊓C(S))` (ActsPrimeOn 共役不変性に要、必要なら)。
+
+**実行プラン (methodical, 次フラグメント〜)**:
+1. **κ=τ₁**: κ⊆τ₁ (case hyp ¬(κ∩τ₃) + kappa_subset_tau1_union_tau3)。τ₁⊆κ: κ nonempty の witness P を
+   exists_conj_smul_le_hallPiece で E₁ へ共役 → Msigma_inf_centralizer_conj_ne_bot で C_{Mσ}(E₁)≠1
+   (E₁ non-regular) → 各 p∈τ₁ に prime 作用 (E1_actsPrime) で C_{Mσ}(P)=C_{Mσ}(E₁)≠1 ⟹ p∈κ。
+   (case-τ₃ の E3_not_regular_of_mem_kappa_tau3 + step2 のミラー。)
+2. **WLOG K=E₁**: K Hall τ₁ of E (κ=τ₁) + E₁ Hall τ₁ of E ⟹ ∃e₀∈E, conj e₀•E₁=K
+   (exists_conj_eq_of_isHall) → `hsetup.conj' (e₀∈M)` で新 setup (新 E₁=K, E は conj e₀•E=E に rw)。
+3. **conjuncts** (新 setup で): (a) ActsPrimeOn K=E1_actsPrime + regular on U=E₂E₃ (Lem 13.12+13.7) /
+   (K*≠1)=C_{Mσ}(E₁)≠1 (step1) / (b1) case-τ₃ (b1) のミラー / (d) case-τ₃ (d) のミラー /
+   **(g) ⚠ case-τ₁ では vacuous でない** (κ=τ₁⊊σ'∩π(M) があり得る ⟹ M が P2 可能) ⟹
+   **実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI) を Thm 3.10(a)/Lem 12.19/12.17 で証明要 = hard core**。
+**⟹ case-τ₁ は ~150 行・(g) が hard core。κ=τ₁ から methodical に。case-τ₃ helper を最大限再利用。**
+
+### ✅ case-τ₁ 進捗 — 基盤 + WLOG + (a)/(K*≠1) (2026-06-15 loop)
+- ✅ `E1_not_regular_of_mem_kappa_tau1` (E3 ミラー) + `mem_kappa_of_mem_primeFactors_card_E1` (coverage)。
+- ✅ **WLOG K=E₁ COMPLETE** (commit `6174fff1`): κ⊆τ₁ (case hyp) + **E₁ Hall κ(M)** (coverage .1 +
+  `hsetup.E₁_hall.2`/κ⊆τ₁ で .2 → `hallPiece_isHall_in_M`) + K Hall κ(M) (hK) →
+  `OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv … : ∃w∈M, conj w•E₁=K` →
+  `SubgroupESetup.conj' hsetup hwM` + `rw[hw]` で新 setup `h'` (E₁'=K)。
+  **🔑 技法: 共役後 h' に E1_* helper 直接適用 (conj-invariance 不要)** — `E1_not_regular_of_mem_kappa_tau1 hG h'`
+  ⟹ K≠⊥/非regular、`E1_actsPrime hG h'` ⟹ (a)、`Msigma_inf_centralizer_E_ne_bot_…` ⟹ (K*≠1)。
+  ⚠ `conj'` は dot 記法不可 (S13 namespace) → `SubgroupESetup.conj' hsetup hwM`。
+- 🔲 **残 case-τ₁ = (b1)/(d)/(g)。case-τ₃ の単純ミラーでない (K=E₁'⊊E' 構造)**:
+  - **(d)**: case-τ₃ (d) は (c)-helper `maximalContaining_centralizer_of_le_Msigma_centralizer_E` が
+    X≤M_σ⊓C(E)[σ'-complement] を要するが、case-τ₁ は X≤Kstar=M_σ⊓C(K)=M_σ⊓C(E₁')。**C(E₁') 版 (c)-helper**
+    (Lemma 13.6 を P=E₁'=K で直適用、X≤M_σ⊓C(E₁) を直接取る変種) を作れば Thm 10.1(e) で同様に。**最も tractable**。
+  - **(b1)**: case-τ₃ (b1)-⊆ は K=E ゆえ y'=ege⁻¹∈E=K で prime 作用可。case-τ₁ は e∈E'⊋K で y'∉K の恐れ
+    ⟹ 直接ミラー不可。**K cyclic (E₁ cyclic) で ⊇ は K≤C(X)≤N(X) から容易**、⊆ は要再設計
+    (M=M_σ⋊E' の K-部分の扱い)。
+  - **(g)**: case-τ₁ では M が P2 可能ゆえ **vacuous でない** ⟹ 実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI、
+    Thm 3.10(a)/Lem 12.19/12.17) = **hard core**。
+**⟹ 次 = (d) [C(E₁') 版 (c)-helper] → (b1) [⊆ 再設計] → (g) [hard]。**
+
+### ✅ case-τ₁ (d) DONE + 残 (b1)/(g) hardness 確定 (2026-06-15 loop)
+- ✅ **(d) landing** (commit `c140797e`): C(E₁) 版 (c)-helper `maximalContaining_centralizer_of_le_Msigma_centralizer_E1`
+  (X≤M_σ⊓C(E₁) 直取り、Lemma 13.6 P=E₁) + case-τ₃ (d) ミラー (h' + hKstar + Thm 10.1(e))。
+- **case-τ₁ 現況: WLOG + (a) + (K*≠1) + (d) = 4/5。残 = (b1)/(g) (genuinely hard)。**
+- 🛑 **(b1) hard**: K=E₁'⊊E' ⟹ case-τ₃ (b1)-⊆ の prime 作用が破綻 (n=s·e, y'=ege⁻¹∈E'∖E₁',
+  prime 作用は K=E₁' のみ ⟹ s∈C_{Mσ}(y') から s∈C_{Mσ}(K) が出ない)。**Frobenius 構造 E'=K⋉U'
+  (K regular on U'=E₂'E₃') での N_M(X)=N_M(K)=K×K* 論法**が要る。⊇ は K cyclic で容易 (K≤C(X)≤N(X))。
+- 🛑 **(g) hard + cite-gap**: case-τ₁ で M が P2 可能 ⟹ vacuous でない。BG (g) (mmd L3850) = E Frobenius
+  kernel U=E₂E₃ → **Lem 14.1**(C_{Mσ}(U)=1 + M_σ nilp) → **Thm 3.10(a)**(K prime on M_σ ⟹ |K| 素数) →
+  U=[U,K]=E' → **Lem 12.19**(E' centralizes Hall β' of M_σ, ✅ S12_E:269) → β=σ → **Lem 12.17**(M_σ∩M_σ^g
+  β'-group ⟹ TI)。**⚠ cite-gap**: Lem 14.1 Frobenius 形 (repo の 14.1=`msigma_structure_of_notMem_sigma_kappa`
+  は別部分) + Lem 12.17 (repo S12_E:72=`C_{Mσ}(E)⊆M_σ'∧[M_σ,E]=M_σ`、TI 部分と別命題) は**未形式化の可能性** →
+  要調査/形式化。IsTypeP2→U≠1 (κ≠σ'∩π(M)⟹E₂'E₃'≠1) も step。
+**⟹ 両者 multi-fragment hard。(b1)=Frobenius 構造、(g)=cite-assembly+gap。focused work 推奨。**
+
+### ✅✅ case-τ₁ (b1) COMPLETE — Frobenius normalizer 論法 (2026-06-15 loop)
+**Prop 14.2 の `typeP_structure` は case-τ₁ (g) **1 本のみ** に縮小** (case-τ₃ 全 5 + case-τ₁ の
+WLOG/(a)/(K\*≠1)/(b1)/(d) 完了)。(b1) は「E₁ が U=E₂E₃ に regular 作用 (E=E₁⋉U Frobenius)」を
+repo machinery の assembly で構成し、Frobenius normalizer 論法で攻略 (sorry-free・axiom-clean、
+`#print axioms` = `[propext, Classical.choice, Quot.sound]`、full build green 3817 jobs ~59s)。
+
+新規 helper (S14、すべて SubgroupESetup パラメトリック・case-τ₁ 専用):
+- `actsRegularlyOn_E3_E1_of_kappa_inf_tau3_empty` (E₁ reg on E₃): κ∩τ₃=∅ で **Lem 13.7 の対偶** —
+  E₁ が E₃ に非regular なら E₁E₃ が M_σ に prime 作用 ⟹ 任意 x∈E₃# で C_{M_σ}(x)=C_{M_σ}(E₁)=K\*≠1
+  ⟹ κ∩τ₃ witness で矛盾。
+- `actsRegularlyOn_E2_E1_of_actsPrime` (E₁ reg on E₂): **Lem 13.12 の対偶** — g∈E₁# が y'∈E₂# (位数
+  q∈τ₂) を中心化すると、E₂ abelian (Cor 12.10b) の q-torsion `omega1OfAbelian E₂ q` が rank-2
+  A∈ℰ_q²(E) で y'∈A ⟹ C_A(⟨g₀⟩)≠1 ⟹ Lem 13.12 で C_{M_σ}(⟨g₀⟩)=1、prime action の K\*≠1 と矛盾。
+- `pRank_eq_of_le_of_not_dvd_index` (S12_Corollary1216 の private 版を S14 に複製) +
+  `exists_elemAb_rank_two_le_E_mem_of_tau2` (r_q(E₂)=r_q(E)=r_q(M)=2 を index-coprime 2 段で、
+  card(Ω₁)=q² を q²∣card ∧ log≤pRank=2 で)。
+- `actsRegularlyOn_E23_E1_of_caseTau1` (E₁ reg on U=E₂E₃): E₃⊴E (12.1b) + E₁≤N(E₂) (12.1e) +
+  E₂⊓E₃=⊥ で u=u₃u₂ 分解 (↥E, mem_sup_of_normal_left)、各因子が g-不変 ⟹ u=1。
+- `normalizer_inf_E_le_E1_of_caseTau1` (N_G(X)⊓E≤E₁): e=u·k 分解 (E₂E₃⊴E)、E₁ abelian で kgk⁻¹=g
+  ⟹ ugu⁻¹=ege⁻¹∈X≤E₁ ⟹ [u,g]∈E₁⊓(E₂E₃)=⊥ ⟹ u∈C_{E₂E₃}(g)=1。
+
+(b1) 本体 assembly: n=a·b (a∈M_σ, b∈E') ⟹ [a,bgb⁻¹]∈M_σ⊓E'=1 ⟹ ngn⁻¹=bgb⁻¹ ⟹ s':=b⁻¹n が g
+中心化 ⟹ s'∈C_{M_σ}(K)=K\* (prime action)、b=n·s'⁻¹∈N_G(X)⊓E'≤K (Helper) ⟹ n=b·s'∈K⊔K\*。
+
+🛑 **残 = case-τ₁ (g) のみ — BG Thm 3.10 + Lem 12.17 TI 形が repo 未形式化で gated**:
+- (g) chain (mmd L3850): U≠1 ⟹ E Frobenius/kernel U → **Lem 14.1**(C_{M_σ}(U)=1, M_σ nilp; repo 14.1
+  は単一 Sylow の Ω₁ 形 ⟹ π(U) の 1 素数を選び A_p≤U で橋渡し可) → **Thm 3.10(a)**(K prime on M_σ ⟹
+  |K| 素数; **repo 未形式化** = solvable Frobenius 群が nilpotent 群に作用する §3 定理) → U=[U,K]=E' →
+  **Lem 12.19**(E' が Hall β' を中心化, ✅) → β=σ → **Lem 12.17**(M_σ∩M_σ^g が β'-group ⟹ TI;
+  **repo 12.17 = `Msigma_E_relations` は C(E)⊓M_σ≤M_σ'∧[M_σ,E]=M_σ のみ、TI 部分は未形式化**)。
+- ⟹ (g) は §3 (Thm 3.10) + §12 (12.17 TI 拡張) の 2 新規形式化に gated。**§14 単独では解禁不可** ⟹
+  hub に報告 + issue 化推奨。case-τ₁ の他 4 conjunct + case-τ₃ 全 5 は完了。
