@@ -89,6 +89,7 @@ import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
+import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.FeitThompson
 import OddOrder.BG.AppC_NormSet
 import OddOrder.BG.AppC_FrobeniusClassSum

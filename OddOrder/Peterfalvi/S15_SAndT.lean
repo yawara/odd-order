@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
+import OddOrder.Peterfalvi.S10_CoherenceWiring
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -240,12 +241,30 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
   sorry
 
-/-- **Peterfalvi (13.2.d)**: the family `S` is coherent. -/
-theorem S_coherent [Finite G] [Fintype G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
+
+The type II/III maximal subgroup `S` carries the Sibley Dade setup of (6.8) realizing its
+integral character map `tauS`, base family `Sset`, and support `A0S` (a `SibleyTarget`).
+Exhibiting this witness is the maximal-subgroup structure obligation of Pf §14 — exactly what
+Peterfalvi's proof of (13.2.d) reads off before invoking "(6.8) applies to `S`".  It is the sole
+remaining gap in `S_coherent`: once it lands, and once lane B supplies the (6.8) proof body of
+`S08.sibleySetup_is_coherent`, `S_coherent` is unconditional. -/
+noncomputable def sibleyTarget_S [Fintype G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
     [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tauS hyp.Sset hyp.A0S) := by
-  sorry
+    CoherenceWiring.SibleyTarget hyp.tauS hyp.Sset hyp.A0S := sorry
+
+/-- **Peterfalvi (13.2.d)**: the family `S` is coherent.
+
+Wired to the (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring bridge:
+given the §14 structural witness `sibleyTarget_S`, coherence is exactly (6.8).  The proof carries
+no `sorry` of its own — its dependencies are `sibleyTarget_S` (§14, this file) and (6.8) (lane B),
+each of which closes `S_coherent` automatically as it lands. -/
+theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
+    [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tauS hyp.Sset hyp.A0S) :=
+  CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_S hG hyp)
 
 /-! ## (13.3)--(13.4): character degrees and the first case split -/
 
