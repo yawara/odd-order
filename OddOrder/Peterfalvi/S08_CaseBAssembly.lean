@@ -648,6 +648,58 @@ theorem caseB_irr_conj_orthogonal_Yset
   rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
     inner_irr_Yset_eq_zero hyp hirr1.conj hη₁ hne, mul_zero]
 
+/-- A `Y`-member is orthogonal to a distinct irreducible (`Y`-member in the *first* slot, the form
+the per-`θ` anchor orthogonality `hirrAnc` needs).  Irreducible Kronecker delta. -/
+theorem inner_Yset_irr_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η ψ : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) (hψirr : IsIrreducibleCharacter ψ)
+    (hne : η ≠ ψ) : ClassFunction.inner η ψ = 0 := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη
+  have hkron := irreducibleCharacter_inner_eq_ite (⟨η, hηirr⟩ : IrreducibleCharacter ↥L)
+    (⟨ψ, hψirr⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg (fun heq => hne (by
+    simpa using congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq))]
+    at hkron
+  simpa using hkron
+
+/-- **`Ind^L_H θ ≠ η`** for a `Y`-member `η`, when `θ` is non-linear (`θ(1) ≠ 1`): the induced
+degree differs from the `Y`-degree `|W₁|`.  The `X ⊥ Y` distinctness for the irreducible branch. -/
+theorem caseB_induce_ne_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H} (hθ1 : (θ : ClassFunction ↥H ℂ) 1 ≠ 1)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η := by
+  intro h
+  have h1 : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L) = η (1 : ↥L) :=
+    by rw [h]
+  rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη] at h1
+  have hw : (Nat.card hyp.W1 : ℂ) ≠ 0 := by
+    have : 0 < Nat.card hyp.W1 := Nat.card_pos
+    exact_mod_cast this.ne'
+  exact hθ1 (mul_left_cancel₀ hw (by rw [mul_one]; exact h1))
+
+/-- **`(Ind^L_H θ).conj ≠ η`** for `θ` non-linear: the conjugate has the same (real) degree
+`|W₁|·θ(1)`, still `≠ |W₁|`. -/
+theorem caseB_induce_conj_ne_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H} (hθ1 : (θ : ClassFunction ↥H ℂ) 1 ≠ 1)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η := by
+  intro h
+  have h1 : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj (1 : ↥L) = η (1 : ↥L) :=
+    by rw [h]
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  rw [ClassFunction.conj_apply, ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hd,
+    hyp.Yset_apply_one hη, ← Nat.cast_mul, star_natCast] at h1
+  have hw : (Nat.card hyp.W1 : ℂ) ≠ 0 := by
+    have : 0 < Nat.card hyp.W1 := Nat.card_pos
+    exact_mod_cast this.ne'
+  refine hθ1 ?_
+  rw [hd]
+  have hd1 : (Nat.card hyp.W1 : ℂ) * (d : ℂ) = (Nat.card hyp.W1 : ℂ) * 1 := by
+    rw [mul_one, ← Nat.cast_mul]; exact h1
+  exact mul_left_cancel₀ hw hd1
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
