@@ -530,3 +530,18 @@ step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs C
   - **(g)**: case-τ₁ では M が P2 可能ゆえ **vacuous でない** ⟹ 実 type-P2 内容 (σ=β/|K|素数/M_σ nilp TI、
     Thm 3.10(a)/Lem 12.19/12.17) = **hard core**。
 **⟹ 次 = (d) [C(E₁') 版 (c)-helper] → (b1) [⊆ 再設計] → (g) [hard]。**
+
+### ✅ case-τ₁ (d) DONE + 残 (b1)/(g) hardness 確定 (2026-06-15 loop)
+- ✅ **(d) landing** (commit `c140797e`): C(E₁) 版 (c)-helper `maximalContaining_centralizer_of_le_Msigma_centralizer_E1`
+  (X≤M_σ⊓C(E₁) 直取り、Lemma 13.6 P=E₁) + case-τ₃ (d) ミラー (h' + hKstar + Thm 10.1(e))。
+- **case-τ₁ 現況: WLOG + (a) + (K*≠1) + (d) = 4/5。残 = (b1)/(g) (genuinely hard)。**
+- 🛑 **(b1) hard**: K=E₁'⊊E' ⟹ case-τ₃ (b1)-⊆ の prime 作用が破綻 (n=s·e, y'=ege⁻¹∈E'∖E₁',
+  prime 作用は K=E₁' のみ ⟹ s∈C_{Mσ}(y') から s∈C_{Mσ}(K) が出ない)。**Frobenius 構造 E'=K⋉U'
+  (K regular on U'=E₂'E₃') での N_M(X)=N_M(K)=K×K* 論法**が要る。⊇ は K cyclic で容易 (K≤C(X)≤N(X))。
+- 🛑 **(g) hard + cite-gap**: case-τ₁ で M が P2 可能 ⟹ vacuous でない。BG (g) (mmd L3850) = E Frobenius
+  kernel U=E₂E₃ → **Lem 14.1**(C_{Mσ}(U)=1 + M_σ nilp) → **Thm 3.10(a)**(K prime on M_σ ⟹ |K| 素数) →
+  U=[U,K]=E' → **Lem 12.19**(E' centralizes Hall β' of M_σ, ✅ S12_E:269) → β=σ → **Lem 12.17**(M_σ∩M_σ^g
+  β'-group ⟹ TI)。**⚠ cite-gap**: Lem 14.1 Frobenius 形 (repo の 14.1=`msigma_structure_of_notMem_sigma_kappa`
+  は別部分) + Lem 12.17 (repo S12_E:72=`C_{Mσ}(E)⊆M_σ'∧[M_σ,E]=M_σ`、TI 部分と別命題) は**未形式化の可能性** →
+  要調査/形式化。IsTypeP2→U≠1 (κ≠σ'∩π(M)⟹E₂'E₃'≠1) も step。
+**⟹ 両者 multi-fragment hard。(b1)=Frobenius 構造、(g)=cite-assembly+gap。focused work 推奨。**
