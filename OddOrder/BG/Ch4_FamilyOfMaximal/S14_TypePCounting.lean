@@ -287,6 +287,57 @@ theorem mem_tau1_union_tau3_of_mem_primeFactors_card_E [Finite G]
       intro hderiv
       exact hd ((mem_tau3_iff M p).mpr ⟨hpσ, hderiv, hr1'⟩)
 
+/-- **`π(E) ⊆ κ(M)`** in BG Proposition 14.2's `κ(M) ∩ τ₃(M) ≠ ∅` case: every prime `p ∣ |E|`
+lies in `κ(M)`.  By `mem_tau1_union_tau3_of_mem_primeFactors_card_E`, `p ∈ τ₁(M) ∪ τ₃(M)`; and a
+rank-one `P = ⟨g⟩ ≤ E` of order `p` (Cauchy) has `C_{M_σ}(P) = C_{M_σ}(g) = C_{M_σ}(E) ≠ 1` by
+prime action (using the `E₃`-witness `x`), so `P` certifies `p ∈ κ(M)`.
+
+This is the `K = E` step: with `π(E) ⊆ κ(M)` and the complement index `[M:E] = |M_σ|` coprime to
+`κ(M)`, `E` is a Hall `κ(M)`-subgroup of `M`, hence equals the Hall `κ(M)`-subgroup `K ≤ E`. -/
+theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hEprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E)
+    {x : G} (hxE3 : x ∈ E₃) (hxne : x ≠ 1)
+    (hxC : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥E).primeFactors) : p ∈ kappa M := by
+  obtain ⟨hpp, hpdvdE, -⟩ := Nat.mem_primeFactors.mp hp
+  haveI : Fact p.Prime := ⟨hpp⟩
+  have hτ13 : p ∈ tau1 M ∪ tau3 M :=
+    mem_tau1_union_tau3_of_mem_primeFactors_card_E hG h hxE3 hxne hxC hp
+  -- `C_{M_σ}(E) ≠ 1` from the witness `x` and prime action.
+  have hCE : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) ≠ ⊥ := by
+    have heqx := hEprime x (h.E₃_le hxE3) hxne
+    rw [← fixedBy_def, ← heqx]; exact hxC
+  -- A rank-one `P = ⟨g⟩ ≤ E` of order `p`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' p hpdvdE
+  have hgE : (g : G) ∈ E := g.2
+  have hgord : orderOf (g : G) = p :=
+    (orderOf_injective E.subtype E.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := by
+    intro hc; rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by
+    rw [Nat.card_zpowers]; exact hgord
+  have hPelem : Subgroup.zpowers (g : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩
+  have hPM : Subgroup.zpowers (g : G) ≤ M := Subgroup.zpowers_le.mpr (h.E_le hgE)
+  -- `C_{M_σ}(⟨g⟩) = C_{M_σ}(g) = C_{M_σ}(E) ≠ 1`.
+  have heqg := hEprime (g : G) hgE hgne
+  have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff] at hy ⊢
+    intro z hz
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+    exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+  have hPC : OddOrder.BG.Ch3.S10.Msigma M ⊓
+      Subgroup.centralizer (↑(Subgroup.zpowers (g : G)) : Set G) ≠ ⊥ := by
+    have hne : OddOrder.BG.Ch3.S10.Msigma M ⊓
+        Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ := by
+      rw [← fixedByElement_def, heqg, fixedBy_def]; exact hCE
+    exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+  exact ⟨hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
