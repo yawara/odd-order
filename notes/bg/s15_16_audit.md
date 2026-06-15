@@ -436,6 +436,70 @@ landing 済。残りは全て passthrough(skeleton 無価値)か deep core(skele
 ⟹ **Lane G の §14-非依存 groundwork は完全に尽きた**(2 engine + N_G(M_σ)=M 補題 + Frattini brick)。
 次の substantive 進捗は §14(Lane H)/ §16 RData(Thm 14.4 conjugacy)landing 待ち。
 
+## 14. 🆕 Thm 15.2 証明の解禁 — Prop 14.2(a) landing による (2026-06-15 夜, Lane G 再開セッション)
+
+section 11 の「§14-非依存 groundwork 尽きた」は **statement/skeleton レベルの結論**であって、
+**Thm 15.2 の本体証明**については **Prop 14.2 (`typeP_structure`) landing 後に状況が変わった**。
+prior audit は Prop 14.2 が gated だった時点の判定ゆえこの解禁を反映していない。
+
+### 14.1 何が解禁されたか
+
+mmd Thm 15.2 証明 (L4190–4202) の **step 2–5 はすべて landed upstream のみを使う**:
+- **Prop 14.2(a)** = `typeP_structure` conjunct 1 `ActsPrimeOn (Msigma M) K` — **✅ landed sorry-free** (Lane H)。
+- **Lemma 6.3(a)** = `commutator_eq_self_of_isComplement'_le_commutator` (S06:300, proved) / 第2結論 `centralizer_inf_le_derivedInG_of_isComplement'` (S06:396, proved)。
+- **Thm 3.7** = `frobeniusKernelIsNilpotent` / `isNilpotent_of_normalizing_primeOrder_fixedPointFree` (S03c, proved)。
+- **Thm 3.10** = `S03g.thm310` (proved, §3 サブプログラム完結)。
+- **Prop 1.5(a)(d)** = `exists_aInvariant_hall` / `coprime_fixedPoints_quotient` (Isaacs Ch04, proved)。
+
+⟹ **step 2–5（M_σ=[M_σ,K] → K\*≤Q=O_q(M) → M_σ/Q nilpotent → minimal-normal Q̄ chain →
+Frobenius KD on Q̄ で p prime/|Q̄|=q^p/D'⊆C_D(Q̄) → (g) F(M)=QC_M(Q)）は §14-非依存に証明可能。**
+§14-gate は **step 1 のみ**: `IsTypeP1 M`（Lemma 14.1）と `q=|K\*| prime`（Thm 14.7(f)）。
+
+### 14.2 なぜ skeleton パターンが効かない（Cor 15.6 と違う点）
+
+Cor 15.6 の `typeP_kstar_in_mf_of_inputs` が sorry-free 配線できたのは、入力 (K\*≠1 / K⊔K\* cyclic /
+M=KM' / K\*⊆MF) が **すべて §14/§15 定理から cite 可能**だったから。**Thm 15.2 の構造的出力
+(Q/D/Q0/Q̄/p/q) は cite 元が存在しない**（この定理自身の新規内容）⟹ `_of_inputs` engine を作っても
+wrapper が入力を sorry-free に供給できず orphaned。さらに `IsTypeP1`/`q prime` も §14 から clean cite
+不可（grep 済: 該当 §14 定理が無い）⟹ engine restructure は monitor の **sorry-不増 gate に抵触**（net +2）。
+
+### 14.3 唯一の productive path = 証明本体を sorry-free conditional helper で積む
+
+**§14-gated facts (`IsTypeP1`, `ActsPrimeOn`, `q prime`) を明示仮説に取った sorry-free 補題**として
+step 2–5 を分割実装する（条件付きゆえ monitor 不抵触・net 0）。完成後、H が Lemma 14.1/Thm 14.7(f)
+を landing した時点で wrapper (S15_MF:846) に配線（wrapper の sorry を置換, net −1）。
+- これは **multi-session**（step 3 の minimal-normal Q̄ chain + step 4 の Frobenius KD on Q̄ が hard core、
+  推定 ~500–800 行）。
+- 🚨 **真の第一 gate = BG Theorem 3.8 が未形式化**（confirmed: grep 済）。Thm 15.2 step 2 は
+  「[M_σ,K]⊄F(M_σ) ⟹ K\*∩F(M)≠1」に Thm 3.8 を contrapositive 適用するが、**repo に BG 3.8 が無い**:
+  - mmd BG Thm 3.8 (L1221) = 「G=KR solvable odd, K⊴G, (1)(|R|,|K|)=1 (2)C_K(x)=C_K(R) ∀x∈R^# (3)C_{F(K)}(R)=1 ⟹ [K,R]⊆F(K)」。
+  - S03 群 = S03b(Lem3.3)/c(Thm3.7)/d(Thm3.4)/e(Thm3.5)/f(Thm3.6)/g(Thm3.10) — **3.8/3.9 は欠番**。
+  - `S04e_GorThm37:550` の "Theorem 3.8" は **Gorenstein "Finite Groups" の別定理**（p'-自己同型、App E 用）。BG 3.8 ではない。
+  - ⟹ **Thm 15.2 を進めるには BG Theorem 3.8 の形式化が前提**（clean §14-非依存 §3 タスク、coprime-action 定理）。
+- **Thm 15.2 依存の最終 ledger**: Prop 14.2(a)✅ / Lem 6.3(a)✅ / Thm 3.7✅ / Thm 3.10✅ / Prop 1.5(a)(d)✅ /
+  Thm 5.5✅(`solvableAut_of_narrow` S05:976) / **Thm 3.8 ❌未形式化** / Lem 14.1・Thm 14.7(f) ⏳§14(H)。
+- 第一 leaf 候補（Thm 3.8 後）: `M_σ=[M_σ,K]`（type-P1 complement + M_σ⊆M' を仮説に
+  `commutator_eq_self_of_isComplement'_le_commutator` を ↥M 内適用、confirmed API）。
+
+### 14.4 推奨（2026-06-15 夜, Lane G 再開セッション結論）
+
+Thm 15.2 本体は FT keystone（Cor 15.3 の Q / Cor 15.6 の K\*⊆MF を供給）だが、§15 の残 6 sorry は
+全て genuinely blocked:
+- **Thm 15.2**: BG **Theorem 3.8 未形式化** + §14 facts（Lem 14.1/Thm 14.7f, H）。
+- **Cor 15.3**: `hconj` が §16 sharp-transitivity（Thm 14.4 RData）依存 → §15 へ循環 import で構造ブロック。
+- **Thm 15.7/15.8/15.9**: 深い §12/§13/FT。
+- gated-endpoint skeleton が効く tractable 定理（Cor 15.4/15.5/15.6 + 2 engine）は完成済。
+
+⟹ G の §15 で sorry を減らす clean な道は現状無い。productive な選択肢（**ユーザー/hub の戦略判断**）:
+- **(a) BG Theorem 3.8 を形式化**（最有力）: §3 の唯一の未形式化前提を埋める。**§14-非依存・well-scoped・
+  coprime-action 定理**（G=KR, K⊴G, 3条件 ⟹ [K,R]⊆F(K)）。Thm 15.2 step 2 を解禁（step 3-5 + §14 wiring は
+  なお残るが clean な keystone 前進）。§3 領域だが §3 lane（a-keystone）は退役済ゆえ owner 空き。
+- **(b) Lane H（§14, 10 sorry）/ Lane F（§13）支援に再配置**: §14 が §15 の gate ゆえ FT 最短。
+- **(c) §15 light-touch**: thin sorry-free conditional helper を積む（Thm 3.8 待ちで step 2 止まり、低価値）。
+
+section 11 の「§14-非依存余地尽きた」は **statement/skeleton レベルでは正**だが、本セッションで
+**Thm 15.2 本体証明の解禁状況（Prop 14.2(a) landed、残 §3 gate = Thm 3.8 のみ）を精密化**した。
+
 ## 参照
 
 - mmd §16 schematic proof 依存表 = L4424–4449（Thm A–E の gate を 1 行で）。
