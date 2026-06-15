@@ -338,6 +338,31 @@ theorem mem_kappa_of_mem_primeFactors_card_E [Finite G]
     exact fun hbot => hne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
   exact ⟨hτ13, Subgroup.zpowers (g : G), hPelem, hPM, hPC⟩
 
+/-- **BG Proposition 14.2(c)** for the `κ(M) ∩ τ₃(M) ≠ ∅` case: if `X ∈ ℰ_q¹(G)` lies in
+`K^* = C_{M_σ}(E)` (i.e. `X ≤ M_σ ⊓ C(E)`), then `𝓜(C_G(X)) = {M}`.  Here `q ∣ |M_σ|` forces
+`q ∈ σ(M)`, and `X ≤ M_σ ⊓ C(E₁)` (since `E₁ ≤ E`), so Lemma 13.6
+(`maximalContaining_eq_singleton_of_E1`) applies with `P = E₁` and a Sylow `q`-subgroup of `M_σ`.
+With `K = E` this is the `𝓜(C_G(X)) = {M}` half of (c); it drives conjunct (d)
+(`K^* ∩ M^g = 1` for `g ∉ M`). -/
+theorem maximalContaining_centralizer_of_le_Msigma_centralizer_E [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) (hE1ne : E₁ ≠ ⊥)
+    {X : Subgroup G} {q : ℕ} [Fact q.Prime] (hX : X ∈ elemAbelianOfRank G q 1)
+    (hXK : X ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G)) :
+    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} := by
+  have hXMσ : X ≤ OddOrder.BG.Ch3.S10.Msigma M := hXK.trans inf_le_left
+  have hXcard : Nat.card ↥X = q := by rw [(mem_elemAbelianOfRank.mp hX).2, pow_one]
+  have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q
+      (Nat.mem_primeFactors.mpr ⟨Fact.out, hXcard ▸ Subgroup.card_dvd_of_le hXMσ, Nat.card_pos.ne'⟩)
+  have hXC : X ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) :=
+    le_inf hXMσ ((hXK.trans inf_le_right).trans
+      (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr h.E₁_le)))
+  obtain ⟨S, hSMσ, hSq, _, hScard⟩ := exists_einvariant_sylow_Msigma hG h q
+  have hSmax : ∀ T : Subgroup G, T ≤ OddOrder.BG.Ch3.S10.Msigma M → IsPGroup q ↥T → S ≤ T →
+      S = T := fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
+  exact (maximalContaining_eq_singleton_of_E1 hG h hqσ (le_refl E₁) hE1ne hX hXC hSMσ hSq hSmax).1
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
