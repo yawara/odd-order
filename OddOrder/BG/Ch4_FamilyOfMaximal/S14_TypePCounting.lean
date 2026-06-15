@@ -1633,7 +1633,9 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (IsTypeP2 M → OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.beta M ∧
         ∃ q : ℕ, q.Prime ∧ Nat.card ↥K = q ∧
           IsTISubset (sigmaSharp M) (Subgroup.normalizer
-            ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G))) := by
+            ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G))) ∧
+      (∀ p : ℕ, p.Prime → ∀ X : Subgroup G, X ∈ elemAbelianOfRank G p 1 → X ≤ Kstar →
+        maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) := by
   classical
   -- `K` is a `σ(M)'`-subgroup (a Hall `κ(M)`-subgroup, and `κ(M) ⊆ σ(M)'`).
   have hK_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := by
@@ -1671,7 +1673,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hd
     have hKEeq : K = E :=
       Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
-    refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
     · -- (a) prime action: immediate from `K = E` and Corollary 13.11.
       rw [hKEeq]; exact hEprime
     · -- `K^* = C_{M_σ}(K) = C_{M_σ}(E) ≠ 1` (prime action + the non-regular witness).
@@ -1828,6 +1830,12 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           Nat.mem_primeFactors.mpr
             ⟨hpp, (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
         exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hpE
+    · -- (c) `ℳ(C_G(X)) = {M}` for `X ∈ ℰ¹(K*)`: `K* = C_{M_σ}(K) = C_{M_σ}(E)` (`K = E`),
+      -- so the `C(E)`-form Corollary 12.14 helper (`…_centralizer_E`) applies directly.
+      intro p hp X hXelem hXKstar
+      haveI : Fact p.Prime := ⟨hp⟩
+      exact maximalContaining_centralizer_of_le_Msigma_centralizer_E hG hsetup hE1ne hXelem
+        (hKEeq ▸ hKstar ▸ hXKstar)
   · -- Case `κ(M) ⊆ τ₁(M)`: `κ = τ₁`, and `K` is `M`-conjugate to `E₁` (both Hall `κ(M)`).
     -- Conjugate the `E`-setup by `w` (`conj w • E₁ = K`) and read the conjuncts off the new setup
     -- via the `E₁`-lemmas (Theorem 13.5 etc.), exactly as in case `τ₃` with `E₁` in place of `E`.
@@ -1858,7 +1866,7 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     obtain ⟨hKne, hKnonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG h'
       (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
     have hKprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K := E1_actsPrime hG h' hKne
-    refine ⟨hKprime, ?_, ?_, ?_, ?_⟩
+    refine ⟨hKprime, ?_, ?_, ?_, ?_, ?_⟩
     · -- (K* ≠ 1) `= C_{M_σ}(K) ≠ 1`.
       rw [hKstar]
       exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
@@ -2020,6 +2028,12 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       obtain ⟨hσβ, q, hq, hqcard⟩ :=
         sigma_eq_beta_and_prime_card_E1_of_caseTau1 hG h' hKne hKstar_ne hτ3 hUne
       exact ⟨hσβ, q, hq, hqcard, isTISubset_sigmaSharp_of_sigma_eq_beta hG hM hσβ⟩
+    · -- (c) `ℳ(C_G(X)) = {M}` for `X ∈ ℰ¹(K*)`: `K* = C_{M_σ}(K) = C_{M_σ}(E₁')` (`K = E₁'`),
+      -- so the `C(E₁)`-form Corollary 12.14 helper (`…_centralizer_E1`) applies directly.
+      intro p hp X hXelem hXKstar
+      haveI : Fact p.Prime := ⟨hp⟩
+      exact maximalContaining_centralizer_of_le_Msigma_centralizer_E1 hG h' hKne hXelem
+        (hKstar ▸ hXKstar)
 
 /-- **BG Corollary 14.3** (mmd L3852): for `x ∈ M_σ^#` and a nonidentity `σ(M)'`-element `x'`
 of `C_M(x)`, either (1) `π(⟨x'⟩) ⊆ κ(M)` and `C_G(x) ⊆ M`, or (2) `π(⟨x'⟩) ⊆ τ₂(M)`,
