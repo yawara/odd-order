@@ -522,4 +522,23 @@ theorem commutator_le_fitting_of_sameFixedPoints
   rw [hmap0, hfix_eq, ← hmapR] at htop0
   exact commutator_le_fitting_of_centralizes_fittingQuotient hRK hcop (by rw [htop0]; exact le_top)
 
+/-- **Condition (2) of BG Theorem 3.8, subgroup consequence** (mmd L1224, L1237-1239): from
+`C_K(x) = C_K(R)` for all `x ∈ R^#` (in the `⊓ K` form), every nontrivial subgroup `R₀ ≤ R` has
+the *same* fixed points on `K`, i.e. `C_K(R₀) = C_K(R)`.  (`⊆`: pick a witness `x ∈ R₀^#` and apply
+condition (2) at `x`, using `C_K(R₀) ≤ C_K(x)`; `⊇`: antitonicity of the centralizer, `R₀ ≤ R`.) -/
+theorem centralizer_inf_eq_of_le_of_cond2
+    {G : Type*} [Group G] {K R R₀ : Subgroup G} (hR₀R : R₀ ≤ R) (hR₀ : R₀ ≠ ⊥)
+    (hcond2 : ∀ x ∈ (R : Set G), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K) :
+    Subgroup.centralizer (R₀ : Set G) ⊓ K = Subgroup.centralizer (R : Set G) ⊓ K := by
+  haveI : Nontrivial ↥R₀ := (Subgroup.nontrivial_iff_ne_bot R₀).mpr hR₀
+  obtain ⟨y, hy⟩ := exists_ne (1 : ↥R₀)
+  refine le_antisymm ?_ ?_
+  · calc Subgroup.centralizer (R₀ : Set G) ⊓ K
+        ≤ Subgroup.centralizer ({(y : G)} : Set G) ⊓ K :=
+          inf_le_inf_right K (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr y.2))
+      _ = Subgroup.centralizer (R : Set G) ⊓ K :=
+          hcond2 (y : G) (hR₀R y.2) (mt OneMemClass.coe_eq_one.mp hy)
+  · exact inf_le_inf_right K (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hR₀R))
+
 end OddOrder.BG.Ch1.S03h
