@@ -224,4 +224,45 @@ theorem caseB_hagg
     (by exact_mod_cast hdecomp)
   exact hagg
 
+/-- **Peterfalvi (6.8.2.3), the per-`φ` anchored image (mixed family, abstract `D`).**  For the
+per-`φ` decomposition family `D` (each constituent `Ind^L_H θ` of `Ind^L_{W₂} φ` decomposed against
+`hyp.tau`, e.g. by the dispatch `caseB_constituentDecomposition`), with `(D θ).tau1 = hyp.tau`, the
+seam-`1` orthogonality `(D θ).X ⊥ Y₀` (`hXorth`) and integrality `⟨(D θ).Y, Y₀⟩ ∈ ℤ` (`hbi`), and
+the (6.8.2.2) decomposition `hdecomp`/`hXaggorth` of `exists_decomposition_caseB`, the pinning gives
+the **anchored image**
+`(Ind^L_H θ − aθ·η₁)^{hyp.tau} = (D θ).X − aθ·Y₀`   (`Y₀ = cY.extension η₁`, `aθ = ⟨φ, Res θ⟩`).
+
+This is the route-independent (6.8.2.3) core: the `Xagg`/`hsq`/`hagg` are assembled internally
+(`caseB_hagg`, `sum_constituentWeight_sq_subtype`); only the family `D` (the constituent dispatch)
+and its per-`θ` orthogonality/integrality remain for the capstone. -/
+theorem caseB_per_phi_anchored
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (D : (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) →
+      OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+        (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) (constituentWeight hφ' i.val • η₁))
+    (htau1 : ∀ i, (D i).tau1 = hyp.tau)
+    {Xagg : ClassFunction G ℂ}
+    (hXaggorth : ClassFunction.inner Xagg (cY.extension η₁) = 0)
+    (hdecomp : hyp.tau (ClassFunction.induce W2 φ - ((W2.subgroupOf H).index : ℂ) • η₁)
+      = Xagg - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁)
+    {b : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ} → ℤ}
+    (hXorth : ∀ i, ClassFunction.inner (D i).X (cY.extension η₁) = 0)
+    (hbi : ∀ i, ClassFunction.inner (D i).Y (cY.extension η₁) = (b i : ℂ))
+    (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
+    hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) - constituentWeight hφ' i.val • η₁)
+      = (D i).X - (constituentWeight hφ' i.val : ℂ) • cY.extension η₁ :=
+  per_phi_anchored_image hyp cY hη₁ Finset.univ D htau1 hXaggorth
+    (caseB_hagg hyp hW2H hcen hφ' D htau1 hdecomp)
+    (sum_constituentWeight_sq_subtype hW2H hcen hφ')
+    (fun i _ => hXorth i) (fun i _ => hbi i) i (Finset.mem_univ i) i.2
+
 end OddOrder.Peterfalvi.S08
