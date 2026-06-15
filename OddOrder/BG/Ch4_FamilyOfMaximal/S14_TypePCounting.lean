@@ -933,6 +933,71 @@ theorem normalizer_inf_E_le_E1_of_caseTau1 [Finite G]
     exact Subgroup.mem_bot.mp (hr ▸ hmem)
   rw [← huke, hu1, one_mul]; exact hkE1
 
+/-- **The §12 complement `E` is a Frobenius group** in case `τ₁` with `U = E₂E₃ ≠ 1`.
+`E₁` acts regularly (fixed-point-freely) on the normal subgroup `U = E₂ ⊔ E₃`
+(`actsRegularlyOn_E23_E1_of_caseTau1`), and `E = E₁ ⋉ U` (`SubgroupESetup.eq_sup`), so `E` is a
+Frobenius group with kernel `U` and complement `E₁`.  This is the Frobenius structure that
+Proposition 14.2(g) feeds to Theorem 3.10(a). -/
+theorem isFrobeniusGroup_E_of_caseTau1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) (hE1ne : E₁ ≠ ⊥)
+    (hKstar : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥)
+    (hτ3 : ¬ (kappa M ∩ tau3 M).Nonempty)
+    (hUne : (E₂ ⊔ E₃ : Subgroup G) ≠ ⊥) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥E
+      ((E₂ ⊔ E₃).subgroupOf E) (E₁.subgroupOf E) := by
+  classical
+  have hreg : ActsRegularlyOn (E₂ ⊔ E₃) E₁ :=
+    actsRegularlyOn_E23_E1_of_caseTau1 hG h hE1ne hKstar hτ3
+  have hE23le : (E₂ ⊔ E₃ : Subgroup G) ≤ E := sup_le h.E₂_le h.E₃_le
+  have hE1le : E₁ ≤ E := h.E₁_le
+  have hE23norm : E ≤ Subgroup.normalizer ((E₂ ⊔ E₃ : Subgroup G) : Set G) := h.E23_normal hG
+  -- `E₁ ⊓ (E₂ ⊔ E₃) = ⊥` (a nonidentity common element would centralize itself, contra FPF).
+  have hdisj : E₁ ⊓ (E₂ ⊔ E₃) = ⊥ := by
+    refine le_antisymm (fun g hg => ?_) bot_le
+    rw [Subgroup.mem_inf] at hg
+    obtain ⟨hgE1, hgU⟩ := hg
+    rw [Subgroup.mem_bot]
+    by_contra hg1
+    have hr := hreg g hgE1 hg1
+    rw [fixedByElement_def, eq_bot_iff] at hr
+    refine hg1 (Subgroup.mem_bot.mp (hr ?_))
+    exact Subgroup.mem_inf.mpr ⟨hgU, Subgroup.mem_centralizer_iff.mpr
+      (fun y hy => by rw [Set.mem_singleton_iff.mp hy])⟩
+  -- normality of the kernel.
+  haveI hKnorm : ((E₂ ⊔ E₃).subgroupOf E).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hE23norm
+  refine ⟨hKnorm, ?_, ?_, ?_, ?_⟩
+  · -- complement: disjoint + product covers `↥E`.
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff]
+      have hi : (E₂ ⊔ E₃).subgroupOf E ⊓ E₁.subgroupOf E = ((E₂ ⊔ E₃) ⊓ E₁).subgroupOf E := rfl
+      rw [hi, inf_comm, hdisj, Subgroup.bot_subgroupOf]
+    · haveI := hKnorm
+      have hsupG : (E₂ ⊔ E₃) ⊔ E₁ = E := by rw [h.eq_sup hG]; ac_rfl
+      have hsup : (E₂ ⊔ E₃).subgroupOf E ⊔ E₁.subgroupOf E = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hE23le hE1le, hsupG, Subgroup.subgroupOf_self]
+      have hmul := Subgroup.normal_mul ((E₂ ⊔ E₃).subgroupOf E) (E₁.subgroupOf E)
+      rw [hsup, Subgroup.coe_top] at hmul
+      exact hmul.symm
+  · rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hUne (hd.eq_bot_of_le hE23le)
+  · rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hE1ne (hd.eq_bot_of_le hE1le)
+  · -- Frobenius condition from the fixed-point-free action.
+    intro a ha hane n hn hnne
+    simp only [Subgroup.mem_subgroupOf] at ha hn
+    intro hcontra
+    have hval : (a : G) * (n : G) * (a : G)⁻¹ = (n : G) := by
+      have := congrArg (Subtype.val) hcontra; push_cast at this; exact this
+    have hane' : (a : G) ≠ 1 := fun hc => hane (Subtype.ext (by simpa using hc))
+    have hnne' : (n : G) ≠ 1 := fun hc => hnne (Subtype.ext (by simpa using hc))
+    have hr := hreg (a : G) ha hane'
+    rw [fixedByElement_def, eq_bot_iff] at hr
+    refine hnne' (Subgroup.mem_bot.mp (hr ?_))
+    exact Subgroup.mem_inf.mpr ⟨hn, Subgroup.mem_centralizer_iff.mpr
+      (fun y hy => by rw [Set.mem_singleton_iff.mp hy]; exact mul_inv_eq_iff_eq_mul.mp hval)⟩
+
 /-- The family `M_P` of type-P maximal subgroups. -/
 def maximalTypePFamily (G : Type*) [Group G] : Set (Subgroup G) :=
   {M | M ∈ maximalSubgroups G ∧ IsTypeP M}
