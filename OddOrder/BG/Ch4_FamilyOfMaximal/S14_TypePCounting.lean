@@ -718,8 +718,35 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hqσ hXbot hXp).2.2.2.2
           hXM hCM g⁻¹ hconj
       exact hgM (by simpa using M.inv_mem hg')
-    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  Needs Thm 3.10 / Lem 12.19 / 12.17.
-      sorry
+    · -- (g) In the `κ ∩ τ₃` case `K = E`, so `κ(M) = π(M) ∖ σ(M)`, i.e. `M` is type `P₁`;
+      -- this contradicts `IsTypeP2 M` (whose defining clause is `κ(M) ≠ π(M) ∖ σ(M)`).
+      intro hP2
+      refine absurd ?_ hP2.2
+      apply Set.eq_of_subset_of_subset
+      · -- `κ(M) ⊆ π(M) ∖ σ(M)`: each `p ∈ κ` is a prime dividing `|M|` (witness `P ≤ M`) and `∉ σ`.
+        intro p hpκ
+        obtain ⟨hpp, hpτ, P, hPelem, hPM, _⟩ := hpκ
+        have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+        have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+          rcases hpτ with h | h
+          · exact tau1_subset_sigma_compl M h
+          · exact tau3_subset_sigma_compl M h
+        exact ⟨Nat.mem_primeFactors.mpr
+            ⟨hpp, hPcard ▸ Subgroup.card_dvd_of_le hPM, Nat.card_pos.ne'⟩, hpσ⟩
+      · -- `π(M) ∖ σ(M) ⊆ κ(M)`: `p ∣ |M|`, `p ∉ σ` ⟹ `p ∣ |E|` ⟹ `p ∈ κ` (by `mem_kappa…`).
+        intro p hp
+        obtain ⟨hpπ, hpσ⟩ := hp
+        obtain ⟨hpp, hpdvdM, _⟩ := Nat.mem_primeFactors.mp hpπ
+        haveI : Fact p.Prime := ⟨hpp⟩
+        have hpnMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hdvd =>
+          hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+            (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩))
+        have hdvdME : p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥E := by
+          rw [hsetup.card_Msigma_mul_card_E]; exact hpdvdM
+        have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+          Nat.mem_primeFactors.mpr
+            ⟨hpp, (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
+        exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hpE
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
     sorry
 
