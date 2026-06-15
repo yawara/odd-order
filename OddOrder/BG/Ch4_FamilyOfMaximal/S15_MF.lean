@@ -949,6 +949,28 @@ theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
     · exact absurd hbot hMne
     · exact absurd htop (mem_maximalSubgroups.mp hM).1
 
+/-- **§15 helper (§14-independent, reusable).**  The `G`-normalizer of `M_σ` is `M`:
+`N_G(M_σ) = M`.  Since `M_σ = O_{σ(M)}(M)` is normal in `M` (`le_normalizer_opiCoreInG`),
+`M ≤ N_G(M_σ)`; if the containment were proper, maximality would force `N_G(M_σ) = G`, so
+`M_σ ⊴ G`, and simplicity would give `M_σ ∈ {⊥, ⊤}` — both excluded (`Msigma_ne_bot`,
+`M_σ ≤ M ⊊ G`).  This turns the `N_G(M_σ)`-fusion of Corollary 15.3(b) at `H := M_σ` into the
+`M`-fusion of BG Theorem D(1). -/
+theorem normalizer_Msigma_eq_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) = M := by
+  have hle : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  refine le_antisymm ?_ hle
+  rcases eq_or_lt_of_le hle with heq | hlt
+  · exact le_of_eq heq.symm
+  · have hnorm : (OddOrder.BG.Ch3.S10.Msigma M).Normal :=
+      Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
+    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    · exact absurd hbot (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    · exact absurd (top_le_iff.mp (htop ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+        (mem_maximalSubgroups.mp hM).1
+
 /-- **General helper (§14-independent, reusable).**  A subgroup `K` of a finite group that
 contains a full Sylow `p`-subgroup for every prime `p` is the whole group.  (No nilpotency:
 each Sylow's order is the `p`-part of `|G|`, so `K.index` is divisible by no prime and equals `1`.)

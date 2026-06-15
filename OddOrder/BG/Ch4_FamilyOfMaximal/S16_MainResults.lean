@@ -203,6 +203,74 @@ theorem theoremC_paired_structure [Finite G]
       (U = ⊥ → ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q) := by
   sorry
 
+/-- **§14/§15-independent assembly engine for BG Theorem D** (mmd L4317; the mmd L4440
+schematic proof: `D(1) ← Cor 15.3(b)`, `D(2) ← Lem 12.17`, `D(3)(4) ← Thm 14.4(b) + Thm A(8)
++ Cor 15.9`).  Theorem D is a pure assembly of upstream §12/§14/§15 results, so this engine
+takes each as a named hypothesis and discharges the conjunction; when those land (Lane H / Lane
+F) the wrapper `theoremD_msigma_conjugacy_and_centralizers` cites them and applies this skeleton
+(the gated-endpoint pattern, cf. `S15.mf_hall_centralizer_control_of_inputs`).
+
+The one nontrivial step is `D(1)`: Corollary 15.3(b) at `H := M_σ` gives fusion control with the
+realizing element in `N_G(M_σ)`; `normalizer_Msigma_eq_self` (`N_G(M_σ) = M`) upgrades this to
+`M`-fusion, which is exactly Theorem D(1).  `D(2)`, `D(3)`, `D(4)` are recorded verbatim from
+their sources (Lemma 12.17 / Theorem 14.4(b) / the Theorem 14.4(b)+A(8)+15.9 package). -/
+theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hfusionMσ : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∃ g : G, y = g * x * g⁻¹) →
+        ∃ n ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G), y = n * x * n⁻¹)
+    (hD2 : ∀ g : G, g ∉ M → IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ (MulAut.conj g • M)))
+    (hD3 : ∀ x : G, x ∈ sigmaSharp M → ∃ R : Subgroup G, RData M x R)
+    (hD4 : ∀ x : G, x ∈ sigmaSharp M → ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
+        ∃ R : Subgroup G,
+          RData M x R ∧
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+            S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
+            x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
+            (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+            Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+              ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
+            (S14.IsTypeP2 N →
+              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+                ∃ E : Subgroup G,
+                  E ≤ M ∧ IsCyclic ↥E ∧
+                  Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+                    (E.subgroupOf M) ∧
+                  OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+                    ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) :
+    (∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
+      (∀ g : G, g ∉ M → IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ (MulAut.conj g • M))) ∧
+      (∀ x : G, x ∈ sigmaSharp M → ∃ R : Subgroup G, RData M x R) ∧
+      (∀ x : G, x ∈ sigmaSharp M → ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
+        ∃ R : Subgroup G,
+          RData M x R ∧
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+            S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
+            x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
+            (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+            Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+              ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
+            (S14.IsTypeP2 N →
+              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+                ∃ E : Subgroup G,
+                  E ≤ M ∧ IsCyclic ↥E ∧
+                  Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+                    (E.subgroupOf M) ∧
+                  OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+                    ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) := by
+  refine ⟨?_, hD2, hD3, hD4⟩
+  -- D(1): upgrade Corollary 15.3(b)'s `N_G(M_σ)`-fusion to `M`-fusion via `N_G(M_σ) = M`.
+  intro x hx y hy hconj
+  obtain ⟨n, hnN, hnconj⟩ := hfusionMσ x hx y hy hconj
+  rw [normalizer_Msigma_eq_self hG hM] at hnN
+  exact ⟨n, hnN, hnconj⟩
+
 /-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
 control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
 action, and the unique maximal subgroup attached to escaping centralizers.
