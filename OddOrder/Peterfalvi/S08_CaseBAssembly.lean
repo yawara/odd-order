@@ -584,6 +584,70 @@ theorem caseB_irr_nonreal
     hyp.card_L_odd (χ := ⟨_, hirr1⟩) (fun htriv => caseB_induce_ne_trivial hyp θ ?_)
   rw [← IrreducibleCharacter.coe_trivialIrreducibleCharacter (G := ↥L), ← htriv]
 
+/-- **(6.8.2.3) irreducible-branch self-conjugate orthogonality** (`CaseBIrrBundle` conjunct #8).
+`⟨Ind^L_H θ, (Ind^L_H θ).conj⟩ = 0`: both `Ind^L_H θ` (`hirr1`) and its conjugate
+(`IsIrreducibleCharacter.conj`) are irreducible and distinct (non-real, `caseB_irr_nonreal`), so the
+irreducible Kronecker inner product vanishes. -/
+theorem caseB_irr_conj_inner
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj = 0 := by
+  set Φ := ClassFunction.induce H (θ : ClassFunction ↥H ℂ) with hΦ
+  have hnonreal := caseB_irr_nonreal hyp hirr1
+  have hne : (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L) ≠ ⟨Φ.conj, hirr1.conj⟩ := by
+    intro heq
+    apply hnonreal
+    have h2 := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq
+    simpa using h2.symm
+  have hkron := irreducibleCharacter_inner_eq_ite (⟨Φ, hirr1⟩ : IrreducibleCharacter ↥L)
+    (⟨Φ.conj, hirr1.conj⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg hne] at hkron
+  simpa using hkron
+
+/-- An irreducible character distinct from a `Y`-member is orthogonal to it (both irreducible, so
+the inner product is the Kronecker delta).  The raw `X ⊥ Y` for the irreducible branch. -/
+theorem inner_irr_Yset_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {φ η₁ : ClassFunction ↥L ℂ} (hφirr : IsIrreducibleCharacter φ)
+    (hη₁ : η₁ ∈ hyp.Yset) (hne : φ ≠ η₁) : ClassFunction.inner φ η₁ = 0 := by
+  have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hkron := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
+    (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+  rw [if_neg (fun heq => hne (by
+    simpa using congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) heq))]
+    at hkron
+  simpa using hkron
+
+/-- **(6.8.2.3) irreducible-branch anchor orthogonality** (`CaseBIrrBundle` conjunct #6).
+The induced character is orthogonal to the weighted `Y`-anchor, given the `X ⊥ Y` distinctness
+`Ind^L_H θ ≠ η₁` (a structural input), via `inner_irr_Yset_eq_zero`. -/
+theorem caseB_irr_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁) (a : ℕ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+    inner_irr_Yset_eq_zero hyp hirr1 hη₁ hne, mul_zero]
+
+/-- **(6.8.2.3) irreducible-branch conjugate anchor orthogonality** (`CaseBIrrBundle` conjunct #7).
+The conjugate induced character is orthogonal to the weighted `Y`-anchor, given
+`(Ind^L_H θ).conj ≠ η₁`: the conjugate is irreducible, so `inner_irr_Yset_eq_zero` applies. -/
+theorem caseB_irr_conj_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr1 : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hne : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) (a : ℕ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      (a • η₁ : ClassFunction ↥L ℂ) = 0 := by
+  rw [← Nat.cast_smul_eq_nsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+    inner_irr_Yset_eq_zero hyp hirr1.conj hη₁ hne, mul_zero]
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
@@ -740,6 +804,40 @@ theorem caseB_column_bundle
     caseB_column_htau1_mema hyp h46 hHK hη₁ χ₂ (constituentWeight hφ' θ) h1,
     caseB_column_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ),
     caseB_column_conj_orthogonal_Yset hyp h46 hW1 hη₁ χ₂ (constituentWeight hφ' θ)⟩
+
+/-- **(6.8.2.3) full irreducible-branch bundle.**  Assembles the entire `CaseBIrrBundle` for the
+dispatch weight `aθ = constituentWeight hφ' θ`.  Given the structural inputs `θ ≠ 1` (for
+irreducibility) and the `X ⊥ Y` distinctnesses of the induced character and its conjugate from the
+anchor, all eight conjuncts are discharged (irreducibility, non-realness, the two supports, `ZIrr`,
+the two anchor orthogonalities, self-conjugate orthogonality).  This is the irreducible-branch input
+`hirr` of the mixed per-`φ` dispatch. -/
+theorem caseB_irr_bundle
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {θ : IrreducibleCharacter ↥H} (hweight : 0 < constituentWeight hφ' θ)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hθne : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H)
+    (hneη : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ≠ η₁)
+    (hneη' : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj ≠ η₁) :
+    CaseBIrrBundle hyp h46 θ η₁ (constituentWeight hφ' θ) := by
+  intro hnotcol
+  have h1 := caseB_irr_induce_isIrreducible h46 hHK hθne hnotcol
+  exact ⟨h1, caseB_irr_nonreal hyp h1, caseB_irr_conj_diff_support hyp θ,
+    caseB_irr_sub_smul_support hyp hW2H hcen hφ' hweight hη₁,
+    caseB_irr_htau1_mema hyp hW2H hcen hφ' hweight hη₁,
+    caseB_irr_orthogonal_Yset hyp h1 hη₁ hneη (constituentWeight hφ' θ),
+    caseB_irr_conj_orthogonal_Yset hyp h1 hη₁ hneη' (constituentWeight hφ' θ),
+    caseB_irr_conj_inner hyp h1⟩
 
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
