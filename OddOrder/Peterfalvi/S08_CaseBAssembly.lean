@@ -34,6 +34,29 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
+/-! ## Dade-map canonicality core (general group theory)
+
+The (6.8.2.3) capstone needs the **map agreement** `dadeIntegralCharacterMap h46.dade0 h46.tau φ =
+hyp.tau φ` on `H^#`-supported `φ`.  Since the only *data* field of `S04.Hypothesis` is the `H(a)`
+assignment (every other field is a `Prop`), this reduces to the equality of the `H`-fields of
+`h46.dade0.restrict A` and `hyp.dade` — both the normal Hall complement of `C_L(a)` in `C_G(a)`.  The
+following two general lemmas are the group-theoretic core of that uniqueness: a subgroup of order
+coprime to a normal subgroup's index is contained in it (so the running images in `C ⧸ N` are
+trivial), whence the normal complement of a fixed subgroup is unique. -/
+
+/-- **A subgroup of order coprime to a normal subgroup's index is contained in it.**  The image of
+`K` in `C ⧸ N` has order dividing both `|K|` and `[C : N]` (Lagrange), which are coprime, so the image
+is trivial and `K ≤ ker (mk' N) = N`. -/
+theorem le_of_card_coprime_index {C : Type*} [Group C]
+    {K N : Subgroup C} [N.Normal] (hcop : Nat.Coprime (Nat.card K) N.index) : K ≤ N := by
+  have hker : (QuotientGroup.mk' N).ker = N := QuotientGroup.ker_mk' N
+  rw [← hker, ← Subgroup.map_eq_bot_iff, ← Subgroup.card_eq_one]
+  have hd1 : Nat.card (K.map (QuotientGroup.mk' N)) ∣ Nat.card K :=
+    Subgroup.card_map_dvd K (QuotientGroup.mk' N)
+  have hd2 : Nat.card (K.map (QuotientGroup.mk' N)) ∣ N.index :=
+    Subgroup.card_subgroup_dvd_card (K.map (QuotientGroup.mk' N))
+  exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
