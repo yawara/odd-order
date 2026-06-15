@@ -660,3 +660,18 @@ Prop 14.2 着地後の funnel 各結果の gating を精査:
 **要特定 API**: (a) Hall κ ⊇ X₀ 存在 (Ch03 solvable Hall containment), (b) σ-core/σ conjugation-equivariance,
 (c) E-setup reconstruction (`exists_subgroupESetup` で M から)。**branch 1 が Prop 14.2 full 適用 (K/U/Kstar 3 producer)、
 branch 2 が Lem 12.11(a)+Cor 12.16+ℓ_σ chain。各 ~60-80 行。** → 14.4 は Cor 14.3 + Thm 13.9 (R(x) headline は §16 defer)。
+
+### ⚠ 14.3 の真の gate = Hall-containment (Hall-D) + branch-2 ℳ-piece landed (2026-06-15, lane-h)
+14.3 着手で判明:
+- **branch 1 は Hall-D (Wielandt: π-subgroup ⊆ Hall π in solvable) に gate** — repo は hall_E/hall_C
+  (存在+共役) のみで **containment 未形式化** (Lane D notes「Cor 10.9 — needs Hall-D, ~250 行」と同じ gap)。
+  branch 1 は K=Hall κ ⊇ X₀ (κ-witness) を要し、これが Hall-D そのもの。Sylow 経由の workaround
+  (X₀≤Syl_{p₀}≤Hall κ) は「Syl_p ⊆ Hall π for p∈π」+ Sylow 共役で可能だが fiddly (~30-40 行) +
+  その後 typeP_structure full 適用 (K/U/Kstar 3 producer) で更に setup 重い。
+- **✅ branch-2 ℳ-piece landed**: `maximalContaining_centralizer_eq_singleton_of_tau2_element`
+  (x' τ₂-elt + C_{M_σ}(x')≠1 ⟹ ℳ(C_G(x'))={M}) = Cor 12.10(e) + E-setup、sorry-free。
+  残 branch 2 = ℓ_σ(x')=1 (Lem 12.11(a)+Cor 12.16+σ-core conj-equivariance `sigma_conj` ✅ で
+  maximalSigmaSubgroupsOfElement 非空)。
+- ⟹ **14.3 完成には Hall-D (or Sylow-workaround) が前提**。14.4 も R(x) headline は §16 gate。
+  **推奨: Hall-D を Ch03 に形式化してから 14.3 branch 1**(Hall-D は Cor 10.9 等でも要る汎用 lemma)、
+  または 14.3 を Hall-D landing 待ちで保留し別 FT-path タスクへ。hub に cross-cutting Hall-D 需要を報告。
