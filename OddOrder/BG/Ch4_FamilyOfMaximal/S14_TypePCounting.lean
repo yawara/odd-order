@@ -2035,6 +2035,26 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact maximalContaining_centralizer_of_le_Msigma_centralizer_E1 hG h' hKne hXelem
         (hKstar ▸ hXKstar)
 
+/-- **A `κ(M)`-subgroup of `M` lies in some Hall `κ(M)`-subgroup of `M`** (Hall D / Wielandt,
+`Ch03.hall_D`, applied inside the solvable group `↥M`).  Used by Corollary 14.3 branch 1 to put
+the `κ`-witness `X₀ ≤ ⟨x'⟩` into a Hall `κ`-subgroup `K`, so that Proposition 14.2(b1)/(c) apply. -/
+theorem exists_isHallSubgroup_kappa_ge [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {X : Subgroup G} (hXM : X ≤ M)
+    (hXκ : ∀ q ∈ (Nat.card ↥X).primeFactors, q ∈ kappa M) :
+    ∃ K : Subgroup G, K ≤ M ∧ Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M) ∧ X ≤ K := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hXsub : ∀ q ∈ (Nat.card ↥(X.subgroupOf M)).primeFactors, q ∈ kappa M := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXM).toEquiv] at hq
+    exact hXκ q hq
+  obtain ⟨K', hK'hall, hK'ge⟩ := Ch03.hall_D (G := ↥M) hXsub
+  have hKeq : (K'.map M.subtype).subgroupOf M = K' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  refine ⟨K'.map M.subtype, Subgroup.map_subtype_le K', ?_, ?_⟩
+  · rw [hKeq]; exact hK'hall
+  · exact le_of_eq_of_le (Subgroup.map_subgroupOf_eq_of_le hXM).symm (Subgroup.map_mono hK'ge)
+
 /-- **BG Corollary 14.3, branch-2 piece** (mmd L3858): if `x'` is a nonidentity `τ₂(M)`-element
 of `M` with `C_{M_σ}(x') ≠ 1`, then `ℳ(C_G(x')) = {M}`.  This is Corollary 12.10(e)
 (`nilpotent_sigmaComplement_abelian`, fifth conjunct) for an `E`-setup of `M`, with the prime
