@@ -1961,4 +1961,28 @@ theorem caseB_S_member_column_or_irreducible
     hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
   exact caseB_induce_column_or_irreducible h46 hHK hθne'
 
+/-- **(6.8.2) `X(W₂) ⊥ Y`** — the `hpair` orthogonality input of the case-(B) `X ∪ Y` glue
+(`coherentXunionYset_caseB_of_glued`).  Every `X`-member is orthogonal to every `Y`-member: by the
+`S`-level cover (`caseB_S_member_column_or_irreducible`) an `X`-member is either a certain-type column
+(`⊥ Y` by `inner_columnSum_Yset_eq_zero`) or an irreducible distinct from the `Y`-member (`⊥ Y` by
+`inner_irr_Yset_eq_zero`); the distinctness is the disjointness `X(W₂) ∩ Y = ∅` (`Y = S(⁅H,H⁆) ⊆
+S(W₂)` since `W₂ ⊆ ⁅H,H⁆`, antitone, and `X(W₂)` is disjoint from `S(W₂)`). -/
+theorem caseB_Xset_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
+    ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0 := by
+  have hdisj : Disjoint (hyp.Xset W2) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration W2 :=
+      hyp.SsubFiltration_antitone hW2comm
+    exact Set.disjoint_of_subset_right hYsub (hyp.disjoint_Xset_SsubFiltration (Z := W2))
+  intro x hx y hy
+  rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hx) with
+    ⟨χ₂, -, rfl⟩ | hirr
+  · exact inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂
+  · exact inner_irr_Yset_eq_zero hyp hirr hy (fun heq => Set.disjoint_left.mp hdisj hx (heq.symm ▸ hy))
+
 end OddOrder.Peterfalvi.S08
