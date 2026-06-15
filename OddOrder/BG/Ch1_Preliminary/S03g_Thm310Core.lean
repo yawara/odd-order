@@ -102,4 +102,73 @@ theorem prime_card_of_freeBlock_cond3
   -- `|R| · dR = finrank V = p · dR`, cancel `dR`.
   exact Nat.eq_of_mul_eq_mul_right hdRpos (hR.symm.trans hP)
 
+/-! ### Weight characters and Frobenius freeness (L4)
+
+The block index set for BG Theorem 3.10(a) is the set of `K`-weight characters with nonzero weight
+space.  A nonzero weight space forces `χ` to be a genuine multiplicative character; the Frobenius
+hypothesis (a nonidentity complement element acts fixed-point-freely on the abelian kernel `K`) then
+forces every nonidentity `c` to move every nontrivial such character — i.e. the complement acts
+freely on the (nontrivial) weight characters.  This supplies the `hfree` hypothesis of
+`prime_card_of_freeBlock_cond3`. -/
+
+section WeightFreeness
+
+open OddOrder.BG.Ch1.S03e OddOrder.RepresentationTheory
+
+variable (ρ : Representation F G V) {K : Subgroup G}
+
+/-- A nonzero weight space forces `χ k ≠ 0` (`ρ k` is invertible). -/
+theorem weightChar_ne_zero {χ : ↥K → F} (hχ : weightSpace ρ K χ ≠ ⊥) (k : ↥K) : χ k ≠ 0 := by
+  obtain ⟨v, hv, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hχ
+  rw [mem_weightSpace] at hv
+  intro h0
+  have hzero : ρ (k : G) v = 0 := by rw [hv k, h0, zero_smul]
+  exact hv0 ((ρ.apply_bijective (k : G)).injective (hzero.trans (map_zero _).symm))
+
+/-- A nonzero weight space forces `χ` to be multiplicative. -/
+theorem weightChar_mul {χ : ↥K → F} (hχ : weightSpace ρ K χ ≠ ⊥) (k k' : ↥K) :
+    χ (k * k') = χ k * χ k' := by
+  obtain ⟨v, hv, hv0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hχ
+  rw [mem_weightSpace] at hv
+  have h1 : ρ ((k * k' : ↥K) : G) v = χ (k * k') • v := hv (k * k')
+  have h2 : ρ ((k * k' : ↥K) : G) v = (χ k * χ k') • v := by
+    rw [Subgroup.coe_mul, map_mul, Module.End.mul_apply, hv k', map_smul, hv k, smul_smul,
+      mul_comm (χ k') (χ k)]
+  have heqv : χ (k * k') • v = (χ k * χ k') • v := h1.symm.trans h2
+  have h3 : (χ (k * k') - χ k * χ k') • v = 0 := by rw [sub_smul, heqv, sub_self]
+  rcases smul_eq_zero.mp h3 with h | h
+  · exact sub_eq_zero.mp h
+  · exact absurd h hv0
+
+/-- A nonzero weight space gives `χ 1 = 1`. -/
+theorem weightChar_one {χ : ↥K → F} (hχ : weightSpace ρ K χ ≠ ⊥) : χ 1 = 1 := by
+  have h := weightChar_mul ρ hχ 1 1
+  rw [mul_one] at h
+  exact (mul_left_cancel₀ (weightChar_ne_zero ρ hχ 1) (by rw [mul_one, ← h])).symm
+
+/-- A nonzero weight space gives `χ a⁻¹ = (χ a)⁻¹`. -/
+theorem weightChar_inv {χ : ↥K → F} (hχ : weightSpace ρ K χ ≠ ⊥) (a : ↥K) :
+    χ a⁻¹ = (χ a)⁻¹ := by
+  have h : χ a * χ a⁻¹ = 1 := by rw [← weightChar_mul ρ hχ, mul_inv_cancel, weightChar_one ρ hχ]
+  exact (inv_eq_of_mul_eq_one_right h).symm
+
+/-- **Freeness (L4).** If conjugation by `c⁻¹` is fixed-point-free on the abelian normal kernel `K`
+(equivalently `C_K(c) = 1`), then a `conjChar c`-fixed character with nonzero weight space is
+trivial.  The Frobenius hypothesis on the complement supplies the fixed-point-freeness. -/
+theorem weightChar_eq_one_of_conjChar_fixed [Finite G] [K.Normal]
+    {c : G} (hFPF : MonoidHom.FixedPointFree (conjNormalMulAut K c⁻¹))
+    {χ : ↥K → F} (hχ : weightSpace ρ K χ ≠ ⊥) (heq : conjChar K c χ = χ) :
+    χ = fun _ => 1 := by
+  funext j
+  obtain ⟨k, hk⟩ := hFPF.commutatorMap_surjective j
+  rw [MonoidHom.commutatorMap_apply] at hk
+  have hfix : χ (conjNormalMulAut K c⁻¹ k) = χ k := congrFun heq k
+  calc χ j = χ (k / conjNormalMulAut K c⁻¹ k) := by rw [hk]
+    _ = χ k * (χ (conjNormalMulAut K c⁻¹ k))⁻¹ := by
+        rw [div_eq_mul_inv, weightChar_mul ρ hχ, weightChar_inv ρ hχ]
+    _ = χ k * (χ k)⁻¹ := by rw [hfix]
+    _ = 1 := mul_inv_cancel₀ (weightChar_ne_zero ρ hχ k)
+
+end WeightFreeness
+
 end OddOrder.BG.Ch1.S03
