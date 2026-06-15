@@ -57,6 +57,56 @@ theorem le_of_card_coprime_index {C : Type*} [Group C]
     Subgroup.card_subgroup_dvd_card (K.map (QuotientGroup.mk' N))
   exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
 
+/-- **The `H`-field of an `S04.Hypothesis` is determined by `(G, A, L)`.**  Two Dade hypotheses on the
+same data agree on every `H(a)`: each is the normal complement of `C_L(a)` in `C_G(a)`
+(`centralizer_eq_sup`/`centralizer_disjoint`/`H_normalized`), of order coprime to `|C_L(a)|`
+(`centralizer_coprime`).  Working inside `↥C_G(a)`, `[C_G(a) : H(a)] = |C_L(a)|`
+(`card_centralizer_eq` + `card_mul_index`), so `le_of_card_coprime_index` gives each `H(a) ≤` the
+other, hence equality.  This is the uniqueness behind the (6.8.2.3) map-agreement: since `H` is the
+only *data* field of `S04.Hypothesis`, it makes the enlarged datum `h46.dade0` restrict to the base
+`hyp.dade` on `H^#`-supported functions (Dade map being `H`-determined). -/
+theorem dade_H_eq {A : Set G} (hyp₁ hyp₂ : OddOrder.Peterfalvi.S04.Hypothesis G A L)
+    (a : {x : G // x ∈ A}) : hyp₁.H a = hyp₂.H a := by
+  suffices h : ∀ p q : OddOrder.Peterfalvi.S04.Hypothesis G A L, p.H a ≤ q.H a from
+    le_antisymm (h hyp₁ hyp₂) (h hyp₂ hyp₁)
+  intro p q
+  have hqC : q.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [q.centralizer_eq_sup a]; exact le_sup_left
+  have hpC : p.H a ≤ Subgroup.centralizer ({a.1} : Set G) := by
+    rw [p.centralizer_eq_sup a]; exact le_sup_left
+  -- `(q.H a).subgroupOf C` is normal in `↥C` (C normalizes `q.H a`, by `H_normalized`).
+  have hCnorm : Subgroup.centralizer ({a.1} : Set G) ≤ Subgroup.normalizer (q.H a) := by
+    intro c hc
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    refine ⟨fun hn => q.H_normalized a c hc n hn, fun hn => ?_⟩
+    have hmem := q.H_normalized a c⁻¹ (Subgroup.inv_mem _ hc) _ hn
+    have heq : c⁻¹ * (c * n * c⁻¹) * (c⁻¹)⁻¹ = n := by group
+    rwa [heq] at hmem
+  haveI : ((q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G))).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hqC).mpr hCnorm
+  -- `|C| = |q.H a| · |C_L(a)|`.
+  have hcard : Nat.card (Subgroup.centralizer ({a.1} : Set G))
+      = Nat.card (q.H a) * Nat.card (OddOrder.Peterfalvi.S04.centralizerIn L a.1) :=
+    q.card_centralizer_eq a
+  -- `[↥C : (q.H a).subgroupOf C] = |C_L(a)|`.
+  have hidx : ((q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G))).index
+      = Nat.card (OddOrder.Peterfalvi.S04.centralizerIn L a.1) := by
+    have hmi := Subgroup.card_mul_index ((q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G)))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hqC).toEquiv, hcard] at hmi
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmi
+  -- `le_of_card_coprime_index` inside `↥C`, then transport back to `G`.
+  have hle : (p.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G))
+      ≤ (q.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G)) := by
+    apply le_of_card_coprime_index
+    rw [hidx, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hpC).toEquiv]
+    exact p.centralizer_coprime a a
+  intro x hx
+  have h1 : (⟨x, hpC hx⟩ : ↥(Subgroup.centralizer ({a.1} : Set G)))
+      ∈ (p.H a).subgroupOf (Subgroup.centralizer ({a.1} : Set G)) :=
+    Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hle h1)
+
 /-- The `tau1` field of a (5.4) decomposition is unchanged when its `χ`-index is transported along
 an equality `χ = χ'` (the field type `IntegralCharacterMap ↥L G` does not mention `χ`).  Used to
 read off `tau1 = hyp.tau` through the column-branch index cast of the per-constituent dispatch. -/
