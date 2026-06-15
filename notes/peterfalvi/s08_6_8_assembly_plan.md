@@ -2838,3 +2838,27 @@ per-χ 公式は per-φ aggregate pinning から: φ∈Irr(W₂),φ≠1 に `I_�
 4. **capstone** (`sibleySetup_is_coherent` X-nonempty, S08_CoherenceTheorems:59)。
 **realistic scope: 大 (dispatch capstone 級 + 2 段 glue)、多ターン。foundation は landed。次=dispatch family (rw [hHK] transport)。**
 **正本=本 session 41 cont.⁷ 続⁵。per-φ foundation 完成 (7 bricks)。組立=HYBRID (chain-adjoin X_irr + union columns, cX 不要)。次=dispatch family。**
+
+## 2026-06-15 (session 42, lane-b 再開, Opus): (6.8.2.3) per-φ anchored 公式 end-to-end landed (新 leaf, 6 commits)
+
+**新 leaf = `OddOrder/Peterfalvi/S08_CaseBAssembly.lean`** (S08_CaseBCoherence2 が 2157 行で 1500 上限超過 → active assembly を新 leaf へ。root import 追加、AxiomsCheck は frontier leaf 不要)。S08_CaseBCoherence2 は hub 分割対象 (issue 化推奨)。
+
+### ✅ landed (全 axiom-clean [propext, Classical.choice, Quot.sound], full build 3626 jobs):
+| commit | 結果 | 役割 |
+|---|---|---|
+| `9a87548c` | **`caseB_constituentDecomposition`** | per-θ dispatch: θ:Irr H に対し `Ind^L_H θ` の (5.4) 分解を column/irreducible 分岐。**dispatch 条件は値レベル `∃ χ₂≠1, columnSum h46 χ₂ = Ind^L_H θ`** (CF L 上等式 → ↥h46.K vs ↥H 型不一致を回避)。column→`columnDecompositionTau` (heq ▸ cast)、irr→`irreducibleDecompositionTau`。per-θ 仮説は conditional bundle hcol/hirr (parametrized)。witness は `.choose` (Type 値ゴール ⟹ Prop ∃ の large-elim 不可) |
+| `d8631d8b` | **`caseB_constituentDecomposition_tau1`** + projection refactor | `(dispatch).tau1 = hyp.tau`。bundle を `.1/.2.…` 射影で消費 (obtain=And.casesOn は field 還元を阻む)、column index は `heq ▸` (rw=Eq.mpr 不可)。`charPsiDecomp_eqRec_tau1` (cast 越しの tau1 不変) |
+| `a9a3a7bf` | **per_phi_anchored_image cY 一般化** (S08_CaseBCoherence2 内) + **`sum_constituentWeight_sq_subtype`** | (1) Y-anchor を hyp.coherentYset から任意 cY へ (exists_decomposition_caseB は \|Y\|=2 edge で swapped cY を返す ⟹ 必須)。(2) hsq: `∑_θ aθ²=\|H:W₂\|` over subtype |
+| `ae49ef08` | **`caseB_hagg`** | (6.8.2.2)→(6.8.2.3) aggregate `Xagg − \|H:W₂\|·Y₀ = ∑ aθ·((D θ).X−(D θ).Y)`。aggregate_eq_sum_of_constituent + sum_smul_constituent_diff_pos_weight_subtype。**hmemimg は仮説側 rw (`rw [htau1] at h`); hconstit は `.trans` (rw=motive エラー回避); ℂ-anchor↔ℕ-anchor は Nat.cast_smul_eq_nsmul** |
+| `38a21b44` | **`caseB_per_phi_anchored`** | **(6.8.2.3) anchored image 本体**: `(Ind^L_H θ − aθ·η₁)^{hyp.tau} = (D θ).X − aθ·cY.ext η₁`。per_phi_anchored_image の thin wiring (hagg/hsq 内部組立)。**family D は抽象** (tau1=hyp.tau な任意 family) ⟹ dispatch 構築と分離 |
+
+### 🎯 (6.8.2.3) route-independent core = landed (skeleton)。残 = per-θ discharge のみ:
+`caseB_per_phi_anchored` が要求する未充足入力 (= 次セッションの genuine §5/§6 math):
+1. **family D 構築**: `caseB_constituentDecomposition` を subtype 上で。per-θ bundle **hcol** (column: hdeg/hmapagree/hSdiff/htau1_mema/hχψ/hχbarψ for χ₂) + **hirr** (irreducible: hirr'/hreal/hdiffsupp/hdiffasupp/htau1_mema/hχaχ1/hχbaraχ1/hχχbar' for Ind^L_H θ) の discharge。column=certain-type (4.9) 構造; irr=case-A Dade chain ミラー (`retarget_isCoherent_fromDade_X`/`DadeChainStep` の field 群)。
+2. **hXorth**: `∀ θ, ⟨(D θ).X, cY.ext η₁⟩=0` (seam-1: mixed-inner toolkit cont.⁶ — column=`inner_certainTypeExtension_columnSum_coherent_extension_eq_zero`, irr=`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`)。dispatch 越しゆえ tau1 同様 per-branch 証明。
+3. **hbi**: `∀ θ, ⟨(D θ).Y, cY.ext η₁⟩ = bθ ∈ ℤ` (ZIrr inner = ℤ; `inner_mem_ZIrr_int`)。
+
+### ▶▶ HYBRID 組立 (cont.⁷ 訂正のまま、anchored 公式が diagonal data):
+anchored 公式 landed ⟹ cont.⁷ 続⁵ の組立計画 (chain-adjoin X_irr to cY + union with cX_col) の diagonal/hgen 入力が供給可能に。残 = (1) per-θ discharge → 具体 D、(2) X_irr chain-adjoin (`retarget_isCoherent_of_supportedDecomposition`)、(3) cX_col union、(4) capstone (`sibleySetup_is_coherent` X-nonempty branch)。
+
+**正本=本 session 42。(6.8.2.3) core landed (abstract D skeleton)。次=per-θ discharge (hcol/hirr → D 具体化, hXorth/hbi)。Opus 継続。**
