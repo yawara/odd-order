@@ -671,8 +671,50 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hEprime hsetup.E₃_le hreg
     · -- (b1) `N_M(X) = K × K^*`.  BG: "clear" from Cor 13.11; needs Lemma 13.13/13.6 wiring.
       sorry
-    · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`.  Needs Theorem 10.1(a).
-      sorry
+    · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`: a rank-one `X ≤ K^* ∩ M^g` has `C_G(X) ⊆ M` by (c),
+      -- and `X ≤ M^g` with Theorem 10.1(e) forces `g ∈ M`.
+      intro g hgM
+      by_contra hne
+      obtain ⟨q, hq, hqdvd⟩ :=
+        (Nat.card ↥(Kstar ⊓ (MulAut.conj g • M))).exists_prime_and_dvd
+          (fun hc => hne (Subgroup.card_eq_one.mp hc))
+      haveI : Fact q.Prime := ⟨hq⟩
+      obtain ⟨w, hw⟩ := exists_prime_orderOf_dvd_card' q hqdvd
+      have hXcard : Nat.card ↥(Subgroup.zpowers (w : G)) = q := by
+        rw [Nat.card_zpowers]
+        exact (orderOf_injective _ (Kstar ⊓ (MulAut.conj g • M)).subtype_injective w).trans hw
+      have hXelem : Subgroup.zpowers (w : G) ∈ elemAbelianOfRank G q 1 :=
+        ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+      have hXle : Subgroup.zpowers (w : G) ≤ Kstar ⊓ (MulAut.conj g • M) :=
+        Subgroup.zpowers_le.mpr w.2
+      have hKstarE : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) := by
+        rw [hKstar, hKEeq]
+      have hXK : Subgroup.zpowers (w : G) ≤
+          OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E : Set G) :=
+        hKstarE ▸ (hXle.trans inf_le_left)
+      -- (c): `C_G(X) ⊆ M`.
+      have h𝓜 := maximalContaining_centralizer_of_le_Msigma_centralizer_E hG hsetup hE1ne hXelem hXK
+      have hCM : Subgroup.centralizer ((Subgroup.zpowers (w : G)) : Set G) ≤ M :=
+        (mem_maximalSubgroupsContaining.mp (by rw [h𝓜]; exact Set.mem_singleton M)).2
+      -- `X ≤ M_σ ≤ M`, `q ∈ σ(M)`, `X` a `q`-group.
+      have hXMσ : Subgroup.zpowers (w : G) ≤ OddOrder.BG.Ch3.S10.Msigma M := hXK.trans inf_le_left
+      have hXM : Subgroup.zpowers (w : G) ≤ M := hXMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+      have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+        OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr
+          ⟨hq, hXcard ▸ Subgroup.card_dvd_of_le hXMσ, Nat.card_pos.ne'⟩)
+      have hXbot : Subgroup.zpowers (w : G) ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hXelem
+      have hXp : IsPGroup q ↥(Subgroup.zpowers (w : G)) := hXelem.1.isPGroup
+      -- `X ≤ M^g` gives `conj g⁻¹ • X ≤ M`; Theorem 10.1(e) yields `g⁻¹ ∈ M`.
+      have hXgM : Subgroup.zpowers (w : G) ≤ MulAut.conj g • M := hXle.trans inf_le_right
+      have hconj : MulAut.conj g⁻¹ • Subgroup.zpowers (w : G) ≤ M := by
+        have h1 : MulAut.conj g⁻¹ • Subgroup.zpowers (w : G) ≤
+            MulAut.conj g⁻¹ • (MulAut.conj g • M) :=
+          (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj g⁻¹)).mpr hXgM
+        rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h1
+      have hg' : g⁻¹ ∈ M :=
+        (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hqσ hXbot hXp).2.2.2.2
+          hXM hCM g⁻¹ hconj
+      exact hgM (by simpa using M.inv_mem hg')
     · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  Needs Thm 3.10 / Lem 12.19 / 12.17.
       sorry
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
