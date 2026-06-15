@@ -146,6 +146,91 @@ theorem caseB_constituentDecomposition_tau1
   · rw [charPsiDecomp_eqRec_tau1]; rfl
   · rfl
 
+/-- **(6.8.2.3) the mixed per-`φ` decomposition family.**  Over the positive-weight subtype
+`{θ : Irr H // 0 < aθ}` (`aθ = ⟨φ, Res^H_{W₂} θ⟩`), each constituent `Ind^L_H θ` of `Ind^L_{W₂} φ`
+is decomposed against `hyp.tau` by the per-`θ` dispatch `caseB_constituentDecomposition` (column /
+irreducible).  This is the family `D` fed to `caseB_per_phi_anchored`; its `tau1 = hyp.tau` is
+`caseB_constituentDecomposition_tau1`.  The per-`θ` column/irreducible bundles `hcol`/`hirr` are the
+genuine §5/§6 discharge (supplied at the capstone). -/
+noncomputable def caseB_phi_family
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H)
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ}
+    (hcol : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        = ClassFunction.induce H (i.val : ClassFunction ↥H ℂ) →
+      (∑ k, ((h46.columnFamily χ₂).mu k : ClassFunction ↥L ℂ) 1
+          = ∑ k, ((h46.columnFamily χ₂⁻¹).mu k : ClassFunction ↥L ℂ) 1)
+      ∧ (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj)
+          = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
+            (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+              - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj))
+      ∧ (∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+            - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj,
+            OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - constituentWeight hφ' i.val • η₁}
+            : Set (ClassFunction ↥L ℂ)),
+          s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+      ∧ (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          - constituentWeight hφ' i.val • η₁) ∈ ZIrr G)
+      ∧ (ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+          (constituentWeight hφ' i.val • η₁ : ClassFunction ↥L ℂ) = 0)
+      ∧ (ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj
+          (constituentWeight hφ' i.val • η₁ : ClassFunction ↥L ℂ) = 0))
+    (hirr : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+          ≠ ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) →
+      IsIrreducibleCharacter (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ))
+      ∧ (¬ ClassFunction.IsReal (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)))
+      ∧ (((ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj
+            - ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+      ∧ ((ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
+          - constituentWeight hφ' i.val • η₁).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+      ∧ (hyp.tau (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
+          - constituentWeight hφ' i.val • η₁) ∈ ZIrr G)
+      ∧ (ClassFunction.inner (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ))
+          (constituentWeight hφ' i.val • η₁ : ClassFunction ↥L ℂ) = 0)
+      ∧ (ClassFunction.inner (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj
+          (constituentWeight hφ' i.val • η₁ : ClassFunction ↥L ℂ) = 0)
+      ∧ (ClassFunction.inner (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ))
+          (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)).conj = 0)) :
+    (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) →
+      OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+        (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) (constituentWeight hφ' i.val • η₁) :=
+  fun i => caseB_constituentDecomposition hyp h46 i.val (hcol i) (hirr i)
+
+/-- The mixed per-`φ` family lands in `tau1 = hyp.tau` at every constituent — the `htau1` input of
+`caseB_per_phi_anchored`. -/
+theorem caseB_phi_family_tau1
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H)
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ} {hcol _hirr}
+    (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) :
+    (caseB_phi_family hyp h46 hW2H hφ' (η₁ := η₁) hcol _hirr i).tau1 = hyp.tau :=
+  caseB_constituentDecomposition_tau1 hyp h46 i.val
+
 /-- **(6.8.2.3) `hsq` over the positive-weight subtype.**  The Clifford square-sum
 `∑_θ ⟨φ, Res^H_{W₂} θ⟩² = |H : W₂|` (`sum_inner_restrict_sq_eq_index`, `W₂` central in `H`),
 reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constituents drop) and cast to
