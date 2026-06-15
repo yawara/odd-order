@@ -478,6 +478,23 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **General helper (§14-independent, reusable).**  A nonidentity maximal subgroup of a minimal
+simple group is self-normalizing: `N_G(M) = M`.  If `M ⊊ N_G(M)`, maximality forces `N_G(M) = G`,
+so `M ⊴ G`; simplicity then gives `M = ⊥` or `M = ⊤`, both excluded.  This is the step of BG
+Corollary 15.3(b) that turns `M^{gc} = M` into `gc ∈ M`. -/
+theorem normalizer_eq_self_of_mem_maximalSubgroups [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hMne : M ≠ ⊥) :
+    Subgroup.normalizer M = M := by
+  refine le_antisymm ?_ Subgroup.le_normalizer
+  rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
+  · exact le_of_eq heq.symm
+  · have hnorm : M.Normal := Subgroup.normalizer_eq_top_iff.mp
+      ((mem_maximalSubgroups.mp hM).2 _ hlt)
+    rcases hG.simple.eq_bot_or_eq_top_of_normal M hnorm with hbot | htop
+    · exact absurd hbot hMne
+    · exact absurd htop (mem_maximalSubgroups.mp hM).1
+
 /-- **General helper (§14-independent, reusable).**  A subgroup `K` of a finite group that
 contains a full Sylow `p`-subgroup for every prime `p` is the whole group.  (No nilpotency:
 each Sylow's order is the `p`-part of `|G|`, so `K.index` is divisible by no prime and equals `1`.)
