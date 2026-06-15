@@ -414,3 +414,19 @@ K (Hall κ=τ₁ of M) と E₁ (Hall τ₁ of E) は M 内共役 (K=E₁^m, m�
 **▶ 次 fragment 順**: (3) E₂=⊥ helper → (2) π(E)⊆κ (helper, step1 helper を消費) → (4) E Hall κ →
 (5) K=E。各 build-green の verified step。K=E 後は 5 conjuncts を Cor 13.11 出力 + K=E で組立
 (conjunct1=hEprime+K=E, conjunct2=step1 helper, 他は §13 cite)。**landing 済 = step1 helper のみ; 残 5 step**。
+
+### ✅✅ K=E (case-τ₃) COMPLETE + conjunct (a)/(K*≠1) landing (2026-06-15 loop, K=E milestone)
+**case-τ₃ の linchpin `K=E` を verified** (commit 後述)。**E₂=⊥ の明示導出は不要だった** — 当初プランの
+step4「E Hall κ」は **既存 `IsHallSubgroup.card_dvd_of_isPiGroup`(Isaacs Ch03 Main:1582) で card 経路に短絡**:
+- step2 `mem_kappa_of_mem_primeFactors_card_E` で `π(E)⊆κ(M)` ⟹ `E.subgroupOf M` は `Ch03.Subgroup.IsPiGroup (kappa M)`。
+- `hK.card_dvd_of_isPiGroup hEpi` : `|E.subgroupOf M| ∣ |K.subgroupOf M|` ⟹ (card_congr で) `|E| ∣ |K|`。
+- `K≤E` (setup hKE) ⟹ `|K| ∣ |E|` ⟹ `Nat.dvd_antisymm` で `|E|=|K|` ⟹ `Subgroup.eq_of_le_of_card_ge hKE` で **K=E**。
+- ⟹ **正規性不要・Hall 共役不要・E₂=⊥ 明示不要**。witness x は hreg から by_contra/push_neg で抽出。
+- **conjunct (a)** ActsPrimeOn K = `rw[K=E]; exact hEprime`。**conjunct K*≠1** = `rw[hKstar,K=E]` + step1 helper。
+- **残 = conjunct (b1)/(d)/(g) + case-τ₁** (各 scoped sorry, BG lemma 明記):
+  - (b1) `N_M(X)=K⊔Kstar` (∀X∈ℰ¹(K)): BG「clear」だが Lemma 13.13/13.6 wiring 要。
+  - (d) `Kstar∩M^g=⊥` (g∉M): Theorem 10.1(a)。
+  - (g) TypeP2 ⟹ σ=β/|K|素数/M_σ nilpotent TI: Thm 3.10(a)/Lem 12.19/12.17。
+  - case-τ₁: κ=τ₁, WLOG K=E₁ (F の issue-7000 ∃→∀ upgrade leaf 着地後に cite), Lem 13.12/13.7, Cor 12.10(b)。
+- **hub LAUNCH (2026-06-15) と整合**: 「Prop 14.2 = 既存 machinery の assembly」を実証。F の issue-7000 leaf は
+  case-τ₁ の WLOG 用 (case-τ₃ は本ループで自己完結)。

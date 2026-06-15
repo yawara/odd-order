@@ -621,7 +621,35 @@ theorem typeP_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have hp : p.Prime := Nat.prime_of_mem_primeFactors ((mem_tau3_iff M p).mp hpτ3).2.1
     obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
     obtain ⟨hE1ne, hEeq, hEprime, hEnorm⟩ := E3_not_regular_consequences hG hsetup hE3ne hreg
-    sorry
+    -- Extract an `E₃`-witness `x` with `C_{M_σ}(x) ≠ 1` from non-regularity.
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon
+      push_neg at hcon
+      exact hreg fun y hy hy1 => hcon y hy hy1
+    -- `π(E) ⊆ κ(M)`, so `E` is a `κ(M)`-subgroup; the Hall `κ(M)`-subgroup `K ≤ E` forces `K = E`.
+    have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
+      intro q hq
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv] at hq
+      exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq
+    have hEdvdK : Nat.card ↥E ∣ Nat.card ↥K := by
+      have hd := hK.card_dvd_of_isPiGroup hEpi
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hd
+    have hKEeq : K = E :=
+      Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
+    refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    · -- (a) prime action: immediate from `K = E` and Corollary 13.11.
+      rw [hKEeq]; exact hEprime
+    · -- `K^* = C_{M_σ}(K) = C_{M_σ}(E) ≠ 1` (prime action + the non-regular witness).
+      rw [hKstar, hKEeq]
+      exact Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hEprime hsetup.E₃_le hreg
+    · -- (b1) `N_M(X) = K × K^*`.  BG: "clear" from Cor 13.11; needs Lemma 13.13/13.6 wiring.
+      sorry
+    · -- (d) `K^* ∩ M^g = 1` for `g ∉ M`.  Needs Theorem 10.1(a).
+      sorry
+    · -- (g) type-`P₂` ⟹ `σ = β`, `|K|` prime, `M_σ` nilpotent TI.  Needs Thm 3.10 / Lem 12.19 / 12.17.
+      sorry
   · -- Case `κ(M) ⊆ τ₁(M)`: `K = E₁` (WLOG), `E₁` prime on `M_σ` (Theorem 13.5); `U = E₂E₃`.
     sorry
 
