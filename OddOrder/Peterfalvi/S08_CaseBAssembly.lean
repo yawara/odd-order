@@ -146,4 +146,38 @@ theorem caseB_constituentDecomposition_tau1
   · rw [charPsiDecomp_eqRec_tau1]; rfl
   · rfl
 
+/-- **(6.8.2.3) `hsq` over the positive-weight subtype.**  The Clifford square-sum
+`∑_θ ⟨φ, Res^H_{W₂} θ⟩² = |H : W₂|` (`sum_inner_restrict_sq_eq_index`, `W₂` central in `H`),
+reindexed to the positive-weight subtype `{θ // 0 < aθ}` (zero-weight constituents drop) and cast to
+`ℤ`.  This is the `hsq` input of `per_phi_anchored_image` (the `n = |H : W₂|` of the (6.8.2.2)
+aggregate). -/
+theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
+    [Invertible (Nat.card M : ℂ)] {K H : Subgroup M} (hKH : K ≤ H)
+    [Fintype ↥H] [Fintype ↥(K.subgroupOf H)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
+    (hcen : K.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥K ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom φ)) :
+    ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+        ((constituentWeight hφ' i.val : ℤ)) ^ 2 = ((K.subgroupOf H).index : ℤ) := by
+  classical
+  -- the full square-sum over `Irr H`, in `ℤ`-form
+  have hfull : (∑ θ : IrreducibleCharacter ↥H, ((constituentWeight hφ' θ : ℤ)) ^ 2)
+      = ((K.subgroupOf H).index : ℤ) := by
+    have key := sum_inner_restrict_sq_eq_index (M := ↥H) (N := K.subgroupOf H) hcen hφ'
+    simp only [constituentWeight_spec hφ'] at key
+    have hcast : ((∑ θ : IrreducibleCharacter ↥H, ((constituentWeight hφ' θ : ℤ)) ^ 2 : ℤ) : ℂ)
+        = (((K.subgroupOf H).index : ℤ) : ℂ) := by
+      push_cast
+      simp only [pow_two]
+      exact key
+    exact_mod_cast hcast
+  refine Eq.trans ?_ hfull
+  exact (sum_eq_sum_pos_weight_subtype (constituentWeight hφ')
+    (fun θ => ((constituentWeight hφ' θ : ℤ)) ^ 2)
+    (fun θ hθ => by
+      change (constituentWeight hφ' θ : ℤ) ^ 2 = 0
+      rw [hθ]; norm_num)).symm
+
 end OddOrder.Peterfalvi.S08

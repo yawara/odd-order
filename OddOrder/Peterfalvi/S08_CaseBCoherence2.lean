@@ -1896,35 +1896,42 @@ per constituent — built by dispatching `columnDecompositionTau` / `irreducible
 (`hagg`/`hsq`/`hXaggorth`), and the per-step `R(χᵢ) ⊥ Y₀` / coefficient data (`hXorth`/`hbi`), the
 pinning `per_constituent_Y_eq_smul` forces `(D i).Y = aᵢ·Y₀`, and the decomposition image equation
 `(D i).tau1_image` then gives the **(6.8.2.3) anchored image**
-`(χᵢ − aᵢ·η₁)^{hyp.tau} = (D i).X − aᵢ·Y₀` (`Y₀ = coherentYset.extension η₁`).
+`(χᵢ − aᵢ·η₁)^{hyp.tau} = (D i).X − aᵢ·Y₀` (`Y₀ = cY.extension η₁`).
+
+The `Y`-coherence `cY` is arbitrary (not fixed to `hyp.coherentYset`): the case-(B) aggregate
+`exists_decomposition_caseB` threads the witness `cY` of `exists_Ycoherence_hgood_caseB`, which is
+`hyp.coherentYset` in the main branch but a *swapped* witness in the `|Y| = 2` edge.  All facts used
+(`extension_inner_eq`, the norm-`1` anchor) hold for any coherence on `hyp.Yset`.
 
 This is the route-independent (6.8.2.3) core, parametric in the family `D`; only the family
 construction (the constituent dispatch + per-`θ` hypothesis discharge) remains for the capstone. -/
 theorem per_phi_anchored_image
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     {ι : Type*} (s : Finset ι) {χ : ι → ClassFunction ↥L ℂ} {a : ι → ℕ}
     (D : (i : ι) → OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau (χ i) (a i • η₁))
     (htau1 : ∀ i, (D i).tau1 = hyp.tau)
     {Xagg : ClassFunction G ℂ} {b : ι → ℤ} {n : ℤ}
-    (hXaggorth : ClassFunction.inner Xagg (hyp.coherentYset.extension η₁) = 0)
-    (hagg : Xagg - (n : ℂ) • hyp.coherentYset.extension η₁
+    (hXaggorth : ClassFunction.inner Xagg (cY.extension η₁) = 0)
+    (hagg : Xagg - (n : ℂ) • cY.extension η₁
       = ∑ i ∈ s, ((a i : ℤ) : ℂ) • ((D i).X - (D i).Y))
     (hsq : ∑ i ∈ s, ((a i : ℤ)) ^ 2 = n)
-    (hXorth : ∀ i ∈ s, ClassFunction.inner (D i).X (hyp.coherentYset.extension η₁) = 0)
+    (hXorth : ∀ i ∈ s, ClassFunction.inner (D i).X (cY.extension η₁) = 0)
     (hbi : ∀ i ∈ s,
-      ClassFunction.inner (D i).Y (hyp.coherentYset.extension η₁) = (b i : ℂ))
+      ClassFunction.inner (D i).Y (cY.extension η₁) = (b i : ℂ))
     (i : ι) (hi : i ∈ s) (hpos : 0 < a i) :
     hyp.tau (χ i - a i • η₁)
-      = (D i).X - (a i : ℂ) • hyp.coherentYset.extension η₁ := by
+      = (D i).X - (a i : ℂ) • cY.extension η₁ := by
   have hηirr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
   have hηnorm : ClassFunction.inner η₁ η₁ = 1 := by
     have h := irreducibleCharacter_inner_eq_ite
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L) (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
     rwa [if_pos rfl] at h
-  have hYY : ClassFunction.inner (hyp.coherentYset.extension η₁)
-      (hyp.coherentYset.extension η₁) = 1 := by
-    rw [hyp.coherentYset.extension_inner_eq η₁ η₁
+  have hYY : ClassFunction.inner (cY.extension η₁)
+      (cY.extension η₁) = 1 := by
+    rw [cY.extension_inner_eq η₁ η₁
       (Submodule.subset_span hη₁) (Submodule.subset_span hη₁)]
     exact hηnorm
   have hY := per_constituent_Y_eq_smul s D hηnorm hYY hXaggorth hagg hsq hXorth hbi i hi hpos
