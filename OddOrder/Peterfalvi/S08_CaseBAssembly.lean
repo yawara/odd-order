@@ -180,4 +180,48 @@ theorem sum_constituentWeight_sq_subtype {M : Type*} [Group M] [Fintype M]
       change (constituentWeight hφ' θ : ℤ) ^ 2 = 0
       rw [hθ]; norm_num)).symm
 
+/-- **(6.8.2.2)→(6.8.2.3) aggregate `hagg` for the mixed per-`φ` family.**  The (6.8.2.2)
+decomposition `τ(Ind^L_{W₂} φ − |H:W₂|·η₁) = Xagg − |H:W₂|·Y₀` (`hdecomp`, from
+`exists_decomposition_caseB`), combined with the constituent sum
+`Ind^L_{W₂} φ − |H:W₂|·η₁ = ∑_θ aθ·(Ind^L_H θ − aθ·η₁)`
+(`sum_smul_constituent_diff_pos_weight_subtype`) and the per-constituent images
+`τ(Ind^L_H θ − aθ·η₁) = (D θ).X − (D θ).Y` (`(D θ).tau1_image`, `tau1 = hyp.tau` via `htau1`), gives
+the `hagg` input of `per_phi_anchored_image`:
+`Xagg − |H:W₂|·Y₀ = ∑_θ aθ·((D θ).X − (D θ).Y)`.  The source aggregate's `ℂ`-scalar `(aθ : ℂ)·η₁`
+is reconciled with the family's `ℕ`-anchor `aθ • η₁` by `Nat.cast_smul_eq_nsmul`. -/
+theorem caseB_hagg
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥W2] [Invertible (Nat.card ↥W2 : ℂ)]
+    [Fintype ↥(W2.subgroupOf H)] [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ}
+    (D : (i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ}) →
+      OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+        (ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)) (constituentWeight hφ' i.val • η₁))
+    (htau1 : ∀ i, (D i).tau1 = hyp.tau)
+    {Xagg Y₀ : ClassFunction G ℂ}
+    (hdecomp : hyp.tau (ClassFunction.induce W2 φ - ((W2.subgroupOf H).index : ℂ) • η₁)
+      = Xagg - ((W2.subgroupOf H).index : ℂ) • Y₀) :
+    Xagg - (((W2.subgroupOf H).index : ℤ) : ℂ) • Y₀
+      = ∑ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+          ((constituentWeight hφ' i.val : ℤ) : ℂ) • ((D i).X - (D i).Y) := by
+  have hagg := aggregate_eq_sum_of_constituent (L := L) Finset.univ hyp.tau
+    (fun i => ClassFunction.induce H (i.val : ClassFunction ↥H ℂ)
+      - constituentWeight hφ' i.val • η₁)
+    (fun i => (D i).X) (fun i => (D i).Y) (fun i => (constituentWeight hφ' i.val : ℤ))
+    (β := ClassFunction.induce W2 φ - ((W2.subgroupOf H).index : ℂ) • η₁)
+    (n := ((W2.subgroupOf H).index : ℤ))
+    -- `hmemimg`: each constituent image is `(D i).tau1_image`, with `tau1 = hyp.tau`.
+    (fun i _ => by have h := (D i).tau1_image; rw [htau1 i] at h; exact h)
+    -- `hconstit`: the source aggregate, with the `ℂ`-anchor reconciled to the `ℕ`-anchor.
+    ((sum_smul_constituent_diff_pos_weight_subtype hW2H hcen φ hφ' η₁).trans
+      (Finset.sum_congr rfl fun i _ => by
+        simp only [Int.cast_natCast, Nat.cast_smul_eq_nsmul]))
+    -- `hdecomp`: the (6.8.2.2) decomposition (`n = |H:W₂|`), bridging the `ℕ`/`ℤ` index cast.
+    (by exact_mod_cast hdecomp)
+  exact hagg
+
 end OddOrder.Peterfalvi.S08
