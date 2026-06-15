@@ -845,6 +845,75 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         ¬ IsCyclic ↥(MF M) := by
   sorry
 
+/-- **§14-independent assembly engine for BG Corollary 15.3** (mmd L4204).  Packages the
+*logic* of Corollary 15.3 with its `§14`/`§15` inputs taken as named hypotheses, so that once
+those land (Lane H), the wrapper `mf_hall_centralizer_control` discharges each by a single
+citation and applies this skeleton (the gated-endpoint pattern, cf.
+`typeP_kstar_in_mf_of_inputs`).  Hypothesis provenance (mmd L4209-4213):
+
+* `ha` (the `C_M(H) = C_{M_σ}(H)·X` decomposition) ← Proposition 14.2(b1)(e) (`C_M(H)` is a
+  `κ(M)'`-group) + Lemma 15.1(c) (the `X` cyclic-`τ₂` extraction);
+* `hconj` (any `G`-conjugacy of `H`-elements is realized inside `M`) ← Theorem 14.4 (find
+  `c ∈ C_G(x)` with `M^{gc} = M`) + self-normalizing `N_G(M) = M`
+  (`normalizer_eq_self_of_mem_maximalSubgroups`); the witness is `m = gc`;
+* `hfratt` (the Frattini factorization `M = N_M(H)·Q` when `H ⋬ M`) ← Theorem 15.2's normal
+  `Q = O_q(M)` with `M_σ/Q` nilpotent (so `QH ⊴ M`, `Q ∩ H = 1`) + the Frattini argument.
+
+The nontrivial step is the `H ⋬ M` glue: writing the realizing `m = n·a` (`n ∈ N_M(H)`,
+`a ∈ Q`), the element `w = a x a⁻¹` lies in `H` (it is `n⁻¹ y n`) and `w x⁻¹ ∈ Q` (`Q ⊴ M`,
+`x ∈ M`), so `w x⁻¹ ∈ Q ∩ H = 1`, whence `w = x` and `y = n x n⁻¹`. -/
+theorem mf_hall_centralizer_control_of_inputs [Finite G]
+    {M H : Subgroup G} (hHM : H ≤ M)
+    (ha : ∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X)
+    (hconj : ∀ x ∈ H, ∀ y ∈ H, ∀ g : G, y = g * x * g⁻¹ → ∃ m ∈ M, y = m * x * m⁻¹)
+    (hfratt : ¬ (H.subgroupOf M).Normal → ∃ Q : Subgroup G, Q ≤ M ∧ (Q.subgroupOf M).Normal ∧
+      Disjoint Q H ∧
+      ∀ m ∈ M, ∃ n a : G, n ∈ Subgroup.normalizer (H : Set G) ∧ a ∈ Q ∧ m = n * a) :
+    (∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X) ∧
+    (∀ x ∈ H, ∀ y ∈ H, (∃ g : G, y = g * x * g⁻¹) →
+      ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
+  refine ⟨ha, ?_⟩
+  rintro x hx y hy ⟨g, hg⟩
+  obtain ⟨m, hmM, hmy⟩ := hconj x hx y hy g hg
+  by_cases hHnorm : (H.subgroupOf M).Normal
+  · -- `H ⊴ M`:  `m ∈ M ⊆ N_G(H)`, so `n = m` works directly.
+    exact ⟨m, ((Subgroup.normal_subgroupOf_iff_le_normalizer hHM).mp hHnorm) hmM, hmy⟩
+  · -- `H ⋬ M`:  Frattini-factor `m = n·a` and run the commutator argument.
+    obtain ⟨Q, hQM, hQnorm, hQH, hfact⟩ := hfratt hHnorm
+    obtain ⟨n, a, hnN, haQ, hmna⟩ := hfact m hmM
+    refine ⟨n, hnN, ?_⟩
+    -- `y = n · (a x a⁻¹) · n⁻¹`.
+    have hyw : y = n * (a * x * a⁻¹) * n⁻¹ := by rw [hmy, hmna]; group
+    -- `w := a x a⁻¹ = n⁻¹ y n ∈ H`.
+    have hwH : a * x * a⁻¹ ∈ H := by
+      have hmem := (Subgroup.mem_normalizer_iff.mp
+        ((Subgroup.normalizer (H : Set G)).inv_mem hnN) y).mp hy
+      rw [inv_inv] at hmem
+      have hweq : a * x * a⁻¹ = n⁻¹ * y * n := by rw [hyw]; group
+      rw [hweq]; exact hmem
+    -- `w x⁻¹ = a (x a⁻¹ x⁻¹) ∈ Q`  (`Q ⊴ M`, `x ∈ M`).
+    have hwxQ : (a * x * a⁻¹) * x⁻¹ ∈ Q := by
+      have hxnorm : x ∈ Subgroup.normalizer (Q : Set G) :=
+        ((Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mp hQnorm) (hHM hx)
+      have hxax : x * a⁻¹ * x⁻¹ ∈ Q :=
+        (Subgroup.mem_normalizer_iff.mp hxnorm a⁻¹).mp (Q.inv_mem haQ)
+      have hrw : (a * x * a⁻¹) * x⁻¹ = a * (x * a⁻¹ * x⁻¹) := by group
+      rw [hrw]; exact Subgroup.mul_mem _ haQ hxax
+    -- `w x⁻¹ ∈ Q ∩ H = ⊥`, so `w = x` and `y = n x n⁻¹`.
+    have hwxH : (a * x * a⁻¹) * x⁻¹ ∈ H := Subgroup.mul_mem _ hwH (H.inv_mem hx)
+    have hwx1 : (a * x * a⁻¹) * x⁻¹ = 1 := by
+      have : (a * x * a⁻¹) * x⁻¹ ∈ Q ⊓ H := Subgroup.mem_inf.mpr ⟨hwxQ, hwxH⟩
+      rw [disjoint_iff.mp hQH] at this
+      exact Subgroup.mem_bot.mp this
+    have hwx : a * x * a⁻¹ = x := by
+      have := mul_eq_one_iff_eq_inv.mp hwx1
+      rw [this]; group
+    rw [hyw, hwx]
+
 /-- **BG Corollary 15.3** (mmd L4204): for a nonidentity Hall subgroup `H` of `M_σ`,
 (a) `C_M(H) = C_{M_σ}(H)·X` with `X` a cyclic `τ₂(M)`-subgroup, and (b) any two elements
 of `H` conjugate in `G` are already conjugate in `N_M(H)` (`N_M(H)`-fusion control).
