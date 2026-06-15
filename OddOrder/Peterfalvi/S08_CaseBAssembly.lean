@@ -1938,4 +1938,27 @@ theorem caseB_irr_orthogonal_columnBase
   · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
     exact caseB_inner_irr_conj_columnSum_eq_zero hyp h46 hW1 hirr χ₂
 
+/-- **(6.8.2) `S`-member dichotomy: column or irreducible** — the `S`-level cover lifting the per-`θ`
+`caseB_induce_column_or_irreducible` over `S = {Ind^L_H θ | θ ≠ 1}`.  Every member of the Sibley set
+`S` is either a non-trivial certain-type column `columnSum h46 χ₂` or an irreducible character.
+
+This is the cover used to assemble the case-(B) `X = 𝒳(W₂)`-coherence (`X ⊆ S`): every `X`-member
+splits into the certain-type column part (coherent as a set) or the irreducible part (adjoined as a
+`{χ, χ̄}` pair).  It also feeds the `X ⊥ Y` orthogonality `hpair` of the `X ∪ Y` glue (a column is
+`⊥ Y` by `inner_columnSum_Yset_eq_zero`; an irreducible `X`-member is `⊥ Y` by degree/distinctness). -/
+theorem caseB_S_member_column_or_irreducible
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {x : ClassFunction ↥L ℂ} (hx : x ∈ hyp.S) :
+    (∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x)
+      ∨ IsIrreducibleCharacter x := by
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hx
+  obtain ⟨θ, hθne, rfl⟩ := hx
+  have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
+    hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
+  exact caseB_induce_column_or_irreducible h46 hHK hθne'
+
 end OddOrder.Peterfalvi.S08
