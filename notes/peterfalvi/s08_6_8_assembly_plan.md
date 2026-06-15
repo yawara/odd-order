@@ -2877,3 +2877,8 @@ anchored 公式 landed ⟹ cont.⁷ 続⁵ の組立計画 (chain-adjoin X_irr t
 
 **∴ 次 = (1) `charPsiDecomp_eqRec_imageSet` helper → (2) hXorth per-branch (toolkit cY 適用) → (3) hbi (hXorth + integrality) → (4) caseB_per_phi_anchored を caseB_phi_family で具体化 (abstract D 解消) → (5) per-θ bundle (hcol/hirr) discharge → (6) HYBRID 組立。**
 **正本=本 session 42 cont.。family landed、hXorth/hbi 経路確定。次=hXorth (cast helper + cY-general toolkit)。**
+
+### session 42 cont.²: ⚠ hXorth の partner-anchor 要件 (設計精緻化、未実装)
+hXorth の column seam-1 `⟨cY.ext η₁, ω_ij^σ⟩=0` を精査: toolkit `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` (S08:1246) は **差 `cY.ext η − cY.ext η'` が tic V 上消失** (`coherent_extension_diff_apply_eq_zero_of_mem_ticVdiffV`) を使うため、**distinct partner η' ∈ Yset (η₁≠η', ⟨η₁,η'⟩=0, η₁−η' は H^#-supported) が必須**。⟹ 単一 η₁ では証明不可。
+**含意**: `caseB_per_phi_anchored` の hXorth 入力 (または family の hXorth 証明) に **partner anchor η' (|Yset|≥2)** を追加要。case-B は |Yset|≥2 が成立するはず (Yset = S(H')-filtration、複数 linear chars) — 要確認 (`exists_Yset_linearRepresentativeFamily` の 2≤n、または \|Yset\|≥2 は別途)。**∴ hXorth 実装時は partner η' を threading する設計に。** irr branch の seam-1 (`inner_decompositionDaFromDadeOfDiff_X_extension_member_eq_zero`) は partner 不要か要確認。
+**正本=本 session 42 cont.²。hXorth は partner-anchor 要 (設計追加)。次=cast helper + partner-threading hXorth。**
