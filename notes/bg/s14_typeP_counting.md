@@ -578,3 +578,40 @@ repo machinery の assembly で構成し、Frobenius normalizer 論法で攻略 
   **repo 12.17 = `Msigma_E_relations` は C(E)⊓M_σ≤M_σ'∧[M_σ,E]=M_σ のみ、TI 部分は未形式化**)。
 - ⟹ (g) は §3 (Thm 3.10) + §12 (12.17 TI 拡張) の 2 新規形式化に gated。**§14 単独では解禁不可** ⟹
   hub に報告 + issue 化推奨。case-τ₁ の他 4 conjunct + case-τ₃ 全 5 は完了。
+
+## ✅✅✅ Prop 14.2 COMPLETE — case-τ₁ (g) 着地 (2026-06-15, lane-h)
+
+**`typeP_structure` (Prop 14.2) 全体が sorry-free + axiom-clean** (commit `f031f7bc`;
+`#print axioms = [propext, Classical.choice, Quot.sound]`)。前項末尾「§14 単独では解禁不可」は
+**解消** — Thm 3.10(a) は `S03g_Thm310.prime_card_complement_of_frobenius_conj` で既に repo 在、
+Lem 12.17 TI は新 leaf `S12_Lemma1217.Msigma_inf_conj_isBetaCompl` で形式化 (commit `35b06ac8`)。
+
+### (g) の実装 (3 helper + assembly、すべて S14)
+- **Lem 12.17 β'-clause** (新 leaf `S12_Lemma1217`): g∉M で M_σ∩M^g は β(M)′-group。
+  rank-1 X≤M_σ∩M^g (Cauchy) → Thm 10.1(b) `fusion_control_of_mem_sigma` の transitivity で
+  C_G(X)⊄M → ℳ(C_G(X))≠{M} → Cor 12.14 (`maximalContaining_centralizer_and_someSylow_eq_singleton`)
+  の対偶で p∉β。**配置**: Cor 12.14 が S12_Theorem1213→S12_E を推移 import ⟹ S12_E 不可 (循環)、
+  downstream leaf 化 (12.13/12.14/12.15/12.16 と同パターン)。cyclic + M_σ' trivial 部分 (§15/§16 用) は deferred。
+- **`E23_ne_bot_of_isTypeP2_caseTau1`**: IsTypeP2 ⟹ E₂E₃≠⊥。対偶 = E₂E₃=⊥ ⟹ E=E₁ (eq_sup) ⟹
+  κ=π−σ (case-τ₃ (g) の κ=sigmaComplementPrimes ミラー: ⊇ は mem_kappa_of_…_card_E1) ⟹ M は P₁ で P₂ 矛盾。
+- **`sigma_eq_beta_and_prime_card_E1_of_caseTau1`** (Frobenius core): generic setup パラメトリック。
+  - |K|素数: `isFrobeniusGroup_E_of_caseTau1` + `Msigma_centralizer_E23_eq_bot_of_caseTau1`
+    (C_{Mσ}(U)=⊥ + M_σ nilp) + coprime |E||M_σ| (Hall) + ActsPrimeOn→hcond3 + solvable
+    → `prime_card_complement_of_frobenius_conj` (Thm 3.10(a))。
+  - σ=β: **U≤E'** = `le_commutator_of_coprime_inf_centralizer_eq_bot` (B=E₁,Y=U; coprime は
+    Frobenius `coprime_card_kernel_complement`、FPF は `actsRegularlyOn_E23_E1_of_caseTau1`) → ⁅E₁,U⁆≤⁅E,E⁆=E'
+    → U abelian (E' abelian = Cor 12.10b `.2.1.2`) [これが Thm 3.10(a) の hUab も供給] →
+    Lem 12.19 `derivedE_centralizes_betaComplement` の W (Hall β' of M_σ, E'≤C(W)) で W≤C_{Mσ}(U)=⊥
+    → π(M_σ)⊆β → σ⊆β (σ⊆π(M_σ) は Hall index 論法); β⊆σ は `alpha_subset_sigma∘beta_subset_alpha`。
+  - **🔑 訂正**: 「U abelian = E₂E₃ abelian standalone」は不要 — U≤E' + E' abelian で取得。
+- **`isTISubset_sigmaSharp_of_sigma_eq_beta`** (generic): σ=β。g が M_σ^# の overlap を作るとき、
+  g∈M なら g∈N_G(M_σ) (M≤N(M_σ)); g∉M なら Lem 12.17 β'-clause で M_σ∩conj g•M_σ は β'=σ'-group
+  かつ ≤M_σ (σ-group) ⟹ ⊥、overlap≠1 と矛盾 ⟹ TI。
+- 補助: `msigma_centralizer_eq_bot_of_elemAb_le` / `Msigma_centralizer_E23_eq_bot_of_caseTau1` を
+  M_σ nilpotent も返すよう augment (Lem 14.1 `msigma_structure_of_notMem_sigma_kappa` の第3連言)。
+
+### ⟹ 次 = §14 funnel (Prop 14.2 解禁後)
+- 14.3 `sigma_diagnostic`: Prop 14.2(b)(c) + Cor 12.10(e) + Lem 12.11(a) で書ける。
+- 14.4 → 14.7 `typeP_duality` (§15/§16 が consume する唯一の §14 結果, call sites
+  S15_MF:785/795/1976・S16_MainResults:437) → 14.9/14.10/14.12/14.13。
+- Lem 14.6 (missing-page counting) と 14.7 の counting 不等式 (|𝒞_G(Ẑ)|>½|G|) が hard core。
