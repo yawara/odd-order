@@ -313,7 +313,8 @@ theorem commutator_le_fitting_of_reduced
     rw [commutatorElement_def]
     exact K.mul_mem (‹K.Normal›.conj_mem k hk r) (K.inv_mem hk)
   have hNK : N ≤ K := Subgroup.normalClosure_le_normal hKR_le_K
-  -- `N ≤ F(K)` via Proposition 1.2 reverse: `N` centralizes every chief factor `U/V` with `U ⊆ F(K)`.
+  -- `N ≤ F(K)` via Proposition 1.2 reverse: `N` centralizes every chief factor `U/V` with `U ⊆
+  -- F(K)`.
   have hNF : N ≤ L := by
     refine OddOrder.BG.Ch1.S01.chiefFactorCentralizer_subset_le_fitting_of_isSolvable hNK ?_
     intro U V hVnorm hChief hUF
@@ -443,7 +444,8 @@ theorem fixedPointsOfMulAut_quotientMulAutHom_eq_map
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Converse of step 1** (mmd L1243, the `R₀`-centralizes-`K̄` direction): if `⁅K, R⁆ ⊆ F(K)`
 (`R` centralizes `K̄`), then `R` fixes every element of `K̄ = ↥K / F(K)` (the induced action's
-fixed points are `⊤`).  This is the reverse of `commutator_le_fitting_of_centralizes_fittingQuotient`:
+fixed points are `⊤`).  This is the reverse of
+`commutator_le_fitting_of_centralizes_fittingQuotient`:
 `⁅K, R⁆ = (actionCommutator φ).map K.subtype ⊆ F(K)` forces `actionCommutator φ ⊆ F(K) = ker`, so
 the induced quotient action commutator is `⊥` (`actionCommutator_quotient_eq_map`), i.e. the action
 on `K̄` is trivial (`actionCommutator_eq_bot_iff_acts_trivially`). -/
@@ -611,7 +613,8 @@ theorem fitting_map_mulEquiv_le {A B : Type*} [Group A] [Group B] [Finite A] [Fi
     (OddOrder.Isaacs.Ch01.fitting.normal A).map e.toMonoidHom e.surjective
   exact OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
 
-/-- **Fitting subgroup is preserved by isomorphisms** (`|RK|`-induction plumbing for BG Theorem 3.8):
+/-- **Fitting subgroup is preserved by isomorphisms** (`|RK|`-induction plumbing for BG Theorem
+3.8):
 `e : A ≃* B` carries `F(A)` onto `F(B)`.  Used to identify the Fitting subgroup of an inductive
 sub-configuration `K'.subgroupOf S` with that of `K'`. -/
 theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A ≃* B) :
@@ -623,7 +626,8 @@ theorem fitting_map_mulEquiv {A B : Type*} [Group A] [Group B] [Finite A] (e : A
   simpa using Subgroup.mem_map_of_mem e.toMonoidHom hsy
 
 /-- **`p`-group transfer across `K ↠ K/N`** (`|RK|`-induction plumbing for BG Theorem 3.8): if the
-quotient `↥K / N` is a `p`-group, then so is the image `K · (N·K)/(N·K)` of `K` in `G / (N.map K.subtype)`
+quotient `↥K / N` is a `p`-group, then so is the image `K · (N·K)/(N·K)` of `K` in `G / (N.map
+K.subtype)`
 (both are `↥K / N`).  Used to upgrade `K̄ = ↥K / F(K)` being a `p`-group to the form
 `IsPGroup p (K.map (mk' (F(K).map K.subtype)))` required by `commutator_le_fitting_of_reduced`. -/
 theorem isPGroup_map_mk'_subtype_of_isPGroup_quotient {G : Type*} [Group G] {K : Subgroup G}
@@ -644,7 +648,8 @@ theorem isPGroup_map_mk'_subtype_of_isPGroup_quotient {G : Type*} [Group G] {K :
   rw [← hgx, ← map_pow, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
   exact hgL
 
-/-- **Conclusion transport from a sub-configuration** (`|RK|`-induction plumbing for BG Theorem 3.8):
+/-- **Conclusion transport from a sub-configuration** (`|RK|`-induction plumbing for BG Theorem
+3.8):
 if the induction hypothesis gives `⁅A', B'⁆ ⊆ F(A')` for the restrictions `A' = A.subgroupOf (A⊔B)`,
 `B' = B.subgroupOf (A⊔B)` inside `↥(A⊔B)`, then pushing forward along `↥(A⊔B) ↪ G` yields
 `⁅A, B⁆ ⊆ F(A)` in `G`.  The commutator side uses `map_commutator` + `subgroupOf_map_subtype`; the
@@ -690,7 +695,8 @@ theorem centralizer_subgroupOf {G : Type*} [Group G] {S : Subgroup G} (T : Set �
 /-- **Fitting of a sub-configuration, via `subgroupOf`** (`|RK|`-induction plumbing for BG Theorem
 3.8): for `A ≤ S`, the Fitting subgroup of `A.subgroupOf S` (pushed into `↥S`) is the restriction to
 `↥S` of `F(A)` (pushed into `G`).  Lets condition (3) — `C_{F(A)}(·) = ⊥` — transport between `G`
-and `↥S`.  Same `map_map` + `fitting_map_mulEquiv` argument as `commutator_le_fitting_of_subgroupOf_sup`. -/
+and `↥S`.  Same `map_map` + `fitting_map_mulEquiv` argument as
+`commutator_le_fitting_of_subgroupOf_sup`. -/
 theorem fitting_subgroupOf_map_subtype_eq {G : Type*} [Group G] [Finite G] {A S : Subgroup G}
     (hAS : A ≤ S) :
     (OddOrder.Isaacs.Ch01.fitting ↥(A.subgroupOf S)).map (A.subgroupOf S).subtype =
@@ -729,7 +735,8 @@ The induction is on `n = |G|`.  `by_cases` on whether `R` centralizes `F(K̄)` (
 - no ⟹ step 2 (`P` = preimage of a non-centralized Sylow `P̄` of `F(K̄)`; if `P ≠ K`, IH on `PR`
   gives `⁅P, R⁆ ⊆ F(P) = F(K)`, so `R` centralizes `P̄`, contradiction — hence `K̄` is a `p`-group)
   then step 3 (`R₀ ≤ R` of prime order; if `R₀ ≠ R`, IH on `KR₀` + `commutator_le_fitting_of_…`
-  reductions give the result — hence `R` is prime) then step 4 (`commutator_le_fitting_of_reduced`). -/
+  reductions give the result — hence `R` is prime) then step 4
+  (`commutator_le_fitting_of_reduced`). -/
 private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSolvable G]
     (K R : Subgroup G), K.Normal → Odd (Nat.card G) → K.IsComplement' R →
     Nat.Coprime (Nat.card ↥R) (Nat.card ↥K) →
@@ -803,7 +810,8 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
             rw [hz1]; exact one_mem _
           -- `F(P_G) = F(K) = L`.
           have hFPGL : (OddOrder.Isaacs.Ch01.fitting ↥PG).map PG.subtype = L := by
-            rw [hPGdef, fitting_map_map_subtype, fitting_map_eq_of_normal_of_fitting_le hFP, ← hLdef]
+            rw [hPGdef, fitting_map_map_subtype,
+              fitting_map_eq_of_normal_of_fitting_le hFP, ← hLdef]
           have hdisjPG : Disjoint PG R := hcompl.disjoint.mono_left hPGK
           -- IH on `P_G R` (`|P_G ⊔ R| < |G|` since `P_G < K`) ⟹ `⁅P_G, R⁆ ⊆ L`.
           have hcommPG : ⁅PG, R⁆ ≤ L := by
@@ -828,7 +836,7 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
               rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : R ≤ PG ⊔ R)).toEquiv,
                 Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : PG ≤ PG ⊔ R)).toEquiv]
               exact hcop.coprime_dvd_right (Subgroup.card_dvd_of_le hPGK)
-            · -- condition (2) for the `P_G`-configuration (`C_K(x) = C_K(R)`, intersected with `P_G ≤ K`).
+            · -- condition (2) for `P_G` (`C_K(x) = C_K(R)`, then intersected with `P_G ≤ K`).
               intro x hx hx1
               have hxR : (↑x : G) ∈ (R : Set G) := Subgroup.mem_subgroupOf.mp hx
               have hx1' : (↑x : G) ≠ 1 := mt OneMemClass.coe_eq_one.mp hx1
@@ -838,7 +846,8 @@ private theorem thm38_aux : ∀ (n : ℕ) {G : Type*} [Group G] [Finite G] [IsSo
                     = (Subgroup.centralizer ({(↑x : G)} : Set G) ⊓ K) ⊓ PG := by
                       rw [inf_assoc, inf_eq_right.mpr hPGK]
                   _ = (Subgroup.centralizer (R : Set G) ⊓ K) ⊓ PG := by rw [hcond2 (↑x) hxR hx1']
-                  _ = Subgroup.centralizer (R : Set G) ⊓ PG := by rw [inf_assoc, inf_eq_right.mpr hPGK]
+                  _ = Subgroup.centralizer (R : Set G) ⊓ PG := by
+                      rw [inf_assoc, inf_eq_right.mpr hPGK]
               have himg : (PG ⊔ R).subtype ''
                   ((R.subgroupOf (PG ⊔ R) : Subgroup ↥(PG ⊔ R)) : Set ↥(PG ⊔ R)) = (R : Set G) := by
                 rw [← Subgroup.coe_map, Subgroup.subgroupOf_map_subtype,
