@@ -2962,3 +2962,15 @@ hmapagree linchpin (cont.⁴ 續²) の**群論核を 1 個 landing**: `le_of_ca
 5. → `certainTypeSet_isCoherent_tau` の hmapagree 充足 → **cX_col 完成** → assembly (cX_col∪cX_irr∪cY, cont.⁴ 續² path)。
 
 **正本=本 session 42 cont.⁴ 續³。Lemma A (canonicality 核) landed。次 = Lemma C (H-field 一意性, C_G(a) relativize + Lemma A 両向き)。**
+
+### session 42 cont.⁴ 續⁴: Lemma C tooling 確定 (API archaeology 完了) — ~60-80 行の relativize 証明
+Lemma C (`dade_H_eq` 等: 同 (G,A,L) の 2 Hypothesis の H-field 一致) の必要 API を全特定。**dadeSupport は H-field 依存** (S04:362, hCoset 経由) ⟹ uniqueness は H-field 一致が必須 (shortcut 無し)。
+**tooling (確定):**
+- 核 = ↥C (C=`Subgroup.centralizer {a.1}`) への relativize。各 `hyp.H a`/`Cℓ`(=`centralizerIn L a.1`) を `.subgroupOf C`。
+- **`(hyp.H a).subgroupOf C` の Normal instance in ↥C**: H_normalized (∀c∈C, ∀x∈H a, cxc⁻¹∈H a) から構成。⚠ 手動 (mathlib に `normal_subgroupOf` 直接なし、`normal_subgroupOf_iff` は別物)。
+- **index [↥C : (hyp.H a).subgroupOf C] = |Cℓ|**: 第2同型 `QuotientGroup.quotientInfEquivProdNormalQuotient` (mathlib QuotientGroup/Basic:293, ただし N normal in **whole group** 要 ⟹ ↥C 内で適用) + disjoint(⊓=⊥)/sup(⊔=C=⊤ in ↥C) rewrite + card transport。**または** `Nat.card C = |H a|·|Cℓ|` 積公式 + `card_mul_index`。⚠ **積公式 `card_sup_mul_card_inf` は mathlib に無い** (要自前 or 第2同型)。
+- card 保存 = `Subgroup.subgroupOfEquivOfLe` (Map:294)。index/card = `IsComplement'.index_eq_card`(Complement:634)/`card_mul`(:649) も利用可だが IsComplement' 構成自体が積公式要。
+- coprime = `hyp.centralizer_coprime a a` (= Coprime |H a| |Cℓ|)。
+- 仕上げ = Lemma A (`le_of_card_coprime_index`, ✅) 両向き → le_antisymm → subgroupOf_le で G に戻す。
+**規模 = ~60-80 行 (normal instance 構成 + 第2同型 in ↥C + card 計算 + Lemma A 適用)。well-defined だが focused pass 推奨。**
+**正本=本 session 42 cont.⁴ 續⁴。Lemma C tooling 完全特定。実装は ↥C relativize の plumbing が核 (normal instance + 第2同型/積公式)。**
