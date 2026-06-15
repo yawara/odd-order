@@ -3229,3 +3229,13 @@ Lean commit なし。`references/peterfalvi/04.8` L156-244 を直読し、cont.�
 
 **▶▶ 次ターン具体第一手 (確定)**: **Route (2) の第一歩 = 既約 X-member 単一 adjoin**。`retarget_isCoherent_of_supportedDecomposition` (S07:4031) を per-φ image (`caseB_per_phi_anchored_fromYset` の Da) + CaseBIrrBundle 正規直交で instantiate し、cY (or 既adjoin prefix) に {Ind θ, conj} を adjoin する補題。hperElem (prefix 像 ⊥ R(Ind θ)) / hgen の供給を精査。これが fold (xChainCoherent 類似) の per-step。**(cont.¹⁵ の gated-skeleton 推奨は撤回** — glue shell が要求する cX は Route 1 専用で、Route 2 = 原文整合かつ軽い)。
 **正本=本 session 43 cont.¹⁶。原文照合で (6.8.2)=τ₂ direct / (6.8.3)=一様 A/B (算術のみ差) と確定。残務 heavy core (quick-win 無し)。次=Route 2 既約 X-member 単一 adjoin 補題。Opus 継続。**
+
+### session 43 cont.¹⁷: ✅ `adjoin_irr_nonreal_of_supportedDecomposition` — fold per-step (commit `e72771ad`)
+- **`adjoin_irr_nonreal_of_supportedDecomposition`** (S08_CaseBAssembly 末尾、general/leaf-local): `retarget_isCoherent_of_supportedDecomposition` の wrapper。χ 既約 + non-real + chi1 既約 から 5 正規直交 hyp (⟨χ,χ⟩=⟨χ̄,χ̄⟩=⟨χ₁,χ₁⟩=1, ⟨χ,χ̄⟩=⟨χ̄,χ⟩=0) を discharge (irr Kronecker `if`、`caseB_irr_conj_inner` mirror + `inner_conj_symm`)。`noncomputable def` (IsCoherent=Type)。残す S₁-依存入力 = hperElem/hχ_S1/hχbar_S1/chi1∈S₁/htau1_*/hY/hgen は fold caller が供給。axiom-clean、leaf green。⚠ 真の general ゆえ split (0070) で S07 へ lift 候補。
+
+**⟹ X∪Y fold の per-step (orthonormality) 完成。残 fold hard parts (次)**:
+1. **hperElem** (prefix 像 ⊥ `Da.imageFamily.imageSet` = R(Ind θ)): 既約枝 prefix 直交。case-A `pairCover_orthogonal_to_prefix` (CorePart1:2735) は全既約前提 → case-B prefix は column 混在ゆえ要適応 (or column ⊥ irr-R(χ) を別途)。
+2. **column base**: cY ∪ cX_col (`certainTypeSet_isCoherent_tau_canonical`) を §7 union (cross-orthogonality 要) で base coherent set 化 → そこに既約を fold-adjoin。
+3. **htau1_chi1 / hY / hgen**: per-φ image (`caseB_phi_family`) の構造から (Da.tau1=hyp.tau via `caseB_phi_family_tau1`、Da.Y=per_phi の Y 成分)。
+4. **fold 全体**: `xChainCoherent` 類似で base から X-member を順次 adjoin (per-φ image = Da)。
+**正本=本 session 43 cont.¹⁷。fold per-step orthonormality wrapper 完成 (`e72771ad`)。次=fold hard parts (hperElem prefix⊥R(χ) / column base union / htau1-hY-hgen 供給)。Opus 継続。**
