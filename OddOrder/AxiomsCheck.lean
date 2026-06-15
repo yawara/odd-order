@@ -56,6 +56,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1212c
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem1213
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Proposition1215
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1214
+import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Corollary1216
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_E
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_ExceptionalBridge
@@ -3927,6 +3928,14 @@ characteristic in it, so `N_G(P) ≤ N_G(X) ≤ M*` and `p ∈ σ(M*)`, a contra
 `C_{M_σ}(E) ⊆ M_σ'`. No keystone input. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_E_relations
+
+/-! ### BG §12: Lemma 12.17 third clause (`Msigma_inf_conj_isBetaCompl`) — unconditional
+
+`M_σ ∩ M^g` is a `β(M)′`-group for `g ∉ M`.  For each prime `p`, a rank-one `X ≤ M_σ ∩ M^g`
+of order `p` has `C_G(X) ⊄ M` (Theorem 10.1(b)), so `ℳ(C_G(X)) ≠ {M}`, and the contrapositive
+of Corollary 12.14 gives `p ∉ β(M)`.  Consumed by Proposition 14.2(g). -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl
 
 /-! ### BG §12: Lemma 12.19 (`derivedE_centralizes_betaComplement`) — unconditional
 
