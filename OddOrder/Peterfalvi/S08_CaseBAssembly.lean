@@ -978,6 +978,57 @@ theorem caseB_irr_bundle
     caseB_irr_conj_orthogonal_Yset hyp h1 hη₁ hneη' (constituentWeight hφ' θ),
     caseB_irr_conj_inner hyp h1⟩
 
+/-- **(6.8.2.3) column dispatch bundle over the whole positive-weight family** (`hcol` input of
+`caseB_per_phi_anchored_fromYset`).  Maps `caseB_column_bundle` over every positive-weight
+constituent `i`; the column branch needs no non-linearity hypothesis (it is gated on the column
+witness equation `columnSum χ₂ = Ind^L_H θ`). -/
+theorem caseB_hcol
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) :
+    ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBColBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val) :=
+  fun i => caseB_column_bundle hyp h46 hHK hW1 hW2H hcen hφ' i.property hη₁
+
+/-- **(6.8.2.3) irreducible dispatch bundle over the whole positive-weight family** (`hirr` input of
+`caseB_per_phi_anchored_fromYset`).  Maps `caseB_irr_bundle` over every positive-weight constituent
+`i`, supplying the three structural inputs `θ ≠ 1`, `Ind θ ≠ η₁`, `(Ind θ)‾ ≠ η₁` from the single
+non-linearity hypothesis `hnonlin` (`caseB_hnonlin`): `θ ≠ 1` since `θ(1) ≠ 1`, and the two `≠ η₁`
+distinctnesses by `caseB_induce_ne_Yset` / `caseB_induce_conj_ne_Yset` (degree mismatch). -/
+theorem caseB_hirr
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    {φ : ClassFunction ↥W2 ℂ}
+    (hφ' : IsIrreducibleCharacter
+      (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hnonlin : ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      (i.val : ClassFunction ↥H ℂ) 1 ≠ 1) :
+    ∀ i : {θ : IrreducibleCharacter ↥H // 0 < constituentWeight hφ' θ},
+      CaseBIrrBundle hyp h46 i.val η₁ (constituentWeight hφ' i.val) :=
+  fun i => caseB_irr_bundle hyp h46 hHK hW2H hcen hφ' i.property hη₁
+    (fun heq => hnonlin i (by rw [heq, trivialClassFunction_apply]))
+    (caseB_induce_ne_Yset hyp (hnonlin i) hη₁)
+    (caseB_induce_conj_ne_Yset hyp (hnonlin i) hη₁)
+
 /-- **(6.8.2.3) per-constituent decomposition (mixed dispatch).**  For a constituent `θ : Irr H` of
 `Ind^L_K φ` (with `K = H`, case (c2)), the (5.4) decomposition data of `Ind^L_H θ` against the
 Sibley–Dade map `hyp.tau`, dispatched on whether `Ind^L_H θ` is a reducible certain-type column
