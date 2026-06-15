@@ -88,13 +88,26 @@ g∈R# は K に FPF (Frobenius) ⟹ K̂ (指標) に FPF ⟹ 非自明指標を
 - 単純対角化 `Module.End.iSup_iInf_maxGenEigenspace_eq_top_of_forall_mapsTo` (Pi.lean) = L3 span。
 - elem-ab→ZMod module (`OperatorMaschke.lean`)、minimal normal→elem ab (`ChiefFactor.lean`/Isaacs Ch03)。
 
-### 残タスク (この issue)
-- [ ] keystone proof (FreeBlockPermutation, subagent 進行中)
-- [ ] L3: weightSpace の IsInternal (support 制限 + alg-closed span via Pi.lean)
-- [ ] L4 + module core terminal (|R|=p assembly)
-- [ ] K-abelian reduction 帰納
-- [ ] outer (minimal normal + MulDistribMulAction + 具体 wrapper)
-- [ ] Lem 14.1 Frobenius 形 (C_{M_σ}(U)=1) / Lem 12.17 TI 形 / σ=β (Lem 12.19) bridge → (g) 配線
+### 残タスク (この issue) — 2026-06-15 大幅進捗
+
+**✅ Thm 3.10(a) Case 2 の数学的核心は全完了** (sorry-free + axiom-clean, 3 commits):
+- [x] **keystone** `finrank_eq_card_mul_finrank_invariants_of_freeBlock` (`FreeBlockPermutation.lean`,
+      commit b0c1cf35) — 軌道和同型で per-orbit fixed dim。
+- [x] **|R|=p assembly** `prime_card_of_freeBlock_cond3` (`S03g_Thm310Core.lean`, b0c1cf35)。
+- [x] **L3a span** `iSup_weightSpace_eq_top` (`S03e_WeightSpan.lean`, fc3cdb18) — 半単純+同時対角化。
+- [x] **L4 freeness** `weightChar_eq_one_of_conjChar_fixed` + char 抽出 (`S03g_Thm310Core.lean`, fc3cdb18)。
+- [ ] **module core terminal** `prime_card_of_abelian_frobenius_weight` (`S03g_Thm310Module.lean`,
+      statement 確定・proof subagent 進行中) — 上記 4 件を support IsInternal で配線 ⟹ abelian K で |R| 素数。
+
+**残 (terminal 着地後)**:
+- [ ] **K-abelian reduction**: K₀ minimal normal ≤K で C_V(K₀)∈{0,V} 二分律 → |G| 帰納で K abelian に還元
+      (V irreducible 要、M₀ minimal normal から)。
+- [ ] **outer**: M nilpotent → minimal G-normal M₀ (elem ab, irreducible) → module 化 (base change F̄ +
+      ZMod r module) → terminal/reduction 呼び出し。abstract `MulDistribMulAction G M` + 具体 conjugation
+      wrapper (`isNilpotent_of_normalizing_primeOrder_fixedPointFree` パターン)。
+- [ ] **§12/§14 bridge** (rep-theory と独立、§14 lane 領域): Lem 14.1 Frobenius 形 (C_{M_σ}(U)=1 +
+      M_σ nilp) / Lem 12.17 TI 形 (M_σ∩M_σ^g β'-group ⟹ TI) / σ=β (Lem 12.19 ✅既存) → IsTypeP2⟹U≠1。
+- [ ] **(g) 配線**: 上記で `typeP_structure` case-τ₁ (g) を埋める。
 
 ## 完了条件
 
