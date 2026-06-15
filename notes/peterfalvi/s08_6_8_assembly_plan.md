@@ -3089,3 +3089,17 @@ column 機構を irreducible 枝に流用:
 
 **▶▶ 次 (#1 を正面から)**: induce_isIrreducible 直用の seam (transport + χ₂=1) を組む。χ₂=1 edge が重い場合は ChatGPT 相談 ([[feedback-ask-chatgpt-for-elided-gaps]], 最強モデル) で cleanest bridge を得る。#1 着地後は #2/#6/#7/#8 → caseB_irr_bundle constructor → hirrAnc → dispatch family。
 **正本=本 session 43 cont.⁷。irr seam-free #3/#4/#5 done (`e956da40`)。残りは #1 既約性 seam が唯一の gate (value↔index transport + χ₂=1 edge)。次=#1 正面 (必要なら ChatGPT)。Opus 継続。**
+
+### session 43 cont.⁸: 🎯 #1 既約性の math 完全確定 (χ₂=1 edge 解決) — 残り = ↥K↔↥H transport plumbing
+**χ₂=1 edge を解決**: `(h46.columnFamily 1).mu 0 = trivialClassFunction L` (S06_CertainTypeCharacters:1015, `columnFamily_one_...`) ⟹ `chiRestrict 1 = Res_K((columnFamily 1).mu 0) = Res_K(trivial) = trivial ↥K` (coe_chiRestrict + restrict_trivial)。
+**⟹ #1 の論法確定** (`induce_isIrreducible_of_forall_chiRestrict_ne (∀χ₂, chiRestrict χ₂ ≠ θ_K)`):
+- χ₂≠1: `chiRestrict χ₂ = θ_K ⟹ columnSum χ₂ = induce K (chiRestrict χ₂) = induce H θ` (4.5.a `induce_restrict_certainType_eq` + coe_chiRestrict + hHK transport) ⟹ hnotcol 矛盾。
+- χ₂=1: `chiRestrict 1 = trivial ≠ θ_K` ⟸ **`θ ≠ trivial`** (= structural input)。
+- ⟹ `inertia θ_K = K` ⟹ `induce K θ_K` irreducible ⟹ (induce_congr で) `induce H θ` irreducible。
+
+**残り plumbing (mechanical)**: (a) θ:Irr↥H → θ_K:Irr↥h46.K の transport (hHK : h46.K=H; `hHK ▸`/cast or `compHom (subgroup eq equiv)`)、(b) `induce h46.K θ_K = induce H θ` (`Hypothesis.induce_congr_of_subgroup_eq hHK`、columnSum_mem_S が実例)、(c) chiRestrict χ₂ ≠ θ_K の transport 越し比較。**↥K↔↥H transport が唯一の Lean 難所** (math は完結)。
+
+**`θ ≠ trivial` の出所**: dispatch の `0 < constituentWeight hφ' θ` から (θ=trivial ⟹ Res θ=trivial ⟹ ⟨φ',trivial⟩=0=weight、φ'≠trivial 前提) 導出可、または capstone が供給。⚠ φ'≠trivial が dispatch hypothesis にあるか要確認 (caseB_per_phi_anchored_fromYset の φ 制約)。
+
+**▶▶ 次**: (1) #1 = `caseB_irr_induce_isIrreducible (θ≠trivial) (hnotcol)` の transport plumbing を組む (ChatGPT で transport incantation を取得も可)。(2) #2 non-real (odd-order no-real-irr; L 全体の補題確認) → #8 (#1+#2)、#6/#7 (Ind θ≠η₁; θ(1)>1 で degree、θ(1)=1 は X/Y disjoint)。(3) caseB_irr_bundle constructor → hirrAnc → dispatch family。
+**正本=本 session 43 cont.⁸。#1 math 完全確定 (chiRestrict 1=trivial → χ₂=1 edge は θ≠trivial で閉)。残り = ↥K↔↥H transport plumbing のみ。Opus 継続。**
