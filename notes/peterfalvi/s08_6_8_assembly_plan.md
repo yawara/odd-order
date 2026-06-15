@@ -3005,8 +3005,7 @@ Lemma C (`dade_H_eq` 等: 同 (G,A,L) の 2 Hypothesis の H-field 一致) の�
 `CaseBColBundle` (per-θ column branch, S08_CaseBAssembly:180) の conjunct #2 = `hyp.tau (μ_j − μ̄_j) = dadeIntegralCharacterMap h46.dade0 h46.tau (μ_j − μ̄_j)` を **linchpin の直接 payoff として** discharge。鎖 = `columnSum_conj_eq` (μ̄_j = μ_{χ₂⁻¹}, S06:621) → `columnDiff_support_subset` (μ_j − μ̄_j は H^#-supported, hdeg 要) → `dade0_map_eq_tau_of_support` の symm。**linchpin 以前は構成不可能だった conjunct**。sorry-free + axiom-clean、full build 3830 jobs (2.86s)。
 
 **per-θ column bundle (CaseBColBundle) の残り conjunct の地図**:
-- ✅ #2 hmapagree = `caseB_column_mapagree` (done)。
-- #1 hdeg (column 次数 = 共役 column 次数, η₁/a 非依存): degree conjugation-invariance で derivable だが realness 経由でやや手間 (column degree が real ⟹ conj-fixed)。**bundle-intrinsic なので独立に landing 可** (次の小 brick 候補)。
+- ✅ #1 hdeg + #2 hmapagree = `caseB_column_mapagree` (**unconditional**, `a044bc3f`)。hdeg は free fact `columnSum_inv_apply_one` (S06:464, ∑μ_{χ₂⁻¹}(1)=∑μ_{χ₂}(1)) ゆえ caseB_column_mapagree が内製 (realness 経由は不要だった)。**bundle-intrinsic 2 conjunct は side-hypothesis 無しで解放**。
 - #3 hSdiff (μ_j−η₁ 系 support) / #4 htau1_mema (ZIrr) / #5,#6 hχψ/hχbarψ (⟨μ_j, η₁⟩=0 系): **η₁/a-coupled** ⟹ dispatch family の anchor 選択 (caseB_per_phi_anchored_fromYset の η₁=Y-member) に結合。**assembly phase (dispatch family 構築) で η₁/a 確定後に discharge**。
-**⟹ column bundle の bundle-intrinsic 部 (hmapagree + hdeg) は linchpin で解放; 残りは dispatch family (HYBRID 組立 step 1) と一体。**
-**正本=本 session 43 cont.。caseB_column_mapagree landed (`383556b0`)。次=hdeg (column degree, 小) or dispatch family 構築 (HYBRID step 1, η₁/a-coupled conjunct を巻き込む本体)。Opus 継続。**
+**⟹ column bundle の bundle-intrinsic 部 (hdeg + hmapagree) は完全解放; 残り 4 conjunct は dispatch family (HYBRID 組立 step 1) と一体 (η₁/a に依存)。**
+**正本=本 session 43 cont.。caseB_column_mapagree unconditional landed (`a044bc3f`)。次=dispatch family 構築 (HYBRID step 1, η₁/a-coupled conjunct を巻き込む本体; caseB_per_phi_anchored_fromYset L917 の per-θ hcol/hirr 入力)。Opus 継続。**
