@@ -2928,3 +2928,25 @@ cont.⁴ の `caseB_per_phi_anchored_family` を強化: **η₁-anchor + partner
 
 **▶▶ 次の brick 候補 (contained 順):** (a) **(6.8.2.2) aggregate 接続** = `exists_decomposition_caseB` を fromYset の hXaggorth/hdecomp に wiring (\|Y\|=2 edge で cY swap; `per_phi_anchored_image` は cY 一般化済ゆえ吸収可) → (b) **hirrAnc discharge** (η₁ vs Ind θ 直交; distinct irr or Yset⊥X 構造) → (c) **per-θ bundles** (column/irr structural, bulk) → (d) **HYBRID 組立** (anchored 公式 = diagonal: cY に X_irr chain-adjoin `retarget_isCoherent_of_supportedDecomposition` + cX_col `certainTypeSet_isCoherent_tau` を §7 union) → (e) capstone `sibleySetup_is_coherent`。
 **正本=本 session 42 cont.⁴ 続。fromYset で anchor 内製化完了。次=(6.8.2.2) aggregate 接続 or hirrAnc discharge。**
+
+### session 42 cont.⁴ 続²: 🔑 capstone case-B の正確な frontier map (hmapagree linchpin = dadeMap canonicality)
+fromYset 完成後の (6.8) capstone case-B (`sibleySetup_is_coherent` の X-nonempty / `cases.inr` 枝) を末端まで精査。
+
+**capstone case-B が供給する構造 (`hyp.cases.inr`, S08CP1:3321-3326):**
+`∃ h46 : Hypothesis46 (sharpImage H) L, h46.dade = hyp.dade ∧ h46.K = H ∧ h46.W1 = W1 ∧ (card h46.W2).Prime ∧ h46.W2 ≤ ⁅H,H⁆ ∧ Coprime (card H) (card W1)`。⟹ **h46 + hHK + `h46.dade = hyp.dade` が直接手に入る**。
+
+**assembly の path (capstone case-B branch):**
+1. **cX_col** (reducible columns μ_j) = `certainTypeSet_isCoherent_tau` (S08CB2:1651, **sorry-free shell**) — 要 `hmapagree`。
+2. **cX_irr** (irreducible 部) = case-A 機構 `xChainCoherent` (S08CP1:2701) over irr X-members — 要 per-step `XAdjoinStepInput` (= per-θ bundle 相当)。
+3. **cX = cX_col ∪ cX_irr** (union)。
+4. **cX ∪ cY** = `coherentXunionYset_caseB_of_glued` (S08CB2:1616, **sorry-free shell**) — 要 ν / hmixed / hpair / D / hgen。**hmixed = (6.8.2.3) content = fromYset の anchored 公式が供給**。
+
+**🔑 linchpin = `hmapagree`** (`dadeIntegralCharacterMap h46.dade0 h46.tau φ = hyp.tau φ` on H^#-supported φ; cX_col + column bundle conjunct 2 + 全 map-agreement の gate):
+- h46.dade0 (enlarged, A₀=A∪Vᴸ) と h46.dade (base, A=H^#) は Hypothesis46 の**別フィールド**で、A 上一致は構造に**無い**。`cases.inr` も `h46.dade=hyp.dade` は与えるが `h46.dade0.restrict A ↔ h46.dade` は与えない。
+- **しかし導出可能** (producer-gate 不要): `Hypothesis.dadeMap_restrict` (S04:3641) は `IsDadeMap.unique` (S04:3442) で証明 = **Dade map は一意**。`Hypothesis` の `H : {a//a∈A}→Subgroup G` フィールド (S04:196) は `centralizer_eq_sup`+`_disjoint`+`_coprime` で **C_G(a) 内 C_L(a) の normal Hall complement = Schur-Zassenhaus 一意** ⟹ (G,A,L) から canonical ⟹ 同 (G,A,L) の 2 Hypothesis は同 dadeMap。
+- **導出鎖**: φ A-supported に対し `dadeIntegralCharacterMap h46.dade0 h46.tau φ` =[`dadeIntegralCharacterMap_restrict_eq_of_support` S08CB2:1585]= `dadeIntegralCharacterMap (h46.dade0.restrict A) (h46.tau.restrict A) φ` =[`apply_of_support` S07:5243]= `(h46.dade0.restrict A).dadeMap ⟨φ⟩` =[**H-field 一意性 → IsDadeMap.unique**]= `hyp.dade.dadeMap ⟨φ⟩` =[`apply_of_support` 逆]= `hyp.tau φ`。
+
+**▶▶ 次の brick (linchpin, 推奨 = canonicality 経路、構造改変も producer 影響も無し):**
+**`dadeMap_eq_of_hypothesis` (S04 一般補題)**: 同 (G,A,L) の 2 Hypothesis hyp₁ hyp₂ → `hyp₁.dadeMap = hyp₂.dadeMap`。核 = `hyp₁.H a = hyp₂.H a` (normal Hall complement 一意; Schur-Zassenhaus、要 mathlib `Subgroup.IsComplement`/coprime uniqueness 探索) → dadeSupport 一致 → `IsDadeMap hyp₁ τ ↔ IsDadeMap hyp₂ τ` → `IsDadeMap.unique`。これで `hmapagree` (S08, h46 用 wrapper) → cX_col → assembly が連鎖 unblock。
+**代替** (canonicality が重い場合): `cases.inr` に `h46.dade0.restrict A` の dadeMap が `hyp.dade` と一致する条項を追加 (producer obligation 化、2026-06-13 の CertainTypeHypothesis→Hypothesis46 強化と同型)。ただし `SibleyDadeHypothesis` core 改変ゆえ producer 全更新要 = 重い。
+**正本=本 session 42 cont.⁴ 続²。capstone case-B path 完全 map。linchpin = hmapagree = dadeMap canonicality (H-field Schur-Zassenhaus 一意)。次 = `dadeMap_eq_of_hypothesis` (S04)。**
