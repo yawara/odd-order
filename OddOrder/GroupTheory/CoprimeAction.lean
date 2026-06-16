@@ -91,46 +91,94 @@ end GammaAction
 
 section WielandtFixedPoint
 
-/-- A carrier for **Peterfalvi (9.1)**: a coprime action of a Frobenius group
-`U E` on a finite solvable group `H`.
+variable {L H : Type*} [Group L] [Group H]
 
-The subgroups `fixedByUE`, `fixedByE`, and `fixedByU` are the three fixed-point
-subgroups appearing in Wielandt's formula.  They are stored explicitly because
-the action itself will later be supplied by the semidirect-product construction
-attached to `H/H_0`. -/
+/-- The subgroup `C_H(K)` of points of `H` fixed by every element of a subgroup `K ≤ L`,
+under an action `φ : L →* MulAut H`.  This is a subgroup of `H` because each `φ l` is a
+group automorphism. -/
+def fixedSubgroup (φ : L →* MulAut H) (K : Subgroup L) : Subgroup H where
+  carrier := {h | ∀ l ∈ K, φ l h = h}
+  one_mem' l _ := map_one (φ l)
+  mul_mem' ha hb l hl := by rw [map_mul, ha l hl, hb l hl]
+  inv_mem' ha l hl := by rw [map_inv, ha l hl]
+
+@[simp] theorem mem_fixedSubgroup {φ : L →* MulAut H} {K : Subgroup L} {x : H} :
+    x ∈ fixedSubgroup φ K ↔ ∀ l ∈ K, φ l x = x := Iff.rfl
+
+/-- Fixing the elements of a *larger* subgroup yields a *smaller* fixed subgroup. -/
+theorem fixedSubgroup_antitone (φ : L →* MulAut H) {K K' : Subgroup L} (h : K ≤ K') :
+    fixedSubgroup φ K' ≤ fixedSubgroup φ K :=
+  fun _ hx l hl => hx l (h hl)
+
+/-- A carrier for **Peterfalvi (9.1)**: a coprime action `φ` of a Frobenius group
+`L = U ⋊ E` (kernel `U`, complement `E`) on a finite solvable group `H`.
+
+The three fixed-point subgroups `C_H(UE)`, `C_H(E)`, `C_H(U)` of Wielandt's formula are
+*derived* from the action (see `fixedByUE`, `fixedByE`, `fixedByU`), not stored, so the
+formula below is a genuine statement about the action. -/
 structure CoprimeFrobeniusAction (L H : Type*) [Group L] [Group H] where
   U : Subgroup L
   E : Subgroup L
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup L U E
   H_solvable : IsSolvable H
+  /-- The action of the Frobenius group `L = U ⋊ E` on `H` by automorphisms. -/
+  φ : L →* MulAut H
   coprime_order : Nat.Coprime (Nat.card H) (Nat.card L)
-  fixedByUE : Subgroup H
-  fixedByE : Subgroup H
-  fixedByU : Subgroup H
 
-/-- **Peterfalvi (9.1)**: Wielandt's fixed-point formula for a coprime
-Frobenius action. -/
+namespace CoprimeFrobeniusAction
+
+/-- `C_H(UE) = C_H(L)`: the points of `H` fixed by the whole Frobenius group `L = UE`. -/
+def fixedByUE (act : CoprimeFrobeniusAction L H) : Subgroup H := fixedSubgroup act.φ ⊤
+/-- `C_H(E)`: the points of `H` fixed by the Frobenius complement `E`. -/
+def fixedByE (act : CoprimeFrobeniusAction L H) : Subgroup H := fixedSubgroup act.φ act.E
+/-- `C_H(U)`: the points of `H` fixed by the Frobenius kernel `U`. -/
+def fixedByU (act : CoprimeFrobeniusAction L H) : Subgroup H := fixedSubgroup act.φ act.U
+
+theorem fixedByUE_le_fixedByE (act : CoprimeFrobeniusAction L H) :
+    act.fixedByUE ≤ act.fixedByE := fixedSubgroup_antitone act.φ le_top
+theorem fixedByUE_le_fixedByU (act : CoprimeFrobeniusAction L H) :
+    act.fixedByUE ≤ act.fixedByU := fixedSubgroup_antitone act.φ le_top
+
+end CoprimeFrobeniusAction
+
+/-- **Peterfalvi (9.1)**: Wielandt's fixed-point formula for a coprime Frobenius action.
+For `L = U ⋊ E` Frobenius with kernel `U` acting on a finite solvable `H` of order prime
+to `|L|`,
+`|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|`.
+
+The proof rests on **Wielandt's fixed-point theorem** ([HB], Ch. XI, Thm 12.4): the
+group-ring identity `U·E + |U|·1 = ∑_{u∈U} E^u + U` in `ℤ[L]` transforms, via the
+solvability of `H` and the coprimality, into the multiplicative fixed-point identity
+`|C_H(UE)|^{|L|} · |H|^{|U|} = (∏_{u∈U} |C_H(E^u)|^{|E|}) · |C_H(U)|^{|U|}`, whence the
+claim by taking `|U|`-th roots.  Wielandt's theorem is not yet available in mathlib: its
+core reduces to a characteristic-0 / Brauer-character trace argument on the
+elementary-abelian chief factors of the solvable group `H`. -/
 theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :
     Nat.card ↥act.fixedByUE ^ Nat.card ↥act.E * Nat.card H =
       Nat.card ↥act.fixedByE ^ Nat.card ↥act.E * Nat.card ↥act.fixedByU := by
   sorry
 
-/-- **Peterfalvi (9.1), first corollary**: if the `E`-fixed subgroup is trivial,
-then the Frobenius kernel centralizes the acted-on group. -/
+/-- **Peterfalvi (9.1), first corollary**: if `C_H(E) = 1` then the Frobenius kernel `U`
+centralizes `H`, i.e. `C_H(U) = H`. -/
 theorem wielandt_fixedPoint_trivial_E_fixed {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
     (hE : act.fixedByE = ⊥) :
     act.fixedByU = ⊤ := by
-  sorry
+  have key := wielandt_fixedPoint_frobenius act
+  have hUE : act.fixedByUE = ⊥ := le_bot_iff.mp (hE ▸ act.fixedByUE_le_fixedByE)
+  simp only [hUE, hE, Subgroup.card_bot, one_pow, one_mul] at key
+  exact Subgroup.eq_top_of_card_eq _ key.symm
 
-/-- **Peterfalvi (9.1), second corollary**: if the `U`-fixed subgroup is
-trivial, then `|H| = |C_H(E)|^|E|`. -/
+/-- **Peterfalvi (9.1), second corollary**: if `C_H(U) = 1` then `|H| = |C_H(E)|^{|E|}`. -/
 theorem wielandt_fixedPoint_trivial_U_fixed {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
     (hU : act.fixedByU = ⊥) :
     Nat.card H = Nat.card ↥act.fixedByE ^ Nat.card ↥act.E := by
-  sorry
+  have key := wielandt_fixedPoint_frobenius act
+  have hUE : act.fixedByUE = ⊥ := le_bot_iff.mp (hU ▸ act.fixedByUE_le_fixedByU)
+  simp only [hUE, hU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
+  exact key
 
 end WielandtFixedPoint
 
