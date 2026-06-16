@@ -1226,3 +1226,47 @@ sorry-free + axiom-clean、full build 3838/~66s)。7 新定理:
    → 全 P1 矛盾 → ∃ P2。
 3. **∃! covering** (L4049-4059, n=1) → typeP_duality close → §15/§16 unblock。
 4. **part(h)** (Prop 14.2(a) packaging + K cyclic、最終)。
+
+### ✅ density 算術背骨 COMPLETE (2026-06-17 loop⁷, 2 commits) — 次 = family indexing (design lift)
+
+**✅ inclusion-exclusion + |T| count** (BG mmd L4031、sorry-free + axiom-clean):
+- `ncard_biUnion_subgroup_add_card` — 単位元のみで交わる n+1 部分群の和集合: `|⋃Sᵢ| + |s| = Σ|Sᵢ| + 1`
+  (各 Sᵢ が |Sᵢ|−1 個の非単位元 [pairwise disjoint] + 共有単位元 1個)。`Finset.Nonempty.cons_induction`、
+  cons step = `ncard_union_add_ncard_inter` + (Sₐ ∩ ⋃ₜ = {1}) + omega。
+- `ncard_sdiff_biUnion_subgroup` — `|Z−⋃Sᵢ| + Σ|Sᵢ| + 1 = |Z| + |s|` (= BG `|T| = z + n − Σk_i*`、s.card=n+1)。
+  inclusion-exclusion + complement `|Z−⋃|+|⋃|=|Z|` (`ncard_diff_add_ncard_of_subset`)。
+
+⟹ **density 算術 (|T| の式) 完成**。Theorem 14.7 step (mmd L4031-4045 の `|𝒞_G(T)|=(z+n−Σk_i*)|G:Z|`) に直結。
+
+### ▶▶ family indexing 設計プラン (次セッションの主タスク、math は完全に詰め済)
+
+**目標**: 族 {M_0=M, M_1,…,M_n} (相異 maximal) + 各 K_i* ≤ Z を Finset 化し、`z = ∏k_i*` / `K_i = ∏_{j≠i}K_j*`
+/ n=1 collapse を確立。building blocks 全て landing 済 (swap=`typeP_swap_Z_eq`, pairwise=`typeP_neighbor_Kstar_inf_eq_bot`,
+density=`ncard_sdiff_biUnion_subgroup`)。
+
+**族モデル**: ℱ : Finset (Subgroup G) = {M} ∪ {𝓜(N_G(X)) : X ∈ ℰ¹(K)} の distinct 群。各 M_i ∈ ℱ に
+K_i* := Z の Hall σ(M_i)-subgroup (= C_{M_iσ}(K_i)、swap で一致、normal in Z ゆえ unique)。choice-heavy
+(各 neighbor で K_i = Hall κ(M_i) ⊇ K*-line を選ぶ) — ここが design lift。
+
+**crux facts (詰め済)**:
+- (α) 各 K_i* = σ(M_i)-Hall of Z: swap `z=|K_i||K_i*|` (K_i=σ(M_i)', K_i*=σ(M_i)) ⟹ |K_i*|=σ(M_i)-part of z。
+- (β) σ(M_i) pairwise disjoint (13.9、nonconjugate)。
+- (γ) coverage: ∀ p|z, p∈σ(M_j) for some j。 p|z=|K||K*|: p|K*⟹p∈σ(M_0); p|K⟹p∈κ(M)⟹line X∈ℰ_p¹(K)の
+  partner M_i で p∈σ(M_i) (`typeP_neighbor_embed`: X≤M_iσ)。
+- ⟹ **z = ∏ k_i*** (pairwise coprime [β] normal Hall pieces、∏|K_i*| = ∏(σ(M_i)-part of z) = z [γ]) +
+  **⊔K_i* = Z** (|⊔|=z)。**K_i = ∏_{j≠i}K_j*** (両方 σ(M_i)'-Hall of Z = unique normal)。
+
+**n=1 collapse**: 全 P1 仮定 → density 不等式 |G^#|≥|𝒞_G(T)|+Σ|𝒞_G(M̃_i)|≥|G| 矛盾 (14.5(c)+`half_lt`+
+`ncard_sdiff_biUnion_subgroup` + T TI [`ncard_conjClassSet_of_isTISubset`、要 N_G(T)=Z]) → ∃ P2 →
+Prop14.2(g): |K_i| 素数 = ∏_{j≠i}k_j* (各 k_j*≥3 odd) ⟹ 単一因子 ⟹ n=1。
+
+**残ピース** (次セッション、順に):
+1. **族 Finset 構築** + per-member K_i* (choice、最も intricate)。
+2. **z = ∏k_i*** + **K_i = ∏_{j≠i}K_j*** (coprime Hall 分解、要 internal product cardinality)。
+3. **T = Z−⋃K_i* が TI + N_G(T)=Z** (Prop 14.2(d) + σ-decomp、`ncard_conjClassSet_of_isTISubset` に接続)。
+4. **density 不等式** → n=1 collapse → Mstar 構築 + covering (`half_lt`)。
+5. **part(h)** (Prop 14.2(a) packaging + K cyclic)。
+- ⟹ `typeP_duality` close → §15/§16 (Lane G) 全下流 unblock。
+
+mechanics: 新 leaf S14_Theorem147 推奨 (hub split issue 0069)。本 loop⁷ landing 10 定理 (swap 7 + density 3)
+は S14 内、すべて sorry-free + axiom-clean + AxiomsCheck 登録。

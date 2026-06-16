@@ -4941,6 +4941,79 @@ theorem typeP_neighbor_Kstar_inf_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSi
       = {Mj} := typeP_centralizer_singleton hG hMj hPj hKjMj hKj hp hY (hYH.trans inf_le_right)
   exact hne (Set.singleton_eq_singleton_iff.mp (hi.symm.trans hj))
 
+/-- **Inclusion–exclusion for subgroups meeting only at the identity** (BG 14.7 density backbone,
+mmd L4031): for a nonempty finite family `{Sᵢ}_{i ∈ s}` of subgroups of `G` with `Sᵢ ⊓ Sⱼ = ⊥`
+(`i ≠ j`), `|⋃ᵢ Sᵢ| + |s| = (∑ᵢ |Sᵢ|) + 1`.  Each `Sᵢ` contributes `|Sᵢ| − 1` non-identity
+elements, all pairwise disjoint, plus the single shared identity.  In Theorem 14.7 (with `n + 1`
+subgroups `Kᵢ*`) this gives `|T| = |Z| + n − ∑ kᵢ*` for `T = Z − ⋃ Kᵢ*`. -/
+theorem ncard_biUnion_subgroup_add_card [Finite G] {ι : Type*}
+    {s : Finset ι} (hs : s.Nonempty) (S : ι → Subgroup G)
+    (hpair : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → S i ⊓ S j = ⊥) :
+    (⋃ i ∈ s, (S i : Set G)).ncard + s.card = (∑ i ∈ s, Nat.card ↥(S i)) + 1 := by
+  classical
+  have hcard_eq : ∀ i, (S i : Set G).ncard = Nat.card ↥(S i) := fun i =>
+    (Nat.card_coe_set_eq (S i : Set G)).symm
+  induction hs using Finset.Nonempty.cons_induction with
+  | singleton a =>
+    simp only [Finset.mem_singleton, Set.iUnion_iUnion_eq_left, Finset.card_singleton,
+      Finset.sum_singleton, hcard_eq]
+  | cons a t ha htne ih =>
+    have hpair_t : ∀ i ∈ t, ∀ j ∈ t, i ≠ j → S i ⊓ S j = ⊥ := fun i hi j hj hij =>
+      hpair i (Finset.mem_cons.mpr (Or.inr hi)) j (Finset.mem_cons.mpr (Or.inr hj)) hij
+    have ih' := ih hpair_t
+    -- `⋃_{cons a t} = S a ∪ ⋃_t`.
+    have hunion : (⋃ i ∈ (Finset.cons a t ha), (S i : Set G))
+        = (S a : Set G) ∪ ⋃ i ∈ t, (S i : Set G) := by
+      ext x
+      simp only [Set.mem_iUnion, Finset.mem_cons, Set.mem_union, exists_prop]
+      constructor
+      · rintro ⟨i, rfl | hi, hxi⟩
+        · exact Or.inl hxi
+        · exact Or.inr ⟨i, hi, hxi⟩
+      · rintro (hxa | ⟨i, hi, hxi⟩)
+        · exact ⟨a, Or.inl rfl, hxa⟩
+        · exact ⟨i, Or.inr hi, hxi⟩
+    -- `S a ∩ ⋃_t = {1}` (pairwise meet at the identity, `t` nonempty).
+    have hinter : (S a : Set G) ∩ (⋃ i ∈ t, (S i : Set G)) = {1} := by
+      ext x
+      simp only [Set.mem_inter_iff, Set.mem_iUnion, Set.mem_singleton_iff, exists_prop]
+      constructor
+      · rintro ⟨hxa, i, hi, hxi⟩
+        have hmem : x ∈ S a ⊓ S i := Subgroup.mem_inf.mpr ⟨hxa, hxi⟩
+        rwa [hpair a (Finset.mem_cons_self a t) i (Finset.mem_cons.mpr (Or.inr hi))
+          (fun h => ha (h ▸ hi)), Subgroup.mem_bot] at hmem
+      · rintro rfl
+        obtain ⟨i, hi⟩ := htne
+        exact ⟨(S a).one_mem, i, hi, (S i).one_mem⟩
+    have hunion_card : ((S a : Set G) ∪ ⋃ i ∈ t, (S i : Set G)).ncard + 1 =
+        Nat.card ↥(S a) + (⋃ i ∈ t, (S i : Set G)).ncard := by
+      have hfin1 : (S a : Set G).Finite := Set.Finite.subset Set.finite_univ (Set.subset_univ _)
+      have hfin2 : (⋃ i ∈ t, (S i : Set G)).Finite :=
+        Set.Finite.subset Set.finite_univ (Set.subset_univ _)
+      have h := Set.ncard_union_add_ncard_inter (S a : Set G) (⋃ i ∈ t, (S i : Set G)) hfin1 hfin2
+      rw [hinter, Set.ncard_singleton, hcard_eq a] at h
+      exact h
+    rw [hunion, Finset.card_cons, Finset.sum_cons]
+    omega
+
+/-- **BG 14.7, the `T = Z − ⋃ Kᵢ*` density count** (mmd L4031): for a nonempty finite family
+`{Sᵢ}_{i ∈ s}` of subgroups of `Z` pairwise meeting at `⊥`,
+`|Z − ⋃ Sᵢ| + (∑ |Sᵢ|) + 1 = |Z| + |s|`, i.e. `|T| = |Z| + (|s| − 1) − ∑ |Sᵢ|`.
+With `s.card = n + 1` this is BG's `|T| = z + n − ∑ kᵢ*`.  Combines the inclusion–exclusion
+count with the complement `|Z − ⋃| + |⋃| = |Z|`. -/
+theorem ncard_sdiff_biUnion_subgroup [Finite G] {ι : Type*} {s : Finset ι} (hs : s.Nonempty)
+    (S : ι → Subgroup G) {Z : Subgroup G} (hSZ : ∀ i ∈ s, S i ≤ Z)
+    (hpair : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → S i ⊓ S j = ⊥) :
+    ((Z : Set G) \ ⋃ i ∈ s, (S i : Set G)).ncard + (∑ i ∈ s, Nat.card ↥(S i)) + 1
+      = Nat.card ↥Z + s.card := by
+  classical
+  have hsub : (⋃ i ∈ s, (S i : Set G)) ⊆ (Z : Set G) :=
+    Set.iUnion₂_subset (fun i hi => SetLike.coe_subset_coe.mpr (hSZ i hi))
+  have hIE := ncard_biUnion_subgroup_add_card hs S hpair
+  have hdiff := Set.ncard_diff_add_ncard_of_subset hsub
+  have hZcard : Nat.card ↥Z = (Z : Set G).ncard := Nat.card_coe_set_eq (Z : Set G)
+  omega
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

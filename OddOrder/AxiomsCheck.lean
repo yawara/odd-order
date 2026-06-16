@@ -4722,6 +4722,16 @@ internal direct product `Ki × Ki*` (`Ki` a `σ'`-group) lands in the `σ`-facto
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_inf_eq_bot
 
+/-! **BG 14.7 density backbone — inclusion–exclusion** (`S14_TypePCounting`,
+`ncard_biUnion_subgroup_add_card`, mmd L4031): for a nonempty finite family of subgroups pairwise
+meeting at `⊥`, `|⋃ Sᵢ| + |s| = (∑ |Sᵢ|) + 1` (each contributes `|Sᵢ| − 1` non-identity elements,
+disjoint, plus the shared identity).  Gives `|T| = |Z| + n − ∑ kᵢ*` for the TI-set `T = Z − ⋃ Kᵢ*`.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_biUnion_subgroup_add_card
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_sdiff_biUnion_subgroup
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
