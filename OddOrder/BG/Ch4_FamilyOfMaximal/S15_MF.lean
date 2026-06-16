@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 
 /-!
 # BG §15: The Subgroup `M_F`
@@ -350,6 +351,24 @@ theorem fittingInAmbient_eq_self_of_isNilpotent [Finite G] {H : Subgroup G}
     top_le_iff.mp OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
   show (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype = H
   rw [htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+
+/-- **Converse of `fittingInAmbient_eq_self_of_isNilpotent`** (`§14`-independent, reusable): if the
+ambient realization of the Fitting subgroup is all of `H` (`fittingInAmbient H = H`), then `H` is
+nilpotent.  Together with the forward direction this is `IsNilpotent ↥H ↔ fittingInAmbient H = H`.
+
+Used in Theorem 15.2's step 2 (the contrapositive of Theorem 3.8): from `⁅M_σ, K⁆ = M_σ ⊆ F(M_σ)`
+one gets `F(M_σ) = M_σ`, hence `M_σ` nilpotent — contradicting `M_F ≠ M_σ`. -/
+theorem isNilpotent_of_fittingInAmbient_eq_self [Finite G] {H : Subgroup G}
+    (h : fittingInAmbient H = H) : Group.IsNilpotent ↥H := by
+  have htop : OddOrder.Isaacs.Ch01.fitting ↥H = ⊤ := by
+    apply Subgroup.map_injective H.subtype_injective
+    rw [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+    exact h
+  have hnil : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting ↥H) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  rw [htop] at hnil
+  haveI := hnil
+  exact nilpotent_of_mulEquiv Subgroup.topEquiv
 
 /-! ### The Aut-abelian core (`§14`-independent, reusable)
 
@@ -853,6 +872,66 @@ theorem msigma_eq_commutator_kappa_of_isComplement' [Finite G]
           rw [derivedInG, Subgroup.subgroupOf,
             Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   exact OddOrder.BG.Ch1.S06.commutator_eq_self_of_isComplement'_le_commutator hcompl hMσ_le
+
+/-- **Theorem 15.2, step 2 core** (mmd L4192, "by Theorem 3.8, `K* ∩ F(M) ≠ 1`"): the
+contrapositive of BG **Theorem 3.8** (`S03h.thm38`) applied to the coprime action of `K` on the
+non-nilpotent `M_σ`.  In the type-`P1` factorization `M = K M_σ` (complement `hcompl`), with `K`'s
+prime-manner action on `M_σ` (`hcond2`, Proposition 14.2(a)), `M_σ` of odd order coprime to `K`
+(`hoddM`, `hcop`), and `M_σ` non-nilpotent (`M_F ≠ M_σ`), the `K`-centralizer meets the Fitting
+subgroup of `M_σ` nontrivially: `C_{F(M_σ)}(K) ≠ 1`.
+
+Proof: were `C_{F(M_σ)}(K) = 1`, Theorem 3.8 (hypotheses (1) `hcop`, (2) `hcond2`, (3) the
+assumed triviality) would give `⁅M_σ, K⁆ ⊆ F(M_σ)`.  But `⁅M_σ, K⁆ = M_σ`
+(`msigma_eq_commutator_kappa_of_isComplement'`), so `F(M_σ) = M_σ`, forcing `M_σ` nilpotent
+(`isNilpotent_of_fittingInAmbient_eq_self`) — contradicting `M_F ≠ M_σ`
+(`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`).  This is the brick that consumes the
+freshly-formalized BG Theorem 3.8 (issue 8011); it unblocks `K* ⊆ Q = O_q(M)` (step 2 tail). -/
+theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) ≠ ⊥ := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `M` has odd order (divisor of `|G|`).
+  have hoddM : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  -- `M_σ` non-nilpotent (else `M_F = M_σ`), transported to the `subgroupOf` realization.
+  have hMσ_not_nil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hnil =>
+    hne ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hnil)
+  have hMσ'_not_nil :
+      ¬ Group.IsNilpotent ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) := by
+    intro hnil
+    haveI := hnil
+    exact hMσ_not_nil
+      (nilpotent_of_mulEquiv
+        (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)))
+  -- normality of `M_σ.subgroupOf M`.
+  have hM_le_NMσ :
+      M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
+  -- Contrapositive of Theorem 3.8: assume `C_{F(M_σ)}(K) = 1`.
+  by_contra hbot
+  have hle := OddOrder.BG.Ch1.S03h.thm38 (G := ↥M)
+    (K := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (R := K.subgroupOf M)
+    hoddM hcompl hcop hcond2 hbot
+  rw [msigma_eq_commutator_kappa_of_isComplement' hG hM hcompl] at hle
+  -- `⁅M_σ, K⁆ = M_σ ⊆ F(M_σ)` gives `F(M_σ) = M_σ`, hence `M_σ` nilpotent — contradiction.
+  have heq : fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M :=
+    le_antisymm (OddOrder.BG.Ch2.S08.fittingInG_le _) hle
+  exact hMσ'_not_nil (isNilpotent_of_fittingInAmbient_eq_self heq)
 
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
