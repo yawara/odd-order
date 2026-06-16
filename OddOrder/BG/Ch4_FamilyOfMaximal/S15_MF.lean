@@ -2782,6 +2782,24 @@ theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
         Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     _ = fittingInAmbient M := rfl
 
+/-- **BG Theorem 15.2(g), assembled from the single `σ`-gap `C_M(Q) ⊆ M_σ`** (mmd L4196-4198):
+chains the equality skeleton (`fittingInAmbient_eq_sup_centralizer_inf_of_inputs`) with the reduced
+reverse inclusion (`centralizer_inf_le_fittingInAmbient_of_le_Msigma`).  For `Q = O_q(M)` with
+`M_σ/Q` nilpotent, the conjunct `F(M) = Q ⊔ (C_G(Q) ⊓ M)` follows from `C_M(Q) ⊆ M_σ` alone.  This
+is the wrapper-facing form: the only outstanding input is the BG-specific `C_M(Q) ⊆ M_σ` (a
+`σ`-uniqueness fact to be supplied from the global analysis / forward input). -/
+theorem fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hM : M ∈ maximalSubgroups G) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal]
+    [Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
+    (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
+    fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) :=
+  fittingInAmbient_eq_sup_centralizer_inf_of_inputs hQ
+    (centralizer_inf_le_fittingInAmbient_of_le_Msigma hG hM hMnormQ hCle)
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
