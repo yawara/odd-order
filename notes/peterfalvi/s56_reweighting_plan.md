@@ -103,3 +103,23 @@ S08 contrapositive の証明を trace して norm-1 の所在を**正確に**特
 **📍 現在地 (cont.²⁹ 完了時点)**: (5.6) reweighting は**完全 scoping 済・着手準備完了**。X-sum 済、core = weighted
 `xAdjoinStep`。FPF tower (cont.²⁶) は別 obligation で H/H′ 実データ済 (H′/W₂+assembly 残)。次セッション第一手 =
 weighted `XAdjoinStepInput` struct + `xAdjoinStep` core (Q4 が証明正本)。**正本=本ファイル + chatgpt_answer.md。**
+
+## cont.³² (session 43 後半): (5.6) core 精密 diff-plan — weighting は member family のみに局所化
+xAdjoinStep の norm-1 entry point を grep で精密特定 ⟹ **weighting は member family (χmem) のみ**:
+- **break member ψ (=χ) と anchor χ₁ (=η₁) は (6.8.3) で常に既約** ⟹ `hχχ=1`/`hchi1chi1=1`/`hχbarχbar=1` は**不変**。
+- 一般化対象 = **member family χmem の `hmemortho = if i=j then 1 else 0` → `if i=j then ‖χmem i‖² else 0`** +
+  bound `hDeg : 2a < ∑ deg²` → `2a < ∑ deg²/‖χmem i‖²`。
+- **🎯 最深核 = `crux1_of_memberFamily` (S08CP1:1888、92 行)**: weighted projection 計算。norm-1 使用 =
+  L40 `hmemortho i j` (member 直交)、L68 `hmemortho i₁ i₁` (anchor、norm-1 のまま可)、L74 `hDeg` (∑deg²)。
+  ⟹ ここを weighted 化 (1/‖χᵢ‖² 射影、quadratic D=∑deg²/‖χᵢ‖²、`int_eq_zero_of_sq_mul_le_of_two_mul_lt` は抽象 D 対応済)。
+- `xAdjoinStep` (189 行) は大半 pass-through (crux1 + retarget 呼ぶ)、weighted crux1 を呼べば追従。
+- struct `XAdjoinStepInput` (S08CP1:2583、52 行): `χmem : ι→IrreducibleCharacter` → 一般 character + norm field、
+  `hmemortho` 対角 weighted。
+
+**⟹ (5.6) core build 順 (additive、~280 行)**: (1) weighted struct → (2) **`crux1_of_memberFamilyW` (92 行、最重・Q4 正本)**
+→ (3) `xAdjoinStepW` (189 行、pass-through) → (4) `coherentDegreeSqNormBound_of_not_coherentW` wrapper。
+break-pair for reducible S は別途 (`exists_coherentBreakPair` の conjugate-pair enumeration、既約非本質の可能性)。
+
+**📍 session 43 総括 (19 commits)**: FPF tower 完結 (hfpf 実 Sibley data) + ChatGPT #1 verdict (sidestep 無し) +
+(5.6) core 精密 diff-plan (crux1 最深、weighting=member family のみ)。**残=(5.6) core build (crux1W 中心、major focused)。**
+正本=本ファイル + chatgpt_answer.md。**次=weighted struct → crux1W build。**
