@@ -1894,6 +1894,27 @@ theorem sup_le_normalizer_centralizer_inf {Q D K : Subgroup G}
     (le_normalizer_inf hKQ (hKD.trans (normalizer_le_normalizer_centralizer D)))
     (le_normalizer_inf hDQ (Subgroup.le_normalizer.trans (normalizer_le_normalizer_centralizer D)))
 
+/-- **Normalizers grow in a nilpotent group** (`§14`-independent, reusable): a proper subgroup
+`Q₀ < Q` of a nilpotent `Q` is properly contained in its `G`-normalizer, `Q₀ < N_G(Q₀)`.
+
+Inside `↥Q` the proper subgroup `Q₀.subgroupOf Q < ⊤` is properly contained in its normalizer (the
+normalizer condition for nilpotent groups, `lt_normalizer_of_isNilpotent_of_lt_top`); transport to
+`G` via `subgroupOf_normalizer_eq`.  In Theorem 15.2's step 3 (mmd L4194) this is `N_Q(Q₀) ⊃ Q₀`,
+so `N_M(Q₀)/Q₀` is nontrivial and has a minimal normal subgroup `Q₁/Q₀`. -/
+theorem lt_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpotent ↥Q]
+    (hQ0Q : Q0 < Q) :
+    Q0 < Subgroup.normalizer (Q0 : Set G) := by
+  have hQ0le : Q0 ≤ Q := hQ0Q.le
+  have hlt : Q0.subgroupOf Q < ⊤ := by
+    rw [lt_top_iff_ne_top, ne_eq, Subgroup.subgroupOf_eq_top]
+    exact hQ0Q.2
+  have h := OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top (G := ↥Q) hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hQ0le] at h
+  rw [lt_iff_le_and_ne]
+  refine ⟨Subgroup.le_normalizer, fun heq => ?_⟩
+  rw [← heq] at h
+  exact lt_irrefl _ h
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
