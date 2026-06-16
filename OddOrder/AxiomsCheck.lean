@@ -4613,6 +4613,10 @@ for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-nor
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.not_type1_of_type2
+/-! **TI-subset saturation count** (`S14_TypePCounting`, `ncard_conjClassSet_of_isTISubset`):
+for a TI-subset `A` stabilised by its normalizer-bound `L`, `|𝒞_G(A)| = |A|·[G:L]`.  The
+disjoint-conjugate count feeding Theorem 14.7 step 5 (`|𝒞_G(T)| = |T|·[G:Z]`). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset
 
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the

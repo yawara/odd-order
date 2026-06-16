@@ -4400,6 +4400,72 @@ theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [hrM, hrN] at heq
     exact absurd heq (by norm_num)
 
+/-- **Conjugacy-saturation count of a TI-subset** (BG §1, the input to Theorem 14.7 step 5):
+for a TI-subset `A` with normalizer-bound `L` that `L` stabilizes (`A^l = A` for `l ∈ L`), the
+saturation `𝒞_G(A)` is the disjoint union of the `[G:L]` conjugates `A^g` (each of cardinality
+`|A|`), whence `|𝒞_G(A)| = |A|·[G:L]`.  The subset analogue of
+`ncard_conjugates_eq_index_of_normalizer_eq_self`. -/
+theorem ncard_conjClassSet_of_isTISubset [Finite G] {A : Set G} {L : Subgroup G}
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (hstab : ∀ l ∈ L, MulAut.conj l • A = A) :
+    (conjClassSet A).ncard = A.ncard * L.index := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hwd : ∀ g₁ g₂ : G, QuotientGroup.leftRel L g₁ g₂ →
+      MulAut.conj g₁ • A = MulAut.conj g₂ • A := by
+    intro g₁ g₂ hrel
+    rw [QuotientGroup.leftRel_apply] at hrel
+    calc MulAut.conj g₁ • A
+        = MulAut.conj g₁ • (MulAut.conj (g₁⁻¹ * g₂) • A) := by rw [hstab _ hrel]
+      _ = MulAut.conj g₂ • A := by rw [← mul_smul, ← map_mul, mul_inv_cancel_left]
+  set B : G ⧸ L → Set G := Quotient.lift (fun g => MulAut.conj g • A) hwd with hBdef
+  have hBval : ∀ g : G, B (QuotientGroup.mk g) = MulAut.conj g • A := fun g => rfl
+  have hunion : conjClassSet A = ⋃ q : G ⧸ L, B q := by
+    ext y
+    rw [mem_conjClassSet, Set.mem_iUnion]
+    constructor
+    · rintro ⟨t, ht, g, rfl⟩
+      refine ⟨QuotientGroup.mk g, ?_⟩
+      rw [hBval, Set.mem_smul_set]
+      exact ⟨t, ht, by rw [MulAut.smul_def, MulAut.conj_apply]⟩
+    · rintro ⟨q, hq⟩
+      obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+      rw [hBval, Set.mem_smul_set] at hq
+      obtain ⟨a, ha, rfl⟩ := hq
+      exact ⟨a, ha, g, by rw [MulAut.smul_def, MulAut.conj_apply]⟩
+  have hdisj : Pairwise (Function.onFun Disjoint B) := by
+    intro q q' hqq'
+    obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+    obtain ⟨g', rfl⟩ := Quotient.exists_rep q'
+    simp only [Function.onFun, hBval]
+    rw [Set.disjoint_left]
+    rintro y hy hy'
+    rw [Set.mem_smul_set] at hy hy'
+    obtain ⟨a, ha, rfl⟩ := hy
+    obtain ⟨a', ha', heq⟩ := hy'
+    have he : g * a * g⁻¹ = g' * a' * g'⁻¹ := by
+      rw [MulAut.smul_def, MulAut.smul_def, MulAut.conj_apply, MulAut.conj_apply] at heq
+      exact heq.symm
+    have hov : (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ ∈ A := by
+      have hc : (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ = a' := by
+        rw [show (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ = g'⁻¹ * (g * a * g⁻¹) * g' from by group, he]; group
+      rw [hc]; exact ha'
+    have hmem : g'⁻¹ * g ∈ L := hTI (g'⁻¹ * g) ⟨a, ha, hov⟩
+    apply hqq'
+    apply Quotient.sound
+    change (QuotientGroup.leftRel L) g g'
+    rw [QuotientGroup.leftRel_apply]
+    have h2 : g⁻¹ * g' = (g'⁻¹ * g)⁻¹ := by group
+    rw [h2]; exact L.inv_mem hmem
+  rw [hunion, Set.ncard_iUnion_of_finite (fun q => Set.toFinite _) hdisj]
+  have hBcard : ∀ q : G ⧸ L, (B q).ncard = A.ncard := by
+    intro q
+    obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+    rw [hBval]; exact Set.ncard_smul_set _ _
+  rw [finsum_congr hBcard, finsum_eq_sum_of_fintype, Finset.sum_const, Finset.card_univ,
+    smul_eq_mul, ← Nat.card_eq_fintype_card, ← Subgroup.index]
+  exact mul_comm _ _
+
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
 
 /-- **Counting-bound kernel for Theorem 14.7(e)** (BG mmd L3975, the `8/15 > 1/2` step).
