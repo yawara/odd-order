@@ -4747,6 +4747,24 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sup_le_normalizer_inf_of_commute
 
+/-! **BG 14.7, internal-product cardinality + commute helpers** (`S14_TypePCounting`):
+`card_sup_of_commute_of_disjoint` — for commuting `H`, `K` with `H ⊓ K = ⊥`, `|H ⊔ K| = |H|·|K|`
+(via `noncommCoprod`).  `commute_of_le_normalizer_of_disjoint` — subgroups `A, B ≤ Z` normal in `Z`
+with `A ⊓ B = ⊥` commute elementwise (`[x,y] ∈ A ⊓ B = ⊥`).  Used for `|Kᵢ* ⊔ Kⱼ*| = kᵢ*·kⱼ*` in the
+pairwise-nonconjugacy argument.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.card_sup_of_commute_of_disjoint
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.commute_of_le_normalizer_of_disjoint
+
+/-! **BG 14.7, pairwise nonconjugacy of the family** (`S14_TypePCounting`,
+`typeP_family_nonconjugate`, mmd L4015): maximal subgroups whose swap factors `Zₖ = M_σ(Mₖ) ⊓ C(Kₖ)`
+meet trivially (with `Z₂ ≠ ⊥`) are nonconjugate — else `σ(M₁) = σ(M₂)` makes `Z₁`, `Z₂` disjoint
+normal `τ`-Halls of `Z` with `z₁ z₂ ∣ z = k₁ z₁`, so `z₂ ∣ k₁` (a `τ`-number divides a `τ'`-number),
+forcing `Z₂ = ⊥`.  Feeds Lemma 14.5(b).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_nonconjugate
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

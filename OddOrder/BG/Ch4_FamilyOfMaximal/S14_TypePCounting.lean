@@ -5161,6 +5161,110 @@ theorem sup_le_normalizer_inf_of_commute {A B : Subgroup G}
     (sup_le Subgroup.le_normalizer (h.trans (Subgroup.centralizer_le_normalizer _)))
     (sup_le (hAB.trans (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer)
 
+/-- **Internal direct product of two commuting subgroups**: if `H`, `K` commute elementwise and
+`H ⊓ K = ⊥`, then `|H ⊔ K| = |H|·|K|`.  (The `noncommCoprod` map `↥H × ↥K → ↥(H ⊔ K)` is an
+isomorphism.)  Used by the family argument for `|Kᵢ* ⊔ Kⱼ*| = kᵢ*·kⱼ*` (pairwise nonconjugacy) and
+in the `n = 1` collapse. -/
+theorem card_sup_of_commute_of_disjoint [Finite G] {H K : Subgroup G}
+    (hcomm : ∀ x ∈ H, ∀ y ∈ K, Commute x y) (hdisj : H ⊓ K = ⊥) :
+    Nat.card ↥(H ⊔ K) = Nat.card ↥H * Nat.card ↥K := by
+  classical
+  have hc : ∀ (a : ↥H) (b : ↥K), Commute (H.subtype a) (K.subtype b) :=
+    fun a b => hcomm (a : G) a.2 (b : G) b.2
+  have hinj : Function.Injective (MonoidHom.noncommCoprod H.subtype K.subtype hc) :=
+    (MonoidHom.noncommCoprod_injective _ _ hc).mpr
+      ⟨H.subtype_injective, K.subtype_injective, by
+        rw [H.range_subtype, K.range_subtype]; exact disjoint_iff.mpr hdisj⟩
+  have hrange : (MonoidHom.noncommCoprod H.subtype K.subtype hc).range = H ⊔ K := by
+    rw [MonoidHom.noncommCoprod_range, H.range_subtype, K.range_subtype]
+  rw [← Nat.card_congr
+      ((MonoidHom.ofInjective hinj).trans (MulEquiv.subgroupCongr hrange)).toEquiv, Nat.card_prod]
+
+/-- **Subgroups normal in a common overgroup, meeting trivially, commute**: if `A, B ≤ Z` with
+`Z ≤ N_G(A)`, `Z ≤ N_G(B)` (so `A, B ◁ Z`) and `A ⊓ B = ⊥`, then every element of `A` commutes with
+every element of `B`.  (The commutator `[x,y]` lies in `A ⊓ B = ⊥`.)  Used for `|Kᵢ* ⊔ Kⱼ*| =
+kᵢ*·kⱼ*` once the `Kᵢ*` are known normal in `Z`. -/
+theorem commute_of_le_normalizer_of_disjoint {Z A B : Subgroup G}
+    (hAZ : A ≤ Z) (hBZ : B ≤ Z) (hAnorm : Z ≤ Subgroup.normalizer (A : Set G))
+    (hBnorm : Z ≤ Subgroup.normalizer (B : Set G)) (hdisj : A ⊓ B = ⊥) :
+    ∀ x ∈ A, ∀ y ∈ B, Commute x y := by
+  haveI hAn : (A.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hAnorm
+  haveI hBn : (B.subgroupOf Z).Normal := Subgroup.normal_subgroupOf_of_le_normalizer hBnorm
+  have hdisjZ : Disjoint (A.subgroupOf Z) (B.subgroupOf Z) := by
+    rw [Subgroup.disjoint_def]
+    intro g hgA hgB
+    have : (g : G) ∈ A ⊓ B :=
+      Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mp hgA, Subgroup.mem_subgroupOf.mp hgB⟩
+    rw [hdisj, Subgroup.mem_bot] at this
+    exact OneMemClass.coe_eq_one.mp this
+  intro x hx y hy
+  have h := Subgroup.commute_of_normal_of_disjoint (A.subgroupOf Z) (B.subgroupOf Z) hAn hBn hdisjZ
+    ⟨x, hAZ hx⟩ ⟨y, hBZ hy⟩ (Subgroup.mem_subgroupOf.mpr hx) (Subgroup.mem_subgroupOf.mpr hy)
+  exact h.map Z.subtype
+
+/-- **BG 14.7, pairwise nonconjugacy of the family** (mmd L4015, "the `Mᵢ` are pairwise not
+conjugate"): if `M₁`, `M₂` are maximal subgroups whose swap factors `Zₖ = M_σ(Mₖ) ⊓ C(Kₖ)` (the
+`σ(Mₖ)`-Halls of `Z = K ⊔ K*`, `Kₖ` Hall `κ(Mₖ)`) meet trivially and `Z₂ ≠ ⊥`, then `M₁`, `M₂` are
+nonconjugate.
+
+Were they conjugate, `σ(M₁) = σ(M₂) =: τ`, so `Z₁`, `Z₂` are both `τ`-Halls of `Z`, normal
+(direct factors) and disjoint.  Then `|Z₁ ⊔ Z₂| = z₁ z₂ ∣ z = k₁ z₁`, giving `z₂ ∣ k₁`; but `z₂` is
+a `τ`-number and `k₁` a `τ'`-number, so `z₂ = 1`, contradicting `Z₂ ≠ ⊥`.  Feeds Lemma 14.5(b)
+(pairwise disjointness of the `𝒞_G(M̃ᵢ)`). -/
+theorem typeP_family_nonconjugate [Finite G]
+    {K Kstar M₁ M₂ K₁ K₂ : Subgroup G}
+    (hK₁M₁ : K₁ ≤ M₁) (hK₁ : Ch03.IsHallSubgroup (kappa M₁) (K₁.subgroupOf M₁))
+    (hsw₁ : K ⊔ Kstar = K₁ ⊔ (OddOrder.BG.Ch3.S10.Msigma M₁ ⊓ Subgroup.centralizer (K₁ : Set G)))
+    (hsw₂ : K ⊔ Kstar = K₂ ⊔ (OddOrder.BG.Ch3.S10.Msigma M₂ ⊓ Subgroup.centralizer (K₂ : Set G)))
+    (hne₂ : OddOrder.BG.Ch3.S10.Msigma M₂ ⊓ Subgroup.centralizer (K₂ : Set G) ≠ ⊥)
+    (hdisj : (OddOrder.BG.Ch3.S10.Msigma M₁ ⊓ Subgroup.centralizer (K₁ : Set G)) ⊓
+      (OddOrder.BG.Ch3.S10.Msigma M₂ ⊓ Subgroup.centralizer (K₂ : Set G)) = ⊥) :
+    ¬ IsConjugateSubgroup M₁ M₂ := by
+  classical
+  set Z₁ := OddOrder.BG.Ch3.S10.Msigma M₁ ⊓ Subgroup.centralizer (K₁ : Set G) with hZ₁def
+  set Z₂ := OddOrder.BG.Ch3.S10.Msigma M₂ ⊓ Subgroup.centralizer (K₂ : Set G) with hZ₂def
+  rintro ⟨g, hg⟩
+  have hσ : OddOrder.BG.Ch3.S10.sigma M₂ = OddOrder.BG.Ch3.S10.sigma M₁ := by
+    rw [← hg]; exact sigma_conj_smul_eq g M₁
+  have hZ₁CK₁ : Z₁ ≤ Subgroup.centralizer (K₁ : Set G) := by rw [hZ₁def]; exact inf_le_right
+  have hZ₁Mσ : Z₁ ≤ OddOrder.BG.Ch3.S10.Msigma M₁ := by rw [hZ₁def]; exact inf_le_left
+  have hZ₂CK₂ : Z₂ ≤ Subgroup.centralizer (K₂ : Set G) := by rw [hZ₂def]; exact inf_le_right
+  have hZ₂Mσ : Z₂ ≤ OddOrder.BG.Ch3.S10.Msigma M₂ := by rw [hZ₂def]; exact inf_le_left
+  have hcommK₁Z₁ : ∀ x ∈ K₁, ∀ y ∈ Z₁, Commute x y := fun x hx y hy =>
+    Subgroup.mem_centralizer_iff.mp (hZ₁CK₁ hy) x hx
+  have hdisjK₁Z₁ : K₁ ⊓ Z₁ = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hrK₁ hrZ₁
+    exact kappaHall_isPiSubgroup_sigmaCompl hK₁M₁ hK₁ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrK₁, Nat.card_pos.ne'⟩)
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M₁ r (Nat.mem_primeFactors.mpr
+        ⟨hr, hrZ₁.trans (Subgroup.card_dvd_of_le hZ₁Mσ), Nat.card_pos.ne'⟩))
+  have hzcard : Nat.card ↥(K ⊔ Kstar) = Nat.card ↥K₁ * Nat.card ↥Z₁ := by
+    rw [hsw₁]; exact card_sup_of_commute_of_disjoint hcommK₁Z₁ hdisjK₁Z₁
+  have hZ₁Z : Z₁ ≤ K ⊔ Kstar := by rw [hsw₁]; exact le_sup_right
+  have hZ₂Z : Z₂ ≤ K ⊔ Kstar := by rw [hsw₂]; exact le_sup_right
+  have hZ₁norm : K ⊔ Kstar ≤ Subgroup.normalizer (Z₁ : Set G) := by
+    rw [hsw₁]; exact (sup_le_normalizer_inf_of_commute hZ₁CK₁).trans inf_le_right
+  have hZ₂norm : K ⊔ Kstar ≤ Subgroup.normalizer (Z₂ : Set G) := by
+    rw [hsw₂]; exact (sup_le_normalizer_inf_of_commute hZ₂CK₂).trans inf_le_right
+  have hz12 : Nat.card ↥(Z₁ ⊔ Z₂) = Nat.card ↥Z₁ * Nat.card ↥Z₂ :=
+    card_sup_of_commute_of_disjoint
+      (commute_of_le_normalizer_of_disjoint hZ₁Z hZ₂Z hZ₁norm hZ₂norm hdisj) hdisj
+  have hdvd : Nat.card ↥(Z₁ ⊔ Z₂) ∣ Nat.card ↥(K ⊔ Kstar) :=
+    Subgroup.card_dvd_of_le (sup_le hZ₁Z hZ₂Z)
+  rw [hz12, hzcard] at hdvd
+  have hZ₂dvdK₁ : Nat.card ↥Z₂ ∣ Nat.card ↥K₁ := by
+    rw [mul_comm (Nat.card ↥K₁)] at hdvd
+    exact (Nat.mul_dvd_mul_iff_left Nat.card_pos).mp hdvd
+  have hcop : Nat.Coprime (Nat.card ↥Z₂) (Nat.card ↥K₁) :=
+    coprime_of_forall_prime_not_dvd (fun r hr hrZ₂ hrK₁ =>
+      kappaHall_isPiSubgroup_sigmaCompl hK₁M₁ hK₁ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrK₁, Nat.card_pos.ne'⟩)
+        (hσ ▸ OddOrder.BG.Ch3.S10.Msigma_isPiGroup M₂ r (Nat.mem_primeFactors.mpr
+          ⟨hr, hrZ₂.trans (Subgroup.card_dvd_of_le hZ₂Mσ), Nat.card_pos.ne'⟩)))
+  have hZ₂one : Nat.card ↥Z₂ = 1 := (Nat.gcd_eq_left hZ₂dvdK₁).symm.trans hcop
+  exact hne₂ (Subgroup.card_eq_one.mp hZ₂one)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
