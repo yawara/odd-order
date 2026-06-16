@@ -2669,6 +2669,46 @@ theorem fittingInAmbient_le_opiCore_sup_centralizer_inf [Finite G] {M : Subgroup
           (Subgroup.centralizer ((opiCoreInG π (fittingInAmbient M) : Subgroup G) : Set G) ⊓ M) :=
         sup_le_sup_left (le_inf hcent hleM) _
 
+/-- **`O_q(F(M)) = O_q(M)`** (`§14`-independent, reusable): the `q`-core of the Fitting subgroup
+equals the `q`-core of `M`.  `O_q(M) ≤ F(M)` (`opiCoreInG_singleton_le_fittingInG`) is normal in
+`F(M)` (it is normal in `M ⊇ F(M)`) and a `q`-group, so `O_q(M) ≤ O_q(F(M))`; conversely
+`O_q(F(M))` is normal in `M` (`M` normalizes `F(M)`, hence its `q`-core) and a `q`-subgroup of `M`,
+so `O_q(F(M)) ≤ O_q(M)`.  Bridges `fittingInAmbient_le_opiCore_sup_centralizer_inf` (phrased with
+`O_q(F(M))`) to Theorem 15.2's `Q = O_q(M)`. -/
+theorem opiCore_singleton_fittingInAmbient_eq [Finite G] {M : Subgroup G} {q : ℕ} [Fact q.Prime] :
+    opiCoreInG ({q} : Set ℕ) (fittingInAmbient M) = opiCoreInG ({q} : Set ℕ) M := by
+  refine le_antisymm ?_ ?_
+  · -- `O_q(F(M)) ≤ O_q(M)`: normal in `M` (char in `F(M) ◁ M`), a `q`-subgroup of `M`.
+    have hle : opiCoreInG ({q} : Set ℕ) (fittingInAmbient M) ≤ M :=
+      (OddOrder.GroupTheory.opiCoreInG_le _ _).trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+    have hMnorm : M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) (fittingInAmbient M)) :=
+      OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer _
+        (fun x hx => OddOrder.BG.Ch2.S08.mem_normalizer_fittingInG_of_mem hx)
+    exact OddOrder.GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hle
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr hMnorm)
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG _ _)
+  · -- `O_q(M) ≤ O_q(F(M))`: `≤ F(M)`, normal in `F(M)`, a `q`-subgroup.
+    have hle : opiCoreInG ({q} : Set ℕ) M ≤ fittingInAmbient M :=
+      OddOrder.BG.Ch2.S08.opiCoreInG_singleton_le_fittingInG M
+    have hFnorm : fittingInAmbient M ≤ Subgroup.normalizer (opiCoreInG ({q} : Set ℕ) M) :=
+      (OddOrder.BG.Ch2.S08.fittingInG_le M).trans
+        (OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer _ Subgroup.le_normalizer)
+    exact OddOrder.GroupTheory.le_opiCoreInG_of_normal_of_isPiSubgroup hle
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hle).mpr hFnorm)
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG _ _)
+
+/-- **Theorem 15.2(g), `⊆`-conjunct in the `Q = O_q(M)` form** (`§14`-independent): combines the
+`O_π` decomposition (`fittingInAmbient_le_opiCore_sup_centralizer_inf` at `π = {q}`) with the bridge
+`O_q(F(M)) = O_q(M)` (`opiCore_singleton_fittingInAmbient_eq`), giving the wrapper-ready inclusion
+`F(M) ≤ Q ⊔ (C_G(Q) ⊓ M)` for the theorem's `Q = O_q(M)`.  The reverse inclusion `C_M(Q) ⊆ F(M)`
+(the situation-specific step-4 core) completes the equality. -/
+theorem fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore [Finite G] {M Q : Subgroup G} {q : ℕ}
+    [Fact q.Prime] (hQ : Q = opiCoreInG ({q} : Set ℕ) M) :
+    fittingInAmbient M ≤ Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) := by
+  subst hQ
+  have h := fittingInAmbient_le_opiCore_sup_centralizer_inf (M := M) ({q} : Set ℕ)
+  rwa [opiCore_singleton_fittingInAmbient_eq] at h
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
