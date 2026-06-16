@@ -3754,6 +3754,10 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.caseB_transfer
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isIrreducible_lift_of_trivial
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.fpf_lift_of_centralizer_bot
+-- BG Theorem 3.10 (a)+(b), general (non-abelian) kernel (issue 8013, piece 3 capstone): the
+-- `K₀`-reduction strong induction assembling base + Case A + Case B into the irreducible-module form
+-- `|R|` prime ∧ `finrank V = |R|·finrank C_V(R)` for a general Frobenius kernel `K ⊴ G`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_frobenius_general
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
