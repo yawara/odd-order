@@ -3503,3 +3503,54 @@ base-union `IsCoherent hyp.tau (certainTypeSet ∪ Y)` を engine で組むに�
 
 **正本=本 session 45。`hgen_withDiagonal_certainTypeSet` + degree-ratio 補題 landed (new leaf
 S08_CaseBXunionY、axiom-clean)。残=ν (列横断 grid glue) + hDτ (per-φ pinning wiring)。**
+
+## 2026-06-16 lane-b 再開 (session 46): 🎯 thrashing 決着 — session 45 path = 教科書整合の sound route と確定 (textbook + engine 署名で照合)
+
+lane-b 再開。session 43-45 (s08 plan) と cont.⁴³-⁴⁷ (s56_reweighting_plan) で **chain adjoin / 直接τ₂ /
+certainTypeSet⊔Y glue の 3 アプローチが振動**していたのを、**原典 (6.8.2) 全文 (04.8.mmd L178-224) +
+engine 署名**で照合し決着させた。**Lean commit は無し** (engine 在庫を exhaustive に確認し、振動を解消して
+正しい 1 経路を確定する RECON; 次の build を fresh context で安全に回すための consolidation)。
+
+### ✅ 教科書 (6.8.2) の構造 (ground truth, 確定):
+- **(6.8.2) は τ₂ を Z[X∪Y] 上に直接構成**: τ₂ は τ on `Z[X∪Y,L^#]` 一致 + `η₁^τ₂ = Y` (Y=η₁^τ₁ or −η₂^τ₁)。
+  生成集合 `{Z[X∪Y,L^#] ∪ {η₁}}` (これが Z[X∪Y] を生成) 上で内積保存を (6.8.2.3) で検証 → X∪Y coherent。
+- **🔑 case (A) と違い cX = IsCoherent(X) を独立に構成しない** (case (B) の X は可約 column μ_j を含むので
+  「X coherent」を経由できない; case (A) のみ (6.6) で X⊂Irr L coherent)。X-coherence は (6.8.2) の帰結であって前提でない。
+
+### ✅ engine 照合の決定的発見 (振動の根本原因):
+- **`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4581) は `hX:IsCoherent τ X` と
+  `hY:IsCoherent τ Y` を両方独立に要求** (= 2 coherent 集合の貼り合わせ engine、case-A Frobenius assembly の
+  ミラー)。⟹ これを `X:=Xset W2` で使うと **cX-standalone (mixed X の coherence) を強いる** = 教科書非整合の
+  重い道。cont.⁴³-⁴⁵ の `xChainCoherentW` (cX-standalone) thrashing の正体。
+- **✅✅ session 45 の path は健全**: glue を `X:=certainTypeSet h46 k` (= 可約 column のみ、`hgen` 済) で使い、
+  **既約 X-member は後段で retarget adjoin** する。⟹ cX-standalone (mixed) を回避しつつ既存 infra を最大活用する
+  **正しい Strategy-B-chain**。session 45 は後退でなく前進だった (cont.⁴⁶ の「session 45=detour」評は誤り)。
+
+### 🧭 確定した case-B 経路 (これで振動終了、以後この 1 本):
+1. **base glue** (session 45 進行中): `coherentXunionYset_caseB_of_glued` 系を `X:=certainTypeSet h46 k`,
+   `Y:=Yset` で適用 → `IsCoherent hyp.tau (certainTypeSet ∪ Y)`。入力 = cX(=`certainTypeSet_isCoherent_tau_canonical`
+   ✅) / cY(=`coherentYset` ✅) / hpair(✅) / hgen(✅ session 45) / **ν + hagreeX/Y + hmixed + hDτ (残)**。
+2. **既約 X-member adjoin**: `retarget_isCoherent_of_decompositions_and_memberFamily` (S07:3979) で
+   (certainTypeSet∪Y) に既約 X-member を per-pair 追加 → `IsCoherent hyp.tau (Xset W2 ∪ Y)`。
+   per-χ data = `irreducibleDecompositionTau` (S08CBC2:1868)、Dmem dispatch (column→`certainTypeMemberDecomposition`)。
+3. **(6.8.3)**: 単一 break {ψ,ψ̄} に Thm (5.6) (`coherentDegreeSqNormBound_of_not_coherentW`) + X-sum +
+   FPF tower (`caseB_fpf_bound` ✅) → `false_of_caseB_break_of_bounds` (✅算術 spine) → S coherent → sole sorry。
+
+### 🔭 次の build = ν 構築 (session 45 long pole、全部品在庫・deep gap 無し):
+**`exists_integralCharacterMap_glue_of_orthonormal` (S07:3125) を `X-source = grid {μ_{ij}}`,
+`Y-source = Yset` で適用**。columnSum は norm |W₁| で非 orthonormal だが **μ_{ij} は正規直交既約**ゆえ
+source に取れる; ν は linearity で `ν(columnSum)=∑_i ν(μ_{ij})=∑_i certainTypeExtension(μ_{ij})=
+certainTypeExtension(columnSum)` ⟹ hagreeX (on columnSum) 充足。νX=`certainTypeExtension` (=`certainType_isCoherent`
+.extension S06:513、=dadeICM S06:453)、νY=`coherentYset.extension`。**要部品 (全在庫)**:
+- grid orthonormality `⟨μ_{ij},μ_{i'j'}⟩=δ`: within-column=既約正規直交、cross-column=`columnFamily_mu_ne`
+  (S06_CertainTypeClifford:827 で使用) + 既約 ⟹ 直交。set-level 組立 (sigma index over deg-class-k columns×Fin w₁) が intricate。
+- μ_{ij}⊥η: `inner_coherentYset_extension_certainTypeRImage_eq_zero` (S08CBC2:1331) / source ⊥ `inner_columnSum_Yset_eq_zero`。
+- hagreeX 接続: ν(columnSum)=certainTypeExtension(columnSum) を linearity で (`map_sum`)。
+**その後**: hmixed (`inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` S08CBC2:1449 既存) +
+hDτ (per-φ pinning `per_constituent_Y_eq_smul` wiring) → base glue 完成 → step 2 adjoin → step 3 → sole sorry。
+
+**📊 honest reckoning**: deep math gap 無し・全 ingredients/infra 在庫だが **large intricate assembly** (ν~100-150
+LOC + adjoin chain + (6.8.3) wiring、multi-session)。session 43-47 の振動は loop の per-turn context reload が原因と
+確定 ⟹ **sustained focus で 1 経路 (上記) を腰を据えて build** すべき (loop-cadence 不適は実証済)。
+**正本=本 session 46。3 アプローチ振動を textbook+engine 署名で決着 (session 45 path=sound Strategy-B-chain)、
+cX-standalone は教科書非整合と確定。次=ν 構築 (grid μ_{ij} orthonormal glue、全部品在庫)。**
