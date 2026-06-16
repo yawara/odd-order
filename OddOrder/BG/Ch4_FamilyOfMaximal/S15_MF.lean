@@ -2819,6 +2819,21 @@ theorem mem_beta_of_inputs {M Q D : Subgroup G} {q : ℕ}
   exact hQ0 (Subgroup.commutator_eq_bot_iff_le_centralizer.mp
     (by rwa [Subgroup.commutator_comm] at hDQ))
 
+/-- **Theorem 15.2(f) — `M_F` non-cyclic, gated-endpoint skeleton** (mmd L4202): `M_F` is
+non-cyclic because it contains the non-cyclic section `Q̄ = Q/Q₀` (the elementary abelian chief
+factor of order `q^p`, `p ≥ 2`).  If `M_F` were cyclic, then so would be its subgroup `Q`
+(`Subgroup.isCyclic_of_le`) and the quotient `Q/Q₀` (`isCyclic_of_surjective`), against `hQbar`.
+Reduces `¬ IsCyclic M_F` to `Q ⊆ M_F` (Theorem 15.2(c)) and `¬ IsCyclic (Q/Q₀)` (from `|Q̄| = q^p`,
+`p ≥ 2`). -/
+theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Normal]
+    (hQMF : Q ≤ MF M) (hQbar : ¬ IsCyclic (↥Q ⧸ Q0.subgroupOf Q)) :
+    ¬ IsCyclic ↥(MF M) := by
+  intro hcyc
+  haveI := hcyc
+  haveI : IsCyclic ↥Q := Subgroup.isCyclic_of_le hQMF
+  exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
+    (QuotientGroup.mk'_surjective _))
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
