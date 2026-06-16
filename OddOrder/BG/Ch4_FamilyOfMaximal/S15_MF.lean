@@ -1156,7 +1156,11 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         Group.IsNilpotent ↥D ∧
         Q0 = Q ⊓ Subgroup.centralizer (D : Set G) ∧
         M ≤ Subgroup.normalizer (Q0 : Set G) ∧
-        Nat.card ↥(Q.subgroupOf (Q ⊔ Q0)) = q ^ p ∧
+        -- mmd 15.2(f): the chief factor `Q̄ = Q/Q0` is elementary abelian of order `q^p`
+        -- (faithfulness fix, Lane G 2026-06-16: the previous scaffold wrote
+        -- `Nat.card ↥(Q.subgroupOf (Q ⊔ Q0))`, which is `|Q|` since `Q0 = Q ⊓ C(D) ⊆ Q` forces
+        -- `Q ⊔ Q0 = Q`; the intended `|Q̄| = |Q : Q0|` is `(Q0.subgroupOf Q).index`).
+        (Q0.subgroupOf Q).index = q ^ p ∧
         OddOrder.BG.Ch3.S10.Msigma M = derivedInG M ∧
         derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
         -- mmd 15.2(g) "F(M) ⊂ M_σ": the Fitting subgroup is contained in the σ-core.
@@ -2799,6 +2803,36 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma [Finite G]
     fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) :=
   fittingInAmbient_eq_sup_centralizer_inf_of_inputs hQ
     (centralizer_inf_le_fittingInAmbient_of_le_Msigma hG hM hMnormQ hCle)
+
+/-- **Theorem 15.2 step 5 — `q ∈ β(M)`, gated-endpoint skeleton** (mmd L4202): "if `q ∉ β(M)`,
+then Theorem 5.5(a) shows `(DK)' = D` centralizes `Q`, a contradiction".  The contradiction is
+clean: `D` centralizing `Q` means `Q ≤ C_G(D)`, i.e. `C_Q(D) = Q`, against the established
+`C_Q(D) = Q₀ ⊊ Q` (`M_σ` non-nilpotent).  Reduces `q ∈ β(M)` to the single Theorem-5.5 input
+`hDcent` (`q ∉ β(M) → D ⊆ C_G(Q)`) and the proper-centralizer fact `hQ0` (`¬ Q ⊆ C_G(D)`). -/
+theorem mem_beta_of_inputs {M Q D : Subgroup G} {q : ℕ}
+    (hQ0 : ¬ Q ≤ Subgroup.centralizer (D : Set G))
+    (hDcent : q ∉ OddOrder.BG.Ch3.S10.beta M → D ≤ Subgroup.centralizer (Q : Set G)) :
+    q ∈ OddOrder.BG.Ch3.S10.beta M := by
+  by_contra hq
+  have hDQ := hDcent hq
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer] at hDQ
+  exact hQ0 (Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+    (by rwa [Subgroup.commutator_comm] at hDQ))
+
+/-- **Theorem 15.2(f) — `M_F` non-cyclic, gated-endpoint skeleton** (mmd L4202): `M_F` is
+non-cyclic because it contains the non-cyclic section `Q̄ = Q/Q₀` (the elementary abelian chief
+factor of order `q^p`, `p ≥ 2`).  If `M_F` were cyclic, then so would be its subgroup `Q`
+(`Subgroup.isCyclic_of_le`) and the quotient `Q/Q₀` (`isCyclic_of_surjective`), against `hQbar`.
+Reduces `¬ IsCyclic M_F` to `Q ⊆ M_F` (Theorem 15.2(c)) and `¬ IsCyclic (Q/Q₀)` (from `|Q̄| = q^p`,
+`p ≥ 2`). -/
+theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Normal]
+    (hQMF : Q ≤ MF M) (hQbar : ¬ IsCyclic (↥Q ⧸ Q0.subgroupOf Q)) :
+    ¬ IsCyclic ↥(MF M) := by
+  intro hcyc
+  haveI := hcyc
+  haveI : IsCyclic ↥Q := Subgroup.isCyclic_of_le hQMF
+  exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
+    (QuotientGroup.mk'_surjective _))
 
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
