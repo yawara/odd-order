@@ -3568,3 +3568,113 @@ finite)。正規直交性: within-column = μ_{ij} 既約 (norm 1) + 相異 (`co
 (S06_CertainTypeCharacters:547) + μ_{ij} 既約補題名 + columnFamily_mu_sum_inner (S06CTChar 近傍)。組立後:
 νX=`certainTypeExtension` (S06:513=coherence.extension)、νY=`coherentYset.extension` → glue ν → hagreeX は
 ν(columnSum)=∑ν(μ_{ij})=certainTypeExtension(columnSum) を `map_sum` で。次 turn は sustained focus で grid 組立から。
+
+### session 46 cont.²: ✅✅ ν 構築 (session 45 long pole) COMPLETE + base glue を単一 obligation hDτ に還元
+**`exists_glue_nu_columnSum_Yset` landed** (commit `0ac7ece5`, S08_CaseBXunionY, axiom-clean): 結合 ν を
+grid source 族 {μ_{ij}} (正規直交既約) と Y の `exists_integralCharacterMap_glue_of_orthonormal` で構築、
+columnSum 一致は linearity (`columnSum_def`+`map_sum`) で grid 一致から復元。grid⊥Y = 既存
+`inner_columnFamily_mu_Yset_eq_zero`、grid 正規直交 = 既約 Kronecker (`irreducibleCharacter_inner` + CF-level
+`hinner` idiom)。**全 3 axioms allowlist**。
+
+**🎯 base glue (`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`, X:=certainTypeSet, Y:=Yset) の
+機械的入力は全て解決可能と確定 — 残る実質 obligation は hDτ ただ 1 つ**:
+- **cX** = `certainTypeSet_isCoherent_tau_canonical hk` ✅ / **cY** = `coherentYset` ✅
+- **hagreeX** ✅: `IsCoherent.congrMap` (S08CBC2:1531) は `extension := c.extension` で **extension 保存** ⟹
+  canonical.extension = `certainTypeExtension` ⟹ `exists_glue_nu_columnSum_Yset` の columnSum 一致が直結
+- **hagreeY** ✅: ν lemma 直接 / **hgen** ✅: `hgen_withDiagonal_certainTypeSet` (session 45)
+- **hsrc_ortho** ✅: `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` (S08CBC2:1555) + hpair=`inner_columnSum_Yset_eq_zero`
+- **hmixed** ✅: ⟨νx,νy⟩=⟨cTE(columnSum),cY.ext(η)⟩=0 (`inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`
+  S08CBC2:1449, 要 hHK) かつ ⟨columnSum,η⟩=0 (column⊥Y) ⟹ 両辺 0
+- **🔴 hDτ** (唯一残): `ν(columnSum k0 − a₀η₁) = hyp.tau(columnSum k0 − a₀η₁)`。LHS=cTE(columnSum k0)−a₀·cY.ext(η₁)
+  (ν linearity)。RHS は **(6.8.2.3) anchored image** = `columnDecompositionTau` (S08CBC2:1822) の D で
+  `hyp.tau(columnSum−a₀η₁)=D.X−D.Y`、pinning `per_constituent_Y_eq_smul` (S08CBC2:871) で `D.Y=a₀·cY.ext(η₁)`・
+  `D.X=cTE(columnSum k0)` ⟹ 一致。**materialize 要** (multi-step、(6.8.2.3) 実質内容)。
+  入力在庫: `columnDecompositionTau` の hmapagree=`caseB_column_mapagree`✅ / hχψ=`caseB_column_orthogonal_Yset`✅ /
+  hχbarψ=`caseB_column_conj_orthogonal_Yset`✅ / hdeg=`columnSum_inv_apply_one`✅ / hSdiff,htau1_mema=要構成。
+  per-φ 機構 `caseB_per_phi_anchored` (S08_CaseBAssembly:1416) も既存。
+
+**⟹ ▶▶ 次 turn の第一手 = hDτ materialize** (anchor column k0 の `columnDecompositionTau` D 構築 → D.X/D.Y を pinning
+抽出 → `tau(columnSum k0−a₀η₁)=cTE(columnSum k0)−a₀·cY.ext(η₁)` を確立) → base glue assembly
+(`coherentCertainTypeSet_union_Yset`) → 既約 adjoin (retarget) → IsCoherent(Xset∪Y) → (6.8.3) → sole sorry。
+**正本=本 session 46 cont.²。ν=DONE、base glue は hDτ ((6.8.2.3) anchored image) 単一 obligation に還元、discharge 経路確定。**
+
+### session 46 cont.³: ✅✅ base glue assembly `coherentCertainTypeSet_union_Yset` landed — 単一 obligation `hanchored` のみ
+**`coherentCertainTypeSet_union_Yset` (commit `8152a356`, S08_CaseBXunionY, axiom-clean)**: case-B base glue
+`IsCoherent hyp.tau (certainTypeSet h46 k ∪ Yset)` を gated skeleton として完成。機械的入力を全て内部 discharge:
+- **ν 抽出は `.choose`** (∃ν は Prop ⟹ IsCoherent データ goal に `obtain` 不可; `have hspec:=…choose_spec`+`set ν:=…choose`)
+- hagreeX: `exact hνcol χ₂` (**`canonical.extension` は `certainTypeExtension` と defeq** — `IsCoherent.congrMap` の
+  `extension := c.extension` 経由、`rfl` 不要で `exact` 通過)
+- hsrc_ortho/hmixed/hgen = 既存 lemma 直結、hDτ = ν linearity (`map_sub`/`map_nsmul`) で hanchored に還元
+- **唯一 hypothesis = `hanchored`**: `hyp.tau(columnSum k0 − a₀•η₁) = certainTypeExtension(columnSum k0)
+  − a₀•coherentYset.extension(η₁)` (= (6.8.2.3) column anchored image、faithful)
+
+**🔴 残る単一 obligation = `hanchored` ((6.8.2.3) column anchored image) — deep hard core**:
+route = `columnDecompositionTau` D (S08CBC2:1822、入力 hdeg=`columnSum_inv_apply_one`/hmapagree=`caseB_column_mapagree`/
+hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系/hSdiff・htau1_mema=要構成) → `D.tau1_image: hyp.tau(columnSum−a₀η₁)=D.X−D.Y`
+(D.tau1=hyp.tau) → pinning `D.Y=a₀•cY.ext(η₁)` (`per_constituent_Y_eq_smul` または `caseB_per_phi_anchored` S08CBA:1416、
+要 (6.8.2.2)=hdecomp [S08CBC `inner_tau_indW2_sub_smul_eq` 系で実質済] + D family `caseB_constituentDecomposition` S08CBA:1037
++ hXorth/hbi) → `D.X=certainTypeExtension(columnSum)` 同定。**multi-hundred LOC、per-constituent + pinning の (6.8.2.3) 本体**
+(lane が長く hard core としてきた部分)。**loop-cadence 不適、focused build 要。**
+
+**▶▶ 次 = `hanchored` materialize** (上記 route)。完成すれば base glue 即完成 → 既約 X-member adjoin
+(`retarget_isCoherent_of_decompositions_and_memberFamily` + `irreducibleDecompositionTau`) → IsCoherent(Xset∪Y) →
+(6.8.3) [FPF tower `caseB_fpf_bound`✅ + (5.6) bound `coherentDegreeSqNormBound_of_not_coherentW`✅] → sole sorry。
+**正本=本 cont.³。base glue=完成 (skeleton)、唯一残=hanchored ((6.8.2.3) per-constituent 本体、deep)。**
+
+### session 46 cont.⁴: 🔬 hanchored を精密マップ — 残る crux = `(caseB_phi_family).X = certainTypeExtension(columnSum)` 同定 (新規 pinning)
+hanchored の discharge 経路を engine 在庫で exhaustive に確認。Lean commit なし (route 確定の RECON)。
+**既存 (6.8.2.3) 機構**: `caseB_per_phi_anchored_fromYset` (S08CBA:1647) が anchored image
+`hyp.tau(Ind^L_H θ − cw•η₁) = (caseB_phi_family … i).X − cw•cY.ext(η₁)` を与える (pinning は内部 = `per_phi_anchored_image`)。
+bundles は **dischargeable** (`caseB_column_bundle` S08CBA:921 = theorem、`caseB_column_bundleFamily` :1002)。
+**⟹ hanchored の残務 3 点**:
+1. **per-φ family setup**: column k0 を `caseB_per_phi_anchored_fromYset` の枠 (φ:Irr W2、constituent θ) に乗せる。
+   columnSum k0 = Ind^L_H θ_{k0} (`columnSum_eq_induce_H`, hHK) を per-φ family の constituent i に同定。
+2. **hdecomp = (6.8.2.2) aggregate**: `hyp.tau(Ind_{W2} φ − [H:W2]•η₁) = Xagg − [H:W2]•cY.ext(η₁)` を供給
+   (S08CBC の `inner_tau_indW2_sub_smul_eq` 系で実質材料はある; aggregate 形への wiring 要)。
+3. **🔴🔴 crux (新規・未存在)**: `(caseB_phi_family … i).X = certainTypeExtension(columnSum k0)`。
+   caseB_phi_family の X は `hyp.tau(…)` の R(columnSum)=σ-image 族への projection で、これが
+   `certainTypeExtension(columnSum)=δ·∑ω^σ` に一致するのは **(6.8.2.3) pinning 結論** (‖X‖²=‖columnSum‖²=|W₁|、
+   X∈ℤ[σ-images]、符号確定)。**structural でなく pinning 依存ゆえ新規 lemma 要。これが真の hard core。**
+
+**📊 honest reckoning**: base glue の機械的 80% は完成 (ν + skeleton)。残る hanchored = (6.8.2.3) per-constituent
+本体で、per-φ assembly + hdecomp wiring + **新規 X=cTE pinning identity** の 3 点。これは教科書 (6.8.2.3) の
+忠実形式化 (reconstruction、research gap でない) だが **multi-hundred LOC の dedicated focused build**。
+loop/end-of-session で rush すると thrash する実績ゾーン。**▶ 次 = fresh focus で (3) X=cTE pinning から
+(最 hard・他を gate)、または (1)(2) wiring を先に。正本=本 cont.⁴。**
+
+### session 47: 🔬 RECON — norm-論法ショートカット不在を確定 + columnDecompositionTau 入力は既に全完備(note 訂正)
+4 commit (Lean は net-zero: `7fbbdf32` で 2 補題追加 → `571bef53` で削除)。endpoint A 継続。
+
+**⚠ 自己訂正(stale note の修正)**: cont.³ の「hSdiff・htau1_mema=要構成」は **誤り(stale)**。実際は
+**既に全部存在**していた — `caseB_column_sub_smul_support` (S08CBA:297) = μ_j−a·η₁ supportedness、
+`caseB_column_hSdiff` (S08CBA:315) = hSdiff 両半分、`caseB_column_htau1_mema` (S08CBA:340) = ZIrr membership、
+すべて `caseB_column_bundle` (S08CBA:921) が束ねて `CaseBColBundle` を完成済。session 47 で一度 standalone 版
+(`columnSum_sub_smul_Yset_support`/`tau_columnSum_sub_smul_mem_ZIrr`)を書いたが既存と重複 ⟹ 規約に従い revert。
+**教訓: 新補題前に既存 bundle/helper を grep して被覆確認すること。**
+
+**🎯 ⟹ columnDecompositionTau (S08CBC2:1822) の column-branch 入力は既に全完備** (要構成は無い):
+hdeg=`columnSum_inv_apply_one`✅ / hmapagree=`caseB_column_mapagree`✅ / hSdiff=`caseB_column_hSdiff`✅ /
+htau1_mema=`caseB_column_htau1_mema`✅ / hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系✅。
+さらに `caseB_phi_family`/`caseB_per_phi_anchored_fromYset` も組立済 ⟹ per-φ 機構は note が示唆したより完成度が高い。
+**唯一の真の gap = crux pinning `(caseB_phi_family … θ).X = certainTypeExtension(μ_j)`** (cont.⁴ と一致)。
+`caseB_per_phi_anchored_fromYset` は `τ(Ind_H θ − aθ·η₁) = (phi_family θ).X − aθ·ν₁` を与える(Y-side pinning
+= per_constituent_Y_eq_smul は engine 内部で済)ので、残るは X-side の同定のみ。その入力 hcol/hirr/hirrAnc/
+hXaggorth/hdecomp((6.8.2.2) aggregate)の wiring + 新規 X=cTE identity が pinning 本体。
+
+**🔬 norm-論法は hard core を回避しない(将来セッション向け・再調査不要)**: 独立に norm 論法
+`‖T − RHS‖²=0` (T=τ(μ_j−a·η₁), RHS=cTEμ−a·ν₁) を精査した結論 — **ショートカット無し**。
+- `⟨T,T⟩=‖RHS‖²=w₁+a₀²` は FREE: isometry `dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`
+  (**hyp.tau はこの abbrev = defeq**, μ_j−a·η₁ supported via `caseB_column_sub_smul_support`) + 列 Gram `columnFamily_mu_sum_inner`
+  (⟨μ_j,μ_j⟩=w₁, ⟨μ_j,μ̄_j⟩=0) + `inner_columnSum_Yset_eq_zero` + `certainTypeExtension_columnSum_inner`
+  (cTE 等長) + `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` (cTEμ⊥ν₁) + ν₁ norm 1。
+- **しかし `⟨T,RHS⟩=w₁+a₀²` の cross-term は hard**: `⟨T,cTEμ⟩=w₁` (hXmass) と `⟨T,ν₁⟩=−a₀` (hYmass) に分解されるが、
+  **個別に isometry で取り出せない**。τ(μ_j−μ̄_j)=cTEμ−cTEμ̄ は `⟨T,cTEμ⟩−⟨T,cTEμ̄⟩=w₁` の 1 式しか与えず、
+  cTEμ 単体は **supported vector の τ-像でない**(μ_j 単体は μ_j(1)≠0 で unsupported)ため、分離する第 2 の独立 isometry 関係が無い。
+- reciprocity `inner_tau_eq_inner_restrict` 経由でも hXmass = `⟨μ_j−a₀η₁, Res_L(cTEμ)⟩` で、**Res_L(certainTypeExtension μ_j)
+  = Res_L(δ_j ∑ω_{ij}^σ) の構造**(σ-image の制限)に bottom-out — 同じ深い (6.8.2.3) 内容。
+- ⟹ **hard core は projection-coeff pinning と同一**: D.X=∑_{α∈R}coeff(α)·α で `coeff(false,i)=1 ∀i ∧ coeff(true,i)=0 ∀i`
+  を示すこと(R=`certainTypeR.imageSet`={δ_j ω_{ij}^σ}∪{−δ_j ω_{ij'}^σ}、2w₁ 個; cTEμ=∑_i certainTypeRImage(false,i))。
+
+**▶▶ 次 = pinning 本体**: per-φ 経路 (`caseB_per_phi_anchored_fromYset` + `per_constituent_Y_eq_smul`、aggregate
+(6.8.2.2) `exists_decomposition_caseB` 経由で D.Y=a·ν₁ を強制 → coeff 計算で D.X=cTEμ) が最有力。
+multi-hundred LOC・dedicated focused build。loop/end-of-session 不適。**正本=本 session 47。**
