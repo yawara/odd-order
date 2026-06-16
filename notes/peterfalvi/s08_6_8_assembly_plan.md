@@ -3642,26 +3642,29 @@ bundles は **dischargeable** (`caseB_column_bundle` S08CBA:921 = theorem、`cas
 loop/end-of-session で rush すると thrash する実績ゾーン。**▶ 次 = fresh focus で (3) X=cTE pinning から
 (最 hard・他を gate)、または (1)(2) wiring を先に。正本=本 cont.⁴。**
 
-### session 47: ✅ columnDecompositionTau の機械的入力 2 本 landed + 🔬 norm-論法ショートカットの不在を確定
-2 commit (実 Lean 1 = `7fbbdf32`)。endpoint A 継続。**columnDecompositionTau を column に直接適用する経路の
-「要構成」入力を 2 本 landed**(S08_CaseBXunionY, axiom-clean):
-- ✅ **`columnSum_sub_smul_Yset_support`** = `(μ_j − a·η₁)` の H^#-supportedness。1 で消失(degree match `ha`)+
-  μ_j は A∪{1} 外で消失((4.7) `columnSum_support_subset`)+ η₁=Ind_H^L θ∈S は正規 H 外で消失
-  (`support_induce_subset_of_normal`、`Yset_subset_S`+`S_eq`)。= columnDecompositionTau `hSdiff` の μ−a·η₁ 半分
-  (μ−μ̄ 半分は既存 `columnDiff_support_subset`)。
-- ✅ **`tau_columnSum_sub_smul_mem_ZIrr`** = `(μ_j − a·η₁)^{hyp.tau} ∈ ZIrr G`。supported+virtual ⟹ image virtual
-  (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`、#1 経由)。= columnDecompositionTau `htau1_mema`。
+### session 47: 🔬 RECON — norm-論法ショートカット不在を確定 + columnDecompositionTau 入力は既に全完備(note 訂正)
+4 commit (Lean は net-zero: `7fbbdf32` で 2 補題追加 → `571bef53` で削除)。endpoint A 継続。
 
-**🎯 これで columnDecompositionTau (S08CBC2:1822) は column に対し完全構築可能** — 全入力が揃った:
-hdeg=`columnSum_inv_apply_one`✅ / hmapagree=`caseB_column_mapagree`✅ / hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系✅ /
-hSdiff={`columnDiff_support_subset`✅, `columnSum_sub_smul_Yset_support`✅(NEW)} / htau1_mema=`tau_columnSum_sub_smul_mem_ZIrr`✅(NEW)。
-⟹ D := columnDecompositionTau … で `hyp.tau(μ_j − a·η₁) = D.X − D.Y` (D.tau1=hyp.tau, `D.tau1_image`) が得られる。
-**唯一残 = pinning `D.X = certainTypeExtension(μ_j)` ∧ `D.Y = a·ν₁`** (ν₁=cY.ext η₁)。
+**⚠ 自己訂正(stale note の修正)**: cont.³ の「hSdiff・htau1_mema=要構成」は **誤り(stale)**。実際は
+**既に全部存在**していた — `caseB_column_sub_smul_support` (S08CBA:297) = μ_j−a·η₁ supportedness、
+`caseB_column_hSdiff` (S08CBA:315) = hSdiff 両半分、`caseB_column_htau1_mema` (S08CBA:340) = ZIrr membership、
+すべて `caseB_column_bundle` (S08CBA:921) が束ねて `CaseBColBundle` を完成済。session 47 で一度 standalone 版
+(`columnSum_sub_smul_Yset_support`/`tau_columnSum_sub_smul_mem_ZIrr`)を書いたが既存と重複 ⟹ 規約に従い revert。
+**教訓: 新補題前に既存 bundle/helper を grep して被覆確認すること。**
+
+**🎯 ⟹ columnDecompositionTau (S08CBC2:1822) の column-branch 入力は既に全完備** (要構成は無い):
+hdeg=`columnSum_inv_apply_one`✅ / hmapagree=`caseB_column_mapagree`✅ / hSdiff=`caseB_column_hSdiff`✅ /
+htau1_mema=`caseB_column_htau1_mema`✅ / hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系✅。
+さらに `caseB_phi_family`/`caseB_per_phi_anchored_fromYset` も組立済 ⟹ per-φ 機構は note が示唆したより完成度が高い。
+**唯一の真の gap = crux pinning `(caseB_phi_family … θ).X = certainTypeExtension(μ_j)`** (cont.⁴ と一致)。
+`caseB_per_phi_anchored_fromYset` は `τ(Ind_H θ − aθ·η₁) = (phi_family θ).X − aθ·ν₁` を与える(Y-side pinning
+= per_constituent_Y_eq_smul は engine 内部で済)ので、残るは X-side の同定のみ。その入力 hcol/hirr/hirrAnc/
+hXaggorth/hdecomp((6.8.2.2) aggregate)の wiring + 新規 X=cTE identity が pinning 本体。
 
 **🔬 norm-論法は hard core を回避しない(将来セッション向け・再調査不要)**: 独立に norm 論法
 `‖T − RHS‖²=0` (T=τ(μ_j−a·η₁), RHS=cTEμ−a·ν₁) を精査した結論 — **ショートカット無し**。
 - `⟨T,T⟩=‖RHS‖²=w₁+a₀²` は FREE: isometry `dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`
-  (**hyp.tau はこの abbrev = defeq**, μ_j−a·η₁ supported via NEW lemma) + 列 Gram `columnFamily_mu_sum_inner`
+  (**hyp.tau はこの abbrev = defeq**, μ_j−a·η₁ supported via `caseB_column_sub_smul_support`) + 列 Gram `columnFamily_mu_sum_inner`
   (⟨μ_j,μ_j⟩=w₁, ⟨μ_j,μ̄_j⟩=0) + `inner_columnSum_Yset_eq_zero` + `certainTypeExtension_columnSum_inner`
   (cTE 等長) + `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` (cTEμ⊥ν₁) + ν₁ norm 1。
 - **しかし `⟨T,RHS⟩=w₁+a₀²` の cross-term は hard**: `⟨T,cTEμ⟩=w₁` (hXmass) と `⟨T,ν₁⟩=−a₀` (hYmass) に分解されるが、
