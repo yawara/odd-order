@@ -2722,6 +2722,29 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_inputs [Finite G] {M Q : Subg
   refine le_antisymm (fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore hQ) (sup_le ?_ hcent)
   rw [hQ]; exact OddOrder.BG.Ch2.S08.opiCoreInG_singleton_le_fittingInG M
 
+/-- **Central-extension nilpotency** (`§14`-independent, reusable): a subgroup `H ≤ K` that
+centralizes a normal subgroup `Q ◁ K` is nilpotent whenever the quotient `K/Q` is nilpotent.
+`H ∩ Q` lies in the centre of `H` (since `H` centralizes `Q`), and `H/(H ∩ Q)` embeds in the
+nilpotent `K/Q`, so `H` is a central extension of a nilpotent group, hence nilpotent
+(`isNilpotent_of_ker_le_center` applied to `H → K/Q`).
+
+This is the crux of Theorem 15.2(g)'s reverse inclusion: with `K = M_σ`, `Q = O_q(M)`, and
+`H = C_M(Q) ⊆ M_σ`, it shows `C_M(Q)` is nilpotent, hence (being normal in `M`) lands in `F(M)`. -/
+theorem isNilpotent_of_centralizes_normal_of_quotient_isNilpotent {Q K H : Subgroup G}
+    [(Q.subgroupOf K).Normal] [Group.IsNilpotent (↥K ⧸ Q.subgroupOf K)]
+    (hHK : H ≤ K) (hHQ : H ≤ Subgroup.centralizer (Q : Set G)) :
+    Group.IsNilpotent ↥H := by
+  refine isNilpotent_of_ker_le_center
+    ((QuotientGroup.mk' (Q.subgroupOf K)).comp (Subgroup.inclusion hHK)) ?_
+  intro x hx
+  simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+    QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf, Subgroup.coe_inclusion] at hx
+  rw [Subgroup.mem_center_iff]
+  intro y
+  apply Subtype.ext
+  rw [Subgroup.coe_mul, Subgroup.coe_mul]
+  exact (Subgroup.mem_centralizer_iff.mp (hHQ y.2) _ hx).symm
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
