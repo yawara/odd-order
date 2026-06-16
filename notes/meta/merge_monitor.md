@@ -146,6 +146,13 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-17 — B の (6.8) §6 gap ブロッカーはユーザー直接対応 (再 flag しない)**: B の session 49 RECON で
+  (6.8) capstone の最終 obligation `hXanchored` が「純 wiring」でなく未形式化の §6 certain-type structure
+  theory (5 gap: p-group reduction / selection positivity / weight identity / hXmixed all-y / A/B dispatch)
+  と判明し B が loop STOP。hub が方向を AskUserQuestion したところ、ユーザーは「**B レーンが直接やりとりする
+  から大丈夫**」と回答。⟹ **B の停滞は既知・ユーザー管理下ゆえ、merge tick の stall 検出で B を再 thumbs-down
+  しない**（commit が notes のみ/0 でも黙って合流継続）。B が Lean を再開したら通常合流に戻る。
+
 - **2026-06-16 (夜³) — F REACTIVATED → Wielandt (9.1) (ユーザー裁可, hub code-verified)**: ユーザー問
   「F はまだ standby が正着か」を受け hub が実コード再検証。2 long pole（H `typeP_duality`
   `S14:4729` / B `(6.8)` `S08_CoherenceTheorems`）は**両方とも未達を確認**（standby の前提は真）。
