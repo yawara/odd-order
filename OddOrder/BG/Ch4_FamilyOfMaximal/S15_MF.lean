@@ -1860,6 +1860,22 @@ theorem isNilpotent_sup_of_commutator_eq_bot {A B : Subgroup G}
     nilpotent_of_surjective f.rangeRestrict f.rangeRestrict_surjective
   exact hrange ▸ this
 
+/-- **`C_Q(D) ⊊ Q` for a non-nilpotent would-be-commuting join** (`§14`-independent, reusable): if
+`Q` and `D` are nilpotent but `Q ⊔ D` is not, then `D` does not centralize `Q`, i.e.
+`Q ⊓ C_G(D) ≠ Q`.  (Otherwise `Q ≤ C_G(D)` gives `⁅Q, D⁆ = ⊥`, making `Q ⊔ D` nilpotent by
+`isNilpotent_sup_of_commutator_eq_bot`.)
+
+In Theorem 15.2's step 3 (mmd L4194) this is `Q₀ = C_Q(D) ⊊ Q` for the `K`-invariant complement
+`D` of `Q` in `M_σ` (`Q ⊔ D = M_σ` non-nilpotent, `Q` the `q`-Sylow, `D` nilpotent by
+`complement_isNilpotent_of_inputs`): the proper subgroup that starts the minimal-normal `Q̄`
+analysis. -/
+theorem inf_centralizer_ne_self_of_sup_not_nilpotent {Q D : Subgroup G}
+    [Group.IsNilpotent ↥Q] [Group.IsNilpotent ↥D]
+    (hnot : ¬ Group.IsNilpotent ↥(Q ⊔ D)) :
+    Q ⊓ Subgroup.centralizer (D : Set G) ≠ Q := fun hQ0 =>
+  hnot (isNilpotent_sup_of_commutator_eq_bot
+    (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (hQ0 ▸ inf_le_right)))
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
