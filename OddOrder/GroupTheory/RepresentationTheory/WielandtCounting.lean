@@ -196,4 +196,13 @@ theorem finrank_elab_identity (ρ : Representation k G V) (U E : Subgroup G) [U.
   rw [invariants_eq_inf_of_sup_eq_top ρ hUE, hb, ← hdaf, htag]
   ring
 
+/-- `ρ a` preserves the dimension of a submodule: `dim (P.map (ρ a)) = dim P`, since `ρ a` is a
+linear automorphism.  (When `E` permutes the isotypic components of `W`, each `ρ a` maps one
+component isomorphically onto another, so all components in an orbit have equal dimension.) -/
+theorem finrank_map_rho_eq (ρ : Representation k G V) (a : G) (P : Submodule k V) :
+    finrank k ↥(P.map (ρ a)) = finrank k ↥P := by
+  have hinv : Function.LeftInverse (ρ a⁻¹) (ρ a) := fun v => by
+    rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
+  exact (Submodule.equivMapOfInjective (ρ a) hinv.injective P).finrank_eq.symm
+
 end OddOrder.GroupTheory.WielandtCounting

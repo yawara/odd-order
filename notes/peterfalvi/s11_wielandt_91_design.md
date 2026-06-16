@@ -88,6 +88,30 @@ Goal: `|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|`.
 Build order (least → most dependent): I-3 (abstract) → step 2 (⋆, Brauer-free) →
 cor (i) via BG 3.3 + I-5 → I-2 → I-1 → (†) → I-4 → assembly.
 
+## 2026-06-17 (loop) — I-1 confirmed as the char-0 wall; mathlib status
+
+Step 2 (⋆ `finrank_elab_identity`) DONE. Drilling into I-1 (the (†) core) confirmed it
+genuinely needs **char-0 / Brauer-character** infrastructure — no char-p bypass:
+
+- (†) ⟸ "**E acts freely on the nontrivial 𝔽̄_p[U]-simple modules**" ⟸ Brauer permutation
+  lemma in **FIXED-POINT form** over 𝔽̄_p: `#(e-fixed simples) = #(e-fixed classes)` for `e∈E`.
+- The char-p trace of the conjugation permutation on `Z(𝔽̄_p[U])` gives `#fixed ≡ #fixed (mod p)`
+  only. `dim ker(σ_e − 1)` gives **#orbits**, not #fixed-points. So the linear-algebra /
+  cycle-type route yields #orbits, not the #fixed-points the free-action argument needs.
+- Genuine fixed-point equality needs the **char-0 trace** ⇒ Brauer characters / the `p′`
+  decomposition-map bijection (`𝔽̄_p`-simples ↔ ℂ-irreducibles, equivariant). This is the
+  classical content and is **absent from mathlib**.
+- **mathlib DOES have** (helps I-2/I-3, Brauer-free): `RingTheory/SimpleModule/Isotypic.lean`
+  (`isotypicComponent`, `IsIsotypic`, `linearEquiv_fun`), `SimpleModule/WedderburnArtin.lean`,
+  `finrank_directSum`. **mathlib does NOT have**: Brauer characters, `p′` root-of-unity lift
+  `𝔽̄_p→ℂ`, decomposition map.
+- ⇒ Building I-1 bottom-up = building (a chunk of) **Brauer-character theory for `p′`-groups**
+  from scratch (Teichmüller-style lift of `p′`-roots of unity, Brauer char as char-0 class
+  function, the permutation lemma). Estimate **several sessions** on its own.
+
+This is the loop's designated stop-point ("I-1 requires full Brauer-character theory").
+Surfaced to user 2026-06-17 for a scope decision.
+
 ## Effort (no-axiom, revised 2026-06-17)
 
 Larger than the earlier (over-optimistic) ~3–5 estimate, because (I-1) the **modular
