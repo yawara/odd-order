@@ -3391,3 +3391,22 @@ systematic だが multi-session core。FPF tower (cont.²⁶、H/H′ 実デー�
 **📍 session 43 cont 総括 (14 commits)**: FPF tower 8 Lean (H/H′ 実データ) + ChatGPT #1 verdict (sidestep 無し) +
 (5.6) 完全 scoping (X-sum 済、core=weighted xAdjoinStep)。残 = (A) FPF H′/W₂+assembly [bounded・上記 recipe] /
 (B) (5.6) core [xAdjoinStep weighted・major]。両者 focused context 推奨。**正本=本 cont.³⁰ + s56_reweighting_plan.md。**
+
+### session 43 cont.³¹: ✅✅ FPF tower COMPLETE — hfpf を実 Sibley data から完全組立 (3 commits)
+cont.³⁰ recipe を実行し H′/W₂ 枝 + assembly を landing (maxed context でも methodical build で突破):
+- **`caseB_W1_dvd_relIndex_commutator`** (`c46b0d13`): `|W₁| ∣ |H′:W₂|−1`。W₁-action を H′=commutator ↥H 上に
+  `invariantSubgroupMulDistribMulAction` (smul-coercion `rfl`) で setup、hMinv は W₂ normality (`conj_mem`、
+  W₂ central)、hfix は centralizer_W2 を H′ で mirror。⚠ build tip: coercion 不一致は equality 回避 +
+  normality(conj_mem)で頑健化; central→normal は `mem_center_iff` 手構成 (前向き rw)。
+- **`caseB_fpf_bound`** (`17 commit`): 両整除 + `two_mul_add_one_sq_le_index_of_chain` → 完全
+  `(2|W₁|+1)²≤|H:W₂|`。oddness は card_L_odd、残 input = nontriviality 2 本 (H 非可換 / W₂≠H′ = (6.8.3) Z≠H′)。
+
+**⟹ case-B (6.8.3) の FPF/hfpf 側は完全に実 Sibley data 化。**`false_of_w2_break_arith` の hfpf 入力完成。
+**残ブロッカー = (5.6) bound (`hbreak`)= weighted `xAdjoinStep` 一般化** (s56_reweighting_plan.md、major focused)。
++ Cor 2.30 (hdsq、易・L4 inline) + break-pair for reducible S (= (5.6) core の一部)。
+
+**📍 endgame leaf (S08_CaseBEndgame, 396 行/9 定理) inventory**: 算術核 `false_of_w2_break_arith` / FPF index bound
+`two_mul_add_one_sq_le_of_two_fpf_factors` / chain bridge `two_mul_add_one_sq_le_index_of_chain` / 機械核
+`W1_dvd_index_of_fixedPoints_le` / action bridge `caseB_W1_dvd_index_of_centralizer_le` / H/H′ `caseB_W1_dvd_index_commutator`
+/ H′/W₂ `caseB_W1_dvd_relIndex_commutator` / **hfpf `caseB_fpf_bound`** / 算術 spine `false_of_caseB_break_of_bounds`。
+**正本=本 cont.³¹。FPF tower 完結、残=(5.6) core。**
