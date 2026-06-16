@@ -167,4 +167,33 @@ theorem ker_averageMap_comp_invariant (ρ : Representation k G V) (U : Subgroup 
   rw [LinearMap.mem_ker] at hx ⊢
   rw [← ρ_comp_averageMap_comm ρ U g x, hx, map_zero]
 
+/-- **The elementary-abelian identity (⋆)** for Peterfalvi (9.1), in dimension form, modulo the
+kernel-FPF fact (†) supplied as `htag`.  For `ρ` a representation of `G = U ⋊ E` (with `U ◁ G`,
+`⟨U,E⟩ = G`) over a field with `|U|` invertible:
+`|E|·dim V^{UE} + dim V = |E|·dim V^E + dim V^U`,
+provided `dim [V,U] = |E|·dim ([V,U] ⊓ V^E)`  (this is (†), discharged later via Maschke +
+the modular Brauer permutation lemma).  Here `V^{UE} = ρ.invariants` since `⟨U,E⟩ = G`. -/
+theorem finrank_elab_identity (ρ : Representation k G V) (U E : Subgroup G) [U.Normal]
+    [Fintype U] [Fintype E] [Invertible (Fintype.card U : k)] [FiniteDimensional k V]
+    (hUE : U ⊔ E = ⊤)
+    (htag : finrank k ↥(LinearMap.ker (averageMap (ρ.comp U.subtype))) =
+      Fintype.card E * finrank k ↥(LinearMap.ker (averageMap (ρ.comp U.subtype)) ⊓
+        invariants (ρ.comp E.subtype))) :
+    Fintype.card E * finrank k ↥ρ.invariants + finrank k V =
+      Fintype.card E * finrank k ↥(invariants (ρ.comp E.subtype)) +
+        finrank k ↥(invariants (ρ.comp U.subtype)) := by
+  have hdaf := finrank_invariants_add_finrank_ker_averageMap (ρ.comp U.subtype)
+  have hb : finrank k ↥(invariants (ρ.comp E.subtype)) =
+      finrank k ↥(invariants (ρ.comp U.subtype) ⊓ invariants (ρ.comp E.subtype)) +
+      finrank k ↥(LinearMap.ker (averageMap (ρ.comp U.subtype)) ⊓
+        invariants (ρ.comp E.subtype)) := by
+    refine finrank_invariants_eq_of_isCompl_invariant (ρ.comp E.subtype)
+      (isCompl_invariants_ker_averageMap (ρ.comp U.subtype)) ?_ ?_
+    · intro e x hx
+      have := le_comap_invariants ρ U (e : G) hx
+      rwa [Submodule.mem_comap] at this
+    · exact fun e x hx => ker_averageMap_comp_invariant ρ U (e : G) x hx
+  rw [invariants_eq_inf_of_sup_eq_top ρ hUE, hb, ← hdaf, htag]
+  ring
+
 end OddOrder.GroupTheory.WielandtCounting
