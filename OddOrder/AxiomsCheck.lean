@@ -4609,6 +4609,10 @@ for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-nor
 /-! **σ-decomposition factor extraction** (`S14_TypePCounting`, `exists_length_one_factor`): every
 `g ≠ 1` factors `g = x·x'` with `ℓ_σ(x) = 1`, `x'` a `σ(M)′`-element (commuting, both in `⟨g⟩`). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_length_one_factor
+/-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
+(`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
+(`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.not_type1_of_type2
 
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
