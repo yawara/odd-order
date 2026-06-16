@@ -52,4 +52,20 @@ theorem finrank_invariants_add_finrank_ker_averageMap
   have hrange : LinearMap.range ρ.averageMap = ρ.invariants := (isProj_averageMap ρ).range
   rw [← hrange, LinearMap.finrank_range_add_finrank_ker]
 
+/-- The two summands of the coprime decomposition meet trivially: a `G`-invariant vector lying
+in the augmentation submodule `[V,G] = ker (averageMap ρ)` is zero.  (This is `[V,G]^G = 0`, used
+to collapse the el-ab identity to the kernel-FPF case.) -/
+theorem eq_zero_of_mem_ker_averageMap_of_mem_invariants
+    (ρ : Representation k G V) [Fintype G] [Invertible (Fintype.card G : k)]
+    {v : V} (hker : v ∈ LinearMap.ker ρ.averageMap) (hinv : v ∈ ρ.invariants) : v = 0 := by
+  rw [LinearMap.mem_ker] at hker
+  exact (averageMap_id ρ v hinv).symm.trans hker
+
+/-- The coprime decomposition `V = V^G ⊕ [V,G]`: the invariants and the augmentation submodule
+`[V,G] = ker (averageMap ρ)` are complementary. -/
+theorem isCompl_invariants_ker_averageMap
+    (ρ : Representation k G V) [Fintype G] [Invertible (Fintype.card G : k)] :
+    IsCompl ρ.invariants (LinearMap.ker ρ.averageMap) :=
+  (isProj_averageMap ρ).isCompl
+
 end OddOrder.GroupTheory.WielandtCounting
