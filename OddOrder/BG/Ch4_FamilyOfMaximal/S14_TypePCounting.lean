@@ -4883,6 +4883,64 @@ theorem typeP_swap_Z_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rwa [← hKstar] at h
   exact le_antisymm hle1 hle2
 
+/-- **BG 14.7, Proposition 14.2(c) packaged** (the unique-centralizer clause): for a type-`P`
+maximal `M` with Hall `κ(M)`-subgroup `K`, every line `Y ∈ ℰ¹(K*)` (`K* = C_{M_σ}(K)`) satisfies
+`ℳ(C_G(Y)) = {M}`.  The Hall `(κ∪σ)'`-subgroup is produced internally, so callers supply only
+`Y ≤ M_σ ⊓ C_G(K)`.  Used to show the `K_i*` are pairwise disjoint. -/
+theorem typeP_centralizer_singleton [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    {p : ℕ} (hp : p.Prime) {Y : Subgroup G} (hY : Y ∈ elemAbelianOfRank G p 1)
+    (hYK : Y ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) = {M} := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  obtain ⟨_, _, _, _, _, hc⟩ := typeP_structure hG hM hP hKM hK rfl hU
+  exact hc p hp Y hY hYK
+
+/-- **BG 14.7, distinct neighbours have disjoint `K*`** (mmd L4005, "By Proposition 14.2(c)
+applied to each `Mi`, `Ki* ∩ Kj* = 1` for `i ≠ j`"): if `Mi ≠ Mj` are type-`P` maximal
+subgroups with Hall `κ`-subgroups `Ki`, `Kj`, then `C_{Mi_σ}(Ki) ⊓ C_{Mj_σ}(Kj) = ⊥`.
+
+A common nonidentity element gives, by Cauchy, a line `Y ∈ ℰ¹(Ki* ⊓ Kj*)`; Proposition 14.2(c)
+then forces `{Mi} = ℳ(C_G(Y)) = {Mj}`, i.e. `Mi = Mj`. -/
+theorem typeP_neighbor_Kstar_inf_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mi Mj Ki Kj : Subgroup G}
+    (hMi : Mi ∈ maximalSubgroups G) (hPi : IsTypeP Mi) (hKiMi : Ki ≤ Mi)
+    (hKi : Ch03.IsHallSubgroup (kappa Mi) (Ki.subgroupOf Mi))
+    (hMj : Mj ∈ maximalSubgroups G) (hPj : IsTypeP Mj) (hKjMj : Kj ≤ Mj)
+    (hKj : Ch03.IsHallSubgroup (kappa Mj) (Kj.subgroupOf Mj))
+    (hne : Mi ≠ Mj) :
+    (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ⊓
+      (OddOrder.BG.Ch3.S10.Msigma Mj ⊓ Subgroup.centralizer (Kj : Set G)) = ⊥ := by
+  classical
+  by_contra hbot
+  set H := (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ⊓
+    (OddOrder.BG.Ch3.S10.Msigma Mj ⊓ Subgroup.centralizer (Kj : Set G)) with hHdef
+  -- Cauchy: a prime-order element `z ∈ H`, generating a line `Y ∈ ℰ¹(H)`.
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hbot
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd (Finite.one_lt_card (α := ↥H)).ne'
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨z, hz⟩ := exists_prime_orderOf_dvd_card' p hpdvd
+  have hzH : (z : G) ∈ H := z.2
+  have hzord : orderOf (z : G) = p := (orderOf_injective H.subtype H.subtype_injective z).trans hz
+  have hYcard : Nat.card ↥(Subgroup.zpowers (z : G)) = p := by rw [Nat.card_zpowers, hzord]
+  have hY : Subgroup.zpowers (z : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
+  have hYH : Subgroup.zpowers (z : G) ≤ H := Subgroup.zpowers_le.mpr hzH
+  -- `ℳ(C_G(Y)) = {Mi} = {Mj}`, so `Mi = Mj`, contradiction.
+  have hi : maximalSubgroupsContaining (Subgroup.centralizer ((Subgroup.zpowers (z : G)) : Set G))
+      = {Mi} := typeP_centralizer_singleton hG hMi hPi hKiMi hKi hp hY (hYH.trans inf_le_left)
+  have hj : maximalSubgroupsContaining (Subgroup.centralizer ((Subgroup.zpowers (z : G)) : Set G))
+      = {Mj} := typeP_centralizer_singleton hG hMj hPj hKjMj hKj hp hY (hYH.trans inf_le_right)
+  exact hne (Set.singleton_eq_singleton_iff.mp (hi.symm.trans hj))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

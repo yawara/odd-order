@@ -4691,6 +4691,15 @@ internal direct product `Ki × Ki*` (`Ki` a `σ'`-group) lands in the `σ`-facto
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_swap_Z_eq
 
+/-! **BG 14.7, `K_i*` pairwise disjoint** (`S14_TypePCounting`, mmd L4005).
+`typeP_centralizer_singleton` packages Proposition 14.2(c) for a neighbour (`ℳ(C_G(Y)) = {M}` for
+`Y ∈ ℰ¹(K*)`).  `typeP_neighbor_Kstar_inf_eq_bot`: distinct type-`P` maximals `Mi ≠ Mj` have
+`C_{Mi_σ}(Ki) ⊓ C_{Mj_σ}(Kj) = ⊥` (a common line would force `{Mi} = {Mj}`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_centralizer_singleton
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_inf_eq_bot
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
