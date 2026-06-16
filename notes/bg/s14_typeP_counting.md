@@ -944,3 +944,31 @@ R(x)=N_σ∩C_G(x) に対し、∀L∈𝓜_σ(x) ∃! r∈R(x) で `conj r•M =
 → Thm 14.7 typeP_duality (counting 矛盾 n=1 + covering + part h)
 ```
 realistically 6-10 session。memory「~2-3.5 session」は σ-decomposition 前提を見落としていた。
+
+### ✅ π-part 元分解 DONE + 14.5(a) reduction 設計 (2026-06-16 lane-h loop 続き²)
+
+**✅ `OddOrder/GroupTheory/PiElementDecomposition.lean` COMPLETE** (commit `bd2f8aff`, sorry-free +
+axiom-clean, full build 3833 jobs): 巡回 ⟨g⟩ の 2-block (π, π') Hall 分解 = σ-decomposition の基礎 primitive。
+- `IsPiElement π g` := `∀ p ∈ (orderOf g).primeFactors, p ∈ π`。
+- `exists_isPiElement_mul`: `∃ a b, a*b=g ∧ Commute a b ∧ IsPiElement π a ∧ IsPiElement πᶜ b ∧ a,b∈zpowers g`
+  (CRT 指数 `Nat.chineseRemainder` で a=g^e, b=g^f; a^nπ=1 via nπ'|e で gcd 回避)。
+- `isPiElement_mul_unique`: 両分解一致 (a,a'∈⟨g⟩ から u=a'⁻¹a が π かつ π'-element ⟹ orderOf u=1)。
+- helper: `coprime_orderOf_of_isPiElement` / `isPiElement_mul_of_commute` / `commute_of_mem_zpowers` /
+  `mem_zpowers_of_mul_eq` / `natPiPart` + mul/coprime/primeFactors。
+
+**🔑 14.5(a) は full s-part σ-decomposition 不要、2-part tool + 13.9 + σ-class partition で可** (設計):
+- g = x·x' (x'∈R(x)⊆N_x,σ): x' は σ(N_x)-elt, σ(N_x)∩σ(M_x)=∅ (13.9) ⟹ x' は σ(M_x)'-elt ⟹
+  **x = σ(M_x)-part of g** (2-part uniqueness, π=σ(M_x))。同様 x = σ(N_x)'-part, x' = σ(N_x)-part。
+- g ∈ yR(y) ⟹ g = y·w (w∈R(y)): primes(g)=primes(x)∪primes(x')⊆σ(M_x)∪σ(N_x)。y≠1 は σ(M_y)-part of g
+  ⟹ σ(M_y) は g の nontrivial class ⟹ σ(M_y)∩(σ(M_x)∪σ(N_x))≠∅ ⟹ **σ(M_y)=σ(M_x) or σ(N_x)**
+  (partition: 13.9 disjoint + `sigma_conj` [S10_HallStructureCore:619] で conjugate⟹σ equal)。
+  - σ(M_y)=σ(M_x): y=σ(M_x)-part=x, x≠y 矛盾。
+  - σ(M_y)=σ(N_x): y=σ(N_x)-part=x' ⟹ y=x'。同様 w=x。x∈R(y)⊆..., y=x'∈R(x)⊆N_x,σ ⟹
+    y∈M∩N_σ=1 矛盾 (BG L3923)。
+- ⟹ **σ-class partition の "equal-or-disjoint" + `sigma_conj` があれば s-part 構築は回避可能**。
+
+**次の H 作業 (順に)**:
+1. **σ-class equal-or-disjoint helper** (13.9 `sigma_disjoint_of_nonconjugate` + `sigma_conj`):
+   `σ(M)∩σ(M')≠∅ → σ(M)=σ(M')` (M,M'∈𝓜)。small。
+2. **R(x) function** (`Rsub hG D x` via 14.4 ∃!N の Classical.choice; |𝓜_σ(x)|=1 で ⊥) + **M̃**。
+3. **Lem 14.5(a)** (上記 reduction) → **(c)** count (sharp transitivity 二重数え) → **14.6** → **14.7**。
