@@ -123,3 +123,18 @@ break-pair for reducible S は別途 (`exists_coherentBreakPair` の conjugate-p
 **📍 session 43 総括 (19 commits)**: FPF tower 完結 (hfpf 実 Sibley data) + ChatGPT #1 verdict (sidestep 無し) +
 (5.6) core 精密 diff-plan (crux1 最深、weighting=member family のみ)。**残=(5.6) core build (crux1W 中心、major focused)。**
 正本=本ファイル + chatgpt_answer.md。**次=weighted struct → crux1W build。**
+
+## cont.³³: 🎯 crux1W 大幅 de-risk — lambda engine 既に weighted、残=orthogonal projection
+crux1_of_memberFamily の証明を精読 ⟹ **(5.6.2) forcing engine `lambda_eq_zero_and_Z_eq_zero` (S07_Coherence) は
+既に完全 norm-general**: `mc : ι→ℝ` (norms)、`horth` 対角 `mc i`、`hψ : ‖ψ‖²=a²·mc i₁`、`hr₁ : rc i₁·mc i₁=1`、
+bound `2a < ∑ rc²·mc` を取る。原 crux1 は `mc=fun _=>1`/`rc=deg` で instantiate。**weighted は `mc i=‖χᵢ‖²`、
+`rc i=deg i/mc i` ⟹ `∑rc²·mc=∑deg²/‖χᵢ‖²` = ChatGPT Q4 と完全一致**。⟹ 最深 engine は無改修で使える。
+
+**残る key piece = orthogonal projection** `exists_indexed_intProjection_of_orthonormal_ZIrr` (S08CP1):
+orthonormal (`horth=if i=j then 1`) + **整数係数 `c:ι→ℤ`**。weighted は norm `mc i` 直交 + **有理係数 `⟨φ,vcᵢ⟩/mc i`**
+(⟨φ,vcᵢ⟩∈ℤ だが /mc i で有理)。⟹ 新規 `exists_indexed_projection_of_orthogonal_ZIrr` 要 (~50 行、
+Z=φ−∑(cZᵢ/mc i)•vcᵢ、⟨Z,vcᵢ⟩=cZᵢ−(cZᵢ/mc i)·mc i=0)。
+
+**⟹ crux1W build**: (1) orthogonal projection lemma [新規 key] → (2) weighted hcoeffval/hY (rc i=deg i/mc i) →
+(3) `lambda_eq_zero_and_Z_eq_zero` (無改修) で λ=0 → μ=−a。**当初の「92 行 monolith rewrite」より遥かに局所的**。
+正本=本ファイル + chatgpt_answer.md Q4。次=orthogonal projection lemma build。
