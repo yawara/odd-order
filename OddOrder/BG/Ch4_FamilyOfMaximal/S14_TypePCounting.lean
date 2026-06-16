@@ -3210,6 +3210,49 @@ theorem half_lt_one_sub_inv_mul {k l : ℕ} (hk : 3 ≤ k) (hl : 5 ≤ l) :
     _ ≤ (1 - 1 / (k : ℚ)) * (1 - 1 / (l : ℚ)) :=
         mul_le_mul (by linarith) (by linarith) (by norm_num) (by linarith)
 
+/-- **BG Theorem 14.7, partner existence** (§16-independent core, mmd L3975-3991): for a type-`P`
+maximal `M` with Hall `κ(M)`-subgroup `K`, `Kstar = C_{M_σ}(K)`, and a line `X ∈ ℰ_p¹(K)`, every
+`M* ∈ 𝓜(N_G(X))` (which exists, `N_G(X)` being proper) is type-`P`, nonconjugate to `M`, contains
+`K ⊔ Kstar` with `X ≤ M*_σ`, and `π(Kstar) ⊆ κ(M*)`.  This is the nonconjugate partner `M*` of
+Theorem 14.7 with its basic neighbour data; cyclicity of `Z`, the TI property, type-`P₂`, and the
+§16-gated covering/uniqueness are layered on top.  Built from `typeP_neighbor_embed` +
+`typeP_neighbor_kappa` (the §16-independent pre-position, steps 1a/1b). -/
+theorem exists_typeP_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K) :
+    ∃ Mstar : Subgroup G,
+      Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)) ∧
+      ¬ IsConjugateSubgroup M Mstar ∧ K ⊔ Kstar ≤ Mstar ∧
+      X ≤ OddOrder.BG.Ch3.S10.Msigma Mstar ∧
+      (∀ q ∈ (Nat.card ↥Kstar).primeFactors, q ∈ kappa Mstar) ∧ IsTypeP Mstar := by
+  classical
+  have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  -- `C_{M_σ}(X) ⊇ C_{M_σ}(K) = Kstar ≠ 1`.
+  have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
+    intro hbot
+    refine hKstarne (le_bot_iff.mp ?_)
+    rw [hKstar]
+    calc OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+        ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) :=
+          inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK))
+      _ = ⊥ := hbot
+  have hXne : X ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hX
+  obtain ⟨Mstar, hMstarmax, hMstarge⟩ :=
+    OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+      hG hM hXne (hXK.trans hKM)
+  have hMstarmem : Mstar ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hMstarmax, hMstarge⟩
+  obtain ⟨hnc, hZle, hXMsσ⟩ :=
+    typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hMstarmem
+  have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hMstarmem
+  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr Finite.one_lt_card
+  exact ⟨Mstar, hMstarmem, hnc, hZle, hXMsσ, hκ, ⟨q, hκ q hq⟩⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
