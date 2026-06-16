@@ -972,3 +972,30 @@ axiom-clean, full build 3833 jobs): 巡回 ⟨g⟩ の 2-block (π, π') Hall �
    `σ(M)∩σ(M')≠∅ → σ(M)=σ(M')` (M,M'∈𝓜)。small。
 2. **R(x) function** (`Rsub hG D x` via 14.4 ∃!N の Classical.choice; |𝓜_σ(x)|=1 で ⊥) + **M̃**。
 3. **Lem 14.5(a)** (上記 reduction) → **(c)** count (sharp transitivity 二重数え) → **14.6** → **14.7**。
+
+### ✅ 14.5(a) gap SOLVED — 14.4(e) で contradiction (ChatGPT 不要, 2026-06-16 lane-h loop³)
+
+**BG L3923 の terse "y∈N_σ∩M=1" を完全再構成** (key = 14.4(e) complement、my 14.4 conclusion に在る):
+
+設定: g ∈ xR(x) ∩ yR(y), x≠y, ℓ_σ(x)=ℓ_σ(y)=1。g = x·x' (x'∈R(x)) = y·y'' (y''∈R(y))。
+R(z)⊆C_G(z) ゆえ x'·x=x·x', y''·y=y·y'' (commute)。
+
+**Case |𝓜_σ(x)|=1** (R(x)=⊥, x'=1, g=x): g=x=y·y''。
+- |𝓜_σ(y)|=1: y''=1, x=y 矛盾。
+- |𝓜_σ(y)|>1: x=y·y'', y σ(M_y)-elt, y'' σ(M_y)'-elt (y''∈N(y)_σ, σ(N(y))∩σ(M_y)=∅) ⟹ y=σ(M_y)-part of x。
+  x は σ(M_x)-elt: σ(M_x)=σ(M_y) なら x=y 矛盾; 違えば x の σ(M_y)-part=1=y, y≠1 矛盾。
+**Case |𝓜_σ(y)|=1**: 対称。
+**Main case |𝓜_σ(x)|>1 ∧ |𝓜_σ(y)|>1**:
+- 14.4 for x → N(x), R(x)=N(x)_σ∩C_G(x); for y → N(y), R(y)=N(y)_σ∩C_G(y)。
+- **factor matching** (2-part tool `isPiElement_mul_unique` + σ-class helper `sigma_eq_of_mem_sigma_of_mem_sigma`):
+  x,x',y,y''∈⟨g⟩ (mem_zpowers_of_mul_eq, coprime commute)。π=σ(M_y) で y=σ(M_y)-part of g。
+  g=x·x' の σ(M_y)-part: x σ(M_x)-elt, x' σ(N(x))-elt (x'∈R(x)⊆N(x)_σ), σ(M_x)∩σ(N(x))=∅。
+  partition で σ(M_y)∈{σ(M_x),σ(N(x))}: σ(M_x) なら y=x 矛盾; ⟹ **σ(M_y)=σ(N(x)), y=x'**。
+  commute cancel: x·x'=y·y''=x'·y'' ⟹ (x' で消去) **x=y''**。
+- ⟹ **y=x'∈R(x)⊆N(x)_σ** & **x=y''∈R(y)⊆N(y)_σ**。
+- ⟹ **N(y)∈𝓜_σ(x)** (x∈N(y)_σ)。**14.4(e) for x with M=N(y)**:
+  `IsComplement'(N(x)_σ.subgroupOf N(x), (N(y)⊓N(x)).subgroupOf N(x))` ⟹ N(x)_σ ⊓ (N(y)⊓N(x)) = ⊥。
+- y∈N(x)_σ (⊆N(x)) ∧ y∈N(y) (y∈C_G(y)⊆N(y)) ⟹ y∈N(x)_σ ⊓ (N(y)⊓N(x)) = ⊥ ⟹ **y=1 矛盾**。
+
+**⟹ ChatGPT 不要。14.4(e) が "N_σ∩M=1" の正体。** 全 case 矛盾 ⟹ xR(x)∩yR(y)=∅。formalize は
+~150-250 行 (4-case + factor matching が bulk)。my 14.4 conclusion に (e) + sharp + (c) すべて在る。
