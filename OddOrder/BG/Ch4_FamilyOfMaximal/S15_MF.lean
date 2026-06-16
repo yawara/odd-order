@@ -2128,6 +2128,123 @@ theorem isNilpotent_quotient_subgroupOf_of_isNilpotent_map {G : Type*} [Group G]
     (QuotientGroup.quotientMulEquivOfEq hker.symm).trans (QuotientGroup.quotientKerEquivRange φ)
   exact nilpotent_of_mulEquiv e.symm
 
+/-- **Brick B2 core of Theorem 15.2 step 3(ii)** (mmd L4194, regular-action ⟹ nilpotent step):
+if `K₁` (prime order) acts regularly on `DQ₁/Q₀` — the preimage fixed-point-free condition `hFPF`
+(`k` fixes `x` mod `Q₀` only when `x ∈ Q₀`) — then `↥(D ⊔ Q₁) / Q₀.subgroupOf _` is nilpotent.
+
+Ambient `P = D ⊔ Q₁ ⊔ K₁` (so `Q₀ ⊴ P`), `Γ = ↥P / Q₀`; push `D ⊔ Q₁`, `K₁` into `Γ` via
+`ψ, ρ = π ∘ inclusion`.  Theorem 3.7 on the images `N̄ = ψ.range`, `R̄ = ρ.range` gives
+`IsNilpotent ↥N̄`; Noether's first isomorphism (`quotientKerEquivRange ψ`, kernel `Q₀.subgroupOf _`)
+transfers it to the quotient.  Feeds `commutator_le_of_quotient_isNilpotent` (B1). -/
+theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
+    {D Q1 K1 Q0 : Subgroup G} [(Q0.subgroupOf (D ⊔ Q1)).Normal]
+    (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hPQ0 : D ⊔ Q1 ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
+    (hdisj : Disjoint (D ⊔ Q1) K1)
+    (hK1Q0disj : Disjoint K1 Q0)
+    (hQ0lt : Q0 < D ⊔ Q1)
+    (hFPF : ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0) :
+    Group.IsNilpotent (↥(D ⊔ Q1) ⧸ (Q0.subgroupOf (D ⊔ Q1))) := by
+  have hDQ1P : D ⊔ Q1 ≤ D ⊔ Q1 ⊔ K1 := le_sup_left
+  have hK1P : K1 ≤ D ⊔ Q1 ⊔ K1 := le_sup_right
+  haveI hQ0P_normal : (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hPQ0
+  set π : ↥(D ⊔ Q1 ⊔ K1) →* ↥(D ⊔ Q1 ⊔ K1) ⧸ (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)) :=
+    QuotientGroup.mk' _ with hπ
+  set ψ : ↥(D ⊔ Q1) →* ↥(D ⊔ Q1 ⊔ K1) ⧸ (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)) :=
+    π.comp (Subgroup.inclusion hDQ1P) with hψ
+  set ρ : ↥K1 →* ↥(D ⊔ Q1 ⊔ K1) ⧸ (Q0.subgroupOf (D ⊔ Q1 ⊔ K1)) :=
+    π.comp (Subgroup.inclusion hK1P) with hρ
+  haveI := hPsolv
+  -- Kernels of `ψ`, `ρ` and the "trivial image ⟺ lies in `Q₀`" criteria.
+  have hkerψ : ψ.ker = Q0.subgroupOf (D ⊔ Q1) := by
+    rw [hψ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+  have hkerρ : ρ.ker = Q0.subgroupOf K1 := by
+    rw [hρ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+  have hψ1 : ∀ b : ↥(D ⊔ Q1), ψ b = 1 ↔ (b : G) ∈ Q0 := fun b => by
+    rw [← MonoidHom.mem_ker, hkerψ, Subgroup.mem_subgroupOf]
+  have hρ1 : ∀ b : ↥K1, ρ b = 1 ↔ (b : G) ∈ Q0 := fun b => by
+    rw [← MonoidHom.mem_ker, hkerρ, Subgroup.mem_subgroupOf]
+  have hρinj : Function.Injective ρ := by
+    rw [← MonoidHom.ker_eq_bot_iff, hkerρ, Subgroup.subgroupOf_eq_bot]
+    exact hK1Q0disj.symm
+  -- Quotient-equality criterion and the values of `ψ`, `ρ`.
+  have hπeq : ∀ u v : ↥(D ⊔ Q1 ⊔ K1), π u = π v ↔ (u : G)⁻¹ * (v : G) ∈ Q0 := by
+    intro u v
+    rw [hπ, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq,
+      Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+  have hψval : ∀ b : ↥(D ⊔ Q1), ψ b = π (Subgroup.inclusion hDQ1P b) := fun b => rfl
+  have hρval : ∀ c : ↥K1, ρ c = π (Subgroup.inclusion hK1P c) := fun c => rfl
+  haveI : IsSolvable ↥(ψ.range ⊔ ρ.range) :=
+    solvable_of_solvable_injective (Subgroup.subtype_injective _)
+  -- `ψ.range` is normal in `Γ`: `P = D ⊔ Q₁ ⊔ K₁ ≤ N_G(D ⊔ Q₁)` (as `K₁` normalizes `D ⊔ Q₁`).
+  have hψrange : ψ.range = ((D ⊔ Q1).subgroupOf (D ⊔ Q1 ⊔ K1)).map π := by
+    rw [hψ, MonoidHom.range_comp, Subgroup.inclusion_range]
+  haveI hNPnormal : ((D ⊔ Q1).subgroupOf (D ⊔ Q1 ⊔ K1)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hK1DQ1)
+  haveI hψrange_normal : (ψ.range).Normal := by
+    rw [hψrange]; exact hNPnormal.map π (QuotientGroup.mk'_surjective _)
+  have hNilpN : Group.IsNilpotent ↥(ψ.range) := by
+    refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+      (N := ψ.range) (R := ρ.range) ?_ ?_ ?_ ?_ ?_ ?_
+    · -- `ρ.range ≤ N(ψ.range) = ⊤` since `ψ.range ⊴ Γ`.
+      exact le_top.trans_eq (Subgroup.normalizer_eq_top_iff.mpr hψrange_normal).symm
+    · -- `Disjoint ψ.range ρ.range`: a common image lifts to `(D ⊔ Q₁) ⊓ K₁ = ⊥`.
+      rw [Subgroup.disjoint_def]
+      intro y hyψ hyρ
+      obtain ⟨b, rfl⟩ := MonoidHom.mem_range.mp hyψ
+      obtain ⟨c, hc⟩ := MonoidHom.mem_range.mp hyρ
+      have hbc : (b : G)⁻¹ * (c : G) ∈ Q0 :=
+        (hπeq (Subgroup.inclusion hDQ1P b) (Subgroup.inclusion hK1P c)).mp
+          (by rw [← hψval, ← hρval]; exact hc.symm)
+      have hcDQ1 : (c : G) ∈ D ⊔ Q1 := by
+        have hrw : (c : G) = (b : G) * ((b : G)⁻¹ * (c : G)) := by group
+        rw [hrw]
+        exact (D ⊔ Q1).mul_mem b.2 (hQ0lt.le hbc)
+      have hmem : (c : G) ∈ (D ⊔ Q1) ⊓ K1 := ⟨hcDQ1, c.2⟩
+      rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
+      rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
+    · -- `ψ.range ≠ ⊥`: the image of an `x ∈ (D ⊔ Q₁) ∖ Q₀` is nontrivial.
+      obtain ⟨x, hxDQ1, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+      intro hbot
+      refine hxQ0 ((hψ1 ⟨x, hxDQ1⟩).mp ?_)
+      have hmem : ψ ⟨x, hxDQ1⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
+      rwa [hbot, Subgroup.mem_bot] at hmem
+    · -- `ρ.range ≠ ⊥`: `K₁` is nontrivial and meets `Q₀` trivially.
+      obtain ⟨p, hp, hcard⟩ := hK1prime
+      haveI : Nontrivial ↥K1 := Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
+      obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
+      intro hbot
+      refine hk1 (Subtype.ext ?_)
+      have hρk : ρ k = 1 := by
+        have hmem : ρ k ∈ ρ.range := MonoidHom.mem_range.mpr ⟨k, rfl⟩
+        rwa [hbot, Subgroup.mem_bot] at hmem
+      have hmem : (k : G) ∈ K1 ⊓ Q0 := ⟨k.2, (hρ1 k).mp hρk⟩
+      rw [hK1Q0disj.eq_bot, Subgroup.mem_bot] at hmem
+      exact hmem
+    · -- `card ρ.range = card K₁ = p` (`ρ` injective).
+      obtain ⟨p, hp, hcard⟩ := hK1prime
+      exact ⟨p, hp, by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
+    · -- Fixed-point-free: a fixed nontrivial image contradicts `hFPF` (`k` fixes `x` mod `Q₀`).
+      intro r hr hr1 n hn hn1 heq
+      obtain ⟨a, rfl⟩ := MonoidHom.mem_range.mp hr
+      obtain ⟨b, rfl⟩ := MonoidHom.mem_range.mp hn
+      have hk1 : (a : G) ≠ 1 := fun h => hr1 (by
+        rw [hρval, show Subgroup.inclusion hK1P a = 1 from Subtype.ext h, map_one])
+      have hconj : ρ a * ψ b * (ρ a)⁻¹ = π (Subgroup.inclusion hK1P a *
+          Subgroup.inclusion hDQ1P b * (Subgroup.inclusion hK1P a)⁻¹) := by
+        rw [hρval, hψval, map_mul, map_mul, map_inv]
+      rw [hconj, hψval b] at heq
+      have hmem := (hπeq _ _).mp heq
+      refine hn1 ((hψ1 b).mpr (hFPF (a : G) a.2 hk1 (b : G) b.2 ?_))
+      simpa only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_inclusion, mul_inv_rev,
+        inv_inv, mul_assoc] using hmem
+  have e : (↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1)) ≃* ↥(ψ.range) :=
+    (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
+  exact nilpotent_of_mulEquiv e.symm
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
