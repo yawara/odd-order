@@ -4772,6 +4772,13 @@ consumes.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap_normal
 
+/-! **BG 14.7, full per-neighbour data** (`S14_TypePCounting`, `exists_neighbor_full`): the complete
+per-member package the `M_i` family consumes — Hall `κ(N)`-subgroup `K_N`, swap `Z = K_N ⊔ K_N*`
+(canonical `K_N* = Z ⊓ M_σ(N)`), `K_N* ◁ Z`, `N` type-`P`, and `K_N* ≠ ⊥` (`X ≤ K_N*`).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_full
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
