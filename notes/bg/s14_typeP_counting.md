@@ -1190,3 +1190,39 @@ K=Hall κ + K*=C_{Mσ}(K) のみ依存 (counting 非依存)。density 式 (L4031
   から。Lane G (S15:806 part h consume, S15:816 cyclic consume) は 14.7 landing まで gated。
 - 次の最有力 = M_i family setup (crux=swap 論法 L3999-4001 `Z=K_i×K_i*`) → density → covering →
   Prop 14.2(a) packaging → part(h)。新 leaf S14_Theorem147 は hub split (issue 0069)。
+
+### ✅✅ M_i family setup — swap 論法 COMPLETE + pairwise disjoint K_i* (2026-06-16 loop⁶, 4 commits)
+
+**✅ swap 論法 `Z = K⊔K* = K_i⊔K_i*` COMPLETE** (mmd L3999-4001、M_i family setup の最 intricate 部、
+sorry-free + axiom-clean、full build 3838/~66s)。7 新定理:
+
+- `typeP_normalizer_inf_eq` — **Prop 14.2(b1) を neighbor 用に packaging**: `N_G(X) ⊓ Mi = Ki ⊔ C_{Miσ}(Ki)`
+  (Mi type-P, Ki Hall κ(Mi), X∈ℰ¹ ≤ Ki)。Hall (κ∪σ)' は `hall_E_exists` で内部生成 ⟹ caller は Ki,X のみ供給。
+- `typeP_swap_Z_le` — **swap 方向 ⊆**: `K⊔K* ≤ Ki⊔Ki*`。K-part = K が X*(≤K*) を centralize ⟹ K≤N_G(X*)⊓Mi。
+  K*-part (**swap 本体**) = K* は κ(Mi)-群ゆえ ∃ Hall κ(Mi)-subgroup Ki'⊇K*、`N_G(X*)⊓Mi=Ki'⊔Ki'*=Ki⊔Ki*`
+  は Hall 選択に非依存 ⟹ K*≤Ki'≤Ki⊔Ki*。
+- `normalizer_le_of_maximalSubgroupsContaining_centralizer` — **N_G(X) ≤ M** (mmd L3992「M⊇N_G(X*)」、§13非依存
+  一般補題): `𝓜(C_G(X))={M}` (Prop 14.2c) ⟹ g∈N_G(X) は C_G(X) を共役固定 ⟹ Mᵍ も C_G(X) 含む極大 ⟹ Mᵍ=M
+  (singleton) ⟹ g∈N_G(M)=M (極大自己正規化)。再利用 API = `map_centralizer_eq_of_bijective` /
+  `conj_smul_eq_self_of_mem_normalizer` (OddOrder.GroupTheory, set-normalizer↔conj-fix bridge) /
+  `isCoatom_conj_smul` (S12) / `pointwise_smul_le_pointwise_smul_iff` / `normalizer_eq_self_of_mem_maximalSubgroups`。
+  **🔑 注: このmathlib版は `Subgroup.normalizer : Set G → Subgroup G` (set-normalizer)**。
+- `le_centralizerFactor_of_le_sup_of_le_Msigma` — **σ-projection** (mmd L3999「Xi⊆Ki*」): 直積 Ki×Ki* (Ki=σ'群)
+  内の σ(Mi)-群 X は σ-因子 Ki* に落ちる。`hxKstar` idiom (L2480) の一般化、decomposition x=a·b + a∈Ki⊓Mσ=⊥。
+- `typeP_swap_Z_eq` — **完全等式 K⊔K*=Ki⊔Ki*** (capstone)。⊆=swap_Z_le、⊇=役割交換 (M,K,X*)↔(Mi,Ki,Xi) で
+  swap_Z_le 再適用。⊇ の3前提: (A) Ki⊔Ki*=N_G(X*)⊓Mi≤M [N_G(X*)≤M 経由] / (B) π(Ki*)⊆κ(M)
+  [`typeP_neighbor_kappa`: M は Mi の X* 経由 partner] / (C) Xi⊆Ki* [σ-projection]。
+
+**✅ pairwise disjoint K_i* COMPLETE** (mmd L4005「Prop 14.2(c) applied to each M_i ⟹ K_i*∩K_j*=1」):
+- `typeP_centralizer_singleton` — **Prop 14.2(c) packaging**: Y∈ℰ¹(K*) ⟹ `𝓜(C_G(Y))={M}` (Hall 内部生成)。
+- `typeP_neighbor_Kstar_inf_eq_bot` — **Mi≠Mj type-P ⟹ C_{Miσ}(Ki)⊓C_{Mjσ}(Kj)=⊥**。共通元 → Cauchy で
+  line Y∈ℰ¹(K_i*⊓K_j*) → {Mi}=𝓜(C_G(Y))={Mj} ⟹ Mi=Mj 矛盾。
+
+**▶ 14.7 残ピース** (順に):
+1. **family indexing** (mmd L4003-4015) — Z=K_0*×K_1*×…×K_n* (各 ℰ¹(Z) の line が或る K_i* に居る) +
+   K_i=∏_{j≠i}K_j*。**design lift**: 相異な neighbor M_i の有限族 (K の line 上を走る 𝓜(N_G(X_i)) の distinct ones)
+   を Finset で index 化。swap (`typeP_swap_Z_eq`) + pairwise disjoint (`typeP_neighbor_Kstar_inf_eq_bot`) が building block。
+2. **density arithmetic** (L4031-4045) — T=Z−⋃K_i*、`ncard_conjClassSet_of_isTISubset`(済)+14.5(c)+`half_lt_one_sub_inv_mul`(済)
+   → 全 P1 矛盾 → ∃ P2。
+3. **∃! covering** (L4049-4059, n=1) → typeP_duality close → §15/§16 unblock。
+4. **part(h)** (Prop 14.2(a) packaging + K cyclic、最終)。
