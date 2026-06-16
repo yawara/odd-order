@@ -1019,6 +1019,123 @@ theorem kstar_le_opiCore_of_le_fittingInAmbient [Finite G]
       (isPiSubgroup_opiCoreInG _ _)
   exact hA.trans hB
 
+/-- **Theorem 15.2, step 2 tail — `G`-form bridge of part 1**: the `↥M`-realized
+`kstar_le_fittingInAmbient_of_inputs` lifted to a statement about the ambient subgroups
+`K* = M_σ ⊓ C_G(K)` and `F(M_σ)` of `G`.
+
+Translates the `↥M` conclusion `C_{↥M}(K) ⊓ M_σ ≤ F(M_σ)` to `M_σ ⊓ C_G(K) ≤ F(M_σ)` (`G`-form)
+via `centralizer_subgroupOf` (the `C_{↥M}(K) = C_G(K) ↾ M` identity) and
+`fitting_subgroupOf_map_subtype_eq` (`F(M_σ ↾ M) = F(M_σ) ↾ M`), then reflects `subgroupOf`-`≤`
+back to `G`.  This is the bridge that lets the `↥M`-native step-2 helpers (which need the ambient
+to be `M` for Lemma 6.3(a) / Theorem 3.8) feed the `G`-native `q`-core chain
+(`kstar_le_opiCore_of_le_fittingInAmbient`).  Needs `K ≤ M` (`hKM`, the Hall containment). -/
+theorem kstar_le_fittingInAmbient_G_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+        ⊓ Subgroup.centralizer (K : Set G))).Prime) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      ≤ fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) := by
+  have hKstar_le_M : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≤ M :=
+    inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  have hF_le_M : fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ≤ M :=
+    (OddOrder.BG.Ch2.S08.fittingInG_le _).trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  -- bridge (a): `C_{↥M}(K) ⊓ M_σ = (M_σ ⊓ C_G(K)) ↾ M`.
+  have hbridge_a : Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+      = (OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)).subgroupOf M := by
+    have himg : M.subtype '' (K.subgroupOf M : Set ↥M) = (K : Set G) := by
+      rw [← Subgroup.coe_map, Subgroup.map_subgroupOf_eq_of_le hKM]
+    rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf (K.subgroupOf M : Set ↥M), himg, inf_comm]
+    simp only [Subgroup.subgroupOf, Subgroup.comap_inf]
+  -- translate `hqG` to the `↥M` prime hypothesis of part 1.
+  have hq : (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+      ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).Prime := by
+    rw [hbridge_a, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKstar_le_M).toEquiv]
+    exact hqG
+  -- bridge (b): `F(M_σ ↾ M) = F(M_σ) ↾ M`.
+  have hbridge_b : fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      = (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)).subgroupOf M :=
+    OddOrder.BG.Ch1.S03h.fitting_subgroupOf_map_subtype_eq (OddOrder.BG.Ch3.S10.Msigma_le M)
+  -- part 1 (`↥M`), then bridge both sides to `G` and reflect.
+  have h := kstar_le_fittingInAmbient_of_inputs hG hM hcompl hcop hcond2 hne hq
+  rw [hbridge_a, hbridge_b] at h
+  have h2 := Subgroup.map_mono (f := M.subtype) h
+  rwa [Subgroup.map_subgroupOf_eq_of_le hKstar_le_M,
+    Subgroup.map_subgroupOf_eq_of_le hF_le_M] at h2
+
+/-- **Theorem 15.2, step 2 tail — `K* ⊆ Q = O_q(M)`** (mmd L4192): the composition of the `G`-form
+part 1 (`K* ⊆ F(M_σ)`) and part 2 (the `q`-core chain), giving the full "`K*` lies in `Q`"
+conclusion from the base `§14` inputs.  Here `q = |K*|` (prime by `hqG`, the §14 Theorem 14.7(f)
+input), so `Q = O_q(M)` is the normal Sylow `q`-subgroup of the theorem. -/
+theorem kstar_le_opiCore_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+        ⊓ Subgroup.centralizer (K : Set G))).Prime) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      ≤ opiCoreInG ({Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+          ⊓ Subgroup.centralizer (K : Set G))} : Set ℕ) M := by
+  have h1 := kstar_le_fittingInAmbient_G_of_inputs hG hM hKM hcompl hcop hcond2 hne hqG
+  refine kstar_le_opiCore_of_le_fittingInAmbient hG hM (fun r hr => ?_) h1
+  rw [hqG.primeFactors, Finset.mem_singleton] at hr
+  exact Set.mem_singleton_iff.mpr hr
+
+/-- **Theorem 15.2, step 2 tail — complement `D` is nilpotent** (mmd L4192, "`M_σ/Q` is nilpotent",
+giving conjunct (d)): a `K`-invariant complement `D` of `Q` in `M_σ` is nilpotent.
+
+Rather than the quotient `M_σ/Q`, we work with the isomorphic complement `D ≤ M_σ` (`D ∩ Q = 1`,
+`hDQ`).  A prime-order `K₁ ≤ K` (`hK₁prime`) normalizes `D` (`hK₁norm`, `K`-invariance) and acts
+on it fixed-point-freely: if `r ∈ K₁#` fixes `n ∈ D` (`r n r⁻¹ = n`), then `n ∈ C_{M_σ}(r) ⊆ Q`
+(`hCentleQ`, the §14 prime-manner action of Proposition 14.2(a) together with `K* ⊆ Q` from the
+`q`-core chain) while `n ∈ D`, so `n ∈ D ∩ Q = 1`.  Theorem 3.7 (`frobeniusKernelIsNilpotent`,
+fixed-point-free prime-order action) then gives `D` nilpotent.  `hCentleQ` is the sole §14 input. -/
+theorem complement_isNilpotent_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {K Q D K₁ : Subgroup G} (hDM : D ≤ M) (hK₁M : K₁ ≤ M)
+    (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M) (hDQ : Disjoint D Q) (hK₁K : K₁ ≤ K)
+    (hK₁norm : K₁ ≤ Subgroup.normalizer (D : Set G)) (hDK₁disj : Disjoint D K₁)
+    (hDne : D ≠ ⊥) (hK₁ne : K₁ ≠ ⊥) (hK₁prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K₁ = p)
+    (hCentleQ : ∀ r ∈ (K : Set G), r ≠ 1 →
+      Subgroup.centralizer ({r} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M ≤ Q) :
+    Group.IsNilpotent ↥D := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable ↥(D ⊔ K₁) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hK₁M))
+  refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+    hK₁norm hDK₁disj hDne hK₁ne hK₁prime ?_
+  intro r hrK₁ hr1 n hnD hn1 hfix
+  have hrK : r ∈ K := hK₁K hrK₁
+  have hnMσ : n ∈ OddOrder.BG.Ch3.S10.Msigma M := hDMσ hnD
+  -- `r n r⁻¹ = n` means `r n = n r`, i.e. `n ∈ C_G(r)`.
+  have hrn : r * n = n * r := by rw [mul_inv_eq_iff_eq_mul] at hfix; exact hfix
+  have hnCent : n ∈ Subgroup.centralizer ({r} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    rintro g hg
+    rw [Set.mem_singleton_iff] at hg; subst hg
+    exact hrn
+  -- so `n ∈ C_{M_σ}(r) ⊆ Q`, while `n ∈ D` and `D ∩ Q = 1`.
+  have hnQ : n ∈ Q := hCentleQ r hrK hr1 (Subgroup.mem_inf.mpr ⟨hnCent, hnMσ⟩)
+  exact hn1 (Subgroup.disjoint_def.mp hDQ hnD hnQ)
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
