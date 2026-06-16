@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
+import OddOrder.Mathlib.Subgroup
 
 /-!
 # BG §15: The Subgroup `M_F`
@@ -2244,6 +2245,42 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
   have e : (↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1)) ≃* ↥(ψ.range) :=
     (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
   exact nilpotent_of_mulEquiv e.symm
+
+/-- **Brick A "core" of Theorem 15.2 step 3(ii)** (mmd L4194): under the `K*`-condition, the fixed
+points of `k` (with prime-manner action `C_{M_σ}(k) = K*`) inside `D ⊔ Q₁` land in `Q₀`.
+`C(k) ⊓ (D ⊔ Q₁) ⊆ C(k) ⊓ M_σ = K*`; since `K* ≤ Q` and `Q ⊓ (D ⊔ Q₁) = Q₁` (Dedekind, `D ⊓ Q = ⊥`,
+`D ≤ N_G(Q₁)`), the fixed points lie in `K* ⊓ Q₁`, which is `≤ Q₀` (if `K* ≤ Q₀`) or trivial (if
+`K* ⊄ Q₁`, as `|K*|` is prime).  Supplies `C_{DQ₁}(k) ⊆ Q₀` to brick A's Prop 1.5(d) lift. -/
+theorem centralizer_inf_DQ1_le_Q0 [Finite G]
+    {Mσ D Q Q1 Q0 Kstar : Subgroup G} {k : G}
+    (hKstar : Subgroup.centralizer ({k} : Set G) ⊓ Mσ = Kstar)
+    (hKstarQ : Kstar ≤ Q) (hDQ1Mσ : D ⊔ Q1 ≤ Mσ)
+    (hQ1Q : Q1 ≤ Q) (hDQ : Disjoint D Q)
+    (hDnormQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hcond : Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1)
+    (hprime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q) :
+    Subgroup.centralizer ({k} : Set G) ⊓ (D ⊔ Q1) ≤ Q0 := by
+  have hDed : (Q1 ⊔ D) ⊓ Q = Q1 :=
+    Subgroup.inf_sup_eq_of_le_normalizer_of_inf_eq_bot hQ1Q hDQ.eq_bot hDnormQ1
+  have hsub : Subgroup.centralizer ({k} : Set G) ⊓ (D ⊔ Q1) ≤ Kstar ⊓ Q1 := by
+    intro y hy
+    obtain ⟨hyC, hyDQ1⟩ := Subgroup.mem_inf.mp hy
+    have hyKstar : y ∈ Kstar := hKstar ▸ Subgroup.mem_inf.mpr ⟨hyC, hDQ1Mσ hyDQ1⟩
+    refine Subgroup.mem_inf.mpr ⟨hyKstar, ?_⟩
+    have hmem : y ∈ (Q1 ⊔ D) ⊓ Q := ⟨by rw [sup_comm]; exact hyDQ1, hKstarQ hyKstar⟩
+    rwa [hDed] at hmem
+  refine hsub.trans ?_
+  rcases hcond with hc | hc
+  · exact inf_le_left.trans hc
+  · have hbot : Kstar ⊓ Q1 = ⊥ := by
+      obtain ⟨q, hq, hcard⟩ := hprime
+      have hdvd : Nat.card ↥(Kstar ⊓ Q1) ∣ Nat.card ↥Kstar := Subgroup.card_dvd_of_le inf_le_left
+      rw [hcard] at hdvd
+      rcases (Nat.dvd_prime hq).mp hdvd with h1 | hqq
+      · exact Subgroup.eq_bot_of_card_eq _ h1
+      · exact absurd ((Subgroup.eq_of_le_of_card_ge inf_le_left
+          (by rw [hcard]; exact hqq.symm.le)) ▸ inf_le_right) hc
+    rw [hbot]; exact bot_le
 
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
