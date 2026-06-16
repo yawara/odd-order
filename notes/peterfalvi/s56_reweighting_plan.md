@@ -253,3 +253,31 @@ glue shell **`coherentXunionYset_caseB_of_glued`** (`S08_CaseBCoherence2.lean:16
   (R(μ_j)/(5.6) projection core は全部済)。
 - **正本=本 cont.³⁷。誤診訂正済: R(μ_j)=certainTypeR 既存、残=cX wiring 3 ピース (A/B/C)、本セッション
   engine 一般化+bound wrapper landed。次=(A) 着手前に CaseBAssembly per-constituent 機構を RECON。**
+
+## cont.³⁸ (2026-06-16 loop): architecture RECON 完了 ((6.8.2) vs (6.8.3)) + `certainTypeMemberDecomposition` landed
+cont.³⁷ の RECON 課題 (per-constituent 機構の位置付け) を解決。**(6.8) の二層構造を確定**:
+- **(6.8.2)** = X-member 構造: per-constituent 機構 `caseB_hagg`/`caseB_per_phi_anchored`/`caseB_constituentDecomposition`/
+  `caseB_phi_family` (= `Ind^L_{W₂}φ` の constituent `Ind^L_H θ` 分解、constituentWeight=⟨φ,Resθ⟩) + 二分
+  `caseB_induce_column_or_irreducible` (各 X-member = column or irreducible) + cX。**これは (5.6) engine とは別ピース**
+  (constituent 分解 = glue 入力 D / X-coherence 用)。
+- **(6.8.3)** = 最終 X∪Y→S 拡張: `false_of_caseB_break_of_bounds` (`S08_CaseBEndgame:384`) =
+  **`hbreak: w1·hZ·(cZ−1) ≤ 2w1²d` (nat 算術) + FPF tower ✅ + Cor2.30 → False**。⟹ **私の
+  `coherentDegreeSqNormBound_of_not_coherentW` (∑deg²/mc ≤ 2a, 実数) が hbreak を産む経路** (cont.²⁵ #1 = これ)。
+  残 = (i) engine を certain-type データで instantiate (Dmem/hortho_mem 要) (ii) **X-sum 恒等式 `∑deg²/mc = w1·hZ·(cZ−1)`**
+  (notes 既述 `sum_div_normSq_induce_kernelFilter_eq` で X-sum 済) (iii) `2a ↔ 2w1²d` 接続 → `false_of_caseB_break_of_bounds`。
+
+**✅ 本 loop landed (`08640b33`)**: **`certainTypeMemberDecomposition`** (`S06_CertainTypeCoherence:721`) =
+reducible column の **ψ=0 member 分解** (tau1=ν=coherence extension、`certainTypeR` 経由 ofProjection)。
+= `memberExtensionDecomposition` の reducible 版 (`certainTypeDecompositionDa` は tau1=τ の Da-style ψ=a·η₁、
+これは ν-style ψ=0)。⟹ **weighted engine `xAdjoinStepW`/`coherentDegreeSqNormBound_of_not_coherentW` の `Dmem`
+入力が reducible column 用に揃った** (`htau1Dmem`=`(Dmem).tau1=ν` は rfl)。certain-type 決定族完備: Da-style + member-style。
+
+**▶ 次の bounded piece (次 loop)**: **reducible column の cross-family orthogonality `hortho_mem`**
+= `(certainTypeMemberDecomposition …).imageFamily.Orthogonal (dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ …)`
+(= `(certainTypeR h hχ₂ hdeg).Orthogonal (R(break χ))`、ofProjection ゆえ imageFamily=certainTypeR)。
+(5.2.e)-style: certainTypeR の σ-image 各々 ⊥ break χ の Dade image 各々。template = `certainTypeRImage` の構造 +
+`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`。その後 engine instantiation (Dmem/hortho_mem/mc/χmem=columns)
+→ `∑deg²/mc ≤ 2a` → X-sum 恒等式 → `false_of_caseB_break_of_bounds` で (6.8.3)。**正本=本 cont.³⁸。**
+**⚠ τ 注意**: `certainTypeMemberDecomposition` は τ=`dadeIntegralCharacterMap h.dade0 h.tau` (certain-type)。
+engine は τ=`hyp.fullDadeIsometryData` (S04)。instantiation 時に (B) reconciliation (`certainTypeSet_isCoherent_tau`
+の hmapagree/congrMap) 経由で τ を一致させる必要。**正本=本 cont.³⁸。Dmem reducible 版 landed、次=hortho_mem。**
