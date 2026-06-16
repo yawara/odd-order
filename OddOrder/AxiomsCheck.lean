@@ -43,6 +43,7 @@ import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
@@ -3758,6 +3759,11 @@ set_option linter.style.longLine false in
 -- `K₀`-reduction strong induction assembling base + Case A + Case B into the irreducible-module form
 -- `|R|` prime ∧ `finrank V = |R|·finrank C_V(R)` for a general Frobenius kernel `K ⊴ G`.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_frobenius_general
+-- BG Theorem 3.10 elementary-abelian reducible-module induction infrastructure (issue 8013, piece 5):
+-- invariants of a subrepresentation as an ambient `finrank` (`C_V(H) ⊓ W`), and their additivity over
+-- an internal direct sum of `H`-stable subrepresentations.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.finrank_invariants_toRepresentation_inf
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.finrank_inf_invariants_sup_of_disjoint
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
