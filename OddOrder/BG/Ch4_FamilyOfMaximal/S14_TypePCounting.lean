@@ -3323,6 +3323,40 @@ theorem sigma_eq_of_mem_sigma_of_mem_sigma [Finite G]
     have h := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hq
     rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
 
+/-- **σ-decomposition keystone** (BG §1, mmd L3793): a nonidentity `σ(M)`-element `x` has
+`ℓ_σ(x) = 1`.  The cyclic group `⟨x⟩` is a nonidentity proper `σ(M)`-subgroup (proper since `G` is
+non-solvable, hence non-cyclic), so by Corollary 12.16(a)
+(`sigma_subgroup_conj_into_Msigma_general`) it is `G`-conjugate into `M_σ`; thus a conjugate of `M`
+is a `σ`-maximal of `x`, giving `𝓜_σ(x) ≠ ∅`.  This is the existence half of the σ-decomposition
+that drives Lemma 14.6 (extracting a `σ`-length-one factor of an element). -/
+theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : x ≠ 1) (hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) :
+    D.length x = 1 := by
+  rw [D.length_one_iff]
+  refine ⟨hx, ?_⟩
+  have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
+    hx (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
+  have hlt : Subgroup.closure ({x} : Set G) < ⊤ := by
+    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable (isSolvable_of_comm fun a b => ?_))
+    have hmem : ∀ y : G, y ∈ Subgroup.zpowers x := fun y => by
+      rw [Subgroup.zpowers_eq_closure, htop]; exact Subgroup.mem_top y
+    obtain ⟨m, rfl⟩ := hmem a
+    obtain ⟨n, rfl⟩ := hmem b
+    rw [← zpow_add, ← zpow_add, Int.add_comm]
+  have hxpisub : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      (Subgroup.closure ({x} : Set G)) := fun p hp =>
+    hxpi p (by rwa [← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp)
+  obtain ⟨g, hg⟩ := sigma_subgroup_conj_into_Msigma_general hG hM hclosne hlt hxpisub
+    (fun hN hnc => sigma_disjoint_of_nonconjugate hG hM hN hnc)
+  refine ⟨MulAut.conj g⁻¹ • M, mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g⁻¹, rfl⟩, ?_⟩
+  rw [Msigma_conj_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  have he : (MulAut.conj g⁻¹)⁻¹ • x = MulAut.conj g • x := by
+    rw [← map_inv (MulAut.conj) g⁻¹, inv_inv]
+  rw [he]
+  exact hg (Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) _
+    (Subgroup.subset_closure (Set.mem_singleton x)))
+
 open Classical in
 /-- **BG's `R(x)`** (mmd L3906): the normal Hall subgroup of `C_G(x)` from Theorem 14.4.  When
 `ℓ_σ(x) = 1` and `|𝓜_σ(x)| > 1`, `R(x) = N_σ ∩ C_G(x)` for the unique `N = N(x) ∈ 𝓜(C_G(x))`

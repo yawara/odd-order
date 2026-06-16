@@ -4599,6 +4599,11 @@ via sharp transitivity (Theorem 14.4). -/
 `R`-equivariance `Rsub_conj`) combined with Part A.  The type-`P` counting bound for Theorem 14.7. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard
 
+/-! **σ-decomposition keystone** (`S14_TypePCounting`, `length_one_of_isPiElement_sigma`):
+a nonidentity `σ(M)`-element `x` has `ℓ_σ(x) = 1`.  Existence half of the σ-decomposition (BG §1):
+`⟨x⟩` is conjugate into `M_σ` (Cor 12.16(a)), so `𝓜_σ(x) ≠ ∅`.  Foundation for Lemma 14.6. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.length_one_of_isPiElement_sigma
+
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
 normalizer identity `N_M(X) = K ⊔ K*`, the `(d)` clause `K* ∩ M^g = 1`, and (for type `P₂`)
