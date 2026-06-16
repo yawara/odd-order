@@ -438,4 +438,34 @@ theorem eq_sup_inf_of_le_sup_of_normal_of_le
   rw [← inf_sup_eq_sup_inf_of_normal_of_le hEM]
   exact (inf_eq_left.mpr hMle).symm
 
+/-- **Dedekind / modular law, normalizer form**: if `W ≤ L`, `A ⊓ L = ⊥`, and `A` normalizes `W`,
+then `(W ⊔ A) ⊓ L = W`.  Unlike `inf_sup_eq_sup_inf_of_normal_of_le`, this needs only that `A`
+*normalizes* `W` (so `W` is normal in `W ⊔ A`), not global normality — fitting the BG step 3(ii)
+situation `(Q₁ ⊔ D) ⊓ Q = Q₁` (`Q₁ ≤ Q`, `D ⊓ Q = ⊥`, `D ≤ N_G(Q₁)`).  The noncommutative case is
+handled via the product representation `W·A` of `W ⊔ A`. -/
+theorem inf_sup_eq_of_le_normalizer_of_inf_eq_bot
+    {W A L : Subgroup G} (hW_le : W ≤ L) (hA_inf : A ⊓ L = ⊥)
+    (hAnorm : A ≤ Subgroup.normalizer (W : Set G)) :
+    (W ⊔ A) ⊓ L = W := by
+  apply le_antisymm
+  · intro x ⟨hxWA, hxL⟩
+    haveI : (W.subgroupOf (A ⊔ W)).Normal :=
+      Subgroup.normal_subgroupOf_sup_of_le_normalizer hAnorm
+    have hx_AW : x ∈ A ⊔ W := by rw [sup_comm]; exact hxWA
+    have hmem : (⟨x, hx_AW⟩ : ↥(A ⊔ W)) ∈ (W.subgroupOf (A ⊔ W)) ⊔ (A.subgroupOf (A ⊔ W)) := by
+      rw [← Subgroup.subgroupOf_sup (le_sup_right) (le_sup_left), sup_comm W A,
+        Subgroup.subgroupOf_self]
+      exact Subgroup.mem_top _
+    rw [Subgroup.mem_sup_of_normal_left] at hmem
+    obtain ⟨⟨w, hw_AW⟩, hw, ⟨a, ha_AW⟩, ha, heq⟩ := hmem
+    have hxeq : x = w * a := congrArg (Subtype.val) heq |>.symm
+    have ha_L : a ∈ L := by
+      have : w⁻¹ * x ∈ L := L.mul_mem (L.inv_mem (hW_le hw)) hxL
+      rwa [hxeq, ← mul_assoc, inv_mul_cancel, one_mul] at this
+    have ha_one : a = 1 := by
+      have : a ∈ A ⊓ L := ⟨ha, ha_L⟩
+      rw [hA_inf, Subgroup.mem_bot] at this; exact this
+    rw [hxeq, ha_one, mul_one]; exact hw
+  · exact le_inf le_sup_left hW_le
+
 end Subgroup
