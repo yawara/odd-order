@@ -193,4 +193,25 @@ theorem hgen_withDiagonal_certainTypeSet
   · exact Submodule.smul_mem _ s
       (Submodule.subset_span (Set.mem_union_right _ (Set.mem_singleton _)))
 
+/-- **The certain-type set `𝒯 = certainTypeSet h46 k` is finite.**
+
+Every member is a column character `columnSum h46 χ₂` for some `W₂`-dual
+`χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ`, so `𝒯 ⊆ range (columnSum h46)`.  The index type
+of `W₂`-duals — linear characters of a *finite* group — is finite
+(`SibleyDadeHypothesis.finite_linearCharacters_of_finite`), hence the range, hence `𝒯`.
+
+This is the `hXfin` input of the `(6.8.2)` `ν`-glue `exists_integralCharacterMap_glue_of_orthonormal`
+(via the column-sum-to-grid source reduction) and of any finite-enumeration of the column base. -/
+theorem certainTypeSet_finite
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    (OddOrder.Peterfalvi.S06.certainTypeSet h46 k).Finite := by
+  haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
+    SibleyDadeHypothesis.finite_linearCharacters_of_finite
+  refine Set.Finite.subset (Set.finite_range (OddOrder.Peterfalvi.S06.columnSum h46)) ?_
+  rintro f ⟨χ₂, -, -, rfl⟩
+  exact ⟨χ₂, rfl⟩
+
 end OddOrder.Peterfalvi.S08
