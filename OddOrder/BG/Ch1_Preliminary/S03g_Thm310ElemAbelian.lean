@@ -36,29 +36,57 @@ restricted representation `W.toRepresentation` (a submodule of `↥W.toSubmodule
 This lets the reducible-module induction phrase every conclusion in ambient `finrank`s (so the
 recursion stays over subrepresentations of the *fixed* `ρ`), while the irreducible leaves still
 feed `prime_card_and_finrank_of_frobenius_general` through `W.toRepresentation`. -/
+theorem invariants_toRepresentation_map_eq (ρ : Representation F G V) (W : Subrepresentation ρ)
+    (H : Subgroup G) :
+    (Representation.invariants (W.toRepresentation.comp H.subtype)).map W.toSubmodule.subtype
+      = Representation.invariants (ρ.comp H.subtype) ⊓ W.toSubmodule := by
+  ext v
+  constructor
+  · rintro ⟨⟨w, hw⟩, hinv, rfl⟩
+    have hinv' := (Representation.mem_invariants (W.toRepresentation.comp H.subtype) ⟨w, hw⟩).mp hinv
+    refine Submodule.mem_inf.mpr
+      ⟨(Representation.mem_invariants (ρ.comp H.subtype) w).mpr fun g => ?_, hw⟩
+    have hg := congrArg Subtype.val (hinv' g)
+    simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hg
+  · intro hv
+    obtain ⟨hfix, hw⟩ := Submodule.mem_inf.mp hv
+    have hfix' := (Representation.mem_invariants (ρ.comp H.subtype) v).mp hfix
+    refine ⟨⟨v, hw⟩, (Representation.mem_invariants (W.toRepresentation.comp H.subtype)
+      ⟨v, hw⟩).mpr fun g => ?_, rfl⟩
+    apply Subtype.ext
+    simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hfix' g
+
 theorem finrank_invariants_toRepresentation_inf (ρ : Representation F G V)
     (W : Subrepresentation ρ) (H : Subgroup G) :
     finrank F (Representation.invariants (W.toRepresentation.comp H.subtype))
       = finrank F ↥(Representation.invariants (ρ.comp H.subtype) ⊓ W.toSubmodule) := by
-  have hmap : (Representation.invariants (W.toRepresentation.comp H.subtype)).map W.toSubmodule.subtype
-      = Representation.invariants (ρ.comp H.subtype) ⊓ W.toSubmodule := by
-    ext v
-    constructor
-    · rintro ⟨⟨w, hw⟩, hinv, rfl⟩
-      have hinv' := (Representation.mem_invariants (W.toRepresentation.comp H.subtype) ⟨w, hw⟩).mp hinv
-      refine Submodule.mem_inf.mpr
-        ⟨(Representation.mem_invariants (ρ.comp H.subtype) w).mpr fun g => ?_, hw⟩
-      have hg := congrArg Subtype.val (hinv' g)
-      simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hg
-    · intro hv
-      obtain ⟨hfix, hw⟩ := Submodule.mem_inf.mp hv
-      have hfix' := (Representation.mem_invariants (ρ.comp H.subtype) v).mp hfix
-      refine ⟨⟨v, hw⟩, (Representation.mem_invariants (W.toRepresentation.comp H.subtype)
-        ⟨v, hw⟩).mpr fun g => ?_, rfl⟩
-      apply Subtype.ext
-      simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using hfix' g
   rw [← Submodule.finrank_map_subtype_eq W.toSubmodule
-    (Representation.invariants (W.toRepresentation.comp H.subtype)), hmap]
+    (Representation.invariants (W.toRepresentation.comp H.subtype)),
+    invariants_toRepresentation_map_eq]
+
+/-- **Hypothesis restriction: trivial invariants pass to a subrepresentation** (issue 8013 piece 5).
+If `C_V(H) ⊓ W = ⊥` then the `H`-invariants of `W.toRepresentation` are `⊥`.  Used to transfer
+`C_V(K) = ⊥` to the pieces `U, U'` of a Maschke split. -/
+theorem invariants_toRepresentation_eq_bot (ρ : Representation F G V) (W : Subrepresentation ρ)
+    (H : Subgroup G) (h : Representation.invariants (ρ.comp H.subtype) ⊓ W.toSubmodule = ⊥) :
+    Representation.invariants (W.toRepresentation.comp H.subtype) = ⊥ := by
+  have hmap := invariants_toRepresentation_map_eq ρ W H
+  rw [h] at hmap
+  apply Submodule.map_injective_of_injective (Submodule.injective_subtype W.toSubmodule)
+  rw [Submodule.map_bot]
+  exact hmap
+
+/-- **Hypothesis restriction: the prime-manner equality passes to a subrepresentation** (issue 8013
+piece 5).  If `C_V(H₁) ⊓ W = C_V(H₂) ⊓ W` then the `H₁`- and `H₂`-invariants of `W.toRepresentation`
+agree.  Used to transfer the subspace-form prime-manner hypothesis `C_V(x) = C_V(R)` to `U, U'`. -/
+theorem invariants_toRepresentation_eq_of_inf_eq (ρ : Representation F G V) (W : Subrepresentation ρ)
+    (H₁ H₂ : Subgroup G)
+    (h : Representation.invariants (ρ.comp H₁.subtype) ⊓ W.toSubmodule
+      = Representation.invariants (ρ.comp H₂.subtype) ⊓ W.toSubmodule) :
+    Representation.invariants (W.toRepresentation.comp H₁.subtype)
+      = Representation.invariants (W.toRepresentation.comp H₂.subtype) := by
+  apply Submodule.map_injective_of_injective (Submodule.injective_subtype W.toSubmodule)
+  rw [invariants_toRepresentation_map_eq, invariants_toRepresentation_map_eq, h]
 
 /-- **Invariants distribute over an internal direct sum of subrepresentations** (issue 8013 piece 5).
 For two subrepresentations `W₀, W₁ ≤ ρ` that meet trivially (`W₀ ⊓ W₁ = ⊥`), the `H`-invariants of
