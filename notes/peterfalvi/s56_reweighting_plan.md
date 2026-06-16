@@ -394,3 +394,26 @@ X-sum→hbreak) → S coherent → sole sorry case-B 枝。**+ case-A 枝 (cX �
 (~300-550 LOC、enumeration 前提性質 + hstep monolith + wiring) + (6.8.3)/glue/case-A wiring。**deep math gap は無い**
 (全ツール在庫) が **large focused assembly** — 60s loop 小刻みより dedicated 多セッション or Workflow 向き。
 **正本=本 cont.⁴³。enumeration=`exists_conjugatePairCover_general`、残=cX assembly 本体 (構造性質→hstep monolith→wiring)。**
+
+## cont.⁴⁴ (2026-06-16 loop): ✅ X-enumeration landed + 🔬 degree-class 構造的発見
+**新 leaf `S08_CaseBEnumeration.lean` (`93f3b670`、199 行、3 decl 全 axiom-clean)**:
+- ✅✅ **`Xset_hasNoRealCharacters_caseB`** + **`certainTypeSet_closedUnderConjugate`** = **unconditional 再利用 helper** 2 本。
+- **`caseB_Xset_conjugatePairCover`** = X = Xset W2、S₀ = certainTypeSet h46 k の conjugate-pair cover
+  (`exists_conjugatePairCover_general` 経由、非-S₀ pairs から既約 χs 抽出、xChainCoherentW の hpair0/1/pairs/cover を産む)。
+
+**🔬🔬 重要な構造的発見** (subagent が `hnonS₀_irr` 仮説を要したことで露呈): **`certainTypeSet h46 k` は単一 degree
+class k に制限** (def に degree-match 条件 `∑μ_ij(1)=∑μ_ik(1)`)。⟹ 他 degree class の column は **reducible だが
+certainTypeSet h46 k に非含** → 非-S₀ X-member が既約とは限らない。`caseB_Xset_conjugatePairCover` は
+**2 honest 仮説**を持つ (workaround でない真の obligation): (1) `hbase`: certainTypeSet ⊆ Xset (column∈S(W2)、deferred)
+(2) `hnonS₀_irr`: 非-certainTypeSet X-member は既約。
+
+**⟹ cX base の構造的論点 (hstep 前に要解決)**: cX = IsCoherent (Xset W2) は**全 degree class の column** を要する
+(X-sum は全 X over θ:W2⊄ker)。だが column 基底 coherence `certainTypeSet_isCoherent_tau_canonical` は**単一 k**。
+要確認 = (A) certain-type 構造で全 column が同一 degree か (なら certainTypeSet h46 k=全 column、hnonS₀_irr 自動) /
+(B) 全 class union ∪_k certainTypeSet h46 k が base か (なら union coherence 要) / (C) (6.8.3) が per-class か。
+**この degree-class 構造の解明が cX assembly の次の鍵** (hstep monolith より先に要)。
+
+**📊 進捗 (本セッション 10 Lean commit)**: 基盤・構造 (engine/Dmem/(B)/hortho_mem/fold) + enumeration helper +
+cover (conditional)。残 = (i) **degree-class 構造解明** [次、cX base 設計] (ii) hstep monolith (iii) wiring → cX →
+(6.8.3)/glue/case-A。⚠ subagent 委譲は ~155k tok/piece と高コスト、hstep は深く大きい。**正本=本 cont.⁴⁴。
+enumeration landed (2 unconditional helper)、次=degree-class 構造解明 (cX base が単一 k か全 class union か)。**
