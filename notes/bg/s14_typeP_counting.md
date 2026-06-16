@@ -999,3 +999,26 @@ R(z)⊆C_G(z) ゆえ x'·x=x·x', y''·y=y·y'' (commute)。
 
 **⟹ ChatGPT 不要。14.4(e) が "N_σ∩M=1" の正体。** 全 case 矛盾 ⟹ xR(x)∩yR(y)=∅。formalize は
 ~150-250 行 (4-case + factor matching が bulk)。my 14.4 conclusion に (e) + sharp + (c) すべて在る。
+
+### 14.5(a) building blocks DONE + 残 assembly 設計詳細 (2026-06-16 lane-h loop³ 続き)
+
+**✅ committed** (`d87e7d79`): `exists_neighbor_eq_Rsub` (14.4 出力 package: N, R=N_σ∩C_G, π(⟨z⟩)⊆τ₂N, (e))
++ `isPiElement_sigmaCompl_of_mem_Rsub` (r∈R(z) は σ(M)'-elt, M∈𝓜_σ(z))。+ `Rsub_le_centralizer`,
+`Rsub_eq_inf`, `sigma_eq_of_mem_sigma_of_mem_sigma`, `Mtilde`, π-part decomposition (別 leaf)。
+
+**残 = 14.5(a) assembly (`xRsub_disjoint`), nested 4-case (~200行, 機械的, gap なし)**:
+g=x·x'=y·y'' (x'∈R(x), y''∈R(y))。M_x∈𝓜_σ(x) (x∈M_x,σ, x は σ(M_x)-elt), M_y 同。
+x' は σ(M_x)'-elt (building block), x' commute x (Rsub_le_centralizer)。同 y''。
+- **case σ(M_x)=σ(M_y)**: x σ(M_y)-elt, x' σ(M_y)'-elt ⟹ g=x·x' (σ(M_y),σ(M_y)')-split;
+  g=y·y'' も。`isPiElement_mul_unique` ⟹ x=y, hxy 矛盾。
+- **case σ(M_x)∩σ(M_y)=∅** (helper の contrapositive):
+  - **|𝓜_σ(x)|>1**: `exists_neighbor_eq_Rsub` for x → N(x), x'∈N(x)_σ ⟹ primes(x')⊆σ(N(x)) (single class)。
+    x' を π=σ(M_y) で split (x'=a·b, exists_isPiElement_mul): g=x·x'=a·(x·b) (x σ(M_y)'-elt), uniqueness
+    vs y·y'' ⟹ y=a=σ(M_y)-part of x'。y≠1 ⟹ σ(M_y)∩σ(N(x))≠∅ ⟹ σ(M_y)=σ(N(x)) ⟹ x' σ(M_y)-elt ⟹
+    **x'=y**。commute cancel ⟹ **x=y''**。⟹ x=y''∈R(y)⊆N(y)_σ ⟹ **N(y)∈𝓜_σ(x)** ⟹ `exists_neighbor`
+    (e) for x with M=N(y): N(x)_σ⊓(N(y)⊓N(x))=⊥; y∈N(x)_σ(=x'∈R(x)) ∧ y∈N(y)(C_G(y)) ∧ y∈N(x) ⟹
+    y∈⊥ ⟹ **y=1 矛盾**。
+  - **|𝓜_σ(x)|=1** (x'=1, g=x): g=x σ(M_x)-elt = y·y''。σ(M_x)-part: y σ(M_x)'-elt ⟹ x=σ(M_x)-part of y''。
+    |𝓜_σ(y)|=1 ⟹ y''=1, x=y 矛盾; |𝓜_σ(y)|>1 ⟹ y''∈N(y)_σ single class, 対称に x=y'' ⟹ g=x=y·x ⟹ y=1 矛盾。
+- helper 名: `isPiElement_mul_unique`/`exists_isPiElement_mul` (PiElementDecomposition),
+  `exists_neighbor_eq_Rsub`/`isPiElement_sigmaCompl_of_mem_Rsub`/`commute_of_mem_zpowers`。
