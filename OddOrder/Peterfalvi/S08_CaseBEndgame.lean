@@ -163,6 +163,54 @@ theorem W1_dvd_index_of_fixedPoints_le {H W : Type*}
   rw [hidx]
   exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
 
+/-- **(6.8.3) case-(B) `W₁`-FPF divisibility from the centralizer condition.**  The concrete-action
+instance of `W1_dvd_index_of_fixedPoints_le` for the `W₁`-conjugation action on `H`: if `M` is a
+*characteristic* subgroup of `H` containing every `x ∈ H` that commutes with some nonidentity
+`a ∈ W₁` (the certain-type fixed-point condition `C_H(W₁) = W₂ ⊆ M`), then `|W₁| ∣ |H : M| − 1`.
+
+The conjugation action `a • x = (a:L)·(x:L)·(a:L)⁻¹` is set up internally (so neither the statement nor
+the caller mentions it); a fixed point `a • x = x` unfolds — via `toMulAut`/`MulAut.conjNormal_apply`
+— to `(a:L)·(x:L) = (x:L)·(a:L)`, discharging the `hfix` hypothesis of
+`W1_dvd_index_of_fixedPoints_le` from `hcomm`.  `M`-invariance comes from `M` characteristic
+(the `toMulAut` map-membership trick).  Applied with `M = [H,H]` and `hcomm` supplied by
+`S06 …centralizer_W2`, this is the first FPF divisibility `|W₁| ∣ |H:H′| − 1`. -/
+theorem caseB_W1_dvd_index_of_centralizer_le {G : Type*} [Group G] [Finite G]
+    {L : Subgroup G} {H : Subgroup ↥L} [H.Normal] (W1 : Subgroup ↥L)
+    (hCop : Nat.Coprime (Nat.card ↥W1) (Nat.card ↥H))
+    (M : Subgroup ↥H) [M.Characteristic]
+    (hcomm : ∀ a : ↥W1, a ≠ 1 → ∀ x : ↥H,
+      (a : ↥L) * (x : ↥L) = (x : ↥L) * (a : ↥L) → x ∈ M) :
+    Nat.card ↥W1 ∣ M.index - 1 := by
+  haveI : Finite ↥H := inferInstance
+  haveI : Finite ↥W1 := inferInstance
+  haveI : M.Normal := inferInstance
+  letI act : MulDistribMulAction ↥W1 ↥H :=
+    MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp W1.subtype)
+  -- the conjugation action unfolds to `(a:L)·(x:L)·(a:L)⁻¹`
+  have hsmul : ∀ (a : ↥W1) (x : ↥H), ((a • x : ↥H) : ↥L) = (a : ↥L) * (x : ↥L) * (a : ↥L)⁻¹ := by
+    intro a x
+    have h1 : (a • x : ↥H) = (MulDistribMulAction.toMulAut ↥W1 ↥H a) x := by
+      simp [MulDistribMulAction.toMulAut_apply]
+    rw [h1]
+    show ((MulAut.conjNormal (H := H) (W1.subtype a)) x : ↥L) = _
+    rw [MulAut.conjNormal_apply]; rfl
+  -- `M` characteristic ⟹ invariant under the action
+  have hMinv : ∀ a : ↥W1, ∀ m ∈ M, a • m ∈ M := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp ‹M.Characteristic›
+      (MulDistribMulAction.toMulAut ↥W1 ↥H a)
+    have hmem : (MulDistribMulAction.toMulAut ↥W1 ↥H a).toMonoidHom m ∈ M := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- a fixed point of `a` commutes with `a`, so lands in `M` by `hcomm`
+  have hfix : ∀ a : ↥W1, a ≠ 1 → ∀ x : ↥H, a • x = x → x ∈ M := by
+    intro a ha x hx
+    refine hcomm a ha x ?_
+    have hc := hsmul a x
+    rw [hx] at hc
+    exact mul_inv_eq_iff_eq_mul.mp hc.symm
+  exact W1_dvd_index_of_fixedPoints_le hCop M hMinv hfix
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
