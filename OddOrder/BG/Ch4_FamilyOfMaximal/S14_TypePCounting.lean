@@ -4468,6 +4468,120 @@ theorem ncard_conjClassSet_of_isTISubset [Finite G] {A : Set G} {L : Subgroup G}
 
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
 
+/-! ### `Z = K ⊔ K*` internal direct product (BG 14.7 bedrock)
+
+For a type-`P` maximal `M`, a Hall `κ(M)`-subgroup `K`, and `K* = C_{M_σ}(K)`, the join
+`Z = K ⊔ K*` is the *internal direct product* of `K` and `K*`: their orders are coprime
+(`K` a `σ(M)'`-group since `κ(M) ⊆ σ(M)'`, `K* ≤ M_σ` a `σ(M)`-group), and they commute
+(`K* ≤ C_G(K)`).  Hence `K ⊓ K* = 1`, `|Z| = |K|·|K*|`, and — once both factors are cyclic
+(which the §14 counting collapse forces, BG L4041) — `Z` is cyclic.
+
+These are the *ungated* structural facts underlying the density count of Theorem 14.7(e)
+(`|𝒞_G(Ẑ)| = (1 - 1/k - 1/k* + 1/kk*)|G|`, mmd L4031-4045) and the `IsCyclic (K ⊔ K*)`
+conjunct (d).  They depend only on `K` being a Hall `κ(M)`-subgroup and `K* = C_{M_σ}(K)`,
+not on the type-P duality counting itself. -/
+
+/-- A Hall `κ(M)`-subgroup `K` is a `σ(M)'`-subgroup (since `κ(M) ⊆ σ(M)'`).  Extracted from
+the `hK_pi` step internal to `typeP_structure` for reuse in the `Z`-structure lemmas. -/
+theorem kappaHall_isPiSubgroup_sigmaCompl {M K : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) :
+    Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := by
+  intro p hp
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hp
+  exact kappa_subset_sigmaCompl (hK.1 p hp)
+
+/-- `K* = C_{M_σ}(K)` is a `σ(M)`-subgroup (it lies in `M_σ`, a `σ(M)`-group). -/
+theorem Kstar_isPiSubgroup_sigma [Finite G] {M K Kstar : Subgroup G}
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M) Kstar := by
+  intro p hp
+  have hle : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := hKstar ▸ inf_le_left
+  obtain ⟨hpp, hpdvd, _⟩ := Nat.mem_primeFactors.mp hp
+  refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
+    ⟨hpp, hpdvd.trans (Subgroup.card_dvd_of_le hle), Nat.card_pos.ne'⟩)
+
+/-- **BG 14.7, `|K|`, `|K*|` coprime** (mmd L4027): `K` is a `σ(M)'`-group, `K* ≤ M_σ` a
+`σ(M)`-group, so no prime divides both. -/
+theorem coprime_card_kappaHall_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Nat.Coprime (Nat.card ↥K) (Nat.card ↥Kstar) := by
+  apply Nat.coprime_of_dvd
+  intro p hp hpK hpKstar
+  have hpσc : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+    kappaHall_isPiSubgroup_sigmaCompl hKM hK p
+      (Nat.mem_primeFactors.mpr ⟨hp, hpK, Nat.card_pos.ne'⟩)
+  exact hpσc (Kstar_isPiSubgroup_sigma hKstar p
+    (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩))
+
+/-- **BG 14.7, `K ⊓ K* = 1`**: the coprime factors meet trivially. -/
+theorem kappaHall_inf_Kstar_eq_bot [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    K ⊓ Kstar = ⊥ :=
+  Subgroup.inf_eq_bot_of_coprime (coprime_card_kappaHall_Kstar hKM hK hKstar)
+
+/-- **BG 14.7, `K*` centralizes `K`**: every element of `K` commutes with every element of
+`K* = C_{M_σ}(K)` (which lies in `C_G(K)`). -/
+theorem commute_kappaHall_Kstar {M K Kstar : Subgroup G}
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    ∀ (a : ↥K) (b : ↥Kstar), Commute (K.subtype a) (Kstar.subtype b) := by
+  intro a b
+  have hb : (b : G) ∈ Subgroup.centralizer (K : Set G) := by
+    have hbmem : (b : G) ∈
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) := by
+      rw [← hKstar]; exact b.2
+    exact (Subgroup.mem_inf.mp hbmem).2
+  exact Subgroup.mem_centralizer_iff.mp hb (a : G) a.2
+
+/-- **BG 14.7, `Z = K × K*` internal direct product iso** `↥K × ↥K* ≃* ↥(K ⊔ K*)`,
+`(a, b) ↦ a·b` (well-defined since `K`, `K*` commute, injective since `K ⊓ K* = 1`). -/
+noncomputable def kappaHall_prod_Kstar_mulEquiv [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (↥K × ↥Kstar) ≃* ↥(K ⊔ Kstar) := by
+  have hcomm := commute_kappaHall_Kstar hKstar
+  have hinj : Function.Injective (MonoidHom.noncommCoprod K.subtype Kstar.subtype hcomm) :=
+    (MonoidHom.noncommCoprod_injective _ _ hcomm).mpr
+      ⟨K.subtype_injective, Kstar.subtype_injective, by
+        rw [K.range_subtype, Kstar.range_subtype]
+        exact disjoint_iff.mpr (kappaHall_inf_Kstar_eq_bot hKM hK hKstar)⟩
+  have hrange : (MonoidHom.noncommCoprod K.subtype Kstar.subtype hcomm).range = K ⊔ Kstar := by
+    rw [MonoidHom.noncommCoprod_range, K.range_subtype, Kstar.range_subtype]
+  exact (MonoidHom.ofInjective hinj).trans (MulEquiv.subgroupCongr hrange)
+
+/-- **BG 14.7, `|Z| = |K|·|K*|`** (mmd L4029, `z = k k*`): the internal direct product order. -/
+theorem card_kappaHall_sup_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Nat.card ↥(K ⊔ Kstar) = Nat.card ↥K * Nat.card ↥Kstar := by
+  rw [← Nat.card_congr (kappaHall_prod_Kstar_mulEquiv hKM hK hKstar).toEquiv, Nat.card_prod]
+
+/-- **BG 14.7(d), `Z = K ⊔ K*` cyclic** (mmd L4041): once both factors are cyclic (forced by the
+counting collapse `n = 1`, where `r(K) = r(K*) = 1`), the coprime commuting product is cyclic. -/
+theorem isCyclic_kappaHall_sup_Kstar_of_cyclic [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    [IsCyclic ↥K] [IsCyclic ↥Kstar] :
+    IsCyclic ↥(K ⊔ Kstar) := by
+  have hprodcyc : IsCyclic (↥K × ↥Kstar) :=
+    Group.isCyclic_prod_iff.mpr
+      ⟨inferInstance, inferInstance, coprime_card_kappaHall_Kstar hKM hK hKstar⟩
+  exact (kappaHall_prod_Kstar_mulEquiv hKM hK hKstar).isCyclic.mp hprodcyc
+
+/-- **BG 14.7(h), coprimality is free given the complement**: if `M' = [M,M]` complements the
+Hall `κ(M)`-subgroup `K` in `M`, then `|M'|` and `|K|` are coprime — `|M'| = [M : K]` (from the
+complement) and a Hall subgroup has order coprime to its index.  This reduces Theorem 14.7(h) to its
+substantive obligation `IsComplement' M' K` (mmd L4061, which consumes "`K` cyclic" from the
+counting collapse); the second conjunct then follows with no further input. -/
+theorem coprime_card_derived_kappaHall_of_isComplement' [Finite G] {M K : Subgroup G}
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hc : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M)) :
+    Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) := by
+  have hcop := hK.coprime_index
+  rw [hc.index_eq_card] at hcop
+  exact hcop.symm
+
 /-- **Counting-bound kernel for Theorem 14.7(e)** (BG mmd L3975, the `8/15 > 1/2` step).
 For `k ≥ 3` and `k* ≥ 5`, the saturation density `(1 - 1/k)(1 - 1/k*)` exceeds `1/2`
 (minimised at `(1 - 1/3)(1 - 1/5) = 8/15`).  In Theorem 14.7, `k = |K|` and `k* = |K*|` are

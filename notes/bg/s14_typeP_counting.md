@@ -1167,3 +1167,26 @@ realistically 2-4 session (counting infra + ∃! covering assembly)。新 leaf S
 3. **∃! covering** (~80行): n=1, T=Ẑ, half_lt >½|G|, S_H 交差 → H~M or M*。
 4. **part(h)** (~50行, §16-indep): M_σ⊆M'(Thm10.2c)+Prop14.2(a) UM_σ+K cyclic → UM_σ=M', κ=τ₁。
 これらを組んで `typeP_duality` (S14:4475 sorry) を close → §15/§16 (Lane G) 全下流 unblock。
+
+### ✅ Z=K⊔K* 直積 foundation + 🔑 part(h) gating 訂正 (2026-06-16 loop⁵, commit 87e8a77d)
+
+**✅ `Z=K⊔K*` 内部直積 foundation COMPLETE** (8 lemma, sorry-free + axiom-clean, full build 3838/~66s):
+`kappaHall_isPiSubgroup_sigmaCompl` (K=σ'群) / `Kstar_isPiSubgroup_sigma` (K*≤Mσ=σ群) /
+`coprime_card_kappaHall_Kstar` (`Coprime |K||K*|`, L4027) / `kappaHall_inf_Kstar_eq_bot` (K⊓K*=⊥) /
+`commute_kappaHall_Kstar` (K*≤C_G(K)) / `kappaHall_prod_Kstar_mulEquiv` (↥K×↥K*≃*↥(K⊔K*),
+noncommCoprod, S13 の inj+range recipe 再利用) / `card_kappaHall_sup_Kstar` (`|Z|=|K||K*|`, L4029=z) /
+`isCyclic_kappaHall_sup_Kstar_of_cyclic` (両 cyclic⟹Z cyclic via `Group.isCyclic_prod_iff`, conjunct d)。
+K=Hall κ + K*=C_{Mσ}(K) のみ依存 (counting 非依存)。density 式 (L4031-4045) と cyclic conjunct の土台。
+
+**🔑🔑 訂正: 上記「4. part(h) §16-indep」は誤り** — part(h) は **14.7 の最終ステップで、独立抽出不可**:
+- τ₁/τ₃ 定義 (`tau1={p∉σ∧p∉π(M')∧rank1}`, `tau3=同 but p∈π(M')`, S12_ECore:51) ⟹ `κ=τ₁ ⟺ Coprime |K||M'|`。
+  part(h) の `M'=UM_σ ⟹ κ=τ₁` は BG L4061 で **「K cyclic」を消費**、K cyclic は L4174 明記どおり
+  14.7(d) = **14.7 自身の counting collapse (n=1, L4041, r(K)=r(K*)=1)** 由来。§16 ではないが counting の後。
+- **Prop 14.2(a) の「UM_σ は K の normal complement」は repo 未パッケージ**: E-setup 断片
+  (`SubgroupESetup`, `isFrobeniusGroup_E_of_caseTau1` E=U⋊E₁ [U=E₂E₃], `actsRegularlyOn_E23_E1_of_caseTau1`)
+  のみ存在、assembled「UM_σ normal complement of K in M」は無 (case κ⊆τ₁ vs κ∩τ₃≠∅[K=E,U=1] で split)。
+  part(h) には **先に Prop 14.2(a) packaging** が要る (missing prerequisite)。
+- ⟹ **14.7 全体が 1 つの interlocked counting**: conjunct d/cyclic/part h/covering すべて n=1 collapse
+  から。Lane G (S15:806 part h consume, S15:816 cyclic consume) は 14.7 landing まで gated。
+- 次の最有力 = M_i family setup (crux=swap 論法 L3999-4001 `Z=K_i×K_i*`) → density → covering →
+  Prop 14.2(a) packaging → part(h)。新 leaf S14_Theorem147 は hub split (issue 0069)。
