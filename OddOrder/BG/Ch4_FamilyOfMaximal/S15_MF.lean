@@ -972,6 +972,53 @@ theorem kstar_le_fittingInAmbient_of_inputs [Finite G]
     exact hcore
   exact OddOrder.BG.Ch1.S05.le_of_inf_ne_bot_of_card_prime rfl hInf_ne
 
+/-- **Theorem 15.2, step 2 tail (part 2)** (mmd L4192, "Thus `K*` lies in `Q = O_q(M)`"): given
+`K* ⊆ F(M_σ)` (part 1) and that `K*` is a `q`-group (`hKstar_q`, from `|K*| = q` prime), the
+`q`-core chain lands `K* ⊆ O_q(M) = Q`.
+
+`K* ⊆ O_q(F(M_σ))` (a `q`-subgroup of the nilpotent `F(M_σ)`, `piGroup_le_opiCoreInG_of_nilpotent`);
+`O_q(F(M_σ))` is normal in `M` (the characteristic chain `O_q(F(M_σ)) ⊴ F(M_σ) ⊴ M_σ`, lifted by
+`M ≤ N_G(M_σ) ⟹ M ≤ N_G(F(M_σ)) ⟹ M ≤ N_G(O_q(F(M_σ)))`), hence a normal `q`-subgroup of `M`, so
+`⊆ O_q(M)` (`le_opiCoreInG_of_normal_of_isPiSubgroup`).  The §14 input is `q = |K*|` prime (used
+only to know `K*` is a `q`-group, via `hKstar_q`). -/
+theorem kstar_le_opiCore_of_le_fittingInAmbient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {q : ℕ}
+    (hKstar_q : ∀ r ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+        ⊓ Subgroup.centralizer (K : Set G))).primeFactors, r ∈ ({q} : Set ℕ))
+    (hKstar_le_F : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+        ≤ fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+        ≤ opiCoreInG ({q} : Set ℕ) M := by
+  haveI : Group.IsNilpotent ↥(fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :=
+    OddOrder.BG.Ch2.S08.fittingInG_isNilpotent _
+  -- step A: `K* ⊆ O_q(F(M_σ))` — a `q`-subgroup of the nilpotent `F(M_σ)`.
+  have hA : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      ≤ opiCoreInG ({q} : Set ℕ) (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) :=
+    piGroup_le_opiCoreInG_of_nilpotent hKstar_q hKstar_le_F
+  -- characteristic chain: `M ≤ N(M_σ) → N(F(M_σ)) → N(O_q(F(M_σ)))`.
+  have hM_le_NMσ :
+      M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hM_le_NF : M ≤ Subgroup.normalizer
+      ((fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) : Subgroup G) : Set G) :=
+    fun x hx => OddOrder.BG.Ch2.S08.mem_normalizer_fittingInG_of_mem_normalizer (hM_le_NMσ hx)
+  have hM_le_NOq : M ≤ Subgroup.normalizer
+      ((opiCoreInG ({q} : Set ℕ) (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M))
+        : Subgroup G) : Set G) :=
+    le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ) hM_le_NF
+  -- `O_q(F(M_σ)) ≤ M`, normal in `M`, a `{q}`-subgroup ⟹ `⊆ O_q(M)`.
+  have hOq_le_M : opiCoreInG ({q} : Set ℕ) (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)) ≤ M :=
+    (opiCoreInG_le _ _).trans
+      ((OddOrder.BG.Ch2.S08.fittingInG_le _).trans (OddOrder.BG.Ch3.S10.Msigma_le M))
+  have hB : opiCoreInG ({q} : Set ℕ) (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M))
+      ≤ opiCoreInG ({q} : Set ℕ) M :=
+    le_opiCoreInG_of_normal_of_isPiSubgroup hOq_le_M
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hOq_le_M).mpr hM_le_NOq)
+      (isPiSubgroup_opiCoreInG _ _)
+  exact hA.trans hB
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
