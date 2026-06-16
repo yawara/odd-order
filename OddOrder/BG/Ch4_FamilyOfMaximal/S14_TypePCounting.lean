@@ -3562,6 +3562,41 @@ def Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompos
     (M : Subgroup G) : Set G :=
   {g | ∃ x ∈ sigmaSharp M, ∃ x' ∈ Rsub hG D x, g = x * x'}
 
+/-- **BG Lemma 14.5(b)** (mmd L3920), faithful `M̃` form: for nonconjugate maximal `M₁`, `M₂`,
+the sets `M̃₁`, `M̃₂` are disjoint.  Immediate from 14.5(a): if `g = x·x' = w·w'` with
+`x ∈ (M₁)_σ^#`, `w ∈ (M₂)_σ^#`, then `x ≠ w` (else `x` is a nonidentity element of
+`σ(M₁) ∩ σ(M₂) = ∅`), so `g ∈ x R(x) ∩ w R(w) = ∅`. -/
+theorem Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M₁ M₂ : Subgroup G} (hM₁ : M₁ ∈ maximalSubgroups G)
+    (hM₂ : M₂ ∈ maximalSubgroups G) (hnc : ¬ IsConjugateSubgroup M₁ M₂) :
+    Disjoint (Mtilde hG D M₁) (Mtilde hG D M₂) := by
+  classical
+  rw [Set.disjoint_left]
+  rintro g ⟨x, hxsharp, x', hx'R, rfl⟩ ⟨w, hwsharp, w', hw'R, hgw⟩
+  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    at hxsharp hwsharp
+  obtain ⟨hxM₁, hx1⟩ := hxsharp
+  obtain ⟨hwM₂, hw1⟩ := hwsharp
+  have hlx : D.length x = 1 := (D.length_one_iff x).mpr ⟨hx1, ⟨M₁, hM₁, hxM₁⟩⟩
+  have hlw : D.length w = 1 := (D.length_one_iff w).mpr ⟨hw1, ⟨M₂, hM₂, hwM₂⟩⟩
+  -- `x ≠ w`: else a prime of `x` lies in `σ(M₁) ∩ σ(M₂) = ∅`.
+  have hxw : x ≠ w := by
+    rintro rfl
+    obtain ⟨p, hp, hpx⟩ :=
+      (orderOf x).exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
+    have hpσ1 : p ∈ OddOrder.BG.Ch3.S10.sigma M₁ :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M₁ p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpx.trans ((OddOrder.BG.Ch3.S10.Msigma M₁).orderOf_dvd_natCard hxM₁),
+          Nat.card_pos.ne'⟩)
+    have hpσ2 : p ∈ OddOrder.BG.Ch3.S10.sigma M₂ :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M₂ p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpx.trans ((OddOrder.BG.Ch3.S10.Msigma M₂).orderOf_dvd_natCard hwM₂),
+          Nat.card_pos.ne'⟩)
+    exact Set.disjoint_left.mp
+      (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM₁ hM₂ hnc) hpσ1 hpσ2
+  exact Set.disjoint_left.mp (xRsub_disjoint hG D hlx hlw hxw)
+    ⟨x', hx'R, rfl⟩ ⟨w', hw'R, hgw⟩
+
 /-- **BG Lemma 14.5(b)** (mmd L3875): for nonconjugate maximal `M`, `N`, the conjugacy
 saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
 Theorem 14.7 and Corollary 14.9.
