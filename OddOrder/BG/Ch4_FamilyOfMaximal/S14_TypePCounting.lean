@@ -3418,6 +3418,143 @@ theorem isPiElement_sigmaCompl_of_mem_Rsub [Finite G]
     rw [hr, orderOf_one, Nat.primeFactors_one] at hp
     simp at hp
 
+/-- **BG Lemma 14.5(a)** (mmd L3919): for distinct `σ`-length-one elements `x`, `y`, the cosets
+`x R(x)` and `y R(y)` are disjoint.  Proof (s-part-free, via the two-block decomposition):
+`g = x·x'` makes `x` the `σ(M_x)`-part of `g`, `g = y·y''` makes `y` the `σ(M_y)`-part.  If the
+`σ`-classes agree, `x = y` (contradiction); otherwise some prime of `y` forces `σ(M_y) = σ(N_x)`,
+so `x' = y` and `x = y''`, and then Theorem 14.4(e) (`N_y ∩ N_x` complements `(N_x)_σ`) gives
+`y ∈ (N_x)_σ ∩ N_y = 1`, a contradiction. -/
+theorem xRsub_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {x y : G} (hx : D.length x = 1) (hy : D.length y = 1)
+    (hxy : x ≠ y) :
+    Disjoint {g : G | ∃ r ∈ Rsub hG D x, g = x * r}
+      {g : G | ∃ r ∈ Rsub hG D y, g = y * r} := by
+  classical
+  rw [Set.disjoint_left]
+  rintro g ⟨x', hx'R, rfl⟩ ⟨y'', hy''R, hg2⟩
+  -- `g = x · x'`, and `hg2 : x · x' = y · y''`.
+  have hx1 : x ≠ 1 := ((D.length_one_iff x).mp hx).1
+  have hy1 : y ≠ 1 := ((D.length_one_iff y).mp hy).1
+  obtain ⟨M_x, hMxmax, hxMx⟩ := ((D.length_one_iff x).mp hx).2
+  obtain ⟨M_y, hMymax, hyMy⟩ := ((D.length_one_iff y).mp hy).2
+  -- `x` is a `σ(M_x)`-element, `y` a `σ(M_y)`-element.
+  have hxPi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x) x := fun p hp =>
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M_x p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp,
+        (Nat.dvd_of_mem_primeFactors hp).trans
+          ((OddOrder.BG.Ch3.S10.Msigma M_x).orderOf_dvd_natCard hxMx),
+        Nat.card_pos.ne'⟩)
+  have hyPi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_y) y := fun p hp =>
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M_y p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp,
+        (Nat.dvd_of_mem_primeFactors hp).trans
+          ((OddOrder.BG.Ch3.S10.Msigma M_y).orderOf_dvd_natCard hyMy),
+        Nat.card_pos.ne'⟩)
+  -- `x'` is a `σ(M_x)′`-element, `y''` a `σ(M_y)′`-element (the crux building block).
+  have hx'Pi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x)ᶜ x' :=
+    isPiElement_sigmaCompl_of_mem_Rsub hG D hx ⟨hMxmax, hxMx⟩ hx'R
+  have hy''Pi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_y)ᶜ y'' :=
+    isPiElement_sigmaCompl_of_mem_Rsub hG D hy ⟨hMymax, hyMy⟩ hy''R
+  -- `x` commutes with `x'`, `y` with `y''`.
+  have hcx : Commute x x' :=
+    Subgroup.mem_centralizer_iff.mp (Rsub_le_centralizer hG D x hx'R) x (Set.mem_singleton x)
+  have hcy : Commute y y'' :=
+    Subgroup.mem_centralizer_iff.mp (Rsub_le_centralizer hG D y hy''R) y (Set.mem_singleton y)
+  by_cases hσeq : OddOrder.BG.Ch3.S10.sigma M_x = OddOrder.BG.Ch3.S10.sigma M_y
+  · -- **Equal classes**: both decompositions are `(σ(M_x), σ(M_x)′)`, so `x = y`.
+    have ha2 : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x) y := by
+      rw [hσeq]; exact hyPi
+    have hb2 : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x)ᶜ y'' := by
+      rw [hσeq]; exact hy''Pi
+    exact hxy (OddOrder.GroupTheory.isPiElement_mul_unique rfl hcx hxPi hx'Pi
+      hg2.symm hcy ha2 hb2).1
+  · -- **Disjoint classes**: `σ(M_x) ∩ σ(M_y) = ∅`.
+    have hdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M_x) (OddOrder.BG.Ch3.S10.sigma M_y) :=
+      Set.disjoint_left.mpr fun p hpx hpy =>
+        hσeq (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hMymax hpx hpy)
+    -- `x` is a `σ(M_y)′`-element (disjoint).
+    have hxPiCompl : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_y)ᶜ x := by
+      intro p hp
+      exact fun hpy => Set.disjoint_left.mp hdisj (hxPi p hp) hpy
+    -- `π(g) = π(x) ∪ π(x')` (coprime commuting factors).
+    have hcox : Nat.Coprime (orderOf x) (orderOf x') :=
+      OddOrder.GroupTheory.coprime_orderOf_of_isPiElement hxPi hx'Pi
+    have hpg : (orderOf (x * x')).primeFactors =
+        (orderOf x).primeFactors ∪ (orderOf x').primeFactors := by
+      rw [hcx.orderOf_mul_eq_mul_orderOf_of_coprime hcox,
+        Nat.primeFactors_mul (orderOf_pos x).ne' (orderOf_pos x').ne']
+    -- `π(y) ⊆ π(g)` (`y` is a factor of `g`).
+    have hcoy : Nat.Coprime (orderOf y) (orderOf y'') :=
+      OddOrder.GroupTheory.coprime_orderOf_of_isPiElement hyPi hy''Pi
+    have hyg : (orderOf y).primeFactors ⊆ (orderOf (x * x')).primeFactors := by
+      rw [hg2, hcy.orderOf_mul_eq_mul_orderOf_of_coprime hcoy,
+        Nat.primeFactors_mul (orderOf_pos y).ne' (orderOf_pos y'').ne']
+      exact Finset.subset_union_left
+    -- `y ≠ 1` gives a prime `p ∈ π(y)`.
+    obtain ⟨p, hpy⟩ : (orderOf y).primeFactors.Nonempty := by
+      apply Nat.nonempty_primeFactors.mpr
+      have h0 := orderOf_pos y
+      have h1 : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h)
+      omega
+    have hpσMy : p ∈ OddOrder.BG.Ch3.S10.sigma M_y := hyPi p hpy
+    -- `|𝓜_σ(x)| > 1`: else `x' = 1` and `p ∈ π(x) ⊆ σ(M_x)`, forcing `σ(M_x) = σ(M_y)`.
+    by_cases hgtx : 1 < (maximalSigmaSubgroupsOfElement x).ncard
+    · -- **Main case.**
+      obtain ⟨N_x, hNxmax, _, hReqx, hπτ2x, hcomplx⟩ := exists_neighbor_eq_Rsub hG D hx hgtx
+      have hx'Nx : x' ∈ OddOrder.BG.Ch3.S10.Msigma N_x := by
+        rw [hReqx] at hx'R; exact (Subgroup.mem_inf.mp hx'R).1
+      have hx'PiNx : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N_x) x' :=
+        fun q hq => OddOrder.BG.Ch3.S10.Msigma_isPiGroup N_x q (Nat.mem_primeFactors.mpr
+          ⟨Nat.prime_of_mem_primeFactors hq,
+            (Nat.dvd_of_mem_primeFactors hq).trans
+              ((OddOrder.BG.Ch3.S10.Msigma N_x).orderOf_dvd_natCard hx'Nx),
+            Nat.card_pos.ne'⟩)
+      -- `p ∈ π(x) ∪ π(x')`; the `π(x)` case is impossible, so `σ(M_y) = σ(N_x)`.
+      have hpmem : p ∈ (orderOf x).primeFactors ∪ (orderOf x').primeFactors := hpg ▸ hyg hpy
+      have hσMyNx : OddOrder.BG.Ch3.S10.sigma M_y = OddOrder.BG.Ch3.S10.sigma N_x := by
+        rcases Finset.mem_union.mp hpmem with hpx | hpx'
+        · exact absurd
+            (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hMymax (hxPi p hpx) hpσMy) hσeq
+        · exact sigma_eq_of_mem_sigma_of_mem_sigma hG hMymax hNxmax hpσMy (hx'PiNx p hpx')
+      -- Hence `x'` is a `σ(M_y)`-element; `g = x'·x` is a `(σ(M_y), σ(M_y)′)`-split.
+      have hx'PiMy : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_y) x' := by
+        rw [hσMyNx]; exact hx'PiNx
+      obtain ⟨hx'y, hxy''⟩ := OddOrder.GroupTheory.isPiElement_mul_unique
+        (g := x * x') hcx.symm hcx.symm hx'PiMy hxPiCompl hg2.symm hcy hyPi hy''Pi
+      -- `x'=y`, `x=y''`; then `N_y ∈ 𝓜_σ(x)` and 14.4(e) give the contradiction.
+      have hy_in_NxSigma : y ∈ OddOrder.BG.Ch3.S10.Msigma N_x := hx'y ▸ hx'Nx
+      -- `x = y'' ∈ R(y) ⊆ (N_y)_σ`, so `|𝓜_σ(y)| > 1` and `N_y ∈ 𝓜_σ(x)`.
+      have hgty : 1 < (maximalSigmaSubgroupsOfElement y).ncard := by
+        by_contra h
+        rw [Rsub, dif_neg (fun hc => h hc.2.2), Subgroup.mem_bot] at hy''R
+        exact hx1 (hxy''.trans hy''R)
+      obtain ⟨N_y, hNymax, hCyNy, hReqy, _, _⟩ := exists_neighbor_eq_Rsub hG D hy hgty
+      have hx_in_NySigma : x ∈ OddOrder.BG.Ch3.S10.Msigma N_y := by
+        rw [hReqy] at hy''R
+        rw [hxy'']; exact (Subgroup.mem_inf.mp hy''R).1
+      have hNy_mem : N_y ∈ maximalSigmaSubgroupsOfElement x := ⟨hNymax, hx_in_NySigma⟩
+      -- Theorem 14.4(e) for `x` with `M = N_y`: `N_y ∩ N_x` complements `(N_x)_σ` in `N_x`.
+      -- `y ∈ (N_x)_σ ∩ (N_y ∩ N_x)`, but the complement makes that trivial; so `y = 1`.
+      have hcompl := hcomplx N_y hNy_mem
+      have hyNx : y ∈ N_x := (OddOrder.BG.Ch3.S10.Msigma_le N_x) hy_in_NxSigma
+      have hyNy : y ∈ N_y := hCyNy (Subgroup.mem_centralizer_iff.mpr fun z hz => by
+        rw [Set.mem_singleton_iff.mp hz])
+      have hmem : (⟨y, hyNx⟩ : ↥N_x) ∈
+          (OddOrder.BG.Ch3.S10.Msigma N_x).subgroupOf N_x ⊓ (N_y ⊓ N_x).subgroupOf N_x := by
+        rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+        exact ⟨hy_in_NxSigma, Subgroup.mem_inf.mpr ⟨hyNy, hyNx⟩⟩
+      have hd := hcompl.disjoint
+      rw [disjoint_iff] at hd
+      rw [hd, Subgroup.mem_bot] at hmem
+      exact hy1 (by simpa using congrArg (Subgroup.subtype N_x) hmem)
+    · -- single-maximal case (`x' = 1`, `g = x`): forces `σ(M_x) = σ(M_y)`, a contradiction.
+      rw [Rsub, dif_neg (fun hc => hgtx hc.2.2), Subgroup.mem_bot] at hx'R
+      rw [hx'R, mul_one] at hpg hyg
+      have hpmem : p ∈ (orderOf x).primeFactors := by
+        have := hyg hpy
+        rwa [hpg, orderOf_one, Nat.primeFactors_one, Finset.union_empty] at this
+      exact hσeq (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hMymax (hxPi p hpmem) hpσMy)
+
 /-- **BG's `M̃`** (mmd L3908): `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, the `σ`-decompositions of
 length `≤ 2` with leading factor in `M_σ^#`.  This is the genuine BG `M̃` (it adjoins the
 `ℓ_σ = 2` twisted elements `x x'` that the under-approximation `sigmaSharp` omits). -/
