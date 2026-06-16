@@ -1019,6 +1019,60 @@ theorem kstar_le_opiCore_of_le_fittingInAmbient [Finite G]
       (isPiSubgroup_opiCoreInG _ _)
   exact hA.trans hB
 
+/-- **Theorem 15.2, step 2 tail — `G`-form bridge of part 1**: the `↥M`-realized
+`kstar_le_fittingInAmbient_of_inputs` lifted to a statement about the ambient subgroups
+`K* = M_σ ⊓ C_G(K)` and `F(M_σ)` of `G`.
+
+Translates the `↥M` conclusion `C_{↥M}(K) ⊓ M_σ ≤ F(M_σ)` to `M_σ ⊓ C_G(K) ≤ F(M_σ)` (`G`-form)
+via `centralizer_subgroupOf` (the `C_{↥M}(K) = C_G(K) ↾ M` identity) and
+`fitting_subgroupOf_map_subtype_eq` (`F(M_σ ↾ M) = F(M_σ) ↾ M`), then reflects `subgroupOf`-`≤`
+back to `G`.  This is the bridge that lets the `↥M`-native step-2 helpers (which need the ambient
+to be `M` for Lemma 6.3(a) / Theorem 3.8) feed the `G`-native `q`-core chain
+(`kstar_le_opiCore_of_le_fittingInAmbient`).  Needs `K ≤ M` (`hKM`, the Hall containment). -/
+theorem kstar_le_fittingInAmbient_G_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+        ⊓ Subgroup.centralizer (K : Set G))).Prime) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      ≤ fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) := by
+  have hKstar_le_M : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≤ M :=
+    inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  have hF_le_M : fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ≤ M :=
+    (OddOrder.BG.Ch2.S08.fittingInG_le _).trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  -- bridge (a): `C_{↥M}(K) ⊓ M_σ = (M_σ ⊓ C_G(K)) ↾ M`.
+  have hbridge_a : Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+      = (OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)).subgroupOf M := by
+    have himg : M.subtype '' (K.subgroupOf M : Set ↥M) = (K : Set G) := by
+      rw [← Subgroup.coe_map, Subgroup.map_subgroupOf_eq_of_le hKM]
+    rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf (K.subgroupOf M : Set ↥M), himg, inf_comm]
+    simp only [Subgroup.subgroupOf, Subgroup.comap_inf]
+  -- translate `hqG` to the `↥M` prime hypothesis of part 1.
+  have hq : (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+      ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).Prime := by
+    rw [hbridge_a, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKstar_le_M).toEquiv]
+    exact hqG
+  -- bridge (b): `F(M_σ ↾ M) = F(M_σ) ↾ M`.
+  have hbridge_b : fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      = (fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M)).subgroupOf M :=
+    OddOrder.BG.Ch1.S03h.fitting_subgroupOf_map_subtype_eq (OddOrder.BG.Ch3.S10.Msigma_le M)
+  -- part 1 (`↥M`), then bridge both sides to `G` and reflect.
+  have h := kstar_le_fittingInAmbient_of_inputs hG hM hcompl hcop hcond2 hne hq
+  rw [hbridge_a, hbridge_b] at h
+  have h2 := Subgroup.map_mono (f := M.subtype) h
+  rwa [Subgroup.map_subgroupOf_eq_of_le hKstar_le_M,
+    Subgroup.map_subgroupOf_eq_of_le hF_le_M] at h2
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
