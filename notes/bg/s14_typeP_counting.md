@@ -1150,3 +1150,20 @@ statement (既存, faithful): (h) M'=derivedInG M が K を complement + coprime
   **half_lt** |𝒞_G(Ẑ)|>½|G| → covering (∀ type-P H, 𝒞_G(S_H)>½|G| ⟹ 交差 ⟹ H~M or M*)。
 - part(h): M_σ⊆M' (Thm10.2c) + K cyclic + Prop14.2(a) normal complement UM_σ → UM_σ=M' → κ=τ₁。
 realistically 2-4 session (counting infra + ∃! covering assembly)。新 leaf S14_Theorem147 推奨 (hub split)。
+
+### ✅ Theorem 14.7 着手 — TI saturation count COMPLETE (2026-06-16 loop⁴ 続き⁴, commit b53d8c6c)
+
+**`ncard_conjClassSet_of_isTISubset` sorry-free + axiom-clean + AxiomsCheck**: TI-subset A
+(stabilized by normalizer-bound L) ⟹ |𝒞_G(A)|=|A|·[G:L]。conjugates を G⧸L で index
+(L-stab で well-def, Quotient.lift)、TI で pairwise disjoint、各 ncard |A| (`Set.ncard_smul_set`)、
+`Set.ncard_iUnion_of_finite`+`finsum_eq_sum_of_fintype` で合計。**14.7 step 5 (|𝒞_G(T)|=|T||G:Z|) の核。**
+鍵 API: `Set.ncard_iUnion_of_finite`, `finsum_eq_sum_of_fintype`(to_additive), Quotient.lift+`change (leftRel L)`。
+再利用可: Peterfalvi TI-subset counting にも (現状 S14 内、upstream 候補=TISubset.lean)。
+
+**▶ 14.7 残ピース** (順に、新 leaf S14_Theorem147 推奨):
+1. **M_i family setup** (~100行, 最 intricate): X_i∈ℰ¹(K) → M_i=𝓜(N_G(X_i)); Prop14.2(b) で Z⊆M_i,
+   X_i⊆M_iσ; M_i 非conj-to-M; K_i=Hall κ(M_i), K_i*=C_{M_iσ}(K_i); N_{M_i}(X*)=K_i×K_i*。
+2. **density arithmetic** (~50行): |𝒞_G(T)|=(1+n/z-Σ1/k_i)|G| [TI count] + (全P1) 14.5(c) Σ → |G^#|≥|G| 矛盾。
+3. **∃! covering** (~80行): n=1, T=Ẑ, half_lt >½|G|, S_H 交差 → H~M or M*。
+4. **part(h)** (~50行, §16-indep): M_σ⊆M'(Thm10.2c)+Prop14.2(a) UM_σ+K cyclic → UM_σ=M', κ=τ₁。
+これらを組んで `typeP_duality` (S14:4475 sorry) を close → §15/§16 (Lane G) 全下流 unblock。
