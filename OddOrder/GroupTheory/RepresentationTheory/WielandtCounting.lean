@@ -52,6 +52,13 @@ theorem finrank_invariants_add_finrank_ker_averageMap
   have hrange : LinearMap.range ρ.averageMap = ρ.invariants := (isProj_averageMap ρ).range
   rw [← hrange, LinearMap.finrank_range_add_finrank_ker]
 
+/-- Explicit form of the averaging projection: `averageMap ρ v = ⅟|G| • ∑_g ρ g v`. -/
+theorem averageMap_apply (ρ : Representation k G V) [Fintype G]
+    [Invertible (Fintype.card G : k)] (v : V) :
+    ρ.averageMap v = ⅟(Fintype.card G : k) • ∑ g : G, ρ g v := by
+  simp only [averageMap, GroupAlgebra.average, map_smul, map_sum, MonoidAlgebra.of_apply,
+    asAlgebraHom_single_one, LinearMap.smul_apply, LinearMap.coeFn_sum, Finset.sum_apply]
+
 /-- The two summands of the coprime decomposition meet trivially: a `G`-invariant vector lying
 in the augmentation submodule `[V,G] = ker (averageMap ρ)` is zero.  (This is `[V,G]^G = 0`, used
 to collapse the el-ab identity to the kernel-FPF case.) -/
@@ -96,5 +103,43 @@ theorem invariants_eq_inf_of_sup_eq_top (ρ : Representation k G V) {H₁ H₂ :
     have hStop : S = ⊤ :=
       top_le_iff.mp (hsup ▸ sup_le (fun g hg => hv1 ⟨g, hg⟩) (fun g hg => hv2 ⟨g, hg⟩))
     exact fun g => (hStop ▸ Subgroup.mem_top g : g ∈ S)
+
+/-- **Fixed points split along an invariant decomposition.**  If `V = A ⊕ B` with both `A`
+and `B` stable under every `ρ g`, then the `G`-invariants decompose accordingly:
+`dim V^G = dim (A ⊓ V^G) + dim (B ⊓ V^G)`.  (Used with `A = V^U`, `B = [V,U]`, `G = E` to
+get `dim V^E = dim V^{UE} + dim ([V,U])^E` in the el-ab identity (⋆).) -/
+theorem finrank_invariants_eq_of_isCompl_invariant
+    (ρ : Representation k G V) [FiniteDimensional k V]
+    {A B : Submodule k V} (hAB : IsCompl A B)
+    (hA : ∀ g : G, ∀ a ∈ A, ρ g a ∈ A) (hB : ∀ g : G, ∀ b ∈ B, ρ g b ∈ B) :
+    finrank k ρ.invariants =
+      finrank k ↥(A ⊓ ρ.invariants) + finrank k ↥(B ⊓ ρ.invariants) := by
+  have hdisj : (A ⊓ ρ.invariants) ⊓ (B ⊓ ρ.invariants) = ⊥ :=
+    le_bot_iff.mp (le_trans (inf_le_inf inf_le_left inf_le_left) hAB.disjoint.le_bot)
+  have hsup : (A ⊓ ρ.invariants) ⊔ (B ⊓ ρ.invariants) = ρ.invariants := by
+    refine le_antisymm (sup_le inf_le_right inf_le_right) ?_
+    intro v hv
+    obtain ⟨a, ha, b, hb, rfl⟩ := Submodule.mem_sup.mp (codisjoint_iff.mp hAB.codisjoint ▸
+      Submodule.mem_top (x := v))
+    -- `a` and `b` are each `G`-fixed, by uniqueness of the `A ⊕ B` decomposition.
+    have hainv : a ∈ ρ.invariants := by
+      rw [mem_invariants]
+      intro g
+      have key : ρ g a + ρ g b = a + b := by rw [← map_add]; exact hv g
+      have hba : ρ g a - a = b - ρ g b :=
+        sub_eq_sub_iff_add_eq_add.mpr (key.trans (add_comm a b))
+      have hmemB : ρ g a - a ∈ B := by rw [hba]; exact B.sub_mem hb (hB g b hb)
+      have hzero : ρ g a - a = 0 := by
+        rw [← Submodule.mem_bot k, ← hAB.inf_eq_bot]
+        exact ⟨A.sub_mem (hA g a ha) ha, hmemB⟩
+      exact sub_eq_zero.mp hzero
+    have hbinv : b ∈ ρ.invariants := by
+      have h := ρ.invariants.sub_mem hv hainv
+      rwa [add_sub_cancel_left] at h
+    exact Submodule.mem_sup.mpr ⟨a, ⟨ha, hainv⟩, b, ⟨hb, hbinv⟩, rfl⟩
+  have hrank := Submodule.finrank_sup_add_finrank_inf_eq
+    (A ⊓ ρ.invariants) (B ⊓ ρ.invariants)
+  rw [hsup, hdisj, finrank_bot, add_zero] at hrank
+  exact hrank
 
 end OddOrder.GroupTheory.WielandtCounting
