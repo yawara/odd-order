@@ -541,8 +541,11 @@ private theorem abelian_sz_conjugacy
       stabilizer_quotientDiff_eq_self hN hK αK hαK] at hstab
   exact hstab.symm
 
-/-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`. -/
-private theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
+/-- Existence of a minimal `G`-normal subgroup contained in nontrivial `N`.
+
+(Public: also used by BG Theorem 15.2's step 3, applied to the quotient `N_M(Q₀)/Q₀` to obtain the
+minimal normal `Q₁/Q₀` — the same quotient-instantiation pattern as `step_caseB` below.) -/
+theorem exists_minimal_normal_le {N : Subgroup G} (hN_normal : N.Normal) (hN : N ≠ ⊥) :
     ∃ L : Subgroup G, L.Normal ∧ L ≤ N ∧ L ≠ ⊥ ∧
       ∀ L' : Subgroup G, L'.Normal → L' ≤ L → L' ≠ ⊥ → L' = L := by
   let S : Set (Subgroup G) := {L | L.Normal ∧ L ≤ N ∧ L ≠ ⊥}
