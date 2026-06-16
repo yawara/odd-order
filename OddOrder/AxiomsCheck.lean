@@ -4671,6 +4671,14 @@ independent of the Hall choice).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_swap_Z_le
 
+/-! **BG 14.7, `M ⊇ N_G(X)` from a unique centralizer-maximal** (`S14_TypePCounting`,
+`normalizer_le_of_maximalSubgroupsContaining_centralizer`, mmd L3992): if `ℳ(C_G(X)) = {M}` then
+`N_G(X) ≤ M`.  General fact (conjugation fixes `C_G(X)`, uniqueness forces `Mᵍ = M`, `M`
+self-normalizing); supplies the swap argument's reverse direction.  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S14.normalizer_le_of_maximalSubgroupsContaining_centralizer
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

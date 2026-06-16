@@ -4665,6 +4665,44 @@ theorem typeP_normalizer_inf_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
   obtain ⟨_, _, hb1, _, _, _⟩ := typeP_structure hG hMi hPi hKiMi hKi rfl hU
   exact hb1 p hp X hX hXKi
 
+/-- **BG 14.7, `M ⊇ N_G(X)` from a unique centralizer-maximal** (mmd L3992, "Moreover, `M ⊇
+N_G(X)`"): if `M` is the *unique* maximal subgroup containing `C_G(X)` (i.e.
+`ℳ(C_G(X)) = {M}`, the conclusion of Proposition 14.2(c)), then `N_G(X) ≤ M`.
+
+For `g ∈ N_G(X)`, conjugation by `g` fixes `C_G(X)` (`g` normalizes `X`), so `Mᵍ` is again a
+maximal subgroup containing `C_G(X)`; by uniqueness `Mᵍ = M`, hence `g ∈ N_G(M) = M`
+(`M` self-normalizing as a maximal subgroup).  A general fact, independent of §13. -/
+theorem normalizer_le_of_maximalSubgroupsContaining_centralizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M X : Subgroup G}
+    (hsing : maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M}) :
+    Subgroup.normalizer (X : Set G) ≤ M := by
+  classical
+  have hMmem : M ∈ maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) := by
+    rw [hsing]; rfl
+  rw [mem_maximalSubgroupsContaining] at hMmem
+  obtain ⟨hMcoat, hCXM⟩ := hMmem
+  intro g hg
+  -- `g` normalizes `X`, hence normalizes `C_G(X)`: `Mᵍ ⊇ C_G(X)ᵍ = C_G(X)`.
+  have hgcent : MulAut.conj g • Subgroup.centralizer (X : Set G)
+      = Subgroup.centralizer (X : Set G) := by
+    have h1 : MulAut.conj g • Subgroup.centralizer (X : Set G)
+        = Subgroup.centralizer ((MulAut.conj g • X : Subgroup G) : Set G) :=
+      Subgroup.map_centralizer_eq_of_bijective (X : Set G) (MulAut.conj g).toMonoidHom
+        (MulAut.conj g).bijective
+    rwa [OddOrder.GroupTheory.conj_smul_eq_self_of_mem_normalizer hg] at h1
+  -- `Mᵍ` is a maximal subgroup containing `C_G(X)`, so by uniqueness `Mᵍ = M`.
+  have hgM_mem : (MulAut.conj g • M) ∈
+      maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) := by
+    rw [mem_maximalSubgroupsContaining]
+    refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul hMcoat, ?_⟩
+    rw [← hgcent]
+    exact (Subgroup.pointwise_smul_le_pointwise_smul_iff).mpr hCXM
+  rw [hsing, Set.mem_singleton_iff] at hgM_mem
+  -- `Mᵍ = M` gives `g ∈ N_G(M) = M`.
+  have hgNM : g ∈ Subgroup.normalizer (M : Set G) :=
+    OddOrder.GroupTheory.mem_normalizer_of_conj_smul_eq_self hgM_mem
+  rwa [normalizer_eq_self_of_mem_maximalSubgroups hG (mem_maximalSubgroups.mpr hMcoat)] at hgNM
+
 /-- **BG 14.7, swap argument — direction `⊆`** (mmd L3999): with `M` type-`P`, `K* = C_{M_σ}(K)`,
 and a neighbour `Mi` containing `Z = K ⊔ K*` with `π(K*) ⊆ κ(Mi)`, for any line `X* ≤ K*` and any
 Hall `κ(Mi)`-subgroup `Ki ∋ X*` (with `Ki* = C_{Mi_σ}(Ki)`),
