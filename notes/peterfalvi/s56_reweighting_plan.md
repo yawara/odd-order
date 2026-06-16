@@ -138,3 +138,65 @@ Z=φ−∑(cZᵢ/mc i)•vcᵢ、⟨Z,vcᵢ⟩=cZᵢ−(cZᵢ/mc i)·mc i=0)。
 **⟹ crux1W build**: (1) orthogonal projection lemma [新規 key] → (2) weighted hcoeffval/hY (rc i=deg i/mc i) →
 (3) `lambda_eq_zero_and_Z_eq_zero` (無改修) で λ=0 → μ=−a。**当初の「92 行 monolith rewrite」より遥かに局所的**。
 正本=本ファイル + chatgpt_answer.md Q4。次=orthogonal projection lemma build。
+
+## cont.³⁴: ✅✅ crux1W (最難核) DONE — 残 xAdjoinStepW は 189 行コピー+4 変更 (機械的)
+**(5.6) weighted core の最難 piece `crux1_of_memberFamilyW` COMPLETE** (commit、axiom-clean)。
+de-risk (lambda engine 既 general) + mc-parameter 設計 (inner-self-real 回避) + orthogonal projection で、
+maxed context でも build (4→1→green)。
+
+**📍 (5.6) core 現状 (S08_CoherenceWeighted.lean)**:
+- ✅ `XAdjoinStepInputW` struct
+- ✅ `exists_indexed_projection_of_orthogonal_ZIrr` (orthogonal 整数射影、有理係数 cZ/mc)
+- ✅ `crux1_of_memberFamilyW` (weighted (5.6.1)/(5.6.2) 核、mc/rc=deg/mc/lambda_eq_zero)
+
+**残 = `xAdjoinStepW` = xAdjoinStep (S08CP1:2262-2451、189 行) のコピー + 4 変更のみ** (他は norm-agnostic で不変):
+1. **signature**: `hmemortho` 対角 `(mc i:ℂ)` + `hDeg : 2a < ∑deg²/mc i` + 引数 `mc/hmempos/hanchorNorm` 追加。
+2. **hchi1chi1** (L2352): `rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl, hanchorNorm]` (mc i₁=1 で 1)。
+3. **hcoeffval の key** (L~2410): `rw [hmemortho i₁ hi₁ i hi] at key` 後、i=i₁ case で `mc i₁` を hanchorNorm で 1 化
+   (rcases i i₁ の subst 枝で hanchorNorm 適用)。
+4. **crux1 call** (L~2420) → `crux1_of_memberFamilyW … mc hmempos hmemortho hanchorNorm hcoeffval … hDeg`。
+不変部: Da/hYeq/hDaY_ZIrr、hmemχ/hmemχbar/hmembarχ/hmembarχbar、Dmem/hortho_mem/hXortho/hfound、hcrux2/hτdiffZ、
+`retarget_isCoherent_of_extensionImage` call (hχχ/hchi1chi1 norm-1 で不変)。
+**→ その後 wrapper `coherentDegreeSqNormBound_of_not_coherentW` (xAdjoinStepW を contrapose、~10 行) + break-pair for
+reducible S (`exists_coherentBreakPair` 一般化、別途)。**
+
+**📍 session 43 総括 (23+ commits)**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) core 最難核 crux1W 完成。
+残 (5.6): xAdjoinStepW [189 行機械コピー+4 変更] + wrapper + break-pair。**正本=本ファイル。次=xAdjoinStepW コピー (fresh context 推奨、189 行ゆえ).**
+
+## cont.³⁵: ⚠ 訂正 — xAdjoinStepW (IrreducibleCharacter) は vacuous、真の残務=reducible member-decomp (5.3.b)
+cont.³⁴ の「forward engine COMPLETE」は **overclaim**。verbatim extract の xAdjoinStepW は `χmem : ι →
+IrreducibleCharacter` のまま ⟹ hmemortho `⟨χmem i,χmem i⟩=if i=j then mc i` で既約は ⟨χmem i,χmem i⟩=1 ゆえ
+**mc=1 強制 = vacuous weighting**(xAdjoinStep と同等、reducible-S に無価値)。
+
+**🎯 χmem を ClassFunction に変えると line 360 で詰まる**: `Dmem := memberExtensionDecomposition hyp hconj hS₁
+(χmem i) …` が **`memberExtensionDecomposition` (S08CP1:1585) の `(χ : IrreducibleCharacter ↥L)` 引数を要求**。
+⟹ xAdjoinStep の **per-member ν-aux 分解 Dmem (= R(χᵢ) image family) は IrreducibleCharacter 専用**。
+reducible μ_j では R(μ_j) を別構成 (σ-image) で与える必要。
+
+**⟹ (5.6) reweighting の真の構造**:
+- ✅ **crux1W** = member 分解 (Da, Dmem, R(χᵢ)) を**所与**とした weighted projection + λ-forcing。genuine・reusable。
+- 🔴 **残 core = reducible member-decomposition**: reducible μ_j の per-member image family R(μ_j) を σ-isometry
+  から構成 (= ChatGPT が言う **(5.3.b): R(μ_j)=ω_ij^σ で Hyp(5.2) を case-B 確立**)。`memberExtensionDecomposition`
+  の reducible 版 (σ-image ベース) が要る。**これが (5.6) の本丸の残り**(projection でなく member の R 構成)。
+  構築済 σ-isometry (`dadeOrthonormalCharacterImageFamily`、(3.x) sessions) に接続。
+- その後 xAdjoinStepW を reducible Dmem で再構成 → wrapper → break-pair。
+
+**📍 session 43 honest 総括**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) の **projection 核 crux1W + orthogonal
+projection + struct** 完成(genuine)。xAdjoinStepW は IrreducibleCharacter 版 (vacuous、committed だが要再構成)。
+**真の残 = reducible member-decomp R(μ_j) via σ (=(5.3.b))** → これが (5.6) の最後の hard piece。**正本=本 cont.³⁵。**
+
+## cont.³⁶: reducible member-decomp の精密構造 — ofProjection R(μ_j) via σ
+`memberExtensionDecomposition` (S08CP1:1585) の本体 = `CharacterPsiDecomposition.ofProjection
+(dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)` (IrreducibleCharacter χ の
+χ−χ̄ の Dade σ-image を R(χ) image family として projection)。
+
+**⟹ reducible μ_j の member-decomposition build target**: `CharacterPsiDecomposition.ofProjection (R(μ_j))` で
+**R(μ_j) = reducible column μ_j の σ-image orthonormal family**。`dadeOrthonormalCharacterImageFamilyOfDiff` は
+IrreducibleCharacter 専用ゆえ、μ_j 用の σ-image family producer が要る (= ChatGPT (5.3.b): R(μ_j)=ω_ij^σ)。
+構築済 σ-isometry ((3.x) `dadeOrthonormalCharacterImageFamily` / signed family、sessions 13-22) に接続。
+
+**▶ 次セッション (fresh context 推奨) の第一手**: (1) `dadeOrthonormalCharacterImageFamilyOfDiff` の output 構造
+(R(χ) = OrthonormalCharacterImageFamily?) を読む → (2) μ_j (= certain-type column) の σ-image が同型 family を産むか
+(構築済 σ-data から) → (3) `CharacterPsiDecomposition.ofProjection (R(μ_j))` で reducible member-decomp → (4) これを
+xAdjoinStepW の Dmem に差し込み (memberExtensionDecomposition の reducible 版) → forward engine 完成 → wrapper。
+**正本=本 cont.³⁶。crux1W (projection) done、残=R(μ_j) via σ の member-decomp (=(5.3.b)、§5↔§6 bridge、deep)。**
