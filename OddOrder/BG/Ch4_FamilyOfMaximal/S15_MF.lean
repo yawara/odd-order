@@ -2106,6 +2106,28 @@ theorem commutator_le_of_quotient_isNilpotent {N : Type*} [Group N] [Finite N]
   rw [← Subgroup.map_commutator, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
   exact hbot
 
+/-- **Second-isomorphism nilpotency transfer** (reusable): for `N ⊴ G` and `H ≤ G`, if the image
+`H.map (mk' N)` (`= H·N/N`) is nilpotent then so is the quotient `↥H / (N.subgroupOf H)`.
+The map `mk' N ∘ H.subtype : ↥H → G/N` has kernel `N.subgroupOf H` and range `H.map (mk' N)`, so
+Noether's first isomorphism (`quotientKerEquivRange`) gives the iso, and nilpotency transfers.
+
+Brick B2 of Theorem 15.2 step 3(ii): once Theorem 3.7 makes the image of `D ⊔ Q₁` in the ambient
+quotient nilpotent, this transfers it to `IsNilpotent (↥(D ⊔ Q₁) / Q₀.subgroupOf _)`, feeding `B1`
+(`commutator_le_of_quotient_isNilpotent`). -/
+theorem isNilpotent_quotient_subgroupOf_of_isNilpotent_map {G : Type*} [Group G]
+    {N H : Subgroup G} [N.Normal]
+    (hNilp : Group.IsNilpotent ↥(H.map (QuotientGroup.mk' N))) :
+    Group.IsNilpotent (↥H ⧸ N.subgroupOf H) := by
+  set φ : ↥H →* G ⧸ N := (QuotientGroup.mk' N).comp H.subtype with hφ
+  have hker : φ.ker = N.subgroupOf H := by
+    rw [hφ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+  have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
+    rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]
+  haveI : Group.IsNilpotent ↥φ.range := by rw [hrange]; exact hNilp
+  have e : ↥H ⧸ N.subgroupOf H ≃* ↥φ.range :=
+    (QuotientGroup.quotientMulEquivOfEq hker.symm).trans (QuotientGroup.quotientKerEquivRange φ)
+  exact nilpotent_of_mulEquiv e.symm
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
