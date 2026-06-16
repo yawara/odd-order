@@ -5014,6 +5014,27 @@ theorem ncard_sdiff_biUnion_subgroup [Finite G] {ι : Type*} {s : Finset ι} (hs
   have hZcard : Nat.card ↥Z = (Z : Set G).ncard := Nat.card_coe_set_eq (Z : Set G)
   omega
 
+/-- **Internal direct product cardinality** (BG 14.7 `z = ∏ kᵢ*`, mmd L4009): a finite family
+`{Hᵢ}` of pairwise-commuting subgroups with pairwise-coprime orders is an internal direct product,
+so `|⨆ᵢ Hᵢ| = ∏ᵢ |Hᵢ|`.  (Independence comes from coprimality via
+`Subgroup.independent_of_coprime_order`; the `noncommPiCoprod` map is then injective with range
+`⨆ Hᵢ`.)  In Theorem 14.7, applied to the `Kᵢ*` (Hall `σ(Mᵢ)`-subgroups of `Z`, pairwise coprime
+since the `σ(Mᵢ)` are disjoint) it gives `z = ∏ kᵢ*` and hence `kᵢ = ∏_{j≠i} kⱼ*`. -/
+theorem card_iSup_of_pairwise_commute_coprime [Finite G] {ι : Type*} [Fintype ι]
+    (H : ι → Subgroup G)
+    (hcomm : Pairwise fun i j => ∀ x y : G, x ∈ H i → y ∈ H j → Commute x y)
+    (hcoprime : Pairwise fun i j => Nat.Coprime (Nat.card ↥(H i)) (Nat.card ↥(H j))) :
+    Nat.card ↥(⨆ i, H i) = ∏ i, Nat.card ↥(H i) := by
+  classical
+  haveI : ∀ i, Fintype ↥(H i) := fun i => Fintype.ofFinite _
+  have hcop' : Pairwise fun i j => Nat.Coprime (Fintype.card ↥(H i)) (Fintype.card ↥(H j)) :=
+    fun i j hij => by simpa only [Nat.card_eq_fintype_card] using hcoprime hij
+  have hind : iSupIndep H := Subgroup.independent_of_coprime_order hcomm hcop'
+  have hinj := Subgroup.injective_noncommPiCoprod_of_iSupIndep (hcomm := hcomm) hind
+  have hrange : (Subgroup.noncommPiCoprod hcomm).range = ⨆ i, H i :=
+    Subgroup.noncommPiCoprod_range
+  rw [← hrange, ← Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv, Nat.card_pi]
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
