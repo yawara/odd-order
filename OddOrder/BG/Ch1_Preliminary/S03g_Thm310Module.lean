@@ -32,16 +32,22 @@ namespace OddOrder.BG.Ch1.S03
 variable {F : Type*} [Field F] {G : Type*} [Group G]
 variable {V : Type*} [AddCommGroup V] [Module F V]
 
-/-- **BG Theorem 3.10(a), abelian-kernel module case.**  Let `K ⊴ G` be abelian with `char ∤ |K|`,
-acting via `ρ` on a nonzero finite-dimensional space `V` over an algebraically closed field, with
-`C_V(K) = 0`.  Let `R ≤ G` (`R ≠ 1`) be such that every nonidentity element of `R` acts
+/-- **BG Theorem 3.10(a)+(b), abelian-kernel module case.**  Let `K ⊴ G` be abelian with
+`char ∤ |K|`, acting via `ρ` on a nonzero finite-dimensional space `V` over an algebraically closed
+field, with `C_V(K) = 0`.  Let `R ≤ G` (`R ≠ 1`) be such that every nonidentity element of `R` acts
 fixed-point-freely by conjugation on `K` (the Frobenius condition), and the prime-action condition
-`finrank V^⟨x⟩ = finrank V^R` holds for every `x ∈ R^#`.  Then `|R|` is prime.
+`finrank V^⟨x⟩ = finrank V^R` holds for every `x ∈ R^#`.  Then `|R|` is prime **(a)** and
+`finrank V = |R| · finrank V^R` **(b)** (the free block dimension formula — conclusion (b)
+`|M| = |C_M(R)|^p` of BG Theorem 3.10 at the rank level).
 
 The `K`-weight spaces decompose `V`; `R` permutes them freely (Frobenius ⟹ a nonidentity element
 fixes only the trivial character, whose weight space is `C_V(K) = 0`), so the free block dimension
-formula and the prime-action condition give `|R|` prime. -/
-theorem prime_card_of_abelian_frobenius_weight [Finite G] [IsAlgClosed F]
+formula (`finrank_eq_card_mul_finrank_invariants_of_freeBlock`) gives (b), and with the prime-action
+condition the free block keystone (`prime_card_of_freeBlock_cond3`) gives (a).
+
+The thin projection `prime_card_of_abelian_frobenius_weight` recovers the (a)-only form used by the
+existing elementary-abelian / conjugation ladder (and Prop 14.2(g) at `S14`). -/
+theorem prime_card_and_finrank_of_abelian_frobenius_weight [Finite G] [IsAlgClosed F]
     (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
     {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥)
     (hKab : ∀ a b : ↥K, (a : G) * (b : G) = (b : G) * (a : G))
@@ -51,7 +57,8 @@ theorem prime_card_of_abelian_frobenius_weight [Finite G] [IsAlgClosed F]
     (hcond3 : ∀ x : G, x ∈ R → x ≠ 1 →
       finrank F (Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype))
         = finrank F (Representation.invariants (ρ.comp R.subtype))) :
-    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p := by
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
+      finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
   classical
   haveI : Finite ↥R := Subtype.finite
   -- The trivial character's weight space is `C_V(K) = 0`.
@@ -135,8 +142,28 @@ theorem prime_card_of_abelian_frobenius_weight [Finite G] [IsAlgClosed F]
     have htriv : i.val = fun _ => (1 : F) :=
       weightChar_eq_one_of_conjChar_fixed ρ hFPF i.2 hcharfix
     exact i.2 (by rw [htriv]; exact hTrivWS)
-  -- (7) Apply the free block keystone.
-  exact prime_card_of_freeBlock_cond3 ρ hRne hW hfree hperm hcond3
+  -- (7) Apply the free block keystone (a) and the free block dimension formula (b).
+  obtain ⟨p, hp, hpcard⟩ := prime_card_of_freeBlock_cond3 ρ hRne hW hfree hperm hcond3
+  exact ⟨p, hp, hpcard, ρ.finrank_eq_card_mul_finrank_invariants_of_freeBlock R hW hfree hperm⟩
+
+/-- **BG Theorem 3.10(a), abelian-kernel module case** (thin projection of
+`prime_card_and_finrank_of_abelian_frobenius_weight`, dropping the rank conjunct (b)).  This is the
+(a)-only form consumed by the elementary-abelian / conjugation ladder and Prop 14.2(g) (`S14`);
+the (a)+(b) form feeds the conclusion-(b) ladder of the full BG Theorem 3.10 (issue 8013). -/
+theorem prime_card_of_abelian_frobenius_weight [Finite G] [IsAlgClosed F]
+    (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
+    {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥)
+    (hKab : ∀ a b : ↥K, (a : G) * (b : G) = (b : G) * (a : G))
+    (hKcard : (Nat.card ↥K : F) ≠ 0)
+    (hCVK : Representation.invariants (ρ.comp K.subtype) = ⊥)
+    (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k)
+    (hcond3 : ∀ x : G, x ∈ R → x ≠ 1 →
+      finrank F (Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype))
+        = finrank F (Representation.invariants (ρ.comp R.subtype))) :
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p := by
+  obtain ⟨p, hp, hpcard, _⟩ := prime_card_and_finrank_of_abelian_frobenius_weight
+    ρ hRne hKab hKcard hCVK hFrob hcond3
+  exact ⟨p, hp, hpcard⟩
 
 /-! ### Elementary-abelian group case via base change to the algebraic closure (O1)
 
