@@ -3912,3 +3912,36 @@ T=0-free base-union の 4 obligation を `Ximg χ₂ := (columnDecompositionTau 
 **hard core = (1)(2) の per-φ 機構を全 column で組む assembly** (新 math 無し、既存 sorry-free 補題の wiring、
 ただし case-B 構造仮説の threading + φ-family ↔ column の同定で multi-hundred LOC)。
 **T=0 は完全に消えた**(base-union が hXanchored から hDτ を出す)。**正本 = 本 session 48 cont.⁶。**
+
+### session 48 cont.⁷: ✅ discharge を hXanchored 1 本に削減 — hXinner 導出 + hXzirr brick landed
+
+3 commits (`944055f2`/`05722cc5` + 本 note)。base-union の 4 obligation のうち 3 を解決し、hard core を hXanchored 1 本に圧縮:
+- **hXzirr** ✅ `characterPsiDecomposition_X_mem_ZIrr` (汎用、D.X=∑coeff•α + imageFamily.mem_ZIrr)。
+- **hXinner** ✅ `xchi_inner_eq_of_anchored` — **hXanchored から代数的に導出** (別途 Y-pinning 不要):
+  `Xj=τ(μj−a₀η₁)+a₀ν₁` (hXanchored 移項) + hXmixed (Xj⊥ν₁) + τ-等長 (`dadeIntegralCharacterMap_inner_eq_on_supported_span`) + 列⊥Y + ‖η₁‖²=‖ν₁‖²=1 ⟹ `⟨Xj,Xl⟩=⟨μj−a₀η₁,μl−a₀η₁⟩+a₀²−a₀²−a₀²+a₀²=⟨μj,μl⟩`。**これが key 簡略化**: 当初 hard core ×2 (hXanchored+hXinner) と見ていたが hXinner は hXanchored の系。
+- **hXmixed** = 既存 `inner_decomposition_X_coherentYset_extension_eq_zero_of_mem_Yset` (Ximg=D.X、himg=imageSet⊆certainTypeRImage)。
+- **hXanchored** = 唯一残る hard core = (6.8.2.2) aggregate `Y`-pinning。
+
+⚠ Lean 知見 (再調査不要): hXinner 証明で `set τj/τl` は hanc を τj-form に畳んで後続 rw を壊す → τ-項は明示参照。
+cross-term の inner_smul_left は `rw` でなく `simp only [..., inner_smul_left, star_natCast]` で robust 化 (nsmul→ℂ-smul の `← Nat.cast_smul_eq_nsmul ℂ a₀ ν` 後)。
+
+**▶▶ 残る唯一の discharge = hXanchored**: `Ximg χ₂ := (columnDecompositionTau D).X`、
+`τ(μ_j−a₀η₁) = Ximg χ₂ − a₀·cY.ext η₁` を `caseB_per_phi_anchored_fromYset` (S08CBA:1647) で。
+入力 = `exists_decomposition_caseB` (S08CBC2:126, sorry-free) の (6.8.2.2) aggregate + caseB_hcol/hirr bundles +
+case-B 構造仮説 (capstone level: hcop/hp/hHp/hprime/hW2comm/hW2cen/hc2/hFPF) + 列↔constituent 同定
+(`columnSum_eq_induce_H`)。これが (6.8.2.3) per-φ assembly の本体 (新 math 無し、既存 sorry-free 補題の wiring)。
+**正本 = 本 session 48 cont.⁷。** 完成後 cTE-glue 旧ファイル群 (下流未消費) を撤去。
+
+### session 48 cont.⁸: 🧹 cTE-glue dead code 撤去 (over-constrained T=0 route の片付け)
+
+cont.⁴ で確定した「cTE-glue は over-constrained ゆえ撤去」を実施 (commit `e52aee95`、184 行削除)。
+grep で外部 caller なしを確認した dead def 3 本を S08_CaseBXunionY から撤去:
+- `certainTypeExtension_columnSum_eq_falseHalf_sum` (参照ゼロ、T=0 falseHalf bridge の残骸)
+- `exists_glue_nu_columnSum_Yset` (旧 base 専用、`exists_glue_nu_columnSum_Yset_via_map` が一般化済)
+- `coherentCertainTypeSet_union_Yset` (caller なし、unprovable な hanchored=T=0 に gate された旧 base)
+keep (textbook 経路が再利用): `certainTypeSet_span_apply_one_eq_intMul` / `hgen_withDiagonal_certainTypeSet` / `certainTypeSet_finite`。
+**⚠ (4.9) cTE coherence 機構 (`certainType_isCoherent`/`certainTypeExtension`/`certainTypeSet_isCoherent_tau`) は孤立せず存続** — 正当な Peterfalvi (4.9)(b) 結果ゆえ unused でも残す (過剰削除しない)。full build (3840 jobs) green、axiom 不変。
+
+**本セッションの新規 Lean は dead/garbage なし**: textbook 経路の連鎖 (xChiExtension→producer→glue→base-union) は全 used、
+discharge 用 brick (`characterPsiDecomposition_X_mem_ZIrr`/`xchi_inner_eq_of_anchored`) は意図的 down-payment (docstring 明示)。
+迷い (chain 経路 cont.²→撤回 cont.³) は notes/分析のみで Lean commit には出ていない。**正本 = 本 session 48 cont.⁸。**
