@@ -471,4 +471,42 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
     ← baseChangeRepresentation_comp, finrank_invariants_baseChangeRepresentation] at hfr'
   exact hfr'
 
+/-- **BG Theorem 3.10 (b) in cardinality form, elementary-abelian group case, general kernel**
+(issue 8013 piece 5+2b — this is `(f)` `|Q̄| = q^p` of §15.2 step 4).  Under the same hypotheses as
+`prime_card_and_finrank_of_elemAbelian_general`, `|M| = |C_M(R)|^{|R|}` where `C_M(R)` is the
+`R`-invariant submodule (`= C_M(R)` as the `R`-fixed points of `M`).
+
+Both `|M|` and `|C_M(R)|` are powers of `p` with exponents `finrank (Additive M)` and
+`finrank C_M(R)` (`Module.card_eq_pow_finrank`); the rank formula `(b)`
+`finrank (Additive M) = |R| · finrank C_M(R)` turns the first into the `|R|`-th power of the second. -/
+theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
+    [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
+    {K R : Subgroup H} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
+    (hpH : ¬ p ∣ Nat.card H) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hCK : ∀ m : M, (∀ k : ↥K, (k : H) • m = m) → m = 1)
+    (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k)
+    (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
+      ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m)) :
+    Nat.card M = (Nat.card ↥(Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R := by
+  classical
+  obtain ⟨_, _, _, hfr⟩ := prime_card_and_finrank_of_elemAbelian_general hRne hKne hpH hcop hCK hFrob
+    hcond3
+  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  haveI : Fintype (Additive M) := Fintype.ofFinite _
+  haveI : Fintype ↥(Representation.invariants
+    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := Fintype.ofFinite _
+  show Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
+    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R
+  have hM : Nat.card (Additive M) = p ^ finrank (ZMod p) (Additive M) := by
+    rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
+  have hInv : Nat.card ↥(Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))
+      = p ^ finrank (ZMod p) (Representation.invariants
+        ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := by
+    rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
+  rw [hM, hfr, mul_comm, pow_mul, ← hInv]
+
 end OddOrder.BG.Ch1.S03
