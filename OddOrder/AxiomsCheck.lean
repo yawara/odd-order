@@ -4804,6 +4804,14 @@ per-member source for the family — raw swap factor `K_N* = M_σ(N) ⊓ C(K_N)`
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_data
 
+/-! **BG 14.7, uniform per-member family data** (`S14_TypePCounting`, `typeP_family_member_data`,
+mmd L4003): every member `N` of the type-`P` family (`IsZFamilyMember`: `N = M` or a maximal over
+`N_G(X)` for a line `X ∈ ℰ_p¹(K)`) is a type-`P` maximal containing `Z`, with Hall `κ(N)`-subgroup
+`K_N` realising the swap (raw + canonical `K_N* = Z ⊓ M_σ(N)`, `K_N* ≠ ⊥`).  Case-split
+`typeP_self_member`/`exists_neighbor_data`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_member_data
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
