@@ -42,6 +42,7 @@ import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
@@ -3736,6 +3737,13 @@ set_option linter.style.longLine false in
 -- BG Proposition 3.9 (§3E): an odd `p`-group acting in a Frobenius (fixed-point-free) manner on a
 -- nontrivial finite group is cyclic.  Feeds BG Theorem 3.10 → Proposition 14.2(g) (issue 2007).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isCyclic_of_isPGroup_of_isFrobeniusAction
+-- BG Theorem 3.10 conclusion-(b) ladder (issue 8013): the rank formula `finrank V = |R|·finrank V^R`
+-- of the free block permutation, at the abelian-Frobenius-weight and elementary-abelian levels.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_abelian_frobenius_weight
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian
+-- BG Theorem 3.10 general (non-abelian) kernel, the `K₀`-reduction dichotomy (issue 8013, piece 3):
+-- for an irreducible `ρ` and normal `K₀ ⊴ G`, the `K₀`-invariants `C_V(K₀)` are `⊥` or `⊤`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_normal_eq_bot_or_top_of_isIrreducible
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
