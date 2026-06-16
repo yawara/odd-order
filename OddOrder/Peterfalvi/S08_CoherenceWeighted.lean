@@ -424,5 +424,82 @@ noncomputable def xAdjoinStepW
     hS₁ χ hdiffsuppχ hdiffasuppχ hχχ hχbarχbar hχχbar hχbarχ hchi1chi1 hχ_S1 hχbar_S1
     (hmemS1 i₁ hi₁) htau1_memaχ hτdiffZ hcrux1 hcrux2 hSgen hgen
 
+/-- **Norm-weighted (5.6) degree-square bound (contrapositive of `xAdjoinStepW`).**
+
+The norm-weighted Peterfalvi (5.6) inequality: if `S₁` is coherent but `S₁ ∪ {χ, χ̄}` is **not**, then
+the weighted degree-square sum is bounded by twice the degree ratio,
+`∑_{i∈s} deg(i)² / ‖χmem i‖² ≤ 2a`.  This is the reducible-member generalization of
+`coherentDegreeSumBound_of_not_coherent` (the case-A `‖χmem i‖² = 1` specialization, with conclusion
+`∑ deg² ≤ 2a`).
+
+Pure contrapositive of the forward engine `xAdjoinStepW`: were the bound to fail
+(`2a < ∑ deg²/mc`), `xAdjoinStepW` would produce coherence of `S₁ ∪ {χ, χ̄}`, contradicting `hnc`.
+All the per-member decomposition data (`Dmem`/`hortho_mem`/`htau1Dmem`) is threaded through
+unchanged — for case (B) it is supplied per member from `certainTypeDecompositionDa`/`certainTypeR`
+(reducible certain-type columns) and `memberExtensionDecomposition` (irreducible members). -/
+theorem coherentDegreeSqNormBound_of_not_coherentW
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : IrreducibleCharacter ↥L)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ) = 1)
+    (hχbarχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj
+      (χ : ClassFunction ↥L ℂ).conj = 1)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0)
+    (hχbarχ : ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj (χ : ClassFunction ↥L ℂ) = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ) x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner (χ : ClassFunction ↥L ℂ).conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction ↥L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemdegdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁)
+    (mc : ι → ℝ) (hmempos : ∀ i ∈ s, 0 < mc i)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
+        if i = j then (mc i : ℂ) else 0)
+    (hanchorNorm : mc i₁ = 1)
+    (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χmem i) 0)
+    (hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal
+      (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hrealχ
+        hdiffsuppχ))
+    (htau1Dmem : ∀ i (hi : i ∈ s),
+      (Dmem i hi).tau1 (χmem i) = hS₁.extension (χmem i))
+    {a : ℕ}
+    (hdiffasuppχ : ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      ((χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+        {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+         (χ : ClassFunction ↥L ℂ) - a • (χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {(χ : ClassFunction ↥L ℂ), (χ : ClassFunction ↥L ℂ).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i ≤ 2 * (a : ℝ) := by
+  by_contra hlt
+  push_neg at hlt
+  exact hnc ⟨xAdjoinStepW hyp hconj hS₁ χ hrealχ hdiffsuppχ hχχ hχbarχbar hχχbar hχbarχ
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
+    Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
 end OddOrder.Peterfalvi.S08
