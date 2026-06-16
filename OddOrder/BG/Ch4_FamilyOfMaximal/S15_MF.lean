@@ -1876,6 +1876,24 @@ theorem inf_centralizer_ne_self_of_sup_not_nilpotent {Q D : Subgroup G}
   hnot (isNilpotent_sup_of_commutator_eq_bot
     (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (hQ0 ▸ inf_le_right)))
 
+/-- **`Q₀ = C_Q(D)` is `KD`-invariant** (`§14`-independent, reusable): if `K` and `D` each
+normalize `Q`, and `K` normalizes `D`, then `K ⊔ D` normalizes `Q ⊓ C_G(D)`.  (`D` always
+normalizes its own centralizer and `Q`; `K` normalizes `C_G(D)` because it normalizes `D`
+[`normalizer_le_normalizer_centralizer`]; both then normalize the intersection
+[`le_normalizer_inf`].)
+
+In Theorem 15.2's step 3 (mmd L4194) this makes `Q₀ = C_Q(D)` a `KD`-invariant subgroup of `Q`,
+so that `K` and `D` act on `N_M(Q₀)/Q₀` (whence the minimal normal `Q₁/Q₀`). -/
+theorem sup_le_normalizer_centralizer_inf {Q D K : Subgroup G}
+    (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
+    (hDQ : D ≤ Subgroup.normalizer (Q : Set G))
+    (hKD : K ≤ Subgroup.normalizer (D : Set G)) :
+    K ⊔ D ≤ Subgroup.normalizer
+      ((Q ⊓ Subgroup.centralizer (D : Set G) : Subgroup G) : Set G) :=
+  sup_le
+    (le_normalizer_inf hKQ (hKD.trans (normalizer_le_normalizer_centralizer D)))
+    (le_normalizer_inf hDQ (Subgroup.le_normalizer.trans (normalizer_le_normalizer_centralizer D)))
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
