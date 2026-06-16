@@ -4569,6 +4569,19 @@ theorem isCyclic_kappaHall_sup_Kstar_of_cyclic [Finite G] {M K Kstar : Subgroup 
       ⟨inferInstance, inferInstance, coprime_card_kappaHall_Kstar hKM hK hKstar⟩
   exact (kappaHall_prod_Kstar_mulEquiv hKM hK hKstar).isCyclic.mp hprodcyc
 
+/-- **BG 14.7(h), coprimality is free given the complement**: if `M' = [M,M]` complements the
+Hall `κ(M)`-subgroup `K` in `M`, then `|M'|` and `|K|` are coprime — `|M'| = [M : K]` (from the
+complement) and a Hall subgroup has order coprime to its index.  This reduces Theorem 14.7(h) to its
+substantive obligation `IsComplement' M' K` (mmd L4061, which consumes "`K` cyclic" from the
+counting collapse); the second conjunct then follows with no further input. -/
+theorem coprime_card_derived_kappaHall_of_isComplement' [Finite G] {M K : Subgroup G}
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hc : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M)) :
+    Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) := by
+  have hcop := hK.coprime_index
+  rw [hc.index_eq_card] at hcop
+  exact hcop.symm
+
 /-- **Counting-bound kernel for Theorem 14.7(e)** (BG mmd L3975, the `8/15 > 1/2` step).
 For `k ≥ 3` and `k* ≥ 5`, the saturation density `(1 - 1/k)(1 - 1/k*)` exceeds `1/2`
 (minimised at `(1 - 1/3)(1 - 1/5) = 8/15`).  In Theorem 14.7, `k = |K|` and `k* = |K*|` are
