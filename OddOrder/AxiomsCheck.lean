@@ -4725,6 +4725,13 @@ the `σ(N)`-part of `Z`, independent of the chosen Hall `κ(N)`-subgroup `Kₙ`.
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_eq_Z_inf_Msigma
 
+/-! **BG 14.7, per-neighbour swap package** (`S14_TypePCounting`, `exists_neighbor_kappaHall_swap`,
+mmd L3997-4009): for a type-`P` maximal `M` and a maximal `N ⊇ N_G(X)` (`X ∈ ℰ¹(K)`), there is a
+Hall `κ(N)`-subgroup `K_N` realising the swap `Z = K_N ⊔ K_N*` with canonical `K_N* = Z ⊓ M_σ(N)`.
+The per-neighbour foundation the `M_i` family iterates over.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
