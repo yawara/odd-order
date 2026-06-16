@@ -281,3 +281,30 @@ reducible column の **ψ=0 member 分解** (tau1=ν=coherence extension、`cert
 **⚠ τ 注意**: `certainTypeMemberDecomposition` は τ=`dadeIntegralCharacterMap h.dade0 h.tau` (certain-type)。
 engine は τ=`hyp.fullDadeIsometryData` (S04)。instantiation 時に (B) reconciliation (`certainTypeSet_isCoherent_tau`
 の hmapagree/congrMap) 経由で τ を一致させる必要。**正本=本 cont.³⁸。Dmem reducible 版 landed、次=hortho_mem。**
+
+## cont.³⁹ (2026-06-16 loop): (B) reconciliation 既存判明 + Dmem を τ' 一般化 + assembly 重複の整理
+**✅ (B) τ-reconciliation は既存 infra で discharge 済** (cont.³⁷ の「~50-100 LOC」は過大評価):
+- `SibleyDadeHypothesis.dade0_map_eq_tau_of_support` (`S08_CaseBAssembly:149`) = hmapagree 無条件証明 (τ_ct=hyp.tau on H^#-supported)。
+- `certainTypeSet_isCoherent_tau_canonical` (`:170`) = **column 基底 coherence を hyp.tau 上で構築済**。
+- `caseB_column_mapagree` (`:194`) = column 共役差 map 一致 `hyp.tau(μ_j−μ̄_j)=τ_ct(μ_j−μ̄_j)`。
+- `columnRFamilyTau` (`S08_CaseBCoherence2`) = **R(μ_j) を hyp.tau に transport 済** (= 私の inline transport と同等)。
+
+**✅ 本 loop landed (`08640b33`+`fd821436`)**: `certainTypeMemberDecomposition` を **一般 τ' + hagree** に一般化
+(image family を inline transport、`τ'=hyp.tau`/`hagree=caseB_column_mapagree`/`hS₁=certainTypeSet_isCoherent_tau_canonical`
+で hyp.tau 上の reducible column ψ=0 Dmem が直接得られる)。
+
+**🔑 architecture 整理 (重複/相補の確定)**: case-B assembly (S08_CaseBAssembly/CaseBCoherence2) は engine path と**相補的**:
+- assembly = **材料** = `columnDecompositionTau` (ψ=a·η₁ Da-style, hyp.tau) / `irreducibleDecompositionTau` /
+  `columnDecompositionTau_X_orthogonal` (via `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`) /
+  per-constituent `caseB_per_phi_anchored*` (6.8.2.3 anchored images)。
+- engine = **(5.6) bound 産出** = `coherentDegreeSqNormBound_of_not_coherentW` (assembly に bound 産出器は無い)
+  → (6.8.3) `false_of_caseB_break_of_bounds` の hbreak。⟹ **engine は redundant でない**。
+- 私の `certainTypeMemberDecomposition` (ψ=0) = assembly に無い member-style 補完 (assembly は ψ=a·η₁ のみ)。
+  transport は `columnRFamilyTau` と軽微重複だが **S06 層が S08 を import 不可**ゆえ inline 不可避 (将来 columnRFamilyTau を
+  S06 へ移せば共有可、issue 候補)。
+
+**▶ 残 (engine instantiation → (6.8.3))**: (1) **`hortho_mem`** = `certainTypeR ⊥ R(break χ)` (break χ=既約 X-member の
+Dade family)。⚠ assembly の `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` は σ-image ⊥ **Y-anchor extension**
+で別物 (break χ の Dade family R(χ) との直交は新規の可能性)。(2) X-sum 恒等式 `∑deg²/mc=w1·hZ·(cZ−1)` (`sum_div_normSq_…` で X-sum 済)。
+(3) engine を column data で instantiate → hbreak → (6.8.3)。**⚠ 統合は多ファイル横断で大きい**。次 loop=hortho_mem 着手 (tractability 評価)。
+**正本=本 cont.³⁹。(B) 既存・Dmem τ' 化 landed・engine⊥assembly 相補確定。次=hortho_mem。**
