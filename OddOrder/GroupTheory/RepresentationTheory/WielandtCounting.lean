@@ -142,4 +142,29 @@ theorem finrank_invariants_eq_of_isCompl_invariant
   rw [hsup, hdisj, finrank_bot, add_zero] at hrank
   exact hrank
 
+/-- For a normal subgroup `U ◁ G`, the averaging projection over `U` commutes with `ρ g` for any
+`g : G`: conjugation by `g` permutes `U`, fixing `∑_{u∈U} ρ u`. -/
+theorem ρ_comp_averageMap_comm (ρ : Representation k G V) (U : Subgroup G) [U.Normal]
+    [Fintype U] [Invertible (Fintype.card U : k)] (g : G) (v : V) :
+    ρ g (averageMap (ρ.comp U.subtype) v) = averageMap (ρ.comp U.subtype) (ρ g v) := by
+  rw [averageMap_apply, averageMap_apply, map_smul]
+  congr 1
+  rw [map_sum]
+  refine Fintype.sum_equiv (MulAut.conjNormal g : MulAut U).toEquiv _ _ (fun u => ?_)
+  show ρ g (ρ (u : G) v) = ρ (↑(MulAut.conjNormal g u) : G) (ρ g v)
+  rw [MulAut.conjNormal_apply]
+  simp only [← Module.End.mul_apply, ← map_mul]
+  congr 2
+  group
+
+/-- For `U ◁ G`, the augmentation submodule `[V,U] = ker (averageMap ρ|_U)` is `ρ g`-invariant
+for every `g : G`. -/
+theorem ker_averageMap_comp_invariant (ρ : Representation k G V) (U : Subgroup G) [U.Normal]
+    [Fintype U] [Invertible (Fintype.card U : k)] (g : G) :
+    ∀ x ∈ LinearMap.ker (averageMap (ρ.comp U.subtype)),
+      ρ g x ∈ LinearMap.ker (averageMap (ρ.comp U.subtype)) := by
+  intro x hx
+  rw [LinearMap.mem_ker] at hx ⊢
+  rw [← ρ_comp_averageMap_comm ρ U g x, hx, map_zero]
+
 end OddOrder.GroupTheory.WielandtCounting
