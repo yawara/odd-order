@@ -97,4 +97,34 @@ theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F
     rw [← Subgroup.coe_mul, ← Subgroup.coe_mul, hKea.comm]
   exact prime_card_and_finrank_of_abelian_frobenius_weight ρ hRne hKab hKcard hCVK hFrob hcond3
 
+/-- **Case B transfer brick — invariants are preserved under the lift to `G ⧸ K₀`** (issue 8013
+piece 3).  When `K₀` acts trivially (`ρ x = 1` for `x ∈ K₀`), `ρ` factors as
+`ρ̄ = QuotientGroup.lift K₀ ρ` through `G ⧸ K₀`, and the `ρ̄`-invariants of the image `S·K₀/K₀` of any
+`S ≤ G` coincide (as a submodule of `V`) with the `ρ`-invariants of `S`: the actions agree on
+representatives (`ρ̄ ⟦g⟧ = ρ g`), so the same vectors are fixed.
+
+In Case B of the `K₀` reduction this both transfers the hypothesis `C_V(K) = ⊥` to the quotient
+(`S = K`) and transfers the conclusion's `C_V(R)` back from the quotient (`S = R`). -/
+theorem invariants_lift_map_eq_of_trivial (ρ : Representation F G V) {K₀ : Subgroup G} [K₀.Normal]
+    (hker : ∀ x ∈ K₀, ρ x = 1) (S : Subgroup G) :
+    Representation.invariants
+        ((QuotientGroup.lift K₀ ρ hker).comp (S.map (QuotientGroup.mk' K₀)).subtype)
+      = Representation.invariants (ρ.comp S.subtype) := by
+  ext v
+  rw [Representation.mem_invariants, Representation.mem_invariants]
+  constructor
+  · intro h s
+    have hmem : (QuotientGroup.mk' K₀) (s : G) ∈ S.map (QuotientGroup.mk' K₀) :=
+      Subgroup.mem_map_of_mem _ s.2
+    have hs := h ⟨(QuotientGroup.mk' K₀) (s : G), hmem⟩
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, QuotientGroup.lift_mk'] at hs ⊢
+    exact hs
+  · intro h s'
+    obtain ⟨g, hgS, hgeq⟩ := s'.2
+    have hg := h ⟨g, hgS⟩
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype] at hg
+    have hX : (S.map (QuotientGroup.mk' K₀)).subtype s' = (QuotientGroup.mk' K₀) g := hgeq.symm
+    rw [MonoidHom.comp_apply, hX]
+    exact hg
+
 end OddOrder.BG.Ch1.S03
