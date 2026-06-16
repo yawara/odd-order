@@ -42,6 +42,7 @@ import OddOrder.BG.Ch1_Preliminary.S03d_Thm34
 import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
@@ -3736,6 +3737,16 @@ set_option linter.style.longLine false in
 -- BG Proposition 3.9 (§3E): an odd `p`-group acting in a Frobenius (fixed-point-free) manner on a
 -- nontrivial finite group is cyclic.  Feeds BG Theorem 3.10 → Proposition 14.2(g) (issue 2007).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isCyclic_of_isPGroup_of_isFrobeniusAction
+-- BG Theorem 3.10 conclusion-(b) ladder (issue 8013): the rank formula `finrank V = |R|·finrank V^R`
+-- of the free block permutation, at the abelian-Frobenius-weight and elementary-abelian levels.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_abelian_frobenius_weight
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian
+-- BG Theorem 3.10 general (non-abelian) kernel, the `K₀`-reduction dichotomy (issue 8013, piece 3):
+-- for an irreducible `ρ` and normal `K₀ ⊴ G`, the `K₀`-invariants `C_V(K₀)` are `⊥` or `⊤`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_normal_eq_bot_or_top_of_isIrreducible
+-- BG Theorem 3.10 general kernel, induction base case (issue 8013, piece 3): `K` minimal normal ⟹
+-- elementary abelian ⟹ the abelian-kernel rank theorem gives (a)+(b).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_minimalNormal_kernel
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
@@ -4589,6 +4600,34 @@ two-block decomposition (`isPiElement_mul_unique`) + Theorem 14.4(e); no §15/§
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.xRsub_disjoint
 -- **BG Lemma 14.5(b)** (faithful `M̃` form): nonconjugate `M₁`, `M₂` have disjoint `M̃₁`, `M̃₂`.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Mtilde_disjoint
+
+/-! **BG Lemma 14.5(c), Part A** (`S14_TypePCounting`, `sigmaSaturation_Rsub_count`): the double
+count `∑_{x ∈ 𝒞_G(M_σ^#)} |R(x)| = |M_σ^#|·[G : M]`, counting incidence pairs `(x, Mᵍ)` two ways
+via sharp transitivity (Theorem 14.4). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaSaturation_Rsub_count
+/-! **BG Lemma 14.5(c)** (`S14_TypePCounting`, `sigmaConjugacySaturation_Mtilde_ncard`):
+`|𝒞_G(M̃)| = (|M_σ| − 1)·[G : M]`.  Part B (the disjoint cover `𝒞_G(M̃) = ⊔ₓ x R(x)` via the
+`R`-equivariance `Rsub_conj`) combined with Part A.  The type-`P` counting bound for Theorem 14.7. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard
+
+/-! **σ-decomposition keystone** (`S14_TypePCounting`, `length_one_of_isPiElement_sigma`):
+a nonidentity `σ(M)`-element `x` has `ℓ_σ(x) = 1`.  Existence half of the σ-decomposition (BG §1):
+`⟨x⟩` is conjugate into `M_σ` (Cor 12.16(a)), so `𝓜_σ(x) ≠ ∅`.  Foundation for Lemma 14.6. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.length_one_of_isPiElement_sigma
+/-! **Every prime divides some `σ(M)`** (`S14_TypePCounting`, `exists_mem_sigma_of_prime_dvd_card`):
+for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-normal Sylow `p`-subgroup). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_sigma_of_prime_dvd_card
+/-! **σ-decomposition factor extraction** (`S14_TypePCounting`, `exists_length_one_factor`): every
+`g ≠ 1` factors `g = x·x'` with `ℓ_σ(x) = 1`, `x'` a `σ(M)′`-element (commuting, both in `⟨g⟩`). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_length_one_factor
+/-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
+(`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
+(`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.not_type1_of_type2
+/-! **TI-subset saturation count** (`S14_TypePCounting`, `ncard_conjClassSet_of_isTISubset`):
+for a TI-subset `A` stabilised by its normalizer-bound `L`, `|𝒞_G(A)| = |A|·[G:L]`.  The
+disjoint-conjugate count feeding Theorem 14.7 step 5 (`|𝒞_G(T)| = |T|·[G:Z]`). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset
 
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the

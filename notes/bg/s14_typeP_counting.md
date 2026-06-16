@@ -1022,3 +1022,148 @@ x' は σ(M_x)'-elt (building block), x' commute x (Rsub_le_centralizer)。同 y
     |𝓜_σ(y)|=1 ⟹ y''=1, x=y 矛盾; |𝓜_σ(y)|>1 ⟹ y''∈N(y)_σ single class, 対称に x=y'' ⟹ g=x=y·x ⟹ y=1 矛盾。
 - helper 名: `isPiElement_mul_unique`/`exists_isPiElement_mul` (PiElementDecomposition),
   `exists_neighbor_eq_Rsub`/`isPiElement_sigmaCompl_of_mem_Rsub`/`commute_of_mem_zpowers`。
+
+### ✅✅ 14.5(c) COMPLETE — |𝒞_G(M̃)| = (|M_σ|−1)·[G:M] (2026-06-16 lane-h loop⁴, commit b9a7031b)
+
+**`sigmaConjugacySaturation_Mtilde_ncard` sorry-free + axiom-clean** (AxiomsCheck 登録、full build
+3838 jobs ~65s)。Part A (`sigmaSaturation_Rsub_count`, 既 landing) + 新 Part B (cover) で締め。
+
+**Part B = cover `𝒞_G(M̃) = ⊔_{x∈𝒞_G(M_σ^#)} xR(x)`。核心 = R-同変性 `R(gxg⁻¹)=(conj g)•R(x)`。**
+Classical.choice の literal tracking は不要 — **「N(x) = C_G(x) を含む唯一の極大」characterization**
+経由 (uniqueness で choose(xᵍ)=choose(x)ᵍ):
+- `exists_neighbor_Rsub_singleton`: 14.4 spec から N(x) + 𝓜(C_G(x))={N(x)} (Cor 14.3
+  `maximalContaining_centralizer_eq_singleton_of_tau2_element` に spec data を供給)。
+- `maximalSigmaSubgroupsOfElement_conj`: 𝓜_σ(gxg⁻¹) = (conj g)•𝓜_σ(x) (image)。R の if-条件
+  (length via length_one_iff, ncard via image bijection) が共役不変 ⟹ 両 branch 整合。
+- `Rsub_conj`: N(x)ᵍ は C_G(gxg⁻¹) を含む極大 ⟹ singleton で = N(gxg⁻¹); N_σ∩C_G が共役。
+  道具 = `Msigma_conj_smul`/`smul_centralizer_singleton`(S14_Prop142Support, import 追加)/`Subgroup.smul_inf`。
+- `conjClassSet_Mtilde_eq_biUnion`: cover 集合等式 (両包含、Rsub_conj + g=(xᵍ)(x'ᵍ) factoring)。
+- 最終 count: `Set.Finite.ncard_biUnion` (14.5a disjoint) + `Set.ncard_smul_set` (|xR(x)|=|R(x)|) + Part A。
+
+**🔑 重要: 14.5(c) は full σ-decomposition を回避** (Part B は R-同変性 + 2-block で済んだ)。
+**しかし 14.6 は回避不可** (下記)。
+
+### ▶ 次 = Lemma 14.6 dichotomy — **σ-decomposition の length-1 factor 抽出が必須前提**
+
+**BG Lem 14.6** (mmd L3945): g∈G^# は排他的に 2 条件の一方を満たす:
+1. g=xx', ℓ_σ(x)=1, x'∈R(x)  (= g ∈ 何らかの xR(x))
+2. g=yy', ℓ_σ(y)=1, y' は C_M(y) の非自明 κ(M)-element (∃M∈𝓜_P(y))
+
+**証明が要する σ-decomposition (回避不可)**: ℓ_σ(g)>1 のとき「g の σ-decomposition の σ-length-1 factor x
+を取る」(g=xx', x∈⟨g⟩, x'∈⟨g⟩ commute, x は σ(M)-elt for M∈𝓜_σ(x))。これは 2-block tool では不足 —
+**「σ(M)-element a≠1 が ℓ_σ(a)=1 をもつ (=∃ maximal M', a∈M'_σ)」が要**。⟹ σ(M)-部分群が
+M_σ-conjugate に入る Hall 論法 (`sigma_subgroup_le_Msigma_of_isHall` 系) が核。
+14.6 proof のその他 deps = Cor 14.3 / Thm 14.4(c)(e) / Thm 13.9 / R(x)=C_{M_σ}(x') — repo 在。
+
+**改訂 gate chain:**
+```
+✅ Prop 14.2 / Lem 12.17 / Cor 14.3 / Thm 13.9 / half_lt / Thm 14.4 sharp / M̃ /
+   14.5(a) xRsub_disjoint / 14.5(b) Mtilde_disjoint / 14.5(c) ncard  ← 全 DONE
+σ-decomposition existence (length-1 factor 抽出) ← 次の必須前提 (新 leaf 候補)
+  └─ 「σ(M)-elt a≠1 ⟹ ℓ_σ(a)=1」(a∈⟨g⟩, ⟨a⟩ σ(M)-group ≤ M_σ^conj)
+→ Lem 14.6 dichotomy (上記 + Cor14.3/14.4(c)(e)/13.9)
+→ Thm 14.7 typeP_duality (M_i setup L3993-4015 + Ẑ TI + counting 矛盾 n=1 + covering + part h)
+   = FT-critical (S15:785/795/2170, S16:530 consume)
+```
+realistically 14.6=1-2 session (σ-decomp leaf 込)、14.7=2-3 session。
+
+### ✅ σ-decomposition keystone DONE + foundation-2/factor-extraction 設計 (2026-06-16 loop⁴ 続き, commit d24bdd7f)
+
+**✅ `length_one_of_isPiElement_sigma` COMPLETE** (sorry-free + axiom-clean + AxiomsCheck): 非自明
+σ(M)-element x ⟹ ℓ_σ(x)=1。⟨x⟩ は非自明 proper σ(M)-subgroup (proper = G 非可解⟹非巡回,
+`isSolvable_of_comm` で htop 矛盾) → `sigma_subgroup_conj_into_Msigma_general` で M_σ-conjugate →
+conj g⁻¹•M ∈ 𝓜_σ(x)。**14.6 の length-1 factor 抽出の核。**
+
+**▶ 次 (Lemma 14.6 への残り、順に):**
+
+**Foundation 2 = 「全素数 p||G| ∈ 或る σ(M)」** (BG §1 明記, `exists_mem_sigma_of_prime_dvd_card`):
+構成 = Sylow p P of G → N_G(P)<⊤ (P≠⊥ ∵ p||G|; P◁G なら G simple と矛盾 ∵ ⊥≠P≠G[G 非 p-group]) →
+maximal M ⊇ N_G(P) → P は M の Sylow p (P≤M, |P|=p-part|G|) → `mem_sigma_iff` (p||M| ∧ ∃Q:Sylow p ↥M,
+N_G(Q-image)≤M; Q=P, image=P, N_G(P)≤M ✓)。~50-80行 (Sylow/simplicity)。helper = maximal-containing-proper
+(`exists_le_maximal` 系 / S08 `exists_maximalSubgroup_containing_normalizer...`), Sylow-of-M restriction。
+
+**Factor extraction** (`exists_length_one_factor`): g≠1 → prime p||g| → p∈σ(M) [Found.2] →
+2-block split g=x·x' (`exists_isPiElement_mul`, π=σ(M)) → x=σ(M)-part≠1 (p||x|) → ℓ_σ(x)=1 [lemma A] →
+x,x'∈⟨g⟩ commute, x' σ(M)'-elt。~40行。
+
+**Lemma 14.6 dichotomy** (`sigmaDecomposition_dichotomy`, ~120-180行, intricate):
+排他的 (1) g=xx', ℓ_σ(x)=1, x'∈R(x) / (2) g=yy', ℓ_σ(y)=1, y'=非自明 κ(M)-elt of C_M(y), M∈𝓜_P(y)。
+- 排他性 (1∧2→⊥): 2-block uniqueness (`isPiElement_mul_unique`) で y∈{x,x'} → Cor14.3 + 14.4(c) →
+  y=x' → 13.9 で M,N conjugate → κ(M) vs τ₂(N) 矛盾。
+- 全域性 (¬1∧¬2→⊥): ℓ_σ(g)>1 (¬1), length-1 factor x [extraction], g=xx', M∈𝓜_σ(x), N∈𝓜(C_G(x))。
+  g∈M なら x' σ(M)'∧¬κ(M) → Cor14.3 ℓ_σ(x')=1,𝓜(C_G(x'))={M} → x∈C_{Mσ}(x')=R(x') → (1) 矛盾。
+  g∉M → C_G(x)⊄M → g σ(N)'-elt of N → 14.4(e) complement → g∈(M∩N)^a → g∈M^a, x∈M_σ^a → M^a 選べた → g∉M 矛盾。
+  deps = Cor14.3/14.4(c)(e)/13.9/R(x)=C_{Mσ}(x') 全 repo 在。
+**14.6 着地で 14.7 へ。新 leaf 化 (S14_SigmaDecomposition) は 14.6 規模で hub prefix-split 推奨 (S14 既 4175行)。**
+
+### ✅✅ σ-decomposition existence 機構 COMPLETE (2026-06-16 loop⁴ 続き², commits d24bdd7f + a0bbfefa)
+
+**3 lemma すべて sorry-free + axiom-clean + AxiomsCheck:**
+- `length_one_of_isPiElement_sigma` (keystone): σ(M)-element x≠1 ⟹ ℓ_σ(x)=1。
+- `exists_mem_sigma_of_prime_dvd_card` (foundation 2): 全素数 p||G| ∈ 或る σ(M)。Sylow P non-normal
+  (G 非可解⟹非 p-group, `IsPGroup.isNilpotent`+`IsNilpotent.to_isSolvable`) → N_G(P) ≤ maximal M
+  (`eq_top_or_exists_le_coatom`) → P = M の Sylow p (p-parts 一致, `Sylow.ofCard`+factorization) →
+  `mem_sigma_iff`。鍵 API: `Sylow.ne_bot_of_dvd_card`/`Sylow.card_eq_multiplicity`/`subgroupOf_map_subtype`。
+- `exists_length_one_factor` (extraction): g≠1 → p||g| → σ(M) → 2-block split (`exists_isPiElement_mul`) →
+  σ(M)-part x が ℓ_σ=1。返り = (x,x',M, g=xx', commute, x,x'∈⟨g⟩, ℓ_σ(x)=1, M maximal, x σ(M)-elt, x' σ(M)'-elt)。
+
+**⟹ 14.6 の「σ-length-1 factor 抽出」前提は完全に揃った。残りは 14.6 dichotomy proof 本体。**
+
+**▶ 次 = Lemma 14.6 dichotomy 本体** (intricate, 14.7 消費形と結合設計要):
+- statement: g∈G^# は排他的に (1) g=xx', ℓ_σ(x)=1, x'∈R(x) / (2) g=yy', ℓ_σ(y)=1, y'=非自明
+  `IsPiElement (kappa M) y'` ∈ C_M(y), M∈𝓜_σ(y)∩IsTypeP。**14.7 が要するのは exclusivity 方向**
+  (type-2 ⟹ ¬type-1 = g∉H̃; "T∩H̃ empty" L4021)。exhaustivity は "exactly one" 完全性用。
+- 定義は全在: `kappa`/`IsTypeP`/`maximalSigmaSubgroupsOfElement`/`Rsub`/`Mtilde`。𝓜_P(y)=`{M∈𝓜_σ(y)|IsTypeP M}` inline。
+- 排他性 proof: 2-block uniq (`isPiElement_mul_unique`) で y∈{x,x'} → Cor14.3(`sigma_diagnostic`)+14.4(c) →
+  y=x' → x'∈R(x)⊆N_σ, y∈M∩N_σ → 13.9 で M,N conj → κ(M) vs τ₂(N) 矛盾。~60-80行。
+- 全域性 proof: ℓ_σ(g)>1 [¬1], `exists_length_one_factor` で x, g=xx', M∈𝓜_σ(x), N∈𝓜(C_G(x))。
+  g∈M → x' σ(M)'∧¬κ(M) → Cor14.3 ℓ_σ(x')=1, 𝓜(C_G(x'))={M} → x∈C_{Mσ}(x')=R(x') → (1) 矛盾。
+  g∉M → C_G(x)⊄M → g σ(N)'-elt of N → 14.4(e) complement → g∈(M∩N)^a → x∈M_σ^a → M^a 選べた → 矛盾。~100-150行。
+- 推奨: **14.7 が consume する exclusivity を named lemma 化**してから full "exactly one"。新 leaf S14_SigmaDecomposition
+  (S14 既 4250行) へ移すなら hub prefix-split (issue 0069)。
+
+### ✅✅✅ BG Lemma 14.6 exclusivity COMPLETE (2026-06-16 loop⁴ 続き³, commit a1519e5b)
+
+**`not_type1_of_type2` sorry-free + axiom-clean + AxiomsCheck** (~180行 factor-matching, 一発 green
++ namespace 1 修正のみ): type-2 (g=y·y', y∈M_σ^#, y'=非自明 κ(M)-elt of C_M(y)) ⟹ ¬type-1
+(g=x·x', ℓ_σ(x)=1, x'∈R(x))。**14.7 が "T∩H̃=∅" として消費する FT-critical 方向。**
+証明 = 14.5(a) factor-matching (`isPiElement_mul_unique`+σ-partition) を σ-decomposition existence
+機構で駆動。x'≠1 → |𝓜_σ(x)|>1 → N (π(⟨x⟩)⊆τ₂(N), 𝓜(C_G(x))={N})。
+- equal σ(M_x)=σ(M): x=y, Cor14.3 (C_G(y)⊆M, τ₂枝は κ∩τ₂=∅[rank 1 vs 2]で排除)+singleton → M=N →
+  x∈M_σ が τ₂(M)-elt = 矛盾。
+- disjoint: factor-match y=x', y'=x; M,N conj (13.9); x=y' は κ(M)[pRank 1] & τ₂(N)[pRank 2],
+  pRank 共役不変 (`pRank_eq_of_mulEquiv` + `equivMapOfInjective`+`MulEquiv.subgroupCongr`) で 1=2 矛盾。
+新 API 発見: `tau1/tau3_subset_sigma_compl`, `tau{1,2,3}_pRank_eq_{one,two}`, `pRank_eq_of_mulEquiv`(S13)。
+
+**⟹ Lemma 14.6 は FT 的に done** (14.7 は exclusivity のみ要; exhaustivity = "exactly one" 完全性は
+14.7 非依存ゆえ後回し可)。
+
+### ▶ 最終 §14 FT-critical ピース = Theorem 14.7 `typeP_duality` (S14:4475, sorry)
+**全依存 green**: 14.5(c)✅ 14.5(b)✅ 14.6 exclusivity✅ Prop14.2✅ half_lt✅ Thm14.4✅。
+statement (既存, faithful): (h) M'=derivedInG M が K を complement + coprime ∧ ∃! Mstar
+[maximal∧typeP∧¬conj∧Hall κ∧cyclic(K⊔Kstar)∧TI(zTilde)∧(P2 M∨P2 Mstar)∧covering]。
+**proof = §14 最大の counting** (mmd L3993-4063, ~200行超):
+- M_1..M_n = 𝓜(N_G(X_i)) for X_i∈ℰ¹(K); Prop14.2(b) で Z=K×Kstar⊆M_i, X_i⊆M_iσ。
+- T=Z-⋃K_i*; **14.6 exclusivity で T∩H̃=∅** → 𝒞_G(T) ⊥ 𝒞_G(M̃_i); |𝒞_G(T)|=|T||G:Z| (TI, Prop14.2d)。
+- 全 M_i type-P1 仮定 → **14.5(c)** |𝒞_G(M̃_i)|=(|M_iσ|-1)|G:M_i| + 14.5(b) pairwise disjoint →
+  |G^#|≥|𝒞_G(T)|+Σ → ≥|G| 矛盾 → ∃ M_i type-P2 → Prop14.2(g) n=1, Z cyclic, T=Ẑ →
+  **half_lt** |𝒞_G(Ẑ)|>½|G| → covering (∀ type-P H, 𝒞_G(S_H)>½|G| ⟹ 交差 ⟹ H~M or M*)。
+- part(h): M_σ⊆M' (Thm10.2c) + K cyclic + Prop14.2(a) normal complement UM_σ → UM_σ=M' → κ=τ₁。
+realistically 2-4 session (counting infra + ∃! covering assembly)。新 leaf S14_Theorem147 推奨 (hub split)。
+
+### ✅ Theorem 14.7 着手 — TI saturation count COMPLETE (2026-06-16 loop⁴ 続き⁴, commit b53d8c6c)
+
+**`ncard_conjClassSet_of_isTISubset` sorry-free + axiom-clean + AxiomsCheck**: TI-subset A
+(stabilized by normalizer-bound L) ⟹ |𝒞_G(A)|=|A|·[G:L]。conjugates を G⧸L で index
+(L-stab で well-def, Quotient.lift)、TI で pairwise disjoint、各 ncard |A| (`Set.ncard_smul_set`)、
+`Set.ncard_iUnion_of_finite`+`finsum_eq_sum_of_fintype` で合計。**14.7 step 5 (|𝒞_G(T)|=|T||G:Z|) の核。**
+鍵 API: `Set.ncard_iUnion_of_finite`, `finsum_eq_sum_of_fintype`(to_additive), Quotient.lift+`change (leftRel L)`。
+再利用可: Peterfalvi TI-subset counting にも (現状 S14 内、upstream 候補=TISubset.lean)。
+
+**▶ 14.7 残ピース** (順に、新 leaf S14_Theorem147 推奨):
+1. **M_i family setup** (~100行, 最 intricate): X_i∈ℰ¹(K) → M_i=𝓜(N_G(X_i)); Prop14.2(b) で Z⊆M_i,
+   X_i⊆M_iσ; M_i 非conj-to-M; K_i=Hall κ(M_i), K_i*=C_{M_iσ}(K_i); N_{M_i}(X*)=K_i×K_i*。
+2. **density arithmetic** (~50行): |𝒞_G(T)|=(1+n/z-Σ1/k_i)|G| [TI count] + (全P1) 14.5(c) Σ → |G^#|≥|G| 矛盾。
+3. **∃! covering** (~80行): n=1, T=Ẑ, half_lt >½|G|, S_H 交差 → H~M or M*。
+4. **part(h)** (~50行, §16-indep): M_σ⊆M'(Thm10.2c)+Prop14.2(a) UM_σ+K cyclic → UM_σ=M', κ=τ₁。
+これらを組んで `typeP_duality` (S14:4475 sorry) を close → §15/§16 (Lane G) 全下流 unblock。
