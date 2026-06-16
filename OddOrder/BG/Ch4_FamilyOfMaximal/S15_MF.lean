@@ -2800,6 +2800,21 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma [Finite G]
   fittingInAmbient_eq_sup_centralizer_inf_of_inputs hQ
     (centralizer_inf_le_fittingInAmbient_of_le_Msigma hG hM hMnormQ hCle)
 
+/-- **Theorem 15.2 step 5 — `q ∈ β(M)`, gated-endpoint skeleton** (mmd L4202): "if `q ∉ β(M)`,
+then Theorem 5.5(a) shows `(DK)' = D` centralizes `Q`, a contradiction".  The contradiction is
+clean: `D` centralizing `Q` means `Q ≤ C_G(D)`, i.e. `C_Q(D) = Q`, against the established
+`C_Q(D) = Q₀ ⊊ Q` (`M_σ` non-nilpotent).  Reduces `q ∈ β(M)` to the single Theorem-5.5 input
+`hDcent` (`q ∉ β(M) → D ⊆ C_G(Q)`) and the proper-centralizer fact `hQ0` (`¬ Q ⊆ C_G(D)`). -/
+theorem mem_beta_of_inputs {M Q D : Subgroup G} {q : ℕ}
+    (hQ0 : ¬ Q ≤ Subgroup.centralizer (D : Set G))
+    (hDcent : q ∉ OddOrder.BG.Ch3.S10.beta M → D ≤ Subgroup.centralizer (Q : Set G)) :
+    q ∈ OddOrder.BG.Ch3.S10.beta M := by
+  by_contra hq
+  have hDQ := hDcent hq
+  rw [← Subgroup.commutator_eq_bot_iff_le_centralizer] at hDQ
+  exact hQ0 (Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+    (by rwa [Subgroup.commutator_comm] at hDQ))
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
