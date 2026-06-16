@@ -3931,3 +3931,17 @@ cross-term の inner_smul_left は `rw` でなく `simp only [..., inner_smul_le
 case-B 構造仮説 (capstone level: hcop/hp/hHp/hprime/hW2comm/hW2cen/hc2/hFPF) + 列↔constituent 同定
 (`columnSum_eq_induce_H`)。これが (6.8.2.3) per-φ assembly の本体 (新 math 無し、既存 sorry-free 補題の wiring)。
 **正本 = 本 session 48 cont.⁷。** 完成後 cTE-glue 旧ファイル群 (下流未消費) を撤去。
+
+### session 48 cont.⁸: 🧹 cTE-glue dead code 撤去 (over-constrained T=0 route の片付け)
+
+cont.⁴ で確定した「cTE-glue は over-constrained ゆえ撤去」を実施 (commit `e52aee95`、184 行削除)。
+grep で外部 caller なしを確認した dead def 3 本を S08_CaseBXunionY から撤去:
+- `certainTypeExtension_columnSum_eq_falseHalf_sum` (参照ゼロ、T=0 falseHalf bridge の残骸)
+- `exists_glue_nu_columnSum_Yset` (旧 base 専用、`exists_glue_nu_columnSum_Yset_via_map` が一般化済)
+- `coherentCertainTypeSet_union_Yset` (caller なし、unprovable な hanchored=T=0 に gate された旧 base)
+keep (textbook 経路が再利用): `certainTypeSet_span_apply_one_eq_intMul` / `hgen_withDiagonal_certainTypeSet` / `certainTypeSet_finite`。
+**⚠ (4.9) cTE coherence 機構 (`certainType_isCoherent`/`certainTypeExtension`/`certainTypeSet_isCoherent_tau`) は孤立せず存続** — 正当な Peterfalvi (4.9)(b) 結果ゆえ unused でも残す (過剰削除しない)。full build (3840 jobs) green、axiom 不変。
+
+**本セッションの新規 Lean は dead/garbage なし**: textbook 経路の連鎖 (xChiExtension→producer→glue→base-union) は全 used、
+discharge 用 brick (`characterPsiDecomposition_X_mem_ZIrr`/`xchi_inner_eq_of_anchored`) は意図的 down-payment (docstring 明示)。
+迷い (chain 経路 cont.²→撤回 cont.³) は notes/分析のみで Lean commit には出ていない。**正本 = 本 session 48 cont.⁸。**
