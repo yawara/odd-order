@@ -3738,3 +3738,78 @@ frontier `hanchored`(`X=cTEμ`)は**誤った target の可能性大**。教科�
 
 **▶ 次セッションの推奨**: まず**案A の実現可能性**を精査(textbook-faithful union engine が §7 に組めるか/`exists_decomposition_caseB` 系が per-column X_i⊥Y で union を出せるか)。組めれば T=0 を完全に回避でき最短。組めなければ案B(orientation 大域論法、ChatGPT 相談推奨 [[feedback-ask-chatgpt-for-elided-gaps]])。**いずれにせよ session 47 の「T=0 が単一の山・出れば機械的」は楽観的すぎ — T=0 はそもそも単一列では未決(over-constrained)で、frontier の再定義が先決。**
 **正本 = 本 session 48。** session 47 までの「hanchored materialize」路線は事実3/4 により保留。
+
+### session 48 cont.: ✅ ユーザー裁可 = 案A(textbook-faithful 再配線)。具体ビルドプラン + 核心 reduction insight
+
+**決定(ユーザー 2026-06-16)**: frontier を hanchored(T=0/X=cTE)から外し、**案A = textbook-faithful 再配線**で進める。
+
+**🔑 核心 reduction insight(T=0 を深い σ-restriction なしで回避する鍵)**:
+column cross-diagonal は irreducible constituent の cross-diagonal の**和**に分解できる:
+`μ_j − a₀·η₁ = ∑_i (μ_{ij} − a_i·η₁)`(`a_i = μ_{ij}(1)/|W₁|`, `∑_i a_i = a₀`, 次数一致)。
+かつ cTE は per-irreducible(`certainTypeExtension_mu`: `cTE(μ_{ij}) = δ_j ω_{ij}^σ`)で `∑_i cTE(μ_{ij}) = cTE(μ_j)`。
+⟹ **各既約 μ_{ij} で per-irreducible hanchored `τ(μ_{ij}−a_iη₁) = cTE(μ_{ij}) − a_i·ν₁` が出れば、和を取って column hanchored が従う**。
+だが per-irreducible 版も norm-1 ゆえ X_i = ±(単一 σ-image)で **self/conj 2-枝の曖昧性は残る**(教科書 6.8.1 の「X=χ₁^τ₁ or X=−χ₂^τ₂」そのもの)。
+
+**∴ 真の解決 = 「chain は実際の像 X_i を使い cTE 同定を要求しない」**:
+`adjoin_irr_nonreal_of_supportedDecomposition`(S08CBA:1720)/`xAdjoinStepW`(S08CoherenceWeighted:286)/
+`retarget_isCoherent_of_supportedDecomposition`(S07:4031)は **`Da.X`(実際の (5.4) 分解像、self でも −conj でも)を使い**、
+それが cTE か否かを問わず**有効な coherence を構成する**(`himg: τ(χ−a•χ₁)=Da.X − a•ext(χ₁)` は定義上成立)。
+⟹ Xset coherence cX を chain で組めば `cX.extension(μ_{ij}) = X_i`(実像)。Y-glue の diagonal `hDτ: ν(χ−aη₁)=τ(χ−aη₁)`
+は `ν=cX.extension` ゆえ **構成上自動成立**(T=0 不要)。cTE は base の coherence にしか使わず、glue には一切使わない。
+
+**🚧 案A の障害(= 次セッションが解く核心)— Lean の Xset 構造の乖離**:
+教科書 X = 個々の既約 `{μ_{ij} : Z⊄Ker}`。だが Lean `certainTypeSet h46 k` = **列 columnSum χ₂(既約の和)**で、
+`caseB_Xset_conjugatePairCover`(S08CaseBEnumeration:134)は **S₀=certainTypeSet(列)** を base に非-S₀ 既約を pair。
+⟹ 列を base coherence(cTE)にした時点で「列の cross-diagonal を cX.extension=cTE で扱う」=T=0 に逆戻り。
+**列と個々の μ_{ij} が両方 Xset にあると `μ_j=∑μ_{ij}` の線形関係で `cX.extension(μ_j)=∑X_i` 整合性が要り、これが ∑-form の T=0**。
+
+**▶▶ 案A の具体タスク(次セッション、focused、優先順)**:
+1. **Xset/S/certainTypeSet の構造精査**: 個々の μ_{ij} は Xset に入るか?(`hyp.Xset W2` の定義 = S08CoherenceCorePart2:544 を読む)。
+   textbook X は μ_{ij} だが Lean は列を S₀ にしている。**μ_{ij} を直接 X-member にできるか**(列を base から外し μ_{ij} を chain adjoin)が分岐点。
+2. **per-irreducible 経路が組めるなら**: `caseB_per_phi_anchored_fromYset`(S08CBA:1647、既存)が既約 `Ind_H θ` の anchored 像
+   `τ(Ind_H θ − a·η₁) = caseB_phi_family.X − a·ν₁` を与える。これを `adjoin_irr_nonreal_of_supportedDecomposition` に渡し
+   chain で Xset coherence を組む → Y-glue は diagonal 自動。**cTE-glue base(`coherentCertainTypeSet_union_Yset`)は捨てる**(現在下流未消費なので影響なし)。
+3. **列を base に残す必要がある場合**: 列 hanchored = ∑(per-irreducible hanchored) の線形 reduction を使うが、per-irreducible でも
+   self/conj 解決が要る ⟹ 教科書 (6.8.1) の n≥3/relabeling 大域論法の case-B 版(ChatGPT 相談候補)。**1 より重い**。
+
+**現状の資産(壊さない)**: `coherentCertainTypeSet_union_Yset`(hanchored gated skeleton)は下流未消費ゆえ**当面温存**(案A 確定後に撤去/置換)。
+`exists_glue_nu_columnSum_Yset`/`certainTypeExtension_columnSum_eq_falseHalf_sum` 等は cTE-glue 専用なので案A では不要化するが削除は最後。
+**正本 = 本 session 48 cont.。次の一手 = タスク1(Xset 構造精査)。**
+
+### session 48 cont.²: ✅ 案A の健全な形を確定(cont. の per-μ_{ij}/basis-linear 懸念を精密化・解消)— Xset 構造精査の結論
+
+**🔑 Xset 構造の確定事実**(`SsubFiltration`/`Xset` = S08CoherenceCorePart2:535-546 を読んだ):
+`Xset hyp Z = hyp.S \ hyp.SsubFiltration Z`、`hyp.S = {Ind_H^L θ : θ∈Irr H, θ≠1}`。⟹ **X-member は誘導指標 Ind_H^L θ**。
+- reducible な X-member = 列 `μ_j = columnSum = Ind_H^L χ_j`(χ_j=Res_H μ_{0j}∈Irr H、`columnSum_eq_induce_H`)。
+- 個々の `μ_{ij}` は **W₁-軌道の構成要素で Ind でない ⟹ X に入らない**(cont. の「μ_{ij} を adjoin」は不可、訂正)。
+- 既約な X-member = Ind_H^L θ で Ind が既約なもの(教科書 6.8.2.3 の χ_i = Ind_H θ_i、θ_i = Ind_Z φ の構成要素)。
+
+**🎯 案A の正しい形(cont. の混乱を解消)— Y-glue を「列∪Y」でなく「full Xset」で、既約 anchor を使う**:
+1. **cTE-base**: `certainTypeSet`(列)を **単独で** coherent(`certainTypeSet_isCoherent_tau`、cTE)。**Y なし ⟹ T=0 なし**。✅既存。
+2. **chain**: `xChainCoherentW`(S08CoherenceWeighted:556)で既約 X-member pair を base に fold → **Xset coherent cX**。
+   各既約 χ の adjoin は **実際の (6.8.2.3) 像 X_χ を使う**(`xAdjoinStepW`/`adjoin_irr_nonreal_of_supportedDecomposition`、
+   `Da.X` 経由、cTE 同定不要)。cover = `caseB_Xset_conjugatePairCover`(S08CaseBEnumeration:134)✅既存。
+   cX は coherence ゆえ `cX.ext` は **ℤ[Xset,L^#] 全体で τ 一致**(`extends_on_supported`)— 列像 cTE(μ_j) と既約像 X_χ の
+   整合は **chain の coherence 証明が確立**(standalone T=0 でなく)。
+3. **Y-glue**: `coherentXunionYset_caseB_of_glued`(S08CBC2:1616)で cX ⊕ Y。**diagonal anchor に既約 X-member χ₀** を使う。
+   `hDτ: ν(χ₀−a₀η₁)=τ(χ₀−a₀η₁)` は `ν=cX.ext(χ₀)=X_{χ₀}`(chain 像)ゆえ **構成上自動**。
+
+**🔑 列の cross-diagonal は既約 anchor + X-internal に分解 ⟹ 列の hDτ は T=0 なしで従う**:
+`μ_j − a₀η₁ = (μ_j − χ₀) + (χ₀ − a₀η₁)`(χ₀ = 列と同次数 a₀|W₁| の既約 anchor)。
+- `μ_j − χ₀`: 次数 0、H^#-supported(両者 Ind_H、H 正規ゆえ support⊆H、1 で消える)、∈ ℤ[Xset,L^#] ⟹ `ν=τ`(**cX coherence**)。
+- `χ₀ − a₀η₁`: 既約 anchor diagonal ⟹ `ν=τ`(自動、chain 像)。
+⟹ `hgen` が `{μ_j−χ₀}∪{χ₀−a₀η₁}` で列 cross-diagonal を生成すれば、列 hDτ は線形性で従う。**cTE(μ_j) は Y-diagonal に直接現れず、X-internal 経由で cX coherence が吸収 ⟹ standalone T=0 不要**。
+
+**🚧 案A が依存する未検証前提(次セッションの検証標的、優先順)**:
+1. **既約 X-member anchor χ₀ の存在**(列と同次数 a₀|W₁|)。case B は Z=W₂⊆H' ゆえ degree-1 X-member 無し(a₀>1)。
+   ⟹ anchor は次数 a₀|W₁| の **既約 Ind_H θ**(θ(1)=a₀, Ind 既約)。存在は H 構造依存 — **要確認**(教科書 χ_i のどれかが既約か)。
+   存在しない(全 X-member が列=reducible)региме では案A の anchor が無く、別途 reducible anchor の hDτ=T=0 に戻る恐れ。
+2. **chain adjoin の decomposition 入力**: 既約 χ の base(cTE 列)に対する (6.8.2.3) 分解。`caseB_per_phi_anchored_fromYset`
+   が anchored 像を与えるが、その full aggregate 入力(hcol/hirr/hirrAnc/hdecomp)の discharge が要る(既存 skeleton)。
+3. **hgen**(列 cross-diagonal が既約 anchor + X-internal で生成)の形式化。
+
+**▶▶ 次の一手**: 前提1(既約 X-member anchor の存在)を確認。存在すれば案A は既存インフラ(xChainCoherentW +
+coherentXunionYset_caseB_of_glued)で組め、cTE-glue base(coherentCertainTypeSet_union_Yset)は不要化(撤去)。
+存在が問題なら、教科書 (6.8.2) の τ₂ 構成(L^# 一致 + η₁↦Y の abstract isometry)を Lean で直接組む engine が要る
+(basis-linear IntegralCharacterMap では列=Σμ_{ij} ゆえ per-μ_{ij} 値が要り、自然な cTE が T=0 を呼ぶ ⟹ ChatGPT 相談候補)。
+**正本 = 本 session 48 cont.²。session 48 cont. の「per-irreducible で adjoin」は Xset 構造誤認ゆえ撤回、本 cont.² が正。**
