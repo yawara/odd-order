@@ -103,4 +103,41 @@ structure XAdjoinStepInputW {A : Set G}
     (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {χmem i₁})
 
+/-- **Orthogonal integer projection onto a norm-weighted `ZIrr` family.**  The weighted analogue of
+`exists_indexed_intProjection_of_orthonormal_ZIrr`: for `φ ∈ ℤ[Irr G]` and a family
+`vc : ι → ClassFunction G ℂ` of `ZIrr`-members that are pairwise *orthogonal* with squared norms
+`mc i = ⟨vc i, vc i⟩` (`horth i j = if i=j then mc i else 0`, `mc i > 0`), the inner products
+`⟨φ, vc i⟩ = cZ i` are integers and `φ` decomposes as `φ = ∑ (cZ i / mc i)·vc i + Z` with the
+remainder `Z` orthogonal to every `vc i`.  Unlike the orthonormal case the coefficients
+`cZ i / mc i` are *rational* (the integer `cZ i` divided by the squared norm) — exactly the
+`1/‖χᵢ‖²` projection coefficient of Peterfalvi (5.6) (mmd 04.7; ChatGPT Q4). -/
+theorem exists_indexed_projection_of_orthogonal_ZIrr {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {φ : ClassFunction G ℂ} (hφ : φ ∈ ZIrr G)
+    {ι : Type*} (s : Finset ι) (vc : ι → ClassFunction G ℂ) (mc : ι → ℝ)
+    (hvcZ : ∀ i ∈ s, vc i ∈ ZIrr G) (hmc_pos : ∀ i ∈ s, 0 < mc i)
+    (horth : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (vc i) (vc j) = if i = j then (mc i : ℂ) else 0) :
+    ∃ (cZ : ι → ℤ) (Z : ClassFunction G ℂ),
+      (∀ i ∈ s, ClassFunction.inner φ (vc i) = (cZ i : ℂ)) ∧
+      φ = (∑ i ∈ s, (((cZ i : ℝ) / mc i : ℝ) : ℂ) • vc i) + Z ∧
+      ∀ i ∈ s, ClassFunction.inner Z (vc i) = 0 := by
+  classical
+  have hint : ∀ i ∈ s, ∃ n : ℤ, ClassFunction.inner φ (vc i) = (n : ℂ) :=
+    fun i hi => ClassFunction.inner_mem_ZIrr_int hφ (hvcZ i hi)
+  choose! cZ hcZ using hint
+  refine ⟨cZ, φ - ∑ i ∈ s, (((cZ i : ℝ) / mc i : ℝ) : ℂ) • vc i, hcZ, by abel, ?_⟩
+  intro i hi
+  rw [ClassFunction.inner_sub_left]
+  have hsum : ClassFunction.inner (∑ j ∈ s, (((cZ j : ℝ) / mc j : ℝ) : ℂ) • vc j) (vc i)
+      = (cZ i : ℂ) := by
+    rw [inner_sum_left, Finset.sum_eq_single i]
+    · rw [ClassFunction.inner_smul_left, horth i hi i hi, if_pos rfl]
+      have hmci : (mc i : ℂ) ≠ 0 := by exact_mod_cast (hmc_pos i hi).ne'
+      push_cast
+      field_simp
+    · intro j hj hji
+      rw [ClassFunction.inner_smul_left, horth j hj i hi, if_neg hji, mul_zero]
+    · intro hni; exact absurd hi hni
+  rw [hsum, hcZ i hi, sub_self]
+
 end OddOrder.Peterfalvi.S08
