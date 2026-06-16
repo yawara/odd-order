@@ -40,8 +40,8 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
 ### 新規インフラ sub-pieces（正本 = notes/peterfalvi/s11_wielandt_91_design.md）
 
 - [x] coprime 分解 `V=V^G⊕[V,G]`（dim 形 + `[V,G]^G=0` + `IsCompl`）— `WielandtCounting.lean` `a1bddfaa`
+- [x] **step 2: el-ab 恒等式 (⋆) COMPLETE (modulo (†))** — `finrank_elab_identity` `95757a9f`。toolkit: `Vᵁᴱ=Vᵁ⊓Vᴱ`(`80a4d926`) + compatible-decomposition(`fadb55d6`) + averageMap 明示形(`87816c20`) + `[V,U]` L-不変性 via `MulAut.conjNormal`(`6e2df864`)
 - [ ] (I-3) regular-orbit fixed-space count（抽象・Brauer-free）
-- [ ] step 2: el-ab 恒等式 (⋆)（Brauer-free）
 - [ ] 系(i) を BG 3.3 + chief-series で **unconditional 化**
 - [ ] (I-2) isotypic 分解（mathlib `IsSemisimpleModule`+`Maschke`）
 - [ ] (I-1) **modular Brauer permutation lemma**（`Z(𝔽̄_p[U])` の char-0 trace-lift）← 核心
