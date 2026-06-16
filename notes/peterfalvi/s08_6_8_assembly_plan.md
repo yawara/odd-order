@@ -3304,3 +3304,21 @@ cont.¹⁹-²⁴ で S-level cover (`caseB_S_member_column_or_irreducible`) + X�
 2. **(6.8.3) L4** (X∪Y→S): case-A `false_of_coherentXunionYset_of_not_coherentS` (CB2:3439) の case-B 適応 (Z=W₂、算術 |H:W₂|≥(2|W₁|+1)²、case-B (5.6) bound + S-facts)。~100LOC。最も decomposable か。
 3. **hgen** (X∪Y span 包含、cX 非依存): intricate だが loop で挑戦可。
 **▶ 次**: heavy pieces の decomposability を精査し最も committable な sub-piece を選ぶ (L4 arithmetic core or hgen)。**正本=本 cont.²⁴。prerequisite 層 10 commits 完成、capstone は heavy core (cX/L4) 待ち。Opus 継続。**
+
+### session 43 cont.²⁵: ✅✅✅ case-B (6.8.3) 算術層 COMPLETE (3 commits) + 構造的発見 (mixed-S break-pair)
+main を clean fast-forward 取り込み (lane-g Thm 3.8 / lane-h Thm E + AxiomsCheck のみ、Peterfalvi 無関係)。**新 leaf `S08_CaseBEndgame.lean`** (134 行、imports CaseBCoherence2) を切り、教科書 (6.8.3) 統一論法 (04.8 L234-244) の **case-B 算術層を完全形式化** (3 commits、全 green + axiom-clean):
+
+1. **`false_of_w2_break_arith`** (`07452579`): case-B 算術核。break (5.6) `w1·hZ·(cZ−1) ≤ 2w1²d` + Cor 2.30 `d²≤hZ` + FPF `(2w1+1)²≤hZ` → False。論法: `cZ−1≥1` で `hZ≤2w1d` → `d²≤hZ≤2w1d` で `d≤2w1` → `hZ≤4w1²` で `(2w1+1)²≤hZ` 矛盾。case-A `false_of_centralCommutator_break_arith` (CorePart2:3094) の mirror、FPF 入力が `|H:Z|` 側 ((2w1+1)²) なのが差。
+2. **`two_mul_add_one_sq_le_of_two_fpf_factors`** (`e1b7c1a8`): case-B FPF index bound `(2w1+1)²≤|H:Z|`。W₁ FPF on H/H′ と H′/Z の 2 factor それぞれ `two_mul_add_one_le_of_odd_dvd` (CorePart1:2838、(6.5)(a) chief-factor 算術、既存再利用) で `≥2w1+1` → `|H:Z|=|H:H′|·|H′:Z|` で square。oddness + `card_modEq_one` 整除 + index 積を仮説化 (FPF action 2 本 + chain index 恒等式を named obligation 化)。
+3. **`false_of_caseB_break_of_bounds`** (`4f16fef0`): 算術 spine。1+2 を合成し (6.8.3) case-B 矛盾を **「(5.6) break + Cor 2.30 + 2-FPF factors → False」**に完全還元。各仮説を Sibley-data source でラベル化。
+
+**🔑🔑 決定的構造発見 (L4 設計を変える)**: `exists_coherentBreakPair` (CorePart1:965) は **`hSbirr : ∀ χ ∈ Sb, IsIrreducibleCharacter χ` (全既約) を要求**。case-B の S は**可約 column μ_j (columnSum = Ind^L_H θ for some θ、∈S) を含む mixed** ゆえ、**case-A の break-pair engine (`exists_coherentBreakPair` / `xSum_le_two_psi`、ともに `hSbirr` / Frobenius `hF` 依存) は case-B に直接適用不可**。教科書の (5.6) は ‖χ‖²-weighted 和 `∑χ(1)²/‖χ‖²` で可約 member を扱う ⟹ **case-B には norm-aware な (5.6) bound + reducible-S 対応の conjugate-pair break が新規に必要**。これが残 heavy core の本体 (cont.¹⁶-²⁴ が "heavy interlocking core" と呼んでいた中身の正体)。
+
+**⟹ 残務 = `false_of_caseB_break_of_bounds` の仮説 discharge (優先順・難度評価)**:
+1. **`hbreak` = (5.6) mixed-X break bound** [🔴 最重・新規 infra]: reducible-S 対応 break-pair existence (case-A `exists_coherentBreakPair` の ‖χ‖²-weighted 一般化) + mixed-X の `∑χ(1)²/‖χ‖² = |W₁||H:Z|(|Z|−1)` 再指標化 (sources θ で和を取り直す、(1.5.c,d))。case-A `xSum_le_two_psi`/`sMember_degreeSqReBound_of_not_coherent` は Frobenius+全既約前提ゆえ要全面適応。
+2. **2-FPF factor blocks** [🟡 中・群論]: W₁ FPF on H/H′・H′/W₂ を case-B CertainType data から。template = case-A `centralCommutator_card_subgroupOf_lower` (CorePart2:725、単一 factor、`IsFrobeniusAction.subgroup`+`card_modEq_one`)。要: case-B の W₁-action データ (CertainType hypothesis の構造未精査) + chain index `|H:W₂|=|H:H′|·|H′:W₂|`。
+3. **`hdsq` = Cor 2.30 `d²≤|H:W₂|`** [🟢 易]: W₂ central ゆえ `θ.isIrreducible.exists_degree_sq_le_index` 直用 (case-A L4 line 3479-3486 と同型、Z=W₂ に置換)。
+4. **`hcZ` = |W₂|≥2 / `hw1odd` / oddness** [🟢 易]: 奇位数 + W₂≠1。
+
+**▶▶ 次の focused session 第一手 (推奨)**: **#2 (2-FPF factor blocks) を先に landing** — group-theory で #1 より tractable、`centralCommutator_card_subgroupOf_lower` template + 既存 `two_mul_add_one_le_of_odd_dvd`/`IsFrobeniusAction.subgroup` で組める。要 RECON = case-B CertainType が W₁-FPF-on-H/H′・H′/W₂ をどう供給するか (S06.CertainTypeHypothesis 構造)。#1 (norm-aware (5.6)) は最重、別 focused session か workflow 候補。
+**正本=本 cont.²⁵。算術層 3 commits 完結 (新 leaf S08_CaseBEndgame)。L4 は `false_of_caseB_break_of_bounds` 仮説 discharge に還元。決定的発見=mixed-S ゆえ case-A break-pair 不適用→norm-aware (5.6) が heavy core。次=#2 FPF factor blocks (群論、tractable)。Opus 継続。**
