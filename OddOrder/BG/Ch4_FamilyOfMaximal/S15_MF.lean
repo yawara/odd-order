@@ -812,6 +812,48 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
 
 /-! ## Theorem 15.2: `M_F != M_sigma` forces type `P1` -/
 
+/-! ### Theorem 15.2 proof body — §14-gated conditional helpers (issue 8011)
+
+The structural content of Theorem 15.2 (`mf_ne_msigma_typeP1_structure`, mmd L4190-4202) is built
+up here as **sorry-free conditional helpers** that take the §14-gated facts (type-`P1`, `K`'s prime
+action on `M_σ`, `q = |K*|` prime — Lemma 14.1 / Theorem 14.7(f) / Proposition 14.2(a)) as explicit
+hypotheses.  Once Lane H lands those §14 results the wrapper `mf_ne_msigma_typeP1_structure`
+discharges each hypothesis by a single citation and assembles these helpers (net `-1` sorry then).
+The proof's first §3 gate, BG **Theorem 3.8** (`S03h.thm38`), is now formalized, unblocking step 2. -/
+
+/-- **Theorem 15.2, step 2 entry** (mmd L4192, "By Lemma 6.3(a), `M_σ = [M_σ, K]`"): in a
+type-`P1` factorization `M = K M_σ` (so `M_σ` is a complement of `K` in `M`), the σ-core is its
+own commutator with `K`: `⁅M_σ, K⁆ = M_σ` (inside `M`).
+
+This is the §14-independent algebraic core of step 2.  The only §14 input is the complement
+`M = K M_σ` (type-`P1`, from Lemma 14.1 / Theorem 14.7(h)), taken here as `hcompl`; combined with
+`M_σ ⊆ M'` (Theorem A, `Msigma_le_derived`) and solvability of `M`, Lemma 6.3(a)
+(`commutator_eq_self_of_isComplement'_le_commutator`) gives the identity.  It feeds the
+contrapositive of Theorem 3.8 in the next step: `⁅M_σ, K⁆ = M_σ ⊄ F(M_σ)` since `M_σ` is
+non-nilpotent (`M_F ⊊ M_σ`). -/
+theorem msigma_eq_commutator_kappa_of_isComplement' [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M)) :
+    ⁅(OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M, K.subgroupOf M⁆
+      = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hM_le_NMσ :
+      M ≤ Subgroup.normalizer ((OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  haveI hMσ_norm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr hM_le_NMσ
+  have hMσ_le : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ≤ commutator ↥M := by
+    calc (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        ≤ (derivedInG M).subgroupOf M :=
+          Subgroup.comap_mono (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+      _ = commutator ↥M := by
+          rw [derivedInG, Subgroup.subgroupOf,
+            Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  exact OddOrder.BG.Ch1.S06.commutator_eq_self_of_isComplement'_le_commutator hcompl hMσ_le
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
