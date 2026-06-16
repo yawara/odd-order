@@ -4763,6 +4763,13 @@ The per-neighbour foundation the `M_i` family iterates over.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap
 
+/-! **BG 14.7, coverage of `κ(M)`-primes** (`S14_TypePCounting`, `exists_typeP_neighbor_mem_sigma`,
+mmd L4007): every prime `p ∣ |K|` lies in `σ(N)` for a nonconjugate type-`P` neighbour `N ⊇ Z`
+(via a line `X ∈ ℰ_p¹(K)` and its partner).  With `M` (covering `σ(M) ⊇ π(K*)`) this gives the
+coverage `⋃ σ(Mᵢ) ⊇ π(Z)` forcing `⨆ Kᵢ* = Z`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_neighbor_mem_sigma
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

@@ -1315,3 +1315,23 @@ data) + Cauchy で X*∈ℰ¹(K*) + Hall K_N⊇X* + `typeP_swap_Z_eq` + `typeP_n
 
 本 loop⁷ 累計 **13 定理** (swap 7 + density/tools 5 + per-neighbor package 1)、全 S14 内 sorry-free +
 axiom-clean + AxiomsCheck。typeP_duality 残 = family Finset assembly + T-TI + collapse + part(h)。
+
+### ✅ coverage primitive landing (2026-06-17 loop⁷ cont.³) — 14 定理目、family の最後の foundation
+
+**✅ `exists_typeP_neighbor_mem_sigma`**: p prime, p|K ⟹ ∃ type-P neighbor N (¬conj, Z≤N) with **p∈σ(N)**。
+line X∈ℰ_p¹(K) (Cauchy in K) → partner N (`exists_typeP_partner`) → X≤Msigma N → p∈σ(N)。M 自身 (σ-prime 側)
+と合わせて **coverage ⋃σ(M_i)⊇π(Z)** ⟹ ⊔K_i*=Z。
+
+**▶ 残り = family Finset assembly (1 大統合) — 全 foundation 揃った**:
+14.7 の残務は本質的に **1 つの大きな統合証明**:
+1. 族 ℱ={M}∪{neighbors} の Finset 化 (Fintype(Subgroup G)+DecidablePred、または Set.Finite.toFinset)。
+2. per-member K_i*=Z⊓M_σ(N): `exists_neighbor_kappaHall_swap` で swap → K_i*⊴Z (commute); σ-disjoint で coprime;
+   `exists_typeP_neighbor_mem_sigma`+M で coverage ⊔K_i*=Z。
+3. **z=∏k_i*** = `card_iSup_of_pairwise_commute_coprime` (commute+coprime、⊔=Z)。
+4. **T=Z−⋃K_i* TI** (Prop14.2(d)) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)| → density 不等式
+   (`ncard_sdiff_biUnion_subgroup`+14.5(c)+`half_lt`) → **n=1 collapse** (Prop14.2(g): |K_i| 素数=∏_{j≠i}k_j*) →
+   Mstar+covering → `typeP_duality` close。
+5. **part(h)**。
+
+**本 loop⁷ 累計 14 定理** (swap 7 + density/tools 5 + per-neighbor package 1 + coverage 1)、全 S14 内 sorry-free +
+axiom-clean + AxiomsCheck。**14.7 の building block は全て landing**、残りは family Finset の組立統合のみ。

@@ -5112,6 +5112,38 @@ theorem exists_neighbor_kappaHall_swap [Finite G] (hG : OddOrder.BG.IsMinimalSim
       Fact.out hX hXK hXNσ hKNN hKN
   exact ⟨KN, hKNN, hKN, hswap, typeP_neighbor_Kstar_eq_Z_inf_Msigma hKNN hKN hswap⟩
 
+/-- **BG 14.7, coverage of `κ(M)`-primes** (mmd L4007): every prime `p ∣ |K|` lies in `σ(N)` for
+some nonconjugate type-`P` neighbour `N` containing `Z`.  A line `X ∈ ℰ_p¹(K)` (Cauchy in `K`) has
+a partner `N ∈ 𝓜(N_G(X))` (`exists_typeP_partner`) with `X ⊆ M_σ(N)`, so `p ∈ σ(N)`.  Together with
+`M` itself (covering `σ(M) ⊇ π(K*)`), this gives the coverage `⋃ σ(Mᵢ) ⊇ π(Z)` that forces
+`⨆ Kᵢ* = Z`. -/
+theorem exists_typeP_neighbor_mem_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} (hp : p.Prime) (hpK : p ∣ Nat.card ↥K) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧ IsTypeP N ∧ ¬ IsConjugateSubgroup M N ∧
+      p ∈ OddOrder.BG.Ch3.S10.sigma N ∧ K ⊔ Kstar ≤ N := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+  have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+  have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+  obtain ⟨N, hNmem, hnc, hZN, hXNσ, _, hPN⟩ :=
+    exists_typeP_partner hG hM hP hKM hK hKstar hU hXelem hXK
+  have hNmax : N ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hNmem).1
+  -- `p ∈ σ(N)` since `X ⊆ M_σ(N)` and `p ∣ |X|`.
+  have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+      ⟨hp, (by rw [hXcard] : p ∣ Nat.card ↥(Subgroup.zpowers (x : G))).trans
+        (Subgroup.card_dvd_of_le hXNσ), Nat.card_pos.ne'⟩)
+  exact ⟨N, hNmax, hPN, hnc, hpσN, hZN⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
