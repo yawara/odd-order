@@ -3365,3 +3365,29 @@ cont.²⁶ で #1 を long pole とフラグ後、S07/(5.6) 機構を精査し�
 systematic だが multi-session core。FPF tower (cont.²⁶、H/H′ 実データ済) は別 obligation で独立に valid。
 **▶ 要ユーザー判断**: (a) (5.6) reweighting 着手 (endpoint A 完遂路、multi-session) / (b) FPF tower 完成優先 /
 (c) endpoint B/C/D/E redirect。**正本=本 cont.²⁸ + chatgpt_answer.md。#1=systematic (5.6) reweight、sidestep 無し確定。**
+
+### session 43 cont.³⁰: FPF tower H′/W₂ 枝の build recipe + (5.6) core = xAdjoinStep monolith 確認
+両残務とも focused context 向き。次セッションが直接実行できるよう recipe を記録 (maxed context での careful build 回避)。
+
+**FPF tower H′/W₂ 枝** (`|W₁| ∣ |H′:W₂|−1`、cont.²⁶ tower の残・hfpf 完成に必要): H/H′ (`caseB_W1_dvd_index_commutator`,
+`3335a772`) の mirror だが nested ゆえ ~100 行・要注意:
+- action setup: `actH : MulDistribMulAction ↥W1 ↥H` (compHom conjugation) → commutator ↥H は characteristic で
+  W₁-invariant (`hMinv_comm`) → **`IsFrobeniusAction.invariantSubgroupMulDistribMulAction (commutator ↥H) hMinv_comm`**
+  で `MulDistribMulAction ↥W1 ↥(commutator ↥H)`。**smul-coercion は定義的**: `(a•y : ↥(commutator ↥H)).val = a •_H (y:↥H)`
+  (FrobeniusActionTI:80、`⟨fun a m => ⟨a•(m:N), …⟩⟩`)。⟹ `((a•y:↥(commutator ↥H)):↥L) = (a:L)(y:L)(a:L)⁻¹` (H/H′ の hsmul 再用)。
+- M = `(W2.subgroupOf H).subgroupOf (commutator ↥H)` (要 `W2.subgroupOf H ≤ commutator ↥H`、case-B hderiv)。
+  - **M.Normal**: W₂ central in H (case-B hW2cen) → W₂ ◁ H → M ◁ H′。
+  - **hMinv (M の W₁-invariance)**: W₂=C_H(W₁) は W₁-invariant (a•x=axa⁻¹、x が W₁ 中心化ゆえ a⁻¹ba も中心化 → axa⁻¹∈C_H(W₁)=W₂)。
+    ⚠ characteristic 不可ゆえこの centralizer 論法を要明示。
+  - **hfix**: a•y=y → (a:L)(y:L) 可換 → (y:L)∈C_L(a)⊓K=W₂ (centralizer_W2) → y∈M。H/H′ の discharge を H′ レベルで mirror。
+- `W1_dvd_index_of_fixedPoints_le (H:=↥(commutator ↥H)) hCop M hMinv hfix` → `|W₁| ∣ M.index−1 = |H′:W₂|−1`。
+- 最後に **assembly**: `caseB_W1_dvd_index_commutator` (H/H′) + 上記 (H′/W₂) + `two_mul_add_one_sq_le_index_of_chain`
+  (cont.²⁶ `0a084543`) → 完全 `(2|W₁|+1)²≤|H:W₂|` = hfpf。⟹ `false_of_caseB_break_of_bounds` の hfpf 入力完成。
+
+**(5.6) reweighting core**: `xAdjoinStep` (S08CP1:2262、189 行 τ₂) は norm-1 (`hχχ=1`/`hchi1chi1=1`/`hmemortho` 対角=1) を
+**全体に thread した monolith** — clean な incremental factoring 無し。weighted 版は ChatGPT Q4 を正本に copy+modify
+(射影係数 1/‖χᵢ‖²)、major focused build。
+
+**📍 session 43 cont 総括 (14 commits)**: FPF tower 8 Lean (H/H′ 実データ) + ChatGPT #1 verdict (sidestep 無し) +
+(5.6) 完全 scoping (X-sum 済、core=weighted xAdjoinStep)。残 = (A) FPF H′/W₂+assembly [bounded・上記 recipe] /
+(B) (5.6) core [xAdjoinStep weighted・major]。両者 focused context 推奨。**正本=本 cont.³⁰ + s56_reweighting_plan.md。**
