@@ -1957,6 +1957,47 @@ theorem exists_minimal_normalOver [Finite G] {N Q0 T : Subgroup G}
   exact ⟨Q1, hQ0Q1, hQ1T, hQ1norm, fun H hQ0H hHQ1 hHnorm =>
     hQ1min ⟨hQ0H, hHQ1.trans hQ1T, hHnorm⟩ hHQ1⟩
 
+/-- **Chief factor over `Q₁` normalized by `D` and `K₁`** (Theorem 15.2 brick D construction,
+mmd L4194).  If `Q₁ < Q` with `Q` nilpotent, `Q ⊴ M` (`Q ≤ M ≤ N_G(Q)`), and `D, K₁ ≤ M ⊓ N_G(Q₁)`,
+then there is a chief factor `Q₂/Q₁` with `Q₁ < Q₂ ≤ Q` whose `Q₂` is normalized by `D` and `K₁`
+and itself normalizes `Q₁`.
+
+Ambient `N = M ⊓ N_G(Q₁)` contains `D` and `K₁` and normalizes `T = N_Q(Q₁) = Q ⊓ N_G(Q₁) ≤ Q`
+(`N ≤ N_G(Q)` since `N ≤ M ≤ N_G(Q)`, and `N ≤ N_G(N_G(Q₁))` by `le_normalizer`, so `N ≤ N_G(T)` by
+`le_normalizer_inf`).  `lt_inf_normalizer_of_lt_of_isNilpotent` gives the nontrivial top
+`Q₁ < N_Q(Q₁)`; `exists_minimal_normalOver` then produces the minimal `N`-normal `Q₂` over `Q₁`
+inside `T`, and `Q₂ ⊴ N` transfers to `D, K₁ ≤ N_G(Q₂)`. -/
+theorem exists_chiefFactor_over_normalized [Finite G]
+    {M Q Q1 D K1 : Subgroup G} [Group.IsNilpotent ↥Q]
+    (hQ1Q : Q1 < Q) (hQM : Q ≤ M) (hMQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hDN : D ≤ M ⊓ Subgroup.normalizer (Q1 : Set G))
+    (hK1N : K1 ≤ M ⊓ Subgroup.normalizer (Q1 : Set G)) :
+    ∃ Q2 : Subgroup G, Q1 < Q2 ∧ Q2 ≤ Q ∧
+      D ≤ Subgroup.normalizer (Q2 : Set G) ∧
+      K1 ≤ Subgroup.normalizer (Q2 : Set G) ∧
+      Q2 ≤ Subgroup.normalizer (Q1 : Set G) := by
+  -- Nontrivial chain top `Q₁ < N_Q(Q₁) = Q ⊓ N_G(Q₁)`.
+  have hQ1T : Q1 < Q ⊓ Subgroup.normalizer (Q1 : Set G) :=
+    lt_inf_normalizer_of_lt_of_isNilpotent hQ1Q
+  -- `T = N_Q(Q₁) ≤ N = N_M(Q₁)`.
+  have hTN : Q ⊓ Subgroup.normalizer (Q1 : Set G) ≤ M ⊓ Subgroup.normalizer (Q1 : Set G) :=
+    inf_le_inf hQM le_rfl
+  -- `N` normalizes `T` (it normalizes `Q` via `M ≤ N_G(Q)` and `N_G(Q₁)` via `le_normalizer`).
+  have hN_normT : M ⊓ Subgroup.normalizer (Q1 : Set G) ≤
+      Subgroup.normalizer ((Q ⊓ Subgroup.normalizer (Q1 : Set G) : Subgroup G) : Set G) :=
+    le_normalizer_inf (inf_le_left.trans hMQ) (inf_le_right.trans Subgroup.le_normalizer)
+  have hTnorm : ((Q ⊓ Subgroup.normalizer (Q1 : Set G)).subgroupOf
+      (M ⊓ Subgroup.normalizer (Q1 : Set G))).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hTN).mpr hN_normT
+  -- Minimal `N`-normal subgroup over `Q₁` inside `T`.
+  obtain ⟨Q2, hQ1Q2, hQ2T, hQ2norm, _⟩ := exists_minimal_normalOver hQ1T hTnorm
+  have hQ2Q : Q2 ≤ Q := hQ2T.trans inf_le_left
+  have hQ2Q1norm : Q2 ≤ Subgroup.normalizer (Q1 : Set G) := hQ2T.trans inf_le_right
+  -- `Q₂ ⊴ N`, so `N`—and hence `D`, `K₁`—normalizes `Q₂`.
+  have hN_normQ2 : M ⊓ Subgroup.normalizer (Q1 : Set G) ≤ Subgroup.normalizer (Q2 : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (hQ2T.trans hTN)).mp hQ2norm
+  exact ⟨Q2, hQ1Q2, hQ2Q, hDN.trans hN_normQ2, hK1N.trans hN_normQ2, hQ2Q1norm⟩
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Coprime lifting over a normal `D`-invariant subgroup** (`§14`-independent, reusable; the
 practical non-abelian form of `N = ⁅N,D⁆·C_N(D)` instantiated at a *given* normal subgroup `M₀`
