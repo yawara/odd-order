@@ -4812,6 +4812,12 @@ mmd L4003): every member `N` of the type-`P` family (`IsZFamilyMember`: `N = M` 
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_member_data
 
+/-! **BG 14.7, family pairwise nonconjugate** (`S14_TypePCounting`,
+`typeP_family_pairwise_nonconjugate`, mmd L4015): any two distinct `IsZFamilyMember`s are
+nonconjugate (per-member data + `neighbor_pair_nonconjugate`).  Feeds Lemma 14.5(b).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_pairwise_nonconjugate
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

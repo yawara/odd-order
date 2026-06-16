@@ -5458,6 +5458,24 @@ theorem typeP_family_member_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       hswap ▸ sup_le hKNN (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le N)),
       KN, hKNN, hKN, hswap, hcanon, hne⟩
 
+/-- **BG 14.7, the family is pairwise nonconjugate** (mmd L4015): any two distinct members of the
+type-`P` family are nonconjugate.  Extracts each member's swap data
+(`typeP_family_member_data`) and applies `neighbor_pair_nonconjugate`.  Feeds Lemma 14.5(b)
+(pairwise disjointness of the `𝒞_G(M̃ᵢ)`). -/
+theorem typeP_family_pairwise_nonconjugate [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ¬ IsConjugateSubgroup N₁ N₂ := by
+  obtain ⟨hN₁max, hP₁, _, K₁, hK₁N₁, hK₁, hsw₁, _, _⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, hP₂, _, K₂, hK₂N₂, hK₂, hsw₂, _, hne₂⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  exact neighbor_pair_nonconjugate hG hN₁max hP₁ hK₁N₁ hK₁ hN₂max hP₂ hK₂N₂ hK₂ hsw₁ hsw₂ hne₂ hne
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
