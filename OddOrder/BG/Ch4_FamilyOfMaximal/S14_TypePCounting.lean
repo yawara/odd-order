@@ -5035,6 +5035,32 @@ theorem card_iSup_of_pairwise_commute_coprime [Finite G] {ι : Type*} [Fintype �
     Subgroup.noncommPiCoprod_range
   rw [← hrange, ← Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv, Nat.card_pi]
 
+/-- **BG 14.7, the canonical form of `Kᵢ*`** (mmd L4009): once the swap gives `Z = Kₙ ⊔ Kₙ*`
+(`Kₙ* = C_{Nσ}(Kₙ)`), the factor `Kₙ*` is exactly `Z ⊓ Nσ` — the `σ(N)`-part of `Z`.  This
+removes the dependence of `Kₙ*` on the chosen Hall `κ(N)`-subgroup `Kₙ`: it is the canonical
+`Z ⊓ M_σ(N)`, so the family `{Kᵢ*}` can be defined choice-free as `N ↦ Z ⊓ Nσ`.
+
+`⊆`: `Kₙ* ≤ Z` (a factor) and `Kₙ* ≤ Nσ`.  `⊇`: `Z ⊓ Nσ = (Kₙ ⊔ Kₙ*) ⊓ Nσ` is a `σ(N)`-group
+inside the product `Kₙ × Kₙ*`, so the `σ`-projection lands it in `Kₙ*`. -/
+theorem typeP_neighbor_Kstar_eq_Z_inf_Msigma [Finite G]
+    {N K Kstar KN : Subgroup G} (hKNN : KN ≤ N)
+    (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N))
+    (hZeq : K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))) :
+    OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+      = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N := by
+  classical
+  refine le_antisymm (le_inf (hZeq ▸ le_sup_right) inf_le_left) ?_
+  rw [hZeq]
+  have hKNMσbot : KN ⊓ OddOrder.BG.Ch3.S10.Msigma N = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hrKN hrMσ
+    exact (kappaHall_isPiSubgroup_sigmaCompl hKNN hKN r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrKN, Nat.card_pos.ne'⟩))
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrMσ, Nat.card_pos.ne'⟩))
+  exact le_centralizerFactor_of_le_sup_of_le_Msigma inf_le_right inf_le_left hKNMσbot
+    inf_le_left inf_le_right
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

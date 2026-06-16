@@ -4718,6 +4718,13 @@ range `⨆ Hᵢ`).  Gives `z = ∏ kᵢ*` for the `Kᵢ*`.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.card_iSup_of_pairwise_commute_coprime
 
+/-! **BG 14.7, canonical `Kᵢ*`** (`S14_TypePCounting`, `typeP_neighbor_Kstar_eq_Z_inf_Msigma`,
+mmd L4009): given the swap `Z = Kₙ ⊔ Kₙ*`, the factor `Kₙ* = C_{Nσ}(Kₙ)` equals `Z ⊓ M_σ(N)` —
+the `σ(N)`-part of `Z`, independent of the chosen Hall `κ(N)`-subgroup `Kₙ`.  Lets the family
+`{Kᵢ*}` be defined choice-free as `N ↦ Z ⊓ M_σ(N)`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_eq_Z_inf_Msigma
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
