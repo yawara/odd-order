@@ -287,4 +287,87 @@ theorem exists_glue_nu_columnSum_Yset
   simp only [map_sum]
   exact Finset.sum_congr rfl fun i _ => hνgrid _ ⟨(χ₂, i), rfl⟩
 
+/-- **(6.8.2) case-(B), the `certainTypeSet ⊔ Y` base union is coherent** — assembly.
+
+Glues the column base `certainTypeSet h46 k` (coherent via `certainTypeSet_isCoherent_tau_canonical`)
+with `Y` (coherent via `coherentYset`) into `IsCoherent hyp.tau (certainTypeSet ∪ Y)` through the §7
+diagonal-aware engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`.  Every
+mechanical engine input is discharged here from established facts:
+
+* `ν`/`hagreeX`/`hagreeY` — the grid-glue map `exists_glue_nu_columnSum_Yset` (its column agreement
+  *is* `certainTypeExtension`, which is the canonical coherence extension because `IsCoherent.congrMap`
+  preserves `.extension`);
+* `hsrc_ortho` — `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` over the column-`Y` orthogonality
+  `inner_columnSum_Yset_eq_zero`;
+* `hmixed` — `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` (both the image and
+  the source inner products vanish);
+* `hgen` — `hgen_withDiagonal_certainTypeSet` (the `(6.8.1)` generation, session 45);
+* `hDτ` — reduces by `ν`-linearity to the **single** `(6.8.2.3)` obligation `hanchored`.
+
+`hanchored` is the faithful `(6.8.2.3)` anchored-image identity for the reference column `μ_{k0}`:
+`(μ_{k0} − a₀·η₁)^τ = ν(μ_{k0}) − a₀·η₁^{τ₁}` (with `ν(μ_{k0}) = certainTypeExtension(μ_{k0})` and
+`η₁^{τ₁} = coherentYset.extension η₁`).  It is the certain-type per-constituent decomposition +
+pinning content (`columnDecompositionTau` / `per_constituent_Y_eq_smul`), to be discharged separately;
+this lemma isolates it as the lone remaining input of the case-(B) base glue. -/
+noncomputable def coherentCertainTypeSet_union_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hHK : h46.K = H) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {k0 : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (hk0mem : OddOrder.Peterfalvi.S06.columnSum h46 k0
+      ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k)
+    {a₀ : ℕ}
+    (ha₀ : (OddOrder.Peterfalvi.S06.columnSum h46 k0 : ClassFunction ↥L ℂ) 1
+      = (a₀ : ℂ) * η₁ 1)
+    (hanchored : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 k0 - a₀ • η₁)
+      = OddOrder.Peterfalvi.S06.certainTypeExtension h46
+          (OddOrder.Peterfalvi.S06.columnSum h46 k0)
+        - a₀ • hyp.coherentYset.extension η₁) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet h46 k ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  -- `ν` is data (an `IntegralCharacterMap`); extract it via choice (the `∃` cannot be destructured
+  -- into the `IsCoherent` data goal), keeping its agreement spec as `hνcol`/`hνY`.
+  have hspec := (exists_glue_nu_columnSum_Yset hyp h46 hW1).choose_spec
+  set ν := (exists_glue_nu_columnSum_Yset hyp h46 hW1).choose with hνdef
+  have hνcol := hspec.1
+  have hνY := hspec.2
+  -- `hagreeX`: column agreement is `certainTypeExtension = canonical coherence extension`.
+  have hagreeX : ∀ x ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k,
+      ν x = (hyp.certainTypeSet_isCoherent_tau_canonical h46 hk).extension x := by
+    rintro x ⟨χ₂, -, -, rfl⟩
+    exact hνcol χ₂
+  -- `hsrc_ortho`: column ⊥ `Y` (source level) spread to the spans.
+  have hpair : ∀ χ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k, ∀ η ∈ hyp.Yset,
+      ClassFunction.inner χ η = 0 := by
+    rintro χ ⟨χ₂, -, -, rfl⟩ η hη
+    exact inner_columnSum_Yset_eq_zero hyp h46 hW1 hη χ₂
+  -- `hmixed`: both `⟨ν x, ν y⟩` (image side) and `⟨x, y⟩` (source side) vanish.
+  have hmixed : ∀ x ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y := by
+    rintro x ⟨χ₂, -, -, rfl⟩ y hy
+    rw [hνcol χ₂, hνY y hy,
+      inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero hyp h46 hHK hy χ₂,
+      inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂]
+  -- `hDτ`: `ν`-linearity reduces the cross-diagonal image to `hanchored`.
+  have hDτ : ∀ d ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 k0 - a₀ • η₁} :
+        Set (ClassFunction ↥L ℂ)), ν d = hyp.tau d := by
+    intro d hd
+    rw [Set.mem_singleton_iff] at hd
+    subst hd
+    rw [hanchored, map_sub, map_nsmul, hνcol k0, hνY η₁ hη₁]
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    (hyp.certainTypeSet_isCoherent_tau_canonical h46 hk) hyp.coherentYset
+    ν hagreeX hνY
+    (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed
+    {OddOrder.Peterfalvi.S06.columnSum h46 k0 - a₀ • η₁} hDτ
+    (hgen_withDiagonal_certainTypeSet hyp h46 hHK hk0mem hη₁ ha₀)
+
 end OddOrder.Peterfalvi.S08
