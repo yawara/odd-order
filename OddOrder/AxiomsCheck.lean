@@ -4777,6 +4777,14 @@ coverage `⋃ σ(Mᵢ) ⊇ π(Z)` forcing `⨆ Kᵢ* = Z`.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_neighbor_mem_sigma
 
+/-! **BG 14.7, internal-direct-product factor normality** (`S14_TypePCounting`,
+`sup_le_normalizer_inf_of_commute`): in `A ⊔ B` with `B ≤ C_G(A)`, both factors are normal,
+`A ⊔ B ≤ N_G(A) ⊓ N_G(B)`.  Applied to the swap `Z = K_N ⊔ K_N*` it makes `K_N`, `K_N*` normal in
+`Z` (input to pairwise commutativity, pairwise nonconjugacy, and the `n = 1` collapse).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sup_le_normalizer_inf_of_commute
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
