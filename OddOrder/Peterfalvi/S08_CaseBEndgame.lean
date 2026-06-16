@@ -133,6 +133,36 @@ theorem two_mul_add_one_sq_le_index_of_chain {K : Type*} [Group K] [Finite K]
     rw [mul_comm]; exact (Subgroup.relIndex_mul_index hWM).symm
   exact two_mul_add_one_sq_le_of_two_fpf_factors hw1odd h1odd hMgt h1dvd h2odd hWMgt h2dvd hprod
 
+/-- **(6.8.3) case-(B) fixed-point-free divisibility from a fixed-point bound.**  The mechanical
+core of the case-(B) `hfpf` derivation: a finite group `W` acting on a finite group `H` with
+`(|W|, |H|) = 1`, whose nonidentity elements fix only points of a normal `W`-invariant subgroup
+`M` (`a • x = x → x ∈ M`), induces a *fixed-point-free* action on the quotient `H ⧸ M`
+(`IsFrobeniusAction.quotient_of_fixedPoints_le`); Burnside's `card_modEq_one` then gives
+`|H : M| ≡ 1 (mod |W|)`, i.e. `|W| ∣ |H : M| − 1`.
+
+Applied twice in the (6.8.3) extension with `W = W₁`: once to `M = H′ = [H,H]` (the fixed points
+`C_H(W₁) = W₂ ⊆ H′`), giving `|W₁| ∣ |H:H′| − 1`; once to the restricted action on `H′` with
+`M = W₂`, giving `|W₁| ∣ |H′:W₂| − 1`.  These are exactly the two divisibility inputs of
+`two_mul_add_one_sq_le_index_of_chain`.  The remaining residual is the certain-type fixed-point
+bridge `C_H(W₁) = W₂` (`S06 …centralizer_W2`) translating into the `hfix` hypothesis here. -/
+theorem W1_dvd_index_of_fixedPoints_le {H W : Type*}
+    [Group H] [Finite H] [Group W] [Finite W] [MulDistribMulAction W H]
+    (hCop : Nat.Coprime (Nat.card W) (Nat.card H))
+    (M : Subgroup H) [M.Normal] (hMinv : ∀ a : W, ∀ m ∈ M, a • m ∈ M)
+    (hfix : ∀ a : W, a ≠ 1 → ∀ x : H, a • x = x → x ∈ M) :
+    Nat.card W ∣ M.index - 1 := by
+  letI : MulDistribMulAction W (H ⧸ M) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction M hMinv
+  have hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusAction W (H ⧸ M) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le hCop M hMinv hfix
+  haveI : Fintype W := Fintype.ofFinite _
+  haveI : Fintype (H ⧸ M) := Fintype.ofFinite _
+  have hmod : Nat.card (H ⧸ M) ≡ 1 [MOD Nat.card W] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrob.card_modEq_one
+  have hidx : M.index = Nat.card (H ⧸ M) := rfl
+  rw [hidx]
+  exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
