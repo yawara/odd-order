@@ -1095,3 +1095,29 @@ x,x'∈⟨g⟩ commute, x' σ(M)'-elt。~40行。
   g∉M → C_G(x)⊄M → g σ(N)'-elt of N → 14.4(e) complement → g∈(M∩N)^a → g∈M^a, x∈M_σ^a → M^a 選べた → g∉M 矛盾。
   deps = Cor14.3/14.4(c)(e)/13.9/R(x)=C_{Mσ}(x') 全 repo 在。
 **14.6 着地で 14.7 へ。新 leaf 化 (S14_SigmaDecomposition) は 14.6 規模で hub prefix-split 推奨 (S14 既 4175行)。**
+
+### ✅✅ σ-decomposition existence 機構 COMPLETE (2026-06-16 loop⁴ 続き², commits d24bdd7f + a0bbfefa)
+
+**3 lemma すべて sorry-free + axiom-clean + AxiomsCheck:**
+- `length_one_of_isPiElement_sigma` (keystone): σ(M)-element x≠1 ⟹ ℓ_σ(x)=1。
+- `exists_mem_sigma_of_prime_dvd_card` (foundation 2): 全素数 p||G| ∈ 或る σ(M)。Sylow P non-normal
+  (G 非可解⟹非 p-group, `IsPGroup.isNilpotent`+`IsNilpotent.to_isSolvable`) → N_G(P) ≤ maximal M
+  (`eq_top_or_exists_le_coatom`) → P = M の Sylow p (p-parts 一致, `Sylow.ofCard`+factorization) →
+  `mem_sigma_iff`。鍵 API: `Sylow.ne_bot_of_dvd_card`/`Sylow.card_eq_multiplicity`/`subgroupOf_map_subtype`。
+- `exists_length_one_factor` (extraction): g≠1 → p||g| → σ(M) → 2-block split (`exists_isPiElement_mul`) →
+  σ(M)-part x が ℓ_σ=1。返り = (x,x',M, g=xx', commute, x,x'∈⟨g⟩, ℓ_σ(x)=1, M maximal, x σ(M)-elt, x' σ(M)'-elt)。
+
+**⟹ 14.6 の「σ-length-1 factor 抽出」前提は完全に揃った。残りは 14.6 dichotomy proof 本体。**
+
+**▶ 次 = Lemma 14.6 dichotomy 本体** (intricate, 14.7 消費形と結合設計要):
+- statement: g∈G^# は排他的に (1) g=xx', ℓ_σ(x)=1, x'∈R(x) / (2) g=yy', ℓ_σ(y)=1, y'=非自明
+  `IsPiElement (kappa M) y'` ∈ C_M(y), M∈𝓜_σ(y)∩IsTypeP。**14.7 が要するのは exclusivity 方向**
+  (type-2 ⟹ ¬type-1 = g∉H̃; "T∩H̃ empty" L4021)。exhaustivity は "exactly one" 完全性用。
+- 定義は全在: `kappa`/`IsTypeP`/`maximalSigmaSubgroupsOfElement`/`Rsub`/`Mtilde`。𝓜_P(y)=`{M∈𝓜_σ(y)|IsTypeP M}` inline。
+- 排他性 proof: 2-block uniq (`isPiElement_mul_unique`) で y∈{x,x'} → Cor14.3(`sigma_diagnostic`)+14.4(c) →
+  y=x' → x'∈R(x)⊆N_σ, y∈M∩N_σ → 13.9 で M,N conj → κ(M) vs τ₂(N) 矛盾。~60-80行。
+- 全域性 proof: ℓ_σ(g)>1 [¬1], `exists_length_one_factor` で x, g=xx', M∈𝓜_σ(x), N∈𝓜(C_G(x))。
+  g∈M → x' σ(M)'∧¬κ(M) → Cor14.3 ℓ_σ(x')=1, 𝓜(C_G(x'))={M} → x∈C_{Mσ}(x')=R(x') → (1) 矛盾。
+  g∉M → C_G(x)⊄M → g σ(N)'-elt of N → 14.4(e) complement → g∈(M∩N)^a → x∈M_σ^a → M^a 選べた → 矛盾。~100-150行。
+- 推奨: **14.7 が consume する exclusivity を named lemma 化**してから full "exactly one"。新 leaf S14_SigmaDecomposition
+  (S14 既 4250行) へ移すなら hub prefix-split (issue 0069)。
