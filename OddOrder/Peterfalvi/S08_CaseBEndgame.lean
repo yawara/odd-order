@@ -327,6 +327,41 @@ theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
     ((cert.W2.subgroupOf H).subgroupOf (commutator ↥H)) hMinv hfix
   exact hdvd
 
+/-- **(6.8.3) case-(B) full FPF bound** `(2|W₁|+1)² ≤ |H:W₂|`, assembled from the Sibley data.
+Combines the two FPF divisibilities `caseB_W1_dvd_index_commutator` (H/H′) and
+`caseB_W1_dvd_relIndex_commutator` (H′/W₂) through the chain bound
+`two_mul_add_one_sq_le_index_of_chain`, discharging the group-order oddnesses from the odd order of
+`L` (`card_L_odd`).  The two section-nontriviality facts `1 < |H:H′|` (`H` non-abelian) and
+`1 < |H′:W₂|` (`W₂ ≠ H′`, the (6.8.3) `Z ≠ H′` case) remain as inputs — both are (6.8.3)-context
+hypotheses.  This is exactly the `hfpf` input to `false_of_w2_break_arith` (with
+`|H:W₂| = (cert.W2.subgroupOf H).index`). -/
+theorem caseB_fpf_bound {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)] (hyp : SibleyDadeHypothesis G L H)
+    (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
+    (hW2cen : cert.W2 ≤ Subgroup.center ↥L)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    (hMgt : 1 < (commutator ↥H).index)
+    (hWMgt : 1 < (cert.W2.subgroupOf H).relIndex (commutator ↥H)) :
+    (2 * Nat.card ↥hyp.W1 + 1) ^ 2 ≤ (cert.W2.subgroupOf H).index := by
+  letI : H.Normal := hyp.H_normal
+  have hW2le : cert.W2.subgroupOf H ≤ commutator ↥H := by
+    rw [← commutator_subgroupOf_self]
+    intro x hx
+    exact Subgroup.mem_subgroupOf.mpr (hW2 (Subgroup.mem_subgroupOf.mp hx))
+  have oddOf : ∀ {a : ℕ}, a ∣ Nat.card ↥L → Odd a := by
+    intro a ha
+    rcases ha with ⟨c, hc⟩
+    rcases Nat.even_or_odd a with he | ho
+    · exact absurd (hc ▸ he.mul_right c) (Nat.not_even_iff_odd.mpr hyp.card_L_odd)
+    · exact ho
+  have hKodd : Odd (Nat.card ↥H) := oddOf (Subgroup.card_subgroup_dvd_card H)
+  have hw1odd : Odd (Nat.card ↥hyp.W1) := oddOf (Subgroup.card_subgroup_dvd_card hyp.W1)
+  exact two_mul_add_one_sq_le_index_of_chain hW2le hKodd hw1odd hMgt hWMgt
+    (caseB_W1_dvd_index_commutator hyp cert hK hW1 hW2 hcop)
+    (caseB_W1_dvd_relIndex_commutator hyp cert hK hW1 hW2 hW2cen hcop)
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
