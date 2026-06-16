@@ -3641,3 +3641,37 @@ bundles は **dischargeable** (`caseB_column_bundle` S08CBA:921 = theorem、`cas
 忠実形式化 (reconstruction、research gap でない) だが **multi-hundred LOC の dedicated focused build**。
 loop/end-of-session で rush すると thrash する実績ゾーン。**▶ 次 = fresh focus で (3) X=cTE pinning から
 (最 hard・他を gate)、または (1)(2) wiring を先に。正本=本 cont.⁴。**
+
+### session 47: ✅ columnDecompositionTau の機械的入力 2 本 landed + 🔬 norm-論法ショートカットの不在を確定
+2 commit (実 Lean 1 = `7fbbdf32`)。endpoint A 継続。**columnDecompositionTau を column に直接適用する経路の
+「要構成」入力を 2 本 landed**(S08_CaseBXunionY, axiom-clean):
+- ✅ **`columnSum_sub_smul_Yset_support`** = `(μ_j − a·η₁)` の H^#-supportedness。1 で消失(degree match `ha`)+
+  μ_j は A∪{1} 外で消失((4.7) `columnSum_support_subset`)+ η₁=Ind_H^L θ∈S は正規 H 外で消失
+  (`support_induce_subset_of_normal`、`Yset_subset_S`+`S_eq`)。= columnDecompositionTau `hSdiff` の μ−a·η₁ 半分
+  (μ−μ̄ 半分は既存 `columnDiff_support_subset`)。
+- ✅ **`tau_columnSum_sub_smul_mem_ZIrr`** = `(μ_j − a·η₁)^{hyp.tau} ∈ ZIrr G`。supported+virtual ⟹ image virtual
+  (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`、#1 経由)。= columnDecompositionTau `htau1_mema`。
+
+**🎯 これで columnDecompositionTau (S08CBC2:1822) は column に対し完全構築可能** — 全入力が揃った:
+hdeg=`columnSum_inv_apply_one`✅ / hmapagree=`caseB_column_mapagree`✅ / hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系✅ /
+hSdiff={`columnDiff_support_subset`✅, `columnSum_sub_smul_Yset_support`✅(NEW)} / htau1_mema=`tau_columnSum_sub_smul_mem_ZIrr`✅(NEW)。
+⟹ D := columnDecompositionTau … で `hyp.tau(μ_j − a·η₁) = D.X − D.Y` (D.tau1=hyp.tau, `D.tau1_image`) が得られる。
+**唯一残 = pinning `D.X = certainTypeExtension(μ_j)` ∧ `D.Y = a·ν₁`** (ν₁=cY.ext η₁)。
+
+**🔬 norm-論法は hard core を回避しない(将来セッション向け・再調査不要)**: 独立に norm 論法
+`‖T − RHS‖²=0` (T=τ(μ_j−a·η₁), RHS=cTEμ−a·ν₁) を精査した結論 — **ショートカット無し**。
+- `⟨T,T⟩=‖RHS‖²=w₁+a₀²` は FREE: isometry `dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj`
+  (**hyp.tau はこの abbrev = defeq**, μ_j−a·η₁ supported via NEW lemma) + 列 Gram `columnFamily_mu_sum_inner`
+  (⟨μ_j,μ_j⟩=w₁, ⟨μ_j,μ̄_j⟩=0) + `inner_columnSum_Yset_eq_zero` + `certainTypeExtension_columnSum_inner`
+  (cTE 等長) + `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero` (cTEμ⊥ν₁) + ν₁ norm 1。
+- **しかし `⟨T,RHS⟩=w₁+a₀²` の cross-term は hard**: `⟨T,cTEμ⟩=w₁` (hXmass) と `⟨T,ν₁⟩=−a₀` (hYmass) に分解されるが、
+  **個別に isometry で取り出せない**。τ(μ_j−μ̄_j)=cTEμ−cTEμ̄ は `⟨T,cTEμ⟩−⟨T,cTEμ̄⟩=w₁` の 1 式しか与えず、
+  cTEμ 単体は **supported vector の τ-像でない**(μ_j 単体は μ_j(1)≠0 で unsupported)ため、分離する第 2 の独立 isometry 関係が無い。
+- reciprocity `inner_tau_eq_inner_restrict` 経由でも hXmass = `⟨μ_j−a₀η₁, Res_L(cTEμ)⟩` で、**Res_L(certainTypeExtension μ_j)
+  = Res_L(δ_j ∑ω_{ij}^σ) の構造**(σ-image の制限)に bottom-out — 同じ深い (6.8.2.3) 内容。
+- ⟹ **hard core は projection-coeff pinning と同一**: D.X=∑_{α∈R}coeff(α)·α で `coeff(false,i)=1 ∀i ∧ coeff(true,i)=0 ∀i`
+  を示すこと(R=`certainTypeR.imageSet`={δ_j ω_{ij}^σ}∪{−δ_j ω_{ij'}^σ}、2w₁ 個; cTEμ=∑_i certainTypeRImage(false,i))。
+
+**▶▶ 次 = pinning 本体**: per-φ 経路 (`caseB_per_phi_anchored_fromYset` + `per_constituent_Y_eq_smul`、aggregate
+(6.8.2.2) `exists_decomposition_caseB` 経由で D.Y=a·ν₁ を強制 → coeff 計算で D.X=cTEμ) が最有力。
+multi-hundred LOC・dedicated focused build。loop/end-of-session 不適。**正本=本 session 47。**
