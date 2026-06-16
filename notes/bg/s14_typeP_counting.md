@@ -911,3 +911,36 @@ sharp transitivity を要するため、14.7 完全証明には **§14 で 14.4 
 
 **見積もり訂正**: memory の「~2-3.5 session」は楽観的。14.4 sharp transitivity だけで 1-2 session、
 全 chain で realistically 5-10 session。これが FT critical path の真の long pole。
+
+### ✅ 14.4 sharp transitivity DONE + 🔬 σ-decomposition は必須前提と判明 (2026-06-16 lane-h loop 続き)
+
+**✅ Thm 14.4 sharp transitivity COMPLETE** (commit `74bc9678`, sorry-free + axiom-clean, full build 3832 jobs):
+`sigmaLength_one_centralizer_structure` に **4th per-M conjunct** = 正則作用を追加。N (14.4 の ∃!) と
+R(x)=N_σ∩C_G(x) に対し、∀L∈𝓜_σ(x) ∃! r∈R(x) で `conj r•M = L`。証明は既存 ∃!N+補群(hsigmaInf₂/hsigmaSup₂)
+を再利用し hRx の v-construction を任意 L へ一般化 (fusion Thm10.1b → c=v·a 分解 → conj(x⁻¹vx)•M=conj v•M
++ freeness)。**これは §16 Theorem D の sorry だった部分を §14 で証明したもの。**
+
+**🔬 次の必須前提 = σ-decomposition theory (BG §1, L3791-3795) — repo 未形式化:**
+- BG def: σ(M) (conj-class reps) が π(G) を分割 → {σ_1,...,σ_s}。各 g∈G は **一意に** g=g_1⋯g_s
+  (pairwise commuting σ_i-elements, g_i∈⟨g⟩) と書ける = **巡回群 ⟨g⟩ の σ-分割による Hall 分解**。
+  ℓ_σ(g) = 非自明 g_i の個数。
+- repo 現状: `SigmaDecompositionData` は `length`+`length_one_iff` のみ (実分解なし)。L2615 に dummy D 構成あり。
+  **downstream (S15/S16/AppC/Pf) は SigmaDecompositionData を一切構成しない** (grep 確認)。
+- **しかし 14.7 (`typeP_duality`, D 引数なし) の証明は counting (14.5c/14.6) を要し、それらは σ-decomposition を
+  要する。14.7 の signature は consumer (S15:785/795/2170, S16:530) で固定ゆえ D 引数追加不可
+  ⟹ 14.7 証明内で実 σ-decomposition (D) を構成せねばならない。scaffold 退避不可。**
+- ⟹ **σ-decomposition は FT critical path の必須前提**。mathlib に element π-decomposition の既製補題なし
+  (`Nat.factorization`/`ZMod` CRT から構築要)。~1-2 session 見込。
+
+**改訂 gate chain (14.4 sharp transitivity 後):**
+```
+σ-decomposition theory (BG §1) ← 次の必須前提 (NEW, repo 未形式化)
+  ├─ σ-class partition of π(G) (Thm 13.9 disjoint + every-prime-in-some-σ(M))
+  ├─ element decomposition g=∏g_i (Hall components of ⟨g⟩) + uniqueness
+  └─ ℓ_σ def + SigmaDecompositionData の length とのbridge
+→ R(x) function (via 14.4 ∃!N choice) + M̃ = ⋃_{x∈M_σ^#} xR(x)
+→ Lem 14.5(a) xR(x)∩yR(y)=∅ (σ-decomp uniqueness) + (c) count (sharp transitivity 二重数え)
+→ Lem 14.6 dichotomy (σ-decomp + Cor14.3 + 14.4c)
+→ Thm 14.7 typeP_duality (counting 矛盾 n=1 + covering + part h)
+```
+realistically 6-10 session。memory「~2-3.5 session」は σ-decomposition 前提を見落としていた。
