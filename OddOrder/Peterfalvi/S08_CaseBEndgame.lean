@@ -100,6 +100,39 @@ theorem two_mul_add_one_sq_le_of_two_fpf_factors {w1 idxHHc idxHcZ idxHZ : ℕ}
     _ ≤ idxHHc * idxHcZ := Nat.mul_le_mul h1 h2
     _ = idxHZ := hprod.symm
 
+/-- **(6.8.3) case-(B) FPF index bound over a subgroup chain.**  The group-theoretic bridge from the
+abstract FPF bound `two_mul_add_one_sq_le_of_two_fpf_factors` to a concrete chain `W ≤ M ≤ K` in a
+finite group `K` of odd order (the Sibley instance is `K = ↥H`, `M = H′ = [H,H]`, `W = W₂` with
+`w1 = |W₁|`): all section indices `|K:M|`, `|M:W|` are odd (dividing the odd `|K|`), so the two
+fixed-point-free divisibilities `w1 ∣ |K:M| − 1` and `w1 ∣ |M:W| − 1` (the `card_modEq_one` outputs)
+force `|K:M|, |M:W| ≥ 2·w1 + 1` and `|K:W| = |K:M|·|M:W| ≥ (2·w1+1)²`.
+
+Only the two fixed-point-free divisibilities and the two section-nontriviality facts (`1 < |K:M|`,
+i.e. `M < K`; `1 < |M:W|`, i.e. `W < M`) remain as inputs — the oddness and the chain index identity
+are discharged here from `Odd (Nat.card K)`. -/
+theorem two_mul_add_one_sq_le_index_of_chain {K : Type*} [Group K] [Finite K]
+    {W M : Subgroup K} (hWM : W ≤ M) (hKodd : Odd (Nat.card K))
+    {w1 : ℕ} (hw1odd : Odd w1)
+    (hMgt : 1 < M.index) (hWMgt : 1 < W.relIndex M)
+    (h1dvd : w1 ∣ M.index - 1) (h2dvd : w1 ∣ W.relIndex M - 1) :
+    (2 * w1 + 1) ^ 2 ≤ W.index := by
+  -- every divisor of the odd `|K|` is odd
+  have oddDvd : ∀ {a : ℕ}, a ∣ Nat.card K → Odd a := by
+    intro a ha
+    rcases ha with ⟨c, hc⟩
+    rcases Nat.even_or_odd a with he | ho
+    · exact absurd (hc ▸ he.mul_right c) (Nat.not_even_iff_odd.mpr hKodd)
+    · exact ho
+  -- `|M:W|` divides `|K|` (via `|K|` of the subgroup `M`)
+  have hMcard : Nat.card ↥M ∣ Nat.card K := Subgroup.card_subgroup_dvd_card M
+  have h1odd : Odd M.index := oddDvd M.index_dvd_card
+  have h2odd : Odd (W.relIndex M) :=
+    oddDvd (dvd_trans ((W.subgroupOf M).index_dvd_card) hMcard)
+  -- chain index identity `|K:W| = |K:M|·|M:W|`
+  have hprod : W.index = M.index * W.relIndex M := by
+    rw [mul_comm]; exact (Subgroup.relIndex_mul_index hWM).symm
+  exact two_mul_add_one_sq_le_of_two_fpf_factors hw1odd h1odd hMgt h1dvd h2odd hWMgt h2dvd hprod
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
