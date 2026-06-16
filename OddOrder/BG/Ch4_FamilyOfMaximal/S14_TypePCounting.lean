@@ -4996,6 +4996,24 @@ theorem ncard_biUnion_subgroup_add_card [Finite G] {ι : Type*}
     rw [hunion, Finset.card_cons, Finset.sum_cons]
     omega
 
+/-- **BG 14.7, the `T = Z − ⋃ Kᵢ*` density count** (mmd L4031): for a nonempty finite family
+`{Sᵢ}_{i ∈ s}` of subgroups of `Z` pairwise meeting at `⊥`,
+`|Z − ⋃ Sᵢ| + (∑ |Sᵢ|) + 1 = |Z| + |s|`, i.e. `|T| = |Z| + (|s| − 1) − ∑ |Sᵢ|`.
+With `s.card = n + 1` this is BG's `|T| = z + n − ∑ kᵢ*`.  Combines the inclusion–exclusion
+count with the complement `|Z − ⋃| + |⋃| = |Z|`. -/
+theorem ncard_sdiff_biUnion_subgroup [Finite G] {ι : Type*} {s : Finset ι} (hs : s.Nonempty)
+    (S : ι → Subgroup G) {Z : Subgroup G} (hSZ : ∀ i ∈ s, S i ≤ Z)
+    (hpair : ∀ i ∈ s, ∀ j ∈ s, i ≠ j → S i ⊓ S j = ⊥) :
+    ((Z : Set G) \ ⋃ i ∈ s, (S i : Set G)).ncard + (∑ i ∈ s, Nat.card ↥(S i)) + 1
+      = Nat.card ↥Z + s.card := by
+  classical
+  have hsub : (⋃ i ∈ s, (S i : Set G)) ⊆ (Z : Set G) :=
+    Set.iUnion₂_subset (fun i hi => SetLike.coe_subset_coe.mpr (hSZ i hi))
+  have hIE := ncard_biUnion_subgroup_add_card hs S hpair
+  have hdiff := Set.ncard_diff_add_ncard_of_subset hsub
+  have hZcard : Nat.card ↥Z = (Z : Set G).ncard := Nat.card_coe_set_eq (Z : Set G)
+  omega
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

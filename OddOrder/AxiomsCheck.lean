@@ -4708,6 +4708,8 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_biUnion_subgroup_add_card
 
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_sdiff_biUnion_subgroup
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
