@@ -5144,6 +5144,23 @@ theorem exists_typeP_neighbor_mem_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSi
         (Subgroup.card_dvd_of_le hXNσ), Nat.card_pos.ne'⟩)
   exact ⟨N, hNmax, hPN, hnc, hpσN, hZN⟩
 
+/-- **Both factors of an internal direct product are normal**: in `A ⊔ B` with `B ≤ C_G(A)`
+(so `A`, `B` commute), `A ⊔ B ≤ N_G(A) ⊓ N_G(B)`.  In Theorem 14.7, applied to the swap
+`Z = K_N ⊔ K_N*` (`K_N* ≤ C(K_N)`), it makes both `K_N` and `K_N* = Z ⊓ M_σ(N)` normal in `Z` —
+the input to pairwise commutativity of the `Kᵢ*` (for `z = ∏ kᵢ*`), to pairwise nonconjugacy of
+the `Mᵢ`, and to the `n = 1` collapse (`Kᵢ ◁ Z` is the unique `σ(Mᵢ)'`-Hall). -/
+theorem sup_le_normalizer_inf_of_commute {A B : Subgroup G}
+    (h : B ≤ Subgroup.centralizer (A : Set G)) :
+    A ⊔ B ≤ Subgroup.normalizer (A : Set G) ⊓ Subgroup.normalizer (B : Set G) := by
+  have hAB : A ≤ Subgroup.centralizer (B : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro b hb
+    exact (Subgroup.mem_centralizer_iff.mp (h hb) a ha).symm
+  exact le_inf
+    (sup_le Subgroup.le_normalizer (h.trans (Subgroup.centralizer_le_normalizer _)))
+    (sup_le (hAB.trans (Subgroup.centralizer_le_normalizer _)) Subgroup.le_normalizer)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
