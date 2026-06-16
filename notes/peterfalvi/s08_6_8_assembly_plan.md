@@ -3841,3 +3841,18 @@ case-B Xset は **reducible 列 μ_j を含む**。`IsCoherent.extension` は **
 ([[feedback-ask-chatgpt-for-elided-gaps]]、最強モデル)。または reducible-member coherence producer engine の設計。
 これは単一セッションを超える**深いアーキ crux で複数セッション thrash 済**(s44-47 cTE / 先行 per-χ / cont.² chain)。
 **正本 = 本 session 48 cont.³(cont.² の chain 案を supersede、先行 τ₂-direct course-correction を再確認 + T=0 反駁で厳密化)。**
+
+### session 48 cont.⁴: ✅ 検証 workflow (6-agent, 実コード精読+敵対反証) で T0-FREE-CONFIRMED — cont.³ の「no producer」過度悲観を訂正
+
+**6-agent workflow 結論 (実 file:line 精読)**: ユーザーの直感「文献どおりなら問題は起きない」は **正しい**。確定事項:
+- **T=0/hanchored は cTE-glue 配線固有の artifact**(`coherentCertainTypeSet_union_Yset` S08CBXunionY:356-359 が RHS に cTE を使うため `D.X=cTE` を強制)。**decomposition 機構自体は T=0-free**: `columnDecompositionTau`(`ofProjection`, S07:1185, `D.X=∑coeff•α` は τ₁(χ−ψ) の **R(χ) への直交射影**で cTE 非依存)+ `per_phi_anchored_image`(S08CBC2:1908, `τ(χ−aη₁)=D.X−a•cY.ext η₁`)+ `per_constituent_Y_eq_smul`(Y-pinning)。どこも `D.X=cTE` を要求しない。
+- **session 48 本体の over-constraint 証明(反例 E=Ē=true-half ⟹ X₁=−cTEμ̄)は厳密・正しい**(5.4.b は `E⊆R(μ_j), |E|=‖μ_j‖²` のみで E=false-half を同定しない)。
+- **🔴 cont.³ の「basis-linear 枠で reducible-column coherence producer が無い = 全経路の共通根」は過度悲観・部分的に誤り**。Probe C 確認: 列は disjoint 基底 support で**線形独立** ⟹ `Basis.constr` で `extension(μ_j)=X_χ_j` を割当可能(IsCoherent は `ℤ[列]` 上のみ拘束、個々 μ_{ij} 値は自由)。**producer は構成可能**。
+- **🔴 cont.³ の「chain は case-A detour ゆえ撤回」も訂正**: cont.² の **既約 anchor 経路は sound**(workflow が再確認)。`xChainCoherentW`+`caseB_Xset_conjugatePairCover`(S08CaseBEnumeration:134)は case-B 用に存在し、既約 X-member を実像 `Da.X` で fold(cTE 非依存)。
+
+**🎯 確定した T0-free 経路(2 sub-route、いずれも cTE-glue を捨て (6.8.2.3) 実像 X_χ を使う)**:
+- **案A1(cTE-base + chain + 既約 anchor)**: 列を cTE-base で単独 coherent(Y なし=T=0 なし)→ chain で既約 fold → cX → Y-glue を**既約 anchor χ₀**(列同次数 a₀|W₁|)で。列 cross-diagonal `μ_j−a₀η₁=(μ_j−χ₀)+(χ₀−a₀η₁)`、前者 cX.extends_on_supported・後者 chain 像 ⟹ hDτ auto。**唯一の未検証前提 = 既約 X-member anchor の存在**(case B は Z=W₂⊆H' ゆえ a₀>1; (6.8.2.3) の χ_i=Ind_H θ_i のどれかが既約か = 構造事実、要教科書確認)。
+- **案A2(full X_χ-coherence、前提不要・最 robust)**: **全列**に (6.8.2.3) 実像 X_χ_j を割り当てた cX を Basis.constr で構成。等長 `⟨X_j,X_l⟩=⟨μ_j,μ_l⟩`(等長性から従う、Probe B)+ `extends_on_supported`(2 つの (6.8.2.3) 像の差 `τ(μ_j−μ_l)=X_j−X_l`)。すると **任意の anchor(列でも)で hDτ auto** ⟹ 既約 anchor 前提不要。
+
+**▶▶ 残作業(T=0 でない、real だが原理的障害なし)**: (3b) `caseB_per_phi_anchored_fromYset`(S08CBA:1647)の aggregate 入力(hcol/hirr/hirrAnc/hXaggorth/hdecomp = (6.8.2.2) per-φ b_i=a_i pinning)を**全列**で discharge → (案A2) Basis.constr で cX 構成 + 等長/agreement → glue(`coherentXunionYset_caseB_of_glued` S08CBC2:1616, cX 入力)→ (6.8.3) break → sole sorry。完成後 `coherentCertainTypeSet_union_Yset`/`exists_glue_nu_columnSum_Yset`/`certainTypeExtension_columnSum_eq_falseHalf_sum`(cTE-glue 専用、下流未消費)を撤去。
+**ChatGPT 相談は不要**(route は T=0-free + 既存インフラ)。**正本 = 本 session 48 cont.⁴**(cont.² sound・cont.³ 過度悲観を訂正、workflow `wf_7aeebca4-e2c` で code-verified)。
