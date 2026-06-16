@@ -3322,3 +3322,17 @@ main を clean fast-forward 取り込み (lane-g Thm 3.8 / lane-h Thm E + Axioms
 
 **▶▶ 次の focused session 第一手 (推奨)**: **#2 (2-FPF factor blocks) を先に landing** — group-theory で #1 より tractable、`centralCommutator_card_subgroupOf_lower` template + 既存 `two_mul_add_one_le_of_odd_dvd`/`IsFrobeniusAction.subgroup` で組める。要 RECON = case-B CertainType が W₁-FPF-on-H/H′・H′/W₂ をどう供給するか (S06.CertainTypeHypothesis 構造)。#1 (norm-aware (5.6)) は最重、別 focused session か workflow 候補。
 **正本=本 cont.²⁵。算術層 3 commits 完結 (新 leaf S08_CaseBEndgame)。L4 は `false_of_caseB_break_of_bounds` 仮説 discharge に還元。決定的発見=mixed-S ゆえ case-A break-pair 不適用→norm-aware (5.6) が heavy core。次=#2 FPF factor blocks (群論、tractable)。Opus 継続。**
+
+### session 43 cont.²⁶: ✅✅ FPF tower 構築 (cont.²⁵ 後 +5 commits) — `hfpf` obligation の H/H′ 枝を実 Sibley data から完全導出
+cont.²⁵ で「#2 FPF factor blocks (tractable)」と判定後、FPF 導出層を S08_CaseBEndgame に構築 (本 session 計 8 Lean commits)。**(6.8.3) `hfpf` (= `(2|W₁|+1)²≤|H:W₂|`) を gated tower として組み、H/H′ 枝を実データで close**:
+
+1. **`two_mul_add_one_sq_le_index_of_chain`** (`0a084543`): 抽象 FPF bound を subgroup chain `W≤M≤K` (K odd) に橋渡し。oddness (index∣|K|) + chain index 積 (`relIndex_mul_index`) を discharge、残入力 = 2 FPF 整除 + section 非自明。
+2. **`W1_dvd_index_of_fixedPoints_le`** (`7fc0dd0c`): 機械核。coprime action + 固定点⊆M → `quotient_of_fixedPoints_le` で商 FPF → `card_modEq_one` で `|W| ∣ |H:M|−1`。
+3. **`caseB_W1_dvd_index_of_centralizer_le`** (`c9cb284a`): W₁-共役 action を**証明内 letI** で setup、`a•x` を `toMulAut_apply`+`conjNormal_apply` で共役展開 (🔑 compHom smul は rfl/rw/simp 不可、内部 letI が鍵)。可換形 `hcomm` から `hfix` を discharge。M characteristic → invariant。
+4. **`caseB_W1_dvd_index_commutator`** (`3335a772`): **H/H′ 枝完成・実 Sibley data**。`hcomm` を `cert.centralizer_W2` (C_L(a)⊓K=W₂) + W₂⊆⁅H,H⁆ + `commutator_subgroupOf_self` で discharge。arg = case-(c2) projection (`h46.toCertainTypeHypothesis` 等、`inertia_eq_H_of_c2` mirror)。
+
+**⟹ `hfpf` の残務**: (a) **H′/W₂ 枝** `|W₁| ∣ |H′:W₂|−1` — W₁-action を **H′=commutator ↥H (部分群=群)** 上に setup、M=W₂-in-H′、固定点⊆W₂ を centralizer_W2 から。H/H′ の mirror だが「部分群を群として」action する分やや tricky。(b) **assembly**: 両整除 + section 非自明 (H 非可換, W₂≠H′) を `two_mul_add_one_sq_le_index_of_chain` に投入 → 完全 `hfpf`。
+
+**🛑 正直な戦略フラグ (要認識)**: **FPF tower (`hfpf`) は (6.8.3) L4 の 4 obligation の 1 つに過ぎず、しかも easier な方**。L4 capstone (`false_of_coherentXunionYset_caseB_of_not_coherentS`) の真の long pole = **#1 norm-aware (5.6) break bound for reducible S** (cont.²⁵ 発見: case-B の S は可約 column を含む mixed ⟹ case-A の `exists_coherentBreakPair` [全既約要求] / `xSum_le_two_psi` [Frobenius+全既約] が不適用、‖χ‖²-weighted な break-pair existence + (5.6) bound の新規 infra が必要)。**#1 は未着手で最重**。FPF tower 完成 (hfpf close) しても #1 無しでは L4 は閉じない。⟹ hfpf 完成後の優先 = #1 の真の難度評価 (loop-tractable か、focused workflow / ChatGPT 相談 [[feedback-ask-chatgpt-for-elided-gaps]] が要るか)。
+
+**▶ 次 (loop)**: H′/W₂ 枝 → assembly で `hfpf` を close、その後 #1 評価へ pivot。**正本=本 cont.²⁶。FPF tower 8 commits、H/H′ 実データ完成。残=H′/W₂+assembly→hfpf。真 long pole=#1 (reducible-S break, 未着手)。Opus 継続。**
