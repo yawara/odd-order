@@ -2734,7 +2734,13 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
             tau2 N ∩ piSet N ⊆ OddOrder.BG.Ch3.S10.sigma M ∧
             OddOrder.BG.Ch3.S10.sigma N ∩ piSet M ⊆ OddOrder.BG.Ch3.S10.beta N ∧
             Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
-              ((M ⊓ N).subgroupOf N)) := by
+              ((M ⊓ N).subgroupOf N) ∧
+            -- **(Sharp transitivity, BG Thm 14.4 headline)**: `R(x) = N_σ ∩ C_G(x)` acts
+            -- *regularly* (sharply transitively) on `𝓜_σ(x)` by conjugation: for every other
+            -- `L ∈ 𝓜_σ(x)` there is a *unique* `r ∈ R(x)` with `M^r = L`.
+            (∀ L ∈ maximalSigmaSubgroupsOfElement x,
+              ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
+                MulAut.conj r • M = L)) := by
   classical
   -- (Nonempty) `𝓜_σ(x)` is nonempty because `ℓ_σ(x) = 1`.
   obtain ⟨-, hne⟩ := (D.length_one_iff x).mp hlen
@@ -3042,7 +3048,7 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     have h1215₂ := sigma_subgroup_maximal_interaction hG hM₂max hqσM₂ hXM₂le hXne hXq hNmem hNM₂
       hS₂le hXS₂ hS₂q hSmax₂
     obtain ⟨_, hdN₂, hsigmaInf₂, hsigmaSup₂⟩ := h1215₂.2.2.2.2 hqnσN
-    refine ⟨?_, ?_, ?_⟩
+    refine ⟨?_, ?_, ?_, ?_⟩
     · -- (c) `τ₂(N) ⊆ σ(M₂)` (Corollary 12.6 argument).  Take `A ∈ ℰ_p²(N)` inside the complement
       -- `M₂ ∩ N` (= an `E`-setup `E_N` of `N` by `exists_subgroupESetup_with_le`); then `A ⊴ E_N`
       -- (Cor 12.6(a)) and `x ∈ M₂∩N = E_N` normalises `A`, so `x ∈ N_{M₂σ}(A) ⊋ 1`.  As `A ≤ M₂`
@@ -3173,6 +3179,117 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
         rw [← Subgroup.subgroupOf_sup hMσN_le inf_le_right, hsigmaSup₂, Subgroup.subgroupOf_self]
       apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hinf₂'
       rw [← Subgroup.normal_mul, hsup₂', Subgroup.coe_top]
+    · -- **(Sharp transitivity)**: `R(x) = N_σ ∩ C_G(x)` acts regularly on `𝓜_σ(x)`
+      -- (BG L3896-3900). For `L ∈ 𝓜_σ(x)`: `L = M₂^c` for some `c ∈ C_G(X)` (Theorem 10.1(b)
+      -- fusion); write `c = v·a`, `v ∈ N_σ`, `a ∈ M₂∩N` (complement `N = N_σ(M₂∩N)`), so
+      -- `conj v • M₂ = L`. Then `conj (x⁻¹vx) • M₂ = conj v • M₂` + freeness (`N_G(M₂)∩N_σ = 1`)
+      -- forces `x⁻¹vx = v`, i.e. `v ∈ C_G(x)`; uniqueness is the same freeness argument.
+      intro L hLmem
+      obtain ⟨hLmax, hxLσ⟩ := hLmem
+      have hxM₂mem : x ∈ M₂ := OddOrder.BG.Ch3.S10.Msigma_le M₂ hxM₂σ
+      have hxLmem : x ∈ L := OddOrder.BG.Ch3.S10.Msigma_le L hxLσ
+      -- `N_G(M₂) = M₂` (maximal ⟹ self-normalizing).
+      have hM₂ne : M₂ ≠ ⊥ := fun hb => hXne (le_bot_iff.mp (hb ▸ hXM₂le))
+      have hN_M₂_le : Subgroup.normalizer M₂ ≤ M₂ := by
+        rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M₂)) with heq | hlt
+        · exact heq.ge
+        · rcases hG.simple.eq_bot_or_eq_top_of_normal M₂
+              (Subgroup.normalizer_eq_top_iff.mp
+                ((mem_maximalSubgroups.mp hM₂max).2 _ hlt)) with hb | ht
+          · exact absurd hb hM₂ne
+          · exact absurd ht (mem_maximalSubgroups.mp hM₂max).1
+      -- `L` conjugate to `M₂` (else Thm 13.9 σ-disjoint, but `q ∈ σ(M₂) ∩ σ(L)`).
+      have hqσL : q ∈ OddOrder.BG.Ch3.S10.sigma L :=
+        OddOrder.BG.Ch3.S10.Msigma_isPiGroup L q (Nat.mem_primeFactors.mpr
+          ⟨hqp, hqdvd.trans ((OddOrder.BG.Ch3.S10.Msigma L).orderOf_dvd_natCard hxLσ),
+            Nat.card_pos.ne'⟩)
+      obtain ⟨gL, hgL⟩ : ∃ g : G, MulAut.conj g • M₂ = L := by
+        by_contra hnc
+        exact Set.disjoint_left.mp
+          (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM₂max hLmax hnc) hqσM₂ hqσL
+      -- Fusion (Theorem 10.1(b)): `c ∈ C_G(X)` with `conj c • M₂ = L`.
+      have hXLle : X ≤ L :=
+        (hXx.trans (Subgroup.zpowers_le.mpr hxLσ)).trans (OddOrder.BG.Ch3.S10.Msigma_le L)
+      have hXM₂' : X ≤ MulAut.conj (1 : G) • M₂ := by rw [map_one, one_smul]; exact hXM₂le
+      have hXgL : X ≤ MulAut.conj gL • M₂ := by rw [hgL]; exact hXLle
+      obtain ⟨c, hcC, hcconj⟩ :=
+        (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM₂max hqσM₂ hXne hXq).2.1 1 gL
+          hXM₂' hXgL
+      rw [map_one, one_smul] at hcconj
+      have hcL : MulAut.conj c • M₂ = L := by rw [hcconj, hgL]
+      -- `c ∈ N`; decompose `c = v · a` with `v ∈ N_σ`, `a ∈ M₂ ⊓ N`.
+      have hcN : c ∈ N := ((Subgroup.centralizer_le_normalizer (X : Set G)).trans hNge) hcC
+      have hsup₂'' :
+          (OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N ⊔ (M₂ ⊓ N).subgroupOf N = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hMσN_le inf_le_right, hsigmaSup₂,
+          Subgroup.subgroupOf_self]
+      have hc'mem : (⟨c, hcN⟩ : ↥N) ∈
+          (↑((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) *
+            ↑((M₂ ⊓ N).subgroupOf N) : Set ↥N) := by
+        rw [← Subgroup.normal_mul, hsup₂'']; exact Subgroup.mem_top _
+      obtain ⟨vsub, hvsub, asub, hasub, hva⟩ := hc'mem
+      have hvMσ : (vsub : G) ∈ OddOrder.BG.Ch3.S10.Msigma N := Subgroup.mem_subgroupOf.mp hvsub
+      have haM₂ : (asub : G) ∈ M₂ :=
+        (Subgroup.mem_inf.mp (Subgroup.mem_subgroupOf.mp hasub)).1
+      have hcva : (vsub : G) * (asub : G) = c := by
+        have := congrArg (Subgroup.subtype N) hva; simpa using this
+      -- `conj v • M₂ = L` (as `a ∈ M₂`).
+      have hvL : MulAut.conj (vsub : G) • M₂ = L := by
+        have ha_fix : MulAut.conj (asub : G) • M₂ = M₂ :=
+          conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer haM₂)
+        rw [← hcL, ← hcva, map_mul, mul_smul, ha_fix]
+      -- `x⁻¹vx ∈ N_σ`; `conj (x⁻¹vx) • M₂ = conj v • M₂` (uses `x∈M₂`, `x∈L`).
+      have hconjMσ : x⁻¹ * (vsub : G) * x ∈ OddOrder.BG.Ch3.S10.Msigma N := by
+        have h := hMσNnormal.conj_mem vsub hvsub (⟨x, hxN⟩⁻¹)
+        have := Subgroup.mem_subgroupOf.mp h; simpa using this
+      have hkey :
+          MulAut.conj (x⁻¹ * (vsub : G) * x) • M₂ = MulAut.conj (vsub : G) • M₂ := by
+        have hxM₂ : MulAut.conj x • M₂ = M₂ :=
+          conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hxM₂mem)
+        have hxL : MulAut.conj x⁻¹ • L = L :=
+          conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (L.inv_mem hxLmem))
+        calc MulAut.conj (x⁻¹ * (vsub : G) * x) • M₂
+            = MulAut.conj x⁻¹ • (MulAut.conj (vsub : G) • (MulAut.conj x • M₂)) := by
+              rw [map_mul, map_mul, mul_smul, mul_smul]
+          _ = MulAut.conj x⁻¹ • (MulAut.conj (vsub : G) • M₂) := by rw [hxM₂]
+          _ = MulAut.conj x⁻¹ • L := by rw [hvL]
+          _ = L := hxL
+          _ = MulAut.conj (vsub : G) • M₂ := hvL.symm
+      have hmemNM : (vsub : G)⁻¹ * (x⁻¹ * (vsub : G) * x) ∈ Subgroup.normalizer M₂ := by
+        apply mem_normalizer_of_conj_smul_eq_self
+        rw [map_mul, mul_smul, hkey, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      have hmemMσ : (vsub : G)⁻¹ * (x⁻¹ * (vsub : G) * x) ∈ OddOrder.BG.Ch3.S10.Msigma N :=
+        (OddOrder.BG.Ch3.S10.Msigma N).mul_mem
+          ((OddOrder.BG.Ch3.S10.Msigma N).inv_mem hvMσ) hconjMσ
+      have hmem1 : (vsub : G)⁻¹ * (x⁻¹ * (vsub : G) * x) = 1 := by
+        have hinbot : (vsub : G)⁻¹ * (x⁻¹ * (vsub : G) * x) ∈ (⊥ : Subgroup G) := by
+          rw [← hsigmaInf₂]
+          exact Subgroup.mem_inf.mpr ⟨hmemMσ,
+            Subgroup.mem_inf.mpr ⟨hN_M₂_le hmemNM, hMσN_le hmemMσ⟩⟩
+        exact Subgroup.mem_bot.mp hinbot
+      have hvx : x⁻¹ * (vsub : G) * x = (vsub : G) := (inv_mul_eq_one.mp hmem1).symm
+      have hvCx : (vsub : G) ∈ Subgroup.centralizer ({x} : Set G) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy; rw [Set.mem_singleton_iff.mp hy]
+        have hcomm : x * (vsub : G) = (vsub : G) * x := by nth_rewrite 1 [← hvx]; group
+        exact hcomm
+      -- Existence + uniqueness of `r ∈ R(x)` with `conj r • M₂ = L`.
+      refine ⟨(vsub : G), ⟨Subgroup.mem_inf.mpr ⟨hvMσ, hvCx⟩, hvL⟩, ?_⟩
+      rintro r ⟨hrR, hrL⟩
+      obtain ⟨hrMσ, _hrCx⟩ := Subgroup.mem_inf.mp hrR
+      have hconj_eq : MulAut.conj ((vsub : G)⁻¹ * r) • M₂ = M₂ := by
+        rw [map_mul, mul_smul, hrL, ← hvL, ← mul_smul, ← map_mul, inv_mul_cancel,
+          map_one, one_smul]
+      have hmemN' : (vsub : G)⁻¹ * r ∈ Subgroup.normalizer M₂ :=
+        mem_normalizer_of_conj_smul_eq_self hconj_eq
+      have hmemMσ' : (vsub : G)⁻¹ * r ∈ OddOrder.BG.Ch3.S10.Msigma N :=
+        (OddOrder.BG.Ch3.S10.Msigma N).mul_mem
+          ((OddOrder.BG.Ch3.S10.Msigma N).inv_mem hvMσ) hrMσ
+      have hbot' : (vsub : G)⁻¹ * r ∈ (⊥ : Subgroup G) := by
+        rw [← hsigmaInf₂]
+        exact Subgroup.mem_inf.mpr ⟨hmemMσ',
+          Subgroup.mem_inf.mpr ⟨hN_M₂_le hmemN', hMσN_le hmemMσ'⟩⟩
+      exact (inv_mul_eq_one.mp (Subgroup.mem_bot.mp hbot')).symm
   · -- Uniqueness: any qualifying `N'` lies in `ℳ(C_G(x)) = {N}`.
     intro N' hN'
     have hmem : N' ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
