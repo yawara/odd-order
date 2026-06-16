@@ -3410,3 +3410,12 @@ cont.³⁰ recipe を実行し H′/W₂ 枝 + assembly を landing (maxed conte
 `W1_dvd_index_of_fixedPoints_le` / action bridge `caseB_W1_dvd_index_of_centralizer_le` / H/H′ `caseB_W1_dvd_index_commutator`
 / H′/W₂ `caseB_W1_dvd_relIndex_commutator` / **hfpf `caseB_fpf_bound`** / 算術 spine `false_of_caseB_break_of_bounds`。
 **正本=本 cont.³¹。FPF tower 完結、残=(5.6) core。**
+
+### 🚨 訂正 (2026-06-16, cont.³⁷ = s56_reweighting_plan.md): 「残=(5.6) core / R(μ_j) deep bridge」は **誤診**
+cont.³¹/³⁵/³⁶ の「(5.6) core = R(μ_j) via σ の deep §5↔§6 bridge を新規構成」は **誤り**。R(μ_j) は
+**`certainTypeR`** (`S06_CertainTypeCoherence.lean:639`、lane-b 自身が 6/14 commit `72798461` で構築) として
+**既存・4 field 充足** (image_eq=`dadeICM_columnDiff_eq_sum`)。reducible μ_j 用 Da も `certainTypeDecompositionDa`
+(`:684`) 既存。**真の残務 = cX wiring 3 ピース (~350-550 LOC、deep math gap 無し)**: (A) weighted X-chain→cX /
+(B) hmapagree / (C) extension assembly → glue (`coherentXunionYset_caseB_of_glued`、sorry-free) → sorry 解消。
+2026-06-16 session: `xAdjoinStepW` 一般化 (`6a59b41e`) + `coherentDegreeSqNormBound_of_not_coherentW`
+(`c7c3f6a0`) landed。**詳細・次手の正本 = `s56_reweighting_plan.md` cont.³⁷** (本ファイルの cont.³¹ は obsolete)。
