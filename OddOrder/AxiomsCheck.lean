@@ -4590,6 +4590,15 @@ two-block decomposition (`isPiElement_mul_unique`) + Theorem 14.4(e); no §15/§
 -- **BG Lemma 14.5(b)** (faithful `M̃` form): nonconjugate `M₁`, `M₂` have disjoint `M̃₁`, `M̃₂`.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Mtilde_disjoint
 
+/-! **BG Lemma 14.5(c), Part A** (`S14_TypePCounting`, `sigmaSaturation_Rsub_count`): the double
+count `∑_{x ∈ 𝒞_G(M_σ^#)} |R(x)| = |M_σ^#|·[G : M]`, counting incidence pairs `(x, Mᵍ)` two ways
+via sharp transitivity (Theorem 14.4). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaSaturation_Rsub_count
+/-! **BG Lemma 14.5(c)** (`S14_TypePCounting`, `sigmaConjugacySaturation_Mtilde_ncard`):
+`|𝒞_G(M̃)| = (|M_σ| − 1)·[G : M]`.  Part B (the disjoint cover `𝒞_G(M̃) = ⊔ₓ x R(x)` via the
+`R`-equivariance `Rsub_conj`) combined with Part A.  The type-`P` counting bound for Theorem 14.7. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard
+
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
 normalizer identity `N_M(X) = K ⊔ K*`, the `(d)` clause `K* ∩ M^g = 1`, and (for type `P₂`)

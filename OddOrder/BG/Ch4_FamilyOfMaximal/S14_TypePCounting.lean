@@ -8,6 +8,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Theorem125
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1211
 import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
+import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.GroupTheory.MaximalSubgroupType
@@ -3889,6 +3890,182 @@ theorem sigmaSaturation_Rsub_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       (normalizer_eq_self_of_mem_maximalSubgroups hG hM)]
   rw [hConjcard]
   exact Nat.mul_comm _ _
+
+/-! #### Part B of Lemma 14.5(c): the cover `𝒞_G(M̃) = ⊔ₓ x R(x)` via `R`-equivariance -/
+
+/-- The chosen neighbour `N(x)` of Theorem 14.4 (multi-maximal case), packaged with the
+**singleton characterisation** `𝓜(C_G(x)) = {N(x)}` (BG mmd L3906).  The singleton clause is
+Corollary 14.3's `maximalContaining_centralizer_eq_singleton_of_tau2_element` applied to the
+`∃!`-spec data; it pins `N(x)` as the *unique* maximal subgroup containing `C_G(x)`, which is
+exactly what makes `R(x)` conjugation-equivariant (`Rsub_conj`). -/
+theorem exists_neighbor_Rsub_singleton [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {x : G} (hlen : D.length x = 1)
+    (hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧ Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      Rsub hG D x = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+      maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N} := by
+  have hx : x ≠ 1 := ((D.length_one_iff x).mp hlen).1
+  set N := ((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose with hNdef
+  have spec := ((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose_spec
+  have hxN : x ∈ N := spec.2.1 (Subgroup.mem_centralizer_iff.mpr
+    (fun a ha => by rw [Set.mem_singleton_iff.mp ha]))
+  exact ⟨N, spec.1, spec.2.1, Rsub_eq_inf hG D hx hlen hgt,
+    maximalContaining_centralizer_eq_singleton_of_tau2_element hG spec.1 hxN hx
+      spec.2.2.2.2.1 spec.2.2.1⟩
+
+/-- **`𝓜_σ(x)` is conjugation-equivariant**: `𝓜_σ(gxg⁻¹) = (conj g) • 𝓜_σ(x)` (as the image
+under `L ↦ Lᵍ`).  Conjugation by `g` is an order-isomorphism of subgroups carrying `M_σ` to
+`(Mᵍ)_σ` (`Msigma_conj_smul`), so it bijects the `σ`-maximals of `x` with those of `gxg⁻¹`. -/
+private theorem maximalSigmaSubgroupsOfElement_conj [Finite G] (g x : G) :
+    maximalSigmaSubgroupsOfElement (g * x * g⁻¹)
+      = (fun L : Subgroup G => MulAut.conj g • L) '' maximalSigmaSubgroupsOfElement x := by
+  have key : ∀ L : Subgroup G, x ∈ OddOrder.BG.Ch3.S10.Msigma L
+      ↔ g * x * g⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • L) := by
+    intro L
+    rw [Msigma_conj_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcalc : (MulAut.conj g)⁻¹ • (g * x * g⁻¹) = x := by
+      rw [← map_inv (MulAut.conj) g, MulAut.smul_def, MulAut.conj_apply, inv_inv]; group
+    rw [hcalc]
+  ext L
+  constructor
+  · rintro ⟨hLmax, hxL⟩
+    have hL₀L : MulAut.conj g • (MulAut.conj g⁻¹ • L) = L := by
+      rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    exact ⟨MulAut.conj g⁻¹ • L,
+      ⟨mem_maximalSubgroups_of_isConjugateSubgroup hLmax ⟨g⁻¹, rfl⟩,
+        by rw [key (MulAut.conj g⁻¹ • L), hL₀L]; exact hxL⟩, hL₀L⟩
+  · rintro ⟨L₀, ⟨hL₀max, hxL₀⟩, rfl⟩
+    exact ⟨mem_maximalSubgroups_of_isConjugateSubgroup hL₀max ⟨g, rfl⟩, (key L₀).mp hxL₀⟩
+
+/-- **`R(x)` is conjugation-equivariant**: `R(gxg⁻¹) = (conj g) • R(x)` (BG mmd L3908, the
+identity behind the cover `𝒞_G(M̃) = ⋃ₓ x R(x)`).  The `if`-condition of `R` is conjugation
+invariant (`𝓜_σ` equivariance), and in the multi-maximal case `R(x) = N_σ ∩ C_G(x)` with `N(x)`
+the *unique* maximal containing `C_G(x)`; since `N(x)ᵍ` is the unique maximal containing
+`C_G(gxg⁻¹)`, it equals `N(gxg⁻¹)`, and the intersection conjugates accordingly. -/
+theorem Rsub_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) (g x : G) :
+    Rsub hG D (g * x * g⁻¹) = MulAut.conj g • Rsub hG D x := by
+  classical
+  have hne1 : g * x * g⁻¹ ≠ 1 ↔ x ≠ 1 := by
+    rw [ne_eq, ne_eq, mul_inv_eq_one, mul_eq_left]
+  have himg : maximalSigmaSubgroupsOfElement (g * x * g⁻¹)
+      = (fun L : Subgroup G => MulAut.conj g • L) '' maximalSigmaSubgroupsOfElement x :=
+    maximalSigmaSubgroupsOfElement_conj g x
+  have hinj : Function.Injective (fun L : Subgroup G => MulAut.conj g • L) :=
+    fun a b h => by simpa using congrArg (fun L => (MulAut.conj g)⁻¹ • L) h
+  have hncard : (maximalSigmaSubgroupsOfElement (g * x * g⁻¹)).ncard
+      = (maximalSigmaSubgroupsOfElement x).ncard := by
+    rw [himg, Set.ncard_image_of_injective _ hinj]
+  have hne_iff : (maximalSigmaSubgroupsOfElement (g * x * g⁻¹)).Nonempty
+      ↔ (maximalSigmaSubgroupsOfElement x).Nonempty := by rw [himg, Set.image_nonempty]
+  have hcond_iff : (g * x * g⁻¹ ≠ 1 ∧ D.length (g * x * g⁻¹) = 1
+        ∧ 1 < (maximalSigmaSubgroupsOfElement (g * x * g⁻¹)).ncard)
+      ↔ (x ≠ 1 ∧ D.length x = 1 ∧ 1 < (maximalSigmaSubgroupsOfElement x).ncard) := by
+    rw [D.length_one_iff, D.length_one_iff, hne1, hne_iff, hncard]
+  by_cases hcase : x ≠ 1 ∧ D.length x = 1 ∧ 1 < (maximalSigmaSubgroupsOfElement x).ncard
+  · obtain ⟨hx, hlen, hgt⟩ := hcase
+    obtain ⟨hxc, hlenc, hgtc⟩ := hcond_iff.mpr ⟨hx, hlen, hgt⟩
+    obtain ⟨N, hNmax, hCN, hReq, _⟩ := exists_neighbor_Rsub_singleton hG D hlen hgt
+    obtain ⟨N', _, _, hReq', hsing'⟩ := exists_neighbor_Rsub_singleton hG D hlenc hgtc
+    have hNconj : MulAut.conj g • N = N' := by
+      have hmem : MulAut.conj g • N
+          ∈ maximalSubgroupsContaining (Subgroup.centralizer ({g * x * g⁻¹} : Set G)) := by
+        rw [mem_maximalSubgroupsContaining]
+        refine ⟨mem_maximalSubgroups.mp
+          (mem_maximalSubgroups_of_isConjugateSubgroup hNmax ⟨g, rfl⟩), ?_⟩
+        rw [← smul_centralizer_singleton]
+        intro y hy
+        rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hy ⊢
+        exact hCN hy
+      rw [hsing', Set.mem_singleton_iff] at hmem
+      exact hmem
+    rw [hReq', hReq, Subgroup.smul_inf, ← Msigma_conj_smul, smul_centralizer_singleton, hNconj]
+  · have h1 : Rsub hG D (g * x * g⁻¹) = ⊥ := by
+      rw [Rsub, dif_neg (fun h => hcase (hcond_iff.mp h))]
+    have h2 : Rsub hG D x = ⊥ := by rw [Rsub, dif_neg hcase]
+    rw [h1, h2, Subgroup.smul_bot]
+
+/-- The left coset `x R(x)` as a pointwise scalar action: `x • R = { x r | r ∈ R }`.  Bridges
+the set-builder form used by `xRsub_disjoint` to the `x • (R : Set G)` form on which the
+pointwise-cardinality lemmas (`Set.ncard_smul_set`) act. -/
+private theorem smul_coe_eq_coset (x : G) (R : Subgroup G) :
+    x • (R : Set G) = {g : G | ∃ r ∈ R, g = x * r} := by
+  ext g
+  rw [Set.mem_smul_set]
+  simp only [SetLike.mem_coe, Set.mem_setOf_eq, smul_eq_mul]
+  constructor
+  · rintro ⟨r, hr, h⟩; exact ⟨r, hr, h.symm⟩
+  · rintro ⟨r, hr, h⟩; exact ⟨r, hr, h.symm⟩
+
+/-- **The cover** (BG mmd L3933, Lemma 14.5(c) Part B): the conjugacy saturation of `M̃` is the
+disjoint union of the cosets `x R(x)` over `x ∈ 𝒞_G(M_σ^#)`.  By `R`-equivariance (`Rsub_conj`),
+conjugating a product `x x'` (`x ∈ M_σ^#`, `x' ∈ R(x)`) by `g` gives `(xᵍ)(x'ᵍ)` with
+`x'ᵍ ∈ R(xᵍ)` and `xᵍ ∈ 𝒞_G(M_σ^#)`, and conversely. -/
+theorem conjClassSet_Mtilde_eq_biUnion [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} :
+    conjClassSet (Mtilde hG D M)
+      = ⋃ x ∈ sigmaConjugacySaturation M, x • (Rsub hG D x : Set G) := by
+  ext y
+  simp only [mem_conjClassSet, Set.mem_iUnion, exists_prop]
+  constructor
+  · rintro ⟨m, hm, g, rfl⟩
+    obtain ⟨x, hxsharp, x', hx'R, rfl⟩ := hm
+    refine ⟨g * x * g⁻¹, ⟨x, hxsharp, g, rfl⟩, ?_⟩
+    rw [Set.mem_smul_set]
+    have hmem : g * x' * g⁻¹ ∈ Rsub hG D (g * x * g⁻¹) := by
+      rw [Rsub_conj, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      have hcalc : (MulAut.conj g)⁻¹ • (g * x' * g⁻¹) = x' := by
+        rw [← map_inv (MulAut.conj) g, MulAut.smul_def, MulAut.conj_apply, inv_inv]; group
+      rw [hcalc]; exact hx'R
+    exact ⟨g * x' * g⁻¹, hmem, by rw [smul_eq_mul]; group⟩
+  · rintro ⟨z, hz, hy⟩
+    rw [Set.mem_smul_set] at hy
+    obtain ⟨r, hr, rfl⟩ := hy
+    rw [sigmaConjugacySaturation, mem_conjClassSet] at hz
+    obtain ⟨t, ht, a, rfl⟩ := hz
+    have hr' : r ∈ Rsub hG D (a * t * a⁻¹) := hr
+    rw [Rsub_conj, Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hr'
+    set s : G := (MulAut.conj a)⁻¹ • r with hs
+    have hrs : r = a * s * a⁻¹ := by
+      rw [hs, ← map_inv (MulAut.conj) a, MulAut.smul_def, MulAut.conj_apply, inv_inv]; group
+    refine ⟨t * s, ⟨t, ht, s, hr', rfl⟩, a, ?_⟩
+    rw [smul_eq_mul, hrs]; group
+
+/-- **BG Lemma 14.5(c)** (mmd L3933-3940): `|𝒞_G(M̃)| = (|M_σ| − 1)·[G : M]`.  Combines Part B
+(the disjoint cover `𝒞_G(M̃) = ⊔ₓ x R(x)`, giving `|𝒞_G(M̃)| = ∑ₓ |R(x)|` via 14.5(a) +
+left-translation) with Part A (`sigmaSaturation_Rsub_count`: `∑ₓ |R(x)| = |M_σ^#|·[G : M]`).
+This is the type-`P` counting bound that drives Theorem 14.7. -/
+theorem sigmaConjugacySaturation_Mtilde_ncard [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    (conjClassSet (Mtilde hG D M)).ncard
+      = (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1) * M.index := by
+  classical
+  have hdisj : (sigmaConjugacySaturation M).PairwiseDisjoint
+      (fun x => x • (Rsub hG D x : Set G)) := by
+    intro x hx y hy hxy
+    simp only [Function.onFun]
+    rw [smul_coe_eq_coset, smul_coe_eq_coset]
+    exact xRsub_disjoint hG D
+      (length_one_of_mem_sigmaConjugacySaturation hG D hM hx).1
+      (length_one_of_mem_sigmaConjugacySaturation hG D hM hy).1 hxy
+  have key : (⋃ x ∈ sigmaConjugacySaturation M, x • (Rsub hG D x : Set G)).ncard
+      = ∑ x ∈ (Set.toFinite (sigmaConjugacySaturation M)).toFinset,
+          Nat.card ↥(Rsub hG D x) := by
+    rw [(Set.toFinite (sigmaConjugacySaturation M)).ncard_biUnion
+        (fun i _ => Set.toFinite _) hdisj, ← finsum_mem_coe_finset]
+    refine finsum_mem_congr (Set.Finite.coe_toFinset _).symm (fun x _ => ?_)
+    rw [Set.ncard_smul_set, ← Nat.card_coe_set_eq]
+    exact Nat.card_congr (Equiv.refl _)
+  have hsharp : (sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)).ncard
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1 := by
+    have hc : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)
+        = (OddOrder.BG.Ch3.S10.Msigma M : Set G).ncard := by
+      rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+    rw [sharpSubgroup, Set.ncard_diff
+        (Set.singleton_subset_iff.mpr (OddOrder.BG.Ch3.S10.Msigma M).one_mem),
+      Set.ncard_singleton, hc]
+  rw [conjClassSet_Mtilde_eq_biUnion hG D, key, sigmaSaturation_Rsub_count hG D hM, hsharp]
 
 /-- **BG Lemma 14.5(b)** (mmd L3875): for nonconjugate maximal `M`, `N`, the conjugacy
 saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
