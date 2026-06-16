@@ -347,3 +347,25 @@ V-vanishing 技法 (each σ-image=scalar·chiFam、break diff `(χ−χ̄)^τ` �
 `∑deg²/mc ≤ 2a` → ⬜ X-sum 恒等式 `∑deg²/mc = w1·hZ·(cZ−1)` (`sum_div_normSq_…` で X-sum 済、要接続) +
 `2a↔2w1²d` → `false_of_caseB_break_of_bounds` で **(6.8.3)** → cX wiring → glue → sole sorry。
 全ツール在庫、deep math gap 無し。**正本=本 cont.⁴¹。hortho_mem landed、次=engine instantiation (最後の山)。**
+
+## cont.⁴² (2026-06-16 loop): ✅ xChainCoherentW (weighted X-chain fold shell)
+**`xChainCoherentW`** (`S08_CoherenceWeighted` 末尾、`cd5409f1`、build-green+axiom-clean) = `xChainCoherent` の
+weighted verbatim analogue (`coherentOfPairChainCover` + `XAdjoinStepInputW.adjoin`、struct 差し替えのみ)。
+base S₀ (case-B = certainTypeSet via `certainTypeSet_isCoherent_tau_canonical`) に既約 X-member pair を fold → X-coherence。
+fold shell は per-step `hstep : XAdjoinStepInputW` を**パラメータ**に取る (xChainCoherent と同型)。
+
+**📍 case-B (6.8.3) ロードマップ (構造ピース全完了、残は per-step 組立)**:
+✅engine一般化 ✅Dmem τ'化 ✅(B)既存 ✅hortho_mem ✅**xChainCoherentW fold** →
+⬜ **per-step `hstep` 構築 = 真の hard core** [次・最重 ~200-400 LOC]: 各 adjoin step で full `XAdjoinStepInputW` を
+heterogeneous member family (accumulator = columns + 既 adjoin 済 irreducibles) から組む。要: (a) X の degree-monotone
+enumeration (pair/χs/cover) (b) 各 member を column/irreducible に分類し Dmem (column=`certainTypeMemberDecomposition`、
+irr=`memberExtensionDecomposition`)・hortho_mem (column=今回の lemma、irr=`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`)
+を供給 (c) mc=norms (column ‖·‖²>1, irr=1) (d) deg data (e) hSgen/hgen/break facts。これが case-A
+`Xset_commutator_isCoherent_…_of_frobenius` の hstepData に相当する case-B monolith。
+→ cX → glue (`coherentXunionYset_caseB_of_glued`) → X∪Y coherence + (6.8.3) `false_of_caseB_break_of_bounds` (S₁=X∪Y、
+hbreak=X-sum 経由) → S coherent → sole sorry の case-B 枝。**+ case-A 枝 + dispatch も sole sorry に要**。
+
+**🔭 honest 見立て**: 構造・基盤ピースは全完了 (engine/Dmem/(B)/hortho_mem/fold)。残 = per-step monolith builder
+(~200-400 LOC、heterogeneous 組立、deep math gap 無しだが大きい) + (6.8.3) wiring + case-A。**large focused assembly**
+(60s loop の小刻みより腰を据えた multi-session 向き、但し全ツール在庫で unblocked)。**正本=本 cont.⁴²。fold shell landed、
+次=per-step hstep monolith (subagent 候補) または (6.8.3) break wiring を先に。**
