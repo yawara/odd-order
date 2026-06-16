@@ -3777,6 +3777,10 @@ set_option linter.style.longLine false in
 -- Base change preserves a subgroup-equality of invariants (issue 8013, piece 5): the prime-manner
 -- transfer `C_M(x) = C_M(R)` from `ZMod p` to its algebraic closure, for the group↔module bridge.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_baseChangeRepresentation_comp_eq
+-- BG Theorem 3.10 (a)+(b), elementary-abelian GROUP case, general kernel (issue 8013, piece 5+2b):
+-- the `MulDistribMulAction` group form, dropping the abelian-kernel restriction by base change to the
+-- algebraic closure + the general-kernel reducible-module Theorem 3.10.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38

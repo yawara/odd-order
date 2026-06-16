@@ -374,4 +374,101 @@ theorem invariants_baseChangeRepresentation_comp_eq
   · rw [← baseChangeRepresentation_comp, ← baseChangeRepresentation_comp,
       finrank_invariants_baseChangeRepresentation, finrank_invariants_baseChangeRepresentation, h]
 
+open OddOrder.RepresentationTheory in
+/-- **BG Theorem 3.10 (a)+(b), elementary-abelian group case, GENERAL kernel** (issue 8013 piece 5).
+Let `H` act (`MulDistribMulAction`) on a finite nontrivial elementary-abelian `p`-group `M`, with
+`H` solvable, a normal `K ⊴ H` (not assumed abelian) acting with `C_M(K) = 1`, `R ≤ H` nonidentity
+acting fixed-point-freely (`hFrob`) and in prime manner (`hcond3`), `p ∤ |H|` and `(|R|,|K|) = 1`.
+Then `|R|` is prime and `finrank (Additive M) = |R| · finrank C_M(R)`.
+
+This drops the **abelian-kernel** restriction of `prime_card_and_finrank_of_elemAbelian` by
+base-changing to the algebraic closure and applying the general-kernel reducible-module Theorem 3.10
+`prime_card_and_finrank_of_frobenius_elemAbelian`.  The subspace-form prime-manner hypothesis
+transfers to the closure via `invariants_baseChangeRepresentation_comp_eq`. -/
+theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
+    [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
+    {K R : Subgroup H} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
+    (hpH : ¬ p ∣ Nat.card H) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hCK : ∀ m : M, (∀ k : ↥K, (k : H) • m = m) → m = 1)
+    (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k)
+    (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
+      ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m)) :
+    ∃ p' : ℕ, p'.Prime ∧ Nat.card ↥R = p' ∧
+      finrank (ZMod p) (Additive M) = Nat.card ↥R *
+        finrank (ZMod p) (Representation.invariants
+          ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := by
+  classical
+  set ρ : Representation (ZMod p) H (Additive M) :=
+    Representation.ofDistribMulAction (ZMod p) H (Additive M) with hρ
+  set ρ' := baseChangeRepresentation (AlgebraicClosure (ZMod p)) ρ with hρ'
+  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  haveI : FiniteDimensional (AlgebraicClosure (ZMod p))
+      (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) := inferInstance
+  haveI hChar : CharP (AlgebraicClosure (ZMod p)) p :=
+    (Algebra.charP_iff (ZMod p) (AlgebraicClosure (ZMod p)) p).mp inferInstance
+  haveI hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
+  haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
+    (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
+      (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
+  -- `p ∤ |H|` gives `(|H| : F̄) ≠ 0`, hence the `NeZero` instance Maschke needs, and `(|K| : F̄) ≠ 0`.
+  haveI hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
+    ⟨by rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpH⟩
+  have hpK : ¬ p ∣ Nat.card ↥K := fun hdvd => hpH (hdvd.trans (Subgroup.card_subgroup_dvd_card K))
+  -- **Bridge**: `ρ g v = v` over `Additive M` ⟺ `(g:H) • (toMul v) = toMul v` in `M`.
+  have hbridge : ∀ (g : H) (v : Additive M),
+      ρ g v = v ↔ (g : H) • Additive.toMul v = Additive.toMul v := by
+    intro g v
+    rw [hρ, Representation.ofDistribMulAction_apply_apply]
+    constructor
+    · intro h; have := congrArg Additive.toMul h; simpa using this
+    · intro h; apply Additive.toMul.injective; simpa using h
+  -- `C_V(K) = 0` over `ZMod p`.
+  have hCK0 : Representation.invariants (ρ.comp K.subtype) = ⊥ := by
+    ext v
+    rw [Representation.mem_invariants, Submodule.mem_bot]
+    constructor
+    · intro h
+      have hfix : ∀ k : ↥K, (k : H) • Additive.toMul v = Additive.toMul v :=
+        fun k => (hbridge (k : H) v).mp (h k)
+      have hv : Additive.toMul v = (1 : M) := hCK (Additive.toMul v) hfix
+      simpa using hv
+    · intro h k; simp [h]
+  have hKcard : (Nat.card ↥K : AlgebraicClosure (ZMod p)) ≠ 0 := by
+    rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpK
+  -- Apply the general-kernel, alg-closed terminal to `ρ'`.
+  obtain ⟨p', hp', hcard', hfr'⟩ := prime_card_and_finrank_of_frobenius_elemAbelian ρ' hRne hKne hcop
+    (by rw [hρ', ← baseChangeRepresentation_comp]
+        exact invariants_baseChangeRepresentation_eq_bot _ _ hCK0)
+    hFrob
+    (fun x hxR hx1 => by
+      -- ZMod p subspace prime-manner, then transfer to the closure.
+      have hsub : Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype)
+          = Representation.invariants (ρ.comp R.subtype) := by
+        ext v
+        rw [Representation.mem_invariants, Representation.mem_invariants]
+        have hgen : ∀ y : ↥(Subgroup.zpowers x), y ∈ Subgroup.zpowers
+            (⟨x, Subgroup.mem_zpowers x⟩ : ↥(Subgroup.zpowers x)) := by
+          intro y; obtain ⟨n, hn⟩ := y.2; exact ⟨n, Subtype.ext (by simpa using hn)⟩
+        have hLHS : (∀ y : ↥(Subgroup.zpowers x), (ρ.comp (Subgroup.zpowers x).subtype) y v = v)
+            ↔ ρ x v = v := by
+          have h := Representation.mem_invariants_iff_of_forall_mem_zpowers
+            (ρ.comp (Subgroup.zpowers x).subtype)
+            (⟨x, Subgroup.mem_zpowers x⟩ : ↥(Subgroup.zpowers x)) hgen v
+          rw [Representation.mem_invariants] at h
+          simpa [MonoidHom.comp_apply] using h
+        rw [hLHS, hbridge x v, hcond3 x hxR hx1 (Additive.toMul v)]
+        refine forall_congr' (fun s => ?_)
+        rw [← hbridge (s : H) v]
+        rfl
+      rw [hρ']
+      exact (invariants_baseChangeRepresentation_comp_eq (AlgebraicClosure (ZMod p)) ρ
+        (Subgroup.zpowers_le.mpr hxR) hsub.symm).symm)
+  refine ⟨p', hp', hcard', ?_⟩
+  rw [hρ', Module.finrank_baseChange (R := AlgebraicClosure (ZMod p)) (S := ZMod p)
+      (M' := Additive M),
+    ← baseChangeRepresentation_comp, finrank_invariants_baseChangeRepresentation] at hfr'
+  exact hfr'
+
 end OddOrder.BG.Ch1.S03
