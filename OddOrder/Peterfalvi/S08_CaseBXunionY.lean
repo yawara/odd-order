@@ -214,4 +214,77 @@ theorem certainTypeSet_finite
   rintro f ⟨χ₂, -, -, rfl⟩
   exact ⟨χ₂, rfl⟩
 
+/-- **(6.8.2) case-(B), the glue map `ν` (`τ₂`) for the `certainTypeSet ⊔ Y` base union.**
+
+The combined `IntegralCharacterMap (↥L) G` of the case-(B) `(6.8.2)` glue: it agrees with the
+certain-type coherent extension `certainTypeExtension h46` on **every** column character
+`μ_j = columnSum h46 χ₂`, and with the `Y`-coherent extension `coherentYset.extension` on every
+`η ∈ Y`.
+
+Built by `exists_integralCharacterMap_glue_of_orthonormal` from the **grid** source family
+`{μ_{ij}}` (`p ↦ (h46.columnFamily p.1).mu p.2`, orthonormal irreducibles — the
+`SignedIrreducibleDifferenceFamily.mu` are `IrreducibleCharacter`) and `Y` (orthonormal irreducibles),
+which are mutually orthogonal by `inner_columnFamily_mu_Yset_eq_zero` (the source-level `(4.1)`
+`X ⊥ Y`).  The column-character agreement is recovered from the grid agreement *by linearity*
+(`columnSum = ∑_i μ_{ij}` via `columnSum_def`, `map_sum`), since `columnSum` is itself **not**
+orthonormal (norm `|W₁|`) and cannot serve as a glue source directly.
+
+This supplies the `ν`/`hagreeX`/`hagreeY` inputs of `coherentXunionYset_caseB_of_glued` (instantiated
+with the column base `X := certainTypeSet h46 k`); the column agreement specialises to the
+certain-type members `columnSum h46 χ₂ ∈ 𝒯`. -/
+theorem exists_glue_nu_columnSum_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)] :
+    ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G,
+      (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+        ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+          = OddOrder.Peterfalvi.S06.certainTypeExtension h46
+              (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)) ∧
+      (∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y) := by
+  classical
+  haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
+    SibleyDadeHypothesis.finite_linearCharacters_of_finite
+  -- CF-level orthonormality of irreducibles (`⟨φ,ψ⟩ = δ` for irreducible `φ,ψ`).
+  have hinner : ∀ φ ψ : ClassFunction ↥L ℂ, IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  -- the orthonormal grid source family `{μ_{ij}}`, indexed by `(χ₂, i)`.
+  set grid : Set (ClassFunction ↥L ℂ) :=
+    Set.range (fun p : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) × Fin (Nat.card h46.W1) =>
+      ((h46.columnFamily p.1).mu p.2 : ClassFunction ↥L ℂ)) with hgrid
+  have hXfin : grid.Finite := Set.finite_range _
+  have hXorth : ∀ x ∈ grid, ∀ x' ∈ grid,
+      ClassFunction.inner x x' = if x = x' then (1 : ℂ) else 0 := by
+    rintro _ ⟨p, rfl⟩ _ ⟨q, rfl⟩
+    exact hinner _ _ ((h46.columnFamily p.1).mu p.2).property
+      ((h46.columnFamily q.1).mu q.2).property
+  have hYorth : ∀ y ∈ hyp.Yset, ∀ y' ∈ hyp.Yset,
+      ClassFunction.inner y y' = if y = y' then (1 : ℂ) else 0 :=
+    fun y hy y' hy' => hinner _ _ (hyp.isIrreducibleCharacter_of_mem_Yset hy)
+      (hyp.isIrreducibleCharacter_of_mem_Yset hy')
+  have hXY : ∀ x ∈ grid, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0 := by
+    rintro _ ⟨p, rfl⟩ y hy
+    exact inner_columnFamily_mu_Yset_eq_zero hyp h46 hW1 hy p.1 p.2
+  -- glue the two orthonormal source families through the two coherent extensions.
+  obtain ⟨ν, hνgrid, hνY⟩ :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
+    hXfin hyp.Yset_finite hXorth hYorth hXY
+    (OddOrder.Peterfalvi.S06.certainTypeExtension h46) hyp.coherentYset.extension
+  refine ⟨ν, fun χ₂ => ?_, hνY⟩
+  -- column agreement by linearity: `ν(∑ μ_{ij}) = ∑ ν μ_{ij} = ∑ certainTypeExtension μ_{ij}`.
+  rw [OddOrder.Peterfalvi.S06.columnSum_def]
+  simp only [map_sum]
+  exact Finset.sum_congr rfl fun i _ => hνgrid _ ⟨(χ₂, i), rfl⟩
+
 end OddOrder.Peterfalvi.S08
