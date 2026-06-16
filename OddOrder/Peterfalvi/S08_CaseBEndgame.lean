@@ -100,4 +100,35 @@ theorem two_mul_add_one_sq_le_of_two_fpf_factors {w1 idxHHc idxHcZ idxHZ : ℕ}
     _ ≤ idxHHc * idxHcZ := Nat.mul_le_mul h1 h2
     _ = idxHZ := hprod.symm
 
+/-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
+contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
+`d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
+(oddness + `card_modEq_one` divisibility + the chain index identity `hZ = |H:H′|·|H′:Z|`), one derives
+`False`.  This composes the FPF index bound `two_mul_add_one_sq_le_of_two_fpf_factors` (giving the
+`(2·w1+1)² ≤ hZ` input) with the break arithmetic core `false_of_w2_break_arith`.
+
+Every hypothesis is labelled by its source, so the remaining case-(B) (6.8.3) extension reduces to
+supplying these inputs from the Sibley data:
+
+* `hbreak` — the (5.6) break-pair degree bound over the **mixed** `X` (`X` contains reducible
+  certain-type columns, so the case-(A) all-irreducible break-pair engine `exists_coherentBreakPair`
+  / `xSum_le_two_psi` does **not** transfer; a norm-`‖χ‖²`-weighted break is required);
+* `hdsq` — [Is] Cor 2.30, valid because `Z = W₂` is central in `H`;
+* `hcZ` — `|W₂| ≥ 2` (`W₂ ≠ 1`);
+* the two FPF blocks — `W₁` acts fixed-point-freely on `H/H′` and on `H′/W₂`, and
+  `|H:W₂| = |H:H′|·|H′:W₂|`.
+
+Here `w1 = |W₁|`, `d = θ(1)`, `hZ = |H:W₂|`, `cZ = |W₂|`, `idxHHc = |H:H′|`, `idxHcZ = |H′:W₂|`. -/
+theorem false_of_caseB_break_of_bounds {w1 d hZ cZ idxHHc idxHcZ : ℕ}
+    (hw1 : 1 ≤ w1) (hw1odd : Odd w1) (hd : 1 ≤ d)
+    (hdsq : d ^ 2 ≤ hZ) (hcZ : 2 ≤ cZ)
+    (hbreak : w1 * hZ * (cZ - 1) ≤ 2 * w1 ^ 2 * d)
+    (h1odd : Odd idxHHc) (h1gt : 1 < idxHHc) (h1dvd : w1 ∣ idxHHc - 1)
+    (h2odd : Odd idxHcZ) (h2gt : 1 < idxHcZ) (h2dvd : w1 ∣ idxHcZ - 1)
+    (hprod : hZ = idxHHc * idxHcZ) :
+    False :=
+  false_of_w2_break_arith hw1 hd hdsq hcZ
+    (two_mul_add_one_sq_le_of_two_fpf_factors hw1odd h1odd h1gt h1dvd h2odd h2gt h2dvd hprod)
+    hbreak
+
 end OddOrder.Peterfalvi.S08
