@@ -2016,6 +2016,29 @@ theorem le_sup_inf_centralizer_of_commutator_le [Finite G]
   calc N = Subgroup.centralizer (D : Set G) ⊓ N ⊔ M₀ := hmapN.symm
     _ = M₀ ⊔ (N ⊓ Subgroup.centralizer (D : Set G)) := by rw [inf_comm, sup_comm]
 
+/-- **Step 3(ii) contradiction engine** for Theorem 15.2 (mmd L4194): in the configuration
+`Q₀ = C_Q(D) ≤ Q₁ ≤ Q` with `D`/`Q₁` normalizing the relevant subgroups and `(|D|, |Q₁|) = 1`, if
+`D` centralizes `Q₁/Q₀` (`⁅Q₁, D⁆ ≤ Q₀`) then `Q₁ ≤ Q₀`.  This is the collapse that makes "`D`
+centralizes `Q₁/Q₀`" contradict `Q₀ < Q₁`: the lifting `le_sup_inf_centralizer_of_commutator_le`
+gives `Q₁ ≤ Q₀ ⊔ C_{Q₁}(D)`, and `C_{Q₁}(D) = Q₁ ⊓ C_G(D) ≤ Q ⊓ C_G(D) = Q₀` (since `Q₁ ≤ Q`),
+so `Q₁ ≤ Q₀`.  In the proof of (e), `D` centralizing `Q₁/Q₀` is what the regular `K`-action on
+`DQ₁/Q₀` (via Theorem 3.7) forces, so this lemma turns that into the contradiction `Q₁ = Q₀`. -/
+theorem le_of_commutator_le_centralizerCap [Finite G]
+    {Q Q0 Q1 D : Subgroup G}
+    (hQ0 : Q0 = Q ⊓ Subgroup.centralizer (D : Set G))
+    (hQ01 : Q0 ≤ Q1) (hQ1Q : Q1 ≤ Q)
+    (hDQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hQ1Q0 : Q1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G))
+    (hcomm : ⁅Q1, D⁆ ≤ Q0)
+    (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1))
+    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥Q1) :
+    Q1 ≤ Q0 := by
+  have hlift := le_sup_inf_centralizer_of_commutator_le hQ01 hDQ1 hQ1Q0 hDQ0 hcomm hcop hSolv
+  have hcap : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0 := by
+    rw [hQ0]; exact inf_le_inf_right _ hQ1Q
+  exact hlift.trans (sup_le le_rfl hcap)
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
