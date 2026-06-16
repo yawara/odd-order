@@ -467,3 +467,26 @@ S₁ member family に on-path** (S₁ の column members 用)。単一 break �
 (教科書 misread)。on-path = (5.6) engine/bound + Dmem + hortho_mem + FPF tower。残 = (6.8.2) τ₂ (case-B assembly、
 進捗未 assess) + (6.8.3) 単一 break wiring。**正本=本 cont.⁴⁶ (cont.⁴⁵ 訂正)。次=case-B assembly の (6.8.2) τ₂
 進捗を assess (columnDecompositionTau/caseB_per_phi_anchored がどこまで X∪Y coherence を産むか) → (6.8.3) wiring。**
+
+## cont.⁴⁷ (2026-06-16 loop): cX 構築 infra 特定 + セッション consolidation
+case-B assembly assess: **cX (`IsCoherent (Xset)`) を産む定理は無い** (glue `coherentXunionYset_caseB_of_glued` は cX を入力)。
+per-χ (6.8.2.3) ingredients は揃う: `columnDecompositionTau`/`irreducibleDecompositionTau` (`S08_CaseBCoherence2`、
+caseB_constituentDecomposition `:1104/1112` が消費) + `per_constituent_Y_eq_smul` (`:871`、(6.8.2.3) τ₂-Y pinning) +
+X-orthogonalities (`columnDecompositionTau_X_orthogonal` 等)。
+**cX 構築 infra (S07)**: `retarget_isCoherent_of_decompositions*` (`:3911-4126`) / `coherentImageMapGlue` (`:3092`) /
+`exists_integralCharacterMap_glue_of_orthonormal` (`:3125`) = per-χ images から IsCoherent 構築。
+**⟹ 残 cX = これら infra に per-χ (6.8.2.3) decompositions を投入し `IsCoherent (Xset)` を τ₂|_X 構築** (intricate、
+case-B assembly/S07 領域、未着手)。
+
+### 📊 セッション総括 (2026-06-16 lane-b、~18 loop iterations)
+**landed (11 Lean commit、全 build-green+axiom-clean)**:
+- ✅ on-path: `xAdjoinStepW` 一般化 + `.adjoin` + struct + **`coherentDegreeSqNormBound_of_not_coherentW`** ((5.6) bound) /
+  `certainTypeMemberDecomposition` (ψ=0 Dmem、τ' 一般化) / **`certainTypeR_imageSet_orthogonal_dadeOfDiff`** (hortho_mem) /
+  unconditional helper `Xset_hasNoRealCharacters_caseB`/`certainTypeSet_closedUnderConjugate`。← (6.8.3) 単一 break 用。
+- ⚠ detour (valid だが case-B 経路外): `xChainCoherentW` (`cd5409f1`) / `caseB_Xset_conjugatePairCover` (`93f3b670`)。
+**確定事項**: cont.³⁶ 誤診訂正 (R(μ_j)=certainTypeR 既存) / (B) reconciliation 既存 / **原典 (6.8) 構造確定**
+((6.8.2)=τ₂ 直接 not chain、(6.8.3)=単一 (5.6) break)。
+**残務 (正確)**: (a) **cX via per-χ (6.8.2.3) τ₂|_X 構築** [上記 infra、未着手、large] (b) glue → X∪Y (c) (6.8.3) 単一
+break wiring [my (5.6) bound + X-sum + FPF] (d) sole sorry (case-A+B+dispatch)。**deep math gap 無し・全 ingredients/infra
+在庫だが large focused assembly** (multi-session or Workflow 向き)。**正本=本 cont.⁴⁷。次セッション: cX via per-χ τ₂|_X
+を `retarget_isCoherent_of_decompositions*` + columnDecompositionTau で構築 (xChainCoherentW は使わない)。**
