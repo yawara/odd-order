@@ -3336,3 +3336,16 @@ cont.²⁵ で「#2 FPF factor blocks (tractable)」と判定後、FPF 導出層
 **🛑 正直な戦略フラグ (要認識)**: **FPF tower (`hfpf`) は (6.8.3) L4 の 4 obligation の 1 つに過ぎず、しかも easier な方**。L4 capstone (`false_of_coherentXunionYset_caseB_of_not_coherentS`) の真の long pole = **#1 norm-aware (5.6) break bound for reducible S** (cont.²⁵ 発見: case-B の S は可約 column を含む mixed ⟹ case-A の `exists_coherentBreakPair` [全既約要求] / `xSum_le_two_psi` [Frobenius+全既約] が不適用、‖χ‖²-weighted な break-pair existence + (5.6) bound の新規 infra が必要)。**#1 は未着手で最重**。FPF tower 完成 (hfpf close) しても #1 無しでは L4 は閉じない。⟹ hfpf 完成後の優先 = #1 の真の難度評価 (loop-tractable か、focused workflow / ChatGPT 相談 [[feedback-ask-chatgpt-for-elided-gaps]] が要るか)。
 
 **▶ 次 (loop)**: H′/W₂ 枝 → assembly で `hfpf` を close、その後 #1 評価へ pivot。**正本=本 cont.²⁶。FPF tower 8 commits、H/H′ 実データ完成。残=H′/W₂+assembly→hfpf。真 long pole=#1 (reducible-S break, 未着手)。Opus 継続。**
+
+### session 43 cont.²⁷: 🛑 #1 (reducible-S break) verdict 確定 — framework 一般化必須・loop-tractable でない
+cont.²⁶ で #1 を long pole とフラグ後、S07/(5.6) 機構を精査して **定義的 verdict** を得た:
+- **(5.6) engine `sMember_degreeSumBound_of_not_coherent` (CorePart2:2650) + `sMember_degreeSqReBound_of_not_coherent` は `hF : IsFrobeniusGroup` 依存** = case-A (Frobenius) 専用。case-B (CertainType) では `hF` 無し。
+- **結論が S₁ を `χmem : Fin k → IrreducibleCharacter ↥L` として列挙**(`.re^2`、‖χ‖² denominator 無し)。case-B の S₁ は可約 column を含む ⟹ 既約列挙が破綻。
+- **S07 に norm-weighted / reducible-aware な coherence-break 機構は存在しない**(grep 確認)。S07 coherence 理論全体が `‖χ‖²=1`(既約・正規直交)前提(S07:2492/2528/3240)。
+- `exists_conjugatePairCover` も同様に既約 pair 前提。
+
+⟹ **#1 = §5/§7 の coherence-break framework を「Frobenius-free かつ norm-weighted (reducible-S 対応)」に一般化する大規模改修**。`sMember_degreeSumBound_of_not_coherent` / `exists_conjugatePairCover` / DadeChainStep / (5.6) bound の reformulation を要し、**loop-cadence では不可・focused multi-session または framework 専任作業**。
+
+**現状の B lane 成果(再利用可能)**: (6.8.3) 算術 spine + FPF tower(H/H′ 実データ完成、H′/W₂+assembly 残)は #1 と独立に valid。capstone `sibleySetup_is_coherent` の case-B branch は #1 が closeしない限り閉じない。
+
+**▶ 戦略 fork(要ユーザー判断)**: (a) FPF tower 完成(hfpf 再利用 infra、L4 は #1 block 継続) / (b) #1 の textbook 再定式化を ChatGPT 評価(reducible-S 回避の余地精査) / (c) endpoint B/C/D/E signature-pin に redirect / (d) #1 framework 一般化に着手(大規模)。**正本=本 cont.²⁷。#1 = framework 一般化必須・loop 不可。**
