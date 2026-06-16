@@ -4622,6 +4622,23 @@ nonidentity `σ(M)'`-element `x'` of `C_M(x)`, either `π(⟨x'⟩) ⊆ κ(M)` w
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_diagnostic
 
+/-! **BG Theorem 14.4** (`S14_TypePCounting`, `sigmaLength_one_centralizer_structure`): if
+`ℓ_σ(x) = 1` and `|𝓜_σ(x)| > 1`, then `C_G(x)` lies in a unique `N ∈ 𝓜` with
+`R(x) = N_σ ∩ C_G(x) ⊋ 1` a Hall `σ(N)`-subgroup of `C_G(x)`, `π(⟨x⟩) ⊆ τ₂(N)`,
+`N ∈ 𝓜_F ∪ 𝓜_{P₂}`, and for every `M ∈ 𝓜_σ(x)`: `τ₂(N) ∩ π(N) ⊆ σ(M)`, `σ(N) ∩ π(M) ⊆ β(N)`,
+and `M ∩ N` complements `N_σ` in `N`.  (The `§16`-circular sharply-transitive headline and part
+(b) are deferred to §16's `RData`.)  Proof: Theorems 13.9 + 10.1(b) give `N ≠ M`; Proposition
+12.15(e) gives `(d)`, `(e)`, `q ∈ τ₂(N)`; Corollary 14.3 (`sigma_diagnostic`) gives
+`π(⟨x⟩) ⊆ τ₂(N)` and the uniqueness `𝓜(C_G(x)) = {N}`; Corollary 12.6 +
+`exists_subgroupESetup_with_le` give `(c)`.  The `(c)` clause uses `∩ piSet N` (BG's `τ₂(N) ⊆ π(N)`)
+since the repo `tau2` predicate is not prime-restricted.  Fully unconditional, axiom-clean.  Helper
+`Msigma_inf_normalizer_eq_bot_of_tau2` (`N_G(A) ⊓ M_σ = 1` for `A ∈ ℰ_p²(E)`, `p ∈ τ₂(M)`, the crux
+of `(c)`) is also axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_one_centralizer_structure
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_inf_normalizer_eq_bot_of_tau2
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
