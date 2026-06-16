@@ -123,6 +123,20 @@ theorem xChiExtension_columnSum
   · intro i _ hi; exact xChiExtension_mu_ne_zero h46 Ximg χ₂ hi
   · intro h0; exact absurd (Finset.mem_univ _) h0
 
+/-- **A `(5.4)` decomposition's `X`-part is a virtual character** (`D.X ∈ ℤ[Irr G]`).  Generic
+brick discharging the `hXzirr` obligation of the textbook `X_χ`-coherence: `X = ∑_{α ∈ R(χ)} coeff α • α`
+(`X_eq`) is a `ℤ`-combination of the orthonormal image-family members `α ∈ ZIrr G`
+(`imageFamily.mem_ZIrr`).  For the column decomposition `columnDecompositionTau`, `imageFamily =
+columnRFamilyTau` (`imageSet = certainTypeR.imageSet`, the signed `σ`-images), so its `X` lands in
+`ZIrr G`. -/
+theorem characterPsiDecomposition_X_mem_ZIrr
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {χ ψ : ClassFunction ↥L ℂ}
+    (D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition τ χ ψ) : D.X ∈ ZIrr G := by
+  rw [D.X_eq]
+  exact Submodule.sum_mem _ (fun α hα => by
+    rw [Int.cast_smul_eq_zsmul ℂ (D.coeff α) α]
+    exact Submodule.smul_mem _ (D.coeff α) (D.imageFamily.mem_ZIrr α hα))
+
 /-- **The textbook case-(B) `X`-coherence on the certain-type columns** (Peterfalvi (6.8.2),
 `X_χ`-route).  The Sibley–Dade map `hyp.tau` is coherent on `certainTypeSet h46 k` with the extension
 `ν = xChiExtension h46 Ximg` sending each column `μ_j = columnSum χ₂` to its `(6.8.2.3)` projection
