@@ -5289,6 +5289,58 @@ theorem exists_neighbor_kappaHall_swap_normal [Finite G]
   rw [← hcanon, hswap]
   exact (sup_le_normalizer_inf_of_commute inf_le_right).trans inf_le_right
 
+/-- **BG 14.7, full per-neighbour data** (mmd L3997-4015): the complete per-member package the
+`M_i` family consumes — for a line `X ∈ ℰ_p¹(K)` and a maximal `N ⊇ N_G(X)`, a Hall `κ(N)`-subgroup
+`K_N` with the swap `Z = K_N ⊔ K_N*` (canonical `K_N* = Z ⊓ M_σ(N)`), `K_N* ◁ Z`, `N` type-`P`, and
+`K_N* ≠ ⊥` (since `X ≤ K_N*`, as `X ≤ K ≤ Z` and `X ⊆ M_σ(N)`).  Builds on
+`exists_neighbor_kappaHall_swap_normal` + `typeP_neighbor_embed`/`typeP_neighbor_kappa`. -/
+theorem exists_neighbor_full [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
+      K ⊔ Kstar ≤ Subgroup.normalizer
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) ∧
+      IsTypeP N ∧ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≠ ⊥ := by
+  obtain ⟨KN, hKNN, hKN, hswap, hnorm⟩ :=
+    exists_neighbor_kappaHall_swap_normal hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  obtain ⟨_, _, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr Finite.one_lt_card
+  have hPN : IsTypeP N := ⟨q, hκ q hq⟩
+  have hXKstar : X ≤ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    le_inf (hXK.trans le_sup_left) hXNσ
+  have hKstarNne : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≠ ⊥ := fun hbot =>
+    ne_bot_of_mem_elemAbelianOfRank_one hX (le_bot_iff.mp (hbot ▸ hXKstar))
+  exact ⟨KN, hKNN, hKN, hswap, hnorm, hPN, hKstarNne⟩
+
+/-- **BG 14.7, two family members are nonconjugate** (mmd L4015): given two type-`P` maximals
+`N₁ ≠ N₂` with Hall `κ`-subgroups and the swaps `Z = Kₖ ⊔ (M_σ(Nₖ) ⊓ C(Kₖ))` (`Z₂* ≠ ⊥`), the
+members are nonconjugate.  Combines Proposition 14.2(c) (`typeP_neighbor_Kstar_inf_eq_bot`: the swap
+factors meet trivially since the members are distinct) with `typeP_family_nonconjugate`.  This is
+the per-pair input to the family's pairwise nonconjugacy (and thence Lemma 14.5(b)). -/
+theorem neighbor_pair_nonconjugate [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {K Kstar N₁ N₂ K₁ K₂ : Subgroup G}
+    (hN₁ : N₁ ∈ maximalSubgroups G) (hP₁ : IsTypeP N₁) (hK₁N₁ : K₁ ≤ N₁)
+    (hK₁ : Ch03.IsHallSubgroup (kappa N₁) (K₁.subgroupOf N₁))
+    (hN₂ : N₂ ∈ maximalSubgroups G) (hP₂ : IsTypeP N₂) (hK₂N₂ : K₂ ≤ N₂)
+    (hK₂ : Ch03.IsHallSubgroup (kappa N₂) (K₂.subgroupOf N₂))
+    (hsw₁ : K ⊔ Kstar = K₁ ⊔ (OddOrder.BG.Ch3.S10.Msigma N₁ ⊓ Subgroup.centralizer (K₁ : Set G)))
+    (hsw₂ : K ⊔ Kstar = K₂ ⊔ (OddOrder.BG.Ch3.S10.Msigma N₂ ⊓ Subgroup.centralizer (K₂ : Set G)))
+    (hne₂ : OddOrder.BG.Ch3.S10.Msigma N₂ ⊓ Subgroup.centralizer (K₂ : Set G) ≠ ⊥)
+    (hne : N₁ ≠ N₂) :
+    ¬ IsConjugateSubgroup N₁ N₂ :=
+  typeP_family_nonconjugate hK₁N₁ hK₁ hsw₁ hsw₂ hne₂
+    (typeP_neighbor_Kstar_inf_eq_bot hG hN₁ hP₁ hK₁N₁ hK₁ hN₂ hP₂ hK₂N₂ hK₂ hne)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
