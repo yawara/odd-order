@@ -3767,6 +3767,9 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.finrank_inf_invariants_sup_of_disjoint
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_toRepresentation_eq_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_toRepresentation_eq_of_inf_eq
+-- BG Theorem 3.10 (a)+(b), elementary-abelian reducible-module case (issue 8013, piece 5): drops the
+-- irreducibility hypothesis of piece 3 via a Maschke `⊤ = U ⊕ U'` strong induction on `finrank V`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_frobenius_elemAbelian
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
