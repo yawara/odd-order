@@ -156,6 +156,7 @@ import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBCoherence2
 import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S08_CoherenceWeighted
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
