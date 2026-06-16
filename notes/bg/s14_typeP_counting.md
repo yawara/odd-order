@@ -1361,3 +1361,27 @@ conjugate なら σ(M₁)=σ(M₂)、Z₁,Z₂ は Z の disjoint normal τ-Hall
 
 **本 loop⁷ 累計 18 定理**、全 S14 内 sorry-free + axiom-clean + AxiomsCheck。typeP_duality の building block +
 integration helper は全て landing、残りは族 Finset 上の counting 統合 (最終 endgame、~200行)。
+
+### ✅ 族インフラ完成 (2026-06-17 loop⁷ /loop自走、26 定理+1def) — 残り = counting endgame
+
+**/loop dynamic mode で 8 イテレーション自走、全 green + axiom-clean (一発通過多数)**:
+- per-neighbor: `exists_neighbor_kappaHall_swap_normal` / `exists_neighbor_full` / `exists_neighbor_data`
+  (raw swap + canonical K_N*=Z⊓Msigma N + ⊴Z + type-P + K_N*≠⊥ を 1 call)
+- M (i=0): `typeP_self_member` (K_M*=Kstar、同形)
+- **族述語 + 統一データ**: `IsZFamilyMember M K N` (def) + `typeP_family_member_data` (∀メンバーの統一データ)
+- **pairwise 非共役**: `neighbor_pair_nonconjugate` (per-pair) + `typeP_family_pairwise_nonconjugate` (∀メンバー)
+- collapse helper: `le_of_coprime_index` (N⊴G, |H| coprime [G:N] ⟹ H≤N)
+- factor normality `sup_le_normalizer_inf_of_commute` / `card_sup_of_commute_of_disjoint` /
+  `commute_of_le_normalizer_of_disjoint`
+
+**▶ 残り = counting endgame (intricate, 相互依存)**:
+1. **族 Finset** (Set.Finite.toFinset, IsZFamilyMember から) — 軽い wrapping。
+2. **T=Z−⋃K_i* TI + N_G(T)=Z** — 🔴 hard: 各 i で Z=K_i×K_i* (swap) の per-i decomposition + Prop14.2(d)。
+   t∈T ⟺ ∃i, t=y y' (y∈K_i*#, y'∈K_i#)。σ-decomposition の per-i 構造が要。
+3. **|M_i|≥2z** — Z<M_i (proper) を要す: Msigma M_i ⊋ K_i*=Z⊓Msigma M_i (σ(M_i) が π(z) に収まらない)。要論証。
+4. **density 不等式** — |𝒞_G(T)|=|T|[G:Z] (TI count) + |𝒞_G(M̃_i)|=(|M_iσ|−1)[G:M_i] (14.5c済) +
+   14.5(b)済 disjoint + 14.6 (T∩M̃_i=∅) で 𝒞_G(T)⊥𝒞_G(M̃_i) → Σ≥|G| 矛盾 (算術は 1+(n−1)/(2z)≥1、trivial)。
+5. **n=1 collapse** (le_of_coprime_index + |K_i| 素数 [Prop14.2(g)] + pairwise coprime) → Mstar。
+6. **covering** (half_lt 交差) + **part(h)** (Prop14.2(a) + K cyclic)。
+
+⚠ endgame は helper grinding と違い相互依存・σ-decomposition が subtle。loop で進めるが blocker は document。

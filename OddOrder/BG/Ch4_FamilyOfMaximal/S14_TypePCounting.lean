@@ -5411,6 +5411,99 @@ theorem exists_neighbor_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact ⟨KN, hKNN, hKN, hswap, hcanon, ⟨q, hκ q hq⟩, fun hbot =>
     ne_bot_of_mem_elemAbelianOfRank_one hX (le_bot_iff.mp (hbot ▸ hcanon.symm ▸ hXcanon))⟩
 
+/-- **BG 14.7, the family member predicate** (mmd L4003): `N` is a member of the type-`P` family
+attached to `Z` — either `N = M`, or `N` is a maximal subgroup over `N_G(X)` for a line
+`X ∈ ℰ_p¹(K)`. -/
+def IsZFamilyMember (M K N : Subgroup G) : Prop :=
+  N = M ∨ ∃ (p : ℕ) (X : Subgroup G), p.Prime ∧ X ∈ elemAbelianOfRank G p 1 ∧ X ≤ K ∧
+    N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))
+
+/-- **BG 14.7, uniform per-member data for the family** (mmd L4003-4015): every member `N` of the
+type-`P` family is a type-`P` maximal subgroup containing `Z = K ⊔ K*`, with a Hall `κ(N)`-subgroup
+`K_N` realising the swap `Z = K_N ⊔ K_N*` (raw `K_N* = M_σ(N) ⊓ C(K_N)`, canonical
+`K_N* = Z ⊓ M_σ(N)`, `K_N* ≠ ⊥`).  Case-split on `N = M` (`typeP_self_member`) vs a neighbour
+(`exists_neighbor_data`); this is the data the family `Finset` carries. -/
+theorem typeP_family_member_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    N ∈ maximalSubgroups G ∧ IsTypeP N ∧ K ⊔ Kstar ≤ N ∧
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+        = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G) ≠ ⊥ := by
+  rcases hN with hNM | ⟨p, X, hp, hX, hXK, hN⟩
+  · -- `N = M`: base member.
+    rw [hNM]
+    obtain ⟨hKstarEq, _, _, _⟩ := typeP_self_member hG hM hP hKM hK hKstar hU
+    refine ⟨hM, hP, sup_le hKM (hKstar ▸ inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)),
+      K, hKM, hK, by rw [hKstar], (hKstarEq.trans hKstar).symm,
+      hKstar ▸ (typeP_structure hG hM hP hKM hK hKstar hU).2.1⟩
+  · -- neighbour from a line `X`.
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
+      intro hbot
+      refine (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (le_bot_iff.mp ?_)
+      rw [hKstar]
+      calc OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+          ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) :=
+            inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK))
+        _ = ⊥ := hbot
+    obtain ⟨KN, hKNN, hKN, hswap, hcanon, hPN, hne⟩ :=
+      exists_neighbor_data hG hM hP hKM hK hKstar hU hX hXK hCX hN
+    refine ⟨mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hN).1, hPN,
+      hswap ▸ sup_le hKNN (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le N)),
+      KN, hKNN, hKN, hswap, hcanon, hne⟩
+
+/-- **BG 14.7, the family is pairwise nonconjugate** (mmd L4015): any two distinct members of the
+type-`P` family are nonconjugate.  Extracts each member's swap data
+(`typeP_family_member_data`) and applies `neighbor_pair_nonconjugate`.  Feeds Lemma 14.5(b)
+(pairwise disjointness of the `𝒞_G(M̃ᵢ)`). -/
+theorem typeP_family_pairwise_nonconjugate [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ¬ IsConjugateSubgroup N₁ N₂ := by
+  obtain ⟨hN₁max, hP₁, _, K₁, hK₁N₁, hK₁, hsw₁, _, _⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, hP₂, _, K₂, hK₂N₂, hK₂, hsw₂, _, hne₂⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  exact neighbor_pair_nonconjugate hG hN₁max hP₁ hK₁N₁ hK₁ hN₂max hP₂ hK₂N₂ hK₂ hsw₁ hsw₂ hne₂ hne
+
+/-- **BG 14.7, the family `Kᵢ*` are pairwise disjoint** (mmd L4005): for distinct members
+`N₁ ≠ N₂`, the canonical factors `Kᵢ* = Z ⊓ M_σ(Nᵢ)` meet trivially.  Distinct members are
+nonconjugate (`typeP_family_pairwise_nonconjugate`), so `σ(N₁)`, `σ(N₂)` are disjoint
+(Theorem 13.9), hence `M_σ(N₁) ⊓ M_σ(N₂) = ⊥` (coprime `σ`-groups), and a fortiori the `Kᵢ*` meet
+trivially.  This is the pairwise-`⊥` input to the inclusion–exclusion `|T|` count. -/
+theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁) ⊓
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂) = ⊥ := by
+  obtain ⟨hN₁max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  have hnc := typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU hN₁ hN₂ hne
+  have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₁max hN₂max hnc
+  have hMσdisj : OddOrder.BG.Ch3.S10.Msigma N₁ ⊓ OddOrder.BG.Ch3.S10.Msigma N₂ = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hr₁ hr₂
+    exact Set.disjoint_left.mp hσdisj
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₁ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hr₁, Nat.card_pos.ne'⟩))
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₂ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hr₂, Nat.card_pos.ne'⟩))
+  exact le_bot_iff.mp (le_trans (inf_le_inf inf_le_right inf_le_right) (le_of_eq hMσdisj))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
