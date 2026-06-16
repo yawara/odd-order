@@ -471,4 +471,145 @@ theorem prime_card_and_finrank_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
     ← baseChangeRepresentation_comp, finrank_invariants_baseChangeRepresentation] at hfr'
   exact hfr'
 
+/-- **BG Theorem 3.10 (b) in cardinality form, elementary-abelian group case, general kernel**
+(issue 8013 piece 5+2b — this is `(f)` `|Q̄| = q^p` of §15.2 step 4).  Under the same hypotheses as
+`prime_card_and_finrank_of_elemAbelian_general`, `|M| = |C_M(R)|^{|R|}` where `C_M(R)` is the
+`R`-invariant submodule (`= C_M(R)` as the `R`-fixed points of `M`).
+
+Both `|M|` and `|C_M(R)|` are powers of `p` with exponents `finrank (Additive M)` and
+`finrank C_M(R)` (`Module.card_eq_pow_finrank`); the rank formula `(b)`
+`finrank (Additive M) = |R| · finrank C_M(R)` turns the first into the `|R|`-th power of the second. -/
+theorem card_eq_pow_card_invariants_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
+    [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
+    {K R : Subgroup H} [K.Normal] (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
+    (hpH : ¬ p ∣ Nat.card H) (hcop : Nat.Coprime (Nat.card ↥R) (Nat.card ↥K))
+    (hCK : ∀ m : M, (∀ k : ↥K, (k : H) • m = m) → m = 1)
+    (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k)
+    (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
+      ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m)) :
+    Nat.card M = (Nat.card ↥(Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R := by
+  classical
+  obtain ⟨_, _, _, hfr⟩ := prime_card_and_finrank_of_elemAbelian_general hRne hKne hpH hcop hCK hFrob
+    hcond3
+  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  haveI : Fintype (Additive M) := Fintype.ofFinite _
+  haveI : Fintype ↥(Representation.invariants
+    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := Fintype.ofFinite _
+  show Nat.card (Additive M) = (Nat.card ↥(Representation.invariants
+    ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))) ^ Nat.card ↥R
+  have hM : Nat.card (Additive M) = p ^ finrank (ZMod p) (Additive M) := by
+    rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
+  have hInv : Nat.card ↥(Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype))
+      = p ^ finrank (ZMod p) (Representation.invariants
+        ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) := by
+    rw [Nat.card_eq_fintype_card, Module.card_eq_pow_finrank (K := ZMod p), ZMod.card]
+  rw [hM, hfr, mul_comm, pow_mul, ← hInv]
+
+open OddOrder.RepresentationTheory in
+/-- **BG Theorem 3.10 (c), elementary-abelian group case, general kernel** (issue 8013 piece 5 —
+this is `(g)` `D' ⊆ C_D(Q̄)` of §15.2 step 4).  Under the hypotheses of
+`prime_card_and_finrank_of_elemAbelian_general` plus the genuine Frobenius-group structure
+`IsFrobeniusGroup H K R` and cyclicity of `C_M(R)` (`finrank ≤ 1`), the kernel's derived subgroup
+acts trivially: every `g ∈ ⁅K, K⁆` fixes every `m ∈ M` (i.e. `K' ⊆ C_K(M)`).
+
+Base-changes to the algebraic closure where the reducible-module Theorem 3.10 (c)
+`commutator_eq_one_of_frobenius_elemAbelian` gives `ρ̄ g = 1`; faithful flatness of the extension
+descends this to `ρ g = 1` over `ZMod p`, and the action bridge turns it into `(g : H) • m = m`. -/
+theorem commutator_acts_trivially_of_elemAbelian_general {p : ℕ} [Fact p.Prime]
+    {H : Type*} [Group H] [Finite H] [IsSolvable H]
+    {M : Type*} [CommGroup M] [Finite M] [Nontrivial M]
+    [Module (ZMod p) (Additive M)] [MulDistribMulAction H M]
+    {K R : Subgroup H} [K.Normal]
+    (hIsFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup H K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
+    (hpH : ¬ p ∣ Nat.card H)
+    (hCK : ∀ m : M, (∀ k : ↥K, (k : H) • m = m) → m = 1)
+    (hcond3 : ∀ x : H, x ∈ R → x ≠ 1 →
+      ∀ m : M, ((x : H) • m = m) ↔ (∀ s : ↥R, (s : H) • m = m))
+    (hcyc : finrank (ZMod p) (Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod p) H (Additive M)).comp R.subtype)) ≤ 1) :
+    ∀ g ∈ ⁅K, K⁆, ∀ m : M, (g : H) • m = m := by
+  classical
+  set ρ : Representation (ZMod p) H (Additive M) :=
+    Representation.ofDistribMulAction (ZMod p) H (Additive M) with hρ
+  set ρ' := baseChangeRepresentation (AlgebraicClosure (ZMod p)) ρ with hρ'
+  haveI : FiniteDimensional (ZMod p) (Additive M) := Module.Finite.of_finite
+  haveI : FiniteDimensional (AlgebraicClosure (ZMod p))
+      (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) := inferInstance
+  haveI hChar : CharP (AlgebraicClosure (ZMod p)) p :=
+    (Algebra.charP_iff (ZMod p) (AlgebraicClosure (ZMod p)) p).mp inferInstance
+  haveI hntM : Nontrivial (Additive M) := inferInstanceAs (Nontrivial (Additive M))
+  haveI : Nontrivial (TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M)) :=
+    (Module.FaithfullyFlat.nontrivial_tensorProduct_iff_right (R := ZMod p)
+      (M := AlgebraicClosure (ZMod p)) (N := Additive M)).mpr hntM
+  haveI hNeZeroH : NeZero (Nat.card H : AlgebraicClosure (ZMod p)) :=
+    ⟨by rw [Ne, CharP.cast_eq_zero_iff (AlgebraicClosure (ZMod p)) p]; exact hpH⟩
+  have hbridge : ∀ (g : H) (v : Additive M),
+      ρ g v = v ↔ (g : H) • Additive.toMul v = Additive.toMul v := by
+    intro g v
+    rw [hρ, Representation.ofDistribMulAction_apply_apply]
+    constructor
+    · intro h; have := congrArg Additive.toMul h; simpa using this
+    · intro h; apply Additive.toMul.injective; simpa using h
+  have hCK0 : Representation.invariants (ρ.comp K.subtype) = ⊥ := by
+    ext v
+    rw [Representation.mem_invariants, Submodule.mem_bot]
+    constructor
+    · intro h
+      have hfix : ∀ k : ↥K, (k : H) • Additive.toMul v = Additive.toMul v :=
+        fun k => (hbridge (k : H) v).mp (h k)
+      have hv : Additive.toMul v = (1 : M) := hCK (Additive.toMul v) hfix
+      simpa using hv
+    · intro h k; simp [h]
+  have hCVK' : Representation.invariants (ρ'.comp K.subtype) = ⊥ := by
+    rw [hρ', ← baseChangeRepresentation_comp]
+    exact invariants_baseChangeRepresentation_eq_bot _ _ hCK0
+  have hcond3' : ∀ x : H, x ∈ R → x ≠ 1 →
+      Representation.invariants (ρ'.comp (Subgroup.zpowers x).subtype)
+        = Representation.invariants (ρ'.comp R.subtype) := by
+    intro x hxR hx1
+    have hsub : Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype)
+        = Representation.invariants (ρ.comp R.subtype) := by
+      ext v
+      rw [Representation.mem_invariants, Representation.mem_invariants]
+      have hgen : ∀ y : ↥(Subgroup.zpowers x), y ∈ Subgroup.zpowers
+          (⟨x, Subgroup.mem_zpowers x⟩ : ↥(Subgroup.zpowers x)) := by
+        intro y; obtain ⟨n, hn⟩ := y.2; exact ⟨n, Subtype.ext (by simpa using hn)⟩
+      have hLHS : (∀ y : ↥(Subgroup.zpowers x), (ρ.comp (Subgroup.zpowers x).subtype) y v = v)
+          ↔ ρ x v = v := by
+        have h := Representation.mem_invariants_iff_of_forall_mem_zpowers
+          (ρ.comp (Subgroup.zpowers x).subtype)
+          (⟨x, Subgroup.mem_zpowers x⟩ : ↥(Subgroup.zpowers x)) hgen v
+        rw [Representation.mem_invariants] at h
+        simpa [MonoidHom.comp_apply] using h
+      rw [hLHS, hbridge x v, hcond3 x hxR hx1 (Additive.toMul v)]
+      refine forall_congr' (fun s => ?_)
+      rw [← hbridge (s : H) v]
+      rfl
+    rw [hρ']
+    exact (invariants_baseChangeRepresentation_comp_eq (AlgebraicClosure (ZMod p)) ρ
+      (Subgroup.zpowers_le.mpr hxR) hsub.symm).symm
+  have hcyc' : finrank (AlgebraicClosure (ZMod p))
+      (Representation.invariants (ρ'.comp R.subtype)) ≤ 1 := by
+    rw [hρ', ← baseChangeRepresentation_comp, finrank_invariants_baseChangeRepresentation]
+    exact hcyc
+  -- Theorem 3.10 (c) over the closure gives `ρ' g = 1`; descend and use the action bridge.
+  intro g hg m
+  have hcomm := commutator_eq_one_of_frobenius_elemAbelian ρ' hIsFrob hRne hKne hCVK' hcond3' hcyc'
+    g hg
+  have hρg : ρ g = 1 := by
+    apply LinearMap.ext
+    intro v
+    apply Module.FaithfullyFlat.tensorProduct_mk_injective (A := ZMod p)
+      (B := AlgebraicClosure (ZMod p)) (Additive M)
+    have hmap := congrArg
+      (fun f : TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M) →ₗ[AlgebraicClosure (ZMod p)]
+        TensorProduct (ZMod p) (AlgebraicClosure (ZMod p)) (Additive M) => f (1 ⊗ₜ[ZMod p] v)) hcomm
+    simpa [hρ'] using hmap
+  have hfix : ρ g (Additive.ofMul m) = Additive.ofMul m := by rw [hρg]; rfl
+  simpa using (hbridge g (Additive.ofMul m)).mp hfix
+
 end OddOrder.BG.Ch1.S03

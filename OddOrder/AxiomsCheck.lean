@@ -3781,6 +3781,12 @@ set_option linter.style.longLine false in
 -- the `MulDistribMulAction` group form, dropping the abelian-kernel restriction by base change to the
 -- algebraic closure + the general-kernel reducible-module Theorem 3.10.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general
+-- BG Theorem 3.10 (b) cardinality form (issue 8013, piece 5+2b = §15.2 step-4 (f) `|Q̄|=q^p`):
+-- `|M| = |C_M(R)|^{|R|}` from the rank formula via `Module.card_eq_pow_finrank`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.card_eq_pow_card_invariants_of_elemAbelian_general
+-- BG Theorem 3.10 (c) GROUP form (issue 8013, piece 5 = §15.2 step-4 (g) `D'⊆C_D(Q̄)`): with the
+-- genuine `IsFrobeniusGroup` and `C_M(R)` cyclic, `K'` acts trivially on `M` (`∀ g∈⁅K,K⁆, g•m=m`).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.commutator_acts_trivially_of_elemAbelian_general
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
