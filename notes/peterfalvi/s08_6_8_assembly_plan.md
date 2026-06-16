@@ -3455,3 +3455,51 @@ loop-cadence 不適 (session 43 が ~18 iter で thrash した assembly-scale)�
 
 **正本=本 session 44。engine=標準 (weighted 不要)、base=certainType⊔Y、残=hstep monolith assembly (sustained focus
 or 集中 subagent or Workflow 向き)。次=base-union glue → 既約 X-member adjoin chain (hstep)。**
+
+## 2026-06-16 lane-b (session 45, base-union piece): ✅ `hgen` for certainTypeSet base 着地 (new leaf S08_CaseBXunionY)
+
+session-44 architecture の **base = `certainTypeSet h46 k ⊔ Y`** に向け、glue engine
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` (S07:4581) の **`hgen`
+(generation hypothesis) を column-base 用に完全形式化**。新 leaf `S08_CaseBXunionY.lean`
+(imports `S08_CaseBAssembly`、OddOrder root に配線済、full build 3838 jobs/375s green、
+sorry 141 不変、両 lemma axiom-clean = 3-axiom allowlist のみ)。
+
+### ✅ landed (2 theorems, S08_CaseBXunionY.lean):
+1. **`certainTypeSet_span_apply_one_eq_intMul`** (column degree-ratio integrality): 任意の
+   `ψ ∈ ℤ[certainTypeSet h46 k]` は `ψ(1) = s·μ_{j₀}(1)` (`s∈ℤ`、`μ_{j₀}=columnSum k0` は
+   任意の anchor member)。**核 = certainTypeSet 定義に組込まれた等次数性** (全 member が
+   reference degree `∑_i μ_{ik}(1)` を共有、`columnSum_apply_one` 経由)。⟹ single-member ratio=1、
+   span induction で integer combination へ。Frobenius `hsX`
+   (`exists_charValue_one_eq_mul_xBaseBlock_anchor` 経由) の column 版置換。
+2. **`hgen_withDiagonal_certainTypeSet`** ((6.8.1) generation hypothesis、column base): glue engine
+   `hgen` を `X:=certainTypeSet h46 k`, `Y:=Yset`, diagonal `D:={columnSum k0 − a₀·η₁}` で discharge。
+   `hgen_withDiagonal_of_frobenius` (S08_CoherenceCore:3235) の完全 mirror — supported φ を
+   φ_X+φ_Y に分割、3 piece `(φ_X−s·μ_{j₀})`/`(φ_Y+s·(a₀·η₁))`/`s·(μ_{j₀}−a₀·η₁)` が各々 supported
+   かつ右 submodule。anchor は **member** `k0≠1` (`hk0mem:columnSum k0∈certainTypeSet h46 k`)
+   で取る (reference `k` 自身は trivial かもしれず column でない、RISK #5 に対応)。
+
+### 🔑 RISK #2 (degree-class) は単一 certainTypeSet 内では杞憂と確認:
+`certainTypeSet h46 k` は **定義上**全 member が同次数 (`∑_i μ_{iχ₂}(1)=∑_i μ_{ik}(1)`)。⟹
+`hgen` の degree-ratio `s` は常に整数 (member 単体は ratio 1)。複数 degree-class 問題は
+**raw (4.9) を単一 certainTypeSet 外で使う時のみ**で、本 base には不要。session 41 cont.⁷ の
+ChatGPT 訂正 (「w₂ 素数 → 非零列は全同次数の単一 certain-type 族」) とも整合。
+
+### 🔴 残る base-union obligation (この leaf では未着手、full base-union を閉じるのに必要):
+base-union `IsCoherent hyp.tau (certainTypeSet ∪ Y)` を engine で組むには `hgen` の他に:
+1. **ν 構築** (RISK #1、real new infra): `certainTypeExtension` (列上) と `coherentYset.extension`
+   (Y上) で一致する単一 `IntegralCharacterMap`。`exists_integralCharacterMap_glue_of_orthonormal`
+   (S07:3125) は **orthonormal SOURCE** を要求するが column は norm `|W₁|≠1` ゆえ直接不可。正攻法 =
+   全非自明列の grid character `μ_{ij}` (これは正規直交既約) + Y を source family とする
+   `coherentImageMapGlue` (列横断 grid 正規直交が要)。
+2. **hDτ** (b≡0 conclusion): `ν(μ_{j₀}−a₀·η₁)=hyp.tau(μ_{j₀}−a₀·η₁)`。`columnDecompositionTau`
+   (S08_CaseBCoherence2:1822) の `tau1_image` で `hyp.tau(μ_{j₀}−a₀·η₁)=D.X−D.Y`、pinning
+   `per_constituent_Y_eq_smul` で `D.Y=a₀·Y₀`、`D.X=certainTypeExtension μ_{j₀}` ⟹ ν 一致と接続。
+   per-φ aggregate (`caseB_per_phi_anchored_fromYset` 等) の wiring が要 — column-specific anchored
+   image (`(μ_{j₀}−a₀η₁)^τ = certainTypeExtension μ_{j₀} − a₀·Y₀`) を materialize。
+3. **hmixed**: `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`
+   (S08_CaseBCoherence2:1449、**既存**) が列-Y image 直交を直接供給。+ source ⊥
+   (`inner_columnSum_Yset_eq_zero` 既存) + hagreeX/hagreeY rewrite。
+**⟹ `hgen` は ✅ 完了。次の長 pole = ν 構築 (1) + hDτ wiring (2)** (両者 heavy、ν は新 infra)。
+
+**正本=本 session 45。`hgen_withDiagonal_certainTypeSet` + degree-ratio 補題 landed (new leaf
+S08_CaseBXunionY、axiom-clean)。残=ν (列横断 grid glue) + hDτ (per-φ pinning wiring)。**
