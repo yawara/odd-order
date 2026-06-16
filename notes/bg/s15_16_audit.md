@@ -551,3 +551,9 @@ R↦K.subgroupOf M で contrapositive 適用 → `C_{F(M_σ)}(K)≠1`)。frictio
 coprimality / 冪零⟺`fittingInAmbient=self` 逆向き / R^# 条件形合わせ) は issue 8012 に記録。
 `M_σ 非冪零` は `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` の contrapositive (§14-非依存)。
 `fittingInAmbient H=(fitting ↥H).map H.subtype` が thm38 結論形と一致するのは確認済 (S15_MF:345)。
+
+**✅ step 2 core も同セッションで landed** (`centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs`,
+commit `0047671d`): friction (i)(iii)(iv) 解決、(ii) hcop は仮説化 (wrapper が Hall 構造から供給)。
+支持 = 新 reusable `isNilpotent_of_fittingInAmbient_eq_self` (forward の converse, §14-非依存)。
+import `S03h_Thm38` 追加。leaf build 3115 jobs, sorry 0。次 = **step 2 tail** (`K*⊆Q=O_q(M)` +
+`M_σ/Q` 冪零 via Prop 1.5(d)+Thm 3.7) ⟹ (c)(d)。以降 step 3-5 は hard core (issue 8012)。
