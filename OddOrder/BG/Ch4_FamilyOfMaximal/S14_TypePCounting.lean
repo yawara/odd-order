@@ -3323,6 +3323,124 @@ theorem sigma_eq_of_mem_sigma_of_mem_sigma [Finite G]
     have h := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hq
     rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
 
+/-- **Every prime divides some `σ(M)`** (BG §1, mmd L3789): for a prime `p ∣ |G|` there is a
+maximal subgroup `M` with `p ∈ σ(M)`.  A Sylow `p`-subgroup `P` of `G` is non-normal (else `G`
+would be a `p`-group, hence solvable, against `hG.notSolvable`), so `N_G(P)` lies in a maximal `M`;
+then `P` is a Sylow `p`-subgroup of `M` whose `G`-normalizer `N_G(P) ≤ M`, which is exactly
+`p ∈ σ(M)`.  Foundation for the σ-decomposition (every nonidentity element has a `σ`-piece). -/
+theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] (hpG : p ∣ Nat.card G) :
+    ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+  classical
+  haveI : IsSimpleGroup G := hG.simple
+  obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+  have hPcard : Nat.card ↥(P : Subgroup G) = p ^ (Nat.card G).factorization p :=
+    P.card_eq_multiplicity
+  have hfactG : (Nat.card G).factorization p ≠ 0 :=
+    (Nat.Prime.factorization_pos_of_dvd Fact.out (Nat.card_pos).ne' hpG).ne'
+  have hPne : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hpG
+  have hNne : Subgroup.normalizer ((P : Subgroup G) : Set G) ≠ ⊤ := by
+    intro hN_top
+    have hPnormal : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp hN_top
+    rcases hPnormal.eq_bot_or_eq_top with hb | ht
+    · exact hPne hb
+    · refine hG.notSolvable ?_
+      have hPG : IsPGroup p G := by
+        have he : IsPGroup p ↥(⊤ : Subgroup G) := ht ▸ P.isPGroup'
+        exact he.of_equiv Subgroup.topEquiv
+      haveI := hPG.isNilpotent
+      infer_instance
+  obtain ⟨M, hMco, hNM⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNne
+  have hM : M ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMco
+  have hPM : (P : Subgroup G) ≤ M := Subgroup.le_normalizer.trans hNM
+  have hpP : p ∣ Nat.card ↥(P : Subgroup G) := by
+    rw [hPcard]; exact dvd_pow_self p hfactG
+  have hpdvdM : p ∣ Nat.card ↥M := hpP.trans (Subgroup.card_dvd_of_le hPM)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdM, (Nat.card_pos).ne'⟩
+  refine ⟨M, hM, ?_⟩
+  rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+  refine ⟨hpM, ?_⟩
+  -- `P` is a Sylow `p`-subgroup of `M` (the `p`-parts of `|M|` and `|G|` agree).
+  have hmap : ((P : Subgroup G).subgroupOf M).map M.subtype = (P : Subgroup G) := by
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPM]
+  have hcardPM : Nat.card ↥((P : Subgroup G).subgroupOf M) = Nat.card ↥(P : Subgroup G) := by
+    have h := Nat.card_congr (Subgroup.equivMapOfInjective
+      ((P : Subgroup G).subgroupOf M) M.subtype M.subtype_injective).toEquiv
+    rwa [hmap] at h
+  have hfacteq : (Nat.card G).factorization p = (Nat.card ↥M).factorization p := by
+    refine le_antisymm ?_ ?_
+    · rw [← Nat.Prime.pow_dvd_iff_le_factorization Fact.out (Nat.card_pos).ne', ← hPcard]
+      exact Subgroup.card_dvd_of_le hPM
+    · exact (Nat.factorization_le_iff_dvd (Nat.card_pos).ne' (Nat.card_pos).ne').mpr
+        (Subgroup.card_subgroup_dvd_card M) p
+  have hQcard : Nat.card ↥((P : Subgroup G).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by rw [hcardPM, hPcard, hfacteq]
+  refine ⟨Sylow.ofCard ((P : Subgroup G).subgroupOf M) hQcard, ?_⟩
+  rw [Sylow.coe_ofCard, hmap]
+  exact hNM
+
+/-- **σ-decomposition keystone** (BG §1, mmd L3793): a nonidentity `σ(M)`-element `x` has
+`ℓ_σ(x) = 1`.  The cyclic group `⟨x⟩` is a nonidentity proper `σ(M)`-subgroup (proper since `G` is
+non-solvable, hence non-cyclic), so by Corollary 12.16(a)
+(`sigma_subgroup_conj_into_Msigma_general`) it is `G`-conjugate into `M_σ`; thus a conjugate of `M`
+is a `σ`-maximal of `x`, giving `𝓜_σ(x) ≠ ∅`.  This is the existence half of the σ-decomposition
+that drives Lemma 14.6 (extracting a `σ`-length-one factor of an element). -/
+theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : x ≠ 1) (hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) :
+    D.length x = 1 := by
+  rw [D.length_one_iff]
+  refine ⟨hx, ?_⟩
+  have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
+    hx (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
+  have hlt : Subgroup.closure ({x} : Set G) < ⊤ := by
+    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable (isSolvable_of_comm fun a b => ?_))
+    have hmem : ∀ y : G, y ∈ Subgroup.zpowers x := fun y => by
+      rw [Subgroup.zpowers_eq_closure, htop]; exact Subgroup.mem_top y
+    obtain ⟨m, rfl⟩ := hmem a
+    obtain ⟨n, rfl⟩ := hmem b
+    rw [← zpow_add, ← zpow_add, Int.add_comm]
+  have hxpisub : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      (Subgroup.closure ({x} : Set G)) := fun p hp =>
+    hxpi p (by rwa [← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp)
+  obtain ⟨g, hg⟩ := sigma_subgroup_conj_into_Msigma_general hG hM hclosne hlt hxpisub
+    (fun hN hnc => sigma_disjoint_of_nonconjugate hG hM hN hnc)
+  refine ⟨MulAut.conj g⁻¹ • M, mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g⁻¹, rfl⟩, ?_⟩
+  rw [Msigma_conj_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  have he : (MulAut.conj g⁻¹)⁻¹ • x = MulAut.conj g • x := by
+    rw [← map_inv (MulAut.conj) g⁻¹, inv_inv]
+  rw [he]
+  exact hg (Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) _
+    (Subgroup.subset_closure (Set.mem_singleton x)))
+
+/-- **σ-decomposition: extracting a `σ`-length-one factor** (BG §1, mmd L3793): every `g ≠ 1`
+factors as `g = x · x'` with `x` a `σ`-length-one element (the `σ(M)`-part for a maximal `M` whose
+`σ(M)` contains a prime of `g`), `x'` a `σ(M)′`-element, both in `⟨g⟩` and commuting.  Combines
+`exists_mem_sigma_of_prime_dvd_card` (a prime of `g` lies in some `σ(M)`), the two-block
+decomposition `exists_isPiElement_mul`, and the keystone `length_one_of_isPiElement_sigma`.  This
+is the existence input to Lemma 14.6. -/
+theorem exists_length_one_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {g : G} (hg : g ≠ 1) :
+    ∃ (x x' : G) (M : Subgroup G), g = x * x' ∧ Commute x x' ∧
+      x ∈ Subgroup.zpowers g ∧ x' ∈ Subgroup.zpowers g ∧ D.length x = 1 ∧
+      M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x ∧
+      OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x' := by
+  classical
+  obtain ⟨p, hp, hpg⟩ := (orderOf g).exists_prime_and_dvd (fun h => hg (orderOf_eq_one_iff.mp h))
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpG : p ∣ Nat.card G := hpg.trans (orderOf_dvd_natCard g)
+  obtain ⟨M, hM, hpσM⟩ := exists_mem_sigma_of_prime_dvd_card hG hpG
+  obtain ⟨x, x', hmul, hcomm, hxπ, hx'π, hxz, hx'z⟩ :=
+    OddOrder.GroupTheory.exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma M) g
+  have hx1 : x ≠ 1 := by
+    intro hx0
+    rw [hx0, one_mul] at hmul
+    exact (hx'π p (by
+      rw [hmul]; exact Nat.mem_primeFactors.mpr ⟨hp, hpg, (orderOf_pos g).ne'⟩)) hpσM
+  exact ⟨x, x', M, hmul.symm, hcomm, hxz, hx'z,
+    length_one_of_isPiElement_sigma hG D hM hx1 hxπ, hM, hxπ, hx'π⟩
+
 open Classical in
 /-- **BG's `R(x)`** (mmd L3906): the normal Hall subgroup of `C_G(x)` from Theorem 14.4.  When
 `ℓ_σ(x) = 1` and `|𝓜_σ(x)| > 1`, `R(x) = N_σ ∩ C_G(x)` for the unique `N = N(x) ∈ 𝓜(C_G(x))`
@@ -4119,6 +4237,234 @@ theorem sigmaConjugacy_disjoint_of_nonconjugate [Finite G]
   -- A prime `p ∣ orderOf t` then lies in `σ(M) ∩ σ(N)`, contradicting Theorem 13.9.
   obtain ⟨p, hp, hpt⟩ := Nat.exists_prime_and_dvd (fun h => ht1 (orderOf_eq_one_iff.mp h))
   exact Set.disjoint_left.mp hσ (bridge M t htM p hp hpt) (bridge N s hsN p hp (hts ▸ hpt))
+
+/-- **BG Lemma 14.6, exclusivity** (mmd L3947): the `type-2 ⟹ ¬type-1` direction that Theorem 14.7
+consumes as "`T ∩ H̃` is empty".  If `g = y·y'` with `y ∈ M_σ^#` (hence `ℓ_σ(y) = 1`) and `y'` a
+nonidentity `κ(M)`-element of `C_M(y)`, then `g` is **not** of the form `x·x'` with `ℓ_σ(x) = 1`
+and `x' ∈ R(x)`.  Mirrors Lemma 14.5(a)'s factor matching (`isPiElement_mul_unique` + the σ-class
+partition); the contradiction is `κ(M)` (`p`-rank 1) vs `τ₂(N)` (`p`-rank 2) for the factor
+`x = y'`, using that `p`-rank is conjugation invariant. -/
+theorem not_type1_of_type2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {g : G} {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {y y' : G} (hy : y ∈ sigmaSharp M) (hgyy' : g = y * y') (hcomm : Commute y y')
+    (hy'1 : y' ≠ 1) (hy'M : y' ∈ M) (hy'C : y' ∈ Subgroup.centralizer ({y} : Set G))
+    (hy'κ : ∀ p ∈ piSet (Subgroup.closure {y'}), p ∈ kappa M) :
+    ¬ ∃ x x' : G, g = x * x' ∧ D.length x = 1 ∧ x' ∈ Rsub hG D x := by
+  classical
+  rintro ⟨x, x', hgxx', hlx, hx'R⟩
+  have hx1 : x ≠ 1 := ((D.length_one_iff x).mp hlx).1
+  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hy
+  obtain ⟨hyMσ, hy1⟩ := hy
+  have hgeq : x * x' = y * y' := hgxx'.symm.trans hgyy'
+  have hpiSet : ∀ z : G, ∀ {q : ℕ}, q ∈ (orderOf z).primeFactors →
+      q ∈ piSet (Subgroup.closure ({z} : Set G)) := fun z {q} hq => by
+    rw [piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]; exact hq
+  obtain ⟨M_x, hMxmax, hxMx⟩ := ((D.length_one_iff x).mp hlx).2
+  have hxPi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x) x := fun p hp =>
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M_x p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp, (Nat.dvd_of_mem_primeFactors hp).trans
+        ((OddOrder.BG.Ch3.S10.Msigma M_x).orderOf_dvd_natCard hxMx), Nat.card_pos.ne'⟩)
+  have hyPi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) y := fun p hp =>
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp, (Nat.dvd_of_mem_primeFactors hp).trans
+        ((OddOrder.BG.Ch3.S10.Msigma M).orderOf_dvd_natCard hyMσ), Nat.card_pos.ne'⟩)
+  have hx'Pi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x)ᶜ x' :=
+    isPiElement_sigmaCompl_of_mem_Rsub hG D hlx ⟨hMxmax, hxMx⟩ hx'R
+  have hy'Pi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ y' := by
+    intro p hp hpM
+    rcases (hy'κ p (hpiSet y' hp)).2.1 with h1 | h3
+    · exact tau1_subset_sigma_compl M h1 hpM
+    · exact tau3_subset_sigma_compl M h3 hpM
+  have hcx : Commute x x' :=
+    Subgroup.mem_centralizer_iff.mp (Rsub_le_centralizer hG D x hx'R) x (Set.mem_singleton x)
+  -- `x' ≠ 1`: else `g = x` collides with `g = y·y'`, `y' ≠ 1`.
+  have hx'1 : x' ≠ 1 := by
+    intro hx'0
+    rw [hx'0, mul_one] at hgeq
+    by_cases hσ : OddOrder.BG.Ch3.S10.sigma M_x = OddOrder.BG.Ch3.S10.sigma M
+    · have hxPiM : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := by
+        rw [← hσ]; exact hxPi
+      exact hy'1 (OddOrder.GroupTheory.isPiElement_mul_unique (mul_one x) (Commute.one_right x)
+        hxPiM (OddOrder.GroupTheory.isPiElement_one _) hgeq.symm hcomm hyPi hy'Pi).2.symm
+    · have hxPiMc : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x :=
+        fun p hp hpM => hσ (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hp) hpM)
+      exact hy1 (OddOrder.GroupTheory.isPiElement_mul_unique (one_mul x) (Commute.one_left x)
+        (OddOrder.GroupTheory.isPiElement_one _) hxPiMc hgeq.symm hcomm hyPi hy'Pi).1.symm
+  have hgtx : 1 < (maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    rw [Rsub, dif_neg (fun hc => h hc.2.2), Subgroup.mem_bot] at hx'R
+    exact hx'1 hx'R
+  obtain ⟨N, hNmax, hCxN, hReqN, hπτ2N, _⟩ := exists_neighbor_eq_Rsub hG D hlx hgtx
+  have hxN : x ∈ N := hCxN (Subgroup.mem_centralizer_iff.mpr fun z hz => by
+    rw [Set.mem_singleton_iff.mp hz])
+  have hRxne : OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+    rw [← hReqN]; intro hbot; exact hx'1 (Subgroup.mem_bot.mp (hbot ▸ hx'R))
+  have hsingx : maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N} :=
+    maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hπτ2N hRxne
+  by_cases hσeq : OddOrder.BG.Ch3.S10.sigma M_x = OddOrder.BG.Ch3.S10.sigma M
+  · -- **Equal classes**: `x = y`; then `M = N` and `x = y ∈ M_σ` is a `τ₂(M)`-element, absurd.
+    have hyPiMx : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x) y := by
+      rw [hσeq]; exact hyPi
+    have hy'PiMxc : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M_x)ᶜ y' := by
+      rw [hσeq]; exact hy'Pi
+    have hxy : x = y :=
+      (OddOrder.GroupTheory.isPiElement_mul_unique rfl hcx hxPi hx'Pi hgeq.symm hcomm
+        hyPiMx hy'PiMxc).1
+    -- Corollary 14.3 for `(y, y')`: branch 2 (`τ₂`) is impossible, so `C_G(y) ⊆ M`.
+    have hCyM : Subgroup.centralizer ({y} : Set G) ≤ M := by
+      have hyσsharp : y ∈ sigmaSharp M := by
+        rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+        exact ⟨hyMσ, hy1⟩
+      rcases sigma_diagnostic hG D hM hyσsharp hy'M hy'1 hy'C
+        (fun p hp => hy'Pi p (by
+          rw [piSet, Set.mem_setOf_eq, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp
+          exact hp)) with ⟨_, hsub⟩ | ⟨hτ2, _, _⟩
+      · exact hsub
+      · exfalso
+        obtain ⟨q, hqy⟩ : (orderOf y').primeFactors.Nonempty :=
+          Nat.nonempty_primeFactors.mpr (by
+            have := orderOf_pos y'; have hne : orderOf y' ≠ 1 := fun h => hy'1 (orderOf_eq_one_iff.mp h)
+            omega)
+        have hqκ := hy'κ q (hpiSet y' hqy)
+        have hqτ2 := hτ2 q (hpiSet y' hqy)
+        rcases hqκ.2.1 with h1 | h3
+        · exact absurd ((tau1_pRank_eq_one h1).symm.trans (tau2_pRank_eq_two hqτ2)) (by norm_num)
+        · exact absurd ((tau3_pRank_eq_one h3).symm.trans (tau2_pRank_eq_two hqτ2)) (by norm_num)
+    have hMN : M = N := by
+      have hmem : M ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
+        mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hxy ▸ hCyM⟩
+      rw [hsingx, Set.mem_singleton_iff] at hmem; exact hmem
+    obtain ⟨p, hpx⟩ : (orderOf x).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
+      have := orderOf_pos x; have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h); omega)
+    have hpτ2M : p ∈ tau2 M := hMN ▸ hπτ2N p (hpiSet x hpx)
+    have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hxy ▸ hyMσ
+    have hpσM : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr
+        ⟨Nat.prime_of_mem_primeFactors hpx, (Nat.dvd_of_mem_primeFactors hpx).trans
+          ((OddOrder.BG.Ch3.S10.Msigma M).orderOf_dvd_natCard hxMσ), Nat.card_pos.ne'⟩)
+    exact tau2_subset_sigma_compl M hpτ2M hpσM
+  · -- **Disjoint classes**: factor matching gives `y = x'`, `y' = x`; then `M, N` conjugate, and
+    -- `x = y'` is a `κ(M)`-element (rank 1) and a `τ₂(N)`-element (rank 2), absurd by conj-invariance.
+    have hxPiMc : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x :=
+      fun p hp hpM => hσeq (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hp) hpM)
+    have hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N := by
+      rw [hReqN] at hx'R; exact (Subgroup.mem_inf.mp hx'R).1
+    have hx'PiN : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N) x' := fun q hq =>
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup N q (Nat.mem_primeFactors.mpr
+        ⟨Nat.prime_of_mem_primeFactors hq, (Nat.dvd_of_mem_primeFactors hq).trans
+          ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard hx'N), Nat.card_pos.ne'⟩)
+    obtain ⟨p, hpy⟩ : (orderOf y).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
+      have := orderOf_pos y; have hne : orderOf y ≠ 1 := fun h => hy1 (orderOf_eq_one_iff.mp h); omega)
+    have hcox : Nat.Coprime (orderOf x) (orderOf x') :=
+      OddOrder.GroupTheory.coprime_orderOf_of_isPiElement hxPi hx'Pi
+    have hpg : (orderOf (x * x')).primeFactors =
+        (orderOf x).primeFactors ∪ (orderOf x').primeFactors := by
+      rw [hcx.orderOf_mul_eq_mul_orderOf_of_coprime hcox,
+        Nat.primeFactors_mul (orderOf_pos x).ne' (orderOf_pos x').ne']
+    have hcoy : Nat.Coprime (orderOf y) (orderOf y') :=
+      OddOrder.GroupTheory.coprime_orderOf_of_isPiElement hyPi hy'Pi
+    have hyg : (orderOf y).primeFactors ⊆ (orderOf (x * x')).primeFactors := by
+      rw [hgeq, hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcoy,
+        Nat.primeFactors_mul (orderOf_pos y).ne' (orderOf_pos y').ne']
+      exact Finset.subset_union_left
+    have hpmem : p ∈ (orderOf x).primeFactors ∪ (orderOf x').primeFactors := hpg ▸ hyg hpy
+    have hσMN : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma N := by
+      rcases Finset.mem_union.mp hpmem with hpx | hpx'
+      · exact absurd (sigma_eq_of_mem_sigma_of_mem_sigma hG hMxmax hM (hxPi p hpx) (hyPi p hpy)) hσeq
+      · exact sigma_eq_of_mem_sigma_of_mem_sigma hG hM hNmax (hyPi p hpy) (hx'PiN p hpx')
+    have hx'PiM : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x' := by
+      rw [hσMN]; exact hx'PiN
+    obtain ⟨hx'y, hxy'⟩ := OddOrder.GroupTheory.isPiElement_mul_unique (g := x * x')
+      hcx.symm hcx.symm hx'PiM hxPiMc hgeq.symm hcomm hyPi hy'Pi
+    -- `M, N` conjugate (`y ∈ M_σ ∩ N_σ`, `σ(M) = σ(N)`, Thm 13.9).
+    have hconj : IsConjugateSubgroup M N := by
+      by_contra hnc
+      exact Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hNmax hnc)
+        (hyPi p hpy) (hσMN ▸ hyPi p hpy)
+    -- `x = y'` is a `κ(M)`-element and a `τ₂(N)`-element; `p`-rank is conjugation invariant.
+    obtain ⟨p2, hp2x⟩ : (orderOf x).primeFactors.Nonempty := Nat.nonempty_primeFactors.mpr (by
+      have := orderOf_pos x; have hne : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h); omega)
+    have hp2κ : p2 ∈ kappa M := hy'κ p2 (hxy' ▸ hpiSet x hp2x)
+    have hp2τ2 : p2 ∈ tau2 N := hπτ2N p2 (hpiSet x hp2x)
+    have hrM : pRank ↥M p2 = 1 := by
+      rcases hp2κ.2.1 with h1 | h3
+      · exact tau1_pRank_eq_one h1
+      · exact tau3_pRank_eq_one h3
+    have hrN : pRank ↥N p2 = 2 := tau2_pRank_eq_two hp2τ2
+    obtain ⟨c, hc⟩ := hconj
+    have hmapN : M.map (MulAut.conj c).toMonoidHom = N := hc
+    have heq : pRank ↥M p2 = pRank ↥N p2 :=
+      pRank_eq_of_mulEquiv
+        ((Subgroup.equivMapOfInjective M (MulAut.conj c).toMonoidHom
+          (MulAut.conj c).injective).trans (MulEquiv.subgroupCongr hmapN))
+    rw [hrM, hrN] at heq
+    exact absurd heq (by norm_num)
+
+/-- **Conjugacy-saturation count of a TI-subset** (BG §1, the input to Theorem 14.7 step 5):
+for a TI-subset `A` with normalizer-bound `L` that `L` stabilizes (`A^l = A` for `l ∈ L`), the
+saturation `𝒞_G(A)` is the disjoint union of the `[G:L]` conjugates `A^g` (each of cardinality
+`|A|`), whence `|𝒞_G(A)| = |A|·[G:L]`.  The subset analogue of
+`ncard_conjugates_eq_index_of_normalizer_eq_self`. -/
+theorem ncard_conjClassSet_of_isTISubset [Finite G] {A : Set G} {L : Subgroup G}
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (hstab : ∀ l ∈ L, MulAut.conj l • A = A) :
+    (conjClassSet A).ncard = A.ncard * L.index := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hwd : ∀ g₁ g₂ : G, QuotientGroup.leftRel L g₁ g₂ →
+      MulAut.conj g₁ • A = MulAut.conj g₂ • A := by
+    intro g₁ g₂ hrel
+    rw [QuotientGroup.leftRel_apply] at hrel
+    calc MulAut.conj g₁ • A
+        = MulAut.conj g₁ • (MulAut.conj (g₁⁻¹ * g₂) • A) := by rw [hstab _ hrel]
+      _ = MulAut.conj g₂ • A := by rw [← mul_smul, ← map_mul, mul_inv_cancel_left]
+  set B : G ⧸ L → Set G := Quotient.lift (fun g => MulAut.conj g • A) hwd with hBdef
+  have hBval : ∀ g : G, B (QuotientGroup.mk g) = MulAut.conj g • A := fun g => rfl
+  have hunion : conjClassSet A = ⋃ q : G ⧸ L, B q := by
+    ext y
+    rw [mem_conjClassSet, Set.mem_iUnion]
+    constructor
+    · rintro ⟨t, ht, g, rfl⟩
+      refine ⟨QuotientGroup.mk g, ?_⟩
+      rw [hBval, Set.mem_smul_set]
+      exact ⟨t, ht, by rw [MulAut.smul_def, MulAut.conj_apply]⟩
+    · rintro ⟨q, hq⟩
+      obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+      rw [hBval, Set.mem_smul_set] at hq
+      obtain ⟨a, ha, rfl⟩ := hq
+      exact ⟨a, ha, g, by rw [MulAut.smul_def, MulAut.conj_apply]⟩
+  have hdisj : Pairwise (Function.onFun Disjoint B) := by
+    intro q q' hqq'
+    obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+    obtain ⟨g', rfl⟩ := Quotient.exists_rep q'
+    simp only [Function.onFun, hBval]
+    rw [Set.disjoint_left]
+    rintro y hy hy'
+    rw [Set.mem_smul_set] at hy hy'
+    obtain ⟨a, ha, rfl⟩ := hy
+    obtain ⟨a', ha', heq⟩ := hy'
+    have he : g * a * g⁻¹ = g' * a' * g'⁻¹ := by
+      rw [MulAut.smul_def, MulAut.smul_def, MulAut.conj_apply, MulAut.conj_apply] at heq
+      exact heq.symm
+    have hov : (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ ∈ A := by
+      have hc : (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ = a' := by
+        rw [show (g'⁻¹ * g) * a * (g'⁻¹ * g)⁻¹ = g'⁻¹ * (g * a * g⁻¹) * g' from by group, he]; group
+      rw [hc]; exact ha'
+    have hmem : g'⁻¹ * g ∈ L := hTI (g'⁻¹ * g) ⟨a, ha, hov⟩
+    apply hqq'
+    apply Quotient.sound
+    change (QuotientGroup.leftRel L) g g'
+    rw [QuotientGroup.leftRel_apply]
+    have h2 : g⁻¹ * g' = (g'⁻¹ * g)⁻¹ := by group
+    rw [h2]; exact L.inv_mem hmem
+  rw [hunion, Set.ncard_iUnion_of_finite (fun q => Set.toFinite _) hdisj]
+  have hBcard : ∀ q : G ⧸ L, (B q).ncard = A.ncard := by
+    intro q
+    obtain ⟨g, rfl⟩ := Quotient.exists_rep q
+    rw [hBval]; exact Set.ncard_smul_set _ _
+  rw [finsum_congr hBcard, finsum_eq_sum_of_fintype, Finset.sum_const, Finset.card_univ,
+    smul_eq_mul, ← Nat.card_eq_fintype_card, ← Subgroup.index]
+  exact mul_comm _ _
 
 /-! ## Theorem 14.7 through Lemma 14.13: type-P duality and global counting -/
 
