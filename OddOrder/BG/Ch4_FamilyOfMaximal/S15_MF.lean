@@ -1916,6 +1916,28 @@ theorem lt_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpoten
   rw [← heq] at h
   exact lt_irrefl _ h
 
+/-- **Strict normalizer growth, intersected form** (`§14`-independent, reusable): for a proper
+subgroup `Q0 < Q` of a nilpotent `Q`, a witness normalizing `Q0` lies *inside* `Q`, so
+`Q0 < Q ⊓ N_G(Q0) = N_Q(Q0)`.  Sharper than `lt_normalizer_of_lt_of_isNilpotent` (which keeps only
+`Q0 < N_G(Q0)`, dropping the `≤ Q` containment): the strict step is obtained inside `↥Q` and pushed
+back through `Q.subtype` (`map_lt_map_iff_of_injective` + `subgroupOf_map_subtype`).
+
+In Theorem 15.2's brick D (mmd L4194) this furnishes the nontrivial chain top `Q1 < N_Q(Q1)` handed
+to `exists_minimal_normalOver` (ambient `N_M(Q1)`, `T = N_Q(Q1) ≤ Q`) to build the next chief
+factor `Q2/Q1` with `Q1 < Q2 ≤ Q`. -/
+theorem lt_inf_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpotent ↥Q]
+    (hQ0Q : Q0 < Q) :
+    Q0 < Q ⊓ Subgroup.normalizer (Q0 : Set G) := by
+  have hQ0le : Q0 ≤ Q := hQ0Q.le
+  have hlt : Q0.subgroupOf Q < ⊤ := by
+    rw [lt_top_iff_ne_top, ne_eq, Subgroup.subgroupOf_eq_top]; exact hQ0Q.2
+  have h := OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top (G := ↥Q) hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hQ0le] at h
+  -- `h : Q0.subgroupOf Q < (N_G Q0).subgroupOf Q`; map back to `G` along the injective `Q.subtype`.
+  have hmap := (Subgroup.map_lt_map_iff_of_injective Q.subtype_injective).mpr h
+  rw [Subgroup.map_subgroupOf_eq_of_le hQ0le, Subgroup.subgroupOf_map_subtype] at hmap
+  rwa [inf_comm] at hmap
+
 /-- **Minimal `N`-normal subgroup over `Q₀`** (`§14`-independent, reusable): given a nontrivial
 `N`-normal subgroup `T` strictly above `Q₀`, there is a minimal `N`-normal subgroup `Q₁` with
 `Q₀ < Q₁ ≤ T` (no `N`-normal subgroup lies strictly between `Q₀` and `Q₁`).  This is the
@@ -1934,6 +1956,47 @@ theorem exists_minimal_normalOver [Finite G] {N Q0 T : Subgroup G}
   obtain ⟨Q1, ⟨hQ0Q1, hQ1T, hQ1norm⟩, hQ1min⟩ := hS_fin.exists_minimal hS_ne
   exact ⟨Q1, hQ0Q1, hQ1T, hQ1norm, fun H hQ0H hHQ1 hHnorm =>
     hQ1min ⟨hQ0H, hHQ1.trans hQ1T, hHnorm⟩ hHQ1⟩
+
+/-- **Chief factor over `Q₁` normalized by `D` and `K₁`** (Theorem 15.2 brick D construction,
+mmd L4194).  If `Q₁ < Q` with `Q` nilpotent, `Q ⊴ M` (`Q ≤ M ≤ N_G(Q)`), and `D, K₁ ≤ M ⊓ N_G(Q₁)`,
+then there is a chief factor `Q₂/Q₁` with `Q₁ < Q₂ ≤ Q` whose `Q₂` is normalized by `D` and `K₁`
+and itself normalizes `Q₁`.
+
+Ambient `N = M ⊓ N_G(Q₁)` contains `D` and `K₁` and normalizes `T = N_Q(Q₁) = Q ⊓ N_G(Q₁) ≤ Q`
+(`N ≤ N_G(Q)` since `N ≤ M ≤ N_G(Q)`, and `N ≤ N_G(N_G(Q₁))` by `le_normalizer`, so `N ≤ N_G(T)` by
+`le_normalizer_inf`).  `lt_inf_normalizer_of_lt_of_isNilpotent` gives the nontrivial top
+`Q₁ < N_Q(Q₁)`; `exists_minimal_normalOver` then produces the minimal `N`-normal `Q₂` over `Q₁`
+inside `T`, and `Q₂ ⊴ N` transfers to `D, K₁ ≤ N_G(Q₂)`. -/
+theorem exists_chiefFactor_over_normalized [Finite G]
+    {M Q Q1 D K1 : Subgroup G} [Group.IsNilpotent ↥Q]
+    (hQ1Q : Q1 < Q) (hQM : Q ≤ M) (hMQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hDN : D ≤ M ⊓ Subgroup.normalizer (Q1 : Set G))
+    (hK1N : K1 ≤ M ⊓ Subgroup.normalizer (Q1 : Set G)) :
+    ∃ Q2 : Subgroup G, Q1 < Q2 ∧ Q2 ≤ Q ∧
+      D ≤ Subgroup.normalizer (Q2 : Set G) ∧
+      K1 ≤ Subgroup.normalizer (Q2 : Set G) ∧
+      Q2 ≤ Subgroup.normalizer (Q1 : Set G) := by
+  -- Nontrivial chain top `Q₁ < N_Q(Q₁) = Q ⊓ N_G(Q₁)`.
+  have hQ1T : Q1 < Q ⊓ Subgroup.normalizer (Q1 : Set G) :=
+    lt_inf_normalizer_of_lt_of_isNilpotent hQ1Q
+  -- `T = N_Q(Q₁) ≤ N = N_M(Q₁)`.
+  have hTN : Q ⊓ Subgroup.normalizer (Q1 : Set G) ≤ M ⊓ Subgroup.normalizer (Q1 : Set G) :=
+    inf_le_inf hQM le_rfl
+  -- `N` normalizes `T` (it normalizes `Q` via `M ≤ N_G(Q)` and `N_G(Q₁)` via `le_normalizer`).
+  have hN_normT : M ⊓ Subgroup.normalizer (Q1 : Set G) ≤
+      Subgroup.normalizer ((Q ⊓ Subgroup.normalizer (Q1 : Set G) : Subgroup G) : Set G) :=
+    le_normalizer_inf (inf_le_left.trans hMQ) (inf_le_right.trans Subgroup.le_normalizer)
+  have hTnorm : ((Q ⊓ Subgroup.normalizer (Q1 : Set G)).subgroupOf
+      (M ⊓ Subgroup.normalizer (Q1 : Set G))).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hTN).mpr hN_normT
+  -- Minimal `N`-normal subgroup over `Q₁` inside `T`.
+  obtain ⟨Q2, hQ1Q2, hQ2T, hQ2norm, _⟩ := exists_minimal_normalOver hQ1T hTnorm
+  have hQ2Q : Q2 ≤ Q := hQ2T.trans inf_le_left
+  have hQ2Q1norm : Q2 ≤ Subgroup.normalizer (Q1 : Set G) := hQ2T.trans inf_le_right
+  -- `Q₂ ⊴ N`, so `N`—and hence `D`, `K₁`—normalizes `Q₂`.
+  have hN_normQ2 : M ⊓ Subgroup.normalizer (Q1 : Set G) ≤ Subgroup.normalizer (Q2 : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (hQ2T.trans hTN)).mp hQ2norm
+  exact ⟨Q2, hQ1Q2, hQ2Q, hDN.trans hN_normQ2, hK1N.trans hN_normQ2, hQ2Q1norm⟩
 
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
 /-- **Coprime lifting over a normal `D`-invariant subgroup** (`§14`-independent, reusable; the
@@ -2478,6 +2541,38 @@ theorem false_of_kstar_condition_of_lt [Finite G]
   have hle := le_of_commutator_le_of_inf_centralizer_le hQ0lt.le hDnormQ1
     (le_sup_right.trans hDQ1Q0) (le_sup_left.trans hDQ1Q0) hcomm hcopDQ1 (Or.inr hsolvQ1) hcap
   exact absurd (lt_of_lt_of_le hQ0lt hle) (lt_irrefl Q0)
+
+/-- **Step 1 of Theorem 15.2 part (ii)** (mmd L4194): the `K*`-condition is *false*, hence
+`K* ⊆ Q₁` and `K* ⊄ Q₀`.  Direct contrapositive of `false_of_kstar_condition_of_lt`: were either
+disjunct of `Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1` to hold, the regular `K₁`-action would collapse `Q₁ ≤ Q₀`,
+against `Q₀ < Q₁`.  Supplies the `Kstar ≤ Q₁` premise that brick D feeds back into the engine at the
+next chief factor `(Q₁, Q₂)`. -/
+theorem kstar_le_Q1_of_inputs [Finite G]
+    {Mσ D Q Q1 Q0 Kstar K1 : Subgroup G} {q : ℕ} [Fact q.Prime]
+    [(Q0.subgroupOf (D ⊔ Q1)).Normal] [(Q1.subgroupOf (D ⊔ Q1)).Normal]
+    (hprime_manner : ∀ k ∈ K1, k ≠ 1 → Subgroup.centralizer ({k} : Set G) ⊓ Mσ = Kstar)
+    (hKstarQ : Kstar ≤ Q) (hKstar_prime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q)
+    (hDQ1Mσ : D ⊔ Q1 ≤ Mσ) (hQ1Q : Q1 ≤ Q)
+    (hQ0DQ1 : Q0 ≤ D ⊔ Q1) (hQ0lt : Q0 < Q1)
+    (hDQ : Disjoint D Q) (hdisj : Disjoint (D ⊔ Q1) K1) (hK1Q0disj : Disjoint K1 Q0)
+    (hDnormQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hPQ0 : D ⊔ Q1 ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
+    (hQ1q : IsPGroup q (Q1.subgroupOf (D ⊔ Q1)))
+    (hDq' : q ∉ (Nat.card ↥(D.subgroupOf (D ⊔ Q1))).primeFactors)
+    (hcopZ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
+    (hcopDQ1 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q1))
+    (hsolvDQ1 : IsSolvable ↥(D ⊔ Q1)) (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hcap : Q1 ⊓ Subgroup.centralizer (D : Set G) ≤ Q0) :
+    ¬ Kstar ≤ Q0 ∧ Kstar ≤ Q1 := by
+  have hkey : ¬ (Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1) := fun hcond =>
+    false_of_kstar_condition_of_lt hprime_manner hKstarQ hKstar_prime hDQ1Mσ hQ1Q hQ0DQ1 hQ0lt
+      hDQ hdisj hK1Q0disj hDnormQ1 hK1DQ1 hDQ1Q0 hPQ0 hK1prime hQ1q hDq' hcopZ hcopDQ1 hsolvDQ1
+      hPsolv hcond hcap
+  rw [not_or, not_not] at hkey
+  exact hkey
 
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
