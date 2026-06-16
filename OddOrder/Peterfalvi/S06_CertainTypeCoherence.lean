@@ -716,4 +716,56 @@ noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat
       S07.dadeIntegralCharacterMap_inner_eq_on_supported_span_of_data h.dade0 h.tau hSdiff hφ hζ)
     rfl htau1_mema hχψ hχbarψ hχχbar
 
+/-- **Per-column ν-aux decomposition for a reducible certain-type member `μ_j` (ψ = 0).**
+
+The reducible analogue of `memberExtensionDecomposition` (irreducible `χ`): for a coherent set `S₁`
+containing the certain-type column `μ_j = columnSum χ₂` and its conjugate `μ̄_j = columnSum χ₂⁻¹`,
+builds the (5.5) `ψ = 0` decomposition `D' : CharacterPsiDecomposition τ μ_j 0` whose auxiliary
+isometry `τ₁` is the **running coherence extension `ν = hS₁.extension`** (not the Dade base map `τ`,
+unlike `certainTypeDecompositionDa`).  It uses the reducible image family `R(μ_j) = certainTypeR`
+(Peterfalvi (5.3.b)) in place of the irreducible Dade family
+`dadeOrthonormalCharacterImageFamilyOfDiff`.
+
+This is the `Dmem`-style member decomposition for a reducible column member of the weighted (5.6)
+adjoin engine `xAdjoinStepW` (its `htau1Dmem` field `(Dmem i).tau1 = ν` then holds by `rfl`); the
+remaining `xAdjoinStepW`-side inputs are the (5.2.e) cross-family orthogonality (from
+`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`-style reasoning against the break family). -/
+noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+    [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {S₁ : Set (ClassFunction ↥L ℂ)} {A' : Set ↥L}
+    (hS₁ : S07.IsCoherent (S07.dadeIntegralCharacterMap h.dade0 h.tau) S₁ A')
+    (hμ_S1 : columnSum h χ₂ ∈ S₁) (hμbar_S1 : (columnSum h χ₂).conj ∈ S₁)
+    (hνZ : hS₁.extension (columnSum h χ₂) ∈ ZIrr G)
+    (hdiffsupported : columnSum h χ₂ - (columnSum h χ₂).conj ∈
+      S07.zSupportedSpan (L := ↥L) S₁ A') :
+    S07.CharacterPsiDecomposition (S07.dadeIntegralCharacterMap h.dade0 h.tau)
+      (columnSum h χ₂) 0 := by
+  have hχmem : columnSum h χ₂ ∈ Submodule.span ℤ S₁ := Submodule.subset_span hμ_S1
+  have hχbarmem : (columnSum h χ₂).conj ∈ Submodule.span ℤ S₁ := Submodule.subset_span hμbar_S1
+  -- The (5.4) sponsoring set `{μ_j − μ̄_j, μ_j − 0}` lies in `ℤ[S₁]`.
+  have hle : Submodule.span ℤ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - 0} :
+      Set (ClassFunction ↥L ℂ)) ≤ Submodule.span ℤ S₁ := by
+    rw [Submodule.span_le]
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact Submodule.sub_mem _ hχmem hχbarmem
+    · rw [sub_zero]; exact hχmem
+  have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
+    rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
+      if_neg (column_inv_ne_self h hχ₂).symm]
+  exact S07.CharacterPsiDecomposition.ofProjection (certainTypeR h hχ₂ hdeg)
+    hS₁.extension
+    (fun φ ζ hφ hζ => hS₁.extension_inner_eq φ ζ (hle hφ) (hle hζ))
+    (hS₁.extends_on_supported _ hdiffsupported)
+    (by rw [sub_zero]; exact hνZ)
+    (by simp)
+    (by simp)
+    hχχbar
+
 end OddOrder.Peterfalvi.S06
