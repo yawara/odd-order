@@ -4600,6 +4600,16 @@ of the §16-independent pre-position: every prime `q ∈ π(K*)` lies in `κ(M_i
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_kappa
 
+/-! **BG Theorem 14.7 partner existence** (`S14_TypePCounting`, `exists_typeP_partner`), the
+§16-independent core assembling steps 1a/1b (`typeP_neighbor_embed` + `typeP_neighbor_kappa`):
+for a type-`P` maximal `M` with Hall `κ(M)`-subgroup `K`, `K* = C_{M_σ}(K) ≠ 1`, and a line
+`X ∈ ℰ_p¹(K)`, the maximal subgroup `M* ∈ ℳ(N_G(X))` (which exists, `N_G(X)` proper) is type-`P`,
+nonconjugate to `M`, contains `K ⊔ K*` with `X ≤ M*_σ`, and has `π(K*) ⊆ κ(M*)`.  This is the
+nonconjugate partner `M*` of Theorem 14.7 with its basic neighbour data; cyclicity of `Z`, the
+TI property, type-`P₂`, and the §16-gated covering/uniqueness layer on top.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_partner
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
