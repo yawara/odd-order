@@ -3856,3 +3856,34 @@ case-B Xset は **reducible 列 μ_j を含む**。`IsCoherent.extension` は **
 
 **▶▶ 残作業(T=0 でない、real だが原理的障害なし)**: (3b) `caseB_per_phi_anchored_fromYset`(S08CBA:1647)の aggregate 入力(hcol/hirr/hirrAnc/hXaggorth/hdecomp = (6.8.2.2) per-φ b_i=a_i pinning)を**全列**で discharge → (案A2) Basis.constr で cX 構成 + 等長/agreement → glue(`coherentXunionYset_caseB_of_glued` S08CBC2:1616, cX 入力)→ (6.8.3) break → sole sorry。完成後 `coherentCertainTypeSet_union_Yset`/`exists_glue_nu_columnSum_Yset`/`certainTypeExtension_columnSum_eq_falseHalf_sum`(cTE-glue 専用、下流未消費)を撤去。
 **ChatGPT 相談は不要**(route は T=0-free + 既存インフラ)。**正本 = 本 session 48 cont.⁴**(cont.² sound・cont.³ 過度悲観を訂正、workflow `wf_7aeebca4-e2c` で code-verified)。
+
+### session 48 cont.⁵: ✅✅ T=0-free base-union 実装完了 (2 commits, build-green, axiom-clean) — frontier が「不可能な T=0」→「4 dischargeable obligation」に転換
+
+案A を実コードで実装。新 leaf `S08_CaseBXChiCoherence.lean`:
+- **`xChiExtensionFun`/`xChiExtension`/`xChiExtension_mu_zero`/`_ne_zero`/`xChiExtension_columnSum`** (commit `57a95174`):
+  列 μ_j=columnSum χ₂ を (6.8.2.3) 射影像 `Ximg χ₂` に送る大域 IntegralCharacterMap (Basis.constr + 0th-row trick)。
+  ⚠ **pair-existential `∃ p, μ_{p.1,p.2}=ω ∧ p.2=0`** が必須 (単一-χ₂ existential は injectivity 適用時に
+  `hex.choose` の pair packaging で whnf 爆発 → timeout; 原型 `certainTypeExtension_mu` の pair 構造に倣う)。
+- **`certainTypeSet_isCoherent_via_anchoredImages`** (commit `57a95174`): IsCoherent hyp.tau (certainTypeSet)、
+  extension=xChiExtension。3 field を列レベル仮説から証明 (cTE 非依存)。
+- **`exists_glue_nu_columnSum_Yset_via_map`** (commit `cc7f27db`): glue を νX 一般化
+  (`exists_integralCharacterMap_glue_of_orthonormal` は **source の正規直交のみ要し target νX 任意** — 私の
+  「target 正規直交要」懸念は誤りだった)。νX=xChiExtension で ν(列)=Ximg。
+- **`coherentCertainTypeSet_union_Yset_via_anchoredImages`** (commit `cc7f27db`): IsCoherent hyp.tau
+  (certainTypeSet ∪ Y)。**核心成果: hDτ (cross-diagonal) が `hXanchored` ((6.8.2.3) 像) から 1 行で成立、
+  T=0 (Ximg=cTE) を一切要求しない**。`coherentCertainTypeSet_union_Yset` (cTE-glue, hanchored=T=0 gated) の
+  textbook-faithful 代替。⚠ hXanchored は **membership 形** (`columnSum χ₂ ∈ certainTypeSet`) で k0/k0' ミスマッチ回避。
+
+**⟹ frontier 転換確定**: 「不可能/over-constrained な T=0」は消滅。残るは base-union の 4 gated obligation
+(全て (6.8.2.3) per-column 出力、**dischargeable**、T=0 でない):
+- `hXanchored` = `τ(columnSum χ₂ − a₀η₁) = Ximg χ₂ − a₀·cY.ext(η₁)` (per-column anchored image)。**最重 = (6.8.2.2) aggregate**。
+- `hXinner` = `⟨Ximg χ₂, Ximg χ₂'⟩ = ⟨columnSum χ₂, columnSum χ₂'⟩` (cross-column 等長、τ-isometry から)。
+- `hXzirr` = `Ximg χ₂ ∈ ZIrr G` (D.X ∈ ℤ[R])。
+- `hXmixed` = `⟨Ximg χ₂, cY.ext y⟩ = 0` (seam-1 X_χ⊥Y^{τ₁}、既存 `inner_decomposition_X_coherentYset_extension_*`)。
+
+**▶▶ 次セッション = 4 obligation の discharge**。設計: `Ximg χ₂ := (columnDecompositionTau D_{χ₂}).X`
+(射影像、cTE 非依存)。hXanchored = `per_phi_anchored_image` (S08CBC2:1908) を列に適用 (Y-pinning 内済) —
+入力 = `exists_decomposition_caseB` (S08CBC2:126) の (6.8.2.2) aggregate `hdecomp` + bundles
+(`caseB_column_bundle` 等、session 47 で全完備確認済)。hXinner/hXzirr/hXmixed は D.X から機械的。
+完成後 `coherentCertainTypeSet_union_Yset`/`exists_glue_nu_columnSum_Yset`/`certainTypeExtension_columnSum_eq_falseHalf_sum`
+(cTE-glue 専用、下流未消費) を撤去。**正本 = 本 session 48 cont.⁵。ChatGPT 不要、既存インフラで closeable。**
