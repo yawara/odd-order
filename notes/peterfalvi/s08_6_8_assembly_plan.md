@@ -3696,6 +3696,13 @@ S07_Coherence に既に rich な (5.4)-(5.6) 理論がある(3 回目 grep で�
 **▶▶ 次 = 単一スカラー `T = ⟨τ(μ_j−a·η₁), cTEμ̄⟩ = 0` の discharge**(これが残る唯一の deep content)。
 これは σ-isometry の restriction 構造(`certainTypeOmegaSigma`/§5 σ map の Res_L、`inner_tau_eq_inner_restrict`
 経由 `⟨μ_j−a·η₁, Res_L(ω_{ij'}^σ)⟩=0`)を要する **§5/§6 σ-subsystem の focused dive**(multi-hundred LOC、loop 不適)。
+**T=0 の素材ポインタ(session 47 調査)**: §6 (4.3) restriction 機構 = `certainType_apply_eq_of_mem_V`
+(S06_CertainTypeCharacters:878、`μ_{ij}(v)=δ_j·ω_{ij}(v)` on V⊆W−W₂)/ `inner_omegaColumnDiff_restrict_eq_zero`
+(:895)/ `certainType_vanishes_of_ne`(:919); seam 直交性 = `inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`
+(S08CBC2:1303、ν₁⊥σ-image)/ `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`(:1246)/
+`columnDecompositionTau_X_orthogonal`(S08CBA:1227、⟨D.X,ν₁⟩=0)/ `certainTypeR_imageSet_orthogonal_dadeOfDiff`
+(S08CBHortho:44)。Dade reciprocity = `inner_tau_eq_inner_restrict`(S08CBCorePart2:48)。これらを組み合わせて
+`⟨τ(μ_j−a·η₁), ω_{ij'}^σ⟩=0`(自列 anchored 像が共役列 σ-image 成分なし)を出すのが T=0 の本体。
 **T=0 さえ出れば残りは機械的**: per-φ 経路で `τ(μ_j−a·η₁)=X−a·ν₁`(Y-pinning は engine 内済) → 5.4.b で
 X=∑_{α∈E}α (|E|=‖μ_j‖²=w₁=`columnFamily_mu_sum_inner`) → T=0 で E⊆false-half、|false-half|=w₁ ⟹ E=false-half
 (`Finset.eq_of_subset_of_card_le`) → `certainTypeExtension_columnSum_eq_falseHalf_sum` で X=cTEμ → hanchored。
