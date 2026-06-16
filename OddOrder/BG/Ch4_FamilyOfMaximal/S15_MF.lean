@@ -2081,6 +2081,31 @@ theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
     Subgroup.commutator_le_inf A (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗))
   exact (hmono.trans hinf).trans hAO.le
 
+/-- **B1 of Theorem 15.2 step 3(ii)** (`§14`-independent, reusable): if the quotient `N/Q₀'` is
+nilpotent, `A₀ ⊴ N` is a `q`-group (`q` prime) and `B₀ ≤ N` is a `q′`-group, then `⁅A₀, B₀⁆ ≤ Q₀'`.
+The images `Ā₀ = A₀·Q₀'/Q₀'` (normal `q`-group) and `B̄₀` (`q′`-group) of the nilpotent quotient
+satisfy `⁅Ā₀, B̄₀⁆ = ⊥` (`commutator_eq_bot_of_isNilpotent_of_normal_isPGroup`); since
+`⁅Ā₀, B̄₀⁆ = ⁅A₀, B₀⁆·Q₀'/Q₀'` (`map_commutator`), the commutator lands in `ker = Q₀'`.
+
+For the regular-action contradiction (mmd L4194): with `N = ↥(D ⊔ Q₁)`, `Q₀' = Q₀.subgroupOf`,
+`A₀ = Q₁.subgroupOf`, `B₀ = D.subgroupOf`, once `DQ₁/Q₀` is nilpotent (Theorem 3.7) this gives
+`⁅Q₁, D⁆ ⊆ Q₀`, feeding `le_of_commutator_le_centralizerCap` for the contradiction. -/
+theorem commutator_le_of_quotient_isNilpotent {N : Type*} [Group N] [Finite N]
+    {q : ℕ} [Fact q.Prime] {Q0' A0 B0 : Subgroup N} [Q0'.Normal] [A0.Normal]
+    (hNilp : Group.IsNilpotent (N ⧸ Q0'))
+    (hA0 : IsPGroup q A0) (hB0 : q ∉ (Nat.card ↥B0).primeFactors) :
+    ⁅A0, B0⁆ ≤ Q0' := by
+  haveI := hNilp
+  haveI : (A0.map (QuotientGroup.mk' Q0')).Normal :=
+    ‹A0.Normal›.map _ (QuotientGroup.mk'_surjective Q0')
+  have hAq : IsPGroup q (A0.map (QuotientGroup.mk' Q0')) := hA0.map _
+  have hBq' : q ∉ (Nat.card ↥(B0.map (QuotientGroup.mk' Q0'))).primeFactors := fun hq =>
+    hB0 (Nat.primeFactors_mono (Subgroup.card_map_dvd (H := B0) _) Nat.card_pos.ne' hq)
+  have hbot : ⁅A0.map (QuotientGroup.mk' Q0'), B0.map (QuotientGroup.mk' Q0')⁆ = ⊥ :=
+    commutator_eq_bot_of_isNilpotent_of_normal_isPGroup hAq hBq'
+  rw [← Subgroup.map_commutator, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+  exact hbot
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
