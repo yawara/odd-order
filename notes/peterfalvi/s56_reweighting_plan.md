@@ -330,3 +330,20 @@ hortho_mem tractability 評価完了。**構築可能**(crux fact 成立)、た�
 🔨 hortho_mem [recipe 完備、S08 層 ~60-100 LOC、次] → ⬜ X-sum 恒等式接続 → ⬜ engine instantiate (`coherentDegreeSqNormBound_of_not_coherentW`
 を certain-type S₁/columns/Dmem/hortho_mem で) → hbreak → ⬜ `false_of_caseB_break_of_bounds` で (6.8.3) → cX wiring → glue → sole sorry。
 multi-session focused だが deep math gap 無し・全ツール在庫。**正本=本 cont.⁴⁰。hortho_mem recipe 完備、次=S08 層で構築。**
+
+## cont.⁴¹ (2026-06-16 loop): ✅✅ hortho_mem 完成 (`certainTypeR_imageSet_orthogonal_dadeOfDiff`)
+**新 leaf `S08_CaseBHortho.lean` (163 行、`286f35d5`、build-green+axiom-clean+0 sorryAx)** に hortho_mem を構築
+(recipe 通り、subagent 実装→自己検証)。`certainTypeR_imageSet_orthogonal_dadeOfDiff`:
+`∀ α ∈ (certainTypeR h46 hχ₂ hdeg).imageSet, ∀ β ∈ (dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj χ …).imageSet, ⟨α,β⟩=0`
+= R(μ_j) ⊥ R(break χ) の imageSet 形 (= `.Orthogonal`、transported certainTypeR の imageSet=certainTypeR.imageSet ゆえ直結)。
+V-vanishing 技法 (each σ-image=scalar·chiFam、break diff `(χ−χ̄)^τ` が V 上消える `tau_apply_eq_zero_of_mem_ticVdiffV` +
+`inner_smul_chiFam_eq_zero_of_diff_vanishOnV`、4 case + conj 対称)。⚠ 知見: toOrthonormalImage は ℤ-smul、key は ℂ-smul →
+`Int.cast_smul_eq_zsmul` で橋渡し。
+
+**📍 case-B (6.8.3) ロードマップ**: ✅engine一般化 ✅Dmem τ'化 ✅(B)既存 ✅**hortho_mem** →
+⬜ **engine instantiation** [次・最後の山]: `coherentDegreeSqNormBound_of_not_coherentW` を certain-type データで instantiate
+— S₁=certainTypeSet (coherent via `certainTypeSet_isCoherent_tau_canonical`)、χmem=columns、Dmem=`certainTypeMemberDecomposition`
+(τ'=hyp.tau、hagree=`caseB_column_mapagree`)、hortho_mem=今回の lemma、mc=column норм、break χ=既約 X-member、deg data →
+`∑deg²/mc ≤ 2a` → ⬜ X-sum 恒等式 `∑deg²/mc = w1·hZ·(cZ−1)` (`sum_div_normSq_…` で X-sum 済、要接続) +
+`2a↔2w1²d` → `false_of_caseB_break_of_bounds` で **(6.8.3)** → cX wiring → glue → sole sorry。
+全ツール在庫、deep math gap 無し。**正本=本 cont.⁴¹。hortho_mem landed、次=engine instantiation (最後の山)。**

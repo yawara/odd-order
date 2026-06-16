@@ -537,4 +537,47 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
+/-- **(T-A2, norm-weighted) The X-family coherence chain fold.**
+
+The weighted analogue of `xChainCoherent`: folds the per-step weighted adjoin `xAdjoinStepW` (via
+`XAdjoinStepInputW.adjoin`) over a degree-monotone conjugate-pair cover of `X`, from a coherent base
+`S₀` — for case (B), the reducible certain-type column set `certainTypeSet`, coherent via
+`certainTypeSet_isCoherent_tau_canonical`.  Each step adjoins the irreducible pair `(χs i, χ̄s i)` to
+the accumulator `pairUnion S₀ pair i` through the bundled weighted input `hstep i`, whose member
+family ranges over the **(possibly reducible)** accumulator members — exactly the case-(B) X-chain
+the unweighted `xChainCoherent` cannot express (its `XAdjoinStepInput` bakes in member orthonormality
+`‖χmem i‖² = 1`, which fails on the reducible columns).
+
+The construction of `hstep` (the per-step `XAdjoinStepInputW`) from the certain-type column data —
+`certainTypeMemberDecomposition` for the reducible-column members, `certainTypeR_imageSet_orthogonal_
+dadeOfDiff` for their cross-family orthogonality, `memberExtensionDecomposition` for the
+already-adjoined irreducibles — is the remaining per-step obligation; this fold packages it into the
+full `X`-coherence `cX`. -/
+noncomputable def xChainCoherentW
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {X S₀ : Set (ClassFunction ↥L ℂ)}
+    (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+    (χs : ℕ → IrreducibleCharacter ↥L)
+    (hpair0 : ∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ))
+    (hpair1 : ∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj)
+    (hS₀ : S₀ ⊆ X)
+    (hpairs : ∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ X)
+    (hcover : ∀ χ ∈ X, χ ∈ S₀ ∨ ∃ j, j < N ∧ χ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j)
+    (h0 : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₀ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (hstep : ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+        (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L) S₀ pair i)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L)),
+      XAdjoinStepInputW hyp hconj hcoh (χs i)) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      X (OddOrder.Peterfalvi.S04.supportInSubgroup A L) :=
+  OddOrder.Peterfalvi.S07.coherentOfPairChainCover pair N hS₀ hpairs hcover h0
+    (fun i hi hcoh => by
+      rw [OddOrder.Peterfalvi.S07.pairUnion_succ_eq_union_pair (hpair0 i hi) (hpair1 i hi)]
+      exact (hstep i hi hcoh).adjoin)
+
 end OddOrder.Peterfalvi.S08
