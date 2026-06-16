@@ -1099,6 +1099,43 @@ theorem kstar_le_opiCore_of_inputs [Finite G]
   rw [hqG.primeFactors, Finset.mem_singleton] at hr
   exact Set.mem_singleton_iff.mpr hr
 
+/-- **Theorem 15.2, step 2 tail — complement `D` is nilpotent** (mmd L4192, "`M_σ/Q` is nilpotent",
+giving conjunct (d)): a `K`-invariant complement `D` of `Q` in `M_σ` is nilpotent.
+
+Rather than the quotient `M_σ/Q`, we work with the isomorphic complement `D ≤ M_σ` (`D ∩ Q = 1`,
+`hDQ`).  A prime-order `K₁ ≤ K` (`hK₁prime`) normalizes `D` (`hK₁norm`, `K`-invariance) and acts
+on it fixed-point-freely: if `r ∈ K₁#` fixes `n ∈ D` (`r n r⁻¹ = n`), then `n ∈ C_{M_σ}(r) ⊆ Q`
+(`hCentleQ`, the §14 prime-manner action of Proposition 14.2(a) together with `K* ⊆ Q` from the
+`q`-core chain) while `n ∈ D`, so `n ∈ D ∩ Q = 1`.  Theorem 3.7 (`frobeniusKernelIsNilpotent`,
+fixed-point-free prime-order action) then gives `D` nilpotent.  `hCentleQ` is the sole §14 input. -/
+theorem complement_isNilpotent_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {K Q D K₁ : Subgroup G} (hDM : D ≤ M) (hK₁M : K₁ ≤ M)
+    (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M) (hDQ : Disjoint D Q) (hK₁K : K₁ ≤ K)
+    (hK₁norm : K₁ ≤ Subgroup.normalizer (D : Set G)) (hDK₁disj : Disjoint D K₁)
+    (hDne : D ≠ ⊥) (hK₁ne : K₁ ≠ ⊥) (hK₁prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K₁ = p)
+    (hCentleQ : ∀ r ∈ (K : Set G), r ≠ 1 →
+      Subgroup.centralizer ({r} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M ≤ Q) :
+    Group.IsNilpotent ↥D := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable ↥(D ⊔ K₁) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hK₁M))
+  refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+    hK₁norm hDK₁disj hDne hK₁ne hK₁prime ?_
+  intro r hrK₁ hr1 n hnD hn1 hfix
+  have hrK : r ∈ K := hK₁K hrK₁
+  have hnMσ : n ∈ OddOrder.BG.Ch3.S10.Msigma M := hDMσ hnD
+  -- `r n r⁻¹ = n` means `r n = n r`, i.e. `n ∈ C_G(r)`.
+  have hrn : r * n = n * r := by rw [mul_inv_eq_iff_eq_mul] at hfix; exact hfix
+  have hnCent : n ∈ Subgroup.centralizer ({r} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    rintro g hg
+    rw [Set.mem_singleton_iff] at hg; subst hg
+    exact hrn
+  -- so `n ∈ C_{M_σ}(r) ⊆ Q`, while `n ∈ D` and `D ∩ Q = 1`.
+  have hnQ : n ∈ Q := hCentleQ r hrK hr1 (Subgroup.mem_inf.mpr ⟨hnCent, hnMσ⟩)
+  exact hn1 (Subgroup.disjoint_def.mp hDQ hnD hnQ)
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
