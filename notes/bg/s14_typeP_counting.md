@@ -813,3 +813,23 @@ recent merge log = 全て lane-h 自身の commit (Lane G/F/B の合流無し)�
 `R : G → Subgroup G` + sorry 多数 (R(x)/tildeM/Lemma 14.6 未構築)。⟹ Lane H の §14 machinery
 (Prop 14.2 / Cor 14.3 / gen Cor 12.16(a) / 14.7 steps 0-1b) は揃ったが、**binding result 14.7 は
 §16 counting gated のまま、FT 接続は Lane G の §16 進展待ち**。merge cron 稼働状況も要確認。
+
+### ✅✅✅ Thm 14.4 `sigmaLength_one_centralizer_structure` COMPLETE (2026-06-16, lane-h loop)
+**sorry-free + axiom-clean + AxiomsCheck 登録済** (`#assert_only_allowed_axioms` 通過, full build green 1:05)。
+§16 の R(x) foundation を供給する §14 構造定理。証明構成 (~700 行):
+- setup: x(ℓ_σ=1, |𝓜_σ(x)|>1) から M·q·g·X 選択; |𝓜_σ(x)|≥2 で M'≠M (13.9 共役) + transitivity (10.1b) ⟹ N≠M, C_G(x)≤N.
+- **hRx (R(x)=N_σ∩C_G(x)≠1)**: BG u-construction — c=v·a (↥N 分解, N_σ⊴N) ⟹ conj v•M=M', v≠1; x⁻¹vx=v は v⁻¹(x⁻¹vx)∈N_σ∩N_G(M)=⊥.
+- **Hall**: R'.index=(N_σ).relIndex C ∣ (N_σ).relIndex N ∣ (N_σ).index[σ(N)' by Msigma_isHall] (relIndex_subgroupOf + relIndex_dvd_index_of_normal).
+- **hπτ2 + uniqueness**: sigma_diagnostic(Cor14.3) を (N, w∈N_σ^#, x) で適用, κ-branch を pRank で排除.
+- **(f)**: κ(N)⊆τ₁∪τ₃, q∈τ₂(N) ⟹ N∉𝓜_{P₁}.
+- **∀M (c)(d)(e)**: 各 M₂ で Prop 12.15(e) 再適用 (N≠M₂ は x∉N_σ から); (c)=Cor 12.6 + `exists_subgroupESetup_with_le` (E_N⊇M₂∩N, A∈ℰ_p²⊴E_N, x が正規化, p∈τ₂M₂⟹N_{M₂σ}(A)=⊥ で矛盾).
+- crux helper `Msigma_inf_normalizer_eq_bot_of_tau2` (14.4 直前): A∈ℰ_p²(E),p∈τ₂(M) ⟹ N_G(A)⊓M_σ=⊥ (Cor12.6(b)+E_compl_inf).
+
+### 🐛 faithfulness 発見 (2026-06-16): repo `tau2` def は素数制限を欠く
+`tau2 M = {p | p∉σ M ∧ pRank M p = 2}` は **prime 条件 (p∈π(M)) を欠く**。`IsElementaryAbelian p` の定義
+`(abelian ∧ ∀x, x^p=1)` は p 素数を強制しない ⟹ **素数べき r²（Sylow-r=(ℤ/r²)² なら IsElementaryAbelian r²,
+log_{r²}(r⁴)=2 ⟹ pRank=2, r²∉σ）等の非素数が τ₂ に入りうる**。BG は τ₂(M)⊆π(M)（素数）。
+- ⟹ 14.4 の (c) は当初 `tau2 N ⊆ sigma M`（偽）→ **`tau2 N ∩ piSet N ⊆ sigma M`** に修正（piSet N=素因数で
+  BG の τ₂(N)⊆π(N) を回復, = BG faithful）。consumer 0 ゆえ安全。
+- **⚠ hub 注意**: `tau2` def 自体が latent unfaithful。他の `tau2 ⊆ …` 形 statement があれば同様の素数制限要
+  （大半の使用は [Fact p.Prime] 付きで無害）。将来 τ₂ def に `p∈π(M)` を足すリファクタも検討余地（広域影響）。
