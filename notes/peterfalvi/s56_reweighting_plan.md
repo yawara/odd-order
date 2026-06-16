@@ -49,3 +49,37 @@
 
 **正本=本ファイル + chatgpt_answer.md。S07 core は norm-agnostic 判明、reweighting は S08 application 層 (a)+(c) が本体。
 次=forward (5.6) bound 形の scoping → S08 norm-weighted 版追加。**
+
+## cont.²⁹ 続: scoping 完了 — core = 抽象エンジン `coherentDegreeSumBound_of_not_coherent` の一般化
+
+S08 contrapositive の証明を trace して norm-1 の所在を**正確に**特定:
+- `sMember_degreeSumBound_of_not_coherent` (S08CP2:2650) は抽象エンジン **`coherentDegreeSumBound_of_not_coherent`
+  (S08_CoherenceCorePart1:2451)** を呼ぶ。`hF` は `sBreakPair_fields hF` で break-pair fields を**産む**のに使うのみ
+  (定理本体の制約でない)。
+- **🎯 真の (5.6) core = `coherentDegreeSumBound_of_not_coherent` (S08CP1:2451) が norm-1 を bake**:
+  - `χmem : ι → IrreducibleCharacter ↥L` (既約族)。
+  - `hmemortho : ∀i∈s,∀j∈s, ⟨χmem i, χmem j⟩ = if i=j then 1 else 0` (**正規直交**、対角 = ‖χmem i‖²=1)。
+  - `hχχ : ⟨χ,χ⟩=1` (break member ψ も norm-1)。
+  - 出力 bound = `∑ⱼ (degⱼ)² ≤ 2a` (norm-1 形、denominator 無し)。
+- low-level (`CharacterPsiDecomposition` S07:1110 / opening bound S07:1444 / `int_eq_zero_of_sq_mul_le_of_two_mul_lt`
+  S07:1780) は norm-agnostic と確認済 ⟹ **一般化は組立エンジンの再 thread が本体**。
+
+### 🔴 core build target (次セッション focused)
+**`coherentDegreeSqNormBound_of_not_coherent`** (新、additive、既約版は保持):
+- `χmem : ι → IrreducibleCharacter` → 一般 character family (ClassFunction、または "coherent member" 型 + norm field)。
+- `hmemortho … = if i=j then 1 else 0` → `… = if i=j then ⟨χmem i,χmem i⟩ else 0` (直交、一般 norm)。
+- `hχχ=1` → `hχχ = ‖χ‖²` (or break member も一般 — 但し (6.8.3) では ψ=Ind θ 既約ゆえ ψ は norm-1 のまま可)。
+- 出力 = `∑ⱼ (degⱼ)²/‖χmem j‖² ≤ 2a` (weighted)。
+- 証明 = ChatGPT Q4 (chatgpt_answer.md): 射影係数 1/‖χᵢ‖²、quadratic `λ²∑(aᵢ²/‖χᵢ‖²)−2aλ+‖Z‖²≤0` →
+  `int_eq_zero_of_sq_mul_le_of_two_mul_lt` (D=∑aᵢ²/‖χᵢ‖²、既に抽象 D 対応) で λ=0。低レベル norm-agnostic
+  piece を最大流用。⚠ 規模大 (40-field 級エンジン)、focused session 推奨。
+
+### 残 (core 後)
+- **break-pair fields for reducible S**: `sBreakPair_fields` / `exists_coherentBreakPair` (S08CP1:965、`hSbirr` 全既約要求)
+  を reducible 対応に。conjugate-pair enumeration は involution ベースで既約非本質の可能性 (要精査) だが、
+  各 pair の norm-1 を使う箇所は要 weight 化。
+- **(5.3.b)** Hyp(5.2) case-B 確立 (R(μ_j)=ω_ij^σ、σ-isometry 接続)。
+- **case-B X-sum identity** (mixed X、`∑_X χ(1)²/‖χ‖²=|W₁||H:Z|(|Z|-1)`) + L4 assembly + FPF tower。
+
+**正本=本ファイル。core build target = `coherentDegreeSqNormBound_of_not_coherent` (S08CP1:2451 の weighted 版)。
+次=core build 着手 (focused、Q4 が証明正本)。**
