@@ -5364,6 +5364,22 @@ theorem typeP_self_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact (sup_le_normalizer_inf_of_commute inf_le_right).trans inf_le_right
   · rw [hKstarEq]; exact (typeP_structure hG hM hP hKM hK hKstar hU).2.1
 
+/-- **A subgroup of order coprime to a normal subgroup's index lies inside it** (BG 14.7 `n = 1`
+collapse, mmd L4043): if `N ◁ G` and `|H|` is coprime to `[G : N]`, then `H ≤ N`.  (The image of
+`H` in `G/N` has order dividing both `|H|` and `[G : N]`, hence `1`, so `H ≤ ker = N`.)  In the
+collapse, applied with `N = Kᵢ` (the normal `σ(Mᵢ)'`-Hall of `Z`, `[Z : Kᵢ] = kᵢ*` a `σ(Mᵢ)`-number)
+and `H = Kⱼ*` (a `σ(Mᵢ)'`-group), it gives `Kⱼ* ≤ Kᵢ`; with `|Kᵢ|` prime this forces `Kⱼ* = Kᵢ`. -/
+theorem le_of_coprime_index {N H : Subgroup G} [N.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) N.index) : H ≤ N := by
+  have hd1 : Nat.card ↥(H.map (QuotientGroup.mk' N)) ∣ Nat.card ↥H :=
+    Subgroup.card_map_dvd H (QuotientGroup.mk' N)
+  have hd2 : Nat.card ↥(H.map (QuotientGroup.mk' N)) ∣ N.index :=
+    Subgroup.card_subgroup_dvd_card _
+  have hcard1 : Nat.card ↥(H.map (QuotientGroup.mk' N)) = 1 :=
+    Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
+  have hbot : H.map (QuotientGroup.mk' N) = ⊥ := Subgroup.eq_bot_of_card_eq _ hcard1
+  rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
