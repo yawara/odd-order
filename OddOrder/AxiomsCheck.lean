@@ -4622,6 +4622,15 @@ nonidentity `σ(M)'`-element `x'` of `C_M(x)`, either `π(⟨x'⟩) ⊆ κ(M)` w
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_diagnostic
 
+/-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
+`sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
+have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
+`σ(Mᵢ)` "disjoint union" piece — derived from BG Theorem 13.9 (`sigma_disjoint_of_nonconjugate`,
+Lane F, landed sorry-free) via the `∃!` non-conjugacy of distinct representatives.  Fully
+unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
