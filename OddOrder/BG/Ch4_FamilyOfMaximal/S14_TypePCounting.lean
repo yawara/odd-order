@@ -11,6 +11,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S12_Lemma1217
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.GroupTheory.MaximalSubgroupType
+import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
 # BG §14: Maximal Subgroups of Type P and Counting
@@ -3350,6 +3351,72 @@ theorem Rsub_eq_inf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose)
       ⊓ Subgroup.centralizer ({x} : Set G) := by
   rw [Rsub, dif_pos ⟨hx, hlen, hgt⟩]
+
+/-- **Packaged neighbour data for `R(x)`** (the multi-maximal case): the unique `N = N(x)` of
+Theorem 14.4 together with `R(x) = N_σ ∩ C_G(x)`, `C_G(x) ≤ N`, `π(⟨x⟩) ⊆ τ₂(N)`, and the
+complement property `M ∩ N` complements `N_σ` in `N` for every `M ∈ 𝓜_σ(x)` (14.4(e)).  This
+is the interface consumed by Lemma 14.5(a)/(c) and Lemma 14.6. -/
+theorem exists_neighbor_eq_Rsub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {x : G} (hlen : D.length x = 1)
+    (hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      Rsub hG D x = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+      (∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) ∧
+      (∀ M ∈ maximalSigmaSubgroupsOfElement x,
+        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+          ((M ⊓ N).subgroupOf N)) := by
+  have hx : x ≠ 1 := ((D.length_one_iff x).mp hlen).1
+  set N := ((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose with hNdef
+  have spec := ((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose_spec
+  refine ⟨N, spec.1, spec.2.1, Rsub_eq_inf hG D hx hlen hgt, spec.2.2.2.2.1, fun M hM => ?_⟩
+  exact (spec.2.2.2.2.2.2 M hM).2.2.1
+
+/-- **`R(z)` consists of `σ(M)′`-elements** for `M ∈ 𝓜_σ(z)`.  Crux of the σ-factor matching
+in Lemma 14.5(a): with `z` a `σ(M)`-element, `g = z·r` (`r ∈ R(z)`) is a `(σ(M), σ(M)′)`-split.
+Proof: `r ∈ N_σ` is a `σ(N)`-element (`N = N(z)`); a prime `p ∈ σ(M) ∩ σ(N)` forces
+`σ(M) = σ(N)` (partition), but `π(⟨z⟩) ⊆ σ(M) = σ(N)` and `⊆ τ₂(N)` with `τ₂(N) ∩ σ(N) = ∅`
+gives `z = 1`. (When `|𝓜_σ(z)| = 1`, `R(z) = 1`, trivially.) -/
+theorem isPiElement_sigmaCompl_of_mem_Rsub [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G) {z : G}
+    (hlen : D.length z = 1) {M : Subgroup G} (hM : M ∈ maximalSigmaSubgroupsOfElement z)
+    {r : G} (hr : r ∈ Rsub hG D z) :
+    OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ r := by
+  intro p hp
+  rw [Set.mem_compl_iff]
+  intro hpσM
+  by_cases hgt : 1 < (maximalSigmaSubgroupsOfElement z).ncard
+  · obtain ⟨N, hNmax, _, hReq, hπτ2, _⟩ := exists_neighbor_eq_Rsub hG D hlen hgt
+    rw [hReq] at hr
+    have hrN : r ∈ OddOrder.BG.Ch3.S10.Msigma N := (Subgroup.mem_inf.mp hr).1
+    -- `p ∈ σ(N)` since `r ∈ N_σ`.
+    have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+        ⟨Nat.prime_of_mem_primeFactors hp,
+          (Nat.dvd_of_mem_primeFactors hp).trans
+            ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard hrN),
+          Nat.card_pos.ne'⟩)
+    -- `σ(M) = σ(N)` since they share `p`.
+    have hσeq : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma N :=
+      sigma_eq_of_mem_sigma_of_mem_sigma hG hM.1 hNmax hpσM hpσN
+    -- A prime `q ∣ |z|` lies in `σ(M)=σ(N)` and `τ₂(N)`, against `τ₂(N) ⊆ σ(N)ᶜ`.
+    have hz1 : z ≠ 1 := ((D.length_one_iff z).mp hlen).1
+    obtain ⟨q, hqp, hqdvd⟩ :=
+      (orderOf z).exists_prime_and_dvd (fun h => hz1 (orderOf_eq_one_iff.mp h))
+    have hcardz : Nat.card ↥(Subgroup.closure ({z} : Set G)) = orderOf z := by
+      rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+    have hqπ : q ∈ piSet (Subgroup.closure ({z} : Set G)) := by
+      rw [piSet, Set.mem_setOf_eq, hcardz]
+      exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos z).ne'⟩
+    have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr
+        ⟨hqp, hqdvd.trans ((OddOrder.BG.Ch3.S10.Msigma M).orderOf_dvd_natCard hM.2),
+          Nat.card_pos.ne'⟩)
+    rw [hσeq] at hqσM
+    exact tau2_subset_sigma_compl N (hπτ2 q hqπ) hqσM
+  · rw [Rsub, dif_neg (fun h => hgt h.2.2), Subgroup.mem_bot] at hr
+    rw [hr, orderOf_one, Nat.primeFactors_one] at hp
+    simp at hp
 
 /-- **BG's `M̃`** (mmd L3908): `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, the `σ`-decompositions of
 length `≤ 2` with leading factor in `M_σ^#`.  This is the genuine BG `M̃` (it adjoins the
