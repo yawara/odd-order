@@ -3747,6 +3747,13 @@ set_option linter.style.longLine false in
 -- BG Theorem 3.10 general kernel, induction base case (issue 8013, piece 3): `K` minimal normal ⟹
 -- elementary abelian ⟹ the abelian-kernel rank theorem gives (a)+(b).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_minimalNormal_kernel
+-- BG Theorem 3.10 general kernel, Case B transfer (issue 8013, piece 3): `K₀` acting trivially ⟹ `ρ`
+-- factors through `G ⧸ K₀`, and `ρ̄`-invariants of `S·K₀/K₀` equal `ρ`-invariants of `S`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_lift_map_eq_of_trivial
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.card_map_mk'_eq_of_disjoint
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.caseB_transfer
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isIrreducible_lift_of_trivial
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.fpf_lift_of_centralizer_bot
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38

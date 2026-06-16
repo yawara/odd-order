@@ -1,4 +1,5 @@
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import Mathlib.RepresentationTheory.Irreducible
@@ -96,5 +97,176 @@ theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F
     intro a b
     rw [← Subgroup.coe_mul, ← Subgroup.coe_mul, hKea.comm]
   exact prime_card_and_finrank_of_abelian_frobenius_weight ρ hRne hKab hKcard hCVK hFrob hcond3
+
+/-- **Case B transfer brick — invariants are preserved under the lift to `G ⧸ K₀`** (issue 8013
+piece 3).  When `K₀` acts trivially (`ρ x = 1` for `x ∈ K₀`), `ρ` factors as
+`ρ̄ = QuotientGroup.lift K₀ ρ` through `G ⧸ K₀`, and the `ρ̄`-invariants of the image `S·K₀/K₀` of any
+`S ≤ G` coincide (as a submodule of `V`) with the `ρ`-invariants of `S`: the actions agree on
+representatives (`ρ̄ ⟦g⟧ = ρ g`), so the same vectors are fixed.
+
+In Case B of the `K₀` reduction this both transfers the hypothesis `C_V(K) = ⊥` to the quotient
+(`S = K`) and transfers the conclusion's `C_V(R)` back from the quotient (`S = R`). -/
+theorem invariants_lift_map_eq_of_trivial (ρ : Representation F G V) {K₀ : Subgroup G} [K₀.Normal]
+    (hker : ∀ x ∈ K₀, ρ x = 1) (S : Subgroup G) :
+    Representation.invariants
+        ((QuotientGroup.lift K₀ ρ hker).comp (S.map (QuotientGroup.mk' K₀)).subtype)
+      = Representation.invariants (ρ.comp S.subtype) := by
+  ext v
+  rw [Representation.mem_invariants, Representation.mem_invariants]
+  constructor
+  · intro h s
+    have hmem : (QuotientGroup.mk' K₀) (s : G) ∈ S.map (QuotientGroup.mk' K₀) :=
+      Subgroup.mem_map_of_mem _ s.2
+    have hs := h ⟨(QuotientGroup.mk' K₀) (s : G), hmem⟩
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, QuotientGroup.lift_mk'] at hs ⊢
+    exact hs
+  · intro h s'
+    obtain ⟨g, hgS, hgeq⟩ := s'.2
+    have hg := h ⟨g, hgS⟩
+    simp only [MonoidHom.comp_apply, Subgroup.coe_subtype] at hg
+    have hX : (S.map (QuotientGroup.mk' K₀)).subtype s' = (QuotientGroup.mk' K₀) g := hgeq.symm
+    rw [MonoidHom.comp_apply, hX]
+    exact hg
+
+/-- **Case B transfer brick — the complement's order is unchanged by the lift** (issue 8013 piece 3).
+A Frobenius complement `R` meets the kernel trivially (`R ∩ K₀ = ⊥`, here `K₀ ⊆ K`), so the quotient
+map `mk' K₀` is injective on `R` and `|R·K₀/K₀| = |R|`.  Used to transfer `|R'| = p` (the quotient
+conclusion (a)) back to `|R| = p`. -/
+theorem card_map_mk'_eq_of_disjoint {K₀ R : Subgroup G} [K₀.Normal] (hdisj : Disjoint R K₀) :
+    Nat.card (R.map (QuotientGroup.mk' K₀)) = Nat.card ↥R := by
+  have hinj : Function.Injective ((QuotientGroup.mk' K₀).comp R.subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro r hr
+    rw [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hr
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext (Subgroup.disjoint_def.mp hdisj r.2 hr)
+  have hrange : ((QuotientGroup.mk' K₀).comp R.subtype).range = R.map (QuotientGroup.mk' K₀) := by
+    rw [MonoidHom.range_comp, Subgroup.range_subtype]
+  rw [← hrange]
+  exact (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+
+/-- **Case B transfer of BG Theorem 3.10 (a)+(b)** (issue 8013 piece 3): when `K₀` acts trivially,
+the conclusion of the theorem for the lifted representation `ρ̄` on `G ⧸ K₀` (with kernel `K/K₀`,
+complement `R·K₀/K₀`) transfers back to `ρ` on `G` (kernel `K`, complement `R`).  The complement's
+order is unchanged (`card_map_mk'_eq_of_disjoint`) and so is the `finrank` of its invariants
+(`invariants_lift_map_eq_of_trivial`), so `(a)` `|R| = p` and `(b)` `finrank V = |R| · finrank C_V(R)`
+carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying the
+induction hypothesis to `ρ̄` (whose kernel `K/K₀` is strictly smaller). -/
+theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀.Normal]
+    (hker : ∀ x ∈ K₀, ρ x = 1) (hdisj : Disjoint R K₀)
+    (hquot : ∃ p : ℕ, p.Prime ∧ Nat.card (R.map (QuotientGroup.mk' K₀)) = p ∧
+      finrank F V = Nat.card (R.map (QuotientGroup.mk' K₀)) *
+        finrank F (Representation.invariants
+          ((QuotientGroup.lift K₀ ρ hker).comp (R.map (QuotientGroup.mk' K₀)).subtype))) :
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
+      finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
+  obtain ⟨p, hp, hcardR', hfinrank'⟩ := hquot
+  have hcard : Nat.card (R.map (QuotientGroup.mk' K₀)) = Nat.card ↥R :=
+    card_map_mk'_eq_of_disjoint hdisj
+  have hinv : Representation.invariants
+      ((QuotientGroup.lift K₀ ρ hker).comp (R.map (QuotientGroup.mk' K₀)).subtype)
+      = Representation.invariants (ρ.comp R.subtype) :=
+    invariants_lift_map_eq_of_trivial ρ hker R
+  exact ⟨p, hp, by rw [← hcard]; exact hcardR', by rw [hfinrank', hcard, hinv]⟩
+
+/-- **Case B brick — irreducibility lifts to the quotient** (issue 8013 piece 3).  When `K₀` acts
+trivially, the lifted representation `ρ̄ = QuotientGroup.lift K₀ ρ` on `G ⧸ K₀` is again irreducible:
+its subrepresentations are the same submodules as those of `ρ` (a submodule is `ρ̄`-invariant iff
+`ρ`-invariant, since `ρ̄ ⟦g⟧ = ρ g` and `mk'` is surjective), so the simple-order structure carries
+over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the induction hypothesis to `ρ̄`. -/
+theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V) [ρ.IsIrreducible]
+    {K₀ : Subgroup G} [K₀.Normal] (hker : ∀ x ∈ K₀, ρ x = 1) :
+    Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) := by
+  haveI hnt : Nontrivial (Subrepresentation (QuotientGroup.lift K₀ ρ hker)) := by
+    refine ⟨⊥, ⊤, fun h => ?_⟩
+    exact absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top
+  refine { eq_bot_or_eq_top := fun S => ?_ }
+  let Sρ : Subrepresentation ρ :=
+    { toSubmodule := S.toSubmodule
+      apply_mem_toSubmodule := fun g {v} hv => S.apply_mem_toSubmodule (QuotientGroup.mk' K₀ g) hv }
+  rcases IsSimpleOrder.eq_bot_or_eq_top Sρ with h | h
+  · refine Or.inl (Subrepresentation.toSubmodule_injective ?_)
+    exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊥ : Submodule F V))
+  · refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
+    exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊤ : Submodule F V))
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Case B brick — the Frobenius FPF action lifts to the quotient kernel** (issue 8013 piece 3,
+Proposition 1.5(d)).  If `r ∈ R` acts fixed-point-freely on `K` (`C_K(r) = 1`, the Frobenius
+condition) and `r` acts coprimely on `K` (with `K₀ ⊴ G`, `K₀ ⊆ K`, `r`-invariant), then `r` acts
+fixed-point-freely on the quotient `K / K₀`: a class `k̄` fixed by `r` (`⁅r, k⁆ ∈ K₀`) is trivial
+(`k ∈ K₀`).
+
+This transfers the Frobenius hypothesis of BG Theorem 3.10 to `KR/K₀` in Case B of the `K₀`
+reduction.  Mirrors `OddOrder.BG.Ch4.S15.fpf_of_centralizer_inf_le`, but the fixed-point source is
+`C_K(r) = 1` (the conjugation-action fixed points are `⊥` directly) and the target is the kernel `K`. -/
+theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Normal] {r : G}
+    (hrK : r ∈ Subgroup.normalizer (K : Set G)) (hK₀K : K₀ ≤ K)
+    (hKK₀ : K ≤ Subgroup.normalizer (K₀ : Set G)) (hrK₀ : r ∈ Subgroup.normalizer (K₀ : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers r)) (Nat.card ↥K))
+    (hsolv : IsSolvable ↥(Subgroup.zpowers r) ∨ IsSolvable ↥K)
+    (hCbot : ∀ k ∈ K, r * k * r⁻¹ = k → k = 1)
+    {k : G} (hkK : k ∈ K) (hfix : r * k * r⁻¹ * k⁻¹ ∈ K₀) :
+    k ∈ K₀ := by
+  classical
+  have hzK : Subgroup.zpowers r ≤ Subgroup.normalizer (K : Set G) := Subgroup.zpowers_le.mpr hrK
+  have hzK₀ : Subgroup.zpowers r ≤ Subgroup.normalizer (K₀ : Set G) := Subgroup.zpowers_le.mpr hrK₀
+  set φ : ↥(Subgroup.zpowers r) →* MulAut ↥K :=
+    (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hzK) with hφ
+  haveI hK₀_normal : (K₀.subgroupOf K).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hK₀K).mpr hKK₀
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (K₀.subgroupOf K) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ K₀
+    exact (Subgroup.mem_normalizer_iff.mp (hzK₀ a.2) (y : G)).mp hy
+  -- The conjugation-action fixed points are `⊥` (the Frobenius FPF condition `C_K(r) = 1`).
+  have hfpbot : Subgroup.fixedPointsOfMulAut φ = ⊥ := by
+    rw [eq_bot_iff]
+    intro y hy
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hy
+    have hr : ((φ ⟨r, Subgroup.mem_zpowers r⟩ y : ↥K) : G) = (y : G) :=
+      congrArg Subtype.val (hy ⟨r, Subgroup.mem_zpowers r⟩)
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext (hCbot (y : G) y.2 hr)
+  -- Proposition 1.5(d): the quotient fixed points push forward from `⊥`, hence are `⊥`.
+  have heq := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hsolv hMinv
+  rw [hfpbot, Subgroup.map_bot] at heq
+  -- `k`'s class is fixed by every power of `r` (generator argument), hence is `1`, so `k ∈ K₀`.
+  have hpow : ∀ (f : MulAut (↥K ⧸ K₀.subgroupOf K)) (y : ↥K ⧸ K₀.subgroupOf K),
+      f y = y → ∀ i : ℤ, (f ^ i) y = y :=
+    fun f y hf i => MulAction.mem_stabilizer_iff.mp
+      ((MulAction.stabilizer (MulAut (↥K ⧸ K₀.subgroupOf K)) y).zpow_mem
+        (MulAction.mem_stabilizer_iff.mpr hf) i)
+  have hkbar : quotientMulAutHom hMinv ⟨r, Subgroup.mem_zpowers r⟩
+      (QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩) =
+      QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩ := by
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show (r * k * r⁻¹)⁻¹ * k ∈ K₀
+    have heqk : (r * k * r⁻¹)⁻¹ * k = k⁻¹ * (r * k * r⁻¹ * k⁻¹)⁻¹ * (k⁻¹)⁻¹ := by group
+    have hkN : k ∈ Subgroup.normalizer (K₀ : Set G) := hKK₀ hkK
+    rw [heqk]
+    exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (K₀ : Set G)).inv_mem hkN)
+      ((r * k * r⁻¹ * k⁻¹)⁻¹)).mp (K₀.inv_mem hfix)
+  have hxbar : QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩ ∈
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) := by
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have ha : a = ⟨r, Subgroup.mem_zpowers r⟩ ^ i := by
+      apply Subtype.ext
+      rw [Subgroup.coe_zpow]
+      exact hi.symm
+    rw [ha, map_zpow]
+    exact hpow (quotientMulAutHom hMinv ⟨r, Subgroup.mem_zpowers r⟩)
+      (QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩) hkbar i
+  rw [heq, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+    Subgroup.mem_subgroupOf] at hxbar
+  exact hxbar
 
 end OddOrder.BG.Ch1.S03
