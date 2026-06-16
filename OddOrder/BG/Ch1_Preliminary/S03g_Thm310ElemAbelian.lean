@@ -349,4 +349,29 @@ theorem commutator_eq_one_of_frobenius_elemAbelian
     ∀ g ∈ ⁅K, K⁆, ρ g = 1 :=
   frobenius_elemAbelian_c_aux hIsFrob hRne hKne (finrank F V) ρ hCVK hcond3 hcyc rfl
 
+open OddOrder.RepresentationTheory in
+/-- **Base change preserves a subgroup-equality of invariants** (issue 8013 piece 5, the
+prime-manner transfer for the group↔module bridge).  If `H₁ ≤ H₂` and the `H₁`- and `H₂`-invariants
+of `ρ` over `F` coincide, then so do those of the scalar extension `baseChange L ρ` over `L`.
+
+The `H₂`-invariants are always contained in the `H₁`-invariants (`H₁ ≤ H₂`), and base change
+preserves the `finrank` of each (`finrank_invariants_baseChangeRepresentation`), which equal by
+hypothesis; a containment of submodules with equal `finrank` is an equality.  This transfers the
+subspace-form prime-manner hypothesis `C_M(x) = C_M(R)` to the algebraic closure, where the
+elementary-abelian Theorem 3.10 applies. -/
+theorem invariants_baseChangeRepresentation_comp_eq
+    {F : Type*} [Field F] {H : Type*} [Group H] [Finite H]
+    {W : Type*} [AddCommGroup W] [Module F W] [FiniteDimensional F W]
+    (L : Type*) [Field L] [Algebra F L]
+    (ρ : Representation F H W) {H₁ H₂ : Subgroup H} (hle : H₁ ≤ H₂)
+    (h : Representation.invariants (ρ.comp H₂.subtype)
+      = Representation.invariants (ρ.comp H₁.subtype)) :
+    Representation.invariants ((baseChangeRepresentation L ρ).comp H₂.subtype)
+      = Representation.invariants ((baseChangeRepresentation L ρ).comp H₁.subtype) := by
+  refine Submodule.eq_of_le_of_finrank_eq (fun v hv => ?_) ?_
+  · rw [Representation.mem_invariants] at hv ⊢
+    exact fun y => hv ⟨y.1, hle y.2⟩
+  · rw [← baseChangeRepresentation_comp, ← baseChangeRepresentation_comp,
+      finrank_invariants_baseChangeRepresentation, finrank_invariants_baseChangeRepresentation, h]
+
 end OddOrder.BG.Ch1.S03
