@@ -2361,6 +2361,33 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
 
+/-- **Brick A assembled** (Theorem 15.2 step 3(ii)): the `K*`-condition gives the regular/FPF
+condition `hFPF` for every `k ∈ K₁^#`, by composing brick A-core (`centralizer_inf_DQ1_le_Q0`,
+the `C(k)⊓(D⊔Q₁) ⊆ Q₀` step) with brick A-lift (`fpf_of_centralizer_inf_le`, the Prop 1.5(d)
+fixed-point lift).  Per-`k` normalizer/coprimality data is drawn from the `K₁`-level hypotheses.
+
+This is general over `(Q₀, Q₁)` (it does *not* require `Q₀ = C_Q(D)`), so it serves both the
+`(Q₀, Q₁)` application and brick D's re-application with `(Q₁, Q₂)`. -/
+theorem hFPF_of_kstar_condition [Finite G]
+    {Mσ D Q Q1 Q0 Kstar K1 : Subgroup G}
+    (hprime_manner : ∀ k ∈ K1, k ≠ 1 → Subgroup.centralizer ({k} : Set G) ⊓ Mσ = Kstar)
+    (hKstarQ : Kstar ≤ Q) (hDQ1Mσ : D ⊔ Q1 ≤ Mσ)
+    (hQ1Q : Q1 ≤ Q) (hDQ : Disjoint D Q)
+    (hDnormQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hcond : Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1)
+    (hKstar_prime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q)
+    (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hK1Q0 : K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
+    (hcop : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
+    (hsolv : IsSolvable ↥(D ⊔ Q1)) :
+    ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
+  intro k hk hk1
+  have hCk := centralizer_inf_DQ1_le_Q0 (hprime_manner k hk hk1) hKstarQ hDQ1Mσ hQ1Q hDQ hDnormQ1
+    hcond hKstar_prime
+  exact fpf_of_centralizer_inf_le (hK1DQ1 hk) (hK1Q0 hk) hDQ1Q0 hQ0DQ1 (hcop k hk) (Or.inr hsolv) hCk
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
