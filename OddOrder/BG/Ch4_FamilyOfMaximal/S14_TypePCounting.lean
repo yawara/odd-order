@@ -4641,6 +4641,39 @@ theorem exists_typeP_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Nat.nonempty_primeFactors.mpr Finite.one_lt_card
   exact ⟨Mstar, hMstarmem, hnc, hZle, hXMsσ, hκ, ⟨q, hκ q hq⟩⟩
 
+/-- **σ-part lands in the σ-factor of an internal direct product**: in `Ki ⊔ Kistar`, where `Kistar`
+centralizes `Ki`, `Kistar ≤ M_σ`, and `Ki ⊓ M_σ = ⊥` (e.g. `Ki` is a `σ(Mi)'`-group), any subgroup
+`X ≤ Ki ⊔ Kistar` contained in `M_σ` lies in `Kistar`.  Writing `x = a·b` (`a ∈ Ki`, `b ∈ Kistar`),
+the `σ'`-part `a = x·b⁻¹ ∈ M_σ ⊓ Ki = ⊥`, so `x = b ∈ Kistar`.  This is the `σ`-projection used by
+the swap argument (BG mmd L3999, "it follows that `X_i ⊆ K_i*`") and the `Z`-decomposition. -/
+theorem le_centralizerFactor_of_le_sup_of_le_Msigma [Finite G] {Mi Ki Kistar X : Subgroup G}
+    (hKistarC : Kistar ≤ Subgroup.centralizer (Ki : Set G))
+    (hKistarMσ : Kistar ≤ OddOrder.BG.Ch3.S10.Msigma Mi)
+    (hKiMσ : Ki ⊓ OddOrder.BG.Ch3.S10.Msigma Mi = ⊥)
+    (hXsup : X ≤ Ki ⊔ Kistar) (hXMσ : X ≤ OddOrder.BG.Ch3.S10.Msigma Mi) :
+    X ≤ Kistar := by
+  classical
+  -- `Ki` is normal in `Ki ⊔ Kistar` (`Kistar` centralizes it), so elements decompose as `a · b`.
+  have hKnorm : Ki ⊔ Kistar ≤ Subgroup.normalizer (Ki : Set G) :=
+    sup_le Subgroup.le_normalizer (hKistarC.trans (Subgroup.centralizer_le_normalizer _))
+  haveI : ((Ki).subgroupOf (Ki ⊔ Kistar)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
+  have hsuptop : (Ki.subgroupOf (Ki ⊔ Kistar)) ⊔ (Kistar.subgroupOf (Ki ⊔ Kistar)) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  intro x hx
+  obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_left.mp
+    (hsuptop ▸ Subgroup.mem_top (⟨x, hXsup hx⟩ : ↥(Ki ⊔ Kistar)))
+  have haKi : (a : G) ∈ Ki := Subgroup.mem_subgroupOf.mp ha
+  have hbKistar : (b : G) ∈ Kistar := Subgroup.mem_subgroupOf.mp hb
+  have hab' : (a : G) * (b : G) = x := by have := congrArg Subtype.val hab; simpa using this
+  have haMσ : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma Mi := by
+    have heq : (a : G) = x * (b : G)⁻¹ := by rw [← hab']; group
+    rw [heq]
+    exact (OddOrder.BG.Ch3.S10.Msigma Mi).mul_mem (hXMσ hx)
+      ((OddOrder.BG.Ch3.S10.Msigma Mi).inv_mem (hKistarMσ hbKistar))
+  have ha1 : (a : G) = 1 := Subgroup.mem_bot.mp (hKiMσ ▸ Subgroup.mem_inf.mpr ⟨haKi, haMσ⟩)
+  rw [← hab', ha1, one_mul]; exact hbKistar
+
 /-- **BG 14.7, neighbour normalizer identity** (Proposition 14.2(b1) packaged for a neighbour,
 mmd L3997): for a type-`P` maximal `Mi`, a Hall `κ(Mi)`-subgroup `Ki ≤ Mi`, and a rank-one
 `X ≤ Ki`, `N_G(X) ⊓ Mi = Ki ⊔ C_{Mi_σ}(Ki)`.  The Hall `(κ(Mi) ∪ σ(Mi))'`-subgroup that
@@ -4752,6 +4785,103 @@ theorem typeP_swap_Z_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _ = Subgroup.normalizer (X : Set G) ⊓ Mi := hNeq'.symm
       _ = Ki ⊔ Kistar := hNeq
   exact sup_le hKle hKstarle
+
+/-- **BG 14.7, swap argument — the `Z`-coincidence** (mmd L3999-4001): the neighbour `Mi`'s own
+direct-product decomposition coincides with `Z`, i.e. `Z = K ⊔ K* = Ki ⊔ Ki*`.
+
+`M`/`K`/`K*` are the type-`P` data, `Mi` a nonconjugate type-`P` neighbour (e.g. the partner
+`exists_typeP_partner` from a line `Xi ∈ ℰ¹(K)`) containing `Z` with `π(K*) ⊆ κ(Mi)`,
+`Xi ⊆ Mi_σ`; `X* ∈ ℰ¹(K*)` is a line lying in a Hall `κ(Mi)`-subgroup `Ki`, with
+`Ki* = C_{Mi_σ}(Ki)`.  Direction `⊆` is `typeP_swap_Z_le`.  Direction `⊇` re-runs the swap with
+the roles of `(M, K, X*)` and `(Mi, Ki, Xi)` exchanged, using:
+* `M ⊇ N_G(X*)` (`normalizer_le_of_maximalSubgroupsContaining_centralizer` applied to Prop 14.2(c)'s
+  `ℳ(C_G(X*)) = {M}`), which gives `Ki ⊔ Ki* = N_G(X*) ⊓ Mi ≤ M`;
+* `π(Ki*) ⊆ κ(M)` (`typeP_neighbor_kappa` for `Mi`, since `M` is the partner of `Mi` via `X*`);
+* `Xi ⊆ Ki*` (`le_centralizerFactor_of_le_sup_of_le_Msigma`: `Xi`, a `σ(Mi)`-group inside
+  `Ki × Ki*`, lands in the `σ`-factor `Ki*`). -/
+theorem typeP_swap_Z_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mi Ki : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMimax : Mi ∈ maximalSubgroups G) (hPi : IsTypeP Mi) (hZMi : K ⊔ Kstar ≤ Mi)
+    (hKstarκ : ∀ q ∈ (Nat.card ↥Kstar).primeFactors, q ∈ kappa Mi)
+    {pstar : ℕ} (hpstar : pstar.Prime) {Xstar : Subgroup G}
+    (hXstar : Xstar ∈ elemAbelianOfRank G pstar 1) (hXstarKstar : Xstar ≤ Kstar)
+    (hXstarKi : Xstar ≤ Ki)
+    {pi : ℕ} (hpi : pi.Prime) {Xi : Subgroup G}
+    (hXi : Xi ∈ elemAbelianOfRank G pi 1) (hXiK : Xi ≤ K)
+    (hXiMiσ : Xi ≤ OddOrder.BG.Ch3.S10.Msigma Mi)
+    (hKiMi : Ki ≤ Mi) (hKi : Ch03.IsHallSubgroup (kappa Mi) (Ki.subgroupOf Mi)) :
+    K ⊔ Kstar = Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) := by
+  classical
+  haveI : Fact pstar.Prime := ⟨hpstar⟩
+  -- Direction `⊆` (the original swap).
+  have hle1 : K ⊔ Kstar ≤
+      Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) :=
+    typeP_swap_Z_le hG hKstar hMimax hPi hZMi hKstarκ hpstar hXstar hXstarKstar hKiMi hKi hXstarKi
+  -- `ℳ(C_G(X*)) = {M}` (Prop 14.2(c)) and hence `N_G(X*) ≤ M`.
+  obtain ⟨_, _, _, _, _, hc⟩ := typeP_structure hG hM hP hKM hK hKstar hU
+  have hNXstarM : Subgroup.normalizer (Xstar : Set G) ≤ M :=
+    normalizer_le_of_maximalSubgroupsContaining_centralizer hG
+      (hc pstar hpstar Xstar hXstar hXstarKstar)
+  -- `N_G(X*) ⊓ Mi = Ki ⊔ Ki*` (Prop 14.2(b1) for `Mi`).
+  have hZiMi : Subgroup.normalizer (Xstar : Set G) ⊓ Mi =
+      Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) :=
+    typeP_normalizer_inf_eq hG hMimax hPi hKiMi hKi hpstar hXstar hXstarKi
+  -- (A) `Ki ⊔ Ki* ≤ M`.
+  have hA : Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ≤ M := by
+    rw [← hZiMi]; exact inf_le_left.trans hNXstarM
+  -- A Hall `(κ(Mi) ∪ σ(Mi))'`-subgroup of `Mi` (for Proposition 14.2 applied to `Mi`).
+  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  obtain ⟨Ui', hUi'⟩ := Ch03.hall_E_exists (G := ↥Mi)
+    ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
+  have hUieq : (Ui'.map Mi.subtype).subgroupOf Mi = Ui' :=
+    Subgroup.comap_map_eq_self_of_injective Mi.subtype_injective Ui'
+  have hUi : Ch03.IsHallSubgroup ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
+      ((Ui'.map Mi.subtype).subgroupOf Mi) := by rw [hUieq]; exact hUi'
+  -- (B) `π(Ki*) ⊆ κ(M)`: `M` is the partner of `Mi` via `X*` (`ℳ(N_G(X*)) = {M}`).
+  have hKistarne : OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G) ≠ ⊥ :=
+    (typeP_structure hG hMimax hPi hKiMi hKi rfl hUi).2.1
+  have hCXstarMi : OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Xstar : Set G) ≠ ⊥ :=
+    fun hbot => hKistarne (le_bot_iff.mp (hbot ▸ inf_le_inf_left _
+      (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXstarKi))))
+  have hM_in_NXstar : M ∈ maximalSubgroupsContaining (Subgroup.normalizer (Xstar : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨mem_maximalSubgroups.mp hM, hNXstarM⟩
+  have hB : ∀ q ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma Mi ⊓
+      Subgroup.centralizer (Ki : Set G))).primeFactors, q ∈ kappa M :=
+    typeP_neighbor_kappa hG hMimax hPi hKiMi hKi rfl hUi hXstar hXstarKi hCXstarMi hM_in_NXstar
+  -- (C) `Xi ≤ Ki*` (`σ`-part extraction).
+  have hXiCXstar : Xi ≤ Subgroup.centralizer (Xstar : Set G) := by
+    intro a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have hyCK : y ∈ Subgroup.centralizer (K : Set G) :=
+      (Subgroup.mem_inf.mp (hKstar ▸ hXstarKstar hy)).2
+    exact (Subgroup.mem_centralizer_iff.mp hyCK a (hXiK ha)).symm
+  have hXisup : Xi ≤ Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) := by
+    rw [← hZiMi]
+    exact le_inf (hXiCXstar.trans (Subgroup.centralizer_le_normalizer _))
+      (hXiMiσ.trans (OddOrder.BG.Ch3.S10.Msigma_le Mi))
+  have hKiMσbot : Ki ⊓ OddOrder.BG.Ch3.S10.Msigma Mi = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hrKi hrMσ
+    exact (kappaHall_isPiSubgroup_sigmaCompl hKiMi hKi r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrKi, Nat.card_pos.ne'⟩))
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mi r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrMσ, Nat.card_pos.ne'⟩))
+  have hC : Xi ≤ OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G) :=
+    le_centralizerFactor_of_le_sup_of_le_Msigma inf_le_right inf_le_left hKiMσbot hXisup hXiMiσ
+  -- Direction `⊇` (the swap with `(M, K, X*) ↔ (Mi, Ki, Xi)` exchanged).
+  have hle2 : Ki ⊔ (OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G)) ≤
+      K ⊔ Kstar := by
+    have h := typeP_swap_Z_le hG (rfl :
+      OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G) =
+        OddOrder.BG.Ch3.S10.Msigma Mi ⊓ Subgroup.centralizer (Ki : Set G))
+      hM hP hA hB hpi hXi hC hKM hK hXiK
+    rwa [← hKstar] at h
+  exact le_antisymm hle1 hle2
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
