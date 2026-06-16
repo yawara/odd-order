@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
 
 /-!
 # BG §15: The Subgroup `M_F`
@@ -932,6 +933,44 @@ theorem centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs [Finite G]
       = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M :=
     le_antisymm (OddOrder.BG.Ch2.S08.fittingInG_le _) hle
   exact hMσ'_not_nil (isNilpotent_of_fittingInAmbient_eq_self heq)
+
+/-- **Theorem 15.2, step 2 tail (part 1)** (mmd L4192, "Thus `K*` lies in `Q = O_q(M)`"): the
+order-`q` subgroup `K* = C_{M_σ}(K)` is contained in the Fitting subgroup of `M_σ`.
+
+Combines step 2 core (`C_{F(M_σ)}(K) ≠ 1`, i.e. `K* ⊓ F(M_σ) ≠ 1`) with `|K*| = q` prime (`hq`,
+the §14 input Theorem 14.7(f)): a prime-order subgroup meeting `F(M_σ)` nontrivially is contained
+in it (`le_of_inf_ne_bot_of_card_prime`).  Since `K*` is a `q`-group, this lands `K* ⊆ O_q(F(M_σ))
+⊆ O_q(M) = Q` (the `Q`-containment is the remaining part-2 bookkeeping).
+
+Here `K*` is the `↥M`-realization `C_{↥M}(K) ⊓ M_σ`; the wrapper supplies `hq` from the `§14`
+value `q = |K*|` (prime) and the `subgroupOf` cardinality identity. -/
+theorem kstar_le_fittingInAmbient_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hq : (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).Prime) :
+    Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+      ≤ fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) := by
+  have hcore :=
+    centralizer_kappa_inf_fittingInAmbient_ne_bot_of_inputs hG hM hcompl hcop hcond2 hne
+  haveI : Fact (Nat.card ↥(Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+      ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).Prime := ⟨hq⟩
+  -- `K* ⊓ F(M_σ) = C(K) ⊓ F(M_σ) ≠ ⊥` (since `F(M_σ) ≤ M_σ`).
+  have hInf_ne : (Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+        ⊓ fittingInAmbient ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) ≠ ⊥ := by
+    rw [inf_assoc, inf_of_le_right (OddOrder.BG.Ch2.S08.fittingInG_le _)]
+    exact hcore
+  exact OddOrder.BG.Ch1.S05.le_of_inf_ne_bot_of_card_prime rfl hInf_ne
 
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
