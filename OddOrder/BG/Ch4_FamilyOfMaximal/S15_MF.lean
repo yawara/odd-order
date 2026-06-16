@@ -2040,6 +2040,21 @@ theorem le_of_commutator_le_centralizerCap [Finite G]
     rw [hQ0]; exact inf_le_inf_right _ hQ1Q
   exact hlift.trans (sup_le le_rfl hcap)
 
+/-- **General collapse** (Theorem 15.2 step 3(ii)): `⁅N,D⁆ ≤ M₀` and `N ⊓ C_G(D) ≤ M₀` give
+`N ≤ M₀` (the lifting `le_sup_inf_centralizer_of_commutator_le` plus the centralizer cap).
+Generalizes `le_of_commutator_le_centralizerCap` by taking the cap directly, so it also applies to
+brick D's `(Q₁, Q₂)` step where `M₀ = Q₁ ≠ C_Q(D)`. -/
+theorem le_of_commutator_le_of_inf_centralizer_le [Finite G] {N M₀ D : Subgroup G}
+    (hM₀N : M₀ ≤ N) (hDN : D ≤ Subgroup.normalizer (N : Set G))
+    (hN_M₀ : N ≤ Subgroup.normalizer (M₀ : Set G))
+    (hDM₀ : D ≤ Subgroup.normalizer (M₀ : Set G))
+    (hcomm : ⁅N, D⁆ ≤ M₀) (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥N)
+    (hcap : N ⊓ Subgroup.centralizer (D : Set G) ≤ M₀) :
+    N ≤ M₀ :=
+  (le_sup_inf_centralizer_of_commutator_le hM₀N hDN hN_M₀ hDM₀ hcomm hcop hSolv).trans
+    (sup_le le_rfl hcap)
+
 /-- **Nilpotent ⟹ coprime normal `q`-part centralizes `q′`-part** (`§14`-independent, reusable): in
 a nilpotent finite group, a normal `q`-subgroup `A` (`q` prime) and a `q′`-subgroup `B` satisfy
 `⁅A, B⁆ = ⊥`.  `B` lies in the normal Hall `q′`-subgroup `O_{q′} = opiCoreInG {q}ᶜ ⊤` (nilpotency,
@@ -2360,6 +2375,63 @@ theorem fpf_of_centralizer_inf_le [Finite G]
   rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
+
+/-- **Brick A assembled** (Theorem 15.2 step 3(ii)): the `K*`-condition gives the regular/FPF
+condition `hFPF` for every `k ∈ K₁^#`, by composing brick A-core (`centralizer_inf_DQ1_le_Q0`,
+the `C(k)⊓(D⊔Q₁) ⊆ Q₀` step) with brick A-lift (`fpf_of_centralizer_inf_le`, the Prop 1.5(d)
+fixed-point lift).  Per-`k` normalizer/coprimality data is drawn from the `K₁`-level hypotheses.
+
+This is general over `(Q₀, Q₁)` (it does *not* require `Q₀ = C_Q(D)`), so it serves both the
+`(Q₀, Q₁)` application and brick D's re-application with `(Q₁, Q₂)`. -/
+theorem hFPF_of_kstar_condition [Finite G]
+    {Mσ D Q Q1 Q0 Kstar K1 : Subgroup G}
+    (hprime_manner : ∀ k ∈ K1, k ≠ 1 → Subgroup.centralizer ({k} : Set G) ⊓ Mσ = Kstar)
+    (hKstarQ : Kstar ≤ Q) (hDQ1Mσ : D ⊔ Q1 ≤ Mσ)
+    (hQ1Q : Q1 ≤ Q) (hDQ : Disjoint D Q)
+    (hDnormQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hcond : Kstar ≤ Q0 ∨ ¬ Kstar ≤ Q1)
+    (hKstar_prime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q)
+    (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hK1Q0 : K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
+    (hcop : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
+    (hsolv : IsSolvable ↥(D ⊔ Q1)) :
+    ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
+  intro k hk hk1
+  have hCk := centralizer_inf_DQ1_le_Q0 (hprime_manner k hk hk1) hKstarQ hDQ1Mσ hQ1Q hDQ hDnormQ1
+    hcond hKstar_prime
+  exact fpf_of_centralizer_inf_le (hK1DQ1 hk) (hK1Q0 hk) hDQ1Q0 hQ0DQ1 (hcop k hk)
+    (Or.inr hsolv) hCk
+
+/-- **Part-(ii) contradiction core** (Theorem 15.2 step 3(ii)): from the regular condition `hFPF`,
+the chain `B2-core → B1` gives `⁅Q₁, D⁆ ⊆ Q₀`.  `isNilpotent_DQ1_quotient_of_regular` makes
+`(D ⊔ Q₁)/Q₀` nilpotent; `commutator_le_of_quotient_isNilpotent` (normal `q`-subgroup `Q₁`,
+`q′`-subgroup `D`) gives `⁅Q₁, D⁆ ≤ Q₀` inside `↥(D ⊔ Q₁)`, pushed back to `G` via the subtype
+(`map_commutator` + `subgroupOf_map_subtype`).  Composed with `hFPF_of_kstar_condition` and a
+collapse, this yields the `K*`-condition contradiction. -/
+theorem commutator_le_Q0_of_fpf [Finite G]
+    {D Q1 K1 Q0 : Subgroup G} {q : ℕ} [Fact q.Prime]
+    [(Q0.subgroupOf (D ⊔ Q1)).Normal] [(Q1.subgroupOf (D ⊔ Q1)).Normal]
+    (hPsolv : IsSolvable ↥(D ⊔ Q1 ⊔ K1))
+    (hPQ0 : D ⊔ Q1 ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hK1DQ1 : K1 ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
+    (hdisj : Disjoint (D ⊔ Q1) K1) (hK1Q0disj : Disjoint K1 Q0)
+    (hQ0lt : Q0 < D ⊔ Q1)
+    (hQ1q : IsPGroup q (Q1.subgroupOf (D ⊔ Q1)))
+    (hDq' : q ∉ (Nat.card ↥(D.subgroupOf (D ⊔ Q1))).primeFactors)
+    (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
+    (hFPF : ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0) :
+    ⁅Q1, D⁆ ≤ Q0 := by
+  have hNilp := isNilpotent_DQ1_quotient_of_regular hPsolv hPQ0 hK1DQ1 hK1prime hdisj hK1Q0disj
+    hQ0lt hFPF
+  have hB1 := commutator_le_of_quotient_isNilpotent (q := q) hNilp hQ1q hDq'
+  have hmap := Subgroup.map_mono (f := (D ⊔ Q1).subtype) hB1
+  simp only [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype,
+    inf_eq_left.mpr (le_sup_right : Q1 ≤ D ⊔ Q1), inf_eq_left.mpr (le_sup_left : D ≤ D ⊔ Q1),
+    inf_eq_left.mpr hQ0DQ1] at hmap
+  exact hmap
 
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
