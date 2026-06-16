@@ -77,4 +77,27 @@ theorem false_of_w2_break_arith {w1 d hZ cZ : ℕ}
   rw [hexp] at hcontra
   omega
 
+/-- **(6.8.3) case-(B) fixed-point-free bound** `(2|W₁|+1)² ≤ |H:Z|`.
+In case (B), `W₁` acts fixed-point-freely on `H/H′` and on `H′/Z` (`Z = W₂ ≤ H′`); with all orders
+odd this forces `|H:H′|, |H′:Z| ≥ 2|W₁|+1` (`two_mul_add_one_le_of_odd_dvd`), and the index
+multiplicativity `|H:Z| = |H:H′|·|H′:Z|` for the chain `Z ≤ H′ ≤ H` gives the square bound.
+
+Stated over the two intermediate index factors as oddness + `card_modEq_one` divisibility
+hypotheses (`w1 ∣ idx − 1`, the fixed-point-free outputs) together with the index product, so the
+group-theoretic inputs (the two fixed-point-free actions and the chain index identity) are isolated
+as named obligations for the case-(B) (6.8.3) extension.  This supplies the `hfpf` hypothesis of
+`false_of_w2_break_arith` (with `idxHZ = |H:Z|`).  Mirrors the *single*-factor case-(A) bound
+`2|W₁| ≤ |Z| − 1` (`centralCommutator_card_subgroupOf_lower`), which only needs FPF on `Z` itself. -/
+theorem two_mul_add_one_sq_le_of_two_fpf_factors {w1 idxHHc idxHcZ idxHZ : ℕ}
+    (hw1odd : Odd w1)
+    (h1odd : Odd idxHHc) (h1gt : 1 < idxHHc) (h1dvd : w1 ∣ idxHHc - 1)
+    (h2odd : Odd idxHcZ) (h2gt : 1 < idxHcZ) (h2dvd : w1 ∣ idxHcZ - 1)
+    (hprod : idxHZ = idxHHc * idxHcZ) :
+    (2 * w1 + 1) ^ 2 ≤ idxHZ := by
+  have h1 : 2 * w1 + 1 ≤ idxHHc := two_mul_add_one_le_of_odd_dvd hw1odd h1odd h1dvd h1gt
+  have h2 : 2 * w1 + 1 ≤ idxHcZ := two_mul_add_one_le_of_odd_dvd hw1odd h2odd h2dvd h2gt
+  calc (2 * w1 + 1) ^ 2 = (2 * w1 + 1) * (2 * w1 + 1) := by ring
+    _ ≤ idxHHc * idxHcZ := Nat.mul_le_mul h1 h2
+    _ = idxHZ := hprod.symm
+
 end OddOrder.Peterfalvi.S08
