@@ -4660,6 +4660,17 @@ TI property, type-`P₂`, and the §16-gated covering/uniqueness layer on top.  
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_partner
 
+/-! **BG Theorem 14.7 swap argument** (`S14_TypePCounting`): the neighbour-`Z` machinery.
+`typeP_normalizer_inf_eq` packages Proposition 14.2(b1) for a neighbour `Mi` (producing its Hall
+`(κ∪σ)'`-subgroup internally), giving `N_G(X) ⊓ Mi = Ki ⊔ C_{Mi_σ}(Ki)` for a Hall `κ(Mi)`-subgroup
+`Ki ∋ X`.  `typeP_swap_Z_le` is direction `⊆` of the swap (mmd L3999): `K ⊔ K* ≤ Ki ⊔ Ki*`, the
+`K*`-part using Hall conjugacy (`K* ⊆` some Hall `κ(Mi)`-subgroup `Ki'`, with `N_G(X) ⊓ Mi`
+independent of the Hall choice).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_normalizer_inf_eq
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_swap_Z_le
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
