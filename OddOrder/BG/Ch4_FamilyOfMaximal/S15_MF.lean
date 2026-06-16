@@ -2574,6 +2574,72 @@ theorem kstar_le_Q1_of_inputs [Finite G]
   rw [not_or, not_not] at hkey
   exact hkey
 
+/-- **Brick D of Theorem 15.2 part (ii)** (mmd L4194): once step 1 has established `K* ⊆ Q₁`, the
+chief factor `Q₁` is in fact all of `Q`.  Were `Q₁ < Q`, `exists_chiefFactor_over_normalized` builds
+the next chief factor `Q₂/Q₁` (with `Q₁ < Q₂ ≤ Q`, normalized by `D` and `K₁`); the regular-action
+engine `false_of_kstar_condition_of_lt` then fires at `(Q₁, Q₂)` — its `K*`-condition holds via the
+*left* disjunct `K* ⊆ Q₁` — giving `Q₂ ≤ Q₁`, against `Q₁ < Q₂`.  Hence `Q₁ = Q`.
+
+The `(Q₁, Q₂)`-level engine hypotheses are mechanically derived from the global structural data:
+order/coprimality facts descend along `Q₂ ≤ Q` (monotonicity of `Disjoint`, `Nat.Coprime`,
+`IsPGroup`, `card_dvd_of_le`); normalization comes from `Q₂`'s construction; the centralizer cap
+`Q₂ ⊓ C(D) ≤ Q₁` factors through `Q ⊓ C(D) ≤ Q₁`. -/
+theorem Q1_eq_Q_of_inputs [Finite G]
+    {M Mσ D Q Q1 Kstar K1 : Subgroup G} {q : ℕ} [Fact q.Prime] [Group.IsNilpotent ↥Q]
+    (hprime_manner : ∀ k ∈ K1, k ≠ 1 → Subgroup.centralizer ({k} : Set G) ⊓ Mσ = Kstar)
+    (hKstarQ : Kstar ≤ Q) (hKstar_prime : ∃ q : ℕ, q.Prime ∧ Nat.card ↥Kstar = q)
+    (hDQMσ : D ⊔ Q ≤ Mσ) (hDQ : Disjoint D Q)
+    (hDQK1disj : Disjoint (D ⊔ Q) K1) (hK1Qdisj : Disjoint K1 Q)
+    (hK1normD : K1 ≤ Subgroup.normalizer (D : Set G))
+    (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
+    (hQ_pg : IsPGroup q Q) (hD_q' : q ∉ (Nat.card ↥D).primeFactors)
+    (hcopZ : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q)))
+    (hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q)) (hsolv : IsSolvable ↥(D ⊔ Q ⊔ K1))
+    (hcap : Q ⊓ Subgroup.centralizer (D : Set G) ≤ Q1)
+    (hQM : Q ≤ M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hDM : D ≤ M) (hK1M : K1 ≤ M)
+    (hQ1Q : Q1 ≤ Q) (hKstarQ1 : Kstar ≤ Q1)
+    (hDnormQ1 : D ≤ Subgroup.normalizer (Q1 : Set G))
+    (hK1normQ1 : K1 ≤ Subgroup.normalizer (Q1 : Set G)) :
+    Q1 = Q := by
+  by_contra hne
+  have hQ1ltQ : Q1 < Q := lt_of_le_of_ne hQ1Q hne
+  obtain ⟨Q2, hQ1Q2, hQ2Q, hDnormQ2, hK1normQ2, hQ2normQ1⟩ :=
+    exists_chiefFactor_over_normalized hQ1ltQ hQM hMnormQ (le_inf hDM hDnormQ1) (le_inf hK1M hK1normQ1)
+  -- (Q₁, Q₂)-level engine hypotheses, descended from the global data.
+  have hDQ2Mσ : D ⊔ Q2 ≤ Mσ := (sup_le_sup_left hQ2Q D).trans hDQMσ
+  have hQ1DQ2 : Q1 ≤ D ⊔ Q2 := hQ1Q2.le.trans le_sup_right
+  have hdisj2 : Disjoint (D ⊔ Q2) K1 := hDQK1disj.mono_left (sup_le_sup_left hQ2Q D)
+  have hK1Q1disj : Disjoint K1 Q1 := hK1Qdisj.mono_right hQ1Q
+  have hK1DQ2 : K1 ≤ Subgroup.normalizer ((D ⊔ Q2 : Subgroup G) : Set G) :=
+    le_normalizer_sup hK1normD hK1normQ2
+  have hDQ2normQ1 : D ⊔ Q2 ≤ Subgroup.normalizer (Q1 : Set G) := sup_le hDnormQ1 hQ2normQ1
+  have hPnormQ1 : D ⊔ Q2 ⊔ K1 ≤ Subgroup.normalizer (Q1 : Set G) := sup_le hDQ2normQ1 hK1normQ1
+  have hcardD : Nat.card ↥(D.subgroupOf (D ⊔ Q2)) = Nat.card ↥D :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left : D ≤ D ⊔ Q2)).toEquiv
+  have hDq'2 : q ∉ (Nat.card ↥(D.subgroupOf (D ⊔ Q2))).primeFactors := by rw [hcardD]; exact hD_q'
+  have hQ2_pg : IsPGroup q (Q2.subgroupOf (D ⊔ Q2)) := (hQ_pg.to_le hQ2Q).comap_subtype
+  have hcopZ2 : ∀ k ∈ K1, Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q2)) :=
+    fun k hk => (hcopZ k hk).coprime_dvd_right (Subgroup.card_dvd_of_le (sup_le_sup_left hQ2Q D))
+  have hcopDQ2 : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q2) :=
+    hcopDQ.coprime_dvd_right (Subgroup.card_dvd_of_le hQ2Q)
+  haveI := hsolv
+  have hsolv2 : IsSolvable ↥(D ⊔ Q2) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective
+      ((sup_le_sup_left hQ2Q D).trans (le_sup_left : D ⊔ Q ≤ D ⊔ Q ⊔ K1)))
+  have hPsolv2 : IsSolvable ↥(D ⊔ Q2 ⊔ K1) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective
+      (sup_le_sup_right (sup_le_sup_left hQ2Q D) K1))
+  have hcap2 : Q2 ⊓ Subgroup.centralizer (D : Set G) ≤ Q1 := (inf_le_inf_right _ hQ2Q).trans hcap
+  haveI : (Q1.subgroupOf (D ⊔ Q2)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ1DQ2).mpr hDQ2normQ1
+  haveI : (Q2.subgroupOf (D ⊔ Q2)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_right).mpr
+      (sup_le hDnormQ2 Subgroup.le_normalizer)
+  exact false_of_kstar_condition_of_lt hprime_manner hKstarQ hKstar_prime hDQ2Mσ hQ2Q hQ1DQ2
+    hQ1Q2 hDQ hdisj2 hK1Q1disj hDnormQ2 hK1DQ2 hDQ2normQ1 hPnormQ1 hK1prime hQ2_pg hDq'2
+    hcopZ2 hcopDQ2 hsolv2 hPsolv2 (Or.inl hKstarQ1) hcap2
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
