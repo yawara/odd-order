@@ -205,4 +205,18 @@ theorem finrank_map_rho_eq (ρ : Representation k G V) (a : G) (P : Submodule k 
     rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one, Module.End.one_apply]
   exact (Submodule.equivMapOfInjective (ρ a) hinv.injective P).finrank_eq.symm
 
+/-- **I-3, dimension half.**  If `V = ⊕_{g:G} A g` (internal direct sum) and `ρ` permutes the
+summands regularly (`(A e).map (ρ a) = A (a*e)`), then `dim V = |G| · dim (A 1)`: all summands lie
+in one regular `G`-orbit, so each `A g = (A 1).map (ρ g)` has dimension `dim (A 1)`. -/
+theorem finrank_eq_card_mul_of_regular_orbit (ρ : Representation k G V)
+    [Fintype G] [DecidableEq G] [FiniteDimensional k V] {A : G → Submodule k V}
+    (hint : DirectSum.IsInternal A) (hperm : ∀ a e : G, (A e).map (ρ a) = A (a * e)) :
+    finrank k V = Fintype.card G * finrank k ↥(A 1) := by
+  have hW : finrank k V = ∑ g : G, finrank k ↥(A g) := by
+    rw [← (LinearEquiv.ofBijective (DirectSum.coeLinearMap A) hint).finrank_eq, finrank_directSum]
+  have heq : ∀ g : G, finrank k ↥(A g) = finrank k ↥(A 1) := fun g => by
+    have hAg : A g = (A 1).map (ρ g) := by rw [hperm g 1, mul_one]
+    rw [hAg, finrank_map_rho_eq]
+  rw [hW, Finset.sum_congr rfl (fun g _ => heq g), Finset.sum_const, Finset.card_univ, smul_eq_mul]
+
 end OddOrder.GroupTheory.WielandtCounting
