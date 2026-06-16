@@ -162,6 +162,48 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
   sorry
 
+/-- **BG Theorem A — the ungated conjuncts** (mmd L4274), as a standalone `sorry`-free lemma.
+
+Bundles the four conjuncts of `theoremA_maximal_structure` whose upstreams are all proved
+transitively (mirroring `theoremB_U_sylow_abelian_rank_le_two` / `sigma_reps_pairwise_disjoint`):
+
+* A(1) `M_σ` is a `σ(M)`-Hall subgroup (`Msigma_isHall`);
+* A(5) `Kstar ≠ ⊥` — the genuinely new content, unblocked once Proposition 14.2
+  (`S14.typeP_structure`) landed `sorry`-free: a `K`-case-split, with the `K ≠ ⊥` branch supplying
+  `IsTypeP M` (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`) and reading off the `Kstar ≠ ⊥`
+  conjunct of Proposition 14.2, and the `K = ⊥` (type-F) branch collapsing `Kstar = M_σ ≠ ⊥`;
+* A(6) `M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`).
+
+As with the Theorem B(1) precedent the explicit `hKM : K ≤ M` is added (it is part of the BG setup
+`M = K U M_σ` but not forced by `hK`, a Hall condition on `K.subgroupOf M`); the monolith
+`theoremA_maximal_structure` is left untouched (its other conjuncts are `§14`/`§15`-gated). -/
+theorem theoremA_ungated_conjuncts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M)) :
+    Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
+      Kstar ≠ ⊥ ∧
+      S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M := by
+  refine ⟨OddOrder.BG.Ch3.S10.Msigma_isHall hG hM, ?_,
+    maxNilpotentNormalHall_le_Msigma hG hM, OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM⟩
+  by_cases hKbot : K = ⊥
+  · -- type-F branch: `Kstar = M_σ ⊓ C(1) = M_σ ≠ ⊥`.
+    subst hKbot
+    have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+      rw [Subgroup.coe_bot, Subgroup.centralizer_eq_top_iff_subset]
+      exact Set.singleton_subset_iff.mpr (Subgroup.one_mem _)
+    rw [hc, inf_top_eq] at hKstar
+    rw [hKstar]
+    exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+  · -- type-P branch: `Kstar ≠ ⊥` is conjunct 2 of Proposition 14.2.
+    have hKofne : K.subgroupOf M ≠ ⊥ := fun h =>
+      hKbot (by rw [← Subgroup.map_subgroupOf_eq_of_le hKM, h, Subgroup.map_bot])
+    have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
+    exact (S14.typeP_structure hG hM hP hKM hK hKstar hU).2.1
+
 /-- **BG Theorem B** (mmd L4295): restrictions on `U` and the tameness of
 `A(M) - M_sigma`. -/
 theorem theoremB_U_and_A_tame [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
