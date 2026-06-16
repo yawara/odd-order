@@ -4656,6 +4656,14 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two
 
+/-! **BG Theorem A — ungated conjuncts** (`S16_MainResults`, `theoremA_ungated_conjuncts`):
+`M_σ` is a `σ`-Hall, `Kstar ≠ ⊥`, and `M_F ≤ M_σ ≤ M'`.  Standalone bundle of the four conjuncts of
+`theoremA_maximal_structure` whose upstreams are all proved transitively; the genuinely new content
+is `Kstar ≠ ⊥`, unblocked once Proposition 14.2 (`S14.typeP_structure`) landed sorry-free.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
