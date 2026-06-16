@@ -1156,7 +1156,11 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         Group.IsNilpotent ↥D ∧
         Q0 = Q ⊓ Subgroup.centralizer (D : Set G) ∧
         M ≤ Subgroup.normalizer (Q0 : Set G) ∧
-        Nat.card ↥(Q.subgroupOf (Q ⊔ Q0)) = q ^ p ∧
+        -- mmd 15.2(f): the chief factor `Q̄ = Q/Q0` is elementary abelian of order `q^p`
+        -- (faithfulness fix, Lane G 2026-06-16: the previous scaffold wrote
+        -- `Nat.card ↥(Q.subgroupOf (Q ⊔ Q0))`, which is `|Q|` since `Q0 = Q ⊓ C(D) ⊆ Q` forces
+        -- `Q ⊔ Q0 = Q`; the intended `|Q̄| = |Q : Q0|` is `(Q0.subgroupOf Q).index`).
+        (Q0.subgroupOf Q).index = q ^ p ∧
         OddOrder.BG.Ch3.S10.Msigma M = derivedInG M ∧
         derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
         -- mmd 15.2(g) "F(M) ⊂ M_σ": the Fitting subgroup is contained in the σ-core.
