@@ -2282,6 +2282,85 @@ theorem centralizer_inf_DQ1_le_Q0 [Finite G]
           (by rw [hcard]; exact hqq.symm.le)) ▸ inf_le_right) hc
     rw [hbot]; exact bot_le
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Brick A "lift" of Theorem 15.2 step 3(ii)** (Prop 1.5(d)): from `C(k) ⊓ (D ⊔ Q₁) ≤ Q₀`
+(brick A-core) and the coprime conjugation action of `⟨k⟩` on `D ⊔ Q₁`, `k` acts fixed-point-freely
+on `(D ⊔ Q₁)/Q₀` — i.e. `k·x⁻¹·k⁻¹·x ∈ Q₀ ⟹ x ∈ Q₀`.  The quotient fixed points push forward from
+`C_{D⊔Q₁}(⟨k⟩) = C(k) ⊓ (D ⊔ Q₁) ⊆ Q₀` (`fixedPointsOfMulAut_quotientMulAutHom_eq_map`), so they
+are trivial; a `k`-fixed `x̄` is `⟨k⟩`-fixed (generator argument), hence `1`. -/
+theorem fpf_of_centralizer_inf_le [Finite G]
+    {D Q1 Q0 : Subgroup G} {k : G}
+    (hk_norm : k ∈ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G))
+    (hk_normQ0 : k ∈ Subgroup.normalizer (Q0 : Set G))
+    (hDQ1Q0 : D ⊔ Q1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQ0DQ1 : Q0 ≤ D ⊔ Q1)
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥(D ⊔ Q1)))
+    (hsolv : IsSolvable ↥(Subgroup.zpowers k) ∨ IsSolvable ↥(D ⊔ Q1))
+    (hCk : Subgroup.centralizer ({k} : Set G) ⊓ (D ⊔ Q1) ≤ Q0) :
+    ∀ x ∈ D ⊔ Q1, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
+  have hkz : Subgroup.zpowers k ≤ Subgroup.normalizer ((D ⊔ Q1 : Subgroup G) : Set G) :=
+    Subgroup.zpowers_le.mpr hk_norm
+  have hkzQ0 : Subgroup.zpowers k ≤ Subgroup.normalizer (Q0 : Set G) :=
+    Subgroup.zpowers_le.mpr hk_normQ0
+  set φ : ↥(Subgroup.zpowers k) →* MulAut ↥(D ⊔ Q1) :=
+    (Subgroup.normalizerMonoidHom (D ⊔ Q1)).comp (Subgroup.inclusion hkz) with hφ
+  haveI hQ0_normal : (Q0.subgroupOf (D ⊔ Q1)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0DQ1).mpr hDQ1Q0
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf (D ⊔ Q1)) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    show (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hkzQ0 a.2) (x : G)).mp hx
+  -- Prop 1.5(d) + brick A-core: the quotient fixed points are trivial.
+  have hbridge : (Subgroup.fixedPointsOfMulAut φ).map (D ⊔ Q1).subtype =
+      Subgroup.centralizer ((Subgroup.zpowers k : Subgroup G) : Set G) ⊓ (D ⊔ Q1) :=
+    OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hkz
+  have hfp_le : Subgroup.fixedPointsOfMulAut φ ≤ Q0.subgroupOf (D ⊔ Q1) := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf]
+    have hym : ((D ⊔ Q1).subtype y) ∈ (Subgroup.fixedPointsOfMulAut φ).map (D ⊔ Q1).subtype :=
+      ⟨y, hy, rfl⟩
+    rw [hbridge] at hym
+    obtain ⟨hcent, _⟩ := Subgroup.mem_inf.mp hym
+    exact hCk (Subgroup.mem_inf.mpr
+      ⟨Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers k)) hcent, y.2⟩)
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hsolv hMinv
+  have hfpbot : Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) = ⊥ := by
+    rw [hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hfp_le
+  intro x hx hpre
+  -- A `MulAut` fixing `y` fixes `y` under all its `zpowers` (stabilizer is a subgroup).
+  have hpow : ∀ (f : MulAut (↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1)))
+      (y : ↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1)), f y = y → ∀ i : ℤ, (f ^ i) y = y :=
+    fun f y hf i => MulAction.mem_stabilizer_iff.mp
+      ((MulAction.stabilizer (MulAut (↥(D ⊔ Q1) ⧸ Q0.subgroupOf (D ⊔ Q1))) y).zpow_mem
+        (MulAction.mem_stabilizer_iff.mpr hf) i)
+  -- The generator `k` fixes `x̄` (the premise `k·x⁻¹·k⁻¹·x ∈ Q₀`).
+  have hkbar : quotientMulAutHom hMinv ⟨k, Subgroup.mem_zpowers k⟩
+      (QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩) =
+      QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩ := by
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show (k * x * k⁻¹)⁻¹ * x ∈ Q0
+    have heq : (k * x * k⁻¹)⁻¹ * x = k * x⁻¹ * k⁻¹ * x := by group
+    rw [heq]; exact hpre
+  -- Hence `x̄` is fixed by all of `⟨k⟩`, so lies in the trivial fixed-point set.
+  have hxbar : QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩ ∈
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) := by
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have ha : a = ⟨k, Subgroup.mem_zpowers k⟩ ^ i := Subtype.ext (by rw [← hi, Subgroup.coe_zpow])
+    rw [ha, map_zpow]
+    exact hpow (quotientMulAutHom hMinv ⟨k, Subgroup.mem_zpowers k⟩)
+      (QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩) hkbar i
+  rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+    Subgroup.mem_subgroupOf] at hxbar
+  exact hxbar
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
