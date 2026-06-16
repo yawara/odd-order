@@ -2640,6 +2640,35 @@ theorem Q1_eq_Q_of_inputs [Finite G]
     hQ1Q2 hDQ hdisj2 hK1Q1disj hDnormQ2 hK1DQ2 hDQ2normQ1 hPnormQ1 hK1prime hQ2_pg hDq'2
     hcopZ2 hcopDQ2 hsolv2 hPsolv2 (Or.inl hKstarQ1) hcap2
 
+/-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
+`F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
+(`opiCoreInG_sup_compl_eq_of_isNilpotent`), and the `π'`-part centralizes the `π`-part
+(`opiCoreInG_commutator_compl_eq_bot`) while lying in `M`, so
+`F(M) ≤ O_π(F(M)) ⊔ (C_G(O_π(F(M))) ⊓ M)`.  Instantiated at `π = {q}` (with `O_q(F(M)) = Q`) this
+is the easy inclusion of conjunct (g); the reverse `Q ⊔ (C_G(Q) ⊓ M) ≤ F(M)` is the
+situation-specific `C_M(Q) ⊆ F(M)` (`D` nilpotent, `M_σ` not), deferred to the step-4 core. -/
+theorem fittingInAmbient_le_opiCore_sup_centralizer_inf [Finite G] {M : Subgroup G} (π : Set ℕ) :
+    fittingInAmbient M ≤ opiCoreInG π (fittingInAmbient M) ⊔
+      (Subgroup.centralizer ((opiCoreInG π (fittingInAmbient M) : Subgroup G) : Set G) ⊓ M) := by
+  haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hsplit : opiCoreInG π (fittingInAmbient M) ⊔ opiCoreInG πᶜ (fittingInAmbient M) =
+      fittingInAmbient M := opiCoreInG_sup_compl_eq_of_isNilpotent π
+  have hcomm : ⁅opiCoreInG π (fittingInAmbient M), opiCoreInG πᶜ (fittingInAmbient M)⁆ = ⊥ :=
+    OddOrder.BG.Ch2.S08.opiCoreInG_commutator_compl_eq_bot π (fittingInAmbient M)
+  have hcent : opiCoreInG πᶜ (fittingInAmbient M) ≤
+      Subgroup.centralizer ((opiCoreInG π (fittingInAmbient M) : Subgroup G) : Set G) := by
+    have hcomm' : ⁅opiCoreInG πᶜ (fittingInAmbient M), opiCoreInG π (fittingInAmbient M)⁆ = ⊥ := by
+      rw [Subgroup.commutator_comm]; exact hcomm
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm'
+  have hleM : opiCoreInG πᶜ (fittingInAmbient M) ≤ M :=
+    (OddOrder.GroupTheory.opiCoreInG_le πᶜ (fittingInAmbient M)).trans
+      (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  calc fittingInAmbient M
+      = opiCoreInG π (fittingInAmbient M) ⊔ opiCoreInG πᶜ (fittingInAmbient M) := hsplit.symm
+    _ ≤ opiCoreInG π (fittingInAmbient M) ⊔
+          (Subgroup.centralizer ((opiCoreInG π (fittingInAmbient M) : Subgroup G) : Set G) ⊓ M) :=
+        sup_le_sup_left (le_inf hcent hleM) _
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
