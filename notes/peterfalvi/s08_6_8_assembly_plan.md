@@ -3813,3 +3813,31 @@ coherentXunionYset_caseB_of_glued)で組め、cTE-glue base(coherentCertainTypeS
 存在が問題なら、教科書 (6.8.2) の τ₂ 構成(L^# 一致 + η₁↦Y の abstract isometry)を Lean で直接組む engine が要る
 (basis-linear IntegralCharacterMap では列=Σμ_{ij} ゆえ per-μ_{ij} 値が要り、自然な cTE が T=0 を呼ぶ ⟹ ChatGPT 相談候補)。
 **正本 = 本 session 48 cont.²。session 48 cont. の「per-irreducible で adjoin」は Xset 構造誤認ゆえ撤回、本 cont.² が正。**
+
+### session 48 cont.³: 🔄 先行 course-correction との照合 — cont.² の chain 経路は detour、真の crux = reducible-column coherence producer
+
+**重要照合(memory `peterfalvi-s6-coherence-reduction.md` 最新エントリ 2026-06-16「原典精読 course-correction」と突合)**:
+先行 lane-b セッションが既に `references/peterfalvi/04.8.mmd` L156-244 を全文精読して確定していた:
+- **case-B (6.8.2) = τ₂ 直接構成**(τ on Z[X∪Y,L^#] 一致 + η₁^{τ₂}=Y)。per-χ (6.8.2.3) `(χ−aη₁)^τ=X₁−aY` で τ₂ 内積保存。
+- **chain adjoin (`xChainCoherentW`) は case-A (6.6) `X⊂Irr L` 専用 — case-B では DETOUR**(valid lemma だが経路外)。
+- 正しい cX = per-χ (6.8.2.3) → `IsCoherent(Xset)` via τ₂|_X だが **組立未完 = IsCoherent(Xset) 産出器が無い**。
+
+**⟹ 私の session 48 の位置づけ(訂正)**:
+- session 48 の T=0 over-constraint 厳密証明(等長性から未決・反例・self/conj 曖昧性)は**この先行 course-correction と完全に整合**
+  (cTE-glue の X=cTE 要求が間違い、textbook は X₁⊥Y のみ — 同じ結論を独立に厳密化した)。
+- **cont.² の「xChainCoherentW で既約 anchor」案は先行セッションが detour 判定した chain を再提案 ⟹ 撤回**。
+
+**🎯 真の crux(全セッション通じての根本、未解決)= basis-linear 枠での reducible-column coherence producer**:
+case-B Xset は **reducible 列 μ_j を含む**。`IsCoherent.extension` は **IntegralCharacterMap = Irr(L) basis 上 ℤ-linear** ゆえ
+τ₂ は per-μ_{ij} 値で決まる。per-χ (6.8.2.3) は **列レベルの像 X_χ しか与えない** ⟹ τ₂(列)=X_χ を満たす per-μ_{ij} 割当は
+**未決定**で、自然な cТЕ 割当は T=0 を呼ぶ。これが全 3 経路がブロックされる共通根:
+- 経路1 cTE-glue(s44-47): T=0 要求(over-constrained、本 session 48 で反駁)。
+- 経路2 per-χ τ₂ 直接(先行・textbook 忠実): producer 無し(列レベル像から basis-linear τ₂ を組む = 同じ未決定性)。
+- 経路3 chain(cont.²/xChainCoherentW): case-A 専用 detour。
+- **教科書はこれを抽象 ℤ-linear τ₂ on ℤ[X∪Y](Irr(L) basis 全体に拡げない)で回避** — Lean の IntegralCharacterMap 枠と不整合。
+
+**▶▶ 推奨される次の一手(要 focused/相談)**: 教科書 (6.8.2) の **abstract ℤ-linear τ₂ on ℤ[X∪Y]** を Lean で構成する方法
+(IntegralCharacterMap を ℤ[X∪Y] 部分格子上で組むか、basis 拡張の per-μ_{ij} 自由度をどう埋めるか)を **ChatGPT 相談**
+([[feedback-ask-chatgpt-for-elided-gaps]]、最強モデル)。または reducible-member coherence producer engine の設計。
+これは単一セッションを超える**深いアーキ crux で複数セッション thrash 済**(s44-47 cTE / 先行 per-χ / cont.² chain)。
+**正本 = 本 session 48 cont.³(cont.² の chain 案を supersede、先行 τ₂-direct course-correction を再確認 + T=0 反駁で厳密化)。**
