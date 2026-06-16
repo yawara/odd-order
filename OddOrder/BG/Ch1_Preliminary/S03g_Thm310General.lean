@@ -127,4 +127,46 @@ theorem invariants_lift_map_eq_of_trivial (ρ : Representation F G V) {K₀ : Su
     rw [MonoidHom.comp_apply, hX]
     exact hg
 
+/-- **Case B transfer brick — the complement's order is unchanged by the lift** (issue 8013 piece 3).
+A Frobenius complement `R` meets the kernel trivially (`R ∩ K₀ = ⊥`, here `K₀ ⊆ K`), so the quotient
+map `mk' K₀` is injective on `R` and `|R·K₀/K₀| = |R|`.  Used to transfer `|R'| = p` (the quotient
+conclusion (a)) back to `|R| = p`. -/
+theorem card_map_mk'_eq_of_disjoint {K₀ R : Subgroup G} [K₀.Normal] (hdisj : Disjoint R K₀) :
+    Nat.card (R.map (QuotientGroup.mk' K₀)) = Nat.card ↥R := by
+  have hinj : Function.Injective ((QuotientGroup.mk' K₀).comp R.subtype) := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro r hr
+    rw [MonoidHom.mem_ker, MonoidHom.comp_apply, Subgroup.coe_subtype,
+      QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hr
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext (Subgroup.disjoint_def.mp hdisj r.2 hr)
+  have hrange : ((QuotientGroup.mk' K₀).comp R.subtype).range = R.map (QuotientGroup.mk' K₀) := by
+    rw [MonoidHom.range_comp, Subgroup.range_subtype]
+  rw [← hrange]
+  exact (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+
+/-- **Case B transfer of BG Theorem 3.10 (a)+(b)** (issue 8013 piece 3): when `K₀` acts trivially,
+the conclusion of the theorem for the lifted representation `ρ̄` on `G ⧸ K₀` (with kernel `K/K₀`,
+complement `R·K₀/K₀`) transfers back to `ρ` on `G` (kernel `K`, complement `R`).  The complement's
+order is unchanged (`card_map_mk'_eq_of_disjoint`) and so is the `finrank` of its invariants
+(`invariants_lift_map_eq_of_trivial`), so `(a)` `|R| = p` and `(b)` `finrank V = |R| · finrank C_V(R)`
+carry over verbatim.  The induction (Case B) supplies the quotient conclusion `hquot` by applying the
+induction hypothesis to `ρ̄` (whose kernel `K/K₀` is strictly smaller). -/
+theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀.Normal]
+    (hker : ∀ x ∈ K₀, ρ x = 1) (hdisj : Disjoint R K₀)
+    (hquot : ∃ p : ℕ, p.Prime ∧ Nat.card (R.map (QuotientGroup.mk' K₀)) = p ∧
+      finrank F V = Nat.card (R.map (QuotientGroup.mk' K₀)) *
+        finrank F (Representation.invariants
+          ((QuotientGroup.lift K₀ ρ hker).comp (R.map (QuotientGroup.mk' K₀)).subtype))) :
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
+      finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
+  obtain ⟨p, hp, hcardR', hfinrank'⟩ := hquot
+  have hcard : Nat.card (R.map (QuotientGroup.mk' K₀)) = Nat.card ↥R :=
+    card_map_mk'_eq_of_disjoint hdisj
+  have hinv : Representation.invariants
+      ((QuotientGroup.lift K₀ ρ hker).comp (R.map (QuotientGroup.mk' K₀)).subtype)
+      = Representation.invariants (ρ.comp R.subtype) :=
+    invariants_lift_map_eq_of_trivial ρ hker R
+  exact ⟨p, hp, by rw [← hcard]; exact hcardR', by rw [hfinrank', hcard, hinv]⟩
+
 end OddOrder.BG.Ch1.S03
