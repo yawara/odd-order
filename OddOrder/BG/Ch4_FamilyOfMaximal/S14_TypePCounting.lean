@@ -5014,6 +5014,104 @@ theorem ncard_sdiff_biUnion_subgroup [Finite G] {ι : Type*} {s : Finset ι} (hs
   have hZcard : Nat.card ↥Z = (Z : Set G).ncard := Nat.card_coe_set_eq (Z : Set G)
   omega
 
+/-- **Internal direct product cardinality** (BG 14.7 `z = ∏ kᵢ*`, mmd L4009): a finite family
+`{Hᵢ}` of pairwise-commuting subgroups with pairwise-coprime orders is an internal direct product,
+so `|⨆ᵢ Hᵢ| = ∏ᵢ |Hᵢ|`.  (Independence comes from coprimality via
+`Subgroup.independent_of_coprime_order`; the `noncommPiCoprod` map is then injective with range
+`⨆ Hᵢ`.)  In Theorem 14.7, applied to the `Kᵢ*` (Hall `σ(Mᵢ)`-subgroups of `Z`, pairwise coprime
+since the `σ(Mᵢ)` are disjoint) it gives `z = ∏ kᵢ*` and hence `kᵢ = ∏_{j≠i} kⱼ*`. -/
+theorem card_iSup_of_pairwise_commute_coprime [Finite G] {ι : Type*} [Fintype ι]
+    (H : ι → Subgroup G)
+    (hcomm : Pairwise fun i j => ∀ x y : G, x ∈ H i → y ∈ H j → Commute x y)
+    (hcoprime : Pairwise fun i j => Nat.Coprime (Nat.card ↥(H i)) (Nat.card ↥(H j))) :
+    Nat.card ↥(⨆ i, H i) = ∏ i, Nat.card ↥(H i) := by
+  classical
+  haveI : ∀ i, Fintype ↥(H i) := fun i => Fintype.ofFinite _
+  have hcop' : Pairwise fun i j => Nat.Coprime (Fintype.card ↥(H i)) (Fintype.card ↥(H j)) :=
+    fun i j hij => by simpa only [Nat.card_eq_fintype_card] using hcoprime hij
+  have hind : iSupIndep H := Subgroup.independent_of_coprime_order hcomm hcop'
+  have hinj := Subgroup.injective_noncommPiCoprod_of_iSupIndep (hcomm := hcomm) hind
+  have hrange : (Subgroup.noncommPiCoprod hcomm).range = ⨆ i, H i :=
+    Subgroup.noncommPiCoprod_range
+  rw [← hrange, ← Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv, Nat.card_pi]
+
+/-- **BG 14.7, the canonical form of `Kᵢ*`** (mmd L4009): once the swap gives `Z = Kₙ ⊔ Kₙ*`
+(`Kₙ* = C_{Nσ}(Kₙ)`), the factor `Kₙ*` is exactly `Z ⊓ Nσ` — the `σ(N)`-part of `Z`.  This
+removes the dependence of `Kₙ*` on the chosen Hall `κ(N)`-subgroup `Kₙ`: it is the canonical
+`Z ⊓ M_σ(N)`, so the family `{Kᵢ*}` can be defined choice-free as `N ↦ Z ⊓ Nσ`.
+
+`⊆`: `Kₙ* ≤ Z` (a factor) and `Kₙ* ≤ Nσ`.  `⊇`: `Z ⊓ Nσ = (Kₙ ⊔ Kₙ*) ⊓ Nσ` is a `σ(N)`-group
+inside the product `Kₙ × Kₙ*`, so the `σ`-projection lands it in `Kₙ*`. -/
+theorem typeP_neighbor_Kstar_eq_Z_inf_Msigma [Finite G]
+    {N K Kstar KN : Subgroup G} (hKNN : KN ≤ N)
+    (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N))
+    (hZeq : K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))) :
+    OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+      = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N := by
+  classical
+  refine le_antisymm (le_inf (hZeq ▸ le_sup_right) inf_le_left) ?_
+  rw [hZeq]
+  have hKNMσbot : KN ⊓ OddOrder.BG.Ch3.S10.Msigma N = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hrKN hrMσ
+    exact (kappaHall_isPiSubgroup_sigmaCompl hKNN hKN r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrKN, Nat.card_pos.ne'⟩))
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N r
+        (Nat.mem_primeFactors.mpr ⟨hr, hrMσ, Nat.card_pos.ne'⟩))
+  exact le_centralizerFactor_of_le_sup_of_le_Msigma inf_le_right inf_le_left hKNMσbot
+    inf_le_left inf_le_right
+
+/-- **BG 14.7, per-neighbour swap package** (mmd L3997-4009): for a type-`P` maximal `M` with Hall
+data `K`, `K*`, a line `X ∈ ℰ_p¹(K)` (`C_{M_σ}(X) ≠ 1`) and a maximal `N ⊇ N_G(X)`, there is a
+Hall `κ(N)`-subgroup `K_N` of `N` realising the swap: `Z = K ⊔ K* = K_N ⊔ K_N*` with the canonical
+factor `K_N* = Z ⊓ M_σ(N)`.  This is the per-neighbour foundation that the `M_i` family iterates
+over: assembles `typeP_neighbor_embed`/`typeP_neighbor_kappa` (neighbour data), a chosen line
+`X* ∈ ℰ¹(K*)` with a Hall `κ(N)`-subgroup `K_N ∋ X*`, `typeP_swap_Z_eq` (the swap) and
+`typeP_neighbor_Kstar_eq_Z_inf_Msigma` (the canonical form). -/
+theorem exists_neighbor_kappaHall_swap [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+        = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N := by
+  classical
+  obtain ⟨hnc, hZN, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hNmax : N ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp hN).1
+  have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr Finite.one_lt_card
+  have hqκN : q ∈ kappa N := hκ q hq
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+  -- A line `X* ∈ ℰ¹(K*)` of prime order `q`, inside a Hall `κ(N)`-subgroup `K_N`.
+  obtain ⟨x', hx'⟩ := exists_prime_orderOf_dvd_card' q (Nat.dvd_of_mem_primeFactors hq)
+  have hx'ord : orderOf (x' : G) = q :=
+    (orderOf_injective Kstar.subtype Kstar.subtype_injective x').trans hx'
+  have hXstarcard : Nat.card ↥(Subgroup.zpowers (x' : G)) = q := by rw [Nat.card_zpowers, hx'ord]
+  have hXstarElem : Subgroup.zpowers (x' : G) ∈ elemAbelianOfRank G q 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXstarcard, by rw [hXstarcard, pow_one]⟩
+  have hXstarKstar : Subgroup.zpowers (x' : G) ≤ Kstar := Subgroup.zpowers_le.mpr x'.2
+  have hXstarκN : ∀ r ∈ (Nat.card ↥(Subgroup.zpowers (x' : G))).primeFactors, r ∈ kappa N := by
+    intro r hr
+    rw [hXstarcard, (Nat.prime_of_mem_primeFactors hq).primeFactors, Finset.mem_singleton] at hr
+    exact hr ▸ hqκN
+  obtain ⟨KN, hKNN, hKN, hXstarKN⟩ :=
+    exists_isHallSubgroup_kappa_ge hG hNmax (hXstarKstar.trans (le_sup_right.trans hZN)) hXstarκN
+  have hswap : K ⊔ Kstar =
+      KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) :=
+    typeP_swap_Z_eq hG hM hP hKM hK hKstar hU hNmax ⟨q, hqκN⟩ hZN hκ
+      (Nat.prime_of_mem_primeFactors hq) hXstarElem hXstarKstar hXstarKN
+      Fact.out hX hXK hXNσ hKNN hKN
+  exact ⟨KN, hKNN, hKN, hswap, typeP_neighbor_Kstar_eq_Z_inf_Msigma hKNN hKN hswap⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
