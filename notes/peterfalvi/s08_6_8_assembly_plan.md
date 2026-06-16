@@ -3419,3 +3419,39 @@ cont.³¹/³⁵/³⁶ の「(5.6) core = R(μ_j) via σ の deep §5↔§6 bridg
 (B) hmapagree / (C) extension assembly → glue (`coherentXunionYset_caseB_of_glued`、sorry-free) → sorry 解消。
 2026-06-16 session: `xAdjoinStepW` 一般化 (`6a59b41e`) + `coherentDegreeSqNormBound_of_not_coherentW`
 (`c7c3f6a0`) landed。**詳細・次手の正本 = `s56_reweighting_plan.md` cont.³⁷** (本ファイルの cont.³¹ は obsolete)。
+
+## 2026-06-16 lane-b 再開 (session 44): 🎯🎯 engine-level architecture 確定 — (6.8.2) は標準 engine + base=certainType⊔Y、weighted 不要
+
+lane-b 再開。原典 (6.8) + S07/S08 engine を engine-level で精読し、session 43 の chain-vs-direct / weighted-base
+混乱を **engine 署名から決着**。**deep math gap は無く、残は hstep monolith assembly のみ**と再確認。
+
+### ✅ engine-level で確定した事実 (session 43 の混乱を supersede):
+1. **per-χ decomposition は全て η₁-anchored で uniform**: `columnDecompositionTau` (S08_CaseBCoherence2:1822)
+   と `irreducibleDecompositionTau` (:1868) は**両方とも** `CharacterPsiDecomposition hyp.tau χ (a • η₁)`
+   を産む (column も irr も共有 anchor η₁∈Y)。= 原典 (6.8.2.3) `(χ−a·η₁)^τ = X₁−a·Y` の uniform 形式化。
+2. **標準 engine は reducible base を扱える**: `retarget_isCoherent_of_supportedDecomposition_and_memberFamily`
+   (S07:4126) の per-member 直交 helper `inner_extension_member_orthogonal_imageSet` (S07:3845) は
+   base member を `D' : CharacterPsiDecomposition τ χ' 0` で**一般に**取る (既約性要求なし)。⟹ 各 base member の
+   直交は自分の decomposition で discharge。**reducible column を base に置ける** (Dmem=`certainTypeMemberDecomposition`)。
+3. **engine 制約は anchor∈base + anchor norm-1 + adjoined-member norm-1 のみ** (`hchi1∈S₁`, `hchi1chi1=1`, `hχχ=1`)。
+   η₁ は既約 (norm-1)、irr X-member も norm-1 ⟹ 充足。columns は adjoin せず base に置く (reducible でも IsCoherent OK)。
+
+### 🧭 確定した (6.8.2) 構築経路 (session 43 の weighted/chain 議論を上書き):
+**`IsCoherent hyp.tau (X∪Y)` を直接構築** (glue shell `coherentXunionYset_caseB_of_glued` の cX-分離は bypass):
+- **base = certainTypeSet ⊔ Y** (η₁∈Y を含む、両者 coherent: `certainTypeSet_isCoherent_tau` / `coherentYset`、
+  直交 `caseB_Xset_orthogonal_Yset`)。orthogonal-union glue (`coherentUnion_of_glued` 系) で組む。
+- **既約 X-member を η₁ anchor で順次 adjoin** (`retarget_isCoherent_of_supportedDecomposition_and_memberFamily`、
+  Da=`irreducibleDecompositionTau`)。→ 結果 = certainType ⊔ Y ⊔ irr-X = X∪Y。
+- **⟹ weighted engine (xChainCoherentW/xAdjoinStepW) は (6.8.2) coherence 構築には不要** (session 43 の前提を訂正)。
+  weighted bound `coherentDegreeSqNormBound_of_not_coherentW` は **(6.8.3) break** にのみ要る (S₁=X∪Y が reducible
+  columns を含むため、Thm (5.6) の bound 側が weighted)。coherence 構築 (engine) と break bound (5.6 適用) は別レイヤ。
+
+### 🔴 残る irreducible hard core = hstep monolith (~200-400 LOC、deep gap 無し、assembly-scale):
+各 adjoin step の data (Da + heterogeneous Dmem + per-step 直交 + hgen)。Dmem dispatch =
+column→`certainTypeMemberDecomposition`、Y/既-adjoin-irr→`memberExtensionDecomposition`。per-step 直交 = column⊥new
+(`certainTypeR_imageSet_orthogonal_dadeOfDiff` cont.⁴¹)、irr⊥new (`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`)。
++ base-union glue + chain enumeration + (6.8.3) wiring。**全ツール在庫、engine/base 確定、deep math gap 無し**だが
+loop-cadence 不適 (session 43 が ~18 iter で thrash した assembly-scale)。
+
+**正本=本 session 44。engine=標準 (weighted 不要)、base=certainType⊔Y、残=hstep monolith assembly (sustained focus
+or 集中 subagent or Workflow 向き)。次=base-union glue → 既約 X-member adjoin chain (hstep)。**
