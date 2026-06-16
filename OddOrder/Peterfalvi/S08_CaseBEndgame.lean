@@ -243,6 +243,90 @@ theorem caseB_W1_dvd_index_commutator {G : Type*} [Group G] [Fintype G]
   rw [← commutator_subgroupOf_self]
   exact Subgroup.mem_subgroupOf.mpr (hW2 hxW2)
 
+/-- **(6.8.3) case-(B) second FPF divisibility** `|W₁| ∣ |H′:W₂| − 1`, from the Sibley data.
+The `H′/W₂` companion of `caseB_W1_dvd_index_commutator`: `W₁` acts (by conjugation) on
+`H′ = commutator ↥H` (restricting the `H`-action, `H′` characteristic), and its fixed points lie in
+`W₂` (`cert.centralizer_W2`), so `|W₁| ∣ |H′:W₂| − 1` by `W1_dvd_index_of_fixedPoints_le`.  `W₂`'s
+`W₁`-invariance is automatic from `W₂ ≤ Z(↥L)` (central elements are fixed by conjugation), and its
+normality from the same.  With `caseB_W1_dvd_index_commutator` this feeds
+`two_mul_add_one_sq_le_index_of_chain` to give the full `hfpf` bound `(2|W₁|+1)² ≤ |H:W₂|`. -/
+theorem caseB_W1_dvd_relIndex_commutator {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)] (hyp : SibleyDadeHypothesis G L H)
+    (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
+    (hW2cen : cert.W2 ≤ Subgroup.center ↥L)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1)) :
+    Nat.card ↥hyp.W1 ∣ (cert.W2.subgroupOf H).relIndex (commutator ↥H) - 1 := by
+  letI : H.Normal := hyp.H_normal
+  haveI : Finite ↥H := inferInstance
+  haveI : Finite ↥hyp.W1 := inferInstance
+  -- `W₂` is normal in `↥L` (it is central)
+  have hW2normalL : cert.W2.Normal :=
+    { conj_mem := fun n hn g => by
+        have hc := (Subgroup.mem_center_iff).mp (hW2cen hn)
+        have hgn : g * (n : ↥L) * g⁻¹ = n := by
+          rw [hc g, mul_assoc, mul_inv_cancel, mul_one]
+        rw [hgn]; exact hn }
+  -- the `W₁`-conjugation action on `H`
+  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+    MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
+  have hsmulH : ∀ (a : ↥hyp.W1) (x : ↥H),
+      ((a • x : ↥H) : ↥L) = (a : ↥L) * (x : ↥L) * (a : ↥L)⁻¹ := by
+    intro a x
+    have h1 : (a • x : ↥H) = (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a) x := by
+      simp [MulDistribMulAction.toMulAut_apply]
+    rw [h1]
+    show ((MulAut.conjNormal (H := H) (hyp.W1.subtype a)) x : ↥L) = _
+    rw [MulAut.conjNormal_apply]; rfl
+  -- `commutator ↥H` is `W₁`-invariant (characteristic)
+  have hcommInv : ∀ a : ↥hyp.W1, ∀ m ∈ commutator ↥H, a • m ∈ commutator ↥H := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator ↥H).Characteristic) (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a)
+    have hmem : (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a).toMonoidHom m ∈ commutator ↥H := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  -- the restricted `W₁`-action on `H′ = commutator ↥H`
+  letI actHp : MulDistribMulAction ↥hyp.W1 ↥(commutator ↥H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction
+      (commutator ↥H) hcommInv
+  haveI : Finite ↥(commutator ↥H) := inferInstance
+  -- the `H′`-smul coerces to the `H`-action on the underlying element (definitional)
+  have hsmulHp : ∀ (a : ↥hyp.W1) (y : ↥(commutator ↥H)),
+      ((a • y : ↥(commutator ↥H)) : ↥H) = a • (y : ↥H) := fun _ _ => rfl
+  haveI hW2subH_normal : (cert.W2.subgroupOf H).Normal := hW2normalL.subgroupOf H
+  haveI hMnorm : ((cert.W2.subgroupOf H).subgroupOf (commutator ↥H)).Normal :=
+    hW2subH_normal.subgroupOf (commutator ↥H)
+  have hCop' : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(commutator ↥H)) :=
+    hcop.symm.coprime_dvd_right (Subgroup.card_subgroup_dvd_card _)
+  -- `W₂` central ⟹ conjugation fixes its elements ⟹ `M`-invariance
+  have hMinv : ∀ a : ↥hyp.W1, ∀ m ∈ (cert.W2.subgroupOf H).subgroupOf (commutator ↥H),
+      a • m ∈ (cert.W2.subgroupOf H).subgroupOf (commutator ↥H) := by
+    intro a m hm
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hm ⊢
+    rw [hsmulHp a m, hsmulH a (m : ↥H)]
+    exact hW2normalL.conj_mem _ hm (a : ↥L)
+  -- fixed points of `W₁` on `H′` lie in `W₂` (`centralizer_W2`)
+  have hfix : ∀ a : ↥hyp.W1, a ≠ 1 → ∀ y : ↥(commutator ↥H),
+      a • y = y → y ∈ (cert.W2.subgroupOf H).subgroupOf (commutator ↥H) := by
+    intro a ha y hy
+    rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+    have hcoe : (((a • y : ↥(commutator ↥H)) : ↥H) : ↥L)
+        = (a : ↥L) * ((y : ↥H) : ↥L) * (a : ↥L)⁻¹ := by
+      rw [hsmulHp a y, hsmulH a (y : ↥H)]
+    rw [hy] at hcoe
+    have hcomm : ((y : ↥H) : ↥L) * (a : ↥L) = (a : ↥L) * ((y : ↥H) : ↥L) :=
+      (mul_inv_eq_iff_eq_mul.mp hcoe.symm).symm
+    have haW1 : (a : ↥L) ∈ cert.W1 := by rw [hW1]; exact a.2
+    have hane : (a : ↥L) ≠ 1 := fun h => ha (OneMemClass.coe_eq_one.mp h)
+    rw [← cert.centralizer_W2 (a : ↥L) haW1 hane]
+    refine Subgroup.mem_inf.mpr ⟨Subgroup.mem_centralizer_singleton_iff.mpr hcomm, ?_⟩
+    rw [hK]; exact (y : ↥H).2
+  have hdvd := W1_dvd_index_of_fixedPoints_le hCop'
+    ((cert.W2.subgroupOf H).subgroupOf (commutator ↥H)) hMinv hfix
+  exact hdvd
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
