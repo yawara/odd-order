@@ -3554,3 +3554,17 @@ LOC + adjoin chain + (6.8.3) wiring、multi-session)。session 43-47 の振動�
 確定 ⟹ **sustained focus で 1 経路 (上記) を腰を据えて build** すべき (loop-cadence 不適は実証済)。
 **正本=本 session 46。3 アプローチ振動を textbook+engine 署名で決着 (session 45 path=sound Strategy-B-chain)、
 cX-standalone は教科書非整合と確定。次=ν 構築 (grid μ_{ij} orthonormal glue、全部品在庫)。**
+
+### session 46 cont.: ✅ `certainTypeSet_finite` landed (ν-glue hXfin foundation, S08_CaseBXunionY, axiom-clean)
+ν 構築の最初の bounded 部品を landing。`certainTypeSet h46 k` 有限性 = `certainTypeSet ⊆ range(columnSum h46)`
++ W₂-dual 型 `(...→* ℂˣ)` 有限 (`SibleyDadeHypothesis.finite_linearCharacters_of_finite`、有限群 linear char)。
+standalone (hyp/hHK 不要)、commit `1c4753f2`、leaf green 3627 jobs、axiom-clean (3 allowlist)。
+
+**▶▶ 次の sub-piece = grid source 族の set-level 組立 + 正規直交性** (ν-glue `exists_integralCharacterMap_glue_of_orthonormal`
+の hXfin/hXorth/hXY 入力)。grid set = `⋃_{χ₂∈deg-class-k} {(h46.columnFamily χ₂).mu i | i:Fin w₁}` (finite union of
+finite)。正規直交性: within-column = μ_{ij} 既約 (norm 1) + 相異 (`columnFamily_mu_ne`、同 χ₂ 内 i≠i')、cross-column =
+`columnFamily_mu_ne` (χ₂≠χ₂') + 既約直交。grid⊥Y = `inner_coherentYset_extension_certainTypeRImage_eq_zero`
+(S08CBC2:1331) 系 / source ⊥ `inner_columnSum_Yset_eq_zero`。要確認 = `columnFamily_mu_ne` の正確な署名
+(S06_CertainTypeCharacters:547) + μ_{ij} 既約補題名 + columnFamily_mu_sum_inner (S06CTChar 近傍)。組立後:
+νX=`certainTypeExtension` (S06:513=coherence.extension)、νY=`coherentYset.extension` → glue ν → hagreeX は
+ν(columnSum)=∑ν(μ_{ij})=certainTypeExtension(columnSum) を `map_sum` で。次 turn は sustained focus で grid 組立から。
