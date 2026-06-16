@@ -944,3 +944,81 @@ R(x)=N_σ∩C_G(x) に対し、∀L∈𝓜_σ(x) ∃! r∈R(x) で `conj r•M =
 → Thm 14.7 typeP_duality (counting 矛盾 n=1 + covering + part h)
 ```
 realistically 6-10 session。memory「~2-3.5 session」は σ-decomposition 前提を見落としていた。
+
+### ✅ π-part 元分解 DONE + 14.5(a) reduction 設計 (2026-06-16 lane-h loop 続き²)
+
+**✅ `OddOrder/GroupTheory/PiElementDecomposition.lean` COMPLETE** (commit `bd2f8aff`, sorry-free +
+axiom-clean, full build 3833 jobs): 巡回 ⟨g⟩ の 2-block (π, π') Hall 分解 = σ-decomposition の基礎 primitive。
+- `IsPiElement π g` := `∀ p ∈ (orderOf g).primeFactors, p ∈ π`。
+- `exists_isPiElement_mul`: `∃ a b, a*b=g ∧ Commute a b ∧ IsPiElement π a ∧ IsPiElement πᶜ b ∧ a,b∈zpowers g`
+  (CRT 指数 `Nat.chineseRemainder` で a=g^e, b=g^f; a^nπ=1 via nπ'|e で gcd 回避)。
+- `isPiElement_mul_unique`: 両分解一致 (a,a'∈⟨g⟩ から u=a'⁻¹a が π かつ π'-element ⟹ orderOf u=1)。
+- helper: `coprime_orderOf_of_isPiElement` / `isPiElement_mul_of_commute` / `commute_of_mem_zpowers` /
+  `mem_zpowers_of_mul_eq` / `natPiPart` + mul/coprime/primeFactors。
+
+**🔑 14.5(a) は full s-part σ-decomposition 不要、2-part tool + 13.9 + σ-class partition で可** (設計):
+- g = x·x' (x'∈R(x)⊆N_x,σ): x' は σ(N_x)-elt, σ(N_x)∩σ(M_x)=∅ (13.9) ⟹ x' は σ(M_x)'-elt ⟹
+  **x = σ(M_x)-part of g** (2-part uniqueness, π=σ(M_x))。同様 x = σ(N_x)'-part, x' = σ(N_x)-part。
+- g ∈ yR(y) ⟹ g = y·w (w∈R(y)): primes(g)=primes(x)∪primes(x')⊆σ(M_x)∪σ(N_x)。y≠1 は σ(M_y)-part of g
+  ⟹ σ(M_y) は g の nontrivial class ⟹ σ(M_y)∩(σ(M_x)∪σ(N_x))≠∅ ⟹ **σ(M_y)=σ(M_x) or σ(N_x)**
+  (partition: 13.9 disjoint + `sigma_conj` [S10_HallStructureCore:619] で conjugate⟹σ equal)。
+  - σ(M_y)=σ(M_x): y=σ(M_x)-part=x, x≠y 矛盾。
+  - σ(M_y)=σ(N_x): y=σ(N_x)-part=x' ⟹ y=x'。同様 w=x。x∈R(y)⊆..., y=x'∈R(x)⊆N_x,σ ⟹
+    y∈M∩N_σ=1 矛盾 (BG L3923)。
+- ⟹ **σ-class partition の "equal-or-disjoint" + `sigma_conj` があれば s-part 構築は回避可能**。
+
+**次の H 作業 (順に)**:
+1. **σ-class equal-or-disjoint helper** (13.9 `sigma_disjoint_of_nonconjugate` + `sigma_conj`):
+   `σ(M)∩σ(M')≠∅ → σ(M)=σ(M')` (M,M'∈𝓜)。small。
+2. **R(x) function** (`Rsub hG D x` via 14.4 ∃!N の Classical.choice; |𝓜_σ(x)|=1 で ⊥) + **M̃**。
+3. **Lem 14.5(a)** (上記 reduction) → **(c)** count (sharp transitivity 二重数え) → **14.6** → **14.7**。
+
+### ✅ 14.5(a) gap SOLVED — 14.4(e) で contradiction (ChatGPT 不要, 2026-06-16 lane-h loop³)
+
+**BG L3923 の terse "y∈N_σ∩M=1" を完全再構成** (key = 14.4(e) complement、my 14.4 conclusion に在る):
+
+設定: g ∈ xR(x) ∩ yR(y), x≠y, ℓ_σ(x)=ℓ_σ(y)=1。g = x·x' (x'∈R(x)) = y·y'' (y''∈R(y))。
+R(z)⊆C_G(z) ゆえ x'·x=x·x', y''·y=y·y'' (commute)。
+
+**Case |𝓜_σ(x)|=1** (R(x)=⊥, x'=1, g=x): g=x=y·y''。
+- |𝓜_σ(y)|=1: y''=1, x=y 矛盾。
+- |𝓜_σ(y)|>1: x=y·y'', y σ(M_y)-elt, y'' σ(M_y)'-elt (y''∈N(y)_σ, σ(N(y))∩σ(M_y)=∅) ⟹ y=σ(M_y)-part of x。
+  x は σ(M_x)-elt: σ(M_x)=σ(M_y) なら x=y 矛盾; 違えば x の σ(M_y)-part=1=y, y≠1 矛盾。
+**Case |𝓜_σ(y)|=1**: 対称。
+**Main case |𝓜_σ(x)|>1 ∧ |𝓜_σ(y)|>1**:
+- 14.4 for x → N(x), R(x)=N(x)_σ∩C_G(x); for y → N(y), R(y)=N(y)_σ∩C_G(y)。
+- **factor matching** (2-part tool `isPiElement_mul_unique` + σ-class helper `sigma_eq_of_mem_sigma_of_mem_sigma`):
+  x,x',y,y''∈⟨g⟩ (mem_zpowers_of_mul_eq, coprime commute)。π=σ(M_y) で y=σ(M_y)-part of g。
+  g=x·x' の σ(M_y)-part: x σ(M_x)-elt, x' σ(N(x))-elt (x'∈R(x)⊆N(x)_σ), σ(M_x)∩σ(N(x))=∅。
+  partition で σ(M_y)∈{σ(M_x),σ(N(x))}: σ(M_x) なら y=x 矛盾; ⟹ **σ(M_y)=σ(N(x)), y=x'**。
+  commute cancel: x·x'=y·y''=x'·y'' ⟹ (x' で消去) **x=y''**。
+- ⟹ **y=x'∈R(x)⊆N(x)_σ** & **x=y''∈R(y)⊆N(y)_σ**。
+- ⟹ **N(y)∈𝓜_σ(x)** (x∈N(y)_σ)。**14.4(e) for x with M=N(y)**:
+  `IsComplement'(N(x)_σ.subgroupOf N(x), (N(y)⊓N(x)).subgroupOf N(x))` ⟹ N(x)_σ ⊓ (N(y)⊓N(x)) = ⊥。
+- y∈N(x)_σ (⊆N(x)) ∧ y∈N(y) (y∈C_G(y)⊆N(y)) ⟹ y∈N(x)_σ ⊓ (N(y)⊓N(x)) = ⊥ ⟹ **y=1 矛盾**。
+
+**⟹ ChatGPT 不要。14.4(e) が "N_σ∩M=1" の正体。** 全 case 矛盾 ⟹ xR(x)∩yR(y)=∅。formalize は
+~150-250 行 (4-case + factor matching が bulk)。my 14.4 conclusion に (e) + sharp + (c) すべて在る。
+
+### 14.5(a) building blocks DONE + 残 assembly 設計詳細 (2026-06-16 lane-h loop³ 続き)
+
+**✅ committed** (`d87e7d79`): `exists_neighbor_eq_Rsub` (14.4 出力 package: N, R=N_σ∩C_G, π(⟨z⟩)⊆τ₂N, (e))
++ `isPiElement_sigmaCompl_of_mem_Rsub` (r∈R(z) は σ(M)'-elt, M∈𝓜_σ(z))。+ `Rsub_le_centralizer`,
+`Rsub_eq_inf`, `sigma_eq_of_mem_sigma_of_mem_sigma`, `Mtilde`, π-part decomposition (別 leaf)。
+
+**残 = 14.5(a) assembly (`xRsub_disjoint`), nested 4-case (~200行, 機械的, gap なし)**:
+g=x·x'=y·y'' (x'∈R(x), y''∈R(y))。M_x∈𝓜_σ(x) (x∈M_x,σ, x は σ(M_x)-elt), M_y 同。
+x' は σ(M_x)'-elt (building block), x' commute x (Rsub_le_centralizer)。同 y''。
+- **case σ(M_x)=σ(M_y)**: x σ(M_y)-elt, x' σ(M_y)'-elt ⟹ g=x·x' (σ(M_y),σ(M_y)')-split;
+  g=y·y'' も。`isPiElement_mul_unique` ⟹ x=y, hxy 矛盾。
+- **case σ(M_x)∩σ(M_y)=∅** (helper の contrapositive):
+  - **|𝓜_σ(x)|>1**: `exists_neighbor_eq_Rsub` for x → N(x), x'∈N(x)_σ ⟹ primes(x')⊆σ(N(x)) (single class)。
+    x' を π=σ(M_y) で split (x'=a·b, exists_isPiElement_mul): g=x·x'=a·(x·b) (x σ(M_y)'-elt), uniqueness
+    vs y·y'' ⟹ y=a=σ(M_y)-part of x'。y≠1 ⟹ σ(M_y)∩σ(N(x))≠∅ ⟹ σ(M_y)=σ(N(x)) ⟹ x' σ(M_y)-elt ⟹
+    **x'=y**。commute cancel ⟹ **x=y''**。⟹ x=y''∈R(y)⊆N(y)_σ ⟹ **N(y)∈𝓜_σ(x)** ⟹ `exists_neighbor`
+    (e) for x with M=N(y): N(x)_σ⊓(N(y)⊓N(x))=⊥; y∈N(x)_σ(=x'∈R(x)) ∧ y∈N(y)(C_G(y)) ∧ y∈N(x) ⟹
+    y∈⊥ ⟹ **y=1 矛盾**。
+  - **|𝓜_σ(x)|=1** (x'=1, g=x): g=x σ(M_x)-elt = y·y''。σ(M_x)-part: y σ(M_x)'-elt ⟹ x=σ(M_x)-part of y''。
+    |𝓜_σ(y)|=1 ⟹ y''=1, x=y 矛盾; |𝓜_σ(y)|>1 ⟹ y''∈N(y)_σ single class, 対称に x=y'' ⟹ g=x=y·x ⟹ y=1 矛盾。
+- helper 名: `isPiElement_mul_unique`/`exists_isPiElement_mul` (PiElementDecomposition),
+  `exists_neighbor_eq_Rsub`/`isPiElement_sigmaCompl_of_mem_Rsub`/`commute_of_mem_zpowers`。

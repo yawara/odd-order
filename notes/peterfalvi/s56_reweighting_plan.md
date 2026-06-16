@@ -394,3 +394,99 @@ X-sum→hbreak) → S coherent → sole sorry case-B 枝。**+ case-A 枝 (cX �
 (~300-550 LOC、enumeration 前提性質 + hstep monolith + wiring) + (6.8.3)/glue/case-A wiring。**deep math gap は無い**
 (全ツール在庫) が **large focused assembly** — 60s loop 小刻みより dedicated 多セッション or Workflow 向き。
 **正本=本 cont.⁴³。enumeration=`exists_conjugatePairCover_general`、残=cX assembly 本体 (構造性質→hstep monolith→wiring)。**
+
+## cont.⁴⁴ (2026-06-16 loop): ✅ X-enumeration landed + 🔬 degree-class 構造的発見
+**新 leaf `S08_CaseBEnumeration.lean` (`93f3b670`、199 行、3 decl 全 axiom-clean)**:
+- ✅✅ **`Xset_hasNoRealCharacters_caseB`** + **`certainTypeSet_closedUnderConjugate`** = **unconditional 再利用 helper** 2 本。
+- **`caseB_Xset_conjugatePairCover`** = X = Xset W2、S₀ = certainTypeSet h46 k の conjugate-pair cover
+  (`exists_conjugatePairCover_general` 経由、非-S₀ pairs から既約 χs 抽出、xChainCoherentW の hpair0/1/pairs/cover を産む)。
+
+**🔬🔬 重要な構造的発見** (subagent が `hnonS₀_irr` 仮説を要したことで露呈): **`certainTypeSet h46 k` は単一 degree
+class k に制限** (def に degree-match 条件 `∑μ_ij(1)=∑μ_ik(1)`)。⟹ 他 degree class の column は **reducible だが
+certainTypeSet h46 k に非含** → 非-S₀ X-member が既約とは限らない。`caseB_Xset_conjugatePairCover` は
+**2 honest 仮説**を持つ (workaround でない真の obligation): (1) `hbase`: certainTypeSet ⊆ Xset (column∈S(W2)、deferred)
+(2) `hnonS₀_irr`: 非-certainTypeSet X-member は既約。
+
+**⟹ cX base の構造的論点 (hstep 前に要解決)**: cX = IsCoherent (Xset W2) は**全 degree class の column** を要する
+(X-sum は全 X over θ:W2⊄ker)。だが column 基底 coherence `certainTypeSet_isCoherent_tau_canonical` は**単一 k**。
+要確認 = (A) certain-type 構造で全 column が同一 degree か (なら certainTypeSet h46 k=全 column、hnonS₀_irr 自動) /
+(B) 全 class union ∪_k certainTypeSet h46 k が base か (なら union coherence 要) / (C) (6.8.3) が per-class か。
+**この degree-class 構造の解明が cX assembly の次の鍵** (hstep monolith より先に要)。
+
+**📊 進捗 (本セッション 10 Lean commit)**: 基盤・構造 (engine/Dmem/(B)/hortho_mem/fold) + enumeration helper +
+cover (conditional)。残 = (i) **degree-class 構造解明** [次、cX base 設計] (ii) hstep monolith (iii) wiring → cX →
+(6.8.3)/glue/case-A。⚠ subagent 委譲は ~155k tok/piece と高コスト、hstep は深く大きい。**正本=本 cont.⁴⁴。
+enumeration landed (2 unconditional helper)、次=degree-class 構造解明 (cX base が単一 k か全 class union か)。**
+
+## cont.⁴⁵ (2026-06-16 loop): 🔑 原典 (6.8) 精読 — `xChainCoherentW` アプローチが正しいと確認
+`references/peterfalvi/04.8_…Some_Coherence_Theorems.mmd` の (6.6)/(6.8.1)/(6.8.2)/(6.8.3) を精読:
+- **(6.8.3)** (S coherent): S₁ (X∪Y⊂S₁⊂S) coherent + S₂={ψ,ψ̄}⊂S not-coherent に **Thm (5.6)** →
+  `2ψ(1)η₁(1) ≥ ∑_{S₁}χ(1)²/‖χ‖² > ∑_X = |W₁||H:Z|(|Z|−1)`、Cor 2.30 `d²≤|H:Z|`、case B `|H:Z|≥(2|W₁|+1)²`
+  → 矛盾。**= 私の `false_of_caseB_break_of_bounds` と完全一致** (S₁=X∪Y、X-sum、FPF tower)。
+- **(6.6)**: X⊂Irr L ⟹ X coherent via **「repeated use of Theorem (5.6)」= chain adjoin** (= 私の xChainCoherent 系)。
+- **case (A)** [Z=Z(H)∩H']: (6.8.1) — (c1)(c2) 両方で「S と S(Z) が各 w₂−1 reducible」⟹ reducibles∈S(Z) ⟹
+  **X=S−S(Z)⊂Irr L (全既約)** → (6.6) chain adjoin。X∪Y glue = τ₂ (τ on supported + η₁↦Y、(4.1) 直交 + 6.8.2.3 anchored)。
+- **case (B)** [Z=W₂]: reducible columns ∈ X ⟹ **X非全既約**。⟹ cX = **certain-type 𝒯 coherence (4.9) を base に
+  既約 X-member を (5.6) で adjoin** = **私の `xChainCoherentW` (reducible base + 既約 adjoin) がまさにこの構造**。
+
+**⟹✅ アプローチ確認**: xChainCoherentW (reducible 𝒯 base + 既約 (5.6) adjoin) = 教科書 case-B cX の正しい構造。
+hstep = per-step (5.6) data (column member は 𝒯-base 内ゆえ Dmem=`certainTypeMemberDecomposition`/hortho=今回 lemma、
+adjoin 済既約は memberExtension)。X∪Y glue は別 (τ₂ 直接=`coherentXunionYset_caseB_of_glued`、case-B assembly 既存)。
+
+**🔬 残 degree-class 詳細**: 𝒯=certainTypeSet h k=単一 degree class。case-B の reducible columns が全て同一 degree なら
+𝒯=全 column (cX base 単純)、複数 degree なら base=∪_k 𝒯 (union coherence 要)。**要 (4.9) 原典確認** (column μ_j=Ind χ_j、
+χ_j(1) が j で変動するか)。これが解ければ cX base 確定 → hstep monolith。
+
+**📊 milestone (本セッション 11 Lean commit + textbook 確認)**: 基盤・構造・enumeration 全完了、**アプローチ正当性を原典で確認**。
+残 = (i) degree-class 詳細 [(4.9) 原典、bounded] (ii) **hstep monolith** [最難核、~200-400 LOC] (iii) cX wiring →
+(6.8.3)/glue/case-A。deep だが**経路は確定**。**正本=本 cont.⁴⁵。xChainCoherentW=正しい case-B cX 経路 (原典確認)、
+次=(4.9) で degree-class 確認 → hstep monolith。**
+
+## cont.⁴⁶ (2026-06-16 loop): ⚠⚠ 訂正 (cont.⁴⁵ course-correction) — (6.8.2) は τ₂ 直接、chain adjoin でない
+**(6.8.2)「X∪Y is coherent in case (B)」の証明全体を精読** (`04.8.mmd` L178-224)。cont.⁴⁵ の「case-B cX = chain
+adjoin (xChainCoherentW)」は **誤り**:
+- **(6.8.2) は τ₂ を直接構成**: `τ₂ : Z[X∪Y]→Z[Irr G]`、`τ on Z[X∪Y,L^#]` 一致 + `η₁^{τ₂}=Y` (Y は (6.8.2.2) で固定)。
+  per-χ の **(6.8.2.3)** `(χ−aη₁)^τ = X₁−aY` (R(χᵢ) families + (5.4.a/b) `‖Xᵢ‖²≥‖χᵢ‖²` 分解、bᵢ=aᵢ forcing) で
+  τ₂ が内積保存 → X∪Y coherent。**chain adjoin (repeated (5.6)) は使わない** (case (A) の (6.6) のみ chain)。
+- ⟹ **`xChainCoherentW` (`cd5409f1`) + `caseB_Xset_conjugatePairCover` (`93f3b670`) は case-B では DETOUR**
+  (chain-adjoin cX を想定したが、教科書 case-B は τ₂ 直接)。両 lemma は valid だが case-B 経路上にない。
+  case-B assembly の **`columnDecompositionTau`/`caseB_per_phi_anchored`/`caseB_constituentDecomposition`/glue
+  `coherentXunionYset_caseB_of_glued` がまさに (6.8.2) τ₂ 経路**を実装中。
+
+**✅ on-path (検証済)**: (6.8.3) break は **S₁=X∪Y に単一 break {ψ,ψ̄} を Thm (5.6)** で適用 →
+`2ψ(1)η₁(1) ≥ ∑_{S₁} > ∑_X`。⟹ 私の **`coherentDegreeSqNormBound_of_not_coherentW` (= (5.6) bound) + Dmem
+(`certainTypeMemberDecomposition`) + hortho_mem (`certainTypeR_imageSet_orthogonal_dadeOfDiff`) は (6.8.3) の
+S₁ member family に on-path** (S₁ の column members 用)。単一 break ゆえ chain (xChainCoherentW) 不要。
+
+**🧭 正しい case-B 経路 (再確定)**:
+- **(6.8.2)** X∪Y coherence = **τ₂ 直接** (case-B assembly: columnDecompositionTau + caseB_per_phi_anchored の
+  6.8.2.3 anchored images + glue)。**← my xChainCoherentW でない。case-B assembly の進捗を assess 要**。
+- **(6.8.3)** S coherence = (5.6) 単一 break (my bound + Dmem + hortho_mem) + X-sum + FPF (`false_of_caseB_break_of_bounds`)。
+
+**📊 honest reckoning**: 本セッション 11 Lean commit のうち **2 本 (xChainCoherentW + enumeration) は case-B detour**
+(教科書 misread)。on-path = (5.6) engine/bound + Dmem + hortho_mem + FPF tower。残 = (6.8.2) τ₂ (case-B assembly、
+進捗未 assess) + (6.8.3) 単一 break wiring。**正本=本 cont.⁴⁶ (cont.⁴⁵ 訂正)。次=case-B assembly の (6.8.2) τ₂
+進捗を assess (columnDecompositionTau/caseB_per_phi_anchored がどこまで X∪Y coherence を産むか) → (6.8.3) wiring。**
+
+## cont.⁴⁷ (2026-06-16 loop): cX 構築 infra 特定 + セッション consolidation
+case-B assembly assess: **cX (`IsCoherent (Xset)`) を産む定理は無い** (glue `coherentXunionYset_caseB_of_glued` は cX を入力)。
+per-χ (6.8.2.3) ingredients は揃う: `columnDecompositionTau`/`irreducibleDecompositionTau` (`S08_CaseBCoherence2`、
+caseB_constituentDecomposition `:1104/1112` が消費) + `per_constituent_Y_eq_smul` (`:871`、(6.8.2.3) τ₂-Y pinning) +
+X-orthogonalities (`columnDecompositionTau_X_orthogonal` 等)。
+**cX 構築 infra (S07)**: `retarget_isCoherent_of_decompositions*` (`:3911-4126`) / `coherentImageMapGlue` (`:3092`) /
+`exists_integralCharacterMap_glue_of_orthonormal` (`:3125`) = per-χ images から IsCoherent 構築。
+**⟹ 残 cX = これら infra に per-χ (6.8.2.3) decompositions を投入し `IsCoherent (Xset)` を τ₂|_X 構築** (intricate、
+case-B assembly/S07 領域、未着手)。
+
+### 📊 セッション総括 (2026-06-16 lane-b、~18 loop iterations)
+**landed (11 Lean commit、全 build-green+axiom-clean)**:
+- ✅ on-path: `xAdjoinStepW` 一般化 + `.adjoin` + struct + **`coherentDegreeSqNormBound_of_not_coherentW`** ((5.6) bound) /
+  `certainTypeMemberDecomposition` (ψ=0 Dmem、τ' 一般化) / **`certainTypeR_imageSet_orthogonal_dadeOfDiff`** (hortho_mem) /
+  unconditional helper `Xset_hasNoRealCharacters_caseB`/`certainTypeSet_closedUnderConjugate`。← (6.8.3) 単一 break 用。
+- ⚠ detour (valid だが case-B 経路外): `xChainCoherentW` (`cd5409f1`) / `caseB_Xset_conjugatePairCover` (`93f3b670`)。
+**確定事項**: cont.³⁶ 誤診訂正 (R(μ_j)=certainTypeR 既存) / (B) reconciliation 既存 / **原典 (6.8) 構造確定**
+((6.8.2)=τ₂ 直接 not chain、(6.8.3)=単一 (5.6) break)。
+**残務 (正確)**: (a) **cX via per-χ (6.8.2.3) τ₂|_X 構築** [上記 infra、未着手、large] (b) glue → X∪Y (c) (6.8.3) 単一
+break wiring [my (5.6) bound + X-sum + FPF] (d) sole sorry (case-A+B+dispatch)。**deep math gap 無し・全 ingredients/infra
+在庫だが large focused assembly** (multi-session or Workflow 向き)。**正本=本 cont.⁴⁷。次セッション: cX via per-χ τ₂|_X
+を `retarget_isCoherent_of_decompositions*` + columnDecompositionTau で構築 (xChainCoherentW は使わない)。**
