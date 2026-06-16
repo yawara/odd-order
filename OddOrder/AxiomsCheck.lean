@@ -4552,6 +4552,14 @@ cites (replacing the former S12_E `sorry`'d forward-decls); fully unconditional,
 
 /-! ### BG §14 (`S14_TypePCounting`) -/
 
+/-! **Derived subgroup of a split extension** (`S14_TypePCounting`,
+`commutator_eq_sup_commutator_of_isComplement'`): general group theory — if `N ⊴ H` has a
+complement `E` and `N ≤ H'`, then `H' = N ⊔ ⁅E,E⁆`.  Used to reduce Theorem 14.7(h)
+(`M' = M_σ ⊔ E'`, so `M'` complements `K` iff `E = K ⋉ E'` inside the `σ(M)'`-complement).
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.commutator_eq_sup_commutator_of_isComplement'
+
 /-! **BG Lemma 14.1** (`S14_TypePCounting`): for `M ∈ 𝓜` and a prime
 `p ∈ π(M) - (σ(M) ∪ κ(M))` with `A ∈ ℰ_p^{r_p(M)}(M)`, one has `|A| ≤ p²`,
 `C_{M_σ}(A) = 1`, and `M_σ` is nilpotent.  The `r_p = 2` case is Theorem 12.5(a)(d);

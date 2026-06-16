@@ -62,6 +62,47 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-! ## Derived subgroup of a split extension (general group theory)
+
+Used for BG Theorem 14.7(h): if `M = M_σ ⋊ E` and `M_σ ≤ M'`, then `M' = M_σ ⊔ E'`, so the
+type-`P` complement structure reduces to `E = K ⋉ E'` inside the `σ(M)'`-complement `E`. -/
+
+open scoped commutatorElement in
+/-- **Derived subgroup of a split extension**: if `N ⊴ H` has a complement `E`
+(`H = N ⋊ E`) and `N ≤ H'`, then `H' = N ⊔ ⁅E, E⁆`.
+
+`N ⊔ ⁅E,E⁆ ≤ H'` is immediate (`N ≤ H'` by hypothesis, `⁅E,E⁆ ≤ ⁅⊤,⊤⁆ = H'`).  For
+`H' ≤ N ⊔ ⁅E,E⁆`, every commutator `⁅n₁e₁, n₂e₂⁆` is congruent mod `N` to `⁅e₁,e₂⁆ ∈ ⁅E,E⁆`
+(pushing through `H ↠ H/N` kills the `N`-factors), and `N ⊴ H` makes `N · ⁅E,E⁆` a subgroup. -/
+theorem commutator_eq_sup_commutator_of_isComplement' {H : Type*} [Group H]
+    {N E : Subgroup H} [N.Normal] (hcompl : N.IsComplement' E)
+    (hNle : N ≤ commutator H) :
+    commutator H = N ⊔ ⁅E, E⁆ := by
+  have hsup : N ⊔ E = ⊤ := hcompl.sup_eq_top
+  refine le_antisymm ?_ (sup_le hNle ?_)
+  · -- `H' = ⁅⊤,⊤⁆ ≤ N ⊔ ⁅E,E⁆`.
+    rw [commutator_def, ← hsup, Subgroup.commutator_le]
+    intro a ha b hb
+    -- Decompose `a = n₁ e₁`, `b = n₂ e₂` using `N ⊴ H`.
+    obtain ⟨n₁, hn₁, e₁, he₁, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp ha
+    obtain ⟨n₂, hn₂, e₂, he₂, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hb
+    -- `⁅n₁e₁, n₂e₂⁆ ≡ ⁅e₁,e₂⁆  (mod N)`, via `H ↠ H/N`.
+    have hmod : ⁅n₁ * e₁, n₂ * e₂⁆ * ⁅e₁, e₂⁆⁻¹ ∈ N := by
+      have hf₁ : (QuotientGroup.mk' N) n₁ = 1 := (QuotientGroup.eq_one_iff n₁).mpr hn₁
+      have hf₂ : (QuotientGroup.mk' N) n₂ = 1 := (QuotientGroup.eq_one_iff n₂).mpr hn₂
+      have key : (QuotientGroup.mk' N) (⁅n₁ * e₁, n₂ * e₂⁆ * ⁅e₁, e₂⁆⁻¹) = 1 := by
+        simp only [map_mul, map_inv, map_commutatorElement, hf₁, hf₂, one_mul, mul_inv_cancel]
+      exact (QuotientGroup.eq_one_iff _).mp (by rwa [QuotientGroup.mk'_apply] at key)
+    -- `⁅n₁e₁, n₂e₂⁆ = (⁅n₁e₁,n₂e₂⁆ ⁅e₁,e₂⁆⁻¹) · ⁅e₁,e₂⁆ ∈ N · ⁅E,E⁆ ⊆ N ⊔ ⁅E,E⁆`.
+    have heq : ⁅n₁ * e₁, n₂ * e₂⁆ = (⁅n₁ * e₁, n₂ * e₂⁆ * ⁅e₁, e₂⁆⁻¹) * ⁅e₁, e₂⁆ := by
+      group
+    rw [heq]
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hmod)
+      (Subgroup.mem_sup_right (Subgroup.commutator_mem_commutator he₁ he₂))
+  · -- `⁅E,E⁆ ≤ ⁅⊤,⊤⁆ = H'`.
+    rw [commutator_def]
+    exact Subgroup.commutator_mono le_top le_top
+
 /-! ## Basic §14 notation: `kappa(M)`, type-P families, and sigma-length -/
 
 /-- The set of prime divisors of a finite subgroup, used as BG's `pi(M)`. -/
