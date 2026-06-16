@@ -200,3 +200,56 @@ IrreducibleCharacter 専用ゆえ、μ_j 用の σ-image family producer が要�
 (構築済 σ-data から) → (3) `CharacterPsiDecomposition.ofProjection (R(μ_j))` で reducible member-decomp → (4) これを
 xAdjoinStepW の Dmem に差し込み (memberExtensionDecomposition の reducible 版) → forward engine 完成 → wrapper。
 **正本=本 cont.³⁶。crux1W (projection) done、残=R(μ_j) via σ の member-decomp (=(5.3.b)、§5↔§6 bridge、deep)。**
+
+## cont.³⁷ (2026-06-16, lane-b 再開): 🚨🚨 **cont.³⁵/³⁶ 誤診を訂正 — R(μ_j) は `certainTypeR` として既存** + 一般 engine + bound wrapper landed
+
+lane-b 再開セッション。cont.³⁶ の推奨第一手「R(μ_j) を σ から新規構成 (deep §5↔§6 bridge)」を実行しようとして
+**grep/Explore で R(μ_j) が既に完全構築済と判明**。cont.³⁵/³⁶ の「deep bridge 未構成」評価は **誤診**だった
+(lane-b 自身が 6/14 に S06_CertainTypeCoherence で構築したものを cont 系ノートが見落とし)。
+
+### ✅ 既存と判明 (cont.³⁶ が「残 hard core」と誤認していた構造):
+- **`certainTypeR`** (`S06_CertainTypeCoherence.lean:639`、commit `72798461`) = **reducible column μ_j の
+  `OrthonormalCharacterImageFamily τ (columnSum χ₂)`**。`imageSet` = σ-image family (2w₁ 元、`certainTypeRImage`)、
+  `mem_ZIrr`/`orthonormal`/**`image_eq` (= `dadeICM_columnDiff_eq_sum`: τ(μ_j−μ̄_j)=∑R(μ_j))** 全 4 field 充足。
+  = **まさに (5.3.b) R(μ_j)=ω_ij^σ。cont.³⁶ の build target は完成済**。
+- **`certainTypeDecompositionDa`** (`S06_…Coherence.lean:684`、commit `0987d047`) = reducible μ_j 用
+  `CharacterPsiDecomposition τ μ_j (a·η₁)` (= `decompositionDaFromDadeOfDiff` の reducible 版、ofProjection 経由)。
+- τ = `dadeIntegralCharacterMap h.dade0 h.tau` (h : Hypothesis46)。`xAdjoinStepW` の τ
+  (`hyp.fullDadeIsometryData hconj`、hyp : S04.Hypothesis) との橋は **`certainTypeSet_isCoherent_tau`**
+  (`S08_CaseBCoherence2.lean:1651`) が `hmapagree`/congrMap で既に処理。
+
+### ✅ 本セッションの 2 commit (genuine、build-green+axiom-clean):
+1. **`xAdjoinStepW` 一般化** (`6a59b41e`): `χmem : ι → ClassFunction`(was IrreducibleCharacter)+ `Dmem`/
+   `hortho_mem`/`htau1Dmem` を**パラメータ化**(was 内部 `memberExtensionDecomposition` 構成)。cont.³⁵ の
+   「vacuous」(全 member 既約) を解消。既約 member→`memberExtensionDecomposition`、reducible column→
+   `certainTypeR` 経由 `ofProjection`。**crux1W は元から `χmem : ClassFunction` 一般** ゆえ engine 本体は無改修、
+   既約依存は `Dmem`/`hortho_mem`/`htau1Dmem` obligation に hoist しただけ。
+2. **`coherentDegreeSqNormBound_of_not_coherentW`** (`c7c3f6a0`): (5.6) weighted bound = `xAdjoinStepW` の
+   contrapose (`∑deg²/mc ≤ 2a`)。case-A `coherentDegreeSumBound_of_not_coherent` (CP1:2451) の reducible 版。
+
+### 🎯 **真の残務 = ~350-550 LOC の well-defined wiring 3 ピース** (Explore 2 件で精密 trace、deep bridge ではない):
+sole sorry = `sibleySetup_is_coherent` (`S08_CoherenceTheorems.lean:59`) の case-B (CertainType) 枝。
+全 case-B files (CaseBAssembly/CaseBCoherence2/CaseBEndgame/S06_…Coherence/CoherenceWeighted) は **sorry-free**。
+glue shell **`coherentXunionYset_caseB_of_glued`** (`S08_CaseBCoherence2.lean:1616`、sorry-free) は
+`cX : IsCoherent hyp.tau (Xset W2)` を**入力**に取り `IsCoherent (Xset W2 ∪ Yset)` を産む。残 gap:
+- **(A) irreducible X-chain assembly → cX** [~200-300 LOC、最重]: reducible column base
+  (`certainTypeSet_isCoherent_tau`) に irreducible X-members を **weighted `xChainCoherentW`**
+  (= 本セッション engine `xAdjoinStepW`/bound wrapper を使う weighted X-chain、未構築) で adjoin → cX。
+  case-A template = `Xset_commutator_isCoherent_…_of_frobenius` (`S08_CoherenceCore.lean:1884`)、
+  unweighted chain = `xChainCoherent` (CP1:2701)。⚠ case-B は base に reducible column を含むので
+  (5.6) sum が weighted → unweighted `xChainCoherent` 不可、**weighted 版が要る** (本セッション engine の用途)。
+- **(B) `hmapagree`** [~50-100 LOC]: `certainTypeSet_isCoherent_tau` の Dade-map 一致 (h.dade0/tau ↔ hyp.tau on H^#)。
+- **(C) extension assembly (ν, hagreeX/Y, hmixed)** [~100-150 LOC]: cX.extension + coherentYset.extension を
+  ν に合成 → glue 呼び出し。glue の他入力 (hpair/D/hDτ/hgen) は ✅ 済 (`caseB_Xset_orthogonal_Yset` 等)。
+- critical path: (B)→(A)→(C)→glue→L4 (`S08_CaseBEndgame` 算術 spine 済)→sorry 解消。
+
+### ⚠ 注意 (次セッションへ):
+- **R(μ_j) を新規構成しない** (= certainTypeR、再 build 禁止)。cont.³⁶ の「第一手 (1)-(4)」は obsolete。
+- **`S08_CaseBAssembly` の per-constituent 機構** (`caseB_constituentDecomposition`/`caseB_phi_family`/
+  `caseB_per_phi_anchored*`) が (A) の weighted X-chain と同一経路か別経路かは**未確認**
+  (glue 入力 D=per-φ images を産む側に見える)。(A) 着手前にこの機構の終端定理が何を産むか精査要
+  (weighted xChain を呼ぶのか、独立に cX を産むのか)。重複 build 回避のため必須 RECON。
+- 見積 ~350-550 LOC は Explore agent 概算、multi-session だが各ピース bounded・deep math gap 無し
+  (R(μ_j)/(5.6) projection core は全部済)。
+- **正本=本 cont.³⁷。誤診訂正済: R(μ_j)=certainTypeR 既存、残=cX wiring 3 ピース (A/B/C)、本セッション
+  engine 一般化+bound wrapper landed。次=(A) 着手前に CaseBAssembly per-constituent 機構を RECON。**
