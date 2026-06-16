@@ -3568,3 +3568,32 @@ finite)。正規直交性: within-column = μ_{ij} 既約 (norm 1) + 相異 (`co
 (S06_CertainTypeCharacters:547) + μ_{ij} 既約補題名 + columnFamily_mu_sum_inner (S06CTChar 近傍)。組立後:
 νX=`certainTypeExtension` (S06:513=coherence.extension)、νY=`coherentYset.extension` → glue ν → hagreeX は
 ν(columnSum)=∑ν(μ_{ij})=certainTypeExtension(columnSum) を `map_sum` で。次 turn は sustained focus で grid 組立から。
+
+### session 46 cont.²: ✅✅ ν 構築 (session 45 long pole) COMPLETE + base glue を単一 obligation hDτ に還元
+**`exists_glue_nu_columnSum_Yset` landed** (commit `0ac7ece5`, S08_CaseBXunionY, axiom-clean): 結合 ν を
+grid source 族 {μ_{ij}} (正規直交既約) と Y の `exists_integralCharacterMap_glue_of_orthonormal` で構築、
+columnSum 一致は linearity (`columnSum_def`+`map_sum`) で grid 一致から復元。grid⊥Y = 既存
+`inner_columnFamily_mu_Yset_eq_zero`、grid 正規直交 = 既約 Kronecker (`irreducibleCharacter_inner` + CF-level
+`hinner` idiom)。**全 3 axioms allowlist**。
+
+**🎯 base glue (`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal`, X:=certainTypeSet, Y:=Yset) の
+機械的入力は全て解決可能と確定 — 残る実質 obligation は hDτ ただ 1 つ**:
+- **cX** = `certainTypeSet_isCoherent_tau_canonical hk` ✅ / **cY** = `coherentYset` ✅
+- **hagreeX** ✅: `IsCoherent.congrMap` (S08CBC2:1531) は `extension := c.extension` で **extension 保存** ⟹
+  canonical.extension = `certainTypeExtension` ⟹ `exists_glue_nu_columnSum_Yset` の columnSum 一致が直結
+- **hagreeY** ✅: ν lemma 直接 / **hgen** ✅: `hgen_withDiagonal_certainTypeSet` (session 45)
+- **hsrc_ortho** ✅: `inner_eq_zero_of_mem_span_of_pairwise_orthogonal` (S08CBC2:1555) + hpair=`inner_columnSum_Yset_eq_zero`
+- **hmixed** ✅: ⟨νx,νy⟩=⟨cTE(columnSum),cY.ext(η)⟩=0 (`inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`
+  S08CBC2:1449, 要 hHK) かつ ⟨columnSum,η⟩=0 (column⊥Y) ⟹ 両辺 0
+- **🔴 hDτ** (唯一残): `ν(columnSum k0 − a₀η₁) = hyp.tau(columnSum k0 − a₀η₁)`。LHS=cTE(columnSum k0)−a₀·cY.ext(η₁)
+  (ν linearity)。RHS は **(6.8.2.3) anchored image** = `columnDecompositionTau` (S08CBC2:1822) の D で
+  `hyp.tau(columnSum−a₀η₁)=D.X−D.Y`、pinning `per_constituent_Y_eq_smul` (S08CBC2:871) で `D.Y=a₀·cY.ext(η₁)`・
+  `D.X=cTE(columnSum k0)` ⟹ 一致。**materialize 要** (multi-step、(6.8.2.3) 実質内容)。
+  入力在庫: `columnDecompositionTau` の hmapagree=`caseB_column_mapagree`✅ / hχψ=`caseB_column_orthogonal_Yset`✅ /
+  hχbarψ=`caseB_column_conj_orthogonal_Yset`✅ / hdeg=`columnSum_inv_apply_one`✅ / hSdiff,htau1_mema=要構成。
+  per-φ 機構 `caseB_per_phi_anchored` (S08_CaseBAssembly:1416) も既存。
+
+**⟹ ▶▶ 次 turn の第一手 = hDτ materialize** (anchor column k0 の `columnDecompositionTau` D 構築 → D.X/D.Y を pinning
+抽出 → `tau(columnSum k0−a₀η₁)=cTE(columnSum k0)−a₀·cY.ext(η₁)` を確立) → base glue assembly
+(`coherentCertainTypeSet_union_Yset`) → 既約 adjoin (retarget) → IsCoherent(Xset∪Y) → (6.8.3) → sole sorry。
+**正本=本 session 46 cont.²。ν=DONE、base glue は hDτ ((6.8.2.3) anchored image) 単一 obligation に還元、discharge 経路確定。**
