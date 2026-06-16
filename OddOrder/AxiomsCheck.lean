@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Lean
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
+import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
@@ -1482,6 +1483,12 @@ set_option linter.style.longLine false in
 -- 反復 conjugacy 剛性 (`conj_fixes_of_commute`) + 繊維数 |C_H(g)| の数え上げ closure.
 #assert_only_allowed_axioms OddOrder.GroupTheory.coset_eq_cosetConjImage
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_mem_centralizer_conj
+
+-- BG §1 σ-decomposition foundation (lane-h): the π-part / π′-part decomposition of a
+-- finite-order element, `g = a·b` (a a π-element, b a π′-element, commuting powers of g),
+-- with existence (CRT exponents) and uniqueness (both factors determined as powers of g).
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_isPiElement_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.isPiElement_mul_unique
 
 -- Peterfalvi §7 (5.4) gateway (issue 1001, Round-9 Track B): R(χ) を ℤ[Irr G] の
 -- 一般 orthonormal subset へ一般化した OrthonormalCharacterImageFamily と, その上の
