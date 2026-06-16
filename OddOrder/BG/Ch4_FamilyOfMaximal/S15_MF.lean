@@ -2039,6 +2039,48 @@ theorem le_of_commutator_le_centralizerCap [Finite G]
     rw [hQ0]; exact inf_le_inf_right _ hQ1Q
   exact hlift.trans (sup_le le_rfl hcap)
 
+/-- **Nilpotent ⟹ coprime normal `q`-part centralizes `q′`-part** (`§14`-independent, reusable): in
+a nilpotent finite group, a normal `q`-subgroup `A` (`q` prime) and a `q′`-subgroup `B` satisfy
+`⁅A, B⁆ = ⊥`.  `B` lies in the normal Hall `q′`-subgroup `O_{q′} = opiCoreInG {q}ᶜ ⊤` (nilpotency,
+`piGroup_le_opiCoreInG_of_nilpotent`), which is normal of order coprime to the `q`-group `A`, so
+`⁅A, B⁆ ≤ ⁅A, O_{q′}⁆ ≤ A ⊓ O_{q′} = ⊥`.
+
+This is the kernel of Theorem 15.2 step 3(ii): the nilpotent quotient `DQ₁/Q₀` (from Theorem 3.7
+on the regular `K`-action) has the `q′`-image of `D` centralizing the normal `q`-subgroup `Q₁/Q₀`,
+i.e. `⁅Q₁, D⁆ ⊆ Q₀` after pulling back. -/
+theorem commutator_eq_bot_of_isNilpotent_of_normal_isPGroup
+    {𝓗 : Type*} [Group 𝓗] [Finite 𝓗] [Group.IsNilpotent 𝓗]
+    {q : ℕ} [Fact q.Prime] {A B : Subgroup 𝓗} [A.Normal] (hA : IsPGroup q A)
+    (hB : q ∉ (Nat.card ↥B).primeFactors) :
+    ⁅A, B⁆ = ⊥ := by
+  haveI : Group.IsNilpotent ↥(⊤ : Subgroup 𝓗) :=
+    nilpotent_of_mulEquiv Subgroup.topEquiv.symm
+  haveI hOnorm : (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)).Normal :=
+    opiCoreInG_normal ({q}ᶜ : Set ℕ)
+  -- `B ≤ O_{q′}` (a `q′`-subgroup of a nilpotent group).
+  have hBO : B ≤ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) := by
+    refine piGroup_le_opiCoreInG_of_nilpotent (fun r hr => ?_) le_top
+    simp only [Set.mem_compl_iff, Set.mem_singleton_iff]
+    rintro rfl; exact hB hr
+  -- `A ⊓ O_{q′} = ⊥` (`q`-group vs `q′`-group).
+  have hAO : A ⊓ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime
+      (coprime_of_forall_prime_not_dvd (fun r hr hrA hrO => ?_))
+    have hrq : r = q := by
+      have hπA : Subgroup.IsPiSubgroup ({q} : Set ℕ) A :=
+        isPiSubgroup_of_isPGroup_of_mem hA rfl
+      exact hπA r (Nat.mem_primeFactors.mpr ⟨hr, hrA, Nat.card_pos.ne'⟩)
+    rw [hrq] at hr hrO
+    exact (isPiSubgroup_opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) q
+      (Nat.mem_primeFactors.mpr ⟨hr, hrO, Nat.card_pos.ne'⟩)) rfl
+  rw [eq_bot_iff]
+  have hmono : ⁅A, B⁆ ≤ ⁅A, opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)⁆ :=
+    Subgroup.commutator_mono le_rfl hBO
+  have hinf : ⁅A, opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗)⁆ ≤
+      A ⊓ opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗) :=
+    Subgroup.commutator_le_inf A (opiCoreInG ({q}ᶜ : Set ℕ) (⊤ : Subgroup 𝓗))
+  exact (hmono.trans hinf).trans hAO.le
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
