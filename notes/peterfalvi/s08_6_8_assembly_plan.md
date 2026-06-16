@@ -3620,3 +3620,24 @@ hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系/hSdiff・htau1_mema=要構成
 (`retarget_isCoherent_of_decompositions_and_memberFamily` + `irreducibleDecompositionTau`) → IsCoherent(Xset∪Y) →
 (6.8.3) [FPF tower `caseB_fpf_bound`✅ + (5.6) bound `coherentDegreeSqNormBound_of_not_coherentW`✅] → sole sorry。
 **正本=本 cont.³。base glue=完成 (skeleton)、唯一残=hanchored ((6.8.2.3) per-constituent 本体、deep)。**
+
+### session 46 cont.⁴: 🔬 hanchored を精密マップ — 残る crux = `(caseB_phi_family).X = certainTypeExtension(columnSum)` 同定 (新規 pinning)
+hanchored の discharge 経路を engine 在庫で exhaustive に確認。Lean commit なし (route 確定の RECON)。
+**既存 (6.8.2.3) 機構**: `caseB_per_phi_anchored_fromYset` (S08CBA:1647) が anchored image
+`hyp.tau(Ind^L_H θ − cw•η₁) = (caseB_phi_family … i).X − cw•cY.ext(η₁)` を与える (pinning は内部 = `per_phi_anchored_image`)。
+bundles は **dischargeable** (`caseB_column_bundle` S08CBA:921 = theorem、`caseB_column_bundleFamily` :1002)。
+**⟹ hanchored の残務 3 点**:
+1. **per-φ family setup**: column k0 を `caseB_per_phi_anchored_fromYset` の枠 (φ:Irr W2、constituent θ) に乗せる。
+   columnSum k0 = Ind^L_H θ_{k0} (`columnSum_eq_induce_H`, hHK) を per-φ family の constituent i に同定。
+2. **hdecomp = (6.8.2.2) aggregate**: `hyp.tau(Ind_{W2} φ − [H:W2]•η₁) = Xagg − [H:W2]•cY.ext(η₁)` を供給
+   (S08CBC の `inner_tau_indW2_sub_smul_eq` 系で実質材料はある; aggregate 形への wiring 要)。
+3. **🔴🔴 crux (新規・未存在)**: `(caseB_phi_family … i).X = certainTypeExtension(columnSum k0)`。
+   caseB_phi_family の X は `hyp.tau(…)` の R(columnSum)=σ-image 族への projection で、これが
+   `certainTypeExtension(columnSum)=δ·∑ω^σ` に一致するのは **(6.8.2.3) pinning 結論** (‖X‖²=‖columnSum‖²=|W₁|、
+   X∈ℤ[σ-images]、符号確定)。**structural でなく pinning 依存ゆえ新規 lemma 要。これが真の hard core。**
+
+**📊 honest reckoning**: base glue の機械的 80% は完成 (ν + skeleton)。残る hanchored = (6.8.2.3) per-constituent
+本体で、per-φ assembly + hdecomp wiring + **新規 X=cTE pinning identity** の 3 点。これは教科書 (6.8.2.3) の
+忠実形式化 (reconstruction、research gap でない) だが **multi-hundred LOC の dedicated focused build**。
+loop/end-of-session で rush すると thrash する実績ゾーン。**▶ 次 = fresh focus で (3) X=cTE pinning から
+(最 hard・他を gate)、または (1)(2) wiring を先に。正本=本 cont.⁴。**
