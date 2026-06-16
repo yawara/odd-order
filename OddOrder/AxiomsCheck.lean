@@ -4876,6 +4876,14 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_Kstar_disjoint
 
+/-! **BG 14.7, type-`P` family as a `Finset`** (`S14_TypePCounting`, `ZFamilyFinset` + `mem_`/
+`_nonempty`): `{N | IsZFamilyMember M K N}` as a `Finset` (`M` always a member).  The index for
+the `|T|` count and density sum.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_ZFamilyFinset
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ZFamilyFinset_nonempty
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
