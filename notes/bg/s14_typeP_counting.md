@@ -861,3 +861,53 @@ P1 で part(h) `IsComplement'(M') K` は **E-内部の `IsComplement'(E') K` (= 
 - **次の H 候補**: (a) 14.7 M_i/Z combinatorial setup (BG L3993-4015, §16-indep, exists_typeP_partner
   上に構築) / (b) case-τ₃ faithfulness 精査 (part(h) statement が全 type-P M で真か, E cyclic 必須か) /
   (c) §16 counting 自体 = Lane G 領域。**要ユーザー/hub 判断** (part(h) gating で frontier 再選定)。
+
+### 🔑🔑 2026-06-16 (lane-h loop) — frontier 再診断: 「§16-gated」は誤り、真の long pole = 14.4 sharp transitivity
+
+**前節 (part(h) §16-gated) の結論を訂正する。** BG 原文 (L3962-4063) を再精読した結果:
+
+**14.7 の "K cyclic"(part h の要)は §16 でなく 14.7 *自身の* internal counting (L4031-4045) 由来。**
+- L4061 part(8): "since K is cyclic, UM_σ = M′"。"K cyclic" = part(4) "Z cyclic" の subgroup。
+- L4041: Z cyclic は **n=1** 強制から(`Z=K_i×K_i*`, `K_i*⊆M_iσ` nilpotent rank-1 ⟹ cyclic)。
+- n=1 は L4031-4039 の **counting 矛盾**(全 M_i が P₁ なら `|G^#|≥|G|`)から。この counting は
+  §16 でなく **Thm 14.7 の証明本体**(`half_lt_one_sub_inv_mul` 8/15>½ kernel は既に repo L3244 在)。
+- ⟹ 前節「§16 counting が configuration を制約」は **§14-internal counting の誤認**。§16 は §14 の *下流*
+  (S16→S15→S14 の DAG; S16:530 が `typeP_duality` を consume)。§14→§16 依存は存在しない。
+
+**真の gate chain(すべて §14-internal、§15/§16 非依存):**
+```
+14.7 typeP_duality
+├─ Prop 14.2 (a)-(g) ............................. ✅ DONE (typeP_structure, sorry-free)
+├─ Lem 12.17 clause3 (β′-group) ................. ✅ DONE (Msigma_inf_conj_isBetaCompl, S12_Lemma1217)
+├─ Cor 14.3 sigma_diagnostic ..................... ✅ DONE (sorry-free)
+├─ Thm 13.9 ..................................... ✅ (cited)
+├─ half_lt_one_sub_inv_mul (8/15>½ kernel) ...... ✅ DONE (L3244)
+├─ Lem 14.5(b) sigmaConjugacy_disjoint .......... ✅ DONE (sorry-free)
+├─ **Thm 14.4 sharply-transitive R(x) + part(b)** ❌ DEFERRED (S16 Theorem D = sorry!) ← LONG POLE
+├─ **M̃ = {xx′ | x∈M_σ^#, x′∈R(x)}** ............. ❌ 未定義 (現 sigmaConjugacySaturation は M_σ^# のみ=過小)
+├─ **Lem 14.5(a)** xR(x)∩yR(y)=∅ ................ ❌ 未着手 (M̃ 要)
+├─ **Lem 14.5(c)** |𝒞_G(M̃)|=(|M_σ|-1)|G:M| ..... ❌ 未着手 (sharp transitivity の二重数え)
+└─ **Lem 14.6** dichotomy ........................ ❌ 未着手 (R(x)/σ-decomp/Cor14.3)
+```
+
+**核心発見: Thm 14.4 の "sharply transitive R(x)" headline + part(b) は repo が §16 に defer したが、その
+BG 証明(L3896-3900)は §12/§13/§14 のみ使用(Thm 13.9, Thm 10.1(b), Prop 12.15, Cor 14.3, Cor 12.6)で
+§15/§16 を一切使わない。** ⟹ deferral comment「importing §16 here would be circular」は *packaging* の話
+(RData の def が §16 に在る)で *math* の循環ではない。S16 Theorem D
+(`theoremD_msigma_conjugacy_and_centralizers`, L281)は **sorry**(L307)ゆえ sharp transitivity は現状 repo の
+どこにも証明が無い。Lem 14.5(c) の二重数え「各 x∈𝒞_G(M_σ^#) は丁度 |R(x)| 個の M^g に属す」(BG L3937)が
+sharp transitivity を要するため、14.7 完全証明には **§14 で 14.4 sharp transitivity を証明する**のが唯一の道
+(§16 を import できない=cycle)。これで S16 Theorem D の sorry も §14 cite で消せる(bonus, Lane G 領域)。
+
+**実装方針(lane-h, head-on):**
+1. **Thm 14.4 sharp transitivity / regular action**(新 standalone theorem, §14)。`sigmaLength_one_centralizer_structure`
+   は AxiomsCheck 以外 consumer 0 ゆえ拡張/併設自由。14.4 conclusion が `IsComplement'(N_σ, M∩N in N)` を
+   expose ⟹ `M∩N_σ=1` + `(M∩N)N_σ=N` 取得可。X/fusion setup(L2742-2789)+ orbit-stabilizer
+   (regular action: ∀M,L∈𝓜_σ(x) ∃! r∈N_σ∩C_G(x), L=M^r)を再構成。~100行見込。
+2. **R(x) 関数化 + M̃ 定義**(R: G→Subgroup G via ∃! N の choice; M̃ = ⋃_{x∈M_σ^#} xR(x))。
+3. **Lem 14.5(a)** then **(c)**(Finset.sum 二重数え; 難)。
+4. **Lem 14.6** dichotomy(難)。
+5. **Thm 14.7** 本体(M_i setup L3993-4015 + T の TI + counting 矛盾 + covering + part h)。
+
+**見積もり訂正**: memory の「~2-3.5 session」は楽観的。14.4 sharp transitivity だけで 1-2 session、
+全 chain で realistically 5-10 session。これが FT critical path の真の long pole。
