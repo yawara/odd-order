@@ -5265,6 +5265,30 @@ theorem typeP_family_nonconjugate [Finite G]
   have hZ₂one : Nat.card ↥Z₂ = 1 := (Nat.gcd_eq_left hZ₂dvdK₁).symm.trans hcop
   exact hne₂ (Subgroup.card_eq_one.mp hZ₂one)
 
+/-- **BG 14.7, per-neighbour swap package with normality** (mmd L3997-4015): the per-neighbour
+swap `exists_neighbor_kappaHall_swap`, restated with the canonical factor `K_N* = Z ⊓ M_σ(N)`
+folded into the swap and augmented with `K_N* ◁ Z` (`Z ≤ N_G(K_N*)`).  This is the exact per-member
+data the `M_i` family consumes: the swap `Z = K_N ⊔ K_N*`, the canonical `K_N*`, and its normality
+in `Z` (for pairwise commutativity, the `|T|` count, and the `n = 1` collapse). -/
+theorem exists_neighbor_kappaHall_swap_normal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
+      K ⊔ Kstar ≤ Subgroup.normalizer
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+  obtain ⟨KN, hKNN, hKN, hswap, hcanon⟩ :=
+    exists_neighbor_kappaHall_swap hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  refine ⟨KN, hKNN, hKN, hswap.trans (by rw [hcanon]), ?_⟩
+  rw [← hcanon, hswap]
+  exact (sup_le_normalizer_inf_of_commute inf_le_right).trans inf_le_right
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

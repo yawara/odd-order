@@ -4765,6 +4765,13 @@ forcing `Z₂ = ⊥`.  Feeds Lemma 14.5(b).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_nonconjugate
 
+/-! **BG 14.7, per-neighbour swap package with normality** (`S14_TypePCounting`,
+`exists_neighbor_kappaHall_swap_normal`): the per-neighbour swap restated with canonical factor
+`K_N* = Z ⊓ M_σ(N)` folded in and `K_N* ◁ Z` added — the exact per-member data the `M_i` family
+consumes.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap_normal
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
