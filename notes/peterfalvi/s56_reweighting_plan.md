@@ -441,3 +441,29 @@ adjoin 済既約は memberExtension)。X∪Y glue は別 (τ₂ 直接=`coherent
 残 = (i) degree-class 詳細 [(4.9) 原典、bounded] (ii) **hstep monolith** [最難核、~200-400 LOC] (iii) cX wiring →
 (6.8.3)/glue/case-A。deep だが**経路は確定**。**正本=本 cont.⁴⁵。xChainCoherentW=正しい case-B cX 経路 (原典確認)、
 次=(4.9) で degree-class 確認 → hstep monolith。**
+
+## cont.⁴⁶ (2026-06-16 loop): ⚠⚠ 訂正 (cont.⁴⁵ course-correction) — (6.8.2) は τ₂ 直接、chain adjoin でない
+**(6.8.2)「X∪Y is coherent in case (B)」の証明全体を精読** (`04.8.mmd` L178-224)。cont.⁴⁵ の「case-B cX = chain
+adjoin (xChainCoherentW)」は **誤り**:
+- **(6.8.2) は τ₂ を直接構成**: `τ₂ : Z[X∪Y]→Z[Irr G]`、`τ on Z[X∪Y,L^#]` 一致 + `η₁^{τ₂}=Y` (Y は (6.8.2.2) で固定)。
+  per-χ の **(6.8.2.3)** `(χ−aη₁)^τ = X₁−aY` (R(χᵢ) families + (5.4.a/b) `‖Xᵢ‖²≥‖χᵢ‖²` 分解、bᵢ=aᵢ forcing) で
+  τ₂ が内積保存 → X∪Y coherent。**chain adjoin (repeated (5.6)) は使わない** (case (A) の (6.6) のみ chain)。
+- ⟹ **`xChainCoherentW` (`cd5409f1`) + `caseB_Xset_conjugatePairCover` (`93f3b670`) は case-B では DETOUR**
+  (chain-adjoin cX を想定したが、教科書 case-B は τ₂ 直接)。両 lemma は valid だが case-B 経路上にない。
+  case-B assembly の **`columnDecompositionTau`/`caseB_per_phi_anchored`/`caseB_constituentDecomposition`/glue
+  `coherentXunionYset_caseB_of_glued` がまさに (6.8.2) τ₂ 経路**を実装中。
+
+**✅ on-path (検証済)**: (6.8.3) break は **S₁=X∪Y に単一 break {ψ,ψ̄} を Thm (5.6)** で適用 →
+`2ψ(1)η₁(1) ≥ ∑_{S₁} > ∑_X`。⟹ 私の **`coherentDegreeSqNormBound_of_not_coherentW` (= (5.6) bound) + Dmem
+(`certainTypeMemberDecomposition`) + hortho_mem (`certainTypeR_imageSet_orthogonal_dadeOfDiff`) は (6.8.3) の
+S₁ member family に on-path** (S₁ の column members 用)。単一 break ゆえ chain (xChainCoherentW) 不要。
+
+**🧭 正しい case-B 経路 (再確定)**:
+- **(6.8.2)** X∪Y coherence = **τ₂ 直接** (case-B assembly: columnDecompositionTau + caseB_per_phi_anchored の
+  6.8.2.3 anchored images + glue)。**← my xChainCoherentW でない。case-B assembly の進捗を assess 要**。
+- **(6.8.3)** S coherence = (5.6) 単一 break (my bound + Dmem + hortho_mem) + X-sum + FPF (`false_of_caseB_break_of_bounds`)。
+
+**📊 honest reckoning**: 本セッション 11 Lean commit のうち **2 本 (xChainCoherentW + enumeration) は case-B detour**
+(教科書 misread)。on-path = (5.6) engine/bound + Dmem + hortho_mem + FPF tower。残 = (6.8.2) τ₂ (case-B assembly、
+進捗未 assess) + (6.8.3) 単一 break wiring。**正本=本 cont.⁴⁶ (cont.⁴⁵ 訂正)。次=case-B assembly の (6.8.2) τ₂
+進捗を assess (columnDecompositionTau/caseB_per_phi_anchored がどこまで X∪Y coherence を産むか) → (6.8.3) wiring。**
