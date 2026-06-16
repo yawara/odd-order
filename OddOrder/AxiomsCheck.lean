@@ -4818,6 +4818,13 @@ nonconjugate (per-member data + `neighbor_pair_nonconjugate`).  Feeds Lemma 14.5
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_pairwise_nonconjugate
 
+/-! **BG 14.7, family `Kᵢ*` pairwise disjoint** (`S14_TypePCounting`, `typeP_family_Kstar_disjoint`,
+mmd L4005): for distinct members `N₁ ≠ N₂`, `(Z ⊓ M_σ(N₁)) ⊓ (Z ⊓ M_σ(N₂)) = ⊥` (nonconjugate ⟹
+`σ` disjoint by Thm 13.9 ⟹ `M_σ(N₁) ⊓ M_σ(N₂) = ⊥`).  Pairwise-`⊥` input to the `|T|` count.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_Kstar_disjoint
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

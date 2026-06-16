@@ -5476,6 +5476,34 @@ theorem typeP_family_pairwise_nonconjugate [Finite G] (hG : OddOrder.BG.IsMinima
     typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
   exact neighbor_pair_nonconjugate hG hN₁max hP₁ hK₁N₁ hK₁ hN₂max hP₂ hK₂N₂ hK₂ hsw₁ hsw₂ hne₂ hne
 
+/-- **BG 14.7, the family `Kᵢ*` are pairwise disjoint** (mmd L4005): for distinct members
+`N₁ ≠ N₂`, the canonical factors `Kᵢ* = Z ⊓ M_σ(Nᵢ)` meet trivially.  Distinct members are
+nonconjugate (`typeP_family_pairwise_nonconjugate`), so `σ(N₁)`, `σ(N₂)` are disjoint
+(Theorem 13.9), hence `M_σ(N₁) ⊓ M_σ(N₂) = ⊥` (coprime `σ`-groups), and a fortiori the `Kᵢ*` meet
+trivially.  This is the pairwise-`⊥` input to the inclusion–exclusion `|T|` count. -/
+theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁) ⊓
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂) = ⊥ := by
+  obtain ⟨hN₁max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  have hnc := typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU hN₁ hN₂ hne
+  have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₁max hN₂max hnc
+  have hMσdisj : OddOrder.BG.Ch3.S10.Msigma N₁ ⊓ OddOrder.BG.Ch3.S10.Msigma N₂ = ⊥ := by
+    refine Subgroup.inf_eq_bot_of_coprime (coprime_of_forall_prime_not_dvd ?_)
+    intro r hr hr₁ hr₂
+    exact Set.disjoint_left.mp hσdisj
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₁ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hr₁, Nat.card_pos.ne'⟩))
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₂ r
+        (Nat.mem_primeFactors.mpr ⟨hr, hr₂, Nat.card_pos.ne'⟩))
+  exact le_bot_iff.mp (le_trans (inf_le_inf inf_le_right inf_le_right) (le_of_eq hMσdisj))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
