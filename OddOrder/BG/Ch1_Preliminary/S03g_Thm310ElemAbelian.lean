@@ -137,6 +137,33 @@ theorem finrank_inf_invariants_sup_of_disjoint (ρ : Representation F G V) [Fini
   rw [hdisj', finrank_bot, add_zero] at hkey
   rw [hdistrib, hkey]
 
+/-- **Maschke split of a reducible representation** (issue 8013 piece 5).  A semisimple (Maschke,
+`NeZero (Nat.card G : F)`) representation that is not irreducible splits as a direct sum of two
+nonzero subrepresentations `⊤ = U ⊕ U'`.  Shared by the `(a)+(b)` and `(c)` reducible-module
+inductions. -/
+theorem exists_maschke_split [Finite G] [NeZero (Nat.card G : F)] (ρ : Representation F G V)
+    [Nontrivial V] (hirr : ¬ Representation.IsIrreducible ρ) :
+    ∃ U U' : Subrepresentation ρ, U ≠ ⊥ ∧ U' ≠ ⊥ ∧
+      U.toSubmodule ⊔ U'.toSubmodule = ⊤ ∧ U.toSubmodule ⊓ U'.toSubmodule = ⊥ := by
+  haveI : Representation.IsSemisimpleRepresentation ρ := inferInstance
+  haveI : Nontrivial (Subrepresentation ρ) :=
+    ⟨⊥, ⊤, fun h => absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top⟩
+  obtain ⟨U, hUbot, hUtop⟩ : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
+    by_contra hcon
+    push_neg at hcon
+    exact hirr { eq_bot_or_eq_top := fun U => (em (U = ⊥)).imp id (hcon U) }
+  obtain ⟨U', hUU'⟩ := exists_isCompl U
+  have hsup : U.toSubmodule ⊔ U'.toSubmodule = ⊤ := by
+    rw [← Subrepresentation.toSubmodule_sup]
+    exact congrArg Subrepresentation.toSubmodule hUU'.sup_eq_top
+  have hinf : U.toSubmodule ⊓ U'.toSubmodule = ⊥ := by
+    rw [← Subrepresentation.toSubmodule_inf]
+    exact congrArg Subrepresentation.toSubmodule hUU'.inf_eq_bot
+  refine ⟨U, U', hUbot, ?_, hsup, hinf⟩
+  rintro rfl
+  rw [show ((⊥ : Subrepresentation ρ).toSubmodule) = ⊥ from rfl, sup_bot_eq] at hsup
+  exact hUtop (Subrepresentation.toSubmodule_injective hsup)
+
 /-- **BG Theorem 3.10 (a)+(b) for elementary abelian `M`, the reducible-module strong induction**
 (issue 8013 piece 5, Case 1 of the proof, mmd L1287-1317).  The group `V` is universally quantified
 inside the induction (the recursion passes to subrepresentations `U, U'`, different modules); the
@@ -176,27 +203,9 @@ private theorem frobenius_elemAbelian_ab_aux
       exact prime_card_and_finrank_of_frobenius_general ρ hRne hKne hKcard hcop hCVK hFrob
         (fun x hx hx1 => by rw [hcond3 x hx hx1])
     · -- Reducible: split `⊤ = U ⊕ U'` by Maschke and recurse on both pieces.
-      haveI : Representation.IsSemisimpleRepresentation ρ := inferInstance
-      haveI : Nontrivial (Subrepresentation ρ) :=
-        ⟨⊥, ⊤, fun h => absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top⟩
-      have hex : ∃ U : Subrepresentation ρ, U ≠ ⊥ ∧ U ≠ ⊤ := by
-        by_contra hcon
-        push_neg at hcon
-        exact hirr { eq_bot_or_eq_top := fun U => (em (U = ⊥)).imp id (hcon U) }
-      obtain ⟨U, hUbot, hUtop⟩ := hex
-      obtain ⟨U', hUU'⟩ := exists_isCompl U
-      have hsup : U.toSubmodule ⊔ U'.toSubmodule = ⊤ := by
-        rw [← Subrepresentation.toSubmodule_sup]
-        exact congrArg Subrepresentation.toSubmodule hUU'.sup_eq_top
-      have hinf : U.toSubmodule ⊓ U'.toSubmodule = ⊥ := by
-        rw [← Subrepresentation.toSubmodule_inf]
-        exact congrArg Subrepresentation.toSubmodule hUU'.inf_eq_bot
+      obtain ⟨U, U', hUbot, hU'ne, hsup, hinf⟩ := exists_maschke_split ρ hirr
       have hsum : finrank F ↥U.toSubmodule + finrank F ↥U'.toSubmodule = finrank F V :=
         Submodule.finrank_add_eq_of_isCompl ⟨disjoint_iff.mpr hinf, codisjoint_iff.mpr hsup⟩
-      have hU'ne : U' ≠ ⊥ := by
-        rintro rfl
-        rw [show ((⊥ : Subrepresentation ρ).toSubmodule) = ⊥ from rfl, sup_bot_eq] at hsup
-        exact hUtop (Subrepresentation.toSubmodule_injective hsup)
       haveI : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
         (fun h => hUbot (Subrepresentation.toSubmodule_injective h))
       haveI : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
@@ -241,5 +250,103 @@ theorem prime_card_and_finrank_of_frobenius_elemAbelian
     ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
       finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) :=
   frobenius_elemAbelian_ab_aux hcop hRne hKne hFrob (finrank F V) ρ hCVK hcond3 rfl
+
+/-- **BG Theorem 3.10 (c) for elementary abelian `M`, the reducible-module induction** (issue 8013
+piece 5, mmd L1313-1321/1321).  When `C_V(R)` is cyclic (here: `finrank C_V(R) ≤ 1`), the kernel's
+derived subgroup centralizes `V`: `K' ⊆ C_K(V)`, i.e. `ρ g = 1` for every `g ∈ ⁅K, K⁆`.
+
+Carries the genuine Frobenius-group structure `IsFrobeniusGroup G K R` (needed for Theorem 3.5 at the
+irreducible leaf).  The irreducible leaf is `thm35` (BG Theorem 3.5); `|R|` prime and the
+one-dimensionality of `C_V(R)` come from the `(a)+(b)` result `…_frobenius_elemAbelian`.  The
+reducible case splits `⊤ = U ⊕ U'`, the cyclicity restricts (`C_U(R) ≤ C_V(R)`), and the conclusions
+`ρ g = 1` on `U` and on `U'` recombine to `ρ g = 1` on `V = U ⊕ U'`. -/
+private theorem frobenius_elemAbelian_c_aux
+    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    {K R : Subgroup G} [K.Normal]
+    (hIsFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥) :
+    ∀ (n : ℕ) {V : Type*} [AddCommGroup V] [Module F V] [FiniteDimensional F V] [Nontrivial V]
+      (ρ : Representation F G V),
+      Representation.invariants (ρ.comp K.subtype) = ⊥ →
+      (∀ x : G, x ∈ R → x ≠ 1 →
+        Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype)
+          = Representation.invariants (ρ.comp R.subtype)) →
+      finrank F (Representation.invariants (ρ.comp R.subtype)) ≤ 1 →
+      finrank F V = n →
+      ∀ g ∈ ⁅K, K⁆, ρ g = 1 := by
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n IH =>
+    intro V _ _ _ _ ρ hCVK hcond3 hcyc hn
+    classical
+    by_cases hirr : Representation.IsIrreducible ρ
+    · -- Irreducible leaf: BG Theorem 3.5.
+      obtain ⟨p, hp, hpcard, hb⟩ := prime_card_and_finrank_of_frobenius_elemAbelian ρ hRne hKne
+        hIsFrob.coprime_card_kernel_complement.symm hCVK hIsFrob.conj_frobenius hcond3
+      have hCV1 : finrank F (Representation.invariants (ρ.comp R.subtype)) = 1 := by
+        have hpos : 0 < finrank F V := finrank_pos
+        rcases Nat.eq_zero_or_pos (finrank F (Representation.invariants (ρ.comp R.subtype)))
+          with h0 | h1
+        · rw [h0, mul_zero] at hb; omega
+        · omega
+      exact OddOrder.BG.Ch1.S03e.thm35 ρ K R hIsFrob inferInstance ⟨p, hp, hpcard⟩
+        (NeZero.ne (Nat.card G : F)) hCV1
+    · -- Reducible: split `⊤ = U ⊕ U'` and recurse on (c).
+      obtain ⟨U, U', hUbot, hU'ne, hsup, hinf⟩ := exists_maschke_split ρ hirr
+      have hsum : finrank F ↥U.toSubmodule + finrank F ↥U'.toSubmodule = finrank F V :=
+        Submodule.finrank_add_eq_of_isCompl ⟨disjoint_iff.mpr hinf, codisjoint_iff.mpr hsup⟩
+      haveI : Nontrivial ↥U.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+        (fun h => hUbot (Subrepresentation.toSubmodule_injective h))
+      haveI : Nontrivial ↥U'.toSubmodule := Submodule.nontrivial_iff_ne_bot.mpr
+        (fun h => hU'ne (Subrepresentation.toSubmodule_injective h))
+      have hUpos : 0 < finrank F ↥U.toSubmodule := finrank_pos
+      have hU'pos : 0 < finrank F ↥U'.toSubmodule := finrank_pos
+      have hUlt : finrank F ↥U.toSubmodule < n := by rw [hn] at hsum; omega
+      have hU'lt : finrank F ↥U'.toSubmodule < n := by rw [hn] at hsum; omega
+      have hcycU : finrank F (Representation.invariants (U.toRepresentation.comp R.subtype)) ≤ 1 := by
+        rw [finrank_invariants_toRepresentation_inf]
+        exact le_trans (Submodule.finrank_mono inf_le_left) hcyc
+      have hcycU' : finrank F (Representation.invariants (U'.toRepresentation.comp R.subtype)) ≤ 1 := by
+        rw [finrank_invariants_toRepresentation_inf]
+        exact le_trans (Submodule.finrank_mono inf_le_left) hcyc
+      have hIHU := IH (finrank F ↥U.toSubmodule) hUlt U.toRepresentation
+        (invariants_toRepresentation_eq_bot ρ _ K (by rw [hCVK]; exact bot_inf_eq _))
+        (fun x hx hx1 => invariants_toRepresentation_eq_of_inf_eq ρ U (Subgroup.zpowers x) R
+          (by rw [hcond3 x hx hx1])) hcycU rfl
+      have hIHU' := IH (finrank F ↥U'.toSubmodule) hU'lt U'.toRepresentation
+        (invariants_toRepresentation_eq_bot ρ _ K (by rw [hCVK]; exact bot_inf_eq _))
+        (fun x hx hx1 => invariants_toRepresentation_eq_of_inf_eq ρ U' (Subgroup.zpowers x) R
+          (by rw [hcond3 x hx hx1])) hcycU' rfl
+      intro g hg
+      have hgU : ∀ u ∈ U.toSubmodule, ρ g u = u := by
+        intro u hu
+        have h := congrArg Subtype.val (DFunLike.congr_fun (hIHU g hg) ⟨u, hu⟩)
+        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply,
+          Module.End.one_apply] using h
+      have hgU' : ∀ u ∈ U'.toSubmodule, ρ g u = u := by
+        intro u hu
+        have h := congrArg Subtype.val (DFunLike.congr_fun (hIHU' g hg) ⟨u, hu⟩)
+        simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply,
+          Module.End.one_apply] using h
+      refine LinearMap.ext fun v => ?_
+      obtain ⟨u, hu, u', hu', rfl⟩ := Submodule.mem_sup.mp
+        (show v ∈ U.toSubmodule ⊔ U'.toSubmodule by rw [hsup]; exact Submodule.mem_top)
+      show ρ g (u + u') = u + u'
+      rw [map_add, hgU u hu, hgU' u' hu']
+
+/-- **BG Theorem 3.10 (c), elementary abelian module case** (issue 8013 piece 5).  For a Frobenius
+group `G = KR` acting on an elementary abelian `M = V` (over alg-closed `F`, `char F ∤ |G|`) with
+`C_V(K) = ⊥` and prime-manner action, if `C_V(R)` is cyclic (`finrank ≤ 1`) then `K' ⊆ C_K(V)`. -/
+theorem commutator_eq_one_of_frobenius_elemAbelian
+    [IsAlgClosed F] [Finite G] [IsSolvable G] [NeZero (Nat.card G : F)]
+    (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
+    {K R : Subgroup G} [K.Normal]
+    (hIsFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G K R) (hRne : R ≠ ⊥) (hKne : K ≠ ⊥)
+    (hCVK : Representation.invariants (ρ.comp K.subtype) = ⊥)
+    (hcond3 : ∀ x : G, x ∈ R → x ≠ 1 →
+      Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype)
+        = Representation.invariants (ρ.comp R.subtype))
+    (hcyc : finrank F (Representation.invariants (ρ.comp R.subtype)) ≤ 1) :
+    ∀ g ∈ ⁅K, K⁆, ρ g = 1 :=
+  frobenius_elemAbelian_c_aux hIsFrob hRne hKne (finrank F V) ρ hCVK hcond3 hcyc rfl
 
 end OddOrder.BG.Ch1.S03
