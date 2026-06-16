@@ -1916,6 +1916,28 @@ theorem lt_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpoten
   rw [← heq] at h
   exact lt_irrefl _ h
 
+/-- **Strict normalizer growth, intersected form** (`§14`-independent, reusable): for a proper
+subgroup `Q0 < Q` of a nilpotent `Q`, a witness normalizing `Q0` lies *inside* `Q`, so
+`Q0 < Q ⊓ N_G(Q0) = N_Q(Q0)`.  Sharper than `lt_normalizer_of_lt_of_isNilpotent` (which keeps only
+`Q0 < N_G(Q0)`, dropping the `≤ Q` containment): the strict step is obtained inside `↥Q` and pushed
+back through `Q.subtype` (`map_lt_map_iff_of_injective` + `subgroupOf_map_subtype`).
+
+In Theorem 15.2's brick D (mmd L4194) this furnishes the nontrivial chain top `Q1 < N_Q(Q1)` handed
+to `exists_minimal_normalOver` (ambient `N_M(Q1)`, `T = N_Q(Q1) ≤ Q`) to build the next chief
+factor `Q2/Q1` with `Q1 < Q2 ≤ Q`. -/
+theorem lt_inf_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpotent ↥Q]
+    (hQ0Q : Q0 < Q) :
+    Q0 < Q ⊓ Subgroup.normalizer (Q0 : Set G) := by
+  have hQ0le : Q0 ≤ Q := hQ0Q.le
+  have hlt : Q0.subgroupOf Q < ⊤ := by
+    rw [lt_top_iff_ne_top, ne_eq, Subgroup.subgroupOf_eq_top]; exact hQ0Q.2
+  have h := OddOrder.Isaacs.Ch01.lt_normalizer_of_isNilpotent_of_lt_top (G := ↥Q) hlt
+  rw [← Subgroup.subgroupOf_normalizer_eq hQ0le] at h
+  -- `h : Q0.subgroupOf Q < (N_G Q0).subgroupOf Q`; map back to `G` along the injective `Q.subtype`.
+  have hmap := (Subgroup.map_lt_map_iff_of_injective Q.subtype_injective).mpr h
+  rw [Subgroup.map_subgroupOf_eq_of_le hQ0le, Subgroup.subgroupOf_map_subtype] at hmap
+  rwa [inf_comm] at hmap
+
 /-- **Minimal `N`-normal subgroup over `Q₀`** (`§14`-independent, reusable): given a nontrivial
 `N`-normal subgroup `T` strictly above `Q₀`, there is a minimal `N`-normal subgroup `Q₁` with
 `Q₀ < Q₁ ≤ T` (no `N`-normal subgroup lies strictly between `Q₀` and `Q₁`).  This is the
