@@ -531,3 +531,23 @@ theoremE conjunct 3 を unblock しており、review が cross-reference し損
 - theoremA-D / Prop 16.1 = §14 (Prop 14.2 は landed だが theoremA-D は更に 14.4/14.5/14.7 + §9-10 uniqueness 要)。
 
 ⟹ F は本 conjunct landing 後、再び H (14.5/14.7/14.9) + B (6.8) gate の STANDBY。
+
+## 15. Thm 15.2 proof body 着手 — step 2 entry landed (2026-06-16, Lane G)
+
+§14.3 の plan を実行開始。**BG Theorem 3.8 (`S03h.thm38`) を issue 8011 で形式化・main 合流済み**
+(sorry-free + axiom-clean, AxiomsCheck 登録) ⟹ Thm 15.2 step 2 の §3 gate 解除。
+
+本体は純 `_of_inputs` skeleton 不可 (§14.2) ゆえ **§14-gated facts を仮説化した sorry-free
+conditional helper** で積む方針に確定。追跡 = **issue 8012** (step 2-5 の brick 分解 + friction 列挙)。
+
+landed (sorry-free, leaf build green 3114 jobs):
+- **step 2 entry** `msigma_eq_commutator_kappa_of_isComplement'` (S15_MF, Thm 15.2 直前):
+  type-P1 complement `IsComplement'(M_σ.subgroupOf M)(K.subgroupOf M)` を仮説に、Lem 6.3(a)
+  (`commutator_eq_self_of_isComplement'_le_commutator`) + `Msigma_le_derived` (M_σ⊆M') + M solvable
+  で `⁅M_σ,K⁆=M_σ` (inside ↥M)。
+
+次 brick (issue 8012) = **step 2 core = Thm 3.8 application** (`thm38` を G:=↥M, K↦M_σ.subgroupOf M,
+R↦K.subgroupOf M で contrapositive 適用 → `C_{F(M_σ)}(K)≠1`)。friction 4 点 (M 奇数性 / κ-σ
+coprimality / 冪零⟺`fittingInAmbient=self` 逆向き / R^# 条件形合わせ) は issue 8012 に記録。
+`M_σ 非冪零` は `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` の contrapositive (§14-非依存)。
+`fittingInAmbient H=(fitting ↥H).map H.subtype` が thm38 結論形と一致するのは確認済 (S15_MF:345)。
