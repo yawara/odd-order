@@ -83,3 +83,23 @@ S08 contrapositive の証明を trace して norm-1 の所在を**正確に**特
 
 **正本=本ファイル。core build target = `coherentDegreeSqNormBound_of_not_coherent` (S08CP1:2451 の weighted 版)。
 次=core build 着手 (focused、Q4 が証明正本)。**
+
+## cont.²⁹ 続²: 完全 scoping — core = weighted `xAdjoinStep` (189 行 τ₂ 構築) + X-sum は既済
+さらに trace して reweighting の**完全 scope** を確定:
+- `coherentDegreeSumBound_of_not_coherent` (S08CP1:2451) は薄い contrapositive wrapper、本体は
+  `exact hnc ⟨xAdjoinStep …⟩`。**真の core = `xAdjoinStep` (S08CP1:2262、≈189 行の τ₂ coherent-extension 構築)**。
+  正規直交 member から S₁∪{ψ,ψ̄} の coherent 拡張を建てる ((5.6.3) τ₂)。norm-1 はここで本質使用。
+- **`XAdjoinStepInput` 構造体 (S08CP1:2583、≈52 行)**: `χmem : ι → IrreducibleCharacter` + `hmemortho` (正規直交)。
+  + **8 個の `xAdjoinStepInput_of_*` builders** (S08CP1×8 / S08Core×36ref / S08CP2×13ref)。
+- **✅ X-sum 側は既に norm-weighted で形式化済**: `sum_div_normSq_induce_kernelFilter_eq` (S08CP1:~2520) =
+  `∑_{χ∈S(A)} χ(1)²/‖χ‖² = [G:H]·(|H:A|−1)` (`χ 1 ^2 / inner χ χ` 形)。⟹ **case-B X-sum identity は無改修で使える**。
+
+**⟹ 完全 scope**: (5.6) reweighting = (1) `XAdjoinStepInput` struct を weighted 化 (`χmem` 一般 character、
+`hmemortho = if i=j then ‖χmem i‖² else 0`)、(2) **`xAdjoinStep` (189 行 τ₂) を weighted 一般化** [core、最重]、
+(3) builders を weighted 化 (or case-B 用 1 builder のみ)、(4) `coherentDegreeSqNormBound` wrapper、
+(5) break-pair for reducible S、(6) (5.3.b) Hyp(5.2)。証明正本 = chatgpt_answer.md Q4 (射影 1/‖χᵢ‖²、quadratic)。
+**規模: major multi-file focused build (189 行 core + struct + builders)。clean context の focused session 推奨。**
+
+**📍 現在地 (cont.²⁹ 完了時点)**: (5.6) reweighting は**完全 scoping 済・着手準備完了**。X-sum 済、core = weighted
+`xAdjoinStep`。FPF tower (cont.²⁶) は別 obligation で H/H′ 実データ済 (H′/W₂+assembly 残)。次セッション第一手 =
+weighted `XAdjoinStepInput` struct + `xAdjoinStep` core (Q4 が証明正本)。**正本=本ファイル + chatgpt_answer.md。**
