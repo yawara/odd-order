@@ -3689,6 +3689,14 @@ S07_Coherence に既に rich な (5.4)-(5.6) 理論がある(3 回目 grep で�
 = 単一スカラー `⟨τ(μ_j−a·η₁), certainTypeExtension(μ̄_j)⟩ = 0` (cTEμ̄ = −true-half-sum)。
 これは「τ(μ_j−a·η₁) が共役列の σ-image 成分を持たない」= 教科書 (6.8.2.3)/(4.9) の σ-isometry 構造そのもの。
 
-**▶▶ 次 = この単一スカラー `T = ⟨τ(μ_j−a·η₁), cTEμ̄⟩ = 0` の discharge**(残り全部は 5.4.b + free facts で機械的)。
-per-φ 経路 (`caseB_per_phi_anchored_fromYset`、Y-pinning は engine 内済) で `τ(μ_j−a·η₁)=X−a·ν₁` を取得 →
-5.4.b で X=∑_{α∈E}α → T=0 で E=false-half → X=cTEμ。multi-hundred LOC・dedicated focused build。loop 不適。**正本=本 session 47。**
+**✅ landed (session 47, `7e961346`, axiom-clean): `certainTypeExtension_columnSum_eq_falseHalf_sum`**
+= 構造的橋渡し `cTEμ = ∑_i certainTypeRImage χ₂ χ₂⁻¹ (false,i)`(cTEμ = R-族の false-half-sum)。
+= 5.4.b の結論 `X=∑_{α∈E}α` を cTEμ に同定する最終ステップの非自明部分(両辺 δ_j•∑ω_{ij}^σ)。非重複(grep 確認)。
+
+**▶▶ 次 = 単一スカラー `T = ⟨τ(μ_j−a·η₁), cTEμ̄⟩ = 0` の discharge**(これが残る唯一の deep content)。
+これは σ-isometry の restriction 構造(`certainTypeOmegaSigma`/§5 σ map の Res_L、`inner_tau_eq_inner_restrict`
+経由 `⟨μ_j−a·η₁, Res_L(ω_{ij'}^σ)⟩=0`)を要する **§5/§6 σ-subsystem の focused dive**(multi-hundred LOC、loop 不適)。
+**T=0 さえ出れば残りは機械的**: per-φ 経路で `τ(μ_j−a·η₁)=X−a·ν₁`(Y-pinning は engine 内済) → 5.4.b で
+X=∑_{α∈E}α (|E|=‖μ_j‖²=w₁=`columnFamily_mu_sum_inner`) → T=0 で E⊆false-half、|false-half|=w₁ ⟹ E=false-half
+(`Finset.eq_of_subset_of_card_le`) → `certainTypeExtension_columnSum_eq_falseHalf_sum` で X=cTEμ → hanchored。
+**正本=本 session 47。** T=0 が次セッションの単一の山。
