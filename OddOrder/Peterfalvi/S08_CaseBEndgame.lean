@@ -211,6 +211,38 @@ theorem caseB_W1_dvd_index_of_centralizer_le {G : Type*} [Group G] [Finite G]
     exact mul_inv_eq_iff_eq_mul.mp hc.symm
   exact W1_dvd_index_of_fixedPoints_le hCop M hMinv hfix
 
+/-- **(6.8.3) case-(B) first FPF divisibility** `|W₁| ∣ |H:H′| − 1`, fully from the Sibley
+certain-type data.  Discharges the `hcomm` hypothesis of `caseB_W1_dvd_index_of_centralizer_le` at
+`M = [H,H]` from the certain-type centralizer datum `cert.centralizer_W2` (`C_L(a) ⊓ K = W₂`) and
+`W₂ ⊆ ⁅H,H⁆`: if `x ∈ H` commutes with a nonidentity `a ∈ W₁`, then `(x:L) ∈ C_L(a) ⊓ K = W₂ ⊆
+⁅H,H⁆`, so `x ∈ ([H,H]).subgroupOf H = commutator ↥H` (`commutator_subgroupOf_self`).
+
+The `cert`/`hK`/`hW1`/`hW2`/`hcop` arguments are exactly the case-(c2) projection of `hyp.cases`
+(`h46.toCertainTypeHypothesis`, `h46.K = H`, `h46.W1 = W₁`, `h46.W2 ⊆ ⁅H,H⁆`, the Hall
+coprimality), mirroring `inertia_eq_H_of_c2`. -/
+theorem caseB_W1_dvd_index_commutator {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)] (hyp : SibleyDadeHypothesis G L H)
+    (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1)) :
+    Nat.card ↥hyp.W1 ∣ (commutator ↥H).index - 1 := by
+  letI : H.Normal := hyp.H_normal
+  refine caseB_W1_dvd_index_of_centralizer_le hyp.W1 hcop.symm (commutator ↥H) ?_
+  intro a ha x hcomm
+  -- `(x:L)` commutes with `(a:L)`, so lies in `C_L(a)`
+  have hxcen : (x : ↥L) ∈ Subgroup.centralizer ({(a : ↥L)} : Set ↥L) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm
+  have haW1 : (a : ↥L) ∈ cert.W1 := by rw [hW1]; exact a.2
+  have hane : (a : ↥L) ≠ 1 := fun h => ha (OneMemClass.coe_eq_one.mp h)
+  -- `(x:L) ∈ C_L(a) ⊓ K = W₂`
+  have hxW2 : (x : ↥L) ∈ cert.W2 := by
+    rw [← cert.centralizer_W2 (a : ↥L) haW1 hane]
+    exact Subgroup.mem_inf.mpr ⟨hxcen, by rw [hK]; exact x.2⟩
+  -- `W₂ ⊆ ⁅H,H⁆`, so `x ∈ commutator ↥H`
+  rw [← commutator_subgroupOf_self]
+  exact Subgroup.mem_subgroupOf.mpr (hW2 hxW2)
+
 /-- **(6.8.3) case-(B) arithmetic spine.**  The complete numeric reduction of the case-(B) (6.8.3)
 contradiction: given the break-pair (5.6) bound `w1·hZ·(cZ−1) ≤ 2·w1²·d`, the [Is] Cor 2.30 bound
 `d² ≤ hZ`, and the case-(B) fixed-point-free data on the two intermediate factors `|H:H′|`, `|H′:Z|`
