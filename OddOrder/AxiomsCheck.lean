@@ -3752,6 +3752,7 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_lift_map_eq_of_trivial
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.card_map_mk'_eq_of_disjoint
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.caseB_transfer
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isIrreducible_lift_of_trivial
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38

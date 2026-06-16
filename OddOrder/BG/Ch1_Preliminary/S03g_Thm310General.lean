@@ -169,4 +169,25 @@ theorem caseB_transfer (ρ : Representation F G V) {K₀ K R : Subgroup G} [K₀
     invariants_lift_map_eq_of_trivial ρ hker R
   exact ⟨p, hp, by rw [← hcard]; exact hcardR', by rw [hfinrank', hcard, hinv]⟩
 
+/-- **Case B brick — irreducibility lifts to the quotient** (issue 8013 piece 3).  When `K₀` acts
+trivially, the lifted representation `ρ̄ = QuotientGroup.lift K₀ ρ` on `G ⧸ K₀` is again irreducible:
+its subrepresentations are the same submodules as those of `ρ` (a submodule is `ρ̄`-invariant iff
+`ρ`-invariant, since `ρ̄ ⟦g⟧ = ρ g` and `mk'` is surjective), so the simple-order structure carries
+over.  Supplies the `[IsIrreducible ρ̄]` instance needed to apply the induction hypothesis to `ρ̄`. -/
+theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V) [ρ.IsIrreducible]
+    {K₀ : Subgroup G} [K₀.Normal] (hker : ∀ x ∈ K₀, ρ x = 1) :
+    Representation.IsIrreducible (QuotientGroup.lift K₀ ρ hker) := by
+  haveI hnt : Nontrivial (Subrepresentation (QuotientGroup.lift K₀ ρ hker)) := by
+    refine ⟨⊥, ⊤, fun h => ?_⟩
+    exact absurd (congrArg Subrepresentation.toSubmodule h) bot_ne_top
+  refine { eq_bot_or_eq_top := fun S => ?_ }
+  let Sρ : Subrepresentation ρ :=
+    { toSubmodule := S.toSubmodule
+      apply_mem_toSubmodule := fun g {v} hv => S.apply_mem_toSubmodule (QuotientGroup.mk' K₀ g) hv }
+  rcases IsSimpleOrder.eq_bot_or_eq_top Sρ with h | h
+  · refine Or.inl (Subrepresentation.toSubmodule_injective ?_)
+    exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊥ : Submodule F V))
+  · refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
+    exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊤ : Submodule F V))
+
 end OddOrder.BG.Ch1.S03
