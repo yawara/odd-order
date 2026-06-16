@@ -4786,6 +4786,12 @@ The per-pair input to the family's pairwise nonconjugacy.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.neighbor_pair_nonconjugate
 
+/-! **BG 14.7, the base member `M` (`i = 0`)** (`S14_TypePCounting`, `typeP_self_member`, mmd L4003):
+`M`'s own data in the family's canonical shape — `K_M* = Z ⊓ M_σ(M) = Kstar`, trivial swap
+`Z = K ⊔ K_M*`, `K_M* ◁ Z`, `K_M* ≠ ⊥`.  Aligns `M` with the neighbours.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_self_member
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
