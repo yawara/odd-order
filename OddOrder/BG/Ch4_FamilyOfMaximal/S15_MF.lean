@@ -1934,6 +1934,88 @@ theorem exists_minimal_normalOver [Finite G] {N Q0 T : Subgroup G}
   exact ⟨Q1, hQ0Q1, hQ1T, hQ1norm, fun H hQ0H hHQ1 hHnorm =>
     hQ1min ⟨hQ0H, hHQ1.trans hQ1T, hHnorm⟩ hHQ1⟩
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **Coprime lifting over a normal `D`-invariant subgroup** (`§14`-independent, reusable; the
+practical non-abelian form of `N = ⁅N,D⁆·C_N(D)` instantiated at a *given* normal subgroup `M₀`
+containing `⁅N,D⁆`).  If `D` normalizes `N`, `M₀ ≤ N` is normalized by both `N` and `D`,
+`⁅N, D⁆ ≤ M₀`, and `(|D|, |N|) = 1` (with `D` or `N` solvable), then `N = M₀·C_N(D)`, i.e.
+`N ≤ M₀ ⊔ (N ⊓ C_G(D))`.
+
+Quotienting by the *normal* `M₀` sidesteps the (not-free) `⁅N,D⁆ ⊴ N`: since `⁅N,D⁆ ⊆ M₀`, `D` acts
+trivially on `N/M₀`, so the quotient fixed points are `⊤`; the coprime fixed-point lifting
+`fixedPointsOfMulAut_quotientMulAutHom_eq_map` (BG Proposition 1.5(d)) rewrites them as the
+push-forward `C_N(D)·M₀/M₀`, whence `N = C_N(D)·M₀`.  The conjugation action of `D` on `↥N` is
+`(normalizerMonoidHom N).comp (inclusion hDN)`, matching the `S06`/`S03h` bridges
+(`actionCommutator_conj_map_subtype`, `fixedPointsOfMulAut_conj_map_subtype`).
+
+In Theorem 15.2's step 3 part (ii) (mmd L4194): with `N = Q₁`, `M₀ = Q₀ = C_Q(D)`, an extra
+`C_{Q₁}(D) ⊆ Q₀` forces `Q₁ ⊆ Q₀`, contradicting `Q₀ < Q₁`. -/
+theorem le_sup_inf_centralizer_of_commutator_le [Finite G]
+    {N M₀ D : Subgroup G}
+    (hM₀N : M₀ ≤ N)
+    (hDN : D ≤ Subgroup.normalizer (N : Set G))
+    (hN_M₀ : N ≤ Subgroup.normalizer (M₀ : Set G))
+    (hDM₀ : D ≤ Subgroup.normalizer (M₀ : Set G))
+    (hcomm : ⁅N, D⁆ ≤ M₀)
+    (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥N))
+    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥N) :
+    N ≤ M₀ ⊔ (N ⊓ Subgroup.centralizer (D : Set G)) := by
+  -- The conjugation action of `D` on `↥N` (`D ≤ N_G(N)`).
+  set φ : ↥D →* MulAut ↥N :=
+    (Subgroup.normalizerMonoidHom N).comp (Subgroup.inclusion hDN) with hφ
+  -- `M₀.subgroupOf N` is normal in `↥N` and `D`-invariant.
+  haveI hM₀N_normal : (M₀.subgroupOf N).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hM₀N).mpr hN_M₀
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (M₀.subgroupOf N) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    show (a : G) * (x : G) * (a : G)⁻¹ ∈ M₀
+    exact (Subgroup.mem_normalizer_iff.mp (hDM₀ a.2) (x : G)).mp hx
+  -- `actionCommutator φ ≤ M₀.subgroupOf N` (from `⁅N,D⁆ ⊆ M₀`).
+  have hac_map : (OddOrder.Isaacs.Ch04.actionCommutator φ).map N.subtype = ⁅N, D⁆ :=
+    OddOrder.BG.Ch1.S06.actionCommutator_conj_map_subtype hDN
+  have hac_le : OddOrder.Isaacs.Ch04.actionCommutator φ ≤ M₀.subgroupOf N := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf]
+    have : (N.subtype y) ∈ (OddOrder.Isaacs.Ch04.actionCommutator φ).map N.subtype :=
+      ⟨y, hy, rfl⟩
+    rw [hac_map] at this
+    exact hcomm this
+  -- `D` acts trivially on `N/M₀`: the quotient fixed points are `⊤`.
+  have htop : Subgroup.fixedPointsOfMulAut
+      (quotientMulAutHom hMinv) = ⊤ := by
+    have hbot : OddOrder.Isaacs.Ch04.actionCommutator
+        (quotientMulAutHom hMinv) = ⊥ := by
+      rw [OddOrder.Isaacs.Ch04.actionCommutator_quotient_eq_map, Subgroup.map_eq_bot_iff,
+        QuotientGroup.ker_mk']
+      exact hac_le
+    rw [Subgroup.eq_top_iff']
+    intro g
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    exact (OddOrder.Isaacs.Ch04.actionCommutator_eq_bot_iff_acts_trivially _).mp hbot a g
+  -- Proposition 1.5(d): quotient fixed points are the push-forward of `C_N(D)`.
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hSolv hMinv
+  rw [htop] at hmap
+  -- `C_N(D) ⊔ M₀ = ⊤` in `↥N`.
+  have hsup : Subgroup.fixedPointsOfMulAut φ ⊔ M₀.subgroupOf N = ⊤ := by
+    have hcme := Subgroup.comap_map_eq (f := QuotientGroup.mk' (M₀.subgroupOf N))
+      (Subgroup.fixedPointsOfMulAut φ)
+    rw [QuotientGroup.ker_mk', ← hmap, Subgroup.comap_top] at hcme
+    exact hcme.symm
+  -- Map back to `G`: `(C_G(D) ⊓ N) ⊔ M₀ = N`.
+  have hbridge : (Subgroup.fixedPointsOfMulAut φ).map N.subtype =
+      Subgroup.centralizer (D : Set G) ⊓ N :=
+    OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hDN
+  have hmapN := congrArg (Subgroup.map N.subtype) hsup
+  rw [Subgroup.map_sup, hbridge, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hM₀N,
+    ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmapN
+  refine le_of_eq ?_
+  calc N = Subgroup.centralizer (D : Set G) ⊓ N ⊔ M₀ := hmapN.symm
+    _ = M₀ ⊔ (N ⊓ Subgroup.centralizer (D : Set G)) := by rw [inf_comm, sup_comm]
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
