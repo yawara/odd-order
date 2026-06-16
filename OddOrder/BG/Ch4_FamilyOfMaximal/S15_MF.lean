@@ -1915,6 +1915,25 @@ theorem lt_normalizer_of_lt_of_isNilpotent {Q Q0 : Subgroup G} [Group.IsNilpoten
   rw [← heq] at h
   exact lt_irrefl _ h
 
+/-- **Minimal `N`-normal subgroup over `Q₀`** (`§14`-independent, reusable): given a nontrivial
+`N`-normal subgroup `T` strictly above `Q₀`, there is a minimal `N`-normal subgroup `Q₁` with
+`Q₀ < Q₁ ≤ T` (no `N`-normal subgroup lies strictly between `Q₀` and `Q₁`).  This is the
+subgroup-lattice (quotient-free) form of "the quotient `N/Q₀` has a minimal normal subgroup inside
+`T/Q₀`", obtained from finiteness of the subgroup lattice (`Set.Finite.exists_minimal`).
+
+In Theorem 15.2's step 3 (mmd L4194) `N = N_M(Q₀)` and `T = N_Q(Q₀) = Q ⊓ N_M(Q₀)` (nontrivial over
+`Q₀` by `lt_normalizer_of_lt_of_isNilpotent`), giving the minimal normal `Q₁/Q₀` with `Q₁ ≤ Q`. -/
+theorem exists_minimal_normalOver [Finite G] {N Q0 T : Subgroup G}
+    (hQ0T : Q0 < T) (hTnorm : (T.subgroupOf N).Normal) :
+    ∃ Q1 : Subgroup G, Q0 < Q1 ∧ Q1 ≤ T ∧ (Q1.subgroupOf N).Normal ∧
+      ∀ H : Subgroup G, Q0 < H → H ≤ Q1 → (H.subgroupOf N).Normal → Q1 ≤ H := by
+  let S : Set (Subgroup G) := {H | Q0 < H ∧ H ≤ T ∧ (H.subgroupOf N).Normal}
+  have hS_fin : S.Finite := Set.toFinite S
+  have hS_ne : S.Nonempty := ⟨T, hQ0T, le_refl T, hTnorm⟩
+  obtain ⟨Q1, ⟨hQ0Q1, hQ1T, hQ1norm⟩, hQ1min⟩ := hS_fin.exists_minimal hS_ne
+  exact ⟨Q1, hQ0Q1, hQ1T, hQ1norm, fun H hQ0H hHQ1 hHnorm =>
+    hQ1min ⟨hQ0H, hHQ1.trans hQ1T, hHnorm⟩ hHQ1⟩
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
