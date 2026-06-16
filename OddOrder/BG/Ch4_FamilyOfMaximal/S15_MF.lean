@@ -2644,6 +2644,80 @@ theorem Q1_eq_Q_of_inputs [Finite G]
     hQ1Q2 hDQ hdisj2 hK1Q1disj hDnormQ2 hK1DQ2 hDQ2normQ1 hPnormQ1 hK1prime hQ2_pg hDq'2
     hcopZ2 hcopDQ2 hsolv2 hPsolv2 (Or.inl hKstarQ1) hcap2
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+open scoped commutatorElement in
+/-- **Theorem 15.2 step 4, the fixed-point-free fact `C_{Q̄}(D) = 1`** (Proposition 1.5(d), mmd
+L4196).  With `Q₀ = C_Q(D)` and `D` acting coprimely on `Q` (`D ≤ N_G(Q)`, `Q, D ≤ N_G(Q₀)`), `D`
+acts fixed-point-freely on `Q̄ = Q/Q₀`: any `x ∈ Q` whose class is centralized by `D`
+(`⁅d, x⁆ ∈ Q₀` for every `d ∈ D`) already lies in `Q₀`.
+
+This is the `C_M(U) = 1` hypothesis (`hCU`) of BG Theorem 3.10
+(`prime_card_complement_of_frobenius_conj`) in the `M = Q̄`, `U = D̄` instantiation that yields
+`|K|` prime (Theorem 15.2 conjunct (f)): a class of `Q̄` centralizing `D̄` lifts to a representative
+`x` with `⁅d, x⁆ ∈ Q₀` for all `d ∈ D`, forced by this lemma into `Q₀`, i.e. the class is trivial.
+
+Proof (mirrors `fpf_of_centralizer_inf_le`, but the fixed-point source is the *definitional*
+`C_Q(D) = Q₀` rather than a separate centralizer bound, and no generator lift is needed since the
+whole group `D` acts): the `D`-fixed points of `Q/Q₀` push forward from `C_{↥Q}(D) = Q₀`
+(`fixedPointsOfMulAut_quotientMulAutHom_eq_map`, Proposition 1.5(d)), hence are trivial.  The
+bracket conversion `⁅a, x⁻¹⁆ = x⁻¹ ⁅a, x⁆⁻¹ x` uses `x ∈ Q ≤ N_G(Q₀)`. -/
+theorem mem_centralizer_of_centralizes_quotient [Finite G]
+    {Q D Q0 : Subgroup G} (hQ0 : Q0 = Q ⊓ Subgroup.centralizer (D : Set G))
+    (hDQ : D ≤ Subgroup.normalizer (Q : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q))
+    (hSolv : IsSolvable ↥D ∨ IsSolvable ↥Q)
+    {x : G} (hxQ : x ∈ Q) (hfix : ∀ d ∈ D, ⁅d, x⁆ ∈ Q0) :
+    x ∈ Q0 := by
+  have hQ0Q : Q0 ≤ Q := by rw [hQ0]; exact inf_le_left
+  set φ : ↥D →* MulAut ↥Q :=
+    (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hDQ) with hφ
+  haveI hQ0_normal : (Q0.subgroupOf Q).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0Q).mpr hQQ0
+  -- `Q₀.subgroupOf Q` is `D`-invariant.
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hDQ0 a.2) (y : G)).mp hy
+  -- Proposition 1.5(d): the quotient fixed points push forward from `C_{↥Q}(D) = Q₀`, hence `⊥`.
+  have hbridge : (Subgroup.fixedPointsOfMulAut φ).map Q.subtype =
+      Subgroup.centralizer (D : Set G) ⊓ Q :=
+    OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hDQ
+  have hfp_le : Subgroup.fixedPointsOfMulAut φ ≤ Q0.subgroupOf Q := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf]
+    have hym : (Q.subtype y) ∈ (Subgroup.fixedPointsOfMulAut φ).map Q.subtype := ⟨y, hy, rfl⟩
+    rw [hbridge] at hym
+    obtain ⟨hcent, _⟩ := Subgroup.mem_inf.mp hym
+    rw [hQ0]; exact Subgroup.mem_inf.mpr ⟨y.2, hcent⟩
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hSolv hMinv
+  have hfpbot : Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) = ⊥ := by
+    rw [hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hfp_le
+  -- The class of `x` is `D`-fixed (each `a ∈ D` fixes it, by the premise), hence trivial.
+  have hxN : x ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 hxQ
+  have hxbar : QuotientGroup.mk' (Q0.subgroupOf Q) ⟨x, hxQ⟩ ∈
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) := by
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show ((a : G) * x * (a : G)⁻¹)⁻¹ * x ∈ Q0
+    have h1 : ⁅(a : G), x⁆ ∈ Q0 := hfix a a.2
+    have h2 : ((a : G) * x * (a : G)⁻¹)⁻¹ * x = x⁻¹ * ⁅(a : G), x⁆⁻¹ * (x⁻¹)⁻¹ := by
+      rw [commutatorElement_def]; group
+    rw [h2]
+    exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN)
+      (⁅(a : G), x⁆⁻¹)).mp (Q0.inv_mem h1)
+  rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+    Subgroup.mem_subgroupOf] at hxbar
+  exact hxbar
+
 /-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
 (`opiCoreInG_sup_compl_eq_of_isNilpotent`), and the `π'`-part centralizes the `π`-part
