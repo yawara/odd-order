@@ -1789,4 +1789,200 @@ theorem caseB_induce_column_or_irreducible
   · exact Or.inr (caseB_irr_induce_isIrreducible h46 hHK hθne
       (fun χ₂ hχ₂ heq => hc ⟨χ₂, hχ₂, heq⟩))
 
+/-- **(6.8.2) irreducible `X`-member ⊥ certain-type column** — the cross-orthogonality the case-(B)
+`X`-coherence fold needs (an irreducible `Ind^L_H θ` adjoined onto the column base `cX_col`).
+
+`⟨Ind^L_H θ, columnSum h46 χ₂⟩ = 0`: by additivity `columnSum = ∑_i μ_{ij}`, it suffices each grid
+character `μ_{ij}` is `⊥ Ind^L_H θ`.  Both are irreducible, and distinct **by degree mod `|W₁|`**:
+`Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)` (`induce_apply_one` + `index_H_eq_card_W1`), whereas
+a grid degree is `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, sign `= ±1`), with `|W₁| ≠ 1`.  So the
+irreducible Kronecker inner product vanishes.  (This is the same degree argument as the `X ⊥ Y`
+`inner_columnFamily_mu_Yset_eq_zero`, with the `Y`-degree `|W₁|` replaced by `|W₁|·θ(1)`.) -/
+theorem caseB_inner_irr_columnSum_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, inner_sum_right]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  have hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      ≠ ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) := by
+    intro heq
+    obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
+    obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hindeg : ClassFunction.induce H (θ : ClassFunction ↥H ℂ) (1 : ↥L)
+        = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+      rw [ClassFunction.induce_apply_one, hd, hyp.index_H_eq_card_W1]
+    rw [← heq, hindeg] at ha
+    have hcard : (Nat.card h46.W1 : ℂ) = (Nat.card hyp.W1 : ℂ) := by rw [hW1]
+    rw [hcard] at ha
+    have hw1 : Nat.card hyp.W1 ≠ 1 := fun h => hyp.W1_nontrivial (Subgroup.card_eq_one.mp h)
+    have hsign : ((h46.columnFamily χ₂).sign : ℂ)
+        = (Nat.card hyp.W1 : ℂ) * ((d : ℂ) - (a : ℂ)) := by linear_combination -ha
+    have hsignZ : (h46.columnFamily χ₂).sign = (Nat.card hyp.W1 : ℤ) * ((d : ℤ) - a) := by
+      exact_mod_cast hsign
+    have hdvd1 : (Nat.card hyp.W1 : ℤ) ∣ 1 := by
+      have hdvd : (Nat.card hyp.W1 : ℤ) ∣ (h46.columnFamily χ₂).sign := ⟨(d : ℤ) - a, hsignZ⟩
+      rcases (h46.columnFamily χ₂).sign_eq with hs | hs
+      · rwa [hs] at hdvd
+      · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
+    exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
+  have hkron := irreducibleCharacter_inner_eq_ite
+    (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ : IrreducibleCharacter ↥L)
+    ((h46.columnFamily χ₂).mu i)
+  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  simpa using hkron
+
+omit [Invertible (Nat.card ↥H : ℂ)] in
+/-- **(6.8.2) distinct certain-type columns are orthogonal** — `⟨columnSum h46 χ₂, columnSum h46 χ₂'⟩
+= 0` for `χ₂ ≠ χ₂'`.  By additivity over `columnSum = ∑_i μ_{ij}`, it reduces to the cross-column
+grid orthogonality `⟨μ_{ij}, μ_{i'j'}⟩ = 0` (`columnFamily_cross_products_zero`, Peterfalvi (4.1)),
+read off via the same `i, i' = 0` case split as `columnFamily_mu_ne`.
+
+This is the cross-orthogonality between different certain-type columns the case-(B) `X`-coherence
+needs to assemble the column base across degree classes (columns of distinct `W₂`-duals — in
+particular distinct degrees — are mutually orthogonal). -/
+theorem inner_columnSum_cross_eq_zero
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hne : χ₂ ≠ χ₂') :
+    ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnSum_def,
+    inner_sum_left]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [inner_sum_right]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  have hz : (⟨1, h46.one_lt_card_W1⟩ : Fin (Nat.card h46.W1)) ≠ 0 := Fin.ne_of_val_ne (by simp)
+  rcases eq_or_ne i 0 with hi | hi <;> rcases eq_or_ne j 0 with hj | hj
+  · subst hi; subst hj; exact (h46.columnFamily_cross_products_zero hne hz hz).2.2.2
+  · subst hi; exact (h46.columnFamily_cross_products_zero hne hz hj).2.2.1
+  · subst hj; exact (h46.columnFamily_cross_products_zero hne hi hz).2.1
+  · exact (h46.columnFamily_cross_products_zero hne hi hj).1
+
+/-- **(6.8.2) conjugate irreducible `X`-member ⊥ certain-type column** — the `χ̄`-side companion of
+`caseB_inner_irr_columnSum_eq_zero`: `⟨(Ind^L_H θ)‾, columnSum h46 χ₂⟩ = 0` for irreducible
+`Ind^L_H θ`.  Same degree argument: `(Ind θ)‾` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)` (conjugation
+fixes the degree, a real value), while grid degrees are `≡ ±1`, so `(Ind θ)‾` is distinct from every
+`μ_{ij}` and the inner product vanishes.  This supplies the `χ̄ ⊥ S₁` (`hχbar_S1`) input when the
+irreducible pair `{Ind θ, (Ind θ)‾}` is adjoined onto the column base in the case-(B) `X`-fold. -/
+theorem caseB_inner_irr_conj_columnSum_eq_zero
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = 0 := by
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, inner_sum_right]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  have hne : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      ≠ ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) := by
+    intro heq
+    obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
+    obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hindeg : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj (1 : ↥L)
+        = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+      rw [ClassFunction.conj_apply, ClassFunction.induce_apply_one, hd, hyp.index_H_eq_card_W1]
+      simp [mul_comm]
+    rw [← heq, hindeg] at ha
+    have hcard : (Nat.card h46.W1 : ℂ) = (Nat.card hyp.W1 : ℂ) := by rw [hW1]
+    rw [hcard] at ha
+    have hw1 : Nat.card hyp.W1 ≠ 1 := fun h => hyp.W1_nontrivial (Subgroup.card_eq_one.mp h)
+    have hsign : ((h46.columnFamily χ₂).sign : ℂ)
+        = (Nat.card hyp.W1 : ℂ) * ((d : ℂ) - (a : ℂ)) := by linear_combination -ha
+    have hsignZ : (h46.columnFamily χ₂).sign = (Nat.card hyp.W1 : ℤ) * ((d : ℤ) - a) := by
+      exact_mod_cast hsign
+    have hdvd1 : (Nat.card hyp.W1 : ℤ) ∣ 1 := by
+      have hdvd : (Nat.card hyp.W1 : ℤ) ∣ (h46.columnFamily χ₂).sign := ⟨(d : ℤ) - a, hsignZ⟩
+      rcases (h46.columnFamily χ₂).sign_eq with hs | hs
+      · rwa [hs] at hdvd
+      · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
+    exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
+  have hkron := irreducibleCharacter_inner_eq_ite
+    (⟨(ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj, hirr.conj⟩ : IrreducibleCharacter ↥L)
+    ((h46.columnFamily χ₂).mu i)
+  rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at hkron
+  simpa using hkron
+
+/-- **(6.8.2) irreducible `X`-member ⊥ a certain-type column base** — the `χ`/`χ̄ ⊥ S₁` inputs
+(`hχ_S1`/`hχbar_S1`) of the case-(B) `X`-fold per-step, for the part of the prefix `S₁` consisting of
+certain-type columns.  Given that every member of `S₀` is a non-trivial column `columnSum h46 χ₂`,
+the irreducible `Ind^L_H θ` and its conjugate are orthogonal to all of `S₀`, by
+`caseB_inner_irr_columnSum_eq_zero` / `caseB_inner_irr_conj_columnSum_eq_zero`.  (The prefix's
+already-adjoined irreducible pairs are handled separately by the irreducible Kronecker delta.) -/
+theorem caseB_irr_orthogonal_columnBase
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {θ : IrreducibleCharacter ↥H}
+    (hirr : IsIrreducibleCharacter (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)))
+    {S₀ : Set (ClassFunction ↥L ℂ)}
+    (hS₀ : ∀ x ∈ S₀, ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      χ₂ ≠ 1 ∧ OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x) :
+    (∀ x ∈ S₀, ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)) x = 0) ∧
+      (∀ x ∈ S₀,
+        ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj x = 0) := by
+  refine ⟨fun x hx => ?_, fun x hx => ?_⟩
+  · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
+    exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hirr χ₂
+  · obtain ⟨χ₂, -, rfl⟩ := hS₀ x hx
+    exact caseB_inner_irr_conj_columnSum_eq_zero hyp h46 hW1 hirr χ₂
+
+/-- **(6.8.2) `S`-member dichotomy: column or irreducible** — the `S`-level cover lifting the per-`θ`
+`caseB_induce_column_or_irreducible` over `S = {Ind^L_H θ | θ ≠ 1}`.  Every member of the Sibley set
+`S` is either a non-trivial certain-type column `columnSum h46 χ₂` or an irreducible character.
+
+This is the cover used to assemble the case-(B) `X = 𝒳(W₂)`-coherence (`X ⊆ S`): every `X`-member
+splits into the certain-type column part (coherent as a set) or the irreducible part (adjoined as a
+`{χ, χ̄}` pair).  It also feeds the `X ⊥ Y` orthogonality `hpair` of the `X ∪ Y` glue (a column is
+`⊥ Y` by `inner_columnSum_Yset_eq_zero`; an irreducible `X`-member is `⊥ Y` by degree/distinctness). -/
+theorem caseB_S_member_column_or_irreducible
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {x : ClassFunction ↥L ℂ} (hx : x ∈ hyp.S) :
+    (∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+        OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x)
+      ∨ IsIrreducibleCharacter x := by
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hx
+  obtain ⟨θ, hθne, rfl⟩ := hx
+  have hθne' : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H := fun heq =>
+    hθne (Subtype.ext (heq.trans (IrreducibleCharacter.coe_trivialIrreducibleCharacter).symm))
+  exact caseB_induce_column_or_irreducible h46 hHK hθne'
+
+/-- **(6.8.2) `X(W₂) ⊥ Y`** — the `hpair` orthogonality input of the case-(B) `X ∪ Y` glue
+(`coherentXunionYset_caseB_of_glued`).  Every `X`-member is orthogonal to every `Y`-member: by the
+`S`-level cover (`caseB_S_member_column_or_irreducible`) an `X`-member is either a certain-type column
+(`⊥ Y` by `inner_columnSum_Yset_eq_zero`) or an irreducible distinct from the `Y`-member (`⊥ Y` by
+`inner_irr_Yset_eq_zero`); the distinctness is the disjointness `X(W₂) ∩ Y = ∅` (`Y = S(⁅H,H⁆) ⊆
+S(W₂)` since `W₂ ⊆ ⁅H,H⁆`, antitone, and `X(W₂)` is disjoint from `S(W₂)`). -/
+theorem caseB_Xset_orthogonal_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
+    ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0 := by
+  have hdisj : Disjoint (hyp.Xset W2) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration W2 :=
+      hyp.SsubFiltration_antitone hW2comm
+    exact Set.disjoint_of_subset_right hYsub (hyp.disjoint_Xset_SsubFiltration (Z := W2))
+  intro x hx y hy
+  rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hx) with
+    ⟨χ₂, -, rfl⟩ | hirr
+  · exact inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂
+  · exact inner_irr_Yset_eq_zero hyp hirr hy (fun heq => Set.disjoint_left.mp hdisj hx (heq.symm ▸ hy))
+
 end OddOrder.Peterfalvi.S08
