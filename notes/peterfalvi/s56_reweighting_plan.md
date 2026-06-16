@@ -369,3 +369,28 @@ hbreak=X-sum 経由) → S coherent → sole sorry の case-B 枝。**+ case-A �
 (~200-400 LOC、heterogeneous 組立、deep math gap 無しだが大きい) + (6.8.3) wiring + case-A。**large focused assembly**
 (60s loop の小刻みより腰を据えた multi-session 向き、但し全ツール在庫で unblocked)。**正本=本 cont.⁴²。fold shell landed、
 次=per-step hstep monolith (subagent 候補) または (6.8.3) break wiring を先に。**
+
+## cont.⁴³ (2026-06-16 loop): cX assembly の完全 RECON — enumeration ツール確定 + 残務 milestone 確定
+cX (= `IsCoherent hyp.tau (Xset W2)`) の全構成要素を確定。**基盤・構造ピースは全完了**、残 = **cX assembly 本体 (large focused)**:
+
+**X-enumeration ツール = `exists_conjugatePairCover_general`** (`S08CP1:816`、`exists_conjugatePairCover` (:673) と違い
+`hXirr` 不要)。pairs は非-S₀ member から構成 ⟹ **S₀=certainTypeSet (columns) なら pairs=非-column=既約 X-members**
+(`caseB_S_member_column_or_irreducible` :1949 で保証)。⟹ X = Xset W2、S₀ = certainTypeSet で適用 → conjugate-pair cover。
+⚠ **要件 4 性質が未証明** (grep 確認、case-B cX 未着手の証左): `Xset W2` の Finite / `ClosedUnderConjugate` /
+`HasNoRealCharacters`、`certainTypeSet` の `ClosedUnderConjugate`。これらの証明 (~50-100 LOC) が enumeration の前段。
+
+**🔭 残 cX assembly = 1 個の大きな def** (xChainCoherentW を核に、~300-550 LOC):
+1. **Xset/certainTypeSet 構造性質** (finite/conj/no-real、~50-100 LOC) — 未証明、enumeration 前提。
+2. **X-enumeration** (`exists_conjugatePairCover_general` → pair/N/χs、非-column=既約で χs 抽出、~50 LOC)。
+3. **hstep monolith** (per-step `XAdjoinStepInputW`、heterogeneous member: column→`certainTypeMemberDecomposition`+
+   今回 hortho lemma、irr→`memberExtensionDecomposition`+`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`、
+   mc/deg/hSgen/hgen/break facts、~200-400 LOC、case-A hstepData 相当の最難核)。
+4. **wiring** (`xChainCoherentW` enumeration+base+hstep → cX、bounded)。
+その後: cX → glue (`coherentXunionYset_caseB_of_glued`) + (6.8.3) `false_of_caseB_break_of_bounds` (S₁=X∪Y、
+X-sum→hbreak) → S coherent → sole sorry case-B 枝。**+ case-A 枝 (cX 既存 `Xset_commutator_…_of_frobenius`、wiring) + dispatch**。
+
+**📊 milestone**: 本セッション 8 Lean commit で **case-B (6.8.3) の基盤・構造ピース全完了**
+(engine 一般化 / Dmem τ'化 / (B) reconciliation / hortho_mem / xChainCoherentW fold)。残 = cX assembly 本体
+(~300-550 LOC、enumeration 前提性質 + hstep monolith + wiring) + (6.8.3)/glue/case-A wiring。**deep math gap は無い**
+(全ツール在庫) が **large focused assembly** — 60s loop 小刻みより dedicated 多セッション or Workflow 向き。
+**正本=本 cont.⁴³。enumeration=`exists_conjugatePairCover_general`、残=cX assembly 本体 (構造性質→hstep monolith→wiring)。**
