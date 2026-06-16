@@ -2722,6 +2722,84 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_inputs [Finite G] {M Q : Subg
   refine le_antisymm (fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore hQ) (sup_le ?_ hcent)
   rw [hQ]; exact OddOrder.BG.Ch2.S08.opiCoreInG_singleton_le_fittingInG M
 
+/-- **Central-extension nilpotency** (`§14`-independent, reusable): a subgroup `H ≤ K` that
+centralizes a normal subgroup `Q ◁ K` is nilpotent whenever the quotient `K/Q` is nilpotent.
+`H ∩ Q` lies in the centre of `H` (since `H` centralizes `Q`), and `H/(H ∩ Q)` embeds in the
+nilpotent `K/Q`, so `H` is a central extension of a nilpotent group, hence nilpotent
+(`isNilpotent_of_ker_le_center` applied to `H → K/Q`).
+
+This is the crux of Theorem 15.2(g)'s reverse inclusion: with `K = M_σ`, `Q = O_q(M)`, and
+`H = C_M(Q) ⊆ M_σ`, it shows `C_M(Q)` is nilpotent, hence (being normal in `M`) lands in `F(M)`. -/
+theorem isNilpotent_of_centralizes_normal_of_quotient_isNilpotent {Q K H : Subgroup G}
+    [(Q.subgroupOf K).Normal] [Group.IsNilpotent (↥K ⧸ Q.subgroupOf K)]
+    (hHK : H ≤ K) (hHQ : H ≤ Subgroup.centralizer (Q : Set G)) :
+    Group.IsNilpotent ↥H := by
+  refine isNilpotent_of_ker_le_center
+    ((QuotientGroup.mk' (Q.subgroupOf K)).comp (Subgroup.inclusion hHK)) ?_
+  intro x hx
+  simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+    QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf, Subgroup.coe_inclusion] at hx
+  rw [Subgroup.mem_center_iff]
+  intro y
+  apply Subtype.ext
+  rw [Subgroup.coe_mul, Subgroup.coe_mul]
+  exact (Subgroup.mem_centralizer_iff.mp (hHQ y.2) _ hx).symm
+
+/-- **Theorem 15.2(g) reverse inclusion, reduced to `C_M(Q) ⊆ M_σ`** (mmd L4196-4198): if the
+centralizer `C_M(Q)` of the normal `q`-subgroup `Q` lies in `M_σ` (the genuinely BG-specific input,
+from `σ`-uniqueness — it does *not* follow from local structure, cf. the ChatGPT-verified counter-
+example `M = (C₇⋊C₃)×(C₃₁⋊C₅)`), then `C_M(Q) ⊆ F(M)`.  `C_M(Q)` is nilpotent
+(`isNilpotent_of_centralizes_normal_of_quotient_isNilpotent`: it centralizes `Q ◁ M_σ` and
+`M_σ/Q` is nilpotent) and normal in `M` (`M ≤ N_G(Q) ≤ N_G(C_G(Q))`), so a nilpotent normal
+subgroup of `M` lands in `F(M)` (`nilpotent_normal_le_fitting`).  Discharges the `hcent` input of
+`fittingInAmbient_eq_sup_centralizer_inf_of_inputs`. -/
+theorem centralizer_inf_le_fittingInAmbient_of_le_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal]
+    [Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
+    (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
+    Subgroup.centralizer (Q : Set G) ⊓ M ≤ fittingInAmbient M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `C_M(Q)` is nilpotent (central extension over the nilpotent `M_σ/Q`).
+  haveI : Group.IsNilpotent ↥(Subgroup.centralizer (Q : Set G) ⊓ M) :=
+    isNilpotent_of_centralizes_normal_of_quotient_isNilpotent hCle inf_le_left
+  -- `C_M(Q) ◁ M` (`M` normalizes `Q`, hence `C_G(Q)`, hence `C_G(Q) ⊓ M`).
+  have hMnormC : M ≤ Subgroup.normalizer
+      ((Subgroup.centralizer (Q : Set G) ⊓ M : Subgroup G) : Set G) :=
+    le_normalizer_inf (hMnormQ.trans (normalizer_le_normalizer_centralizer Q)) Subgroup.le_normalizer
+  haveI : ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr hMnormC
+  haveI : Group.IsNilpotent ↥((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (inf_le_right :
+      Subgroup.centralizer (Q : Set G) ⊓ M ≤ M)).symm
+  -- Nilpotent normal subgroup of `M` lands in `F(M)`.
+  calc Subgroup.centralizer (Q : Set G) ⊓ M
+      = ((Subgroup.centralizer (Q : Set G) ⊓ M).subgroupOf M).map M.subtype :=
+        (Subgroup.map_subgroupOf_eq_of_le inf_le_right).symm
+    _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
+        Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+    _ = fittingInAmbient M := rfl
+
+/-- **BG Theorem 15.2(g), assembled from the single `σ`-gap `C_M(Q) ⊆ M_σ`** (mmd L4196-4198):
+chains the equality skeleton (`fittingInAmbient_eq_sup_centralizer_inf_of_inputs`) with the reduced
+reverse inclusion (`centralizer_inf_le_fittingInAmbient_of_le_Msigma`).  For `Q = O_q(M)` with
+`M_σ/Q` nilpotent, the conjunct `F(M) = Q ⊔ (C_G(Q) ⊓ M)` follows from `C_M(Q) ⊆ M_σ` alone.  This
+is the wrapper-facing form: the only outstanding input is the BG-specific `C_M(Q) ⊆ M_σ` (a
+`σ`-uniqueness fact to be supplied from the global analysis / forward input). -/
+theorem fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hM : M ∈ maximalSubgroups G) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal]
+    [Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
+    (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
+    fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) :=
+  fittingInAmbient_eq_sup_centralizer_inf_of_inputs hQ
+    (centralizer_inf_le_fittingInAmbient_of_le_Msigma hG hM hMnormQ hCle)
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
