@@ -4779,6 +4779,13 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_full
 
+/-! **BG 14.7, two family members nonconjugate** (`S14_TypePCounting`,
+`neighbor_pair_nonconjugate`, mmd L4015): distinct type-`P` maximals `N₁ ≠ N₂` with their swaps are
+nonconjugate — Proposition 14.2(c) (swap factors meet trivially) + `typeP_family_nonconjugate`.
+The per-pair input to the family's pairwise nonconjugacy.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.neighbor_pair_nonconjugate
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`
