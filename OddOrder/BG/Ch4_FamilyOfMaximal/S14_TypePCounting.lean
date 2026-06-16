@@ -5504,6 +5504,18 @@ theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimple
         (Nat.mem_primeFactors.mpr ⟨hr, hr₂, Nat.card_pos.ne'⟩))
   exact le_bot_iff.mp (le_trans (inf_le_inf inf_le_right inf_le_right) (le_of_eq hMσdisj))
 
+/-- **BG 14.7, the type-`P` family as a `Finset`** (mmd L4003): `{N | IsZFamilyMember M K N}`
+collected as a `Finset` (finite since `Subgroup G` is finite). -/
+noncomputable def ZFamilyFinset [Finite G] (M K : Subgroup G) : Finset (Subgroup G) :=
+  (Set.toFinite {N | IsZFamilyMember M K N}).toFinset
+
+theorem mem_ZFamilyFinset [Finite G] {M K N : Subgroup G} :
+    N ∈ ZFamilyFinset M K ↔ IsZFamilyMember M K N :=
+  Set.Finite.mem_toFinset _
+
+theorem ZFamilyFinset_nonempty [Finite G] {M K : Subgroup G} : (ZFamilyFinset M K).Nonempty :=
+  ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl)⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
