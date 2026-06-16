@@ -1335,3 +1335,29 @@ line X∈ℰ_p¹(K) (Cauchy in K) → partner N (`exists_typeP_partner`) → X�
 
 **本 loop⁷ 累計 14 定理** (swap 7 + density/tools 5 + per-neighbor package 1 + coverage 1)、全 S14 内 sorry-free +
 axiom-clean + AxiomsCheck。**14.7 の building block は全て landing**、残りは family Finset の組立統合のみ。
+
+### ✅ pairwise nonconjugate + integration helpers (2026-06-17 loop⁷ cont.⁴) — 18 定理目
+
+**✅ `typeP_family_nonconjugate`** (mmd L4015、族 M_i は pairwise nonconjugate ⟹ 14.5(b) disjoint):
+conjugate なら σ(M₁)=σ(M₂)、Z₁,Z₂ は Z の disjoint normal τ-Halls、z₁z₂∣z=k₁z₁ ⟹ z₂∣k₁ (τ-number ∣
+τ'-number) ⟹ Z₂=⊥ 矛盾。helper: `card_sup_of_commute_of_disjoint` (|H⊔K|=|H||K|, noncommCoprod) +
+`commute_of_le_normalizer_of_disjoint` (A,B⊴Z, ⊓=⊥ ⟹ commute via [x,y]∈A⊓B) + `sup_le_normalizer_inf_of_commute`
+(因子 normality)。
+
+**🔑 整理 (density 論法の精査で判明)**:
+- **n=1 collapse は z=∏ 不要**: |K_i| 素数 + K_i⊴Z (σ(M_i)'-Hall) + K_j*≤K_i (σ(M_i)'-subgroup が normal
+  Hall に入る、π'-subgroup→π-quotient trivial) + coprime ⟹ 高々1つの j≠i ⟹ n=1。(card_iSup は off-path)
+- **coverage (⊔K_i*=Z) も density に不要**: |T|=z+n−Σk_i* は pairwise ⊓=⊥ + ⋃⊆Z のみ (⊔=Z 不要)。
+  covering 結論 (∀ type-P H ~ M or Mstar) は half_lt (>½|G|) の交差論法で、prime-coverage 不要。
+
+**▶ 残り = typeP_duality の最終統合 (大きい、intricate)**:
+1. **族 ℱ Finset** = {M}∪{distinct neighbors}; 各 N で swap (exists_neighbor_kappaHall_swap) + K_N*=Z⊓Msigma N
+   + K_N*⊴Z; pairwise nonconjugate (typeP_family_nonconjugate)。M は i=0 (K_M*=Kstar, canonical bridge)。
+2. **T=Z−⋃K_i* TI + N_G(T)=Z** (Prop14.2(d) + 14.6 で T∩M̃_i=∅) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)|。
+3. **density 不等式** (`ncard_sdiff_biUnion_subgroup` |T| + swap z=k_i k_i* + 14.5(c) + 14.5(b) disjoint +
+   14.6 で 𝒞_G(T)⊥𝒞_G(M̃_i)) → 全 P1 矛盾 → ∃ P2。
+4. **n=1 collapse** (normality + K_j*≤K_i + coprime) → Mstar。
+5. **covering** (half_lt 交差) + **part(h)** (Prop14.2(a) + K cyclic)。
+
+**本 loop⁷ 累計 18 定理**、全 S14 内 sorry-free + axiom-clean + AxiomsCheck。typeP_duality の building block +
+integration helper は全て landing、残りは族 Finset 上の counting 統合 (最終 endgame、~200行)。
