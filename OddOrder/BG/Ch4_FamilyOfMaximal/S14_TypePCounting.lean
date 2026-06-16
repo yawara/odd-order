@@ -5341,6 +5341,76 @@ theorem neighbor_pair_nonconjugate [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   typeP_family_nonconjugate hK₁N₁ hK₁ hsw₁ hsw₂ hne₂
     (typeP_neighbor_Kstar_inf_eq_bot hG hN₁ hP₁ hK₁N₁ hK₁ hN₂ hP₂ hK₂N₂ hK₂ hne)
 
+/-- **BG 14.7, the base member `M` (`i = 0`)** (mmd L4003, "let `M₀ = M`"): `M`'s own data in the
+same canonical shape the family uses.  `K_M* = Z ⊓ M_σ(M)` equals `K* = Kstar`, the swap
+`Z = K ⊔ K_M*` is trivial, `K_M* ◁ Z`, and `K_M* ≠ ⊥` (since `Kstar ≠ ⊥`).  Aligns `M` with the
+neighbours (`exists_neighbor_full`) so the family `{M} ∪ {neighbours}` has uniform per-member data. -/
+theorem typeP_self_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar ∧
+    K ⊔ Kstar = K ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ∧
+    K ⊔ Kstar ≤ Subgroup.normalizer
+      (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+    (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := by
+  have hcanon : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M :=
+    typeP_neighbor_Kstar_eq_Z_inf_Msigma hKM hK (by rw [hKstar])
+  have hKstarEq : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := hcanon.symm.trans hKstar.symm
+  refine ⟨hKstarEq, by rw [hKstarEq], ?_, ?_⟩
+  · rw [hKstarEq, hKstar]
+    exact (sup_le_normalizer_inf_of_commute inf_le_right).trans inf_le_right
+  · rw [hKstarEq]; exact (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+
+/-- **A subgroup of order coprime to a normal subgroup's index lies inside it** (BG 14.7 `n = 1`
+collapse, mmd L4043): if `N ◁ G` and `|H|` is coprime to `[G : N]`, then `H ≤ N`.  (The image of
+`H` in `G/N` has order dividing both `|H|` and `[G : N]`, hence `1`, so `H ≤ ker = N`.)  In the
+collapse, applied with `N = Kᵢ` (the normal `σ(Mᵢ)'`-Hall of `Z`, `[Z : Kᵢ] = kᵢ*` a `σ(Mᵢ)`-number)
+and `H = Kⱼ*` (a `σ(Mᵢ)'`-group), it gives `Kⱼ* ≤ Kᵢ`; with `|Kᵢ|` prime this forces `Kⱼ* = Kᵢ`. -/
+theorem le_of_coprime_index {N H : Subgroup G} [N.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) N.index) : H ≤ N := by
+  have hd1 : Nat.card ↥(H.map (QuotientGroup.mk' N)) ∣ Nat.card ↥H :=
+    Subgroup.card_map_dvd H (QuotientGroup.mk' N)
+  have hd2 : Nat.card ↥(H.map (QuotientGroup.mk' N)) ∣ N.index :=
+    Subgroup.card_subgroup_dvd_card _
+  have hcard1 : Nat.card ↥(H.map (QuotientGroup.mk' N)) = 1 :=
+    Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2)
+  have hbot : H.map (QuotientGroup.mk' N) = ⊥ := Subgroup.eq_bot_of_card_eq _ hcard1
+  rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
+
+/-- **BG 14.7, unified per-neighbour data** (mmd L3997-4015): the single per-member source for the
+family, exposing the **raw** swap factor `K_N* = M_σ(N) ⊓ C(K_N)` (for pairwise nonconjugacy and the
+`z = k_N·k_N*` card) together with the **canonical identity** `K_N* = Z ⊓ M_σ(N)` (for the family's
+`Kᵢ*`), plus `N` type-`P` and `K_N* ≠ ⊥`.  Resolves the raw/canonical form tension at the source. -/
+theorem exists_neighbor_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+        = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ∧
+      IsTypeP N ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G) ≠ ⊥ := by
+  obtain ⟨KN, hKNN, hKN, hswap, hcanon⟩ :=
+    exists_neighbor_kappaHall_swap hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  obtain ⟨_, _, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr Finite.one_lt_card
+  have hXcanon : X ≤ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    le_inf (hXK.trans le_sup_left) hXNσ
+  exact ⟨KN, hKNN, hKN, hswap, hcanon, ⟨q, hκ q hq⟩, fun hbot =>
+    ne_bot_of_mem_elemAbelianOfRank_one hX (le_bot_iff.mp (hbot ▸ hcanon.symm ▸ hXcanon))⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
