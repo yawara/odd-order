@@ -137,6 +137,97 @@ theorem characterPsiDecomposition_X_mem_ZIrr
     rw [Int.cast_smul_eq_zsmul ℂ (D.coeff α) α]
     exact Submodule.smul_mem _ (D.coeff α) (D.imageFamily.mem_ZIrr α hα))
 
+/-- **The cross-column isometry `hXinner` follows from the anchored image `hXanchored`** (no separate
+Y-pinning argument needed).  Writing `Xⱼ = τ(μⱼ − a₀·η₁) + a₀·ν₁` (`ν₁ = η₁^{τ₁}`, from the
+`(6.8.2.3)` anchored image), the Dade isometry of `τ` on the `H^#`-supported `μⱼ − a₀·η₁` plus
+`Xⱼ ⊥ ν₁` (`hmix`), `column ⊥ Y`, and `‖η₁‖² = ‖ν₁‖² = 1` give
+`⟨Xⱼ, Xₗ⟩ = ⟨μⱼ − a₀η₁, μₗ − a₀η₁⟩ + a₀² − a₀² − a₀² + a₀² = ⟨μⱼ, μₗ⟩`.
+
+This is the key simplification of the case-(B) discharge: it reduces the two hard-core obligations
+(`hXanchored`, `hXinner`) of `coherentCertainTypeSet_union_Yset_via_anchoredImages` to the single
+`hXanchored` (the `(6.8.2.2)` aggregate `Y`-pinning); `hXinner` is then *derived*. -/
+theorem xchi_inner_eq_of_anchored
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) {a₀ : ℕ}
+    {Xj Xl : ClassFunction G ℂ}
+    {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (hanc : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+      = Xj - a₀ • hyp.coherentYset.extension η₁)
+    (hanc' : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)
+      = Xl - a₀ • hyp.coherentYset.extension η₁)
+    (hmix : ClassFunction.inner Xj (hyp.coherentYset.extension η₁) = 0)
+    (hmix' : ClassFunction.inner Xl (hyp.coherentYset.extension η₁) = 0)
+    (hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hsupp' : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    ClassFunction.inner Xj Xl
+      = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') := by
+  classical
+  set ν := hyp.coherentYset.extension η₁ with hνdef
+  -- `Xⱼ = τ(μⱼ − a₀η₁) + a₀·ν` (rearranged anchored image), in `ℂ`-smul form.
+  have hXj : Xj = hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁) + (a₀ : ℂ) • ν := by
+    rw [hanc, ← Nat.cast_smul_eq_nsmul ℂ a₀ ν]; abel
+  have hXl : Xl = hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁) + (a₀ : ℂ) • ν := by
+    rw [hanc', ← Nat.cast_smul_eq_nsmul ℂ a₀ ν]; abel
+  -- norm/orthogonality scalar facts.
+  have hηirr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηη : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hνν : ClassFunction.inner ν ν = 1 := by
+    rw [hνdef, hyp.coherentYset.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
+      (Submodule.subset_span hη₁), hηη]
+  have hcolj : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) η₁ = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂
+  have hcoll : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') η₁ = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂'
+  -- `⟨τⱼ, τₗ⟩ = ⟨μⱼ, μₗ⟩ + a₀²` (Dade isometry + the `H^#`-supported difference expansion).
+  have hττ : ClassFunction.inner
+        (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁))
+        (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁))
+      = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') + (a₀ : ℂ) ^ 2 := by
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+        (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁,
+          OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁} : Set (ClassFunction ↥L ℂ)))
+        (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+            rcases hs with rfl | rfl; exacts [hsupp, hsupp'])
+        (Submodule.subset_span (Set.mem_insert _ _))
+        (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))]
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,
+      ClassFunction.inner_sub_right, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+    rw [hcolj, hηη, OddOrder.RepresentationTheory.inner_conj_symm
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') η₁, hcoll, star_zero]
+    ring
+  -- the cross-terms `⟨τⱼ, ν⟩ = ⟨ν, τₗ⟩ = −a₀`.
+  have hτjν : ClassFunction.inner
+      (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)) ν = -(a₀ : ℂ) := by
+    rw [hanc]
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ ν, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left, star_natCast]
+    rw [hmix, hνν]; ring
+  have hτlν : ClassFunction.inner
+      (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)) ν = -(a₀ : ℂ) := by
+    rw [hanc']
+    simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ ν, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left, star_natCast]
+    rw [hmix', hνν]; ring
+  have hντl : ClassFunction.inner ν
+      (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)) = -(a₀ : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hτlν, star_neg, star_natCast]
+  -- assemble: `⟨Xⱼ, Xₗ⟩ = ⟨τⱼ,τₗ⟩ + a₀⟨τⱼ,ν⟩ + a₀⟨ν,τₗ⟩ + a₀²⟨ν,ν⟩`.
+  rw [hXj, hXl]
+  simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+  rw [hττ, hτjν, hντl, hνν]; ring
+
 /-- **The textbook case-(B) `X`-coherence on the certain-type columns** (Peterfalvi (6.8.2),
 `X_χ`-route).  The Sibley–Dade map `hyp.tau` is coherent on `certainTypeSet h46 k` with the extension
 `ν = xChiExtension h46 Ximg` sending each column `μ_j = columnSum χ₂` to its `(6.8.2.3)` projection
