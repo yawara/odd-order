@@ -3675,6 +3675,66 @@ hXaggorth/hdecomp((6.8.2.2) aggregate)の wiring + 新規 X=cTE identity が pin
 - ⟹ **hard core は projection-coeff pinning と同一**: D.X=∑_{α∈R}coeff(α)·α で `coeff(false,i)=1 ∀i ∧ coeff(true,i)=0 ∀i`
   を示すこと(R=`certainTypeR.imageSet`={δ_j ω_{ij}^σ}∪{−δ_j ω_{ij'}^σ}、2w₁ 個; cTEμ=∑_i certainTypeRImage(false,i))。
 
-**▶▶ 次 = pinning 本体**: per-φ 経路 (`caseB_per_phi_anchored_fromYset` + `per_constituent_Y_eq_smul`、aggregate
-(6.8.2.2) `exists_decomposition_caseB` 経由で D.Y=a·ν₁ を強制 → coeff 計算で D.X=cTEμ) が最有力。
-multi-hundred LOC・dedicated focused build。loop/end-of-session 不適。**正本=本 session 47。**
+**🔑 {0,1}-pinning は既存 (5.4.b `norm_eq_and_X_eq_sum_of_norm_Y_ge`, S07:1469) — crux を「E=false-half」に精密化**:
+S07_Coherence に既に rich な (5.4)-(5.6) 理論がある(3 回目 grep で確認、重複回避):
+- `inner_self_chi_eq_sum_coeff` (S07:1356) = `‖χ‖² = ∑_{α∈R}coeff(α)` (= free fact 2)。
+- `inner_self_chi_re_le_inner_self_X` (S07:1382) = (5.4.a) `‖χ‖²≤‖X‖²` (整数 Cauchy-Schwarz `finset_sum_le_sum_sq`)。
+- **`norm_eq_and_X_eq_sum_of_norm_Y_ge` (S07:1469) = (5.4.b)**: `‖ψ‖²≤‖Y‖²` ⟹ `‖X‖²=‖χ‖²` ∧
+  **`∃ E ⊆ R(χ), X = ∑_{α∈E}α ∧ |E|=‖χ‖²`**。これがまさに私の {0,1}+count 知見(E={coeff=1}、整数核 `finset_sum_eq_sum_sq_iff` ZIrrFourier:313)。
+  ⟹ **整数論法を再実装するな**。`‖ψ‖²≤‖Y‖²` は (5.6.2) `inner_self_Y_re_le_inner_self_psi` の逆向きで、
+  column では `ψ=a·η₁`, `‖ψ‖²=a²`, `‖Y‖²=a²` (Y-pinning) ⟹ 等号 ⟹ 5.4.b 適用可。
+
+⟹ **crux の真の残務 = `E = {certainTypeRImage(false,i) | i}`** (= false-half、= cTEμ)。5.4.b は「ある E」しか与えず、
+**E が共役列 σ-image (true-half {−δ_j ω_{ij'}^σ}) を含まないこと = coeff(true,i)=0 ∀i** が deep gap。
+= 単一スカラー `⟨τ(μ_j−a·η₁), certainTypeExtension(μ̄_j)⟩ = 0` (cTEμ̄ = −true-half-sum)。
+これは「τ(μ_j−a·η₁) が共役列の σ-image 成分を持たない」= 教科書 (6.8.2.3)/(4.9) の σ-isometry 構造そのもの。
+
+**✅ landed (session 47, `7e961346`, axiom-clean): `certainTypeExtension_columnSum_eq_falseHalf_sum`**
+= 構造的橋渡し `cTEμ = ∑_i certainTypeRImage χ₂ χ₂⁻¹ (false,i)`(cTEμ = R-族の false-half-sum)。
+= 5.4.b の結論 `X=∑_{α∈E}α` を cTEμ に同定する最終ステップの非自明部分(両辺 δ_j•∑ω_{ij}^σ)。非重複(grep 確認)。
+
+**▶▶ 次 = 単一スカラー `T = ⟨τ(μ_j−a·η₁), cTEμ̄⟩ = 0` の discharge**(これが残る唯一の deep content)。
+これは σ-isometry の restriction 構造(`certainTypeOmegaSigma`/§5 σ map の Res_L、`inner_tau_eq_inner_restrict`
+経由 `⟨μ_j−a·η₁, Res_L(ω_{ij'}^σ)⟩=0`)を要する **§5/§6 σ-subsystem の focused dive**(multi-hundred LOC、loop 不適)。
+**T=0 の素材ポインタ(session 47 調査)**: §6 (4.3) restriction 機構 = `certainType_apply_eq_of_mem_V`
+(S06_CertainTypeCharacters:878、`μ_{ij}(v)=δ_j·ω_{ij}(v)` on V⊆W−W₂)/ `inner_omegaColumnDiff_restrict_eq_zero`
+(:895)/ `certainType_vanishes_of_ne`(:919); seam 直交性 = `inner_coherentYset_extension_certainTypeOmegaSigma_eq_zero`
+(S08CBC2:1303、ν₁⊥σ-image)/ `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`(:1246)/
+`columnDecompositionTau_X_orthogonal`(S08CBA:1227、⟨D.X,ν₁⟩=0)/ `certainTypeR_imageSet_orthogonal_dadeOfDiff`
+(S08CBHortho:44)。Dade reciprocity = `inner_tau_eq_inner_restrict`(S08CBCorePart2:48)。これらを組み合わせて
+`⟨τ(μ_j−a·η₁), ω_{ij'}^σ⟩=0`(自列 anchored 像が共役列 σ-image 成分なし)を出すのが T=0 の本体。
+**T=0 さえ出れば残りは機械的**: per-φ 経路で `τ(μ_j−a·η₁)=X−a·ν₁`(Y-pinning は engine 内済) → 5.4.b で
+X=∑_{α∈E}α (|E|=‖μ_j‖²=w₁=`columnFamily_mu_sum_inner`) → T=0 で E⊆false-half、|false-half|=w₁ ⟹ E=false-half
+(`Finset.eq_of_subset_of_card_le`) → `certainTypeExtension_columnSum_eq_falseHalf_sum` で X=cTEμ → hanchored。
+**正本=本 session 47。** T=0 が次セッションの単一の山。
+
+### session 48: 🚨🚨 重大発見 — hanchored (X=cTE) は cTE-glue 固有の **over-constraint** で、教科書が証明しない自列/共役列の relabeling 曖昧性に抵触(T=0 が multi-session 詰まる根本原因を特定)
+
+session 47 の「T=0 が次の単一の山」を**精査して訂正**。Lean commit なし(architecture-level の RECON、要ユーザー判断)。endpoint A 継続だが frontier の **正しさ自体**に疑義。
+
+**🔬 確定事実1: T=0 ⟺ hanchored ⟺ `D.X = cTEμ`(self 枝固定)。**
+`coherentCertainTypeSet_union_Yset` は §7 engine `coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` を呼ぶ。その `hagreeX: ν = hX.extension = cTE on X` が **ν を cTE に固定**し、`hDτ: ν d = τ d`(d=μ_{k0}−a₀η₁)が `extends_on_supported` で必須。⟹ `hDτ ⟺ cTEμ − a₀ν₁ = τ(μ−a₀η₁) = D.X − a₀ν₁ ⟺ D.X = cTEμ`。これが hanchored の正体。
+
+**🔬 確定事実2: `D.X = cTEμ` は等長性から導けない(3 通りの独立計算で証明)。**
+- `⟨τ(μ−aη), τ(μ−μ̄)⟩ = ⟨μ−aη, μ−μ̄⟩ = w₁`(等長)。LHS を展開 ⟹ `#(false∩E) − T = w₁`、ただし T=`⟨τ(μ−aη),cTEμ̄⟩`。これは `|E|=w₁`(既知)の再導出に終わる(`#(false∩E)+#(true∩E)=|E|=w₁` と T=−#(true∩E) で恒等)。
+- `⟨τ(μ−aη), τ(μ̄−aη)⟩ = a²`(等長)⟹ `⟨D.X, D.X̄⟩ = 0`(X₁⊥X̄₁)。だが indicator 計算で `[(false,i)∈E][(true,i)∈Ē]=0 ∧ [(true,i)∈E][(false,i)∈Ē]=0` のみ ⟹ E=false-half を**強制しない**。
+- `hXmass = ⟨τ(μ−aη),cTEμ⟩` と T は `hXmass = T + w₁`(cTE(μ−μ̄)=τ(μ−μ̄) を代入)で**循環**。どちらも等長単独で出ない。
+
+**🔬 確定事実3(核心)— 明示的反例: `E=Ē=true-half` は全等長制約を満たし `X₁=−cTEμ̄ ≠ cTEμ`。**
+基底 {ω_{i,k0}^σ}∪{ω_{i,k0⁻¹}^σ}(2w₁ 正規直交)で:E=true-half ⟹ X₁=∑_i(−δ)ω_{i,k0⁻¹}^σ=−cTEμ̄。Ē=true-half ⟹ X̄₁=∑_i(−δ)ω_{i,k0}^σ。`X₁−X̄₁` の係数 = (ω_{i,k0}: δ, ω_{i,k0⁻¹}: −δ) = `cTEμ−cTEμ̄` ✅、`⟨X₁,X̄₁⟩=0` ✅、`|E|=|Ē|=w₁` ✅。⟹ **等長 + 差分制約は X₁ を {cTEμ, −cTEμ̄} の2枝で曖昧にし、−conj 枝も完全に整合的**。
+
+**🔑 確定事実4 — 教科書 (6.8.1) はこの曖昧性を明示し、case A は relabeling/第3列で解決、case B (6.8.2.3) は解決しない。**
+(6.8.1) 原文: 「Considering ((χ₁−aη₁)^τ,(χ₂−χ₁)^τ), we see that **X=χ₁^{τ₁} or X=−χ₂^{τ₂}**. If n≥3, ... X=χ₁^{τ₁} by considering (...,(χ₃−d₃χ₁)^τ). If n=2, we may assume X=χ₁^{τ₁}, **possibly on replacing χ₁^{τ₁} and χ₂^{τ₂} by −χ₂^{τ₂} and −χ₁^{τ₁}**.」← 自列/負共役列の曖昧性を**第3列 or 符号付き relabeling** で resolve。
+(6.8.2.3) 原文の証明は per-constituent b_i=a_i pinning((6.8.2.2) aggregate)→ 5.4.b で `α_i^τ=X_i−a_iY`(`X_i∈ℤ[R(χ_i)]`, `X_i⊥Y^{τ₁}`)で**終わり**。`X_i=cTEχ_i` は**一切主張しない**。続く (6.8.2) assembly は `((χ−a₀η₁)^τ, η₁^{τ₂})=(χ−a₀η₁,η₁)=−a₀` のみ要し、これは `(X_i−a₀Y, Y)=−a₀`(`X_i⊥Y`, `‖Y‖²=1`)で出る ⟹ **case B は X_i⊥Y のみで完遂、self/conj の解決不要**。
+
+**⟹ 結論: Lean の cTE-glue は教科書 case B が証明も要求もしない `X=cTEμ`(self 枝)を強制する over-constraint。**
+特定の `ofProjection` D(`D.X=proj_{R(μ)}(τ(μ−a₀η₁))`)が −conj 枝(`D.X=−cTEμ̄`)に落ちれば **hanchored は FALSE**。落ちるか否かは σ-image の H^# 上の値(深い §6 σ-machinery)依存で、等長性からは決まらない。これが T=0 が session 13–47 で hard core であり続けた**根本原因**:単一列の (6.8.2.3) では self/conj が原理的に未決で、教科書の解決(第3列 n≥3 / relabeling n=2)は**複数列/orientation の大域構造**を使う。
+
+**🧭 推奨される再アーキテクチャ(要ユーザー裁可)**:
+frontier `hanchored`(`X=cTEμ`)は**誤った target の可能性大**。教科書忠実な真の target は **`X⊥Y^{τ₁}` + `(χ−a₀η₁)^τ=X−a₀Y`**(= `caseB_per_phi_anchored_fromYset`/`per_phi_anchored_image` が**既に供給**)。
+- 案A(textbook-faithful 再配線): union coherence を cTE-glue でなく「η₁↦Y + L^# 一致」の τ₂ で組む engine に差し替え。`(X−a₀Y, Y)=−a₀` の inner-product 検証のみ要求 ⟹ T=0 不要。障害: τ₂ を IntegralCharacterMap(basis-linear, per-irreducible)として構成する必要があり、`X_i` は列単位(per-irreducible でない)ゆえ basis 構成が awkward。§7 に「per-column anchored image から union を組む」非 glue engine が無い(`retarget_isCoherent_of_supportedDecomposition` は norm-1 既約専用)。
+- 案B(orientation 解決): hanchored を `D.X = cTEμ ∨ D.X = −cTEμ̄` に弱め、(6.8.2.3)+第3列/relabeling で正しい枝を選ぶ大域論法を形式化。教科書 (6.8.1) の n≥3/n=2 論法の case-B 版が要る(教科書に明示が無いので reconstruction)。
+- 案C(σ-restriction で self 枝を証明): `⟨μ−a₀η₁, Res_L(ω_{i,k0⁻¹}^σ)⟩=0` を H^# 上の σ-image 値から直接示す。session 47 が指した §6 補題(`certainType_apply_eq_of_mem_V` 等)は **V-値専用**で H^# に届かない ⟹ 新規 (6.8.2.2) Res-machinery(`Res_Z φ=aρ_Z+b1_Z`, (6.8.2.1) η^{τ₁} は Z^# 上定数)が要る。multi-hundred LOC。**ただし反例(事実3)が示す通り、単一列では self 枝が成立する保証が無いので案C は案B の orientation 論法と本質的に同じものを要する可能性が高い**。
+
+**▶ 次セッションの推奨**: まず**案A の実現可能性**を精査(textbook-faithful union engine が §7 に組めるか/`exists_decomposition_caseB` 系が per-column X_i⊥Y で union を出せるか)。組めれば T=0 を完全に回避でき最短。組めなければ案B(orientation 大域論法、ChatGPT 相談推奨 [[feedback-ask-chatgpt-for-elided-gaps]])。**いずれにせよ session 47 の「T=0 が単一の山・出れば機械的」は楽観的すぎ — T=0 はそもそも単一列では未決(over-constrained)で、frontier の再定義が先決。**
+**正本 = 本 session 48。** session 47 までの「hanchored materialize」路線は事実3/4 により保留。

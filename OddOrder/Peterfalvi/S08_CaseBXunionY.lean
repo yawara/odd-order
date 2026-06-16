@@ -287,6 +287,34 @@ theorem exists_glue_nu_columnSum_Yset
   simp only [map_sum]
   exact Finset.sum_congr rfl fun i _ => hνgrid _ ⟨(χ₂, i), rfl⟩
 
+/-- **The certain-type extension of a column is the `false`-half sum of its `R(μ_j)` family.**
+
+`certainTypeExtension h46 (μ_j) = ∑_i certainTypeRImage h46 χ₂ χ₂⁻¹ (false, i)`, i.e. the coherent
+image `ν(μ_j) = δ_j ∑_i ω_{ij}^σ` (`certainTypeExtension_columnSum`) is exactly the sum of the
+`false`-indexed half `{δ_j ω_{ij}^σ}` of the orthonormal difference family
+`R(μ_j) = {δ_j ω_{ij}^σ} ∪ {−δ_j ω_{ij'}^σ}` (`certainTypeRImage`, with `μ̄_j = μ_{χ₂⁻¹}`); the
+`true`-half `{−δ_j ω_{ij'}^σ}` is the conjugate-column contribution `−ν(μ̄_j)`.
+
+This is the structural bridge that identifies the `(6.8.2.3)` column-image `X = ∑_{α ∈ E} α`
+(`E ⊆ R(μ_j)`, the (5.4.b) `norm_eq_and_X_eq_sum_of_norm_Y_ge` conclusion) with `ν(μ_j)`: once the
+pinning shows `E` is the `false`-half, `X = ∑_{α ∈ false-half} α = certainTypeExtension(μ_j)`.
+Both sides are `δ_j • ∑_i ω_{ij}^σ`, matched after the `ℤ`/`ℂ`-scalar reconciliation
+(`Int.cast_smul_eq_zsmul`). -/
+theorem certainTypeExtension_columnSum_eq_falseHalf_sum
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    OddOrder.Peterfalvi.S06.certainTypeExtension h46 (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      = ∑ i, OddOrder.Peterfalvi.S06.certainTypeRImage h46 χ₂ χ₂⁻¹ (false, i) := by
+  rw [OddOrder.Peterfalvi.S06.certainTypeExtension_columnSum,
+    ← Int.cast_smul_eq_zsmul ℂ (h46.columnFamily χ₂).sign
+      (∑ i, OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i),
+    Finset.smul_sum]
+  rfl
+
 /-- **(6.8.2) case-(B), the `certainTypeSet ⊔ Y` base union is coherent** — assembly.
 
 Glues the column base `certainTypeSet h46 k` (coherent via `certainTypeSet_isCoherent_tau_canonical`)
