@@ -3675,6 +3675,20 @@ hXaggorth/hdecomp((6.8.2.2) aggregate)の wiring + 新規 X=cTE identity が pin
 - ⟹ **hard core は projection-coeff pinning と同一**: D.X=∑_{α∈R}coeff(α)·α で `coeff(false,i)=1 ∀i ∧ coeff(true,i)=0 ∀i`
   を示すこと(R=`certainTypeR.imageSet`={δ_j ω_{ij}^σ}∪{−δ_j ω_{ij'}^σ}、2w₁ 個; cTEμ=∑_i certainTypeRImage(false,i))。
 
-**▶▶ 次 = pinning 本体**: per-φ 経路 (`caseB_per_phi_anchored_fromYset` + `per_constituent_Y_eq_smul`、aggregate
-(6.8.2.2) `exists_decomposition_caseB` 経由で D.Y=a·ν₁ を強制 → coeff 計算で D.X=cTEμ) が最有力。
-multi-hundred LOC・dedicated focused build。loop/end-of-session 不適。**正本=本 session 47。**
+**🔑 {0,1}-pinning は既存 (5.4.b `norm_eq_and_X_eq_sum_of_norm_Y_ge`, S07:1469) — crux を「E=false-half」に精密化**:
+S07_Coherence に既に rich な (5.4)-(5.6) 理論がある(3 回目 grep で確認、重複回避):
+- `inner_self_chi_eq_sum_coeff` (S07:1356) = `‖χ‖² = ∑_{α∈R}coeff(α)` (= free fact 2)。
+- `inner_self_chi_re_le_inner_self_X` (S07:1382) = (5.4.a) `‖χ‖²≤‖X‖²` (整数 Cauchy-Schwarz `finset_sum_le_sum_sq`)。
+- **`norm_eq_and_X_eq_sum_of_norm_Y_ge` (S07:1469) = (5.4.b)**: `‖ψ‖²≤‖Y‖²` ⟹ `‖X‖²=‖χ‖²` ∧
+  **`∃ E ⊆ R(χ), X = ∑_{α∈E}α ∧ |E|=‖χ‖²`**。これがまさに私の {0,1}+count 知見(E={coeff=1}、整数核 `finset_sum_eq_sum_sq_iff` ZIrrFourier:313)。
+  ⟹ **整数論法を再実装するな**。`‖ψ‖²≤‖Y‖²` は (5.6.2) `inner_self_Y_re_le_inner_self_psi` の逆向きで、
+  column では `ψ=a·η₁`, `‖ψ‖²=a²`, `‖Y‖²=a²` (Y-pinning) ⟹ 等号 ⟹ 5.4.b 適用可。
+
+⟹ **crux の真の残務 = `E = {certainTypeRImage(false,i) | i}`** (= false-half、= cTEμ)。5.4.b は「ある E」しか与えず、
+**E が共役列 σ-image (true-half {−δ_j ω_{ij'}^σ}) を含まないこと = coeff(true,i)=0 ∀i** が deep gap。
+= 単一スカラー `⟨τ(μ_j−a·η₁), certainTypeExtension(μ̄_j)⟩ = 0` (cTEμ̄ = −true-half-sum)。
+これは「τ(μ_j−a·η₁) が共役列の σ-image 成分を持たない」= 教科書 (6.8.2.3)/(4.9) の σ-isometry 構造そのもの。
+
+**▶▶ 次 = この単一スカラー `T = ⟨τ(μ_j−a·η₁), cTEμ̄⟩ = 0` の discharge**(残り全部は 5.4.b + free facts で機械的)。
+per-φ 経路 (`caseB_per_phi_anchored_fromYset`、Y-pinning は engine 内済) で `τ(μ_j−a·η₁)=X−a·ν₁` を取得 →
+5.4.b で X=∑_{α∈E}α → T=0 で E=false-half → X=cTEμ。multi-hundred LOC・dedicated focused build。loop 不適。**正本=本 session 47。**
