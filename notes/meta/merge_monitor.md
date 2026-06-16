@@ -146,7 +146,18 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
-- **2026-06-16 — F STANDBY (ユーザー裁可, 2 scout で code-verified)**: F は §16 集約後 POLE-1 +
+- **2026-06-16 (夜³) — F REACTIVATED → Wielandt (9.1) (ユーザー裁可, hub code-verified)**: ユーザー問
+  「F はまだ standby が正着か」を受け hub が実コード再検証。2 long pole（H `typeP_duality`
+  `S14:4729` / B `(6.8)` `S08_CoherenceTheorems`）は**両方とも未達を確認**（standby の前提は真）。
+  だが「F に ungated 作業不在」は誤りと判明: **Wielandt (9.1) `CoprimeAction.lean` の 3 実 sorry**
+  （`wielandt_fixedPoint_frobenius`/`_trivial_E_fixed`/`_trivial_U_fixed`）は FT closure 内・依存的に
+  ungated（入力=`IsFrobeniusGroup`+coprime のみ）・非衝突（消費側 Pf §11 は docstring 参照のみ、term 未配線）。
+  ⟹ ユーザー裁可で **F を Wielandt (9.1) に reactivate**（issue 7004, base 7000, hard 多 session）。
+  **⚠ cron の「F=0 は STANDBY ゆえ正常」は失効** — F は今後 producing。次 cron で F-status 行を訂正
+  （reactivate 直後 1-2 tick は F=0 でも stall でない＝first commit まで）。再開トリガー = H が
+  `typeP_duality` landing → §16 解禁で F を §16/POLE-2 に呼び戻し（Wielandt 進捗 commit して pivot）。
+
+- **2026-06-16 — F STANDBY (ユーザー裁可, 2 scout で code-verified) [上で superseded]**: F は §16 集約後 POLE-1 +
   Thm II hDsub/Conjunct1 skeleton を landing したが、残 §16 はすべて上流 gated (S16 Thm A-E/II = §14/§15、
   POLE-2 = Pf §10-13 char theory) と確定 → **ungated FT-critical task 無し ⟹ STANDBY**。**merge tick で F=0 は正常、
   flag しない**。再開トリガー: H が §14 Thm A-E feeder/14.7 を landing (→S16 解禁) / B が (6.8)+Pf §10-13 char API
