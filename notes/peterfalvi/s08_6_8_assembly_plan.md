@@ -3945,3 +3945,42 @@ keep (textbook 経路が再利用): `certainTypeSet_span_apply_one_eq_intMul` / 
 **本セッションの新規 Lean は dead/garbage なし**: textbook 経路の連鎖 (xChiExtension→producer→glue→base-union) は全 used、
 discharge 用 brick (`characterPsiDecomposition_X_mem_ZIrr`/`xchi_inner_eq_of_anchored`) は意図的 down-payment (docstring 明示)。
 迷い (chain 経路 cont.²→撤回 cont.³) は notes/分析のみで Lean commit には出ていない。**正本 = 本 session 48 cont.⁸。**
+
+### session 49: 🛑🛑 RECON — hXanchored は「純 wiring」でなく §6 structure-theory gap (cont.⁷/⁸ の評価を訂正・STOP)
+
+cont.⁷/⁸ の「残る唯一 = hXanchored、新 math 無し・既存 sorry-free 補題の wiring・**ChatGPT 不要**」は **誤り**。
+5-agent code-verified workflow (`wf_f0f820f3-d90`、4 mapper 並列 + synthesis、585k tokens) + 自力 grep 検証で、
+hXanchored を per-column で discharge する経路は **複数の genuine §6/§8 gap** に bottom-out すると確定 (verdict=`has-genuine-gap`、
+3/4 mapper が中心 gap を HIGH confidence 独立確認)。
+
+**✅ 本当に DONE (sorry-free、wiring 可)**: per-φ engine `caseB_per_phi_anchored_fromYset` (S08CBA:1647) +
+bundle 群 `caseB_hcol`/`caseB_hirr`/`caseB_hirrAnc`/`caseB_hnonlin` (S08CBA:985/1009/757/719) +
+aggregate `exists_decomposition_caseB` (S08CBC2:126) + column↔induce 橋 `columnSum_eq_induce_H` (S08CBC2:1714) +
+structural discharge `certainType_W2_le_center`/`certainType_index_bounds` (S08CBC2:176/209) +
+base-union 本体 `coherentCertainTypeSet_union_Yset_via_anchoredImages` (S08CBX:389、パラメータ化済) +
+mechanical obligation hXzirr (`characterPsiDecomposition_X_mem_ZIrr` S08CBX:132) / hXinner (`xchi_inner_eq_of_anchored` S08CBX:149)。
+
+**🛑 genuine gaps (per-column hXanchored を組むのに不足、いずれも既存補題で closeable でない)**:
+1. **(6.5) p-group reduction (CertainType 枝)**: `exists_decomposition_caseB` は `IsPGroup p ↥H` を必須入力に取る (S08CBC2:129)。
+   structure は `H_nilpotent` のみ (CorePart1:3273)。p-group producer は `isPGroup_of_not_coherent` (CorePart2:3794) のみで
+   **Frobenius 専用** (`hF : IsFrobeniusGroup` + `S not coherent` を要求)、CertainType 枝に適用不可。CertainType 側 p-group は未形式化。
+2. **selection positivity (中心 §6 gap)**: certain-type column の θ_{χ₂}=`chiRestrict χ₂` が固定 nontrivial linear `φ:Irr(W₂)` 上にある
+   (`0 < constituentWeight hφ' θ_{χ₂}`) を **証明する producer 皆無** (grep: `0 < constituentWeight` は全て仮説/subtype index/`constituentWeight_pos_iff` 逆向き使用のみ)。
+   ⟹ total selection map `certainTypeSet h46 k → {θ // 0 < weight}` が定義不能 → `Ximg χ₂ := (caseB_phi_family … i(χ₂)).X` が legal でない。
+   付随: column index は `(h46.W2.subgroupOf (h46.W1⊔h46.W2)) →* ℂˣ`、φ は `ClassFunction ↥W2 ℂ` (W2≤H⊆L) — 2 つの W₂ 間の structural bridge も不在。
+3. **weight identity**: uniform a₀ (ha₀ で reference column k0 に固定) が per-column `constituentWeight = θ(1)` (`constituentWeight_eq_apply_one` S08CBA:362、column 毎に変動) とも
+   aggregate weight `|H:W₂|` (`sum_inner_restrict_sq_eq_index` S08CBC2:537) とも未同定。「全 certain-type column が degree θ(1)=a₀ を共有」は未組立。
+4. **hXmixed all-y**: target は `∀ y∈Yset, ⟨Ximg χ₂, cY.ext y⟩=0` (S08CBX:412)。既存 `caseB_constituentDecomposition_X_orthogonal` (S08CBA:1477) は
+   anchor η₁ のみ。一般 y は constructible (engine `inner_decomposition_X_extension_member_eq_zero` CorePart1:1546 は anchor-generic) だが per-y partner + y-restated hirrAnc が要 → 新補題要。
+5. **math-(A)/(B) dispatch**: capstone S08:59 は bare sorry。`eq_bot_or_eq_of_le_of_card_prime` (CorePart1:3354) で case-(B) (`hB`) を選ぶ分岐、case-(A) を centralCommutator/Zc 経路へ流す dispatch が未配線。
+
+**⟹ frontier 再分類**: hXanchored は「既存補題の wiring」でなく、**§6 certain-type structure theory の未形式化 content** (gap 1,2,3,5) + 1 補題 (gap 4)。
+cont.⁶ が「φ-family↔column 同定」を wiring と呼んだのが過小評価だった。**ボトルネック = gap 2 (column が φ 上にある positivity) と gap 1 (p-group reduction)。**
+
+**▶ 推奨次手 (要ユーザー判断、loop は STOP)**:
+- (A) **ChatGPT 相談** ([[feedback-ask-chatgpt-for-elided-gaps]]、最強モデル): Peterfalvi (6.8.2) が「certain-type columns ↔ Ind^L_{W₂}φ の constituents」対応と
+  p-group reduction を CertainType case でどう確立するか (原文 mmd `04.8` L178-224)。教科書が省略している structural identification の再構成。
+- (B) gap を独立 leaf で正面形式化 (multi-session §6 work): p-group reduction (CertainType) → column-over-φ positivity + W₂ bridge → weight identity → hXmixed all-y → A/B dispatch。
+- (C) 別 Ximg 経路の再検討 (per-φ engine を経由せず `columnConstituentDecomposition` S08CBC2:1750 から直接 per-column anchored image — ただし Y-pinning は結局 aggregate=per-φ 依存ゆえ gap 2 を回避できるか要精査)。
+
+**正本 = 本 session 49 (workflow `wf_f0f820f3-d90`)。cont.⁷/⁸ の「ChatGPT 不要・純 wiring」は撤回。** Lean は無変更 (gap 確認のみ、build 不変)。
