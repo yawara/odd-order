@@ -7,6 +7,27 @@ created: 2026-06-16
 
 # Lane F reactivate — §16 ungated carve-outs
 
+## 結果 (2026-06-16, Lane F)
+
+- ✅ **#2 `theoremA_ungated_conjuncts` DONE** (commit `72a07d93`): A(1) M_σ-Hall / **A(5) Kstar≠⊥**
+  (genuine, Prop 14.2 解禁) / A(6) M_F≤M_σ / M_σ≤M' を standalone sorry-free + axiom-clean で landing。
+  AxiomsCheck 登録、full build 3834 green。#3 (Kstar≠⊥) は #2 の A(5) に統合済。
+- ❌ **#1 `theoremII_escaping_subset_aset` REJECT** — audit の「axiom-clean確認済」は**誤り**。
+  抽出 probe を実装し `#print axioms` で実証: `[propext, sorryAx, Classical.choice, Quot.sound]`
+  = **sorryAx 混入**。理由 = `D⊆M_σ#` の導出 (`hDsub`) が **sorried monolith を3つ cite**:
+  `theoremB_U_and_A_tame.2.2.2.2` (B(5) TI, S16:723) / `theoremA_maximal_structure.2.2.1`
+  (A(3), S16:739) / `theoremC_paired_structure` (C(9) hTIC, S16:745)。B(5)/C(9) の TI piece は
+  sorried theoremB/C の conjunct で **proved standalone source が無い** (§14 Hall 構造 gated)。
+  ⟹ axiom-clean な抽出は不可。audit prototype は B(5)/C(9) を**仮説に hoist**して sorry-free に
+  見せた [[scaffold-sorry-free-not-done]] の罠。**§14 landing 後** (B(5)/C(9) が proved standalone
+  化したら) #1 は再 actionable — それまで deferred (lane-H の typeP_duality / §14 Hall 構造待ち)。
+
+⟹ **本 issue は resolved** (#2 landed, #1 は §14-gated と確定)。#1 再開は §14 landing がトリガー
+(F の STANDBY 再開トリガーと同じ条件)。
+
+---
+
+
 ## 背景
 
 F STANDBY 判定 (@69f9435e LAUNCH.md) は **H の Thm 14.4 landing / Prop 14.2・Cor 14.3 の
