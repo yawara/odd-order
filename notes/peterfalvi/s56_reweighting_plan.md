@@ -308,3 +308,25 @@ Dade family)。⚠ assembly の `inner_coherent_extension_certainTypeOmegaSigma_
 で別物 (break χ の Dade family R(χ) との直交は新規の可能性)。(2) X-sum 恒等式 `∑deg²/mc=w1·hZ·(cZ−1)` (`sum_div_normSq_…` で X-sum 済)。
 (3) engine を column data で instantiate → hbreak → (6.8.3)。**⚠ 統合は多ファイル横断で大きい**。次 loop=hortho_mem 着手 (tractability 評価)。
 **正本=本 cont.³⁹。(B) 既存・Dmem τ' 化 landed・engine⊥assembly 相補確定。次=hortho_mem。**
+
+## cont.⁴⁰ (2026-06-16 loop): hortho_mem (`certainTypeR ⊥ R(break χ)`) の完全 recipe — tractable 確認
+hortho_mem tractability 評価完了。**構築可能**(crux fact 成立)、ただし **S08 層・~60-100 LOC・fiddly**。
+- **必要形**: `(certainTypeR h χ₂ hdeg).Orthogonal (dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj χ …)`
+  = `∀ α ∈ σ-images, ∀ β ∈ R(break χ), ⟨α,β⟩=0` (xAdjoinStepW の `hortho_mem`、column member Dmem の imageFamily)。
+- **既存ツール (全て揃っている)**:
+  - **`tau_apply_eq_zero_of_mem_ticVdiffV`** (`S08_CaseBCoherence2:1108`): H^#-supported α ⟹ `(hyp.tau α) v=0` on V。
+    ⟹ break χ の `τ(χ−χ̄)` は V 上消える (χ−χ̄ は `hdiffsuppχ` で H^#-supported)。**crux 成立**。
+  - **`inner_smul_chiFam_eq_zero_of_diff_vanishOnV`** (`:1181`): orthonormal ξ,ξ'∈±Irr で `c·ξ−c'·ξ'` が V 上消える
+    ⟹ `⟨c·ξ, ω^σ⟩=0` (ω^σ=chiFam)。
+  - **`certainTypeOmegaSigma_eq_chiFam`** (σ-image=chiFam 書換)、**`inner_coherent_extension_certainTypeOmegaSigma_eq_zero`**
+    (`:1246`、ミラー対象 — ν-extension 版だが技法同一)。
+- **構築**: R(χ)={ε·μ, −ε·ν} (`dadeOrthonormalCharacterImageFamilyOfDiff`→`toOrthonormalImage`)、`τ(χ−χ̄)=∑R(χ)=ε·μ−ε·ν`
+  が V 上消える → `inner_smul_chiFam_eq_zero_of_diff_vanishOnV` で各 R(χ) 元 ⊥ ω^σ (2 元それぞれ partner を入替え)。
+  共役対称で `⟨ω^σ, R(χ)元⟩=0` に flip。σ-image 側は ±certainTypeOmegaSigma の sign 処理。
+- **build 層**: V-vanishing tools は S08_CaseBCoherence2 (S06 下流) ゆえ **hortho_mem は S08 層** (新 leaf or CaseBCoherence2 末尾、
+  ただし 2164 行ゆえ新 leaf 推奨 `S08_CaseBHortho`)。`inner_coherent_extension_certainTypeOmegaSigma_eq_zero` を template に。
+
+**📍 case-B (6.8.3) 残ロードマップ (収束、各ピース bounded)**: ✅ engine 一般化 / ✅ Dmem τ'化 / ✅ (B)既存 /
+🔨 hortho_mem [recipe 完備、S08 層 ~60-100 LOC、次] → ⬜ X-sum 恒等式接続 → ⬜ engine instantiate (`coherentDegreeSqNormBound_of_not_coherentW`
+を certain-type S₁/columns/Dmem/hortho_mem で) → hbreak → ⬜ `false_of_caseB_break_of_bounds` で (6.8.3) → cX wiring → glue → sole sorry。
+multi-session focused だが deep math gap 無し・全ツール在庫。**正本=本 cont.⁴⁰。hortho_mem recipe 完備、次=S08 層で構築。**
