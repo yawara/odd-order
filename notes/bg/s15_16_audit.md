@@ -476,8 +476,13 @@ step 2–5 を分割実装する（条件付きゆえ monitor 不抵触・net 0�
   - S03 群 = S03b(Lem3.3)/c(Thm3.7)/d(Thm3.4)/e(Thm3.5)/f(Thm3.6)/g(Thm3.10) — **3.8/3.9 は欠番**。
   - `S04e_GorThm37:550` の "Theorem 3.8" は **Gorenstein "Finite Groups" の別定理**（p'-自己同型、App E 用）。BG 3.8 ではない。
   - ⟹ **Thm 15.2 を進めるには BG Theorem 3.8 の形式化が前提**（clean §14-非依存 §3 タスク、coprime-action 定理）。
-- **Thm 15.2 依存の最終 ledger**: Prop 14.2(a)✅ / Lem 6.3(a)✅ / Thm 3.7✅ / Thm 3.10✅ / Prop 1.5(a)(d)✅ /
-  Thm 5.5✅(`solvableAut_of_narrow` S05:976) / **Thm 3.8 ❌未形式化** / Lem 14.1・Thm 14.7(f) ⏳§14(H)。
+- **Thm 15.2 依存の最終 ledger**: Prop 14.2(a)✅ / Lem 6.3(a)✅ / Thm 3.7✅ / **Thm 3.10 ⚠半分のみ** / Prop 1.5(a)(d)✅ /
+  Thm 5.5✅(`solvableAut_of_narrow` S05:976) / **Thm 3.8 ❌→✅ (issue 8011 で形式化済)** / Lem 14.1・Thm 14.7(f) ⏳§14(H)。
+  - **⚠ 2026-06-16 訂正 (Lane G)**: 「Thm 3.10✅」は **§15.2 用途には不正確**。repo は conclusion **(a) `|R| prime`
+    の abelian-kernel 形のみ** (`prime_card_complement_of_frobenius_conj` / `prime_card_of_abelian_frobenius_weight`,
+    Prop 14.2(g) 用 specialized)。**conclusion (b) `|M|=|C_M(R)|^p` と (c) `K'⊆C_K(M)` と一般 (非 abelian)
+    kernel は未形式化**。⟹ step 4 (f) `|Q̄|=q^p` + (g) `D'⊆C_D(Q̄)` (kernel=D 非 abelian 可) は **full Thm 3.10
+    の未形式化部分に gate** = 新 §3 task (step 2 の Thm 3.8 gate と同型, substantial/multi-session)。正本 = issue 8012 step-4 SCOPE 発見節。
 - 第一 leaf 候補（Thm 3.8 後）: `M_σ=[M_σ,K]`（type-P1 complement + M_σ⊆M' を仮説に
   `commutator_eq_self_of_isComplement'_le_commutator` を ↥M 内適用、confirmed API）。
 
