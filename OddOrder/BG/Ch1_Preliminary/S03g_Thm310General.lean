@@ -1,4 +1,5 @@
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.Isaacs.Ch02_Subnormality.Main
 import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import Mathlib.RepresentationTheory.Irreducible
@@ -189,5 +190,83 @@ theorem isIrreducible_lift_of_trivial [Nontrivial V] (ρ : Representation F G V)
     exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊥ : Submodule F V))
   · refine Or.inr (Subrepresentation.toSubmodule_injective ?_)
     exact (congrArg Subrepresentation.toSubmodule h : Sρ.toSubmodule = (⊤ : Submodule F V))
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Case B brick — the Frobenius FPF action lifts to the quotient kernel** (issue 8013 piece 3,
+Proposition 1.5(d)).  If `r ∈ R` acts fixed-point-freely on `K` (`C_K(r) = 1`, the Frobenius
+condition) and `r` acts coprimely on `K` (with `K₀ ⊴ G`, `K₀ ⊆ K`, `r`-invariant), then `r` acts
+fixed-point-freely on the quotient `K / K₀`: a class `k̄` fixed by `r` (`⁅r, k⁆ ∈ K₀`) is trivial
+(`k ∈ K₀`).
+
+This transfers the Frobenius hypothesis of BG Theorem 3.10 to `KR/K₀` in Case B of the `K₀`
+reduction.  Mirrors `OddOrder.BG.Ch4.S15.fpf_of_centralizer_inf_le`, but the fixed-point source is
+`C_K(r) = 1` (the conjugation-action fixed points are `⊥` directly) and the target is the kernel `K`. -/
+theorem fpf_lift_of_centralizer_bot [Finite G] {K₀ K : Subgroup G} [K₀.Normal] {r : G}
+    (hrK : r ∈ Subgroup.normalizer (K : Set G)) (hK₀K : K₀ ≤ K)
+    (hKK₀ : K ≤ Subgroup.normalizer (K₀ : Set G)) (hrK₀ : r ∈ Subgroup.normalizer (K₀ : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers r)) (Nat.card ↥K))
+    (hsolv : IsSolvable ↥(Subgroup.zpowers r) ∨ IsSolvable ↥K)
+    (hCbot : ∀ k ∈ K, r * k * r⁻¹ = k → k = 1)
+    {k : G} (hkK : k ∈ K) (hfix : r * k * r⁻¹ * k⁻¹ ∈ K₀) :
+    k ∈ K₀ := by
+  classical
+  have hzK : Subgroup.zpowers r ≤ Subgroup.normalizer (K : Set G) := Subgroup.zpowers_le.mpr hrK
+  have hzK₀ : Subgroup.zpowers r ≤ Subgroup.normalizer (K₀ : Set G) := Subgroup.zpowers_le.mpr hrK₀
+  set φ : ↥(Subgroup.zpowers r) →* MulAut ↥K :=
+    (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hzK) with hφ
+  haveI hK₀_normal : (K₀.subgroupOf K).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hK₀K).mpr hKK₀
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (K₀.subgroupOf K) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ K₀
+    exact (Subgroup.mem_normalizer_iff.mp (hzK₀ a.2) (y : G)).mp hy
+  -- The conjugation-action fixed points are `⊥` (the Frobenius FPF condition `C_K(r) = 1`).
+  have hfpbot : Subgroup.fixedPointsOfMulAut φ = ⊥ := by
+    rw [eq_bot_iff]
+    intro y hy
+    rw [Subgroup.mem_fixedPointsOfMulAut] at hy
+    have hr : ((φ ⟨r, Subgroup.mem_zpowers r⟩ y : ↥K) : G) = (y : G) :=
+      congrArg Subtype.val (hy ⟨r, Subgroup.mem_zpowers r⟩)
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext (hCbot (y : G) y.2 hr)
+  -- Proposition 1.5(d): the quotient fixed points push forward from `⊥`, hence are `⊥`.
+  have heq := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hsolv hMinv
+  rw [hfpbot, Subgroup.map_bot] at heq
+  -- `k`'s class is fixed by every power of `r` (generator argument), hence is `1`, so `k ∈ K₀`.
+  have hpow : ∀ (f : MulAut (↥K ⧸ K₀.subgroupOf K)) (y : ↥K ⧸ K₀.subgroupOf K),
+      f y = y → ∀ i : ℤ, (f ^ i) y = y :=
+    fun f y hf i => MulAction.mem_stabilizer_iff.mp
+      ((MulAction.stabilizer (MulAut (↥K ⧸ K₀.subgroupOf K)) y).zpow_mem
+        (MulAction.mem_stabilizer_iff.mpr hf) i)
+  have hkbar : quotientMulAutHom hMinv ⟨r, Subgroup.mem_zpowers r⟩
+      (QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩) =
+      QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩ := by
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show (r * k * r⁻¹)⁻¹ * k ∈ K₀
+    have heqk : (r * k * r⁻¹)⁻¹ * k = k⁻¹ * (r * k * r⁻¹ * k⁻¹)⁻¹ * (k⁻¹)⁻¹ := by group
+    have hkN : k ∈ Subgroup.normalizer (K₀ : Set G) := hKK₀ hkK
+    rw [heqk]
+    exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (K₀ : Set G)).inv_mem hkN)
+      ((r * k * r⁻¹ * k⁻¹)⁻¹)).mp (K₀.inv_mem hfix)
+  have hxbar : QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩ ∈
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) := by
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have ha : a = ⟨r, Subgroup.mem_zpowers r⟩ ^ i := by
+      apply Subtype.ext
+      rw [Subgroup.coe_zpow]
+      exact hi.symm
+    rw [ha, map_zpow]
+    exact hpow (quotientMulAutHom hMinv ⟨r, Subgroup.mem_zpowers r⟩)
+      (QuotientGroup.mk' (K₀.subgroupOf K) ⟨k, hkK⟩) hkbar i
+  rw [heq, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+    Subgroup.mem_subgroupOf] at hxbar
+  exact hxbar
 
 end OddOrder.BG.Ch1.S03
