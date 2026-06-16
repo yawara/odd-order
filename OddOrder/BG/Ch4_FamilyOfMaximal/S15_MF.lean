@@ -2709,6 +2709,19 @@ theorem fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore [Finite G] {M Q : Su
   have h := fittingInAmbient_le_opiCore_sup_centralizer_inf (M := M) ({q} : Set ℕ)
   rwa [opiCore_singleton_fittingInAmbient_eq] at h
 
+/-- **Theorem 15.2(g) equality — gated-endpoint skeleton** (`§14`-independent assembly): from the
+hard step-4 inclusion `C_M(Q) ⊆ F(M)` (hypothesis `hcent`; the situation-specific content of
+"Proposition 1.5(d) yields `F(M) = Q C_M(Q)`", which holds because `D` is nilpotent while `M_σ` is
+not) together with the landed `⊆`-half (`fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore`) and
+`O_q(M) ⊆ F(M)`, this gives the conjunct-(g) equality `F(M) = Q ⊔ (C_G(Q) ⊓ M)` for `Q = O_q(M)`.
+Once the step-4 core discharges `hcent`, the equality becomes unconditional. -/
+theorem fittingInAmbient_eq_sup_centralizer_inf_of_inputs [Finite G] {M Q : Subgroup G} {q : ℕ}
+    [Fact q.Prime] (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    (hcent : Subgroup.centralizer (Q : Set G) ⊓ M ≤ fittingInAmbient M) :
+    fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) := by
+  refine le_antisymm (fittingInAmbient_le_sup_centralizer_inf_of_eq_qcore hQ) (sup_le ?_ hcent)
+  rw [hQ]; exact OddOrder.BG.Ch2.S08.opiCoreInG_singleton_le_fittingInG M
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
