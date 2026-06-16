@@ -3744,6 +3744,9 @@ set_option linter.style.longLine false in
 -- BG Theorem 3.10 general (non-abelian) kernel, the `K₀`-reduction dichotomy (issue 8013, piece 3):
 -- for an irreducible `ρ` and normal `K₀ ⊴ G`, the `K₀`-invariants `C_V(K₀)` are `⊥` or `⊤`.
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_normal_eq_bot_or_top_of_isIrreducible
+-- BG Theorem 3.10 general kernel, induction base case (issue 8013, piece 3): `K` minimal normal ⟹
+-- elementary abelian ⟹ the abelian-kernel rank theorem gives (a)+(b).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_minimalNormal_kernel
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38

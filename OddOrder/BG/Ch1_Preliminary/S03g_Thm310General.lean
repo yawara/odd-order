@@ -1,4 +1,6 @@
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310Module
+import OddOrder.Isaacs.Ch02_Subnormality.Main
+import OddOrder.Isaacs.Ch03_SplitExtensions.Main
 import Mathlib.RepresentationTheory.Irreducible
 import Mathlib.RepresentationTheory.Subrepresentation
 
@@ -67,5 +69,32 @@ theorem invariants_normal_eq_bot_or_top_of_isIrreducible
   · right
     have h := congrArg Subrepresentation.toSubmodule ht
     simpa using h
+
+/-- **BG Theorem 3.10(a)+(b), the induction base case** (mmd L1346 "we can assume that `K` is a
+minimal normal subgroup of `KR`; since `KR` is solvable, this implies that `K` is an elementary
+abelian `q`-group").  When the Frobenius kernel `K` is minimal normal in the (solvable) group `G`,
+it is elementary abelian (`solvable_minimal_normal_isElementaryAbelian`), in particular abelian, so
+the abelian-kernel rank theorem `prime_card_and_finrank_of_abelian_frobenius_weight` applies and
+yields (a) `|R|` prime and (b) `finrank V = |R| · finrank C_V(R)`.
+
+This is the base of the `K₀`-reduction induction (issue 8013 piece 3): the recursive step reduces a
+general kernel to this case via `invariants_normal_eq_bot_or_top_of_isIrreducible`. -/
+theorem prime_card_and_finrank_of_minimalNormal_kernel [Finite G] [IsAlgClosed F] [IsSolvable G]
+    (ρ : Representation F G V) [FiniteDimensional F V] [Nontrivial V]
+    {K R : Subgroup G} [K.Normal] (hRne : R ≠ ⊥)
+    (hKmin : OddOrder.Isaacs.Ch02.IsMinimalNormal K)
+    (hKcard : (Nat.card ↥K : F) ≠ 0)
+    (hCVK : Representation.invariants (ρ.comp K.subtype) = ⊥)
+    (hFrob : ∀ r ∈ R, r ≠ 1 → ∀ k ∈ K, k ≠ 1 → r * k * r⁻¹ ≠ k)
+    (hcond3 : ∀ x : G, x ∈ R → x ≠ 1 →
+      finrank F (Representation.invariants (ρ.comp (Subgroup.zpowers x).subtype))
+        = finrank F (Representation.invariants (ρ.comp R.subtype))) :
+    ∃ p : ℕ, p.Prime ∧ Nat.card ↥R = p ∧
+      finrank F V = Nat.card ↥R * finrank F (Representation.invariants (ρ.comp R.subtype)) := by
+  obtain ⟨q, _hq, hKea⟩ := OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hKmin
+  have hKab : ∀ a b : ↥K, (a : G) * (b : G) = (b : G) * (a : G) := by
+    intro a b
+    rw [← Subgroup.coe_mul, ← Subgroup.coe_mul, hKea.comm]
+  exact prime_card_and_finrank_of_abelian_frobenius_weight ρ hRne hKab hKcard hCVK hFrob hcond3
 
 end OddOrder.BG.Ch1.S03
