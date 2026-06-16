@@ -4798,6 +4798,12 @@ Applied with `N = Kᵢ` (normal `σ(Mᵢ)'`-Hall of `Z`) and `H = Kⱼ*` gives `
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.le_of_coprime_index
 
+/-! **BG 14.7, unified per-neighbour data** (`S14_TypePCounting`, `exists_neighbor_data`): the single
+per-member source for the family — raw swap factor `K_N* = M_σ(N) ⊓ C(K_N)`, canonical identity
+`K_N* = Z ⊓ M_σ(N)`, `N` type-`P`, `K_N* ≠ ⊥`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_data
+
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`
 transports a prime action `ActsPrimeOn N X` along conjugacy by a normalizer element of `N`

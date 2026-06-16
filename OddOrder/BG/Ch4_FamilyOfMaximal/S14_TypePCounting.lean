@@ -5380,6 +5380,37 @@ theorem le_of_coprime_index {N H : Subgroup G} [N.Normal]
   have hbot : H.map (QuotientGroup.mk' N) = ⊥ := Subgroup.eq_bot_of_card_eq _ hcard1
   rwa [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hbot
 
+/-- **BG 14.7, unified per-neighbour data** (mmd L3997-4015): the single per-member source for the
+family, exposing the **raw** swap factor `K_N* = M_σ(N) ⊓ C(K_N)` (for pairwise nonconjugacy and the
+`z = k_N·k_N*` card) together with the **canonical identity** `K_N* = Z ⊓ M_σ(N)` (for the family's
+`Kᵢ*`), plus `N` type-`P` and `K_N* ≠ ⊥`.  Resolves the raw/canonical form tension at the source. -/
+theorem exists_neighbor_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} [Fact p.Prime] {X : Subgroup G} (hX : X ∈ elemAbelianOfRank G p 1) (hXK : X ≤ K)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (X : Set G))) :
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
+      K ⊔ Kstar = KN ⊔ (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+        = (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ∧
+      IsTypeP N ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G) ≠ ⊥ := by
+  obtain ⟨KN, hKNN, hKN, hswap, hcanon⟩ :=
+    exists_neighbor_kappaHall_swap hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  obtain ⟨_, _, hXNσ⟩ := typeP_neighbor_embed hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hκ := typeP_neighbor_kappa hG hM hP hKM hK hKstar hU hX hXK hCX hN
+  have hKstarne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  haveI : Nontrivial ↥Kstar := (Subgroup.nontrivial_iff_ne_bot _).mpr hKstarne
+  obtain ⟨q, hq⟩ : (Nat.card ↥Kstar).primeFactors.Nonempty :=
+    Nat.nonempty_primeFactors.mpr Finite.one_lt_card
+  have hXcanon : X ≤ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    le_inf (hXK.trans le_sup_left) hXNσ
+  exact ⟨KN, hKNN, hKN, hswap, hcanon, ⟨q, hκ q hq⟩, fun hbot =>
+    ne_bot_of_mem_elemAbelianOfRank_one hX (le_bot_iff.mp (hbot ▸ hcanon.symm ▸ hXcanon))⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
