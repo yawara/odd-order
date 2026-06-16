@@ -3323,6 +3323,63 @@ theorem sigma_eq_of_mem_sigma_of_mem_sigma [Finite G]
     have h := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hq
     rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
 
+/-- **Every prime divides some `σ(M)`** (BG §1, mmd L3789): for a prime `p ∣ |G|` there is a
+maximal subgroup `M` with `p ∈ σ(M)`.  A Sylow `p`-subgroup `P` of `G` is non-normal (else `G`
+would be a `p`-group, hence solvable, against `hG.notSolvable`), so `N_G(P)` lies in a maximal `M`;
+then `P` is a Sylow `p`-subgroup of `M` whose `G`-normalizer `N_G(P) ≤ M`, which is exactly
+`p ∈ σ(M)`.  Foundation for the σ-decomposition (every nonidentity element has a `σ`-piece). -/
+theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {p : ℕ} [Fact p.Prime] (hpG : p ∣ Nat.card G) :
+    ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+  classical
+  haveI : IsSimpleGroup G := hG.simple
+  obtain ⟨P⟩ : Nonempty (Sylow p G) := inferInstance
+  have hPcard : Nat.card ↥(P : Subgroup G) = p ^ (Nat.card G).factorization p :=
+    P.card_eq_multiplicity
+  have hfactG : (Nat.card G).factorization p ≠ 0 :=
+    (Nat.Prime.factorization_pos_of_dvd Fact.out (Nat.card_pos).ne' hpG).ne'
+  have hPne : (P : Subgroup G) ≠ ⊥ := P.ne_bot_of_dvd_card hpG
+  have hNne : Subgroup.normalizer ((P : Subgroup G) : Set G) ≠ ⊤ := by
+    intro hN_top
+    have hPnormal : (P : Subgroup G).Normal := Subgroup.normalizer_eq_top_iff.mp hN_top
+    rcases hPnormal.eq_bot_or_eq_top with hb | ht
+    · exact hPne hb
+    · refine hG.notSolvable ?_
+      have hPG : IsPGroup p G := by
+        have he : IsPGroup p ↥(⊤ : Subgroup G) := ht ▸ P.isPGroup'
+        exact he.of_equiv Subgroup.topEquiv
+      haveI := hPG.isNilpotent
+      infer_instance
+  obtain ⟨M, hMco, hNM⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNne
+  have hM : M ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hMco
+  have hPM : (P : Subgroup G) ≤ M := Subgroup.le_normalizer.trans hNM
+  have hpP : p ∣ Nat.card ↥(P : Subgroup G) := by
+    rw [hPcard]; exact dvd_pow_self p hfactG
+  have hpdvdM : p ∣ Nat.card ↥M := hpP.trans (Subgroup.card_dvd_of_le hPM)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨Fact.out, hpdvdM, (Nat.card_pos).ne'⟩
+  refine ⟨M, hM, ?_⟩
+  rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+  refine ⟨hpM, ?_⟩
+  -- `P` is a Sylow `p`-subgroup of `M` (the `p`-parts of `|M|` and `|G|` agree).
+  have hmap : ((P : Subgroup G).subgroupOf M).map M.subtype = (P : Subgroup G) := by
+    rw [Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hPM]
+  have hcardPM : Nat.card ↥((P : Subgroup G).subgroupOf M) = Nat.card ↥(P : Subgroup G) := by
+    have h := Nat.card_congr (Subgroup.equivMapOfInjective
+      ((P : Subgroup G).subgroupOf M) M.subtype M.subtype_injective).toEquiv
+    rwa [hmap] at h
+  have hfacteq : (Nat.card G).factorization p = (Nat.card ↥M).factorization p := by
+    refine le_antisymm ?_ ?_
+    · rw [← Nat.Prime.pow_dvd_iff_le_factorization Fact.out (Nat.card_pos).ne', ← hPcard]
+      exact Subgroup.card_dvd_of_le hPM
+    · exact (Nat.factorization_le_iff_dvd (Nat.card_pos).ne' (Nat.card_pos).ne').mpr
+        (Subgroup.card_subgroup_dvd_card M) p
+  have hQcard : Nat.card ↥((P : Subgroup G).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by rw [hcardPM, hPcard, hfacteq]
+  refine ⟨Sylow.ofCard ((P : Subgroup G).subgroupOf M) hQcard, ?_⟩
+  rw [Sylow.coe_ofCard, hmap]
+  exact hNM
+
 /-- **σ-decomposition keystone** (BG §1, mmd L3793): a nonidentity `σ(M)`-element `x` has
 `ℓ_σ(x) = 1`.  The cyclic group `⟨x⟩` is a nonidentity proper `σ(M)`-subgroup (proper since `G` is
 non-solvable, hence non-cyclic), so by Corollary 12.16(a)
@@ -3356,6 +3413,33 @@ theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSi
   rw [he]
   exact hg (Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) _
     (Subgroup.subset_closure (Set.mem_singleton x)))
+
+/-- **σ-decomposition: extracting a `σ`-length-one factor** (BG §1, mmd L3793): every `g ≠ 1`
+factors as `g = x · x'` with `x` a `σ`-length-one element (the `σ(M)`-part for a maximal `M` whose
+`σ(M)` contains a prime of `g`), `x'` a `σ(M)′`-element, both in `⟨g⟩` and commuting.  Combines
+`exists_mem_sigma_of_prime_dvd_card` (a prime of `g` lies in some `σ(M)`), the two-block
+decomposition `exists_isPiElement_mul`, and the keystone `length_one_of_isPiElement_sigma`.  This
+is the existence input to Lemma 14.6. -/
+theorem exists_length_one_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {g : G} (hg : g ≠ 1) :
+    ∃ (x x' : G) (M : Subgroup G), g = x * x' ∧ Commute x x' ∧
+      x ∈ Subgroup.zpowers g ∧ x' ∈ Subgroup.zpowers g ∧ D.length x = 1 ∧
+      M ∈ maximalSubgroups G ∧ OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x ∧
+      OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x' := by
+  classical
+  obtain ⟨p, hp, hpg⟩ := (orderOf g).exists_prime_and_dvd (fun h => hg (orderOf_eq_one_iff.mp h))
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpG : p ∣ Nat.card G := hpg.trans (orderOf_dvd_natCard g)
+  obtain ⟨M, hM, hpσM⟩ := exists_mem_sigma_of_prime_dvd_card hG hpG
+  obtain ⟨x, x', hmul, hcomm, hxπ, hx'π, hxz, hx'z⟩ :=
+    OddOrder.GroupTheory.exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma M) g
+  have hx1 : x ≠ 1 := by
+    intro hx0
+    rw [hx0, one_mul] at hmul
+    exact (hx'π p (by
+      rw [hmul]; exact Nat.mem_primeFactors.mpr ⟨hp, hpg, (orderOf_pos g).ne'⟩)) hpσM
+  exact ⟨x, x', M, hmul.symm, hcomm, hxz, hx'z,
+    length_one_of_isPiElement_sigma hG D hM hx1 hxπ, hM, hxπ, hx'π⟩
 
 open Classical in
 /-- **BG's `R(x)`** (mmd L3906): the normal Hall subgroup of `C_G(x)` from Theorem 14.4.  When

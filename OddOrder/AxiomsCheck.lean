@@ -4603,6 +4603,12 @@ via sharp transitivity (Theorem 14.4). -/
 a nonidentity `σ(M)`-element `x` has `ℓ_σ(x) = 1`.  Existence half of the σ-decomposition (BG §1):
 `⟨x⟩` is conjugate into `M_σ` (Cor 12.16(a)), so `𝓜_σ(x) ≠ ∅`.  Foundation for Lemma 14.6. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.length_one_of_isPiElement_sigma
+/-! **Every prime divides some `σ(M)`** (`S14_TypePCounting`, `exists_mem_sigma_of_prime_dvd_card`):
+for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-normal Sylow `p`-subgroup). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_sigma_of_prime_dvd_card
+/-! **σ-decomposition factor extraction** (`S14_TypePCounting`, `exists_length_one_factor`): every
+`g ≠ 1` factors `g = x·x'` with `ℓ_σ(x) = 1`, `x'` a `σ(M)′`-element (commuting, both in `⟨g⟩`). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_length_one_factor
 
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
