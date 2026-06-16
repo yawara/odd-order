@@ -1073,6 +1073,32 @@ theorem kstar_le_fittingInAmbient_G_of_inputs [Finite G]
   rwa [Subgroup.map_subgroupOf_eq_of_le hKstar_le_M,
     Subgroup.map_subgroupOf_eq_of_le hF_le_M] at h2
 
+/-- **Theorem 15.2, step 2 tail — `K* ⊆ Q = O_q(M)`** (mmd L4192): the composition of the `G`-form
+part 1 (`K* ⊆ F(M_σ)`) and part 2 (the `q`-core chain), giving the full "`K*` lies in `Q`"
+conclusion from the base `§14` inputs.  Here `q = |K*|` (prime by `hqG`, the §14 Theorem 14.7(f)
+input), so `Q = O_q(M)` is the normal Sylow `q`-subgroup of the theorem. -/
+theorem kstar_le_opiCore_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M)
+    (hcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M))
+    (hcop : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+      (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)))
+    (hcond2 : ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+        ⊓ Subgroup.centralizer (K : Set G))).Prime) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+      ≤ opiCoreInG ({Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+          ⊓ Subgroup.centralizer (K : Set G))} : Set ℕ) M := by
+  have h1 := kstar_le_fittingInAmbient_G_of_inputs hG hM hKM hcompl hcop hcond2 hne hqG
+  refine kstar_le_opiCore_of_le_fittingInAmbient hG hM (fun r hr => ?_) h1
+  rw [hqG.primeFactors, Finset.mem_singleton] at hr
+  exact Set.mem_singleton_iff.mpr hr
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
