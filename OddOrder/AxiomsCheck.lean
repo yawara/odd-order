@@ -4583,6 +4583,13 @@ makes 13.9 alone sufficient — no `R(x)` / `M̃` machinery needed.) -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacy_disjoint_of_nonconjugate
 
+/-! **BG Lemma 14.5(a)** (`S14_TypePCounting`, `xRsub_disjoint`): for distinct σ-length-one
+`x`, `y`, the cosets `x R(x)`, `y R(y)` are disjoint.  Proven via the σ-class partition + the
+two-block decomposition (`isPiElement_mul_unique`) + Theorem 14.4(e); no §15/§16 needed. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.xRsub_disjoint
+-- **BG Lemma 14.5(b)** (faithful `M̃` form): nonconjugate `M₁`, `M₂` have disjoint `M̃₁`, `M̃₂`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Mtilde_disjoint
+
 /-! **BG Proposition 14.2** (`S14_TypePCounting`): the full structure theorem for a type-`P`
 maximal subgroup `M` — `K` (Hall `κ(M)`) is prime on `M_σ`, `K* = C_{M_σ}(K) ≠ 1`, the
 normalizer identity `N_M(X) = K ⊔ K*`, the `(d)` clause `K* ∩ M^g = 1`, and (for type `P₂`)
