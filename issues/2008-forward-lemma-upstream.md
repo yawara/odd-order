@@ -40,3 +40,18 @@ part(h) の証明には **forward lemma**「`K≠⊥ → derivedInG M = U ⊔ Ms
 - `notes/bg/s14_typeP_counting.md`「§14 frontier 確定」/ `OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean:518,543,556,683,785`
 - `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean:3224` (typeP_duality)
 - 暫定: S14 側は helper を inline/別名で先行証明可(hub が後で upstream 統合)。
+
+## 🔧 訂正 (2026-06-16, mmd 精読): 依存方向が逆だった — port 不要
+
+mmd L4174 (Lemma 15.1 proof): 「**By Theorem 14.7(d) and (h)**, K cyclic and M'=UM_σ」
+⟹ **S15 の forward lemma (Lemma 15.1) は 14.7(h) を consume する側**。14.7(h) が source。
+mmd L4061 (14.7(h) proof): Prop 14.2(a)[normal complement UM_σ] + Thm 10.2(c)[`Msigma_le_derived`,
+M_σ⊆M', S10 在] + K cyclic ⟹ M'=UM_σ。**§16-independent・自己完結**(S15 非依存)。
+
+**⟹ 当初の「S15 forward lemma を S14 に port」は不要・誤り**。正しい task:
+- **H-lane**: 14.7 の §16-independent core を S14 で証明 (part(h) + K/Z cyclic + Mstar 存在 + TI + P2;
+  large ~300行)。covering(∃!)+uniqueness のみ §16-gated (Lane G §16) で残す skeleton。
+  part(h) を sorry-free lemma 抽出 → S15:785 un-taint。
+- **Lane G**: 14.7(d)(h) landing 後、S15:683 の Lemma 15.1 を 14.7 から証明 (sorry 解消)。
+- 注: repo Prop 14.2 (`typeP_structure`) は ActsPrimeOn を返すが **normal complement UM_σ を露出しない** ⟹
+  14.7(h) で E-setup から UM_σ (normal complement of K) を別途構成要。
