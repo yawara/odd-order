@@ -833,3 +833,31 @@ log_{r²}(r⁴)=2 ⟹ pRank=2, r²∉σ）等の非素数が τ₂ に入りう�
   BG の τ₂(N)⊆π(N) を回復, = BG faithful）。consumer 0 ゆえ安全。
 - **⚠ hub 注意**: `tau2` def 自体が latent unfaithful。他の `tau2 ⊆ …` 形 statement があれば同様の素数制限要
   （大半の使用は [Fact p.Prime] 付きで無害）。将来 τ₂ def に `p∈π(M)` を足すリファクタも検討余地（広域影響）。
+
+### ✅ Thm 14.7 §16-independent partner existence + ⚠ part(h) 再評価 (2026-06-16, lane-h loop)
+**`exists_typeP_partner` COMPLETE** (commit `9c69d433`, sorry-free + axiom-clean + AxiomsCheck 登録):
+14.7 の nonconjugate partner `M*` の存在 + basic neighbour data (type-P / ¬conj / `K⊔K*≤M*` /
+`X≤M*_σ` / `π(K*)⊆κ(M*)`)。step 1a/1b (`typeP_neighbor_embed` + `typeP_neighbor_kappa`) を組立。
+`∃!` の existence 半分を供給 (cyclic Z / TI / P₂ / covering は §16-gated)。
+
+**✅ P1 reduction lemma `commutator_eq_sup_commutator_of_isComplement'` COMPLETE** (commit `acffa2ab`,
+一般群論, sorry-free + axiom-clean): `N⊴H` complement `E`, `N≤H'` ⟹ `H' = N ⊔ ⁅E,E⁆`。
+⟹ **`M' = M_σ ⊔ E'` uniform** (case 分析・regular action 不要; `M_σ≤M'`=Thm 10.2c + `E'=[E,E]≤[M,M]=M'`)。
+
+**⚠⚠ part(h) は LAUNCH/issue-2008 の「§16-independent・~50-100行」評価が誤り (要訂正)**:
+P1 で part(h) `IsComplement'(M') K` は **E-内部の `IsComplement'(E') K` (= `E = K ⋉ E'`) に還元**
+(`M'∩K = E'∩K`, `M'K=M ⟺ E'K=E`)。これは **`E' = κ'-Hall(E)`** と同値で:
+- **case τ₁** (K=E₁): `E' = E₂E₃` = deferred Prop 14.2(a) の **regular action `[E₂E₃,E₁]=E₂E₃`**
+  (BG L3840, Lem 13.12+13.7 assembly — `typeP_structure` も deferred 済, 露出無し)。E₃≤E' は
+  Lem 12.1 在だが E₂≤E' が regular action 要。**実質 ~150-250 行の assembly**。
+- **case τ₃** (K=E, κ-group): `κ'-Hall(E)=1` ⟹ `E'=1` 要だが **Lem 12.1 で `E₃≤E'` かつ E₃≠1**
+  ⟹ `E'≠1` の **緊張**。⟹ part(h) は case-τ₃ 生 configuration で偽に見え、BG part(8) は
+  **§16 counting (n=1 collapse, Z cyclic) で configuration を制約してから**成立 = **§16-gated**。
+  (BG L4061 の "K cyclic" は L4041 の Z=K×K* cyclic 由来 = post-counting。)
+- ⟹ **part(h) を §16-independent な standalone sorry-free lemma に切り出して S15:785 を un-taint する
+  ことは不可** (part(h) 自体が §16/counting に依存)。S15 の part(h) 消費は inherently §16-gated
+  (Lane G が §15+§16 両方所有ゆえ問題なし)。
+- **P1 は正しい foundation** として landing 済 (将来 part(h) を §16 と共に証明する際に使う)。
+- **次の H 候補**: (a) 14.7 M_i/Z combinatorial setup (BG L3993-4015, §16-indep, exists_typeP_partner
+  上に構築) / (b) case-τ₃ faithfulness 精査 (part(h) statement が全 type-P M で真か, E cyclic 必須か) /
+  (c) §16 counting 自体 = Lane G 領域。**要ユーザー/hub 判断** (part(h) gating で frontier 再選定)。
