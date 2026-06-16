@@ -68,4 +68,33 @@ theorem isCompl_invariants_ker_averageMap
     IsCompl ρ.invariants (LinearMap.ker ρ.averageMap) :=
   (isProj_averageMap ρ).isCompl
 
+/-- If subgroups `H₁, H₂` generate `G` (`H₁ ⊔ H₂ = ⊤`), then the invariants of `ρ` are the
+intersection of the invariants of the restrictions `ρ|_{H₁}` and `ρ|_{H₂}`: being fixed by a
+generating set forces being fixed by the whole group.  Specialised to `⟨U,E⟩ = L`, this is
+`V^{UE} = V^U ⊓ V^E`. -/
+theorem invariants_eq_inf_of_sup_eq_top (ρ : Representation k G V) {H₁ H₂ : Subgroup G}
+    (hsup : H₁ ⊔ H₂ = ⊤) :
+    ρ.invariants = invariants (ρ.comp H₁.subtype) ⊓ invariants (ρ.comp H₂.subtype) := by
+  apply le_antisymm
+  · exact le_inf (fun v hv s => hv _) (fun v hv s => hv _)
+  · intro v hv
+    rw [Submodule.mem_inf, mem_invariants, mem_invariants] at hv
+    obtain ⟨hv1, hv2⟩ := hv
+    -- the stabiliser `{g | ρ g v = v}` is a subgroup containing `H₁` and `H₂`, hence `⊤`.
+    let S : Subgroup G :=
+      { carrier := {g | ρ g v = v}
+        one_mem' := by simp
+        mul_mem' := fun {a b} ha hb => by
+          simp only [Set.mem_setOf_eq] at *
+          rw [map_mul, Module.End.mul_apply, hb, ha]
+        inv_mem' := fun {a} ha => by
+          simp only [Set.mem_setOf_eq] at *
+          have h := congrArg (ρ a⁻¹) ha
+          rw [← Module.End.mul_apply, ← map_mul, inv_mul_cancel, map_one,
+            Module.End.one_apply] at h
+          exact h.symm }
+    have hStop : S = ⊤ :=
+      top_le_iff.mp (hsup ▸ sup_le (fun g hg => hv1 ⟨g, hg⟩) (fun g hg => hv2 ⟨g, hg⟩))
+    exact fun g => (hStop ▸ Subgroup.mem_top g : g ∈ S)
+
 end OddOrder.GroupTheory.WielandtCounting

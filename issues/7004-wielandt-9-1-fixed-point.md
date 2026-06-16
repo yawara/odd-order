@@ -19,19 +19,42 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
 - 非衝突: 消費側は Pf §11（`S11_MaximalII_III_IV`）の docstring 参照のみ（term 未配線）。
 - FT-path 必然: Pf §11 (9.2)-(9.9) の全 character count が (9.1) ベース。
 
-## やること
+## 進捗 (2026-06-17)
 
-- [ ] `wielandt_fixedPoint_frobenius`（`CoprimeAction.lean:113`）= 本体
-      `|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|`
-- [ ] `wielandt_fixedPoint_trivial_E_fixed`（:121）= 系(i) `C_H(E)=1 ⇒ fixedByU=⊤`
-- [ ] `wielandt_fixedPoint_trivial_U_fixed`（:129）= 系(ii) `C_H(U)=1 ⇒ |H|=|C_H(E)|^|E|`
-- [ ] 必要なら `CoprimeFrobeniusAction` 構造体を再設計（証明に足る field へ）
-- [ ] mathlib に Wielandt/coprime-action fixed-point 基盤があるか先に確認
+- [x] `CoprimeFrobeniusAction` faithful 再設計（実 action `φ:L→MulAut H`, fixedByUE/E/U
+      = `fixedSubgroup`; 旧構造は作用無しで証明不能だった）— `c55f6db2`（main 合流済）
+- [x] 系(i)(ii) を本体から証明（`wielandt_fixedPoint_trivial_E_fixed`/`_U_fixed`）
+- [x] **3 sorry → 1**（残=本体 `wielandt_fixedPoint_frobenius`）
+- [ ] 本体 `wielandt_fixedPoint_frobenius` = `|C_H(UE)|^|E|·|H| = |C_H(E)|^|E|·|C_H(U)|`
+
+## 方針: NO axiom, ボトムアップ完全形式化 (ユーザー裁可 2026-06-17)
+
+本体の **勘定核心 (†)** `Wᵁ=0 ⇒ dim W=|E|·dim Wᴱ` は「E が非自明 `𝔽_p[U]`-既約**加群**に
+自由作用」＝ **modular Brauer permutation lemma (𝔽̄_p 上, p′-群)** を要する。repo の Brauer は
+**ℂ-指標版のみ**で `𝔽_p`-加群へ橋渡し不可。⟹ **欠落インフラを新規構築（axiom 無し）**。
+
+- **FT 接続確認済**: (9.1) → Pf `S11`→`S12`/`S13`→`S14`→`S15`→`S16` → S16.Hypothesis → `feitThompson`
+- **レーン干渉なし**: F は `GroupTheory/CoprimeAction` + 新規 `GroupTheory/RepresentationTheory/*`
+  のみ編集; lane-b/g/h はこれら・`RepresentationTheory/` を一切 commit せず（検証済）
+
+### 新規インフラ sub-pieces（正本 = notes/peterfalvi/s11_wielandt_91_design.md）
+
+- [x] coprime 分解 `V=V^G⊕[V,G]`（dim 形 + `[V,G]^G=0` + `IsCompl`）— `WielandtCounting.lean` `a1bddfaa`
+- [ ] (I-3) regular-orbit fixed-space count（抽象・Brauer-free）
+- [ ] step 2: el-ab 恒等式 (⋆)（Brauer-free）
+- [ ] 系(i) を BG 3.3 + chief-series で **unconditional 化**
+- [ ] (I-2) isotypic 分解（mathlib `IsSemisimpleModule`+`Maschke`）
+- [ ] (I-1) **modular Brauer permutation lemma**（`Z(𝔽̄_p[U])` の char-0 trace-lift）← 核心
+- [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
+- [ ] (I-5) chief-series coprime（`C_{H/N}(X)=C_H(X)N/N`, L-invariant el-ab 系, 乗法性）
+- [ ] assembly → `wielandt_fixedPoint_frobenius`
+
+**見積 ~6-9 session**（I-1 が `p`-adic lifting まで要れば再 flag）。
 
 ## 完了条件
 
-`CoprimeAction.lean` の 3 sorry が消え、`lake build OddOrder OddOrder.AxiomsCheck` が green +
-AxiomsCheck 違反なし + 実 sorry が 3 本減（hub merge tick で検証）。
+`CoprimeAction.lean` の本体 sorry が消え、`lake build OddOrder OddOrder.AxiomsCheck` green +
+**新規 axiom 無し** + 実 sorry が（最終的に）3 本減（hub merge tick で検証）。
 
 ## 参照
 
