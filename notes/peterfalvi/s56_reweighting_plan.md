@@ -184,3 +184,19 @@ reducible μ_j では R(μ_j) を別構成 (σ-image) で与える必要。
 **📍 session 43 honest 総括**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) の **projection 核 crux1W + orthogonal
 projection + struct** 完成(genuine)。xAdjoinStepW は IrreducibleCharacter 版 (vacuous、committed だが要再構成)。
 **真の残 = reducible member-decomp R(μ_j) via σ (=(5.3.b))** → これが (5.6) の最後の hard piece。**正本=本 cont.³⁵。**
+
+## cont.³⁶: reducible member-decomp の精密構造 — ofProjection R(μ_j) via σ
+`memberExtensionDecomposition` (S08CP1:1585) の本体 = `CharacterPsiDecomposition.ofProjection
+(dadeOrthonormalCharacterImageFamilyOfDiff hyp hconj χ hreal hdiffsupp)` (IrreducibleCharacter χ の
+χ−χ̄ の Dade σ-image を R(χ) image family として projection)。
+
+**⟹ reducible μ_j の member-decomposition build target**: `CharacterPsiDecomposition.ofProjection (R(μ_j))` で
+**R(μ_j) = reducible column μ_j の σ-image orthonormal family**。`dadeOrthonormalCharacterImageFamilyOfDiff` は
+IrreducibleCharacter 専用ゆえ、μ_j 用の σ-image family producer が要る (= ChatGPT (5.3.b): R(μ_j)=ω_ij^σ)。
+構築済 σ-isometry ((3.x) `dadeOrthonormalCharacterImageFamily` / signed family、sessions 13-22) に接続。
+
+**▶ 次セッション (fresh context 推奨) の第一手**: (1) `dadeOrthonormalCharacterImageFamilyOfDiff` の output 構造
+(R(χ) = OrthonormalCharacterImageFamily?) を読む → (2) μ_j (= certain-type column) の σ-image が同型 family を産むか
+(構築済 σ-data から) → (3) `CharacterPsiDecomposition.ofProjection (R(μ_j))` で reducible member-decomp → (4) これを
+xAdjoinStepW の Dmem に差し込み (memberExtensionDecomposition の reducible 版) → forward engine 完成 → wrapper。
+**正本=本 cont.³⁶。crux1W (projection) done、残=R(μ_j) via σ の member-decomp (=(5.3.b)、§5↔§6 bridge、deep)。**
