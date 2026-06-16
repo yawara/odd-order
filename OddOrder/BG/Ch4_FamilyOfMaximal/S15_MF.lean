@@ -2834,6 +2834,24 @@ theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Norma
   exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
     (QuotientGroup.mk'_surjective _))
 
+/-- **Theorem 15.2(g) `F(M) ⊆ M_σ`** (mmd L4198), from the same `σ`-gap as the `(g)` equality:
+`F(M) = Q ⊔ (C_G(Q) ⊓ M)` (`fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma`), with
+`Q = O_q(M) ⊆ M_σ` (`opiCoreInG_singleton_le_Msigma_of_mem_sigma`, `q ∈ σ(M)`) and
+`C_M(Q) ⊆ M_σ` (the forward input `hCle`).  So `F(M) ⊆ M_σ`. -/
+theorem fittingInAmbient_le_Msigma_of_le_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hM : M ∈ maximalSubgroups G) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M) (hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M)
+    [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal]
+    [Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))]
+    (hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M) :
+    fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  rw [fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma hG hM hMnormQ hQ hCle]
+  refine sup_le ?_ hCle
+  rw [hQ]
+  exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent
