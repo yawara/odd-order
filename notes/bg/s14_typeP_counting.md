@@ -1121,3 +1121,32 @@ x,x'∈⟨g⟩ commute, x' σ(M)'-elt。~40行。
   g∉M → C_G(x)⊄M → g σ(N)'-elt of N → 14.4(e) complement → g∈(M∩N)^a → x∈M_σ^a → M^a 選べた → 矛盾。~100-150行。
 - 推奨: **14.7 が consume する exclusivity を named lemma 化**してから full "exactly one"。新 leaf S14_SigmaDecomposition
   (S14 既 4250行) へ移すなら hub prefix-split (issue 0069)。
+
+### ✅✅✅ BG Lemma 14.6 exclusivity COMPLETE (2026-06-16 loop⁴ 続き³, commit a1519e5b)
+
+**`not_type1_of_type2` sorry-free + axiom-clean + AxiomsCheck** (~180行 factor-matching, 一発 green
++ namespace 1 修正のみ): type-2 (g=y·y', y∈M_σ^#, y'=非自明 κ(M)-elt of C_M(y)) ⟹ ¬type-1
+(g=x·x', ℓ_σ(x)=1, x'∈R(x))。**14.7 が "T∩H̃=∅" として消費する FT-critical 方向。**
+証明 = 14.5(a) factor-matching (`isPiElement_mul_unique`+σ-partition) を σ-decomposition existence
+機構で駆動。x'≠1 → |𝓜_σ(x)|>1 → N (π(⟨x⟩)⊆τ₂(N), 𝓜(C_G(x))={N})。
+- equal σ(M_x)=σ(M): x=y, Cor14.3 (C_G(y)⊆M, τ₂枝は κ∩τ₂=∅[rank 1 vs 2]で排除)+singleton → M=N →
+  x∈M_σ が τ₂(M)-elt = 矛盾。
+- disjoint: factor-match y=x', y'=x; M,N conj (13.9); x=y' は κ(M)[pRank 1] & τ₂(N)[pRank 2],
+  pRank 共役不変 (`pRank_eq_of_mulEquiv` + `equivMapOfInjective`+`MulEquiv.subgroupCongr`) で 1=2 矛盾。
+新 API 発見: `tau1/tau3_subset_sigma_compl`, `tau{1,2,3}_pRank_eq_{one,two}`, `pRank_eq_of_mulEquiv`(S13)。
+
+**⟹ Lemma 14.6 は FT 的に done** (14.7 は exclusivity のみ要; exhaustivity = "exactly one" 完全性は
+14.7 非依存ゆえ後回し可)。
+
+### ▶ 最終 §14 FT-critical ピース = Theorem 14.7 `typeP_duality` (S14:4475, sorry)
+**全依存 green**: 14.5(c)✅ 14.5(b)✅ 14.6 exclusivity✅ Prop14.2✅ half_lt✅ Thm14.4✅。
+statement (既存, faithful): (h) M'=derivedInG M が K を complement + coprime ∧ ∃! Mstar
+[maximal∧typeP∧¬conj∧Hall κ∧cyclic(K⊔Kstar)∧TI(zTilde)∧(P2 M∨P2 Mstar)∧covering]。
+**proof = §14 最大の counting** (mmd L3993-4063, ~200行超):
+- M_1..M_n = 𝓜(N_G(X_i)) for X_i∈ℰ¹(K); Prop14.2(b) で Z=K×Kstar⊆M_i, X_i⊆M_iσ。
+- T=Z-⋃K_i*; **14.6 exclusivity で T∩H̃=∅** → 𝒞_G(T) ⊥ 𝒞_G(M̃_i); |𝒞_G(T)|=|T||G:Z| (TI, Prop14.2d)。
+- 全 M_i type-P1 仮定 → **14.5(c)** |𝒞_G(M̃_i)|=(|M_iσ|-1)|G:M_i| + 14.5(b) pairwise disjoint →
+  |G^#|≥|𝒞_G(T)|+Σ → ≥|G| 矛盾 → ∃ M_i type-P2 → Prop14.2(g) n=1, Z cyclic, T=Ẑ →
+  **half_lt** |𝒞_G(Ẑ)|>½|G| → covering (∀ type-P H, 𝒞_G(S_H)>½|G| ⟹ 交差 ⟹ H~M or M*)。
+- part(h): M_σ⊆M' (Thm10.2c) + K cyclic + Prop14.2(a) normal complement UM_σ → UM_σ=M' → κ=τ₁。
+realistically 2-4 session (counting infra + ∃! covering assembly)。新 leaf S14_Theorem147 推奨 (hub split)。
