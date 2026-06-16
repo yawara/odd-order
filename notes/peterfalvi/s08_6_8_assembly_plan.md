@@ -3349,3 +3349,19 @@ cont.²⁶ で #1 を long pole とフラグ後、S07/(5.6) 機構を精査し�
 **現状の B lane 成果(再利用可能)**: (6.8.3) 算術 spine + FPF tower(H/H′ 実データ完成、H′/W₂+assembly 残)は #1 と独立に valid。capstone `sibleySetup_is_coherent` の case-B branch は #1 が closeしない限り閉じない。
 
 **▶ 戦略 fork(要ユーザー判断)**: (a) FPF tower 完成(hfpf 再利用 infra、L4 は #1 block 継続) / (b) #1 の textbook 再定式化を ChatGPT 評価(reducible-S 回避の余地精査) / (c) endpoint B/C/D/E signature-pin に redirect / (d) #1 framework 一般化に着手(大規模)。**正本=本 cont.²⁷。#1 = framework 一般化必須・loop 不可。**
+
+### session 43 cont.²⁸: ✅ #1 ChatGPT 評価完了 (Pro 拡張 + project 資料) — verdict 確認 + 精緻化
+ユーザー裁可で #1 を ChatGPT (GPT-5.5 Pro 拡張、odd-order project の教科書 upload を参照、思考 13m25s) に評価依頼。
+全文+検証 = **notes/peterfalvi/s08_6_8_3_reducibleS_chatgpt_answer.md** (出典 04.7/04.8/04.17、私が cont.²⁷ と照合し確認)。
+
+**結論 (検証済)**: cont.²⁷ verdict **確認** — case-B (6.8.3) は reducible column を含む S₁ に (5.6) を適用し
+‖χ‖²-weighted 和を使う、**sidestep 無し**。**精緻化**:
+- (5.6) は抽象 Hyp (5.2) 下の定理で**既約不要・Frobenius-free**。私の Lean 版 (`hF` + IrreducibleCharacter 列挙) は
+  norm-1 特殊化 = artifact。case-B では (5.3.b) が Hyp (5.2) を確立 (R(μ_j)=ω_ij^σ、**構築済 σ-isometry に接続**)。
+- 必要な一般化 = **systematic reweighting** (‖χᵢ‖²=1 → 一般 ‖χᵢ‖²、射影係数 1/‖χᵢ‖²)。既存 (5.6) 証明と概念同型、
+  arbitrary virtual char でない。但し「more than a local patch」(S07/S08 core の (5.6) 機構 reweight、multi-session)。
+
+**⟹ endpoint A (6.8 capstone) の残ブロッカー = (5.6) の norm-weighted/Frobenius-free 一般化 + (5.3.b)**。
+systematic だが multi-session core。FPF tower (cont.²⁶、H/H′ 実データ済) は別 obligation で独立に valid。
+**▶ 要ユーザー判断**: (a) (5.6) reweighting 着手 (endpoint A 完遂路、multi-session) / (b) FPF tower 完成優先 /
+(c) endpoint B/C/D/E redirect。**正本=本 cont.²⁸ + chatgpt_answer.md。#1=systematic (5.6) reweight、sidestep 無し確定。**
