@@ -3297,6 +3297,67 @@ theorem sigmaLength_one_centralizer_structure [Finite G]
     rw [hsingleton] at hmem
     exact Set.mem_singleton_iff.mp hmem
 
+/-- **σ-classes are equal or disjoint** (BG §1 partition, mmd L3789): if two maximal subgroups
+share a `σ`-prime then their `σ`-sets coincide.  Combines Theorem 13.9 (nonconjugate ⟹ disjoint
+`σ`) with the conjugation-equivariance of `σ` (`sigma_conj`).  This is the partition property the
+`σ`-decomposition rests on; used to match the `σ`-factors of an element in Lemma 14.5(a). -/
+theorem sigma_eq_of_mem_sigma_of_mem_sigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M M' : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hM' : M' ∈ maximalSubgroups G) {p : ℕ}
+    (hpM : p ∈ OddOrder.BG.Ch3.S10.sigma M) (hpM' : p ∈ OddOrder.BG.Ch3.S10.sigma M') :
+    OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma M' := by
+  -- `M`, `M'` are conjugate (else Theorem 13.9 makes their `σ`-sets disjoint).
+  obtain ⟨g, rfl⟩ : IsConjugateSubgroup M M' := by
+    by_contra hnc
+    exact Set.disjoint_left.mp
+      (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hM hM' hnc) hpM hpM'
+  ext q
+  refine ⟨fun hq => ?_, fun hq => ?_⟩
+  · haveI : Fact q.Prime :=
+      ⟨Nat.prime_of_mem_primeFactors ((OddOrder.BG.Ch3.S10.mem_sigma_iff M q).mp hq).1⟩
+    exact OddOrder.BG.Ch3.S10.sigma_conj g hq
+  · haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors
+      ((OddOrder.BG.Ch3.S10.mem_sigma_iff (MulAut.conj g • M) q).mp hq).1⟩
+    have h := OddOrder.BG.Ch3.S10.sigma_conj g⁻¹ hq
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
+
+open Classical in
+/-- **BG's `R(x)`** (mmd L3906): the normal Hall subgroup of `C_G(x)` from Theorem 14.4.  When
+`ℓ_σ(x) = 1` and `|𝓜_σ(x)| > 1`, `R(x) = N_σ ∩ C_G(x)` for the unique `N = N(x) ∈ 𝓜(C_G(x))`
+of Theorem 14.4; otherwise (`x = 1`, `ℓ_σ(x) ≠ 1`, or `|𝓜_σ(x)| = 1`) `R(x) = 1`. -/
+noncomputable def Rsub [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) (x : G) : Subgroup G :=
+  if h : x ≠ 1 ∧ D.length x = 1 ∧ 1 < (maximalSigmaSubgroupsOfElement x).ncard then
+    OddOrder.BG.Ch3.S10.Msigma
+        (((sigmaLength_one_centralizer_structure hG D h.1 h.2.1).2 h.2.2).exists.choose)
+      ⊓ Subgroup.centralizer ({x} : Set G)
+  else ⊥
+
+/-- `R(x) ≤ C_G(x)` (immediate from the definition; holds in both branches). -/
+theorem Rsub_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) (x : G) :
+    Rsub hG D x ≤ Subgroup.centralizer ({x} : Set G) := by
+  rw [Rsub]; split_ifs
+  · exact inf_le_right
+  · exact bot_le
+
+/-- The defining value of `R(x)` in the multi-maximal case: `R(x) = N_σ ∩ C_G(x)` for the
+unique `N` of Theorem 14.4 (`.exists.choose`). -/
+theorem Rsub_eq_inf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {x : G} (hx : x ≠ 1) (hlen : D.length x = 1)
+    (hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard) :
+    Rsub hG D x = OddOrder.BG.Ch3.S10.Msigma
+      (((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose)
+      ⊓ Subgroup.centralizer ({x} : Set G) := by
+  rw [Rsub, dif_pos ⟨hx, hlen, hgt⟩]
+
+/-- **BG's `M̃`** (mmd L3908): `{ x x' | x ∈ M_σ^#, x' ∈ R(x) }`, the `σ`-decompositions of
+length `≤ 2` with leading factor in `M_σ^#`.  This is the genuine BG `M̃` (it adjoins the
+`ℓ_σ = 2` twisted elements `x x'` that the under-approximation `sigmaSharp` omits). -/
+def Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    (M : Subgroup G) : Set G :=
+  {g | ∃ x ∈ sigmaSharp M, ∃ x' ∈ Rsub hG D x, g = x * x'}
+
 /-- **BG Lemma 14.5(b)** (mmd L3875): for nonconjugate maximal `M`, `N`, the conjugacy
 saturations `𝒞_G(M̃)`, `𝒞_G(Ñ)` are disjoint — a counting-separation lemma feeding
 Theorem 14.7 and Corollary 14.9.
