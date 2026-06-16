@@ -138,3 +138,27 @@ Z=φ−∑(cZᵢ/mc i)•vcᵢ、⟨Z,vcᵢ⟩=cZᵢ−(cZᵢ/mc i)·mc i=0)。
 **⟹ crux1W build**: (1) orthogonal projection lemma [新規 key] → (2) weighted hcoeffval/hY (rc i=deg i/mc i) →
 (3) `lambda_eq_zero_and_Z_eq_zero` (無改修) で λ=0 → μ=−a。**当初の「92 行 monolith rewrite」より遥かに局所的**。
 正本=本ファイル + chatgpt_answer.md Q4。次=orthogonal projection lemma build。
+
+## cont.³⁴: ✅✅ crux1W (最難核) DONE — 残 xAdjoinStepW は 189 行コピー+4 変更 (機械的)
+**(5.6) weighted core の最難 piece `crux1_of_memberFamilyW` COMPLETE** (commit、axiom-clean)。
+de-risk (lambda engine 既 general) + mc-parameter 設計 (inner-self-real 回避) + orthogonal projection で、
+maxed context でも build (4→1→green)。
+
+**📍 (5.6) core 現状 (S08_CoherenceWeighted.lean)**:
+- ✅ `XAdjoinStepInputW` struct
+- ✅ `exists_indexed_projection_of_orthogonal_ZIrr` (orthogonal 整数射影、有理係数 cZ/mc)
+- ✅ `crux1_of_memberFamilyW` (weighted (5.6.1)/(5.6.2) 核、mc/rc=deg/mc/lambda_eq_zero)
+
+**残 = `xAdjoinStepW` = xAdjoinStep (S08CP1:2262-2451、189 行) のコピー + 4 変更のみ** (他は norm-agnostic で不変):
+1. **signature**: `hmemortho` 対角 `(mc i:ℂ)` + `hDeg : 2a < ∑deg²/mc i` + 引数 `mc/hmempos/hanchorNorm` 追加。
+2. **hchi1chi1** (L2352): `rw [hmemortho i₁ hi₁ i₁ hi₁, if_pos rfl, hanchorNorm]` (mc i₁=1 で 1)。
+3. **hcoeffval の key** (L~2410): `rw [hmemortho i₁ hi₁ i hi] at key` 後、i=i₁ case で `mc i₁` を hanchorNorm で 1 化
+   (rcases i i₁ の subst 枝で hanchorNorm 適用)。
+4. **crux1 call** (L~2420) → `crux1_of_memberFamilyW … mc hmempos hmemortho hanchorNorm hcoeffval … hDeg`。
+不変部: Da/hYeq/hDaY_ZIrr、hmemχ/hmemχbar/hmembarχ/hmembarχbar、Dmem/hortho_mem/hXortho/hfound、hcrux2/hτdiffZ、
+`retarget_isCoherent_of_extensionImage` call (hχχ/hchi1chi1 norm-1 で不変)。
+**→ その後 wrapper `coherentDegreeSqNormBound_of_not_coherentW` (xAdjoinStepW を contrapose、~10 行) + break-pair for
+reducible S (`exists_coherentBreakPair` 一般化、別途)。**
+
+**📍 session 43 総括 (23+ commits)**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) core 最難核 crux1W 完成。
+残 (5.6): xAdjoinStepW [189 行機械コピー+4 変更] + wrapper + break-pair。**正本=本ファイル。次=xAdjoinStepW コピー (fresh context 推奨、189 行ゆえ).**
