@@ -728,8 +728,15 @@ unlike `certainTypeDecompositionDa`).  It uses the reducible image family `R(μ_
 
 This is the `Dmem`-style member decomposition for a reducible column member of the weighted (5.6)
 adjoin engine `xAdjoinStepW` (its `htau1Dmem` field `(Dmem i).tau1 = ν` then holds by `rfl`); the
-remaining `xAdjoinStepW`-side inputs are the (5.2.e) cross-family orthogonality (from
-`dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`-style reasoning against the break family). -/
+remaining `xAdjoinStepW`-side input is the (5.2.e) cross-family orthogonality against the break
+family.
+
+The coherence `hS₁` and decomposition are stated over a **general** integral map `τ'` (the engine's
+Dade map, e.g. the Sibley–Dade `hyp.tau`), agreeing with the certain-type Dade map
+`dadeIntegralCharacterMap h.dade0 h.tau` on the conjugate column difference (`hagree`, supplied for
+case (B) by `caseB_column_mapagree`); the reducible image family `R(μ_j) = certainTypeR` is
+transported to `τ'` by replacing only its `image_eq` field (the orthonormal `imageSet ⊆ ZIrr G` is
+map-independent). -/
 noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Invertible (Nat.card ↥h.K : ℂ)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
@@ -737,14 +744,16 @@ noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero 
     {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
     (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
       = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    {τ' : S07.IntegralCharacterMap (↥L) G}
+    (hagree : τ' (columnSum h χ₂ - (columnSum h χ₂).conj)
+      = S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - (columnSum h χ₂).conj))
     {S₁ : Set (ClassFunction ↥L ℂ)} {A' : Set ↥L}
-    (hS₁ : S07.IsCoherent (S07.dadeIntegralCharacterMap h.dade0 h.tau) S₁ A')
+    (hS₁ : S07.IsCoherent τ' S₁ A')
     (hμ_S1 : columnSum h χ₂ ∈ S₁) (hμbar_S1 : (columnSum h χ₂).conj ∈ S₁)
     (hνZ : hS₁.extension (columnSum h χ₂) ∈ ZIrr G)
     (hdiffsupported : columnSum h χ₂ - (columnSum h χ₂).conj ∈
       S07.zSupportedSpan (L := ↥L) S₁ A') :
-    S07.CharacterPsiDecomposition (S07.dadeIntegralCharacterMap h.dade0 h.tau)
-      (columnSum h χ₂) 0 := by
+    S07.CharacterPsiDecomposition τ' (columnSum h χ₂) 0 := by
   have hχmem : columnSum h χ₂ ∈ Submodule.span ℤ S₁ := Submodule.subset_span hμ_S1
   have hχbarmem : (columnSum h χ₂).conj ∈ Submodule.span ℤ S₁ := Submodule.subset_span hμbar_S1
   -- The (5.4) sponsoring set `{μ_j − μ̄_j, μ_j − 0}` lies in `ℤ[S₁]`.
@@ -759,7 +768,14 @@ noncomputable def certainTypeMemberDecomposition (h : Hypothesis46 A L) [NeZero 
   have hχχbar : ClassFunction.inner (columnSum h χ₂) (columnSum h χ₂).conj = 0 := by
     rw [columnSum_conj_eq, columnSum_def, columnSum_def, columnFamily_mu_sum_inner,
       if_neg (column_inv_ne_self h hχ₂).symm]
-  exact S07.CharacterPsiDecomposition.ofProjection (certainTypeR h hχ₂ hdeg)
+  -- The reducible image family `R(μ_j) = certainTypeR`, transported from the certain-type Dade map
+  -- to `τ'` by replacing only `image_eq` (`hagree`); the orthonormal `imageSet ⊆ ZIrr G` is shared.
+  exact S07.CharacterPsiDecomposition.ofProjection
+    ({ imageSet := (certainTypeR h hχ₂ hdeg).imageSet
+       mem_ZIrr := (certainTypeR h hχ₂ hdeg).mem_ZIrr
+       orthonormal := (certainTypeR h hχ₂ hdeg).orthonormal
+       image_eq := by rw [hagree]; exact (certainTypeR h hχ₂ hdeg).image_eq } :
+      S07.OrthonormalCharacterImageFamily τ' (columnSum h χ₂))
     hS₁.extension
     (fun φ ζ hφ hζ => hS₁.extension_inner_eq φ ζ (hle hφ) (hle hζ))
     (hS₁.extends_on_supported _ hdiffsupported)
