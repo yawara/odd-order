@@ -4631,6 +4631,14 @@ unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint
 
+/-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
+subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
+prime `p`) form of the first conjunct of `theoremB_U_and_A_tame`, derived cite-only over §12
+(`exists_subgroupESetup_with_le` + `SubgroupESetup.rank_le_two` + `nilpotent_sigmaComplement_abelian`).
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results

@@ -179,6 +179,52 @@ theorem theoremB_U_and_A_tame [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       IsTISubset (ASet M U \ (OddOrder.BG.Ch3.S10.Msigma M : Set G)) M := by
   sorry
 
+/-- **BG Theorem B(1)** (mmd L4373): every Sylow subgroup of `U` is abelian of rank at most two.
+
+Standalone, `sorry`-free form of the first conjunct of `theoremB_U_and_A_tame`, mirroring
+`sigma_reps_pairwise_disjoint` (the Theorem E precedent).  Two faithfulness adjustments over the
+scaffold conjunct:
+
+* the explicit hypothesis `hUM : U ≤ M` — the §12 supporting-subgroup reduction
+  (`exists_subgroupESetup_with_le`) genuinely needs `U ≤ M`, and `hU` (a Hall condition on
+  `U.subgroupOf M`) does not force it; in BG `U ⊆ M` is part of the setup (`M = K U M_σ`);
+* the restriction to a *prime* `p` — "Sylow subgroup" means a `p`-group for prime `p`; for a
+  composite `p` the bare `IsPGroup p` hypothesis is met by non-abelian `{q, r}`-groups (e.g. a
+  Frobenius `7 ⋊ 3`, possible in odd order), so the unrestricted `∀ p : ℕ` form is false.
+
+Proof (cite-only over §12): a `p`-subgroup `P ≤ U` is a `σ(M)'`-subgroup of `M`, hence lies in a
+supporting subgroup `E` with `SubgroupESetup M E …` (`exists_subgroupESetup_with_le`); then
+`rank P ≤ rank E ≤ 2` (`rank_le_two`) and `P`, a prime `p`-group, is nilpotent, so abelian by
+`nilpotent_sigmaComplement_abelian` (a). -/
+theorem theoremB_U_sylow_abelian_rank_le_two [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M)) :
+    ∀ p : ℕ, p.Prime → ∀ P : Subgroup G, P ≤ U → IsPGroup p ↥P →
+      rank ↥P ≤ 2 ∧ IsMulCommutative ↥P := by
+  intro p hp P hPU hPp
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hPM : P ≤ M := hPU.trans hUM
+  -- `P ≤ U` is a `σ(M)'`-subgroup of `M`.
+  have hP_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) P := by
+    intro q hq
+    have hqU : q ∈ (Nat.card ↥U).primeFactors :=
+      Nat.primeFactors_mono (Subgroup.card_dvd_of_le hPU) Nat.card_pos.ne' hq
+    intro hqσ
+    exact hU.1 q (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+      (Set.mem_union_right _ hqσ)
+  -- §12 supporting subgroup `E ⊇ P`.
+  obtain ⟨E, _E₁, _E₂, _E₃, hsetup, hPE, _hE_pi⟩ :=
+    exists_subgroupESetup_with_le hG hM hPM hP_pi
+  refine ⟨?_, ?_⟩
+  · rw [rank_le_iff]
+    intro q hq
+    exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective hPE))
+      ((rank_le_iff.mp (hsetup.rank_le_two hG)) q hq)
+  · exact (nilpotent_sigmaComplement_abelian hG hsetup).1 P hPM hP_pi
+      (IsPGroup.isNilpotent hPp)
+
 /-- **BG Theorem C** (mmd L4303): when `K != 1`, `M` has a paired maximal
 subgroup `Mstar`, the cyclic product `Z = K Kstar`, a TI set `Z_tilde`, and the
 associated type-P duality. -/
