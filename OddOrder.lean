@@ -160,6 +160,7 @@ import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBCoherence2
 import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBXunionY
+import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
 import OddOrder.Peterfalvi.S08_CaseBEndgame
 import OddOrder.Peterfalvi.S08_CaseBHortho
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
