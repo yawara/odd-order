@@ -3597,3 +3597,26 @@ columnSum 一致は linearity (`columnSum_def`+`map_sum`) で grid 一致から�
 抽出 → `tau(columnSum k0−a₀η₁)=cTE(columnSum k0)−a₀·cY.ext(η₁)` を確立) → base glue assembly
 (`coherentCertainTypeSet_union_Yset`) → 既約 adjoin (retarget) → IsCoherent(Xset∪Y) → (6.8.3) → sole sorry。
 **正本=本 session 46 cont.²。ν=DONE、base glue は hDτ ((6.8.2.3) anchored image) 単一 obligation に還元、discharge 経路確定。**
+
+### session 46 cont.³: ✅✅ base glue assembly `coherentCertainTypeSet_union_Yset` landed — 単一 obligation `hanchored` のみ
+**`coherentCertainTypeSet_union_Yset` (commit `8152a356`, S08_CaseBXunionY, axiom-clean)**: case-B base glue
+`IsCoherent hyp.tau (certainTypeSet h46 k ∪ Yset)` を gated skeleton として完成。機械的入力を全て内部 discharge:
+- **ν 抽出は `.choose`** (∃ν は Prop ⟹ IsCoherent データ goal に `obtain` 不可; `have hspec:=…choose_spec`+`set ν:=…choose`)
+- hagreeX: `exact hνcol χ₂` (**`canonical.extension` は `certainTypeExtension` と defeq** — `IsCoherent.congrMap` の
+  `extension := c.extension` 経由、`rfl` 不要で `exact` 通過)
+- hsrc_ortho/hmixed/hgen = 既存 lemma 直結、hDτ = ν linearity (`map_sub`/`map_nsmul`) で hanchored に還元
+- **唯一 hypothesis = `hanchored`**: `hyp.tau(columnSum k0 − a₀•η₁) = certainTypeExtension(columnSum k0)
+  − a₀•coherentYset.extension(η₁)` (= (6.8.2.3) column anchored image、faithful)
+
+**🔴 残る単一 obligation = `hanchored` ((6.8.2.3) column anchored image) — deep hard core**:
+route = `columnDecompositionTau` D (S08CBC2:1822、入力 hdeg=`columnSum_inv_apply_one`/hmapagree=`caseB_column_mapagree`/
+hχψ・hχbarψ=`caseB_column_orthogonal_Yset`系/hSdiff・htau1_mema=要構成) → `D.tau1_image: hyp.tau(columnSum−a₀η₁)=D.X−D.Y`
+(D.tau1=hyp.tau) → pinning `D.Y=a₀•cY.ext(η₁)` (`per_constituent_Y_eq_smul` または `caseB_per_phi_anchored` S08CBA:1416、
+要 (6.8.2.2)=hdecomp [S08CBC `inner_tau_indW2_sub_smul_eq` 系で実質済] + D family `caseB_constituentDecomposition` S08CBA:1037
++ hXorth/hbi) → `D.X=certainTypeExtension(columnSum)` 同定。**multi-hundred LOC、per-constituent + pinning の (6.8.2.3) 本体**
+(lane が長く hard core としてきた部分)。**loop-cadence 不適、focused build 要。**
+
+**▶▶ 次 = `hanchored` materialize** (上記 route)。完成すれば base glue 即完成 → 既約 X-member adjoin
+(`retarget_isCoherent_of_decompositions_and_memberFamily` + `irreducibleDecompositionTau`) → IsCoherent(Xset∪Y) →
+(6.8.3) [FPF tower `caseB_fpf_bound`✅ + (5.6) bound `coherentDegreeSqNormBound_of_not_coherentW`✅] → sole sorry。
+**正本=本 cont.³。base glue=完成 (skeleton)、唯一残=hanchored ((6.8.2.3) per-constituent 本体、deep)。**
