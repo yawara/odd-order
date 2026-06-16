@@ -162,3 +162,25 @@ reducible S (`exists_coherentBreakPair` 一般化、別途)。**
 
 **📍 session 43 総括 (23+ commits)**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) core 最難核 crux1W 完成。
 残 (5.6): xAdjoinStepW [189 行機械コピー+4 変更] + wrapper + break-pair。**正本=本ファイル。次=xAdjoinStepW コピー (fresh context 推奨、189 行ゆえ).**
+
+## cont.³⁵: ⚠ 訂正 — xAdjoinStepW (IrreducibleCharacter) は vacuous、真の残務=reducible member-decomp (5.3.b)
+cont.³⁴ の「forward engine COMPLETE」は **overclaim**。verbatim extract の xAdjoinStepW は `χmem : ι →
+IrreducibleCharacter` のまま ⟹ hmemortho `⟨χmem i,χmem i⟩=if i=j then mc i` で既約は ⟨χmem i,χmem i⟩=1 ゆえ
+**mc=1 強制 = vacuous weighting**(xAdjoinStep と同等、reducible-S に無価値)。
+
+**🎯 χmem を ClassFunction に変えると line 360 で詰まる**: `Dmem := memberExtensionDecomposition hyp hconj hS₁
+(χmem i) …` が **`memberExtensionDecomposition` (S08CP1:1585) の `(χ : IrreducibleCharacter ↥L)` 引数を要求**。
+⟹ xAdjoinStep の **per-member ν-aux 分解 Dmem (= R(χᵢ) image family) は IrreducibleCharacter 専用**。
+reducible μ_j では R(μ_j) を別構成 (σ-image) で与える必要。
+
+**⟹ (5.6) reweighting の真の構造**:
+- ✅ **crux1W** = member 分解 (Da, Dmem, R(χᵢ)) を**所与**とした weighted projection + λ-forcing。genuine・reusable。
+- 🔴 **残 core = reducible member-decomposition**: reducible μ_j の per-member image family R(μ_j) を σ-isometry
+  から構成 (= ChatGPT が言う **(5.3.b): R(μ_j)=ω_ij^σ で Hyp(5.2) を case-B 確立**)。`memberExtensionDecomposition`
+  の reducible 版 (σ-image ベース) が要る。**これが (5.6) の本丸の残り**(projection でなく member の R 構成)。
+  構築済 σ-isometry (`dadeOrthonormalCharacterImageFamily`、(3.x) sessions) に接続。
+- その後 xAdjoinStepW を reducible Dmem で再構成 → wrapper → break-pair。
+
+**📍 session 43 honest 総括**: FPF tower 完結 + ChatGPT #1 verdict + (5.6) の **projection 核 crux1W + orthogonal
+projection + struct** 完成(genuine)。xAdjoinStepW は IrreducibleCharacter 版 (vacuous、committed だが要再構成)。
+**真の残 = reducible member-decomp R(μ_j) via σ (=(5.3.b))** → これが (5.6) の最後の hard piece。**正本=本 cont.³⁵。**
