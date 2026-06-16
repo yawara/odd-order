@@ -219,4 +219,45 @@ theorem finrank_eq_card_mul_of_regular_orbit (ρ : Representation k G V)
     rw [hAg, finrank_map_rho_eq]
   rw [hW, Finset.sum_congr rfl (fun g _ => heq g), Finset.sum_const, Finset.card_univ, smul_eq_mul]
 
+/-- **I-3, easy half.**  For `V = ⊕_{g:G} A g` (internal) with `ρ` permuting the summands regularly
+and `|G|` invertible, averaging `A 1 → V^G`, `w ↦ averageMap ρ w`, is injective, so
+`dim (A 1) ≤ dim V^G`.  Key fact: the `A 1`-component of `averageMap ρ w` is `⅟|G| • w`. -/
+theorem finrank_A1_le_finrank_invariants (ρ : Representation k G V)
+    [Fintype G] [DecidableEq G] [Invertible (Fintype.card G : k)] [FiniteDimensional k V]
+    {A : G → Submodule k V} (hint : DirectSum.IsInternal A)
+    (hperm : ∀ a e : G, (A e).map (ρ a) = A (a * e)) :
+    finrank k ↥(A 1) ≤ finrank k ↥(invariants ρ) := by
+  classical
+  set e := LinearEquiv.ofBijective (DirectSum.coeLinearMap A) hint with he
+  have hmem : ∀ (g h : G) (x : V), x ∈ A h → ρ g x ∈ A (g * h) := fun g h x hx =>
+    hperm g h ▸ Submodule.mem_map_of_mem hx
+  have hcs1 : ∀ (x : V) (hx : x ∈ A 1), e.symm x 1 = ⟨x, hx⟩ := fun x hx => by
+    rw [he]; exact hint.ofBijective_coeLinearMap_of_mem hx
+  have hcn1 : ∀ (g : G) (x : V), x ∈ A g → g ≠ 1 → e.symm x 1 = 0 := fun g x hx hg => by
+    rw [he]; exact hint.ofBijective_coeLinearMap_of_mem_ne hg hx
+  have hcomp : ∀ w : ↥(A 1),
+      e.symm (averageMap ρ (w : V)) 1 = ⅟(Fintype.card G : k) • w := by
+    intro w
+    simp only [averageMap_apply, map_smul, map_sum]
+    show ⅟(Fintype.card G : k) • ((∑ x : G, e.symm (ρ x (w : V))) 1) = ⅟(Fintype.card G : k) • w
+    rw [DirectSum.sum_apply]
+    congr 1
+    rw [Finset.sum_eq_single (1 : G)]
+    · show e.symm (ρ (1 : G) (w : V)) 1 = w
+      have h1 : ρ (1 : G) (w : V) ∈ A 1 := by simpa using hmem 1 1 (w : V) w.2
+      rw [hcs1 _ h1]; ext; simp
+    · intro g _ hg1
+      have hg : ρ g (w : V) ∈ A g := by simpa using hmem g 1 (w : V) w.2
+      exact hcn1 g _ hg hg1
+    · intro h; exact absurd (Finset.mem_univ (1 : G)) h
+  let f : ↥(A 1) →ₗ[k] ↥(invariants ρ) :=
+    (LinearMap.codRestrict (invariants ρ) (averageMap ρ) (averageMap_invariant ρ)).comp
+      (A 1).subtype
+  refine LinearMap.finrank_le_finrank_of_injective (f := f) (fun x y hxy => ?_)
+  have hav : averageMap ρ (x : V) = averageMap ρ (y : V) := Subtype.ext_iff.mp hxy
+  have key : ⅟(Fintype.card G : k) • x = ⅟(Fintype.card G : k) • y := by
+    rw [← hcomp x, ← hcomp y, hav]
+  have h2 := congrArg (fun z : ↥(A 1) => (Fintype.card G : k) • z) key
+  simpa [smul_smul, mul_invOf_self] using h2
+
 end OddOrder.GroupTheory.WielandtCounting
