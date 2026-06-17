@@ -4960,6 +4960,22 @@ every family member is `M` or `M*`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_partner
 
+/-! **BG Theorem 14.7(f), the type-`P₂` dichotomy** (`S14_TypePCounting`,
+`isTypeP2_or_isTypeP2_partner`): one of `M`, `M*` is type `P₂` (the density inequality's type-`P₂`
+member is `M` or `M*`).  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP2_or_isTypeP2_partner
+
+/-! **BG Theorem 14.7, the partner canonical factor** (`S14_TypePCounting`, `partner_canonical_eq`):
+`Z ⊓ M*_σ = K`.  The partner's canonical family factor equals `M`'s Hall `κ`-subgroup — a `σ(M)′`-
+subgroup of `Z = K × K*` lying in the `σ(M)′`-Hall `K` (`isPiSubgroup_le_left_of_commute`), and
+`K ≤ M*_σ` since every prime of `K` lies in `σ(M*)` (`kappaHall_primes_subset_sigma_partner`, the
+line→partner argument).  This is the structural keystone turning `T = Z − ⋃ Kᵢ*` into
+`Ẑ = Z − (K ∪ K*)`.  Both registered.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappaHall_primes_subset_sigma_partner
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.partner_canonical_eq
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
