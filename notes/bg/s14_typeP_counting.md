@@ -1668,3 +1668,33 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 2. **step 1 equivariance helpers** ×3 (上記、~50 行 clean)。
 3. **assembly `typeP_covering`**: 任意 type-P H → exists_zTilde_…(M)+(H) で両 bound → ncard_inter → matching → Kstar/K-case 双方で 14.2(c) double → H~M∨Mstar (~60 行)。
 - **正本 = この節。matching は landed、partner symmetry が次の lynchpin。**
+
+### ✅✅✅ partner symmetry 14.7(1)(2)(3) COMPLETE (2026-06-17 再開² cont., commits `0fbd151e` `e55a93d5`) — covering lynchpin 突破、残り = 機械的 assembly のみ
+
+**🎉 BG 末尾の長い「Hall σ(M)-subgroup of Mstar」論法を回避する近道を発見。family 機構が既に partner 構造を encode していた。** covering の真のボトルネックだった partner symmetry を sorry-free + axiom-clean で landing。
+- **`typeP_sigma_subgroup_le_Msigma`** (14.2(f), `0fbd151e`): σ(M)-subgroup Y<⊤ で Y⊓K*≠⊥ ⟹ Y≤Mσ。Cor 12.16 (`sigma_subgroup_conj_into_Msigma_general`, σ-disjoint gate=Thm13.9) + (d) で conjugator∈M。[結局 assembly では未使用 — 近道が判明したため。だが Prop 14.2(f) として独立価値+登録済]
+- **🔑 `typeP_partner_structure`** (14.7(2)(3), `e55a93d5`): **Kstar=Hall κ(Mstar) ∧ K=C_{Mstar_σ}(Kstar)**。`typeP_family_member_data` が Mstar の Hall κ(Mstar)-subgroup KN + swap Z=KN⊔C_{Mstar_σ}(KN) を与え、`partner_canonical_eq` が Z⊓Mstar_σ=K。**KN=Kstar は双方向 `isPiSubgroup_le_left_of_commute` (π=σ(Mstar): K=σ(Mstar)-part, KN/Kstar=σ(Mstar)'-part) で card 不要**。一発 green。
+- **🔑 `typeP_partner_centralizer_singleton`** (14.7(1), `e55a93d5`): **𝓜(C_G(Y))={Mstar} for Y∈ℰ¹(K)**。partner_structure で K=Mstar's Kstar-role ⟹ 14.2(c) for Mstar (`typeP_structure ….2.2.2.2.2`, U_Mstar は hall_E_exists)。covering K-case 解禁。
+
+**▶▶ 残り = `typeP_covering` assembly のみ (機械的, ~100 行, 新数学ゼロ)** — 全 math piece 揃った:
+1. M-bound (`typeP_zTilde_conjClass_gt_half`) + H-bound (`exists_zTilde_conjClass_gt_half_of_isTypeP`) → `ncard_inter_nonempty_of_two_mul_gt` → 共通元 u。
+2. `mem_conjClassSet` (= `∃t∈A,∃g, g*t*g⁻¹=u`) 展開 → t∈Ẑ_M, s∈Ẑ_H, **t=c•s** (c=a⁻¹b)。
+3. matching (`exists_inf_ne_bot_of_mem_zTilde_inter`, πM=σ(M), L'=c•L, Lstar'=c•Lstar) → **(c•Lstar)⊓K≠⊥ ∨ (c•Lstar)⊓Kstar≠⊥**。
+4. rank-1 Y∈ℰ¹(交差) (`exists_prime_orderOf_dvd_card'`+zpowers、typeP_kappaHall_inf_conj_eq_bot のパターン) → double 14.2(c):
+   - Kstar-case: Y≤Kstar→𝓜(C_G(Y))={M} (14.2(c)/M); Y≤c•Lstar→c⁻¹•Y≤Lstar→𝓜(C_G(c⁻¹•Y))={H} (14.2(c)/H, U_H 要再構成)→ c•H⊇C_G(Y) (centralizer_conj_smul) ∧ c•H maximal → c•H∈{M} → **c•H=M → H~M**。
+   - K-case: Y≤K→𝓜(C_G(Y))={Mstar} (**14.7(1)=typeP_partner_centralizer_singleton**); 同様 → **c•H=Mstar → H~Mstar**。
+- **要 equivariance 配線 (5)**: `conj_smul_mem_elemAbelianOfRank`(public✓) / `centralizer_conj_smul`(✓) / `isCoatom_conj_smul`(✓) / `mem_maximalSubgroups_of_isConjugateSubgroup`(✓) / **card_conj_smul (private×2 → inline 再証明要: `Nat.card_congr (L.equivMapOfInjective (conj c).toMonoidHom (conj c).injective)`)** + maximalSubgroupsContaining conj-singleton は inline (mem + isCoatom + centralizer_conj_smul で)。
+- **IsConjugateSubgroup A B = ∃g, conj g•B=A** (g=1 で refl, line 6131)。c•H=M ⟹ H=c⁻¹•M ⟹ ∃g=c⁻¹, conj g•M=H ⟹ IsConjugateSubgroup H M。
+- 正本 = この節。**partner symmetry 突破済 ⟹ typeP_covering は機械的 assembly のみ**。次セッションで完遂可。
+
+### ✅✅✅✅ covering 14.7(7) COMPLETE (2026-06-18, commit `90651d52`) — ユーザー指示「3 sub-step」全完遂
+
+**`typeP_covering` (BG 14.7(7)): ∀ H type-P, H~M ∨ H~Mstar。sorry-free + axiom-clean + AxiomsCheck。** step 1+2+3 を一気に assemble (新数学ゼロ、conjugation 配線のみ)。covering ボトルネックだった partner symmetry を先に突破済ゆえ機械的に完遂。
+- 両 Ẑ の >½|G| (M-bound + `exists_zTilde_…of_isTypeP` [U も返すよう拡張]) → `ncard_inter_nonempty_of_two_mul_gt` → 共通元 → **t=c•s** (`MulAut.conj`/group tactic で c=a⁻¹b)。
+- matching (`exists_inf_ne_bot_of_mem_zTilde_inter`, πM=σ(M)/πH=σ(H)) → Y≤c•Lstar が K/Kstar に当たる。
+- double singleton: Y≤Kstar→{M} (14.2(c)); Y≤K→{Mstar} (14.7(1)); c⁻¹•Y∈ℰ¹(Lstar)→{H} (14.2(c)/H) → **c•H=M∨Mstar → H~M∨Mstar**。
+- equivariance: `conj_smul_mem_elemAbelianOfRank`(public) / `centralizer_conj_smul` / `isCoatom_conj_smul` / `Subgroup.card_map_of_injective (conj c).injective` (=card_conj_smul inline) / cancel 補題 `conj c⁻¹•(conj c•X)=X` (`← map_mul`+inv_mul_cancel+map_one+one_smul、map_inv が LHS も書き換える罠を回避)。
+- **🔑 技法**: `IsConjugateSubgroup M N = ∃g, conj g•M=N` (向き注意; `⟨c, hcHN⟩` 直接、conj c•H=N がそのまま witness)。`mem_maximalSubgroupsContaining.mp (hsing.symm ▸ Set.mem_singleton H)` で H∈𝓜 抽出。
+
+**🛑 STOP — GATE「残 2 設計判断到達で停止」に到達**: typeP_duality ∃! bundle の covering/Hall κ(Mstar)/TI/P2/¬conj conjunct は全て in hand。残り typeP_duality 完成 = **(1) IsCyclic(K⊔Kstar) [Ω₁(Sylow) helper] (2) part(h) [Prop 14.2(a) UM_σ packaging]** の 2 設計判断のみ + uniqueness 組立。これらは原 AskUserQuestion の残 2 obligation でユーザー裁可待ち。
+- **§14 funnel 進捗サマリ (2026-06-18)**: density bound + 14.7(e)(f) + partner symmetry 14.7(1)(2)(3) + **covering 14.7(7)** 全 landing。残 = 14.7(d) cyclic + 14.7(8) part(h) → typeP_duality close → §15/§16 unblock。正本 = この節。

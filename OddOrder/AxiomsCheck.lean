@@ -5057,6 +5057,16 @@ covering step to conjugate a type-`P` subgroup to `M*`.  Fully unconditional, ax
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_partner_centralizer_singleton
 
+/-! **BG Theorem 14.7(7), the covering** (`S14_TypePCounting`, `typeP_covering`): every type-`P`
+maximal subgroup `H` is conjugate to `M` or to its partner `M*`.  The capstone of the `∃! M*`
+bundle: both `Ẑ_M` and `Ẑ_H` cover `> ½|G|` (`exists_zTilde_conjClass_gt_half_of_isTypeP`), so the
+saturations meet (`ncard_inter_nonempty_of_two_mul_gt`); the `σ`-part matching
+(`exists_inf_ne_bot_of_mem_zTilde_inter`) lands a line `Y` meeting `K` or `K*`, and the double
+`14.2(c)` / `14.7(1)` singleton (`typeP_partner_centralizer_singleton`) forces `c·H = M` or `M*`.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_covering
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
