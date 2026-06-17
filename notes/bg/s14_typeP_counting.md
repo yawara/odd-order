@@ -1616,3 +1616,55 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 - `{M, Mstar}` Finset literal は statement で DecidableEq (Subgroup G) 要 → predicate 形 `∀N,…→N=M∨N=Mstar` で回避。
 - member_data の `∃KN` witness を `-` で捨てると後続 (hcanon/hne が KN 参照) 壊れる → KN 命名。
 - `Nat.card_coe_set_eq (s:Set) : Nat.card ↥s = s.ncard` + `Nat.card_congr (Equiv.refl _)` で subgroup-coe ↔ subtype card 橋渡し。
+
+### ✅✅ >½|G| density bound COMPLETE (2026-06-17 lane-h 再開セッション², commit `b2fc3c18`) — counting heart 着地、🛑 残り = 設計判断 3 件
+
+**LAUNCH GATE objective (VERDICT=LOOP_THEN_STOP) を 1 iteration で完遂。両 deliverable sorry-free + axiom-clean + AxiomsCheck 登録、full build green 3838/67.5s。GATE の stop-when (typeP_duality 本体組立の前で停止) に正確に到達 → 🛑 STOP。**
+
+**landing 群** (`S14_TypePCounting.lean`):
+1. **`family_inf_msigma_union_eq`** (14.7(e) 補題抽出): `⋃_{N∈𝓕}(Z⊓N_σ)=↑K∪↑Kstar`。`typeP_zTilde_isTI` の `hunion` 証明を standalone 化 (typeP_self_member + partner_canonical_eq)。`typeP_zTilde_isTI` を cite 形に refactor。
+2. **`typeP_zTilde_conjClass_gt_half`** (density bound, mmd L3975/L4051): **`Nat.card G < 2·(conjClassSet (zTilde K Kstar)).ncard`**。
+   - chain: `|𝒞_G(Ẑ)|=|Ẑ|·[G:Z]` (`ncard_conjClassSet_of_isTISubset` + `typeP_zTilde_isTI` + hstab[Ẑ=T 経由で `typeP_family_Z_normalizes_T` 転送]) = `(k−1)(k*−1)·[G:Z]` (`zTilde_ncard_eq`); `|G|=k·k*·[G:Z]` (`card_kappaHall_sup_Kstar`+`card_mul_index`); reduces to ℕ ineq `k·k*<2(k−1)(k*−1)`。
+   - **`card_kkstar_lt`** (private ℕ arith): coprime odd k,l>1 ⟹ k·l<2(k−1)(l−1)。`Odd` で `k=2a+1,l=2b+1` subst → `2a+2b+1<4ab` を `2≤a∨2≤b` で casing + `Nat.mul_le_mul`+omega (ab を atom 扱い) → `nlinarith [key]`。唯一失敗の odd pair ≥3 は k=l=3 (coprime `by decide` 排除 ⟹ 一方 ≥5)。
+   - 入力: `k=|K|>1` = prime p∈κ(M) ∣ |K| (typeP 展開, typeP_family_Z_lt_member ミラー); `k*=|K*|>1` = `typeP_structure ….2.1` (K*≠⊥); coprime = `coprime_card_kappaHall_Kstar`; odd = `hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)`。
+
+**技法メモ**: (i) `mul_lt_mul_of_pos_right harith hidx_pos` で `(K⊔Kstar).index` を両辺に乗せ `mul_assoc` で締め。(ii) hstab は zTilde を `rw [hzeq]` で family-T 形に直してから `typeP_family_Z_normalizes_T` (zTilde 用 normalizer 補題を新設不要)。(iii) `IsTypeP M` = `(kappa M).Nonempty`; `p∈kappa M` 展開 = `p.Prime ∧ p∈τ₁∪τ₃ ∧ ∃P∈ℰ¹, P≤M ∧ Mσ⊓C(P)≠⊥`。
+
+**🛑🛑 残り = typeP_duality 本体組立 (FT consume sorry S14:7160) = 設計判断 3 件 (sorry 退避せず STOP, [[feedback-no-avoiding-hard-parts]])**:
+1. **`IsCyclic (K⊔Kstar)` の根拠** — `isCyclic_kappaHall_sup_Kstar_of_cyclic` は `[IsCyclic K][IsCyclic Kstar]` instance 要。K,Kstar cyclic は type-P2 member の prime |K_i| + 他 factor rank-1 nilpotent。**⚠ max-rank elemAbelian (Ω₁ of Sylow) 構成 helper 未特定** = M_σ nilpotent (Lem 14.1)→Z nilpotent→rank-1 Sylow cyclic の stack の起点。**設計判断 = この Ω₁ helper をどう建てるか (BG §1/§12 由来の rank-1⟹cyclic 経路)。**
+2. **part(h) `IsComplement' (derivedInG M).subgroupOf M (K.subgroupOf M)`** — M_σ⊆M' (`Msigma_le_derived`) + **Prop14.2(a) の UM_σ=K normal complement** ⊆M' + K cyclic ⟹ M'=UM_σ。**⚠⚠ Prop14.2(a) の UM_σ normal complement は repo 未パッケージ** (E-setup 断片のみ; 要構築) = part(h) の gate。coprime は `coprime_card_derived_kappaHall_of_isComplement'` で free。**設計判断 = Prop14.2(a) packaging を S14 に建てるか別 leaf か。**
+3. **∃! Mstar 一意性の出どころ** — witness=Mstar (`exists_partner`); covering (step 10, mmd L4053: S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| [本 commit の bound を H に適用] + |𝒞_G(Ẑ)|>½|G| ⟹ 𝒞 交差≠∅ ⟹ Prop14.2(c)) で global conj。uniqueness は equality ゆえ conj では不足 → `𝓜(C_G(X))={Mstar}` (X∈ℰ¹(K)) で pin。**設計判断 = uniqueness の正確な pin (covering ＋ 𝓜-singleton の組合せ)。** + conjunct「Kstar が Hall κ(Mstar)」も要 (Kstar=Z⊓Mstar_σ が κ(Mstar)-Hall?)。
+- **density bound (本 commit) は covering の左辺 (|𝒞_G(Ẑ)|>½|G|) を供給済。covering は本 bound を H(任意 type-P)に適用するだけ** — 設計判断は uniqueness の組立方。
+
+### ✅ covering building blocks landing (2026-06-17 再開² cont., commit `dcb31fcc`, ユーザー裁可で covering 着手) — 次 = covering 核 (~150-200 行, multi-iteration)
+
+**ユーザーが AskUserQuestion で「covering 論法」を選択 → bottom-up で再利用部品 3 件を landing (green + axiom-clean + AxiomsCheck)。**
+- `dummySigmaDecomposition` (def): `exists_partner` が要求する length-1 carrier (G explicit、`open Classical in`)。再利用可。
+- `ncard_inter_nonempty_of_two_mul_gt`: 有限群で `2|A|>|G| ∧ 2|B|>|G| ⟹ A∩B≠∅` (incl-excl、`Set.ncard_union_add_ncard_inter`+`Set.ncard_univ`+omega)。
+- `exists_zTilde_conjClass_gt_half_of_isTypeP`: **任意 type-P H に L=Hall κ(H)/L*=C_{Hσ}(L)/`|𝒞_G(Ẑ_H)|>½|G|`** (BG「we also have」)。H の Hall は `Ch03.hall_E_exists (G:=↥H)` で L', U' を取り `.map H.subtype` + `subgroupOf` 往復 (`comap_map_eq_self_of_injective`); partner data は `exists_partner hG (dummySigmaDecomposition G) …`; 本体は `typeP_zTilde_conjClass_gt_half`。
+
+**▶▶ covering 核 (typeP_duality (g) conjunct = ∀ H type-P, H~M ∨ H~Mstar) の残り — 3 sub-step、密結合**:
+1. **intersection → 共役** (~40 行, conjugation tracking が摩擦): `exists_zTilde_…(M)` + `…(H)` で両 `|𝒞_G(Ẑ)|>½` → `ncard_inter_nonempty_of_two_mul_gt` で `𝒞_G(Ẑ_M)∩𝒞_G(Ẑ_H)≠∅` → 共通元 u が `u~t (t∈Ẑ_M)` かつ `u~s (s∈Ẑ_H)` → `t~s` → `∃c, t=c•s` → `t∈Ẑ_M ∩ Ẑ_{c•H}` (c•Ẑ_H=Ẑ_{c•H}, c•L/c•L* は c•H の Hall κ data)。**⚠ conjClassSet membership ↔ ∃conj の往復 + `c•Ẑ_H=Ẑ_{c•H}` の保存 (Hall/centralizer/sup/sdiff の pointwise smul) を要する**。
+2. **🔑 matching `t∈Ẑ_M ∩ Ẑ_{H'} ⟹ L'*⊓K≠⊥ ∨ L'*⊓Kstar≠⊥`** (~60 行, 数学は明快): t∈Ẑ_{H'}=L'×L'*−(L'∪L'*) ⟹ t∉L' ⟹ **σ(H')-part w:=`exists_isPiElement_mul (σ H') t` の π-part ≠1, w∈L'*** (σ(H')-元 of Z_{H'}=L'×L'*); w∈⟨t⟩⊆Z_M=K×Kstar ⟹ `exists_isPiElement_mul (σ M) w` で `w=a·b` (a=σ(M)-part∈Kstar, b=σ(M)'-part∈K, **両 ∈⟨w⟩⊆L'***); w≠1 ⟹ a≠1∨b≠1 ⟹ `L'*⊓Kstar≠⊥ ∨ L'*⊓K≠⊥`。
+   - membership: **b∈K = `isPiElementCompl_mem_left_of_commute (A:=K)(B:=Kstar)(π:=σ M)`** (clean: K=σ(M)ᶜ群=`kappaHall_isPiSubgroup_sigmaCompl`, Kstar=σ(M)群=`Kstar_isPiSubgroup_sigma`, hcent=`hKstar▸inf_le_right`)。**a∈Kstar = 同 lemma の dual** (A:=Kstar,B:=K,π:=(σM)ᶜ; `compl_compl` massaging 要、or 小 dual helper 新設が clean)。
+3. **double Prop 14.2(c) → H'=M ∨ M*** (~40 行): Y∈ℰ¹(L'*⊓K_i*) → ① M-side `maximalContaining_centralizer_eq_singleton…` (`typeP_structure ….2.2.2.2.2`: X∈ℰ¹(Kstar)⟹{M}; X∈ℰ¹(K)⟹{Mstar} via 14.7(1)/`exists_typeP_partner`) ② H'-side (Y≤L'*=Hσ' の Kstar' ⟹ {H'}) → `{H'}={M_i}` ⟹ H'=M∨Mstar ⟹ **H~H'=M∨Mstar**。**⚠ n=1 collapse 後の K_i*={K,Kstar} ラベリングと、`{H}` vs `{M_i}` の singleton 同定が要**。
+- **見積: covering 核 = ~150-200 行 multi-iteration。摩擦点 = step1 の conjugation-invariance + step2 の dual membership。** matching の数学は worked out (上記)。次 iteration はこの順で。
+
+**技法メモ (本 commit)**: `open Classical in` は docstring の**前**に置く (docstring→open は parse error); `hall_E_exists (G:=↥H) π` → `.map H.subtype` + `comap_map_eq_self_of_injective` 往復で `subgroupOf H` 形へ; `nlinarith [key]` は内部で "ring failed" trace を出すが成功 (error でない)。
+
+### ✅ covering step 2 (matching) COMPLETE (2026-06-17 再開² cont., commit `05acdba0`) + 🔑 architectural finding: K-case = 14.7(1) = partner symmetry
+
+**ユーザー指示「3 sub step」→ step 2 (matching の数学核) を green+axiom-clean で landing。** step 1/3 を深掘りして **covering の真の残依存 = partner symmetry (14.7(1))** を確定。
+- **`isPiElement_mem_right_of_commute`** (dual helper): `isPiElementCompl_mem_left_of_commute` の A/B/π↔πᶜ swap 版 (`compl_compl` + commute 対称)。
+- **🔑 `exists_inf_ne_bot_of_mem_zTilde_inter`** (matching, generic πM/πH): t∈Ẑ_M∩(L⊔Lstar), t∉L ⟹ `Lstar⊓K≠⊥ ∨ Lstar⊓Kstar≠⊥`。σ(H)-part w∈Lstar (≠1), w∈⟨t⟩⊆K⊔Kstar, σ(M)-/σ(M)'-part (∈⟨w⟩⊆Lstar) が Kstar/K に着地。数学は完全 worked out。
+
+**🔑🔑 architectural finding (step 1/3 深掘り) — covering の残依存を確定**:
+1. **step 1 (conjugation) は σ(H) 直接使用で軽量化可** — H を conjugate して Ẑ_{c•H} を作る必要なし。`𝒞_G(Ẑ_M)∩𝒞_G(Ẑ_H)≠∅` から t∈Ẑ_M, s∈Ẑ_H, t=c•s → t∈Ẑ_M ∩ ((c•L)⊔(c•Lstar)), t∉c•L。matching を **πH:=σ(H), L':=c•L, Lstar':=c•Lstar** で適用 (IsPiSubgroup は conj で order 不変ゆえ σ(H) のまま転送、**Msigma/kappa equivariance 不要**)。要 helper 3: `IsPiSubgroup π (c•N) ↔ IsPiSubgroup π N` (card 不変)、`c•zTilde L Lstar = zTilde (c•L)(c•Lstar)` (smul over sup/sdiff)、`𝓜(C_G(c•X))=c•𝓜(C_G(X))` (singleton 転送)。
+2. **step 3 Kstar-case は clean** — Y∈ℰ¹(Lstar'⊓Kstar): Y≤Kstar ⟹ `𝓜(C_G(Y))={M}` (14.2(c)/M = `typeP_structure….2.2.2.2.2`); Y≤c•Lstar ⟹ `𝓜(C_G(Y))={c•H}` (14.2(c)/H + 𝓜-equivariance) ⟹ M=c•H ⟹ **H~M**。
+3. **🛑 step 3 K-case = 14.7(1) = partner symmetry** — Y∈ℰ¹(Lstar'⊓K): Y≤K ⟹ 要 `𝓜(C_G(Y))={Mstar}` = **BG 14.7(1)**, repo 未証明。**= 14.2(c) for Mstar** (Mstar's Kstar = K): 要 **14.7(2) Kstar=Hall κ(Mstar) + 14.7(3) K=C_{Mstar_σ}(Kstar)** = partner symmetry `M∩Mstar=Z`。BG 14.7 証明末尾の論法 (Hall σ(M)-subgroup Y of Mstar containing Kstar → 14.2(f) Y⊆Mσ → [Y,X₁]⊆Mσ∩Mstar_σ=1 → Y⊆C_{Mσ}(X₁)=Kstar → Kstar=Mσ∩Mstar ◁ M∩Mstar → 14.2(b1) for Mstar: N_{Mstar}(Kstar)=Kstar×K → M∩Mstar=Z)。**~80-100 行 substantial co-proved 前提** (14.2(f)/14.2(b1) for Mstar は repo 在)。
+
+**▶▶ 次 (covering 完成までの残り、依存順)**:
+1. **partner symmetry** `M∩Mstar=Z` + 14.7(2) (Kstar Hall κ(Mstar)) + 14.7(3) (K=C_{Mstar_σ}(Kstar)) → 14.7(1) (𝓜(C_G(Y))={Mstar} for Y∈ℰ¹(K))。**lynchpin、~80-100 行、∃! bundle conjuncts も discharge**。
+2. **step 1 equivariance helpers** ×3 (上記、~50 行 clean)。
+3. **assembly `typeP_covering`**: 任意 type-P H → exists_zTilde_…(M)+(H) で両 bound → ncard_inter → matching → Kstar/K-case 双方で 14.2(c) double → H~M∨Mstar (~60 行)。
+- **正本 = この節。matching は landed、partner symmetry が次の lynchpin。**

@@ -137,6 +137,71 @@ not just a single `⟨e⟩`).
 I-3 + I-4 + I-5 + the main-formula glue); step 3a/3b are reusable infra, sorry-count-neutral so far.
 Loop cadence was 60s (no external gate). `bin/count-sorry` = 139.
 
+## 2026-06-17 (resume⁴) — steps 1-4 DONE: the Brauer orbit equality landed
+
+Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`, sorry-free,
+`#print axioms` = {propext, Classical.choice, Quot.sound}):
+
+- `idemBasis φ : Basis (Fin N) k (CenterCarrier k G)` = `(Pi.basisFun k (Fin N)).map
+  φ.symm.toLinearEquiv` (the primitive-idempotent basis, retyped over `CenterCarrier`).
+- `centerRep'_apply_idemBasis` = simples-side `hρ`: `centerRep' g (idemBasis φ i) =
+  idemBasis φ (simplesAction φ g i)` (massage `idemBasis φ j = φ.symm (Pi.single j 1)` via
+  `Basis.map_apply` + `Pi.basisFun_apply`, then `centerRep_apply_symm_single`).
+- `finrank_centerRep_invariants_eq_card_orbits_simples` = cornerstone applied to `idemBasis`:
+  `dim Z^{MulAut G} = #(MulAut G-orbits on Fin N)`. **Stated with `[MulAction (MulAut G) (Fin N)]`
+  + `hact : ∀ g i, g • i = simplesAction φ g i` as decoupled hypotheses** (rather than a
+  term-dependent instance keyed on `φ`): the caller supplies `MulAction.compHom (Fin N)
+  (simplesAction φ)`, for which `hact` holds by `rfl` (`compHom_smul_def` + `Perm.smul_def`).
+- `card_orbits_classes_eq_card_orbits_simples` = **the orbit-count Brauer equality**
+  `#(orbits on ConjClasses G) = #(orbits on Fin N)` — both sides `= dim Z^{MulAut G}` (class-sum and
+  idempotent bases), so they agree. No char-0 / Teichmüller.
+
+**NEXT — step 3d (counting bridge), toward (†):**
+1. ✅ **DONE (3d.1, `78f8c86f`)** — orbit equality for an arbitrary acting group via a hom
+   `ψ : Γ →* MulAut G`: `centerRepComp ψ = centerRep'.comp ψ : Representation k Γ (CenterCarrier k G)`
+   (a `Representation` IS a `MonoidHom` to `Module.End`, so `MonoidHom.comp` typechecks; ascription
+   pins the carrier), cornerstone twice ⟹ `card_orbits_classes_eq_card_orbits_simples_comp :
+   #(Γ-orbits on classes) = #(Γ-orbits on simples)`. For `Γ = ↥(Subgroup.zpowers e)`,
+   `ψ = Subgroup.subtype`, `compHom`-action on `Fin N`, the agreement hyps `hcl`/`hsi` hold by `rfl`.
+2. ✅ **DONE (3d.2, `dccd7dd3`)** — "coprime-FPF automorphism fixes only the trivial class":
+   `CenterOrbitFree.map_eq_self_imp_eq_trivial_of_fpf` — for `β : MulAut G` with `⟨β⟩` coprime to
+   `|G|` and FPF (`β x = x → x = 1`), a `β`-fixed class `C` (`β • C = C`) is `mk 1`. Built via
+   `glauberman_fixed_point_exists` (Isaacs 3.24(a)) on `Ω = {y // mk y = C}` (transitive `G`-conj
+   set; `⟨β⟩` acts via `β`, compatible); the `β`-fixed element is in `Fix(β) = {1}`. `⟨β⟩` solvable
+   via `isSolvable_of_comm` + `mul_comm'` (zpowers `IsMulCommutative`). sorry-free, axiom-clean.
+3. **(3d.3) transfer to simples** — **abstract backbone COMPLETE** (3d.1/3d.2/3d.3a/forward-count
+   all sorry-free + axiom-clean); remaining = the rep-theory `i₀` identification + concrete wiring.
+   - ✅ **forward-count DONE (`9b64a344`)** — `FreeActionOrbitCount.card_orbits_eq_of_free_off_unique_fixed`
+     (unique fixed point + free elsewhere ⟹ `#orbits = 1 + (n−1)/d`; 3d.3a's converse, defect sum via
+     `Finset.sum_eq_single`). The class side feeds this (Γ=E, x₀=trivial class, free-off-trivial by 3d.2).
+   - ✅ **(3d.3a) DONE (`9ec8db73`)** — `FreeActionOrbitCount.orbit_trivial_or_free_of_card_orbits`:
+     finite `Γ` (order `d > 1`) on finite nonempty `S` with `#orbits = 1 + (n−1)/d` and `d ∣ n−1` ⟹
+     **every orbit size `1` or `d`, at most one fixed point**. The divisor argument went through as
+     worked out (no primality): `∑ᵢ (d − sᵢ) = d − 1`, each proper-divisor defect `≥ d/2` (via
+     `2sᵢ ≤ d`), so `#{proper}·d ≤ 2(d−1) < 2d ⟹ ≤ 1` proper orbit, of size `1`. Helpers
+     `card_orbit_dvd_card_group` (orbit-stabiliser `index_dvd_card`), `two_mul_le_of_dvd_of_lt`,
+     `orbit_eq_singleton_of_mem_fixedPoints`. sorry-free, axiom-clean.
+   - **(3d.3b) the trivial simple is `MulAut G`-fixed** [identification]. The trivial central
+     idempotent `t = (1/|U|) ∑_{g} single g 1 ∈ Z(k[U])` is `MulAut`-fixed (`α(∑ g) = ∑ g`) and is a
+     primitive idempotent, so `t = idemBasis φ i₀` for some `i₀`; `centerRep_apply_symm_single` then
+     forces `simplesAction φ α i₀ = i₀`, so `i₀ ∈ fixedPoints`.
+   - **(3d.3c) combine:** Brauer equality (3d.1, `Γ = E` via the orbit hom) + `Nsimples = Ncl`
+     (equal `finrank Z`) + "`E` free on nontrivial classes" (3d.2 per `e ∈ E#`) gives
+     `#orbits-classes = 1 + (Ncl−1)/|E|` [needs a **forward-count** lemma: an action with one fixed
+     point and free elsewhere has `#orbits = 1 + (n−1)/d` — the converse of 3d.3a, also via the
+     orbit partition]; then `#orbits-simples = 1 + (Ncl−1)/|E|`; (3d.3a) ⟹ exactly one fixed simple +
+     rest free; (3d.3b) ⟹ that fixed simple is the trivial one ⟹ **`E` free on the nontrivial
+     simples**. ⚠ 3d.3c also needs `1 < |E|` (E nontrivial — holds: Frobenius complement) and the
+     wiring of the abstract `Γ`-action to the concrete `simplesAction φ`/`Fin N` (compHom + `rfl`
+     agreement, as set up in 3d.1).
+   Then (†): I-2 isotypic decomposition of `W` (`W^U = 0` ⟹ only nontrivial components) + I-4 base
+   change `𝔽_p → 𝔽̄_p` + per-orbit I-3 (`finrank_eq_card_mul_finrank_invariants`) ⟹
+   `dim W = |E|·dim W^E`.
+
+`Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
+of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a
+separate fact.
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**

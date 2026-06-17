@@ -3197,6 +3197,54 @@ theorem fittingInAmbient_le_Msigma_of_le_Msigma [Finite G]
   rw [hQ]
   exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
 
+open scoped commutatorElement in
+/-- **Theorem 15.2 conjunct 3 — `M'' ⊆ F(M)`, gated-endpoint skeleton** (mmd L4198-4201): the
+chain `M'' = M_σ' ⊆ Q D' ⊆ C_{M_σ}(Q̄) = F(M)`.
+
+After identifying `M'' = M_σ'` (conjunct 2, `h2 : M_σ = M'`), the proof reduces `M_σ' ⊆ F(M)` to
+three structural ingredients:
+* `hsigmaprime : M_σ' ⊆ Q ⊔ ⁅D, D⁆` — the derived subgroup of the semidirect `M_σ = Q ⋊ D`
+  (`Q ◁ M_σ`, complement `D`) lands in `Q · D'` (the `M_σ = QD` structure consequence);
+* `hQab` / `hDcomm` — both `Q` and `D' = ⁅D, D⁆` *centralize the chief factor* `Q̄ = Q/Q₀`:
+  `Q̄` is (elementary) abelian (`⁅Q, Q⁆ ⊆ Q₀`, `hQab`) and `D' ⊆ C_D(Q̄)` is the engine output
+  `chiefFactor_card_and_commutator_of_inputs` (`∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q₀`, mmd 15.2(g));
+* `hsecFit : C_{M_σ}(Q̄) ⊆ F(M)` — the *section-centralizer* containment, the genuinely BG-specific
+  forward input.  This is the mmd's "Proposition 1.5(d) yields `F(M) = Q C_M(Q) = C_{M_σ}(Q̄)`"
+  (`D` nilpotent while `M_σ` is not), which bundles the `σ`-uniqueness gap `C_M(Q) ⊆ M_σ` (cf.
+  `fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma`) with the Prop 1.5(d) section identity.
+  Note `D'` only centralizes the *section* `Q̄`, not `Q` itself, so the full-centralizer helper
+  `centralizer_inf_le_fittingInAmbient_of_le_Msigma` is too weak here; the section form is needed.
+
+Both `Q` and `D'` therefore lie in `C_{M_σ}(Q̄)` (they centralize `Q̄` and sit inside `M_σ`), whence
+in `F(M)` by `hsecFit`, so `M_σ' ⊆ Q ⊔ D' ⊆ F(M)`.  Once the step-4 core supplies `hsigmaprime`
+(QD structure) and `hsecFit` (Prop 1.5(d) + `σ`-gap), conjunct 3 becomes unconditional. -/
+theorem derivedDerived_le_fittingInAmbient_of_inputs [Finite G] {M Q Q0 D : Subgroup G}
+    (h2 : OddOrder.BG.Ch3.S10.Msigma M = derivedInG M)
+    (hsigmaprime : derivedInG (OddOrder.BG.Ch3.S10.Msigma M) ≤ Q ⊔ ⁅D, D⁆)
+    (hQsig : Q ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hDsig : D ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hQab : ∀ x ∈ Q, ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0)
+    (hDcomm : ∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q0)
+    (hsecFit : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) → x ∈ fittingInAmbient M) :
+    derivedInG (derivedInG M) ≤ fittingInAmbient M := by
+  -- `M'' = M_σ'` (conjunct 2): rewrite the inner `derivedInG M` to `M_σ`.
+  rw [← h2]
+  -- `M_σ' ⊆ Q ⊔ D'`; show each of `Q`, `D'` lands in `F(M)` via the section-Fitting input.
+  refine hsigmaprime.trans (sup_le ?_ ?_)
+  · -- `Q ⊆ F(M)`: each `x ∈ Q` lies in `M_σ` and centralizes `Q̄` (`Q̄` abelian).
+    intro x hx
+    exact hsecFit x (hQsig hx) (fun y hy => hQab x hx y hy)
+  · -- `D' ⊆ F(M)`: each `g ∈ ⁅D, D⁆` lies in `M_σ` and centralizes `Q̄` (engine output).
+    have hDDsig : ⁅D, D⁆ ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+      rw [Subgroup.commutator_le]
+      intro a ha b hb
+      rw [commutatorElement_def]
+      exact mul_mem (mul_mem (mul_mem (hDsig ha) (hDsig hb)) (inv_mem (hDsig ha)))
+        (inv_mem (hDsig hb))
+    intro g hg
+    exact hsecFit g (hDDsig hg) (fun x hx => hDcomm g hg x hx)
+
 /-- **BG Corollary 15.5, "Lemma 1"**: `O_{σ(M)}(F(M)) = F(M_σ)` (`§14`-independent).
 `≤`: `O_σ(F(M)) ≤ O_σ(M) = M_σ` (`opiCoreInG_fittingInG_le_opiCoreInG`); it is nilpotent (subgroup
 of `F(M)`) and normal in `M` (characteristic in `F(M) ◁ M`), hence normal in `M_σ`, so a nilpotent

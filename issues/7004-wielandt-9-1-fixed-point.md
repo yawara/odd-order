@@ -74,10 +74,14 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       cornerstone (simples 側)**。**step 3b 大半 ✅ (loop, `afa21d09`→`f1527db4`)**: 群作用整合の
       subtle 部分を `algAutPerm : Aut(∏k) →* Perm`（正準 MonoidHom）で解決（⟨e⟩ 限定でなく MulAut G 全体が
       genuine MulAction）+ `centerCongrHom : Aut k[G] →* Aut Z` + **`simplesAction φ : MulAut G →* Perm(Fin N)`**
-      + cornerstone hρ `centerRep_apply_symm_single` 完成（`CenterSimplesOrbit.lean`）。**残 = (1) MulAction.compHom
-      (Fin N) simplesAction + (2) 冪等元基底 `Pi.basisFun.map φ.symm` + (3) cornerstone 適用 (CenterCarrier synonym)
-      → dim Z = #orbits-on-Fin-N + (4) class-sum capstone と equate = Brauer orbit 等式**。詳細 handoff =
-      design notes「2026-06-17 (loop handoff)」。
+      + cornerstone hρ `centerRep_apply_symm_single` 完成（`CenterSimplesOrbit.lean`）。
+      **✅✅✅ steps 1-4 COMPLETE (2026-06-17 resume⁴, `f26fd70c`, sorry-free + axiom-clean)**:
+      `idemBasis φ` (冪等元基底 = `Pi.basisFun.map φ.symm`, CenterCarrier 経由) + `centerRep'_apply_idemBasis`
+      (simples 側 hρ) + `finrank_centerRep_invariants_eq_card_orbits_simples` (cornerstone 適用、
+      任意の `[MulAction (MulAut G) (Fin N)]` + `hact = simplesAction φ` 一致仮説で `dim Z = #orbits-on-Fin-N`)
+      + **`card_orbits_classes_eq_card_orbits_simples` = Brauer orbit 等式
+      `#(orbits on ConjClasses) = #(orbits on Fin N)`** (両者 = `dim Z^{MulAut G}`、char-0/Teichmüller 不要)。
+      詳細 = design notes「2026-06-17 (resume⁴)」。
       **(4) class-sum 側 ✅✅ FULLY COMPLETE** (`CenterOrbitCount.lean` `cab132a7`+`faeb1bc8`):
       `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
       (MulAut G) ↥center` (`domCongr α` を中心へ制限) + compatibility `centerRep_apply_centerBasis`
@@ -85,10 +89,22 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       `finrank ↥(invariants centerRep') = #(MulAut G-orbits on classes)`**。⚠ isDefEq/whnf 爆発
       (`↥(Subalgebra.center k …)` の Module instance diamond) は **carrier type synonym `CenterCarrier`
       + inferInstanceAs で正準化して解消** ([[lean-type-synonym-fixes-instance-diamond]])。
-      **残 hard core = (3) 冪等元基底**（Wedderburn-Artin + center of product, 新規; 同 cornerstone を
-      synonym 経由で適用すれば #orbits-on-simples が出る = (4) で de-risk 済）。
       ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
-      正本 = design notes「2026-06-17 (resume²)」「(resume³)」。
+      **残 = step 3d counting bridge**: (3d.1) ✅ **DONE (`78f8c86f`)** Brauer 等式を一般作用群へ一般化
+      （`centerRepComp ψ`, `card_orbits_classes_eq_card_orbits_simples_comp`）→ (3d.2) ✅ **DONE
+      (`dccd7dd3`)** coprime-FPF auto は自明 class のみ固定（`CenterOrbitFree.map_eq_self_imp_eq_trivial_of_fpf`,
+      `glauberman_fixed_point_exists` を `Ω={y//mk y=C}` に適用、sorry-free・axiom-clean）→ (3d.3a) ✅
+      **DONE (`9ec8db73`)** free-action orbit 算術 `FreeActionOrbitCount.orbit_trivial_or_free_of_card_orbits`
+      （`#orbits=1+(n−1)/d ⟹ 各軌道 size 1 or d + 固定点≤1`; ∑(d−sᵢ)=d−1 & 真の約数≤d/2 で defect 1 個に
+      強制、素数性不要、sorry-free・axiom-clean）+ (forward-count) ✅ **DONE (`9b64a344`)**
+      `card_orbits_eq_of_free_off_unique_fixed`（一意固定点+残り自由 ⟹ #orbits=1+(n−1)/d; 3d.3a の逆、
+      defect 和 `sum_eq_single` で単一固定軌道に集約）→ **(3d.3) 残（抽象 backbone 完成、残は具体配線）**:
+      (3d.3b) trivial simple は MulAut-fixed（対称化冪等元 `e₀=(1/|U|)∑g` が primitive central idempotent
+      = `idemBasis φ i₀`、rep-theory 要 ~50-80 行）+ (N=Ncl) `idemBasis`/`centerBasis` 両基底の index 等濃
+      （finrank 経由）+ (3d.3c) **CoprimeAction carrier の E/U/共役作用へ配線**（Γ=E で 3d.1 Brauer +
+      forward-count[classes, 3d.2 で free-off-trivial] + N=Ncl + 3d.3a ⟹ E free off ≤1 fixed; 3d.3b で
+      その fixed=trivial ⟹ E free on 非自明 simples）→ (†) [I-2 isotypic + I-4 base change + per-orbit I-3]。
+      正本 = design notes「2026-06-17 (resume⁴)」(詳細・約数論法込み)。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）

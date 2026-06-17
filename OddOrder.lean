@@ -4,6 +4,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
 import OddOrder.GroupTheory.CoprimeFrobeniusKernel
 import OddOrder.GroupTheory.CriticalSubgroup
@@ -26,6 +27,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -172,6 +174,7 @@ import OddOrder.Peterfalvi.S08_CaseBEndgame
 import OddOrder.Peterfalvi.S08_CaseBHortho
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
 import OddOrder.Peterfalvi.S08_CoherenceWeighted
+import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure

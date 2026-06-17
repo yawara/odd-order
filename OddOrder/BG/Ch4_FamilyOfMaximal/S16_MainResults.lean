@@ -470,6 +470,105 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
+/-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
+runs over Theorems A(8)/B(1)(2)(3)(4)/C(1)(2)(3)(10)/D(1), Theorem 15.2(a), and Theorem 15.7(c)).
+Proposition 16.1 is the bridge from the BG-local `κ`/`σ`/`M_F` taxonomy to the shared, bundled
+Type I--V predicates; the genuinely gated content is the *construction* of each `TypeXData`
+structure from the local classification.  This engine isolates those constructions (and the few
+structural facts the source proof uses to combine them) as named hypotheses and discharges the full
+six-clause conjunction `sorry`-free; when the §15--§16 structural theory lands, the wrapper
+`proposition_type_classification` cites it and applies this skeleton (the gated-endpoint pattern,
+cf. `theoremD_msigma_conjugacy_and_centralizers_of_inputs`).
+
+The named obligations, with their BG sources:
+
+* the four **forward bridges** `hFI`/`hP2II`/`hP1neIIIIV`/`hP1eqV` — construct the Type
+  I/II/III--IV/V data from the local classification (Theorem A(8)+B(1)(2)(3)+15.7(c) for I;
+  C(1)(10)+B(1)(4)+A(8) for II; A(8)+Frattini for III/IV; 15.7(c) for V).  These are exactly the
+  directions that `theoremI_nilpotentHall_conjugacy_and_type_dichotomy` and
+  `theoremII_tame_embedding` consume;
+* the four **reverse classifications** `hIF`/`hIIP2`/`hIIIIVP1`/`hVP1` — read off the local type
+  from the Peterfalvi data (the `π(W₁) ⊆ κ(M)` argument for `→ M_P`, plus the `κ`/`M_F` refinement;
+  Theorem C(2) for `I → M_F`);
+* `hP_derived` (**Theorem C(3)**: `M' = U M_σ` for `M ∈ M_P`) and `hF_not_derived` (**Theorem
+  A(3)**: `M = U M_σ ⊋ M'` for `M ∈ M_F`), which power clause (e);
+* `h152a` (**Theorem 15.2(a)**: `M_F ≠ M_σ ⟹ M ∈ M_P₁`), used for clause (f).
+
+The genuinely *derived* content (not a renamed hypothesis) is clauses (e) and (f), assembled from
+the `κ`-trichotomy (`isTypeP_iff_isTypeP1_or_isTypeP2`, `isTypeF_iff_not_isTypeP`,
+`not_isTypeP1_and_isTypeP2`) together with the bridges. -/
+theorem proposition_type_classification_of_inputs {M : Subgroup G}
+    (hFI : S14.IsTypeF M → OddOrder.GroupTheory.IsTypeI M)
+    (hP2II : S14.IsTypeP2 M → OddOrder.GroupTheory.IsTypeII M)
+    (hP1neIIIIV : S14.IsTypeP1 M → S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
+      OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M)
+    (hP1eqV : S14.IsTypeP1 M → S15.MF M = OddOrder.BG.Ch3.S10.Msigma M →
+      OddOrder.GroupTheory.IsTypeV M)
+    (hIF : OddOrder.GroupTheory.IsTypeI M → S14.IsTypeF M)
+    (hIIP2 : OddOrder.GroupTheory.IsTypeII M → S14.IsTypeP2 M)
+    (hIIIIVP1 : (OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) →
+      S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hVP1 : OddOrder.GroupTheory.IsTypeV M →
+      S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    (hP_derived : S14.IsTypeP M →
+      ∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+    (hF_not_derived : S14.IsTypeF M →
+      ¬ ∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+    (h152a : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M → S14.IsTypeP1 M) :
+    (OddOrder.GroupTheory.IsTypeI M ↔ S14.IsTypeF M) ∧
+      (OddOrder.GroupTheory.IsTypeII M ↔ S14.IsTypeP2 M) ∧
+      ((OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) ↔
+        S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) ∧
+      (OddOrder.GroupTheory.IsTypeV M ↔
+        S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) ∧
+      ((∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+          (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M) ↔
+          ¬ OddOrder.GroupTheory.IsTypeI M) ∧
+      (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔
+        OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨
+          OddOrder.GroupTheory.IsTypeV M) := by
+  -- `¬ M_P₁ ⟹ M_F = M_σ`, the contrapositive of Theorem 15.2(a).
+  have mf_eq_of_not_typeP1 :
+      ¬ S14.IsTypeP1 M → S15.MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+    intro hnP1
+    by_contra hne
+    exact hnP1 (h152a hne)
+  refine ⟨⟨hIF, hFI⟩, ⟨hIIP2, hP2II⟩, ⟨hIIIIVP1, fun h => hP1neIIIIV h.1 h.2⟩,
+    ⟨hVP1, fun h => hP1eqV h.1 h.2⟩, ?_, ?_⟩
+  · -- **(e)** `M' = U M_σ ⟺ ¬ Type I`.  Via (a) (`Type I ⟺ M_F`), this is `(∃U …) ⟺ M_P`.
+    constructor
+    · -- `→`: a Type I `M` would be `M_F` (`hIF`), contradicting Theorem A(3) (`hF_not_derived`).
+      intro hex hI
+      exact hF_not_derived (hIF hI) hex
+    · -- `←`: `¬ Type I ⟹ ¬ M_F ⟹ M_P`, and Theorem C(3) (`hP_derived`) supplies the decomposition.
+      intro hnI
+      have hnF : ¬ S14.IsTypeF M := fun hF => hnI (hFI hF)
+      have hP : S14.IsTypeP M := not_not.mp (by rwa [S14.isTypeF_iff_not_isTypeP] at hnF)
+      exact hP_derived hP
+  · -- **(f)** `M_F = M_σ ⟺ M` is Type I, II, or V.
+    constructor
+    · -- `→`: case on the `κ`-trichotomy.  `M_F` (`κ = ∅`) ⟹ I; `M_P₂` ⟹ II; `M_P₁`+`M_F = M_σ` ⟹ V.
+      intro heq
+      by_cases hP : S14.IsTypeP M
+      · rcases S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with hP1 | hP2
+        · exact Or.inr (Or.inr (hP1eqV hP1 heq))
+        · exact Or.inr (Or.inl (hP2II hP2))
+      · exact Or.inl (hFI (S14.isTypeF_iff_not_isTypeP.mpr hP))
+    · -- `←`: Type I ⟹ `M_F` ⟹ `¬ M_P₁` ⟹ `M_F = M_σ`; Type II ⟹ `M_P₂` ⟹ `¬ M_P₁` ⟹ `M_F = M_σ`;
+      -- Type V carries `M_F = M_σ` directly (`hVP1`).
+      rintro (hI | hII | hV)
+      · have hnP : ¬ S14.IsTypeP M := S14.isTypeF_iff_not_isTypeP.mp (hIF hI)
+        exact mf_eq_of_not_typeP1 (fun hP1 => hnP (S14.isTypeP_of_isTypeP1 hP1))
+      · have hP2 := hIIP2 hII
+        exact mf_eq_of_not_typeP1 (fun hP1 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hP2⟩)
+      · exact (hVP1 hV).2
+
 /-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
 the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
 Six clauses = mmd (a)-(f): (a) Type I ⟺ `M ∈ ℳ_𝓕`, (b) Type II ⟺ `M ∈ ℳ_𝓟₂`,
@@ -680,14 +779,35 @@ theorem theoremII_conjunct1_of_inputs {M K U : Subgroup G}
         have hyA : y ∉ ASet M U := fun h => hxA (hAiff.mpr h)
         exact ⟨g, hTI_C g ⟨x, ⟨hXA0 ▸ hxX, hxA⟩, hg ▸ ⟨hXA0 ▸ hyX, hyA⟩⟩, hg⟩
 
-/-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  This
-is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
-theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Assembly for BG Theorem II** (mmd L4548), as a *gated-endpoint skeleton* (`sorry`-free in its
+own body).  `A(M)`/`A_0(M)` are tamely embedded — the BG form of the centralizer-control input used
+by Peterfalvi (8.12)--(8.13).
+
+The body is the full Theorem II proof; it still cites the (`sorry`-bearing) §16 structure theorems
+A--D and Proposition 16.1 inline, so it is *not* axiom-clean (it depends transitively on `sorryAx`
+through them).  What this skeleton isolates are the two obligations *beyond* that standard A--D
+suite, as named hypotheses (cf. `theoremII_conjunct1_of_inputs`):
+* `hPieceInv` — the conjunct-1 cross-piece exclusion: `G`-conjugate elements of `X` share `M_σ`-
+  and `A(M)`-membership (the "distinct orders across pieces" content of BG Theorem E);
+* `hMaxUnique` — the conjunct-3 uniqueness `|ℳ(C_G(x))| = 1` for an escaping centralizer
+  (BG §9--§10 Uniqueness), which pins the Type I/II maximal overgroup of `C_G(x)` to Theorem
+  D(4)'s `N(x)`.
+
+The wrapper `theoremII_tame_embedding` cites this with both obligations as `sorry`. -/
+theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M))
-    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K)
+    (hPieceInv : ∀ x ∈ X, ∀ y ∈ X, (∃ g : G, y = g * x * g⁻¹) →
+      (x ∈ OddOrder.BG.Ch3.S10.Msigma M ↔ y ∈ OddOrder.BG.Ch3.S10.Msigma M) ∧
+        (x ∈ ASet M U ↔ y ∈ ASet M U))
+    (hMaxUnique : ∀ x : G, x ∈ X → x ≠ 1 →
+      ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
+        ∀ N₁ N₂ : Subgroup G,
+          N₁ ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) →
+          N₂ ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) → N₁ = N₂) :
     (∀ x ∈ X, ∀ y ∈ X,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
       let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
@@ -774,8 +894,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       (theoremD_msigma_conjugacy_and_centralizers hG hM).1
       ((theoremB_U_and_A_tame hG hM hU).2.2.2.2) hTI_C hX ?_
     -- `hPieceInv`: `G`-conjugate elements of `X` share `M_σ`- and `A(M)`-membership — the
-    -- "distinct orders across pieces" input of the mmd proof (BG Theorem E), still gated.
-    sorry
+    -- "distinct orders across pieces" input of the mmd proof (BG Theorem E), a named obligation.
+    exact hPieceInv
   · -- **Conjunct 3 (mmd L4552).**  For `x ∈ D ⊆ M_σ#` with `C_G(x) ⊄ M`, Theorem D(4) gives a
     -- unique maximal `N(x) ⊇ C_G(x)` that is of type `F` or `P₂`; Proposition 16.1(a)(b) rewrites
     -- this as Type I or Type II.  Existence and the type classification are pure citation; the
@@ -796,10 +916,35 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       · exact Or.inl (hIiff.mpr hF)
       · exact Or.inr (hIIiff.mpr hP2)
     refine ⟨N₀, ⟨hN₀mem, htype⟩, ?_⟩
-    -- Uniqueness of the maximal overgroup of `C_G(x)`: the residual gated input.  Theorem D(4)
-    -- gives uniqueness only for its *full* predicate `Q`; pinning the weaker "maximal overgroup,
-    -- Type I/II" to the same `N₀` needs `|ℳ(C_G(x))| = 1` (BG Uniqueness), not citable here.
+    -- Uniqueness of the maximal overgroup of `C_G(x)`: the named obligation `hMaxUnique`.  Theorem
+    -- D(4) gives uniqueness only for its *full* predicate `Q`; pinning the weaker "maximal
+    -- overgroup, Type I/II" to the same `N₀` is exactly `|ℳ(C_G(x))| = 1` (BG §9--§10 Uniqueness).
     rintro N' ⟨hN'mem, _hN'type⟩
-    sorry
+    exact hMaxUnique x hxX hx1 hxc N' N₀ hN'mem hN₀mem
+
+/-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  The BG form of the
+centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-endpoint skeleton
+`theoremII_tame_embedding_of_inputs`; the two residual obligations — the BG Theorem E cross-piece
+exclusion and the BG §9--§10 maximal-overgroup uniqueness — remain `sorry`. -/
+theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M))
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
+    (∀ x ∈ X, ∀ y ∈ X,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
+      let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
+      -- BG Thm II: `D ⊆ A(M)` (not merely `D ⊆ X`); a genuine claim when `X = A_0(M)`.
+      D ⊆ ASet M U ∧
+        ∀ x : G, x ∈ D →
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) :=
+  theoremII_tame_embedding_of_inputs hG hM hK hU hX
+    -- `hPieceInv`: BG Theorem E cross-piece exclusion.
+    (by sorry)
+    -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`.
+    (by sorry)
 
 end OddOrder.BG.Ch4.S16
