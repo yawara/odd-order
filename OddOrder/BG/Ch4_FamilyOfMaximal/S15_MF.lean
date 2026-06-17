@@ -3151,6 +3151,34 @@ theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Norma
   exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
     (QuotientGroup.mk'_surjective _))
 
+/-- A finite elementary-abelian `q`-group of order exceeding `q` is not cyclic (`§14`-independent,
+reusable; generalises `not_isCyclic_of_card_prime_sq` to any order `> q`).  A cyclic group has
+`Monoid.exponent = Nat.card`, while elementary-abelianness forces the exponent to divide `q`, so
+`Nat.card ∣ q`. -/
+theorem not_isCyclic_of_lt_card {q : ℕ} (hq : q.Prime) {Mod : Type*} [Group Mod] [Finite Mod]
+    (h : OddOrder.GroupTheory.IsElementaryAbelian q Mod) (hlt : q < Nat.card Mod) :
+    ¬ IsCyclic Mod := by
+  intro hcyc
+  have hExp_eq : Monoid.exponent Mod = Nat.card Mod := IsCyclic.exponent_eq_card
+  have hExp_dvd : Monoid.exponent Mod ∣ q := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]; exact h.pow_eq_one
+  rw [hExp_eq] at hExp_dvd
+  exact (Nat.not_dvd_of_pos_of_lt hq.pos hlt) hExp_dvd
+
+/-- **Theorem 15.2(f) conjunct `¬ IsCyclic M_F`, gated-endpoint skeleton** (mmd L4202): assembles
+`not_isCyclic_MF_of_inputs` with the engine output `[Q : Q₀] = q^n` (`n = |K| ≥ 2`, since `|K|` is
+the prime `p`).  The chief factor `Q̄ = Q/Q₀` (elementary abelian of order `q^n > q`) is non-cyclic
+(`not_isCyclic_of_lt_card`), and `Q ⊆ M_F` (`hQMF`, Theorem 15.2(c)) lifts this to `M_F`. -/
+theorem not_isCyclic_MF_of_chiefFactor_inputs [Finite G] {M Q Q0 : Subgroup G}
+    [(Q0.subgroupOf Q).Normal] {q n : ℕ} (hq : q.Prime) (hn : 2 ≤ n)
+    (hEA : OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q))
+    (hindex : (Q0.subgroupOf Q).index = q ^ n) (hQMF : Q ≤ MF M) :
+    ¬ IsCyclic ↥(MF M) := by
+  refine not_isCyclic_MF_of_inputs hQMF (not_isCyclic_of_lt_card hq hEA ?_)
+  rw [← Subgroup.index_eq_card, hindex]
+  calc q = q ^ 1 := (pow_one q).symm
+    _ < q ^ n := pow_lt_pow_right₀ hq.one_lt (by omega)
+
 /-- **Theorem 15.2(g) `F(M) ⊆ M_σ`** (mmd L4198), from the same `σ`-gap as the `(g)` equality:
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)` (`fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma`), with
 `Q = O_q(M) ⊆ M_σ` (`opiCoreInG_singleton_le_Msigma_of_mem_sigma`, `q ∈ σ(M)`) and
