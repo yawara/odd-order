@@ -7507,6 +7507,29 @@ theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact Or.inl (hfinish hp hYea (hYS.trans inf_le_left)
       ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.2 p hp _ hYea (hYS.trans inf_le_right)))
 
+/-- A Hall `κ(N)`-subgroup `K'` of a maximal `N`, lying inside a nilpotent subgroup `W`, is cyclic.
+Since `κ(N) ⊆ τ₁(N) ∪ τ₃(N)`, every prime `p ∣ |K'|` has `pRank N p = 1`, so `pRank K' p ≤ 1`
+(`= 0` off `π(K')`); and `K' ≤ W` nilpotent makes `K'` nilpotent.  An odd nilpotent group with
+`pRank ≤ 1` everywhere is cyclic (`isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one`).  Used to
+make both Hall factors of `Z` cyclic in `typeP_Z_isCyclic`. -/
+theorem isCyclic_kappaHall_of_le_nilpotent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N K' W : Subgroup G} (hK'N : K' ≤ N)
+    (hK'_hall : Ch03.IsHallSubgroup (kappa N) (K'.subgroupOf N))
+    (hK'W : K' ≤ W) [Group.IsNilpotent ↥W] : IsCyclic ↥K' := by
+  haveI : Group.IsNilpotent ↥K' :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hK'W)
+  have hodd : Odd (Nat.card ↥K') :=
+    hG.odd.of_dvd_nat ((Subgroup.card_dvd_of_le hK'N).trans (Subgroup.card_subgroup_dvd_card N))
+  refine isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one hodd fun p hp => ?_
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_cases hpK : p ∈ (Nat.card ↥K').primeFactors
+  · have hpκ : p ∈ kappa N := hK'_hall.1 p (by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK'N).toEquiv])
+    have hpτ : pRank ↥N p = 1 := hpκ.2.1.elim tau1_pRank_eq_one tau3_pRank_eq_one
+    exact le_trans (pRank_le_of_injective (Subgroup.inclusion_injective hK'N)) (le_of_eq hpτ)
+  · by_contra hcon
+    exact hpK (OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

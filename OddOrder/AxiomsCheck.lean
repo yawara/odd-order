@@ -5016,6 +5016,15 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_covering
 
+/-! **Hall `κ`-subgroup inside a nilpotent group is cyclic** (`S14_TypePCounting`,
+`isCyclic_kappaHall_of_le_nilpotent`): a Hall `κ(N)`-subgroup `K' ≤ N` contained in a nilpotent
+`W` is cyclic.  `κ(N) ⊆ τ₁(N) ∪ τ₃(N)` bounds `pRank K' p ≤ 1` at every prime, and `K' ≤ W`
+nilpotent makes `K'` nilpotent; `isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one` concludes.
+The cyclicity engine for both Hall factors of `Z` in Theorem 14.7(d).  Fully unconditional,
+axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isCyclic_kappaHall_of_le_nilpotent
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
