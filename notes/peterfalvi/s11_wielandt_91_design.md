@@ -11,6 +11,47 @@
     `Subgroup.eq_top_of_card_eq`).
 - ❌ **Main `wielandt_fixedPoint_frobenius` = the sole remaining sorry.**
 
+## 2026-06-17 (resume³) — I-1 step (2) COMPLETE; step (3)/(4) plan
+
+**I-1 build-order step (2) DONE** (`CenterClassSumBasis.lean`, lane-f, sorry-free + axiom-clean):
+- `centerBasis : Basis (ConjClasses G) k ↥(Subalgebra.center k (MonoidAlgebra k G))` — the
+  **class-sum basis over an arbitrary field** (`bbc3519c`). Helpers: `center_apply_conj`
+  (central ⇒ class-constant coeffs, via `single_mul_apply`/`mul_single_apply`),
+  `center_apply_of_mk_eq`, `center_eq_sum_classSum` (span half), `classSumCenter`/`Basis.mk`.
+- `domCongr_classSum : domCongr α (classSum C) = classSum (ConjClasses.map α C)` — the **σ-permutation
+  of the basis** by a group automorphism `α : G ≃* G` (`c4f52a6c`). Coefficient proof + `if_congr`,
+  `MonoidHom.map_isConj` for `α`/`α.symm`.
+
+**Lean gotchas hit** (memory [[lean-basis-in-module-namespace]]): (a) `Basis` is `Module.Basis` →
+need `open Module` (import was fine all along; the bare-`import Basis.Basic` exposes it only namespaced;
+cost ~6 build iters). (b) MonoidAlgebra application `z y` needs the codomain `k` pinned or it can't
+synth `DFunLike k[G] G ?` — use `(z y : k)` ascription or `Finsupp.ext_iff` (not `DFunLike.congr_fun`,
+which leaves the codomain a metavar). (c) `Finsupp.finset_sum_apply` won't `rw` on a MonoidAlgebra
+sum (def wrapper, no syntactic match) → use `map_sum (Finsupp.applyAddHom y) _ univ` via a `have` then `rw`.
+
+### Remaining: step (3) idempotent basis [hard core] + step (4) wiring
+**Step (3) — `Z(𝔽̄_p[U]) ≅ 𝔽̄_p^N` idempotent basis** (the one remaining hard core):
+`U` is `p′`, `𝔽̄_p` alg-closed ⇒ `𝔽̄_p[U]` split semisimple ⇒ `Z` split commutative semisimple ⇒
+product of `𝔽̄_p`. mathlib API to use: `MonoidAlgebra` Maschke / `IsSemisimpleRing`,
+`IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` (Wedderburn-Artin: `𝔽̄_p[U] ≅ ∏ Mat_{n_i}`),
+center of `Mat_n k = k·1` ⇒ `Z ≅ ∏ 𝔽̄_p` (N = #simples = #matrix blocks). The idempotent basis =
+the standard basis of `∏ 𝔽̄_p` pulled back; `σ_e` permutes the factors = permutes simples. **Investigate
+the exact `Mat`-center + `Pi`-algebra API before committing** (new infra, multi-session).
+
+**Step (4) — cornerstone wiring** (shared by both bases): parametrise by a `MonoidHom ψ : G' →* MulAut G`
+(`G'` arbitrary; instantiate `G' = ⟨e⟩` / the cyclic image for the Brauer count). Then:
+- `MulAction G' (ConjClasses G)` via `g • C := ConjClasses.map (ψ g) C` (= `MulAction.compHom` of the
+  `MulAut G`-action along `ψ`; the `MulAut G`-action on `ConjClasses G` is `ConjClasses.map`, needs
+  `one_smul`/`mul_smul` = `ConjClasses.map` functoriality).
+- `Representation k G' ↥center` = `domCongrAut k k` (a `MulAut G →* (k[G] ≃ₐ[k] k[G])`) **restricted to
+  the centre** (an algebra auto preserves `Subalgebra.center`) precomposed with `ψ`.
+- compatibility `ρ g (centerBasis C) = centerBasis (g • C)` = `domCongr_classSum` lifted to the subtype.
+- apply `finrank_invariants_eq_card_orbits` **twice with the same `ρ`** (basis 1 = `centerBasis`/classes,
+  basis 2 = idempotents/simples): `finrank k ↥(invariants ρ)` is intrinsic ⇒
+  `#(G'-orbits on classes) = #(G'-orbits on simples)`.
+Then the counting bridge (coprime-FPF free-on-nontrivial-classes via repo Glauberman + orbit-size
+counting) ⇒ free `E`-action on nontrivial simples ⇒ feed I-3 ⇒ (†). See resume² for the bridge math.
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**
