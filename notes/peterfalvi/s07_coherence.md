@@ -1,3 +1,7 @@
+> ⚠️ **2026-06-17 STATUS 訂正**: (5.6)/(6.8.3)/case-B capstone の現状は [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md) が正本。
+> 本ロードマップ内（特に pass 3/4 の「main (5.6) 未着地 / 新 brick 必要 / IsCoherent.extension_isometry が唯一 gap」）は **stale**:
+> norm-weighted (5.6) エンジン (`S08_CoherenceWeighted`: `coherentDegreeSqNormBound_of_not_coherentW`/`xChainCoherentW`) + (5.4)/(5.5)/(5.6.2)/(5.6.3) 計算は**既に sorry-free 着地済**。
+
 # Peterfalvi §7: Coherence — mini-roadmap (Phase 2b の中核)
 
 **スコープ**: Peterfalvi §7 (pp.25-29), mmd `04.7_pp_25_29_Coherence.mmd` (136 行), **9 結果 ((5.1)-(5.9))** ⚠️ audit 訂正 (旧 6 結果は (5.7) degree-regular, (5.8) reducible μ_k, (5.9) automorphism/μ-μ̄ 欠落; **(5.5) ×11 cite + (5.7) ×10 cite が forward 最多 hub**).

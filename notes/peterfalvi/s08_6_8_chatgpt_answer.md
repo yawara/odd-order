@@ -1,3 +1,7 @@
+> ⚠️ **2026-06-17 STALE-FRAMING 訂正 — 必ず読むこと**: 下記「gap 5 = (6.8.3) は norm-weighted/reducible 版 (5.6) が**真に必要**・残る**大物**・Section 5 拡張」は **過大評価で STALE**。
+> 現 source-of-truth = [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md): **(6.8.3) に数学 gap は無く**、norm-weighted (5.6) エンジン (`S08_CoherenceWeighted`: `coherentDegreeSqNormBound_of_not_coherentW`/`xChainCoherentW`)・counting (`sum_re_sq_Xset_eq`)・FPF 破綻 (`false_of_caseB_break_of_bounds`) は**既に repo に sorry-free 実在**（未配線なだけ）。残務は **case-B glue のみ**。
+> 本ファイルの **Q1-Q4 (per-φ producer / centralChar+Isaacs 2.27 positivity / a₀ / τ₂)** は有効（hXanchored 解決の正本）。「(5.6) 要構築/大物」系のみ無視。
+
 # ChatGPT Pro 回答 — Pf (6.8) case-(B) discharge (session 49 相談の回答)
 
 取得: 2026-06-17 (hub が Chrome MCP で投入・回収)。モデル = Pro 拡張「最高」。思考時間 = 13m25s + 15m4s。
@@ -9,8 +13,9 @@
 ## 🎯 一言結論 (formalization verdict)
 
 session 49 RECON の「5 gap」は、**単一 φ 固定が間違った形だった**ことが判明し、大半が
-**φ-polymorphic リファクタ**で解ける。ただし (6.8.3) は **norm-weighted/reducible 版 Theorem (5.6)**
-が真に必要 (軽い回避策なし) で、これが残る大物。
+**φ-polymorphic リファクタ**で解ける。(6.8.3) は **norm-weighted/reducible 版 Theorem (5.6)** を使うが、
+⚠️ **その engine は既に repo に sorry-free 実在** (`S08_CoherenceWeighted`、未配線なだけ)。「要構築の大物」ではなく
+**配線 (glue)**。詳細は [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md) を正本とすること。
 
 | RECON gap | 回答による解消 | 規模 |
 |---|---|---|

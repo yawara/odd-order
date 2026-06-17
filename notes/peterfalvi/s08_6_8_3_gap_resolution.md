@@ -2,7 +2,8 @@
 
 > **この note が (6.8.3) / norm-weighted (5.6) / case-B capstone の現時点 source-of-truth。**
 > 先行の `s56_reweighting_plan.md`(churn 多・retraction 多)・`s08_6_8_3_reducibleS_chatgpt_answer.md`
-> ・`s08_6_8_assembly_plan.md` のうち本 note と矛盾する記述は本 note を優先。
+> ・`s08_6_8_assembly_plan.md` のうち本 note と矛盾する記述は本 note を優先(各々に STALE banner 付与済)。
+> hXanchored/(6.8.2) の per-φ 解決の正本 = `s08_6_8_chatgpt_answer.md`(↑の near-homonym `…3_reducibleS…` とは別物)。
 > 検証 = workflow `wf_4810e1ac-022` (Recon 6 + Derive 2 + Verify 5、1.35M tokens) + hub 直接 grep 裏取り。
 
 ## 🎯 結論 (一言)
@@ -70,7 +71,8 @@ S not coherent と仮定 → 有限性で X∪Y⊂S₁⊂S (共役閉, S₁ cohe
 
 ## 3. 残務 = formalization GLUE (新数学なし) — frontier
 
-唯一の実 sorry = **`S08_CoherenceTheorems.lean:59`** (`sibleySetup_is_coherent` の X-nonempty 枝)。閉じるのに必要:
+唯一の実 sorry = **`S08_CoherenceTheorems.lean:59`** (`sibleySetup_is_coherent` の X-nonempty 枝)。閉じるのに必要
+(以下の「NEW WORK」は**新 Lean glue/assembly コードの意で、新数学ではない** — headline「新数学なし」と一貫):
 
 1. **(6.8.3) bootstrap 配線** (NEW WORK, assembly): 既存重み付きエンジンを消費する case-B capstone
    - `caseB_xSum_le_two_psi`: case-A `xSum_le_two_psi`(S08CP2:3229) の mirror、`coherentDegreeSqNormBound_of_not_coherentW` + `caseB_member_family_weighted` を使う。
@@ -79,7 +81,8 @@ S not coherent と仮定 → 有限性で X∪Y⊂S₁⊂S (共役閉, S₁ cohe
    `XAdjoinStepInputW` を組む。`mc i = ‖μ_j‖²` を供給。部品は既存 (`caseB_constituentDecomposition`/`caseB_phi_family`/`certainTypeR`/σ-images)。
 3. **per-step `XAdjoinStepInputW` 構成子** (NEW WORK): `xChainCoherentW` が hstep として要求。certain-type column data から各ステップ入力を構築 (xChainCoherentW の docstring に明示)。
 4. **reducible 用 break-pair extractor**: `exists_coherentBreakPair`(S08CP1:965) は `hSbirr`=全既約を仮定。
-   involution ベースの列挙ゆえ irreducibility 非依存の可能性が高いが、**1 箇所も ‖χ‖²=1 を消費しないか要確認** (移植 or 1 点 weight-aware 化)。
+   ⚠ **ただし conjugation-closed/real-free 一般版 `exists_coherentBreakPair_general`(S08CP1:1035) が既に存在**
+   (docstring: irreducibility 不要)。よって TODO は「新規構築」でなく**「`exists_coherentBreakPair_general` が mixed (既約+reducible column) break set に足りるか確認」**。
 5. **math-(A)/(B) dispatch** (NEW WORK, final wiring): S08:59 で `hyp.cases` (Frobenius/CertainType) 分岐 +
    case (c2) 内で `Z(H)∩W₂` を `eq_bot_or_eq_of_le_of_card_prime` で case-A(=⊥)/case-B(=W₂) に分け、A→centralCommutator/Zc 経路、B→anchored-image+算術破綻 経路へ。
 

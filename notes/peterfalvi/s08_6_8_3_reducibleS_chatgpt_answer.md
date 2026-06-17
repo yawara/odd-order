@@ -1,3 +1,6 @@
+> ⚠️ **2026-06-17 STALE-FRAMING 訂正**: 本ファイルは「(5.6) の norm-weighted 一般化が**必要**・**multi-session core reweight**・more than a local patch」と書くが、**これは過大評価で STALE**（当時 repo 在庫を未確認）。
+> 現 source-of-truth = [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md): Peterfalvi (5.6) は**出版時点で既に norm-weighted**、その engine (`S08_CoherenceWeighted`) は**既に repo に sorry-free 実在**。「要構築」でなく「未配線」。残務は **case-B glue のみ**。Q1-Q3 の数学的内容（(5.6) は Frobenius-free・reducible 回避不可・counting）は正しい。
+
 # ChatGPT (Pro 拡張) 回答: (6.8.3) case-B の reducible-S と (5.6) 一般化
 
 **日時**: 2026-06-16 / **モデル**: GPT-5.5 Pro 拡張 (思考 13m25s) / **資料**: odd-order project upload (04.7/04.8/04.17 引用)

@@ -1,3 +1,6 @@
+> ⚠️ **2026-06-17 STALE-FRAMING 訂正 — 必ず読むこと**: 本ファイル（特に session 49 RECON）の「5 genuine §6 gap / hXanchored は未形式化 §6 content / generalized (5.6) が必須・大物」は **過大評価で STALE**。
+> 現 source-of-truth = [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md): **(6.8.3) に数学 gap は無く**、norm-weighted (5.6) エンジン (`S08_CoherenceWeighted`)・counting・FPF 破綻は**既に repo に sorry-free 実在**（未配線なだけ）。残務は **case-B glue のみ**。hXanchored は per-φ-polymorphic 化（`s08_6_8_chatgpt_answer.md` Q1）で解決。本ファイルは history として残置。
+
 # Peterfalvi (6.8) Sibley coherence — assembly plan + [Is] Thm 6.34 progress
 
 **作成**: 2026-06-01 (worktree `lucid-kapitsa-c87a31`)。2 並列 explore (Plan agent) の統合 + 本線 proof 進捗。

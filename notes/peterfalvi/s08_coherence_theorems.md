@@ -1,3 +1,7 @@
+> ⚠️ **2026-06-17 STATUS 訂正**: (6.8)/(6.8.3)/case-B capstone の現状は [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md) が正本。
+> 本ロードマップ内の「(6.8.3) very hardest / final contradiction 未実装 / Wave 5 7-10日 / ★★★★★」は **stale**:
+> (6.8.3) の数学 gap=0、final contradiction (`false_of_caseB_break_of_bounds` @ S08_CaseBEndgame) + counting (`sum_re_sq_Xset_eq`) + 重み付き (5.6) (`S08_CoherenceWeighted`) は**既に sorry-free 着地済**。残務は case-B glue のみ（唯一 sorry `S08_CoherenceTheorems:59`）。
+
 # Peterfalvi §8: Some Coherence Theorems — mini-roadmap
 
 **スコープ**: Peterfalvi §8 (pp. 30-37), mmd `04.8_pp_30_37_*.mmd` (243 行), **8 結果 ((6.1)-(6.8)) 全て同格 named results** ⚠️ audit 訂正 (旧記載「4+2 結果」は `**(N.M)**` grep artifact).

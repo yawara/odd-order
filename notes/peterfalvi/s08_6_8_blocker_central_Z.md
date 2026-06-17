@@ -1,3 +1,6 @@
+> ⚠️ **2026-06-17 STALE — central-Zc 経路は放棄済**: 本ファイルが記述する central-Zc (T=0 = `D.X=cTEμ`) 経路は session 48 で**厳密反駁・放棄**され、教科書 (6.8.2) τ₂ 経路に置換済（関連 handoff は削除済）。
+> (6.8.3)/case-B の現状は [`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md) が正本（数学 gap=0、engine `S08_CoherenceWeighted` 既存、残務=case-B glue）。**Lane B はこの central-Zc 経路に戻らないこと**。本ファイルは history。
+
 # Peterfalvi (6.8) capstone — BLOCKER: producer requires central `Z`, formalization uses `Z = ⁅H,H⁆`
 
 **Status (2026-06-07): the (6.8) capstone `sibleySetup_is_coherent` (S08:7582 sorry,
