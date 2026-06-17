@@ -53,11 +53,11 @@ instance : MulAction (MulAut G) (ConjClasses G) where
 
 /-! ### The induced representation of `MulAut G` on `Z(k[G])` -/
 
-/-- An algebra automorphism preserves the centre (`e z` commutes with everything, by transporting
-the commutation of `z` with `e.symm w` through `e`). -/
-theorem _root_.AlgEquiv.map_mem_center {k A : Type*} [CommSemiring k] [Semiring A] [Algebra k A]
-    (e : A ≃ₐ[k] A) {z : A} (hz : z ∈ Subalgebra.center k A) :
-    e z ∈ Subalgebra.center k A := by
+/-- An algebra isomorphism carries the centre into the centre (`e z` commutes with everything, by
+transporting the commutation of `z` with `e.symm w` through `e`). -/
+theorem _root_.AlgEquiv.map_mem_center {k A B : Type*} [CommSemiring k] [Semiring A] [Semiring B]
+    [Algebra k A] [Algebra k B] (e : A ≃ₐ[k] B) {z : A} (hz : z ∈ Subalgebra.center k A) :
+    e z ∈ Subalgebra.center k B := by
   rw [Subalgebra.mem_center_iff] at hz ⊢
   intro w
   calc w * e z = e (e.symm w) * e z := by rw [e.apply_symm_apply]
