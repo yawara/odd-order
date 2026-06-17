@@ -1533,3 +1533,41 @@ counting 部分。** 全論法を **ℕ で完結**(ℚ 不要、`omega` で締�
    ⚠ Prop14.2(a) の normal complement UM_σ は repo 未パッケージ (要構築)。`coprime_card_derived_kappaHall_of_isComplement'` で coprime は free。
 4. **∃! Mstar 組立**: Mstar = 一意 neighbor (n=1)。uniqueness は 𝓜(C_G(X))={Mstar} (X∈ℰ¹(K)) で pin。
    parts (2)(3): K* Hall κ(M*), M∩M_1=Z。
+
+### ✅✅✅ n=1 collapse COMPLETE (2026-06-17 lane-h 再開 cont., 2 commits) — step 8 着地、|𝓕|=2
+
+**`family_card_eq_two` (BG 14.7 step 8, mmd L4047): 型-P 族 {M}∪{neighbors} は丁度 2 メンバー。** structural keystone。
+
+**論法** (density の type-P2 member を起点):
+- exists_typeP2_member で M_i∈𝓕 type-P2 → member_data で KN_i (Hall κ(M_i)) + swap Z=KN_i⊔K_i* (K_i*=Z⊓M_iσ)。
+- **|KN_i|=q 素数**: M_i に Prop14.2(g) 適用 (hall_E_exists で M_i の Hall(κ∪σ)' を構築 → `typeP_structure ... .2.2.2.2.1 hMiP2`)。
+- **各 member M_j≠M_i: K_j*=KN_i**: K_j*=Z⊓M_jσ は σ(M_i)'-群 (σ(M_j)∩σ(M_i)=∅ via 13.9 nonconj) ⟹ K_j*≤KN_i
+  (`isPiSubgroup_le_left_of_commute`: KN_i=σ(M_i)'-Hall of Z); K_j*≠⊥ + |KN_i|=q 素数 ⟹ K_j*=KN_i (`eq_of_le_of_card_ge`)。
+- **≤1 neighbor**: 異なる M_a,M_b≠M_i は K_a*=KN_i=K_b* だが pairwise disjoint (`typeP_family_Kstar_disjoint`) ⟹ KN_i=⊥、矛盾 (q≥2)。
+  `Finset.card_le_one` on erase Mi + `Finset.card_erase_of_mem` + omega。
+
+**新 helper `isPiSubgroup_le_left_of_commute`**: `isPiElementCompl_mem_left_of_commute` の部分群版 (Z=A×B 直積、A=πᶜ群、
+B=π群、L≤Z πᶜ群 ⟹ L≤A; A.subgroupOf Z=normal Hall πᶜ via `isPiGroup_le_of_normal_isHallSubgroup`)。
+
+commit `4aed1736` (+`isPiSubgroup_le_left`), AxiomsCheck 登録、full build 3817/65s。
+⚠ **技法**: member_data の `∃ KN` witness を `-` で捨てると後続 (hcanon/hne が KN 参照) が壊れる → KN 命名要。
+
+### ▶▶ typeP_duality 残務 (step 9-11 + ∃! 組立) — 密結合した最終 assembly (次の大単位)
+
+`family_card_eq_two` (|𝓕|=2) ⟹ 族={M, Mstar}。Mstar = 一意 neighbor (`Finset.card_eq_two` で抽出可)。残り:
+1. **IsCyclic (K⊔Kstar)**: `isCyclic_kappaHall_sup_Kstar_of_cyclic` は **[IsCyclic K][IsCyclic Kstar] instance 要**。
+   K,Kstar cyclic は collapse の prime-order 構造から (type-P2 member の Hall κ=prime ⟹ cyclic; 他因子 rank1)。
+   ⚠ K (=M の Hall κ) cyclic は **どちらが type-P2 か**で分岐 (M か Mstar)。BG L4049「Z=K_i×K_i*=K_j*×K_j cyclic ∵ K_i*⊆M_iσ ∧ r(K_i*)=r(K_j)=1」。
+2. **covering** (step 10, mmd L4053): H type-P, S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| (`half_lt_one_sub_inv_mul`)
+   ⟹ 𝒞_G(T)∩𝒞_G(S_H)≠∅ ⟹ T∩S_H≠∅ ⟹ L*∩K_i*≠1 ⟹ Prop14.2(c): {H}=𝓜(C_G(Y))={M_i} ⟹ H~M_i。
+   ⚠ T=Ẑ=zTilde 同定 (n=1 で T=Z−(K∪K*)) + |𝒞_G(T)|=(1−1/k)(1−1/k*)|G|>½|G| 要 (density count を n=1 特殊化)。
+3. **part(h)** (step 11, mmd L4061): M_σ⊆M' (`Msigma_le_derived`)、Prop14.2(a) の UM_σ=K の normal complement ⊆M'、
+   K cyclic ⟹ UM_σ=M'。⟹ `IsComplement' (derivedInG M).subgroupOf M (K.subgroupOf M)`。
+   coprime は `coprime_card_derived_kappaHall_of_isComplement'` で free。
+   ⚠⚠ **Prop14.2(a) の normal complement UM_σ は repo 未パッケージ** (E-setup 断片のみ; 要構築 = part(h) の前提障壁)。
+4. **∃! Mstar 組立**: witness=Mstar (n=1 neighbor)、uniqueness=𝓜(C_G(X))={Mstar} (X∈ℰ¹(K)) で pin。
+   parts: Hall κ(Mstar) Kstar (BG (2): K*=Hall κ(M*) of M*) + IsTISubset zTilde Z + (P2 M∨P2 Mstar) + covering。
+   ⚠ 多数の conjunct を Mstar について同時証明 = 最大の組立労力。
+
+**現在地サマリ (2026-06-17)**: typeP_duality endgame の **counting/structural 核 3 件 (typeP1_card_eq + density 不等式 + n=1 collapse) 完了**。
+残り = cyclicity + covering + part(h) + ∃! 組立 = 密結合した最終 assembly (新規の大単位、Prop14.2(a) packaging が part(h) gate)。
