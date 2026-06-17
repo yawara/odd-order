@@ -533,7 +533,7 @@ theorem exists_sMemberOrthogonalFamilyW
     hinj, hrange, hmemS1, ?_, ?_⟩
   · -- `mc j > 0`: column members have `‖μ_j‖² = |W₁|`, irreducibles have `‖χ‖² = 1`.
     intro j
-    show (0 : ℝ) < (ClassFunction.inner (χmem j) (χmem j)).re
+    change (0 : ℝ) < (ClassFunction.inner (χmem j) (χmem j)).re
     rcases hmemS1 j with hX | hY
     · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hX) with
         ⟨χ₂, hχ₂, hcol⟩ | hirr
@@ -559,7 +559,7 @@ theorem exists_sMemberOrthogonalFamilyW
     by_cases hij : i = j
     · subst hij
       rw [if_pos rfl]
-      show ClassFunction.inner (χmem i) (χmem i)
+      change ClassFunction.inner (χmem i) (χmem i)
         = (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ)
       rw [inner_self_eq_realCast (χmem i), Complex.ofReal_re]
     · rw [if_neg hij]
