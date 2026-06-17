@@ -354,4 +354,40 @@ theorem false_of_coherentXunionYset_caseB_of_not_coherentS
     _ ≤ 2 * (Nat.card hyp.W1 * d) * Nat.card hyp.W1 := hxbN
     _ = 2 * Nat.card hyp.W1 ^ 2 * d := by ring
 
+/-- **(6.8.3) case-(B) coherence producer** (gated-endpoint skeleton).
+
+The producer (positive) form of the case-(B) (6.8.3) contradiction
+`false_of_coherentXunionYset_caseB_of_not_coherentS`: given the `X(W₂) ∪ Y` coherence **seed**
+`hXYcoh` together with the case-(B) structural data (`W₂` central in `H` (`hW2cen`), `|W₂| ≥ 2`
+(`hcZ`), and the fixed-point-free bound `(2|W₁|+1)² ≤ |H:W₂|` (`hfpf`, from `caseB_fpf_bound`)), the
+Sibley set `S` is coherent.  The proof is `by_contra` plus the (6.8.3) contradiction.
+
+This is the case-(B) analogue of the case-(A) producer `nonempty_coherent_S_caseA_of_frobenius`,
+with one essential difference: case (A) **constructs** its seed inline from the Frobenius data,
+whereas the case-(B) seed `hXYcoh` is taken as a hypothesis.  Constructing it
+(`coherentXunionYset_caseB_of_glued`) requires the §6 certain-type structure-theory anchoring
+`hXanchored`, the residual gate of the `S08_CoherenceTheorems` c2-math-B dispatch — *not* discharged
+here.  So this lemma is the sorry-free skeleton that reduces the case-(B) branch of
+`sibleySetup_is_coherent` to exactly the seed construction. -/
+theorem nonempty_coherent_S_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal]
+    (hW2cen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H))
+    (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
+    (hXYcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.Xset h46.W2 ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  by_contra hncoh
+  exact false_of_coherentXunionYset_caseB_of_not_coherentS hyp h46 hHK hW1
+    hW2cen hcZ hfpf hXYcoh hncoh
+
 end OddOrder.Peterfalvi.S08
