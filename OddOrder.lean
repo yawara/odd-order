@@ -55,6 +55,7 @@ import OddOrder.GroupTheory.RepresentationTheory.PermutationInvariants
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
 import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
