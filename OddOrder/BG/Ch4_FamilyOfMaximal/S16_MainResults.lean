@@ -941,8 +941,10 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
           ∃! N : Subgroup G,
             N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
             (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) :=
-  -- Residual obligations: `hPieceInv` (BG Theorem E cross-piece exclusion) and `hMaxUnique`
-  -- (BG §9--§10 uniqueness `|ℳ(C_G(x))| = 1`).
-  theoremII_tame_embedding_of_inputs hG hM hK hU hX (by sorry) (by sorry)
+  theoremII_tame_embedding_of_inputs hG hM hK hU hX
+    -- `hPieceInv`: BG Theorem E cross-piece exclusion.
+    (by sorry)
+    -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`.
+    (by sorry)
 
 end OddOrder.BG.Ch4.S16
