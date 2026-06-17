@@ -74,10 +74,14 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       cornerstone (simples 側)**。**step 3b 大半 ✅ (loop, `afa21d09`→`f1527db4`)**: 群作用整合の
       subtle 部分を `algAutPerm : Aut(∏k) →* Perm`（正準 MonoidHom）で解決（⟨e⟩ 限定でなく MulAut G 全体が
       genuine MulAction）+ `centerCongrHom : Aut k[G] →* Aut Z` + **`simplesAction φ : MulAut G →* Perm(Fin N)`**
-      + cornerstone hρ `centerRep_apply_symm_single` 完成（`CenterSimplesOrbit.lean`）。**残 = (1) MulAction.compHom
-      (Fin N) simplesAction + (2) 冪等元基底 `Pi.basisFun.map φ.symm` + (3) cornerstone 適用 (CenterCarrier synonym)
-      → dim Z = #orbits-on-Fin-N + (4) class-sum capstone と equate = Brauer orbit 等式**。詳細 handoff =
-      design notes「2026-06-17 (loop handoff)」。
+      + cornerstone hρ `centerRep_apply_symm_single` 完成（`CenterSimplesOrbit.lean`）。
+      **✅✅✅ steps 1-4 COMPLETE (2026-06-17 resume⁴, `f26fd70c`, sorry-free + axiom-clean)**:
+      `idemBasis φ` (冪等元基底 = `Pi.basisFun.map φ.symm`, CenterCarrier 経由) + `centerRep'_apply_idemBasis`
+      (simples 側 hρ) + `finrank_centerRep_invariants_eq_card_orbits_simples` (cornerstone 適用、
+      任意の `[MulAction (MulAut G) (Fin N)]` + `hact = simplesAction φ` 一致仮説で `dim Z = #orbits-on-Fin-N`)
+      + **`card_orbits_classes_eq_card_orbits_simples` = Brauer orbit 等式
+      `#(orbits on ConjClasses) = #(orbits on Fin N)`** (両者 = `dim Z^{MulAut G}`、char-0/Teichmüller 不要)。
+      詳細 = design notes「2026-06-17 (resume⁴)」。
       **(4) class-sum 側 ✅✅ FULLY COMPLETE** (`CenterOrbitCount.lean` `cab132a7`+`faeb1bc8`):
       `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
       (MulAut G) ↥center` (`domCongr α` を中心へ制限) + compatibility `centerRep_apply_centerBasis`
@@ -85,10 +89,12 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       `finrank ↥(invariants centerRep') = #(MulAut G-orbits on classes)`**。⚠ isDefEq/whnf 爆発
       (`↥(Subalgebra.center k …)` の Module instance diamond) は **carrier type synonym `CenterCarrier`
       + inferInstanceAs で正準化して解消** ([[lean-type-synonym-fixes-instance-diamond]])。
-      **残 hard core = (3) 冪等元基底**（Wedderburn-Artin + center of product, 新規; 同 cornerstone を
-      synonym 経由で適用すれば #orbits-on-simples が出る = (4) で de-risk 済）。
       ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
-      正本 = design notes「2026-06-17 (resume²)」「(resume³)」。
+      **残 = step 3d counting bridge**: (i) Brauer 等式を cyclic ⟨e⟩ へ特殊化（`centerRep'.comp ψ`,
+      `ψ : Γ →* MulAut G`、`Γ = ↥⟨e⟩` or 一般群）→ (ii) Glauberman coprime-FPF（repo
+      `glauberman_fixed_points_conj`）で ⟨e⟩ が非自明 class に自由作用 → #orbits-classes = 1+(Ncl−1)/d →
+      (iii) 等式 + `Nsimples = Ncl` で free on 非自明 simples ⟹ (†)。
+      正本 = design notes「2026-06-17 (resume²)」「(resume³)」「(resume⁴)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）

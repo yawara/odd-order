@@ -137,6 +137,42 @@ not just a single `⟨e⟩`).
 I-3 + I-4 + I-5 + the main-formula glue); step 3a/3b are reusable infra, sorry-count-neutral so far.
 Loop cadence was 60s (no external gate). `bin/count-sorry` = 139.
 
+## 2026-06-17 (resume⁴) — steps 1-4 DONE: the Brauer orbit equality landed
+
+Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`, sorry-free,
+`#print axioms` = {propext, Classical.choice, Quot.sound}):
+
+- `idemBasis φ : Basis (Fin N) k (CenterCarrier k G)` = `(Pi.basisFun k (Fin N)).map
+  φ.symm.toLinearEquiv` (the primitive-idempotent basis, retyped over `CenterCarrier`).
+- `centerRep'_apply_idemBasis` = simples-side `hρ`: `centerRep' g (idemBasis φ i) =
+  idemBasis φ (simplesAction φ g i)` (massage `idemBasis φ j = φ.symm (Pi.single j 1)` via
+  `Basis.map_apply` + `Pi.basisFun_apply`, then `centerRep_apply_symm_single`).
+- `finrank_centerRep_invariants_eq_card_orbits_simples` = cornerstone applied to `idemBasis`:
+  `dim Z^{MulAut G} = #(MulAut G-orbits on Fin N)`. **Stated with `[MulAction (MulAut G) (Fin N)]`
+  + `hact : ∀ g i, g • i = simplesAction φ g i` as decoupled hypotheses** (rather than a
+  term-dependent instance keyed on `φ`): the caller supplies `MulAction.compHom (Fin N)
+  (simplesAction φ)`, for which `hact` holds by `rfl` (`compHom_smul_def` + `Perm.smul_def`).
+- `card_orbits_classes_eq_card_orbits_simples` = **the orbit-count Brauer equality**
+  `#(orbits on ConjClasses G) = #(orbits on Fin N)` — both sides `= dim Z^{MulAut G}` (class-sum and
+  idempotent bases), so they agree. No char-0 / Teichmüller.
+
+**NEXT — step 3d (counting bridge), toward (†):**
+1. Specialise the orbit equality to a cyclic `⟨e⟩`. Cleanest: generalise to an arbitrary acting
+   group via a hom `ψ : Γ →* MulAut G` — `centerRep'.comp ψ : Representation k Γ (CenterCarrier k G)`
+   (a `Representation` IS a `MonoidHom` to `Module.End`, so `MonoidHom.comp` typechecks), apply the
+   cornerstone twice (class-sum + idempotent) ⟹ `#(Γ-orbits on classes) = #(Γ-orbits on simples)`.
+   Then take `Γ = ↥(Subgroup.zpowers e)` (or a cyclic group) with `ψ = Subgroup.subtype`.
+2. Glauberman coprime-FPF (repo `glauberman_fixed_points_conj`): every `e^j` (`1≤j<d`) is FPF on `U`
+   ⟹ fixes only the trivial class ⟹ `⟨e⟩` free on the `Ncl−1` nontrivial classes ⟹
+   `#orbits-classes = 1 + (Ncl−1)/d`.
+3. Transfer via the Brauer equality + `Nsimples = Ncl` ⟹ `#orbits-simples = 1 + (Ncl−1)/d` ⟹ every
+   nontrivial-simple orbit has size `d` ⟹ `⟨e⟩` (hence `E`) acts freely on the nontrivial simples ⟹
+   feed I-3 ⟹ (†).
+
+`Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
+of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a
+separate fact.
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**
