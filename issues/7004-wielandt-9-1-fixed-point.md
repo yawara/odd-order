@@ -67,9 +67,13 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       **(3) σ-置換の核心 ✅ COMPLETE** (`PiAlgebraAut.lean` `afa21d09`): `algEquiv_permutes_single` =
       「`(ι→k)` の代数自己同型は標準冪等元 `Pi.single i 1` を置換」(自己完結・upstream 可)。⚠ char p の
       罠（列和=1 では p+1 個も和=1）を **orthogonality（各座標高々1個）** で回避、support disjoint+cover
-      の Finset 数え上げ。残 (3) = **`Z(𝔽̄_p[U]) ≅ (Fin N → k)` の Wedderburn center transport**（plumbing:
-      `exists_algEquiv_pi_matrix_of_isAlgClosed` + center-of-Pi + `Matrix.subalgebraCenter_eq_scalarAlgHom_map`)
-      → 冪等元基底 = 標準基底の pullback、σ-置換 = `algEquiv_permutes_single`、cornerstone 適用（synonym で de-risk 済）。
+      の Finset 数え上げ。**(3) Wedderburn center transport ✅ COMPLETE** (`CenterSplitting.lean`
+      `edba3d51`/`2688af89`/`0606a2f2`/`3584c746`): `exists_center_algEquiv_pi : ∃ N, Nonempty
+      (Z(k[U]) ≃ₐ[k] (Fin N → k))` を 3 リンク (`AlgEquiv.centerCongr` Z(A)≅Z(B) / `centerPiEquiv`
+      Z(∏C)≅∏Z(C) / `matrixCenterEquiv` Z(Mat n k)≅k) + Wedderburn で組立。**残 (3) = 冪等元基底 +
+      cornerstone (simples 側)**: φ:Z≅(Fin N→k) から basis `b i = φ.symm (Pi.single i 1)`、σ-置換は
+      `φ∘σ∘φ.symm` に `algEquiv_permutes_single` 適用（⟨e⟩ 単一σ/cyclic で π_σ の群作用整合）→ cornerstone
+      (CenterCarrier synonym で de-risk 済) → dim Z^σ = #orbits-on-simples。
       **(4) class-sum 側 ✅✅ FULLY COMPLETE** (`CenterOrbitCount.lean` `cab132a7`+`faeb1bc8`):
       `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
       (MulAut G) ↥center` (`domCongr α` を中心へ制限) + compatibility `centerRep_apply_centerBasis`
