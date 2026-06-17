@@ -2719,6 +2719,21 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
 
+/-- A finite `ZMod q`-module of cardinality `q` (`q` prime) has `Module.finrank ≤ 1`
+(`§14`-independent, reusable).  Used to feed the cyclicity hypothesis `hcyc` of BG Theorem 3.10(c)
+once `|C_{Q̄}(K)| = q` is known. -/
+theorem finrank_le_one_of_card_eq {q : ℕ} [Fact q.Prime] {Mod : Type*}
+    [AddCommGroup Mod] [Module (ZMod q) Mod] [Finite Mod] (h : Nat.card Mod = q) :
+    Module.finrank (ZMod q) Mod ≤ 1 := by
+  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  haveI : Fintype Mod := Fintype.ofFinite Mod
+  have hpow : Fintype.card Mod = q ^ Module.finrank (ZMod q) Mod := by
+    rw [Module.card_eq_pow_finrank (K := ZMod q), ZMod.card]
+  rw [Nat.card_eq_fintype_card, hpow] at h
+  have hfin : Module.finrank (ZMod q) Mod = 1 :=
+    Nat.pow_right_injective (Fact.out : q.Prime).two_le (h.trans (pow_one q).symm)
+  omega
+
 /-- **Counting the invariants of a quotient module by its fixed-point subgroup** (`§14`-independent,
 reusable).  For a finite commutative `H`-module `Mod` over `ZMod q` (with `H` acting through a
 `MulDistribMulAction`) and a subgroup `R ≤ H`, if `Cbar ≤ Mod` is exactly the set of `R`-fixed
