@@ -470,6 +470,76 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Proposition 16.1 forward bridges: constructing the shared type data -/
 
+/-- The pointwise `MulAut`-action distributes over `sSup` of subgroups (it is `Subgroup.map`, a
+left adjoint, so it preserves arbitrary joins). -/
+private theorem mulAut_smul_sSup (a : MulAut G) (T : Set (Subgroup G)) :
+    a • sSup T = ⨆ S ∈ T, a • S := by
+  rw [Subgroup.pointwise_smul_def]
+  exact (Subgroup.gc_map_comap _).l_sSup
+
+/-- Conjugation by `u` carries `C_G(x)` to `C_G(u x u⁻¹)`. -/
+private theorem conj_smul_centralizer_singleton (u x : G) :
+    MulAut.conj u • Subgroup.centralizer ({x} : Set G)
+      = Subgroup.centralizer ({u * x * u⁻¹} : Set G) := by
+  ext g
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+  have hsmul : ((MulAut.conj u)⁻¹ • g : G) = u⁻¹ * g * u := by
+    rw [← map_inv]; simp [MulAut.smul_def, MulAut.conj_apply]
+  rw [hsmul]
+  simp only [Subgroup.mem_centralizer_iff, Set.mem_singleton_iff, forall_eq]
+  constructor
+  · intro h
+    have h2 := congrArg (fun t => u * t * u⁻¹) h
+    simp only at h2
+    calc u * x * u⁻¹ * g = u * (x * (u⁻¹ * g * u)) * u⁻¹ := by group
+      _ = u * (u⁻¹ * g * u * x) * u⁻¹ := h2
+      _ = g * (u * x * u⁻¹) := by group
+  · intro h
+    have h2 := congrArg (fun t => u⁻¹ * t * u) h
+    simp only at h2
+    calc x * (u⁻¹ * g * u) = u⁻¹ * (u * x * u⁻¹ * g) * u := by group
+      _ = u⁻¹ * (g * (u * x * u⁻¹)) * u := by rw [h]
+      _ = u⁻¹ * g * u * x := by group
+
+/-- The generating family `{U ⊓ C_G(x) : x ∈ M_σ#}` of `centralizerGeneratedBySigma M U`. -/
+private abbrev sigCentFam (M U : Subgroup G) : Set (Subgroup G) :=
+  {C | ∃ x ∈ S14.sigmaSharp M, C = U ⊓ Subgroup.centralizer ({x} : Set G)}
+
+/-- `U`-conjugation fixes `⟨C_U(x) | x ∈ M_σ#⟩`: for `u ∈ U ≤ M` it permutes the generating set
+`{U ⊓ C_G(x) : x ∈ M_σ#}`, since `M_σ ◁ M` makes `x ↦ u x u⁻¹` a bijection of `M_σ#` and
+`u (U ⊓ C_G(x)) u⁻¹ = U ⊓ C_G(u x u⁻¹)`. -/
+private theorem conj_smul_centralizerGeneratedBySigma {M U : Subgroup G} {u : G}
+    (huM : u ∈ M) (huU : u ∈ U) :
+    MulAut.conj u • S15.centralizerGeneratedBySigma M U
+      = S15.centralizerGeneratedBySigma M U := by
+  -- conjugation by an element of `M` preserves `M_σ#` (as `M_σ ◁ M`).
+  have hsig : ∀ v : G, v ∈ M → ∀ x : G, x ∈ S14.sigmaSharp M → v * x * v⁻¹ ∈ S14.sigmaSharp M := by
+    intro v hv x hx
+    rw [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+      Set.mem_singleton_iff] at hx ⊢
+    obtain ⟨hxMσ, hx1⟩ := hx
+    refine ⟨?_, fun h => hx1 (mul_left_cancel ((mul_inv_eq_one.mp h).trans (mul_one v).symm))⟩
+    have hvN : v ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M) :=
+      le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M hv
+    exact (Subgroup.mem_normalizer_iff.mp hvN x).mp hxMσ
+  -- conjugation by `v ∈ M ∩ U` maps each generator to a generator.
+  have hgen : ∀ v : G, v ∈ M → v ∈ U →
+      ∀ C ∈ sigCentFam M U, MulAut.conj v • C ∈ sigCentFam M U := by
+    rintro v hvM hvU C ⟨x, hx, rfl⟩
+    exact ⟨v * x * v⁻¹, hsig v hvM x hx, by
+      rw [Subgroup.smul_inf, Subgroup.conj_smul_eq_self_of_mem hvU,
+        conj_smul_centralizer_singleton]⟩
+  rw [show S15.centralizerGeneratedBySigma M U = sSup (sigCentFam M U) from rfl, mulAut_smul_sSup]
+  refine le_antisymm (iSup_le fun C => iSup_le fun hC => le_sSup (hgen u huM huU C hC)) ?_
+  refine sSup_le fun C hC => ?_
+  have hC' : (MulAut.conj u)⁻¹ • C ∈ sigCentFam M U := by
+    rw [← map_inv MulAut.conj]
+    exact hgen u⁻¹ (inv_mem huM) (inv_mem huU) C hC
+  calc C = MulAut.conj u • ((MulAut.conj u)⁻¹ • C) := (smul_inv_smul _ _).symm
+    _ ≤ ⨆ C' ∈ sigCentFam M U, MulAut.conj u • C' :=
+      le_iSup₂ (f := fun C' (_ : C' ∈ sigCentFam M U) => MulAut.conj u • C')
+        ((MulAut.conj u)⁻¹ • C) hC'
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
@@ -477,21 +547,19 @@ This is the `M ∈ ℳ_𝓕 ⟹ Type F` core feeding `proposition_type_classific
 `mpr`).  The deep fields are read off existing §15 results: `U1_commutative` and `frobenius_HU0`
 from `typeP_auxiliary_structure` (mmd 15.1(d)(e)); `H = M_F = M_σ` from Theorem A(8) (`U ≠ ⊥` rules
 out the `M_F ≠ M_σ` branch); `M = U M_σ` from Theorem A(3) with `K = ⊥`; `centralizer_le_U1` is
-`le_sSup` over `M_F# ⊆ M_σ#`.  The lone named residual `hU1normal` (`⟨C_U(x) | x ∈ M_σ#⟩ ◁ U`) is
-the `U`-conjugation invariance of the generating set `{U ⊓ C_G(x) : x ∈ M_σ#}` (as `M_σ ◁ M`); it is
-derivable but isolated here pending the pointwise-`sSup`-conjugation bookkeeping.  Sorry-free in its
-own body; transitively conditional on the (sorried) Theorem A and the gated half of
-`typeP_auxiliary_structure`. -/
+`le_sSup` over `M_F# ⊆ M_σ#`; and `U1_normal` (`⟨C_U(x) | x ∈ M_σ#⟩ ◁ U`) is `U`-conjugation
+invariance of the generating set `{U ⊓ C_G(x) : x ∈ M_σ#}` (`conj_smul_centralizerGeneratedBySigma`,
+as `M_σ ◁ M`).  Sorry-free in its own body; transitively conditional on the (sorried) Theorem A and
+the gated half of `typeP_auxiliary_structure`. -/
 theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥)
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (hUne : U ≠ ⊥)
-    (hU1normal : ((S15.centralizerGeneratedBySigma M U).subgroupOf U).Normal) :
+    (hUne : U ≠ ⊥) :
     OddOrder.GroupTheory.IsTypeF M := by
   classical
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
-  -- Theorem A: the maximal-subgroup decomposition `M = K U M_σ` (A3) and the `M_F ≠ M_σ` branch (A8).
+  -- Theorem A: the decomposition `M = K U M_σ` (A3) and the `M_F ≠ M_σ` branch (A8).
   obtain ⟨_, _, hA3, _, _, _, _, _, _, _, hA8⟩ := theoremA_maximal_structure hG hM hK rfl hU
   -- `M_F = M_σ`: `U ≠ ⊥` excludes A(8)'s `M_F ≠ M_σ ⟹ U = ⊥` conclusion.
   have hMFMσ : S15.MF M = Mσ := by
@@ -499,7 +567,7 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     exact hUne (hA8 hne).1
   -- `M = U M_σ` (A3 with `K = ⊥`).
   have hMU : M = U ⊔ Mσ := by rw [hA3, hKbot, bot_sup_eq]
-  -- `typeP_auxiliary_structure`: `⟨C_U(M_σ#)⟩` abelian (15.1(d)) and the Frobenius `U₀ M_σ` (15.1(e)).
+  -- `typeP_auxiliary_structure`: `U1` abelian (15.1(d)) + the Frobenius `U₀ M_σ` (15.1(e)).
   obtain ⟨_, _, _, _, _, _, hU1comm, hU0clause⟩ :=
     typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
   obtain ⟨U0, hU0U, hexp, hfrob⟩ := hU0clause hUne
@@ -519,7 +587,7 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       exact inf_le_left
     U0_le := hU0U
     complement := ?_
-    U1_normal := hU1normal
+    U1_normal := ?_
     U1_commutative := hU1comm
     centralizer_le_U1 := by
       intro x hx hx1
@@ -547,8 +615,13 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       exact Subtype.ext hx
     · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) hUM,
         hsetup.E_compl_sup, Subgroup.subgroupOf_self, Subgroup.coe_top]
-  · -- `frobenius_HU0`: rewrite `M_F = M_σ` and `M_F ⊔ U₀ = U₀ ⊔ M_σ` into `typeP_auxiliary_structure`'s
-    -- Frobenius datum.
+  · -- `U1_normal`: `U`-conjugation fixes `⟨C_U(x) | x ∈ M_σ#⟩` (it permutes the generators).
+    apply Subgroup.Normal.of_conjugate_fixed
+    intro h
+    rw [Subgroup.conj_smul_subgroupOf
+      (by apply sSup_le; rintro C ⟨x, _, rfl⟩; exact inf_le_left) h,
+      conj_smul_centralizerGeneratedBySigma (hUM h.2) h.2]
+  · -- `frobenius_HU0`: rewrite `M_F = M_σ`, `M_F ⊔ U₀ = U₀ ⊔ M_σ` into the Frobenius datum.
     rw [hMFMσ, sup_comm]
     exact hfrob
 
