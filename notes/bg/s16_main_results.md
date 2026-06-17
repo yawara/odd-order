@@ -655,3 +655,65 @@ structure TheoremA_Structure (M : Subgroup G) where
 *연계: BG _overview.md (L43), Peterfalvi s10_structure.md, ROADMAP Phase 2a*  
 *다음 단계: Phase 2a 제 5 파 개시 시 App.A → §6 → §7-§15 → §16 순차 형식화*
 
+---
+
+## 2026-06-18 (lane G): Prop 16.1 type-`P` data construction layer — engine + bridges DONE
+
+**landed (commit `1a4ccfd9`, `S16_MainResults`, all sorry-free + axiom-clean, AxiomsCheck 5 decls):**
+the shared `TypePData` construction layer feeding the three type-`P` forward bridges
+(`hP2II`/`hP1neIIIIV`/`hP1eqV`) of `proposition_type_classification`.  Analogous to
+`typeFData_of_kappa_eq_bot` for type I (the F→I core).
+
+1. `normalizer_eq_sup_of_isTISubset_of_isCyclic` — the genuine `normalizer_V` reduction
+   (Peterfalvi (8.4)): for cyclic `W = W₁⊔W₂` and `V = W∖(W₁∪W₂)` `TI` relative to `W`, every
+   nonempty `X ⊆ V` has `N_G(X) = W`.  `≤ W` from `IsTISubset` (`mem_set_normalizer_iff''` lands a
+   conjugate of `a∈X⊆V` back in `V`); `≥ W` from abelianness of the cyclic `W` (`IsCyclic.commGroup`
+   + `congrArg Subtype.val (mul_comm …)`).  **Pure group theory, unconditional** — reusable.
+2. `typePData_of_inputs` (`def`) — assembles the 20-field `TypePData M` from the BG-local
+   structural facts as **18 named §14/§15 hypotheses** (gated-endpoint pattern).  Derives inside:
+   `W_eq` (defn `W := W₁⊔W₂`), `W1_cyclic`/`W2_cyclic` (`Subgroup.isCyclic_of_le` on cyclic `W`),
+   `normalizer_V` (the reduction above).
+3. `isTypeIII_or_IV_of_typePData` / `isTypeII_of_typePData` / `isTypeV_of_typePData` — type-specific
+   last-mile packers.  III/IV is the clean part of `hP1neIIIIV` (decidable `IsMulCommutative ↥U`
+   split, no deep gate); II holds `derived_typeF : IsTypeF (M')` + `derived_fitting_eq` as named
+   residuals; V holds the Peterfalvi-(8.8) `alternative` trichotomy as a named residual.
+
+### the next deep unit = the `typePData` WRAPPER (BG-σ ↔ Peterfalvi-H-U structural bridge)
+
+To **discharge** the forward bridges (not just isolate them), a wrapper `typePData (hG hM hP …) :
+TypePData M` must supply `typePData_of_inputs`' 18 hypotheses by citing the (sorried) §14/§15
+results, with `H = M_F`, `W₁ = K`, `W₂ = K*`, `U = ?`.  **Field-provenance map** (verified
+citable unless flagged):
+
+| field | source | note |
+|---|---|---|
+| `H_eq` | `H := MF M`, `rfl` | `MF M = maxNilpotentNormalHall M` defn |
+| `H_le` (M_F ≤ M') | `maxNilpotentNormalHall_le_derived` | chain M_F ≤ M_σ ≤ M' |
+| `W1_le` (K ≤ M) | `hKM` | |
+| `W2_le` (K* ≤ M_F ⊓ M'') | `typeP_kstar_in_mf` (K*≤M_F, K*≤M'') | |
+| `W_cyclic` (K⊔K* cyclic) | `typeP_duality` | |
+| `W1_nontrivial` (K≠⊥) | from `IsTypeP` (κ≠∅) | check exact lemma |
+| `W2_nontrivial` (K*≠⊥) | `typeP_structure` (14.2c) / `typeP_kstar_in_mf` | |
+| `M_complement` | `typeP_duality` part (h) | |
+| `U_nilpotent` | `typeP_auxiliary_structure` conj5: U abelian ⟹ nilpotent | (K≠⊥) |
+| `hTI` (zTilde TI) | `typeP_duality` (`IsTISubset (zTilde K K*) (K⊔K*)`) | matches `V` defn-eq |
+| `centralizer_W1` (M'∩C(K#)=K*) | ⚠ **needs verification** — C_{M'}(K#)=K* identity | |
+| `secondDerived_le_fitting` / `fitting_eq` / `fitting_lt_derived` | `mf_ne_msigma_typeP1_structure` (P1) | M_σ=M', F(M)=Q⊔(C(Q)⊓M), M_F<M' |
+| `H_noncyclic` (¬cyclic M_F) | `typeP_kstar_in_mf` (last conj) | |
+| **`U_le` / `U_normal` / `derived_complement`** | ⚠⚠ **the deep bridge** | see below |
+
+**⚠⚠ key open subtlety (the genuine (8.x) content):** Peterfalvi's `derived_complement` is
+`M' = H · U = M_F · U_pf` (internal complement of `M_F` in `M'`), but BG's σ-decomposition gives
+`M' = U_bg ⊔ M_σ` (`typeP_auxiliary_structure` conj5, `U_bg` = the Hall `(κ∪σ)'`-complement).
+Since **M_F ⊊ M_σ for type P₁** (`MF M ≠ Msigma M`), the two complements differ: `U_pf ≠ U_bg`.
+Peterfalvi's `U` is a complement of `M_F` (not `M_σ`) in `M'`, so the wrapper must either
+(a) construct `U_pf` (a Schur–Zassenhaus complement of the Hall-normal `M_F` in `M'`) and re-derive
+`U_normal`/`U_le`, or (b) find a BG result giving the `M' = M_F U` form directly.  This is the deep
+structural assembly Prop 16.1 is built on — NOT a quick citation.  **Recommend** resolving (a)/(b)
+before attempting the wrapper; the engine + bridges above are already in place to receive it.
+(Corrected mis-reading: the ordering is `M_F ≤ M_σ ≤ M' ≤ M`, NOT `M_σ ⊆ M_F`;
+`maxNilpotentNormalHall_le_Msigma` S15:161.)
+
+residual modest skeleton queue (lower value, §14-independent): `theoremA/C/E/aSets _of_inputs`
+(bare sorry → named residual; F already did D / II-conj1 / A-ungated / B(1) / sigma-disjoint).
+

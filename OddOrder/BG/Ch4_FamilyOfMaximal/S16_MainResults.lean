@@ -625,6 +625,165 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     rw [hMFMσ, sup_comm]
     exact hfrob
 
+/-- **Type-`P` `V`-normalizer characterization** (the `normalizer_V` field of `TypePData`,
+Peterfalvi (8.4); BG records it as the self-normalizing exceptional set `M = N_G(V)`): if
+`W = W₁ ⊔ W₂` is cyclic and the exceptional set `V = W ∖ (W₁ ∪ W₂)` is a `TI`-subset relative to
+`W`, then every nonempty `X ⊆ V` has normalizer exactly `W`.
+
+This is the genuine reduction underlying the deep-looking `normalizer_V` field: `N_G(X) ≤ W` is the
+`TI` property (a conjugate of an element of `X ⊆ V` lands back in `V`, forcing the conjugator into
+`W`); `W ≤ N_G(X)` is abelianness of the cyclic `W` (every `w ∈ W` centralizes `X ⊆ W`, so fixes it
+setwise).  Both inputs (`W = K ⊔ K*` cyclic and the `zTilde K K*` `TI` property) are supplied by
+Theorem 14.7 (`typeP_duality`), so this lemma discharges `normalizer_V` once §14 lands. -/
+theorem normalizer_eq_sup_of_isTISubset_of_isCyclic {W1 W2 : Subgroup G}
+    (hWcyc : IsCyclic ↥(W1 ⊔ W2))
+    (hTI : IsTISubset ((↑(W1 ⊔ W2) : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) (W1 ⊔ W2))
+    {X : Set G} (hXne : X.Nonempty)
+    (hXV : X ⊆ (↑(W1 ⊔ W2) : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) :
+    Subgroup.normalizer X = W1 ⊔ W2 := by
+  classical
+  haveI : IsCyclic ↥(W1 ⊔ W2) := hWcyc
+  letI : CommGroup ↥(W1 ⊔ W2) := IsCyclic.commGroup
+  -- elements of the cyclic `W = W₁ ⊔ W₂` commute in `G`.
+  have hcomm : ∀ a b : G, a ∈ W1 ⊔ W2 → b ∈ W1 ⊔ W2 → a * b = b * a := fun a b ha hb =>
+    congrArg Subtype.val (mul_comm (⟨a, ha⟩ : ↥(W1 ⊔ W2)) ⟨b, hb⟩)
+  apply le_antisymm
+  · -- `N_G(X) ≤ W`: a conjugate of `a ∈ X ⊆ V` lands in `V`, so the `TI` property forces `g ∈ W`.
+    intro g hg
+    obtain ⟨a, haX⟩ := hXne
+    have h1 : g⁻¹ * a * g ∈ X := (Subgroup.mem_set_normalizer_iff''.mp hg a).mp haX
+    refine hTI g ⟨g⁻¹ * a * g, hXV h1, ?_⟩
+    have he : g * (g⁻¹ * a * g) * g⁻¹ = a := by group
+    rw [he]; exact hXV haX
+  · -- `W ≤ N_G(X)`: `w ∈ W` centralizes `X ⊆ W` (abelian), so it fixes `X` setwise.
+    intro w hw
+    rw [Subgroup.mem_set_normalizer_iff]
+    intro h
+    constructor
+    · intro hhX
+      have hfix : w * h * w⁻¹ = h := by rw [hcomm w h hw (hXV hhX).1]; group
+      rw [hfix]; exact hhX
+    · intro hconj
+      have hhW : h ∈ W1 ⊔ W2 := by
+        have hrw : h = w⁻¹ * (w * h * w⁻¹) * w := by group
+        rw [hrw]
+        exact mul_mem (mul_mem (inv_mem hw) (hXV hconj).1) hw
+      have hfix : w * h * w⁻¹ = h := by rw [hcomm w h hw hhW]; group
+      rwa [hfix] at hconj
+
+/-- **Prop 16.1(b)--(d) forward bridge, shared core**: assemble the Peterfalvi type-`P` datum
+`TypePData M` (mmd L4116/L4190, Peterfalvi (8.4)) from the BG-local structural facts.  This is the
+single construction feeding *all three* of the `hP2II`/`hP1neIIIIV`/`hP1eqV` forward bridges of
+`proposition_type_classification` (types II, III, IV, V all bundle a `TypePData`).
+
+Following the gated-endpoint skeleton pattern (cf. `typeP_kstar_in_mf_of_inputs`), the deep
+structural fields are taken as named hypotheses; their BG sources are:
+
+* the derived-series complement `M = M' W₁`, `W = W₁ ⊔ W₂` cyclic, and the `zTilde` `TI` property
+  (`hMcompl`/`hWcyc`/`hTI`) come from Theorem 14.7 (`typeP_duality`) with `W₁ = K`, `W₂ = K*`,
+  `W = K ⊔ K*`;
+* the Fitting decomposition `F(M) = H ⊔ (U ⊓ C_M(H))`, `M'' ≤ F(M)`, `F(M) < M'`, and `M_F`
+  noncyclic (`hFiteq`/`hSDfit`/`hFitlt`/`hHncyc`) come from Theorem 15.2
+  (`mf_ne_msigma_typeP1_structure`) and Corollary 15.6;
+* the `M'`-internal complement `M' = H U` with `U ⊴ M'` nilpotent (`hDcompl`/`hUnorm`/`hUnilp`)
+  comes from Lemma 15.1 / Theorem A.
+
+The genuinely *derived* (not renamed) fields are `W_eq` (definitional), `W1_cyclic`/`W2_cyclic`
+(subgroups of the cyclic `W`), and `normalizer_V` (the `TI` + cyclic reduction
+`normalizer_eq_sup_of_isTISubset_of_isCyclic`).  Sorry-free in its own body. -/
+def typePData_of_inputs {M H U W1 W2 : Subgroup G}
+    (hHeq : H = maxNilpotentNormalHall M)
+    (hHle : H ≤ derivedInG M)
+    (hUle : U ≤ derivedInG M)
+    (hW1le : W1 ≤ M)
+    (hW2le : W2 ≤ H ⊓ secondDerivedInAmbient M)
+    (hWcyc : IsCyclic ↥(W1 ⊔ W2))
+    (hW1ne : W1 ≠ ⊥) (hW2ne : W2 ≠ ⊥)
+    (hMcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (W1.subgroupOf M))
+    (hUnorm : (U.subgroupOf (derivedInG M)).Normal)
+    (hUnilp : Group.IsNilpotent ↥U)
+    (hDcompl :
+      Subgroup.IsComplement' (H.subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M)))
+    (hHncyc : ¬ IsCyclic ↥H)
+    (hSDfit : secondDerivedInAmbient M ≤ H ⊔ (U ⊓ Subgroup.centralizer (H : Set G)))
+    (hFiteq : maxNilpotentNormalHall M = H ⊔ (U ⊓ Subgroup.centralizer (H : Set G)))
+    (hFitlt : maxNilpotentNormalHall M < derivedInG M)
+    (hCentW1 : ∀ x ∈ W1, x ≠ 1 →
+      derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = W2)
+    (hTI : IsTISubset ((↑(W1 ⊔ W2) : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) (W1 ⊔ W2)) :
+    TypePData M := by
+  haveI := hWcyc
+  exact
+    { H := H
+      U := U
+      W1 := W1
+      W2 := W2
+      W := W1 ⊔ W2
+      H_eq := hHeq
+      H_le := hHle
+      U_le := hUle
+      W1_le := hW1le
+      W2_le := hW2le
+      W_eq := rfl
+      W_cyclic := hWcyc
+      W1_nontrivial := hW1ne
+      W2_nontrivial := hW2ne
+      W1_cyclic := Subgroup.isCyclic_of_le (le_sup_left : W1 ≤ W1 ⊔ W2)
+      W2_cyclic := Subgroup.isCyclic_of_le (le_sup_right : W2 ≤ W1 ⊔ W2)
+      M_complement := hMcompl
+      U_normal := hUnorm
+      U_nilpotent := hUnilp
+      derived_complement := hDcompl
+      H_noncyclic := hHncyc
+      secondDerived_le_fitting := hSDfit
+      fitting_eq := hFiteq
+      fitting_lt_derived := hFitlt
+      centralizer_W1 := hCentW1
+      normalizer_V := fun X hXne hXV =>
+        normalizer_eq_sup_of_isTISubset_of_isCyclic hWcyc hTI hXne hXV }
+
+/-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
+`U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
+This is the clean part of the `hP1neIIIIV` bridge — no deep `alternative`/`derived_typeF` content,
+only the decidable `IsMulCommutative ↥U` split distinguishing III (`U` abelian) from IV. -/
+theorem isTypeIII_or_IV_of_typePData {M : Subgroup G} (data : TypePData M)
+    (hcommon : TypePNontrivialCore M data)
+    (hnorm : Subgroup.normalizer (data.U : Set G) ≤ M) :
+    IsTypeIII M ∨ IsTypeIV M := by
+  classical
+  by_cases hU : IsMulCommutative ↥data.U
+  · exact Or.inl ⟨{ typeP := data, common := hcommon, U_commutative := hU, normalizer_le := hnorm }⟩
+  · exact Or.inr
+      ⟨{ typeP := data, common := hcommon, U_not_commutative := hU, normalizer_le := hnorm }⟩
+
+/-- **Prop 16.1 forward bridge, type II last mile** (Peterfalvi (8.6)): a type-`P` datum with `U`
+abelian, `N_G(U) ⊄ M`, and the derived subgroup `M'` of type `F` (with `F(M') = H`) is of type II.
+The `derived_typeF` field is the genuinely deep named residual (the type-`F` structure of `M'`). -/
+theorem isTypeII_of_typePData {M : Subgroup G} (data : TypePData M)
+    (hcommon : TypePNontrivialCore M data)
+    (hUcomm : IsMulCommutative ↥data.U)
+    (hnorm : ¬ Subgroup.normalizer (data.U : Set G) ≤ M)
+    (hderF : OddOrder.GroupTheory.IsTypeF (derivedInG M))
+    (hderfit : maxNilpotentNormalHall (derivedInG M) = data.H) :
+    IsTypeII M :=
+  ⟨{ typeP := data, common := hcommon, U_commutative := hUcomm,
+     normalizer_not_le := hnorm, derived_typeF := hderF, derived_fitting_eq := hderfit }⟩
+
+/-- **Prop 16.1 forward bridge, type V last mile** (Peterfalvi (8.8)): a type-`P` datum with
+`U = ⊥` and the Peterfalvi (8.8) trichotomy on `H = M_F` is of type V.  The `alternative`
+disjunction is the deep named residual (BG §15.7(c) / Peterfalvi (8.8)). -/
+theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
+    (hUbot : data.U = ⊥)
+    (halt :
+      IsTISubset (sharpSubgroup data.H) (Subgroup.normalizer (data.H : Set G)) ∨
+      (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥data.H).primeFactors ∧
+        Nat.card ↥data.W1 ∣ p - 1 ∧ IsCyclic ↥(opiCoreInG {p}ᶜ data.H)) ∨
+      (∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥data.H).primeFactors ∧
+        Nat.card ↥(opiCoreInG {p} data.H) = p ^ 3 ∧ Nat.card ↥data.W1 ∣ p + 1 ∧
+        IsCyclic ↥(opiCoreInG {p}ᶜ data.H))) :
+    IsTypeV M :=
+  ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
