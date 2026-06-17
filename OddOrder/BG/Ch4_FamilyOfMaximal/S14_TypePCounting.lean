@@ -6093,6 +6093,75 @@ theorem typeP_family_conjClass_T_count [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (typeP_family_T_isTI hG hM hP hKM hK hKstar hU)
     (typeP_family_Z_normalizes_T hG hM hP hKM hK hKstar hU)
 
+/-- **BG 14.7, `Z ⊊ Mᵢ` (so `|Mᵢ| ≥ 2z`)** (mmd L4033, the `|M_i| ≥ 2z` step): every family member
+`N` properly contains `Z = K ⊔ K*`.  The clean argument (NOT self-centralizing — BG's "prime
+manner" allows trivial action): the family has `≥ 2` members (`M` plus a neighbour, which exists
+since `N_G(X) ⊄ M` for `X ∈ ℰ¹(K)`), all containing `Z`; if `Z = N` then `N ⊆ M'` for some other
+member `M' ≠ N`, impossible for distinct maximal subgroups.  Hence `Z ⊊ N`, giving `|N| ≥ 2z`. -/
+theorem typeP_family_Z_lt_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    K ⊔ Kstar < N := by
+  classical
+  -- Distinct maximal subgroups form an antichain.
+  have hanti : ∀ {A B : Subgroup G}, A ∈ maximalSubgroups G → B ∈ maximalSubgroups G →
+      A ≤ B → A = B := fun {A B} hA hB hAB => hAB.lt_or_eq.elim
+    (fun hlt => absurd ((mem_maximalSubgroups.mp hA).2 _ hlt) (mem_maximalSubgroups.mp hB).1) id
+  -- A prime `p ∣ |K|` (κ(M) ≠ ∅, κ-primes divide |M|, Hall index avoids κ).
+  have hP2 := hP
+  obtain ⟨p, hpκ⟩ := hP2
+  have hpprime : p.Prime := hpκ.1
+  obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
+  have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
+  have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
+  have hpK : p ∣ Nat.card ↥K := by
+    have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact Subgroup.card_mul_index (K.subgroupOf M)
+    have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+      hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+    exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
+  -- A neighbour `N₁ ≠ M` containing `Z`.
+  obtain ⟨N₁, hN₁max, -, hncM, -, hZN₁⟩ :=
+    exists_typeP_neighbor_mem_sigma hG hM hP hKM hK hKstar hU hpprime hpK
+  have hN₁neM : N₁ ≠ M := fun h =>
+    hncM (h ▸ (⟨1, by rw [map_one, one_smul]⟩ : IsConjugateSubgroup M M))
+  obtain ⟨hNmax, -, hZN, -⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  have hZM : K ⊔ Kstar ≤ M :=
+    sup_le hKM (hKstar ▸ inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
+  refine lt_of_le_of_ne hZN (fun heq => ?_)
+  by_cases hNM : N = M
+  · exact hN₁neM ((hanti hNmax hN₁max (heq ▸ hZN₁)).symm.trans hNM)
+  · exact hNM (hanti hNmax hM (heq ▸ hZM))
+
+/-- **BG 14.7, `|Mᵢ| ≥ 2z`** (mmd L4033): the cardinality form of `Z ⊊ Mᵢ`, the lower bound the
+density inequality needs (`|𝒞_G(M̃ᵢ)| ≥ (1/kᵢ − 1/2z)|G|`).  From `Z < N` (proper), `[N : Z] ≥ 2`. -/
+theorem typeP_family_two_mul_card_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    2 * Nat.card ↥(K ⊔ Kstar) ≤ Nat.card ↥N := by
+  classical
+  have hlt := typeP_family_Z_lt_member hG hM hP hKM hK hKstar hU hN
+  have hle : K ⊔ Kstar ≤ N := hlt.le
+  have hlag : Nat.card ↥(K ⊔ Kstar) * ((K ⊔ Kstar).subgroupOf N).index = Nat.card ↥N := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv]
+    exact Subgroup.card_mul_index ((K ⊔ Kstar).subgroupOf N)
+  have hne1 : ((K ⊔ Kstar).subgroupOf N).index ≠ 1 := fun h =>
+    hlt.ne (le_antisymm hle (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp h)))
+  have hidx2 : 2 ≤ ((K ⊔ Kstar).subgroupOf N).index :=
+    (Nat.two_le_iff _).mpr ⟨Subgroup.index_ne_zero_of_finite, hne1⟩
+  calc 2 * Nat.card ↥(K ⊔ Kstar)
+      ≤ ((K ⊔ Kstar).subgroupOf N).index * Nat.card ↥(K ⊔ Kstar) :=
+        Nat.mul_le_mul_right _ hidx2
+    _ = Nat.card ↥(K ⊔ Kstar) * ((K ⊔ Kstar).subgroupOf N).index := Nat.mul_comm _ _
+    _ = Nat.card ↥N := hlag
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
