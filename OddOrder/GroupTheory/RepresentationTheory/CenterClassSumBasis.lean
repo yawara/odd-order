@@ -186,4 +186,25 @@ noncomputable def centerBasis :
     centerBasis (k := k) (G := G) C = classSumCenter C :=
   Basis.mk_apply _ _ C
 
+/-- A group automorphism `α` of `G` acts on conjugacy classes compatibly with the algebra
+automorphism `MonoidAlgebra.domCongr α` of `k[G]`: it **permutes the class-sum basis**,
+`domCongr α (classSum C) = classSum (map α C)`.  Reading off the coefficient at `y`, both sides are
+`1` exactly when `α⁻¹ y ∈ C`, equivalently `y ∈ map α C` (`α` is an isomorphism, so it carries the
+conjugacy relation both ways).  This is the `σ_e`-permutation feeding the cornerstone. -/
+theorem domCongr_classSum (α : G ≃* G) (C : ConjClasses G) :
+    MonoidAlgebra.domCongr k k α (classSum (k := k) C)
+      = classSum (k := k) (ConjClasses.map (α : G →* G) C) := by
+  refine Finsupp.ext fun y => ?_
+  rw [MonoidAlgebra.domCongr_apply]
+  obtain ⟨c, rfl⟩ := ConjClasses.mk_surjective C
+  have hmap : ConjClasses.map (α : G →* G) (ConjClasses.mk c) = ConjClasses.mk (α c) := rfl
+  simp only [classSum_apply, hmap]
+  have hiff : (ConjClasses.mk (α.symm y) = ConjClasses.mk c)
+      ↔ (ConjClasses.mk y = ConjClasses.mk (α c)) := by
+    rw [ConjClasses.mk_eq_mk_iff_isConj, ConjClasses.mk_eq_mk_iff_isConj]
+    constructor
+    · intro h; simpa using MonoidHom.map_isConj (α : G →* G) h
+    · intro h; simpa using MonoidHom.map_isConj (α.symm : G →* G) h
+  exact if_congr hiff rfl rfl
+
 end OddOrder.GroupTheory.CenterClassSum
