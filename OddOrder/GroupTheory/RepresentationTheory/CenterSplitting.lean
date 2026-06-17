@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import Mathlib.Algebra.Central.Matrix
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.RingTheory.SimpleModule.IsAlgClosed
 
 /-!
 # Transporting the centre along an algebra isomorphism
@@ -105,5 +107,23 @@ noncomputable def matrixCenterEquiv [Nonempty n] :
     (AlgEquiv.ofInjective (Matrix.scalarAlgHom n k) scalarAlgHom_injective).symm
 
 end Matrix
+
+section Wedderburn
+
+variable (k G : Type*) [Field k] [IsAlgClosed k] [Group G] [Finite G] [NeZero (Nat.card G : k)]
+
+/-- **The centre of `k[G]` splits as `(Fin N → k)`** when `k` is algebraically closed and
+`char k ∤ |G|` (so `k[G]` is split semisimple).  `N` is the number of Wedderburn blocks = the number
+of simple modules.  Assembled from the Wedderburn decomposition `k[G] ≅ ∏ᵢ Matᵢ(k)` and the three
+centre links (`centerCongr`, `centerPiEquiv`, `matrixCenterEquiv`). -/
+theorem exists_center_algEquiv_pi :
+    ∃ N : ℕ, Nonempty (Subalgebra.center k (MonoidAlgebra k G) ≃ₐ[k] (Fin N → k)) := by
+  obtain ⟨n, d, hd, ⟨e⟩⟩ :=
+    IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed k (MonoidAlgebra k G)
+  refine ⟨n, ⟨e.centerCongr.trans (centerPiEquiv.trans (AlgEquiv.piCongrRight fun i => ?_))⟩⟩
+  haveI : Nonempty (Fin (d i)) := ⟨⟨0, Nat.pos_of_ne_zero (hd i).out⟩⟩
+  exact matrixCenterEquiv
+
+end Wedderburn
 
 end OddOrder.GroupTheory.CenterSplitting
