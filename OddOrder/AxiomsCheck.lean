@@ -4909,6 +4909,12 @@ every family member is `M` or `M*`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_partner
 
+/-! **BG Theorem 14.7(f), the type-`P₂` dichotomy** (`S14_TypePCounting`,
+`isTypeP2_or_isTypeP2_partner`): one of `M`, `M*` is type `P₂` (the density inequality's type-`P₂`
+member is `M` or `M*`).  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP2_or_isTypeP2_partner
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

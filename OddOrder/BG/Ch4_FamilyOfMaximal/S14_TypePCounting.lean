@@ -6841,6 +6841,21 @@ theorem exists_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [Finset.mem_insert, Finset.mem_singleton] at hN'
     exact hN'.elim (fun h => Or.inr h) (fun h => Or.inl (h.trans hMb.symm))
 
+/-- **BG Theorem 14.7(f), the type-`P₂` dichotomy** (mmd L4047): for the partner `M*` (so every
+family member is `M` or `M*`), one of `M`, `M*` is type `P₂`.  Immediate from the density
+inequality (`exists_typeP2_member`): the type-`P₂` member it produces is `M` or `M*`. -/
+theorem isTypeP2_or_isTypeP2_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    IsTypeP2 M ∨ IsTypeP2 Mstar := by
+  obtain ⟨N, hN𝓕, hNP2⟩ := exists_typeP2_member hG D hM hP hKM hK hKstar hU
+  rcases hpart N (mem_ZFamilyFinset.mp hN𝓕) with h | h
+  · subst h; exact Or.inl hNP2
+  · subst h; exact Or.inr hNP2
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
