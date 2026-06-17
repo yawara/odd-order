@@ -157,17 +157,28 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
   idempotent bases), so they agree. No char-0 / Teichmüller.
 
 **NEXT — step 3d (counting bridge), toward (†):**
-1. Specialise the orbit equality to a cyclic `⟨e⟩`. Cleanest: generalise to an arbitrary acting
-   group via a hom `ψ : Γ →* MulAut G` — `centerRep'.comp ψ : Representation k Γ (CenterCarrier k G)`
-   (a `Representation` IS a `MonoidHom` to `Module.End`, so `MonoidHom.comp` typechecks), apply the
-   cornerstone twice (class-sum + idempotent) ⟹ `#(Γ-orbits on classes) = #(Γ-orbits on simples)`.
-   Then take `Γ = ↥(Subgroup.zpowers e)` (or a cyclic group) with `ψ = Subgroup.subtype`.
-2. Glauberman coprime-FPF (repo `glauberman_fixed_points_conj`): every `e^j` (`1≤j<d`) is FPF on `U`
-   ⟹ fixes only the trivial class ⟹ `⟨e⟩` free on the `Ncl−1` nontrivial classes ⟹
-   `#orbits-classes = 1 + (Ncl−1)/d`.
-3. Transfer via the Brauer equality + `Nsimples = Ncl` ⟹ `#orbits-simples = 1 + (Ncl−1)/d` ⟹ every
-   nontrivial-simple orbit has size `d` ⟹ `⟨e⟩` (hence `E`) acts freely on the nontrivial simples ⟹
-   feed I-3 ⟹ (†).
+1. ✅ **DONE (3d.1, `78f8c86f`)** — orbit equality for an arbitrary acting group via a hom
+   `ψ : Γ →* MulAut G`: `centerRepComp ψ = centerRep'.comp ψ : Representation k Γ (CenterCarrier k G)`
+   (a `Representation` IS a `MonoidHom` to `Module.End`, so `MonoidHom.comp` typechecks; ascription
+   pins the carrier), cornerstone twice ⟹ `card_orbits_classes_eq_card_orbits_simples_comp :
+   #(Γ-orbits on classes) = #(Γ-orbits on simples)`. For `Γ = ↥(Subgroup.zpowers e)`,
+   `ψ = Subgroup.subtype`, `compHom`-action on `Fin N`, the agreement hyps `hcl`/`hsi` hold by `rfl`.
+2. **NEXT (3d.2) — "coprime-FPF automorphism fixes only the trivial class":** for `α : MulAut G`
+   coprime to `|G|` with `Fix_G(α) = {1}` (FPF), an `α`-fixed class `C` is trivial. **Tool FOUND
+   (no wall): `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists`** (Isaacs Lem 3.24(a),
+   `ForwardFromCh03.lean:180`) = coprime + one-solvable + `G`-transitive `Ω` + `IsCompatibleMulAction
+   φ Ω` ⟹ `∃ α-fixed ω`. **Construction** (~60-80 lines, pattern = `glauberman_fixed_points_conj`
+   `:330`): take `Ω := {y : G // ConjClasses.mk y = C}`; `MulAction G Ω` by conjugation
+   (`g•⟨y,_⟩ = ⟨g*y*g⁻¹,_⟩`, class-preserving), transitive (any two reps of `C` are conjugate);
+   `MulAction A Ω` via `φ` where `A = ↥(zpowers α)` (well-defined since `α` fixes `C` ⟹ every
+   `α^n` does); compatibility `a•(g•ω) = φ a g • (a•ω)` (`α(gyg⁻¹) = α(g)α(y)α(g)⁻¹`); nonempty
+   (`C.out`). Glauberman ⟹ `α`-fixed `y ∈ C` ⟹ `y ∈ Fix(α) = {1}` ⟹ `C = mk 1` trivial.
+   ⟹ `⟨e⟩` free on the `Ncl−1` nontrivial classes ⟹ `#orbits-classes = 1 + (Ncl−1)/d`.
+3. **(3d.3) transfer:** Brauer equality (3d.1) + `Nsimples = Ncl` ⟹ `#orbits-simples = 1 + (Ncl−1)/d`
+   ⟹ (the trivial simple is a `Γ`-fixed singleton orbit + every other orbit size `| d`, summing to
+   `Ncl−1` in `(Ncl−1)/d` orbits ⟹ all size `d`) ⟹ `⟨e⟩` (hence `E`) free on nontrivial simples ⟹
+   feed I-3 ⟹ (†).  Needs an abstract free-action orbit-count arithmetic lemma + identifying the
+   trivial simple's index as `Γ`-fixed.
 
 `Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
 of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a

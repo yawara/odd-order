@@ -90,10 +90,13 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       (`↥(Subalgebra.center k …)` の Module instance diamond) は **carrier type synonym `CenterCarrier`
       + inferInstanceAs で正準化して解消** ([[lean-type-synonym-fixes-instance-diamond]])。
       ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
-      **残 = step 3d counting bridge**: (i) Brauer 等式を cyclic ⟨e⟩ へ特殊化（`centerRep'.comp ψ`,
-      `ψ : Γ →* MulAut G`、`Γ = ↥⟨e⟩` or 一般群）→ (ii) Glauberman coprime-FPF（repo
-      `glauberman_fixed_points_conj`）で ⟨e⟩ が非自明 class に自由作用 → #orbits-classes = 1+(Ncl−1)/d →
-      (iii) 等式 + `Nsimples = Ncl` で free on 非自明 simples ⟹ (†)。
+      **残 = step 3d counting bridge**: (3d.1) ✅ **DONE (`78f8c86f`)** Brauer 等式を一般作用群へ一般化
+      （`centerRepComp ψ`, `ψ : Γ →* MulAut G`、`card_orbits_classes_eq_card_orbits_simples_comp`;
+      `Γ = ↥(zpowers e)` + `compHom` で hcl/hsi が rfl）→ (3d.2) **coprime-FPF auto は自明 class のみ固定**
+      （tool 確定・wall 無し: **`Isaacs.Ch04.glauberman_fixed_point_exists`** = Lem 3.24(a) を
+      conjugacy-class-as-transitive-G-set `Ω={y//mk y=C}` に適用、~60-80 行; pattern =
+      `glauberman_fixed_points_conj:330`）→ #orbits-classes = 1+(Ncl−1)/d → (3d.3) 等式 + `Nsimples=Ncl`
+      + free-action orbit 算術 + trivial-simple は Γ-fixed で free on 非自明 simples ⟹ (†)。
       正本 = design notes「2026-06-17 (resume²)」「(resume³)」「(resume⁴)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
