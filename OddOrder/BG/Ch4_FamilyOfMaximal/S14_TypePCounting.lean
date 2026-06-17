@@ -6292,6 +6292,36 @@ theorem typeP_family_T_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKNN).toEquiv]
     exact Nat.mem_primeFactors.mpr ⟨hpp, hpKN, Nat.card_pos.ne'⟩
 
+/-- **BG 14.7, `𝒞_G(T)` is disjoint from each `𝒞_G(M̃ᵢ)`** (mmd L4025): the TI-set's conjugacy
+saturation meets no `𝒞_G(M̃ᵢ)`.  A common `z = g₁tg₁⁻¹ = g₂sg₂⁻¹` (`t ∈ T`, `s ∈ M̃ᵢ`) makes
+`t = (g₁⁻¹g₂)·s·(g₁⁻¹g₂)⁻¹` a conjugate of `s ∈ M̃ᵢ`, so `t ∈ M̃(Mᵢ^{g₁⁻¹g₂})` (`Mtilde_conj_smul`)
+has the type-2 form (`mem_Mtilde_imp_form`); but `t ∈ T` has the type-1 form
+(`typeP_family_T_form`), contradicting Lemma 14.6 (`not_type1_of_type2`).  The last disjointness
+needed for the density inequality. -/
+theorem conjClassSet_T_Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {Mi : Subgroup G} (hMi : Mi ∈ maximalSubgroups G) :
+    Disjoint (conjClassSet (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)))
+      (conjClassSet (Mtilde hG D Mi)) := by
+  rw [Set.disjoint_left]
+  rintro z ⟨t, htT, g₁, rfl⟩ ⟨s, hsM, g₂, hz₂⟩
+  obtain ⟨N, hNmax, y, y', hgyy', hcomm, hy, hy'1, hy'N, hy'C, hy'κ⟩ :=
+    typeP_family_T_form hG hM hP hKM hK hKstar hU htT
+  have heq : t = MulAut.conj (g₁⁻¹ * g₂) • s := by
+    rw [MulAut.smul_def, MulAut.conj_apply,
+      show (g₁⁻¹ * g₂) * s * (g₁⁻¹ * g₂)⁻¹ = g₁⁻¹ * (g₂ * s * g₂⁻¹) * g₁ from by group, hz₂]
+    group
+  have htM : t ∈ Mtilde hG D (MulAut.conj (g₁⁻¹ * g₂) • Mi) := by
+    rw [← Mtilde_conj_smul, heq]; exact Set.smul_mem_smul_set hsM
+  obtain ⟨x, x'', htxx, hlenx, hx''R⟩ := mem_Mtilde_imp_form hG D
+    (mem_maximalSubgroups_of_isConjugateSubgroup hMi ⟨g₁⁻¹ * g₂, rfl⟩) htM
+  exact not_type1_of_type2 hG D hNmax hy hgyy' hcomm hy'1 hy'N hy'C hy'κ ⟨x, x'', htxx, hlenx, hx''R⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
