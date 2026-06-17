@@ -52,8 +52,15 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       + 表現 setup + BG 3.3 適用 + keystone で `C_{H/N}(E)=1` + φ̄ 強帰納 `Nat.card H`）。
       ⚠ **cor (i) は side-quest**（I-5 keystone が既存判明ゆえ新規共有インフラ無し・sorry 数不変）。
 - [ ] (I-2) isotypic 分解（mathlib `IsSemisimpleModule`+`Maschke`）
-- [ ] (I-1) **modular Brauer permutation lemma**（fixed-point 形 `#e-fixed simples = #e-fixed classes`,
-      Teichmüller integer-lift）← **核心・真の wall**（full Brauer char より小さい slice）
+- [ ] (I-1) **Brauer permutation 補題 — ⚡ Teichmüller-free に再設計 (2026-06-17, user 裁可)**:
+      `#(⟨e⟩-orbits on classes) = #(⟨e⟩-orbits on simples)` を `Z(𝔽̄_p[U])` の 2 基底（class-sum /
+      冪等元 `Z≅𝔽̄_p^N`）+ `dim ker(σ_e−1)=#orbits`（任意体）で導出 → coprime-FPF free-on-classes +
+      counting で free-on-simples。**Teichmüller integer-lift 不要**（旧「char-0 wall」を回避）。
+      build order = (1) cornerstone `finrank V^σ = #orbits`（orbit-sum 基底, pure 線形代数, 次の leaf）
+      → (2) `Z(𝔽̄_p[U])` class-sum 基底 → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底（mathlib
+      `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) #orbits 一致 + Glauberman
+      free-on-classes + counting。hard core = (2)(3) の 2 基底（標準 char-p 代数）。正本 = design notes
+      「2026-06-17 (resume²)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）
