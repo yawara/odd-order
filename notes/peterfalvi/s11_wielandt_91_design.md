@@ -52,6 +52,24 @@ the exact `Mat`-center + `Pi`-algebra API before committing** (new infra, multi-
 Then the counting bridge (coprime-FPF free-on-nontrivial-classes via repo Glauberman + orbit-size
 counting) ⇒ free `E`-action on nontrivial simples ⇒ feed I-3 ⇒ (†). See resume² for the bridge math.
 
+**Step (4) class-sum side — DONE except the final line** (`CenterOrbitCount.lean`, commit `cab132a7`,
+sorry-free + axiom-clean): I built it directly for `G' = MulAut G` (no `ψ` yet — instantiate to a
+cyclic subgroup when wiring the Brauer count). Landed: `ConjClasses.map_id`/`map_comp`,
+`instance MulAction (MulAut G) (ConjClasses G)` (`rfl` laws), `AlgEquiv.map_mem_center` (algebra autos
+preserve the centre), `centerEnd`/`centerRep` (the representation, `show`-based structure-field
+proofs), and the keystone **`centerRep_apply_centerBasis : centerRep α (centerBasis C) = centerBasis
+(α • C)`** (= the cornerstone's `hρ`, via `domCongr_classSum`).
+⚠ **BLOCKER on the one-line capstone** `finrank k ↥(invariants centerRep) = Nat.card (orbits)`: even
+*stating* `↥(Representation.invariants centerRep)` triggers an `isDefEq`/`whnf` blowup over the
+`↥(Subalgebra.center k (MonoidAlgebra k G))` coercion tower (>1M heartbeats; `irreducible` on
+`centerEnd`/`centerRep` does not help — the cost is the subalgebra/coe instance resolution, not def
+unfolding). `centerRep_apply_centerBasis` itself (which also mentions both) compiles fine, so it is
+specifically `invariants centerRep` that explodes (likely the `k[MulAut G]`-module / `asModule`
+structure it forces on the heavy `V`). **Fix to try next**: a `def`-`irreducible` type synonym (or a
+plain `Module k`-wrapper) for `Z(k[G])` so the coercion tower is opaque, then apply the cornerstone
+through it; alternatively restate the cornerstone to take the fixed space as `LinearMap.ker (ρ g − 1)`
+for a generator rather than `Representation.invariants`.
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**

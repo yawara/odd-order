@@ -63,11 +63,16 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       `domCongr_classSum` σ-置換 `c4f52a6c`, 任意体, sorry-free, axiom-clean)
       → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底
       （mathlib `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) cornerstone を 2 基底
-      に適用し #orbits 一致 + Glauberman free-on-classes + counting。**残 hard core = (3) 冪等元基底**
-      （Wedderburn-Artin + center of product, multi-session・新規）+ (4) wiring（MulAut→center の
-      Representation, design notes 参照）。⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので
-      (2) は新規に k-一般化済（class-sum basis を一般体へ）。
-      正本 = design notes「2026-06-17 (resume²)」「2026-06-17 (resume³)」。
+      に適用し #orbits 一致 + Glauberman free-on-classes + counting。
+      **(4) class-sum 側 wiring ✅ COMPLETE** (`CenterOrbitCount.lean` `cab132a7`):
+      `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
+      (MulAut G) ↥center` (`domCongr α` を中心へ制限) + **compatibility `centerRep_apply_centerBasis`
+      = cornerstone の `hρ`**。⚠ 最終 1 行 `finrank ↥(invariants centerRep) = #orbits` は **Lean の
+      isDefEq/whnf 爆発で block** (`↥(Subalgebra.center k (MonoidAlgebra k G))` の coercion tower、
+      1M heartbeats 超・`irreducible` 無効; math は完成・elaboration 性能問題)。fix 候補 = 中心の
+      type synonym。**残 hard core = (3) 冪等元基底**（Wedderburn-Artin + center of product, 新規）。
+      ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
+      正本 = design notes「2026-06-17 (resume²)」「(resume³)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）
