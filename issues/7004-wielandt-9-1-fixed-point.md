@@ -56,11 +56,14 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       `#(⟨e⟩-orbits on classes) = #(⟨e⟩-orbits on simples)` を `Z(𝔽̄_p[U])` の 2 基底（class-sum /
       冪等元 `Z≅𝔽̄_p^N`）+ `dim ker(σ_e−1)=#orbits`（任意体）で導出 → coprime-FPF free-on-classes +
       counting で free-on-simples。**Teichmüller integer-lift 不要**（旧「char-0 wall」を回避）。
-      build order = (1) cornerstone `finrank V^σ = #orbits`（orbit-sum 基底, pure 線形代数, 次の leaf）
-      → (2) `Z(𝔽̄_p[U])` class-sum 基底 → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底（mathlib
-      `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) #orbits 一致 + Glauberman
-      free-on-classes + counting。hard core = (2)(3) の 2 基底（標準 char-p 代数）。正本 = design notes
-      「2026-06-17 (resume²)」。
+      build order: (1) ✅ **cornerstone `finrank_invariants_eq_card_orbits` COMPLETE**
+      (`PermutationInvariants.lean` `d4b0d4b5`, 任意体, orbit パラメトリゼーション `orbitToVec`,
+      lint-clean) → (2) `Z(𝔽̄_p[U])` class-sum 基底 + σ_e 置換 → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底
+      （mathlib `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) cornerstone を 2 基底
+      に適用し #orbits 一致 + Glauberman free-on-classes + counting。**hard core = (2)(3) の 2 基底**
+      （multi-session・新規）。⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**で、(2) は k-一般化が必要
+      （classSum/center basis を一般体へ）。mathlib にも「群環中心の class-sum 基底」は無し。
+      正本 = design notes「2026-06-17 (resume²)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）
