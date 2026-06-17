@@ -102,6 +102,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    失敗は報告)。変化なし/全 abort なら push しない。
 6. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
    + サイズ flag + push 結果。
+7. **LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md))**: 各 worktree の
+   `LAUNCH.md` 冒頭「▶ LOOP GATE」ブロックは各レーンが起動時に `/loop` を自己選択する判定材料。**毎 tick で
+   再監査はしない** (重い)。代わりに、今 tick のマージが**他レーンの gate を解いた**ときだけ VERDICT を見直す:
+   - `typeP_duality` (lane-h) が proved → G の conjunct 2/assembly + F の §16/POLE-2 が解禁 → G/F の VERDICT を
+     `STOP`→`LOOP`/`LOOP_THEN_STOP` に更新しうる。
+   - σ-gap (`C_M(Q)≤M_σ`, issue 8012) が proved → G の conjunct 3-5 が unconditional 化。
+   - (6.8) capstone (`S08_CoherenceTheorems:59`) が閉じた → B を次タスクへ。
+   判定 = マージ差分に上記 gate statement の `sorry` 除去が含まれるか。含まれれば該当レーンの LAUNCH.md VERDICT
+   行を更新 (worktree LAUNCH.md は git-excluded ゆえ直接編集可・build 不要)、含まれなければ触らない。サマリに
+   「VERDICT 更新: \<lane\> \<old\>→\<new\>」を 1 行。**新規レーン投入時や VERDICT が古い疑いがあれば** 単発で
+   loop-readiness 監査 (read-only、frontier ファイル + cite 先 sorry 有無を grep) を回して VERDICT を引き直す。
 
 ## 注意
 
@@ -146,6 +157,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-17 (夜) — レーン自律 loop ポリシー導入 ([`lane_loop_policy.md`](lane_loop_policy.md))**: ユーザー要望で
+  「各レーンが LAUNCH.md の記述を見て妥当なタイミングで自律的に `/loop` を選べる」仕組みを構築。各 worktree の
+  `LAUNCH.md` 冒頭に「▶ LOOP GATE」ブロック (VERDICT = LOOP / LOOP_THEN_STOP / STOP + objective + develop leaf +
+  stop-when + gates) を配置。判定の正本 = `lane_loop_policy.md`。**ハブは他セッションに loop を注入できない**
+  (`send_message` は承認必須 + unsupervised 不可) ゆえ判定を外在化し、レーン自身が起動時に評価する。初回 VERDICT
+  (8-agent code-verified + 敵対的検証 audit `woudrwk45`): **H**=LOOP_THEN_STOP (>½|G| count + 補題抽出) /
+  **B**=LOOP_THEN_STOP (brick 3→4、S08:59 で停止) / **G**=STOP (conjunct 2-5 は σ-gap+§14 gated、連続 loop は
+  σ-gap ローカル discharge で空転 — 残務は条件付き `_of_inputs` skeleton 離散ユニットのみ) / **F**=STOP→**LOOP_THEN_STOP**
+  (ユーザー裁可 2026-06-17 で **I-1 critical path に pivot**; off-path の step 3 は後回し、build order
+  I-3→step2→系(i)→I-2 を loop、I-1 modular Brauer hard wall ~6-9 session で escalate=最強モデル+ChatGPT)。
+  ハブは上記手順 7 で gate 解除時に VERDICT を更新。
 - **2026-06-17 — B の (6.8) §6 gap ブロッカーはユーザー直接対応 (再 flag しない)**: B の session 49 RECON で
   (6.8) capstone の最終 obligation `hXanchored` が「純 wiring」でなく未形式化の §6 certain-type structure
   theory (5 gap: p-group reduction / selection positivity / weight identity / hXmixed all-y / A/B dispatch)
