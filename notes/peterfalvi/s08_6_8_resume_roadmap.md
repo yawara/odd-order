@@ -4,6 +4,46 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅ 2026-06-17 セッション更新 — brick 1 COMPLETE (`caseB_member_psiDecomposition`)
+
+**brick 1 = 着地** (`S08_CaseBEnumeration.lean` 末尾、build-green 3628 jobs・axiom-clean `[propext,
+Classical.choice, Quot.sound]`)。per-member Dmem dispatcher: `x ∈ S₁ ⊆ hyp.S`(conj-closed coherent)
+→ `CharacterPsiDecomposition hyp.tau x 0`。
+
+**実装で確定した roadmap 訂正 (6-agent workflow + 直接 grep で code-verified)**:
+1. **classifier は `x ∈ hyp.S` を取る (S₁ でない)** — `caseB_S_member_column_or_irreducible`
+   (`S08_CaseBAssembly:1949`) は S-level。brick 1 は `hS₁sub : S₁ ⊆ hyp.S` で橋渡し。
+2. **irreducible 枝の facts は `caseB_irr_*` (induce-θ 形) を使う。`xMember_*_of_irreducible_X` は NG** —
+   後者は `hX : ∀ φ ∈ Xset Z, IsIrreducibleCharacter φ`(Xset 全 irreducible)を要求するが case-B は
+   まさに X が reducible column を含むケースゆえ偽。正しい供給源:
+   - hreal = `caseB_irr_nonreal hyp hirr`(`S08_CaseBAssembly:578`、奇位数 Burnside)
+   - hdiffsupp = `caseB_irr_conj_diff_support hyp θ`(`S08_CaseBAssembly`)
+   - hχχbar = `caseB_irr_conj_inner hyp hirr`(`S08_CaseBAssembly`)
+   - column hagree = `caseB_column_mapagree hyp h46 hχ₂`(`:194`、roadmap 既述通り)
+   - column hdeg = `(columnSum_inv_apply_one h46 χ₂).symm`、hdiffsupported = `columnDiff_support_subset`
+     + `mem_zSupportedSpan_iff`。
+3. **Type-vs-Prop 消去の罠 (再調査不要)**: 出力 `CharacterPsiDecomposition` は `Type`。`x ∈ S` の
+   `∃`、dispatch の `∨` は `Prop` ⟹ `obtain`/`rcases` で `Type` goal に消去できない
+   (`Exists.casesOn can only eliminate into Prop`)。対処:
+   - column index χ₂ は `by_cases hcolumn : ∃ χ₂, …` + `hcolumn.choose`/`.choose_spec`(noncomputable
+     関数、Type 消去可)。
+   - irreducible 判定は `(caseB_S_member_column_or_irreducible …).resolve_left hcolumn`(Prop→Prop)。
+   - inducing source θ は **top で抽出しない**(`set θ := choose` は x への循環依存を作り
+     `rw [← hcol]`/`rw [hxeq]` が「revert dependencies」で失敗)。irreducible facts は各々 `Prop`-have
+     内で `obtain ⟨θ, _, hxeq⟩ := (hxS の S_eq 展開)` → `rw [hxeq]`(θ は fresh、循環なし)。
+   - column 主 goal の `columnSum χ₂ → x` 変換は `hcol ▸ (term)`(term-level、循環なし。`rw [← hcol]`
+     は χ₂ が x 依存ゆえ NG)。
+4. memberExtensionDecomposition は **x をそのまま** χ:=⟨x,hirrx⟩ で渡せる(induce 形不要)。返り値
+   `CharacterPsiDecomposition (dade…) x 0` は `hyp.tau` abbrev と defeq ⟹ 変換不要。
+
+**▶ 次 = brick 2** `exists_sMemberOrthogonalFamilyW`(`exists_sMemberOrthonormalFamily`
+`CorePart2:2464` を template、IrreducibleCharacter 制約を外す)。weighted engine
+`coherentDegreeSqNormBound_of_not_coherentW`(`S08_CoherenceWeighted:475`)の要求 = `mc`(weight=norm)
++ `Dmem`(= brick 1)+ `hortho_mem`(column = `certainTypeR_imageSet_orthogonal_dadeOfDiff`
+`S08_CaseBHortho:44`、irreducible = `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`)+
+`htau1Dmem`(= rfl、両 producer とも tau1 = hS₁.extension)。engine は単一 break χ + family を取る
+抽象形(`{ι}(s : Finset ι)(χmem)(deg)(mc)…`)ゆえ enumerator は family を組んで渡す。
+
 ## 結論 (一言)
 
 bootstrap 経路は **viable**。`gap_resolution` note の「残務 = glue のみ」は誤りだが、Plan agent の
