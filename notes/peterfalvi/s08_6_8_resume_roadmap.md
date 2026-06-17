@@ -4,6 +4,36 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅✅✅ 2026-06-18 セッション更新 — brick 4 endgame COMPLETE (case-B (6.8.3) 矛盾)
+
+**`false_of_coherentXunionYset_caseB_of_not_coherentS` 完成**(`S08_CaseBWeightedEndgame`、commit
+`277f3013`、build-green・axiom-clean・sorry-free、full build 3851 jobs/3.66s)= **case-B (6.8.3) の
+矛盾** 「X(W₂)∪Y coherent ∧ S not coherent ⟹ False」。これで brick 4 chain (4.1→4.2→4.3) 完結。
+
+**着地した brick 4 結果**(`S08_CaseBWeightedEndgame`、すべて axiom-clean):
+1. **`sum_re_div_normSq_Xset_eq`**(4.1)= weighted Xset 恒等式 `∑_{X(Z)} (χ1).re²/‖χ‖² = |L:H|·(|H|-|H:Z|)`。
+2. **`xSum_le_two_psi_caseB`**(4.2)= bridge(任意 S₁ ⊇ Xset W2、`Xdiff⊆Xset W2⊆S₁`)。
+3. **`S_hasNoRealCharacters_caseB`** = `Xset_hasNoRealCharacters_caseB` の S-level 版(break extractor 用)。
+4. **`false_of_coherentXunionYset_caseB_of_not_coherentS`**(4.3 endgame)= 上記 + `exists_coherentBreakPair_general`
+   + ψ-irreducibility 導出 + Cor 2.30 (`degree_sq_le_index_of_central_quotient`) + `false_of_w2_break_arith`。
+
+**🔑 (a)(b) 両 gate を解除した知見**(2026-06-17 の「gate 近傍」懸念は杞憂と確定):
+- **(a) general S₁**: chain 全体(`caseB_S_pairwise_orthogonal`/enumerator/breakChar/brick3/bridge)を
+  **任意 conj-closed coherent S₁ ⊆ S** に in-place 一般化(commit `de9f2054`、net −52行=general 版は簡潔)。
+  per-member dispatch は S-level ゆえ機械的だった。
+- **(b) break char irreducible**: `columnSum_mem_S` + `columnSum_notMem_SsubFiltration`(両形式化済)で
+  **column ∈ X(W₂) ⊆ S₁** ⟹ break char ψ∈S\S₁ は column 不可 ⟹ irreducible。endgame 内の小補題で導出。
+
+**▶ 残 = brick 4.4 = `S08_CoherenceTheorems:59` c2-math-B dispatch**(endgame を消費):
+endgame は hypothesis で取る `hXYcoh`(X∪Y seed coherence)・`hfpf`((2|W₁|+1)²≤|H:W₂|)・`hW2cen`(W₂ 中心)・
+`hcZ`(2≤|W₂|)を S08:59 で供給:
+- **hXYcoh の構成** = `coherentXunionYset_caseB_of_glued`(`CaseBCoherence2:1616`)で X(h46.W2)∪Y coherence
+  を組む。ここで **`hXanchored`(§6 certain-type structure theory gap)= ユーザー直接管理 gate**。
+- **hfpf** = `caseB_fpf_bound`(`CaseBEndgame:338`)。⚠ これは `cert : CertainTypeHypothesis`(h46 でない)
+  を取る → h46 ↔ cert の reconcile 要(または cert を `hyp.cases.inr` から直接取得)。hW2cen/hcZ も同源。
+- dispatch = `eq_bot_or_eq_of_le_of_card_prime`(`CorePart1:3354`)で math-A/math-B 分岐、math-B 枝で endgame。
+endgame 自体は閉じた(seed を hypothesis 化)ので、残務は **seed 構成(gate)+ FPF data 配線**のみ。
+
 ## ✅✅✅ 2026-06-17 セッション更新 — brick 3 COMPLETE (norm-weighted member-family bound)
 
 **3 結果着地** (`S08_CaseBEnumeration.lean`、全 build-green、axiom-clean
