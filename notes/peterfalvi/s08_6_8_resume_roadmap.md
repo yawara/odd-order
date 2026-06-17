@@ -4,6 +4,29 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅ 2026-06-18 cont. — brick 4.4 consumer producer skeleton landed → loop STOP @ hXanchored
+
+**`nonempty_coherent_S_caseB` 完成**(`S08_CaseBWeightedEndgame`、commit `089b4033`、build-green
+3631 jobs・axiom-clean `[propext, Classical.choice, Quot.sound]`)= case-(B) (6.8.3) 矛盾の
+**producer (正) 形**。`by_contra` + `false_of_coherentXunionYset_caseB_of_not_coherentS` で
+「seed `hXYcoh` + 構造データ (hW2cen/hcZ/hfpf) ⟹ `Nonempty (IsCoherent hyp.tau hyp.S …)`」。
+case-(A) producer `nonempty_coherent_S_caseA_of_frobenius` の正確な mirror(ただし case-A は seed を
+inline 構成、case-B は seed を hypothesis 化 = §6 `hXanchored` gate ゆえ)。
+
+**⟹ brick 4.4 の loop で閉じられる側(consumer skeleton)は landed。** S08:59 の case-(B) 枝は
+`nonempty_coherent_S_caseB hyp h46 hHK hW1 hW2cen hcZ hfpf (seed)` 一発に reduce 済(seed 構成だけが残)。
+
+**🛑 LOOP STOP に到達**(LAUNCH stop-when 通り): 残る唯一の gate = `hXYcoh` seed 構成
+(`coherentXunionYset_caseB_of_glued` の `hXanchored`、§6 certain-type structure theory)=
+**ユーザー直接管理ゆえ loop では閉じない**。⚠ [[scaffold-sorry-free-not-done]]: producer は sorry-free
+でも (6.8) は **done でない**(seed = hXanchored が未構成のまま)。S08:59 は依然 bare sorry。
+- **残務(loop 外、要ユーザー判断 or 司令塔指示)**: (1) hXanchored 構成(§6、ユーザー管理) →
+  (2) hfpf を `caseB_fpf_bound`(`CaseBEndgame:338`、`cert` 取る)から導出 = h46↔cert reconcile +
+  `.index = Nat.card (↥H ⧸ …)` 同定 → (3) S08:59 で `hyp.cases.inr` から h46/cert 抽出 +
+  `eq_bot_or_eq_of_le_of_card_prime`(`CorePart1:3354`) math-A/B 分岐 + case-B 枝 producer 呼出。
+- **代替(LAUNCH 許容)**: endpoint A が STOP ⟹ endpoint B/C/D/E signature pin へ並列切替も可
+  (ただし [[ft-path-policy]]: S15/S16 の ω/μ/ν/τ₃ は free field で現状 orphaned consumer 0)。
+
 ## ✅✅✅✅ 2026-06-18 セッション更新 — brick 4 endgame COMPLETE (case-B (6.8.3) 矛盾)
 
 **`false_of_coherentXunionYset_caseB_of_not_coherentS` 完成**(`S08_CaseBWeightedEndgame`、commit
