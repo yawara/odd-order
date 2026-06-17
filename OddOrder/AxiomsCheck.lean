@@ -5128,6 +5128,27 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts
 
+/-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
+`TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
+`proposition_type_classification`'s forward bridges.
+
+* `normalizer_eq_sup_of_isTISubset_of_isCyclic` — the genuine `normalizer_V` reduction (Peterfalvi
+  (8.4)): a nonempty subset of the exceptional set `V = W ∖ (W₁ ∪ W₂)` of a cyclic `W = W₁ ⊔ W₂`
+  that is `TI` relative to `W` is normalized exactly by `W`.  Pure group theory, unconditional.
+* `typePData_of_inputs` — assembles `TypePData M` from the BG-local structural facts (taken as
+  named hypotheses, the gated-endpoint pattern), deriving `W₁/W₂`-cyclicity and `normalizer_V`.
+* `isTypeIII_or_IV_of_typePData` / `isTypeII_of_typePData` / `isTypeV_of_typePData` — the
+  type-specific bridges wrapping a `TypePData` into the shared Peterfalvi type predicates.
+
+Each is axiom-clean: the deep §14/§15 content is held abstract in the hypotheses, so the engines
+themselves cite no `sorry`. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_sup_of_isTISubset_of_isCyclic
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_inputs
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeIII_or_IV_of_typePData
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_typePData
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeV_of_typePData
+
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
