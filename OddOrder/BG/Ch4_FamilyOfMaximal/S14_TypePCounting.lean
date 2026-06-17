@@ -6387,6 +6387,299 @@ theorem typeP1_card_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hja : j = a := Nat.dvd_antisymm hj_dvd_a ha_dvd_j
   rw [← hlagNσ, hja]
 
+/-- **BG 14.7, `1 ∉ M̃`** (mmd L3920): the identity is never a "twisted" product `x·x'`
+(`x ∈ M_σ^#`, `x' ∈ R(x)`).  If `x·x' = 1` then `x' = x⁻¹`, which has the same order as the
+`σ(N)`-element `x`, so `x'` is a `σ(N)`-element; but `x' ∈ R(x)` is a `σ(N)′`-element
+(`isPiElement_sigmaCompl_of_mem_Rsub`), and a nonidentity element cannot be both.  Hence each
+`𝒞_G(M̃)` avoids `1` and lies in `G^#`, which the density inequality of Theorem 14.7(e) needs. -/
+theorem one_not_mem_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {N : Subgroup G} (hN : N ∈ maximalSubgroups G) :
+    (1 : G) ∉ Mtilde hG D N := by
+  rintro ⟨x, hxsharp, x', hx'R, hxx'⟩
+  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hxsharp
+  obtain ⟨hxN, hx1⟩ := hxsharp
+  have hx'eq : x' = x⁻¹ := (mul_eq_one_iff_inv_eq.mp hxx'.symm).symm
+  have hlen : D.length x = 1 := (D.length_one_iff x).mpr ⟨hx1, ⟨N, hN, hxN⟩⟩
+  have hπ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N)ᶜ x' :=
+    isPiElement_sigmaCompl_of_mem_Rsub hG D hlen ⟨hN, hxN⟩ hx'R
+  have hx'1 : x' ≠ 1 := by rw [hx'eq]; exact inv_ne_one.mpr hx1
+  have hord : orderOf x' ≠ 1 := fun h => hx'1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord
+  have hordeq : orderOf x' = orderOf x := by rw [hx'eq, orderOf_inv]
+  refine hπ p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos x').ne'⟩)
+    (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr ⟨hp,
+      (hordeq ▸ hpdvd).trans ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard hxN),
+      Nat.card_pos.ne'⟩))
+
+/-- **BG 14.7, the per-member `σ`-Hall identity** (mmd L4039): for a type-`P₁` member `N` of the
+type-`P` family, `|N_σ|·[G : N] = [G : Z]·kᵢ*` where `kᵢ* = |Z ⊓ N_σ|` is the canonical family
+factor.  This is the cancellation crux of the density inequality: it turns each
+`|𝒞_G(M̃ᵢ)| = (|N_σ| − 1)·[G : N]` summand into `[G : Z]·kᵢ* − [G : N]`, so the `[G : Z]·kᵢ*`
+parts cancel against the `𝒞_G(T)` count.  Proof: multiply by `kᵢ = |K_N|` and use
+`|N| = |N_σ|·kᵢ` (type `P₁`, `typeP1_card_eq`), `z = kᵢ·kᵢ*` (the swap,
+`card_kappaHall_sup_Kstar`), and Lagrange `|N|·[G:N] = |G| = z·[G:Z]`. -/
+theorem typeP1_member_Msigma_index_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) (hP1 : IsTypeP1 N) :
+    Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * N.index
+      = (K ⊔ Kstar).index * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+  classical
+  obtain ⟨hNmax, hPN, hZN, KN, hKNN, hKN_hall, hswap, hcanon, hne⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  have hz : Nat.card ↥(K ⊔ Kstar)
+      = Nat.card ↥KN * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    have h1 := card_kappaHall_sup_Kstar (M := N) (K := KN)
+      (Kstar := OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))
+      hKNN hKN_hall rfl
+    rw [← hswap, hcanon] at h1
+    exact h1
+  have hN_card : Nat.card ↥N
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * Nat.card ↥KN :=
+    typeP1_card_eq hG hNmax hP1 hKNN hKN_hall
+  have hlagN : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+  have hlagZ : Nat.card ↥(K ⊔ Kstar) * (K ⊔ Kstar).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  refine Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := ↥KN)) ?_
+  calc Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * N.index * Nat.card ↥KN
+      = (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * Nat.card ↥KN) * N.index := by ring
+    _ = Nat.card ↥N * N.index := by rw [← hN_card]
+    _ = Nat.card G := hlagN
+    _ = Nat.card ↥(K ⊔ Kstar) * (K ⊔ Kstar).index := hlagZ.symm
+    _ = (Nat.card ↥KN * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N))
+          * (K ⊔ Kstar).index := by rw [hz]
+    _ = (K ⊔ Kstar).index * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N)
+          * Nat.card ↥KN := by ring
+
+/-- **BG 14.7, the per-member index bound** (mmd L4033): each family member `N` has
+`2·[G : N] ≤ [G : Z]`, the upper bound on `[G : N]` the density inequality needs (from
+`|N| ≥ 2z`, `typeP_family_two_mul_card_le`).  Cancelling `z` from `2z·[G:N] ≤ |N|·[G:N] =
+|G| = z·[G:Z]`. -/
+theorem typeP_member_two_mul_index_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    2 * N.index ≤ (K ⊔ Kstar).index := by
+  have h2z : 2 * Nat.card ↥(K ⊔ Kstar) ≤ Nat.card ↥N :=
+    typeP_family_two_mul_card_le hG hM hP hKM hK hKstar hU hN
+  have hlagN : Nat.card ↥N * N.index = Nat.card G := Subgroup.card_mul_index N
+  have hlagZ : Nat.card ↥(K ⊔ Kstar) * (K ⊔ Kstar).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  refine Nat.le_of_mul_le_mul_left ?_ (Nat.card_pos (α := ↥(K ⊔ Kstar)))
+  calc Nat.card ↥(K ⊔ Kstar) * (2 * N.index)
+      = (2 * Nat.card ↥(K ⊔ Kstar)) * N.index := by ring
+    _ ≤ Nat.card ↥N * N.index := by gcongr
+    _ = Nat.card G := hlagN
+    _ = Nat.card ↥(K ⊔ Kstar) * (K ⊔ Kstar).index := hlagZ.symm
+
+/-- **BG 14.7, the family has `≥ 2` members** (mmd L3993, "`n ≥ 1`"): the type-`P` family
+`{M} ∪ {neighbours}` has at least two members — `M` itself and a neighbour `N ∈ 𝓜(N_G(X))` for a
+line `X ∈ ℰ_p¹(K)` (`p ∣ |K|`), which is nonconjugate to `M` (`exists_typeP_partner`).  This is
+the `n ≥ 1` the density inequality needs for `(n − 1)/2z ≥ 0`. -/
+theorem ZFamilyFinset_one_lt_card [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    1 < (ZFamilyFinset M K).card := by
+  classical
+  have hPe := hP
+  obtain ⟨p, hpκ⟩ := hPe
+  have hpprime := hpκ.1
+  obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
+  have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
+  have hpK : p ∣ Nat.card ↥K := by
+    have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact Subgroup.card_mul_index (K.subgroupOf M)
+    have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
+    have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+      hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+    exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
+  haveI : Fact p.Prime := ⟨hpprime⟩
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+  have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+  have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+  obtain ⟨N, hNmem, hnc, -, -, -, -⟩ :=
+    exists_typeP_partner hG hM hP hKM hK hKstar hU hXelem hXK
+  have hNfam : IsZFamilyMember M K N :=
+    Or.inr ⟨p, Subgroup.zpowers (x : G), hpprime, hXelem, hXK, hNmem⟩
+  have hMN : M ≠ N := fun h => hnc (h ▸ IsConjugateSubgroup.refl M)
+  exact Finset.one_lt_card.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl), N,
+    mem_ZFamilyFinset.mpr hNfam, hMN⟩
+
+/-- The identity is conjugacy-closed: if `1 ∉ A` then `1 ∉ 𝒞_G(A)` (a conjugate `g·t·g⁻¹ = 1`
+forces `t = 1`).  Used to place each density piece `𝒞_G(T)`, `𝒞_G(M̃ᵢ)` inside `G^#`. -/
+theorem one_not_mem_conjClassSet {A : Set G} (h : (1 : G) ∉ A) :
+    (1 : G) ∉ conjClassSet A := by
+  rintro ⟨t, ht, g, hg⟩
+  rw [(MulAut.conj_apply g t).symm, ← map_one (MulAut.conj g)] at hg
+  exact h ((MulAut.conj g).injective hg ▸ ht)
+
+/-- **BG 14.7, the density pieces fit in `G^#`** (mmd L4035): the conjugacy saturations `𝒞_G(T)`
+and `{𝒞_G(M̃ᵢ)}_{i}` over the type-`P` family are pairwise disjoint subsets of `G^# = G − {1}`, so
+their cardinalities sum to at most `|G| − 1`.  Disjointness: `𝒞_G(T) ⊥ 𝒞_G(M̃ᵢ)`
+(`conjClassSet_T_Mtilde_disjoint`, Lemma 14.6) and `𝒞_G(M̃ᵢ) ⊥ 𝒞_G(M̃ⱼ)`
+(`conjClassSet_Mtilde_disjoint`, Lemma 14.5(b), via pairwise nonconjugacy of the family).
+Membership in `G^#`: `1 ∉ T` (`1 ∈ Kᵢ*`) and `1 ∉ M̃ᵢ` (`one_not_mem_Mtilde`).  This is the
+upper bound `∑ |𝒞_G(·)| ≤ |G^#|` of the density inequality of Theorem 14.7(e). -/
+theorem density_pieces_ncard_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (conjClassSet (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))).ncard
+      + (∑ N ∈ ZFamilyFinset M K, (conjClassSet (Mtilde hG D N)).ncard)
+      ≤ Nat.card G - 1 := by
+  classical
+  set Tset := ((K ⊔ Kstar : Subgroup G) : Set G) \
+      ⋃ N ∈ ZFamilyFinset M K,
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) with hTset
+  set A := conjClassSet Tset with hA
+  set U := ⋃ N ∈ (↑(ZFamilyFinset M K) : Set (Subgroup G)), conjClassSet (Mtilde hG D N) with hU'
+  -- `U.ncard = ∑ |𝒞_G(M̃ᵢ)|`
+  have hpair : (↑(ZFamilyFinset M K) : Set (Subgroup G)).PairwiseDisjoint
+      (fun N => conjClassSet (Mtilde hG D N)) := by
+    intro N₁ hN₁ N₂ hN₂ hne
+    refine conjClassSet_Mtilde_disjoint hG D
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN₁)).1
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN₂)).1 ?_
+    exact typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU
+      (mem_ZFamilyFinset.mp hN₁) (mem_ZFamilyFinset.mp hN₂) hne
+  have hUcard : U.ncard = ∑ N ∈ ZFamilyFinset M K, (conjClassSet (Mtilde hG D N)).ncard := by
+    rw [hU', Set.Finite.ncard_biUnion (ZFamilyFinset M K).finite_toSet
+      (fun N _ => Set.toFinite _) hpair, finsum_mem_coe_finset]
+  -- all pieces avoid `1`
+  have h1T : (1 : G) ∉ Tset := fun h =>
+    (Set.mem_diff _ |>.mp h).2 (Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
+      SetLike.mem_coe.mpr (Subgroup.one_mem _)⟩)
+  have h1A : (1 : G) ∉ A := one_not_mem_conjClassSet h1T
+  have h1U : (1 : G) ∉ U := by
+    rw [hU', Set.mem_iUnion₂]; rintro ⟨N, hN, hzN⟩
+    exact one_not_mem_conjClassSet (one_not_mem_Mtilde hG D
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN)).1) hzN
+  -- `A` disjoint from `U`
+  have hAU : Disjoint A U := by
+    rw [Set.disjoint_left]
+    rintro z hzA hzU
+    rw [hU', Set.mem_iUnion₂] at hzU
+    obtain ⟨N, hN, hzN⟩ := hzU
+    exact Set.disjoint_left.mp (conjClassSet_T_Mtilde_disjoint hG D hM hP hKM hK hKstar hU
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN)).1) hzA hzN
+  -- `A ∪ U ⊆ G^#`
+  have hsub : A ∪ U ⊆ {g : G | g ≠ 1} := by
+    rintro z (hz | hz)
+    · exact fun h => h1A (h ▸ hz)
+    · exact fun h => h1U (h ▸ hz)
+  have hWcard : ({g : G | g ≠ 1} : Set G).ncard = Nat.card G - 1 := by
+    have hWeq : {g : G | g ≠ 1} = (Set.univ : Set G) \ {1} := by
+      ext g; simp [Set.mem_diff]
+    rw [hWeq, Set.ncard_diff (Set.singleton_subset_iff.mpr (Set.mem_univ 1)), Set.ncard_univ,
+      Set.ncard_singleton]
+  calc A.ncard + ∑ N ∈ ZFamilyFinset M K, (conjClassSet (Mtilde hG D N)).ncard
+      = A.ncard + U.ncard := by rw [hUcard]
+    _ = (A ∪ U).ncard := (Set.ncard_union_eq hAU).symm
+    _ ≤ ({g : G | g ≠ 1} : Set G).ncard := Set.ncard_le_ncard hsub
+    _ = Nat.card G - 1 := hWcard
+
+/-- **BG Theorem 14.7, the density inequality** (mmd L4031-4045): some member of the type-`P`
+family `{M} ∪ {neighbours}` has type `P₂`.  If every member were type `P₁`, the disjoint conjugacy
+pieces `𝒞_G(T)` and `{𝒞_G(M̃ᵢ)}` would already cover `G^#`:
+`|G^#| ≥ |𝒞_G(T)| + ∑ |𝒞_G(M̃ᵢ)| = |G| + n·[G:Z] − ∑ [G:Mᵢ] ≥ |G| + (n−1)·[G:Z]/… ≥ |G|`,
+contradicting `|G^#| = |G| − 1`.  The `∑ [G:Z]·kᵢ*` parts cancel between the two counts
+(`typeP1_member_Msigma_index_eq`); the bound uses `[G:Mᵢ] ≤ [G:Z]/2` (`|Mᵢ| ≥ 2z`) and `n ≥ 1`
+(a neighbour exists).  Entirely a `ℕ` computation closed by `omega`. -/
+theorem exists_typeP2_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∃ N ∈ ZFamilyFinset M K, IsTypeP2 N := by
+  classical
+  by_contra hcon
+  push_neg at hcon
+  have hallP1 : ∀ N ∈ ZFamilyFinset M K, IsTypeP1 N := fun N hN =>
+    (isTypeP_iff_isTypeP1_or_isTypeP2.mp
+      (typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN)).2.1).resolve_right
+      (hcon N hN)
+  -- lemma instances (explicit `T`), then fold `T`
+  have hT_count := typeP_family_conjClass_T_count hG hM hP hKM hK hKstar hU
+  have hT_card := typeP_family_T_count hG hM hP hKM hK hKstar hU
+  have hbound := density_pieces_ncard_le hG D hM hP hKM hK hKstar hU
+  have hcardlt := ZFamilyFinset_one_lt_card hG hM hP hKM hK hKstar hU
+  set Tset := ((K ⊔ Kstar : Subgroup G) : Set G) \
+      ⋃ N ∈ ZFamilyFinset M K,
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) with hTset
+  have hzcard : Nat.card ↥(K ⊔ Kstar) * (K ⊔ Kstar).index = Nat.card G :=
+    Subgroup.card_mul_index _
+  -- per-member `M̃` additive identity and its sum
+  have hmem_add : ∀ N ∈ ZFamilyFinset M K,
+      (conjClassSet (Mtilde hG D N)).ncard + N.index
+        = (K ⊔ Kstar).index * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    intro N hN
+    have hNmax := (typeP_family_member_data hG hM hP hKM hK hKstar hU
+      (mem_ZFamilyFinset.mp hN)).1
+    have hmem_id := typeP1_member_Msigma_index_eq hG hM hP hKM hK hKstar hU
+      (mem_ZFamilyFinset.mp hN) (hallP1 N hN)
+    rw [sigmaConjugacySaturation_Mtilde_ncard hG D hNmax, Nat.sub_one_mul]
+    have hge : N.index ≤ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * N.index :=
+      Nat.le_mul_of_pos_left _ Nat.card_pos
+    omega
+  have hMtilde_sum : (∑ N ∈ ZFamilyFinset M K, (conjClassSet (Mtilde hG D N)).ncard)
+      + (∑ N ∈ ZFamilyFinset M K, N.index)
+      = ∑ N ∈ ZFamilyFinset M K,
+          (K ⊔ Kstar).index * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    rw [← Finset.sum_add_distrib]; exact Finset.sum_congr rfl hmem_add
+  -- `T` additive (multiply the `|T|` count by `[G:Z]`)
+  have hmul : Tset.ncard * (K ⊔ Kstar).index
+      + (∑ N ∈ ZFamilyFinset M K,
+          Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) * (K ⊔ Kstar).index)
+      + (K ⊔ Kstar).index
+      = Nat.card G + (ZFamilyFinset M K).card * (K ⊔ Kstar).index := by
+    have h := congrArg (· * (K ⊔ Kstar).index) hT_card
+    simp only [add_mul, one_mul, Finset.sum_mul] at h
+    rw [hzcard] at h
+    exact h
+  have hPcomm : (∑ N ∈ ZFamilyFinset M K,
+        (K ⊔ Kstar).index * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N))
+      = ∑ N ∈ ZFamilyFinset M K,
+        Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) * (K ⊔ Kstar).index :=
+    Finset.sum_congr rfl (fun N _ => mul_comm _ _)
+  -- key inequality `∑ [G:Mᵢ] ≤ (𝓕.card − 1)·[G:Z]`
+  have hkey : (∑ N ∈ ZFamilyFinset M K, N.index)
+      ≤ ((ZFamilyFinset M K).card - 1) * (K ⊔ Kstar).index := by
+    have h2sum : 2 * (∑ N ∈ ZFamilyFinset M K, N.index)
+        ≤ (ZFamilyFinset M K).card * (K ⊔ Kstar).index := by
+      rw [Finset.mul_sum]
+      calc (∑ N ∈ ZFamilyFinset M K, 2 * N.index)
+          ≤ ∑ _N ∈ ZFamilyFinset M K, (K ⊔ Kstar).index :=
+            Finset.sum_le_sum (fun N hN => typeP_member_two_mul_index_le hG hM hP hKM hK hKstar hU
+              (mem_ZFamilyFinset.mp hN))
+        _ = (ZFamilyFinset M K).card * (K ⊔ Kstar).index := by
+            rw [Finset.sum_const, smul_eq_mul]
+    have hc2 : (ZFamilyFinset M K).card ≤ 2 * ((ZFamilyFinset M K).card - 1) := by omega
+    have hstep : (ZFamilyFinset M K).card * (K ⊔ Kstar).index
+        ≤ 2 * (((ZFamilyFinset M K).card - 1) * (K ⊔ Kstar).index) := by
+      rw [← mul_assoc]; exact mul_le_mul_right' hc2 _
+    omega
+  -- expansion fact relating `𝓕.card·[G:Z]` and `(𝓕.card−1)·[G:Z]`
+  have hexp : (ZFamilyFinset M K).card * (K ⊔ Kstar).index
+      = ((ZFamilyFinset M K).card - 1) * (K ⊔ Kstar).index + (K ⊔ Kstar).index := by
+    have hle : (K ⊔ Kstar).index ≤ (ZFamilyFinset M K).card * (K ⊔ Kstar).index :=
+      Nat.le_mul_of_pos_left _ (by omega)
+    rw [Nat.sub_one_mul]; omega
+  have hgpos : 1 ≤ Nat.card G := Nat.card_pos
+  omega
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
