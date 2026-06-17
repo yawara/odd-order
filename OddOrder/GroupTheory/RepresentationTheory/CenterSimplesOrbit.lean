@@ -113,6 +113,23 @@ theorem card_orbits_classes_eq_card_orbits_simples
   rw [← finrank_centerRep_invariants_eq_card_orbits (k := k) (G := G)]
   exact finrank_centerRep_invariants_eq_card_orbits_simples φ hact
 
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+include φ in
+/-- **The number of simples equals the number of conjugacy classes** (`N = #(ConjClasses G)`).  Both
+the idempotent basis `idemBasis φ` (indexed by `Fin N`) and the class-sum basis `centerBasis'`
+(indexed by `ConjClasses G`) are bases of the same space `Z(k[G])`, so their index sets have equal
+cardinality.  This converts the class-side orbit count `1 + (#classes − 1)/d` into the simples-side
+`1 + (N − 1)/d` that `FreeActionOrbitCount.orbit_trivial_or_free_of_card_orbits` consumes. -/
+theorem card_simples_eq_card_classes
+    [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)] :
+    N = Fintype.card (ConjClasses G) := by
+  have h1 : Module.finrank k (CenterCarrier k G) = N := by
+    rw [Module.finrank_eq_card_basis (idemBasis φ), Fintype.card_fin]
+  have h2 : Module.finrank k (CenterCarrier k G) = Fintype.card (ConjClasses G) :=
+    Module.finrank_eq_card_basis centerBasis'
+  omega
+
 /-! ### The orbit equality for a subgroup / arbitrary acting group
 
 For the kernel-FPF count (†) we need the orbit equality not for all of `MulAut G` but for a single
