@@ -4954,6 +4954,22 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_zTilde_conjClass_gt_half
 
+/-! **Two `> ½|G|` subsets intersect** (`S14_TypePCounting`, `ncard_inter_nonempty_of_two_mul_gt`):
+in a finite group, `2·|A| > |G|` and `2·|B| > |G|` force `A ∩ B ≠ ∅` (inclusion–exclusion).  The
+combinatorial core of the covering step of Theorem 14.7 (`𝒞_G(Ẑ) ∩ 𝒞_G(S) ≠ ∅`).  Fully
+unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_inter_nonempty_of_two_mul_gt
+
+/-! **BG Theorem 14.7, the density bound for every type-`P` maximal** (`S14_TypePCounting`,
+`exists_zTilde_conjClass_gt_half_of_isTypeP`): every `H ∈ 𝓜_𝓟` has a Hall `κ(H)`-subgroup `L`,
+`L* = C_{Hσ}(L)`, and `|𝒞_G(Ẑ_H)| > ½|G|` — the same density count run for an arbitrary type-`P`
+member (BG's "we also have `|𝒞_G(S)| > ½|G|`"), with `H`'s partner data produced internally via
+`exists_partner` fed `dummySigmaDecomposition`.  The covering step applies this to both `M` and the
+arbitrary `H`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_zTilde_conjClass_gt_half_of_isTypeP
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

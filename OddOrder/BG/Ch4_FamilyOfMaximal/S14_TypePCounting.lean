@@ -7128,6 +7128,65 @@ theorem typeP_zTilde_conjClass_gt_half [Finite G] (hG : OddOrder.BG.IsMinimalSim
     _ = 2 * ((Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1) * (K ⊔ Kstar).index) :=
         mul_assoc _ _ _
 
+open Classical in
+/-- A reusable dummy `SigmaDecompositionData`: `length x = 1` iff `x ≠ 1` and `x` has a maximal
+`σ`-subgroup.  The structure axiom `length_one_iff` pins this predicate across *all* carriers, and
+the family/density machinery (`family_card_eq_two`, `exists_partner`, …) consumes `D` only through
+`D.length x = 1`; so this dummy suffices — no genuine `σ`-decomposition theory is needed. -/
+noncomputable def dummySigmaDecomposition (G : Type*) [Group G] : SigmaDecompositionData G where
+  length := fun y => if y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty then 1 else 0
+  length_one_iff := by
+    intro y
+    by_cases h : y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty <;> simp [h]
+
+/-- Two subsets of a finite group, each covering more than half of it, must intersect. -/
+theorem ncard_inter_nonempty_of_two_mul_gt [Finite G] {A B : Set G}
+    (hA : Nat.card G < 2 * A.ncard) (hB : Nat.card G < 2 * B.ncard) :
+    (A ∩ B).Nonempty := by
+  classical
+  by_contra hempty
+  rw [Set.not_nonempty_iff_eq_empty] at hempty
+  have hunion := Set.ncard_union_add_ncard_inter A B
+  rw [hempty, Set.ncard_empty] at hunion
+  have hle : (A ∪ B).ncard ≤ Nat.card G := by
+    rw [← Set.ncard_univ G]
+    exact Set.ncard_le_ncard (Set.subset_univ _) Set.finite_univ
+  omega
+
+/-- **BG Theorem 14.7, the density bound holds for every type-`P` maximal subgroup** (mmd L4053,
+"we also have `|𝒞_G(S)| > ½|G|`"): for `H ∈ 𝓜_𝓟` there is a Hall `κ(H)`-subgroup `L` with
+`L* = C_{Hσ}(L)` and `|𝒞_G(Ẑ_H)| > ½|G|`.  The same density count (`typeP_zTilde_conjClass_gt_half`)
+run for `H`; the partner data for `H` is produced internally (`exists_partner`, fed the dummy
+`σ`-decomposition).  Reused in the covering step of `typeP_duality`. -/
+theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H : Subgroup G}
+    (hHmax : H ∈ maximalSubgroups G) (hHP : IsTypeP H) :
+    ∃ L Lstar : Subgroup G, L ≤ H ∧ Ch03.IsHallSubgroup (kappa H) (L.subgroupOf H) ∧
+      Lstar = OddOrder.BG.Ch3.S10.Msigma H ⊓ Subgroup.centralizer (L : Set G) ∧
+      Nat.card G < 2 * (conjClassSet (zTilde L Lstar)).ncard := by
+  classical
+  haveI : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hHmax
+  -- Hall `κ(H)`-subgroup `L` of `H`.
+  obtain ⟨L', hL'⟩ := Ch03.hall_E_exists (G := ↥H) (kappa H)
+  have hLeq : (L'.map H.subtype).subgroupOf H = L' :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective L'
+  have hL : Ch03.IsHallSubgroup (kappa H) ((L'.map H.subtype).subgroupOf H) := by
+    rw [hLeq]; exact hL'
+  have hLH : L'.map H.subtype ≤ H := Subgroup.map_subtype_le L'
+  set L := L'.map H.subtype with hLdef
+  set Lstar := OddOrder.BG.Ch3.S10.Msigma H ⊓ Subgroup.centralizer (L : Set G) with hLstar
+  -- Hall `(κ(H) ∪ σ(H))'`-subgroup `U` of `H`.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥H) ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+  have hUeq : (U'.map H.subtype).subgroupOf H = U' :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+      ((U'.map H.subtype).subgroupOf H) := by rw [hUeq]; exact hU'
+  -- Partner data for `H`, then the density bound.
+  obtain ⟨Hstar, hHstarne, hHstarmem, hpart⟩ :=
+    exists_partner hG (dummySigmaDecomposition G) hHmax hHP hLH hL hLstar hU
+  exact ⟨L, Lstar, hLH, hL, hLstar,
+    typeP_zTilde_conjClass_gt_half hG hHmax hHP hLH hL hLstar hU hHstarmem hHstarne hpart⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
