@@ -7244,6 +7244,52 @@ theorem exists_inf_ne_bot_of_mem_zTilde_inter [Finite G] {K Kstar L Lstar : Subg
       have : b ∈ Lstar ⊓ K := Subgroup.mem_inf.mpr ⟨hbLstar, hbK⟩
       rwa [hbot, Subgroup.mem_bot] at this)
 
+/-- **BG Proposition 14.2(f)** (mmd L3838): every `σ(M)`-subgroup `Y < ⊤` of `G` meeting `K*`
+nontrivially lies in `M_σ`.  Not among `typeP_structure`'s packaged conjuncts; derived here from
+Corollary 12.16 (`Y` is `G`-conjugate into `M_σ`) and Proposition 14.2(d) (the conjugator lies in
+`M`, since it fixes a nontrivial element of `K*`).  A step of the partner-symmetry argument of
+Theorem 14.7. -/
+theorem typeP_sigma_subgroup_le_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {Y : Subgroup G} (hYlt : Y < ⊤)
+    (hYpi : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M) Y)
+    (hYmeet : Y ⊓ Kstar ≠ ⊥) :
+    Y ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  have hYne : Y ≠ ⊥ := fun h => hYmeet (by rw [h, bot_inf_eq])
+  -- Corollary 12.16: `Y` is `G`-conjugate into `M_σ`.
+  obtain ⟨g, hg⟩ := sigma_subgroup_conj_into_Msigma_general hG hM hYne hYlt hYpi
+    (fun hN hnc => sigma_disjoint_of_nonconjugate hG hM hN hnc)
+  -- A nontrivial common element `y ∈ Y ⊓ K*`.
+  obtain ⟨ysub, hysub1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hYmeet
+  have hy1 : (ysub : G) ≠ 1 := fun h => hysub1 (OneMemClass.coe_eq_one.mp h)
+  have hyY : (ysub : G) ∈ Y := (Subgroup.mem_inf.mp ysub.2).1
+  have hyKstar : (ysub : G) ∈ Kstar := (Subgroup.mem_inf.mp ysub.2).2
+  -- `conj g • y ∈ M_σ ⊆ M`, so `y ∈ conj g⁻¹ • M`.
+  have hyMconj : (ysub : G) ∈ MulAut.conj g⁻¹ • M := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show (MulAut.conj g⁻¹)⁻¹ • (ysub : G) = MulAut.conj g • (ysub : G) by
+        rw [← map_inv MulAut.conj g⁻¹, inv_inv]]
+    exact OddOrder.BG.Ch3.S10.Msigma_le M
+      (hg (Subgroup.smul_mem_pointwise_smul (ysub : G) (MulAut.conj g) Y hyY))
+  -- Proposition 14.2(d): `K* ⊓ Mᵍ⁻¹ ≠ 1` forces `g⁻¹ ∈ M`.
+  have hginvM : g⁻¹ ∈ M := by
+    by_contra hg'
+    exact hy1 (Subgroup.mem_bot.mp
+      (((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.1 g⁻¹ hg') ▸
+        Subgroup.mem_inf.mpr ⟨hyKstar, hyMconj⟩))
+  have hgM : g ∈ M := inv_inv g ▸ M.inv_mem hginvM
+  -- `conj g` fixes `M` and `M_σ`; descend `conj g • Y ≤ M_σ` to `Y ≤ M_σ`.
+  have hconjM : MulAut.conj g • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hgM)
+  have hgMsigma :
+      MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [← Msigma_conj_smul, hconjM]
+  exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp (hgMsigma ▸ hg)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
