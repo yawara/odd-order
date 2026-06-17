@@ -803,7 +803,7 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       rw [ne_eq, Subgroup.subgroupOf_eq_bot]
       exact fun hd => hKne (hd.eq_bot_of_le hKM)
     have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
-    obtain ⟨hcompl, hcop, _⟩ := typeP_duality hG hM hP hK hKstar
+    obtain ⟨hcompl, hcop, _⟩ := typeP_duality hG hM hP hKM hK hKstar
     exact ⟨hM'eq, hUab, hcompl, hcop⟩
   -- **Conjunct 2** (`K` cyclic).
   have hconj2 : IsCyclic ↥K := by
@@ -813,7 +813,7 @@ theorem typeP_auxiliary_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         rw [ne_eq, Subgroup.subgroupOf_eq_bot]
         exact fun hd => hKne (hd.eq_bot_of_le hKM)
       have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
-      obtain ⟨_, _, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hK hKstar
+      obtain ⟨_, _, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
       haveI := hcyc
       exact Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
   -- **Conjunct 1** (`M ≤ N_G(U M_σ)`): `U M_σ = M` (`K = ⊥`) or `= M'` (`K ≠ ⊥`), both normal.
@@ -3483,7 +3483,7 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hKne : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstar hU).2.1
   -- `K K*` cyclic and the `M = K M'` complement / coprime data:  Theorem 14.7(d),(h).
   obtain ⟨hcompl, hcop, _Mstar, ⟨_, _, _, _, hcyc, _, _, _⟩, _⟩ :=
-    typeP_duality hG hM hP hK hKstar
+    typeP_duality hG hM hP hKM hK hKstar
   -- `K* ⊆ M_F`:  Theorem 15.2 when `M_F ≠ M_σ`, else `K* ⊆ M_σ = M_F` directly.
   have hKsubMF : Kstar ≤ MF M := by
     by_cases hMF : MF M = OddOrder.BG.Ch3.S10.Msigma M
