@@ -1698,3 +1698,16 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 
 **🛑 STOP — GATE「残 2 設計判断到達で停止」に到達**: typeP_duality ∃! bundle の covering/Hall κ(Mstar)/TI/P2/¬conj conjunct は全て in hand。残り typeP_duality 完成 = **(1) IsCyclic(K⊔Kstar) [Ω₁(Sylow) helper] (2) part(h) [Prop 14.2(a) UM_σ packaging]** の 2 設計判断のみ + uniqueness 組立。これらは原 AskUserQuestion の残 2 obligation でユーザー裁可待ち。
 - **§14 funnel 進捗サマリ (2026-06-18)**: density bound + 14.7(e)(f) + partner symmetry 14.7(1)(2)(3) + **covering 14.7(7)** 全 landing。残 = 14.7(d) cyclic + 14.7(8) part(h) → typeP_duality close → §15/§16 unblock。正本 = この節。
+
+### ✅ 14.7(d) cyclicity engine landing (2026-06-18, commit `7d56d199`) — IsCyclic の概念的核心、残り = Mσ-nilpotent-for-P2 + assembly
+
+**ユーザー「難しいほう=IsCyclic」を選択。「Ω₁ helper 未特定」は誤りと判明 — `isCyclic_of_odd_of_isNilpotent_of_forall_pRank_le_one` (S12_ECore:461) が既存。**
+- ✅ **`isCyclic_kappaHall_of_le_nilpotent`** (`7d56d199`): Hall κ(N)-subgroup K'≤N, K'≤W (nilpotent) ⟹ IsCyclic K'。pRank K' p≤1 (p∈π(K')⟹κ(N)⟹τ₁∪τ₃⟹pRank N p=1 via `tau1/tau3_pRank_eq_one`+`pRank_le_of_injective`; p∤card⟹0 via `mem_primeFactors_card_of_pos_pRank`) + nilpotent (`nilpotent_of_mulEquiv (subgroupOfEquivOfLe)`) + odd → helper。S12_ECore:849 パターン踏襲。**IsCyclic の "rank-1 nilpotent⟹cyclic" 核心。**
+
+**▶ 残り IsCyclic (typeP_Z_isCyclic) = 2 piece (~90行, 機械的だが card 細部あり)**:
+1. **`msigma_isNilpotent_of_isTypeP2`** (P2 ⟹ Mσ nilpotent, ~50行): P2 ⟹ `kappa M ⊊ sigmaComplementPrimes M` (kappa⊆sigmaComplementPrimes [κ⊆piSet∧⊆σᶜ] + IsTypeP2.2 [≠]) → `Set.exists_of_ssubset` で **p∈π(M)−(σ∪κ)** → max-rank A → **Lemma 14.1 `msigma_structure_of_notMem_sigma_kappa` .2.2**。
+   - **max-rank A 構成** (crux): `exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G:=↥M)(p)(n:=pRank ↥M p) (hpos=one_le_pRank_of_mem_primeFactors hpπ) (le_refl)` → B:Subgroup ↥M, log_p|B|≥pRank; `le_pRank B hB_ea : log_p|B|≤pRank ↥M p` ⟹ log_p|B|=pRank; **card 細部** = `Nat.card B = p^(pRank)` (B elem-ab-p ⟹ |B|=p^(log_p|B|)、IsPGroup card 経由)。A:=B.map M.subtype, `IsElementaryAbelian.map`+`card_map_of_injective`。
+2. **`typeP_Z_isCyclic`** (~40行): `isTypeP2_or_isTypeP2_partner` で M/Mstar P2 を case。
+   - M P2: |K|=prime (typeP_structure (g) `.2.2.2.2.1 hM2`→⟨_,q,hq,hKq,_⟩) ⟹ `isCyclic_of_prime_card`; Kstar=Hall κ(Mstar) (partner_structure) ⊆ Mσ (nilpotent via piece-1) ⟹ `isCyclic_kappaHall_of_le_nilpotent (N:=Mstar)(K':=Kstar)(W:=Mσ)`; → `isCyclic_kappaHall_sup_Kstar_of_cyclic`。
+   - Mstar P2: 対称 — |Kstar|=prime (Mstar's Hall κ); K=C_{Mstar_σ}(Kstar)⊆Mstar_σ (nilpotent) ⟹ `isCyclic_kappaHall_of_le_nilpotent (N:=M)(K':=K)(W:=Mstar_σ)`; → `isCyclic_kappaHall_sup_Kstar_of_cyclic hKstarMstar hKstar_hall hK_eq` で IsCyclic(Kstar⊔K)→sup_comm。
+- **正本=この節。cyclicity engine 済 ⟹ 残り機械的。part(h) は IsCyclic 着地後 (K cyclic を要する)。**
