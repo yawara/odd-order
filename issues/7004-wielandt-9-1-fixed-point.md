@@ -91,13 +91,13 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       + inferInstanceAs で正準化して解消** ([[lean-type-synonym-fixes-instance-diamond]])。
       ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
       **残 = step 3d counting bridge**: (3d.1) ✅ **DONE (`78f8c86f`)** Brauer 等式を一般作用群へ一般化
-      （`centerRepComp ψ`, `ψ : Γ →* MulAut G`、`card_orbits_classes_eq_card_orbits_simples_comp`;
-      `Γ = ↥(zpowers e)` + `compHom` で hcl/hsi が rfl）→ (3d.2) **coprime-FPF auto は自明 class のみ固定**
-      （tool 確定・wall 無し: **`Isaacs.Ch04.glauberman_fixed_point_exists`** = Lem 3.24(a) を
-      conjugacy-class-as-transitive-G-set `Ω={y//mk y=C}` に適用、~60-80 行; pattern =
-      `glauberman_fixed_points_conj:330`）→ #orbits-classes = 1+(Ncl−1)/d → (3d.3) 等式 + `Nsimples=Ncl`
-      + free-action orbit 算術 + trivial-simple は Γ-fixed で free on 非自明 simples ⟹ (†)。
-      正本 = design notes「2026-06-17 (resume²)」「(resume³)」「(resume⁴)」。
+      （`centerRepComp ψ`, `card_orbits_classes_eq_card_orbits_simples_comp`）→ (3d.2) ✅ **DONE
+      (`dccd7dd3`)** coprime-FPF auto は自明 class のみ固定（`CenterOrbitFree.map_eq_self_imp_eq_trivial_of_fpf`,
+      `glauberman_fixed_point_exists` を `Ω={y//mk y=C}` に適用、sorry-free・axiom-clean）→ **(3d.3) 残**:
+      (3d.3a) free-action orbit 算術 `#orbits=1+(n−1)/d ⟹ 固定点1個+残り自由`（∑(d−sᵢ)=d−1 & 真の約数≤d/2
+      で defect 1 個に強制; ~80-120 行）+ (3d.3b) trivial simple は MulAut-fixed（対称化冪等元
+      `(1/|U|)∑g` 経由）+ (3d.3c) 合流 ⟹ E free on 非自明 simples → (†) [I-2 isotypic + I-4 base change
+      + per-orbit I-3]。正本 = design notes「2026-06-17 (resume⁴)」(詳細・約数論法込み)。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
       残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）

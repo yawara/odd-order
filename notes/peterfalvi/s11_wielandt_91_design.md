@@ -163,22 +163,33 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
    pins the carrier), cornerstone twice ⟹ `card_orbits_classes_eq_card_orbits_simples_comp :
    #(Γ-orbits on classes) = #(Γ-orbits on simples)`. For `Γ = ↥(Subgroup.zpowers e)`,
    `ψ = Subgroup.subtype`, `compHom`-action on `Fin N`, the agreement hyps `hcl`/`hsi` hold by `rfl`.
-2. **NEXT (3d.2) — "coprime-FPF automorphism fixes only the trivial class":** for `α : MulAut G`
-   coprime to `|G|` with `Fix_G(α) = {1}` (FPF), an `α`-fixed class `C` is trivial. **Tool FOUND
-   (no wall): `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists`** (Isaacs Lem 3.24(a),
-   `ForwardFromCh03.lean:180`) = coprime + one-solvable + `G`-transitive `Ω` + `IsCompatibleMulAction
-   φ Ω` ⟹ `∃ α-fixed ω`. **Construction** (~60-80 lines, pattern = `glauberman_fixed_points_conj`
-   `:330`): take `Ω := {y : G // ConjClasses.mk y = C}`; `MulAction G Ω` by conjugation
-   (`g•⟨y,_⟩ = ⟨g*y*g⁻¹,_⟩`, class-preserving), transitive (any two reps of `C` are conjugate);
-   `MulAction A Ω` via `φ` where `A = ↥(zpowers α)` (well-defined since `α` fixes `C` ⟹ every
-   `α^n` does); compatibility `a•(g•ω) = φ a g • (a•ω)` (`α(gyg⁻¹) = α(g)α(y)α(g)⁻¹`); nonempty
-   (`C.out`). Glauberman ⟹ `α`-fixed `y ∈ C` ⟹ `y ∈ Fix(α) = {1}` ⟹ `C = mk 1` trivial.
-   ⟹ `⟨e⟩` free on the `Ncl−1` nontrivial classes ⟹ `#orbits-classes = 1 + (Ncl−1)/d`.
-3. **(3d.3) transfer:** Brauer equality (3d.1) + `Nsimples = Ncl` ⟹ `#orbits-simples = 1 + (Ncl−1)/d`
-   ⟹ (the trivial simple is a `Γ`-fixed singleton orbit + every other orbit size `| d`, summing to
-   `Ncl−1` in `(Ncl−1)/d` orbits ⟹ all size `d`) ⟹ `⟨e⟩` (hence `E`) free on nontrivial simples ⟹
-   feed I-3 ⟹ (†).  Needs an abstract free-action orbit-count arithmetic lemma + identifying the
-   trivial simple's index as `Γ`-fixed.
+2. ✅ **DONE (3d.2, `dccd7dd3`)** — "coprime-FPF automorphism fixes only the trivial class":
+   `CenterOrbitFree.map_eq_self_imp_eq_trivial_of_fpf` — for `β : MulAut G` with `⟨β⟩` coprime to
+   `|G|` and FPF (`β x = x → x = 1`), a `β`-fixed class `C` (`β • C = C`) is `mk 1`. Built via
+   `glauberman_fixed_point_exists` (Isaacs 3.24(a)) on `Ω = {y // mk y = C}` (transitive `G`-conj
+   set; `⟨β⟩` acts via `β`, compatible); the `β`-fixed element is in `Fix(β) = {1}`. `⟨β⟩` solvable
+   via `isSolvable_of_comm` + `mul_comm'` (zpowers `IsMulCommutative`). sorry-free, axiom-clean.
+3. **NEXT — (3d.3) transfer to simples** (3 sub-pieces):
+   - **(3d.3a) free-action orbit arithmetic** [pure combinatorics, ~80-120 lines]. For finite `Γ`
+     (order `d`) on finite `S` (size `n`) with `#orbits = 1 + (n−1)/d`: **exactly one fixed point,
+     all other orbits size `d`**. ⚑ **Proof (worked out, no primality needed):** orbit sizes `sᵢ ∣ d`
+     (orbit-stabilizer), `∑ sᵢ = n` (`MulAction.selfEquivSigmaOrbits`). Then
+     `∑ᵢ (d − sᵢ) = d·#orbits − n = d(1+(n−1)/d) − n = d − 1`. Every **proper** divisor of `d` is
+     `≤ d/2` (`s ∣ d, s < d ⟹ 2s ≤ d`), so each nonzero defect `d − sᵢ ≥ d/2`; `t` nonzero defects
+     give `t·(d/2) ≤ d−1 < d ⟹ t ≤ 1`, and `d−1 > 0 ⟹ t = 1` (for `d ≥ 2`); that single defect is
+     `d−1`, i.e. `sᵢ = 1`. ⟹ exactly one size-1 orbit (fixed point), rest size `d` (free). mathlib:
+     `selfEquivSigmaOrbits` + `card_orbit_mul_card_stabilizer_eq_card_group` + `Nat.card_sigma`.
+   - **(3d.3b) the trivial simple is `MulAut G`-fixed** [identification]. The trivial central
+     idempotent `t = (1/|U|) ∑_{g} single g 1 ∈ Z(k[U])` is `MulAut`-fixed (`α(∑ g) = ∑ g`) and is a
+     primitive idempotent, so `t = idemBasis φ i₀` for some `i₀`; `centerRep_apply_symm_single` then
+     forces `simplesAction φ α i₀ = i₀`, so `i₀ ∈ fixedPoints`.
+   - **(3d.3c) combine:** Brauer equality (3d.1, `Γ = E` via the orbit hom) + `Nsimples = Ncl`
+     (equal `finrank Z`) + "`E` free on nontrivial classes" (3d.2 per `e ∈ E#`) gives
+     `#orbits-simples = 1 + (Ncl−1)/|E|`; (3d.3a) ⟹ exactly one fixed simple + rest free; (3d.3b)
+     ⟹ that fixed simple is the trivial one ⟹ **`E` free on the nontrivial simples**.
+   Then (†): I-2 isotypic decomposition of `W` (`W^U = 0` ⟹ only nontrivial components) + I-4 base
+   change `𝔽_p → 𝔽̄_p` + per-orbit I-3 (`finrank_eq_card_mul_finrank_invariants`) ⟹
+   `dim W = |E|·dim W^E`.
 
 `Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
 of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a
