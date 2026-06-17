@@ -4,6 +4,43 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🔨 2026-06-18 cont.² — hXanchored 着手: central-char bridge 完成 + integration マップ確定
+
+**新 leaf `S08_CaseBAnchoredSeed.lean`**(commits `cf736ef5`→`b4820084`、build-green 3629 jobs・axiom-clean):
+- **`exists_central_phi_data`**(= Q1「中心 gap」解決): 任意 irreducible θ of H (W₂≤Z(H)) について、θ の
+  中心線形指標 φ_θ([Is] 2.27 `exists_central_linear_restriction`、`Res^H_{W₂} θ = θ(1)·φ_θ`)を
+  `subgroupOfEquivOfLe` で L-部分群 W₂ に transport し、**両形式 + linearity + positivity** を出す:
+  (i) `hφ' : IsIrreducibleCharacter (compHom e φ)`(W₂.subgroupOf H 上 = producer 用)、
+  (ii) `IsIrreducibleCharacter φ`(W₂ 上 = aggregate 用、`compHom_of_surjective`)、(iii) `φ 1 = 1`、
+  (iv) `0 < constituentWeight hφ' θ`(= θ(1))。**fixed-φ 誤読を解消**: 各 column の θ は**自分の** φ_θ に乗る。
+
+**🔑 integration の全 building block が実在・sorry-free と確認**(再調査不要):
+- aggregate (6.8.2.2): `SibleyDadeHypothesis.exists_decomposition_caseB`(`S08_CaseBCoherence2:126`)。
+  入力 = hcop/hp/**hHp(IsPGroup p ↥H = (6.5)還元)**/hprime/hW2comm/hW2cen/hη₁/**φ:IrreducibleCharacter ↥W₂**/
+  hφ1/hφ(≠1)/hc2/hFPF。出力 = `∃ cY X, X⊥Y ∧ X∈ZIrr ∧ τ(Ind φ − |H:W₂|•η₁) = X − |H:W₂|•cY.ext η₁`。
+- bundles: `caseB_hcol`(`S08CBA:986`)・`caseB_hirr`(`:1010`、要 `caseB_hnonlin` `:719`)・
+  `caseB_hirrAnc`(`:757`)。per-φ anchored producer: `caseB_per_phi_anchored_fromYset`(`S08CBA:1647`、sorry-free)。
+- column→θ: `columnSum_eq_induce_H`(θ=Res_H μ_{0,χ₂})・`certainTypeRestrict_isIrreducible`。
+  column degree: `columnSum_apply_one`(`S06_CertainTypeCoherence:278`)。
+
+**🛑 残 integration の核心 subtlety = cY-anchor consistency**(数学 gap でなく Lean 設計判断):
+- `certainTypeSet_isCoherent_via_anchoredImages`(`S08_CaseBXChiCoherence:246`)の hXanchored は anchor を
+  **`hyp.coherentYset.extension η₁` に hardcode**。一方 producer `caseB_per_phi_anchored_fromYset` は
+  parametric cY を取り `… − a•cY.ext η₁` を出す。
+- `exists_decomposition_caseB` は cY を **existential** で返す ⟹ producer に渡す cY が `hyp.coherentYset` と
+  一致する保証が項レベルで取れない。**ただし** `exists_Ycoherence_hgood_caseB`(`S08_CaseBCoherence:1309`)の
+  **good case は cY = `hyp.coherentYset`**(`:1341`)、m=2 edge case のみ別 cY(η₂ relabel, `:1342+`)。
+- ⟹ 選択肢: (A) seed lemma `certainTypeSet_isCoherent_via_anchoredImages` の anchor を**parametric cY 化**
+  (hyp.coherentYset hardcode を外す) → producer の cY をそのまま使える / (B) good-case cY=hyp.coherentYset を
+  existential から露出する variant を作る + m=2 edge を別処理。**(A) が clean**(seed lemma の小改修)。
+- 他の残: per-column で Ximg χ₂ := `(caseB_phi_family … φ_{χ₂} …).X` を定義、a₀ uniform = θ(1)(certainTypeSet
+  equal-degree)、∀-column 組立、φ≠1 nontriviality(column の W₂⊄ker θ から)、m=2 edge。
+
+**▶ 次の一手**: (1) cY-anchor を (A) で解決(seed lemma parametric 化)→ (2) per-column anchored image
+`caseB_column_anchored_image`(exists_central_phi_data + exists_decomposition_caseB + caseB_hcol/hirr/hirrAnc
++ caseB_per_phi_anchored_fromYset)→ (3) ∀-column hXanchored + Ximg 定義 → (4) seed cX→hXYcoh→endgame。
+**ChatGPT 不要**(全 block 実在、Q1-Q3 = `s08_6_8_chatgpt_answer.md` で math 健全確認済、残は wiring + (A) 設計)。
+
 ## ✅ 2026-06-18 cont. — brick 4.4 consumer producer skeleton landed → loop STOP @ hXanchored
 
 **`nonempty_coherent_S_caseB` 完成**(`S08_CaseBWeightedEndgame`、commit `089b4033`、build-green
