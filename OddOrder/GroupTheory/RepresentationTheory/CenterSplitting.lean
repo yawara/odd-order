@@ -44,6 +44,15 @@ def _root_.AlgEquiv.centerCongr (e : A ≃ₐ[R] B) :
 @[simp] theorem centerCongr_apply (e : A ≃ₐ[R] B) (x : Subalgebra.center R A) :
     (e.centerCongr x : B) = e (x : A) := rfl
 
+/-- `AlgEquiv.centerCongr` packaged as a **monoid homomorphism** on automorphisms:
+`(A ≃ₐ[R] A) →* (Z(A) ≃ₐ[R] Z(A))`.  Makes `MulAut`-actions descend to the centre as group
+actions. -/
+def _root_.AlgEquiv.centerCongrHom :
+    (A ≃ₐ[R] A) →* (Subalgebra.center R A ≃ₐ[R] Subalgebra.center R A) where
+  toFun := AlgEquiv.centerCongr
+  map_one' := by ext x; simp [AlgEquiv.one_apply]
+  map_mul' e₁ e₂ := by ext x; simp [AlgEquiv.mul_apply]
+
 section Pi
 
 variable {ι : Type*} [DecidableEq ι] {C : ι → Type*} [∀ i, Semiring (C i)] [∀ i, Algebra R (C i)]
