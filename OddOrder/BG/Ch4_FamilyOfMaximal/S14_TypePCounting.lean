@@ -5911,6 +5911,33 @@ theorem isPiElementCompl_mem_left_of_commute [Finite G] {A B Z : Subgroup G} {π
     Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers b)
   exact Subgroup.mem_subgroupOf.mp (hbZsub hbmem)
 
+/-- **BG 14.7, Proposition 14.2(d)-first for family members** (mmd L3827, the `K* ∩ Mᵍ = 1` clause):
+for a family member `N` and `g ∉ N`, the canonical factor `Kᵢ* = Z ⊓ M_σ(N)` meets the conjugate
+`Nᵍ` trivially.  Builds the type-`P` data of `N` (its Hall `κ(N)`-subgroup from
+`typeP_family_member_data`, a Hall `(κ(N) ∪ σ(N))′`-subgroup `U` via `hall_E_exists` since `N` is
+solvable) and reads off conjunct (d)-first of `typeP_structure`, transported to the canonical
+`Kᵢ*` via `hcanon`.  Used in the TI-of-`T` step to force `g ∈ N` from `yᵍ ∈ Kᵢ* ∩ Nᵍ`. -/
+theorem typeP_family_dFirst [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) {g : G} (hgN : g ∉ N) :
+    ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) = ⊥ := by
+  classical
+  obtain ⟨hNmax, hPN, _, KN, hKNN, hKN, _, hcanon, _⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  haveI : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hNmax
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥N)
+    ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
+  have hUeq : (U'.map N.subtype).subgroupOf N = U' :=
+    Subgroup.comap_map_eq_self_of_injective N.subtype_injective U'
+  have hUN : Ch03.IsHallSubgroup ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
+      ((U'.map N.subtype).subgroupOf N) := by rw [hUeq]; exact hU'
+  have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
+  rw [hcanon] at hd
+  exact hd g hgN
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
