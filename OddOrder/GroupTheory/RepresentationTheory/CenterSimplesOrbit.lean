@@ -176,4 +176,69 @@ theorem card_orbits_classes_eq_card_orbits_simples_comp
 
 end CompOrbitCount
 
+/-! ### The trivial simple is a `MulAut G`-fixed point (Peterfalvi (9.1), step 3d.3b)
+
+The trivial central character of `k[G]` is the **augmentation** `aug : Z(k[G]) →ₐ[k] k`, the
+restriction of `MonoidAlgebra.lift 1` (the algebra hom sending each `single g 1 ↦ 1`).  It is
+invariant under every `centerRep α` (`α` permutes `G` without changing the sum of coefficients), and
+a `k`-algebra hom `(Fin N → k) →ₐ[k] k` is evaluation at a single coordinate
+(`PiAlgebraAut.algHom_pi_eq_eval`).  Transporting `aug` through the splitting `φ` names that
+coordinate `i₀`; invariance then forces `simplesAction φ α i₀ = i₀` for every `α` — so `i₀` is the
+**fixed simple**, the one 3d.3c pairs with the fixed (trivial) class. -/
+
+/-- The **augmentation** of `Z(k[G])`: `MonoidAlgebra.lift 1` (sending `single g c ↦ c`) restricted
+to the centre — the trivial central character, as a `k`-algebra hom `Z(k[G]) →ₐ[k] k`. -/
+noncomputable def aug : Subalgebra.center k (MonoidAlgebra k G) →ₐ[k] k :=
+  (MonoidAlgebra.lift k k G 1).comp (Subalgebra.center k (MonoidAlgebra k G)).val
+
+theorem aug_apply (z : Subalgebra.center k (MonoidAlgebra k G)) :
+    aug z = MonoidAlgebra.lift k k G 1 (z : MonoidAlgebra k G) := rfl
+
+/-- The augmentation `MonoidAlgebra.lift 1` is unchanged by the basis permutation `domCongrAut α`:
+both algebra homs `k[G] →ₐ[k] k` send each `single g 1 ↦ 1`. -/
+theorem lift_one_comp_domCongrAut (α : MulAut G) :
+    (MonoidAlgebra.lift k k G 1).comp
+        (MonoidAlgebra.domCongrAut (R := k) (A := k) α).toAlgHom
+      = MonoidAlgebra.lift k k G 1 := by
+  refine MonoidAlgebra.algHom_ext fun g => ?_
+  rw [AlgHom.comp_apply, AlgEquiv.toAlgHom_apply,
+    show MonoidAlgebra.domCongrAut (R := k) (A := k) α (MonoidAlgebra.single g (1 : k))
+        = MonoidAlgebra.single (α g) (1 : k) from MonoidAlgebra.domCongr_single α g 1,
+    MonoidAlgebra.lift_single, MonoidAlgebra.lift_single, MonoidHom.one_apply, MonoidHom.one_apply]
+
+/-- `aug` is `centerRep`-invariant: `aug (centerRep α z) = aug z`.  Indeed
+`(centerRep α z : k[G]) = domCongrAut α (z : k[G])`, and `aug = lift 1` is
+`domCongrAut`-invariant (`lift_one_comp_domCongrAut`). -/
+theorem aug_centerRep (α : MulAut G) (z : Subalgebra.center k (MonoidAlgebra k G)) :
+    aug (centerRep α z) = aug z := by
+  rw [aug_apply, aug_apply]
+  have hval : ((centerRep α z : Subalgebra.center k (MonoidAlgebra k G)) : MonoidAlgebra k G)
+      = MonoidAlgebra.domCongrAut (R := k) (A := k) α (z : MonoidAlgebra k G) := rfl
+  rw [hval]
+  exact DFunLike.congr_fun (lift_one_comp_domCongrAut (k := k) α) (z : MonoidAlgebra k G)
+
+/-- **The trivial simple is a fixed point** (Peterfalvi (9.1), step 3d.3b).  There is a coordinate
+`i₀ : Fin N` — the augmentation / trivial central character, read off through the splitting `φ` —
+with `simplesAction φ α i₀ = i₀` for **every** `α : MulAut G`.  This is the fixed simple that 3d.3c
+pairs with the fixed (trivial) class to conclude `E` acts freely on the *nontrivial* simples. -/
+theorem exists_fixed_simple :
+    ∃ i₀ : Fin N, ∀ α : MulAut G, simplesAction φ α i₀ = i₀ := by
+  classical
+  obtain ⟨i₀, hi₀⟩ := PiAlgebraAut.algHom_pi_eq_eval (aug.comp φ.symm.toAlgHom)
+  -- `aug` at the transported idempotent `φ.symm (Pi.single j 1)` reads off coordinate `i₀`.
+  have hread : ∀ j : Fin N,
+      aug (φ.symm (Pi.single j (1 : k))) = (Pi.single j (1 : k) : Fin N → k) i₀ := by
+    intro j
+    have h := hi₀ (Pi.single j (1 : k))
+    rwa [AlgHom.comp_apply, AlgEquiv.toAlgHom_apply] at h
+  refine ⟨i₀, fun α => ?_⟩
+  have e1 : aug (φ.symm (Pi.single i₀ (1 : k))) = 1 := by rw [hread i₀, Pi.single_eq_same]
+  -- invariance + the permutation: `aug` at the `α`-image of the fixed idempotent is also `1`.
+  have e2 : aug (φ.symm (Pi.single (simplesAction φ α i₀) (1 : k))) = 1 := by
+    rw [← centerRep_apply_symm_single φ α i₀, aug_centerRep, e1]
+  rw [hread] at e2
+  by_contra hne
+  rw [Pi.single_eq_of_ne (Ne.symm hne)] at e2
+  exact one_ne_zero e2.symm
+
 end OddOrder.GroupTheory.CenterSimplesOrbit
