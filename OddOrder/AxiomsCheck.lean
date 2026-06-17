@@ -5052,6 +5052,25 @@ Existence from `exists_partner` + `typeP_partner_structure` + `typeP_Z_isCyclic`
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_partner_existsUnique
 
+/-! **Derived subgroup via a `σ`-complement** (`S14_TypePCounting`,
+`derivedInG_eq_Msigma_sup_derivedInG_complement`): for a §12 `E`-setup of `M`, `M' = M_σ ⊔ E'`. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.derivedInG_eq_Msigma_sup_derivedInG_complement
+
+/-! **BG Theorem 14.7(h) core** (`S14_TypePCounting`, `typeP_derivedInG_isComplement_kappaHall`):
+for a type-P maximal `M` with Hall `κ(M)`-subgroup `K` cyclic, `M' = [M,M]` complements `K` in `M`
+(Proposition 14.2(a): `M' = U M_σ`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_derivedInG_complement_of_eq_complement
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall
+
+/-! **BG Theorem 14.7, type-P duality** (`S14_TypePCounting`, `typeP_duality`): the full Theorem 14.7
+for a type-P maximal `M` — `M' = [M,M]` complements `K` with coprime orders (part (h)), and the
+unique nonconjugate type-P partner `M*` with cyclic `Z`, TI `Ẑ`, type-P₂ side, and covering.
+Fully unconditional, axiom-clean — completes the §14 long pole feeding §15/§16. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_duality
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

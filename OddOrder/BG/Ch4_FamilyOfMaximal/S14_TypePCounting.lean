@@ -7709,6 +7709,244 @@ theorem typeP_partner_existsUnique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   rw [h0, Set.mem_singleton_iff] at hmem
   exact hmem
 
+/-- **Derived subgroup via a `σ`-complement** (BG 14.7(h), Proposition 14.2(a) skeleton, mmd L4061):
+for any §12 `E`-setup of `M` (so `M = M_σ ⋊ E`), the derived subgroup `M' = [M,M]` equals
+`M_σ ⊔ E'` where `E' = [E,E]` is the derived subgroup of the `σ(M)'`-complement.
+
+`⊇` is `Msigma_le_derived` (`M_σ ≤ M'`) plus `commutator_mono` (`E' ≤ M'`).  For `⊆`, an element
+`x ∈ M'` decomposes as `x = a·b` (`a ∈ M_σ`, `b ∈ E`) inside `↥M = M_σ ⋊ E`; then `b = a⁻¹x ∈ M'`
+(both factors lie in the normal `M'`), so `b ∈ E ⊓ M' ≤ E'` by `inf_derivedInG_le_derivedInG`,
+hence `x = a·b ∈ M_σ ⊔ E'`. -/
+theorem derivedInG_eq_Msigma_sup_derivedInG_complement [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) :
+    derivedInG M = OddOrder.BG.Ch3.S10.Msigma M ⊔ derivedInG E := by
+  classical
+  have hM := h.mem_maximal
+  have hMσM' : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M :=
+    OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+  refine le_antisymm (fun x hx => ?_) (sup_le hMσM' ?_)
+  · have hxM : x ∈ M := Subgroup.map_subtype_le _ hx
+    haveI : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    have hsuptop : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔ E.subgroupOf M = ⊤ := by
+      rw [← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) h.E_le,
+        h.E_compl_sup, Subgroup.subgroupOf_self]
+    obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_left.mp
+      (hsuptop ▸ Subgroup.mem_top (⟨x, hxM⟩ : ↥M))
+    have hs : (a : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := Subgroup.mem_subgroupOf.mp ha
+    have he : (b : G) ∈ E := Subgroup.mem_subgroupOf.mp hb
+    have hse : (a : G) * (b : G) = x := by
+      have hh := congrArg Subtype.val hab; simpa using hh
+    have hbM' : (b : G) ∈ derivedInG M := by
+      have hbeq : (b : G) = (a : G)⁻¹ * x := by rw [← hse]; group
+      rw [hbeq]
+      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hMσM' hs)) hx
+    have hbdE : (b : G) ∈ derivedInG E :=
+      h.inf_derivedInG_le_derivedInG (Subgroup.mem_inf.mpr ⟨he, hbM'⟩)
+    rw [← hse]
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hs) (Subgroup.mem_sup_right hbdE)
+  · rw [show derivedInG E = ⁅E, E⁆ from Subgroup.map_subtype_commutator E,
+      show derivedInG M = ⁅M, M⁆ from Subgroup.map_subtype_commutator M]
+    exact Subgroup.commutator_mono h.E_le h.E_le
+
+/-- **part (h), degenerate case `K = E`** (BG 14.7(8), mmd L4061 with `U = 1`): if the Hall
+`κ(M)`-subgroup `K` equals the whole `σ(M)'`-complement `E` (the case `κ(M) ∩ τ₃(M) ≠ ∅` of
+Proposition 14.2(a), or `E₂E₃ = 1`), then `E = K` is cyclic, so `E' = 1` and `M' = M_σ`;
+the `M_σ ⋊ E` structure makes `K = E` a complement of `M' = M_σ`. -/
+theorem typeP_derivedInG_complement_of_eq_complement [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ K : Subgroup G}
+    (h : SubgroupESetup M E E₁ E₂ E₃) (hKE : K = E) [IsCyclic ↥K] :
+    Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := by
+  classical
+  -- `E = K` is cyclic, hence abelian, so `E' = ⁅E,E⁆ = ⊥`.
+  have hEbot : derivedInG E = ⊥ := by
+    rw [← hKE, show derivedInG K = ⁅K, K⁆ from Subgroup.map_subtype_commutator K]
+    refine Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (fun x hx => ?_)
+    letI : CommGroup ↥K := IsCyclic.commGroup
+    refine Subgroup.mem_centralizer_iff.mpr (fun y hy => ?_)
+    exact congrArg Subtype.val (mul_comm (⟨y, hy⟩ : ↥K) (⟨x, hx⟩ : ↥K))
+  -- `M' = M_σ ⊔ E' = M_σ`.
+  have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [derivedInG_eq_Msigma_sup_derivedInG_complement hG h, hEbot, sup_bot_eq]
+  rw [hM'eq, hKE]
+  exact h.isComplement'_subgroupOf
+
+/-- **BG Theorem 14.7(h) core, `M'` complements `K`** (mmd L4061): for a type-`P` maximal `M`
+with Hall `κ(M)`-subgroup `K` *cyclic* (the counting collapse `n = 1` of Theorem 14.7 makes
+`Z = K × K*` cyclic, hence `K`), the derived subgroup `M' = [M,M]` is a complement of `K` in `M`.
+
+By Proposition 14.2(a): take a §12 `E`-setup with `K ≤ E`.  If `κ(M) ∩ τ₃(M) ≠ ∅` then `K = E`
+(`typeP_derivedInG_complement_of_eq_complement`).  Otherwise `κ(M) ⊆ τ₁(M)`; conjugate so `K = E₁`,
+and (when `E₂E₃ = 1`) again `K = E`, or (`E₂E₃ ≠ 1`) `E = K ⋉ U` is Frobenius with `U = E₂E₃ = E'`
+(`U = [U,K]` by the coprime regular action `le_commutator_of_coprime_inf_centralizer_eq_bot`), so
+`M' = M_σ ⊔ U`; coprimality (`κ` vs `σ ∪ τ₂ ∪ τ₃`) gives `M' ⊓ K = 1`, and `U ⋊ K = E`,
+`M_σ ⋊ E = M` give `M' · K = M`. -/
+theorem typeP_derivedInG_isComplement_kappaHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
+    Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := by
+  classical
+  -- `K` is a `σ(M)'`-subgroup (a Hall `κ(M)`-subgroup, and `κ(M) ⊆ σ(M)'`).
+  have hK_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) K := by
+    intro p hp
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hp
+    exact kappa_subset_sigmaCompl (hK.1 p hp)
+  obtain ⟨E, E₁, E₂, E₃, hsetup, hKE, hE_pi⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hKM hK_pi
+  by_cases hτ3 : (kappa M ∩ tau3 M).Nonempty
+  · -- Case `κ(M) ∩ τ₃(M) ≠ ∅`: `K = E`.
+    obtain ⟨p, hpmem⟩ := hτ3
+    rw [Set.mem_inter_iff] at hpmem
+    obtain ⟨hpκ, hpτ3⟩ := hpmem
+    have hp : p.Prime := Nat.prime_of_mem_primeFactors ((mem_tau3_iff M p).mp hpτ3).2.1
+    obtain ⟨hE3ne, hreg⟩ := E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
+    obtain ⟨hE1ne, hEeq, hEprime, hEnorm⟩ := E3_not_regular_consequences hG hsetup hE3ne hreg
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon
+      push_neg at hcon
+      exact hreg fun y hy hy1 => hcon y hy hy1
+    have hEpi : Ch03.Subgroup.IsPiGroup (kappa M) (E.subgroupOf M) := by
+      intro q hq
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv] at hq
+      exact mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq
+    have hEdvdK : Nat.card ↥E ∣ Nat.card ↥K := by
+      have hd := hK.card_dvd_of_isPiGroup hEpi
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hd
+    have hKEeq : K = E :=
+      Subgroup.eq_of_le_of_card_ge hKE (Nat.dvd_antisymm hEdvdK (Subgroup.card_dvd_of_le hKE)).le
+    exact typeP_derivedInG_complement_of_eq_complement hG hsetup hKEeq
+  · -- Case `κ(M) ⊆ τ₁(M)`: conjugate the setup so its `E₁` is `K`.
+    haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    have hκτ1 : ∀ p ∈ kappa M, p ∈ tau1 M := fun p hpκ =>
+      (kappa_subset_tau1_union_tau3 hpκ).resolve_right
+        (fun hpτ3 => hτ3 ⟨p, Set.mem_inter hpκ hpτ3⟩)
+    obtain ⟨p₀, hp₀κ⟩ := hP
+    obtain ⟨hE1ne, hE1nonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG hsetup
+      (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+    have hE1prime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) E₁ := E1_actsPrime hG hsetup hE1ne
+    have hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥ :=
+      Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hE1prime (le_refl E₁) hE1nonreg
+    have hE1HallκE : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf E) :=
+      ⟨fun p hp => mem_kappa_of_mem_primeFactors_card_E1 hG hsetup hE1prime hCE1
+          (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv] at hp),
+        fun p hp hpκ => hsetup.E₁_hall.2 p hp (hκτ1 p hpκ)⟩
+    have hE1Hallκ : Ch03.IsHallSubgroup (kappa M) (E₁.subgroupOf M) :=
+      hallPiece_isHall_in_M hG hsetup hsetup.E₁_le hE1HallκE kappa_subset_sigmaCompl
+    obtain ⟨w, hwM, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv
+      (hsetup.E₁_le.trans hsetup.E_le) hKM hE1Hallκ hK
+    have h' := SubgroupESetup.conj' hsetup hwM
+    rw [hw] at h'
+    set Ebar := MulAut.conj w • E with hEbardef
+    set Ebar₂ := MulAut.conj w • E₂ with hEbar₂def
+    set Ebar₃ := MulAut.conj w • E₃ with hEbar₃def
+    -- `h' : SubgroupESetup M Ebar K Ebar₂ Ebar₃`.
+    by_cases hUbot : (Ebar₂ ⊔ Ebar₃ : Subgroup G) = ⊥
+    · -- `Ebar = K`, so `M' = M_σ` and `K = Ebar` complements it.
+      have hEbarK : K = Ebar := by
+        have hsup := h'.eq_sup hG
+        rw [sup_assoc, hUbot, sup_bot_eq] at hsup
+        exact hsup.symm
+      exact typeP_derivedInG_complement_of_eq_complement hG h' hEbarK
+    · -- `E = K ⋉ U` is a Frobenius group with `U = Ebar₂ ⊔ Ebar₃ ≠ 1`, and `U = E' = [E,E]`.
+      have hUleE : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ Ebar := sup_le h'.E₂_le h'.E₃_le
+      have hKleEbar : K ≤ Ebar := h'.E₁_le
+      obtain ⟨hKne, hKnonreg⟩ := E1_not_regular_of_mem_kappa_tau1 hG h'
+        (prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+      have hKprime : ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K := E1_actsPrime hG h' hKne
+      have hKstar' : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ≠ ⊥ :=
+        Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hKprime (le_refl K) hKnonreg
+      have hfrob := isFrobeniusGroup_E_of_caseTau1 hG h' hKne hKstar' hτ3 hUbot
+      have hcompl_Ebar : ((Ebar₂ ⊔ Ebar₃).subgroupOf Ebar).IsComplement' (K.subgroupOf Ebar) :=
+        hfrob.isComplement
+      -- coprime `|K|`, `|U|` and `U ⊓ C(K) = ⊥` (regular action of `K = E₁` on `U`).
+      have hcopKU : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(Ebar₂ ⊔ Ebar₃)) := by
+        have hc := (hfrob.coprime_card_kernel_complement).symm
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleEbar).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleE).toEquiv] at hc
+      have hCUK : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ⊓ Subgroup.centralizer (K : Set G) = ⊥ := by
+        obtain ⟨⟨g₀, hg₀K⟩, hg₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hKne
+        have hg₀1 : g₀ ≠ 1 := fun hc => hg₀ne (Subtype.ext hc)
+        have hr := actsRegularlyOn_E23_E1_of_caseTau1 hG h' hKne hKstar' hτ3 g₀ hg₀K hg₀1
+        rw [fixedByElement_def] at hr
+        rw [eq_bot_iff, ← hr]
+        exact inf_le_inf_left _ (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hg₀K))
+      -- `U = [K, U] ≤ E' = derivedInG Ebar`.
+      haveI hKsolv : IsSolvable ↥K :=
+        solvable_of_solvable_injective (Subgroup.inclusion_injective (hKleEbar.trans h'.E_le))
+      have hUleE' : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ derivedInG Ebar := by
+        have hUcomm : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ ⁅K, Ebar₂ ⊔ Ebar₃⁆ :=
+          OddOrder.BG.Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot
+            (hKleEbar.trans (h'.E23_normal hG)) hcopKU hCUK
+        have hcomm_le : (⁅K, Ebar₂ ⊔ Ebar₃⁆ : Subgroup G) ≤ ⁅Ebar, Ebar⁆ :=
+          Subgroup.commutator_mono hKleEbar hUleE
+        exact hUcomm.trans (le_of_le_of_eq hcomm_le (Subgroup.map_subtype_commutator Ebar).symm)
+      -- `E' = U`: the abstract `commutator_eq_sup` for `Ebar = K ⋉ U` with `K` cyclic.
+      have hcommEbar_eq : (derivedInG Ebar).subgroupOf Ebar = commutator ↥Ebar := by
+        rw [derivedInG, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective Ebar.subtype_injective]
+      have hdEbar : derivedInG Ebar = (Ebar₂ ⊔ Ebar₃ : Subgroup G) := by
+        haveI hUnorm : ((Ebar₂ ⊔ Ebar₃).subgroupOf Ebar).Normal :=
+          Subgroup.normal_subgroupOf_of_le_normalizer (h'.E23_normal hG)
+        have hUcommE : (Ebar₂ ⊔ Ebar₃).subgroupOf Ebar ≤ commutator ↥Ebar := by
+          rw [← hcommEbar_eq]; exact Subgroup.comap_mono hUleE'
+        have hsupcomm := commutator_eq_sup_commutator_of_isComplement' hcompl_Ebar hUcommE
+        have hKbarbot : ⁅K.subgroupOf Ebar, K.subgroupOf Ebar⁆ = ⊥ := by
+          refine Subgroup.commutator_eq_bot_iff_le_centralizer.mpr (fun x hx => ?_)
+          letI : CommGroup ↥K := IsCyclic.commGroup
+          refine Subgroup.mem_centralizer_iff.mpr (fun y hy => Subtype.ext ?_)
+          have hxK : (x : G) ∈ K := Subgroup.mem_subgroupOf.mp hx
+          have hyK : (y : G) ∈ K := Subgroup.mem_subgroupOf.mp hy
+          have hcm := congrArg Subtype.val (mul_comm (⟨(y : G), hyK⟩ : ↥K) (⟨(x : G), hxK⟩ : ↥K))
+          simpa using hcm
+        rw [hKbarbot, sup_bot_eq] at hsupcomm
+        rw [show derivedInG Ebar = (commutator ↥Ebar).map Ebar.subtype from rfl, hsupcomm,
+          Subgroup.map_subgroupOf_eq_of_le hUleE]
+      -- `M' = M_σ ⊔ U`.
+      have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M ⊔ (Ebar₂ ⊔ Ebar₃) := by
+        rw [derivedInG_eq_Msigma_sup_derivedInG_complement hG h', hdEbar]
+      have hcommM : (derivedInG M).subgroupOf M = commutator ↥M := by
+        rw [derivedInG, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+      have hdEbarM : derivedInG Ebar ≤ derivedInG M := by
+        rw [show derivedInG Ebar = ⁅Ebar, Ebar⁆ from Subgroup.map_subtype_commutator Ebar,
+          show derivedInG M = ⁅M, M⁆ from Subgroup.map_subtype_commutator M]
+        exact Subgroup.commutator_mono h'.E_le h'.E_le
+      have hUleM' : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ≤ derivedInG M := hdEbar ▸ hdEbarM
+      -- `M' ⊓ K = ⊥` (coprime `κ` vs `σ ∪ τ₂ ∪ τ₃`, via `M' ⊓ K ≤ E' ⊓ K = U ⊓ K`).
+      have hMKbot : derivedInG M ⊓ K = ⊥ := by
+        have hle1 : derivedInG M ⊓ K ≤ derivedInG Ebar :=
+          (inf_le_inf_left (derivedInG M) hKleEbar).trans
+            (by rw [inf_comm]; exact h'.inf_derivedInG_le_derivedInG)
+        have hbot2 : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ⊓ K = ⊥ := by
+          rw [inf_comm]; exact Subgroup.inf_eq_bot_of_coprime hcopKU
+        exact le_bot_iff.mp ((le_inf (hle1.trans hdEbar.le) inf_le_right).trans hbot2.le)
+      -- `M' ⊔ K = M` (`U ⊔ K = Ebar`, `M_σ ⊔ Ebar = M`).
+      have hUKsup : (Ebar₂ ⊔ Ebar₃ : Subgroup G) ⊔ K = Ebar := by
+        have hsup := hcompl_Ebar.sup_eq_top
+        rw [← Subgroup.subgroupOf_sup hUleE hKleEbar] at hsup
+        exact le_antisymm (sup_le hUleE hKleEbar) (Subgroup.subgroupOf_eq_top.mp hsup)
+      have hMKsup : derivedInG M ⊔ K = M := by
+        refine le_antisymm (sup_le (Subgroup.map_subtype_le _) hKM) ?_
+        calc M = OddOrder.BG.Ch3.S10.Msigma M ⊔ Ebar := h'.E_compl_sup.symm
+          _ ≤ derivedInG M ⊔ K := by
+              refine sup_le ((OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM).trans le_sup_left) ?_
+              rw [← hUKsup]
+              exact sup_le (hUleM'.trans le_sup_left) le_sup_right
+      -- Assemble the complement: disjoint + product covers `↥M` (`M'` normal).
+      have hderM_le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+      rw [hcommM]
+      refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+      · rw [disjoint_iff, ← hcommM,
+          show (derivedInG M).subgroupOf M ⊓ K.subgroupOf M
+            = (derivedInG M ⊓ K).subgroupOf M from rfl, hMKbot, Subgroup.bot_subgroupOf]
+      · have hsuptop : commutator ↥M ⊔ K.subgroupOf M = ⊤ := by
+          rw [← hcommM, ← Subgroup.subgroupOf_sup hderM_le hKM, hMKsup, Subgroup.subgroupOf_self]
+        rw [← Subgroup.normal_mul, hsuptop, Subgroup.coe_top]
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
@@ -7743,9 +7981,17 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
   have hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
-  -- Part (h): `M' = [M,M]` complements `K` in `M` (gated on the Proposition 14.2(a) normal
-  -- complement `U M_σ`; see `notes/bg/s14_typeP_counting.md`).
-  have hparth : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := sorry
+  -- The counting collapse `n = 1` makes `Z = K ⊔ K*` cyclic, hence the Hall `κ`-factor `K`
+  -- cyclic (subgroup of a cyclic group); this is what Proposition 14.2(a)/part (h) consumes.
+  obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ :=
+    exists_partner hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU
+  haveI hZcyc : IsCyclic ↥(K ⊔ Kstar) :=
+    typeP_Z_isCyclic hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  haveI : IsCyclic ↥K :=
+    (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
+  -- Part (h): `M' = [M,M]` complements `K` in `M` (Proposition 14.2(a): `M' = U M_σ`).
+  have hparth : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) :=
+    typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK
   exact ⟨hparth, coprime_card_derived_kappaHall_of_isComplement' hK hparth,
     typeP_partner_existsUnique hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU⟩
 
@@ -7852,4 +8098,3 @@ theorem sigmaLength_one_frobenius_type [Finite G]
   sorry
 
 end OddOrder.BG.Ch4.S14
-
