@@ -1571,3 +1571,48 @@ commit `4aed1736` (+`isPiSubgroup_le_left`), AxiomsCheck 登録、full build 381
 
 **現在地サマリ (2026-06-17)**: typeP_duality endgame の **counting/structural 核 3 件 (typeP1_card_eq + density 不等式 + n=1 collapse) 完了**。
 残り = cyclicity + covering + part(h) + ∃! 組立 = 密結合した最終 assembly (新規の大単位、Prop14.2(a) packaging が part(h) gate)。
+
+### 🤝 引き継ぎ (2026-06-17 再開セッション + /loop 自走、計 11 feature commit) — typeP_duality assembly 進行中
+
+**typeP_duality の counting/structural 核 + 3 conjunct を landing。全 green+axiom-clean、AxiomsCheck 登録済、full build 3817/~65s。**
+working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge** — 機械は大半揃い、残り = >½|G| count + covering + cyclic + part(h) + ∃! 組立。
+
+**本セッション landing 群** (依存順、すべて `S14_TypePCounting.lean`):
+1. **`typeP1_card_eq`** (`4d4851a5`): P1 ⟹ |N|=|N_σ|·|K_N| (σ-part 一意性)。
+2. **`exists_typeP2_member`** (`5634f28c`, step 7): density 不等式 → ∃ type-P2 member。**ℕ-only omega**。helper 6:
+   one_not_mem_Mtilde / one_not_mem_conjClassSet / typeP1_member_Msigma_index_eq / typeP_member_two_mul_index_le /
+   ZFamilyFinset_one_lt_card / density_pieces_ncard_le。
+3. **`family_card_eq_two`** (`4aed1736`, step 8): n=1 collapse → |𝓕|=2。helper `isPiSubgroup_le_left_of_commute`
+   (πᶜ-subgroup ≤ Z=A×B の A factor)。
+4. **`exists_partner`** (`4a861bd2`): |𝓕|=2 → 一意 partner Mstar (∀N member→N=M∨N=Mstar; Finset literal 回避で predicate 形)。
+5. **`isTypeP2_or_isTypeP2_partner`** (`225a93de`, 14.7(f)): IsTypeP2 M ∨ IsTypeP2 Mstar。
+6. **🔑 `partner_canonical_eq`** (`1f85d1ab`, **keystone**): **Z⊓Mstar_σ = K**。helper `kappaHall_primes_subset_sigma_partner`
+   (line X∈ℰ_p¹(K)→partner=Mstar→p∈σ(Mstar))。両 inclusion (isPiSubgroup_le_left + sigma_subgroup_le_Msigma)。
+7. **`typeP_zTilde_isTI`** (`a1718a1c`, 14.7(e) conjunct): IsTISubset (zTilde K Kstar) (K⊔Kstar)。
+   ⋃_{N∈𝓕}(Z⊓N_σ)=K∪Kstar (partner_canonical_eq + typeP_self_member.1) ⟹ zTilde=family-T ⟹ typeP_family_T_isTI。
+8. **`zTilde_ncard_eq`** (`59121a09`): |zTilde|=(|K|−1)(|K*|−1)。helper `nat_mul_sub_kl_identity` (k·l−(k+l−1)=(k−1)(l−1))。
+
+**▶▶ 残り (typeP_duality 完成までの assembly)** — 依存順:
+1. **>½|G| count `Nat.card G < 2·(conjClassSet (zTilde K Kstar)).ncard`** (次の最有力, cyclicity 不要):
+   - **union collapse を `family_inf_msigma_union_eq` に factor out** (typeP_zTilde_isTI の hunion を再利用 lemma 化; ⋃_{N∈𝓕}(Z⊓N_σ)=↑K∪↑Kstar)。
+   - |𝒞_G(zTilde)|=|𝒞_G(family-T)| (zTilde=family-T)=|family-T|·[G:Z] (typeP_family_conjClass_T_count)=|zTilde|·[G:Z]=(|K|−1)(|K*|−1)·[G:Z]。
+   - 算術: |G|=|Z|·[G:Z]=|K||K*|·[G:Z]、需 |K||K*|<2(|K|−1)(|K*|−1)。oddness=`hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)` で |K|,|K*| odd ≥3、coprime (coprime_card_kappaHall_Kstar) で not both 3 ⟹ max≥5。(k−2)(l−2)>2 ⟺ kl<2(k−1)(l−1)。
+2. **covering** (step 10, mmd L4053): H type-P, S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| (上記を H に適用) + |𝒞_G(T)|>½|G|
+   ⟹ 𝒞_G(T)∩𝒞_G(S_H)≠∅ (sum>|G|, both ⊆G) ⟹ WLOG T∩S_H≠∅ ⟹ L*∩K_i*≠1 (∃ common elt) ⟹ Y∈ℰ¹(L*∩K_i*),
+   Prop14.2(c) {H}=𝓜(C_G(Y))={M_i} ⟹ H~M_i (=M or Mstar)。⚠ 大きい (S 機構 + 交差論法 + Prop14.2(c) 適用)。
+3. **cyclic `IsCyclic(K⊔Kstar)`** (deep stack): isCyclic_kappaHall_sup_Kstar_of_cyclic は [IsCyclic K][IsCyclic Kstar] instance 要。
+   K,Kstar cyclic は: type-P2 member の prime |K_i| + 他 factor rank-1 nilpotent。**M_σ nilpotent (Lemma 14.1 = msigma_structure_of_notMem_sigma_kappa、要 (π−σ)−κ の素数 p + max-rank elemAbelian A 構成) → Z nilpotent → rank-1 Sylow cyclic** の stack。⚠ max-rank elemAbelian 構成 helper 未特定 (Ω₁(Sylow))。
+4. **part(h)** (step 11): IsComplement' (derivedInG M).subgroupOf M (K.subgroupOf M) + Coprime。
+   M_σ⊆M' (`Msigma_le_derived`) + Prop14.2(a) の UM_σ=K normal complement ⊆M' + K cyclic ⟹ M'=UM_σ。
+   coprime は `coprime_card_derived_kappaHall_of_isComplement'` で free。**⚠⚠ Prop14.2(a) の UM_σ normal complement は repo 未パッケージ = part(h) の gate (要構築)**。
+5. **∃! Mstar 組立**: witness=Mstar (exists_partner)、uniqueness は Mstar' も partner ⟹ 𝓜(C_G(X))={Mstar} (X∈ℰ¹(K)) で pin
+   (or: covering で Mstar'~Mstar かつ both nonconj M ⟹ ... 要検討、∃! は equality ゆえ conj では不足、𝓜(C_G(X)) singleton 経由)。
+   conjuncts: maximal/typeP/¬conj M (exists_partner+member_data) / Hall κ(Mstar) Kstar (BG(2): Kstar=Hall κ(M*) of M* —
+   要証明, Kstar=Z⊓Mstar_σ=K_{Mstar}* が Hall κ(Mstar)?) / IsCyclic [上記3] / IsTISubset [済 typeP_zTilde_isTI] /
+   P2 dichotomy [済] / covering [上記2]。⚠ 「Kstar が Hall κ(Mstar)」conjunct も要 (Kstar は M_σ-part だが Mstar 視点で κ(Mstar)-Hall)。
+
+**技法メモ (本セッション)**:
+- ℕ subtraction の積を含む等式は generic-variable helper に切り出す (`rw [ha : Nat.card K = a+1]` は product atom を split し omega 不能; lemma param なら `obtain ⟨a,rfl⟩` subst 可)。
+- `{M, Mstar}` Finset literal は statement で DecidableEq (Subgroup G) 要 → predicate 形 `∀N,…→N=M∨N=Mstar` で回避。
+- member_data の `∃KN` witness を `-` で捨てると後続 (hcanon/hne が KN 参照) 壊れる → KN 命名。
+- `Nat.card_coe_set_eq (s:Set) : Nat.card ↥s = s.ncard` + `Nat.card_congr (Equiv.refl _)` で subgroup-coe ↔ subtype card 橋渡し。

@@ -4983,6 +4983,12 @@ family `{M, M*}` the union `⋃ (Z ⊓ N_σ)` collapses to `K ∪ K*` (via `part
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_zTilde_isTI
 
+/-! **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (`S14_TypePCounting`, `zTilde_ncard_eq`): the TI-set
+`Ẑ = Z − (K ∪ K*)` has `(|K| − 1)(|K*| − 1)` elements (`|Z| = |K|·|K*|`, `K ∩ K* = 1`).  The count
+underlying the density bound `|𝒞_G(Ẑ)| > ½|G|`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.zTilde_ncard_eq
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
