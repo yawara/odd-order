@@ -5866,6 +5866,51 @@ theorem typeP_family_isPiElement_mem_Kstar [Finite G] (hG : OddOrder.BG.IsMinima
     (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax)
     (Subgroup.zpowers_le.mpr (hZN haZ)) hpi (Subgroup.mem_zpowers a)
 
+/-- **An internal direct factor absorbs coprime elements** (BG 14.7, the `σ(N)′`-part lands in
+`K_N`): if `Z = A ⊔ B` with `B ≤ C_G(A)` (so `A`, `B` commute), `A` a `πᶜ`-group and `B` a
+`π`-group, then every `πᶜ`-element of `Z` lies in `A`.  Proof: `A ◁ Z` (commuting factor) is a Hall
+`πᶜ`-subgroup of `Z` (`|Z| = |A|·|B|`, index `= |B|` a `π`-number), so the `πᶜ`-group `⟨b⟩ ≤ Z` lies
+in `A` (`isPiGroup_le_of_normal_isHallSubgroup` in `↥Z`).  Applied with `A = K_N` (the `σ(N)′`-Hall
+of `Z`), `B = Kᵢ*`, `π = σ(N)`: the `σ(N)′`-part of any `t ∈ Z` lands in `K_N`. -/
+theorem isPiElementCompl_mem_left_of_commute [Finite G] {A B Z : Subgroup G} {π : Set ℕ}
+    (hswap : Z = A ⊔ B) (hcent : B ≤ Subgroup.centralizer (A : Set G))
+    (hAπc : Subgroup.IsPiSubgroup πᶜ A) (hBπ : Subgroup.IsPiSubgroup π B)
+    {b : G} (hbZ : b ∈ Z) (hbπc : IsPiElement πᶜ b) : b ∈ A := by
+  classical
+  have hAZ : A ≤ Z := by rw [hswap]; exact le_sup_left
+  have hcomm : ∀ a ∈ A, ∀ c ∈ B, Commute a c := fun a ha c hc =>
+    Subgroup.mem_centralizer_iff.mp (hcent hc) a ha
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥B) := by
+    apply Nat.coprime_of_dvd
+    intro p hp hpA hpB
+    exact (hAπc p (Nat.mem_primeFactors.mpr ⟨hp, hpA, Nat.card_pos.ne'⟩))
+      (hBπ p (Nat.mem_primeFactors.mpr ⟨hp, hpB, Nat.card_pos.ne'⟩))
+  have hdisj : A ⊓ B = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
+    rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
+  haveI hAnZ : (A.subgroupOf Z).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAZ).mpr hnorm
+  have hZcard : Nat.card ↥Z = Nat.card ↥A * Nat.card ↥B := by
+    rw [hswap]; exact card_sup_of_commute_of_disjoint hcomm hdisj
+  have hcardSub : Nat.card ↥(A.subgroupOf Z) = Nat.card ↥A :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAZ).toEquiv
+  have hidx : (A.subgroupOf Z).index = Nat.card ↥B := by
+    have hl := Subgroup.card_mul_index (A.subgroupOf Z)
+    rw [hcardSub, hZcard] at hl
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hl
+  have hHall : Ch03.IsHallSubgroup πᶜ (A.subgroupOf Z) := by
+    refine ⟨fun p hp => ?_, fun p hp hpc => ?_⟩
+    · rw [hcardSub] at hp; exact hAπc p hp
+    · exact hpc (hBπ p (by rwa [hidx] at hp))
+  have hbZsub : (Subgroup.zpowers b).subgroupOf Z ≤ A.subgroupOf Z := by
+    refine OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hHall (fun p hp => ?_)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (Subgroup.zpowers_le.mpr hbZ)).toEquiv, Nat.card_zpowers] at hp
+    exact hbπc p hp
+  have hbmem : (⟨b, hbZ⟩ : ↥Z) ∈ (Subgroup.zpowers b).subgroupOf Z :=
+    Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers b)
+  exact Subgroup.mem_subgroupOf.mp (hbZsub hbmem)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
