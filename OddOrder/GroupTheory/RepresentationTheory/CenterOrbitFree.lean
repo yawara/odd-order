@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 
 /-!
@@ -29,6 +30,11 @@ lies in `Fix(β) = {1}`, forcing `C = mk 1`.  No characteristic-0 / Brauer-chara
 
 open OddOrder.Isaacs.Ch04 (glauberman_fixed_point_exists IsCompatibleMulAction)
 open OddOrder.GroupTheory.CenterClassSum
+open OddOrder.GroupTheory.CenterSimplesOrbit (simplesAction exists_fixed_simple
+  card_simples_eq_card_classes card_orbits_classes_eq_card_orbits_simples_comp)
+open OddOrder.GroupTheory.FreeActionOrbitCount (card_orbits_eq_of_free_off_unique_fixed
+  dvd_card_sub_one_of_free_off_unique_fixed orbit_trivial_or_free_of_card_orbits)
+open MulAction
 
 namespace OddOrder.GroupTheory.CenterOrbitFree
 
@@ -91,5 +97,90 @@ theorem map_eq_self_imp_eq_trivial_of_fpf (β : MulAut G)
   -- It is `β`-fixed, hence trivial by `hFPF`; so `C = mk 1`.
   have hβfix : β ω₀.1 = ω₀.1 := Subtype.ext_iff.mp (hω₀ ⟨β, Subgroup.mem_zpowers β⟩)
   rw [← ω₀.2, hFPF ω₀.1 hβfix]
+
+/-! ### 3d.3c: a coprime complement acts freely on the nontrivial simples -/
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **3d.3c: a coprime Frobenius complement acts freely on the nontrivial simples.**
+Let the kernel `G` be finite with splitting `φ : Z(k[G]) ≃ₐ[k] (Fin N → k)`, and let a finite group
+`Γ` (the complement) act through `ψ : Γ →* MulAut G` so that every nonidentity `ψ γ` is
+fixed-point-free on `G` (`hfpf`) with `⟨ψ γ⟩` coprime to `|G|` (`hcop`).  Then on the simples
+`Fin N` (acted on through `simplesAction φ ∘ ψ`, agreement `hsi`) there is a **unique** `Γ`-fixed
+point — the trivial simple `i₀` — and `Γ` acts **freely** off it (every other orbit has size `|Γ|`).
+
+Proof: on the conjugacy classes (agreement `hcl`), `mk 1` is fixed and, by
+`map_eq_self_imp_eq_trivial_of_fpf` (3d.2), is the *only* fixed class, with trivial stabilisers
+elsewhere — so `Γ` is free off `mk 1`.  The orbit count `1 + (#classes − 1)/|Γ|` and divisibility
+`|Γ| ∣ #classes − 1` carry over to the simples by the orbit-count Brauer equality (3d.1) and
+`N = #classes` (N=Ncl); `orbit_trivial_or_free_of_card_orbits` (3d.3a) then forces the simples
+action to be free off a single fixed point, identified as `i₀` by `exists_fixed_simple` (3d.3b). -/
+theorem gamma_free_off_trivial_simple
+    {k : Type*} [Field k] {N : ℕ}
+    (φ : Subalgebra.center k (MonoidAlgebra k G) ≃ₐ[k] (Fin N → k))
+    {Γ : Type*} [Group Γ] [Finite Γ] (ψ : Γ →* MulAut G)
+    [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)]
+    [MulAction Γ (ConjClasses G)] [MulAction Γ (Fin N)]
+    (hcl : ∀ (γ : Γ) (C : ConjClasses G), γ • C = ψ γ • C)
+    (hsi : ∀ (γ : Γ) (i : Fin N), γ • i = simplesAction φ (ψ γ) i)
+    (hd : 1 < Nat.card Γ)
+    (hcop : ∀ γ : Γ, γ ≠ 1 → Nat.Coprime (Nat.card ↥(Subgroup.zpowers (ψ γ))) (Nat.card G))
+    (hfpf : ∀ γ : Γ, γ ≠ 1 → ∀ x : G, ψ γ x = x → x = 1) :
+    ∃ i₀ : Fin N, i₀ ∈ fixedPoints Γ (Fin N) ∧
+      (∀ i : Fin N, i ∈ fixedPoints Γ (Fin N) → i = i₀) ∧
+      (∀ i : Fin N, i ∉ fixedPoints Γ (Fin N) → Nat.card (orbit Γ i) = Nat.card Γ) := by
+  classical
+  obtain ⟨γ₀, hγ₀⟩ : ∃ γ : Γ, γ ≠ 1 :=
+    haveI : Nontrivial Γ := Finite.one_lt_card_iff_nontrivial.mp hd
+    exists_ne 1
+  -- CLASS SIDE: `Γ` is free off the trivial class `mk 1`.
+  have hx₀ : (ConjClasses.mk 1 : ConjClasses G) ∈ fixedPoints Γ (ConjClasses G) :=
+    mem_fixedPoints.mpr fun γ => by rw [hcl, mulAut_smul_mk, map_one]
+  have huniqC : ∀ C : ConjClasses G, C ∈ fixedPoints Γ (ConjClasses G) → C = ConjClasses.mk 1 :=
+    fun C hC => map_eq_self_imp_eq_trivial_of_fpf (ψ γ₀) (hcop γ₀ hγ₀) (hfpf γ₀ hγ₀)
+      (by rw [← hcl]; exact mem_fixedPoints.mp hC γ₀)
+  have hfreeC : ∀ C : ConjClasses G, C ∉ fixedPoints Γ (ConjClasses G) →
+      Nat.card (orbit Γ C) = Nat.card Γ := by
+    intro C hC
+    have hstab : stabilizer Γ C = ⊥ := by
+      rw [eq_bot_iff]
+      intro γ hγ
+      by_contra hγ1
+      have hγne : γ ≠ 1 := fun h => hγ1 (Subgroup.mem_bot.mpr h)
+      have hCmk : C = ConjClasses.mk 1 :=
+        map_eq_self_imp_eq_trivial_of_fpf (ψ γ) (hcop γ hγne) (hfpf γ hγne)
+          (by rw [← hcl]; exact mem_stabilizer_iff.mp hγ)
+      rw [hCmk] at hC; exact hC hx₀
+    calc Nat.card (orbit Γ C)
+        = Nat.card (Γ ⧸ stabilizer Γ C) := Nat.card_congr (orbitEquivQuotientStabilizer Γ C)
+      _ = Nat.card (Γ ⧸ (⊥ : Subgroup Γ)) := by rw [hstab]
+      _ = Nat.card Γ := Nat.card_congr QuotientGroup.quotientBot.toEquiv
+  -- carry the orbit count and divisibility from classes to simples.
+  have horbC := card_orbits_eq_of_free_off_unique_fixed (ConjClasses.mk 1) hx₀ huniqC hfreeC
+  have hdvdC := dvd_card_sub_one_of_free_off_unique_fixed (ConjClasses.mk 1) hx₀ huniqC hfreeC
+  have hBr := card_orbits_classes_eq_card_orbits_simples_comp φ ψ hcl hsi
+  have hNcl : Nat.card (Fin N) = Nat.card (ConjClasses G) := by
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_fin]
+    exact card_simples_eq_card_classes φ
+  have horbS : Nat.card (orbitRel.Quotient Γ (Fin N))
+      = 1 + (Nat.card (Fin N) - 1) / Nat.card Γ := by rw [← hBr, horbC, hNcl]
+  have hdvdS : Nat.card Γ ∣ Nat.card (Fin N) - 1 := by rw [hNcl]; exact hdvdC
+  haveI : Nonempty (Fin N) := by
+    have hpos : 0 < Nat.card (Fin N) := by
+      rw [hNcl]; haveI : Nonempty (ConjClasses G) := ⟨ConjClasses.mk 1⟩; exact Nat.card_pos
+    rw [Nat.card_eq_fintype_card, Fintype.card_fin] at hpos
+    exact Fin.pos_iff_nonempty.mp hpos
+  -- 3d.3a: every simples orbit has size `1` or `|Γ|`, with at most one fixed point.
+  obtain ⟨hsize, hatmost⟩ := orbit_trivial_or_free_of_card_orbits hd horbS hdvdS
+  -- 3d.3b: the trivial simple `i₀` is `Γ`-fixed.
+  obtain ⟨i₀, hi₀⟩ := exists_fixed_simple φ
+  have hi₀fix : i₀ ∈ fixedPoints Γ (Fin N) :=
+    mem_fixedPoints.mpr fun γ => by rw [hsi]; exact hi₀ (ψ γ)
+  refine ⟨i₀, hi₀fix, fun i hi => hatmost i i₀ hi hi₀fix, fun i hi => ?_⟩
+  rcases hsize i with h1 | hdd
+  · haveI : Fintype (orbit Γ i) := Fintype.ofFinite _
+    exact absurd (mem_fixedPoints_iff_card_orbit_eq_one.mpr
+      (by rw [← Nat.card_eq_fintype_card]; exact h1)) hi
+  · exact hdd
 
 end OddOrder.GroupTheory.CenterOrbitFree

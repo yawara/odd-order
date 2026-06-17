@@ -9,7 +9,12 @@
     statements are genuine.
   - Both corollaries proved from the main formula (antitone fixed points +
     `Subgroup.eq_top_of_card_eq`).
-- ❌ **Main `wielandt_fixedPoint_frobenius` = the sole remaining sorry.**
+- ✅ **I-1 abstract backbone COMPLETE** (2026-06-18, resume⁵): the Teichmüller-free orbit-count
+  Brauer lemma is fully assembled at the abstract level — `CenterSimplesOrbit.exists_fixed_simple`
+  (3d.3b), `card_simples_eq_card_classes` (N=Ncl), `FreeActionOrbitCount.dvd_card_sub_one_of_free_…`,
+  `CenterOrbitFree.gamma_free_off_trivial_simple` (3d.3c). All sorry-free + axiom-clean. See resume⁵.
+- ❌ **Main `wielandt_fixedPoint_frobenius` = the sole remaining sorry.** Next = carrier-level wiring
+  of 3d.3c + (†) [I-2 isotypic + I-4 base change + I-3] + I-5; a DESIGN phase (see resume⁵ "NEXT").
 
 ## 2026-06-17 (resume³) — I-1 step (2) COMPLETE; step (3)/(4) plan
 
@@ -209,6 +214,43 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
 `Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
 of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a
 separate fact.
+
+## 2026-06-18 (resume⁵) — I-1 abstract backbone COMPLETE (3d.3b + 3d.3c landed)
+
+Both remaining step-3d pieces landed (sorry-free, axiom-clean = {propext, Classical.choice,
+Quot.sound}), so the **Teichmüller-free orbit-count Brauer lemma is complete at the abstract level**
+(the original "char-0 lifting wall" is dissolved — never needed):
+
+- **3d.3b assembly** (`1ba00224`, `CenterSimplesOrbit.exists_fixed_simple`): the trivial simple `i₀`
+  is `MulAut G`-fixed. Built the augmentation `aug : Z(k[G]) →ₐ[k] k` = `MonoidAlgebra.lift 1`
+  restricted to the centre (`aug`/`aug_apply`), proved `centerRep`-invariance `aug_centerRep` (via
+  `lift_one_comp_domCongrAut`: `lift 1 ∘ domCongrAut α = lift 1` by `algHom_ext` on `single`), applied
+  `PiAlgebraAut.algHom_pi_eq_eval` to `aug ∘ φ.symm` to name `i₀`, and `centerRep_apply_symm_single`
+  forces `simplesAction φ α i₀ = i₀`. **No block theory.**
+- **N=Ncl** (`93a83924`, `CenterSimplesOrbit.card_simples_eq_card_classes`): `N = #(ConjClasses G)`
+  via `Module.finrank_eq_card_basis` on `idemBasis φ`/`centerBasis'`. Needs `include φ in` (statement
+  doesn't mention `φ`/`k`).
+- **divisibility** (`93a83924`, `FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed`):
+  free-off-unique-fixed ⟹ `|Γ| ∣ |S|−1` (split off `⟦x₀⟧`: `|S| = 1 + (#orbits−1)·|Γ|`). Feeds 3d.3a.
+- **3d.3c combine** (`93a83924`, `CenterOrbitFree.gamma_free_off_trivial_simple`): finite `Γ` via
+  `ψ : Γ →* MulAut G` (each nonid `ψ γ` FPF + `⟨ψ γ⟩` coprime) ⟹ on `Fin N`, `i₀` unique fixed +
+  free off it. Class side free-off-`mk 1` (3d.2 ×2: uniqueness + trivial stabilisers via
+  `orbitEquivQuotientStabilizer` + `quotientBot`); `card_orbits_eq_of_free_off_unique_fixed` +
+  divisibility carry to simples by Brauer (3d.1) + N=Ncl; 3d.3a ⟹ free-off-single-fixed; 3d.3b names
+  it `i₀`. Caller supplies `Γ`-actions by `compHom` (agreement `hcl`/`hsi` by `rfl`).
+
+**NEXT — carrier-level, requires DESIGN (not a mechanical loop):**
+1. **Wire 3d.3c to the real carrier**: in `CoprimeAction`, kernel `U` + complement `E` of Frobenius
+   `L = U ⋊ E`; `ψ = E → MulAut U` (conjugation, each nonid FPF by Frobenius + coprime); splitting
+   `φ : Z(𝔽̄_p[U]) ≃ₐ (Fin N → 𝔽̄_p)` from `exists_center_algEquiv_pi` (needs `IsAlgClosed`,
+   `char ∤ |U|`); `compHom` actions on classes / `Fin N`.
+2. **(†)** `W^U = 0 ⟹ dim W = |E|·dim W^E`: I-2 isotypic decomposition of `𝔽̄_p[U]`-module `W`
+   (mathlib `IsSemisimpleModule`/Maschke), drop trivial isotypic (= `W^U = 0`), `E` permutes the rest
+   freely (3d.3c) ⟹ per-orbit I-3 (`finrank_eq_card_mul_finrank_invariants`).
+3. **I-4 base change** `𝔽_p → 𝔽̄_p` (chief factors live over `𝔽_p`). **Likely the real hard wall now**;
+   repo/mathlib coverage TBD.
+4. **(I-5)** chief-series multiplicativity `|C_H(X)| = ∏ |C_{V_i}(X)|` (keystone Cor 3.28 exists).
+5. assembly → `wielandt_fixedPoint_frobenius` (`CoprimeAction.lean` sole sorry).
 
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 

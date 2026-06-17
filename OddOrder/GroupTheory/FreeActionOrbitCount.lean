@@ -245,4 +245,43 @@ theorem card_orbits_eq_of_free_off_unique_fixed
   rw [show Nat.card S - 1 = d * m' from hdm'.symm, Nat.mul_div_cancel_left _ hd_pos]
   omega
 
+omit [Finite Γ] in
+/-- **Divisibility from a free-off-unique-fixed action.**  If a finite group `Γ` acts on a finite
+`S` with a unique fixed point `x₀` and acts freely off it, then `|Γ|` divides `|S| − 1`: the
+non-fixed points split into free orbits, each of size `|Γ|`.  (For Peterfalvi (9.1): the
+divisibility hypothesis `d ∣ |S| − 1` that `orbit_trivial_or_free_of_card_orbits` needs on simples,
+obtained from the free structure on the class side and carried over by `|simples| = |classes|`.) -/
+theorem dvd_card_sub_one_of_free_off_unique_fixed
+    (x₀ : S) (hx₀ : x₀ ∈ fixedPoints Γ S)
+    (huniq : ∀ x : S, x ∈ fixedPoints Γ S → x = x₀)
+    (hfree : ∀ x : S, x ∉ fixedPoints Γ S → Nat.card (orbit Γ x) = Nat.card Γ) :
+    Nat.card Γ ∣ Nat.card S - 1 := by
+  classical
+  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  set d := Nat.card Γ with hd_def
+  -- orbit sizes sum to `|S|`; the fixed orbit `⟦x₀⟧` has size `1`, every other orbit size `d`.
+  have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
+    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+      fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
+    rw [← Nat.card_sigma]
+    exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
+  have h1 : Nat.card (orbitRel.Quotient.orbit (Quotient.mk'' x₀ : orbitRel.Quotient Γ S)) = 1 := by
+    rw [orbitRel.Quotient.orbit_mk, orbit_eq_singleton_of_mem_fixedPoints hx₀, Nat.card_coe_set_eq,
+      Set.ncard_singleton]
+  have hd_orbit : ∀ ω : orbitRel.Quotient Γ S, ω ≠ Quotient.mk'' x₀ → Nat.card ω.orbit = d := by
+    intro ω hne
+    obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
+    rw [orbitRel.Quotient.orbit_mk]
+    exact hfree a fun hmem => hne (by rw [huniq a hmem])
+  -- splitting off `⟦x₀⟧`: `|S| = 1 + (#orbits − 1)·d`.
+  have hsplit : Nat.card S = 1 + (Nat.card (orbitRel.Quotient Γ S) - 1) * d := by
+    have hx₀mem := Finset.mem_univ (Quotient.mk'' x₀ : orbitRel.Quotient Γ S)
+    rw [← hsum, ← Finset.add_sum_erase _ _ hx₀mem, h1]
+    congr 1
+    rw [Finset.sum_congr rfl (fun ω hω => hd_orbit ω (Finset.ne_of_mem_erase hω)),
+      Finset.sum_const, smul_eq_mul, Finset.card_erase_of_mem (Finset.mem_univ _),
+      Finset.card_univ, Nat.card_eq_fintype_card]
+  rw [hsplit, Nat.add_sub_cancel_left]
+  exact dvd_mul_left d _
+
 end OddOrder.GroupTheory.FreeActionOrbitCount
