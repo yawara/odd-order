@@ -1616,3 +1616,22 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 - `{M, Mstar}` Finset literal は statement で DecidableEq (Subgroup G) 要 → predicate 形 `∀N,…→N=M∨N=Mstar` で回避。
 - member_data の `∃KN` witness を `-` で捨てると後続 (hcanon/hne が KN 参照) 壊れる → KN 命名。
 - `Nat.card_coe_set_eq (s:Set) : Nat.card ↥s = s.ncard` + `Nat.card_congr (Equiv.refl _)` で subgroup-coe ↔ subtype card 橋渡し。
+
+### ✅✅ >½|G| density bound COMPLETE (2026-06-17 lane-h 再開セッション², commit `b2fc3c18`) — counting heart 着地、🛑 残り = 設計判断 3 件
+
+**LAUNCH GATE objective (VERDICT=LOOP_THEN_STOP) を 1 iteration で完遂。両 deliverable sorry-free + axiom-clean + AxiomsCheck 登録、full build green 3838/67.5s。GATE の stop-when (typeP_duality 本体組立の前で停止) に正確に到達 → 🛑 STOP。**
+
+**landing 群** (`S14_TypePCounting.lean`):
+1. **`family_inf_msigma_union_eq`** (14.7(e) 補題抽出): `⋃_{N∈𝓕}(Z⊓N_σ)=↑K∪↑Kstar`。`typeP_zTilde_isTI` の `hunion` 証明を standalone 化 (typeP_self_member + partner_canonical_eq)。`typeP_zTilde_isTI` を cite 形に refactor。
+2. **`typeP_zTilde_conjClass_gt_half`** (density bound, mmd L3975/L4051): **`Nat.card G < 2·(conjClassSet (zTilde K Kstar)).ncard`**。
+   - chain: `|𝒞_G(Ẑ)|=|Ẑ|·[G:Z]` (`ncard_conjClassSet_of_isTISubset` + `typeP_zTilde_isTI` + hstab[Ẑ=T 経由で `typeP_family_Z_normalizes_T` 転送]) = `(k−1)(k*−1)·[G:Z]` (`zTilde_ncard_eq`); `|G|=k·k*·[G:Z]` (`card_kappaHall_sup_Kstar`+`card_mul_index`); reduces to ℕ ineq `k·k*<2(k−1)(k*−1)`。
+   - **`card_kkstar_lt`** (private ℕ arith): coprime odd k,l>1 ⟹ k·l<2(k−1)(l−1)。`Odd` で `k=2a+1,l=2b+1` subst → `2a+2b+1<4ab` を `2≤a∨2≤b` で casing + `Nat.mul_le_mul`+omega (ab を atom 扱い) → `nlinarith [key]`。唯一失敗の odd pair ≥3 は k=l=3 (coprime `by decide` 排除 ⟹ 一方 ≥5)。
+   - 入力: `k=|K|>1` = prime p∈κ(M) ∣ |K| (typeP 展開, typeP_family_Z_lt_member ミラー); `k*=|K*|>1` = `typeP_structure ….2.1` (K*≠⊥); coprime = `coprime_card_kappaHall_Kstar`; odd = `hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)`。
+
+**技法メモ**: (i) `mul_lt_mul_of_pos_right harith hidx_pos` で `(K⊔Kstar).index` を両辺に乗せ `mul_assoc` で締め。(ii) hstab は zTilde を `rw [hzeq]` で family-T 形に直してから `typeP_family_Z_normalizes_T` (zTilde 用 normalizer 補題を新設不要)。(iii) `IsTypeP M` = `(kappa M).Nonempty`; `p∈kappa M` 展開 = `p.Prime ∧ p∈τ₁∪τ₃ ∧ ∃P∈ℰ¹, P≤M ∧ Mσ⊓C(P)≠⊥`。
+
+**🛑🛑 残り = typeP_duality 本体組立 (FT consume sorry S14:7160) = 設計判断 3 件 (sorry 退避せず STOP, [[feedback-no-avoiding-hard-parts]])**:
+1. **`IsCyclic (K⊔Kstar)` の根拠** — `isCyclic_kappaHall_sup_Kstar_of_cyclic` は `[IsCyclic K][IsCyclic Kstar]` instance 要。K,Kstar cyclic は type-P2 member の prime |K_i| + 他 factor rank-1 nilpotent。**⚠ max-rank elemAbelian (Ω₁ of Sylow) 構成 helper 未特定** = M_σ nilpotent (Lem 14.1)→Z nilpotent→rank-1 Sylow cyclic の stack の起点。**設計判断 = この Ω₁ helper をどう建てるか (BG §1/§12 由来の rank-1⟹cyclic 経路)。**
+2. **part(h) `IsComplement' (derivedInG M).subgroupOf M (K.subgroupOf M)`** — M_σ⊆M' (`Msigma_le_derived`) + **Prop14.2(a) の UM_σ=K normal complement** ⊆M' + K cyclic ⟹ M'=UM_σ。**⚠⚠ Prop14.2(a) の UM_σ normal complement は repo 未パッケージ** (E-setup 断片のみ; 要構築) = part(h) の gate。coprime は `coprime_card_derived_kappaHall_of_isComplement'` で free。**設計判断 = Prop14.2(a) packaging を S14 に建てるか別 leaf か。**
+3. **∃! Mstar 一意性の出どころ** — witness=Mstar (`exists_partner`); covering (step 10, mmd L4053: S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| [本 commit の bound を H に適用] + |𝒞_G(Ẑ)|>½|G| ⟹ 𝒞 交差≠∅ ⟹ Prop14.2(c)) で global conj。uniqueness は equality ゆえ conj では不足 → `𝓜(C_G(X))={Mstar}` (X∈ℰ¹(K)) で pin。**設計判断 = uniqueness の正確な pin (covering ＋ 𝓜-singleton の組合せ)。** + conjunct「Kstar が Hall κ(Mstar)」も要 (Kstar=Z⊓Mstar_σ が κ(Mstar)-Hall?)。
+- **density bound (本 commit) は covering の左辺 (|𝒞_G(Ẑ)|>½|G|) を供給済。covering は本 bound を H(任意 type-P)に適用するだけ** — 設計判断は uniqueness の組立方。
