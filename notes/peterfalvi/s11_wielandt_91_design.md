@@ -137,6 +137,53 @@ not just a single `⟨e⟩`).
 I-3 + I-4 + I-5 + the main-formula glue); step 3a/3b are reusable infra, sorry-count-neutral so far.
 Loop cadence was 60s (no external gate). `bin/count-sorry` = 139.
 
+## 2026-06-17 (resume⁴) — steps 1-4 DONE: the Brauer orbit equality landed
+
+Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`, sorry-free,
+`#print axioms` = {propext, Classical.choice, Quot.sound}):
+
+- `idemBasis φ : Basis (Fin N) k (CenterCarrier k G)` = `(Pi.basisFun k (Fin N)).map
+  φ.symm.toLinearEquiv` (the primitive-idempotent basis, retyped over `CenterCarrier`).
+- `centerRep'_apply_idemBasis` = simples-side `hρ`: `centerRep' g (idemBasis φ i) =
+  idemBasis φ (simplesAction φ g i)` (massage `idemBasis φ j = φ.symm (Pi.single j 1)` via
+  `Basis.map_apply` + `Pi.basisFun_apply`, then `centerRep_apply_symm_single`).
+- `finrank_centerRep_invariants_eq_card_orbits_simples` = cornerstone applied to `idemBasis`:
+  `dim Z^{MulAut G} = #(MulAut G-orbits on Fin N)`. **Stated with `[MulAction (MulAut G) (Fin N)]`
+  + `hact : ∀ g i, g • i = simplesAction φ g i` as decoupled hypotheses** (rather than a
+  term-dependent instance keyed on `φ`): the caller supplies `MulAction.compHom (Fin N)
+  (simplesAction φ)`, for which `hact` holds by `rfl` (`compHom_smul_def` + `Perm.smul_def`).
+- `card_orbits_classes_eq_card_orbits_simples` = **the orbit-count Brauer equality**
+  `#(orbits on ConjClasses G) = #(orbits on Fin N)` — both sides `= dim Z^{MulAut G}` (class-sum and
+  idempotent bases), so they agree. No char-0 / Teichmüller.
+
+**NEXT — step 3d (counting bridge), toward (†):**
+1. ✅ **DONE (3d.1, `78f8c86f`)** — orbit equality for an arbitrary acting group via a hom
+   `ψ : Γ →* MulAut G`: `centerRepComp ψ = centerRep'.comp ψ : Representation k Γ (CenterCarrier k G)`
+   (a `Representation` IS a `MonoidHom` to `Module.End`, so `MonoidHom.comp` typechecks; ascription
+   pins the carrier), cornerstone twice ⟹ `card_orbits_classes_eq_card_orbits_simples_comp :
+   #(Γ-orbits on classes) = #(Γ-orbits on simples)`. For `Γ = ↥(Subgroup.zpowers e)`,
+   `ψ = Subgroup.subtype`, `compHom`-action on `Fin N`, the agreement hyps `hcl`/`hsi` hold by `rfl`.
+2. **NEXT (3d.2) — "coprime-FPF automorphism fixes only the trivial class":** for `α : MulAut G`
+   coprime to `|G|` with `Fix_G(α) = {1}` (FPF), an `α`-fixed class `C` is trivial. **Tool FOUND
+   (no wall): `OddOrder.Isaacs.Ch04.glauberman_fixed_point_exists`** (Isaacs Lem 3.24(a),
+   `ForwardFromCh03.lean:180`) = coprime + one-solvable + `G`-transitive `Ω` + `IsCompatibleMulAction
+   φ Ω` ⟹ `∃ α-fixed ω`. **Construction** (~60-80 lines, pattern = `glauberman_fixed_points_conj`
+   `:330`): take `Ω := {y : G // ConjClasses.mk y = C}`; `MulAction G Ω` by conjugation
+   (`g•⟨y,_⟩ = ⟨g*y*g⁻¹,_⟩`, class-preserving), transitive (any two reps of `C` are conjugate);
+   `MulAction A Ω` via `φ` where `A = ↥(zpowers α)` (well-defined since `α` fixes `C` ⟹ every
+   `α^n` does); compatibility `a•(g•ω) = φ a g • (a•ω)` (`α(gyg⁻¹) = α(g)α(y)α(g)⁻¹`); nonempty
+   (`C.out`). Glauberman ⟹ `α`-fixed `y ∈ C` ⟹ `y ∈ Fix(α) = {1}` ⟹ `C = mk 1` trivial.
+   ⟹ `⟨e⟩` free on the `Ncl−1` nontrivial classes ⟹ `#orbits-classes = 1 + (Ncl−1)/d`.
+3. **(3d.3) transfer:** Brauer equality (3d.1) + `Nsimples = Ncl` ⟹ `#orbits-simples = 1 + (Ncl−1)/d`
+   ⟹ (the trivial simple is a `Γ`-fixed singleton orbit + every other orbit size `| d`, summing to
+   `Ncl−1` in `(Ncl−1)/d` orbits ⟹ all size `d`) ⟹ `⟨e⟩` (hence `E`) free on nontrivial simples ⟹
+   feed I-3 ⟹ (†).  Needs an abstract free-action orbit-count arithmetic lemma + identifying the
+   trivial simple's index as `Γ`-fixed.
+
+`Nsimples = Ncl`: `idemBasis` is indexed by `Fin N` and `centerBasis` by `ConjClasses G`, both bases
+of the same `Z(k[G])`, so `N = #(ConjClasses G)` (equal `finrank`) — the `dim`-equality, not a
+separate fact.
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**

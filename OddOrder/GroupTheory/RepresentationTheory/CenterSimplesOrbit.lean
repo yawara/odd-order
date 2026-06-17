@@ -22,8 +22,8 @@ automorphism `autCongr φ (...)` of `Fin N → k`, which permutes the standard i
 `simplesAction φ g` (`algAutPerm_apply_single`).
 -/
 
-open OddOrder.GroupTheory.CenterClassSum (centerRep centerEnd CenterCarrier centerRep'
-  finrank_centerRep_invariants_eq_card_orbits)
+open OddOrder.GroupTheory.CenterClassSum (centerRep centerEnd CenterCarrier centerRep' centerBasis'
+  centerRep'_apply_centerBasis' finrank_centerRep_invariants_eq_card_orbits)
 open OddOrder.GroupTheory.PiAlgebraAut (algAutPerm algAutPerm_apply_single)
 open OddOrder.GroupTheory.PermutationInvariants (finrank_invariants_eq_card_orbits)
 open Module MulAction
@@ -112,5 +112,68 @@ theorem card_orbits_classes_eq_card_orbits_simples
       = Nat.card (orbitRel.Quotient (MulAut G) (Fin N)) := by
   rw [← finrank_centerRep_invariants_eq_card_orbits (k := k) (G := G)]
   exact finrank_centerRep_invariants_eq_card_orbits_simples φ hact
+
+/-! ### The orbit equality for a subgroup / arbitrary acting group
+
+For the kernel-FPF count (†) we need the orbit equality not for all of `MulAut G` but for a single
+conjugation automorphism `e` (equivalently the cyclic group `⟨e⟩`).  We generalise to an arbitrary
+group `Γ` acting through a hom `ψ : Γ →* MulAut G`: precomposing `centerRep'` with `ψ` gives a
+`Representation k Γ` (a `Representation` is an `abbrev` for the `MonoidHom`, so `MonoidHom.comp`
+typechecks), and the cornerstone applies to both bases as before.  Taking
+`Γ = ↥(Subgroup.zpowers e)` with `ψ = Subgroup.subtype` (the agreement hypotheses then hold by
+`rfl`) specialises to `⟨e⟩`. -/
+
+section CompOrbitCount
+
+variable {Γ : Type*} [Group Γ] (ψ : Γ →* MulAut G)
+
+/-- `centerRep'` precomposed with `ψ : Γ →* MulAut G`, viewed as a representation of `Γ` on the
+centre (the type ascription is what lets `Representation.invariants` resolve the carrier). -/
+noncomputable def centerRepComp : Representation k Γ (CenterCarrier k G) := centerRep'.comp ψ
+
+-- See `card_orbits_classes_eq_card_orbits_simples` for why the in-type linters are suppressed.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- Class-sum side, for a `Γ`-action factoring through `ψ : Γ →* MulAut G`. -/
+theorem finrank_centerRepComp_invariants_eq_card_orbits_classes
+    [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)]
+    [MulAction Γ (ConjClasses G)]
+    (hcl : ∀ (γ : Γ) (C : ConjClasses G), γ • C = ψ γ • C) :
+    finrank k ↥(Representation.invariants (centerRepComp (k := k) ψ))
+      = Nat.card (orbitRel.Quotient Γ (ConjClasses G)) := by
+  refine finrank_invariants_eq_card_orbits centerBasis' (centerRepComp (k := k) ψ) ?_
+  intro γ C
+  change centerRep' (ψ γ) (centerBasis' C) = centerBasis' (γ • C)
+  rw [hcl γ C]
+  exact centerRep'_apply_centerBasis' (ψ γ) C
+
+/-- Simples side, for a `Γ`-action factoring through `ψ : Γ →* MulAut G`. -/
+theorem finrank_centerRepComp_invariants_eq_card_orbits_simples [MulAction Γ (Fin N)]
+    (hsi : ∀ (γ : Γ) (i : Fin N), γ • i = simplesAction φ (ψ γ) i) :
+    finrank k ↥(Representation.invariants (centerRepComp (k := k) ψ))
+      = Nat.card (orbitRel.Quotient Γ (Fin N)) := by
+  refine finrank_invariants_eq_card_orbits (idemBasis φ) (centerRepComp (k := k) ψ) ?_
+  intro γ i
+  change centerRep' (ψ γ) (idemBasis φ i) = idemBasis φ (γ • i)
+  rw [hsi γ i]
+  exact centerRep'_apply_idemBasis φ (ψ γ) i
+
+-- See `card_orbits_classes_eq_card_orbits_simples` for why the in-type linters are suppressed.
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **The orbit-count Brauer equality for a `Γ`-action** (factoring through `ψ : Γ →* MulAut G`):
+`#(Γ-orbits on ConjClasses G) = #(Γ-orbits on Fin N)`.  Both equal `dim Z(k[G])^Γ`.  Specialises the
+full-`MulAut G` equality; for `Γ = ↥(Subgroup.zpowers e)` (with `ψ = Subgroup.subtype` and the
+`compHom` action on `Fin N`) the agreement hypotheses `hcl`/`hsi` hold by `rfl`. -/
+theorem card_orbits_classes_eq_card_orbits_simples_comp
+    [Fintype G] [DecidableEq G] [Fintype (ConjClasses G)] [DecidableEq (ConjClasses G)]
+    [MulAction Γ (ConjClasses G)] [MulAction Γ (Fin N)]
+    (hcl : ∀ (γ : Γ) (C : ConjClasses G), γ • C = ψ γ • C)
+    (hsi : ∀ (γ : Γ) (i : Fin N), γ • i = simplesAction φ (ψ γ) i) :
+    Nat.card (orbitRel.Quotient Γ (ConjClasses G)) = Nat.card (orbitRel.Quotient Γ (Fin N)) := by
+  rw [← finrank_centerRepComp_invariants_eq_card_orbits_classes (k := k) ψ hcl]
+  exact finrank_centerRepComp_invariants_eq_card_orbits_simples (k := k) φ ψ hsi
+
+end CompOrbitCount
 
 end OddOrder.GroupTheory.CenterSimplesOrbit
