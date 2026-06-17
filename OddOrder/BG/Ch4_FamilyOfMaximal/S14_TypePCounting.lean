@@ -6972,6 +6972,43 @@ theorem typeP_zTilde_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hzeq]
   exact typeP_family_T_isTI hG hM hP hKM hK hKstar hU
 
+/-- Pure `ℕ` identity for the `|Ẑ|` count: `k·l − (k + l − 1) = (k − 1)(l − 1)` for `k, l ≥ 1`. -/
+private theorem nat_mul_sub_kl_identity {k l : ℕ} (hk : 1 ≤ k) (hl : 1 ≤ l) :
+    k * l - (k + l - 1) = (k - 1) * (l - 1) := by
+  obtain ⟨a, rfl⟩ := Nat.exists_eq_add_of_le hk
+  obtain ⟨b, rfl⟩ := Nat.exists_eq_add_of_le hl
+  have h1 : (1 + a) * (1 + b) = a * b + a + b + 1 := by ring
+  have h2 : (1 + a - 1) * (1 + b - 1) = a * b := by simp
+  omega
+
+/-- **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (mmd L4051): the TI-set `Ẑ = Z − (K ∪ K*)` has
+`(|K| − 1)(|K*| − 1)` elements.  `|Z| = |K|·|K*|` (`card_kappaHall_sup_Kstar`), `K ∩ K* = 1`
+(`kappaHall_inf_Kstar_eq_bot`) so `|K ∪ K*| = |K| + |K*| − 1`, and `|Ẑ| = |Z| − |K ∪ K*|`.
+This is the cardinality the density bound `|𝒞_G(Ẑ)| = (1 − 1/k)(1 − 1/k*)|G| > ½|G|` rests on. -/
+theorem zTilde_ncard_eq [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (zTilde K Kstar).ncard = (Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1) := by
+  classical
+  have hsub : ((K : Set G) ∪ (Kstar : Set G)) ⊆ ((K ⊔ Kstar : Subgroup G) : Set G) :=
+    Set.union_subset (SetLike.coe_subset_coe.mpr le_sup_left)
+      (SetLike.coe_subset_coe.mpr le_sup_right)
+  have hZc : ((K ⊔ Kstar : Subgroup G) : Set G).ncard = Nat.card ↥K * Nat.card ↥Kstar := by
+    rw [← Nat.card_coe_set_eq]
+    exact (Nat.card_congr (Equiv.refl _)).symm.trans (card_kappaHall_sup_Kstar hKM hK hKstar)
+  have hKc : (K : Set G).ncard = Nat.card ↥K := by
+    rw [← Nat.card_coe_set_eq]; exact (Nat.card_congr (Equiv.refl _)).symm
+  have hKstarc : (Kstar : Set G).ncard = Nat.card ↥Kstar := by
+    rw [← Nat.card_coe_set_eq]; exact (Nat.card_congr (Equiv.refl _)).symm
+  have hinter : (K : Set G) ∩ (Kstar : Set G) = {1} := by
+    rw [← Subgroup.coe_inf, kappaHall_inf_Kstar_eq_bot hKM hK hKstar, Subgroup.coe_bot]
+  have hunion : ((K : Set G) ∪ (Kstar : Set G)).ncard = Nat.card ↥K + Nat.card ↥Kstar - 1 := by
+    have h := Set.ncard_union_add_ncard_inter (K : Set G) (Kstar : Set G)
+    rw [hinter, Set.ncard_singleton, hKc, hKstarc] at h
+    omega
+  rw [zTilde, Set.ncard_diff hsub, hZc, hunion]
+  exact nat_mul_sub_kl_identity Nat.card_pos Nat.card_pos
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
