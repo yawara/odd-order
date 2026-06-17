@@ -1635,3 +1635,19 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 2. **part(h) `IsComplement' (derivedInG M).subgroupOf M (K.subgroupOf M)`** — M_σ⊆M' (`Msigma_le_derived`) + **Prop14.2(a) の UM_σ=K normal complement** ⊆M' + K cyclic ⟹ M'=UM_σ。**⚠⚠ Prop14.2(a) の UM_σ normal complement は repo 未パッケージ** (E-setup 断片のみ; 要構築) = part(h) の gate。coprime は `coprime_card_derived_kappaHall_of_isComplement'` で free。**設計判断 = Prop14.2(a) packaging を S14 に建てるか別 leaf か。**
 3. **∃! Mstar 一意性の出どころ** — witness=Mstar (`exists_partner`); covering (step 10, mmd L4053: S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| [本 commit の bound を H に適用] + |𝒞_G(Ẑ)|>½|G| ⟹ 𝒞 交差≠∅ ⟹ Prop14.2(c)) で global conj。uniqueness は equality ゆえ conj では不足 → `𝓜(C_G(X))={Mstar}` (X∈ℰ¹(K)) で pin。**設計判断 = uniqueness の正確な pin (covering ＋ 𝓜-singleton の組合せ)。** + conjunct「Kstar が Hall κ(Mstar)」も要 (Kstar=Z⊓Mstar_σ が κ(Mstar)-Hall?)。
 - **density bound (本 commit) は covering の左辺 (|𝒞_G(Ẑ)|>½|G|) を供給済。covering は本 bound を H(任意 type-P)に適用するだけ** — 設計判断は uniqueness の組立方。
+
+### ✅ covering building blocks landing (2026-06-17 再開² cont., commit `dcb31fcc`, ユーザー裁可で covering 着手) — 次 = covering 核 (~150-200 行, multi-iteration)
+
+**ユーザーが AskUserQuestion で「covering 論法」を選択 → bottom-up で再利用部品 3 件を landing (green + axiom-clean + AxiomsCheck)。**
+- `dummySigmaDecomposition` (def): `exists_partner` が要求する length-1 carrier (G explicit、`open Classical in`)。再利用可。
+- `ncard_inter_nonempty_of_two_mul_gt`: 有限群で `2|A|>|G| ∧ 2|B|>|G| ⟹ A∩B≠∅` (incl-excl、`Set.ncard_union_add_ncard_inter`+`Set.ncard_univ`+omega)。
+- `exists_zTilde_conjClass_gt_half_of_isTypeP`: **任意 type-P H に L=Hall κ(H)/L*=C_{Hσ}(L)/`|𝒞_G(Ẑ_H)|>½|G|`** (BG「we also have」)。H の Hall は `Ch03.hall_E_exists (G:=↥H)` で L', U' を取り `.map H.subtype` + `subgroupOf` 往復 (`comap_map_eq_self_of_injective`); partner data は `exists_partner hG (dummySigmaDecomposition G) …`; 本体は `typeP_zTilde_conjClass_gt_half`。
+
+**▶▶ covering 核 (typeP_duality (g) conjunct = ∀ H type-P, H~M ∨ H~Mstar) の残り — 3 sub-step、密結合**:
+1. **intersection → 共役** (~40 行, conjugation tracking が摩擦): `exists_zTilde_…(M)` + `…(H)` で両 `|𝒞_G(Ẑ)|>½` → `ncard_inter_nonempty_of_two_mul_gt` で `𝒞_G(Ẑ_M)∩𝒞_G(Ẑ_H)≠∅` → 共通元 u が `u~t (t∈Ẑ_M)` かつ `u~s (s∈Ẑ_H)` → `t~s` → `∃c, t=c•s` → `t∈Ẑ_M ∩ Ẑ_{c•H}` (c•Ẑ_H=Ẑ_{c•H}, c•L/c•L* は c•H の Hall κ data)。**⚠ conjClassSet membership ↔ ∃conj の往復 + `c•Ẑ_H=Ẑ_{c•H}` の保存 (Hall/centralizer/sup/sdiff の pointwise smul) を要する**。
+2. **🔑 matching `t∈Ẑ_M ∩ Ẑ_{H'} ⟹ L'*⊓K≠⊥ ∨ L'*⊓Kstar≠⊥`** (~60 行, 数学は明快): t∈Ẑ_{H'}=L'×L'*−(L'∪L'*) ⟹ t∉L' ⟹ **σ(H')-part w:=`exists_isPiElement_mul (σ H') t` の π-part ≠1, w∈L'*** (σ(H')-元 of Z_{H'}=L'×L'*); w∈⟨t⟩⊆Z_M=K×Kstar ⟹ `exists_isPiElement_mul (σ M) w` で `w=a·b` (a=σ(M)-part∈Kstar, b=σ(M)'-part∈K, **両 ∈⟨w⟩⊆L'***); w≠1 ⟹ a≠1∨b≠1 ⟹ `L'*⊓Kstar≠⊥ ∨ L'*⊓K≠⊥`。
+   - membership: **b∈K = `isPiElementCompl_mem_left_of_commute (A:=K)(B:=Kstar)(π:=σ M)`** (clean: K=σ(M)ᶜ群=`kappaHall_isPiSubgroup_sigmaCompl`, Kstar=σ(M)群=`Kstar_isPiSubgroup_sigma`, hcent=`hKstar▸inf_le_right`)。**a∈Kstar = 同 lemma の dual** (A:=Kstar,B:=K,π:=(σM)ᶜ; `compl_compl` massaging 要、or 小 dual helper 新設が clean)。
+3. **double Prop 14.2(c) → H'=M ∨ M*** (~40 行): Y∈ℰ¹(L'*⊓K_i*) → ① M-side `maximalContaining_centralizer_eq_singleton…` (`typeP_structure ….2.2.2.2.2`: X∈ℰ¹(Kstar)⟹{M}; X∈ℰ¹(K)⟹{Mstar} via 14.7(1)/`exists_typeP_partner`) ② H'-side (Y≤L'*=Hσ' の Kstar' ⟹ {H'}) → `{H'}={M_i}` ⟹ H'=M∨Mstar ⟹ **H~H'=M∨Mstar**。**⚠ n=1 collapse 後の K_i*={K,Kstar} ラベリングと、`{H}` vs `{M_i}` の singleton 同定が要**。
+- **見積: covering 核 = ~150-200 行 multi-iteration。摩擦点 = step1 の conjugation-invariance + step2 の dual membership。** matching の数学は worked out (上記)。次 iteration はこの順で。
+
+**技法メモ (本 commit)**: `open Classical in` は docstring の**前**に置く (docstring→open は parse error); `hall_E_exists (G:=↥H) π` → `.map H.subtype` + `comap_map_eq_self_of_injective` 往復で `subgroupOf H` 形へ; `nlinarith [key]` は内部で "ring failed" trace を出すが成功 (error でない)。
