@@ -66,8 +66,34 @@ unweighted テンプレート `sMember_degreeSumBound_of_not_coherent`(`CorePart
   irreducible member は既存 `memberExtensionDecomposition`。
 - counting 側 = `sum_div_normSq_induce_kernelFilter_eq`(weighted, 実在)で `∑_X χ(1)²/‖χ‖²`。
 
-⟹ **scope = sustained build**(weighted enumerator + reducible Dmem 構成が本体)。これが
-`xSum_le_two_psi_caseB`(`xSum_le_two_psi` `CorePart2:3229` の weighted mirror)→ c2 endgame に積まれる。
+⟹ `xSum_le_two_psi_caseB`(`xSum_le_two_psi` `CorePart2:3229` の weighted mirror)→ c2 endgame に積まれる。
+
+### ⚡ スコープ縮小 (2026-06-17, 追加 grep): per-member producer は実在 ⟹ hard core = **assembly**
+
+`xChainCoherentW` docstring が挙げる per-member producer は **ほぼ全て実装済**(reducible Dmem を
+ゼロから作る必要はない):
+- **`certainTypeMemberDecomposition`**(`S06_CertainTypeCoherence:740`)= 「`memberExtensionDecomposition`
+  の reducible 版」。coherent set `S₁` の reducible certain-type column に per-member
+  `CharacterPsiDecomposition` を供給(`ofProjection (certainTypeR …)` 経由)。
+- **`certainTypeR`**(`S06:639`)= R(μ_j) image family / `certainTypeDecompositionDa`(`S08_CaseBCoherence2:1360`)。
+- **`certainTypeR_imageSet_orthogonal_dadeOfDiff`**(`S08_CaseBHortho:44`)= `hortho_mem` field。
+- **`memberExtensionDecomposition`** = irreducible member 用 Dmem。
+- engine `coherentDegreeSqNormBound_of_not_coherentW` の per-member 要求 = `mc`(norm)+ `Dmem` +
+  `hortho_mem` + `htau1Dmem` は、上記 producer の **dispatch(reducible/irreducible で分岐)で供給可能**。
+
+⟹ **hard core = weighted enumerator `exists_sMemberOrthogonalFamilyW` の ASSEMBLY**
+(`exists_sMemberOrthonormalFamily` `CorePart2:2464` を mirror し、IrreducibleCharacter 制約を外して
+per-member で `certainTypeMemberDecomposition` / `memberExtensionDecomposition` を dispatch、weight
+`mc i = ⟨χmem i, χmem i⟩.re`、orthogonality は coherent set の member 間直交 + `certainTypeR_…orthogonal`)。
+**ゼロからの新証明でなく既存 green producer の結線** ⟹ scope は当初見積より縮小(ただし multi-hundred LOC)。
+
+### 次の coding action (確定)
+
+1. `exists_sMemberOrthogonalFamilyW`(新 lemma, S08_CoherenceWeighted.lean)を `exists_sMemberOrthonormalFamily`
+   を template に書く。member dispatch = `certainTypeMemberDecomposition`(reducible)/
+   `memberExtensionDecomposition`(irreducible)。leaf build で increment。
+2. → `xSum_le_two_psi_caseB`(counting を `sum_div_normSq_induce_kernelFilter_eq` に差替)。
+3. → c2 endgame → 3-way dispatch を S08:59 に。
 
 ## (6.5) p-group reduction — 完備 (Plan agent の「未形式化」は誤り)
 
