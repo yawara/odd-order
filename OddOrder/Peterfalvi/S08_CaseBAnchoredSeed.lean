@@ -229,6 +229,7 @@ theorem caseB_column_anchored_image
     {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
     (hYcard : hyp.Yset.ncard ≠ 2) :
     ∃ (X : ClassFunction G ℂ) (a : ℕ),
+      ((OddOrder.Peterfalvi.S06.columnSum h46 χ₂ : ClassFunction ↥L ℂ) 1 = (a : ℂ) * η₁ 1) ∧
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
         = X - (a : ℂ) • hyp.coherentYset.extension η₁ := by
   classical
@@ -268,8 +269,12 @@ theorem caseB_column_anchored_image
   have hanc := caseB_per_phi_anchored_fromYset hyp h46 hHK hW2H hcen hφ' hyp.coherentYset hη₁
     hcol hirr hirrAnc (hXaggorth η₁ hη₁) hdecomp ⟨θ, hweight⟩
   refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X,
-    constituentWeight hφ' θ, ?_⟩
-  rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval]
-  exact hanc
+    constituentWeight hφ' θ, ?_, ?_⟩
+  · rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval, ClassFunction.induce_apply_one,
+      hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
+      constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
+    ring
+  · rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval]
+    exact hanc
 
 end OddOrder.Peterfalvi.S08
