@@ -36,13 +36,47 @@ Classical.choice, Quot.sound]`)。per-member Dmem dispatcher: `x ∈ S₁ ⊆ hy
 4. memberExtensionDecomposition は **x をそのまま** χ:=⟨x,hirrx⟩ で渡せる(induce 形不要)。返り値
    `CharacterPsiDecomposition (dade…) x 0` は `hyp.tau` abbrev と defeq ⟹ 変換不要。
 
-**▶ 次 = brick 2** `exists_sMemberOrthogonalFamilyW`(`exists_sMemberOrthonormalFamily`
-`CorePart2:2464` を template、IrreducibleCharacter 制約を外す)。weighted engine
-`coherentDegreeSqNormBound_of_not_coherentW`(`S08_CoherenceWeighted:475`)の要求 = `mc`(weight=norm)
-+ `Dmem`(= brick 1)+ `hortho_mem`(column = `certainTypeR_imageSet_orthogonal_dadeOfDiff`
-`S08_CaseBHortho:44`、irreducible = `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`)+
-`htau1Dmem`(= rfl、両 producer とも tau1 = hS₁.extension)。engine は単一 break χ + family を取る
-抽象形(`{ι}(s : Finset ι)(χmem)(deg)(mc)…`)ゆえ enumerator は family を組んで渡す。
+## ✅ brick 2a COMPLETE + brick 2/3 詳細設計 (2026-06-17, 3-agent scope workflow code-verified)
+
+**✅ brick 2a = `exists_finEnum_general`**(`S08_CaseBEnumeration.lean`、build-green・axiom-clean)。
+一般有限集合 `S : Set (ClassFunction Γ ℂ)` を injective `Fin k`-family に列挙(irreducible 不要)。
+= `Set.Finite.fintype` + `Fintype.equivFin` の純 formalization(数学ゼロ)。reducible column を含む
+case-B coherent set の列挙プリミティブ。`exists_finEnum_irreducible`(`CorePart1:631`)の一般版。
+
+### brick 2 full = weighted enumerator(次の大物、multi-hundred LOC)
+
+unweighted テンプレート = **`sMember_degreeSumBound_of_not_coherent`**(`CorePart2:2650`、8 step)。
+weighted 版 brick 3 = `sMember_degreeSqNormBound_of_not_coherent` はこれを mirror し step 8 で
+weighted engine `coherentDegreeSqNormBound_of_not_coherentW`(`S08_CoherenceWeighted:475`、結論
+`∑ deg²/mc ≤ 2a`)を叩く。**step 1-7 は generic(orthonormality 非依存)= unweighted をほぼコピー**。
+
+weighted engine が unweighted と異なり要求する **NEW 4 inputs**(= brick 2 が供給):
+- **`mc : Fin k → ℝ`** = `(⟨χmem i, χmem i⟩).re`。column = **|W₁|**(`columnFamily_mu_sum_inner`
+  `S06_CertainTypeIsometry:1094` = `if χ₂=χ₂' then |W₁| else 0`)、irreducible = **1**。
+  `hmempos`(全 > 0)、**`hanchorNorm : mc i₁ = 1`** ⟹ **anchor は irreducible で取る**
+  (= Yset メンバー、`isIrreducibleCharacter_of_mem_Yset` + degree |W₁| `Yset_apply_one`。
+  reducible column を anchor にしてはいけない)。
+- **`Dmem`** = brick 1 `caseB_member_psiDecomposition`(✅ DONE)。
+- **`hortho_mem : ∀ i, (Dmem i).imageFamily.Orthogonal (dadeOrthonormalCharacterImageFamilyOfDiff … ψ)`**
+  = column は `certainTypeR_imageSet_orthogonal_dadeOfDiff`(`S08_CaseBHortho:44`)、
+  irreducible は `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(`CorePart1:1681`)。
+- **`htau1Dmem : ∀ i, (Dmem i).tau1 (χmem i) = hS₁.extension (χmem i)`** = 両 producer とも
+  tau1 = `hS₁.extension` ゆえ **rfl**。
+
+**`hmemortho`**(`∀ i j, ⟨χmem i, χmem j⟩ = if i=j then mc i else 0`)の組立 = 全 per-pair 補題実在:
+col-col 直交=`inner_columnSum_cross_eq_zero`(`CaseBAssembly:1850`)/col self=上記 Gram/
+col-irr=`caseB_inner_irr_columnSum_eq_zero`(`:1801`)+ conj `:1875`/irr-irr=`irreducibleCharacter_inner_eq_ite`/
+col-Y=`inner_columnSum_Yset_eq_zero`(`:250`)/irr-Y=`inner_irr_Yset_eq_zero`(`:611`)。
+**統合済 X⊥Y = `caseB_Xset_orthogonal_Yset`(`CaseBAssembly:1970`)**。member を column/irr で dispatch して組む。
+
+### brick 2/3 推奨着手順
+1. brick 2 enumerator: `exists_finEnum_general` で S₁=X∪Y を列挙 → 各 member に brick 1 で Dmem、
+   `mc` を `⟨χmem i,χmem i⟩.re` で定義、`hmemortho` を per-pair dispatch で組む、anchor を Yset から取る。
+2. brick 3: unweighted `sMember_degreeSumBound_of_not_coherent` の step 1-7 をコピー、step 8 で
+   weighted engine、最後に real-part scaling(`sMember_degreeSqReBound_of_not_coherent` `CorePart2:2738` mirror)。
+3. brick 4 = c2 endgame `false_of_coherentXunionYset_caseB_of_not_coherentS`(weighted+FPF mirror)
+   → S08:59 の 3-way dispatch。
+**正本詳細 = この note + scope workflow result(transcript)。再調査不要: enum/orthogonality 在庫は full。**
 
 ## 結論 (一言)
 
