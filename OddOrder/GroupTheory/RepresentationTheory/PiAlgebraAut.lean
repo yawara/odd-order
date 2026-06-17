@@ -167,4 +167,63 @@ theorem algAutPerm_apply_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) (i : ι) 
     ψ (Pi.single i (1 : k)) = Pi.single (algAutPerm ψ i) 1 := by
   classical exact Classical.choose_spec (algEquiv_permutes_single ψ) i
 
+/-- The standard idempotents `Pi.single i 1` expand the identity: `∑ i, Pi.single i 1 = 1`. -/
+theorem sum_single_one : ∑ i, Pi.single i (1 : k) = (1 : ι → k) := by
+  funext j; rw [Finset.sum_apply]; simp [Pi.single_apply, Finset.sum_ite_eq]
+
+/-- A vector is the sum of standard idempotents weighted by its own coordinates. -/
+theorem eq_sum_smul_single (v : ι → k) : v = ∑ i, v i • (Pi.single i 1 : ι → k) := by
+  funext j
+  rw [Finset.sum_apply,
+    Finset.sum_eq_single j (fun i _ hij => by simp [Pi.single_eq_of_ne (Ne.symm hij)]) fun h =>
+      absurd (Finset.mem_univ j) h]
+  simp
+
+set_option linter.unusedFintypeInType false in
+set_option linter.unusedDecidableInType false in
+/-- **A `k`-algebra homomorphism `(ι → k) →ₐ[k] k` is evaluation at a single index.**  The images
+`f (Pi.single i 1)` form orthogonal `0/1` idempotents summing to `1` (over a field), so exactly one
+is `1`; `f` then reads off that coordinate.  (For Peterfalvi (9.1): the central character of the
+trivial module is such an evaluation, fixed by every automorphism — the trivial simple.) -/
+theorem algHom_pi_eq_eval (f : (ι → k) →ₐ[k] k) : ∃ i₀, ∀ v : ι → k, f v = v i₀ := by
+  classical
+  -- `eᵢ := f (Pi.single i 1)` is idempotent in `k`, hence `0` or `1`.
+  have h01 : ∀ i, f (Pi.single i (1 : k)) = 0 ∨ f (Pi.single i 1) = 1 := by
+    intro i
+    refine IsIdempotentElem.iff_eq_zero_or_one.mp ?_
+    rw [IsIdempotentElem, ← map_mul]
+    congr 1
+    funext j; by_cases h : j = i <;> simp [Pi.single_apply, h]
+  -- distinct ones are orthogonal.
+  have hortho : ∀ i j, i ≠ j → f (Pi.single i (1 : k)) * f (Pi.single j 1) = 0 := by
+    intro i j hij
+    rw [← map_mul, show (Pi.single i 1 : ι → k) * Pi.single j 1 = 0 from ?_, map_zero]
+    funext l
+    simp only [Pi.mul_apply, Pi.single_apply]
+    by_cases hi : l = i <;> by_cases hj : l = j <;> simp_all
+  -- they sum to `1`.
+  have hsum : ∑ i, f (Pi.single i (1 : k)) = 1 := by
+    rw [← map_sum, sum_single_one, map_one]
+  -- some index has value `1` (else the sum would be `0`).
+  obtain ⟨i₀, hi₀⟩ : ∃ i₀, f (Pi.single i₀ (1 : k)) = 1 := by
+    by_contra h
+    have hall : ∀ i, f (Pi.single i (1 : k)) = 0 :=
+      fun i => (h01 i).resolve_right fun hi => h ⟨i, hi⟩
+    rw [Finset.sum_congr rfl fun i _ => hall i, Finset.sum_const_zero] at hsum
+    exact one_ne_zero hsum.symm
+  -- every other index has value `0` (orthogonal to the `1`).
+  have hzero : ∀ j, j ≠ i₀ → f (Pi.single j (1 : k)) = 0 := by
+    intro j hj
+    have := hortho i₀ j (Ne.symm hj)
+    rwa [hi₀, one_mul] at this
+  refine ⟨i₀, fun v => ?_⟩
+  have hfv : f v = ∑ i, v i * f (Pi.single i (1 : k)) := by
+    conv_lhs => rw [eq_sum_smul_single v]
+    rw [map_sum]
+    simp_rw [map_smul, smul_eq_mul]
+  rw [hfv,
+    Finset.sum_eq_single_of_mem i₀ (Finset.mem_univ i₀)
+      (fun j _ hj => by rw [hzero j hj, mul_zero]),
+    hi₀, mul_one]
+
 end OddOrder.GroupTheory.PiAlgebraAut
