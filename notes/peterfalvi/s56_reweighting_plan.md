@@ -1,3 +1,9 @@
+> ⚠ **2026-06-17 SUPERSEDED (部分)**: (6.8.3)/(5.6)-weighted/case-B capstone の現 source-of-truth は
+> **[`s08_6_8_3_gap_resolution.md`](s08_6_8_3_gap_resolution.md)** (hub 13-agent workflow + 検証で確定:
+> 数学 gap=0、norm-weighted (5.6) エンジン `S08_CoherenceWeighted` は既に repo に sorry-free、残務は glue のみ)。
+> 本ファイルの cont.³⁴〜⁴⁷ には retract 済の overclaim が多数。数学・残務の判断は resolution note を優先し、
+> 本ファイルは history として残置。
+
 # (5.6) norm-weighted reweighting — multi-session plan (endpoint A 完遂)
 
 **着手**: 2026-06-16 (lane-b session 43 cont.²⁹) / ユーザー裁可「(5.6) reweighting 着手」(cont.²⁸ fork)
