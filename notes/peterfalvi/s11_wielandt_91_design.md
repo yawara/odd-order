@@ -126,6 +126,56 @@ new infrastructure, not a reuse of the repo's ℂ lemma:
 (robust if F is pivoted back to §16 when H lands `typeP_duality`).  If I-1 balloons
 (e.g. forces full `p`-adic lifting), re-flag to user.
 
+## 2026-06-17 (resume) — source proof confirmed + reusable-infra map + cor (i) plan
+
+**I-3 COMPLETE** (`WielandtCounting.lean`, commit `b95fcc6b`): reverse half
+`finrank_invariants_le_finrank_A1` + capstone `finrank_eq_card_mul_finrank_invariants`
+(`dim V = |G|·dim V^G` for a regular `G`-orbit). Abstract Brauer-free; feeds (†) per `E`-orbit.
+
+**Source proof read** (`04.11_…mmd` (9.1)): Peterfalvi cites **Wielandt ([HB] XI.12.4)** as a black
+box and applies it to the Frobenius group-ring identity `U·E + |U|·1 = ∑_{u∈U} E^u + U` (= `L + |U|·1
+= ∑_u E^u + U` since `underline U · underline E = underline L`), giving
+`|C_H(UE)|^{|UE|}|H|^{|U|} = (∏_u |C_H(E^u)|^{|E|})|C_H(U)|^{|U|}`; `|U|`-th root + `E^u` conjugate ⟹
+(9.1). **So the crux IS Wielandt's theorem** (not in mathlib).
+
+**Route B reaffirmed over a "cleaner" Brauer-character route.** The uniform route
+"`dim V^S = (1/|S|)∑_{s∈S} β_V(s)` (β = char-0 Brauer char) + group-ring linearity" needs the FULL
+Brauer character ring. Route B's slice = the **permutation fixed-point lemma** (`#e-fixed simples =
+#e-fixed classes`, integer form via Teichmüller) — a SMALLER Brauer slice. ⟹ keep Route B; I-3 + (⋆)
+`finrank_elab_identity` stay on-path.
+
+### 🎯 Reusable infrastructure FOUND (the I-5 chief-series machinery already exists)
+- **keystone** `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient` (+ `_of_coprime_normal`),
+  `ForwardFromCh03.lean:794/808` = **Isaacs Cor 3.28** in EXACTLY the `φ : A →* MulAut G` form:
+  coprime + (A or G solvable) + `IsAInvariant φ N` + A-fixed coset `∀a, φ a g ∈ gN` ⟹ ∃ fixed rep
+  `c` (`∀a, φ a c = c`) with `c ∈ gN`. This is "`C_{G/N}(A) = image C_G(A)`" — the I-5 hard direction.
+- **BG 3.3** `S03b.kernel_acts_trivially_of_centralizer_eq_bot`: Frobenius `G=KR` + `C_V(R)=0` +
+  `(|K|:F)≠0` ⟹ `K` trivial on `V`. (qualitative module Wielandt.)
+- **el-ab bridge** `GroupTheory.ElementaryAbelianRepresentation`: `MulDistribMulAction G M` (M el-ab
+  p) ⟹ `Representation (ZMod p) G (Additive M)` via `ofDistribMulAction` (+ the `SMulCommClass`
+  instance). `φ : L →* MulAut H` gives `MulDistribMulAction L H` by `compHom`.
+- **chief series** `GroupTheory.ChiefFactor`: `chiefSeriesInside`, `IsChiefFactor`,
+  `chiefFactorCentralizer`, `chiefFactor_isElementaryAbelian` (S03c).
+- **stability (Frattini case)** `Ch04.aFixed_quotient_frattini` = Isaacs Cor 3.29: A trivial on
+  `G/Φ(G)` ⟹ A trivial on `G`. (Pattern for the general stability step.)
+- BG 3.7 internal machinery (`S03c_Thm37.lean`) is all tied to `chiefFactorConjAction` (internal
+  conjugation) — NOT directly reusable for the external `φ`, but the same induction shape.
+
+### cor (i) assembly plan (Brauer-free, achievable NOW)
+`C_H(E)=1 ⟹ U trivial on H`, strong induction on `Nat.card H`:
+1. `H=1` trivial; else take **N = minimal `φ(L)`-invariant normal ≤ H** (el-ab, exists in nontrivial
+   solvable `φ(L)`-group). [new piece — minimal invariant normal]
+2. **N**: `C_N(E) ≤ C_H(E)=1` ⟹ `C_N(E)=0`; el-ab bridge + **BG 3.3** ⟹ `U` trivial on `N`.
+3. **H/N**: keystone (`coprime_fixedPoints_quotient`) ⟹ `C_{H/N}(E)=1`; descend `φ` to `φ̄ : L →*
+   MulAut(H/N)` (needs `IsAInvariant φ N`); induction ⟹ `U` trivial on `H/N`.
+4. **stability (el-ab N)**: `α := φ u` fixes `N` pointwise and `h⁻¹·α h ∈ N` ∀h ⟹ `α^k h = h·(h⁻¹ α
+   h)^k` (clean computation, `α|_N=id` kills the cross terms) ⟹ `α^p = id` (el-ab N exponent p);
+   `α^{|u|}=id`, `gcd(p,|u|)=1` ⟹ `α=id`. [new piece — self-contained helper]
+New pieces = (1) minimal invariant normal + (4) el-ab stability + the `φ`-descent wiring. Everything
+else cites the found infra. ⟹ makes `wielandt_fixedPoint_trivial_E_fixed` unconditional (de-gates it
+from the sorried main formula). Does NOT drop sorry count (main formula `wielandt_fixedPoint_frobenius`
+still sorried, needs I-1 wall) but is genuine on-path progress (I-5 application validated).
+
 ## Not on the immediate critical path
 
 (9.1) is consumed by (9.3) → §11, which is Lane-B character-API-gated and far downstream;
