@@ -1427,3 +1427,30 @@ coverage 素材は **既存**: `exists_typeP_neighbor_mem_sigma` (p|K→neighbor
 組立 = Fintype on Finset + Hall-part 算術 (`card_iSup_of_pairwise_commute_coprime`済) で `⊔K_i*=Z`。これが次の主タスク。
 ⟹ 揃えば TI-of-T (hstab済 + (d)both済 + coverage) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)| →
 density 不等式 (|T| count済 + 14.5c済 + 14.6済) → n=1 collapse → covering → part(h)。
+
+### ✅✅ σ-decomposition coverage `⊔Kᵢ*=Z` COMPLETE (2026-06-17 lane-h loop⁸ cont., 4 commits)
+
+**TI-of-T の flagged "sole remaining hard core" を解消。全 green + axiom-clean。** 本 cont. の landing:
+
+1. **`typeP_family_Kstar_coprime` + `typeP_family_Kstar_commute`** (31e2406f, 838717e7) =
+   `card_iSup_of_pairwise_commute_coprime` の両入力 (coprime=σ-disjoint via 13.9, commute=◁Z+disjoint)。
+2. **`typeP_family_sigma_covers`** (79e6200d) = coverage primitive: ∀p|z, ∃N∈family, p∈σ(N)。
+   p|k*→σ(M) (Kstar σ(M)-group); p|k→neighbor N via `exists_typeP_partner` (IsZFamilyMember witness を保持、
+   `exists_typeP_neighbor_mem_sigma` は捨てていた)。
+3. **`typeP_family_prime_pow_dvd_Kstar`** = Kᵢ*=Z⊓Msigma N は σ(N)-Hall of Z: p∈σ(N), pᵏ|z ⟹ pᵏ|kᵢ*。
+   |Z|=|K_N||Kᵢ*| (`card_kappaHall_sup_Kstar` を N の swap data に適用) + K_N σ(N)'-group ⟹ pᵏ⊥|K_N| ⟹ pᵏ|kᵢ*。
+4. **🔑 `typeP_family_iSup_Kstar_eq`** (94e4aa42) = **`⊔_{N∈family}(Z⊓Msigma N)=Z`**: ⊔≤Z は自明、
+   Z≤⊔ は |Z| ∣ |⊔| を prime-pow ごとに (`Nat.dvd_iff_prime_pow_dvd_dvd`): pᵏ|z → coverage で N → pᵏ|kᵢ* | |⊔|。
+5. **`typeP_family_isPiElement_mem_Kstar`** (1a6f1911) = σ(N)-元 a∈Z ⟹ a∈Kᵢ*: ⟨a⟩ は N の σ(N)-部分群
+   ⟹ ⟨a⟩≤Msigma N (`sigma_subgroup_le_Msigma_of_isHall`)。**t=yy' の σ(N)-part 側 half。**
+
+**▶ 残り = TI-of-T assembly (次の distinct unit, ~120 行)**。全 building block は揃った:
+- **σ(N)′-part 側** `b∈Z σ(N)'-元 ⟹ b∈K_N` (未): K_N は swap で **Z の σ(N)'-Hall** (|K_N|=σ(N)'-part of |Z|,
+  Z=K_N×Kᵢ* 直積ゆえ K_N◁Z)。`isPiGroup_le_of_normal_isHallSubgroup` を ↥Z で適用 (subgroupOf-Z plumbing 要、~40 行)。
+  ⚠ K_N は member_data の existential (choice) ゆえ、TI proof 内で obtain して使う。
+- **TI proof** `IsTISubset T Z` (~80 行): t∈T (t∉⋃Kᵢ*), t^g∈Z。π-decompose t (`exists_isPiElement_mul`):
+  coverage + t∉⋃Kᵢ* ⟹ ∃N, σ(N)-part y≠1 ∧ σ(N)'-part y'≠1。y∈Kᵢ*(済 helper), y'∈K_N(上記)。
+  y^g∈Kᵢ* (σ-part of t^g∈Z) → **(d)-first** [typeP_structure conjunct 4 for N] ⟹ g∈N。
+  y'^g∈K_N → **(d)-second** [`typeP_kappaHall_inf_conj_eq_bot` for N] ⟹ g∈Z (by_contra g∉Z で K_N∩K_N^g=⊥ vs y'^g≠1)。
+- TI-of-T 後: hstab(済) + `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)|=|T|[G:Z] → density 不等式
+  (|T| count済 + 14.5c済 + 14.6済) → n=1 collapse (`le_of_coprime_index`+Prop14.2(g)) → covering (half_lt) → part(h)。
