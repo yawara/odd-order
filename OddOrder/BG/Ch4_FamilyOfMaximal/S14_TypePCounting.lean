@@ -6162,6 +6162,39 @@ theorem typeP_family_two_mul_card_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     _ = Nat.card ↥(K ⊔ Kstar) * ((K ⊔ Kstar).subgroupOf N).index := Nat.mul_comm _ _
     _ = Nat.card ↥N := hlag
 
+/-- **`σ`-sharp set is conjugation-equivariant**: `conj g • (M_σ^#) = (M^g)_σ^#`.  From
+`Msigma_conj_smul` (`M_σ` equivariant) and `conj g` fixing `1`. -/
+theorem sigmaSharp_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    MulAut.conj g • sigmaSharp M = sigmaSharp (MulAut.conj g • M) := by
+  rw [sigmaSharp, sigmaSharp, sharpSubgroup, sharpSubgroup, Set.smul_set_sdiff,
+    ← Subgroup.coe_pointwise_smul, ← Msigma_conj_smul]
+  congr 1
+  simp [Set.smul_set_singleton, MulAut.smul_def]
+
+/-- **`M̃` is conjugation-equivariant** (mmd L3908): `conj g • M̃(M) = M̃(Mᵍ)`.  Each product
+`x·x'` (`x ∈ M_σ^#`, `x' ∈ R(x)`) conjugates to `(xᵍ)(x'ᵍ)` with `xᵍ ∈ (Mᵍ)_σ^#`
+(`sigmaSharp_conj_smul`) and `x'ᵍ ∈ R(xᵍ)` (`Rsub_conj`).  This is what turns the set-level
+disjointness 14.5(b) into disjointness of the conjugacy saturations `𝒞_G(M̃ᵢ)`. -/
+theorem Mtilde_conj_smul [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) (g : G) (M : Subgroup G) :
+    MulAut.conj g • Mtilde hG D M = Mtilde hG D (MulAut.conj g • M) := by
+  have hle : ∀ (h : G) (N : Subgroup G),
+      MulAut.conj h • Mtilde hG D N ⊆ Mtilde hG D (MulAut.conj h • N) := by
+    rintro h N y ⟨z, ⟨x, hx, x', hx', rfl⟩, rfl⟩
+    refine ⟨MulAut.conj h • x, ?_, MulAut.conj h • x', ?_, ?_⟩
+    · rw [← sigmaSharp_conj_smul]; exact Set.smul_mem_smul_set hx
+    · rw [show MulAut.conj h • x = h * x * h⁻¹ from by rw [MulAut.smul_def, MulAut.conj_apply],
+        Rsub_conj]
+      exact Subgroup.smul_mem_pointwise_smul _ _ _ hx'
+    · exact smul_mul' _ _ _
+  refine Set.Subset.antisymm (hle g M) (fun y hy => ?_)
+  have h2 := hle g⁻¹ (MulAut.conj g • M)
+  rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h2
+  have hmem : MulAut.conj g⁻¹ • y ∈ Mtilde hG D M := h2 (Set.smul_mem_smul_set hy)
+  rw [show y = MulAut.conj g • (MulAut.conj g⁻¹ • y) by
+    rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]]
+  exact Set.smul_mem_smul_set hmem
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
