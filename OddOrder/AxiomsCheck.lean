@@ -4938,6 +4938,22 @@ underlying the density bound `|𝒞_G(Ẑ)| > ½|G|`.  Fully unconditional, axio
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.zTilde_ncard_eq
 
+/-! **BG Theorem 14.7(e), family `Z ⊓ N_σ` collapse** (`S14_TypePCounting`,
+`family_inf_msigma_union_eq`): for the type-`P` family `{M, M*}`, `⋃_{N} (Z ⊓ N_σ) = K ∪ K*`
+(`Z ⊓ M_σ = K*` via `typeP_self_member`, `Z ⊓ M*_σ = K` via `partner_canonical_eq`).  Factored out
+of `typeP_zTilde_isTI`; identifies `Ẑ = Z − (K ∪ K*)` with the family TI-set in the density count.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.family_inf_msigma_union_eq
+
+/-! **BG Theorem 14.7, the density bound `|𝒞_G(Ẑ)| > ½|G|`** (`S14_TypePCounting`,
+`typeP_zTilde_conjClass_gt_half`): the conjugacy saturation of `Ẑ` covers more than half of `G`.
+`|𝒞_G(Ẑ)| = |Ẑ|·[G:Z] = (k−1)(k*−1)·[G:Z]` (TI count + `zTilde_ncard_eq`) and `|G| = k·k*·[G:Z]`
+(`card_kappaHall_sup_Kstar`), reducing to `k·k* < 2(k−1)(k*−1)` for coprime odd `k = |K|`,
+`k* = |K*| > 1`.  The counting heart of the `∃! M*` covering.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_zTilde_conjClass_gt_half
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
