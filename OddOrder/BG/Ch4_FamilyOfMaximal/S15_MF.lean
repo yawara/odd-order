@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 import OddOrder.BG.Ch1_Preliminary.S05_NarrowCharacterization
 import OddOrder.Mathlib.Subgroup
 
@@ -2717,6 +2718,211 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
   rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
+
+/-- **Counting the invariants of a quotient module by its fixed-point subgroup** (`§14`-independent,
+reusable).  For a finite commutative `H`-module `Mod` over `ZMod q` (with `H` acting through a
+`MulDistribMulAction`) and a subgroup `R ≤ H`, if `Cbar ≤ Mod` is exactly the set of `R`-fixed
+points (`hchar`), then the `R`-invariants of the associated representation have cardinality `|Cbar|`.
+
+This isolates the `Module.End`/`Additive` instance bookkeeping (the module is an *instance argument*
+here, mirroring `card_eq_pow_card_invariants_of_elemAbelian_general`), so the caller can apply it
+without re-synthesising the representation.  Used in Theorem 15.2(f) to read off `|C_{Q̄}(K)|`. -/
+theorem card_invariants_eq_card_of_fixedPoints {q : ℕ} {H : Type*} [Group H]
+    {Mod : Type*} [CommGroup Mod] [Finite Mod] [Module (ZMod q) (Additive Mod)]
+    [MulDistribMulAction H Mod] {R : Subgroup H} (Cbar : Subgroup Mod)
+    (hchar : ∀ w : Mod, (∀ r : ↥R, (r : H) • w = w) ↔ w ∈ Cbar) :
+    Nat.card ↥(Representation.invariants
+      ((Representation.ofDistribMulAction (ZMod q) H (Additive Mod)).comp R.subtype))
+      = Nat.card ↥Cbar := by
+  apply Nat.card_congr
+  refine Equiv.subtypeEquiv Additive.toMul (fun v => ?_)
+  rw [Representation.mem_invariants, ← hchar (Additive.toMul v)]
+  refine forall_congr' (fun r => ?_)
+  show ((r : H) • v = v) ↔ ((r : H) • Additive.toMul v = Additive.toMul v)
+  constructor
+  · intro h; have := congrArg Additive.toMul h; simpa using this
+  · intro h; apply Additive.toMul.injective; simpa using h
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+open scoped commutatorElement in
+open scoped IsMulCommutative in
+/-- **Theorem 15.2(f) — the chief factor `Q̄ = Q/Q₀` has order `q^p`, gated-endpoint skeleton**
+(mmd L4196, BG Theorem 3.10(b)).  The Frobenius group `D ⋊ K` (kernel `D`, complement `K`) acts by
+conjugation on the elementary-abelian chief factor `Q̄ = Q/Q₀` (`hEA`).  BG Theorem 3.10(b)
+(`card_eq_pow_card_invariants_of_elemAbelian_general`) gives `|Q̄| = |C_{Q̄}(K)|^{|K|}`; the
+caller-supplied subgroup `C` (with `C/Q₀ = C_{Q̄}(K)` via `hCfix`, and `|C : Q₀| = q` via `hCcard`)
+turns this into `[Q : Q₀] = q^{|K|}`.
+
+The §14-gated inputs are `hcond3` (prime-manner action of `K`, Proposition 14.2(a)) and
+`hCcard`/`hCfix` (`|K*| = q`, Theorem 14.7(f)); `hFPF` is discharged by
+`mem_centralizer_of_centralizes_quotient`. -/
+theorem chiefFactor_index_eq_pow_of_inputs [Finite G]
+    {Q Q0 D K C : Subgroup G} {q : ℕ} [Fact q.Prime] [(Q0.subgroupOf Q).Normal]
+    (hQ0Q : Q0 ≤ Q) (hQ0C : Q0 ≤ C) (hCQ : C ≤ Q) (hDne : D ≠ ⊥)
+    (hEA : OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q))
+    (hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q))
+    (hDQ : D ≤ Subgroup.normalizer (Q : Set G)) (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
+    (hDQ0 : D ≤ Subgroup.normalizer (Q0 : Set G)) (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hsolv : IsSolvable ↥(D ⊔ K))
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(D ⊔ K)
+      (D.subgroupOf (D ⊔ K)) (K.subgroupOf (D ⊔ K)))
+    (hcop : Nat.Coprime (Nat.card ↥(D ⊔ K)) (Nat.card ↥Q))
+    (hFPF : ∀ x ∈ Q, (∀ d ∈ D, ⁅d, x⁆ ∈ Q0) → x ∈ Q0)
+    (hcond3 : ∀ x ∈ K, x ≠ 1 → ∀ y ∈ Q, (⁅x, y⁆ ∈ Q0 ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q0))
+    (hCfix : ∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C))
+    (hCcard : (Q0.subgroupOf C).index = q) :
+    (Q0.subgroupOf Q).index = q ^ Nat.card ↥K := by
+  classical
+  set H : Subgroup G := D ⊔ K with hH
+  have hDH : D ≤ H := le_sup_left
+  have hKH : K ≤ H := le_sup_right
+  have hHQ : H ≤ Subgroup.normalizer (Q : Set G) := sup_le hDQ hKQ
+  have hHQ0 : H ≤ Subgroup.normalizer (Q0 : Set G) := sup_le hDQ0 hKQ0
+  haveI : Finite ↥H := inferInstance
+  haveI hHsolv : IsSolvable ↥H := hsolv
+  -- conjugation hom of `H = D ⊔ K` on `↥Q`, descended to the chief factor `Q̄ = Q/Q₀`.
+  set φ : ↥H →* MulAut ↥Q :=
+    (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hHQ) with hφ
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hHQ0 a.2) (y : G)).mp hy
+  haveI : NeZero q := ⟨(Fact.out : q.Prime).ne_zero⟩
+  letI act : MulDistribMulAction ↥H (↥Q ⧸ Q0.subgroupOf Q) :=
+    MulDistribMulAction.compHom _ (quotientMulAutHom hMinv)
+  haveI hcomm : IsMulCommutative (↥Q ⧸ Q0.subgroupOf Q) :=
+    (isMulCommutative_iff).mpr (fun a b => hEA.comm a b)
+  letI : CommGroup (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
+  letI : Module (ZMod q) (Additive (↥Q ⧸ Q0.subgroupOf Q)) := hEA.zmodModule
+  -- the conjugation-fixed-class characterization: `a • [x] = [x] ↔ ⁅a, x⁆ ∈ Q₀`.
+  have hsmul_iff : ∀ (a : ↥H) (x : ↥Q),
+      ((a • (QuotientGroup.mk x : ↥Q ⧸ Q0.subgroupOf Q)) = QuotientGroup.mk x)
+        ↔ ⁅(a : G), (x : G)⁆ ∈ Q0 := by
+    intro a x
+    show (quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
+        = QuotientGroup.mk' (Q0.subgroupOf Q) x) ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
+    have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
+        = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by
+      rw [commutatorElement_def]; group
+    rw [heq]
+    have htransfer : ((x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ ∈ Q0)
+        ↔ ⁅(a : G), (x : G)⁆⁻¹ ∈ Q0 :=
+      (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN)
+        (⁅(a : G), (x : G)⁆⁻¹)).symm
+    rw [htransfer, Subgroup.inv_mem_iff]
+  -- **BG Theorem 3.10(b)** applied to `Q̄`, kernel `K_thm = D̄`, complement `R_thm = K̄`.
+  have hRne : K.subgroupOf H ≠ ⊥ := hfrob.ne_bot_complement
+  haveI hKnormal : (D.subgroupOf H).Normal := hfrob.isNormal
+  have hKne : D.subgroupOf H ≠ ⊥ := by
+    rw [Ne, Subgroup.subgroupOf_eq_bot, disjoint_iff, inf_eq_left.mpr hDH]; exact hDne
+  -- `q ∣ |Q|`, hence `¬ q ∣ |H|` by coprimality.
+  have hqdvdQ : q ∣ Nat.card ↥Q := by
+    have h1 : q ∣ (Q0.subgroupOf Q).index := by
+      obtain ⟨n, hn⟩ := (IsPGroup.iff_card (p := q)).mp hEA.isPGroup
+      have : (Q0.subgroupOf Q).index = Nat.card (↥Q ⧸ Q0.subgroupOf Q) := rfl
+      rw [this, hn]
+      rcases n with _ | n
+      · simp only [pow_zero] at hn
+        exact absurd hn (Finite.one_lt_card_iff_nontrivial.mpr hNT).ne'
+      · exact dvd_pow_self q (Nat.succ_ne_zero n)
+    exact h1.trans (Subgroup.index_dvd_card (Q0.subgroupOf Q))
+  have hpH : ¬ q ∣ Nat.card ↥H := by
+    intro hqH
+    exact (Fact.out : q.Prime).one_lt.ne' (Nat.eq_one_of_dvd_coprimes hcop hqH hqdvdQ)
+  -- module-level `hCK`, `hFrob`, `hcond3`.
+  have hCK : ∀ m : ↥Q ⧸ Q0.subgroupOf Q,
+      (∀ k : ↥(D.subgroupOf H), ((k : ↥H) • m = m)) → m = 1 := by
+    intro m hm
+    induction m using QuotientGroup.induction_on with
+    | _ x =>
+      have hd : ∀ d ∈ D, ⁅d, (x : G)⁆ ∈ Q0 := by
+        intro d hdD
+        have hdsub : (⟨d, hDH hdD⟩ : ↥H) ∈ D.subgroupOf H := (Subgroup.mem_subgroupOf).mpr hdD
+        exact (hsmul_iff ⟨d, hDH hdD⟩ x).mp (hm ⟨⟨d, hDH hdD⟩, hdsub⟩)
+      rw [QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+      exact hFPF (x : G) x.2 hd
+  have hFrob : ∀ r ∈ K.subgroupOf H, r ≠ 1 → ∀ k ∈ D.subgroupOf H, k ≠ 1 →
+      r * k * r⁻¹ ≠ k := hfrob.conj_frobenius
+  have hcond3' : ∀ x : ↥H, x ∈ K.subgroupOf H → x ≠ 1 →
+      ∀ m : ↥Q ⧸ Q0.subgroupOf Q,
+        ((x : ↥H) • m = m) ↔ (∀ s : ↥(K.subgroupOf H), (s : ↥H) • m = m) := by
+    intro x hxK hx1 m
+    induction m using QuotientGroup.induction_on with
+    | _ y =>
+      have hxG : (x : G) ∈ K := (Subgroup.mem_subgroupOf).mp hxK
+      have hxG1 : (x : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+      rw [hsmul_iff x y]
+      rw [hcond3 (x : G) hxG hxG1 (y : G) y.2]
+      constructor
+      · intro h s
+        have hsG : (s : G) ∈ K := (Subgroup.mem_subgroupOf).mp s.2
+        exact (hsmul_iff (s : ↥H) y).mpr (h (s : G) hsG)
+      · intro h s hsK
+        have hsHmem : (⟨s, hKH hsK⟩ : ↥H) ∈ K.subgroupOf H := (Subgroup.mem_subgroupOf).mpr hsK
+        exact (hsmul_iff ⟨s, hKH hsK⟩ y).mp (h ⟨⟨s, hKH hsK⟩, hsHmem⟩)
+  have hmain := OddOrder.BG.Ch1.S03.card_eq_pow_card_invariants_of_elemAbelian_general
+    (p := q) (H := ↥H) (M := ↥Q ⧸ Q0.subgroupOf Q)
+    (K := D.subgroupOf H) (R := K.subgroupOf H) hRne hKne hpH
+    (by
+      have := (hfrob.coprime_card_kernel_complement)
+      rwa [Nat.coprime_comm] at this)
+    hCK hFrob hcond3'
+  -- convert: LHS `Nat.card Q̄ = index`; the invariants cardinality is `q`; `|R̄| = |K|`.
+  have hcardK : Nat.card ↥(K.subgroupOf H) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv
+  rw [show (Q0.subgroupOf Q).index = Nat.card (↥Q ⧸ Q0.subgroupOf Q) from rfl, hmain, hcardK]
+  -- remaining bridge: `|C_{Q̄}(K)| = q`.  The `K`-invariants of `Q̄` are the image of `C`
+  -- (`hCfix`), which has order `[C : Q₀] = q` (`hCcard`).
+  congr 1
+  -- `g : ↥C →* Q̄`, the natural map `c ↦ [c]`; its range is the image of `C` in `Q̄`.
+  set g : ↥C →* (↥Q ⧸ Q0.subgroupOf Q) :=
+    (QuotientGroup.mk' (Q0.subgroupOf Q)).comp (Subgroup.inclusion hCQ) with hg
+  -- `mk x ∈ g.range ↔ (x:G) ∈ C` (using `Q₀ ≤ C ≤ Q`).
+  have hg_mem : ∀ x : ↥Q,
+      (QuotientGroup.mk x : ↥Q ⧸ Q0.subgroupOf Q) ∈ g.range ↔ (x : G) ∈ C := by
+    intro x
+    rw [MonoidHom.mem_range]
+    constructor
+    · rintro ⟨c, hc⟩
+      rw [hg, MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.eq,
+        Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv] at hc
+      have h1 : ((c : G)⁻¹ * (x : G)) ∈ Q0 := hc
+      have hx' : (x : G) = (c : G) * ((c : G)⁻¹ * (x : G)) := by group
+      rw [hx']; exact C.mul_mem c.2 (hQ0C h1)
+    · intro hxC
+      refine ⟨⟨(x : G), hxC⟩, ?_⟩
+      rw [hg, MonoidHom.comp_apply, QuotientGroup.mk'_apply, QuotientGroup.eq,
+        Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+      show ((x : G))⁻¹ * (x : G) ∈ Q0
+      rw [inv_mul_cancel]; exact Q0.one_mem
+  -- the `K`-fixed classes of `Q̄` are exactly `g.range` (the image of `C`), via `hsmul_iff`+`hCfix`.
+  have hchar : ∀ w : ↥Q ⧸ Q0.subgroupOf Q,
+      (∀ r : ↥(K.subgroupOf H), (r : ↥H) • w = w) ↔ w ∈ g.range := by
+    intro w
+    obtain ⟨x, hx⟩ := QuotientGroup.mk_surjective w
+    rw [← hx, hg_mem x, ← hCfix (x : G) x.2]
+    constructor
+    · intro h k hkK
+      exact (hsmul_iff ⟨k, hKH hkK⟩ x).mp (h ⟨⟨k, hKH hkK⟩, (Subgroup.mem_subgroupOf).mpr hkK⟩)
+    · intro h r
+      exact (hsmul_iff (r : ↥H) x).mpr (h _ ((Subgroup.mem_subgroupOf).mp r.2))
+  -- `ker g = Q₀.subgroupOf C`, so `|g.range| = [C : Q₀] = q` by the first isomorphism theorem.
+  have hker : g.ker = Q0.subgroupOf C := by
+    ext c
+    simp only [hg, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf, Subgroup.coe_inclusion]
+  rw [card_invariants_eq_card_of_fixedPoints g.range hchar,
+    ← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv, hker,
+    ← Subgroup.index_eq_card]
+  exact hCcard
 
 /-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
