@@ -4872,6 +4872,13 @@ of `(c)`) is also axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_inf_normalizer_eq_bot_of_tau2
 
+/-! **BG Theorem 14.7, type-`P₁` Hall complement card** (`S14_TypePCounting`, `typeP1_card_eq`):
+for a type-`P₁` maximal `N` with Hall `κ(N)`-subgroup `K_N`, `|N| = |N_σ|·|K_N|` (the σ-part
+uniqueness; `K_N` Hall `σ(N)′` complements the normal Hall `σ(N)`-subgroup `N_σ`).  Feeds the
+density inequality of Theorem 14.7(e).  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP1_card_eq
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

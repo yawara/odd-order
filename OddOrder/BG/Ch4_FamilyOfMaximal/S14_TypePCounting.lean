@@ -6322,6 +6322,71 @@ theorem conjClassSet_T_Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSim
     (mem_maximalSubgroups_of_isConjugateSubgroup hMi ⟨g₁⁻¹ * g₂, rfl⟩) htM
   exact not_type1_of_type2 hG D hNmax hy hgyy' hcomm hy'1 hy'N hy'C hy'κ ⟨x, x'', htxx, hlenx, hx''R⟩
 
+/-- **BG 14.7, type-`P₁` Hall complement card** (mmd L4039, "`Kᵢ` complements `M_{iσ}` in `M_i`"):
+for a type-`P₁` maximal subgroup `N` with a Hall `κ(N)`-subgroup `K_N ≤ N`, the order factors as
+`|N| = |N_σ|·|K_N|`.  For type `P₁`, `κ(N) = π(N) − σ(N)`, so `K_N` is a Hall `σ(N)′`-subgroup
+complementing the normal Hall `σ(N)`-subgroup `N_σ` (`Msigma_isHall`).  The proof is the σ-part
+uniqueness: with `m = |N_σ|`, `j = [N : N_σ]`, `a = |K_N|`, `j' = [N : K_N]`, one has
+`m·j = |N| = a·j'` with `m`, `j'` being `σ`-numbers and `a`, `j` being `σ′`-numbers, so `a = j`.
+This is the `[N : N_σ] = kᵢ` identity the density inequality of Theorem 14.7(e) uses to rewrite
+`(|N_σ| − 1)·[G : N]` as `(1/kᵢ − 1/|N|)·|G|`. -/
+theorem typeP1_card_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N KN : Subgroup G} (hNmax : N ∈ maximalSubgroups G) (hP1 : IsTypeP1 N)
+    (hKN : KN ≤ N) (hKN_hall : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N)) :
+    Nat.card ↥N = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) * Nat.card ↥KN := by
+  classical
+  have hMσle : OddOrder.BG.Ch3.S10.Msigma N ≤ N := OddOrder.BG.Ch3.S10.Msigma_le N
+  have hMσHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax
+  -- card transfers between `subgroupOf N` and the ambient subgroup
+  have hcardNσ : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+      = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσle).toEquiv
+  have hcardKN : Nat.card ↥(KN.subgroupOf N) = Nat.card ↥KN :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKN).toEquiv
+  -- Lagrange inside `↥N`
+  have hlagNσ : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N)
+      * ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).index = Nat.card ↥N := by
+    rw [← hcardNσ]; exact Subgroup.card_mul_index _
+  have hlagKN : Nat.card ↥KN * (KN.subgroupOf N).index = Nat.card ↥N := by
+    rw [← hcardKN]; exact Subgroup.card_mul_index _
+  set m := Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma N) with hm
+  set j := ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).index with hjdef
+  set a := Nat.card ↥KN with ha
+  set j' := (KN.subgroupOf N).index with hj'def
+  -- `m`'s primes lie in `σ(N)` (`N_σ` is a Hall `σ`-subgroup)
+  have hm_sigma : ∀ p, p ∈ m.primeFactors → p ∈ OddOrder.BG.Ch3.S10.sigma N := hMσHall.1
+  -- `a`'s primes avoid `σ(N)` (`κ(N) ⊆ σ(N)′`)
+  have ha_sigma : ∀ p, p ∈ a.primeFactors → p ∉ OddOrder.BG.Ch3.S10.sigma N := fun p hp =>
+    kappa_subset_sigmaCompl (hKN_hall.1 p (by rw [hcardKN]; exact hp))
+  -- `j`'s primes avoid `σ(N)` (`j ∣ (N_σ).index`, a Hall index)
+  have hj_div : j ∣ (OddOrder.BG.Ch3.S10.Msigma N).index :=
+    Subgroup.relIndex_dvd_index_of_le hMσle
+  have hj_sigma : ∀ p, p ∈ j.primeFactors → p ∉ OddOrder.BG.Ch3.S10.sigma N := fun p hp =>
+    hMσHall.2 p (Nat.mem_primeFactors.mpr ⟨(Nat.mem_primeFactors.mp hp).1,
+      (Nat.dvd_of_mem_primeFactors hp).trans hj_div, Subgroup.index_ne_zero_of_finite⟩)
+  -- `j'`'s primes lie in `σ(N)` (type `P₁`: `κ(N) = π(N) − σ(N)`)
+  have hj'_dvd_N : j' ∣ Nat.card ↥N := Subgroup.index_dvd_card _
+  have hj'_sigma : ∀ p, p ∈ j'.primeFactors → p ∈ OddOrder.BG.Ch3.S10.sigma N := by
+    intro p hp
+    have hpprime := (Nat.mem_primeFactors.mp hp).1
+    have hp_dvd_N : p ∣ Nat.card ↥N := (Nat.dvd_of_mem_primeFactors hp).trans hj'_dvd_N
+    have hp_notκ : p ∉ kappa N := hKN_hall.2 p hp
+    rw [hP1.2] at hp_notκ
+    by_contra hpσ
+    exact hp_notκ ⟨Nat.mem_primeFactors.mpr ⟨hpprime, hp_dvd_N, Nat.card_pos.ne'⟩, hpσ⟩
+  -- coprimalities and the `a = j` matching
+  have hcop_am : Nat.Coprime a m := Nat.coprime_of_dvd fun p hp hpa hpm =>
+    ha_sigma p (Nat.mem_primeFactors.mpr ⟨hp, hpa, Nat.card_pos.ne'⟩)
+      (hm_sigma p (Nat.mem_primeFactors.mpr ⟨hp, hpm, Nat.card_pos.ne'⟩))
+  have hcop_jj' : Nat.Coprime j j' := Nat.coprime_of_dvd fun p hp hpj hpj' =>
+    hj_sigma p (Nat.mem_primeFactors.mpr ⟨hp, hpj, Subgroup.index_ne_zero_of_finite⟩)
+      (hj'_sigma p (Nat.mem_primeFactors.mpr ⟨hp, hpj', Subgroup.index_ne_zero_of_finite⟩))
+  have ha_dvd_j : a ∣ j := hcop_am.dvd_of_dvd_mul_left (by rw [hlagNσ]; exact ⟨j', hlagKN.symm⟩)
+  have hj_dvd_a : j ∣ a := hcop_jj'.dvd_of_dvd_mul_right (by rw [hlagKN]; exact ⟨m, by
+    rw [← hlagNσ]; ring⟩)
+  have hja : j = a := Nat.dvd_antisymm hj_dvd_a ha_dvd_j
+  rw [← hlagNσ, hja]
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
