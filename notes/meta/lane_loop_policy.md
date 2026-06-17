@@ -33,6 +33,9 @@
    3. feature 単位で commit（build-green を別ステップで検証してから、[[feedback-verify-build-before-commit]]；
       記号本文は heredoc、[[git-commit-heredoc-for-lean-symbols]]）。
    4. **STOP 条件を再評価**（下記）。真なら loop を抜ける。
+   - **⚠ 新 leaf (`.lean`) を作ったら必ず `OddOrder.lean` に `import` 行を追記**（root closure 未登録だと
+     `lake build OddOrder` の対象外になり、leaf build が green でも full build / 合流ゲートをすり抜ける、
+     [[leaf-build-stale-green]]）。axiom-clean な新定理は `AxiomsCheck.lean` にも登録する。
 
 ### STOP / 入らない — いずれか真なら loop に入らず、1 ステップだけ進めて handoff し停止
 
