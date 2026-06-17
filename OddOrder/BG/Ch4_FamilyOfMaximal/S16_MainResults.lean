@@ -468,6 +468,90 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       Supports (ASet M U) (S14.zTilde K Kstar ∪ A0Set M K) := by
   sorry
 
+/-! ## Proposition 16.1 forward bridges: constructing the shared type data -/
+
+/-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
+Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
+
+This is the `M ∈ ℳ_𝓕 ⟹ Type F` core feeding `proposition_type_classification`'s `hFI` (clause (a),
+`mpr`).  The deep fields are read off existing §15 results: `U1_commutative` and `frobenius_HU0`
+from `typeP_auxiliary_structure` (mmd 15.1(d)(e)); `H = M_F = M_σ` from Theorem A(8) (`U ≠ ⊥` rules
+out the `M_F ≠ M_σ` branch); `M = U M_σ` from Theorem A(3) with `K = ⊥`; `centralizer_le_U1` is
+`le_sSup` over `M_F# ⊆ M_σ#`.  The lone named residual `hU1normal` (`⟨C_U(x) | x ∈ M_σ#⟩ ◁ U`) is
+the `U`-conjugation invariance of the generating set `{U ⊓ C_G(x) : x ∈ M_σ#}` (as `M_σ ◁ M`); it is
+derivable but isolated here pending the pointwise-`sSup`-conjugation bookkeeping.  Sorry-free in its
+own body; transitively conditional on the (sorried) Theorem A and the gated half of
+`typeP_auxiliary_structure`. -/
+theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUne : U ≠ ⊥)
+    (hU1normal : ((S15.centralizerGeneratedBySigma M U).subgroupOf U).Normal) :
+    OddOrder.GroupTheory.IsTypeF M := by
+  classical
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  -- Theorem A: the maximal-subgroup decomposition `M = K U M_σ` (A3) and the `M_F ≠ M_σ` branch (A8).
+  obtain ⟨_, _, hA3, _, _, _, _, _, _, _, hA8⟩ := theoremA_maximal_structure hG hM hK rfl hU
+  -- `M_F = M_σ`: `U ≠ ⊥` excludes A(8)'s `M_F ≠ M_σ ⟹ U = ⊥` conclusion.
+  have hMFMσ : S15.MF M = Mσ := by
+    by_contra hne
+    exact hUne (hA8 hne).1
+  -- `M = U M_σ` (A3 with `K = ⊥`).
+  have hMU : M = U ⊔ Mσ := by rw [hA3, hKbot, bot_sup_eq]
+  -- `typeP_auxiliary_structure`: `⟨C_U(M_σ#)⟩` abelian (15.1(d)) and the Frobenius `U₀ M_σ` (15.1(e)).
+  obtain ⟨_, _, _, _, _, _, hU1comm, hU0clause⟩ :=
+    typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+  obtain ⟨U0, hU0U, hexp, hfrob⟩ := hU0clause hUne
+  refine ⟨{
+    H := S15.MF M
+    U := U
+    U1 := S15.centralizerGeneratedBySigma M U
+    U0 := U0
+    H_eq := rfl
+    H_nontrivial := by rw [hMFMσ]; exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+    U_nontrivial := hUne
+    H_le := S15.maxNilpotentNormalHall_le M
+    U_le := hUM
+    U1_le := by
+      apply sSup_le
+      rintro C ⟨x, _, rfl⟩
+      exact inf_le_left
+    U0_le := hU0U
+    complement := ?_
+    U1_normal := hU1normal
+    U1_commutative := hU1comm
+    centralizer_le_U1 := by
+      intro x hx hx1
+      apply le_sSup
+      refine ⟨x, ?_, rfl⟩
+      rw [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+        Set.mem_singleton_iff]
+      exact ⟨S15.maxNilpotentNormalHall_le_Msigma hG hM hx, hx1⟩
+    exponent_eq := hexp
+    frobenius_HU0 := ?_ }⟩
+  · -- `complement`: `M_F = M_σ` complements `U` in `M`.  `M_σ ◁ M`, `M_σ ⊓ U = ⊥` and `M_σ ⊔ U = M`
+    -- come from the `K = ⊥` `SubgroupESetup` (`subgroupESetup_of_isHall_kappa_eq_bot`).
+    obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
+      subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
+    rw [hMFMσ]
+    haveI hMσnorm : ((Mσ).subgroupOf M).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le M)).mpr
+        (le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M)
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [Subgroup.disjoint_def]
+      intro x hxMσ hxU
+      rw [Subgroup.mem_subgroupOf] at hxMσ hxU
+      have hx : (x : G) ∈ Mσ ⊓ U := ⟨hxMσ, hxU⟩
+      rw [hsetup.E_compl_inf, Subgroup.mem_bot] at hx
+      exact Subtype.ext hx
+    · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) hUM,
+        hsetup.E_compl_sup, Subgroup.subgroupOf_self, Subgroup.coe_top]
+  · -- `frobenius_HU0`: rewrite `M_F = M_σ` and `M_F ⊔ U₀ = U₀ ⊔ M_σ` into `typeP_auxiliary_structure`'s
+    -- Frobenius datum.
+    rw [hMFMσ, sup_comm]
+    exact hfrob
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
