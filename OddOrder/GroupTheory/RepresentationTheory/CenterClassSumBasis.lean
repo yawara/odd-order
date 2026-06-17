@@ -35,7 +35,7 @@ set_option linter.unusedFintypeInType false
 set_option linter.unusedDecidableInType false
 
 variable {k G : Type*} [Field k] [Group G] [Fintype G] [DecidableEq G]
-  [DecidableEq (ConjClasses G)]
+  [DecidableEq (ConjClasses G)] [Fintype (ConjClasses G)]
 
 /-- The **class sum** `classSum C = ∑_{x ∈ C} x ∈ k[G]` of a conjugacy class `C`. -/
 noncomputable def classSum (C : ConjClasses G) : MonoidAlgebra k G :=
@@ -93,10 +93,29 @@ theorem classSum_mem_center (C : ConjClasses G) :
       group
     · simp [h0]
 
--- TODO (next iteration): class sums are `k`-linearly independent and span `Z(k[G])`, giving
--- `Basis (ConjClasses G) k ↥(center)`.  Cleaner route: apply the cornerstone
--- `finrank_invariants_eq_card_orbits` to the conjugation action `ConjAct G ↷ k[G]` (orbits =
--- conjugacy classes, invariants = centre), which yields the class-sum basis for free, then the
--- `σ_e`-permutation `σ_e (classSum C) = classSum (e · C)`.
+/-- The class sums are `k`-linearly independent: distinct classes have disjoint supports, so the
+`C.out`-coordinate of `∑_C a_C • classSum C` reads off `a_C`. -/
+theorem classSum_linearIndependent :
+    LinearIndependent k (classSum (k := k) (G := G)) := by
+  rw [Fintype.linearIndependent_iff]
+  intro a ha C
+  have hmk : ConjClasses.mk (C.out) = C := by
+    rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq C
+  have key : ∀ C' : ConjClasses G,
+      (a C' • classSum (k := k) C') C.out = if C = C' then a C' else 0 := by
+    intro C'
+    rw [MonoidAlgebra.smul_apply, classSum_apply, hmk, smul_eq_mul]
+    split <;> simp_all
+  have hx : ∑ C' : ConjClasses G, (a C' • classSum (k := k) C') C.out = 0 := by
+    have h0 : (∑ C' : ConjClasses G, a C' • classSum (k := k) C') C.out = 0 := by rw [ha]; rfl
+    rw [← h0]
+    exact (map_sum (Finsupp.applyAddHom C.out)
+      (fun C' => a C' • classSum (k := k) C') Finset.univ).symm
+  rw [Finset.sum_congr rfl (fun C' _ => key C'), Finset.sum_ite_eq Finset.univ C a] at hx
+  simpa using hx
+
+-- TODO (next iteration): class sums span `Z(k[G])`, giving `Basis (ConjClasses G) k ↥(center)`
+-- (an invariant element is constant on conjugacy classes ⟹ `= ∑_C (coeff) • classSum C`), then the
+-- `σ_e`-permutation `σ_e (classSum C) = classSum (e · C)`; feed both into the cornerstone for (4).
 
 end OddOrder.GroupTheory.CenterClassSum
