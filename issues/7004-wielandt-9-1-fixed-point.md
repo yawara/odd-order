@@ -27,6 +27,27 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
 - [x] **3 sorry → 1**（残=本体 `wielandt_fixedPoint_frobenius`）
 - [ ] 本体 `wielandt_fixedPoint_frobenius` = `|C_H(UE)|^|E|·|H| = |C_H(E)|^|E|·|C_H(U)|`
 
+## 進捗 (2026-06-18) — I-1 abstract backbone COMPLETE
+
+- [x] **3d.3b assembly** (`1ba00224`, sorry-free, axiom-clean) — `CenterSimplesOrbit.exists_fixed_simple`:
+      the trivial simple `i₀` is `MulAut G`-fixed. augmentation `aug:Z(k[G])→ₐk`
+      (`MonoidAlgebra.lift 1`|center) + `aug_centerRep` invariance + `algHom_pi_eq_eval` ⟹
+      `simplesAction φ α i₀ = i₀ ∀ α`. block 理論不要（対称化冪等元経路を supersede）。
+- [x] **N=Ncl** (`93a83924`) — `CenterSimplesOrbit.card_simples_eq_card_classes`:
+      `N = #(ConjClasses G)`（idemBasis/centerBasis' 両基底の finrank 一致）。
+- [x] **divisibility helper** (`93a83924`) — `FreeActionOrbitCount.dvd_card_sub_one_of_free_off_unique_fixed`:
+      free-off-unique-fixed ⟹ `|Γ| ∣ |S|−1`（3d.3a 用）。
+- [x] **3d.3c combine** (`93a83924`, sorry-free, axiom-clean) — `CenterOrbitFree.gamma_free_off_trivial_simple`:
+      finite `Γ` (=E) acting via `ψ:Γ→*MulAut G` (各 nonid `ψγ` FPF+coprime) ⟹ simples `Fin N` 上で
+      i₀ が一意 fixed + その他は free（orbit size `|Γ|`）。class side free-off-mk1 (3d.2 ×2: 一意性+stab自明)
+      → forward-count + divisibility → Brauer (3d.1) + N=Ncl → 3d.3a → 3d.3b で i₀ 同定。
+      caller は Γ-action を `compHom` で供給（agreement hcl/hsi は `rfl`、3d.1 と同型）。
+- ⟹ **I-1 (Teichmüller-free orbit-count Brauer lemma) の抽象 backbone は完全完成**（char-0 wall 不要を実証）。
+- [ ] **残（carrier-level、要設計）**: (3d.3c) を CoprimeAction の実 carrier（E/U 共役、W=chief factor module、
+      `IsAlgClosed` から φ 構成）へ配線 + (†) [I-2 isotypic + I-4 base change `𝔽_p→𝔽̄_p` + per-orbit I-3]
+      → `dim W=|E|·dim W^E` + (I-5) chief-series 乗法性 → 本体 `wielandt_fixedPoint_frobenius`。
+      ⚠ ここからは module-level rep-theory + base change の新インフラ（mechanical loop でなく設計フェーズ）。
+
 ## 方針: NO axiom, ボトムアップ完全形式化 (ユーザー裁可 2026-06-17)
 
 本体の **勘定核心 (†)** `Wᵁ=0 ⇒ dim W=|E|·dim Wᴱ` は「E が非自明 `𝔽_p[U]`-既約**加群**に
