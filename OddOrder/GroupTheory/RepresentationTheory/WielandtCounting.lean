@@ -260,4 +260,82 @@ theorem finrank_A1_le_finrank_invariants (ρ : Representation k G V)
   have h2 := congrArg (fun z : ↥(A 1) => (Fintype.card G : k) • z) key
   simpa [smul_smul, mul_invOf_self] using h2
 
+set_option linter.unusedFintypeInType false in
+/-- **I-3, reverse half.**  For `V = ⊕_{g:G} A g` (internal) with `ρ` permuting regularly, the
+`A 1`-component map `V^G → A 1` is injective: an invariant `v` satisfies `v_g = ρ g · v_1`, so it
+is determined by `v_1`.  Hence `dim V^G ≤ dim (A 1)`. -/
+theorem finrank_invariants_le_finrank_A1 (ρ : Representation k G V)
+    [Fintype G] [DecidableEq G] [FiniteDimensional k V]
+    {A : G → Submodule k V} (hint : DirectSum.IsInternal A)
+    (hperm : ∀ a e : G, (A e).map (ρ a) = A (a * e)) :
+    finrank k ↥(invariants ρ) ≤ finrank k ↥(A 1) := by
+  classical
+  set e := LinearEquiv.ofBijective (DirectSum.coeLinearMap A) hint with he
+  have hmem : ∀ (g h : G) (x : V), x ∈ A h → ρ g x ∈ A (g * h) := fun g h x hx =>
+    hperm g h ▸ Submodule.mem_map_of_mem hx
+  have hcs : ∀ (j : G) (x : V) (hx : x ∈ A j), e.symm x j = ⟨x, hx⟩ := fun j x hx => by
+    rw [he]; exact hint.ofBijective_coeLinearMap_of_mem hx
+  have hcn : ∀ (i j : G) (x : V), x ∈ A i → i ≠ j → e.symm x j = 0 := fun i j x hx hij => by
+    rw [he]; exact hint.ofBijective_coeLinearMap_of_mem_ne hij hx
+  have hdecomp : ∀ v : V, ∑ g : G, ((e.symm v g : ↥(A g)) : V) = v := fun v => by
+    have key : ∑ g : G, ((e.symm v g : ↥(A g)) : V) = DirectSum.coeLinearMap A (e.symm v) := by
+      conv_rhs => rw [← DirectSum.sum_univ_of (e.symm v), map_sum]
+      exact Finset.sum_congr rfl (fun g _ => (DirectSum.coeLinearMap_of A g _).symm)
+    rw [key]; exact e.apply_symm_apply v
+  -- invariant components: `v_g = ρ g · v_1`
+  have hrel : ∀ v ∈ invariants ρ, ∀ g : G, (e.symm v g : V) = ρ g ((e.symm v 1 : ↥(A 1)) : V) := by
+    intro v hv g
+    have hgv : ρ g v = v := hv g
+    have hexp : ρ g v = ∑ h : G, ρ g ((e.symm v h : ↥(A h)) : V) := by
+      conv_lhs => rw [← hdecomp v]
+      rw [map_sum]
+    have : (e.symm (ρ g v) g : V) = ρ g ((e.symm v 1 : ↥(A 1)) : V) := by
+      rw [hexp, map_sum, DirectSum.sum_apply]
+      rw [Finset.sum_eq_single (1 : G)]
+      · have hm : ρ g ((e.symm v 1 : ↥(A 1)) : V) ∈ A g := by simpa using hmem g 1 _ (e.symm v 1).2
+        rw [hcs g _ hm]
+      · intro h _ hh1
+        have hm : ρ g ((e.symm v h : ↥(A h)) : V) ∈ A (g * h) := hmem g h _ (e.symm v h).2
+        exact hcn (g * h) g _ hm (fun hc => hh1 (mul_left_cancel (hc.trans (mul_one g).symm)))
+      · intro h; exact absurd (Finset.mem_univ (1 : G)) h
+    rwa [hgv] at this
+  -- the `A 1`-component map, injective on invariants
+  let π : ↥(invariants ρ) →ₗ[k] ↥(A 1) :=
+    { toFun := fun v => e.symm (v : V) 1
+      map_add' := fun x y => by simp [map_add, DirectSum.add_apply]
+      map_smul' := fun c x => by simp [map_smul, DirectSum.smul_apply] }
+  refine LinearMap.finrank_le_finrank_of_injective (f := π) (fun x y hxy => ?_)
+  have h0 : (e.symm ((x : V) - y) 1 : ↥(A 1)) = 0 := by
+    rw [map_sub, DirectSum.sub_apply]
+    have : e.symm (x : V) 1 = e.symm (y : V) 1 := hxy
+    rw [this, sub_self]
+  have hsub : (x : V) - (y : V) = 0 := by
+    rw [← hdecomp ((x : V) - y)]
+    refine Finset.sum_eq_zero (fun g _ => ?_)
+    have hxyinv : (x : V) - y ∈ invariants ρ := (invariants ρ).sub_mem x.2 y.2
+    rw [hrel _ hxyinv g]
+    rw [show (e.symm ((x : V) - y) 1 : ↥(A 1)) = (0 : ↥(A 1)) from h0]
+    simp
+  exact Subtype.ext (sub_eq_zero.mp hsub)
+
+set_option linter.unusedFintypeInType false in
+/-- **I-3, regular-orbit fixed-space count** (capstone).  If `V = ⊕_{g:G} A g` (internal direct
+sum) and `ρ` permutes the summands in one regular `G`-orbit (`(A e).map (ρ a) = A (a*e)`), with
+`|G|` invertible in `k`, then `dim V = |G| · dim V^G`.  Proof: `dim V = |G|·dim (A 1)` (dimension
+half) and `dim (A 1) = dim V^G` (easy + reverse halves, by antisymmetry).
+
+This is the abstract Brauer-free engine behind the kernel-FPF count (†): when the Frobenius
+complement `E` permutes the nontrivial `U`-isotypic components of `W` *freely*, each `E`-orbit of
+components is a regular `E`-set, so applying this per orbit and summing yields
+`dim W = |E|·dim W^E`. -/
+theorem finrank_eq_card_mul_finrank_invariants (ρ : Representation k G V)
+    [Fintype G] [DecidableEq G] [Invertible (Fintype.card G : k)] [FiniteDimensional k V]
+    {A : G → Submodule k V} (hint : DirectSum.IsInternal A)
+    (hperm : ∀ a e : G, (A e).map (ρ a) = A (a * e)) :
+    finrank k V = Fintype.card G * finrank k ↥(invariants ρ) := by
+  rw [finrank_eq_card_mul_of_regular_orbit ρ hint hperm]
+  congr 1
+  exact le_antisymm (finrank_A1_le_finrank_invariants ρ hint hperm)
+    (finrank_invariants_le_finrank_A1 ρ hint hperm)
+
 end OddOrder.GroupTheory.WielandtCounting
