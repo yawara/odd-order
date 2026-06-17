@@ -2762,17 +2762,23 @@ open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
 open scoped IsMulCommutative in
-/-- **Theorem 15.2(f) — the chief factor `Q̄ = Q/Q₀` has order `q^p`, gated-endpoint skeleton**
-(mmd L4196, BG Theorem 3.10(b)).  The Frobenius group `D ⋊ K` (kernel `D`, complement `K`) acts by
-conjugation on the elementary-abelian chief factor `Q̄ = Q/Q₀` (`hEA`).  BG Theorem 3.10(b)
-(`card_eq_pow_card_invariants_of_elemAbelian_general`) gives `|Q̄| = |C_{Q̄}(K)|^{|K|}`; the
-caller-supplied subgroup `C` (with `C/Q₀ = C_{Q̄}(K)` via `hCfix`, and `|C : Q₀| = q` via `hCcard`)
-turns this into `[Q : Q₀] = q^{|K|}`.
+/-- **Theorem 15.2(f)+(g) — `[Q : Q₀] = q^p` and `D' ⊆ C_D(Q̄)`, gated-endpoint skeleton**
+(mmd L4196-4200, BG Theorem 3.10(b)(c)).  The Frobenius group `D ⋊ K` (kernel `D`, complement `K`)
+acts by conjugation on the elementary-abelian chief factor `Q̄ = Q/Q₀` (`hEA`).  The
+caller-supplied subgroup `C` records the `K`-fixed classes (`C/Q₀ = C_{Q̄}(K)` via `hCfix`, with
+`|C : Q₀| = q` via `hCcard`), so `|C_{Q̄}(K)| = q`.  Then:
+
+* **(f)** BG Theorem 3.10(b) (`card_eq_pow_card_invariants_of_elemAbelian_general`) gives
+  `|Q̄| = |C_{Q̄}(K)|^{|K|} = q^{|K|}`, i.e. `[Q : Q₀] = q^{|K|}`;
+* **(g)** BG Theorem 3.10(c) (`commutator_acts_trivially_of_elemAbelian_general`, with the cyclicity
+  hypothesis discharged by `finrank_le_one_of_card_eq` from `|C_{Q̄}(K)| = q`) gives
+  `D' ⊆ C_D(Q̄)`, i.e. `∀ g ∈ ⁅D,D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q₀`.
 
 The §14-gated inputs are `hcond3` (prime-manner action of `K`, Proposition 14.2(a)) and
 `hCcard`/`hCfix` (`|K*| = q`, Theorem 14.7(f)); `hFPF` is discharged by
-`mem_centralizer_of_centralizes_quotient`. -/
-theorem chiefFactor_index_eq_pow_of_inputs [Finite G]
+`mem_centralizer_of_centralizes_quotient`.  Both BG Theorem 3.10 forms share the one conjugation
+`MulDistribMulAction` setup built here. -/
+theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     {Q Q0 D K C : Subgroup G} {q : ℕ} [Fact q.Prime] [(Q0.subgroupOf Q).Normal]
     (hQ0Q : Q0 ≤ Q) (hQ0C : Q0 ≤ C) (hCQ : C ≤ Q) (hDne : D ≠ ⊥)
     (hEA : OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q))
@@ -2788,7 +2794,8 @@ theorem chiefFactor_index_eq_pow_of_inputs [Finite G]
     (hcond3 : ∀ x ∈ K, x ≠ 1 → ∀ y ∈ Q, (⁅x, y⁆ ∈ Q0 ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q0))
     (hCfix : ∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C))
     (hCcard : (Q0.subgroupOf C).index = q) :
-    (Q0.subgroupOf Q).index = q ^ Nat.card ↥K := by
+    (Q0.subgroupOf Q).index = q ^ Nat.card ↥K ∧
+      ∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q0 := by
   classical
   set H : Subgroup G := D ⊔ K with hH
   have hDH : D ≤ H := le_sup_left
@@ -2890,17 +2897,11 @@ theorem chiefFactor_index_eq_pow_of_inputs [Finite G]
       have := (hfrob.coprime_card_kernel_complement)
       rwa [Nat.coprime_comm] at this)
     hCK hFrob hcond3'
-  -- convert: LHS `Nat.card Q̄ = index`; the invariants cardinality is `q`; `|R̄| = |K|`.
   have hcardK : Nat.card ↥(K.subgroupOf H) = Nat.card ↥K :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv
-  rw [show (Q0.subgroupOf Q).index = Nat.card (↥Q ⧸ Q0.subgroupOf Q) from rfl, hmain, hcardK]
-  -- remaining bridge: `|C_{Q̄}(K)| = q`.  The `K`-invariants of `Q̄` are the image of `C`
-  -- (`hCfix`), which has order `[C : Q₀] = q` (`hCcard`).
-  congr 1
-  -- `g : ↥C →* Q̄`, the natural map `c ↦ [c]`; its range is the image of `C` in `Q̄`.
+  -- `g : ↥C →* Q̄`, the natural map `c ↦ [c]`; its range is the image of `C`, of order `[C:Q₀]=q`.
   set g : ↥C →* (↥Q ⧸ Q0.subgroupOf Q) :=
     (QuotientGroup.mk' (Q0.subgroupOf Q)).comp (Subgroup.inclusion hCQ) with hg
-  -- `mk x ∈ g.range ↔ (x:G) ∈ C` (using `Q₀ ≤ C ≤ Q`).
   have hg_mem : ∀ x : ↥Q,
       (QuotientGroup.mk x : ↥Q ⧸ Q0.subgroupOf Q) ∈ g.range ↔ (x : G) ∈ C := by
     intro x
@@ -2929,15 +2930,36 @@ theorem chiefFactor_index_eq_pow_of_inputs [Finite G]
       exact (hsmul_iff ⟨k, hKH hkK⟩ x).mp (h ⟨⟨k, hKH hkK⟩, (Subgroup.mem_subgroupOf).mpr hkK⟩)
     · intro h r
       exact (hsmul_iff (r : ↥H) x).mpr (h _ ((Subgroup.mem_subgroupOf).mp r.2))
-  -- `ker g = Q₀.subgroupOf C`, so `|g.range| = [C : Q₀] = q` by the first isomorphism theorem.
+  -- `ker g = Q₀.subgroupOf C`, so `|g.range| = [C : Q₀] = q` (first isomorphism theorem).
   have hker : g.ker = Q0.subgroupOf C := by
     ext c
     simp only [hg, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
       QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf, Subgroup.coe_inclusion]
-  rw [card_invariants_eq_card_of_fixedPoints g.range hchar,
-    ← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv, hker,
-    ← Subgroup.index_eq_card]
-  exact hCcard
+  have hinvq : Nat.card ↥(g.range) = q := by
+    rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv, hker,
+      ← Subgroup.index_eq_card]
+    exact hCcard
+  refine ⟨?_, ?_⟩
+  · -- **(f)**: `[Q : Q₀] = q^{|K|}` (Thm 3.10(b), with `|C_{Q̄}(K)| = |g.range| = q`).
+    rw [show (Q0.subgroupOf Q).index = Nat.card (↥Q ⧸ Q0.subgroupOf Q) from rfl, hmain, hcardK]
+    congr 1
+    rw [card_invariants_eq_card_of_fixedPoints g.range hchar]; exact hinvq
+  · -- **(g)**: `D' ⊆ C_D(Q̄)`, i.e. `∀ g ∈ ⁅D,D⁆, ∀ x ∈ Q, ⁅g,x⁆ ∈ Q₀` (Thm 3.10(c)).
+    -- `hcyc` (C_{Q̄}(K) cyclic) holds since `|C_{Q̄}(K)| = q` (`finrank_le_one_of_card_eq`).
+    have hcomm := OddOrder.BG.Ch1.S03.commutator_acts_trivially_of_elemAbelian_general
+      (p := q) (H := ↥H) (M := ↥Q ⧸ Q0.subgroupOf Q) (K := D.subgroupOf H) (R := K.subgroupOf H)
+      hfrob hRne hKne hpH hCK hcond3'
+      (by apply finrank_le_one_of_card_eq
+          rw [card_invariants_eq_card_of_fixedPoints g.range hchar]; exact hinvq)
+    intro g0 hg0 x hxQ
+    -- lift `g0 ∈ ⁅D,D⁆` to `⁅D̄,D̄⁆ ≤ ↥H`, apply `hcomm`, and read off via `hsmul_iff`.
+    have hmapeq : (⁅D.subgroupOf H, D.subgroupOf H⁆ : Subgroup ↥H).map H.subtype = ⁅D, D⁆ := by
+      rw [Subgroup.map_commutator, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hDH]
+    rw [← hmapeq] at hg0
+    obtain ⟨gbar, hgbarmem, hgbareq⟩ := Subgroup.mem_map.mp hg0
+    have hbrk := (hsmul_iff gbar ⟨x, hxQ⟩).mp (hcomm gbar hgbarmem (QuotientGroup.mk ⟨x, hxQ⟩))
+    have hg0eq : ((gbar : ↥H) : G) = g0 := hgbareq
+    rw [← hg0eq]; exact hbrk
 
 /-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
@@ -3128,6 +3150,34 @@ theorem not_isCyclic_MF_of_inputs {M Q Q0 : Subgroup G} [(Q0.subgroupOf Q).Norma
   haveI : IsCyclic ↥Q := Subgroup.isCyclic_of_le hQMF
   exact hQbar (isCyclic_of_surjective (QuotientGroup.mk' (Q0.subgroupOf Q))
     (QuotientGroup.mk'_surjective _))
+
+/-- A finite elementary-abelian `q`-group of order exceeding `q` is not cyclic (`§14`-independent,
+reusable; generalises `not_isCyclic_of_card_prime_sq` to any order `> q`).  A cyclic group has
+`Monoid.exponent = Nat.card`, while elementary-abelianness forces the exponent to divide `q`, so
+`Nat.card ∣ q`. -/
+theorem not_isCyclic_of_lt_card {q : ℕ} (hq : q.Prime) {Mod : Type*} [Group Mod] [Finite Mod]
+    (h : OddOrder.GroupTheory.IsElementaryAbelian q Mod) (hlt : q < Nat.card Mod) :
+    ¬ IsCyclic Mod := by
+  intro hcyc
+  have hExp_eq : Monoid.exponent Mod = Nat.card Mod := IsCyclic.exponent_eq_card
+  have hExp_dvd : Monoid.exponent Mod ∣ q := by
+    rw [Monoid.exponent_dvd_iff_forall_pow_eq_one]; exact h.pow_eq_one
+  rw [hExp_eq] at hExp_dvd
+  exact (Nat.not_dvd_of_pos_of_lt hq.pos hlt) hExp_dvd
+
+/-- **Theorem 15.2(f) conjunct `¬ IsCyclic M_F`, gated-endpoint skeleton** (mmd L4202): assembles
+`not_isCyclic_MF_of_inputs` with the engine output `[Q : Q₀] = q^n` (`n = |K| ≥ 2`, since `|K|` is
+the prime `p`).  The chief factor `Q̄ = Q/Q₀` (elementary abelian of order `q^n > q`) is non-cyclic
+(`not_isCyclic_of_lt_card`), and `Q ⊆ M_F` (`hQMF`, Theorem 15.2(c)) lifts this to `M_F`. -/
+theorem not_isCyclic_MF_of_chiefFactor_inputs [Finite G] {M Q Q0 : Subgroup G}
+    [(Q0.subgroupOf Q).Normal] {q n : ℕ} (hq : q.Prime) (hn : 2 ≤ n)
+    (hEA : OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q))
+    (hindex : (Q0.subgroupOf Q).index = q ^ n) (hQMF : Q ≤ MF M) :
+    ¬ IsCyclic ↥(MF M) := by
+  refine not_isCyclic_MF_of_inputs hQMF (not_isCyclic_of_lt_card hq hEA ?_)
+  rw [← Subgroup.index_eq_card, hindex]
+  calc q = q ^ 1 := (pow_one q).symm
+    _ < q ^ n := pow_lt_pow_right₀ hq.one_lt (by omega)
 
 /-- **Theorem 15.2(g) `F(M) ⊆ M_σ`** (mmd L4198), from the same `σ`-gap as the `(g)` equality:
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)` (`fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma`), with
