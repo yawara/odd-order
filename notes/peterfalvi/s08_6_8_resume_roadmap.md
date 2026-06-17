@@ -43,22 +43,36 @@ import する**新 leaf `S08_CaseBWeightedEndgame.lean`** に置く（FPF spine 
 unweighted endgame `false_of_coherentXunionYset_of_not_coherentS`(`CorePart2:3439`)+ `xSum_le_two_psi`
 (`:3229`)を mirror。4 sub-piece:
 
-1. **`sum_div_normSq_Xset_eq`**(weighted Xset 恒等式、~30 行、**case-B 仮説不要**)= `sum_re_sq_Xset_eq`
-   (`CorePart2:2837`)の重み付き版。summand を `(χ1).re²/(⟨χ,χ⟩).re`、`sum_div_normSq_induce_kernelFilter_eq`
-   (`CorePart1:2526`, **複素** `χ1²/⟨χ,χ⟩` 形, irreducibility 不要)の A=⊥ と A=W₂ を `Finset.sum_sdiff` で差。
-   real 変換は `sum_re_sq_induce_kernelFilter_eq`(`:2789`)の `hsummand`/`Complex.ofReal_inj` パターン
-   (χ1 実正・⟨χ,χ⟩ 実正ゆえ `χ1²/⟨χ,χ⟩ = ((χ1).re²/(⟨χ,χ⟩).re:ℂ)`)。→ `|L:H|·(|H|-|H:W₂|)`。
-2. **`xSum_le_two_psi_caseB`**(bridge、~50 行)= `xSum_le_two_psi`(`:3229`)の重み付き版。brick 3
-   `sMember_degreeSqNormReBound_of_not_coherent` + (1) + `Xdiff ⊆ (range χmem).toFinset` +
-   `sum_toFinset_range_eq` で `|L:H|·(|H|-|H:W₂|) ≤ 2ψ(1).re·η(1).re`。**summand 一致**: index 側
-   `(χmem j 1).re²/mc j`(mc=(⟨χmem,χmem⟩).re)、set 側 `(χ1).re²/(⟨χ,χ⟩).re`。
-3. **`false_of_coherentXunionYset_caseB_of_not_coherentS`**(endgame、~90 行)= `:3439` mirror。X∪Y
-   coherence seed を **hypothesis** で取り(`exists_coherentBreakPair` で break pair)、(2) →
-   `hbreak : w1·hZ·(cZ-1) ≤ 2·w1²·d` に整形 → `false_of_caseB_break_of_bounds`(`CaseBEndgame:384`、proved)。
-   case-B 構造仮説 = `caseB_fpf_bound`(`:338`)の署名(hW2cen/hcop/hMgt/hWMgt)+ Cor 2.30 `d²≤|H:W₂|`。
-4. **`S08_CoherenceTheorems:59` の c2-math-B dispatch**: X∪Y seed を **構成**（`coherentXunionYset_caseB_of_glued`
-   `CaseBCoherence2:1616`）— ここで `hXanchored`（§6 certain-type structure theory gap）が要求され
-   **ユーザー直接管理ゆえ loop では閉じない**（LAUNCH stop 条件）。(1)-(3) は閉じられる、(4) で gate。
+1. ✅ **`sum_re_div_normSq_Xset_eq`**(commit `eae34b5c`、build-green・axiom-clean、`S08_CaseBWeightedEndgame`)=
+   weighted Xset 恒等式 `∑_{X(Z)} (χ1).re²/(⟨χ,χ⟩).re = |L:H|·(|H|-|H:Z|)`、**case-B 仮説不要**。
+   `sum_div_normSq_induce_kernelFilter_eq`(複素 `χ1²/⟨χ,χ⟩`)の A=⊥/A=Z 差 + 各 summand real 変換
+   (`induce_apply_one` で degree、`inner_self_eq_realCast` で norm)。**実装罠**: `sum_div_normSq_…` 呼出は
+   named-arg `(H:=H)` が instance 解決前に H を pin せず stuck → **`@` positional 形**(`@sum_div… ↥L _ _ _ H _ _ ⊥ _`)。
+   ambient `[Invertible (Nat.card ↥H)]` は statement の `induce` 経由で auto-include 済 → **shadowing haveI 不可**
+   (key の Finset が `this` を使い goal の ambient と不一致になる)。
+2. ✅ **`xSum_le_two_psi_caseB`**(同 commit)= bridge `|L:H|·(|H|-|H:W₂|) ≤ 2ψ(1).re·η(1).re`。brick 3
+   `sMember_degreeSqNormReBound` + (1) + `Xdiff ⊆ (range χmem).toFinset` + `sum_toFinset_range_eq` +
+   nonneg `inner_self_re_nonneg`。**⚠ S₁ = X(W₂)∪Y 特化**(↓ (3) で general 化が必要)。
+3. 🛑 **`false_of_coherentXunionYset_caseB_of_not_coherentS`**(endgame)— **2 構造要件が判明**
+   (`:3439` の素朴 mirror は不可):
+   - **(a) general S₁**: `exists_coherentBreakPair`(all-irr S 前提)は case-B で不可、`exists_coherentBreakPair_general`
+     (`CorePart1:1035`)を使うが **S₁ ⊋ X(W₂)∪Y**(break は chain の最初の破綻点 = より大きい coherent S₁)。
+     ⟹ brick 3 + (2) を **任意 conj-closed coherent S₁ ⊆ S**(anchor η∈Yset⊆S₁)に general 化要。
+     per-member machinery(`caseB_member_orthoDatum`/`caseB_S_member_column_or_irreducible` dispatch)は
+     **既に S-level で general** ゆえ機械的: general `caseB_S_pairwise_orthogonal`(X/Y-split を column/irr dispatch
+     に置換)+ general enumerator(`exists_finEnum_general`)+ `caseB_breakChar_fields`/brick 3/bridge を S₁ 化。
+   - **(b) irreducible break char**: weighted engine `coherentDegreeSqNormBound_of_not_coherentW` は
+     **irreducible** な `χ : IrreducibleCharacter` を adjoin するが、case-B の conjugate-pair cover
+     (`exists_conjugatePairCover_general`)は **reducible column pair {columnSum χ₂, columnSum χ₂⁻¹}** を
+     pair しうる ⟹ break char が reducible なら engine 不適用。要解決: cover が reducible columns を **base S₀
+     に押し込む**(= 全 reducible が X(W₂)∪Y 内)ことを示すか、reducible break を別処理。これは §6 certain-type
+     structure(どの column がどの filtration 層か)に依存し **hXanchored gate 近傍**。
+   discharge 先 = `hbreak : w1·hZ·(cZ-1) ≤ 2·w1²·d` 整形 → `false_of_caseB_break_of_bounds`
+   (`CaseBEndgame:384`、proved)+ Cor 2.30 `d²≤|H:W₂|` + `caseB_fpf_bound`(`:338`)。
+4. **`S08:59` c2-math-B dispatch**: X∪Y seed 構成(`coherentXunionYset_caseB_of_glued` `CaseBCoherence2:1616`)
+   = `hXanchored` ユーザー管理 gate。
+**▶ 次の具体手** = (3)(a) の general 化(brick 2/3/breakChar を S₁ パラメータ化、機械的)→ (3)(b) の cover 構造
+精査(reducible break が起きるか)。(1)(2) は landed。
 
 ## ✅✅ 2026-06-17 セッション更新 — brick 2 COMPLETE (coupled producer + pairwise + enumerator)
 
