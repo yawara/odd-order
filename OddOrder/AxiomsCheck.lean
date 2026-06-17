@@ -5093,6 +5093,16 @@ unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_Z_isCyclic
 
+/-! **BG Theorem 14.7, unique nonconjugate partner `M*`** (`S14_TypePCounting`,
+`typeP_partner_existsUnique`): the `∃!` heart of Theorem 14.7 — there is a unique maximal `M*` that
+is type-P, nonconjugate to `M`, has `K*` Hall `κ(M*)` with `K = C_{M*_σ}(K*)`, makes `Z = K ⊔ K*`
+cyclic with `Ẑ` a TI-set, has `M` or `M*` type-P₂, and covers every type-P maximal up to conjugacy.
+Existence from `exists_partner` + `typeP_partner_structure` + `typeP_Z_isCyclic` + `typeP_zTilde_isTI`
++ `isTypeP2_or_isTypeP2_partner` + `typeP_covering`; uniqueness from the partner symmetry
+`K = C_{M*_σ}(K*)` pinning `ℳ(C_G(X)) = {M*}` for `X ∈ ℰ¹(K)`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_partner_existsUnique
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

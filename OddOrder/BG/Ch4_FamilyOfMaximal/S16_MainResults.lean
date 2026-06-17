@@ -871,7 +871,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
         OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
       -- Theorem 14.7 (`typeP_duality`): the dual pair `S, T := Mstar`, with covering.
       obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar, _, hcyc, _, hP2disj, hcover⟩, _⟩ :=
-        typeP_duality hG hS hSP hK hKstardef
+        typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
       refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_⟩
       · -- `S ≠ Mstar`: else `S` would be conjugate to itself `= Mstar`, against `¬conj S Mstar`.
         rintro rfl

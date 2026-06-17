@@ -1723,3 +1723,26 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 1. **∃! uniqueness assembly** (`typeP_partner_existsUnique` 推奨 standalone): existence の **8 conjunct すべて in hand** (maximal/typeP/¬conj=`typeP_family_pairwise_nonconjugate` / Hall κ(M*)=partner_structure / **IsCyclic=本commit** / TI=`typeP_zTilde_isTI` / P2-dichotomy / covering=`typeP_covering`)。witness=`exists_partner`。**uniqueness pin が intricate** (~100-150行): covering(Mstar0)を H:=Mstar' に適用 → Mstar'~Mstar0 (conjugate); ¬conj M Mstar' で ~M を排除。equality へは Hall-conjugacy (Kstar=Hall κ(Mstar0)=Hall κ(Mstar') の両方; c•Kstar も Hall κ(c•Mstar0) ⟹ ∃m∈Mstar', d:=mc∈N_G(Kstar) で d•Mstar0=Mstar') → **d∈Mstar0 を示す段が要設計** (N_G(Kstar) 関連の containment; 14.7(1)+`normalizer_le_of_maximalSubgroupsContaining_centralizer` は N_G(X)≤Mstar0 for X∈ℰ¹(K) を与えるが Kstar 側は別途)。
 2. **part(h)** `IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M)`: **Prop 14.2(a) の UM_σ normal complement が repo 未パッケージ = §13-gated 構築 gate** (S14:1657 docstring「(a) regular action on U / normal complement U M_σ … Deferred to proof time, gated on §13」)。building blocks = κ⊆τ₁ case の `Msigma_centralizer_E23_…`(525/676/767, E₃/E₂/E₁-half regular action)。M'=UM_σ には UM_σ◁M complement + K cyclic(本commit済)⟹ M/(UM_σ)≅K abelian。coprime conjunct は `coprime_card_derived_kappaHall_of_isComplement'` で free。**substantial/multi-session。**
 - **正本=この節。** 次の選択 = uniqueness(self-contained, intricate)か part(h)(§13 構築 gate, longer)か。
+
+### ✅✅✅ 14.7 ∃! partner COMPLETE + statement faithfulness fix (2026-06-18 lane-h 再開 cont., commit `023b2d36`) — 残り typeP_duality = part(h) のみ
+
+**ユーザー「両方を順に (フル close)」を選択 → ∃! を先に完遂。`typeP_partner_existsUnique` sorry-free + axiom-clean + AxiomsCheck。full build green 3838 jobs ~56s、sorry 141。**
+
+**🐛🐛 重大発見: 旧 typeP_duality の ∃! は証明不可能 (偽) だった** — uniqueness を精査して 2 つの statement bug を発見・修正:
+1. **`hKM : K ≤ M` 欠落**: helper 全て (typeP_structure 等) が要求するが、`IsHallSubgroup (kappa M) (K.subgroupOf M)` 単独からは導けない (`K.subgroupOf M = K ⊓ M` が Hall でも K≤M は出ない)。hypothesis に追加。
+2. **partner-symmetry conjunct 欠落**: `K = C_{Mstar_σ}(Kstar)` (BG 14.7(3)/appendix(4)) が無いと **反例**: `Mstar' := (Mstar)^d` (d∈N_{Mσ}(Kstar)∖Kstar、Mσ nilpotent[M P2 で normalizer condition]で存在) が他 conjunct を全て満たす (Hall κ(Mstar') Kstar は d∈N_G(Kstar) で保存、¬conj/covering/P2 は conjugacy 不変) のに Mstar'≠Mstar ⟹ ∃! 偽。**conjunct 4 を BG-appendix(4) 三つ組 `Kstar ≤ Mstar ∧ Hall κ(Mstar) Kstar ∧ K = C_{Mstar_σ}(Kstar)` に bundle** (§15/§16 consumer は pos 4 が `_` ゆえ pair/triple を吸収、pos 5-8 不変で無傷)。
+
+**uniqueness の clean な核** (partner-sym があれば): competitor Mstar' に対し `K = C_{Mstar'_σ}(Kstar)` が **K を Mstar' の Kstar-role に**する ⟹ typeP_structure(Mstar') の last conjunct で `𝓜(C_G(X))={Mstar'}` (X∈ℰ¹(K))、これが `{Mstar}` (14.7(1)=`typeP_partner_centralizer_singleton`) に等しい ⟹ Mstar'=Mstar。**conjugation→equality の困難 (d∈N_G(K) gap) を完全回避**。line X は κ(M) nonempty → p∈κ → Hall で p∣|K| (`hK.2` で p∉index) → `exists_prime_orderOf_dvd_card'`。
+- consumer 更新: hKM 渡す (S15 ×3 = hKM param、S16 ×1 = `Subgroup.map_subtype_le K'`)。
+
+**▶▶ 残り = part(h) のみ** `IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M)` (typeP_duality の唯一 sorry `S14:7748`)。coprime conjunct は `coprime_card_derived_kappaHall_of_isComplement'` で free。
+
+**part(h) = §13-gated 構築 (Prop 14.2(a) U M_σ normal complement、repo 全体で未構築 — `typeP_auxiliary_structure_gated` S15:721 の sorry も同 gap)**。BG L4061 経路:
+- **M' = U M_σ** が核心:
+  - **M_σ ⊆ M'** (Thm 10.2(c) = `Msigma_le_derived hG hM` ✓ 在)。
+  - **U ⊆ M'**: Frobenius `E = E₁⋉U` (κ⊆τ₁ case = `isFrobeniusGroup_E_of_caseTau1` ✓) で **[E₁,U]=U** (coprime fixed-point-free `actsRegularlyOn_E23_E1_of_caseTau1` ✓ → `[A,N]=N`) ⊆ [M,M]=M'。case κ∩τ₃≠∅ は K=E (typeP_structure 第1枝の `hKEeq`) ⟹ U=1、U M_σ=M_σ。
+  - **M' ⊆ U M_σ**: U M_σ ◁ M (K normalizes U[U◁E] + M_σ) + M/(U M_σ)≅K cyclic abelian ⟹ M'⊆ker=U M_σ。
+- **K complements M'=U M_σ**: U M_σ ◁ M、K∩U M_σ=1 (K=κ群, U M_σ=κ'群[U=(κ∪σ)', M_σ=σ]), |K||U M_σ|=|M| (M=M_σ⋊E, E=K⋉U) → `IsComplement'`。
+- building blocks 在: `E_complement`/`isComplement'_subgroupOf`/`card_Msigma_mul_card_E` (S12_ECore:192/229/243), `exists_subgroupESetup_with_le` (K≤E), `commutator_eq_self_of_isComplement'_le_commutator` (S06)。
+- **摩擦点**: (i) 与えられた K (Hall κ)・U (Hall(κ∪σ)') を E-setup の E₁・E₂E₃ に matching (typeP_structure の proof が前例)、(ii) case split (κ∩τ₃ vs κ⊆τ₁) を mirror、(iii) coprime `[A,N]=N`、(iv) normal complement → IsComplement' API。**~150-250 行、multi-step。**
+- 正本=この節。次セッション = part(h) 構築 (`derivedInG_eq_U_sup_Msigma` を核 lemma に切り出すのが推奨)。

@@ -7618,6 +7618,97 @@ theorem typeP_Z_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       isCyclic_kappaHall_sup_Kstar_of_cyclic hKstarMstar hKstar_hall hKeq
     rw [sup_comm]; exact hcyc
 
+/-- **BG Theorem 14.7, the unique nonconjugate partner `M*`** (mmd L3962-3971, parts (1)-(7) +
+appendix item (4)): for a type-`P` maximal `M`, there is a *unique* maximal subgroup `M*` that is
+type-`P`, nonconjugate to `M`, has `K*` as a Hall `κ(M*)`-subgroup with `K = C_{M*_σ}(K*)`, makes
+`Z = K ⊔ K*` cyclic with `Ẑ` a TI-set, has one of `M`, `M*` type-`P₂`, and covers every type-`P`
+maximal up to conjugacy.
+
+Existence is the canonical partner of `exists_partner`, its data assembled from
+`typeP_partner_structure` (maximal/type-P/`K* ≤ M*`/Hall `κ(M*)`/`K = C_{M*_σ}(K*)`),
+`typeP_family_pairwise_nonconjugate`, `typeP_Z_isCyclic`, `typeP_zTilde_isTI`,
+`isTypeP2_or_isTypeP2_partner`, and `typeP_covering`.
+
+**Uniqueness** turns on the partner-symmetry conjunct `K = C_{M*_σ}(K*)` (BG 14.7(3), appendix (4)):
+it makes `K` the `K*`-role subgroup of any competitor `M*'`, so Proposition 14.2(c) for `M*'`
+(`typeP_structure`, last conjunct) gives `ℳ(C_G(X)) = {M*'}` for a line `X ∈ ℰ¹(K)`, which also
+equals `{M*}` (Theorem 14.7(1), `typeP_partner_centralizer_singleton`), forcing `M*' = M*`.
+
+The partner-symmetry conjunct is *essential*: without it the `∃!` is false, since
+`M*' := (M*)ᵈ` for `d ∈ N_{M_σ}(K*) ∖ K*` (which exists when `M_σ` is nilpotent and `K* ⊊ M_σ`,
+e.g. `M` type-`P₂`) is nonconjugate to `M*`, still has `K*` Hall `κ(M*')` (as `d` normalizes `K*`),
+and satisfies every other conjunct, yet `M*' ≠ M*`. -/
+theorem typeP_partner_existsUnique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∃! Mstar : Subgroup G,
+      Mstar ∈ maximalSubgroups G ∧ IsTypeP Mstar ∧ ¬ IsConjugateSubgroup M Mstar ∧
+      (Kstar ≤ Mstar ∧ Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar) ∧
+        K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G)) ∧
+      IsCyclic ↥(K ⊔ Kstar) ∧ IsTISubset (zTilde K Kstar) (K ⊔ Kstar) ∧
+      (IsTypeP2 M ∨ IsTypeP2 Mstar) ∧
+      (∀ H : Subgroup G, H ∈ maximalSubgroups G → IsTypeP H →
+        IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
+  classical
+  obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ := exists_partner hG D hM hP hKM hK hKstar hU
+  obtain ⟨hMstarmax, hMstarP, hKstarMstar, hKstar_hall, hKeq⟩ :=
+    typeP_partner_structure hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  -- A line `X = ⟨x⟩ ∈ ℰ¹(K)` (needed for both the existence data and the uniqueness pin).
+  obtain ⟨p, hpκ⟩ := id hP
+  have hp : p.Prime := prime_of_mem_kappa hpκ
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpK : p ∣ Nat.card ↥K := by
+    obtain ⟨_, _, P, hPelem, hPM, _⟩ := id hpκ
+    have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+    have hpdvdM : p ∣ Nat.card ↥M := by rw [← hPcard]; exact Subgroup.card_dvd_of_le hPM
+    have hsplit : p ∣ Nat.card ↥(K.subgroupOf M) * (K.subgroupOf M).index := by
+      rw [Subgroup.card_mul_index]; exact hpdvdM
+    have hpKsub : p ∣ Nat.card ↥(K.subgroupOf M) := by
+      rcases hp.dvd_mul.mp hsplit with h | h
+      · exact h
+      · exact absurd hpκ (hK.2 p (Nat.mem_primeFactors.mpr
+          ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩))
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at hpKsub
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+  have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+  have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+  -- `ℳ(C_G(X)) = {M*}` (Theorem 14.7(1)).
+  have h0 : maximalSubgroupsContaining (Subgroup.centralizer ((Subgroup.zpowers (x : G)) : Set G))
+      = {Mstar} :=
+    typeP_partner_centralizer_singleton hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart hXelem hXK
+  refine ⟨Mstar, ⟨hMstarmax, hMstarP,
+    typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU (Or.inl rfl) hMstarmem
+      (Ne.symm hMstarne),
+    ⟨hKstarMstar, hKstar_hall, hKeq⟩,
+    typeP_Z_isCyclic hG D hM hP hKM hK hKstar hU hMstarmem hMstarne hpart,
+    typeP_zTilde_isTI hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart,
+    isTypeP2_or_isTypeP2_partner hG D hM hP hKM hK hKstar hU hpart,
+    fun H hHmax hHP =>
+      typeP_covering hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart hHmax hHP⟩, ?_⟩
+  -- Uniqueness: any competitor `M*'` satisfies `ℳ(C_G(X)) = {M*'}` via the partner symmetry.
+  rintro Mstar' ⟨hMstar'max, hMstar'P, -, ⟨hKstarMstar', hKstar'_hall, hKeq'⟩, -, -, -, -⟩
+  haveI : IsSolvable ↥Mstar' := hG.solvable_of_mem_maximalSubgroups hMstar'max
+  obtain ⟨U'', hU''⟩ := Ch03.hall_E_exists (G := ↥Mstar')
+    ((kappa Mstar' ∪ OddOrder.BG.Ch3.S10.sigma Mstar')ᶜ)
+  have hU''eq : (U''.map Mstar'.subtype).subgroupOf Mstar' = U'' :=
+    Subgroup.comap_map_eq_self_of_injective Mstar'.subtype_injective U''
+  have hUstar' : Ch03.IsHallSubgroup ((kappa Mstar' ∪ OddOrder.BG.Ch3.S10.sigma Mstar')ᶜ)
+      ((U''.map Mstar'.subtype).subgroupOf Mstar') := by rw [hU''eq]; exact hU''
+  have h' : maximalSubgroupsContaining (Subgroup.centralizer ((Subgroup.zpowers (x : G)) : Set G))
+      = {Mstar'} :=
+    (typeP_structure hG hMstar'max hMstar'P hKstarMstar' hKstar'_hall hKeq' hUstar').2.2.2.2.2
+      p hp _ hXelem hXK
+  have hmem : Mstar' ∈ maximalSubgroupsContaining
+      (Subgroup.centralizer ((Subgroup.zpowers (x : G)) : Set G)) := by
+    rw [h']; exact Set.mem_singleton _
+  rw [h0, Set.mem_singleton_iff] at hmem
+  exact hmem
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
@@ -7630,19 +7721,33 @@ complement of `K` in `M` (`M = K M'`, `K ∩ M' = 1`), with `|M'|`, `|K|` coprim
 (mmd L4232) and Lemma 15.1 cite this directly; it is surfaced as the two leading conjuncts so
 `§15` can apply it without re-deriving κ/τ prime-handling. -/
 theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M)
+    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) ∧
     Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M)) (Nat.card ↥(K.subgroupOf M)) ∧
     ∃! Mstar : Subgroup G,
       Mstar ∈ maximalSubgroups G ∧ IsTypeP Mstar ∧ ¬ IsConjugateSubgroup M Mstar ∧
-      Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar) ∧
+      (Kstar ≤ Mstar ∧ Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar) ∧
+        K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G)) ∧
       IsCyclic ↥(K ⊔ Kstar) ∧ IsTISubset (zTilde K Kstar) (K ⊔ Kstar) ∧
       (IsTypeP2 M ∨ IsTypeP2 Mstar) ∧
       (∀ H : Subgroup G, H ∈ maximalSubgroups G → IsTypeP H →
         IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
-  sorry
+  classical
+  -- A Hall `(κ(M) ∪ σ(M))'`-subgroup `U` of `M` (Hall's theorem in the solvable `M`).
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  -- Part (h): `M' = [M,M]` complements `K` in `M` (gated on the Proposition 14.2(a) normal
+  -- complement `U M_σ`; see `notes/bg/s14_typeP_counting.md`).
+  have hparth : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := sorry
+  exact ⟨hparth, coprime_card_derived_kappaHall_of_isComplement' hK hparth,
+    typeP_partner_existsUnique hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU⟩
 
 /-- **BG Corollary 14.8** (mmd L4065): the type-`P₁` maximal subgroups, if any, are all
 conjugate in `G`; and if the type-`P` family is nonempty it consists of exactly two conjugacy
