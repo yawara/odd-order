@@ -11,8 +11,8 @@
 | レーン | branch | 内容 | 推奨モデル | 自動合流 |
 |---|---|---|---|---|
 | **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | 🅿 **STANDBY** (§16 ungated runway 枯渇, scout 確認): POLE-1 + Thm II hDsub/Conjunct1 skeleton 完了。再開トリガー = H §14 landing (→S16 Thm A-E/II) / B (6.8)+Pf§10-13 (→POLE-2)。**F=0 は正常 (flag 不要)** | Opus 4.8 (1M) | ✅ 対象 |
-| **G** | `lane-g` | **BG §15 専念** (`S15_MF` のみ; §16 は F に移管): `_of_inputs` sorry-free skeleton (Thm 15.2/Thm 15.7 + M_F + Cor 15.x) を §14 obligation named residual 化 | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | **Wielandt (9.1) I-1 critical path** (2026-06-16 夜³ reactivate, issue 7004): `CoprimeAction`/`RepresentationTheory/*` のボトムアップ。on-path lead-up (I-3→step2→系(i)→I-2) を loop、I-1 modular Brauer hard wall で escalate。**producing** (F=0 は first commit 後なら stall 候補) | Opus 4.8 (1M) | ✅ 対象 |
+| **G** | `lane-g` | **§16 skeleton pre-positioning** (2026-06-17 夜² ユーザー裁可で §15→§16 転換): `S16_MainResults` 主結果 (proposition_type_classification → theoremI_type_dichotomy_of_inputs → theoremII_tame_embedding_of_inputs) を `_of_inputs` skeleton 化。§15.2 は depleted。**S16_MainResults editable 部を G に再 grant** (F は Wielandt) | Opus 4.8 (1M) | ✅ 対象 |
 | **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
 
 **G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
@@ -157,6 +157,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-17 (夜²) — G を §16 skeleton pre-positioning に転換 (ユーザー裁可 + feasibility audit `a8b3835fd`)**:
+  §15.2 の §14-非依存 skeleton が depleted (conjunct 3 landing 済 `d2961075`、残 conjunct 2/4/5 は σ-gap/§14
+  gated で空転) とコード検証 (audit `lane-g 監査`) で確定 → ユーザー裁可で **G を §16 (`S16_MainResults.lean`) に
+  転換**。F が Wielandt I-1 へ pivot して §16 が空いたため衝突なし (F は §16 復帰せず Wielandt 継続; H が
+  typeP_duality landing で F が §16/POLE-2 復帰する際に ownership 再調整)。G の objective = §16 主結果を `_of_inputs`
+  skeleton 化、価値順 3 ユニット: (1) `proposition_type_classification` (`S16_MainResults:495`, typeP_duality
+  非依存, ~1 session, 最初の一手) (2) `theoremI_type_dichotomy_of_inputs` (`:527-635`, typeP_duality named-hyp,
+  FT path 直結, ~1-2 session) (3) `theoremII_tame_embedding_of_inputs` (`:685-803`, ~1 session)。⚠ G は
+  **editable 部のみ** (frozen `S16_NonExistenceGCore` は不可)、F 既済 skeleton
+  (`theoremD_..._of_inputs`/`theoremII_conjunct1_of_inputs`) は複製しない。**「G = §15 専念 / S16_MainResults
+  編集禁止」の旧取り決めは G に限り解除** (F が Wielandt にいる間)。G VERDICT: STOP→LOOP_THEN_STOP。
 - **2026-06-17 (夜) — レーン自律 loop ポリシー導入 ([`lane_loop_policy.md`](lane_loop_policy.md))**: ユーザー要望で
   「各レーンが LAUNCH.md の記述を見て妥当なタイミングで自律的に `/loop` を選べる」仕組みを構築。各 worktree の
   `LAUNCH.md` 冒頭に「▶ LOOP GATE」ブロック (VERDICT = LOOP / LOOP_THEN_STOP / STOP + objective + develop leaf +
