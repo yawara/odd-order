@@ -117,8 +117,11 @@ per-member で `certainTypeMemberDecomposition` / `memberExtensionDecomposition`
 **brick 3-4**: `xSum_le_two_psi_caseB`(brick 2 + counting `sum_div_normSq_induce_kernelFilter_eq`)→
 c2 endgame `false_of_coherentXunionYset_caseB_of_not_coherentS` → S08:59 の 3-way dispatch。
 
-⚠ 唯一の未確認点 = brick 1 irreducible 枝の case-B member-fact(`hreal`/`hdiffsupp`)の供給元。
-column 枝・instance・classification・engine 側はすべて確認済。
+✅ 全部品 verified(未確認点ゼロ): brick 1 irreducible 枝の case-B member-fact は
+`xMember_diffSupport_of_irreducible_X`(`S08_CoherenceCore:513`, Frobenius 非依存)+ 次数ベース
+support(`sMember_diffSupport_of_charValue_eq`)で供給。`hreal` は irreducible X-member の非実性
+(case-B X は奇位数ゆえ非実、既存の X-member fact)。column 枝・instance・classification・engine 側も確認済。
+⟹ brick 1 から純粋に coding(新数学なし、既存 green producer の結線)。
 
 ## (6.5) p-group reduction — 完備 (Plan agent の「未形式化」は誤り)
 
