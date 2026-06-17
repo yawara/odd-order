@@ -5591,6 +5591,120 @@ theorem typeP_family_Z_normalizes_T [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       conj_smul_eq_self_of_mem_normalizer
         (typeP_family_member_normal hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN) hl)]
 
+/-- **BG Proposition 14.2(d), second assertion** (mmd L3827): for a type-`P` maximal `M` with Hall
+`κ(M)`-subgroup `K` and `K* = C_{M_σ}(K)`, every `g ∈ M − (K ⊔ K*)` satisfies `K ∩ K^g = 1`.
+
+BG: "the second assertion follows easily from (b1) since `K` is a Z-group."  Lean proof: a
+nontrivial element of `K ∩ K^g` gives a rank-one `X = ⟨x⟩ ≤ K` of prime order `p` and its conjugate
+`Y = ⟨g⁻¹ x g⟩ ≤ K`.  By Proposition 14.2(b1) (`typeP_structure`), `N_G(X) ⊓ M = N_G(Y) ⊓ M = Z`, so
+`K` normalises both.  Since `g ∈ M` but `g ∉ Z`, `g ∉ N_G(X)`, hence `MulAut.conj g⁻¹ • X ≠ X`,
+i.e. `X ≠ Y`.  Two distinct normal rank-one subgroups of `K` generate an elementary abelian `p²`
+inside `M`, forcing `pRank_M(p) ≥ 2` — contradicting `pRank_M(p) = 1` (`p ∈ π(K) ⊆ κ(M) ⊆ τ₁ ∪ τ₃`).
+This is the `(d)`-clause the TI-argument of Theorem 14.7 invokes (`g ∈ K_i × K_i*`). -/
+theorem typeP_kappaHall_inf_conj_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {g : G} (hgM : g ∈ M) (hgZ : g ∉ K ⊔ Kstar) :
+    K ⊓ (MulAut.conj g • K) = ⊥ := by
+  classical
+  by_contra hne
+  -- A prime `p ∣ |K ∩ K^g|` and an order-`p` element `x ∈ K ∩ K^g`.
+  have hcard_ne : Nat.card ↥(K ⊓ (MulAut.conj g • K)) ≠ 1 :=
+    fun h => hne (Subgroup.eq_bot_of_card_eq _ h)
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  have hxmem : (x : G) ∈ K ⊓ (MulAut.conj g • K) := x.2
+  have hxK : (x : G) ∈ K := (Subgroup.mem_inf.mp hxmem).1
+  have hxKg : (x : G) ∈ MulAut.conj g • K := (Subgroup.mem_inf.mp hxmem).2
+  have hxord' : orderOf (x : G) = p :=
+    (orderOf_injective (K ⊓ (MulAut.conj g • K)).subtype
+      (K ⊓ (MulAut.conj g • K)).subtype_injective x).trans hxord
+  have hxne1 : (x : G) ≠ 1 := fun h => hp_prime.ne_one (by rw [← hxord', h, orderOf_one])
+  -- `X = ⟨x⟩ ≤ K`, rank-one.
+  set X := Subgroup.zpowers (x : G) with hXdef
+  have hXcard : Nat.card ↥X = p := by rw [hXdef, Nat.card_zpowers, hxord']
+  have hXea : X ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXleK : X ≤ K := Subgroup.zpowers_le.mpr hxK
+  -- `Y = ⟨g⁻¹ x g⟩ ≤ K`, rank-one (`g⁻¹ x g ∈ K` since `x ∈ K^g`).
+  have hgxgK : g⁻¹ * (x : G) * g ∈ K := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hxKg
+    simpa [MulAut.smul_def] using hxKg
+  set y₀ := g⁻¹ * (x : G) * g with hy₀def
+  have hy₀conj : y₀ = (MulAut.conj g⁻¹).toMonoidHom (x : G) := by
+    rw [hy₀def, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]; group
+  have hy₀ord : orderOf y₀ = p := by
+    rw [hy₀conj, orderOf_injective (MulAut.conj g⁻¹).toMonoidHom (MulAut.conj g⁻¹).injective]
+    exact hxord'
+  set Y := Subgroup.zpowers y₀ with hYdef
+  have hYcard : Nat.card ↥Y = p := by rw [hYdef, Nat.card_zpowers, hy₀ord]
+  have hYea : Y ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
+  have hYleK : Y ≤ K := Subgroup.zpowers_le.mpr hgxgK
+  -- (b1): `N_G(X) ⊓ M = N_G(Y) ⊓ M = Z`, so `K` normalises both.
+  have hb1 := (typeP_structure hG hM hP hKM hK hKstar hU).2.2.1
+  have hNX : Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar := hb1 p hp_prime X hXea hXleK
+  have hNY : Subgroup.normalizer (Y : Set G) ⊓ M = K ⊔ Kstar := hb1 p hp_prime Y hYea hYleK
+  have hKNX : K ≤ Subgroup.normalizer (X : Set G) :=
+    le_trans (le_trans le_sup_left hNX.ge) inf_le_left
+  have hKNY : K ≤ Subgroup.normalizer (Y : Set G) :=
+    le_trans (le_trans le_sup_left hNY.ge) inf_le_left
+  -- `X ≠ Y`: else `MulAut.conj g⁻¹ • X = Y = X`, so `g ∈ N_G(X) ⊓ M = Z`, against `g ∉ Z`.
+  have hXneY : X ≠ Y := by
+    intro hXeqY
+    have hsmulXY : MulAut.conj g⁻¹ • X = Y := by
+      rw [hXdef, hYdef, hy₀conj,
+        show MulAut.conj g⁻¹ • Subgroup.zpowers (x : G)
+          = (Subgroup.zpowers (x : G)).map (MulAut.conj g⁻¹).toMonoidHom from rfl,
+        MonoidHom.map_zpowers]
+    have hginvNX : g⁻¹ ∈ Subgroup.normalizer (X : Set G) :=
+      mem_normalizer_of_conj_smul_eq_self (hsmulXY.trans hXeqY.symm)
+    have hgNX : g ∈ Subgroup.normalizer (X : Set G) := by
+      simpa using (Subgroup.normalizer (X : Set G)).inv_mem hginvNX
+    exact hgZ (hNX ▸ Subgroup.mem_inf.mpr ⟨hgNX, hgM⟩)
+  -- `X ⊓ Y = ⊥` (distinct rank-one subgroups of prime order `p`).
+  have hXYbot : X ⊓ Y = ⊥ := by
+    by_contra hb
+    have hdvd : Nat.card ↥(X ⊓ Y) ∣ p := hXcard ▸ Subgroup.card_dvd_of_le inf_le_left
+    have hne1 : Nat.card ↥(X ⊓ Y) ≠ 1 := fun h => hb (Subgroup.eq_bot_of_card_eq _ h)
+    have hpeq : Nat.card ↥(X ⊓ Y) = p := ((Nat.dvd_prime hp_prime).mp hdvd).resolve_left hne1
+    have hXY_eq_X : X ⊓ Y = X :=
+      Subgroup.eq_of_le_of_card_ge inf_le_left (hXcard.le.trans hpeq.ge)
+    exact hXneY (Subgroup.eq_of_le_of_card_ge (hXY_eq_X ▸ inf_le_right)
+      (hYcard.le.trans hXcard.ge))
+  -- `X`, `Y` commute (both normal in `K`, trivial meet), so `X ⊔ Y` is elementary abelian `p²`.
+  have hcomm : ∀ a ∈ X, ∀ b ∈ Y, Commute a b :=
+    commute_of_le_normalizer_of_disjoint hXleK hYleK hKNX hKNY hXYbot
+  have hXcentY : X ≤ Subgroup.centralizer (Y : Set G) := fun a ha =>
+    (Subgroup.mem_centralizer_iff).mpr fun b hb => (hcomm a ha b hb).symm
+  have hsupea : (X ⊔ Y).IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.sup_of_le_centralizer hXea.1 hYea.1 hXcentY
+  have hsupcard : Nat.card ↥(X ⊔ Y) = p ^ 2 := by
+    rw [card_sup_of_commute_of_disjoint hcomm hXYbot, hXcard, hYcard]; ring
+  -- `X ⊔ Y ≤ M`, witnessing `pRank_M(p) ≥ 2`.
+  have hsupM : X ⊔ Y ≤ M := sup_le (hXleK.trans hKM) (hYleK.trans hKM)
+  have hsubea : ((X ⊔ Y).subgroupOf M).IsElementaryAbelian p :=
+    IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hsupM).symm hsupea
+  have hsubcard : Nat.card ↥((X ⊔ Y).subgroupOf M) = p ^ 2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsupM).toEquiv, hsupcard]
+  have hle := le_pRank ((X ⊔ Y).subgroupOf M) hsubea
+  rw [hsubcard, Nat.log_pow hp_prime.one_lt] at hle
+  -- but `pRank_M(p) = 1` since `p ∈ π(K) ⊆ κ(M) ⊆ τ₁ ∪ τ₃`.
+  have hp_kappa : p ∈ kappa M := by
+    apply hK.1 p
+    rw [Nat.mem_primeFactors]
+    refine ⟨hp_prime, ?_, Nat.card_pos.ne'⟩
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+    exact hp_dvd.trans (Subgroup.card_dvd_of_le inf_le_left)
+  have hpRank1 : pRank ↥M p = 1 := by
+    rcases kappa_subset_tau1_union_tau3 hp_kappa with h | h
+    · exact tau1_pRank_eq_one h
+    · exact tau3_pRank_eq_one h
+  omega
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
