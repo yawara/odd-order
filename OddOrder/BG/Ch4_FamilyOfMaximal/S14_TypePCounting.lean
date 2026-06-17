@@ -6222,6 +6222,17 @@ theorem conjClassSet_Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     (mem_maximalSubgroups_of_isConjugateSubgroup hM₁ ⟨g₁, rfl⟩)
     (mem_maximalSubgroups_of_isConjugateSubgroup hM₂ ⟨g₂, rfl⟩) hncc) hz1 hz2
 
+/-- **`M̃`-membership is the `not_type1_of_type2` "type-2 form"**: `g ∈ M̃(M)` (for maximal `M`)
+gives `g = x·x'` with `ℓ_σ(x) = 1` and `x' ∈ R(x)`.  The `ℓ_σ(x) = 1` is from `length_one_iff`
+(`x ∈ M_σ^#`, so `M ∈ 𝓜_σ(x)`).  Feeds the `𝒞_G(T) ⊥ 𝒞_G(M̃ᵢ)` disjointness via Lemma 14.6. -/
+theorem mem_Mtilde_imp_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G}
+    (hg : g ∈ Mtilde hG D M) :
+    ∃ x x' : G, g = x * x' ∧ D.length x = 1 ∧ x' ∈ Rsub hG D x := by
+  obtain ⟨x, hx, x', hx', rfl⟩ := hg
+  rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
+  exact ⟨x, x', rfl, (D.length_one_iff x).mpr ⟨hx.2, ⟨M, hM, hx.1⟩⟩, hx'⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
