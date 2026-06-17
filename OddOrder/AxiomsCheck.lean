@@ -4894,6 +4894,15 @@ axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.density_pieces_ncard_le
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP2_member
 
+/-! **BG Theorem 14.7, the `n = 1` collapse** (`S14_TypePCounting`, `family_card_eq_two`): the
+type-`P` family has exactly two members.  The type-`P₂` member's Hall `κ`-subgroup has prime order
+(Prop 14.2(g)); every other member's canonical factor `Kⱼ*` is a nontrivial `σ(Mᵢ)′`-subgroup of `Z`
+(`isPiSubgroup_le_left_of_commute`), forced equal to it, but pairwise disjoint, so at most one
+neighbour.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiSubgroup_le_left_of_commute
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.family_card_eq_two
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
