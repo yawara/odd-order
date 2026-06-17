@@ -470,6 +470,105 @@ theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
+/-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
+runs over Theorems A(8)/B(1)(2)(3)(4)/C(1)(2)(3)(10)/D(1), Theorem 15.2(a), and Theorem 15.7(c)).
+Proposition 16.1 is the bridge from the BG-local `κ`/`σ`/`M_F` taxonomy to the shared, bundled
+Type I--V predicates; the genuinely gated content is the *construction* of each `TypeXData`
+structure from the local classification.  This engine isolates those constructions (and the few
+structural facts the source proof uses to combine them) as named hypotheses and discharges the full
+six-clause conjunction `sorry`-free; when the §15--§16 structural theory lands, the wrapper
+`proposition_type_classification` cites it and applies this skeleton (the gated-endpoint pattern,
+cf. `theoremD_msigma_conjugacy_and_centralizers_of_inputs`).
+
+The named obligations, with their BG sources:
+
+* the four **forward bridges** `hFI`/`hP2II`/`hP1neIIIIV`/`hP1eqV` — construct the Type
+  I/II/III--IV/V data from the local classification (Theorem A(8)+B(1)(2)(3)+15.7(c) for I;
+  C(1)(10)+B(1)(4)+A(8) for II; A(8)+Frattini for III/IV; 15.7(c) for V).  These are exactly the
+  directions that `theoremI_nilpotentHall_conjugacy_and_type_dichotomy` and
+  `theoremII_tame_embedding` consume;
+* the four **reverse classifications** `hIF`/`hIIP2`/`hIIIIVP1`/`hVP1` — read off the local type
+  from the Peterfalvi data (the `π(W₁) ⊆ κ(M)` argument for `→ M_P`, plus the `κ`/`M_F` refinement;
+  Theorem C(2) for `I → M_F`);
+* `hP_derived` (**Theorem C(3)**: `M' = U M_σ` for `M ∈ M_P`) and `hF_not_derived` (**Theorem
+  A(3)**: `M = U M_σ ⊋ M'` for `M ∈ M_F`), which power clause (e);
+* `h152a` (**Theorem 15.2(a)**: `M_F ≠ M_σ ⟹ M ∈ M_P₁`), used for clause (f).
+
+The genuinely *derived* content (not a renamed hypothesis) is clauses (e) and (f), assembled from
+the `κ`-trichotomy (`isTypeP_iff_isTypeP1_or_isTypeP2`, `isTypeF_iff_not_isTypeP`,
+`not_isTypeP1_and_isTypeP2`) together with the bridges. -/
+theorem proposition_type_classification_of_inputs {M : Subgroup G}
+    (hFI : S14.IsTypeF M → OddOrder.GroupTheory.IsTypeI M)
+    (hP2II : S14.IsTypeP2 M → OddOrder.GroupTheory.IsTypeII M)
+    (hP1neIIIIV : S14.IsTypeP1 M → S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
+      OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M)
+    (hP1eqV : S14.IsTypeP1 M → S15.MF M = OddOrder.BG.Ch3.S10.Msigma M →
+      OddOrder.GroupTheory.IsTypeV M)
+    (hIF : OddOrder.GroupTheory.IsTypeI M → S14.IsTypeF M)
+    (hIIP2 : OddOrder.GroupTheory.IsTypeII M → S14.IsTypeP2 M)
+    (hIIIIVP1 : (OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) →
+      S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hVP1 : OddOrder.GroupTheory.IsTypeV M →
+      S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    (hP_derived : S14.IsTypeP M →
+      ∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+    (hF_not_derived : S14.IsTypeF M →
+      ¬ ∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+    (h152a : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M → S14.IsTypeP1 M) :
+    (OddOrder.GroupTheory.IsTypeI M ↔ S14.IsTypeF M) ∧
+      (OddOrder.GroupTheory.IsTypeII M ↔ S14.IsTypeP2 M) ∧
+      ((OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) ↔
+        S14.IsTypeP1 M ∧ S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) ∧
+      (OddOrder.GroupTheory.IsTypeV M ↔
+        S14.IsTypeP1 M ∧ S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) ∧
+      ((∃ U : Subgroup G,
+        Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+          (U.subgroupOf M) ∧
+        derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M) ↔
+          ¬ OddOrder.GroupTheory.IsTypeI M) ∧
+      (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔
+        OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨
+          OddOrder.GroupTheory.IsTypeV M) := by
+  -- `¬ M_P₁ ⟹ M_F = M_σ`, the contrapositive of Theorem 15.2(a).
+  have mf_eq_of_not_typeP1 :
+      ¬ S14.IsTypeP1 M → S15.MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+    intro hnP1
+    by_contra hne
+    exact hnP1 (h152a hne)
+  refine ⟨⟨hIF, hFI⟩, ⟨hIIP2, hP2II⟩, ⟨hIIIIVP1, fun h => hP1neIIIIV h.1 h.2⟩,
+    ⟨hVP1, fun h => hP1eqV h.1 h.2⟩, ?_, ?_⟩
+  · -- **(e)** `M' = U M_σ ⟺ ¬ Type I`.  Via (a) (`Type I ⟺ M_F`), this is `(∃U …) ⟺ M_P`.
+    constructor
+    · -- `→`: a Type I `M` would be `M_F` (`hIF`), contradicting Theorem A(3) (`hF_not_derived`).
+      intro hex hI
+      exact hF_not_derived (hIF hI) hex
+    · -- `←`: `¬ Type I ⟹ ¬ M_F ⟹ M_P`, and Theorem C(3) (`hP_derived`) supplies the decomposition.
+      intro hnI
+      have hnF : ¬ S14.IsTypeF M := fun hF => hnI (hFI hF)
+      have hP : S14.IsTypeP M := not_not.mp (by rwa [S14.isTypeF_iff_not_isTypeP] at hnF)
+      exact hP_derived hP
+  · -- **(f)** `M_F = M_σ ⟺ M` is Type I, II, or V.
+    constructor
+    · -- `→`: case on the `κ`-trichotomy.  `M_F` (`κ = ∅`) ⟹ I; `M_P₂` ⟹ II; `M_P₁`+`M_F = M_σ` ⟹ V.
+      intro heq
+      by_cases hP : S14.IsTypeP M
+      · rcases S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with hP1 | hP2
+        · exact Or.inr (Or.inr (hP1eqV hP1 heq))
+        · exact Or.inr (Or.inl (hP2II hP2))
+      · exact Or.inl (hFI (S14.isTypeF_iff_not_isTypeP.mpr hP))
+    · -- `←`: Type I ⟹ `M_F` ⟹ `¬ M_P₁` ⟹ `M_F = M_σ`; Type II ⟹ `M_P₂` ⟹ `¬ M_P₁` ⟹ `M_F = M_σ`;
+      -- Type V carries `M_F = M_σ` directly (`hVP1`).
+      rintro (hI | hII | hV)
+      · have hnP : ¬ S14.IsTypeP M := S14.isTypeF_iff_not_isTypeP.mp (hIF hI)
+        exact mf_eq_of_not_typeP1 (fun hP1 => hnP (S14.isTypeP_of_isTypeP1 hP1))
+      · have hP2 := hIIP2 hII
+        exact mf_eq_of_not_typeP1 (fun hP1 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hP2⟩)
+      · exact (hVP1 hV).2
+
 /-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
 the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
 Six clauses = mmd (a)-(f): (a) Type I ⟺ `M ∈ ℳ_𝓕`, (b) Type II ⟺ `M ∈ ℳ_𝓟₂`,
