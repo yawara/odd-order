@@ -1454,3 +1454,39 @@ density 不等式 (|T| count済 + 14.5c済 + 14.6済) → n=1 collapse → cover
   y'^g∈K_N → **(d)-second** [`typeP_kappaHall_inf_conj_eq_bot` for N] ⟹ g∈Z (by_contra g∉Z で K_N∩K_N^g=⊥ vs y'^g≠1)。
 - TI-of-T 後: hstab(済) + `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)|=|T|[G:Z] → density 不等式
   (|T| count済 + 14.5c済 + 14.6済) → n=1 collapse (`le_of_coprime_index`+Prop14.2(g)) → covering (half_lt) → part(h)。
+
+### ✅✅✅ TI-of-T COMPLETE + dummy-D finding (2026-06-17 lane-h loop⁸ /loop自走, ~10 commits)
+
+**`/loop` dynamic mode で自走。TI-of-T (long pole の最難関構造的核心) を完全形式化。全 green + axiom-clean。**
+
+landing 群 (依存順):
+- `isPiElementCompl_mem_left_of_commute` (一般): Z=A⊔B 直積 (B≤C(A)), A=πᶜ群, B=π群 ⟹ πᶜ-元∈A。
+  ↥Z で `isPiGroup_le_of_normal_isHallSubgroup` (A=normal Hall πᶜ; `normal_subgroupOf_iff_le_normalizer`
+  + `card_mul_index`)。⟹ σ(N)′-part∈K_N。
+- `typeP_family_member_dData` (包括 producer): family member N の K_N + swap + `Kᵢ*≤C(K_N)` (hcent) +
+  `IsPiSubgroup (σN)ᶜ K_N` + (d)-first + (d)-second を 1 call。hU は `hall_E_exists` (N solvable) で内部構築。
+  TI proof の唯一ソース (choice 一意性のため member_data 単一 obtain)。
+- `typeP_family_exists_sigmaPart`: t∈Z, t≠1 ⟹ ∃N∈family で σ(N)-part≠1 (coverage 矛盾)。
+- 🔑🔑 **`typeP_family_T_isTI`**: `IsTISubset T (K⊔Kstar)`。t∈T, t^g∈Z → exists_sigmaPart で N →
+  π-分解 t=y·y' (`exists_isPiElement_mul`) → y∈Kᵢ*/y'∈K_N (両≠1) → y^g,y'^g は t^g∈Z の powers ゆえ∈Z →
+  y^g∈Kᵢ*∩N^g で **(d)-first ⟹ g∈N** → y'^g∈K_N∩K_N^g で **(d)-second ⟹ g∈Z**。conj bookkeeping は
+  `MulAut.conj`/`map_eq_one_iff`/`conj g•H=H.map(conj g).toMonoidHom`(rfl)。
+- `typeP_family_conjClass_T_count`: **|𝒞_G(T)|=|T|·[G:Z]** (`ncard_conjClassSet_of_isTISubset` +
+  T_isTI + Z_normalizes_T)。
+
+**🔑🔑🔑 dummy-D 発見 (density 論法の feasibility を解決)**: density 論法が使う `Mtilde`/14.5(c)/14.6 は
+すべて **D-parametric** で、`Rsub hG D x` は D を `D.length x=1` 経由でのみ使う。これは構造体公理
+`SigmaDecompositionData.length_one_iff` (`length x=1 ↔ x≠1 ∧ (maximalSigmaSubgroupsOfElement x).Nonempty`)
+で**全 D で同一述語**に固定。14.4 (`sigmaLength_one_centralizer_structure`) の ∃!N も
+`maximalSigmaSubgroupsOfElement x` (D-independent) について。⟹ **dummy D** (line 2617 の `length:=if … then 1 else 0`
+carrier、構成可能) で 14.5(c)/14.6 がそのまま使え、density 論法に **true σ-decomposition theory は不要**。
+⟹ 旧 flag「σ-decomposition theory=必須前提」は density 部分には**当たらない** (true length は不要、length=1 述語のみ)。
+
+**▶ 残り = density 不等式 → n=1 collapse → covering → part(h) → typeP_duality close** (intricate, multi-iteration):
+1. **|M_i|≥2z** (Z⊊M_i proper): M_iσ⊋K_i*=Z⊓M_iσ (K_i prime-action on M_iσ ⟹ C_{M_iσ}(K_i)⊊M_iσ)。要 prime-action 補題。
+2. **conjClass 互いに素**: 𝒞_G(M̃_i) pairwise disjoint (14.5b の M̃_i disjoint + nonconjugate ⟹ conjClass disjoint、要補題) +
+   𝒞_G(T)⊥𝒞_G(M̃_i) (14.6 T∩M̃=∅ ⟹ conjClass disjoint)。
+3. **density 不等式**: dummy D で 14.5(c) → |𝒞_G(M̃_i)|=(|M_iσ|−1)[G:M_i]≥(1/k_i−1/2z)|G|。
+   |G^#|≥|𝒞_G(T)|+Σ|𝒞_G(M̃_i)|≥(1+(n−1)/2z)|G|≥|G| 矛盾 ⟹ ∃M_i type-P2。(14.9 不要、disjoint+card のみ)
+4. **n=1 collapse** (`le_of_coprime_index`+Prop14.2(g): |K_i| 素数=∏_{j≠i}k_j*) → Mstar。
+5. **covering** (half_lt) + **part(h)** (Prop14.2(a) + K cyclic)。
