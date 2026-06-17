@@ -41,15 +41,26 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
 
 - [x] coprime 分解 `V=V^G⊕[V,G]`（dim 形 + `[V,G]^G=0` + `IsCompl`）— `WielandtCounting.lean` `a1bddfaa`
 - [x] **step 2: el-ab 恒等式 (⋆) COMPLETE (modulo (†))** — `finrank_elab_identity` `95757a9f`。toolkit: `Vᵁᴱ=Vᵁ⊓Vᴱ`(`80a4d926`) + compatible-decomposition(`fadb55d6`) + averageMap 明示形(`87816c20`) + `[V,U]` L-不変性 via `MulAut.conjNormal`(`6e2df864`)
-- [ ] (I-3) regular-orbit fixed-space count（抽象・Brauer-free）
-- [ ] 系(i) を BG 3.3 + chief-series で **unconditional 化**
+- [x] **(I-3) regular-orbit fixed-space count COMPLETE** — `finrank_eq_card_mul_finrank_invariants` (`dim V = |G|·dim V^G`) + reverse-half `finrank_invariants_le_finrank_A1`, `b95fcc6b`（dimension/easy halves は `8c1f0f43`/`c140816c`）
+- [ ] 系(i) を BG 3.3 + chief-series で **unconditional 化** — **2026-06-17: 部品調査完了**。keystone
+      `Isaacs.Ch04.coprime_fixedPoints_quotient`（Cor 3.28, `φ:A→MulAut G` 形式）+ BG 3.3
+      `S03b.kernel_acts_trivially_of_centralizer_eq_bot` + el-ab bridge
+      `ElementaryAbelianRepresentation` + φ-descent `IsAInvariant.quotientMulAutHom`(Ch04 Main:2248)
+      は**全て既存**。**stability helper COMPLETE**（新 leaf `CoprimeFrobeniusKernel.lean`
+      `mulAut_iterate_apply`/`_pow_eq_one_of_exponent`/`_eq_one_of_exponent_of_coprime`, `c467872a`）。
+      残 = induction assembly（el-ab φ(L)-不変 normal 存在 [derived 末項の p-torsion で characteristic]
+      + 表現 setup + BG 3.3 適用 + keystone で `C_{H/N}(E)=1` + φ̄ 強帰納 `Nat.card H`）。
+      ⚠ **cor (i) は side-quest**（I-5 keystone が既存判明ゆえ新規共有インフラ無し・sorry 数不変）。
 - [ ] (I-2) isotypic 分解（mathlib `IsSemisimpleModule`+`Maschke`）
-- [ ] (I-1) **modular Brauer permutation lemma**（`Z(𝔽̄_p[U])` の char-0 trace-lift）← 核心
+- [ ] (I-1) **modular Brauer permutation lemma**（fixed-point 形 `#e-fixed simples = #e-fixed classes`,
+      Teichmüller integer-lift）← **核心・真の wall**（full Brauer char より小さい slice）
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
-- [ ] (I-5) chief-series coprime（`C_{H/N}(X)=C_H(X)N/N`, L-invariant el-ab 系, 乗法性）
+- [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
+      残 = 乗法性 `|C_H(X)|=∏|C_{V_i}(X)|`（main formula 用、keystone + chief series から組立）
 - [ ] assembly → `wielandt_fixedPoint_frobenius`
 
-**見積 ~6-9 session**（I-1 が `p`-adic lifting まで要れば再 flag）。
+**見積 ~6-9 session**（I-1 が `p`-adic lifting まで要れば再 flag）。**真の critical path = I-1 wall**
+（cor (i)/I-5-keystone は achievable/既存）。
 
 ## 完了条件
 
