@@ -34,15 +34,31 @@
 - `hνZ`(member の coherent extension ∈ ZIrr)= `hS₁coh.extension_mem_ZIrr (χmem i) (Submodule.subset_span …)`
   (`IsCoherent` 構造体フィールド)。
 
-### ▶▶ 次 = brick 4 = c2 endgame `false_of_coherentXunionYset_caseB_of_not_coherentS`
+### ▶▶ 次 = brick 4 = c2 endgame（**新 leaf 必須**、scope 確定 2026-06-17）
 
-unweighted endgame `false_of_coherentXunionYset_of_not_coherentS`(`CorePart2:3439`)を mirror:
-break pair を `exists_coherentBreakPair` で作り、weighted `xSum_le_two_psi` 相当
-(brick 3 `sMember_degreeSqNormReBound_of_not_coherent` + weighted counting
-`sum_div_normSq_induce_kernelFilter_eq`)→ FPF 破綻 `false_of_caseB_break_of_bounds`(`CaseBEndgame:384`)。
-- weighted counting で `∑_{χ∈X(W₂)} χ(1).re²/‖χ‖²` を `|L:H|·…` に同定する補題が要る(unweighted は
-  `sum_re_sq_Xset_eq`)。case-B 版 `sum_div_normSq_induce_kernelFilter_eq`(`CorePart1:2526`)を Xset 形に。
-- 完成後 → `S08_CoherenceTheorems:59` の 3-way dispatch(c2-math-B 枝)。hXanchored gap はユーザー管理。
+**⚠ leaf 配置**: `S08_CaseBEndgame.lean` は `S08_CaseBCoherence2` のみ import し **brick 3
+(`S08_CaseBEnumeration`)を見ない**。brick 4 は `S08_CaseBEnumeration` + `S08_CaseBEndgame` 両方を
+import する**新 leaf `S08_CaseBWeightedEndgame.lean`** に置く（FPF spine + brick 3 + X∪Y seed が揃う）。
+
+unweighted endgame `false_of_coherentXunionYset_of_not_coherentS`(`CorePart2:3439`)+ `xSum_le_two_psi`
+(`:3229`)を mirror。4 sub-piece:
+
+1. **`sum_div_normSq_Xset_eq`**(weighted Xset 恒等式、~30 行、**case-B 仮説不要**)= `sum_re_sq_Xset_eq`
+   (`CorePart2:2837`)の重み付き版。summand を `(χ1).re²/(⟨χ,χ⟩).re`、`sum_div_normSq_induce_kernelFilter_eq`
+   (`CorePart1:2526`, **複素** `χ1²/⟨χ,χ⟩` 形, irreducibility 不要)の A=⊥ と A=W₂ を `Finset.sum_sdiff` で差。
+   real 変換は `sum_re_sq_induce_kernelFilter_eq`(`:2789`)の `hsummand`/`Complex.ofReal_inj` パターン
+   (χ1 実正・⟨χ,χ⟩ 実正ゆえ `χ1²/⟨χ,χ⟩ = ((χ1).re²/(⟨χ,χ⟩).re:ℂ)`)。→ `|L:H|·(|H|-|H:W₂|)`。
+2. **`xSum_le_two_psi_caseB`**(bridge、~50 行)= `xSum_le_two_psi`(`:3229`)の重み付き版。brick 3
+   `sMember_degreeSqNormReBound_of_not_coherent` + (1) + `Xdiff ⊆ (range χmem).toFinset` +
+   `sum_toFinset_range_eq` で `|L:H|·(|H|-|H:W₂|) ≤ 2ψ(1).re·η(1).re`。**summand 一致**: index 側
+   `(χmem j 1).re²/mc j`(mc=(⟨χmem,χmem⟩).re)、set 側 `(χ1).re²/(⟨χ,χ⟩).re`。
+3. **`false_of_coherentXunionYset_caseB_of_not_coherentS`**(endgame、~90 行)= `:3439` mirror。X∪Y
+   coherence seed を **hypothesis** で取り(`exists_coherentBreakPair` で break pair)、(2) →
+   `hbreak : w1·hZ·(cZ-1) ≤ 2·w1²·d` に整形 → `false_of_caseB_break_of_bounds`(`CaseBEndgame:384`、proved)。
+   case-B 構造仮説 = `caseB_fpf_bound`(`:338`)の署名(hW2cen/hcop/hMgt/hWMgt)+ Cor 2.30 `d²≤|H:W₂|`。
+4. **`S08_CoherenceTheorems:59` の c2-math-B dispatch**: X∪Y seed を **構成**（`coherentXunionYset_caseB_of_glued`
+   `CaseBCoherence2:1616`）— ここで `hXanchored`（§6 certain-type structure theory gap）が要求され
+   **ユーザー直接管理ゆえ loop では閉じない**（LAUNCH stop 条件）。(1)-(3) は閉じられる、(4) で gate。
 
 ## ✅✅ 2026-06-17 セッション更新 — brick 2 COMPLETE (coupled producer + pairwise + enumerator)
 
