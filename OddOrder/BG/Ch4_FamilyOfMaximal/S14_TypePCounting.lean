@@ -5947,6 +5947,31 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · intro g hgN hgZ
     exact typeP_kappaHall_inf_conj_eq_bot hG hNmax hPN hKNN hKN rfl hUN hgN (hswap ▸ hgZ)
 
+/-- **BG 14.7, every nontrivial `t ∈ Z` has a nontrivial `σ`-part** (mmd L4015, `z = ∏ xᵢ` is the
+`σ`-decomposition): for `t ∈ Z`, `t ≠ 1`, some family member `N` has `t` *not* a `σ(N)′`-element
+(equivalently its `σ(N)`-part is nontrivial).  Else every prime of `ord(t)` avoids every `σ(N)`,
+contradicting the coverage `⋃ σ(Nᵢ) ⊇ π(z)` (`typeP_family_sigma_covers`) since `ord(t) ∣ |Z|`.
+This is the half of the `t = yy'` characterisation that finds the splitting member. -/
+theorem typeP_family_exists_sigmaPart [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {t : G} (htZ : t ∈ K ⊔ Kstar) (ht1 : t ≠ 1) :
+    ∃ N : Subgroup G, IsZFamilyMember M K N ∧
+      ¬ IsPiElement (OddOrder.BG.Ch3.S10.sigma N)ᶜ t := by
+  by_contra hcon
+  push_neg at hcon
+  -- `ord(t) ≠ 1` has a prime factor `p`, and `p ∣ |Z|`.
+  have hordne : orderOf t ≠ 1 := by rw [Ne, orderOf_eq_one_iff]; exact ht1
+  obtain ⟨p, hp, hpord⟩ := Nat.exists_prime_and_dvd hordne
+  have hpz : p ∣ Nat.card ↥(K ⊔ Kstar) := by
+    refine hpord.trans ?_
+    have := Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr htZ)
+    rwa [Nat.card_zpowers] at this
+  obtain ⟨N, hN, hpσN⟩ := typeP_family_sigma_covers hG hM hP hKM hK hKstar hU hp hpz
+  exact hcon N hN p (Nat.mem_primeFactors.mpr ⟨hp, hpord, (orderOf_pos t).ne'⟩) hpσN
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
