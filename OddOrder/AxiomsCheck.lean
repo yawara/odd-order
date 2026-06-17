@@ -5032,6 +5032,31 @@ direct-product `σ`-structures), then `L*` meets one of `K`, `K*` nontrivially �
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_inf_ne_bot_of_mem_zTilde_inter
 
+/-! **BG Proposition 14.2(f)** (`S14_TypePCounting`, `typeP_sigma_subgroup_le_Msigma`): every
+`σ(M)`-subgroup `Y < ⊤` of `G` meeting `K*` nontrivially lies in `M_σ`.  Not packaged in
+`typeP_structure`; derived from Corollary 12.16 (`sigma_subgroup_conj_into_Msigma_general`, the
+`σ`-disjointness gate discharged by Theorem 13.9) and Proposition 14.2(d) (the conjugator fixes a
+nontrivial element of `K*`, so lies in `M`).  A step of the Theorem 14.7 partner-symmetry argument.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_sigma_subgroup_le_Msigma
+
+/-! **BG Theorem 14.7(2)(3), partner symmetry** (`S14_TypePCounting`, `typeP_partner_structure`):
+the partner `M*` carries the dual Hall structure — `K*` is a Hall `κ(M*)`-subgroup of `M*` and
+`K = C_{M*_σ}(K*)`.  Short via the family machinery: `typeP_family_member_data` produced `M*`'s Hall
+`κ(M*)`-subgroup `KN` with `Z = KN ⊔ C_{M*_σ}(KN)` and `partner_canonical_eq` gives
+`Z ⊓ M*_σ = K`; two applications of `isPiSubgroup_le_left_of_commute` (π = σ(M*)) give `KN = K*`.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_partner_structure
+
+/-! **BG Theorem 14.7(1)** (`S14_TypePCounting`, `typeP_partner_centralizer_singleton`):
+`ℳ(C_G(Y)) = {M*}` for every `Y ∈ ℰ¹(K)`.  Proposition 14.2(c) applied to the partner `M*` (whose
+`K*`-role is `K`, by `typeP_partner_structure`); the `K`-side companion of `14.2(c)`, used by the
+covering step to conjugate a type-`P` subgroup to `M*`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_partner_centralizer_singleton
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
