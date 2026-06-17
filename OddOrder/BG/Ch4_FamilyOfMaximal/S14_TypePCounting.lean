@@ -6680,6 +6680,167 @@ theorem exists_typeP2_member [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hgpos : 1 ≤ Nat.card G := Nat.card_pos
   omega
 
+/-- **A `πᶜ`-subgroup of an internal direct product `Z = A × B` (`A` a `πᶜ`-group, `B` a
+`π`-group) lies in the left factor `A`.**  Subgroup generalisation of
+`isPiElementCompl_mem_left_of_commute`: `A.subgroupOf Z` is the normal Hall `πᶜ`-subgroup of `Z`,
+so any `πᶜ`-subgroup `L ≤ Z` lies in it (`isPiGroup_le_of_normal_isHallSubgroup`).  In the `n = 1`
+collapse of Theorem 14.7, `A = Kᵢ` (the Hall `κ(Mᵢ) ⊆ σ(Mᵢ)′`-subgroup), `B = Kᵢ*` (the
+`σ(Mᵢ)`-part), and `L = Kⱼ*` (a `σ(Mᵢ)′`-group since `σ(Mⱼ) ∩ σ(Mᵢ) = ∅`), forcing `Kⱼ* ≤ Kᵢ`. -/
+theorem isPiSubgroup_le_left_of_commute [Finite G] {A B Z L : Subgroup G} {π : Set ℕ}
+    (hswap : Z = A ⊔ B) (hcent : B ≤ Subgroup.centralizer (A : Set G))
+    (hAπc : Subgroup.IsPiSubgroup πᶜ A) (hBπ : Subgroup.IsPiSubgroup π B)
+    (hLZ : L ≤ Z) (hLπc : Subgroup.IsPiSubgroup πᶜ L) : L ≤ A := by
+  classical
+  have hAZ : A ≤ Z := by rw [hswap]; exact le_sup_left
+  have hcomm : ∀ a ∈ A, ∀ c ∈ B, Commute a c := fun a ha c hc =>
+    Subgroup.mem_centralizer_iff.mp (hcent hc) a ha
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥B) := by
+    apply Nat.coprime_of_dvd
+    intro p hp hpA hpB
+    exact (hAπc p (Nat.mem_primeFactors.mpr ⟨hp, hpA, Nat.card_pos.ne'⟩))
+      (hBπ p (Nat.mem_primeFactors.mpr ⟨hp, hpB, Nat.card_pos.ne'⟩))
+  have hdisj : A ⊓ B = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  have hnorm : Z ≤ Subgroup.normalizer (A : Set G) := by
+    rw [hswap]; exact (sup_le_normalizer_inf_of_commute hcent).trans inf_le_left
+  haveI hAnZ : (A.subgroupOf Z).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hAZ).mpr hnorm
+  have hZcard : Nat.card ↥Z = Nat.card ↥A * Nat.card ↥B := by
+    rw [hswap]; exact card_sup_of_commute_of_disjoint hcomm hdisj
+  have hcardSub : Nat.card ↥(A.subgroupOf Z) = Nat.card ↥A :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAZ).toEquiv
+  have hidx : (A.subgroupOf Z).index = Nat.card ↥B := by
+    have hl := Subgroup.card_mul_index (A.subgroupOf Z)
+    rw [hcardSub, hZcard] at hl
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hl
+  have hHall : Ch03.IsHallSubgroup πᶜ (A.subgroupOf Z) := by
+    refine ⟨fun p hp => ?_, fun p hp hpc => ?_⟩
+    · rw [hcardSub] at hp; exact hAπc p hp
+    · exact hpc (hBπ p (by rwa [hidx] at hp))
+  have hLsub : L.subgroupOf Z ≤ A.subgroupOf Z := by
+    refine OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hHall (fun p hp => ?_)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLZ).toEquiv] at hp
+    exact hLπc p hp
+  intro x hx
+  have hmem : (⟨x, hLZ hx⟩ : ↥Z) ∈ L.subgroupOf Z := Subgroup.mem_subgroupOf.mpr hx
+  exact Subgroup.mem_subgroupOf.mp (hLsub hmem)
+
+/-- **BG Theorem 14.7, the `n = 1` collapse** (mmd L4047): the type-`P` family `{M} ∪ {neighbours}`
+has exactly two members.  By the density inequality some member `Mᵢ` is type `P₂`, so its Hall
+`κ(Mᵢ)`-subgroup `Kᵢ` has prime order `q` (Proposition 14.2(g)).  In the swap `Z = Kᵢ × Kᵢ*`, `Kᵢ`
+is the normal Hall `σ(Mᵢ)′`-subgroup; every other member `Mⱼ` has `Kⱼ* = Z ⊓ M_{jσ}` a nontrivial
+`σ(Mᵢ)′`-subgroup of `Z` (`σ(Mⱼ) ∩ σ(Mᵢ) = ∅` by Theorem 13.9), hence `Kⱼ* ≤ Kᵢ`
+(`isPiSubgroup_le_left_of_commute`), and `Kⱼ* = Kᵢ` since `|Kᵢ| = q` is prime.  But the `Kⱼ*` are
+pairwise disjoint (`typeP_family_Kstar_disjoint`), so two distinct neighbours would give
+`Kᵢ = Kⱼ* ⊓ Kₗ* = 1`, contradicting `q ≥ 2`.  Thus at most one neighbour, i.e. `|family| = 2`. -/
+theorem family_card_eq_two [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (ZFamilyFinset M K).card = 2 := by
+  classical
+  refine le_antisymm ?_ (ZFamilyFinset_one_lt_card hG hM hP hKM hK hKstar hU)
+  obtain ⟨Mi, hMi𝓕, hMiP2⟩ := exists_typeP2_member hG D hM hP hKM hK hKstar hU
+  obtain ⟨hMimax, hMiP, hZMi, KNi, hKNiMi, hKNi, hswapi, hcanoni, hnei⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hMi𝓕)
+  -- `|KNi| = q` is prime (Proposition 14.2(g))
+  haveI : IsSolvable ↥Mi := hG.solvable_of_mem_maximalSubgroups hMimax
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mi)
+    ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
+  have hUeq : (U'.map Mi.subtype).subgroupOf Mi = U' :=
+    Subgroup.comap_map_eq_self_of_injective Mi.subtype_injective U'
+  have hUi : Ch03.IsHallSubgroup ((kappa Mi ∪ OddOrder.BG.Ch3.S10.sigma Mi)ᶜ)
+      ((U'.map Mi.subtype).subgroupOf Mi) := by rw [hUeq]; exact hU'
+  obtain ⟨q, hq, hqcard, -⟩ :=
+    ((typeP_structure hG hMimax hMiP hKNiMi hKNi rfl hUi).2.2.2.2.1 hMiP2).2
+  have hKNine : KNi ≠ ⊥ := fun h => by
+    rw [h, Subgroup.card_bot] at hqcard; exact hq.ne_one hqcard.symm
+  -- the `σ(Mᵢ)′`-Hall data of the swap `Z = KNi × Kᵢ*` for `isPiSubgroup_le_left_of_commute`
+  have hswapMi : K ⊔ Kstar = KNi ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mi) :=
+    hswapi.trans (by rw [hcanoni])
+  have hcentMi : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mi
+      ≤ Subgroup.centralizer (KNi : Set G) := hcanoni ▸ inf_le_right
+  have hAπc : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma Mi)ᶜ KNi :=
+    kappaHall_isPiSubgroup_sigmaCompl hKNiMi hKNi
+  have hBπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma Mi)
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mi) := fun p hp =>
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mi p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp).1,
+        (Nat.dvd_of_mem_primeFactors hp).trans (Subgroup.card_dvd_of_le inf_le_right),
+        Nat.card_pos.ne'⟩)
+  -- every member `≠ Mᵢ` has its canonical factor equal to `KNi`
+  have hKstarEq : ∀ N ∈ (ZFamilyFinset M K).erase Mi,
+      (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N = KNi := by
+    intro N hNe
+    have hN𝓕 := Finset.mem_of_mem_erase hNe
+    have hNneMi : N ≠ Mi := Finset.ne_of_mem_erase hNe
+    obtain ⟨hNmax, hNP, -, KNj, -, -, -, hcanonj, hnej⟩ :=
+      typeP_family_member_data hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN𝓕)
+    have hnej' : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≠ ⊥ := hcanonj ▸ hnej
+    have hdisjσ : Disjoint (OddOrder.BG.Ch3.S10.sigma Mi) (OddOrder.BG.Ch3.S10.sigma N) :=
+      sigma_disjoint_of_nonconjugate hG hMimax hNmax
+        (typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU
+          (mem_ZFamilyFinset.mp hMi𝓕) (mem_ZFamilyFinset.mp hN𝓕) (Ne.symm hNneMi))
+    have hLπc : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma Mi)ᶜ
+        ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := fun p hp => by
+      have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
+        OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+          ⟨(Nat.mem_primeFactors.mp hp).1,
+            (Nat.dvd_of_mem_primeFactors hp).trans (Subgroup.card_dvd_of_le inf_le_right),
+            Nat.card_pos.ne'⟩)
+      exact fun hpσMi => Set.disjoint_left.mp hdisjσ hpσMi hpσN
+    have hle : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≤ KNi :=
+      isPiSubgroup_le_left_of_commute hswapMi hcentMi hAπc hBπ inf_le_left hLπc
+    -- prime-order `KNi`: a nontrivial subgroup is all of it
+    have hdvd : Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∣ q := by
+      rw [← hqcard]; exact Subgroup.card_dvd_of_le hle
+    have hne1 : Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ≠ 1 :=
+      fun h => hnej' (Subgroup.eq_bot_of_card_eq _ h)
+    have hcardeq : Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) = Nat.card ↥KNi := by
+      rw [hqcard]; exact (hq.eq_one_or_self_of_dvd _ hdvd).resolve_left hne1
+    exact Subgroup.eq_of_le_of_card_ge hle hcardeq.ge
+  -- at most one member is `≠ Mᵢ`
+  have herase_le : ((ZFamilyFinset M K).erase Mi).card ≤ 1 := by
+    rw [Finset.card_le_one]
+    intro a ha b hb
+    by_contra hab
+    have hdisj := typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU
+      (mem_ZFamilyFinset.mp (Finset.mem_of_mem_erase ha))
+      (mem_ZFamilyFinset.mp (Finset.mem_of_mem_erase hb)) hab
+    rw [hKstarEq a ha, hKstarEq b hb, inf_idem] at hdisj
+    rw [hdisj, Subgroup.card_bot] at hqcard
+    exact hq.ne_one hqcard.symm
+  have hcard_erase := Finset.card_erase_of_mem hMi𝓕
+  omega
+
+/-- **BG Theorem 14.7, the unique partner `M*`** (mmd L4047): since the type-`P` family has exactly
+two members (`family_card_eq_two`) and `M` is one of them, there is a unique other member `M*`, the
+nonconjugate partner of Theorem 14.7.  It is a type-`P` maximal subgroup containing `Z = K ⊔ K*`,
+nonconjugate to `M`. -/
+theorem exists_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∃ Mstar : Subgroup G, Mstar ≠ M ∧ IsZFamilyMember M K Mstar ∧
+      ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar := by
+  classical
+  obtain ⟨a, b, hab, hfam⟩ :=
+    Finset.card_eq_two.mp (family_card_eq_two hG D hM hP hKM hK hKstar hU)
+  have hMfam : M ∈ ZFamilyFinset M K := mem_ZFamilyFinset.mpr (Or.inl rfl)
+  rw [hfam, Finset.mem_insert, Finset.mem_singleton] at hMfam
+  rcases hMfam with hMa | hMb
+  · refine ⟨b, by rw [hMa]; exact Ne.symm hab,
+      mem_ZFamilyFinset.mp (by rw [hfam]; simp), fun N hN => ?_⟩
+    have hN' : N ∈ ({a, b} : Finset (Subgroup G)) := hfam ▸ mem_ZFamilyFinset.mpr hN
+    rw [Finset.mem_insert, Finset.mem_singleton] at hN'
+    exact hN'.imp (fun h => h.trans hMa.symm) id
+  · refine ⟨a, by rw [hMb]; exact hab,
+      mem_ZFamilyFinset.mp (by rw [hfam]; simp), fun N hN => ?_⟩
+    have hN' : N ∈ ({a, b} : Finset (Subgroup G)) := hfam ▸ mem_ZFamilyFinset.mpr hN
+    rw [Finset.mem_insert, Finset.mem_singleton] at hN'
+    exact hN'.elim (fun h => Or.inr h) (fun h => Or.inl (h.trans hMb.symm))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
