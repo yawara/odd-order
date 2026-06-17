@@ -779,14 +779,35 @@ theorem theoremII_conjunct1_of_inputs {M K U : Subgroup G}
         have hyA : y ∉ ASet M U := fun h => hxA (hAiff.mpr h)
         exact ⟨g, hTI_C g ⟨x, ⟨hXA0 ▸ hxX, hxA⟩, hg ▸ ⟨hXA0 ▸ hyX, hyA⟩⟩, hg⟩
 
-/-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  This
-is the BG form of the centralizer-control input used by Peterfalvi (8.12)--(8.13). -/
-theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Assembly for BG Theorem II** (mmd L4548), as a *gated-endpoint skeleton* (`sorry`-free in its
+own body).  `A(M)`/`A_0(M)` are tamely embedded — the BG form of the centralizer-control input used
+by Peterfalvi (8.12)--(8.13).
+
+The body is the full Theorem II proof; it still cites the (`sorry`-bearing) §16 structure theorems
+A--D and Proposition 16.1 inline, so it is *not* axiom-clean (it depends transitively on `sorryAx`
+through them).  What this skeleton isolates are the two obligations *beyond* that standard A--D
+suite, as named hypotheses (cf. `theoremII_conjunct1_of_inputs`):
+* `hPieceInv` — the conjunct-1 cross-piece exclusion: `G`-conjugate elements of `X` share `M_σ`-
+  and `A(M)`-membership (the "distinct orders across pieces" content of BG Theorem E);
+* `hMaxUnique` — the conjunct-3 uniqueness `|ℳ(C_G(x))| = 1` for an escaping centralizer
+  (BG §9--§10 Uniqueness), which pins the Type I/II maximal overgroup of `C_G(x)` to Theorem
+  D(4)'s `N(x)`.
+
+The wrapper `theoremII_tame_embedding` cites this with both obligations as `sorry`. -/
+theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M))
-    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K)
+    (hPieceInv : ∀ x ∈ X, ∀ y ∈ X, (∃ g : G, y = g * x * g⁻¹) →
+      (x ∈ OddOrder.BG.Ch3.S10.Msigma M ↔ y ∈ OddOrder.BG.Ch3.S10.Msigma M) ∧
+        (x ∈ ASet M U ↔ y ∈ ASet M U))
+    (hMaxUnique : ∀ x : G, x ∈ X → x ≠ 1 →
+      ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
+        ∀ N₁ N₂ : Subgroup G,
+          N₁ ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) →
+          N₂ ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) → N₁ = N₂) :
     (∀ x ∈ X, ∀ y ∈ X,
       (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
       let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
@@ -873,8 +894,8 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       (theoremD_msigma_conjugacy_and_centralizers hG hM).1
       ((theoremB_U_and_A_tame hG hM hU).2.2.2.2) hTI_C hX ?_
     -- `hPieceInv`: `G`-conjugate elements of `X` share `M_σ`- and `A(M)`-membership — the
-    -- "distinct orders across pieces" input of the mmd proof (BG Theorem E), still gated.
-    sorry
+    -- "distinct orders across pieces" input of the mmd proof (BG Theorem E), a named obligation.
+    exact hPieceInv
   · -- **Conjunct 3 (mmd L4552).**  For `x ∈ D ⊆ M_σ#` with `C_G(x) ⊄ M`, Theorem D(4) gives a
     -- unique maximal `N(x) ⊇ C_G(x)` that is of type `F` or `P₂`; Proposition 16.1(a)(b) rewrites
     -- this as Type I or Type II.  Existence and the type classification are pure citation; the
@@ -895,10 +916,35 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       · exact Or.inl (hIiff.mpr hF)
       · exact Or.inr (hIIiff.mpr hP2)
     refine ⟨N₀, ⟨hN₀mem, htype⟩, ?_⟩
-    -- Uniqueness of the maximal overgroup of `C_G(x)`: the residual gated input.  Theorem D(4)
-    -- gives uniqueness only for its *full* predicate `Q`; pinning the weaker "maximal overgroup,
-    -- Type I/II" to the same `N₀` needs `|ℳ(C_G(x))| = 1` (BG Uniqueness), not citable here.
+    -- Uniqueness of the maximal overgroup of `C_G(x)`: the named obligation `hMaxUnique`.  Theorem
+    -- D(4) gives uniqueness only for its *full* predicate `Q`; pinning the weaker "maximal
+    -- overgroup, Type I/II" to the same `N₀` is exactly `|ℳ(C_G(x))| = 1` (BG §9--§10 Uniqueness).
     rintro N' ⟨hN'mem, _hN'type⟩
-    sorry
+    exact hMaxUnique x hxX hx1 hxc N' N₀ hN'mem hN₀mem
+
+/-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  The BG form of the
+centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-endpoint skeleton
+`theoremII_tame_embedding_of_inputs`; the two residual obligations — the BG Theorem E cross-piece
+exclusion and the BG §9--§10 maximal-overgroup uniqueness — remain `sorry`. -/
+theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M))
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K) :
+    (∀ x ∈ X, ∀ y ∈ X,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
+      let D : Set G := {x | x ∈ X ∧ x ≠ 1 ∧ ¬ Subgroup.centralizer ({x} : Set G) ≤ M}
+      -- BG Thm II: `D ⊆ A(M)` (not merely `D ⊆ X`); a genuine claim when `X = A_0(M)`.
+      D ⊆ ASet M U ∧
+        ∀ x : G, x ∈ D →
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) :=
+  theoremII_tame_embedding_of_inputs hG hM hK hU hX
+    -- `hPieceInv`: BG Theorem E cross-piece exclusion.
+    (by sorry)
+    -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`.
+    (by sorry)
 
 end OddOrder.BG.Ch4.S16
