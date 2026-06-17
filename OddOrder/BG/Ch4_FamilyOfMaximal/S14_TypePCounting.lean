@@ -5751,6 +5751,40 @@ theorem typeP_kappaHall_inf_conj_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSi
     · exact tau3_pRank_eq_one h
   omega
 
+/-- **BG 14.7, the family `σ(Nᵢ)` cover `π(z)`** (mmd L4007 "each `X ∈ ℰ¹(Z)` lies in some `Kᵢ*`"):
+every prime `p ∣ |Z|` lies in `σ(N)` for some family member `N`.  For `p ∣ |K*|` it is the base
+member `M` (`K* ≤ M_σ`, `Kstar_isPiSubgroup_sigma`); for `p ∣ |K|` (`p ∈ κ(M)`) a line
+`X ∈ ℰ_p¹(K)` has a type-`P` partner `N ∈ 𝓜(N_G(X))` — a family member — with `X ⊆ M_σ(N)`, so
+`p ∈ σ(N)`.  This coverage forces `⋂ᵢ Kᵢ = 1`, i.e. the `t = yy'` characterisation of `T`. -/
+theorem typeP_family_sigma_covers [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} (hp : p.Prime) (hpZ : p ∣ Nat.card ↥(K ⊔ Kstar)) :
+    ∃ N : Subgroup G, IsZFamilyMember M K N ∧ p ∈ OddOrder.BG.Ch3.S10.sigma N := by
+  classical
+  rw [card_kappaHall_sup_Kstar hKM hK hKstar] at hpZ
+  rcases hp.dvd_mul.mp hpZ with hpK | hpKstar
+  · -- `p ∣ k`: a line `X ∈ ℰ_p¹(K)` and its type-`P` partner is a family member.
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+    have hxord : orderOf (x : G) = p :=
+      (orderOf_injective K.subtype K.subtype_injective x).trans hx
+    have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+    have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+    have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+    obtain ⟨N, hNmem, _, _, hXNσ, _, _⟩ :=
+      exists_typeP_partner hG hM hP hKM hK hKstar hU hXelem hXK
+    refine ⟨N, Or.inr ⟨p, Subgroup.zpowers (x : G), hp, hXelem, hXK, hNmem⟩, ?_⟩
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+      ⟨hp, (by rw [hXcard] : p ∣ Nat.card ↥(Subgroup.zpowers (x : G))).trans
+        (Subgroup.card_dvd_of_le hXNσ), Nat.card_pos.ne'⟩)
+  · -- `p ∣ k*`: the base member `M` itself, since `K* ≤ M_σ`.
+    exact ⟨M, Or.inl rfl, Kstar_isPiSubgroup_sigma hKstar p
+      (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩)⟩
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
