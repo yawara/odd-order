@@ -4903,6 +4903,12 @@ neighbour.  Fully unconditional, axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiSubgroup_le_left_of_commute
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.family_card_eq_two
 
+/-! **BG Theorem 14.7, the unique partner `M*`** (`S14_TypePCounting`, `exists_partner`): from
+`|family| = 2` and `M ∈ family`, the unique other member `M*` is the nonconjugate type-`P` partner;
+every family member is `M` or `M*`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_partner
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the

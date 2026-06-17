@@ -6813,6 +6813,34 @@ theorem family_card_eq_two [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hcard_erase := Finset.card_erase_of_mem hMi𝓕
   omega
 
+/-- **BG Theorem 14.7, the unique partner `M*`** (mmd L4047): since the type-`P` family has exactly
+two members (`family_card_eq_two`) and `M` is one of them, there is a unique other member `M*`, the
+nonconjugate partner of Theorem 14.7.  It is a type-`P` maximal subgroup containing `Z = K ⊔ K*`,
+nonconjugate to `M`. -/
+theorem exists_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∃ Mstar : Subgroup G, Mstar ≠ M ∧ IsZFamilyMember M K Mstar ∧
+      ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar := by
+  classical
+  obtain ⟨a, b, hab, hfam⟩ :=
+    Finset.card_eq_two.mp (family_card_eq_two hG D hM hP hKM hK hKstar hU)
+  have hMfam : M ∈ ZFamilyFinset M K := mem_ZFamilyFinset.mpr (Or.inl rfl)
+  rw [hfam, Finset.mem_insert, Finset.mem_singleton] at hMfam
+  rcases hMfam with hMa | hMb
+  · refine ⟨b, by rw [hMa]; exact Ne.symm hab,
+      mem_ZFamilyFinset.mp (by rw [hfam]; simp), fun N hN => ?_⟩
+    have hN' : N ∈ ({a, b} : Finset (Subgroup G)) := hfam ▸ mem_ZFamilyFinset.mpr hN
+    rw [Finset.mem_insert, Finset.mem_singleton] at hN'
+    exact hN'.imp (fun h => h.trans hMa.symm) id
+  · refine ⟨a, by rw [hMb]; exact hab,
+      mem_ZFamilyFinset.mp (by rw [hfam]; simp), fun N hN => ?_⟩
+    have hN' : N ∈ ({a, b} : Finset (Subgroup G)) := hfam ▸ mem_ZFamilyFinset.mpr hN
+    rw [Finset.mem_insert, Finset.mem_singleton] at hN'
+    exact hN'.elim (fun h => Or.inr h) (fun h => Or.inl (h.trans hMb.symm))
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
