@@ -1490,3 +1490,46 @@ carrier、構成可能) で 14.5(c)/14.6 がそのまま使え、density 論法�
    |G^#|≥|𝒞_G(T)|+Σ|𝒞_G(M̃_i)|≥(1+(n−1)/2z)|G|≥|G| 矛盾 ⟹ ∃M_i type-P2。(14.9 不要、disjoint+card のみ)
 4. **n=1 collapse** (`le_of_coprime_index`+Prop14.2(g): |K_i| 素数=∏_{j≠i}k_j*) → Mstar。
 5. **covering** (half_lt) + **part(h)** (Prop14.2(a) + K cyclic)。
+
+### ✅✅ density 不等式 COMPLETE (2026-06-17 lane-h 再開, 2 commits) — step 7 着地、ℕ で omega 締め
+
+**`exists_typeP2_member` (BG 14.7 step 7, mmd L4031-4045) を green+axiom-clean で landing。endgame で最難の
+counting 部分。** 全論法を **ℕ で完結**(ℚ 不要、`omega` で締まる)できると判明 — これが鍵だった。
+
+**🔑 ℕ-only density 論法の構造** (notes 旧記述の「(1+(n−1)/2z)|G|」を ℕ-omega 化):
+- A := |𝒞_G(T)| = |T|·[G:Z], B := Σ|𝒞_G(M̃ᵢ)|, S := Σ[G:Mᵢ], P := Σ([G:Z]·kᵢ*), zi := [G:Z], c := |𝓕|=n+1, g := |G|。
+- **T-additive** (hmul): A + Σ(kᵢ*·zi) + zi = g + c·zi (hT_card×zi + hT_count + card_mul_index)。
+- **M̃-additive** (per P1 member): |𝒞_G(M̃ᵢ)| + [G:Mᵢ] = [G:Z]·kᵢ* ⟹ B + S = P。
+  ← `(|N_σ|−1)·[G:N] + [G:N] = |N_σ|·[G:N] = [G:Z]·kᵢ*` (`Nat.sub_one_mul`+omega+per-member 恒等式)。
+- **bound** (hbound): A + B ≤ g−1 (`density_pieces_ncard_le`、disjoint+⊆G^#)。
+- **key** (hkey): S ≤ (c−1)·zi。← 2·[G:Mᵢ]≤zi (|Mᵢ|≥2z) ⟹ 2S ≤ c·zi ≤ 2(c−1)·zi (c≤2(c−1) ∵ c≥2) ⟹ **omega が 2S≤2X ⟹ S≤X を処理**。
+- **expansion** (hexp): c·zi = (c−1)·zi + zi (omega が nonlinear 積 c·zi, (c−1)·zi を hexp で橋渡し)。
+- **final omega**: A=AT, hmul: A+P+zi = g+c·zi = g+(c−1)·zi+zi ⟹ A+P = g+(c−1)·zi; B+S=P ⟹ A+B+S=g+(c−1)·zi;
+  S≤(c−1)·zi ⟹ A+B≥g; hbound A+B≤g−1 ⟹ g≤g−1 矛盾 (g≥1)。**全 linear、omega 一発。**
+
+**landing 群** (commit `5634f28c`、AxiomsCheck 登録、full build 3817/64s):
+- `typeP1_card_eq` (前 commit `4d4851a5`): **P1 ⟹ |N|=|N_σ|·|K_N|** (σ-part 一意性: m·j=|N|=a·j', m,j' σ-数 ∧ a,j σ'-数 ⟹ a=j、coprime+dvd_antisymm; j'⊆σ のみ P1 使用 [κ=π−σ])。
+- `typeP1_member_Msigma_index_eq`: **|N_σ|·[G:N] = [G:Z]·kᵢ*** (×|K_N| して |N|=|N_σ|·k_N + z=k_N·k_N* [`card_kappaHall_sup_Kstar`] + Lagrange、`Nat.eq_of_mul_eq_mul_right`)。**cancellation crux**。
+- `typeP_member_two_mul_index_le`: 2·[G:N]≤[G:Z] (|N|≥2z ×[G:N]、z で約分)。
+- `ZFamilyFinset_one_lt_card`: **n≥1** (M + 非共役 neighbor `exists_typeP_partner`、|𝓕|≥2)。
+- `one_not_mem_conjClassSet` (汎用): 1∉A ⟹ 1∉𝒞_G(A) (MulAut.conj 単射)。
+- `one_not_mem_Mtilde`: **1∉M̃** (x'=x⁻¹ は x∈Nσ ゆえ σ(N)-元、だが `isPiElement_sigmaCompl_of_mem_Rsub` で σ(N)'-元 ⟹ 矛盾)。
+- `density_pieces_ncard_le`: **Σ|𝒞_G(·)| ≤ |G|−1** (𝒞_G(T) ⊔ ⋃𝒞_G(M̃ᵢ) pairwise disjoint ⊆ G^#;
+  `Set.Finite.ncard_biUnion`[↑𝓕 Set-coe]+`finsum_mem_coe_finset`+`Set.ncard_union_eq`+`Set.ncard_le_ncard`)。
+
+⚠ **技法メモ**: (i) `rw [hswap]` は goal 全体の `K⊔Kstar` を書き換える (RHS 内も) → `rw [← hswap] at h1` で hypothesis 側に逃がす。
+(ii) `obtain ⟨p,hpκ⟩ := hP` は hP を消費 → `have hPe := hP; obtain := hPe` で温存。
+(iii) `Nat.le_of_mul_le_mul_left` は k metavar 化で omega 不能 → `2S≤2X ⟹ S≤X` は omega が直接できる。
+(iv) ncard biUnion は **↑𝓕 (Set-coe) で回す**と `Finite.ncard_biUnion`+`finsum_mem_coe_finset` で Finset.sum に落ちる (Finset-membership の `⋃ N ∈ 𝓕` 形は使わない)。
+
+**▶ 残り (typeP_duality の残務、step 8-11 + ∃! 組立)**:
+1. **n=1 collapse** (step 8): exists_typeP2_member の M_i に Prop14.2(g) [|K_i|=q 素数] → 各 K_j*(j≠i) は σ(M_i)'-群 (13.9)
+   ⟹ K_j*≤K_i (=σ(M_i)'-Hall of Z, `le_of_coprime_index`) ⟹ K_j*=K_i (|K_i| 素数) ⟹ pairwise disjoint で高々1 ⟹ **n=1**。
+   ⟹ 族={M, Mstar} (2 メンバー)、Z=K_i×K_i* cyclic (両 rank1)。⚠ K_i⊴Z の確立要 (swap 直積、`sup_le_normalizer_inf_of_commute`)。
+   ⚠ Prop14.2(g) 適用には M_i の full setup (hU_{M_i}=Hall(κ∪σ)' 構築要)。
+2. **covering** (step 10): H type-P, S_H=L×L*−(L∪L*), |𝒞_G(S_H)|>½|G| (half_lt) ⟹ 𝒞_G(T)∩𝒞_G(S_H)≠∅ ⟹ T∩S_H≠∅
+   ⟹ L*∩K_i*≠1 ⟹ Prop14.2(c) で {H}=𝓜(C_G(Y))={M_i} ⟹ H~M_i。
+3. **part(h)** (step 11): M_σ⊆M', Prop14.2(a) の UM_σ=K の normal complement ⊆M', K cyclic ⟹ UM_σ=M'。
+   ⚠ Prop14.2(a) の normal complement UM_σ は repo 未パッケージ (要構築)。`coprime_card_derived_kappaHall_of_isComplement'` で coprime は free。
+4. **∃! Mstar 組立**: Mstar = 一意 neighbor (n=1)。uniqueness は 𝓜(C_G(X))={Mstar} (X∈ℰ¹(K)) で pin。
+   parts (2)(3): K* Hall κ(M*), M∩M_1=Z。

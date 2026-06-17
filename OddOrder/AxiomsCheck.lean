@@ -4930,6 +4930,21 @@ density inequality of Theorem 14.7(e).  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP1_card_eq
 
+/-! **BG Theorem 14.7, the density inequality** (`S14_TypePCounting`, `exists_typeP2_member`): some
+member of the type-`P` family `{M} ∪ {neighbours}` has type `P₂`.  Proof = the BG density count: if
+all members were type `P₁`, the pairwise-disjoint conjugacy pieces `𝒞_G(T)`, `{𝒞_G(M̃ᵢ)}` would
+cover more than `G^#`.  Entirely a `ℕ` computation (`omega`) over the landed counts.  Supporting
+lemmas (`typeP1_member_Msigma_index_eq`, `typeP_member_two_mul_index_le`, `ZFamilyFinset_one_lt_card`,
+`one_not_mem_Mtilde`, `density_pieces_ncard_le`) registered alongside.  Fully unconditional,
+axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.one_not_mem_Mtilde
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP1_member_Msigma_index_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_member_two_mul_index_le
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ZFamilyFinset_one_lt_card
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.density_pieces_ncard_le
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP2_member
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
