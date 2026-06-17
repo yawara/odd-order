@@ -23,6 +23,7 @@ import OddOrder.GroupTheory.RepresentationTheory.AbsolutelyIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutation
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
 import OddOrder.GroupTheory.RepresentationTheory.CenterClassSumBasis
+import OddOrder.GroupTheory.RepresentationTheory.CenterModuleDecomp
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
@@ -56,6 +57,7 @@ import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
 import OddOrder.GroupTheory.RepresentationTheory.SecondOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
+import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
 import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr

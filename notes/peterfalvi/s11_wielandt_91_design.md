@@ -17,6 +17,11 @@
   `finrank_eq_card_mul_finrank_invariants_of_free` (`FreeOrbitModuleCount.lean`) — `V = ⊕ Aᵢ`, `G`
   free on `ι` permuting summands ⟹ `dim V = |G|·dim Vᴳ` (sorry-free, axiom-clean). Plus I-4 core
   `Module.finrank_baseChange` confirmed in mathlib (base change is **not** a wall).
+- ✅ **Module decomposition (I-2) COMPLETE** (2026-06-18, resume⁵): `IdempotentDirectSum`
+  `isInternal_range_of_completeOrthogonalIdempotents` (complete orthogonal idempotent endos ⟹
+  `M = ⊕ range`) + `CenterModuleDecomp` `isInternal_centerProj` (any `Representation k U W`
+  decomposes via `centerProj φ ρ i = asAlgebraHom ρ (φ.symm (Pi.single i 1))`, the U-isotypic
+  projections). Gives the `DirectSum.IsInternal A` the free-(†) engine consumes.
 - ❌ **Main `wielandt_fixedPoint_frobenius` = the sole remaining sorry.** Next = carrier-level wiring
   of 3d.3c + (†) [I-2 isotypic + I-4 base change + I-3] + I-5; a DESIGN phase (see resume⁵ "NEXT").
 
@@ -243,11 +248,19 @@ Quot.sound}), so the **Teichmüller-free orbit-count Brauer lemma is complete at
   divisibility carry to simples by Brauer (3d.1) + N=Ncl; 3d.3a ⟹ free-off-single-fixed; 3d.3b names
   it `i₀`. Caller supplies `Γ`-actions by `compHom` (agreement `hcl`/`hsi` by `rfl`).
 
-**NEXT — carrier-level, requires DESIGN (not a mechanical loop):**
+**NEXT — carrier-level (abstract engines + I-2 module decomposition now DONE):**
+0. **★ THE next concrete piece — the E-conjugation → `simplesAction` module bridge**: for `e ∈ E`
+   acting on `W` (via `ρ_L`, `L = U⋊E`), show `ρ_L(e)` maps `range (centerProj φ ρ_U i)` onto
+   `range (centerProj φ ρ_U (simplesAction φ (conjAut e) i))`. Ingredients: (a) semilinear
+   compatibility `ρ_L(e) ∘ asAlgebraHom ρ_U a = asAlgebraHom ρ_U (domCongrAut (conjAut e) a) ∘ ρ_L(e)`
+   (from `ρ(e)ρ(u)ρ(e)⁻¹ = ρ(eue⁻¹)`, `U ◁ L`); (b) `domCongrAut (conjAut e) ε_i = ε_{σ e i}` (=
+   `centerRep_apply_symm_single`, center level). ⟹ the `A i := range (centerProj i)` are an
+   `E`-permuted family with permutation `simplesAction φ ∘ conjAut`, matching the free-(†) engine's
+   `hperm`. Est. ~100-150 lines; the genuinely-coupled crux.
 1. **Wire 3d.3c to the real carrier**: in `CoprimeAction`, kernel `U` + complement `E` of Frobenius
    `L = U ⋊ E`; `ψ = E → MulAut U` (conjugation, each nonid FPF by Frobenius + coprime); splitting
    `φ : Z(𝔽̄_p[U]) ≃ₐ (Fin N → 𝔽̄_p)` from `exists_center_algEquiv_pi` (needs `IsAlgClosed`,
-   `char ∤ |U|`); `compHom` actions on classes / `Fin N`.
+   `char ∤ |U|`).
 2. **(†)** `W^U = 0 ⟹ dim W = |E|·dim W^E`: **the abstract engine
    `finrank_eq_card_mul_finrank_invariants_of_free` is DONE** (resume⁵). Remaining = *wire the module*:
    take `A i := (idemBasis φ i) · W` (idempotent projections = I-2 isotypic comps, internal since the
