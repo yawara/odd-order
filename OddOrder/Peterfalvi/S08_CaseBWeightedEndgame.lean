@@ -166,21 +166,24 @@ theorem xSum_le_two_psi_caseB
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
-    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) [W2.Normal]
-    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2 ∪ hyp.Yset)
+    {W2 : Subgroup ↥L} [W2.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
-    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset)
+    (hXsub : hyp.Xset W2 ⊆ S₁)
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
     {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
-    (hψnotS1 : ψ ∉ hyp.Xset W2 ∪ hyp.Yset) (hψcnotS1 : ψ.conj ∉ hyp.Xset W2 ∪ hyp.Yset)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-      ((hyp.Xset W2 ∪ hyp.Yset) ∪ {ψ, ψ.conj})
+      (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
       ≤ 2 * (ψ 1).re * (η 1).re := by
   classical
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
-    sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hW2comm hS₁coh hηY hψS hψirr
-      hψnotS1 hψcnotS1 hnc
+    sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY hηS₁
+      hψS hψirr hψnotS1 hψcnotS1 hnc
   have hXsum := sum_re_div_normSq_Xset_eq hyp (Z := W2)
   set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
           (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
@@ -205,7 +208,7 @@ theorem xSum_le_two_psi_caseB
       obtain ⟨θ', hne', hker', heq'⟩ := hmem
       exact hχnotZ (Finset.mem_image.mpr
         ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
-    exact Or.inl (hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩)
+    exact hXsub (hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩)
   rw [← hXsum]
   calc ∑ χ ∈ Xdiff, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
       ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=

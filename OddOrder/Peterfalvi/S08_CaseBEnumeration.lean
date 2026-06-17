@@ -421,34 +421,31 @@ noncomputable def caseB_member_orthoDatum
     exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade hyp.hconj
       hreal hdiffsupp hrealχ hdiffsuppχ hxχ hxχbar hxbarχ hxbarχbar
 
-/-- **Peterfalvi (6.8.2) case-(B): the `X(W₂) ∪ Y` coherent set is pairwise orthogonal.**
+/-- **Peterfalvi (6.8.2) case-(B): distinct `S`-members are pairwise orthogonal.**
 
-For distinct members `x ≠ y` of `X(W₂) ∪ Y` (the case-(B) `X ∪ Y` coherent seed), `⟨x, y⟩ = 0`.
-This is the off-diagonal of the weighted Gram matrix `hmemortho` that the norm-weighted (5.6) engine
-consumes — the genuinely new structural fact case (B) needs, because the members are no longer all
-irreducible: `X(W₂)` contains the reducible certain-type columns `columnSum h46 χ₂`.
+For distinct members `x ≠ y` of `S` (any two, not just the `X(W₂) ∪ Y` seed), `⟨x, y⟩ = 0`.  This
+is the off-diagonal of the weighted Gram matrix the norm-weighted (5.6) engine consumes, for an
+arbitrary conjugation-closed coherent `S₁ ⊆ S` (the break pair yields `S₁ ⊋ X(W₂) ∪ Y`).  The
+genuinely new structural fact case (B) needs, since `S`-members are no longer all irreducible: `S`
+contains the reducible certain-type columns `columnSum h46 χ₂`.
 
-The four membership cases (each `X`-member splits, by `caseB_S_member_column_or_irreducible`, into a
-nontrivial column or an irreducible):
+Each `S`-member splits, by `caseB_S_member_column_or_irreducible`, into a nontrivial column or an
+irreducible:
 
 * **column vs column** — distinct columns (`χ₂ ≠ χ₂'`, forced by `x ≠ y`) are orthogonal by
   `inner_columnSum_cross_eq_zero` (Peterfalvi (4.1) grid cross-orthogonality);
-* **column vs irreducible** / **irreducible vs column** — a column `columnSum h46 χ₂` and an
-  irreducible `Ind^L_H θ` are orthogonal by `caseB_inner_irr_columnSum_eq_zero` (the degree-`mod |W₁|`
-  argument: grid degrees are `≡ ±1`, induced degrees `≡ 0`), one order via conjugate symmetry;
-* **irreducible vs irreducible** — distinct irreducibles are orthogonal (`irreducibleCharacter_inner_
-  eq_ite`);
-* **`X` vs `Y`** / **`Y` vs `X`** — `caseB_Xset_orthogonal_Yset` (one order via conjugate symmetry);
-* **`Y` vs `Y`** — distinct irreducible `Y`-members (`isIrreducibleCharacter_of_mem_Yset`). -/
-theorem caseB_Sunion_pairwise_orthogonal
+* **column vs irreducible** / **irreducible vs column** — a column and an irreducible `Ind^L_H θ`
+  are orthogonal by `caseB_inner_irr_columnSum_eq_zero` (the degree-`mod |W₁|` argument), one order
+  via conjugate symmetry;
+* **irreducible vs irreducible** — distinct irreducibles are orthogonal
+  (`irreducibleCharacter_inner_eq_ite`). -/
+theorem caseB_S_pairwise_orthogonal
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
-    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
-    ∀ x ∈ hyp.Xset W2 ∪ hyp.Yset, ∀ y ∈ hyp.Xset W2 ∪ hyp.Yset, x ≠ y →
-      ClassFunction.inner x y = 0 := by
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)] :
+    ∀ x ∈ hyp.S, ∀ y ∈ hyp.S, x ≠ y → ClassFunction.inner x y = 0 := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
   -- helper: an irreducible `S`-member is orthogonal to every certain-type column.
@@ -459,97 +456,71 @@ theorem caseB_Sunion_pairwise_orthogonal
     rw [hyp.S_eq, Set.mem_setOf_eq] at hzS
     obtain ⟨θ, hθne, rfl⟩ := hzS
     exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hzirr χ₂
-  intro x hx y hy hxy
-  rcases hx with hxX | hxY
-  · rcases hy with hyX | hyY
-    · -- both in `X(W₂)`
-      rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hxX) with
-        ⟨χ₂, hχ₂, hcolx⟩ | hirrx
-      · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hyX) with
-          ⟨χ₂', hχ₂', hcoly⟩ | hirry
-        · -- column vs column
-          have hne : χ₂ ≠ χ₂' := fun h => hxy (by subst h; exact hcolx.symm.trans hcoly)
-          exact hcolx ▸ hcoly ▸ inner_columnSum_cross_eq_zero h46 hne
-        · -- column vs irreducible (conjugate symmetry of irreducible vs column)
-          refine hcolx ▸ ?_
-          rw [inner_conj_symm y (OddOrder.Peterfalvi.S06.columnSum h46 χ₂),
-            hirr_col y hirry (hyp.Xset_subset_S hyX) χ₂, star_zero]
-      · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hyX) with
-          ⟨χ₂', hχ₂', hcoly⟩ | hirry
-        · -- irreducible vs column
-          exact hcoly ▸ hirr_col x hirrx (hyp.Xset_subset_S hxX) χ₂'
-        · -- irreducible vs irreducible
-          have h := irreducibleCharacter_inner_eq_ite
-            (⟨x, hirrx⟩ : IrreducibleCharacter ↥L) ⟨y, hirry⟩
-          rwa [if_neg (fun he => hxy (congrArg Subtype.val he))] at h
-    · -- `X(W₂)` vs `Y`
-      exact caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm x hxX y hyY
-  · rcases hy with hyX | hyY
-    · -- `Y` vs `X(W₂)` (conjugate symmetry)
-      rw [inner_conj_symm y x, caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm y hyX x hxY,
-        star_zero]
-    · -- both in `Y`: distinct irreducibles
+  intro x hxS y hyS hxy
+  rcases caseB_S_member_column_or_irreducible hyp h46 hHK hxS with ⟨χ₂, hχ₂, hcolx⟩ | hirrx
+  · rcases caseB_S_member_column_or_irreducible hyp h46 hHK hyS with ⟨χ₂', hχ₂', hcoly⟩ | hirry
+    · -- column vs column
+      have hne : χ₂ ≠ χ₂' := fun h => hxy (by subst h; exact hcolx.symm.trans hcoly)
+      exact hcolx ▸ hcoly ▸ inner_columnSum_cross_eq_zero h46 hne
+    · -- column vs irreducible (conjugate symmetry of irreducible vs column)
+      refine hcolx ▸ ?_
+      rw [inner_conj_symm y (OddOrder.Peterfalvi.S06.columnSum h46 χ₂),
+        hirr_col y hirry hyS χ₂, star_zero]
+  · rcases caseB_S_member_column_or_irreducible hyp h46 hHK hyS with ⟨χ₂', hχ₂', hcoly⟩ | hirry
+    · -- irreducible vs column
+      exact hcoly ▸ hirr_col x hirrx hxS χ₂'
+    · -- irreducible vs irreducible
       have h := irreducibleCharacter_inner_eq_ite
-        (⟨x, hyp.isIrreducibleCharacter_of_mem_Yset hxY⟩ : IrreducibleCharacter ↥L)
-        ⟨y, hyp.isIrreducibleCharacter_of_mem_Yset hyY⟩
+        (⟨x, hirrx⟩ : IrreducibleCharacter ↥L) ⟨y, hirry⟩
       rwa [if_neg (fun he => hxy (congrArg Subtype.val he))] at h
 
 /-- **Peterfalvi (6.8.2) case-(B) norm-weighted member-family enumerator** (brick 2): the
-ψ-independent data of the norm-weighted (5.6) member family for the `X(W₂) ∪ Y` coherent seed.
+ψ-independent data of the norm-weighted (5.6) member family for an arbitrary finite `S₁ ⊆ S`.
 
-Enumerates `S₁ = X(W₂) ∪ Y` (finite, by `exists_finEnum_general` — *not*
+Enumerates `S₁` (any finite subset of `S`, by `exists_finEnum_general` — *not*
 `exists_finEnum_irreducible`, since case (B) members include the reducible certain-type columns) as
 an injective `Fin k`-family `χmem : Fin k → ClassFunction ↥L ℂ`, together with:
 
 * the per-member squared norms `mc j = (⟨χmem j, χmem j⟩).re`, all positive (`|W₁|` for the columns,
-  `1` for the irreducibles);
+  `1` for the irreducibles, by the `S`-member dichotomy `caseB_S_member_column_or_irreducible`);
 * the **weighted Gram identity** `⟨χmem i, χmem j⟩ = if i = j then (mc i : ℂ) else 0` — diagonal the
-  real squared norm (`inner_self_eq_realCast`), off-diagonal `0` by the pairwise orthogonality
-  `caseB_Sunion_pairwise_orthogonal`.
+  real squared norm (`inner_self_eq_realCast`), off-diagonal `0` by `caseB_S_pairwise_orthogonal`.
 
 This is exactly the `χmem`/`mc`/`hmempos`/`hmemortho` block the engine
 `coherentDegreeSqNormBound_of_not_coherentW` consumes; the χ-dependent per-member data
 (`Dmem`/`hortho_mem`/`htau1Dmem`, supplied by `caseB_member_orthoDatum`) and the degree data are
-layered on in the (6.8.3) bound (brick 3). -/
+layered on in the (6.8.3) bound (brick 3).  Taking `S₁ = X(W₂) ∪ Y` recovers the seed enumerator. -/
 theorem exists_sMemberOrthogonalFamilyW
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S) (hS₁fin : S₁.Finite) :
     ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
       Function.Injective χmem ∧
-      Set.range χmem = hyp.Xset W2 ∪ hyp.Yset ∧
-      (∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset) ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, χmem j ∈ S₁) ∧
       (∀ j, 0 < mc j) ∧
       (∀ i j, ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0) := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
-  have hfin : (hyp.Xset W2 ∪ hyp.Yset).Finite := (hyp.Xset_finite W2).union hyp.Yset_finite
-  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hfin
-  have hmemS1 : ∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset := fun j => hrange ▸ Set.mem_range_self j
+  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hS₁fin
+  have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
   refine ⟨k, χmem, fun j => (ClassFunction.inner (χmem j) (χmem j)).re,
     hinj, hrange, hmemS1, ?_, ?_⟩
   · -- `mc j > 0`: column members have `‖μ_j‖² = |W₁|`, irreducibles have `‖χ‖² = 1`.
     intro j
     change (0 : ℝ) < (ClassFunction.inner (χmem j) (χmem j)).re
-    rcases hmemS1 j with hX | hY
-    · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hX) with
-        ⟨χ₂, hχ₂, hcol⟩ | hirr
-      · have hval := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
-        rw [if_pos rfl] at hval
-        simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hval
-        rw [hcol] at hval
-        rw [hval, Complex.natCast_re]
-        exact_mod_cast Nat.card_pos
-      · have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
-          have h := irreducibleCharacter_inner_eq_ite
-            (⟨χmem j, hirr⟩ : IrreducibleCharacter ↥L) ⟨χmem j, hirr⟩
-          rwa [if_pos rfl] at h
-        rw [hval]; norm_num
-    · have hirr := hyp.isIrreducibleCharacter_of_mem_Yset hY
-      have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
+    rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hS₁sub (hmemS1 j)) with
+      ⟨χ₂, hχ₂, hcol⟩ | hirr
+    · have hval := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
+      rw [if_pos rfl] at hval
+      simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hval
+      rw [hcol] at hval
+      rw [hval, Complex.natCast_re]
+      exact_mod_cast Nat.card_pos
+    · have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
         have h := irreducibleCharacter_inner_eq_ite
           (⟨χmem j, hirr⟩ : IrreducibleCharacter ↥L) ⟨χmem j, hirr⟩
         rwa [if_pos rfl] at h
@@ -563,8 +534,8 @@ theorem exists_sMemberOrthogonalFamilyW
         = (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ)
       rw [inner_self_eq_realCast (χmem i), Complex.ofReal_re]
     · rw [if_neg hij]
-      exact caseB_Sunion_pairwise_orthogonal hyp h46 hHK hW1 hW2comm
-        (χmem i) (hmemS1 i) (χmem j) (hmemS1 j) (fun h => hij (hinj h))
+      exact caseB_S_pairwise_orthogonal hyp h46 hHK hW1
+        (χmem i) (hS₁sub (hmemS1 i)) (χmem j) (hS₁sub (hmemS1 j)) (fun h => hij (hinj h))
 
 /-- **Peterfalvi (6.8.3) case-(B) break-character fields** (the case-(B) analogue of
 `sBreakPair_fields`).
@@ -585,15 +556,15 @@ theorem caseB_breakChar_fields
     (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
-    {W2 : Subgroup ↥L}
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
     {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
-    (hψnotS1 : ψ ∉ hyp.Xset W2 ∪ hyp.Yset) (hψcnotS1 : ψ.conj ∉ hyp.Xset W2 ∪ hyp.Yset) :
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
     ¬ ClassFunction.IsReal ψ ∧
       ClassFunction.inner ψ ψ = 1 ∧ ClassFunction.inner ψ.conj ψ.conj = 1 ∧
       ClassFunction.inner ψ.conj ψ = 0 ∧ ClassFunction.inner ψ ψ.conj = 0 ∧
       ((ψ.conj - ψ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
-      (∀ χ ∈ hyp.Xset W2 ∪ hyp.Yset, ClassFunction.inner ψ χ = 0) ∧
-      (∀ χ ∈ hyp.Xset W2 ∪ hyp.Yset, ClassFunction.inner ψ.conj χ = 0) := by
+      (∀ χ ∈ S₁, ClassFunction.inner ψ χ = 0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner ψ.conj χ = 0) := by
   classical
   haveI : Fintype ↥H := Fintype.ofFinite _
   -- `ψ = Ind^L_H θ` for a (nontrivial) source `θ` (membership in `S`).
@@ -618,43 +589,24 @@ theorem caseB_breakChar_fields
   have hdiffsupp : (ψ.conj - ψ).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
     rw [hψeq]; exact caseB_irr_conj_diff_support hyp θ
-  -- an irreducible `S`-member is orthogonal to every certain-type column.
-  have hirr_col : ∀ z, IsIrreducibleCharacter z → z ∈ hyp.S →
-      ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
-      ClassFunction.inner z (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = 0 := by
-    intro z hzirr hzS χ₂
-    rw [hyp.S_eq, Set.mem_setOf_eq] at hzS
-    obtain ⟨θ', -, rfl⟩ := hzS
-    exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hzirr χ₂
-  -- `φ ⊥ S₁` for an irreducible `S`-member `φ ∉ S₁`: dispatch each member into column/irreducible.
-  have hortho : ∀ φ, IsIrreducibleCharacter φ → φ ∈ hyp.S → φ ∉ hyp.Xset W2 ∪ hyp.Yset →
-      ∀ χ ∈ hyp.Xset W2 ∪ hyp.Yset, ClassFunction.inner φ χ = 0 := by
-    intro φ hφirr hφS hφnotS1 χ hχ
-    rcases hχ with hχX | hχY
-    · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hχX) with
-        ⟨χ₂, hχ₂, hcol⟩ | hirrχ
-      · rw [← hcol]; exact hirr_col φ hφirr hφS χ₂
-      · have hne : φ ≠ χ := fun h => hφnotS1 (by rw [h]; exact Or.inl hχX)
-        have h := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
-          ⟨χ, hirrχ⟩
-        rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
-    · have hirrχ := hyp.isIrreducibleCharacter_of_mem_Yset hχY
-      have hne : φ ≠ χ := fun h => hφnotS1 (by rw [h]; exact Or.inr hχY)
-      have h := irreducibleCharacter_inner_eq_ite (⟨φ, hφirr⟩ : IrreducibleCharacter ↥L)
-        ⟨χ, hirrχ⟩
-      rwa [if_neg (fun he => hne (congrArg Subtype.val he))] at h
+  -- `φ ⊥ S₁` for an `S`-member `φ ∉ S₁`: distinct `S`-members are orthogonal.
+  have hortho : ∀ φ, φ ∈ hyp.S → φ ∉ S₁ → ∀ χ ∈ S₁, ClassFunction.inner φ χ = 0 := by
+    intro φ hφS hφnotS1 χ hχ
+    exact caseB_S_pairwise_orthogonal hyp h46 hHK hW1 φ hφS χ (hS₁sub hχ)
+      (fun h => hφnotS1 (by rw [h]; exact hχ))
   exact ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar, hdiffsupp,
-    hortho ψ hψirr hψS hψnotS1,
-    hortho ψ.conj hψirr.conj (hyp.S_closedUnderConjugate.conj_mem hψS) hψcnotS1⟩
+    hortho ψ hψS hψnotS1,
+    hortho ψ.conj (hyp.S_closedUnderConjugate.conj_mem hψS) hψcnotS1⟩
 
 /-- **Peterfalvi (6.8.3) case-(B) norm-weighted member-family degree-square bound** (brick 3, the
 weighted analogue of `sMember_degreeSumBound_of_not_coherent`).
 
-For the case-(B) coherent seed `S₁ = X(W₂) ∪ Y` with an anchor `η ∈ Y` (degree `|W₁|`, irreducible
-hence weight `‖η‖² = 1`) and a break character `ψ ∈ S` whose pair `{ψ, ψ̄}` is disjoint from `S₁`
-and *cannot* be coherently adjoined, the norm-weighted degree-ratio sum is bounded by twice the
-degree ratio: `∑ⱼ (degⱼ)² / mcⱼ ≤ 2·a`, where `degⱼ = χⱼ(1)/η(1)`, `mcⱼ = ‖χⱼ‖²` and
-`a = ψ(1)/η(1)`.
+For an arbitrary conjugation-closed coherent finite `S₁ ⊆ S` with a `Y`-anchor `η ∈ S₁` (degree
+`|W₁|`, irreducible hence weight `‖η‖² = 1`) and a break character `ψ ∈ S` whose pair `{ψ, ψ̄}` is
+disjoint from `S₁` and *cannot* be coherently adjoined, the norm-weighted degree-ratio sum is
+bounded by twice the degree ratio: `∑ⱼ (degⱼ)² / mcⱼ ≤ 2·a`, where `degⱼ = χⱼ(1)/η(1)`,
+`mcⱼ = ‖χⱼ‖²` and `a = ψ(1)/η(1)`.  (`S₁ = X(W₂) ∪ Y` is the seed instance; the break pair yields
+a larger `S₁`.)
 
 All member-family fields are discharged from the landed case-(B) pieces: the ψ-independent
 enumerator (`exists_sMemberOrthogonalFamilyW`, brick 2), the coupled per-member decomposition data
@@ -673,18 +625,19 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
-    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆)
-    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2 ∪ hyp.Yset)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
-    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset)
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
     {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
-    (hψnotS1 : ψ ∉ hyp.Xset W2 ∪ hyp.Yset) (hψcnotS1 : ψ.conj ∉ hyp.Xset W2 ∪ hyp.Yset)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-      ((hyp.Xset W2 ∪ hyp.Yset) ∪ {ψ, ψ.conj})
+      (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ) (deg : Fin k → ℕ) (a : ℕ),
       Function.Injective χmem ∧
-      Set.range χmem = hyp.Xset W2 ∪ hyp.Yset ∧
+      Set.range χmem = S₁ ∧
       (∀ j, 0 < mc j) ∧
       (∀ j, ClassFunction.inner (χmem j) (χmem j) = (mc j : ℂ)) ∧
       (∀ j, χmem j 1 = (deg j : ℂ) * η 1) ∧
@@ -693,19 +646,10 @@ theorem sMember_degreeSqNormBound_of_not_coherent
   classical
   -- (1) the ψ-independent member family (brick 2).
   obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
-    exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hW2comm
-  have hS₁sub : (hyp.Xset W2 ∪ hyp.Yset) ⊆ hyp.S := by
-    rintro φ (hX | hY)
-    · exact hyp.Xset_subset_S hX
-    · exact hyp.Yset_subset_S hY
-  have hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.Xset W2 ∪ hyp.Yset) := by
-    intro φ hφ
-    rcases hφ with hX | hY
-    · exact Or.inl (hyp.Xset_closedUnderConjugate_unconditional W2 hX)
-    · exact Or.inr (hyp.Yset_closedUnderConjugate hY)
+    exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin
   have hmemS : ∀ j, χmem j ∈ hyp.S := fun j => hS₁sub (hmemS1set j)
   -- (2) the anchor index `i₁` (the `Y`-anchor `η` lies in `range χmem = S₁`).
-  obtain ⟨i₁, hi₁eq⟩ : η ∈ Set.range χmem := by rw [hrange]; exact Or.inr hηY
+  obtain ⟨i₁, hi₁eq⟩ : η ∈ Set.range χmem := by rw [hrange]; exact hηS₁
   have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hηY
   have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := hyp.Yset_apply_one hηY
   have hanchordeg : χmem i₁ 1 = (Nat.card hyp.W1 : ℂ) := by rw [hi₁eq]; exact hηdeg
@@ -732,7 +676,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     fun i _ => hyp.sMember_scaledDiffSupport_of_charValue_eq (hmemS i) (hmemS i₁) (hdeg_eq i)
   -- (4) break-character fields and the ψ degree ratio.
   obtain ⟨hrealψ, hψψ, hψbarψbar, hψbarψ, hψψbar, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
-    caseB_breakChar_fields hyp h46 hHK hW1 hψS hψirr hψnotS1 hψcnotS1
+    caseB_breakChar_fields hyp h46 hHK hW1 hS₁sub hψS hψirr hψnotS1 hψcnotS1
   obtain ⟨a, _ha_pos, hψratio⟩ := hyp.sMember_charValue_one_eq_mul_anchor hψS hanchordeg
   have hdiffasuppψ : (ψ - a • (χmem i₁)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
@@ -741,7 +685,7 @@ theorem sMember_degreeSqNormBound_of_not_coherent
   have htau1ψ : hyp.tau (ψ - a • (χmem i₁)) ∈ ZIrr G :=
     hyp.scaledDiff_dadeImage_mem_ZIrr (χ := ⟨ψ, hψirr⟩) (χ₁ := ⟨χmem i₁, hanchorIrr⟩) hdiffasuppψ
   -- (5) the generation bridges (weighting-independent).
-  have hcover : ∀ x ∈ (hyp.Xset W2 ∪ hyp.Yset), ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
       χmem j = x := by
     intro x hx; rw [← hrange] at hx; obtain ⟨j, hj⟩ := hx; exact ⟨j, Finset.mem_univ j, hj⟩
   have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
@@ -802,26 +746,27 @@ theorem sMember_degreeSqNormReBound_of_not_coherent
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
-    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆)
-    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2 ∪ hyp.Yset)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
-    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset)
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
     {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
-    (hψnotS1 : ψ ∉ hyp.Xset W2 ∪ hyp.Yset) (hψcnotS1 : ψ.conj ∉ hyp.Xset W2 ∪ hyp.Yset)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
     (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-      ((hyp.Xset W2 ∪ hyp.Yset) ∪ {ψ, ψ.conj})
+      (S₁ ∪ {ψ, ψ.conj})
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
       Function.Injective χmem ∧
-      Set.range χmem = hyp.Xset W2 ∪ hyp.Yset ∧
-      (∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset) ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, χmem j ∈ S₁) ∧
       (∀ j, 0 < mc j) ∧
       (∀ j, ClassFunction.inner (χmem j) (χmem j) = (mc j : ℂ)) ∧
       ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j ≤ 2 * (ψ 1).re * (η 1).re := by
   obtain ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos, hmcnorm, hdeg_eq, hψ_eq, hbound⟩ :=
-    sMember_degreeSqNormBound_of_not_coherent hyp h46 hHK hW1 hW2comm hS₁coh hηY hψS hψirr
-      hψnotS1 hψcnotS1 hnc
-  have hmemS1 : ∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset := fun j => hrange ▸ Set.mem_range_self j
+    sMember_degreeSqNormBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY hηS₁
+      hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
   refine ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, ?_⟩
   -- real parts of the degree relations
   have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (η 1).re := by
