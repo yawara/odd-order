@@ -5516,6 +5516,27 @@ theorem mem_ZFamilyFinset [Finite G] {M K N : Subgroup G} :
 theorem ZFamilyFinset_nonempty [Finite G] {M K : Subgroup G} : (ZFamilyFinset M K).Nonempty :=
   ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl)⟩
 
+/-- **BG 14.7, the `|T|` count for the family** (mmd L4031): with `T = Z − ⋃_{N} (Z ⊓ M_σ(N))`
+over the family `ZFamilyFinset`, `|T| + ∑ |Kᵢ*| + 1 = |Z| + |family|` — i.e. `|T| = z + n − ∑ kᵢ*`
+(`|family| = n + 1`).  Direct instance of inclusion–exclusion
+(`ncard_sdiff_biUnion_subgroup`) with the pairwise disjointness `typeP_family_Kstar_disjoint`. -/
+theorem typeP_family_T_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)).ncard
+      + (∑ N ∈ ZFamilyFinset M K, Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N)) + 1
+      = Nat.card ↥(K ⊔ Kstar) + (ZFamilyFinset M K).card := by
+  refine ncard_sdiff_biUnion_subgroup (s := ZFamilyFinset M K) (Z := K ⊔ Kstar)
+    (S := fun N => (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N)
+    ZFamilyFinset_nonempty (fun _ _ => inf_le_left) ?_
+  intro N₁ hN₁ N₂ hN₂ hne
+  exact typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU
+    (mem_ZFamilyFinset.mp hN₁) (mem_ZFamilyFinset.mp hN₂) hne
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
