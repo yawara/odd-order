@@ -196,4 +196,116 @@ theorem caseB_Xset_conjugatePairCover
     rw [hi] at hci
     exact hci
 
+/-- **General finite enumeration of a set of class functions** (the case-(B) analogue of
+`exists_finEnum_irreducible`, dropping the irreducibility requirement).
+
+For a finite set `S : Set (ClassFunction Γ ℂ)` produces an injective `Fin k`-indexed family whose
+range is `S` — **without** requiring its members to be irreducible.  This is the enumeration
+primitive for the case-(B) norm-weighted member family, whose coherent set `X ∪ Y` contains the
+*reducible* certain-type columns `μ_j = columnSum h46 χ₂` (so the `IrreducibleCharacter`-typed
+`exists_finEnum_irreducible` does not apply).  Pure formalization (no character theory): the `Fin`
+enumeration of a `Fintype` via `Fintype.equivFin`. -/
+theorem exists_finEnum_general {Γ : Type*} [Group Γ] {S : Set (ClassFunction Γ ℂ)}
+    (hSfin : S.Finite) :
+    ∃ (k : ℕ) (f : Fin k → ClassFunction Γ ℂ),
+      Function.Injective f ∧ Set.range f = S := by
+  classical
+  haveI : Fintype S := hSfin.fintype
+  refine ⟨Fintype.card S, fun j => ((Fintype.equivFin S).symm j : ClassFunction Γ ℂ), ?_, ?_⟩
+  · intro i j hij
+    exact (Fintype.equivFin S).symm.injective (Subtype.ext hij)
+  · ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact ((Fintype.equivFin S).symm j).2
+    · intro hφ
+      exact ⟨Fintype.equivFin S ⟨φ, hφ⟩, by simp⟩
+
+/-- **Peterfalvi (6.8.2) case-(B) per-member `(5.4)` decomposition** (brick 1 of the norm-weighted
+member-family bound).
+
+For a member `x` of a conjugation-closed coherent set `S₁ ⊆ S` (the `X ∪ Y` coherent seed of case
+(B)), produces the `ψ = 0` decomposition `CharacterPsiDecomposition hyp.tau x 0` — the `Dmem` datum
+of the norm-weighted (5.6) member-family bound `coherentDegreeSqNormBound_of_not_coherentW`.
+
+Dispatches on the `S`-member dichotomy `caseB_induce_column_or_irreducible` (`x = Ind^L_H θ`):
+
+* **reducible certain-type column** `x = columnSum h46 χ₂` (`χ₂ ≠ 1`): the reducible `R(μ_j)`
+  decomposition `certainTypeMemberDecomposition`, with the conjugate-column degree equality
+  (`columnSum_inv_apply_one`), the map agreement `caseB_column_mapagree` (`hyp.tau` equals the
+  certain-type Dade map on `μ_j − μ̄_j`), and the `H^#`-supported difference
+  (`columnDiff_support_subset`);
+* **irreducible** `x = Ind^L_H θ`: the irreducible `R(χ)` decomposition
+  `memberExtensionDecomposition`, with the odd-order non-realness `caseB_irr_nonreal`, the conjugate
+  difference support `caseB_irr_conj_diff_support`, and the self-conjugate orthogonality
+  `caseB_irr_conj_inner`.
+
+In both branches the auxiliary isometry `τ₁` is the running coherence extension
+`ν = hS₁coh.extension` (so the weighted engine's `htau1Dmem` field holds by `rfl`), and the image
+family `R(·)` is orthonormal in `ZIrr G`. -/
+noncomputable def caseB_member_psiDecomposition
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    {x : ClassFunction ↥L ℂ} (hxS₁ : x ∈ S₁)
+    (hνZ : hS₁coh.extension x ∈ ZIrr G) :
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau x 0 := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hxS : x ∈ hyp.S := hS₁sub hxS₁
+  -- The goal is `Type`-valued (`CharacterPsiDecomposition` carries data), so the column index `χ₂`
+  -- must be extracted via `Exists.choose` rather than `obtain`/`rcases` (a `Prop`-valued `∃`/`∨`
+  -- cannot be eliminated into a `Type`).  The inducing source `θ` is recovered only inside the
+  -- `Prop`-valued sub-`have`s of the irreducible branch.
+  by_cases hcolumn : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x
+  · -- reducible certain-type column branch
+    set χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ := hcolumn.choose with hχ₂def
+    have hχ₂ : χ₂ ≠ 1 := hcolumn.choose_spec.1
+    have hcol : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x := hcolumn.choose_spec.2
+    have hμ_S1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ S₁ := by rw [hcol]; exact hxS₁
+    have hμbar_S1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj ∈ S₁ :=
+      hS₁conj.conj_mem hμ_S1
+    have hνZ' : hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) ∈ ZIrr G := by
+      rw [hcol]; exact hνZ
+    have hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+    -- transport the `columnSum χ₂`-decomposition to `x` along `hcol` (term-level `▸`, no dependency
+    -- cycle, unlike `rw [← hcol]` which would try to abstract `x` under the `x`-dependent `χ₂`).
+    exact hcol ▸ OddOrder.Peterfalvi.S06.certainTypeMemberDecomposition h46 hχ₂
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+      (caseB_column_mapagree hyp h46 hχ₂) hS₁coh hμ_S1 hμbar_S1 hνZ'
+      (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+        ⟨Submodule.sub_mem _ (Submodule.subset_span hμ_S1) (Submodule.subset_span hμbar_S1),
+          hsupp⟩)
+  · -- irreducible branch (`x` is not a nontrivial column, so the `S`-member dichotomy forces it)
+    have hirrx : IsIrreducibleCharacter x :=
+      (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
+    have hreal : ¬ ClassFunction.IsReal x := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
+    have hdiffsupp : (x.conj - x).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
+    have hχχbar : ClassFunction.inner x x.conj = 0 := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
+    exact memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+      hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar
+
 end OddOrder.Peterfalvi.S08
