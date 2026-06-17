@@ -48,6 +48,27 @@ bootstrap 経路は **viable**。`gap_resolution` note の「残務 = glue の�
    - FPF 算術破綻: `false_of_caseB_break_of_bounds`(`S08_CaseBEndgame:384`)+ `caseB_fpf_bound`(`:338`)実在。
    - dispatch: `eq_bot_or_eq_of_le_of_card_prime`(`CorePart1:3354`)で math-A/B 分岐。
 
+## HARD CORE の解剖 (`sMember_degreeSqNormBound_of_not_coherent`)
+
+unweighted テンプレート `sMember_degreeSumBound_of_not_coherent`(`CorePart2:2650`)の構造:
+1. `exists_sMemberOrthonormalFamily`(`hF`)で `S₁` を **irreducible(norm 1)member** `χmem : Fin k →
+   IrreducibleCharacter ↥L` として列挙 + 各 member の orthonormality (`⟨χmem i,χmem j⟩ = if i=j then 1 else 0`)。
+2. `exists_sMemberDegreeData` で degree ratio、`sBreakPair_fields` で break pair ψ,ψ̄。
+3. abstract engine `coherentDegreeSumBound_of_not_coherent` に渡す。
+
+**weighted 版の crux** = case-B では `S₁` に **reducible certain-type column** が混ざる ⟹
+- `χmem` は `IrreducibleCharacter ↥L` でなく一般 `ClassFunction ↥L ℂ`、norm `‖χmem j‖² = ⟨χmem j,χmem j⟩` 一般。
+- **`exists_sMemberOrthogonalFamilyW`(未実装)** = orthonormal でなく **orthogonal** な enumerator で、
+  weighted engine `coherentDegreeSqNormBound_of_not_coherentW`(`S08_CoherenceWeighted:475`)が要求する
+  **各 member の `CharacterPsiDecomposition` (Dmem) + orthogonality + 重み付き degree bound** を供給する。
+- **genuine new math = reducible member の per-member Dmem 構成**: certain-type column の分解は
+  certain-type R(χ) 機構(`certainTypeDecompositionDa`/`certainTypeR`, §4/§5 σ-isometry)から作る。
+  irreducible member は既存 `memberExtensionDecomposition`。
+- counting 側 = `sum_div_normSq_induce_kernelFilter_eq`(weighted, 実在)で `∑_X χ(1)²/‖χ‖²`。
+
+⟹ **scope = sustained build**(weighted enumerator + reducible Dmem 構成が本体)。これが
+`xSum_le_two_psi_caseB`(`xSum_le_two_psi` `CorePart2:3229` の weighted mirror)→ c2 endgame に積まれる。
+
 ## (6.5) p-group reduction — 完備 (Plan agent の「未形式化」は誤り)
 
 - c1: `isPGroup_of_isFrobeniusGroup_of_card_le`(`CorePart1:3120`)
