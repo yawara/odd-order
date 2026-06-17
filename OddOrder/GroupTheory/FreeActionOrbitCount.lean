@@ -186,4 +186,63 @@ theorem orbit_trivial_or_free_of_card_orbits [Nonempty S]
   rw [orbit_eq_singleton_of_mem_fixedPoints hy] at hmem
   exact Set.mem_singleton_iff.mp hmem
 
+/-- **Forward orbit count** (converse of `orbit_trivial_or_free_of_card_orbits`).  If a finite group
+`Γ` acts on a finite type `S` with a *unique* fixed point `x₀` and acts *freely* off it (every
+non-fixed orbit has size `|Γ|`), then the number of orbits is `1 + (|S| − 1) / |Γ|`.  (For
+Peterfalvi (9.1): the class side — `⟨E⟩` free on the nontrivial classes, trivial class fixed — has
+this orbit count, which the Brauer equality then carries to the simples.) -/
+theorem card_orbits_eq_of_free_off_unique_fixed
+    (x₀ : S) (hx₀ : x₀ ∈ fixedPoints Γ S)
+    (huniq : ∀ x : S, x ∈ fixedPoints Γ S → x = x₀)
+    (hfree : ∀ x : S, x ∉ fixedPoints Γ S → Nat.card (orbit Γ x) = Nat.card Γ) :
+    Nat.card (orbitRel.Quotient Γ S) = 1 + (Nat.card S - 1) / Nat.card Γ := by
+  classical
+  set d := Nat.card Γ with hd_def
+  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  haveI : Nonempty (orbitRel.Quotient Γ S) := ⟨Quotient.mk'' x₀⟩
+  have hd_pos : 0 < d := Nat.card_pos
+  -- the fixed orbit `⟦x₀⟧` has size `1`; every other orbit has size `d`.
+  have h1 : Nat.card (orbitRel.Quotient.orbit (Quotient.mk'' x₀ : orbitRel.Quotient Γ S)) = 1 := by
+    rw [orbitRel.Quotient.orbit_mk, orbit_eq_singleton_of_mem_fixedPoints hx₀, Nat.card_coe_set_eq,
+      Set.ncard_singleton]
+  have hd_orbit : ∀ ω : orbitRel.Quotient Γ S, ω ≠ Quotient.mk'' x₀ → Nat.card ω.orbit = d := by
+    intro ω hne
+    obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
+    rw [orbitRel.Quotient.orbit_mk]
+    exact hfree a fun hmem => hne (by rw [huniq a hmem])
+  -- the orbits partition `S`, and the defect sum collapses to the single fixed orbit.
+  have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
+    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+      fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
+    rw [← Nat.card_sigma]
+    exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
+  have hsize_le : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit ≤ d := by
+    intro ω
+    obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
+    rw [orbitRel.Quotient.orbit_mk]
+    exact Nat.le_of_dvd hd_pos (card_orbit_dvd_card_group a)
+  have hdefect : ∑ ω : orbitRel.Quotient Γ S, (d - Nat.card ω.orbit) = d - 1 := by
+    rw [Finset.sum_eq_single (Quotient.mk'' x₀ : orbitRel.Quotient Γ S)]
+    · rw [h1]
+    · intro ω _ hne; rw [hd_orbit ω hne, Nat.sub_self]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  -- `d * #orbits = n + (d - 1)`.
+  have hdm : d * Nat.card (orbitRel.Quotient Γ S) = Nat.card S + (d - 1) := by
+    have hcancel : ∑ ω : orbitRel.Quotient Γ S, ((d - Nat.card ω.orbit) + Nat.card ω.orbit)
+        = ∑ _ω : orbitRel.Quotient Γ S, d :=
+      Finset.sum_congr rfl fun ω _ => Nat.sub_add_cancel (hsize_le ω)
+    rw [Finset.sum_add_distrib, hsum, hdefect, Finset.sum_const, Finset.card_univ, smul_eq_mul,
+      ← Nat.card_eq_fintype_card, mul_comm] at hcancel
+    omega
+  -- divide out by `d`.
+  obtain ⟨m', hm'⟩ : ∃ m', Nat.card (orbitRel.Quotient Γ S) = m' + 1 := by
+    have := Nat.card_pos (α := orbitRel.Quotient Γ S)
+    exact ⟨Nat.card (orbitRel.Quotient Γ S) - 1, by omega⟩
+  rw [hm'] at hdm ⊢
+  have hdm' : d * m' = Nat.card S - 1 := by
+    have hexp : d * (m' + 1) = d * m' + d := Nat.mul_succ d m'
+    omega
+  rw [show Nat.card S - 1 = d * m' from hdm'.symm, Nat.mul_div_cancel_left _ hd_pos]
+  omega
+
 end OddOrder.GroupTheory.FreeActionOrbitCount
