@@ -169,24 +169,31 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
    `glauberman_fixed_point_exists` (Isaacs 3.24(a)) on `Ω = {y // mk y = C}` (transitive `G`-conj
    set; `⟨β⟩` acts via `β`, compatible); the `β`-fixed element is in `Fix(β) = {1}`. `⟨β⟩` solvable
    via `isSolvable_of_comm` + `mul_comm'` (zpowers `IsMulCommutative`). sorry-free, axiom-clean.
-3. **NEXT — (3d.3) transfer to simples** (3 sub-pieces):
-   - **(3d.3a) free-action orbit arithmetic** [pure combinatorics, ~80-120 lines]. For finite `Γ`
-     (order `d`) on finite `S` (size `n`) with `#orbits = 1 + (n−1)/d`: **exactly one fixed point,
-     all other orbits size `d`**. ⚑ **Proof (worked out, no primality needed):** orbit sizes `sᵢ ∣ d`
-     (orbit-stabilizer), `∑ sᵢ = n` (`MulAction.selfEquivSigmaOrbits`). Then
-     `∑ᵢ (d − sᵢ) = d·#orbits − n = d(1+(n−1)/d) − n = d − 1`. Every **proper** divisor of `d` is
-     `≤ d/2` (`s ∣ d, s < d ⟹ 2s ≤ d`), so each nonzero defect `d − sᵢ ≥ d/2`; `t` nonzero defects
-     give `t·(d/2) ≤ d−1 < d ⟹ t ≤ 1`, and `d−1 > 0 ⟹ t = 1` (for `d ≥ 2`); that single defect is
-     `d−1`, i.e. `sᵢ = 1`. ⟹ exactly one size-1 orbit (fixed point), rest size `d` (free). mathlib:
-     `selfEquivSigmaOrbits` + `card_orbit_mul_card_stabilizer_eq_card_group` + `Nat.card_sigma`.
+3. **(3d.3) transfer to simples** — **abstract backbone COMPLETE** (3d.1/3d.2/3d.3a/forward-count
+   all sorry-free + axiom-clean); remaining = the rep-theory `i₀` identification + concrete wiring.
+   - ✅ **forward-count DONE (`9b64a344`)** — `FreeActionOrbitCount.card_orbits_eq_of_free_off_unique_fixed`
+     (unique fixed point + free elsewhere ⟹ `#orbits = 1 + (n−1)/d`; 3d.3a's converse, defect sum via
+     `Finset.sum_eq_single`). The class side feeds this (Γ=E, x₀=trivial class, free-off-trivial by 3d.2).
+   - ✅ **(3d.3a) DONE (`9ec8db73`)** — `FreeActionOrbitCount.orbit_trivial_or_free_of_card_orbits`:
+     finite `Γ` (order `d > 1`) on finite nonempty `S` with `#orbits = 1 + (n−1)/d` and `d ∣ n−1` ⟹
+     **every orbit size `1` or `d`, at most one fixed point**. The divisor argument went through as
+     worked out (no primality): `∑ᵢ (d − sᵢ) = d − 1`, each proper-divisor defect `≥ d/2` (via
+     `2sᵢ ≤ d`), so `#{proper}·d ≤ 2(d−1) < 2d ⟹ ≤ 1` proper orbit, of size `1`. Helpers
+     `card_orbit_dvd_card_group` (orbit-stabiliser `index_dvd_card`), `two_mul_le_of_dvd_of_lt`,
+     `orbit_eq_singleton_of_mem_fixedPoints`. sorry-free, axiom-clean.
    - **(3d.3b) the trivial simple is `MulAut G`-fixed** [identification]. The trivial central
      idempotent `t = (1/|U|) ∑_{g} single g 1 ∈ Z(k[U])` is `MulAut`-fixed (`α(∑ g) = ∑ g`) and is a
      primitive idempotent, so `t = idemBasis φ i₀` for some `i₀`; `centerRep_apply_symm_single` then
      forces `simplesAction φ α i₀ = i₀`, so `i₀ ∈ fixedPoints`.
    - **(3d.3c) combine:** Brauer equality (3d.1, `Γ = E` via the orbit hom) + `Nsimples = Ncl`
      (equal `finrank Z`) + "`E` free on nontrivial classes" (3d.2 per `e ∈ E#`) gives
-     `#orbits-simples = 1 + (Ncl−1)/|E|`; (3d.3a) ⟹ exactly one fixed simple + rest free; (3d.3b)
-     ⟹ that fixed simple is the trivial one ⟹ **`E` free on the nontrivial simples**.
+     `#orbits-classes = 1 + (Ncl−1)/|E|` [needs a **forward-count** lemma: an action with one fixed
+     point and free elsewhere has `#orbits = 1 + (n−1)/d` — the converse of 3d.3a, also via the
+     orbit partition]; then `#orbits-simples = 1 + (Ncl−1)/|E|`; (3d.3a) ⟹ exactly one fixed simple +
+     rest free; (3d.3b) ⟹ that fixed simple is the trivial one ⟹ **`E` free on the nontrivial
+     simples**. ⚠ 3d.3c also needs `1 < |E|` (E nontrivial — holds: Frobenius complement) and the
+     wiring of the abstract `Γ`-action to the concrete `simplesAction φ`/`Fin N` (compHom + `rfl`
+     agreement, as set up in 3d.1).
    Then (†): I-2 isotypic decomposition of `W` (`W^U = 0` ⟹ only nontrivial components) + I-4 base
    change `𝔽_p → 𝔽̄_p` + per-orbit I-3 (`finrank_eq_card_mul_finrank_invariants`) ⟹
    `dim W = |E|·dim W^E`.

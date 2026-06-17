@@ -4,6 +4,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.FreeActionOrbitCount
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
 import OddOrder.GroupTheory.CoprimeFrobeniusKernel
 import OddOrder.GroupTheory.CriticalSubgroup
