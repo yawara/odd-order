@@ -6933,10 +6933,44 @@ theorem partner_canonical_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact kappaHall_primes_subset_sigma_partner hG hM hP hKM hK hKstar hU hpart
       (Nat.prime_of_mem_primeFactors hq) (Nat.dvd_of_mem_primeFactors hq)
 
+/-- **BG Theorem 14.7(e), the family `Z ⊓ N_σ` collapse** (mmd L4051): for the type-`P` family
+`{M, M*}` (recorded by `hpart`), the union of the canonical factors collapses to `K ∪ K*`,
+`⋃_{N ∈ 𝓕} (Z ⊓ N_σ) = K ∪ K*`, since `Z ⊓ M_σ = K*` (`typeP_self_member`) and `Z ⊓ M*_σ = K`
+(`partner_canonical_eq`).  Factored out of `typeP_zTilde_isTI`; reused by the `> ½|G|` density
+count `typeP_zTilde_conjClass_gt_half`, where it identifies `Ẑ = Z − (K ∪ K*)` with the family
+TI-set `T = Z − ⋃_{N} (Z ⊓ N_σ)`. -/
+theorem family_inf_msigma_union_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    (⋃ N ∈ ZFamilyFinset M K,
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
+      = ((K : Set G) ∪ (Kstar : Set G)) := by
+  classical
+  have hcanonM : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar :=
+    (typeP_self_member hG hM hP hKM hK hKstar hU).1
+  have hcanonMstar : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = K :=
+    partner_canonical_eq hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  apply Set.Subset.antisymm
+  · rintro x hx
+    rw [Set.mem_iUnion₂] at hx
+    obtain ⟨N, hN, hxN⟩ := hx
+    rcases hpart N (mem_ZFamilyFinset.mp hN) with rfl | rfl
+    · rw [hcanonM] at hxN; exact Or.inr hxN
+    · rw [hcanonMstar] at hxN; exact Or.inl hxN
+  · rintro x (hxK | hxKstar)
+    · exact Set.mem_iUnion₂.mpr ⟨Mstar, mem_ZFamilyFinset.mpr hMstarmem,
+        by rw [hcanonMstar]; exact hxK⟩
+    · exact Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
+        by rw [hcanonM]; exact hxKstar⟩
+
 /-- **BG Theorem 14.7(e), `Ẑ` is a TI-subset** (mmd L4051): with the family `{M, M*}`, the
-union `⋃_{N} (Z ⊓ N_σ)` collapses to `K ∪ K*` (`Z ⊓ M_σ = K*` by `typeP_self_member`, `Z ⊓ M*_σ = K`
-by `partner_canonical_eq`), so the family TI-set `T = Z − ⋃ (Z ⊓ N_σ)` equals `Ẑ = Z − (K ∪ K*)`.
-Hence `Ẑ` inherits the TI property from `typeP_family_T_isTI`.  A conjunct of the `∃! Mstar`. -/
+union `⋃_{N} (Z ⊓ N_σ)` collapses to `K ∪ K*` (`family_inf_msigma_union_eq`), so the family TI-set
+`T = Z − ⋃ (Z ⊓ N_σ)` equals `Ẑ = Z − (K ∪ K*)`.  Hence `Ẑ` inherits the TI property from
+`typeP_family_T_isTI`.  A conjunct of the `∃! Mstar`. -/
 theorem typeP_zTilde_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
@@ -6946,25 +6980,7 @@ theorem typeP_zTilde_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
     OddOrder.GroupTheory.IsTISubset (zTilde K Kstar) (K ⊔ Kstar) := by
   classical
-  have hcanonM : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar :=
-    (typeP_self_member hG hM hP hKM hK hKstar hU).1
-  have hcanonMstar : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = K :=
-    partner_canonical_eq hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
-  have hunion : (⋃ N ∈ ZFamilyFinset M K,
-      (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
-      = ((K : Set G) ∪ (Kstar : Set G)) := by
-    apply Set.Subset.antisymm
-    · rintro x hx
-      rw [Set.mem_iUnion₂] at hx
-      obtain ⟨N, hN, hxN⟩ := hx
-      rcases hpart N (mem_ZFamilyFinset.mp hN) with rfl | rfl
-      · rw [hcanonM] at hxN; exact Or.inr hxN
-      · rw [hcanonMstar] at hxN; exact Or.inl hxN
-    · rintro x (hxK | hxKstar)
-      · exact Set.mem_iUnion₂.mpr ⟨Mstar, mem_ZFamilyFinset.mpr hMstarmem,
-          by rw [hcanonMstar]; exact hxK⟩
-      · exact Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
-          by rw [hcanonM]; exact hxKstar⟩
+  have hunion := family_inf_msigma_union_eq hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
   have hzeq : zTilde K Kstar = ((K ⊔ Kstar : Subgroup G) : Set G) \
       ⋃ N ∈ ZFamilyFinset M K,
         (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
@@ -7008,6 +7024,168 @@ theorem zTilde_ncard_eq [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
     omega
   rw [zTilde, Set.ncard_diff hsub, hZc, hunion]
   exact nat_mul_sub_kl_identity Nat.card_pos Nat.card_pos
+
+/-- Pure `ℕ` arithmetic for the `8/15 > 1/2` density step: for coprime odd `k, l > 1` one has
+`k·l < 2(k−1)(l−1)`.  Equivalently `(k−2)(l−2) > 2`; the only odd pair `≥ 3` failing this is
+`k = l = 3`, excluded by coprimality (`gcd 3 3 = 3 ≠ 1`).  Hence one factor is `≥ 5`. -/
+private theorem card_kkstar_lt {k l : ℕ} (hk : Odd k) (hl : Odd l)
+    (hk1 : k ≠ 1) (hl1 : l ≠ 1) (hcop : Nat.Coprime k l) :
+    k * l < 2 * ((k - 1) * (l - 1)) := by
+  obtain ⟨a, rfl⟩ := hk
+  obtain ⟨b, rfl⟩ := hl
+  have ha : 1 ≤ a := by omega
+  have hb : 1 ≤ b := by omega
+  have hnotboth : ¬ (a = 1 ∧ b = 1) := by
+    rintro ⟨rfl, rfl⟩; exact absurd hcop (by decide)
+  have hab : 2 ≤ a ∨ 2 ≤ b := by omega
+  have key : 2 * a + 2 * b + 1 < 4 * (a * b) := by
+    rcases hab with ha2 | hb2
+    · have h1 : 2 * b ≤ a * b := Nat.mul_le_mul ha2 (le_refl b)
+      have h2 : a ≤ a * b := by simpa using Nat.mul_le_mul (le_refl a) hb
+      omega
+    · have h1 : 2 * a ≤ a * b := by simpa [mul_comm] using Nat.mul_le_mul (le_refl a) hb2
+      have h2 : b ≤ a * b := by simpa [mul_comm] using Nat.mul_le_mul (le_refl b) ha
+      omega
+  have e1 : 2 * a + 1 - 1 = 2 * a := by omega
+  have e2 : 2 * b + 1 - 1 = 2 * b := by omega
+  rw [e1, e2]
+  nlinarith [key]
+
+/-- **BG Theorem 14.7, the density bound `|𝒞_G(Ẑ)| > ½|G|`** (mmd L3975/L4051): the conjugacy
+saturation of the TI-set `Ẑ` covers more than half of `G`.  This is the counting heart of the
+`∃! M*` covering — a third nonconjugate type-`P` maximal subgroup would force a *second* `> ½|G|`
+saturation piece disjoint from this one, which is impossible.
+
+Proof chain: `Ẑ` is a TI-subset of `Z = K ⊔ K*` (`typeP_zTilde_isTI`) normalised by `Z`
+(`typeP_family_Z_normalizes_T`, transported along `Ẑ = T`), so `|𝒞_G(Ẑ)| = |Ẑ|·[G : Z]`; with
+`|Ẑ| = (k−1)(k*−1)` (`zTilde_ncard_eq`) and `|G| = |Z|·[G : Z] = k·k*·[G : Z]`
+(`card_kappaHall_sup_Kstar`), the bound reduces to the pure inequality `k·k* < 2(k−1)(k*−1)`
+(`card_kkstar_lt`) for the coprime (`coprime_card_kappaHall_Kstar`) odd `k = |K|`, `k* = |K*| > 1`
+(`K* ≠ 1` is `typeP_structure`'s second conjunct). -/
+theorem typeP_zTilde_conjClass_gt_half [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    Nat.card G < 2 * (conjClassSet (zTilde K Kstar)).ncard := by
+  classical
+  -- `Ẑ = T` (the family TI-set), via the `Z ⊓ N_σ` collapse.
+  have hzeq : zTilde K Kstar = ((K ⊔ Kstar : Subgroup G) : Set G) \
+      ⋃ N ∈ ZFamilyFinset M K,
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+    simp only [zTilde]
+    rw [family_inf_msigma_union_eq hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart]
+  -- `Z` normalises `Ẑ` (transported from the family form).
+  have hstab : ∀ l ∈ K ⊔ Kstar, MulAut.conj l • (zTilde K Kstar) = zTilde K Kstar := by
+    intro l hl
+    rw [hzeq]; exact typeP_family_Z_normalizes_T hG hM hP hKM hK hKstar hU l hl
+  -- Saturation count `|𝒞_G(Ẑ)| = |Ẑ|·[G : Z]`.
+  have hcount : (conjClassSet (zTilde K Kstar)).ncard
+      = (zTilde K Kstar).ncard * (K ⊔ Kstar).index :=
+    ncard_conjClassSet_of_isTISubset
+      (typeP_zTilde_isTI hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart) hstab
+  -- `|Ẑ| = (k − 1)(k* − 1)`.
+  have hZc : (zTilde K Kstar).ncard = (Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1) :=
+    zTilde_ncard_eq hKM hK hKstar
+  -- `|G| = |Z|·[G : Z] = k·k*·[G : Z]`.
+  have hG_eq : Nat.card G = Nat.card ↥K * Nat.card ↥Kstar * (K ⊔ Kstar).index := by
+    rw [← card_kappaHall_sup_Kstar hKM hK hKstar]
+    exact (Subgroup.card_mul_index (K ⊔ Kstar)).symm
+  have hidx_pos : 0 < (K ⊔ Kstar).index := Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  -- `k, k*` are odd (divisors of `|G|`).
+  have hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  have hKstarodd : Odd (Nat.card ↥Kstar) :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Kstar)
+  -- `k > 1`: a prime `p ∈ κ(M)` divides `|K|`.
+  have hKne1 : Nat.card ↥K ≠ 1 := by
+    obtain ⟨p, hpκ⟩ := hP
+    have hpprime : p.Prime := hpκ.1
+    obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
+    have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
+    have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
+    have hpK : p ∣ Nat.card ↥K := by
+      have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
+        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+        exact Subgroup.card_mul_index (K.subgroupOf M)
+      have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+        hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+      exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
+    exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
+  -- `k* > 1`: `K* ≠ ⊥` (Proposition 14.2's second conjunct).
+  have hKstarne1 : Nat.card ↥Kstar ≠ 1 :=
+    fun h => (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (Subgroup.eq_bot_of_card_eq _ h)
+  have hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Kstar) :=
+    coprime_card_kappaHall_Kstar hKM hK hKstar
+  have harith : Nat.card ↥K * Nat.card ↥Kstar
+      < 2 * ((Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1)) :=
+    card_kkstar_lt hKodd hKstarodd hKne1 hKstarne1 hcop
+  rw [hcount, hZc, hG_eq]
+  calc Nat.card ↥K * Nat.card ↥Kstar * (K ⊔ Kstar).index
+      < 2 * ((Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1)) * (K ⊔ Kstar).index :=
+        mul_lt_mul_of_pos_right harith hidx_pos
+    _ = 2 * ((Nat.card ↥K - 1) * (Nat.card ↥Kstar - 1) * (K ⊔ Kstar).index) :=
+        mul_assoc _ _ _
+
+open Classical in
+/-- A reusable dummy `SigmaDecompositionData`: `length x = 1` iff `x ≠ 1` and `x` has a maximal
+`σ`-subgroup.  The structure axiom `length_one_iff` pins this predicate across *all* carriers, and
+the family/density machinery (`family_card_eq_two`, `exists_partner`, …) consumes `D` only through
+`D.length x = 1`; so this dummy suffices — no genuine `σ`-decomposition theory is needed. -/
+noncomputable def dummySigmaDecomposition (G : Type*) [Group G] : SigmaDecompositionData G where
+  length := fun y => if y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty then 1 else 0
+  length_one_iff := by
+    intro y
+    by_cases h : y ≠ 1 ∧ (maximalSigmaSubgroupsOfElement y).Nonempty <;> simp [h]
+
+/-- Two subsets of a finite group, each covering more than half of it, must intersect. -/
+theorem ncard_inter_nonempty_of_two_mul_gt [Finite G] {A B : Set G}
+    (hA : Nat.card G < 2 * A.ncard) (hB : Nat.card G < 2 * B.ncard) :
+    (A ∩ B).Nonempty := by
+  classical
+  by_contra hempty
+  rw [Set.not_nonempty_iff_eq_empty] at hempty
+  have hunion := Set.ncard_union_add_ncard_inter A B
+  rw [hempty, Set.ncard_empty] at hunion
+  have hle : (A ∪ B).ncard ≤ Nat.card G := by
+    rw [← Set.ncard_univ G]
+    exact Set.ncard_le_ncard (Set.subset_univ _) Set.finite_univ
+  omega
+
+/-- **BG Theorem 14.7, the density bound holds for every type-`P` maximal subgroup** (mmd L4053,
+"we also have `|𝒞_G(S)| > ½|G|`"): for `H ∈ 𝓜_𝓟` there is a Hall `κ(H)`-subgroup `L` with
+`L* = C_{Hσ}(L)` and `|𝒞_G(Ẑ_H)| > ½|G|`.  The same density count (`typeP_zTilde_conjClass_gt_half`)
+run for `H`; the partner data for `H` is produced internally (`exists_partner`, fed the dummy
+`σ`-decomposition).  Reused in the covering step of `typeP_duality`. -/
+theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H : Subgroup G}
+    (hHmax : H ∈ maximalSubgroups G) (hHP : IsTypeP H) :
+    ∃ L Lstar : Subgroup G, L ≤ H ∧ Ch03.IsHallSubgroup (kappa H) (L.subgroupOf H) ∧
+      Lstar = OddOrder.BG.Ch3.S10.Msigma H ⊓ Subgroup.centralizer (L : Set G) ∧
+      Nat.card G < 2 * (conjClassSet (zTilde L Lstar)).ncard := by
+  classical
+  haveI : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hHmax
+  -- Hall `κ(H)`-subgroup `L` of `H`.
+  obtain ⟨L', hL'⟩ := Ch03.hall_E_exists (G := ↥H) (kappa H)
+  have hLeq : (L'.map H.subtype).subgroupOf H = L' :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective L'
+  have hL : Ch03.IsHallSubgroup (kappa H) ((L'.map H.subtype).subgroupOf H) := by
+    rw [hLeq]; exact hL'
+  have hLH : L'.map H.subtype ≤ H := Subgroup.map_subtype_le L'
+  set L := L'.map H.subtype with hLdef
+  set Lstar := OddOrder.BG.Ch3.S10.Msigma H ⊓ Subgroup.centralizer (L : Set G) with hLstar
+  -- Hall `(κ(H) ∪ σ(H))'`-subgroup `U` of `H`.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥H) ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+  have hUeq : (U'.map H.subtype).subgroupOf H = U' :=
+    Subgroup.comap_map_eq_self_of_injective H.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ)
+      ((U'.map H.subtype).subgroupOf H) := by rw [hUeq]; exact hU'
+  -- Partner data for `H`, then the density bound.
+  obtain ⟨Hstar, hHstarne, hHstarmem, hpart⟩ :=
+    exists_partner hG (dummySigmaDecomposition G) hHmax hHP hLH hL hLstar hU
+  exact ⟨L, Lstar, hLH, hL, hLstar,
+    typeP_zTilde_conjClass_gt_half hG hHmax hHP hLH hL hLstar hU hHstarmem hHstarne hpart⟩
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
