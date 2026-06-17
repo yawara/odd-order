@@ -28,6 +28,8 @@ namespace OddOrder.GroupTheory.CenterClassSum
 
 open scoped MonoidAlgebra
 
+open Module
+
 -- The shared `variable` block below serves lemmas with differing instance usage; suppress the
 -- section-variable hygiene linters (the instances are all genuinely needed by `classSum`).
 set_option linter.unusedSectionVars false
@@ -114,8 +116,74 @@ theorem classSum_linearIndependent :
   rw [Finset.sum_congr rfl (fun C' _ => key C'), Finset.sum_ite_eq Finset.univ C a] at hx
   simpa using hx
 
--- TODO (next iteration): class sums span `Z(k[G])`, giving `Basis (ConjClasses G) k ↥(center)`
--- (an invariant element is constant on conjugacy classes ⟹ `= ∑_C (coeff) • classSum C`), then the
--- `σ_e`-permutation `σ_e (classSum C) = classSum (e · C)`; feed both into the cornerstone for (4).
+/-- A central element of `k[G]` has class-constant coefficients: `z (h * x * h⁻¹) = z x`.
+Conjugation by `h` permutes the support of `z` without changing the coefficients (this is the
+content of `z` commuting with `single h 1`). -/
+theorem center_apply_conj {z : MonoidAlgebra k G}
+    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) (h x : G) :
+    (z (h * x * h⁻¹) : k) = z x := by
+  have key := (Finsupp.ext_iff.mp
+    ((Subalgebra.mem_center_iff.mp hz) (MonoidAlgebra.single h 1))) (h * x)
+  rw [MonoidAlgebra.single_mul_apply, MonoidAlgebra.mul_single_apply, one_mul, mul_one,
+    inv_mul_cancel_left] at key
+  exact key.symm
+
+/-- A central element is constant along a conjugacy class: `mk a = mk b ⟹ z a = z b`. -/
+theorem center_apply_of_mk_eq {z : MonoidAlgebra k G}
+    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) {a b : G}
+    (hab : ConjClasses.mk a = ConjClasses.mk b) : (z a : k) = z b := by
+  obtain ⟨h, rfl⟩ := isConj_iff.mp (ConjClasses.mk_eq_mk_iff_isConj.mp hab)
+  exact (center_apply_conj hz h a).symm
+
+/-- **The class-sum expansion of a central element**: `z = ∑_C z(C.out) • classSum C`.
+Reading off the coefficient at `y`, only the class `C = mk y` contributes, with value
+`z (mk y).out = z y` (central ⟹ class-constant).  This is the spanning half of the basis. -/
+theorem center_eq_sum_classSum {z : MonoidAlgebra k G}
+    (hz : z ∈ Subalgebra.center k (MonoidAlgebra k G)) :
+    z = ∑ C : ConjClasses G, z (C.out) • classSum (k := k) C := by
+  refine Finsupp.ext fun y => ?_
+  have hrhs : (∑ C : ConjClasses G, z (C.out) • classSum (k := k) C) y
+      = ∑ C : ConjClasses G, (z (C.out) • classSum (k := k) C) y :=
+    map_sum (Finsupp.applyAddHom y) (fun C => z (C.out) • classSum (k := k) C) Finset.univ
+  rw [hrhs]
+  simp only [MonoidAlgebra.smul_apply, smul_eq_mul, classSum_apply, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_ite_eq Finset.univ (ConjClasses.mk y) (fun C => z (C.out)),
+    if_pos (Finset.mem_univ _)]
+  have hmk : ConjClasses.mk ((ConjClasses.mk y).out) = ConjClasses.mk y := by
+    rw [← ConjClasses.quotient_mk_eq_mk]; exact Quotient.out_eq _
+  exact (center_apply_of_mk_eq hz hmk).symm
+
+/-- The class sum `classSum C`, packaged as an element of the centre subalgebra. -/
+noncomputable def classSumCenter (C : ConjClasses G) :
+    ↥(Subalgebra.center k (MonoidAlgebra k G)) :=
+  ⟨classSum C, classSum_mem_center C⟩
+
+@[simp] theorem classSumCenter_coe (C : ConjClasses G) :
+    (classSumCenter (k := k) C : MonoidAlgebra k G) = classSum C := rfl
+
+/-- **The class-sum basis of the centre `Z(k[G])`** over an arbitrary field, indexed by conjugacy
+classes.  Linear independence is inherited from the ambient `k[G]` (disjoint supports); spanning is
+`center_eq_sum_classSum`.  This is one of the two bases of `Z(𝔽̄_p[U])` fed into the cornerstone
+`finrank_invariants_eq_card_orbits` for Peterfalvi (9.1)'s orbit-count Brauer lemma. -/
+noncomputable def centerBasis :
+    Basis (ConjClasses G) k ↥(Subalgebra.center k (MonoidAlgebra k G)) :=
+  Basis.mk (v := classSumCenter)
+    (LinearIndependent.of_comp
+      (Subalgebra.center k (MonoidAlgebra k G)).val.toLinearMap classSum_linearIndependent)
+    (by
+      intro z _
+      have hsum : z = ∑ C : ConjClasses G,
+          (z : MonoidAlgebra k G) (C.out) • classSumCenter (k := k) C := by
+        apply Subtype.ext
+        rw [AddSubmonoidClass.coe_finset_sum]
+        simp only [SetLike.val_smul, classSumCenter_coe]
+        exact center_eq_sum_classSum z.2
+      rw [hsum]
+      exact Submodule.sum_mem _ fun C _ =>
+        Submodule.smul_mem _ _ (Submodule.subset_span ⟨C, rfl⟩))
+
+@[simp] theorem centerBasis_apply (C : ConjClasses G) :
+    centerBasis (k := k) (G := G) C = classSumCenter C :=
+  Basis.mk_apply _ _ C
 
 end OddOrder.GroupTheory.CenterClassSum
