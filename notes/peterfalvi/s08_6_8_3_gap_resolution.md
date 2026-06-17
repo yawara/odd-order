@@ -1,5 +1,12 @@
 # Pf (6.8.3) gap RESOLVED — 正本 (2026-06-17, hub 13-agent workflow + 厳密検証)
 
+> ⚠⚠ **2026-06-17 再検証による訂正 (2 workflow / 8 agent code-verified)**: 本 note §1 在庫 (14 部品 sorry-free) は
+> **正しい**。だが本 note の中核主張「math gap = 0 / 残務 = case-B glue **のみ**」は **過大評価**。bootstrap 経路を採れば
+> per-φ 固有 GAP (`IsPGroup ↥H` 等) は回避できるが、残 obligation は **glue でなく** A/B dispatch + Frobenius 枝
+> hstepData/ν 構成 + set-bridge (`certainTypeSet ↔ Xset ⁅H,H⁆`) を含む (= 多少の新証明を要する)。さらに (6.8) は
+> 現 FT carrier (S15/Section16Inputs の free char field) から **orphaned** で、閉じても feitThompson 残 sorry は今は
+> 減らない (honest architecture では deferred-payoff な実 FT 前提)。正本 = 記憶 [[ft-path-policy]] 2026-06-17 ブロック。
+
 > **この note が (6.8.3) / norm-weighted (5.6) / case-B capstone の現時点 source-of-truth。**
 > 先行の `s56_reweighting_plan.md`(churn 多・retraction 多)・`s08_6_8_3_reducibleS_chatgpt_answer.md`
 > ・`s08_6_8_assembly_plan.md` のうち本 note と矛盾する記述は本 note を優先(各々に STALE banner 付与済)。
