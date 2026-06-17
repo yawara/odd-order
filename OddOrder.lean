@@ -74,6 +74,7 @@ import OddOrder.BG.Ch1_Preliminary.S03f_Prelim
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch1_Preliminary.PLength
 import OddOrder.BG.Ch1_Preliminary.PLengthTransfer
@@ -159,6 +160,7 @@ import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S08_CaseBCoherence2
 import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBXunionY
+import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
 import OddOrder.Peterfalvi.S08_CaseBEndgame
 import OddOrder.Peterfalvi.S08_CaseBHortho
 import OddOrder.Peterfalvi.S08_CaseBEnumeration

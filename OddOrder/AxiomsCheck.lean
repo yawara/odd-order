@@ -43,6 +43,7 @@ import OddOrder.BG.Ch1_Preliminary.S03e_Thm35
 import OddOrder.BG.Ch1_Preliminary.S03f_Thm36
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310General
+import OddOrder.BG.Ch1_Preliminary.S03g_Thm310ElemAbelian
 import OddOrder.BG.Ch1_Preliminary.S03h_Thm38
 import OddOrder.BG.Ch2_Uniqueness.S07_Transitivity
 import OddOrder.BG.Ch2_Uniqueness.S08_FittingOfMaximal
@@ -3754,6 +3755,38 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.caseB_transfer
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isIrreducible_lift_of_trivial
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.fpf_lift_of_centralizer_bot
+-- BG Theorem 3.10 (a)+(b), general (non-abelian) kernel (issue 8013, piece 3 capstone): the
+-- `K₀`-reduction strong induction assembling base + Case A + Case B into the irreducible-module form
+-- `|R|` prime ∧ `finrank V = |R|·finrank C_V(R)` for a general Frobenius kernel `K ⊴ G`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_frobenius_general
+-- BG Theorem 3.10 elementary-abelian reducible-module induction infrastructure (issue 8013, piece 5):
+-- invariants of a subrepresentation as an ambient `finrank` (`C_V(H) ⊓ W`), and their additivity over
+-- an internal direct sum of `H`-stable subrepresentations.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_toRepresentation_map_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.finrank_invariants_toRepresentation_inf
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.finrank_inf_invariants_sup_of_disjoint
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_toRepresentation_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_toRepresentation_eq_of_inf_eq
+-- BG Theorem 3.10 (a)+(b), elementary-abelian reducible-module case (issue 8013, piece 5): drops the
+-- irreducibility hypothesis of piece 3 via a Maschke `⊤ = U ⊕ U'` strong induction on `finrank V`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.exists_maschke_split
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_frobenius_elemAbelian
+-- BG Theorem 3.10 (c) elementary-abelian (issue 8013, piece 5): `C_V(R)` cyclic ⟹ `K' ⊆ C_K(V)`,
+-- threaded through the same Maschke induction (irreducible leaf = Theorem 3.5 `thm35`).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.commutator_eq_one_of_frobenius_elemAbelian
+-- Base change preserves a subgroup-equality of invariants (issue 8013, piece 5): the prime-manner
+-- transfer `C_M(x) = C_M(R)` from `ZMod p` to its algebraic closure, for the group↔module bridge.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.invariants_baseChangeRepresentation_comp_eq
+-- BG Theorem 3.10 (a)+(b), elementary-abelian GROUP case, general kernel (issue 8013, piece 5+2b):
+-- the `MulDistribMulAction` group form, dropping the abelian-kernel restriction by base change to the
+-- algebraic closure + the general-kernel reducible-module Theorem 3.10.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general
+-- BG Theorem 3.10 (b) cardinality form (issue 8013, piece 5+2b = §15.2 step-4 (f) `|Q̄|=q^p`):
+-- `|M| = |C_M(R)|^{|R|}` from the rank formula via `Module.card_eq_pow_finrank`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.card_eq_pow_card_invariants_of_elemAbelian_general
+-- BG Theorem 3.10 (c) GROUP form (issue 8013, piece 5 = §15.2 step-4 (g) `D'⊆C_D(Q̄)`): with the
+-- genuine `IsFrobeniusGroup` and `C_M(R)` cyclic, `K'` acts trivially on `M` (`∀ g∈⁅K,K⁆, g•m=m`).
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.commutator_acts_trivially_of_elemAbelian_general
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
@@ -4688,6 +4721,168 @@ independent of the Hall choice).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_normalizer_inf_eq
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_swap_Z_le
+
+/-! **BG 14.7, `M ⊇ N_G(X)` from a unique centralizer-maximal** (`S14_TypePCounting`,
+`normalizer_le_of_maximalSubgroupsContaining_centralizer`, mmd L3992): if `ℳ(C_G(X)) = {M}` then
+`N_G(X) ≤ M`.  General fact (conjugation fixes `C_G(X)`, uniqueness forces `Mᵍ = M`, `M`
+self-normalizing); supplies the swap argument's reverse direction.  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S14.normalizer_le_of_maximalSubgroupsContaining_centralizer
+
+/-! **BG 14.7, swap argument — the `Z`-coincidence** (`S14_TypePCounting`, mmd L3999-4001).
+`le_centralizerFactor_of_le_sup_of_le_Msigma` is the `σ`-projection: a `σ(Mi)`-group inside an
+internal direct product `Ki × Ki*` (`Ki` a `σ'`-group) lands in the `σ`-factor `Ki*`.
+`typeP_swap_Z_eq` is the full coincidence `Z = K ⊔ K* = Ki ⊔ Ki*`: direction `⊆` from
+`typeP_swap_Z_le`, direction `⊇` from the role-exchanged swap using `M ⊇ N_G(X*)`,
+`π(Ki*) ⊆ κ(M)`, and `Xi ⊆ Ki*`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S14.le_centralizerFactor_of_le_sup_of_le_Msigma
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_swap_Z_eq
+
+/-! **BG 14.7, `K_i*` pairwise disjoint** (`S14_TypePCounting`, mmd L4005).
+`typeP_centralizer_singleton` packages Proposition 14.2(c) for a neighbour (`ℳ(C_G(Y)) = {M}` for
+`Y ∈ ℰ¹(K*)`).  `typeP_neighbor_Kstar_inf_eq_bot`: distinct type-`P` maximals `Mi ≠ Mj` have
+`C_{Mi_σ}(Ki) ⊓ C_{Mj_σ}(Kj) = ⊥` (a common line would force `{Mi} = {Mj}`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_centralizer_singleton
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_inf_eq_bot
+
+/-! **BG 14.7 density backbone — inclusion–exclusion** (`S14_TypePCounting`,
+`ncard_biUnion_subgroup_add_card`, mmd L4031): for a nonempty finite family of subgroups pairwise
+meeting at `⊥`, `|⋃ Sᵢ| + |s| = (∑ |Sᵢ|) + 1` (each contributes `|Sᵢ| − 1` non-identity elements,
+disjoint, plus the shared identity).  Gives `|T| = |Z| + n − ∑ kᵢ*` for the TI-set `T = Z − ⋃ Kᵢ*`.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_biUnion_subgroup_add_card
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ncard_sdiff_biUnion_subgroup
+
+/-! **BG 14.7 internal direct product cardinality** (`S14_TypePCounting`,
+`card_iSup_of_pairwise_commute_coprime`, mmd L4009): a finite family of pairwise-commuting subgroups
+with pairwise-coprime orders is an internal direct product, so `|⨆ Hᵢ| = ∏ |Hᵢ|`
+(independence from `Subgroup.independent_of_coprime_order`, then `noncommPiCoprod` injective with
+range `⨆ Hᵢ`).  Gives `z = ∏ kᵢ*` for the `Kᵢ*`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.card_iSup_of_pairwise_commute_coprime
+
+/-! **BG 14.7, canonical `Kᵢ*`** (`S14_TypePCounting`, `typeP_neighbor_Kstar_eq_Z_inf_Msigma`,
+mmd L4009): given the swap `Z = Kₙ ⊔ Kₙ*`, the factor `Kₙ* = C_{Nσ}(Kₙ)` equals `Z ⊓ M_σ(N)` —
+the `σ(N)`-part of `Z`, independent of the chosen Hall `κ(N)`-subgroup `Kₙ`.  Lets the family
+`{Kᵢ*}` be defined choice-free as `N ↦ Z ⊓ M_σ(N)`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_neighbor_Kstar_eq_Z_inf_Msigma
+
+/-! **BG 14.7, per-neighbour swap package** (`S14_TypePCounting`, `exists_neighbor_kappaHall_swap`,
+mmd L3997-4009): for a type-`P` maximal `M` and a maximal `N ⊇ N_G(X)` (`X ∈ ℰ¹(K)`), there is a
+Hall `κ(N)`-subgroup `K_N` realising the swap `Z = K_N ⊔ K_N*` with canonical `K_N* = Z ⊓ M_σ(N)`.
+The per-neighbour foundation the `M_i` family iterates over.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap
+
+/-! **BG 14.7, coverage of `κ(M)`-primes** (`S14_TypePCounting`, `exists_typeP_neighbor_mem_sigma`,
+mmd L4007): every prime `p ∣ |K|` lies in `σ(N)` for a nonconjugate type-`P` neighbour `N ⊇ Z`
+(via a line `X ∈ ℰ_p¹(K)` and its partner).  With `M` (covering `σ(M) ⊇ π(K*)`) this gives the
+coverage `⋃ σ(Mᵢ) ⊇ π(Z)` forcing `⨆ Kᵢ* = Z`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_neighbor_mem_sigma
+
+/-! **BG 14.7, internal-direct-product factor normality** (`S14_TypePCounting`,
+`sup_le_normalizer_inf_of_commute`): in `A ⊔ B` with `B ≤ C_G(A)`, both factors are normal,
+`A ⊔ B ≤ N_G(A) ⊓ N_G(B)`.  Applied to the swap `Z = K_N ⊔ K_N*` it makes `K_N`, `K_N*` normal in
+`Z` (input to pairwise commutativity, pairwise nonconjugacy, and the `n = 1` collapse).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sup_le_normalizer_inf_of_commute
+
+/-! **BG 14.7, internal-product cardinality + commute helpers** (`S14_TypePCounting`):
+`card_sup_of_commute_of_disjoint` — for commuting `H`, `K` with `H ⊓ K = ⊥`, `|H ⊔ K| = |H|·|K|`
+(via `noncommCoprod`).  `commute_of_le_normalizer_of_disjoint` — subgroups `A, B ≤ Z` normal in `Z`
+with `A ⊓ B = ⊥` commute elementwise (`[x,y] ∈ A ⊓ B = ⊥`).  Used for `|Kᵢ* ⊔ Kⱼ*| = kᵢ*·kⱼ*` in the
+pairwise-nonconjugacy argument.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.card_sup_of_commute_of_disjoint
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.commute_of_le_normalizer_of_disjoint
+
+/-! **BG 14.7, pairwise nonconjugacy of the family** (`S14_TypePCounting`,
+`typeP_family_nonconjugate`, mmd L4015): maximal subgroups whose swap factors `Zₖ = M_σ(Mₖ) ⊓ C(Kₖ)`
+meet trivially (with `Z₂ ≠ ⊥`) are nonconjugate — else `σ(M₁) = σ(M₂)` makes `Z₁`, `Z₂` disjoint
+normal `τ`-Halls of `Z` with `z₁ z₂ ∣ z = k₁ z₁`, so `z₂ ∣ k₁` (a `τ`-number divides a `τ'`-number),
+forcing `Z₂ = ⊥`.  Feeds Lemma 14.5(b).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_nonconjugate
+
+/-! **BG 14.7, per-neighbour swap package with normality** (`S14_TypePCounting`,
+`exists_neighbor_kappaHall_swap_normal`): the per-neighbour swap restated with canonical factor
+`K_N* = Z ⊓ M_σ(N)` folded in and `K_N* ◁ Z` added — the exact per-member data the `M_i` family
+consumes.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_kappaHall_swap_normal
+
+/-! **BG 14.7, full per-neighbour data** (`S14_TypePCounting`, `exists_neighbor_full`): the complete
+per-member package the `M_i` family consumes — Hall `κ(N)`-subgroup `K_N`, swap `Z = K_N ⊔ K_N*`
+(canonical `K_N* = Z ⊓ M_σ(N)`), `K_N* ◁ Z`, `N` type-`P`, and `K_N* ≠ ⊥` (`X ≤ K_N*`).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_full
+
+/-! **BG 14.7, two family members nonconjugate** (`S14_TypePCounting`,
+`neighbor_pair_nonconjugate`, mmd L4015): distinct type-`P` maximals `N₁ ≠ N₂` with their swaps are
+nonconjugate — Proposition 14.2(c) (swap factors meet trivially) + `typeP_family_nonconjugate`.
+The per-pair input to the family's pairwise nonconjugacy.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.neighbor_pair_nonconjugate
+
+/-! **BG 14.7, the base member `M` (`i = 0`)** (`S14_TypePCounting`, `typeP_self_member`, mmd L4003):
+`M`'s own data in the family's canonical shape — `K_M* = Z ⊓ M_σ(M) = Kstar`, trivial swap
+`Z = K ⊔ K_M*`, `K_M* ◁ Z`, `K_M* ≠ ⊥`.  Aligns `M` with the neighbours.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_self_member
+
+/-! **BG 14.7 `n=1` collapse helper** (`S14_TypePCounting`, `le_of_coprime_index`, mmd L4043): if
+`N ◁ G` and `|H|` is coprime to `[G : N]`, then `H ≤ N` (the image of `H` in `G/N` has order `1`).
+Applied with `N = Kᵢ` (normal `σ(Mᵢ)'`-Hall of `Z`) and `H = Kⱼ*` gives `Kⱼ* ≤ Kᵢ`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.le_of_coprime_index
+
+/-! **BG 14.7, unified per-neighbour data** (`S14_TypePCounting`, `exists_neighbor_data`): the single
+per-member source for the family — raw swap factor `K_N* = M_σ(N) ⊓ C(K_N)`, canonical identity
+`K_N* = Z ⊓ M_σ(N)`, `N` type-`P`, `K_N* ≠ ⊥`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_neighbor_data
+
+/-! **BG 14.7, uniform per-member family data** (`S14_TypePCounting`, `typeP_family_member_data`,
+mmd L4003): every member `N` of the type-`P` family (`IsZFamilyMember`: `N = M` or a maximal over
+`N_G(X)` for a line `X ∈ ℰ_p¹(K)`) is a type-`P` maximal containing `Z`, with Hall `κ(N)`-subgroup
+`K_N` realising the swap (raw + canonical `K_N* = Z ⊓ M_σ(N)`, `K_N* ≠ ⊥`).  Case-split
+`typeP_self_member`/`exists_neighbor_data`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_member_data
+
+/-! **BG 14.7, family pairwise nonconjugate** (`S14_TypePCounting`,
+`typeP_family_pairwise_nonconjugate`, mmd L4015): any two distinct `IsZFamilyMember`s are
+nonconjugate (per-member data + `neighbor_pair_nonconjugate`).  Feeds Lemma 14.5(b).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_pairwise_nonconjugate
+
+/-! **BG 14.7, family `Kᵢ*` pairwise disjoint** (`S14_TypePCounting`, `typeP_family_Kstar_disjoint`,
+mmd L4005): for distinct members `N₁ ≠ N₂`, `(Z ⊓ M_σ(N₁)) ⊓ (Z ⊓ M_σ(N₂)) = ⊥` (nonconjugate ⟹
+`σ` disjoint by Thm 13.9 ⟹ `M_σ(N₁) ⊓ M_σ(N₂) = ⊥`).  Pairwise-`⊥` input to the `|T|` count.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_family_Kstar_disjoint
+
+/-! **BG 14.7, type-`P` family as a `Finset`** (`S14_TypePCounting`, `ZFamilyFinset` + `mem_`/
+`_nonempty`): `{N | IsZFamilyMember M K N}` as a `Finset` (`M` always a member).  The index for
+the `|T|` count and density sum.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_ZFamilyFinset
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.ZFamilyFinset_nonempty
 
 /-! **BG Proposition 14.2 support** (`S14_Prop142Support`, Lane F, issue 7000): generic
 `κ`-free conjugation-transport utilities that Proposition 14.2 cites.  `actsPrimeOn_conj`

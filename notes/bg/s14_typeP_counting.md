@@ -1190,3 +1190,198 @@ K=Hall κ + K*=C_{Mσ}(K) のみ依存 (counting 非依存)。density 式 (L4031
   から。Lane G (S15:806 part h consume, S15:816 cyclic consume) は 14.7 landing まで gated。
 - 次の最有力 = M_i family setup (crux=swap 論法 L3999-4001 `Z=K_i×K_i*`) → density → covering →
   Prop 14.2(a) packaging → part(h)。新 leaf S14_Theorem147 は hub split (issue 0069)。
+
+### ✅✅ M_i family setup — swap 論法 COMPLETE + pairwise disjoint K_i* (2026-06-16 loop⁶, 4 commits)
+
+**✅ swap 論法 `Z = K⊔K* = K_i⊔K_i*` COMPLETE** (mmd L3999-4001、M_i family setup の最 intricate 部、
+sorry-free + axiom-clean、full build 3838/~66s)。7 新定理:
+
+- `typeP_normalizer_inf_eq` — **Prop 14.2(b1) を neighbor 用に packaging**: `N_G(X) ⊓ Mi = Ki ⊔ C_{Miσ}(Ki)`
+  (Mi type-P, Ki Hall κ(Mi), X∈ℰ¹ ≤ Ki)。Hall (κ∪σ)' は `hall_E_exists` で内部生成 ⟹ caller は Ki,X のみ供給。
+- `typeP_swap_Z_le` — **swap 方向 ⊆**: `K⊔K* ≤ Ki⊔Ki*`。K-part = K が X*(≤K*) を centralize ⟹ K≤N_G(X*)⊓Mi。
+  K*-part (**swap 本体**) = K* は κ(Mi)-群ゆえ ∃ Hall κ(Mi)-subgroup Ki'⊇K*、`N_G(X*)⊓Mi=Ki'⊔Ki'*=Ki⊔Ki*`
+  は Hall 選択に非依存 ⟹ K*≤Ki'≤Ki⊔Ki*。
+- `normalizer_le_of_maximalSubgroupsContaining_centralizer` — **N_G(X) ≤ M** (mmd L3992「M⊇N_G(X*)」、§13非依存
+  一般補題): `𝓜(C_G(X))={M}` (Prop 14.2c) ⟹ g∈N_G(X) は C_G(X) を共役固定 ⟹ Mᵍ も C_G(X) 含む極大 ⟹ Mᵍ=M
+  (singleton) ⟹ g∈N_G(M)=M (極大自己正規化)。再利用 API = `map_centralizer_eq_of_bijective` /
+  `conj_smul_eq_self_of_mem_normalizer` (OddOrder.GroupTheory, set-normalizer↔conj-fix bridge) /
+  `isCoatom_conj_smul` (S12) / `pointwise_smul_le_pointwise_smul_iff` / `normalizer_eq_self_of_mem_maximalSubgroups`。
+  **🔑 注: このmathlib版は `Subgroup.normalizer : Set G → Subgroup G` (set-normalizer)**。
+- `le_centralizerFactor_of_le_sup_of_le_Msigma` — **σ-projection** (mmd L3999「Xi⊆Ki*」): 直積 Ki×Ki* (Ki=σ'群)
+  内の σ(Mi)-群 X は σ-因子 Ki* に落ちる。`hxKstar` idiom (L2480) の一般化、decomposition x=a·b + a∈Ki⊓Mσ=⊥。
+- `typeP_swap_Z_eq` — **完全等式 K⊔K*=Ki⊔Ki*** (capstone)。⊆=swap_Z_le、⊇=役割交換 (M,K,X*)↔(Mi,Ki,Xi) で
+  swap_Z_le 再適用。⊇ の3前提: (A) Ki⊔Ki*=N_G(X*)⊓Mi≤M [N_G(X*)≤M 経由] / (B) π(Ki*)⊆κ(M)
+  [`typeP_neighbor_kappa`: M は Mi の X* 経由 partner] / (C) Xi⊆Ki* [σ-projection]。
+
+**✅ pairwise disjoint K_i* COMPLETE** (mmd L4005「Prop 14.2(c) applied to each M_i ⟹ K_i*∩K_j*=1」):
+- `typeP_centralizer_singleton` — **Prop 14.2(c) packaging**: Y∈ℰ¹(K*) ⟹ `𝓜(C_G(Y))={M}` (Hall 内部生成)。
+- `typeP_neighbor_Kstar_inf_eq_bot` — **Mi≠Mj type-P ⟹ C_{Miσ}(Ki)⊓C_{Mjσ}(Kj)=⊥**。共通元 → Cauchy で
+  line Y∈ℰ¹(K_i*⊓K_j*) → {Mi}=𝓜(C_G(Y))={Mj} ⟹ Mi=Mj 矛盾。
+
+**▶ 14.7 残ピース** (順に):
+1. **family indexing** (mmd L4003-4015) — Z=K_0*×K_1*×…×K_n* (各 ℰ¹(Z) の line が或る K_i* に居る) +
+   K_i=∏_{j≠i}K_j*。**design lift**: 相異な neighbor M_i の有限族 (K の line 上を走る 𝓜(N_G(X_i)) の distinct ones)
+   を Finset で index 化。swap (`typeP_swap_Z_eq`) + pairwise disjoint (`typeP_neighbor_Kstar_inf_eq_bot`) が building block。
+2. **density arithmetic** (L4031-4045) — T=Z−⋃K_i*、`ncard_conjClassSet_of_isTISubset`(済)+14.5(c)+`half_lt_one_sub_inv_mul`(済)
+   → 全 P1 矛盾 → ∃ P2。
+3. **∃! covering** (L4049-4059, n=1) → typeP_duality close → §15/§16 unblock。
+4. **part(h)** (Prop 14.2(a) packaging + K cyclic、最終)。
+
+### ✅ density 算術背骨 COMPLETE (2026-06-17 loop⁷, 2 commits) — 次 = family indexing (design lift)
+
+**✅ inclusion-exclusion + |T| count** (BG mmd L4031、sorry-free + axiom-clean):
+- `ncard_biUnion_subgroup_add_card` — 単位元のみで交わる n+1 部分群の和集合: `|⋃Sᵢ| + |s| = Σ|Sᵢ| + 1`
+  (各 Sᵢ が |Sᵢ|−1 個の非単位元 [pairwise disjoint] + 共有単位元 1個)。`Finset.Nonempty.cons_induction`、
+  cons step = `ncard_union_add_ncard_inter` + (Sₐ ∩ ⋃ₜ = {1}) + omega。
+- `ncard_sdiff_biUnion_subgroup` — `|Z−⋃Sᵢ| + Σ|Sᵢ| + 1 = |Z| + |s|` (= BG `|T| = z + n − Σk_i*`、s.card=n+1)。
+  inclusion-exclusion + complement `|Z−⋃|+|⋃|=|Z|` (`ncard_diff_add_ncard_of_subset`)。
+
+⟹ **density 算術 (|T| の式) 完成**。Theorem 14.7 step (mmd L4031-4045 の `|𝒞_G(T)|=(z+n−Σk_i*)|G:Z|`) に直結。
+
+### ▶▶ family indexing 設計プラン (次セッションの主タスク、math は完全に詰め済)
+
+**目標**: 族 {M_0=M, M_1,…,M_n} (相異 maximal) + 各 K_i* ≤ Z を Finset 化し、`z = ∏k_i*` / `K_i = ∏_{j≠i}K_j*`
+/ n=1 collapse を確立。building blocks 全て landing 済 (swap=`typeP_swap_Z_eq`, pairwise=`typeP_neighbor_Kstar_inf_eq_bot`,
+density=`ncard_sdiff_biUnion_subgroup`)。
+
+**族モデル**: ℱ : Finset (Subgroup G) = {M} ∪ {𝓜(N_G(X)) : X ∈ ℰ¹(K)} の distinct 群。各 M_i ∈ ℱ に
+K_i* := Z の Hall σ(M_i)-subgroup (= C_{M_iσ}(K_i)、swap で一致、normal in Z ゆえ unique)。choice-heavy
+(各 neighbor で K_i = Hall κ(M_i) ⊇ K*-line を選ぶ) — ここが design lift。
+
+**crux facts (詰め済)**:
+- (α) 各 K_i* = σ(M_i)-Hall of Z: swap `z=|K_i||K_i*|` (K_i=σ(M_i)', K_i*=σ(M_i)) ⟹ |K_i*|=σ(M_i)-part of z。
+- (β) σ(M_i) pairwise disjoint (13.9、nonconjugate)。
+- (γ) coverage: ∀ p|z, p∈σ(M_j) for some j。 p|z=|K||K*|: p|K*⟹p∈σ(M_0); p|K⟹p∈κ(M)⟹line X∈ℰ_p¹(K)の
+  partner M_i で p∈σ(M_i) (`typeP_neighbor_embed`: X≤M_iσ)。
+- ⟹ **z = ∏ k_i*** (pairwise coprime [β] normal Hall pieces、∏|K_i*| = ∏(σ(M_i)-part of z) = z [γ]) +
+  **⊔K_i* = Z** (|⊔|=z)。**K_i = ∏_{j≠i}K_j*** (両方 σ(M_i)'-Hall of Z = unique normal)。
+
+**n=1 collapse**: 全 P1 仮定 → density 不等式 |G^#|≥|𝒞_G(T)|+Σ|𝒞_G(M̃_i)|≥|G| 矛盾 (14.5(c)+`half_lt`+
+`ncard_sdiff_biUnion_subgroup` + T TI [`ncard_conjClassSet_of_isTISubset`、要 N_G(T)=Z]) → ∃ P2 →
+Prop14.2(g): |K_i| 素数 = ∏_{j≠i}k_j* (各 k_j*≥3 odd) ⟹ 単一因子 ⟹ n=1。
+
+**残ピース** (次セッション、順に):
+1. **族 Finset 構築** + per-member K_i* (choice、最も intricate)。
+2. **z = ∏k_i*** + **K_i = ∏_{j≠i}K_j*** (coprime Hall 分解、要 internal product cardinality)。
+3. **T = Z−⋃K_i* が TI + N_G(T)=Z** (Prop 14.2(d) + σ-decomp、`ncard_conjClassSet_of_isTISubset` に接続)。
+4. **density 不等式** → n=1 collapse → Mstar 構築 + covering (`half_lt`)。
+5. **part(h)** (Prop 14.2(a) packaging + K cyclic)。
+- ⟹ `typeP_duality` close → §15/§16 (Lane G) 全下流 unblock。
+
+mechanics: 新 leaf S14_Theorem147 推奨 (hub split issue 0069)。本 loop⁷ landing 10 定理 (swap 7 + density 3)
+は S14 内、すべて sorry-free + axiom-clean + AxiomsCheck 登録。
+
+### ✅ z=∏ ツール + 🔑 canonical K_i* 簡約 (2026-06-17 loop⁷ cont., 2 commits)
+
+**✅ `card_iSup_of_pairwise_commute_coprime`** (z=∏k_i* の核): pairwise commute + pairwise coprime な
+有限部分群族 ⟹ `|⊔Hᵢ| = ∏|Hᵢ|`。mathlib `independent_of_coprime_order` + `noncommPiCoprod`(inj) +
+`ofInjective` + `Nat.card_pi`。⚠ `[Fintype ι]` 必須 (`∏ i`=Finset.univ ゆえ; `[Finite ι]` だと統合失敗)。
+
+**🔑🔑 canonical K_i* = Z ⊓ M_σ(N) (`typeP_neighbor_Kstar_eq_Z_inf_Msigma`) — family を大幅単純化**:
+swap `Z=K_N⊔K_N*` (K_N*=C_{Nσ}(K_N)) の下で **K_N* = (K⊔Kstar) ⊓ M_σ(N)** (=Z の σ(N)-part)。
+⊆: K_N*≤Z (factor) ∧ K_N*≤M_σ(N)。⊇: Z⊓M_σ(N)=(K_N⊔K_N*)⊓M_σ(N) は σ(N)-群 in 直積 ⟹ σ-projection で K_N*。
+⟹ **family の K_i* は N↦Z⊓M_σ(N) で choice-free に定義可** (per-neighbor の Hall κ(N) 選択を index から除去)。
+- pairwise coprime: σ(N)∩σ(N')=∅ (13.9) から直接 (typeP_neighbor_Kstar_inf_eq_bot 不要に簡約可)。
+- pairwise commute: K_i* ⊴ Z (normal、direct factor) から (要 per-neighbor swap)。
+- ⟹ z=∏k_i* (card_iSup) + coverage (∀p|z, p∈σ(M_j)) で ⊔K_i*=Z。
+
+### ▶ family Finset 構築 = 次の主タスク (tools 全て landing、canonical 簡約で de-risk 済)
+
+残り = **族 ℱ ⊆ Finset(Subgroup G) の構築 + per-neighbor swap の threading** (normality 用):
+- ℱ = {M} ∪ {N type-P neighbor}; K_i* := Z⊓M_σ(N) (canonical)。
+- per-neighbor swap package: 各 neighbor N (line X_i∈ℰ¹(K) 由来) で typeP_swap_Z_eq → Z=K_N⊔K_N* → K_N*⊴Z。
+  ⚠ typeP_swap_Z_eq は X_i (K の line、N 生成) と X*(Kstar の line) 両方要 ⟹ 族は K の line で index 化が自然。
+- coverage: p|z ⟹ p∈σ(M_j) (p|K*→σ(M); p|K→κ(M)→line の partner で σ(N)、`typeP_neighbor_embed`)。
+- ⟹ card_iSup で z=∏k_i*、inclusion-exclusion で |T|、TI で |𝒞_G(T)|、density 不等式 → n=1 → Mstar+covering。
+
+本 loop⁷ 累計 12 定理 (swap 7 + density/tools 5: incl-excl, |T|, card_iSup, canonical-K_i*, +)、全 S14 内
+sorry-free + axiom-clean + AxiomsCheck。
+
+### ✅ per-neighbor swap package landing (2026-06-17 loop⁷ cont.²) — family の gateway
+
+**✅ `exists_neighbor_kappaHall_swap`**: type-P M + line X∈ℰ¹(K) + maximal N⊇N_G(X) ⟹ ∃ Hall κ(N)-subgroup
+K_N で **Z=K⊔K*=K_N⊔K_N*** + **canonical K_N*=Z⊓M_σ(N)**。組立 = `typeP_neighbor_embed`/`_kappa` (neighbor
+data) + Cauchy で X*∈ℰ¹(K*) + Hall K_N⊇X* + `typeP_swap_Z_eq` + `typeP_neighbor_Kstar_eq_Z_inf_Msigma`。
+⟹ **per-neighbor の swap + canonical K_N* が 1 call で出る**。族 Finset の各メンバーで呼ぶ foundation。
+
+**▶ 残り family Finset assembly (per-neighbor package で大幅 de-risk)**:
+1. **族 ℱ = {M} ∪ {distinct type-P neighbors}** を Finset 化 (Subgroup G の有限性)。K_i* := Z⊓M_σ(N) (canonical)。
+   各 neighbor で `exists_neighbor_kappaHall_swap` → swap + K_i*⊴Z (direct factor から)。
+2. **coverage** ∀p|z: p|K*→σ(M); p|K→κ(M)→line の partner N で p∈σ(N)。⟹ ⊔K_i*=Z。
+3. **z=∏k_i*** = `card_iSup_of_pairwise_commute_coprime` (commute=⊴Z, coprime=σ-disjoint[13.9], ⊔=Z[coverage])。
+4. **T=Z−⋃K_i* TI** (Prop14.2(d)) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)| → density 不等式
+   (`ncard_sdiff_biUnion_subgroup`済) → n=1 collapse → Mstar+covering → `typeP_duality` close。
+5. **part(h)**。
+
+本 loop⁷ 累計 **13 定理** (swap 7 + density/tools 5 + per-neighbor package 1)、全 S14 内 sorry-free +
+axiom-clean + AxiomsCheck。typeP_duality 残 = family Finset assembly + T-TI + collapse + part(h)。
+
+### ✅ coverage primitive landing (2026-06-17 loop⁷ cont.³) — 14 定理目、family の最後の foundation
+
+**✅ `exists_typeP_neighbor_mem_sigma`**: p prime, p|K ⟹ ∃ type-P neighbor N (¬conj, Z≤N) with **p∈σ(N)**。
+line X∈ℰ_p¹(K) (Cauchy in K) → partner N (`exists_typeP_partner`) → X≤Msigma N → p∈σ(N)。M 自身 (σ-prime 側)
+と合わせて **coverage ⋃σ(M_i)⊇π(Z)** ⟹ ⊔K_i*=Z。
+
+**▶ 残り = family Finset assembly (1 大統合) — 全 foundation 揃った**:
+14.7 の残務は本質的に **1 つの大きな統合証明**:
+1. 族 ℱ={M}∪{neighbors} の Finset 化 (Fintype(Subgroup G)+DecidablePred、または Set.Finite.toFinset)。
+2. per-member K_i*=Z⊓M_σ(N): `exists_neighbor_kappaHall_swap` で swap → K_i*⊴Z (commute); σ-disjoint で coprime;
+   `exists_typeP_neighbor_mem_sigma`+M で coverage ⊔K_i*=Z。
+3. **z=∏k_i*** = `card_iSup_of_pairwise_commute_coprime` (commute+coprime、⊔=Z)。
+4. **T=Z−⋃K_i* TI** (Prop14.2(d)) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)| → density 不等式
+   (`ncard_sdiff_biUnion_subgroup`+14.5(c)+`half_lt`) → **n=1 collapse** (Prop14.2(g): |K_i| 素数=∏_{j≠i}k_j*) →
+   Mstar+covering → `typeP_duality` close。
+5. **part(h)**。
+
+**本 loop⁷ 累計 14 定理** (swap 7 + density/tools 5 + per-neighbor package 1 + coverage 1)、全 S14 内 sorry-free +
+axiom-clean + AxiomsCheck。**14.7 の building block は全て landing**、残りは family Finset の組立統合のみ。
+
+### ✅ pairwise nonconjugate + integration helpers (2026-06-17 loop⁷ cont.⁴) — 18 定理目
+
+**✅ `typeP_family_nonconjugate`** (mmd L4015、族 M_i は pairwise nonconjugate ⟹ 14.5(b) disjoint):
+conjugate なら σ(M₁)=σ(M₂)、Z₁,Z₂ は Z の disjoint normal τ-Halls、z₁z₂∣z=k₁z₁ ⟹ z₂∣k₁ (τ-number ∣
+τ'-number) ⟹ Z₂=⊥ 矛盾。helper: `card_sup_of_commute_of_disjoint` (|H⊔K|=|H||K|, noncommCoprod) +
+`commute_of_le_normalizer_of_disjoint` (A,B⊴Z, ⊓=⊥ ⟹ commute via [x,y]∈A⊓B) + `sup_le_normalizer_inf_of_commute`
+(因子 normality)。
+
+**🔑 整理 (density 論法の精査で判明)**:
+- **n=1 collapse は z=∏ 不要**: |K_i| 素数 + K_i⊴Z (σ(M_i)'-Hall) + K_j*≤K_i (σ(M_i)'-subgroup が normal
+  Hall に入る、π'-subgroup→π-quotient trivial) + coprime ⟹ 高々1つの j≠i ⟹ n=1。(card_iSup は off-path)
+- **coverage (⊔K_i*=Z) も density に不要**: |T|=z+n−Σk_i* は pairwise ⊓=⊥ + ⋃⊆Z のみ (⊔=Z 不要)。
+  covering 結論 (∀ type-P H ~ M or Mstar) は half_lt (>½|G|) の交差論法で、prime-coverage 不要。
+
+**▶ 残り = typeP_duality の最終統合 (大きい、intricate)**:
+1. **族 ℱ Finset** = {M}∪{distinct neighbors}; 各 N で swap (exists_neighbor_kappaHall_swap) + K_N*=Z⊓Msigma N
+   + K_N*⊴Z; pairwise nonconjugate (typeP_family_nonconjugate)。M は i=0 (K_M*=Kstar, canonical bridge)。
+2. **T=Z−⋃K_i* TI + N_G(T)=Z** (Prop14.2(d) + 14.6 で T∩M̃_i=∅) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)|。
+3. **density 不等式** (`ncard_sdiff_biUnion_subgroup` |T| + swap z=k_i k_i* + 14.5(c) + 14.5(b) disjoint +
+   14.6 で 𝒞_G(T)⊥𝒞_G(M̃_i)) → 全 P1 矛盾 → ∃ P2。
+4. **n=1 collapse** (normality + K_j*≤K_i + coprime) → Mstar。
+5. **covering** (half_lt 交差) + **part(h)** (Prop14.2(a) + K cyclic)。
+
+**本 loop⁷ 累計 18 定理**、全 S14 内 sorry-free + axiom-clean + AxiomsCheck。typeP_duality の building block +
+integration helper は全て landing、残りは族 Finset 上の counting 統合 (最終 endgame、~200行)。
+
+### ✅ 族インフラ完成 (2026-06-17 loop⁷ /loop自走、26 定理+1def) — 残り = counting endgame
+
+**/loop dynamic mode で 8 イテレーション自走、全 green + axiom-clean (一発通過多数)**:
+- per-neighbor: `exists_neighbor_kappaHall_swap_normal` / `exists_neighbor_full` / `exists_neighbor_data`
+  (raw swap + canonical K_N*=Z⊓Msigma N + ⊴Z + type-P + K_N*≠⊥ を 1 call)
+- M (i=0): `typeP_self_member` (K_M*=Kstar、同形)
+- **族述語 + 統一データ**: `IsZFamilyMember M K N` (def) + `typeP_family_member_data` (∀メンバーの統一データ)
+- **pairwise 非共役**: `neighbor_pair_nonconjugate` (per-pair) + `typeP_family_pairwise_nonconjugate` (∀メンバー)
+- collapse helper: `le_of_coprime_index` (N⊴G, |H| coprime [G:N] ⟹ H≤N)
+- factor normality `sup_le_normalizer_inf_of_commute` / `card_sup_of_commute_of_disjoint` /
+  `commute_of_le_normalizer_of_disjoint`
+
+**▶ 残り = counting endgame (intricate, 相互依存)**:
+1. **族 Finset** (Set.Finite.toFinset, IsZFamilyMember から) — 軽い wrapping。
+2. **T=Z−⋃K_i* TI + N_G(T)=Z** — 🔴 hard: 各 i で Z=K_i×K_i* (swap) の per-i decomposition + Prop14.2(d)。
+   t∈T ⟺ ∃i, t=y y' (y∈K_i*#, y'∈K_i#)。σ-decomposition の per-i 構造が要。
+3. **|M_i|≥2z** — Z<M_i (proper) を要す: Msigma M_i ⊋ K_i*=Z⊓Msigma M_i (σ(M_i) が π(z) に収まらない)。要論証。
+4. **density 不等式** — |𝒞_G(T)|=|T|[G:Z] (TI count) + |𝒞_G(M̃_i)|=(|M_iσ|−1)[G:M_i] (14.5c済) +
+   14.5(b)済 disjoint + 14.6 (T∩M̃_i=∅) で 𝒞_G(T)⊥𝒞_G(M̃_i) → Σ≥|G| 矛盾 (算術は 1+(n−1)/(2z)≥1、trivial)。
+5. **n=1 collapse** (le_of_coprime_index + |K_i| 素数 [Prop14.2(g)] + pairwise coprime) → Mstar。
+6. **covering** (half_lt 交差) + **part(h)** (Prop14.2(a) + K cyclic)。
+
+⚠ endgame は helper grinding と違い相互依存・σ-decomposition が subtle。loop で進めるが blocker は document。
