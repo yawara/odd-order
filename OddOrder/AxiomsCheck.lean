@@ -4970,6 +4970,17 @@ arbitrary `H`.  Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_zTilde_conjClass_gt_half_of_isTypeP
 
+/-! **BG Theorem 14.7 covering, the `σ`-part matching** (`S14_TypePCounting`,
+`exists_inf_ne_bot_of_mem_zTilde_inter`, with helper `isPiElement_mem_right_of_commute`): if `t`
+lies in both `Ẑ_M = (K ⊔ K*) − (K ∪ K*)` and `L ⊔ L*` but not in `L` (the two coprime
+direct-product `σ`-structures), then `L*` meets one of `K`, `K*` nontrivially — BG's
+"`T ∩ S ≠ ∅ ⟹ L* ∩ Kᵢ* ≠ 1`".  The `σ(H)`-part of `t` lands in `L*`, and its `σ(M)`- and
+`σ(M)′`-parts (powers of it, so in `L*`) lie in `K*` and `K`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_mem_right_of_commute
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_inf_ne_bot_of_mem_zTilde_inter
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
