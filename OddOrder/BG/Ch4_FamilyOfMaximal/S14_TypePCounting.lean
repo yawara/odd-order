@@ -5537,6 +5537,60 @@ theorem typeP_family_T_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU
     (mem_ZFamilyFinset.mp hN₁) (mem_ZFamilyFinset.mp hN₂) hne
 
+/-- **BG 14.7, each family factor `Kᵢ* ◁ Z`** (mmd L3995 "`N_{M_i}(X*) = K_i × K_i*`"): every member
+`N` of the type-`P` family has its canonical factor `Z ⊓ M_σ(N)` normalised by all of `Z = K ⊔ K*`.
+For `N = M` this is `typeP_self_member`; for a neighbour it is the normality clause of
+`exists_neighbor_full`.  Feeds the `Z`-stability of `T` (`hstab` for the TI count). -/
+theorem typeP_family_member_normal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    K ⊔ Kstar ≤ Subgroup.normalizer
+      (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+  rcases hN with hNM | ⟨p, X, hp, hX, hXK, hN⟩
+  · rw [hNM]; exact (typeP_self_member hG hM hP hKM hK hKstar hU).2.2.1
+  · haveI : Fact p.Prime := ⟨hp⟩
+    have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
+      intro hbot
+      refine (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (le_bot_iff.mp ?_)
+      rw [hKstar]
+      calc OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+          ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) :=
+            inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK))
+        _ = ⊥ := hbot
+    obtain ⟨_, _, _, _, hnorm, _, _⟩ :=
+      exists_neighbor_full hG hM hP hKM hK hKstar hU hX hXK hCX hN
+    exact hnorm
+
+/-- **BG 14.7, `Z` normalises `T`** (mmd L4029, "`N_G(T) = Z`" half — the easy `Z ≤ N_G(T)` part):
+conjugation by any `l ∈ Z = K ⊔ K*` fixes the set `T = Z − ⋃_{N} (Z ⊓ M_σ(N))`, because `l`
+normalises `Z` (self-normalisation) and each canonical factor `Z ⊓ M_σ(N)`
+(`typeP_family_member_normal`).  This is the `hstab` hypothesis of
+`ncard_conjClassSet_of_isTISubset` once `T` is shown to be a TI-subset. -/
+theorem typeP_family_Z_normalizes_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∀ l ∈ K ⊔ Kstar, MulAut.conj l •
+        (((K ⊔ Kstar : Subgroup G) : Set G) \
+          ⋃ N ∈ ZFamilyFinset M K,
+            (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
+      = ((K ⊔ Kstar : Subgroup G) : Set G) \
+          ⋃ N ∈ ZFamilyFinset M K,
+            (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+  intro l hl
+  rw [Set.smul_set_sdiff, Set.smul_set_iUnion₂]
+  congr 1
+  · rw [← Subgroup.coe_pointwise_smul,
+      conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hl)]
+  · refine Set.iUnion₂_congr (fun N hN => ?_)
+    rw [← Subgroup.coe_pointwise_smul,
+      conj_smul_eq_self_of_mem_normalizer
+        (typeP_family_member_normal hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN) hl)]
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
